@@ -2014,8 +2014,23 @@ static errr Term_pict_x11(int x, int y, int n, const byte *ap, const char *cp, c
 		x2 = (tc&0x7F) * td->fnt->wid;
 		y2 = (ta&0x7F) * td->fnt->hgt;
 
+		/* Illegal tile index */
+		if (td->tiles->width < x1 + td->fnt->wid ||
+		    td->tiles->height < y1 + td->fnt->hgt)
+		{
+			/* Draw black square */
+			XFillRectangle(Metadpy->dpy, td->win->win, clr[0]->gc,
+				       x, y, 
+				       td->fnt->wid - 1, td->fnt->hgt - 1);
+
+			/* Skip drawing tile */
+			continue;
+		}
+
 		/* Optimise the common case */
-		if ((x1 == x2) && (y1 == y2))
+		if ((x1 == x2 && y1 == y2) ||
+		    td->tiles->width < x2 + td->fnt->wid ||
+		    td->tiles->height < y2 + td->fnt->hgt)
 		{
 			/* Draw object / terrain */
 			XPutImage(Metadpy->dpy, td->win->win,
