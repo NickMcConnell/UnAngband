@@ -526,7 +526,7 @@ static void wr_extra(void)
 
 	u16b tmp16u;
 
-	if (!variant_more_spells) max_spells = 64;
+	if (!variant_study_more) max_spells = 64;
 
 	wr_string(op_ptr->full_name);
 

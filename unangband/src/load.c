@@ -899,7 +899,7 @@ static errr rd_extra(void)
 
 	int max_spells = PY_MAX_SPELLS;
 
-	if (!variant_more_spells) max_spells = 64;
+	if (!variant_study_more) max_spells = 64;
 
 	rd_string(op_ptr->full_name, 32);
 

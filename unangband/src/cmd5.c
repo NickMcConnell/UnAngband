@@ -562,7 +562,7 @@ void do_cmd_study(void)
 
 	int max_spells = PY_MAX_SPELLS;
 
-	if (!variant_more_spells) max_spells = 64;
+	if (!variant_study_more) max_spells = 64;
 
 	/* Cannot cast spells if illiterate */
 	if (c_info[p_ptr->pclass].spell_first > 50)

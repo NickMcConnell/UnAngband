@@ -1562,7 +1562,7 @@ static void calc_spells(void)
 	int max_spells = PY_MAX_SPELLS;
 	cptr p;
 
-	if (!variant_more_spells) max_spells = 64;
+	if (!variant_study_more) max_spells = 64;
 
 	/* Hack --- We don't know which book it comes from */
 	switch (c_info[p_ptr->pclass].spell_stat)

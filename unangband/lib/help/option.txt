@@ -841,6 +841,11 @@ Limit power of summoning
     incompatible with vanilla Angband.
 
 ***** <variant_more_spells>
+Allow more than 256 kind of spells
+    Without this option, the savefile cannot hold memories for newer
+    spells which have spell-number 257 or higher.
+
+***** <variant_study_more>
 Learn more than 64 spells
     The character is not limited to 64 spells: instead their spell stat
     gives the only upper limit as to how many spells they may learn.  This

@@ -1458,7 +1458,7 @@ const cptr option_text[OPT_MAX] =
 	"variant_save_feats",		   /* xxx */
 	"view_glowing_lite",			/* xxx */
 	"view_surface_lite",			/* OPT_view_surface_lite */
-	NULL,						/* xxx */
+	"variant_study_more",		   /* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
@@ -1722,7 +1722,7 @@ const cptr option_desc[OPT_MAX] =
 	"Save new features in save-file",			/* xxx */
 	"Use special colours for glowing lite (slow)",	/* OPT_view_glowing_lite */
 	"Use special colours for surface lite",		/* OPT_view_surface_lite */
-	NULL,										/* xxx */
+	"Learn more than 64 spells",										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
@@ -1762,7 +1762,7 @@ const cptr option_desc[OPT_MAX] =
 	"Move faster but get tired",									   /* xxx */
 	"Limit power of summoning",									   /* xxx */
 	"Generate friendly uniques",									   /* xxx */
-	"Learn more than 64 spells",									   /* xxx */
+	"Allow more than 256 kind of spells",									   /* xxx */
 	"Monsters drop corpses",									   /* xxx */
 	"Birth: Allow purchase of stats using points",	/* OPT_birth_point_based */
 	"Birth: Allow specification of minimal stats",	/* OPT_birth_auto_roller */
@@ -1986,7 +1986,7 @@ const bool option_norm[OPT_MAX] =
 	TRUE,	  /* OPT_variant_save_feats */
 	FALSE,		/* OPT_view_glowing_lite */
 	FALSE,		/* OPT_view_surface_lite */
-	FALSE,		/* xxx */
+	TRUE,	  /* OPT_variant_study_more */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
@@ -2377,9 +2377,9 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_variant_fast_moves,
 		OPT_variant_unsummon,
 		OPT_variant_more_spells,
+		OPT_variant_study_more,
 		OPT_variant_drop_body,
 		OPT_variant_save_feats,
-		255,
 		255,
 		255,
 		255,

@@ -442,7 +442,7 @@
 /*
  * Maximum number of players spells
  */
-#define PY_MAX_SPELLS 64
+#define PY_MAX_SPELLS 128
 
 
 /*
@@ -3290,6 +3290,7 @@
 #define OPT_variant_save_feats   83
 #define OPT_view_glowing_lite 84
 #define OPT_view_surface_lite 85
+#define OPT_variant_study_more   86
 /* xxx xxx */
 #define OPT_birth_point_based    (OPT_BIRTH+0)
 #define OPT_birth_auto_roller    (OPT_BIRTH+1)
@@ -3524,6 +3525,7 @@
 #define variant_more_spells op_ptr->opt[OPT_variant_more_spells]
 #define variant_drop_body op_ptr->opt[OPT_variant_drop_body]
 #define variant_save_feats op_ptr->opt[OPT_variant_save_feats]
+#define variant_study_more op_ptr->opt[OPT_variant_study_more]
 
 
 
