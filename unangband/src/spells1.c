@@ -70,6 +70,9 @@ void teleport_away(int m_idx, int dis)
 			/* Require safe location for monster */
 			if (!place_monster_here(ny, nx, m_ptr->r_idx)) continue;
 
+			/* Don't allow teleporting into other monster or player */
+			if (cave_m_idx[ny][nx]) continue;
+
 			/* Hack -- no teleport onto glyph of warding */
 			if (f_info[cave_feat[ny][nx]].flags1 & (FF1_GLYPH)) continue;
 
