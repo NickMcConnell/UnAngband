@@ -55,6 +55,9 @@ look and act like real waves.
 - Doors and other wooden objects now cause persistent fires, which can be
 put out by bashing them.
 
+- Teleport is now a lot safer to use. You will not be placed in potentially
+dangerous grids.
+
 ### User Interface ###
 
 - Added ability to create html screen dumps similar to T.O.M.E. This can 
