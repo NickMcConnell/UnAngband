@@ -1,7 +1,7 @@
 
 
               **************************************************
-              **  UnAngband 0.5.2  **    The Unnamed Angband  **
+              **  UnAngband 0.5.2a **    The Unnamed Angband  **
               **************************************************
 
            Based on Moria:   Copyright (c) 1985 Robert Alan Koeneke
@@ -16,7 +16,7 @@
 		UnAngband 0.1.0 - 0.5.2 by Andrew Doull
 
      Send comments, bug reports, and patches, to "andrewdoull@hotmail.com"
-       Visit the Angband Home Page at "http://thangorodrim.angband.org/"
+       Visit the Angband Home Page at "http://unangband.berlios.de/"
       Browse the Angband newsgroup at "news:rec.games.roguelike.angband"
     Read the online help files, especially "general.txt" and "version.txt"
    Angband is available for Unix, X11, DOS, Windows, Macintosh, Amiga, etc.

@@ -15,6 +15,8 @@ still using the flavour attr/char mapping. This for instance allows you
 to colour all 'bad' potions/scrolls/etc. dark grey so that you don't
 attempt to get them.
 
+- Added reference to new web site at http://unangband.berlios.de.
+
 ### Build / Platform ###
 
 - Removed use of 'near' member of structure as used as a reserved
