@@ -34,6 +34,9 @@ are unaffected (Bug 682).
 
 - Handle being stuck inside terrain correctly in all instances (Bug 807).
 
+- Fixed spurious and incorrect messages when monster hits player trap (Bug
+808).
+
 
 
 ### Build / Platform ###

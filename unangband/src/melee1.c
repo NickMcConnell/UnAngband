@@ -769,17 +769,9 @@ void mon_hit_trap(int m_idx, int y, int x)
 							/* No negative damage */
 							if (k < 0) k = 0;
 
-							/* Trap description */
-							msg_format("%^s hits you.",o_name);
-
 							/* Damage, check for fear and death */
 							(void)mon_take_hit(cave_m_idx[y][x], k, &fear, NULL);
 
-						}
-						else
-						{
-							/* Trap description */
-							msg_format("%^s narrowly misses you.",o_name);
 						}
 
 						/* Get local object */
@@ -838,9 +830,6 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 					/* No negative damage */
 					if (k < 0) k = 0;
-
-					/* Trap description */
-					msg_format("%^s hits you.",o_name);
 
 					/* Damage, check for fear and death */
 					(void)mon_take_hit(cave_m_idx[y][x], k, &fear, NULL);
