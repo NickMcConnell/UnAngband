@@ -1703,7 +1703,7 @@ void move_player(int dir, int jumping)
 		name = (f_name + f_info[mimic].name);
 
 		/* Tell the player */
-		msg_format("There is &s%s blocking your way.",
+		msg_format("There is %s%s blocking your way.",
 			((f_ptr->flags2 & (FF2_FILLED)) ? "" :
 			(is_a_vowel(name[0]) ? "an " : "a ")),name);
 		}
