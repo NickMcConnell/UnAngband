@@ -746,6 +746,17 @@ void do_cmd_destroy(void)
 
 	}
 
+	/* Cursed equipments cannot be destroyed */
+	if ((item >= INVEN_WIELD) && cursed_p(o_ptr))
+	{
+		/* Message */
+		msg_format("The %s you are %s appears to be cursed.",
+		           o_name, describe_use(item));
+
+		/* Done */
+		return;
+	}
+
 	/* Message */
 	msg_format("You destroy %s.", o_name);
 
