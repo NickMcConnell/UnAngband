@@ -1920,14 +1920,14 @@ static void do_cmd_walk_or_jump(int jumping)
 	if (stuck_player(&dir))
 	{
 		/* Get the mimiced feature */
-		int mimic = f_ptr->mimic;
+		int mimic = f_info[cave_feat[py][px]].mimic;
 
 		/* Get the feature name */
 		cptr name = (f_name + f_info[mimic].name);
 
 		/* Tell the player */
 		msg_format("You are stuck %s%s.",
-			((f_ptr->flags2 & (FF2_FILLED)) ? "" :
+			((f_info[mimic].flags2 & (FF2_FILLED)) ? "" :
 				(is_a_vowel(name[0]) ? "inside an " : "inside a ")),name);
 	}
 
@@ -2006,8 +2006,7 @@ void do_cmd_run(void)
 	/* Hack -- handle stuck players */
 	if (stuck_player(&dir))
 	{
-		/* Get the mimiced feature */
-		int mimic = f_ptr->mimic;
+		int mimic = f_info[cave_feat[py][px]].mimic;
 
 		/* Get the feature name */
 		cptr name = (f_name + f_info[mimic].name);
@@ -2017,7 +2016,7 @@ void do_cmd_run(void)
 
 		/* Tell the player */
 		msg_format("You are stuck %s%s.",
-			((f_ptr->flags2 & (FF2_FILLED)) ? "" :
+			((f_info[mimic].flags2 & (FF2_FILLED)) ? "" :
 				(is_a_vowel(name[0]) ? "inside an " : "inside a ")),name);
 	}
 

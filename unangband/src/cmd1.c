@@ -1531,7 +1531,7 @@ bool stuck_player(int *dir)
 	cptr name;
 
 	/* Hack -- allowed to move nowhere */
-	if (dir == 5) return (FALSE);
+	if ((!*dir) || (*dir == 5)) return (FALSE);
 
 	/* Player can not walk through "walls" */
 	if (!(f_ptr->flags1 & (FF1_MOVE))
