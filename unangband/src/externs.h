@@ -282,11 +282,7 @@ extern bool los(int y1, int x1, int y2, int x2);
 extern bool no_lite(void);
 extern bool cave_valid_bold(int y, int x);
 extern bool feat_supports_lighting(byte feat);
-#ifdef USE_TRANSPARENCY
 extern void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp);
-#else /* USE_TRANSPARENCY */
-extern void map_info(int y, int x, byte *ap, char *cp);
-#endif /* USE_TRANSPARENCY */
 extern void move_cursor_relative(int y, int x);
 extern void print_rel(char c, byte a, int y, int x);
 extern void note_spot(int y, int x);
@@ -577,6 +573,7 @@ extern bool make_head(object_type *j_ptr, int r_idx);
 extern bool make_part(object_type *j_ptr, int r_idx);
 extern bool make_skin(object_type *j_ptr, int r_idx);
 extern bool make_feat(object_type *j_ptr, int feat);
+extern void place_trapped_door(int y, int x);
 extern s16b floor_carry(int y, int x, object_type *j_ptr);
 extern void race_near(int r_idx, int y1, int x1);
 extern void drop_near(object_type *j_ptr, int chance, int y, int x);

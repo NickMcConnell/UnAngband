@@ -1200,7 +1200,7 @@ void update_mon(int m_idx, bool full)
  */
 		/* Normal line of sight, and not blind */
 		if ((!p_ptr->blind) && ((player_has_los_bold(fy, fx) || (surface && outside && (m_ptr->mflag & (MFLAG_OVER)))))
-			&& !(surface && !outside && (m_ptr->mflag & (MFLAG_OVER)) && !(f_info[cave_feat[y][x]].flags3 & FF3_EASY_CLIMB) ))
+			&& !(surface && !outside && (m_ptr->mflag & (MFLAG_OVER)) && !(f_info[cave_feat[fy][fx]].flags3 & FF3_EASY_CLIMB) ))
 		{
 			bool do_invisible = FALSE;
 			bool do_cold_blood = FALSE;

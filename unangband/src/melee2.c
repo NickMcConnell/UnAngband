@@ -3962,7 +3962,7 @@ bool make_attack_spell(int m_idx)
 	if (m_ptr->mflag & (MFLAG_NICE)) return (FALSE);
 
 	/* Cannot cast spells */
-	if (!r_ptr->freq_spell && !r_ptr->freq_innate) return;
+	if (!r_ptr->freq_spell && !r_ptr->freq_innate) return (FALSE);
 
 	/* Sometimes allow spells) */
 	if (rand_int(100) < r_ptr->freq_spell) allow_spell = TRUE;
@@ -3971,7 +3971,7 @@ bool make_attack_spell(int m_idx)
 	if (rand_int(100) < r_ptr->freq_innate) allow_innate = TRUE;
 
 	/* Cannot use abilities */
-	if (!allow_spell && !allow_innate) return;
+	if (!allow_spell && !allow_innate) return (FALSE);
 
 	/* Hack -- require in range player */
 	if (normal)

@@ -5276,10 +5276,9 @@ void place_chest(int y, int x)
  */
 void pick_door(int y, int x)
 {
+	int feat = cave_feat[y][x];
 
-	int feat= cave_feat[y][x];
-
-	if (feat == FEAT_TRAP) place_trapped_door(y,x);
+	if (feat == FEAT_DOOR_INVIS) place_trapped_door(y,x);
 	else if (feat == FEAT_SECRET) place_secret_door(y,x);
 	else place_jammed_door(y,x);
 }
@@ -5488,8 +5487,8 @@ void place_trapped_door(int y, int x)
 {
 	int feat;
 
-	/*Set the hook */
-	get_feat_num_hook = vault_locked_door;
+	/* Set the hook */
+	get_feat_num_hook = vault_trapped_door;
 
 	get_feat_num_prep();
 

@@ -4778,6 +4778,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 
 				(void)set_confused(p_ptr->confused + randint(20) + 10);
 			}
+
 			take_hit(dam, killer);
 			break;
 		}
@@ -4787,12 +4788,12 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			if (fuzzy) msg_print("You are hit by something!");
 
 			/* Take damage */
-			take_hit(damage, killer);
+			take_hit(dam, killer);
 
 			/* Increase "image" */
 			if (!p_ptr->resist_chaos)
 			{
-				if (set_image(p_ptr->image + 3 + randint(rlev / 2)))
+				if (set_image(p_ptr->image + 3 + randint(dam / 2)))
 				{
 					obvious = TRUE;
 				}
@@ -5007,7 +5008,9 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		case GF_ICE:
 		{
 			if (fuzzy) msg_print("You are hit by something sharp!");
-			cold_dam(dam, killer);
+
+			cold_dam(dam, killer, TRUE);
+
 			if (!p_ptr->resist_shard)
 			{
 				/* Always notice */
