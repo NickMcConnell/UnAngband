@@ -2162,7 +2162,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 				else if ((target < 0) || ((target ==0) && (known))) msg_format("%^s casts a stinking cloud.", m_name);
 				else if (known) msg_format("%^s casts a stinking cloud at %s.", m_name, t_name);
 
-				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+				flg = PROJECT_KILL;
 
 				/* Determine the radius of the blast */
 				rad = (r_ptr->flags2 & (RF2_POWERFUL)) ? 3 : 2;
