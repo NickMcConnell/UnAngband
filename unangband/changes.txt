@@ -5,6 +5,8 @@
 - Added Triple tile mode, which is like Double tile mode, but intended for
 use with David Gervais' 54x54 graphics tiles (As 54 is not divisible by 4).
 
+- Improve scrolling when setting visuals.
+
 Unangband 0.5.5: "New Years Resolution"
 
 ### Game Play ###

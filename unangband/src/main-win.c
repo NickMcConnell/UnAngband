@@ -2581,19 +2581,18 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 
 				if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_display))
 				{ 
-
 					/* Mask out the terrain */
 					BitBlt(hdc, x2, y2, tw2, th2, hdcMask, x3, y3, SRCAND);
 
 					/* Draw the terrain */
 					BitBlt(hdc, x2, y2, tw2, th2, hdcSrc, x3, y3, SRCPAINT);
+
 				}
 				else
 				{
 					/* Copy the terrain picture from the bitmap to the window */
 					BitBlt(hdc, x2, y2, tw2, th2, hdcSrc, x3, y3, SRCCOPY);
 				}
-
 
 				/* Only draw if terrain and overlay are different */
 				if ((x1 != x3) || (y1 != y3))
@@ -2612,8 +2611,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 				/* Set the correct mode for stretching the tiles */
 				SetStretchBltMode(hdc, COLORONCOLOR);
 
-
-				if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) || (td->grid_display))
+				if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_display))
 				{ 
 					/* Mask out the terrain */
 					StretchBlt(hdc, x2, y2, tw2, th2, hdcMask, x3, y3, w1, h1, SRCAND);

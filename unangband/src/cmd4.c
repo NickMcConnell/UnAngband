@@ -3173,8 +3173,8 @@ static cptr monster_group_char[] =
 	"I",
 	"j",
 	"K",
-	"M",
 	"L",
+	"M",
 	"$!?=.|~[]",
 	"m",
 	",",
@@ -4013,6 +4013,25 @@ static bool visual_mode_command(char ch, bool *visual_list_ptr,
 	static byte attr_old = 0;
 	static char char_old = 0;
 
+	int frame_left = 10;
+	int frame_right = 10;
+	int frame_top = 4;
+	int frame_bottom = 4;
+
+	if (use_trptile) frame_left /= (use_bigtile ? 6 : 3);
+	else if (use_dbltile) frame_left /= (use_bigtile ? 4 : 2);
+	else if (use_bigtile) frame_left /= 2;
+
+	if (use_trptile) frame_right /= (use_bigtile ? 6 : 3);
+	else if (use_dbltile) frame_right /= (use_bigtile ? 4 : 2);
+	else if (use_bigtile) frame_right /= 2;
+
+	if (use_trptile) frame_top /= 3;
+	else if (use_dbltile) frame_top /= 2;
+
+	if (use_trptile) frame_bottom /= 3;
+	else if (use_dbltile) frame_bottom /= 2;
+
 	switch (ch)
 	{
 	case ESCAPE:
@@ -4045,8 +4064,8 @@ static bool visual_mode_command(char ch, bool *visual_list_ptr,
 		{
 			*visual_list_ptr = TRUE;
 
-			*attr_top_ptr = (byte)MAX(0, (int)*cur_attr_ptr - 5);
-			*char_left_ptr = (char)MAX(-128, (int)*cur_char_ptr - 10);
+			*attr_top_ptr = (byte)MAX(0, (int)*cur_attr_ptr - frame_top);
+			*char_left_ptr = (char)MAX(-128, (int)*cur_char_ptr - frame_left);
 
 			attr_old = *cur_attr_ptr;
 			char_old = *cur_char_ptr;
@@ -4069,14 +4088,14 @@ static bool visual_mode_command(char ch, bool *visual_list_ptr,
 		{
 			/* Set the char */
 			*cur_attr_ptr = attr_idx;
-			*attr_top_ptr = (byte)MAX(0, (int)*cur_attr_ptr - 5);
+			*attr_top_ptr = (byte)MAX(0, (int)*cur_attr_ptr - frame_top);
 		}
 
 		if (char_idx)
 		{
 			/* Set the char */
 			*cur_char_ptr = char_idx;
-			*char_left_ptr = (char)MAX(-128, (int)*cur_char_ptr - 10);
+			*char_left_ptr = (char)MAX(-128, (int)*cur_char_ptr - frame_left);
 		}
 
 		return TRUE;
@@ -4089,7 +4108,7 @@ static bool visual_mode_command(char ch, bool *visual_list_ptr,
 			byte a = *cur_attr_ptr;
 			char c = *cur_char_ptr;
 
-			if (use_dbltile) eff_width = width / (use_bigtile ? 6 : 3);
+			if (use_trptile) eff_width = width / (use_bigtile ? 6 : 3);
 			else if (use_dbltile) eff_width = width / (use_bigtile ? 4 : 2);
 			else if (use_bigtile) eff_width = width / 2;
 			else eff_width = width;
@@ -4113,10 +4132,10 @@ static bool visual_mode_command(char ch, bool *visual_list_ptr,
 
 
 			/* Move the frame */
-			if ((ddx[d] < 0) && *char_left_ptr > MAX(-128, (int)c - 10)) (*char_left_ptr)--;
-			if ((ddx[d] > 0) && *char_left_ptr + eff_width < MIN(127, (int)c + 10)) (*char_left_ptr)++;
-			if ((ddy[d] < 0) && *attr_top_ptr > MAX(0, (int)a - 4)) (*attr_top_ptr)--;
-			if ((ddy[d] > 0) && *attr_top_ptr + eff_height < MIN(255, (int)a + 4)) (*attr_top_ptr)++;
+			if ((ddx[d] < 0) && *char_left_ptr > MAX(-128, (int)c - frame_left)) (*char_left_ptr)--;
+			if ((ddx[d] > 0) && *char_left_ptr + eff_width < MIN(127, (int)c + frame_right)) (*char_left_ptr)++;
+			if ((ddy[d] < 0) && *attr_top_ptr > MAX(0, (int)a - frame_top)) (*attr_top_ptr)--;
+			if ((ddy[d] > 0) && *attr_top_ptr + eff_height < MIN(255, (int)a + frame_bottom)) (*attr_top_ptr)++;
 			return TRUE;
 		}
 				
