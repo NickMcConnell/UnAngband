@@ -32,6 +32,8 @@ are unaffected (Bug 682).
 
 - Improved support for advanced lighting features in graphics mode (Bug 779).
 
+- Handle being stuck inside terrain correctly in all instances (Bug 807).
+
 
 
 ### Build / Platform ###

@@ -747,6 +747,9 @@ void do_cmd_open(void)
 	/* Get a direction (or abort) */
 	if (!get_rep_dir(&dir)) return;
 
+	/* Hack -- Apply stuck */
+	stuck_player(&dir);
+
 	/* Get location */
 	y = py + ddy[dir];
 	x = px + ddx[dir];
@@ -759,8 +762,8 @@ void do_cmd_open(void)
 	/* Take a turn */
 	p_ptr->energy_use = 100;
 
-	/* Apply stuck / confusion */
-	if (stuck_player(&dir) || confuse_dir(&dir))
+	/* Apply confusion */
+	if (dir && confuse_dir(&dir))
 	{
 		/* Get location */
 		y = py + ddy[dir];
@@ -891,6 +894,9 @@ void do_cmd_close(void)
 	/* Get a direction (or abort) */
 	if (!get_rep_dir(&dir)) return;
 
+	/* Hack -- Apply stuck */
+	stuck_player(&dir);
+
 	/* Get location */
 	y = py + ddy[dir];
 	x = px + ddx[dir];
@@ -902,7 +908,7 @@ void do_cmd_close(void)
 	p_ptr->energy_use = 50;
 
 	/* Apply stuck / confusion */
-	if (stuck_player(&dir) || confuse_dir(&dir))
+	if (dir && confuse_dir(&dir))
 	{
 		/* Get location */
 		y = py + ddy[dir];
@@ -1139,13 +1145,14 @@ void do_cmd_tunnel(void)
 	p_ptr->energy_use = 100;
 
 	/* Apply confusion */
-	if (confuse_dir(&dir))
+	if (dir && confuse_dir(&dir))
 	{
 		/* Get location */
 		y = py + ddy[dir];
 		x = px + ddx[dir];
 
 	}
+
 	/* Allow repeated command */
 	if (p_ptr->command_arg)
 	{
@@ -1321,6 +1328,9 @@ void do_cmd_disarm(void)
 	/* Get a direction (or abort) */
 	if (!get_rep_dir(&dir)) return;
 
+	/* Hack -- Apply stuck */
+	stuck_player(&dir);
+
 	/* Get location */
 	y = py + ddy[dir];
 	x = px + ddx[dir];
@@ -1334,7 +1344,7 @@ void do_cmd_disarm(void)
 	p_ptr->energy_use = 100;
 
 	/* Apply stuck / confusion */
-	if (stuck_player(&dir) || confuse_dir(&dir))
+	if (dir && confuse_dir(&dir))
 	{
 		/* Get location */
 		y = py + ddy[dir];
@@ -1528,6 +1538,9 @@ void do_cmd_bash(void)
 	/* Get a direction (or abort) */
 	if (!get_rep_dir(&dir)) return;
 
+	/* Hack -- Apply stuck */
+	stuck_player(&dir);
+
 	/* Get location */
 	y = py + ddy[dir];
 	x = px + ddx[dir];
@@ -1541,7 +1554,7 @@ void do_cmd_bash(void)
 	p_ptr->energy_use = 100;
 
 	/* Apply confusion */
-	if (stuck_player(&dir) || confuse_dir(&dir))
+	if (dir && confuse_dir(&dir))
 	{
 		/* Get location */
 		y = py + ddy[dir];
@@ -1634,7 +1647,7 @@ void do_cmd_alter(void)
 	p_ptr->energy_use = 100;
 
 	/* Apply confusion */
-	if (confuse_dir(&dir))
+	if (dir && confuse_dir(&dir))
 	{
 		/* Get location */
 		y = py + ddy[dir];
@@ -1807,6 +1820,9 @@ void do_cmd_set_trap_or_spike(void)
 	/* Get a direction (or abort) */
 	if (!get_rep_dir(&dir)) return;
 
+	/* Hack -- Apply stuck */
+	stuck_player(&dir);
+
 	/* Get location */
 	y = py + ddy[dir];
 	x = px + ddx[dir];
@@ -1823,7 +1839,7 @@ void do_cmd_set_trap_or_spike(void)
 
 
 	/* Apply stuck / confusion */
-	if (stuck_player(&dir) || confuse_dir(&dir))
+	if (dir && confuse_dir(&dir))
 	{
 		/* Get location */
 		y = py + ddy[dir];

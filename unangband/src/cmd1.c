@@ -1963,10 +1963,6 @@ bool stuck_player(int *dir)
 
 	feature_type *f_ptr = &f_info[cave_feat[py][px]];
 
-	int mimic;
-
-	cptr name;
-
 	/* Hack -- allowed to move nowhere */
 	if ((!*dir) || (*dir == 5)) return (FALSE);
 
@@ -1989,17 +1985,6 @@ bool stuck_player(int *dir)
 				/* Hit the trap */
 				hit_trap(py, px);
 			}
-
-			/* Get the mimiced feature */
-			mimic = f_ptr->mimic;
-
-			/* Get the feature name */
-			name = (f_name + f_info[mimic].name);
-
-			/* Tell the player */
-			msg_format("You feel you are stuck %s%s.",
-				((f_ptr->flags2 & (FF2_FILLED)) ? "" :
-					(is_a_vowel(name[0]) ? "inside an " : "inside a ")),name);
 
 			cave_info[py][px] |= (CAVE_MARK);
 
