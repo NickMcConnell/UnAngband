@@ -4448,6 +4448,9 @@ void cave_set_feat(int y, int x, int feat)
 	bool dayt = ((f_ptr->flags3 & (FF3_OUTSIDE)) !=0) && (daytime) && (surface);
 	bool dayt2 = ((f_ptr2->flags3 & (FF3_OUTSIDE)) !=0) && (daytime) && (surface);
 
+	/* Change the feature */
+	cave_set_feat_aux(y,x,feat);
+
 	if (glow && !glow2)
 	{
 		/* Darken temporarily */
@@ -4495,19 +4498,19 @@ void cave_set_feat(int y, int x, int feat)
 						cave_info[yy][xx] |= (CAVE_GLOW);
 					}
 				}
+			}
 
-				/* Notice change */
-				if (!(cave_info[yy][xx] & (CAVE_GLOW)))
-				{
-					note_spot(yy,xx);
+			/* Notice change */
+			if ((view_glowing_lite) || !(cave_info[yy][xx] & (CAVE_GLOW)))
+			{
+				note_spot(yy,xx);
 
-					lite_spot(yy,xx);
-				}
+				lite_spot(yy,xx);
 			}
 		}
 
 		/* Notice change */
-		if (!(cave_info[y][x] & (CAVE_GLOW)))
+		if ((view_glowing_lite) || !(cave_info[y][x] & (CAVE_GLOW)))
 		{
 			note_spot(y,x);
 
@@ -4539,17 +4542,13 @@ void cave_set_feat(int y, int x, int feat)
 		}
 
 		/* Notice change */
-		if (!(cave_info[y][x] & (CAVE_GLOW)))
+		if (/*(view_glowing_lite) || */ !(cave_info[y][x] & (CAVE_GLOW)))
 		{
 			note_spot(y,x);
 
 			lite_spot(y,x);
 		}
 	}
-
-
-	/* Change the feature */
-	cave_set_feat_aux(y,x,feat);
 
 	/* Set the level type */
 	if (f_ptr2->flags2 & (FF2_WATER)) level_flag |= (LF1_WATER);
@@ -4752,7 +4751,7 @@ void cave_set_feat(int y, int x, int feat)
 	/* Handle creating 'GLOW' */
 	if (f_ptr2->flags2 & FF2_GLOW)
 	{
-		if (!(cave_info[y][x] & (CAVE_GLOW)))
+		if ((view_glowing_lite) || !(cave_info[y][x] & (CAVE_GLOW)))
 		{
 			/* Illuminate the grid */
 			cave_info[y][x] |= (CAVE_GLOW);
@@ -4773,7 +4772,7 @@ void cave_set_feat(int y, int x, int feat)
 			if (!in_bounds_fully(yy, xx)) continue;
 
 			/* Notice/Redraw */
-			if (!(cave_info[yy][xx] & (CAVE_GLOW)))
+			if ((view_glowing_lite) || !(cave_info[yy][xx] & (CAVE_GLOW)))
 			{
 				/* Illuminate the grid */
 				cave_info[yy][xx] |= (CAVE_GLOW);
@@ -4787,8 +4786,10 @@ void cave_set_feat(int y, int x, int feat)
 		}    
 	}
 	/* Handle creating 'OUTSIDE' */
-	else if ( daytime && surface && (f_ptr2->flags3 & (FF3_OUTSIDE)) && !(cave_info[y][x] & (CAVE_GLOW)))
+	else if ( daytime && surface && (f_ptr2->flags3 & (FF3_OUTSIDE)))
 	{
+		if ((view_glowing_lite) || !(cave_info[y][x] & (CAVE_GLOW)))
+		{
 			/* Illuminate the grid */
 			cave_info[y][x] |= (CAVE_GLOW);
 
@@ -4797,6 +4798,7 @@ void cave_set_feat(int y, int x, int feat)
 
 			/* Redraw */
 			lite_spot(y, x);
+		}
 	}
 
 	/* Handle gold/items */
