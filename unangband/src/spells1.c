@@ -197,8 +197,8 @@ void teleport_player(int dis)
 			/* Ignore illegal locations */
 			if (!in_bounds_fully(y, x)) continue;
 
-			/* Require "naked" floor space */
-			if (!cave_safe_bold(y, x)) continue;
+			/* Require "start" floor space */
+			if (!cave_start_bold(y, x)) continue;
 
 			/* Don't allow teleporting into vaults */
 			by = y/BLOCK_HGT;
