@@ -1009,7 +1009,7 @@ void object_aware(object_type *o_ptr)
 	for (i = 1; i < inven_max; i++)
 	{
 		/* Get the object */
-		object_type *i_ptr = &inventory[inven_max];
+		object_type *i_ptr = &inventory[i];
 
 		/* Skip dead objects */
 		if (!i_ptr->k_idx) continue;

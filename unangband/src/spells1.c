@@ -6718,6 +6718,9 @@ bool project(int who, int rad, int y, int x, int dam, int typ, int flg)
 			y = gy[i];
 			x = gx[i];
 
+                        /* Here is no monster or is player */
+                        if (cave_m_idx[y][x] <= 0) continue;
+
 			/* Don't affect hidden monsters */
 			if (m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)) continue;
 
