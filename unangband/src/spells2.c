@@ -5857,7 +5857,7 @@ bool process_spell_eaten(int spell, int level, bool *cancel)
 		}
 		else
 		{
-			if (project_p(0,0,p_ptr->py,p_ptr->px,damage, effect)) obvious = TRUE;
+			if (project_p(-2,0,p_ptr->py,p_ptr->px,damage, effect)) obvious = TRUE;
 		}
 	}
 

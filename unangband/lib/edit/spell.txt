@@ -2755,7 +2755,7 @@ D:Massive explosions rupture your body.
 N:297:Death
 A:65:52:1
 A:75:23:1
-B:AIM:DRAIN_LIFE:0d0+5000
+B:SELF:DRAIN_LIFE:0d0+5000
 D:A feeling of Death flows through your body.
 
 N:298:Infravision

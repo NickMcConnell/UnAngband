@@ -4426,7 +4426,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		/* Get the monster's real name */
 		monster_desc(killer, m_ptr, 0x88);
 	}
-	else
+	else if (who == 0)
 	{
 		feature_type *f_ptr = &f_info[cave_feat[y][x]];
 
@@ -4434,6 +4434,10 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		strcpy(killer,f_name + f_ptr->name);
 
 	}
+        else
+        {
+                strcpy(killer, "yourself");
+        }
 
 	/* Analyze the damage */
 	switch (typ)
@@ -6110,6 +6114,15 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		{
                         obvious = hp_player(dam);
 			dam = 0;
+
+			break;
+		}
+
+		/* Heal the player */
+		case GF_OLD_DRAIN:
+		{
+                        obvious = TRUE;
+                        take_hit(dam, killer);
 
 			break;
 		}
