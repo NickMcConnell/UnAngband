@@ -12,6 +12,8 @@ are unaffected (Bug 682).
 
 - Support transparency for graphics modes (Bug 782).
 
+- Updated pref files required for 32x32 bit maps (Bug 777).
+
 UnAngband 0.5.4a: "A Whole Lotta Love"
 
 ### Game-play ###
