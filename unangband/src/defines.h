@@ -53,7 +53,7 @@
 /*
  * Current version string
  */
-#define VERSION_STRING	"0.5.4b"
+#define VERSION_STRING	"0.5.4c"
 
 /*
  * Hack -- note use of new version name/string but old version
