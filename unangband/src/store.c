@@ -1223,7 +1223,7 @@ static void store_create(void)
 			object_level = depth;
 
 			object_aware(i_ptr);
-			object_known(i_ptr);
+			object_known_store(i_ptr);
 
 			/* Attempt to carry the (known) object */
 			(void)store_carry(i_ptr);
@@ -1289,7 +1289,7 @@ static void store_create(void)
 		}
 
 		/* The object is "known" */
-		object_known(i_ptr);
+		object_known_store(i_ptr);
 #if 0
 		/* Prune the black market */
 		if (store_num == STORE_B_MARKET)
@@ -1477,7 +1477,7 @@ static void display_entry(int item)
 		}
 
 		/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
-                if (!k_info[o_ptr->k_idx].flavor) k_info[o_ptr->k_idx].aware = TRUE;
+		if (!k_info[o_ptr->k_idx].flavor) k_info[o_ptr->k_idx].aware = TRUE;
 
 		/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
 		if (o_ptr->name2) e_info[o_ptr->name2].aware = TRUE;
@@ -2501,6 +2501,9 @@ static void store_purchase(void)
 
 				/* Buying an object makes you aware of it */
 				object_aware(i_ptr);
+
+				/* The object kind is not guessed */
+				k_info[i_ptr->k_idx].guess = 0;
 
 				/* Combine / Reorder the pack (later) */
 				p_ptr->notice |= (PN_COMBINE | PN_REORDER);
