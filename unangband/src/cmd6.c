@@ -1596,6 +1596,7 @@ void do_cmd_apply_rune(void)
          * Previously 'not' flags may be added.
          * Previously 'can'/'may' flags may have been removed.
          */
+	i_ptr->ident &= ~(IDENT_MENTAL);
         drop_all_flags(i_ptr);
 
 	if (i_ptr->xtra1 == OBJECT_XTRA_MIN_RUNES + rune)
