@@ -15,12 +15,22 @@
 			<table cellpadding="4" cellspacing="0" border="0" width="100%">
 				<tr>
 					<td>
+						<b><a href="/index.php">Main Page</a></b>
+					</td>
+				</tr>
+
+				<tr>
+					<td>&nbsp;</td>
+				</tr>
+
+				<tr>
+					<td>
 						<b>Screenshots</b><br>
 
-						&middot; <a href="caradhras.html">Caradhras</a><br>
-						&middot; <a href="isengard.html">Isengard</a><br>
-						&middot; <a href="lothlorien.html">Lothlorien</a><br>
-						&middot; <a href="moria.html">Moria</a>
+						&middot; <a href="screenshot.php?shot=caradhras">Caradhras</a><br>
+						&middot; <a href="screenshot.php?shot=isengard">Isengard</a><br>
+						&middot; <a href="screenshot.php?shot=lothlorien">Lothlorien</a><br>
+						&middot; <a href="screenshot.php?shot=moria">Moria</a>
 					</td>
 				</tr>
 
