@@ -2160,6 +2160,9 @@ static errr rd_savefile_new_aux(void)
 	/* Hack -- no ghosts */
 	r_info[z_info->r_max-1].max_num = 0;
 
+        /* Set important Save-File Option */
+        variant_save_feats = TRUE;
+
 
 	/* Success */
 	return (0);

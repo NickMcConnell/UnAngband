@@ -458,7 +458,7 @@ extern bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, boo
 extern void spell_info(char *p, int spell, bool use_level);
 extern bool list_object_flags(u32b f1, u32b f2, u32b f3, int mode);
 extern void list_object(const object_type *o_ptr, int mode);
-extern void screen_object(const object_type *o_ptr, bool real);
+extern void screen_object(object_type *o_ptr, bool real);
 extern void print_powers(const s16b *book, int num, int y, int x);
 extern void print_spells(const s16b *book, int num, int y, int x);
 extern bool make_fake_artifact(object_type *o_ptr, byte name1);
@@ -534,7 +534,8 @@ extern void update_smart_learn(int m_idx, int what);
 extern void flavor_init(void);
 extern void reset_visuals(bool prefs);
 extern void object_flags(const object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3);
-extern void object_flags_known(const object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3);
+extern void object_obvious_flags(object_type *o_ptr);
+extern void object_flags_known(object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3);
 extern void object_desc(char *buf, const object_type *o_ptr, int pref, int mode);
 extern void object_desc_store(char *buf, const object_type *o_ptr, int pref, int mode);
 extern char index_to_label(int i);

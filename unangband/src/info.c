@@ -209,12 +209,47 @@ void object_flags(const object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3)
 }
 
 
+/*
+ * Set obvious flags for average items 
+ */
+void object_obvious_flags(object_type *o_ptr)
+{
+        if (o_ptr->ident & (IDENT_MENTAL))
+        {
+                u32b f1,f2,f3;
+
+                /* Spoil the object */
+                object_flags(o_ptr, &f1, &f2, &f3);
+
+                object_can_flags(o_ptr, f1, f2, f3);
+
+                object_not_flags(o_ptr, ~(f1), ~(f2), ~(f3));
+        }
+
+        else if (object_known_p(o_ptr) && !o_ptr->name1)
+        {
+                /* Abilities of base item are always known */
+                o_ptr->can_flags1 |= k_info[o_ptr->k_idx].flags1;
+                o_ptr->can_flags2 |= k_info[o_ptr->k_idx].flags2;
+                o_ptr->can_flags3 |= k_info[o_ptr->k_idx].flags3;
+
+                /* Non-runed average item have no more hidden ability */
+                if (!o_ptr->xtra1)
+                        object_not_flags(o_ptr, ~(o_ptr->can_flags1), 
+                                         ~(o_ptr->can_flags2), 
+                                         ~(o_ptr->can_flags3));
+        }
+}
+
 
 /*
  * Obtain the "flags" for an item which are known to the player
  */
-void object_flags_known(const object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3)
+void object_flags_known(object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3)
 {
+        /* Set obvious flags for an average item */
+        object_obvious_flags(o_ptr);
+
 	object_flags_aux(OBJECT_FLAGS_KNOWN, o_ptr, f1, f2, f3);
 }
 
@@ -1595,7 +1630,7 @@ static void obj_top(const object_type *o_ptr, bool real)
 /*
  * Display an object at the top of the screen
  */
-void screen_object(const object_type *o_ptr, bool real)
+void screen_object(object_type *o_ptr, bool real)
 {
 	/* Flush messages */
 	message_flush();
@@ -1606,8 +1641,12 @@ void screen_object(const object_type *o_ptr, bool real)
 	/* Begin recall */
 	Term_gotoxy(0, 1);
 
+        /* Set obvious flags for an average item */
+        object_obvious_flags(o_ptr);
+
 	/* Actually display the item */
-	list_object(o_ptr, OBJECT_FLAGS_KNOWN);
+        if (o_ptr->ident & (IDENT_MENTAL)) list_object(o_ptr, OBJECT_FLAGS_FULL);
+        else list_object(o_ptr, OBJECT_FLAGS_KNOWN);
 
 	/* Display item name */
 	obj_top(o_ptr, real);
@@ -1674,7 +1713,7 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, int mode)
 	cptr *list_ptr;
 
 	/* Brands */
-	if (f1)
+	if (f1 || f3)
 	{
 		list_ptr = list;
 
@@ -2269,8 +2308,8 @@ void list_object(const object_type *o_ptr, int mode)
 				powers |= spell_desc(&s_info[book[i]],(i==0)?p:", or ",0,detail, target);
 			}
 
-			if ((charge) && (powers)) text_out(format(", recharging in d%d turns.",o_ptr->pval));
-			else if (powers) text_out(".");
+			if ((charge) && (powers)) text_out(format(", recharging in d%d turns.  ",o_ptr->pval));
+			else if (powers) text_out(".  ");
 
 			anything |= powers;
 		}
@@ -2298,6 +2337,9 @@ void list_object(const object_type *o_ptr, int mode)
 		/* Display the flags */
 		anything |= list_object_flags(o_ptr->not_flags1, o_ptr->not_flags2, o_ptr->not_flags3, 3); 
 	}
+
+        /* *Identified* object */
+	else if (spoil) text_out("You know everything about this item.  ");
 
 
 	/* Nothing was printed */

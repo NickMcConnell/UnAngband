@@ -4456,7 +4456,7 @@ static void desc_obj_fake(int k_idx)
 	object_prep(o_ptr, k_idx);
 
 	/* It's fully know */
-	if (!k_info[k_idx].flavor) o_ptr->ident |= IDENT_KNOWN;
+	if (!k_info[k_idx].flavor) object_known_store(o_ptr);
 
 	/* Track the object */
 	object_actual_track(o_ptr);

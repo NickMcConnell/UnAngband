@@ -1578,6 +1578,9 @@ void do_cmd_apply_rune(void)
 	/* Decrease the item (in the pack) */
 	if (item2 >= 0)
 	{
+                /* Forget guessed information */
+                if (j_ptr->number == 1) inven_drop_flags(j_ptr);
+
 		inven_item_increase(item2, -1);
 		inven_item_optimize(item2);
 	}
@@ -1587,6 +1590,13 @@ void do_cmd_apply_rune(void)
 		floor_item_increase(0 - item2, -1);
 		floor_item_optimize(item2);
 	}
+
+        /*
+         * Forget about it
+         * Previously 'not' flags may be added.
+         * Previously 'can'/'may' flags may have been removed.
+         */
+        drop_all_flags(i_ptr);
 
 	if (i_ptr->xtra1 == OBJECT_XTRA_MIN_RUNES + rune)
 	{
