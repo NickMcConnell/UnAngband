@@ -470,17 +470,11 @@ s16b get_mon_num(int level)
 			continue;
 		}
 
-		/* Hack -- "questor" monsters must be placed specifically */
-		if ((r_ptr->flags1 & (RF1_QUESTOR)) && (r_ptr->flags1 & (RF1_GUARDIAN)))
-		{
-			continue;
-		}
+		/* Hack -- "questor" monsters and guardians must be placed specifically */
+		if ((r_ptr->flags1 & (RF1_QUESTOR)) || (r_ptr->flags1 & (RF1_GUARDIAN))) continue;
 
 		/* Depth Monsters never appear out of depth */
-		if ((r_ptr->flags1 & (RF1_FORCE_DEPTH)) && (r_ptr->level > p_ptr->depth))
-		{
-			continue;
-		}
+		if ((r_ptr->flags1 & (RF1_FORCE_DEPTH)) && (r_ptr->level > p_ptr->depth)) continue;
 
 		/* Hack -- No MULTIPLY monsters on surface */
 		if (surface && (r_ptr->flags2 & (RF2_MULTIPLY))) continue;
