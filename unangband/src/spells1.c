@@ -6427,7 +6427,7 @@ bool project(int who, int rad, int y, int x, int dam, int typ, int flg)
 		int nx = GRID_X(path_g[i]);
 
 		/* Hack -- Balls explode before reaching walls */
-		if (!cave_floor_bold(ny, nx) && (rad > 0)) break;
+		if (!(f_info[cave_feat[ny][nx]].flags1 & (FF1_PROJECT)) && (rad > 0)) break;
 
 		/* Advance */
 		y = ny;
