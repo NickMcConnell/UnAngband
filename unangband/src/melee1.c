@@ -508,7 +508,7 @@ bool make_attack_normal(int m_idx)
 				}
 
 				/* Object used? */
-				object_usage(INVEN_WIELD);
+				object_usage(slot);
 			}
 
 			if (effect)
