@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001 Andrew Doull. Modifications to the Angband 2.9.1
+ * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.1
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -2228,7 +2228,7 @@ void monster_death(int m_idx)
 	x = m_ptr->fx;
 
 	/* Some monsters stop radiating lite when dying */
-	if (r_ptr->flags2 & (RF2_HAS_LITE))
+	if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE))
 	{
 		/* Update the visuals */
 		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
@@ -2422,6 +2422,11 @@ void monster_death(int m_idx)
 	}
 
 	/* Only process "Quest Monsters" */
+	if (!(r_ptr->flags1 & (RF1_QUESTOR | RF1_GUARDIAN)))
+		return;
+
+#if 0
+	/* Only process "Quest Monsters" */
 	if (!(r_ptr->flags1 & (RF1_QUESTOR))) return;
 
 	/* Hack -- Mark quests as complete */
@@ -2440,9 +2445,28 @@ void monster_death(int m_idx)
 	{
 		return;
 	}
+#endif
+
+	/* Hack -- Mark quests as complete */
+	if (r_ptr->flags1 & (RF1_QUESTOR)) for (i = 0; i < MAX_Q_IDX; i++)
+	{
+		/* Hack -- note completed quests */
+		if (q_list[i].level == r_ptr->level) q_list[i].level = 0;
+
+		/* Count incomplete quests */
+		if (q_list[i].level) total++;
+	}
+
+	/* Hack -- campaign mode has quest monsters without stairs */
+	if (!(r_ptr->flags1 & (RF1_QUESTOR)) &&
+	    ((p_ptr->depth != max_depth(p_ptr->dungeon)) ||
+	     (p_ptr->depth == min_depth(p_ptr->dungeon))) )
+	{
+		return;
+	}
 
 	/* Need some stairs */
-	else if ((total) || (adult_campaign))
+	else if (total || !(r_ptr->flags1 & (RF1_QUESTOR)))
 	{
 		/* Stagger around */
 		while (!cave_valid_bold(y, x))
@@ -2741,12 +2765,12 @@ bool modify_panel(int wy, int wx)
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
 	/* Verify wy, adjust if needed */
-	if (!zone->fill) wy = SCREEN_HGT;
+	if (!zone->fill) wy = 0;
 	else if (wy > DUNGEON_HGT - SCREEN_HGT) wy = DUNGEON_HGT - SCREEN_HGT;
 	else if (wy < 0) wy = 0;
 
 	/* Verify wx, adjust if needed */
-	if (!zone->fill) wx = SCREEN_WID;
+	if (!zone->fill) wx = 0;
 	else if (wx > DUNGEON_WID - SCREEN_WID) wx = DUNGEON_WID - SCREEN_WID;
 	else if (wx < 0) wx = 0;
 
@@ -2907,11 +2931,17 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 
 		case (ROOM_PIT_GIANT):
 		{
-			strcat(name, "dragon pit");
-			strcpy(text_visible, "You have entered a room used as a breeding ground for dragons. ");
+			strcpy(name, "giant pit");
+			strcpy(text_visible, "You have stumbled into an immense cavern where giants dwell.");
 			return;
 		}
 		case (ROOM_PIT_DRAGON):
+		{
+			strcat(name, "dragon pit");
+			strcpy(text_visible, "You have entered a room used as a breeding ground for dragons. ");
+			return;
+                }
+		case (ROOM_PIT_DEMON):
 		{
 			strcpy(name, "demon pit");
 			strcpy(text_visible, "You have entered a chamber full of arcane symbols, and an overpowering smell of brimstone.");
@@ -3338,13 +3368,12 @@ cptr look_mon_desc(int m_idx)
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	bool living = TRUE;
-	int perc;
 
 
 	/* Determine if the monster is "living" (vs "undead") */
 	if (r_ptr->flags3 & (RF3_UNDEAD)) living = FALSE;
 	if (r_ptr->flags3 & (RF3_DEMON)) living = FALSE;
-	if (strchr("Egv", r_ptr->d_char)) living = FALSE;
+	if (r_ptr->flags3 & (RF3_NONLIVING)) living = FALSE;
 
 
 	/* Healthy monsters */
@@ -3353,27 +3382,25 @@ cptr look_mon_desc(int m_idx)
 		/* No damage */
 		return (living ? "unhurt" : "undamaged");
 	}
-
-
-	/* Calculate a health "percentage" */
-	perc = 100L * m_ptr->hp / m_ptr->maxhp;
-
-	if (perc >= 60)
+	else
 	{
-		return (living ? "somewhat wounded" : "somewhat damaged");
+		/* Calculate a health "percentage" */
+		int perc = 100L * m_ptr->hp / m_ptr->maxhp;
+
+		if (perc >= 60)
+			return(living ? "somewhat wounded" : "somewhat damaged");
+		else if (perc >= 25)
+			return (living ? "wounded" : "damaged");
+		else if (perc >= 10)
+			return (living ? "badly wounded" : "badly damaged");
+		else
+			return(living ? "almost dead" : "almost destroyed");
 	}
 
-	if (perc >= 25)
-	{
-		return (living ? "wounded" : "damaged");
-	}
-
-	if (perc >= 10)
-	{
-		return (living ? "badly wounded" : "badly damaged");
-	}
-
-	return (living ? "almost dead" : "almost destroyed");
+	if (m_ptr->csleep) return("asleep");
+	if (m_ptr->confused) return("confused");
+	if (m_ptr->monfear) return("afraid");
+	if (m_ptr->stunned) return("stunned");
 }
 
 
@@ -4065,6 +4092,8 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 
 					object_type *o_ptr;
 
+					bool recall = FALSE;
+
 					/* Get the object */
 					o_ptr = &o_list[this_o_idx];
 
@@ -4072,13 +4101,54 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 					next_o_idx = o_ptr->next_o_idx;
 
 					/* Obtain an object description */
-					object_desc(o_name, o_ptr, TRUE, 3);
+					object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
-					/* Describe the object */
-					sprintf(out_val, "%s%s%s%s [%s]", s1, s2, s3, o_name, info);
-					prt(out_val, 0, 0);
-					move_cursor_relative(y, x);
-					query = inkey();
+					/* Interact */
+					while (1)
+					{
+						/* Recall */
+						if (recall)
+						{
+							/* Save screen */
+							screen_save();
+
+							/* Recall monster on screen */
+							/* Except for containers holding 'something' */
+							if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_known_p(o_ptr)))) screen_roff(o_ptr->name3);
+
+							/* Recall on screen */
+							else screen_object(o_ptr, TRUE);
+
+							/* Hack -- Complete the prompt (again) */
+							Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
+
+							/* Command */
+							query = inkey();
+
+							/* Load screen */
+							screen_load();
+						}
+
+						/* Normal */
+						else
+						{
+							/* Describe the object */
+							sprintf(out_val, "%s%s%s%s [r,%s]", s1, s2, s3, o_name, info);
+							prt(out_val, 0, 0);
+
+							/* Place cursor */
+							move_cursor_relative(y, x);
+
+							/* Command */
+							query = inkey();
+						}
+
+						/* Normal commands */
+						if (query != 'r') break;
+
+						/* Toggle recall */
+						recall = !recall;
+					}
 
 					/* Stop on everything but "return"/"space" */
 					if ((query != '\n') && (query != '\r') && (query != ' ')) break;
@@ -4117,11 +4187,11 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 		/* Scan all objects in the grid */
 		if (easy_floor)
 		{
-			int floor_list[24];
+			int floor_list[MAX_FLOOR_STACK];
 			int floor_num;
 
 			/* Scan for floor objects */
-			floor_num = scan_floor(floor_list, 24, y, x, 0x02);
+			floor_num = scan_floor(floor_list, MAX_FLOOR_STACK, y, x, 0x02);
 
 			/* Actual pile */
 			if (floor_num > 1)
@@ -4199,19 +4269,62 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 			/* Describe it */
 			if (o_ptr->marked)
 			{
+				bool recall = FALSE;
+
 				char o_name[80];
 
 				/* Not boring */
 				boring = FALSE;
 
 				/* Obtain an object description */
-				object_desc(o_name, o_ptr, TRUE, 3);
+				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
-				/* Describe the object */
-				sprintf(out_val, "%s%s%s%s [%s]", s1, s2, s3, o_name, info);
-				prt(out_val, 0, 0);
-				move_cursor_relative(y, x);
-				query = inkey();
+				/* Interact */
+				while (1)
+				{
+					/* Recall */
+					if (recall)
+					{
+						/* Save screen */
+						screen_save();
+
+						/* Recall monster on screen */
+						/* Except for containers holding 'something' */
+						if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_known_p(o_ptr)))) screen_roff(o_ptr->name3);
+
+						/* Recall on screen */
+						else screen_object(o_ptr, TRUE);
+
+						/* Hack -- Complete the prompt (again) */
+						Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
+
+						/* Command */
+						query = inkey();
+
+						/* Load screen */
+						screen_load();
+					}
+
+					/* Normal */
+					else
+					{
+						/* Describe the object */
+						sprintf(out_val, "%s%s%s%s [r,%s]", s1, s2, s3, o_name, info);
+						prt(out_val, 0, 0);
+
+						/* Place cursor */
+						move_cursor_relative(y, x);
+
+						/* Command */
+						query = inkey();
+					}
+
+					/* Normal commands */
+					if (query != 'r') break;
+
+					/* Toggle recall */
+					recall = !recall;
+				}
 
 				/* Stop on everything but "return"/"space" */
 				if ((query != '\n') && (query != '\r') && (query != ' ')) break;
@@ -4260,7 +4373,7 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 			    (f_info[feat].flags2 & (FF2_DEEP)) ||
 			    (f_info[feat].flags2 & (FF2_FILLED)) ||
 			    (f_info[feat].flags2 & (FF2_CHASM)) ||
-			    (f_info[feat].flags3 & (FF3_CAN_HIDE)) ||
+			    (f_info[feat].flags2 & (FF2_HIDE_SNEAK)) ||
 			    (f_info[feat].flags3 & (FF3_NEED_TREE)) ))
 			{
 				s2 = "in ";
@@ -4296,8 +4409,6 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 			if (f_info[feat].flags1 & (FF1_ENTER))
 			{
 				s3 = "the entrance to the ";
-
-				name = u_name + u_info[t_info[p_ptr->dungeon].store[feat-FEAT_SHOP_HEAD]].name;
 			}
 
 			/* Display a message */
@@ -4360,7 +4471,6 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 
 
 			/* Interact */
-
 			while (1)
 			{
 				/* Recall */
@@ -4957,10 +5067,7 @@ bool get_aim_dir(int *dp)
  *
  * This function should be used for all "repeatable" commands, such as
  * run, walk, open, close, bash, disarm, spike, tunnel, etc, as well
- * as all commands which must reference a grid adjacent to the player,
- * and which may not reference the grid under the player.
- *
- * Directions "5" and "0" are illegal and will not be accepted.
+ * as all commands which must reference a grid adjacent to the player.
  *
  * This function tracks and uses the "global direction", and uses
  * that as the "desired direction", if it is set.

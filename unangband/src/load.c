@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001-2 Andrew Doull. Modifications to the Angband 2.9.6
+ * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -125,6 +125,7 @@ static bool wearable_p(const object_type *o_ptr)
 		case TV_HAFTED:
 		case TV_POLEARM:
 		case TV_SWORD:
+                case TV_INSTRUMENT:
 		case TV_STAFF:
 		case TV_BOOTS:
 		case TV_GLOVES:
@@ -407,7 +408,7 @@ static errr rd_item(object_type *o_ptr)
 		artifact_type *a_ptr;
 
 		/* Paranoia */
-		if (o_ptr->name1 >= z_info->a_max) return (-1);
+		if (o_ptr->name1 >= 256) return (-1);
 
 		/* Obtain the artifact info */
 		a_ptr = &a_info[o_ptr->name1];
@@ -537,9 +538,18 @@ static void rd_monster(monster_type *m_ptr)
 	{
 		rd_byte(&m_ptr->summoned);
 
-		if (!(older_than(2,9,6)))
+		if (older_than(3,0,1))
+		{
+			rd_byte(&tmp8u);
+			m_ptr->mflag = tmp8u;
+		}
+		else
 		{
 			rd_u16b(&m_ptr->mflag);
+		}
+
+		if (!(older_than(2,9,6)))
+		{
 			rd_byte(&m_ptr->min_range);
 			rd_byte(&m_ptr->best_range);
 			rd_byte(&m_ptr->ty);
@@ -747,6 +757,15 @@ static void rd_options(void)
 	u32b window_flag[ANGBAND_TERM_MAX];
 	u32b window_mask[ANGBAND_TERM_MAX];
 
+        /* Hack -- unset all Save File Options for compatibility */
+	for (i = 0; i < OPT_PAGE_PER; i++)
+	{
+		/* Collect options on this "page" */
+		if (option_page[8][i] != 255)
+		{
+			op_ptr->opt[option_page[8][i]] = FALSE;
+		}
+	}
 
 	/*** Oops ***/
 
@@ -886,9 +905,29 @@ static errr rd_extra(void)
 
 	rd_string(p_ptr->died_from, 80);
 
-	for (i = 0; i < 4; i++)
+	if (older_than(3, 0, 1))
 	{
-		rd_string(p_ptr->history[i], 60);
+		char *hist = p_ptr->history;
+
+		for (i = 0; i < 4; i++)
+		{
+			/* Read a part of the history */
+			rd_string(hist, 60);
+
+			/* Advance */
+			hist += strlen(hist);
+
+			/* Separate by spaces */
+			hist[0] = ' ';
+			hist++;
+		}
+
+		/* Make sure it is terminated */
+		hist[0] = '\0';
+	}
+	else
+	{
+		rd_string(p_ptr->history, 250);
 	}
 
 	/* Player race */
@@ -1347,8 +1386,7 @@ static errr rd_inventory(void)
 		}
 
 		/* Warning -- backpack is full */
-		else if ((p_ptr->inven_cnt > INVEN_PACK) ||
-		(!(variant_belt_slot) && (p_ptr->inven_cnt == INVEN_PACK)))
+		else if (p_ptr->inven_cnt == INVEN_PACK)
 		{
 			/* Oops */
 			note("Too many items in the inventory!");
@@ -1518,6 +1556,8 @@ u16b limit;
 		}
 	}
 
+	/* Hack -- not fully dynamic */
+	dyna_full = FALSE;
 
 	/*** Run length decoding ***/
 
@@ -1549,6 +1589,21 @@ u16b limit;
 				cave_info[y][x] |= (CAVE_WALL);
 			}
 
+			/* Handle dynamic grids */
+			if (f_info[cave_feat[y][x]].flags3 & (FF3_DYNAMIC_MASK))
+			{
+				if (dyna_n < (DYNA_MAX-1))
+				{
+					dyna_g[dyna_n++] = GRID(y,x);
+				}
+				else
+				{
+					dyna_full = TRUE;
+					dyna_cent_y = 255;
+					dyna_cent_x = 255;
+				}
+			}
+
 			/* Advance/Wrap */
 			if (++x >= DUNGEON_WID)
 			{
@@ -1560,7 +1615,6 @@ u16b limit;
 			}
 		}
 	}
-
 
 	/*** Player ***/
 
@@ -1636,7 +1690,7 @@ u16b limit;
 	rd_u16b(&limit);
 
 	/* Verify maximum */
-	if (limit >= z_info->o_max)
+	if (limit > z_info->o_max)
 	{
 		note(format("Too many (%d) object entries!", limit));
 		return (-1);
@@ -1704,7 +1758,7 @@ u16b limit;
 	rd_u16b(&limit);
 
 	/* Hack -- verify */
-	if (limit >= z_info->m_max)
+	if (limit > z_info->m_max)
 	{
 		note(format("Too many (%d) monster entries!", limit));
 		return (-1);
@@ -1934,7 +1988,7 @@ static errr rd_savefile_new_aux(void)
 	a_max = tmp16u;
 
 	/* Incompatible save files */
-	if (tmp16u > 256)
+	if (a_max > 256)
 	{
 		note(format("Too many (%u) artifacts!", tmp16u));
 		return (-1);
@@ -1947,7 +2001,7 @@ static errr rd_savefile_new_aux(void)
 	C_MAKE(a_list_new, a_max, object_lore);
 
 	/* Read the artifact flags */
-	for (i = 0; i < tmp16u; i++)
+	for (i = 0; i < a_max; i++)
 	{
 		object_lore *n_ptr = &a_list_new[i];
 
@@ -2033,16 +2087,17 @@ static errr rd_savefile_new_aux(void)
 
 
 	/* Read random artifacts */
-#if 0
 	if ((adult_rand_artifacts) || (a_max == 256))
 	{
-#endif
 		if (rd_randarts()) return (-1);
 		if (arg_fiddle) note("Loaded Random Artifacts");
-#if 0
 	}
-#endif
+
+	/* Only restore fixed arts if dead */
 	if (a_max > z_info->a_max) a_max = z_info->a_max;
+
+	/* Don't restore fixed art knowledge if all random */
+	else if (p_ptr->is_dead) a_max = 0;
 
 	/* Copy over the artifact flags */
 	for (i = 0; i < a_max; i++)
@@ -2143,6 +2198,9 @@ static errr rd_savefile_new_aux(void)
 
 	/* Hack -- no ghosts */
 	r_info[z_info->r_max-1].max_num = 0;
+
+        /* Set important Save-File Option */
+        variant_save_feats = TRUE;
 
 
 	/* Success */

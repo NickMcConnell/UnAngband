@@ -6,6 +6,12 @@
  * This software may be copied and distributed for educational, research,
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
+ *
+ * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
+ * source code are released under the Gnu Public License. See www.fsf.org
+ * for current GPL license details. Addition permission granted to
+ * incorporate modifications in all Angband variants as defined in the
+ * Angband variants FAQ. See rec.games.roguelike.angband for FAQ.
  */
 
 #include "angband.h"
@@ -229,7 +235,7 @@ static void wiz_display_item(const object_type *o_ptr)
 	Term_clear();
 
 	/* Describe fully */
-	object_desc_store(buf, o_ptr, TRUE, 3);
+	object_desc_spoil(buf, sizeof(buf), o_ptr, TRUE, 3);
 	prt(buf, 2, j);
 
 	prt(format("kind = %-5d  level = %-4d  tval = %-5d  sval = %-5d",
@@ -320,9 +326,9 @@ static int wiz_create_itemtype(void)
 	char ch;
 
 	int choice[60];
-	static const char choice_name[] = ("abcdefghijklmnopqrst"
-	                                   "ABCDEFGHIJKLMNOPQRST"
-	                                   "0123456789:;<=>?@%&*");
+	static const char choice_name[] = "abcdefghijklmnopqrst"
+	                                  "ABCDEFGHIJKLMNOPQRST"
+	                                  "0123456789:;<=>?@%&*";
 	const char *cp;
 
 	char buf[160];
@@ -1032,31 +1038,31 @@ static void do_cmd_wiz_jump(void)
                 if (p_ptr->command_arg <= 0)
                 {
                         char ppp[80];
-        
+
                         char tmp_val[160];
-        
+
                         /* Prompt */
-                        sprintf(ppp, "Jump to dungeon (1-%d): ", z_info->t_max-1);
-        
+                        sprintf(ppp, "Jump to dungeon (0-%d): ", z_info->t_max-1);
+
                         /* Default */
                         sprintf(tmp_val, "%d", p_ptr->dungeon);
-        
+
                         /* Ask for a level */
                         if (!get_string(ppp, tmp_val, 10)) return;
-        
+
                         /* Extract request */
                         p_ptr->command_arg = atoi(tmp_val);
                 }
 
                 /* Paranoia */
-                if (p_ptr->command_arg < 1) p_ptr->command_arg = 1;
-        
+                if (p_ptr->command_arg < 0) p_ptr->command_arg = 0;
+
                 /* Paranoia */
                 if (p_ptr->command_arg >= z_info->t_max) p_ptr->command_arg = z_info->t_max -1;
-        
+
                 /* Accept request */
                 msg_format("You jump to %s.", t_name + t_info[p_ptr->command_arg].name);
-        
+
                 /* New depth */
                 p_ptr->dungeon = p_ptr->command_arg;
 
@@ -1238,7 +1244,7 @@ static void do_cmd_wiz_zap(int d)
 {
 	int i;
 
-	/* Genocide everyone nearby */
+	/* Banishment everyone nearby */
 	for (i = 1; i < m_max; i++)
 	{
 		monster_type *m_ptr = &m_list[i];
@@ -1605,7 +1611,7 @@ void do_cmd_debug(void)
 			break;
 		}
 
-		/* Zap Monsters (Genocide) */
+		/* Zap Monsters (Banishment) */
 		case 'z':
 		{
 			if (p_ptr->command_arg <= 0) p_ptr->command_arg = MAX_SIGHT;

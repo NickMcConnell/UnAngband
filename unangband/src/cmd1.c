@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001-2 Andrew Doull. Modifications to the Angband 2.9.6
+ * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -199,9 +199,9 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 				if (m_ptr->ml)
 				{
 					object_can_flags(o_ptr,TR1_SLAY_NATURAL,0x0L,0x0L);
-                                        if (r_ptr->flags3 & RF3_ANIMAL) l_ptr->flags3 |= (RF3_ANIMAL);
-                                        if (r_ptr->flags3 & RF3_PLANT) l_ptr->flags3 |= (RF3_PLANT);
-                                        if (r_ptr->flags3 & RF3_INSECT) l_ptr->flags3 |= (RF3_INSECT);
+					if (r_ptr->flags3 & RF3_ANIMAL) l_ptr->flags3 |= (RF3_ANIMAL);
+					if (r_ptr->flags3 & RF3_PLANT) l_ptr->flags3 |= (RF3_PLANT);
+					if (r_ptr->flags3 & RF3_INSECT) l_ptr->flags3 |= (RF3_INSECT);
 				}
 
 				if (mult < 2) mult = 2;
@@ -337,7 +337,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 				{
 					if (rand_int(100)<tdam)
 					{
-                                                object_can_flags(o_ptr,TR1_KILL_DRAGON,0x0L,0x0L);
+						object_can_flags(o_ptr,TR1_KILL_DRAGON,0x0L,0x0L);
 					}
 					else object_can_flags(o_ptr,TR1_SLAY_DRAGON,0x0L,0x0L);
 					l_ptr->flags3 |= (RF3_DRAGON);
@@ -416,7 +416,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 						if (m_ptr->ml)
 						{
 							object_can_flags(o_ptr,TR1_BRAND_ACID,0x0L,0x0L);
-                                                        l_ptr->flags2 |= (RF2_ARMOR);
+							l_ptr->flags2 |= (RF2_ARMOR);
 						}
 
 							if (mult < 2 ) mult = 2;
@@ -564,9 +564,10 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 
 
 /*
- *	Find a secret at the specified location and change it according to the state.
+ * Find a secret at the specified location and change it according to
+ * the state.
  */
-void find_secret(y,x)
+void find_secret(int y, int x)
 {
 	feature_type *f_ptr;
 
@@ -768,7 +769,7 @@ static void py_destroy_aux(int o_idx)
 
 
 	/* Describe the object */
-	object_desc(o_name, o_ptr, TRUE, 3);
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 	/* Verify destruction */
 	if (verify_destroy)
@@ -866,7 +867,7 @@ static void py_pickup_aux(int o_idx)
 	o_ptr = &inventory[slot];
 
 	/* Describe the object */
-	object_desc(o_name, o_ptr, TRUE, 3);
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 	/* Message */
 	msg_format("You have %s (%c).", o_name, index_to_label(slot));
@@ -918,10 +919,14 @@ void py_pickup(int pickup)
 
 			/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
 			if (!k_info[o_ptr->k_idx].flavor) k_info[o_ptr->k_idx].aware = TRUE;
+
+			/* XXX XXX - Mark monster objects as "seen" */
+			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights)) l_list[o_ptr->name3].sights++;
+
 		}
 
 		/* Describe the object */
-		object_desc(o_name, o_ptr, TRUE, 3);
+		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 		/* Get the next object */
 		next_o_idx = o_ptr->next_o_idx;
@@ -1059,7 +1064,7 @@ void py_pickup(int pickup)
 				o_ptr = &o_list[last_o_idx];
 
 				/* Describe the object */
-				object_desc(o_name, o_ptr, TRUE, 3);
+				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 				/* Message */
 				msg_format("You see %s.", o_name);
@@ -1086,7 +1091,7 @@ void py_pickup(int pickup)
 				o_ptr = &o_list[last_o_idx];
 
 				/* Describe the object */
-				object_desc(o_name, o_ptr, TRUE, 3);
+				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 				/* Message */
 				msg_format("You have no room for %s.", o_name);
@@ -1184,37 +1189,472 @@ void hit_trap(int y, int x)
 	/* Disturb the player */
 	disturb(0, 0);
 
-	if (strlen(text))
+	/* Apply the object */
+	if ((cave_o_idx[y][x]) && (f_ptr->flags1 & (FF1_HIT_TRAP)))
 	{
-		/* Message */
-		msg_format("%s",text);
+		object_type *o_ptr = &o_list[cave_o_idx[y][x]];
+
+		char o_name[80];
+
+		int power = 0;
+
+		switch (o_ptr->tval)
+		{
+			case TV_BOW:
+			{
+				object_type *j_ptr;
+				u32b f1,f2,f3;
+
+				int i, shots = 1;
+
+				/* Get bow */
+				j_ptr = o_ptr;
+
+				/* Get bow flags */
+				object_flags(o_ptr,&f1,&f2,&f3);
+
+				/* Apply extra shots */
+				if (f1 & (TR1_SHOTS)) shots += j_ptr->pval;
+
+				/* Test for hit */
+				for (i = 0; i < shots; i++)
+				{
+					if (j_ptr->next_o_idx)
+					{
+						int ammo = j_ptr->next_o_idx;
+						object_type *i_ptr;
+						object_type object_type_body;
+
+						/* Use ammo instead of bow */
+						o_ptr = &o_list[ammo];
+
+						/* Describe ammo */
+						object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
+
+						if ((ammo) && (test_hit_fire((j_ptr->to_h + o_ptr->to_h)* BTH_PLUS_ADJ + f_ptr->power, p_ptr->ac, TRUE)))
+						{
+							int k, mult;
+
+							switch (j_ptr->sval)
+							{
+								case SV_SLING:
+								case SV_SHORT_BOW:
+								mult = 2;
+								break;
+								case SV_LONG_BOW:
+								case SV_LIGHT_XBOW:
+									mult = 3;
+									break;
+								case SV_HEAVY_XBOW:
+									mult = 4;
+									break;
+								default:
+									mult = 1;
+									break;
+							}
+
+							/* Apply extra might */
+							if (f1 & (TR1_MIGHT)) mult += j_ptr->pval;
+
+							k = damroll(o_ptr->dd, o_ptr->ds);
+							k *= mult;
+
+							k = critical_shot(o_ptr->weight, o_ptr->to_h + j_ptr->to_h, k);
+							k += o_ptr->to_d + j_ptr->to_d;
+
+							/* No negative damage */
+							if (k < 0) k = 0;
+
+							/* Trap description */
+							msg_format("%^s hits you.",o_name);
+
+							/* Damage, check for fear and death */
+							take_hit(k, "a player trap");
+						}
+						else
+						{
+							/* Trap description */
+							msg_format("%^s narrowly misses you.",o_name);
+						}
+
+						/* Get local object */
+						i_ptr = &object_type_body;
+
+						/* Obtain a local object */
+						object_copy(i_ptr, o_ptr);
+
+						/* Modify quantity */
+						i_ptr->number = 1;
+
+						/* Drop nearby - some chance of breakage */
+						drop_near(i_ptr,y,x,breakage_chance(i_ptr));
+
+						/* Decrease the item */
+						floor_item_increase(ammo, -1);
+						floor_item_optimize(ammo);
+
+						break;
+					}
+					else
+					{
+						/* Disarm */
+						cave_alter_feat(y,x,FS_DISARM);
+					}
+				}
+			}
+
+			case TV_SHOT:
+			case TV_ARROW:
+			case TV_BOLT:
+			case TV_HAFTED:
+			case TV_SWORD:
+			case TV_POLEARM:
+			{
+				object_type *i_ptr;
+				object_type object_type_body;
+
+				/* Describe ammo */
+				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
+
+				/* Test for hit */
+				if (test_hit_norm(o_ptr->to_h * BTH_PLUS_ADJ + f_ptr->power, p_ptr->ac, TRUE))
+				{
+					int k;
+
+					k = damroll(o_ptr->dd, o_ptr->ds);
+
+					k = critical_norm(o_ptr->weight, o_ptr->to_h, k);
+					k += o_ptr->to_d;
+
+					/* Armour reduces total damage */
+					k -= (k * ((p_ptr->ac < 150) ? p_ptr->ac : 150) / 250);
+
+					/* No negative damage */
+					if (k < 0) k = 0;
+
+					/* Trap description */
+					msg_format("%^s hits you.",o_name);
+
+					/* Damage, check for fear and death */
+					take_hit(k, "a player trap");
+
+				}
+				else
+				{
+					/* Trap description */
+					msg_format("%^s narrowly misses you.",o_name);					
+				}
+
+				/* Get local object */
+				i_ptr = &object_type_body;
+
+				/* Obtain a local object */
+				object_copy(i_ptr, o_ptr);
+
+				/* Modify quantity */
+				i_ptr->number = 1;
+
+				/* Drop nearby - some chance of breakage */
+				drop_near(i_ptr,y,x,breakage_chance(i_ptr));
+
+				/* Decrease the item */
+				floor_item_increase(cave_o_idx[y][x], -1);
+				floor_item_optimize(cave_o_idx[y][x]);
+
+				/* Disarm if runs out */
+				if (!cave_o_idx[y][x]) cave_alter_feat(y,x,FS_DISARM);
+
+				break;
+			}
+
+			case TV_WAND:
+			case TV_STAFF:
+			{
+				if (o_ptr->pval > 0)
+				{
+					/* Get item effect */
+					get_spell(&power, "use", o_ptr, FALSE);
+
+					/* XXX Hack -- new unstacking code */
+					o_ptr->stackc++;
+
+					/* No spare charges */	
+					if (o_ptr->stackc >= o_ptr->number)
+					{
+						/* Use a charge off the stack */
+						o_ptr->pval--;
+
+						/* Reset the stack count */
+						o_ptr->stackc = 0;
+					}
+
+					/* XXX Hack -- unstack if necessary */
+					if ((o_ptr->number > 1) &&
+					((!variant_pval_stacks) || 
+					((!object_known_p(o_ptr) && (o_ptr->pval == 2) && (o_ptr->stackc > 1)) ||
+					  (!object_known_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
+					  (o_ptr->stackc != 1) && (o_ptr->pval > 2)))))
+					{
+						object_type *i_ptr;
+						object_type object_type_body;
+
+						/* Get local object */
+						i_ptr = &object_type_body;
+
+						/* Obtain a local object */
+						object_copy(i_ptr, o_ptr);
+
+						/* Modify quantity */
+						i_ptr->number = 1;
+
+						/* Reset stack counter */
+						i_ptr->stackc = 0;
+ 
+				 		/* Unstack the used item */
+				 		o_ptr->number--;
+
+						/* Reduce the charges on the new item */
+						if (o_ptr->stackc > 1)
+						{
+							i_ptr->pval-=2;
+							o_ptr->stackc--;
+						}
+						else if (!o_ptr->stackc)
+						{
+							i_ptr->pval--;
+							o_ptr->pval++;
+							o_ptr->stackc = o_ptr->number-1;
+						}
+
+						(void)floor_carry(y,x,i_ptr);
+					}
+				}
+				else
+				{
+					/* Disarm if runs out */
+					cave_alter_feat(y,x,FS_DISARM);
+				}
+
+				break;
+			}
+
+			case TV_ROD:
+			case TV_DRAG_ARMOR:
+			{
+				if (!((o_ptr->timeout) && ((!o_ptr->stackc) || (o_ptr->stackc >= o_ptr->number))))
+				{
+					int tmpval;
+
+					/* Store pval */
+					tmpval = o_ptr->timeout;
+
+					/* Time rod out */
+					o_ptr->timeout = o_ptr->pval;
+
+					/* Get item effect */
+					get_spell(&power, "use", o_ptr, FALSE);
+
+					/* Has a power */
+					/* Hack -- check if we are stacking rods */
+					if ((o_ptr->timeout > 0) && (!(tmpval) || stack_force_times))
+					{
+						/* Hack -- one more rod charging */
+						if (o_ptr->timeout) o_ptr->stackc++;
+
+						/* Reset stack count */
+						if (o_ptr->stackc == o_ptr->number) o_ptr->stackc = 0;
+
+						/* Hack -- always use maximum timeout */
+						if (tmpval > o_ptr->timeout) o_ptr->timeout = tmpval;
+
+					}
+
+					/* XXX Hack -- unstack if necessary */
+					if ((o_ptr->number > 1) && (o_ptr->timeout > 0))
+					{
+						object_type *i_ptr;
+						object_type object_type_body;
+
+						/* Get local object */
+						i_ptr = &object_type_body;
+
+						/* Obtain a local object */
+						object_copy(i_ptr, o_ptr);
+
+						/* Modify quantity */
+						i_ptr->number = 1;
+
+						/* Clear stack counter */
+						i_ptr->stackc = 0;
+
+						/* Restore "charge" */
+						o_ptr->timeout = tmpval;
+
+						/* Unstack the used item */
+						o_ptr->number--;
+
+						/* Reset the stack if required */
+						if (o_ptr->stackc == o_ptr->number) o_ptr->stackc = 0;
+
+						(void)floor_carry(y,x,i_ptr);
+					}
+				}
+				break;
+			}
+
+			case TV_POTION:
+			case TV_SCROLL:
+			case TV_FLASK:
+			case TV_FOOD:
+			{
+				/* Hack -- boring food */
+				if ((o_ptr->tval == TV_FOOD) && (o_ptr->sval >= SV_FOOD_MIN_FOOD))
+				{
+					/* Trap description */
+					msg_print("Hmm... there was something under this rock.");					
+
+					/* Disarm */
+					cave_alter_feat(y,x,FS_DISARM);
+				}
+				else
+				{
+					/* Get item effect */
+					get_spell(&power, "use", o_ptr, FALSE);
+
+					/* Decrease the item */
+					floor_item_increase(cave_o_idx[y][x], -1);
+					floor_item_optimize(cave_o_idx[y][x]);
+
+					/* Disarm if runs out */
+					if (!cave_o_idx[y][x]) cave_alter_feat(y,x,FS_DISARM);
+				}
+
+				break;
+			}
+
+			case TV_RUNESTONE:
+			{
+				u32b runes = p_ptr->cur_runes;
+
+				int num = 0;
+				s16b book[26];
+
+				/* Hack -- use current rune */
+				p_ptr->cur_runes = (2 << (o_ptr->sval-1));
+
+				/* Fill the book with spells */
+				fill_book(o_ptr,book,&num);
+
+				/* Unhack */
+				p_ptr->cur_runes = runes;
+
+				/* Get a power */
+				power = book[rand_int(num)];
+
+				/* Decrease the item */
+				floor_item_increase(cave_o_idx[y][x], -1);
+				floor_item_optimize(cave_o_idx[y][x]);
+
+				/* Disarm if runs out */
+				if (!cave_o_idx[y][x]) cave_alter_feat(y,x,FS_DISARM);
+
+				break;
+			}
+
+			default:
+			{
+				/* Trap description */
+				msg_print("Hmm... there was something under this rock.");					
+
+				/* Disarm */
+				cave_alter_feat(y,x,FS_DISARM);
+
+				break;
+			}
+		}
+
+
+		/* Has a power */
+		if (power > 0)
+		{
+			spell_type *s_ptr = &s_info[power];
+
+			int ap_cnt;
+
+			/* Object is used */
+			if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
+
+			/* Scan through all four blows */
+			for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
+			{
+				int damage = 0;
+
+				/* Extract the attack infomation */
+				int effect = s_ptr->blow[ap_cnt].effect;
+				int method = s_ptr->blow[ap_cnt].method;
+				int d_dice = s_ptr->blow[ap_cnt].d_dice;
+				int d_side = s_ptr->blow[ap_cnt].d_side;
+				int d_plus = s_ptr->blow[ap_cnt].d_plus;
+
+				/* Hack -- no more attacks */
+				if (!method) break;
+
+				/* Mega hack -- dispel evil/undead objects */
+				if (!d_side)
+				{
+					d_plus += 25 * d_dice;
+				}
+
+				/* Roll out the damage */
+				if ((d_dice) && (d_side))
+				{
+					damage = damroll(d_dice, d_side) + d_plus;
+				}
+				else
+				{
+					damage = d_plus;
+				}
+
+				(void)project_p(0,0,y,x,damage, effect);
+				(void)project_f(0,0,y,x,damage, effect);
+			}
+		}
 	}
 
-	/* Apply the spell */
-	if (f_ptr->spell)
+	/* Regular traps */
+	else
 	{
-      	make_attack_spell_aux(0,y,x,f_ptr->spell);
-	}
-	else if (f_ptr->blow.method)
-	{
-		dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
+		if (strlen(text))
+		{
+			/* Message */
+			msg_format("%s",text);
+		}
+
+		if (f_ptr->spell)
+		{
+      		make_attack_spell_aux(0,y,x,f_ptr->spell);
+		}
+		else if (f_ptr->blow.method)
+		{
+			dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
    
-		/* Apply the blow */
-		project_p(0, 0, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
-	}
+			/* Apply the blow */
+			project_p(0, 0, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
+		}
 
-	/* Get feature */
-	f_ptr = &f_info[cave_feat[p_ptr->py][p_ptr->px]];
+		/* Get feature */
+		f_ptr = &f_info[cave_feat[p_ptr->py][p_ptr->px]];
 
-	if (f_ptr->flags1 & (FF1_HIT_TRAP))
-	{
-		/* Modify the location hit by the trap */
-		cave_alter_feat(y,x,FS_HIT_TRAP);
-	}
-	else if (f_ptr->flags1 & (FF1_SECRET))
-	{
-		/* Discover */
-		cave_alter_feat(y,x,FS_SECRET);
+		if (f_ptr->flags1 & (FF1_HIT_TRAP))
+		{
+			/* Modify the location hit by the trap */
+			cave_alter_feat(y,x,FS_HIT_TRAP);
+		}
+		else if (f_ptr->flags1 & (FF1_SECRET))
+		{
+			/* Discover */
+			cave_alter_feat(y,x,FS_SECRET);
+		}
 	}
 }
 
@@ -1366,14 +1806,16 @@ void py_attack(int y, int x)
 	/* Attack once for each legal blow */
 	while (num++ < p_ptr->num_blow)
 	{
+		int slot = INVEN_WIELD;
+
 		/* Deliver a blow */
 		blows++;
 
-		/* Get the weapon */
-		o_ptr = &inventory[INVEN_WIELD];
-
 		/* Get secondary weapon instead */
-		if (!(blows % 2) && (melee_style & (1L << WS_TWO_WEAPON))) o_ptr = &inventory[INVEN_ARM];
+		if (!(blows % 2) && (melee_style & (1L << WS_TWO_WEAPON))) slot = INVEN_ARM;
+
+		/* Get the weapon */
+		o_ptr = &inventory[slot];
 
 		/* Get the unarmed weapon */
 		if (melee_style & (1L << WS_UNARMED))
@@ -1416,7 +1858,7 @@ void py_attack(int y, int x)
 				u32b k2 = o_ptr->can_flags2;
 				u32b k3 = o_ptr->can_flags3;
 
-				u33b n1, n2, n3;
+				u32b n1, n2, n3;
 
 				k = damroll(o_ptr->dd, o_ptr->ds);
 				k = tot_dam_aux(o_ptr, k, m_ptr);
@@ -1431,16 +1873,16 @@ void py_attack(int y, int x)
 				{
 					/* Sometimes notice */
 					if (rand_int(100)<50) object_not_flags(o_ptr,0x0L,0x0L,TR3_IMPACT);
-				}				
+				}
 				k = critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
 				k += o_ptr->to_d;
 
 				/* Check for new flags */
 				n1 = o_ptr->can_flags1 & ~(k1);
-				n2 = o_ptr->can_flags1 & ~(k2);
-				n3 = o_ptr->can_flags1 & ~(k3);
+				n2 = o_ptr->can_flags2 & ~(k2);
+				n3 = o_ptr->can_flags3 & ~(k3);
 
-				if (n1 || n2 || n3) update_slot_flags(INVEN_WIELD, n1, n2, n3);
+				if (n1 || n2 || n3) update_slot_flags(slot, n1, n2, n3);
 
 				/* Check usage */
 				object_usage(INVEN_WIELD);
@@ -1514,7 +1956,7 @@ void py_attack(int y, int x)
  * This routine should only be called when energy has been expended.
  *
  */
-bool stuck_player(int dir)
+bool stuck_player(int *dir)
 {
 	int py = p_ptr->py;
 	int px = p_ptr->px;
@@ -1526,7 +1968,7 @@ bool stuck_player(int dir)
 	cptr name;
 
 	/* Hack -- allowed to move nowhere */
-	if (dir == 5) return (FALSE);
+	if ((!*dir) || (*dir == 5)) return (FALSE);
 
 	/* Player can not walk through "walls" */
 	if (!(f_ptr->flags1 & (FF1_MOVE))
@@ -1565,20 +2007,8 @@ bool stuck_player(int dir)
 
 		}
 
-		/* Mention known obstacles */
-		else
-		{
-			/* Get the mimiced feature */
-			mimic = f_ptr->mimic;
-
-			/* Get the feature name */
-			name = (f_name + f_info[mimic].name);
-
-			/* Tell the player */
-			msg_format("You are stuck %s%s.",
-				((f_ptr->flags2 & (FF2_FILLED)) ? "" :
-					(is_a_vowel(name[0]) ? "inside an " : "inside a ")),name);
-		}
+		/* Always make direction 0 */
+		*dir = 0;
 
 		return (TRUE);
 
@@ -1591,7 +2021,7 @@ bool stuck_player(int dir)
 
 /*
  * Move player in the given direction, with the given "pickup" flag.
- *
+ * 
  * This routine should only be called when energy has been expended.
  *
  * Note that this routine handles monsters in the destination grid,
@@ -1602,19 +2032,28 @@ void move_player(int dir, int jumping)
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
-        feature_type *f_ptr;
+	feature_type *f_ptr;
 
 	int y, x;
 
-        int mimic;
+	int mimic;
 
-        cptr name;
+	cptr name;
+
+	/* Move is a climb? -- force boolean */
+        bool climb = FALSE;
 
 	/* Find the result of moving */
 	y = py + ddy[dir];
 	x = px + ddx[dir];
 
-        f_ptr = &f_info[cave_feat[y][x]];
+	f_ptr = &f_info[cave_feat[y][x]];
+
+        climb = ((!(f_ptr->flags1 & (FF1_MOVE))
+		&& (f_ptr->flags3 & (FF3_EASY_CLIMB)))
+		|| (!(f_ptr->flags3 & (FF3_MUST_CLIMB)) 
+                && (f_info[cave_feat[py][px]].flags3 & (FF3_MUST_CLIMB)))) != 0;
+
 
 	/* Hack -- attack monsters --- except hidden ones */
 	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)))
@@ -1623,7 +2062,7 @@ void move_player(int dir, int jumping)
 		py_attack(y, x);
 	}
 
-	else if (stuck_player(dir))
+	else if (stuck_player(&dir))
 	{
 		/* Do nothing */
 	}
@@ -1672,66 +2111,68 @@ void move_player(int dir, int jumping)
 		if (!(cave_info[y][x] & (CAVE_MARK)))
 		{
 
-		/* Get hit by terrain/traps */
-		if ((f_ptr->flags1 & (FF1_HIT_TRAP)) ||
-		(f_ptr->spell) || (f_ptr->blow.method))
-		{
-			/* Hit the trap */
-			hit_trap(y, x);
+			/* Get hit by terrain/traps */
+			if ((f_ptr->flags1 & (FF1_HIT_TRAP)) ||
+			(f_ptr->spell) || (f_ptr->blow.method))
+			{
+				/* Hit the trap */
+				hit_trap(y, x);
+			}
+
+			/* Get the mimiced feature */
+			mimic = f_ptr->mimic;
+
+			/* Get the feature name */
+			name = (f_name + f_info[mimic].name);
+
+			/* Tell the player */
+			msg_format("You feel %s%s blocking your way.",
+				((f_ptr->flags2 & (FF2_FILLED)) ? "" :
+					(is_a_vowel(name[0]) ? "an " : "a ")),name);
+
+
+				cave_info[y][x] |= (CAVE_MARK);
+
+				lite_spot(y, x);
+
 		}
 
-		/* Get the mimiced feature */
-		mimic = f_ptr->mimic;
+		/* Mention known obstacles */
+		else
+		{
+			/* Get the mimiced feature */
+			mimic = f_ptr->mimic;
 
-		/* Get the feature name */
-		name = (f_name + f_info[mimic].name);
+			/* Get the feature name */
+			name = (f_name + f_info[mimic].name);
 
-		/* Tell the player */
-		msg_format("You feel %s%s blocking your way.",
-			((f_ptr->flags2 & (FF2_FILLED)) ? "" :
+			/* Tell the player */
+			msg_format("There is %s%s blocking your way.",
+				((f_ptr->flags2 & (FF2_FILLED)) ? "" :
 				(is_a_vowel(name[0]) ? "an " : "a ")),name);
-
-
-			cave_info[y][x] |= (CAVE_MARK);
-
-			lite_spot(y, x);
-
-	}
-
-	/* Mention known obstacles */
-	else
-	{
-		/* Get the mimiced feature */
-		mimic = f_ptr->mimic;
-
-		/* Get the feature name */
-		name = (f_name + f_info[mimic].name);
-
-		/* Tell the player */
-		msg_format("There is &s%s blocking your way.",
-			((f_ptr->flags2 & (FF2_FILLED)) ? "" :
-			(is_a_vowel(name[0]) ? "an " : "a ")),name);
 		}
 	}
 
 	/* Partial movement */
-	else if (!(f_ptr->flags1 & (FF1_MOVE))
-        && (f_ptr->flags3 & (FF3_EASY_CLIMB))
-	&& (dir !=p_ptr->climbing))
+	else if ((climb) && (dir !=p_ptr->climbing))
 	{
 		/* Get the mimiced feature */
 		mimic = f_ptr->mimic;
+
+		/* Use existing feature if not easy climb */
+                if (!(f_ptr->flags3 & (FF3_EASY_CLIMB))) mimic = f_info[cave_feat[py][px]].mimic;
 
 		/* Get the feature name */
 		name = (f_name + f_info[mimic].name);
 
 		/* Tell the player */
-		msg_format("You climb %s%s.",
+		msg_format("You climb %s%s%s.",
+				((f_ptr->flags3 & (FF3_EASY_CLIMB)) ? "" : "out of "),
 				((f_ptr->flags2 & (FF2_FILLED)) ? "" : "the "), name);
 
 		p_ptr->climbing = dir;
 
-                /* Automate 2nd movement command */
+		/* Automate 2nd movement command */
 		p_ptr->command_cmd = 59;
 		p_ptr->command_rep = 1;
 		p_ptr->command_dir = dir;
@@ -1884,11 +2325,11 @@ static int see_stop(int dir, int y, int x)
 	/* Illegal grids are not known walls XXX XXX XXX */
 	if (!in_bounds(y, x)) return (FALSE);
 
-        /* Unknown walls are not known obstacles */
+	/* Unknown walls are not known obstacles */
 	if (!(cave_info[y][x] & (CAVE_MARK))) return (FALSE);
 
-        /* Run-able grids are not known obstacles */
-        if (f_info[f_info[cave_feat[y][x]].mimic].flags1 & (FF1_RUN)) return (FALSE);
+	/* Run-able grids are not known obstacles */
+	if (f_info[f_info[cave_feat[y][x]].mimic].flags1 & (FF1_RUN)) return (FALSE);
 
 	/* Default */
 	return (TRUE);
@@ -2211,7 +2652,7 @@ static bool run_test(void)
 	int i, max, inv;
 	int option, option2;
 
-        int feat;
+	int feat;
 
 	/* No options yet */
 	option = 0;
@@ -2381,16 +2822,16 @@ static bool run_test(void)
 			row = py + ddy[new_dir];
 			col = px + ddx[new_dir];
 
-                        /* Get feature */
-                        feat = cave_feat[row][col];
+			/* Get feature */
+			feat = cave_feat[row][col];
 
 			/* Get mimiced feature */
-                        feat = f_info[feat].mimic;
+			feat = f_info[feat].mimic;
 
 			/* Unknown grid or non-wall */
 			/* Was: cave_floor_bold(row, col) */
 			if (!(cave_info[row][col] & (CAVE_MARK)) ||
-                            (!(f_info[feat].flags1 & (FF1_WALL))) )
+			    (!(f_info[feat].flags1 & (FF1_WALL))) )
 			{
 				/* Looking to break right */
 				if (p_ptr->run_break_right)
@@ -2418,16 +2859,16 @@ static bool run_test(void)
 			row = py + ddy[new_dir];
 			col = px + ddx[new_dir];
 
-                        /* Get feature */
-                        feat = cave_feat[row][col];
+			/* Get feature */
+			feat = cave_feat[row][col];
 
 			/* Get mimiced feature */
-                        feat = f_info[feat].mimic;
+			feat = f_info[feat].mimic;
 
 			/* Unknown grid or non-wall */
 			/* Was: cave_floor_bold(row, col) */
 			if (!(cave_info[row][col] & (CAVE_MARK)) ||
-                            (!(f_info[feat].flags1 & (FF1_RUN))))
+			    (!(f_info[feat].flags1 & (FF1_WALL))))
 			{
 				/* Looking to break left */
 				if (p_ptr->run_break_left)
@@ -2526,7 +2967,7 @@ static bool run_test(void)
 
 
 	/* About to hit a known wall, stop */
-        if (see_stop(p_ptr->run_cur_dir, py, px))
+	if (see_stop(p_ptr->run_cur_dir, py, px))
 	{
 		return (TRUE);
 	}
@@ -2579,14 +3020,13 @@ void run_step(int dir)
 	/* Take time */
 	p_ptr->energy_use = 100;
 
-	/* Catch breath */
-	if (!(f_ptr->flags2 & (FF2_FILLED)))
-	{
-		/* Rest the player */
-		set_rest(p_ptr->rest + PY_REST_RATE - p_ptr->tiring);
-	}
+	/* Rest the player */
+	/* XXX Should never be able to run on filled terrain */
+	set_rest(p_ptr->rest + PY_REST_RATE - p_ptr->tiring);
 
 	/* Move the player */
 	move_player(p_ptr->run_cur_dir, FALSE);
+
+	return;
 }
 

@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001 Andrew Doull. Modifications to the Angband 2.9.1
+ * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.1
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -135,6 +135,10 @@ int i,ii;
 	{
 		/* Get a random spell */
 		*sn = book[rand_int(num)];
+
+#ifdef ALLOW_REPEAT
+		repeat_push(*sn);
+#endif /* ALLOW_REPEAT */
 
 		/* Something happened */
 		return (TRUE);
@@ -313,13 +317,10 @@ int i,ii;
 	return (TRUE);
 }
 
-
-bool inven_book_okay(const object_type *o_ptr)
-{
 /* Note this routine is simple, but horribly inefficient due 
    to the (1st iteration) design of the data structures */
-
-
+bool inven_book_okay(const object_type *o_ptr)
+{
 	int i,ii,iii;
 
 	spell_type *s_ptr;
@@ -383,7 +384,7 @@ void do_cmd_browse(void)
 
 
 	/* Cannot browse books if illiterate */
-        if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
+	if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
 	{
 		msg_print("You cannot read books.");
 
@@ -637,7 +638,7 @@ void do_cmd_study(void)
 		break;
 
 		case TV_MAGIC_BOOK:
-		p = "song";
+		p = "spell";
 		break;
 
 		case TV_RUNESTONE:
@@ -870,7 +871,13 @@ void do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 		/* Verify */
 		if (!get_check("Attempt it anyway? "))
 		{
-			p_ptr->held_song = 0;
+			if (p_ptr->held_song)
+			{
+				/* Redraw the state */
+				p_ptr->redraw |= (PR_STATE);			
+
+				p_ptr->held_song = 0;
+			}
 
 			return;
 		}
@@ -886,8 +893,13 @@ void do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 		/* Verify */
 		if (!get_check("Attempt it anyway? "))
 		{
-			p_ptr->held_song = 0;
+			if (p_ptr->held_song)
+			{
+				/* Redraw the state */
+				p_ptr->redraw |= (PR_STATE);			
 
+				p_ptr->held_song = 0;
+			}
 			return;
 		}
 	}
@@ -919,7 +931,13 @@ void do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 		if (flush_failure) flush();
 		msg_format("You failed to %s the %s!",p,t);
 
-		p_ptr->held_song = 0;
+		if (p_ptr->held_song)
+		{
+			/* Redraw the state */
+			p_ptr->redraw |= (PR_STATE);			
+
+			p_ptr->held_song = 0;
+		}
 	}
 
 	/* Process spell */
@@ -1042,11 +1060,17 @@ void do_cmd_cast(void)
 	if (p_ptr->held_song)
 	{
 		/* Verify */
-		if (!get_check(format("Continue singing %s?", s_name + s_info[p_ptr->held_song].name))) p_ptr->held_song = 0;
+		if (!get_check(format("Continue singing %s?", s_name + s_info[p_ptr->held_song].name)))
+		{
+			/* Redraw the state */
+			p_ptr->redraw |= (PR_STATE);			
+
+			p_ptr->held_song = 0;
+		}
 	}
 
 	/* Cannot cast spells if illiterate */
-        if (c_info[p_ptr->pclass].spell_first > 50)
+	if (c_info[p_ptr->pclass].spell_first > 50)
 	{
 		msg_print("You cannot read books.");
 		return;
@@ -1152,7 +1176,7 @@ void do_cmd_cast(void)
 	/* Ask for a spell */
 	if (!get_spell(&spell, p, o_ptr, TRUE))
 	{
-		if (spell == -2) msg_format("You don't know any &ss in that book.",t);
+		if (spell == -2) msg_format("You don't know any %ss in that book.",t);
 		return;
 	}
 

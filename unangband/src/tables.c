@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001 Andrew Doull. Modifications to the Angband 2.9.1
+ * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.1
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -1397,9 +1397,9 @@ const cptr option_text[OPT_MAX] =
 	"disturb_panel",			/* OPT_disturb_panel */
 	"disturb_state",			/* OPT_disturb_state */
 	"disturb_minor",			/* OPT_disturb_minor */
-	"disturb_other",			/* OPT_disturb_other */
-	"alert_hitpoint",			/* OPT_alert_hitpoint */
-	"alert_failure",			/* OPT_alert_failure */
+	"",			/* OPT_disturb_other */
+	"",			/* OPT_alert_hitpoint */
+	"",			/* OPT_alert_failure */
 	"verify_destroy",			/* OPT_verify_destroy */
 	"verify_special",			/* OPT_verify_special */
 	"allow_quantity",			/* OPT_allow_quantity */
@@ -1455,9 +1455,9 @@ const cptr option_text[OPT_MAX] =
 	"reseed_artifacts",						/* xxx */
         "easy_autos",                                      /* xxx */
 	"easy_search",						/* xxx */
-	"variant_save_feats",					   /* xxx */
-	NULL,						/* xxx */
-	NULL,						/* xxx */
+	"variant_save_feats",		   /* xxx */
+	"view_glowing_lite",			/* xxx */
+	"view_surface_lite",			/* OPT_view_surface_lite */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
@@ -1509,7 +1509,7 @@ const cptr option_text[OPT_MAX] =
 	"birth_no_artifacts",		/* OPT_birth_no_artifacts */
 	"birth_rand_artifacts",		/* OPT_birth_rand_artifacts */
 	"birth_campaign",			       /* xxx */
-	NULL,						/* xxx */
+	"birth_no_stacking",			/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
@@ -1573,7 +1573,7 @@ const cptr option_text[OPT_MAX] =
 	"adult_no_artifacts",		/* OPT_adult_no_artifacts */
 	"adult_rand_artifacts",		/* OPT_adult_rand_artifacts */
 	"adult_campaign",				/* xxx */
-	NULL,						/* xxx */
+	"adult_no_stacking",			/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
@@ -1661,9 +1661,9 @@ const cptr option_desc[OPT_MAX] =
 	"Disturb whenever map panel changes",		/* OPT_disturb_panel */
 	"Disturb whenever player state changes",	/* OPT_disturb_state */
 	"Disturb whenever boring things happen",	/* OPT_disturb_minor */
-	"Disturb whenever various things happen",	/* OPT_disturb_other */
-	"Alert user to critical hitpoints",			/* OPT_alert_hitpoint */
-	"Alert user to various failures",			/* OPT_alert_failure */
+	"",	/* OPT_disturb_other */
+	"",			/* OPT_alert_hitpoint */
+	"",			/* OPT_alert_failure */
 	"Verify destruction of objects",			/* OPT_verify_destroy */
 	"Verify use of special commands",			/* OPT_verify_special */
 	"Allow quantity specification",				/* OPT_allow_quantity */
@@ -1710,18 +1710,18 @@ const cptr option_desc[OPT_MAX] =
 	"Automatically clear '-more-' prompts",		/* OPT_auto_more */
 	"Monsters behave more intelligently",		/* OPT_smart_monsters */
 	NULL,								/* xxx */
-	"Merge pvals when stacking",					     /* xxx */
-	"Merge timeouts when stacking",					  /* xxx */
-	"Map marked by detect traps",						/* xxx */
-	"Display room descriptions",						/* xxx */
-	"Display room names",						/* xxx */
-	"Verify critical mana",						/* xxx */
-	"Reseed random artifacts on death",						/* xxx */
-        "Automatically inscribe all objects",
+	"Merge pvals when stacking",				/* xxx */
+	"Merge timeouts when stacking",			/* xxx */
+	"Map marked by detect traps",				/* xxx */
+	"Display room descriptions",				/* xxx */
+	"Display room names",					/* xxx */
+	"Verify critical mana",					/* xxx */
+	"Reseed random artifacts on death",			/* xxx */
+      "Automatically inscribe all objects",
 	"Start searching if not disturbed",										/* xxx */
-	"Save new features in save-file",									   /* xxx */
-	NULL,										/* xxx */
-	NULL,										/* xxx */
+	"Save new features in save-file",			/* xxx */
+	"Use special colours for glowing lite (slow)",	/* OPT_view_glowing_lite */
+	"Use special colours for surface lite",		/* OPT_view_surface_lite */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
@@ -1773,7 +1773,7 @@ const cptr option_desc[OPT_MAX] =
 	"Birth: Restrict creation of artifacts",	/* OPT_birth_no_artifacts */
 	"Birth: Randomize all of the artifacts",       /* OPT_birth_rand_artifacts */
 	"Birth: Play in Lord of the Rings campaign",   /* OPT_birth_campaign */
-	NULL,										/* xxx */
+	"Birth: Don't stack objects on the floor",	/* OPT_birth_no_stacking */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
@@ -1837,6 +1837,7 @@ const cptr option_desc[OPT_MAX] =
 	"Adult: Restrict creation of artifacts",	/* OPT_adult_no_artifacts */
 	"Adult: Randomize all of the artifacts",       /* OPT_adult_rand_artifacts */
 	"Adult: Play in Lord of the Rings campaign",   /* OPT_birth_campaign */
+	"Adult: Don't stack objects on the floor",	/* OPT_birth_no_stacking */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
@@ -1859,15 +1860,14 @@ const cptr option_desc[OPT_MAX] =
 	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
-	NULL,										/* xxx */
-	"Score: Peek into object creation",			/* OPT_score_peek */
-	"Score: Peek into monster creation",		/* OPT_score_hear */
-	"Score: Peek into dungeon creation",		/* OPT_score_room */
-	"Score: Peek into something else",			/* OPT_score_xtra */
+	"Score: Peek into object creation",					/* OPT_score_peek */
+	"Score: Peek into monster creation",				/* OPT_score_hear */
+	"Score: Peek into dungeon creation",				/* OPT_score_room */
+	"Score: Peek into something else",/* OPT_score_xtra */
 	"Score: Know complete monster info",		/* OPT_score_know */
 	"Score: Allow player to avoid death",		/* OPT_score_live */
-	"Score: Know complete artifact/ego info",					       /* xxx */
-	"Score: Auto-inscribe items as if known",									   /* xxx */
+	"Score: Know complete artifact/ego info",				/* xxx */
+	"Score: Auto-inscribe items as if known",				/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
@@ -1983,9 +1983,9 @@ const bool option_norm[OPT_MAX] =
 	TRUE,		/* OPT_reseed_artifacts */
       FALSE,	   /* OPT_easy_autos */
 	FALSE,		/* OPT_easy_search */
-	FALSE,	  /* OPT_variant_save_feats */
-	FALSE,		/* xxx */
-	FALSE,		/* xxx */
+	TRUE,	  /* OPT_variant_save_feats */
+	FALSE,		/* OPT_view_glowing_lite */
+	FALSE,		/* OPT_view_surface_lite */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
@@ -1999,12 +1999,12 @@ const bool option_norm[OPT_MAX] =
 	FALSE,	  /* OPT_variant_town */
 	TRUE,	   /* OPT_variant_mushroom */
 	TRUE,	   /* OPT_variant_mon_hit_trap */
-	FALSE,	  /* OPT_variant_room_info */
+	TRUE,	  /* OPT_variant_room_info */
 	TRUE,	   /* OPT_variant_free_stats */
 	TRUE,	   /* OPT_variant_fast_kills */
 	TRUE,	   /* OPT_variant_scale_damage */
 	TRUE,	   /* OPT_variant_scale_hp */
-	FALSE,	  /* OPT_variant_pval_stacks */
+	TRUE,	  /* OPT_variant_pval_stacks */
 	TRUE,	   /* OPT_variant_oos_summons */
 	TRUE,	   /* OPT_variant_oos_teleports */
 	TRUE,	   /* OPT_variant_oos_heals */
@@ -2013,21 +2013,21 @@ const bool option_norm[OPT_MAX] =
 	TRUE,	   /* OPT_variant_lake_feats */
 	TRUE,	   /* OPT_variant_big_feats */
 	TRUE,	   /* OPT_variant_new_feats */
-	FALSE,	  /* OPT_variant_learn_id */
-	FALSE,	  /* OPT_variant_guess_id */
-	FALSE,	  /* OPT_variant_usage_id */
+	TRUE,	  /* OPT_variant_learn_id */
+	TRUE,	  /* OPT_variant_guess_id */
+	TRUE,	  /* OPT_variant_usage_id */
 	TRUE,	   /* OPT_variant_great_id */
 	TRUE,	   /* OPT_variant_dis_attacks */
-	FALSE,	  /* OPT_variant_time_stacks */
+	TRUE,	  /* OPT_variant_time_stacks */
 	TRUE,		/* OPT_variant_many_rings */
 	TRUE,	  /* OPT_variant_fast_floor */
 	TRUE,	   /* OPT_variant_fast_equip */
-	FALSE,	  /* OPT_variant_belt_slot */
-	FALSE,	  /* OPT_variant_fast_moves */
-	FALSE,	  /* OPT_variant_unsummon */
+	TRUE,	  /* OPT_variant_belt_slot */
+	TRUE,	  /* OPT_variant_fast_moves */
+	TRUE,	  /* OPT_variant_unsummon */
 	FALSE,	  /* OPT_variant_friendly */
-	FALSE,	  /* OPT_variant_more_spells */
-	FALSE,	  /* OPT_variant_drop_body */
+	TRUE,	  /* OPT_variant_more_spells */
+	TRUE,	  /* OPT_variant_drop_body */
 	FALSE,		/* OPT_birth_point_based */
 	FALSE,		/* OPT_birth_auto_roller */
 	TRUE,		/* OPT_birth_maximize */
@@ -2101,7 +2101,7 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* OPT_adult_no_artifacts */
 	FALSE,		/* OPT_adult_rand_artifacts */
 	FALSE,	  /* OPT_adult_campaign */
-	FALSE,		/* xxx */
+	FALSE,		/* OPT_adult_no_stacking */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
@@ -2201,12 +2201,12 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_disturb_panel,
 		OPT_disturb_state,
 		OPT_disturb_minor,
-		OPT_alert_failure,
 		OPT_verify_destroy,
 		OPT_verify_special,
 		OPT_allow_quantity,
 		OPT_auto_more,
 		OPT_verify_mana,
+		255,
 		255,
 		255,
 		255,
@@ -2278,13 +2278,13 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_view_bright_lite,
 		OPT_view_granite_lite,
 		OPT_view_special_lite,
+		OPT_view_glowing_lite,
+		OPT_view_surface_lite,
  		OPT_center_player,
  		OPT_run_avoid_center,
 		OPT_show_piles,
 		OPT_room_names,
 		OPT_room_descriptions,
-		255,
-		255,
 		255,
 		255
 	},
@@ -2301,7 +2301,7 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_birth_no_artifacts,
 		OPT_birth_rand_artifacts,
 		OPT_birth_campaign,
-		255,
+		OPT_birth_no_stacking,
 		255,
 		255,
 		255,
@@ -2397,7 +2397,7 @@ const cptr inscrip_text[MAX_INSCRIP] =
 	"worthless",
 	"cursed",
 	"broken",
-	"average",
+	"empty",
 	"good",
 	"excellent",
 	"special",

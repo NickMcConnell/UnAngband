@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001 Andrew Doull. Modifications to the Angband 2.9.1
+ * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.1
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -61,8 +61,8 @@ bool hp_player(int num)
 		}
 
 		/* Heal 35+ */
-                else
-                {
+		else
+		{
 			msg_print("You feel very good.");
 		}
 
@@ -638,7 +638,7 @@ void self_knowledge(void)
 		{
 			text_out("Your weapon has special powers.  ");
 	
-                        list_object_flags(f1,f2,f3,1);
+			list_object_flags(f1,f2,f3,1);
 	
 			object_can_flags(o_ptr,f1,f2,f3);
 	
@@ -689,9 +689,6 @@ bool lose_all_info(void)
 
 		/* Hack -- Clear the "known" flag */
 		o_ptr->ident &= ~(IDENT_KNOWN);
-
-		/* Hack -- Clear the "empty" flag */
-		o_ptr->ident &= ~(IDENT_EMPTY);
 	}
 
 	/* Recalculate bonuses */
@@ -1013,6 +1010,9 @@ bool detect_objects_normal(void)
 			/* Hack -- have seen object */
 			if (!(k_info[o_ptr->k_idx].flavor)) k_info[o_ptr->k_idx].aware = TRUE;
 
+			/* XXX XXX - Mark monster objects as "seen" */
+			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights)) l_list[o_ptr->name3].sights++;
+
 			/* Redraw */
 			lite_spot(y, x);
 
@@ -1155,7 +1155,7 @@ bool detect_objects_magic(void)
 	/* Scan all objects */
 	for (i = 1; i < o_max; i++)
 	{
-		int feel = INSCRIP_AVERAGE;
+		int feel = 0;
 
 		bool okay = FALSE;
 
@@ -1190,6 +1190,9 @@ bool detect_objects_magic(void)
 
 			/* Hack -- have seen object */
 			if (!(k_info[o_ptr->k_idx].flavor)) k_info[o_ptr->k_idx].aware = TRUE;
+
+			/* XXX XXX - Mark monster objects as "seen" */
+			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights)) l_list[o_ptr->name3].sights++;
 
 			/* Redraw */
 			lite_spot(y, x);
@@ -1256,7 +1259,7 @@ bool detect_objects_magic(void)
 	/* Sense inventory */
 	for (i = 0; i < INVEN_TOTAL+1; i++)
 	{
-		int feel = INSCRIP_AVERAGE;
+		int feel = 0;
 
 		bool okay = FALSE;
 
@@ -1285,6 +1288,8 @@ bool detect_objects_magic(void)
 			case TV_SOFT_ARMOR:
 			case TV_HARD_ARMOR:
 			case TV_DRAG_ARMOR:
+			case TV_STAFF:
+			case TV_INSTRUMENT:
 			{
 				okay = TRUE;
 				break;
@@ -1358,6 +1363,8 @@ bool detect_objects_cursed(void)
 	{
 		int feel;
 
+		bool okay = FALSE;
+
 		object_type *o_ptr = &o_list[i];
 
 		/* Skip dead objects */
@@ -1382,12 +1389,48 @@ bool detect_objects_cursed(void)
 			/* Hack -- have seen object */
 			if (!(k_info[o_ptr->k_idx].flavor)) k_info[o_ptr->k_idx].aware = TRUE;
 
+			/* XXX XXX - Mark monster objects as "seen" */
+			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights)) l_list[o_ptr->name3].sights++;
+
 			/* Redraw */
 			lite_spot(y, x);
 
 			/* Detect */
 			detect = TRUE;
 		}
+
+		/* Valid "tval" codes */
+		switch (o_ptr->tval)
+		{
+			case TV_SHOT:
+			case TV_ARROW:
+			case TV_BOLT:
+			case TV_BOW:
+			case TV_DIGGING:
+			case TV_HAFTED:
+			case TV_POLEARM:
+			case TV_SWORD:
+			case TV_BOOTS:
+			case TV_GLOVES:
+			case TV_HELM:
+			case TV_CROWN:
+			case TV_SHIELD:
+			case TV_CLOAK:
+			case TV_SOFT_ARMOR:
+			case TV_HARD_ARMOR:
+			case TV_DRAG_ARMOR:
+			case TV_AMULET:
+			case TV_RING:
+			case TV_STAFF:
+			case TV_INSTRUMENT:
+			{
+				okay = TRUE;
+				break;
+			}
+		}
+
+		/* Skip objects */
+		if (!okay) continue;
 
 		/* It already has a discount or special inscription */
 		if (o_ptr->discount > 0) continue;
@@ -1418,10 +1461,45 @@ bool detect_objects_cursed(void)
 	{
 		int feel;
 
+		bool okay = FALSE;
+
 		object_type *o_ptr = &inventory[i];
 
 		/* Skip empty slots */
 		if (!o_ptr->k_idx) continue;
+
+		/* Valid "tval" codes */
+		switch (o_ptr->tval)
+		{
+			case TV_SHOT:
+			case TV_ARROW:
+			case TV_BOLT:
+			case TV_BOW:
+			case TV_DIGGING:
+			case TV_HAFTED:
+			case TV_POLEARM:
+			case TV_SWORD:
+			case TV_BOOTS:
+			case TV_GLOVES:
+			case TV_HELM:
+			case TV_CROWN:
+			case TV_SHIELD:
+			case TV_CLOAK:
+			case TV_SOFT_ARMOR:
+			case TV_HARD_ARMOR:
+			case TV_DRAG_ARMOR:
+			case TV_AMULET:
+			case TV_RING:
+			case TV_STAFF:
+			case TV_INSTRUMENT:
+			{
+				okay = TRUE;
+				break;
+			}
+		}
+
+		/* Skip objects */
+		if (!okay) continue;
 
 		/* It already has a discount or special inscription */
 		if (o_ptr->discount > 0) continue;
@@ -1433,7 +1511,7 @@ bool detect_objects_cursed(void)
 		if (object_known_p(o_ptr)) continue;
 
 		/* Get the inscription */
-		 feel = value_check_aux4(o_ptr);
+		feel = value_check_aux4(o_ptr);
 
 		/* Sense something? */
 		if (!feel) continue;
@@ -2285,7 +2363,7 @@ bool enchant_spell(int num_hit, int num_dam, int num_ac)
 	}
 
 	/* Description */
-	object_desc(o_name, o_ptr, FALSE, 0);
+	object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
 
 	/* Describe */
 	msg_format("%s %s glow%s brightly!",
@@ -2364,7 +2442,7 @@ bool brand_item(int brand, cptr act)
 	}
 
 	/* Description */
-	object_desc(o_name, o_ptr, FALSE, 0);
+	object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
 
 	/* Describe */
 	msg_format("%s %s %s!",
@@ -2378,76 +2456,77 @@ bool brand_item(int brand, cptr act)
 		object_type *i_ptr;
 		object_type object_type_body;
 
-	/* Hack -- split stack only if required. This is dangerous otherwise as we may
-	   be calling from a routine where we delete items later. XXX XXX */
-	/* Mega-hack -- we allow 5 arrows/shots/bolts to be enchanted per application */
-	if ((o_ptr->number > 1) && ((!brand_ammo) || (o_ptr->number > 5)))
-	{
+		/* Hack -- split stack only if required. This is dangerous otherwise as we may
+		   be calling from a routine where we delete items later. XXX XXX */
+		/* Mega-hack -- we allow 5 arrows/shots/bolts to be enchanted per application */
+		if ((o_ptr->number > 1) && ((!brand_ammo) || (o_ptr->number > 5)))
+		{
 
-		int qty = (brand_ammo) ? 5 : 1;
-		split = TRUE;
+			int qty = (brand_ammo) ? 5 : 1;
+			split = TRUE;
 
-	/* Get local object */
-	i_ptr = &object_type_body;
+			/* Get local object */
+			i_ptr = &object_type_body;
 
-	/* Obtain a local object */
-	object_copy(i_ptr, o_ptr);
+			/* Obtain a local object */
+			object_copy(i_ptr, o_ptr);
 
-	/* Modify quantity */
-	i_ptr->number = qty;
+			/* Modify quantity */
+			i_ptr->number = qty;
 
-	/* Reset stack counter */
-	i_ptr->stackc = 0;
+			/* Reset stack counter */
+			i_ptr->stackc = 0;
 
-	/* Decrease the item (in the pack) */
-	if (item >= 0)
-	{
-		inven_item_increase(item, -qty);
-	    floor_item_describe(0 - item);
-	    inven_item_optimize(item);
-	}
-	/* Decrease the item (from the floor) */
-	else
-	{
-		floor_item_increase(0 - item, -qty);
-		floor_item_describe(0 - item);
-		floor_item_optimize(0 - item);
-	}
-		/* Hack -- use new temporary item */
-		o_ptr = i_ptr;
-	}
+			/* Decrease the item (in the pack) */
+			if (item >= 0)
+			{
+				inven_item_increase(item, -qty);
+				inven_item_describe(item);
+				inven_item_optimize(item);
+			}
+			/* Decrease the item (from the floor) */
+			else
+			{
+				floor_item_increase(0 - item, -qty);
+				floor_item_describe(0 - item);
+				floor_item_optimize(0 - item);
+			}
+
+			/* Hack -- use new temporary item */
+			o_ptr = i_ptr;
+		}
 
 		o_ptr->xtra1 = brand;
 		o_ptr->xtra2 = (byte)rand_int(object_xtra_size[brand]);
 
-			if (object_xtra_what[brand] == 1)
-			{
-		    		object_can_flags(o_ptr,object_xtra_base[brand] << o_ptr->xtra2,0x0L,0x0L);
-			}
-			else if (object_xtra_what[brand] == 2)
-			{
-		    		object_can_flags(o_ptr,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L);
-			}
-			else if (object_xtra_what[brand] == 3)
-			{
-		    		object_can_flags(o_ptr,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2);
-			}
+		if (object_xtra_what[brand] == 1)
+		{
+    			object_can_flags(o_ptr,object_xtra_base[brand] << o_ptr->xtra2,0x0L,0x0L);
+		}
+		else if (object_xtra_what[brand] == 2)
+		{
+	    		object_can_flags(o_ptr,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L);
+		}
+		else if (object_xtra_what[brand] == 3)
+		{
+    			object_can_flags(o_ptr,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2);
+		}
 
 		/* Remove special inscription, if any */
 		if (o_ptr->discount >= INSCRIP_NULL) o_ptr->discount = 0;
 
-		    /* Carry item again if split */
-		    if (split)
-		    {
-			/* Adjust the weight and carry */
-      		  item = inven_carry(o_ptr);
-		    }
-	
 		/* Take note if allowed */
 		if (o_ptr->discount == 0) o_ptr->discount = INSCRIP_MIN_HIDDEN + brand -1;
 	
 		/* The object has been "sensed" */
 		o_ptr->ident |= (IDENT_SENSE);
+
+		/* Carry item again if split */
+		if (split)
+		{
+			/* Drop it near the player */
+			drop_near(o_ptr, 0, p_ptr->py, p_ptr->px);
+		}
 	
 		/* Recalculate bonuses */
 		p_ptr->update |= (PU_BONUS);
@@ -2521,7 +2600,7 @@ bool ident_spell(void)
 	p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
 
 	/* Description */
-	object_desc(o_name, o_ptr, TRUE, 3);
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 	/* Describe */
 	if (item >= INVEN_WIELD)
@@ -2593,7 +2672,7 @@ bool ident_spell_bonus(void)
 	p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
 
 	/* Description */
-	object_desc(o_name, o_ptr, TRUE, 3);
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 	/* Describe */
 	if (item >= INVEN_WIELD)
@@ -2736,7 +2815,7 @@ bool ident_spell_rumor(void)
 		object_can_flags(o_ptr,f1,f2,f3);
 
 		/* Description */
-		object_desc(o_name, o_ptr, TRUE, 3);
+		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 		/* Describe */
 		if (item >= INVEN_WIELD)
@@ -2848,7 +2927,7 @@ bool ident_spell_tval(int tval)
 	p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
 
 	/* Description */
-	object_desc(o_name, o_ptr, TRUE, 3);
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 	/* Describe */
 	if (item >= INVEN_WIELD)
@@ -2927,7 +3006,7 @@ bool identify_fully(void)
 	handle_stuff();
 
 	/* Description */
-	object_desc(o_name, o_ptr, TRUE, 3);
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 	/* Describe */
 	if (item >= INVEN_WIELD)
@@ -2949,7 +3028,16 @@ bool identify_fully(void)
 
 	msg_print("");
 
-	screen_object(o_ptr,TRUE);
+	/* Save the screen */
+	screen_save();
+
+	/* Describe */
+	screen_object(o_ptr, TRUE);
+
+	(void)inkey();
+
+	/* Load the screen */
+	screen_load();
 
 	/* Success */
 	return (TRUE);
@@ -3115,8 +3203,11 @@ bool recharge(int num)
 			/* Hack -- we no longer "know" the item */
 			o_ptr->ident &= ~(IDENT_KNOWN);
 
-			/* Hack -- we no longer think the item is empty */
-			o_ptr->ident &= ~(IDENT_EMPTY);
+			/* Hack -- we no longer "sense" the item */
+			o_ptr->ident &= ~(IDENT_SENSE);
+
+			/* Hack -- the item is no longer empty */
+			if (o_ptr->discount < INSCRIP_MIN_HIDDEN) o_ptr->discount = 0;
 
 			/* Hack -- round up */
 			o_ptr->stackc = 0;
@@ -3237,7 +3328,7 @@ void aggravate_monsters(int who)
 /*
  * Delete all non-unique monsters of a given "type" from the level
  */
-bool genocide(void)
+bool banishment(void)
 {
 	int i;
 
@@ -3247,7 +3338,7 @@ bool genocide(void)
 
 
 	/* Mega-Hack -- Get a monster symbol */
-	(void)(get_com("Choose a monster race (by symbol) to genocide: ", &typ));
+	(void)(get_com("Choose a monster race (by symbol) to banishment: ", &typ));
 
 	/* Delete the monsters of that "type" */
 	for (i = 1; i < m_max; i++)
@@ -3268,7 +3359,7 @@ bool genocide(void)
 		delete_monster_idx(i);
 
 		/* Take some damage */
-		take_hit(randint(4), "the strain of casting Genocide");
+		take_hit(randint(4), "the strain of casting Banishment");
 
 		/* Take note */
 		result = TRUE;
@@ -3281,7 +3372,7 @@ bool genocide(void)
 /*
  * Delete all nearby (non-unique) monsters
  */
-bool mass_genocide(void)
+bool mass_banishment(void)
 {
 	int i;
 
@@ -3307,7 +3398,7 @@ bool mass_genocide(void)
 		delete_monster_idx(i);
 
 		/* Take some damage */
-		take_hit(randint(3), "the strain of casting Mass Genocide");
+		take_hit(randint(3), "the strain of casting Mass Banishment");
 
 		/* Note effect */
 		result = TRUE;
@@ -3495,7 +3586,7 @@ void destroy_area(int y1, int x1, int r, bool full)
  *
  * Monsters will take damage, and "jump" into a safe grid if possible,
  * otherwise they will be "buried" in the rubble, disappearing from
- * the level in the same way that they do when genocided.
+ * the level in the same way that they do when banished.
  *
  * Note that players and monsters (except eaters of walls and passers
  * through walls) will never occupy the same grid as a wall (or door).
@@ -4170,6 +4261,39 @@ bool fire_ball(int typ, int dir, int dam, int rad)
 
 
 /*
+ * Cast a cloud spell
+ * Stop if we hit a monster, act as a "ball"
+ * Allow "target" mode to pass over monsters
+ * Affect monsters only
+ */
+bool fire_cloud(int typ, int dir, int dam, int rad)
+{
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int ty, tx;
+
+	int flg = PROJECT_STOP | PROJECT_KILL;
+
+	/* Use the given direction */
+	ty = py + 99 * ddy[dir];
+	tx = px + 99 * ddx[dir];
+
+	/* Hack -- Use an actual "target" */
+	if ((dir == 5) && target_okay())
+	{
+		flg &= ~(PROJECT_STOP);
+
+		ty = p_ptr->target_row;
+		tx = p_ptr->target_col;
+	}
+
+	/* Analyze the "dir" and the "target".  Hurt items on floor. */
+	return (project(-1, rad, ty, tx, dam, typ, flg));
+}
+
+
+/*
  * Hack -- apply a "projection()" in a direction (or at the target)
  */
 static bool project_hook(int typ, int dir, int dam, int flg)
@@ -4205,7 +4329,7 @@ static bool project_hook(int typ, int dir, int dam, int flg)
  */
 bool fire_bolt(int typ, int dir, int dam)
 {
-	int flg = PROJECT_STOP | PROJECT_KILL;
+	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_GRID;
 	return (project_hook(typ, dir, dam, flg));
 }
 
@@ -4216,7 +4340,7 @@ bool fire_bolt(int typ, int dir, int dam)
  */
 bool fire_beam(int typ, int dir, int dam)
 {
-	int flg = PROJECT_BEAM | PROJECT_KILL;
+	int flg = PROJECT_BEAM | PROJECT_KILL | PROJECT_GRID;
 	return (project_hook(typ, dir, dam, flg));
 }
 
@@ -4265,7 +4389,7 @@ bool fire_hands(int typ, int dir, int dam)
 /*
  * Create a (wielded) spell item
  */
-static void wield_spell(int item, int sval, int time)
+static void wield_spell(int item, int k_idx, int time)
 {
 
 	object_type *i_ptr;
@@ -4282,7 +4406,7 @@ static void wield_spell(int item, int sval, int time)
 	i_ptr = &object_type_body;
 
 	/* Create the spell */
-	object_prep(i_ptr, lookup_kind(TV_SPELL, sval));
+	object_prep(i_ptr, k_idx);
 	i_ptr->timeout = time;
 	object_aware(i_ptr);
 	object_known(i_ptr);
@@ -4316,7 +4440,7 @@ static void wield_spell(int item, int sval, int time)
 	p_ptr->equip_cnt++;
 
 	/* Where is the item now */
-        if (((item == INVEN_WIELD) && (o_ptr->number > 1)) || (item == INVEN_BELT))
+	if (((item == INVEN_WIELD) && (o_ptr->number > 1)) || (item == INVEN_BELT))
 	{
 		act = "You are carrying";
 	}
@@ -4325,9 +4449,9 @@ static void wield_spell(int item, int sval, int time)
 		(o_ptr->tval == TV_DIGGING))
 	{
 		act = "You are wielding";
-                if (item == INVEN_ARM) act = "You are wielding off-handed";
+		if (item == INVEN_ARM) act = "You are wielding off-handed";
 	}
-        else if (item == INVEN_WIELD)
+	else if (item == INVEN_WIELD)
 	{
 		act = "You are using";
 	}
@@ -4335,11 +4459,11 @@ static void wield_spell(int item, int sval, int time)
 	{
 		act = "You are playing music with";
 	}
-        else if (item == INVEN_BOW)
+	else if (item == INVEN_BOW)
 	{
 		act = "You are shooting with";
 	}
-        else if (item == INVEN_LITE)
+	else if (item == INVEN_LITE)
 	{
 		act = "Your light source is";
 	}
@@ -4351,7 +4475,7 @@ static void wield_spell(int item, int sval, int time)
 
 
 	/* Describe the result */
-	object_desc(o_name, o_ptr, TRUE, 3);
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 	/* Message */
 	msg_format("%s %s (%c).", act, o_name, index_to_label(item));
@@ -4593,7 +4717,7 @@ static bool curse_armor(void)
 
 
 	/* Describe */
-	object_desc(o_name, o_ptr, FALSE, 3);
+	object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 3);
 
 	/* Attempt a saving throw for artifacts */
 	if (artifact_p(o_ptr) && (rand_int(100) < 50))
@@ -4661,7 +4785,7 @@ static bool curse_weapon(void)
 
 
 	/* Describe */
-	object_desc(o_name, o_ptr, FALSE, 3);
+	object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 3);
 
 	/* Attempt a saving throw */
 	if (artifact_p(o_ptr) && (rand_int(100) < 50))
@@ -4820,8 +4944,16 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 	if ((s_ptr->flags1 & (SF1_DETECT_TRAPS)) && (detect_traps())) obvious = TRUE;
 	if ((s_ptr->flags1 & (SF1_DETECT_STAIRS)) && (detect_stairs())) obvious = TRUE;
 	if ((s_ptr->flags1 & (SF1_DETECT_WATER)) && (detect_water())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_GOLD)) && ((detect_treasure() || detect_objects_gold))) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_OBJECT)) && ((detect_objects_buried() || detect_objects_normal))) obvious = TRUE;
+	if (s_ptr->flags1 & (SF1_DETECT_GOLD))
+        {
+                if (detect_treasure()) obvious = TRUE;
+                if (detect_objects_gold()) obvious = TRUE;
+        }
+	if (s_ptr->flags1 & (SF1_DETECT_OBJECT))
+        {
+                if (detect_objects_buried()) obvious = TRUE;
+                if (detect_objects_normal()) obvious = TRUE;
+        }
 	if ((s_ptr->flags1 & (SF1_DETECT_MAGIC)) && (detect_objects_magic())) obvious = TRUE;
 	if ((s_ptr->flags1 & (SF1_DETECT_CURSE)) && (detect_objects_cursed())) obvious = TRUE;
 	if ((s_ptr->flags1 & (SF1_DETECT_MONSTER)) && (detect_monsters_normal())) obvious = TRUE;
@@ -4927,15 +5059,15 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 		obvious = TRUE;
 	}
 
-	if (s_ptr->flags2 & (SF2_GENOCIDE))
+	if (s_ptr->flags2 & (SF2_BANISHMENT))
 	{
-		(void)genocide();
+		(void)banishment();
 		obvious = TRUE;
 	}
 
-	if (s_ptr->flags2 & (SF2_MASS_GENOCIDE))
+	if (s_ptr->flags2 & (SF2_MASS_BANISHMENT))
 	{
-		mass_genocide();
+		mass_banishment();
 		obvious = TRUE;
 	}
 
@@ -5299,7 +5431,6 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 			{
 				/* Allow direction to be cancelled for free */
 				if ((!get_rep_dir(&dir)) && (*cancel)) return (FALSE);
-					  
 
 				/* Hack - scale damage */
 				if ((level > 5) && (d_side)) damage+= damroll((level-1)/5, d_side);
@@ -5321,14 +5452,13 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 			}
 			case RBM_BOLT_10:
 			{
-					int beam;
+				int beam;
 
 				if (c_info[p_ptr->pclass].spell_power) beam = level;
 				else beam = level/2;
 
 				/* Allow direction to be cancelled for free */
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
-						
 
 				/* Hack - scale damage */
 				if ((level > 8) && (d_side)) damage += damroll((level-5)/4, d_side);
@@ -5356,7 +5486,6 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 			{
 				/* Allow direction to be cancelled for free */
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
-						
 
 				/* Hack - scale damage */
 				if ((level > 8) && (d_side)) damage += damroll((level-5)/4, d_side);
@@ -5369,7 +5498,6 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 			{
 				/* Allow direction to be cancelled for free */
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
-						
 
 				/* Hack - scale damage */
 				damage += level;
@@ -5384,20 +5512,17 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 
 				/* Allow direction to be cancelled for free */
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
-						
 
 				/* Hack - scale damage */
 				if ((level > 8) && (d_side)) damage += damroll((level-5)/4, d_side);
 
-					if (project_hook(effect, dir, damage, flg)) obvious = TRUE;
+				if (project_hook(effect, dir, damage, flg)) obvious = TRUE;
 				break;
 			}
 			case RBM_BALL:
 			{
 				/* Allow direction to be cancelled for free */
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
-					  
-
 
 				if (fire_ball(effect, dir, damage, 2)) obvious = TRUE;
 
@@ -5409,13 +5534,11 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 
 				/* Allow direction to be cancelled for free */
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
-					  
-
 
 				/* Hack - scale damage */
 				damage += level / 2;
 				
-				if (fire_ball(effect, dir, damage, rad)) obvious = TRUE;
+				if (fire_cloud(effect, dir, damage, rad)) obvious = TRUE;
 
 				break;
 			}
@@ -5423,8 +5546,6 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 			{
 				/* Allow direction to be cancelled for free */
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
-					  
-
 
 				if (fire_ball(effect, dir, damage, 3)) obvious = TRUE;
 
@@ -5434,8 +5555,6 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 			{
 				/* Allow direction to be cancelled for free */
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
-					  
-
 
 				if (fire_ball(effect, dir, MIN(p_ptr->chp,damage), 2)) obvious = TRUE;
 
@@ -5463,7 +5582,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 
 				/* Allow direction to be cancelled for free */
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
-                                if (project_hook(effect, dir, damage, flg)) obvious = TRUE;
+				if (project_hook(effect, dir, damage, flg)) obvious = TRUE;
 				break;
 			}
 			case RBM_AIM:
@@ -5471,8 +5590,6 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				int flg = PROJECT_STOP | PROJECT_KILL;
 				/* Allow direction to be cancelled for free */
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
-					  
-
 
 				if (project_hook(effect, dir, damage, flg)) obvious = TRUE;
 
@@ -5488,8 +5605,6 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				/* Allow direction to be cancelled for free */
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
 
-					  
-
 				if (fire_ball(effect, dir, damage, rad)) obvious = TRUE;
 
 				break;
@@ -5500,9 +5615,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 
 				/* Allow direction to be cancelled for free */
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
-					  
 
-				
 				for (k = 0; k < 4; k++) if (fire_beam(effect, ddd[k], damage)) obvious = TRUE;
 
 				break;
@@ -5678,6 +5791,8 @@ bool process_spell_types(int spell, int level, bool *cancel)
 			{
 				if ((!get_rep_dir(&dir)) && (*cancel)) return (FALSE);
 				else warding_trap(s_ptr->param,dir);
+				*cancel = FALSE;
+				obvious = TRUE;
 				break;
 			}
 			case SPELL_SUMMON:
@@ -5814,7 +5929,7 @@ bool process_spell_eaten(int spell, int level, bool *cancel)
 		}
 		else
 		{
-			if (project_p(0,0,p_ptr->py,p_ptr->px,damage, effect)) obvious = TRUE;
+			if (project_p(-2,0,p_ptr->py,p_ptr->px,damage, effect)) obvious = TRUE;
 		}
 	}
 

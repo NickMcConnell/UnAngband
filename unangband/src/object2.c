@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001 Andrew Doull. Modifications to the Angband 2.9.1
+ * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.1
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -717,20 +717,18 @@ s16b get_obj_num(int level)
  */
 void object_mental(object_type *o_ptr)
 {
+	u32b f1,f2,f3;
 
 	/* Now we know about the item */
 	o_ptr->ident |= (IDENT_MENTAL);
 
-	object_can_flags(o_ptr,o_ptr->can_flags1,
-				o_ptr->can_flags2,
-				o_ptr->can_flags3);
+	/* Spoil the object */
+	object_flags(o_ptr,&f1,&f2,&f3);
 
-	object_not_flags(o_ptr,o_ptr->not_flags1,
-				o_ptr->not_flags2,
-				o_ptr->not_flags3);
+	object_can_flags(o_ptr,f1,f2,f3);
 
+	object_not_flags(o_ptr,~(f1),~(f2),~(f3));
 }
-
 
 
 
@@ -759,9 +757,6 @@ void object_known(object_type *o_ptr)
 	/* The object is not "sensed" */
 	o_ptr->ident &= ~(IDENT_SENSE);
 
-	/* Clear the "Empty" info */
-	o_ptr->ident &= ~(IDENT_EMPTY);
-
 	/* The object is not "partially sensed" */
 	o_ptr->ident &= ~(IDENT_BONUS);
 
@@ -776,16 +771,11 @@ void object_known(object_type *o_ptr)
 	if (o_ptr->name2)
 	{
 		if (!o_ptr->note) o_ptr->note = e_info[o_ptr->name2].note;
-
-		e_info[o_ptr->name2].aware = TRUE;
 	}
 	else
 	{
 		if (!o_ptr->note) o_ptr->note = k_info[o_ptr->k_idx].note;
 	}
-
-	/* The object kind is not guessed */
-	k_info[o_ptr->k_idx].guess = 0; 
 
 	/* Now we know about the item */
 	o_ptr->ident |= (IDENT_KNOWN);
@@ -801,16 +791,27 @@ void object_known(object_type *o_ptr)
 				a_list[o_ptr->name1].not_flags2,
 				a_list[o_ptr->name1].not_flags3);
 	}
-	/* Now we know what it is, update what we know about it from our ego item memory */
-	else if (o_ptr->name2)
+	else
 	{
-		object_can_flags(o_ptr,e_list[o_ptr->name2].can_flags1,
-				e_list[o_ptr->name2].can_flags2,
-				e_list[o_ptr->name2].can_flags3);
+		/* Now we know what it is, update what we know about it from our ego item memory */
+		if (o_ptr->name2)
+		{
+			/* Obvious flags */
+			object_can_flags(o_ptr,e_info[o_ptr->name2].obv_flags1,
+					 e_info[o_ptr->name2].obv_flags2,
+					 e_info[o_ptr->name2].obv_flags3);
 
-		object_not_flags(o_ptr,e_list[o_ptr->name2].not_flags1,
-				e_list[o_ptr->name2].not_flags2,
-				e_list[o_ptr->name2].not_flags3);
+			/* Known flags */
+			object_can_flags(o_ptr,e_list[o_ptr->name2].can_flags1,
+					 e_list[o_ptr->name2].can_flags2,
+					 e_list[o_ptr->name2].can_flags3);
+			
+			object_not_flags(o_ptr,e_list[o_ptr->name2].not_flags1,
+					 e_list[o_ptr->name2].not_flags2,
+					 e_list[o_ptr->name2].not_flags3);
+		}
+		else
+			object_obvious_flags(o_ptr);
 	}
 
 	/* Now we know what it is, update what we know about it */
@@ -826,6 +827,11 @@ void object_known(object_type *o_ptr)
 			o_ptr->may_flags2,
 			o_ptr->may_flags3);
 
+	/* Know about ego-type */
+	if ((o_ptr->name2) && !(o_ptr->ident & (IDENT_STORE)))
+	{
+		e_info[o_ptr->name2].aware = TRUE;
+	}
 }
 
 
@@ -837,7 +843,6 @@ void object_known(object_type *o_ptr)
  */
 void object_bonus(object_type *o_ptr)
 {
-
 	int feel = 0;
 
 	/* Identify the bonuses */
@@ -985,7 +990,7 @@ void object_aware(object_type *o_ptr)
 	for (i = 1; i < inven_max; i++)
 	{
 		/* Get the object */
-		object_type *i_ptr = &inventory[inven_max];
+		object_type *i_ptr = &inventory[i];
 
 		/* Skip dead objects */
 		if (!i_ptr->k_idx) continue;
@@ -1715,7 +1720,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 				if ((!stack_force_pvals) &&
 					((o_ptr->pval != j_ptr->pval-1) || (o_ptr->stackc))  &&
 					((o_ptr->pval != j_ptr->pval+1) || (j_ptr->stackc))
-					&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) ) return (0);		 }
+					&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) ) return (0);             }
 
 			/* Require identical "artifact" names */
 			if (o_ptr->name1 != j_ptr->name1) return (FALSE);
@@ -1937,6 +1942,9 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 	/* Hack -- Blend "bonus" status */
 	if (j_ptr->ident & (IDENT_BONUS)) o_ptr->ident |= (IDENT_BONUS);
 
+	/* Hack -- Blend "store" status */
+	if (j_ptr->ident & (IDENT_STORE)) o_ptr->ident |= (IDENT_STORE);
+
 	/* Hack -- Blend "mental" status */
 	if (j_ptr->ident & (IDENT_MENTAL)) o_ptr->ident |= (IDENT_MENTAL);
 
@@ -1974,8 +1982,11 @@ s16b lookup_kind(int tval, int sval)
 		if ((k_ptr->tval == tval) && (k_ptr->sval == sval)) return (k);
 	}
 
+	/* Since this function will be called at startup, msg_format is not yet usable. */
+#if 0
 	/* Oops */
 	msg_format("No object (%d,%d)", tval, sval);
+#endif
 
 	/* Oops */
 	return (0);
@@ -2153,7 +2164,7 @@ static void object_mention(object_type *o_ptr)
 	char o_name[80];
 
 	/* Describe */
-	object_desc_store(o_name, o_ptr, FALSE, 0);
+	object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
 
 	/* Artifact */
 	if (artifact_p(o_ptr))
@@ -2532,15 +2543,9 @@ static void a_m_aux_1(object_type *o_ptr, int level, int power)
 	{
 		case TV_DIGGING:
 		{
-			/* Very good */
-			if (power > 1)
-			{
-				/* Special Ego-item */
-				o_ptr->name2 = EGO_DIGGING;
-			}
 
 			/* Very bad */
-			else if (power < -1)
+			if (power < -1)
 			{
 				/* Hack -- Horrible digging bonus */
 				o_ptr->pval = 0 - (5 + randint(5));
@@ -3210,6 +3215,13 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			break;
 		}
 
+		case TV_INSTRUMENT:
+		{
+			if (((power > 1) ? TRUE : FALSE) || (power < -1))
+				(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
+			break;
+		}
+
 		case TV_RING:
 		case TV_AMULET:
 		{
@@ -3222,6 +3234,8 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		case TV_STAFF:
 		{
 			if (!(k_info[o_ptr->k_idx].cost)) power = -1;
+			else if (power < 0) power = 0;
+
 			if (power) a_m_aux_1(o_ptr, lev, power);
 			a_m_aux_4(o_ptr, lev, power);
 			break;
@@ -3662,9 +3676,9 @@ static bool kind_is_race(int k_idx)
 			return (FALSE);
 		}
 		/* Soft armor/boots/cloaks/gloves */
-	    case TV_SOFT_ARMOR:
+		case TV_SOFT_ARMOR:
 		{
-				/* Hack -- armored monsters don't carry soft armor */
+			/* Hack -- armored monsters don't carry soft armor */
 			if (r_ptr->flags2 & (RF2_ARMOR)) return (FALSE);
 		}
 		case TV_GLOVES:
@@ -3678,17 +3692,18 @@ static bool kind_is_race(int k_idx)
 		case TV_SWORD:
 		case TV_POLEARM:
 		{
-				/* Hack -- priests other than shamans only carry hafted weapons */
-				if ((r_ptr->flags2 & (RF2_PRIEST)) && !(r_ptr->flags2 & (RF2_MAGE))) return (FALSE);
+			/* Hack -- priests other than shamans only carry hafted weapons */
+			if ((r_ptr->flags2 & (RF2_PRIEST)) && !(r_ptr->flags2 & (RF2_MAGE))) return (FALSE);
+
 		/* Fall through */
 		}
 		case TV_HAFTED:
 		{
-				/* Hack -- mages/priests/thieves only carry weapons < 20 lbs */
-				if ((r_ptr->flags2 & (RF2_PRIEST | RF2_MAGE | RF2_SNEAKY)) && (k_ptr->weight >= 200)) return (FALSE);
+			/* Hack -- mages/priests/thieves/archers only carry weapons < 20 lbs */
+			if ((r_ptr->flags2 & (RF2_PRIEST | RF2_MAGE | RF2_SNEAKY | RF2_ARCHER)) && (k_ptr->weight >= 200)) return (FALSE);
 
-				/* Hack -- warriors only carry weapons >= 7 lbs */
-				if ((r_ptr->flags2 & (RF2_ARMOR)) && (k_ptr->weight < 70)) return (FALSE);
+			/* Hack -- warriors only carry weapons >= 7 lbs */
+			if ((r_ptr->flags2 & (RF2_ARMOR)) && (k_ptr->weight < 70)) return (FALSE);
 
 			if (r_ptr->flags7 & (RF7_DROP_WEAPON)) return (TRUE);
 			return (FALSE);
@@ -3707,29 +3722,29 @@ static bool kind_is_race(int k_idx)
 		/* Books/Scrolls */
 		case TV_MAGIC_BOOK:
 		{
-				/* Hack -- priests other than shamans do not carry magic books*/
-				if ((r_ptr->flags2 & (RF2_PRIEST)) && !(r_ptr->flags2 & (RF2_MAGE))) return (FALSE);				
+			/* Hack -- priests other than shamans do not carry magic books*/
+			if ((r_ptr->flags2 & (RF2_PRIEST)) && !(r_ptr->flags2 & (RF2_MAGE))) return (FALSE);                            
 
-				/* Mega hack -- priests and paladins other than shamans do not carry magic books */
-				if ((r_ptr->d_char == 'p') && !(r_ptr->flags2 & (RF2_MAGE))) return (FALSE);				
+			/* Mega hack -- priests and paladins other than shamans do not carry magic books */
+			if ((r_ptr->d_char == 'p') && !(r_ptr->flags2 & (RF2_MAGE))) return (FALSE);                            
 
 			if (r_ptr->flags7 & (RF7_DROP_WRITING)) return (TRUE);
 			return (FALSE);
 		}
 		case TV_PRAYER_BOOK:
 		{
-				/* Hack -- mages other than shamans do not carry priest books*/
-				if ((r_ptr->flags2 & (RF2_MAGE)) && !(r_ptr->flags2 & (RF2_PRIEST))) return (FALSE);				
+			/* Hack -- mages other than shamans do not carry priest books*/
+			if ((r_ptr->flags2 & (RF2_MAGE)) && !(r_ptr->flags2 & (RF2_PRIEST))) return (FALSE);                            
 
-				/* Mega hack -- mages and rangers other than shamans do not carry priest books */
-				if ((r_ptr->d_char == 'q') && !(r_ptr->flags2 & (RF2_PRIEST))) return (FALSE);				
+			/* Mega hack -- mages and rangers other than shamans do not carry priest books */
+			if ((r_ptr->d_char == 'q') && !(r_ptr->flags2 & (RF2_PRIEST))) return (FALSE);                          
 
 			if (r_ptr->flags7 & (RF7_DROP_WRITING)) return (TRUE);
 			return (FALSE);
 		}
 		case TV_SCROLL:
 		{
-				if (r_ptr->d_char == '?') return (TRUE);
+			if (r_ptr->d_char == '?') return (TRUE);
 
 		}
 		case TV_RUNESTONE:
@@ -3742,8 +3757,7 @@ static bool kind_is_race(int k_idx)
 		/* Rings/Amulets/Crowns */
 		case TV_RING:
 		{
-				if (r_ptr->d_char == '=') return (TRUE);
-
+			if (r_ptr->d_char == '=') return (TRUE);
 		}
 		case TV_AMULET:
 		case TV_CROWN:
@@ -3755,7 +3769,7 @@ static bool kind_is_race(int k_idx)
 		/* Potions */
 		case TV_POTION:
 		{
-				if (r_ptr->d_char == '!') return (TRUE);
+			if (r_ptr->d_char == '!') return (TRUE);
 			if (r_ptr->flags7 & (RF7_DROP_POTION)) return (TRUE);
 			return (FALSE);
 		}
@@ -3771,7 +3785,7 @@ static bool kind_is_race(int k_idx)
 		case TV_LITE:
 		case TV_FLASK:
 		{
-			if (r_ptr->flags2 & (RF2_HAS_LITE)) return (TRUE);
+			if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE)) return (TRUE);
 			if (r_ptr->flags7 & (RF7_DROP_LITE)) return (TRUE);
 			return (FALSE);
 		}
@@ -3974,8 +3988,8 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 /*
  * XXX XXX XXX Do not use these hard-coded values.
  */
-#define OBJ_GOLD_LIST	480	/* First "gold" entry */
-#define MAX_GOLD	18	/* Number of "gold" entries */
+#define OBJ_GOLD_LIST   480     /* First "gold" entry */
+#define MAX_GOLD        18      /* Number of "gold" entries */
 
 /*
  * Make a treasure object
@@ -4250,6 +4264,8 @@ bool make_feat(object_type *j_ptr, int feat)
  */
 s16b floor_carry(int y, int x, object_type *j_ptr)
 {
+	int n = 0;
+
 	s16b o_idx;
 
 	s16b this_o_idx, next_o_idx = 0;
@@ -4274,7 +4290,16 @@ s16b floor_carry(int y, int x, object_type *j_ptr)
 			/* Result */
 			return (this_o_idx);
 		}
+
+		/* Count objects */
+		n++;
 	}
+
+	/* The stack is already too large */
+	if (n > MAX_FLOOR_STACK) return (0);
+
+	/* Option -- disallow stacking */
+	if (adult_no_stacking && n) return (0);
 
 	/* Make an object */
 	o_idx = o_pop();
@@ -4384,7 +4409,7 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 	if (j_ptr->number != 1) plural = TRUE;
 
 	/* Describe object */
-	object_desc(o_name, j_ptr, FALSE, 0);	
+	object_desc(o_name, sizeof(o_name), j_ptr, FALSE, 0);   
 
 	/* Handle normal "breakage" */
 	if (!artifact_p(j_ptr) && (rand_int(100) < chance))
@@ -4477,8 +4502,11 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 			/* Add new object */
 			if (!comb) k++;
 
+			/* Option -- disallow stacking */
+			if (adult_no_stacking && (k > 1)) continue;
+			
 			/* Paranoia */
-			if (k > 99) continue;
+			if (k > MAX_FLOOR_STACK) continue;
 
 			/* Calculate score */
 			s = 1000 - (d + k * 5);
@@ -4509,7 +4537,7 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 	if (!flag && !artifact_p(j_ptr))
 	{
 		/* Message */
-                msg_format("The %s disappear%s.",
+		msg_format("The %s disappear%s.",
 			   o_name, (plural ? "" : "s"));
 
 		/* Debug */
@@ -4553,7 +4581,7 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 	if (!floor_carry(by, bx, j_ptr))
 	{
 		/* Message */
-                msg_format("The %s disappear%s.",
+		msg_format("The %s disappear%s.",
 			   o_name, (plural ? "" : "s"));
 
 		/* Debug */
@@ -4571,7 +4599,7 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 	if (f_info[cave_feat[by][bx]].flags2 & (FF2_HIDE_ITEM))
 	{
 		/* Message */
-                msg_format("The %s disappear%s from view.",
+		msg_format("The %s disappear%s from view.",
 			   o_name, (plural ? "" : "s"));
 	}
 
@@ -4584,6 +4612,9 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 	if (chance && (cave_m_idx[by][bx] < 0))
 	{
 		msg_print("You feel something roll beneath your feet.");
+
+		/* Recalculate runes */
+		p_ptr->update |= (PU_RUNES);
 	}
 }
 
@@ -4672,7 +4703,7 @@ void feat_near(int feat, int y, int x)
 	}
 
 	/* Give it to the floor */
-	if (flag) cave_set_feat(y, x, feat);
+	if (flag) cave_set_feat(by, bx, feat);
 }
 
 /*
@@ -5153,6 +5184,66 @@ void pick_trap(int y, int x)
 
 			get_feat_num_hook = vault_trap_chest;
 		}
+		else if (cave_o_idx[y][x])
+		{
+			switch (o_list[cave_o_idx[y][x]].tval)
+			{
+				case TV_SHOT:
+				case TV_ARROW:
+				case TV_BOLT:
+				case TV_BOW:
+					pick_attr = TERM_L_RED;		/* Murder hole */
+					break;
+
+				case TV_HAFTED:
+				case TV_SWORD:
+				case TV_POLEARM:
+					pick_attr = TERM_RED;		/* Spring-loaded trap */
+					break;
+
+				case TV_WAND:
+					pick_attr = TERM_YELLOW;	/* Tripwire */
+					break;
+
+				case TV_STAFF:
+				case TV_ROD:
+					pick_attr = TERM_L_BLUE;	/* Magic symbol */
+					break;
+
+				case TV_POTION:
+					pick_attr = TERM_BLUE;		/* Explosive device */
+					break;
+
+				case TV_SCROLL:
+					pick_attr = TERM_L_GREEN;	/* Ancient hex */
+					break;
+
+				case TV_FLASK:
+					pick_attr = TERM_UMBER;		/* Discoloured spot */
+					break;
+
+				case TV_DRAG_ARMOR:
+					pick_attr = TERM_L_WHITE;	/* Stone face */
+					break;
+
+				case TV_FOOD:
+					if (o_list[cave_o_idx[y][x]].sval < SV_FOOD_MIN_FOOD) pick_attr = TERM_GREEN;		/* Gas trap */
+					else pick_attr = TERM_VIOLET;
+					break;
+
+				case TV_RUNESTONE:
+					pick_attr = TERM_ORANGE;	/* Strange rune */
+					break;
+
+ 				default:
+					pick_attr = TERM_VIOLET;	/* Loose rock */
+					break;
+			}
+
+			/* Set hook*/
+			get_feat_num_hook = vault_trap_attr;
+			
+		}
 		else get_feat_num_hook = vault_trap_floor;
 	}
 	else
@@ -5276,10 +5367,9 @@ void place_chest(int y, int x)
  */
 void pick_door(int y, int x)
 {
+	int feat = cave_feat[y][x];
 
-	int feat= cave_feat[y][x];
-
-	if (feat == FEAT_TRAP) place_trapped_door(y,x);
+	if (feat == FEAT_DOOR_INVIS) place_trapped_door(y,x);
 	else if (feat == FEAT_SECRET) place_secret_door(y,x);
 	else place_jammed_door(y,x);
 }
@@ -5488,8 +5578,8 @@ void place_trapped_door(int y, int x)
 {
 	int feat;
 
-	/*Set the hook */
-	get_feat_num_hook = vault_locked_door;
+	/* Set the hook */
+	get_feat_num_hook = vault_trapped_door;
 
 	get_feat_num_prep();
 
@@ -5586,7 +5676,7 @@ void inven_item_describe(int item)
 	char o_name[80];
 
 	/* Get a description */
-	object_desc(o_name, o_ptr, TRUE, 3);
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 	/* Print a message */
 	msg_format("You have %s (%c).", o_name, index_to_label(item));
@@ -5610,7 +5700,7 @@ void inven_item_increase(int item, int num)
 	num -= o_ptr->number;
 
 	/* Forget about item */
-        if (!num) inven_drop_flags(o_ptr);
+	if (!num) inven_drop_flags(o_ptr);
 
 	/* Change the number and weight */
 	if (num)
@@ -5680,6 +5770,9 @@ void inven_item_optimize(int item)
 		/* Hack -- wipe hole */
 		(void)WIPE(&inventory[i], object_type);
 
+		/* Recalculate runes */
+		p_ptr->update |= (PU_RUNES);
+
 		/* Window stuff */
 		p_ptr->window |= (PW_INVEN);
 	}
@@ -5700,7 +5793,7 @@ void inven_item_optimize(int item)
 		p_ptr->update |= (PU_TORCH);
 
 		/* Recalculate mana XXX */
-		p_ptr->update |= (PU_MANA);
+		p_ptr->update |= (PU_MANA | PU_RUNES);
 
 		/* Window stuff */
 		p_ptr->window |= (PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
@@ -5748,7 +5841,7 @@ void floor_item_describe(int item)
 	char o_name[80];
 
 	/* Get a description */
-	object_desc(o_name, o_ptr, TRUE, 3);
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 	/* Print a message */
 	msg_format("You see %s.", o_name);
@@ -5890,6 +5983,7 @@ s16b inven_carry(object_type *o_ptr)
 		/* Check if the two items can be combined */
 		if (object_similar(j_ptr, o_ptr))
 		{
+
 
 			/* Combine the items */
 			object_absorb(j_ptr, o_ptr);
@@ -6080,7 +6174,7 @@ s16b inven_carry(object_type *o_ptr)
 	p_ptr->inven_cnt++;
 
 	/* Recalculate bonuses */
-	p_ptr->update |= (PU_BONUS);
+	p_ptr->update |= (PU_BONUS | PU_RUNES);
 
 	/* Combine and Reorder pack */
 	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -6168,7 +6262,7 @@ s16b inven_takeoff(int item, int amt)
 
 
 	/* Describe the object */
-	object_desc(o_name, i_ptr, TRUE, 3);
+	object_desc(o_name, sizeof(o_name), i_ptr, TRUE, 3);
 
 	/* Destroy spell */
 	if (i_ptr->tval == TV_SPELL)
@@ -6182,7 +6276,7 @@ s16b inven_takeoff(int item, int amt)
 		act = "You were carrying";
 	}
 	else if ((i_ptr->tval == TV_SWORD) || (i_ptr->tval == TV_POLEARM)
-                        || (i_ptr->tval == TV_HAFTED) || (i_ptr->tval== TV_STAFF))
+			|| (i_ptr->tval == TV_HAFTED) || (i_ptr->tval== TV_STAFF))
 	{
 		act = "You were wielding";
 		if (item == INVEN_ARM) act = "You were wielding off-handed";
@@ -6322,7 +6416,7 @@ void inven_drop(int item, int amt)
 	if (o_ptr->number == amt) inven_drop_flags(o_ptr);
 
 	/* Describe local object */
-	object_desc(o_name, i_ptr, TRUE, 3);
+	object_desc(o_name, sizeof(o_name), i_ptr, TRUE, 3);
 
 	/* Message */
 	msg_format("You drop %s (%c).", o_name, index_to_label(item));
@@ -6537,7 +6631,8 @@ void reorder_pack(void)
 
 
 /*
- * Fills a book with spells (in order). Note hack for runestones.
+ * Fills a book with spells (in order). Note hack for runestones
+ * in order to fit them all in is to use book as a hashtable.
  */
 void fill_book(const object_type *o_ptr, s16b *book, int *num)
 {
@@ -6558,24 +6653,35 @@ void fill_book(const object_type *o_ptr, s16b *book, int *num)
 
 		for (ii=0;ii<MAX_SPELL_APPEARS;ii++)
 		{
-			if ((s_ptr->appears[ii].tval == o_ptr->tval) &&
-				(s_ptr->appears[ii].sval == o_ptr->sval))
+			int tval = s_ptr->appears[ii].tval;
+			int sval = s_ptr->appears[ii].sval;
+			int slot = s_ptr->appears[ii].slot;
+
+			if ((tval == o_ptr->tval) &&
+				(sval == o_ptr->sval))
 			{
 				if (o_ptr->tval == TV_RUNESTONE)
 				{
-					int iii;
-
-					for (iii = 0;iii<INVEN_WIELD;iii++)
+					if (p_ptr->cur_runes & (2 << (slot-1)))
 					{
-						if (inventory[iii].k_idx)
+						/* Use book as hash table */
+                                                slot = slot % 20;
+
+						/* Free entry in book */
+						if (book[slot] == 0)
 						{
-							if ((inventory[iii].tval == TV_RUNESTONE)
-								&& (inventory[iii].sval == s_ptr->appears[ii].slot))
-							{
-								book[iii] = i;
-								if (*num < iii+1) *num = iii+1;
-							}
+							book[slot] = i;
 						}
+
+						/* Collision -- minimise impact by going from end of table */
+						else
+						{
+                                                        for (slot = 19; (slot >=0) && book[slot]; slot--) ;
+
+							if ((slot >= 0) && (!book[slot])) book[slot] = i;
+						}
+
+						if ((*num) < slot) (*num) = slot;
 					}
 				}
 				else
@@ -6584,11 +6690,8 @@ void fill_book(const object_type *o_ptr, s16b *book, int *num)
 					(*num)++;
 				}
 			}
-
 		}
-
 	}
-
 }
 
 /*

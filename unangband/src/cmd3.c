@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001 Andrew Doull. Modifications to the Angband 2.9.1
+ * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.1
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -267,7 +267,7 @@ void do_cmd_wield(void)
 	if (cursed_p(&inventory[slot]) && (slot < INVEN_BELT))
 	{
 		/* Describe it */
-		object_desc(o_name, &inventory[slot], FALSE, 0);
+		object_desc(o_name, sizeof(o_name), &inventory[slot], FALSE, 0);
 
 		/* Message */
 		msg_format("The %s you are %s appears to be cursed.",
@@ -277,10 +277,10 @@ void do_cmd_wield(void)
 		return;
 	}
 	/* Prevent wielding from cursed slot */
-	else if (cursed_p(&inventory[item]) && (item >= INVEN_WIELD) && (item != INVEN_BELT))
+	else if ((item >= INVEN_WIELD) && cursed_p(&inventory[item]) && (item != INVEN_BELT))
 	{
 		/* Describe it */
-		object_desc(o_name, &inventory[item], FALSE, 0);
+		object_desc(o_name, sizeof(o_name), &inventory[item], FALSE, 0);
 
 		/* Message */
 		msg_format("The %s you are %s appears to be cursed.",
@@ -361,17 +361,20 @@ void do_cmd_wield(void)
 		object_copy(j_ptr, o_ptr);
 
 	}
-	/* Drop existing item */
-	else if ((o_ptr->k_idx) && (p_ptr->energy_use == 50))
-	{
-		/* Take off existing item */
-		(void)inven_drop(slot, 255);
-	}
 	/* Take off existing item */
 	else if ((o_ptr->k_idx) && (!rings))
 	{
-		/* Take off existing item */
-		(void)inven_takeoff(slot, 255);
+                /* variant_fast_floor? */
+                if (p_ptr->energy_use == 50)
+                {
+                        /* Drop existing item */
+                        (void)inven_drop(slot, 255);
+                }
+                else
+                {
+                        /* Take off existing item */
+                        (void)inven_takeoff(slot, 255);
+                }
 	}
 
 	/* Wear the new rings */
@@ -420,7 +423,7 @@ void do_cmd_wield(void)
 	}
 
 	/* Describe the result */
-	object_desc(o_name, o_ptr, TRUE, 3);
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 	/* Message */
 	msg_format("%s %s (%c).", act, o_name, index_to_label(slot));
@@ -510,15 +513,22 @@ void do_cmd_wield(void)
 	}
 	else object_not_flags(o_ptr,0x0L,0x0L,TR3_BLESSED);
 
+	/* Hack --- the following are either obvious or (relatively) unimportant */
+	if (f3 & (TR3_THROWING))
+	{
+		object_can_flags(o_ptr,0x0L,0x0L,TR3_THROWING);
+	}
+	else object_not_flags(o_ptr,0x0L,0x0L,TR3_THROWING);
+
 	if (f3 & (TR3_LIGHT_CURSE)) object_can_flags(o_ptr,0x0L,0x0L,TR3_LIGHT_CURSE);
 	else object_not_flags(o_ptr,0x0L,0x0L,TR3_LIGHT_CURSE);
 
 	/* Check for new flags */
 	n1 = o_ptr->can_flags1 & ~(k1);
-	n2 = o_ptr->can_flags1 & ~(k2);
-	n3 = o_ptr->can_flags1 & ~(k3);
+	n2 = o_ptr->can_flags2 & ~(k2);
+	n3 = o_ptr->can_flags3 & ~(k3);
 
-	if (n1 || n2 || n3) update_slot_flags(INVEN_WIELD, n1, n2, n3);
+	if (n1 || n2 || n3) update_slot_flags(slot, n1, n2, n3);
 
 	/* Recalculate bonuses */
 	p_ptr->update |= (PU_BONUS);
@@ -680,7 +690,7 @@ void do_cmd_destroy(void)
 	/* Describe the object */
 	old_number = o_ptr->number;
 	o_ptr->number = amt;
-	object_desc(o_name, o_ptr, TRUE, 3);
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 	o_ptr->number = old_number;
 
 	/* Verify destruction */
@@ -704,7 +714,7 @@ void do_cmd_destroy(void)
 		msg_format("You cannot destroy %s.", o_name);
 
 		return;
-        }
+	}
 
 	/* Artifacts cannot be destroyed */
 	if (artifact_p(o_ptr))
@@ -739,18 +749,18 @@ void do_cmd_destroy(void)
 	/* Message */
 	msg_format("You destroy %s.", o_name);
 
-        /* Sometimes use lower stack object */
-        if (!object_known_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
-        {
-                if (amt >= o_ptr->stackc)
-                {
-                        o_ptr->stackc = 0;
-                }
-                else
-                {
-                        o_ptr->stackc -= amt;
-                }
-        }
+	/* Sometimes use lower stack object */
+	if (!object_known_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
+	{
+		if (amt >= o_ptr->stackc)
+		{
+			o_ptr->stackc = 0;
+		}
+		else
+		{
+			o_ptr->stackc -= amt;
+		}
+	}
 
 	/* Eliminate the item (from the pack) */
 	if (item >= 0)
@@ -765,7 +775,7 @@ void do_cmd_destroy(void)
 		floor_item_increase(0 - item, -amt);
 		floor_item_describe(0 - item);
 		floor_item_optimize(0 - item);
-        }
+	}
 
 }
 
@@ -793,9 +803,9 @@ void do_cmd_observe(void)
 	/* Get the feature */
 	if (item >= INVEN_TOTAL+1)
 	{
-object_type object_type_body;
+		object_type object_type_body;
 
-o_ptr = &object_type_body;
+		o_ptr = &object_type_body;
 
 		if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
 	}
@@ -812,15 +822,23 @@ o_ptr = &object_type_body;
 	}
 
 	/* Description */
-	object_desc(o_name, o_ptr, TRUE, 3);
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 	/* Describe */
 	msg_format("Examining %s...", o_name);
 
-        msg_print("");
+	msg_print("");
 
-        /* Describe */
-        screen_object(o_ptr, TRUE);
+	/* Save the screen */
+	screen_save();
+
+	/* Describe */
+	screen_object(o_ptr, TRUE);
+
+	(void)inkey();
+
+	/* Load the screen */
+	screen_load();
 }
 
 
@@ -837,7 +855,7 @@ void do_cmd_uninscribe(void)
 
 	cptr q, s;
 
-        int i;
+	int i;
 
 	/* Get an item */
 	q = "Un-inscribe which item? ";
@@ -875,54 +893,54 @@ void do_cmd_uninscribe(void)
 	/* Window stuff */
 	p_ptr->window |= (PW_INVEN | PW_EQUIP);
 
-        /* Prompt to always inscribe? */
-        if (!easy_autos) return;
+	/* Prompt to always inscribe? */
+	if (!easy_autos) return;
 
-        /* Do we inscribe all these ego items? */
-        if (object_known_p(o_ptr) && (o_ptr->name2) && (e_info[o_ptr->name2].note))
-        {
-                e_info[o_ptr->name1].note = 0;
+	/* Do we inscribe all these ego items? */
+	if (object_known_p(o_ptr) && (o_ptr->name2) && (e_info[o_ptr->name2].note))
+	{
+		e_info[o_ptr->name2].note = 0;
 
-                /* Process objects */
-                for (i = 1; i < o_max; i++)
-                {
-                        /* Get the object */
-                        object_type *i_ptr = &o_list[i];
+		/* Process objects */
+		for (i = 1; i < o_max; i++)
+		{
+			/* Get the object */
+			object_type *i_ptr = &o_list[i];
 
-                        /* Skip dead objects */
-                        if (!i_ptr->k_idx) continue;
+			/* Skip dead objects */
+			if (!i_ptr->k_idx) continue;
 
-                        /* Not matching ego item */
-                        if (i_ptr->name2 != o_ptr->name2) continue;
+			/* Not matching ego item */
+			if (i_ptr->name2 != o_ptr->name2) continue;
 
-                        /* Auto-inscribe */
-                        if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = 0;
+			/* Auto-inscribe */
+			if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = 0;
 
-                }
+		}
 
-        }
-        /* Do we inscribe all these object kinds? */
-        else if (object_aware_p(o_ptr) && (k_info[o_ptr->k_idx].note))
-        {
-                k_info[o_ptr->k_idx].note = 0;
+	}
+	/* Do we inscribe all these object kinds? */
+	else if (object_aware_p(o_ptr) && (k_info[o_ptr->k_idx].note))
+	{
+		k_info[o_ptr->k_idx].note = 0;
 
-                /* Process objects */
-                for (i = 1; i < o_max; i++)
-                {
-                        /* Get the object */
-                        object_type *i_ptr = &o_list[i];
+		/* Process objects */
+		for (i = 1; i < o_max; i++)
+		{
+			/* Get the object */
+			object_type *i_ptr = &o_list[i];
 
-                        /* Skip dead objects */
-                        if (!i_ptr->k_idx) continue;
+			/* Skip dead objects */
+			if (!i_ptr->k_idx) continue;
 
-                        /* Not matching ego item */
-                        if (i_ptr->k_idx != o_ptr->k_idx) continue;
+			/* Not matching ego item */
+			if (i_ptr->k_idx != o_ptr->k_idx) continue;
 
-                        /* Auto-inscribe */
-                        if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = 0;
+			/* Auto-inscribe */
+			if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = 0;
 
-                }
-        }
+		}
+	}
 }
 
 
@@ -941,7 +959,7 @@ void do_cmd_inscribe(void)
 
 	cptr q, s;
 
-        int i;
+	int i;
 
 	/* Get an item */
 	q = "Inscribe which item? ";
@@ -961,7 +979,7 @@ void do_cmd_inscribe(void)
 	}
 
 	/* Describe the activity */
-	object_desc(o_name, o_ptr, TRUE, 3);
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 	/* Message */
 	msg_format("Inscribing %s.", o_name);
@@ -990,70 +1008,70 @@ void do_cmd_inscribe(void)
 		p_ptr->window |= (PW_INVEN | PW_EQUIP);
 	}
 
-        /* Inscribe */
-        if ((item < 0) && (auto_pickup_ignore(o_ptr))) o_ptr->marked = FALSE;
+	/* Inscribe */
+	if ((item < 0) && (auto_pickup_ignore(o_ptr))) o_ptr->marked = FALSE;
 
-        /* Prompt to always inscribe? */
-        if (!easy_autos) return;
+	/* Prompt to always inscribe? */
+	if (!easy_autos) return;
 
-        /* Do we inscribe all these ego items? */
-        if (object_known_p(o_ptr) && (o_ptr->name2))
-        {
-                e_info[o_ptr->name1].note = o_ptr->note;
+	/* Do we inscribe all these ego items? */
+	if (object_known_p(o_ptr) && (o_ptr->name2))
+	{
+		e_info[o_ptr->name2].note = o_ptr->note;
 
-                /* Process objects */
-                for (i = 1; i < o_max; i++)
-                {
-                        /* Get the object */
-                        object_type *i_ptr = &o_list[i];
+		/* Process objects */
+		for (i = 1; i < o_max; i++)
+		{
+			/* Get the object */
+			object_type *i_ptr = &o_list[i];
 
-                        /* Skip dead objects */
-                        if (!i_ptr->k_idx) continue;
+			/* Skip dead objects */
+			if (!i_ptr->k_idx) continue;
 
-                        /* Not matching ego item */
-                        if (i_ptr->name2 != o_ptr->name2) continue;
+			/* Not matching ego item */
+			if (i_ptr->name2 != o_ptr->name2) continue;
 
-                        /* Already has inscription */
-                        if (i_ptr->note) continue;
+			/* Already has inscription */
+			if (i_ptr->note) continue;
 
-                        /* Auto-inscribe */
-                        if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = e_info[o_ptr->name2].note;
+			/* Auto-inscribe */
+			if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = e_info[o_ptr->name2].note;
 
-                        /* Ignore */
-                        if (auto_pickup_ignore(o_ptr)) o_ptr->marked = FALSE;
+			/* Ignore */
+			if (auto_pickup_ignore(o_ptr)) o_ptr->marked = FALSE;
 
-                }
+		}
 
-        }
-        /* Do we inscribe all these object kinds? */
-        else if (object_aware_p(o_ptr))
-        {
-                k_info[o_ptr->k_idx].note = o_ptr->note;
+	}
+	/* Do we inscribe all these object kinds? */
+	else if (object_aware_p(o_ptr))
+	{
+		k_info[o_ptr->k_idx].note = o_ptr->note;
 
-                /* Process objects */
-                for (i = 1; i < o_max; i++)
-                {
-                        /* Get the object */
-                        object_type *i_ptr = &o_list[i];
+		/* Process objects */
+		for (i = 1; i < o_max; i++)
+		{
+			/* Get the object */
+			object_type *i_ptr = &o_list[i];
 
-                        /* Skip dead objects */
-                        if (!i_ptr->k_idx) continue;
+			/* Skip dead objects */
+			if (!i_ptr->k_idx) continue;
 
-                        /* Not matching ego item */
-                        if (i_ptr->k_idx != o_ptr->k_idx) continue;
+			/* Not matching ego item */
+			if (i_ptr->k_idx != o_ptr->k_idx) continue;
 
-                        /* Already has inscription */
-                        if (i_ptr->note) continue;
+			/* Already has inscription */
+			if (i_ptr->note) continue;
 
-                        /* Auto-inscribe */
-                        if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = o_ptr->note;
+			/* Auto-inscribe */
+			if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = o_ptr->note;
 
-                        /* Ignore */
-                        if (auto_pickup_ignore(o_ptr)) o_ptr->marked = FALSE;
+			/* Ignore */
+			if (auto_pickup_ignore(o_ptr)) o_ptr->marked = FALSE;
 
-                }
+		}
 
-        }
+	}
 }
 
 /*
@@ -1147,7 +1165,8 @@ void do_cmd_refill(void)
 	object_type *i_ptr;
 	object_type *j_ptr;
 
-object_type object_type_body;
+	object_type object_type_body;
+	object_type feat_object_type_body;
 
 	cptr q, s;
 
@@ -1161,7 +1180,7 @@ bool unstack = FALSE;
 	/* Get an item */
 	q = "Fill/fuel which item? ";
 	s = "You have nothing to fill or fuel.";
-if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return;
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -1177,8 +1196,8 @@ if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return;
 
 	if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_LANTERN))
 	{
-/* Restrict the choices */
-item_tester_hook = item_tester_refill_lantern;
+		/* Restrict the choices */
+		item_tester_hook = item_tester_refill_lantern;
 
 		/* Get an item */
 		q = "Refill with which source of oil? ";
@@ -1188,164 +1207,146 @@ item_tester_hook = item_tester_refill_lantern;
 	}
 	else if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_TORCH))
 	{
-/* Restrict the choices */
-item_tester_hook = item_tester_refill_torch;
+		/* Restrict the choices */
+		item_tester_hook = item_tester_refill_torch;
 
-/* Get an item */
-q = "Refuel with which torch? ";
-s = "You have no extra torches.";
+		/* Get an item */
+		q = "Refuel with which torch? ";
+		s = "You have no extra torches.";
 
-if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATG))) return;
+		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATG))) return;
 	}
 
 	else
 	{
-/* Restrict the choices */
-item_tester_hook = item_tester_refill_flask;
+		/* Restrict the choices */
+		item_tester_hook = item_tester_refill_flask;
 
-/* Get an item to fill */
-q = "Fill from where? ";
-s = "You have nothing to fill it with.";
+		/* Get an item to fill */
+		q = "Fill from where? ";
+		s = "You have nothing to fill it with.";
 
-if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
+		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 	}
 
 	/* Can't fuel self */
 	if (item == item2) return;
 
 	/* Get the feature */
-if (item2 >= INVEN_TOTAL+1)
+	if (item2 >= INVEN_TOTAL+1)
 	{
-object_type object_type_body;
+		j_ptr = &feat_object_type_body;
 
-j_ptr = &object_type_body;
-
-if (!make_feat(j_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
+		if (!make_feat(j_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
 	}
+
 	/* Get the item (in the pack) */
 	else if (item2 >= 0)
 	{
-j_ptr = &inventory[item2];
+		j_ptr = &inventory[item2];
 	}
 
 	/* Get the item (on the floor) */
 	else
 	{
-j_ptr = &o_list[0 - item2];
+		j_ptr = &o_list[0 - item2];
 	}
 
 	/* Take a partial turn */
 	p_ptr->energy_use = 50;
 
-if (o_ptr->number > 1)
-{
-/* Get local object */
-i_ptr = &object_type_body;
+	if (o_ptr->number > 1)
+	{
+		/* Get local object */
+		i_ptr = &object_type_body;
 
-/* Obtain a local object */
-object_copy(i_ptr, o_ptr);
+		/* Obtain a local object */
+		object_copy(i_ptr, o_ptr);
 
-/* Modify quantity */
-i_ptr->number = 1;
+		/* Modify quantity */
+		i_ptr->number = 1;
 
-/* Reset stack counter */
-i_ptr->stackc = 0;
+		/* Reset stack counter */
+		i_ptr->stackc = 0;
 
-/* Unstack the used item */
-o_ptr->number--;
+		/* Unstack the used item */
+		o_ptr->number--;
 
-o_ptr = i_ptr;
+		/* Adjust the weight */
+		p_ptr->total_weight -= i_ptr->weight;
 
-unstack = TRUE;
+		o_ptr = i_ptr;
 
-}
+		unstack = TRUE;
+	}
 
 	if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_LANTERN))
 	{
 
-/* Message */
-if (unstack) msg_print("You unstack your lantern.");
+		/* Message */
+		if (unstack) msg_print("You unstack your lantern.");
 
-/* Refuel */
-o_ptr->pval += j_ptr->pval;
+		/* Refuel */
+		o_ptr->pval += j_ptr->pval;
 
-/* Message */
-msg_print("You fuel the lamp.");
+		/* Message */
+		msg_print("You fuel the lamp.");
 
-/* Comment */
-if (o_ptr->pval >= FUEL_LAMP)
-{
-o_ptr->pval = FUEL_LAMP;
-msg_print("The lamp is full.");
-}
-
+		/* Comment */
+		if (o_ptr->pval >= FUEL_LAMP)
+		{
+			o_ptr->pval = FUEL_LAMP;
+			msg_print("The lamp is full.");
+		}
 	}
 	else if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_TORCH))
 	{
 
-/* Message */
-if (unstack) msg_print("You unstack your torch.");
+		/* Message */
+		if (unstack) msg_print("You unstack your torch.");
 
-/* Refuel */
-o_ptr->pval += j_ptr->pval + 5;
+		/* Refuel */
+		o_ptr->pval += j_ptr->pval + 5;
 
-/* Message */
-msg_print("You combine the torches.");
+		/* Message */
+		msg_print("You combine the torches.");
 
-/* Over-fuel message */
-if (o_ptr->pval >= FUEL_TORCH)
-{
-o_ptr->pval = FUEL_TORCH;
-msg_print("Your torch is fully fueled.");
-}
+		/* Over-fuel message */
+		if (o_ptr->pval >= FUEL_TORCH)
+		{
+			o_ptr->pval = FUEL_TORCH;
+			msg_print("Your torch is fully fueled.");
+		}
 
-/* Refuel message */
-else if (item == INVEN_LITE)
-{
-msg_print("Your torch glows more brightly.");
-}
-}
-else
-{
-if (unstack)
-{
-/* We are done */
-}
-else if (item >= INVEN_TOTAL+1)
-{
-cave_alter_feat(p_ptr->py,p_ptr->px,FS_USE_FEAT);
-}
+		/* Refuel message */
+		else if (item == INVEN_LITE)
+		{
+			msg_print("Your torch glows more brightly.");
+		}
+	}
+	else
+	{
+		/* Fill empty bottle or flask with the potion */
+		object_copy(o_ptr, j_ptr);
 
-/* Decrease the item (in the pack) */
-else if ((item >= 0) && (o_ptr->tval != TV_LITE))
-{
-inven_item_increase(item, -1);
-inven_item_describe(item);
-inven_item_optimize(item);
-}
-/* Decrease the item (from the floor) */
-else
-{
-floor_item_increase(0 - item, -1);
-floor_item_describe(0 - item);
-floor_item_optimize(0 - item);
-}
+		/* Modify quantity */
+		o_ptr->number = 1;
 
-/* Adjust the weight and carry */
-item = inven_carry(j_ptr);
+		/* Reset stack counter */
+		o_ptr->stackc = 0;
 
-}
+		/* Adjust the weight */
+		p_ptr->total_weight += o_ptr->weight;
+	}
 
-if (unstack)
-{
-/* Adjust the weight and carry */
-p_ptr->total_weight -= o_ptr->weight;
-item = inven_carry(o_ptr);
-}
-
+	if (unstack)
+	{
+		/* Carry */
+		item = inven_carry(o_ptr);
+	}
 
 	/* Decrease the feature */
-if ((item2 >= INVEN_TOTAL+1) && (o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_TORCH))
+	if ((item2 >= INVEN_TOTAL+1) && (o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_TORCH))
 	{
 		cave_alter_feat(p_ptr->py,p_ptr->px,FS_GET_FEAT);
 	}
@@ -1356,38 +1357,38 @@ if ((item2 >= INVEN_TOTAL+1) && (o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_L
 	/* Use fuel from a lantern */
 	else if ((j_ptr->tval == TV_LITE) && (j_ptr->sval == SV_LITE_LANTERN))
 	{
-if (j_ptr->number > 1)
-{
-/* Get local object */
-i_ptr = &object_type_body;
+		if (j_ptr->number > 1)
+		{
+			/* Get local object */
+			i_ptr = &object_type_body;
 
-/* Obtain a local object */
-object_copy(i_ptr, j_ptr);
+			/* Obtain a local object */
+			object_copy(i_ptr, j_ptr);
 
-/* Modify quantity */
-i_ptr->number = 1;
+			/* Modify quantity */
+			i_ptr->number = 1;
 
-/* Reset stack counter */
-i_ptr->stackc = 0;
+			/* Reset stack counter */
+			i_ptr->stackc = 0;
 
-/* Reset the pval */
-i_ptr->pval = 0;
+			/* Reset the pval */
+			i_ptr->pval = 0;
 
-/* Unstack the used item */
-j_ptr->number--;
+			/* Unstack the used item */
+			j_ptr->number--;
 
-/* Adjust the weight and carry */
-p_ptr->total_weight -= i_ptr->weight;
-item = inven_carry(i_ptr);
+			/* Adjust the weight and carry */
+			p_ptr->total_weight -= i_ptr->weight;
+			item = inven_carry(i_ptr);
 
-/* Message */
-msg_print("You unstack your lantern.");
-}
-else
-{
-/* Use up last of fuel */
-j_ptr->pval = 0;
-}
+			/* Message */
+			msg_print("You unstack your lantern.");
+		}
+		else
+		{
+			/* Use up last of fuel */
+			j_ptr->pval = 0;
+		}
 	}
 	/* Decrease the item (in the pack) */
 	else if (item2 >= 0)
@@ -1395,7 +1396,7 @@ j_ptr->pval = 0;
 		inven_item_increase(item2, -1);
 		inven_item_describe(item2);
 		inven_item_optimize(item2);
-}
+	}
 	/* Decrease the item (from the floor) */
 	else
 	{
@@ -1604,7 +1605,7 @@ static cptr ident_info[] =
 	"C:Canine",
 	"D:mature Dragons",
 	"E:Elemental",
-"F:Fish/Amphibian",
+	"F:Fish/Amphibian",
 	"G:Ghost",
 	"H:Hybrid",
 	"I:Insect",
@@ -1614,9 +1615,9 @@ static cptr ident_info[] =
 	"M:Maiar",
 	"N:Nightsbane",
 	"O:Ogre",
-"P:Giant",
+	"P:Giant",
 	"Q:Quadrepeds",
-"R:Reptile",
+	"R:Reptile",
 	"S:Spider/Scorpion/Tick",
 	"T:Troll",
 	"U:Major Demon",
@@ -1634,11 +1635,11 @@ static cptr ident_info[] =
 	"a:Ant",
 	"b:Bat",
 	"c:Centipede",
-"d:Young Dragon",
+	"d:Young Dragon",
 	"e:Floating Eye",
 	"f:Feline",
 	"g:Golem",
-"h:Hobbit/Dwarf",
+	"h:Hobbit/Dwarf",
 	"i:Icky Thing",
 	"j:Jelly",
 	"k:Goblin",
@@ -1646,11 +1647,11 @@ static cptr ident_info[] =
 	"m:Mold",
 	"n:Naga",
 	"o:Orc",
-"p:Priest",
-"q:Mage",
+	"p:Priest",
+	"q:Mage",
 	"r:Rodent",
 	"s:Skeleton",
-"t:Thief/Warrior",
+	"t:Thief/Warrior",
 	"u:Minor Demon",
 	"v:Vortex",
 	"w:Worm/Worm-Mass",
@@ -1688,8 +1689,8 @@ bool ang_sort_comp_hook(vptr u, vptr v, int a, int b)
 	if (*why >= 4)
 	{
 		/* Extract player kills */
-                z1 = l_list[w1].pkills;
-                z2 = l_list[w2].pkills;
+		z1 = l_list[w1].pkills;
+		z2 = l_list[w2].pkills;
 
 		/* Compare player kills */
 		if (z1 < z2) return (TRUE);
@@ -1701,8 +1702,8 @@ bool ang_sort_comp_hook(vptr u, vptr v, int a, int b)
 	if (*why >= 3)
 	{
 		/* Extract total kills */
-                z1 = l_list[w1].tkills;
-                z2 = l_list[w2].tkills;
+		z1 = l_list[w1].tkills;
+		z2 = l_list[w2].tkills;
 
 		/* Compare total kills */
 		if (z1 < z2) return (TRUE);
@@ -1804,6 +1805,7 @@ static void roff_top(int r_idx)
 	/* Append the "optional" attr/char info */
 	Term_addstr(-1, TERM_WHITE, "/('");
 	Term_addch(a2, c2);
+	if (use_bigtile && (a2 & 0x80)) Term_addch(255, -1);
 	Term_addstr(-1, TERM_WHITE, "'):");
 }
 
@@ -1884,7 +1886,7 @@ void do_cmd_query_symbol(void)
 		monster_lore *l_ptr = &l_list[i];
 
 		/* Nothing to recall */
-                if (!cheat_know && !l_ptr->sights) continue;
+		if (!cheat_know && !l_ptr->sights) continue;
 
 		/* Require non-unique monsters if needed */
 		if (norm && (r_ptr->flags1 & (RF1_UNIQUE))) continue;
@@ -1900,7 +1902,7 @@ void do_cmd_query_symbol(void)
 	if (!n)
 	{
 		/* XXX XXX Free the "who" array */
-                KILL(who);
+		KILL(who);
 
 		return;
 	}
@@ -1934,7 +1936,7 @@ void do_cmd_query_symbol(void)
 	if (query != 'y')
 	{
 		/* XXX XXX Free the "who" array */
-                KILL(who);
+		KILL(who);
 
 		return;
 	}
@@ -2034,5 +2036,5 @@ void do_cmd_query_symbol(void)
 	prt(buf, 0, 0);
 
 	/* Free the "who" array */
-        KILL(who);
+	KILL(who);
 }

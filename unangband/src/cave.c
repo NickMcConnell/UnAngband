@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001-2 Andrew Doull. Modifications to the Angband 2.9.6
+ * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -415,7 +415,7 @@ static u16b image_random(void)
 
 
 /*
- * The 16x16 tile of the terrain supports lighting
+ * The 16x16 and 32x32 tile of the terrain supports lighting
  */
 bool feat_supports_lighting(byte feat)
 {
@@ -452,7 +452,7 @@ bool feat_supports_lighting(byte feat)
 byte lite_attr[16] =
 {
 	TERM_L_DARK,	/* TERM_DARK */
-	TERM_L_WHITE, 	/* TERM_WHITE - silver */
+	TERM_YELLOW, 	/* TERM_WHITE - silver */
 	TERM_L_WHITE, 	/* TERM_SLATE - iron */
 	TERM_YELLOW, 	/* TERM_ORANGE - brass */
 	TERM_L_RED, 	/* TERM_RED - ruby */
@@ -467,6 +467,31 @@ byte lite_attr[16] =
 	TERM_YELLOW, 	/* TERM_L_GREEN - adamantite*/
 	TERM_YELLOW, 	/* TERM_L_BLUE - mithril*/
 	TERM_YELLOW 	/* TERM_L_UMBER - bronze */
+};
+
+/*
+ * Reverse of above table lookup.
+ * These are 1 or 2 shades darker, or slate if already dark.
+ * Don't ever get too dark though.
+ */
+byte dark_attr[16] =
+{
+	TERM_DARK,		/* TERM_DARK */
+	TERM_SLATE, 	/* TERM_WHITE - silver */
+	TERM_L_DARK,	/* TERM_SLATE - iron */
+	TERM_SLATE, 	/* TERM_ORANGE - brass */
+	TERM_SLATE,		/* TERM_RED - ruby */
+	TERM_SLATE,		/* TERM_GREEN - emerald */
+	TERM_SLATE, 	/* TERM_BLUE - sapphire */
+	TERM_SLATE, 	/* TERM_UMBER - copper */
+	TERM_L_DARK, 	/* TERM_L_DARK - coal */
+	TERM_SLATE, 	/* TERM_L_WHITE - diamond */
+	TERM_SLATE, 	/* TERM_VIOLET - amethyst */
+	TERM_L_WHITE, 	/* TERM_YELLOW - gold */
+	TERM_RED, 		/* TERM_L_RED */
+	TERM_GREEN, 	/* TERM_L_GREEN - adamantite*/
+	TERM_BLUE,	 	/* TERM_L_BLUE - mithril*/
+	TERM_UMBER	 	/* TERM_L_UMBER - bronze */
 };
 
 
@@ -640,11 +665,7 @@ byte lite_attr[16] =
  * tiles should be handled differently.  One possibility would be to
  * extend feature_type with attr/char definitions for the different states.
  */
-#ifdef USE_TRANSPARENCY
 void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
-#else /* USE_TRANSPARENCY */
-void map_info(int y, int x, byte *ap, char *cp)
-#endif /* USE_TRANSPARENCY */
 {
 	byte a;
 	char c;
@@ -661,9 +682,6 @@ void map_info(int y, int x, byte *ap, char *cp)
 	s16b image = p_ptr->image;
 
 	int floor_num = 0;
-
-	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
-	bool daytime = (((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2)));
 
 	/* Hack -- Assume that "new" means "Adam Bolt Tiles" */
 	bool graf_new = (use_graphics && streq(ANGBAND_GRAF, "new"));
@@ -693,126 +711,8 @@ void map_info(int y, int x, byte *ap, char *cp)
 		if ((info & (CAVE_MARK)) ||
 		    (info & (CAVE_SEEN)))
 		{
-			/* Looks like floor */
-			if (f_info[feat].flags2 & (FF2_ATTR_LITE))
-			{
-				/* Get the floor feature */
-				f_ptr = &f_info[FEAT_FLOOR];
-
-				/* Normal attr */
-				a = f_ptr->x_attr;
-
-				/* Normal char */
-				c = f_ptr->x_char;
-
-				/* Special lighting effects */
-				if (view_special_lite && ((a == TERM_WHITE) || graf_new))
-				{
-					/* Handle "seen" grids */
-					if (info & (CAVE_SEEN))
-					{
-						/* Only lit by "torch" lite */
-						if (view_yellow_lite && !(info & (CAVE_GLOW)))
-						{
-							if (graf_new)
-							{
-								/* Use a brightly lit tile */
-								c += 2;
-							}
-							else
-							{
-								/* Use "yellow" */
-								a = TERM_YELLOW;
-							}
-						}
-					}
-
-					/* Handle "blind" */
-					else if (p_ptr->blind)
-					{
-						if (graf_new)
-						{
-							/* Use a dark tile */
-							c += 1;
-						}
-						else
-						{
-							/* Use "dark gray" */
-							a = TERM_L_DARK;
-						}
-					}
-
-					/* Handle "dark" grids */
-					else if (!(info & (CAVE_GLOW)))
-					{
-						if (graf_new)
-						{
-							/* Use a dark tile */
-							c += 1;
-						}
-						else
-						{
-							/* Use "dark gray" */
-							a = TERM_L_DARK;
-						}
-					}
-
-					/* Handle "view_bright_lite" */
-					else if (view_bright_lite)
-					{
-						if (graf_new)
-						{
-							/* Use a dark tile */
-							c += 1;
-						}
-						else
-						{
-							/* Use "gray" */
-							a = TERM_SLATE;
-						}
-					}
-				}
-			}
-			/* Boring non-floor-like grids */
-			else
-			{
-				/* Apply "mimic" field */
-				feat = f_info[feat].mimic;
-
-				/* Get the feature */
-				f_ptr = &f_info[feat];
-
-				/* Normal attr */
-				a = f_ptr->x_attr;
-
-				/* Normal char */
-				c = f_ptr->x_char;
-
-				/* Special lighting effects */
-				if (view_special_lite)
-				{
-					/* Handle "seen" grids */
-					if (info & (CAVE_SEEN))
-					{
-						/* Only lit by "torch" lite */
-						if (view_yellow_lite && !(info & (CAVE_GLOW)))
-						{
-							if (!graf_new)
-							{
-								/* Use lighter shade */
-								a = lite_attr[f_pt->x_attr];
-							}
-						}
-					}
-				}
-			}
-		}
-		/* Hack -- display unseen graphic in wilderness during daytime */
-		else if (surface)
-		{
-			/* Apply "unseen" field */
-			if (variant_save_feats) feat = f_info[feat].unseen;
-			else feat = f_info[feat].mimic;
+			/* Apply "mimic" field */
+			feat = f_info[feat].mimic;
 
 			/* Get the feature */
 			f_ptr = &f_info[feat];
@@ -823,22 +723,147 @@ void map_info(int y, int x, byte *ap, char *cp)
 			/* Normal char */
 			c = f_ptr->x_char;
 
-			/* Hard to see at night */
-			if (!daytime)
+			/* Special lighting effects */
+			if (view_special_lite) /* && (use_transparency ? feat_supports_lighting(feat) : TRUE))*/
 			{
-				if (graf_new)
+				/* Handle "seen" grids */
+				if (info & (CAVE_SEEN))
 				{
-					/* Use a dark tile */
-					c += 1;
+					/* Lit by "indirect sun" light */
+					if (view_surface_lite && p_ptr->outside &&
+                                                !(f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
+					{
+						if (graf_new)
+						{
+							/* Use a dark tile */
+							c += 1;
+						}
+						else
+						{
+							/* Use "gray" */
+							a = dark_attr[a];
+						}
+					}
+
+					/* Only lit by "torch" lite */
+					else if (view_yellow_lite && !(info & (CAVE_GLOW)))
+					{
+						if (graf_new)
+						{
+							/* Use a brightly lit tile */
+							if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
+								c -= 1;
+							else
+								c += 2;
+						}
+						else
+						{
+							/* Use "yellow" */
+							a = lite_attr[a];
+						}
+					}
+
+					/* Lit by "glowing" lite */
+					else if (view_glowing_lite && (info & (CAVE_GLOW)))
+					{
+						int i;
+
+						for (i = 0; i < 8; i++)
+						{
+							int yy = y + ddy_ddd[i];
+							int xx = x + ddx_ddd[i];
+
+							/* Ignore annoying locations */
+							if (!in_bounds_fully(yy, xx)) continue;
+
+							if (f_info[cave_feat[yy][xx]].flags2 & (FF2_GLOW))
+							{
+								if (graf_new)
+								{
+									/* Use a brightly lit tile */
+									if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
+										c -= 1;
+									else
+										c += 2;
+								}
+								else
+								{
+									/* Use "yellow" */
+									a = lite_attr[a];
+								}
+
+								/* Important -- exit loop */
+								break;
+							}
+						}
+					}
 				}
-				else
+
+				/* Handle "blind" */
+				else if (p_ptr->blind)
 				{
-					/* Use "gray" */
-					a = TERM_L_DARK;
+					if (graf_new)
+					{
+						/* Use a dark tile */
+						c += 1;
+					}
+					else
+					{
+						/* Use "dark gray" */
+						a = dark_attr[dark_attr[a]];
+					}
+				}
+
+				/* Handle "dark" grids */
+				else if (!(info & (CAVE_GLOW)))
+				{
+					if (graf_new)
+					{
+						/* Use a dark tile */
+						c += 1;
+					}
+					else
+					{
+						/* Use "dark gray" */
+						a = dark_attr[dark_attr[a]];
+					}
+				}
+
+				/* Handle "view_bright_lite" */
+				else if (view_bright_lite)
+				{
+					if (graf_new)
+					{
+						/* Use a dark tile */
+						c += 1;
+					}
+					else
+					{
+						/* Use "gray" */
+						a = dark_attr[a];
+					}
 				}
 			}
-			/* Handle "view_bright_lite" */
-			else if ((view_bright_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
+		}
+
+		/* Handle surface grids */
+		else if (p_ptr->outside)
+		{
+			/* Get the feature */
+			if (variant_save_feats) feat = f_info[feat].unseen;
+			else feat = f_info[feat].mimic;
+
+			/* Get the feature*/
+			f_ptr = &f_info[feat];
+
+			/* Normal attr */
+			a = f_ptr->x_attr;
+
+			/* Normal char */
+			c = f_ptr->x_char;
+
+			/* Handle "blind" and night time*/
+			if (p_ptr->blind  || !(((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))))
 			{
 				if (graf_new)
 				{
@@ -847,12 +872,27 @@ void map_info(int y, int x, byte *ap, char *cp)
 				}
 				else
 				{
-					/* Use "gray" */
-					a = TERM_SLATE;
+					/* Use "dark gray" */
+					a = dark_attr[dark_attr[a]];
 				}
 			}
 
+			/* Handle "dark" grids */
+			else if (view_bright_lite)
+			{
+				if (graf_new)
+				{
+					/* Use a dark tile */
+					c += 1;
+				}
+				else
+				{
+					/* Use "gray" */
+					a = dark_attr[a];
+				}
+			}
 		}
+
 		/* Hack -- Safe cave grid -- now use 'invisible trap' */
 		else if (view_safe_grids && !(info & (CAVE_SAFE)))
 		{
@@ -869,6 +909,7 @@ void map_info(int y, int x, byte *ap, char *cp)
 			a = TERM_L_DARK;
 			c = 'x';
 		}
+
 		/* Unknown */
 		else
 		{
@@ -902,9 +943,9 @@ void map_info(int y, int x, byte *ap, char *cp)
 			c = f_ptr->x_char;
 
 			/* Special lighting effects (walls only) */
-			if (view_granite_lite &&
-			    (((f_info[feat].flags2 & (FF2_ATTR_LITE)) && !use_transparency) ||
-			     (use_transparency && feat_supports_lighting(feat))))
+			if (view_granite_lite) /*&&
+                            ((!use_transparency && (f_ptr->flags1 && (FF1_WALL))) ||
+			     (use_transparency && feat_supports_lighting(feat))))*/
 			{
 				/* Handle "seen" grids */
 				if (info & (CAVE_SEEN))
@@ -930,7 +971,22 @@ void map_info(int y, int x, byte *ap, char *cp)
 					else
 					{
 						/* Use "dark gray" */
-						a = TERM_L_DARK;
+						a = dark_attr[dark_attr[a]];
+					}
+				}
+
+				/* Handle "dark" grids */
+				else if (!(info & (CAVE_GLOW)))
+				{
+					if (graf_new)
+					{
+						/* Use a dark tile */
+						c += 1;
+					}
+					else
+					{
+						/* Use "dark gray" */
+						a = dark_attr[dark_attr[a]];
 					}
 				}
 
@@ -939,13 +995,13 @@ void map_info(int y, int x, byte *ap, char *cp)
 				{
 					if (graf_new)
 					{
-						/* Use a lit tile */
+						/* Use a dark tile */
 						c += 1;
 					}
 					else
 					{
 						/* Use "gray" */
-						a = TERM_SLATE;
+						a = dark_attr[a];
 					}
 				}
 				else
@@ -953,7 +1009,10 @@ void map_info(int y, int x, byte *ap, char *cp)
 					if (graf_new)
 					{
 						/* Use a brightly lit tile */
-						c += 2;
+						if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
+							c -= 1;
+						else
+							c += 2;
 					}
 					else
 					{
@@ -961,28 +1020,16 @@ void map_info(int y, int x, byte *ap, char *cp)
 					}
 				}
 			}
-			/* Mega hack -- fiddle with store graphics */
-			else if ((adult_campaign) && (f_info[feat].flags1 & (FF1_ENTER)))
-			{
-				int n = feat-FEAT_SHOP_HEAD;
-				town_type *t_ptr = &t_info[p_ptr->dungeon];
-				store_type *u_ptr = &u_info[t_ptr->store[n]];
-
-				/* Hack -- custom attr */
-				a = u_ptr->d_attr;
-
-				/* Hack -- custom char */
-				c = u_ptr->d_char;
-			}
 		}
-		/* Hack -- display unseen graphic in wilderness during daytime */
-		else if (surface)
+
+		/* Handle surface grids */
+		else if (p_ptr->outside)
 		{
-			/* Apply "unseen" field */
+			/* Get the feature */
 			if (variant_save_feats) feat = f_info[feat].unseen;
 			else feat = f_info[feat].mimic;
 
-			/* Get the feature */
+			/* Get the feature*/
 			f_ptr = &f_info[feat];
 
 			/* Normal attr */
@@ -991,8 +1038,8 @@ void map_info(int y, int x, byte *ap, char *cp)
 			/* Normal char */
 			c = f_ptr->x_char;
 
-			/* Hard to see at night */
-			if (!daytime)
+			/* Handle "blind" and night time*/
+			if (p_ptr->blind  || !(((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))))
 			{
 				if (graf_new)
 				{
@@ -1001,25 +1048,25 @@ void map_info(int y, int x, byte *ap, char *cp)
 				}
 				else
 				{
-					/* Use "gray" */
-					a = TERM_L_DARK;
-				}
-			}
-			/* Handle "view_bright_lite" */
-			else if ((view_bright_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
-			{
-				if (graf_new)
-				{
-					/* Use a dark tile */
-					c += 1;
-				}
-				else
-				{
-					/* Use "gray" */
-					a = TERM_SLATE;
+					/* Use "dark gray" */
+					a = dark_attr[dark_attr[a]];
 				}
 			}
 
+			/* Handle "dark" grids */
+			else if (view_bright_lite)
+			{
+				if (graf_new)
+				{
+					/* Use a dark tile */
+					c += 1;
+				}
+				else
+				{
+					/* Use "gray" */
+					a = dark_attr[a];
+				}
+			}
 		}
 
 		/* Hack -- Safe cave grid -- now use 'invisible trap' */
@@ -1037,7 +1084,6 @@ void map_info(int y, int x, byte *ap, char *cp)
 #endif
 			a = TERM_L_DARK;
 			c = 'x';
-
 		}
 
 		/* Unknown */
@@ -1053,6 +1099,7 @@ void map_info(int y, int x, byte *ap, char *cp)
 			c = f_ptr->x_char;
 		}
 	}
+
 
 #ifdef USE_TRANSPARENCY
 
@@ -1285,6 +1332,8 @@ void move_cursor_relative(int y, int x)
 	/* Location in window */
 	vx = kx + COL_MAP;
 
+	if (use_bigtile) vx += kx;
+
 	/* Go there */
 	Term_gotoxy(vx, vy);
 }
@@ -1323,13 +1372,21 @@ void print_rel(char c, byte a, int y, int x)
 	/* Location in window */
 	vx = kx + COL_MAP;
 
-	/* Hack -- Queue it */
-#ifdef USE_TRANSPARENCY
-	Term_queue_char(vx, vy, a, c, 0, 0);
-#else /* USE_TRANSPARENCY */
-	Term_queue_char(vx, vy, a, c);
-#endif /* USE_TRANSPARENCY */
+	if (use_bigtile) vx += kx;
 
+	/* Hack -- Queue it */
+	Term_queue_char(vx, vy, a, c, 0, 0);
+
+	if (use_bigtile)
+	{
+		/* Mega-Hack : Queue dummy char */
+		if (a & 0x80)
+			Term_queue_char(vx+1, vy, 255, -1, 0, 0);
+		else
+			Term_queue_char(vx+1, vy, TERM_WHITE, ' ', 0, 0);
+	}
+
+	return;
 }
 
 
@@ -1381,8 +1438,8 @@ void note_spot(int y, int x)
 	/* Require "seen" flag */
 	if (!(info & (CAVE_SEEN))) return;
 
-        /* Mark it */
-        cave_info[y][x] |= (CAVE_SAFE);
+	/* Mark it */
+	cave_info[y][x] |= (CAVE_SAFE);
 
 	/* Hack -- memorize objects */
 	/* ANDY -- Only memorise objects if they are not hidden by the feature */
@@ -1391,7 +1448,7 @@ void note_spot(int y, int x)
 		for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
 		{
 			object_type *o_ptr = &o_list[this_o_idx];
-                        object_kind *k_ptr = &k_info[o_ptr->k_idx];
+			object_kind *k_ptr = &k_info[o_ptr->k_idx];
 
 			/* Get the next object */
 			next_o_idx = o_ptr->next_o_idx;
@@ -1400,7 +1457,7 @@ void note_spot(int y, int x)
 			if (!auto_pickup_ignore(o_ptr)) o_ptr->marked = TRUE;
 
 			/* Hack -- have seen object */
-                        if (!(k_ptr->flavor)) k_ptr->aware = TRUE;
+			if (!(k_ptr->flavor)) k_ptr->aware = TRUE;
 		}
 	}
 
@@ -1410,13 +1467,8 @@ void note_spot(int y, int x)
 		/* Memorize some "boring" grids */
 		if (!(f_info[feat].flags1 & (FF1_REMEMBER)))
 		{
-
-			bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
-
-			if (surface && !(info & (CAVE_GLOW))) cave_info[y][x] |= (CAVE_MARK);
-
 			/* Option -- memorize certain floors */
-			else if (((info & (CAVE_GLOW)) && view_perma_grids) ||
+			if (((info & (CAVE_GLOW)) && view_perma_grids) ||
 			    view_torch_grids)
 			{
 				/* Memorize */
@@ -1449,10 +1501,8 @@ void lite_spot(int y, int x)
 	byte a;
 	char c;
 
-#ifdef USE_TRANSPARENCY
 	byte ta;
 	char tc;
-#endif /* USE_TRANSPARENCY */
 
 	unsigned ky, kx;
 	unsigned vy, vx;
@@ -1475,7 +1525,7 @@ void lite_spot(int y, int x)
 	/* Location in window */
 	vx = kx + COL_MAP;
 
-#ifdef USE_TRANSPARENCY
+	if (use_bigtile) vx += kx;
 
 	/* Hack -- redraw the grid */
 	map_info(y, x, &a, &c, &ta, &tc);
@@ -1483,16 +1533,18 @@ void lite_spot(int y, int x)
 	/* Hack -- Queue it */
 	Term_queue_char(vx, vy, a, c, ta, tc);
 
-#else /* USE_TRANSPARENCY */
+	if (use_bigtile)
+	{
+		vx++;
 
-	/* Hack -- redraw the grid */
-	map_info(y, x, &a, &c);
+		/* Mega-Hack : Queue dummy char */
+		if (a & 0x80)
+			Term_queue_char(vx, vy, 255, -1, 0, 0);
+		else
+			Term_queue_char(vx, vy, TERM_WHITE, ' ', TERM_WHITE, ' ');
+	}
 
-	/* Hack -- Queue it */
-	Term_queue_char(vx, vy, a, c);
-
-#endif /* USE_TRANSPARENCY */
-
+	return;
 }
 
 
@@ -1509,10 +1561,8 @@ void prt_map(void)
 	byte a;
 	char c;
 
-#ifdef USE_TRANSPARENCY
 	byte ta;
 	char tc;
-#endif /* USE_TRANSPARENCY */
 
 	int y, x;
 	int vy, vx;
@@ -1530,26 +1580,26 @@ void prt_map(void)
 			/* Check bounds */
 			if (!in_bounds(y, x)) continue;
 
-#ifdef USE_TRANSPARENCY
-
 			/* Determine what is there */
 			map_info(y, x, &a, &c, &ta, &tc);
 
 			/* Hack -- Queue it */
 			Term_queue_char(vx, vy, a, c, ta, tc);
 
-#else /* USE_TRANSPARENCY */
+			if (use_bigtile)
+			{
+				vx++;
 
-			/* Determine what is there */
-			map_info(y, x, &a, &c);
-
-			/* Hack -- Queue it */
-			Term_queue_char(vx, vy, a, c);
-
-#endif /* USE_TRANSPARENCY */
-
+				/* Mega-Hack : Queue dummy char */
+				if (a & 0x80)
+					Term_queue_char(vx, vy, 255, -1, 0, 0);
+				else
+					Term_queue_char(vx, vy, TERM_WHITE, ' ', TERM_WHITE, ' ');
+			}
 		}
 	}
+
+	return;
 }
 
 
@@ -1626,13 +1676,19 @@ void display_map(int *cy, int *cx)
 
 	monster_race *r_ptr = &r_info[0];
 
+	town_type *t_ptr = &t_info[p_ptr->dungeon];
+
+	dungeon_zone *zone=&t_ptr->zone[0];;
+
+	/* Get the zone */
+	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
 	/* Desired map height */
 	map_hgt = Term->hgt - 2;
 	map_wid = Term->wid - 2;
 
-	dungeon_hgt = (p_ptr->depth == 0) ? TOWN_HGT : DUNGEON_HGT;
-	dungeon_wid = (p_ptr->depth == 0) ? TOWN_WID : DUNGEON_WID;
+	dungeon_hgt = (!(zone->fill)) ? TOWN_HGT : DUNGEON_HGT;
+	dungeon_wid = (!(zone->fill)) ? TOWN_WID : DUNGEON_WID;
 
 	/* Prevent accidents */
 	if (map_hgt > dungeon_hgt) map_hgt = dungeon_hgt;
@@ -1701,17 +1757,11 @@ void display_map(int *cy, int *cx)
 			row = (y * map_hgt / dungeon_hgt);
 			col = (x * map_wid / dungeon_wid);
 
-#ifdef USE_TRANSPARENCY
+			if (use_bigtile)
+				col = col & ~1;
 
 			/* Get the attr/char at that map location */
 			map_info(y, x, &ta, &tc, &ta, &tc);
-
-#else /* USE_TRANSPARENCY */
-
-			/* Get the attr/char at that map location */
-			map_info(y, x, &ta, &tc);
-
-#endif /* USE_TRANSPARENCY */
 
 			/* Get the priority of that attr/char */
 			tp = priority(ta, tc);
@@ -1721,6 +1771,14 @@ void display_map(int *cy, int *cx)
 			{
 				/* Add the character */
 				Term_putch(col + 1, row + 1, ta, tc);
+
+				if (use_bigtile)
+				{
+					if (ta & 0x80)
+						Term_putch(col + 2, row + 1, 255, -1);
+					else
+						Term_putch(col + 2, row + 1, TERM_WHITE, ' ');
+				}
 
 				/* Save priority */
 				mp[row][col] = tp;
@@ -2821,7 +2879,7 @@ void update_view(void)
 	byte info;
 
 #ifdef MONSTER_LITE
-        int fy,fx;
+	int fy,fx;
 #endif
 
 	/*** Step 0 -- Begin ***/
@@ -2865,184 +2923,178 @@ void update_view(void)
 	if (radius > 0) ++radius;
 
 #ifdef MONSTER_LITE
-    /*** Step 1A -- monster lites ***/
-    /* Scan monster list and add monster lites */
-    for ( i = 1; i < z_info->m_max; i++)
-   {
+	/*** Step 1A -- monster lites ***/
+	/* Scan monster list and add monster lites */
+	for ( i = 1; i < z_info->m_max; i++)
+	{
 
-/* Check the i'th monster */
-monster_type *m_ptr = &m_list[i];
-monster_race *r_ptr = &r_info[m_ptr->r_idx];
+		/* Check the i'th monster */
+		monster_type *m_ptr = &m_list[i];
+		monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
-       /* Skip dead monsters */
-       if (!m_ptr->r_idx) continue;
+	      /* Skip dead monsters */
+      	if (!m_ptr->r_idx) continue;
 
-/* Skip sleeping monsters */
-if (m_ptr->csleep) continue;
+		/* Skip sleeping monsters */
+		if (m_ptr->csleep) continue;
 
-/* Skip hiding monsters */
-if (m_ptr->mflag & (MFLAG_HIDE)) continue;
+		/* Skip hiding monsters */
+		if (m_ptr->mflag & (MFLAG_HIDE)) continue;
 
+		/* Access the location */
+		fx = m_ptr->fx;
+		fy = m_ptr->fy;
 
-       /* Access the location */
-       fx = m_ptr->fx;
-       fy = m_ptr->fy;
+		/* Carrying lite */
+		if ((r_ptr->flags2 & (RF2_HAS_LITE))
+			|| ((r_ptr->flags2 & (RF2_NEED_LITE)) && !(radius)
+                  && !(fast_cave_info[pg] & (CAVE_GLOW))))
+		{
+			/* monster grid */
+			if (los(py,px,fy,fx))
+			{
+				g = GRID(fy,fx);
+				info = fast_cave_info[g];
 
-/* Carrying lite */
-if (r_ptr->flags2 & (RF2_HAS_LITE))
-#if 0
-/* We might also allow the following situation for monsters
- * to carry lights:
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
 
-  - if they are t, p, q, P, h or l
-  - and not hurt lite
-  - and the player is hidden or in darkness
- *
- */
+				/* Save cave info */
+				fast_cave_info[g] = info;
 
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
+
+			/* Radius 1 -- torch radius */
+
+			/* Adjacent grid */
+			if (los(py,px,fy+1,fx))
+			{
+				g = GRID(fy+1,fx);
+				info = fast_cave_info[g];
+
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
+
+				/* Save cave info */
+				fast_cave_info[g] = info;
+
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
+
+			if (los(py,px,fy-1,fx))
+			{
+				g = GRID(fy-1,fx);
+				info = fast_cave_info[g];
+
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
+
+				/* Save cave info */
+				fast_cave_info[g] = info;
+
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
+
+			if (los(py,px,fy,fx+1))
+			{
+				g = GRID(fy,fx+1);
+				info = fast_cave_info[g];
+
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
+
+				/* Save cave info */
+				fast_cave_info[g] = info;
+
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
+
+			if (los(py,px,fy,fx-1))
+			{
+				g = GRID(fy,fx-1);
+				info = fast_cave_info[g];
+
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
+
+				/* Save cave info */
+				fast_cave_info[g] = info;
+
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
+
+			/* Diagonal grids */
+			if (los(py,px,fy+1,fx+1))
+			{
+				g = GRID(fy+1,fx+1);
+				info = fast_cave_info[g];
+
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
+
+				/* Save cave info */
+				fast_cave_info[g] = info;
+
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
+
+			if (los(py,px,fy+1,fx-1))
+			{
+				g = GRID(fy+1,fx-1);
+				info = fast_cave_info[g];
+
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
+
+				/* Save cave info */
+				fast_cave_info[g] = info;
+
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
+
+			if (los(py,px,fy-1,fx+1))
+			{
+				g = GRID(fy-1,fx+1);
+				info = fast_cave_info[g];
+
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
+
+				/* Save cave info */
+				fast_cave_info[g] = info;
+
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
+
+			if (los(py,px,fy-1,fx-1))
+			{
+				g = GRID(fy-1,fx-1);
+				info = fast_cave_info[g];
+
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
+
+				/* Save cave info */
+				fast_cave_info[g] = info;
+
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
+
+		}
+
+	}
 #endif
-{
-    /* monster grid */
-    if (los(py,px,fy,fx))
-    {
-g = GRID(fy,fx);
-info = fast_cave_info[g];
-
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
-
-/* Save cave info */
-fast_cave_info[g] = info;
-
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
-
-    /* Radius 1 -- torch radius */
-
-    /* Adjacent grid */
-    if (los(py,px,fy+1,fx))
-    {
-g = GRID(fy+1,fx);
-info = fast_cave_info[g];
-
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
-
-/* Save cave info */
-fast_cave_info[g] = info;
-
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
-
-
-    if (los(py,px,fy-1,fx))
-    {
-g = GRID(fy-1,fx);
-info = fast_cave_info[g];
-
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
-
-/* Save cave info */
-fast_cave_info[g] = info;
-
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
-    if (los(py,px,fy,fx+1))
-    {
-g = GRID(fy,fx+1);
-info = fast_cave_info[g];
-
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
-
-/* Save cave info */
-fast_cave_info[g] = info;
-
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
-    if (los(py,px,fy,fx-1))
-    {
-g = GRID(fy,fx-1);
-info = fast_cave_info[g];
-
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
-
-/* Save cave info */
-fast_cave_info[g] = info;
-
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
-
-    /* Diagonal grids */
-    if (los(py,px,fy+1,fx+1))
-    {
-g = GRID(fy+1,fx+1);
-info = fast_cave_info[g];
-
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
-
-/* Save cave info */
-fast_cave_info[g] = info;
-
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
-    if (los(py,px,fy+1,fx-1))
-    {
-g = GRID(fy+1,fx-1);
-info = fast_cave_info[g];
-
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
-
-/* Save cave info */
-fast_cave_info[g] = info;
-
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
-    if (los(py,px,fy-1,fx+1))
-    {
-g = GRID(fy-1,fx+1);
-info = fast_cave_info[g];
-
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
-
-/* Save cave info */
-fast_cave_info[g] = info;
-
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
-    if (los(py,px,fy-1,fx-1))
-    {
-g = GRID(fy-1,fx-1);
-info = fast_cave_info[g];
-
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
-
-/* Save cave info */
-fast_cave_info[g] = info;
-
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
-
-}
-
-    }
-#endif
-        /*** Step 1B -- player grid ***/
+	/*** Step 1B -- player grid ***/
 
 	/* Player grid */
 	g = pg;
@@ -3319,6 +3371,236 @@ fast_view_g[fast_view_n++] = g;
 	view_n = fast_view_n;
 }
 
+/*
+ * Update the features that have dynamic flags. These grids need to be
+ * checked every turn to see if they affected adjacent grids with
+ * an attack of some kind.
+ *
+ * INSTANT grids always alter themselves.
+ *
+ * EXPLODE grids always explode for a radius 1 ball attack equal to twice the
+ * damage of their blow attack.
+ *
+ * TIMED grids will 2% of the time alter themselves.
+ *
+ * SPREAD grids will 66% of the time affect an adjacent grid with an attack
+ * equal to their blow attack, along with their own grid. 8% of the time they
+ * will affect their own grid only.
+ *
+ * ERUPT grids will 5% of the time project a radius 2 ball attack equal to three times
+ * the damage of their blow attack, centred on their grid.
+ *
+ * STRIKE grids will 5% of the time project a radius 0 ball attack equal to ten times
+ * the damage of their blow attack, centred on their grid. At some point, it'd be
+ * nice to change this to a beam attack in a random direction, but this will require
+ * changes to the project function.
+ *
+ * Examples of dynamic attacks include fire, smoke, steam, acidic vapours and
+ * poison gas.  Examples of erupt attacks include vents. Examples of strike
+ * attacks include charged clouds.
+ *
+ * Because we can potentially have the whole level consisting of features of
+ * this type, we maintain an array of 'nearby' grids, that is a list of all
+ * grids out to an approximate distance of 20 away. We update the list of grids
+ * whenever we move 5 or more distance away from the current location.
+ *
+ * As an efficiency gain, we only do the above, when we note such a level is
+ * 'dyna_full', that is, we have tried adding a dyna_grid that would overflow
+ * the array. In instances where we are not dyna_full, the dyna_grid array contains
+ * every instance of a dynamic feature of some kind on the level. Once a level
+ * has been noted as being 'dyna_full', we do not reset this information until
+ * the start of level generation on a new level.
+ *
+ * We also update this list by adding and removing features that are either
+ * dynamic as they are created/destroyed. However, this requires that we create
+ * a temporary copy of this list when we are applying the attacks in
+ * this function.
+ * This may prove not to be such an efficiency gain.
+ */
+void update_dyna(void)
+{
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int dist, y, x, g, i;
+
+	int dam, flg;
+
+	int fast_dyna_n = dyna_n;
+	u16b *fast_dyna_g = dyna_g;
+
+	u16b temp_dyna_g[DYNA_MAX];
+
+	s16b feat;
+
+	feature_type *f_ptr;
+
+	bool full = FALSE;
+
+	/* Must be able to modify features */
+	if (!variant_hurt_feats) return;
+
+	/* Efficiency */
+	if (dyna_full)
+	{
+		dist = ABS(p_ptr->py - dyna_cent_y);
+		if (ABS(p_ptr->px - dyna_cent_x) > dist)
+			dist = ABS(p_ptr->px - dyna_cent_x);
+
+		/*
+		 * Character is far enough away from the previous dyna center - 
+		 * do a full rebuild.
+		 */
+		if (dist >= 5) full = TRUE;
+	}
+
+	/* Fully update */
+	if (full)
+	{
+		int min_y = MAX(0, py - MAX_SIGHT);
+		int max_y = MIN(DUNGEON_HGT, py + MAX_SIGHT + 1);
+		int min_x = MAX(0, px - MAX_SIGHT);
+		int max_x = MIN(DUNGEON_WID, px + MAX_SIGHT + 1);
+
+		fast_dyna_n = 0;
+
+		/* Scan the potentially visible area of the dungeon */
+		for (y = min_y; y < max_y; y++)
+		{
+			for (x = min_x; x < max_x; x++)
+			{
+				/* Check distance */
+				if (distance(y,x,py,px) > MAX_SIGHT) continue;
+
+				/* Get grid feat */
+				feat = cave_feat[y][x];
+
+				/* Get the feature */
+				f_ptr = &f_info[feat];
+
+				/* Check for dynamic */
+				if (f_ptr->flags3 & (FF3_DYNAMIC_MASK))
+				{
+					fast_dyna_g[fast_dyna_n++] = GRID(y,x);
+				}
+			}
+		}
+
+		dyna_cent_y = py;
+		dyna_cent_x = px;
+		dyna_n = fast_dyna_n;
+	}
+
+	/* Actually apply the attacks */
+	for (i = 0; i < fast_dyna_n; i++)
+	{
+		temp_dyna_g[i] = fast_dyna_g[i];
+	}
+
+	/* Actually apply the attacks */
+	for (i = 0; i < fast_dyna_n; i++)
+	{
+		feature_type *f_ptr;
+
+		/* Grid */
+		g = fast_dyna_g[i];
+
+		/* Coordinates */
+		y = GRID_Y(g);
+		x = GRID_X(g);
+
+		/* Get grid feat */
+		feat = cave_feat[y][x];
+
+		/* Get the feature */
+		f_ptr = &f_info[feat];
+
+		/* Instant */
+		if (f_ptr->flags3 & (FF3_INSTANT))
+		{
+			cave_alter_feat(y,x,FS_INSTANT);
+		}
+
+		/* Explode */
+		if (f_ptr->flags3 & (FF3_EXPLODE))
+		{
+			flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_HIDE;
+
+			dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice) * 10;
+   
+			/* Apply the blow */
+			project(0, 1, y, x, dam, f_ptr->blow.effect, flg);
+		}
+
+		/* Timed */
+		if (f_ptr->flags3 & (FF3_TIMED))
+		{
+			if (!(rand_int(50)))
+			{
+				cave_alter_feat(y,x,FS_TIMED);
+			}
+		}
+
+		/* Erupt */
+		if (f_ptr->flags3 & (FF3_ERUPT))
+		{
+			if (!(rand_int(20)))
+			{
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+
+				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice) * 2;
+   
+				/* Apply the blow */
+				project(0, 2, y, x, dam, f_ptr->blow.effect, flg);
+			}
+		}
+
+		/* Strike */
+		if (f_ptr->flags3 & (FF3_STRIKE))
+		{
+			if (!(rand_int(20)))
+			{
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+
+				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice) * 10;
+   
+				/* Apply the blow */
+				project(0, 0, y, x, dam, f_ptr->blow.effect, flg);
+			}
+		}
+
+		/* Dynamic */
+		if (f_ptr->flags3 & (FF3_SPREAD))
+		{
+			int dir = rand_int(12);
+
+			if (dir < 8)
+			{
+				int yy = y + ddy_ddd[dir];
+				int xx = x + ddx_ddd[dir];
+
+				int adjfeat = cave_feat[yy][xx];
+
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_HIDE;
+
+				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
+   
+				/* Apply the blow */
+				project(0, 0, yy, xx, dam, f_ptr->blow.effect, flg);
+
+				/* Hack -- require smoke/acid clouds to move */
+				if (adjfeat == cave_feat[yy][xx]) dir = 12;
+			}
+
+			if (dir < 9)
+			{
+				cave_alter_feat(y,x,FS_SPREAD);
+			}
+		}
+	}
+}
+
+
 
 /*
  * Every so often, the character makes enough noise that nearby 
@@ -3361,7 +3643,7 @@ void update_noise(void)
 	int this_cycle = 0;
 	int next_cycle = 1;
 
-byte flow_table[2][2][8 * NOISE_STRENGTH];
+	byte flow_table[2][2][8 * NOISE_STRENGTH];
 
 	/* The character's grid has no flow info.  Do a full rebuild. */
 	if (cave_cost[p_ptr->py][p_ptr->px] == 0) full = TRUE;
@@ -3726,6 +4008,9 @@ void update_smell(void)
 #endif
 }
 
+
+
+
 /*
  * Map the current panel (plus some) ala "magic mapping"
  *
@@ -3926,53 +4211,68 @@ void town_illuminate(bool daytime)
 {
 	int y, x, i;
 
-town_type *t_ptr = &t_info[p_ptr->dungeon];
+	town_type *t_ptr = &t_info[p_ptr->dungeon];
 
-dungeon_zone *zone=&t_ptr->zone[0];;
+	dungeon_zone *zone=&t_ptr->zone[0];
+
+	int dungeon_hgt, dungeon_wid;
 
 	/* Get the zone */
-get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+
+	dungeon_hgt = (!(zone->fill)) ? TOWN_HGT : DUNGEON_HGT;
+	dungeon_wid = (!(zone->fill)) ? TOWN_WID : DUNGEON_WID;
 
 	/* Apply light or darkness */
-	for (y = 0; y < DUNGEON_HGT; y++)
+	for (y = 0; y < dungeon_hgt; y++)
 	{
-		for (x = 0; x < DUNGEON_WID; x++)
+		for (x = 0; x < dungeon_wid; x++)
 		{
-			/* Don't affect indoors */
-			if (!(f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
-			{
-				if ((daytime) && (cave_info[y][x] & (CAVE_WALL)))
-				{
-					for (i = 0; i < 8; i++)
-					{
-						int yy = y + ddy_ddd[i];
-						int xx = x + ddx_ddd[i];
-
-						/* Ignore annoying locations */
-						if (!in_bounds_fully(yy, xx)) continue;
-
-						if (f_info[cave_feat[yy][xx]].flags3 & (FF3_OUTSIDE))
-						{
-							/* Illuminate the grid */
-							cave_info[y][x] |= (CAVE_GLOW);
-						}
-					}
-				}
-			}
-
-			/* Boring grids (light) */
-			else if (daytime)
+			/* Light outside and adjacent indoors */
+			if ((daytime) && (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
 			{
 				/* Illuminate the grid */
 				cave_info[y][x] |= (CAVE_GLOW);
+
+				for (i = 0; i < 8; i++)
+				{
+					int yy = y + ddy_ddd[i];
+					int xx = x + ddx_ddd[i];
+
+					/* Ignore annoying locations */
+					if (!in_bounds_fully(yy, xx)) continue;
+
+					/* Illuminate the grid */
+					cave_info[yy][xx] |= (CAVE_GLOW);
+				}
 			}
 
-			/* Boring grids (dark) */
-			else
+			/* Darken */
+			else if (!daytime && !(f_info[cave_feat[y][x]].flags2 & (FF2_GLOW)))
 			{
 				/* Darken the grid */
-				if (!(f_info[cave_feat[y][x]].flags2 & (FF2_GLOW))) cave_info[y][x] &= ~(CAVE_GLOW);
+				if (f_info[cave_feat[y][x]].flags2 & (FF3_OUTSIDE)) cave_info[y][x] &= ~(CAVE_GLOW);
 
+				/* Indoors adjacent to outside*/
+				else for (i = 0; i < 8; i++)
+				{
+					int yy = y + ddy_ddd[i];
+					int xx = x + ddx_ddd[i];
+
+					/* Ignore annoying locations */
+					if (!in_bounds_fully(yy, xx)) continue;
+
+					/* Ignore walls of rooms */
+					if (cave_info[y][x] & (CAVE_ROOM)) continue;
+
+					if (f_info[cave_feat[yy][xx]].flags3 & (FF3_OUTSIDE))
+					{
+						/* Darken the grid */
+						cave_info[y][x] &= ~(CAVE_GLOW);
+					}
+				}
+
+				/* Lit by glowing terrain */
 				for (i = 0; i < 8; i++)
 				{
 					int yy = y + ddy_ddd[i];
@@ -4002,8 +4302,8 @@ get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 		/* Pick a location */
 		while (1)
 		{
-			y = rand_int(DUNGEON_HGT);
-			x = rand_int(DUNGEON_WID);
+			y = rand_int(dungeon_hgt);
+			x = rand_int(dungeon_wid);
 
 			if (cave_naked_bold(y, x)) break;
 		}
@@ -4030,36 +4330,78 @@ get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 static void cave_set_feat_aux(int y, int x, int feat)
 {
 	/* Set if blocks los */
-bool los = cave_floor_bold(y,x);
+	bool los = cave_floor_bold(y,x);
 
-/* Get feature */
-feature_type *f_ptr = &f_info[feat];
+	/* Get feature */
+	feature_type *f_ptr = &f_info[feat];
 
-bool hide_item = (f_info[cave_feat[y][x]].flags2 & (FF2_HIDE_ITEM)) != 0;
+	/* Set if dynamic */
+	bool dyna = (f_info[cave_feat[y][x]].flags3 & (FF3_DYNAMIC_MASK)) != 0;
+
+	bool hide_item = (f_info[cave_feat[y][x]].flags2 & (FF2_HIDE_ITEM)) != 0;
+
+	bool outside;
 
 	s16b this_o_idx, next_o_idx = 0;
 
-/* Really set the feature */
-cave_feat[y][x] = feat;
+	/* Really set the feature */
+	cave_feat[y][x] = feat;
 
-/* Check for bit 5 set*/
-if (f_ptr->flags1 & (FF1_LOS))
-{
-cave_info[y][x] &= ~(CAVE_WALL);
-}
+	/* Check for bit 5 set*/
+	if (f_ptr->flags1 & (FF1_LOS))
+	{
+		cave_info[y][x] &= ~(CAVE_WALL);
+	}
 
-/* Handle wall grids */
-else
-{
-cave_info[y][x] |= (CAVE_WALL);
-}
+	/* Handle wall grids */
+	else
+	{
+		cave_info[y][x] |= (CAVE_WALL);
+	}
 
-/* Check for change to boring grid */
-if (!(f_ptr->flags1 & (FF1_REMEMBER))) cave_info[y][x] &= ~(CAVE_MARK);
+	/* Check for change to boring grid */
+	if (!(f_ptr->flags1 & (FF1_REMEMBER))) cave_info[y][x] &= ~(CAVE_MARK);
 
-/* Check for change to out of sight grid */
-else if (!(player_can_see_bold(y,x))) cave_info[y][x] &= ~(CAVE_MARK);
+	/* Check for change to out of sight grid */
+	else if (!(player_can_see_bold(y,x))) cave_info[y][x] &= ~(CAVE_MARK);
 
+	/* Check if adding to dynamic list */
+	if (!dyna && (f_ptr->flags3 & (FF3_DYNAMIC_MASK)))
+	{
+		if (dyna_full)
+		{
+			if (distance(y,x,p_ptr->py,p_ptr->px) < MAX_SIGHT)
+			{
+				dyna_g[dyna_n++] = GRID(y,x);
+			}
+		}
+		else if (dyna_n == (DYNA_MAX -1))
+		{
+			dyna_full = TRUE;
+
+			/* Hack to force rebuild */
+			dyna_cent_y = 255;
+			dyna_cent_x = 255;
+		}
+		else
+		{
+			dyna_g[dyna_n++] = GRID(y,x);			
+		}
+	}
+	/* Check if removing from dynamic list */
+	else if (dyna && !(f_ptr->flags3 & (FF3_DYNAMIC_MASK)))
+	{
+		int i, new_i = 0;
+
+		for (i = 0; i < dyna_n; i++)
+		{
+			if (dyna_g[i] == GRID(y,x)) continue;
+
+			dyna_g[new_i++] = dyna_g[i];
+		}
+
+		dyna_n = new_i;
+	}
 
 	/* Check to see if monster exposed by change */
 	if (cave_m_idx[y][x] > 0)
@@ -4070,12 +4412,12 @@ else if (!(player_can_see_bold(y,x))) cave_info[y][x] &= ~(CAVE_MARK);
 
 		if (hidden)
 		{
-monster_hide(y,x,place_monster_here(y,x,m_ptr->r_idx), m_ptr);
+			monster_hide(y,x,place_monster_here(y,x,m_ptr->r_idx) > 0, m_ptr);
 
 			if (!(m_ptr->mflag & (MFLAG_HIDE)))
 			{
-		/* And update */
-update_mon(cave_m_idx[y][x],FALSE);
+				/* And update */
+				update_mon(cave_m_idx[y][x],FALSE);
 
 		/* Hack --- tell the player if something unhides */
 		if (m_ptr->ml)
@@ -4086,8 +4428,8 @@ update_mon(cave_m_idx[y][x],FALSE);
 		monster_desc(m_name, m_ptr, 0);
 
 		msg_format("%^s emerges from %s%s.",m_name,
-		((f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_FILLED))?"":"the "),
-	f_name+f_info[cave_feat[m_ptr->fy][m_ptr->fx]].name);
+			((f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_FILLED))?"":"the "),
+			f_name+f_info[cave_feat[m_ptr->fy][m_ptr->fx]].name);
 		}
 
 				/* Disturb on "move" */
@@ -4104,15 +4446,15 @@ update_mon(cave_m_idx[y][x],FALSE);
 	}
 
 	/* Scan all objects in the grid */
-for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
-{
-	object_type *o_ptr;
+	for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
+	{
+		object_type *o_ptr;
 
-/* Get the object */
-o_ptr = &o_list[this_o_idx];
+		/* Get the object */
+		o_ptr = &o_list[this_o_idx];
 
-/* Get the next object */
-next_o_idx = o_ptr->next_o_idx;
+		/* Get the next object */
+		next_o_idx = o_ptr->next_o_idx;
 
 		/* Hide stuff */
 		if ((!hide_item) && (f_ptr->flags2 & (FF2_HIDE_ITEM)))
@@ -4122,37 +4464,52 @@ next_o_idx = o_ptr->next_o_idx;
 		}
 	}
 
-
 	/* Check if los has changed */
-        if ((los) && (player_has_los_bold(y,x)) && !(cave_floor_bold(y,x)))
-        {
+	if ((los) && (player_has_los_bold(y,x)) && !(cave_floor_bold(y,x)))
+	{
 		/* Update the visuals */
-                p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
+		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 	}
-        else if ((!los) && (player_has_los_bold(y,x)) && (cave_floor_bold(y,x)))
+	else if ((!los) && (player_has_los_bold(y,x)) && (cave_floor_bold(y,x)))
 	{
 		/* Update the visuals */
 		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 	}
 
-        if (player_has_los_bold(y,x))
-        {
-                /* Notice */
-                note_spot(y, x);
+	/* Check if location changed under player */
+	if ((p_ptr->py == y) && (p_ptr->px == x))
+	{
+		/* Recalculate bonuses */
+		p_ptr->update |= (PU_BONUS);
 
-                /* Redraw */
-                lite_spot(y, x);
-        }
+		/* Update view if moved outside/inside */
+		outside = ((p_ptr->depth == min_depth(p_ptr->dungeon)) && 
+			(f_info[feat].flags3 & (FF3_OUTSIDE)));
+
+		/* Changed inside/outside */
+		if (outside != p_ptr->outside)
+		{
+ 			p_ptr->redraw |= (PR_MAP);
+		}
+
+		/* Change state */
+		p_ptr->outside = outside;
+	}
+
+	if (player_has_los_bold(y,x))
+	{
+		/* Notice */
+		note_spot(y, x);
+
+		/* Redraw */
+		lite_spot(y, x);
+	}
 
 }
 
 
 /*
  * Change the "feat" flag for a grid, and notice/redraw the grid
- */
-/*
- * ANDY - Updated to set FF2_GLOW correctly.
- * TODO - Handle fires/smoke etc.
  */
 void cave_set_feat(int y, int x, int feat)
 {
@@ -4163,15 +4520,19 @@ void cave_set_feat(int y, int x, int feat)
 	feature_type *f_ptr = &f_info[cave_feat[y][x]];
 	feature_type *f_ptr2 = &f_info[feat];
 
-	bool glow = (f_ptr->flags2 & (FF2_GLOW)) !=0;
-	bool glow2 = (f_ptr2->flags2 & (FF2_GLOW)) != 0;
+	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
+	bool daytime = (((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2)));
 
-	bool wall = (f_ptr->flags1 & (FF1_WALL)) !=0;
-	bool wall2 = (f_ptr2->flags1 & (FF1_WALL)) != 0;
+	bool glow = ((f_ptr->flags2 & FF2_GLOW) || ( daytime && surface && (f_ptr->flags3 & (FF3_OUTSIDE)))) !=0;
+	bool glow2 = ((f_ptr2->flags2 & FF2_GLOW) || ( daytime && surface && (f_ptr2->flags3 & (FF3_OUTSIDE)))) !=0;
 
-	bool tree = (f_ptr->flags3 & (FF3_TREE_BIG)) !=0;
-	bool tree2 = (f_ptr2->flags3 & (FF3_TREE_BIG)) != 0;
+	bool tree = (f_ptr->flags3 & (FF3_TREE)) !=0;
+	bool tree2 = (f_ptr2->flags3 & (FF3_TREE)) != 0;
 
+	/* Change the feature */
+	cave_set_feat_aux(y,x,feat);
+
+	/* Handle destroying glow and creating terrain 'inside' */
 	if (glow && !glow2)
 	{
 		/* Darken temporarily */
@@ -4187,7 +4548,7 @@ void cave_set_feat(int y, int x, int feat)
 			/* Ignore annoying locations */
 			if (!in_bounds_fully(yy, xx)) continue;
 
-			glow3 = (f_info[cave_feat[yy][xx]].flags2 & (FF2_GLOW)) != 0;
+			glow3 = ((f_info[cave_feat[yy][xx]].flags2 & (FF2_GLOW)) || ( daytime && surface && (f_info[cave_feat[yy][xx]].flags3 & (FF3_OUTSIDE)))) != 0;
 
 			if (glow3)
 			{
@@ -4200,7 +4561,7 @@ void cave_set_feat(int y, int x, int feat)
 			{
 				/* Darken temporarily */
 				cave_info[yy][xx] &= ~(CAVE_GLOW);
-			
+
 				for (ii = 0; ii < 8; ii++)
 				{
 					int yyy = yy + ddy_ddd[ii];
@@ -4211,26 +4572,33 @@ void cave_set_feat(int y, int x, int feat)
 					/* Ignore annoying locations */
 					if (!in_bounds_fully(yyy, xxx)) continue;
 
-					glow4 = (f_info[cave_feat[yyy][xxx]].flags2 & (FF2_GLOW)) != 0;
+					glow4 = ((f_info[cave_feat[yyy][xxx]].flags2 & (FF2_GLOW)) || ( daytime && surface && (f_info[cave_feat[yyy][xxx]].flags3 & (FF3_OUTSIDE))))  != 0;
 
-					if (glow4 && !(cave_info[yy][xx] & (CAVE_GLOW)))
+					if (glow4)
 					{
 						/* Illuminate the grid */
 						cave_info[yy][xx] |= (CAVE_GLOW);
-
-						/* Notice */
-						note_spot(yy, xx);
-
-						/* Redraw */
-						lite_spot(yy, xx);
-                                        }
+					}
 				}
 			}
+
+			/* Notice change */
+			if ((view_glowing_lite) || !(cave_info[yy][xx] & (CAVE_GLOW)))
+			{
+				note_spot(yy,xx);
+
+				lite_spot(yy,xx);
+			}
+		}
+
+		/* Notice change */
+		if ((view_glowing_lite) || !(cave_info[y][x] & (CAVE_GLOW)))
+		{
+			note_spot(y,x);
+
+			lite_spot(y,x);
 		}
 	}
-
-	/* Change the feature */
-	cave_set_feat_aux(y,x,feat);
 
 	/* Set the level type */
 	if (f_ptr2->flags2 & (FF2_WATER)) level_flag |= (LF1_WATER);
@@ -4240,120 +4608,63 @@ void cave_set_feat(int y, int x, int feat)
 	if (f_ptr2->flags2 & (FF2_OIL)) level_flag |= (LF1_OIL);
 	if (f_ptr2->flags2 & (FF2_CHASM)) level_flag |= (LF1_CHASM);
 
-	/*
-	 * ANDY - Handle creation of big trees.
-	 */
-	if (feat == FEAT_TREE_BIG)
-	{
-		for (i = 0; i < 8; i++)
-		{
-                        int yy,xx;
-        
-                        int k = rand_int(8);
-        
-                        yy = y + ddy_ddd[k];
-                        xx = x + ddx_ddd[k];
-        
-                        /* Ignore annoying locations */
-                        if (!in_bounds_fully(yy, xx)) continue;
-        
-                        if (f_info[cave_feat[yy][xx]].flags3 & (FF3_GROUND))
-                        {
-                                cave_set_feat_aux(yy,xx,FEAT_TREE_SHADE);
-                        }
-                        else if (f_info[cave_feat[yy][xx]].flags2 & (FF2_CHASM))
-                        {
-                                cave_set_feat_aux(yy,xx,FEAT_TREE_SHADE_C);
-                        }
-                        else if (cave_feat[yy][xx] == FEAT_WALL_EXTRA)
-                        {
-                                cave_set_feat_aux(yy,xx,FEAT_TREE_SHADE_W);
-                        }
-                }
-	}
-	else if (feat == FEAT_TREE_BIG_S)
-	{
-		for (i = 0; i < 8; i++)
-		{
-			int yy,xx;
-
-			int k = rand_int(8);
-
-			yy = y + ddy_ddd[k];
-			xx = x + ddx_ddd[k];
-
-     			/* Ignore annoying locations */
-			if (!in_bounds_fully(yy, xx)) continue;
-
-			if (f_info[cave_feat[yy][xx]].flags3 & (FF3_GROUND))
-			{
-				cave_set_feat_aux(yy,xx,FEAT_TREE_SHADE_S);
-			}
-		}
-	}
-
-
-	/* Handle NEED_WALL/ NEED_TREE locations */
-	if ((wall && !wall2) || (tree && !tree2))
+	/* Handle NEED_TREE locations */
+	if (tree && !tree2)
 	{
 		for (i = 0; i < 8; i++)
 		{
 			int yy = y + ddy_ddd[i];
 			int xx = x + ddx_ddd[i];
 
-			int feat2;
-
-			bool need_wall, need_tree;
+			bool need_tree;
 
 			/* Ignore annoying locations */
 			if (!in_bounds_fully(yy, xx)) continue;
 
+			/* Get the feature */
 			feat2 = cave_feat[yy][xx];
 
-			need_wall = (f_info[feat2].flags3 & (FF3_NEED_WALL));
-			need_tree = (f_info[feat2].flags3 & (FF3_NEED_TREE));
+			need_tree = ((f_info[feat2].flags3 & (FF3_NEED_TREE))!=0);
 
 			/* Was destroyed grid only one holding this one up */
-			if ((wall && !wall2 && need_wall) || (tree && !wall2 && need_tree))
+			if (need_tree)
 			{
-				/* Collapse temporarily */
-				feat2 = feat_state(cave_feat[yy][xx],FS_TUNNEL);
+				/* Temporarily "need_tree" the grid */
+				cave_set_feat_aux(yy,xx,feat_state(feat2,FS_NEED_TREE));
 
 				for (ii = 0; ii < 8; ii++)
 				{
 					int yyy = yy + ddy_ddd[ii];
 					int xxx = xx + ddx_ddd[ii];
 
-					bool wall4, tree4;
+					bool tree4;
 
 					/* Ignore annoying locations */
 					if (!in_bounds_fully(yyy, xxx)) continue;
 
-					wall4 = (f_info[cave_feat[yyy][xxx]].flags1 & (FF1_WALL)) !=0;
-					tree4 = (f_info[cave_feat[yyy][xxx]].flags3 & (FF3_TREE_BIG)) !=0;
+					/* Is a tree? */
+					tree4 = ((f_info[cave_feat[yyy][xxx]].flags3 & (FF3_TREE)) !=0);
 
-					if (wall && !wall2 && need_wall && wall4 && (rand_int(100) < 50)) feat2 = cave_feat[yy][xx];
+					/* Hack -- sometimes do not restore trees */
+					if ((tree4) && (rand_int(100)<50))
+					{
+						/* Restore the grid */
+						cave_set_feat_aux(yy,xx,feat2);
 
-					if (tree && !tree2 && need_tree && tree4 && (rand_int(100) < 50)) cave_feat[yy][xx] = feat2;
-					feat2 = cave_feat[yy][xx];
+						break;
+					}
 				}
 			}
-
-			/* Affect the grid */
-			cave_set_feat_aux(yy,xx,feat2);
-
 		}
 	}
 
 	/*
 	 * ANDY - Handle removal of orphaned chasm edges. This is a pretting
 	 * up function, and not necessary, but it makes chasms look a lot
-	 * better. I prefer this here, than generate.c because it matches the
-	 * algorithm for creation and destruction of glow features.
+	 * better.
 	 */
 	if (f_ptr2->flags2 & (FF2_CHASM))
 	{
-
 		if (feat == FEAT_CHASM) feat = FEAT_CHASM_E;
 
 		cave_set_feat_aux(y,x,FEAT_CHASM);
@@ -4372,17 +4683,18 @@ void cave_set_feat(int y, int x, int feat)
 				continue;
 			}
 
-			if ((cave_feat[yy][xx] != FEAT_NONE) &&
-			    !((f_info[cave_feat[yy][xx]].flags2 & (FF2_CHASM)) ||
-			      (f_info[cave_feat[yy][xx]].flags2 & (FF2_BRIDGED))))
+			/* Get the feature */
+			feat2 = cave_feat[yy][xx];
+
+			if ((feat2 != FEAT_NONE) &&
+			    !((f_info[feat2].flags2 & (FF2_CHASM)) ||
+			      (f_info[feat2].flags2 & (FF2_BRIDGED))))
 			{
 				cave_set_feat_aux(yy,xx,feat);
 			}
 			/* Was destroyed grid only one edging for this one? */
-			else if (f_info[cave_feat[yy][xx]].flags2 & (FF2_CHASM))
+			else if (f_info[feat2].flags2 & (FF2_CHASM))
 			{
-				feat2 = cave_feat[yy][xx];
-
 				if (feat2 == FEAT_CHASM) feat2 = FEAT_CHASM_E;
 
 				/* Temporarily chasm the grid */
@@ -4399,15 +4711,17 @@ void cave_set_feat(int y, int x, int feat)
 						/* Restore the grid */
 						cave_set_feat_aux(yy,xx,feat2);
 
-						continue;
+						break;
 					}
 
-					if ((cave_feat[yy][xx] != FEAT_NONE) &&
+					if ((cave_feat[yyy][xxx] != FEAT_NONE) &&
 					    !((f_info[cave_feat[yyy][xxx]].flags2 & (FF2_CHASM))||
 					     (f_info[cave_feat[yyy][xxx]].flags2 & (FF2_BRIDGED))))
 					{
 						/* Restore the grid */
 						cave_set_feat_aux(yy,xx,feat2);
+
+						break;
 					}
 				}
 			}
@@ -4427,15 +4741,26 @@ void cave_set_feat(int y, int x, int feat)
 			{
 				/* Restore the grid */
 				cave_set_feat_aux(yy,xx,FEAT_CHASM_E);
+
+				break;
 			}
 		}
 	}
 
-	/* Handle creating 'GLOW' */
-	if (f_ptr2->flags2 & FF2_GLOW)
+	/* Handle creating 'GLOW' or locations outside */
+	if ((f_ptr2->flags2 & FF2_GLOW) || ( daytime && surface && (f_ptr2->flags3 & (FF3_OUTSIDE))))
 	{
-		/* Illuminate the grid */
-		cave_info[y][x] |= (CAVE_GLOW);
+		if ((view_glowing_lite) || !(cave_info[y][x] & (CAVE_GLOW)))
+		{
+			/* Illuminate the grid */
+			cave_info[y][x] |= (CAVE_GLOW);
+
+			/* Notice */
+			note_spot(y, x);
+
+			/* Redraw */
+			lite_spot(y, x);
+		}
 
 		for (i = 0; i < 8; i++)
 		{
@@ -4446,7 +4771,7 @@ void cave_set_feat(int y, int x, int feat)
 			if (!in_bounds_fully(yy, xx)) continue;
 
 			/* Notice/Redraw */
-			if ((character_dungeon) && !(cave_info[yy][xx] & (CAVE_GLOW)))
+			if ((view_glowing_lite) || !(cave_info[yy][xx] & (CAVE_GLOW)))
 			{
 				/* Illuminate the grid */
 				cave_info[yy][xx] |= (CAVE_GLOW);
@@ -4456,11 +4781,6 @@ void cave_set_feat(int y, int x, int feat)
 
 				/* Redraw */
 				lite_spot(yy, xx);
-			}
-			else
-			{
-				/* Illuminate the grid */
-				cave_info[yy][xx] |= (CAVE_GLOW);
 			}
 		}    
 	}
@@ -5132,8 +5452,3 @@ bool is_quest(int level)
 	/* Nope */
 	return (FALSE);
 }
-
-
-
-
-
