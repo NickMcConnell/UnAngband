@@ -1594,8 +1594,9 @@
 #define SV_MATTOCK			7
 
 /* The "sval" values for TV_HAFTED */
-#define SV_WHIP					2	/* 1d6 */
+#define SV_WHIP					2	/* 1d4 */
 #define SV_QUARTERSTAFF			3	/* 1d9 */
+#define SV_BATON				4	/* 1d5 */
 #define SV_MACE					5	/* 2d4 */
 #define SV_BALL_AND_CHAIN		6	/* 2d4 */
 #define SV_WAR_HAMMER			8	/* 3d3 */
@@ -2516,7 +2517,7 @@
 #define TR3_EASY_KNOW    0x02000000L     /* Item is known if aware */
 #define TR3_HIDE_TYPE    0x04000000L     /* Item hides description */
 #define TR3_SHOW_MODS    0x08000000L     /* Item shows Tohit/Todam */
-#define TR3_XXX1  0x10000000L     /* XXX1 */
+#define TR3_THROWING	 0x10000000L     /* Item gets shots/might bonus when thrown */
 #define TR3_LIGHT_CURSE  0x20000000L     /* Item has Light Curse */
 #define TR3_HEAVY_CURSE  0x40000000L     /* Item has Heavy Curse */
 #define TR3_PERMA_CURSE  0x80000000L     /* Item has Perma Curse */

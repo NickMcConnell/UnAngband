@@ -49,8 +49,8 @@ reorganised some of later campaign to be a smoother transition from end
 - Made dynamic terrain allowing forests to burn down, seas to have waves
  and various other effects, poison gas and smoke to spread and disappate.
 
-- Added waves and rough water to allow water to have waves in it. These
-look and act like real waves.
+- Added waves and wave crests to allow water to have waves in it. These
+look and act like 'real' waves.
 
 - Doors and other wooden objects now cause persistent fires, which can be
 put out by bashing them.
@@ -59,6 +59,25 @@ put out by bashing them.
 potentially dangerous grids.
 
 - Musical instruments will now occasionally be ego items.
+
+- Torches, lanterns, etc. now will also affect the terrain under them
+as well as the monster.
+
+- Some weapons are now 'throwing': to use them, unequip your bow or
+cross-bow, and use the fire command. You will see which weapons are
+available as throwing weapons. This is currently daggers, batons,
+darts, javelins and spears, all potions, flasks, bottles and sling
+ammunition.  Throwing weapons get a much greater range, and their
+to hit and damage bonuses count for double when fired. Warning:
+using the throw command will not give you these benefits.
+
+- Slings can now fire any 'throwing' weapon, allowing you to lob
+potions (Such as potions of Detonations) to much greater distances.
+
+- Added Burning arrows and Batons.
+
+- Potions of Death are now very expensive.
+
 
 ### User Interface ###
 
@@ -124,3 +143,9 @@ the surface.
 
 - Using some wands from the ground, could cause problems as they could
 be destroyed by their effects.
+
+- Fixed bug preventing 'I'nspection of an object displaying anything
+to the screen.
+
+- Fixed logic bug: thrown specialists now gain their might/shots
+benefits, but only with throwing weapons.

@@ -3628,10 +3628,10 @@ static void death_examine(void)
 		/* Describe */
 		screen_object(o_ptr, TRUE);
 
+		(void)inkey();
+
 		/* Load the screen */
 		screen_load();
-
-		(void)inkey();
 	}
 }
 

@@ -197,8 +197,8 @@ void teleport_player(int dis)
 			/* Ignore illegal locations */
 			if (!in_bounds_fully(y, x)) continue;
 
-			/* Require safe floor space */
-			if (!cave_start_bold(y, x)) continue;
+			/* Require "naked" floor space */
+			if (!cave_naked_bold(y, x)) continue;
 
 			/* Don't allow teleporting into vaults */
 			by = y/BLOCK_HGT;
@@ -1639,7 +1639,7 @@ static bool temp_lite(int y, int x)
  *
  * Perhaps we should affect doors and/or walls.
  */
-static bool project_f(int who, int r, int y, int x, int dam, int typ)
+bool project_f(int who, int r, int y, int x, int dam, int typ)
 {
 	bool obvious = FALSE;
 
@@ -2287,9 +2287,8 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 			case GF_COLD:
 			{
 
-	/* Hack -- double cold damage in water */
-	if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam *= 2;
-
+				/* Hack -- double cold damage in water */
+				if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam *= 2;
 
 				if (hates_cold(o_ptr))
 				{
@@ -2363,8 +2362,8 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 				{
 					note_kill = (plural ? " soak through!" : " soaks through!");
 					do_kill = TRUE;
-					if (f2 & (TR2_IGNORE_COLD)) ignore = TRUE;
-					if2 |= TR2_IGNORE_COLD;
+					if (f2 & (TR2_IGNORE_WATER)) ignore = TRUE;
+					if2 |= TR2_IGNORE_WATER;
 				}
 				break;
 			}
@@ -2377,13 +2376,11 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 				{
 					note_kill = (plural ? " soak through!" : " soaks through!");
 					do_kill = TRUE;
-					if (f2 & (TR2_IGNORE_COLD)) ignore = TRUE;
-					if2 |= TR2_IGNORE_COLD;
+					if (f2 & (TR2_IGNORE_WATER)) ignore = TRUE;
+					if2 |= TR2_IGNORE_WATER;
 				}
 				break;
 			}
-
-			
 
 			/* Mana -- destroys everything */
 			/* Explosion -- very destructive to objects */
@@ -2391,7 +2388,13 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 			case GF_MANA:
 			{
 				do_kill = TRUE;
-				note_kill = (plural ? " are destroyed!" : " is destroyed!");
+				note_kill = (plural ? " melt!" : " melts!");
+				if ((f2 & (TR2_IGNORE_ACID)) &&
+				    (f2 & (TR2_IGNORE_COLD)) &&
+				    (f2 & (TR2_IGNORE_ELEC)) &&
+				    (f2 & (TR2_IGNORE_FIRE)) &&
+				    (f2 & (TR2_IGNORE_WATER))) ignore = TRUE;
+
 				break;
 			}
 

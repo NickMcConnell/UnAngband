@@ -2415,6 +2415,7 @@ static s16b choose_item(int a_idx)
 
 	case TV_HAFTED:
 		if (r2 < 3) sval = SV_WHIP;
+		else if (r2 < 5) sval = SV_BATON;
 		else if (r2 < 8) sval = SV_MACE;
 		else if (r2 < 15) sval = SV_WAR_HAMMER;
 		else if (r2 < 22) sval = SV_QUARTERSTAFF;
