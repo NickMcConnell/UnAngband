@@ -175,7 +175,7 @@ static void do_cmd_travel(void)
 			if (get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) selection = inventory[item].sval;
 
 			/* Make sure we can get back */
-			if ((selection != p_ptr->dungeon) && (!(adult_campaign) || (t_info[selection].near == p_ptr->dungeon)))
+			if ((selection != p_ptr->dungeon) && (!(adult_campaign) || (t_info[selection].nearby == p_ptr->dungeon)))
 			{
 				 msg_format("This map will lead you to %s.",t_name + t_info[selection].name);
 				if (get_check("Journey there? "))
@@ -191,7 +191,7 @@ static void do_cmd_travel(void)
 			{
 				/* XXX Bit wordy, but we may have many locations with 'identical' names. */
 				msg_print("You cannot follow this map yet.");
-				msg_format("But %s seems the best place to start.", t_name + t_info[t_info[selection].near].name);
+				msg_format("But %s seems the best place to start.", t_name + t_info[t_info[selection].nearby].name);
 				selection = p_ptr->dungeon;
 			}
 
@@ -208,12 +208,12 @@ static void do_cmd_travel(void)
 					journey = damroll(2,4);
 				}
 			}
-			else if ((selection==p_ptr->dungeon) && (t_ptr->near != p_ptr->dungeon))
+			else if ((selection==p_ptr->dungeon) && (t_ptr->nearby != p_ptr->dungeon))
 			{
-				msg_format("You see a well worn trail to %s.",t_name + t_info[t_ptr->near].name);
+				msg_format("You see a well worn trail to %s.",t_name + t_info[t_ptr->nearby].name);
 				if (get_check("Journey there? "))
 				{
-					selection = t_ptr->near;
+					selection = t_ptr->nearby;
 					
 					journey = damroll(2,4);
 				}

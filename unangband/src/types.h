@@ -189,7 +189,7 @@ struct town_type
 	u32b name;     /* Name (offset) */
 	u32b text;      /* Text (offset) */
 
-	u16b near;
+	u16b nearby;
 	u16b distant;
 
 	byte r_char;    /* Add races of this char */

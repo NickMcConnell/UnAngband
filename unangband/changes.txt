@@ -4,6 +4,12 @@
 This is done via a graphic user interface type setting, allowing you to
 see large numbers of possible graphics to select from.
 
+
+### Build / Platform ###
+
+- Removed use of 'near' member of structure as used as a reserved
+keyword in VC++.
+
 ### Bug fixes ###
 
 - Actually made teleport a lot safer to use. You will not be placed in
