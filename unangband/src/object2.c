@@ -3236,6 +3236,8 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		case TV_STAFF:
 		{
 			if (!(k_info[o_ptr->k_idx].cost)) power = -1;
+			else if (power < 0) power = 0;
+
 			if (power) a_m_aux_1(o_ptr, lev, power);
 			a_m_aux_4(o_ptr, lev, power);
 			break;
