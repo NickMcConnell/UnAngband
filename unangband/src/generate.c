@@ -2492,6 +2492,67 @@ static bool vault_aux_undead(int r_idx)
 	return (TRUE);
 }
 
+/*
+ * Helper function for "monster nest (theme)"
+ */
+static bool vault_aux_theme_nest(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Decline unique monsters */
+	if (r_ptr->flags1 & (RF1_UNIQUE)) return (FALSE);
+
+	/* Hack -- Accept monsters with flag */
+	if (t_info[p_ptr->dungeon].r_flag)
+	{
+		int mon_flag = t_info[p_ptr->dungeon].r_flag-1;
+
+		if ((mon_flag < 32) && 
+			(r_ptr->flags1 & (1L << mon_flag))) return (TRUE);
+
+		if ((mon_flag >= 32) && 
+			(mon_flag < 64) && 
+			(r_ptr->flags2 & (1L << (mon_flag -32)))) return (TRUE);
+
+		if ((mon_flag >= 64) && 
+			(mon_flag < 96) && 
+			(r_ptr->flags3 & (1L << (mon_flag -64)))) return (TRUE);
+
+		if ((mon_flag >= 96) && 
+			(mon_flag < 128) && 
+			(r_ptr->flags4 & (1L << (mon_flag -96)))) return (TRUE);
+
+		return (FALSE);
+	}
+
+	/* Okay */
+	return (TRUE);
+}
+
+
+/*
+ * Helper function for "monster pit (theme)"
+ */
+static bool vault_aux_theme_pit(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Decline unique monsters */
+	if (r_ptr->flags1 & (RF1_UNIQUE)) return (FALSE);
+
+	/* Hack -- Accept monsters with graphic */
+	if (t_info[p_ptr->dungeon].r_char)
+	{
+		if (r_ptr->d_char == t_info[p_ptr->dungeon].r_char) return (TRUE);
+
+		return (FALSE);
+	}
+
+	/* Okay */
+	return (TRUE);
+}
+
+
 
 /*
  * Helper function for "monster pit (orc)"
@@ -2670,9 +2731,9 @@ static void build_type5(int y0, int x0)
 	if ((adult_campaign) && (tmp < 25))
 	{
 		/* Describe */
-		name = "monster";
+		name = "themed";
 
-		get_mon_num_hook = dun_level_mon;
+		get_mon_num_hook = vault_aux_theme_nest;
 
 		/* Appropriate rating bonus */
 		rating_bonus = 10;
@@ -2887,9 +2948,9 @@ static void build_type6(int y0, int x0)
 	if ((adult_campaign) && (tmp < 10))
 	{
 		/* Describe */
-		name = "monster";
+		name = "themed";
 
-		get_mon_num_hook = dun_level_mon;
+		get_mon_num_hook = vault_aux_theme_pit;
 
 		/* Appropriate rating bonus */
 		rating_bonus = 10;
