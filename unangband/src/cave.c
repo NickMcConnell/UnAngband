@@ -721,7 +721,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 								a = TERM_YELLOW;
 							}
 						}
-						else if (view_glowing_lite)
+						else if (view_glowing_lite && (info & (CAVE_GLOW)))
 						{
 							int i;
 
@@ -826,7 +826,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 								a = lite_attr[f_ptr->x_attr];
 							}
 						}
-						else if (view_glowing_lite)
+						else if (view_glowing_lite && (info & (CAVE_GLOW)))
 						{
 							int i;
 
