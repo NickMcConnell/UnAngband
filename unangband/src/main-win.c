@@ -1918,6 +1918,16 @@ static errr Term_xtra_win_react(void)
 		/* Change setting */
 		use_graphics = arg_graphics;
 
+		/* Hack -- always redraw */
+		if (use_graphics == GRAPHICS_DAVID_GERVAIS_ISO)
+		{
+			Term->always_draw = TRUE;
+		}
+		else
+		{
+			Term->always_draw = FALSE;
+		}
+
 		/* Reset visuals */
 #ifdef ANGBAND_2_8_1
 		reset_visuals();
@@ -2149,6 +2159,15 @@ static int Term_xtra_win_grids(int v)
 	term_data *td = (term_data*)(Term->data);
 
 	td->grid_display = v;
+
+	if (arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO)
+	{
+		Term->always_draw = TRUE;
+	}
+	else
+	{
+		Term->always_draw = FALSE;
+	}
 
 	/* Success */
 	return (0);
@@ -2578,15 +2597,38 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 			/* Perfect size */
 			if ((w1 == tw2) && (h1 == th2))
 			{
+				if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_display) && ((x) || (y)))
+				{
+					if (!(x))
+					{
+						/* Copy the terrain picture from the bitmap to the window */
+						BitBlt(hdc, x2, y2, tw2 / 2, th2, hdcSrc, x3, y3, SRCCOPY);
 
-				if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_display))
-				{ 
-					/* Mask out the terrain */
-					BitBlt(hdc, x2, y2, tw2, th2, hdcMask, x3, y3, SRCAND);
+						/* Mask out the terrain */
+						BitBlt(hdc, x2 + tw2 / 2, y2, tw2 / 2, th2, hdcMask, x3 + tw2 / 2, y3, SRCAND);
 
-					/* Draw the terrain */
-					BitBlt(hdc, x2, y2, tw2, th2, hdcSrc, x3, y3, SRCPAINT);
+						/* Draw the terrain */
+						BitBlt(hdc, x2 + tw2 / 2, y2, tw2 / 2, th2, hdcSrc, x3 + tw2 / 2, y3, SRCPAINT);
+					}
+					else if (!(y))
+					{
+						/* Copy the terrain picture from the bitmap to the window */
+						BitBlt(hdc, x2 + tw2 / 2, y2, tw2 / 2, th2, hdcSrc, x3 + tw2 / 2, y3, SRCCOPY);
 
+						/* Mask out the terrain */
+						BitBlt(hdc, x2, y2, tw2 / 2, th2, hdcMask, x3, y3, SRCAND);
+
+						/* Draw the terrain */
+						BitBlt(hdc, x2, y2, tw2 / 2, th2, hdcSrc, x3, y3, SRCPAINT);
+					}
+					else
+					{
+						/* Mask out the terrain */
+						BitBlt(hdc, x2, y2, tw2, th2, hdcMask, x3, y3, SRCAND);
+
+						/* Draw the terrain */
+						BitBlt(hdc, x2, y2, tw2, th2, hdcSrc, x3, y3, SRCPAINT);
+					}
 				}
 				else
 				{
@@ -2611,21 +2653,44 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 				/* Set the correct mode for stretching the tiles */
 				SetStretchBltMode(hdc, COLORONCOLOR);
 
-				if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_display))
+				if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_display) && ((x) || (y)))
 				{ 
-					/* Mask out the terrain */
-					StretchBlt(hdc, x2, y2, tw2, th2, hdcMask, x3, y3, w1, h1, SRCAND);
+					if (!(x))
+					{
+						/* Copy the terrain picture from the bitmap to the window */
+						StretchBlt(hdc, x2, y2, tw2 / 2, th2, hdcSrc, x3, y3, w1 / 2, h1, SRCCOPY);
 
-					/* Draw the terrain */
-					StretchBlt(hdc, x2, y2, tw2, th2, hdcSrc, x3, y3, w1, h1, SRCPAINT);
+						/* Mask out the terrain */
+						StretchBlt(hdc, x2 + tw2 / 2, y2, tw2 / 2, th2, hdcMask, x3 + tw2 / 2, y3, w1 / 2, h1, SRCAND);
 
+						/* Draw the terrain */
+						StretchBlt(hdc, x2 + tw2 / 2, y2, tw2 / 2, th2, hdcSrc, x3 + tw2 / 2, y3, w1 / 2, h1, SRCPAINT);
+					}
+					else if (!(y))
+					{
+						/* Copy the terrain picture from the bitmap to the window */
+						StretchBlt(hdc, x2 + tw2 / 2, y2, tw2 / 2, th2, hdcSrc, x3 + tw2 / 2, y3, w1 / 2, h1, SRCCOPY);
+
+						/* Mask out the terrain */
+						StretchBlt(hdc, x2, y2, tw2 / 2, th2, hdcMask, x3, y3, w1 / 2, h1, SRCAND);
+
+						/* Draw the terrain */
+						StretchBlt(hdc, x2, y2, tw2 / 2, th2, hdcSrc, x3, y3, w1 / 2, h1, SRCPAINT);
+					}
+					else
+					{
+						/* Mask out the terrain */
+						StretchBlt(hdc, x2, y2, tw2, th2, hdcMask, x3, y3, w1, h1, SRCAND);
+
+						/* Draw the terrain */
+						StretchBlt(hdc, x2, y2, tw2, th2, hdcSrc, x3, y3, w1, h1, SRCPAINT);
+					}
 				}
 				else
 				{
 					/* Copy the terrain picture from the bitmap to the window */
 					StretchBlt(hdc, x2, y2, tw2, th2, hdcSrc, x3, y3, w1, h1, SRCCOPY);
 				}
-
 
 				/* Only draw if terrain and overlay are different */
 				if ((x1 != x3) || (y1 != y3))

@@ -96,6 +96,9 @@ struct term_win
  *	- Flag "always_text"
  *	  Use the "Term_text()" routine for invisible text
  *
+ *	- Flag "always_draw"
+ *	  Always redraw grids
+ *
  *	- Flag "notice_grid"
  *	  Call the "TERM_XTRA_GRIDS" action when grid layout changes
  *
@@ -104,7 +107,6 @@ struct term_win
  *
  *	- Flag "never_frosh"
  *	  Never call the "TERM_XTRA_FROSH" action
- *
  *
  *	- Value "attr_blank"
  *	  Use this "attr" value for "blank" grids
@@ -174,6 +176,7 @@ struct term
 	bool always_pict;
 	bool higher_pict;
 	bool always_text;
+	bool always_draw;
 	bool notice_grid;
 	bool never_bored;
 	bool never_frosh;

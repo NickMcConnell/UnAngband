@@ -7,6 +7,12 @@ use with David Gervais' 54x54 graphics tiles (As 54 is not divisible by 4).
 
 - Improve scrolling when setting visuals.
 
+- Greatly improved isometric tile mode, so that it is now a playable option.
+In particular, all tiles are correctly drawn and redrawn after every refresh.
+However, many more monsters/objects etc. need to have the correct tiles
+assigned to them and there are still visual artefacts that need to be
+cleaned up.
+
 ### Build / Platform ###
 
 - Makefile.std was reporting errors if the files it tries to clean are not
@@ -439,7 +445,7 @@ terrain while on the surface.
 currently used, but if you copy them into your Zangband lib\edit directory
 (Backing up the current versions of the files), you can see an Unangband
 'version' of the Zangband wilderness, using Unangband's version of the terrain
-graphics. (Uses Zangband 2.8.1). This is for testing purposes and comments...
+graphics. (Uses Zangband 2.7.1). This is for testing purposes and comments...
 
 - Updated copyright notices in source.
 

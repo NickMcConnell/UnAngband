@@ -500,7 +500,7 @@ void Term_queue_char(int x, int y, byte a, char c, byte ta, char tc)
 	if (!tc) tc = otc;
 
 	/* Hack -- Ignore non-changes */
-	if ((oa == a) && (oc == c) && (ota == ta) && (otc == tc)) return;
+	if (!(Term->always_draw) && (oa == a) && (oc == c) && (ota == ta) && (otc == tc)) return;
 
 	/* Save the "literal" information */
 	scr_aa[x] = a;
@@ -547,7 +547,7 @@ void Term_queue_chars(int x, int y, int n, byte a, cptr s)
 		char otc = scr_tcc[x];
 
 		/* Hack -- Ignore non-changes */
-		if ((oa == a) && (oc == *s) && (ota == 0) && (otc == 0)) continue;
+		if (!(Term->always_draw) && (oa == a) && (oc == *s) && (ota == 0) && (otc == 0)) continue;
 
 		/* Save the "literal" information */
 		scr_aa[x] = a;
@@ -636,7 +636,7 @@ static void Term_fresh_row_pict(int y, int x1, int x2)
 		ntc = scr_tcc[x];
 
 		/* Handle unchanged grids */
-		if ((na == oa) && (nc == oc) && (nta == ota) && (ntc == otc))
+		if (!(Term->always_draw) && (na == oa) && (nc == oc) && (nta == ota) && (ntc == otc))
 		{
 			/* Flush */
 			if (fn)
@@ -736,7 +736,7 @@ static void Term_fresh_row_both(int y, int x1, int x2)
 		ntc = scr_tcc[x];
 
 		/* Handle unchanged grids */
-		if ((na == oa) && (nc == oc) && (nta == ota) && (ntc == otc))
+		if (!(Term->always_draw) && (na == oa) && (nc == oc) && (nta == ota) && (ntc == otc))
 		{
 			/* Flush */
 			if (fn)

@@ -1760,6 +1760,13 @@ void lite_spot(int y, int x)
 	unsigned ky, kx;
 	unsigned vy, vx;
 
+	/* Hack -- complete redraw */
+	if (arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO)
+	{
+		p_ptr->redraw |= (PR_MAP);
+		return;
+	}
+
 	/* Location relative to panel */
 	ky = (unsigned)(y - p_ptr->wy);
 
