@@ -1,3 +1,9 @@
+- Fixed some elves that were incorrectly using the 'h' symbol.
+
+- Added high-level guardians to remaining areas in campaign mode.
+
+- Replaced fletchers with jewellers in Edoras.
+
 UnAngband 0.5.4: "It'll be Sangband next" (Out the door release)
 
 ### Game Play ###
@@ -60,6 +66,8 @@ plasma or immunity to water.
 - Sneaky monsters try to be more sneaky.
 
 - Hidden monsters no longer radiate an aura.
+
+- Adjusted various ring depths to make some more useful.
 
 ### User Interface ###
 
