@@ -2824,17 +2824,17 @@ void do_cmd_save_screen(void)
 
 	FILE *fff;
 
-	char buf[1024];
+	char file_name[1024];
 
 
 	/* Build the filename */
-	path_build(buf, 1024, ANGBAND_DIR_USER, "dump.txt");
+	path_build(file_name, 1024, ANGBAND_DIR_USER, "dump.txt");
 
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
 
 	/* Append to the file */
-	fff = my_fopen(buf, "w");
+	fff = my_fopen(file_name, "w");
 
 	/* Oops */
 	if (!fff) return;
@@ -3050,6 +3050,8 @@ void do_cmd_save_screen_html(void)
 	/* Refresh */
 	do_cmd_redraw();
 
+	/* Delete the file */
+	fd_kill(file_name);
 }
 
 
@@ -4538,6 +4540,7 @@ static void do_cmd_knowledge_ego_items(void)
 			prt("Knowledge - ego items", 2, 0);
 			prt("Group", 4, 0);
 			prt("Name", 4, max + 3);
+			prt("Inscribed", 4, 65);
 			prt("Sym", 4, 75);
 
 			for (i = 0; i < 78; i++)
@@ -4932,6 +4935,7 @@ static void do_cmd_knowledge_objects(void)
 			prt("Knowledge - objects", 2, 0);
 			prt("Group", 4, 0);
 			prt("Name", 4, max + 3);
+			prt("Inscribed", 4, 65);
 			prt("Sym", 4, 75);
 
 			for (i = 0; i < 78; i++)

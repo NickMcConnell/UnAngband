@@ -16,6 +16,9 @@ only become aware when you see the object for the first time.
 - Could not see some objects (eg corpses) in knowledge menus as they did
 not randomly appear in the dungeon. (Reported by topazg).
 
+- Delete the dump.prf file after generating a screen dump, to prevent this
+file becoming excessively large.
+
 
 UnAngband 0.5.4c: "Competitive Fix"
 
