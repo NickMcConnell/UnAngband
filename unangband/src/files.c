@@ -958,6 +958,123 @@ errr process_pref_file(cptr name)
 
 
 
+/*
+ * Hack -- save a screen dump to a file in html format
+ *
+ * Note:  Unlike other Angband variants, I'm not worried too about bad attr/char
+ * mappings.
+ *
+ * This may seem like laziness on my part, but the only clean way I can see of
+ * doing this code-wise requires that I reset all the visuals anyway. So we do this
+ * when we have to (Dumping as a command from the main map) and anywhere else, we
+ * try and avoid it (Due to obvious problems with tryiing to redraw the screen
+ * mid-way through displaying a message/animation and so on). That way for someone
+ * truely worried about getting everything via an html screenshot, they can reset
+ * their pref file and avoid using font preferences that use non-ASCII characters.
+ *
+ * This also has the additional advantage that we can dump any screen to html,
+ * rather than just the main map, which other variants do via duplication of the
+ * map info code. We do this by hooking into the currently unused Ctrl-right carat
+ * in util.c. This is probably dangerous, so we don't use screen_save/screen_load
+ * or notify the player in any way that we have committed a screen_dump. Hopefully
+ * by the time we call inkey() we don't have any issues with outputting a file.
+ *
+ */
+void dump_html(void)
+{
+	int y, x;
+
+	byte a = 0, oa = TERM_WHITE;
+	char c = ' ';
+
+	FILE *fff;
+
+	char buf[1024];
+
+
+	/* Build the filename */
+	/* XXX Support .html vs. .htm file names. We dumb down for DOS */
+	path_build(buf, 1024, ANGBAND_DIR_USER, "dump.htm");
+
+	/* File type is "TEXT" */
+	FILE_TYPE(FILE_TYPE_TEXT);
+
+	/* Append to the file */
+	fff = my_fopen(buf, "w");
+
+	/* Oops */
+	if (!fff) return;
+
+
+	/* Html preamble */
+	fprintf(fff, "<html>\n");
+	fprintf(fff, "<head>\n");
+	fprintf(fff, "<meta name='generator' content='UnAngband " VERSION_STRING "'>\n");
+	fprintf(fff, "<title>" VERSION_NAME " " VERSION_STRING " Screen Dump</title>\n");
+	fprintf(fff, "</head>\n");
+	fprintf(fff, "<body text='#%02x%02x%02x' bgcolor='#000000'>",
+	             angband_color_table[TERM_WHITE][1],
+	             angband_color_table[TERM_WHITE][2],
+	             angband_color_table[TERM_WHITE][3]);
+	fprintf(fff, "<pre><tt>");
+
+	/* Dump the screen */
+	for (y = 0; y < 24; y++)
+	{
+		/* Dump each row */
+		for (x = 0; x < 79; x++)
+		{
+			/* Get the attr/char */
+			(void)(Term_what(x, y, &a, &c));
+
+			/* Check for being white (reduce file size) */
+			if ((a == oa) && (oa == TERM_WHITE))
+			{
+				/* Do nothing. */
+			}
+			else if ((a != oa) && (oa == TERM_WHITE))
+			{
+				fprintf(fff, "<font color='#%02x%02x%02x'>",
+				                  angband_color_table[a][1],
+				                  angband_color_table[a][2],
+				                  angband_color_table[a][3]);
+
+				oa = a;
+			}
+			else if ((a != oa) && (a == TERM_WHITE))
+			{
+				fprintf(fff, "</font>");
+
+				oa = a;
+			}
+			else if ((a != oa) && (oa != TERM_WHITE))
+			{
+				fprintf(fff, "</font><font color='#%02x%02x%02x'>",
+				                  angband_color_table[a][1],
+				                  angband_color_table[a][2],
+				                  angband_color_table[a][3]);
+
+				oa = a;
+			}
+
+			fprintf(fff, "%c", c);
+		}
+
+		/* End the row */
+		fprintf(fff, "\n");
+	}
+
+	fprintf(fff, "</tt></pre>\n");
+
+	fprintf(fff, "</body>\n");
+	fprintf(fff, "</html>\n");
+
+	/* Close it */
+	my_fclose(fff);
+
+}
+
+
 
 #ifdef CHECK_TIME
 
@@ -1644,15 +1761,17 @@ static void display_player_xtra_info(void)
 	desc = likert(xsrh, 6);
 	c_put_str(likert_color, format("%9s", desc), 17, col+14);
 
-
-	/* Bottom */
-	col = 5;
+	/* Indent output by 1 character, and wrap at column 72 */
+	text_out_wrap = 72;
+	text_out_indent = 1;
 
 	/* History */
-	for (i = 0; i < 4; i++)
-	{
-		put_str(p_ptr->history[i], i + 19, col);
-	}
+	Term_gotoxy(text_out_indent, 19);
+	text_out_to_screen(TERM_WHITE, p_ptr->history);
+
+	/* Reset text_out() vars */
+	text_out_wrap = 0;
+	text_out_indent = 0;
 }
 
 
@@ -2311,7 +2430,7 @@ errr file_character(cptr name, bool full)
 	text_out_file = fff;
 
 	/* Begin dump */
-	fprintf(fff, "  [Unangband 0.5.1d Character Dump]\n\n");
+	fprintf(fff, "  [Unangband 0.5.3b Character Dump]\n\n");
 
 	/* Display player */
 	display_player(0);
@@ -2366,7 +2485,7 @@ errr file_character(cptr name, bool full)
 		fprintf(fff, "  [Character Equipment]\n\n");
 		for (i = INVEN_WIELD; i < inven_max; i++)
 		{
-			object_desc(o_name, &inventory[i], TRUE, 3);
+			object_desc(o_name, sizeof(o_name), &inventory[i], TRUE, 3);
 			fprintf(fff, "%c) %s\n",
 			        index_to_label(i), o_name);
 
@@ -2382,7 +2501,7 @@ errr file_character(cptr name, bool full)
 	{
 		if (!inventory[i].k_idx) break;
 
-		object_desc(o_name, &inventory[i], TRUE, 3);
+		object_desc(o_name, sizeof(o_name), &inventory[i], TRUE, 3);
 		fprintf(fff, "%c) %s\n",
 		        index_to_label(i), o_name);
 
@@ -2401,7 +2520,7 @@ errr file_character(cptr name, bool full)
 		/* Dump all available items */
 		for (i = 0; i < st_ptr->stock_num; i++)
 		{
-			object_desc(o_name, &st_ptr->stock[i], TRUE, 3);
+			object_desc(o_name, sizeof(o_name), &st_ptr->stock[i], TRUE, 3);
 			fprintf(fff, "%c) %s\n", I2A(i), o_name);
 
 			/* Describe random object attributes */
@@ -3470,7 +3589,7 @@ static void show_info(void)
 				prt(tmp_val, j+2, 4);
 
 				/* Get the object description */
-				object_desc(o_name, o_ptr, TRUE, 3);
+				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 				/* Get the inventory color */
 				attr = tval_to_attr[o_ptr->tval & 0x7F];
@@ -3521,15 +3640,23 @@ static void death_examine(void)
                 object_known(o_ptr);
 
 		/* Description */
-		object_desc(o_name, o_ptr, TRUE, 3);
+		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 		/* Describe */
 		msg_format("Examining %s...", o_name);
 
-                msg_print("");
+		msg_print("");
 
-                screen_object(o_ptr, TRUE);
+		/* Save the screen */
+		screen_save();
 
+		/* Describe */
+		screen_object(o_ptr, TRUE);
+
+		(void)inkey();
+
+		/* Load the screen */
+		screen_load();
 	}
 }
 
