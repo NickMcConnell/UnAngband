@@ -973,13 +973,16 @@ void acid_dam(int dam, cptr kb_str, bool inven)
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
 	/* Total Immunity */
-	if (p_ptr->immune_acid || (dam <= 0))
+	if (p_ptr->immune_acid)
 	{
 		/* Always notice */
 		equip_can_flags(0x0L,TR2_IM_ACID,0x0L);
 
 		return;
 	}
+
+	/* No damage */
+	if (dam <= 0) return;
 
 	/* Resist the damage */
 	if (p_ptr->resist_acid)
@@ -1016,7 +1019,7 @@ void elec_dam(int dam, cptr kb_str, bool inven)
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
 	/* Total immunity */
-	if (p_ptr->immune_elec || (dam <= 0))
+	if (p_ptr->immune_elec)
 	{
 		/* Always notice */
 		equip_can_flags(0x0L,TR2_IM_ELEC,0x0L);
@@ -1024,6 +1027,8 @@ void elec_dam(int dam, cptr kb_str, bool inven)
 		return;
 	}
 
+	/* No damage */
+	if (dam <= 0) return;
 
 	/* Resist the damage */
 	if (p_ptr->oppose_elec) dam = (dam + 2) / 3;
@@ -1058,13 +1063,16 @@ void fire_dam(int dam, cptr kb_str, bool inven)
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
 	/* Totally immune */
-	if (p_ptr->immune_fire || (dam <= 0))
+	if (p_ptr->immune_fire)
 	{
 		/* Always notice */
 		equip_can_flags(0x0L,TR2_IM_FIRE,0x0L);
 
 		return;
 	}
+
+	/* No damage */
+	if (dam <= 0) return;
 
 	/* Resist the damage */
 	if (p_ptr->resist_fire)
@@ -1098,7 +1106,7 @@ void cold_dam(int dam, cptr kb_str, bool inven)
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
 	/* Total immunity */
-	if (p_ptr->immune_cold || (dam <= 0))
+	if (p_ptr->immune_cold)
 	{
 		/* Always notice */
 		equip_can_flags(0x0L,TR2_IM_COLD,0x0L);
@@ -1106,6 +1114,8 @@ void cold_dam(int dam, cptr kb_str, bool inven)
 		return;
 	}
 
+	/* No damage */
+	if (dam <= 0) return;
 
 	/* Resist the damage */
 	if (p_ptr->resist_cold)
