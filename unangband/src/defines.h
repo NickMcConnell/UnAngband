@@ -110,19 +110,19 @@
 #define PANEL_WID ((use_dbltile && use_bigtile) ? 8 : ((use_dbltile || use_bigtile) ? 16 : 33))
 
 #define ROW_MAP			1
-#define COL_MAP			13
+#define COL_MAP			(show_sidebar ? 13 : 0)
 
 /*
  * Number of grids in each screen (vertically)
  * Must be a multiple of PANEL_HGT (at least 2x)
  */
-#define SCREEN_HGT	((Term->hgt - ROW_MAP - 1) / (use_dbltile ? 2 : 1))
+#define SCREEN_HGT	((Term->hgt - ROW_MAP - 1 - (show_sidebar ? 0 : 1)) / (use_dbltile ? 2 : 1))
 
 /*
  * Number of grids in each screen (horizontally)
  * Must be a multiple of PANEL_WID (at least 2x)
  */
-#define SCREEN_WID	((Term->wid - COL_MAP - 1) / ((use_dbltile && use_bigtile) ? 4 :((use_dbltile || use_bigtile) ? 2 : 1)))
+#define SCREEN_WID	((Term->wid - COL_MAP) / ((use_dbltile && use_bigtile) ? 4 :((use_dbltile || use_bigtile) ? 2 : 1)))
 
 
 /*
@@ -533,68 +533,68 @@
 #define ROW_TITLE		3
 #define COL_TITLE		0	/* <title> or <mode> */
 
-#define ROW_LEVEL		4
+#define ROW_LEVEL		(show_sidebar ? 4 : Term->hgt - 1)
 #define COL_LEVEL		0	/* "LEVEL xxxxxx" */
 
-#define ROW_EXP			5
-#define COL_EXP			0	/* "EXP xxxxxxxx" */
+#define ROW_EXP		(show_sidebar ? 5 : Term->hgt - 1)
+#define COL_EXP		(show_sidebar ? 0 : 7)	/* "EXP xxxxxxxx" */
 
-#define ROW_GOLD		6
-#define COL_GOLD		0	/* "AU xxxxxxxxx" */
+#define ROW_GOLD		(show_sidebar ? 6 : Term->hgt - 1)
+#define COL_GOLD		(show_sidebar ? 0 : 20)	/* "AU xxxxxxxxx" */
 
-#define ROW_STAT		8
+#define ROW_STAT		(show_sidebar ? 8 : Term->hgt - 2)
 #define COL_STAT		0	/* "xxx   xxxxxx" */
 
-#define ROW_AC			15
-#define COL_AC			0	/* "Cur AC xxxxx" */
+#define ROW_AC		(show_sidebar ? 15 : Term->hgt - 1)
+#define COL_AC		(show_sidebar ? 0 : 33)	/* "Cur AC xxxxx" */
 
-#define ROW_MAXHP		16
-#define COL_MAXHP		0	/* "Max HP xxxxx" */
+#define ROW_MAXHP		(show_sidebar ? 16 : Term->hgt - 1)
+#define COL_MAXHP		(show_sidebar ? 0 : 48)	/* "Max HP xxxxx" */
 
-#define ROW_CURHP		17
-#define COL_CURHP		0	/* "Cur HP xxxxx" */
+#define ROW_CURHP		(show_sidebar ? 17 : Term->hgt - 1)
+#define COL_CURHP		(show_sidebar ? 0 : 40)	/* "Cur HP xxxxx" */
 
-#define ROW_MAXSP		18
-#define COL_MAXSP		0	/* "Max SP xxxxx" */
+#define ROW_MAXSP		(show_sidebar ? 18 : Term->hgt - 1)
+#define COL_MAXSP		(show_sidebar ? 0 : 63)	/* "Max SP xxxxx" */
 
-#define ROW_CURSP		19
-#define COL_CURSP		0	/* "Cur SP xxxxx" */
+#define ROW_CURSP		(show_sidebar ? 19 : Term->hgt - 1)
+#define COL_CURSP		(show_sidebar ? 0 : 55)	/* "Cur SP xxxxx" */
 
 #define ROW_INFO		20
 #define COL_INFO		0	/* "xxxxxxxxxxxx" */
 
-#define ROW_CUT			21
-#define COL_CUT			0	/* <cut> */
+#define ROW_CUT		(show_sidebar ? 21 : Term->hgt -2)
+#define COL_CUT		(show_sidebar ? 0 : 18)	/* <cut> */
 
-#define ROW_STUN		22
-#define COL_STUN		0	/* <stun> */
+#define ROW_STUN		(show_sidebar ? 22 : Term->hgt -2)
+#define COL_STUN		(show_sidebar ? 0 : 22)	/* <stun> */
 
-#define ROW_HUNGRY		(Term->hgt - 1)
-#define COL_HUNGRY		0	/* "Weak" / "Hungry" / "Full" / "Gorged" */
+#define ROW_HUNGRY	(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define COL_HUNGRY	(show_sidebar ? 0 : 26)	/* "Weak" / "Hungry" / "Full" / "Gorged" */
 
-#define ROW_BLIND		(Term->hgt - 1)
-#define COL_BLIND		7	/* "Blind" */
+#define ROW_BLIND		(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define COL_BLIND		(show_sidebar ? 7 : 30)	/* "Blind" */
 
-#define ROW_CONFUSED	(Term->hgt - 1)
-#define COL_CONFUSED	13	/* "Confused" */
+#define ROW_CONFUSED	(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define COL_CONFUSED	(show_sidebar ? 13 : 34)	/* "Confused" */
 
-#define ROW_AFRAID		(Term->hgt - 1)
-#define COL_AFRAID		22	/* "Afraid" */
+#define ROW_AFRAID	(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define COL_AFRAID	(show_sidebar ? 22 : 38)	/* "Afraid" */
 
-#define ROW_POISONED	(Term->hgt - 1)
-#define COL_POISONED	29	/* "Poisoned" */
+#define ROW_POISONED	(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define COL_POISONED	(show_sidebar ? 29 : 42)	/* "Poisoned" */
 
-#define ROW_STATE		(Term->hgt - 1)
-#define COL_STATE		38	/* <state> */
+#define ROW_STATE		(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define COL_STATE		(show_sidebar ? 38 : 67)	/* <state> */
 
-#define ROW_SPEED		(Term->hgt - 1)
-#define COL_SPEED		49	/* "Slow (-NN)" or "Fast (+NN)" */
+#define ROW_SPEED		(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define COL_SPEED		(show_sidebar ? 49 : 52)	/* "Slow (-NN)" or "Fast (+NN)" */
 
-#define ROW_STUDY		(Term->hgt - 1)
-#define COL_STUDY		64	/* "Study" */
+#define ROW_STUDY		(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define COL_STUDY		(show_sidebar ? 64 : 46)	/* "Study" */
 
-#define ROW_DEPTH		(Term->hgt - 1)
-#define COL_DEPTH		70	/* "Lev NNN" / "NNNN ft" */
+#define ROW_DEPTH		Term->hgt - 1
+#define COL_DEPTH		(show_sidebar ? 70 : 72)	/* "Lev NNN" / "NNNN ft" */
 
 
 /*** General index values ***/
@@ -3288,6 +3288,7 @@
 #define OPT_view_glowing_lite 84
 #define OPT_view_surface_lite 85
 #define OPT_variant_study_more   86
+#define OPT_show_sidebar	87
 /* xxx xxx */
 #define OPT_birth_point_based    (OPT_BIRTH+0)
 #define OPT_birth_auto_roller    (OPT_BIRTH+1)
@@ -3523,7 +3524,7 @@
 #define variant_drop_body op_ptr->opt[OPT_variant_drop_body]
 #define variant_save_feats op_ptr->opt[OPT_variant_save_feats]
 #define variant_study_more op_ptr->opt[OPT_variant_study_more]
-
+#define show_sidebar op_ptr->opt[OPT_show_sidebar]
 
 
 /*
