@@ -59,7 +59,6 @@ C:0:X
 A:^V
 C:0:n
 
-
 ##### Roguelike Keyset Mappings #####
 
 # Stay still (numerical)
@@ -197,6 +196,10 @@ C:1:z
 # Zap a rod (Activate)
 A:z
 C:1:a
+
+# Engrave a rune (Apply)
+A:y
+C:1:^G
 
 # Hack -- Commit suicide
 A:Q
