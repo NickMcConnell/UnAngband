@@ -14,6 +14,11 @@ are unaffected (Bug 682).
 
 - Updated pref files required for 32x32 bit maps (Bug 777).
 
+### Build / Platform ###
+
+- Remove references to nangband in makefile.
+
+
 UnAngband 0.5.4a: "A Whole Lotta Love"
 
 ### Game-play ###
