@@ -4793,7 +4793,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			/* Increase "image" */
 			if (!p_ptr->resist_chaos)
 			{
-				if (set_image(p_ptr->image + 3 + randint(dam / 2)))
+				if (set_image(p_ptr->image + 6 + randint(dam / 2)))
 				{
 					obvious = TRUE;
 				}
