@@ -3,6 +3,10 @@
 
 - Bill Ferny now guards the bottom of Bree.
 
+- The Trollshaw forest is now harder.
+
+- Bert, Bill and Tom occur earlier in non-campaign mode.
+
 ### User Interface ###
 
 - Added ability to redefine visual prefs using the knowledge menus (~).
