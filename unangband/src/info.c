@@ -445,7 +445,8 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 	vn = 0;
 	if ((s_ptr->flags1 & (SF1_ENCHANT_TOH | SF1_ENCHANT_TOD))
 		|| (s_ptr->type == SPELL_BRAND_WEAPON)) vp[vn++]="weapon";
-	if (s_ptr->flags1 & (SF1_ENCHANT_TOH | SF1_ENCHANT_TOD)) vp[vn++]="missile";
+	if ((s_ptr->flags1 & (SF1_ENCHANT_TOH | SF1_ENCHANT_TOD))
+		|| (s_ptr->type == SPELL_BRAND_AMMO)) vp[vn++]="missile";
 	if ((s_ptr->flags1 & (SF1_ENCHANT_TOA))
 		|| (s_ptr->type == SPELL_BRAND_WEAPON)) vp[vn++]="piece of armor";
 	if (s_ptr->type == SPELL_BRAND_ITEM) vp[vn++]="item";
@@ -497,9 +498,12 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 	if (s_ptr->flags1 & (SF1_ENCHANT_TOD)) vp[vn++]="increase damage";
 	if (s_ptr->flags1 & (SF1_ENCHANT_TOA)) vp[vn++]="increase armor class";
 
-	if ((s_ptr->type == SPELL_BRAND_WEAPON)
-		|| (s_ptr->type == SPELL_BRAND_ARMOR))
-			vp[vn++]=inscrip_text[INSCRIP_MIN_HIDDEN-INSCRIP_NULL+s_ptr->param];
+	if ((s_ptr->type == SPELL_BRAND_WEAPON) ||
+	    (s_ptr->type == SPELL_BRAND_ARMOR) ||
+	    (s_ptr->type == SPELL_BRAND_AMMO))
+	{
+		vp[vn++]=inscrip_text[INSCRIP_MIN_HIDDEN-INSCRIP_NULL+s_ptr->param];
+	}
 
 	if (s_ptr->type == SPELL_ENCHANT_TVAL) vp[vn++]="change its kind";
 
@@ -582,6 +586,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 	if (s_ptr->flags2 & (SF2_SEE_INVIS)) vp[vn++]="allows you to see invisible monsters";
 	if (s_ptr->flags2 & (SF2_PROT_EVIL)) vp[vn++]="protects your from evil monsters";
 	if (s_ptr->flags2 & (SF2_HASTE)) vp[vn++]="hastes you";
+	if (s_ptr->flags2 & (SF2_SLOW)) vp[vn++]="slows you";
 	if (s_ptr->flags2 & (SF2_CUT)) vp[vn++]="makes you bleed";
 	if (s_ptr->flags2 & (SF2_STUN)) vp[vn++]="stuns you";
 	if (s_ptr->flags2 & (SF2_POISON)) vp[vn++]="poisons you";
