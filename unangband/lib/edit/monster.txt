@@ -3726,7 +3726,7 @@ D:A stumpy figure carved from stone, with glittering eyes, this sentinel
 D: strides towards you with deadly intent.
 
 N:277:Wood elf shaman
-G:h:G
+G:l:G
 I:120:20d20:15:75:10
 W:25:3:0:500
 B:HIT:HURT:1d7
@@ -6449,7 +6449,7 @@ S:S_MONSTER | CURE
 D:A tall black cloaked Ringwraith.
 
 N:450:Wood elf sorcerer
-G:h:R
+G:l:R
 I:130:80d10:20:70:10
 W:41:2:0:3000
 B:HIT:HURT:2d8
@@ -8969,7 +8969,7 @@ D:Clouds of these monsters light up the dungeon - so brightly that you can
 D: barely see through them.
 
 N:594:Eol, the Dark Elf
-G:h:D
+G:l:D
 I:130:80d30:20:100:60
 W:49:2:0:25000
 B:HIT:HURT:3d8
@@ -8990,7 +8990,7 @@ D: he is currently fleeing their wrath, following the murder of Princess
 D: Aredhel of Gondolin.
 
 N:595:Maeglin, the Traitor of Gondolin
-G:h:D
+G:l:D
 I:130:60d100:70:120:20
 W:81:2:0:35000
 B:HIT:HURT:8d8
