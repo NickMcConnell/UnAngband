@@ -799,6 +799,12 @@ void object_known_store(object_type *o_ptr)
                 /* Now we know what it is, update what we know about it from our ego item memory */
                 if (o_ptr->name2)
                 {
+                        /* Obvious flags */
+                        object_can_flags(o_ptr,e_info[o_ptr->name2].obv_flags1,
+                                         e_info[o_ptr->name2].obv_flags2,
+                                         e_info[o_ptr->name2].obv_flags3);
+
+                        /* Known flags */
                         object_can_flags(o_ptr,e_list[o_ptr->name2].can_flags1,
                                          e_list[o_ptr->name2].can_flags2,
                                          e_list[o_ptr->name2].can_flags3);

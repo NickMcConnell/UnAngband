@@ -2769,6 +2769,37 @@ static bool grab_one_ego_item_flag(ego_item_type *e_ptr, cptr what)
 
 
 /*
+ * Grab one flag in a ego-item_type from a textual string
+ */
+static bool grab_one_obvious_ego_item_flag(ego_item_type *e_ptr, cptr what)
+{
+	if (grab_one_flag(&e_ptr->obv_flags1, k_info_flags1, what) == 0)
+        {
+                e_ptr->flags1 |= e_ptr->obv_flags1;
+		return (0);
+        }
+
+	if (grab_one_flag(&e_ptr->obv_flags2, k_info_flags2, what) == 0)
+        {
+                e_ptr->flags2 |= e_ptr->obv_flags2;
+		return (0);
+        }
+
+	if (grab_one_flag(&e_ptr->obv_flags3, k_info_flags3, what) == 0)
+        {
+                e_ptr->flags3 |= e_ptr->obv_flags3;
+		return (0);
+        }
+
+	/* Oops */
+	msg_format("Unknown ego-item flag '%s'.", what);
+
+	/* Error */
+	return (PARSE_ERROR_GENERIC);
+}
+
+
+/*
  * Initialize the "e_info" array, by parsing an ascii "template" file
  */
 errr parse_e_info(char *buf, header *head)
@@ -2942,6 +2973,33 @@ errr parse_e_info(char *buf, header *head)
 
 			/* Parse this entry */
 			if (0 != grab_one_ego_item_flag(e_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
+
+			/* Start the next entry */
+			s = t;
+		}
+	}
+
+	/* Hack -- Process 'O' for obvious flags */
+	else if (buf[0] == 'O')
+	{
+		/* There better be a current e_ptr */
+		if (!e_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Parse every entry textually */
+		for (s = buf + 2; *s; )
+		{
+			/* Find the end of this entry */
+			for (t = s; *t && (*t != ' ') && (*t != '|'); ++t) /* loop */;
+
+			/* Nuke and skip any dividers */
+			if (*t)
+			{
+				*t++ = '\0';
+				while ((*t == ' ') || (*t == '|')) t++;
+			}
+
+			/* Parse this entry */
+			if (0 != grab_one_obvious_ego_item_flag(e_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
 
 			/* Start the next entry */
 			s = t;
