@@ -1,6 +1,12 @@
 ### Game-play ###
 
-- Implemented obvious flags set for ego items.
+- Dropped down effectiveness of healing spell of a monster.
+
+- *identified* status of an object will be lost when a rune is applied.
+
+- Changed some routes between maps.  So that a meaningless loop is removed.
+
+- Implemented the Obvious Flags set for ego items.
 
 - Resistances and abilities of average items and base item of ego
 items will be known as soon as identified.
@@ -21,12 +27,26 @@ character is loaded.
 
 ### Bug fixes ###
 
-- Fixed bug which prevent saving Ego status of musical instruments.
+- Fixed bug which causes crash when fire/throw command is used.
+
+- Potion of death didn't kill you.
+
+- Fixed bug which causes crash when cheat death is used at Wizard mode. 
+
+- Fixed bug of object detection spell.
+
+- Fixed bug where teleport level was used at surface only map like Lake Town.
+
+- Fixed wrong room descriptions of pits.
+
+- Fixed bug where teleport-to spell of a monster may place player on Chasm.
+
+- Fixed bug which prevents saving Ego status of musical instruments.
 
 - Fixed bug which cause wrong 'may' flags to be remained after
   applying rune to some object.
 
-- Fixed bug which prevent displaying earth quake ability of a weapon.
+- Fixed bug which prevents displaying earth quake ability of a weapon.
 
 - Fixed bug which display meaningless '-more-' prompt when you press
 '=' at startup (only when random artifact is re-rolled).
