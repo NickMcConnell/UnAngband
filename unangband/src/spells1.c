@@ -254,6 +254,15 @@ void teleport_player_to(int ny, int nx)
 	/* Find a usable location */
 	while (1)
 	{
+                int by,bx;
+
+		/* Occasionally advance the distance */
+		if (ctr++ > (4 * dis * dis + 4 * dis + 1))
+		{
+			ctr = 0;
+			dis++;
+		}
+
 		/* Pick a nearby legal location */
 		while (1)
 		{
@@ -263,14 +272,18 @@ void teleport_player_to(int ny, int nx)
 		}
 
 		/* Accept "naked" floor grids */
-		if (cave_naked_bold(y, x)) break;
+		if (!cave_naked_bold(y, x)) continue;
 
-		/* Occasionally advance the distance */
-		if (++ctr > (4 * dis * dis + 4 * dis + 1))
-		{
-			ctr = 0;
-			dis++;
-		}
+                /* Require "start" floor space */
+                if (!cave_start_bold(y, x)) continue;
+
+                /* Don't allow teleporting into vaults */
+                by = y/BLOCK_HGT;
+                bx = x/BLOCK_HGT;
+
+                if (room_info[dun_room[by][bx]].flags & (ROOM_ICKY)) continue;
+
+                break;
 	}
 
 	/* Sound */
