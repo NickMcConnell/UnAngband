@@ -3306,7 +3306,7 @@ void play_game(bool new_game)
 				strcpy(p_ptr->died_from, "Cheating death");
 
 				/* New depth */
-				p_ptr->depth = 0;
+				p_ptr->depth = min_depth(p_ptr->dungeon);
 
 				/* Leaving */
 				p_ptr->leaving = TRUE;
