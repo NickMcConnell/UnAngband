@@ -3799,10 +3799,7 @@ static void do_cmd_knowledge_artifacts(void)
 		display_artifact_list(max + 3, 6, browser_rows, object_idx, object_cur, object_top);
 
 		/* Prompt */
-		prt("<dir>, ENTER to recall, ESC", hgt, 0);
-
-		/* Prompt */
-		prt("<dir>, 'r' to recall, ESC", hgt - 1, 0);
+		prt("<dir>, ENTER to recall, ESC", hgt - 1, 0);
 
 		/* Mega Hack -- track this artifact race */
 		if (object_cnt) artifact_track(object_idx[object_cur]);
@@ -3838,8 +3835,6 @@ static void do_cmd_knowledge_artifacts(void)
 
 			case 'R':
 			case 'r':
-			case '\n':
-			case '\r':
 			{
 				/* Recall on screen */
 				desc_art_fake(object_idx[object_cur]);
@@ -4413,6 +4408,64 @@ static void desc_ego_fake(int e_idx)
 }
 
 
+/*
+ * Create a copy of an existing quark, except if the quark has '=x' in it, 
+ * If an quark has '=x' in it remove it from the copied string, otherwise append it where 'x' is ch.
+ * Return the new quark location.
+ */
+static int auto_note_modify(int note, char ch)
+{
+	char tmp[80];
+
+	cptr s;
+
+	/* Paranoia */
+	if (!ch) return(note);
+
+	/* Null length string to start */
+	tmp[0] = '\0';
+
+	/* Inscription */
+	if (note)
+	{
+
+		/* Get the inscription */
+		s = quark_str(note);
+
+		/* Temporary copy */
+		my_strcpy(tmp,s,80);
+
+		/* Process inscription */
+		while (s)
+		{
+
+			/* Auto-pickup on "=g" */
+			if (s[1] == ch)
+			{
+
+				/* Truncate string */
+				tmp[strlen(tmp)-strlen(s)] = '\0';
+
+				/* Overwrite shorter string */
+				my_strcat(tmp,s+2,80);
+				
+				/* Create quark */
+				return(quark_add(tmp));
+			}
+
+			/* Find another '=' */
+			s = strchr(s + 1, '=');
+		}
+	}
+
+	/* Append note */
+	my_strcat(tmp,format("=%c",ch),80);
+
+	/* Create quark */
+	return(quark_add(tmp));
+}
+
+
 
 /*
  * Display known ego_items
@@ -4521,8 +4574,8 @@ static void do_cmd_knowledge_ego_items(void)
 		e_ptr = &e_info[object_idx[object_cur]];
 
 		/* Prompt */
-		prt(format("<dir>, 'r' to recall, '{', '}'%s, ESC",
-			(note_idx) ? ", 'i' to re-inscribe" : (e_ptr->note) ? ", 'i'" : ""), hgt - 1, 0);
+		prt(format("<dir>, 'r' to recall, '{', '}'%s, ESC, 'k', 'g', ...",
+			(note_idx) ? ", '\\' to re-inscribe" : (e_ptr->note) ? ", '\\', " : ""), hgt - 1, 0);
 
 		if (!column)
 		{
@@ -4621,8 +4674,7 @@ static void do_cmd_knowledge_ego_items(void)
 				break;
 			}
 
-			case 'I':
-			case 'i':
+			case '\\':
 			{
 				if (note_idx)
 				{
@@ -4659,8 +4711,16 @@ static void do_cmd_knowledge_ego_items(void)
 
 			default:
 			{
-				/* Move the cursor */
-				browser_cursor(ch, &column, &grp_cur, grp_cnt, &object_cur, object_cnt);
+				if (target_dir(ch))
+				{
+					/* Move the cursor */
+					browser_cursor(ch, &column, &grp_cur, grp_cnt, &object_cur, object_cnt);
+				}
+				else
+				{
+					note_idx = auto_note_modify(e_ptr->note,ch);
+					e_ptr->note = note_idx;
+				}
 				break;
 			}
 		}
@@ -4930,10 +4990,10 @@ static void do_cmd_knowledge_objects(void)
 		if (object_cnt) object_kind_track(object_idx[object_cur]);
 
 		/* Prompt */
-		prt(format("<dir>, 'r' to recall%s%s, '{', '}'%s, ESC",
+		prt(format("<dir>, 'r' to recall%s%s, '{', '}'%s, ESC, 'k', 'g', ...",
 			(visual_list) ? ", ENTER to accept" : ", 'v' for visuals",
 			(attr_idx||char_idx) ? ", 'c', 'p' to paste" : ", 'c' to copy",
-			(note_idx) ? ", 'i' to re-inscribe" : (k_ptr->note) ? ", 'i'" : ""), hgt - 1, 0);
+			(note_idx) ? ", '\\' to re-inscribe" : (k_ptr->note) ? ", '\\'" : ""), hgt - 1, 0);
 
 		/* The "current" object changed */
 		if (object_old != object_idx[object_cur])
@@ -5055,8 +5115,7 @@ static void do_cmd_knowledge_objects(void)
 				break;
 			}
 
-			case 'I':
-			case 'i':
+			case '\\':
 			{
 				if (note_idx)
 				{
@@ -5093,8 +5152,17 @@ static void do_cmd_knowledge_objects(void)
 
 			default:
 			{
-				/* Move the cursor */
-				browser_cursor(ch, &column, &grp_cur, grp_cnt, &object_cur, object_cnt);
+				if (target_dir(ch))
+				{
+					/* Move the cursor */
+					browser_cursor(ch, &column, &grp_cur, grp_cnt, &object_cur, object_cnt);
+				}
+				else
+				{
+					note_idx = auto_note_modify(k_ptr->note,ch);
+					k_ptr->note = note_idx;
+				}
+
 				break;
 			}
 

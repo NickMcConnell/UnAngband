@@ -1,3 +1,10 @@
+### User Interface ###
+
+- Can now use 'k' in knowledge menus to toggle auto-destruction of objects,
+'g' to toggle auto-pickup, 'i' to toggle auto-ignore, 's' to toggle auto-
+stack. Other unrecognised characters will set a similiar auto-inscription
+however these have no effect.
+
 ### Bug fixes ###
 
 - Many low level spell casting monsters were casting mana bolt instead of
