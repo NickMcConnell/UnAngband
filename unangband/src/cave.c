@@ -702,7 +702,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 				c = f_ptr->x_char;
 
 				/* Special lighting effects */
-				if (view_special_lite && ((a == TERM_WHITE) || graf_new))
+				if (view_special_lite)
 				{
 					/* Handle "seen" grids */
 					if (info & (CAVE_SEEN))
@@ -2847,18 +2847,9 @@ void update_view(void)
 		fy = m_ptr->fy;
 
 		/* Carrying lite */
-		if (r_ptr->flags2 & (RF2_HAS_LITE))
-		#if 0
-			/* We might also allow the following situation for monsters
-			 * to carry lights:
-
-			  - if they are t, p, q, P, h or l
-			  - and not hurt lite
-			  - and the player is hidden or in darkness
-			 *
-			 */
-
-		#endif
+		if ((r_ptr->flags2 & (RF2_HAS_LITE))
+			|| ((r_ptr->flags2 & (RF2_NEED_LITE)) && !(radius)
+                  && !(fast_cave_info[pg] & (CAVE_GLOW))))
 		{
 			/* monster grid */
 			if (los(py,px,fy,fx))

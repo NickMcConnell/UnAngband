@@ -54,6 +54,8 @@ Barracks and Blackmarket to be more appropriate for players
 at the level they will encounter the stores. Note that
 the Blackmarket in Angband will now generate items at a
 deeper level.
+- If you are hidden in darkness, a lot more monsters will
+use light to see by...
 
 Andrew Sidwell has volunteered to help out while I'm
 on holiday, as a 'caretaker' rather than fully fledged

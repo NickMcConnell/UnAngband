@@ -1531,7 +1531,7 @@ void monster_swap(int y1, int x1, int y2, int x2)
 		m_ptr->fx = x2;
 
 		/* Some monsters radiate lite when moving */
-		if (r_ptr->flags2 & (RF2_HAS_LITE))
+		if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE))
 		{
 			/* Update the visuals */
 			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
@@ -1589,7 +1589,7 @@ void monster_swap(int y1, int x1, int y2, int x2)
 
 
 		/* Some monsters radiate lite when moving */
-		if (r_ptr->flags2 & (RF2_HAS_LITE))
+		if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE))
 		{
 			/* Update the visuals */
 			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
@@ -2357,7 +2357,7 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp)
 	repair_mflag_born = TRUE;
 
 		/* Some monsters radiate lite when born */
-		if (r_ptr->flags2 & (RF2_HAS_LITE))
+		if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE))
 		{
 			/* Update the visuals */
 			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);

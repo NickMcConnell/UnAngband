@@ -2228,7 +2228,7 @@ void monster_death(int m_idx)
 	x = m_ptr->fx;
 
 	/* Some monsters stop radiating lite when dying */
-	if (r_ptr->flags2 & (RF2_HAS_LITE))
+	if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE))
 	{
 		/* Update the visuals */
 		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);

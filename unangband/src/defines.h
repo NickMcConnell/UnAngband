@@ -2684,7 +2684,7 @@
  * New monster race bit flags
  */
 #define RF2_STUPID	0x00000001      /* Monster is stupid */
-#define RF2_SMART	0x00000002      /* Monster is smart */
+#define RF2_SMART		0x00000002      /* Monster is smart */
 #define RF2_CAN_DIG	0x00000004      /* (?) */
 #define RF2_HAS_LITE	0x00000008      /* (?) */
 #define RF2_INVISIBLE	0x00000010      /* Monster avoids vision */
@@ -2698,22 +2698,22 @@
 #define RF2_POWERFUL	0x00001000      /* Monster has strong breath */
 #define RF2_CAN_CLIMB	0x00002000      /* (?) */
 #define RF2_CAN_FLY	0x00004000      /* (?) */
-#define RF2_MUST_FLY      0x00008000      /* (?) */
-#define RF2_OPEN_DOOR    0x00010000      /* Monster can open doors */
-#define RF2_BASH_DOOR    0x00020000      /* Monster can bash doors */
-#define RF2_PASS_WALL    0x00040000      /* Monster can pass walls */
-#define RF2_KILL_WALL    0x00080000      /* Monster can destroy walls */
-#define RF2_MOVE_BODY    0x00100000      /* Monster can move monsters */
-#define RF2_KILL_BODY    0x00200000      /* Monster can kill monsters */
-#define RF2_TAKE_ITEM    0x00400000      /* Monster can pick up items */
-#define RF2_KILL_ITEM    0x00800000      /* Monster can crush items */
+#define RF2_MUST_FLY    0x00008000      /* (?) */
+#define RF2_OPEN_DOOR	0x00010000      /* Monster can open doors */
+#define RF2_BASH_DOOR	0x00020000      /* Monster can bash doors */
+#define RF2_PASS_WALL	0x00040000      /* Monster can pass walls */
+#define RF2_KILL_WALL	0x00080000      /* Monster can destroy walls */
+#define RF2_MOVE_BODY	0x00100000      /* Monster can move monsters */
+#define RF2_KILL_BODY	0x00200000      /* Monster can kill monsters */
+#define RF2_TAKE_ITEM	0x00400000      /* Monster can pick up items */
+#define RF2_KILL_ITEM	0x00800000      /* Monster can crush items */
 #define RF2_SNEAKY 	0x01000000 /* Monster hides a lot of actions */
-#define RF2_ARMOR	0x02000000 /* Monster is fully armoured (Reduces acid damage/stops some arrows) */
+#define RF2_ARMOR		0x02000000 /* Monster is fully armoured (Reduces acid damage/stops some arrows) */
 #define RF2_PRIEST 	0x04000000 /* Monster has access to priest spells ? */
 #define RF2_MAGE   	0x08000000 /* Monster has access to mage spells ? */
 #define RF2_HAS_AURA  	0x10000000 /* Monster radiates an aura attack */
 #define RF2_HAS_WEB	0x20000000 /* Monster leaves a trail of webs */
-#define RF2_BRAIN_7	0x40000000
+#define RF2_NEED_LITE	0x40000000 /* Monster cannot see the player if player is not visible */
 #define RF2_BRAIN_8	0x80000000
 
 /*

@@ -443,7 +443,7 @@ static cptr r_info_flags2[] =
 	"MAGE",
 	"HAS_AURA",
 	"HAS_WEB",
-	"BRAIN_7",
+	"NEED_LITE",
 	"BRAIN_8"
 };
 
