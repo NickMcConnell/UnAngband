@@ -15626,6 +15626,7 @@ B:SPORE:DISEASE:2d4
 S:SPORE | 1_IN_7
 F:PLANT | EMPTY_MIND | NEVER_MOVE | STUPID | DROP_60 |
 F:NO_FEAR | NO_SLEEP | NO_CONF | IM_POIS | COLD_BLOOD 
+F:DROP_60 | DROP_90 | ONLY_ITEM
 D:A small patch of mushrooms, oozing with an upleasent ichor.
 
 N:1088:Rabid jackal
