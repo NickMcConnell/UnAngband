@@ -940,7 +940,7 @@ static long *mon_power;
 static long tot_mon_power;
 
 /* Global just for convenience. */
-static int randart_verbose = 1;
+static int randart_verbose = 0;
 
 
 /*ARD_RAND - Extra global variable.
