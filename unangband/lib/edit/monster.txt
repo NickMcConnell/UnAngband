@@ -4724,7 +4724,7 @@ D: ethereal drake's eyes glare with white hatred from the shadows.
 # These guys are now the same strength as stone trolls, but encountered a lot
 # earlier. Also note change in description.
 
-N:343:Bert,the Stone Troll
+N:343:Bert, the Stone Troll
 G:T:W
 I:110:23d10:20:40:50
 W:25:1:0:85
