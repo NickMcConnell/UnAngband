@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001-2 Andrew Doull. Modifications to the Angband 2.9.6
+ * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -253,16 +253,22 @@ void object_flags_known(object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3)
 	object_flags_aux(OBJECT_FLAGS_KNOWN, o_ptr, f1, f2, f3);
 }
 
+
 /*
  * Describe an item's random attributes for "character dumps"
  */
 void identify_random_gen(const object_type *o_ptr)
 {
-	text_out_indent = 4;
-	list_object(o_ptr, OBJECT_FLAGS_RANDOM);
-	text_out_indent = 0;
-}
+	/* Set the indent/wrap */
+	text_out_indent = 3;
+	text_out_wrap = 75;
 
+	list_object(o_ptr, OBJECT_FLAGS_RANDOM);
+
+	/* Reset indent/wrap */
+	text_out_indent = 0;
+	text_out_wrap = 0;
+}
 
 
 /*
@@ -1613,9 +1619,9 @@ static cptr *spoiler_flag_aux(const u32b art_flags, const o_flag_desc *flag_x_pt
  */
 static void obj_top(const object_type *o_ptr, bool real)
 {
-	char name[80];
+	char o_name[80];
 
-	object_desc(name, o_ptr, TRUE, 1);
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 1);
 
 	/* Clear the top line */
 	Term_erase(0, 0, 255);
@@ -1624,7 +1630,7 @@ static void obj_top(const object_type *o_ptr, bool real)
 	Term_gotoxy(0, 0);
 
 	/* Dump the name */
-	Term_addstr(-1, TERM_L_BLUE, name);
+	Term_addstr(-1, TERM_L_BLUE, o_name);
 }
 
 /*
@@ -2128,8 +2134,6 @@ void list_object(const object_type *o_ptr, int mode)
 	bool random = (mode == OBJECT_FLAGS_RANDOM) ? TRUE : FALSE;
 	bool spoil = (mode == OBJECT_FLAGS_FULL) ? TRUE : FALSE;
 
-	int flavor = k_info[o_ptr->k_idx].flavor;
-
 	/* Basic stats */
 	if (!random) for (i = 0; object_group_tval[i]; i++)
 	{
@@ -2143,7 +2147,7 @@ void list_object(const object_type *o_ptr, int mode)
 
 				/* Hack -- sets of plural items */
 				if (object_group_text[i][strlen(object_group_text[i])-1] == 's')
-					text_out(" set of ");
+					text_out("set of ");
 
 				/* 'Basic' object */
 				text_out(object_group_text[i]);
@@ -2155,7 +2159,7 @@ void list_object(const object_type *o_ptr, int mode)
 				/* Hack -- sets of plural items */
 				if (object_group_text[i][strlen(object_group_text[i])-1] == 's')
 				{
-					text_out(" sets of ");
+					text_out("sets of ");
 
 					/* 'Basic' object */
 					text_out(object_group_text[i]);
@@ -2167,18 +2171,6 @@ void list_object(const object_type *o_ptr, int mode)
 
 					text_out("s");
 				}
-			}
-
-			/* Flavor */
-			if (flavor)
-			{
-				/* Weight */
-				if (o_ptr->number == 1) text_out(" is ");
-				else text_out(" are ");
-
-				text_out(x_text + x_info[flavor].text);
-
-				text_out(", and");
 			}
 
 			if (o_ptr->number == 1) text_out(" weighs ");
@@ -2225,7 +2217,7 @@ void list_object(const object_type *o_ptr, int mode)
 	}
 
 	/* Extra powers */
-	if (!random && (object_aware_p(o_ptr)) 
+	if (!random && ((object_aware_p(o_ptr)) || (spoil))
 		&& (o_ptr->tval !=TV_MAGIC_BOOK) && (o_ptr->tval != TV_PRAYER_BOOK)
 		&& (o_ptr->tval !=TV_SONG_BOOK) && (o_ptr->tval != TV_RUNESTONE))
 	{
@@ -2274,7 +2266,7 @@ void list_object(const object_type *o_ptr, int mode)
 		}
 
 		/* Artifacts */
-		if ((o_ptr->name1) && (object_known_p(o_ptr)) && (f3 & TR3_ACTIVATE))
+		if ((o_ptr->name1) && ((object_known_p(o_ptr)) || (spoil)) && (f3 & TR3_ACTIVATE))
 		{
 			artifact_type *a_ptr = &a_info[o_ptr->name1];
 
@@ -2287,8 +2279,8 @@ void list_object(const object_type *o_ptr, int mode)
 				{
 					anything = TRUE;
 
-					if (art_charge) text_out(format(", recharging in %d + d%d turns.",a_ptr->time,a_ptr->randtime));
-					else text_out(".");
+					if (art_charge) text_out(format(", recharging in %d + d%d turns.  ",a_ptr->time,a_ptr->randtime));
+					else text_out(".  ");
 				}
 
 				p = NULL;
@@ -2609,7 +2601,7 @@ void display_koff(const object_type *o_ptr)
 	if (!o_ptr->k_idx) return;
 
 	/* Fully describe the object */
-	object_desc(o_name,o_ptr, TRUE,1);
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE,1);
 
 	/* Set text_out hook */
 	text_out_hook = text_out_to_screen;
@@ -2679,6 +2671,12 @@ void object_guess_name(object_type *o_ptr)
 
 	/* Variant? */
 	if (!variant_guess_id) return;
+
+	/* Do not guess identified items */
+	if (object_known_p(o_ptr)) return;
+
+	/* Do not guess aware items */
+	if (object_aware_p(o_ptr)) return;
 
 	/* Check the ego item list */
 	/* Hack -- exclude artifacts */
@@ -2788,12 +2786,10 @@ void object_guess_name(object_type *o_ptr)
 	/* This should be here to guess for rings/amulets etc. */
 
 	/* Check the normal item list */
-	/* Hack -- exclude non flavored objects */
 	/* Hack -- exclude artifacts */
-	if (k_info[o_ptr->k_idx].flavor &&
-	    !(o_ptr->discount == INSCRIP_SPECIAL) &&
-	    !(o_ptr->discount == INSCRIP_TERRIBLE) &&
-	    !(o_ptr->discount == INSCRIP_UNBREAKABLE))
+	if (!(o_ptr->discount == INSCRIP_SPECIAL) &&
+	       !(o_ptr->discount == INSCRIP_TERRIBLE) &&
+	       !(o_ptr->discount == INSCRIP_UNBREAKABLE))
 	for (i = 1; i < z_info->k_max; i++)
 	{
 		object_kind *k_ptr = &k_info[i];
@@ -2801,11 +2797,14 @@ void object_guess_name(object_type *o_ptr)
 		/* Skip "empty" items */
 		if (!k_ptr->name) continue;
 
-		/* Must be the same tval */
-		if (k_ptr->tval != o_ptr->tval) continue;
-
 		/* Must not already be aware? */
 		if (k_ptr->aware) continue;
+
+		/* Must be flavored */
+		if (!k_ptr->flavor) continue;
+
+		/* Must be the same tval */
+		if (k_ptr->tval != o_ptr->tval) continue;
 
 		/* Must possess powers */
 		if (o_ptr->not_flags1 & k_ptr->flags1) continue;
@@ -2966,7 +2965,7 @@ void object_guess_name(object_type *o_ptr)
 		o_ptr->guess1 = guess1;
 
 		/* Describe the object */
-		object_desc(o_name, o_ptr, FALSE, 0);
+		object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
 
 		/* Combine / Reorder the pack (later) */
 		p_ptr->notice |= (PN_REORDER);
@@ -2985,7 +2984,7 @@ void object_guess_name(object_type *o_ptr)
 		o_ptr->guess2 = guess2;
 
 		/* Describe the object */
-		object_desc(o_name, o_ptr, FALSE, 0);
+		object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
 
 		/* Combine / Reorder the pack (later) */
 		p_ptr->notice |= (PN_REORDER);
@@ -3006,7 +3005,7 @@ void object_guess_name(object_type *o_ptr)
 		k_info[o_ptr->k_idx].tried = TRUE;
 
 		/* Describe the object */
-		object_desc(o_name, o_ptr, FALSE, 0);
+		object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
 
 		/* Combine / Reorder the pack (later) */
 		p_ptr->notice |= (PN_REORDER);
@@ -3015,8 +3014,6 @@ void object_guess_name(object_type *o_ptr)
 		p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
 		
 	}
-
-
 }
 
 /*
@@ -3061,9 +3058,7 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3)
 	/* Must be identified to continue */
 	if (!object_known_p(o_ptr))
 	{
-		object_kind *k_ptr = &k_info[o_ptr->k_idx];
-
-		if (!k_ptr->aware) object_guess_name(o_ptr);
+		object_guess_name(o_ptr);
 
 		return;
 	}
@@ -3341,9 +3336,7 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3)
 	/* Must be identified to continue */
 	if (!object_known_p(o_ptr))
 	{
-		object_kind *k_ptr = &k_info[o_ptr->k_idx];
-
-		if (!k_ptr->aware) object_guess_name(o_ptr);
+		object_guess_name(o_ptr);
 
 		return;
 	}
@@ -3408,9 +3401,7 @@ void object_may_flags(object_type *o_ptr, u32b f1,u32b f2,u32b f3)
 	/* Must be identified to continue */
 	if (!object_known_p(o_ptr))
 	{
-		object_kind *k_ptr = &k_info[o_ptr->k_idx];
-
-		if (!k_ptr->aware) object_guess_name(o_ptr);
+		object_guess_name(o_ptr);
 	}
 }
 
@@ -3472,13 +3463,13 @@ void object_usage(int slot)
 	if ((o_ptr->usage)<MAX_SHORT) o_ptr->usage++;
 
 	/* Describe the object */
-	object_desc(o_name, o_ptr, FALSE, 0);
+	object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
 
 	/* Don't identify if fully known */
 	if (o_ptr->ident & (IDENT_MENTAL)) return;
 
 	/* Describe the object */
-	object_desc(o_name, o_ptr, FALSE, 0);
+	object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
 
 	/* Hack --- know everything */
 	if ((o_ptr->usage) == MAX_SHORT)
@@ -3566,14 +3557,14 @@ void update_slot_flags(int slot, u32b f1, u32b f2, u32b f3)
 	if (!variant_learn_id) return;
 
 	/* Get the item */
-	if (slot >=0) i_ptr =&inventory[slot];
-	else i_ptr=&o_list[0-slot];
+	if (slot >=0) i_ptr = &inventory[slot];
+	else i_ptr= &o_list[0-slot];
 
 	/* Update the object */
 	object_can_flags(i_ptr,f1,f2,f3);
 
 	/* Describe the object */
-	object_desc(o_name, i_ptr, FALSE, 0);
+	object_desc(o_name, sizeof(o_name), i_ptr, FALSE, 0);
 
 	/* Describe what we now know */
 	msg_format("You feel you know the %s you are %s better...",o_name, describe_use(slot));
@@ -3676,9 +3667,7 @@ void equip_can_flags(u32b f1,u32b f2,u32b f3)
 		/* Must be identified to continue */
 		if ((guess) && (!object_known_p(i_ptr)))
 		{
-			object_kind *k_ptr = &k_info[i_ptr->k_idx];
-
-			if (!k_ptr->aware) object_guess_name(i_ptr);
+			object_guess_name(i_ptr);
 		}
 	}
 

@@ -53,13 +53,13 @@
  *  contain characters that are valid as part of a RISC OS path variable.
  *  [eg. "Yin-Yangband" is not okay, "EyAngband" is.]
  */
-#define RISCOS_VARIANT	"UnAngband"
+#define RISCOS_VARIANT	"Angband"
 
 /*
  * AUTHORS
  *  For the info box. [eg. "Ben Harrison"]
  */
-#define AUTHORS		"Andrew Doull"
+#define AUTHORS		"Robert Ruehlmann"
 
 /*
  * PORTERS
@@ -599,15 +599,15 @@ errr cached_fgets(FILE *fch, char *buffer, int max_len);
  | We attach these functions to the ralloc_aux and rnfree_aux hooks
  | that z-virt.c provides.
  */
-static vptr g_malloc(huge size);
-static vptr g_free(vptr blk);
+static void* g_malloc(size_t size);
+static void* g_free(void *blk);
 
 
 /*
  | These functions act as malloc/free, but (if possible) using memory
  | in the 'Fonts' Dynamic Area created by init_memory()
  */
-static void *f_malloc(size_t size);
+static void* f_malloc(size_t size);
 static void f_free(void *blk);
 
 
@@ -1235,7 +1235,7 @@ errr fd_lock(int handle, int what)
 
 
 /* Get a temporary filename */
-errr path_temp(char *buf, int max)
+errr path_temp(char *buf, size_t max)
 {
 
 	/*
@@ -1284,7 +1284,7 @@ errr path_temp(char *buf, int max)
  * Note that this function yields a path which must be "parsed"
  * using the "parse" function above.
  */
-errr path_build(char *buf, int max, cptr path, cptr file)
+errr path_build(char *buf, size_t max, cptr path, cptr file)
 {
 	/* Special file */
 	if (file[0] == '~')
@@ -1475,7 +1475,7 @@ static ZapFont *load_font(char *name, ZapFont *f)
 		}
 		*t = 0;
 	}
-	strcat(path, name);
+	my_strcat(path, name, sizeof(path));
 
 
 	/* Open the file */
@@ -1935,17 +1935,22 @@ static void init_save_window(void)
  | require that the header files are altered we simply provide our
  | own strnicmp() function.
  */
-static int my_strnicmp(char *a, char *b, int n)
+static int my_strnicmp(const char *a, const char *b, int n)
 {
 	int i;
 
 	n--;
+
 	for (i = 0; i <= n; i++)
 	{
-		if (tolower(b[i]) != tolower(a[i]))
+		if (tolower((unsigned char)a[i]) != tolower((unsigned char)b[i]))
+			return tolower((unsigned char)a[i]) - tolower((unsigned char)b[i]);
+
+		if (a[i] == '\0')
 			break;
 	}
-	return tolower(b[i]) - tolower(a[i]);
+
+	return 0;
 }
 
 
@@ -3138,7 +3143,7 @@ static void term_data_link(term_data *td, int k)
 	t->text_hook = Term_text_acn;
 	t->user_hook = Term_user_acn;
 
-	t->data = (vptr)td;
+	t->data = td;
 
 	Term_activate(t);
 }
@@ -3719,7 +3724,7 @@ static void load_choices(void)
 	{
 		char *t_, *o_;
 
-		if (!fgets(buffer, 260, fp))
+		if (!fgets(buffer, sizeof(buffer), fp))
 		{
 			fclose(fp);
 			return;
@@ -3731,7 +3736,7 @@ static void load_choices(void)
 		}
 
 		/* Load choices */
-		while (fgets(buffer, 260, fp))
+		while (fgets(buffer, sizeof(buffer), fp))
 		{
 			t_ = strtok(buffer, " ");	/* Term number (or keyword, "Gamma", etc.) */
 			o_ = strtok(NULL, "\n");	/* argument string */
@@ -3770,7 +3775,7 @@ static void load_choices(void)
 						if (!strcmp(alarm_types[i], o_))
 							alarm_type = i;
 				}
-				else if (isdigit(*t_))
+				else if (isdigit((unsigned char)*t_))
 				{
 					int t = atoi(t_);
 					if (t >= 0 && t < MAX_TERM_DATA)
@@ -3936,7 +3941,7 @@ static void read_alarm_choices(void)
 	{
 		char *t_, *o_;
 		/* Load choices */
-		while (fgets(buffer, 260, fp))
+		while (fgets(buffer, sizeof(buffer), fp))
 		{
 			t_ = strtok(buffer, " ");	/* Keyword */
 			o_ = strtok(NULL, "\n");	/* argument string */
@@ -4369,7 +4374,7 @@ static unsigned int htoi(char *s)
 	while (*s)
 	{
 		char *m;
-		int d = toupper(*s++);
+		int d = toupper((unsigned char)*s++);
 		m = strchr(hex, d);
 		if (!m)
 		{
@@ -4575,7 +4580,7 @@ int main(int argc, char *argv[])
 	{
 		if (argv[i][0] == '-')
 		{
-			switch (tolower(argv[i][1]))
+			switch (tolower((unsigned char)argv[i][1]))
 			{
 				case 'm':
 				{
@@ -4588,9 +4593,9 @@ int main(int argc, char *argv[])
 				case 'c':		/* -c[a][s][f][<n>] */
 					for (j = 2; argv[i][j]; j++)
 					{
-						int on = isupper(argv[i][j]);
+						int on = isupper((unsigned char)argv[i][j]);
 
-						switch (tolower(argv[i][j]))
+						switch (tolower((unsigned char)argv[i][j]))
 						{
 #ifdef ABBR_FILECACHE
 							case 'a': abbr_filecache =
@@ -4611,11 +4616,11 @@ int main(int argc, char *argv[])
 								break;
 
 							default:
-								if (isdigit(argv[i][j]))
+								if (isdigit((unsigned char)argv[i][j]))
 								{
 									max_file_cache_size =
 										atoi(argv[i] + j) << 10;
-									while (isdigit(argv[i][++j]))
+									while (isdigit((unsigned char)argv[i][++j]))
 										;
 									if (max_file_cache_size <= 0)
 									{
@@ -4653,7 +4658,7 @@ int main(int argc, char *argv[])
 						vfiletype = htoi(argv[i] + 2);
 					break;
 				case 'd':		/* -df, -dg, -dc or -d : disable DAs */
-					switch (tolower(argv[i][2]))
+					switch (tolower((unsigned char)argv[i][2]))
 					{
 						case 0:	/* -d => disable both */
 							da_font = da_game = 0;
@@ -4823,7 +4828,10 @@ int main(int argc, char *argv[])
 
 	/* Initialise Angband */
 	Start_Hourglass;			/* Paranoia */
-	strcpy(savefile, unixify_name(arg_savefile));
+
+	strncpy(savefile, unixify_name(arg_savefile), sizeof(savefile));
+	savefile[sizeof(savefile) - 1] = '\0';
+
 	use_sound = 1;
 	init_angband();
 	initialised = 1;
@@ -6246,10 +6254,8 @@ static void f_free(void *blk)
 
 /*
  | Allocate a block of memory in the game heap
- |
- | The 'huge' is to be type-compatible with z-virt.c
  */
-static vptr g_malloc(huge size)
+static void* g_malloc(size_t size)
 {
 	void *c;
 	int s;
@@ -6280,7 +6286,7 @@ static vptr g_malloc(huge size)
 	}
 
 	if (log_g_malloc)
-		fprintf(stderr, "ralloc(%ld) == %p\n", size, c);
+		fprintf(stderr, "ralloc(%ld) == %p\n", (long)size, c);
 
 	return c;
 }
@@ -6292,7 +6298,7 @@ static vptr g_malloc(huge size)
  | The 'len' is to be compatible with z-virt.c (we don't need/use it)
  | Returns NULL.
  */
-static vptr g_free(vptr blk)
+static void* g_free(void *blk)
 {
 	os_error *e;
 	int s;
@@ -6447,13 +6453,13 @@ static void read_sound_config(void)
 	}
 
 	/* Parse the file */
-	while (fgets(buffer, 2048, f))
+	while (fgets(buffer, sizeof(buffer), f))
 	{
 		char *sample_name;
 		int event_number;
 
 		/* Skip comments and lines that begin with whitespace */
-		if (*buffer == '#' || isspace(*buffer))
+		if (*buffer == '#' || isspace((unsigned char)*buffer))
 		{
 			continue;
 		}
@@ -6466,7 +6472,7 @@ static void read_sound_config(void)
 
 		/* Place a NULL after the event name and find the first sample name */
 		sample_name = buffer;
-		while (*sample_name && !isspace(*sample_name))
+		while (*sample_name && !isspace((unsigned char)*sample_name))
 			sample_name++;
 
 		/* Bad line? */
@@ -6516,7 +6522,7 @@ static void read_sound_config(void)
 			SampNode *sn;
 
 			/* Find the start of the next word */
-			while (isspace(*sample_name) && *sample_name)
+			while (isspace((unsigned char)*sample_name) && *sample_name)
 				sample_name++;
 
 			/* End of line? */
@@ -6527,7 +6533,7 @@ static void read_sound_config(void)
 
 			/* Find the end of the sample name */
 			s = sample_name;	/* start of the name */
-			while (!isspace(*sample_name) && *sample_name)
+			while (!isspace((unsigned char)*sample_name) && *sample_name)
 				sample_name++;
 
 			/* Hack: shorten sample names that are too long */
@@ -6549,7 +6555,7 @@ static void read_sound_config(void)
 			   | Copy the sample name into the node, converting it into
 			   | RISC OS style as we go.
 			 */
-			for (i = 0; !isspace(s[i]) && s[i]; i++)
+			for (i = 0; !isspace((unsigned char)s[i]) && s[i]; i++)
 			{
 				if (s[i] == '.')
 					sn->sample_name[i] = '/';
@@ -6747,7 +6753,7 @@ static void do_alarm_message_input(int y)
 
 static errr Term_user_acn(int n)
 {
-	int i;
+	bool cursor_state;
 	int optn = 0;
 	int k, adj;
 	int redraw_mung = 0;
@@ -6786,8 +6792,8 @@ static errr Term_user_acn(int n)
 	 */
 	Term_activate(&(data[0].t));
 	Term_save();
-	Term_get_cursor(&i);
-	Term_set_cursor(1);
+	Term_get_cursor(&cursor_state);
+	Term_set_cursor(TRUE);
 
 	do
 	{
@@ -7043,7 +7049,7 @@ static errr Term_user_acn(int n)
 		write_alarm_choices();
 	}
 
-	Term_set_cursor(i);
+	Term_set_cursor(cursor_state);
 
 	/* Restore the screen */
 	Term_load();
@@ -7520,7 +7526,7 @@ static FileCacheEntry *cache_file(char *name)
 		if (!size)
 		{
 			int k;
-			while (!my_fgets(fp, buffer, 1024))
+			while (!my_fgets(fp, buffer, sizeof(buffer)))
 			{
 				if (smart_filecache && (!*buffer || *buffer == '#'))
 					continue;
@@ -7540,7 +7546,7 @@ static FileCacheEntry *cache_file(char *name)
 	else
 	{
 		/* Count the number of bytes */
-		while (!my_fgets(fp, buffer, 1024))
+		while (!my_fgets(fp, buffer, sizeof(buffer)))
 		{
 			if (smart_filecache && (!*buffer || *buffer == '#'))
 				continue;
@@ -7588,7 +7594,7 @@ static FileCacheEntry *cache_file(char *name)
 
 		/* And read it into the buffer... */
 		d = file_cache[i].text;
-		while (!my_fgets(fp, buffer, 1024))
+		while (!my_fgets(fp, buffer, sizeof(buffer)))
 		{
 			if (smart_filecache && (!*buffer || *buffer == '#'))
 				continue;
@@ -7901,7 +7907,7 @@ extern errr check_modification_date(int fd, cptr template_file)
 	}
 
 	/* Build the path to the template_file */
-	path_build(txt_buf, 1024, ANGBAND_DIR_EDIT, template_file);
+	path_build(txt_buf, sizeof(txt_buf), ANGBAND_DIR_EDIT, template_file);
 
 	i = file_is_newer(riscosify_name(txt_buf), raw_buf);
 

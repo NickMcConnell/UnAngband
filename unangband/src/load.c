@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001-2 Andrew Doull. Modifications to the Angband 2.9.6
+ * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -538,9 +538,18 @@ static void rd_monster(monster_type *m_ptr)
 	{
 		rd_byte(&m_ptr->summoned);
 
-		if (!(older_than(2,9,6)))
+		if (older_than(3,0,1))
+		{
+			rd_byte(&tmp8u);
+			m_ptr->mflag = tmp8u;
+		}
+		else
 		{
 			rd_u16b(&m_ptr->mflag);
+		}
+
+		if (!(older_than(2,9,6)))
+		{
 			rd_byte(&m_ptr->min_range);
 			rd_byte(&m_ptr->best_range);
 			rd_byte(&m_ptr->ty);
@@ -896,9 +905,29 @@ static errr rd_extra(void)
 
 	rd_string(p_ptr->died_from, 80);
 
-	for (i = 0; i < 4; i++)
+	if (older_than(3, 0, 1))
 	{
-		rd_string(p_ptr->history[i], 60);
+		char *hist = p_ptr->history;
+
+		for (i = 0; i < 4; i++)
+		{
+			/* Read a part of the history */
+			rd_string(hist, 60);
+
+			/* Advance */
+			hist += strlen(hist);
+
+			/* Separate by spaces */
+			hist[0] = ' ';
+			hist++;
+		}
+
+		/* Make sure it is terminated */
+		hist[0] = '\0';
+	}
+	else
+	{
+		rd_string(p_ptr->history, 250);
 	}
 
 	/* Player race */
@@ -1661,7 +1690,7 @@ u16b limit;
 	rd_u16b(&limit);
 
 	/* Verify maximum */
-	if (limit >= z_info->o_max)
+	if (limit > z_info->o_max)
 	{
 		note(format("Too many (%d) object entries!", limit));
 		return (-1);
@@ -1729,7 +1758,7 @@ u16b limit;
 	rd_u16b(&limit);
 
 	/* Hack -- verify */
-	if (limit >= z_info->m_max)
+	if (limit > z_info->m_max)
 	{
 		note(format("Too many (%d) monster entries!", limit));
 		return (-1);

@@ -57,7 +57,7 @@
 
 #Version information
 
-V:2.9.6
+V:3.0.1
 
 
 # Default starting dungeon.
