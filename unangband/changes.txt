@@ -15,6 +15,9 @@ t is the timeout of the stack and n is the number of rods recharging. This
 allows rods to be reused more quickly, and where the rod timeout is less than
 stack size, you can reuse a rod every turn.
 
+- You can notice hidden features at greater ranges, but features deeper in
+the dungeon are harder to notice (From Sangband).
+
 ### User Interface ###
 
 - Now supports specifying whether or not a feature supports advanced lighting

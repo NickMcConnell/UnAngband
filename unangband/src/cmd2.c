@@ -2262,14 +2262,8 @@ static void do_cmd_hold_or_stay(int pickup)
 		set_rest(p_ptr->rest + PY_REST_RATE - p_ptr->tiring);
 	}
 
-	/* Spontaneous Searching */
-	if ((p_ptr->skill_fos >= 50) || (0 == rand_int(50 - p_ptr->skill_fos)))
-	{
-		search();
-	}
-
-	/* Continuous Searching */
-	if (p_ptr->searching)
+	/* Spontaneous Searching - doubly effective */
+	if ((p_ptr->skill_fos >= 25) || (0 == rand_int(25 - p_ptr->skill_fos)))
 	{
 		search();
 	}
