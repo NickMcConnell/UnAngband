@@ -2492,6 +2492,67 @@ static bool vault_aux_undead(int r_idx)
 	return (TRUE);
 }
 
+/*
+ * Helper function for "monster nest (theme)"
+ */
+static bool vault_aux_theme_nest(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Decline unique monsters */
+	if (r_ptr->flags1 & (RF1_UNIQUE)) return (FALSE);
+
+	/* Hack -- Accept monsters with flag */
+	if (t_info[p_ptr->dungeon].r_flag)
+	{
+		int mon_flag = t_info[p_ptr->dungeon].r_flag-1;
+
+		if ((mon_flag < 32) && 
+			(r_ptr->flags1 & (1L << mon_flag))) return (TRUE);
+
+		if ((mon_flag >= 32) && 
+			(mon_flag < 64) && 
+			(r_ptr->flags2 & (1L << (mon_flag -32)))) return (TRUE);
+
+		if ((mon_flag >= 64) && 
+			(mon_flag < 96) && 
+			(r_ptr->flags3 & (1L << (mon_flag -64)))) return (TRUE);
+
+		if ((mon_flag >= 96) && 
+			(mon_flag < 128) && 
+			(r_ptr->flags4 & (1L << (mon_flag -96)))) return (TRUE);
+
+		return (FALSE);
+	}
+
+	/* Okay */
+	return (TRUE);
+}
+
+
+/*
+ * Helper function for "monster pit (theme)"
+ */
+static bool vault_aux_theme_pit(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Decline unique monsters */
+	if (r_ptr->flags1 & (RF1_UNIQUE)) return (FALSE);
+
+	/* Hack -- Accept monsters with graphic */
+	if (t_info[p_ptr->dungeon].r_char)
+	{
+		if (r_ptr->d_char == t_info[p_ptr->dungeon].r_char) return (TRUE);
+
+		return (FALSE);
+	}
+
+	/* Okay */
+	return (TRUE);
+}
+
+
 
 /*
  * Helper function for "monster pit (orc)"
@@ -2670,9 +2731,9 @@ static void build_type5(int y0, int x0)
 	if ((adult_campaign) && (tmp < 25))
 	{
 		/* Describe */
-		name = "monster";
+		name = "themed";
 
-		get_mon_num_hook = dun_level_mon;
+		get_mon_num_hook = vault_aux_theme_nest;
 
 		/* Appropriate rating bonus */
 		rating_bonus = 10;
@@ -2887,9 +2948,9 @@ static void build_type6(int y0, int x0)
 	if ((adult_campaign) && (tmp < 10))
 	{
 		/* Describe */
-		name = "monster";
+		name = "themed";
 
-		get_mon_num_hook = dun_level_mon;
+		get_mon_num_hook = vault_aux_theme_pit;
 
 		/* Appropriate rating bonus */
 		rating_bonus = 10;
@@ -4680,9 +4741,8 @@ static void cave_gen(void)
 			}
 		}
 	}
-	/* Ensure guardian monsters --- only night time in towns */
-	else if ((zone->guard) && (r_info[zone->guard].cur_num <= 0)
-		&& (!surface || !daytime))
+	/* Ensure guardian monsters */
+	else if ((zone->guard) && (r_info[zone->guard].cur_num <= 0))
 	{
 		int y, x;
 
@@ -4692,7 +4752,7 @@ static void cave_gen(void)
 			y = rand_int(DUNGEON_HGT);
 			x = rand_int(DUNGEON_WID);
 
-			if (cave_naked_bold(y, x)) break;
+			if (place_monster_here(y, x, zone->guard)) break;
 		}
 
 		/* Place the questor */
@@ -4704,11 +4764,6 @@ static void cave_gen(void)
 
 /*
  * Builds a store at a given pseudo-location
- *
- * As of 2.8.1 (?) the town is actually centered in the middle of a
- * complete level, and thus the top left corner of the town itself
- * is no longer at (0,0), but rather, at (qy,qx), so the constants
- * in the comments below should be mentally modified accordingly.
  *
  * As of 2.7.4 (?) the stores are placed in a more "user friendly"
  * configuration, such that the four "center" buildings always
@@ -4722,24 +4777,19 @@ static void cave_gen(void)
  * Note the use of "town_illuminate()" to handle all "illumination"
  * and "memorization" issues.
  */
-static void build_store(int n, int yy, int xx)
+static void build_store(int feat, int yy, int xx)
 {
 	int y, x, y0, x0, y1, x1, y2, x2, tmp;
 
-	int qy = SCREEN_HGT;
-	int qx = SCREEN_WID;
-
-	town_type *t_ptr = &t_info[p_ptr->dungeon];
-
 	/* Hack -- extract char value */
-	byte d_char = u_info[t_ptr->store[n]].d_char;
+	byte d_char = f_info[feat].d_char;
 
 	/* Hack -- don't build building for some 'special locations' */
 	bool building = (((d_char >= '0') && (d_char <= '8')) || (d_char == '+'));
 
 	/* Find the "center" of the store */
-	y0 = qy + yy * 9 + 6;
-	x0 = qx + xx * 14 + 12;
+	y0 = yy * 9 + 6;
+	x0 = xx * 14 + 12;
 
 	/* Determine the store boundaries */
 	y1 = y0 - randint((yy == 0) ? 3 : 2);
@@ -4811,7 +4861,7 @@ static void build_store(int n, int yy, int xx)
 	}
 
 	/* Clear previous contents, add a store door */
-	cave_set_feat(y, x, FEAT_SHOP_HEAD + n);
+	cave_set_feat(y, x, feat);
 }
 
 
@@ -4828,9 +4878,6 @@ static void town_gen_hack(void)
 {
 	int y, x, k, n;
 
-	int qy = SCREEN_HGT;
-	int qx = SCREEN_WID;
-
 	int rooms[MAX_STORES];
 
 	town_type *t_ptr = &t_info[p_ptr->dungeon];
@@ -4846,9 +4893,9 @@ static void town_gen_hack(void)
 	Rand_value = seed_town;
 
 	/* Then place some floors */
-	for (y = qy+1; y < qy+SCREEN_HGT-1; y++)
+	for (y = 1; y < TOWN_HGT-1; y++)
 	{
-		for (x = qx+1; x < qx+SCREEN_WID-1; x++)
+		for (x = 1; x < TOWN_WID-1; x++)
 		{
 			/* Create terrain on top */
 			build_terrain(y, x, zone->big);
@@ -4859,9 +4906,10 @@ static void town_gen_hack(void)
 	/* Hack -- place small terrain */
 	if (zone->small)
 	{
-		build_feature(qy + SCREEN_HGT/2, qx + SCREEN_WID/2, zone->small, FALSE);
+		build_feature(TOWN_HGT/2, TOWN_WID/2, zone->small, FALSE);
 	}
 #endif
+
 	/* Prepare an Array of "remaining stores", and count them */
 	for (n = 0; n < MAX_STORES; n++) rooms[n] = n;
 
@@ -4875,7 +4923,7 @@ static void town_gen_hack(void)
 			k = ((n <= 1) ? 0 : rand_int(n));
 
 			/* Build that store at the proper location */
-			if (t_ptr->store[rooms[k]]) build_store(rooms[k], y, x);
+			if (t_ptr->store[rooms[k]]) build_store(t_ptr->store[rooms[k]], y, x);
 				
 			/* Shift the stores down, remove one store */
 			rooms[k] = rooms[--n];
@@ -4886,8 +4934,8 @@ static void town_gen_hack(void)
 	while (TRUE)
 	{
 		/* Pick a location at least "three" from the outer walls */
-		y = qy + rand_range(3, SCREEN_HGT - 4);
-		x = qx + rand_range(3, SCREEN_WID - 4);
+		y = rand_range(3, TOWN_HGT - 4);
+		x = rand_range(3, TOWN_WID - 4);
 
 		/* Require a "naked" floor grid */
 		if (cave_naked_bold(y, x)) break;
@@ -4907,8 +4955,8 @@ static void town_gen_hack(void)
 	while (TRUE)
 	{
 		/* Pick a location at least "three" from the outer walls */
-		y = qy + rand_range(3, SCREEN_HGT - 4);
-		x = qx + rand_range(3, SCREEN_WID - 4);
+		y = rand_range(3, TOWN_HGT - 4);
+		x = rand_range(3, TOWN_WID - 4);
 
 		/* Require a "naked" floor grid */
 		if (cave_naked_bold(y, x)) break;
@@ -4947,10 +4995,9 @@ static void town_gen(void)
 
 	int residents;
 
-	bool daytime;
+	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
 
-	int qy = SCREEN_HGT;
-	int qx = SCREEN_WID;
+	bool daytime = ((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2));
 
 	int by,bx;
 
@@ -4973,21 +5020,15 @@ static void town_gen(void)
 	room_info[0].flags = 0;
 
 	/* Day time */
-	if (((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2)))
+	if (surface && daytime)
 	{
-		/* Day time */
-		daytime = TRUE;
-
 		/* Number of residents */
 		residents = MIN_M_ALLOC_TD;
 	}
 
-	/* Night time */
+	/* Night time / underground */
 	else
 	{
-		/* Night time */
-		daytime = FALSE;
-
 		/* Number of residents */
 		residents = MIN_M_ALLOC_TN;
 
@@ -5004,9 +5045,9 @@ static void town_gen(void)
 	}
 
 	/* Then place some floors */
-	for (y = qy+1; y < qy+SCREEN_HGT-1; y++)
+	for (y = 1; y < TOWN_HGT-1; y++)
 	{
-		for (x = qx+1; x < qx+SCREEN_WID-1; x++)
+		for (x = 1; x < TOWN_WID-1; x++)
 		{
 			/* Create empty ground */
 			cave_set_feat(y, x, FEAT_GROUND);
@@ -5020,13 +5061,13 @@ static void town_gen(void)
 	town_illuminate(daytime);
 
 	/* Ensure guardian monsters */
-	if ((!daytime) && (zone->guard) && (r_info[zone->guard].cur_num <= 0))
+	if (!(daytime && surface) && (zone->guard) && (r_info[zone->guard].cur_num <= 0))
 	{
 		/* Pick a location */
 		while (1)
 		{
-			y = qy + rand_range(3, SCREEN_HGT - 4);
-			x = qx + rand_range(3, SCREEN_WID - 4);
+			y = rand_range(3, TOWN_HGT - 4);
+			x = rand_range(3, TOWN_WID - 4);
 
 			/* Require a "naked" floor grid */
 			if (cave_naked_bold(y, x)) break;
@@ -5042,8 +5083,6 @@ static void town_gen(void)
 	/* Prepare allocation table */
 	get_mon_num_prep();
 
-
-
 	/* Make some residents */
 	for (i = 0; i < residents; i++)
 	{
@@ -5055,9 +5094,6 @@ static void town_gen(void)
 
 	/* Prepare allocation table */
 	get_mon_num_prep();
-
-
-
 
 }
 
@@ -5075,7 +5111,7 @@ void generate_cave(void)
 {
 	int y, x, num;
 
-	dungeon_zone *zone=&t_info[0].zone[0];;
+	dungeon_zone *zone=&t_info[0].zone[0];
 
 	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
 
@@ -5084,6 +5120,9 @@ void generate_cave(void)
 
 	/* The dungeon is not ready */
 	character_dungeon = FALSE;
+
+        /* There is no dynamic terrain */
+        dyna_full = FALSE;
 
 	/* Generate */
 	for (num = 0; TRUE; num++)

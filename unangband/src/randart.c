@@ -1385,7 +1385,9 @@ static long eval_max_dam(int r_idx)
 		for (i = 0; i < 4; i++)
 		{
 			/* Extract the attack infomation */
+#if 0 /* Unused */
 			int effect = rptr->blow[i].effect;
+#endif
 			int method = rptr->blow[i].method;
 			int d_dice = rptr->blow[i].d_dice;
 			int d_side = rptr->blow[i].d_side;
@@ -1546,8 +1548,8 @@ static bool init_mon_power (void)
 			/* Write the monster power rating, hp and damage to file */
 			fprintf(randart_log, "Power rating for monster %d: ", i);
 			dmg = eval_max_dam(i);
-			fprintf(randart_log, "Max dam: %d ", dmg);
-			fprintf(randart_log, "Rating: %d\n", mon_power[i]);
+			fprintf(randart_log, "Max dam: %i ", (int)dmg);
+			fprintf(randart_log, "Rating: %i\n", (int)mon_power[i]);
 			fflush(randart_log);
 		}
 
@@ -1711,7 +1713,7 @@ static s32b slay_power(int a_idx)
 		if (a_ptr->flags1 & TR1_BRAND_COLD) fprintf(randart_log,"Cld ");
 		if (a_ptr->flags1 & TR1_BRAND_POIS) fprintf(randart_log,"Poi ");
 
-		fprintf(randart_log,"times 1000 is: %d\n", (1000 * sv) / tot_mon_power);
+		fprintf(randart_log,"times 1000 is: %d\n", (int)((1000 * sv) / tot_mon_power));
 		fflush(randart_log);
 	}
 
@@ -2413,6 +2415,7 @@ static s16b choose_item(int a_idx)
 
 	case TV_HAFTED:
 		if (r2 < 3) sval = SV_WHIP;
+		else if (r2 < 5) sval = SV_BATON;
 		else if (r2 < 8) sval = SV_MACE;
 		else if (r2 < 15) sval = SV_WAR_HAMMER;
 		else if (r2 < 22) sval = SV_QUARTERSTAFF;
@@ -5301,7 +5304,7 @@ static void scramble_artifact(int a_idx)
 			 */
 			k_ptr = &k_info[k_idx];
 			rarity_new = ( (s16b) rarity_old * (s16b) base_rarity_old ) /
-				(s16b) k_ptr->chance[0];
+				(s16b) (k_ptr->chance[0] ? k_ptr->chance[0] : 1);
 
 			if (rarity_new > 255) rarity_new = 255;
 			if (rarity_new < 1) rarity_new = 1;
@@ -5332,7 +5335,7 @@ static void scramble_artifact(int a_idx)
 	build_freq_table(a_ptr, art_freq);
 
 	/* Copy artifact info temporarily. */
-	a_old = *a_ptr;
+	COPY(&a_old, a_ptr, artifact_type);
 
 	/* Give this artifact a shot at being supercharged */
 	try_supercharge(a_ptr);
@@ -5348,7 +5351,8 @@ static void scramble_artifact(int a_idx)
 	if (curse_me)
 	{
 		/* Copy artifact info temporarily. */
-		a_old = *a_ptr;
+		COPY(&a_old, a_ptr, artifact_type);
+
 		do
 		{
 			add_ability(a_ptr);
@@ -5364,7 +5368,8 @@ static void scramble_artifact(int a_idx)
 			else
 			{
 				LOG_PRINT("Inhibited ability added - rolling back.\n");
-				*a_ptr = a_old;
+				COPY(a_ptr, &a_old, artifact_type);
+
 			}
 		} while (!success);
 	}
@@ -5379,14 +5384,15 @@ static void scramble_artifact(int a_idx)
 		{
 
 			/* Copy artifact info temporarily. */
-			a_old = *a_ptr;
+			COPY(&a_old, a_ptr, artifact_type);
 			add_ability(a_ptr);
 			ap = artifact_power(a_idx);
+
 			/* CR 11/14/01 - pushed both limits up by about 5% */
 			if (ap > (power * 23) / 20 + 1)
 			{
 				/* too powerful -- put it back */
-				*a_ptr = a_old;
+				COPY(a_ptr, &a_old, artifact_type);
 				LOG_PRINT("--- Too powerful!  Rolling back.\n");
 				continue;
 			}
@@ -5512,10 +5518,8 @@ static int artifacts_acceptable(void)
 				hats > 0 ? " hats" : "",
 				gloves > 0 ? " gloves" : "",
 				boots > 0 ? " boots" : "");
-			msg_format("Restarting generation process: not enough%s",
-				types);
-			LOG_PRINT1("Restarting generation process: not enough%s",
-				types);
+			msg_format("Restarting generation process: not enough %s", types);
+			LOG_PRINT1("Restarting generation process: not enough %s", types);
 		}
 		return (0);
 	}

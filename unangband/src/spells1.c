@@ -117,11 +117,11 @@ void teleport_away(int m_idx, int dis)
 			/* Ignore illegal locations */
 			if (!in_bounds_fully(ny, nx)) continue;
 
-			/* Require "start" floor space */
-			if (!cave_start_bold(ny, nx)) continue;
+			/* Require safe location for monster */
+			if (!place_monster_here(ny, nx, m_ptr->r_idx)) continue;
 
 			/* Hack -- no teleport onto glyph of warding */
-			/*if (cave_feat[ny][nx] == FEAT_GLYPH) continue;*/
+			if (f_info[cave_feat[ny][nx]].flags1 & (FF1_GLYPH)) continue;
 
 			/* Don't allow teleporting into vaults */
 			by = ny/BLOCK_HGT;
@@ -197,8 +197,8 @@ void teleport_player(int dis)
 			/* Ignore illegal locations */
 			if (!in_bounds_fully(y, x)) continue;
 
-			/* Require "naked" floor space */
-			if (!cave_naked_bold(y, x)) continue;
+			/* Require "start" floor space */
+			if (!cave_start_bold(y, x)) continue;
 
 			/* Don't allow teleporting into vaults */
 			by = y/BLOCK_HGT;
@@ -254,6 +254,15 @@ void teleport_player_to(int ny, int nx)
 	/* Find a usable location */
 	while (1)
 	{
+                int by,bx;
+
+		/* Occasionally advance the distance */
+		if (ctr++ > (4 * dis * dis + 4 * dis + 1))
+		{
+			ctr = 0;
+			dis++;
+		}
+
 		/* Pick a nearby legal location */
 		while (1)
 		{
@@ -263,14 +272,18 @@ void teleport_player_to(int ny, int nx)
 		}
 
 		/* Accept "naked" floor grids */
-		if (cave_naked_bold(y, x)) break;
+		if (!cave_naked_bold(y, x)) continue;
 
-		/* Occasionally advance the distance */
-		if (++ctr > (4 * dis * dis + 4 * dis + 1))
-		{
-			ctr = 0;
-			dis++;
-		}
+                /* Require "start" floor space */
+                if (!cave_start_bold(y, x)) continue;
+
+                /* Don't allow teleporting into vaults */
+                by = y/BLOCK_HGT;
+                bx = x/BLOCK_HGT;
+
+                if (room_info[dun_room[by][bx]].flags & (ROOM_ICKY)) continue;
+
+                break;
 	}
 
 	/* Sound */
@@ -298,8 +311,12 @@ void teleport_player_level(void)
 		return;
 	}
 
-
-	if (p_ptr->depth == min_depth(p_ptr->dungeon))
+        if (!max_depth(p_ptr->dungeon))
+        {
+		msg_print("Nothing happens.");
+                return;
+        }
+        else if (p_ptr->depth == min_depth(p_ptr->dungeon))
 	{
 		message(MSG_TPLEVEL, 0, "You sink through the floor.");
 
@@ -973,13 +990,16 @@ void acid_dam(int dam, cptr kb_str, bool inven)
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
 	/* Total Immunity */
-	if (p_ptr->immune_acid || (dam <= 0))
+	if (p_ptr->immune_acid)
 	{
 		/* Always notice */
 		equip_can_flags(0x0L,TR2_IM_ACID,0x0L);
 
 		return;
 	}
+
+	/* No damage */
+	if (dam <= 0) return;
 
 	/* Resist the damage */
 	if (p_ptr->resist_acid)
@@ -1016,7 +1036,7 @@ void elec_dam(int dam, cptr kb_str, bool inven)
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
 	/* Total immunity */
-	if (p_ptr->immune_elec || (dam <= 0))
+	if (p_ptr->immune_elec)
 	{
 		/* Always notice */
 		equip_can_flags(0x0L,TR2_IM_ELEC,0x0L);
@@ -1024,6 +1044,8 @@ void elec_dam(int dam, cptr kb_str, bool inven)
 		return;
 	}
 
+	/* No damage */
+	if (dam <= 0) return;
 
 	/* Resist the damage */
 	if (p_ptr->oppose_elec) dam = (dam + 2) / 3;
@@ -1058,13 +1080,16 @@ void fire_dam(int dam, cptr kb_str, bool inven)
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
 	/* Totally immune */
-	if (p_ptr->immune_fire || (dam <= 0))
+	if (p_ptr->immune_fire)
 	{
 		/* Always notice */
 		equip_can_flags(0x0L,TR2_IM_FIRE,0x0L);
 
 		return;
 	}
+
+	/* No damage */
+	if (dam <= 0) return;
 
 	/* Resist the damage */
 	if (p_ptr->resist_fire)
@@ -1098,7 +1123,7 @@ void cold_dam(int dam, cptr kb_str, bool inven)
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
 	/* Total immunity */
-	if (p_ptr->immune_cold || (dam <= 0))
+	if (p_ptr->immune_cold)
 	{
 		/* Always notice */
 		equip_can_flags(0x0L,TR2_IM_COLD,0x0L);
@@ -1106,6 +1131,8 @@ void cold_dam(int dam, cptr kb_str, bool inven)
 		return;
 	}
 
+	/* No damage */
+	if (dam <= 0) return;
 
 	/* Resist the damage */
 	if (p_ptr->resist_cold)
@@ -1639,7 +1666,7 @@ static bool temp_lite(int y, int x)
  *
  * Perhaps we should affect doors and/or walls.
  */
-static bool project_f(int who, int r, int y, int x, int dam, int typ)
+bool project_f(int who, int r, int y, int x, int dam, int typ)
 {
 	bool obvious = FALSE;
 
@@ -1647,7 +1674,6 @@ static bool project_f(int who, int r, int y, int x, int dam, int typ)
 
 	/* Set feature name */
 	f = (f_name + f_info[cave_feat[y][x]].name);
-
 
 #if 0 /* unused */
 	/* Reduce damage by distance */
@@ -2045,7 +2071,7 @@ static bool project_f(int who, int r, int y, int x, int dam, int typ)
 
 			strcpy(name,f_name+f_info[cave_feat[y][x]].name);
 
-			if (!(prefix(name,"stone bridge"))) cave_set_feat(y,x,old_feat);
+			if (!(strstr(name,"stone bridge"))) cave_set_feat(y,x,old_feat);
 
 			break;
 		}
@@ -2288,9 +2314,8 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 			case GF_COLD:
 			{
 
-	/* Hack -- double cold damage in water */
-	if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam *= 2;
-
+				/* Hack -- double cold damage in water */
+				if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam *= 2;
 
 				if (hates_cold(o_ptr))
 				{
@@ -2364,8 +2389,8 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 				{
 					note_kill = (plural ? " soak through!" : " soaks through!");
 					do_kill = TRUE;
-					if (f2 & (TR2_IGNORE_COLD)) ignore = TRUE;
-					if2 |= TR2_IGNORE_COLD;
+					if (f2 & (TR2_IGNORE_WATER)) ignore = TRUE;
+					if2 |= TR2_IGNORE_WATER;
 				}
 				break;
 			}
@@ -2378,13 +2403,11 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 				{
 					note_kill = (plural ? " soak through!" : " soaks through!");
 					do_kill = TRUE;
-					if (f2 & (TR2_IGNORE_COLD)) ignore = TRUE;
-					if2 |= TR2_IGNORE_COLD;
+					if (f2 & (TR2_IGNORE_WATER)) ignore = TRUE;
+					if2 |= TR2_IGNORE_WATER;
 				}
 				break;
 			}
-
-			
 
 			/* Mana -- destroys everything */
 			/* Explosion -- very destructive to objects */
@@ -2392,7 +2415,13 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 			case GF_MANA:
 			{
 				do_kill = TRUE;
-				note_kill = (plural ? " are destroyed!" : " is destroyed!");
+				note_kill = (plural ? " melt!" : " melts!");
+				if ((f2 & (TR2_IGNORE_ACID)) &&
+				    (f2 & (TR2_IGNORE_COLD)) &&
+				    (f2 & (TR2_IGNORE_ELEC)) &&
+				    (f2 & (TR2_IGNORE_FIRE)) &&
+				    (f2 & (TR2_IGNORE_WATER))) ignore = TRUE;
+
 				break;
 			}
 
@@ -4065,7 +4094,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 	if (r_ptr->flags1 & (RF1_UNIQUE))
 	{
 		/* Uniques may only be killed by the player */
-		if ((who > 0) && (dam > m_ptr->hp)) dam = m_ptr->hp;
+		if ((who >= 0) && (dam > m_ptr->hp)) dam = m_ptr->hp;
 	}
 
 
@@ -4397,7 +4426,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		/* Get the monster's real name */
 		monster_desc(killer, m_ptr, 0x88);
 	}
-	else
+	else if (who == 0)
 	{
 		feature_type *f_ptr = &f_info[cave_feat[y][x]];
 
@@ -4405,6 +4434,10 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		strcpy(killer,f_name + f_ptr->name);
 
 	}
+        else
+        {
+                strcpy(killer, "yourself");
+        }
 
 	/* Analyze the damage */
 	switch (typ)
@@ -4778,6 +4811,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 
 				(void)set_confused(p_ptr->confused + randint(20) + 10);
 			}
+
 			take_hit(dam, killer);
 			break;
 		}
@@ -4787,12 +4821,12 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			if (fuzzy) msg_print("You are hit by something!");
 
 			/* Take damage */
-			take_hit(damage, killer);
+			take_hit(dam, killer);
 
 			/* Increase "image" */
 			if (!p_ptr->resist_chaos)
 			{
-				if (set_image(p_ptr->image + 3 + randint(rlev / 2)))
+				if (set_image(p_ptr->image + 6 + randint(dam / 2)))
 				{
 					obvious = TRUE;
 				}
@@ -5007,7 +5041,9 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		case GF_ICE:
 		{
 			if (fuzzy) msg_print("You are hit by something sharp!");
-			cold_dam(dam, killer);
+
+			cold_dam(dam, killer, TRUE);
+
 			if (!p_ptr->resist_shard)
 			{
 				/* Always notice */
@@ -6082,6 +6118,15 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Heal the player */
+		case GF_OLD_DRAIN:
+		{
+                        obvious = TRUE;
+                        take_hit(dam, killer);
+
+			break;
+		}
+
 		/* Teleport the player -- use dam as power*/
 		case GF_AWAY_ALL:
 		{
@@ -6412,7 +6457,7 @@ bool project(int who, int rad, int y, int x, int dam, int typ, int flg)
 		int nx = GRID_X(path_g[i]);
 
 		/* Hack -- Balls explode before reaching walls */
-		if (!cave_floor_bold(ny, nx) && (rad > 0)) break;
+		if (!(f_info[cave_feat[ny][nx]].flags1 & (FF1_PROJECT)) && (rad > 0)) break;
 
 		/* Advance */
 		y = ny;
@@ -6672,6 +6717,9 @@ bool project(int who, int rad, int y, int x, int dam, int typ, int flg)
 			/* Get the grid location */
 			y = gy[i];
 			x = gx[i];
+
+                        /* Here is no monster or is player */
+                        if (cave_m_idx[y][x] <= 0) continue;
 
 			/* Don't affect hidden monsters */
 			if (m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)) continue;

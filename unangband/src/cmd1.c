@@ -199,9 +199,9 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 				if (m_ptr->ml)
 				{
 					object_can_flags(o_ptr,TR1_SLAY_NATURAL,0x0L,0x0L);
-                                        if (r_ptr->flags3 & RF3_ANIMAL) l_ptr->flags3 |= (RF3_ANIMAL);
-                                        if (r_ptr->flags3 & RF3_PLANT) l_ptr->flags3 |= (RF3_PLANT);
-                                        if (r_ptr->flags3 & RF3_INSECT) l_ptr->flags3 |= (RF3_INSECT);
+					if (r_ptr->flags3 & RF3_ANIMAL) l_ptr->flags3 |= (RF3_ANIMAL);
+					if (r_ptr->flags3 & RF3_PLANT) l_ptr->flags3 |= (RF3_PLANT);
+					if (r_ptr->flags3 & RF3_INSECT) l_ptr->flags3 |= (RF3_INSECT);
 				}
 
 				if (mult < 2) mult = 2;
@@ -337,7 +337,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 				{
 					if (rand_int(100)<tdam)
 					{
-                                                object_can_flags(o_ptr,TR1_KILL_DRAGON,0x0L,0x0L);
+						object_can_flags(o_ptr,TR1_KILL_DRAGON,0x0L,0x0L);
 					}
 					else object_can_flags(o_ptr,TR1_SLAY_DRAGON,0x0L,0x0L);
 					l_ptr->flags3 |= (RF3_DRAGON);
@@ -416,7 +416,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 						if (m_ptr->ml)
 						{
 							object_can_flags(o_ptr,TR1_BRAND_ACID,0x0L,0x0L);
-                                                        l_ptr->flags2 |= (RF2_ARMOR);
+							l_ptr->flags2 |= (RF2_ARMOR);
 						}
 
 							if (mult < 2 ) mult = 2;
@@ -564,9 +564,10 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 
 
 /*
- *	Find a secret at the specified location and change it according to the state.
+ * Find a secret at the specified location and change it according to
+ * the state.
  */
-void find_secret(y,x)
+void find_secret(int y, int x)
 {
 	feature_type *f_ptr;
 
@@ -918,6 +919,10 @@ void py_pickup(int pickup)
 
 			/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
 			if (!k_info[o_ptr->k_idx].flavor) k_info[o_ptr->k_idx].aware = TRUE;
+
+			/* XXX XXX - Mark monster objects as "seen" */
+			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights)) l_list[o_ptr->name3].sights++;
+
 		}
 
 		/* Describe the object */
@@ -1366,14 +1371,16 @@ void py_attack(int y, int x)
 	/* Attack once for each legal blow */
 	while (num++ < p_ptr->num_blow)
 	{
+		int slot = INVEN_WIELD;
+
 		/* Deliver a blow */
 		blows++;
 
-		/* Get the weapon */
-		o_ptr = &inventory[INVEN_WIELD];
-
 		/* Get secondary weapon instead */
-		if (!(blows % 2) && (melee_style & (1L << WS_TWO_WEAPON))) o_ptr = &inventory[INVEN_ARM];
+		if (!(blows % 2) && (melee_style & (1L << WS_TWO_WEAPON))) slot = INVEN_ARM;
+
+		/* Get the weapon */
+		o_ptr = &inventory[slot];
 
 		/* Get the unarmed weapon */
 		if (melee_style & (1L << WS_UNARMED))
@@ -1416,7 +1423,7 @@ void py_attack(int y, int x)
 				u32b k2 = o_ptr->can_flags2;
 				u32b k3 = o_ptr->can_flags3;
 
-				u33b n1, n2, n3;
+				u32b n1, n2, n3;
 
 				k = damroll(o_ptr->dd, o_ptr->ds);
 				k = tot_dam_aux(o_ptr, k, m_ptr);
@@ -1437,10 +1444,10 @@ void py_attack(int y, int x)
 
 				/* Check for new flags */
 				n1 = o_ptr->can_flags1 & ~(k1);
-				n2 = o_ptr->can_flags1 & ~(k2);
-				n3 = o_ptr->can_flags1 & ~(k3);
+				n2 = o_ptr->can_flags2 & ~(k2);
+				n3 = o_ptr->can_flags3 & ~(k3);
 
-				if (n1 || n2 || n3) update_slot_flags(INVEN_WIELD, n1, n2, n3);
+				if (n1 || n2 || n3) update_slot_flags(slot, n1, n2, n3);
 
 				/* Check usage */
 				object_usage(INVEN_WIELD);
@@ -1514,7 +1521,7 @@ void py_attack(int y, int x)
  * This routine should only be called when energy has been expended.
  *
  */
-bool stuck_player(int dir)
+bool stuck_player(int *dir)
 {
 	int py = p_ptr->py;
 	int px = p_ptr->px;
@@ -1526,7 +1533,7 @@ bool stuck_player(int dir)
 	cptr name;
 
 	/* Hack -- allowed to move nowhere */
-	if (dir == 5) return (FALSE);
+	if ((!*dir) || (*dir == 5)) return (FALSE);
 
 	/* Player can not walk through "walls" */
 	if (!(f_ptr->flags1 & (FF1_MOVE))
@@ -1565,20 +1572,8 @@ bool stuck_player(int dir)
 
 		}
 
-		/* Mention known obstacles */
-		else
-		{
-			/* Get the mimiced feature */
-			mimic = f_ptr->mimic;
-
-			/* Get the feature name */
-			name = (f_name + f_info[mimic].name);
-
-			/* Tell the player */
-			msg_format("You are stuck %s%s.",
-				((f_ptr->flags2 & (FF2_FILLED)) ? "" :
-					(is_a_vowel(name[0]) ? "inside an " : "inside a ")),name);
-		}
+		/* Always make direction 0 */
+		*dir = 0;
 
 		return (TRUE);
 
@@ -1602,19 +1597,19 @@ void move_player(int dir, int jumping)
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
-        feature_type *f_ptr;
+	feature_type *f_ptr;
 
 	int y, x;
 
-        int mimic;
+	int mimic;
 
-        cptr name;
+	cptr name;
 
 	/* Find the result of moving */
 	y = py + ddy[dir];
 	x = px + ddx[dir];
 
-        f_ptr = &f_info[cave_feat[y][x]];
+	f_ptr = &f_info[cave_feat[y][x]];
 
 	/* Hack -- attack monsters --- except hidden ones */
 	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)))
@@ -1623,7 +1618,7 @@ void move_player(int dir, int jumping)
 		py_attack(y, x);
 	}
 
-	else if (stuck_player(dir))
+	else if (stuck_player(&dir))
 	{
 		/* Do nothing */
 	}
@@ -1708,7 +1703,7 @@ void move_player(int dir, int jumping)
 		name = (f_name + f_info[mimic].name);
 
 		/* Tell the player */
-		msg_format("There is &s%s blocking your way.",
+		msg_format("There is %s%s blocking your way.",
 			((f_ptr->flags2 & (FF2_FILLED)) ? "" :
 			(is_a_vowel(name[0]) ? "an " : "a ")),name);
 		}
@@ -1716,7 +1711,7 @@ void move_player(int dir, int jumping)
 
 	/* Partial movement */
 	else if (!(f_ptr->flags1 & (FF1_MOVE))
-        && (f_ptr->flags3 & (FF3_EASY_CLIMB))
+	&& (f_ptr->flags3 & (FF3_EASY_CLIMB))
 	&& (dir !=p_ptr->climbing))
 	{
 		/* Get the mimiced feature */
@@ -1731,7 +1726,7 @@ void move_player(int dir, int jumping)
 
 		p_ptr->climbing = dir;
 
-                /* Automate 2nd movement command */
+		/* Automate 2nd movement command */
 		p_ptr->command_cmd = 59;
 		p_ptr->command_rep = 1;
 		p_ptr->command_dir = dir;
@@ -1884,11 +1879,11 @@ static int see_stop(int dir, int y, int x)
 	/* Illegal grids are not known walls XXX XXX XXX */
 	if (!in_bounds(y, x)) return (FALSE);
 
-        /* Unknown walls are not known obstacles */
+	/* Unknown walls are not known obstacles */
 	if (!(cave_info[y][x] & (CAVE_MARK))) return (FALSE);
 
-        /* Run-able grids are not known obstacles */
-        if (f_info[f_info[cave_feat[y][x]].mimic].flags1 & (FF1_RUN)) return (FALSE);
+	/* Run-able grids are not known obstacles */
+	if (f_info[f_info[cave_feat[y][x]].mimic].flags1 & (FF1_RUN)) return (FALSE);
 
 	/* Default */
 	return (TRUE);
@@ -2211,7 +2206,7 @@ static bool run_test(void)
 	int i, max, inv;
 	int option, option2;
 
-        int feat;
+	int feat;
 
 	/* No options yet */
 	option = 0;
@@ -2381,16 +2376,16 @@ static bool run_test(void)
 			row = py + ddy[new_dir];
 			col = px + ddx[new_dir];
 
-                        /* Get feature */
-                        feat = cave_feat[row][col];
+			/* Get feature */
+			feat = cave_feat[row][col];
 
 			/* Get mimiced feature */
-                        feat = f_info[feat].mimic;
+			feat = f_info[feat].mimic;
 
 			/* Unknown grid or non-wall */
 			/* Was: cave_floor_bold(row, col) */
 			if (!(cave_info[row][col] & (CAVE_MARK)) ||
-                            (!(f_info[feat].flags1 & (FF1_WALL))) )
+			    (!(f_info[feat].flags1 & (FF1_WALL))) )
 			{
 				/* Looking to break right */
 				if (p_ptr->run_break_right)
@@ -2418,16 +2413,16 @@ static bool run_test(void)
 			row = py + ddy[new_dir];
 			col = px + ddx[new_dir];
 
-                        /* Get feature */
-                        feat = cave_feat[row][col];
+			/* Get feature */
+			feat = cave_feat[row][col];
 
 			/* Get mimiced feature */
-                        feat = f_info[feat].mimic;
+			feat = f_info[feat].mimic;
 
 			/* Unknown grid or non-wall */
 			/* Was: cave_floor_bold(row, col) */
 			if (!(cave_info[row][col] & (CAVE_MARK)) ||
-                            (!(f_info[feat].flags1 & (FF1_RUN))))
+			    (!(f_info[feat].flags1 & (FF1_WALL))))
 			{
 				/* Looking to break left */
 				if (p_ptr->run_break_left)
@@ -2526,7 +2521,7 @@ static bool run_test(void)
 
 
 	/* About to hit a known wall, stop */
-        if (see_stop(p_ptr->run_cur_dir, py, px))
+	if (see_stop(p_ptr->run_cur_dir, py, px))
 	{
 		return (TRUE);
 	}
@@ -2579,14 +2574,13 @@ void run_step(int dir)
 	/* Take time */
 	p_ptr->energy_use = 100;
 
-	/* Catch breath */
-	if (!(f_ptr->flags2 & (FF2_FILLED)))
-	{
-		/* Rest the player */
-		set_rest(p_ptr->rest + PY_REST_RATE - p_ptr->tiring);
-	}
+	/* Rest the player */
+	/* XXX Should never be able to run on filled terrain */
+	set_rest(p_ptr->rest + PY_REST_RATE - p_ptr->tiring);
 
 	/* Move the player */
 	move_player(p_ptr->run_cur_dir, FALSE);
+
+	return;
 }
 

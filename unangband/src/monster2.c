@@ -470,17 +470,11 @@ s16b get_mon_num(int level)
 			continue;
 		}
 
-		/* Hack -- "questor" monsters must be placed specifically */
-		if (r_ptr->flags1 & (RF1_QUESTOR))
-		{
-			continue;
-		}
+		/* Hack -- "questor" monsters and guardians must be placed specifically */
+		if ((r_ptr->flags1 & (RF1_QUESTOR)) || (r_ptr->flags1 & (RF1_GUARDIAN))) continue;
 
 		/* Depth Monsters never appear out of depth */
-		if ((r_ptr->flags1 & (RF1_FORCE_DEPTH)) && (r_ptr->level > p_ptr->depth))
-		{
-			continue;
-		}
+		if ((r_ptr->flags1 & (RF1_FORCE_DEPTH)) && (r_ptr->level > p_ptr->depth)) continue;
 
 		/* Hack -- No MULTIPLY monsters on surface */
 		if (surface && (r_ptr->flags2 & (RF2_MULTIPLY))) continue;
@@ -644,7 +638,7 @@ s16b get_mon_num(int level)
  * Useful Modes:
  *   0x00 --> Full nominative name ("the goblin") or "it"
  *   0x04 --> Full nominative name ("the goblin") or "something"
- *   0x80 --> Genocide resistance name ("the goblin")
+ *   0x80 --> Banishment resistance name ("the goblin")
  *   0x88 --> Killing name ("a goblin")
  *   0x22 --> Possessive, genderized if visable ("his") or "its"
  *   0x23 --> Reflexive, genderized if visable ("himself") or "itself"
@@ -1200,7 +1194,7 @@ void update_mon(int m_idx, bool full)
  */
 		/* Normal line of sight, and not blind */
 		if ((!p_ptr->blind) && ((player_has_los_bold(fy, fx) || (surface && outside && (m_ptr->mflag & (MFLAG_OVER)))))
-			&& !(surface && !outside && (m_ptr->mflag & (MFLAG_OVER)) && !(f_info[cave_feat[y][x]].flags3 & FF3_EASY_CLIMB) ))
+			&& !(surface && !outside && (m_ptr->mflag & (MFLAG_OVER)) && !(f_info[cave_feat[fy][fx]].flags3 & FF3_EASY_CLIMB) ))
 		{
 			bool do_invisible = FALSE;
 			bool do_cold_blood = FALSE;
@@ -1531,7 +1525,7 @@ void monster_swap(int y1, int x1, int y2, int x2)
 		m_ptr->fx = x2;
 
 		/* Some monsters radiate lite when moving */
-		if (r_ptr->flags2 & (RF2_HAS_LITE))
+		if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE))
 		{
 			/* Update the visuals */
 			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
@@ -1589,7 +1583,7 @@ void monster_swap(int y1, int x1, int y2, int x2)
 
 
 		/* Some monsters radiate lite when moving */
-		if (r_ptr->flags2 & (RF2_HAS_LITE))
+		if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE))
 		{
 			/* Update the visuals */
 			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
@@ -1726,6 +1720,12 @@ bool mon_resist_feat(int feat, int r_idx)
 	feature_type *f_ptr;
 	monster_race *r_ptr;
 
+	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
+
+	bool daytime = ((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2));
+
+	bool outside = (f_info[feat].flags3 & (FF3_OUTSIDE));
+
 	/* Get feature info */
 	f_ptr= &f_info[feat];
 	
@@ -1734,6 +1734,9 @@ bool mon_resist_feat(int feat, int r_idx)
 
 	/* Race */
 	r_ptr = &r_info[r_idx];
+
+	/* Always get burnt by daylight */
+	if ((surface && daytime && outside) && (r_ptr->flags3 & (RF3_HURT_LITE))) return (FALSE);
 
 	/* Always risk traps if stupid */
 	if ((f_ptr->flags1 & (FF1_HIT_TRAP)) &&
@@ -1782,7 +1785,7 @@ bool mon_resist_feat(int feat, int r_idx)
 			break;
 
 			case GF_LAVA:
-                        if (!(r_ptr->flags3 & (RF3_RES_LAVA))) return (FALSE);
+			if (!(r_ptr->flags3 & (RF3_RES_LAVA))) return (FALSE);
 			break;
 
 			case GF_WATER_WEAK:
@@ -1790,11 +1793,11 @@ bool mon_resist_feat(int feat, int r_idx)
 			if (r_ptr->flags3 & (RF3_NONLIVING))  return (TRUE);
 			if ((r_ptr->flags2 & (RF2_CAN_SWIM)) && (f_ptr->flags2 & (FF2_CAN_SWIM)))
 			{
-                                return (TRUE);
+				return (TRUE);
 			}
 			else if ((r_ptr->flags2 & (RF2_CAN_DIG)) && (f_ptr->flags2 & (FF2_CAN_DIG)))
 			{
-                                return (TRUE);
+				return (TRUE);
 			}
 			else
 			{
@@ -1900,9 +1903,6 @@ int place_monster_here(int y, int x, int r_idx)
 	feature_type *f_ptr;
 	monster_race *r_ptr;
 
-	/* Hack -- flying/climbing monsters can travel anywhere on surface except outer edges */
-	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
-
 	/* Get feature */
 	feat = cave_feat[y][x];
 
@@ -1949,16 +1949,16 @@ int place_monster_here(int y, int x, int r_idx)
 
 	/* Hack -- check for oozing */
 	if ((mon_resist_feat(feat,r_idx)) &&
-                (r_ptr->flags3 & (RF3_OOZE)) &&
-                (f_ptr->flags2 & (FF2_CAN_OOZE)))
+		(r_ptr->flags3 & (RF3_OOZE)) &&
+		(f_ptr->flags2 & (FF2_CAN_OOZE)))
 	{
-                return(MM_OOZE);
+		return(MM_OOZE);
 	}
 
 
 	/* Hack -- check for flying. */
 	if ((r_ptr->flags2 & (RF2_CAN_FLY)) &&
-		((f_ptr->flags2 & (FF2_CAN_FLY)) || (surface && (cave_feat[y][x] != FEAT_PERM_SOLID)) ))
+		(f_ptr->flags2 & (FF2_CAN_FLY)))
 	{
 		return(MM_FLY);
 	}
@@ -1970,7 +1970,7 @@ int place_monster_here(int y, int x, int r_idx)
 
 	/* Hack -- check for climbing. */
 	if ((r_ptr->flags2 & (RF2_CAN_CLIMB)) && 
-		((f_ptr->flags2 & (FF2_CAN_FLY)) || (surface && (cave_feat[y][x] != FEAT_PERM_SOLID)) ))
+		(f_ptr->flags2 & (FF2_CAN_FLY)))
 	{
 		int i;
 
@@ -2348,7 +2348,7 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp)
 	repair_mflag_born = TRUE;
 
 		/* Some monsters radiate lite when born */
-		if (r_ptr->flags2 & (RF2_HAS_LITE))
+		if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE))
 		{
 			/* Update the visuals */
 			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
@@ -3073,10 +3073,10 @@ bool animate_object(int item)
 		   "has" : "have")), p);
 
 		/* Destroy the item */
-		if (o_ptr->stackc) floor_item_increase(item, -(o_ptr->stackc));
-		else floor_item_increase(item,-(o_ptr->number));
+		if (o_ptr->stackc) floor_item_increase(0 - item, -(o_ptr->stackc));
+		else floor_item_increase(0 - item, -(o_ptr->number));
 
-		floor_item_optimize(item);
+		floor_item_optimize(0 - item);
 	}
 
 	return (TRUE);
@@ -3159,6 +3159,9 @@ void message_pain(int m_idx, int dam)
 	tmp = (newhp * 100L) / oldhp;
 	percentage = (int)(tmp);
 
+
+	/* Hack -- avoid mentioning minor damage */
+	if (!(m_ptr->ml) && (percentage > 95)) return;
 
 	/* Jelly's, Mold's, Vortex's, Quthl's */
 	if (strchr("jmvQ", r_ptr->d_char))

@@ -41,13 +41,18 @@
 /*
  * Name of the version/variant
  */
-#define VERSION_NAME "Angband"
+#define VERSION_NAME "UnAngband"
 
 
 /*
  * Current version string
  */
-#define VERSION_STRING	"2.9.6 alpha"
+#define VERSION_STRING	"0.5.3"
+
+/*
+ * Hack -- note use of new version name/string but old version
+ * major/minor/patch numbers.
+ */
 
 
 /*
@@ -216,6 +221,13 @@
  * to calculate monster flow, but note that the flow code is "paranoid".
  */
 #define TEMP_MAX 1536
+
+/*
+ * Maximum size of the "dyna" array (see "cave.c")
+ * Note that the "dyna radius" will NEVER exceed 20, and even if the "dyna"
+ * was octagonal, we would never require more than 1520 entries in the array.
+ */
+#define DYNA_MAX 1536
 
 
 /*
@@ -1054,19 +1066,22 @@
 #define FF3_EASY_CLIMB  0x00020000
 #define FF3_NEED_TREE   0x00040000
 #define FF3_NEED_WALL   0x00080000
-#define FF3_TOWN		0x00100000
+#define FF3_FULL_MOVE	0x00100000
 #define FF3_BLOOD		0x00200000
 #define FF3_DUST		0x00400000
 #define FF3_SLIME		0x00800000
 #define FF3_TREE 		0x01000000
 #define FF3_TREE_BIG    0x02000000
-#define FF3_XXX3		0x04000000
-#define FF3_FULL_MOVE 	0x08000000
-#define FF3_COLLAPSE    0x10000000
+#define FF3_INSTANT	0x04000000
+#define FF3_EXPLODE 	0x08000000
+#define FF3_TIMED       0x10000000
 #define FF3_ERUPT       0x20000000
 #define FF3_STRIKE      0x40000000
-#define FF3_DYNAMIC     0x80000000
+#define FF3_SPREAD      0x80000000
 
+/* Which features are dynamic */
+#define FF3_DYNAMIC_MASK \
+ (FF3_INSTANT | FF3_EXPLODE | FF3_TIMED | FF3_ERUPT | FF3_STRIKE | FF3_SPREAD)
 
 /* Feature actions -- used to define actions performed on features */
 
@@ -1114,8 +1129,12 @@
 #define FS_USE_FEAT	76
 #define FS_GET_FEAT	77
 #define FS_GROUND       79
-#define FS_TREE  81
+#define FS_TREE  		81
 #define FS_NEED_WALL    82
+#define FS_INSTANT	90
+#define FS_EXPLODE	91
+#define FS_TIMED		92
+#define FS_SPREAD		95
 
 #define FS_FLAGS_END    96
 
@@ -1166,8 +1185,8 @@
 #define SF2_CREATE_STAIR 0x00000008
 #define SF2_TELE_LEVEL   0x00000010
 #define SF2_ALTER_LEVEL  0x00000020
-#define SF2_GENOCIDE     0x00000040
-#define SF2_MASS_GENOCIDE       0x00000080
+#define SF2_BANISHMENT     0x00000040
+#define SF2_MASS_BANISHMENT       0x00000080
 #define SF2_CUT   0x00000100
 #define SF2_STUN  0x00000200
 #define SF2_POISON       0x00000400
@@ -1575,8 +1594,9 @@
 #define SV_MATTOCK			7
 
 /* The "sval" values for TV_HAFTED */
-#define SV_WHIP					2	/* 1d6 */
+#define SV_WHIP					2	/* 1d4 */
 #define SV_QUARTERSTAFF			3	/* 1d9 */
+#define SV_BATON				4	/* 1d5 */
 #define SV_MACE					5	/* 2d4 */
 #define SV_BALL_AND_CHAIN		6	/* 2d4 */
 #define SV_WAR_HAMMER			8	/* 3d3 */
@@ -1806,7 +1826,7 @@
 #define SV_STAFF_DISPEL_EVIL	24
 #define SV_STAFF_POWER			25
 #define SV_STAFF_HOLINESS		26
-#define SV_STAFF_GENOCIDE		27
+#define SV_STAFF_BANISHMENT		27
 #define SV_STAFF_EARTHQUAKES	28
 #define SV_STAFF_DESTRUCTION	29
 
@@ -1919,8 +1939,8 @@
 #define SV_SCROLL_STAR_DESTRUCTION		41
 #define SV_SCROLL_DISPEL_UNDEAD			42
 /* xxx */
-#define SV_SCROLL_GENOCIDE				44
-#define SV_SCROLL_MASS_GENOCIDE			45
+#define SV_SCROLL_BANISHMENT				44
+#define SV_SCROLL_MASS_BANISHMENT			45
 #define SV_SCROLL_ACQUIREMENT			46
 #define SV_SCROLL_STAR_ACQUIREMENT		47
 #define SV_SCROLL_LEGEND_LORE			48
@@ -2497,7 +2517,7 @@
 #define TR3_EASY_KNOW    0x02000000L     /* Item is known if aware */
 #define TR3_HIDE_TYPE    0x04000000L     /* Item hides description */
 #define TR3_SHOW_MODS    0x08000000L     /* Item shows Tohit/Todam */
-#define TR3_XXX1  0x10000000L     /* XXX1 */
+#define TR3_THROWING	 0x10000000L     /* Item gets shots/might bonus when thrown */
 #define TR3_LIGHT_CURSE  0x20000000L     /* Item has Light Curse */
 #define TR3_HEAVY_CURSE  0x40000000L     /* Item has Heavy Curse */
 #define TR3_PERMA_CURSE  0x80000000L     /* Item has Perma Curse */
@@ -2653,7 +2673,7 @@
 #define RF1_FORCE_DEPTH  0x00000100      /* Start at "correct" depth */
 #define RF1_FORCE_MAXHP  0x00000200      /* Start with max hitpoints */
 #define RF1_FORCE_SLEEP  0x00000400      /* Start out sleeping */
-#define RF1_FORCE_EXTRA  0x00000800      /* Start out something */
+#define RF1_GUARDIAN     0x00000800      /* Dungeon guardian*/
 #define RF1_ATTR_METAL   0x00001000      /* Lightens color occasionally */
 #define RF1_FRIENDS       0x00002000      /* Arrive with some friends */
 #define RF1_ESCORT 0x00004000      /* Arrive with an escort */
@@ -2679,7 +2699,7 @@
  * New monster race bit flags
  */
 #define RF2_STUPID	0x00000001      /* Monster is stupid */
-#define RF2_SMART	0x00000002      /* Monster is smart */
+#define RF2_SMART		0x00000002      /* Monster is smart */
 #define RF2_CAN_DIG	0x00000004      /* (?) */
 #define RF2_HAS_LITE	0x00000008      /* (?) */
 #define RF2_INVISIBLE	0x00000010      /* Monster avoids vision */
@@ -2693,22 +2713,22 @@
 #define RF2_POWERFUL	0x00001000      /* Monster has strong breath */
 #define RF2_CAN_CLIMB	0x00002000      /* (?) */
 #define RF2_CAN_FLY	0x00004000      /* (?) */
-#define RF2_MUST_FLY      0x00008000      /* (?) */
-#define RF2_OPEN_DOOR    0x00010000      /* Monster can open doors */
-#define RF2_BASH_DOOR    0x00020000      /* Monster can bash doors */
-#define RF2_PASS_WALL    0x00040000      /* Monster can pass walls */
-#define RF2_KILL_WALL    0x00080000      /* Monster can destroy walls */
-#define RF2_MOVE_BODY    0x00100000      /* Monster can move monsters */
-#define RF2_KILL_BODY    0x00200000      /* Monster can kill monsters */
-#define RF2_TAKE_ITEM    0x00400000      /* Monster can pick up items */
-#define RF2_KILL_ITEM    0x00800000      /* Monster can crush items */
+#define RF2_MUST_FLY    0x00008000      /* (?) */
+#define RF2_OPEN_DOOR	0x00010000      /* Monster can open doors */
+#define RF2_BASH_DOOR	0x00020000      /* Monster can bash doors */
+#define RF2_PASS_WALL	0x00040000      /* Monster can pass walls */
+#define RF2_KILL_WALL	0x00080000      /* Monster can destroy walls */
+#define RF2_MOVE_BODY	0x00100000      /* Monster can move monsters */
+#define RF2_KILL_BODY	0x00200000      /* Monster can kill monsters */
+#define RF2_TAKE_ITEM	0x00400000      /* Monster can pick up items */
+#define RF2_KILL_ITEM	0x00800000      /* Monster can crush items */
 #define RF2_SNEAKY 	0x01000000 /* Monster hides a lot of actions */
-#define RF2_ARMOR	0x02000000 /* Monster is fully armoured (Reduces acid damage/stops some arrows) */
+#define RF2_ARMOR		0x02000000 /* Monster is fully armoured (Reduces acid damage/stops some arrows) */
 #define RF2_PRIEST 	0x04000000 /* Monster has access to priest spells ? */
 #define RF2_MAGE   	0x08000000 /* Monster has access to mage spells ? */
 #define RF2_HAS_AURA  	0x10000000 /* Monster radiates an aura attack */
 #define RF2_HAS_WEB	0x20000000 /* Monster leaves a trail of webs */
-#define RF2_BRAIN_7	0x40000000
+#define RF2_NEED_LITE	0x40000000 /* Monster cannot see the player if player is not visible */
 #define RF2_BRAIN_8	0x80000000
 
 /*
@@ -2894,7 +2914,7 @@
  */
 #define RF1_OBVIOUS_MASK \
 	(RF1_UNIQUE | RF1_QUESTOR | RF1_MALE | RF1_FEMALE | \
-	 RF1_FRIENDS | RF1_ESCORT | RF1_ESCORTS)
+	 RF1_GUARDIAN | RF1_FRIENDS | RF1_ESCORT | RF1_ESCORTS)
 
 /*
  * "race" flags
@@ -3238,7 +3258,7 @@
 #define OPT_easy_autos    81
 #define OPT_easy_search			82
 #define OPT_variant_save_feats   83
-/* xxx */
+#define OPT_view_glowing_lite 84
 /* xxx xxx */
 #define OPT_birth_point_based    (OPT_BIRTH+0)
 #define OPT_birth_auto_roller    (OPT_BIRTH+1)
@@ -3395,8 +3415,8 @@
 #define reseed_artifacts			op_ptr->opt[OPT_reseed_artifacts]
 #define easy_autos   op_ptr->opt[OPT_easy_autos]
 #define easy_search   op_ptr->opt[OPT_easy_search]
-/* xxx */
-/* xxx */
+#define view_glowing_lite   op_ptr->opt[OPT_view_glowing_lite]
+
 /* xxx xxx */
 #define birth_point_based op_ptr->opt[OPT_birth_point_based]
 #define birth_auto_roller op_ptr->opt[OPT_birth_auto_roller]
@@ -3527,11 +3547,11 @@
 
 /*
  * Return the "attr" for a given item.
- * Use "flavor" if available.
+ * Use "flavor" if available and not aware.
  * Default to user definitions.
  */
 #define object_attr(T) \
-	((k_info[(T)->k_idx].flavor) ? \
+	((k_info[(T)->k_idx].flavor && !k_info[(T)->k_idx].aware) ? \
 	 (x_info[k_info[(T)->k_idx].flavor].x_attr) : \
 	 (k_info[(T)->k_idx].x_attr))
 

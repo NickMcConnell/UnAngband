@@ -1675,6 +1675,8 @@ void do_cmd_macros(void)
 
 
 
+
+
 /*
  * Interact with "visuals"
  */
@@ -2546,14 +2548,17 @@ static void strip_name(char *buf, int k_idx)
 
 	cptr str = (k_name + k_ptr->name);
 
+	/* If not aware, use flavor */
+	if (!k_ptr->aware && k_ptr->flavor) str = x_name + x_info[k_ptr->flavor].name;
+
 	/* Skip past leading characters */
 	while ((*str == ' ') || (*str == '&') || (*str == '#')) str++;
 
 	/* Copy useful chars */
 	for (t = buf; *str; str++)
 	{
-                if (prefix(str,"# ")) str++; /* Skip following space */
-                else if (*str != '~') *t++ = *str;
+		if (prefix(str,"# ")) str++; /* Skip following space */
+		else if (*str != '~') *t++ = *str;
 	}
 
 	/* Terminate the new name */
@@ -2828,6 +2833,152 @@ void do_cmd_save_screen(void)
 	screen_load();
 }
 
+/*
+ * Hack -- save a screen dump to a file in html format
+ */
+void do_cmd_save_screen_html(void)
+{
+	int i;
+
+	FILE *fff;
+
+	char buf[1024];
+
+
+	/* Build the filename */
+	path_build(buf, 1024, ANGBAND_DIR_USER, "dump.prf");
+
+	/* File type is "TEXT" */
+	FILE_TYPE(FILE_TYPE_TEXT);
+
+	/* Append to the file */
+	fff = my_fopen(buf, "w");
+
+	/* Oops */
+	if (!fff) return;
+
+
+	/* Extract default attr/char code for features */
+	for (i = 0; i < z_info->f_max; i++)
+	{
+		feature_type *f_ptr = &f_info[i];
+
+		if (!f_ptr->name) continue;
+
+		/* Dump a comment */
+		fprintf(fff, "# %s\n", (f_name + f_ptr->name));
+
+		/* Dump the attr/char info */
+		fprintf(fff, "F:%d:0x%02X:0x%02X\n\n", i,
+			(byte)(f_ptr->x_attr), (byte)(f_ptr->x_char));
+
+		/* Assume we will use the underlying values */
+		f_ptr->x_attr = f_ptr->d_attr;
+		f_ptr->x_char = f_ptr->d_char;
+	}
+
+	/* Extract default attr/char code for objects */
+	for (i = 0; i < z_info->k_max; i++)
+	{
+		object_kind *k_ptr = &k_info[i];
+
+		if (!k_ptr->name) continue;
+
+		/* Dump a comment */
+		fprintf(fff, "# %s\n", (k_name + k_ptr->name));
+
+		/* Dump the attr/char info */
+		fprintf(fff, "K:%d:0x%02X:0x%02X\n\n", i,
+			(byte)(k_ptr->x_attr), (byte)(k_ptr->x_char));
+
+		/* Default attr/char */
+		k_ptr->x_attr = k_ptr->d_attr;
+		k_ptr->x_char = k_ptr->d_char;
+	}
+
+	/* Extract default attr/char code for flavors */
+	for (i = 0; i < z_info->x_max; i++)
+	{
+		flavor_type *x_ptr = &x_info[i];
+
+		if (!x_ptr->name) continue;
+
+		/* Dump a comment */
+		fprintf(fff, "# %s\n", (x_name + x_ptr->name));
+
+		/* Dump the attr/char info */
+		fprintf(fff, "L:%d:0x%02X:0x%02X\n\n", i,
+			(byte)(x_ptr->x_attr), (byte)(x_ptr->x_char));
+
+		/* Default attr/char */
+		x_ptr->x_attr = x_ptr->d_attr;
+		x_ptr->x_char = x_ptr->d_char;
+	}
+
+
+	/* Extract default attr/char code for monsters */
+	for (i = 0; i < z_info->r_max; i++)
+	{
+		monster_race *r_ptr = &r_info[i];
+
+		if (!r_ptr->name) continue;
+
+		/* Dump a comment */
+		fprintf(fff, "# %s\n", (r_name + r_ptr->name));
+
+		/* Dump the attr/char info */
+		fprintf(fff, "R:%d:0x%02X:0x%02X\n\n", i,
+			(byte)(r_ptr->x_attr), (byte)(r_ptr->x_char));
+
+		/* Default attr/char */
+		r_ptr->x_attr = r_ptr->d_attr;
+		r_ptr->x_char = r_ptr->d_char;
+	}
+
+	/* Skip a line */
+	fprintf(fff, "\n");
+
+
+	/* Close it */
+	my_fclose(fff);
+
+	/* Refresh */
+	do_cmd_redraw();
+
+	/* Hack -- dump the graphics before loading font/graphics */
+	dump_html();
+
+	/* Graphic symbols */
+	if (use_graphics)
+	{
+		/* Process "graf.prf" */
+		process_pref_file("graf.prf");
+	}
+
+	/* Normal symbols */
+	else
+	{
+		/* Process "font.prf" */
+		process_pref_file("font.prf");
+	}
+
+	/* Process "dump.prf" */
+	process_pref_file("dump.prf");
+
+
+#ifdef ALLOW_BORG_GRAPHICS
+	/* Initialize the translation table for the borg */
+	init_translate_visuals();
+#endif /* ALLOW_BORG_GRAPHICS */
+
+	/* Message */
+	msg_print("Html screen dump saved.");
+	message_flush();
+
+	/* Refresh */
+	do_cmd_redraw();
+
+}
 
 
 
@@ -2998,6 +3149,7 @@ static int collect_monsters(int grp_cur, int *mon_idx, int mode)
 	return mon_cnt;
 }
 
+
 /*
  * Build a list of monster indexes in the given group. Return the number
  * of monsters in the group.
@@ -3010,7 +3162,7 @@ static int collect_ego_items(int grp_cur, int object_idx[])
 	byte group_tval = object_group_tval[grp_cur];
 
 	/* Check every object */
-        for (i = 0; i < z_info->e_max; i++)
+	for (i = 0; i < z_info->e_max; i++)
 	{
 		/* Access the race */
 		ego_item_type *e_ptr = &e_info[i];
@@ -3023,7 +3175,7 @@ static int collect_ego_items(int grp_cur, int object_idx[])
 		if (!(k))  continue; 
 
 		/* Require objects ever seen*/
-		if (!(e_ptr->aware)) continue;
+		if (!(cheat_lore) && !(e_ptr->aware)) continue;
 
 		/* Add the race */
 		object_idx[object_cnt++] = i;
@@ -3042,7 +3194,7 @@ static int collect_ego_items(int grp_cur, int object_idx[])
  * Build a list of monster indexes in the given group. Return the number
  * of monsters in the group.
  */
-static int collect_objects(int grp_cur, int object_idx[])
+static int collect_objects(int grp_cur, int object_idx[], int mode)
 {
 	int i, j, k, object_cnt = 0;
 
@@ -3067,13 +3219,39 @@ static int collect_objects(int grp_cur, int object_idx[])
 		if (!(k))  continue; 
 
 		/* Require objects ever seen*/
-		if (!(k_ptr->aware)) continue;
+		if (!(mode & 0x02) && !(cheat_lore) && !(k_ptr->aware) && !(k_ptr->flavor)) continue;
 
 		/* Check for race in the group */
 		if (k_ptr->tval == group_tval)
 		{
+			int idx, ii, tmp;
+
+			char name1[80];
+			char name2[80];
+
+			object_kind *i_ptr;
+
+			for (ii = 0, idx = i;ii < object_cnt; ii++)
+			{
+				/* Get the object */
+				i_ptr = &k_info[object_idx[ii]];
+
+				/* If flavoured, list known items first */
+				if (!k_ptr->aware && k_ptr->flavor && i_ptr->aware) continue;
+
+				strip_name(name1,idx);
+				strip_name(name2,object_idx[ii]);
+
+				if ((k_ptr->aware && !i_ptr->aware && i_ptr->flavor) || (strcmp(name1,name2) <= 0))
+				{
+					tmp = idx;
+					idx = object_idx[ii];
+					object_idx[ii] = tmp;
+				}
+			}
+
 			/* Add the race */
-			object_idx[object_cnt++] = i;
+			object_idx[object_cnt++] = idx;
 		}
 	}
 
@@ -3114,7 +3292,7 @@ static int collect_artifacts(int grp_cur, int object_idx[])
 		if (!a_ptr->name) continue;
 
 		/* Skip "uncreated" artifacts */
-		if (!a_ptr->cur_num) continue;
+		if (!(cheat_lore) && !a_ptr->cur_num) continue;
 
 		/* Assume okay */
 		okay[k] = TRUE;
@@ -3142,7 +3320,7 @@ static int collect_artifacts(int grp_cur, int object_idx[])
 				if (!artifact_p(o_ptr)) continue;
 
 				/* Ignore known items */
-				if (object_known_p(o_ptr)) continue;
+				if ((cheat_lore) || object_known_p(o_ptr)) continue;
 
 				/* Note the artifact */
 				okay[o_ptr->name1] = FALSE;
@@ -3162,7 +3340,7 @@ static int collect_artifacts(int grp_cur, int object_idx[])
 		if (!artifact_p(o_ptr)) continue;
 
 		/* Ignore known items */
-		if (object_known_p(o_ptr)) continue;
+		if ((cheat_lore) || object_known_p(o_ptr)) continue;
 
 		/* Note the artifact */
 		okay[o_ptr->name1] = FALSE;
@@ -3301,13 +3479,15 @@ static void browser_cursor(char ch, int *column, int *grp_cur, int grp_cnt,
 		list += ddy[d];
 
 		/* Verify */
-		if (list < 0) list = 0;
 		if (list >= list_cnt) list = list_cnt - 1;
+		if (list < 0) list = 0;
 	}
 
 	(*grp_cur) = grp;
 	(*list_cur) = list;
 }
+
+
 
 /*
  * Display the objects in a group.
@@ -3382,7 +3562,16 @@ static void desc_art_fake(int a_idx)
 	/* Hack -- Handle stuff */
 	handle_stuff();
 
+	/* Save the screen */
+	screen_save();
+
+	/* Describe */
 	screen_object(o_ptr, FALSE);
+
+	/* Load the screen */
+	screen_load();
+
+	(void)inkey();
 }
 
 /*
@@ -3477,7 +3666,7 @@ static void do_cmd_knowledge_artifacts(void)
 		display_artifact_list(max + 3, 6, BROWSER_ROWS, object_idx, object_cur, object_top);
 
 		/* Prompt */
-		prt("<dir>, 'r' to recall, ESC", 23, 0);
+		prt("<dir>, ENTER to recall, ESC", 23, 0);
 
 		/* Mega Hack -- track this monster race */
 		if (object_cnt) artifact_track(object_idx[object_cur]);
@@ -3513,6 +3702,8 @@ static void do_cmd_knowledge_artifacts(void)
 
 			case 'R':
 			case 'r':
+			case '\n':
+			case '\r':
 			{
 				/* Recall on screen */
 				desc_art_fake(object_idx[object_cur]);
@@ -3529,11 +3720,36 @@ static void do_cmd_knowledge_artifacts(void)
 			}
 		}
 	}
-        /* Prompt */
-        if (!grp_cnt) prt("No artifacts known.", 14, 0);
+	/* Prompt */
+	if (!grp_cnt) msg_print("No artifacts known.");
 
 	/* XXX XXX Free the "object_idx" array */
-        FREE(object_idx);
+	FREE(object_idx);
+}
+
+/*
+ * Display visuals.
+ */
+static void display_visual_list(int col, int row, int height, byte attr_cur, byte attr_top, char char_cur, char char_left)
+{
+	int i, ii;
+
+	/* Clear the display lines */
+	for (i = 0; i < height; i++)
+	{
+		Term_erase(col, row + i, 255);
+	}
+
+	/* Display lines until done */
+	for (i = 0; i < height; i++)
+	{
+		/* Display columns until done */
+		for (ii = 0; ii < (SCREEN_WID - col); ii++)
+		{
+			/* Display the name */
+			Term_putch(col+ii, row+i, attr_top + i, char_left+ii);
+		}
+	}
 }
 
 /*
@@ -3594,6 +3810,16 @@ static void do_cmd_knowledge_monsters(void)
 	bool flag;
 	bool redraw;
 
+	bool visual_list = FALSE;
+	byte attr_top = 0;
+	char char_left = 0;
+	byte attr_idx = 0;
+	char char_idx = 0;
+	byte attr_old = 0;
+	char char_old = 0;
+
+	monster_race *r_ptr;
+
 	/* Allocate the "mon_idx" array */
 	C_MAKE(mon_idx, z_info->r_max, int);
 
@@ -3626,7 +3852,7 @@ static void do_cmd_knowledge_monsters(void)
 	flag = FALSE;
 	redraw = TRUE;
 
-        while ((!flag) && (grp_cnt))
+	while ((!flag) && (grp_cnt))
 	{
 		char ch;
 
@@ -3669,8 +3895,17 @@ static void do_cmd_knowledge_monsters(void)
 		/* Display a list of monsters in the current group */
 		display_monster_list(max + 3, 6, BROWSER_ROWS, mon_idx, mon_cur, mon_top);
 
+		/* Get the current monster */
+		r_ptr = &r_info[mon_idx[mon_cur]];
+
+		/* Display visual list below first monster */
+		if (visual_list) display_visual_list(max + 3, 7, BROWSER_ROWS-1, r_ptr->x_attr, attr_top, r_ptr->x_char, char_left);
+
 		/* Prompt */
-		prt("<dir>, 'r' to recall, ESC", 23, 0);
+		if (visual_list && (attr_idx || char_idx)) prt("<dir>, ENTER to accept, 'c', 'p' to paste ESC",23,0);
+		else if (visual_list) prt("<dir>, ENTER to accept, 'c' to copy, ESC",23,0);
+		else if ((attr_idx || char_idx)) prt("<dir>, ENTER to recall, 'v' for visuals, 'p' to paste, ESC", 23, 0);
+		else prt("<dir>, ENTER to recall, 'v' for visuals, ESC", 23, 0);
 
 		/* Mega Hack -- track this monster race */
 		if (mon_cnt) p_ptr->monster_race_idx = mon_idx[mon_cur];
@@ -3681,7 +3916,12 @@ static void do_cmd_knowledge_monsters(void)
 		/* Hack -- handle stuff */
 		handle_stuff();
 
-		if (!column)
+		if (visual_list)
+		{
+			/* Place the cursor */
+			Term_gotoxy(max + 3 + (r_ptr->x_char - char_left), 7 + (r_ptr->x_attr - attr_top));
+		}
+		else if (!column)
 		{
 			Term_gotoxy(0, 6 + (grp_cur - grp_top));
 		}
@@ -3696,40 +3936,126 @@ static void do_cmd_knowledge_monsters(void)
 		{
 			case ESCAPE:
 			{
-				flag = TRUE;
+				if (visual_list)
+				{
+					r_ptr->x_attr = attr_old;
+					r_ptr->x_char = char_old;					
+
+					visual_list = FALSE;
+				}
+				else
+				{
+					flag = TRUE;
+				}
 				break;
 			}
 
 			case 'R':
 			case 'r':
+			case '\n':
+			case '\r':
 			{
+				if (visual_list)
+				{
+					visual_list = FALSE;
+				}
 				/* Recall on screen */
-				if (mon_idx[mon_cur])
+				else if (mon_idx[mon_cur])
 				{
 					screen_roff(mon_idx[mon_cur]);
 
 					(void) inkey();
-	
 					redraw = TRUE;
+				}
+				break;
+			}
+
+			case 'V':
+			case 'v':
+			{
+				if (!visual_list)
+				{
+					visual_list = TRUE;
+
+					attr_top = MAX(0, r_ptr->x_attr - 5);
+					char_left = MAX(-128, r_ptr->x_char - 10);
+
+					attr_old = r_ptr->x_attr;
+					char_old = r_ptr->x_char;
+
+					mon_top = mon_cur;
+				}
+				break;
+			}
+
+			case 'C':
+			case 'c':
+			{
+				if (visual_list)
+				{
+					/* Set the visual */
+					attr_idx = r_ptr->x_attr;
+					char_idx = r_ptr->x_char;
+				}
+				break;
+			}
+
+			case 'P':
+			case 'p':
+			{
+				if (attr_idx)
+				{
+					/* Set the char */
+					r_ptr->x_attr = attr_idx;
+					attr_top = MAX(0, r_ptr->x_attr - 5);
+				}
+
+				if (char_idx)
+				{
+					/* Set the char */
+					r_ptr->x_char = char_idx;
+					char_left = MAX(-128, r_ptr->x_char - 10);
 				}
 				break;
 			}
 
 			default:
 			{
-				/* Move the cursor */
-				browser_cursor(ch, &column, &grp_cur, grp_cnt, &mon_cur, mon_cnt);
-				
+				if (visual_list)
+				{
+					int d = target_dir(ch);
+
+					/* Restrict direction */
+					if ((r_ptr->x_attr== 0) && (ddy[d] < 0)) d = 0;
+					if ((r_ptr->x_char== -128) && (ddx[d] < 0)) d = 0;
+					if ((r_ptr->x_attr== 255) && (ddy[d] > 0)) d = 0;
+					if ((r_ptr->x_char== 127) && (ddx[d] > 0)) d = 0;
+
+					/* Set the visual */
+					r_ptr->x_attr += ddy[d];
+					r_ptr->x_char += ddx[d];
+
+					/* Move the frame */
+					if ((char_left > -128) && (ddx[d] < 0) && (r_ptr->x_char < 117)) char_left += ddx[d];
+					if ((char_left < 127 - SCREEN_WID + max + 4) && (ddx[d] > 0) && (r_ptr->x_char > -118)) char_left += ddx[d];
+					if ((attr_top > 0) && (ddy[d] < 0) && (r_ptr->x_attr < 250)) attr_top += ddy[d];
+					if ((attr_top < 255 - BROWSER_ROWS + 2) && (ddy[d] > 0) && (r_ptr->x_attr > 5)) attr_top += ddy[d];
+				}
+				else
+				{
+					/* Move the cursor */
+					browser_cursor(ch, &column, &grp_cur, grp_cnt, &mon_cur, mon_cnt);
+				}
 				break;
 			}
 		}
 	}
 
-        /* Prompt */
-        if (!grp_cnt) prt("No monsters known.", 14, 0);
+	/* Prompt */
+	if (!grp_cnt) msg_print("No monsters known.");
 
 	/* XXX XXX Free the "mon_idx" array */
-        FREE(mon_idx);
+	FREE(mon_idx);
 }
 
 /*
@@ -3744,24 +4070,24 @@ static void display_ego_item_list(int col, int row, int per_page, int object_idx
 	for (i = 0; i < per_page && object_idx[i]; i++)
 	{
 		/* Get the object index */
-                int e_idx = object_idx[object_top + i];
+		int e_idx = object_idx[object_top + i];
 
 		/* Access the object */
-                ego_item_type *e_ptr = &e_info[e_idx];
+		ego_item_type *e_ptr = &e_info[e_idx];
 
 		/* Choose a color */
-                byte attr = ((e_ptr->aware) ? TERM_WHITE : TERM_SLATE);
-                byte cursor = ((e_ptr->aware) ? TERM_L_BLUE : TERM_BLUE);
+		byte attr = ((e_ptr->aware) ? TERM_WHITE : TERM_SLATE);
+		byte cursor = ((e_ptr->aware) ? TERM_L_BLUE : TERM_BLUE);
 
 		attr = ((i + object_top == object_cur) ? cursor : attr);
 
-                /* Display the name */
-                c_prt(attr, e_name + e_ptr->name, row + i, col);
+		/* Display the name */
+		c_prt(attr, e_name + e_ptr->name, row + i, col);
 
-                if (e_ptr->note)
-                {
-                        c_prt(TERM_YELLOW,quark_str(e_ptr->note), row+i, 65);
-                }
+		if (e_ptr->note)
+		{
+			c_prt(TERM_YELLOW,quark_str(e_ptr->note), row+i, 65);
+		}
 	}
 
 	/* Clear remaining lines */
@@ -3816,7 +4142,7 @@ static void do_cmd_knowledge_ego_items(void)
 {
 	int i, len, max;
 	int grp_cur, grp_top;
-        int object_cur, object_top;
+	int object_cur, object_top;
 	int grp_cnt, grp_idx[100];
 	int object_cnt;
 	int *object_idx;
@@ -3826,6 +4152,8 @@ static void do_cmd_knowledge_ego_items(void)
 	bool redraw;
 
 	int note_idx = 0;
+
+	ego_item_type *e_ptr;
 
 	/* Allocate the "object_idx" array */
 	C_MAKE(object_idx, z_info->e_max, int);
@@ -3843,7 +4171,7 @@ static void do_cmd_knowledge_ego_items(void)
 		if (len > max) max = len;
 
 		/* See if any monsters are known */
-                if (collect_ego_items(i, object_idx))
+		if (collect_ego_items(i, object_idx))
 		{
 			/* Build a list of groups with known monsters */
 			grp_idx[grp_cnt++] = i;
@@ -3859,7 +4187,7 @@ static void do_cmd_knowledge_ego_items(void)
 	flag = FALSE;
 	redraw = TRUE;
 
-        while ((!flag) && (grp_cnt))
+	while ((!flag) && (grp_cnt))
 	{
 		char ch;
 
@@ -3867,7 +4195,7 @@ static void do_cmd_knowledge_ego_items(void)
 		{
 			clear_from(0);
 		
-                        prt("Knowledge - ego items", 2, 0);
+			prt("Knowledge - ego items", 2, 0);
 			prt("Group", 4, 0);
 			prt("Name", 4, max + 3);
 			prt("Sym", 4, 75);
@@ -3883,7 +4211,7 @@ static void do_cmd_knowledge_ego_items(void)
 			}
 
 			redraw = FALSE;
-		}                
+		}		
 
 		/* Scroll group list */
 		if (grp_cur < grp_top) grp_top = grp_cur;
@@ -3897,14 +4225,17 @@ static void do_cmd_knowledge_ego_items(void)
 		display_group_list(0, 6, max, BROWSER_ROWS, grp_idx, object_group_text, grp_cur, grp_top);
 
 		/* Get a list of objects in the current group */
-                object_cnt = collect_ego_items(grp_idx[grp_cur], object_idx);
+		object_cnt = collect_ego_items(grp_idx[grp_cur], object_idx);
 
 		/* Display a list of objects in the current group */
-                display_ego_item_list(max + 3, 6, BROWSER_ROWS, object_idx, object_cur, object_top);
+		display_ego_item_list(max + 3, 6, BROWSER_ROWS, object_idx, object_cur, object_top);
+
+		/* Get the current ego item */
+		e_ptr = &e_info[object_idx[object_cur]];
 
 		/* Prompt */
-                if (note_idx) prt("<dir>, 'r', '{', '}', 'c', 'p' to paste, ESC", 23,0);
-                else prt("<dir>, 'r' to recall, '{' to inscribe, '}', 'c' to copy, ESC", 23, 0);
+		if (note_idx) prt("<dir>, ENTER, '{', '}', 'c', 'p' to paste, ESC", 23,0);
+		else prt("<dir>, ENTER to recall, '{' to inscribe, '}', 'c' to copy, ESC", 23, 0);
 
 		if (!column)
 		{
@@ -3927,126 +4258,117 @@ static void do_cmd_knowledge_ego_items(void)
 
 			case 'R':
 			case 'r':
+			case '\n':
+			case '\r':
 			{
 				/* Recall on screen */
-                                desc_ego_fake(object_idx[object_cur]);
+				desc_ego_fake(object_idx[object_cur]);
 
 				redraw = TRUE;
 				break;
 			}
 
-                        case '{':
+			case '{':
 			{
-                                char note_text[80];
+				char note_text[80];
 
-                                ego_item_type *e_ptr = &e_info[object_idx[object_cur]];
+				/* Prompt */
+				prt("Inscribe with: ", 23, 0);
+	
+				/* Default note */
+				sprintf(note_text, "%s", quark_str(e_ptr->note));
+	
+				/* Get a filename */
+				if (!askfor_aux(note_text, 80)) continue;
+	
+				/* Set the inscription */
+				e_ptr->note = quark_add(note_text);
 
-                                /* Prompt */
-                                prt("Inscribe with: ", 23, 0);
-        
-                                /* Default note */
-                                sprintf(note_text, "%s", quark_str(e_ptr->note));
-        
-                                /* Get a filename */
-                                if (!askfor_aux(note_text, 80)) continue;
-        
-                                /* Set the inscription */
-                                e_ptr->note = quark_add(note_text);
+				/* Process objects */
+				for (i = 1; i < o_max; i++)
+				{
+					/* Get the object */
+					object_type *i_ptr = &o_list[i];
+		
+					/* Skip dead objects */
+					if (!i_ptr->k_idx) continue;
+		
+					/* Not matching ego item */
+					if (i_ptr->name2 != object_idx[object_cur]) continue;
+		
+					/* Already has note */
+					if (i_ptr->note) continue;
+		
+					/* Auto-inscribe */
+					if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = e_ptr->note;
 
-                                /* Process objects */
-                                for (i = 1; i < o_max; i++)
-                                {
-                                        /* Get the object */
-                                        object_type *i_ptr = &o_list[i];
-                
-                                        /* Skip dead objects */
-                                        if (!i_ptr->k_idx) continue;
-                
-                                        /* Not matching ego item */
-                                        if (i_ptr->name2 != object_idx[object_cur]) continue;
-                
-                                        /* Already has note */
-                                        if (i_ptr->note) continue;
-                
-                                        /* Auto-inscribe */
-                                        if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = e_ptr->note;
-
-                                }
-                
-                                redraw = TRUE;
-                                break;
+				}
+				break;
 			}
 
-                        case '}':
+			case '}':
 			{
-                                ego_item_type *e_ptr = &e_info[object_idx[object_cur]];
+				/* Set the inscription */
+				e_ptr->note = 0;
 
-                                /* Set the inscription */
-                                e_ptr->note = 0;
+				/* Process objects */
+				for (i = 1; i < o_max; i++)
+				{
+					/* Get the object */
+					object_type *i_ptr = &o_list[i];
+		
+					/* Skip dead objects */
+					if (!i_ptr->k_idx) continue;
+		
+					/* Not matching ego item */
+					if (i_ptr->name2 != object_idx[object_cur]) continue;
+		
+					/* Auto-inscribe */
+					if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = 0;
 
-                                /* Process objects */
-                                for (i = 1; i < o_max; i++)
-                                {
-                                        /* Get the object */
-                                        object_type *i_ptr = &o_list[i];
-                
-                                        /* Skip dead objects */
-                                        if (!i_ptr->k_idx) continue;
-                
-                                        /* Not matching ego item */
-                                        if (i_ptr->name2 != object_idx[object_cur]) continue;
-                
-                                        /* Auto-inscribe */
-                                        if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = 0;
-
-                                }
-                
-                                redraw = TRUE;
-                                break;
+				}
+				break;
 			}
 
-                        case 'C':
-                        case 'c':
-                        {
-                                /* Set the note */
-                                note_idx = e_info[object_idx[object_cur]].note;
+			case 'C':
+			case 'c':
+			{
+				/* Set the note */
+				note_idx = e_ptr->note;
 
-                                redraw = TRUE;
-                                break;
-                        }
+				break;
+			}
 
-                        case 'P':
-                        case 'p':
-                        {
-                                if (note_idx)
-                                {
-                                        /* Set the note */
-                                        e_info[object_idx[object_cur]].note = note_idx;
-        
-                                        /* Process objects */
-                                        for (i = 1; i < o_max; i++)
-                                        {
-                                                /* Get the object */
-                                                object_type *i_ptr = &o_list[i];
-                        
-                                                /* Skip dead objects */
-                                                if (!i_ptr->k_idx) continue;
-                        
-                                                /* Not matching ego item */
-                                                if (i_ptr->name2 != object_idx[object_cur]) continue;
-                        
-                                                /* Already has note */
-                                                if (i_ptr->note) continue;
-                        
-                                                /* Auto-inscribe */
-                                                if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = note_idx;
-        
-                                        }
-                
-                                        redraw = TRUE;
-                                }
-                                break;
-                        }
+			case 'P':
+			case 'p':
+			{
+				if (note_idx)
+				{
+					/* Set the note */
+					e_ptr->note = note_idx;
+	
+					/* Process objects */
+					for (i = 1; i < o_max; i++)
+					{
+						/* Get the object */
+						object_type *i_ptr = &o_list[i];
+			
+						/* Skip dead objects */
+						if (!i_ptr->k_idx) continue;
+			
+						/* Not matching ego item */
+						if (i_ptr->name2 != object_idx[object_cur]) continue;
+			
+						/* Already has note */
+						if (i_ptr->note) continue;
+			
+						/* Auto-inscribe */
+						if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = note_idx;
+	
+					}
+				}
+				break;
+			}
 
 			default:
 			{
@@ -4057,11 +4379,11 @@ static void do_cmd_knowledge_ego_items(void)
 		}
 	}
 
-        /* Prompt */
-        if (!grp_cnt)  prt("No ego items known.", 14, 0);
+	/* Prompt */
+	if (!grp_cnt)  msg_print("No ego items known.");
 
 	/* XXX XXX Free the "object_idx" array */
-        FREE(object_idx);
+	FREE(object_idx);
 }
 
 
@@ -4082,35 +4404,31 @@ static void display_object_list(int col, int row, int per_page, int object_idx[]
 		/* Access the object */
 		object_kind *k_ptr = &k_info[k_idx];
 
-                char o_name[80];
+		char o_name[80];
 
 		/* Choose a color */
 		byte attr = ((k_ptr->aware) ? TERM_WHITE : TERM_SLATE);
 		byte cursor = ((k_ptr->aware) ? TERM_L_BLUE : TERM_BLUE);
 
-
+		byte a = (k_ptr->flavor && !k_ptr->aware)? x_info[k_ptr->flavor].x_attr:
+				k_ptr->x_attr;
+		byte c = k_ptr->x_char;
+	
 		attr = ((i + object_top == object_cur) ? cursor : attr);
 
-                /* Tidy name */
-                strip_name(o_name,k_idx);
+		/* Tidy name */
+		strip_name(o_name,k_idx);
 
-                /* Display the name */
-                c_prt(attr, o_name, row + i, col);
+		/* Display the name */
+		c_prt(attr, o_name, row + i, col);
 
-                if (k_ptr->note)
-                {
-                        c_prt(TERM_YELLOW,quark_str(k_ptr->note), row+i, 65);
-                }
-
-		if (k_ptr->aware)
+		if (k_ptr->note && (k_ptr->aware || !k_ptr->flavor))
 		{
-			byte a = (k_ptr->flavor)? x_info[k_ptr->flavor].x_attr:
-				k_ptr->x_attr;
-			byte c = k_ptr->x_char;
-	
-			/* Display symbol */
-			Term_putch(76, row + i, a, c);
+			c_prt(TERM_YELLOW,quark_str(k_ptr->note), row+i, 65);
 		}
+
+		/* Display symbol */
+		Term_putch(76, row + i, a, c);
 	}
 
 	/* Clear remaining lines */
@@ -4138,7 +4456,7 @@ static void desc_obj_fake(int k_idx)
 	object_prep(o_ptr, k_idx);
 
 	/* It's fully know */
-	o_ptr->ident |= IDENT_KNOWN;
+	if (!k_info[k_idx].flavor) object_known_store(o_ptr);
 
 	/* Track the object */
 	object_actual_track(o_ptr);
@@ -4149,8 +4467,18 @@ static void desc_obj_fake(int k_idx)
 	/* Hack -- Handle stuff */
 	handle_stuff();
 
+	/* Save the screen */
+	screen_save();
+
+	/* Describe */
 	screen_object(o_ptr, FALSE);
+
+	/* Load the screen */
+	screen_load();
+
+	(void)inkey();
 }
+
 
 /*
  * Display known objects
@@ -4168,7 +4496,19 @@ static void do_cmd_knowledge_objects(void)
 	bool flag;
 	bool redraw;
 
-        int note_idx = 0;
+	bool visual_list = FALSE;
+	byte attr_top = 0;
+	char char_left = 0;
+	byte attr_idx = 0;
+	char char_idx = 0;
+	byte attr_old = 0;
+	char char_old = 0;
+
+	int note_idx = 0;
+
+	object_kind *k_ptr;
+	byte *x_attr;
+	char *x_char;
 
 	/* Allocate the "object_idx" array */
 	C_MAKE(object_idx, z_info->k_max, int);
@@ -4185,10 +4525,10 @@ static void do_cmd_knowledge_objects(void)
 		/* Save the maximum length */
 		if (len > max) max = len;
 
-		/* See if any monsters are known */
-		if (collect_objects(i, object_idx))
+		/* See if any objects are known */
+		if (collect_objects(i, object_idx, 0x01))
 		{
-			/* Build a list of groups with known monsters */
+			/* Build a list of groups with known objects */
 			grp_idx[grp_cnt++] = i;
 		}
 	}
@@ -4203,7 +4543,7 @@ static void do_cmd_knowledge_objects(void)
 	flag = FALSE;
 	redraw = TRUE;
 
-        while ((!flag) && (grp_cnt))
+	while ((!flag) && (grp_cnt))
 	{
 		char ch;
 
@@ -4241,14 +4581,37 @@ static void do_cmd_knowledge_objects(void)
 		display_group_list(0, 6, max, BROWSER_ROWS, grp_idx, object_group_text, grp_cur, grp_top);
 
 		/* Get a list of objects in the current group */
-		object_cnt = collect_objects(grp_idx[grp_cur], object_idx);
+		object_cnt = collect_objects(grp_idx[grp_cur], object_idx,0x00);
 
 		/* Display a list of objects in the current group */
 		display_object_list(max + 3, 6, BROWSER_ROWS, object_idx, object_cur, object_top);
 
+		/* Get the current object kind */
+		k_ptr = &k_info[object_idx[object_cur]];
+
+		/* Get the 'correct' attr/char */
+		if (k_ptr->flavor && !k_ptr->aware)
+		{
+			x_attr = &x_info[k_ptr->flavor].x_attr;
+			x_char = &x_info[k_ptr->flavor].x_char;
+		}
+		else
+		{
+			x_attr = &k_ptr->x_attr;
+			x_char = &k_ptr->x_char;
+		}		
+
+		/* Display visual list below first object */
+		if (visual_list) display_visual_list(max + 3, 7, BROWSER_ROWS-1, *x_attr, attr_top, *x_attr, char_left);
+
 		/* Prompt */
-                if (note_idx) prt("<dir>, 'r', '{', '}', 'c', 'p' to paste, ESC", 23,0);
-                else prt("<dir>, 'r' to recall, '{' to inscribe, '}', 'c' to copy, ESC", 23, 0);
+		if (visual_list && (attr_idx || char_idx)) prt("<dir>, ENTER to accept, 'c', 'p' to paste, ESC",23,0);
+		else if (visual_list) prt("<dir>, ENTER to accept, 'c' to copy, ESC",23,0);
+		else if (attr_idx || char_idx) prt("<dir>, ENTER to recall, 'c', 'p' to paste visual, 'v', ESC",23,0);
+		else if (note_idx && (k_ptr->aware || !k_ptr->flavor)) prt("<dir>, ENTER, '{', '}', 'c', 'p' to paste inscrip, 'v' for visuals, ESC", 23,0);
+		else if (note_idx) prt("<dir>, ENTER, 'c', 'p' to paste inscrip, 'v' for visuals, ESC", 23,0);
+		else if (k_ptr->aware || !k_ptr->flavor) prt("<dir>, ENTER to recall, '{' to inscribe, '}', 'c' to copy, 'v' for visuals, ESC", 23, 0);
+		else prt("<dir>, ENTER to recall, 'c' to copy, 'v' for visuals, ESC", 23, 0);
 
 		/* Mega Hack -- track this monster race */
 		if (object_cnt) object_kind_track(object_idx[object_cur]);
@@ -4263,7 +4626,12 @@ static void do_cmd_knowledge_objects(void)
 			object_old = object_idx[object_cur];
 		}
 
-		if (!column)
+		if (visual_list)
+		{
+			/* Place the cursor */
+			Term_gotoxy(max + 3 + (*x_char - char_left), 7 + (*x_attr + - attr_top));
+		}
+		else if (!column)
 		{
 			Term_gotoxy(0, 6 + (grp_cur - grp_top));
 		}
@@ -4278,149 +4646,631 @@ static void do_cmd_knowledge_objects(void)
 		{
 			case ESCAPE:
 			{
-				flag = TRUE;
+				if (visual_list)
+				{
+					/* Reset the visuals */
+					*x_attr = attr_old;
+					*x_char = char_old;
+
+					visual_list = FALSE;
+				}
+				else
+				{
+					flag = TRUE;
+				}
 				break;
 			}
 
 			case 'R':
 			case 'r':
+			case '\n':
+			case '\r':
 			{
-				/* Recall on screen */
-				desc_obj_fake(object_idx[object_cur]);
-
-				redraw = TRUE;
+				if (visual_list)
+				{
+					visual_list = FALSE;
+				}
+				else
+				{
+					/* Recall on screen */
+					desc_obj_fake(object_idx[object_cur]);
+					redraw = TRUE;
+				}
 				break;
 			}
 
-                        case '{':
+			case 'V':
+			case 'v':
 			{
-                                char note_text[80];
+				if (!visual_list)
+				{
+					visual_list = TRUE;
 
-                                object_kind *k_ptr = &k_info[object_idx[object_cur]];
+					attr_top = MAX(0, *x_attr - 5);
+					char_left = MAX(-128, *x_char - 10);
 
-                                /* Prompt */
-                                prt("Inscribe with: ", 23, 0);
-        
-                                /* Default note */
-                                sprintf(note_text, "%s", quark_str(k_ptr->note));
-        
-                                /* Get a filename */
-                                if (!askfor_aux(note_text, 80)) continue;
-        
-                                /* Set the inscription */
-                                k_ptr->note = quark_add(note_text);
+					attr_old = *x_attr;
+					char_old = *x_char;
 
-                                /* Process objects */
-                                for (i = 1; i < o_max; i++)
-                                {
-                                        /* Get the object */
-                                        object_type *i_ptr = &o_list[i];
-                
-                                        /* Skip dead objects */
-                                        if (!i_ptr->k_idx) continue;
-                
-                                        /* Not matching ego item */
-                                        if (i_ptr->k_idx != object_idx[object_cur]) continue;
-                
-                                        /* Already has note */
-                                        if (i_ptr->note) continue;
-                
-                                        /* Auto-inscribe */
-                                        if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = k_ptr->note;
+					object_top = object_cur;
 
-                                }
-                
-                                redraw = TRUE;
-                                break;
+					note_idx = 0;
+				}
+				break;
 			}
 
-                        case '}':
+			case '{':
 			{
-                                object_kind *k_ptr = &k_info[object_idx[object_cur]];
+				char note_text[80];
 
-                                /* Set the inscription */
-                                k_ptr->note = 0;
+				if (!visual_list && (k_ptr->aware || !k_ptr->flavor))
+				{
 
-                                /* Process objects */
-                                for (i = 1; i < o_max; i++)
-                                {
-                                        /* Get the object */
-                                        object_type *i_ptr = &o_list[i];
-                
-                                        /* Skip dead objects */
-                                        if (!i_ptr->k_idx) continue;
-                
-                                        /* Not matching ego item */
-                                        if (i_ptr->k_idx != object_idx[object_cur]) continue;
-                
-                                        /* Auto-inscribe */
-                                        i_ptr->note = 0;
-                                }
-                
-                                redraw = TRUE;
-                                break;
+					/* Prompt */
+					prt("Inscribe with: ", 23, 0);
+	
+					/* Default note */
+					sprintf(note_text, "%s", quark_str(k_ptr->note));
+	
+					/* Get a filename */
+					if (!askfor_aux(note_text, 80)) continue;
+	
+					/* Set the inscription */
+					k_ptr->note = quark_add(note_text);
+
+					/* Process objects */
+					for (i = 1; i < o_max; i++)
+					{
+						/* Get the object */
+						object_type *i_ptr = &o_list[i];
+
+						/* Skip dead objects */
+						if (!i_ptr->k_idx) continue;
+
+						/* Not matching ego item */
+						if (i_ptr->k_idx != object_idx[object_cur]) continue;
+
+						/* Already has note */
+						if (i_ptr->note) continue;
+		
+						/* Auto-inscribe */
+						if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = k_ptr->note;
+					}
+				}
+				break;
 			}
 
-                        case 'C':
-                        case 'c':
-                        {
-                                /* Set the note */
-                                note_idx = k_info[object_idx[object_cur]].note;
+			case '}':
+			{
+				if (!visual_list && (k_ptr->aware || !k_ptr->flavor))
+				{
+					/* Set the inscription */
+					k_ptr->note = 0;
 
-                                redraw = TRUE;
-                                break;
-                        }
+					/* Process objects */
+					for (i = 1; i < o_max; i++)
+					{
+						/* Get the object */
+						object_type *i_ptr = &o_list[i];
+		
+						/* Skip dead objects */
+						if (!i_ptr->k_idx) continue;
+		
+						/* Not matching ego item */
+						if (i_ptr->k_idx != object_idx[object_cur]) continue;
+		
+						/* Auto-inscribe */
+						i_ptr->note = 0;
+					}
+				}
+				break;
+			}
 
-                        case 'P':
-                        case 'p':
-                        {
-                                if (note_idx)
-                                {
-                                        /* Set the note */
-                                        k_info[object_idx[object_cur]].note = note_idx;
-        
-                                        redraw = TRUE;
+			case 'C':
+			case 'c':
+			{
+				if (visual_list)
+				{
+					/* Clear the buffer */
+					note_idx = 0;
 
-                                        /* Process objects */
-                                        for (i = 1; i < o_max; i++)
-                                        {
-                                                /* Get the object */
-                                                object_type *i_ptr = &o_list[i];
-                        
-                                                /* Skip dead objects */
-                                                if (!i_ptr->k_idx) continue;
-                        
-                                                /* Not matching ego item */
-                                                if (i_ptr->k_idx != object_idx[object_cur]) continue;
+					attr_idx = *x_attr;
+					char_idx = *x_char;
+				}
+				else
+				{
+					/* Set the note */
+					note_idx = k_ptr->note;
 
-                                                /* Already has note */
-                                                if (i_ptr->note) continue;
-                        
-                                                /* Auto-inscribe */
-                                                if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = note_idx;
+					/* Clear the buffer */
+					char_idx = 0;
+					attr_idx = 0;
+				}
+				break;
+			}
 
+			case 'P':
+			case 'p':
+			{
+				if (attr_idx)
+				{
+					*x_attr = attr_idx;
+					attr_top = MAX(0, *x_attr - 5);
+				}
 
-                                        }
-                
-                                }
-                                break;
-                        }
+				if (char_idx)
+				{
+					*x_char = char_idx;
+					char_left = MAX(-128, *x_char - 10);
+				}
+
+				if (note_idx)
+				{
+					/* Set the note */
+					k_ptr->note = note_idx;
+	
+					/* Process objects */
+					for (i = 1; i < o_max; i++)
+					{
+						/* Get the object */
+						object_type *i_ptr = &o_list[i];
+			
+						/* Skip dead objects */
+						if (!i_ptr->k_idx) continue;
+			
+						/* Not matching ego item */
+						if (i_ptr->k_idx != object_idx[object_cur]) continue;
+
+						/* Already has note */
+						if (i_ptr->note) continue;
+			
+						/* Auto-inscribe */
+						if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = note_idx;
+					}
+		
+				}
+				break;
+			}
 
 			default:
 			{
-				/* Move the cursor */
-				browser_cursor(ch, &column, &grp_cur, grp_cnt, &object_cur, object_cnt);
+				if (visual_list)
+				{
+					int d = target_dir(ch);
+
+					if ((*x_attr== 0) && (ddy[d] < 0)) d = 0;
+					if ((*x_char== -128) && (ddx[d] < 0)) d = 0;
+					if ((*x_attr== 255) && (ddy[d] > 0)) d = 0;
+					if ((*x_char== 127) && (ddx[d] > 0)) d = 0;
+
+					*x_attr += ddy[d];
+					*x_char += ddx[d];
+
+					/* Move the frame */
+					if ((char_left > -128) && (ddx[d] < 0) && (*x_char < 117)) char_left += ddx[d];
+					if ((char_left < 127 - SCREEN_WID + max + 4) && (ddx[d] > 0) && (*x_char > -118)) char_left += ddx[d];
+					if ((attr_top > 0) && (ddy[d] < 0) && (*x_attr < 250)) attr_top += ddy[d];
+					if ((attr_top < 255 - BROWSER_ROWS + 2) && (ddy[d] > 0) && (*x_attr > 5)) attr_top += ddy[d];
+				}
+				else
+				{
+					/* Move the cursor */
+					browser_cursor(ch, &column, &grp_cur, grp_cnt, &object_cur, object_cnt);
+				}
 				break;
 			}
 		}
 	}
 
-        /* Prompt */
-        if (!grp_cnt) prt("No object kinds known.", 14, 0);
+	/* Prompt */
+	if (!grp_cnt) prt("No object kinds known.", 14, 0);
 
 	/* XXX XXX Free the "object_idx" array */
-        FREE(object_idx);
+	FREE(object_idx);
 }
+
+/*
+ * Description of each feature group.
+ */
+static cptr feature_group_text[] = 
+{
+	"Hidden Features",
+	"Useful Terrain",
+	"Pickable Terrain",
+	"Floors",
+	"Traps",
+	"Doors",
+	"Stairs",
+	"Walls",
+	"Streamers",
+	"Stores",
+	"Chests",
+	"Furnishings",
+	"Bridges",
+	"Water",
+	"Waves",
+	"Lava",
+	"Ice",
+	"Acid",
+	"Oil",
+	"Chasms",
+	"Mud/Earth",
+	"Ground",
+	"Trees",
+	"Cover",
+	"Clouds",
+	NULL
+};
+
+/*
+ * Flags of features in each group.
+ */
+static u32b feature_group_flag[] = 
+{
+	FF1_SECRET, 0, 0,
+	0, 0, FF3_USE_FEAT,
+	0, 0, FF3_GET_FEAT,
+	FF1_FLOOR, 0, 0,
+	FF1_TRAP, 0, 0,
+	FF1_DOOR, 0, 0,
+	FF1_STAIRS, 0, 0,
+	FF1_WALL, 0, 0,
+	FF1_STREAMER, 0, 0,
+	FF1_ENTER, 0, 0,
+	0, 0, FF3_CHEST,
+	0, 0, FF3_ALLOC,
+	0, FF2_BRIDGED, 0,
+	0, FF2_WATER, 0,
+	0, 0, FF3_INSTANT | FF3_EXPLODE,
+	0, FF2_LAVA, 0,
+	0, FF2_ICE, 0,
+	0, FF2_ACID, 0,
+	0, FF2_OIL, 0,
+	0, FF2_CHASM, 0,
+	0, FF2_CAN_DIG, 0,
+	0, 0, FF3_GROUND,
+	0, 0, FF3_TREE,
+	0, 0, FF3_CAN_HIDE,
+	0, 0, FF3_SPREAD | FF3_STRIKE,
+	0,0,0
+};
+
+/*
+ * Build a list of feature indexes in the given group. Return the number
+ * of features in the group.
+ */
+static int collect_features(int grp_cur, int *feat_idx)
+{
+	int i, feat_cnt = 0;
+
+	u32b flags1 = feature_group_flag[grp_cur*3+0];
+	u32b flags2 = feature_group_flag[grp_cur*3+1];
+	u32b flags3 = feature_group_flag[grp_cur*3+2];
+
+	/* Check every feature */
+	for (i = 0; i < z_info->f_max; i++)
+	{
+		/* Access the race */
+		feature_type *f_ptr = &f_info[i];
+
+		/* Skip empty race */
+		if (!f_ptr->name) continue;
+
+		/* Check for any flags matching in the group */
+		if (f_ptr->flags1 & (flags1))
+		{
+			/* Add the race */
+			feat_idx[feat_cnt++] = i;
+		}
+
+		/* Check for any flags matching in the group */
+		else if (f_ptr->flags2 & (flags2))
+		{
+			/* Add the race */
+			feat_idx[feat_cnt++] = i;
+		}
+
+		/* Check for any flags matching in the group */
+		else if (f_ptr->flags3 & (flags3))
+		{
+			/* Add the race */
+			feat_idx[feat_cnt++] = i;
+		}
+	}
+
+	/* Terminate the list */
+	feat_idx[feat_cnt] = 0;
+
+	/* Return the number of races */
+	return feat_cnt;
+}
+
+/*
+ * Display the features in a group.
+ */
+static void display_feature_list(int col, int row, int per_page, int *feat_idx,
+	int feat_cur, int feat_top)
+{
+	int i;
+
+	/* Display lines until done */
+	for (i = 0; i < per_page && feat_idx[i]; i++)
+	{
+		byte attr;
+
+		/* Get the race index */
+		int f_idx = feat_idx[feat_top + i];
+
+		/* Access the race */
+		feature_type *f_ptr = &f_info[f_idx];
+
+		/* Choose a color */
+		attr = ((i + feat_top == feat_cur) ? TERM_L_BLUE : TERM_WHITE);
+
+		/* Display the name */
+		c_prt(attr, f_name + f_ptr->name, row + i, col);
+
+		/* Display symbol */
+		Term_putch(68, row + i, f_ptr->x_attr, f_ptr->x_char);
+
+	}
+
+	/* Clear remaining lines */
+	for (; i < per_page; i++)
+	{
+		Term_erase(col, row + i, 255);
+	}
+}
+
+
+/*
+ * Interact with feature visuals.
+ */
+static void do_cmd_knowledge_features(void)
+{
+	int i, len, max;
+	int grp_cur, grp_top;
+	int feat_cur, feat_top;
+	int grp_cnt, grp_idx[100];
+	int feat_cnt;
+	int *feat_idx;
+	
+	int column = 0;
+	bool flag;
+	bool redraw;
+
+	bool visual_list = FALSE;
+	byte attr_top = 0;
+	char char_left = 0;
+	byte attr_idx = 0;
+	char char_idx = 0;
+	byte attr_old = 0;
+	char char_old = 0;
+
+	feature_type *f_ptr;
+
+	/* Allocate the "feat_idx" array */
+	C_MAKE(feat_idx, z_info->f_max, int);
+
+	max = 0;
+	grp_cnt = 0;
+
+	/* Check every group */
+	for (i = 0; feature_group_text[i] != NULL; i++)
+	{
+		/* Measure the label */
+		len = strlen(feature_group_text[i]);
+
+		/* Save the maximum length */
+		if (len > max) max = len;
+
+		/* See if any features are known */
+		if (collect_features(i, feat_idx))
+		{
+			/* Build a list of groups with known features */
+			grp_idx[grp_cnt++] = i;
+		}
+	}
+
+	/* Terminate the list */
+	grp_idx[grp_cnt] = -1;
+
+	grp_cur = grp_top = 0;
+	feat_cur = feat_top = 0;
+
+	flag = FALSE;
+	redraw = TRUE;
+
+	while ((!flag) && (grp_cnt))
+	{
+		char ch;
+
+		if (redraw)
+		{
+			clear_from(0);
+		
+			prt("Visuals - features", 2, 0);
+			prt("Group", 4, 0);
+			prt("Name", 4, max + 3);
+			prt("Sym", 4, 67);
+
+			for (i = 0; i < 78; i++)
+			{
+				Term_putch(i, 5, TERM_WHITE, '=');
+			}
+
+			for (i = 0; i < BROWSER_ROWS; i++)
+			{
+				Term_putch(max + 1, 6 + i, TERM_WHITE, '|');
+			}
+
+			redraw = FALSE;
+		}
+
+		/* Scroll group list */
+		if (grp_cur < grp_top) grp_top = grp_cur;
+		if (grp_cur >= grp_top + BROWSER_ROWS) grp_top = grp_cur - BROWSER_ROWS + 1;
+
+		/* Scroll feature list */
+		if (feat_cur < feat_top) feat_top = feat_cur;
+		if (feat_cur >= feat_top + BROWSER_ROWS) feat_top = feat_cur - BROWSER_ROWS + 1;
+
+		/* Display a list of feature groups */
+		display_group_list(0, 6, max, BROWSER_ROWS, grp_idx, feature_group_text, grp_cur, grp_top);
+
+		/* Get a list of features in the current group */
+		feat_cnt = collect_features(grp_idx[grp_cur], feat_idx);
+
+		/* Display a list of features in the current group */
+		display_feature_list(max + 3, 6, BROWSER_ROWS, feat_idx, feat_cur, feat_top);
+
+		/* Get the current feature */
+		f_ptr = &f_info[feat_idx[feat_cur]];
+
+		/* Display visual list below first monster */
+		if (visual_list) display_visual_list(max + 3, 7, BROWSER_ROWS-1, f_ptr->x_attr, attr_top, f_ptr->x_char, char_left);
+
+		/* Prompt */
+		if (visual_list && (attr_idx || char_idx)) prt("<dir>, ENTER to accept, 'c', 'p' to paste ESC",23,0);
+		else if (visual_list) prt("<dir>, ENTER to accept, 'c' to copy, ESC",23,0);
+		else if ((attr_idx || char_idx)) prt("<dir>, 'v' for visuals, 'p' to paste, ESC", 23, 0);
+		else prt("<dir>, 'v' for visuals, ESC", 23, 0);
+
+		if (visual_list)
+		{
+			/* Place the cursor */
+			Term_gotoxy(max + 3 + (f_ptr->x_char - char_left), 7 + (f_ptr->x_attr - attr_top));
+		}
+		else if (!column)
+		{
+			Term_gotoxy(0, 6 + (grp_cur - grp_top));
+		}
+		else
+		{
+			Term_gotoxy(max + 3, 6 + (feat_cur - feat_top));
+		}
+	
+		ch = inkey();
+
+		switch (ch)
+		{
+			case ESCAPE:
+			{
+				if (visual_list)
+				{
+					f_ptr->x_attr = attr_old;
+					f_ptr->x_char = char_old;					
+
+					visual_list = FALSE;
+				}
+				else
+				{
+					flag = TRUE;
+				}
+				break;
+			}
+
+			case 'R':
+			case 'r':
+			case '\n':
+			case '\r':
+			{
+				if (visual_list)
+				{
+					visual_list = FALSE;
+				}
+				break;
+			}
+
+			case 'V':
+			case 'v':
+			{
+				if (!visual_list)
+				{
+					visual_list = TRUE;
+
+					attr_top = MAX(0, f_ptr->x_attr - 5);
+					char_left = MAX(-128, f_ptr->x_char - 10);
+
+					attr_old = f_ptr->x_attr;
+					char_old = f_ptr->x_char;
+
+					feat_top = feat_cur;
+				}
+				break;
+			}
+
+			case 'C':
+			case 'c':
+			{
+				if (visual_list)
+				{
+					/* Set the visual */
+					attr_idx = f_ptr->x_attr;
+					char_idx = f_ptr->x_char;
+				}
+				break;
+			}
+
+			case 'P':
+			case 'p':
+			{
+				if (attr_idx)
+				{
+					/* Set the char */
+					f_ptr->x_attr = attr_idx;
+					attr_top = MAX(0, f_ptr->x_attr - 5);
+				}
+
+				if (char_idx)
+				{
+					/* Set the char */
+					f_ptr->x_char = char_idx;
+					char_left = MAX(-128, f_ptr->x_char - 10);
+				}
+				break;
+			}
+
+			default:
+			{
+				if (visual_list)
+				{
+					int d = target_dir(ch);
+
+					/* Restrict direction */
+					if ((f_ptr->x_attr== 0) && (ddy[d] < 0)) d = 0;
+					if ((f_ptr->x_char== -128) && (ddx[d] < 0)) d = 0;
+					if ((f_ptr->x_attr== 255) && (ddy[d] > 0)) d = 0;
+					if ((f_ptr->x_char== 127) && (ddx[d] > 0)) d = 0;
+
+					/* Set the visual */
+					f_ptr->x_attr += ddy[d];
+					f_ptr->x_char += ddx[d];
+
+					/* Move the frame */
+					if ((char_left > -128) && (ddx[d] < 0) && (f_ptr->x_char < 117)) char_left += ddx[d];
+					if ((char_left < 127 - SCREEN_WID + max + 4) && (ddx[d] > 0) && (f_ptr->x_char > -118)) char_left += ddx[d];
+					if ((attr_top > 0) && (ddy[d] < 0) && (f_ptr->x_attr < 250)) attr_top += ddy[d];
+					if ((attr_top < 255 - BROWSER_ROWS + 2) && (ddy[d] > 0) && (f_ptr->x_attr > 5)) attr_top += ddy[d];
+				}
+				else
+				{
+					/* Move the cursor */
+					browser_cursor(ch, &column, &grp_cur, grp_cnt, &feat_cur, feat_cnt);
+				}
+				break;
+			}
+		}
+	}
+
+	/* Prompt */
+	if (!grp_cnt) msg_print("No features known.");
+
+	/* XXX XXX Free the "feat_idx" array */
+	FREE(feat_idx);
+}
+
+
 
 /*
  * Display contents of the Home. Code taken from the player death interface 
@@ -4497,14 +5347,15 @@ void do_cmd_knowledge(void)
 		/* Give some choices */
 		prt("(1) Display known artifacts", 4, 5);
 		prt("(2) Display known monsters", 5, 5);
-                prt("(3) Display known ego-items", 6, 5);
-                prt("(4) Display known objects", 7, 5);
-                prt("(5) Display contents of your home", 8, 5);
-                prt("(6) Load a user pref file", 9, 5);
-                prt("(7) Dump auto-inscriptions", 10, 5);
+		prt("(3) Display known ego-items", 6, 5);
+		prt("(4) Display known objects", 7, 5);
+		prt("(5) Display known features", 8, 5);
+		prt("(6) Display contents of your home", 9, 5);
+		prt("(7) Load a user pref file", 10, 5);
+		prt("(8) Dump auto-inscriptions", 11, 5);
 
 		/* Prompt */
-                prt("Command: ", 12, 0);
+		prt("Command: ", 13, 0);
 
 		/* Prompt */
 		ch = inkey();
@@ -4526,32 +5377,39 @@ void do_cmd_knowledge(void)
 			do_cmd_knowledge_monsters();
 		}
 
-                /* Ego Items */
-                else if (ch == '3')
+		/* Ego Items */
+		else if (ch == '3')
 		{
 			/* Spawn */
-                        do_cmd_knowledge_ego_items();
+			do_cmd_knowledge_ego_items();
 		}
 
 		/* Objects */
-                else if (ch == '4')
+		else if (ch == '4')
 		{
 			/* Spawn */
-                        do_cmd_knowledge_objects();
+			do_cmd_knowledge_objects();
+		}
+
+		/* Features */
+		else if (ch == '5')
+		{
+			/* Spawn */
+			do_cmd_knowledge_features();
 		}
 
 		/* Home */
-                else if (ch == '5')
+		else if (ch == '6')
 		{
 			/* Spawn */
 			do_cmd_knowledge_home();
 		}
 
 		/* Load a user pref file */
-                else if (ch == '6')
+		else if (ch == '7')
 		{
 			/* Ask for and load a user pref file */
-                        do_cmd_pref_file_hack(12);
+			do_cmd_pref_file_hack(13);
 
 			/* Could skip the following if loading cancelled XXX XXX XXX */
 
@@ -4560,15 +5418,15 @@ void do_cmd_knowledge(void)
 		}
 
 		/* Dump colors */
-                else if (ch == '7')
+		else if (ch == '8')
 		{
-                        char ftmp[80];
+			char ftmp[80];
 
 			/* Prompt */
-                        prt("Command: Dump auto-inscriptions", 12, 0);
+			prt("Command: Dump auto-inscriptions", 13, 0);
 
 			/* Prompt */
-                        prt("File: ", 14, 0);
+			prt("File: ", 15, 0);
 
 			/* Default filename */
 			sprintf(ftmp, "%s.prf", op_ptr->base_name);
@@ -4580,14 +5438,14 @@ void do_cmd_knowledge(void)
 			safe_setuid_drop();
 
 			/* Dump the macros */
-                        (void)autos_dump(ftmp);
+			(void)autos_dump(ftmp);
 
 			/* Grab priv's */
 			safe_setuid_grab();
    
 			/* Message */
-                        msg_print("Appended auto-inscriptions.");
-                }                                                
+			msg_print("Appended auto-inscriptions.");
+		}						
 		/* Unknown option */
 		else
 		{

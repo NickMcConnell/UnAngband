@@ -4804,11 +4804,6 @@ static void init_stuff(void)
 	validate_dir(ANGBAND_DIR_BONE);
 	validate_dir(ANGBAND_DIR_DATA);
 	validate_dir(ANGBAND_DIR_EDIT);
-
-#ifdef USE_SCRIPT
-	validate_dir(ANGBAND_DIR_SCRIPT);
-#endif /* USE_SCRIPT */
-
 	validate_dir(ANGBAND_DIR_FILE);
 	validate_dir(ANGBAND_DIR_HELP);
 	validate_dir(ANGBAND_DIR_INFO);

@@ -370,6 +370,14 @@ u16b *temp_g;
 byte *temp_y;
 byte *temp_x;
 
+/*
+ * Arrays[DYNA_MAX] used for various things
+ */
+sint dyna_n = 0;
+u16b *dyna_g;
+byte dyna_cent_y;
+byte dyna_cent_x;
+bool dyna_full;
 
 /*
  * Array[DUNGEON_HGT][256] of cave grid info flags (padded)
@@ -894,12 +902,17 @@ bool (*get_feat_num_hook)(int f_idx);
 
 
 /*
- * Hack -- function hook to restrict "get_feat_num_prep()" function
+ * Hack -- File hundle for output used within the text_out_to_file()
  */
 FILE *text_out_file = NULL;
 
 /*
- * Hack -- function hook to restrict "get_feat_num_prep()" function
+ * Hack -- Indent number used within the text_out_to_file()
+ */
+int text_out_indent = 0;
+
+/*
+ * Hack -- function hook for text_out()
  */
 void (*text_out_hook)(byte a, cptr str);
 

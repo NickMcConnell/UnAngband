@@ -125,6 +125,7 @@ static bool wearable_p(const object_type *o_ptr)
 		case TV_HAFTED:
 		case TV_POLEARM:
 		case TV_SWORD:
+                case TV_INSTRUMENT:
 		case TV_STAFF:
 		case TV_BOOTS:
 		case TV_GLOVES:
@@ -407,7 +408,7 @@ static errr rd_item(object_type *o_ptr)
 		artifact_type *a_ptr;
 
 		/* Paranoia */
-		if (o_ptr->name1 >= z_info->a_max) return (-1);
+		if (o_ptr->name1 >= 256) return (-1);
 
 		/* Obtain the artifact info */
 		a_ptr = &a_info[o_ptr->name1];
@@ -747,6 +748,15 @@ static void rd_options(void)
 	u32b window_flag[ANGBAND_TERM_MAX];
 	u32b window_mask[ANGBAND_TERM_MAX];
 
+        /* Hack -- unset all Save File Options for compatibility */
+	for (i = 0; i < OPT_PAGE_PER; i++)
+	{
+		/* Collect options on this "page" */
+		if (option_page[8][i] != 255)
+		{
+			op_ptr->opt[option_page[8][i]] = FALSE;
+		}
+	}
 
 	/*** Oops ***/
 
@@ -1347,8 +1357,7 @@ static errr rd_inventory(void)
 		}
 
 		/* Warning -- backpack is full */
-		else if ((p_ptr->inven_cnt > INVEN_PACK) ||
-		(!(variant_belt_slot) && (p_ptr->inven_cnt == INVEN_PACK)))
+		else if (p_ptr->inven_cnt == INVEN_PACK)
 		{
 			/* Oops */
 			note("Too many items in the inventory!");
@@ -1518,6 +1527,8 @@ u16b limit;
 		}
 	}
 
+	/* Hack -- not fully dynamic */
+	dyna_full = FALSE;
 
 	/*** Run length decoding ***/
 
@@ -1549,6 +1560,21 @@ u16b limit;
 				cave_info[y][x] |= (CAVE_WALL);
 			}
 
+			/* Handle dynamic grids */
+			if (f_info[cave_feat[y][x]].flags3 & (FF3_DYNAMIC_MASK))
+			{
+				if (dyna_n < (DYNA_MAX-1))
+				{
+					dyna_g[dyna_n++] = GRID(y,x);
+				}
+				else
+				{
+					dyna_full = TRUE;
+					dyna_cent_y = 255;
+					dyna_cent_x = 255;
+				}
+			}
+
 			/* Advance/Wrap */
 			if (++x >= DUNGEON_WID)
 			{
@@ -1560,7 +1586,6 @@ u16b limit;
 			}
 		}
 	}
-
 
 	/*** Player ***/
 
@@ -1934,7 +1959,7 @@ static errr rd_savefile_new_aux(void)
 	a_max = tmp16u;
 
 	/* Incompatible save files */
-	if (tmp16u > 256)
+	if (a_max > 256)
 	{
 		note(format("Too many (%u) artifacts!", tmp16u));
 		return (-1);
@@ -1947,7 +1972,7 @@ static errr rd_savefile_new_aux(void)
 	C_MAKE(a_list_new, a_max, object_lore);
 
 	/* Read the artifact flags */
-	for (i = 0; i < tmp16u; i++)
+	for (i = 0; i < a_max; i++)
 	{
 		object_lore *n_ptr = &a_list_new[i];
 
@@ -2033,16 +2058,17 @@ static errr rd_savefile_new_aux(void)
 
 
 	/* Read random artifacts */
-#if 0
 	if ((adult_rand_artifacts) || (a_max == 256))
 	{
-#endif
 		if (rd_randarts()) return (-1);
 		if (arg_fiddle) note("Loaded Random Artifacts");
-#if 0
 	}
-#endif
+
+	/* Only restore fixed arts if dead */
 	if (a_max > z_info->a_max) a_max = z_info->a_max;
+
+	/* Don't restore fixed art knowledge if all random */
+	else if (p_ptr->is_dead) a_max = 0;
 
 	/* Copy over the artifact flags */
 	for (i = 0; i < a_max; i++)
@@ -2143,6 +2169,9 @@ static errr rd_savefile_new_aux(void)
 
 	/* Hack -- no ghosts */
 	r_info[z_info->r_max-1].max_num = 0;
+
+        /* Set important Save-File Option */
+        variant_save_feats = TRUE;
 
 
 	/* Success */
