@@ -5,6 +5,12 @@
 - The chance of tunnelling was out by a factor of 10 (Reported by Jeffrey
 Turner).
 
+### Bug fixes ###
+
+- Piles of earth were removed, resulting in 'nothing' occuring in some rooms.
+(Reported by Anthony Holmes).
+
+
 UnAngband 0.5.4b: "Survival of the Fittest"
 
 ### Game Play ###
