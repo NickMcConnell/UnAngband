@@ -7,7 +7,31 @@ stores to be seen from anywhere on town level.
 - Prevent user inscribing or unscribing any unaware objects, also do 
 not display inscription in the knowledge menus.
 
+- Changed definition of VERSION_NAME from "Angband" to "Unangband",
+  which change name of user directry on unix.
+
+
 ### Bug fixes ###
+
+- Fix bug allowing flavored name to be displayed when you examine
+  unaware object in store.
+
+- Fix bug preventing '... Blade' spells working correctly.
+
+- Fix various bugs that object memory wasn't correctly
+  updated/displayed.
+
+- Fix bug preventing updating auto inscription of ego item as you
+  inscribe an ego item.
+
+- Fix bug where refilling empty bottle from fountain or other potions
+  was buggy.
+
+- Fix bug preventing 'w'ear command listing normal weapons when you
+  are wielding a staff.
+
+- Fix bug that activate wrong spell when read from a stack of scrolls
+  using repeat command.
 
 - Fix a display problem when pasting a visual attr/char mapping.
 
