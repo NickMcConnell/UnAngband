@@ -5,14 +5,14 @@ UnAngband 0.5.4c: "Competitive Fix"
 
 - Snow, particularly deep snow, is riskier again.
 
-- The chance of tunnelling was out by a factor of 10 (Reported by Jeffrey
-Turner).
-
 ### User Interface ###
 
 - Improved user interface for selecting which location to travel to.
 
 ### Bug fixes ###
+
+- The chance of tunnelling was out by a factor of 10 (Reported by Jeffrey
+Turner).
 
 - Piles of earth were removed, resulting in 'nothing' occuring in some rooms.
 (Reported by Anthony Holmes).
