@@ -22,6 +22,8 @@ you know of, but have not found this game.
 
 - Added reference to new web site at http://unangband.berlios.de.
 
+- Made torches light brown, and other junk dark brown.
+
 ### Build / Platform ###
 
 - Removed use of 'near' member of structure as used as a reserved
