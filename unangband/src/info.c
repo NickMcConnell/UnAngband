@@ -1577,8 +1577,7 @@ static void obj_top(const object_type *o_ptr, bool real)
 {
 	char name[80];
 
-	if (real) object_desc(name, o_ptr, TRUE, 1);
-	else object_desc_store(name, o_ptr, FALSE, 0);
+	object_desc(name, o_ptr, TRUE, 1);
 
 	/* Clear the top line */
 	Term_erase(0, 0, 255);

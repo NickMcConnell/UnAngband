@@ -15,6 +15,11 @@ still using the flavour attr/char mapping. This for instance allows you
 to colour all 'bad' potions/scrolls/etc. dark grey so that you don't
 attempt to get them.
 
+- The objects menu under the knowledge menu now lists the flavours of
+all unknown objects, primarily so you can interact with the visuals for
+these objects. This is different for Eyangband, which lists the objects
+you know of, but have not found this game.
+
 - Added reference to new web site at http://unangband.berlios.de.
 
 ### Build / Platform ###

@@ -301,6 +301,13 @@ void flavor_init(void)
 
 		/* Check for "easily known" */
 		k_ptr->easy_know = object_easy_know(i);
+
+		/* Hack -- color if flavoured */
+		if (k_ptr->flavor)
+		{
+			k_ptr->d_attr = x_info[k_ptr->flavor].d_attr;
+			k_ptr->x_attr = x_info[k_ptr->flavor].x_attr;
+		}
 	}
 
 }

@@ -2548,6 +2548,9 @@ static void strip_name(char *buf, int k_idx)
 
 	cptr str = (k_name + k_ptr->name);
 
+	/* If not aware, use flavor */
+	if (!k_ptr->aware && k_ptr->flavor) str = x_name + x_info[k_ptr->flavor].name;
+
 	/* Skip past leading characters */
 	while ((*str == ' ') || (*str == '&') || (*str == '#')) str++;
 
@@ -2978,6 +2981,7 @@ void do_cmd_save_screen_html(void)
 }
 
 
+
 #define BROWSER_ROWS	16
 
 /*
@@ -3145,6 +3149,7 @@ static int collect_monsters(int grp_cur, int *mon_idx, int mode)
 	return mon_cnt;
 }
 
+
 /*
  * Build a list of monster indexes in the given group. Return the number
  * of monsters in the group.
@@ -3214,13 +3219,39 @@ static int collect_objects(int grp_cur, int object_idx[], int mode)
 		if (!(k))  continue; 
 
 		/* Require objects ever seen*/
-		if (!(mode & 0x02) && !(cheat_lore) && !(k_ptr->aware)) continue;
+		if (!(mode & 0x02) && !(cheat_lore) && !(k_ptr->aware) && !(k_ptr->flavor)) continue;
 
 		/* Check for race in the group */
 		if (k_ptr->tval == group_tval)
 		{
+			int idx, ii, tmp;
+
+			char name1[80];
+			char name2[80];
+
+			object_kind *i_ptr;
+
+			for (ii = 0, idx = i;ii < object_cnt; ii++)
+			{
+				/* Get the object */
+				i_ptr = &k_info[object_idx[ii]];
+
+				/* If flavoured, list known items first */
+				if (!k_ptr->aware && k_ptr->flavor && i_ptr->aware) continue;
+
+				strip_name(name1,idx);
+				strip_name(name2,object_idx[ii]);
+
+				if ((k_ptr->aware && !i_ptr->aware && i_ptr->flavor) || (strcmp(name1,name2) <= 0))
+				{
+					tmp = idx;
+					idx = object_idx[ii];
+					object_idx[ii] = tmp;
+				}
+			}
+
 			/* Add the race */
-			object_idx[object_cnt++] = i;
+			object_idx[object_cnt++] = idx;
 		}
 	}
 
@@ -3455,6 +3486,8 @@ static void browser_cursor(char ch, int *column, int *grp_cur, int grp_cnt,
 	(*grp_cur) = grp;
 	(*list_cur) = list;
 }
+
+
 
 /*
  * Display the objects in a group.
@@ -4421,7 +4454,7 @@ static void desc_obj_fake(int k_idx)
 	object_prep(o_ptr, k_idx);
 
 	/* It's fully know */
-	o_ptr->ident |= IDENT_KNOWN;
+	if (!k_info[k_idx].flavor) o_ptr->ident |= IDENT_KNOWN;
 
 	/* Track the object */
 	object_actual_track(o_ptr);
@@ -4490,10 +4523,10 @@ static void do_cmd_knowledge_objects(void)
 		/* Save the maximum length */
 		if (len > max) max = len;
 
-		/* See if any monsters are known */
+		/* See if any objects are known */
 		if (collect_objects(i, object_idx, 0x01))
 		{
-			/* Build a list of groups with known monsters */
+			/* Build a list of groups with known objects */
 			grp_idx[grp_cnt++] = i;
 		}
 	}
