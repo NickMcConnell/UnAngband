@@ -1381,8 +1381,8 @@ void note_spot(int y, int x)
 	/* Require "seen" flag */
 	if (!(info & (CAVE_SEEN))) return;
 
-        /* Mark it */
-        cave_info[y][x] |= (CAVE_SAFE);
+	/* Mark it */
+	cave_info[y][x] |= (CAVE_SAFE);
 
 	/* Hack -- memorize objects */
 	/* ANDY -- Only memorise objects if they are not hidden by the feature */
@@ -1391,7 +1391,7 @@ void note_spot(int y, int x)
 		for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
 		{
 			object_type *o_ptr = &o_list[this_o_idx];
-                        object_kind *k_ptr = &k_info[o_ptr->k_idx];
+			object_kind *k_ptr = &k_info[o_ptr->k_idx];
 
 			/* Get the next object */
 			next_o_idx = o_ptr->next_o_idx;
@@ -1400,7 +1400,7 @@ void note_spot(int y, int x)
 			if (!auto_pickup_ignore(o_ptr)) o_ptr->marked = TRUE;
 
 			/* Hack -- have seen object */
-                        if (!(k_ptr->flavor)) k_ptr->aware = TRUE;
+			if (!(k_ptr->flavor)) k_ptr->aware = TRUE;
 		}
 	}
 
@@ -2821,7 +2821,7 @@ void update_view(void)
 	byte info;
 
 #ifdef MONSTER_LITE
-        int fy,fx;
+	int fy,fx;
 #endif
 
 	/*** Step 0 -- Begin ***/
@@ -3042,7 +3042,7 @@ fast_view_g[fast_view_n++] = g;
 
     }
 #endif
-        /*** Step 1B -- player grid ***/
+	/*** Step 1B -- player grid ***/
 
 	/* Player grid */
 	g = pg;
@@ -3926,12 +3926,12 @@ void town_illuminate(bool daytime)
 {
 	int y, x, i;
 
-town_type *t_ptr = &t_info[p_ptr->dungeon];
+	town_type *t_ptr = &t_info[p_ptr->dungeon];
 
-dungeon_zone *zone=&t_ptr->zone[0];;
+	dungeon_zone *zone=&t_ptr->zone[0];;
 
 	/* Get the zone */
-get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
 	/* Apply light or darkness */
 	for (y = 0; y < DUNGEON_HGT; y++)
@@ -4030,35 +4030,35 @@ get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 static void cave_set_feat_aux(int y, int x, int feat)
 {
 	/* Set if blocks los */
-bool los = cave_floor_bold(y,x);
+	bool los = cave_floor_bold(y,x);
 
-/* Get feature */
-feature_type *f_ptr = &f_info[feat];
+	/* Get feature */
+	feature_type *f_ptr = &f_info[feat];
 
-bool hide_item = (f_info[cave_feat[y][x]].flags2 & (FF2_HIDE_ITEM)) != 0;
+	bool hide_item = (f_info[cave_feat[y][x]].flags2 & (FF2_HIDE_ITEM)) != 0;
 
 	s16b this_o_idx, next_o_idx = 0;
 
-/* Really set the feature */
-cave_feat[y][x] = feat;
+	/* Really set the feature */
+	cave_feat[y][x] = feat;
 
-/* Check for bit 5 set*/
-if (f_ptr->flags1 & (FF1_LOS))
-{
-cave_info[y][x] &= ~(CAVE_WALL);
-}
+	/* Check for bit 5 set*/
+	if (f_ptr->flags1 & (FF1_LOS))
+	{
+		cave_info[y][x] &= ~(CAVE_WALL);
+	}
 
-/* Handle wall grids */
-else
-{
-cave_info[y][x] |= (CAVE_WALL);
-}
+	/* Handle wall grids */
+	else
+	{
+		cave_info[y][x] |= (CAVE_WALL);
+	}
 
-/* Check for change to boring grid */
-if (!(f_ptr->flags1 & (FF1_REMEMBER))) cave_info[y][x] &= ~(CAVE_MARK);
+	/* Check for change to boring grid */
+	if (!(f_ptr->flags1 & (FF1_REMEMBER))) cave_info[y][x] &= ~(CAVE_MARK);
 
-/* Check for change to out of sight grid */
-else if (!(player_can_see_bold(y,x))) cave_info[y][x] &= ~(CAVE_MARK);
+	/* Check for change to out of sight grid */
+	else if (!(player_can_see_bold(y,x))) cave_info[y][x] &= ~(CAVE_MARK);
 
 
 	/* Check to see if monster exposed by change */
@@ -4070,12 +4070,12 @@ else if (!(player_can_see_bold(y,x))) cave_info[y][x] &= ~(CAVE_MARK);
 
 		if (hidden)
 		{
-monster_hide(y,x,place_monster_here(y,x,m_ptr->r_idx), m_ptr);
+			monster_hide(y,x,place_monster_here(y,x,m_ptr->r_idx), m_ptr);
 
 			if (!(m_ptr->mflag & (MFLAG_HIDE)))
 			{
-		/* And update */
-update_mon(cave_m_idx[y][x],FALSE);
+				/* And update */
+				update_mon(cave_m_idx[y][x],FALSE);
 
 		/* Hack --- tell the player if something unhides */
 		if (m_ptr->ml)
@@ -4086,8 +4086,8 @@ update_mon(cave_m_idx[y][x],FALSE);
 		monster_desc(m_name, m_ptr, 0);
 
 		msg_format("%^s emerges from %s%s.",m_name,
-		((f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_FILLED))?"":"the "),
-	f_name+f_info[cave_feat[m_ptr->fy][m_ptr->fx]].name);
+			((f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_FILLED))?"":"the "),
+			f_name+f_info[cave_feat[m_ptr->fy][m_ptr->fx]].name);
 		}
 
 				/* Disturb on "move" */
@@ -4104,15 +4104,15 @@ update_mon(cave_m_idx[y][x],FALSE);
 	}
 
 	/* Scan all objects in the grid */
-for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
-{
-	object_type *o_ptr;
+	for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
+	{
+		object_type *o_ptr;
 
-/* Get the object */
-o_ptr = &o_list[this_o_idx];
+		/* Get the object */
+		o_ptr = &o_list[this_o_idx];
 
-/* Get the next object */
-next_o_idx = o_ptr->next_o_idx;
+		/* Get the next object */
+		next_o_idx = o_ptr->next_o_idx;
 
 		/* Hide stuff */
 		if ((!hide_item) && (f_ptr->flags2 & (FF2_HIDE_ITEM)))
@@ -4124,25 +4124,25 @@ next_o_idx = o_ptr->next_o_idx;
 
 
 	/* Check if los has changed */
-        if ((los) && (player_has_los_bold(y,x)) && !(cave_floor_bold(y,x)))
-        {
+	if ((los) && (player_has_los_bold(y,x)) && !(cave_floor_bold(y,x)))
+	{
 		/* Update the visuals */
-                p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
+		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 	}
-        else if ((!los) && (player_has_los_bold(y,x)) && (cave_floor_bold(y,x)))
+	else if ((!los) && (player_has_los_bold(y,x)) && (cave_floor_bold(y,x)))
 	{
 		/* Update the visuals */
 		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 	}
 
-        if (player_has_los_bold(y,x))
-        {
-                /* Notice */
-                note_spot(y, x);
+	if (player_has_los_bold(y,x))
+	{
+		/* Notice */
+		note_spot(y, x);
 
-                /* Redraw */
-                lite_spot(y, x);
-        }
+		/* Redraw */
+		lite_spot(y, x);
+	}
 
 }
 
@@ -4223,7 +4223,7 @@ void cave_set_feat(int y, int x, int feat)
 
 						/* Redraw */
 						lite_spot(yy, xx);
-                                        }
+					}
 				}
 			}
 		}
@@ -4247,29 +4247,29 @@ void cave_set_feat(int y, int x, int feat)
 	{
 		for (i = 0; i < 8; i++)
 		{
-                        int yy,xx;
-        
-                        int k = rand_int(8);
-        
-                        yy = y + ddy_ddd[k];
-                        xx = x + ddx_ddd[k];
-        
-                        /* Ignore annoying locations */
-                        if (!in_bounds_fully(yy, xx)) continue;
-        
-                        if (f_info[cave_feat[yy][xx]].flags3 & (FF3_GROUND))
-                        {
-                                cave_set_feat_aux(yy,xx,FEAT_TREE_SHADE);
-                        }
-                        else if (f_info[cave_feat[yy][xx]].flags2 & (FF2_CHASM))
-                        {
-                                cave_set_feat_aux(yy,xx,FEAT_TREE_SHADE_C);
-                        }
-                        else if (cave_feat[yy][xx] == FEAT_WALL_EXTRA)
-                        {
-                                cave_set_feat_aux(yy,xx,FEAT_TREE_SHADE_W);
-                        }
-                }
+			int yy,xx;
+	
+			int k = rand_int(8);
+	
+			yy = y + ddy_ddd[k];
+			xx = x + ddx_ddd[k];
+	
+			/* Ignore annoying locations */
+			if (!in_bounds_fully(yy, xx)) continue;
+	
+			if (f_info[cave_feat[yy][xx]].flags3 & (FF3_GROUND))
+			{
+				cave_set_feat_aux(yy,xx,FEAT_TREE_SHADE);
+			}
+			else if (f_info[cave_feat[yy][xx]].flags2 & (FF2_CHASM))
+			{
+				cave_set_feat_aux(yy,xx,FEAT_TREE_SHADE_C);
+			}
+			else if (cave_feat[yy][xx] == FEAT_WALL_EXTRA)
+			{
+				cave_set_feat_aux(yy,xx,FEAT_TREE_SHADE_W);
+			}
+		}
 	}
 	else if (feat == FEAT_TREE_BIG_S)
 	{
