@@ -904,15 +904,6 @@ struct store_type
 {
 	u32b name;     /* Name (offset) */
 
-	byte d_char;      /* Default feature char */
-	byte d_attr;      /* Default feature attr */
-
-	byte x_attr;    /* Desired feature attribute */
-	char x_char;    /* Desired feature character */
-
-	byte level;
-	byte stval;
-
 	byte owner;     /* Owner index */
 	byte extra;     /* Unused for now */
 
@@ -922,8 +913,7 @@ struct store_type
 	s16b bad_buy;   /* Number of "bad" buys */
 
 	s32b store_open;/* Closed until this turn */
-
-	s32b store_wrap;/* Unused for now */
+	s32b store_wary;/* Unused */
 
 	byte tval[STORE_CHOICES];
 	byte sval[STORE_CHOICES];

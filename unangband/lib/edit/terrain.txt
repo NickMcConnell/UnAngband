@@ -482,64 +482,64 @@ F:REMEMBER | NOTICE | PLACE | CAN_FLY
 N:8:General Store
 W:0:1:20:0
 G:1:U
-U:32
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_1
 
 # 0x09 --> shop -- armoury (perm)
 
 N:9:Armoury
 W:0:1:20:0
 G:2:s
-U:32
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_2
 
 # 0x0A --> shop -- weapon shop (perm)
 
 N:10:Weapon Smiths
 W:0:1:20:0
 G:3:w
-U:32
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_3
 
 # 0x0B --> shop -- temple (perm)
 
 N:11:Temple
 W:0:1:20:0
 G:4:g
-U:32
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_4
 
 # 0x0C --> shop -- alchemist (perm)
 
 N:12:Alchemy Shop
 W:0:1:20:0
 G:5:b
-U:32
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_5
 
 # 0x0D --> shop -- magic shop (perm)
 
 N:13:Magic Shop
 W:0:1:20:0
 G:6:r
-U:32
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_6
 
 # 0x0E --> shop -- black market (perm)
 
 N:14:Black Market
-W:0:1:20:0
+W:45:1:20:0
 G:7:D
-U:32
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_7
 
 # 0x0F --> shop -- home (perm)
 
 N:15:Home
 W:0:1:20:0
 G:8:y
-U:32
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_8
 
 # 0x10 --> visible trap -- trap door
 
@@ -3550,6 +3550,7 @@ F:DOOR | CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
 F:HURT_FIRE | HURT_ACID | CLOSE | PLACE | BASH | CAN_FLY
 
 # 0x04 --> open door
+
 N:263:open door
 U:56
 G:':U
@@ -3562,70 +3563,55 @@ K:HURT_ACID:165
 F:DOOR | CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
 F:HURT_FIRE | HURT_ACID | CLOSE | PLACE | BASH | CAN_FLY
 
-# Following stores allow us to have up to 16 stores in a city.
-# Note that these stores have to be found...
-
-N:264:General Store
-W:0:1:20:0
-U:56
-G:1:U
+N:264:Farmer Maggot's Mushroom Store
+G:1:r
+W:1:1:20:0
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_9
 
-# 0x09 --> shop -- armoury (perm)
-
-N:265:Armoury
-W:0:1:20:0
-U:56
-G:2:s
+N:265:Mill
+G:7:U
+W:15:1:20:0
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_10
 
-# 0x0A --> shop -- weapon shop (perm)
-
-N:266:Weapon Smiths
+N:266:'Bag End'
+G:8:G
 W:0:1:20:0
-U:56
-G:3:w
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_11
 
-# 0x0B --> shop -- temple (perm)
-
-N:267:Temple
+N:267:House of Elrond
+G:+:U
 W:0:1:20:0
-U:56
-G:4:g
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_12
 
-# 0x0C --> shop -- alchemist (perm)
+N:268:Marketplace
+G:7:u
+W:25:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_13
 
-N:268:Alchemy Shop
+N:269:House of Beorn
+G:+:U
 W:0:1:20:0
-U:56
-G:5:b
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_14
 
-# 0x0D --> shop -- magic shop (perm)
-
-N:269:Magic Shop
-W:0:1:20:0
-U:56
-G:6:r
+N:270:Festhall
+G:1:o
+W:25:1:20:0
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
-
-# 0x0E --> shop -- black market (perm)
-
-N:270:Black Market
-W:0:1:20:0
-U:56
-G:7:D
-F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_15
 
 # 0x0F --> shop -- home (perm)
 
-N:271:Home
-W:0:1:20:0
-G:8:y
-U:56
+N:271:Music hall
+G:1:y
+W:35:1:20:0
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_16
 
 # Here follow some deep traps.
 
@@ -6727,3 +6713,123 @@ K:HURT_WATER:308
 K:BASH:308
 F:LOS | CAN_FLY | GLOW | SPREAD | REMEMBER | TIMED | HURT_WATER
 F:BASH
+
+N:503:Fletcher
+G:3:U
+W:25:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_17
+
+N:504:Jewelers
+G:6:y
+W:35:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_18
+
+N:505:Library
+G:6:R
+W:35:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_19
+
+N:506:newly erected statue in your honor
+G:9:w
+W:60:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_20
+
+N:507:Farmhouse
+G:+:U
+W:0:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_21
+
+N:508:Inn
+G:1:u
+W:10:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_22
+
+N:509:Barracks
+G:1:D
+W:30:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_23
+
+N:510:White Tree
+G:<:W
+W:80:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_24
+
+N:511:Shrine
+G:4:G
+W:35:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_25
+
+N:512:Storeroom
+G:+:U
+W:40:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_26
+
+N:513:Bilbo's House
+G:8:g
+W:0:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_27
+
+N:514:House of Tom Bombadil
+G:+:U
+W:0:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_28
+
+N:515:Small Goods Store
+G:2:U
+W:0:0:0:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_29
+
+N:516:Heavy Armoury
+G:2:D
+W:35:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_30
+
+N:517:Heavy Weapon Smith
+G:3:W
+W:35:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_31
+
+N:518:Runesmith
+G:6:g
+W:35:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_32
+
+N:519:Chemist
+G:5:R
+W:35:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_33
+
+N:520:Storeroom
+G:+:U
+W:40:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_26
+
+N:521:Storeroom
+G:+:U
+W:40:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_26
+
+N:522:Storeroom
+G:+:U
+W:40:1:20:0
+F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW
+F:POWER_26

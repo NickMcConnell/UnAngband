@@ -4782,17 +4782,15 @@ static void cave_gen(void)
  * Note the use of "town_illuminate()" to handle all "illumination"
  * and "memorization" issues.
  */
-static void build_store(int n, int yy, int xx)
+static void build_store(int feat, int yy, int xx)
 {
 	int y, x, y0, x0, y1, x1, y2, x2, tmp;
 
 	int qy = SCREEN_HGT;
 	int qx = SCREEN_WID;
 
-	town_type *t_ptr = &t_info[p_ptr->dungeon];
-
 	/* Hack -- extract char value */
-	byte d_char = u_info[t_ptr->store[n]].d_char;
+	byte d_char = f_info[feat].d_char;
 
 	/* Hack -- don't build building for some 'special locations' */
 	bool building = (((d_char >= '0') && (d_char <= '8')) || (d_char == '+'));
@@ -4871,7 +4869,7 @@ static void build_store(int n, int yy, int xx)
 	}
 
 	/* Clear previous contents, add a store door */
-	cave_set_feat(y, x, FEAT_SHOP_HEAD + n);
+	cave_set_feat(y, x, feat);
 }
 
 
@@ -4935,7 +4933,7 @@ static void town_gen_hack(void)
 			k = ((n <= 1) ? 0 : rand_int(n));
 
 			/* Build that store at the proper location */
-			if (t_ptr->store[rooms[k]]) build_store(rooms[k], y, x);
+			if (t_ptr->store[rooms[k]]) build_store(t_ptr->store[rooms[k]], y, x);
 				
 			/* Shift the stores down, remove one store */
 			rooms[k] = rooms[--n];

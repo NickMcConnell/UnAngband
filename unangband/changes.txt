@@ -1,3 +1,10 @@
+### User Interface ###
+
+- Stores no longer use the large hack they did previously for display
+purposes. This will allow the player to set attr/mappings. Also allows
+stores to be seen from anywhere on town level.
+
+Unangband 0.5.2a Bugfix release
 
 ### Game-play ###
 

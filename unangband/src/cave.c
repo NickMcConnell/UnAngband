@@ -1006,19 +1006,6 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 					}
 				}
 			}
-			/* Mega hack -- fiddle with store graphics */
-			else if ((adult_campaign) && (f_info[feat].flags1 & (FF1_ENTER)))
-			{
-				int n = feat-FEAT_SHOP_HEAD;
-				town_type *t_ptr = &t_info[p_ptr->dungeon];
-				store_type *u_ptr = &u_info[t_ptr->store[n]];
-
-				/* Hack -- custom attr */
-				a = u_ptr->d_attr;
-
-				/* Hack -- custom char */
-				c = u_ptr->d_char;
-			}
 		}
 		/* Hack -- display unseen graphic in wilderness during daytime */
 		else if (surface)

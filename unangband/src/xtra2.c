@@ -4382,8 +4382,6 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 			if (f_info[feat].flags1 & (FF1_ENTER))
 			{
 				s3 = "the entrance to the ";
-
-				name = u_name + u_info[t_info[p_ptr->dungeon].store[feat-FEAT_SHOP_HEAD]].name;
 			}
 
 			/* Display a message */

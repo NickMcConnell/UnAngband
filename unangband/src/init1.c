@@ -4970,51 +4970,6 @@ errr parse_u_info(char *buf, header *head)
 		cur_t = 0;
 	}
 
-	/* Process 'G' for "Graphics" (one line only) */
-	else if (buf[0] == 'G')
-	{
-		char sym;
-		int tmp;
-
-		/* There better be a current u_ptr */
-		if (!u_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* Paranoia */
-		if (!buf[2]) return (PARSE_ERROR_GENERIC);
-		if (!buf[3]) return (PARSE_ERROR_GENERIC);
-		if (!buf[4]) return (PARSE_ERROR_GENERIC);
-
-		/* Extract the char */
-		sym = buf[2];
-
-		/* Extract the attr */
-		tmp = color_char_to_attr(buf[4]);
-
-		/* Paranoia */
-		if (tmp < 0) return (PARSE_ERROR_GENERIC);
-
-		/* Save the values */
-		u_ptr->d_attr = tmp;
-		u_ptr->d_char = sym;
-	}
-
-	/* Process 'I' for "Info" (one line only) */
-	else if (buf[0] == 'I')
-	{
-		int level, stval;
-
-		/* There better be a current u_ptr */
-		if (!u_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* Scan for the values */
-		if (2 != sscanf(buf+2, "%d:%d", &level, &stval)) return (PARSE_ERROR_GENERIC);
-
-		/* Save the values */
-		u_ptr->level=level;
-		u_ptr->stval=stval;
-
-	}
-
 	/* Process 'O' for "Offered" (up to thirty two lines) */
 	else if (buf[0] == 'O')
 	{
