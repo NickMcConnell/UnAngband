@@ -11,6 +11,8 @@
 
 #include "angband.h"
 
+#include "init.h"
+
 /*
  * Original random artifact generator (randart) by Greg Wooledge.
  * Updated by Chris Carr / Chris Robertson in 2001.
@@ -1131,7 +1133,7 @@ static errr init_names(void)
 	KILL(names);
 
 	/* Store the names */
-	a_name = a_base;
+	a_head.name_ptr = a_name = a_base;
 
 	/* Success */
 	return (0);
@@ -5277,7 +5279,7 @@ errr do_randart(u32b randart_seed, bool full)
 		KILL(a_list);		
 	
 		/* Set new a_info array to existing */
-		a_info = a_info_new;
+		a_head.info_ptr = a_info = a_info_new;
 
 		/* Set new a_info array to existing */
 		a_list = a_list_new;
