@@ -1312,7 +1312,7 @@ F:BLESSED | SHOW_MODS
 # The Trident of Ulmo
 
 N:108:of Ulmo
-I:22:55:4
+I:22:15:4
 W:30:90:70:120000
 P:0:8d4:15:19:0
 F:DEX | HIDE_TYPE | 

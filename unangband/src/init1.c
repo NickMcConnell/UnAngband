@@ -2201,7 +2201,7 @@ errr parse_f_info(char *buf, header *head)
 		for (i = 0; i < MAX_FEAT_STATES; i++) if (f_ptr->state[i].action == FS_FLAGS_END) break;
 
 		/* Oops, no more slots */
-		if (i == 4) return (PARSE_ERROR_GENERIC);
+		if (i == MAX_FEAT_STATES) return (PARSE_ERROR_GENERIC);
 
 		/* Analyze the first field */
 		for (s = t = buf+2; *t && (*t != ':'); t++) /* loop */;
