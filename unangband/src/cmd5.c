@@ -1176,7 +1176,7 @@ void do_cmd_cast(void)
 	/* Ask for a spell */
 	if (!get_spell(&spell, p, o_ptr, TRUE))
 	{
-		if (spell == -2) msg_format("You don't know any &ss in that book.",t);
+		if (spell == -2) msg_format("You don't know any %ss in that book.",t);
 		return;
 	}
 
