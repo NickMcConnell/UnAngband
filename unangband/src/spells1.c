@@ -311,8 +311,12 @@ void teleport_player_level(void)
 		return;
 	}
 
-
-	if (p_ptr->depth == min_depth(p_ptr->dungeon))
+        if (!max_depth(p_ptr->dungeon))
+        {
+		msg_print("Nothing happens.");
+                return;
+        }
+        else if (p_ptr->depth == min_depth(p_ptr->dungeon))
 	{
 		message(MSG_TPLEVEL, 0, "You sink through the floor.");
 
