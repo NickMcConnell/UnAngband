@@ -398,7 +398,7 @@ bool make_attack_normal(int m_idx)
 
 			case RBM_SLIME:
 			{
-				act = "slimes you!";
+				act = "slimes you";
 				break;
 			}
 
