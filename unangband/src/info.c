@@ -2788,10 +2788,12 @@ void object_guess_name(object_type *o_ptr)
 	/* This should be here to guess for rings/amulets etc. */
 
 	/* Check the normal item list */
+	/* Hack -- exclude non flavored objects */
 	/* Hack -- exclude artifacts */
-	if (!(o_ptr->discount == INSCRIP_SPECIAL) &&
-	       !(o_ptr->discount == INSCRIP_TERRIBLE) &&
-	       !(o_ptr->discount == INSCRIP_UNBREAKABLE))
+	if (k_info[o_ptr->k_idx].flavor &&
+	    !(o_ptr->discount == INSCRIP_SPECIAL) &&
+	    !(o_ptr->discount == INSCRIP_TERRIBLE) &&
+	    !(o_ptr->discount == INSCRIP_UNBREAKABLE))
 	for (i = 1; i < z_info->k_max; i++)
 	{
 		object_kind *k_ptr = &k_info[i];
