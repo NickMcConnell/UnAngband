@@ -1,4 +1,4 @@
-Spoiler File -- Basic Items (0.5.1d)
+Spoiler File -- Basic Items (0.5.3)
 
 
 Description                             Dam/AC   Wgt Lev     Cost Info        
@@ -11,6 +11,7 @@ Ammo
   Arrow                                    1d4   0.2   3        1            
   Iron Shot                                1d4   0.5   3        2            
   Bolt                                     1d5   0.3   3        2            
+  Burning Arrow                            1d3   0.3   5        5 dam 2d6    
   Mithril Shot                             2d4   0.4  40       20            
   Seeker Arrow                             4d4   0.2  55       20            
   Seeker Bolt                              4d5   0.3  65       25            
@@ -34,6 +35,7 @@ Weapons
   Dagger                                   1d4   1.2   0       10            
   Dart                                     1d4   1.2   0       10            
   Shovel                                   1d2   6.0   1       10            
+  Baton                                    1d5   4.5   0       25            
   Main Gauche                              1d5   3.0   3       25            
   Whip                                     1d4   3.0   3       30            
   Javelin                                  1d6   5.0   5       36            
@@ -267,8 +269,8 @@ Scrolls
   Scroll of Alter Reality                        0.5  35      600            
   Scroll of Enchant Bolts Brand                  0.5  25      750            
   Scroll of Poison Bolts                         0.4  25      750            
-  Scroll of Genocide                             0.5  40      750            
-  Scroll of Mass Genocide                        0.5  50     1000            
+  Scroll of Banishment                           0.5  40      750            
+  Scroll of Mass Banishment                      0.5  50     1000            
   Scroll of *Identify*                           0.5  40     2000            
   Scroll of Enchant Weapon Brand                 0.5  50     2500            
   Scroll of Enchant Armor To-Resist              0.5  50     5000            
@@ -393,11 +395,11 @@ Rods
   Rod of Teleport Other                          1.5  45     1400 range 25   
   Rod of Slow Monster                            1.5  30     1500 pow 25     
   Rod of Sleep Monster                           1.5  30     1500 pow 25     
-  Rod of Lightning Bolts                         1.5  20     2000 dam 3d8    
+  Rod of Lightning Bolts                         1.5  20     2000 dam 3d6    
   Rod of Disarming                               1.5  35     2100            
   Rod of Frost Bolts                             1.5  25     2500 dam 5d8    
-  Rod of Fire Bolts                              1.5  30     3000 dam 8d8    
-  Rod of Acid Bolts                              1.5  40     3500 dam 6d8    
+  Rod of Fire Bolts                              1.5  30     3000 dam 6d8    
+  Rod of Acid Bolts                              1.5  40     3500 dam 8d8    
   Rod of Drain Life                              1.5  75     3600 dam 125    
   Rod of Recall                                  1.5  30     4000            
   Rod of Lightning Balls                         1.5  55     4000 dam 40     
@@ -431,39 +433,39 @@ Wands
   Wand of Confuse Monster                        1.0   5      500 pow 25     
   Wand of Sleep Monster                          1.0   5      500 pow 25     
   Wand of Scare Monster                          1.0  10      500 pow 25     
-  Wand of Lightning Bolts                        1.0  15      600 dam 3d8    
+  Wand of Lightning Bolts                        1.0  15      600 dam 3d6    
   Wand of Blind Monster                          1.0  10      700 dam 25     
   Wand of Disarming                              1.0  20      700            
   Wand of Frost Bolts                            1.0  20      800 dam 5d8    
-  Wand of Acid Bolts                             1.0  30      950 dam 6d8    
-  Wand of Fire Bolts                             1.0  30     1000 dam 8d8    
+  Wand of Acid Bolts                             1.0  30      950 dam 8d8    
+  Wand of Fire Bolts                             1.0  30     1000 dam 6d8    
   Wand of Lightning Balls                        1.0  35     1200 dam 40     
   Wand of Drain Life                             1.0  50     1200 dam 125    
-  Wand of Lightning Bolts II                     1.0  35     1250 dam 3d8    
-  Wand of Frost Bolts II                         1.0  40     1400 dam 5d8    
+  Wand of Lightning Bolts II                     1.0  35     1250 dam 3d9    
+  Wand of Frost Bolts II                         1.0  40     1400 dam 5d12   
   Wand of Cold Balls                             1.0  40     1500 dam 55     
   Wand of Deadly Clouds                          1.0  40     1500 dam 20     
   Wand of Water Bolts                            1.0  40     1500 dam 6d8    
-  Wand of Fire Bolts II                          1.0  45     1500 dam 8d8    
+  Wand of Fire Bolts II                          1.0  45     1500 dam 6d12   
   Wand of Freezing Clouds                        1.0  50     1500 dam 20     
   Wand of Acid Balls                             1.0  50     1650 dam 65     
-  Wand of Acid Bolts II                          1.0  50     1750 dam 6d8    
+  Wand of Acid Bolts II                          1.0  50     1750 dam 8d12   
   Wand of Fire Balls                             1.0  50     1800 dam 80     
   Wand of Striking                               1.0  50     1800 dam 3d6    
-  Wand of Lightning Bolts III                    1.0  50     2000 dam 3d8    
+  Wand of Lightning Bolts III                    1.0  50     2000 dam 3d12   
   Wand of Conjuring Flame                        1.0  60     2000 dam 80     
   Wand of Conjuring Acid                         1.0  60     2000 dam 70     
   Wand of Conjuring Ice                          1.0  60     2000 dam 85     
   Wand of Conjuring Lightning                    1.0  60     2000 dam 75     
-  Wand of Frost Bolts III                        1.0  55     2300 dam 5d8    
-  Wand of Dragon's Flame                         1.0  50     2400 dam 100    
-  Wand of Dragon's Frost                         1.0  50     2400 dam 80     
-  Wand of Dragon's Storm                         1.0  50     2400 dam 80     
-  Wand of Dragon's Bile                          1.0  50     2400 dam 100    
+  Wand of Frost Bolts III                        1.0  55     2300 dam 5d16   
+  Wand of Dragon's Flame                         1.0  50     2400 dam 200    
+  Wand of Dragon's Frost                         1.0  50     2400 dam 110    
+  Wand of Dragon's Storm                         1.0  50     2400 dam 100    
+  Wand of Dragon's Bile                          1.0  50     2400 dam 130    
   Wand of Dragon's Venom                         1.0  50     2400 dam 60     
   Wand of Dragon's Breath                        1.0  60     2400 5 powers   
   Wand of Sound Bolts                            1.0  50     2500 dam 8d8    
-  Wand of Fire Bolts III                         1.0  60     2500 dam 8d8    
+  Wand of Fire Bolts III                         1.0  60     2500 dam 6d16   
   Wand of Acidic Clouds                          1.0  60     2500 dam 30     
   Wand of Shooting Stars                         1.0  50     3000 dam 10d8   
   Wand of Annihilation                           1.0  60     3000 dam 250    
@@ -473,10 +475,10 @@ Wands
   Wand of Ice Storms                             1.0  60     4000 dam 120    
   Wand of Mana Bolts                             1.0  60     4500 dam 100    
   Wand of Fire Storms                            1.0  70     4500 dam 145    
-  Wand of Acid Bolts III                         1.0  70     4500 dam 6d8    
+  Wand of Acid Bolts III                         1.0  70     4500 dam 8d16   
   Wand of Lightning Storms                       1.0  70     4500 dam 165    
   Wand of Acid Storms                            1.0  80     5000 dam 115    
-  Wand of Meteors                                1.0  80     5500 dam 115    
+  Wand of Meteors                                1.0  80     5500 dam 30     
   Wand of Whirlpools                             1.0  80     6500 dam 110    
   Wand of Death                                  1.0 111    60000 dam 5000   
 
@@ -509,7 +511,7 @@ Staffs
   Staff of Probing                         1d6   5.0  30     2000            
   Staff of *Destruction*                   1d6   5.0  50     2500            
   Staff of Perception                      1d6   5.0  45     3000            
-  Staff of Genocide                        2d6   5.0  70     3500            
+  Staff of Banishment                      2d6   5.0  70     3500            
   Staff of Power                           2d6   5.0  70     4000 dam 125    
   Staff of the Magi                        2d6   5.0  70     4500            
   Staff of Holiness                        1d6   5.0  70     4500 dam 100    
@@ -518,30 +520,30 @@ Staffs
 
 Books (Mage)
 
-  Magic Book of Cantrips                         3.0   5       25 10 spells  
-  Magic Book of Conjuring                        3.0  10      100 9 spells   
+  Magic Book of Cantrips                         3.0   5       25 11 spells  
+  Magic Book of Conjuring                        3.0  10      100 10 spells  
   Magic Book of Incantations                     3.0  20      400 8 spells   
-  Magic Book of Sorcery                          3.0  30      800 7 spells   
-  Magic Book of Glamours                         3.0  33     1000 8 spells   
-  Magic Book of Animal Magic                     3.0  33     1250 8 spells   
+  Magic Book of Sorcery                          3.0  30      800 6 spells   
+  Magic Book of Glamours                         3.0  33     1000 7 spells   
+  Magic Book of Animal Magic                     3.0  33     1250 3 spells   
   Magic Book of Life Magic                       3.0  36     1500 8 spells   
-  Magic Book of Illusions                        3.0  36     1750 9 spells   
-  Magic Book of Rune Magic                       3.0  40     2000 13 spells  
-  Magic Book of Resistances                      3.0  40     2500 7 spells   
-  Magic Book of Celestial Magic                  3.0  43     3000 8 spells   
-  Magic Book of Earth Magic                      3.0  46     4000 8 spells   
+  Magic Book of Illusions                        3.0  36     1750 4 spells   
+  Magic Book of Rune Magic                       3.0  40     2000 11 spells  
+  Magic Book of Resistances                      3.0  40     2500 6 spells   
+  Magic Book of Celestial Magic                  3.0  43     3000 9 spells   
+  Magic Book of Earth Magic                      3.0  46     4000 6 spells   
   Magic Book of Escapes                          3.0  50     5000 7 spells   
-  Magic Book of Air Magic                        3.0  50     6000 9 spells   
+  Magic Book of Air Magic                        3.0  50     6000 8 spells   
   Magic Book of Water Magic                      3.0  53     7500 7 spells   
-  Magic Book of Power                            3.0  60    10000 5 spells   
-  Magic Book of Fire Magic                       3.0  56    11000 12 spells  
+  Magic Book of Power                            3.0  60    10000 9 spells   
+  Magic Book of Fire Magic                       3.0  56    11000 13 spells  
   Magic Book of Frost Magic                      3.0  60    12000 10 spells  
-  Magic Book of Acid Magic                       3.0  63    13000 12 spells  
+  Magic Book of Acid Magic                       3.0  63    13000 13 spells  
   Magic Book of Storm Magic                      3.0  66    14000 10 spells  
   Magic Book of Alchemy                          3.0  70    16000 15 spells  
-  Magic Book of Necromancy                       3.0  70    18000 7 spells   
-  Magic Book of Destruction                      3.0  80    20000 6 spells   
-  Magic Book of Artifice                         3.0  73    22000 8 spells   
+  Magic Book of Necromancy                       3.0  70    18000 4 spells   
+  Magic Book of Destruction                      3.0  80    20000 7 spells   
+  Magic Book of Artifice                         3.0  73    22000 7 spells   
   Magic Book of Lore                             3.0  76    24000 10 spells  
   Magic Book of Transformations                  3.0 100    30000 7 spells   
 
@@ -555,11 +557,11 @@ Books (Priest)
   Prayer Book of Abjurations                     3.0  35     2000 8 spells   
   Prayer Book of the Way of God                  3.0  40     2500 7 spells   
   Prayer Book of Miracles                        3.0  45     3500 7 spells   
-  Prayer Book of Accursed Ways                   3.0  50     4000 9 spells   
+  Prayer Book of Accursed Ways                   3.0  50     4000 7 spells   
   Prayer Book of Divine Insights                 3.0  50     5000 8 spells   
-  Prayer Book of the Dead                        3.0  55     7500 8 spells   
+  Prayer Book of the Dead                        3.0  55     7500 6 spells   
   Prayer Book of Laying of Hands                 3.0  60    10000 9 spells   
-  Prayer Book of Retribution                     3.0  70    12500 8 spells   
+  Prayer Book of Retribution                     3.0  70    12500 7 spells   
   Prayer Book of Most Holy Relics                3.0  80    20000 9 spells   
   Prayer Book of Battle Hymns                    3.0  90    25000 9 spells   
   Prayer Book of Holy Wrath                      3.0 100    30000 5 spells   
@@ -568,16 +570,16 @@ Books (Priest)
 Books (Bard)
 
   Song Book of Chords                            3.0   5       25 10 spells  
-  Song Book of Harmonies                         3.0  20      400 8 spells   
+  Song Book of Harmonies                         3.0  20      400 7 spells   
   Song Book of Tunes                             3.0  33     1000 8 spells   
   Song Book of Progressions                      3.0  36     1500 6 spells   
-  Song Book of Soothing                          3.0  40     2000 8 spells   
+  Song Book of Soothing                          3.0  40     2000 7 spells   
   Song Book of Drills                            3.0  43     3000 6 spells   
-  Song Book of Snake Charming                    3.0  46     4000 7 spells   
-  Song Book of Shanties                          3.0  50     6000 7 spells   
-  Song Book of Dirges                            3.0  53     7500 7 spells   
-  Song Book of Pandemonium                       3.0  56    12000 7 spells   
-  Song Book of Discordance                       3.0  60    14000 8 spells   
+  Song Book of Snake Charming                    3.0  46     4000 2 spells   
+  Song Book of Shanties                          3.0  50     6000 5 spells   
+  Song Book of Dirges                            3.0  53     7500 5 spells   
+  Song Book of Pandemonium                       3.0  56    12000 4 spells   
+  Song Book of Discordance                       3.0  60    14000 5 spells   
   Song Book of Symphonies                        3.0  70    20000 8 spells   
 
 

@@ -1,11 +1,11 @@
-Monster Spoilers for Angband Version 0.5.1d
+Monster Spoilers for UnAngband Version 0.5.3
 ------------------------------------------
 
 The Filthy street urchin  (Red 't')
 === Num:1  Lev:0  Rar:2  Spd:+0  Hp:1d4  Ac:1  Exp:0
 He looks squalid and thoroughly revolting.  This thief lives in the town,
-and moves a bit erratically at normal speed.  He can illuminate the
-dungeon, open doors, pick up objects and hide in unusual places.  He takes
+and moves a bit erratically at normal speed.  He can open doors, pick up
+objects and hide in unusual places.  He needs light to see you.  He takes
 quite a while to see intruders, which he may notice from 40 feet.  He
 usually appears in groups.  He can beg to nothing, and touch to steal gold.
  
@@ -24,102 +24,107 @@ the town, and moves a bit erratically at normal speed.  It is observant of
 intruders, which it may notice from 200 feet.  It can bite to attack with
 damage 1d1.  
 
-[Q] Farmer Maggot  (L.Slate 'h')
+[U] Farmer Maggot  (L.Slate 'h')
 === Num:4  Lev:0  Rar:4  Spd:+0  Hp:350  Ac:10  Exp:0
 He's lost his dogs.  He's had his mushrooms stolen.  He's not a happy
 hobbit!  This creature lives in the town, and moves at normal speed.  He
 can illuminate the dungeon, open doors and bash down doors.  He cannot be
 confused or slept.  He is very observant of intruders, which he may notice
 from 400 feet.  He may carry a good object.  He can moan to nothing, and
-moan to nothing.  You feel an intense desire to kill this monster...  
+moan to nothing.  
 
 The Blubbering idiot  (White 't')
 === Num:5  Lev:0  Rar:1  Spd:+0  Hp:1d2  Ac:1  Exp:0
 He tends to blubber a lot.  This person lives in the town, and moves a bit
 erratically at normal speed.  He can illuminate the dungeon and pick up
-objects.  He is ever vigilant for intruders, which he may notice from 60
-feet.  He can drool on you to nothing.  
+objects.  He needs light to see you.  He is ever vigilant for intruders,
+which he may notice from 60 feet.  He can drool on you to nothing.  
 
 The Boil-covered wretch  (Slate 't')
 === Num:6  Lev:0  Rar:1  Spd:+0  Hp:1d2  Ac:1  Exp:0
 Ugly doesn't begin to describe him.  This person lives in the town, and
 moves a bit erratically at normal speed.  He can illuminate the dungeon,
-open doors, bash down doors and pick up objects.  He is ever vigilant for
-intruders, which he may notice from 60 feet.  He can drool on you to
-nothing.  
+open doors, bash down doors and pick up objects.  He needs light to see
+you.  He is ever vigilant for intruders, which he may notice from 60 feet.
+ He can drool on you to nothing.  
 
 The Village idiot  (L.Dark 't')
 === Num:7  Lev:0  Rar:1  Spd:+10  Hp:4d4  Ac:1  Exp:0
 Drooling and comical, but then, what do you expect?  This person lives in
 the town, and moves a bit erratically, and quickly.  He can illuminate the
-dungeon and pick up objects.  He is ever vigilant for intruders, which he
-may notice from 60 feet.  He can drool on you to nothing.  
+dungeon and pick up objects.  He needs light to see you.  He is ever
+vigilant for intruders, which he may notice from 60 feet.  He can drool on
+you to nothing.  
 
 The Pitiful-looking beggar  (L.Slate 't')
 === Num:8  Lev:0  Rar:1  Spd:+0  Hp:1d4  Ac:1  Exp:0
 You just can't help feeling sorry for him.  This person lives in the town,
 and moves a bit erratically at normal speed.  He can illuminate the
-dungeon, open doors and pick up objects.  He takes quite a while to see
-intruders, which he may notice from 100 feet.  He can beg to nothing.  
+dungeon, open doors and pick up objects.  He needs light to see you.  He
+takes quite a while to see intruders, which he may notice from 100 feet. 
+He can beg to nothing.  
 
 The Mangy-looking leper  (Green 't')
 === Num:9  Lev:0  Rar:1  Spd:+0  Hp:1  Ac:1  Exp:0
 You feel it isn't safe to touch him.  This person lives in the town, and
 moves a bit erratically at normal speed.  He can illuminate the dungeon,
-open doors and pick up objects.  He tends to overlook intruders, which he
-may notice from 100 feet.  He can beg to nothing.  
+open doors and pick up objects.  He needs light to see you.  He tends to
+overlook intruders, which he may notice from 100 feet.  He can beg to
+nothing.  
 
 The Squint-eyed rogue  (L.Red 't')
 === Num:10  Lev:0  Rar:1  Spd:+0  Hp:2d8  Ac:8  Exp:0
 A hardy, street-wise crook that knows an easy catch when it sees one.  This
-evil thief lives in the town, and moves at normal speed.  He can illuminate
-the dungeon, open doors, bash down doors, pick up objects and hide in
-unusual places.  He pays very little attention to intruders, which he may
-notice from 100 feet.  He may carry a object or treasure.  He can hit to
-attack with damage 1d6, touch to steal items, and insult to nothing.  
+evil thief lives in the town, and moves at normal speed.  He can open
+doors, bash down doors, pick up objects and hide in unusual places.  He
+needs light to see you.  He pays very little attention to intruders, which
+he may notice from 100 feet.  He may carry a object or treasure.  He can
+hit to attack with damage 1d6, touch to steal items, and insult to nothing.
+ 
 
 The Singing, happy drunk  (Blue 't')
 === Num:11  Lev:0  Rar:1  Spd:+0  Hp:2d3  Ac:1  Exp:0
 He makes you glad to be sober.  This person lives in the town, and moves
 somewhat erratically at normal speed.  He can illuminate the dungeon, open
-doors, bash down doors and pick up objects.  He is ever vigilant for
-intruders, which he may notice from 100 feet.  He may carry a treasure.  He
-can beg to nothing, and vomit to nothing.  
+doors, bash down doors and pick up objects.  He needs light to see you.  He
+is ever vigilant for intruders, which he may notice from 100 feet.  He may
+carry a treasure.  He can beg to nothing, and vomit to nothing.  
 
 The Aimless-looking merchant  (L.Blue 't')
 === Num:12  Lev:0  Rar:1  Spd:+0  Hp:3d3  Ac:1  Exp:0
 The typical ponce around town, with purse jingling, and looking for more
 amulets of adornment to buy.  This person lives in the town, and moves
 somewhat erratically at normal speed.  He can illuminate the dungeon, open
-doors, bash down doors and pick up objects.  He prefers to ignore
-intruders, which he may notice from 100 feet.  He may carry a treasure.  He
-can hit to attack with damage 1d3.  
+doors, bash down doors and pick up objects.  He needs light to see you.  He
+prefers to ignore intruders, which he may notice from 100 feet.  He may
+carry a treasure.  He can hit to attack with damage 1d3.  
 
 The Mean-looking mercenary  (L.Umber 't')
 === Num:13  Lev:0  Rar:1  Spd:+0  Hp:5d8  Ac:20  Exp:0
 No job is too low for him.  This evil warrior lives in the town, and moves
 somewhat erratically at normal speed.  He can illuminate the dungeon, open
-doors, bash down doors and pick up objects.  He prefers to ignore
-intruders, which he may notice from 100 feet.  He may carry a object or
-treasure.  He can hit to attack with damage 1d10.  
+doors, bash down doors and pick up objects.  He needs light to see you.  He
+prefers to ignore intruders, which he may notice from 100 feet.  He may
+carry a object or treasure.  He can hit to attack with damage 1d10.  
 
 The Battle-scarred veteran  (Orange 't')
 === Num:14  Lev:0  Rar:1  Spd:+0  Hp:7d8  Ac:30  Exp:0
 He doesn't take to strangers kindly.  This warrior lives in the town, and
 moves somewhat erratically at normal speed.  He can illuminate the dungeon,
-open doors, bash down doors and pick up objects.  He prefers to ignore
-intruders, which he may notice from 100 feet.  He may carry a object or
-treasure.  He can hit to attack with damage 2d6.  
+open doors, bash down doors and pick up objects.  He needs light to see
+you.  He prefers to ignore intruders, which he may notice from 100 feet. 
+He may carry a object or treasure.  He can hit to attack with damage 2d6.
+ 
 
-[Q] Harry Goatleaf, Gatekeeper of Bree  (White 't')
+[U] Harry Goatleaf, Gatekeeper of Bree  (White 't')
 === Num:617  Lev:0  Rar:4  Spd:+0  Hp:350  Ac:10  Exp:0
 The suspicious and gruff keeper of the West-gate of Bree.  He betrayed his
 people by letting Saruman's thugs into the city.  This person lives in the
 town, and moves at normal speed.  He may gaze at you.  He can illuminate
-the dungeon, open doors and bash down doors.  He cannot be confused or
-slept.  He is very observant of intruders, which he may notice from 400
-feet.  He may carry a good object.  He can gaze to nothing, and insult to
-nothing.  You feel an intense desire to kill this monster...  
+the dungeon, open doors and bash down doors.  He needs light to see you. 
+He cannot be confused or slept.  He is very observant of intruders, which
+he may notice from 400 feet.  He may carry a good object.  He can gaze to
+nothing, and insult to nothing.  
 
 The Faerie light  (L.Slate 'E')
 === Num:800  Lev:0  Rar:3  Spd:+10  Hp:1  Ac:1  Exp:0
@@ -166,26 +171,27 @@ The Bumbling priest  (Blue 'p')
 He is bumbling and ineffectual at the best of times.  This priest lives in
 the town, and moves a bit erratically at normal speed.  He is magical,
 casting spells which terrify or heal-self; 1 time in 12.  He can illuminate
-the dungeon, open doors and bash down doors.  He is fairly observant of
-intruders, which he may notice from 200 feet.  He may carry a object or
-treasure.  He can hit to attack with damage 1d5.  
+the dungeon, open doors and bash down doors.  He needs light to see you. 
+He is fairly observant of intruders, which he may notice from 200 feet.  He
+may carry a object or treasure.  He can hit to attack with damage 1d5.  
 
 The Cross-eyed mage  (Red 'q')
 === Num:1033  Lev:0  Rar:2  Spd:+0  Hp:4d4  Ac:6  Exp:0
 He can't see straight, let alone cast spells straight.  This mage lives in
 the town, and moves somewhat erratically at normal speed.  He is magical,
 casting spells which confuse or blink-self; 1 time in 12.  He can
-illuminate the dungeon, open doors and bash down doors.  He is observant of
-intruders, which he may notice from 200 feet.  He may carry a object or
-treasure.  He can hit to attack with damage 1d3.  
+illuminate the dungeon, open doors and bash down doors.  He needs light to
+see you.  He is observant of intruders, which he may notice from 200 feet.
+ He may carry a object or treasure.  He can hit to attack with damage 1d3.
+ 
 
 The Wide-eyed tourist  (Yellow 't')
 === Num:1055  Lev:0  Rar:3  Spd:+0  Hp:3d3  Ac:5  Exp:0
 This shill seems a little out of place and down on his luck.  This person
 lives in the town, and moves at normal speed.  He can illuminate the
-dungeon, open doors, bash down doors and pick up objects.  He is fairly
-observant of intruders, which he may notice from 100 feet.  He may carry
-one or two treasures.  He can beg to nothing.  
+dungeon, open doors, bash down doors and pick up objects.  He needs light
+to see you.  He is fairly observant of intruders, which he may notice from
+100 feet.  He may carry one or two treasures.  He can beg to nothing.  
 
 The Grey mushroom patch  (Slate ',')
 === Num:16  Lev:1  Rar:1  Spd:+0  Hp:1d2  Ac:1  Exp:1
@@ -407,9 +413,10 @@ The Novice warrior  (Umber 't')
 === Num:35  Lev:2  Rar:1  Spd:+0  Hp:9d4  Ac:16  Exp:6
 He looks inexperienced but tough.  This warrior is normally found on
 dungeon level 2, and moves at normal speed.  He can illuminate the dungeon,
-open doors and bash down doors.  He is observant of intruders, which he may
-notice from 200 feet.  He may carry a object or treasure.  He can hit to
-attack with damage 1d7, and hit to attack with damage 1d7.  
+open doors and bash down doors.  He needs light to see you.  He is
+observant of intruders, which he may notice from 200 feet.  He may carry a
+object or treasure.  He can hit to attack with damage 1d7, and hit to
+attack with damage 1d7.  
 
 The Novice rogue  (Blue 't')
 === Num:36  Lev:2  Rar:1  Spd:+0  Hp:8d4  Ac:12  Exp:6
@@ -424,9 +431,10 @@ The Novice priest  (Blue 'p')
 He is tripping over his priestly robes.  This priest is normally found on
 dungeon level 2, and moves at normal speed.  He is magical, casting spells
 which cause light wounds, terrify or heal-self; 1 time in 12.  He can
-illuminate the dungeon, open doors and bash down doors.  He is fairly
-observant of intruders, which he may notice from 200 feet.  He may carry a
-object or treasure.  He can hit to attack with damage 1d5.  
+illuminate the dungeon, open doors and bash down doors.  He needs light to
+see you.  He is fairly observant of intruders, which he may notice from 200
+feet.  He may carry a object or treasure.  He can hit to attack with damage
+1d5.  
 
 The Novice mage  (Red 'q')
 === Num:38  Lev:2  Rar:1  Spd:+0  Hp:6d4  Ac:6  Exp:6
@@ -434,9 +442,9 @@ He is leaving behind a trail of dropped spell components.  This mage is
 normally found on dungeon level 2, and moves at normal speed.  He is
 magical, casting spells which produce magic missiles, blind, confuse or
 blink-self; 1 time in 12.  He can illuminate the dungeon, open doors and
-bash down doors.  He is observant of intruders, which he may notice from
-200 feet.  He may carry a object or treasure.  He can hit to attack with
-damage 1d4.  
+bash down doors.  He needs light to see you.  He is observant of intruders,
+which he may notice from 200 feet.  He may carry a object or treasure.  He
+can hit to attack with damage 1d4.  
 
 The Giant green frog  (Green 'F')
 === Num:41  Lev:2  Rar:1  Spd:+0  Hp:2d8  Ac:8  Exp:6
@@ -588,10 +596,11 @@ The Scruffy looking hobbit  (Blue 'h')
 === Num:61  Lev:3  Rar:1  Spd:+0  Hp:3d5  Ac:8  Exp:4
 A short little guy, in bedraggled clothes.  He appears to be looking for a
 good tavern.  This evil thief is normally found on dungeon level 3, and
-moves at normal speed.  He can open doors, bash down doors, pick up objects
-and hide in unusual places.  He is fairly observant of intruders, which he
-may notice from 160 feet.  He may carry a object or treasure.  He can hit
-to attack with damage 1d4, and touch to steal gold.  
+moves at normal speed.  He can illuminate the dungeon, open doors, bash
+down doors, pick up objects and hide in unusual places.  He is fairly
+observant of intruders, which he may notice from 160 feet.  He may carry a
+object or treasure.  He can hit to attack with damage 1d4, and touch to
+steal gold.  
 
 The Yellow worm mass  (Yellow 'w')
 === Num:65  Lev:3  Rar:2  Spd:-10  Hp:4d8  Ac:4  Exp:4
@@ -705,9 +714,9 @@ He is waves a magical talisman at you.  This shaman is normally found on
 dungeon level 3, and moves at normal speed.  He is magical, casting spells
 which produce magic missiles, terrify, heal-self, blink-self or summon
 animals; 1 time in 12.  He can illuminate the dungeon, open doors and bash
-down doors.  He is observant of intruders, which he may notice from 200
-feet.  He may carry a object or treasure.  He can hit to attack with damage
-1d4.  
+down doors.  He needs light to see you.  He is observant of intruders,
+which he may notice from 200 feet.  He may carry a object or treasure.  He
+can hit to attack with damage 1d4.  
 
 The Yellow mold  (Yellow 'm')
 === Num:63  Lev:3  Rar:1  Spd:+0  Hp:8d8  Ac:10  Exp:9
@@ -797,7 +806,7 @@ speed.  She can bash down doors and swim under water.  She pays very little
 attention to intruders, which she may notice from 160 feet.  She may carry
 a object or treasure.  She can crush to attack with damage 1d8.  
 
-[Q] Smeagol  (L.Blue 'h')
+[U] Smeagol  (L.Blue 'h')
 === Num:52  Lev:3  Rar:2  Spd:+20  Hp:400  Ac:12  Exp:50
 Usually known as Gollum.  He's been sneaking, and he wants his 'precious.'
  This evil thief is normally found on dungeon level 3, and moves extremely
@@ -805,8 +814,7 @@ erratically, and very quickly.  He can open doors, bash down doors, pick up
 objects, climb on walls and ceilings and hide in unusual places.  He is
 invisible.  He is observant of intruders, which he may notice from 200
 feet.  He may carry a exceptional object or treasure.  He can touch to
-steal gold with damage 1d4.  You feel an intense desire to kill this
-monster...  
+steal gold with damage 1d4.  
 
 The Giant white rat  (L.Slate 'r')
 === Num:73  Lev:4  Rar:1  Spd:+0  Hp:2d2  Ac:7  Exp:1
@@ -897,7 +905,7 @@ It is about ten feet long.  This animal is normally found on dungeon level
 tends to overlook intruders, which it may notice from 60 feet.  It can bite
 to attack with damage 1d5, and crush to attack with damage 1d8.  
 
-The Giant fruit fly  (Green 'I')
+The Giant may fly  (Green 'I')
 === Num:917  Lev:4  Rar:1  Spd:+10  Hp:3d8  Ac:14  Exp:14
 An annoying pest.  This insect is normally found on dungeon level 4, and
 moves extremely erratically, and quickly.  It can fly over obstacles.  It
@@ -920,20 +928,20 @@ The Novice ranger  (L.Slate 'q')
 An agile hunter, ready and relaxed.  This warrior mage is normally found on
 dungeon level 4, and moves at normal speed.  He may shoot at you.  He is
 magical, casting spells which produce magic missiles; 1 time in 9.  He can
-illuminate the dungeon, open doors and bash down doors.  He is observant of
-intruders, which he may notice from 200 feet.  He may carry a object or
-treasure.  He can hit to attack with damage 1d5, hit to attack with damage
-1d5, and hurt with arrows.  
+illuminate the dungeon, open doors and bash down doors.  He needs light to
+see you.  He is observant of intruders, which he may notice from 200 feet.
+ He may carry a object or treasure.  He can hit to attack with damage 1d5,
+hit to attack with damage 1d5, and hurt with arrows.  
 
 The Novice paladin  (White 'p')
 === Num:70  Lev:4  Rar:1  Spd:+0  Hp:6d8  Ac:16  Exp:18
 An adventurer both devoutly religious and skillful in combat.  This warrior
 priest is normally found on dungeon level 4, and moves at normal speed.  He
 is magical, casting spells which cause light wounds or terrify; 1 time in
-9.  He can illuminate the dungeon, open doors and bash down doors.  He is
-observant of intruders, which he may notice from 200 feet.  He may carry a
-object or treasure.  He can hit to attack with damage 1d7, and hit to
-attack with damage 1d7.  
+9.  He can illuminate the dungeon, open doors and bash down doors.  He
+needs light to see you.  He is observant of intruders, which he may notice
+from 200 feet.  He may carry a object or treasure.  He can hit to attack
+with damage 1d7, and hit to attack with damage 1d7.  
 
 The Goblin archer  (L.Slate 'k')
 === Num:94  Lev:4  Rar:1  Spd:+0  Hp:6d7  Ac:16  Exp:20
@@ -1153,10 +1161,10 @@ A swarthy man of Bree.  He has heavy black brows and dark scornful eyes;
 his large mouth is curled in a sneer.  He sells anything to anybody and
 enjoys making mischief for his personal amusement.  This person is normally
 found on dungeon level 5, and moves quickly.  He can illuminate the
-dungeon, open doors and bash down doors.  He is fairly observant of
-intruders, which he may notice from 160 feet.  He may carry up to 4 good
-objects.  He can hit to attack with damage 1d8, and hit to attack with
-damage 1d8.  
+dungeon, open doors and bash down doors.  He needs light to see you.  He is
+fairly observant of intruders, which he may notice from 160 feet.  He may
+carry up to 4 good objects.  He can hit to attack with damage 1d8, and hit
+to attack with damage 1d8.  
 
 [U] Lotho Sackville-Baggins, Betrayer of the Shire  (L.Umber 'h')
 === Num:621  Lev:5  Rar:3  Spd:+10  Hp:60  Ac:8  Exp:90
@@ -1199,28 +1207,29 @@ He is leaving behind a trail of dropped spell components.  This mage is
 normally found on dungeon level 6, and moves at normal speed.  He is
 magical, casting spells which produce magic missiles, blind, confuse or
 blink-self; 1 time in 12.  He can illuminate the dungeon, open doors and
-bash down doors.  He is fairly observant of intruders, which he may notice
-from 200 feet.  He usually appears in groups.  He may carry a object or
-treasure.  He can hit to attack with damage 1d4.  
+bash down doors.  He needs light to see you.  He is fairly observant of
+intruders, which he may notice from 200 feet.  He usually appears in
+groups.  He may carry a object or treasure.  He can hit to attack with
+damage 1d4.  
 
 The Novice priest  (Blue 'p')
 === Num:89  Lev:6  Rar:2  Spd:+0  Hp:7d4  Ac:10  Exp:6
 He is tripping over his priestly robes.  This priest is normally found on
 dungeon level 6, and moves at normal speed.  He is magical, casting spells
 which cause light wounds, terrify or heal-self; 1 time in 12.  He can
-illuminate the dungeon, open doors and bash down doors.  He is observant of
-intruders, which he may notice from 200 feet.  He usually appears in
-groups.  He may carry a object or treasure.  He can hit to attack with
-damage 1d5.  
+illuminate the dungeon, open doors and bash down doors.  He needs light to
+see you.  He is observant of intruders, which he may notice from 200 feet.
+ He usually appears in groups.  He may carry a object or treasure.  He can
+hit to attack with damage 1d5.  
 
 The Novice warrior  (Umber 't')
 === Num:90  Lev:6  Rar:2  Spd:+0  Hp:9d4  Ac:16  Exp:6
 He looks inexperienced but tough.  This warrior is normally found on
 dungeon level 6, and moves at normal speed.  He can illuminate the dungeon,
-open doors and bash down doors.  He is observant of intruders, which he may
-notice from 200 feet.  He usually appears in groups.  He may carry a object
-or treasure.  He can hit to attack with damage 1d7, and hit to attack with
-damage 1d7.  
+open doors and bash down doors.  He needs light to see you.  He is
+observant of intruders, which he may notice from 200 feet.  He usually
+appears in groups.  He may carry a object or treasure.  He can hit to
+attack with damage 1d7, and hit to attack with damage 1d7.  
 
 The Novice rogue  (Blue 't')
 === Num:91  Lev:6  Rar:2  Spd:+0  Hp:8d4  Ac:12  Exp:6
@@ -1255,9 +1264,10 @@ He is waves a magical talisman at you.  This shaman is normally found on
 dungeon level 6, and moves at normal speed.  He is magical, casting spells
 which produce magic missiles, terrify, heal-self, blink-self or summon
 animals; 1 time in 12.  He can illuminate the dungeon, open doors and bash
-down doors.  He is fairly observant of intruders, which he may notice from
-200 feet.  He usually appears in groups.  He may carry a object or
-treasure.  He can hit to attack with damage 1d4.  
+down doors.  He needs light to see you.  He is fairly observant of
+intruders, which he may notice from 200 feet.  He usually appears in
+groups.  He may carry a object or treasure.  He can hit to attack with
+damage 1d4.  
 
 The Chimpanzee  (Slate 'Y')
 === Num:1076  Lev:6  Rar:2  Spd:+0  Hp:13d4  Ac:13  Exp:9
@@ -1410,7 +1420,7 @@ very little attention to intruders, which she may notice from 190 feet.
 She may carry a object or treasure.  She can crush to attack with damage
 1d8, and spit to poison with damage 2d8.  
 
-[Q] Old Man Willow  (Slate ',')
+[U] Old Man Willow  (Slate '<')
 === Num:622  Lev:6  Rar:5  Spd:+0  Hp:320  Ac:10  Exp:230
 A huge willow-tree, old and hoary.  It looks enormous, its sprawling
 branches going up like reaching arms with many long-fingered hands, its
@@ -1424,7 +1434,7 @@ teleport to or create darkness; 1 time in 8.  It is cold blooded.  It is
 not detected by telepathy.  It resists acid and poison.  It takes a while
 to see intruders, which it may notice from 200 feet.  It may carry a good
 object.  It can touch to paralyze, touch to paralyze, and crush to attack
-with damage 2d12.  You feel an intense desire to kill this monster...  
+with damage 2d12.  
 
 The Giant grey mouse  (Slate 'r')
 === Num:1036  Lev:7  Rar:1  Spd:+0  Hp:2d3  Ac:6  Exp:2
@@ -1666,6 +1676,39 @@ little attention to intruders, which she may notice from 200 feet.  She may
 carry a object or treasure.  She can crush to attack with damage 1d10, and
 bite to reduce strength with damage 1d4.  
 
+[U] Bert, the Stone Troll  (L.Slate 'T')
+=== Num:343  Lev:7  Rar:1  Spd:+0  Hp:23d10  Ac:40  Exp:85
+Big, brawny, powerful and with a taste for dwarf.  He has friends called
+Bill and Tom.  This evil troll is normally found on dungeon level 7, and
+moves at normal speed.  He can open doors and bash down doors.  He
+regenerates quickly.  He is hurt by rock remover and bright light.  He
+tends to overlook intruders, which he may notice from 200 feet.  He usually
+appears in groups.  He may carry a good object or treasure.  He can hit to
+attack with damage 1d6, hit to attack with damage 1d6, and bite to attack
+with damage 3d4.  
+
+[U] Bill, the Stone Troll  (L.Slate 'T')
+=== Num:344  Lev:7  Rar:1  Spd:+0  Hp:23d10  Ac:40  Exp:85
+Big, brawny, stupid and with a taste for dwarf.  He has friends called Bert
+and Tom.  This evil troll is normally found on dungeon level 7, and moves
+at normal speed.  He can open doors and bash down doors.  He regenerates
+quickly.  He is hurt by rock remover and bright light.  He tends to
+overlook intruders, which he may notice from 200 feet.  He usually appears
+in groups.  He may carry a good object or treasure.  He can hit to attack
+with damage 1d6, hit to attack with damage 1d6, and bite to attack with
+damage 3d4.  
+
+[U] Tom, the Stone Troll  (L.Slate 'T')
+=== Num:345  Lev:7  Rar:1  Spd:+0  Hp:23d10  Ac:40  Exp:85
+Big, brawny, stupid and with a taste for dwarf.  He has friends called Bill
+and Bert.   This evil troll is normally found on dungeon level 7, and moves
+at normal speed.  He can open doors and bash down doors.  He regenerates
+quickly.  He is hurt by rock remover and bright light.  He tends to
+overlook intruders, which he may notice from 200 feet.  He usually appears
+in groups.  He may carry a good object or treasure.  He can hit to attack
+with damage 1d6, hit to attack with damage 1d6, and bite to attack with
+damage 3d4.  
+
 [U] Radbug, the Goblin  (L.Slate 'k')
 === Num:110  Lev:7  Rar:3  Spd:+0  Hp:150  Ac:20  Exp:100
 Strong and powerful, for a goblin.  This evil orc is normally found on
@@ -1717,20 +1760,22 @@ The Novice ranger  (L.Slate 'q')
 An agile hunter, ready and relaxed.  This warrior mage is normally found on
 dungeon level 8, and moves at normal speed.  He may shoot at you.  He is
 magical, casting spells which produce magic missiles; 1 time in 9.  He can
-illuminate the dungeon, open doors and bash down doors.  He is observant of
-intruders, which he may notice from 200 feet.  He usually appears in
-groups.  He may carry a object or treasure.  He can hit to attack with
-damage 1d5, hit to attack with damage 1d5, and hurt with arrows.  
+illuminate the dungeon, open doors and bash down doors.  He needs light to
+see you.  He is observant of intruders, which he may notice from 200 feet.
+ He usually appears in groups.  He may carry a object or treasure.  He can
+hit to attack with damage 1d5, hit to attack with damage 1d5, and hurt with
+arrows.  
 
 The Novice paladin  (White 'p')
 === Num:118  Lev:8  Rar:2  Spd:+0  Hp:6d8  Ac:16  Exp:18
 An adventurer both devoutly religious and skillful in combat.  This warrior
 priest is normally found on dungeon level 8, and moves at normal speed.  He
 is magical, casting spells which cause light wounds or terrify; 1 time in
-9.  He can illuminate the dungeon, open doors and bash down doors.  He is
-observant of intruders, which he may notice from 200 feet.  He usually
-appears in groups.  He may carry a object or treasure.  He can hit to
-attack with damage 1d7, and hit to attack with damage 1d7.  
+9.  He can illuminate the dungeon, open doors and bash down doors.  He
+needs light to see you.  He is observant of intruders, which he may notice
+from 200 feet.  He usually appears in groups.  He may carry a object or
+treasure.  He can hit to attack with damage 1d7, and hit to attack with
+damage 1d7.  
 
 The Pink icky thing  (L.Red 'i')
 === Num:896  Lev:8  Rar:1  Spd:+0  Hp:6d8  Ac:14  Exp:18
@@ -1829,10 +1874,10 @@ The Bandit  (Red 't')
 === Num:121  Lev:8  Rar:2  Spd:+0  Hp:8d8  Ac:24  Exp:26
 He is after your cash!  This evil thief is normally found on dungeon level
 8, and moves at normal speed.  He can open doors, bash down doors, pick up
-objects and hide in unusual places.  He is fairly observant of intruders,
-which he may notice from 200 feet.  He may carry one or two objects or
-treasures.  He can hit to attack with damage 2d4, and touch to steal gold.
- 
+objects and hide in unusual places.  He needs light to see you.  He is
+fairly observant of intruders, which he may notice from 200 feet.  He may
+carry one or two objects or treasures.  He can hit to attack with damage
+2d4, and touch to steal gold.  
 
 The Green mold  (Green 'm')
 === Num:116  Lev:8  Rar:1  Spd:+0  Hp:21d8  Ac:14  Exp:28
@@ -1900,7 +1945,7 @@ good objects.  He can hit to attack with damage 1d10, hit to attack with
 damage 1d10, hit to attack with damage 1d9, and hit to attack with damage
 1d9.  
 
-[Q] The Dunlending Agent of the Nazgul  (L.Blue 't')
+[U] The Dunlending Agent of the Nazgul  (L.Blue 't')
 === Num:111  Lev:8  Rar:1  Spd:+0  Hp:250  Ac:30  Exp:150
 A squint-eyed southerner working with Bill Ferny as a spy in Bree.  He is
 an outlaw driven from Dunland, where many said that he had orc-blood in
@@ -1910,10 +1955,10 @@ to Bree as a spy in their service.  This evil person is normally found on
 dungeon level 8, and moves at normal speed.  He is magical, casting spells
 which produce poison balls, produce frost bolts, slow, heal-self or create
 traps; 1 time in 5.  He can open doors, bash down doors and pick up
-objects.  He takes a while to see intruders, which he may notice from 200
-feet.  He may carry one or two exceptional objects.  He can hit to attack
-with damage 1d5, hit to attack with damage 1d5, touch to steal gold, and
-insult to nothing.  You feel an intense desire to kill this monster...  
+objects.  He needs light to see you.  He takes a while to see intruders,
+which he may notice from 200 feet.  He may carry one or two exceptional
+objects.  He can hit to attack with damage 1d5, hit to attack with damage
+1d5, touch to steal gold, and insult to nothing.  
 
 The Giant grey rat  (Slate 'r')
 === Num:124  Lev:9  Rar:1  Spd:+0  Hp:2d3  Ac:12  Exp:2
@@ -2171,11 +2216,11 @@ with damage 1d8.
 === Num:133  Lev:9  Rar:2  Spd:+0  Hp:210  Ac:25  Exp:100
 A nasty piece of work, Brodda picks on defenseless women and children. 
 This person is normally found on dungeon level 9, and moves at normal
-speed.  He can open doors and bash down doors.  He takes a while to see
-intruders, which he may notice from 200 feet.  He may carry one or two good
-objects.  He can hit to attack with damage 1d12, hit to attack with damage
-1d12, hit to attack with damage 1d12, and hit to attack with damage 1d12.
- 
+speed.  He can open doors and bash down doors.  He needs light to see you.
+ He takes a while to see intruders, which he may notice from 200 feet.  He
+may carry one or two good objects.  He can hit to attack with damage 1d12,
+hit to attack with damage 1d12, hit to attack with damage 1d12, and hit to
+attack with damage 1d12.  
 
 The Giant red centipede  (Red 'c')
 === Num:741  Lev:10  Rar:1  Spd:+10  Hp:3d8  Ac:26  Exp:2
@@ -2371,10 +2416,10 @@ The Brigand  (L.Red 't')
 === Num:150  Lev:10  Rar:2  Spd:+0  Hp:9d8  Ac:32  Exp:35
 He is eyeing your backpack.  This evil thief is normally found on dungeon
 level 10, and moves at normal speed.  He can open doors, bash down doors,
-pick up objects and hide in unusual places.  He is fairly observant of
-intruders, which he may notice from 200 feet.  He may carry one or two
-objects or treasures.  He can hit to attack with damage 2d4, and touch to
-steal items.  
+pick up objects and hide in unusual places.  He needs light to see you.  He
+is fairly observant of intruders, which he may notice from 200 feet.  He
+may carry one or two objects or treasures.  He can hit to attack with
+damage 2d4, and touch to steal items.  
 
 The Gnome rogue  (Blue 'h')
 === Num:877  Lev:10  Rar:2  Spd:+0  Hp:9d8  Ac:28  Exp:35
@@ -2802,10 +2847,10 @@ The Priest  (L.Blue 'p')
 A robed man, dedicated to his god.  This evil priest is normally found on
 dungeon level 12, and moves at normal speed.  He is magical, casting spells
 intelligently which cause serious wounds, terrify, heal-self or summon a
-monster; 1 time in 3.  He can illuminate the dungeon, open doors and bash
-down doors.  He takes quite a while to see intruders, which he may notice
-from 200 feet.  He may carry one or two objects or treasures.  He can hit
-to attack with damage 2d3, and hit to attack with damage 2d3.  
+monster; 1 time in 3.  He can open doors and bash down doors.  He needs
+light to see you.  He takes quite a while to see intruders, which he may
+notice from 200 feet.  He may carry one or two objects or treasures.  He
+can hit to attack with damage 2d3, and hit to attack with damage 2d3.  
 
 The Skeleton human  (White 's')
 === Num:164  Lev:12  Rar:1  Spd:+0  Hp:10d8  Ac:30  Exp:38
@@ -2847,9 +2892,10 @@ The Swordsman  (L.Umber 't')
 === Num:168  Lev:12  Rar:1  Spd:+0  Hp:12d8  Ac:34  Exp:40
 A warrior of considerable skill.  This warrior is normally found on dungeon
 level 12, and moves at normal speed.  He can open doors and bash down
-doors.  He takes a while to see intruders, which he may notice from 200
-feet.  He may carry one or two objects or treasures.  He can hit to attack
-with damage 3d5, and hit to attack with damage 3d5.  
+doors.  He needs light to see you.  He takes a while to see intruders,
+which he may notice from 200 feet.  He may carry one or two objects or
+treasures.  He can hit to attack with damage 3d5, and hit to attack with
+damage 3d5.  
 
 The Stegocentipede  (Umber 'c')
 === Num:169  Lev:12  Rar:2  Spd:+10  Hp:13d8  Ac:30  Exp:40
@@ -3012,9 +3058,9 @@ A deceptive spell caster.  This evil mage is normally found on dungeon
 level 13, and moves quickly.  He is magical, casting spells intelligently
 which blind, confuse, slow, paralyze, haste-self, blink-self, teleport-self
 or create darkness; 1 time in 3.  He can open doors and bash down doors. 
-He is fairly observant of intruders, which he may notice from 200 feet.  He
-may carry one or two objects or treasures.  He can hit to attack with
-damage 2d2.  
+He needs light to see you.  He is fairly observant of intruders, which he
+may notice from 200 feet.  He may carry one or two objects or treasures. 
+He can hit to attack with damage 2d2.  
 
 The Shaman  (Green 'p')
 === Num:177  Lev:13  Rar:2  Spd:+0  Hp:12d12  Ac:10  Exp:50
@@ -3022,10 +3068,10 @@ A priest devoted to Nature.  This evil shaman is normally found on dungeon
 level 13, and moves at normal speed.  He is magical, casting spells
 intelligently which produce lightning bolts, produce fire bolts, blind,
 slow, paralyze, haste-self, blink-self or summon animals; 1 time in 3.  He
-can open doors and bash down doors.  He is fairly observant of intruders,
-which he may notice from 200 feet.  He may carry one or two objects or
-treasures.  He can hit to attack with damage 2d4, and hit to attack with
-damage 2d4.  
+can open doors and bash down doors.  He needs light to see you.  He is
+fairly observant of intruders, which he may notice from 200 feet.  He may
+carry one or two objects or treasures.  He can hit to attack with damage
+2d4, and hit to attack with damage 2d4.  
 
 The Orc sergeant  (L.Umber 'o')
 === Num:995  Lev:13  Rar:1  Spd:+0  Hp:15d10  Ac:46  Exp:50
@@ -3065,7 +3111,7 @@ quickly.  It can bash down doors.  It takes quite a while to see intruders,
 which it may notice from 250 feet.  It usually appears in groups.  It can
 bite to attack with damage 1d6, and bite to attack with damage 1d6.  
 
-[Q] The Great Goblin of the Misty Mountains  (Violet 'k')
+[U] The Great Goblin of the Misty Mountains  (Violet 'k')
 === Num:173  Lev:13  Rar:3  Spd:+10  Hp:180  Ac:24  Exp:200
 A great goblin, powerful in magic and sorcery.  This evil orc is normally
 found on dungeon level 13, and moves quickly.  He is magical, casting
@@ -3075,8 +3121,7 @@ He can open doors and bash down doors.  He is hurt by bright light.  He is
 fairly observant of intruders, which he may notice from 180 feet.  He
 usually appears with escorts.  He may carry up to 3 good objects.  He can
 hit to attack with damage 1d9, hit to attack with damage 1d9, and hit to
-attack with damage 1d8.  You feel an intense desire to kill this monster...
- 
+attack with damage 1d8.  
 
 The Giant black louse  (L.Dark 'I')
 === Num:187  Lev:14  Rar:1  Spd:+10  Hp:1d2  Ac:7  Exp:3
@@ -3430,10 +3475,10 @@ He is a hideous deformed cross-breed with man and orc, combining man's
 strength and cunning with orcish evil.  The traitorous wizard Saruman is
 generally believed to be responsible for this abomination.  This evil orc
 is normally found on dungeon level 15, and moves at normal speed.  He can
-open doors and bash down doors.  He takes a while to see intruders, which
-he may notice from 200 feet.  He usually appears in groups.  He may carry
-a object or treasure.  He can hit to attack with damage 3d4, and hit to
-attack with damage 3d4.  
+open doors and bash down doors.  He needs light to see you.  He takes a
+while to see intruders, which he may notice from 200 feet.  He usually
+appears in groups.  He may carry a object or treasure.  He can hit to
+attack with damage 3d4, and hit to attack with damage 3d4.  
 
 The Clear hound  (White 'Z')
 === Num:203  Lev:15  Rar:1  Spd:+0  Hp:6d6  Ac:30  Exp:50
@@ -3557,16 +3602,6 @@ It can fly over obstacles.  It is rarely detected by telepathy.  It breeds
 explosively.  It is fairly observant of intruders, which it may notice from
 80 feet.  It can bite to confuse with damage 2d2.  
 
-The Green slime  (Green ',')
-=== Num:660  Lev:16  Rar:2  Spd:+10  Hp:2d4  Ac:1  Exp:5
-Ugh! It quickly creeps alone the dungeon floor.  This plant is normally
-found on dungeon level 16, and moves extremely erratically, and quickly,
-but does not deign to chase intruders.  It is cold blooded.  It is not
-detected by telepathy.  It breeds explosively.  It resists acid and poison.
- It cannot be frightened, confused or slept.  It is ever vigilant for
-intruders, which it may notice from 40 feet.  It usually appears in groups.
- It can touch to poison with damage 1d4.  
-
 The Giant green locust  (Green 'I')
 === Num:903  Lev:16  Rar:1  Spd:+10  Hp:2d5  Ac:7  Exp:5
 It voraciously eats and breeds leaving nothing in its wake.  This insect is
@@ -3665,7 +3700,7 @@ from 200 feet.  He usually appears in groups.  He may carry a object or
 treasure.  He can hit to attack with damage 3d5, hit to attack with damage
 3d5, and hurt with arrows.  
 
-The Green dragon bat  (Red 'b')
+The Green dragon bat  (Green 'b')
 === Num:714  Lev:16  Rar:1  Spd:+20  Hp:2d7  Ac:22  Exp:60
 It is a sharp-tailed bat, rank with venom.  This mix of animal and dragon
 is normally found on dungeon level 16, and moves somewhat erratically, and
@@ -3855,20 +3890,11 @@ feet.  It usually appears in groups.  It can bite to attack with damage
 === Num:211  Lev:16  Rar:3  Spd:+0  Hp:340  Ac:40  Exp:200
 A short and swarthy Easterling.  This evil warrior is normally found on
 dungeon level 16, and moves at normal speed.  He can open doors, bash down
-doors and pick up objects.  He takes quite a while to see intruders, which
-he may notice from 200 feet.  He may carry a good object.  He can hit to
-attack with damage 3d5, hit to attack with damage 3d5, hit to attack with
-damage 3d5, and hit to attack with damage 3d5.  
-
-The Yellow slime  (Yellow ',')
-=== Num:661  Lev:17  Rar:3  Spd:+10  Hp:3d4  Ac:1  Exp:6
-Ugh! It quickly creeps alone the dungeon floor.  This plant is normally
-found on dungeon level 17, and moves extremely erratically, and quickly,
-but does not deign to chase intruders.  It is cold blooded.  It is not
-detected by telepathy.  It breeds explosively.  It resists acid and poison.
- It cannot be frightened, confused or slept.  It is ever vigilant for
-intruders, which it may notice from 40 feet.  It usually appears in groups.
- It can touch to eat your food with damage 1d4.  
+doors and pick up objects.  He needs light to see you.  He takes quite a
+while to see intruders, which he may notice from 200 feet.  He may carry a
+good object.  He can hit to attack with damage 3d5, hit to attack with
+damage 3d5, hit to attack with damage 3d5, and hit to attack with damage
+3d5.  
 
 The Giant yellow locust  (Yellow 'I')
 === Num:904  Lev:17  Rar:1  Spd:+10  Hp:2d7  Ac:7  Exp:6
@@ -4044,15 +4070,15 @@ he may notice from 250 feet.  He may carry one or two good objects.  He can
 hit to attack with damage 3d5, hit to attack with damage 3d5, hit to attack
 with damage 3d5, and hit to attack with damage 3d5.  
 
-The Silver slime  (L.Slate ',')
-=== Num:662  Lev:18  Rar:3  Spd:+10  Hp:3d4  Ac:1  Exp:7
+The Green slime  (Green ',')
+=== Num:660  Lev:18  Rar:2  Spd:+10  Hp:2d4  Ac:1  Exp:5
 Ugh! It quickly creeps alone the dungeon floor.  This plant is normally
 found on dungeon level 18, and moves extremely erratically, and quickly,
 but does not deign to chase intruders.  It is cold blooded.  It is not
 detected by telepathy.  It breeds explosively.  It resists acid and poison.
  It cannot be frightened, confused or slept.  It is ever vigilant for
 intruders, which it may notice from 40 feet.  It usually appears in groups.
- It can touch to absorb light with damage 1d4.  
+ It can touch to poison with damage 1d4.  
 
 The Giant red speckled frog  (Red 'F')
 === Num:815  Lev:18  Rar:1  Spd:+0  Hp:6d8  Ac:20  Exp:16
@@ -4193,7 +4219,7 @@ with escorts.  He may carry a object or treasure.  He can hit to attack
 with damage 3d5, hit to attack with damage 3d5, hit to attack with damage
 3d5, and hurt with arrows.  
 
-[Q] Black eye  (L.Dark 'e')
+The Black eye  (L.Dark 'e')
 === Num:588  Lev:18  Rar:3  Spd:+0  Hp:15d8  Ac:6  Exp:80
 A huge disembodied eye.  As you stare into the black nothingness of its
 pupil, you feel your will and vitality draining away, and are unable to do
@@ -4204,7 +4230,7 @@ spells which paralyze or teleport to; 1 time in 7.  It can fly over
 obstacles.  It is hurt by bright light.  It cannot be frightened.  It is
 fairly observant of intruders, which it may notice from 20 feet.  It can
 gaze to lower experience (by 10d6+), and gaze to lower experience (by
-10d6+).  You feel an intense desire to kill this monster...  
+10d6+).  
 
 The Chanting spirit  (L.Red 'G')
 === Num:865  Lev:18  Rar:2  Spd:+10  Hp:16d8  Ac:20  Exp:92
@@ -4236,16 +4262,6 @@ erratically, and quickly.  It may shriek for help.  It is rarely detected
 by telepathy.  It breeds explosively.  It is fairly observant of intruders,
 which it may notice from 80 feet.  It can bite to poison with damage 2d2.
  
-
-The Clear slime  (White ',')
-=== Num:663  Lev:19  Rar:3  Spd:+10  Hp:4d4  Ac:1  Exp:8
-Ugh! It quickly creeps alone the dungeon floor.  This plant is normally
-found on dungeon level 19, and moves a bit erratically, and quickly, but
-does not deign to chase intruders.  It is invisible.  It is cold blooded.
- It is not detected by telepathy.  It breeds explosively.  It cannot be
-frightened, confused or slept.  It is ever vigilant for intruders, which it
-may notice from 40 feet.  It usually appears in groups.  It can touch to
-attack with damage 1d4.  
 
 The Disenchanter ooze  (Violet 'j')
 === Num:932  Lev:19  Rar:1  Spd:+0  Hp:6d8  Ac:15  Exp:50
@@ -4444,17 +4460,6 @@ usually appears with escorts.  He may carry one or two good objects.  He
 can hit to attack with damage 3d8, hit to attack with damage 3d8, hit to
 attack with damage 3d5, and hit to attack with damage 3d5.  
 
-The Purple slime  (Violet ',')
-=== Num:664  Lev:20  Rar:2  Spd:+10  Hp:4d4  Ac:1  Exp:9
-Ugh! It quickly creeps alone the dungeon floor.  This plant is normally
-found on dungeon level 20, and moves extremely erratically, and quickly,
-but does not deign to chase intruders.  It is cold blooded.  It is not
-detected by telepathy.  It breeds explosively.  It cannot be frightened,
-confused or slept.  It is ever vigilant for intruders, which it may notice
-from 40 feet.  It usually appears in groups.  It can touch to reduce
-constitution with damage 1d4, and touch to reduce constitution with damage
-1d4.  
-
 The Giant red bat  (Red 'b')
 === Num:713  Lev:20  Rar:1  Spd:+10  Hp:8d8  Ac:24  Exp:10
 It screeches as it attacks.  This animal is normally found on dungeon level
@@ -4482,9 +4487,10 @@ warrior mage is normally found on dungeon level 20, and moves at normal
 speed.  He is magical, casting spells which produce lightning bolts,
 produce frost bolts, produce magic missiles, blink-self or summon animals;
 1 time in 4.  He can open doors, bash down doors and pick up objects.  He
-takes quite a while to see intruders, which he may notice from 200 feet. 
-He may carry one or two objects or treasures.  He can hit to attack with
-damage 5d4, hit to attack with damage 5d4, and hurt with arrows.  
+needs light to see you.  He takes quite a while to see intruders, which he
+may notice from 200 feet.  He may carry one or two objects or treasures. 
+He can hit to attack with damage 5d4, hit to attack with damage 5d4, and
+hurt with arrows.  
 
 The Paladin  (Slate 'p')
 === Num:581  Lev:20  Rar:1  Spd:+0  Hp:15d11  Ac:40  Exp:55
@@ -4493,10 +4499,10 @@ is rivalry even between the various gods of Good, so he is your enemy.
 This warrior priest is normally found on dungeon level 20, and moves at
 normal speed.  He is magical, casting spells which cause serious wounds,
 terrify, blind, slow or heal-self; 1 time in 4.  He can open doors, bash
-down doors and pick up objects.  He takes quite a while to see intruders,
-which he may notice from 200 feet.  He may carry one or two objects or
-treasures.  He can hit to attack with damage 4d5, and hit to attack with
-damage 4d5.  
+down doors and pick up objects.  He needs light to see you.  He takes quite
+a while to see intruders, which he may notice from 200 feet.  He may carry
+one or two objects or treasures.  He can hit to attack with damage 4d5, and
+hit to attack with damage 4d5.  
 
 The Blink spider  (L.Blue 'S')
 === Num:236  Lev:20  Rar:2  Spd:+10  Hp:6d8  Ac:25  Exp:60
@@ -4709,15 +4715,15 @@ feet.  He usually appears with escorts.  He may carry up to 4 good objects.
  He can hit to attack with damage 3d6, hit to attack with damage 3d6, hit
 to attack with damage 3d6, and hit to attack with damage 3d6.  
 
-The Pink slime  (White ',')
-=== Num:665  Lev:21  Rar:2  Spd:+10  Hp:5d4  Ac:1  Exp:10
+The Yellow slime  (Yellow ',')
+=== Num:661  Lev:21  Rar:3  Spd:+10  Hp:3d4  Ac:1  Exp:6
 Ugh! It quickly creeps alone the dungeon floor.  This plant is normally
 found on dungeon level 21, and moves extremely erratically, and quickly,
 but does not deign to chase intruders.  It is cold blooded.  It is not
-detected by telepathy.  It breeds explosively.  It cannot be frightened,
-confused or slept.  It is ever vigilant for intruders, which it may notice
-from 40 feet.  It usually appears in groups.  It can touch to reduce
-strength with damage 1d4, and touch to reduce strength with damage 1d4.  
+detected by telepathy.  It breeds explosively.  It resists acid and poison.
+ It cannot be frightened, confused or slept.  It is ever vigilant for
+intruders, which it may notice from 40 feet.  It usually appears in groups.
+ It can touch to eat your food with damage 1d4.  
 
 The Grey ooze  (Slate 'j')
 === Num:929  Lev:21  Rar:1  Spd:+0  Hp:10d8  Ac:6  Exp:10
@@ -4979,14 +4985,14 @@ with damage 2d6.
 === Num:633  Lev:22  Rar:3  Spd:+0  Hp:720  Ac:95  Exp:550
 A strong and cunning orc warrior, a commander of Saruman's orcish horde. 
 This evil orc warrior is normally found on dungeon level 22, and moves at
-normal speed.  He can open doors and bash down doors.  He resists fire,
-cold and poison.  He cannot be confused or slept.  He takes a while to see
-intruders, which he may notice from 200 feet.  He usually appears with
-escorts.  He may carry one or two good objects.  He can hit to attack with
-damage 3d8, hit to attack with damage 3d8, hit to attack with damage 3d5,
-and hit to attack with damage 3d5.  
+normal speed.  He can open doors and bash down doors.  He needs light to
+see you.  He resists fire, cold and poison.  He cannot be confused or
+slept.  He takes a while to see intruders, which he may notice from 200
+feet.  He usually appears with escorts.  He may carry one or two good
+objects.  He can hit to attack with damage 3d8, hit to attack with damage
+3d8, hit to attack with damage 3d5, and hit to attack with damage 3d5.  
 
-[Q] Grishnakh, the Half Orc Captain of Barad-dur  (Blue 'o')
+[U] Grishnakh, the Half Orc Captain of Barad-dur  (Blue 'o')
 === Num:634  Lev:22  Rar:3  Spd:+0  Hp:720  Ac:95  Exp:550
 A strong and cunning orc warrior, a commander of Sauron's orcish horde. 
 This evil orc warrior is normally found on dungeon level 22, and moves at
@@ -4995,10 +5001,9 @@ cold and poison.  He cannot be confused or slept.  He takes a while to see
 intruders, which he may notice from 200 feet.  He usually appears with
 escorts.  He may carry one or two good objects.  He can hit to attack with
 damage 3d8, hit to attack with damage 3d8, hit to attack with damage 3d5,
-and hit to attack with damage 3d5.  You feel an intense desire to kill this
-monster...  
+and hit to attack with damage 3d5.  
 
-[Q] Lurtz, Uruk Captain of the White Hand  (Blue 'o')
+[U] Lurtz, Uruk Captain of the White Hand  (Blue 'o')
 === Num:644  Lev:22  Rar:3  Spd:+0  Hp:720  Ac:95  Exp:550
 A strong and cunning orc warrior, a commander of Saruman's orcish horde. 
 This evil orc is normally found on dungeon level 22, and moves at normal
@@ -5007,20 +5012,18 @@ poison.  He cannot be confused or slept.  He takes a while to see
 intruders, which he may notice from 200 feet.  He usually appears with
 escorts.  He may carry one or two good objects.  He can hit to attack with
 damage 3d8, hit to attack with damage 3d8, hit to attack with damage 3d5,
-and hit to attack with damage 3d5.  You feel an intense desire to kill this
-monster...  
+and hit to attack with damage 3d5.  
 
-[Q] Ugluk, Half-Orc Captain of the White Hand  (Blue 'o')
+[U] Ugluk, Half-Orc Captain of the White Hand  (Blue 'o')
 === Num:249  Lev:22  Rar:3  Spd:+0  Hp:720  Ac:95  Exp:600
 A strong and cunning orc warrior, the commander of Saruman's orcish horde.
  This evil orc is normally found on dungeon level 22, and moves at normal
-speed.  He can open doors and bash down doors.  He resists fire, cold and
-poison.  He cannot be confused or slept.  He takes a while to see
-intruders, which he may notice from 200 feet.  He usually appears with
-escorts.  He may carry one or two good objects.  He can hit to attack with
-damage 3d8, hit to attack with damage 3d8, hit to attack with damage 3d5,
-and hit to attack with damage 3d5.  You feel an intense desire to kill this
-monster...  
+speed.  He can open doors and bash down doors.  He needs light to see you.
+ He resists fire, cold and poison.  He cannot be confused or slept.  He
+takes a while to see intruders, which he may notice from 200 feet.  He
+usually appears with escorts.  He may carry one or two good objects.  He
+can hit to attack with damage 3d8, hit to attack with damage 3d8, hit to
+attack with damage 3d5, and hit to attack with damage 3d5.  
 
 The Black ooze  (L.Dark 'j')
 === Num:260  Lev:23  Rar:1  Spd:-20  Hp:6d8  Ac:6  Exp:7
@@ -5032,16 +5035,6 @@ tiny cracks.  It is not detected by telepathy.  It breeds explosively.  It
 resists poison.  It cannot be frightened.  It is vigilant for intruders,
 which it may notice from 100 feet.  It may carry a object or treasure.  It
 can touch to dissolve with damage 2d6.  
-
-The Blue slime  (Blue ',')
-=== Num:666  Lev:23  Rar:3  Spd:+10  Hp:5d4  Ac:1  Exp:12
-Ugh! It quickly creeps alone the dungeon floor.  This plant is normally
-found on dungeon level 23, and moves extremely erratically, and quickly,
-but does not deign to chase intruders.  It is cold blooded.  It is not
-detected by telepathy.  It breeds explosively.  It cannot be frightened,
-confused or slept.  It is ever vigilant for intruders, which it may notice
-from 40 feet.  It usually appears in groups.  It can touch to disenchant
-with damage 1d4, and touch to disenchant with damage 1d4.  
 
 The Crimson mold  (L.Red 'm')
 === Num:981  Lev:23  Rar:1  Spd:+0  Hp:16d8  Ac:18  Exp:40
@@ -5065,10 +5058,10 @@ The Hardened warrior  (L.Umber 't')
 === Num:261  Lev:23  Rar:1  Spd:+0  Hp:15d11  Ac:40  Exp:60
 A scarred warrior who moves with confidence.  This evil warrior is normally
 found on dungeon level 23, and moves at normal speed.  He can open doors,
-bash down doors and pick up objects.  He takes quite a while to see
-intruders, which he may notice from 200 feet.  He may carry one or two
-objects or treasures.  He can hit to attack with damage 6d5, and hit to
-attack with damage 6d5.  
+bash down doors and pick up objects.  He needs light to see you.  He takes
+quite a while to see intruders, which he may notice from 200 feet.  He may
+carry one or two objects or treasures.  He can hit to attack with damage
+6d5, and hit to attack with damage 6d5.  
 
 The Red dragon bat  (Red 'b')
 === Num:264  Lev:23  Rar:1  Spd:+20  Hp:3d8  Ac:28  Exp:60
@@ -5088,7 +5081,7 @@ very quickly.  It may breathe frost; 1 time in 4.  It can bash down doors.
  It tends to overlook intruders, which it may notice from 120 feet.  It
 usually appears in groups.  It can bite to freeze with damage 1d3.  
 
-The Black dragon bat  (White 'b')
+The Black dragon bat  (L.Dark 'b')
 === Num:725  Lev:23  Rar:2  Spd:+20  Hp:3d8  Ac:28  Exp:60
 It is a sharp-tailed bat, dripping in acid.  This mix of animal and dragon
 is normally found on dungeon level 23, and moves somewhat erratically, and
@@ -5182,10 +5175,11 @@ The Master rogue  (L.Blue 't')
 === Num:263  Lev:23  Rar:2  Spd:+10  Hp:15d9  Ac:30  Exp:110
 A thief of great power and shifty speed.  This evil thief is normally found
 on dungeon level 23, and moves quickly.  He can open doors, bash down
-doors, pick up objects and hide in unusual places.  He takes quite a while
-to see intruders, which he may notice from 200 feet.  He may carry up to 4
-objects or treasures.  He can hit to attack with damage 2d8, hit to attack
-with damage 2d8, and hit to steal gold with damage 4d4.  
+doors, pick up objects and hide in unusual places.  He needs light to see
+you.  He takes quite a while to see intruders, which he may notice from 200
+feet.  He may carry up to 4 objects or treasures.  He can hit to attack
+with damage 2d8, hit to attack with damage 2d8, and hit to steal gold with
+damage 4d4.  
 
 The Orc chieftain  (L.Green 'o')
 === Num:996  Lev:23  Rar:3  Spd:+0  Hp:30d10  Ac:72  Exp:110
@@ -5259,6 +5253,16 @@ barely see through them.  This insect is normally found on dungeon level
 dungeon and fly over obstacles.  It is rarely detected by telepathy.  It
 breeds explosively.  It is fairly observant of intruders, which it may
 notice from 80 feet.  It can bite to blind with damage 1d2.  
+
+The Silver slime  (L.Slate ',')
+=== Num:662  Lev:24  Rar:3  Spd:+10  Hp:3d4  Ac:1  Exp:7
+Ugh! It quickly creeps alone the dungeon floor.  This plant is normally
+found on dungeon level 24, and moves extremely erratically, and quickly,
+but does not deign to chase intruders.  It is cold blooded.  It is not
+detected by telepathy.  It breeds explosively.  It resists acid and poison.
+ It cannot be frightened, confused or slept.  It is ever vigilant for
+intruders, which it may notice from 40 feet.  It usually appears in groups.
+ It can touch to absorb light with damage 1d4.  
 
 The Banshee  (Blue 'G')
 === Num:275  Lev:24  Rar:2  Spd:+10  Hp:6d8  Ac:24  Exp:60
@@ -5413,22 +5417,23 @@ disenchant.
 A Black Numenorean with a blacker heart.  This evil person is normally
 found on dungeon level 24, and moves at normal speed.  He is magical,
 casting spells which slow or cause amnesia; 1 time in 4.  He can open doors
-and bash down doors.  He resists lightning and fire.  He cannot be confused
-or slept.  He takes a while to see intruders, which he may notice from 250
-feet.  He may carry up to 3 good objects.  He can hit to attack with damage
-4d6, hit to attack with damage 4d6, hit to attack with damage 4d6, and hit
-to attack with damage 4d6.  
+and bash down doors.  He needs light to see you.  He resists lightning and
+fire.  He cannot be confused or slept.  He takes a while to see intruders,
+which he may notice from 250 feet.  He may carry up to 3 good objects.  He
+can hit to attack with damage 4d6, hit to attack with damage 4d6, hit to
+attack with damage 4d6, and hit to attack with damage 4d6.  
 
 [U] Angamaite of Umbar  (Slate 'q')
 === Num:274  Lev:24  Rar:2  Spd:+0  Hp:800  Ac:80  Exp:400
 A Black Numenorean who hates the men of the west.  This evil person is
 normally found on dungeon level 24, and moves at normal speed.  He is
 magical, casting spells which slow or cause amnesia; 1 time in 4.  He can
-open doors and bash down doors.  He resists lightning and fire.  He cannot
-be confused or slept.  He takes a while to see intruders, which he may
-notice from 250 feet.  He may carry up to 3 good objects.  He can hit to
-attack with damage 4d6, hit to attack with damage 4d6, hit to attack with
-damage 4d6, and hit to attack with damage 4d6.  
+open doors and bash down doors.  He needs light to see you.  He resists
+lightning and fire.  He cannot be confused or slept.  He takes a while to
+see intruders, which he may notice from 250 feet.  He may carry up to 3
+good objects.  He can hit to attack with damage 4d6, hit to attack with
+damage 4d6, hit to attack with damage 4d6, and hit to attack with damage
+4d6.  
 
 The 4-headed hydra  (Yellow 'y')
 === Num:270  Lev:24  Rar:2  Spd:+10  Hp:100d6  Ac:70  Exp:450
@@ -5447,16 +5452,6 @@ It is a rodent of unusual size.  This animal is normally found on dungeon
 level 25, and moves a bit erratically at normal speed.  It can swim under
 water.  It breeds explosively.  It takes a while to see intruders, which it
 may notice from 80 feet.  It can bite to poison with damage 2d5.  
-
-The Black slime  (L.Dark ',')
-=== Num:667  Lev:25  Rar:4  Spd:+10  Hp:6d4  Ac:1  Exp:15
-Ugh! It quickly creeps alone the dungeon floor.  This plant is normally
-found on dungeon level 25, and moves extremely erratically, and quickly,
-but does not deign to chase intruders.  It is cold blooded.  It is not
-detected by telepathy.  It breeds explosively.  It cannot be frightened,
-confused or slept.  It is ever vigilant for intruders, which it may notice
-from 40 feet.  It usually appears in groups.  It can touch to reduce all
-stats with damage 1d4.  
 
 The Giant horned toad  (L.Umber 'F')
 === Num:826  Lev:25  Rar:1  Spd:+0  Hp:10d8  Ac:32  Exp:45
@@ -5524,39 +5519,6 @@ and bright light.  He tends to overlook intruders, which he may notice from
 treasure.  He can hit to attack with damage 1d6, hit to attack with damage
 1d6, and bite to attack with damage 3d4.  
 
-[Q] Bert,the Stone Troll  (L.Slate 'T')
-=== Num:343  Lev:25  Rar:1  Spd:+0  Hp:23d10  Ac:40  Exp:85
-Big, brawny, powerful and with a taste for dwarf.  He has friends called
-Bill and Tom.  This evil troll is normally found on dungeon level 25, and
-moves at normal speed.  He can open doors and bash down doors.  He
-regenerates quickly.  He is hurt by rock remover and bright light.  He
-tends to overlook intruders, which he may notice from 200 feet.  He usually
-appears in groups.  He may carry a good object or treasure.  He can hit to
-attack with damage 1d6, hit to attack with damage 1d6, and bite to attack
-with damage 3d4.  You feel an intense desire to kill this monster...  
-
-[Q] Bill, the Stone Troll  (L.Slate 'T')
-=== Num:344  Lev:25  Rar:1  Spd:+0  Hp:23d10  Ac:40  Exp:85
-Big, brawny, stupid and with a taste for dwarf.  He has friends called Bert
-and Tom.  This evil troll is normally found on dungeon level 25, and moves
-at normal speed.  He can open doors and bash down doors.  He regenerates
-quickly.  He is hurt by rock remover and bright light.  He tends to
-overlook intruders, which he may notice from 200 feet.  He usually appears
-in groups.  He may carry a good object or treasure.  He can hit to attack
-with damage 1d6, hit to attack with damage 1d6, and bite to attack with
-damage 3d4.  You feel an intense desire to kill this monster...  
-
-[Q] Tom, the Stone Troll  (L.Slate 'T')
-=== Num:345  Lev:25  Rar:1  Spd:+0  Hp:23d10  Ac:40  Exp:85
-Big, brawny, stupid and with a taste for dwarf.  He has friends called Bill
-and Bert.   This evil troll is normally found on dungeon level 25, and
-moves at normal speed.  He can open doors and bash down doors.  He
-regenerates quickly.  He is hurt by rock remover and bright light.  He
-tends to overlook intruders, which he may notice from 200 feet.  He usually
-appears in groups.  He may carry a good object or treasure.  He can hit to
-attack with damage 1d6, hit to attack with damage 1d6, and bite to attack
-with damage 3d4.  You feel an intense desire to kill this monster...  
-
 The Killer red beetle  (Red 'K')
 === Num:282  Lev:25  Rar:1  Spd:+0  Hp:20d8  Ac:50  Exp:90
 It is a giant beetle with poisonous mandibles.  This insect is normally
@@ -5569,10 +5531,10 @@ The Hill giant  (L.Umber 'P')
 === Num:184  Lev:25  Rar:1  Spd:+0  Hp:30d15  Ac:45  Exp:150
 A ten foot tall humanoid with powerful muscles.  This evil giant is
 normally found on dungeon level 25, and moves at normal speed.  It may
-throw boulders.  It can open doors and bash down doors.  It tends to
-overlook intruders, which it may notice from 200 feet.  It may carry a
-object or treasure.  It can hit to attack with damage 4d8, and hit to
-attack with damage 4d8.  
+throw boulders.  It can open doors and bash down doors.  It needs light to
+see you.  It tends to overlook intruders, which it may notice from 200
+feet.  It may carry a object or treasure.  It can hit to attack with damage
+4d8, and hit to attack with damage 4d8.  
 
 The Clear horror  (White 'H')
 === Num:889  Lev:25  Rar:1  Spd:+5  Hp:25d20  Ac:55  Exp:150
@@ -5861,10 +5823,20 @@ attack with damage 2d10, and hit to attack with damage 2d10.
 === Num:284  Lev:26  Rar:4  Spd:+0  Hp:850  Ac:40  Exp:500
 A short and swarthy Easterling.  This evil person is normally found on
 dungeon level 26, and moves at normal speed.  He can open doors, bash down
-doors and pick up objects.  He takes quite a while to see intruders, which
-he may notice from 200 feet.  He may carry a good object.  He can hit to
-attack with damage 4d6, hit to attack with damage 4d6, and hit to attack
-with damage 4d6.  
+doors and pick up objects.  He needs light to see you.  He takes quite a
+while to see intruders, which he may notice from 200 feet.  He may carry a
+good object.  He can hit to attack with damage 4d6, hit to attack with
+damage 4d6, and hit to attack with damage 4d6.  
+
+The Clear slime  (White ',')
+=== Num:663  Lev:27  Rar:3  Spd:+10  Hp:4d4  Ac:1  Exp:8
+Ugh! It quickly creeps alone the dungeon floor.  This plant is normally
+found on dungeon level 27, and moves a bit erratically, and quickly, but
+does not deign to chase intruders.  It is invisible.  It is cold blooded.
+ It is not detected by telepathy.  It breeds explosively.  It cannot be
+frightened, confused or slept.  It is ever vigilant for intruders, which it
+may notice from 40 feet.  It usually appears in groups.  It can touch to
+attack with damage 1d4.  
 
 The Creeping adamantite coins  (L.Green '$')
 === Num:292  Lev:27  Rar:3  Spd:+10  Hp:20d25  Ac:50  Exp:60
@@ -5881,10 +5853,11 @@ The Half-ogre  (L.Umber 'O')
 === Num:1013  Lev:27  Rar:1  Spd:+0  Hp:32d10  Ac:33  Exp:75
 A giant half-human orc-like figure.  This evil mix of orc and giant is
 normally found on dungeon level 27, and moves at normal speed.  It can open
-doors and bash down doors.  It takes quite a while to see intruders, which
-it may notice from 200 feet.  It usually appears in groups.  It may carry
-a object or treasure.  It can hit to attack with damage 1d8, hit to attack
-with damage 1d8, and hit to attack with damage 1d8.  
+doors and bash down doors.  It needs light to see you.  It takes quite a
+while to see intruders, which it may notice from 200 feet.  It usually
+appears in groups.  It may carry a object or treasure.  It can hit to
+attack with damage 1d8, hit to attack with damage 1d8, and hit to attack
+with damage 1d8.  
 
 The Giant driver ant  (L.Blue 'a')
 === Num:687  Lev:27  Rar:2  Spd:+10  Hp:14d6  Ac:40  Exp:90
@@ -6146,9 +6119,10 @@ is normally found on dungeon level 28, and moves at normal speed.  He is
 magical, casting spells intelligently which produce lightning bolts,
 produce fire bolts, produce frost bolts, blind, confuse, haste-self,
 teleport-self, teleport to or summon a monster; 1 time in 3.  He can open
-doors and bash down doors.  He is fairly observant of intruders, which he
-may notice from 200 feet.  He may carry one or two objects.  He can hit to
-attack with damage 2d5, and hit to attack with damage 2d5.  
+doors and bash down doors.  He needs light to see you.  He is fairly
+observant of intruders, which he may notice from 200 feet.  He may carry
+one or two objects.  He can hit to attack with damage 2d5, and hit to
+attack with damage 2d5.  
 
 The Spectator  (L.Blue 'e')
 === Num:589  Lev:28  Rar:2  Spd:+0  Hp:195  Ac:1  Exp:150
@@ -6166,12 +6140,12 @@ The Frost giant  (White 'P')
 === Num:199  Lev:28  Rar:1  Spd:+0  Hp:32d15  Ac:50  Exp:180
 A twelve foot tall giant covered in furs.  This evil giant is normally
 found on dungeon level 28, and moves at normal speed.  It may throw
-boulders.  It can open doors and bash down doors.  It resists cold.  It
-tends to overlook intruders, which it may notice from 200 feet.  It may
-carry a object or treasure.  It can hit to freeze with damage 5d8, and hit
-to freeze with damage 5d8.  
+boulders.  It can open doors and bash down doors.  It needs light to see
+you.  It resists cold.  It tends to overlook intruders, which it may notice
+from 200 feet.  It may carry a object or treasure.  It can hit to freeze
+with damage 5d8, and hit to freeze with damage 5d8.  
 
-The Mind flayer  (Violet 'h')
+The Mind flayer  (Violet 'H')
 === Num:306  Lev:28  Rar:1  Spd:+0  Hp:150  Ac:60  Exp:200
 A humanoid form with a gruesome head, tentacular mouth, and piercing eyes.
  Claws reach out for you and you feel a presence invade your mind.  This
@@ -6210,10 +6184,10 @@ He is a figure encased in deep black plate armour; he looks at you
 menacingly.  This evil warrior is normally found on dungeon level 28, and
 moves quickly.  He is magical, casting spells which cause critical wounds,
 terrify, blind or create darkness; 1 time in 8.  He can open doors and bash
-down doors.  He is fairly observant of intruders, which he may notice from
-200 feet.  He may carry one or two objects or treasures.  He can hit to
-attack with damage 5d5, hit to attack with damage 5d5, and hit to attack
-with damage 5d5.  
+down doors.  He needs light to see you.  He is fairly observant of
+intruders, which he may notice from 200 feet.  He may carry one or two
+objects or treasures.  He can hit to attack with damage 5d5, hit to attack
+with damage 5d5, and hit to attack with damage 5d5.  
 
 The Reflection  (L.Slate 'G')
 === Num:841  Lev:28  Rar:2  Spd:+10  Hp:12d8  Ac:29  Exp:270
@@ -6245,10 +6219,11 @@ sons of Feanor, it was Uldor's treachery that turned the tide of the Battle
 of Unnumbered Tears in Morgoth's favour.  This evil person is normally
 found on dungeon level 28, and moves at normal speed.  He is magical,
 casting spells which summon similar monsters; 1 time in 10.  He can open
-doors, bash down doors and pick up objects.  He takes quite a while to see
-intruders, which he may notice from 200 feet.  He may carry one or two good
-objects.  He can hit to attack with damage 4d6, hit to attack with damage
-4d6, hit to attack with damage 4d6, and hit to attack with damage 4d6.  
+doors, bash down doors and pick up objects.  He needs light to see you.  He
+takes quite a while to see intruders, which he may notice from 200 feet. 
+He may carry one or two good objects.  He can hit to attack with damage
+4d6, hit to attack with damage 4d6, hit to attack with damage 4d6, and hit
+to attack with damage 4d6.  
 
 The 5-headed hydra  (Green 'y')
 === Num:302  Lev:28  Rar:2  Spd:+10  Hp:100d8  Ac:80  Exp:650
@@ -6261,21 +6236,19 @@ carry up to 10 treasures.  It can bite to poison with damage 4d4, bite to
 poison with damage 4d4, bite to poison with damage 4d4, and bite to poison
 with damage 4d4.  
 
-[Q] Tom Bombadil  (Violet 'u')
+[U] Tom Bombadil  (Violet 'u')
 === Num:307  Lev:28  Rar:5  Spd:+10  Hp:520  Ac:50  Exp:750
 He wears a blue coat, his eyes are blue, and his face is as a ripe as a red
 apple, but creased in laughter.  This evil demon is normally found on
 dungeon level 28, and moves a bit erratically, and quickly.  It is magical,
 casting spells intelligently which terrify, blind, confuse, blink-self,
-teleport-self, teleport to, teleport away, teleport level or summon similar
-monsters; 1 time in 5.  It can bash down doors.  It is invisible.  It
-resists fire.  It takes a while to see intruders, which it may notice from
-200 feet.  It usually appears with escorts.  It may carry up to 8 good
-objects.  It can hit to poison with damage 3d4, hit to poison with damage
-3d4, and hit to attack with damage 3d4.  You feel an intense desire to kill
-this monster...  
+teleport-self, teleport to, teleport away or teleport level; 1 time in 5.
+ It can bash down doors.  It is invisible.  It resists fire.  It takes a
+while to see intruders, which it may notice from 200 feet.  It may carry up
+to 8 good objects.  It can hit to poison with damage 3d4, hit to poison
+with damage 3d4, and hit to attack with damage 3d4.  
 
-[Q] Beorn, the Shape-Changer  (L.Dark 'Q')
+[U] Beorn, the Shape-Changer  (L.Dark 'Q')
 === Num:566  Lev:28  Rar:3  Spd:+10  Hp:1400  Ac:60  Exp:1000
 Beorn is only occasionally seen in human form these days, preferring to
 appear in the shape of a giant black bear:  he also prefers the company of
@@ -6286,8 +6259,7 @@ bash down doors and push past weaker monsters.  He takes a while to see
 intruders, which he may notice from 250 feet.  He usually appears with
 escorts.  He may carry up to 4 good objects.  He can claw to attack with
 damage 2d10, claw to attack with damage 2d10, bite to attack with damage
-4d8, and crush to attack with damage 3d6.  You feel an intense desire to
-kill this monster...  
+4d8, and crush to attack with damage 3d6.  
 
 The Giant glowing rat  (Yellow 'r')
 === Num:1043  Lev:29  Rar:1  Spd:+0  Hp:3d3  Ac:24  Exp:2
@@ -6324,9 +6296,10 @@ The Green giant  (L.Green 'P')
 === Num:1022  Lev:29  Rar:1  Spd:+0  Hp:33d16  Ac:60  Exp:200
 A thirteen foot tall giant with smooth green skin.  This evil giant is
 normally found on dungeon level 29, and moves at normal speed.  It can open
-doors and bash down doors.  It tends to overlook intruders, which it may
-notice from 200 feet.  It may carry a object or treasure.  It can hit to
-burn with damage 6d8, and hit to burn with damage 6d8.  
+doors and bash down doors.  It needs light to see you.  It tends to
+overlook intruders, which it may notice from 200 feet.  It may carry a
+object or treasure.  It can hit to burn with damage 6d8, and hit to burn
+with damage 6d8.  
 
 The Clawed horror  (L.Red 'H')
 === Num:893  Lev:29  Rar:1  Spd:+5  Hp:33d20  Ac:75  Exp:230
@@ -6437,6 +6410,17 @@ down doors.  It is rarely detected by telepathy.  It resists lightning.  It
 tends to overlook intruders, which it may notice from 100 feet.  It can
 bite to electrify with damage 5d5.  
 
+The Purple slime  (Violet ',')
+=== Num:664  Lev:30  Rar:2  Spd:+10  Hp:4d4  Ac:1  Exp:9
+Ugh! It quickly creeps alone the dungeon floor.  This plant is normally
+found on dungeon level 30, and moves extremely erratically, and quickly,
+but does not deign to chase intruders.  It is cold blooded.  It is not
+detected by telepathy.  It breeds explosively.  It cannot be frightened,
+confused or slept.  It is ever vigilant for intruders, which it may notice
+from 40 feet.  It usually appears in groups.  It can touch to reduce
+constitution with damage 1d4, and touch to reduce constitution with damage
+1d4.  
+
 The Giant lightning bat  (Blue 'b')
 === Num:711  Lev:30  Rar:1  Spd:+10  Hp:8d8  Ac:34  Exp:10
 It screeches as it attacks.  This animal is normally found on dungeon level
@@ -6501,9 +6485,9 @@ The Fire giant  (Red 'P')
 A glowing fourteen foot tall giant.  Flames drip from its red skin.  This
 evil giant is normally found on dungeon level 30, and moves at normal
 speed.  It may throw boulders.  It can open doors and bash down doors.  It
-resists fire.  It tends to overlook intruders, which it may notice from 200
-feet.  It may carry a object or treasure.  It can hit to burn with damage
-6d8, and hit to burn with damage 6d8.  
+needs light to see you.  It resists fire.  It tends to overlook intruders,
+which it may notice from 200 feet.  It may carry a object or treasure.  It
+can hit to burn with damage 6d8, and hit to burn with damage 6d8.  
 
 The Skeleton troll  (White 's')
 === Num:320  Lev:30  Rar:1  Spd:+0  Hp:20d10  Ac:55  Exp:225
@@ -6600,10 +6584,10 @@ The Forest giant  (Green 'P')
 === Num:1023  Lev:31  Rar:1  Spd:+0  Hp:35d17  Ac:65  Exp:230
 A fifteen foot tall giant with legs like tree-trunks.  This evil giant is
 normally found on dungeon level 31, and moves at normal speed.  It can open
-doors, bash down doors and pick up objects.  It resists fire.  It tends to
-overlook intruders, which it may notice from 200 feet.  It may carry a
-object or treasure.  It can hit to attack with damage 6d8, and hit to
-attack with damage 6d8.  
+doors, bash down doors and pick up objects.  It needs light to see you.  It
+resists fire.  It tends to overlook intruders, which it may notice from 200
+feet.  It may carry a object or treasure.  It can hit to attack with damage
+6d8, and hit to attack with damage 6d8.  
 
 The Ghost  (White 'G')
 === Num:326  Lev:31  Rar:1  Spd:+10  Hp:13d8  Ac:30  Exp:350
@@ -6685,10 +6669,10 @@ The River giant  (L.Blue 'P')
 === Num:1024  Lev:32  Rar:2  Spd:+0  Hp:34d18  Ac:70  Exp:235
 A sixteen foot tall giant with unstoppable strength.  This evil giant is
 normally found on dungeon level 32, and moves at normal speed.  It can open
-doors, bash down doors, pick up objects and swim under water.  It tends to
-overlook intruders, which it may notice from 200 feet.  It may carry a
-object or treasure.  It can hit to attack with damage 7d8, and hit to
-attack with damage 7d8.  
+doors, bash down doors, pick up objects and swim under water.  It needs
+light to see you.  It tends to overlook intruders, which it may notice from
+200 feet.  It may carry a object or treasure.  It can hit to attack with
+damage 7d8, and hit to attack with damage 7d8.  
 
 The Doombat  (L.Red 'b')
 === Num:606  Lev:32  Rar:2  Spd:+10  Hp:24d14  Ac:75  Exp:250
@@ -6735,7 +6719,7 @@ intruders, which it may notice from 200 feet.  It may carry up to 8 objects
 or treasures.  It can claw to attack with damage 2d6, claw to attack with
 damage 2d6, and bite to attack with damage 3d8.  
 
-[Q] The Great Spider of Mirkwood  (L.Dark 'S')
+[U] The Great Spider of Mirkwood  (L.Dark 'S')
 === Num:637  Lev:32  Rar:3  Spd:+0  Hp:1200  Ac:80  Exp:1200
 The fattest and most bloated spider living in Mirkwood.  This evil insect
 is normally found on dungeon level 32, and moves at normal speed.  He is
@@ -6747,7 +6731,7 @@ slept.  He pays little attention to intruders, which he may notice from 80
 feet.  He usually appears with escorts.  He may carry up to 6 good objects.
  He can claw to poison with damage 2d5, claw to poison with damage 2d5,
 bite to paralyze with damage 2d10, and sting to reduce strength with damage
-1d4.  You feel an intense desire to kill this monster...  
+1d4.  
 
 [U] Ulbandi, the Ogre Chieftain  (Violet 'O')
 === Num:297  Lev:32  Rar:2  Spd:+10  Hp:1500  Ac:100  Exp:1500
@@ -6758,6 +6742,16 @@ doors.  He resists poison.  He takes a while to see intruders, which he may
 notice from 200 feet.  He usually appears with escorts.  He may carry up to
 4 good objects.  He can hit to attack with damage 6d6, hit to attack with
 damage 6d6, and hit to attack with damage 6d6.  
+
+The Pink slime  (White ',')
+=== Num:665  Lev:33  Rar:2  Spd:+10  Hp:5d4  Ac:1  Exp:10
+Ugh! It quickly creeps alone the dungeon floor.  This plant is normally
+found on dungeon level 33, and moves extremely erratically, and quickly,
+but does not deign to chase intruders.  It is cold blooded.  It is not
+detected by telepathy.  It breeds explosively.  It cannot be frightened,
+confused or slept.  It is ever vigilant for intruders, which it may notice
+from 40 feet.  It usually appears in groups.  It can touch to reduce
+strength with damage 1d4, and touch to reduce strength with damage 1d4.  
 
 The Orc king  (L.Green 'o')
 === Num:997  Lev:33  Rar:3  Spd:+0  Hp:40d10  Ac:85  Exp:110
@@ -6783,18 +6777,18 @@ The Swamp giant  (L.Green 'P')
 A seventeen foot tall giant with putrid hair and slimey skin.  This evil
 giant is normally found on dungeon level 33, and moves at normal speed.  It
 can open doors, bash down doors, pick up objects and swim under water.  It
-resists acid.  It tends to overlook intruders, which it may notice from 200
-feet.  It may carry a object or treasure.  It can hit to attack with damage
-7d8, and hit to attack with damage 7d8.  
+needs light to see you.  It resists acid.  It tends to overlook intruders,
+which it may notice from 200 feet.  It may carry a object or treasure.  It
+can hit to attack with damage 7d8, and hit to attack with damage 7d8.  
 
 The Stone giant  (L.Slate 'P')
 === Num:230  Lev:33  Rar:1  Spd:+0  Hp:35d18  Ac:75  Exp:250
 It is eighteen feet tall and looking at you.  This evil giant is normally
 found on dungeon level 33, and moves at normal speed.  It may throw
 boulders.  It can open doors, bash down doors and pick up objects.  It
-tends to overlook intruders, which it may notice from 200 feet.  It may
-carry a object or treasure.  It can hit to attack with damage 7d8, and hit
-to attack with damage 7d8.  
+needs light to see you.  It tends to overlook intruders, which it may
+notice from 200 feet.  It may carry a object or treasure.  It can hit to
+attack with damage 7d8, and hit to attack with damage 7d8.  
 
 The Skeleton ettin  (White 's')
 === Num:338  Lev:33  Rar:1  Spd:+0  Hp:450  Ac:50  Exp:325
@@ -6890,12 +6884,12 @@ An adept at unarmed combat, the mystic strikes with stunning power.  He can
 summon help from nature and is able to focus his power to ease any pain. 
 This shaman is normally found on dungeon level 33, and moves quickly.  He
 is magical, casting spells which heal-self, summon animals or summon
-spiders; 1 time in 6.  He can open doors and bash down doors.  He is
-invisible.  He resists acid and poison.  He cannot be confused or slept. 
-He is observant of intruders, which he may notice from 300 feet.  He may
-carry one or two objects.  He can kick to attack with damage 10d2, kick to
-attack with damage 10d2, kick to attack with damage 10d2, and kick to
-attack with damage 10d2.  
+spiders; 1 time in 6.  He can open doors and bash down doors.  He needs
+light to see you.  He is invisible.  He resists acid and poison.  He cannot
+be confused or slept.  He is observant of intruders, which he may notice
+from 300 feet.  He may carry one or two objects.  He can kick to attack
+with damage 10d2, kick to attack with damage 10d2, kick to attack with
+damage 10d2, and kick to attack with damage 10d2.  
 
 The Ice golem  (L.Blue 'g')
 === Num:834  Lev:33  Rar:1  Spd:+10  Hp:70d8  Ac:60  Exp:500
@@ -7098,11 +7092,11 @@ Cool and confident, fast and lithe; protect your possessions quickly!  This
 evil thief is normally found on dungeon level 34, and moves very quickly.
  He may shoot at you.  He is magical, casting spells which blink-self or
 create traps; 1 time in 6.  He can open doors, bash down doors, pick up
-objects and hide in unusual places.  He takes quite a while to see
-intruders, which he may notice from 200 feet.  He may carry up to 5 objects
-or treasures.  He can hit to attack with damage 3d10, hit to steal gold
-with damage 4d4, hit to steal items with damage 4d5, and hurt with arrows.
- 
+objects and hide in unusual places.  He needs light to see you.  He takes
+quite a while to see intruders, which he may notice from 200 feet.  He may
+carry up to 5 objects or treasures.  He can hit to attack with damage 3d10,
+hit to steal gold with damage 4d4, hit to steal items with damage 4d5, and
+hurt with arrows.  
 
 The Earth elemental  (Umber 'E')
 === Num:359  Lev:34  Rar:2  Spd:+0  Hp:30d10  Ac:60  Exp:375
@@ -7133,11 +7127,11 @@ The Half-troll  (L.Umber 'T')
 === Num:335  Lev:34  Rar:2  Spd:+0  Hp:25d14  Ac:50  Exp:400
 A huge, ugly, half-human in search of plunder.  This evil troll is normally
 found on dungeon level 34, and moves at normal speed.  He can open doors
-and bash down doors.  He regenerates quickly.  He resists poison.  He tends
-to overlook intruders, which he may notice from 200 feet.  He usually
-appears in groups.  He may carry a object.  He can claw to attack with
-damage 1d5, claw to attack with damage 1d5, bite to attack with damage 2d6,
-and bite to attack with damage 2d6.  
+and bash down doors.  He needs light to see you.  He regenerates quickly.
+ He resists poison.  He tends to overlook intruders, which he may notice
+from 200 feet.  He usually appears in groups.  He may carry a object.  He
+can claw to attack with damage 1d5, claw to attack with damage 1d5, bite to
+attack with damage 2d6, and bite to attack with damage 2d6.  
 
 The Guard drake  (Slate 'D')
 === Num:771  Lev:34  Rar:2  Spd:+0  Hp:320  Ac:60  Exp:420
@@ -7182,10 +7176,10 @@ spiked mace.  This evil warrior priest is normally found on dungeon level
 34, and moves quickly.  He is magical, casting spells intelligently which
 cause critical wounds, cause mortal wounds, terrify, blind, paralyze,
 heal-self or create darkness; 1 time in 5.  He can open doors and bash down
-doors.  He is fairly observant of intruders, which he may notice from 200
-feet.  He may carry up to 3 objects or treasures.  He can hit to attack
-with damage 5d5, hit to attack with damage 5d5, and hit to attack with
-damage 5d5.  
+doors.  He needs light to see you.  He is fairly observant of intruders,
+which he may notice from 200 feet.  He may carry up to 3 objects or
+treasures.  He can hit to attack with damage 5d5, hit to attack with damage
+5d5, and hit to attack with damage 5d5.  
 
 The 6-headed hydra  (L.Slate 'y')
 === Num:1069  Lev:34  Rar:2  Spd:+10  Hp:100d9  Ac:85  Exp:1175
@@ -7205,10 +7199,10 @@ once openly swore allegiance to the High Elves, but were secretly in the
 pay of Morgoth.  This evil person is normally found on dungeon level 34,
 and moves quickly.  He is magical, casting spells which summon similar
 monsters; 1 time in 10.  He can open doors, bash down doors and pick up
-objects.  He takes quite a while to see intruders, which he may notice from
-200 feet.  He may carry up to 4 good objects.  He can hit to attack with
-damage 5d5, hit to attack with damage 5d5, hit to attack with damage 5d5,
-and hit to attack with damage 5d5.  
+objects.  He needs light to see you.  He takes quite a while to see
+intruders, which he may notice from 200 feet.  He may carry up to 4 good
+objects.  He can hit to attack with damage 5d5, hit to attack with damage
+5d5, hit to attack with damage 5d5, and hit to attack with damage 5d5.  
 
 The Eog golem  (Umber 'g')
 === Num:362  Lev:34  Rar:4  Spd:-10  Hp:100d20  Ac:125  Exp:1200
@@ -7265,6 +7259,30 @@ fire.  It cannot be confused or slept.  It tends to overlook intruders,
 which it may notice from 200 feet.  It may carry up to 8 objects or
 treasures.  It can claw to attack with damage 2d8, claw to attack with
 damage 2d8, and bite to attack with damage 4d8.  
+
+[U] Boromir, son of Denethor  (Green 't')
+=== Num:1083  Lev:34  Rar:5  Spd:+10  Hp:1000  Ac:90  Exp:1200
+The once noble son of the steward of Gondor has been driven mad by his lust
+for the ring of Power.  He believes you have it.  This warrior is normally
+found on dungeon level 34, and moves quickly.  He may shoot at you.  He is
+magical, casting spells which summon similar monsters; 1 time in 10.  He
+can open doors, bash down doors and pick up objects.  He needs light to see
+you.  He takes quite a while to see intruders, which he may notice from 200
+feet.  He may carry up to 4 good objects.  He can hit to attack with damage
+5d5, hit to attack with damage 5d5, hit to attack with damage 5d5, and hurt
+with arrows.  
+
+[U] Faramir, son of Denethor  (L.Green 't')
+=== Num:1084  Lev:34  Rar:5  Spd:+10  Hp:1000  Ac:90  Exp:1200
+The still-noble son of the steward of Gondor guards the depths of Ithilien
+against the Enemy. You are an intruder here.  This warrior is normally
+found on dungeon level 34, and moves quickly.  He may shoot at you.  He is
+magical, casting spells which summon similar monsters; 1 time in 10.  He
+can open doors, bash down doors and pick up objects.  He needs light to see
+you.  He takes quite a while to see intruders, which he may notice from 200
+feet.  He may carry up to 4 good objects.  He can hit to attack with damage
+5d5, hit to attack with damage 5d5, hit to attack with damage 5d5, and hurt
+with arrows.  
 
 The Wormwood  (L.Green '<')
 === Num:676  Lev:35  Rar:1  Spd:-10  Hp:300  Ac:20  Exp:100
@@ -7339,10 +7357,10 @@ The Grey giant  (Slate 'P')
 === Num:1026  Lev:35  Rar:1  Spd:+0  Hp:35d19  Ac:70  Exp:350
 It is ninenteen feet tall and drained of color.  This evil giant is
 normally found on dungeon level 35, and moves at normal speed.  It can open
-doors, bash down doors and pick up objects.  It tends to overlook
-intruders, which it may notice from 200 feet.  It may carry a object or
-treasure.  It can hit to attack with damage 7d8, and hit to attack with
-damage 7d8.  
+doors, bash down doors and pick up objects.  It needs light to see you.  It
+tends to overlook intruders, which it may notice from 200 feet.  It may
+carry a object or treasure.  It can hit to attack with damage 7d8, and hit
+to attack with damage 7d8.  
 
 The Water troll  (Blue 'T')
 === Num:348  Lev:35  Rar:1  Spd:+0  Hp:360  Ac:50  Exp:420
@@ -7370,11 +7388,11 @@ The Dagashi  (Orange 't')
 === Num:364  Lev:35  Rar:4  Spd:+10  Hp:13d25  Ac:70  Exp:500
 A human warrior, moving with lightning speed.  This evil warrior is
 normally found on dungeon level 35, and moves quickly.  He can open doors
-and bash down doors.  He cannot be confused or slept.  He is fairly
-observant of intruders, which he may notice from 200 feet.  He may carry
-one or two objects or treasures.  He can hit to poison with damage 3d4, hit
-to reduce strength with damage 3d4, hit to reduce strength with damage 3d4,
-and hit to poison with damage 3d4.  
+and bash down doors.  He needs light to see you.  He cannot be confused or
+slept.  He is fairly observant of intruders, which he may notice from 200
+feet.  He may carry one or two objects or treasures.  He can hit to poison
+with damage 3d4, hit to reduce strength with damage 3d4, hit to reduce
+strength with damage 3d4, and hit to poison with damage 3d4.  
 
 The Gravity hound  (L.Slate 'Z')
 === Num:365  Lev:35  Rar:2  Spd:+0  Hp:35d10  Ac:30  Exp:500
@@ -7472,7 +7490,7 @@ overlook intruders, which it may notice from 200 feet.  It may carry up to
 4 objects or treasures.  It can claw to attack with damage 2d6, claw to
 attack with damage 2d6, and bite to attack with damage 2d8.  
 
-[Q] Silent watcher  (Red 'g')
+The Silent watcher  (Red 'g')
 === Num:597  Lev:35  Rar:3  Spd:+0  Hp:80d25  Ac:80  Exp:800
 A figure carved from stone, with three vulture faces whose eyes glow with
 a malevolent light.  This evil creature is normally found on dungeon level
@@ -7484,22 +7502,7 @@ telepathy.  It is hurt by rock remover and bright light.  It resists
 lightning, fire, cold and poison.  It cannot be frightened, confused or
 slept.  It is fairly observant of intruders, which it may notice from 420
 feet.  It can gaze to terrify, gaze to paralyze, gaze to reduce strength,
-and gaze to create hallucinations.  You feel an intense desire to kill this
-monster...  
-
-The Grave lich  (Umber 'L')
-=== Num:961  Lev:35  Rar:2  Spd:+0  Hp:500  Ac:63  Exp:1600
-It is a skeletal form dressed in robes.  It radiates vastly evil power. 
-This evil undead creature is normally found on dungeon level 35, and moves
-at normal speed.  It is magical, casting spells intelligently which drain
-mana, cause brain smashing, cause critical wounds, terrify, blind, slow,
-paralyze, blink-self, teleport to or teleport away; 1 time in 4.  It can
-open doors and bash down doors.  It is cold blooded.  It is hurt by bright
-light.  It resists cold and poison.  It cannot be confused or slept.  It
-tends to overlook intruders, which it may notice from 200 feet.  It may
-carry up to 4 objects or treasures.  It can touch to lower experience (by
-40d6+), touch to drain charges, touch to reduce dexterity with damage 2d9,
-and touch to reduce dexterity with damage 2d9.  
+and gaze to create hallucinations.  
 
 The Mumak  (Slate 'Q')
 === Num:373  Lev:35  Rar:3  Spd:+0  Hp:90d10  Ac:55  Exp:2100
@@ -7595,9 +7598,10 @@ The Cloud giant  (Blue 'P')
 It is a twenty foot tall giant wreathed in clouds.  This evil giant is
 normally found on dungeon level 36, and moves at normal speed.  It may
 throw boulders.  It can open doors, bash down doors and pick up objects. 
-It resists lightning.  It tends to overlook intruders, which it may notice
-from 200 feet.  It may carry a object or treasure.  It can hit to electrify
-with damage 8d8, and hit to electrify with damage 8d8.  
+It needs light to see you.  It resists lightning.  It tends to overlook
+intruders, which it may notice from 200 feet.  It may carry a object or
+treasure.  It can hit to electrify with damage 8d8, and hit to electrify
+with damage 8d8.  
 
 The Trapper  (White '.')
 === Num:388  Lev:36  Rar:3  Spd:+10  Hp:600  Ac:75  Exp:580
@@ -7627,9 +7631,9 @@ The Mountain giant  (L.Umber 'P')
 It is a twenty-two foot tall giant rugged as the mountain.  This evil giant
 is normally found on dungeon level 36, and moves at normal speed.  It can
 open doors, bash down doors, pick up objects and climb on walls and
-ceilings.  It tends to overlook intruders, which it may notice from 200
-feet.  It may carry a object or treasure.  It can hit to attack with damage
-9d8, and hit to attack with damage 9d8.  
+ceilings.  It needs light to see you.  It tends to overlook intruders,
+which it may notice from 200 feet.  It may carry a object or treasure.  It
+can hit to attack with damage 9d8, and hit to attack with damage 9d8.  
 
 The Necromancer  (Slate 'q')
 === Num:391  Lev:36  Rar:2  Spd:+0  Hp:280  Ac:50  Exp:630
@@ -7637,10 +7641,10 @@ A gaunt figure, clothed in black robes.  This evil person is normally found
 on dungeon level 36, and moves at normal speed.  He is magical, casting
 spells intelligently which cause critical wounds, produce nether bolts,
 terrify, blind, paralyze, haste-self, teleport-self, teleport to or summon
-an undead; 1 time in 3.  He can open doors and bash down doors.  He is
-fairly observant of intruders, which he may notice from 200 feet.  He may
-carry one or two objects.  He can hit to attack with damage 2d6, and hit to
-attack with damage 2d6.  
+an undead; 1 time in 3.  He can open doors and bash down doors.  He needs
+light to see you.  He is fairly observant of intruders, which he may notice
+from 200 feet.  He may carry one or two objects.  He can hit to attack with
+damage 2d6, and hit to attack with damage 2d6.  
 
 The Xorn  (Umber 'X')
 === Num:376  Lev:36  Rar:2  Spd:+0  Hp:160  Ac:80  Exp:650
@@ -7673,10 +7677,10 @@ A figure twisted by evil standing in robes of deepest crimson.  This evil
 mage is normally found on dungeon level 36, and moves quickly.  He is
 magical, casting spells intelligently which produce fire bolts, paralyze,
 teleport-self or summon a demon; 1 time in 2.  He can open doors and bash
-down doors.  He is fairly observant of intruders, which he may notice from
-200 feet.  He may carry one or two objects.  He can hit to attack with
-damage 2d6, hit to attack with damage 2d6, and hit to attack with damage
-2d6.  
+down doors.  He needs light to see you.  He is fairly observant of
+intruders, which he may notice from 200 feet.  He may carry one or two
+objects.  He can hit to attack with damage 2d6, hit to attack with damage
+2d6, and hit to attack with damage 2d6.  
 
 The Master vampire  (Green 'V')
 === Num:357  Lev:36  Rar:1  Spd:+0  Hp:340  Ac:60  Exp:750
@@ -7738,12 +7742,12 @@ attack with damage 6d6.
 A mighty warrior from the east, Lorgan hates everything that he cannot
 control.  This evil person is normally found on dungeon level 36, and moves
 quickly.  He is magical, casting spells which teleport to or summon
-monsters; 1 time in 4.  He can open doors and bash down doors.  He resists
-acid, lightning, fire, cold and poison.  He cannot be confused or slept. 
-He is fairly observant of intruders, which he may notice from 250 feet.  He
-may carry up to 4 good objects.  He can hit to attack with damage 6d6, hit
-to attack with damage 6d6, hit to attack with damage 3d8, and hit to attack
-with damage 3d8.  
+monsters; 1 time in 4.  He can open doors and bash down doors.  He needs
+light to see you.  He resists acid, lightning, fire, cold and poison.  He
+cannot be confused or slept.  He is fairly observant of intruders, which he
+may notice from 250 feet.  He may carry up to 4 good objects.  He can hit
+to attack with damage 6d6, hit to attack with damage 6d6, hit to attack
+with damage 3d8, and hit to attack with damage 3d8.  
 
 The Young amethyst dragon  (Violet 'd')
 === Num:766  Lev:36  Rar:3  Spd:+0  Hp:320  Ac:60  Exp:1320
@@ -7838,20 +7842,6 @@ from 200 feet.  It may carry up to 10 objects or treasures.  It can claw to
 attack with damage 2d10, claw to attack with damage 2d10, and bite to
 attack with damage 4d10.  
 
-The Crypt lich  (L.Umber 'L')
-=== Num:962  Lev:36  Rar:2  Spd:+0  Hp:700  Ac:66  Exp:2400
-It is a skeletal form dressed in robes.  It radiates vastly evil power. 
-This evil undead creature is normally found on dungeon level 36, and moves
-at normal speed.  It is magical, casting spells intelligently which drain
-mana, cause brain smashing, cause critical wounds, terrify, blind, slow,
-paralyze, blink-self, teleport to or teleport away; 1 time in 4.  It can
-open doors and bash down doors.  It is cold blooded.  It is hurt by bright
-light.  It resists cold and poison.  It cannot be confused or slept.  It
-tends to overlook intruders, which it may notice from 200 feet.  It may
-carry up to 6 objects or treasures.  It can touch to lower experience (by
-40d6+), touch to drain charges, touch to reduce dexterity with damage 2d10,
-and touch to reduce dexterity with damage 2d10.  
-
 The Black pudding  (L.Dark 'j')
 === Num:398  Lev:37  Rar:5  Spd:+0  Hp:400  Ac:18  Exp:50
 A lump of rotting black flesh that slurrrrrrrps across the dungeon floor.
@@ -7904,10 +7894,10 @@ The Two-headed giant  (L.Red 'P')
 It is a twenty-two foot tall giant with two bickering heads.  This evil
 giant is normally found on dungeon level 37, and moves a bit erratically at
 normal speed.  It can open doors, bash down doors and pick up objects.  It
-tends to overlook intruders, which it may notice from 200 feet.  It may
-carry a object or treasure.  It can hit to attack with damage 8d8, hit to
-attack with damage 8d8, bite to attack with damage 10d4, and bite to attack
-with damage 10d4.  
+needs light to see you.  It tends to overlook intruders, which it may
+notice from 200 feet.  It may carry a object or treasure.  It can hit to
+attack with damage 8d8, hit to attack with damage 8d8, bite to attack with
+damage 10d4, and bite to attack with damage 10d4.  
 
 The Nexus vortex  (Violet 'v')
 === Num:400  Lev:37  Rar:1  Spd:+10  Hp:32d10  Ac:40  Exp:800
@@ -7982,6 +7972,20 @@ may notice from 200 feet.  It may carry one or two objects or treasures.
 It can claw to attack with damage 2d10, claw to attack with damage 2d10,
 and bite to attack with damage 4d10.  
 
+[U] The King of the Wood Elves  (Orange 'l')
+=== Num:1082  Lev:37  Rar:4  Spd:+10  Hp:1100  Ac:80  Exp:1000
+A strong and unforgiving wood elf, he holds court in the deepest bowels of
+Mirkwood, and acts without mercy against outsiders.  This evil creature is
+normally found on dungeon level 37, and moves quickly.  He is magical,
+casting spells which produce fire bolts, produce frost bolts, blind,
+confuse, haste-self, create darkness, summon a monster, summon animals or
+summon spiders; 1 time in 5.  He can illuminate the dungeon, open doors and
+bash down doors.  He resists fire, cold and poison.  He cannot be confused
+or slept.  He takes a while to see intruders, which he may notice from 200
+feet.  He usually appears with escorts.  He may carry up to 4 exceptional
+objects.  He can hit to attack with damage 3d8, hit to attack with damage
+3d8, and hit to attack with damage 3d8.  
+
 The Mature copper dragon  (Umber 'D')
 === Num:777  Lev:37  Rar:1  Spd:+0  Hp:480  Ac:80  Exp:1400
 A large dragon, scales tinted deep copper.  This evil dragon is normally
@@ -8017,31 +8021,19 @@ feet.  It may carry up to 10 objects or treasures.  It can claw to attack
 with damage 2d10, claw to attack with damage 2d10, and bite to attack with
 damage 4d10.  
 
-[U] The Queen Ant  (Violet 'a')
-=== Num:395  Lev:37  Rar:2  Spd:+10  Hp:1500  Ac:100  Exp:2000
-She's upset because you hurt her children.  This insect is normally found
-on dungeon level 37, and moves quickly.  She is magical, casting spells
-which summon similar monsters; 1 time in 2.  She can open doors and bash
-down doors.  She is rarely detected by telepathy.  She cannot be confused
-or slept.  She is fairly observant of intruders, which she may notice from
-300 feet.  She usually appears with escorts.  She may carry up to 4 good
-objects.  She can bite to attack with damage 2d12, bite to attack with
-damage 2d12, bite to attack with damage 2d8, and bite to attack with damage
-2d8.  
-
-The Pit lich  (Green 'L')
-=== Num:963  Lev:37  Rar:2  Spd:+0  Hp:900  Ac:69  Exp:3200
+The Grave lich  (Umber 'L')
+=== Num:961  Lev:37  Rar:2  Spd:+0  Hp:500  Ac:63  Exp:1600
 It is a skeletal form dressed in robes.  It radiates vastly evil power. 
 This evil undead creature is normally found on dungeon level 37, and moves
 at normal speed.  It is magical, casting spells intelligently which drain
-mana, cause brain smashing, cause critical wounds, terrify, blind,
+mana, cause brain smashing, cause critical wounds, terrify, blind, slow,
 paralyze, blink-self, teleport to or teleport away; 1 time in 4.  It can
 open doors and bash down doors.  It is cold blooded.  It is hurt by bright
 light.  It resists cold and poison.  It cannot be confused or slept.  It
 tends to overlook intruders, which it may notice from 200 feet.  It may
-carry up to 8 objects or treasures.  It can touch to lower experience (by
-40d6+), touch to drain charges, touch to reduce dexterity with damage 2d11,
-and touch to reduce dexterity with damage 2d11.  
+carry up to 4 objects or treasures.  It can touch to lower experience (by
+40d6+), touch to drain charges, touch to reduce dexterity with damage 2d9,
+and touch to reduce dexterity with damage 2d9.  
 
 The Aranea  (L.Red 'S')
 === Num:602  Lev:38  Rar:2  Spd:+10  Hp:300  Ac:45  Exp:250
@@ -8121,11 +8113,11 @@ Easterlings are an evil warrior people, dressed in blood-red armor and
 slaves to Morgoth. Once numerous, there constant wars with other races at
 Morgoth's command has left only the strongest of fighters behind.  This
 evil warrior is normally found on dungeon level 38, and moves quickly.  He
-resists lightning, fire and cold.  He cannot be confused or slept.  He is
-fairly observant of intruders, which he may notice from 250 feet.  He may
-carry up to 4 objects or treasures.  He can hit to attack with damage 3d8,
-hit to attack with damage 3d8, hit to attack with damage 2d4, and hit to
-attack with damage 2d4.  
+needs light to see you.  He resists lightning, fire and cold.  He cannot be
+confused or slept.  He is fairly observant of intruders, which he may
+notice from 250 feet.  He may carry up to 4 objects or treasures.  He can
+hit to attack with damage 3d8, hit to attack with damage 3d8, hit to attack
+with damage 2d4, and hit to attack with damage 2d4.  
 
 The Death knight  (L.Dark 't')
 === Num:407  Lev:38  Rar:1  Spd:+10  Hp:600  Ac:100  Exp:1000
@@ -8178,10 +8170,11 @@ evil.  This evil person is normally found on dungeon level 38, and moves
 quickly.  He is magical, casting spells intelligently which produce
 lightning bolts, produce fire bolts, produce frost bolts, produce ice
 bolts, heal-self or create traps; 1 time in 2.  He can open doors, bash
-down doors and pick up objects.  He takes quite a while to see intruders,
-which he may notice from 200 feet.  He may carry up to 4 good objects.  He
-can hit to attack with damage 5d5, hit to attack with damage 5d5, hit to
-attack with damage 5d5, and hit to attack with damage 5d5.  
+down doors and pick up objects.  He needs light to see you.  He takes quite
+a while to see intruders, which he may notice from 200 feet.  He may carry
+up to 4 good objects.  He can hit to attack with damage 5d5, hit to attack
+with damage 5d5, hit to attack with damage 5d5, and hit to attack with
+damage 5d5.  
 
 The Emperor wight  (Red 'W')
 === Num:414  Lev:38  Rar:2  Spd:+10  Hp:380  Ac:40  Exp:1600
@@ -8196,7 +8189,7 @@ carry up to 9 objects.  It can hit to attack with damage 1d12, hit to
 attack with damage 1d12, touch to lower experience (by 80d6+), and touch to
 lower experience (by 80d6+).  
 
-[Q] The Emperor Wight of Carn Dum  (Red 'W')
+[U] The Emperor Wight of Carn Dum  (Red 'W')
 === Num:1081  Lev:38  Rar:2  Spd:+10  Hp:380  Ac:40  Exp:1600
 Your life force is torn from your body as this powerful unearthly being
 approaches. It whispers dreadful words of ancient songs, cold and
@@ -8208,8 +8201,7 @@ light.  It resists cold and poison.  It cannot be confused or slept.  It is
 fairly observant of intruders, which it may notice from 200 feet.  It may
 carry up to 9 good objects.  It can hit to attack with damage 1d12, hit to
 attack with damage 1d12, touch to lower experience (by 80d6+), and touch to
-lower experience (by 80d6+).  You feel an intense desire to kill this
-monster...  
+lower experience (by 80d6+).  
 
 The Black wraith  (L.Dark 'W')
 === Num:417  Lev:38  Rar:2  Spd:+10  Hp:500  Ac:55  Exp:1700
@@ -8323,20 +8315,6 @@ intruders, which it may notice from 120 feet.  It can hit to attack with
 damage 4d6, hit to attack with damage 4d6, hit to attack with damage 4d6,
 and hit to attack with damage 4d6.  
 
-The Spirit lich  (L.Slate 'L')
-=== Num:964  Lev:38  Rar:2  Spd:+0  Hp:1100  Ac:72  Exp:4000
-It is an insubstantial skeletal form dressed in robes.  It radiates vastly
-evil power.  This evil undead creature is normally found on dungeon level
-38, and moves at normal speed.  It is magical, casting spells intelligently
-which drain mana, cause mind blasting, cause brain smashing, cause critical
-wounds, terrify, blind, slow, paralyze, blink-self or teleport to; 1 time
-in 4.  It can open doors and bash down doors.  It is invisible.  It is cold
-blooded.  It is hurt by bright light.  It resists cold and poison.  It
-cannot be confused or slept.  It tends to overlook intruders, which it may
-notice from 200 feet.  It may carry up to 6 objects.  It can touch to lower
-experience (by 40d6+), touch to drain charges, touch to reduce dexterity
-with damage 2d8, and touch to reduce dexterity with damage 2d8.  
-
 The Kudzu  (Green '<')
 === Num:678  Lev:39  Rar:1  Spd:+10  Hp:300  Ac:20  Exp:100
 It is a dangerous mass of razor sharp branches, growing furiously.  This
@@ -8353,9 +8331,9 @@ It is a twenty-four foot tall giant surrounded by waves.  This evil giant
 is normally found on dungeon level 39, and moves at normal speed.  It is
 magical, casting spells which produce water bolts, terrify or confuse; 1
 time in 8.  It can open doors, bash down doors, pick up objects and swim
-under water.  It tends to overlook intruders, which it may notice from 200
-feet.  It may carry a object or treasure.  It can hit to attack with damage
-10d8, and hit to attack with damage 10d8.  
+under water.  It needs light to see you.  It tends to overlook intruders,
+which it may notice from 200 feet.  It may carry a object or treasure.  It
+can hit to attack with damage 10d8, and hit to attack with damage 10d8.  
 
 The Nether wraith  (L.Green 'W')
 === Num:419  Lev:39  Rar:2  Spd:+10  Hp:480  Ac:55  Exp:1700
@@ -8403,20 +8381,6 @@ cannot be confused or slept.  It is ever vigilant for intruders, which it
 may notice from 300 feet.  It may carry up to 4 treasures.  It can bite to
 lower experience (by 80d6+) with damage 2d6, hit to attack with damage 3d8,
 hit to attack with damage 3d8, and hit to confuse with damage 6d6.  
-
-The Guardian lich  (L.Blue 'L')
-=== Num:965  Lev:39  Rar:2  Spd:+0  Hp:1300  Ac:75  Exp:4800
-It is a skeletal form dressed in robes.  It radiates vastly evil power. 
-This evil undead creature is normally found on dungeon level 39, and moves
-at normal speed.  It is magical, casting spells intelligently which drain
-mana, cause brain smashing, cause critical wounds, terrify, blind, confuse,
-paralyze, blink-self, teleport away or create darkness; 1 time in 4.  It
-can open doors and bash down doors.  It is cold blooded.  It is hurt by
-bright light.  It resists cold and poison.  It cannot be confused or slept.
- It tends to overlook intruders, which it may notice from 200 feet.  It may
-carry up to 8 objects.  It can touch to lower experience (by 40d6+), touch
-to drain charges, touch to reduce dexterity with damage 2d12, and touch to
-reduce dexterity with damage 2d12.  
 
 The Disenchanter worm mass  (Violet 'w')
 === Num:430  Lev:40  Rar:3  Spd:-10  Hp:10d8  Ac:5  Exp:30
@@ -8467,10 +8431,10 @@ is normally found on dungeon level 40, and moves quickly.  It may throw
 boulders.  It is magical, casting spells which produce lightning balls,
 produce lightning bolts, terrify, confuse, blink-self or teleport to; 1
 time in 8.  It can open doors, bash down doors and pick up objects.  It
-resists lightning and cold.  It takes quite a while to see intruders, which
-it may notice from 200 feet.  It may carry one or two objects or treasures.
- It can hit to electrify with damage 10d8, and hit to electrify with damage
-10d8.  
+needs light to see you.  It resists lightning and cold.  It takes quite a
+while to see intruders, which it may notice from 200 feet.  It may carry
+one or two objects or treasures.  It can hit to electrify with damage 10d8,
+and hit to electrify with damage 10d8.  
 
 The Giant roc  (Umber 'B')
 === Num:439  Lev:40  Rar:3  Spd:+0  Hp:80d13  Ac:70  Exp:1000
@@ -8528,10 +8492,10 @@ frame.  This evil priest is normally found on dungeon level 40, and moves
 quickly.  He is magical, casting spells intelligently which cause critical
 wounds, cause mortal wounds, blind, paralyze, heal-self, summon a monster
 or summon an undead; 1 time in 2.  He can open doors and bash down doors.
- He cannot be confused or slept.  He is fairly observant of intruders,
-which he may notice from 200 feet.  He may carry up to 5 objects.  He can
-hit to attack with damage 3d4, hit to attack with damage 3d4, and hit to
-attack with damage 3d5.  
+ He needs light to see you.  He cannot be confused or slept.  He is fairly
+observant of intruders, which he may notice from 200 feet.  He may carry up
+to 5 objects.  He can hit to attack with damage 3d4, hit to attack with
+damage 3d4, and hit to attack with damage 3d5.  
 
 The Ancient blue dragon  (Blue 'A')
 === Num:411  Lev:40  Rar:1  Spd:+10  Hp:720  Ac:90  Exp:2000
@@ -8610,10 +8574,10 @@ This elusive female spellcaster has a special affinity for dragons, whom
 she rarely fights without.  This evil mage is normally found on dungeon
 level 40, and moves very quickly.  She is magical, casting spells which
 blind or summon a dragon; 1 time in 2.  She can open doors and bash down
-doors.  She cannot be confused or slept.  She is fairly observant of
-intruders, which she may notice from 200 feet.  She may carry up to 4 good
-objects.  She can hit to attack with damage 2d6, hit to attack with damage
-2d6, and hit to attack with damage 2d8.  
+doors.  She needs light to see you.  She cannot be confused or slept.  She
+is fairly observant of intruders, which she may notice from 200 feet.  She
+may carry up to 4 good objects.  She can hit to attack with damage 2d6, hit
+to attack with damage 2d6, and hit to attack with damage 2d8.  
 
 The Minotaur  (Slate 'H')
 === Num:441  Lev:40  Rar:2  Spd:+20  Hp:100d10  Ac:25  Exp:2100
@@ -8631,10 +8595,25 @@ dungeon level 40, and moves very quickly.  He is magical, casting spells
 which produce fire balls, produce frost balls, cause critical wounds,
 produce acid bolts, blind, confuse, blink-self, teleport to, create traps,
 summon a monster, summon an undead or summon a dragon; 1 time in 2.  He can
-open doors and bash down doors.  He cannot be confused or slept.  He is
-fairly observant of intruders, which he may notice from 200 feet.  He may
-carry up to 9 objects.  He can hit to attack with damage 2d8, hit to attack
-with damage 2d8, and hit to attack with damage 2d8.  
+open doors and bash down doors.  He needs light to see you.  He cannot be
+confused or slept.  He is fairly observant of intruders, which he may
+notice from 200 feet.  He may carry up to 9 objects.  He can hit to attack
+with damage 2d8, hit to attack with damage 2d8, and hit to attack with
+damage 2d8.  
+
+The Crypt lich  (L.Umber 'L')
+=== Num:962  Lev:40  Rar:2  Spd:+0  Hp:700  Ac:66  Exp:2400
+It is a skeletal form dressed in robes.  It radiates vastly evil power. 
+This evil undead creature is normally found on dungeon level 40, and moves
+at normal speed.  It is magical, casting spells intelligently which drain
+mana, cause brain smashing, cause critical wounds, terrify, blind, slow,
+paralyze, blink-self, teleport to or teleport away; 1 time in 4.  It can
+open doors and bash down doors.  It is cold blooded.  It is hurt by bright
+light.  It resists cold and poison.  It cannot be confused or slept.  It
+tends to overlook intruders, which it may notice from 200 feet.  It may
+carry up to 6 objects or treasures.  It can touch to lower experience (by
+40d6+), touch to drain charges, touch to reduce dexterity with damage 2d10,
+and touch to reduce dexterity with damage 2d10.  
 
 The Ancient copper dragon  (Umber 'A')
 === Num:693  Lev:40  Rar:2  Spd:+10  Hp:1000  Ac:100  Exp:2750
@@ -8725,36 +8704,7 @@ may notice from 300 feet.  It can gaze to lower experience (by 20d6+) with
 damage 2d6, gaze to drain charges with damage 2d6, gaze to reduce
 intelligence with damage 2d6, and bite to attack with damage 6d6.  
 
-The Black lich  (L.Dark 'L')
-=== Num:966  Lev:40  Rar:2  Spd:+0  Hp:2250  Ac:78  Exp:6400
-It is a skeletal form dressed in robes.  It radiates vastly evil power. 
-This evil undead creature is normally found on dungeon level 40, and moves
-at normal speed.  It is magical, casting spells intelligently which drain
-mana, cause brain smashing, cause critical wounds, cause mortal wounds,
-terrify, blind, paralyze, blink-self, teleport to or teleport away; 1 time
-in 4.  It can open doors and bash down doors.  It is cold blooded.  It is
-hurt by bright light.  It resists cold and poison.  It cannot be confused
-or slept.  It tends to overlook intruders, which it may notice from 200
-feet.  It may carry up to 10 objects.  It can touch to lower experience (by
-80d6+), touch to drain charges, touch to reduce dexterity with damage 2d12,
-and touch to reduce dexterity with damage 2d12.  
-
-[U] Medusa, the Gorgon  (Violet 'n')
-=== Num:442  Lev:40  Rar:3  Spd:+10  Hp:2400  Ac:100  Exp:9000
-One of the original three ugly sisters.  Her face could sink a thousand
-ships.  Her scales rattle as she slithers towards you, venom dripping from
-her ghastly mouth.  This evil creature is normally found on dungeon level
-40, and moves quickly.  She may gaze at you.  She is magical, casting
-spells intelligently which produce acid balls, cause critical wounds,
-produce fire bolts, produce plasma bolts, terrify, paralyze, summon similar
-monsters or summon hydras; 1 time in 2.  She can open doors and bash down
-doors.  She resists acid, fire and poison.  She cannot be confused or
-slept.  She is observant of intruders, which she may notice from 300 feet.
- She may carry up to 6 good objects.  She can gaze to lower experience (by
-80d6+), gaze to paralyze, hit to attack with damage 8d6, and hit to attack
-with damage 8d6.  
-
-[Q] The Black Rider at Bree  (L.Dark 'W')
+[U] The Black Rider at Bree  (L.Dark 'W')
 === Num:440  Lev:40  Rar:3  Spd:+10  Hp:1800  Ac:60  Exp:10000
 A tall black cloaked Ringwraith.  This evil undead creature is normally
 found on dungeon level 40, and moves quickly.  He can open doors, bash down
@@ -8763,8 +8713,7 @@ bright light.  He resists cold and poison.  He cannot be confused or slept.
  He is fairly observant of intruders, which he may notice from 900 feet. 
 He may carry up to 4 good objects.  He can hit to attack with damage 6d6,
 hit to attack with damage 6d6, hit to lower experience (by 80d6+) with
-damage 4d6, and radiate to terrify with damage 4d6.  You feel an intense
-desire to kill this monster...  
+damage 4d6, and radiate to terrify with damage 4d6.  
 
 The Ranger Chieftain  (L.Green 'q')
 === Num:582  Lev:41  Rar:2  Spd:+10  Hp:1000  Ac:60  Exp:1600
@@ -8776,11 +8725,12 @@ normally found on dungeon level 41, and moves quickly.  He may shoot at
 you.  He is magical, casting spells which produce frost balls, produce
 lightning bolts, produce fire bolts, produce magic missiles, haste-self,
 blink-self or summon animals; 1 time in 4.  He can open doors, bash down
-doors and pick up objects.  He is invisible.  He resists lightning, fire,
-cold and poison.  He cannot be confused or slept.  He is fairly observant
-of intruders, which he may notice from 200 feet.  He may carry up to 4
-objects.  He can hit to attack with damage 5d5, hit to attack with damage
-5d5, hit to attack with damage 5d5, and hurt with arrows.  
+doors and pick up objects.  He needs light to see you.  He is invisible. 
+He resists lightning, fire, cold and poison.  He cannot be confused or
+slept.  He is fairly observant of intruders, which he may notice from 200
+feet.  He may carry up to 4 objects.  He can hit to attack with damage 5d5,
+hit to attack with damage 5d5, hit to attack with damage 5d5, and hurt with
+arrows.  
 
 The Ancient black dragon  (Slate 'A')
 === Num:429  Lev:41  Rar:1  Spd:+10  Hp:1000  Ac:90  Exp:2500
@@ -8853,25 +8803,12 @@ servant of evil, even though the other side of his "bargain" was not kept.
  This warrior is normally found on dungeon level 41, and moves quickly.  He
 is magical, casting spells intelligently which cause critical wounds,
 produce water bolts or produce mana bolts; 1 time in 2.  He can open doors
-and bash down doors.  He resists acid, lightning, cold and poison.  He
-cannot be confused or slept.  He takes quite a while to see intruders,
-which he may notice from 200 feet.  He may carry up to 4 good objects.  He
-can hit to attack with damage 8d6, hit to attack with damage 8d6, hit to
-disenchant with damage 6d8, and hit to disenchant with damage 6d8.  
-
-The Master lich  (Red 'L')
-=== Num:451  Lev:41  Rar:2  Spd:+10  Hp:1800  Ac:80  Exp:10000
-A skeletal form wrapped in robes.  Powerful magic crackles along its bony
-fingers.  This evil undead creature is normally found on dungeon level 41,
-and moves quickly.  It is magical, casting spells intelligently which drain
-mana, cause brain smashing, cause critical wounds, cause mortal wounds,
-terrify, blind, confuse, paralyze, blink-self, teleport to or summon an
-undead; 1 time in 3.  It can open doors and bash down doors.  It is cold
-blooded.  It resists cold and poison.  It cannot be confused or slept.  It
-tends to overlook intruders, which it may notice from 200 feet.  It may
-carry up to 12 objects.  It can touch to lower experience (by 80d6+), touch
-to drain charges, touch to reduce dexterity with damage 2d12, and touch to
-reduce dexterity with damage 2d12.  
+and bash down doors.  He needs light to see you.  He resists acid,
+lightning, cold and poison.  He cannot be confused or slept.  He takes
+quite a while to see intruders, which he may notice from 200 feet.  He may
+carry up to 4 good objects.  He can hit to attack with damage 8d6, hit to
+attack with damage 8d6, hit to disenchant with damage 6d8, and hit to
+disenchant with damage 6d8.  
 
 The Fallen  (Yellow 'M')
 === Num:455  Lev:41  Rar:6  Spd:+20  Hp:100d35  Ac:140  Exp:15000
@@ -8887,6 +8824,16 @@ fire, cold and poison.  It prefers to ignore intruders, which it may notice
 from 300 feet.  It may carry up to 14 good objects.  It can gaze to terrify
 with damage 4d4, gaze to terrify with damage 4d4, hit to attack with damage
 8d6, and hit to attack with damage 8d6.  
+
+The Blue slime  (Blue ',')
+=== Num:666  Lev:42  Rar:3  Spd:+10  Hp:5d4  Ac:1  Exp:12
+Ugh! It quickly creeps alone the dungeon floor.  This plant is normally
+found on dungeon level 42, and moves extremely erratically, and quickly,
+but does not deign to chase intruders.  It is cold blooded.  It is not
+detected by telepathy.  It breeds explosively.  It cannot be frightened,
+confused or slept.  It is ever vigilant for intruders, which it may notice
+from 40 feet.  It usually appears in groups.  It can touch to disenchant
+with damage 1d4, and touch to disenchant with damage 1d4.  
 
 The Hell crawler  (Red 'c')
 === Num:747  Lev:42  Rar:1  Spd:+0  Hp:40d10  Ac:40  Exp:300
@@ -8914,20 +8861,19 @@ intruders, which it may notice from 200 feet.  It usually appears in
 groups.  It may carry a object.  It can hit to attack with damage 6d6, hit
 to attack with damage 6d6, and hit to reduce strength with damage 3d4.  
 
-The Vampire lord  (Blue 'V')
-=== Num:428  Lev:42  Rar:1  Spd:+10  Hp:1600  Ac:70  Exp:1800
-A foul wind chills your bones as this ghastly figure approaches.  This evil
-undead creature is normally found on dungeon level 42, and moves quickly.
- It is magical, casting spells which drain mana, cause brain smashing,
-cause critical wounds, cause mortal wounds, produce nether bolts, terrify,
-blind, paralyze or create darkness; 1 time in 7.  It can open doors, bash
-down doors and fly over obstacles.  It is cold blooded.  It regenerates
-quickly.  It is hurt by bright light.  It resists cold and poison.  It
-cannot be confused or slept.  It is fairly observant of intruders, which it
-may notice from 200 feet.  It may carry up to 9 objects or treasures.  It
-can hit to attack with damage 3d6, hit to attack with damage 3d6, bite to
-lower experience (by 80d6+) with damage 4d6, and bite to lower experience
-(by 80d6+) with damage 4d6.  
+The Pit lich  (Green 'L')
+=== Num:963  Lev:42  Rar:2  Spd:+0  Hp:900  Ac:69  Exp:3200
+It is a skeletal form dressed in robes.  It radiates vastly evil power. 
+This evil undead creature is normally found on dungeon level 42, and moves
+at normal speed.  It is magical, casting spells intelligently which drain
+mana, cause brain smashing, cause critical wounds, terrify, blind,
+paralyze, blink-self, teleport to or teleport away; 1 time in 4.  It can
+open doors and bash down doors.  It is cold blooded.  It is hurt by bright
+light.  It resists cold and poison.  It cannot be confused or slept.  It
+tends to overlook intruders, which it may notice from 200 feet.  It may
+carry up to 8 objects or treasures.  It can touch to lower experience (by
+40d6+), touch to drain charges, touch to reduce dexterity with damage 2d11,
+and touch to reduce dexterity with damage 2d11.  
 
 [U] Eilinel the Entrapped  (L.Dark 'G')
 === Num:638  Lev:42  Rar:10  Spd:+10  Hp:900  Ac:40  Exp:3500
@@ -8968,21 +8914,6 @@ notice from 200 feet.  He usually appears with escorts.  He may carry up to
 6 good objects.  He can hit to attack with damage 6d7, hit to attack with
 damage 6d7, bite to attack with damage 4d10, and spit to dissolve with
 damage 4d8.  
-
-The Night lich  (Blue 'L')
-=== Num:967  Lev:42  Rar:2  Spd:+10  Hp:2200  Ac:83  Exp:11000
-A skeletal form wrapped in robes and cloaked in darkness.  Powerful magic
-crackles along its bony fingers.  This evil undead creature is normally
-found on dungeon level 42, and moves quickly.  It is magical, casting
-spells intelligently which drain mana, cause brain smashing, cause critical
-wounds, cause mortal wounds, terrify, blind, confuse, paralyze, blink-self,
-teleport to, create darkness or summon an undead; 1 time in 3.  It can open
-doors and bash down doors.  It is cold blooded.  It resists cold and
-poison.  It cannot be confused or slept.  It tends to overlook intruders,
-which it may notice from 200 feet.  It may carry up to 12 objects.  It can
-touch to lower experience (by 80d6+), touch to drain charges, touch to
-reduce dexterity with damage 2d13, and touch to reduce dexterity with
-damage 2d13.  
 
 The Silent killer  (Yellow 'E')
 === Num:803  Lev:43  Rar:1  Spd:+30  Hp:100d14  Ac:55  Exp:480
@@ -9094,7 +9025,7 @@ from 120 feet.  It can hit to attack with damage 4d6, hit to attack with
 damage 4d6, hit to confuse with damage 4d4, and hit to confuse with damage
 4d4.  
 
-[Q] The Black Rider at Weathertop  (L.Dark 'W')
+[U] The Black Rider at Weathertop  (L.Dark 'W')
 === Num:449  Lev:43  Rar:3  Spd:+10  Hp:2100  Ac:60  Exp:13000
 A tall black cloaked Ringwraith.  This evil undead creature is normally
 found on dungeon level 43, and moves quickly.  She is magical, casting
@@ -9106,8 +9037,7 @@ hurt by bright light.  She resists cold and poison.  She cannot be confused
 or slept.  She is fairly observant of intruders, which she may notice from
 900 feet.  She may carry up to 8 good objects.  She can hit to attack with
 damage 6d6, hit to attack with damage 6d6, touch to lower experience (by
-80d6+) with damage 5d6, and radiate to terrify with damage 5d6.  You feel
-an intense desire to kill this monster...  
+80d6+) with damage 5d6, and radiate to terrify with damage 5d6.  
 
 The Ancient multi-hued dragon  (Violet 'A')
 === Num:462  Lev:43  Rar:1  Spd:+10  Hp:2100  Ac:100  Exp:13000
@@ -9207,10 +9137,24 @@ are set against each other.  This person is normally found on dungeon level
 44, and moves quickly.  He is magical, casting spells intelligently which
 cause critical wounds, cause mortal wounds, terrify, blind, haste-self or
 heal-self; 1 time in 4.  He can open doors, bash down doors and pick up
-objects.  He cannot be frightened, confused or slept.  He is fairly
-observant of intruders, which he may notice from 200 feet.  He may carry up
-to 5 objects.  He can hit to attack with damage 5d5, hit to attack with
-damage 5d5, and hit to attack with damage 5d5.  
+objects.  He needs light to see you.  He cannot be frightened, confused or
+slept.  He is fairly observant of intruders, which he may notice from 200
+feet.  He may carry up to 5 objects.  He can hit to attack with damage 5d5,
+hit to attack with damage 5d5, and hit to attack with damage 5d5.  
+
+The Spirit lich  (L.Slate 'L')
+=== Num:964  Lev:44  Rar:2  Spd:+0  Hp:1100  Ac:72  Exp:4000
+It is an insubstantial skeletal form dressed in robes.  It radiates vastly
+evil power.  This evil undead creature is normally found on dungeon level
+44, and moves at normal speed.  It is magical, casting spells intelligently
+which drain mana, cause mind blasting, cause brain smashing, cause critical
+wounds, terrify, blind, slow, paralyze, blink-self or teleport to; 1 time
+in 4.  It can open doors and bash down doors.  It is invisible.  It is cold
+blooded.  It is hurt by bright light.  It resists cold and poison.  It
+cannot be confused or slept.  It tends to overlook intruders, which it may
+notice from 200 feet.  It may carry up to 6 objects.  It can touch to lower
+experience (by 40d6+), touch to drain charges, touch to reduce dexterity
+with damage 2d8, and touch to reduce dexterity with damage 2d8.  
 
 The 11-headed hydra  (L.Red 'y')
 === Num:469  Lev:44  Rar:2  Spd:+10  Hp:100d18  Ac:100  Exp:6000
@@ -9255,30 +9199,15 @@ notice from 250 feet.  It can claw to attack with damage 3d10, claw to
 attack with damage 3d10, bite to poison with damage 5d10, and hurt with
 arrows.  
 
-The Death lich  (Slate 'L')
-=== Num:968  Lev:44  Rar:2  Spd:+10  Hp:2600  Ac:86  Exp:12000
-A skeletal form wrapped in robes and cloaked in darkness.  Powerful magic
-crackles along its bony fingers.  This evil undead creature is normally
-found on dungeon level 44, and moves quickly.  It is magical, casting
-spells intelligently which drain mana, cause brain smashing, cause critical
-wounds, cause mortal wounds, terrify, blind, confuse, paralyze, blink-self,
-teleport to, create darkness or summon an undead; 1 time in 3.  It can open
-doors and bash down doors.  It is cold blooded.  It resists cold and
-poison.  It cannot be confused or slept.  It tends to overlook intruders,
-which it may notice from 200 feet.  It may carry up to 12 objects.  It can
-touch to lower experience (by 80d6+), touch to drain charges, touch to
-reduce dexterity with damage 2d14, and touch to reduce dexterity with
-damage 2d14.  
-
 The Cyclops  (Umber 'P')
 === Num:584  Lev:45  Rar:2  Spd:+10  Hp:1200  Ac:120  Exp:1500
 A gigantic ugly humanoid with but one eye and very thick skin.  This evil
 giant is normally found on dungeon level 45, and moves quickly.  It may
 throw boulders.  It can open doors, bash down doors, push past weaker
-monsters and pick up objects.  It resists acid, fire, cold and poison.  It
-takes a while to see intruders, which it may notice from 200 feet.  It may
-carry one or two objects or treasures.  It can hit to attack with damage
-9d9, and hit to attack with damage 9d9.  
+monsters and pick up objects.  It needs light to see you.  It resists acid,
+fire, cold and poison.  It takes a while to see intruders, which it may
+notice from 200 feet.  It may carry one or two objects or treasures.  It
+can hit to attack with damage 9d9, and hit to attack with damage 9d9.  
 
 The Berserker  (Orange 't')
 === Num:583  Lev:45  Rar:2  Spd:+10  Hp:1500  Ac:80  Exp:2500
@@ -9289,10 +9218,11 @@ tramples weaker creatures underfoot in his eagerness to get to his real
 enemy, and his battle-cry strikes terror into his foes.  This warrior is
 normally found on dungeon level 45, and moves quickly.  He is magical,
 casting spells which terrify or haste-self; 1 time in 4.  He can bash down
-doors and destroy weaker monsters.  He cannot be frightened, confused or
-slept.  He is fairly observant of intruders, which he may notice from 200
-feet.  He may carry up to 5 objects.  He can hit to attack with damage 6d6,
-hit to attack with damage 6d6, and hit to attack with damage 6d6.  
+doors and destroy weaker monsters.  He needs light to see you.  He cannot
+be frightened, confused or slept.  He is fairly observant of intruders,
+which he may notice from 200 feet.  He may carry up to 5 objects.  He can
+hit to attack with damage 6d6, hit to attack with damage 6d6, and hit to
+attack with damage 6d6.  
 
 The Nalfeshnee  (Red 'U')
 === Num:458  Lev:45  Rar:2  Spd:+0  Hp:900  Ac:50  Exp:5000
@@ -9399,7 +9329,7 @@ It takes a while to see intruders, which it may notice from 250 feet.  It
 may carry up to 18 objects.  It can claw to attack with damage 4d10, claw
 to attack with damage 4d10, and bite to attack with damage 7d10.  
 
-[Q] The Black Rider at the Ford to Rivendell  (L.Dark 'W')
+[U] The Black Rider at the Ford to Rivendell  (L.Dark 'W')
 === Num:453  Lev:45  Rar:3  Spd:+10  Hp:2400  Ac:70  Exp:15000
 A tall black cloaked Ringwraith.  This evil undead creature is normally
 found on dungeon level 45, and moves quickly.  He may gaze at you.  He is
@@ -9411,8 +9341,7 @@ bright light.  He resists cold and poison.  He cannot be confused or slept.
  He is fairly observant of intruders, which he may notice from 900 feet. 
 He may carry up to 8 good objects.  He can hit to attack with damage 7d6,
 hit to attack with damage 7d6, gaze to lower experience (by 80d6+) with
-damage 6d6, and radiate to terrify with damage 6d6.  You feel an intense
-desire to kill this monster...  
+damage 6d6, and radiate to terrify with damage 6d6.  
 
 The Grand Master thief  (Violet 't')
 === Num:1057  Lev:46  Rar:2  Spd:+20  Hp:15d100  Ac:75  Exp:1500
@@ -9427,20 +9356,19 @@ He may carry up to 4 objects or treasures.  He can hit to steal items with
 damage 5d5, hit to steal items with damage 5d5, hit to steal gold with
 damage 5d5, and hit to steal gold with damage 5d5.  
 
-The Nether lich  (L.Green 'L')
-=== Num:969  Lev:46  Rar:2  Spd:+10  Hp:3000  Ac:90  Exp:13000
-A skeletal form wrapped in robes and cloaked in darkness.  Powerful magic
-crackles along its bony fingers.  This evil undead creature is normally
-found on dungeon level 46, and moves quickly.  It is magical, casting
-spells intelligently which drain mana, cause brain smashing, cause critical
-wounds, cause mortal wounds, produce nether bolts, terrify, blind, confuse,
-paralyze, blink-self, teleport to, create darkness or summon an undead; 1
-time in 3.  It can open doors and bash down doors.  It is cold blooded.  It
-resists cold and poison.  It resists nether.  It cannot be confused or
-slept.  It tends to overlook intruders, which it may notice from 200 feet.
- It may carry up to 12 objects.  It can touch to lower experience (by
-80d6+), touch to drain charges, touch to reduce dexterity with damage 2d15,
-and touch to reduce dexterity with damage 2d15.  
+The Guardian lich  (L.Blue 'L')
+=== Num:965  Lev:46  Rar:2  Spd:+0  Hp:1300  Ac:75  Exp:4800
+It is a skeletal form dressed in robes.  It radiates vastly evil power. 
+This evil undead creature is normally found on dungeon level 46, and moves
+at normal speed.  It is magical, casting spells intelligently which drain
+mana, cause brain smashing, cause critical wounds, terrify, blind, confuse,
+paralyze, blink-self, teleport away or create darkness; 1 time in 4.  It
+can open doors and bash down doors.  It is cold blooded.  It is hurt by
+bright light.  It resists cold and poison.  It cannot be confused or slept.
+ It tends to overlook intruders, which it may notice from 200 feet.  It may
+carry up to 8 objects.  It can touch to lower experience (by 40d6+), touch
+to drain charges, touch to reduce dexterity with damage 2d12, and touch to
+reduce dexterity with damage 2d12.  
 
 [U] Scatha the Worm  (L.Slate 'A')
 === Num:473  Lev:46  Rar:2  Spd:+10  Hp:2200  Ac:130  Exp:17000
@@ -9505,6 +9433,16 @@ from 300 feet.  He may carry up to 14 good objects.  He can claw to attack
 with damage 4d10, claw to attack with damage 4d10, bite to burn with damage
 4d14, and bite to burn with damage 4d14.  
 
+The Black slime  (L.Dark ',')
+=== Num:667  Lev:48  Rar:4  Spd:+10  Hp:6d4  Ac:1  Exp:15
+Ugh! It quickly creeps alone the dungeon floor.  This plant is normally
+found on dungeon level 48, and moves extremely erratically, and quickly,
+but does not deign to chase intruders.  It is cold blooded.  It is not
+detected by telepathy.  It breeds explosively.  It cannot be frightened,
+confused or slept.  It is ever vigilant for intruders, which it may notice
+from 40 feet.  It usually appears in groups.  It can touch to reduce all
+stats with damage 1d4.  
+
 The Elder aranea  (Red 'S')
 === Num:603  Lev:48  Rar:3  Spd:+10  Hp:1200  Ac:65  Exp:2500
 A vast, bloated arachnid, master of its brood: among the more terrible of
@@ -9549,20 +9487,19 @@ nether.  It is observant of intruders, which it may notice from 300 feet.
 bite to lower experience (by 40d6+) with damage 4d6, and bite to lower
 experience (by 40d6+) with damage 4d6.  
 
-The Emperor lich  (Violet 'L')
-=== Num:970  Lev:48  Rar:2  Spd:+10  Hp:3500  Ac:95  Exp:15000
-A skeletal form wrapped in robes and ancient reliqury.  Powerful magic
-crackles along its bony fingers.  This evil undead creature is normally
-found on dungeon level 48, and moves quickly.  It is magical, casting
-spells intelligently which drain mana, cause brain smashing, cause critical
-wounds, cause mortal wounds, produce nether bolts, terrify, blind, confuse,
-paralyze, blink-self, teleport to, create darkness, summon similar monsters
-or summon an undead; 1 time in 3.  It can open doors and bash down doors.
- It is cold blooded.  It resists cold and poison.  It cannot be confused or
-slept.  It tends to overlook intruders, which it may notice from 200 feet.
- It may carry up to 14 objects.  It can touch to lower experience (by
-80d6+), touch to drain charges, touch to reduce dexterity with damage 2d16,
-and touch to reduce dexterity with damage 2d16.  
+The Black lich  (L.Dark 'L')
+=== Num:966  Lev:48  Rar:2  Spd:+0  Hp:2250  Ac:78  Exp:6400
+It is a skeletal form dressed in robes.  It radiates vastly evil power. 
+This evil undead creature is normally found on dungeon level 48, and moves
+at normal speed.  It is magical, casting spells intelligently which drain
+mana, cause brain smashing, cause critical wounds, cause mortal wounds,
+terrify, blind, paralyze, blink-self, teleport to or teleport away; 1 time
+in 4.  It can open doors and bash down doors.  It is cold blooded.  It is
+hurt by bright light.  It resists cold and poison.  It cannot be confused
+or slept.  It tends to overlook intruders, which it may notice from 200
+feet.  It may carry up to 10 objects.  It can touch to lower experience (by
+80d6+), touch to drain charges, touch to reduce dexterity with damage 2d12,
+and touch to reduce dexterity with damage 2d12.  
 
 [U] One of the Nine  (L.Dark 'W')
 === Num:457  Lev:48  Rar:3  Spd:+10  Hp:2700  Ac:70  Exp:18000
@@ -9578,7 +9515,7 @@ carry up to 8 good objects.  He can hit to attack with damage 7d7, hit to
 attack with damage 7d7, touch to lower experience (by 80d6+) with damage
 6d7, and radiate to terrify with damage 6d7.  
 
-[Q] Smaug the Golden  (Yellow 'A')
+[U] Smaug the Golden  (Yellow 'A')
 === Num:475  Lev:48  Rar:2  Spd:+10  Hp:2400  Ac:130  Exp:23000
 Smaug is one of the Uruloki that still survive, a fire-drake of immense
 cunning and intelligence.  His speed through air is matched by few other
@@ -9591,8 +9528,7 @@ weaker monsters and fly over obstacles.  He resists fire.  He cannot be
 confused or slept.  He tends to overlook intruders, which he may notice
 from 300 feet.  He may carry up to 14 good objects.  He can claw to attack
 with damage 4d12, claw to attack with damage 4d12, bite to burn with damage
-5d14, and bite to burn with damage 5d14.  You feel an intense desire to
-kill this monster...  
+5d14, and bite to burn with damage 5d14.  
 
 The Fire Demon  (Violet 'U')
 === Num:467  Lev:49  Rar:2  Spd:+10  Hp:2000  Ac:50  Exp:10000
@@ -9624,7 +9560,7 @@ to overlook intruders, which he may notice from 200 feet.  He may carry up
 to 12 good objects.  He can hit to attack with damage 3d8, hit to attack
 with damage 3d8, and hit to attack with damage 3d8.  
 
-[Q] The Watcher in the Water  (L.Dark 'F')
+[U] The Watcher in the Water  (L.Dark 'F')
 === Num:639  Lev:49  Rar:2  Spd:+10  Hp:2464  Ac:75  Exp:60000
 A huge many-tentacled creature, this is the Kraken of Moria.  Its tentacles
 are luminous and slimy green, and an inky stench comes from its fowl bulk.
@@ -9639,8 +9575,22 @@ lightning, fire and poison.  It cannot be confused or slept.  It pays
 little attention to intruders, which it may notice from 300 feet.  It may
 carry one or two good objects.  It can crush to attack with damage 16d12,
 crush to attack with damage 16d12, crush to attack with damage 16d12, and
-crush to attack with damage 16d12.  You feel an intense desire to kill this
-monster...  
+crush to attack with damage 16d12.  
+
+The Vampire lord  (Blue 'V')
+=== Num:428  Lev:50  Rar:1  Spd:+10  Hp:1600  Ac:70  Exp:1800
+A foul wind chills your bones as this ghastly figure approaches.  This evil
+undead creature is normally found on dungeon level 50, and moves quickly.
+ It is magical, casting spells which drain mana, cause brain smashing,
+cause critical wounds, cause mortal wounds, produce nether bolts, terrify,
+blind, paralyze or create darkness; 1 time in 7.  It can open doors, bash
+down doors and fly over obstacles.  It is cold blooded.  It regenerates
+quickly.  It is hurt by bright light.  It resists cold and poison.  It
+cannot be confused or slept.  It is fairly observant of intruders, which it
+may notice from 200 feet.  It may carry up to 9 objects or treasures.  It
+can hit to attack with damage 3d6, hit to attack with damage 3d6, bite to
+lower experience (by 80d6+) with damage 4d6, and bite to lower experience
+(by 80d6+) with damage 4d6.  
 
 The Master Sorcerer  (Violet 'q')
 === Num:1034  Lev:50  Rar:2  Spd:+20  Hp:1300  Ac:60  Exp:5000
@@ -9671,6 +9621,20 @@ from 300 feet.  He may carry up to 6 objects.  He can kick to attack with
 damage 10d2, kick to attack with damage 10d2, hit to poison with damage
 20d1, and hit to paralyze with damage 15d1.  
 
+The Master lich  (Red 'L')
+=== Num:451  Lev:50  Rar:2  Spd:+10  Hp:1800  Ac:80  Exp:10000
+A skeletal form wrapped in robes.  Powerful magic crackles along its bony
+fingers.  This evil undead creature is normally found on dungeon level 50,
+and moves quickly.  It is magical, casting spells intelligently which drain
+mana, cause brain smashing, cause critical wounds, cause mortal wounds,
+terrify, blind, confuse, paralyze, blink-self, teleport to or summon an
+undead; 1 time in 3.  It can open doors and bash down doors.  It is cold
+blooded.  It resists cold and poison.  It cannot be confused or slept.  It
+tends to overlook intruders, which it may notice from 200 feet.  It may
+carry up to 12 objects.  It can touch to lower experience (by 80d6+), touch
+to drain charges, touch to reduce dexterity with damage 2d12, and touch to
+reduce dexterity with damage 2d12.  
+
 The Minor Death  (L.Dark 'G')
 === Num:847  Lev:50  Rar:3  Spd:+10  Hp:2400  Ac:140  Exp:16000
 It is implacable, inescapable, and yet only a shadow of its true master. 
@@ -9684,7 +9648,7 @@ which it may notice from 200 feet.  It may carry up to 10 objects.  It can
 hit to attack with damage 18d6, touch to lower experience (by 80d6+), and
 touch to reduce all stats.  
 
-[Q] Durin's Bane, the Balrog of Khazad-dum  (Violet 'U')
+[U] Durin's Bane, the Balrog of Khazad-dum  (Violet 'U')
 === Num:483  Lev:50  Rar:3  Spd:+20  Hp:3000  Ac:100  Exp:30000
 A huge Balrog surrounded by raging pillars of fire, he is indeed a terrible
 opponent.  The dark figure holds in its right hand a sword like a stabbing
@@ -9700,19 +9664,18 @@ fly over obstacles.  He resists fire.  He cannot be confused or slept.  He
 pays little attention to intruders, which he may notice from 200 feet.  He
 usually appears with escorts.  He may carry up to 18 good objects.  He can
 hit to burn with damage 6d12, radiate to burn with damage 6d12, crush to
-attack with damage 5d12, and touch to drain charges.  You feel an intense
-desire to kill this monster...  
+attack with damage 5d12, and touch to drain charges.  
 
 [U] Gilim, the Giant of Eruman  (Umber 'P')
 === Num:640  Lev:51  Rar:7  Spd:+0  Hp:913  Ac:35  Exp:980
 A fifty foot tall humanoid that shakes the very ground you stand on.  He
 looks down on your pathetic figure with hate and disdain.  This evil giant
 is normally found on dungeon level 51, and moves at normal speed.  He can
-open doors, bash down doors and pick up objects.  He resists acid, cold and
-poison.  He tends to overlook intruders, which he may notice from 200 feet.
- He usually appears with escorts.  He may carry a good object.  He can hit
-to attack with damage 5d5, bite to attack with damage 2d10, and hit to
-steal gold with damage 2d2.  
+open doors, bash down doors and pick up objects.  He needs light to see
+you.  He resists acid, cold and poison.  He tends to overlook intruders,
+which he may notice from 200 feet.  He usually appears with escorts.  He
+may carry a good object.  He can hit to attack with damage 5d5, bite to
+attack with damage 2d10, and hit to steal gold with damage 2d2.  
 
 The Nether hound  (L.Green 'Z')
 === Num:485  Lev:51  Rar:2  Spd:+10  Hp:60d10  Ac:100  Exp:5000
@@ -9790,6 +9753,21 @@ It may carry up to 4 good objects.  It can bite to poison with damage 5d7,
 bite to poison with damage 5d7, crush to lower experience (by 40d6+) with
 damage 8d9, and crush to lower experience (by 40d6+) with damage 8d9.  
 
+The Night lich  (Blue 'L')
+=== Num:967  Lev:52  Rar:2  Spd:+10  Hp:2200  Ac:83  Exp:11000
+A skeletal form wrapped in robes and cloaked in darkness.  Powerful magic
+crackles along its bony fingers.  This evil undead creature is normally
+found on dungeon level 52, and moves quickly.  It is magical, casting
+spells intelligently which drain mana, cause brain smashing, cause critical
+wounds, cause mortal wounds, terrify, blind, confuse, paralyze, blink-self,
+teleport to, create darkness or summon an undead; 1 time in 3.  It can open
+doors and bash down doors.  It is cold blooded.  It resists cold and
+poison.  It cannot be confused or slept.  It tends to overlook intruders,
+which it may notice from 200 feet.  It may carry up to 12 objects.  It can
+touch to lower experience (by 80d6+), touch to drain charges, touch to
+reduce dexterity with damage 2d13, and touch to reduce dexterity with
+damage 2d13.  
+
 The Wood elf assassin  (L.Dark 'l')
 === Num:959  Lev:52  Rar:2  Spd:+15  Hp:14d13  Ac:30  Exp:15815
 An elven assassin, so stealthy that he is almost impossible to see.  This
@@ -9855,34 +9833,20 @@ carry up to 9 good objects or treasures.  It can hit to attack with damage
 with damage 5d6, and bite to lower experience (by 80d6+) with damage 5d6.
  
 
-The Demilich  (L.Umber 'L')
-=== Num:557  Lev:54  Rar:2  Spd:+10  Hp:3200  Ac:100  Exp:12500
-A lich who is partially immaterial, on its way to a new, ethereal form. 
-This evil undead creature is normally found on dungeon level 54, and moves
-quickly.  It is magical, casting spells intelligently which drain mana,
-cause brain smashing, cause critical wounds, cause mortal wounds, terrify,
-blind, confuse, paralyze, heal-self, blink-self, teleport-self, teleport
-to, cause amnesia, summon a demon or summon an undead; 1 time in 3.  It can
-open doors and bash down doors.  It is cold blooded.  It resists cold and
+The Death lich  (Slate 'L')
+=== Num:968  Lev:54  Rar:2  Spd:+10  Hp:2600  Ac:86  Exp:12000
+A skeletal form wrapped in robes and cloaked in darkness.  Powerful magic
+crackles along its bony fingers.  This evil undead creature is normally
+found on dungeon level 54, and moves quickly.  It is magical, casting
+spells intelligently which drain mana, cause brain smashing, cause critical
+wounds, cause mortal wounds, terrify, blind, confuse, paralyze, blink-self,
+teleport to, create darkness or summon an undead; 1 time in 3.  It can open
+doors and bash down doors.  It is cold blooded.  It resists cold and
 poison.  It cannot be confused or slept.  It tends to overlook intruders,
-which it may notice from 200 feet.  It may carry up to 10 good objects.  It
-can touch to lower experience (by 80d6+), touch to drain charges, touch to
-reduce dexterity with damage 4d12, and touch to reduce dexterity with
-damage 4d12.  
-
-[U] The Phoenix  (Red 'B')
-=== Num:497  Lev:54  Rar:3  Spd:+10  Hp:3600  Ac:130  Exp:40000
-A massive glowing eagle bathed in flames.  The searing heat chars your skin
-and melts your armour.  This animal is normally found on dungeon level 54,
-and moves quickly.  It may breathe fire, light or plasma, and is also
-magical, casting spells which produce fire balls, produce fire bolts,
-produce plasma bolts or summon similar monsters; 1 time in 3.  It can
-illuminate the dungeon, open doors, bash down doors and fly over obstacles.
- It resists acid, lightning, fire and poison.  It resists plasma.  It
-cannot be confused or slept.  It is ever vigilant for intruders, which it
-may notice from 600 feet.  It may carry up to 4 good objects.  It can bite
-to burn with damage 12d6, bite to burn with damage 12d6, hit to burn with
-damage 9d12, and radiate to burn with damage 9d12.  
+which it may notice from 200 feet.  It may carry up to 12 objects.  It can
+touch to lower experience (by 80d6+), touch to drain charges, touch to
+reduce dexterity with damage 2d14, and touch to reduce dexterity with
+damage 2d14.  
 
 The Barbazu  (L.Green 'U')
 === Num:567  Lev:55  Rar:2  Spd:+10  Hp:800  Ac:60  Exp:3000
@@ -9933,11 +9897,11 @@ condemned Numenor to oblivion.  This evil person is normally found on
 dungeon level 55, and moves very quickly.  He is magical, casting spells
 intelligently which heal-self, teleport away, summon similar monsters or
 summon monsters; 1 time in 6.  He can open doors, bash down doors, push
-past weaker monsters and pick up objects.  He resists lightning, fire and
-poison.  He prefers to ignore intruders, which he may notice from 300 feet.
- He may carry up to 8 exceptional objects.  He can hit to attack with
-damage 8d8, hit to attack with damage 8d8, hit to attack with damage 8d8,
-and hit to attack with damage 8d8.  
+past weaker monsters and pick up objects.  He needs light to see you.  He
+resists lightning, fire and poison.  He prefers to ignore intruders, which
+he may notice from 300 feet.  He may carry up to 8 exceptional objects.  He
+can hit to attack with damage 8d8, hit to attack with damage 8d8, hit to
+attack with damage 8d8, and hit to attack with damage 8d8.  
 
 The Lesser titan  (Yellow 'P')
 === Num:433  Lev:56  Rar:3  Spd:+10  Hp:2400  Ac:80  Exp:6000
@@ -9945,13 +9909,28 @@ It is a humanoid figure thirty feet tall that gives off an aura of power
 and hate.  This evil giant is normally found on dungeon level 56, and moves
 quickly.  It may throw boulders.  It is magical, casting spells
 intelligently which heal-self, teleport to or summon monsters; 1 time in 3.
- It can open doors, bash down doors and pick up objects.  It takes a while
-to see intruders, which it may notice from 300 feet.  It may carry up to 8
-good objects.  It can hit to confuse with damage 9d9, hit to confuse with
-damage 9d9, hit to confuse with damage 9d9, and hit to confuse with damage
-9d9.  
+ It can open doors, bash down doors and pick up objects.  It needs light to
+see you.  It takes a while to see intruders, which it may notice from 300
+feet.  It may carry up to 8 good objects.  It can hit to confuse with
+damage 9d9, hit to confuse with damage 9d9, hit to confuse with damage 9d9,
+and hit to confuse with damage 9d9.  
 
-[Q] The Messenger of Khamul  (L.Dark 'W')
+The Nether lich  (L.Green 'L')
+=== Num:969  Lev:56  Rar:2  Spd:+10  Hp:3000  Ac:90  Exp:13000
+A skeletal form wrapped in robes and cloaked in darkness.  Powerful magic
+crackles along its bony fingers.  This evil undead creature is normally
+found on dungeon level 56, and moves quickly.  It is magical, casting
+spells intelligently which drain mana, cause brain smashing, cause critical
+wounds, cause mortal wounds, produce nether bolts, terrify, blind, confuse,
+paralyze, blink-self, teleport to, create darkness or summon an undead; 1
+time in 3.  It can open doors and bash down doors.  It is cold blooded.  It
+resists cold and poison.  It resists nether.  It cannot be confused or
+slept.  It tends to overlook intruders, which it may notice from 200 feet.
+ It may carry up to 12 objects.  It can touch to lower experience (by
+80d6+), touch to drain charges, touch to reduce dexterity with damage 2d15,
+and touch to reduce dexterity with damage 2d15.  
+
+[U] The Messenger of Khamul  (L.Dark 'W')
 === Num:474  Lev:56  Rar:3  Spd:+10  Hp:4000  Ac:90  Exp:25000
 Once a powerful King among Men, he was enslaved by one of the Nine Rings
 and became one of the chief servants of Sauron.  This Ringwraith serves in
@@ -9966,7 +9945,7 @@ He cannot be confused or slept.  He is fairly observant of intruders, which
 he may notice from 900 feet.  He may carry up to 8 good objects.  He can
 hit to attack with damage 8d8, hit to attack with damage 8d8, bite to lower
 experience (by 40d6+) with damage 6d7, and radiate to terrify with damage
-6d7.  You feel an intense desire to kill this monster...  
+6d7.  
 
 The Hand druj  (Yellow 's')
 === Num:499  Lev:57  Rar:2  Spd:+20  Hp:600  Ac:110  Exp:12000
@@ -9995,22 +9974,6 @@ He may carry up to 8 objects.  He can kick to attack with damage 20d2, kick
 to attack with damage 10d2, hit to poison with damage 20d1, and hit to
 paralyze with damage 15d1.  
 
-[U] The Lernaean Hydra  (Violet 'y')
-=== Num:504  Lev:57  Rar:2  Spd:+10  Hp:4500  Ac:140  Exp:20000
-A massive legendary hydra.  It has twelve powerful heads.  Its many eyes
-stare at you as clouds of smoke and poisonous vapour rise from its seething
-form.  And it grows new heads as fast as you chop them off.  This animal is
-normally found on dungeon level 57, and moves quickly.  It may breathe fire
-or poison, and is also magical, casting spells intelligently which produce
-fire balls, produce poison balls, produce fire bolts, produce plasma bolts,
-terrify, summon similar monsters or summon hydras; 1 time in 3.  It can
-open doors, bash down doors and destroy weaker monsters.  It regenerates
-quickly.  It resists fire and poison.  It cannot be confused or slept.  It
-takes a while to see intruders, which it may notice from 200 feet.  It may
-carry up to 14 treasures.  It can bite to poison with damage 8d6, bite to
-poison with damage 8d6, bite to burn with damage 12d6, and bite to burn
-with damage 12d6.  
-
 The Eye druj  (Red 's')
 === Num:500  Lev:58  Rar:2  Spd:+20  Hp:1000  Ac:90  Exp:15000
 A bloodshot eyeball floating in the air, you'd be forgiven for assuming it
@@ -10023,17 +9986,20 @@ poison.  It cannot be frightened, confused or slept.  It is fairly
 observant of intruders, which it may notice from 200 feet.  It has no
 physical attacks.  
 
-[U] The Minotaur of the Labrynth  (Violet 'H')
-=== Num:490  Lev:58  Rar:4  Spd:+20  Hp:4700  Ac:120  Exp:24000
-A fearsome bull-headed monster, who guarded the Labyrinth at Crete.  This
-evil creature is normally found on dungeon level 58, and moves very
-quickly.  He may shoot at you.  He may breathe force, and is also magical,
-casting spells which produce lightning balls, produce mana bolts, produce
-plasma bolts or slow; 1 time in 6.  He can bash down doors.  He resists
-fire and poison.  He cannot be confused or slept.  He takes quite a while
-to see intruders, which he may notice from 300 feet.  He may carry up to 10
-good objects.  He can butt to attack with damage 12d13, butt to attack with
-damage 12d13, hit to attack with damage 10d10, and hurt with arrows.  
+The Emperor lich  (Violet 'L')
+=== Num:970  Lev:58  Rar:2  Spd:+10  Hp:3500  Ac:95  Exp:15000
+A skeletal form wrapped in robes and ancient reliqury.  Powerful magic
+crackles along its bony fingers.  This evil undead creature is normally
+found on dungeon level 58, and moves quickly.  It is magical, casting
+spells intelligently which drain mana, cause brain smashing, cause critical
+wounds, cause mortal wounds, produce nether bolts, terrify, blind, confuse,
+paralyze, blink-self, teleport to, create darkness, summon similar monsters
+or summon an undead; 1 time in 3.  It can open doors and bash down doors.
+ It is cold blooded.  It resists cold and poison.  It cannot be confused or
+slept.  It tends to overlook intruders, which it may notice from 200 feet.
+ It may carry up to 14 objects.  It can touch to lower experience (by
+80d6+), touch to drain charges, touch to reduce dexterity with damage 2d16,
+and touch to reduce dexterity with damage 2d16.  
 
 The Ethereal hound  (White 'Z')
 === Num:495  Lev:59  Rar:3  Spd:+10  Hp:60d15  Ac:100  Exp:7000
@@ -10074,6 +10040,21 @@ may notice from 1000 feet.  It can engulf to electrify with damage 5d5,
 engulf to burn with damage 5d5, engulf to dissolve with damage 5d5, and
 engulf to freeze with damage 5d5.  
 
+The Demilich  (L.Umber 'L')
+=== Num:557  Lev:60  Rar:2  Spd:+10  Hp:3200  Ac:100  Exp:12500
+A lich who is partially immaterial, on its way to a new, ethereal form. 
+This evil undead creature is normally found on dungeon level 60, and moves
+quickly.  It is magical, casting spells intelligently which drain mana,
+cause brain smashing, cause critical wounds, cause mortal wounds, terrify,
+blind, confuse, paralyze, heal-self, blink-self, teleport-self, teleport
+to, cause amnesia, summon a demon or summon an undead; 1 time in 3.  It can
+open doors and bash down doors.  It is cold blooded.  It resists cold and
+poison.  It cannot be confused or slept.  It tends to overlook intruders,
+which it may notice from 200 feet.  It may carry up to 10 good objects.  It
+can touch to lower experience (by 80d6+), touch to drain charges, touch to
+reduce dexterity with damage 4d12, and touch to reduce dexterity with
+damage 4d12.  
+
 [U] The Watcher of Cirith Ungol  (Slate 'g')
 === Num:641  Lev:60  Rar:5  Spd:+10  Hp:60d200  Ac:40  Exp:25000
 It looks like a great figure seated upon a throne, with three joined bodies
@@ -10092,7 +10073,7 @@ notice from 420 feet.  It can gaze to terrify with damage 5d8, gaze to
 paralyze with damage 5d8, gaze to reduce strength with damage 5d8, and gaze
 to confuse with damage 5d8.  
 
-[Q] Grimma Wormtongue, Agent of Saruman  (Yellow 'q')
+[U] Grimma Wormtongue, Agent of Saruman  (Yellow 'q')
 === Num:514  Lev:60  Rar:1  Spd:+10  Hp:5000  Ac:100  Exp:35000
 He is a pathetic sniveling wretch. He has been spying for Saruman.  This
 evil person is normally found on dungeon level 60, and moves quickly.  He
@@ -10102,12 +10083,11 @@ cause mortal wounds, produce ice bolts, terrify, blind, haste-self,
 heal-self, teleport-self, teleport away, create traps, cause amnesia,
 summon monsters, summon animals, summon a demon, summon an undead or summon
 Ancient Dragons; 1 time in 2.  He can open doors and bash down doors.  He
-resists lightning, fire, cold and poison.  He cannot be confused or slept.
- He is ever vigilant for intruders, which he may notice from 1000 feet.  He
-may carry up to 18 exceptional objects.  He can hit to disenchant with
-damage 6d8, hit to disenchant with damage 6d8, hit to attack with damage
-5d5, and hit to attack with damage 5d5.  You feel an intense desire to kill
-this monster...  
+needs light to see you.  He resists lightning, fire, cold and poison.  He
+cannot be confused or slept.  He is ever vigilant for intruders, which he
+may notice from 1000 feet.  He may carry up to 18 exceptional objects.  He
+can hit to disenchant with damage 6d8, hit to disenchant with damage 6d8,
+hit to attack with damage 5d5, and hit to attack with damage 5d5.  
 
 The Nightwing  (L.Dark 'N')
 === Num:484  Lev:61  Rar:3  Spd:+10  Hp:60d60  Ac:120  Exp:10000
@@ -10175,6 +10155,24 @@ fire, cold and poison.  He is fairly observant of intruders, which he may
 notice from 400 feet.  He may carry up to 14 good objects.  He can hit to
 burn with damage 9d12, hit to burn with damage 4d6, hit to attack with
 damage 10d10, and hit to attack with damage 10d10.  
+
+[U] Denethor, Steward of Gondor  (Orange 't')
+=== Num:1085  Lev:61  Rar:3  Spd:+20  Hp:5500  Ac:160  Exp:25000
+The proud 'king' of Gondor, he has been driven mad by his contact with
+Sauron through the palantir, and by the death of his sons.  You see the
+glint of a terrible fire in his eyes.  This person is normally found on
+dungeon level 61, and moves very quickly.  He is magical, casting spells
+intelligently which produce fire balls, cause brain smashing, cause mortal
+wounds, produce fire bolts, produce mana bolts, produce plasma bolts,
+terrify, blind, confuse, haste-self, heal-self, teleport-self, teleport to,
+teleport away, create traps, cause amnesia or summon similar monsters; 1
+time in 2.  He can open doors, bash down doors, push past weaker monsters
+and pick up objects.  He needs light to see you.  He resists acid,
+lightning, fire, cold and poison.  He is fairly observant of intruders,
+which he may notice from 400 feet.  He usually appears with escorts.  He
+may carry up to 14 good objects.  He can hit to burn with damage 9d12, hit
+to burn with damage 4d6, hit to attack with damage 10d10, and hit to attack
+with damage 10d10.  
 
 The Dreadlord  (Red 'G')
 === Num:515  Lev:62  Rar:2  Spd:+10  Hp:3000  Ac:150  Exp:20000
@@ -10370,7 +10368,7 @@ carry up to 12 good objects.  It can touch to lower experience (by 80d6+),
 touch to drain charges, touch to reduce dexterity with damage 8d12, and
 touch to reduce dexterity with damage 8d12.  
 
-[Q] Gothmog, the Lieutenant of Morgul  (L.Dark 'W')
+[U] Gothmog, the Lieutenant of Morgul  (L.Dark 'W')
 === Num:492  Lev:64  Rar:3  Spd:+10  Hp:4500  Ac:100  Exp:30000
 This Ringwraith was once a mighty King among Men before being enslaved by
 one of the Nine Rings.  Now a servant of Sauron, he serves as the
@@ -10385,8 +10383,7 @@ cold and poison.  He cannot be confused or slept.  He is fairly observant
 of intruders, which he may notice from 900 feet.  He may carry up to 12
 good objects.  He can hit to attack with damage 9d9, hit to attack with
 damage 9d9, touch to lower experience (by 80d6+) with damage 6d7, and
-radiate to terrify with damage 6d7.  You feel an intense desire to kill
-this monster...  
+radiate to terrify with damage 6d7.  
 
 The Osyluth  (L.Slate 'U')
 === Num:569  Lev:65  Rar:2  Spd:+20  Hp:2600  Ac:75  Exp:13000
@@ -10403,7 +10400,7 @@ It pays little attention to intruders, which it may notice from 200 feet.
 damage 6d6, hit to reduce charisma with damage 6d6, bite to poison with
 damage 8d8, and sting to reduce strength with damage 5d5.  
 
-[Q] Saruman of Many Colours  (Violet 'q')
+[U] Saruman of Many Colours  (Violet 'M')
 === Num:532  Lev:65  Rar:3  Spd:+20  Hp:7000  Ac:100  Exp:38000
 Originally known as the White, Saruman fell prey to Sauron's wiles.  He
 seeks to emulate him and breeds orcs and trolls to fight for him.  He
@@ -10418,14 +10415,13 @@ invisible.  He resists lightning, fire and cold.  He cannot be confused or
 slept.  He is fairly observant of intruders, which he may notice from 600
 feet.  He may carry up to 10 good objects.  He can hit to disenchant with
 damage 6d8, hit to disenchant with damage 6d8, hit to drain charges with
-damage 5d5, and hit to drain charges with damage 5d5.  You feel an intense
-desire to kill this monster...  
+damage 5d5, and hit to drain charges with damage 5d5.  
 
-[Q] The Sorcerer of Dol Goldur  (Violet 'M')
+[U] The Sorcerer of Dol Goldur  (Slate 'q')
 === Num:645  Lev:65  Rar:3  Spd:+20  Hp:7000  Ac:100  Exp:38000
 A mysterious and evil sorcerer, wrapped in black robes and with a burning
 gaze.  Some whisper that his power is as great as Sauron's.  This evil
-creature is normally found on dungeon level 65, and moves very quickly.  He
+person is normally found on dungeon level 65, and moves very quickly.  He
 is magical, casting spells intelligently which produce fire balls, produce
 nether balls, produce water balls, invoke mana storms, invoke darkness
 storms, cause critical wounds, produce plasma bolts, paralyze, teleport to,
@@ -10435,8 +10431,7 @@ invisible.  He resists lightning, fire and cold.  He cannot be confused or
 slept.  He is fairly observant of intruders, which he may notice from 600
 feet.  He may carry up to 10 good objects.  He can hit to disenchant with
 damage 6d8, hit to disenchant with damage 6d8, hit to drain charges with
-damage 5d5, and hit to drain charges with damage 5d5.  You feel an intense
-desire to kill this monster...  
+damage 5d5, and hit to drain charges with damage 5d5.  
 
 The Greater titan  (Orange 'P')
 === Num:477  Lev:66  Rar:3  Spd:+10  Hp:3800  Ac:125  Exp:23500
@@ -10445,11 +10440,11 @@ radiating from its frame shakes your courage, its hatred inspired by your
 defiance.  This evil giant is normally found on dungeon level 66, and moves
 quickly.  It may throw boulders.  It is magical, casting spells
 intelligently which heal-self, teleport to or summon monsters; 1 time in 3.
- It can bash down doors and pick up objects.  It takes a while to see
-intruders, which it may notice from 300 feet.  It may carry up to 10 good
-objects.  It can hit to confuse with damage 12d12, hit to confuse with
-damage 12d12, hit to confuse with damage 12d12, and hit to confuse with
-damage 12d12.  
+ It can bash down doors and pick up objects.  It needs light to see you. 
+It takes a while to see intruders, which it may notice from 300 feet.  It
+may carry up to 10 good objects.  It can hit to confuse with damage 12d12,
+hit to confuse with damage 12d12, hit to confuse with damage 12d12, and hit
+to confuse with damage 12d12.  
 
 [U] Tevildo, Prince of Cats  (Violet 'f')
 === Num:516  Lev:66  Rar:3  Spd:+20  Hp:4800  Ac:200  Exp:30000
@@ -10591,7 +10586,7 @@ to disenchant with damage 8d8, hit to disenchant with damage 8d8, hit to
 reduce strength with damage 6d6, and hit to reduce strength with damage
 6d6.  
 
-[Q] Baldor the Hapless  (L.Red 'G')
+[U] Baldor the Hapless  (L.Red 'G')
 === Num:522  Lev:68  Rar:2  Spd:+20  Hp:6500  Ac:150  Exp:35000
 The eldest son of Brego, second King of Rohan.  At the feast held to
 celebrate the completion of Meduseld, he made a rash vow to tread the Paths
@@ -10605,8 +10600,7 @@ fly over obstacles.  He is cold blooded.  He resists cold and poison.  He
 cannot be confused or slept.  He is fairly observant of intruders, which he
 may notice from 200 feet.  He may carry up to 14 good objects.  He can hit
 to attack with damage 10d10, hit to attack with damage 10d10, hit to reduce
-strength with damage 4d6, and hit to reduce strength with damage 4d6.  You
-feel an intense desire to kill this monster...  
+strength with damage 4d6, and hit to reduce strength with damage 4d6.  
 
 The Gelugon  (White 'U')
 === Num:570  Lev:69  Rar:3  Spd:+20  Hp:3500  Ac:100  Exp:14000
@@ -10852,7 +10846,7 @@ to 18 good objects.  It can claw to attack with damage 5d12, claw to attack
 with damage 5d12, bite to attack with damage 7d14, and bite to attack with
 damage 7d14.  
 
-[Q] Shelob, Spider of Darkness  (L.Dark 'S')
+[U] Shelob, Spider of Darkness  (L.Dark 'S')
 === Num:530  Lev:75  Rar:1  Spd:+20  Hp:13000  Ac:160  Exp:35000
 Shelob is an enormous bloated spider, the last daughter of Ungoliant the
 Unlight.  Her poison is legendary, as is her ego.  She normally guards the
@@ -10867,9 +10861,9 @@ cannot be confused or slept.  She pays little attention to intruders, which
 she may notice from 400 feet.  She may carry up to 8 good objects.  She can
 claw to poison with damage 8d6, claw to poison with damage 8d6, bite to
 paralyze with damage 8d10, and sting to reduce strength with damage 8d4. 
-You feel an intense desire to kill this monster...  
 
-[Q] Caradhras, the Mountain  (Slate 'P')
+
+[U] Caradhras, the Mountain  (Slate 'P')
 === Num:586  Lev:76  Rar:3  Spd:+10  Hp:6000  Ac:160  Exp:37000
 The greatest peak of the Misty Mountains, created by Morgoth to stop
 Orome's progress into the East.  This evil giant is normally found on
@@ -10879,8 +10873,7 @@ pick up objects.  He is hurt by rock remover.  He resists acid, lightning,
 fire, cold and poison.  He takes a while to see intruders, which he may
 notice from 300 feet.  He may carry up to 8 good objects.  He can hit to
 shatter with damage 13d13, hit to confuse with damage 13d13, hit to shatter
-with damage 13d13, and hit to confuse with damage 13d13.  You feel an
-intense desire to kill this monster...  
+with damage 13d13, and hit to confuse with damage 13d13.  
 
 The Pit Fiend  (Orange 'U')
 === Num:572  Lev:77  Rar:3  Spd:+20  Hp:4000  Ac:120  Exp:22000
@@ -10898,7 +10891,7 @@ from 300 feet.  It may carry up to 12 good objects.  It can claw to burn
 with damage 6d10, claw to burn with damage 6d10, bite to poison with damage
 5d10, and bite to reduce constitution with damage 5d10.  
 
-[Q] The Lord of the Paths of the Dead  (Yellow 'L')
+[U] The Lord of the Paths of the Dead  (Yellow 'L')
 === Num:528  Lev:77  Rar:2  Spd:+20  Hp:5000  Ac:85  Exp:30000
 The mightiest of the oath breakers who lie in the Paths of the Dead. 
 Hispowerful blows and fell magic rain down on you, for you are not an heir
@@ -10913,8 +10906,7 @@ slept.  He tends to overlook intruders, which he may notice from 200 feet.
  He usually appears with escorts.  He may carry up to 12 exceptional
 objects.  He can touch to lower experience (by 80d6+) with damage 6d12,
 touch to drain charges with damage 6d12, touch to reduce dexterity with
-damage 6d12, and touch to reduce dexterity with damage 6d12.  You feel an
-intense desire to kill this monster...  
+damage 6d12, and touch to reduce dexterity with damage 6d12.  
 
 The Hellhound  (Red 'C')
 === Num:537  Lev:78  Rar:2  Spd:+10  Hp:400  Ac:80  Exp:600
@@ -11046,7 +11038,7 @@ feet.  It may carry up to 18 good objects.  It can claw to attack with
 damage 5d12, claw to attack with damage 5d12, bite to attack with damage
 7d12, and bite to attack with damage 7d14.  
 
-[Q] The Witch-King of Angmar, Lord of the Nazgul  (L.Dark 'W')
+[U] The Witch-King of Angmar, Lord of the Nazgul  (L.Dark 'W')
 === Num:535  Lev:80  Rar:3  Spd:+20  Hp:6000  Ac:120  Exp:60000
 The Chief of the Ringwraiths.  A fell being of devastating power.  His
 spells are lethal and his combat blows crushingly hard.  He moves at speed,
@@ -11063,8 +11055,7 @@ resists cold and poison.  He cannot be confused or slept.  He is fairly
 observant of intruders, which he may notice from 900 feet.  He may carry up
 to 14 exceptional objects.  He can hit to attack with damage 10d10, hit to
 attack with damage 10d10, hit to lower experience (by 80d6+) with damage
-7d7, and radiate to terrify with damage 7d7.  You feel an intense desire to
-kill this monster...  
+7d7, and radiate to terrify with damage 7d7.  
 
 [U] Maeglin, the Traitor of Gondolin  (L.Dark 'h')
 === Num:595  Lev:81  Rar:2  Spd:+20  Hp:6000  Ac:120  Exp:35000
@@ -11097,7 +11088,7 @@ objects.  He can claw to attack with damage 6d8, claw to attack with damage
 6d8, bite to poison with damage 6d6, and bite to poison with damage 6d6. 
 
 
-[Q] The Mouth of Sauron  (Violet 'q')
+[U] The Mouth of Sauron  (L.Dark 'q')
 === Num:538  Lev:84  Rar:2  Spd:+30  Hp:7500  Ac:120  Exp:45000
 The Mouth of Sauron is a mighty spell caster.  So old that even he cannot
 remember his own name, his power and evil are undeniable.  He believes
@@ -11112,8 +11103,7 @@ and poison.  He cannot be frightened, confused or slept.  He pays little
 attention to intruders, which he may notice from 200 feet.  He may carry up
 to 18 exceptional objects.  He can gaze to lower experience (by 80d6+) with
 damage 5d5, gaze to lower experience (by 80d6+) with damage 5d5, touch to
-poison with damage 5d5, and touch to poison with damage 5d5.  You feel an
-intense desire to kill this monster...  
+poison with damage 5d5, and touch to poison with damage 5d5.  
 
 [U] Ancalagon the Black  (L.Dark 'A')
 === Num:511  Lev:85  Rar:3  Spd:+20  Hp:10000  Ac:170  Exp:45000
@@ -11129,18 +11119,6 @@ intruders, which he may notice from 400 feet.  He usually appears with
 escorts.  He may carry up to 18 exceptional objects.  He can claw to attack
 with damage 6d12, claw to attack with damage 6d12, bite to attack with
 damage 10d14, and bite to attack with damage 10d14.  
-
-[U] The Tarrasque  (Violet 'R')
-=== Num:539  Lev:86  Rar:2  Spd:+20  Hp:8500  Ac:185  Exp:35000
-The Tarrasque is a massive reptile of legend, rumoured to be unkillable and
-immune to magic.  Fear its anger, for its devastation is unmatched!  This
-animal is normally found on dungeon level 86, and moves very quickly.  It
-may breathe fire, frost or disenchantment; 1 time in 2.  It can open doors,
-bash down doors and push past weaker monsters.  It resists fire and cold.
- It resists disenchantment.  It cannot be confused or slept.  It takes a
-while to see intruders, which it may notice from 500 feet.  It may carry up
-to 12 good objects.  It can hit to attack with damage 10d10, hit to attack
-with damage 10d10, touch to drain charges, and touch to drain charges.  
 
 [U] Kronos, Lord of the Titans  (Violet 'P')
 === Num:587  Lev:87  Rar:3  Spd:+10  Hp:7000  Ac:150  Exp:42000
@@ -11200,7 +11178,7 @@ may notice from 500 feet.  He may carry up to 8 good objects.  He can claw
 to burn with damage 9d12, claw to burn with damage 9d12, bite to burn with
 damage 9d12, and bite to burn with damage 9d12.  
 
-[Q] Ungoliant, the Unlight  (Violet 'S')
+[U] Ungoliant, the Unlight  (Violet 'S')
 === Num:542  Lev:92  Rar:3  Spd:+20  Hp:16000  Ac:180  Exp:55000
 This enormous, hideous spirit of void is in the form of a spider of immense
 proportions.  She is surrounded by a cloud of Unlight as she sucks in all
@@ -11219,10 +11197,9 @@ ever vigilant for intruders, which he may notice from 1000 feet.  He
 usually appears with escorts.  He may carry up to 18 exceptional objects.
  He can bite to lower experience (by 80d6+) with damage 7d12, bite to
 poison with damage 7d12, sting to drain charges with damage 7d12, and
-radiate to blast with powerful darkness with damage 7d12.  You feel an
-intense desire to kill this monster...  
+radiate to blast with powerful darkness with damage 7d12.  
 
-[Q] Gothmog, the High Captain of Balrogs  (Violet 'U')
+[U] Gothmog, the High Captain of Balrogs  (Violet 'U')
 === Num:545  Lev:95  Rar:1  Spd:+20  Hp:8000  Ac:140  Exp:43000
 Gothmog is the Chief Balrog in Morgoth's personal guard.  He is renowned
 for slaying Feanor and Fingon, two of the High Kings of the Noldor Elves,
@@ -11237,7 +11214,7 @@ be confused or slept.  He is ever vigilant for intruders, which he may
 notice from 1000 feet.  He usually appears with escorts.  He may carry up
 to 18 exceptional objects.  He can hit to burn with damage 9d12, radiate to
 burn with damage 9d12, crush to attack with damage 8d12, and touch to drain
-charges.  You feel an intense desire to kill this monster...  
+charges.  
 
 [Q] Sauron, the Sorcerer  (Violet 'q')
 === Num:546  Lev:99  Rar:1  Spd:+20  Hp:10500  Ac:160  Exp:50000
