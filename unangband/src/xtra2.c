@@ -2932,7 +2932,7 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 		case (ROOM_PIT_GIANT):
 		{
 			strcpy(name, "giant pit");
-			strcpy(text_visible, "You have stumbled into the barracks of a group of giants.");
+			strcpy(text_visible, "You have stumbled into an immense cavern where giants dwell.");
 			return;
 		}
 		case (ROOM_PIT_DRAGON):
