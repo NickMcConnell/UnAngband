@@ -37,6 +37,7 @@ are unaffected (Bug 682).
 - Fixed spurious and incorrect messages when monster hits player trap (Bug
 808).
 
+- Monsters can now tunnel (Bug 605).
 
 
 ### Build / Platform ###

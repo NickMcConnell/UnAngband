@@ -6599,9 +6599,6 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				msg_print("The rune of protection is broken!");
 			}
 	
-			/* Forget the rune */
-			cave_info[ny][nx] &= ~(CAVE_MARK);
-	
 			/* Break the rune */
 			cave_alter_feat(ny, nx, FS_GLYPH);
 	
@@ -6616,7 +6613,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			if (f_info[feat].flags1 & (FF1_SECRET)) cave_alter_feat(ny,nx,FS_SECRET);
 
 			/* Monster bashes the door down */
-			if ((bash) & (f_info[feat].flags1 & (FF1_BASH)))
+			if ((bash) && (f_info[feat].flags1 & (FF1_BASH)))
 			{
 				/* Character is not too far away */
 				if (m_ptr->cdis < 30)
@@ -6651,11 +6648,11 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			/* Monster opens the door */
 			else if (f_info[feat].flags1 & (FF1_OPEN))
 			{
-					/* Unlock the door */
-					cave_alter_feat(ny, nx, FS_OPEN);
+				/* Unlock the door */
+				cave_alter_feat(ny, nx, FS_OPEN);
 
-					/* Do not move */
-					do_move = FALSE;
+				/* Do not move */
+				do_move = FALSE;
 			}
 		}
 
@@ -6709,9 +6706,6 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					msg_format("%^s disarms the %s.",m_name,f_name+f_info[cave_feat[ny][nx]].name);
 				}
 
-				/* Forget the rune */
-				cave_info[ny][nx] &= ~(CAVE_MARK);
-
 				/* Break the rune */
 				cave_alter_feat(ny, nx, FS_DISARM);
 
@@ -6728,6 +6722,17 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				do_move = FALSE;	
 			}
 		}
+
+		/* Monsters tunnel through impassable terrain */
+		else if ((r_ptr->flags2 & (RF2_KILL_WALL)) && (f_info[feat].flags1 & (FF1_TUNNEL)))
+		{
+			/* Unlock the door */
+			cave_alter_feat(ny, nx, FS_TUNNEL);
+
+			/* Did kill wall */
+			did_kill_wall = TRUE;
+		}
+
 
 		else if (!(f_info[feat].flags1 & (FF1_MOVE))) return;
 
