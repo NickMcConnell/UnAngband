@@ -117,11 +117,11 @@ void teleport_away(int m_idx, int dis)
 			/* Ignore illegal locations */
 			if (!in_bounds_fully(ny, nx)) continue;
 
-			/* Require "start" floor space */
-			if (!cave_start_bold(ny, nx)) continue;
+			/* Require safe location for monster */
+			if (!place_monster_here(ny, nx, m_ptr->r_idx)) continue;
 
 			/* Hack -- no teleport onto glyph of warding */
-			/*if (cave_feat[ny][nx] == FEAT_GLYPH) continue;*/
+			if (f_info[cave_feat[ny][nx]].flags1 & (FF1_GLYPH)) continue;
 
 			/* Don't allow teleporting into vaults */
 			by = ny/BLOCK_HGT;
