@@ -23,6 +23,8 @@ part of screen if window is resized.
 
 - Fixed some flags for various types of terrain.
 
+- Fixed bug where learning a spell would report it as a song (Reported
+ by Adam Horowitz).
 
 Angband 0.5.2 "I'm on fire" release
 

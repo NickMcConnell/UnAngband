@@ -634,7 +634,7 @@ void do_cmd_study(void)
 		break;
 
 		case TV_MAGIC_BOOK:
-		p = "song";
+		p = "spell";
 		break;
 
 		case TV_RUNESTONE:
