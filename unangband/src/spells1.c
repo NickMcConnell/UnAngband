@@ -4077,7 +4077,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 	if (r_ptr->flags1 & (RF1_UNIQUE))
 	{
 		/* Uniques may only be killed by the player */
-		if ((who > 0) && (dam > m_ptr->hp)) dam = m_ptr->hp;
+		if ((who >= 0) && (dam > m_ptr->hp)) dam = m_ptr->hp;
 	}
 
 
