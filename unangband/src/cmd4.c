@@ -3312,10 +3312,9 @@ static int collect_objects(int grp_cur, int object_idx[], int mode)
 		/* Skip empty objects */
 		if (!k_ptr->name) continue;
 
-#if 0
-		/* Skip non-flavoured objects */
-		if (!k_ptr->flavor) continue;
-#endif
+		/* Skip non-flavoured non-aware objects */
+		if ((!k_ptr->aware) && (!k_ptr->flavor)) continue;
+
 		/* Skip items with no distribution (special artifacts) */
 		for (j = 0, k = 0; j < 4; j++) k += k_ptr->chance[j];
 		if (!(k))  continue; 

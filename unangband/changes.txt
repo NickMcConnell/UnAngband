@@ -3,6 +3,8 @@
 - Many low level spell casting monsters were casting mana bolt instead of
 magic missile.
 
+- Objects were incorrectly being initialised as aware, as per Angband. Now
+only become aware when you see the object for the first time.
 
 
 UnAngband 0.5.4c: "Competitive Fix"

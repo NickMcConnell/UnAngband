@@ -281,17 +281,6 @@ void flavor_init(void)
 	/* Hack -- Use the "complex" RNG */
 	Rand_quick = FALSE;
 
-	/* Analyze every object */
-	for (i = 1; i < z_info->k_max; i++)
-	{
-		object_kind *k_ptr = &k_info[i];
-
-		/* Skip "empty" objects */
-		if (!k_ptr->name) continue;
-
-		/* No flavor yields aware */
-		if (!k_ptr->flavor) k_ptr->aware = TRUE;
-	}
 }
 
 #ifdef ALLOW_BORG_GRAPHICS
