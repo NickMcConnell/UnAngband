@@ -1,5 +1,7 @@
 ### Game-play ###
 
+- Implemented obvious flags set for ego items.
+
 - Resistances and abilities of average items and base item of ego
 items will be known as soon as identified.
 
@@ -18,6 +20,8 @@ character is loaded.
 - All Save File Options are now default for new save-file.
 
 ### Bug fixes ###
+
+- Fixed bug which prevent saving Ego status of musical instruments.
 
 - Fixed bug which cause wrong 'may' flags to be remained after
   applying rune to some object.
