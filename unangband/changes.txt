@@ -1,3 +1,19 @@
+
+
+### Bug fixes ###
+
+- Actually made teleport is a lot safer to use. You will not be placed in
+potentially dangerous grids.
+
+- Fixed bug where monster could end up in unsafe grids for the monster
+after teleporting.
+
+- Fixed bug where town/dungeon name and depth were displayed in wrong
+part of screen if window is resized.
+
+
+
+
 Angband 0.5.2 "I'm on fire" release
 
 I have reorganised this changes.txt file to similar to what Eytan Zweig
