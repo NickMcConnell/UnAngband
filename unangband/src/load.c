@@ -407,7 +407,7 @@ static errr rd_item(object_type *o_ptr)
 		artifact_type *a_ptr;
 
 		/* Paranoia */
-		if (o_ptr->name1 >= z_info->a_max) return (-1);
+		if (o_ptr->name1 >= 256) return (-1);
 
 		/* Obtain the artifact info */
 		a_ptr = &a_info[o_ptr->name1];
@@ -1347,8 +1347,7 @@ static errr rd_inventory(void)
 		}
 
 		/* Warning -- backpack is full */
-		else if ((p_ptr->inven_cnt > INVEN_PACK) ||
-		(!(variant_belt_slot) && (p_ptr->inven_cnt == INVEN_PACK)))
+		else if (p_ptr->inven_cnt == INVEN_PACK)
 		{
 			/* Oops */
 			note("Too many items in the inventory!");
@@ -1950,7 +1949,7 @@ static errr rd_savefile_new_aux(void)
 	a_max = tmp16u;
 
 	/* Incompatible save files */
-	if (tmp16u > 256)
+	if (a_max > 256)
 	{
 		note(format("Too many (%u) artifacts!", tmp16u));
 		return (-1);
@@ -1963,7 +1962,7 @@ static errr rd_savefile_new_aux(void)
 	C_MAKE(a_list_new, a_max, object_lore);
 
 	/* Read the artifact flags */
-	for (i = 0; i < tmp16u; i++)
+	for (i = 0; i < a_max; i++)
 	{
 		object_lore *n_ptr = &a_list_new[i];
 
@@ -2049,16 +2048,17 @@ static errr rd_savefile_new_aux(void)
 
 
 	/* Read random artifacts */
-#if 0
 	if ((adult_rand_artifacts) || (a_max == 256))
 	{
-#endif
 		if (rd_randarts()) return (-1);
 		if (arg_fiddle) note("Loaded Random Artifacts");
-#if 0
 	}
-#endif
+
+	/* Only restore fixed arts if dead */
 	if (a_max > z_info->a_max) a_max = z_info->a_max;
+
+	/* Don't restore fixed art knowledge if all random */
+	else if (p_ptr->is_dead) a_max = 0;
 
 	/* Copy over the artifact flags */
 	for (i = 0; i < a_max; i++)

@@ -18,8 +18,8 @@ as ball spells.
 
 - Smoke/steam removed by cold attacks (Suggested by Adam Horowitz).
 
-- Guardians on surface levels are now generated during daytime as well
- (But still only night time in towns).
+- Guardians on surface levels and dungeon towns are now generated
+during daytime as well  (But still only night time in surface towns).
 
 - Statues/containers/body parts now give you some information about the
  monster when you discover them.
@@ -149,3 +149,7 @@ to the screen.
 
 - Fixed logic bug: thrown specialists now gain their might/shots
 benefits, but only with throwing weapons.
+
+- Fixed bug where loading a deceased character would fail if it was
+carrying a random artifact numbered higher than the regular artifacts.
+(Reported by Adam Horowitz). This will load any affected save file.
