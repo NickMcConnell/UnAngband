@@ -1,3 +1,7 @@
+### Game-play ###
+
+- Shamans start having a scroll of bless weapon
+
 ### User Interface ###
 
 - Stores no longer use the large hack they did previously for display
@@ -13,10 +17,20 @@ not display inscription in the knowledge menus.
 
 ### Bug fixes ###
 
+- Fix various bugs preventing player becoming *winner* on campaign mode.
+
+- Fix bug preventing destroy command from actually destroy bottles on floor.
+
+- Fix bug allowing {cursed} good staves being generated.
+
+- Fix bug that objects of your home disappears occasionally.
+
+- Fix bug allowing blood-stained floor being placed at non-floor grids.
+
 - Fix bug allowing flavored name to be displayed when you examine
   unaware object in store.
 
-- Fix bug preventing '... Blade' spells working correctly.
+- Fix various bugs preventing various spells working correctly.
 
 - Fix various bugs that object memory wasn't correctly
   updated/displayed.
