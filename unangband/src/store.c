@@ -3271,7 +3271,6 @@ static void store_process_command(void)
 			break;
 		}
 
-
 		/* Hack -- Unknown command */
 		default:
 		{

@@ -774,3 +774,16 @@ Save screen dump (right-paren)
         This command dumps a "snap-shot" of the current screen to the file
         "dump.txt", including encoded color information.
 
+Save html screen dump (]) or (^])
+        This command dumps a "snap-shot" of the current screen to the file
+        "dump.htm", including encoded color information. Unlike the above
+        screen shot commands, this screen dump is in html format. Currently
+        Unangband does not have the ability to reload html screen shots
+        dumped in this manner.
+
+        Using ctrl-right-bracket to invoke this command will dump the
+        html file but without any visual feedback as to the success or
+        failure of this command. This method of invoking this command may
+        be used any time Unangband is expecting keyboard input, however it
+        will use the currently set visual prefs, rather than the underlying
+        'ASCII' visuals.

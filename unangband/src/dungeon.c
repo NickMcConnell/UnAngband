@@ -2056,6 +2056,13 @@ static void process_command(void)
 			break;
 		}
 
+		/* Save "html screen dump" */
+		case ']':
+		{
+			do_cmd_save_screen_html();
+			break;
+		}
+
 		/* Hack -- Unknown command */
 		default:
 		{

@@ -2828,7 +2828,152 @@ void do_cmd_save_screen(void)
 	screen_load();
 }
 
+/*
+ * Hack -- save a screen dump to a file in html format
+ */
+void do_cmd_save_screen_html(void)
+{
+	int i;
 
+	FILE *fff;
+
+	char buf[1024];
+
+
+	/* Build the filename */
+	path_build(buf, 1024, ANGBAND_DIR_USER, "dump.prf");
+
+	/* File type is "TEXT" */
+	FILE_TYPE(FILE_TYPE_TEXT);
+
+	/* Append to the file */
+	fff = my_fopen(buf, "w");
+
+	/* Oops */
+	if (!fff) return;
+
+
+	/* Extract default attr/char code for features */
+	for (i = 0; i < z_info->f_max; i++)
+	{
+		feature_type *f_ptr = &f_info[i];
+
+		if (!f_ptr->name) continue;
+
+		/* Dump a comment */
+		fprintf(fff, "# %s\n", (f_name + f_ptr->name));
+
+		/* Dump the attr/char info */
+		fprintf(fff, "F:%d:0x%02X:0x%02X\n\n", i,
+			(byte)(f_ptr->x_attr), (byte)(f_ptr->x_char));
+
+		/* Assume we will use the underlying values */
+		f_ptr->x_attr = f_ptr->d_attr;
+		f_ptr->x_char = f_ptr->d_char;
+	}
+
+	/* Extract default attr/char code for objects */
+	for (i = 0; i < z_info->k_max; i++)
+	{
+		object_kind *k_ptr = &k_info[i];
+
+		if (!k_ptr->name) continue;
+
+		/* Dump a comment */
+		fprintf(fff, "# %s\n", (k_name + k_ptr->name));
+
+		/* Dump the attr/char info */
+		fprintf(fff, "K:%d:0x%02X:0x%02X\n\n", i,
+			(byte)(k_ptr->x_attr), (byte)(k_ptr->x_char));
+
+		/* Default attr/char */
+		k_ptr->x_attr = k_ptr->d_attr;
+		k_ptr->x_char = k_ptr->d_char;
+	}
+
+	/* Extract default attr/char code for flavors */
+	for (i = 0; i < z_info->x_max; i++)
+	{
+		flavor_type *x_ptr = &x_info[i];
+
+		if (!x_ptr->name) continue;
+
+		/* Dump a comment */
+		fprintf(fff, "# %s\n", (x_name + x_ptr->name));
+
+		/* Dump the attr/char info */
+		fprintf(fff, "L:%d:0x%02X:0x%02X\n\n", i,
+			(byte)(x_ptr->x_attr), (byte)(x_ptr->x_char));
+
+		/* Default attr/char */
+		x_ptr->x_attr = x_ptr->d_attr;
+		x_ptr->x_char = x_ptr->d_char;
+	}
+
+
+	/* Extract default attr/char code for monsters */
+	for (i = 0; i < z_info->r_max; i++)
+	{
+		monster_race *r_ptr = &r_info[i];
+
+		if (!r_ptr->name) continue;
+
+		/* Dump a comment */
+		fprintf(fff, "# %s\n", (r_name + r_ptr->name));
+
+		/* Dump the attr/char info */
+		fprintf(fff, "R:%d:0x%02X:0x%02X\n\n", i,
+			(byte)(r_ptr->x_attr), (byte)(r_ptr->x_char));
+
+		/* Default attr/char */
+		r_ptr->x_attr = r_ptr->d_attr;
+		r_ptr->x_char = r_ptr->d_char;
+	}
+
+	/* Skip a line */
+	fprintf(fff, "\n");
+
+
+	/* Close it */
+	my_fclose(fff);
+
+	/* Refresh */
+	do_cmd_redraw();
+
+	/* Hack -- dump the graphics before loading font/graphics */
+	dump_html();
+
+	/* Graphic symbols */
+	if (use_graphics)
+	{
+		/* Process "graf.prf" */
+		process_pref_file("graf.prf");
+	}
+
+	/* Normal symbols */
+	else
+	{
+		/* Process "font.prf" */
+		process_pref_file("font.prf");
+	}
+
+	/* Process "dump.prf" */
+	process_pref_file("dump.prf");
+
+
+#ifdef ALLOW_BORG_GRAPHICS
+	/* Initialize the translation table for the borg */
+	init_translate_visuals();
+#endif /* ALLOW_BORG_GRAPHICS */
+
+	/* Message */
+	msg_print("Html screen dump saved.");
+	message_flush();
+
+	/* Refresh */
+	do_cmd_redraw();
+
+}
 
 
 #define BROWSER_ROWS	16

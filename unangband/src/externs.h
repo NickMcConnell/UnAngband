@@ -385,6 +385,7 @@ extern void do_cmd_feeling(void);
 extern void do_cmd_room_desc(void);
 extern void do_cmd_load_screen(void);
 extern void do_cmd_save_screen(void);
+extern void do_cmd_save_screen_html(void);
 extern void do_cmd_knowledge(void);
 
 /* cmd5.c */
@@ -415,6 +416,7 @@ extern void safe_setuid_grab(void);
 extern s16b tokenize(char *buf, s16b num, char **tokens);
 extern errr process_pref_file_command(char *buf);
 extern errr process_pref_file(cptr name);
+extern void dump_html(void);
 extern errr check_time(void);
 extern errr check_time_init(void);
 extern errr check_load(void);
