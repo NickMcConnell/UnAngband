@@ -617,6 +617,12 @@ static bool do_cmd_open_aux(int y, int x)
 	/* Verify legality */
 	if (!do_cmd_test(y, x, FS_OPEN)) return (FALSE);
 
+	/* Unknown trapped door */
+	if (f_info[cave_feat[y][x]].flags3 & (FF3_PICK_DOOR))
+	{
+		pick_door(y,x);
+	}
+
 	/* Trapped door */
 	if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
 	{
@@ -1598,6 +1604,9 @@ void do_cmd_alter(void)
 
 	/* Original feature */
 	feat = cave_feat[y][x];
+
+	/* Get mimiced feature */
+	feat = f_info[feat].mimic;
 
 	/* Must have knowledge to know feature XXX XXX */
 	if (!(cave_info[y][x] & (CAVE_MARK))) feat = FEAT_NONE;
