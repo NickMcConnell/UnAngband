@@ -888,10 +888,10 @@ void do_cmd_options(void)
 
 		/* Special choices */
 		prt("(D) Base Delay Factor", 18, 5);
-		prt("(H) Hitpoint Warning", 18, 5);
+		prt("(H) Hitpoint Warning", 19, 5);
 
 		/* Prompt */
-		prt("Command: ", 20, 0);
+		prt("Command: ", 21, 0);
 
 		/* Get command */
 		ch = inkey();
