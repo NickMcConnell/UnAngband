@@ -5571,24 +5571,6 @@ F:NO_CONF | NO_SLEEP | NO_FEAR | REGENERATE
 D:It is a massive figure clothed in wrappings.  You are wary of its massive
 D: fists.
 
-N:395:The Queen Ant
-G:a:v
-I:120:15d100:30:100:10
-W:37:2:0:2000
-B:BITE:HURT:2d12
-B:BITE:HURT:2d12
-B:BITE:HURT:2d8
-B:BITE:HURT:2d8
-F:UNIQUE | FEMALE
-F:FORCE_SLEEP | FORCE_MAXHP
-F:ESCORT | ESCORTS
-F:ONLY_ITEM | DROP_2D2 | DROP_GOOD
-F:WEIRD_MIND | OPEN_DOOR | BASH_DOOR
-F:INSECT | NO_CONF | NO_SLEEP
-S:1_IN_2
-S:S_KIN
-D:She's upset because you hurt her children.
-
 N:396:Will o' the wisp
 G:E:W
 I:130:20d10:30:150:0
@@ -6334,26 +6316,6 @@ B:BUTT:HURT:2d6
 F:BASH_DOOR
 F:EVIL
 D:It is a cross between a human and a bull.
-
-N:442:Medusa, the Gorgon
-G:n:v
-I:120:24d100:30:100:5
-W:40:3:0:9000
-B:GAZE:EXP_80
-B:GAZE:PARALYZE
-B:HIT:HURT:8d6
-B:HIT:HURT:8d6
-F:UNIQUE | FEMALE
-F:FORCE_SLEEP | FORCE_MAXHP
-F:ONLY_ITEM | DROP_1D2 | DROP_2D2 | DROP_GOOD
-F:SMART | OPEN_DOOR | BASH_DOOR
-F:EVIL | IM_ACID | IM_FIRE | IM_POIS | NO_CONF | NO_SLEEP
-S:1_IN_2
-S:HOLD | SCARE | CAUSE_3 | BO_FIRE | BO_PLAS | BA_ACID
-S:S_HYDRA | S_KIN | GAZE
-D:One of the original three ugly sisters.  Her face could sink a thousand
-D: ships.  Her scales rattle as she slithers towards you, venom dripping from
-D: her ghastly mouth.
 
 N:443:Shadow dragon
 G:D:G
@@ -7261,25 +7223,6 @@ D:A vast dragon of power.  Storms and lightning crash around its titanic
 D: form.  Deep blue scales reflect the flashes and highlight the creature's
 D: great muscles.  It regards you with contempt.
 
-N:490:The Minotaur of the Labrynth
-G:H:v
-I:130:47d100:30:120:30
-W:58:4:0:24000
-B:BUTT:HURT:12d13
-B:BUTT:HURT:12d13
-B:HIT:HURT:10d10
-B:SHOOT:ARROW:7d6
-F:UNIQUE | MALE
-F:FORCE_SLEEP | FORCE_MAXHP
-F:ONLY_ITEM | DROP_1D2 | DROP_4D2 | DROP_GOOD
-F:BASH_DOOR
-F:EVIL | IM_FIRE | IM_POIS | NO_CONF | NO_SLEEP
-S:1_IN_6
-S:SLOW | SHOOT | BO_MANA | BO_PLAS | BA_ELEC
-S:BR_WALL
-D:A fearsome bull-headed monster, who guarded the Labyrinth
-D: at Crete.
-
 N:491:Harowen the Black Hand
 G:t:v
 I:140:25d100:40:90:0
@@ -7404,27 +7347,6 @@ D:An immense dragon capable of awesome destruction.  You have never felt
 D: such extreme cold, or witnessed such an icy stare.  Begone quickly or feel
 D: its wrath!
 
-N:497:The Phoenix
-G:B:r
-I:120:36d100:60:130:0
-W:54:3:0:40000
-B:BITE:FIRE:12d6
-B:BITE:FIRE:12d6
-B:HIT:FIRE:9d12
-B:AURA:FIRE:9d12
-F:UNIQUE
-F:FORCE_SLEEP | FORCE_MAXHP
-F:ONLY_ITEM | DROP_2D2 | DROP_GOOD
-F:OPEN_DOOR | BASH_DOOR
-F:ANIMAL | IM_ACID | IM_FIRE | IM_ELEC | IM_POIS | NO_CONF | NO_SLEEP
-F:HAS_AURA | HAS_LITE | RES_PLAS
-F:CAN_FLY
-S:1_IN_3
-S:BO_FIRE | BO_PLAS | BA_FIRE
-S:BR_FIRE | BR_LITE | BR_PLAS | S_KIN
-D:A massive glowing eagle bathed in flames.  The searing heat chars your
-D: skin and melts your armour.
-
 N:498:Nightcrawler
 G:N:D
 I:120:80d60:20:160:10
@@ -7530,28 +7452,6 @@ S:BR_ACID | BR_FIRE | BR_COLD | BR_ELEC | BR_POIS | BR_LITE
 S:BR_DARK | BR_SOUN | BR_CONF | BR_CHAO | BR_SHAR | BR_NETH
 S:BR_WALL | BR_INER | BR_TIME | BR_GRAV | BR_PLAS | BR_NEXU
 D:An awesome vortex of pure magic, power radiates from its frame.
-
-N:504:The Lernaean Hydra
-G:y:v
-I:120:45d100:20:140:20
-W:57:2:0:20000
-B:BITE:POISON:8d6
-B:BITE:POISON:8d6
-B:BITE:FIRE:12d6
-B:BITE:FIRE:12d6
-F:UNIQUE
-F:FORCE_SLEEP | FORCE_MAXHP | SMART
-F:ONLY_GOLD | DROP_3D2 | DROP_4D2
-F:OPEN_DOOR | BASH_DOOR | KILL_BODY | POWERFUL
-F:ANIMAL | IM_FIRE | IM_POIS
-F:NO_CONF | NO_SLEEP | REGENERATE
-S:1_IN_3
-S:SCARE
-S:BO_FIRE | BO_PLAS | BA_FIRE | BA_POIS
-S:BR_FIRE | BR_POIS | S_HYDRA | S_KIN
-D:A massive legendary hydra.  It has twelve powerful heads.  Its many eyes
-D: stare at you as clouds of smoke and poisonous vapour rise from its
-D: seething form.  And it grows new heads as fast as you chop them off.
 
 N:505:Thuringwethil, the Vampire Messenger
 G:V:v
@@ -8118,25 +8018,6 @@ D:The Mouth of Sauron is a mighty spell caster.  So old that even he cannot
 D: remember his own name, his power and evil are undeniable.  He believes
 D: unshakeably that he is unbeatable and laughs as he weaves his awesome
 D: spells.
-
-N:539:The Tarrasque
-G:R:v
-I:130:85d100:50:185:20
-W:86:2:0:35000
-B:HIT:HURT:10d10
-B:HIT:HURT:10d10
-B:TOUCH:UN_POWER
-B:TOUCH:UN_POWER
-F:UNIQUE | ATTR_MULTI
-F:FORCE_SLEEP | FORCE_MAXHP
-F:ONLY_ITEM | DROP_2D2 | DROP_4D2 | DROP_GOOD
-F:OPEN_DOOR | BASH_DOOR | POWERFUL | MOVE_BODY
-F:ANIMAL | IM_FIRE | IM_COLD | NO_CONF | NO_SLEEP
-F:RES_DISE
-S:1_IN_2
-S:BR_FIRE | BR_COLD | BR_DISE
-D:The Tarrasque is a massive reptile of legend, rumoured to be unkillable
-D: and immune to magic.  Fear its anger, for its devastation is unmatched!
 
 N:540:Lungorthin, the Balrog of White Fire
 G:U:v

@@ -424,9 +424,9 @@ L:60:148:145:0:0:0
 
 N:47:the Battle of Five Armies
 X:52:48
-G:o
+G:C
 R:ESCORT
-L:39:420:56:153:634:0
+L:20:420:56:153:235:0
 
 N:48:Dol Goldur
 X:20:23
