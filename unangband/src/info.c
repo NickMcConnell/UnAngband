@@ -1622,7 +1622,7 @@ static cptr *spoiler_flag_aux(const u32b art_flags, const o_flag_desc *flag_x_pt
 /*
  * Hack -- Display the "name" and "attr/chars" of a monster race
  */
-static void obj_top(const object_type *o_ptr, bool real)
+static void obj_top(const object_type *o_ptr)
 {
 	char o_name[80];
 
@@ -1641,7 +1641,7 @@ static void obj_top(const object_type *o_ptr, bool real)
 /*
  * Display an object at the top of the screen
  */
-void screen_object(object_type *o_ptr, bool real)
+void screen_object(object_type *o_ptr)
 {
 	/* Flush messages */
 	message_flush();
@@ -1660,7 +1660,7 @@ void screen_object(object_type *o_ptr, bool real)
         else list_object(o_ptr, OBJECT_FLAGS_KNOWN);
 
 	/* Display item name */
-	obj_top(o_ptr, real);
+	obj_top(o_ptr);
 }
 
 
@@ -2617,7 +2617,7 @@ void display_koff(const object_type *o_ptr)
 	list_object(o_ptr, OBJECT_FLAGS_KNOWN);
 
 	/* Display item name */
-	obj_top(o_ptr, term_obj_real);
+	obj_top(o_ptr);
 
 	/* Warriors are illiterate */
 	if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL) return;

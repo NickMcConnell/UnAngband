@@ -3688,7 +3688,7 @@ static void desc_art_fake(int a_idx)
 	screen_save();
 
 	/* Describe */
-	screen_object(o_ptr, FALSE);
+	screen_object(o_ptr);
 
 	/* Load the screen */
 	screen_load();
@@ -4755,7 +4755,7 @@ static void desc_obj_fake(int k_idx)
 	screen_save();
 
 	/* Describe */
-	screen_object(o_ptr, FALSE);
+	screen_object(o_ptr);
 
 	/* Load the screen */
 	screen_load();

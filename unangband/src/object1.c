@@ -317,6 +317,8 @@ void reset_visuals(bool unused)
 {
 	int i;
 
+	/* Prevent compilation warning */
+	unused = FALSE;
 
 	/* Extract default attr/char code for features */
 	for (i = 0; i < z_info->f_max; i++)
@@ -579,6 +581,9 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 	object_kind *k_ptr = &k_info[o_ptr->k_idx];
 
+
+	/* Prevent compiler warning */
+	max = 0;
 
 	/* Extract some flags */
 	object_flags(o_ptr, &f1, &f2, &f3);

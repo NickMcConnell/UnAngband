@@ -3679,7 +3679,7 @@ static void death_examine(void)
 		screen_save();
 
 		/* Describe */
-		screen_object(o_ptr, TRUE);
+		screen_object(o_ptr);
 
 		(void)inkey();
 

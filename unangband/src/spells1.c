@@ -1383,6 +1383,8 @@ bool apply_disenchant(int mode)
 
 	char o_name[80];
 
+	/* Prevent warning */
+	mode = 0;
 
 	/* Pick a random slot */
 	switch (randint(8))
@@ -1629,10 +1631,14 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 	/* Set feature name */
 	f = (f_name + f_info[cave_feat[y][x]].name);
 
-#if 0 /* unused */
+	/* This is dangerous when creating features at the moment */
+#if 0
 	/* Reduce damage by distance */
 	dam = (dam + r) / (r + 1);
-#endif /* 0 */
+#else
+	/* Prevent warning */
+	r = 0;
+#endif
 
 	if (!variant_hurt_feats) dam = 0;
 
@@ -2200,6 +2206,8 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 	dam = (dam + r) / (r + 1);
 #endif /* 0 */
 
+	/* Prevent warning */
+	who = 0;
 
 	/* Scan all objects in the grid */
 	for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)

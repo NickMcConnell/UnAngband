@@ -47,6 +47,11 @@ moving or attacking successfully (Bug 653).
 
 - Remove references to nangband in makefile.
 
+- Reduce compiler warnings through bogus assignments. I have mixed thoughts on
+this, as to whether it is better to change function declarations than use
+bogus assignments, or perhaps leave warnings intact. These warnings only occur
+in GCC 3 or later.
+
 
 UnAngband 0.5.4a: "A Whole Lotta Love"
 

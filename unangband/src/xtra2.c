@@ -4125,7 +4125,7 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 							if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_known_p(o_ptr)))) screen_roff(o_ptr->name3);
 
 							/* Recall on screen */
-							else screen_object(o_ptr, TRUE);
+							else screen_object(o_ptr);
 
 							/* Hack -- Complete the prompt (again) */
 							Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
@@ -4301,7 +4301,7 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 						if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_known_p(o_ptr)))) screen_roff(o_ptr->name3);
 
 						/* Recall on screen */
-						else screen_object(o_ptr, TRUE);
+						else screen_object(o_ptr);
 
 						/* Hack -- Complete the prompt (again) */
 						Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));

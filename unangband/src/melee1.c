@@ -504,7 +504,7 @@ bool make_attack_normal(int m_idx)
 					case 3: slot = INVEN_OUTER; break;
 					case 4: slot = INVEN_HANDS; break;
 					case 5: slot = INVEN_HEAD; break;
-					case 6: slot = INVEN_FEET; break;
+					default: slot = INVEN_FEET; break;
 				}
 
 				/* Object used? */
