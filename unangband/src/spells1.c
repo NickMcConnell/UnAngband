@@ -2045,7 +2045,7 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		/* Make bridge */
 		case GF_BRIDGE:
 		{
-			int old_feat = cave_feat[y][x];
+			/* int old_feat = cave_feat[y][x]; */
 			char name[80];
 
 			if (f_info[cave_feat[y][x]].flags1 & (FF1_SECRET)) cave_alter_feat(y,x,FS_SECRET);
@@ -2054,7 +2054,7 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 
 			strcpy(name,f_name+f_info[cave_feat[y][x]].name);
 
-			if (!(prefix(name,"stone bridge"))) cave_set_feat(y,x,old_feat);
+			/* if (!(prefix(name,"stone bridge"))) cave_set_feat(y,x,old_feat);*/
 
 			break;
 		}
