@@ -13,6 +13,8 @@ Turner).
 - Occasionally on the far right of the map, the wrong panel would be displayed
 (Reported by Anthony Holmes).
 
+- Isengard should now be full of trees again.
+
 
 UnAngband 0.5.4b: "Survival of the Fittest"
 
