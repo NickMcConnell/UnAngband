@@ -5100,7 +5100,7 @@ static cptr feature_group_text[] =
 	"Chasms",
 	"Sand/Earth",
 	"Ground",
-	"Trees",
+	"Trees/Plants",
 	"Wilderness",
 	NULL
 };
@@ -5128,7 +5128,7 @@ static u32b feature_group_flag[] =
 	0, FF2_CHASM, 0,
 	0, FF2_CAN_DIG, 0,
 	0, 0, FF3_GROUND,
-	0, 0, FF3_TREE,
+	0, 0, FF3_LIVING,
 	0, 0, FF3_OUTSIDE,
 	0,0,0
 };

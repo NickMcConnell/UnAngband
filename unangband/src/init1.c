@@ -366,7 +366,7 @@ static cptr f_info_flags3[] =
 	"BLOOD",
 	"DUST",
 	"SLIME",
-	"XXX1",
+	"LIVING",
 	"XXX2",
 	"INSTANT",
 	"EXPLODE",

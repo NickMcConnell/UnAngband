@@ -60,6 +60,10 @@ by missile or thrown weapons (Bug 654).
 - Spells and items that brand objects correctly tell you which brand they
 provide when inspected or browsed.
 
+- Additional features can be editted from within knowledge menus.
+
+- Can correctly edit the displayed graphic for tree tops.
+
 
 ### Build / Platform ###
 
