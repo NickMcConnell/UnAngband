@@ -866,10 +866,12 @@ static void process_world(void)
 		regen_amount = regen_amount * 2;
 	}
 
+	if (p_ptr->disease & (DISEASE_DRAIN_MANA)) regen_amount = 0;
+
 	/* Regenerate the mana */
 	if (p_ptr->csp < p_ptr->msp)
 	{
-		regenmana(regen_amount);
+		if (!p_ptr->mana_drain) regenmana(regen_amount);
 	}
 
 	/* Various things interfere with healing */
@@ -877,6 +879,8 @@ static void process_world(void)
 	if (p_ptr->poisoned) regen_amount = 0;
 	if (p_ptr->stun) regen_amount = 0;
 	if (p_ptr->cut) regen_amount = 0;
+	if (p_ptr->hp_drain) regen_amount = 0;
+	if (p_ptr->disease) regen_amount = 0;
 	if ((room) && (d_ptr->flags & (ROOM_BLOODY))) regen_amount = 0;
 
 	/* Regenerate Hit Points if needed */
@@ -1097,46 +1101,48 @@ static void process_world(void)
 	/*** Process Inventory ***/
 
 	/* Handle experience draining */
-	if (p_ptr->exp_drain)
+	if ((p_ptr->exp_drain) || (p_ptr->disease & (DISEASE_DRAIN_EXP)))
 	{
 		if ((rand_int(100) < 10) && (p_ptr->exp > 0))
 		{
 			/* Always notice */
-			equip_can_flags(0x0L,0x0L,TR3_DRAIN_EXP);
+			if (!(p_ptr->disease & (DISEASE_DRAIN_EXP))) equip_can_flags(0x0L,0x0L,TR3_DRAIN_EXP);
 
 			p_ptr->exp--;
 			p_ptr->max_exp--;
+			if (p_ptr->exp <= 0) p_ptr->exp = 0;
+
 			check_experience();
 		}
 	}
 
 	/* Handle hit point draining */
-	if (p_ptr->hp_drain)
+	if ((p_ptr->hp_drain) || (p_ptr->disease & (DISEASE_DRAIN_HP)))
 	{
 		if ((rand_int(100) < 10) && (p_ptr->chp > 0))
 		{
 			/* Always notice */
-			equip_can_flags(0x0L,0x0L,TR3_DRAIN_HP);
+			if (!(p_ptr->disease & (DISEASE_DRAIN_HP))) equip_can_flags(0x0L,0x0L,TR3_DRAIN_HP);
 
-			p_ptr->chp--;
-			p_ptr->chp_frac = 0;
-
-			/* Redraw */
-			p_ptr->redraw |= (PR_HP);
+			if (p_ptr->disease & (DISEASE_DRAIN_HP))
+				take_hit(1, "disease");
+			else
+				take_hit(1, "curse");
 
 		}
 	}
 
 	/* Handle mana draining */
-	if (p_ptr->mana_drain)
+	if ((p_ptr->mana_drain) || (p_ptr->disease & (DISEASE_DRAIN_MANA)))
 	{
 		if ((rand_int(100) < 10) && (p_ptr->csp > 0))
 		{
 			/* Always notice */
-			equip_can_flags(0x0L,0x0L,TR3_DRAIN_MANA);
+			if (!(p_ptr->disease & (DISEASE_DRAIN_MANA))) equip_can_flags(0x0L,0x0L,TR3_DRAIN_MANA);
 
 			p_ptr->csp--;
 			p_ptr->csp_frac = 0;
+			if (p_ptr->exp <= 0) p_ptr->csp = 0;
 
 			/* Redraw */
 			p_ptr->redraw |= (PR_MANA);		
@@ -1328,6 +1334,152 @@ static void process_world(void)
 		}
 
 	}
+
+	/*** Handle disease ***/
+	if ((p_ptr->disease & (DISEASE_BLOWS)) && (rand_int(300) < ((p_ptr->disease & (DISEASE_QUICK | DISEASE_LIGHT)) ? 3 : 1)))
+	{
+		int cnt, flg, effect;
+
+		msg_print("You feel an illness eat away at you.");
+
+		cnt = 1;
+
+		/* Select one of the possible effects that the player can suffer */
+		for (flg = 1; flg < DISEASE_BLOWS; flg*=2)
+		{
+			if (!(p_ptr->disease & flg)) continue;
+			
+			if (!rand_int(cnt++)) effect = flg;
+		}
+
+		switch (flg)
+		{
+
+			case DISEASE_LOSE_STR:
+			{
+				dec_stat(A_STR, p_ptr->disease & (DISEASE_POWER) ? randint(3) : 1, 0);
+				break;
+			}
+
+			case DISEASE_LOSE_INT:
+			{
+				dec_stat(A_INT, p_ptr->disease & (DISEASE_POWER) ? randint(3) : 1, 0);
+				break;
+			}
+
+			case DISEASE_LOSE_WIS:
+			{
+				dec_stat(A_WIS, p_ptr->disease & (DISEASE_POWER) ? randint(3) : 1, 0);
+				break;
+			}
+
+			case DISEASE_LOSE_DEX:
+			{
+				dec_stat(A_DEX, p_ptr->disease & (DISEASE_POWER) ? randint(3) : 1, 0);
+				break;
+			}
+
+			case DISEASE_LOSE_CON:
+			{
+				dec_stat(A_CON, p_ptr->disease & (DISEASE_POWER) ? randint(3) : 1, 0);
+				break;
+			}
+
+			case DISEASE_LOSE_CHR:
+			{
+				dec_stat(A_CHR, p_ptr->disease & (DISEASE_POWER) ? randint(3) : 1, 0);
+				break;
+			}
+
+			case DISEASE_HUNGER:
+			{
+				msg_print("You vomit up your food!");
+				(void)set_food(PY_FOOD_STARVE - 1);
+				break;
+			}
+
+			case DISEASE_THIRST:
+			{
+				(void)set_food(p_ptr->food - randint(30) + 10);
+				break;
+			}
+
+			case DISEASE_CUT:
+			{
+				(void)set_cut(p_ptr->cut + randint(30) + 10);
+				break;
+			}
+
+			case DISEASE_STUN:
+			{
+				(void)set_cut(p_ptr->cut + randint(10) + 2);
+				break;
+			}
+
+			case DISEASE_POISON:
+			{
+				(void)set_poisoned(p_ptr->poisoned + randint(30) + 10);
+				break;
+			}
+
+			case DISEASE_BLIND:
+			{
+				(void)set_blind(p_ptr->blind + randint(30) + 10);
+				break;
+			}
+
+			case DISEASE_FEAR:
+			{
+				(void)set_afraid(p_ptr->afraid + randint(30) + 10);
+				break;
+			}
+
+			case DISEASE_CONFUSE:
+			{
+				(void)set_confused(p_ptr->confused + randint(30) + 10);
+				break;
+			}
+
+			case DISEASE_HALLUC:
+			{
+				(void)set_image(p_ptr->image + randint(30) + 10);
+				break;
+			}
+
+			case DISEASE_PARALYZE:
+			{
+				(void)set_paralyzed(p_ptr->paralyzed + randint(3) + 1);
+				break;
+			}
+
+			case DISEASE_SLOW:
+			{
+				(void)set_slow(p_ptr->slow + randint(30) + 10);
+				break;
+			}
+
+		}
+
+		if ((p_ptr->disease & (DISEASE_DISEASE)) && !(rand_int(3)))
+		{
+			if ((cnt < 3) && (p_ptr->disease & (DISEASE_HEAVY)))
+				p_ptr->disease |= (1 << rand_int(DISEASE_TYPES_HEAVY));
+			else if (cnt < 3)
+				p_ptr->disease |= (1 << rand_int(DISEASE_TYPES));
+			
+			if (cnt > 1) p_ptr->disease &= ~(1 << rand_int(DISEASE_TYPES));
+			if (!rand_int(20)) p_ptr->disease &= ~(DISEASE_DISEASE);
+		}
+
+		/* The player is on the mend */
+		if ((p_ptr->disease & (DISEASE_LIGHT)) & !rand_int(3))
+		{
+			msg_print("The illness has subsided.");
+			p_ptr->disease = 0;
+		}		
+
+	}
+
 
 	/*** Involuntary Movement ***/
 

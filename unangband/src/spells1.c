@@ -2774,6 +2774,22 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Disease */
+		case GF_DISEASE:
+		{
+			if (seen) obvious = TRUE;
+			if (r_ptr->flags3 & (RF3_NONLIVING))
+			{
+				dam /= 9;
+				if (seen)
+				{
+					if (!(l_ptr->flags3 & (RF3_NONLIVING))) note = " is immune to disease.";
+					l_ptr->flags3 |= (RF3_NONLIVING);
+				}
+			}
+			break;
+		}
+
 		/* Holy Orb -- hurts Evil */
 		case GF_HOLY_ORB:
 		{
@@ -4117,15 +4133,6 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		/* Melee attack - hunger */
 		case GF_HUNGER:
 
-		/* Melee attack - hunger */
-		case GF_DISEASE:
-		{
-			if (seen) obvious = TRUE;
-
-			/* All do damage */
-			break;
-		}
-
 		/* Probe visible monsters */
 		case GF_PROBE:
 		{
@@ -4734,6 +4741,90 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			{
 				/* Always notice */
 				equip_can_flags(0x0L,TR2_RES_POIS,0x0L);
+			}
+			break;
+		}
+
+		/* Standard damage -- also disease player */
+		case GF_DISEASE:
+		{
+			if (fuzzy) msg_print("You are hit by disease!");
+			take_hit(dam, killer);
+
+			/* Critical disease - multiple effects either quickly, powerfully or heavily */
+			if (dam > 15)
+			{
+				while (dam > 0)
+				{
+					if (p_ptr->disease & (DISEASE_HEAVY)) dam -= 30;
+					if (p_ptr->disease & (DISEASE_QUICK)) dam -= 30;
+					if (p_ptr->disease & (DISEASE_POWER)) dam -= 15;
+
+					if (dam > 0)
+					{
+						p_ptr->disease |= (1 << rand_int(DISEASE_TYPES_HEAVY));
+
+						if ((dam > 15) && (rand_int(3)))
+						{
+							p_ptr->disease |= (DISEASE_HEAVY);
+							dam -= 30;
+						}
+
+						if ((dam > 15) && (rand_int(3)))
+						{
+							p_ptr->disease |= (DISEASE_QUICK);
+							dam -= 30;
+						}
+
+						if (dam > 0) p_ptr->disease |= (DISEASE_POWER);
+						dam -= 15;
+					}
+
+					p_ptr->disease &= ~(DISEASE_LIGHT);
+				}
+
+				if (dam < 0) dam = 0;
+			}
+			/* Serious disease - multiple mutating disease effects for long time */
+			else if (dam > 10)
+			{
+				if (!p_ptr->disease)
+				{
+					p_ptr->disease |= (1 << rand_int(DISEASE_TYPES));
+					p_ptr->disease |= (DISEASE_DISEASE);											
+				}
+				else if (!p_ptr->disease & (DISEASE_HEAVY | DISEASE_QUICK | DISEASE_POWER)) p_ptr->disease |= (DISEASE_DISEASE);
+				p_ptr->disease &= ~(DISEASE_LIGHT);
+			}
+			/* Moderate disease - 1 or more disease effects for long time */
+			else if (dam > 5)
+			{
+				if (!p_ptr->disease)
+				{
+					p_ptr->disease |= (1 << rand_int(DISEASE_TYPES));
+				}
+				else if (p_ptr->disease & (DISEASE_LIGHT))
+				{
+					if (!rand_int(3))
+						p_ptr->disease |= (1 << rand_int(DISEASE_TYPES));
+					else
+						p_ptr->disease &= ~(DISEASE_LIGHT);
+				}
+			}
+			/* Light disease - 1 disease effect for limited time */
+			else if (dam > 0)
+			{
+				if (!p_ptr->disease || !(p_ptr->disease & (DISEASE_BLOWS)) )
+				{
+					p_ptr->disease |= (1 << rand_int(DISEASE_TYPES));
+					p_ptr->disease |= (DISEASE_LIGHT);
+				}
+			}
+			/* Very light disease - stops recovery of hp for limited time */
+			else
+			{
+				if (!p_ptr->disease)
+					p_ptr->disease |= (DISEASE_LIGHT);
 			}
 			break;
 		}

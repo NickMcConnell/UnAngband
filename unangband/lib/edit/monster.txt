@@ -198,6 +198,7 @@ G:t:g
 I:110:1d1:10:1:50
 W:0:1:0:0
 B:BEG
+B:TOUCH:DISEASE
 F:MALE
 F:RAND_25
 F:TAKE_ITEM | OPEN_DOOR | HAS_LITE | NEED_LITE
@@ -3433,8 +3434,8 @@ N:256:Mummified orc
 G:z:w
 I:110:15d8:20:28:75
 W:21:1:0:56
-B:HIT:HURT:2d4
-B:HIT:HURT:2d4
+B:HIT:DISEASE:2d4
+B:HIT:DISEASE:2d4
 F:DROP_90
 F:EMPTY_MIND | COLD_BLOOD | OPEN_DOOR | BASH_DOOR
 F:EVIL | ORC | UNDEAD
@@ -3640,8 +3641,8 @@ N:271:Mummified human
 G:z:w
 I:110:17d9:20:34:60
 W:24:1:0:70
-B:HIT:HURT:2d4
-B:HIT:HURT:2d4
+B:HIT:DISEASE:2d4
+B:HIT:DISEASE:2d4
 F:ONLY_ITEM | DROP_90
 F:EMPTY_MIND | COLD_BLOOD | OPEN_DOOR | BASH_DOOR
 F:EVIL | UNDEAD | IM_COLD | IM_POIS
@@ -5560,8 +5561,8 @@ N:394:Mummified troll
 G:z:w
 I:110:19d10:20:50:50
 W:37:1:0:420
-B:HIT:HURT:2d6
-B:HIT:HURT:2d6
+B:HIT:DISEASE:2d6
+B:HIT:DISEASE:2d6
 F:FORCE_MAXHP
 F:DROP_60
 F:EMPTY_MIND | COLD_BLOOD | OPEN_DOOR | BASH_DOOR
@@ -9061,10 +9062,10 @@ D:Trained to hunt and kill without fear.
 
 N:599:Ghoul
 G:z:U
-I:110:15d10:30:30:20
+I:115:15d10:30:30:20
 W:26:2:0:95
-B:CLAW:PARALYZE:1d4
-B:CLAW:PARALYZE:1d4
+B:CLAW:DISEASE:1d4
+B:CLAW:DISEASE:1d4
 B:BITE:POISON:1d6
 F:DROP_60 | OPEN_DOOR | BASH_DOOR
 F:EVIL | UNDEAD | FRIENDS | IM_POIS | IM_COLD | NO_CONF | NO_SLEEP
@@ -9075,10 +9076,10 @@ D:Flesh is falling off in chunks from this decaying abomination.
 
 N:600:Ghast
 G:z:u
-I:120:30d10:30:50:20
+I:125:30d10:30:50:20
 W:30:3:0:130
-B:CLAW:PARALYZE:2d4
-B:CLAW:PARALYZE:2d4
+B:CLAW:DISEASE:2d4
+B:CLAW:DISEASE:2d4
 B:BITE:LOSE_CON:2d4
 B:BITE:LOSE_CHR:2d4
 F:DROP_60 | OPEN_DOOR | BASH_DOOR
@@ -10165,7 +10166,7 @@ F:STUPID | EMPTY_MIND |
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT
 S:1_IN_6 | 
 S:S_UNDEAD
-D:A mass of brown vegetation. Maggots writhe among its
+D:A mass of brown vegetation. Maggots writhe among its 
 D:long dead fronds.
 
 N:673:Black willow
@@ -12556,10 +12557,10 @@ D:It drains your blood from you.
 
 N:852:Ghoulish soul
 G:G:g
-I:110:9d10:12:10:11
+I:115:9d10:12:10:11
 W:17:2:0:60
 B:HIT:HURT:2d3
-B:TOUCH:PARALYZE
+B:TOUCH:DISEASE
 F:RAND_50 | DROP_60 | DROP_90 | CAN_FLY |
 F:COLD_BLOOD | TAKE_ITEM | PASS_WALL | 
 F:EVIL | UNDEAD | 
@@ -12584,11 +12585,11 @@ D:It takes you back a while.
 
 N:854:Ghastly soul
 G:G:G
-I:110:9d10:12:10:11
+I:115:9d10:12:10:11
 W:20:2:0:90
 B:HIT:HURT:2d4
 B:HIT:HURT:2d4
-B:TOUCH:PARALYZE
+B:TOUCH:DISEASE
 F:RAND_50 | DROP_60 | DROP_90 | CAN_FLY |
 F:COLD_BLOOD | TAKE_ITEM | PASS_WALL | 
 F:EVIL | UNDEAD | 
@@ -13185,14 +13186,14 @@ F:RAND_50 |
 F:EMPTY_MIND
 D:It is a smallish, slimy, icky, pestilent creature.
 
-N:901:Cockroach
+N:901:Large cockroach
 G:I:D
 I:110:1d1:20:1:5
 W:0:1:0:0
-B:CRAWL
+B:CRAWL:DISEASE
 F:RAND_50 | RAND_25 | FRIENDS | 
 F:INSECT
-D:This insect used to live in the inn.
+D:An cockroach the size of your fist.
 
 N:902:Giant brown locust
 G:I:u
@@ -15607,3 +15608,237 @@ S:S_KIN
 D:The proud 'king' of Gondor, he has been driven mad by his contact
 D: with Sauron through the palantir, and by the death of his sons.
 D:  You see the glint of a terrible fire in his eyes.
+
+N:1086:Maggot mass
+G:w:o
+I:100:4d5:7:3:10
+W:3:4:0:1
+B:CRAWL:DISEASE:1d2
+F:ANIMAL | HURT_LITE | MULTIPLY | NO_FEAR | RAND_25 | RAND_50 | STUPID |
+F:WEIRD_MIND
+D:A disgusting and diseased mass of maggots.
+
+N:1087:Noxious mushroom patch
+G:,:G
+I:110:1d1:4:1:0
+W:4:1:0:2
+B:SPORE:DISEASE:2d4
+S:SPORE | 1_IN_7
+F:PLANT | EMPTY_MIND | NEVER_MOVE | STUPID | DROP_60 |
+F:NO_FEAR | NO_SLEEP | NO_CONF | IM_POIS | COLD_BLOOD 
+D:A small patch of mushrooms, oozing with an upleasent ichor.
+
+N:1088:Rabid jackal
+G:C:G
+I:110:2d5:15:5:5
+W:4:3:0:10
+B:BITE:DISEASE:2d3
+B:BITE:DISEASE:2d3
+F:ANIMAL | NO_FEAR | WEIRD_MIND
+D:A large dog, foaming at the mouth.
+
+N:1089:Noxious mold
+G:m:G
+I:110:8d10:2:8:30
+W:5:1:0:12
+B:SPORE:DISEASE:1d5
+S:SPORE | 1_IN_7
+F:PLANT | EMPTY_MIND | NEVER_MOVE | NO_FEAR | NO_SLEEP | 
+F:NO_CONF | IM_POIS | STUPID |  
+D:It is a strange noxious growth on the dungeon floor.
+
+N:1090:Plague rat
+G:r:g
+I:110:2d7:8:10:25
+W:6:2:0:2
+B:BITE:DISEASE:2d2
+F:ANIMAL | MULTIPLY | RAND_25 |  | 
+D:Vermin, deadly not on its own account, but because of the disease it carries.
+
+N:1091:Noxious jelly
+G:j:G
+I:120:16d10:2:1:99
+W:7:1:0:21
+B:TOUCH:DISEASE:1d3
+B:TOUCH:DISEASE:1d3
+F:PLANT | NO_FEAR | NO_CONF | NO_STUN | 
+F:EMPTY_MIND | HURT_LITE | NEVER_MOVE | STUPID
+D:It is a large pile of rotting jelly, excreting a disgusting slime.
+
+N:1092:Huge cockroach
+G:I:U
+I:120:1d3:6:5:55
+W:7:2:0:2
+B:CRAWL:DISEASE:2d1
+F:INSECT | HURT_LITE | MULTIPLY | RAND_25 | RAND_50 | STUPID |
+F:WEIRD_MIND | 
+D:A cockroach the size of your head.
+
+N:1093:Rabid kobold
+G:k:o
+I:110:6d10:20:20:10
+W:9:3:0:34
+B:BITE:DISEASE:2d3
+B:HIT:HURT:1d6
+F:BASH_DOOR | DROP_60 | EVIL | NO_FEAR | IM_POIS
+D:A small, dog head humanoid, it seems maddened. It is foaming at the mouth.
+
+N:1094:Giant cockroach
+G:I:g
+I:120:1d5:7:10:50
+W:11:2:0:4
+B:CRAWL:DISEASE:2d2
+F:INSECT | HURT_LITE | MULTIPLY | RAND_25 | RAND_50 | STUPID |
+F:WEIRD_MIND | 
+D:A cockroach the size of a small dog.
+
+N:1095:giant tse-tse fly
+G:I:o
+I:120:1d5:10:15:10
+W:13:4:0:8
+B:STING:DISEASE:1d2
+F:INSECT | MULTIPLY | NO_SLEEP | RAND_25 | RAND_50 | WEIRD_MIND
+D:It spreads malaria across the dungeon.
+
+N:1096:Rabid wolf
+G:C:g
+I:120:6d10:30:30:15
+W:14:3:0:57
+B:BITE:DISEASE:2d4
+B:BITE:DISEASE:2d4
+F:ANIMAL | BASH_DOOR | NO_FEAR | WEIRD_MIND
+D:A large wolf, foam spraying from its mouth, and its coming right at you.
+
+N:1097:Mummified servant
+G:z:U
+I:100:9d14:20:28:75
+W:24:1:0:100
+B:HIT:DISEASE:2d3
+B:TOUCH:POISON:2d3
+F:BASH_DOOR | COLD_BLOOD | DROP_90 | EMPTY_MIND | EVIL |  |
+F:NO_FEAR | NO_SLEEP | OPEN_DOOR | IM_COLD | NO_CONF | IM_POIS | UNDEAD
+D:This lesser mummy was created to do menial tasks after death.
+
+N:1098:Giant wolf tick
+G:S:G
+I:110:9d14:14:50:20
+W:27:1:0:75
+B:BITE:DISEASE:3d4
+B:STING:HURT:3d4
+F:INSECT | BASH_DOOR | RAND_25 | WEIRD_MIND
+D:It is moving slowly and intently towards you.
+
+N:1099:Dzoo-noo-qua
+G:T:R
+I:100:19d10:20:50:40
+W:28:2:0:235
+B:BITE:DISEASE:2d7
+B:BITE:DISEASE:2d7
+B:HIT:HURT:2d4
+B:HIT:HURT:2d4
+F:BASH_DOOR | DROP_90 | EVIL | HURT_LITE | MALE | OPEN_DOOR | REGENERATE |
+F:IM_POIS | WEIRD_MIND | 
+D:Once a normal troll, he has become even more horridly deformed by
+D: a magical disease.
+
+N:1100:Cadaver
+G:z:o
+I:100:9d9:35:20:20
+W:28:2:0:195
+B:BITE:DISEASE:6d2
+B:HIT:DISEASE:3d3
+B:HIT:DISEASE:3d3
+F:DROP_90 | NO_SLEEP | NO_CONF | UNDEAD | EVIL | IM_POIS | IM_COLD | 
+F:COLD_BLOOD | HURT_LITE | BASH_DOOR | STUPID | 
+F:EMPTY_MIND |  | KILL_BODY | NO_FEAR | 
+D:A walking corpse, it bears the marks of many horrific experiments 
+D: conducted upon it by nameless necromancers.
+
+N:1101:Mummified soldier
+G:z:w
+I:110:11d14:20:35:60
+W:30:1:0:133
+B:HIT:DISEASE:2d4
+B:HIT:DISEASE:2d4
+B:TOUCH:POISON:1d4
+F:BASH_DOOR | COLD_BLOOD | DROP_90 | EMPTY_MIND | EVIL  NO_FEAR | 
+F:NO_SLEEP | ONLY_ITEM | OPEN_DOOR | IM_COLD | NO_CONF | IM_POIS | UNDEAD
+D:It is a human figure clothed in wrappings.  A malevolent light glows from where
+D: its eyes should be.
+
+N:1102:Mummified guard
+G:z:u
+I:110:9d37:20:50:50
+W:39:1:0:230
+B:HIT:DISEASE:2d6
+B:HIT:DISEASE:2d6
+B:TOUCH:POISON:2d4
+F:BASH_DOOR | COLD_BLOOD | DROP_1D2 | EMPTY_MIND | EVIL  NO_FEAR | 
+F:NO_SLEEP | OPEN_DOOR | IM_COLD | NO_CONF |  | IM_POIS | UNDEAD |
+F:SMART | 
+D:An ancient human form encased in mouldy wrappings, forever guarding
+D: treasures long lost.
+
+N:1103:Corruption Vortex
+G:v:G
+I:130:35d10:100:40:0
+W:40:2:0:2000
+B:ENGULF:DISEASE:4d6
+B:ENGULF:POISON:4d6
+B:ENGULF:NEXUS:4d6
+F:BASH_DOOR | EMPTY_MIND    NO_FEAR | NO_SLEEP |
+F:RAND_25 | RAND_50 | NO_CONF | IM_POIS | POWERFUL
+S:1_IN_5 | BR_NEXU | BR_POIS
+D:A toxic whirlpool, it's foulness can be sensed from afar.
+
+N:1104:Mummified priest
+G:z:g
+I:110:147d10:20:70:50
+W:44:3:0:1930
+B:HIT:DISEASE:2d8
+B:HIT:DISEASE:2d8
+B:TOUCH:LOSE_INT:2d5
+F:BASH_DOOR | COLD_BLOOD | DROP_1D2 | EMPTY_MIND | EVIL  NO_FEAR |
+F:NO_SLEEP | OPEN_DOOR | IM_COLD |  | NO_CONF | 
+F:IM_POIS | UNDEAD | SMART
+S:1_IN_4 | BLIND | WOUND | HEAL | SCARE | S_KIN 
+D:The wrappings on this mummy are well maintained, and are decorated with
+D: many unholy hieroglyphics.
+
+N:1105:Mummified noble
+G:z:y
+I:120:267d10:20:75:50
+W:49:3:0:5100
+B:HIT:DISEASE:3d8
+B:HIT:DISEASE:3d8
+B:TOUCH:POISON:4d5
+F:BASH_DOOR | COLD_BLOOD | DROP_2D2 | EMPTY_MIND | EVIL  NO_FEAR |
+F:NO_SLEEP | OPEN_DOOR | IM_COLD | ESCORT | NO_CONF | 
+F:IM_POIS | UNDEAD | SMART
+S:1_IN_5 | WOUND 
+D:A well-perserved undead creature, decorated with lavish jewelry.
+
+N:1106:Mummified king
+G:z:o
+I:120:33d100:20:85:50
+W:59:4:0:7625
+B:HIT:DISEASE:4d8
+B:HIT:DISEASE:4d8
+B:TOUCH:POISON:4d7
+F:BASH_DOOR | COLD_BLOOD | DROP_3D2 | DROP_GOOD | EMPTY_MIND | EVIL  NO_FEAR |
+F:NO_SLEEP | OPEN_DOOR | IM_COLD | ESCORT | ESCORTS | NO_CONF | 
+F:IM_POIS | UNDEAD | SMART | IM_ACID | KILL_WALL | KILL_BODY | 
+F:POWERFUL | RES_NETH 
+S:1_IN_5 | WOUND | BO_NETH | BR_WALL | BR_DARK | S_KIN
+D:A great and ancient king, arisen to reclaim his dominion.
+
+N:1107:Diseased mass
+G:j:u
+I:110:8d8:70:12:5
+W:10:2:0:33
+B:TOUCH:DISEASE:1d6
+B:TOUCH:LOSE_CON:1d6
+F:UNDEAD | EMPTY_MIND | NO_CONF | NO_SLEEP | IM_POIS | IM_COLD | NO_FEAR |
+F:HURT_LITE | COLD_BLOOD | EVIL | NEVER_MOVE | MULTIPLY
+D:A sickening mound of decaying flesh, bones, hands and so on. It seems to 
+D:be growing.

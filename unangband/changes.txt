@@ -19,6 +19,9 @@ or on the right every 4 turns (an adjacent water fall will hit every 2 turns).
 - Cracked walls now can come in hidden, weaker versions that can be easily
 bashed or tunnelled through.
 
+- The player can now be infected with various diseases. A number of disease causing
+monsters from Eyangband have been added.
+
 ### User Interface ###
 
 - Monster recall now reports what particular types of items are dropped by each

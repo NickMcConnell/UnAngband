@@ -1443,6 +1443,8 @@ struct player_type
 
 	bool bless_blade;       /* Blessed blade */
 
+	u32b disease;	/* Disease types */
+
 	s16b dis_to_h;  /* Known bonus to hit */
 	s16b dis_to_d;  /* Known bonus to dam */
 	s16b dis_to_a;  /* Known bonus to ac */
