@@ -10,6 +10,8 @@ Mountain (Bug 589).
 - Objects resistant to damage will only display a message the first time they
 are unaffected (Bug 682).
 
+- Support transparency for graphics modes (Bug 782).
+
 UnAngband 0.5.4a: "A Whole Lotta Love"
 
 ### Game-play ###
