@@ -1,3 +1,8 @@
+
+### Game-play ###
+
+- Bill Ferny now guards the bottom of Bree.
+
 ### User Interface ###
 
 - Added ability to redefine visual prefs using the knowledge menus (~).
