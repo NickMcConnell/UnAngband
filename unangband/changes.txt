@@ -1,3 +1,10 @@
+### Bug fixes ###
+
+- Eilineil the Entrapped is now a female (Bug 648).
+
+- The Dale now has a food supply (Bug 588).
+
+
 UnAngband 0.5.4a: "A Whole Lotta Love"
 
 ### Game-play ###

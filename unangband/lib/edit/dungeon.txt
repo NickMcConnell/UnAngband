@@ -463,7 +463,7 @@ L:80:407:218:208:511:0
 N:52:the Dale
 X:47:42
 L:0:0:411:0:0:0
-S:515:516:517:11:12:13:268:0
+S:509:516:517:11:12:13:268:0
 
 # Other alternate dungeons should be placed here
 
