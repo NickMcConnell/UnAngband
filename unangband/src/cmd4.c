@@ -4688,7 +4688,7 @@ static void do_cmd_knowledge_objects(void)
 		else if (note_idx && (k_ptr->aware || !k_ptr->flavor)) prt("<dir>, ENTER, '{', '}', 'c', 'p' to paste inscrip, 'v' for visuals, ESC", 23,0);
 		else if (note_idx) prt("<dir>, ENTER, 'c', 'p' to paste inscrip, 'v' for visuals, ESC", 23,0);
 		else if (k_ptr->aware || !k_ptr->flavor) prt("<dir>, ENTER to recall, '{' to inscribe, '}', 'c' to copy, 'v' for visuals, ESC", 23, 0);
-		else prt("<dir>, ENTER to recall, 'c' to copy, 'v' for visuals, ESC", 23, 0);
+		else prt("<dir>, 'c' to copy, 'v' for visuals, ESC", 23, 0);
 
 		/* Mega Hack -- track this monster race */
 		if (object_cnt) object_kind_track(object_idx[object_cur]);
@@ -4749,9 +4749,12 @@ static void do_cmd_knowledge_objects(void)
 				}
 				else
 				{
-					/* Recall on screen */
-					desc_obj_fake(object_idx[object_cur]);
-					redraw = TRUE;
+					if (k_ptr->aware || !k_ptr->flavor)
+					{
+						/* Recall on screen */
+						desc_obj_fake(object_idx[object_cur]);
+						redraw = TRUE;
+					}
 				}
 				break;
 			}
