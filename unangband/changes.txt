@@ -62,6 +62,8 @@ to glowing features such as torches in a room. This is
 another 'pretty' function that may cause a slight
 performance hit, but should make those screen dumps even
 prettier.
+- Dungeon entrances are now lit, so they are easier to
+find at night...
 
 
 Andrew Sidwell has volunteered to help out while I'm
