@@ -11,6 +11,9 @@ not display inscription in the knowledge menus.
 
 - Fix a display problem when pasting a visual attr/char mapping.
 
+- Fix bug with Dragonscales spell applying as a weapon, rather than
+body armor. (Reported by Adam Horowitz).
+
 Unangband 0.5.2a Bugfix release
 
 ### Game-play ###
