@@ -6,7 +6,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 </head>
 
-<body bgcolor="#A6BAE2" text="#003373" link="#006BAA" alink="#CCDEFF" vlink="#568FD3">
+<!--<body bgcolor="#A6BAE2" text="#003373" link="#0000FF" alink="#CCDEFF" vlink="#003373">-->
+<body>
 <h1 align="center">Unangband: <?=$title?></h1>
 
 <table border="0" cellspacing="2" width="100%">
@@ -15,7 +16,7 @@
 			<table cellpadding="4" cellspacing="0" border="0" width="100%">
 				<tr>
 					<td>
-						<b><a href="/index.php">Main Page</a></b>
+						<b><a href="/">Main Page</a></b>
 					</td>
 				</tr>
 
