@@ -57,6 +57,9 @@ by missile or thrown weapons (Bug 654).
 
 - Can no longer browse illegible spells (Bug 253).
 
+- Spells and items that brand objects correctly tell you which brand they
+provide when inspected or browsed.
+
 
 ### Build / Platform ###
 

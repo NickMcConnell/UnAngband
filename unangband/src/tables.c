@@ -2416,7 +2416,7 @@ const cptr inscrip_text[MAX_INSCRIP] =
 	"low resist",
 	"ignore",
 	"blessed",
-	"slay",
+	"slaying",
 	"branded",
 	"poisoned",
 	"lite",

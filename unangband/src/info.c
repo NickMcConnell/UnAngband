@@ -448,7 +448,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 	if ((s_ptr->flags1 & (SF1_ENCHANT_TOH | SF1_ENCHANT_TOD))
 		|| (s_ptr->type == SPELL_BRAND_AMMO)) vp[vn++]="missile";
 	if ((s_ptr->flags1 & (SF1_ENCHANT_TOA))
-		|| (s_ptr->type == SPELL_BRAND_WEAPON)) vp[vn++]="piece of armor";
+		|| (s_ptr->type == SPELL_BRAND_ARMOR)) vp[vn++]="piece of armor";
 	if (s_ptr->type == SPELL_BRAND_ITEM) vp[vn++]="item";
 
 	if (s_ptr->type == SPELL_ENCHANT_TVAL)
@@ -500,9 +500,10 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 
 	if ((s_ptr->type == SPELL_BRAND_WEAPON) ||
 	    (s_ptr->type == SPELL_BRAND_ARMOR) ||
-	    (s_ptr->type == SPELL_BRAND_AMMO))
+	    (s_ptr->type == SPELL_BRAND_AMMO) ||
+	    (s_ptr->type == SPELL_BRAND_ITEM))
 	{
-		vp[vn++]=inscrip_text[INSCRIP_MIN_HIDDEN-INSCRIP_NULL+s_ptr->param];
+		vp[vn++]=format("become %s",inscrip_text[INSCRIP_MIN_HIDDEN-INSCRIP_NULL+s_ptr->param-1]);
 	}
 
 	if (s_ptr->type == SPELL_ENCHANT_TVAL) vp[vn++]="change its kind";
@@ -2107,7 +2108,7 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, int mode)
 				anything |= outlist("It may burden you with", list, TERM_L_WHITE);
 				break;
 			case LIST_FLAGS_NOT:
-				anything |= outlist("It does not burdern you with", list, TERM_SLATE);
+				anything |= outlist("It does not burden you with", list, TERM_SLATE);
 				break;
 		} 
 	}
