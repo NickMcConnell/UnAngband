@@ -1575,7 +1575,7 @@ I:70:47:0
 W:60:0:5:200000
 A:60/16
 
-N:200:Mass Genocide
+N:200:Mass Banishment
 G:?:d
 I:70:45:0
 W:50:0:5:1000
@@ -1622,7 +1622,7 @@ W:40:0:5:200
 A:40/1
 Y:27:1
 
-N:207:Genocide
+N:207:Banishment
 G:?:d
 I:70:44:0
 W:40:0:5:750
@@ -2604,7 +2604,7 @@ F:RES_DARK
 F:SHOW_MODS
 Y:18:2
 
-N:323:Genocide
+N:323:Banishment
 G:_:d
 I:55:27:0
 W:70:0:50:3500

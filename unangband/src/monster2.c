@@ -644,7 +644,7 @@ s16b get_mon_num(int level)
  * Useful Modes:
  *   0x00 --> Full nominative name ("the goblin") or "it"
  *   0x04 --> Full nominative name ("the goblin") or "something"
- *   0x80 --> Genocide resistance name ("the goblin")
+ *   0x80 --> Banishment resistance name ("the goblin")
  *   0x88 --> Killing name ("a goblin")
  *   0x22 --> Possessive, genderized if visable ("his") or "its"
  *   0x23 --> Reflexive, genderized if visable ("himself") or "itself"

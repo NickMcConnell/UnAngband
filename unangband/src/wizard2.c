@@ -1238,7 +1238,7 @@ static void do_cmd_wiz_zap(int d)
 {
 	int i;
 
-	/* Genocide everyone nearby */
+	/* Banishment everyone nearby */
 	for (i = 1; i < m_max; i++)
 	{
 		monster_type *m_ptr = &m_list[i];
@@ -1605,7 +1605,7 @@ void do_cmd_debug(void)
 			break;
 		}
 
-		/* Zap Monsters (Genocide) */
+		/* Zap Monsters (Banishment) */
 		case 'z':
 		{
 			if (p_ptr->command_arg <= 0) p_ptr->command_arg = MAX_SIGHT;

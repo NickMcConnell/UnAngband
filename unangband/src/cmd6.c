@@ -961,7 +961,7 @@ static bool item_tester_hook_charged(const object_type *o_ptr)
  *
  * Unstack fully charged rods as needed.
  *
- * Hack -- rods of perception/genocide can be "cancelled"
+ * Hack -- rods of perception/banishment can be "cancelled"
  * All rods can be cancelled at the "Direction?" prompt
  */
 void do_cmd_zap_rod(void)

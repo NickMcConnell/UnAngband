@@ -3256,7 +3256,7 @@ void aggravate_monsters(int who)
 /*
  * Delete all non-unique monsters of a given "type" from the level
  */
-bool genocide(void)
+bool banishment(void)
 {
 	int i;
 
@@ -3266,7 +3266,7 @@ bool genocide(void)
 
 
 	/* Mega-Hack -- Get a monster symbol */
-	(void)(get_com("Choose a monster race (by symbol) to genocide: ", &typ));
+	(void)(get_com("Choose a monster race (by symbol) to banishment: ", &typ));
 
 	/* Delete the monsters of that "type" */
 	for (i = 1; i < m_max; i++)
@@ -3287,7 +3287,7 @@ bool genocide(void)
 		delete_monster_idx(i);
 
 		/* Take some damage */
-		take_hit(randint(4), "the strain of casting Genocide");
+		take_hit(randint(4), "the strain of casting Banishment");
 
 		/* Take note */
 		result = TRUE;
@@ -3300,7 +3300,7 @@ bool genocide(void)
 /*
  * Delete all nearby (non-unique) monsters
  */
-bool mass_genocide(void)
+bool mass_banishment(void)
 {
 	int i;
 
@@ -3326,7 +3326,7 @@ bool mass_genocide(void)
 		delete_monster_idx(i);
 
 		/* Take some damage */
-		take_hit(randint(3), "the strain of casting Mass Genocide");
+		take_hit(randint(3), "the strain of casting Mass Banishment");
 
 		/* Note effect */
 		result = TRUE;
@@ -3514,7 +3514,7 @@ void destroy_area(int y1, int x1, int r, bool full)
  *
  * Monsters will take damage, and "jump" into a safe grid if possible,
  * otherwise they will be "buried" in the rubble, disappearing from
- * the level in the same way that they do when genocided.
+ * the level in the same way that they do when banished.
  *
  * Note that players and monsters (except eaters of walls and passers
  * through walls) will never occupy the same grid as a wall (or door).
@@ -4987,15 +4987,15 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 		obvious = TRUE;
 	}
 
-	if (s_ptr->flags2 & (SF2_GENOCIDE))
+	if (s_ptr->flags2 & (SF2_BANISHMENT))
 	{
-		(void)genocide();
+		(void)banishment();
 		obvious = TRUE;
 	}
 
-	if (s_ptr->flags2 & (SF2_MASS_GENOCIDE))
+	if (s_ptr->flags2 & (SF2_MASS_BANISHMENT))
 	{
-		mass_genocide();
+		mass_banishment();
 		obvious = TRUE;
 	}
 
