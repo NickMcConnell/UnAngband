@@ -4375,6 +4375,10 @@ static void display_object_list(int col, int row, int per_page, int object_idx[]
 		byte attr = ((k_ptr->aware) ? TERM_WHITE : TERM_SLATE);
 		byte cursor = ((k_ptr->aware) ? TERM_L_BLUE : TERM_BLUE);
 
+		byte a = (k_ptr->flavor && !k_ptr->aware)? x_info[k_ptr->flavor].x_attr:
+				k_ptr->x_attr;
+		byte c = k_ptr->x_char;
+	
 		attr = ((i + object_top == object_cur) ? cursor : attr);
 
 		/* Tidy name */
@@ -4388,15 +4392,8 @@ static void display_object_list(int col, int row, int per_page, int object_idx[]
 			c_prt(TERM_YELLOW,quark_str(k_ptr->note), row+i, 65);
 		}
 
-		if (k_ptr->aware || cheat_lore)
-		{
-			byte a = (k_ptr->flavor)? x_info[k_ptr->flavor].x_attr:
-				k_ptr->x_attr;
-			byte c = k_ptr->x_char;
-	
-			/* Display symbol */
-			Term_putch(76, row + i, a, c);
-		}
+		/* Display symbol */
+		Term_putch(76, row + i, a, c);
 	}
 
 	/* Clear remaining lines */
@@ -4558,14 +4555,13 @@ static void do_cmd_knowledge_objects(void)
 		k_ptr = &k_info[object_idx[object_cur]];
 
 		/* Get the 'correct' attr/char */
-		if (k_ptr->flavor)
+		if (k_ptr->flavor && !k_ptr->aware)
 		{
 			x_attr = &x_info[k_ptr->flavor].x_attr;
 			x_char = &x_info[k_ptr->flavor].x_char;
 		}
 		else
 		{
-			/* Reset the visuals */
 			x_attr = &k_ptr->x_attr;
 			x_char = &k_ptr->x_char;
 		}		

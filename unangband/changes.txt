@@ -9,6 +9,11 @@
 This is done via a graphic user interface type setting, allowing you to
 see large numbers of possible graphics to select from.
 
+- If you specify a graphic/attr/char mapping for e.g. a potion of speed,
+once you become aware of the object, it will use this mapping rather than
+still using the flavour attr/char mapping. This for instance allows you
+to colour all 'bad' potions/scrolls/etc. dark grey so that you don't
+attempt to get them.
 
 ### Build / Platform ###
 
@@ -33,6 +38,9 @@ part of screen if window is resized.
 
 - Fixed bugs so that you can escape locations where you are stuck other
 than by teleporting.
+
+- Partially fixed bug so that at least 'aware' flavoured items are
+displayed with correct graphic when using graphics.
 
 Angband 0.5.2 "I'm on fire" release
 

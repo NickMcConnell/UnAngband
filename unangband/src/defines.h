@@ -3547,11 +3547,11 @@
 
 /*
  * Return the "attr" for a given item.
- * Use "flavor" if available.
+ * Use "flavor" if available and not aware.
  * Default to user definitions.
  */
 #define object_attr(T) \
-	((k_info[(T)->k_idx].flavor) ? \
+	((k_info[(T)->k_idx].flavor && !k_info[(T)->k_idx].aware) ? \
 	 (x_info[k_info[(T)->k_idx].flavor].x_attr) : \
 	 (k_info[(T)->k_idx].x_attr))
 
