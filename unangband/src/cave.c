@@ -1086,13 +1086,9 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		}
 	}
 
-#ifdef USE_TRANSPARENCY
-
 	/* Save the terrain info for the transparency effects */
 	(*tap) = a;
 	(*tcp) = c;
-
-#endif /* USE_TRANSPARENCY */
 
 	/* Objects */
 	for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
