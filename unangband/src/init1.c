@@ -562,7 +562,7 @@ static cptr r_info_flags5[] =
 	"BO_MANA",
 	"BO_PLAS",
 	"BO_ICEE",
-	"",
+	"MISSILE",
 	"SCARE",
 	"BLIND",
 	"CONF",

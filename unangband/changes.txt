@@ -1,3 +1,10 @@
+### Bug fixes ###
+
+- Many low level spell casting monsters were casting mana bolt instead of
+magic missile.
+
+
+
 UnAngband 0.5.4c: "Competitive Fix"
 
 

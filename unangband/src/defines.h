@@ -2858,10 +2858,10 @@
 #define RF5_BO_POIS			0x00100000	/* Poison Bolt (unused) */
 #define RF5_BO_NETH			0x00200000	/* Nether Bolt */
 #define RF5_BO_WATE			0x00400000	/* Water Bolt */
-#define RF5_BO_MANA			0x00800000	/* Magic Missile */
+#define RF5_BO_MANA			0x00800000	/* Mana Bolt */
 #define RF5_BO_PLAS			0x01000000	/* Plasma Bolt */
 #define RF5_BO_ICEE			0x02000000	/* Ice Bolt */
-#define RF5_XXX5			0x04000000	/* XXX */
+#define RF5_MISSILE			0x04000000	/* Magic Missile */
 #define RF5_SCARE			0x08000000	/* Frighten Player */
 #define RF5_BLIND			0x10000000	/* Blind Player */
 #define RF5_CONF			0x20000000	/* Confuse Player */

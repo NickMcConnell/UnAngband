@@ -299,7 +299,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags5 & RF5_BO_MANA)     vp[vn++] = "produce mana bolts";
 	if (l_ptr->flags5 & RF5_BO_PLAS)     vp[vn++] = "produce plasma bolts";
 	if (l_ptr->flags5 & RF5_BO_ICEE)     vp[vn++] = "produce ice bolts";
-	if (l_ptr->flags5 & RF5_XXX5)        vp[vn++] = "do something";
+	if (l_ptr->flags5 & RF5_MISSILE)     vp[vn++] = "produce magic missiles";
 	if (l_ptr->flags5 & RF5_SCARE)       vp[vn++] = "terrify";
 	if (l_ptr->flags5 & RF5_BLIND)       vp[vn++] = "blind";
 	if (l_ptr->flags5 & RF5_CONF)vp[vn++] = "confuse";
