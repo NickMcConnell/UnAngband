@@ -1,3 +1,10 @@
+### Bug fixes ###
+
+- Prevented original graphic tiles from trying to use dark and lite tiles.
+
+- Added Triple tile mode, which is like Double tile mode, but intended for
+use with David Gervais' 54x54 graphics tiles (As 54 is not divisible by 4).
+
 Unangband 0.5.5: "New Years Resolution"
 
 ### Game Play ###

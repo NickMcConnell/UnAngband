@@ -464,6 +464,286 @@ byte dark_attr[16] =
 };
 
 
+/*
+ * Modify a 'boring' grid appearance based on the ambient light
+ */
+void modify_grid_boring(byte *a, char *c, int y, int x, u32b info)
+{
+	/* Handle "seen" grids */
+	if (info & (CAVE_SEEN))
+	{
+		/* Lit by "indirect sun" light */
+		if (view_surface_lite && p_ptr->outside &&
+			!(f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
+		{
+
+			/* Mega-hack */
+			if (*a & 0x80)
+			{
+				if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+				{
+					/* Use a dark tile */
+					*c += 1;
+				}
+			}
+			else
+			{
+				/* Use "gray" */
+				*a = dark_attr[*a];
+			}
+		}
+
+		/* Only lit by "torch" lite */
+		else if (view_yellow_lite && !(info & (CAVE_GLOW)))
+		{
+			/* Mega-hack */
+			if (*a & 0x80)
+			{
+				/* Use a brightly lit tile */
+				if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
+					*c -= 1;
+				else if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+					*c += 2;
+			}
+			else
+			{
+				/* Use "yellow" */
+				*a = lite_attr[*a];
+			}
+		}
+
+		/* Lit by "glowing" lite */
+		else if (view_glowing_lite && (info & (CAVE_GLOW)))
+		{
+			int i;
+
+			for (i = 0; i < 8; i++)
+			{
+				int yy = y + ddy_ddd[i];
+				int xx = x + ddx_ddd[i];
+
+				/* Ignore annoying locations */
+				if (!in_bounds_fully(yy, xx)) continue;
+
+				if (f_info[cave_feat[yy][xx]].flags2 & (FF2_GLOW))
+				{
+					/* Mega-hack */
+					if (*a & 0x80)
+					{
+
+						/* Use a brightly lit tile */
+						if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
+							*c -= 1;
+						else if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+							*c += 2;
+					}
+					else
+					{
+						/* Use "yellow" */
+						*a = lite_attr[*a];
+					}
+
+					/* Important -- exit loop */
+					break;
+				}
+			}
+		}
+	}
+
+	/* Handle "blind" */
+	else if (p_ptr->blind)
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+			{
+				/* Use a dark tile */
+				*c += 1;
+			}
+		}
+		else
+		{
+			/* Use "dark gray" */
+			*a = dark_attr[dark_attr[*a]];
+		}
+	}
+
+	/* Handle "dark" grids */
+	else if (!(info & (CAVE_GLOW)))
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+			{
+				/* Use a dark tile */
+				*c += 1;
+			}
+		}
+		else
+		{
+			/* Use "dark gray" */
+			*a = dark_attr[dark_attr[*a]];
+		}
+	}
+
+	/* Handle "view_bright_lite" */
+	else if (view_bright_lite)
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+			{
+				/* Use a dark tile */
+				*c += 1;
+			}
+		}
+		else
+		{
+			/* Use "gray" */
+			*a = dark_attr[*a];
+		}
+	}
+}
+
+/*
+ * Modify an 'unseen' grid appearance based on the ambient light
+ */
+void modify_grid_unseen(byte *a, char *c)
+{
+	/* Handle "blind" and night time*/
+	if (p_ptr->blind  || !(((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))))
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+			{
+				/* Use a dark tile */
+				*c += 1;
+			}
+		}
+		else
+		{
+			/* Use "dark gray" */
+			*a = dark_attr[dark_attr[*a]];
+		}
+	}
+
+	/* Handle "dark" grids */
+	else if (view_bright_lite)
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
+			{
+				/* Use a dark tile */
+				*c += 1;
+			}
+		}
+		else
+		{
+			/* Use "gray" */
+			*a = dark_attr[*a];
+		}
+	}
+}
+
+/*
+ * Modify an 'interesting' grid appearance based on the ambient light
+ */
+void modify_grid_interesting(byte *a, char *c, u32b info)
+{
+	/* Handle "seen" grids */
+	if (info & (CAVE_SEEN))
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			/* Use a lit tile */
+		}
+		else
+		{
+			/* Use "white" */
+		}
+	}
+
+	/* Handle "blind" */
+	else if (p_ptr->blind)
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+			{
+				/* Use a dark tile */
+				*c += 1;
+			}
+		}
+		else
+		{
+			/* Use "dark gray" */
+			*a = dark_attr[dark_attr[*a]];
+		}
+	}
+
+	/* Handle "dark" grids */
+	else if (!(info & (CAVE_GLOW)))
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+			{
+				/* Use a dark tile */
+				*c += 1;
+			}
+		}
+		else
+		{
+			/* Use "dark gray" */
+			*a = dark_attr[dark_attr[*a]];
+		}
+	}
+
+	/* Handle "view_bright_lite" */
+	else if (view_bright_lite)
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+			{
+				/* Use a dark tile */
+				*c += 1;
+			}
+		}
+		else
+		{
+			/* Use "gray" */
+			*a = dark_attr[*a];
+		}
+	}
+	else
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			/* Use a brightly lit tile */
+			if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
+				*c -= 1;
+			else if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+				*c += 2;
+		}
+		else
+		{
+			/* Use "white" */
+		}
+	}
+}
 
 /*
  * Extract the attr/char to display at the given (legal) map location
@@ -652,6 +932,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 
 	int floor_num = 0;
 
+	bool under = FALSE;
+
 	/* Monster/Player */
 	m_idx = cave_m_idx[y][x];
 
@@ -692,142 +974,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			/* Special lighting effects */
 			if ((view_special_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
 			{
-				/* Handle "seen" grids */
-				if (info & (CAVE_SEEN))
-				{
-					/* Lit by "indirect sun" light */
-					if (view_surface_lite && p_ptr->outside &&
-                                                !(f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
-					{
-
-						/* Mega-hack */
-						if (a & 0x80)
-						{
-							if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
-							{
-								/* Use a dark tile */
-								c += 1;
-							}
-						}
-						else
-						{
-							/* Use "gray" */
-							a = dark_attr[a];
-						}
-					}
-
-					/* Only lit by "torch" lite */
-					else if (view_yellow_lite && !(info & (CAVE_GLOW)))
-					{
-						/* Mega-hack */
-						if (a & 0x80)
-						{
-							/* Use a brightly lit tile */
-							if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
-								c -= 1;
-							else if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
-								c += 2;
-						}
-						else
-						{
-							/* Use "yellow" */
-							a = lite_attr[a];
-						}
-					}
-
-					/* Lit by "glowing" lite */
-					else if (view_glowing_lite && (info & (CAVE_GLOW)))
-					{
-						int i;
-
-						for (i = 0; i < 8; i++)
-						{
-							int yy = y + ddy_ddd[i];
-							int xx = x + ddx_ddd[i];
-
-							/* Ignore annoying locations */
-							if (!in_bounds_fully(yy, xx)) continue;
-
-							if (f_info[cave_feat[yy][xx]].flags2 & (FF2_GLOW))
-							{
-								/* Mega-hack */
-								if (a & 0x80)
-								{
-									/* Use a brightly lit tile */
-									if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
-										c -= 1;
-									else if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
-										c += 2;
-								}
-								else
-								{
-									/* Use "yellow" */
-									a = lite_attr[a];
-								}
-
-								/* Important -- exit loop */
-								break;
-							}
-						}
-					}
-				}
-
-				/* Handle "blind" */
-				else if (p_ptr->blind)
-				{
-					/* Mega-hack */
-					if (a & 0x80)
-					{
-						if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
-						{
-							/* Use a dark tile */
-							c += 1;
-						}
-					}
-					else
-					{
-						/* Use "dark gray" */
-						a = dark_attr[dark_attr[a]];
-					}
-				}
-
-				/* Handle "dark" grids */
-				else if (!(info & (CAVE_GLOW)))
-				{
-					/* Mega-hack */
-					if (a & 0x80)
-					{
-						if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
-						{
-							/* Use a dark tile */
-							c += 1;
-						}
-					}
-					else
-					{
-						/* Use "dark gray" */
-						a = dark_attr[dark_attr[a]];
-					}
-				}
-
-				/* Handle "view_bright_lite" */
-				else if (view_bright_lite)
-				{
-					/* Mega-hack */
-					if (a & 0x80)
-					{
-						if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
-						{
-							/* Use a dark tile */
-							c += 1;
-						}
-					}
-					else
-					{
-						/* Use "gray" */
-						a = dark_attr[a];
-					}
-				}
+				/* Modify the lighting */
+				modify_grid_boring(&a, &c, y, x, info);
 			}
 		}
 
@@ -847,43 +995,11 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			/* Normal char */
 			c = f_ptr->x_char;
 
-			/* Handle "blind" and night time*/
-			if ((p_ptr->blind  || !(((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))))
-				 && (f_ptr->flags2 & (FF2_ATTR_LITE)))
+			/* Special lighting effects */
+			if (f_ptr->flags2 & (FF2_ATTR_LITE))
 			{
-				/* Mega-hack */
-				if (a & 0x80)
-				{
-						if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
-						{
-							/* Use a dark tile */
-							c += 1;
-						}
-				}
-				else
-				{
-					/* Use "dark gray" */
-					a = dark_attr[dark_attr[a]];
-				}
-			}
-
-			/* Handle "dark" grids */
-			else if ((view_bright_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
-			{
-				/* Mega-hack */
-				if (a & 0x80)
-				{
-					if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
-					{
-						/* Use a dark tile */
-						c += 1;
-					}
-				}
-				else
-				{
-					/* Use "gray" */
-					a = dark_attr[a];
-				}
+				/* Modify lighting */
+				modify_grid_unseen(&a, &c);
 			}
 		}
 
@@ -923,6 +1039,16 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			/* Apply "mimic" field */
 			feat = f_info[feat].mimic;
 
+			/* Apply "under" field if appropriate */
+			if (f_info[feat].under)
+			{
+				/* Get the feat beneath */
+				feat = f_info[feat].under;
+
+				/* Showing terrain under */
+				under = TRUE;
+			}
+
 			/* Get the feature */
 			f_ptr = &f_info[feat];
 
@@ -933,94 +1059,17 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			c = f_ptr->x_char;
 
 			/* Special lighting effects */
-			if ((view_granite_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
+			if ((view_special_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)) && (f_ptr->flags1 & (FF1_REMEMBER)))
 			{
-				/* Handle "seen" grids */
-				if (info & (CAVE_SEEN))
-				{
-					/* Mega-hack */
-					if (a & 0x80)
-					{
-						/* Use a lit tile */
-					}
-					else
-					{
-						/* Use "white" */
-					}
-				}
+				/* Modify lighting */
+				modify_grid_boring(&a, &c, y, x, info);
+			}
 
-				/* Handle "blind" */
-				else if (p_ptr->blind)
-				{
-					/* Mega-hack */
-					if (a & 0x80)
-					{
-						if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
-						{
-							/* Use a dark tile */
-							c += 1;
-						}
-					}
-					else
-					{
-						/* Use "dark gray" */
-						a = dark_attr[dark_attr[a]];
-					}
-				}
-
-				/* Handle "dark" grids */
-				else if (!(info & (CAVE_GLOW)))
-				{
-					/* Mega-hack */
-					if (a & 0x80)
-					{
-						if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
-						{
-							/* Use a dark tile */
-							c += 1;
-						}
-					}
-					else
-					{
-						/* Use "dark gray" */
-						a = dark_attr[dark_attr[a]];
-					}
-				}
-
-				/* Handle "view_bright_lite" */
-				else if (view_bright_lite)
-				{
-					/* Mega-hack */
-					if (a & 0x80)
-					{
-						if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
-						{
-							/* Use a dark tile */
-							c += 1;
-						}
-					}
-					else
-					{
-						/* Use "gray" */
-						a = dark_attr[a];
-					}
-				}
-				else
-				{
-					/* Mega-hack */
-					if (a & 0x80)
-					{
-						/* Use a brightly lit tile */
-						if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
-							c -= 1;
-						else if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
-							c += 2;
-					}
-					else
-					{
-						/* Use "white" */
-					}
-				}
+			/* Special lighting effects */
+			else if ((view_granite_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
+			{
+				/* Modify lighting */
+				modify_grid_interesting(&a, &c, info);
 			}
 		}
 
@@ -1040,43 +1089,11 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			/* Normal char */
 			c = f_ptr->x_char;
 
-			/* Handle "blind" and night time*/
-			if ((p_ptr->blind  || !(((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))))
-				 && (f_ptr->flags2 & (FF2_ATTR_LITE)))
+			/* Special lighting effects */
+			if (f_ptr->flags2 & (FF2_ATTR_LITE))
 			{
-				/* Mega-hack */
-				if (a & 0x80)
-				{
-					if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
-					{
-						/* Use a dark tile */
-						c += 1;
-					}
-				}
-				else
-				{
-					/* Use "dark gray" */
-					a = dark_attr[dark_attr[a]];
-				}
-			}
-
-			/* Handle "dark" grids */
-			else if ((view_bright_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
-			{
-				/* Mega-hack */
-				if (a & 0x80)
-				{
-					if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
-					{
-						/* Use a dark tile */
-						c += 1;
-					}
-				}
-				else
-				{
-					/* Use "gray" */
-					a = dark_attr[a];
-				}
+				/* Modify lighting */
+				modify_grid_unseen(&a, &c);
 			}
 		}
 
@@ -1111,6 +1128,31 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 	/* Save the terrain info for the transparency effects */
 	(*tap) = a;
 	(*tcp) = c;
+
+
+	/* Terrain over terrain */
+	if (under)
+	{
+		/* Apply "mimic" field */
+		feat = f_info[cave_feat[y][x]].mimic;
+
+		/* Get the feature */
+		f_ptr = &f_info[feat];
+
+		/* Normal attr */
+		a = f_ptr->x_attr;
+
+		/* Normal char */
+		c = f_ptr->x_char;
+
+		/* Special lighting effects */
+		if ((view_granite_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
+		{
+			/* Modify lighting */
+			modify_grid_interesting(&a, &c, info);
+		}
+	}
+
 
 	/* Objects */
 	for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
@@ -1335,7 +1377,12 @@ void move_cursor_relative(int y, int x)
 	/* Location in window */
 	vx = kx + COL_MAP;
 
-	if (use_dbltile)
+	if (use_trptile)
+	{
+		vx += (use_bigtile ? 5 : 2) * kx;
+		vy += 2 * ky;
+	}
+	else if (use_dbltile)
 	{
 		vx += (use_bigtile ? 3 : 1) * kx;
 		vy += ky;
@@ -1353,7 +1400,7 @@ void big_queue_char(int x, int y, byte a, char c, byte a1, char c1)
 	(void)c;
 
 	/* Paranoia */
-	if (use_bigtile || use_dbltile)
+	if (use_bigtile || use_dbltile || use_trptile)
 	{
 		/* Mega-Hack : Queue dummy char */
 		if (a & 0x80)
@@ -1362,40 +1409,76 @@ void big_queue_char(int x, int y, byte a, char c, byte a1, char c1)
 			Term_queue_char(x + 1, y, TERM_WHITE, ' ', a1, c1);
 
 		/* Mega-Hack : Queue more dummy chars */
-		if (use_dbltile)
+		if (use_dbltile || use_trptile)
 		{
 			if (a & 0x80)
 			{
-				if (use_bigtile)
+				if (use_bigtile || use_trptile) Term_queue_char(x + 2, y, 255, -1, 0, 0);
+				if (use_bigtile) Term_queue_char(x + 3, y, 255, -1, 0, 0);
+				if (use_bigtile && use_trptile)
 				{
-					Term_queue_char(x + 2, y, 255, -1, 0, 0);
-					Term_queue_char(x + 3, y, 255, -1, 0, 0);
+					Term_queue_char(x + 4, y, 255, -1, 0, 0);
+					Term_queue_char(x + 5, y, 255, -1, 0, 0);
 				}
 
 				Term_queue_char(x , y + 1, 255, -1, 0, 0);
 				Term_queue_char(x + 1, y + 1, 255, -1, 0, 0);
 
-				if (use_bigtile)
+				if (use_bigtile || use_trptile) Term_queue_char(x + 2, y + 1, 255, -1, 0, 0);
+				if (use_bigtile) Term_queue_char(x + 3, y + 1, 255, -1, 0, 0);
+				if (use_bigtile && use_trptile)
 				{
-					Term_queue_char(x + 2, y + 1, 255, -1, 0, 0);
-					Term_queue_char(x + 3, y + 1, 255, -1, 0, 0);
+					Term_queue_char(x + 4, y + 1, 255, -1, 0, 0);
+					Term_queue_char(x + 5, y + 1, 255, -1, 0, 0);
+				}
+
+				if (use_trptile)
+				{
+					Term_queue_char(x , y + 2, 255, -1, 0, 0);
+					Term_queue_char(x + 1, y + 2, 255, -1, 0, 0);
+					Term_queue_char(x + 2, y + 2, 255, -1, 0, 0);
+					
+					if (use_bigtile)
+					{
+						Term_queue_char(x + 3, y + 2, 255, -1, 0, 0);
+						Term_queue_char(x + 4, y + 2, 255, -1, 0, 0);
+						Term_queue_char(x + 5, y + 2, 255, -1, 0, 0);
+					}
 				}
 			}
 			else
 			{
-				if (use_bigtile)
+				if (use_bigtile || use_trptile) Term_queue_char(x + 2, y, TERM_WHITE, ' ', a1, c1);
+				if (use_bigtile) Term_queue_char(x + 3, y, TERM_WHITE, ' ', a1, c1);
+				if (use_bigtile && use_trptile)
 				{
-					Term_queue_char(x + 2, y, TERM_WHITE, ' ', a1, c1);
-					Term_queue_char(x + 3, y, TERM_WHITE, ' ', a1, c1);
+					Term_queue_char(x + 4, y, TERM_WHITE, ' ', a1, c1);
+					Term_queue_char(x + 5, y, TERM_WHITE, ' ', a1, c1);
 				}
 
 				Term_queue_char(x , y + 1, TERM_WHITE, ' ', a1, c1);
 				Term_queue_char(x + 1, y + 1, TERM_WHITE, ' ', a1, c1);
 
-				if (use_bigtile)
+				if (use_bigtile || use_trptile) Term_queue_char(x + 2, y + 1, TERM_WHITE, ' ', a1, c1);
+				if (use_bigtile) Term_queue_char(x + 3, y + 1, TERM_WHITE, ' ', a1, c1);
+				if (use_bigtile && use_trptile)
 				{
-					Term_queue_char(x + 2, y + 1, TERM_WHITE, ' ', a1, c1);
-					Term_queue_char(x + 3, y + 1, TERM_WHITE, ' ', a1, c1);
+					Term_queue_char(x + 4, y + 1, TERM_WHITE, ' ', a1, c1);
+					Term_queue_char(x + 5, y + 1, TERM_WHITE, ' ', a1, c1);
+				}
+
+				if (use_trptile)
+				{
+					Term_queue_char(x , y + 2, TERM_WHITE, ' ', a1, c1);
+					Term_queue_char(x + 1, y + 2, TERM_WHITE, ' ', a1, c1);
+					Term_queue_char(x + 2, y + 2, TERM_WHITE, ' ', a1, c1);
+					
+					if (use_bigtile)
+					{
+						Term_queue_char(x + 3, y + 2, TERM_WHITE, ' ', a1, c1);
+						Term_queue_char(x + 4, y + 2, TERM_WHITE, ' ', a1, c1);
+						Term_queue_char(x + 5, y + 2, TERM_WHITE, ' ', a1, c1);
+					}
 				}
 			}
 		}
@@ -1417,36 +1500,76 @@ void big_putch(int x, int y, byte a, char c)
 			Term_putch(x + 1, y, TERM_WHITE, ' ');
 
 		/* Mega-Hack : Queue more dummy chars */
-		if (use_dbltile)
+		if (use_dbltile || use_trptile)
 		{
 			if (a & 0x80)
 			{
-				if (use_bigtile)
+				if (use_bigtile || use_trptile) Term_putch(x + 2, y, 255, -1);
+				if (use_bigtile) Term_putch(x + 3, y, 255, -1);
+				if (use_bigtile && use_trptile)
 				{
-					Term_putch(x + 2, y, 255, -1);
-					Term_putch(x + 3, y, 255, -1);
+					Term_putch(x + 4, y, 255, -1);
+					Term_putch(x + 5, y, 255, -1);
 				}
+
 				Term_putch(x , y + 1, 255, -1);
 				Term_putch(x + 1, y + 1, 255, -1);
-				if (use_bigtile)
+
+				if (use_bigtile || use_trptile) Term_putch(x + 2, y + 1, 255, -1);
+				if (use_bigtile) Term_putch(x + 3, y + 1, 255, -1);
+				if (use_bigtile && use_trptile)
 				{
-					Term_putch(x + 2, y + 1, 255, -1);
-					Term_putch(x + 3, y + 1, 255, -1);
+					Term_putch(x + 4, y + 1, 255, -1);
+					Term_putch(x + 5, y + 1, 255, -1);
+				}
+
+				if (use_trptile)
+				{
+					Term_putch(x , y + 2, 255, -1);
+					Term_putch(x + 1, y + 2, 255, -1);
+					Term_putch(x + 2, y + 2, 255, -1);
+					
+					if (use_bigtile)
+					{
+						Term_putch(x + 3, y + 2, 255, -1);
+						Term_putch(x + 4, y + 2, 255, -1);
+						Term_putch(x + 5, y + 2, 255, -1);
+					}
 				}
 			}
 			else
 			{
-				if (use_bigtile)
+				if (use_bigtile || use_trptile) Term_putch(x + 2, y, TERM_WHITE, ' ');
+				if (use_bigtile) Term_putch(x + 3, y, TERM_WHITE, ' ');
+				if (use_bigtile && use_trptile)
 				{
-					Term_putch(x + 2, y, TERM_WHITE, ' ');
-					Term_putch(x + 3, y, TERM_WHITE, ' ');
+					Term_putch(x + 4, y, TERM_WHITE, ' ');
+					Term_putch(x + 5, y, TERM_WHITE, ' ');
 				}
+
 				Term_putch(x , y + 1, TERM_WHITE, ' ');
 				Term_putch(x + 1, y + 1, TERM_WHITE, ' ');
-				if (use_bigtile)
+
+				if (use_bigtile || use_trptile) Term_putch(x + 2, y + 1, TERM_WHITE, ' ');
+				if (use_bigtile) Term_putch(x + 3, y + 1, TERM_WHITE, ' ');
+				if (use_bigtile && use_trptile)
 				{
-					Term_putch(x + 2, y + 1, TERM_WHITE, ' ');
-					Term_putch(x + 3, y + 1, TERM_WHITE, ' ');
+					Term_putch(x + 4, y + 1, TERM_WHITE, ' ');
+					Term_putch(x + 5, y + 1, TERM_WHITE, ' ');
+				}
+
+				if (use_trptile)
+				{
+					Term_putch(x , y + 2, TERM_WHITE, ' ');
+					Term_putch(x + 1, y + 2, TERM_WHITE, ' ');
+					Term_putch(x + 2, y + 2, TERM_WHITE, ' ');
+					
+					if (use_bigtile)
+					{
+						Term_putch(x + 3, y + 2, TERM_WHITE, ' ');
+						Term_putch(x + 4, y + 2, TERM_WHITE, ' ');
+						Term_putch(x + 5, y + 2, TERM_WHITE, ' ');
+					}
 				}
 			}
 		}
@@ -1486,7 +1609,12 @@ void print_rel(char c, byte a, int y, int x)
 	/* Location in window */
 	vx = kx + COL_MAP;
 
-	if (use_dbltile)
+	if (use_trptile)
+	{
+		vx += (use_bigtile ? 5 : 2) * kx;
+		vy += 2 * ky;
+	}
+	else if (use_dbltile)
 	{
 		vx += (use_bigtile ? 3 : 1) * kx;
 		vy += ky;
@@ -1496,7 +1624,7 @@ void print_rel(char c, byte a, int y, int x)
 	/* Hack -- Queue it */
 	Term_queue_char(vx, vy, a, c, 0, 0);
 
-	if (use_bigtile || use_dbltile)
+	if (use_bigtile || use_dbltile || use_trptile)
 	{
 		/* Mega-Hack : Queue dummy char */
 		big_queue_char(vx, vy, a, c, 0, 0);
@@ -1644,7 +1772,12 @@ void lite_spot(int y, int x)
 	/* Location in window */
 	vx = kx + COL_MAP;
 
-	if (use_dbltile)
+	if (use_trptile)
+	{
+		vx += (use_bigtile ? 5 : 2) * kx;
+		vy += 2 * ky;
+	}
+	else if (use_dbltile)
 	{
 		vx += (use_bigtile ? 3 : 1) * kx;
 		vy += ky;
@@ -1657,7 +1790,7 @@ void lite_spot(int y, int x)
 	/* Hack -- Queue it */
 	Term_queue_char(vx, vy, a, c, ta, tc);
 
-	if (use_bigtile || use_dbltile)
+	if (use_bigtile || use_dbltile || use_trptile)
 	{
 		big_queue_char(vx, vy, a, c, TERM_WHITE, ' ');
 	}
@@ -1702,15 +1835,23 @@ void prt_map(void)
 			/* Hack -- Queue it */
 			Term_queue_char(vx, vy, a, c, ta, tc);
 
-			if (use_bigtile || use_dbltile)
+			if (use_bigtile || use_dbltile || use_trptile)
 			{
 				big_queue_char(vx, vy, a, c, TERM_WHITE, ' ');
 
-				vx+= ((use_dbltile && use_bigtile) ? 3 : 1);
+				if (use_trptile)
+				{
+					vx += (use_bigtile ? 5 : 2);
+				}
+				else
+					vx+= ((use_dbltile && use_bigtile) ? 3 : 1);
 			}
 		}
 
-		if (use_dbltile)
+		if (use_trptile)
+			vy++;
+
+		if (use_dbltile || use_trptile)
 			vy++;
 	}
 }
@@ -1872,7 +2013,12 @@ void display_map(int *cy, int *cx)
 			row = (y * map_hgt / dungeon_hgt);
 			col = (x * map_wid / dungeon_wid);
 
-			if (use_dbltile)
+			if (use_trptile)
+			{
+				col = col - (col % (use_bigtile ? 6 : 3));
+				row = row - (row % 3);
+			}
+			else if (use_dbltile)
 			{
 				col = col & ~(use_bigtile ? 3 : 1);
 				row = row & ~1;
@@ -1892,7 +2038,7 @@ void display_map(int *cy, int *cx)
 				/* Add the character */
 				Term_putch(col + 1, row + 1, ta, tc);
 
-				if (use_bigtile || use_dbltile)
+				if (use_bigtile || use_dbltile || use_trptile)
 				{
 					big_putch(col + 1, row + 1, ta, tc);
 				}
@@ -1908,7 +2054,12 @@ void display_map(int *cy, int *cx)
 	row = (py * map_hgt / dungeon_hgt);
 	col = (px * map_wid / dungeon_wid);
 
-	if (use_dbltile)
+	if (use_trptile)
+	{
+		col = col - (col % (use_bigtile ? 6 : 3));
+		row = row - (row % 3);
+	}
+	else if (use_dbltile)
 	{
 		col = col & ~(use_bigtile ? 3 : 1);
 		row = row & ~1;

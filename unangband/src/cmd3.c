@@ -1801,7 +1801,7 @@ static void roff_top(int r_idx)
 	/* Dump the name */
 	Term_addstr(-1, TERM_WHITE, (r_name + r_ptr->name));
 
-	if (!use_dbltile)
+	if (!use_dbltile && !use_trptile)
 	{
 		/* Append the "standard" attr/char info */
 		Term_addstr(-1, TERM_WHITE, " ('");

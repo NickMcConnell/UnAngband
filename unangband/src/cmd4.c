@@ -1697,16 +1697,29 @@ void do_cmd_visuals(void)
 
 	const char *empty_symbol = "<< ? >>";
 	const char *empty_symbol2 = "\0";
+	const char *empty_symbol3 = "\0";
 
-	if (use_dbltile && use_bigtile)
+	if (use_trptile && use_bigtile)
 	{
-		empty_symbol = "//      \\\\";
-		empty_symbol2 = "\\\\      //";
+		empty_symbol = "// ?????? \\\\";
+		empty_symbol2 = "   ??????   ";
+		empty_symbol3 = "\\\\ ?????? //";
+	}
+	else if (use_dbltile && use_bigtile)
+	{
+		empty_symbol = "// ???? \\\\";
+		empty_symbol2 = "\\\\ ???? //";
+	}
+	else if (use_trptile)
+	{
+		empty_symbol = "// ??? \\\\";
+		empty_symbol2 = "   ???   ";
+		empty_symbol3 = "\\\\ ??? //";
 	}
 	else if (use_dbltile)
 	{
-		empty_symbol = "//    \\\\";
-		empty_symbol2 = "\\\\    //";
+		empty_symbol = "// ?? \\\\";
+		empty_symbol2 = "\\\\ ?? //";
 	}
 	else if (use_bigtile) empty_symbol = "<< ?? >>";
 
@@ -2010,7 +2023,7 @@ void do_cmd_visuals(void)
 				byte ca = (byte)(r_ptr->x_attr);
 				byte cc = (byte)(r_ptr->x_char);
 
-				int linec = (use_dbltile ? 21 : 20);
+				int linec = (use_trptile ? 22: (use_dbltile ? 21 : 20));
 
 				/* Label the object */
 				Term_putstr(5, 17, -1, TERM_WHITE,
@@ -2021,10 +2034,12 @@ void do_cmd_visuals(void)
 				Term_putstr(10, 19, -1, TERM_WHITE,
 					    format("Default attr/char = %3u / %3u", da, dc));
 				Term_putstr(40, 19, -1, TERM_WHITE, empty_symbol);
-				if (use_dbltile) Term_putstr (40, 20, -1, TERM_WHITE, empty_symbol2); 
+				if (use_dbltile || use_trptile) Term_putstr (40, 20, -1, TERM_WHITE, empty_symbol2);
+				if (use_trptile) Term_putstr (40, 20, -1, TERM_WHITE, empty_symbol3);
+
 				Term_putch(43, 19, da, dc);
 
-				if (use_bigtile || use_dbltile)
+				if (use_bigtile || use_dbltile || use_trptile)
 				{
 					big_putch(43, 19, da, dc);
 				}
@@ -2033,13 +2048,15 @@ void do_cmd_visuals(void)
 				Term_putstr(10, linec, -1, TERM_WHITE,
 					    format("Current attr/char = %3u / %3u", ca, cc));
 				Term_putstr(40, linec, -1, TERM_WHITE, empty_symbol);
-				if (use_dbltile) Term_putstr (40, linec+1, -1, TERM_WHITE, empty_symbol2); 
+				if (use_dbltile || use_trptile) Term_putstr (40, linec+1, -1, TERM_WHITE, empty_symbol2); 
+				if (use_trptile) Term_putstr (40, linec+2, -1, TERM_WHITE, empty_symbol3); 
 				Term_putch(43, linec, ca, cc);
 
-				if (use_bigtile || use_dbltile)
+				if (use_bigtile || use_dbltile || use_trptile)
 				{
 					big_putch(43, linec++, ca, cc);
 				}
+				if (use_trptile) linec++;
 
 				/* Prompt */
 				Term_putstr(0, linec + 2, -1, TERM_WHITE,
@@ -2079,7 +2096,7 @@ void do_cmd_visuals(void)
 				byte ca = (byte)(k_ptr->x_attr);
 				byte cc = (byte)(k_ptr->x_char);
 
-				int linec = (use_dbltile ? 21 : 20);
+				int linec = (use_trptile ? 22: (use_dbltile ? 21 : 20));
 
 				/* Label the object */
 				Term_putstr(5, 17, -1, TERM_WHITE,
@@ -2088,12 +2105,14 @@ void do_cmd_visuals(void)
 
 				/* Label the Default values */
 				Term_putstr(10, 19, -1, TERM_WHITE,
-					    format("Default attr/char = %3d / %3d", da, dc));
+					    format("Default attr/char = %3u / %3u", da, dc));
 				Term_putstr(40, 19, -1, TERM_WHITE, empty_symbol);
-				if (use_dbltile) Term_putstr (40, 20, -1, TERM_WHITE, empty_symbol2); 
+				if (use_dbltile || use_trptile) Term_putstr (40, 20, -1, TERM_WHITE, empty_symbol2);
+				if (use_trptile) Term_putstr (40, 20, -1, TERM_WHITE, empty_symbol3);
+
 				Term_putch(43, 19, da, dc);
 
-				if (use_bigtile || use_dbltile)
+				if (use_bigtile || use_dbltile || use_trptile)
 				{
 					big_putch(43, 19, da, dc);
 				}
@@ -2102,13 +2121,15 @@ void do_cmd_visuals(void)
 				Term_putstr(10, linec, -1, TERM_WHITE,
 					    format("Current attr/char = %3u / %3u", ca, cc));
 				Term_putstr(40, linec, -1, TERM_WHITE, empty_symbol);
-				if (use_dbltile) Term_putstr (40, linec+1, -1, TERM_WHITE, empty_symbol2); 
+				if (use_dbltile || use_trptile) Term_putstr (40, linec+1, -1, TERM_WHITE, empty_symbol2); 
+				if (use_trptile) Term_putstr (40, linec+2, -1, TERM_WHITE, empty_symbol3); 
 				Term_putch(43, linec, ca, cc);
 
-				if (use_bigtile || use_dbltile)
+				if (use_bigtile || use_dbltile || use_trptile)
 				{
 					big_putch(43, linec++, ca, cc);
 				}
+				if (use_trptile) linec++;
 
 				/* Prompt */
 				Term_putstr(0, linec+2, -1, TERM_WHITE,
@@ -2148,7 +2169,7 @@ void do_cmd_visuals(void)
 				byte ca = (byte)(f_ptr->x_attr);
 				byte cc = (byte)(f_ptr->x_char);
 
-				int linec = (use_dbltile ? 21 : 20);
+				int linec = (use_trptile ? 22: (use_dbltile ? 21 : 20));
 
 				/* Label the object */
 				Term_putstr(5, 17, -1, TERM_WHITE,
@@ -2157,12 +2178,14 @@ void do_cmd_visuals(void)
 
 				/* Label the Default values */
 				Term_putstr(10, 19, -1, TERM_WHITE,
-					    format("Default attr/char = %3d / %3d", da, dc));
+					    format("Default attr/char = %3u / %3u", da, dc));
 				Term_putstr(40, 19, -1, TERM_WHITE, empty_symbol);
-				if (use_dbltile) Term_putstr (40, 20, -1, TERM_WHITE, empty_symbol2); 
+				if (use_dbltile || use_trptile) Term_putstr (40, 20, -1, TERM_WHITE, empty_symbol2);
+				if (use_trptile) Term_putstr (40, 20, -1, TERM_WHITE, empty_symbol3);
+
 				Term_putch(43, 19, da, dc);
 
-				if (use_bigtile || use_dbltile)
+				if (use_bigtile || use_dbltile || use_trptile)
 				{
 					big_putch(43, 19, da, dc);
 				}
@@ -2171,13 +2194,15 @@ void do_cmd_visuals(void)
 				Term_putstr(10, linec, -1, TERM_WHITE,
 					    format("Current attr/char = %3u / %3u", ca, cc));
 				Term_putstr(40, linec, -1, TERM_WHITE, empty_symbol);
-				if (use_dbltile) Term_putstr (40, linec+1, -1, TERM_WHITE, empty_symbol2); 
+				if (use_dbltile || use_trptile) Term_putstr (40, linec+1, -1, TERM_WHITE, empty_symbol2); 
+				if (use_trptile) Term_putstr (40, linec+2, -1, TERM_WHITE, empty_symbol3); 
 				Term_putch(43, linec, ca, cc);
 
-				if (use_bigtile || use_dbltile)
+				if (use_bigtile || use_dbltile || use_trptile)
 				{
-					big_putch(43, linec, ca, cc);
+					big_putch(43, linec++, ca, cc);
 				}
+				if (use_trptile) linec++;
 
 				/* Prompt */
 				Term_putstr(0, linec+2, -1, TERM_WHITE,
@@ -2217,7 +2242,7 @@ void do_cmd_visuals(void)
 				byte ca = (byte)(x_ptr->x_attr);
 				byte cc = (byte)(x_ptr->x_char);
 
-				int linec = (use_dbltile ? 21 : 20);
+				int linec = (use_trptile ? 22: (use_dbltile ? 21 : 20));
 
 				/* Label the object */
 				Term_putstr(5, 17, -1, TERM_WHITE,
@@ -2226,12 +2251,14 @@ void do_cmd_visuals(void)
 
 				/* Label the Default values */
 				Term_putstr(10, 19, -1, TERM_WHITE,
-					    format("Default attr/char = %3d / %3d", da, dc));
+					    format("Default attr/char = %3u / %3u", da, dc));
 				Term_putstr(40, 19, -1, TERM_WHITE, empty_symbol);
-				if (use_dbltile) Term_putstr (40, 20, -1, TERM_WHITE, empty_symbol2); 
+				if (use_dbltile || use_trptile) Term_putstr (40, 20, -1, TERM_WHITE, empty_symbol2);
+				if (use_trptile) Term_putstr (40, 20, -1, TERM_WHITE, empty_symbol3);
+
 				Term_putch(43, 19, da, dc);
 
-				if (use_bigtile || use_dbltile)
+				if (use_bigtile || use_dbltile || use_trptile)
 				{
 					big_putch(43, 19, da, dc);
 				}
@@ -2240,13 +2267,15 @@ void do_cmd_visuals(void)
 				Term_putstr(10, linec, -1, TERM_WHITE,
 					    format("Current attr/char = %3u / %3u", ca, cc));
 				Term_putstr(40, linec, -1, TERM_WHITE, empty_symbol);
-				if (use_dbltile) Term_putstr (40, linec+1, -1, TERM_WHITE, empty_symbol2); 
+				if (use_dbltile || use_trptile) Term_putstr (40, linec+1, -1, TERM_WHITE, empty_symbol2); 
+				if (use_trptile) Term_putstr (40, linec+2, -1, TERM_WHITE, empty_symbol3); 
 				Term_putch(43, linec, ca, cc);
 
-				if (use_bigtile || use_dbltile)
+				if (use_bigtile || use_dbltile || use_trptile)
 				{
 					big_putch(43, linec++, ca, cc);
 				}
+				if (use_trptile) linec++;
 
 				/* Prompt */
 				Term_putstr(0, linec+2, -1, TERM_WHITE,
@@ -3875,8 +3904,14 @@ static void display_visual_list(int col, int row, int height, int width, byte at
 		Term_erase(col, row + i, width);
 	}
 
-	/* Super big uses double height and width width */
-	if (use_dbltile)
+	/* Triple tile uses double height and width width */
+	if (use_trptile)
+	{
+		width /= (use_bigtile ? 6 : 3);
+		height /= 3;
+	}
+	/* Double tile uses double height and width width */
+	else if (use_dbltile)
 	{
 		width /= (use_bigtile ? 4 : 2);
 		height /= 2;
@@ -3897,8 +3932,14 @@ static void display_visual_list(int col, int row, int height, int width, byte at
 			int y = row + i;
 			int ia, ic;
 
+			/* Triple tile mode uses double width and double height */
+			if (use_trptile)
+			{
+				y += 2 * i;
+				x += (use_bigtile ? 5 : 2) * j;
+			}
 			/* Double tile mode uses double width and double height */
-			if (use_dbltile)
+			else if (use_dbltile)
 			{
 				y += i;
 				x += (use_bigtile ? 3 : 1) * j;
@@ -3915,7 +3956,7 @@ static void display_visual_list(int col, int row, int height, int width, byte at
 			/* Display symbol */
 			Term_putch(x, y, a, c);
 
-			if (use_bigtile || use_dbltile)
+			if (use_bigtile || use_dbltile || use_trptile)
 			{
 				big_putch(x, y, a, c);
 			}
@@ -3935,8 +3976,14 @@ static void place_visual_list_cursor(int col, int row, byte a, byte c, byte attr
 	int x = col + j;
 	int y = row + i;
 
+	/* Triple tile mode uses double height and width */
+	if (use_trptile)
+	{
+		y += 2 * i;
+		x += (use_bigtile ? 5 : 2) * j;
+	}
 	/* Double tile mode uses double height and width */
-	if (use_dbltile)
+	else if (use_dbltile)
 	{
 		y += i;
 		x += (use_bigtile ? 3 : 1) * j;
@@ -4042,11 +4089,13 @@ static bool visual_mode_command(char ch, bool *visual_list_ptr,
 			byte a = *cur_attr_ptr;
 			char c = *cur_char_ptr;
 
-			if (use_dbltile) eff_width = width / (use_bigtile ? 4 : 2);
+			if (use_dbltile) eff_width = width / (use_bigtile ? 6 : 3);
+			else if (use_dbltile) eff_width = width / (use_bigtile ? 4 : 2);
 			else if (use_bigtile) eff_width = width / 2;
 			else eff_width = width;
 
-			if (use_dbltile) eff_height = height / 2;
+			if (use_trptile) eff_height = height / 3;
+			else if (use_dbltile) eff_height = height / 2;
 			else eff_height = height;
 					
 			/* Restrict direction */
@@ -4117,7 +4166,7 @@ static void display_monster_list(int col, int row, int per_page, int *mon_idx,
 			c_prt(attr, format("%d", r_idx), row + i, 60);
 		}
 
-		if (!use_dbltile)
+		if (!use_dbltile && !use_trptile)
 		{
 			a = r_ptr->x_attr;
 			c = r_ptr->x_char;
@@ -4818,7 +4867,7 @@ static void display_object_list(int col, int row, int per_page, int object_idx[]
 		}
 
 		/* Hack - don't use if double tile */
-		if (!use_dbltile)
+		if (!use_dbltile && !use_trptile)
 		{
 
 			/* Display symbol */
@@ -5362,7 +5411,7 @@ static void display_feature_list(int col, int row, int per_page, int *feat_idx,
 			c_prt(attr, format("%d", f_idx), row + i, 60);
 		}
 
-		if (!use_dbltile)
+		if (!use_dbltile && !use_trptile)
 		{
 			/* Display symbol */
 			Term_putch(68, row + i, f_ptr->x_attr, f_ptr->x_char);

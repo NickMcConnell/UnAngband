@@ -189,6 +189,7 @@
 #define IDM_OPTIONS_GRAPHICS_ADAM   402
 #define IDM_OPTIONS_GRAPHICS_DAVID  403
 #define IDM_OPTIONS_GRAPHICS_DAVID_ISO  404
+#define IDM_OPTIONS_TRPTILE         407
 #define IDM_OPTIONS_DBLTILE         408
 #define IDM_OPTIONS_BIGTILE         409
 #define IDM_OPTIONS_SOUND           410
@@ -1030,6 +1031,10 @@ static void save_prefs(void)
 	sprintf(buf, "%d", arg_graphics);
 	WritePrivateProfileString("Angband", "Graphics", buf, ini_file);
 
+	/* Save the "use_trptile" flag */
+	strcpy(buf, use_trptile ? "1" : "0");
+	WritePrivateProfileString("Angband", "Trptile", buf, ini_file);
+
 	/* Save the "use_dbltile" flag */
 	strcpy(buf, use_dbltile ? "1" : "0");
 	WritePrivateProfileString("Angband", "Dbltile", buf, ini_file);
@@ -1103,6 +1108,9 @@ static void load_prefs(void)
 
 	/* Extract the "arg_graphics" flag */
 	arg_graphics = GetPrivateProfileInt("Angband", "Graphics", GRAPHICS_NONE, ini_file);
+
+	/* Extract the "use_trptile" flag */
+	use_trptile = GetPrivateProfileInt("Angband", "Trptile", FALSE, ini_file);
 
 	/* Extract the "use_dbltile" flag */
 	use_dbltile = GetPrivateProfileInt("Angband", "Dbltile", FALSE, ini_file);
@@ -2285,9 +2293,9 @@ static errr Term_bigcurs_win(int x, int y)
 
 	/* Frame the grid */
 	rc.left = x * tile_wid + td->size_ow1;
-	rc.right = rc.left + ((use_dbltile && use_bigtile) ? 4 : 2) * tile_wid;
+	rc.right = rc.left + ((use_trptile && use_bigtile) ? 6 : (use_trptile ? 3 : ((use_dbltile && use_bigtile) ? 4 : 2))) * tile_wid;
 	rc.top = y * tile_hgt + td->size_oh1;
-	rc.bottom = rc.top + (use_dbltile ? 2 : 1) * tile_hgt;
+	rc.bottom = rc.top + (use_trptile ? 3 : (use_dbltile ? 2 : 1)) * tile_hgt;
 
 	/* Cursor is done as a yellow "box" */
 	hdc = GetDC(td->w);
@@ -2473,14 +2481,18 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 		w2 = td->tile_wid;
 		h2 = td->tile_hgt;
 
-		/* Super big mode */
-		if (use_dbltile)
+		/* Triple tile mode */
+		if (use_trptile)
+			th2 = 3 * h2;
+		else if (use_dbltile)
 			th2 = 2 * h2;
 		else
 			th2 = h2;
 
-		/* Super big mode */
-		if (use_dbltile)
+		/* Triple tile mode */
+		if (use_trptile)
+			tw2 = (use_bigtile ? 6 : 3) * w2;
+		else if (use_dbltile)
 			tw2 = (use_bigtile ? 4 : 2) * w2;
 		/* big tile mode */
 		else if (use_bigtile)
@@ -2498,7 +2510,12 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 		x = (x - COL_MAP);
 		y = (y - ROW_MAP);
 
-		if (use_dbltile)
+		if (use_trptile)
+		{
+			x /= (use_bigtile ? 6 : 3);
+			y /= 3;
+		}
+		else if (use_dbltile)
 		{
 			x /= (use_bigtile ? 4 : 2);
 			y /= 2;
@@ -2506,7 +2523,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 		else if (use_bigtile)
 			x /= 2;
 
-		x2 = (x - y) * tw2 / 2 + ((td->rows - ROW_MAP) * tw2 / ((use_dbltile) ? 4 : 2)) + w2 * (COL_MAP-1) + td->size_ow1;
+		x2 = (x - y) * tw2 / 2 + ((td->rows - ROW_MAP) * tw2 / (use_trptile ? 6 : (use_dbltile ? 4 : 2))) + w2 * (COL_MAP-1) + td->size_ow1;
 		y2 = (y + x) * th2 / 4 + h2 * ROW_MAP + td->size_ow2; 
 	}
 	else
@@ -3194,6 +3211,8 @@ static void setup_menus(void)
 	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 	EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_ISO,
 	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+	EnableMenuItem(hm, IDM_OPTIONS_TRPTILE,
+	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 	EnableMenuItem(hm, IDM_OPTIONS_DBLTILE,
 	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 	EnableMenuItem(hm, IDM_OPTIONS_BIGTILE,
@@ -3224,6 +3243,8 @@ static void setup_menus(void)
 	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_ISO,
 	              (arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO ? MF_CHECKED : MF_UNCHECKED));
 
+	CheckMenuItem(hm, IDM_OPTIONS_TRPTILE,
+	              (use_trptile ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(hm, IDM_OPTIONS_DBLTILE,
 	              (use_dbltile ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(hm, IDM_OPTIONS_BIGTILE,
@@ -3247,6 +3268,7 @@ static void setup_menus(void)
 		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_ADAM, MF_ENABLED);
 		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID, MF_ENABLED);
 		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_ISO, MF_ENABLED);
+		EnableMenuItem(hm, IDM_OPTIONS_TRPTILE, MF_ENABLED);
 		EnableMenuItem(hm, IDM_OPTIONS_DBLTILE, MF_ENABLED);
 		EnableMenuItem(hm, IDM_OPTIONS_BIGTILE, MF_ENABLED);
 	}
@@ -3978,6 +4000,27 @@ static void process_menus(WORD wCmd)
 			break;
 		}
 
+		case IDM_OPTIONS_TRPTILE:
+		{
+			/* Paranoia */
+			if (!inkey_flag || !initialized)
+			{
+				plog("You may not do that right now.");
+				break;
+			}
+
+			/* Toggle "use_trptile" */
+			use_trptile = !use_trptile;
+
+			/* Cancel "use_dbltile" */
+			use_dbltile = FALSE;
+
+			/* Mega-Hack : Redraw screen */
+			Term_key_push(KTRL('R'));
+
+			break;
+		}
+
 		case IDM_OPTIONS_DBLTILE:
 		{
 			/* Paranoia */
@@ -3989,6 +4032,9 @@ static void process_menus(WORD wCmd)
 
 			/* Toggle "use_dbltile" */
 			use_dbltile = !use_dbltile;
+
+			/* Cancel "use_trptile" */
+			use_trptile = FALSE;
 
 			/* Mega-Hack : Redraw screen */
 			Term_key_push(KTRL('R'));

@@ -113,6 +113,7 @@ extern bool use_sound;
 extern bool use_graphics;
 extern bool use_bigtile;
 extern bool use_dbltile;
+extern bool use_trptile;
 extern s16b signal_count;
 extern bool msg_flag;
 extern bool inkey_base;
@@ -279,6 +280,7 @@ extern FILE *text_out_file;
 extern void (*text_out_hook)(byte a, cptr str);
 extern int text_out_wrap;
 extern int text_out_indent;
+extern int text_out_lines;
 extern int highscore_fd;
 extern bool use_transparency;
 
