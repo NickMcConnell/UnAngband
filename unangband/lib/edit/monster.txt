@@ -14152,7 +14152,7 @@ S:S_UNDEAD
 D:A skeletal form wrapped in robes and cloaked in darkness.  Powerful magic crackles along its bony
 D: fingers.
 
-N:970:Emporer lich
+N:970:Emperor lich
 G:L:v
 I:120:35d100:20:95:50
 W:48:2:0:15000
@@ -14444,7 +14444,7 @@ F:TAKE_ITEM | BASH_DOOR |
 F:EVIL | IM_COLD | IM_POIS | CAN_SWIM
 D:A large snake with a woman's torso and fins.
 
-N:990:Emporer naga
+N:990:Emperor naga
 G:n:U
 I:110:27d13:20:65:120
 W:22:1:0:120
@@ -15594,3 +15594,23 @@ F:BASH_DOOR | CAN_SWIM |
 F:ANIMAL | IM_WATER | HURT_WATER
 D:Liquid footprints follow this hound as it pads around the dungeon.  It
 D: has fins and a fish tail.
+
+N:1081:The Emperor Wight of Carn Dum
+G:W:r
+I:120:38d10:20:40:10
+W:38:2:0:1600
+B:HIT:HURT:1d12
+B:HIT:HURT:1d12
+B:TOUCH:EXP_80
+B:TOUCH:EXP_80
+F:FORCE_SLEEP | FORCE_MAXHP
+F:ONLY_ITEM | DROP_90 | DROP_4D2
+F:COLD_BLOOD | OPEN_DOOR | BASH_DOOR
+F:EVIL | UNDEAD | IM_COLD | IM_POIS | HURT_LITE | NO_CONF | NO_SLEEP
+F:UNIQUE | DROP_GOOD
+S:1_IN_6
+S:HOLD | SCARE | CAUSE_3 | BO_NETH
+D:Your life force is torn from your body as this powerful unearthly being
+D: approaches. It whispers dreadful words of ancient songs, cold and
+D: unearthly.
+
