@@ -2670,10 +2670,8 @@
 
 #define MFLAG_ACTV      0x0100    /* Monster is currently active */
 #define MFLAG_RUNS      0x0200    /* Monster is currently running */
-#define MFLAG_RUN_BREAK_LEFT    0x1000
-#define MFLAG_RUN_BREAK_RIGHT   0x2000
-#define MFLAG_RUN_OPEN_LEFT     0x4000
-#define MFLAG_RUN_OPEN_RIGHT    0x8000
+#define MFLAG_PUSH      0x0400    /* Monster has pushed/been pushed aside */
+
 
 /*
  * Monster movement (return from place_monster_on)

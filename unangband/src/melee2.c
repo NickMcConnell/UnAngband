@@ -4315,6 +4315,15 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 			move_chance = 100;
 		}
 
+		/* Pushed already */
+		else if ((m_ptr->mflag & (MFLAG_PUSH)) || (n_ptr->mflag & (MFLAG_PUSH)))
+		{
+
+			/* Cannot push away the other monster */
+			return (0);
+
+		}
+
 		/* Push past weaker or similar monsters */
 		else if (r_ptr->mexp >= nr_ptr->mexp)
 		{
@@ -6812,6 +6821,16 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 						do_move = FALSE;
 					}
 				}
+
+				/* Mark monsters as pushed */
+				if (do_move)
+				{
+					/* Monster has pushed */
+					m_ptr->mflag |= (MFLAG_PUSH);
+
+					/* Monster has been pushed aside */
+					n_ptr->mflag |= (MFLAG_PUSH);
+				}
 			}
 		}
 	}
@@ -7213,6 +7232,9 @@ static void process_monster(int m_idx)
 	bool random = FALSE;
 
 
+	/* Monster can act - Reset push flag */
+	m_ptr->mflag &= ~(MFLAG_PUSH);
+
 	/* If monster is sleeping, or in stasis, it loses its turn. */
 	if (m_ptr->csleep) return;
 
@@ -7253,7 +7275,6 @@ static void process_monster(int m_idx)
 			if (monster_can_smell(m_ptr)) m_ptr->mflag |= (MFLAG_ACTV);
 		}
 	}
-
 
 	/* A monster in passive mode will end its turn at this point. */
 	if (!(m_ptr->mflag & (MFLAG_ACTV))) return;
