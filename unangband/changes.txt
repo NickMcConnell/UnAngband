@@ -50,6 +50,8 @@ moving or attacking successfully (Bug 653).
 - Hidden monsters can no longer pick up objects from the ground or be hit
 by missile or thrown weapons (Bug 654).
 
+- Priest spell banish evil now works (Bug 681).
+
 ### Build / Platform ###
 
 - Remove references to nangband in makefile.
