@@ -26,6 +26,9 @@ file becoming excessively large.
 
 - Non-ego weapons with improved damage dice or sides now sense as "great".
 
+- You could spike a door multiple times to break it (Reported by @nothere).
+
+- Doors did not appear jammed after first spiking them (Reported by @nothere).
 
 UnAngband 0.5.4c: "Competitive Fix"
 
