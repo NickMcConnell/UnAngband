@@ -100,6 +100,11 @@ Display room names
 
 === Display options ===
 
+***** <show_flavors>
+Show flavors in object descriptions    [view_flavors]
+    Display "flavors" (color or variety) in object graphics, even for
+    objects whose type is known.
+
 ***** <view_glowing_lite>
 Use special colors for glowing lite (slow)   [view_glowing_lite]
     This option causes special colors to be used for "glowing" grids in

@@ -3229,7 +3229,7 @@
 #define OPT_disturb_panel  22
 #define OPT_disturb_state  23
 #define OPT_disturb_minor  24
-/* #define OPT_disturb_other */
+#define OPT_view_flavors   25
 /* #define OPT_alert_hitpoint */
 /* #define OPT_alert_failure */
 #define OPT_verify_destroy 28
@@ -3389,7 +3389,7 @@
 #define disturb_panel     op_ptr->opt[OPT_disturb_panel]
 #define disturb_state     op_ptr->opt[OPT_disturb_state]
 #define disturb_minor     op_ptr->opt[OPT_disturb_minor]
-#define disturb_other     op_ptr->opt[OPT_disturb_other]
+#define view_flavors      op_ptr->opt[OPT_view_flavors]
 #define alert_hitpoint    op_ptr->opt[OPT_alert_hitpoint]
 #define alert_failure     op_ptr->opt[OPT_alert_failure]
 #define verify_destroy    op_ptr->opt[OPT_verify_destroy]
@@ -3586,7 +3586,7 @@
  * Default to user definitions.
  */
 #define object_attr(T) \
-	((k_info[(T)->k_idx].flavor && !k_info[(T)->k_idx].aware) ? \
+	((k_info[(T)->k_idx].flavor && (view_flavors || !k_info[(T)->k_idx].aware)) ? \
 	 (x_info[k_info[(T)->k_idx].flavor].x_attr) : \
 	 (k_info[(T)->k_idx].x_attr))
 
@@ -3596,7 +3596,7 @@
  * Default to user definitions.
  */
 #define object_char(T) \
-	((k_info[(T)->k_idx].flavor && !k_info[(T)->k_idx].aware) ? \
+	((k_info[(T)->k_idx].flavor && (view_flavors || !k_info[(T)->k_idx].aware)) ? \
 	 (x_info[k_info[(T)->k_idx].flavor].x_char) : \
 	 (k_info[(T)->k_idx].x_char))
 

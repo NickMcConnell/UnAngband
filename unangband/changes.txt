@@ -19,11 +19,16 @@ stack size, you can reuse a rod every turn.
 options in the pref file. Just append :YES or :NO to the existing pref file
 entry in the graf-xxx.prf file. The default is 'NO' for any existing entry
 and 'YES' for any feature which does not have an entry (eg uses original
-ASCII graphics). This feature is not yet supported by any in-game display
-option and pref file tools.
+ASCII graphics).
 
 - Knowledge menu sub-items are sorted alphabetically. This could be changed 
 in the future to allow a selection of possible sort orders (Depth, kills etc).
+
+- 'view_flavors' option is added, which allows you to display, eg, known rings
+of speed using a different graphics consistently from game to game. This also
+allows all the David Gervais known scroll graphics to be used when a scroll is
+found. Switch this option from TRUE (The Angband default) to FALSE to enable
+this.
 
 ### Bug fixes ###
 

@@ -425,6 +425,11 @@ Show flavors in object descriptions    [show_flavors]
     Display "flavors" (color or variety) in object descriptions, even for
     objects whose type is known.  This does not affect objects in stores.
 
+***** <show_flavors>
+Show flavors in object descriptions    [view_flavors]
+    Display "flavors" (color or variety) in object graphics, even for
+    objects whose type is known.
+
 ***** <hilite_player>
 Hilite the player with the cursor    [hilite_player]
     Place the visible cursor on the player.  This looks fine on some Unix
