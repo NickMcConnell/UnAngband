@@ -38,6 +38,10 @@ spells as well as ball spells.
 Horowitz).
 - Guardians on surface levels are now generated during
 daytime as well (But still only night time in towns).
+- You can now recall objects while you are looking at
+them.
+- Statues/containers/body parts now give you some
+information about the monster when you discover them.
 
 Andrew Sidwell has volunteered to help out while I'm
 on holiday, as a 'caretaker' rather than fully fledged

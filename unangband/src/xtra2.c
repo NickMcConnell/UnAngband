@@ -4065,6 +4065,8 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 
 					object_type *o_ptr;
 
+					bool recall = FALSE;
+
 					/* Get the object */
 					o_ptr = &o_list[this_o_idx];
 
@@ -4074,11 +4076,48 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 					/* Obtain an object description */
 					object_desc(o_name, o_ptr, TRUE, 3);
 
-					/* Describe the object */
-					sprintf(out_val, "%s%s%s%s [%s]", s1, s2, s3, o_name, info);
-					prt(out_val, 0, 0);
-					move_cursor_relative(y, x);
-					query = inkey();
+					/* Interact */
+					while (1)
+					{
+						/* Recall */
+						if (recall)
+						{
+							/* Save screen */
+							screen_save();
+
+							/* Recall on screen */
+							screen_object(o_ptr, TRUE);
+
+							/* Hack -- Complete the prompt (again) */
+							Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
+
+							/* Command */
+							query = inkey();
+
+							/* Load screen */
+							screen_load();
+						}
+
+						/* Normal */
+						else
+						{
+							/* Describe the object */
+							sprintf(out_val, "%s%s%s%s [r,%s]", s1, s2, s3, o_name, info);
+							prt(out_val, 0, 0);
+
+							/* Place cursor */
+							move_cursor_relative(y, x);
+
+							/* Command */
+							query = inkey();
+						}
+
+						/* Normal commands */
+						if (query != 'r') break;
+
+						/* Toggle recall */
+						recall = !recall;
+					}
 
 					/* Stop on everything but "return"/"space" */
 					if ((query != '\n') && (query != '\r') && (query != ' ')) break;
@@ -4207,11 +4246,48 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 				/* Obtain an object description */
 				object_desc(o_name, o_ptr, TRUE, 3);
 
-				/* Describe the object */
-				sprintf(out_val, "%s%s%s%s [%s]", s1, s2, s3, o_name, info);
-				prt(out_val, 0, 0);
-				move_cursor_relative(y, x);
-				query = inkey();
+				/* Interact */
+				while (1)
+				{
+					/* Recall */
+					if (recall)
+					{
+						/* Save screen */
+						screen_save();
+
+						/* Recall on screen */
+						screen_object(o_ptr, TRUE);
+
+						/* Hack -- Complete the prompt (again) */
+						Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
+
+						/* Command */
+						query = inkey();
+
+						/* Load screen */
+						screen_load();
+					}
+
+					/* Normal */
+					else
+					{
+						/* Describe the object */
+						sprintf(out_val, "%s%s%s%s [r,%s]", s1, s2, s3, o_name, info);
+						prt(out_val, 0, 0);
+
+						/* Place cursor */
+						move_cursor_relative(y, x);
+
+						/* Command */
+						query = inkey();
+					}
+
+					/* Normal commands */
+					if (query != 'r') break;
+
+					/* Toggle recall */
+					recall = !recall;
+				}
 
 				/* Stop on everything but "return"/"space" */
 				if ((query != '\n') && (query != '\r') && (query != ' ')) break;
@@ -4360,7 +4436,6 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 
 
 			/* Interact */
-
 			while (1)
 			{
 				/* Recall */
