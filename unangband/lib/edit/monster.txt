@@ -8032,7 +8032,7 @@ D: uncertain all of a sudden.
 #Was the Mouth of Sauron
 
 N:532:Saruman of Many Colours
-G:q:v
+G:M:v
 I:130:70d100:60:100:10
 W:65:3:0:38000
 B:HIT:UN_BONUS:6d8
@@ -8097,7 +8097,7 @@ D:It is a giant dog that glows with heat.  Flames pour from its nostrils.
 # Was Cantoras, the Skeletal Lord
 
 N:538:The Mouth of Sauron
-G:q:v
+G:q:D
 I:140:75d100:20:120:80
 W:84:2:0:45000
 B:GAZE:EXP_80:5d5
@@ -9918,7 +9918,7 @@ F:EVIL | ORC | IM_FIRE | IM_COLD | IM_POIS | NO_CONF | NO_SLEEP
 D:A strong and cunning orc warrior, a commander of Saruman's orcish horde.
 
 N:645:The Sorcerer of Dol Goldur
-G:M:v
+G:q:s
 I:130:70d100:60:100:10
 W:65:3:0:38000
 B:HIT:UN_BONUS:6d8
