@@ -103,6 +103,78 @@ bool do_cmd_test(int y, int x, int action)
 }
 
 /*
+ * Print a list of spells (for browsing or casting or viewing).
+ */
+void print_routes(const s16b *route, int num, int y, int x)
+{
+	int i, town;
+
+	cptr distance;
+
+	char out_val[160];
+
+	byte line_attr;
+
+	town_type *t_ptr = &t_info[p_ptr->dungeon];
+	dungeon_zone *zone1 = &t_ptr->zone[0];
+
+	/* Title the list */
+	prt("", y, x);
+	put_str("Location", y, x + 5);
+	put_str(" Distance", y, x + 35);
+
+	/* Dump the routes */
+	for (i = 0; i < num; i++)
+	{
+		line_attr = TERM_WHITE;
+
+		/* Get the town index */
+		town = route[i];
+
+		/* Skip inaccessible towns */
+		if (town < 0)
+		{
+			t_ptr = &t_info[(-1) - town];
+
+			line_attr = TERM_SLATE;
+
+			sprintf(out_val, "  %c) %-30s near to %-16s",
+				I2A(i), t_name + t_ptr->name, t_name + t_info[t_ptr->nearby].name);
+			c_prt(line_attr, out_val, y + i + 1, x);
+
+			continue;
+		}
+
+		/* Get the distance */
+		if (t_ptr->nearby == town)
+		{
+			distance = "nearby";
+		}
+		else
+		{
+			distance = "distant";
+		}
+
+		/* Get the destination info */
+		t_ptr = &t_info[town];
+
+		/* Get the top of the dungeon */
+		get_zone(&zone1,p_ptr->dungeon,min_depth(p_ptr->dungeon));
+
+		/* Dump the spell --(-- */
+		sprintf(out_val, "  %c) %-30s %-16s",
+			I2A(i), t_name + t_ptr->name,distance);
+		c_prt(line_attr, out_val, y + i + 1, x);
+	}
+
+
+	/* Clear the bottom line */
+	prt("", y + i + 1, x);
+}
+
+
+
+/*
  * Travel to a different dungeon.
  *
  * This whole thing is a hack -- I haven't decided how elegant it is yet.
@@ -112,10 +184,6 @@ static void do_cmd_travel(void)
 	town_type *t_ptr = &t_info[p_ptr->dungeon];
 	dungeon_zone *zone1 = &t_ptr->zone[0];
 	dungeon_zone *zone2 = &t_ptr->zone[0];
-
-	cptr q, s;
-
-	int item;
 
 	int journey = 0;
 
@@ -166,152 +234,221 @@ static void do_cmd_travel(void)
 		{
 			int selection = p_ptr->dungeon;
 
-			/* Restrict choices to scrolls */
-			item_tester_tval = TV_MAP;
-
-			/* Get an item */
-			q = "Follow which map? ";
-			s = "You have no maps to guide you.";
-			if (get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) selection = inventory[item].sval;
-
-			/* Make sure we can get back */
-			if ((selection != p_ptr->dungeon) && (!(adult_campaign) || (t_info[selection].nearby == p_ptr->dungeon)))
+			if (adult_campaign)
 			{
-				 msg_format("This map will lead you to %s.",t_name + t_info[selection].name);
-				if (get_check("Journey there? "))
+				s16b routes[24];
+				char out_val[160];
+
+				int i, num = 0;
+
+				bool flag, redraw;
+				char choice;
+
+				/* Add nearby route */
+				routes[num++] = t_ptr->nearby;
+
+				/* Add far route if possible */
+				if (t_ptr->distant != p_ptr->dungeon)
 				{
-					journey = damroll(2,4);
+					if (!(zone2->guard) || (!r_info[zone2->guard].max_num))
+					{
+						routes[num++] = t_ptr->distant;
+					}
 				}
-				else
+
+				/* Add maps */
+				for (i = 0; i < INVEN_WIELD; i++)
 				{
-					selection = p_ptr->dungeon;
+
+					/* Skip non-objects */
+					if (!inventory[i].k_idx) continue;
+
+					if (inventory[i].tval == TV_MAP)
+					{
+						if (t_info[inventory[i].sval].nearby == p_ptr->dungeon)
+						{
+							routes[num++] = inventory[i].sval;
+						}
+						else
+						{
+							routes[num++] = -inventory[i].sval - 1;
+						}
+					}
 				}
+
+				/* Build a prompt (accept all spells) */
+				strnfmt(out_val, 78, "(Travel %c-%c, *=List, ESC=exit) Travel where? ",
+				I2A(0), I2A(num - 1) );
+
+				/* Nothing chosen yet */
+				flag = FALSE;
+
+				/* No redraw yet */
+				redraw = FALSE;
+
+				/* Get a spell from the user */
+				while (!flag && get_com(out_val, &choice))
+				{
+					/* Request redraw */
+					if ((choice == ' ') || (choice == '*') || (choice == '?'))
+					{
+						/* Hide the list */
+						if (redraw)
+						{
+							/* Load screen */
+							screen_load();
+
+							/* Hide list */
+							redraw = FALSE;
+						}
+
+						/* Show the list */
+						else
+						{
+							/* Show list */
+							redraw = TRUE;
+
+							/* Save screen */
+							screen_save();
+
+							/* Display a list of spells */
+							print_routes(routes, num, 1, 20);
+						}
+
+						/* Ask again */
+						continue;
+
+					}
+
+					/* Lowercase 1+*/
+					choice = tolower(choice);
+
+					/* Extract request */
+					i = (islower(choice) ? A2I(choice) : -1);
+
+					/* Totally Illegal */
+					if ((i < 0) || (i >= num))
+					{
+						bell("Illegal destination choice!");
+						continue;
+					}
+
+					/* Get selection */
+					selection = routes[i];
+
+					/* Require "okay" spells */
+					if (selection < 0)
+					{
+						bell("Illegal destination choice!");
+						msg_print("You may not travel there from here.");
+						continue;
+					}
+
+					/* Stop the loop */
+					flag = TRUE;
+				}
+
+				/* Restore the screen */
+				if (redraw)
+				{
+					/* Load screen */
+					screen_load();
+
+					/* Hack -- forget redraw */
+					/* redraw = FALSE; */
+				}
+
+
+				/* Abort if needed */
+				if (!flag) return;
+
 			}
-			else if (selection != p_ptr->dungeon)
+			else
 			{
-				/* XXX Bit wordy, but we may have many locations with 'identical' names. */
-				msg_print("You cannot follow this map yet.");
-				msg_format("But %s seems the best place to start.", t_name + t_info[t_info[selection].nearby].name);
-				selection = p_ptr->dungeon;
+				cptr q, s;
+
+				int item;
+
+				/* Return to Angband? */
+				if (p_ptr->dungeon != 0) selection = 0;
+
+				/* Restrict choices to scrolls */
+				item_tester_tval = TV_MAP;
+
+				/* Get an item */
+				q = "Follow which map? ";
+				s = "You have no maps to guide you.";
+				if (get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) selection = inventory[item].sval;
+
+				/* Did not make selection */
+				if (!selection) return;
+
+				/* Returning to Angband */
+				if (selection == p_ptr->dungeon) selection = 0;
+
+				/* Journey time */
+				journey = damroll(2,4);
+
 			}
 
-			/* Hack -- need a map to leave dungeon */
-			/* if (p_ptr->dungeon == 0) return; */
-			if (!adult_campaign && p_ptr->dungeon == 0) return;
-
-			if ((selection==p_ptr->dungeon) && !(adult_campaign))
+			if (journey < 4)
 			{
-				msg_format("You see a trail back to %s.",t_name + t_info[0].name);
-				if (get_check("Journey there? "))
-				{
-					selection = 0;
-					
-					journey = damroll(2,4);
-				}
+				msg_print("You have a mild and pleasant journey.");
 			}
-			else if ((selection==p_ptr->dungeon) && (t_ptr->nearby != p_ptr->dungeon))
+			else if (journey < 7)
 			{
-				msg_format("You see a well worn trail to %s.",t_name + t_info[t_ptr->nearby].name);
-				if (get_check("Journey there? "))
-				{
-					selection = t_ptr->nearby;
-					
-					journey = damroll(2,4);
-				}
+				msg_print("Your travels are without incident.");
+			}
+			else if (journey < 10)
+			{
+				msg_print("You have a long and arduous trip.");
+			}
+			else
+			{
+				msg_print("You get lost in the wilderness!");
+				/* XXX Fake a wilderness location? */
 			}
 
-			if ((selection==p_ptr->dungeon)
-			 && (t_ptr->distant != p_ptr->dungeon)
-			 && ((!zone2->guard) || (!r_info[zone2->guard].max_num)))
-			{
+			/* Hack -- Get hungry/tired/sore */
+			set_food(p_ptr->food-(PY_FOOD_FULL/10*journey));
 
-				if (!zone2->guard) msg_format("In the distance lies %s.",t_name + t_info[t_ptr->distant].name);
-				else msg_format("By defeating %s, you have opened the way to %s.",
-				r_name + r_info[zone2->guard].name, t_name + t_info[t_ptr->distant].name);
+			/* Hack -- Time passes (at 4* food use rate) */
+			turn += PY_FOOD_FULL/10*journey*4;
 
-				if (get_check("Journey there? "))
-				{
-					selection = t_ptr->distant;
+			/* XXX Recharges, stop temporary speed etc. */
 
-					journey = damroll(3,4);
+			/* Change the dungeon */
+			p_ptr->dungeon = selection;
 
-				}
-
-			}
-			else if ((zone2->guard) && (selection == p_ptr->dungeon))
-			{
-				/* XXX Reveal monster name? */
-				msg_format("All other ways are guarded by %s.",r_name + r_info[zone2->guard].name);
-			}
-
-			/* Do we travel? */
-			if (selection != p_ptr->dungeon)
-			{
-				if (journey < 4)
-				{
-					msg_print("You have a mild and pleasant journey.");
-				}
-				else if (journey < 7)
-				{
-					msg_print("Your travels are without incident.");
-				}
-				else if (journey < 10)
-				{
-					msg_print("You have a long and arduous trip.");
-				}
-				else
-				{
-					msg_print("You get lost in the wilderness!");
-					/* XXX Fake a wilderness location? */
-				}
-
-				/* Hack -- Get hungry/tired/sore */
-				set_food(p_ptr->food-(PY_FOOD_FULL/10*journey));
-
-				/* Hack -- Time passes (at 4* food use rate) */
-				turn += PY_FOOD_FULL/10*journey*4;
-
-				/* XXX Recharges, stop temporary speed etc. */
-
-				/* Change the dungeon */
-				p_ptr->dungeon = selection;
-
-				/* Set the new depth */
-				p_ptr->depth = min_depth(p_ptr->dungeon);
+			/* Set the new depth */
+			p_ptr->depth = min_depth(p_ptr->dungeon);
 
 #if 0
-				/* Reset the recall depth */
-				p_ptr->max_depth = min_depth(p_ptr->dungeon);
+			/* Reset the recall depth */
+			p_ptr->max_depth = min_depth(p_ptr->dungeon);
 #endif
 
-				/* Mega-hack */
-				if ((adult_campaign) && (p_ptr->dungeon == z_info->t_max -1))
-				{
+			/* Mega-hack */
+			if ((adult_campaign) && (p_ptr->dungeon == z_info->t_max -1))
+			{
 
-					p_ptr->total_winner = TRUE;
+				p_ptr->total_winner = TRUE;
 
-					/* Redraw the "title" */
-					p_ptr->redraw |= (PR_TITLE);
+				/* Redraw the "title" */
+				p_ptr->redraw |= (PR_TITLE);
 
-					/* Congratulations */
-					msg_print("*** CONGRATULATIONS ***");
-					msg_print("You have won the game!");
-					msg_print("You may retire (commit suicide) when you are ready.");
-				}
+				/* Congratulations */
+				msg_print("*** CONGRATULATIONS ***");
+				msg_print("You have won the game!");
+				msg_print("You may retire (commit suicide) when you are ready.");
+			}
 
-				/* Leaving */
-				p_ptr->leaving = TRUE;
-
-			}				
-
+			/* Leaving */
+			p_ptr->leaving = TRUE;
 		}
 
 		return;
-
 	}
-
-
-
 }
 
 
