@@ -522,10 +522,10 @@ void do_cmd_wield(void)
 
 	/* Check for new flags */
 	n1 = o_ptr->can_flags1 & ~(k1);
-	n2 = o_ptr->can_flags1 & ~(k2);
-	n3 = o_ptr->can_flags1 & ~(k3);
+	n2 = o_ptr->can_flags2 & ~(k2);
+	n3 = o_ptr->can_flags3 & ~(k3);
 
-	if (n1 || n2 || n3) update_slot_flags(INVEN_WIELD, n1, n2, n3);
+	if (n1 || n2 || n3) update_slot_flags(slot, n1, n2, n3);
 
 	/* Recalculate bonuses */
 	p_ptr->update |= (PU_BONUS);
@@ -1162,7 +1162,8 @@ void do_cmd_refill(void)
 	object_type *i_ptr;
 	object_type *j_ptr;
 
-object_type object_type_body;
+	object_type object_type_body;
+	object_type feat_object_type_body;
 
 	cptr q, s;
 
@@ -1231,9 +1232,7 @@ bool unstack = FALSE;
 	/* Get the feature */
 	if (item2 >= INVEN_TOTAL+1)
 	{
-		object_type object_type_body;
-
-		j_ptr = &object_type_body;
+		j_ptr = &feat_object_type_body;
 
 		if (!make_feat(j_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
 	}
@@ -1269,6 +1268,9 @@ bool unstack = FALSE;
 
 		/* Unstack the used item */
 		o_ptr->number--;
+
+		/* Adjust the weight */
+		p_ptr->total_weight -= i_ptr->weight;
 
 		o_ptr = i_ptr;
 
@@ -1321,39 +1323,22 @@ bool unstack = FALSE;
 	}
 	else
 	{
-		if (unstack)
-		{
-			/* We are done */
-		}
-		else if (item >= INVEN_TOTAL+1)
-		{
-			cave_alter_feat(p_ptr->py,p_ptr->px,FS_USE_FEAT);
-		}
+		/* Fill empty bottle or flask with the potion */
+		object_copy(o_ptr, j_ptr);
 
-		/* Decrease the item (in the pack) */
-		else if ((item >= 0) && (o_ptr->tval != TV_LITE))
-		{
-			inven_item_increase(item, -1);
-			inven_item_describe(item);
-			inven_item_optimize(item);
-		}
-		/* Decrease the item (from the floor) */
-		else
-		{
-			floor_item_increase(0 - item, -1);
-			floor_item_describe(0 - item);
-			floor_item_optimize(0 - item);
-		}
+		/* Modify quantity */
+		o_ptr->number = 1;
 
-		/* Adjust the weight and carry */
-		item = inven_carry(j_ptr);
+		/* Reset stack counter */
+		o_ptr->stackc = 0;
 
+		/* Adjust the weight */
+		p_ptr->total_weight += o_ptr->weight;
 	}
 
 	if (unstack)
 	{
-		/* Adjust the weight and carry */
-		p_ptr->total_weight -= o_ptr->weight;
+		/* Carry */
 		item = inven_carry(o_ptr);
 	}
 

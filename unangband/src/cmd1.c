@@ -1371,14 +1371,16 @@ void py_attack(int y, int x)
 	/* Attack once for each legal blow */
 	while (num++ < p_ptr->num_blow)
 	{
+		int slot = INVEN_WIELD;
+
 		/* Deliver a blow */
 		blows++;
 
-		/* Get the weapon */
-		o_ptr = &inventory[INVEN_WIELD];
-
 		/* Get secondary weapon instead */
-		if (!(blows % 2) && (melee_style & (1L << WS_TWO_WEAPON))) o_ptr = &inventory[INVEN_ARM];
+		if (!(blows % 2) && (melee_style & (1L << WS_TWO_WEAPON))) slot = INVEN_ARM;
+
+		/* Get the weapon */
+		o_ptr = &inventory[slot];
 
 		/* Get the unarmed weapon */
 		if (melee_style & (1L << WS_UNARMED))
@@ -1442,10 +1444,10 @@ void py_attack(int y, int x)
 
 				/* Check for new flags */
 				n1 = o_ptr->can_flags1 & ~(k1);
-				n2 = o_ptr->can_flags1 & ~(k2);
-				n3 = o_ptr->can_flags1 & ~(k3);
+				n2 = o_ptr->can_flags2 & ~(k2);
+				n3 = o_ptr->can_flags3 & ~(k3);
 
-				if (n1 || n2 || n3) update_slot_flags(INVEN_WIELD, n1, n2, n3);
+				if (n1 || n2 || n3) update_slot_flags(slot, n1, n2, n3);
 
 				/* Check usage */
 				object_usage(INVEN_WIELD);

@@ -57,6 +57,7 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 			*f1 |= o_ptr->can_flags1;
 			*f2 |= o_ptr->can_flags2;
 			*f3 |= o_ptr->can_flags3;
+			return;
 		}
 
 		/* Must be identified */

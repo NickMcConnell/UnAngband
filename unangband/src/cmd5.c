@@ -136,6 +136,10 @@ int i,ii;
 		/* Get a random spell */
 		*sn = book[rand_int(num)];
 
+#ifdef ALLOW_REPEAT
+		repeat_push(*sn);
+#endif /* ALLOW_REPEAT */
+
 		/* Something happened */
 		return (TRUE);
 	}

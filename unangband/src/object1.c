@@ -1691,7 +1691,7 @@ s16b wield_slot(const object_type *o_ptr)
 			/* Two-weapon combat -- primary weapon */
 			if ((inventory[INVEN_ARM].k_idx)
 				&& ((inventory[INVEN_ARM].tval == TV_SWORD)
-					|| (inventory[INVEN_WIELD].tval == TV_STAFF)
+					|| (inventory[INVEN_ARM].tval == TV_STAFF)
 					|| (inventory[INVEN_ARM].tval == TV_POLEARM)
 						|| (inventory[INVEN_ARM].tval == TV_HAFTED)))
 			{
