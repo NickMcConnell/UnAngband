@@ -4698,7 +4698,7 @@ static void display_object_list(int col, int row, int per_page, int object_idx[]
 		attr = ((i + object_top == object_cur) ? cursor : attr);
 
 		/* Symbol is unknown */	
-		if (!k_ptr->aware && !p_ptr->wizard)
+		if (!k_ptr->aware && !k_ptr->flavor && !p_ptr->wizard)
 		{
 			c = ' ';
 			a = TERM_DARK;
