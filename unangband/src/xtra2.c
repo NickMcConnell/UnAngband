@@ -2931,11 +2931,17 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 
 		case (ROOM_PIT_GIANT):
 		{
-			strcat(name, "dragon pit");
-			strcpy(text_visible, "You have entered a room used as a breeding ground for dragons. ");
+			strcpy(name, "giant pit");
+			strcpy(text_visible, "You have stumbled into the barracks of a group of giants.");
 			return;
 		}
 		case (ROOM_PIT_DRAGON):
+		{
+			strcat(name, "dragon pit");
+			strcpy(text_visible, "You have entered a room used as a breeding ground for dragons. ");
+			return;
+                }
+		case (ROOM_PIT_DEMON):
 		{
 			strcpy(name, "demon pit");
 			strcpy(text_visible, "You have entered a chamber full of arcane symbols, and an overpowering smell of brimstone.");
