@@ -69,6 +69,7 @@ provide when inspected or browsed.
 
 - Can correctly edit the displayed graphic for tree tops.
 
+- Flavoured items are now correctly displayed when unknown for all graphics.
 
 ### Build / Platform ###
 

@@ -3592,10 +3592,13 @@
 
 /*
  * Return the "char" for a given item.
+ * Use "flavor" if available and not aware.
  * Default to user definitions.
  */
 #define object_char(T) \
-	 (k_info[(T)->k_idx].x_char)
+	((k_info[(T)->k_idx].flavor && !k_info[(T)->k_idx].aware) ? \
+	 (x_info[k_info[(T)->k_idx].flavor].x_char) : \
+	 (k_info[(T)->k_idx].x_char))
 
 
 
