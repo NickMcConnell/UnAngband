@@ -3243,7 +3243,7 @@
 #define OPT_easy_autos    81
 #define OPT_easy_search			82
 #define OPT_variant_save_feats   83
-/* xxx */
+#define OPT_view_glowing_lite 84
 /* xxx xxx */
 #define OPT_birth_point_based    (OPT_BIRTH+0)
 #define OPT_birth_auto_roller    (OPT_BIRTH+1)
@@ -3400,8 +3400,8 @@
 #define reseed_artifacts			op_ptr->opt[OPT_reseed_artifacts]
 #define easy_autos   op_ptr->opt[OPT_easy_autos]
 #define easy_search   op_ptr->opt[OPT_easy_search]
-/* xxx */
-/* xxx */
+#define view_glowing_lite   op_ptr->opt[OPT_view_glowing_lite]
+
 /* xxx xxx */
 #define birth_point_based op_ptr->opt[OPT_birth_point_based]
 #define birth_auto_roller op_ptr->opt[OPT_birth_auto_roller]

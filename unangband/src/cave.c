@@ -721,6 +721,33 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 								a = TERM_YELLOW;
 							}
 						}
+						else if (view_glowing_lite)
+						{
+							int i;
+
+							for (i = 0; i < 8; i++)
+							{
+								int yy = y + ddy_ddd[i];
+								int xx = x + ddx_ddd[i];
+
+								/* Ignore annoying locations */
+								if (!in_bounds_fully(yy, xx)) continue;
+
+								if (f_info[cave_feat[yy][xx]].flags3 & (FF3_OUTSIDE))
+								{
+									if (graf_new)
+									{
+										/* Use a brightly lit tile */
+										c += 2;
+									}
+									else
+									{
+										/* Use "yellow" */
+										a = TERM_YELLOW;
+									}
+								}
+							}
+						}
 					}
 
 					/* Handle "blind" */
@@ -797,6 +824,28 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 							{
 								/* Use lighter shade */
 								a = lite_attr[f_ptr->x_attr];
+							}
+						}
+						else if (view_glowing_lite)
+						{
+							int i;
+
+							for (i = 0; i < 8; i++)
+							{
+								int yy = y + ddy_ddd[i];
+								int xx = x + ddx_ddd[i];
+
+								/* Ignore annoying locations */
+								if (!in_bounds_fully(yy, xx)) continue;
+
+								if (f_info[cave_feat[yy][xx]].flags3 & (FF3_OUTSIDE))
+								{
+									if (!graf_new)
+									{
+										/* Use lighter shade */
+										a = lite_attr[f_ptr->x_attr];
+									}
+								}
 							}
 						}
 					}

@@ -56,6 +56,13 @@ the Blackmarket in Angband will now generate items at a
 deeper level.
 - If you are hidden in darkness, a lot more monsters will
 use light to see by...
+- Added option view_glowing_lite which applies special
+(eg torch-lit) lighting to boring grids that are adjacent
+to glowing features such as torches in a room. This is
+another 'pretty' function that may cause a slight
+performance hit, but should make those screen dumps even
+prettier.
+
 
 Andrew Sidwell has volunteered to help out while I'm
 on holiday, as a 'caretaker' rather than fully fledged
