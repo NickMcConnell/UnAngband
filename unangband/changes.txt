@@ -55,8 +55,10 @@ look and act like real waves.
 - Doors and other wooden objects now cause persistent fires, which can be
 put out by bashing them.
 
-- Teleport is now a lot safer to use. You will not be placed in potentially
-dangerous grids.
+- Teleport is now a lot safer to use. You will not be placed in
+potentially dangerous grids.
+
+- Musical instruments will now occasionally be ego items.
 
 ### User Interface ###
 

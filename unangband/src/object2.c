@@ -2545,15 +2545,9 @@ static void a_m_aux_1(object_type *o_ptr, int level, int power)
 	{
 		case TV_DIGGING:
 		{
-			/* Very good */
-			if (power > 1)
-			{
-				/* Special Ego-item */
-				o_ptr->name2 = EGO_DIGGING;
-			}
 
 			/* Very bad */
-			else if (power < -1)
+			if (power < -1)
 			{
 				/* Hack -- Horrible digging bonus */
 				o_ptr->pval = 0 - (5 + randint(5));
@@ -3218,6 +3212,13 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		case TV_BOOTS:
 		{
 			if (power) a_m_aux_2(o_ptr, lev, power);
+			if (((power > 1) ? TRUE : FALSE) || (power < -1))
+				(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
+			break;
+		}
+
+		case TV_INSTRUMENT:
+		{
 			if (((power > 1) ? TRUE : FALSE) || (power < -1))
 				(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
 			break;
