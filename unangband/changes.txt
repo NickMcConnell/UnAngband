@@ -45,6 +45,15 @@ them. You will recall the monster instead if they are
 a monster body part or container or statue...
 - Removed Create Golem spell until friendly monsters are
 implemented.
+- Fixed bug preventing creation of town in Minas Tirith.
+- Added Heavy Armoury, Heavy Weaponsmith, Runesmith and
+Chemist and added to and reorganised stores in a number
+of towns.
+- Improved store inventories in Jewelers, Marketplace,
+Barracks and Blackmarket to be more appropriate for players
+at the level they will encounter the stores. Note that
+the Blackmarket in Angband will now generate items at a
+deeper level.
 
 Andrew Sidwell has volunteered to help out while I'm
 on holiday, as a 'caretaker' rather than fully fledged

@@ -41,7 +41,7 @@ M:V:51
 M:T:54
 
 # Maximum number of stores
-M:U:30
+M:U:34
 
 # Maximum number of player races
 M:P:11
