@@ -2973,10 +2973,7 @@ void object_guess_name(object_type *o_ptr)
  */
 void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3)
 {
-	u32b if1 = o_ptr->may_flags1 & (f1);
-	u32b if2 = o_ptr->may_flags2 & (f2);
-	u32b if3 = o_ptr->may_flags3 & (f3);
-
+	u32b xf1 = 0, xf2 = 0, xf3 = 0;
 	int i;
 
 	/* Variant? */
@@ -2990,6 +2987,10 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3)
 	/* Clear may flags on all kit - include inventory */
 	for (i = 0; i < INVEN_TOTAL+1; i++)
 	{
+		u32b if1 = o_ptr->may_flags1 & (f1);
+		u32b if2 = o_ptr->may_flags2 & (f2);
+		u32b if3 = o_ptr->may_flags3 & (f3);
+
 		object_type *i_ptr = &inventory[i];
 
 		/* Skip non-objects */
@@ -3048,15 +3049,18 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3)
 	{
 		if (object_xtra_what[o_ptr->xtra1] == 1)
 		{
-			(f1) &= ~(object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+			xf1 = (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+			f1 &= ~xf1;
 		}
 		else if (object_xtra_what[o_ptr->xtra1] == 2)
 		{
-			(f2) &= ~(object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+			xf2 = (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+			f2 &= ~xf2;
 		}
 		else if (object_xtra_what[o_ptr->xtra1] == 3)
 		{
-			(f3) &= ~(object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+			xf3 = (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+			f3 &= ~xf3;
 		}
 	}
 
@@ -3070,14 +3074,20 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3)
 		n_ptr->not_flags2 &= ~(f2);
 		n_ptr->not_flags3 &= ~(f3);
 
-		n_ptr->may_flags1 &= ~(f1);
-		n_ptr->may_flags2 &= ~(f2);
-		n_ptr->may_flags3 &= ~(f3);
-
+		/* Fixed flags */
 		n_ptr->can_flags1 |= (f1);
 		n_ptr->can_flags2 |= (f2);
 		n_ptr->can_flags3 |= (f3);
 
+		/* Extra flags */
+		n_ptr->may_flags1 |= xf1;
+		n_ptr->may_flags2 |= xf2;
+		n_ptr->may_flags3 |= xf3;
+
+		/* Exclude fixed flags */
+		n_ptr->may_flags1 &= ~(n_ptr->can_flags1);
+		n_ptr->may_flags2 &= ~(n_ptr->can_flags2);
+		n_ptr->may_flags3 &= ~(n_ptr->can_flags3);
 	}
 
 	/* Ego item */
@@ -3089,28 +3099,20 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3)
 		n_ptr->not_flags2 &= ~(f2);
 		n_ptr->not_flags3 &= ~(f3);
 
-		if (!o_ptr->xtra1)
-		{
-			n_ptr->can_flags1 |= f1;
-			n_ptr->can_flags2 |= f2;
-			n_ptr->can_flags3 |= f3;
-		}
-		else if ((n_ptr->can_flags1) || (n_ptr->can_flags2) || (n_ptr->can_flags3))
-		{
-			f1 &= ~(n_ptr->may_flags1);
-			f2 &= ~(n_ptr->may_flags2);
-			f3 &= ~(n_ptr->may_flags3);
+		/* Fixed flags */
+		n_ptr->can_flags1 |= (f1);
+		n_ptr->can_flags2 |= (f2);
+		n_ptr->can_flags3 |= (f3);
 
-			n_ptr->can_flags1 |= f1;
-			n_ptr->can_flags2 |= f2;
-			n_ptr->can_flags3 |= f3;
-		}
-		else
-		{
-			n_ptr->may_flags1 |= f1;
-			n_ptr->may_flags2 |= f2;
-			n_ptr->may_flags3 |= f3;
-		}
+		/* Extra flags */
+		n_ptr->may_flags1 |= xf1;
+		n_ptr->may_flags2 |= xf2;
+		n_ptr->may_flags3 |= xf3;
+
+		/* Exclude fixed flags */
+		n_ptr->may_flags1 &= ~(n_ptr->can_flags1);
+		n_ptr->may_flags2 &= ~(n_ptr->can_flags2);
+		n_ptr->may_flags3 &= ~(n_ptr->can_flags3);
 	}
 }
 
@@ -3304,10 +3306,6 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3)
 		n_ptr->not_flags2 |= f2;
 		n_ptr->not_flags3 |= f3;
 
-		n_ptr->may_flags1 &= ~(f1);
-		n_ptr->may_flags2 &= ~(f2);
-		n_ptr->may_flags3 &= ~(f3);
-
 		n_ptr->can_flags1 &= ~(f1);
 		n_ptr->can_flags2 &= ~(f2);
 		n_ptr->can_flags3 &= ~(f3);
@@ -3315,64 +3313,18 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3)
 	}
 
 	/* Ego item */
-	if (o_ptr->name2)
+	else if (o_ptr->name2)
 	{
 		object_lore *n_ptr = &e_list[o_ptr->name2];
 
-		u32b one_resist = OBJECT_XTRA_BASE_RESIST + (1L<<OBJECT_XTRA_SIZE_RESIST) -1;
-		u32b one_sustain = OBJECT_XTRA_BASE_SUSTAIN + (1L<<OBJECT_XTRA_SIZE_SUSTAIN) -1;
-		u32b one_power = OBJECT_XTRA_BASE_POWER + (1L<<OBJECT_XTRA_SIZE_POWER) -1;
+		n_ptr->not_flags1 |= f1;
+		n_ptr->not_flags2 |= f2;
+		n_ptr->not_flags3 |= f3;
 
 		n_ptr->can_flags1 &= ~(f1);
 		n_ptr->can_flags2 &= ~(f2);
 		n_ptr->can_flags3 &= ~(f3);
-
-		if ((n_ptr->may_flags2 & (f2)) && (f2 & one_sustain))
-		{
-			/* One sustain */
-			n_ptr->can_flags1 |= n_ptr->may_flags1;
-			n_ptr->can_flags2 |= (n_ptr->may_flags2 & ~(one_sustain));
-			n_ptr->can_flags3 |= n_ptr->may_flags3;
-
-			object_can_flags(o_ptr,n_ptr->can_flags1,n_ptr->can_flags2,
-					n_ptr->can_flags3);
-
-			n_ptr->may_flags1 = 0x0L;
-			n_ptr->may_flags2 = one_sustain;
-			n_ptr->may_flags3 = 0x0L;
-
-		}
-		else if ((n_ptr->may_flags2 & (f2)) && (f2 & one_resist))
-		{
-			/* One resist */
-			n_ptr->can_flags1 |= n_ptr->may_flags1;
-			n_ptr->can_flags2 |= (n_ptr->may_flags2 & ~(one_resist));
-			n_ptr->can_flags3 |= n_ptr->may_flags3;
-
-			object_can_flags(o_ptr,n_ptr->can_flags1,n_ptr->can_flags2,
-					n_ptr->can_flags3);
-
-			n_ptr->may_flags1 = 0x0L;
-			n_ptr->may_flags2 = one_resist;
-			n_ptr->may_flags3 = 0x0L;
-		}
-		else if ((n_ptr->may_flags3 & (f3)) && (f2 & one_power))
-		{
-			/* One ability */
-			n_ptr->can_flags1 |= n_ptr->may_flags1;
-			n_ptr->can_flags2 |= n_ptr->may_flags2;
-			n_ptr->can_flags3 |= (n_ptr->may_flags3 & ~(one_power));
-
-			object_can_flags(o_ptr,n_ptr->can_flags1,n_ptr->can_flags2,
-					n_ptr->can_flags3);
-
-			n_ptr->may_flags1 = 0x0L;
-			n_ptr->may_flags2 = 0x0L;
-			n_ptr->may_flags3 = one_power;
-		}
-
 	}
-
 }
 
 /*
