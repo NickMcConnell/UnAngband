@@ -33,6 +33,12 @@ parts.
 
 - Added statues of varying values. These are all extremely heavy however.
 
+- Added flying skulls of various types.
+
+- Upgraded unique cats.
+
+- Amended various monster types to do battering and wounding damage as per Sangband.
+
 ### User Interface ###
 
 - Monster recall now reports what particular types of items are dropped by each
