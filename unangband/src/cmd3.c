@@ -277,7 +277,7 @@ void do_cmd_wield(void)
 		return;
 	}
 	/* Prevent wielding from cursed slot */
-	else if (cursed_p(&inventory[item]) && (item >= INVEN_WIELD) && (item != INVEN_BELT))
+	else if ((item >= INVEN_WIELD) && cursed_p(&inventory[item]) && (item != INVEN_BELT))
 	{
 		/* Describe it */
 		object_desc(o_name, &inventory[item], FALSE, 0);
@@ -361,17 +361,20 @@ void do_cmd_wield(void)
 		object_copy(j_ptr, o_ptr);
 
 	}
-	/* Drop existing item */
-	else if ((o_ptr->k_idx) && (p_ptr->energy_use == 50))
-	{
-		/* Take off existing item */
-		(void)inven_drop(slot, 255);
-	}
 	/* Take off existing item */
 	else if ((o_ptr->k_idx) && (!rings))
 	{
-		/* Take off existing item */
-		(void)inven_takeoff(slot, 255);
+                /* variant_fast_floor? */
+                if (p_ptr->energy_use == 50)
+                {
+                        /* Drop existing item */
+                        (void)inven_drop(slot, 255);
+                }
+                else
+                {
+                        /* Take off existing item */
+                        (void)inven_takeoff(slot, 255);
+                }
 	}
 
 	/* Wear the new rings */
