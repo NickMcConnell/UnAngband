@@ -322,25 +322,25 @@ void do_cmd_go_up(void)
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
-feature_type *f_ptr= &f_info[cave_feat[py][px]];
+	feature_type *f_ptr= &f_info[cave_feat[py][px]];
 
 	/* Verify stairs */
-if (!(f_ptr->flags1 & (FF1_STAIRS)) || !(f_ptr->flags1 & (FF1_LESS)))
+	if (!(f_ptr->flags1 & (FF1_STAIRS)) || !(f_ptr->flags1 & (FF1_LESS)))
 	{
 
-/* Travel if possible */
-if (p_ptr->depth == min_depth(p_ptr->dungeon))
-{
-do_cmd_travel();
-return;
-}
+		/* Travel if possible */
+		if (p_ptr->depth == min_depth(p_ptr->dungeon))
+		{
+			do_cmd_travel();
+			return;
+		}
 
 		msg_print("I see no up staircase here.");
 		return;
 	}
 
 	/* Ironman */
-if ((adult_ironman) && !(adult_campaign))
+	if ((adult_ironman) && !(adult_campaign))
 	{
 		msg_print("Nothing happens!");
 		return;
@@ -355,17 +355,17 @@ if ((adult_ironman) && !(adult_campaign))
 	/* Create a way back */
 	p_ptr->create_down_stair = TRUE;
 
-/* Hack -- tower level increases depth */
-if (t_info[p_ptr->dungeon].zone[0].tower)
-{
-/* New depth */
-p_ptr->depth++;
-}
-else
-{
-/* New depth */
-p_ptr->depth--;
-}
+	/* Hack -- tower level increases depth */
+	if (t_info[p_ptr->dungeon].zone[0].tower)
+	{
+		/* New depth */
+		p_ptr->depth++;
+	}
+	else
+	{
+		/* New depth */
+		p_ptr->depth--;
+	}
 
 	/* Leaving */
 	p_ptr->leaving = TRUE;
@@ -380,56 +380,56 @@ void do_cmd_go_down(void)
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
-feature_type *f_ptr= &f_info[cave_feat[py][px]];
+	feature_type *f_ptr= &f_info[cave_feat[py][px]];
 
 	/* Verify stairs */
-if (!(f_ptr->flags1 & (FF1_STAIRS)) || !(f_ptr->flags1 & (FF1_MORE)))
+	if (!(f_ptr->flags1 & (FF1_STAIRS)) || !(f_ptr->flags1 & (FF1_MORE)))
 	{
-msg_print("I see no down staircase here.");
+		msg_print("I see no down staircase here.");
 		return;
 	}
 
 	/* Hack -- take a turn */
 	p_ptr->energy_use = 100;
 
-/* Hack -- travel through wilderness */
-if ((adult_campaign) && (p_ptr->depth == max_depth(p_ptr->dungeon)))
-{
+	/* Hack -- travel through wilderness */
+	if ((adult_campaign) && (p_ptr->depth == max_depth(p_ptr->dungeon)))
+	{
 
-message(MSG_STAIRS,0,format("You have found a way through %s.",t_name + t_info[p_ptr->dungeon].name));
+		message(MSG_STAIRS,0,format("You have found a way through %s.",t_name + t_info[p_ptr->dungeon].name));
 
-/* Change the dungeon */
-p_ptr->dungeon = t_info[p_ptr->dungeon].distant;
+		/* Change the dungeon */
+		p_ptr->dungeon = t_info[p_ptr->dungeon].distant;
 
-/* Set the new depth */
-p_ptr->depth = min_depth(p_ptr->dungeon);
+		/* Set the new depth */
+		p_ptr->depth = min_depth(p_ptr->dungeon);
 
 		/* Leaving */
 		p_ptr->leaving = TRUE;
-}
+	}
 	else
 	{
 
-/* Success */
-message(MSG_STAIRS, 0, "You enter a maze of down staircases.");
+		/* Success */
+		message(MSG_STAIRS, 0, "You enter a maze of down staircases.");
 
-/* Create a way back */
-p_ptr->create_up_stair = TRUE;
+		/* Create a way back */
+		p_ptr->create_up_stair = TRUE;
 
-/* Hack -- tower level decreases depth */
-if (t_info[p_ptr->dungeon].zone[0].tower)
-{
-/* New depth */
-p_ptr->depth--;
-}
-else
-{
-/* New depth */
-p_ptr->depth++;
-}
+		/* Hack -- tower level decreases depth */
+		if (t_info[p_ptr->dungeon].zone[0].tower)
+		{
+			/* New depth */
+			p_ptr->depth--;
+		}
+		else
+		{
+			/* New depth */
+			p_ptr->depth++;
+		}
 
-/* Leaving */
-p_ptr->leaving = TRUE;
+		/* Leaving */
+		p_ptr->leaving = TRUE;
 	}
 }
 
@@ -551,10 +551,10 @@ static int count_feats(int *y, int *x, int action)
 		/* Must have knowledge */
 		if (!(cave_info[yy][xx] & (CAVE_MARK))) continue;
 
-/* If stuck in something, we can only modify it */
-      if (!(f_info[cave_feat[p_ptr->py][p_ptr->px]].flags1 & (FF1_MOVE))
-&& !(f_info[cave_feat[p_ptr->py][p_ptr->px]].flags3 & (FF3_EASY_CLIMB))
-		&& (d!=9)) continue;
+		/* If stuck in something, we can only modify it */
+	      if (!(f_info[cave_feat[p_ptr->py][p_ptr->px]].flags1 & (FF1_MOVE))
+			&& !(f_info[cave_feat[p_ptr->py][p_ptr->px]].flags3 & (FF3_EASY_CLIMB))
+			&& (d!=9)) continue;
 
 		/* Get the feature */
 		feat = cave_feat[yy][xx];
@@ -570,7 +570,7 @@ static int count_feats(int *y, int *x, int action)
 			if (!(f_ptr->flags1 & flag)) continue;  
 		}
 
-else if (action < FS_FLAGS_END)
+		else if (action < FS_FLAGS_END)
 		{       
 			flag = bitzero << (action - FS_FLAGS2);
 			if (!(f_ptr->flags2 & flag)) continue;  
@@ -732,8 +732,8 @@ void do_cmd_open(void)
 	/* Easy Open */
 	if (easy_open)
 	{
-/* Handle a single closed door  */
-if (count_feats(&y, &x, FS_OPEN)  == 1)
+		/* Handle a single closed door  */
+		if (count_feats(&y, &x, FS_OPEN)  == 1)
 		{
 			p_ptr->command_dir = coords_to_dir(y, x);
 		}
@@ -750,7 +750,7 @@ if (count_feats(&y, &x, FS_OPEN)  == 1)
 
 
 	/* Verify legality */
-if (!do_cmd_test(y, x,FS_OPEN)) return;
+	if (!do_cmd_test(y, x,FS_OPEN)) return;
 
 
 	/* Take a turn */
@@ -820,7 +820,7 @@ static bool do_cmd_close_aux(int y, int x)
 	if (!do_cmd_test(y, x,FS_CLOSE)) return (FALSE);
 
 	/* Trapped door */
-if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
+	if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
 	{
 		hit_trap(y,x);
 
@@ -830,11 +830,11 @@ if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
 	}
 
 	/* Secrets on door/permanent doors */
-else if ((f_info[cave_feat[y][x]].flags1 & (FF1_SECRET)) ||
+	else if ((f_info[cave_feat[y][x]].flags1 & (FF1_SECRET)) ||
 		(f_info[cave_feat[y][x]].flags1 & (FF1_PERMANENT)))
 	{
 		/* Stuck */
-find_secret(y,x);
+		find_secret(y,x);
 
 		/* Update the visuals */
 		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
@@ -984,7 +984,7 @@ static bool do_cmd_tunnel_aux(int y, int x)
 	if (f_info[cave_feat[y][x]].flags1 & (FF1_DOOR)) j = 30;
 
 	/* Trapped door */
-if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
+	if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
 	{
 		hit_trap(y,x);
 
@@ -994,11 +994,11 @@ if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
 	}
 
 	/* Permanent doors/rock */
-else if (f_info[cave_feat[y][x]].flags1 & (FF1_PERMANENT))
+	else if (f_info[cave_feat[y][x]].flags1 & (FF1_PERMANENT))
 
 	{
 		/* Stuck */
-find_secret(y,x);
+		find_secret(y,x);
 
 		/* Update the visuals */
 		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
@@ -1025,8 +1025,8 @@ find_secret(y,x);
 			
 			cave_alter_feat(y,x,FS_TUNNEL);
 
-/* Update the visuals */
-p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
+			/* Update the visuals */
+			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 
 		}
 
@@ -1066,8 +1066,8 @@ p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 			
 			cave_alter_feat(y,x,FS_TUNNEL);
 
-/* Update the visuals */
-p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
+			/* Update the visuals */
+			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 
 		}
 
@@ -1302,7 +1302,7 @@ void do_cmd_disarm(void)
 	if (easy_open)
 	{
 		/* Handle a single visible trap or trapped chest */
-if (count_feats(&y, &x, FS_DISARM) == 1)
+		if (count_feats(&y, &x, FS_DISARM) == 1)
 		{
 			p_ptr->command_dir = coords_to_dir(y, x);
 		}
@@ -1319,7 +1319,7 @@ if (count_feats(&y, &x, FS_DISARM) == 1)
 
 
 	/* Verify legality */
-if (!do_cmd_test(y, x, FS_DISARM)) return;
+	if (!do_cmd_test(y, x, FS_DISARM)) return;
 
 
 	/* Take a turn */
@@ -1402,7 +1402,7 @@ static bool do_cmd_bash_aux(int y, int x)
 	msg_format("You smash into the %s!",name);
 
 	/* Trapped door */
-if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
+	if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
 	{
 		hit_trap(y,x);
 
@@ -1413,11 +1413,11 @@ if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
 
 
 	/* Secrets on door/permanent doors */
-else if ((f_info[cave_feat[y][x]].flags1 & (FF1_SECRET)) ||
+	else if ((f_info[cave_feat[y][x]].flags1 & (FF1_SECRET)) ||
 		(f_info[cave_feat[y][x]].flags1 & (FF1_PERMANENT)))
 	{
 		/* Stuck */
-find_secret(y,x);
+		find_secret(y,x);
 
 		/* Update the visuals */
 		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
@@ -1511,8 +1511,8 @@ void do_cmd_bash(void)
 	/* Easy Bash */
 	if (easy_open)
 	{
-/* Handle a single visible trap */
-if (count_feats(&y, &x, FS_BASH)==1)
+		/* Handle a single visible trap */
+		if (count_feats(&y, &x, FS_BASH)==1)
 		{
 			p_ptr->command_dir = coords_to_dir(y, x);
 		}
@@ -2219,11 +2219,11 @@ static int breakage_chance(object_type *o_ptr)
 		case TV_FLASK:
 		case TV_SPELL:
 		case TV_POTION:
-case TV_HOLD:
+		case TV_HOLD:
 		case TV_FOOD:
 		case TV_JUNK:
 		case TV_SKIN:
-case TV_FIGURE:
+		case TV_FIGURE:
 		{
 			return (100);
 		}
@@ -2231,7 +2231,7 @@ case TV_FIGURE:
 		/* Often break */
 		case TV_LITE:
 		case TV_SCROLL:
-case TV_BONE:
+		case TV_BONE:
 		{
 			return (50);
 		}

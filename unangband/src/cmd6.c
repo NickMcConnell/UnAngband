@@ -64,10 +64,10 @@
  */
 void do_cmd_eat_food(void)
 {
-int item, ident, lev;
+	int item, ident, lev;
 
-	  /* Must be true to let us cancel */
-bool cancel = TRUE;
+	/* Must be true to let us cancel */
+	bool cancel = TRUE;
 
 	object_type *o_ptr;
 
@@ -86,12 +86,13 @@ bool cancel = TRUE;
 	/* Get the feature */
 	if (item >= INVEN_TOTAL+1)
 	{
-object_type object_type_body;
+		object_type object_type_body;
 
-o_ptr = &object_type_body;
+		o_ptr = &object_type_body;
 
-if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
+		if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
 	}
+
 	/* Get the item (in the pack) */
 	else if (item >= 0)
 	{
@@ -110,9 +111,9 @@ if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
 
 
 	/* Take a (partial) turn */
-if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-else p_ptr->energy_use = 100;
+	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
+	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
+	else p_ptr->energy_use = 100;
 
 	/* Identity not known yet */
 	ident = FALSE;
@@ -121,13 +122,13 @@ else p_ptr->energy_use = 100;
 	lev = k_info[o_ptr->k_idx].level;
 
 	/* Get food effect */
-get_spell(&power, "use", o_ptr, FALSE);
+	get_spell(&power, "use", o_ptr, FALSE);
 
-/* Paranoia */
-if (power < 0) return;
+	/* Paranoia */
+	if (power < 0) return;
 
-/* Apply food effect */
-if (process_spell_eaten(power,0,&cancel)) ident = TRUE;
+	/* Apply food effect */
+	if (process_spell_eaten(power,0,&cancel)) ident = TRUE;
 
 	/* Combine / Reorder the pack (later) */
 	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -157,7 +158,7 @@ if (process_spell_eaten(power,0,&cancel)) ident = TRUE;
 		cave_alter_feat(p_ptr->py,p_ptr->px,FS_USE_FEAT);
 	}
 	/* Destroy a food in the pack */
-else if (item >= 0)
+	else if (item >= 0)
 	{
 		inven_item_increase(item, -1);
 		inven_item_describe(item);
@@ -181,11 +182,10 @@ else if (item >= 0)
  */
 void do_cmd_quaff_potion(void)
 {
-int item, ident, lev, power;
+	int item, ident, lev, power;
 
-	 /* Must be true to let us cancel */
-bool cancel = TRUE;
-
+	/* Must be true to let us cancel */
+	bool cancel = TRUE;
 
 	object_type *o_ptr;
 
@@ -202,11 +202,11 @@ bool cancel = TRUE;
 	/* Get the feature */
 	if (item >= INVEN_TOTAL+1)
 	{
-object_type object_type_body;
+		object_type object_type_body;
 
-o_ptr = &object_type_body;
+		o_ptr = &object_type_body;
 
-if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
+		if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
 	}
 	/* Get the item (in the pack) */
 	else if (item >= 0)
@@ -226,9 +226,9 @@ if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
 
 
 	/* Take a (partial) turn */
-if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-else p_ptr->energy_use = 100;
+	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
+	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
+	else p_ptr->energy_use = 100;
 
 	/* Not identified yet */
 	ident = FALSE;
@@ -237,14 +237,13 @@ else p_ptr->energy_use = 100;
 	lev = k_info[o_ptr->k_idx].level;
 
 	/* Get potion effect */
-get_spell(&power, "use", o_ptr, FALSE);
+	get_spell(&power, "use", o_ptr, FALSE);
 
-/* Paranoia */
-if (power < 0) return;
+	/* Paranoia */
+	if (power < 0) return;
 
-/* Apply food effect */
-if (process_spell_eaten(power,0,&cancel)) ident = TRUE;
-
+	/* Apply food effect */
+	if (process_spell_eaten(power,0,&cancel)) ident = TRUE;
 
 	/* Combine / Reorder the pack (later) */
 	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -300,11 +299,10 @@ if (process_spell_eaten(power,0,&cancel)) ident = TRUE;
  */
 void do_cmd_read_scroll(void)
 {
-int item, ident, lev,power;
+	int item, ident, lev,power;
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
-
 
 	object_type *o_ptr;
 
@@ -339,11 +337,11 @@ int item, ident, lev,power;
 	/* Get the feature */
 	if (item >= INVEN_TOTAL+1)
 	{
-object_type object_type_body;
+		object_type object_type_body;
 
-o_ptr = &object_type_body;
+		o_ptr = &object_type_body;
 
-if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
+		if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
 	}
 	/* Get the item (in the pack) */
 	else if (item >= 0)
@@ -359,9 +357,9 @@ if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
 
 
 	/* Take a (partial) turn */
-if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-else p_ptr->energy_use = 100;
+	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
+	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
+	else p_ptr->energy_use = 100;
 
 	/* Not identified yet */
 	ident = FALSE;
@@ -370,13 +368,13 @@ else p_ptr->energy_use = 100;
 	lev = k_info[o_ptr->k_idx].level;
 
 	/* Get scroll effect */
-get_spell(&power, "use", o_ptr, FALSE);
+	get_spell(&power, "use", o_ptr, FALSE);
 
-/* Paranoia */
-if (power < 0) return;
+	/* Paranoia */
+	if (power < 0) return;
 
-/* Apply scroll effect */
-ident = process_spell(power, 0, &cancel);
+	/* Apply scroll effect */
+	ident = process_spell(power, 0, &cancel);
 
 	/* Combine / Reorder the pack (later) */
 	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -427,10 +425,6 @@ ident = process_spell(power, 0, &cancel);
 
 
 
-
-
-
-
 /*
  * Use a staff
  *
@@ -440,7 +434,7 @@ ident = process_spell(power, 0, &cancel);
  */
 void do_cmd_use_staff(void)
 {
-int item, ident, chance, lev, power;
+	int item, ident, chance, lev, power;
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
@@ -449,7 +443,7 @@ int item, ident, chance, lev, power;
 
 	cptr q, s;
 
-int i;
+	int i;
 
 	/* Restrict choices to wands */
 	item_tester_tval = TV_STAFF;
@@ -462,11 +456,11 @@ int i;
 	/* Get the feature */
 	if (item >= INVEN_TOTAL+1)
 	{
-object_type object_type_body;
+		object_type object_type_body;
 
-o_ptr = &object_type_body;
+		o_ptr = &object_type_body;
 
-if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
+		if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
 	}
 	/* Get the item (in the pack) */
 	else if (item >= 0)
@@ -490,9 +484,9 @@ if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
 
 
 	/* Take a (partial) turn */
-if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-else p_ptr->energy_use = 100;
+	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
+	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
+	else p_ptr->energy_use = 100;
 
 	/* Not identified yet */
 	ident = FALSE;
@@ -506,19 +500,19 @@ else p_ptr->energy_use = 100;
 	/* Confusion hurts skill */
 	if (p_ptr->confused) chance = chance / 2;
 
-/* Check for speciality */
+	/* Check for speciality */
 	for (i = 0;i< z_info->w_max;i++)
 	{
 		if (w_info[i].class != p_ptr->pclass) continue;
 
 		if (w_info[i].level > p_ptr->lev) continue;
 
-if (w_info[i].benefit != WB_ID) continue;
+		if (w_info[i].benefit != WB_ID) continue;
 
 		/* Check for styles */
-if ((w_info[i].styles==WS_STAFF) && (p_ptr->pstyle == WS_STAFF))
+		if ((w_info[i].styles==WS_STAFF) && (p_ptr->pstyle == WS_STAFF))
 		{
-chance *=2;
+			chance *=2;
 		}
 	}
 
@@ -531,23 +525,22 @@ chance *=2;
 		chance = USE_DEVICE;
 	}
 
-/* Some rooms only give a (slight) chance */
-if (cave_info[p_ptr->py][p_ptr->px] & (CAVE_ROOM))
-{
-/* Special rooms affect some of this */
-int by = p_ptr->py/BLOCK_HGT;
-int bx = p_ptr->px/BLOCK_HGT;
+	/* Some rooms only give a (slight) chance */
+	if (cave_info[p_ptr->py][p_ptr->px] & (CAVE_ROOM))
+	{
+		/* Special rooms affect some of this */
+		int by = p_ptr->py/BLOCK_HGT;
+		int bx = p_ptr->px/BLOCK_HGT;
 
-/* Get the room */
-if(room_info[dun_room[by][bx]].flags & (ROOM_STATIC))
-{
-chance = USE_DEVICE;
+		/* Get the room */
+		if(room_info[dun_room[by][bx]].flags & (ROOM_STATIC))
+		{
+			chance = USE_DEVICE;
 
-/* Warn the player */
-msg_print("There is a static feeling in the air.");
-
-}
-}    
+			/* Warn the player */
+			msg_print("There is a static feeling in the air.");
+		}
+	}    
 
 	/* Roll for usage */
 	if ((chance < USE_DEVICE) || (randint(chance) < USE_DEVICE))
@@ -572,13 +565,13 @@ msg_print("There is a static feeling in the air.");
 
 
 	/* Get rod effect */
-get_spell(&power, "use", o_ptr, FALSE);
+	get_spell(&power, "use", o_ptr, FALSE);
 
-/* Paranoia */
-if (power < 0) return;
+	/* Paranoia */
+	if (power < 0) return;
 
 	/* Apply rod effect */
-ident = process_spell(power, 0, &cancel);
+	ident = process_spell(power, 0, &cancel);
 
 	/* Combine / Reorder the pack (later) */
 	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -616,7 +609,7 @@ ident = process_spell(power, 0, &cancel);
 	o_ptr->stackc++;
 
 	/* No spare charges */	
-if (o_ptr->stackc >= o_ptr->number)
+	if (o_ptr->stackc >= o_ptr->number)
 	{
 		/* Use a charge off the stack */
 		o_ptr->pval--;
@@ -626,11 +619,11 @@ if (o_ptr->stackc >= o_ptr->number)
 	}
 
 	/* XXX Hack -- unstack if necessary */
-if ((item >= 0) && (o_ptr->number > 1) &&
-((!variant_pval_stacks) || 
-((!object_known_p(o_ptr) && (o_ptr->pval == 2) && (o_ptr->stackc > 1)) ||
-  (!object_known_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
-  (o_ptr->stackc != 1) && (o_ptr->pval > 2)))))
+	if ((item >= 0) && (o_ptr->number > 1) &&
+	((!variant_pval_stacks) || 
+	((!object_known_p(o_ptr) && (o_ptr->pval == 2) && (o_ptr->stackc > 1)) ||
+	  (!object_known_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
+	  (o_ptr->stackc != 1) && (o_ptr->pval > 2)))))
 	{
 		object_type *i_ptr;
 		object_type object_type_body;
@@ -644,27 +637,27 @@ if ((item >= 0) && (o_ptr->number > 1) &&
 		/* Modify quantity */
 		i_ptr->number = 1;
 
-/* Reset stack counter */
-i_ptr->stackc = 0;
+		/* Reset stack counter */
+		i_ptr->stackc = 0;
  
  		/* Unstack the used item */
  		o_ptr->number--;
 
-/* Reduce the charges on the new item */
-if (o_ptr->stackc > 1)
-{
-i_ptr->pval-=2;
-o_ptr->stackc--;
-}
-else if (!o_ptr->stackc)
-{
-i_ptr->pval--;
-o_ptr->pval++;
-o_ptr->stackc = o_ptr->number-1;
-}
+		/* Reduce the charges on the new item */
+		if (o_ptr->stackc > 1)
+		{
+			i_ptr->pval-=2;
+			o_ptr->stackc--;
+		}
+		else if (!o_ptr->stackc)
+		{
+			i_ptr->pval--;
+			o_ptr->pval++;
+			o_ptr->stackc = o_ptr->number-1;
+		}
 
-/* Adjust the weight and carry */
-p_ptr->total_weight -= i_ptr->weight;
+		/* Adjust the weight and carry */
+		p_ptr->total_weight -= i_ptr->weight;
 		item = inven_carry(i_ptr);
 
 		/* Message */
@@ -708,7 +701,7 @@ p_ptr->total_weight -= i_ptr->weight;
  */
 void do_cmd_aim_wand(void)
 {
-int item, lev, ident, chance, power;
+	int item, lev, ident, chance, power;
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
@@ -717,7 +710,7 @@ int item, lev, ident, chance, power;
 
 	cptr q, s;
 
-int i;
+	int i;
 
 	/* Restrict choices to wands */
 	item_tester_tval = TV_WAND;
@@ -730,9 +723,9 @@ int i;
 	/* Get the feature */
 	if (item >= INVEN_TOTAL+1)
 	{
-object_type object_type_body;
+		object_type object_type_body;
 
-o_ptr = &object_type_body;
+		o_ptr = &object_type_body;
 
 		if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
 	}
@@ -758,9 +751,9 @@ o_ptr = &object_type_body;
 
 
 	/* Take a (partial) turn */
-if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-else p_ptr->energy_use = 100;
+	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
+	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
+	else p_ptr->energy_use = 100;
 
 	/* Not identified yet */
 	ident = FALSE;
@@ -774,19 +767,19 @@ else p_ptr->energy_use = 100;
 	/* Confusion hurts skill */
 	if (p_ptr->confused) chance = chance / 2;
 
-/* Check for speciality */
+	/* Check for speciality */
 	for (i = 0;i< z_info->w_max;i++)
 	{
 		if (w_info[i].class != p_ptr->pclass) continue;
 
 		if (w_info[i].level > p_ptr->lev) continue;
 
-if (w_info[i].benefit != WB_ID) continue;
+		if (w_info[i].benefit != WB_ID) continue;
 
 		/* Check for styles */
-if ((w_info[i].styles==WS_WAND) && (p_ptr->pstyle == WS_WAND))
+		if ((w_info[i].styles==WS_WAND) && (p_ptr->pstyle == WS_WAND))
 		{
-chance *=2;
+			chance *=2;
 		}
 	}
 
@@ -800,23 +793,22 @@ chance *=2;
 		chance = USE_DEVICE;
 	}
 
-/* Some rooms only give a (slight) chance */
-if (cave_info[p_ptr->py][p_ptr->px] & (CAVE_ROOM))
-{
-/* Special rooms affect some of this */
-int by = p_ptr->py/BLOCK_HGT;
-int bx = p_ptr->px/BLOCK_HGT;
+	/* Some rooms only give a (slight) chance */
+	if (cave_info[p_ptr->py][p_ptr->px] & (CAVE_ROOM))
+	{
+		/* Special rooms affect some of this */
+		int by = p_ptr->py/BLOCK_HGT;
+		int bx = p_ptr->px/BLOCK_HGT;
 
-/* Get the room */
-if(room_info[dun_room[by][bx]].flags & (ROOM_STATIC))
-{
-chance = USE_DEVICE;
+		/* Get the room */
+		if(room_info[dun_room[by][bx]].flags & (ROOM_STATIC))
+		{
+			chance = USE_DEVICE;
 
-/* Warn the player */
-msg_print("There is a static feeling in the air.");
-
-}
-}    
+			/* Warn the player */
+			msg_print("There is a static feeling in the air.");
+		}
+	}    
 
 	/* Roll for usage */
 	if ((chance < USE_DEVICE) || (randint(chance) < USE_DEVICE))
@@ -840,13 +832,13 @@ msg_print("There is a static feeling in the air.");
 	sound(MSG_ZAP);
 
 	/* Get wand effect */
-get_spell(&power, "use", o_ptr, FALSE);
+	get_spell(&power, "use", o_ptr, FALSE);
 
-/* Paranoia */
-if (power < 0) return;
+	/* Paranoia */
+	if (power < 0) return;
 
-/* Apply wand effect */
-ident = process_spell(power, 0, &cancel);
+	/* Apply wand effect */
+	ident = process_spell(power, 0, &cancel);
 
 	/* Combine / Reorder the pack (later) */
 	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -881,7 +873,7 @@ ident = process_spell(power, 0, &cancel);
 	o_ptr->stackc++;
 
 	/* No spare charges */	
-if (o_ptr->stackc >= o_ptr->number)
+	if (o_ptr->stackc >= o_ptr->number)
 	{
 		/* Use a charge off the stack */
 		o_ptr->pval--;
@@ -891,11 +883,11 @@ if (o_ptr->stackc >= o_ptr->number)
 	}
 
 	/* XXX Hack -- unstack if necessary */
-if ((item >= 0) && (o_ptr->number > 1) &&
-((!variant_pval_stacks) || 
-((!object_known_p(o_ptr) && (o_ptr->pval == 2) && (o_ptr->stackc > 1)) ||
-  (!object_known_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
-  (o_ptr->stackc != 1) && (o_ptr->pval > 2)))))
+	if ((item >= 0) && (o_ptr->number > 1) &&
+	((!variant_pval_stacks) || 
+	((!object_known_p(o_ptr) && (o_ptr->pval == 2) && (o_ptr->stackc > 1)) ||
+	  (!object_known_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
+	  (o_ptr->stackc != 1) && (o_ptr->pval > 2)))))
 	{
 		object_type *i_ptr;
 		object_type object_type_body;
@@ -909,31 +901,31 @@ if ((item >= 0) && (o_ptr->number > 1) &&
 		/* Modify quantity */
 		i_ptr->number = 1;
 
-/* Reset stack counter */
-i_ptr->stackc = 0;
+		/* Reset stack counter */
+		i_ptr->stackc = 0;
  
  		/* Unstack the used item */
  		o_ptr->number--;
 
-/* Reduce the charges on the new item */
-if (o_ptr->stackc > 1)
-{
-i_ptr->pval-=2;
-o_ptr->stackc--;
-}
-else if (!o_ptr->stackc)
-{
-i_ptr->pval--;
-o_ptr->pval++;
-o_ptr->stackc = o_ptr->number-1;
-}
+		/* Reduce the charges on the new item */
+		if (o_ptr->stackc > 1)
+		{
+			i_ptr->pval-=2;
+			o_ptr->stackc--;
+		}
+		else if (!o_ptr->stackc)
+		{
+			i_ptr->pval--;
+			o_ptr->pval++;
+			o_ptr->stackc = o_ptr->number-1;
+		}
 
-/* Adjust the weight and carry */
-p_ptr->total_weight -= i_ptr->weight;
+		/* Adjust the weight and carry */
+		p_ptr->total_weight -= i_ptr->weight;
 		item = inven_carry(i_ptr);
 
 		/* Message */
-msg_print("You unstack your wand.");
+		msg_print("You unstack your wand.");
 	}
 
 	/* Describe the charges in the pack */
@@ -974,7 +966,7 @@ static bool item_tester_hook_charged(const object_type *o_ptr)
  */
 void do_cmd_zap_rod(void)
 {
-int item, ident, chance, lev, power;
+	int item, ident, chance, lev, power;
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
@@ -1127,8 +1119,8 @@ int item, ident, chance, lev, power;
 	/* Hack -- deal with cancelled zap */
 	if (cancel)
 	{
-/* Restore charge */
-o_ptr->timeout = tmpval;
+		/* Restore charge */
+		o_ptr->timeout = tmpval;
 
 		return;
 	}
@@ -1142,22 +1134,22 @@ o_ptr->timeout = tmpval;
 	}
 
 	/* Hack -- check if we are stacking rods */
-if ((o_ptr->timeout > 0) && (!(tmpval) || stack_force_times))
+	if ((o_ptr->timeout > 0) && (!(tmpval) || stack_force_times))
 	{
 		/* Hack -- one more rod charging */
-if (o_ptr->timeout) o_ptr->stackc++;
+		if (o_ptr->timeout) o_ptr->stackc++;
 
-/* Reset stack count */
-if (o_ptr->stackc == o_ptr->number) o_ptr->stackc = 0;
+		/* Reset stack count */
+		if (o_ptr->stackc == o_ptr->number) o_ptr->stackc = 0;
 
 		/* Hack -- always use maximum timeout */
-if (tmpval > o_ptr->timeout) o_ptr->timeout = tmpval;
+		if (tmpval > o_ptr->timeout) o_ptr->timeout = tmpval;
 
 		return;
 	}
 
 	/* XXX Hack -- unstack if necessary */
-if ((item >= 0) && (o_ptr->number > 1) && (o_ptr->timeout > 0))
+	if ((item >= 0) && (o_ptr->number > 1) && (o_ptr->timeout > 0))
 	{
 		object_type *i_ptr;
 		object_type object_type_body;
@@ -1171,19 +1163,19 @@ if ((item >= 0) && (o_ptr->number > 1) && (o_ptr->timeout > 0))
 		/* Modify quantity */
 		i_ptr->number = 1;
 
-/* Clear stack counter */
-i_ptr->stackc = 0;
+		/* Clear stack counter */
+		i_ptr->stackc = 0;
 
-/* Restore "charge" */
-o_ptr->timeout = tmpval;
+		/* Restore "charge" */
+		o_ptr->timeout = tmpval;
 
 		/* Unstack the used item */
 		o_ptr->number--;
 
-/* Reset the stack if required */
-if (o_ptr->stackc == o_ptr->number) o_ptr->stackc = 0;
+		/* Reset the stack if required */
+		if (o_ptr->stackc == o_ptr->number) o_ptr->stackc = 0;
 
-p_ptr->total_weight -= i_ptr->weight;
+		p_ptr->total_weight -= i_ptr->weight;
 		item = inven_carry(i_ptr);
 
 		/* Message */
@@ -1403,7 +1395,7 @@ void do_cmd_activate(void)
 		/* Apply object effect */
 		(void)process_spell(power, 0, &cancel);
 
-            if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
+		if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
 
 		/* Time object out */
 		o_ptr->timeout = rand_int(o_ptr->pval)+o_ptr->pval;

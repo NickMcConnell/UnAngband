@@ -2552,8 +2552,8 @@ static void strip_name(char *buf, int k_idx)
 	/* Copy useful chars */
 	for (t = buf; *str; str++)
 	{
-                if (prefix(str,"# ")) str++; /* Skip following space */
-                else if (*str != '~') *t++ = *str;
+		if (prefix(str,"# ")) str++; /* Skip following space */
+		else if (*str != '~') *t++ = *str;
 	}
 
 	/* Terminate the new name */
@@ -3010,7 +3010,7 @@ static int collect_ego_items(int grp_cur, int object_idx[])
 	byte group_tval = object_group_tval[grp_cur];
 
 	/* Check every object */
-        for (i = 0; i < z_info->e_max; i++)
+	for (i = 0; i < z_info->e_max; i++)
 	{
 		/* Access the race */
 		ego_item_type *e_ptr = &e_info[i];
@@ -3529,11 +3529,11 @@ static void do_cmd_knowledge_artifacts(void)
 			}
 		}
 	}
-        /* Prompt */
-        if (!grp_cnt) prt("No artifacts known.", 14, 0);
+	/* Prompt */
+	if (!grp_cnt) prt("No artifacts known.", 14, 0);
 
 	/* XXX XXX Free the "object_idx" array */
-        FREE(object_idx);
+	FREE(object_idx);
 }
 
 /*
@@ -3626,7 +3626,7 @@ static void do_cmd_knowledge_monsters(void)
 	flag = FALSE;
 	redraw = TRUE;
 
-        while ((!flag) && (grp_cnt))
+	while ((!flag) && (grp_cnt))
 	{
 		char ch;
 
@@ -3725,11 +3725,11 @@ static void do_cmd_knowledge_monsters(void)
 		}
 	}
 
-        /* Prompt */
-        if (!grp_cnt) prt("No monsters known.", 14, 0);
+	/* Prompt */
+	if (!grp_cnt) prt("No monsters known.", 14, 0);
 
 	/* XXX XXX Free the "mon_idx" array */
-        FREE(mon_idx);
+	FREE(mon_idx);
 }
 
 /*
@@ -3744,24 +3744,24 @@ static void display_ego_item_list(int col, int row, int per_page, int object_idx
 	for (i = 0; i < per_page && object_idx[i]; i++)
 	{
 		/* Get the object index */
-                int e_idx = object_idx[object_top + i];
+		int e_idx = object_idx[object_top + i];
 
 		/* Access the object */
-                ego_item_type *e_ptr = &e_info[e_idx];
+		ego_item_type *e_ptr = &e_info[e_idx];
 
 		/* Choose a color */
-                byte attr = ((e_ptr->aware) ? TERM_WHITE : TERM_SLATE);
-                byte cursor = ((e_ptr->aware) ? TERM_L_BLUE : TERM_BLUE);
+		byte attr = ((e_ptr->aware) ? TERM_WHITE : TERM_SLATE);
+		byte cursor = ((e_ptr->aware) ? TERM_L_BLUE : TERM_BLUE);
 
 		attr = ((i + object_top == object_cur) ? cursor : attr);
 
-                /* Display the name */
-                c_prt(attr, e_name + e_ptr->name, row + i, col);
+		/* Display the name */
+		c_prt(attr, e_name + e_ptr->name, row + i, col);
 
-                if (e_ptr->note)
-                {
-                        c_prt(TERM_YELLOW,quark_str(e_ptr->note), row+i, 65);
-                }
+		if (e_ptr->note)
+		{
+			c_prt(TERM_YELLOW,quark_str(e_ptr->note), row+i, 65);
+		}
 	}
 
 	/* Clear remaining lines */
@@ -3816,7 +3816,7 @@ static void do_cmd_knowledge_ego_items(void)
 {
 	int i, len, max;
 	int grp_cur, grp_top;
-        int object_cur, object_top;
+	int object_cur, object_top;
 	int grp_cnt, grp_idx[100];
 	int object_cnt;
 	int *object_idx;
@@ -3843,7 +3843,7 @@ static void do_cmd_knowledge_ego_items(void)
 		if (len > max) max = len;
 
 		/* See if any monsters are known */
-                if (collect_ego_items(i, object_idx))
+		if (collect_ego_items(i, object_idx))
 		{
 			/* Build a list of groups with known monsters */
 			grp_idx[grp_cnt++] = i;
@@ -3859,7 +3859,7 @@ static void do_cmd_knowledge_ego_items(void)
 	flag = FALSE;
 	redraw = TRUE;
 
-        while ((!flag) && (grp_cnt))
+	while ((!flag) && (grp_cnt))
 	{
 		char ch;
 
@@ -3867,7 +3867,7 @@ static void do_cmd_knowledge_ego_items(void)
 		{
 			clear_from(0);
 		
-                        prt("Knowledge - ego items", 2, 0);
+			prt("Knowledge - ego items", 2, 0);
 			prt("Group", 4, 0);
 			prt("Name", 4, max + 3);
 			prt("Sym", 4, 75);
@@ -3883,7 +3883,7 @@ static void do_cmd_knowledge_ego_items(void)
 			}
 
 			redraw = FALSE;
-		}                
+		}		
 
 		/* Scroll group list */
 		if (grp_cur < grp_top) grp_top = grp_cur;
@@ -3897,14 +3897,14 @@ static void do_cmd_knowledge_ego_items(void)
 		display_group_list(0, 6, max, BROWSER_ROWS, grp_idx, object_group_text, grp_cur, grp_top);
 
 		/* Get a list of objects in the current group */
-                object_cnt = collect_ego_items(grp_idx[grp_cur], object_idx);
+		object_cnt = collect_ego_items(grp_idx[grp_cur], object_idx);
 
 		/* Display a list of objects in the current group */
-                display_ego_item_list(max + 3, 6, BROWSER_ROWS, object_idx, object_cur, object_top);
+		display_ego_item_list(max + 3, 6, BROWSER_ROWS, object_idx, object_cur, object_top);
 
 		/* Prompt */
-                if (note_idx) prt("<dir>, 'r', '{', '}', 'c', 'p' to paste, ESC", 23,0);
-                else prt("<dir>, 'r' to recall, '{' to inscribe, '}', 'c' to copy, ESC", 23, 0);
+		if (note_idx) prt("<dir>, 'r', '{', '}', 'c', 'p' to paste, ESC", 23,0);
+		else prt("<dir>, 'r' to recall, '{' to inscribe, '}', 'c' to copy, ESC", 23, 0);
 
 		if (!column)
 		{
@@ -3929,124 +3929,124 @@ static void do_cmd_knowledge_ego_items(void)
 			case 'r':
 			{
 				/* Recall on screen */
-                                desc_ego_fake(object_idx[object_cur]);
+				desc_ego_fake(object_idx[object_cur]);
 
 				redraw = TRUE;
 				break;
 			}
 
-                        case '{':
+			case '{':
 			{
-                                char note_text[80];
+				char note_text[80];
 
-                                ego_item_type *e_ptr = &e_info[object_idx[object_cur]];
+				ego_item_type *e_ptr = &e_info[object_idx[object_cur]];
 
-                                /* Prompt */
-                                prt("Inscribe with: ", 23, 0);
-        
-                                /* Default note */
-                                sprintf(note_text, "%s", quark_str(e_ptr->note));
-        
-                                /* Get a filename */
-                                if (!askfor_aux(note_text, 80)) continue;
-        
-                                /* Set the inscription */
-                                e_ptr->note = quark_add(note_text);
+				/* Prompt */
+				prt("Inscribe with: ", 23, 0);
+	
+				/* Default note */
+				sprintf(note_text, "%s", quark_str(e_ptr->note));
+	
+				/* Get a filename */
+				if (!askfor_aux(note_text, 80)) continue;
+	
+				/* Set the inscription */
+				e_ptr->note = quark_add(note_text);
 
-                                /* Process objects */
-                                for (i = 1; i < o_max; i++)
-                                {
-                                        /* Get the object */
-                                        object_type *i_ptr = &o_list[i];
-                
-                                        /* Skip dead objects */
-                                        if (!i_ptr->k_idx) continue;
-                
-                                        /* Not matching ego item */
-                                        if (i_ptr->name2 != object_idx[object_cur]) continue;
-                
-                                        /* Already has note */
-                                        if (i_ptr->note) continue;
-                
-                                        /* Auto-inscribe */
-                                        if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = e_ptr->note;
+				/* Process objects */
+				for (i = 1; i < o_max; i++)
+				{
+					/* Get the object */
+					object_type *i_ptr = &o_list[i];
+		
+					/* Skip dead objects */
+					if (!i_ptr->k_idx) continue;
+		
+					/* Not matching ego item */
+					if (i_ptr->name2 != object_idx[object_cur]) continue;
+		
+					/* Already has note */
+					if (i_ptr->note) continue;
+		
+					/* Auto-inscribe */
+					if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = e_ptr->note;
 
-                                }
-                
-                                redraw = TRUE;
-                                break;
+				}
+		
+				redraw = TRUE;
+				break;
 			}
 
-                        case '}':
+			case '}':
 			{
-                                ego_item_type *e_ptr = &e_info[object_idx[object_cur]];
+				ego_item_type *e_ptr = &e_info[object_idx[object_cur]];
 
-                                /* Set the inscription */
-                                e_ptr->note = 0;
+				/* Set the inscription */
+				e_ptr->note = 0;
 
-                                /* Process objects */
-                                for (i = 1; i < o_max; i++)
-                                {
-                                        /* Get the object */
-                                        object_type *i_ptr = &o_list[i];
-                
-                                        /* Skip dead objects */
-                                        if (!i_ptr->k_idx) continue;
-                
-                                        /* Not matching ego item */
-                                        if (i_ptr->name2 != object_idx[object_cur]) continue;
-                
-                                        /* Auto-inscribe */
-                                        if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = 0;
+				/* Process objects */
+				for (i = 1; i < o_max; i++)
+				{
+					/* Get the object */
+					object_type *i_ptr = &o_list[i];
+		
+					/* Skip dead objects */
+					if (!i_ptr->k_idx) continue;
+		
+					/* Not matching ego item */
+					if (i_ptr->name2 != object_idx[object_cur]) continue;
+		
+					/* Auto-inscribe */
+					if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = 0;
 
-                                }
-                
-                                redraw = TRUE;
-                                break;
+				}
+		
+				redraw = TRUE;
+				break;
 			}
 
-                        case 'C':
-                        case 'c':
-                        {
-                                /* Set the note */
-                                note_idx = e_info[object_idx[object_cur]].note;
+			case 'C':
+			case 'c':
+			{
+				/* Set the note */
+				note_idx = e_info[object_idx[object_cur]].note;
 
-                                redraw = TRUE;
-                                break;
-                        }
+				redraw = TRUE;
+				break;
+			}
 
-                        case 'P':
-                        case 'p':
-                        {
-                                if (note_idx)
-                                {
-                                        /* Set the note */
-                                        e_info[object_idx[object_cur]].note = note_idx;
-        
-                                        /* Process objects */
-                                        for (i = 1; i < o_max; i++)
-                                        {
-                                                /* Get the object */
-                                                object_type *i_ptr = &o_list[i];
-                        
-                                                /* Skip dead objects */
-                                                if (!i_ptr->k_idx) continue;
-                        
-                                                /* Not matching ego item */
-                                                if (i_ptr->name2 != object_idx[object_cur]) continue;
-                        
-                                                /* Already has note */
-                                                if (i_ptr->note) continue;
-                        
-                                                /* Auto-inscribe */
-                                                if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = note_idx;
-        
-                                        }
-                
-                                        redraw = TRUE;
-                                }
-                                break;
-                        }
+			case 'P':
+			case 'p':
+			{
+				if (note_idx)
+				{
+					/* Set the note */
+					e_info[object_idx[object_cur]].note = note_idx;
+	
+					/* Process objects */
+					for (i = 1; i < o_max; i++)
+					{
+						/* Get the object */
+						object_type *i_ptr = &o_list[i];
+			
+						/* Skip dead objects */
+						if (!i_ptr->k_idx) continue;
+			
+						/* Not matching ego item */
+						if (i_ptr->name2 != object_idx[object_cur]) continue;
+			
+						/* Already has note */
+						if (i_ptr->note) continue;
+			
+						/* Auto-inscribe */
+						if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = note_idx;
+	
+					}
+		
+					redraw = TRUE;
+				}
+				break;
+			}
 
 			default:
 			{
@@ -4057,11 +4057,11 @@ static void do_cmd_knowledge_ego_items(void)
 		}
 	}
 
-        /* Prompt */
-        if (!grp_cnt)  prt("No ego items known.", 14, 0);
+	/* Prompt */
+	if (!grp_cnt)  prt("No ego items known.", 14, 0);
 
 	/* XXX XXX Free the "object_idx" array */
-        FREE(object_idx);
+	FREE(object_idx);
 }
 
 
@@ -4082,7 +4082,7 @@ static void display_object_list(int col, int row, int per_page, int object_idx[]
 		/* Access the object */
 		object_kind *k_ptr = &k_info[k_idx];
 
-                char o_name[80];
+		char o_name[80];
 
 		/* Choose a color */
 		byte attr = ((k_ptr->aware) ? TERM_WHITE : TERM_SLATE);
@@ -4091,16 +4091,16 @@ static void display_object_list(int col, int row, int per_page, int object_idx[]
 
 		attr = ((i + object_top == object_cur) ? cursor : attr);
 
-                /* Tidy name */
-                strip_name(o_name,k_idx);
+		/* Tidy name */
+		strip_name(o_name,k_idx);
 
-                /* Display the name */
-                c_prt(attr, o_name, row + i, col);
+		/* Display the name */
+		c_prt(attr, o_name, row + i, col);
 
-                if (k_ptr->note)
-                {
-                        c_prt(TERM_YELLOW,quark_str(k_ptr->note), row+i, 65);
-                }
+		if (k_ptr->note)
+		{
+			c_prt(TERM_YELLOW,quark_str(k_ptr->note), row+i, 65);
+		}
 
 		if (k_ptr->aware)
 		{
@@ -4168,7 +4168,7 @@ static void do_cmd_knowledge_objects(void)
 	bool flag;
 	bool redraw;
 
-        int note_idx = 0;
+	int note_idx = 0;
 
 	/* Allocate the "object_idx" array */
 	C_MAKE(object_idx, z_info->k_max, int);
@@ -4203,7 +4203,7 @@ static void do_cmd_knowledge_objects(void)
 	flag = FALSE;
 	redraw = TRUE;
 
-        while ((!flag) && (grp_cnt))
+	while ((!flag) && (grp_cnt))
 	{
 		char ch;
 
@@ -4247,8 +4247,8 @@ static void do_cmd_knowledge_objects(void)
 		display_object_list(max + 3, 6, BROWSER_ROWS, object_idx, object_cur, object_top);
 
 		/* Prompt */
-                if (note_idx) prt("<dir>, 'r', '{', '}', 'c', 'p' to paste, ESC", 23,0);
-                else prt("<dir>, 'r' to recall, '{' to inscribe, '}', 'c' to copy, ESC", 23, 0);
+		if (note_idx) prt("<dir>, 'r', '{', '}', 'c', 'p' to paste, ESC", 23,0);
+		else prt("<dir>, 'r' to recall, '{' to inscribe, '}', 'c' to copy, ESC", 23, 0);
 
 		/* Mega Hack -- track this monster race */
 		if (object_cnt) object_kind_track(object_idx[object_cur]);
@@ -4292,119 +4292,119 @@ static void do_cmd_knowledge_objects(void)
 				break;
 			}
 
-                        case '{':
+			case '{':
 			{
-                                char note_text[80];
+				char note_text[80];
 
-                                object_kind *k_ptr = &k_info[object_idx[object_cur]];
+				object_kind *k_ptr = &k_info[object_idx[object_cur]];
 
-                                /* Prompt */
-                                prt("Inscribe with: ", 23, 0);
-        
-                                /* Default note */
-                                sprintf(note_text, "%s", quark_str(k_ptr->note));
-        
-                                /* Get a filename */
-                                if (!askfor_aux(note_text, 80)) continue;
-        
-                                /* Set the inscription */
-                                k_ptr->note = quark_add(note_text);
+				/* Prompt */
+				prt("Inscribe with: ", 23, 0);
+	
+				/* Default note */
+				sprintf(note_text, "%s", quark_str(k_ptr->note));
+	
+				/* Get a filename */
+				if (!askfor_aux(note_text, 80)) continue;
+	
+				/* Set the inscription */
+				k_ptr->note = quark_add(note_text);
 
-                                /* Process objects */
-                                for (i = 1; i < o_max; i++)
-                                {
-                                        /* Get the object */
-                                        object_type *i_ptr = &o_list[i];
-                
-                                        /* Skip dead objects */
-                                        if (!i_ptr->k_idx) continue;
-                
-                                        /* Not matching ego item */
-                                        if (i_ptr->k_idx != object_idx[object_cur]) continue;
-                
-                                        /* Already has note */
-                                        if (i_ptr->note) continue;
-                
-                                        /* Auto-inscribe */
-                                        if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = k_ptr->note;
+				/* Process objects */
+				for (i = 1; i < o_max; i++)
+				{
+					/* Get the object */
+					object_type *i_ptr = &o_list[i];
+		
+					/* Skip dead objects */
+					if (!i_ptr->k_idx) continue;
+		
+					/* Not matching ego item */
+					if (i_ptr->k_idx != object_idx[object_cur]) continue;
+		
+					/* Already has note */
+					if (i_ptr->note) continue;
+		
+					/* Auto-inscribe */
+					if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = k_ptr->note;
 
-                                }
-                
-                                redraw = TRUE;
-                                break;
+				}
+		
+				redraw = TRUE;
+				break;
 			}
 
-                        case '}':
+			case '}':
 			{
-                                object_kind *k_ptr = &k_info[object_idx[object_cur]];
+				object_kind *k_ptr = &k_info[object_idx[object_cur]];
 
-                                /* Set the inscription */
-                                k_ptr->note = 0;
+				/* Set the inscription */
+				k_ptr->note = 0;
 
-                                /* Process objects */
-                                for (i = 1; i < o_max; i++)
-                                {
-                                        /* Get the object */
-                                        object_type *i_ptr = &o_list[i];
-                
-                                        /* Skip dead objects */
-                                        if (!i_ptr->k_idx) continue;
-                
-                                        /* Not matching ego item */
-                                        if (i_ptr->k_idx != object_idx[object_cur]) continue;
-                
-                                        /* Auto-inscribe */
-                                        i_ptr->note = 0;
-                                }
-                
-                                redraw = TRUE;
-                                break;
+				/* Process objects */
+				for (i = 1; i < o_max; i++)
+				{
+					/* Get the object */
+					object_type *i_ptr = &o_list[i];
+		
+					/* Skip dead objects */
+					if (!i_ptr->k_idx) continue;
+		
+					/* Not matching ego item */
+					if (i_ptr->k_idx != object_idx[object_cur]) continue;
+		
+					/* Auto-inscribe */
+					i_ptr->note = 0;
+				}
+		
+				redraw = TRUE;
+				break;
 			}
 
-                        case 'C':
-                        case 'c':
-                        {
-                                /* Set the note */
-                                note_idx = k_info[object_idx[object_cur]].note;
+			case 'C':
+			case 'c':
+			{
+				/* Set the note */
+				note_idx = k_info[object_idx[object_cur]].note;
 
-                                redraw = TRUE;
-                                break;
-                        }
+				redraw = TRUE;
+				break;
+			}
 
-                        case 'P':
-                        case 'p':
-                        {
-                                if (note_idx)
-                                {
-                                        /* Set the note */
-                                        k_info[object_idx[object_cur]].note = note_idx;
-        
-                                        redraw = TRUE;
+			case 'P':
+			case 'p':
+			{
+				if (note_idx)
+				{
+					/* Set the note */
+					k_info[object_idx[object_cur]].note = note_idx;
+	
+					redraw = TRUE;
 
-                                        /* Process objects */
-                                        for (i = 1; i < o_max; i++)
-                                        {
-                                                /* Get the object */
-                                                object_type *i_ptr = &o_list[i];
-                        
-                                                /* Skip dead objects */
-                                                if (!i_ptr->k_idx) continue;
-                        
-                                                /* Not matching ego item */
-                                                if (i_ptr->k_idx != object_idx[object_cur]) continue;
+					/* Process objects */
+					for (i = 1; i < o_max; i++)
+					{
+						/* Get the object */
+						object_type *i_ptr = &o_list[i];
+			
+						/* Skip dead objects */
+						if (!i_ptr->k_idx) continue;
+			
+						/* Not matching ego item */
+						if (i_ptr->k_idx != object_idx[object_cur]) continue;
 
-                                                /* Already has note */
-                                                if (i_ptr->note) continue;
-                        
-                                                /* Auto-inscribe */
-                                                if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = note_idx;
+						/* Already has note */
+						if (i_ptr->note) continue;
+			
+						/* Auto-inscribe */
+						if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = note_idx;
 
 
-                                        }
-                
-                                }
-                                break;
-                        }
+					}
+		
+				}
+				break;
+			}
 
 			default:
 			{
@@ -4415,11 +4415,11 @@ static void do_cmd_knowledge_objects(void)
 		}
 	}
 
-        /* Prompt */
-        if (!grp_cnt) prt("No object kinds known.", 14, 0);
+	/* Prompt */
+	if (!grp_cnt) prt("No object kinds known.", 14, 0);
 
 	/* XXX XXX Free the "object_idx" array */
-        FREE(object_idx);
+	FREE(object_idx);
 }
 
 /*
@@ -4497,14 +4497,14 @@ void do_cmd_knowledge(void)
 		/* Give some choices */
 		prt("(1) Display known artifacts", 4, 5);
 		prt("(2) Display known monsters", 5, 5);
-                prt("(3) Display known ego-items", 6, 5);
-                prt("(4) Display known objects", 7, 5);
-                prt("(5) Display contents of your home", 8, 5);
-                prt("(6) Load a user pref file", 9, 5);
-                prt("(7) Dump auto-inscriptions", 10, 5);
+		prt("(3) Display known ego-items", 6, 5);
+		prt("(4) Display known objects", 7, 5);
+		prt("(5) Display contents of your home", 8, 5);
+		prt("(6) Load a user pref file", 9, 5);
+		prt("(7) Dump auto-inscriptions", 10, 5);
 
 		/* Prompt */
-                prt("Command: ", 12, 0);
+		prt("Command: ", 12, 0);
 
 		/* Prompt */
 		ch = inkey();
@@ -4526,32 +4526,32 @@ void do_cmd_knowledge(void)
 			do_cmd_knowledge_monsters();
 		}
 
-                /* Ego Items */
-                else if (ch == '3')
+		/* Ego Items */
+		else if (ch == '3')
 		{
 			/* Spawn */
-                        do_cmd_knowledge_ego_items();
+			do_cmd_knowledge_ego_items();
 		}
 
 		/* Objects */
-                else if (ch == '4')
+		else if (ch == '4')
 		{
 			/* Spawn */
-                        do_cmd_knowledge_objects();
+			do_cmd_knowledge_objects();
 		}
 
 		/* Home */
-                else if (ch == '5')
+		else if (ch == '5')
 		{
 			/* Spawn */
 			do_cmd_knowledge_home();
 		}
 
 		/* Load a user pref file */
-                else if (ch == '6')
+		else if (ch == '6')
 		{
 			/* Ask for and load a user pref file */
-                        do_cmd_pref_file_hack(12);
+			do_cmd_pref_file_hack(12);
 
 			/* Could skip the following if loading cancelled XXX XXX XXX */
 
@@ -4560,15 +4560,15 @@ void do_cmd_knowledge(void)
 		}
 
 		/* Dump colors */
-                else if (ch == '7')
+		else if (ch == '7')
 		{
-                        char ftmp[80];
+			char ftmp[80];
 
 			/* Prompt */
-                        prt("Command: Dump auto-inscriptions", 12, 0);
+			prt("Command: Dump auto-inscriptions", 12, 0);
 
 			/* Prompt */
-                        prt("File: ", 14, 0);
+			prt("File: ", 14, 0);
 
 			/* Default filename */
 			sprintf(ftmp, "%s.prf", op_ptr->base_name);
@@ -4580,14 +4580,14 @@ void do_cmd_knowledge(void)
 			safe_setuid_drop();
 
 			/* Dump the macros */
-                        (void)autos_dump(ftmp);
+			(void)autos_dump(ftmp);
 
 			/* Grab priv's */
 			safe_setuid_grab();
    
 			/* Message */
-                        msg_print("Appended auto-inscriptions.");
-                }                                                
+			msg_print("Appended auto-inscriptions.");
+		}						
 		/* Unknown option */
 		else
 		{

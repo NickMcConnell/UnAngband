@@ -199,9 +199,9 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 				if (m_ptr->ml)
 				{
 					object_can_flags(o_ptr,TR1_SLAY_NATURAL,0x0L,0x0L);
-                                        if (r_ptr->flags3 & RF3_ANIMAL) l_ptr->flags3 |= (RF3_ANIMAL);
-                                        if (r_ptr->flags3 & RF3_PLANT) l_ptr->flags3 |= (RF3_PLANT);
-                                        if (r_ptr->flags3 & RF3_INSECT) l_ptr->flags3 |= (RF3_INSECT);
+					if (r_ptr->flags3 & RF3_ANIMAL) l_ptr->flags3 |= (RF3_ANIMAL);
+					if (r_ptr->flags3 & RF3_PLANT) l_ptr->flags3 |= (RF3_PLANT);
+					if (r_ptr->flags3 & RF3_INSECT) l_ptr->flags3 |= (RF3_INSECT);
 				}
 
 				if (mult < 2) mult = 2;
@@ -337,7 +337,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 				{
 					if (rand_int(100)<tdam)
 					{
-                                                object_can_flags(o_ptr,TR1_KILL_DRAGON,0x0L,0x0L);
+						object_can_flags(o_ptr,TR1_KILL_DRAGON,0x0L,0x0L);
 					}
 					else object_can_flags(o_ptr,TR1_SLAY_DRAGON,0x0L,0x0L);
 					l_ptr->flags3 |= (RF3_DRAGON);
@@ -416,7 +416,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 						if (m_ptr->ml)
 						{
 							object_can_flags(o_ptr,TR1_BRAND_ACID,0x0L,0x0L);
-                                                        l_ptr->flags2 |= (RF2_ARMOR);
+							l_ptr->flags2 |= (RF2_ARMOR);
 						}
 
 							if (mult < 2 ) mult = 2;
@@ -1602,19 +1602,19 @@ void move_player(int dir, int jumping)
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
-        feature_type *f_ptr;
+	feature_type *f_ptr;
 
 	int y, x;
 
-        int mimic;
+	int mimic;
 
-        cptr name;
+	cptr name;
 
 	/* Find the result of moving */
 	y = py + ddy[dir];
 	x = px + ddx[dir];
 
-        f_ptr = &f_info[cave_feat[y][x]];
+	f_ptr = &f_info[cave_feat[y][x]];
 
 	/* Hack -- attack monsters --- except hidden ones */
 	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)))
@@ -1716,7 +1716,7 @@ void move_player(int dir, int jumping)
 
 	/* Partial movement */
 	else if (!(f_ptr->flags1 & (FF1_MOVE))
-        && (f_ptr->flags3 & (FF3_EASY_CLIMB))
+	&& (f_ptr->flags3 & (FF3_EASY_CLIMB))
 	&& (dir !=p_ptr->climbing))
 	{
 		/* Get the mimiced feature */
@@ -1731,7 +1731,7 @@ void move_player(int dir, int jumping)
 
 		p_ptr->climbing = dir;
 
-                /* Automate 2nd movement command */
+		/* Automate 2nd movement command */
 		p_ptr->command_cmd = 59;
 		p_ptr->command_rep = 1;
 		p_ptr->command_dir = dir;
@@ -1884,11 +1884,11 @@ static int see_stop(int dir, int y, int x)
 	/* Illegal grids are not known walls XXX XXX XXX */
 	if (!in_bounds(y, x)) return (FALSE);
 
-        /* Unknown walls are not known obstacles */
+	/* Unknown walls are not known obstacles */
 	if (!(cave_info[y][x] & (CAVE_MARK))) return (FALSE);
 
-        /* Run-able grids are not known obstacles */
-        if (f_info[f_info[cave_feat[y][x]].mimic].flags1 & (FF1_RUN)) return (FALSE);
+	/* Run-able grids are not known obstacles */
+	if (f_info[f_info[cave_feat[y][x]].mimic].flags1 & (FF1_RUN)) return (FALSE);
 
 	/* Default */
 	return (TRUE);
@@ -2211,7 +2211,7 @@ static bool run_test(void)
 	int i, max, inv;
 	int option, option2;
 
-        int feat;
+	int feat;
 
 	/* No options yet */
 	option = 0;
@@ -2381,16 +2381,16 @@ static bool run_test(void)
 			row = py + ddy[new_dir];
 			col = px + ddx[new_dir];
 
-                        /* Get feature */
-                        feat = cave_feat[row][col];
+			/* Get feature */
+			feat = cave_feat[row][col];
 
 			/* Get mimiced feature */
-                        feat = f_info[feat].mimic;
+			feat = f_info[feat].mimic;
 
 			/* Unknown grid or non-wall */
 			/* Was: cave_floor_bold(row, col) */
 			if (!(cave_info[row][col] & (CAVE_MARK)) ||
-                            (!(f_info[feat].flags1 & (FF1_WALL))) )
+			    (!(f_info[feat].flags1 & (FF1_WALL))) )
 			{
 				/* Looking to break right */
 				if (p_ptr->run_break_right)
@@ -2418,16 +2418,16 @@ static bool run_test(void)
 			row = py + ddy[new_dir];
 			col = px + ddx[new_dir];
 
-                        /* Get feature */
-                        feat = cave_feat[row][col];
+			/* Get feature */
+			feat = cave_feat[row][col];
 
 			/* Get mimiced feature */
-                        feat = f_info[feat].mimic;
+			feat = f_info[feat].mimic;
 
 			/* Unknown grid or non-wall */
 			/* Was: cave_floor_bold(row, col) */
 			if (!(cave_info[row][col] & (CAVE_MARK)) ||
-                            (!(f_info[feat].flags1 & (FF1_RUN))))
+			    (!(f_info[feat].flags1 & (FF1_RUN))))
 			{
 				/* Looking to break left */
 				if (p_ptr->run_break_left)
@@ -2526,7 +2526,7 @@ static bool run_test(void)
 
 
 	/* About to hit a known wall, stop */
-        if (see_stop(p_ptr->run_cur_dir, py, px))
+	if (see_stop(p_ptr->run_cur_dir, py, px))
 	{
 		return (TRUE);
 	}

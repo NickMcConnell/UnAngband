@@ -313,13 +313,10 @@ int i,ii;
 	return (TRUE);
 }
 
-
-bool inven_book_okay(const object_type *o_ptr)
-{
 /* Note this routine is simple, but horribly inefficient due 
    to the (1st iteration) design of the data structures */
-
-
+bool inven_book_okay(const object_type *o_ptr)
+{
 	int i,ii,iii;
 
 	spell_type *s_ptr;
@@ -383,7 +380,7 @@ void do_cmd_browse(void)
 
 
 	/* Cannot browse books if illiterate */
-        if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
+	if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
 	{
 		msg_print("You cannot read books.");
 
@@ -1046,7 +1043,7 @@ void do_cmd_cast(void)
 	}
 
 	/* Cannot cast spells if illiterate */
-        if (c_info[p_ptr->pclass].spell_first > 50)
+	if (c_info[p_ptr->pclass].spell_first > 50)
 	{
 		msg_print("You cannot read books.");
 		return;
