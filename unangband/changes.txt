@@ -38,6 +38,9 @@ allows all the David Gervais known scroll graphics to be used when a scroll is
 found. Switch this option from TRUE (The Angband default) to FALSE to enable
 this.
 
+- Display problems due to Windows XP eliminated by not using the centred dot
+character.
+
 ### Bug fixes ###
 
 - Eilineil the Entrapped is now a female (Bug 648).

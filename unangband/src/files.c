@@ -365,22 +365,8 @@ errr process_pref_file_command(char *buf)
 	/* Process "F:<num>:<a>/<c>" -- attr/char for terrain features */
 	else if (buf[0] == 'F')
 	{
-		if (tokenize(buf+2, 3, zz) == 3)
-		{
-			feature_type *f_ptr;
-			i = (huge)strtol(zz[0], NULL, 0);
-			n1 = strtol(zz[1], NULL, 0);
-			n2 = strtol(zz[2], NULL, 0);
-			if ((i < 0) || (i >= z_info->f_max)) return (1);
-			f_ptr = &f_info[i];
-			if (n1) f_ptr->x_attr = n1;
-			if (n2) f_ptr->x_char = n2;
-			f_ptr->flags2 &= ~(FF2_ATTR_LITE);
-			return (0);
-		}
-
 		/* Mega-hack -- feat supports lighting 'yes' or 'no' */
-		if (tokenize(buf+2, 3, zz) == 4)
+		if (tokenize(buf+2, 4, zz) == 4)
 		{
 			feature_type *f_ptr;
 			i = (huge)strtol(zz[0], NULL, 0);
