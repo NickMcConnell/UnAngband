@@ -3298,7 +3298,7 @@ static int collect_ego_items(int grp_cur, int object_idx[])
  */
 static int collect_objects(int grp_cur, int object_idx[], int mode)
 {
-	int i, j, k, object_cnt = 0;
+	int i, object_cnt = 0;
 
 	/* Get a list of x_char in this group */
 	byte group_tval = object_group_tval[grp_cur];
@@ -3312,12 +3312,8 @@ static int collect_objects(int grp_cur, int object_idx[], int mode)
 		/* Skip empty objects */
 		if (!k_ptr->name) continue;
 
-		/* Skip non-flavoured non-aware objects */
-		if ((!k_ptr->aware) && (!k_ptr->flavor)) continue;
-
-		/* Skip items with no distribution (special artifacts) */
-		for (j = 0, k = 0; j < 4; j++) k += k_ptr->chance[j];
-		if (!(k))  continue; 
+		/* Skip special arts */
+                if (k_ptr->flags3 & (TR3_INSTA_ART)) continue;
 
 		/* Require objects ever seen*/
 		if (!(mode & 0x02) && !(cheat_lore) && !(k_ptr->aware) && !(k_ptr->flavor)) continue;

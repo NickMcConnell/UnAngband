@@ -6,6 +6,9 @@ magic missile.
 - Objects were incorrectly being initialised as aware, as per Angband. Now
 only become aware when you see the object for the first time.
 
+- Could not see some objects (eg corpses) in knowledge menus as they did
+not randomly appear in the dungeon. (Reported by topazg).
+
 
 UnAngband 0.5.4c: "Competitive Fix"
 
