@@ -4686,7 +4686,7 @@ void feat_near(int feat, int y, int x)
 	}
 
 	/* Give it to the floor */
-	if (flag) cave_set_feat(y, x, feat);
+	if (flag) cave_set_feat(by, bx, feat);
 }
 
 /*
