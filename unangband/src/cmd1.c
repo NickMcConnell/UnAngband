@@ -2422,7 +2422,7 @@ static bool run_test(void)
 			/* Unknown grid or non-wall */
 			/* Was: cave_floor_bold(row, col) */
 			if (!(cave_info[row][col] & (CAVE_MARK)) ||
-			    (!(f_info[feat].flags1 & (FF1_RUN))))
+			    (!(f_info[feat].flags1 & (FF1_WALL))))
 			{
 				/* Looking to break left */
 				if (p_ptr->run_break_left)
