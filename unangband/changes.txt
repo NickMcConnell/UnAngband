@@ -1,8 +1,76 @@
-- Fixed some elves that were incorrectly using the 'h' symbol.
+UnAngband 0.5.4a:
+
+### Game-play ###
 
 - Added high-level guardians to remaining areas in campaign mode.
 
 - Replaced fletchers with jewellers in Edoras.
+
+
+### Build / Platform ###
+
+- readdib.[ch] were old.
+
+- Fixed definition of user_name() for Linux port.
+
+
+### Bug fixes ###
+
+- Fixed some elves that were incorrectly using the 'h' symbol.
+
+- Disallow object recall for unknown flavored objects.
+
+- Incorrect default note was set for object and ego inscriptions
+  if there were no note.
+
+- Fixed some bugs in room.txt
+
+- Some dungeon names are misspelt.
+
+- Loading an old savefile crashed the game.
+
+- Some spell flags were not handled in spell_desc()
+
+- You could not tonnnel cages while stuck in them.
+
+- Some boolean variables are incorrectly set when getting bit flags.
+
+- teleport_away() was swapping a monster and another monster or a
+  player if there is one on a random place.
+
+- A window flag for "Display room description" window was not saved.
+
+- Fixed a minor bug about monster recall flag on OLD_DRAIN spell.
+
+- The game crashed at the end of the game.
+
+- Messages for ice bolt said "a prasma bolt"
+
+- Object usage counters for armors are never updated.
+
+- When an object become known to have some flags, may flags
+  on all kits should be removed.
+
+- "(D) Base Delay Factor" was not displayed.
+
+- It was possible to destroy cursed equipments.
+
+- Fixed the bug which forbids more than 64 spells by introduciing new
+  option "variant_study_more" which really allows more than 64 spells
+  to be studied.  Old option "variant_more_spells" is left for
+  savefile compatibility, and now effects only on the number of spell
+  kind.
+
+- The game occasionally crashed when shooting at nearly dead monster.
+
+- Changed form of Wizard Lock to BEAM from STRIKE to correctly close
+  and jam an open door.
+
+- Behavior of Wizard lock was wrong.
+
+- Really fixed bug where Ungoliant was not a female.
+
+
 
 UnAngband 0.5.4: "It'll be Sangband next" (Out the door release)
 
@@ -122,8 +190,6 @@ when first moving into the terrain.
 terrain while on the surface.
 
 - Fixed bug where wizard lock opened doors instead of locking them.
-
-- Fixed bug where Ungoliant was not a female.
 
 - Fixed some inconsistencies with giants.
 
