@@ -813,19 +813,16 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			return;
 		}
 
-		case TV_STATUE:
 		case TV_HOLD:
 		{
-			if (o_ptr->name3 > 0)
-			{
-				if (o_ptr->tval == TV_HOLD) modstr = "sealed";
-				else modstr = "stone";
-				break;
-			}
-			/* Else drop down */
+			if (o_ptr->name3 > 0) modstr = "sealed";
+			else modstr = "empty";
+			break;
 		}
 
 		/* Hack -- Body Parts/Skeletons/Skins etc. */
+		case TV_STATUE:
+		case TV_ASSEMBLY:
 		case TV_BODY:
 		case TV_BONE:
 		case TV_EGG:
@@ -835,14 +832,17 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			{
 				switch (o_ptr->tval)
 				{
+					case TV_STATUE:
+						modstr = "an ancient god";
+						break;
+					case TV_ASSEMBLY:
+						modstr = "mechanism";
+						break;
 					case TV_SKIN:
 						modstr = "dusty";
 						break;
 					case TV_BODY:
 						modstr = "mummified";
-						break;
-					case TV_HOLD:
-						modstr = "empty";
 						break;
 					case TV_EGG:
 						if (o_ptr->sval == SV_EGG_SPORE)
@@ -1080,23 +1080,6 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			object_desc_str_macro(t, "?)");
 		}
 	}
-
-	/* Looks like a monster */
-	if ((o_ptr->tval == TV_STATUE) && (o_ptr->name3 > 0))
-	{
-		object_desc_str_macro(t, " of ");
-
-		if (!(r_info[o_ptr->name3].flags1 & (RF1_UNIQUE)))
-		{
-			cptr name= r_name + r_info[o_ptr->name3].name;
-
-			if (is_a_vowel(name[0])) object_desc_str_macro(t, "an ");
-			else object_desc_str_macro(t, "a ");
-		}
-
-		object_desc_str_macro(t, r_name + r_info[o_ptr->name3].name);
-	}
-
 
 	/* Looks like/holds a monster */
 	if ((o_ptr->tval == TV_HOLD) && (o_ptr->name3 > 0))

@@ -2270,10 +2270,11 @@ void monster_death(int m_idx)
 	/* Drop corpses */
 	if (variant_drop_body)
 	{
-		/* Hack -- only rarely drop bodies */
+		/* Hack -- only sometimes drop bodies */
 		if ((rand_int(100)<30) || (r_ptr->flags1 & (RF1_UNIQUE)) ||
 			(r_ptr->flags2 & (RF2_REGENERATE)) ||
-			(r_ptr->level > p_ptr->depth))
+			(r_ptr->level > p_ptr->depth) ||
+			(r_ptr->flags7 & (RF7_ASSEMBLY)))
 		{
 			/* Get local object */
 			i_ptr = &object_type_body;
@@ -2294,11 +2295,12 @@ void monster_death(int m_idx)
 				/* Drop it in the dungeon */
 				drop_near(i_ptr, -1, y, x);
 			}
-
-			/* Add some dust */
-			if (r_ptr->flags7 & (RF7_HAS_DUST)) feat_near(FEAT_FLOOR_DUST_T,m_ptr->fy,m_ptr->fx);
-
 		}
+
+		/* Add some residue */
+		if (r_ptr->flags3 & (RF3_DEMON)) feat_near(FEAT_FLOOR_FIRE_T,m_ptr->fy,m_ptr->fx);
+		if (r_ptr->flags3 & (RF3_UNDEAD)) feat_near(FEAT_FLOOR_DUST_T,m_ptr->fy,m_ptr->fx);
+		if (r_ptr->flags7 & (RF7_HAS_SLIME)) feat_near(FEAT_FLOOR_SLIME_T,m_ptr->fy,m_ptr->fx);
 	}
 
 	/* Do we drop more treasure? */

@@ -4,7 +4,7 @@
  * Copyright (c) 1997 Ben Harrison, James E. Wilson, Robert A. Koeneke
  *
  * This software may be copied and distributed for educational, research,
- * and not for profit purposes provided that this copyright and statement
+ * and not for profit purposes provided that tefhis copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
  * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
@@ -1536,6 +1536,7 @@
 #define TV_EGG    9      /* Eggs ('~') */
 #define TV_SPELL 10      /* Magic spells (varies) */
 #define TV_STATUE       11      /* Statues ('~') */
+#define TV_ASSEMBLY	12	/* Assemblys ('~') */
 #define TV_SHOT   16      /* Ammo for slings */
 #define TV_ARROW 17      /* Ammo for bows */
 #define TV_BOLT  18      /* Ammo for x-bows */
@@ -1602,6 +1603,38 @@
 #define SV_BODY_LEG   6
 #define SV_BODY_WING  7
 #define SV_BODY_CLAW  12
+#define SV_BODY_HEADLESS  13
+#define SV_BODY_BUTCHERED  14
+#define SV_BODY_MEAT 15
+
+/* The "sval" codes for TV_STATUE */
+#define SV_STATUE_STONE       1
+
+
+/* The "sval" codes for TV_ASSEMBLY */
+#define SV_ASSEMBLY_NONE   	 1
+#define SV_ASSEMBLY_ARM_L	 2
+#define SV_ASSEMBLY_PART_ARM_L 	 3
+#define SV_ASSEMBLY_ARM_R	 4
+#define SV_ASSEMBLY_PART_ARMS	 5
+#define SV_ASSEMBLY_HAND_L	 6
+#define SV_ASSEMBLY_MISS_HAND_R  7
+#define SV_ASSEMBLY_HAND_R       8
+#define SV_ASSEMBLY_PART_HANDS   9
+#define SV_ASSEMBLY_LEG_L	 10
+#define SV_ASSEMBLY_PART_LEG_L	 11
+#define SV_ASSEMBLY_LEG_R	 12
+#define SV_ASSEMBLY_PART_LEGS	 13
+#define SV_ASSEMBLY_HEAD	 14
+#define SV_ASSEMBLY_FULL         15
+#define SV_ASSEMBLY_ARMS	 16
+#define SV_ASSEMBLY_HANDS   	 17
+#define SV_ASSEMBLY_PART_HAND_L  18
+#define SV_ASSEMBLY_PART_ARM_R   19
+#define SV_ASSEMBLY_PART_HAND_R  20
+#define SV_ASSEMBLY_MISS_HAND_L  21
+#define SV_ASSEMBLY_LEGS	 22
+#define SV_ASSEMBLY_PART_LEG_R	 23
 
 /* The "sval" codes for TV_SKIN */
 #define SV_SKIN_SKIN  1
@@ -2996,7 +3029,7 @@
 #define RF7_HAS_LEG	  0x00000080
 #define RF7_HAS_WING	 0x00000100
 #define RF7_HAS_BLOOD	0x00000200      /* Leave bloody trails if injured */
-#define RF7_HAS_DUST	 0x00000400
+#define RF7_ASSEMBLY	 0x00000400	/* Assembly of component parts */
 #define RF7_HAS_SKIN	 0x00000800
 #define RF7_HAS_SCALE	0x00001000
 #define RF7_HAS_FEATHER      0x00002000

@@ -26,6 +26,13 @@ monsters from Eyangband have been added.
 
 - Spores and potions will explode when thrown (Potions used to just affect the target).
 
+- Added golem parts which can be assembled into a complete golem by activating the
+parts.
+
+- Added workshops, which contain golem parts and golems.
+
+- Added statues of varying values. These are all extremely heavy however.
+
 ### User Interface ###
 
 - Monster recall now reports what particular types of items are dropped by each

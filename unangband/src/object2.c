@@ -1579,6 +1579,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 
 
 		/* Bodies, Skeletons, Skins, Eggs, Statues */
+		case TV_ASSEMBLY:
 		case TV_STATUE:
 		case TV_EGG:
 		case TV_BONE:
@@ -3479,6 +3480,32 @@ static bool name_drop_okay(int r_idx)
 		else if ((j_ptr->sval == SV_BODY_WING) && !(r_ptr->flags7 & (RF7_HAS_WING))) return (FALSE);
 		else if ((j_ptr->sval == SV_BODY_CLAW) && !(r_ptr->flags7 & (RF7_HAS_CLAW))) return (FALSE);
 	}
+	else if (j_ptr->tval == TV_ASSEMBLY)
+	{
+		/* Skip if monster does not have body part */
+		if ((j_ptr->sval == SV_ASSEMBLY_NONE) && !(r_ptr->flags7 & (RF7_HAS_CORPSE))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_HEAD) && !(r_ptr->flags7 & (RF7_HAS_HEAD))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_HANDS) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_HAND_L) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_HAND_R) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_HANDS) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_HAND_L) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_HAND_R) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_MISS_HAND_L) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_MISS_HAND_R) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_ARMS) && !(r_ptr->flags7 & (RF7_HAS_ARM))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_ARM_L) && !(r_ptr->flags7 & (RF7_HAS_ARM))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_ARM_R) && !(r_ptr->flags7 & (RF7_HAS_ARM))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_ARMS) && !(r_ptr->flags7 & (RF7_HAS_ARM))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_ARM_L) && !(r_ptr->flags7 & (RF7_HAS_ARM))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_ARM_R) && !(r_ptr->flags7 & (RF7_HAS_ARM))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_LEG_L) && !(r_ptr->flags7 & (RF7_HAS_LEG))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_LEG_R) && !(r_ptr->flags7 & (RF7_HAS_LEG))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_LEGS) && !(r_ptr->flags7 & (RF7_HAS_LEG))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_LEG_L) && !(r_ptr->flags7 & (RF7_HAS_LEG))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_LEG_R) && !(r_ptr->flags7 & (RF7_HAS_LEG))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_LEGS) && !(r_ptr->flags7 & (RF7_HAS_LEG))) return (FALSE);
+	}
 	else if (j_ptr->tval == TV_HOLD)
 	{
 		/* Only fit elementals in bottles */
@@ -3490,7 +3517,6 @@ static bool name_drop_okay(int r_idx)
 		/* Only fit animals in cages */
 		else if ((j_ptr->sval == SV_HOLD_CAGE) && !(r_ptr->flags3 & (RF3_ANIMAL))) return (FALSE);
 	}
-
 	else if (j_ptr->tval == TV_STATUE)
 	{
 		/* Skip never move/never blow */
@@ -4072,14 +4098,22 @@ bool make_body(object_type *j_ptr, int r_idx)
 	}
 
 	/* No body */
-	if (!(r_ptr->flags7 & (RF7_HAS_CORPSE | RF7_HAS_SKELETON | RF7_HAS_SKULL | RF7_HAS_SPORE))) return (FALSE);
+	if (!(r_ptr->flags7 & (RF7_HAS_CORPSE | RF7_HAS_SKELETON | RF7_HAS_SKULL | RF7_ASSEMBLY))) return (FALSE);
 
-	/* Usually produce a corpse */
-	if (r_ptr->flags3 & (RF3_HURT_ROCK)) k_idx = lookup_kind(TV_STATUE,1);
+	/* Living hurt rock monsters turn to stone */
+	if ((r_ptr->flags3 & (RF3_HURT_ROCK)) && !(r_ptr->flags3 & (RF3_NONLIVING))) k_idx = lookup_kind(TV_STATUE,SV_STATUE_STONE);
+
+	/* Hack -- golems leave behind assemblies */
+	else if (r_ptr->flags7 & (RF7_ASSEMBLY)) k_idx = lookup_kind(TV_ASSEMBLY, SV_ASSEMBLY_NONE);
+
+	/* Monsters with corpses produce corpses */
 	else if (r_ptr->flags7 & (RF7_HAS_CORPSE)) k_idx = lookup_kind(TV_BODY,SV_BODY_CORPSE);
+
+	/* Monsters without corpses may produce skeletons */
 	else if (r_ptr->flags7 & (RF7_HAS_SKELETON)) k_idx = lookup_kind(TV_BONE,SV_BONE_SKELETON);
+
+	/* Monsters without corpses or skeletons may produce skulls */
 	else if (r_ptr->flags7 & (RF7_HAS_SKULL)) k_idx = lookup_kind(TV_BONE,SV_BONE_SKULL);
-	else if (r_ptr->flags7 & (RF7_HAS_SPORE)) k_idx = lookup_kind(TV_EGG,SV_EGG_SPORE);
 
 	if (!k_idx) return (FALSE);
 
@@ -4113,8 +4147,16 @@ bool make_head(object_type *j_ptr, int r_idx)
 	/* No body */
 	if (!(r_ptr->flags7 & (RF7_HAS_HEAD))) return (FALSE);
 
-	/* Usually produce a corpse */
+	/* Usually produce a head */
 	k_idx = lookup_kind(TV_BODY,SV_BODY_HEAD);
+
+	if (!k_idx) return (FALSE);
+
+	/* Living hurt rock monsters get assembly (statue) heads sometimes */
+	if ((r_ptr->flags3 & (RF3_HURT_ROCK)) && !(r_ptr->flags3 & (RF3_NONLIVING))) k_idx = lookup_kind(TV_ASSEMBLY,SV_ASSEMBLY_HEAD);
+
+	/* Hack -- golems leave behind assemblies */
+	else if (r_ptr->flags7 & (RF7_ASSEMBLY)) k_idx = lookup_kind(TV_ASSEMBLY, SV_ASSEMBLY_HEAD);
 
 	if (!k_idx) return (FALSE);
 
@@ -4176,6 +4218,34 @@ bool make_part(object_type *j_ptr, int r_idx)
 
 	/* Have a part */
 	if (!k_idx) return(FALSE);
+
+	/* Handle assembly monsters */
+	if (r_ptr->flags7 & (RF7_ASSEMBLY))
+	{
+		if ((k_info[k_idx].tval == TV_BODY) && (k_info[k_idx].sval == SV_BODY_HAND))
+		{
+			if (rand_int(100)<50)
+				k_idx = lookup_kind(TV_ASSEMBLY,SV_ASSEMBLY_HAND_L);
+			else
+				k_idx = lookup_kind(TV_ASSEMBLY,SV_ASSEMBLY_HAND_R);
+		}
+		else if ((k_info[k_idx].tval == TV_BODY) && (k_info[k_idx].sval == SV_BODY_ARM))
+		{
+			if (rand_int(100)<50)
+				k_idx = lookup_kind(TV_ASSEMBLY,SV_ASSEMBLY_ARM_L);
+			else
+				k_idx = lookup_kind(TV_ASSEMBLY,SV_ASSEMBLY_ARM_R);
+		}
+		else if ((k_info[k_idx].tval == TV_BODY) && (k_info[k_idx].sval == SV_BODY_LEG))
+		{
+			if (rand_int(100)<50)
+				k_idx = lookup_kind(TV_ASSEMBLY,SV_ASSEMBLY_LEG_L);
+			else
+				k_idx = lookup_kind(TV_ASSEMBLY,SV_ASSEMBLY_LEG_R);
+		}
+
+		if (!k_idx) return(FALSE);
+	}
 
 	/* Prepare the object */
 	object_prep(j_ptr, k_idx);

@@ -125,6 +125,7 @@ static const grouper group_item[] =
 	{ TV_SKIN,    NULL },
 	{ TV_STATUE,    NULL },
 	{ TV_BODY,      NULL },
+	{ TV_ASSEMBLY,      NULL },
 	  { TV_MAP,       NULL },
 	{ 0, "" }
 };

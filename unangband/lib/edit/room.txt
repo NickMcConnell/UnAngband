@@ -1685,7 +1685,7 @@ F:406
 L:DARK
 S:SEEN
 
-N:17:2:58:2
+N:17:2:69:2
 A:thieves
 B:
 D:Loot covers 
@@ -1693,7 +1693,7 @@ K:100
 S:SEEN
 R:SNEAKY
 
-N:17:2:59:3
+N:17:2:70:3
 A:thieves
 B:
 D:Stolen goods cover 
@@ -1701,13 +1701,20 @@ F:317
 S:SEEN
 R:SNEAKY
 
-N:17:2:60:3
+N:17:2:71:3
 A:thieves
 B:
 D:Stolen goods cover 
 F:316
 S:SEEN
 R:SNEAKY
+
+N:17:2:73:14
+A:
+B:workshop
+D:Spare parts cover
+K:12
+G:g
 
 N:17:4:100:0
 A:
