@@ -198,6 +198,10 @@ C:1:z
 A:z
 C:1:a
 
+# Engrave a rune (Apply)
+A:y
+C:1:^G
+
 # Hack -- Commit suicide
 A:Q
 C:1:^C
