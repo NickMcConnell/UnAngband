@@ -4191,14 +4191,13 @@ B:HIT:POISON:3d4
 B:HIT:HURT:3d4
 F:UNIQUE
 F:FORCE_MAXHP | FORCE_SLEEP
-F:ESCORT
 F:RAND_25
 F:ONLY_ITEM | DROP_4D2 | DROP_GOOD
 F:SMART | INVISIBLE | BASH_DOOR
 F:EVIL | DEMON | IM_FIRE
 S:1_IN_5
 S:BLINK | TPORT | TELE_TO | TELE_AWAY | TELE_LEVEL | BLIND
-S:CONF | SCARE | S_KIN
+S:CONF | SCARE
 D:He wears a blue coat, his eyes are blue, and his face is as a ripe as
 D: a red apple, but creased in laughter.
 
@@ -15495,3 +15494,83 @@ D:Your life force is torn from your body as this powerful unearthly being
 D: approaches. It whispers dreadful words of ancient songs, cold and
 D: unearthly.
 
+N:1082:The King of the Wood Elves
+G:l:o
+I:120:11d100:20:80:20
+W:37:4:0:1000
+B:HIT:HURT:3d8
+B:HIT:HURT:3d8
+B:HIT:HURT:3d8
+F:UNIQUE | MALE
+F:ESCORT
+F:FORCE_MAXHP | FORCE_SLEEP
+F:ONLY_ITEM | DROP_2D2 | DROP_GOOD | DROP_GREAT
+F:OPEN_DOOR | BASH_DOOR
+F:EVIL | IM_FIRE | IM_COLD | IM_POIS
+F:HAS_LITE
+F:NO_CONF | NO_SLEEP
+S:1_IN_5
+S:HASTE | BLIND | CONF | DARKNESS | BO_FIRE | BO_COLD
+S:S_ANIMAL | S_MONSTER | S_SPIDER
+D:A strong and unforgiving wood elf, he holds court in the deepest bowels of
+D: Mirkwood, and acts without mercy against outsiders.
+
+N:1083:Boromir, son of Denethor
+G:t:g
+I:120:10d100:20:90:40
+W:34:5:0:1200
+B:HIT:HURT:5d5
+B:HIT:HURT:5d5
+B:HIT:HURT:5d5
+B:SHOOT:ARROW:5d6
+F:UNIQUE | MALE
+F:FORCE_MAXHP
+F:ONLY_ITEM | DROP_2D2 | DROP_GOOD
+F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
+F:NEED_LITE | WARRIOR
+S:1_IN_10 | S_KIN | SHOOT
+D:The once noble son of the steward of Gondor has been driven mad
+D: by his lust for the ring of Power.  He believes you have it.
+
+N:1084:Faramir, son of Denethor
+G:t:G
+I:120:10d100:20:90:40
+W:34:5:0:1200
+B:HIT:HURT:5d5
+B:HIT:HURT:5d5
+B:HIT:HURT:5d5
+B:SHOOT:ARROW:5d6
+F:UNIQUE | MALE
+F:FORCE_MAXHP
+F:ONLY_ITEM | DROP_2D2 | DROP_GOOD
+F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
+F:NEED_LITE | WARRIOR
+S:1_IN_10 | S_KIN | SHOOT
+D:The still-noble son of the steward of Gondor guards the depths of
+D: Ithilien against the Enemy. You are an intruder here.
+
+# Was Uriel, the Angel of Fire. Removed breaths.
+
+N:1085:Denethor, Steward of Gondor
+G:t:o
+I:130:55d100:40:160:10
+W:61:3:0:25000
+B:HIT:FIRE:9d12
+B:HIT:FIRE:4d6
+B:HIT:HURT:10d10
+B:HIT:HURT:10d10
+F:UNIQUE | MALE | 
+F:ESCORT | ESCORTS |
+F:FORCE_SLEEP | FORCE_MAXHP | 
+F:ONLY_ITEM | DROP_3D2 | DROP_4D2 | DROP_GOOD | 
+F:SMART | TAKE_ITEM | OPEN_DOOR | BASH_DOOR | POWERFUL | MOVE_BODY | 
+F:IM_ACID | IM_FIRE | IM_COLD | IM_ELEC | IM_POIS | NEED_LITE
+S:1_IN_2 | 
+S:TELE_TO | BLIND | 
+S:BO_FIRE | BO_MANA | BO_PLAS | BA_FIRE | 
+S:HEAL | HASTE | TPORT | TELE_AWAY | BLIND | CONF | SCARE | 
+S:CAUSE_4 | BRAIN_SMASH | FORGET | TRAPS | 
+S:S_KIN
+D:The proud 'king' of Gondor, he has been driven mad by his contact
+D: with Sauron through the palantir, and by the death of his sons.
+D:  You see the glint of a terrible fire in his eyes.

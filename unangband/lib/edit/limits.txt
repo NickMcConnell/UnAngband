@@ -1,12 +1,12 @@
-# File: z_info.txt
+# File: limits.txt
 
 
-# This file is used to initialize the "lib/data/z_info.raw" file, which is
+# This file is used to initialize the "lib/data/limits.raw" file, which is
 # used to initialize the "array sizes" information for the Angband game.
 
 # Do not modify this file unless you know exactly what you are doing,
 # unless you wish to risk possible system crashes and broken savefiles.
-# After modifying this file, delete the "lib/data/z_info.raw" file.
+# After modifying this file, delete the "lib/data/limits.raw" file.
 
 
 # Version stamp (required)
@@ -32,7 +32,7 @@ M:E:128
 M:X:203
 
 # Maximum number of monster races
-M:R:1083
+M:R:1087
 
 # Maximum number of vaults
 M:V:51

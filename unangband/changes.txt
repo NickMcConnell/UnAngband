@@ -64,6 +64,12 @@ performance hit, but should make those screen dumps even
 prettier.
 - Dungeon entrances are now lit, so they are easier to
 find at night...
+- Added King of the Wood Elves, Faramir, Boromir and
+Denethor, and reorganised some of later campaign to be a
+smoother transition from end of Moria/Isengard/Caradhras.
+- Removed escorts from Tom Bombadil, and summon kin, as
+it felt a little 'wrong' (Not as bad as killing him of
+course ;)
 
 
 Andrew Sidwell has volunteered to help out while I'm
