@@ -31,6 +31,9 @@ part of screen if window is resized.
 - Fixed bug where learning a spell would report it as a song (Reported
  by Adam Horowitz).
 
+- Fixed bugs so that you can escape locations where you are stuck other
+than by teleporting.
+
 Angband 0.5.2 "I'm on fire" release
 
 I have reorganised this changes.txt file to similar to what Eytan Zweig

@@ -1519,7 +1519,7 @@ void py_attack(int y, int x)
  * This routine should only be called when energy has been expended.
  *
  */
-bool stuck_player(int dir)
+bool stuck_player(int *dir)
 {
 	int py = p_ptr->py;
 	int px = p_ptr->px;
@@ -1570,20 +1570,8 @@ bool stuck_player(int dir)
 
 		}
 
-		/* Mention known obstacles */
-		else
-		{
-			/* Get the mimiced feature */
-			mimic = f_ptr->mimic;
-
-			/* Get the feature name */
-			name = (f_name + f_info[mimic].name);
-
-			/* Tell the player */
-			msg_format("You are stuck %s%s.",
-				((f_ptr->flags2 & (FF2_FILLED)) ? "" :
-					(is_a_vowel(name[0]) ? "inside an " : "inside a ")),name);
-		}
+		/* Always make direction 0 */
+		*dir = 0;
 
 		return (TRUE);
 
@@ -1628,7 +1616,7 @@ void move_player(int dir, int jumping)
 		py_attack(y, x);
 	}
 
-	else if (stuck_player(dir))
+	else if (stuck_player(&dir))
 	{
 		/* Do nothing */
 	}

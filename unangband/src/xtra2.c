@@ -5042,10 +5042,7 @@ bool get_aim_dir(int *dp)
  *
  * This function should be used for all "repeatable" commands, such as
  * run, walk, open, close, bash, disarm, spike, tunnel, etc, as well
- * as all commands which must reference a grid adjacent to the player,
- * and which may not reference the grid under the player.
- *
- * Directions "5" and "0" are illegal and will not be accepted.
+ * as all commands which must reference a grid adjacent to the player.
  *
  * This function tracks and uses the "global direction", and uses
  * that as the "desired direction", if it is set.
