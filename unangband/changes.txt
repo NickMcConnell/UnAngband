@@ -12,6 +12,18 @@ reseting these preferences to the underlying settings.
 However it has much greater flexibility, and can be used
 anytime Angband expects user interaction.
 - Updated the help files to reflect the above commands.
+- Giant spider webs can now allow spells cast through
+them.
+- You can now no longer recall from a dungeon to a town
+in a different location, as it was too unclear for
+when this case would apply.
+- Fixed bug where ego items would be revealed if they
+were generated in a store, even if subsequently discarded.
+- Fixed bug where scrolls of Curse Armour/ Curse Weapon
+effects were reversed.
+- Fixed a bug where Bree town levels extended several
+levels into the dungeon.
+
 
 
 
