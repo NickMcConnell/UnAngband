@@ -12,19 +12,16 @@
 #include "angband.h"
 
 #define LOG_PRINT(string) \
-	do { if (randart_verbose) \
-		fprintf(randart_log, (string)); \
-	} while (0);
+	if (randart_verbose) fprintf(randart_log, (string));
 
 #define LOG_PRINT1(string, value) \
-	do { if (randart_verbose) \
-		fprintf(randart_log, (string), (int)(value)); \
-	} while (0);
+	if (randart_verbose) fprintf(randart_log, (string), (int)(value));
+
+#define LOG_PRINT_STR(string, value) \
+	if (randart_verbose) fprintf(randart_log, (string), (value));
 
 #define LOG_PRINT2(string, val1, val2) \
-	do { if (randart_verbose) \
-		fprintf(randart_log, (string), (int)(val1), (int)(val2)); \
-	} while (0);
+	if (randart_verbose) fprintf(randart_log, (string), (int)(val1), (int)(val2));
 
 /*
  * Original random artifact generator (randart) by Greg Wooledge.
@@ -2392,7 +2389,7 @@ static s16b choose_item(int a_idx)
 	}
 
 	tval = item_choices[i].tval;
-	LOG_PRINT1("Creating %s\n", item_choices[i].report);
+	LOG_PRINT_STR("Creating %s\n", item_choices[i].report);
 
 	switch (tval)
 	{
@@ -5519,7 +5516,7 @@ static int artifacts_acceptable(void)
 				gloves > 0 ? " gloves" : "",
 				boots > 0 ? " boots" : "");
 			msg_format("Restarting generation process: not enough %s", types);
-			LOG_PRINT1("Restarting generation process: not enough %s", types);
+			LOG_PRINT_STR("Restarting generation process: not enough %s", types);
 		}
 		return (0);
 	}
