@@ -1,3 +1,5 @@
+UnAngband 0.5.3: "Let It Be" (the Killer Beatle release)
+
 ### Game-play ###
 
 - Dropped down effectiveness of healing spell of a monster.
@@ -14,6 +16,10 @@ items will be known as soon as identified.
 - 'I'nspection of *Identified* item will always reveal all its true
 abilities regardless of Save File Option.
 
+- Added additional rune combinations to cast spells.
+
+- Added vanilla 3.0 mage spells.
+
 ### User Interface ###
 
 - 'I'nspection of *Identified* items doesn't display annoying 'It does
@@ -26,6 +32,8 @@ character is loaded.
 - All Save File Options are now default for new save-file.
 
 ### Bug fixes ###
+
+- Made HTML screendumps a fair bit smaller, or so I hope.
 
 - Fixed bug which causes crash when fire/throw command is used.
 
@@ -50,6 +58,9 @@ character is loaded.
 
 - Fixed bug which display meaningless '-more-' prompt when you press
 '=' at startup (only when random artifact is re-rolled).
+
+- Fixed placement of guardians and quest monsters.
+
 
 
 Unangband 0.5.2b Bugfix release
@@ -112,6 +123,8 @@ body armor. (Reported by Adam Horowitz).
 
 - Fix bug that crashed game if browsing a brand weapon spell (Reported
 by Adam Horowitz).
+
+
 
 Unangband 0.5.2a Bugfix release
 

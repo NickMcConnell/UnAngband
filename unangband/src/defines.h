@@ -41,13 +41,13 @@
 /*
  * Name of the version/variant
  */
-#define VERSION_NAME "Unangband"
+#define VERSION_NAME "UnAngband"
 
 
 /*
  * Current version string
  */
-#define VERSION_STRING	"0.5.2a"
+#define VERSION_STRING	"0.5.3"
 
 /*
  * Hack -- note use of new version name/string but old version
