@@ -7,6 +7,11 @@ use with David Gervais' 54x54 graphics tiles (As 54 is not divisible by 4).
 
 - Improve scrolling when setting visuals.
 
+### Build / Platform ###
+
+- Makefile.std was reporting errors if the files it tries to clean are not
+there (Reported by Robert Ruehlmann).
+
 Unangband 0.5.5: "New Years Resolution"
 
 ### Game Play ###
