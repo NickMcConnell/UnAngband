@@ -733,7 +733,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 								/* Ignore annoying locations */
 								if (!in_bounds_fully(yy, xx)) continue;
 
-								if (f_info[cave_feat[yy][xx]].flags3 & (FF3_OUTSIDE))
+								if (f_info[cave_feat[yy][xx]].flags2 & (FF2_GLOW))
 								{
 									if (graf_new)
 									{
@@ -838,7 +838,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 								/* Ignore annoying locations */
 								if (!in_bounds_fully(yy, xx)) continue;
 
-								if (f_info[cave_feat[yy][xx]].flags3 & (FF3_OUTSIDE))
+								if (f_info[cave_feat[yy][xx]].flags2 & (FF2_GLOW))
 								{
 									if (!graf_new)
 									{
@@ -3372,7 +3372,7 @@ void update_dyna(void)
 	int fast_dyna_n = dyna_n;
 	u16b *fast_dyna_g = dyna_g;
 
-	s16b *fast_cave_feat = &cave_feat[0][0];
+	u16b temp_dyna_g[DYNA_MAX];
 
 	s16b feat;
 
@@ -3412,29 +3412,30 @@ void update_dyna(void)
 				/* Check distance */
 				if (distance(y,x,py,px) > MAX_SIGHT) continue;
 
-				/* Grid */
-				g = GRID(y,x);
-
 				/* Get grid feat */
-				feat = fast_cave_feat[g];
+				feat = cave_feat[y][x];
 
 				/* Get the feature */
 				f_ptr = &f_info[feat];
 
 				/* Check for dynamic */
-				if (f_ptr->flags3 & (FF3_DYNAMIC | FF3_STRIKE | FF3_ERUPT))
+				if (f_ptr->flags3 & (FF3_DYNAMIC_MASK))
 				{
-					fast_dyna_g[fast_dyna_n++] = g;
+					fast_dyna_g[fast_dyna_n++] = GRID(y,x);
 				}
 			}
 		}
 
 		dyna_cent_y = py;
 		dyna_cent_x = px;
+		dyna_n = fast_dyna_n;
 	}
 
-	/* Create a temporary copy for this function */
-	COPY(fast_dyna_g, dyna_g, u16b);
+	/* Actually apply the attacks */
+	for (i = 0; i < fast_dyna_n; i++)
+	{
+		temp_dyna_g[i] = fast_dyna_g[i];
+	}
 
 	/* Actually apply the attacks */
 	for (i = 0; i < fast_dyna_n; i++)
@@ -3444,43 +3445,23 @@ void update_dyna(void)
 		/* Grid */
 		g = fast_dyna_g[i];
 
+		/* Coordinates */
+		y = GRID_Y(g);
+		x = GRID_X(g);
+
 		/* Get grid feat */
-		feat = fast_cave_feat[g];
+		feat = cave_feat[y][x];
 
 		/* Get the feature */
 		f_ptr = &f_info[feat];
 
-		/* Dynamic */
-		if (f_ptr->flags3 & (FF3_DYNAMIC))
+		/* Timed */
+		if (f_ptr->flags3 & (FF3_TIMED))
 		{
-			int dir = rand_int(10);
-
-			if (dir < 8)
+			if (!(rand_int(50)))
 			{
-				y = GRID_Y(g) + ddy_ddd[dir];
-				x = GRID_X(g) + ddx_ddd[dir];
-
-				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
-
-				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
-   
-				/* Apply the blow */
-				project(0, 0, y, x, dam, f_ptr->blow.effect, flg);
+				cave_alter_feat(y,x,FS_TIMED);
 			}
-
-			if (rand_int(10) < 8)
-			{
-				y = GRID_Y(g);
-				x = GRID_X(g);
-
-				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
-
-				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
-   
-				/* Apply the blow */
-				project(0, 0, y, x, dam, f_ptr->blow.effect, flg);
-			}
-
 		}
 
 		/* Erupt */
@@ -3488,9 +3469,6 @@ void update_dyna(void)
 		{
 			if (!(rand_int(20)))
 			{
-				y = GRID_Y(g);
-				x = GRID_X(g);
-
 				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
 
 				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice) * 2;
@@ -3505,9 +3483,6 @@ void update_dyna(void)
 		{
 			if (!(rand_int(20)))
 			{
-				y = GRID_Y(g);
-				x = GRID_X(g);
-
 				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
 
 				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice) * 10;
@@ -3516,11 +3491,39 @@ void update_dyna(void)
 				project(0, 0, y, x, dam, f_ptr->blow.effect, flg);
 			}
 		}
+
+		/* Dynamic */
+		if (f_ptr->flags3 & (FF3_SPREAD))
+		{
+			int dir = rand_int(10);
+
+			if (dir < 8)
+			{
+				int yy = y + ddy_ddd[dir];
+				int xx = x + ddx_ddd[dir];
+
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+
+				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
+   
+				/* Apply the blow */
+				project(0, 0, yy, xx, dam, f_ptr->blow.effect, flg);
+			}
+
+			if (rand_int(10) < 8)
+			{
+				y = GRID_Y(g);
+				x = GRID_X(g);
+
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+
+				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
+   
+				/* Apply the blow */
+				project(0, 0, y, x, dam, f_ptr->blow.effect, flg);
+			}
+		}
 	}
-
-	/* Free up copied memory */
-	FREE(fast_dyna_g);
-
 }
 
 
@@ -4244,7 +4247,7 @@ static void cave_set_feat_aux(int y, int x, int feat)
 	feature_type *f_ptr = &f_info[feat];
 
 	/* Set if dynamic */
-	bool dyna = (f_info[cave_feat[y][x]].flags3 & (FF3_DYNAMIC | FF3_STRIKE | FF3_ERUPT)) != 0;
+	bool dyna = (f_info[cave_feat[y][x]].flags3 & (FF3_DYNAMIC_MASK)) != 0;
 
 	bool hide_item = (f_info[cave_feat[y][x]].flags2 & (FF2_HIDE_ITEM)) != 0;
 
@@ -4272,11 +4275,11 @@ static void cave_set_feat_aux(int y, int x, int feat)
 	else if (!(player_can_see_bold(y,x))) cave_info[y][x] &= ~(CAVE_MARK);
 
 	/* Check if adding to dynamic list */
-	if (!dyna && (f_ptr->flags3 & (FF3_DYNAMIC | FF3_STRIKE | FF3_ERUPT)))
+	if (!dyna && (f_ptr->flags3 & (FF3_DYNAMIC_MASK)))
 	{
 		if (dyna_full)
 		{
-                        if (distance(y,x,p_ptr->py,p_ptr->px) < MAX_SIGHT)
+			if (distance(y,x,p_ptr->py,p_ptr->px) < MAX_SIGHT)
 			{
 				dyna_g[dyna_n++] = GRID(y,x);
 			}
@@ -4295,7 +4298,7 @@ static void cave_set_feat_aux(int y, int x, int feat)
 		}
 	}
 	/* Check if removing from dynamic list */
-	else if (dyna && !(f_ptr->flags3 & (FF3_DYNAMIC | FF3_STRIKE | FF3_ERUPT)))
+	else if (dyna && !(f_ptr->flags3 & (FF3_DYNAMIC_MASK)))
 	{
 		int i, new_i = 0;
 
