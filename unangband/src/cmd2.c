@@ -541,8 +541,8 @@ static int count_feats(int *y, int *x, int action)
 	/* Count how many matches */
 	count = 0;
 
-	/* Check around (and under) the character */
-	for (d = 0; d < 9; d++)
+	/* Check around the character */
+	for (d = 0; d < 8; d++)
 	{
 		/* Extract adjacent (legal) location */
 		int yy = p_ptr->py + ddy_ddd[d];
@@ -550,11 +550,6 @@ static int count_feats(int *y, int *x, int action)
 
 		/* Must have knowledge */
 		if (!(cave_info[yy][xx] & (CAVE_MARK))) continue;
-
-		/* If stuck in something, we can only modify it */
-	      if (!(f_info[cave_feat[p_ptr->py][p_ptr->px]].flags1 & (FF1_MOVE))
-			&& !(f_info[cave_feat[p_ptr->py][p_ptr->px]].flags3 & (FF3_EASY_CLIMB))
-			&& (d!=0)) continue;
 
 		/* Get the feature */
 		feat = cave_feat[yy][xx];
