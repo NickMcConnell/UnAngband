@@ -14,6 +14,9 @@ are unaffected (Bug 682).
 
 - Updated pref files required for 32x32 bit maps (Bug 777).
 
+- Improved 'visual' editting code from Hengband (Bug 778) [Incomplete].
+
+
 ### Build / Platform ###
 
 - Remove references to nangband in makefile.
