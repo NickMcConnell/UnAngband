@@ -13374,7 +13374,7 @@ S:1_IN_9 |
 S:BR_INER
 D:This glistening ruby dragonfly doesn't seem to move at all.
 
-N:917:Giant fruit fly
+N:917:Giant may fly
 G:I:g
 I:120:3d8:12:14:20
 W:4:1:0:14
