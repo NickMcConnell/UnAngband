@@ -24,10 +24,7 @@ Sangband).
 ### User Interface ###
 
 - Now supports specifying whether or not a feature supports advanced lighting
-options in the pref file. Just append :YES or :NO to the existing pref file
-entry in the graf-xxx.prf file. The default is 'NO' for any existing entry
-and 'YES' for any feature which does not have an entry (eg uses original
-ASCII graphics).
+options in the pref file.
 
 - Knowledge menu sub-items are sorted alphabetically. This could be changed 
 in the future to allow a selection of possible sort orders (Depth, kills etc).
