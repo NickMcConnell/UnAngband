@@ -4317,7 +4317,7 @@ bool fire_hands(int typ, int dir, int dam)
 /*
  * Create a (wielded) spell item
  */
-static void wield_spell(int item, int sval, int time)
+static void wield_spell(int item, int k_idx, int time)
 {
 
 	object_type *i_ptr;
@@ -4334,7 +4334,7 @@ static void wield_spell(int item, int sval, int time)
 	i_ptr = &object_type_body;
 
 	/* Create the spell */
-	object_prep(i_ptr, lookup_kind(TV_SPELL, sval));
+	object_prep(i_ptr, k_idx);
 	i_ptr->timeout = time;
 	object_aware(i_ptr);
 	object_known(i_ptr);
