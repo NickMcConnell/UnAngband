@@ -44,7 +44,7 @@ are unaffected (Bug 682).
 
 - Updated pref files required for 32x32 bit maps (Bug 777).
 
-- Improved 'visual' editting code from Hengband (Bug 778) [Incomplete].
+- Improved 'visual' editting code from Hengband (Bug 778).
 
 - Fixed map refresh bugs caused in big tile mode (Bug 780).
 

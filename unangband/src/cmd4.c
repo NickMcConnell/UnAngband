@@ -3053,9 +3053,6 @@ void do_cmd_save_screen_html(void)
 }
 
 
-
-#define BROWSER_ROWS	16
-
 /*
  * Description of each monster group.
  */
@@ -3536,13 +3533,21 @@ static void browser_cursor(char ch, int *column, int *grp_cur, int grp_cnt,
 	/* Diagonals - hack */
 	if ((ddx[d] > 0) && ddy[d])
 	{
+		int browser_rows;
+		int wid, hgt;
+
+		/* Get size */
+		Term_get_size(&wid, &hgt);
+
+		browser_rows = hgt - 8;
+
 		/* Browse group list */
 		if (!col)
 		{
 			int old_grp = grp;
 
 			/* Move up or down */
-			grp += ddy[d] * BROWSER_ROWS;
+			grp += ddy[d] * browser_rows;
 
 			/* Verify */
 			if (grp >= grp_cnt)	grp = grp_cnt - 1;
@@ -3554,7 +3559,7 @@ static void browser_cursor(char ch, int *column, int *grp_cur, int grp_cnt,
 		else
 		{
 			/* Move up or down */
-			list += ddy[d] * BROWSER_ROWS;
+			list += ddy[d] * browser_rows;
 
 			/* Verify */
 			if (list >= list_cnt) list = list_cnt - 1;
@@ -3710,6 +3715,14 @@ static void do_cmd_knowledge_artifacts(void)
 	bool flag;
 	bool redraw;
 
+	int browser_rows;
+	int wid, hgt;
+
+	/* Get size */
+	Term_get_size(&wid, &hgt);
+
+	browser_rows = hgt - 8;
+
 	/* Allocate the "object_idx" array */
 	C_MAKE(object_idx, z_info->a_max, int);
 
@@ -3760,7 +3773,7 @@ static void do_cmd_knowledge_artifacts(void)
 				Term_putch(i, 5, TERM_WHITE, '=');
 			}
 
-			for (i = 0; i < BROWSER_ROWS; i++)
+			for (i = 0; i < browser_rows; i++)
 			{
 				Term_putch(max + 1, 6 + i, TERM_WHITE, '|');
 			}
@@ -3770,23 +3783,26 @@ static void do_cmd_knowledge_artifacts(void)
 
 		/* Scroll group list */
 		if (grp_cur < grp_top) grp_top = grp_cur;
-		if (grp_cur >= grp_top + BROWSER_ROWS) grp_top = grp_cur - BROWSER_ROWS + 1;
+		if (grp_cur >= grp_top + browser_rows) grp_top = grp_cur - browser_rows + 1;
 
 		/* Scroll monster list */
 		if (object_cur < object_top) object_top = object_cur;
-		if (object_cur >= object_top + BROWSER_ROWS) object_top = object_cur - BROWSER_ROWS + 1;
+		if (object_cur >= object_top + browser_rows) object_top = object_cur - browser_rows + 1;
 
 		/* Display a list of object groups */
-		display_group_list(0, 6, max, BROWSER_ROWS, grp_idx, object_group_text, grp_cur, grp_top);
+		display_group_list(0, 6, max, browser_rows, grp_idx, object_group_text, grp_cur, grp_top);
 
 		/* Get a list of objects in the current group */
 		object_cnt = collect_artifacts(grp_idx[grp_cur], object_idx);
 
 		/* Display a list of objects in the current group */
-		display_artifact_list(max + 3, 6, BROWSER_ROWS, object_idx, object_cur, object_top);
+		display_artifact_list(max + 3, 6, browser_rows, object_idx, object_cur, object_top);
 
 		/* Prompt */
-		prt("<dir>, ENTER to recall, ESC", 23, 0);
+		prt("<dir>, ENTER to recall, ESC", hgt, 0);
+
+		/* Prompt */
+		prt("<dir>, 'r' to recall, ESC", hgt - 1, 0);
 
 		/* Mega Hack -- track this monster race */
 		if (object_cnt) artifact_track(object_idx[object_cur]);
@@ -3850,7 +3866,7 @@ static void do_cmd_knowledge_artifacts(void)
 /*
  * Display visuals.
  */
-static void display_visual_list(int col, int row, int height, int width, byte attr_top, byte char_left)
+static void display_visual_list(int col, int row, int height, int width, byte attr_top, char char_left)
 {
 	int i, j;
 
@@ -3881,11 +3897,6 @@ static void display_visual_list(int col, int row, int height, int width, byte at
 			ia = attr_top + i;
 			ic = char_left + j;
 
-			/* Ignore illegal characters */
-			if (ia > 0x7f || ic > 0xff || ic < ' ' ||
-			    (!use_graphics && ic > 0x7f))
-				continue;
-
 			a = (byte)ia;
 			c = (char)ic;
 
@@ -3910,7 +3921,7 @@ static void display_visual_list(int col, int row, int height, int width, byte at
  */
 static void place_visual_list_cursor(int col, int row, byte a, byte c, byte attr_top, byte char_left)
 {
-	int i = (a & 0x7f) - attr_top;
+	int i = a - attr_top;
 	int j = c - char_left;
 
 	int x = col + j;
@@ -3935,7 +3946,7 @@ static byte char_idx = 0;
  */
 static bool visual_mode_command(char ch, bool *visual_list_ptr, 
 				int height, int width, 
-				byte *attr_top_ptr, byte *char_left_ptr, 
+				byte *attr_top_ptr, char *char_left_ptr, 
 				byte *cur_attr_ptr, char *cur_char_ptr)
 {
 	static byte attr_old = 0;
@@ -3973,8 +3984,8 @@ static bool visual_mode_command(char ch, bool *visual_list_ptr,
 		{
 			*visual_list_ptr = TRUE;
 
-			*attr_top_ptr = MAX(0, (*cur_attr_ptr & 0x7f) - 5);
-			*char_left_ptr = MAX(0, *cur_char_ptr - 10);
+			*attr_top_ptr = (byte)MAX(0, (int)*cur_attr_ptr - 5);
+			*char_left_ptr = (char)MAX(-128, (int)*cur_char_ptr - 10);
 
 			attr_old = *cur_attr_ptr;
 			char_old = *cur_char_ptr;
@@ -3997,14 +4008,14 @@ static bool visual_mode_command(char ch, bool *visual_list_ptr,
 		{
 			/* Set the char */
 			*cur_attr_ptr = attr_idx;
-			*attr_top_ptr = MAX(0, (*cur_attr_ptr & 0x7f) - 5);
+			*attr_top_ptr = (byte)MAX(0, (int)*cur_attr_ptr - 5);
 		}
 
 		if (char_idx)
 		{
 			/* Set the char */
 			*cur_char_ptr = char_idx;
-			*char_left_ptr = MAX(0, *cur_char_ptr - 10);
+			*char_left_ptr = (char)MAX(-128, (int)*cur_char_ptr - 10);
 		}
 
 		return TRUE;
@@ -4014,23 +4025,20 @@ static bool visual_mode_command(char ch, bool *visual_list_ptr,
 		{
 			int eff_width;
 			int d = target_dir(ch);
-			byte a = (*cur_attr_ptr & 0x7f);
-			byte c = *cur_char_ptr;
+			byte a = *cur_attr_ptr;
+			char c = *cur_char_ptr;
 
 			if (use_bigtile) eff_width = width / 2;
 			else eff_width = width;
 					
 			/* Restrict direction */
 			if ((a == 0) && (ddy[d] < 0)) d = 0;
-			if ((c == 0) && (ddx[d] < 0)) d = 0;
-			if ((a == 0x7f) && (ddy[d] > 0)) d = 0;
-			if ((c == 0xff) && (ddx[d] > 0)) d = 0;
+			if ((c == -128) && (ddx[d] < 0)) d = 0;
+			if ((a == 255) && (ddy[d] > 0)) d = 0;
+			if ((c == 127) && (ddx[d] > 0)) d = 0;
 
 			a += ddy[d];
 			c += ddx[d];
-
-			/* Force correct code for both ASCII character and tile */
-			if (c & 0x80) a |= 0x80;
 
 			/* Set the visual */
 			*cur_attr_ptr = a;
@@ -4038,10 +4046,10 @@ static bool visual_mode_command(char ch, bool *visual_list_ptr,
 
 
 			/* Move the frame */
-			if ((ddx[d] < 0) && *char_left_ptr > MAX(0, (int)c - 10)) (*char_left_ptr)--;
-			if ((ddx[d] > 0) && *char_left_ptr + eff_width < MIN(0xff, (int)c + 10)) (*char_left_ptr)++;
-			if ((ddy[d] < 0) && *attr_top_ptr > MAX(0, (int)(a & 0x7f) - 4)) (*attr_top_ptr)--;
-			if ((ddy[d] > 0) && *attr_top_ptr + height < MIN(0x7f, (a & 0x7f) + 4)) (*attr_top_ptr)++;
+			if ((ddx[d] < 0) && *char_left_ptr > MAX(-128, (int)c - 10)) (*char_left_ptr)--;
+			if ((ddx[d] > 0) && *char_left_ptr + eff_width < MIN(127, (int)c + 10)) (*char_left_ptr)++;
+			if ((ddy[d] < 0) && *attr_top_ptr > MAX(0, (int)a - 4)) (*attr_top_ptr)--;
+			if ((ddy[d] > 0) && *attr_top_ptr + height < MIN(255, (int)a + 4)) (*attr_top_ptr)++;
 			return TRUE;
 		}
 				
@@ -4136,7 +4144,8 @@ static void do_cmd_knowledge_monsters(void)
 	bool redraw;
 
 	bool visual_list = FALSE;
-	byte attr_top = 0, char_left = 0;
+	byte attr_top = 0;
+	char char_left = 0;
 
 	int browser_rows;
 	int wid, hgt;
@@ -4200,7 +4209,7 @@ static void do_cmd_knowledge_monsters(void)
 				Term_putch(i, 5, TERM_WHITE, '=');
 			}
 
-			for (i = 0; i < BROWSER_ROWS; i++)
+			for (i = 0; i < browser_rows; i++)
 			{
 				Term_putch(max + 1, 6 + i, TERM_WHITE, '|');
 			}
@@ -4246,7 +4255,9 @@ static void do_cmd_knowledge_monsters(void)
 		}
 
 		/* Prompt */
-		prt(format("<dir>, 'r' to recall%s%s, ESC", visual_list ? ", ENTER to accept" : ", 'v' for visuals", (attr_idx||char_idx) ? ", 'c', 'p' to paste" : ", 'c' to copy"), hgt - 1, 0);
+		prt(format("<dir>, 'r' to recall%s%s, ESC",
+			visual_list ? ", ENTER to accept" : ", 'v' for visuals",
+			(attr_idx||char_idx) ? ", 'c', 'p' to paste" : ", 'c' to copy"), hgt - 1, 0);
 
 		/* Get the current monster */
 		r_ptr = &r_info[mon_idx[mon_cur]];
@@ -4416,7 +4427,15 @@ static void do_cmd_knowledge_ego_items(void)
 
 	int note_idx = 0;
 
+	int browser_rows;
+	int wid, hgt;
+
 	ego_item_type *e_ptr;
+
+	/* Get size */
+	Term_get_size(&wid, &hgt);
+
+	browser_rows = hgt - 8;
 
 	/* Allocate the "object_idx" array */
 	C_MAKE(object_idx, z_info->e_max, int);
@@ -4468,7 +4487,7 @@ static void do_cmd_knowledge_ego_items(void)
 				Term_putch(i, 5, TERM_WHITE, '=');
 			}
 
-			for (i = 0; i < BROWSER_ROWS; i++)
+			for (i = 0; i < browser_rows; i++)
 			{
 				Term_putch(max + 1, 6 + i, TERM_WHITE, '|');
 			}
@@ -4478,27 +4497,27 @@ static void do_cmd_knowledge_ego_items(void)
 
 		/* Scroll group list */
 		if (grp_cur < grp_top) grp_top = grp_cur;
-		if (grp_cur >= grp_top + BROWSER_ROWS) grp_top = grp_cur - BROWSER_ROWS + 1;
+		if (grp_cur >= grp_top + browser_rows) grp_top = grp_cur - browser_rows + 1;
 
 		/* Scroll monster list */
 		if (object_cur < object_top) object_top = object_cur;
-		if (object_cur >= object_top + BROWSER_ROWS) object_top = object_cur - BROWSER_ROWS + 1;
+		if (object_cur >= object_top + browser_rows) object_top = object_cur - browser_rows + 1;
 
 		/* Display a list of object groups */
-		display_group_list(0, 6, max, BROWSER_ROWS, grp_idx, object_group_text, grp_cur, grp_top);
+		display_group_list(0, 6, max, browser_rows, grp_idx, object_group_text, grp_cur, grp_top);
 
 		/* Get a list of objects in the current group */
 		object_cnt = collect_ego_items(grp_idx[grp_cur], object_idx);
 
 		/* Display a list of objects in the current group */
-		display_ego_item_list(max + 3, 6, BROWSER_ROWS, object_idx, object_cur, object_top);
+		display_ego_item_list(max + 3, 6, browser_rows, object_idx, object_cur, object_top);
 
 		/* Get the current ego item */
 		e_ptr = &e_info[object_idx[object_cur]];
 
 		/* Prompt */
-		if (note_idx) prt("<dir>, ENTER, '{', '}', 'c', 'p' to paste, ESC", 23,0);
-		else prt("<dir>, ENTER to recall, '{' to inscribe, '}', 'c' to copy, ESC", 23, 0);
+		prt(format("<dir>, 'r' to recall, '{', '}'%s, ESC",
+			(note_idx) ? ", 'i' to re-inscribe" : (e_ptr->note) ? ", 'i'" : ""), hgt - 1, 0);
 
 		if (!column)
 		{
@@ -4534,7 +4553,7 @@ static void do_cmd_knowledge_ego_items(void)
 				char note_text[80] = "";
 
 				/* Prompt */
-				prt("Inscribe with: ", 23, 0);
+				prt("Inscribe with: ", hgt, 0);
 	
 				/* Default note */
 				if (e_ptr->note)
@@ -4547,6 +4566,9 @@ static void do_cmd_knowledge_ego_items(void)
 	
 				/* Set the inscription */
 				e_ptr->note = quark_add(note_text);
+
+				/* Set the note */
+				note_idx = e_ptr->note;
 
 				/* Process objects */
 				for (i = 1; i < o_max; i++)
@@ -4594,17 +4616,8 @@ static void do_cmd_knowledge_ego_items(void)
 				break;
 			}
 
-			case 'C':
-			case 'c':
-			{
-				/* Set the note */
-				note_idx = e_ptr->note;
-
-				break;
-			}
-
-			case 'P':
-			case 'p':
+			case 'I':
+			case 'i':
 			{
 				if (note_idx)
 				{
@@ -4630,6 +4643,11 @@ static void do_cmd_knowledge_ego_items(void)
 						if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = note_idx;
 	
 					}
+				}
+				else if (e_ptr->note)
+				{
+					/* Set the note */
+					note_idx = e_ptr->note;
 				}
 				break;
 			}
@@ -4674,9 +4692,8 @@ static void display_object_list(int col, int row, int per_page, int object_idx[]
 		byte attr = ((k_ptr->aware) ? TERM_WHITE : TERM_SLATE);
 		byte cursor = ((k_ptr->aware) ? TERM_L_BLUE : TERM_BLUE);
 
-		byte a = (k_ptr->flavor && !k_ptr->aware)? x_info[k_ptr->flavor].x_attr:
-				k_ptr->x_attr;
-		byte c = k_ptr->x_char;
+		byte a = k_ptr->flavor && (view_flavors || !k_ptr->aware) ? (x_info[k_ptr->flavor].x_attr) : (k_ptr->x_attr);
+		byte c = k_ptr->flavor && (view_flavors || !k_ptr->aware) ? (x_info[k_ptr->flavor].x_char) : (k_ptr->x_char);
 	
 		attr = ((i + object_top == object_cur) ? cursor : attr);
 
@@ -4779,7 +4796,8 @@ static void do_cmd_knowledge_objects(void)
 	bool redraw;
 
 	bool visual_list = FALSE;
-	byte attr_top = 0, char_left = 0;
+	byte attr_top = 0;
+	char char_left = 0;
 
 	int browser_rows;
 	int wid, hgt;
@@ -4846,7 +4864,7 @@ static void do_cmd_knowledge_objects(void)
 				Term_putch(i, 5, TERM_WHITE, '=');
 			}
 
-			for (i = 0; i < BROWSER_ROWS; i++)
+			for (i = 0; i < browser_rows; i++)
 			{
 				Term_putch(max + 1, 6 + i, TERM_WHITE, '|');
 			}
@@ -4897,7 +4915,10 @@ static void do_cmd_knowledge_objects(void)
 		if (object_cnt) object_kind_track(object_idx[object_cur]);
 
 		/* Prompt */
-		prt(format("<dir>, 'r' to recall%s%s, ESC", k_ptr->flavor ? "" : visual_list ? ", ENTER to accept" : ", 'v' for visuals", (attr_idx||char_idx) ? ", 'c', 'p' to paste" : ", 'c' to copy"), hgt - 1, 0);
+		prt(format("<dir>, 'r' to recall%s%s, '{', '}'%s, ESC",
+			(visual_list) ? ", ENTER to accept" : ", 'v' for visuals",
+			(attr_idx||char_idx) ? ", 'c', 'p' to paste" : ", 'c' to copy",
+			(note_idx) ? ", 'i' to re-inscribe" : (k_ptr->note) ? ", 'i'" : ""), hgt - 1, 0);
 
 		/* The "current" object changed */
 		if (object_old != object_idx[object_cur])
@@ -4911,7 +4932,7 @@ static void do_cmd_knowledge_objects(void)
 
 		if (visual_list)
 		{
-			place_visual_list_cursor(max + 3, 7, k_ptr->x_attr, k_ptr->x_char, attr_top, char_left);
+			place_visual_list_cursor(max + 3, 7, k_ptr->flavor ? x_info[k_ptr->flavor].x_attr : k_ptr->x_attr, k_ptr->flavor ? x_info[k_ptr->flavor].x_char : k_ptr->x_char, attr_top, char_left);
 		}
 		else if (!column)
 		{
@@ -4925,8 +4946,7 @@ static void do_cmd_knowledge_objects(void)
 		ch = inkey();
 
 		/* Do visual mode command if needed */
-		/* Symbol of objects with flavor cannot be changed */
-		if (!k_ptr->flavor && visual_mode_command(ch, &visual_list, browser_rows-1, wid - (max + 3), &attr_top, &char_left, &k_ptr->x_attr, &k_ptr->x_char)) continue;
+		if (visual_mode_command(ch, &visual_list, browser_rows-1, wid - (max + 3), &attr_top, &char_left, k_ptr->flavor ? &(x_info[k_ptr->flavor].x_attr) : &k_ptr->x_attr, k_ptr->flavor ? &(x_info[k_ptr->flavor].x_char) :&k_ptr->x_char)) continue;
 
 		switch (ch)
 		{
@@ -4955,7 +4975,7 @@ static void do_cmd_knowledge_objects(void)
 				{
 
 					/* Prompt */
-					prt("Inscribe with: ", 23, 0);
+					prt("Inscribe with: ", hgt, 0);
 	
 					/* Default note */
 					if (k_ptr->note)
@@ -4968,6 +4988,9 @@ static void do_cmd_knowledge_objects(void)
 	
 					/* Set the inscription */
 					k_ptr->note = quark_add(note_text);
+
+					/* Set the note */
+					note_idx = k_ptr->note;
 
 					/* Process objects */
 					for (i = 1; i < o_max; i++)
@@ -5017,20 +5040,8 @@ static void do_cmd_knowledge_objects(void)
 				break;
 			}
 
-			case 'C':
-			case 'c':
-			{
-				/* Set the note */
-				note_idx = k_ptr->note;
-
-				/* Clear the buffer */
-				char_idx = 0;
-				attr_idx = 0;
-				break;
-			}
-
-			case 'P':
-			case 'p':
+			case 'I':
+			case 'i':
 			{
 				if (note_idx)
 				{
@@ -5056,6 +5067,11 @@ static void do_cmd_knowledge_objects(void)
 						if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = note_idx;
 					}
 		
+				}
+				else if (k_ptr->note)
+				{
+					/* Set the note */
+					note_idx = k_ptr->note;
 				}
 				break;
 			}
@@ -5310,7 +5326,8 @@ static void do_cmd_knowledge_features(void)
 	bool redraw;
 
 	bool visual_list = FALSE;
-	byte attr_top = 0, char_left = 0;
+	byte attr_top = 0;
+	char char_left = 0;
 
 	int browser_rows;
 	int wid, hgt;
@@ -5374,7 +5391,7 @@ static void do_cmd_knowledge_features(void)
 				Term_putch(i, 5, TERM_WHITE, '=');
 			}
 
-			for (i = 0; i < BROWSER_ROWS; i++)
+			for (i = 0; i < browser_rows; i++)
 			{
 				Term_putch(max + 1, 6 + i, TERM_WHITE, '|');
 			}
