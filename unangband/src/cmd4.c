@@ -4956,6 +4956,9 @@ static int collect_features(int grp_cur, int *feat_idx)
 		/* Skip empty race */
 		if (!f_ptr->name) continue;
 
+		/* Skip features we never see */
+		if (f_ptr->mimic != i) continue;
+
 		/* Check for any flags matching in the group */
 		if (f_ptr->flags1 & (flags1))
 		{
