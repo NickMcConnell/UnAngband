@@ -386,7 +386,7 @@ static cptr r_info_flags1[] =
 	"FORCE_DEPTH",
 	"FORCE_MAXHP",
 	"FORCE_SLEEP",
-	"FORCE_EXTRA",
+	"GUARDIAN",
 	"ATTR_METAL",
 	"FRIENDS",
 	"ESCORT",

@@ -3160,7 +3160,7 @@ void play_game(bool new_game)
 			{
 				int guard = t_info[i].zone[ii].guard;
 
-				if (guard) r_info[guard].flags1 |= RF1_QUESTOR;
+				if (guard) r_info[guard].flags1 |= RF1_GUARDIAN;
 			}
 		}
 	}

@@ -2422,6 +2422,11 @@ void monster_death(int m_idx)
 	}
 
 	/* Only process "Quest Monsters" */
+	if (!(r_ptr->flags1 & (RF1_QUESTOR | RF1_GUARDIAN)))
+		return;
+
+#if 0
+	/* Only process "Quest Monsters" */
 	if (!(r_ptr->flags1 & (RF1_QUESTOR))) return;
 
 	/* Hack -- Mark quests as complete */
@@ -2437,6 +2442,25 @@ void monster_death(int m_idx)
 
 	/* Hack -- campaign mode has quest monsters without stairs */
 	if ((adult_campaign) && ((p_ptr->depth !=max_depth(p_ptr->dungeon)) || (p_ptr->depth == min_depth(p_ptr->dungeon))) )
+	{
+		return;
+	}
+#endif
+
+	/* Hack -- Mark quests as complete */
+	if (r_ptr->flags1 & (RF1_QUESTOR)) for (i = 0; i < MAX_Q_IDX; i++)
+	{
+		/* Hack -- note completed quests */
+		if (q_list[i].level == r_ptr->level) q_list[i].level = 0;
+
+		/* Count incomplete quests */
+		if (q_list[i].level) total++;
+	}
+
+	/* Hack -- campaign mode has quest monsters without stairs */
+	if (!(r_ptr->flags1 & (RF1_QUESTOR)) &&
+	    ((p_ptr->depth != max_depth(p_ptr->dungeon)) ||
+	     (p_ptr->depth == min_depth(p_ptr->dungeon))) )
 	{
 		return;
 	}
