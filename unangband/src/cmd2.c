@@ -242,7 +242,7 @@ static void do_cmd_travel(void)
 			else if ((zone2->guard) && (selection == p_ptr->dungeon))
 			{
 				/* XXX Reveal monster name? */
-				msg_print("All other ways are guarded.");
+				msg_format("All other ways are guarded by %s.",r_name + r_info[zone2->guard].name);
 			}
 
 			/* Do we travel? */
@@ -2731,16 +2731,16 @@ void do_cmd_fire(void)
 
 			int visible = m_ptr->ml;
 
-			/* Note the collision */
-			hit_body = TRUE;
-
 			/* Did we hit it (penalize distance travelled) */
-			if (test_hit_fire(chance2, r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 2 : 1), m_ptr->ml))
+			if (!(m_ptr->mflag & (MFLAG_HIDE)) && (test_hit_fire(chance2, r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 2 : 1), m_ptr->ml)))
 			{
 				bool fear = FALSE;
 
 				/* Assume a default death */
 				cptr note_dies = " dies.";
+
+				/* Note the collision */
+				hit_body = TRUE;
 
 				/* Some monsters get "destroyed" */
 				if ((r_ptr->flags3 & (RF3_NONLIVING)) ||
@@ -2872,10 +2872,10 @@ void do_cmd_fire(void)
 
 				/* Check usage */
 				object_usage(item);
-			}
 
-			/* Stop looking */
-			break;
+				/* Stop looking */
+				break;
+			}
 		}
 	}
 
@@ -3092,16 +3092,16 @@ void do_cmd_throw(void)
 
 			int visible = m_ptr->ml;
 
-			/* Note the collision */
-			hit_body = TRUE;
-
 			/* Did we hit it (penalize range) */
-			if (test_hit_fire(chance2, r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 2 : 1), m_ptr->ml))
+			if (!(m_ptr->mflag & (MFLAG_HIDE)) && (test_hit_fire(chance2, r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 2 : 1), m_ptr->ml)))
 			{
 				bool fear = FALSE;
 
 				/* Assume a default death */
 				cptr note_dies = " dies.";
+
+				/* Note the collision */
+				hit_body = TRUE;
 
 				/* Some monsters get "destroyed" */
 				if ((r_ptr->flags3 & (RF3_NONLIVING)) ||
@@ -3235,10 +3235,9 @@ void do_cmd_throw(void)
 				/* Check usage */
 				object_usage(item);
 
+				/* Stop looking */
+				break;
 			}
-
-			/* Stop looking */
-			break;
 		}
 	}
 

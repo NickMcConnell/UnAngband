@@ -6989,7 +6989,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 
 		/* Can we get the objects */
 		if ((f_info[cave_feat[ny][nx]].flags1 & (FF1_DROP)) &&
-			!(m_ptr->mflag & (MFLAG_OVER)))
+			!(m_ptr->mflag & (MFLAG_OVER | MFLAG_HIDE)))
 		{
 			for (this_o_idx = cave_o_idx[ny][nx]; this_o_idx; this_o_idx = next_o_idx)
 			{

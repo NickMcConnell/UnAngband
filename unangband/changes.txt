@@ -1,4 +1,11 @@
-### Features ###
+### Game Play ###
+
+- The Dale now has a food supply (Bug 588).
+
+- If you fire or thrown an object that misses a monster, it will continue to
+travel along the line of fire, possibly hitting other monsters in its path.
+
+### User Interface ###
 
 - Now supports specifying whether or not a feature supports advanced lighting
 options in the pref file. Just append :YES or :NO to the existing pref file
@@ -13,8 +20,6 @@ in the future to allow a selection of possible sort orders (Depth, kills etc).
 ### Bug fixes ###
 
 - Eilineil the Entrapped is now a female (Bug 648).
-
-- The Dale now has a food supply (Bug 588).
 
 - The ruins of Lake-town are no longer too deep for those who flee the Lonely
 Mountain (Bug 589).
@@ -41,6 +46,9 @@ are unaffected (Bug 682).
 
 - Monsters will no longer push each other around, preventing them from
 moving or attacking successfully (Bug 653).
+
+- Hidden monsters can no longer pick up objects from the ground or be hit
+by missile or thrown weapons (Bug 654).
 
 ### Build / Platform ###
 
