@@ -223,7 +223,9 @@ void object_flags_known(const object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3)
  */
 void identify_random_gen(const object_type *o_ptr)
 {
+	text_out_indent = 4;
 	list_object(o_ptr, OBJECT_FLAGS_RANDOM);
+	text_out_indent = 0;
 }
 
 
@@ -1936,6 +1938,7 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, int mode)
 					text_out_c(TERM_SLATE, "It is not blessed by the gods.  ");
 					break;
 			} 
+			anything = TRUE;
 		}
 
 		/* Note that throwing weapons have special treatment */
@@ -1953,6 +1956,7 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, int mode)
 					text_out_c(TERM_SLATE, "It is not balanced for throwing.  ");
 					break;
 			} 
+			anything = TRUE;
 		}
 	}
 
@@ -2026,6 +2030,7 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, int mode)
 				text_out_c(TERM_SLATE, "It can be stolen from your inventory.  ");
 				break;
 		} 
+		anything = TRUE;
 		}
 	}
 

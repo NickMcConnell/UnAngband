@@ -269,6 +269,7 @@ extern bool (*get_mon_num_hook)(int r_idx);
 extern bool (*get_obj_num_hook)(int k_idx);
 extern bool (*get_feat_num_hook)(int k_idx);
 extern FILE *text_out_file;
+extern int text_out_indent;
 extern void (*text_out_hook)(byte a, cptr str);
 extern int highscore_fd;
 extern bool use_transparency;
