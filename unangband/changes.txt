@@ -1,3 +1,5 @@
+Unangband 0.5.5: "New Years Resolution"
+
 ### Game Play ###
 
 - Much better handling of features which have corresponding objects 'stored'
