@@ -19,6 +19,11 @@ or on the right every 4 turns (an adjacent water fall will hit every 2 turns).
 - Cracked walls now can come in hidden, weaker versions that can be easily
 bashed or tunnelled through.
 
+### User Interface ###
+
+- Monster recall now reports what particular types of items are dropped by each
+monster.
+
 ### Bug fixes ###
 
 - Prevented original graphic tiles from trying to use dark and lite tiles.

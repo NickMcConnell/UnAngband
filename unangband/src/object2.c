@@ -3804,7 +3804,6 @@ static bool kind_is_race(int k_idx)
 
 		/* Lite/Fuel */
 		case TV_LITE:
-		case TV_FLASK:
 		{
 			if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE)) return (TRUE);
 			if (r_ptr->flags7 & (RF7_DROP_LITE)) return (TRUE);
@@ -3831,6 +3830,7 @@ static bool kind_is_race(int k_idx)
 		/* Diggers/Spikes */
 		case TV_DIGGING:
 		case TV_SPIKE:
+		case TV_FLASK:
 		{
 			if (r_ptr->flags7 & (RF7_DROP_TOOL)) return (TRUE);
 			return (FALSE);
