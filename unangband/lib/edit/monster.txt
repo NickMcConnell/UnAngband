@@ -10005,7 +10005,7 @@ F:RAND_50 | RAND_25 |
 F:NEVER_MOVE | COLD_BLOOD | MULTIPLY | FRIENDS |
 F:STUPID | EMPTY_MIND | IM_ACID | IM_POIS |
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT
-D:Ugh! It quickly creeps alone the dungeon floor.
+D:Ugh! It quickly creeps along the dungeon floor.
 
 N:660:Green slime
 G:,:g
@@ -10016,7 +10016,7 @@ F:RAND_50 | RAND_25 |
 F:NEVER_MOVE | COLD_BLOOD | MULTIPLY | FRIENDS |
 F:STUPID | EMPTY_MIND | IM_ACID | IM_POIS |
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT
-D:Ugh! It quickly creeps alone the dungeon floor.
+D:Ugh! It quickly creeps along the dungeon floor.
 
 N:661:Yellow slime
 G:,:y
@@ -10027,7 +10027,7 @@ F:RAND_50 | RAND_25 |
 F:NEVER_MOVE | COLD_BLOOD | MULTIPLY | FRIENDS |
 F:STUPID | EMPTY_MIND | IM_ACID | IM_POIS |
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT
-D:Ugh! It quickly creeps alone the dungeon floor.
+D:Ugh! It quickly creeps along the dungeon floor.
 
 N:662:Silver slime
 G:,:W
@@ -10038,7 +10038,7 @@ F:RAND_50 | RAND_25 |
 F:NEVER_MOVE | COLD_BLOOD | MULTIPLY | FRIENDS | ATTR_METAL |
 F:STUPID | EMPTY_MIND | IM_ACID | IM_POIS |
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT
-D:Ugh! It quickly creeps alone the dungeon floor.
+D:Ugh! It quickly creeps along the dungeon floor.
 
 N:663:Clear slime
 G:,:w
@@ -10049,7 +10049,7 @@ F:RAND_25 | INVISIBLE | ATTR_CLEAR |
 F:NEVER_MOVE | COLD_BLOOD | MULTIPLY | FRIENDS |
 F:STUPID | EMPTY_MIND | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT
-D:Ugh! It quickly creeps alone the dungeon floor.
+D:Ugh! It quickly creeps along the dungeon floor.
 
 N:664:Purple slime
 G:,:v
@@ -10061,7 +10061,7 @@ F:RAND_50 | RAND_25 |
 F:NEVER_MOVE | COLD_BLOOD | MULTIPLY | FRIENDS |
 F:STUPID | EMPTY_MIND | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT
-D:Ugh! It quickly creeps alone the dungeon floor.
+D:Ugh! It quickly creeps along the dungeon floor.
 
 N:665:Pink slime
 G:,:w
@@ -10073,7 +10073,7 @@ F:RAND_50 | RAND_25 |
 F:NEVER_MOVE | COLD_BLOOD | MULTIPLY | FRIENDS |
 F:STUPID | EMPTY_MIND | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT
-D:Ugh! It quickly creeps alone the dungeon floor.
+D:Ugh! It quickly creeps along the dungeon floor.
 
 N:666:Blue slime
 G:,:b
@@ -10085,7 +10085,7 @@ F:RAND_50 | RAND_25 |
 F:NEVER_MOVE | COLD_BLOOD | MULTIPLY | FRIENDS |
 F:STUPID | EMPTY_MIND | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT
-D:Ugh! It quickly creeps alone the dungeon floor.
+D:Ugh! It quickly creeps along the dungeon floor.
 
 N:667:Black slime
 G:,:D
@@ -10096,7 +10096,7 @@ F:RAND_50 | RAND_25 |
 F:NEVER_MOVE | COLD_BLOOD | MULTIPLY | FRIENDS |
 F:STUPID | EMPTY_MIND | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT
-D:Ugh! It quickly creeps alone the dungeon floor.
+D:Ugh! It quickly creeps along the dungeon floor.
 
 N:668:Many-eyed moss
 G:,:o
@@ -14125,7 +14125,7 @@ F:IM_POIS | ATTR_METAL |
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT
 S:1_IN_9 |
 S:SPORE
-D:It is a strange black growth on the dungeon floor.
+D:It is a strange silver growth on the dungeon floor.
 
 N:975:White mold
 G:m:w
@@ -14138,7 +14138,7 @@ F:IM_POIS |
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT
 S:1_IN_9 |
 S:SPORE
-D:A strange brown growth on the dungeon floor.
+D:A strange white growth on the dungeon floor.
 
 N:976:Blue mold
 G:m:b
@@ -14760,7 +14760,7 @@ F:DROP_60 | HAS_LITE | NEED_LITE |
 F:OPEN_DOOR | BASH_DOOR | PRIEST | MAGE
 S:1_IN_12 | 
 S:BLINK | BO_MANA | HEAL | S_ANIMAL | SCARE
-D:He is waves a magical talisman at you.
+D:He waves a magical talisman at you.
 
 N:1020:Novice shaman
 G:p:W
@@ -14773,7 +14773,7 @@ F:FRIENDS | DROP_60 | HAS_LITE | NEED_LITE | PRIEST | MAGE
 F:OPEN_DOOR | BASH_DOOR
 S:1_IN_12 | 
 S:BLINK | BO_MANA | HEAL | S_ANIMAL | SCARE
-D:He is waves a magical talisman at you.
+D:He waves a magical talisman at you.
 
 N:1021:Black bishop
 G:p:D
