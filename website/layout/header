@@ -9,7 +9,7 @@
 <body bgcolor="#A6BAE2" text="#003373" link="#006BAA" alink="#CCDEFF" vlink="#568FD3">
 <h1 align="center">Unangband: The Unnamed Angband</h1>
 
-<table border="0" cellspacing="2">
+<table border="0" cellspacing="2" width="100%">
 	<tr>
 		<td valign="top" width="120">
 			<table cellpadding="4" cellspacing="0" border="0" width="100%">
