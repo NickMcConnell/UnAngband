@@ -1124,6 +1124,9 @@ void do_cmd_tunnel(void)
 	/* Get a direction (or abort) */
 	if (!get_rep_dir(&dir)) return;
 
+	/* Hack -- Apply stuck */
+	stuck_player(&dir);
+
 	/* Get location */
 	y = py + ddy[dir];
 	x = px + ddx[dir];
@@ -1135,8 +1138,8 @@ void do_cmd_tunnel(void)
 	/* Take a turn */
 	p_ptr->energy_use = 100;
 
-	/* Apply stuck / confusion */
-	if (stuck_player(&dir) || confuse_dir(&dir))
+	/* Apply confusion */
+	if (confuse_dir(&dir))
 	{
 		/* Get location */
 		y = py + ddy[dir];
@@ -1609,6 +1612,9 @@ void do_cmd_alter(void)
 	/* Get a direction */
 	if (!get_rep_dir(&dir)) return;
 
+	/* Hack -- Apply stuck */
+	stuck_player(&dir);
+
 	/* Get location */
 	y = py + ddy[dir];
 	x = px + ddx[dir];
@@ -1627,8 +1633,8 @@ void do_cmd_alter(void)
 	/* Take a turn */
 	p_ptr->energy_use = 100;
 
-	/* Apply stuck / confusion */
-	if (stuck_player(&dir) || confuse_dir(&dir))
+	/* Apply confusion */
+	if (confuse_dir(&dir))
 	{
 		/* Get location */
 		y = py + ddy[dir];
