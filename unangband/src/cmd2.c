@@ -1904,18 +1904,8 @@ void do_cmd_set_trap_or_spike(void)
 	s = "You have nothing to set a trap or spike with.";
 	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) return;
 
-	/* Get the feature */
-	if (item >= INVEN_TOTAL+1)
-	{
-		object_type object_type_body;
-
-		o_ptr = &object_type_body;
-
-		if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
-	}
-
 	/* Get the item (in the pack) */
-	else if (item >= 0)
+	if (item >= 0)
         {
 
 		o_ptr = &inventory[item];
@@ -2032,13 +2022,8 @@ void do_cmd_set_trap_or_spike(void)
 			/* Update the visuals */
 			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 
-			/* Destroy the feature */
-			if (item >= INVEN_TOTAL+1)
-			{
-				cave_alter_feat(p_ptr->py,p_ptr->px,FS_USE_FEAT);
-			}
 			/* Destroy a spike in the pack */
-			else if (item >= 0)
+			if (item >= 0)
 			{
 				inven_item_increase(item, -1);
 				inven_item_describe(item);
@@ -2139,13 +2124,8 @@ void do_cmd_set_trap_or_spike(void)
 				/* Check if we can arm it? */
 				do_cmd_disarm_aux(y,x, FALSE);
 	
-				/* Destroy the feature */
-				if (item >= INVEN_TOTAL+1)
-				{
-					cave_alter_feat(p_ptr->py,p_ptr->px,FS_USE_FEAT);
-				}
 				/* Destroy a food in the pack */
-				else if (item >= 0)
+				if (item >= 0)
 				{
 					inven_item_increase(item, -1);
 					inven_item_describe(item);
@@ -2625,7 +2605,6 @@ void do_cmd_fire(void)
 
 	object_type *i_ptr;
 	object_type object_type_body;
-	object_type object_type_feat;
 
 	bool hit_body = FALSE;
 
@@ -2641,6 +2620,8 @@ void do_cmd_fire(void)
 
 	int msec = op_ptr->delay_factor * op_ptr->delay_factor;
 
+	bool get_feat = FALSE;
+
 	/* Get the "bow" (if any) */
 	j_ptr = &inventory[INVEN_BOW];
 
@@ -2655,15 +2636,8 @@ void do_cmd_fire(void)
 	s = "You have nothing to fire.";
 	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATG))) return;
 
-	/* Get the feature */
-	if (item >= INVEN_TOTAL+1)
-	{
-		o_ptr = &object_type_feat;
-
-		if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
-	}
 	/* Get the object */
-	else if (item >= 0)
+	if (item >= 0)
 	{
 		o_ptr = &inventory[item];
 	}
@@ -2671,6 +2645,9 @@ void do_cmd_fire(void)
 	{
 		o_ptr = &o_list[0 - item];
 	}
+
+	/* Get feat */
+	if (o_ptr->ident & (IDENT_STORE)) get_feat = TRUE;
 
 	/* Hack -- if no bow, make object count for double */
 	if (j_ptr->tval != TV_BOW) j_ptr = o_ptr;
@@ -2693,6 +2670,9 @@ void do_cmd_fire(void)
 	/* Reset stack counter */
 	i_ptr->stackc = 0;
 
+	/* No longer 'stored' */
+	i_ptr->ident &= ~(IDENT_STORE);
+
 	/* Sometimes use lower stack object */
 	if (!object_known_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
 	{
@@ -2706,14 +2686,8 @@ void do_cmd_fire(void)
 	/* Forget information on dropped object */
 	drop_may_flags(i_ptr);
 
-	/* Get the feature */
-	if (item >= INVEN_TOTAL+1)
-	{
-		cave_alter_feat(p_ptr->py,p_ptr->px,FS_GET_FEAT);
-	}
-
 	/* Reduce and describe inventory */
-	else if (item >= 0)
+	if (item >= 0)
 	{
 		inven_item_increase(item, -1);
 		inven_item_describe(item);
@@ -2725,6 +2699,7 @@ void do_cmd_fire(void)
 	{
 		floor_item_increase(0 - item, -1);
 		floor_item_optimize(0 - item);
+		if (get_feat && (scan_feat(py,px) < 0)) cave_alter_feat(py,px,FS_GET_FEAT);
 	}
 
 
@@ -3043,9 +3018,9 @@ void do_cmd_throw(void)
 
 	object_type *i_ptr;
 	object_type object_type_body;
-	object_type object_type_feat;
 
 	bool hit_body = FALSE;
+	bool get_feat = FALSE;
 
 	byte missile_attr;
 	char missile_char;
@@ -3059,20 +3034,12 @@ void do_cmd_throw(void)
 
 	int msec = op_ptr->delay_factor * op_ptr->delay_factor;
 
-
 	/* Get an item */
 	q = "Throw which item? ";
 	s = "You have nothing to throw.";
 	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATG))) return;
 
-	/* Get the object */
-	if (item >= INVEN_TOTAL+1)
-	{
-		o_ptr = &object_type_feat;
-
-		if (!make_feat(o_ptr, cave_feat[p_ptr->py][p_ptr->px])) return;
-	}
-	else if (item >= 0)
+	if (item >= 0)
 	{
 		o_ptr = &inventory[item];
 	}
@@ -3081,6 +3048,8 @@ void do_cmd_throw(void)
 		o_ptr = &o_list[0 - item];
 	}
 
+	/* Get feat */
+	if (o_ptr->ident & (IDENT_STORE)) get_feat = TRUE;
 
 	/* Get a direction (or cancel) */
 	if (!get_aim_dir(&dir)) return;
@@ -3097,6 +3066,9 @@ void do_cmd_throw(void)
 	/* Reset stack count*/
 	i_ptr->stackc = 0;
 
+	/* No longer 'stored' */
+	i_ptr->ident &= ~(IDENT_STORE);
+
 	/* Sometimes use lower stack object */
 	if (!object_known_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
 	{
@@ -3111,11 +3083,7 @@ void do_cmd_throw(void)
 	drop_may_flags(i_ptr);
 
 	/* Reduce and describe inventory */
-	if (item >= INVEN_TOTAL+1)
-	{
-		cave_alter_feat(p_ptr->py,p_ptr->px,FS_GET_FEAT);
-	}
-	else if (item >= 0)
+	if (item >= 0)
 	{
 		inven_item_increase(item, -1);
 		inven_item_describe(item);
@@ -3127,6 +3095,7 @@ void do_cmd_throw(void)
 	{
 		floor_item_increase(0 - item, -1);
 		floor_item_optimize(0 - item);
+		if (get_feat && (scan_feat(py,px) < 0)) cave_alter_feat(py,px,FS_GET_FEAT);
 	}
 
 

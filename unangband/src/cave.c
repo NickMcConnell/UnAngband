@@ -1431,6 +1431,9 @@ void note_spot(int y, int x)
 			/* Get the next object */
 			next_o_idx = o_ptr->next_o_idx;
 
+			/* Ignore 'store' objects */
+			if (o_ptr->ident & (IDENT_STORE)) continue;
+
 			/* Memorize objects */
 			if (!auto_pickup_ignore(o_ptr)) o_ptr->marked = TRUE;
 
@@ -4437,6 +4440,12 @@ static void cave_set_feat_aux(int y, int x, int feat)
 		{
 			/* Hide it */
 			o_ptr->marked = FALSE;
+		}
+
+		/* Destroy stored items */
+		if (o_ptr->ident & ~(IDENT_STORE))
+		{
+			delete_object_idx(this_o_idx);
 		}
 	}
 

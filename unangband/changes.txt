@@ -1,3 +1,21 @@
+### Game Play ###
+
+- Much better handling of features which have corresponding objects 'stored'
+in them, such as fountains, water, and so on.
+
+- You can now destroy objects contained inside many features to change that
+feature automatically eg destroying a torch in a torch feature.
+
+- You can use the examine command on a feature that contain objects to create
+instances of that object without having to throw the objects, refuel from it
+or so on.
+
+- You can now create 'flavoured' features, which contain differing instances
+of the same object type, depending on the level at which the feature is
+located. This is currently unused, but is intended to support different
+types of fountains, trees, mineral veins and so on.
+
+
 ### User Interface ###
 
 - Can now use 'k' in knowledge menus to toggle auto-destruction of objects,

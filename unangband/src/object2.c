@@ -4255,21 +4255,85 @@ bool make_skin(object_type *j_ptr, int m_idx)
 }
 
 
+
+static int feat_tval;
+
 /*
- * Make a feature item
- *
+ * Hack -- determine if a template matches feats_tval.
  */
-bool make_feat(object_type *j_ptr, int feat)
+static bool kind_is_feat_tval(int k_idx)
 {
-	feature_type *f_ptr = &f_info[feat];
 
-	int k_idx = f_ptr->k_idx;
+	object_kind *k_ptr = &k_info[k_idx];
 
-	/* Handle failure */
-	if (!k_idx) return (FALSE);
+	if (k_ptr->tval != feat_tval) return (FALSE);
+
+	return (TRUE);
+}
+
+
+/*
+ * Either get a copy of an existing feat item, or create a new one.
+ *
+ * If a new feat item is created, place on the floor in the specified location.
+ */
+bool make_feat(object_type *j_ptr, int y, int x)
+{
+	feature_type *f_ptr;
+
+	int k_idx;
+	int item;
+
+	/* Sanity */
+	if (!in_bounds(y, x)) return (0);
+
+	/* Get the feat */	
+	f_ptr = &f_info[cave_feat[y][x]];
+
+	/* Get the item */
+	k_idx = f_ptr->k_idx;
+
+	/* Get existing item */
+	item = scan_feat(y,x);
+
+	/* Are we done */
+	if (item >= 0)
+	{
+		object_copy(j_ptr,&o_list[item]);
+
+		return (TRUE);
+	}
+
+	/* Hack -- Pick random flavor, if flavored */
+	if (f_ptr->flags3 & (FF3_FLAVOR))
+	{
+		/* Set restriction */
+		feat_tval = k_info[k_idx].tval;
+
+		/* Activate restriction */
+		get_obj_num_hook = kind_is_feat_tval;
+
+		/* Prepare allocation table */
+		get_obj_num_prep();
+
+		/* Pick a random object */
+		k_idx = get_obj_num(object_level);
+
+		/* Clear restriction */
+		get_obj_num_hook = NULL;
+
+		/* Prepare allocation table */
+		get_obj_num_prep();
+
+		/* Failed? */
+		if (!k_idx) k_idx = f_ptr->k_idx;
+	}
 
 	/* Prepare the object */
 	object_prep(j_ptr, k_idx);
+
+	/* This is a 'store' item */
+	j_ptr->ident |= (IDENT_STORE);
 
 	/* Hack -- only apply magic to boring objects */
 	a_m_aux_4(j_ptr, object_level, 0);
@@ -4277,8 +4341,13 @@ bool make_feat(object_type *j_ptr, int feat)
 	/* Auto-inscribe if necessary */
 	if ((cheat_auto) || (object_aware_p(j_ptr))) j_ptr->note = k_info[k_idx].note;
 
-	return (TRUE);
+	/* Add to the floor */
+	if (floor_carry(y,x,j_ptr)) return (TRUE);
+
+	/* Failed */
+	return(FALSE);
 }
+
 
 /*
  * Let the floor carry an object
@@ -5860,6 +5929,9 @@ void floor_item_describe(int item)
 	object_type *o_ptr = &o_list[item];
 
 	char o_name[80];
+
+	/* Hack -- haven't seen item on floor */
+	if (!(o_ptr->marked)) return;
 
 	/* Get a description */
 	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);

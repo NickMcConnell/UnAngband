@@ -766,20 +766,7 @@ static void py_destroy_aux(int o_idx)
 
 	object_type *o_ptr;
 
-	if (o_idx < 0)
-	{
-		object_type object_type_body;
-
-		o_ptr = &object_type_body;
-
-		if (!make_feat(o_ptr,cave_feat[p_ptr->py][p_ptr->px])) return;
-	}
-	else
-	{
-		o_ptr = &o_list[o_idx];
-
-	}
-
+	o_ptr = &o_list[o_idx];
 
 	/* Describe the object */
 	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
@@ -859,19 +846,7 @@ static void py_pickup_aux(int o_idx)
 	char o_name[80];
 	object_type *o_ptr;
 
-	if (o_idx < 0)
-	{
-		object_type object_type_body;
-
-		o_ptr = &object_type_body;
-
-		if (!make_feat(o_ptr,cave_feat[p_ptr->py][p_ptr->px])) return;
-	}
-	else
-	{
-		o_ptr = &o_list[o_idx];
-
-	}
+	o_ptr = &o_list[o_idx];
 
 	/* Carry the object */
 	slot = inven_carry(o_ptr);
@@ -924,6 +899,9 @@ void py_pickup(int pickup)
 	{
 		/* Get the object */
 		o_ptr = &o_list[this_o_idx];
+
+		/* Ignore 'store' items */
+		if (o_ptr->ident & (IDENT_STORE)) continue;
 
 		/* Mark the object */
 		if (!auto_pickup_ignore(o_ptr))
