@@ -6,6 +6,12 @@
  * This software may be copied and distributed for educational, research,
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
+ *
+ * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
+ * source code are released under the Gnu Public License. See www.fsf.org
+ * for current GPL license details. Addition permission granted to
+ * incorporate modifications in all Angband variants as defined in the
+ * Angband variants FAQ. See rec.games.roguelike.angband for FAQ.
  */
 
 
@@ -41,21 +47,26 @@
 /*
  * Name of the version/variant
  */
-#define VERSION_NAME "Angband"
+#define VERSION_NAME "UnAngband"
 
 
 /*
  * Current version string
  */
-#define VERSION_STRING	"2.9.6 alpha"
+#define VERSION_STRING	"0.5.4"
+
+/*
+ * Hack -- note use of new version name/string but old version
+ * major/minor/patch numbers.
+ */
 
 
 /*
  * Current version numbers
  */
-#define VERSION_MAJOR	2
-#define VERSION_MINOR	9
-#define VERSION_PATCH	6
+#define VERSION_MAJOR	3
+#define VERSION_MINOR	0
+#define VERSION_PATCH	1
 #define VERSION_EXTRA	0
 
 
@@ -96,7 +107,7 @@
  * Number of grids in each panel (horizontally)
  * Must be a multiple of BLOCK_WID
  */
-#define PANEL_WID	33
+#define PANEL_WID	(use_bigtile ? 16 : 33)
 
 #define ROW_MAP			1
 #define COL_MAP			13
@@ -112,7 +123,8 @@
  * Number of grids in each screen (horizontally)
  * Must be a multiple of PANEL_WID (at least 2x)
  */
-#define SCREEN_WID	(Term->wid - COL_MAP - 1)
+#define SCREEN_WID	((Term->wid - COL_MAP - 1) / (use_bigtile ? 2 : 1))
+
 
 /*
  * Number of rooms to attempt to generate in dungeon.
@@ -216,6 +228,13 @@
  * to calculate monster flow, but note that the flow code is "paranoid".
  */
 #define TEMP_MAX 1536
+
+/*
+ * Maximum size of the "dyna" array (see "cave.c")
+ * Note that the "dyna radius" will NEVER exceed 20, and even if the "dyna"
+ * was octagonal, we would never require more than 1520 entries in the array.
+ */
+#define DYNA_MAX 1536
 
 
 /*
@@ -465,6 +484,15 @@
 #define MAX_STACK_SIZE			100
 
 
+/*
+ * Maximum number of objects allowed in a single dungeon grid.
+ *
+ * The main-screen has a minimum size of 24 rows, so we can always
+ * display 23 objects + 1 header line.
+ */
+#define MAX_FLOOR_STACK			23
+
+
 
 /*
  * Indexes of the various "stats" (hard-coded by savefiles, etc).
@@ -599,7 +627,7 @@
  */
 #define GF_NOTHING      0
 #define GF_XXX1		1
-#define GF_ARROW	2
+#define GF_ARROW		2
 #define GF_MISSILE      3
 #define GF_MANA		4
 #define GF_HOLY_ORB     5
@@ -611,7 +639,7 @@
 #define GF_ICE		11
 #define GF_GRAVITY      12
 #define GF_INERTIA      13
-#define GF_FORCE	14
+#define GF_FORCE		14
 #define GF_TIME		15
 #define GF_ACID		16
 #define GF_ELEC		17
@@ -621,13 +649,13 @@
 #define GF_XXX2		21
 #define GF_LITE		22
 #define GF_DARK		23
-#define GF_WATER	24
+#define GF_WATER		24
 #define GF_CONFUSION    25
-#define GF_SOUND	26
-#define GF_SHARD	27
-#define GF_NEXUS	28
+#define GF_SOUND		26
+#define GF_SHARD		27
+#define GF_NEXUS		28
 #define GF_NETHER       29
-#define GF_CHAOS	30
+#define GF_CHAOS		30
 #define GF_DISENCHANT   31
 #define GF_EXPLODE      32
 #define GF_KILL_WALL    33
@@ -657,21 +685,21 @@
 #define GF_OLD_SLEEP    57
 #define GF_OLD_DRAIN    58
 #define GF_BWATER  	59
-#define GF_BMUD  	60
-#define GF_HURT  	61
-#define GF_LAVA  	62
+#define GF_BMUD  		60
+#define GF_HURT  		61
+#define GF_LAVA  		62
 #define GF_UN_BONUS     63
 #define GF_UN_POWER     64
 #define GF_EAT_GOLD     65
 #define GF_EAT_ITEM     66
 #define GF_EAT_FOOD     67
 #define GF_EAT_LITE     68
-#define GF_FALL  	69
+#define GF_FALL  		69
 #define GF_FALL_MORE    70
 #define GF_FALL_SPIKE   71
 #define GF_FALL_POIS    72
 #define GF_BLIND  	73
-#define GF_SLOW  	74
+#define GF_SLOW  		74
 #define GF_TERRIFY      75
 #define GF_PARALYZE     76
 #define GF_LOSE_STR     77
@@ -686,16 +714,22 @@
 #define GF_EXP_20 	86
 #define GF_EXP_40 	87
 #define GF_EXP_80 	88
-#define GF_RAISE	89
-#define GF_LOWER	90
-#define GF_PROBE	91
+#define GF_RAISE		89
+#define GF_LOWER		90
+#define GF_PROBE		91
 #define GF_LOCK_DOOR	92
 #define GF_SALT_WATER	93
-#define GF_HALLU	94
+#define GF_HALLU		94
 #define GF_FEATURE	95
-#define GF_STEAM	96
-#define GF_VAPOUR	97
-#define GF_SMOKE	98
+#define GF_STEAM		96
+#define GF_VAPOUR		97
+#define GF_SMOKE		98
+#define GF_SUFFOCATE 	99
+#define GF_HUNGER		100
+#define GF_DISEASE	101
+#define GF_LOSE_MANA	102
+#define GF_WOUND		103
+#define GF_BATTER		104
 
 /*
  * Some constants for the "learn" code
@@ -751,7 +785,7 @@
 /*
  * Number of feats we change to (Excluding default). Used in f_info.txt.
  */
-#define MAX_FEAT_STATES	 6
+#define MAX_FEAT_STATES	 8
 
 /*
  * Maximum number of 
@@ -936,8 +970,8 @@
 
 #define FEAT_GROUND 407
 #define FEAT_GRASS 411
-#define FEAT_TREE       419
-#define FEAT_TREE_BIG   420
+#define FEAT_TREE       420
+#define FEAT_TREE_BIG   419
 #define FEAT_TREE_HIDE  422
 #define FEAT_TREE_APPLE  426
 #define FEAT_TREE_BROKEN 427
@@ -1028,7 +1062,7 @@
 #define FF2_CAN_OOZE    0x01000000
 #define FF2_CAN_DIG     0x02000000
 #define FF2_HIDE_ITEM   0x04000000
-#define FF2_HIDE_DEEP   0x08000000
+#define FF2_HIDE_SNEAK  0x08000000
 #define FF2_HIDE_SWIM   0x10000000
 #define FF2_HIDE_DIG    0x20000000
 #define FF2_KILL_HUGE   0x40000000
@@ -1048,25 +1082,28 @@
 #define FF3_HURT_BWATER 0x00000800
 #define FF3_USE_FEAT    0x00001000
 #define FF3_GET_FEAT    0x00002000
-#define FF3_CAN_HIDE    0x00004000
-#define FF3_GROUND      0x00008000
-#define FF3_OUTSIDE     0x00010000
+#define FF3_GROUND      0x00004000
+#define FF3_OUTSIDE     0x00008000
+#define FF3_EASY_HIDE   0x00010000
 #define FF3_EASY_CLIMB  0x00020000
-#define FF3_NEED_TREE   0x00040000
-#define FF3_NEED_WALL   0x00080000
-#define FF3_TOWN		0x00100000
+#define FF3_MUST_CLIMB  0x00040000
+#define FF3_TREE        0x00080000
+#define FF3_NEED_TREE	0x00100000
 #define FF3_BLOOD		0x00200000
 #define FF3_DUST		0x00400000
 #define FF3_SLIME		0x00800000
-#define FF3_TREE 		0x01000000
-#define FF3_TREE_BIG    0x02000000
-#define FF3_XXX3		0x04000000
-#define FF3_FULL_MOVE 	0x08000000
-#define FF3_COLLAPSE    0x10000000
+#define FF3_XXX1 		0x01000000
+#define FF3_XXX2        0x02000000
+#define FF3_INSTANT	0x04000000
+#define FF3_EXPLODE 	0x08000000
+#define FF3_TIMED       0x10000000
 #define FF3_ERUPT       0x20000000
 #define FF3_STRIKE      0x40000000
-#define FF3_DYNAMIC     0x80000000
+#define FF3_SPREAD      0x80000000
 
+/* Which features are dynamic */
+#define FF3_DYNAMIC_MASK \
+ (FF3_INSTANT | FF3_EXPLODE | FF3_TIMED | FF3_ERUPT | FF3_STRIKE | FF3_SPREAD)
 
 /* Feature actions -- used to define actions performed on features */
 
@@ -1086,6 +1123,7 @@
 #define FS_LESS  22
 #define FS_MORE  23
 #define FS_RUN   24
+#define FS_FLOOR 25
 #define FS_HIT_TRAP     31
 
 #define FS_FLAGS2       32
@@ -1114,8 +1152,12 @@
 #define FS_USE_FEAT	76
 #define FS_GET_FEAT	77
 #define FS_GROUND       79
-#define FS_TREE  81
-#define FS_NEED_WALL    82
+#define FS_TREE		83
+#define FS_NEED_TREE	84
+#define FS_INSTANT	90
+#define FS_EXPLODE	91
+#define FS_TIMED		92
+#define FS_SPREAD		95
 
 #define FS_FLAGS_END    96
 
@@ -1166,8 +1208,8 @@
 #define SF2_CREATE_STAIR 0x00000008
 #define SF2_TELE_LEVEL   0x00000010
 #define SF2_ALTER_LEVEL  0x00000020
-#define SF2_GENOCIDE     0x00000040
-#define SF2_MASS_GENOCIDE       0x00000080
+#define SF2_BANISHMENT     0x00000040
+#define SF2_MASS_BANISHMENT       0x00000080
 #define SF2_CUT   0x00000100
 #define SF2_STUN  0x00000200
 #define SF2_POISON       0x00000400
@@ -1575,8 +1617,9 @@
 #define SV_MATTOCK			7
 
 /* The "sval" values for TV_HAFTED */
-#define SV_WHIP					2	/* 1d6 */
+#define SV_WHIP					2	/* 1d4 */
 #define SV_QUARTERSTAFF			3	/* 1d9 */
+#define SV_BATON				4	/* 1d5 */
 #define SV_MACE					5	/* 2d4 */
 #define SV_BALL_AND_CHAIN		6	/* 2d4 */
 #define SV_WAR_HAMMER			8	/* 3d3 */
@@ -1806,7 +1849,7 @@
 #define SV_STAFF_DISPEL_EVIL	24
 #define SV_STAFF_POWER			25
 #define SV_STAFF_HOLINESS		26
-#define SV_STAFF_GENOCIDE		27
+#define SV_STAFF_BANISHMENT		27
 #define SV_STAFF_EARTHQUAKES	28
 #define SV_STAFF_DESTRUCTION	29
 
@@ -1919,8 +1962,8 @@
 #define SV_SCROLL_STAR_DESTRUCTION		41
 #define SV_SCROLL_DISPEL_UNDEAD			42
 /* xxx */
-#define SV_SCROLL_GENOCIDE				44
-#define SV_SCROLL_MASS_GENOCIDE			45
+#define SV_SCROLL_BANISHMENT				44
+#define SV_SCROLL_MASS_BANISHMENT			45
 #define SV_SCROLL_ACQUIREMENT			46
 #define SV_SCROLL_STAR_ACQUIREMENT		47
 #define SV_SCROLL_LEGEND_LORE			48
@@ -2033,6 +2076,11 @@
 #define SV_FOOD_MIN_FOOD	32
 
 /*
+ * Special "sval" limit -- last "normal" lite
+ */
+#define SV_LITE_MAX_LITE	32
+
+/*
  * Special "sval" limit -- first "aimed" rod
  */
 #define SV_ROD_MIN_DIRECTION	12
@@ -2059,59 +2107,60 @@
 /*
  * New monster blow methods
  */
-#define RBM_HIT  1
-#define RBM_TOUCH       2
-#define RBM_PUNCH       3
-#define RBM_KICK 4
-#define RBM_CLAW 5
-#define RBM_BITE 6
+#define RBM_HIT		1
+#define RBM_TOUCH		2
+#define RBM_PUNCH		3
+#define RBM_KICK		4
+#define RBM_CLAW 		5
+#define RBM_BITE 		6
 #define RBM_STING       7
 #define RBM_VOMIT       8
-#define RBM_BUTT 9
+#define RBM_BUTT 		9
 #define RBM_CRUSH       10
 #define RBM_ENGULF      11
-#define RBM_XXX2 12
+#define RBM_PECK		12
 #define RBM_CRAWL       13
 #define RBM_DROOL       14
-#define RBM_SPIT 15
-#define RBM_XXX3 16
-#define RBM_GAZE 17
-#define RBM_WAIL 18
+#define RBM_SLIME		15
+#define RBM_SPIT		16     /* Minimum ranged attacks */
+#define RBM_GAZE 		17
+#define RBM_WAIL 		18
 #define RBM_SPORE       19
-#define RBM_XXX4 20
-#define RBM_BEG  21
+#define RBM_LASH		20
+#define RBM_BEG  		21
 #define RBM_INSULT      22
-#define RBM_MOAN 23
-#define RBM_XXX5 24
-#define RBM_TRAP 25
+#define RBM_MOAN 		23	/* Maximum normal attacks */
+#define RBM_THROW 	24
+#define RBM_TRAP 		25
 #define RBM_SHOOT       26
-#define RBM_AURA 27
-#define RBM_SELF 28
+#define RBM_AURA 		27
+#define RBM_SELF 		28
 #define RBM_ADJACENT    29
 #define RBM_HANDS       30
 #define RBM_MISSILE     31
 #define RBM_BOLT_10     32
-#define RBM_BOLT 33
-#define RBM_BEAM 34
+#define RBM_BOLT 		33
+#define RBM_BEAM 		34
 #define RBM_BLAST       35
-#define RBM_WALL 36
-#define RBM_BALL 37
+#define RBM_WALL 		36
+#define RBM_BALL 		37
 #define RBM_CLOUD       38
 #define RBM_STORM       39
 #define RBM_BREATH      40
-#define RBM_AREA 41
-#define RBM_LOS  42
-#define RBM_LINE 43
-#define RBM_AIM  44
-#define RBM_ORB  45
-#define RBM_STAR 46
+#define RBM_AREA 		41
+#define RBM_LOS  		42
+#define RBM_LINE 		43
+#define RBM_AIM  		44
+#define RBM_ORB  		45
+#define RBM_STAR 		46
 #define RBM_SPHERE	47
-#define RBM_PANEL	48
-#define RBM_LEVEL	49
+#define RBM_PANEL		48
+#define RBM_LEVEL		49
 #define RBM_CROSS       50
 #define RBM_STRIKE      51
 
-
+#define RBM_MAX_NORMAL  23
+#define RBM_MIN_RANGED  15
 
 /*** Function flags ***/
 
@@ -2204,6 +2253,7 @@
 #define PU_HP			0x00000010L	/* Calculate chp and mhp */
 #define PU_MANA			0x00000020L	/* Calculate csp and msp */
 #define PU_SPELLS		0x00000040L	/* Calculate spells */
+#define PU_RUNES		0x00000080L /* Calculate runes */
 /* xxx (many) */
 #define PU_FORGET_VIEW	0x00010000L	/* Forget field of view */
 #define PU_UPDATE_VIEW	0x00020000L	/* Update field of view */
@@ -2311,13 +2361,13 @@
  */
 #define IDENT_SENSE		0x01	/* Item has been "sensed" */
 #define IDENT_FIXED		0x02	/* Item has been "haggled" */
-#define IDENT_EMPTY		0x04	/* Item charges are known */
+#define IDENT_BONUS		0x04	/* Item bonuses are known */
 #define IDENT_KNOWN		0x08	/* Item abilities are known */
-#define IDENT_BONUS	0x10	/* Item background is known */
+#define IDENT_STORE	0x10	/* Item is in a store */
 #define IDENT_MENTAL	0x20	/* Item information is known */
 #define IDENT_CURSED	0x40	/* Item is temporarily cursed */
 #define IDENT_BROKEN	0x80	/* Item is permanently worthless */
-
+/* Space for implementation of multiple pvals */
 
 /*
  * The special inscriptions.
@@ -2327,7 +2377,7 @@
 #define INSCRIP_WORTHLESS       100+2
 #define INSCRIP_CURSED	  100+3
 #define INSCRIP_BROKEN	  100+4
-#define INSCRIP_AVERAGE	 100+5
+#define INSCRIP_EMPTY	 100+5
 #define INSCRIP_GOOD	    100+6
 #define INSCRIP_EXCELLENT       100+7
 #define INSCRIP_SPECIAL	 100+8
@@ -2497,7 +2547,7 @@
 #define TR3_EASY_KNOW    0x02000000L     /* Item is known if aware */
 #define TR3_HIDE_TYPE    0x04000000L     /* Item hides description */
 #define TR3_SHOW_MODS    0x08000000L     /* Item shows Tohit/Todam */
-#define TR3_XXX1  0x10000000L     /* XXX1 */
+#define TR3_THROWING	 0x10000000L     /* Item gets shots/might bonus when thrown */
 #define TR3_LIGHT_CURSE  0x20000000L     /* Item has Light Curse */
 #define TR3_HEAVY_CURSE  0x40000000L     /* Item has Heavy Curse */
 #define TR3_PERMA_CURSE  0x80000000L     /* Item has Perma Curse */
@@ -2613,13 +2663,13 @@
 #define MFLAG_HIDE      0x0002    /* Monster is hiding in terrain */
 #define MFLAG_OVER      0x0004    /* Monster is flying over terrain*/
 #define MFLAG_MADE      0x0008    /* Monster is not carrying treasure */
-#define MFLAG_BORN      0x0010    /* Monster is still being born */
-#define MFLAG_NICE      0x0020    /* Monster is still being nice */
+#define MFLAG_MOVE	0x0010    /* Monster has moved */
+#define MFLAG_TOWN	0X0020    /* Monster is using "townsman" AI */
 #define MFLAG_SHOW      0x0040    /* Monster is recently memorized */
 #define MFLAG_MARK      0x0080    /* Monster is currently memorized */
+
 #define MFLAG_ACTV      0x0100    /* Monster is currently active */
 #define MFLAG_RUNS      0x0200    /* Monster is currently running */
-
 #define MFLAG_RUN_BREAK_LEFT    0x1000
 #define MFLAG_RUN_BREAK_RIGHT   0x2000
 #define MFLAG_RUN_OPEN_LEFT     0x4000
@@ -2628,16 +2678,17 @@
 /*
  * Monster movement (return from place_monster_on)
  */
-#define MM_FAIL 0       /* Monster cannot occupy terrain */
-#define MM_WALK 0x01    /* Monster will walk on terrain */
-#define MM_FLY  0x02    /* Monster will fly on terrain */
-#define MM_CLIMB 0x04   /* Monster will climb on terrain */
-#define MM_SWIM 0x08    /* Monster will swim in terrain */
-#define MM_DIG 0x10     /* Monster will dig through terrain */
-#define MM_DEEP 0x20    /* Monster is deep in terrain */
-#define MM_PASS 0x40    /* Monster is pass wall */
-#define MM_OOZE 0x80     /* Monster will ooze through terrain */
-
+#define MM_DROWN -1  /* Monster suffers in terrain */
+#define MM_FAIL 0    /* Monster cannot occupy terrain */
+#define MM_WALK 1    /* Monster will walk on terrain */
+#define MM_FLY  2    /* Monster will fly on terrain */
+#define MM_CLIMB 3   /* Monster will climb on terrain */
+#define MM_SWIM 4    /* Monster will swim in terrain */
+#define MM_DIG 5     /* Monster will dig through terrain */
+#define MM_DEEP 6    /* Monster is deep in terrain */
+#define MM_PASS 7    /* Monster is pass wall */
+#define MM_OOZE 8     /* Monster will ooze through terrain */
+#define MM_UNDER 9   /* Monster will walk under terrain */
 
 /*
  * New monster race bit flags
@@ -2653,7 +2704,7 @@
 #define RF1_FORCE_DEPTH  0x00000100      /* Start at "correct" depth */
 #define RF1_FORCE_MAXHP  0x00000200      /* Start with max hitpoints */
 #define RF1_FORCE_SLEEP  0x00000400      /* Start out sleeping */
-#define RF1_FORCE_EXTRA  0x00000800      /* Start out something */
+#define RF1_GUARDIAN     0x00000800      /* Dungeon guardian*/
 #define RF1_ATTR_METAL   0x00001000      /* Lightens color occasionally */
 #define RF1_FRIENDS       0x00002000      /* Arrive with some friends */
 #define RF1_ESCORT 0x00004000      /* Arrive with an escort */
@@ -2679,37 +2730,37 @@
  * New monster race bit flags
  */
 #define RF2_STUPID	0x00000001      /* Monster is stupid */
-#define RF2_SMART	0x00000002      /* Monster is smart */
-#define RF2_CAN_DIG	0x00000004      /* (?) */
-#define RF2_HAS_LITE	0x00000008      /* (?) */
+#define RF2_SMART		0x00000002      /* Monster is smart */
+#define RF2_CAN_DIG	0x00000004      /* Monster can dig */
+#define RF2_HAS_LITE	0x00000008      /* Monster has lite */
 #define RF2_INVISIBLE	0x00000010      /* Monster avoids vision */
 #define RF2_COLD_BLOOD	0x00000020      /* Monster avoids infra */
 #define RF2_EMPTY_MIND	0x00000040      /* Monster avoids telepathy */
 #define RF2_WEIRD_MIND	0x00000080      /* Monster avoids telepathy? */
 #define RF2_MULTIPLY	0x00000100      /* Monster reproduces */
 #define RF2_REGENERATE	0x00000200      /* Monster regenerates */
-#define RF2_CAN_SWIM	0x00000400      /* (?) */
-#define RF2_MUST_SWIM	0x00000800      /* (?) */
+#define RF2_CAN_SWIM	0x00000400      /* Monster can swim */
+#define RF2_MUST_SWIM	0x00000800      /* Monster must swim */
 #define RF2_POWERFUL	0x00001000      /* Monster has strong breath */
-#define RF2_CAN_CLIMB	0x00002000      /* (?) */
-#define RF2_CAN_FLY	0x00004000      /* (?) */
-#define RF2_MUST_FLY      0x00008000      /* (?) */
-#define RF2_OPEN_DOOR    0x00010000      /* Monster can open doors */
-#define RF2_BASH_DOOR    0x00020000      /* Monster can bash doors */
-#define RF2_PASS_WALL    0x00040000      /* Monster can pass walls */
-#define RF2_KILL_WALL    0x00080000      /* Monster can destroy walls */
-#define RF2_MOVE_BODY    0x00100000      /* Monster can move monsters */
-#define RF2_KILL_BODY    0x00200000      /* Monster can kill monsters */
-#define RF2_TAKE_ITEM    0x00400000      /* Monster can pick up items */
-#define RF2_KILL_ITEM    0x00800000      /* Monster can crush items */
+#define RF2_CAN_CLIMB	0x00002000      /* Monster can climb walls */
+#define RF2_CAN_FLY	0x00004000      /* Monster can fly */
+#define RF2_MUST_FLY    0x00008000      /* Monster must fly */
+#define RF2_OPEN_DOOR	0x00010000      /* Monster can open doors */
+#define RF2_BASH_DOOR	0x00020000      /* Monster can bash doors */
+#define RF2_PASS_WALL	0x00040000      /* Monster can pass walls */
+#define RF2_KILL_WALL	0x00080000      /* Monster can destroy walls */
+#define RF2_ARCHER	0x00100000      /* Monster can move monsters */
+#define RF2_KILL_BODY	0x00200000      /* Monster can kill monsters */
+#define RF2_TAKE_ITEM	0x00400000      /* Monster can pick up items */
+#define RF2_KILL_ITEM	0x00800000      /* Monster can crush items */
 #define RF2_SNEAKY 	0x01000000 /* Monster hides a lot of actions */
-#define RF2_ARMOR	0x02000000 /* Monster is fully armoured (Reduces acid damage/stops some arrows) */
+#define RF2_ARMOR		0x02000000 /* Monster is fully armoured (Reduces acid damage/stops some arrows) */
 #define RF2_PRIEST 	0x04000000 /* Monster has access to priest spells ? */
 #define RF2_MAGE   	0x08000000 /* Monster has access to mage spells ? */
 #define RF2_HAS_AURA  	0x10000000 /* Monster radiates an aura attack */
 #define RF2_HAS_WEB	0x20000000 /* Monster leaves a trail of webs */
-#define RF2_BRAIN_7	0x40000000
-#define RF2_BRAIN_8	0x80000000
+#define RF2_NEED_LITE	0x40000000 /* Monster cannot see the player if player is not visible */
+#define RF2_LOW_MANA_RUN	0x80000000	/* Monster will run if low on mana */
 
 /*
  * New monster race bit flags
@@ -2722,8 +2773,8 @@
 #define RF3_UNDEAD 0x00000020      /* Undead */
 #define RF3_EVIL   0x00000040      /* Evil */
 #define RF3_ANIMAL 0x00000080      /* Animal */
-#define RF3_OOZE   0x00000100      /* (?) */
-#define RF3_HUGE   0x00000200      /* (?) */
+#define RF3_OOZE   0x00000100      /* Oozes through things */
+#define RF3_HUGE   0x00000200      /* Huge (breaks things?) */
 #define RF3_NONVOCAL      0x00000400      /* Non-Vocal */
 #define RF3_NONLIVING     0x00000800      /* Non-Living */
 #define RF3_HURT_LITE    0x00001000      /* Hurt by lite */
@@ -2779,9 +2830,9 @@
 #define RF4_BR_WALL	 0x04000000 /* Breathe Force */
 #define RF4_BR_MANA	 0x08000000 /* Breathe Mana */
 #define RF4_BR_FEAR	 0x10000000
-#define RF4_XXX6	    0x20000000
-#define RF4_XXX7	    0x40000000
-#define RF4_BOULDER	 0x80000000 /* Throw a boulder */
+#define RF4_XXX6	    	 0x20000000
+#define RF4_LASH		 0x40000000
+#define RF4_THROW		 0x80000000 /* Throw a boulder */
 
 /*
  * New monster race bit flags
@@ -2798,10 +2849,10 @@
 #define RF5_DRAIN_MANA		0x00000200	/* Drain Mana */
 #define RF5_MIND_BLAST		0x00000400	/* Blast Mind */
 #define RF5_BRAIN_SMASH		0x00000800	/* Smash Brain */
-#define RF5_CAUSE_1			0x00001000	/* Cause Light Wound */
-#define RF5_CAUSE_2			0x00002000	/* Cause Serious Wound */
-#define RF5_CAUSE_3			0x00004000	/* Cause Critical Wound */
-#define RF5_CAUSE_4			0x00008000	/* Cause Mortal Wound */
+#define RF5_WOUND			0x00001000	/* Cause WoundS */
+#define RF5_HUNGER			0x00002000	/* Hunger */
+#define RF5_XXX3			0x00004000	/*  */
+#define RF5_XXX4			0x00008000	/*  */
 #define RF5_BO_ACID			0x00010000	/* Acid Bolt */
 #define RF5_BO_ELEC			0x00020000	/* Elec Bolt (unused) */
 #define RF5_BO_FIRE			0x00040000	/* Fire Bolt */
@@ -2809,10 +2860,10 @@
 #define RF5_BO_POIS			0x00100000	/* Poison Bolt (unused) */
 #define RF5_BO_NETH			0x00200000	/* Nether Bolt */
 #define RF5_BO_WATE			0x00400000	/* Water Bolt */
-#define RF5_BO_MANA			0x00800000	/* Mana Bolt */
+#define RF5_BO_MANA			0x00800000	/* Magic Missile */
 #define RF5_BO_PLAS			0x01000000	/* Plasma Bolt */
 #define RF5_BO_ICEE			0x02000000	/* Ice Bolt */
-#define RF5_MISSILE			0x04000000	/* Magic Missile */
+#define RF5_XXX5			0x04000000	/* XXX */
 #define RF5_SCARE			0x08000000	/* Frighten Player */
 #define RF5_BLIND			0x10000000	/* Blind Player */
 #define RF5_CONF			0x20000000	/* Confuse Player */
@@ -2823,13 +2874,13 @@
  * New monster race bit flags
  */
 #define RF6_HASTE	   0x00000001 /* Speed self */
-#define RF6_XXX1	    0x00000002 /* Speed a lot (?) */
+#define RF6_ADD_MANA	    0x00000002 /* Add to mana */
 #define RF6_HEAL	    0x00000004 /* Heal self */
-#define RF6_XXX2	    0x00000008 /* Heal a lot (?) */
+#define RF6_CURE	    0x00000008 /* Cure self */
 #define RF6_BLINK	   0x00000010 /* Teleport Short */
 #define RF6_TPORT	   0x00000020 /* Teleport Long */
 #define RF6_XXX3	    0x00000040 /* Move to Player (?) */
-#define RF6_XXX4	    0x00000080 /* Move to Monster (?) */
+#define RF6_TELE_SELF_TO	    0x00000080 /* Move to Monster (?) */
 #define RF6_TELE_TO	 0x00000100 /* Move player to monster */
 #define RF6_TELE_AWAY       0x00000200 /* Move player far away */
 #define RF6_TELE_LEVEL      0x00000400 /* Move player vertically */
@@ -2894,7 +2945,7 @@
  */
 #define RF1_OBVIOUS_MASK \
 	(RF1_UNIQUE | RF1_QUESTOR | RF1_MALE | RF1_FEMALE | \
-	 RF1_FRIENDS | RF1_ESCORT | RF1_ESCORTS)
+	 RF1_GUARDIAN | RF1_FRIENDS | RF1_ESCORT | RF1_ESCORTS)
 
 /*
  * "race" flags
@@ -2937,12 +2988,12 @@
  * "Bolt" spells that may hurt fellow monsters
  */
 #define RF4_BOLT_MASK \
-	(RF4_SPIT | RF4_SHOOT | RF4_BOULDER)
+	(RF4_SPIT | RF4_SHOOT | RF4_THROW | RF4_LASH)
 
 #define RF5_BOLT_MASK \
 	(RF5_BO_ACID | RF5_BO_ELEC | RF5_BO_FIRE | RF5_BO_COLD | \
 	 RF5_BO_POIS | RF5_BO_NETH | RF5_BO_WATE | RF5_BO_MANA | \
-	 RF5_BO_PLAS | RF5_BO_ICEE | RF5_MISSILE)
+	 RF5_BO_PLAS | RF5_BO_ICEE)
 
 #define RF6_BOLT_MASK \
 	(0L)
@@ -2964,7 +3015,7 @@
  * Spells that hurt the player directly
  */
 #define RF4_ATTACK_MASK \
-	 (RF4_SPIT | RF4_SHOOT | RF4_EXPLODE | RF4_BOULDER | \
+	 (RF4_SPIT | RF4_SHOOT | RF4_EXPLODE | RF4_LASH | RF4_THROW | \
 	 RF4_BR_ACID | RF4_BR_ELEC | RF4_BR_FIRE | RF4_BR_COLD | RF4_BR_POIS | \
 	 RF4_BR_NETH | RF4_BR_LITE | RF4_BR_DARK | RF4_BR_CONF | RF4_BR_SOUN | \
 	 RF4_BR_CHAO | RF4_BR_DISE | RF4_BR_NEXU | RF4_BR_TIME | RF4_BR_INER | \
@@ -2973,10 +3024,10 @@
 #define RF5_ATTACK_MASK \
 	(RF5_BA_ACID | RF5_BA_ELEC | RF5_BA_FIRE | RF5_BA_COLD | RF5_BA_POIS | \
 	 RF5_BA_NETH | RF5_BA_WATE | RF5_BA_MANA | RF5_BA_DARK | \
-	 RF5_MIND_BLAST | RF5_BRAIN_SMASH | RF5_CAUSE_1 | RF5_CAUSE_2 | \
-	 RF5_CAUSE_3 | RF5_CAUSE_4 | RF5_BO_ACID | RF5_BO_ELEC | RF5_BO_FIRE | \
+	 RF5_MIND_BLAST | RF5_BRAIN_SMASH | RF5_WOUND | RF5_HUNGER | \
+	 RF5_BO_ACID | RF5_BO_ELEC | RF5_BO_FIRE | \
 	 RF5_BO_COLD | RF5_BO_POIS | RF5_BO_NETH | RF5_BO_WATE | RF5_BO_MANA | \
-	 RF5_BO_PLAS | RF5_BO_ICEE | RF5_MISSILE)
+	 RF5_BO_PLAS | RF5_BO_ICEE)
 
 #define RF6_ATTACK_MASK \
 	(0L)
@@ -3056,12 +3107,11 @@
  */
 #define RF4_INNATE_MASK \
 	(RF4_SHRIEK | RF4_SPORE | RF4_WAIL | RF4_GAZE | RF4_SPIT | RF4_SHOOT | \
-	 RF4_EXPLODE | RF4_BOULDER | \
+	 RF4_EXPLODE | RF4_LASH | RF4_THROW | \
 	 RF4_BR_ACID | RF4_BR_ELEC | RF4_BR_FIRE | RF4_BR_COLD | RF4_BR_POIS | \
 	 RF4_BR_NETH | RF4_BR_LITE | RF4_BR_DARK | RF4_BR_CONF | RF4_BR_SOUN | \
 	 RF4_BR_CHAO | RF4_BR_DISE | RF4_BR_NEXU | RF4_BR_TIME | RF4_BR_INER | \
-	 RF4_BR_GRAV | RF4_BR_SHAR | RF4_BR_PLAS | RF4_BR_WALL | RF4_BR_MANA | \
-	 RF4_BOULDER)
+	 RF4_BR_GRAV | RF4_BR_SHAR | RF4_BR_PLAS | RF4_BR_WALL | RF4_BR_MANA)
 
 #define RF5_INNATE_MASK \
 	(0L)
@@ -3181,9 +3231,9 @@
 #define OPT_disturb_panel  22
 #define OPT_disturb_state  23
 #define OPT_disturb_minor  24
-#define OPT_disturb_other  25
-#define OPT_alert_hitpoint 26
-#define OPT_alert_failure  27
+/* #define OPT_disturb_other */
+/* #define OPT_alert_hitpoint */
+/* #define OPT_alert_failure */
 #define OPT_verify_destroy 28
 #define OPT_verify_special 29
 #define OPT_allow_quantity 30
@@ -3238,7 +3288,8 @@
 #define OPT_easy_autos    81
 #define OPT_easy_search			82
 #define OPT_variant_save_feats   83
-/* xxx */
+#define OPT_view_glowing_lite 84
+#define OPT_view_surface_lite 85
 /* xxx xxx */
 #define OPT_birth_point_based    (OPT_BIRTH+0)
 #define OPT_birth_auto_roller    (OPT_BIRTH+1)
@@ -3249,6 +3300,7 @@
 #define OPT_birth_no_artifacts   (OPT_BIRTH+6)
 #define OPT_birth_rand_artifacts (OPT_BIRTH+7)
 #define OPT_birth_campaign  (OPT_BIRTH+8)
+#define OPT_birth_no_stacking       (OPT_BIRTH+9)
 /* xxx xxx */
 #define OPT_cheat_peek     (OPT_CHEAT+0)
 #define OPT_cheat_hear     (OPT_CHEAT+1)
@@ -3267,6 +3319,7 @@
 #define OPT_adult_no_artifacts   (OPT_ADULT+6)
 #define OPT_adult_rand_artifacts (OPT_ADULT+7)
 #define OPT_adult_campaign  (OPT_ADULT+8)
+#define OPT_adult_no_stacking       (OPT_ADULT+9)
 /* xxx xxx */
 #define OPT_score_peek     (OPT_SCORE+0)
 #define OPT_score_hear     (OPT_SCORE+1)
@@ -3395,8 +3448,9 @@
 #define reseed_artifacts			op_ptr->opt[OPT_reseed_artifacts]
 #define easy_autos   op_ptr->opt[OPT_easy_autos]
 #define easy_search   op_ptr->opt[OPT_easy_search]
-/* xxx */
-/* xxx */
+#define view_glowing_lite   op_ptr->opt[OPT_view_glowing_lite]
+#define view_surface_lite   op_ptr->opt[OPT_view_surface_lite]
+
 /* xxx xxx */
 #define birth_point_based op_ptr->opt[OPT_birth_point_based]
 #define birth_auto_roller op_ptr->opt[OPT_birth_auto_roller]
@@ -3426,6 +3480,7 @@
 #define adult_no_artifacts       op_ptr->opt[OPT_adult_no_artifacts]
 #define adult_rand_artifacts    op_ptr->opt[OPT_adult_rand_artifacts]
 #define adult_campaign       op_ptr->opt[OPT_adult_campaign]
+#define adult_no_stacking   op_ptr->opt[OPT_adult_no_stacking]
 /* xxx xxx */
 #define score_peek  op_ptr->opt[OPT_score_peek]
 #define score_hear  op_ptr->opt[OPT_score_hear]
@@ -3527,11 +3582,11 @@
 
 /*
  * Return the "attr" for a given item.
- * Use "flavor" if available.
+ * Use "flavor" if available and not aware.
  * Default to user definitions.
  */
 #define object_attr(T) \
-	((k_info[(T)->k_idx].flavor) ? \
+	((k_info[(T)->k_idx].flavor && !k_info[(T)->k_idx].aware) ? \
 	 (x_info[k_info[(T)->k_idx].flavor].x_attr) : \
 	 (k_info[(T)->k_idx].x_attr))
 
@@ -3864,6 +3919,42 @@ extern int PlayerUID;
 # undef MESSAGE_BUF
 # define MESSAGE_BUF	4096
 #endif
+
+
+/*
+ * Mega-Hack -- maximum known sounds
+ *
+ * Should be the same as MSG_MAX for compatibility reasons.
+ */
+#define SOUND_MAX MSG_MAX
+
+
+
+/*** Hack ***/
+
+
+/*
+ * Hack -- attempt to reduce various values
+ */
+#ifdef ANGBAND_LITE
+# undef MACRO_MAX
+# define MACRO_MAX	128
+# undef QUARK_MAX
+# define QUARK_MAX	128
+# undef MESSAGE_MAX
+# define MESSAGE_MAX	128
+# undef MESSAGE_BUF
+# define MESSAGE_BUF	4096
+#endif
+
+
+/*
+ * Available graphic modes
+ */
+#define GRAPHICS_NONE           0
+#define GRAPHICS_ORIGINAL       1
+#define GRAPHICS_ADAM_BOLT      2
+#define GRAPHICS_DAVID_GERVAIS  3
 
 
 /*
