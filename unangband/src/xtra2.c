@@ -2780,7 +2780,7 @@ bool modify_panel(int wy, int wx)
 		if (wx > TOWN_WID - SCREEN_WID) wx = TOWN_WID - SCREEN_WID;
 		else if (wx < 0) wx = 0;
 	}
-	else if (wx > DUNGEON_WID - SCREEN_WID) wx = DUNGEON_WID - SCREEN_WID;
+	else if (wx > DUNGEON_WID - SCREEN_WID) wx = TOWN_WID - SCREEN_WID;
 
 	/* React to changes */
 	if ((p_ptr->wy != wy) || (p_ptr->wx != wx))
