@@ -4828,16 +4828,16 @@ errr parse_t_info(char *buf, header *head)
 	/* Process 'X' for "Xtra" (one line only) */
 	else if (buf[0] == 'X')
 	{
-		int near,distant;
+		int nearby,distant;
 
 		/* There better be a current t_ptr */
 		if (!t_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (2 != sscanf(buf+2, "%d:%d", &near, &distant)) return (PARSE_ERROR_GENERIC);
+		if (2 != sscanf(buf+2, "%d:%d", &nearby, &distant)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		t_ptr->near=near;
+		t_ptr->nearby=nearby;
 		t_ptr->distant = distant;
 
 	}
