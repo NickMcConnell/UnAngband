@@ -2932,6 +2932,13 @@ static void store_examine(void)
 	/* Get the actual object */
 	o_ptr = &st_ptr->stock[item];
 
+	/* Cannot examine unaware object */
+	if (!object_aware_p(o_ptr))
+	{
+		msg_print("You don't have any knowledge about it.");
+		return;
+	}
+
 	/* Description */
 	object_desc(o_name, o_ptr, TRUE, 3);
 
