@@ -1519,7 +1519,7 @@ void do_cmd_apply_rune(void)
 		j_ptr = &o_list[0 - item2];
 	}
 
-	if ((artifact_p(o_ptr)) || ((j_ptr->xtra1) && (j_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES)))
+	if ((artifact_p(j_ptr)) || ((j_ptr->xtra1) && (j_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES)))
 	{
 		msg_print("It has hidden powers that prevent this.");
 

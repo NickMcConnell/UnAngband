@@ -14,6 +14,8 @@ not display inscription in the knowledge menus.
 - Fix bug with Dragonscales spell applying as a weapon, rather than
 body armor. (Reported by Adam Horowitz).
 
+- Fix bug allowing artifacts to have runes inscribed.
+
 Unangband 0.5.2a Bugfix release
 
 ### Game-play ###
