@@ -2403,7 +2403,7 @@ bool brand_item(int brand, cptr act)
 			if (item >= 0)
 			{
 				inven_item_increase(item, -qty);
-				floor_item_describe(0 - item);
+				inven_item_describe(item);
 				inven_item_optimize(item);
 			}
 			/* Decrease the item (from the floor) */
