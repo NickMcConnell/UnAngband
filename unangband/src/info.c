@@ -95,11 +95,6 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 			}
 		}
 
-		/* Add flags object is known to have */
-		*f1 |= o_ptr->can_flags1;
-		*f2 |= o_ptr->can_flags2;
-		*f3 |= o_ptr->can_flags3;
-
 		if (mode == OBJECT_FLAGS_KNOWN)
 		{
 			/* Obvious artifact flags */
@@ -146,6 +141,17 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 				/* Hack - remove 'ignore' flags */
 				(*f2) &= ~(TR2_IGNORE_MASK);
 			}
+		}
+
+		/* Ego Item */
+		if ((o_ptr->name2) && (mode != OBJECT_FLAGS_RANDOM))
+		{
+			ego_item_type *e_ptr = &e_info[o_ptr->name2];
+
+			(*f1) = e_ptr->flags1;
+			(*f2) = e_ptr->flags2;
+			(*f3) = e_ptr->flags3;
+
 		}
 
 		/* Full knowledge for *identified* objects */

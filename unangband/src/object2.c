@@ -717,18 +717,17 @@ s16b get_obj_num(int level)
  */
 void object_mental(object_type *o_ptr)
 {
+	u32b f1,f2,f3;
 
 	/* Now we know about the item */
 	o_ptr->ident |= (IDENT_MENTAL);
 
-	object_can_flags(o_ptr,o_ptr->can_flags1,
-				o_ptr->can_flags2,
-				o_ptr->can_flags3);
+	/* Spoil the object */
+	object_flags(o_ptr,&f1,&f2,&f3);
 
-	object_not_flags(o_ptr,o_ptr->not_flags1,
-				o_ptr->not_flags2,
-				o_ptr->not_flags3);
+	object_can_flags(o_ptr,f1,f2,f3);
 
+	object_not_flags(o_ptr,~(f1),~(f2),~(f3));
 }
 
 
