@@ -876,22 +876,20 @@ void do_cmd_options(void)
 		prt("(5) Display Options", 8, 5);
 		prt("(6) Birth Options", 9, 5);
 		prt("(7) Cheat Options", 10, 5);
-		prt("(8) Variant Options", 11, 5);
-		prt("(9) Save-File Options", 12, 5);
 
 		/* Window flags */
-		prt("(W) Window flags", 14, 5);
+		prt("(W) Window flags", 12, 5);
 
 		/* Load and Append */
-		prt("(L) Load a user pref file", 15, 5);
-		prt("(A) Append options to a file", 16, 5);
+		prt("(L) Load a user pref file", 13, 5);
+		prt("(A) Append options to a file", 14, 5);
 
 		/* Special choices */
-		prt("(D) Base Delay Factor", 18, 5);
-		prt("(H) Hitpoint Warning", 19, 5);
+		prt("(D) Base Delay Factor", 16, 5);
+		prt("(H) Hitpoint Warning", 17, 5);
 
 		/* Prompt */
-		prt("Command: ", 21, 0);
+		prt("Command: ", 19, 0);
 
 		/* Get command */
 		ch = inkey();
@@ -940,7 +938,7 @@ void do_cmd_options(void)
 		{
 			do_cmd_options_aux(6, "Cheat Options");
 		}
-
+#if 0
 		/* Variant Options */
 		else if (ch == '8')
 		{
@@ -952,7 +950,7 @@ void do_cmd_options(void)
 		{
 			do_cmd_options_aux(8, "Save-File Options");
 		}
-
+#endif
 		/* Window flags */
 		else if ((ch == 'W') || (ch == 'w'))
 		{

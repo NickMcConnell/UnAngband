@@ -2337,7 +2337,9 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		255,
 		255,
 		255
-	},
+	}
+#if 0
+,
 
 	/*** Variant game-play ***/
 
@@ -2388,6 +2390,7 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		255,
 		255
 	}
+#endif
 };
 
 const cptr inscrip_text[MAX_INSCRIP] =

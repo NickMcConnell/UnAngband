@@ -3530,7 +3530,7 @@
 /*
  * Information for "do_cmd_options()".
  */
-#define OPT_PAGE_MAX			    9
+#define OPT_PAGE_MAX			    7
 #define OPT_PAGE_PER				20
 
 

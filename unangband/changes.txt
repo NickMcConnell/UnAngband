@@ -5,6 +5,9 @@
 - If you fire or thrown an object that misses a monster, it will continue to
 travel along the line of fire, possibly hitting other monsters in its path.
 
+- The variant and save file options are now compulsory, and removed from the
+user interface.
+
 ### User Interface ###
 
 - Now supports specifying whether or not a feature supports advanced lighting
