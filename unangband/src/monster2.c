@@ -3079,10 +3079,10 @@ bool animate_object(int item)
 		   "has" : "have")), p);
 
 		/* Destroy the item */
-		if (o_ptr->stackc) floor_item_increase(item, -(o_ptr->stackc));
-		else floor_item_increase(item,-(o_ptr->number));
+		if (o_ptr->stackc) floor_item_increase(0 - item, -(o_ptr->stackc));
+		else floor_item_increase(0 - item, -(o_ptr->number));
 
-		floor_item_optimize(item);
+		floor_item_optimize(0 - item);
 	}
 
 	return (TRUE);
