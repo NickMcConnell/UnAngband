@@ -1,0 +1,50 @@
+This file describes my basic to do list for Unangband.
+Also see Lib\Todo, which is a dumping group for
+various files and ideas.
+
+For a start, here are the current bugs:
+
+
+- Death and high scores do not record styles and sub-styles.
+	Trivial fix. Just haven't got around to it. But it will
+break highscore compatibility for people. :(
+
+And new features:
+- Implement Ego lights, and monster bleeding/poisoning from
+Eyangband.
+	This is primarily so that you can cut a monster and watch
+it bleed everywhere. Which is currently done as a hack. I was
+also thinking about doing magical candles, and haven't decided
+whether lanterns will be done in e_info.txt or k_info.txt.
+
+- Implement the player hiding in terrain, and items of
+invisibility.
+	This will require tweaking the monster AI so that
+monsters that cannot see you do something. Acting confused is
+in my opinion, a bit of a hack. I'd rather they left the room,
+or wandered around the room, if they weren't aware of you. Acting
+confused if they are aware of you might be a possibility.
+
+- Implement friendly monsters and uniques.
+	Long overdue, but its a reasonably big job.
+
+- Implement magic items the same way as spells.
+	The structure is there, but this is guaranteed to
+introduce bugs.
+
+- Implement monster spells the same way as player spells.
+	Ditto.
+
+- Implement alchemy/manufacturing items.
+	This is low priority at this stage.
+
+- Implement room descriptions version 2.
+        This will mean that features and objects will be placed
+more aesthetically around the room, and match the textual
+descriptions.
+
+
+
+
+
+
