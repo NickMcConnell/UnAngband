@@ -2142,7 +2142,7 @@ void do_cmd_rest(void)
 		strcpy(out_val, "&");
 
 		/* Ask for duration */
-		if (!get_string(p, out_val, 4)) return;
+		if (!get_string(p, out_val, 5)) return;
 
 		/* Rest until done */
 		if (out_val[0] == '&')
