@@ -4341,13 +4341,16 @@ static void do_cmd_knowledge_ego_items(void)
 
 			case '{':
 			{
-				char note_text[80];
+				char note_text[80] = "";
 
 				/* Prompt */
 				prt("Inscribe with: ", 23, 0);
 	
 				/* Default note */
-				sprintf(note_text, "%s", quark_str(e_ptr->note));
+				if (e_ptr->note)
+				{
+					sprintf(note_text, "%s", quark_str(e_ptr->note));
+				}
 	
 				/* Get a filename */
 				if (!askfor_aux(note_text, 80)) continue;
@@ -4775,7 +4778,7 @@ static void do_cmd_knowledge_objects(void)
 
 			case '{':
 			{
-				char note_text[80];
+				char note_text[80] = "";
 
 				if (!visual_list && (k_ptr->aware || !k_ptr->flavor))
 				{
@@ -4784,7 +4787,10 @@ static void do_cmd_knowledge_objects(void)
 					prt("Inscribe with: ", 23, 0);
 	
 					/* Default note */
-					sprintf(note_text, "%s", quark_str(k_ptr->note));
+					if (k_ptr->note)
+					{
+						sprintf(note_text, "%s", quark_str(k_ptr->note));
+					}
 	
 					/* Get a filename */
 					if (!askfor_aux(note_text, 80)) continue;
