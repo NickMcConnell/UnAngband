@@ -1416,7 +1416,7 @@ void py_attack(int y, int x)
 				u32b k2 = o_ptr->can_flags2;
 				u32b k3 = o_ptr->can_flags3;
 
-				u33b n1, n2, n3;
+				u32b n1, n2, n3;
 
 				k = damroll(o_ptr->dd, o_ptr->ds);
 				k = tot_dam_aux(o_ptr, k, m_ptr);
@@ -2579,14 +2579,18 @@ void run_step(int dir)
 	/* Take time */
 	p_ptr->energy_use = 100;
 
+#if 0
 	/* Catch breath */
 	if (!(f_ptr->flags2 & (FF2_FILLED)))
 	{
 		/* Rest the player */
 		set_rest(p_ptr->rest + PY_REST_RATE - p_ptr->tiring);
 	}
+#endif
 
 	/* Move the player */
 	move_player(p_ptr->run_cur_dir, FALSE);
+
+	return;
 }
 

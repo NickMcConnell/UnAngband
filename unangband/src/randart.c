@@ -1385,7 +1385,9 @@ static long eval_max_dam(int r_idx)
 		for (i = 0; i < 4; i++)
 		{
 			/* Extract the attack infomation */
+#if 0 /* Unused */
 			int effect = rptr->blow[i].effect;
+#endif
 			int method = rptr->blow[i].method;
 			int d_dice = rptr->blow[i].d_dice;
 			int d_side = rptr->blow[i].d_side;
@@ -1546,8 +1548,8 @@ static bool init_mon_power (void)
 			/* Write the monster power rating, hp and damage to file */
 			fprintf(randart_log, "Power rating for monster %d: ", i);
 			dmg = eval_max_dam(i);
-			fprintf(randart_log, "Max dam: %d ", dmg);
-			fprintf(randart_log, "Rating: %d\n", mon_power[i]);
+			fprintf(randart_log, "Max dam: %i ", (int)dmg);
+			fprintf(randart_log, "Rating: %i\n", (int)mon_power[i]);
 			fflush(randart_log);
 		}
 
@@ -1711,7 +1713,7 @@ static s32b slay_power(int a_idx)
 		if (a_ptr->flags1 & TR1_BRAND_COLD) fprintf(randart_log,"Cld ");
 		if (a_ptr->flags1 & TR1_BRAND_POIS) fprintf(randart_log,"Poi ");
 
-		fprintf(randart_log,"times 1000 is: %d\n", (1000 * sv) / tot_mon_power);
+		fprintf(randart_log,"times 1000 is: %d\n", (int)((1000 * sv) / tot_mon_power));
 		fflush(randart_log);
 	}
 
@@ -5512,10 +5514,8 @@ static int artifacts_acceptable(void)
 				hats > 0 ? " hats" : "",
 				gloves > 0 ? " gloves" : "",
 				boots > 0 ? " boots" : "");
-			msg_format("Restarting generation process: not enough%s",
-				types);
-			LOG_PRINT1("Restarting generation process: not enough%s",
-				types);
+			msg_format("Restarting generation process: not enough %s", types);
+			LOG_PRINT1("Restarting generation process: not enough %s", types);
 		}
 		return (0);
 	}

@@ -249,7 +249,7 @@ static cptr r_info_blow_effect[] =
 	"FEATURE",
 	"STEAM",
 	"VAPOUR",
-	"SMOKE"
+	"SMOKE",
 	NULL
 };
 

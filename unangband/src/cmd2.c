@@ -2557,8 +2557,6 @@ void do_cmd_fire(void)
 				/* Assume a default death */
 				cptr note_dies = " dies.";
 
-				u33b n1, n2, n3;
-
 				/* Some monsters get "destroyed" */
 				if ((r_ptr->flags3 & (RF3_NONLIVING)) ||
 				    (r_ptr->flags2 & (RF2_STUPID)))

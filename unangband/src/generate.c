@@ -5075,7 +5075,7 @@ void generate_cave(void)
 {
 	int y, x, num;
 
-	dungeon_zone *zone=&t_info[0].zone[0];;
+	dungeon_zone *zone=&t_info[0].zone[0];
 
 	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
 
