@@ -101,29 +101,28 @@
  * Number of grids in each panel (vertically)
  * Must be a multiple of BLOCK_HGT
  */
-#define PANEL_HGT	11
+#define PANEL_HGT	(use_dbltile ? 5 : 11)
 
 /*
  * Number of grids in each panel (horizontally)
  * Must be a multiple of BLOCK_WID
  */
-#define PANEL_WID	(use_bigtile ? 16 : 33)
+#define PANEL_WID ((use_dbltile && use_bigtile) ? 8 : ((use_dbltile || use_bigtile) ? 16 : 33))
 
 #define ROW_MAP			1
 #define COL_MAP			13
-
 
 /*
  * Number of grids in each screen (vertically)
  * Must be a multiple of PANEL_HGT (at least 2x)
  */
-#define SCREEN_HGT	(Term->hgt - ROW_MAP - 1)
+#define SCREEN_HGT	((Term->hgt - ROW_MAP - 1) / (use_dbltile ? 2 : 1))
 
 /*
  * Number of grids in each screen (horizontally)
  * Must be a multiple of PANEL_WID (at least 2x)
  */
-#define SCREEN_WID	((Term->wid - COL_MAP - 1) / (use_bigtile ? 2 : 1))
+#define SCREEN_WID	((Term->wid - COL_MAP - 1) / ((use_dbltile && use_bigtile) ? 4 :((use_dbltile || use_bigtile) ? 2 : 1)))
 
 
 /*
@@ -3958,7 +3957,7 @@ extern int PlayerUID;
 #define GRAPHICS_ORIGINAL       1
 #define GRAPHICS_ADAM_BOLT      2
 #define GRAPHICS_DAVID_GERVAIS  3
-
+#define GRAPHICS_DAVID_GERVAIS_ISO	4
 
 /*
  * List of commands that will be auto-repeated

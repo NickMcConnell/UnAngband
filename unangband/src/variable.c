@@ -100,8 +100,8 @@ bool daytime;
 
 bool use_sound;		 /* The "sound" mode is enabled */
 bool use_graphics;	      /* The "graphics" mode is enabled */
+bool use_dbltile = FALSE;
 bool use_bigtile = FALSE;
-
 
 s16b signal_count;	      /* Hack -- Count interrupts */
 

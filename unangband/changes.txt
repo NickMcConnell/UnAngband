@@ -15,8 +15,34 @@ of the same object type, depending on the level at which the feature is
 located. This is currently unused, but is intended to support different
 types of fountains, trees, mineral veins and so on.
 
-
 ### User Interface ###
+
+- Added experimental Double tile mode (Windows only), which is has tiles
+twice as wide and high as regular tiles. When used along with big tiles, results
+in tiles four times as wide and twice as high. Because the tiles have increased 
+height as well as width, double tiles are currently not used in several areas that
+support regular tiles. There are currently some visual artifacts.
+
+- Added support for transparency in David Gervais's 32x32 support for
+Windows users. This requires a (slightly altered) 32x32.bmp and a matching
+mask32.bmp file and is (a little) more correct than equivelent X11 masking.
+
+- Added experimental support for David Gervais's isometric tiles (Windows
+only). This is currently 'proof-of-concept' only and does not require SDL.
+However, it will result in many visual artifacts, and does not have many
+tiles correctly assigned. Advantages from Hajo's Iso-metric tile support
+include two differing iso-metric projections (Switched by toggling big tile
+mode on and off), scaleable tile sizes, and support for mixing isometric
+tiles and text (This is not possible on the main map though). Disadvantages
+include no support for dynamically recolouring of tiles, no support for
+lighting effects, incorrect draw order for tiles, incorrect masking of tiles
+in front and behind, and other visual artefacts that currently make this 
+(mostly) unusable. Do not attempt to assign tiles using the visual tile
+assigner at this stage, as the supplied 54x54.bmp and mask54.bmp file are
+only temporary and some poorly 'glued' together.
+
+- Windows assumes that graphic tile (0,0) is always a floor tile. Corrected this
+so that the .bmp files honour this assumption. 
 
 - Can now use 'k' in knowledge menus to toggle auto-destruction of objects,
 'g' to toggle auto-pickup, 'i' to toggle auto-ignore, 's' to toggle auto-
@@ -25,6 +51,9 @@ however these have no effect.
 
 - "Great" weapons and ammo now much more likely to have additional damage
 dice or sides. (From NPPAngband)
+
+- If you specify a different terrain for invisible traps, it is used to
+identify unsafe floors.
 
 ### Bug fixes ###
 
@@ -47,6 +76,8 @@ file becoming excessively large.
 - You could spike a door multiple times to break it (Reported by @nothere).
 
 - Doors did not appear jammed after first spiking them (Reported by @nothere).
+
+
 
 UnAngband 0.5.4c: "Competitive Fix"
 

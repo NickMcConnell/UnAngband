@@ -2006,8 +2006,14 @@ errr Term_save(void)
 		term_win_init(Term->mem, w, h);
 	}
 
+	/* Tell term we're about to save */
+	if (Term->note_screen) Term_xtra(TERM_XTRA_SAVES,0);
+
 	/* Grab */
 	term_win_copy(Term->mem, Term->scr, w, h);
+
+	/* Tell term we've saved */
+	if (Term->note_screen) Term_xtra(TERM_XTRA_SAVES,1);
 
 	/* Success */
 	return (0);
@@ -2036,8 +2042,14 @@ errr Term_load(void)
 		term_win_init(Term->mem, w, h);
 	}
 
+	/* Tell term we've saved */
+	if (Term->note_screen) Term_xtra(TERM_XTRA_SAVES,2);
+
 	/* Load */
 	term_win_copy(Term->scr, Term->mem, w, h);
+
+	/* Tell term we've saved */
+	if (Term->note_screen) Term_xtra(TERM_XTRA_SAVES,3);
 
 	/* Assume change */
 	for (y = 0; y < h; y++)

@@ -703,8 +703,11 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 						/* Mega-hack */
 						if (a & 0x80)
 						{
-							/* Use a dark tile */
-							c += 1;
+							if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
+							{
+								/* Use a dark tile */
+								c += 1;
+							}
 						}
 						else
 						{
@@ -722,7 +725,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 							/* Use a brightly lit tile */
 							if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
 								c -= 1;
-							else
+							else if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
 								c += 2;
 						}
 						else
@@ -753,7 +756,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 									/* Use a brightly lit tile */
 									if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
 										c -= 1;
-									else
+									else if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
 										c += 2;
 								}
 								else
@@ -775,8 +778,11 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 					/* Mega-hack */
 					if (a & 0x80)
 					{
-						/* Use a dark tile */
-						c += 1;
+						if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
+						{
+							/* Use a dark tile */
+							c += 1;
+						}
 					}
 					else
 					{
@@ -791,8 +797,11 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 					/* Mega-hack */
 					if (a & 0x80)
 					{
-						/* Use a dark tile */
-						c += 1;
+						if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
+						{
+							/* Use a dark tile */
+							c += 1;
+						}
 					}
 					else
 					{
@@ -807,8 +816,11 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 					/* Mega-hack */
 					if (a & 0x80)
 					{
-						/* Use a dark tile */
-						c += 1;
+						if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
+						{
+							/* Use a dark tile */
+							c += 1;
+						}
 					}
 					else
 					{
@@ -842,8 +854,11 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 				/* Mega-hack */
 				if (a & 0x80)
 				{
-					/* Use a dark tile */
-					c += 1;
+						if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
+						{
+							/* Use a dark tile */
+							c += 1;
+						}
 				}
 				else
 				{
@@ -858,8 +873,11 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 				/* Mega-hack */
 				if (a & 0x80)
 				{
-					/* Use a dark tile */
-					c += 1;
+					if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
+					{
+						/* Use a dark tile */
+						c += 1;
+					}
 				}
 				else
 				{
@@ -872,7 +890,6 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		/* Hack -- Safe cave grid -- now use 'invisible trap' */
 		else if (view_safe_grids && !(info & (CAVE_SAFE)))
 		{
-#if 0
 			/* Get the darkness feature */
 			f_ptr = &f_info[FEAT_INVIS];
 
@@ -881,9 +898,6 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 
 			/* Normal char */
 			c = f_ptr->x_char;
-#endif
-			a = TERM_L_DARK;
-			c = 'x';
 		}
 
 		/* Unknown */
@@ -941,8 +955,11 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 					/* Mega-hack */
 					if (a & 0x80)
 					{
-						/* Use a dark tile */
-						c += 1;
+						if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
+						{
+							/* Use a dark tile */
+							c += 1;
+						}
 					}
 					else
 					{
@@ -957,8 +974,11 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 					/* Mega-hack */
 					if (a & 0x80)
 					{
-						/* Use a dark tile */
-						c += 1;
+						if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
+						{
+							/* Use a dark tile */
+							c += 1;
+						}
 					}
 					else
 					{
@@ -973,8 +993,11 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 					/* Mega-hack */
 					if (a & 0x80)
 					{
-						/* Use a dark tile */
-						c += 1;
+						if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
+						{
+							/* Use a dark tile */
+							c += 1;
+						}
 					}
 					else
 					{
@@ -990,7 +1013,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 						/* Use a brightly lit tile */
 						if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
 							c -= 1;
-						else
+						else if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
 							c += 2;
 					}
 					else
@@ -1024,8 +1047,11 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 				/* Mega-hack */
 				if (a & 0x80)
 				{
-					/* Use a dark tile */
-					c += 1;
+					if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
+					{
+						/* Use a dark tile */
+						c += 1;
+					}
 				}
 				else
 				{
@@ -1040,8 +1066,11 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 				/* Mega-hack */
 				if (a & 0x80)
 				{
-					/* Use a dark tile */
-					c += 1;
+					if (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO)
+					{
+						/* Use a dark tile */
+						c += 1;
+					}
 				}
 				else
 				{
@@ -1054,7 +1083,6 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		/* Hack -- Safe cave grid -- now use 'invisible trap' */
 		else if (view_safe_grids && !(info & (CAVE_SAFE)))
 		{
-#if 0
 			/* Get the darkness feature */
 			f_ptr = &f_info[FEAT_INVIS];
 
@@ -1063,9 +1091,6 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 
 			/* Normal char */
 			c = f_ptr->x_char;
-#endif
-			a = TERM_L_DARK;
-			c = 'x';
 		}
 
 		/* Unknown */
@@ -1310,12 +1335,123 @@ void move_cursor_relative(int y, int x)
 	/* Location in window */
 	vx = kx + COL_MAP;
 
-	if (use_bigtile) vx += kx;
+	if (use_dbltile)
+	{
+		vx += (use_bigtile ? 3 : 1) * kx;
+		vy += ky;
+	}
+	else if (use_bigtile) vx += kx;
 
 	/* Go there */
 	Term_gotoxy(vx, vy);
 }
 
+
+void big_queue_char(int x, int y, byte a, char c, byte a1, char c1)
+{
+	/* Avoid warning */
+	(void)c;
+
+	/* Paranoia */
+	if (use_bigtile || use_dbltile)
+	{
+		/* Mega-Hack : Queue dummy char */
+		if (a & 0x80)
+			Term_queue_char(x + 1, y, 255, -1, 0, 0);
+		else
+			Term_queue_char(x + 1, y, TERM_WHITE, ' ', a1, c1);
+
+		/* Mega-Hack : Queue more dummy chars */
+		if (use_dbltile)
+		{
+			if (a & 0x80)
+			{
+				if (use_bigtile)
+				{
+					Term_queue_char(x + 2, y, 255, -1, 0, 0);
+					Term_queue_char(x + 3, y, 255, -1, 0, 0);
+				}
+
+				Term_queue_char(x , y + 1, 255, -1, 0, 0);
+				Term_queue_char(x + 1, y + 1, 255, -1, 0, 0);
+
+				if (use_bigtile)
+				{
+					Term_queue_char(x + 2, y + 1, 255, -1, 0, 0);
+					Term_queue_char(x + 3, y + 1, 255, -1, 0, 0);
+				}
+			}
+			else
+			{
+				if (use_bigtile)
+				{
+					Term_queue_char(x + 2, y, TERM_WHITE, ' ', a1, c1);
+					Term_queue_char(x + 3, y, TERM_WHITE, ' ', a1, c1);
+				}
+
+				Term_queue_char(x , y + 1, TERM_WHITE, ' ', a1, c1);
+				Term_queue_char(x + 1, y + 1, TERM_WHITE, ' ', a1, c1);
+
+				if (use_bigtile)
+				{
+					Term_queue_char(x + 2, y + 1, TERM_WHITE, ' ', a1, c1);
+					Term_queue_char(x + 3, y + 1, TERM_WHITE, ' ', a1, c1);
+				}
+			}
+		}
+	}
+}
+
+void big_putch(int x, int y, byte a, char c)
+{
+	/* Avoid warning */
+	(void)c;
+
+	/* Paranoia */
+	if (use_bigtile || use_dbltile)
+	{
+		/* Mega-Hack : Queue dummy char */
+		if (a & 0x80)
+			Term_putch(x + 1, y, 255, -1);
+		else
+			Term_putch(x + 1, y, TERM_WHITE, ' ');
+
+		/* Mega-Hack : Queue more dummy chars */
+		if (use_dbltile)
+		{
+			if (a & 0x80)
+			{
+				if (use_bigtile)
+				{
+					Term_putch(x + 2, y, 255, -1);
+					Term_putch(x + 3, y, 255, -1);
+				}
+				Term_putch(x , y + 1, 255, -1);
+				Term_putch(x + 1, y + 1, 255, -1);
+				if (use_bigtile)
+				{
+					Term_putch(x + 2, y + 1, 255, -1);
+					Term_putch(x + 3, y + 1, 255, -1);
+				}
+			}
+			else
+			{
+				if (use_bigtile)
+				{
+					Term_putch(x + 2, y, TERM_WHITE, ' ');
+					Term_putch(x + 3, y, TERM_WHITE, ' ');
+				}
+				Term_putch(x , y + 1, TERM_WHITE, ' ');
+				Term_putch(x + 1, y + 1, TERM_WHITE, ' ');
+				if (use_bigtile)
+				{
+					Term_putch(x + 2, y + 1, TERM_WHITE, ' ');
+					Term_putch(x + 3, y + 1, TERM_WHITE, ' ');
+				}
+			}
+		}
+	}
+}
 
 
 /*
@@ -1350,18 +1486,20 @@ void print_rel(char c, byte a, int y, int x)
 	/* Location in window */
 	vx = kx + COL_MAP;
 
-	if (use_bigtile) vx += kx;
+	if (use_dbltile)
+	{
+		vx += (use_bigtile ? 3 : 1) * kx;
+		vy += ky;
+	}
+	else if (use_bigtile) vx += kx;
 
 	/* Hack -- Queue it */
 	Term_queue_char(vx, vy, a, c, 0, 0);
 
-	if (use_bigtile)
+	if (use_bigtile || use_dbltile)
 	{
 		/* Mega-Hack : Queue dummy char */
-		if (a & 0x80)
-			Term_queue_char(vx+1, vy, 255, -1, 0, 0);
-		else
-			Term_queue_char(vx+1, vy, TERM_WHITE, ' ', 0, 0);
+		big_queue_char(vx, vy, a, c, 0, 0);
 	}
 
 	return;
@@ -1506,7 +1644,12 @@ void lite_spot(int y, int x)
 	/* Location in window */
 	vx = kx + COL_MAP;
 
-	if (use_bigtile) vx += kx;
+	if (use_dbltile)
+	{
+		vx += (use_bigtile ? 3 : 1) * kx;
+		vy += ky;
+	}
+	else if (use_bigtile) vx += kx;
 
 	/* Hack -- redraw the grid */
 	map_info(y, x, &a, &c, &ta, &tc);
@@ -1514,15 +1657,9 @@ void lite_spot(int y, int x)
 	/* Hack -- Queue it */
 	Term_queue_char(vx, vy, a, c, ta, tc);
 
-	if (use_bigtile)
+	if (use_bigtile || use_dbltile)
 	{
-		vx++;
-
-		/* Mega-Hack : Queue dummy char */
-		if (a & 0x80)
-			Term_queue_char(vx, vy, 255, -1, 0, 0);
-		else
-			Term_queue_char(vx, vy, TERM_WHITE, ' ', TERM_WHITE, ' ');
+		big_queue_char(vx, vy, a, c, TERM_WHITE, ' ');
 	}
 
 	return;
@@ -1565,17 +1702,16 @@ void prt_map(void)
 			/* Hack -- Queue it */
 			Term_queue_char(vx, vy, a, c, ta, tc);
 
-			if (use_bigtile)
+			if (use_bigtile || use_dbltile)
 			{
-				vx++;
+				big_queue_char(vx, vy, a, c, TERM_WHITE, ' ');
 
-				/* Mega-Hack : Queue dummy char */
-				if (a & 0x80)
-					Term_queue_char(vx, vy, 255, -1, 0, 0);
-				else
-					Term_queue_char(vx, vy, TERM_WHITE, ' ', TERM_WHITE, ' ');
+				vx+= ((use_dbltile && use_bigtile) ? 3 : 1);
 			}
 		}
+
+		if (use_dbltile)
+			vy++;
 	}
 }
 
@@ -1734,7 +1870,12 @@ void display_map(int *cy, int *cx)
 			row = (y * map_hgt / dungeon_hgt);
 			col = (x * map_wid / dungeon_wid);
 
-			if (use_bigtile)
+			if (use_dbltile)
+			{
+				col = col & ~(use_bigtile ? 3 : 1);
+				row = row & ~1;
+			}
+			else if (use_bigtile)
 				col = col & ~1;
 
 			/* Get the attr/char at that map location */
@@ -1749,12 +1890,9 @@ void display_map(int *cy, int *cx)
 				/* Add the character */
 				Term_putch(col + 1, row + 1, ta, tc);
 
-				if (use_bigtile)
+				if (use_bigtile || use_dbltile)
 				{
-					if (ta & 0x80)
-						Term_putch(col + 2, row + 1, 255, -1);
-					else
-						Term_putch(col + 2, row + 1, TERM_WHITE, ' ');
+					big_putch(col + 1, row + 1, ta, tc);
 				}
 
 				/* Save priority */
@@ -1768,7 +1906,12 @@ void display_map(int *cy, int *cx)
 	row = (py * map_hgt / dungeon_hgt);
 	col = (px * map_wid / dungeon_wid);
 
-	if (use_bigtile)
+	if (use_dbltile)
+	{
+		col = col & ~(use_bigtile ? 3 : 1);
+		row = row & ~1;
+	}
+	else if (use_bigtile)
 		col = col & ~1;
 
 	/*** Make sure the player is visible ***/
@@ -1781,6 +1924,11 @@ void display_map(int *cy, int *cx)
 
 	/* Draw the player */
 	Term_putch(col + 1, row + 1, ta, tc);
+
+	if (use_bigtile || use_dbltile)
+	{
+		big_putch(col + 1, row + 1, ta, tc);
+	}
 
 	/* Return player location */
 	if (cy != NULL) (*cy) = row + 1;
