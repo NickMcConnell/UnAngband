@@ -1,4 +1,4 @@
-Monster Spoilers for Unangband Version 0.5.1c
+Monster Spoilers for Angband Version 0.5.1d
 ------------------------------------------
 
 The Filthy street urchin  (Red 't')
@@ -1095,9 +1095,10 @@ The Forest goblin  (L.Green 'k')
 === Num:945  Lev:5  Rar:1  Spd:+0  Hp:8d8  Ac:32  Exp:18
 He is an ugly, green skinned primative looking humanoid.  This evil orc is
 normally found on dungeon level 5, and moves at normal speed.  He can open
-doors and bash down doors.  He takes quite a while to see intruders, which
-he may notice from 200 feet.  He usually appears in groups.  He may carry
-a object or treasure.  He can hit to attack with damage 1d5.  
+doors and bash down doors.  He is hurt by bright light.  He takes quite a
+while to see intruders, which he may notice from 200 feet.  He usually
+appears in groups.  He may carry a object or treasure.  He can hit to
+attack with damage 1d5.  
 
 The Disenchanter eye  (Violet 'e')
 === Num:85  Lev:5  Rar:2  Spd:-10  Hp:7d8  Ac:6  Exp:20
@@ -2015,7 +2016,7 @@ down doors.  It resists cold.  It is fairly observant of intruders, which
 it may notice from 200 feet.  It can claw to attack with damage 1d3, claw
 to attack with damage 1d3, and bite to attack with damage 1d4.  
 
-The Orc shaman  (Red 'o')
+The Orc shaman  (L.Green 'o')
 === Num:126  Lev:9  Rar:1  Spd:+0  Hp:9d8  Ac:15  Exp:30
 An orc dressed in skins who gestures wildly.  This evil orc shaman is
 normally found on dungeon level 9, and moves at normal speed.  He is
@@ -2029,10 +2030,11 @@ The Mirkwood goblin  (Umber 'k')
 === Num:944  Lev:9  Rar:1  Spd:+0  Hp:11d8  Ac:32  Exp:30
 He is an ugly, brown skinned humanoid armed with a variety of dangerous
 weapons.  This evil orc is normally found on dungeon level 9, and moves at
-normal speed.  He can open doors and bash down doors.  He takes quite a
-while to see intruders, which he may notice from 200 feet.  He usually
-appears in groups.  He may carry a object or treasure.  He can hit to
-poison with damage 2d5, and hurt with arrows.  
+normal speed.  He can open doors, bash down doors and climb on walls and
+ceilings.  He is hurt by bright light.  He takes quite a while to see
+intruders, which he may notice from 200 feet.  He usually appears in
+groups.  He may carry a object or treasure.  He can hit to poison with
+damage 2d5, and hurt with arrows.  
 
 The Baby blue dragon  (Blue 'd')
 === Num:127  Lev:9  Rar:2  Spd:+0  Hp:100  Ac:30  Exp:35
@@ -2755,9 +2757,9 @@ A small humanoid that radiates some power.  This evil orc is normally found
 on dungeon level 12, and moves at normal speed.  It is magical, casting
 spells which produce poison balls, blind, slow, blink-self, teleport-self
 or summon a monster; 1 time in 4.  It can open doors and bash down doors.
- It is fairly observant of intruders, which it may notice from 180 feet. 
-It may carry a object or treasure.  It can hit to attack with damage 1d8.
- 
+ It is hurt by bright light.  It is fairly observant of intruders, which it
+may notice from 180 feet.  It may carry a object or treasure.  It can hit
+to attack with damage 1d8.  
 
 The White wolf  (White 'C')
 === Num:156  Lev:12  Rar:1  Spd:+10  Hp:7d7  Ac:30  Exp:30
@@ -2826,10 +2828,11 @@ The Air spirit  (L.Blue 'E')
 === Num:163  Lev:12  Rar:2  Spd:+20  Hp:8d8  Ac:40  Exp:40
 A whirlwind of sentient air.  This creature is normally found on dungeon
 level 12, and moves extremely erratically, and very quickly.  It can bash
-down doors.  It is invisible.  It is cold blooded.  It is not detected by
-telepathy.  It resists lightning and poison.  It cannot be frightened,
-confused or slept.  It takes a while to see intruders, which it may notice
-from 120 feet.  It can hit to attack with damage 1d3.  
+down doors and fly over obstacles.  It is invisible.  It is cold blooded.
+ It is not detected by telepathy.  It resists lightning and poison.  It
+cannot be frightened, confused or slept.  It takes a while to see
+intruders, which it may notice from 120 feet.  It can hit to attack with
+damage 1d3.  
 
 The Tiger  (Orange 'f')
 === Num:166  Lev:12  Rar:2  Spd:+10  Hp:12d10  Ac:40  Exp:40
@@ -2862,11 +2865,11 @@ The Moaning spirit  (Umber 'G')
 A ghostly apparition that shrieks horribly.  This evil undead creature is
 normally found on dungeon level 12, and moves a bit erratically, and
 quickly.  It may wail at you.  It is magical, casting spells which terrify
-or teleport-self; 1 time in 16.  It can pass through walls.  It is
-invisible.  It is cold blooded.  It resists cold.  It cannot be confused or
-slept.  It is fairly observant of intruders, which it may notice from 140
-feet.  It may carry one or two objects or treasures.  It can wail to
-terrify, and touch to reduce dexterity with damage 1d8.  
+or teleport-self; 1 time in 16.  It can pass through walls and fly over
+obstacles.  It is invisible.  It is cold blooded.  It resists cold.  It
+cannot be confused or slept.  It is fairly observant of intruders, which it
+may notice from 140 feet.  It may carry one or two objects or treasures. 
+It can wail to terrify, and touch to reduce dexterity with damage 1d8.  
 
 The Wailing spirit  (Slate 'G')
 === Num:859  Lev:12  Rar:2  Spd:+10  Hp:5d8  Ac:20  Exp:44
@@ -3309,11 +3312,11 @@ The Cave crawler  (L.Dark 'c')
 === Num:744  Lev:15  Rar:1  Spd:+0  Hp:8d8  Ac:40  Exp:20
 An ugly centipede damp with moisture and with wriggling tentacles around
 its head.  This insect is normally found on dungeon level 15, and moves a
-bit erratically at normal speed.  It can bash down doors.  It is rarely
-detected by telepathy.  It resists poison.  It is fairly observant of
-intruders, which it may notice from 150 feet.  It usually appears in
-groups.  It can sting to blind with damage 2d4, and sting to blind with
-damage 2d4.  
+bit erratically at normal speed.  It can bash down doors, climb on walls
+and ceilings and dig through earth and rubble.  It is rarely detected by
+telepathy.  It resists poison.  It is fairly observant of intruders, which
+it may notice from 150 feet.  It usually appears in groups.  It can sting
+to blind with damage 2d4, and sting to blind with damage 2d4.  
 
 The Giant copper ant  (Umber 'a')
 === Num:682  Lev:15  Rar:2  Spd:+0  Hp:8d8  Ac:34  Exp:22
@@ -3550,9 +3553,9 @@ The Hummerhorn  (Yellow 'I')
 === Num:210  Lev:16  Rar:4  Spd:+10  Hp:2d2  Ac:14  Exp:4
 A giant buzzing wasp, its stinger drips venom.  This insect is normally
 found on dungeon level 16, and moves extremely erratically, and quickly. 
-It is rarely detected by telepathy.  It breeds explosively.  It is fairly
-observant of intruders, which it may notice from 80 feet.  It can bite to
-confuse with damage 2d2.  
+It can fly over obstacles.  It is rarely detected by telepathy.  It breeds
+explosively.  It is fairly observant of intruders, which it may notice from
+80 feet.  It can bite to confuse with damage 2d2.  
 
 The Green slime  (Green ',')
 === Num:660  Lev:16  Rar:2  Spd:+10  Hp:2d4  Ac:1  Exp:5
@@ -3684,10 +3687,11 @@ The Mirkwood orc  (Umber 'o')
 === Num:1002  Lev:16  Rar:1  Spd:+0  Hp:16d10  Ac:40  Exp:65
 He is a large orc with powerful arms and brown barklike skin.  This evil
 orc is normally found on dungeon level 16, and moves at normal speed.  He
-may shoot at you.  He can open doors and bash down doors.  He takes a while
-to see intruders, which he may notice from 200 feet.  He usually appears in
-groups.  He may carry a object or treasure.  He can hit to attack with
-damage 3d4, hit to poison with damage 3d6, and hurt with arrows.  
+may shoot at you.  He can open doors, bash down doors and climb on walls
+and ceilings.  He takes a while to see intruders, which he may notice from
+200 feet.  He usually appears in groups.  He may carry a object or
+treasure.  He can hit to attack with damage 3d4, hit to poison with damage
+3d6, and hurt with arrows.  
 
 The Giant red dragonfly  (Red 'I')
 === Num:907  Lev:16  Rar:2  Spd:+0  Hp:7d8  Ac:24  Exp:70
@@ -3756,7 +3760,7 @@ takes quite a while to see intruders, which it may notice from 200 feet.
 It usually appears in groups.  It may carry a object or treasure.  It can
 hit to attack with damage 2d8, and hit to poison with damage 2d10.  
 
-The Grey ogre  (Blue 'O')
+The Grey ogre  (Slate 'O')
 === Num:1010  Lev:16  Rar:1  Spd:+0  Hp:22d9  Ac:33  Exp:95
 A massive orc-like figure with pale grey face and powerful arms.  This evil
 mix of orc and giant is normally found on dungeon level 16, and moves a bit
@@ -3841,10 +3845,11 @@ The Mirkwood wolf  (Green 'C')
 === Num:754  Lev:16  Rar:1  Spd:+5  Hp:16d16  Ac:30  Exp:110
 It is a huge wolf hailing from Mirkwood with eyes that glow with evil
 intelligence.  This animal is normally found on dungeon level 16, and moves
-a bit erratically, and quickly.  It can bash down doors.  It tends to
-overlook intruders, which it may notice from 200 feet.  It usually appears
-in groups.  It can bite to attack with damage 1d6, bite to attack with
-damage 1d6, and bite to attack with damage 1d6.  
+a bit erratically, and quickly.  It can bash down doors and climb on walls
+and ceilings.  It tends to overlook intruders, which it may notice from 200
+feet.  It usually appears in groups.  It can bite to attack with damage
+1d6, bite to attack with damage 1d6, and bite to attack with damage 1d6. 
+
 
 [U] Ulfast, Son of Ulfang  (L.Umber 't')
 === Num:211  Lev:16  Rar:3  Spd:+0  Hp:340  Ac:40  Exp:200
@@ -3905,12 +3910,12 @@ poison with damage 3d4, and hit to poison with damage 3d4.
 The Water spirit  (Blue 'E')
 === Num:217  Lev:17  Rar:2  Spd:+10  Hp:9d8  Ac:28  Exp:58
 A whirlpool of sentient liquid.  This creature is normally found on dungeon
-level 17, and moves a bit erratically, and quickly.  It can bash down
-doors.  It is cold blooded.  It is not detected by telepathy.  It is hurt
-by water remover.  It resists acid, poison and water.  It cannot be
-frightened, confused or slept.  It takes quite a while to see intruders,
-which it may notice from 120 feet.  It can hit to attack with damage 2d4,
-and hit to attack with damage 2d4.  
+level 17, and moves a bit erratically, and quickly.  It can bash down doors
+and swim under water.  It is cold blooded.  It is not detected by
+telepathy.  It is hurt by water remover.  It resists acid, poison and
+water.  It cannot be frightened, confused or slept.  It takes quite a while
+to see intruders, which it may notice from 120 feet.  It can hit to attack
+with damage 2d4, and hit to attack with damage 2d4.  
 
 The Unseen servant  (Yellow 'E')
 === Num:801  Lev:17  Rar:1  Spd:+0  Hp:9d8  Ac:28  Exp:58
@@ -4020,10 +4025,10 @@ A massive orc-like figure with green skin and powerful arms.  This evil mix
 of orc and giant is normally found on dungeon level 17, and moves a bit
 erratically at normal speed.  It may shoot at you.  It is magical, casting
 spells which produce poison balls, create darkness or summon spiders; 1
-time in 5.  It can open doors and bash down doors.  It takes quite a while
-to see intruders, which it may notice from 200 feet.  It may carry a object
-or treasure.  It can hit to attack with damage 2d8, hit to poison with
-damage 2d10, and hurt with arrows.  
+time in 5.  It can open doors, bash down doors and climb on walls and
+ceilings.  It takes quite a while to see intruders, which it may notice
+from 200 feet.  It may carry a object or treasure.  It can hit to attack
+with damage 2d8, hit to poison with damage 2d10, and hurt with arrows.  
 
 [U] Nar, the Dwarf  (Yellow 'h')
 === Num:215  Lev:17  Rar:2  Spd:+0  Hp:450  Ac:70  Exp:250
@@ -4077,11 +4082,12 @@ The Dungeon crawler  (L.Slate 'c')
 === Num:745  Lev:18  Rar:1  Spd:+0  Hp:12d10  Ac:40  Exp:40
 A deformed centipede wet with secretions and with barbed tentacles around
 its head.  This insect is normally found on dungeon level 18, and moves a
-bit erratically at normal speed.  It can bash down doors.  It is rarely
-detected by telepathy.  It resists poison.  It is fairly observant of
-intruders, which it may notice from 150 feet.  It usually appears in
-groups.  It can sting to reduce dexterity with damage 2d5, and sting to
-reduce dexterity with damage 2d5.  
+bit erratically at normal speed.  It can bash down doors, climb on walls
+and ceilings and dig through earth and rubble.  It is rarely detected by
+telepathy.  It resists poison.  It is fairly observant of intruders, which
+it may notice from 150 feet.  It usually appears in groups.  It can sting
+to reduce dexterity with damage 2d5, and sting to reduce dexterity with
+damage 2d5.  
 
 The Blink dog  (L.Blue 'C')
 === Num:225  Lev:18  Rar:2  Spd:+10  Hp:8d8  Ac:20  Exp:50
@@ -4738,11 +4744,11 @@ The Muck crawler  (Umber 'c')
 === Num:746  Lev:21  Rar:1  Spd:+0  Hp:12d10  Ac:40  Exp:45
 A monstrous centipede slick with filth and with ropy tentacles around its
 head.  This insect is normally found on dungeon level 21, and moves a bit
-erratically at normal speed.  It can bash down doors.  It is rarely
-detected by telepathy.  It resists poison.  It is fairly observant of
-intruders, which it may notice from 150 feet.  It usually appears in
-groups.  It can sting to blind with damage 2d5, and sting to blind with
-damage 2d5.  
+erratically at normal speed.  It can bash down doors, climb on walls and
+ceilings and dig through earth and rubble.  It is rarely detected by
+telepathy.  It resists poison.  It is fairly observant of intruders, which
+it may notice from 150 feet.  It usually appears in groups.  It can sting
+to blind with damage 2d5, and sting to blind with damage 2d5.  
 
 The Blue dragon bat  (Blue 'b')
 === Num:250  Lev:21  Rar:1  Spd:+20  Hp:4d4  Ac:26  Exp:54
@@ -4812,11 +4818,11 @@ The Energy vortex  (Blue 'v')
 A shimmering tornado of air, sparks crackle along its length.  This
 creature is normally found on dungeon level 21, and moves somewhat
 erratically at normal speed.  It may breathe lightning; 1 time in 6.  It
-can illuminate the dungeon and bash down doors.  It is not detected by
-telepathy.  It resists lightning.  It cannot be frightened, confused or
-slept.  It is ever vigilant for intruders, which it may notice from 1000
-feet.  It can engulf to electrify with damage 3d3, and radiate to electrify
-with damage 3d3.  
+can illuminate the dungeon, bash down doors and fly over obstacles.  It is
+not detected by telepathy.  It resists lightning.  It cannot be frightened,
+confused or slept.  It is ever vigilant for intruders, which it may notice
+from 1000 feet.  It can engulf to electrify with damage 3d3, and radiate to
+electrify with damage 3d3.  
 
 The Screaming spirit  (Red 'G')
 === Num:867  Lev:21  Rar:2  Spd:+10  Hp:20d8  Ac:20  Exp:110
@@ -4926,7 +4932,7 @@ from 160 feet.  It may carry one or two objects or treasures.  It can hit
 to attack with damage 3d4, hit to attack with damage 3d4, and hit to reduce
 intelligence with damage 1d3.  
 
-The Emporer naga  (L.Umber 'n')
+The Emperor naga  (L.Umber 'n')
 === Num:990  Lev:22  Rar:1  Spd:+0  Hp:27d13  Ac:65  Exp:120
 A lordly snake-like figure with a woman's torso.  This evil creature is
 normally found on dungeon level 22, and moves a bit erratically at normal
@@ -5260,11 +5266,11 @@ It is a ghostly woman's form that wails mournfully.  This evil undead
 creature is normally found on dungeon level 24, and moves somewhat
 erratically, and quickly.  She may wail at you.  She is magical, casting
 spells which drain mana or teleport-self; 1 time in 16.  She can pass
-through walls and pick up objects.  She is invisible.  She is cold blooded.
- She resists cold and poison.  She cannot be confused or slept.  She is
-fairly observant of intruders, which she may notice from 200 feet.  She may
-carry one or two objects or treasures.  She can wail to terrify, and touch
-to lower experience (by 20d6+).  
+through walls, pick up objects and fly over obstacles.  She is cold
+blooded.  She resists cold and poison.  She cannot be confused or slept. 
+She is fairly observant of intruders, which she may notice from 200 feet.
+ She may carry one or two objects or treasures.  She can wail to terrify,
+and touch to lower experience (by 20d6+).  
 
 The Mummified human  (White 'z')
 === Num:271  Lev:24  Rar:1  Spd:+0  Hp:17d9  Ac:34  Exp:70
@@ -5474,10 +5480,11 @@ The Carrion crawler  (Orange 'c')
 === Num:281  Lev:25  Rar:2  Spd:+0  Hp:20d12  Ac:40  Exp:60
 A hideous centipede covered in slime and with glowing tentacles around its
 head.  This insect is normally found on dungeon level 25, and moves a bit
-erratically at normal speed.  It can bash down doors.  It is rarely
-detected by telepathy.  It resists poison.  It is fairly observant of
-intruders, which it may notice from 150 feet.  It can sting to paralyze
-with damage 2d6, and sting to paralyze with damage 2d6.  
+erratically at normal speed.  It can bash down doors, climb on walls and
+ceilings and dig through earth and rubble.  It is rarely detected by
+telepathy.  It resists poison.  It is fairly observant of intruders, which
+it may notice from 150 feet.  It can sting to paralyze with damage 2d6, and
+sting to paralyze with damage 2d6.  
 
 The Giant blue dragonfly  (Blue 'I')
 === Num:908  Lev:25  Rar:1  Spd:+0  Hp:6d8  Ac:24  Exp:70
@@ -5507,7 +5514,7 @@ water.  It takes quite a while to see intruders, which it may notice from
 treasure.  It can hit to attack with damage 3d8, and bite to attack with
 damage 2d8.  
 
-The Stone troll  (L.Slate 'T')
+The Stone troll  (Slate 'T')
 === Num:278  Lev:25  Rar:1  Spd:+0  Hp:23d10  Ac:40  Exp:85
 He is a giant troll with scabrous black skin.  This evil troll is normally
 found on dungeon level 25, and moves at normal speed.  He can open doors
@@ -5517,7 +5524,7 @@ and bright light.  He tends to overlook intruders, which he may notice from
 treasure.  He can hit to attack with damage 1d6, hit to attack with damage
 1d6, and bite to attack with damage 3d4.  
 
-[Q] Bert the Stone Troll  (L.Slate 'T')
+[Q] Bert,the Stone Troll  (L.Slate 'T')
 === Num:343  Lev:25  Rar:1  Spd:+0  Hp:23d10  Ac:40  Exp:85
 Big, brawny, powerful and with a taste for dwarf.  He has friends called
 Bill and Tom.  This evil troll is normally found on dungeon level 25, and
@@ -5528,7 +5535,7 @@ appears in groups.  He may carry a good object or treasure.  He can hit to
 attack with damage 1d6, hit to attack with damage 1d6, and bite to attack
 with damage 3d4.  You feel an intense desire to kill this monster...  
 
-[Q] Bill the Stone Troll  (L.Slate 'T')
+[Q] Bill, the Stone Troll  (L.Slate 'T')
 === Num:344  Lev:25  Rar:1  Spd:+0  Hp:23d10  Ac:40  Exp:85
 Big, brawny, stupid and with a taste for dwarf.  He has friends called Bert
 and Tom.  This evil troll is normally found on dungeon level 25, and moves
@@ -5539,7 +5546,7 @@ in groups.  He may carry a good object or treasure.  He can hit to attack
 with damage 1d6, hit to attack with damage 1d6, and bite to attack with
 damage 3d4.  You feel an intense desire to kill this monster...  
 
-[Q] Tom the Stone Troll  (L.Slate 'T')
+[Q] Tom, the Stone Troll  (L.Slate 'T')
 === Num:345  Lev:25  Rar:1  Spd:+0  Hp:23d10  Ac:40  Exp:85
 Big, brawny, stupid and with a taste for dwarf.  He has friends called Bill
 and Bert.   This evil troll is normally found on dungeon level 25, and
@@ -5554,9 +5561,9 @@ The Killer red beetle  (Red 'K')
 === Num:282  Lev:25  Rar:1  Spd:+0  Hp:20d8  Ac:50  Exp:90
 It is a giant beetle with poisonous mandibles.  This insect is normally
 found on dungeon level 25, and moves a bit erratically at normal speed.  It
-can bash down doors.  It is rarely detected by telepathy.  It takes quite
-a while to see intruders, which it may notice from 140 feet.  It can bite
-to reduce strength with damage 4d4.  
+can bash down doors and fly over obstacles.  It is rarely detected by
+telepathy.  It takes quite a while to see intruders, which it may notice
+from 140 feet.  It can bite to reduce strength with damage 4d4.  
 
 The Hill giant  (L.Umber 'P')
 === Num:184  Lev:25  Rar:1  Spd:+0  Hp:30d15  Ac:45  Exp:150
@@ -5748,7 +5755,7 @@ intruders, which it may notice from 350 feet.  It can bite to attack with
 damage 2d8, hit to attack with damage 1d10, hit to attack with damage 1d10,
 and hit to attack with damage 1d10.  
 
-The Troll priest  (L.Green 'T')
+The Troll priest  (L.Blue 'T')
 === Num:279  Lev:26  Rar:1  Spd:+0  Hp:300  Ac:50  Exp:120
 A troll who is so bright he knows how to read.  This evil troll is normally
 found on dungeon level 26, and moves at normal speed.  He is magical,
@@ -5934,13 +5941,14 @@ It is a humanoid with an aura of power.  You notice a sharp set of front
 teeth.  This evil undead creature is normally found on dungeon level 27,
 and moves at normal speed.  It is magical, casting spells which cause mind
 blasting, cause serious wounds, terrify, paralyze, teleport to, create
-darkness or cause amnesia; 1 time in 9.  It can open doors and bash down
-doors.  It is cold blooded.  It regenerates quickly.  It is hurt by bright
-light.  It resists cold and poison.  It cannot be confused or slept.  It is
-fairly observant of intruders, which it may notice from 200 feet.  It may
-carry up to 3 objects or treasures.  It can hit to attack with damage 1d6,
-hit to attack with damage 1d6, bite to lower experience (by 20d6+) with
-damage 2d6, and bite to lower experience (by 20d6+) with damage 2d6.  
+darkness or cause amnesia; 1 time in 9.  It can open doors, bash down doors
+and fly over obstacles.  It is cold blooded.  It regenerates quickly.  It
+is hurt by bright light.  It resists cold and poison.  It cannot be
+confused or slept.  It is fairly observant of intruders, which it may
+notice from 200 feet.  It may carry up to 3 objects or treasures.  It can
+hit to attack with damage 1d6, hit to attack with damage 1d6, bite to lower
+experience (by 20d6+) with damage 2d6, and bite to lower experience (by
+20d6+) with damage 2d6.  
 
 The Tentacled horror  (Yellow 'H')
 === Num:891  Lev:27  Rar:1  Spd:+5  Hp:29d20  Ac:65  Exp:190
@@ -6033,10 +6041,10 @@ The result of evil experiments, this travesty of nature should never be
 alive.  It has three heads - goat, dragon and gorgon - all attached to a
 lion's body.  This mix of animal and dragon is normally found on dungeon
 level 27, and moves at normal speed.  It may gaze at you.  It may breathe
-fire; 1 time in 8.  It can bash down doors.  It resists fire.  It is fairly
-observant of intruders, which it may notice from 120 feet.  It can butt to
-attack with damage 2d10, bite to burn with damage 2d10, and gaze to
-paralyze with damage 2d6.  
+fire; 1 time in 8.  It can bash down doors and fly over obstacles.  It
+resists fire.  It is fairly observant of intruders, which it may notice
+from 120 feet.  It can butt to attack with damage 2d10, bite to burn with
+damage 2d10, and gaze to paralyze with damage 2d6.  
 
 The Colbran  (Yellow 'g')
 === Num:300  Lev:27  Rar:2  Spd:+10  Hp:80d12  Ac:80  Exp:900
@@ -6083,11 +6091,12 @@ A wraithly snake-like form with the torso of a beautiful woman, it is the
 most powerful of its kind.  This evil creature is normally found on dungeon
 level 28, and moves at normal speed.  She is magical, casting spells which
 cause mind blasting, blind, heal-self or create darkness; 1 time in 4.  She
-can open doors and bash down doors.  She is invisible.  She cannot be
-confused or slept.  She pays very little attention to intruders, which she
-may notice from 200 feet.  She may carry up to 5 objects.  She can crush to
-attack with damage 2d8, crush to attack with damage 2d8, bite to attack
-with damage 1d8, and bite to attack with damage 1d8.  
+can open doors, bash down doors and swim under water.  She is invisible. 
+She cannot be confused or slept.  She pays very little attention to
+intruders, which she may notice from 200 feet.  She may carry up to 5
+objects.  She can crush to attack with damage 2d8, crush to attack with
+damage 2d8, bite to attack with damage 1d8, and bite to attack with damage
+1d8.  
 
 The Killer bronze beetle  (L.Umber 'K')
 === Num:951  Lev:28  Rar:1  Spd:+0  Hp:20d8  Ac:45  Exp:95
@@ -6378,10 +6387,11 @@ It has a form that legends are made of.  Its still-tender scales are a deep
 blue in hue.  Sparks crackle along its length.  This evil dragon is
 normally found on dungeon level 29, and moves at normal speed.  It may
 breathe lightning, and is also magical, casting spells which terrify; 1
-time in 10.  It can open doors and bash down doors.  It resists lightning.
- It tends to overlook intruders, which it may notice from 200 feet.  It may
-carry up to 4 objects or treasures.  It can claw to attack with damage 2d4,
-claw to attack with damage 2d4, and bite to attack with damage 2d6.  
+time in 10.  It can open doors, bash down doors and fly over obstacles.  It
+resists lightning.  It tends to overlook intruders, which it may notice
+from 200 feet.  It may carry up to 4 objects or treasures.  It can claw to
+attack with damage 2d4, claw to attack with damage 2d4, and bite to attack
+with damage 2d6.  
 
 The Young white dragon  (White 'd')
 === Num:315  Lev:29  Rar:1  Spd:+0  Hp:270  Ac:50  Exp:500
@@ -6389,11 +6399,11 @@ It has a form that legends are made of.  Its still-tender scales are a
 frosty white in hue.  Icy blasts of cold air come from it as it breathes.
  This evil dragon is normally found on dungeon level 29, and moves at
 normal speed.  It may breathe frost, and is also magical, casting spells
-which terrify; 1 time in 10.  It can open doors and bash down doors.  It
-resists cold.  It tends to overlook intruders, which it may notice from 200
-feet.  It may carry up to 4 objects or treasures.  It can claw to attack
-with damage 2d4, claw to attack with damage 2d4, and bite to attack with
-damage 2d6.  
+which terrify; 1 time in 10.  It can open doors, bash down doors and fly
+over obstacles.  It resists cold.  It tends to overlook intruders, which it
+may notice from 200 feet.  It may carry up to 4 objects or treasures.  It
+can claw to attack with damage 2d4, claw to attack with damage 2d4, and
+bite to attack with damage 2d6.  
 
 The Young green dragon  (Green 'd')
 === Num:316  Lev:29  Rar:1  Spd:+0  Hp:270  Ac:50  Exp:500
@@ -6401,10 +6411,11 @@ It has a form that legends are made of.  Its still-tender scales are a deep
 green in hue.  Foul gas seeps through its scales.  This evil dragon is
 normally found on dungeon level 29, and moves at normal speed.  It may
 breathe poison, and is also magical, casting spells which terrify; 1 time
-in 10.  It can open doors and bash down doors.  It resists poison.  It
-tends to overlook intruders, which it may notice from 200 feet.  It may
-carry up to 4 objects or treasures.  It can claw to attack with damage 2d4,
-claw to attack with damage 2d4, and bite to attack with damage 2d6.  
+in 10.  It can open doors, bash down doors and fly over obstacles.  It
+resists poison.  It tends to overlook intruders, which it may notice from
+200 feet.  It may carry up to 4 objects or treasures.  It can claw to
+attack with damage 2d4, claw to attack with damage 2d4, and bite to attack
+with damage 2d6.  
 
 The Young bronze dragon  (L.Umber 'd')
 === Num:317  Lev:29  Rar:1  Spd:+0  Hp:270  Ac:50  Exp:500
@@ -6412,11 +6423,11 @@ It has a form that legends are made of.  Its still-tender scales are a rich
 bronze hue, and its shape glitters with strange colours that confuse you.
  This evil dragon is normally found on dungeon level 29, and moves at
 normal speed.  It may breathe fire or confusion, and is also magical,
-casting spells which terrify; 1 time in 10.  It can open doors and bash
-down doors.  It resists fire.  It cannot be confused.  It tends to overlook
-intruders, which it may notice from 200 feet.  It may carry up to 4 objects
-or treasures.  It can claw to attack with damage 2d4, claw to attack with
-damage 2d4, and bite to attack with damage 2d6.  
+casting spells which terrify; 1 time in 10.  It can open doors, bash down
+doors and fly over obstacles.  It resists fire.  It cannot be confused.  It
+tends to overlook intruders, which it may notice from 200 feet.  It may
+carry up to 4 objects or treasures.  It can claw to attack with damage 2d4,
+claw to attack with damage 2d4, and bite to attack with damage 2d6.  
 
 The Giant blue ant  (Blue 'a')
 === Num:689  Lev:30  Rar:2  Spd:+0  Hp:8d8  Ac:40  Exp:0
@@ -6508,10 +6519,10 @@ The Manticore  (Yellow 'H')
 === Num:321  Lev:30  Rar:2  Spd:+10  Hp:250  Ac:15  Exp:300
 It is a winged lion's body with a human torso and a tail covered in vicious
 spikes.  This evil creature is normally found on dungeon level 30, and
-moves quickly.  It may shoot at you.  It can bash down doors.  It is fairly
-observant of intruders, which it may notice from 120 feet.  It can hit to
-attack with damage 3d4, hit to attack with damage 3d4, hit to attack with
-damage 3d4, and hurt with arrows.  
+moves quickly.  It may shoot at you.  It can bash down doors and fly over
+obstacles.  It is fairly observant of intruders, which it may notice from
+120 feet.  It can hit to attack with damage 3d4, hit to attack with damage
+3d4, hit to attack with damage 3d4, and hurt with arrows.  
 
 The Hunting horror  (L.Slate 'H')
 === Num:894  Lev:30  Rar:1  Spd:+5  Hp:35d20  Ac:80  Exp:300
@@ -6600,7 +6611,7 @@ You don't believe in it.  But it believes in you...  This evil undead
 creature is normally found on dungeon level 31, and moves a bit
 erratically, and quickly.  It may wail at you.  It is magical, casting
 spells which drain mana, blind or paralyze; 1 time in 16.  It can pass
-through walls and pick up objects.  It is invisible.  It is cold blooded.
+through walls, pick up objects and fly over obstacles.  It is cold blooded.
  It resists cold and poison.  It cannot be confused or slept.  It is fairly
 observant of intruders, which it may notice from 200 feet.  It may carry up
 to 3 objects or treasures.  It can wail to terrify, touch to lower
@@ -6623,10 +6634,10 @@ It has a form that legends are made of.  Its still-tender scales are a
 darkest black hue.  Acid drips from its body.  This evil dragon is normally
 found on dungeon level 31, and moves at normal speed.  It may breathe acid,
 and is also magical, casting spells which terrify; 1 time in 10.  It can
-open doors and bash down doors.  It resists acid.  It tends to overlook
-intruders, which it may notice from 200 feet.  It may carry up to 6 objects
-or treasures.  It can claw to attack with damage 2d6, claw to attack with
-damage 2d6, and bite to attack with damage 2d8.  
+open doors, bash down doors and fly over obstacles.  It resists acid.  It
+tends to overlook intruders, which it may notice from 200 feet.  It may
+carry up to 6 objects or treasures.  It can claw to attack with damage 2d6,
+claw to attack with damage 2d6, and bite to attack with damage 2d8.  
 
 The Young gold dragon  (Yellow 'd')
 === Num:382  Lev:31  Rar:1  Spd:+0  Hp:300  Ac:60  Exp:700
@@ -6634,10 +6645,11 @@ It has a form that legends are made of.  Its still-tender scales are a
 tarnished gold hue, and light is reflected from its form.  This evil dragon
 is normally found on dungeon level 31, and moves at normal speed.  It may
 breathe poison or sound, and is also magical, casting spells which terrify;
-1 time in 10.  It can open doors and bash down doors.  It resists poison.
- It tends to overlook intruders, which it may notice from 200 feet.  It may
-carry up to 6 objects or treasures.  It can claw to attack with damage 2d6,
-claw to attack with damage 2d6, and bite to attack with damage 2d8.  
+1 time in 10.  It can open doors, bash down doors and fly over obstacles.
+ It resists poison.  It tends to overlook intruders, which it may notice
+from 200 feet.  It may carry up to 6 objects or treasures.  It can claw to
+attack with damage 2d6, claw to attack with damage 2d6, and bite to attack
+with damage 2d8.  
 
 The Young red dragon  (Red 'd')
 === Num:387  Lev:31  Rar:1  Spd:+0  Hp:300  Ac:60  Exp:700
@@ -6645,10 +6657,11 @@ It has a form that legends are made of.  Its still-tender scales are a
 deepest red hue.  Heat radiates from its form.  This evil dragon is
 normally found on dungeon level 31, and moves at normal speed.  It may
 breathe fire, and is also magical, casting spells which terrify; 1 time in
-10.  It can open doors and bash down doors.  It resists fire.  It tends to
-overlook intruders, which it may notice from 200 feet.  It may carry up to
-6 objects or treasures.  It can claw to attack with damage 2d6, claw to
-attack with damage 2d6, and bite to attack with damage 2d8.  
+10.  It can open doors, bash down doors and fly over obstacles.  It resists
+fire.  It tends to overlook intruders, which it may notice from 200 feet.
+ It may carry up to 6 objects or treasures.  It can claw to attack with
+damage 2d6, claw to attack with damage 2d6, and bite to attack with damage
+2d8.  
 
 The Giant hunter ant  (L.Slate 'a')
 === Num:688  Lev:32  Rar:2  Spd:+0  Hp:12d8  Ac:40  Exp:0
@@ -6716,11 +6729,11 @@ It has a form that legends are made of.  Beautiful scales of shimmering and
 magical colours cover it.  This evil dragon is normally found on dungeon
 level 32, and moves at normal speed.  It may breathe acid, lightning, fire,
 frost or poison, and is also magical, casting spells which terrify; 1 time
-in 8.  It can open doors and bash down doors.  It resists acid, lightning,
-fire, cold and poison.  It tends to overlook intruders, which it may notice
-from 200 feet.  It may carry up to 8 objects or treasures.  It can claw to
-attack with damage 2d6, claw to attack with damage 2d6, and bite to attack
-with damage 3d8.  
+in 8.  It can open doors, bash down doors and fly over obstacles.  It
+resists acid, lightning, fire, cold and poison.  It tends to overlook
+intruders, which it may notice from 200 feet.  It may carry up to 8 objects
+or treasures.  It can claw to attack with damage 2d6, claw to attack with
+damage 2d6, and bite to attack with damage 3d8.  
 
 [Q] The Great Spider of Mirkwood  (L.Dark 'S')
 === Num:637  Lev:32  Rar:3  Spd:+0  Hp:1200  Ac:80  Exp:1200
@@ -6799,12 +6812,13 @@ The Water elemental  (Blue 'E')
 It is a towering tempest of water.  This creature is normally found on
 dungeon level 33, and moves a bit erratically, and quickly.  It is magical,
 casting spells which produce water balls or produce frost bolts; 1 time in
-6.  It can bash down doors, destroy weaker monsters and destroy objects. 
-It is cold blooded.  It is not detected by telepathy.  It is hurt by water
-remover.  It resists acid, fire, cold, poison and water.  It cannot be
-frightened, confused or slept.  It tends to overlook intruders, which it
-may notice from 120 feet.  It can hit to attack with damage 1d10, hit to
-attack with damage 1d10, and hit to attack with damage 1d10.  
+6.  It can bash down doors, destroy weaker monsters, destroy objects and
+swim under water.  It is cold blooded.  It is not detected by telepathy. 
+It is hurt by water remover.  It resists acid, fire, cold, poison and
+water.  It cannot be frightened, confused or slept.  It tends to overlook
+intruders, which it may notice from 120 feet.  It can hit to attack with
+damage 1d10, hit to attack with damage 1d10, and hit to attack with damage
+1d10.  
 
 The Cave troll  (Umber 'T')
 === Num:334  Lev:33  Rar:1  Spd:+0  Hp:24d12  Ac:50  Exp:350
@@ -6823,12 +6837,12 @@ A shadowy form clutches at you from the darkness.  A powerful undead
 creature with a deadly touch.  This evil undead creature is normally found
 on dungeon level 33, and moves a bit erratically, and quickly.  It may wail
 at you.  It is magical, casting spells which drain mana, blind, paralyze or
-cause amnesia; 1 time in 16.  It can pass through walls and pick up
-objects.  It is invisible.  It is cold blooded.  It resists cold and
-poison.  It cannot be confused or slept.  It is fairly observant of
-intruders, which it may notice from 200 feet.  It may carry up to 5
-objects.  It can wail to terrify, touch to lower experience (by 40d6+), and
-claw to reduce intelligence with damage 1d10.  
+cause amnesia; 1 time in 16.  It can pass through walls, pick up objects
+and fly over obstacles.  It is cold blooded.  It resists cold and poison.
+ It cannot be confused or slept.  It is fairly observant of intruders,
+which it may notice from 200 feet.  It may carry up to 5 objects.  It can
+wail to terrify, touch to lower experience (by 40d6+), and claw to reduce
+intelligence with damage 1d10.  
 
 The Fire elemental  (Red 'E')
 === Num:349  Lev:33  Rar:2  Spd:+10  Hp:30d8  Ac:50  Exp:350
@@ -6966,26 +6980,27 @@ the dark, and it is surrounded by an aura of unearthly cold that chills the
 soul rather than the body.  This evil dragon is normally found on dungeon
 level 33, and moves at normal speed.  It may breathe nether, and is also
 magical, casting spells which terrify, confuse, slow or create darkness; 1
-time in 6.  It can open doors, bash down doors and pass through walls.  It
-is invisible.  It resists nether.  It cannot be confused or slept.  It
-tends to overlook intruders, which it may notice from 200 feet.  It may
-carry up to 6 objects.  It can claw to attack with damage 2d4, claw to
-attack with damage 2d4, and bite to lower experience (by 10d6+) with damage
-3d6.  
+time in 6.  It can open doors, bash down doors, pass through walls and fly
+over obstacles.  It is invisible.  It resists nether.  It cannot be
+confused or slept.  It tends to overlook intruders, which it may notice
+from 200 feet.  It may carry up to 6 objects.  It can claw to attack with
+damage 2d4, claw to attack with damage 2d4, and bite to lower experience
+(by 10d6+) with damage 3d6.  
 
-The Ethereal drake  (Orange 'd')
+The Ethereal drake  (White 'd')
 === Num:342  Lev:33  Rar:3  Spd:+0  Hp:400  Ac:70  Exp:1200
 A dragon of great power, with control over light and dark, the ethereal
 drake's eyes glare with white hatred from the shadows.  This evil dragon is
 normally found on dungeon level 33, and moves at normal speed.  It may
 breathe light or darkness, and is also magical, casting spells which
-terrify, confuse or slow; 1 time in 6.  It can illuminate the dungeon and
-pass through walls.  It is invisible.  It cannot be confused or slept.  It
-tends to overlook intruders, which it may notice from 200 feet.  It may
-carry up to 6 objects.  It can claw to attack with damage 2d4, claw to
-attack with damage 2d4, and bite to attack with damage 3d6.  
+terrify, confuse or slow; 1 time in 6.  It can illuminate the dungeon, pass
+through walls and fly over obstacles.  It is invisible.  It cannot be
+confused or slept.  It tends to overlook intruders, which it may notice
+from 200 feet.  It may carry up to 6 objects.  It can claw to attack with
+damage 2d4, claw to attack with damage 2d4, and bite to attack with damage
+3d6.  
 
-The Crystal drake  (Umber 'd')
+The Crystal drake  (White 'd')
 === Num:404  Lev:33  Rar:3  Spd:+0  Hp:450  Ac:70  Exp:1350
 A dragon of strange crystalline form.  Light shines through it, dazzling
 your eyes with spectrums of colour.  This evil dragon is normally found on
@@ -7003,12 +7018,12 @@ A dragon twisted by the forces of chaos.  It seems first ugly, then fair,
 as its form shimmers and changes in front of your eyes.  This evil dragon
 is normally found on dungeon level 33, and moves at normal speed.  It may
 breathe chaos or disenchantment, and is also magical, casting spells which
-terrify, confuse or slow; 1 time in 6.  It can open doors and bash down
-doors.  It resists fire.  It resists disenchantment.  It cannot be confused
-or slept.  It tends to overlook intruders, which it may notice from 200
-feet.  It may carry up to 6 objects.  It can claw to attack with damage
-2d4, claw to attack with damage 2d4, and bite to attack with damage 3d6. 
-
+terrify, confuse or slow; 1 time in 6.  It can open doors, bash down doors
+and fly over obstacles.  It resists fire.  It resists disenchantment.  It
+cannot be confused or slept.  It tends to overlook intruders, which it may
+notice from 200 feet.  It may carry up to 6 objects.  It can claw to attack
+with damage 2d4, claw to attack with damage 2d4, and bite to attack with
+damage 3d6.  
 
 The Law drake  (L.Blue 'd')
 === Num:340  Lev:33  Rar:3  Spd:+0  Hp:500  Ac:70  Exp:1400
@@ -7016,11 +7031,11 @@ This dragon is clever and cunning.  It laughs at your puny efforts to
 disturb it.  This evil dragon is normally found on dungeon level 33, and
 moves at normal speed.  It may breathe sound or shards, and is also
 magical, casting spells which terrify, confuse or slow; 1 time in 6.  It
-can open doors and bash down doors.  It resists cold.  It cannot be
-confused or slept.  It tends to overlook intruders, which it may notice
-from 200 feet.  It may carry up to 6 objects.  It can claw to attack with
-damage 2d4, claw to attack with damage 2d4, and bite to attack with damage
-3d6.  
+can open doors, bash down doors and fly over obstacles.  It resists cold.
+ It cannot be confused or slept.  It tends to overlook intruders, which it
+may notice from 200 feet.  It may carry up to 6 objects.  It can claw to
+attack with damage 2d4, claw to attack with damage 2d4, and bite to attack
+with damage 3d6.  
 
 The Balance drake  (Violet 'd')
 === Num:341  Lev:33  Rar:3  Spd:+0  Hp:600  Ac:70  Exp:1600
@@ -7029,21 +7044,21 @@ and despises your feeble efforts to destroy evil.  This evil dragon is
 normally found on dungeon level 33, and moves at normal speed.  It may
 breathe sound, chaos, disenchantment or shards, and is also magical,
 casting spells which terrify, confuse or slow; 1 time in 6.  It can open
-doors and bash down doors.  It resists fire and cold.  It resists
-disenchantment.  It cannot be confused or slept.  It tends to overlook
-intruders, which it may notice from 200 feet.  It may carry up to 6
-objects.  It can claw to attack with damage 2d4, claw to attack with damage
-2d4, and bite to attack with damage 3d6.  
+doors, bash down doors and fly over obstacles.  It resists fire and cold.
+ It resists disenchantment.  It cannot be confused or slept.  It tends to
+overlook intruders, which it may notice from 200 feet.  It may carry up to
+6 objects.  It can claw to attack with damage 2d4, claw to attack with
+damage 2d4, and bite to attack with damage 3d6.  
 
 The Carrion crawler  (Orange 'c')
 === Num:353  Lev:34  Rar:2  Spd:+0  Hp:20d12  Ac:40  Exp:100
 A hideous centipede covered in slime and with glowing tentacles around its
 head.  This insect is normally found on dungeon level 34, and moves a bit
-erratically at normal speed.  It can bash down doors.  It is rarely
-detected by telepathy.  It resists poison.  It is fairly observant of
-intruders, which it may notice from 150 feet.  It usually appears in
-groups.  It can sting to paralyze with damage 2d6, and sting to paralyze
-with damage 2d6.  
+erratically at normal speed.  It can bash down doors, climb on walls and
+ceilings and dig through earth and rubble.  It is rarely detected by
+telepathy.  It resists poison.  It is fairly observant of intruders, which
+it may notice from 150 feet.  It usually appears in groups.  It can sting
+to paralyze with damage 2d6, and sting to paralyze with damage 2d6.  
 
 The Giant vampire bat  (Violet 'b')
 === Num:731  Lev:34  Rar:1  Spd:+10  Hp:36d10  Ac:40  Exp:150
@@ -7070,12 +7085,12 @@ A phantasmal shrieking spirit.  Its wail drives the intense cold of pure
 evil deep within your body.  This evil undead creature is normally found on
 dungeon level 34, and moves a bit erratically, and quickly.  It may wail at
 you.  It is magical, casting spells which drain mana, blind, paralyze or
-cause amnesia; 1 time in 16.  It can pass through walls and pick up
-objects.  It is invisible.  It is cold blooded.  It resists cold and
-poison.  It cannot be confused or slept.  It is fairly observant of
-intruders, which it may notice from 200 feet.  It may carry up to 5
-objects.  It can wail to terrify, touch to lower experience (by 40d6+), and
-claw to reduce wisdom with damage 5d5.  
+cause amnesia; 1 time in 16.  It can pass through walls, pick up objects
+and fly over obstacles.  It is cold blooded.  It resists cold and poison.
+ It cannot be confused or slept.  It is fairly observant of intruders,
+which it may notice from 200 feet.  It may carry up to 5 objects.  It can
+wail to terrify, touch to lower experience (by 40d6+), and claw to reduce
+wisdom with damage 5d5.  
 
 The Master thief  (Violet 't')
 === Num:354  Lev:34  Rar:2  Spd:+20  Hp:18d10  Ac:30  Exp:350
@@ -7107,12 +7122,12 @@ The Air elemental  (L.Blue 'E')
 It is a towering tornado of winds.  This creature is normally found on
 dungeon level 34, and moves a bit erratically, and very quickly.  It is
 magical, casting spells which produce lightning balls or produce lightning
-bolts; 1 time in 8.  It can bash down doors, destroy weaker monsters and
-destroy objects.  It is cold blooded.  It is not detected by telepathy.  It
-resists acid, lightning, cold and poison.  It cannot be frightened,
-confused or slept.  It tends to overlook intruders, which it may notice
-from 120 feet.  It can hit to attack with damage 1d10, hit to confuse with
-damage 1d4, and hit to attack with damage 1d10.  
+bolts; 1 time in 8.  It can bash down doors, destroy weaker monsters,
+destroy objects and fly over obstacles.  It is cold blooded.  It is not
+detected by telepathy.  It resists acid, lightning, cold and poison.  It
+cannot be frightened, confused or slept.  It tends to overlook intruders,
+which it may notice from 120 feet.  It can hit to attack with damage 1d10,
+hit to confuse with damage 1d4, and hit to attack with damage 1d10.  
 
 The Half-troll  (L.Umber 'T')
 === Num:335  Lev:34  Rar:2  Spd:+0  Hp:25d14  Ac:50  Exp:400
@@ -7207,48 +7222,49 @@ it may notice from 120 feet.  It may carry up to 4 treasures.  It can hit
 to attack with damage 8d6, hit to attack with damage 8d6, hit to attack
 with damage 6d6, and hit to attack with damage 6d6.  
 
-The Mature white dragon  (White 'd')
+The Mature white dragon  (White 'D')
 === Num:375  Lev:34  Rar:1  Spd:+0  Hp:400  Ac:70  Exp:1200
 A large dragon, scales gleaming bright white.  This evil dragon is normally
 found on dungeon level 34, and moves at normal speed.  It may breathe
 frost, and is also magical, casting spells which terrify; 1 time in 9.  It
-can open doors and bash down doors.  It resists cold.  It cannot be
-confused or slept.  It tends to overlook intruders, which it may notice
-from 200 feet.  It may carry up to 8 objects or treasures.  It can claw to
-attack with damage 2d8, claw to attack with damage 2d8, and bite to attack
-with damage 4d8.  
+can open doors, bash down doors and fly over obstacles.  It resists cold.
+ It cannot be confused or slept.  It tends to overlook intruders, which it
+may notice from 200 feet.  It may carry up to 8 objects or treasures.  It
+can claw to attack with damage 2d8, claw to attack with damage 2d8, and
+bite to attack with damage 4d8.  
 
-The Mature blue dragon  (Blue 'd')
+The Mature blue dragon  (Blue 'D')
 === Num:384  Lev:34  Rar:1  Spd:+0  Hp:400  Ac:70  Exp:1200
 A large dragon, scales tinted deep blue.  This evil dragon is normally
 found on dungeon level 34, and moves at normal speed.  It may breathe
 lightning, and is also magical, casting spells which terrify; 1 time in 9.
- It can bash down doors.  It resists lightning.  It cannot be confused or
-slept.  It tends to overlook intruders, which it may notice from 200 feet.
- It may carry up to 8 objects or treasures.  It can claw to attack with
-damage 2d8, claw to attack with damage 2d8, and bite to attack with damage
-4d8.  
+ It can bash down doors and fly over obstacles.  It resists lightning.  It
+cannot be confused or slept.  It tends to overlook intruders, which it may
+notice from 200 feet.  It may carry up to 8 objects or treasures.  It can
+claw to attack with damage 2d8, claw to attack with damage 2d8, and bite to
+attack with damage 4d8.  
 
-The Mature green dragon  (Green 'd')
+The Mature green dragon  (Green 'D')
 === Num:385  Lev:34  Rar:1  Spd:+0  Hp:400  Ac:70  Exp:1200
 A large dragon, scales tinted deep green.  This evil dragon is normally
 found on dungeon level 34, and moves at normal speed.  It may breathe
 poison, and is also magical, casting spells which terrify; 1 time in 9.  It
-can bash down doors.  It resists poison.  It cannot be confused or slept.
- It tends to overlook intruders, which it may notice from 200 feet.  It may
-carry up to 8 objects or treasures.  It can claw to attack with damage 2d8,
-claw to attack with damage 2d8, and bite to attack with damage 4d8.  
+can bash down doors and fly over obstacles.  It resists poison.  It cannot
+be confused or slept.  It tends to overlook intruders, which it may notice
+from 200 feet.  It may carry up to 8 objects or treasures.  It can claw to
+attack with damage 2d8, claw to attack with damage 2d8, and bite to attack
+with damage 4d8.  
 
-The Mature bronze dragon  (L.Umber 'd')
+The Mature bronze dragon  (L.Umber 'D')
 === Num:386  Lev:34  Rar:1  Spd:+0  Hp:400  Ac:70  Exp:1200
 A large dragon with scales of rich bronze.  This evil dragon is normally
 found on dungeon level 34, and moves at normal speed.  It may breathe fire
 or confusion, and is also magical, casting spells which terrify or confuse;
-1 time in 9.  It can bash down doors.  It resists fire.  It cannot be
-confused or slept.  It tends to overlook intruders, which it may notice
-from 200 feet.  It may carry up to 8 objects or treasures.  It can claw to
-attack with damage 2d8, claw to attack with damage 2d8, and bite to attack
-with damage 4d8.  
+1 time in 9.  It can bash down doors and fly over obstacles.  It resists
+fire.  It cannot be confused or slept.  It tends to overlook intruders,
+which it may notice from 200 feet.  It may carry up to 8 objects or
+treasures.  It can claw to attack with damage 2d8, claw to attack with
+damage 2d8, and bite to attack with damage 4d8.  
 
 The Wormwood  (L.Green '<')
 === Num:676  Lev:35  Rar:1  Spd:-10  Hp:300  Ac:20  Exp:100
@@ -7328,7 +7344,7 @@ intruders, which it may notice from 200 feet.  It may carry a object or
 treasure.  It can hit to attack with damage 7d8, and hit to attack with
 damage 7d8.  
 
-The Water troll  (L.Blue 'T')
+The Water troll  (Blue 'T')
 === Num:348  Lev:35  Rar:1  Spd:+0  Hp:360  Ac:50  Exp:420
 He is a troll that reeks of brine.  This evil troll is normally found on
 dungeon level 35, and moves at normal speed.  He can open doors, bash down
@@ -7530,12 +7546,12 @@ The Smoke elemental  (L.Red 'E')
 It is a towering blackened form, crackling with heat.  This creature is
 normally found on dungeon level 36, and moves very quickly.  It is magical,
 casting spells which produce fire bolts or create darkness; 1 time in 5. 
-It can bash down doors, destroy weaker monsters and destroy objects.  It is
-not detected by telepathy.  It resists lightning, fire, cold and poison. 
-It cannot be frightened, confused or slept.  It pays little attention to
-intruders, which it may notice from 100 feet.  It can engulf to attack with
-damage 2d6, engulf to attack with damage 2d6, and radiate to burn with
-damage 3d3.  
+It can bash down doors, destroy weaker monsters, destroy objects and fly
+over obstacles.  It is not detected by telepathy.  It resists lightning,
+fire, cold and poison.  It cannot be frightened, confused or slept.  It
+pays little attention to intruders, which it may notice from 100 feet.  It
+can engulf to attack with damage 2d6, engulf to attack with damage 2d6, and
+radiate to burn with damage 3d3.  
 
 The Shadow  (L.Dark 'G')
 === Num:377  Lev:36  Rar:3  Spd:+10  Hp:10d20  Ac:30  Exp:400
@@ -7556,11 +7572,11 @@ The Phantom  (Violet 'G')
 An unholy creature of darkness, the aura emanating from this evil being
 saps your very soul.  This evil undead creature is normally found on
 dungeon level 36, and moves quickly.  It is magical, casting spells which
-cause amnesia; 1 time in 5.  It can pass through walls.  It is invisible.
- It is cold blooded.  It resists cold and poison.  It cannot be confused or
-slept.  It takes a while to see intruders, which it may notice from 300
-feet.  It may carry one or two objects.  It can touch to lower experience
-(by 80d6+), touch to lower experience (by 40d6+), claw to reduce
+cause amnesia; 1 time in 5.  It can pass through walls and fly over
+obstacles.  It is cold blooded.  It resists cold and poison.  It cannot be
+confused or slept.  It takes a while to see intruders, which it may notice
+from 300 feet.  It may carry one or two objects.  It can touch to lower
+experience (by 80d6+), touch to lower experience (by 40d6+), claw to reduce
 intelligence with damage 1d10, and claw to reduce wisdom with damage 1d10.
  
 
@@ -7644,12 +7660,12 @@ A tangible but ghostly form, made of grey fog.  The air around it feels
 deathly cold.  This evil undead creature is normally found on dungeon level
 36, and moves at normal speed.  It is magical, casting spells which cause
 critical wounds, terrify, paralyze or create darkness; 1 time in 7.  It can
-open doors and bash down doors.  It is cold blooded.  It is hurt by bright
-light.  It resists cold and poison.  It cannot be confused or slept.  It is
-fairly observant of intruders, which it may notice from 200 feet.  It may
-carry one or two objects or treasures.  It can hit to attack with damage
-1d10, hit to attack with damage 1d10, and touch to lower experience (by
-40d6+).  
+open doors, bash down doors and fly over obstacles.  It is cold blooded. 
+It is hurt by bright light.  It resists cold and poison.  It cannot be
+confused or slept.  It is fairly observant of intruders, which it may
+notice from 200 feet.  It may carry one or two objects or treasures.  It
+can hit to attack with damage 1d10, hit to attack with damage 1d10, and
+touch to lower experience (by 40d6+).  
 
 The Demonologist  (L.Dark 'q')
 === Num:393  Lev:36  Rar:2  Spd:+10  Hp:280  Ac:50  Exp:700
@@ -7669,13 +7685,13 @@ frame.  This evil undead creature is normally found on dungeon level 36,
 and moves at normal speed.  It is magical, casting spells which cause mind
 blasting, cause critical wounds, produce nether bolts, terrify, confuse,
 paralyze, teleport to, create darkness or cause amnesia; 1 time in 6.  It
-can open doors and bash down doors.  It is cold blooded.  It regenerates
-quickly.  It is hurt by bright light.  It resists cold and poison.  It
-cannot be confused or slept.  It is fairly observant of intruders, which it
-may notice from 200 feet.  It may carry up to 8 objects or treasures.  It
-can hit to attack with damage 2d6, hit to attack with damage 2d6, bite to
-lower experience (by 40d6+) with damage 3d6, and bite to lower experience
-(by 40d6+) with damage 3d6.  
+can open doors, bash down doors and fly over obstacles.  It is cold
+blooded.  It regenerates quickly.  It is hurt by bright light.  It resists
+cold and poison.  It cannot be confused or slept.  It is fairly observant
+of intruders, which it may notice from 200 feet.  It may carry up to 8
+objects or treasures.  It can hit to attack with damage 2d6, hit to attack
+with damage 2d6, bite to lower experience (by 40d6+) with damage 3d6, and
+bite to lower experience (by 40d6+) with damage 3d6.  
 
 The Bodak  (Red 'u')
 === Num:389  Lev:36  Rar:2  Spd:+0  Hp:35d10  Ac:68  Exp:750
@@ -7789,38 +7805,38 @@ from 200 feet.  It may carry up to 10 objects or treasures.  It can claw to
 attack with damage 2d8, claw to attack with damage 2d8, and bite to attack
 with damage 3d8.  
 
-The Mature red dragon  (Red 'd')
+The Mature red dragon  (Red 'D')
 === Num:402  Lev:36  Rar:1  Spd:+0  Hp:500  Ac:80  Exp:1500
 A large dragon, scales tinted deep red.  This evil dragon is normally found
 on dungeon level 36, and moves at normal speed.  It may breathe fire, and
 is also magical, casting spells which terrify or confuse; 1 time in 9.  It
-can bash down doors.  It resists fire.  It cannot be confused or slept.  It
-tends to overlook intruders, which it may notice from 200 feet.  It may
-carry up to 10 objects or treasures.  It can claw to attack with damage
-2d10, claw to attack with damage 2d10, and bite to attack with damage 4d10.
- 
+can bash down doors and fly over obstacles.  It resists fire.  It cannot be
+confused or slept.  It tends to overlook intruders, which it may notice
+from 200 feet.  It may carry up to 10 objects or treasures.  It can claw to
+attack with damage 2d10, claw to attack with damage 2d10, and bite to
+attack with damage 4d10.  
 
-The Mature gold dragon  (Yellow 'd')
+The Mature gold dragon  (Yellow 'D')
 === Num:403  Lev:36  Rar:1  Spd:+0  Hp:500  Ac:80  Exp:1500
 A large dragon with scales of gleaming gold.  This evil dragon is normally
 found on dungeon level 36, and moves at normal speed.  It may breathe
 poison or sound, and is also magical, casting spells which terrify or
-confuse; 1 time in 9.  It can bash down doors.  It resists poison.  It
-cannot be confused or slept.  It tends to overlook intruders, which it may
-notice from 200 feet.  It may carry up to 10 objects or treasures.  It can
-claw to attack with damage 2d10, claw to attack with damage 2d10, and bite
-to attack with damage 4d10.  
+confuse; 1 time in 9.  It can bash down doors and fly over obstacles.  It
+resists poison.  It cannot be confused or slept.  It tends to overlook
+intruders, which it may notice from 200 feet.  It may carry up to 10
+objects or treasures.  It can claw to attack with damage 2d10, claw to
+attack with damage 2d10, and bite to attack with damage 4d10.  
 
-The Mature black dragon  (Slate 'd')
+The Mature black dragon  (Slate 'D')
 === Num:405  Lev:36  Rar:1  Spd:+0  Hp:500  Ac:80  Exp:1500
 A large dragon, with scales of deepest black.  This evil dragon is normally
 found on dungeon level 36, and moves at normal speed.  It may breathe acid,
 and is also magical, casting spells which terrify; 1 time in 9.  It can
-bash down doors.  It resists acid.  It cannot be confused or slept.  It
-tends to overlook intruders, which it may notice from 200 feet.  It may
-carry up to 10 objects or treasures.  It can claw to attack with damage
-2d10, claw to attack with damage 2d10, and bite to attack with damage 4d10.
- 
+bash down doors and fly over obstacles.  It resists acid.  It cannot be
+confused or slept.  It tends to overlook intruders, which it may notice
+from 200 feet.  It may carry up to 10 objects or treasures.  It can claw to
+attack with damage 2d10, claw to attack with damage 2d10, and bite to
+attack with damage 4d10.  
 
 The Crypt lich  (L.Umber 'L')
 === Num:962  Lev:36  Rar:2  Spd:+0  Hp:700  Ac:66  Exp:2400
@@ -8046,12 +8062,12 @@ draw you to it.  You seem somehow compelled to stand still and watch its
 strange dancing motion.  This creature is normally found on dungeon level
 38, and moves somewhat erratically, and very quickly.  It is magical,
 casting spells intelligently which cause serious wounds, confuse,
-blink-self or teleport-self; 1 time in 2.  It can pass through walls.  It
-is invisible.  It is not detected by telepathy.  It resists acid,
-lightning, fire, cold and poison.  It cannot be frightened, confused or
-slept.  It is ever vigilant for intruders, which it may notice from 300
-feet.  It can hit to attack with damage 1d9, hit to attack with damage 1d9,
-hit to create hallucinations with damage 1d9, and hit to create
+blink-self or teleport-self; 1 time in 2.  It can pass through walls and
+fly over obstacles.  It is invisible.  It is not detected by telepathy.  It
+resists acid, lightning, fire, cold and poison.  It cannot be frightened,
+confused or slept.  It is ever vigilant for intruders, which it may notice
+from 300 feet.  It can hit to attack with damage 1d9, hit to attack with
+damage 1d9, hit to create hallucinations with damage 1d9, and hit to create
 hallucinations with damage 1d9.  
 
 The Time vortex  (L.Blue 'v')
@@ -8128,13 +8144,13 @@ The Erinyes  (Umber 'U')
 It is a lesser demon of female form; however, she takes little time to show
 her true colours.  This evil demon is normally found on dungeon level 38,
 and moves at normal speed.  She is magical, casting spells which produce
-fire bolts, blind or confuse; 1 time in 7.  She can open doors and bash
-down doors.  She resists fire and poison.  She cannot be confused or slept.
- She pays little attention to intruders, which she may notice from 200
-feet.  She may carry a object.  She can hit to attack with damage 3d4, and
-touch to reduce strength with damage 1d5.  
+fire bolts, blind or confuse; 1 time in 7.  She can open doors, bash down
+doors and fly over obstacles.  She resists fire and poison.  She cannot be
+confused or slept.  She pays little attention to intruders, which she may
+notice from 200 feet.  She may carry a object.  She can hit to attack with
+damage 3d4, and touch to reduce strength with damage 1d5.  
 
-The Ettin  (Blue 'T')
+The Ettin  (L.Red 'T')
 === Num:421  Lev:38  Rar:3  Spd:+0  Hp:1500  Ac:100  Exp:1000
 A massive two-headed troll of huge strength, ettins are stupid but violent.
 They are also living proof that two heads are not more intelligent than
@@ -8180,18 +8196,34 @@ carry up to 9 objects.  It can hit to attack with damage 1d12, hit to
 attack with damage 1d12, touch to lower experience (by 80d6+), and touch to
 lower experience (by 80d6+).  
 
+[Q] The Emperor Wight of Carn Dum  (Red 'W')
+=== Num:1081  Lev:38  Rar:2  Spd:+10  Hp:380  Ac:40  Exp:1600
+Your life force is torn from your body as this powerful unearthly being
+approaches. It whispers dreadful words of ancient songs, cold and
+unearthly.  This evil undead creature is normally found on dungeon level
+38, and moves quickly.  It is magical, casting spells which cause critical
+wounds, produce nether bolts, terrify or paralyze; 1 time in 6.  It can
+open doors and bash down doors.  It is cold blooded.  It is hurt by bright
+light.  It resists cold and poison.  It cannot be confused or slept.  It is
+fairly observant of intruders, which it may notice from 200 feet.  It may
+carry up to 9 good objects.  It can hit to attack with damage 1d12, hit to
+attack with damage 1d12, touch to lower experience (by 80d6+), and touch to
+lower experience (by 80d6+).  You feel an intense desire to kill this
+monster...  
+
 The Black wraith  (L.Dark 'W')
 === Num:417  Lev:38  Rar:2  Spd:+10  Hp:500  Ac:55  Exp:1700
 A figure that seems made of void, its strangely human shape is cloaked in
 shadow.  It reaches out at you.  This evil undead creature is normally
 found on dungeon level 38, and moves quickly.  It is magical, casting
 spells which cause critical wounds, produce nether bolts, terrify, blind or
-paralyze; 1 time in 7.  It can open doors and bash down doors.  It is cold
-blooded.  It is hurt by bright light.  It resists cold and poison.  It
-cannot be confused or slept.  It is fairly observant of intruders, which it
-may notice from 200 feet.  It may carry up to 6 objects.  It can hit to
-attack with damage 1d12, hit to attack with damage 1d12, touch to lower
-experience (by 40d6+), and touch to lower experience (by 40d6+).  
+paralyze; 1 time in 7.  It can open doors, bash down doors and fly over
+obstacles.  It is cold blooded.  It is hurt by bright light.  It resists
+cold and poison.  It cannot be confused or slept.  It is fairly observant
+of intruders, which it may notice from 200 feet.  It may carry up to 6
+objects.  It can hit to attack with damage 1d12, hit to attack with damage
+1d12, touch to lower experience (by 40d6+), and touch to lower experience
+(by 40d6+).  
 
 The Mature amethyst dragon  (Violet 'D')
 === Num:780  Lev:38  Rar:3  Spd:+0  Hp:640  Ac:65  Exp:1700
@@ -8252,17 +8284,17 @@ overlook intruders, which it may notice from 200 feet.  It may carry up to
 14 objects or treasures.  It can claw to attack with damage 2d12, claw to
 attack with damage 2d12, and bite to attack with damage 4d12.  
 
-The Mature multi-hued dragon  (Violet 'd')
+The Mature multi-hued dragon  (Violet 'D')
 === Num:406  Lev:38  Rar:1  Spd:+0  Hp:600  Ac:80  Exp:1800
 A large dragon, scales shimmering many colours.  This evil dragon is
 normally found on dungeon level 38, and moves at normal speed.  It may
 breathe acid, lightning, fire, frost or poison, and is also magical,
 casting spells which terrify, blind or confuse; 1 time in 7.  It can open
-doors and bash down doors.  It resists acid, lightning, fire, cold and
-poison.  It cannot be confused or slept.  It tends to overlook intruders,
-which it may notice from 200 feet.  It may carry up to 12 objects or
-treasures.  It can claw to attack with damage 2d12, claw to attack with
-damage 2d12, and bite to attack with damage 4d12.  
+doors, bash down doors and fly over obstacles.  It resists acid, lightning,
+fire, cold and poison.  It cannot be confused or slept.  It tends to
+overlook intruders, which it may notice from 200 feet.  It may carry up to
+12 objects or treasures.  It can claw to attack with damage 2d12, claw to
+attack with damage 2d12, and bite to attack with damage 4d12.  
 
 The Betrayed  (Red 'M')
 === Num:415  Lev:38  Rar:6  Spd:+10  Hp:500  Ac:68  Exp:1800
@@ -8332,12 +8364,12 @@ you, a coldness saps your soul.  This evil undead creature is normally
 found on dungeon level 39, and moves quickly.  It is magical, casting
 spells which cause mind blasting, cause critical wounds, produce nether
 bolts, terrify, blind or create darkness; 1 time in 6.  It can pass through
-walls.  It is invisible.  It is cold blooded.  It is hurt by bright light.
- It resists cold and poison.  It resists nether.  It cannot be confused or
-slept.  It is fairly observant of intruders, which it may notice from 200
-feet.  It may carry up to 9 objects.  It can hit to attack with damage
-1d12, hit to attack with damage 1d12, touch to lower experience (by 80d6+),
-and touch to lower experience (by 80d6+).  
+walls and fly over obstacles.  It is invisible.  It is cold blooded.  It is
+hurt by bright light.  It resists cold and poison.  It resists nether.  It
+cannot be confused or slept.  It is fairly observant of intruders, which it
+may notice from 200 feet.  It may carry up to 9 objects.  It can hit to
+attack with damage 1d12, hit to attack with damage 1d12, touch to lower
+experience (by 80d6+), and touch to lower experience (by 80d6+).  
 
 The 7-headed hydra  (L.Green 'y')
 === Num:426  Lev:39  Rar:2  Spd:+10  Hp:100d10  Ac:90  Exp:2000
@@ -8422,11 +8454,11 @@ The Spirit troll  (L.Green 'G')
 === Num:432  Lev:40  Rar:3  Spd:+0  Hp:1000  Ac:90  Exp:900
 A weird ghostly troll-like being from the ethereal plane.  This evil undead
 troll is normally found on dungeon level 40, and moves at normal speed.  It
-can pass through walls.  It is invisible.  It regenerates quickly.  It
-resists lightning, cold and poison.  It cannot be confused or slept.  It is
-observant of intruders, which it may notice from 200 feet.  It may carry a
-object or treasure.  It can hit to attack with damage 3d6, hit to attack
-with damage 3d6, and hit to attack with damage 3d6.  
+can pass through walls.  It regenerates quickly.  It resists lightning,
+cold and poison.  It cannot be confused or slept.  It is observant of
+intruders, which it may notice from 200 feet.  It may carry a object or
+treasure.  It can hit to attack with damage 3d6, hit to attack with damage
+3d6, and hit to attack with damage 3d6.  
 
 The Storm giant  (L.Blue 'P')
 === Num:333  Lev:40  Rar:1  Spd:+10  Hp:800  Ac:60  Exp:1000
@@ -8445,10 +8477,10 @@ The Giant roc  (Umber 'B')
 A vast legendary bird, its iron talons rake the most impenetrable of
 surfaces and its screech echoes through the many winding dungeon corridors.
  This animal is normally found on dungeon level 40, and moves at normal
-speed.  It can bash down doors.  It resists lightning.  It is fairly
-observant of intruders, which it may notice from 200 feet.  It can crush to
-attack with damage 8d12, crush to attack with damage 8d12, and hit to
-electrify.  
+speed.  It can bash down doors and fly over obstacles.  It resists
+lightning.  It is fairly observant of intruders, which it may notice from
+200 feet.  It can crush to attack with damage 8d12, crush to attack with
+damage 8d12, and hit to electrify.  
 
 The Death quasit  (L.Dark 'u')
 === Num:448  Lev:40  Rar:3  Spd:+20  Hp:440  Ac:80  Exp:1000
@@ -8501,53 +8533,53 @@ which he may notice from 200 feet.  He may carry up to 5 objects.  He can
 hit to attack with damage 3d4, hit to attack with damage 3d4, and hit to
 attack with damage 3d5.  
 
-The Ancient blue dragon  (Blue 'D')
+The Ancient blue dragon  (Blue 'A')
 === Num:411  Lev:40  Rar:1  Spd:+10  Hp:720  Ac:90  Exp:2000
 A huge draconic form.  Lightning crackles along its length.  This evil
 dragon is normally found on dungeon level 40, and moves quickly.  It may
 breathe lightning, and is also magical, casting spells intelligently which
-terrify, blind or confuse; 1 time in 6.  It can bash down doors and push
-past weaker monsters.  It resists lightning.  It cannot be confused or
-slept.  It pays little attention to intruders, which it may notice from 200
-feet.  It may carry up to 14 objects or treasures.  It can claw to attack
-with damage 4d8, claw to attack with damage 4d8, and bite to electrify with
-damage 7d8.  
+terrify, blind or confuse; 1 time in 6.  It can bash down doors, push past
+weaker monsters and fly over obstacles.  It resists lightning.  It cannot
+be confused or slept.  It pays little attention to intruders, which it may
+notice from 200 feet.  It may carry up to 14 objects or treasures.  It can
+claw to attack with damage 4d8, claw to attack with damage 4d8, and bite to
+electrify with damage 7d8.  
 
-The Ancient bronze dragon  (L.Umber 'D')
+The Ancient bronze dragon  (L.Umber 'A')
 === Num:412  Lev:40  Rar:1  Spd:+10  Hp:720  Ac:90  Exp:2000
 A huge draconic form enveloped in a cascade of colour.  This evil dragon is
 normally found on dungeon level 40, and moves quickly.  It may breathe fire
 or confusion, and is also magical, casting spells intelligently which
-terrify, blind or confuse; 1 time in 6.  It can bash down doors and push
-past weaker monsters.  It resists fire.  It cannot be confused or slept. 
-It pays little attention to intruders, which it may notice from 200 feet.
- It may carry up to 14 objects or treasures.  It can claw to attack with
-damage 4d8, claw to attack with damage 4d8, and bite to attack with damage
-7d8.  
+terrify, blind or confuse; 1 time in 6.  It can bash down doors, push past
+weaker monsters and fly over obstacles.  It resists fire.  It cannot be
+confused or slept.  It pays little attention to intruders, which it may
+notice from 200 feet.  It may carry up to 14 objects or treasures.  It can
+claw to attack with damage 4d8, claw to attack with damage 4d8, and bite to
+attack with damage 7d8.  
 
-The Ancient white dragon  (White 'D')
+The Ancient white dragon  (White 'A')
 === Num:424  Lev:40  Rar:1  Spd:+10  Hp:720  Ac:90  Exp:2000
 A huge draconic form.  Frost covers it from head to tail.  This evil dragon
 is normally found on dungeon level 40, and moves quickly.  It may breathe
 frost, and is also magical, casting spells intelligently which terrify,
-blind or confuse; 1 time in 6.  It can bash down doors and push past weaker
-monsters.  It resists cold.  It cannot be confused or slept.  It pays
-little attention to intruders, which it may notice from 200 feet.  It may
-carry up to 14 objects or treasures.  It can claw to attack with damage
-4d8, claw to attack with damage 4d8, and bite to freeze with damage 7d8. 
+blind or confuse; 1 time in 6.  It can bash down doors, push past weaker
+monsters and fly over obstacles.  It resists cold.  It cannot be confused
+or slept.  It pays little attention to intruders, which it may notice from
+200 feet.  It may carry up to 14 objects or treasures.  It can claw to
+attack with damage 4d8, claw to attack with damage 4d8, and bite to freeze
+with damage 7d8.  
 
-
-The Ancient green dragon  (Green 'D')
+The Ancient green dragon  (Green 'A')
 === Num:425  Lev:40  Rar:1  Spd:+10  Hp:720  Ac:90  Exp:2000
 A huge draconic form enveloped in clouds of poisonous vapour.  This evil
 dragon is normally found on dungeon level 40, and moves quickly.  It may
 breathe poison, and is also magical, casting spells intelligently which
-terrify, blind or confuse; 1 time in 6.  It can bash down doors and push
-past weaker monsters.  It resists poison.  It cannot be confused or slept.
- It pays little attention to intruders, which it may notice from 200 feet.
- It may carry up to 14 objects or treasures.  It can claw to attack with
-damage 4d8, claw to attack with damage 4d8, and bite to poison with damage
-7d8.  
+terrify, blind or confuse; 1 time in 6.  It can bash down doors, push past
+weaker monsters and fly over obstacles.  It resists poison.  It cannot be
+confused or slept.  It pays little attention to intruders, which it may
+notice from 200 feet.  It may carry up to 14 objects or treasures.  It can
+claw to attack with damage 4d8, claw to attack with damage 4d8, and bite to
+poison with damage 7d8.  
 
 The Vrock  (Slate 'U')
 === Num:447  Lev:40  Rar:2  Spd:+0  Hp:400  Ac:50  Exp:2000
@@ -8722,7 +8754,7 @@ slept.  She is observant of intruders, which she may notice from 300 feet.
 80d6+), gaze to paralyze, hit to attack with damage 8d6, and hit to attack
 with damage 8d6.  
 
-[U] The Black Rider at Bree  (L.Dark 'W')
+[Q] The Black Rider at Bree  (L.Dark 'W')
 === Num:440  Lev:40  Rar:3  Spd:+10  Hp:1800  Ac:60  Exp:10000
 A tall black cloaked Ringwraith.  This evil undead creature is normally
 found on dungeon level 40, and moves quickly.  He can open doors, bash down
@@ -8731,7 +8763,8 @@ bright light.  He resists cold and poison.  He cannot be confused or slept.
  He is fairly observant of intruders, which he may notice from 900 feet. 
 He may carry up to 4 good objects.  He can hit to attack with damage 6d6,
 hit to attack with damage 6d6, hit to lower experience (by 80d6+) with
-damage 4d6, and radiate to terrify with damage 4d6.  
+damage 4d6, and radiate to terrify with damage 4d6.  You feel an intense
+desire to kill this monster...  
 
 The Ranger Chieftain  (L.Green 'q')
 === Num:582  Lev:41  Rar:2  Spd:+10  Hp:1000  Ac:60  Exp:1600
@@ -8749,41 +8782,42 @@ of intruders, which he may notice from 200 feet.  He may carry up to 4
 objects.  He can hit to attack with damage 5d5, hit to attack with damage
 5d5, hit to attack with damage 5d5, and hurt with arrows.  
 
-The Ancient black dragon  (Slate 'D')
+The Ancient black dragon  (Slate 'A')
 === Num:429  Lev:41  Rar:1  Spd:+10  Hp:1000  Ac:90  Exp:2500
 A huge draconic form.  Pools of acid melt the floor around it.  This evil
 dragon is normally found on dungeon level 41, and moves quickly.  It may
 breathe acid, and is also magical, casting spells intelligently which
-terrify, blind or confuse; 1 time in 6.  It can bash down doors and push
-past weaker monsters.  It resists acid.  It cannot be confused or slept. 
-It pays little attention to intruders, which it may notice from 200 feet.
- It may carry up to 14 objects or treasures.  It can claw to attack with
-damage 4d9, claw to attack with damage 4d9, and bite to dissolve with
-damage 7d9.  
+terrify, blind or confuse; 1 time in 6.  It can bash down doors, push past
+weaker monsters and fly over obstacles.  It resists acid.  It cannot be
+confused or slept.  It pays little attention to intruders, which it may
+notice from 200 feet.  It may carry up to 14 objects or treasures.  It can
+claw to attack with damage 4d9, claw to attack with damage 4d9, and bite to
+dissolve with damage 7d9.  
 
-The Ancient red dragon  (Red 'D')
+The Ancient red dragon  (Red 'A')
 === Num:444  Lev:41  Rar:1  Spd:+10  Hp:1000  Ac:90  Exp:2500
 A huge draconic form.  Wisps of smoke steam from its nostrils and the
 extreme heat surrounding it makes you gasp for breath.  This evil dragon is
 normally found on dungeon level 41, and moves quickly.  It may breathe
 fire, and is also magical, casting spells intelligently which terrify,
-blind or confuse; 1 time in 6.  It can bash down doors and push past weaker
-monsters.  It resists fire.  It cannot be confused or slept.  It pays
-little attention to intruders, which it may notice from 200 feet.  It may
-carry up to 14 objects or treasures.  It can claw to attack with damage
-4d9, claw to attack with damage 4d9, and bite to burn with damage 7d9.  
+blind or confuse; 1 time in 6.  It can bash down doors, push past weaker
+monsters and fly over obstacles.  It resists fire.  It cannot be confused
+or slept.  It pays little attention to intruders, which it may notice from
+200 feet.  It may carry up to 14 objects or treasures.  It can claw to
+attack with damage 4d9, claw to attack with damage 4d9, and bite to burn
+with damage 7d9.  
 
-The Ancient gold dragon  (Yellow 'D')
+The Ancient gold dragon  (Yellow 'A')
 === Num:445  Lev:41  Rar:1  Spd:+10  Hp:1000  Ac:90  Exp:2500
 A huge draconic form wreathed in a nimbus of light. Its roar stuns and
 deafens you.  This evil dragon is normally found on dungeon level 41, and
 moves quickly.  It may breathe poison or sound, and is also magical,
 casting spells intelligently which terrify, blind or confuse; 1 time in 6.
- It can bash down doors and push past weaker monsters.  It resists poison.
- It cannot be confused or slept.  It pays little attention to intruders,
-which it may notice from 200 feet.  It may carry up to 14 objects or
-treasures.  It can claw to attack with damage 4d9, claw to attack with
-damage 4d9, and bite to attack with damage 7d9.  
+ It can bash down doors, push past weaker monsters and fly over obstacles.
+ It resists poison.  It cannot be confused or slept.  It pays little
+attention to intruders, which it may notice from 200 feet.  It may carry up
+to 14 objects or treasures.  It can claw to attack with damage 4d9, claw to
+attack with damage 4d9, and bite to attack with damage 7d9.  
 
 The Hezrou  (Green 'U')
 === Num:452  Lev:41  Rar:3  Spd:+0  Hp:520  Ac:40  Exp:2500
@@ -8859,11 +8893,12 @@ The Hell crawler  (Red 'c')
 A monstrous centipede coated with fire and with flaming tentacles around
 its head.  This evil insect is normally found on dungeon level 42, and
 moves a bit erratically at normal speed.  It may breathe fire; 1 time in 6.
- It can bash down doors.  It is rarely detected by telepathy.  It resists
-fire and poison.  It is fairly observant of intruders, which it may notice
-from 150 feet.  It usually appears in groups.  It can sting to burn with
-damage 3d12, sting to burn with damage 3d12, and sting to burn with damage
-3d12.  
+ It can bash down doors, climb on walls and ceilings and dig through earth
+and rubble.  It is rarely detected by telepathy.  It resists fire and
+poison.  It is fairly observant of intruders, which it may notice from 150
+feet.  It usually appears in groups.  It can sting to burn with damage
+3d12, sting to burn with damage 3d12, and sting to burn with damage 3d12.
+ 
 
 The Dread  (Orange 'G')
 === Num:460  Lev:42  Rar:1  Spd:+10  Hp:25d20  Ac:30  Exp:600
@@ -8872,8 +8907,8 @@ its hideous black body seems to struggle against reality as the universe
 itself struggles to banish it.  This evil undead creature is normally found
 on dungeon level 42, and moves a bit erratically, and quickly.  It is
 magical, casting spells which drain mana, produce nether bolts, blind,
-confuse or paralyze; 1 time in 16.  It can pass through walls and pick up
-objects.  It is invisible.  It is cold blooded.  It resists cold and
+confuse or paralyze; 1 time in 16.  It can pass through walls, pick up
+objects and fly over obstacles.  It is cold blooded.  It resists cold and
 poison.  It cannot be confused or slept.  It is fairly observant of
 intruders, which it may notice from 200 feet.  It usually appears in
 groups.  It may carry a object.  It can hit to attack with damage 6d6, hit
@@ -8885,14 +8920,14 @@ A foul wind chills your bones as this ghastly figure approaches.  This evil
 undead creature is normally found on dungeon level 42, and moves quickly.
  It is magical, casting spells which drain mana, cause brain smashing,
 cause critical wounds, cause mortal wounds, produce nether bolts, terrify,
-blind, paralyze or create darkness; 1 time in 7.  It can open doors and
-bash down doors.  It is cold blooded.  It regenerates quickly.  It is hurt
-by bright light.  It resists cold and poison.  It cannot be confused or
-slept.  It is fairly observant of intruders, which it may notice from 200
-feet.  It may carry up to 9 objects or treasures.  It can hit to attack
-with damage 3d6, hit to attack with damage 3d6, bite to lower experience
-(by 80d6+) with damage 4d6, and bite to lower experience (by 80d6+) with
-damage 4d6.  
+blind, paralyze or create darkness; 1 time in 7.  It can open doors, bash
+down doors and fly over obstacles.  It is cold blooded.  It regenerates
+quickly.  It is hurt by bright light.  It resists cold and poison.  It
+cannot be confused or slept.  It is fairly observant of intruders, which it
+may notice from 200 feet.  It may carry up to 9 objects or treasures.  It
+can hit to attack with damage 3d6, hit to attack with damage 3d6, bite to
+lower experience (by 80d6+) with damage 4d6, and bite to lower experience
+(by 80d6+) with damage 4d6.  
 
 [U] Eilinel the Entrapped  (L.Dark 'G')
 === Num:638  Lev:42  Rar:10  Spd:+10  Hp:900  Ac:40  Exp:3500
@@ -9037,13 +9072,13 @@ A towering stone elemental stands before you.  The walls and ceiling are
 reduced to rubble as it advances.  This creature is normally found on
 dungeon level 43, and moves at normal speed.  It is magical, casting spells
 which produce acid balls or produce acid bolts; 1 time in 6.  It can pass
-through walls, destroy weaker monsters and destroy objects.  It is cold
-blooded.  It is not detected by telepathy.  It is hurt by rock remover.  It
-resists lightning, fire, cold and poison.  It cannot be frightened,
-confused or slept.  It pays little attention to intruders, which it may
-notice from 100 feet.  It can hit to attack with damage 6d6, hit to attack
-with damage 6d6, hit to attack with damage 6d6, and hit to shatter with
-damage 10d10.  
+through walls, destroy weaker monsters, destroy objects and dig through
+earth and rubble.  It is cold blooded.  It is not detected by telepathy. 
+It is hurt by rock remover.  It resists lightning, fire, cold and poison.
+ It cannot be frightened, confused or slept.  It pays little attention to
+intruders, which it may notice from 100 feet.  It can hit to attack with
+damage 6d6, hit to attack with damage 6d6, hit to attack with damage 6d6,
+and hit to shatter with damage 10d10.  
 
 [U] The Queen of Air  (L.Blue 'E')
 === Num:468  Lev:43  Rar:3  Spd:+20  Hp:2700  Ac:50  Exp:4750
@@ -9051,12 +9086,13 @@ A towering air elemental, it avoids your blows with its extreme speed.
 This creature is normally found on dungeon level 43, and moves a bit
 erratically, and very quickly.  It is magical, casting spells which produce
 lightning balls, produce frost balls or produce lightning bolts; 1 time in
-5.  It can bash down doors, destroy weaker monsters and destroy objects. 
-It is cold blooded.  It is not detected by telepathy.  It resists acid,
-lightning, cold and poison.  It cannot be frightened, confused or slept. 
-It tends to overlook intruders, which it may notice from 120 feet.  It can
-hit to attack with damage 4d6, hit to attack with damage 4d6, hit to
-confuse with damage 4d4, and hit to confuse with damage 4d4.  
+5.  It can bash down doors, destroy weaker monsters, destroy objects and
+fly over obstacles.  It is cold blooded.  It is not detected by telepathy.
+ It resists acid, lightning, cold and poison.  It cannot be frightened,
+confused or slept.  It tends to overlook intruders, which it may notice
+from 120 feet.  It can hit to attack with damage 4d6, hit to attack with
+damage 4d6, hit to confuse with damage 4d4, and hit to confuse with damage
+4d4.  
 
 [Q] The Black Rider at Weathertop  (L.Dark 'W')
 === Num:449  Lev:43  Rar:3  Spd:+10  Hp:2100  Ac:60  Exp:13000
@@ -9073,18 +9109,18 @@ damage 6d6, hit to attack with damage 6d6, touch to lower experience (by
 80d6+) with damage 5d6, and radiate to terrify with damage 5d6.  You feel
 an intense desire to kill this monster...  
 
-The Ancient multi-hued dragon  (Violet 'D')
+The Ancient multi-hued dragon  (Violet 'A')
 === Num:462  Lev:43  Rar:1  Spd:+10  Hp:2100  Ac:100  Exp:13000
 A huge draconic form.  Many colours ripple down its massive frame.  Few
 live to see another.  This evil dragon is normally found on dungeon level
 43, and moves quickly.  It may breathe acid, lightning, fire, frost or
 poison, and is also magical, casting spells intelligently which terrify,
-blind or confuse; 1 time in 5.  It can bash down doors and push past weaker
-monsters.  It resists acid, lightning, fire, cold and poison.  It cannot be
-confused or slept.  It pays little attention to intruders, which it may
-notice from 250 feet.  It may carry up to 18 objects.  It can claw to
-attack with damage 4d10, claw to attack with damage 4d10, and bite to
-attack with damage 7d10.  
+blind or confuse; 1 time in 5.  It can bash down doors, push past weaker
+monsters and fly over obstacles.  It resists acid, lightning, fire, cold
+and poison.  It cannot be confused or slept.  It pays little attention to
+intruders, which it may notice from 250 feet.  It may carry up to 18
+objects.  It can claw to attack with damage 4d10, claw to attack with
+damage 4d10, and bite to attack with damage 7d10.  
 
 The Ancient amethyst dragon  (Violet 'A')
 === Num:696  Lev:43  Rar:4  Spd:+10  Hp:2100  Ac:100  Exp:13000
@@ -9196,13 +9232,13 @@ of purest black, crush rock and flesh with ease.  This evil undead creature
 is normally found on dungeon level 44, and moves a bit erratically, and
 quickly.  It is magical, casting spells intelligently which drain mana,
 cause mortal wounds, produce nether bolts, blind, confuse, paralyze,
-teleport level or summon an undead; 1 time in 9.  It can pass through walls
-and pick up objects.  It is invisible.  It is cold blooded.  It resists
-cold and poison.  It cannot be confused or slept.  It is fairly observant
-of intruders, which it may notice from 200 feet.  It may carry up to 10
-objects.  It can hit to attack with damage 6d6, hit to attack with damage
-6d6, hit to reduce strength with damage 3d4, and hit to reduce strength
-with damage 3d4.  
+teleport level or summon an undead; 1 time in 9.  It can pass through
+walls, pick up objects and fly over obstacles.  It is cold blooded.  It
+resists cold and poison.  It cannot be confused or slept.  It is fairly
+observant of intruders, which it may notice from 200 feet.  It may carry up
+to 10 objects.  It can hit to attack with damage 6d6, hit to attack with
+damage 6d6, hit to reduce strength with damage 3d4, and hit to reduce
+strength with damage 3d4.  
 
 The Drolem  (Green 'g')
 === Num:472  Lev:44  Rar:3  Spd:+10  Hp:2500  Ac:130  Exp:12000
@@ -9287,7 +9323,7 @@ gaze to lower experience (by 40d6+) with damage 3d6, gaze to drain charges
 with damage 3d6, gaze to reduce intelligence with damage 3d6, and bite to
 lower experience (by 40d6+) with damage 7d6.  
 
-The Death drake  (L.Green 'D')
+The Shadow dragon  (L.Green 'D')
 === Num:443  Lev:45  Rar:2  Spd:+10  Hp:2100  Ac:100  Exp:10000
 It is a dragon-like form wrapped in darkness.  You cannot make out its true
 form but you sense its evil.  This evil dragon is normally found on dungeon
@@ -9300,7 +9336,7 @@ to intruders, which it may notice from 250 feet.  It may carry up to 12
 objects.  It can claw to attack with damage 4d10, claw to attack with
 damage 4d10, and bite to lower experience (by 80d6+) with damage 7d10.  
 
-The Crystal dragon  (Umber 'A')
+The Crystal dragon  (White 'D')
 === Num:446  Lev:45  Rar:2  Spd:+10  Hp:2100  Ac:100  Exp:10000
 A huge crystalline dragon.  Its claws could cut you to shreds and its teeth
 are razor sharp.  Strange colours ripple through it as it moves in the
@@ -9313,18 +9349,19 @@ intruders, which it may notice from 250 feet.  It may carry up to 12
 objects.  It can claw to attack with damage 4d10, claw to attack with
 damage 4d10, and bite to attack with damage 7d10.  
 
-The Ethereal dragon  (Orange 'D')
+The Ethereal dragon  (White 'D')
 === Num:463  Lev:45  Rar:2  Spd:+10  Hp:2100  Ac:100  Exp:10000
 A huge dragon emanating from the ethereal plane, this terrible dragon is a
 master of light and dark.  Its form disappears from sight as it cloaks
 itself in unearthly shadows.  This evil dragon is normally found on dungeon
 level 45, and moves quickly.  It may breathe light, darkness or confusion,
 and is also magical, casting spells intelligently which blind or confuse;
-1 time in 5.  It can illuminate the dungeon, pass through walls and push
-past weaker monsters.  It is invisible.  It cannot be confused or slept. 
-It pays little attention to intruders, which it may notice from 250 feet.
- It may carry up to 12 objects.  It can claw to attack with damage 4d10,
-claw to attack with damage 4d10, and bite to attack with damage 7d10.  
+1 time in 5.  It can illuminate the dungeon, pass through walls, push past
+weaker monsters and fly over obstacles.  It is invisible.  It cannot be
+confused or slept.  It pays little attention to intruders, which it may
+notice from 250 feet.  It may carry up to 12 objects.  It can claw to
+attack with damage 4d10, claw to attack with damage 4d10, and bite to
+attack with damage 7d10.  
 
 The Greater basilisk  (L.Dark 'R')
 === Num:601  Lev:45  Rar:2  Spd:+10  Hp:20d100  Ac:100  Exp:10000
@@ -9405,18 +9442,19 @@ slept.  It tends to overlook intruders, which it may notice from 200 feet.
 80d6+), touch to drain charges, touch to reduce dexterity with damage 2d15,
 and touch to reduce dexterity with damage 2d15.  
 
-[U] Scatha the Worm  (L.Slate 'D')
+[U] Scatha the Worm  (L.Slate 'A')
 === Num:473  Lev:46  Rar:2  Spd:+10  Hp:2200  Ac:130  Exp:17000
 An ancient and wise Dragon.  Scatha has grown clever over the long years.
 His scales are covered with frost, and his breath sends a shower of ice
 into the air.  This evil dragon is normally found on dungeon level 46, and
 moves quickly.  He may breathe frost, and is also magical, casting spells
 intelligently which cause critical wounds or confuse; 1 time in 4.  He can
-bash down doors and push past weaker monsters.  He resists cold.  He cannot
-be confused or slept.  He tends to overlook intruders, which he may notice
-from 300 feet.  He may carry up to 14 good objects.  He can claw to attack
-with damage 4d10, claw to attack with damage 4d10, claw to freeze with
-damage 4d14, and bite to freeze with damage 4d14.  
+bash down doors, push past weaker monsters and fly over obstacles.  He
+resists cold.  He cannot be confused or slept.  He tends to overlook
+intruders, which he may notice from 300 feet.  He may carry up to 14 good
+objects.  He can claw to attack with damage 4d10, claw to attack with
+damage 4d10, claw to freeze with damage 4d14, and bite to freeze with
+damage 4d14.  
 
 The Death mold  (L.Dark 'm')
 === Num:479  Lev:47  Rar:1  Spd:+30  Hp:100d20  Ac:60  Exp:1000
@@ -9454,18 +9492,18 @@ which it may notice from 200 feet.  It may carry up to 12 treasures.  It
 can bite to burn with damage 4d12, bite to burn with damage 4d12, bite to
 poison with damage 4d12, and bite to poison with damage 4d12.  
 
-[U] Itangast the Fire Drake  (L.Red 'D')
+[U] Itangast, the Fire Drake  (L.Red 'A')
 === Num:480  Lev:47  Rar:2  Spd:+10  Hp:2200  Ac:120  Exp:20000
 A mighty ancient dragon, Itangast's form scorches your flesh.  Wisps of
 smoke curl up from his nostrils as he regards you with disdain.  This evil
 dragon is normally found on dungeon level 47, and moves quickly.  He may
 breathe fire, and is also magical, casting spells intelligently which cause
-critical wounds or confuse; 1 time in 4.  He can bash down doors and push
-past weaker monsters.  He resists fire.  He cannot be confused or slept. 
-He tends to overlook intruders, which he may notice from 300 feet.  He may
-carry up to 14 good objects.  He can claw to attack with damage 4d10, claw
-to attack with damage 4d10, bite to burn with damage 4d14, and bite to burn
-with damage 4d14.  
+critical wounds or confuse; 1 time in 4.  He can bash down doors, push past
+weaker monsters and fly over obstacles.  He resists fire.  He cannot be
+confused or slept.  He tends to overlook intruders, which he may notice
+from 300 feet.  He may carry up to 14 good objects.  He can claw to attack
+with damage 4d10, claw to attack with damage 4d10, bite to burn with damage
+4d14, and bite to burn with damage 4d14.  
 
 The Elder aranea  (Red 'S')
 === Num:603  Lev:48  Rar:3  Spd:+10  Hp:1200  Ac:65  Exp:2500
@@ -9511,7 +9549,7 @@ nether.  It is observant of intruders, which it may notice from 300 feet.
 bite to lower experience (by 40d6+) with damage 4d6, and bite to lower
 experience (by 40d6+) with damage 4d6.  
 
-The Emporer lich  (Violet 'L')
+The Emperor lich  (Violet 'L')
 === Num:970  Lev:48  Rar:2  Spd:+10  Hp:3500  Ac:95  Exp:15000
 A skeletal form wrapped in robes and ancient reliqury.  Powerful magic
 crackles along its bony fingers.  This evil undead creature is normally
@@ -9540,7 +9578,7 @@ carry up to 8 good objects.  He can hit to attack with damage 7d7, hit to
 attack with damage 7d7, touch to lower experience (by 80d6+) with damage
 6d7, and radiate to terrify with damage 6d7.  
 
-[Q] Smaug the Golden  (L.Red 'D')
+[Q] Smaug the Golden  (Yellow 'A')
 === Num:475  Lev:48  Rar:2  Spd:+10  Hp:2400  Ac:130  Exp:23000
 Smaug is one of the Uruloki that still survive, a fire-drake of immense
 cunning and intelligence.  His speed through air is matched by few other
@@ -9548,12 +9586,13 @@ dragons and his dragonfire is what legends are made of; he is believed to
 be the greatest dragon still surviving into the Third Age.  This evil
 dragon is normally found on dungeon level 48, and moves quickly.  He may
 breathe fire, and is also magical, casting spells intelligently which cause
-critical wounds or confuse; 1 time in 4.  He can bash down doors and push
-past weaker monsters.  He resists fire.  He cannot be confused or slept. 
-He tends to overlook intruders, which he may notice from 300 feet.  He may
-carry up to 14 good objects.  He can claw to attack with damage 4d12, claw
-to attack with damage 4d12, bite to burn with damage 5d14, and bite to burn
-with damage 5d14.  You feel an intense desire to kill this monster...  
+critical wounds or confuse; 1 time in 4.  He can bash down doors, push past
+weaker monsters and fly over obstacles.  He resists fire.  He cannot be
+confused or slept.  He tends to overlook intruders, which he may notice
+from 300 feet.  He may carry up to 14 good objects.  He can claw to attack
+with damage 4d12, claw to attack with damage 4d12, bite to burn with damage
+5d14, and bite to burn with damage 5d14.  You feel an intense desire to
+kill this monster...  
 
 The Fire Demon  (Violet 'U')
 === Num:467  Lev:49  Rar:2  Spd:+10  Hp:2000  Ac:50  Exp:10000
@@ -9561,11 +9600,12 @@ It is a massive humanoid demon wreathed in flames.  This evil demon is
 normally found on dungeon level 49, and moves quickly.  It may breathe
 fire, and is also magical, casting spells which blind, confuse or summon a
 demon; 1 time in 4.  It can illuminate the dungeon, open doors, bash down
-doors and push past weaker monsters.  It resists fire.  It resists lava. 
-It cannot be confused or slept.  It pays little attention to intruders,
-which it may notice from 200 feet.  It may carry up to 6 good objects.  It
-can hit to burn with damage 4d12, hit to burn with damage 4d12, crush to
-attack with damage 3d12, and radiate to burn with damage 2d12.  
+doors, push past weaker monsters and fly over obstacles.  It resists fire.
+ It resists lava.  It cannot be confused or slept.  It pays little
+attention to intruders, which it may notice from 200 feet.  It may carry up
+to 6 good objects.  It can hit to burn with damage 4d12, hit to burn with
+damage 4d12, crush to attack with damage 3d12, and radiate to burn with
+damage 2d12.  
 
 [U] Eol, the Dark Elf  (L.Dark 'h')
 === Num:594  Lev:49  Rar:2  Spd:+20  Hp:2400  Ac:100  Exp:25000
@@ -9655,13 +9695,13 @@ Khazad-dum, while extending their mithril-mine, roused it from its sleep.
 death is at hand.  This evil demon is normally found on dungeon level 50,
 and moves very quickly.  He may breathe fire, and is also magical, casting
 spells which terrify, confuse, summon a demon or summon an undead; 1 time
-in 4.  He can open doors, bash down doors and push past weaker monsters. 
-He resists fire.  He cannot be confused or slept.  He pays little attention
-to intruders, which he may notice from 200 feet.  He usually appears with
-escorts.  He may carry up to 18 good objects.  He can hit to burn with
-damage 6d12, radiate to burn with damage 6d12, crush to attack with damage
-5d12, and touch to drain charges.  You feel an intense desire to kill this
-monster...  
+in 4.  He can open doors, bash down doors, push past weaker monsters and
+fly over obstacles.  He resists fire.  He cannot be confused or slept.  He
+pays little attention to intruders, which he may notice from 200 feet.  He
+usually appears with escorts.  He may carry up to 18 good objects.  He can
+hit to burn with damage 6d12, radiate to burn with damage 6d12, crush to
+attack with damage 5d12, and touch to drain charges.  You feel an intense
+desire to kill this monster...  
 
 [U] Gilim, the Giant of Eruman  (Umber 'P')
 === Num:640  Lev:51  Rar:7  Spd:+0  Hp:913  Ac:35  Exp:980
@@ -9837,12 +9877,12 @@ and melts your armour.  This animal is normally found on dungeon level 54,
 and moves quickly.  It may breathe fire, light or plasma, and is also
 magical, casting spells which produce fire balls, produce fire bolts,
 produce plasma bolts or summon similar monsters; 1 time in 3.  It can
-illuminate the dungeon, open doors and bash down doors.  It resists acid,
-lightning, fire and poison.  It resists plasma.  It cannot be confused or
-slept.  It is ever vigilant for intruders, which it may notice from 600
-feet.  It may carry up to 4 good objects.  It can bite to burn with damage
-12d6, bite to burn with damage 12d6, hit to burn with damage 9d12, and
-radiate to burn with damage 9d12.  
+illuminate the dungeon, open doors, bash down doors and fly over obstacles.
+ It resists acid, lightning, fire and poison.  It resists plasma.  It
+cannot be confused or slept.  It is ever vigilant for intruders, which it
+may notice from 600 feet.  It may carry up to 4 good objects.  It can bite
+to burn with damage 12d6, bite to burn with damage 12d6, hit to burn with
+damage 9d12, and radiate to burn with damage 9d12.  
 
 The Barbazu  (L.Green 'U')
 === Num:567  Lev:55  Rar:2  Spd:+10  Hp:800  Ac:60  Exp:3000
@@ -9871,19 +9911,19 @@ resists acid and fire.  It resists nexus.  It cannot be confused or slept.
 4d12, bite to attack with damage 4d12, bite to burn with damage 7d14, and
 gaze to paralyze.  
 
-The Dracolich  (L.Green 'D')
+The Dracolich  (L.Green 'A')
 === Num:476  Lev:55  Rar:2  Spd:+10  Hp:3500  Ac:120  Exp:18000
 The skeletal form of a once-great dragon, enchanted by magic most perilous.
  Its animated form strikes with speed and drains life from its prey to
 satisfy its hunger.  This evil undead dragon is normally found on dungeon
 level 55, and moves quickly.  It may breathe frost or nether, and is also
 magical, casting spells intelligently which terrify or confuse; 1 time in
-6.  It can bash down doors, push past weaker monsters and pick up objects.
- It is cold blooded.  It resists cold and poison.  It resists nether.  It
-cannot be confused or slept.  It pays little attention to intruders, which
-it may notice from 250 feet.  It may carry up to 8 good objects.  It can
-claw to attack with damage 4d12, claw to attack with damage 4d12, and bite
-to lower experience (by 80d6+) with damage 7d14.  
+6.  It can bash down doors, push past weaker monsters, pick up objects and
+fly over obstacles.  It is cold blooded.  It resists cold and poison.  It
+resists nether.  It cannot be confused or slept.  It pays little attention
+to intruders, which it may notice from 250 feet.  It may carry up to 8 good
+objects.  It can claw to attack with damage 4d12, claw to attack with
+damage 4d12, and bite to lower experience (by 80d6+) with damage 7d14.  
 
 [U] Ar-Pharazon the Golden  (Yellow 't')
 === Num:611  Lev:55  Rar:1  Spd:+20  Hp:4000  Ac:45  Exp:32500
@@ -9995,7 +10035,7 @@ to see intruders, which he may notice from 300 feet.  He may carry up to 10
 good objects.  He can butt to attack with damage 12d13, butt to attack with
 damage 12d13, hit to attack with damage 10d10, and hurt with arrows.  
 
-The Ethereal hound  (L.Green 'Z')
+The Ethereal hound  (White 'Z')
 === Num:495  Lev:59  Rar:3  Spd:+10  Hp:60d15  Ac:100  Exp:7000
 A pale green hound.  Pulsing red lines and strange fluorescent light hints
 at internal organs best left to the imagination.  This animal is normally
@@ -10079,12 +10119,12 @@ being.  This evil undead creature is normally found on dungeon level 61,
 and moves quickly.  It is magical, casting spells intelligently which
 produce nether balls, cause brain smashing, cause mortal wounds, produce
 nether bolts, produce mana bolts, terrify, blind or summon an undead; 1
-time in 4.  It can open doors and bash down doors.  It is cold blooded.  It
-is hurt by bright light.  It resists cold and poison.  It cannot be
-confused or slept.  It is fairly observant of intruders, which it may
-notice from 200 feet.  It may carry up to 4 good objects.  It can touch to
-poison with damage 6d5, touch to poison with damage 6d5, hit to disenchant
-with damage 6d8, and hit to disenchant with damage 6d8.  
+time in 4.  It can open doors, bash down doors and fly over obstacles.  It
+is cold blooded.  It is hurt by bright light.  It resists cold and poison.
+ It cannot be confused or slept.  It is fairly observant of intruders,
+which it may notice from 200 feet.  It may carry up to 4 good objects.  It
+can touch to poison with damage 6d5, touch to poison with damage 6d5, hit
+to disenchant with damage 6d8, and hit to disenchant with damage 6d8.  
 
 The Bile Demon  (L.Red 'U')
 === Num:568  Lev:61  Rar:2  Spd:+10  Hp:2800  Ac:90  Exp:12000
@@ -10145,8 +10185,8 @@ the stench of death.  Flee its hunger!  This evil undead creature is
 normally found on dungeon level 62, and moves quickly.  It is magical,
 casting spells which produce nether balls, drain mana, cause brain
 smashing, blind, confuse, paralyze, blink-self, teleport-self, teleport to
-or summon an undead; 1 time in 4.  It can pass through walls and pick up
-objects.  It is invisible.  It is cold blooded.  It resists cold and
+or summon an undead; 1 time in 4.  It can pass through walls, pick up
+objects and fly over obstacles.  It is cold blooded.  It resists cold and
 poison.  It cannot be confused or slept.  It is fairly observant of
 intruders, which it may notice from 200 feet.  It may carry up to 18
 objects.  It can hit to lower experience (by 40d6+) with damage 6d6, hit to
@@ -10171,60 +10211,61 @@ to 14 good objects.  He can touch to lower experience (by 80d6+), hit to
 blind with damage 10d5, hit to attack with damage 10d10, and hit to attack
 with damage 10d10.  
 
-The Great Storm Wyrm  (Blue 'D')
+The Great Storm Wyrm  (Blue 'A')
 === Num:489  Lev:63  Rar:2  Spd:+10  Hp:3500  Ac:150  Exp:20000
 A vast dragon of power.  Storms and lightning crash around its titanic
 form.  Deep blue scales reflect the flashes and highlight the creature's
 great muscles.  It regards you with contempt.  This evil dragon is normally
 found on dungeon level 63, and moves quickly.  It may breathe lightning,
 and is also magical, casting spells intelligently which terrify, blind or
-confuse; 1 time in 4.  It can bash down doors and push past weaker
-monsters.  It resists lightning.  It cannot be confused or slept.  It pays
-little attention to intruders, which it may notice from 300 feet.  It may
-carry up to 18 good objects.  It can claw to attack with damage 4d12, claw
-to attack with damage 4d12, bite to electrify with damage 6d14, and bite to
-electrify with damage 6d14.  
+confuse; 1 time in 4.  It can bash down doors, push past weaker monsters
+and fly over obstacles.  It resists lightning.  It cannot be confused or
+slept.  It pays little attention to intruders, which it may notice from 300
+feet.  It may carry up to 18 good objects.  It can claw to attack with
+damage 4d12, claw to attack with damage 4d12, bite to electrify with damage
+6d14, and bite to electrify with damage 6d14.  
 
-The Great Ice Wyrm  (White 'D')
+The Great Ice Wyrm  (White 'A')
 === Num:496  Lev:63  Rar:2  Spd:+10  Hp:3500  Ac:150  Exp:20000
 An immense dragon capable of awesome destruction.  You have never felt such
 extreme cold, or witnessed such an icy stare.  Begone quickly or feel its
 wrath!  This evil dragon is normally found on dungeon level 63, and moves
 quickly.  It may breathe frost, and is also magical, casting spells
 intelligently which terrify, blind or confuse; 1 time in 4.  It can bash
-down doors and push past weaker monsters.  It resists cold.  It cannot be
-confused or slept.  It pays little attention to intruders, which it may
-notice from 300 feet.  It may carry up to 18 good objects.  It can claw to
-attack with damage 4d12, claw to attack with damage 4d12, bite to freeze
-with damage 6d14, and bite to freeze with damage 6d14.  
+down doors, push past weaker monsters and fly over obstacles.  It resists
+cold.  It cannot be confused or slept.  It pays little attention to
+intruders, which it may notice from 300 feet.  It may carry up to 18 good
+objects.  It can claw to attack with damage 4d12, claw to attack with
+damage 4d12, bite to freeze with damage 6d14, and bite to freeze with
+damage 6d14.  
 
-The Great Swamp Wyrm  (Green 'D')
+The Great Swamp Wyrm  (Green 'A')
 === Num:576  Lev:63  Rar:2  Spd:+10  Hp:3500  Ac:150  Exp:20000
 A truly enormous dragon with great powers.  The foul gases issuing from the
 beast nearly make you vomit; and while you may try to hold your breath as
 you fight it, it sees no reason to do likewise.  This evil dragon is
 normally found on dungeon level 63, and moves quickly.  It may breathe
 poison, and is also magical, casting spells intelligently which terrify,
-blind or confuse; 1 time in 4.  It can bash down doors and push past weaker
-monsters.  It resists poison.  It cannot be confused or slept.  It pays
-little attention to intruders, which it may notice from 300 feet.  It may
-carry up to 18 good objects.  It can claw to attack with damage 4d12, claw
-to attack with damage 4d12, bite to poison with damage 6d14, and bite to
-poison with damage 6d14.  
+blind or confuse; 1 time in 4.  It can bash down doors, push past weaker
+monsters and fly over obstacles.  It resists poison.  It cannot be confused
+or slept.  It pays little attention to intruders, which it may notice from
+300 feet.  It may carry up to 18 good objects.  It can claw to attack with
+damage 4d12, claw to attack with damage 4d12, bite to poison with damage
+6d14, and bite to poison with damage 6d14.  
 
-The Great Wyrm of Perplexity  (L.Umber 'D')
+The Great Wyrm of Perplexity  (L.Umber 'A')
 === Num:577  Lev:63  Rar:2  Spd:+10  Hp:3500  Ac:150  Exp:20000
 A dragon of great size and power.  Its polished bronze scales reflect the
 light in strange and confusing patterns, and you find it hard to keep your
 mind on the job of fighting for your life.  This evil dragon is normally
 found on dungeon level 63, and moves quickly.  It may breathe fire or
 confusion, and is also magical, casting spells intelligently which terrify,
-blind or confuse; 1 time in 4.  It can bash down doors and push past weaker
-monsters.  It resists fire.  It cannot be confused or slept.  It pays
-little attention to intruders, which it may notice from 300 feet.  It may
-carry up to 18 good objects.  It can claw to attack with damage 4d12, claw
-to attack with damage 4d12, bite to confuse with damage 6d14, and bite to
-confuse with damage 6d14.  
+blind or confuse; 1 time in 4.  It can bash down doors, push past weaker
+monsters and fly over obstacles.  It resists fire.  It cannot be confused
+or slept.  It pays little attention to intruders, which it may notice from
+300 feet.  It may carry up to 18 good objects.  It can claw to attack with
+damage 4d12, claw to attack with damage 4d12, bite to confuse with damage
+6d14, and bite to confuse with damage 6d14.  
 
 The Great Wyrm of the Nexus  (Umber 'A')
 === Num:703  Lev:63  Rar:3  Spd:+10  Hp:3000  Ac:150  Exp:20000
@@ -10475,55 +10516,55 @@ on dungeon level 67, and moves very quickly.  She is magical, casting
 spells intelligently which produce nether balls, drain mana, cause brain
 smashing, cause critical wounds, cause mortal wounds, terrify, blind,
 paralyze, summon similar monsters or summon Greater Undead; 1 time in 3. 
-She can open doors and bash down doors.  She is cold blooded.  She
-regenerates quickly.  She is hurt by bright light.  She resists cold and
-poison.  She cannot be confused or slept.  She is fairly observant of
-intruders, which she may notice from 200 feet.  She may carry up to 18 good
-objects.  She can bite to lower experience (by 80d6+) with damage 6d6, bite
-to lower experience (by 80d6+) with damage 6d6, hit to confuse with damage
-6d6, and hit to confuse with damage 6d6.  
+She can open doors, bash down doors and fly over obstacles.  She is cold
+blooded.  She regenerates quickly.  She is hurt by bright light.  She
+resists cold and poison.  She cannot be confused or slept.  She is fairly
+observant of intruders, which she may notice from 200 feet.  She may carry
+up to 18 good objects.  She can bite to lower experience (by 80d6+) with
+damage 6d6, bite to lower experience (by 80d6+) with damage 6d6, hit to
+confuse with damage 6d6, and hit to confuse with damage 6d6.  
 
-The Great Hell Wyrm  (Red 'D')
+The Great Hell Wyrm  (Red 'A')
 === Num:506  Lev:67  Rar:2  Spd:+10  Hp:3800  Ac:150  Exp:23000
 A vast dragon of immense power.  Fire leaps continuously from its huge
 form.  The air around it scalds you.  Its slightest glance burns you, and
 you truly realize how insignificant you are.  This evil dragon is normally
 found on dungeon level 67, and moves quickly.  It may breathe fire, and is
 also magical, casting spells intelligently which terrify, blind or confuse;
-1 time in 4.  It can bash down doors and push past weaker monsters.  It
-resists fire.  It cannot be confused or slept.  It pays little attention to
-intruders, which it may notice from 300 feet.  It may carry up to 18 good
-objects.  It can claw to attack with damage 4d12, claw to attack with
-damage 4d12, bite to burn with damage 6d14, and bite to burn with damage
-6d14.  
+1 time in 4.  It can bash down doors, push past weaker monsters and fly
+over obstacles.  It resists fire.  It cannot be confused or slept.  It pays
+little attention to intruders, which it may notice from 300 feet.  It may
+carry up to 18 good objects.  It can claw to attack with damage 4d12, claw
+to attack with damage 4d12, bite to burn with damage 6d14, and bite to burn
+with damage 6d14.  
 
-The Great Bile Wyrm  (Slate 'D')
+The Great Bile Wyrm  (Slate 'A')
 === Num:578  Lev:67  Rar:2  Spd:+10  Hp:3500  Ac:150  Exp:23000
 A huge and very powerful dragon.  Great steaming pools of acid drip from
 its form onto the ground.  You shudder when you see the acid eating away
 the very stones of the dungeon - what could it do to you?  This evil dragon
 is normally found on dungeon level 67, and moves quickly.  It may breathe
 acid, and is also magical, casting spells which terrify, blind or confuse;
-1 time in 4.  It can bash down doors and push past weaker monsters.  It
-resists acid.  It cannot be confused or slept.  It pays little attention to
-intruders, which it may notice from 300 feet.  It may carry up to 18 good
-objects.  It can claw to attack with damage 4d12, claw to attack with
-damage 4d12, bite to dissolve with damage 6d14, and bite to dissolve with
-damage 6d14.  
+1 time in 4.  It can bash down doors, push past weaker monsters and fly
+over obstacles.  It resists acid.  It cannot be confused or slept.  It pays
+little attention to intruders, which it may notice from 300 feet.  It may
+carry up to 18 good objects.  It can claw to attack with damage 4d12, claw
+to attack with damage 4d12, bite to dissolve with damage 6d14, and bite to
+dissolve with damage 6d14.  
 
-The Great Wyrm of Thunder  (Yellow 'D')
+The Great Wyrm of Thunder  (Yellow 'A')
 === Num:579  Lev:67  Rar:2  Spd:+10  Hp:3500  Ac:150  Exp:23000
 A dragon of gigantic proportions, with destructive abilities to match.  The
 sheer loudness of its roar leaves you stunned and unable to think clearly
 enough to defend yourself adequately.  This evil dragon is normally found
 on dungeon level 67, and moves quickly.  It may breathe poison or sound,
 and is also magical, casting spells which terrify, blind or confuse; 1 time
-in 4.  It can bash down doors and push past weaker monsters.  It resists
-poison.  It cannot be confused or slept.  It pays little attention to
-intruders, which it may notice from 300 feet.  It may carry up to 18 good
-objects.  It can claw to attack with damage 4d12, claw to attack with
-damage 4d12, bite to attack with damage 6d14, and bite to attack with
-damage 6d14.  
+in 4.  It can bash down doors, push past weaker monsters and fly over
+obstacles.  It resists poison.  It cannot be confused or slept.  It pays
+little attention to intruders, which it may notice from 300 feet.  It may
+carry up to 18 good objects.  It can claw to attack with damage 4d12, claw
+to attack with damage 4d12, bite to attack with damage 6d14, and bite to
+attack with damage 6d14.  
 
 The Jabberwock  (Violet 'H')
 === Num:517  Lev:68  Rar:3  Spd:+20  Hp:3200  Ac:125  Exp:19000
@@ -10559,11 +10600,11 @@ closed to all save the Dead and the heirs of Isildur.  This evil undead
 creature is normally found on dungeon level 68, and moves very quickly.  He
 is magical, casting spells which produce nether balls, invoke darkness
 storms, blind, confuse, paralyze, summon similar monsters, summon Greater
-Undead or summon Ring Wraiths; 1 time in 3.  He can pass through walls.  He
-is invisible.  He is cold blooded.  He resists cold and poison.  He cannot
-be confused or slept.  He is fairly observant of intruders, which he may
-notice from 200 feet.  He may carry up to 14 good objects.  He can hit to
-attack with damage 10d10, hit to attack with damage 10d10, hit to reduce
+Undead or summon Ring Wraiths; 1 time in 3.  He can pass through walls and
+fly over obstacles.  He is cold blooded.  He resists cold and poison.  He
+cannot be confused or slept.  He is fairly observant of intruders, which he
+may notice from 200 feet.  He may carry up to 14 good objects.  He can hit
+to attack with damage 10d10, hit to attack with damage 10d10, hit to reduce
 strength with damage 4d6, and hit to reduce strength with damage 4d6.  You
 feel an intense desire to kill this monster...  
 
@@ -10612,7 +10653,7 @@ to see intruders, which she may notice from 400 feet.  She may carry up to
 10 good objects.  She can hit to attack with damage 11d10, hit to attack
 with damage 11d10, and hit to shatter with damage 11d10.  
 
-[U] Glaurung, Father of the Dragons  (L.Red 'D')
+[U] Glaurung, Father of the Dragons  (L.Red 'A')
 === Num:481  Lev:70  Rar:3  Spd:+20  Hp:7500  Ac:140  Exp:50000
 Glaurung is the father of all dragons, and was for a long time the most
 powerful.  Though this is no longer so, he still has full command over his
@@ -10620,12 +10661,12 @@ brood and can command them to appear whenever he so wishes.  He is the
 definition of dragonfire.  This evil dragon is normally found on dungeon
 level 70, and moves very quickly.  He may breathe fire or poison, and is
 also magical, casting spells intelligently which terrify, blind, confuse or
-summon Ancient Dragons; 1 time in 3.  He can bash down doors and push past
-weaker monsters.  He resists fire and poison.  He cannot be confused or
-slept.  He tends to overlook intruders, which he may notice from 300 feet.
- He may carry up to 18 exceptional objects.  He can claw to attack with
-damage 5d12, claw to attack with damage 5d12, bite to poison with damage
-8d14, and bite to burn with damage 8d14.  
+summon Ancient Dragons; 1 time in 3.  He can bash down doors, push past
+weaker monsters and fly over obstacles.  He resists fire and poison.  He
+cannot be confused or slept.  He tends to overlook intruders, which he may
+notice from 300 feet.  He may carry up to 18 exceptional objects.  He can
+claw to attack with damage 5d12, claw to attack with damage 5d12, bite to
+poison with damage 8d14, and bite to burn with damage 8d14.  
 
 The Grey reaver  (Slate 'L')
 === Num:971  Lev:71  Rar:3  Spd:+10  Hp:3500  Ac:170  Exp:23000
@@ -10780,7 +10821,7 @@ It tends to overlook intruders, which it may notice from 200 feet.  It can
 hit to attack with damage 10d10, hit to attack with damage 10d10, hit to
 attack with damage 10d10, and hit to attack with damage 10d10.  
 
-The Great Wyrm of Chaos  (Violet 'D')
+The Great Wyrm of Chaos  (Violet 'A')
 === Num:519  Lev:75  Rar:2  Spd:+10  Hp:4500  Ac:170  Exp:29000
 A massive dragon of changing form.  As you watch, it appears first fair and
 then foul.  Its body is twisted by chaotic forces as it strives to stay
@@ -10788,14 +10829,15 @@ real.  Its very existence distorts the universe around it.  This evil
 dragon is normally found on dungeon level 75, and moves quickly.  It may
 breathe chaos or disenchantment, and is also magical, casting spells
 intelligently which terrify, blind, confuse, summon a dragon or summon
-Ancient Dragons; 1 time in 4.  It can bash down doors and push past weaker
-monsters.  It resists fire.  It resists disenchantment.  It cannot be
-confused or slept.  It pays very little attention to intruders, which it
-may notice from 400 feet.  It may carry up to 18 good objects.  It can claw
-to attack with damage 5d12, claw to attack with damage 5d12, bite to attack
-with damage 7d14, and bite to attack with damage 7d14.  
+Ancient Dragons; 1 time in 4.  It can bash down doors, push past weaker
+monsters and fly over obstacles.  It resists fire.  It resists
+disenchantment.  It cannot be confused or slept.  It pays very little
+attention to intruders, which it may notice from 400 feet.  It may carry up
+to 18 good objects.  It can claw to attack with damage 5d12, claw to attack
+with damage 5d12, bite to attack with damage 7d14, and bite to attack with
+damage 7d14.  
 
-The Great Wyrm of Law  (L.Blue 'D')
+The Great Wyrm of Law  (L.Blue 'A')
 === Num:520  Lev:75  Rar:2  Spd:+10  Hp:4500  Ac:170  Exp:29000
 A massive dragon of powerful intellect.  It seeks to dominate the universe
 and despises all other life.  It sees all who do not obey it as mere
@@ -10803,11 +10845,12 @@ insects to be crushed underfoot.  This evil dragon is normally found on
 dungeon level 75, and moves quickly.  It may breathe sound or shards, and
 is also magical, casting spells intelligently which terrify, blind,
 confuse, summon a dragon or summon Ancient Dragons; 1 time in 4.  It can
-bash down doors and push past weaker monsters.  It resists cold.  It cannot
-be confused or slept.  It pays very little attention to intruders, which it
-may notice from 400 feet.  It may carry up to 18 good objects.  It can claw
-to attack with damage 5d12, claw to attack with damage 5d12, bite to attack
-with damage 7d14, and bite to attack with damage 7d14.  
+bash down doors, push past weaker monsters and fly over obstacles.  It
+resists cold.  It cannot be confused or slept.  It pays very little
+attention to intruders, which it may notice from 400 feet.  It may carry up
+to 18 good objects.  It can claw to attack with damage 5d12, claw to attack
+with damage 5d12, bite to attack with damage 7d14, and bite to attack with
+damage 7d14.  
 
 [Q] Shelob, Spider of Darkness  (L.Dark 'S')
 === Num:530  Lev:75  Rar:1  Spd:+20  Hp:13000  Ac:160  Exp:35000
@@ -10848,12 +10891,12 @@ of vast demon armies.  This evil demon is normally found on dungeon level
 77, and moves very quickly.  It may breathe fire, poison or chaos, and is
 also magical, casting spells which produce fire balls, cause mortal wounds,
 terrify, summon Ancient Dragons or summon Greater Demons; 1 time in 5.  It
-can open doors, bash down doors and push past weaker monsters.  It
-regenerates quickly.  It resists fire and poison.  It cannot be confused or
-slept.  It tends to overlook intruders, which it may notice from 300 feet.
- It may carry up to 12 good objects.  It can claw to burn with damage 6d10,
-claw to burn with damage 6d10, bite to poison with damage 5d10, and bite to
-reduce constitution with damage 5d10.  
+can open doors, bash down doors, push past weaker monsters and fly over
+obstacles.  It regenerates quickly.  It resists fire and poison.  It cannot
+be confused or slept.  It tends to overlook intruders, which it may notice
+from 300 feet.  It may carry up to 12 good objects.  It can claw to burn
+with damage 6d10, claw to burn with damage 6d10, bite to poison with damage
+5d10, and bite to reduce constitution with damage 5d10.  
 
 [Q] The Lord of the Paths of the Dead  (Yellow 'L')
 === Num:528  Lev:77  Rar:2  Spd:+20  Hp:5000  Ac:85  Exp:30000
@@ -10892,14 +10935,14 @@ demonic servants.  With its flaming whip and sword it seeks to destroy you.
 quickly.  It may breathe fire or plasma, and is also magical, casting
 spells which produce fire balls, produce plasma bolts, terrify, confuse,
 summon a demon, summon an undead or summon Greater Demons; 1 time in 3.  It
-can open doors, bash down doors and push past weaker monsters.  It resists
-lightning, fire and poison.  It resists plasma.  It cannot be confused or
-slept.  It pays little attention to intruders, which it may notice from 400
-feet.  It may carry up to 14 good objects.  It can hit to burn with damage
-8d12, radiate to burn with damage 8d12, crush to attack with damage 7d12,
-and touch to drain charges.  
+can open doors, bash down doors, push past weaker monsters and fly over
+obstacles.  It resists lightning, fire and poison.  It resists plasma.  It
+cannot be confused or slept.  It pays little attention to intruders, which
+it may notice from 400 feet.  It may carry up to 14 good objects.  It can
+hit to burn with damage 8d12, radiate to burn with damage 8d12, crush to
+attack with damage 7d12, and touch to drain charges.  
 
-The Great Wyrm of Balance  (Violet 'D')
+The Great Wyrm of Balance  (Violet 'A')
 === Num:521  Lev:79  Rar:2  Spd:+10  Hp:5000  Ac:170  Exp:31000
 A massive dragon, one of the mightiest of dragonkind.  It is thousands of
 years old and seeks to maintain the Cosmic Balance.  It sees you as an
@@ -10908,25 +10951,26 @@ destroy you.  This evil dragon is normally found on dungeon level 79, and
 moves quickly.  It may breathe sound, chaos, disenchantment or shards, and
 is also magical, casting spells intelligently which terrify, blind,
 confuse, summon a dragon or summon Ancient Dragons; 1 time in 4.  It can
-bash down doors and push past weaker monsters.  It resists fire and cold.
- It resists disenchantment.  It cannot be confused or slept.  It pays very
-little attention to intruders, which it may notice from 400 feet.  It may
-carry up to 18 good objects.  It can claw to attack with damage 5d12, claw
-to attack with damage 5d12, bite to attack with damage 7d14, and bite to
-attack with damage 7d14.  
+bash down doors, push past weaker monsters and fly over obstacles.  It
+resists fire and cold.  It resists disenchantment.  It cannot be confused
+or slept.  It pays very little attention to intruders, which it may notice
+from 400 feet.  It may carry up to 18 good objects.  It can claw to attack
+with damage 5d12, claw to attack with damage 5d12, bite to attack with
+damage 7d14, and bite to attack with damage 7d14.  
 
-The Great Wyrm of Many Colours  (Violet 'D')
+The Great Wyrm of Many Colours  (Violet 'A')
 === Num:523  Lev:79  Rar:2  Spd:+10  Hp:5000  Ac:170  Exp:31000
 A gigantic dragon whose scales shimmer in myriad hues.  This evil dragon is
 normally found on dungeon level 79, and moves quickly.  It may breathe
 acid, lightning, fire, frost or poison, and is also magical, casting spells
 intelligently which terrify, blind, confuse, summon a dragon or summon
-Ancient Dragons; 1 time in 4.  It can bash down doors and push past weaker
-monsters.  It resists acid, lightning, fire, cold and poison.  It cannot be
-confused or slept.  It pays very little attention to intruders, which it
-may notice from 400 feet.  It may carry up to 18 good objects.  It can claw
-to attack with damage 5d12, claw to attack with damage 5d12, bite to attack
-with damage 7d14, and bite to attack with damage 7d14.  
+Ancient Dragons; 1 time in 4.  It can bash down doors, push past weaker
+monsters and fly over obstacles.  It resists acid, lightning, fire, cold
+and poison.  It cannot be confused or slept.  It pays very little attention
+to intruders, which it may notice from 400 feet.  It may carry up to 18
+good objects.  It can claw to attack with damage 5d12, claw to attack with
+damage 5d12, bite to attack with damage 7d14, and bite to attack with
+damage 7d14.  
 
 The Great Wyrm of Time and Space  (Violet 'A')
 === Num:706  Lev:79  Rar:4  Spd:+10  Hp:5000  Ac:170  Exp:31000
@@ -11071,20 +11115,20 @@ damage 5d5, gaze to lower experience (by 80d6+) with damage 5d5, touch to
 poison with damage 5d5, and touch to poison with damage 5d5.  You feel an
 intense desire to kill this monster...  
 
-[U] Ancalagon the Black  (L.Dark 'D')
+[U] Ancalagon the Black  (L.Dark 'A')
 === Num:511  Lev:85  Rar:3  Spd:+20  Hp:10000  Ac:170  Exp:45000
 "Rushing Jaws" is his name, and death is his game; the greatest and most
 terrible of all dragonkind, his power dismayed even the Valar for a time.
  This evil dragon is normally found on dungeon level 85, and moves very
 quickly.  He may breathe acid, lightning, fire, frost or poison, and is
 also magical, casting spells intelligently which summon similar monsters or
-summon Ancient Dragons; 1 time in 3.  He can bash down doors and push past
-weaker monsters.  He resists acid, lightning, fire, cold and poison.  He
-cannot be confused or slept.  He tends to overlook intruders, which he may
-notice from 400 feet.  He usually appears with escorts.  He may carry up to
-18 exceptional objects.  He can claw to attack with damage 6d12, claw to
-attack with damage 6d12, bite to attack with damage 10d14, and bite to
-attack with damage 10d14.  
+summon Ancient Dragons; 1 time in 3.  He can bash down doors, push past
+weaker monsters and fly over obstacles.  He resists acid, lightning, fire,
+cold and poison.  He cannot be confused or slept.  He tends to overlook
+intruders, which he may notice from 400 feet.  He usually appears with
+escorts.  He may carry up to 18 exceptional objects.  He can claw to attack
+with damage 6d12, claw to attack with damage 6d12, bite to attack with
+damage 10d14, and bite to attack with damage 10d14.  
 
 [U] The Tarrasque  (Violet 'R')
 === Num:539  Lev:86  Rar:2  Spd:+20  Hp:8500  Ac:185  Exp:35000
@@ -11120,13 +11164,13 @@ eyes that smoulder red.  The dungeon floor where he stands is scorched by
 the heat of his body.  This evil demon is normally found on dungeon level
 88, and moves very quickly.  He may breathe fire or plasma, and is also
 magical, casting spells which terrify, blind, confuse, summon an undead or
-summon Greater Demons; 1 time in 4.  He can open doors, bash down doors and
-push past weaker monsters.  He resists fire.  He resists plasma.  He cannot
-be confused or slept.  He pays little attention to intruders, which he may
-notice from 200 feet.  He usually appears with escorts.  He may carry up to
-18 good objects.  He can hit to burn with damage 8d12, radiate to burn with
-damage 8d12, crush to attack with damage 8d12, and touch to drain charges.
- 
+summon Greater Demons; 1 time in 4.  He can open doors, bash down doors,
+push past weaker monsters and fly over obstacles.  He resists fire.  He
+resists plasma.  He cannot be confused or slept.  He pays little attention
+to intruders, which he may notice from 200 feet.  He usually appears with
+escorts.  He may carry up to 18 good objects.  He can hit to burn with
+damage 8d12, radiate to burn with damage 8d12, crush to attack with damage
+8d12, and touch to drain charges.  
 
 [U] Huan, Wolfhound of the Valar  (L.Slate 'C')
 === Num:543  Lev:90  Rar:1  Spd:+20  Hp:8000  Ac:160  Exp:40000
@@ -11187,13 +11231,13 @@ fiery breath he saved his master from Ungoliant's rage.  This evil demon is
 normally found on dungeon level 95, and moves very quickly.  He may breathe
 fire or plasma, and is also magical, casting spells which terrify, blind,
 confuse, summon Greater Undead or summon Greater Demons; 1 time in 3.  He
-can open doors, bash down doors and push past weaker monsters.  He resists
-lightning and fire.  He resists plasma.  He cannot be confused or slept. 
-He is ever vigilant for intruders, which he may notice from 1000 feet.  He
-usually appears with escorts.  He may carry up to 18 exceptional objects.
- He can hit to burn with damage 9d12, radiate to burn with damage 9d12,
-crush to attack with damage 8d12, and touch to drain charges.  You feel an
-intense desire to kill this monster...  
+can open doors, bash down doors, push past weaker monsters and fly over
+obstacles.  He resists lightning and fire.  He resists plasma.  He cannot
+be confused or slept.  He is ever vigilant for intruders, which he may
+notice from 1000 feet.  He usually appears with escorts.  He may carry up
+to 18 exceptional objects.  He can hit to burn with damage 9d12, radiate to
+burn with damage 9d12, crush to attack with damage 8d12, and touch to drain
+charges.  You feel an intense desire to kill this monster...  
 
 [Q] Sauron, the Sorcerer  (Violet 'q')
 === Num:546  Lev:99  Rar:1  Spd:+20  Hp:10500  Ac:160  Exp:50000

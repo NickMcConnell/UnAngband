@@ -1,4 +1,4 @@
-Spoiler File -- Basic Items (0.5.1c)
+Spoiler File -- Basic Items (0.5.1d)
 
 
 Description                             Dam/AC   Wgt Lev     Cost Info        
@@ -55,6 +55,7 @@ Weapons
   Scimitar                                 2d5  13.0  10      250            
   Broad Sword                              2d5  15.0  10      255            
   Long Sword                               2d5  13.0  10      300            
+  Trident                                  3d4  14.0  20      300            
   Orcish Pick                              1d3  18.0  30      300            
   Broad Axe                                2d6  16.0  15      304            
   Battle Axe                               2d8  17.0  15      334            
@@ -68,6 +69,7 @@ Weapons
   Katana                                   3d4  12.0  20      400            
   Beaked Axe                               2d6  18.0  15      408            
   Halberd                                  3d5  19.0  25      430            
+  Lance                                    3d8  30.0  35      460            
   Great Axe                                4d4  23.0  40      500            
   Lead-Filled Mace                         3d4  18.0  15      502            
   Two-Handed Flail                         3d6  28.0  45      590            
@@ -77,6 +79,7 @@ Weapons
   Two-Handed Sword                         3d6  20.0  30      775            
   Scythe                                   5d3  25.0  45      800            
   Executioner's Sword                      4d5  26.0  40      850            
+  Two-Handed Mace                          4d4  24.0  30      900            
   Scythe of Slicing                        8d4  25.0  60     3500            
   Blade of Chaos                           6d5  18.0  70     4000            
   Mace of Disruption                       5d8  40.0  80     4300            
@@ -646,13 +649,13 @@ Various
   Flask of oil                                   1.0   1        3 dam 3d6    
   Flask of acid                                  1.0  10       30 dam 3d6    
   Brass Lantern                                  5.0   3       35 dam 3d6    
-  map to the mountain Caradhras                  0.5  20       50            
-  map to the mines of Moria                      0.5  20       50            
-  map to the citadel of Isengard                 0.5  20       50            
-  map titled 'There and Back Again'              0.5  20       50            
-  map to the ruins of Angmar                     0.5  20       50            
-  map to the sunken city of Numenor              0.5  20       50            
-  map to the temple of Elemental Evil            0.5  20       50            
-  map to the Crystal Castle                      0.5  20       50            
-  map to Shelob's Lair                           0.5  50       50            
-  map to Mount Doom                              0.5  80       50            
+  map to the mountain Caradhras                  0.5  20      250            
+  map to the mines of Moria                      0.5  20      250            
+  map to the citadel of Isengard                 0.5  20      250            
+  map titled 'There and Back Again'              0.5  20      500            
+  map to the ruins of Angmar                     0.5  20      500            
+  map to the sunken city of Numenor              0.5  20      500            
+  map to the temple of Elemental Evil            0.5  20      500            
+  map to the Crystal Castle                      0.5  20      500            
+  map to Shelob's Lair                           0.5  50     1250            
+  map to Mount Doom                              0.5  80     1500            
