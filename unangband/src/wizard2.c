@@ -1036,7 +1036,7 @@ static void do_cmd_wiz_jump(void)
                         char tmp_val[160];
 
                         /* Prompt */
-                        sprintf(ppp, "Jump to dungeon (1-%d): ", z_info->t_max-1);
+                        sprintf(ppp, "Jump to dungeon (0-%d): ", z_info->t_max-1);
 
                         /* Default */
                         sprintf(tmp_val, "%d", p_ptr->dungeon);
@@ -1049,7 +1049,7 @@ static void do_cmd_wiz_jump(void)
                 }
 
                 /* Paranoia */
-                if (p_ptr->command_arg < 1) p_ptr->command_arg = 1;
+                if (p_ptr->command_arg < 0) p_ptr->command_arg = 0;
 
                 /* Paranoia */
                 if (p_ptr->command_arg >= z_info->t_max) p_ptr->command_arg = z_info->t_max -1;

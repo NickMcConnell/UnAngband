@@ -471,7 +471,7 @@ s16b get_mon_num(int level)
 		}
 
 		/* Hack -- "questor" monsters must be placed specifically */
-		if (r_ptr->flags1 & (RF1_QUESTOR))
+		if ((r_ptr->flags1 & (RF1_QUESTOR)) && (r_ptr->flags1 & (RF1_GUARDIAN)))
 		{
 			continue;
 		}

@@ -2466,7 +2466,7 @@ void monster_death(int m_idx)
 	}
 
 	/* Need some stairs */
-	else if ((total) || (adult_campaign))
+	else if (total || !(r_ptr->flags1 & (RF1_QUESTOR)))
 	{
 		/* Stagger around */
 		while (!cave_valid_bold(y, x))

@@ -63,7 +63,7 @@ V:2.9.6
 # Default starting dungeon.
 
 N:0:Angband
-X:43:53
+X:43:0
 L:0:0:407:0:0:0
 L:1:56:0:0:0:0
 L:100:56:0:0:547:0
