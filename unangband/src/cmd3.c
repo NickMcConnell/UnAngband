@@ -896,7 +896,7 @@ void do_cmd_uninscribe(void)
 	/* Do we inscribe all these ego items? */
 	if (object_known_p(o_ptr) && (o_ptr->name2) && (e_info[o_ptr->name2].note))
 	{
-		e_info[o_ptr->name1].note = 0;
+		e_info[o_ptr->name2].note = 0;
 
 		/* Process objects */
 		for (i = 1; i < o_max; i++)
@@ -1014,7 +1014,7 @@ void do_cmd_inscribe(void)
 	/* Do we inscribe all these ego items? */
 	if (object_known_p(o_ptr) && (o_ptr->name2))
 	{
-		e_info[o_ptr->name1].note = o_ptr->note;
+		e_info[o_ptr->name2].note = o_ptr->note;
 
 		/* Process objects */
 		for (i = 1; i < o_max; i++)
