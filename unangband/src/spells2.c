@@ -4872,8 +4872,16 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 	if ((s_ptr->flags1 & (SF1_DETECT_TRAPS)) && (detect_traps())) obvious = TRUE;
 	if ((s_ptr->flags1 & (SF1_DETECT_STAIRS)) && (detect_stairs())) obvious = TRUE;
 	if ((s_ptr->flags1 & (SF1_DETECT_WATER)) && (detect_water())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_GOLD)) && ((detect_treasure() || detect_objects_gold))) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_OBJECT)) && ((detect_objects_buried() || detect_objects_normal))) obvious = TRUE;
+	if (s_ptr->flags1 & (SF1_DETECT_GOLD))
+        {
+                if (detect_treasure()) obvious = TRUE;
+                if (detect_objects_gold()) obvious = TRUE;
+        }
+	if (s_ptr->flags1 & (SF1_DETECT_OBJECT))
+        {
+                if (detect_objects_buried()) obvious = TRUE;
+                if (detect_objects_normal()) obvious = TRUE;
+        }
 	if ((s_ptr->flags1 & (SF1_DETECT_MAGIC)) && (detect_objects_magic())) obvious = TRUE;
 	if ((s_ptr->flags1 & (SF1_DETECT_CURSE)) && (detect_objects_cursed())) obvious = TRUE;
 	if ((s_ptr->flags1 & (SF1_DETECT_MONSTER)) && (detect_monsters_normal())) obvious = TRUE;
