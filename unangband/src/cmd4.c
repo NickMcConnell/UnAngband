@@ -3215,7 +3215,7 @@ static int collect_objects(int grp_cur, int object_idx[], int mode)
 		if (!k_ptr->flavor) continue;
 #endif
 		/* Skip items with no distribution (special artifacts) */
-		for (j = 0, k = 0; j < z_info->k_max; j++) k += k_ptr->chance[j];
+		for (j = 0, k = 0; j < 4; j++) k += k_ptr->chance[j];
 		if (!(k))  continue; 
 
 		/* Require objects ever seen*/
