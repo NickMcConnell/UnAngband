@@ -13,6 +13,15 @@ However, many more monsters/objects etc. need to have the correct tiles
 assigned to them and there are still visual artefacts that need to be
 cleaned up.
 
+- Priest spell righteous fury was for mages, paladins, shamans and bards but
+not for priests.  Now it is for priests, paladins, shamans and bards.  (Fixed
+by kobayasi)
+
+- Enchant food was in a wrong slot in the prayer book of chants so one can
+learn it (randomly) but cannot cast it.  (Fixed by kobayasi)
+
+- The effect of experience was as same as self knowledge.  (Fixed by kobayasi)
+
 ### Build / Platform ###
 
 - Makefile.std was reporting errors if the files it tries to clean are not
