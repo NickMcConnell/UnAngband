@@ -3376,10 +3376,10 @@ void message_pain(int m_idx, int dam)
 	{
 		int percentage2;
 
-		tmp = (oldhp * 100L) / (long)(m_ptr->hp);
+		tmp = (oldhp * 100L) / (long)(m_ptr->maxhp);
 		percentage = (int)(tmp);
 
-		tmp = (newhp * 100L) / (long)(m_ptr->hp);
+		tmp = (newhp * 100L) / (long)(m_ptr->maxhp);
 		percentage2 = (int)(tmp);
 
 		/* Notify the player only if monster 'damage state' changes */
