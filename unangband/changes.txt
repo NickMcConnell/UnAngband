@@ -1,75 +1,110 @@
 Angband 0.5.2 "I'm on fire" release
 
-I have reorganised this changes.txt file to similar to what Eytan Zweig uses for Eyangband. It should be clearer what the changes are.
+I have reorganised this changes.txt file to similar to what Eytan Zweig
+ uses for Eyangband. It should be clearer what the changes are.
 
-To see what changes have been made for previous versions, check the previous release (0.5.1d).
+To see what changes have been made for previous versions, check the 
+previous release (0.5.1d).
 
 ### Game-play ###
 
 - Giant spider webs can now allow spells cast through them.
 
-- You can now no longer recall from a dungeon to a town in a different location, as it was too unclear for when this case would apply.
+- You can now no longer recall from a dungeon to a town in a different 
+location, as it was too unclear for when this case would apply.
 
-- You can now affect doors and other terrain with bolt spells as well as ball spells.
+- You can now affect doors and other terrain with bolt spells as well 
+as ball spells.
 
 - Smoke/steam removed by cold attacks (Suggested by Adam Horowitz).
 
-- Guardians on surface levels are now generated during daytime as well (But still only night time in towns).
+- Guardians on surface levels are now generated during daytime as well
+ (But still only night time in towns).
 
-- Statues/containers/body parts now give you some information about the monster when you discover them.
+- Statues/containers/body parts now give you some information about the
+ monster when you discover them.
 
 - Removed Create Golem spell until friendly monsters are implemented.
 
-- Added Heavy Armoury, Heavy Weaponsmith, Runesmith and Chemist and added to and reorganised stores in a number of towns.
+- Added Heavy Armoury, Heavy Weaponsmith, Runesmith and Chemist and 
+added to and reorganised stores in a number of towns.
 
-- Improved store inventories in Jewelers, Marketplace, Barracks and Blackmarket to be more appropriate for players at the level they will encounter the stores. Note that the Blackmarket in Angband will now generate items at a deeper level.
+- Improved store inventories in Jewelers, Marketplace, Barracks and 
+Blackmarket to be more appropriate for players at the level they will 
+encounter the stores. Note that the Blackmarket in Angband will now 
+generate items at a deeper level.
 
-- If you are hidden in darkness, a lot more monsters will use light to see by...
+- If you are hidden in darkness, a lot more monsters will use light to
+ see by...
 
 - Dungeon entrances are now lit, so they are easier to find at night...
 
-- Added King of the Wood Elves, Faramir, Boromir and Denethor, and reorganised some of later campaign to be a smoother transition from end of Moria/Isengard/Caradhras.
+- Added King of the Wood Elves, Faramir, Boromir and Denethor, and 
+reorganised some of later campaign to be a smoother transition from end
+ of Moria/Isengard/Caradhras.
 
-- Removed escorts from Tom Bombadil, and summon kin, as it felt a little 'wrong' (Not as bad as killing him of course ;)
+- Removed escorts from Tom Bombadil, and summon kin, as it felt a little
+ 'wrong' (Not as bad as killing him of course ;)
 
-- Made dynamic terrain allowing forests to burn down, seas to have waves and various other effects, poison gas and smoke to spread and disappate.
+- Made dynamic terrain allowing forests to burn down, seas to have waves
+ and various other effects, poison gas and smoke to spread and disappate.
 
-- Added waves and rough water to allow sea water to have waves in it. (Should probably do for all water).
+- Added waves and rough water to allow sea water to have waves in it. 
+(Should probably do for all water).
 
 
 ### User Interface ###
 
-- Added ability to create html screen dumps similar to T.O.M.E. This can be invoked with the ] key on the main map.
+- Added ability to create html screen dumps similar to T.O.M.E. This can 
+be invoked with the ] key on the main map.
 
-- Added ability to create html screen dumps at any time using the Ctrl-right-bracket (^]) short cut. This uses the current visual preferences instead of temporarily reseting these preferences to the underlying settings. However it has much greater flexibility, and can be used anytime Angband expects user interaction.
+- Added ability to create html screen dumps at any time using the Ctrl-
+right-bracket (^]) short cut. This uses the current visual preferences 
+instead of temporarily reseting these preferences to the underlying 
+settings. However it has much greater flexibility, and can be used 
+anytime Angband expects user interaction.
 
-- Now use Enter to continue and ESC to restart the character generation process.
+- Now use Enter to continue and ESC to restart the character generation
+ process.
 
-- You can now recall objects while you are looking at them. You will recall the monster instead if they are a monster body part or container or statue...
+- You can now recall objects while you are looking at them. You will 
+recall the monster instead if they are a monster body part or container
+ or statue...
 
-- Added option view_glowing_lite which applies special (eg torch-lit) lighting to boring grids that are adjacent to glowing features such as torches in a room. This is another 'pretty' function that may cause a slight performance hit, but should make those screen dumps even prettier.
+- Added option view_glowing_lite which applies special (eg torch-lit) 
+lighting to boring grids that are adjacent to glowing features such as 
+torches in a room. This is another 'pretty' function that may cause a 
+slight performance hit, but should make those screen dumps even 
+prettier.
 
 - Updated the help files to reflect the above commands.
 
 
 ### Build / Platform ###
 
-- Added readdib.c and removed angband.res to allow compilation for makefile.cyg
+- Added readdib.c and removed angband.res to allow compilation for 
+makefile.cyg
 
 
 ### Bugfixes ### 
 
-- Fixed bug where archer, shaman, bard classes were getting too many blows.
+- Fixed bug where archer, shaman, bard classes were getting too many 
+blows.
 
-- Fixed bug where ego items would be revealed if they were generated in a store, even if subsequently discarded.
+- Fixed bug where ego items would be revealed if they were generated in
+ a store, even if subsequently discarded.
 
-- Fixed bug where scrolls of Curse Armour/ Curse Weapon effects were reversed.
+- Fixed bug where scrolls of Curse Armour/ Curse Weapon effects were 
+reversed.
 
-- Fixed a bug where Bree town levels extended several levels into the dungeon. (Most bugs reported by Adam Horowitz for this release).
+- Fixed a bug where Bree town levels extended several levels into the 
+dungeon. (Most bugs reported by Adam Horowitz for this release).
 
-- Fix division by 0 bug with guard condition in randart generation code that was causing crashes at end of character generation.
+- Fix division by 0 bug with guard condition in randart generation code
+ that was causing crashes at end of character generation.
 
-- Tidied up some problems with terrain causing crasher bugs in campaign mode. Also fixed some logic problems.
+- Tidied up some problems with terrain causing crasher bugs in campaign
+ mode. Also fixed some logic problems.
 
 - Trapped doors should work now.
 
