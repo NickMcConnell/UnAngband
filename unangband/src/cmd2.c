@@ -2649,7 +2649,7 @@ void do_cmd_fire(void)
 					}
 
 					/* Get item effect */
-					get_spell(&power, "use", o_ptr, FALSE);
+					get_spell(&power, "use", i_ptr, FALSE);
 
 					/* Has a power */
 					/* Always apply powers if ammunition */
@@ -3011,7 +3011,7 @@ void do_cmd_throw(void)
 					}
 
 					/* Get item effect */
-					get_spell(&power, "use", o_ptr, FALSE);
+					get_spell(&power, "use", i_ptr, FALSE);
 
 					/* Has a power */
 					/* Always apply powers if ammunition */
