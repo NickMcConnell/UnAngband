@@ -61,8 +61,8 @@ bool hp_player(int num)
 		}
 
 		/* Heal 35+ */
-                else
-                {
+		else
+		{
 			msg_print("You feel very good.");
 		}
 
@@ -638,7 +638,7 @@ void self_knowledge(void)
 		{
 			text_out("Your weapon has special powers.  ");
 	
-                        list_object_flags(f1,f2,f3,1);
+			list_object_flags(f1,f2,f3,1);
 	
 			object_can_flags(o_ptr,f1,f2,f3);
 	
@@ -2378,76 +2378,77 @@ bool brand_item(int brand, cptr act)
 		object_type *i_ptr;
 		object_type object_type_body;
 
-	/* Hack -- split stack only if required. This is dangerous otherwise as we may
-	   be calling from a routine where we delete items later. XXX XXX */
-	/* Mega-hack -- we allow 5 arrows/shots/bolts to be enchanted per application */
-	if ((o_ptr->number > 1) && ((!brand_ammo) || (o_ptr->number > 5)))
-	{
+		/* Hack -- split stack only if required. This is dangerous otherwise as we may
+		   be calling from a routine where we delete items later. XXX XXX */
+		/* Mega-hack -- we allow 5 arrows/shots/bolts to be enchanted per application */
+		if ((o_ptr->number > 1) && ((!brand_ammo) || (o_ptr->number > 5)))
+		{
 
-		int qty = (brand_ammo) ? 5 : 1;
-		split = TRUE;
+			int qty = (brand_ammo) ? 5 : 1;
+			split = TRUE;
 
-	/* Get local object */
-	i_ptr = &object_type_body;
+			/* Get local object */
+			i_ptr = &object_type_body;
 
-	/* Obtain a local object */
-	object_copy(i_ptr, o_ptr);
+			/* Obtain a local object */
+			object_copy(i_ptr, o_ptr);
 
-	/* Modify quantity */
-	i_ptr->number = qty;
+			/* Modify quantity */
+			i_ptr->number = qty;
 
-	/* Reset stack counter */
-	i_ptr->stackc = 0;
+			/* Reset stack counter */
+			i_ptr->stackc = 0;
 
-	/* Decrease the item (in the pack) */
-	if (item >= 0)
-	{
-		inven_item_increase(item, -qty);
-	    floor_item_describe(0 - item);
-	    inven_item_optimize(item);
-	}
-	/* Decrease the item (from the floor) */
-	else
-	{
-		floor_item_increase(0 - item, -qty);
-		floor_item_describe(0 - item);
-		floor_item_optimize(0 - item);
-	}
-		/* Hack -- use new temporary item */
-		o_ptr = i_ptr;
-	}
+			/* Decrease the item (in the pack) */
+			if (item >= 0)
+			{
+				inven_item_increase(item, -qty);
+				floor_item_describe(0 - item);
+				inven_item_optimize(item);
+			}
+			/* Decrease the item (from the floor) */
+			else
+			{
+				floor_item_increase(0 - item, -qty);
+				floor_item_describe(0 - item);
+				floor_item_optimize(0 - item);
+			}
+
+			/* Hack -- use new temporary item */
+			o_ptr = i_ptr;
+		}
 
 		o_ptr->xtra1 = brand;
 		o_ptr->xtra2 = (byte)rand_int(object_xtra_size[brand]);
 
-			if (object_xtra_what[brand] == 1)
-			{
-		    		object_can_flags(o_ptr,object_xtra_base[brand] << o_ptr->xtra2,0x0L,0x0L);
-			}
-			else if (object_xtra_what[brand] == 2)
-			{
-		    		object_can_flags(o_ptr,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L);
-			}
-			else if (object_xtra_what[brand] == 3)
-			{
-		    		object_can_flags(o_ptr,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2);
-			}
+		if (object_xtra_what[brand] == 1)
+		{
+    			object_can_flags(o_ptr,object_xtra_base[brand] << o_ptr->xtra2,0x0L,0x0L);
+		}
+		else if (object_xtra_what[brand] == 2)
+		{
+	    		object_can_flags(o_ptr,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L);
+		}
+		else if (object_xtra_what[brand] == 3)
+		{
+    			object_can_flags(o_ptr,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2);
+		}
 
 		/* Remove special inscription, if any */
 		if (o_ptr->discount >= INSCRIP_NULL) o_ptr->discount = 0;
 
-		    /* Carry item again if split */
-		    if (split)
-		    {
-			/* Adjust the weight and carry */
-      		  item = inven_carry(o_ptr);
-		    }
-	
 		/* Take note if allowed */
 		if (o_ptr->discount == 0) o_ptr->discount = INSCRIP_MIN_HIDDEN + brand -1;
 	
 		/* The object has been "sensed" */
 		o_ptr->ident |= (IDENT_SENSE);
+
+		/* Carry item again if split */
+		if (split)
+		{
+			/* Adjust the weight and carry */
+      		item = inven_carry(o_ptr);
+		}
 	
 		/* Recalculate bonuses */
 		p_ptr->update |= (PU_BONUS);
@@ -4349,7 +4350,7 @@ static void wield_spell(int item, int sval, int time)
 	p_ptr->equip_cnt++;
 
 	/* Where is the item now */
-        if (((item == INVEN_WIELD) && (o_ptr->number > 1)) || (item == INVEN_BELT))
+	if (((item == INVEN_WIELD) && (o_ptr->number > 1)) || (item == INVEN_BELT))
 	{
 		act = "You are carrying";
 	}
@@ -4358,9 +4359,9 @@ static void wield_spell(int item, int sval, int time)
 		(o_ptr->tval == TV_DIGGING))
 	{
 		act = "You are wielding";
-                if (item == INVEN_ARM) act = "You are wielding off-handed";
+		if (item == INVEN_ARM) act = "You are wielding off-handed";
 	}
-        else if (item == INVEN_WIELD)
+	else if (item == INVEN_WIELD)
 	{
 		act = "You are using";
 	}
@@ -4368,11 +4369,11 @@ static void wield_spell(int item, int sval, int time)
 	{
 		act = "You are playing music with";
 	}
-        else if (item == INVEN_BOW)
+	else if (item == INVEN_BOW)
 	{
 		act = "You are shooting with";
 	}
-        else if (item == INVEN_LITE)
+	else if (item == INVEN_LITE)
 	{
 		act = "Your light source is";
 	}
@@ -5483,7 +5484,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 
 				/* Allow direction to be cancelled for free */
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
-                                if (project_hook(effect, dir, damage, flg)) obvious = TRUE;
+				if (project_hook(effect, dir, damage, flg)) obvious = TRUE;
 				break;
 			}
 			case RBM_AIM:
