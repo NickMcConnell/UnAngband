@@ -2523,7 +2523,7 @@ int breakage_chance(object_type *o_ptr)
 		case TV_FOOD:
 		case TV_JUNK:
 		case TV_SKIN:
-		case TV_FIGURE:
+		case TV_EGG:
 		{
 			return (100);
 		}

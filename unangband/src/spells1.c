@@ -2422,8 +2422,8 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 		/* Attempt to destroy the object */
 		if (do_kill)
 		{
-			/* Containers/figurines release contents */
-			if (((o_ptr->tval == TV_FIGURE) || (o_ptr->tval == TV_HOLD))
+			/* Containers release contents */
+			if ((o_ptr->tval == TV_HOLD)
 				&& (o_ptr->name3 > 0))
 			{
 				while (o_ptr->number)

@@ -22,6 +22,10 @@ bashed or tunnelled through.
 - The player can now be infected with various diseases. A number of disease causing
 monsters from Eyangband have been added.
 
+- Statues of hybrids can now occur. Figurines removed from the back end code.
+
+- Spores and potions will explode when thrown (Potions used to just affect the target).
+
 ### User Interface ###
 
 - Monster recall now reports what particular types of items are dropped by each

@@ -1585,7 +1585,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		case TV_BODY:
 		case TV_SKIN:
 		case TV_HOLD:
-		case TV_FIGURE:
 		{
 			/* Require 'similar' timeouts */
 			if ((o_ptr->timeout != j_ptr->timeout) && (!stack_force_times)
@@ -3485,9 +3484,6 @@ static bool name_drop_okay(int r_idx)
 		/* Only fit elementals in bottles */
 		if ((j_ptr->sval == SV_HOLD_BOTTLE) && !(r_ptr->d_char == 'E') && !(r_ptr->d_char == 'v')) return (FALSE);
 
-		/* Only fit non-spellcasters in sacks */
-		else if ((j_ptr->sval == SV_HOLD_SACK) && ((r_ptr->flags4) || (r_ptr->flags5) || (r_ptr->flags6))) return (FALSE);
-
 		/* Only fit undead in boxes */
 		else if ((j_ptr->sval == SV_HOLD_BOX) && !(r_ptr->flags3 & (RF3_UNDEAD))) return (FALSE);
 
@@ -3495,18 +3491,16 @@ static bool name_drop_okay(int r_idx)
 		else if ((j_ptr->sval == SV_HOLD_CAGE) && !(r_ptr->flags3 & (RF3_ANIMAL))) return (FALSE);
 	}
 
-	else if ((j_ptr->tval == TV_STATUE) || (j_ptr->tval == TV_FIGURE))
+	else if (j_ptr->tval == TV_STATUE)
 	{
-
 		/* Skip never move/never blow */
 		if (r_ptr->flags1 & (RF1_NEVER_MOVE | RF1_NEVER_BLOW)) return (FALSE);
 
 		/* Skip stupid */
 		if (r_ptr->flags2 & (RF2_STUPID)) return (FALSE);
 
-		/* Hack -- force unique statues */
-		if ((j_ptr->tval == TV_STATUE) && !(r_ptr->flags1 & (RF1_UNIQUE))) return (FALSE);
-
+		/* Hack -- force unique or hybrid statues */
+		if ((j_ptr->tval == TV_STATUE) && !(r_ptr->flags1 & (RF1_UNIQUE)) && (r_ptr->d_char != 'H')) return (FALSE);
 	}
 
 	/* Accept */
@@ -3527,7 +3521,7 @@ static void name_drop(object_type *j_ptr)
 	/* Are we done? */
 	if ((j_ptr->tval != TV_BONE) && (j_ptr->tval != TV_EGG) && (j_ptr->tval != TV_STATUE)
 		&& (j_ptr->tval != TV_SKIN) && (j_ptr->tval != TV_BODY) &&
-		(j_ptr->tval != TV_HOLD) && (j_ptr->tval != TV_FIGURE)) return;
+		(j_ptr->tval != TV_HOLD)) return;
 
 	if ((rand_int(100) < (30+ (p_ptr->depth/2))) || (race_drop_idx))
 	{
@@ -3849,7 +3843,6 @@ static bool kind_is_race(int k_idx)
 		case TV_ROD:
 		case TV_STAFF:
 		case TV_WAND:
-		case TV_FIGURE:
 		{
 			if (r_ptr->flags7 & (RF7_DROP_RSW)) return (TRUE);
 			return (FALSE);
@@ -4462,6 +4455,197 @@ void race_near(int r_idx, int y1, int x1)
 	}
 }
 
+
+/*
+ * Break an object near a location. Returns true if actually broken.
+ *
+ * Used to apply object breakage special effects.
+ *
+ * Currently only applies for containers, potions, flasks and eggs.
+ *
+ */
+bool break_near(object_type *j_ptr, int y, int x)
+{
+	char o_name[80];
+
+	bool plural = FALSE;
+
+	u32b flg;
+
+	int damage = 0;
+
+	/* Extract the attack infomation */
+	int effect;
+	int method;
+	int d_dice;
+	int d_side;
+	int d_plus;
+
+	int i;
+
+	bool obvious = FALSE;
+
+	/* Extract plural */
+	if (j_ptr->number != 1) plural = TRUE;
+
+	/* Describe object */
+	object_desc(o_name, sizeof(o_name), j_ptr, FALSE, 0);   
+
+	/* Special case breakages */
+	switch (j_ptr->tval)
+	{
+		/* Containers release contents */
+		case TV_HOLD:
+		{
+			/* Message */
+			msg_format("The %s break%s open.",o_name, (plural ? "" : "s"));
+
+			if (j_ptr->name3 > 0)
+			{
+				while (j_ptr->number)
+				{
+					race_near(j_ptr->name3, y, x);
+
+					j_ptr->number--;
+				}
+			}
+
+			return TRUE;
+		}
+
+		/* Potions and flasks explode. Potions have radius 2 explosions, flasks have radius 1. */
+		case TV_POTION:
+		case TV_FLASK:
+		{
+			int power;
+
+			/* Get item effect */
+			get_spell(&power, "use", j_ptr, FALSE);
+
+			/* Has a power */
+			/* Always apply powers if ammunition */
+			if (power > 0)
+			{
+				spell_type *s_ptr = &s_info[power];
+
+				/* Scan through all four blows */
+				for (i = 0; i < 4; i++)
+				{
+					effect = s_ptr->blow[i].effect;
+					method = s_ptr->blow[i].method;
+					d_dice = s_ptr->blow[i].d_dice;
+					d_side = s_ptr->blow[i].d_side;
+					d_plus = s_ptr->blow[i].d_plus;
+
+					/* Hack -- no more attacks */
+					if (!method) break;
+
+					/* Message */
+					if (!i) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
+
+					/* Mega hack -- dispel evil/undead objects */
+					if (!d_side)
+					{
+						d_plus += 25 * d_dice;
+					}
+
+					/* Roll out the damage */
+					if ((d_dice) && (d_side))
+					{
+						damage = damroll(d_dice, d_side) + d_plus;
+					}
+					else
+					{
+						damage = d_plus;
+					}
+
+					flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+
+					/* Hit with radiate attack */
+					obvious |= project(0, (j_ptr->tval == TV_POTION ? 2 : 1), y, x, damroll(d_side, d_dice),
+						 effect, flg);
+
+				}
+
+				/* Object is used */
+				if ((obvious) && (k_info[j_ptr->k_idx].used < MAX_SHORT)) k_info[j_ptr->k_idx].used++;
+			}
+
+			if (obvious) return TRUE;
+
+			break;
+
+		}
+
+		/* Spores explode with radius 1 effect (Note monster spore attacks are radius 2). */
+		/* Eggs turn into bodies. */
+		case TV_EGG:
+		{
+			/* Spores explode */
+			if ((j_ptr->sval == SV_EGG_SPORE) && (j_ptr->name3 > 0))
+			{
+				while (j_ptr->number)
+				{
+					monster_race *r_ptr = &r_info[j_ptr->name3];
+					monster_lore *l_ptr = &l_list[j_ptr->name3];
+
+					/* Scan through all four blows */
+					for (i = 0; i < 4; i++)
+					{
+						effect = r_ptr->blow[i].effect;
+						method = r_ptr->blow[i].method;
+						d_dice = r_ptr->blow[i].d_dice;
+						d_side = r_ptr->blow[i].d_side;
+
+						/* End of attacks */
+						if (!method) break;
+
+						/* Message */
+						if (!i) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
+
+						/* Skip if not spores */
+						if (method != RBM_SPORE) continue;
+
+						flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+
+						/* Hit with radiate attack */
+						obvious = project(0, 1, y, x, damroll(d_side, d_dice),
+							 effect, flg);
+
+						/* Count "obvious" attacks */
+						if (obvious || (l_ptr->blows[i] > 10))
+						{
+							/* Count attacks of this type */
+							if (l_ptr->blows[i] < MAX_UCHAR)
+							{
+								l_ptr->blows[i]++;
+							}
+						}
+					}
+				}
+
+				if (obvious) return TRUE;
+
+				break;
+
+			}
+			else if ((j_ptr->name3 > 0) && (r_info[j_ptr->name3].flags7 & (RF7_HAS_CORPSE)))
+			{
+				j_ptr->tval = TV_BODY;
+				j_ptr->sval = SV_BODY_CORPSE;
+
+				/* Hack - do not adjust weight. Also, if in process of hatching, will 're-animate'. */
+				return FALSE;
+			}
+		}
+	}
+
+	/* Message */
+	msg_format("The %s disappear%s.",o_name, (plural ? "" : "s"));
+
+	return TRUE;
+}
+
 /*
  * Let an object fall to the ground at or near a location.
  *
@@ -4504,26 +4688,7 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 	/* Handle normal "breakage" */
 	if (!artifact_p(j_ptr) && (rand_int(100) < chance))
 	{
-		/* Containers/figurines release contents */
-		if (((j_ptr->tval == TV_FIGURE) || (j_ptr->tval == TV_HOLD))
-			&& (j_ptr->name3 > 0))
-		{
-			while (j_ptr->number)
-			{
-				race_near(j_ptr->name3, y, x);
-
-				j_ptr->number--;
-			}
-		}
-
-		/* Message */
-		msg_format("The %s disappear%s.",o_name, (plural ? "" : "s"));
-
-		/* Debug */
-		if (p_ptr->wizard) msg_print("Breakage (breakage).");
-
-		/* Failure */
-		return;
+		if (break_near(j_ptr, y, x)) return;
 	}
 
 
@@ -4723,7 +4888,6 @@ void feat_near(int feat, int y, int x)
 	int by, bx;
 	int dy, dx;
 	int ty, tx;
-
 
 	bool flag = FALSE;
 

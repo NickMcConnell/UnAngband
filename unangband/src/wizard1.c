@@ -122,7 +122,6 @@ static const grouper group_item[] =
 	{ TV_JUNK,		  NULL },
 	{ TV_HOLD,      NULL },
 	{ TV_BONE,    NULL },
-	{ TV_FIGURE,      NULL },
 	{ TV_SKIN,    NULL },
 	{ TV_STATUE,    NULL },
 	{ TV_BODY,      NULL },

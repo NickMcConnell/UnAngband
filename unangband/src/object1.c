@@ -826,7 +826,6 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		}
 
 		/* Hack -- Body Parts/Skeletons/Skins etc. */
-		case TV_FIGURE:
 		case TV_BODY:
 		case TV_BONE:
 		case TV_EGG:
@@ -845,6 +844,13 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 					case TV_HOLD:
 						modstr = "empty";
 						break;
+					case TV_EGG:
+						if (o_ptr->sval == SV_EGG_SPORE)
+						{
+							modstr = "dried";
+							break;
+						}
+						/* Drop down */
 					default:
 						modstr = "broken";
 						break;
