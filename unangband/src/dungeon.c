@@ -2048,6 +2048,13 @@ static void process_command(void)
 			break;
 		}
 
+		/* Assemble a mechanism */
+		case 'Y':
+		{
+			do_cmd_assemble();
+			break;
+		}
+
 		/*** Looking at Things (nearby or on map) ***/
 
 		/* Full dungeon map */

@@ -425,6 +425,7 @@ extern void do_cmd_read_scroll(void);
 extern void do_cmd_use_staff(void);
 extern void do_cmd_aim_wand(void);
 extern void do_cmd_zap_rod(void);
+extern void do_cmd_assemble(void);
 extern void do_cmd_activate(void);
 extern void do_cmd_apply_rune(void);
 

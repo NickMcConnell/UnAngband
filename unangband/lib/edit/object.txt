@@ -5337,7 +5337,6 @@ G:~:s
 I:12:15:3
 W:0:0:100:0
 P:0:1d1:0:0:0
-F:ACTIVATE
 
 # The below items are for non-standard assembly order...
 

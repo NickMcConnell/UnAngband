@@ -1153,51 +1153,312 @@ static void assemble_parts(int *src_sval, int *tgt_sval, const int r_idx)
 			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_L) {*tgt_sval = SV_ASSEMBLY_PART_HAND_L;} 
 			else if (*tgt_sval == SV_ASSEMBLY_PART_ARMS)  {*tgt_sval = SV_ASSEMBLY_MISS_HAND_R;}
 			else if (*tgt_sval == SV_ASSEMBLY_MISS_HAND_L) {*tgt_sval = SV_ASSEMBLY_PART_HANDS;}
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_MISS_HAND_R;}
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) &&!(r_info[r_idx].flags7 & (RF7_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_MISS_HAND_R;}
 			break;
 		case SV_ASSEMBLY_HAND_R:
 			if (*tgt_sval == SV_ASSEMBLY_HAND_L) {*tgt_sval = SV_ASSEMBLY_HANDS;} 
 			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_R) {*tgt_sval = SV_ASSEMBLY_PART_HAND_R;} 
 			else if (*tgt_sval == SV_ASSEMBLY_PART_ARMS)  {*tgt_sval = SV_ASSEMBLY_MISS_HAND_L;}
 			else if (*tgt_sval == SV_ASSEMBLY_MISS_HAND_R) {*tgt_sval = SV_ASSEMBLY_PART_HANDS;} 
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_MISS_HAND_L;}
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_MISS_HAND_L;}
 			break;
 		case SV_ASSEMBLY_ARMS:
-			if (*tgt_sval == SV_ASSEMBLY_NONE) {*tgt_sval = SV_ASSEMBLY_ARMS;} 
-			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_R) {*tgt_sval = SV_ASSEMBLY_ARMS; *src_sval = SV_ASSEMBLY_ARM_L; } 
-			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_L) {*tgt_sval = SV_ASSEMBLY_ARMS; *src_sval = SV_ASSEMBLY_ARM_R; }
+			if (*tgt_sval == SV_ASSEMBLY_NONE) {*tgt_sval = SV_ASSEMBLY_PART_ARMS;} 
+			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_R) {*tgt_sval = SV_ASSEMBLY_PART_ARMS; *src_sval = SV_ASSEMBLY_ARM_L; } 
+			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_L) {*tgt_sval = SV_ASSEMBLY_PART_ARMS; *src_sval = SV_ASSEMBLY_ARM_R; }
 			break;
 		case SV_ASSEMBLY_HANDS:
 			if (*tgt_sval == SV_ASSEMBLY_PART_ARM_R) {*tgt_sval = SV_ASSEMBLY_PART_HAND_R; *src_sval = SV_ASSEMBLY_HAND_L;}
 			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_L) {*tgt_sval = SV_ASSEMBLY_PART_HAND_L; *src_sval = SV_ASSEMBLY_HAND_R;}
-			else if (*tgt_sval == SV_ASSEMBLY_PART_ARMS) {*tgt_sval = SV_ASSEMBLY_HANDS;}
-			else if (*tgt_sval == SV_ASSEMBLY_MISS_HAND_R) {*tgt_sval = SV_ASSEMBLY_HANDS; *src_sval = SV_ASSEMBLY_HAND_L;}
-			else if (*tgt_sval == SV_ASSEMBLY_MISS_HAND_L) {*tgt_sval = SV_ASSEMBLY_HANDS; *src_sval = SV_ASSEMBLY_HAND_R;}
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_PART_HANDS;}
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_PART_HAND_L; *src_sval = SV_ASSEMBLY_HAND_R;}
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_PART_HAND_R; *src_sval = SV_ASSEMBLY_HAND_L;}
+			else if (*tgt_sval == SV_ASSEMBLY_PART_ARMS) {*tgt_sval = SV_ASSEMBLY_PART_HANDS;}
+			else if (*tgt_sval == SV_ASSEMBLY_MISS_HAND_R) {*tgt_sval = SV_ASSEMBLY_PART_HANDS; *src_sval = SV_ASSEMBLY_HAND_L;}
+			else if (*tgt_sval == SV_ASSEMBLY_MISS_HAND_L) {*tgt_sval = SV_ASSEMBLY_PART_HANDS; *src_sval = SV_ASSEMBLY_HAND_R;}
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_PART_HANDS;}
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_PART_HAND_L; *src_sval = SV_ASSEMBLY_HAND_R;}
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_PART_HAND_R; *src_sval = SV_ASSEMBLY_HAND_L;}
+			break;
 		case SV_ASSEMBLY_LEG_L:
 			if (*tgt_sval == SV_ASSEMBLY_PART_HANDS) {*tgt_sval = SV_ASSEMBLY_PART_LEG_L;}
-			else if (*tgt_sval == SV_ASSEMBLY_LEG_R) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM | RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_L;}
-			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && !(r_info[r_idx].flags7 & (RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_L;}
+			else if (*tgt_sval == SV_ASSEMBLY_LEG_R) {*tgt_sval = SV_ASSEMBLY_LEGS;}
+			else if (*tgt_sval == SV_ASSEMBLY_PART_LEG_R) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM | RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_L;}
+			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_L;}
+			break;
 		case SV_ASSEMBLY_LEG_R:
 			if (*tgt_sval == SV_ASSEMBLY_PART_HANDS) {*tgt_sval = SV_ASSEMBLY_PART_LEG_R;}
-			else if (*tgt_sval == SV_ASSEMBLY_LEG_L) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM | RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_R;}
-			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && !(r_info[r_idx].flags7 & (RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_R;}
+			else if (*tgt_sval == SV_ASSEMBLY_LEG_L) {*tgt_sval = SV_ASSEMBLY_LEGS;}
+			else if (*tgt_sval == SV_ASSEMBLY_PART_LEG_L) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM | RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_R;}
+			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_R;}
+			break;
 		case SV_ASSEMBLY_LEGS:
 			if (*tgt_sval == SV_ASSEMBLY_PART_HANDS) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
-			else if (*tgt_sval == SV_ASSEMBLY_LEG_L) {*tgt_sval = SV_ASSEMBLY_PART_LEGS; *src_sval = SV_ASSEMBLY_LEG_R; }
-			else if (*tgt_sval == SV_ASSEMBLY_LEG_R) {*tgt_sval = SV_ASSEMBLY_PART_LEGS; *src_sval = SV_ASSEMBLY_LEG_L; }
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM | RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
-			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && !(r_info[r_idx].flags7 & (RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
+			else if (*tgt_sval == SV_ASSEMBLY_LEG_L) {*tgt_sval = SV_ASSEMBLY_LEGS; *src_sval = SV_ASSEMBLY_LEG_R; }
+			else if (*tgt_sval == SV_ASSEMBLY_LEG_R) {*tgt_sval = SV_ASSEMBLY_LEGS; *src_sval = SV_ASSEMBLY_LEG_L; }
+			else if (*tgt_sval == SV_ASSEMBLY_PART_LEG_L) {*tgt_sval = SV_ASSEMBLY_PART_LEGS; *src_sval = SV_ASSEMBLY_LEG_R; }
+			else if (*tgt_sval == SV_ASSEMBLY_PART_LEG_R) {*tgt_sval = SV_ASSEMBLY_PART_LEGS; *src_sval = SV_ASSEMBLY_LEG_L; }
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM | RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
+			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
+			break;
 		case SV_ASSEMBLY_HEAD:
-			if ((*tgt_sval == SV_ASSEMBLY_NONE) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM | RF7_HAS_HAND | RF7_HAS_LEG))) {*tgt_sval = SV_ASSEMBLY_FULL;}
-			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && !(r_info[r_idx].flags7 & (RF7_HAS_HAND | RF7_HAS_LEG))) {*tgt_sval = SV_ASSEMBLY_FULL;}
-		break;
+			if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM | RF7_HAS_HAND | RF7_HAS_LEG))) {*tgt_sval = SV_ASSEMBLY_FULL;}
+			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_HAND | RF7_HAS_LEG))) {*tgt_sval = SV_ASSEMBLY_FULL;}
+			break;
 	}
 }
+
+static int assembly_sval;
+static int assembly_name3;
+
+/*
+ * Hook to determine if an object is assembly and activatable
+ */
+static bool item_tester_hook_assemble(const object_type *o_ptr)
+{
+	u32b f1, f2, f3;
+
+	/* Not assembly */
+	if (o_ptr->tval != TV_ASSEMBLY) return (FALSE);
+
+	/* Extract the flags */
+	object_flags(o_ptr, &f1, &f2, &f3);
+
+	/* Check activation flag */
+	if (f3 & (TR3_ACTIVATE)) return (TRUE);
+
+	/* Assume not */
+	return (FALSE);
+ }
+
+
+/*
+ * Hook to determine if an object can be assembled to
+ */
+static bool item_tester_hook_assembly(const object_type *o_ptr)
+{
+	/* Make sure the same type */
+	if (o_ptr->name3 != assembly_name3) return (FALSE);	
+
+	/* Re-attached assemblies to assemblies */
+	if (o_ptr->tval == TV_ASSEMBLY)
+	{
+		int tgt_sval = o_ptr->sval;
+		int src_sval = assembly_sval;
+
+		assemble_parts(&src_sval,&tgt_sval, assembly_name3);
+
+		if (tgt_sval != o_ptr->sval) return (TRUE);
+	}
+
+	/* Assume not */
+	return (FALSE);
+}
+
+
+/*
+ * Assemble an assembly.
+ */
+void do_cmd_assemble(void)
+{
+	int item, item2, lev, chance;
+
+	object_type *o_ptr, *j_ptr;
+
+	cptr q, s;
+
+	int src_sval, tgt_sval = 0;
+
+	/* Prepare the hook */
+	item_tester_hook = item_tester_hook_assemble;
+
+	/* Get an item */
+	q = "Assemble which item? ";
+	s = "You have nothing to assemble.";
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) return;
+
+	/* Get the item (in the pack) */
+	if (item >= 0)
+	{
+		o_ptr = &inventory[item];
+	}
+
+	/* Get the item (on the floor) */
+	else
+	{
+		o_ptr = &o_list[0 - item];
+	}
+
+
+	/* Take a (partial) turn */
+	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
+	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
+	else p_ptr->energy_use = 100;
+
+	/* Extract the item level */
+	lev = k_info[o_ptr->k_idx].level;
+
+	/* Hack -- use monster level instead */
+	if (o_ptr->name3) lev = r_info[o_ptr->name3].level;
+
+	/* Base chance of success */
+	chance = p_ptr->skill_dev;
+
+	/* Confusion hurts skill */
+	if (p_ptr->confused) chance = chance / 2;
+
+	/* High level objects are harder */
+	chance = chance - ((lev > 50) ? 50 : lev);
+
+	/* Give everyone a (slight) chance */
+	if ((chance < USE_DEVICE) && (rand_int(USE_DEVICE - chance + 1) == 0))
+	{
+		chance = USE_DEVICE;
+	}
+
+	/* Roll for usage */
+	if ((chance < USE_DEVICE) || (randint(chance) < USE_DEVICE))
+	{
+		if (flush_failure) flush();
+		msg_print("You failed to understand it properly.");
+		return;
+	}
+
+	/* Initialise static variables */
+	assembly_name3 = o_ptr->name3;
+	assembly_sval = o_ptr->sval;
+
+	/* Prepare the hook */
+	item_tester_hook = item_tester_hook_assembly;
+
+	/* Get an item */
+	q = "Assemble with which item? ";
+	s = "You have nothing to assemble this with.";
+	if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR))) return;
+	
+	/* Get the item (in the pack) */
+	if (item2 >= 0)
+	{
+		j_ptr = &inventory[item2];
+	}
+
+	/* Get the item (on the floor) */
+	else
+	{
+		j_ptr = &o_list[0 - item2];
+	}
+
+	/* Initialise svals */
+	src_sval = o_ptr->sval;
+	tgt_sval = j_ptr->sval;
+
+	assemble_parts(&src_sval,&tgt_sval, o_ptr->name3);
+
+	if (tgt_sval != j_ptr->sval)
+	{
+		object_type *i_ptr, *k_ptr;
+		object_type object_type_body, object_type_body2;
+
+		/* Get local object */
+		i_ptr = &object_type_body;
+
+		/* Obtain a local object */
+		object_copy(i_ptr, j_ptr);
+
+		/* Modify quantity */
+		i_ptr->number = 1;
+
+		/* Reset stack counter */
+		i_ptr->stackc = 0;
+
+		/* Get local object */
+		k_ptr = &object_type_body2;
+
+		/* Obtain a local object */
+		object_copy(k_ptr, o_ptr);
+
+		/* Modify quantity */
+		k_ptr->number = 1;
+
+		/* Reset stack counter */
+		k_ptr->stackc = 0;
+
+		/* Decrease the item (in the pack) */
+		if (item >= 0)
+		{
+			inven_item_increase(item, -1);
+			inven_item_describe(item);
+
+			/* Hack -- handle deletion of item slot */
+			if ((inventory[item].number == 0)
+			   && (item < item2)
+				&& (item2 < INVEN_WIELD)) item2--;
+
+			inven_item_optimize(item);
+		}
+		/* Decrease the item (from the floor) */
+		else
+		{
+			floor_item_increase(0 - item, -1);
+			floor_item_describe(0 - item);
+			floor_item_optimize(0 - item);
+		}
+
+		/* Decrease the item (in the pack) */
+		if (item2 >= 0)
+		{
+			inven_item_increase(item2, -1);
+			inven_item_optimize(item2);
+		}
+		/* Decrease the item (from the floor) */
+		else
+		{
+			floor_item_increase(0 - item2, -1);
+			floor_item_optimize(item2);
+		}
+
+		/* Modify the target item */
+		i_ptr->k_idx = lookup_kind(i_ptr->tval, tgt_sval);
+		i_ptr->sval = tgt_sval;
+		if (src_sval != k_ptr->sval) i_ptr->weight += k_ptr->weight /2;
+		else i_ptr->weight += k_ptr->weight;
+		if (k_info[i_ptr->k_idx].pval) i_ptr->timeout = randint(k_info[i_ptr->k_idx].pval) + k_info[i_ptr->k_idx].pval;
+
+		/* Adjust the weight and carry */
+		if (item2 >= 0)
+		{
+			p_ptr->total_weight -= i_ptr->weight;
+			item2 = inven_carry(i_ptr);
+			inven_item_describe(item2);
+		}
+		else
+		{
+			item2 = floor_carry(p_ptr->py,p_ptr->px,i_ptr);
+			floor_item_describe(item2);
+		}
+
+		if (src_sval != k_ptr->sval)
+		{
+			/* Modify the source item */
+			k_ptr->k_idx = lookup_kind(k_ptr->tval, src_sval);
+			k_ptr->sval = src_sval;
+			k_ptr->weight /= 2;
+
+			/* Adjust the weight and carry */
+			if (item >= 0)
+			{
+				p_ptr->total_weight -= k_ptr->weight;
+				item = inven_carry(k_ptr);
+				inven_item_describe(item);
+			}
+			else
+			{
+				item = floor_carry(p_ptr->py,p_ptr->px,k_ptr);
+				floor_item_describe(item);
+			}
+		}
+	}
+}
+
 
 
 /*
@@ -1218,35 +1479,6 @@ static bool item_tester_hook_activate(const object_type *o_ptr)
 
 	/* Check activation flag */
 	if (f3 & (TR3_ACTIVATE)) return (TRUE);
-
-	/* Assume not */
-	return (FALSE);
-}
-
-static int assembly_sval;
-static int assembly_name3;
-
-/*
- * Hook to determine if an object can be assembled to
- */
-static bool item_tester_hook_assemble(const object_type *o_ptr)
-{
-	/* Not known */
-	if (!object_known_p(o_ptr)) return (FALSE);
-
-	/* Make sure the same type */
-	if (o_ptr->name3 != assembly_name3) return (FALSE);	
-
-	/* Re-attached assemblies to assemblies */
-	if (o_ptr->tval == TV_ASSEMBLY)
-	{
-		int tgt_sval = o_ptr->sval;
-		int src_sval = assembly_sval;
-
-		assemble_parts(&src_sval,&tgt_sval, assembly_name3);
-
-		if (tgt_sval != o_ptr->sval) return (TRUE);
-	}
 
 	/* Assume not */
 	return (FALSE);
@@ -1381,136 +1613,8 @@ void do_cmd_activate(void)
 	/* Activate the artifact */
 	message(MSG_ZAP, 0, "You activate it...");
 
-	/* Hack -- assemblies */
-	if (o_ptr->tval == TV_ASSEMBLY)
-	{
-		object_type *j_ptr;
-
-		int tgt_sval = 0;
-		int src_sval = o_ptr->sval;
-
-		int item2;
-
-		/* Prepare the hook */
-		item_tester_hook = item_tester_hook_assemble;
-
-		/* Get an item */
-		q = "Assemble with which item? ";
-		s = "You have nothing to assemble.";
-		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_EQUIP))) return;
-	
-		/* Get the item (in the pack) */
-		if (item2 >= 0)
-		{
-			j_ptr = &inventory[item2];
-		}
-
-		/* Get the item (on the floor) */
-		else
-		{
-			j_ptr = &o_list[0 - item2];
-		}
-
-		tgt_sval = j_ptr->sval;
-
-		assemble_parts(&src_sval,&tgt_sval, o_ptr->name3);
-
-		if (tgt_sval != j_ptr->sval)
-		{
-			object_type *i_ptr;
-			object_type object_type_body;
-
-			/* Get local object */
-			i_ptr = &object_type_body;
-
-			/* Obtain a local object */
-			object_copy(i_ptr, j_ptr);
-
-			/* Modify quantity */
-			i_ptr->number = 1;
-
-			/* Clear stack counter */
-			i_ptr->stackc = 0;
-
-			/* Unstack the used item */
-			j_ptr->number--;
-
-			/* Modify the item */
-			i_ptr->k_idx = lookup_kind(o_ptr->tval, tgt_sval);
-			i_ptr->sval = tgt_sval;
-			if (src_sval != o_ptr->sval) i_ptr->weight += o_ptr->weight /2;
-			else i_ptr->weight += o_ptr->weight;
-			if (k_info[i_ptr->k_idx].pval) i_ptr->timeout = randint(k_info[i_ptr->k_idx].pval) + k_info[i_ptr->k_idx].pval;
-
-			/* Adjust the weight and carry */
-			if (item2 >= 0)
-			{
-				p_ptr->total_weight -= i_ptr->weight;
-				item2 = inven_carry(i_ptr);
-			}
-			else
-			{
-				item2 = floor_carry(p_ptr->py,p_ptr->px,i_ptr);
-				floor_item_describe(item2);
-			}
-
-			if (src_sval != o_ptr->sval)
-			{
-				/* Get local object */
-				i_ptr = &object_type_body;
-
-				/* Obtain a local object */
-				object_copy(i_ptr, o_ptr);
-
-				/* Modify quantity */
-				i_ptr->number = 1;
-
-				/* Clear stack counter */
-				i_ptr->stackc = 0;
-
-				/* Unstack the used item */
-				o_ptr->number--;
-
-				/* Modify the item */
-				i_ptr->k_idx = lookup_kind(o_ptr->tval, tgt_sval);
-				i_ptr->sval = tgt_sval;
-				if (src_sval != o_ptr->sval) i_ptr->weight += o_ptr->weight /2;
-				else i_ptr->weight += o_ptr->weight;
-				if (i_ptr->sval == SV_ASSEMBLY_FULL) i_ptr->timeout = randint(i_ptr->pval + i_ptr->pval);
-
-				/* Adjust the weight and carry */
-				if (item >= 0)
-				{
-					p_ptr->total_weight -= i_ptr->weight;
-					item2 = inven_carry(i_ptr);
-				}
-				else
-				{
-					item2 = floor_carry(p_ptr->py,p_ptr->px,i_ptr);
-					floor_item_describe(item2);
-				}
-			}
-
-			/* Destroy an assembly in the pack */
-			if (item >= 0)
-			{
-				inven_item_increase(item, -1);
-				inven_item_describe(item);
-				inven_item_optimize(item);
-			}
-
-			/* Destroy an assembly on the floor */
-			else
-			{
-				floor_item_increase(0 - item, -1);
-				floor_item_describe(0 - item);
-				floor_item_optimize(0 - item);
-			}
-		}
-	}
-
 	/* Artifacts */
-	else if (o_ptr->name1)
+	if (o_ptr->name1)
 	{
 		artifact_type *a_ptr = &a_info[o_ptr->name1];
 
