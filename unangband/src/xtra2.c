@@ -2765,14 +2765,22 @@ bool modify_panel(int wy, int wx)
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
 	/* Verify wy, adjust if needed */
-	if (!zone->fill) wy = 0;
+	if (!zone->fill)
+	{
+		if (wy > TOWN_HGT - SCREEN_HGT) wy = TOWN_HGT - SCREEN_HGT;
+		else if (wy < 0) wy = 0;
+	}
 	else if (wy > DUNGEON_HGT - SCREEN_HGT) wy = DUNGEON_HGT - SCREEN_HGT;
-	else if (wy < 0) wy = 0;
+
+	if (wy < 0) wy = 0;
 
 	/* Verify wx, adjust if needed */
-	if (!zone->fill) wx = 0;
+	if (!zone->fill)
+	{
+		if (wx > TOWN_WID - SCREEN_WID) wx = TOWN_WID - SCREEN_WID;
+		else if (wx < 0) wx = 0;
+	}
 	else if (wx > DUNGEON_WID - SCREEN_WID) wx = DUNGEON_WID - SCREEN_WID;
-	else if (wx < 0) wx = 0;
 
 	/* React to changes */
 	if ((p_ptr->wy != wy) || (p_ptr->wx != wx))

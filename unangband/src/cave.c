@@ -1544,7 +1544,6 @@ void lite_spot(int y, int x)
 }
 
 
-
 /*
  * Redraw (on the screen) the current map panel
  *
@@ -1556,7 +1555,6 @@ void prt_map(void)
 {
 	byte a;
 	char c;
-
 	byte ta;
 	char tc;
 
@@ -1565,13 +1563,13 @@ void prt_map(void)
 	int ty, tx;
 
 	/* Assume screen */
-	ty = ROW_MAP + SCREEN_HGT;
-	tx = COL_MAP + SCREEN_WID;
+	ty = p_ptr->wy + SCREEN_HGT;
+	tx = p_ptr->wx + SCREEN_WID;
 
 	/* Dump the map */
-	for (y = p_ptr->wy, vy = ROW_MAP; vy < ty; vy++, y++)
+	for (y = p_ptr->wy, vy = ROW_MAP; y < ty; vy++, y++)
 	{
-		for (x = p_ptr->wx, vx = COL_MAP; vx < tx; vx++, x++)
+		for (x = p_ptr->wx, vx = COL_MAP; x < tx; vx++, x++)
 		{
 			/* Check bounds */
 			if (!in_bounds(y, x)) continue;
@@ -1594,8 +1592,6 @@ void prt_map(void)
 			}
 		}
 	}
-
-	return;
 }
 
 
@@ -1787,6 +1783,8 @@ void display_map(int *cy, int *cx)
 	row = (py * map_hgt / dungeon_hgt);
 	col = (px * map_wid / dungeon_wid);
 
+	if (use_bigtile)
+		col = col & ~1;
 
 	/*** Make sure the player is visible ***/
 

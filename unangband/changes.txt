@@ -16,6 +16,8 @@ are unaffected (Bug 682).
 
 - Improved 'visual' editting code from Hengband (Bug 778) [Incomplete].
 
+- Fixed map refresh bugs caused in big tile mode (Bug 780).
+
 
 ### Build / Platform ###
 
