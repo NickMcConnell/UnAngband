@@ -7,6 +7,8 @@ and 'YES' for any feature which does not have an entry (eg uses original
 ASCII graphics). This feature is not yet supported by any in-game display
 option and pref file tools.
 
+- Knowledge menu sub-items are sorted alphabetically. This could be changed 
+in the future to allow a selection of possible sort orders (Depth, kills etc).
 
 ### Bug fixes ###
 

@@ -1913,8 +1913,8 @@ void do_cmd_visuals(void)
 				fprintf(fff, "# %s\n", (f_name + f_ptr->name));
 
 				/* Dump the feature attr/char info */
-				fprintf(fff, "F:%d:0x%02X:0x%02X\n\n", i,
-					(byte)(f_ptr->x_attr), (byte)(f_ptr->x_char));
+				fprintf(fff, "F:%d:0x%02X:0x%02X:%s\n\n", i,
+					(byte)(f_ptr->x_attr), (byte)(f_ptr->x_char),(f_ptr->flags2 & (FF2_ATTR_LITE)) ? "YES" : "NO");
 			}
 
 			/* All done */
@@ -3208,8 +3208,21 @@ static int collect_monsters(int grp_cur, int *mon_idx, int mode)
 		/* Check for race in the group */
 		if (grp_unique || strchr(group_char, r_ptr->d_char))
 		{
+			int idx, ii, tmp;
+
+			for (ii = 0, idx = i;ii < mon_cnt; ii++)
+			{
+				if (strcmp(r_name + r_info[idx].name, r_name + r_info[mon_idx[ii]].name) <= 0)
+				{
+					tmp = idx;
+					idx = mon_idx[ii];
+					mon_idx[ii] = tmp;
+				}
+
+			}
+
 			/* Add the race */
-			mon_idx[mon_cnt++] = i;
+			mon_idx[mon_cnt++] = idx;
 
 			/* XXX Hack -- Just checking for non-empty group */
 			if (mode & 0x01) break;
@@ -3244,15 +3257,35 @@ static int collect_ego_items(int grp_cur, int object_idx[])
 		/* Skip empty objects */
 		if (!e_ptr->name) continue;
 
-		/* Test if this is a legal ego-item type for this object */
-		for (j = 0, k = 0; j < 3; j++) if (group_tval == e_ptr->tval[j]) k++;
-		if (!(k))  continue; 
-
 		/* Require objects ever seen*/
 		if (!(cheat_lore) && !(e_ptr->aware)) continue;
 
-		/* Add the race */
-		object_idx[object_cnt++] = i;
+		/* Test if this is a legal ego-item type for this object */
+		for (j = 0, k = 0; j < 3; j++) if (group_tval == e_ptr->tval[j]) k++;
+
+		/* Check for race in the group */
+		if (k)
+		{
+			int idx, ii, tmp;
+
+			for (ii = 0, idx = i;ii < object_cnt; ii++)
+			{
+				/* XXX Need to remove leading ' of' or single-quote */
+
+				if (strcmp(e_name + e_info[idx].name, e_name + e_info[object_idx[ii]].name) <= 0)
+				{
+					tmp = idx;
+					idx = object_idx[ii];
+					object_idx[ii] = tmp;
+				}
+
+			}
+
+			/* Add the race */
+			object_idx[object_cnt++] = idx;
+
+		}
+
 	}
 
 	/* Terminate the list */
@@ -3347,7 +3380,7 @@ static int collect_artifacts(int grp_cur, int object_idx[])
 	/* Get a list of x_char in this group */
 	byte group_tval = object_group_tval[grp_cur];
 
-	int k, y, x;
+	int y, x;
 
 	bool *okay;
 
@@ -3355,12 +3388,12 @@ static int collect_artifacts(int grp_cur, int object_idx[])
 	C_MAKE(okay, z_info->a_max, bool);
 
 	/* Scan the artifacts */
-	for (k = 0; k < z_info->a_max; k++)
+	for (i = 0; i < z_info->a_max; i++)
 	{
-		artifact_type *a_ptr = &a_info[k];
+		artifact_type *a_ptr = &a_info[i];
 
 		/* Default */
-		okay[k] = FALSE;
+		okay[i] = FALSE;
 
 		/* Skip "empty" artifacts */
 		if (!a_ptr->name) continue;
@@ -3369,7 +3402,7 @@ static int collect_artifacts(int grp_cur, int object_idx[])
 		if (!(cheat_lore) && !a_ptr->cur_num) continue;
 
 		/* Assume okay */
-		okay[k] = TRUE;
+		okay[i] = TRUE;
 	}
 
 	/* Check the dungeon */
@@ -3421,18 +3454,33 @@ static int collect_artifacts(int grp_cur, int object_idx[])
 	}
 
 	/* Scan the artifacts */
-	for (k = 0; k < z_info->a_max; k++)
+	for (i = 0; i < z_info->a_max; i++)
 	{
-		artifact_type *a_ptr = &a_info[k];
+		artifact_type *a_ptr = &a_info[i];
 
 		/* List "dead" ones */
-		if (!okay[k]) continue;
+		if (!okay[i]) continue;
 
 		/* Check for race in the group */
 		if (a_ptr->tval == group_tval)
 		{
+			int idx, ii, tmp;
+
+			for (ii = 0, idx = i;ii < object_cnt; ii++)
+			{
+				/* XXX Need to remove leading ' of' or single-quote */
+
+				if (strcmp(a_name + a_info[idx].name, a_name + a_info[object_idx[ii]].name) <= 0)
+				{
+					tmp = idx;
+					idx = object_idx[ii];
+					object_idx[ii] = tmp;
+				}
+
+			}
+
 			/* Add the race */
-			object_idx[object_cnt++] = k;
+			object_idx[object_cnt++] = idx;
 		}
 	}
 
@@ -5112,24 +5160,23 @@ static int collect_features(int grp_cur, int *feat_idx)
 		if (f_ptr->mimic != i) continue;
 
 		/* Check for any flags matching in the group */
-		if (f_ptr->flags1 & (flags1))
+		if ((f_ptr->flags1 & (flags1)) || (f_ptr->flags2 & (flags2)) || (f_ptr->flags3 & (flags3)))
 		{
-			/* Add the race */
-			feat_idx[feat_cnt++] = i;
-		}
+			int idx, ii, tmp;
 
-		/* Check for any flags matching in the group */
-		else if (f_ptr->flags2 & (flags2))
-		{
-			/* Add the race */
-			feat_idx[feat_cnt++] = i;
-		}
+			for (ii = 0, idx = i;ii < feat_cnt; ii++)
+			{
+				if (strcmp(f_name + f_info[idx].name, f_name + f_info[feat_idx[ii]].name) <= 0)
+				{
+					tmp = idx;
+					idx = feat_idx[ii];
+					feat_idx[ii] = tmp;
+				}
 
-		/* Check for any flags matching in the group */
-		else if (f_ptr->flags3 & (flags3))
-		{
+			}
+
 			/* Add the race */
-			feat_idx[feat_cnt++] = i;
+			feat_idx[feat_cnt++] = idx;
 		}
 	}
 
