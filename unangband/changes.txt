@@ -23,6 +23,11 @@ were generated in a store, even if subsequently discarded.
 effects were reversed.
 - Fixed a bug where Bree town levels extended several
 levels into the dungeon.
+- Now use Enter to continue and ESC to restart the
+character generation process.
+- Fix division by 0 bug with guard condition in randart
+generation code that was causing crashes at end of
+character generation.
 
 
 
