@@ -19,6 +19,8 @@ not randomly appear in the dungeon. (Reported by topazg).
 - Delete the dump.prf file after generating a screen dump, to prevent this
 file becoming excessively large.
 
+- Fixed broken html dump code.
+
 
 UnAngband 0.5.4c: "Competitive Fix"
 

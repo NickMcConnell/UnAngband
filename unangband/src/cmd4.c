@@ -2824,17 +2824,17 @@ void do_cmd_save_screen(void)
 
 	FILE *fff;
 
-	char file_name[1024];
+	char buf[1024];
 
 
 	/* Build the filename */
-	path_build(file_name, 1024, ANGBAND_DIR_USER, "dump.txt");
+	path_build(buf, 1024, ANGBAND_DIR_USER, "dump.txt");
 
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
 
 	/* Append to the file */
-	fff = my_fopen(file_name, "w");
+	fff = my_fopen(buf, "w");
 
 	/* Oops */
 	if (!fff) return;
@@ -2914,17 +2914,17 @@ void do_cmd_save_screen_html(void)
 
 	FILE *fff;
 
-	char buf[1024];
+	char file_name[1024];
 
 
 	/* Build the filename */
-	path_build(buf, 1024, ANGBAND_DIR_USER, "dump.prf");
+	path_build(file_name, 1024, ANGBAND_DIR_USER, "dump.prf");
 
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
 
 	/* Append to the file */
-	fff = my_fopen(buf, "w");
+	fff = my_fopen(file_name, "w");
 
 	/* Oops */
 	if (!fff) return;
@@ -2941,8 +2941,8 @@ void do_cmd_save_screen_html(void)
 		fprintf(fff, "# %s\n", (f_name + f_ptr->name));
 
 		/* Dump the attr/char info */
-		fprintf(fff, "F:%d:0x%02X:0x%02X\n\n", i,
-			(byte)(f_ptr->x_attr), (byte)(f_ptr->x_char));
+		fprintf(fff, "F:%d:0x%02X:0x%02X:%s\n\n", i,
+			(byte)(f_ptr->x_attr), (byte)(f_ptr->x_char), (f_ptr->flags2 & (FF2_ATTR_LITE) ? "YES" : "NO"));
 
 		/* Assume we will use the underlying values */
 		f_ptr->x_attr = f_ptr->d_attr;
