@@ -196,7 +196,8 @@ static void do_cmd_travel(void)
 			}
 
 			/* Hack -- need a map to leave dungeon */
-			if (p_ptr->dungeon == 0) return;
+			/* if (p_ptr->dungeon == 0) return; */
+			if (!adult_campaign && p_ptr->dungeon == 0) return;
 
 			if ((selection==p_ptr->dungeon) && !(adult_campaign))
 			{
