@@ -3045,9 +3045,9 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3)
 		if (!i_ptr->k_idx) continue;
 
 		/* Clear may flags */
-		o_ptr->may_flags1 &= ~(if1);
-		o_ptr->may_flags2 &= ~(if2);
-		o_ptr->may_flags3 &= ~(if3);
+		i_ptr->may_flags1 &= ~(if1);
+		i_ptr->may_flags2 &= ~(if2);
+		i_ptr->may_flags3 &= ~(if3);
 	}
 
 	/* Mark can flags */
