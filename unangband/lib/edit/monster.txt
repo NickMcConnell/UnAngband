@@ -14791,8 +14791,8 @@ N:1022:Green giant
 G:P:G
 I:110:33d16:20:60:50
 W:29:1:0:200
-B:HIT:FIRE:6d8
-B:HIT:FIRE:6d8
+B:HIT:HURT:6d8
+B:HIT:HURT:6d8
 F:DROP_60 | 
 F:OPEN_DOOR | BASH_DOOR | 
 F:EVIL | GIANT | NEED_LITE
@@ -14806,8 +14806,7 @@ B:HIT:HURT:6d8
 B:HIT:HURT:6d8
 F:DROP_60 | 
 F:OPEN_DOOR | BASH_DOOR | TAKE_ITEM |
-F:EVIL | GIANT | NEED_LITE | 
-F:IM_FIRE
+F:EVIL | GIANT | NEED_LITE
 D:A fifteen foot tall giant with legs like tree-trunks.
 
 N:1024:River giant
@@ -14831,7 +14830,7 @@ B:HIT:HURT:7d8
 F:DROP_60 | 
 F:OPEN_DOOR | BASH_DOOR | TAKE_ITEM |
 F:EVIL | GIANT | NEED_LITE | 
-F:CAN_SWIM | IM_ACID
+F:CAN_SWIM | IM_ACID | IM_POIS
 D:A seventeen foot tall giant with putrid hair and slimey skin.
 
 N:1026:Grey giant
