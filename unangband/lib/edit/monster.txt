@@ -9419,7 +9419,7 @@ D: the rightful Mayor of the Shire, Lotho took over and began industrializing
 D: and regimenting life in the Shire.
 
 N:622:Old Man Willow
-G:,:s
+G:<:s
 I:110:16d20:20:10:20
 W:6:5:0:230
 B:TOUCH:PARALYZE
@@ -10735,7 +10735,7 @@ F:ANIMAL | FRIENDS | CAN_FLY | MUST_FLY
 D:It screeches as it attacks.
 
 N:714:Green dragon bat
-G:b:r
+G:b:g
 I:130:2d7:12:22:50
 W:16:1:0:60
 B:BITE:POISON:1d3
@@ -10836,7 +10836,7 @@ S:BR_COLD
 D:It is a sharp-tailed bat, clouded in frost.
 
 N:725:Black dragon bat
-G:b:w
+G:b:D
 I:130:3d8:12:28:50
 W:23:2:0:60
 B:BITE:ACID:1d3
