@@ -15,7 +15,7 @@ after teleporting.
 - Fixed bug where town/dungeon name and depth were displayed in wrong
 part of screen if window is resized.
 
-
+- Fixed some flags for various types of terrain.
 
 
 Angband 0.5.2 "I'm on fire" release
