@@ -2863,11 +2863,11 @@ A:70:1:1
 F:AGGRAVATE
 
 N:320:Curse Weapon
-A:70:2:1
+A:70:3:1
 F:CURSE_WEAPON
 
 N:321:Curse Armor
-A:70:3:1
+A:70:2:1
 F:CURSE_ARMOR
 
 N:322:Summon Monster
