@@ -3393,8 +3393,16 @@ void do_cmd_store(void)
 		p_ptr->town = p_ptr->dungeon;		
 
 		/* Initialise the stores -- except for home */
-		for (i = 0; i<STORE_HOME;i++)
+		for (i = 0; i < MAX_STORES; i++)
 		{
+			store_num_real = t_info[p_ptr->town].store[i];
+
+			/* No building */
+			if (store_num_real == 0) continue;
+
+			/* Skip Home */
+			if (f_info[store_num_real].d_char == '8') continue;
+
 			store_init(i);
 
 			for (ii = 0;ii<10;ii++)
