@@ -1055,13 +1055,6 @@ static void process_world(void)
 			/* Decrease life-span */
 			o_ptr->pval--;
 
-			/* Hack -- notice interesting fuel steps */
-			if ((o_ptr->pval < 100) || (!(o_ptr->pval % 10)))
-			{
-				/* Window stuff */
-				p_ptr->window |= (PW_EQUIP);
-			}
-
 			/* Hack -- Special treatment when blind */
 			if (p_ptr->blind)
 			{
@@ -1076,11 +1069,18 @@ static void process_world(void)
 				msg_print("Your light has gone out!");
 			}
 
-			/* The light is getting dim */
+			/* The light is getting faint */
 			else if ((o_ptr->pval < 100) && (!(o_ptr->pval % 10)))
 			{
 				if (disturb_minor) disturb(0, 0);
 				msg_print("Your light is growing faint.");
+			}
+
+			/* The light is getting dim */
+			else if ((o_ptr->pval == FUEL_LOW) && (o_ptr->sval == SV_LITE_TORCH))
+			{
+				if (disturb_minor) disturb(0, 0);
+				msg_print("Your torch flame dims.");
 			}
 		}
 	}
