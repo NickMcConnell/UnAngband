@@ -3160,6 +3160,9 @@ void message_pain(int m_idx, int dam)
 	percentage = (int)(tmp);
 
 
+	/* Hack -- avoid mentioning minor damage */
+	if (!(m_ptr->ml) && (percentage > 95)) return;
+
 	/* Jelly's, Mold's, Vortex's, Quthl's */
 	if (strchr("jmvQ", r_ptr->d_char))
 	{
