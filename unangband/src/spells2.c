@@ -2455,8 +2455,8 @@ bool brand_item(int brand, cptr act)
 		/* Carry item again if split */
 		if (split)
 		{
-			/* Adjust the weight and carry */
-      		item = inven_carry(o_ptr);
+			/* Drop it near the player */
+			drop_near(o_ptr, 0, p_ptr->py, p_ptr->px);
 		}
 	
 		/* Recalculate bonuses */
