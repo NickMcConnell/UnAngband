@@ -47,7 +47,12 @@
 /*
  * Current version string
  */
-#define VERSION_STRING	"2.9.6 alpha"
+#define VERSION_STRING	"0.5.1d"
+
+/*
+ * Hack -- note use of new version name/string but old version
+ * major/minor/patch numbers.
+ */
 
 
 /*
