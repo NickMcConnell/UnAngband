@@ -517,6 +517,7 @@ static errr rd_item(object_type *o_ptr)
 static void rd_monster(monster_type *m_ptr)
 {
 	byte tmp8u;
+	s16b tmp16s;
 
 	/* Read the monster race */
 	rd_s16b(&m_ptr->r_idx);
@@ -536,15 +537,16 @@ static void rd_monster(monster_type *m_ptr)
 	/* Summoned monsters timeout */
 	if (variant_unsummon)
 	{
-		rd_byte(&m_ptr->summoned);
-
 		if (older_than(3,0,1))
 		{
+			rd_s16b(&tmp16s);
+			m_ptr->summoned = (byte)tmp16s;
 			rd_byte(&tmp8u);
 			m_ptr->mflag = tmp8u;
 		}
 		else
 		{
+			rd_byte(&m_ptr->summoned);
 			rd_u16b(&m_ptr->mflag);
 		}
 
