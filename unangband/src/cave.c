@@ -683,8 +683,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 
 	int floor_num = 0;
 
-	/* Hack -- Assume that "new" means "Adam Bolt Tiles" */
-	bool graf_new = (use_graphics && streq(ANGBAND_GRAF, "new"));
+	/* Hack -- the old tiles don't support the new lighting effects */
+	bool graf_new = (use_graphics && !streq(ANGBAND_GRAF, "old"));
 
 	/* Monster/Player */
 	m_idx = cave_m_idx[y][x];
@@ -724,7 +724,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			c = f_ptr->x_char;
 
 			/* Special lighting effects */
-			if (view_special_lite) /* && (use_transparency ? feat_supports_lighting(feat) : TRUE))*/
+			if (view_special_lite)
 			{
 				/* Handle "seen" grids */
 				if (info & (CAVE_SEEN))
@@ -733,7 +733,9 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 					if (view_surface_lite && p_ptr->outside &&
                                                 !(f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
 					{
-						if (graf_new)
+
+						/* Mega-hack */
+						if ((graf_new) && (a & 0x80))
 						{
 							/* Use a dark tile */
 							c += 1;
@@ -748,7 +750,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 					/* Only lit by "torch" lite */
 					else if (view_yellow_lite && !(info & (CAVE_GLOW)))
 					{
-						if (graf_new)
+						/* Mega-hack */
+						if ((graf_new) && (a & 0x80))
 						{
 							/* Use a brightly lit tile */
 							if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
@@ -778,7 +781,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 
 							if (f_info[cave_feat[yy][xx]].flags2 & (FF2_GLOW))
 							{
-								if (graf_new)
+								/* Mega-hack */
+								if ((graf_new) && (a & 0x80))
 								{
 									/* Use a brightly lit tile */
 									if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
@@ -802,7 +806,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 				/* Handle "blind" */
 				else if (p_ptr->blind)
 				{
-					if (graf_new)
+					/* Mega-hack */
+					if ((graf_new) && (a & 0x80))
 					{
 						/* Use a dark tile */
 						c += 1;
@@ -817,7 +822,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 				/* Handle "dark" grids */
 				else if (!(info & (CAVE_GLOW)))
 				{
-					if (graf_new)
+					/* Mega-hack */
+					if ((graf_new) && (a & 0x80))
 					{
 						/* Use a dark tile */
 						c += 1;
@@ -832,7 +838,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 				/* Handle "view_bright_lite" */
 				else if (view_bright_lite)
 				{
-					if (graf_new)
+					/* Mega-hack */
+					if ((graf_new) && (a & 0x80))
 					{
 						/* Use a dark tile */
 						c += 1;
@@ -865,7 +872,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			/* Handle "blind" and night time*/
 			if (p_ptr->blind  || !(((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))))
 			{
-				if (graf_new)
+				/* Mega-hack */
+				if ((graf_new) && (a & 0x80))
 				{
 					/* Use a dark tile */
 					c += 1;
@@ -880,7 +888,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			/* Handle "dark" grids */
 			else if (view_bright_lite)
 			{
-				if (graf_new)
+				/* Mega-hack */
+				if ((graf_new) && (a & 0x80))
 				{
 					/* Use a dark tile */
 					c += 1;
@@ -950,7 +959,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 				/* Handle "seen" grids */
 				if (info & (CAVE_SEEN))
 				{
-					if (graf_new)
+					/* Mega-hack */
+					if ((graf_new) && (a & 0x80))
 					{
 						/* Use a lit tile */
 					}
@@ -963,7 +973,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 				/* Handle "blind" */
 				else if (p_ptr->blind)
 				{
-					if (graf_new)
+					/* Mega-hack */
+					if ((graf_new) && (a & 0x80))
 					{
 						/* Use a dark tile */
 						c += 1;
@@ -978,7 +989,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 				/* Handle "dark" grids */
 				else if (!(info & (CAVE_GLOW)))
 				{
-					if (graf_new)
+					/* Mega-hack */
+					if ((graf_new) && (a & 0x80))
 					{
 						/* Use a dark tile */
 						c += 1;
@@ -993,7 +1005,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 				/* Handle "view_bright_lite" */
 				else if (view_bright_lite)
 				{
-					if (graf_new)
+					/* Mega-hack */
+					if ((graf_new) && (a & 0x80))
 					{
 						/* Use a dark tile */
 						c += 1;
@@ -1006,7 +1019,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 				}
 				else
 				{
-					if (graf_new)
+					/* Mega-hack */
+					if ((graf_new) && (a & 0x80))
 					{
 						/* Use a brightly lit tile */
 						if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
@@ -1041,7 +1055,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			/* Handle "blind" and night time*/
 			if (p_ptr->blind  || !(((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))))
 			{
-				if (graf_new)
+				/* Mega-hack */
+				if ((graf_new) && (a & 0x80))
 				{
 					/* Use a dark tile */
 					c += 1;
@@ -1056,7 +1071,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			/* Handle "dark" grids */
 			else if (view_bright_lite)
 			{
-				if (graf_new)
+				/* Mega-hack */
+				if ((graf_new) && (a & 0x80))
 				{
 					/* Use a dark tile */
 					c += 1;
