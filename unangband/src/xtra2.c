@@ -2782,6 +2782,8 @@ bool modify_panel(int wy, int wx)
 	}
 	else if (wx > DUNGEON_WID - SCREEN_WID) wx = DUNGEON_WID - SCREEN_WID;
 
+	if (wx < 0) wx = 0;
+
 	/* React to changes */
 	if ((p_ptr->wy != wy) || (p_ptr->wx != wx))
 	{
