@@ -5,6 +5,9 @@
 stack. Other unrecognised characters will set a similiar auto-inscription
 however these have no effect.
 
+- "Great" weapons and ammo now much more likely to have additional damage
+dice or sides. (From NPPAngband)
+
 ### Bug fixes ###
 
 - Many low level spell casting monsters were casting mana bolt instead of
@@ -21,9 +24,10 @@ file becoming excessively large.
 
 - Fixed broken html dump code.
 
+- Non-ego weapons with improved damage dice or sides now sense as "great".
+
 
 UnAngband 0.5.4c: "Competitive Fix"
-
 
 ### Game Play ###
 
