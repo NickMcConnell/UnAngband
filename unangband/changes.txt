@@ -21,6 +21,9 @@ the dungeon are harder to notice (From Sangband).
 - Torches have a larger light radius when they are more fuelly fueled (From
 Sangband).
 
+- You now hold or stay after each step, so that you will use 100 energy per
+move unless you are disturbed.
+
 ### User Interface ###
 
 - Now supports specifying whether or not a feature supports advanced lighting

@@ -1383,8 +1383,8 @@ bool apply_disenchant(int mode)
 
 	char o_name[80];
 
-	/* Prevent warning */
-	mode = 0;
+	/* Prevent compiler warning */
+	(void)mode;
 
 	/* Pick a random slot */
 	switch (randint(8))
