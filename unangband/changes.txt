@@ -1,4 +1,4 @@
-UnAngband 0.5.4a:
+UnAngband 0.5.4a: "A Whole Lotta Love"
 
 ### Game-play ###
 
