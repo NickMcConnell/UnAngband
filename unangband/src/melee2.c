@@ -2887,8 +2887,8 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 			if (who > 0)
 			{
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
-				else if ((target < 0) || ((target ==0) && (known))) msg_format("%^s casts a plasma bolt.", m_name);
-				else if (known) msg_format("%^s casts a plasma bolt at %s.", m_name, t_name);
+				else if ((target < 0) || ((target ==0) && (known))) msg_format("%^s casts an ice bolt.", m_name);
+				else if (known) msg_format("%^s casts an ice bolt at %s.", m_name, t_name);
 
 				flg = PROJECT_STOP | PROJECT_KILL;
 
