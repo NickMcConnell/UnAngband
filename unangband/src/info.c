@@ -1595,11 +1595,11 @@ static void obj_top(const object_type *o_ptr, bool real)
  */
 void screen_object(const object_type *o_ptr, bool real)
 {
+	/* Flush messages */
+	message_flush();
+
 	/* Set text_out hook */
 	text_out_hook = text_out_to_screen;
-
-	/* Load screen */
-	screen_save();
 
 	/* Begin recall */
 	Term_gotoxy(0, 1);
@@ -1609,11 +1609,6 @@ void screen_object(const object_type *o_ptr, bool real)
 
 	/* Display item name */
 	obj_top(o_ptr, real);
-
-	(void)inkey();
-	
-	/* Load screen */
-	screen_load();
 }
 
 

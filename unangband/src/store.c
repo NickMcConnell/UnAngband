@@ -2941,8 +2941,16 @@ static void store_examine(void)
 
 	msg_print("");
 
+	/* Save the screen */
+	screen_save();
+
 	/* Describe */
 	screen_object(o_ptr, TRUE);
+
+	/* Load the screen */
+	screen_load();
+
+	(void)inkey();
 
 	return;
 }

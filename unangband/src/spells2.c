@@ -2959,7 +2959,16 @@ bool identify_fully(void)
 
 	msg_print("");
 
-	screen_object(o_ptr,TRUE);
+	/* Save the screen */
+	screen_save();
+
+	/* Describe */
+	screen_object(o_ptr, TRUE);
+
+	/* Load the screen */
+	screen_load();
+
+	(void)inkey();
 
 	/* Success */
 	return (TRUE);

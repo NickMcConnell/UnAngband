@@ -819,8 +819,16 @@ void do_cmd_observe(void)
 
 	msg_print("");
 
+	/* Save the screen */
+	screen_save();
+
 	/* Describe */
 	screen_object(o_ptr, TRUE);
+
+	/* Load the screen */
+	screen_load();
+
+	(void)inkey();
 }
 
 

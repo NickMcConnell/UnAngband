@@ -4261,8 +4261,12 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 						/* Save screen */
 						screen_save();
 
+						/* Recall monster on screen */
+						/* Except for containers holding 'something' */
+						if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_known_p(o_ptr)))) screen_roff(o_ptr->name3);
+
 						/* Recall on screen */
-						screen_object(o_ptr, TRUE);
+						else screen_object(o_ptr, TRUE);
 
 						/* Hack -- Complete the prompt (again) */
 						Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));

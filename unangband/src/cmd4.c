@@ -3527,7 +3527,16 @@ static void desc_art_fake(int a_idx)
 	/* Hack -- Handle stuff */
 	handle_stuff();
 
+	/* Save the screen */
+	screen_save();
+
+	/* Describe */
 	screen_object(o_ptr, FALSE);
+
+	/* Load the screen */
+	screen_load();
+
+	(void)inkey();
 }
 
 /*
@@ -4294,7 +4303,16 @@ static void desc_obj_fake(int k_idx)
 	/* Hack -- Handle stuff */
 	handle_stuff();
 
+	/* Save the screen */
+	screen_save();
+
+	/* Describe */
 	screen_object(o_ptr, FALSE);
+
+	/* Load the screen */
+	screen_load();
+
+	(void)inkey();
 }
 
 /*

@@ -3620,10 +3620,18 @@ static void death_examine(void)
 		/* Describe */
 		msg_format("Examining %s...", o_name);
 
-                msg_print("");
+		msg_print("");
 
-                screen_object(o_ptr, TRUE);
+		/* Save the screen */
+		screen_save();
 
+		/* Describe */
+		screen_object(o_ptr, TRUE);
+
+		/* Load the screen */
+		screen_load();
+
+		(void)inkey();
 	}
 }
 
