@@ -1,6 +1,6 @@
 <?php
 
-$title = 'The Unnamed Angband'
+$title = 'The Unnamed Angband';
 include('layout/header');
 
 ?>
@@ -18,8 +18,4 @@ include('layout/header');
 				<li>I have a personal website at <a href="http://promisedpoems.editthispage.com/">promisedpoems.editthispage.com</a> that featured some Unangband related material, if you are after some more.</li>
 			</ul>
 
-<?
-
-include('layout/footer');
-
-?>
+<?php include('layout/footer'); ?>
