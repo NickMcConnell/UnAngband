@@ -380,7 +380,7 @@ X:14:52
 R:DRAGON
 G:B
 L:20:435:56:154:475:0
-L:34:56:0:0:0:0
+L:21:56:0:0:0:0
 L:38:56:0:0:475:0
 
 # Alternate to bypass Moria etc. and reach Angband...
