@@ -1,0 +1,658 @@
+Spoiler File -- Basic Items (0.5.1c)
+
+
+Description                             Dam/AC   Wgt Lev     Cost Info        
+-------------------------------------   ------   --- ---     ---- ---------   
+
+
+Ammo
+
+  Rounded Pebble                           1d2   0.4   0        1            
+  Arrow                                    1d4   0.2   3        1            
+  Iron Shot                                1d4   0.5   3        2            
+  Bolt                                     1d5   0.3   3        2            
+  Mithril Shot                             2d4   0.4  40       20            
+  Seeker Arrow                             4d4   0.2  55       20            
+  Seeker Bolt                              4d5   0.3  65       25            
+  Silver Arrow                             3d4   0.2  55       35            
+  Silver Bolt                              3d5   0.2  50       40            
+
+
+Bows
+
+  Sling                                          0.5   1        5            
+  Short Bow                                      3.0   3       50            
+  Long Bow                                       4.0  10      120            
+  Light Crossbow                                11.0  15      140            
+  Heavy Crossbow                                20.0  30      300            
+
+
+Weapons
+
+  Broken Dagger                            1d1   0.5   0        1            
+  Broken Sword                             1d2   3.0   0        2            
+  Dagger                                   1d4   1.2   0       10            
+  Dart                                     1d4   1.2   0       10            
+  Shovel                                   1d2   6.0   1       10            
+  Main Gauche                              1d5   3.0   3       25            
+  Whip                                     1d4   3.0   3       30            
+  Javelin                                  1d6   5.0   5       36            
+  Rapier                                   1d6   4.0   5       42            
+  Small Sword                              1d6   7.5   5       48            
+  Sabre                                    1d7   5.0   5       50            
+  Pick                                     1d3  15.0   5       50            
+  Cutlass                                  1d7  11.0   5       85            
+  Short Sword                              1d7   8.0   5       90            
+  Gnomish Shovel                           1d2   6.0  20      100            
+  Spear                                    1d8   7.0   5      120            
+  Mace                                     2d4  12.0   5      130            
+  Tulwar                                   2d4  10.0   5      200            
+  Quarterstaff                             1d9  15.0  10      200            
+  Ball-and-Chain                           2d4  15.0  20      200            
+  Dwarven Shovel                           1d3  12.0  40      200            
+  War Hammer                               3d3  12.0   5      225            
+  Two-Handed Spear                         2d8  20.0  10      230            
+  Scimitar                                 2d5  13.0  10      250            
+  Broad Sword                              2d5  15.0  10      255            
+  Long Sword                               2d5  13.0  10      300            
+  Orcish Pick                              1d3  18.0  30      300            
+  Broad Axe                                2d6  16.0  15      304            
+  Battle Axe                               2d8  17.0  15      334            
+  Awl-Pike                                 1d8  16.0  10      340            
+  Bastard Sword                            3d4  14.0  15      350            
+  Flail                                    2d6  15.0  10      353            
+  Pike                                     2d5  16.0  15      358            
+  Glaive                                   2d6  19.0  20      363            
+  Lucerne Hammer                           2d5  12.0  10      376            
+  Morning Star                             2d6  15.0  10      396            
+  Katana                                   3d4  12.0  20      400            
+  Beaked Axe                               2d6  18.0  15      408            
+  Halberd                                  3d5  19.0  25      430            
+  Great Axe                                4d4  23.0  40      500            
+  Lead-Filled Mace                         3d4  18.0  15      502            
+  Two-Handed Flail                         3d6  28.0  45      590            
+  Dwarven Pick                             1d4  20.0  50      600            
+  Mattock                                  1d8  25.0  50      700            
+  Lochaber Axe                             3d8  25.0  45      750            
+  Two-Handed Sword                         3d6  20.0  30      775            
+  Scythe                                   5d3  25.0  45      800            
+  Executioner's Sword                      4d5  26.0  40      850            
+  Scythe of Slicing                        8d4  25.0  60     3500            
+  Blade of Chaos                           6d5  18.0  70     4000            
+  Mace of Disruption                       5d8  40.0  80     4300            
+
+
+Armour (Body)
+
+  Filthy Rag                                 1   2.0   0        1            
+  Robe                                       2   2.0   1        4            
+  Soft Leather Armour                        4   8.0   3       18            
+  Soft Studded Leather                       5   9.0   3       35            
+  Hard Leather Armour                        6  10.0   5      250            
+  Hard Studded Leather                       7  11.0  10      300            
+  Leather Scale Mail                        11  14.0  15      550            
+  Metal Scale Mail                          13  25.0  25      750            
+  Chain Mail                                14  22.0  25      950            
+  Rusty Chain Mail                          14  20.0  25     1050            
+  Double Chain Mail                         16  25.0  30     1050            
+  Augmented Chain Mail                      16  27.0  30     1100            
+  Bar Chain Mail                            18  28.0  35     1150            
+  Metal Brigandine Armour                   19  29.0  35     1400            
+  Partial Plate Armour                      22  26.0  45     1500            
+  Metal Lamellar Armour                     23  34.0  45     1550            
+  Full Plate Armour                         25  38.0  45     1650            
+  Ribbed Plate Armour                       28  38.0  50     1800            
+  Mithril Chain Mail                        28  15.0  55     7100            
+  Mithril Plate Mail                        35  30.0  60    15300            
+  Adamantite Plate Mail                     40  42.0  75    20400            
+  Bronze Dragon Scale Mail                  30  20.0  55    30200 2 powers   
+  Copper Dragon Scale Mail                  30  20.0  55    30200 2 powers   
+  Silver Dragon Scale Mail                  30  20.0  55    30200 2 powers   
+  Black Dragon Scale Mail                   30  20.0  50    40200 dam 130    
+  Blue Dragon Scale Mail                    30  20.0  50    40200 dam 100    
+  White Dragon Scale Mail                   30  20.0  50    40200 dam 110    
+  Red Dragon Scale Mail                     30  20.0  50    40200 dam 200    
+  Brass Dragon Scale Mail                   30  20.0  55    50200 2 powers   
+  Green Dragon Scale Mail                   30  20.0  60    60200 dam 150    
+  Ethereal Dragon Scale Mail                30  20.0  65    60200 3 powers   
+  Gold Dragon Scale Mail                    30  20.0  65    60200 2 powers   
+  Law Dragon Scale Mail                     30  20.0  80    80200 2 powers   
+  Chaos Dragon Scale Mail                   30  20.0  80    80200 2 powers   
+  Balance Dragon Scale Mail                 30  20.0  90   100200 4 powers   
+  Multi-Hued Dragon Scale Mail              30  20.0  95   150200 5 powers   
+  Power Dragon Scale Mail                   40  20.0 110   300300 dam 300    
+
+
+Armour (Misc)
+
+  Cloak                                      1   1.0   1        3            
+  Set of Leather Gloves                      1   0.5   1        3            
+  Pair of Soft Leather Boots                 2   2.0   3        7            
+  Hard Leather Cap                           2   1.5   3       12            
+  Pair of Hard Leather Boots                 3   4.0   5       12            
+  Small Leather Shield                       2   5.0   3       30            
+  Metal Cap                                  3   2.0  10       30            
+  Set of Gauntlets                           2   2.5  10       35            
+  Small Metal Shield                         3   6.5  10       50            
+  Pair of Metal Shod Boots                   6   8.0  20       50            
+  Iron Helm                                  5   7.5  20       75            
+  Set of Cesti                               5   4.0  50      100            
+  Large Leather Shield                       4  10.0  15      120            
+  Large Metal Shield                         5  12.0  30      200            
+  Steel Helm                                 6   6.0  40      200            
+  Iron Crown                                 0   2.0  45      500            
+  Golden Crown                               0   3.0  45     1000            
+  Jewel Encrusted Crown                      0   4.0  50     2000            
+  Shadow Cloak                               6   0.5  60     4000            
+  Shield of Deflection                      10  10.0  70    10000            
+
+
+Amulets
+
+  Amulet of Teleportation                        0.3  15        0            
+  Amulet of Doom                                 0.3  50        0            
+  Amulet of Adornment                            0.3  15       20            
+  Amulet of Infravision                          0.3  10      200            
+  Amulet of Slow Digestion                       0.3  15      200            
+  Amulet of Resist Lightning                     0.3  10      300            
+  Amulet of Resist Acid                          0.3  20      300            
+  Amulet of Wisdom                               0.3  30      500            
+  Amulet of Charisma                             0.3  30      500            
+  Amulet of Searching                            0.3  20      600            
+  Amulet of Regeneration                         0.3  30      600            
+  Amulet of Resistance                           0.3  60    20000            
+  Amulet of ESP                                  0.3  60    25000            
+  Amulet of the Magi                             0.3  50    30000            
+  Amulet of Devotion                             0.3  70    30000            
+  Amulet of Weaponmastery                        0.3  70    30000            
+  Amulet of Trickery                             0.3  70    30000            
+
+
+Rings
+
+  Ring of Teleportation                          0.2   5        0            
+  Ring of Weakness                               0.2   5        0            
+  Ring of Stupidity                              0.2   5        0            
+  Ring of Aggravate Monster                      0.2   5        0            
+  Ring of Woe                                    0.2  50        0            
+  Ring of Feather Falling                        0.2   5      200            
+  Ring of Searching                              0.2   5      250            
+  Ring of Resist Fire                            0.2  10      250            
+  Ring of Resist Cold                            0.2  10      250            
+  Ring of See Invisible                          0.2  30      340            
+  Ring of Protection                             0.2  10      500            
+  Ring of Damage                                 0.2  20      500            
+  Ring of Accuracy                               0.2  20      500            
+  Ring of Sustain Charisma                       0.2  20      500            
+  Ring of Strength                               0.2  30      500            
+  Ring of Dexterity                              0.2  30      500            
+  Ring of Constitution                           0.2  30      500            
+  Ring of Intelligence                           0.2  30      500            
+  Ring of Sustain Intelligence                   0.2  20      600            
+  Ring of Sustain Wisdom                         0.2  20      600            
+  Ring of Sustain Strength                       0.2  20      750            
+  Ring of Sustain Constitution                   0.2  20      750            
+  Ring of Sustain Dexterity                      0.2  20      750            
+  Ring of Slaying                                0.2  40     1000            
+  Ring of Free Action                            0.2  20     1500            
+  Ring of Flames                                 0.2  50     3000 dam 80     
+  Ring of Acid                                   0.2  50     3000 dam 70     
+  Ring of Ice                                    0.2  50     3000 dam 85     
+  Ring of Lightning                              0.2  50     5000 dam 75     
+  Ring of Resist Poison                          0.2  40    16000            
+  Ring of Sustaining                             0.2  50    20000            
+  Ring of Speed                                  0.2  75   100000            
+
+
+Scrolls
+
+  Scroll of Summon Monster                       0.5   1        0            
+  Scroll of Darkness                             0.5   1        0            
+  Scroll of Aggravate Monster                    0.5   5        0            
+  Scroll of Trap Creation                        0.5  10        0            
+  Scroll of Summon Undead                        0.5  15        0            
+  Scroll of Curse Weapon                         0.5  50        0            
+  Scroll of Curse Armor                          0.5  50        0            
+  Scroll of Satisfy Hunger                       0.5   5       10            
+  Scroll of Light                                0.5   0       15 dam 2d8    
+  Scroll of Treasure Detection                   0.5   0       15            
+  Scroll of Object Detection                     0.5   0       15            
+  Scroll of Phase Door                           0.5   1       15 range 10   
+  Scroll of Detect Invisible                     0.5   1       15            
+  Scroll of Blessing                             0.5   1       15 dur 1d12+12
+  Scroll of Detect Undead                        0.5   3       25            
+  Scroll of Detect Animals                       0.5   3       25            
+  Scroll of Trap Detection                       0.5   5       35            
+  Scroll of Door/Stair Location                  0.5   5       35            
+  Scroll of Magic Mapping                        0.5   5       40            
+  Scroll of Teleportation                        0.5  10       40 range 125  
+  Scroll of Holy Chant                           0.5  10       40 dur 1d24+24
+  Scroll of Trap/Door Destruction                0.5  10       50            
+  Scroll of Teleport Level                       0.5  20       50            
+  Scroll of Protection from Evil                 0.5  30       50 dur 1d25   
+  Scroll of Read Magic                           0.5   3       75            
+  Scroll of Analyze Magic                        0.5   3       75            
+  Scroll of Gauge Magic                          0.5   5       75            
+  Scroll of Opening                              0.5   5       75            
+  Scroll of Holy Prayer                          0.5  25       80 dur 1d48+48
+  Scroll of Detect Curse                         0.5   1       90            
+  Scroll of Detect Magic                         0.5   1      120            
+  Scroll of Enchant Weapon To-Hit                0.5  15      125            
+  Scroll of Enchant Weapon To-Dam                0.5  15      125            
+  Scroll of Enchant Armor                        0.5  15      125            
+  Scroll of Word of Recall                       0.5   5      150            
+  Scroll of Sanctuary                            0.5  10      150 pow 25     
+  Scroll of Remove Curse                         0.5  10      180            
+  Scroll of Hero's Prayer                        0.5  35      200 dur 1d48+48
+  Scroll of Recharging                           0.5  40      200            
+  Scroll of Dispel Undead                        0.5  40      200 dam 75     
+  Scroll of Legend Lore                          0.5   3      225            
+  Scroll of Shielding                            0.5  10      250 dur 1d20+30
+  Scroll of Detection                            0.5  25      250            
+  Scroll of *Destruction*                        0.5  40      250            
+  Scroll of Acid Proofing                        0.5  35      300            
+  Scroll of Water Proofing                       0.5  35      300            
+  Scroll of Fire Proofing                        0.5  35      400            
+  Scroll of Identify                             0.5  10      500            
+  Scroll of Theft Proofing                       0.5  35      500            
+  Scroll of *Enchant Weapon*                     0.5  50      500            
+  Scroll of *Enchant Armor*                      0.5  50      500            
+  Scroll of Bless Weapon                         0.5  50      500            
+  Scroll of Rune of Protection                   0.5  60      500            
+  Scroll of Poison Weapon                        0.4  25      600            
+  Scroll of Continual Light                      0.5  35      600            
+  Scroll of Alter Reality                        0.5  35      600            
+  Scroll of Enchant Bolts Brand                  0.5  25      750            
+  Scroll of Poison Bolts                         0.4  25      750            
+  Scroll of Genocide                             0.5  40      750            
+  Scroll of Mass Genocide                        0.5  50     1000            
+  Scroll of *Identify*                           0.5  40     2000            
+  Scroll of Enchant Weapon Brand                 0.5  50     2500            
+  Scroll of Enchant Armor To-Resist              0.5  50     5000            
+  Scroll of *Remove Curse*                       0.5  50     8000            
+  Scroll of Acquirement                          0.5  20   100000            
+  Scroll of *Acquirement*                        0.5  60   200000            
+
+
+Potions
+
+  Potion of Sleep                                0.4   0        0 dur 1d4+4  
+  Potion of Blindness                            0.4   0        0 dur 1d200+200
+  Potion of Confusion                            0.4   0        0 dur 1d10+10
+  Potion of Salt Water                           0.4   0        0 dam 2d6    
+  Potion of Slowness                             0.4   1        0 dur 1d10+10
+  Potion of Weakness                             0.4   3        0            
+  Potion of Poison                               0.4   3        0 dur 1d10+10
+  Potion of Clumsiness                           0.4   5        0            
+  Potion of Sickliness                           0.4  10        0            
+  Potion of Lose Memories                        0.4  10        0            
+  Potion of Stupidity                            0.4  20        0            
+  Potion of Naivety                              0.4  20        0            
+  Potion of Ugliness                             0.4  20        0            
+  Potion of Ruination                            0.4  40        0 dam 10d10  
+  Potion of Death                                0.4  55        0 dam 5000   
+  Potion of Apple Juice                          0.4   0        1            
+  Potion of Water                                0.4   0        1            
+  Potion of Slime Mold Juice                     0.4   0        2            
+  Potion of Boldness                             0.4   1       10            
+  Potion of Cure Light Wounds                    0.4   0       15 heal 3d10  
+  Potion of Infra-vision                         0.4   3       20 dur 1d100+100
+  Potion of Slow Poison                          0.4   1       25            
+  Potion of Resist Heat                          0.4   1       30 dur 1d20+20
+  Potion of Resist Cold                          0.4   1       30 dur 1d20+20
+  Potion of Heroism                              0.4   1       35 dur 1d20+20
+  Potion of Cure Serious Wounds                  0.4   3       40 heal 8d10  
+  Potion of Detect Invisible                     0.4   3       50 dur 1d24+24
+  Potion of Speed                                0.4   1       75 dur 1d30+30
+  Potion of Neutralize Poison                    0.4   5       75            
+  Potion of Berserk Strength                     0.4   3      100 dur 1d25+25
+  Potion of Cure Critical Wounds                 0.4   5      100 heal 12d10 
+  Potion of Resist Heat & Cold                   0.4   5      100 dur 1d10+10
+  Potion of Resist Acid                          0.4   5      100 dur 1d20+20
+  Potion of Resist Lightning                     0.4  10      200 dur 1d20+20
+  Potion of Cure Mortal Wounds                   0.4  10      200 heal 15d10 
+  Potion of Remove Fear & Poison                 0.4  10      225            
+  Potion of Healing                              0.4  15      300 heal 300   
+  Potion of Restore Charisma                     0.4  20      300            
+  Potion of Restore Strength                     0.4  25      300            
+  Potion of Restore Intelligence                 0.4  25      300            
+  Potion of Restore Wisdom                       0.4  25      300            
+  Potion of Restore Dexterity                    0.4  25      300            
+  Potion of Restore Constitution                 0.4  25      300            
+  Potion of Cure All Wounds                      0.4  25      300 heal 500   
+  Potion of Restore Mana                         0.4  25      350            
+  Potion of Resist Poison                        0.4  15      400 dur 1d20+20
+  Potion of Restore Life Levels                  0.4  40      400            
+  Potion of Enlightenment                        0.4  25      800            
+  Potion of Charisma                             0.4  20     1000            
+  Potion of Restoring                            0.1  20     1000            
+  Potion of Resistance                           0.1  40     1000 dur 1d20+20
+  Potion of *Cure All Wounds*                    0.4  40     1200 heal 1000  
+  Potion of Firebreath                           0.4  40     1200 dam 200    
+  Potion of Dragonbreath                         0.4  40     1200 5 powers   
+  Potion of *Healing*                            0.4  40     1500 heal 1200  
+  Potion of Self Knowledge                       0.4  40     2000            
+  Potion of Life                                 0.4  60     5000 heal 5000  
+  Potion of Strength                             0.4  30     8000            
+  Potion of Intelligence                         0.4  30     8000            
+  Potion of Wisdom                               0.4  30     8000            
+  Potion of Constitution                         0.4  30     8000            
+  Potion of Dexterity                            0.4  30     8000            
+  Potion of Detonations                          0.4  60    10000 dam 50d20  
+  Potion of Experience                           0.4  65    25000            
+  Potion of Augmentation                         0.4  40    60000            
+  Potion of *Enlightenment*                      0.4  70    80000            
+
+
+Food
+
+  Mushroom of Blindness                          0.1   5        0 dur 1d200+200
+  Mushroom of Paranoia                           0.1   5        0 dur 1d10+10
+  Mushroom of Confusion                          0.1   5        0 dur 1d10+10
+  Mushroom of Poison                             0.1   5        0 dur 1d10+10
+  Mushroom of Hallucination                      0.1  10        0 dur 1d10+10
+  Mushroom of Weakness                           0.1  10        0 dam 6d6    
+  Mushroom of Sickness                           0.1  10        0 dam 6d6    
+  Mushroom of Stupidity                          0.1  15        0 dam 8d6    
+  Mushroom of Naivety                            0.1  15        0 dam 8d6    
+  Mushroom of Paralysis                          0.1  20        0 dur 1d10+10
+  Hard Biscuit                                   0.2   0        1            
+  Pint of Fine Ale                               0.5   0        1            
+  Strip of Beef Jerky                            0.2   0        2            
+  Pint of Fine Wine                              1.0   0        2            
+  Slime Mold                                     0.5   1        2            
+  Apple                                          0.4   1        2            
+  handful of Berries                             0.4   1        2            
+  Ration of Food                                 1.0   0        3            
+  Piece of Elvish Waybread                       0.3   5       10 heal 4d8   
+  Pint of Orcish Spirits                         1.0   0       20 dam 1d6    
+  Mushroom of Cure Paranoia                      0.1  10       25            
+  Mushroom of Cure Blindness                     0.1  10       50            
+  Mushroom of Cure Confusion                     0.1  10       50            
+  Mushroom of Unhealth                           0.1  15       50 dam 10d10  
+  Mushroom of Disease                            0.1  20       50 dam 10d10  
+  Mushroom of Cure Poison                        0.1  10       60            
+  Mushroom of Mana                               0.1  10       75            
+  Mushroom of Cure Serious Wounds                0.1  15       75 heal 8d10  
+  Mushroom of Restore Constitution               0.1  20      350            
+  Mushroom of Restore Strength                   0.1  20      350            
+  Mushroom of Restoring                          0.1  20     1000            
+
+
+Rods
+
+  Rod of Trap Location                           1.5   5      100            
+  Rod of Dowsing                                 1.5   5      100            
+  Rod of Light                                   1.5  10      500 dam 6d8    
+  Rod of Door/Stair Location                     1.5  15     1000            
+  Rod of Illumination                            1.5  20     1000 dam 2d8    
+  Rod of Polymorph                               1.5  35     1200 pow 25     
+  Rod of Teleport Other                          1.5  45     1400 range 25   
+  Rod of Slow Monster                            1.5  30     1500 pow 25     
+  Rod of Sleep Monster                           1.5  30     1500 pow 25     
+  Rod of Lightning Bolts                         1.5  20     2000 dam 3d8    
+  Rod of Disarming                               1.5  35     2100            
+  Rod of Frost Bolts                             1.5  25     2500 dam 5d8    
+  Rod of Fire Bolts                              1.5  30     3000 dam 8d8    
+  Rod of Acid Bolts                              1.5  40     3500 dam 6d8    
+  Rod of Drain Life                              1.5  75     3600 dam 125    
+  Rod of Recall                                  1.5  30     4000            
+  Rod of Lightning Balls                         1.5  55     4000 dam 40     
+  Rod of Cold Balls                              1.5  60     4500 dam 55     
+  Rod of Detection                               1.5  30     5000            
+  Rod of Fire Balls                              1.5  75     5000 dam 80     
+  Rod of Acid Balls                              1.5  70     5500 dam 65     
+  Rod of Enlightenment                           1.5  65    10000            
+  Rod of Gauge Magic                             1.5  55    12000            
+  Rod of Detect Magic                            1.5  50    13000            
+  Rod of Curing                                  1.5  65    15000            
+  Rod of Healing                                 1.5  80    20000 heal 500   
+  Rod of Restoration                             1.5  80    25000            
+  Rod of Speed                                   1.5  95    50000 dur 1d20+20
+
+
+Wands
+
+  Wand of Heal Monster                           1.0   3        0 heal 4d6   
+  Wand of Haste Monster                          1.0   3        0            
+  Wand of Clone Monster                          1.0  15        0            
+  Wand of Trap/Door Destruction                  1.0  10      100            
+  Wand of Light                                  1.0   3      200 dam 6d8    
+  Wand of Magic Missile                          1.0   3      200 dam 3d4    
+  Wand of Wonder                                 1.0   3      250 22 powers  
+  Wand of Stone to Mud                           1.0  10      300 dam 6d8    
+  Wand of Teleport Other                         1.0  20      350 range 25   
+  Wand of Stinking Cloud                         1.0   5      400 dam 10     
+  Wand of Polymorph                              1.0  20      400 pow 25     
+  Wand of Slow Monster                           1.0   5      500 pow 25     
+  Wand of Confuse Monster                        1.0   5      500 pow 25     
+  Wand of Sleep Monster                          1.0   5      500 pow 25     
+  Wand of Scare Monster                          1.0  10      500 pow 25     
+  Wand of Lightning Bolts                        1.0  15      600 dam 3d8    
+  Wand of Blind Monster                          1.0  10      700 dam 25     
+  Wand of Disarming                              1.0  20      700            
+  Wand of Frost Bolts                            1.0  20      800 dam 5d8    
+  Wand of Acid Bolts                             1.0  30      950 dam 6d8    
+  Wand of Fire Bolts                             1.0  30     1000 dam 8d8    
+  Wand of Lightning Balls                        1.0  35     1200 dam 40     
+  Wand of Drain Life                             1.0  50     1200 dam 125    
+  Wand of Lightning Bolts II                     1.0  35     1250 dam 3d8    
+  Wand of Frost Bolts II                         1.0  40     1400 dam 5d8    
+  Wand of Cold Balls                             1.0  40     1500 dam 55     
+  Wand of Deadly Clouds                          1.0  40     1500 dam 20     
+  Wand of Water Bolts                            1.0  40     1500 dam 6d8    
+  Wand of Fire Bolts II                          1.0  45     1500 dam 8d8    
+  Wand of Freezing Clouds                        1.0  50     1500 dam 20     
+  Wand of Acid Balls                             1.0  50     1650 dam 65     
+  Wand of Acid Bolts II                          1.0  50     1750 dam 6d8    
+  Wand of Fire Balls                             1.0  50     1800 dam 80     
+  Wand of Striking                               1.0  50     1800 dam 3d6    
+  Wand of Lightning Bolts III                    1.0  50     2000 dam 3d8    
+  Wand of Conjuring Flame                        1.0  60     2000 dam 80     
+  Wand of Conjuring Acid                         1.0  60     2000 dam 70     
+  Wand of Conjuring Ice                          1.0  60     2000 dam 85     
+  Wand of Conjuring Lightning                    1.0  60     2000 dam 75     
+  Wand of Frost Bolts III                        1.0  55     2300 dam 5d8    
+  Wand of Dragon's Flame                         1.0  50     2400 dam 100    
+  Wand of Dragon's Frost                         1.0  50     2400 dam 80     
+  Wand of Dragon's Storm                         1.0  50     2400 dam 80     
+  Wand of Dragon's Bile                          1.0  50     2400 dam 100    
+  Wand of Dragon's Venom                         1.0  50     2400 dam 60     
+  Wand of Dragon's Breath                        1.0  60     2400 5 powers   
+  Wand of Sound Bolts                            1.0  50     2500 dam 8d8    
+  Wand of Fire Bolts III                         1.0  60     2500 dam 8d8    
+  Wand of Acidic Clouds                          1.0  60     2500 dam 30     
+  Wand of Shooting Stars                         1.0  50     3000 dam 10d8   
+  Wand of Annihilation                           1.0  60     3000 dam 250    
+  Wand of Storm Clouds                           1.0  70     3000 dam 40     
+  Wand of Magic Arrows                           1.0  70     3000 dam 150    
+  Wand of Burning Clouds                         1.0  80     3500 dam 50     
+  Wand of Ice Storms                             1.0  60     4000 dam 120    
+  Wand of Mana Bolts                             1.0  60     4500 dam 100    
+  Wand of Fire Storms                            1.0  70     4500 dam 145    
+  Wand of Acid Bolts III                         1.0  70     4500 dam 6d8    
+  Wand of Lightning Storms                       1.0  70     4500 dam 165    
+  Wand of Acid Storms                            1.0  80     5000 dam 115    
+  Wand of Meteors                                1.0  80     5500 dam 115    
+  Wand of Whirlpools                             1.0  80     6500 dam 110    
+  Wand of Death                                  1.0 111    60000 dam 5000   
+
+
+Staffs
+
+  Staff of Darkness                        1d6   5.0   5        0            
+  Staff of Summoning                       1d6   5.0  10        0            
+  Staff of Haste Monsters                  1d6   5.0  10        0            
+  Staff of Slowness                        1d6   5.0  40        0 dur 1d10+10
+  Staff of Treasure Location               1d6   5.0   5      200            
+  Staff of Object Location                 1d6   5.0   5      200            
+  Staff of Detect Invisible                1d6   5.0   5      200            
+  Staff of Light                           1d6   5.0   5      250 dam 2d8    
+  Staff of Cure Light Wounds               1d6   5.0   5      350 heal 3d8   
+  Staff of Trap Location                   1d6   5.0  10      350            
+  Staff of Door/Stair Location             1d6   5.0  10      350            
+  Staff of Detect Evil                     1d6   5.0  20      350            
+  Staff of Earthquakes                     2d6   5.0  40      350            
+  Staff of Detect Curse                    1d6   5.0  10      400            
+  Staff of Remove Curse                    1d6   5.0  40      500            
+  Staff of Sleep Monsters                  1d6   5.0  10      700 pow 25     
+  Staff of Enlightenment                   1d6   5.0  20      750            
+  Staff of Slow Monsters                   1d6   5.0  10      800 pow 25     
+  Staff of Starlight                       1d6   5.0  20      800 dam 6d8    
+  Staff of Curing                          1d6   5.0  25     1000            
+  Staff of Speed                           1d6   5.0  40     1000 dur 1d20+20
+  Staff of Dispel Evil                     2d6   5.0  50     1200 dam 75     
+  Staff of Teleportation                   1d6   5.0  20     2000 range 125  
+  Staff of Probing                         1d6   5.0  30     2000            
+  Staff of *Destruction*                   1d6   5.0  50     2500            
+  Staff of Perception                      1d6   5.0  45     3000            
+  Staff of Genocide                        2d6   5.0  70     3500            
+  Staff of Power                           2d6   5.0  70     4000 dam 125    
+  Staff of the Magi                        2d6   5.0  70     4500            
+  Staff of Holiness                        1d6   5.0  70     4500 dam 100    
+  Staff of Healing                         1d6   5.0  70     5000 heal 2000  
+
+
+Books (Mage)
+
+  Magic Book of Cantrips                         3.0   5       25 10 spells  
+  Magic Book of Conjuring                        3.0  10      100 9 spells   
+  Magic Book of Incantations                     3.0  20      400 8 spells   
+  Magic Book of Sorcery                          3.0  30      800 7 spells   
+  Magic Book of Glamours                         3.0  33     1000 8 spells   
+  Magic Book of Animal Magic                     3.0  33     1250 8 spells   
+  Magic Book of Life Magic                       3.0  36     1500 8 spells   
+  Magic Book of Illusions                        3.0  36     1750 9 spells   
+  Magic Book of Rune Magic                       3.0  40     2000 13 spells  
+  Magic Book of Resistances                      3.0  40     2500 7 spells   
+  Magic Book of Celestial Magic                  3.0  43     3000 8 spells   
+  Magic Book of Earth Magic                      3.0  46     4000 8 spells   
+  Magic Book of Escapes                          3.0  50     5000 7 spells   
+  Magic Book of Air Magic                        3.0  50     6000 9 spells   
+  Magic Book of Water Magic                      3.0  53     7500 7 spells   
+  Magic Book of Power                            3.0  60    10000 5 spells   
+  Magic Book of Fire Magic                       3.0  56    11000 12 spells  
+  Magic Book of Frost Magic                      3.0  60    12000 10 spells  
+  Magic Book of Acid Magic                       3.0  63    13000 12 spells  
+  Magic Book of Storm Magic                      3.0  66    14000 10 spells  
+  Magic Book of Alchemy                          3.0  70    16000 15 spells  
+  Magic Book of Necromancy                       3.0  70    18000 7 spells   
+  Magic Book of Destruction                      3.0  80    20000 6 spells   
+  Magic Book of Artifice                         3.0  73    22000 8 spells   
+  Magic Book of Lore                             3.0  76    24000 10 spells  
+  Magic Book of Transformations                  3.0 100    30000 7 spells   
+
+
+Books (Priest)
+
+  Prayer Book of Blessings                       3.0   5       25 9 spells   
+  Prayer Book of Mantras                         3.0  10      100 9 spells   
+  Prayer Book of Chants                          3.0  20      300 9 spells   
+  Prayer Book of Exorcisms                       3.0  30      900 6 spells   
+  Prayer Book of Abjurations                     3.0  35     2000 8 spells   
+  Prayer Book of the Way of God                  3.0  40     2500 7 spells   
+  Prayer Book of Miracles                        3.0  45     3500 7 spells   
+  Prayer Book of Accursed Ways                   3.0  50     4000 9 spells   
+  Prayer Book of Divine Insights                 3.0  50     5000 8 spells   
+  Prayer Book of the Dead                        3.0  55     7500 8 spells   
+  Prayer Book of Laying of Hands                 3.0  60    10000 9 spells   
+  Prayer Book of Retribution                     3.0  70    12500 8 spells   
+  Prayer Book of Most Holy Relics                3.0  80    20000 9 spells   
+  Prayer Book of Battle Hymns                    3.0  90    25000 9 spells   
+  Prayer Book of Holy Wrath                      3.0 100    30000 5 spells   
+
+
+Books (Bard)
+
+  Song Book of Chords                            3.0   5       25 10 spells  
+  Song Book of Harmonies                         3.0  20      400 8 spells   
+  Song Book of Tunes                             3.0  33     1000 8 spells   
+  Song Book of Progressions                      3.0  36     1500 6 spells   
+  Song Book of Soothing                          3.0  40     2000 8 spells   
+  Song Book of Drills                            3.0  43     3000 6 spells   
+  Song Book of Snake Charming                    3.0  46     4000 7 spells   
+  Song Book of Shanties                          3.0  50     6000 7 spells   
+  Song Book of Dirges                            3.0  53     7500 7 spells   
+  Song Book of Pandemonium                       3.0  56    12000 7 spells   
+  Song Book of Discordance                       3.0  60    14000 8 spells   
+  Song Book of Symphonies                        3.0  70    20000 8 spells   
+
+
+Books (Shaman)
+
+  Summoning Rune stone                           2.0  15      125            
+  Door Rune stone                                2.0  15      150            
+  Star Rune stone                                2.0  15      200            
+  Frost Rune stone                               2.0  15      250            
+  Storm Rune stone                               2.0  15      250            
+  Flame Rune stone                               2.0  15      300            
+  Wave Rune stone                                2.0  15      300            
+  Acid Rune stone                                2.0  20      300            
+  Earth Rune stone                               2.0  15      350            
+  Explosive Rune stone                           2.0  25      400            
+  Hand Rune stone                                2.0  25      500            
+  Eye Rune stone                                 2.0  25      600            
+  Mouth Rune stone                               2.0  25      700            
+  Demon Rune stone                               2.0  30      800            
+  Tree Rune stone                                2.0  30     1050            
+  Dwarven Rune stone                             2.0  30     1200            
+  Elven Rune stone                               2.0  35     1500            
+  Sword Rune stone                               2.0  35     1600            
+  Cloud Rune stone                               2.0  40     1600            
+  Moon Rune stone                                2.0  40     1750            
+  Blood Rune stone                               2.0  40     2000            
+  Shield Rune stone                              2.0  40     2250            
+  Mana Rune stone                                2.0  50     2500            
+  Arrow Rune stone                               2.0  50     3000            
+  Dragon Rune stone                              2.0  50     4000            
+  Wonder Rune stone                              2.0  60     4500            
+  Cross Rune stone                               2.0  60     6000            
+  Wheel Rune stone                               2.0  60     7500            
+
+
+Various
+
+  empty Flask                                    1.0   0        0            
+  handful of Sand                                0.5   0        0            
+  handful of Earth                               0.5   0        0            
+  handful of Mud                                 0.5   0        0            
+  handful of Dust                                0.5   0        0            
+  handful of Ice                                 0.5   0        0            
+  Shard of Pottery                               0.5   0        0            
+  Broken Stick                                   0.3   0        0            
+  broken Stump                                  30.0   0        0            
+  broken Branch                                  3.0   0        0            
+  empty Bottle                                   0.2   0        0            
+  broken Bone                                    0.3   0        0            
+  set of broken Teeth                            0.1   0        0            
+  broken Figurine                                0.1   0        0            
+  handful of dusty Fur                           0.1   0        0            
+  broken Statue                                200.0   0        0            
+  mummified Corpse                              10.0   0        0            
+  broken Skull                                   0.2   1        0            
+  broken Skeleton                                2.0   1        0            
+  mummified Head                                 1.5   1        0            
+  mummified Hand                                 0.5   1        0            
+  mummified Arm                                  1.0   1        0            
+  mummified Leg                                  1.5   1        0            
+  handful of dusty Feathers                      0.1   2        0            
+  mummified Claw                                 0.2   2        0            
+  large Rock                                   200.0   5        0            
+  mummified Wing                                 1.5   5        0            
+  handful of dusty Scales                        0.2   9        0            
+  dusty Skin                                     2.0  20        0            
+  Iron Spike                                     1.0   1        1            
+  Wooden Torch                                   3.0   1        2 dam 2d6    
+  Flask of oil                                   1.0   1        3 dam 3d6    
+  Flask of acid                                  1.0  10       30 dam 3d6    
+  Brass Lantern                                  5.0   3       35 dam 3d6    
+  map to the mountain Caradhras                  0.5  20       50            
+  map to the mines of Moria                      0.5  20       50            
+  map to the citadel of Isengard                 0.5  20       50            
+  map titled 'There and Back Again'              0.5  20       50            
+  map to the ruins of Angmar                     0.5  20       50            
+  map to the sunken city of Numenor              0.5  20       50            
+  map to the temple of Elemental Evil            0.5  20       50            
+  map to the Crystal Castle                      0.5  20       50            
+  map to Shelob's Lair                           0.5  50       50            
+  map to Mount Doom                              0.5  80       50            
