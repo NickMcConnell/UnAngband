@@ -3233,8 +3233,8 @@ static int collect_monsters(int grp_cur, int *mon_idx, int mode)
 
 
 /*
- * Build a list of monster indexes in the given group. Return the number
- * of monsters in the group.
+ * Build a list of ego item indexes in the given group. Return the number
+ * of ego items in the group.
  */
 static int collect_ego_items(int grp_cur, int object_idx[])
 {
@@ -3293,8 +3293,8 @@ static int collect_ego_items(int grp_cur, int object_idx[])
 
 
 /*
- * Build a list of monster indexes in the given group. Return the number
- * of monsters in the group.
+ * Build a list of object indexes in the given group. Return the number
+ * of objects in the group.
  */
 static int collect_objects(int grp_cur, int object_idx[], int mode)
 {
@@ -3365,8 +3365,8 @@ static int collect_objects(int grp_cur, int object_idx[], int mode)
 }
 
 /*
- * Build a list of monster indexes in the given group. Return the number
- * of monsters in the group.
+ * Build a list of artifact indexes in the given group. Return the number
+ * of artifacts in the group.
  */
 static int collect_artifacts(int grp_cur, int object_idx[])
 {
@@ -3652,6 +3652,11 @@ static void display_artifact_list(int col, int row, int per_page, int object_idx
 		/* Display the name */
 		c_prt(attr, o_name, row + i, col);
 
+		if (p_ptr->wizard) 
+		{
+			c_prt(attr, format("%d", a_idx), row + i, 60);
+		}
+
 	}
 
 	/* Clear remaining lines */
@@ -3738,10 +3743,10 @@ static void do_cmd_knowledge_artifacts(void)
 		/* Save the maximum length */
 		if (len > max) max = len;
 
-		/* See if any monsters are known */
+		/* See if any artifacts are known */
 		if (collect_artifacts(i, object_idx))
 		{
-			/* Build a list of groups with known monsters */
+			/* Build a list of groups with known artifacts */
 			grp_idx[grp_cnt++] = i;
 		}
 	}
@@ -3785,7 +3790,7 @@ static void do_cmd_knowledge_artifacts(void)
 		if (grp_cur < grp_top) grp_top = grp_cur;
 		if (grp_cur >= grp_top + browser_rows) grp_top = grp_cur - browser_rows + 1;
 
-		/* Scroll monster list */
+		/* Scroll artifact list */
 		if (object_cur < object_top) object_top = object_cur;
 		if (object_cur >= object_top + browser_rows) object_top = object_cur - browser_rows + 1;
 
@@ -3804,7 +3809,7 @@ static void do_cmd_knowledge_artifacts(void)
 		/* Prompt */
 		prt("<dir>, 'r' to recall, ESC", hgt - 1, 0);
 
-		/* Mega Hack -- track this monster race */
+		/* Mega Hack -- track this artifact race */
 		if (object_cnt) artifact_track(object_idx[object_cur]);
 
 		/* The "current" object changed */
@@ -3906,9 +3911,9 @@ static void display_visual_list(int col, int row, int height, int width, byte at
 			if (use_bigtile)
 			{
 				if (a & 0x80)
-					Term_putch(x, y + 1, 255, -1);
+					Term_putch(x + 1, y, 255, -1);
 				else
-					Term_putch(x, y + 1, TERM_WHITE, ' ');
+					Term_putch(x + 1, y, TERM_WHITE, ' ');
 			}
 
 		}
@@ -4092,7 +4097,7 @@ static void display_monster_list(int col, int row, int per_page, int *mon_idx,
 		/* Hack -- visual_list mode */
 		if (per_page == 1)
 		{
-			c_prt(attr, format("%02x/%02x", r_ptr->x_attr, r_ptr->x_char), row + i, 60);
+			c_prt(attr, format(r_ptr->x_char >= 0 ? "%02x/%02x" : "%02x/%d", r_ptr->x_attr, r_ptr->x_char), row + i, 60);
 		}
 		else if (p_ptr->wizard) 
 		{
@@ -4358,6 +4363,11 @@ static void display_ego_item_list(int col, int row, int per_page, int object_idx
 		/* Display the name */
 		c_prt(attr, e_name + e_ptr->name, row + i, col);
 
+		if (p_ptr->wizard) 
+		{
+			c_prt(attr, format("%d", e_idx), row + i, 60);
+		}
+
 		if (e_ptr->note)
 		{
 			c_prt(TERM_YELLOW,quark_str(e_ptr->note), row+i, 65);
@@ -4452,10 +4462,10 @@ static void do_cmd_knowledge_ego_items(void)
 		/* Save the maximum length */
 		if (len > max) max = len;
 
-		/* See if any monsters are known */
+		/* See if any ego items are known */
 		if (collect_ego_items(i, object_idx))
 		{
-			/* Build a list of groups with known monsters */
+			/* Build a list of groups with known ego items */
 			grp_idx[grp_cnt++] = i;
 		}
 	}
@@ -4499,7 +4509,7 @@ static void do_cmd_knowledge_ego_items(void)
 		if (grp_cur < grp_top) grp_top = grp_cur;
 		if (grp_cur >= grp_top + browser_rows) grp_top = grp_cur - browser_rows + 1;
 
-		/* Scroll monster list */
+		/* Scroll ego item list */
 		if (object_cur < object_top) object_top = object_cur;
 		if (object_cur >= object_top + browser_rows) object_top = object_cur - browser_rows + 1;
 
@@ -4693,7 +4703,7 @@ static void display_object_list(int col, int row, int per_page, int object_idx[]
 		byte cursor = ((k_ptr->aware) ? TERM_L_BLUE : TERM_BLUE);
 
 		byte a = k_ptr->flavor && (view_flavors || !k_ptr->aware) ? (x_info[k_ptr->flavor].x_attr) : (k_ptr->x_attr);
-		byte c = k_ptr->flavor && (view_flavors || !k_ptr->aware) ? (x_info[k_ptr->flavor].x_char) : (k_ptr->x_char);
+		char c = k_ptr->flavor && (view_flavors || !k_ptr->aware) ? (x_info[k_ptr->flavor].x_char) : (k_ptr->x_char);
 	
 		attr = ((i + object_top == object_cur) ? cursor : attr);
 
@@ -4709,6 +4719,16 @@ static void display_object_list(int col, int row, int per_page, int object_idx[]
 
 		/* Display the name */
 		c_prt(attr, o_name, row + i, col);
+
+		/* Hack -- visual_list mode */
+		if (per_page == 1)
+		{
+			c_prt(attr, format(c >= 0 ? "%02x/%02x" : "%02x/%d", a, c), row + i, 60);
+		}
+		else if (p_ptr->wizard) 
+		{
+			c_prt(attr, format("%d", k_idx), row + i, 60);
+		}
 
 		if (k_ptr->note && (k_ptr->aware || !k_ptr->flavor))
 		{
@@ -5236,6 +5256,16 @@ static void display_feature_list(int col, int row, int per_page, int *feat_idx,
 		/* Display the name */
 		c_prt(attr, f_name + f_ptr->name, row + i, col);
 
+		/* Hack -- visual_list mode */
+		if (per_page == 1)
+		{
+			c_prt(attr, format(f_ptr->x_char >= 0 ? "%02x/%02x" : "%02x/%d", f_ptr->x_attr, f_ptr->x_char), row + i, 60);
+		}
+		else if (p_ptr->wizard) 
+		{
+			c_prt(attr, format("%d", f_idx), row + i, 60);
+		}
+
 		/* Display symbol */
 		Term_putch(68, row + i, f_ptr->x_attr, f_ptr->x_char);
 
@@ -5432,7 +5462,7 @@ static void do_cmd_knowledge_features(void)
 			/* Display a list of features in the current group */
 			display_feature_list(max + 3, 6, 1, feat_idx, feat_cur, feat_top);
 
-			/* Display visual list below first object */
+			/* Display visual list below first feature */
 			display_visual_list(max + 3, 7, browser_rows-1, wid - (max + 3), attr_top, char_left);
 		}
 
