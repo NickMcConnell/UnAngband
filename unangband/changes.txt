@@ -22,15 +22,22 @@ were generated in a store, even if subsequently discarded.
 - Fixed bug where scrolls of Curse Armour/ Curse Weapon
 effects were reversed.
 - Fixed a bug where Bree town levels extended several
-levels into the dungeon.
+levels into the dungeon. (Most bugs reported by Adam
+Horowitz for this release).
 - Now use Enter to continue and ESC to restart the
 character generation process.
 - Fix division by 0 bug with guard condition in randart
 generation code that was causing crashes at end of
 character generation.
-
-
-
+- Tidied up some problems with terrain causing crasher
+bugs in campaign mode. Also fixed some logic problems.
+- Trapped doors should work now.
+- You can now affect doors and other terrain with bolt
+spells as well as ball spells.
+- Smoke/steam removed by cold attacks (Suggested by Adam
+Horowitz).
+- Guardians on surface levels are now generated during
+daytime as well (But still only night time in towns).
 
 Andrew Sidwell has volunteered to help out while I'm
 on holiday, as a 'caretaker' rather than fully fledged
