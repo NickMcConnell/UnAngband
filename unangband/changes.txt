@@ -17,6 +17,11 @@ types of fountains, trees, mineral veins and so on.
 
 ### User Interface ###
 
+- Added 'show sidebar' option, which defaults to yes. Setting this to no moves
+information normally on the left hand side of the main display to a more compact
+format at the bottom of the window, making more space available for the map
+display.
+
 - Added experimental Double tile mode (Windows only), which is has tiles
 twice as wide and high as regular tiles. When used along with big tiles, results
 in tiles four times as wide and twice as high. Because the tiles have increased 
@@ -41,8 +46,8 @@ in front and behind, and other visual artefacts that currently make this
 assigner at this stage, as the supplied 54x54.bmp and mask54.bmp file are
 only temporary and some poorly 'glued' together.
 
-- Windows assumes that graphic tile (0,0) is always a floor tile. Corrected this
-so that the .bmp files honour this assumption. 
+- Fixed some visual artifacts caused by the assumption that graphics tile
+0 is a floor tile.
 
 - Can now use 'k' in knowledge menus to toggle auto-destruction of objects,
 'g' to toggle auto-pickup, 'i' to toggle auto-ignore, 's' to toggle auto-
