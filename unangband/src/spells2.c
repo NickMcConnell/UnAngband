@@ -5711,6 +5711,8 @@ bool process_spell_types(int spell, int level, bool *cancel)
 			{
 				if ((!get_rep_dir(&dir)) && (*cancel)) return (FALSE);
 				else warding_trap(s_ptr->param,dir);
+				*cancel = FALSE;
+				obvious = TRUE;
 				break;
 			}
 			case SPELL_SUMMON:
