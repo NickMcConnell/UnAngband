@@ -197,7 +197,6 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags4 & (RF4_SHOOT))     vp[vn++] = "shoot at you";
 	if (l_ptr->flags4 & (RF4_EXPLODE))     vp[vn++] = "explode";
 	if (l_ptr->flags4 & (RF4_AURA)) vp[vn++] = "radiate a powerful aura";
-	if (l_ptr->flags4 & (RF4_SHOOT)) vp[vn++] = "shoot you";
 	if (l_ptr->flags4 & (RF4_THROW)) vp[vn++] = "throw things at you";
 
 
@@ -286,7 +285,10 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags5 & RF5_DRAIN_MANA)  vp[vn++] = "drain mana";
 	if (l_ptr->flags5 & RF5_MIND_BLAST)  vp[vn++] = "cause mind blasting";
 	if (l_ptr->flags5 & RF5_BRAIN_SMASH) vp[vn++] = "cause brain smashing";
-	if (l_ptr->flags5 & RF5_WOUND)     	 vp[vn++] = "cause wounds";
+	if (l_ptr->flags5 & RF5_WOUND)       vp[vn++] = "cause wounds";
+	if (l_ptr->flags5 & RF5_HUNGER)      vp[vn++] = "cause hunger";
+	if (l_ptr->flags5 & RF5_XXX3)        vp[vn++] = "do something";
+	if (l_ptr->flags5 & RF5_XXX4)        vp[vn++] = "do something";
 	if (l_ptr->flags5 & RF5_BO_ACID)     vp[vn++] = "produce acid bolts";
 	if (l_ptr->flags5 & RF5_BO_ELEC)     vp[vn++] = "produce lightning bolts";
 	if (l_ptr->flags5 & RF5_BO_FIRE)     vp[vn++] = "produce fire bolts";
@@ -297,6 +299,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags5 & RF5_BO_MANA)     vp[vn++] = "produce mana bolts";
 	if (l_ptr->flags5 & RF5_BO_PLAS)     vp[vn++] = "produce plasma bolts";
 	if (l_ptr->flags5 & RF5_BO_ICEE)     vp[vn++] = "produce ice bolts";
+	if (l_ptr->flags5 & RF5_XXX5)        vp[vn++] = "do something";
 	if (l_ptr->flags5 & RF5_SCARE)       vp[vn++] = "terrify";
 	if (l_ptr->flags5 & RF5_BLIND)       vp[vn++] = "blind";
 	if (l_ptr->flags5 & RF5_CONF)vp[vn++] = "confuse";
