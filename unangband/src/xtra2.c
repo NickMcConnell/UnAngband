@@ -4087,7 +4087,7 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 
 							/* Recall monster on screen */
 							/* Except for containers holding 'something' */
-							if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_known_p(o_ptr))) screen_roff(o_ptr->name3);
+							if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_known_p(o_ptr)))) screen_roff(o_ptr->name3);
 
 							/* Recall on screen */
 							else screen_object(o_ptr, TRUE);
@@ -4242,6 +4242,8 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 			/* Describe it */
 			if (o_ptr->marked)
 			{
+				bool recall = FALSE;
+
 				char o_name[80];
 
 				/* Not boring */

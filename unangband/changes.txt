@@ -43,6 +43,8 @@ information about the monster when you discover them.
 - You can now recall objects while you are looking at
 them. You will recall the monster instead if they are
 a monster body part or container or statue...
+- Removed Create Golem spell until friendly monsters are
+implemented.
 
 Andrew Sidwell has volunteered to help out while I'm
 on holiday, as a 'caretaker' rather than fully fledged
