@@ -10,6 +10,9 @@ Turner).
 - Piles of earth were removed, resulting in 'nothing' occuring in some rooms.
 (Reported by Anthony Holmes).
 
+- Occasionally on the far right of the map, the wrong panel would be displayed
+(Reported by Anthony Holmes).
+
 
 UnAngband 0.5.4b: "Survival of the Fittest"
 
