@@ -7503,9 +7503,9 @@ static void recover_monster(int m_idx, bool regen)
 
 		bool daytime = ((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2));
 
-		bool hurt_lite = r_ptr->flags3 & (RF3_HURT_LITE);
+		bool hurt_lite = ((r_ptr->flags3 & (RF3_HURT_LITE)) ? TRUE : FALSE);
 
-		bool outside = (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE));
+		bool outside = ((f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)) ? TRUE : FALSE);
 
 		/* Hack -- silently wake monster */
 		m_ptr->csleep = 0;

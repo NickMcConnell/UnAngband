@@ -1844,7 +1844,7 @@ bool mon_resist_feat(int feat, int r_idx)
 
 	bool daytime = ((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2));
 
-	bool outside = (f_info[feat].flags3 & (FF3_OUTSIDE));
+	bool outside = ((f_info[feat].flags3 & (FF3_OUTSIDE)) ? TRUE : FALSE);
 
 	/* Get feature info */
 	f_ptr= &f_info[feat];

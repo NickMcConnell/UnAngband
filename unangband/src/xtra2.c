@@ -2214,7 +2214,7 @@ void monster_death(int m_idx)
 
 	bool do_gold = (!(r_ptr->flags1 & (RF1_ONLY_ITEM)));
 	bool do_item = (!(r_ptr->flags1 & (RF1_ONLY_GOLD)));
-	bool do_chest = (r_ptr->flags7 & (RF7_DROP_CHEST));
+	bool do_chest = (r_ptr->flags7 & (RF7_DROP_CHEST) ? TRUE : FALSE);
 
 	int force_food = get_food_type(r_ptr);
 	int force_coin = get_coin_type(r_ptr);
