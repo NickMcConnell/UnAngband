@@ -3904,6 +3904,7 @@ static void do_cmd_knowledge_monsters(void)
 		/* Prompt */
 		if (visual_list && (attr_idx || char_idx)) prt("<dir>, ENTER to accept, 'c', 'p' to paste ESC",23,0);
 		else if (visual_list) prt("<dir>, ENTER to accept, 'c' to copy, ESC",23,0);
+		else if ((attr_idx || char_idx)) prt("<dir>, ENTER to recall, 'v' for visuals, 'p' to paste, ESC", 23, 0);
 		else prt("<dir>, ENTER to recall, 'v' for visuals, ESC", 23, 0);
 
 		/* Mega Hack -- track this monster race */
@@ -4006,12 +4007,14 @@ static void do_cmd_knowledge_monsters(void)
 				{
 					/* Set the char */
 					r_ptr->x_attr = attr_idx;
+					attr_top = MAX(0, r_ptr->x_attr - 5);
 				}
 
 				if (char_idx)
 				{
 					/* Set the char */
 					r_ptr->x_char = char_idx;
+					char_left = MAX(-128, r_ptr->x_char - 10);
 				}
 				break;
 			}
@@ -4037,7 +4040,6 @@ static void do_cmd_knowledge_monsters(void)
 					if ((char_left < 127 - SCREEN_WID + max + 4) && (ddx[d] > 0) && (r_ptr->x_char > -118)) char_left += ddx[d];
 					if ((attr_top > 0) && (ddy[d] < 0) && (r_ptr->x_attr < 250)) attr_top += ddy[d];
 					if ((attr_top < 255 - BROWSER_ROWS + 2) && (ddy[d] > 0) && (r_ptr->x_attr > 5)) attr_top += ddy[d];
-
 				}
 				else
 				{
@@ -4420,7 +4422,7 @@ static void display_object_list(int col, int row, int per_page, int object_idx[]
 		/* Display the name */
 		c_prt(attr, o_name, row + i, col);
 
-		if (k_ptr->note)
+		if (k_ptr->note && (k_ptr->aware || !k_ptr->flavor))
 		{
 			c_prt(TERM_YELLOW,quark_str(k_ptr->note), row+i, 65);
 		}
@@ -4603,10 +4605,13 @@ static void do_cmd_knowledge_objects(void)
 		if (visual_list) display_visual_list(max + 3, 7, BROWSER_ROWS-1, *x_attr, attr_top, *x_attr, char_left);
 
 		/* Prompt */
-		if (visual_list && (attr_idx || char_idx)) prt("<dir>, ENTER to accept, 'c', 'p' to paste ESC",23,0);
+		if (visual_list && (attr_idx || char_idx)) prt("<dir>, ENTER to accept, 'c', 'p' to paste, ESC",23,0);
 		else if (visual_list) prt("<dir>, ENTER to accept, 'c' to copy, ESC",23,0);
-		else if (note_idx) prt("<dir>, ENTER, '{', '}', 'c', 'p' to paste, 'v' for visuals, ESC", 23,0);
-		else prt("<dir>, ENTER to recall, '{' to inscribe, '}', 'c' to copy, 'v' for visuals, ESC", 23, 0);
+		else if (attr_idx || char_idx) prt("<dir>, ENTER to recall, 'c', 'p' to paste visual, 'v', ESC",23,0);
+		else if (note_idx && (k_ptr->aware || !k_ptr->flavor)) prt("<dir>, ENTER, '{', '}', 'c', 'p' to paste inscrip, 'v' for visuals, ESC", 23,0);
+		else if (note_idx) prt("<dir>, ENTER, 'c', 'p' to paste inscrip, 'v' for visuals, ESC", 23,0);
+		else if (k_ptr->aware || !k_ptr->flavor) prt("<dir>, ENTER to recall, '{' to inscribe, '}', 'c' to copy, 'v' for visuals, ESC", 23, 0);
+		else prt("<dir>, ENTER to recall, 'c' to copy, 'v' for visuals, ESC", 23, 0);
 
 		/* Mega Hack -- track this monster race */
 		if (object_cnt) object_kind_track(object_idx[object_cur]);
@@ -4698,7 +4703,7 @@ static void do_cmd_knowledge_objects(void)
 			{
 				char note_text[80];
 
-				if (!visual_list)
+				if (!visual_list && (k_ptr->aware || !k_ptr->flavor))
 				{
 
 					/* Prompt */
@@ -4737,7 +4742,7 @@ static void do_cmd_knowledge_objects(void)
 
 			case '}':
 			{
-				if (!visual_list)
+				if (!visual_list && (k_ptr->aware || !k_ptr->flavor))
 				{
 					/* Set the inscription */
 					k_ptr->note = 0;
@@ -4790,11 +4795,13 @@ static void do_cmd_knowledge_objects(void)
 				if (attr_idx)
 				{
 					*x_attr = attr_idx;
+					attr_top = MAX(0, *x_attr - 5);
 				}
 
 				if (char_idx)
 				{
 					*x_char = char_idx;
+					char_left = MAX(-128, *x_char - 10);
 				}
 
 				if (note_idx)
@@ -5126,6 +5133,7 @@ static void do_cmd_knowledge_features(void)
 		/* Prompt */
 		if (visual_list && (attr_idx || char_idx)) prt("<dir>, ENTER to accept, 'c', 'p' to paste ESC",23,0);
 		else if (visual_list) prt("<dir>, ENTER to accept, 'c' to copy, ESC",23,0);
+		else if ((attr_idx || char_idx)) prt("<dir>, 'v' for visuals, 'p' to paste, ESC", 23, 0);
 		else prt("<dir>, 'v' for visuals, ESC", 23, 0);
 
 		if (visual_list)
@@ -5211,12 +5219,14 @@ static void do_cmd_knowledge_features(void)
 				{
 					/* Set the char */
 					f_ptr->x_attr = attr_idx;
+					attr_top = MAX(0, f_ptr->x_attr - 5);
 				}
 
 				if (char_idx)
 				{
 					/* Set the char */
 					f_ptr->x_char = char_idx;
+					char_left = MAX(-128, f_ptr->x_char - 10);
 				}
 				break;
 			}

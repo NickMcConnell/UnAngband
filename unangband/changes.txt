@@ -4,6 +4,13 @@
 purposes. This will allow the player to set attr/mappings. Also allows
 stores to be seen from anywhere on town level.
 
+- Prevent user inscribing or unscribing any unaware objects, also do 
+not display inscription in the knowledge menus.
+
+### Bug fixes ###
+
+- Fix a display problem when pasting a visual attr/char mapping.
+
 Unangband 0.5.2a Bugfix release
 
 ### Game-play ###
