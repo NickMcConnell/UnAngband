@@ -1,8 +1,12 @@
+### User Interface ###
 
+- Added ability to redefine visual prefs using the knowledge menus (~).
+This is done via a graphic user interface type setting, allowing you to
+see large numbers of possible graphics to select from.
 
 ### Bug fixes ###
 
-- Actually made teleport is a lot safer to use. You will not be placed in
+- Actually made teleport a lot safer to use. You will not be placed in
 potentially dangerous grids.
 
 - Fixed bug where monster could end up in unsafe grids for the monster
