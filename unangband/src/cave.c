@@ -2824,182 +2824,185 @@ void update_view(void)
 	if (radius > 0) ++radius;
 
 #ifdef MONSTER_LITE
-    /*** Step 1A -- monster lites ***/
-    /* Scan monster list and add monster lites */
-    for ( i = 1; i < z_info->m_max; i++)
-   {
+	/*** Step 1A -- monster lites ***/
+	/* Scan monster list and add monster lites */
+	for ( i = 1; i < z_info->m_max; i++)
+	{
 
-/* Check the i'th monster */
-monster_type *m_ptr = &m_list[i];
-monster_race *r_ptr = &r_info[m_ptr->r_idx];
+		/* Check the i'th monster */
+		monster_type *m_ptr = &m_list[i];
+		monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
-       /* Skip dead monsters */
-       if (!m_ptr->r_idx) continue;
+	      /* Skip dead monsters */
+      	if (!m_ptr->r_idx) continue;
 
-/* Skip sleeping monsters */
-if (m_ptr->csleep) continue;
+		/* Skip sleeping monsters */
+		if (m_ptr->csleep) continue;
 
-/* Skip hiding monsters */
-if (m_ptr->mflag & (MFLAG_HIDE)) continue;
+		/* Skip hiding monsters */
+		if (m_ptr->mflag & (MFLAG_HIDE)) continue;
 
+		/* Access the location */
+		fx = m_ptr->fx;
+		fy = m_ptr->fy;
 
-       /* Access the location */
-       fx = m_ptr->fx;
-       fy = m_ptr->fy;
+		/* Carrying lite */
+		if (r_ptr->flags2 & (RF2_HAS_LITE))
+		#if 0
+			/* We might also allow the following situation for monsters
+			 * to carry lights:
 
-/* Carrying lite */
-if (r_ptr->flags2 & (RF2_HAS_LITE))
-#if 0
-/* We might also allow the following situation for monsters
- * to carry lights:
+			  - if they are t, p, q, P, h or l
+			  - and not hurt lite
+			  - and the player is hidden or in darkness
+			 *
+			 */
 
-  - if they are t, p, q, P, h or l
-  - and not hurt lite
-  - and the player is hidden or in darkness
- *
- */
+		#endif
+		{
+			/* monster grid */
+			if (los(py,px,fy,fx))
+			{
+				g = GRID(fy,fx);
+				info = fast_cave_info[g];
 
-#endif
-{
-    /* monster grid */
-    if (los(py,px,fy,fx))
-    {
-g = GRID(fy,fx);
-info = fast_cave_info[g];
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
 
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
+				/* Save cave info */
+				fast_cave_info[g] = info;
 
-/* Save cave info */
-fast_cave_info[g] = info;
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
 
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
+			/* Radius 1 -- torch radius */
 
-    /* Radius 1 -- torch radius */
+			/* Adjacent grid */
+			if (los(py,px,fy+1,fx))
+			{
+				g = GRID(fy+1,fx);
+				info = fast_cave_info[g];
 
-    /* Adjacent grid */
-    if (los(py,px,fy+1,fx))
-    {
-g = GRID(fy+1,fx);
-info = fast_cave_info[g];
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
 
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
+				/* Save cave info */
+				fast_cave_info[g] = info;
 
-/* Save cave info */
-fast_cave_info[g] = info;
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
 
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
+			if (los(py,px,fy-1,fx))
+			{
+				g = GRID(fy-1,fx);
+				info = fast_cave_info[g];
 
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
 
-    if (los(py,px,fy-1,fx))
-    {
-g = GRID(fy-1,fx);
-info = fast_cave_info[g];
+				/* Save cave info */
+				fast_cave_info[g] = info;
 
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
 
-/* Save cave info */
-fast_cave_info[g] = info;
+			if (los(py,px,fy,fx+1))
+			{
+				g = GRID(fy,fx+1);
+				info = fast_cave_info[g];
 
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
-    if (los(py,px,fy,fx+1))
-    {
-g = GRID(fy,fx+1);
-info = fast_cave_info[g];
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
 
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
+				/* Save cave info */
+				fast_cave_info[g] = info;
 
-/* Save cave info */
-fast_cave_info[g] = info;
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
 
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
-    if (los(py,px,fy,fx-1))
-    {
-g = GRID(fy,fx-1);
-info = fast_cave_info[g];
+			if (los(py,px,fy,fx-1))
+			{
+				g = GRID(fy,fx-1);
+				info = fast_cave_info[g];
 
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
 
-/* Save cave info */
-fast_cave_info[g] = info;
+				/* Save cave info */
+				fast_cave_info[g] = info;
 
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
 
-    /* Diagonal grids */
-    if (los(py,px,fy+1,fx+1))
-    {
-g = GRID(fy+1,fx+1);
-info = fast_cave_info[g];
+			/* Diagonal grids */
+			if (los(py,px,fy+1,fx+1))
+			{
+				g = GRID(fy+1,fx+1);
+				info = fast_cave_info[g];
 
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
 
-/* Save cave info */
-fast_cave_info[g] = info;
+				/* Save cave info */
+				fast_cave_info[g] = info;
 
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
-    if (los(py,px,fy+1,fx-1))
-    {
-g = GRID(fy+1,fx-1);
-info = fast_cave_info[g];
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
 
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
+			if (los(py,px,fy+1,fx-1))
+			{
+				g = GRID(fy+1,fx-1);
+				info = fast_cave_info[g];
 
-/* Save cave info */
-fast_cave_info[g] = info;
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
 
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
-    if (los(py,px,fy-1,fx+1))
-    {
-g = GRID(fy-1,fx+1);
-info = fast_cave_info[g];
+				/* Save cave info */
+				fast_cave_info[g] = info;
 
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
 
-/* Save cave info */
-fast_cave_info[g] = info;
+			if (los(py,px,fy-1,fx+1))
+			{
+				g = GRID(fy-1,fx+1);
+				info = fast_cave_info[g];
 
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
-    if (los(py,px,fy-1,fx-1))
-    {
-g = GRID(fy-1,fx-1);
-info = fast_cave_info[g];
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
 
-info |= (CAVE_VIEW);
-info |= (CAVE_SEEN);
+				/* Save cave info */
+				fast_cave_info[g] = info;
 
-/* Save cave info */
-fast_cave_info[g] = info;
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
 
-/* Save in array */
-fast_view_g[fast_view_n++] = g;
-    }
+			if (los(py,px,fy-1,fx-1))
+			{
+				g = GRID(fy-1,fx-1);
+				info = fast_cave_info[g];
 
-}
+				info |= (CAVE_VIEW);
+				info |= (CAVE_SEEN);
 
-    }
+				/* Save cave info */
+				fast_cave_info[g] = info;
+
+				/* Save in array */
+				fast_view_g[fast_view_n++] = g;
+			}
+
+		}
+
+	}
 #endif
 	/*** Step 1B -- player grid ***/
 
@@ -3320,7 +3323,7 @@ void update_noise(void)
 	int this_cycle = 0;
 	int next_cycle = 1;
 
-byte flow_table[2][2][8 * NOISE_STRENGTH];
+	byte flow_table[2][2][8 * NOISE_STRENGTH];
 
 	/* The character's grid has no flow info.  Do a full rebuild. */
 	if (cave_cost[p_ptr->py][p_ptr->px] == 0) full = TRUE;
@@ -3684,6 +3687,9 @@ void update_smell(void)
 
 #endif
 }
+
+
+
 
 /*
  * Map the current panel (plus some) ala "magic mapping"
