@@ -1909,9 +1909,6 @@ int place_monster_here(int y, int x, int r_idx)
 	feature_type *f_ptr;
 	monster_race *r_ptr;
 
-	/* Hack -- flying/climbing monsters can travel anywhere on surface except outer edges */
-	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
-
 	/* Get feature */
 	feat = cave_feat[y][x];
 
@@ -1967,7 +1964,7 @@ int place_monster_here(int y, int x, int r_idx)
 
 	/* Hack -- check for flying. */
 	if ((r_ptr->flags2 & (RF2_CAN_FLY)) &&
-		((f_ptr->flags2 & (FF2_CAN_FLY)) || (surface && (cave_feat[y][x] != FEAT_PERM_SOLID)) ))
+		(f_ptr->flags2 & (FF2_CAN_FLY)))
 	{
 		return(MM_FLY);
 	}
@@ -1979,7 +1976,7 @@ int place_monster_here(int y, int x, int r_idx)
 
 	/* Hack -- check for climbing. */
 	if ((r_ptr->flags2 & (RF2_CAN_CLIMB)) && 
-		((f_ptr->flags2 & (FF2_CAN_FLY)) || (surface && (cave_feat[y][x] != FEAT_PERM_SOLID)) ))
+		(f_ptr->flags2 & (FF2_CAN_FLY)))
 	{
 		int i;
 

@@ -4277,6 +4277,9 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 {
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
+	/* Hack -- fly (almost) anywhere on surface */
+	bool surface = p_ptr->depth == min_depth(p_ptr->dungeon);
+
 	/* Assume nothing in the grid other than the terrain hinders movement */
 	int move_chance = 100;
 
@@ -4353,7 +4356,6 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 	/* Check how we move */
 	mmove = place_monster_here(y,x,m_ptr->r_idx);
 
-
 	/*** Check passability of various features. ***/
 
 	/* The monster is under covered terrain, moving to uncovered terrain. */
@@ -4393,6 +4395,12 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 		{
 			/* Glyphs are hard to break */
 			return (MIN(100 * r_ptr->level / BREAK_GLYPH, move_chance));
+		}
+
+		/* Monsters outside can fly/climb over buildings */
+		if ((surface) && (m_ptr->mflag & (MFLAG_OVER)) && (feat != FEAT_PERM_SOLID))
+		{
+			return (100);
 		}
 
 		/* Monster can open doors */

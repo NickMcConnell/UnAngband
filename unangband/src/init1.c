@@ -362,7 +362,7 @@ static cptr f_info_flags3[] =
 	"SLIME",
 	"TREE",
 	"TREE_BIG",
-	"XXX3",
+	"INSTANT",
 	"FULL_MOVE",
 	"TIMED",
 	"ERUPT",

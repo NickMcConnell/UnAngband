@@ -3322,13 +3322,17 @@ void update_view(void)
 }
 
 /*
- * Update the features that have DYNAMIC | ERUPT | STRIKE flags. These grids
- * need to be checked every turn to see if they affected adjacent grids with
+ * Update the features that have TIMED | ERUPT | STRIKE | SPREAD | INSTANT flags. These
+ * grids need to be checked every turn to see if they affected adjacent grids with
  * an attack of some kind.
  *
- * DYNAMIC grids will 80% of the time affect an adjacent grid with an attack
- * equal to their blow attack. They will also 80% of the time affect their own grid
- * with an additional blow attack.
+ * INSTANT grids always alter themselves.
+ *
+ * TIMED grids will 2% of the time alter themselves.
+ *
+ * SPREAD grids will 66% of the time affect an adjacent grid with an attack
+ * equal to their blow attack, along with their own grid. 8% of the time they
+ * will affect their own grid only.
  *
  * ERUPT grids will 5% of the time project a radius 2 ball attack equal to twice
  * the damage of their blow attack, centred on their grid.
@@ -3455,6 +3459,12 @@ void update_dyna(void)
 		/* Get the feature */
 		f_ptr = &f_info[feat];
 
+		/* Instant */
+		if (f_ptr->flags3 & (FF3_INSTANT))
+		{
+			cave_alter_feat(y,x,FS_INSTANT);
+		}
+
 		/* Timed */
 		if (f_ptr->flags3 & (FF3_TIMED))
 		{
@@ -3495,12 +3505,14 @@ void update_dyna(void)
 		/* Dynamic */
 		if (f_ptr->flags3 & (FF3_SPREAD))
 		{
-			int dir = rand_int(10);
+			int dir = rand_int(12);
 
 			if (dir < 8)
 			{
 				int yy = y + ddy_ddd[dir];
 				int xx = x + ddx_ddd[dir];
+
+				int adjfeat = cave_feat[yy][xx];
 
 				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
 
@@ -3508,19 +3520,14 @@ void update_dyna(void)
    
 				/* Apply the blow */
 				project(0, 0, yy, xx, dam, f_ptr->blow.effect, flg);
+
+				/* Hack -- require smoke/acid clouds to move */
+				if (adjfeat == cave_feat[yy][xx]) dir = 12;
 			}
 
-			if (rand_int(10) < 8)
+			if (dir < 9)
 			{
-				y = GRID_Y(g);
-				x = GRID_X(g);
-
-				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
-
-				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
-   
-				/* Apply the blow */
-				project(0, 0, y, x, dam, f_ptr->blow.effect, flg);
+				cave_alter_feat(y,x,FS_SPREAD);
 			}
 		}
 	}
@@ -4400,10 +4407,6 @@ static void cave_set_feat_aux(int y, int x, int feat)
 /*
  * Change the "feat" flag for a grid, and notice/redraw the grid
  */
-/*
- * ANDY - Updated to set FF2_GLOW correctly.
- * TODO - Handle fires/smoke etc.
- */
 void cave_set_feat(int y, int x, int feat)
 {
 	int i,ii;
@@ -4413,8 +4416,11 @@ void cave_set_feat(int y, int x, int feat)
 	feature_type *f_ptr = &f_info[cave_feat[y][x]];
 	feature_type *f_ptr2 = &f_info[feat];
 
+	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
+	bool daytime = (((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2)));
+
 	bool glow = (f_ptr->flags2 & (FF2_GLOW)) !=0;
-	bool glow2 = (f_ptr2->flags2 & (FF2_GLOW)) != 0;
+	bool glow2 = (f_ptr2->flags2 & (FF2_GLOW)) !=0;
 
 	bool wall = (f_ptr->flags1 & (FF1_WALL)) !=0;
 	bool wall2 = (f_ptr2->flags1 & (FF1_WALL)) != 0;
@@ -4422,10 +4428,13 @@ void cave_set_feat(int y, int x, int feat)
 	bool tree = (f_ptr->flags3 & (FF3_TREE_BIG)) !=0;
 	bool tree2 = (f_ptr2->flags3 & (FF3_TREE_BIG)) != 0;
 
+	bool dayt = ((f_ptr->flags3 & (FF3_OUTSIDE)) !=0) && (daytime) && (surface);
+	bool dayt2 = ((f_ptr2->flags3 & (FF3_OUTSIDE)) !=0) && (daytime) && (surface);
+
 	if (glow && !glow2)
 	{
 		/* Darken temporarily */
-		cave_info[y][x] &= ~(CAVE_GLOW);
+		if (!dayt2) cave_info[y][x] &= ~(CAVE_GLOW);
 
 		for (i = 0; i < 8; i++)
 		{
@@ -4449,8 +4458,8 @@ void cave_set_feat(int y, int x, int feat)
 			else if (cave_info[yy][xx] & (CAVE_GLOW))
 			{
 				/* Darken temporarily */
-				cave_info[yy][xx] &= ~(CAVE_GLOW);
-			
+				if (!daytime || !surface || !(f_ptr2->flags3 & (FF3_OUTSIDE))) cave_info[yy][xx] &= ~(CAVE_GLOW);
+
 				for (ii = 0; ii < 8; ii++)
 				{
 					int yyy = yy + ddy_ddd[ii];
@@ -4463,21 +4472,64 @@ void cave_set_feat(int y, int x, int feat)
 
 					glow4 = (f_info[cave_feat[yyy][xxx]].flags2 & (FF2_GLOW)) != 0;
 
-					if (glow4 && !(cave_info[yy][xx] & (CAVE_GLOW)))
+					if (glow4)
 					{
 						/* Illuminate the grid */
 						cave_info[yy][xx] |= (CAVE_GLOW);
-
-						/* Notice */
-						note_spot(yy, xx);
-
-						/* Redraw */
-						lite_spot(yy, xx);
 					}
+				}
+
+				/* Notice change */
+				if (!(cave_info[yy][xx] & (CAVE_GLOW)))
+				{
+					note_spot(yy,xx);
+
+					lite_spot(yy,xx);
 				}
 			}
 		}
+
+		/* Notice change */
+		if (!(cave_info[y][x] & (CAVE_GLOW)))
+		{
+			note_spot(y,x);
+
+			lite_spot(y,x);
+		}
 	}
+	else if (dayt && !dayt2)
+	{
+		/* Darken temporarily */
+		cave_info[y][x] &= ~(CAVE_GLOW);
+
+		for (i = 0; i < 8; i++)
+		{
+			int yy = y + ddy_ddd[i];
+			int xx = x + ddx_ddd[i];
+
+			bool glow3;
+
+			/* Ignore annoying locations */
+			if (!in_bounds_fully(yy, xx)) continue;
+
+			glow3 = (f_info[cave_feat[yy][xx]].flags2 & (FF2_GLOW)) != 0;
+
+			if (glow3)
+			{
+				/* Illuminate the grid */
+				cave_info[y][x] |= (CAVE_GLOW);
+			}
+		}
+
+		/* Notice change */
+		if (!(cave_info[y][x] & (CAVE_GLOW)))
+		{
+			note_spot(y,x);
+
+			lite_spot(y,x);
+		}
+	}
+
 
 	/* Change the feature */
 	cave_set_feat_aux(y,x,feat);
@@ -4603,7 +4655,6 @@ void cave_set_feat(int y, int x, int feat)
 	 */
 	if (f_ptr2->flags2 & (FF2_CHASM))
 	{
-
 		if (feat == FEAT_CHASM) feat = FEAT_CHASM_E;
 
 		cave_set_feat_aux(y,x,FEAT_CHASM);
@@ -4684,8 +4735,17 @@ void cave_set_feat(int y, int x, int feat)
 	/* Handle creating 'GLOW' */
 	if (f_ptr2->flags2 & FF2_GLOW)
 	{
-		/* Illuminate the grid */
-		cave_info[y][x] |= (CAVE_GLOW);
+		if (!(cave_info[y][x] & (CAVE_GLOW)))
+		{
+			/* Illuminate the grid */
+			cave_info[y][x] |= (CAVE_GLOW);
+
+			/* Notice */
+			note_spot(y, x);
+
+			/* Redraw */
+			lite_spot(y, x);
+		}
 
 		for (i = 0; i < 8; i++)
 		{
@@ -4696,7 +4756,7 @@ void cave_set_feat(int y, int x, int feat)
 			if (!in_bounds_fully(yy, xx)) continue;
 
 			/* Notice/Redraw */
-			if ((character_dungeon) && !(cave_info[yy][xx] & (CAVE_GLOW)))
+			if (!(cave_info[yy][xx] & (CAVE_GLOW)))
 			{
 				/* Illuminate the grid */
 				cave_info[yy][xx] |= (CAVE_GLOW);
@@ -4707,12 +4767,19 @@ void cave_set_feat(int y, int x, int feat)
 				/* Redraw */
 				lite_spot(yy, xx);
 			}
-			else
-			{
-				/* Illuminate the grid */
-				cave_info[yy][xx] |= (CAVE_GLOW);
-			}
 		}    
+	}
+	/* Handle creating 'OUTSIDE' */
+	else if ( daytime && surface && (f_ptr2->flags3 & (FF3_OUTSIDE)) && !(cave_info[y][x] & (CAVE_GLOW)))
+	{
+			/* Illuminate the grid */
+			cave_info[y][x] |= (CAVE_GLOW);
+
+			/* Notice */
+			note_spot(y, x);
+
+			/* Redraw */
+			lite_spot(y, x);
 	}
 
 	/* Handle gold/items */

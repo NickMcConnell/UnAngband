@@ -109,3 +109,8 @@ dungeon. (Most bugs reported by Adam Horowitz for this release).
 - Trapped doors should work now.
 
 - Fixed bug preventing creation of town in Minas Tirith.
+
+- Fixed bug where flying/climbing monsters could walk through walls on
+the surface.
+
+- Fixed bug where outside locations could end up dark during day time.
