@@ -123,8 +123,6 @@ N:7:the Lonely Mountain
 X:8:9
 R:DRAGON
 G:B
-#Was L:33. Need to fix by implementing flags eg RUINS
-#Maybe not...
 L:20:435:56:154:475:0
 L:21:56:0:0:0:0
 L:38:56:0:0:475:0
@@ -135,8 +133,6 @@ N:8:Lake-town
 X:7:9
 R:CAN_SWIM
 L:39:155:407:49:475:0
-L:40:121:0:0:0:0
-L:42:121:0:0:0:0
 
 N:9:Lake-town, rebuilt
 X:42:14

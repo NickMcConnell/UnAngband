@@ -1726,6 +1726,12 @@ bool mon_resist_feat(int feat, int r_idx)
 	feature_type *f_ptr;
 	monster_race *r_ptr;
 
+	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
+
+	bool daytime = ((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2));
+
+	bool outside = (f_info[feat].flags3 & (FF3_OUTSIDE));
+
 	/* Get feature info */
 	f_ptr= &f_info[feat];
 	
@@ -1734,6 +1740,9 @@ bool mon_resist_feat(int feat, int r_idx)
 
 	/* Race */
 	r_ptr = &r_info[r_idx];
+
+	/* Always get burnt by daylight */
+	if ((surface && daytime && outside) && (r_ptr->flags3 & (RF3_HURT_LITE))) return (FALSE);
 
 	/* Always risk traps if stupid */
 	if ((f_ptr->flags1 & (FF1_HIT_TRAP)) &&

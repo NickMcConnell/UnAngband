@@ -4741,9 +4741,8 @@ static void cave_gen(void)
 			}
 		}
 	}
-	/* Ensure guardian monsters --- only night time in towns */
-	else if ((zone->guard) && (r_info[zone->guard].cur_num <= 0)
-		&& (!surface || !daytime))
+	/* Ensure guardian monsters */
+	else if ((zone->guard) && (r_info[zone->guard].cur_num <= 0))
 	{
 		int y, x;
 
@@ -4753,7 +4752,7 @@ static void cave_gen(void)
 			y = rand_int(DUNGEON_HGT);
 			x = rand_int(DUNGEON_WID);
 
-			if (cave_naked_bold(y, x)) break;
+			if (place_monster_here(y, x, zone->guard)) break;
 		}
 
 		/* Place the questor */
