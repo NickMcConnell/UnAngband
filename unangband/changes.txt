@@ -1,3 +1,9 @@
+- Added readdib.c and removed angband.res to allow
+compilation for makefile.cyg
+- Fixed bug with archer, thief, bard, shaman blows
+in p_class.txt.
+
+
 Andrew Sidwell has volunteered to help out while I'm
 on holiday, as a 'caretaker' rather than fully fledged
 variant maintainer. E-mail him your compliments and me
