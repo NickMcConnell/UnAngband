@@ -93,6 +93,9 @@ anytime Angband expects user interaction.
 - Now use Enter to continue and ESC to restart the character generation
  process.
 
+- Also use Enter to recall an object/monster/ego item/artifact in the
+knowledge menus.
+
 - You can now recall objects while you are looking at them. You will 
 recall the monster instead if they are a monster body part or container
  or statue...

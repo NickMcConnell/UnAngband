@@ -3631,7 +3631,7 @@ static void do_cmd_knowledge_artifacts(void)
 		display_artifact_list(max + 3, 6, BROWSER_ROWS, object_idx, object_cur, object_top);
 
 		/* Prompt */
-		prt("<dir>, 'r' to recall, ESC", 23, 0);
+		prt("<dir>, ENTER to recall, ESC", 23, 0);
 
 		/* Mega Hack -- track this monster race */
 		if (object_cnt) artifact_track(object_idx[object_cur]);
@@ -3667,6 +3667,8 @@ static void do_cmd_knowledge_artifacts(void)
 
 			case 'R':
 			case 'r':
+			case '\n':
+			case '\r':
 			{
 				/* Recall on screen */
 				desc_art_fake(object_idx[object_cur]);
@@ -3824,7 +3826,7 @@ static void do_cmd_knowledge_monsters(void)
 		display_monster_list(max + 3, 6, BROWSER_ROWS, mon_idx, mon_cur, mon_top);
 
 		/* Prompt */
-		prt("<dir>, 'r' to recall, ESC", 23, 0);
+		prt("<dir>, ENTER to recall, ESC", 23, 0);
 
 		/* Mega Hack -- track this monster race */
 		if (mon_cnt) p_ptr->monster_race_idx = mon_idx[mon_cur];
@@ -3856,6 +3858,8 @@ static void do_cmd_knowledge_monsters(void)
 
 			case 'R':
 			case 'r':
+			case '\n':
+			case '\r':
 			{
 				/* Recall on screen */
 				if (mon_idx[mon_cur])
@@ -4057,8 +4061,8 @@ static void do_cmd_knowledge_ego_items(void)
 		display_ego_item_list(max + 3, 6, BROWSER_ROWS, object_idx, object_cur, object_top);
 
 		/* Prompt */
-		if (note_idx) prt("<dir>, 'r', '{', '}', 'c', 'p' to paste, ESC", 23,0);
-		else prt("<dir>, 'r' to recall, '{' to inscribe, '}', 'c' to copy, ESC", 23, 0);
+		if (note_idx) prt("<dir>, ENTER, '{', '}', 'c', 'p' to paste, ESC", 23,0);
+		else prt("<dir>, ENTER to recall, '{' to inscribe, '}', 'c' to copy, ESC", 23, 0);
 
 		if (!column)
 		{
@@ -4081,6 +4085,8 @@ static void do_cmd_knowledge_ego_items(void)
 
 			case 'R':
 			case 'r':
+			case '\n':
+			case '\r':
 			{
 				/* Recall on screen */
 				desc_ego_fake(object_idx[object_cur]);
@@ -4410,8 +4416,8 @@ static void do_cmd_knowledge_objects(void)
 		display_object_list(max + 3, 6, BROWSER_ROWS, object_idx, object_cur, object_top);
 
 		/* Prompt */
-		if (note_idx) prt("<dir>, 'r', '{', '}', 'c', 'p' to paste, ESC", 23,0);
-		else prt("<dir>, 'r' to recall, '{' to inscribe, '}', 'c' to copy, ESC", 23, 0);
+		if (note_idx) prt("<dir>, ENTER, '{', '}', 'c', 'p' to paste, ESC", 23,0);
+		else prt("<dir>, ENTER to recall, '{' to inscribe, '}', 'c' to copy, ESC", 23, 0);
 
 		/* Mega Hack -- track this monster race */
 		if (object_cnt) object_kind_track(object_idx[object_cur]);
@@ -4447,6 +4453,8 @@ static void do_cmd_knowledge_objects(void)
 
 			case 'R':
 			case 'r':
+			case '\n':
+			case '\r':
 			{
 				/* Recall on screen */
 				desc_obj_fake(object_idx[object_cur]);
