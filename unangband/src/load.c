@@ -747,6 +747,15 @@ static void rd_options(void)
 	u32b window_flag[ANGBAND_TERM_MAX];
 	u32b window_mask[ANGBAND_TERM_MAX];
 
+        /* Hack -- unset all Save File Options for compatibility */
+	for (i = 0; i < OPT_PAGE_PER; i++)
+	{
+		/* Collect options on this "page" */
+		if (option_page[8][i] != 255)
+		{
+			op_ptr->opt[option_page[8][i]] = FALSE;
+		}
+	}
 
 	/*** Oops ***/
 
