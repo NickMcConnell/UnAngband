@@ -1648,7 +1648,6 @@ static bool project_f(int who, int r, int y, int x, int dam, int typ)
 	/* Set feature name */
 	f = (f_name + f_info[cave_feat[y][x]].name);
 
-
 #if 0 /* unused */
 	/* Reduce damage by distance */
 	dam = (dam + r) / (r + 1);

@@ -1066,14 +1066,14 @@
 #define FF3_EASY_CLIMB  0x00020000
 #define FF3_NEED_TREE   0x00040000
 #define FF3_NEED_WALL   0x00080000
-#define FF3_TOWN		0x00100000
+#define FF3_FULL_MOVE	0x00100000
 #define FF3_BLOOD		0x00200000
 #define FF3_DUST		0x00400000
 #define FF3_SLIME		0x00800000
 #define FF3_TREE 		0x01000000
 #define FF3_TREE_BIG    0x02000000
 #define FF3_INSTANT	0x04000000
-#define FF3_FULL_MOVE 	0x08000000
+#define FF3_EXPLODE 	0x08000000
 #define FF3_TIMED       0x10000000
 #define FF3_ERUPT       0x20000000
 #define FF3_STRIKE      0x40000000
@@ -1081,7 +1081,7 @@
 
 /* Which features are dynamic */
 #define FF3_DYNAMIC_MASK \
- (FF3_INSTANT | FF3_TIMED | FF3_ERUPT | FF3_STRIKE | FF3_SPREAD)
+ (FF3_INSTANT | FF3_EXPLODE | FF3_TIMED | FF3_ERUPT | FF3_STRIKE | FF3_SPREAD)
 
 /* Feature actions -- used to define actions performed on features */
 
@@ -1132,6 +1132,7 @@
 #define FS_TREE  		81
 #define FS_NEED_WALL    82
 #define FS_INSTANT	90
+#define FS_EXPLODE	91
 #define FS_TIMED		92
 #define FS_SPREAD		95
 

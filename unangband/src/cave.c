@@ -3322,11 +3322,14 @@ void update_view(void)
 }
 
 /*
- * Update the features that have TIMED | ERUPT | STRIKE | SPREAD | INSTANT flags. These
- * grids need to be checked every turn to see if they affected adjacent grids with
+ * Update the features that have dynamic flags. These grids need to be
+ * checked every turn to see if they affected adjacent grids with
  * an attack of some kind.
  *
  * INSTANT grids always alter themselves.
+ *
+ * EXPLODE grids always explode for a radius 1 ball attack equal to twice the
+ * damage of their blow attack.
  *
  * TIMED grids will 2% of the time alter themselves.
  *
@@ -3334,7 +3337,7 @@ void update_view(void)
  * equal to their blow attack, along with their own grid. 8% of the time they
  * will affect their own grid only.
  *
- * ERUPT grids will 5% of the time project a radius 2 ball attack equal to twice
+ * ERUPT grids will 5% of the time project a radius 2 ball attack equal to three times
  * the damage of their blow attack, centred on their grid.
  *
  * STRIKE grids will 5% of the time project a radius 0 ball attack equal to ten times
@@ -3359,8 +3362,8 @@ void update_view(void)
  * the start of level generation on a new level.
  *
  * We also update this list by adding and removing features that are either
- * DYNAMIC, ERUPT or STRIKE as they are created/destroyed. However, this requires
- * that we create a temporary copy of this list when we are applying the attacks in
+ * dynamic as they are created/destroyed. However, this requires that we create
+ * a temporary copy of this list when we are applying the attacks in
  * this function.
  * This may prove not to be such an efficiency gain.
  */
@@ -3383,6 +3386,9 @@ void update_dyna(void)
 	feature_type *f_ptr;
 
 	bool full = FALSE;
+
+	/* Must be able to modify features */
+	if (!variant_hurt_feats) return;
 
 	/* Efficiency */
 	if (dyna_full)
@@ -3463,6 +3469,17 @@ void update_dyna(void)
 		if (f_ptr->flags3 & (FF3_INSTANT))
 		{
 			cave_alter_feat(y,x,FS_INSTANT);
+		}
+
+		/* Explode */
+		if (f_ptr->flags3 & (FF3_EXPLODE))
+		{
+			flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+
+			dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice) * 10;
+   
+			/* Apply the blow */
+			project(0, 1, y, x, dam, f_ptr->blow.effect, flg);
 		}
 
 		/* Timed */

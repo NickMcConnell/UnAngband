@@ -49,9 +49,11 @@ reorganised some of later campaign to be a smoother transition from end
 - Made dynamic terrain allowing forests to burn down, seas to have waves
  and various other effects, poison gas and smoke to spread and disappate.
 
-- Added waves and rough water to allow sea water to have waves in it. 
-(Should probably do for all water).
+- Added waves and rough water to allow water to have waves in it. These
+look and act like real waves.
 
+- Doors and other wooden objects now cause persistent fires, which can be
+put out by bashing them.
 
 ### User Interface ###
 
@@ -114,3 +116,6 @@ dungeon. (Most bugs reported by Adam Horowitz for this release).
 the surface.
 
 - Fixed bug where outside locations could end up dark during day time.
+
+- Using some wands from the ground, could cause problems as they could
+be destroyed by their effects.

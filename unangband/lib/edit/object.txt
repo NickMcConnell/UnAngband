@@ -4790,6 +4790,7 @@ I:65:30:0
 W:60:0:10:4000
 A:60/1
 P:0:1d1:0:0:0
+F:IGNORE_COLD
 
 N:660:Meteors
 G:-:d
@@ -4797,6 +4798,7 @@ I:65:31:0
 W:80:0:10:5500
 A:80/2
 P:0:1d1:0:0:0
+F:IGNORE_FIRE | IGNORE_COLD
 
 N:661:Blind Monster
 G:-:d
@@ -4899,6 +4901,7 @@ I:65:44:0
 W:50:0:10:3000
 A:50/2
 P:0:1d1:0:0:0
+F:IGNORE_FIRE | IGNORE_COLD
 
 N:674:Freezing Clouds
 G:-:d
@@ -4968,6 +4971,7 @@ I:65:53:1
 W:50:0:10:2400
 A:50/4
 P:0:1d1:0:0:0
+F:IGNORE_ELEC
 
 N:683:Dragon's Bile
 G:-:d
@@ -4975,6 +4979,7 @@ I:65:54:1
 W:50:0:10:2400
 A:50/4
 P:0:1d1:0:0:0
+F:IGNORE_ACID
 
 N:684:Dragon's Venom
 G:-:d
