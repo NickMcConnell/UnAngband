@@ -1802,12 +1802,12 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, int mode)
 	}
 
 	/* Sustains */
-	if (f1 & all_sustains)
+	if (f2 & all_sustains)
 	{
 		list_ptr = list;
 
 		/* Simplify things if an item sustains all stats */
-		if ((f1 & all_sustains) == all_sustains)
+		if ((f2 & all_sustains) == all_sustains)
 		{
 		switch (mode)
 		{
@@ -1822,9 +1822,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, int mode)
 		}
 
 		/* Should we bother? */
-		else if ((f1 & all_sustains))
+		else if ((f2 & all_sustains))
 		{
-			list_ptr = spoiler_flag_aux(f1, sustain_flags_desc, list_ptr, N_ELEMENTS(sustain_flags_desc));
+			list_ptr = spoiler_flag_aux(f2, sustain_flags_desc, list_ptr, N_ELEMENTS(sustain_flags_desc));
 		}
 
 		/* Terminate the description list */
