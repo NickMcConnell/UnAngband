@@ -2437,16 +2437,23 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 			if (is_art || ignore)
 			{
 				/* Observe the resist */
-				if (o_ptr->marked)
+				if (obvious)
 				{
-					msg_format("The %s %s unaffected!",
-						   o_name, (plural ? "are" : "is"));
+					/* Get known flags */
+					u32b k1,n1;
+					u32b k2,n2;
+					u32b k3,n3;
+
+					k1 = o_ptr->can_flags1;
+					k2 = o_ptr->can_flags2;
+					k3 = o_ptr->can_flags3;
 
 					/* Learn about resistences */
 					if (if1 | if2 | if3)
 					{
 						object_can_flags(o_ptr,if1,if2,if3);
 					}
+
 					/* Item is unbreakable */
 					else
 					{
@@ -2464,6 +2471,16 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 
 						object_can_flags(o_ptr,0x0L,TR2_IGNORE_MASK,0x0L);
 					}
+
+					/* Check for new flags */
+					n1 = o_ptr->can_flags1 & ~(k1);
+					n2 = o_ptr->can_flags2 & ~(k2);
+					n3 = o_ptr->can_flags3 & ~(k3);
+
+					if (n1 || n2 || n3) msg_format("The %s%s unaffected!",
+									o_name, 
+									plural ? " are" : " is");
+
 				}	
 			}
 

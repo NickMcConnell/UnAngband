@@ -3023,6 +3023,23 @@ void object_guess_name(object_type *o_ptr)
 
 /*
  * Object does have flags.
+ *
+ * XXX The function object_can_flags assumes that the object we notice has a particular
+ * set of flags is either wielded or in the inventory, and therefore we clear the 
+ * 'may_flags' that we use to track which objects have information with which we may
+ * be able to deduce what flags that object has, and which do not.
+ *
+ * However, for instance, objects that are thrown from the floor, or are damaged by fire
+ * but ignore it, or are damaging to a particular type of monster which fails to pick it
+ * up, are some of the instances where we call this routine for objects other than those
+ * held in the inventory.
+ *
+ * Currently this is fine as the flags are not those kind we attempt to track anyway eg
+ * weapon flags, ignore flags and so on.
+ *
+ * XXX We might want to return TRUE from this routine if the flags we are adding are not
+ * already known.
+ *
  */
 void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3)
 {

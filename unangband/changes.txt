@@ -4,8 +4,11 @@
 
 - The Dale now has a food supply (Bug 588).
 
-- The ruins of Lake-town are no longer too deep for those who flee the Lonely Mountain (Bug 589).
+- The ruins of Lake-town are no longer too deep for those who flee the Lonely
+Mountain (Bug 589).
 
+- Objects resistant to damage will only display a message the first time they
+are unaffected (Bug 682).
 
 UnAngband 0.5.4a: "A Whole Lotta Love"
 
