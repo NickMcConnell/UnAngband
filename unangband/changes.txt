@@ -1,3 +1,13 @@
+### Features ###
+
+- Now supports specifying whether or not a feature supports advanced lighting
+options in the pref file. Just append :YES or :NO to the existing pref file
+entry in the graf-xxx.prf file. The default is 'NO' for any existing entry
+and 'YES' for any feature which does not have an entry (eg uses original
+ASCII graphics). This feature is not yet supported by any in-game display
+option and pref file tools.
+
+
 ### Bug fixes ###
 
 - Eilineil the Entrapped is now a female (Bug 648).
@@ -18,8 +28,8 @@ are unaffected (Bug 682).
 
 - Fixed map refresh bugs caused in big tile mode (Bug 780) [Incomplete].
 
-- Improved support for advanced lighting features in graphics mode (Bug 779)
-[Incomplete].
+- Improved support for advanced lighting features in graphics mode (Bug 779).
+
 
 
 ### Build / Platform ###
