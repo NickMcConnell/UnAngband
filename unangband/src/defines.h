@@ -2328,14 +2328,36 @@
 /*
  * Special cave grid flags
  */
-#define CAVE_MARK		0x01 	/* memorized feature */
-#define CAVE_GLOW		0x02 	/* self-illuminating */
-#define CAVE_SAFE		0x04 	/* part of a vault */
-#define CAVE_ROOM		0x08 	/* part of a room */
-#define CAVE_SEEN		0x10 	/* seen flag */
-#define CAVE_VIEW		0x20 	/* view flag */
-#define CAVE_TEMP		0x40 	/* temp flag */
-#define CAVE_WALL		0x80 	/* wall flag */
+#define CAVE_GLOW		0x01	/* self-illuminating */
+#define CAVE_ROOM		0x02	/* part of a room */
+#define CAVE_DLIT		0x04	/* lit by daylight during daytime */
+#define CAVE_LITE		0x08	/* lit by "something" */
+#define CAVE_MLIT		0x10	/* lit by a monster (or player in multi-player versions) */
+#define CAVE_XLIT		0x20	/* lit by a magical effect */
+#define CAVE_XLOF		0x40	/* blocks line of fire */
+#define CAVE_XLOS		0x80	/* blocks line of sight */
+
+/*
+ * Special player grid flags
+ */
+#define PLAY_MARK		0x01 	/* memorized feature */ 
+#define PLAY_SAFE		0x02 	/* detected as safe */
+#define PLAY_TMP2		0x04 	/* temp2 flag */
+#define PLAY_LITE		0x08 	/* lit by the player */
+#define PLAY_SEEN		0x10 	/* seen flag */
+#define PLAY_TEMP		0x20 	/* temp flag */
+#define PLAY_VIEW		0x40 	/* view flag */
+#define PLAY_FIRE		0x80 	/* fire flag */
+
+
+/* We always set CAVE_LITE when a location is actually lit: CAVE_DLIT means a location is potentially liteable, and
+ * CAVE_XLIT means that a spell effect graphic is displayed - despite the name this does not necessarily lit the
+ * location. Any time anything unsets the CAVE_LITE location, all grids within radius 2 must be checked for either
+ * a glowing feature, or a monster carrying a light, and all players must be checked to see if the play_lite flag is set.
+ * Additionally it must be checked if it is daytime, if the dlit flag is set. This allows whole rooms to be lit during
+ * daytime, or just parts of rooms... during night only actual outdoor locations are lit (or nothing during new moon). */
+
+
 
 /*** Room flags ***/
 
@@ -2343,16 +2365,38 @@
 /*
  * Special room flags
  */
-#define ROOM_SEEN 0x01    /* room has been seen */
-#define ROOM_ICKY 0x02    /* room is anti-teleport */
-#define ROOM_BLOODY      0x04    /* room causes wounds/poison to become worse */
-#define ROOM_CURSED      0x08    /* room causes monsters to hit more frequently */
-#define ROOM_GLOOMY		0x10	/* room is never wholely lit by light */
-#define ROOM_PORTAL		0x20	/* room teleports you randomly */
-#define ROOM_SILENT		0x40	/* room is magically silent, stopping spells/songs */
-#define ROOM_STATIC      0x80    /* room causes rods/staffs/wands to fail */
-
-
+#define ROOM_SEEN 	0x00000001L    /* room has been seen */
+#define ROOM_HEARD	0x00000002L	   /* room has been heard */
+#define ROOM_ENTER	0x00000004L	   /* room has been entered */
+#define ROOM_QUEST	0x00000008L	   /* room is a quest */
+#define ROOM_LITE		0x00000010L	   /* room is lit */
+#define ROOM_DARK		0x00000020L	   /* room is dark */
+#define ROOM_SURFACE	0x00000040L	   /* room is on surface */
+#define ROOM_BOTTOM	0x00000080L	   /* room is bottom of dungeon */
+#define ROOM_DAYLITE	0x00000100L	   /* room is lit during daytime */ 
+#define ROOM_ICKY 	0x00000200L    /* room cannot be teleport target */
+#define ROOM_BLOODY	0x00000400L    /* room causes wounds/poison to become worse */
+#define ROOM_CURSED	0x00000800L    /* room causes items to not provide bonuses (except artifacts) */
+#define ROOM_GLOOMY	0x00001000L	/* room is never wholely lit by light */
+#define ROOM_PORTAL	0x00002000L	/* room teleports you randomly */
+#define ROOM_SILENT	0x00004000L	/* room is magically silent, stopping spells/songs */
+#define ROOM_STATIC	0x00008000L    /* room causes rods/staffs/wands to fail */
+#define ROOM_STATIS	0x00010000L	   /* room causes monsters to be in statis */
+#define ROOM_SEALED	0x00020000L    /* room causes features to be unalterable */
+#define ROOM_HIDDEN	0x00040000L	   /* room cannot be detected */
+#define ROOM_ANCHOR	0x00080000L	   /* room is anti-teleportation */
+#define ROOM_ECHOES	0x00100000L	   /* room is anti-stealth */
+#define ROOM_STENCH	0x00200000L	   /* room prevents monsters flow by smell */
+#define ROOM_NOISY	0x00400000L	   /* room prevents monsters flow by sound */
+#define ROOM_WINDY	0x00800000L	   /* room prevents missiles/thrown items */
+#define ROOM_GRAVE	0x01000000L	   /* room brings monsters back to life */
+#define ROOM_STORE	0x02000000L	   /* room prevents objects being taken */
+#define ROOM_DISPEL	0x04000000L	   /* room dispels enchantments */
+#define ROOM_RANDOM	0x08000000L	   /* room activates randomly for effect */
+#define ROOM_PUZZLE	0x10000000L	   /* room requires features contained destroyed */
+#define ROOM_LAIR		0x20000000L	   /* room requires monsters contained destroyed */
+#define ROOM_OBJECT	0x40000000L	   /* room requires objects contained destroyed */
+#define ROOM_TRAP		0x80000000L	   /* whole room is a trap */
 
 /*** Object flags ***/
 
@@ -3703,10 +3747,10 @@
  *
  * Line 1 -- forbid doors, rubble, seams, walls
  *
- * Note the use of the new "CAVE_WALL" flag.
+ * Note the use of the new "CAVE_XLOS" flag.
  */
 #define cave_floor_bold(Y,X) \
-	(!(cave_info[Y][X] & (CAVE_WALL)))
+	(!(cave_info[Y][X] & (CAVE_XLOS)))
 
 /*
  * Determine if a "legal" grid is a "clean" floor grid
@@ -3779,7 +3823,7 @@
  * Note the use of comparison to zero to force a "boolean" result
  */
 #define player_has_los_bold(Y,X) \
-	((cave_info[Y][X] & (CAVE_VIEW)) != 0)
+	((play_info[Y][X] & (PLAY_VIEW)) != 0)
 
 
 /*
@@ -3788,7 +3832,7 @@
  * Note the use of comparison to zero to force a "boolean" result
  */
 #define player_can_see_bold(Y,X) \
-	((cave_info[Y][X] & (CAVE_SEEN)) != 0)
+	((play_info[Y][X] & (PLAY_SEEN)) != 0)
 
 
 

@@ -12,6 +12,13 @@ use with David Gervais' 54x54 graphics tiles (As 54 is not divisible by 4).
 - Makefile.std was reporting errors if the files it tries to clean are not
 there (Reported by Robert Ruehlmann).
 
+- Separated out cave flags that are specific to the cave (cave_info) and
+specific to the player (play_info) in preperation for implementing 4GAI
+projection algorithms. This has to be done differently from Sangband et al.
+as there can be terrain in Unangband that blocks line of sight but not 
+spells or arrows (eg smoke). At the moment, most of these new flags are
+not used. WARNING: AT THE MOMENT THIS BREAKS SAVE FILE COMPATIBILITY!!!!
+
 Unangband 0.5.5: "New Years Resolution"
 
 ### Game Play ###

@@ -1965,7 +1965,7 @@ bool stuck_player(int *dir)
 		disturb(0, 0);
 
 		/* Notice unknown obstacles */
-		if (!(cave_info[py][px] & (CAVE_MARK)))
+		if (!(play_info[py][px] & (PLAY_MARK)))
 		{
 
 			/* Get hit by terrain/traps */
@@ -1977,7 +1977,7 @@ bool stuck_player(int *dir)
 				hit_trap(py, px);
 			}
 
-			cave_info[py][px] |= (CAVE_MARK);
+			play_info[py][px] |= (PLAY_MARK);
 
 			lite_spot(py, px);
 
@@ -2047,7 +2047,7 @@ void move_player(int dir, int jumping)
 
 	/* Optionally alter known traps/doors on (non-jumping) movement */
 	else if (easy_alter && !jumping &&
-	 (cave_info[y][x] & (CAVE_MARK)) &&
+	 (play_info[y][x] & (PLAY_MARK)) &&
 		 ( (f_ptr->flags1 & (FF1_DISARM)) ||
 		 ( !(f_ptr->flags1 & (FF1_MOVE)) &&
 		 !(f_ptr->flags3 & (FF3_EASY_CLIMB)) && 
@@ -2078,13 +2078,13 @@ void move_player(int dir, int jumping)
 	/* Also cannot climb over unknown "trees/rubble" */
 	else if (!(f_ptr->flags1 & (FF1_MOVE))
 	&& (!(f_ptr->flags3 & (FF3_EASY_CLIMB))
-	|| !(cave_info[y][x] & (CAVE_MARK))))
+	|| !(play_info[y][x] & (PLAY_MARK))))
 	{
 		/* Disturb the player */
 		disturb(0, 0);
 
 		/* Notice unknown obstacles */
-		if (!(cave_info[y][x] & (CAVE_MARK)))
+		if (!(play_info[y][x] & (PLAY_MARK)))
 		{
 
 			/* Get hit by terrain/traps */
@@ -2107,7 +2107,7 @@ void move_player(int dir, int jumping)
 					(is_a_vowel(name[0]) ? "an " : "a ")),name);
 
 
-				cave_info[y][x] |= (CAVE_MARK);
+				play_info[y][x] |= (PLAY_MARK);
 
 				lite_spot(y, x);
 
@@ -2254,7 +2254,7 @@ void move_player(int dir, int jumping)
 		}
 
 		/* Reveal when you are on shallow, deep or filled terrain */
-		if (!(cave_info[y][x] & (CAVE_MARK)) &&
+		if (!(play_info[y][x] & (PLAY_MARK)) &&
 		((f_ptr->flags2 & (FF2_SHALLOW)) ||
 		(f_ptr->flags2 & (FF2_DEEP)) ||
 		(f_ptr->flags2 & (FF2_FILLED)) ))
@@ -2270,7 +2270,7 @@ void move_player(int dir, int jumping)
 			msg_format("You feel you are %s%s.",
 				((f_ptr->flags2 & (FF2_FILLED)) ? "" : "in "), name);
 
-			cave_info[y][x] |= (CAVE_MARK);
+			play_info[y][x] |= (PLAY_MARK);
 
 			lite_spot(y, x);
 		}
@@ -2293,7 +2293,7 @@ static int see_wall(int dir, int y, int x)
 	if (!(f_info[f_info[cave_feat[y][x]].mimic].flags1 & (FF1_WALL))) return (FALSE);
 
 	/* Unknown walls are not known walls */
-	if (!(cave_info[y][x] & (CAVE_MARK))) return (FALSE);
+	if (!(play_info[y][x] & (PLAY_MARK))) return (FALSE);
 
 	/* Default */
 	return (TRUE);
@@ -2312,7 +2312,7 @@ static int see_stop(int dir, int y, int x)
 	if (!in_bounds(y, x)) return (FALSE);
 
 	/* Unknown walls are not known obstacles */
-	if (!(cave_info[y][x] & (CAVE_MARK))) return (FALSE);
+	if (!(play_info[y][x] & (PLAY_MARK))) return (FALSE);
 
 	/* Run-able grids are not known obstacles */
 	if (f_info[f_info[cave_feat[y][x]].mimic].flags1 & (FF1_RUN)) return (FALSE);
@@ -2335,7 +2335,7 @@ static int see_nothing(int dir, int y, int x)
 	if (!in_bounds(y, x)) return (TRUE);
 
 	/* Memorized grids are always known */
-	if (cave_info[y][x] & (CAVE_MARK)) return (FALSE);
+	if (play_info[y][x] & (PLAY_MARK)) return (FALSE);
 
 	/* Default */
 	return (TRUE);
@@ -2695,7 +2695,7 @@ static bool run_test(void)
 		inv = TRUE;
 
 		/* Check memorized grids */
-		if (cave_info[row][col] & (CAVE_MARK))
+		if (play_info[row][col] & (PLAY_MARK))
 		{
 			bool notice = TRUE;
 
@@ -2816,7 +2816,7 @@ static bool run_test(void)
 
 			/* Unknown grid or non-wall */
 			/* Was: cave_floor_bold(row, col) */
-			if (!(cave_info[row][col] & (CAVE_MARK)) ||
+			if (!(play_info[row][col] & (PLAY_MARK)) ||
 			    (!(f_info[feat].flags1 & (FF1_WALL))) )
 			{
 				/* Looking to break right */
@@ -2853,7 +2853,7 @@ static bool run_test(void)
 
 			/* Unknown grid or non-wall */
 			/* Was: cave_floor_bold(row, col) */
-			if (!(cave_info[row][col] & (CAVE_MARK)) ||
+			if (!(play_info[row][col] & (PLAY_MARK)) ||
 			    (!(f_info[feat].flags1 & (FF1_WALL))))
 			{
 				/* Looking to break left */

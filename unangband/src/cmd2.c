@@ -33,7 +33,7 @@ bool do_cmd_test(int y, int x, int action)
 	int feat;
 
 	/* Must have knowledge */
-	if (!(cave_info[y][x] & (CAVE_MARK)))
+	if (!(play_info[y][x] & (PLAY_MARK)))
 	{
 		/* Message */
 		msg_format("You see nothing %s.",here);
@@ -687,7 +687,7 @@ static int count_feats(int *y, int *x, int action)
 		int xx = p_ptr->px + ddx_ddd[d];
 
 		/* Must have knowledge */
-		if (!(cave_info[yy][xx] & (CAVE_MARK))) continue;
+		if (!(play_info[yy][xx] & (PLAY_MARK))) continue;
 
 		/* Get the feature */
 		feat = cave_feat[yy][xx];
@@ -1776,7 +1776,7 @@ void do_cmd_alter(void)
 	feat = f_info[feat].mimic;
 
 	/* Must have knowledge to know feature XXX XXX */
-	if (!(cave_info[y][x] & (CAVE_MARK))) feat = FEAT_NONE;
+	if (!(play_info[y][x] & (PLAY_MARK))) feat = FEAT_NONE;
 
 
 	/* Take a turn */
@@ -2161,7 +2161,7 @@ static bool do_cmd_walk_test(int y, int x)
 	name = (f_name + f_info[feat].name);
 
 	/* Hack -- walking obtains knowledge XXX XXX */
-	if (!(cave_info[y][x] & (CAVE_MARK))) return (TRUE);
+	if (!(play_info[y][x] & (PLAY_MARK))) return (TRUE);
 
 	/* Hack -- walking allows attacking XXX XXX */
 	if (cave_m_idx[y][x] >0) return (TRUE);
@@ -2171,7 +2171,7 @@ static bool do_cmd_walk_test(int y, int x)
 	/* Also cannot climb over unknown "trees/rubble" */
 	if (!(f_info[feat].flags1 & (FF1_MOVE))
 	&& (!(f_info[feat].flags3 & (FF3_EASY_CLIMB))
-	|| !(cave_info[y][x] & (CAVE_MARK))))
+	|| !(play_info[y][x] & (PLAY_MARK))))
 	{
 #ifdef ALLOW_EASY_ALTER
 

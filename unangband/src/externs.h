@@ -162,6 +162,7 @@ extern byte dyna_cent_y;
 extern byte dyna_cent_x;
 extern bool dyna_full;
 extern byte (*cave_info)[256];
+extern byte (*play_info)[256];
 extern s16b (*cave_feat)[DUNGEON_WID];
 extern s16b (*cave_o_idx)[DUNGEON_WID];
 extern s16b (*cave_m_idx)[DUNGEON_WID];

@@ -9,7 +9,7 @@
  *
  * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
  * source code are released under the Gnu Public License. See www.fsf.org
- * for current GPL license details. Addition permission granted to
+ * for current GPL license details. Additional permission granted to
  * incorporate modifications in all Angband variants as defined in the
  * Angband variants FAQ. See rec.games.roguelike.angband for FAQ.
  */
@@ -467,10 +467,10 @@ byte dark_attr[16] =
 /*
  * Modify a 'boring' grid appearance based on the ambient light
  */
-void modify_grid_boring(byte *a, char *c, int y, int x, u32b info)
+void modify_grid_boring(byte *a, char *c, int y, int x, byte cinfo, byte pinfo)
 {
 	/* Handle "seen" grids */
-	if (info & (CAVE_SEEN))
+	if (pinfo & (PLAY_SEEN))
 	{
 		/* Lit by "indirect sun" light */
 		if (view_surface_lite && p_ptr->outside &&
@@ -494,7 +494,7 @@ void modify_grid_boring(byte *a, char *c, int y, int x, u32b info)
 		}
 
 		/* Only lit by "torch" lite */
-		else if (view_yellow_lite && !(info & (CAVE_GLOW)))
+		else if (view_yellow_lite && !(cinfo & (CAVE_GLOW)))
 		{
 			/* Mega-hack */
 			if (*a & 0x80)
@@ -513,7 +513,7 @@ void modify_grid_boring(byte *a, char *c, int y, int x, u32b info)
 		}
 
 		/* Lit by "glowing" lite */
-		else if (view_glowing_lite && (info & (CAVE_GLOW)))
+		else if (view_glowing_lite && (cinfo & (CAVE_GLOW)))
 		{
 			int i;
 
@@ -570,7 +570,7 @@ void modify_grid_boring(byte *a, char *c, int y, int x, u32b info)
 	}
 
 	/* Handle "dark" grids */
-	else if (!(info & (CAVE_GLOW)))
+	else if (!(cinfo & (CAVE_GLOW)))
 	{
 		/* Mega-hack */
 		if (*a & 0x80)
@@ -655,10 +655,10 @@ void modify_grid_unseen(byte *a, char *c)
 /*
  * Modify an 'interesting' grid appearance based on the ambient light
  */
-void modify_grid_interesting(byte *a, char *c, u32b info)
+void modify_grid_interesting(byte *a, char *c, byte cinfo, byte pinfo)
 {
 	/* Handle "seen" grids */
-	if (info & (CAVE_SEEN))
+	if (pinfo & (PLAY_SEEN))
 	{
 		/* Mega-hack */
 		if (*a & 0x80)
@@ -691,7 +691,7 @@ void modify_grid_interesting(byte *a, char *c, u32b info)
 	}
 
 	/* Handle "dark" grids */
-	else if (!(info & (CAVE_GLOW)))
+	else if (!(cinfo & (CAVE_GLOW)))
 	{
 		/* Mega-hack */
 		if (*a & 0x80)
@@ -920,7 +920,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 	char c;
 
 	s16b feat;
-	byte info;
+	byte cinfo, pinfo;
 
 	feature_type *f_ptr;
 
@@ -941,7 +941,10 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 	feat = cave_feat[y][x];
 
 	/* Cave flags */
-	info = cave_info[y][x];
+	cinfo = cave_info[y][x];
+
+	/* Player flags */
+	pinfo = play_info[y][x];
 
 	/* Hack -- rare random hallucination on non-outer walls */
 	if (image && (!rand_int(256)) && (feat != FEAT_PERM_SOLID))
@@ -956,8 +959,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 	else if (!(f_info[feat].flags1 & (FF1_REMEMBER)))
 	{
 		/* Memorized (or seen) floor */
-		if ((info & (CAVE_MARK)) ||
-		    (info & (CAVE_SEEN)))
+		if ((pinfo & (PLAY_MARK)) ||
+		    (pinfo & (PLAY_SEEN)))
 		{
 			/* Apply "mimic" field */
 			feat = f_info[feat].mimic;
@@ -975,7 +978,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			if ((view_special_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
 			{
 				/* Modify the lighting */
-				modify_grid_boring(&a, &c, y, x, info);
+				modify_grid_boring(&a, &c, y, x, cinfo, pinfo);
 			}
 		}
 
@@ -1004,7 +1007,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		}
 
 		/* Hack -- Safe cave grid -- now use 'invisible trap' */
-		else if (view_safe_grids && !(info & (CAVE_SAFE)))
+		else if (view_safe_grids && !(pinfo & (PLAY_SAFE)))
 		{
 			/* Get the darkness feature */
 			f_ptr = &f_info[FEAT_INVIS];
@@ -1034,7 +1037,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 	else
 	{
 		/* Memorized grids */
-		if (info & (CAVE_MARK))
+		if (pinfo & (PLAY_MARK))
 		{
 			/* Apply "mimic" field */
 			feat = f_info[feat].mimic;
@@ -1062,14 +1065,14 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			if ((view_special_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)) && (f_ptr->flags1 & (FF1_REMEMBER)))
 			{
 				/* Modify lighting */
-				modify_grid_boring(&a, &c, y, x, info);
+				modify_grid_boring(&a, &c, y, x, cinfo, pinfo);
 			}
 
 			/* Special lighting effects */
 			else if ((view_granite_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
 			{
 				/* Modify lighting */
-				modify_grid_interesting(&a, &c, info);
+				modify_grid_interesting(&a, &c, cinfo, pinfo);
 			}
 		}
 
@@ -1098,7 +1101,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		}
 
 		/* Hack -- Safe cave grid -- now use 'invisible trap' */
-		else if (view_safe_grids && !(info & (CAVE_SAFE)))
+		else if (view_safe_grids && !(pinfo & (PLAY_SAFE)))
 		{
 			/* Get the darkness feature */
 			f_ptr = &f_info[FEAT_INVIS];
@@ -1149,7 +1152,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		if ((view_granite_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
 		{
 			/* Modify lighting */
-			modify_grid_interesting(&a, &c, info);
+			modify_grid_interesting(&a, &c, cinfo, pinfo);
 		}
 	}
 
@@ -1668,22 +1671,25 @@ void print_rel(char c, byte a, int y, int x)
 void note_spot(int y, int x)
 {
 	s16b feat;
-	byte info;
+	byte cinfo, pinfo;
 
 	s16b this_o_idx, next_o_idx = 0;
 
 
 	/* Get cave info */
-	info = cave_info[y][x];
+	cinfo = cave_info[y][x];
+
+	/* Get player info */
+	pinfo = play_info[y][x];
 
 	/* Get cave feat */
 	feat = cave_feat[y][x];
 
 	/* Require "seen" flag */
-	if (!(info & (CAVE_SEEN))) return;
+	if (!(pinfo & (PLAY_SEEN))) return;
 
 	/* Mark it */
-	cave_info[y][x] |= (CAVE_SAFE);
+	play_info[y][x] |= (PLAY_SAFE);
 
 	/* Hack -- memorize objects */
 	/* ANDY -- Only memorise objects if they are not hidden by the feature */
@@ -1709,17 +1715,17 @@ void note_spot(int y, int x)
 	}
 
 	/* Hack -- memorize grids */
-	if (!(info & (CAVE_MARK)))
+	if (!(pinfo & (PLAY_MARK)))
 	{
 		/* Memorize some "boring" grids */
 		if (!(f_info[feat].flags1 & (FF1_REMEMBER)))
 		{
 			/* Option -- memorize certain floors */
-			if (((info & (CAVE_GLOW)) && view_perma_grids) ||
+			if (((cinfo & (CAVE_GLOW)) && view_perma_grids) ||
 			    view_torch_grids)
 			{
 				/* Memorize */
-				cave_info[y][x] |= (CAVE_MARK);
+				play_info[y][x] |= (PLAY_MARK);
 			}
 		}
 
@@ -1727,7 +1733,7 @@ void note_spot(int y, int x)
 		else
 		{
 			/* Memorize */
-			cave_info[y][x] |= (CAVE_MARK);
+			play_info[y][x] |= (PLAY_MARK);
 		}
 
 	}
@@ -3004,7 +3010,7 @@ errr vinfo_init(void)
 
 
 /*
- * Forget the "CAVE_VIEW" grids, redrawing as needed
+ * Forget the "PLAY_VIEW" grids, redrawing as needed
  */
 void forget_view(void)
 {
@@ -3013,7 +3019,7 @@ void forget_view(void)
 	int fast_view_n = view_n;
 	u16b *fast_view_g = view_g;
 
-	byte *fast_cave_info = &cave_info[0][0];
+	byte *fast_play_info = &play_info[0][0];
 
 
 	/* None to forget */
@@ -3032,10 +3038,10 @@ void forget_view(void)
 		x = GRID_X(g);
 
 		/* Clear "CAVE_VIEW" and "CAVE_SEEN" flags */
-		fast_cave_info[g] &= ~(CAVE_VIEW | CAVE_SEEN);
+		fast_play_info[g] &= ~(PLAY_VIEW | PLAY_SEEN);
 
 		/* Clear "CAVE_LITE" flag */
-		/* fast_cave_info[g] &= ~(CAVE_LITE); */
+		/* fast_play_info[g] &= ~(PLAY_LITE); */
 
 		/* Redraw */
 		lite_spot(y, x);
@@ -3155,8 +3161,10 @@ void update_view(void)
 	u16b *fast_temp_g = temp_g;
 
 	byte *fast_cave_info = &cave_info[0][0];
+	byte *fast_play_info = &play_info[0][0];
 
-	byte info;
+	byte pinfo;
+	byte cinfo;
 
 #ifdef MONSTER_LITE
 	int fy,fx;
@@ -3171,26 +3179,26 @@ void update_view(void)
 		g = fast_view_g[i];
 
 		/* Get grid info */
-		info = fast_cave_info[g];
+		pinfo = fast_play_info[g];
 
 		/* Save "CAVE_SEEN" grids */
-		if (info & (CAVE_SEEN))
+		if (pinfo & (PLAY_SEEN))
 		{
 			/* Set "CAVE_TEMP" flag */
-			info |= (CAVE_TEMP);
+			pinfo |= (PLAY_TEMP);
 
 			/* Save grid for later */
 			fast_temp_g[fast_temp_n++] = g;
 		}
 
 		/* Clear "CAVE_VIEW" and "CAVE_SEEN" flags */
-		info &= ~(CAVE_VIEW | CAVE_SEEN);
+		pinfo &= ~(PLAY_VIEW | PLAY_SEEN);
 
 		/* Clear "CAVE_LITE" flag */
-		/* info &= ~(CAVE_LITE); */
+		/* info &= ~(PLAY_LITE); */
 
 		/* Save cave info */
-		fast_cave_info[g] = info;
+		fast_play_info[g] = pinfo;
 	}
 
 	/* Reset the "view" array */
@@ -3234,13 +3242,13 @@ void update_view(void)
 			if (los(py,px,fy,fx))
 			{
 				g = GRID(fy,fx);
-				info = fast_cave_info[g];
+				pinfo = fast_play_info[g];
 
-				info |= (CAVE_VIEW);
-				info |= (CAVE_SEEN);
+				pinfo |= (PLAY_VIEW);
+				pinfo |= (PLAY_SEEN);
 
 				/* Save cave info */
-				fast_cave_info[g] = info;
+				fast_play_info[g] = pinfo;
 
 				/* Save in array */
 				fast_view_g[fast_view_n++] = g;
@@ -3252,13 +3260,13 @@ void update_view(void)
 			if (los(py,px,fy+1,fx))
 			{
 				g = GRID(fy+1,fx);
-				info = fast_cave_info[g];
+				pinfo = fast_play_info[g];
 
-				info |= (CAVE_VIEW);
-				info |= (CAVE_SEEN);
+				pinfo |= (PLAY_VIEW);
+				pinfo |= (PLAY_SEEN);
 
 				/* Save cave info */
-				fast_cave_info[g] = info;
+				fast_play_info[g] = pinfo;
 
 				/* Save in array */
 				fast_view_g[fast_view_n++] = g;
@@ -3267,13 +3275,13 @@ void update_view(void)
 			if (los(py,px,fy-1,fx))
 			{
 				g = GRID(fy-1,fx);
-				info = fast_cave_info[g];
+				pinfo = fast_play_info[g];
 
-				info |= (CAVE_VIEW);
-				info |= (CAVE_SEEN);
+				pinfo |= (PLAY_VIEW);
+				pinfo |= (PLAY_SEEN);
 
 				/* Save cave info */
-				fast_cave_info[g] = info;
+				fast_play_info[g] = pinfo;
 
 				/* Save in array */
 				fast_view_g[fast_view_n++] = g;
@@ -3282,13 +3290,13 @@ void update_view(void)
 			if (los(py,px,fy,fx+1))
 			{
 				g = GRID(fy,fx+1);
-				info = fast_cave_info[g];
+				pinfo = fast_play_info[g];
 
-				info |= (CAVE_VIEW);
-				info |= (CAVE_SEEN);
+				pinfo |= (PLAY_VIEW);
+				pinfo |= (PLAY_SEEN);
 
 				/* Save cave info */
-				fast_cave_info[g] = info;
+				fast_play_info[g] = pinfo;
 
 				/* Save in array */
 				fast_view_g[fast_view_n++] = g;
@@ -3297,13 +3305,13 @@ void update_view(void)
 			if (los(py,px,fy,fx-1))
 			{
 				g = GRID(fy,fx-1);
-				info = fast_cave_info[g];
+				pinfo = fast_play_info[g];
 
-				info |= (CAVE_VIEW);
-				info |= (CAVE_SEEN);
+				pinfo |= (PLAY_VIEW);
+				pinfo |= (PLAY_SEEN);
 
 				/* Save cave info */
-				fast_cave_info[g] = info;
+				fast_play_info[g] = pinfo;
 
 				/* Save in array */
 				fast_view_g[fast_view_n++] = g;
@@ -3313,13 +3321,13 @@ void update_view(void)
 			if (los(py,px,fy+1,fx+1))
 			{
 				g = GRID(fy+1,fx+1);
-				info = fast_cave_info[g];
+				pinfo = fast_play_info[g];
 
-				info |= (CAVE_VIEW);
-				info |= (CAVE_SEEN);
+				pinfo |= (PLAY_VIEW);
+				pinfo |= (PLAY_SEEN);
 
 				/* Save cave info */
-				fast_cave_info[g] = info;
+				fast_play_info[g] = pinfo;
 
 				/* Save in array */
 				fast_view_g[fast_view_n++] = g;
@@ -3328,13 +3336,13 @@ void update_view(void)
 			if (los(py,px,fy+1,fx-1))
 			{
 				g = GRID(fy+1,fx-1);
-				info = fast_cave_info[g];
+				pinfo = fast_play_info[g];
 
-				info |= (CAVE_VIEW);
-				info |= (CAVE_SEEN);
+				pinfo |= (PLAY_VIEW);
+				pinfo |= (PLAY_SEEN);
 
 				/* Save cave info */
-				fast_cave_info[g] = info;
+				fast_play_info[g] = pinfo;
 
 				/* Save in array */
 				fast_view_g[fast_view_n++] = g;
@@ -3343,13 +3351,13 @@ void update_view(void)
 			if (los(py,px,fy-1,fx+1))
 			{
 				g = GRID(fy-1,fx+1);
-				info = fast_cave_info[g];
+				pinfo = fast_play_info[g];
 
-				info |= (CAVE_VIEW);
-				info |= (CAVE_SEEN);
+				pinfo |= (PLAY_VIEW);
+				pinfo |= (PLAY_SEEN);
 
 				/* Save cave info */
-				fast_cave_info[g] = info;
+				fast_play_info[g] = pinfo;
 
 				/* Save in array */
 				fast_view_g[fast_view_n++] = g;
@@ -3358,13 +3366,13 @@ void update_view(void)
 			if (los(py,px,fy-1,fx-1))
 			{
 				g = GRID(fy-1,fx-1);
-				info = fast_cave_info[g];
+				pinfo = fast_play_info[g];
 
-				info |= (CAVE_VIEW);
-				info |= (CAVE_SEEN);
+				pinfo |= (PLAY_VIEW);
+				pinfo |= (PLAY_SEEN);
 
 				/* Save cave info */
-				fast_cave_info[g] = info;
+				fast_play_info[g] = pinfo;
 
 				/* Save in array */
 				fast_view_g[fast_view_n++] = g;
@@ -3380,30 +3388,42 @@ void update_view(void)
 	g = pg;
 
 	/* Get grid info */
-	info = fast_cave_info[g];
+	cinfo = fast_cave_info[g];
+
+	/* Get grid info */
+	pinfo = fast_play_info[g];
 
 	/* Assume viewable */
-	info |= (CAVE_VIEW);
+	pinfo |= (PLAY_VIEW);
 
 	/* Torch-lit grid */
 	if (0 < radius)
 	{
-		/* Mark as "CAVE_SEEN" */
-		info |= (CAVE_SEEN);
+		/* Mark as "PLAY_SEEN" */
+		pinfo |= (PLAY_SEEN);
+
+		/* Mark as "PLAY_LITE" */
+		/* pinfo |= (PLAY_LITE); */
 
 		/* Mark as "CAVE_LITE" */
-		/* info |= (CAVE_LITE); */
+		/* cinfo |= (CAVE_LITE); */
+
+		/* Mark as "CAVE_MLIT" */
+		/* cinfo |= (CAVE_MLIT); */
 	}
 
-	/* Perma-lit grid */
-	else if (info & (CAVE_GLOW))
+	/* Lit grid */
+	else if (cinfo & (CAVE_GLOW))
 	{
-		/* Mark as "CAVE_SEEN" */
-		info |= (CAVE_SEEN);
+		/* Mark as "PLAY_SEEN" */
+		pinfo |= (PLAY_SEEN);
 	}
 
 	/* Save cave info */
-	fast_cave_info[g] = info;
+	fast_cave_info[g] = cinfo;
+
+	/* Save player info */
+	fast_play_info[g] = pinfo;
 
 	/* Save in array */
 	fast_view_g[fast_view_n++] = g;
@@ -3453,10 +3473,13 @@ void update_view(void)
 				g = pg + p->grid[o2];
 
 				/* Get grid info */
-				info = fast_cave_info[g];
+				cinfo = fast_cave_info[g];
+
+				/* Get grid info */
+				pinfo = fast_play_info[g];
 
 				/* Handle wall */
-				if (info & (CAVE_WALL))
+				if (cinfo & (CAVE_XLOS))
 				{
 					/* Clear bits */
 					bits0 &= ~(p->bits_0);
@@ -3465,23 +3488,29 @@ void update_view(void)
 					bits3 &= ~(p->bits_3);
 
 					/* Newly viewable wall */
-					if (!(info & (CAVE_VIEW)))
+					if (!(pinfo & (PLAY_VIEW)))
 					{
 						/* Mark as viewable */
-						info |= (CAVE_VIEW);
+						pinfo |= (PLAY_VIEW);
 
 						/* Torch-lit grids */
 						if (p->d < radius)
 						{
-							/* Mark as "CAVE_SEEN" */
-							info |= (CAVE_SEEN);
+							/* Mark as "PLAY_SEEN" */
+							pinfo |= (PLAY_SEEN);
+
+							/* Mark as "PLAY_LITE" */
+							/* pinfo |= (PLAY_LITE); */
 
 							/* Mark as "CAVE_LITE" */
-							/* info |= (CAVE_LITE); */
+							/* cinfo |= (CAVE_LITE); */
+
+							/* Mark as "CAVE_MLIT" */
+							/* cinfo |= (CAVE_MLIT); */
 						}
 
-						/* Perma-lit grids */
-						else if (info & (CAVE_GLOW))
+						/* Lit grids */
+						else if (cinfo & (CAVE_GLOW))
 						{
 							int y = GRID_Y(g);
 							int x = GRID_X(g);
@@ -3493,15 +3522,15 @@ void update_view(void)
 #ifdef UPDATE_VIEW_COMPLEX_WALL_ILLUMINATION
 
 							/* Check for "complex" illumination */
-							if ((!(cave_info[yy][xx] & (CAVE_WALL)) &&
+							if ((!(cave_info[yy][xx] & (CAVE_XLOS)) &&
 							      (cave_info[yy][xx] & (CAVE_GLOW))) ||
-							    (!(cave_info[y][xx] & (CAVE_WALL)) &&
+							    (!(cave_info[y][xx] & (CAVE_XLOS)) &&
 							      (cave_info[y][xx] & (CAVE_GLOW))) ||
-							    (!(cave_info[yy][x] & (CAVE_WALL)) &&
+							    (!(cave_info[yy][x] & (CAVE_XLOS)) &&
 							      (cave_info[yy][x] & (CAVE_GLOW))))
 							{
 								/* Mark as seen */
-								info |= (CAVE_SEEN);
+								pinfo |= (PLAY_SEEN);
 							}
 
 #else /* UPDATE_VIEW_COMPLEX_WALL_ILLUMINATION */
@@ -3510,7 +3539,7 @@ void update_view(void)
 							if (cave_info[yy][xx] & (CAVE_GLOW))
 							{
 								/* Mark as seen */
-								info |= (CAVE_SEEN);
+								pinfo |= (PLAY_SEEN);
 							}
 
 #endif /* UPDATE_VIEW_COMPLEX_WALL_ILLUMINATION */
@@ -3518,7 +3547,10 @@ void update_view(void)
 						}
 
 						/* Save cave info */
-						fast_cave_info[g] = info;
+						fast_cave_info[g] = cinfo;
+
+						/* Save player info */
+						fast_play_info[g] = pinfo;
 
 						/* Save in array */
 						fast_view_g[fast_view_n++] = g;
@@ -3541,30 +3573,39 @@ void update_view(void)
 					}
 
 					/* Newly viewable non-wall */
-					if (!(info & (CAVE_VIEW)))
+					if (!(pinfo & (PLAY_VIEW)))
 					{
 						/* Mark as "viewable" */
-						info |= (CAVE_VIEW);
+						pinfo |= (PLAY_VIEW);
 
 						/* Torch-lit grids */
 						if (p->d < radius)
 						{
-							/* Mark as "CAVE_SEEN" */
-							info |= (CAVE_SEEN);
+							/* Mark as "PLAY_SEEN" */
+							pinfo |= (PLAY_SEEN);
+
+							/* Mark as "PLAY_LITE" */
+							/* pinfo |= (PLAY_LITE); */
 
 							/* Mark as "CAVE_LITE" */
-							/* info |= (CAVE_LITE); */
+							/* cinfo |= (CAVE_LITE); */
+
+							/* Mark as "CAVE_MLIT" */
+							/* cinfo |= (CAVE_MLIT); */
 						}
 
-						/* Perma-lit grids */
-						else if (info & (CAVE_GLOW))
+						/* Lit grids */
+						else if (cinfo & (CAVE_GLOW))
 						{
 							/* Mark as "CAVE_SEEN" */
-							info |= (CAVE_SEEN);
+							pinfo |= (PLAY_SEEN);
 						}
 
 						/* Save cave info */
-						fast_cave_info[g] = info;
+						fast_cave_info[g] = cinfo;
+
+						/* Save player info */
+						fast_play_info[g] = pinfo;
 
 						/* Save in array */
 						fast_view_g[fast_view_n++] = g;
@@ -3586,8 +3627,8 @@ void update_view(void)
 			/* Grid */
 			g = fast_view_g[i];
 
-			/* Grid cannot be "CAVE_SEEN" */
-			fast_cave_info[g] &= ~(CAVE_SEEN);
+			/* Grid cannot be "PLAY_SEEN" */
+			fast_play_info[g] &= ~(PLAY_SEEN);
 		}
 	}
 
@@ -3598,10 +3639,10 @@ void update_view(void)
 		g = fast_view_g[i];
 
 		/* Get grid info */
-		info = fast_cave_info[g];
+		pinfo = fast_play_info[g];
 
-		/* Was not "CAVE_SEEN", is now "CAVE_SEEN" */
-		if ((info & (CAVE_SEEN)) && !(info & (CAVE_TEMP)))
+		/* Was not "PLAY_SEEN", is now "PLAY_SEEN" */
+		if ((pinfo & (PLAY_SEEN)) && !(pinfo & (PLAY_TEMP)))
 		{
 			int y, x;
 
@@ -3624,16 +3665,19 @@ void update_view(void)
 		g = fast_temp_g[i];
 
 		/* Get grid info */
-		info = fast_cave_info[g];
+		cinfo = fast_cave_info[g];
 
-		/* Clear "CAVE_TEMP" flag */
-		info &= ~(CAVE_TEMP);
+		/* Get grid info */
+		pinfo = fast_play_info[g];
+
+		/* Clear "PLAY_TEMP" flag */
+		pinfo &= ~(PLAY_TEMP);
 
 		/* Save cave info */
-		fast_cave_info[g] = info;
+		fast_play_info[g] = pinfo;
 
-		/* Was "CAVE_SEEN", is now not "CAVE_SEEN" */
-		if (!(info & (CAVE_SEEN)))
+		/* Was "PLAY_SEEN", is now not "PLAY_SEEN" */
+		if (!(pinfo & (PLAY_SEEN)))
 		{
 			int y, x;
 
@@ -3650,6 +3694,8 @@ void update_view(void)
 	/* Save 'view_n' */
 	view_n = fast_view_n;
 }
+
+
 
 /*
  * Update the features that have dynamic flags. These grids need to be
@@ -4327,7 +4373,7 @@ void map_area(void)
 				if (f_info[cave_feat[y][x]].flags1 & (FF1_REMEMBER))
 				{
 					/* Memorize the object */
-					cave_info[y][x] |= (CAVE_MARK);
+					play_info[y][x] |= (PLAY_MARK);
 				}
 
 				/* Memorize known walls */
@@ -4340,7 +4386,7 @@ void map_area(void)
 					if (f_info[cave_feat[yy][xx]].flags1 & (FF1_REMEMBER))
 					{
 						/* Memorize the walls */
-						cave_info[yy][xx] |= (CAVE_MARK);
+						play_info[yy][xx] |= (PLAY_MARK);
 					}
 				}
 			}
@@ -4414,14 +4460,14 @@ void wiz_lite(void)
 					if (f_info[cave_feat[yy][xx]].flags1 & (FF1_REMEMBER))
 					{
 						/* Memorize the grid */
-						cave_info[yy][xx] |= (CAVE_MARK);
+						play_info[yy][xx] |= (PLAY_MARK);
 					}
 
 					/* Normally, memorize floors (see above) */
 					if (view_perma_grids && !view_torch_grids)
 					{
 						/* Memorize the grid */
-						cave_info[yy][xx] |= (CAVE_MARK);
+						play_info[yy][xx] |= (PLAY_MARK);
 					}
 				}
 			}
@@ -4453,7 +4499,7 @@ void wiz_dark(void)
 		for (x = 0; x < DUNGEON_WID; x++)
 		{
 			/* Process the grid */
-			cave_info[y][x] &= ~(CAVE_MARK);
+			play_info[y][x] &= ~(PLAY_MARK);
 		}
 	}
 
@@ -4627,23 +4673,35 @@ static void cave_set_feat_aux(int y, int x, int feat)
 	/* Really set the feature */
 	cave_feat[y][x] = feat;
 
-	/* Check for bit 5 set*/
+	/* Check for line of sight */
 	if (f_ptr->flags1 & (FF1_LOS))
 	{
-		cave_info[y][x] &= ~(CAVE_WALL);
+		cave_info[y][x] &= ~(CAVE_XLOS);
 	}
 
 	/* Handle wall grids */
 	else
 	{
-		cave_info[y][x] |= (CAVE_WALL);
+		cave_info[y][x] |= (CAVE_XLOS);
+	}
+
+	/* Check for line of fire */
+	if (f_ptr->flags1 & (FF1_PROJECT))
+	{
+		cave_info[y][x] &= ~(CAVE_XLOF);
+	}
+
+	/* Handle wall grids */
+	else
+	{
+		cave_info[y][x] |= (CAVE_XLOF);
 	}
 
 	/* Check for change to boring grid */
-	if (!(f_ptr->flags1 & (FF1_REMEMBER))) cave_info[y][x] &= ~(CAVE_MARK);
+	if (!(f_ptr->flags1 & (FF1_REMEMBER))) play_info[y][x] &= ~(PLAY_MARK);
 
 	/* Check for change to out of sight grid */
-	else if (!(player_can_see_bold(y,x))) cave_info[y][x] &= ~(CAVE_MARK);
+	else if (!(player_can_see_bold(y,x))) play_info[y][x] &= ~(PLAY_MARK);
 
 	/* Check if adding to dynamic list */
 	if (!dyna && (f_ptr->flags3 & (FF3_DYNAMIC_MASK)))

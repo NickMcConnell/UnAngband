@@ -3862,7 +3862,7 @@ static bool target_set_interactive_accept(int y, int x)
 	}
 
 	/* Interesting memorized features */
-	if ((cave_info[y][x] & (CAVE_MARK)) && (f_info[cave_feat[y][x]].flags1 & (FF1_NOTICE)))
+	if ((play_info[y][x] & (PLAY_MARK)) && (f_info[cave_feat[y][x]].flags1 & (FF1_NOTICE)))
 	{
 		return (TRUE);
 	}
@@ -4361,7 +4361,7 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 		feat = f_info[cave_feat[y][x]].mimic;
 
 		/* Require knowledge about grid, or ability to see grid */
-		if (!(cave_info[y][x] & (CAVE_MARK)) && !player_can_see_bold(y,x))
+		if (!(play_info[y][x] & (PLAY_MARK)) && !player_can_see_bold(y,x))
 		{
 			/* Forget feature */
 			feat = FEAT_NONE;
@@ -4437,7 +4437,7 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 		/* Room description if needed */
 		/* We describe a room if we are looking at ourselves, or something in a room when we are
 		 * not in a room, or in a different room. */
-		if ((cave_info[y][x] & (CAVE_MARK)) &&
+		if ((play_info[y][x] & (PLAY_MARK)) &&
 			(cave_info[y][x] & (CAVE_ROOM)) &&
 			(room_info[dun_room[y/BLOCK_HGT][x/BLOCK_WID]].flags & (ROOM_SEEN)) &&
 			(room_names) &&
