@@ -8,6 +8,11 @@ travel along the line of fire, possibly hitting other monsters in its path.
 - The variant and save file options are now compulsory, and removed from the
 user interface.
 
+- One rod in a stack of recharging rods will recharge in (t - n) time, where
+t is the timeout of the stack and n is the number of rods recharging. This
+allows rods to be reused more quickly, and where the rod timeout is less than
+stack size, you can reuse a rod every turn.
+
 ### User Interface ###
 
 - Now supports specifying whether or not a feature supports advanced lighting
