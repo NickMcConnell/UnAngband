@@ -1782,7 +1782,7 @@ bool mon_resist_feat(int feat, int r_idx)
 			break;
 
 			case GF_LAVA:
-                        if (!(r_ptr->flags3 & (RF3_RES_LAVA))) return (FALSE);
+			if (!(r_ptr->flags3 & (RF3_RES_LAVA))) return (FALSE);
 			break;
 
 			case GF_WATER_WEAK:
@@ -1790,11 +1790,11 @@ bool mon_resist_feat(int feat, int r_idx)
 			if (r_ptr->flags3 & (RF3_NONLIVING))  return (TRUE);
 			if ((r_ptr->flags2 & (RF2_CAN_SWIM)) && (f_ptr->flags2 & (FF2_CAN_SWIM)))
 			{
-                                return (TRUE);
+				return (TRUE);
 			}
 			else if ((r_ptr->flags2 & (RF2_CAN_DIG)) && (f_ptr->flags2 & (FF2_CAN_DIG)))
 			{
-                                return (TRUE);
+				return (TRUE);
 			}
 			else
 			{
@@ -1949,10 +1949,10 @@ int place_monster_here(int y, int x, int r_idx)
 
 	/* Hack -- check for oozing */
 	if ((mon_resist_feat(feat,r_idx)) &&
-                (r_ptr->flags3 & (RF3_OOZE)) &&
-                (f_ptr->flags2 & (FF2_CAN_OOZE)))
+		(r_ptr->flags3 & (RF3_OOZE)) &&
+		(f_ptr->flags2 & (FF2_CAN_OOZE)))
 	{
-                return(MM_OOZE);
+		return(MM_OOZE);
 	}
 
 
