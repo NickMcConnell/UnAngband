@@ -564,9 +564,10 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 
 
 /*
- *	Find a secret at the specified location and change it according to the state.
+ * Find a secret at the specified location and change it according to
+ * the state.
  */
-void find_secret(y,x)
+void find_secret(int y, int x)
 {
 	feature_type *f_ptr;
 
