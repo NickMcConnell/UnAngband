@@ -1,3 +1,8 @@
+### Game Play ###
+
+- Snow, particularly deep snow, is riskier again.
+
+
 UnAngband 0.5.4b: "Survival of the Fittest"
 
 ### Game Play ###
