@@ -76,7 +76,7 @@ extern struct passwd *getpwnam();
 /*
  * Find a default user name from the system.
  */
-void user_name(char *buf, int id)
+void user_name(char *buf, size_t len, int id)
 {
 	struct passwd *pw;
 
@@ -84,50 +84,19 @@ void user_name(char *buf, int id)
 	if ((pw = getpwuid(id)))
 	{
 		/* Get the first 15 characters of the user name */
-		strncpy(buf, pw->pw_name, 16);
-		buf[15] = '\0';
+		my_strcpy(buf, pw->pw_name, len);
 
 #ifdef CAPITALIZE_USER_NAME
 		/* Hack -- capitalize the user name */
-		if (islower(buf[0])) buf[0] = toupper(buf[0]);
-#endif
+		if (islower((unsigned char)buf[0]))
+			buf[0] = toupper((unsigned char)buf[0]);
+#endif /* CAPITALIZE_USER_NAME */
 
 		return;
 	}
 
 	/* Oops.  Hack -- default to "PLAYER" */
-	strcpy(buf, "PLAYER");
-}
-
-
-/*
- * Find the users home directory.
- */
-errr user_home(char *buf, int len)
-{
-	char *homedir;
-	struct passwd *pw;
-
-	/* Get the "HOME" environment variable */
-	homedir = getenv("HOME");
-
-	if (!homedir)
-	{
-		/* Get the directory from the passwd structure */
-		pw = getpwuid(getuid());
-
-		if (pw) homedir = pw->pw_dir;
-
-		/* Paranoia */
-		if (!homedir) return (-1);
-	}
-
-	/* Store the users home directory */
-	strncpy(buf, homedir, len);
-	buf[len-1] = '\0';
-
-	/* Success */
-	return (0);
+	my_strcpy(buf, "PLAYER", len);
 }
 
 #endif /* SET_UID */

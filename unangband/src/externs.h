@@ -876,8 +876,7 @@ extern void get_zone(dungeon_zone **zone_handle, int dungeon, int depth);
 /* util.c */
 extern int usleep(huge usecs);
 # endif /* HAVE_USLEEP */
-extern void user_name(char *buf, int id);
-extern errr user_home(char *buf, int len);
+extern void user_name(char *buf, size_t len, int id);
 #endif /* SET_UID */
 
 
