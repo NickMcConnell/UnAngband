@@ -55,6 +55,9 @@ by missile or thrown weapons (Bug 654).
 
 - Priest spell banish evil now works (Bug 681).
 
+- Can no longer browse illegible spells (Bug 253).
+
+
 ### Build / Platform ###
 
 - Remove references to nangband in makefile.
