@@ -1,3 +1,24 @@
+### Game Play ###
+
+- Vents now act as conduits for water, acid, steam, fire or gas through walls.
+Vents can also be climbed through, but block vision and ranged attacks.
+
+- Falling water, lava, and so on now only cause damage to adjacent terrain every
+second turn.
+
+- It should now be possible to create trapped areas as follows (where < is falling
+terrain and % is a vent):
+
+####.      #####.
+#<%%.   or #<%%%.
+####.      #####.
+
+This results in the the floor locations getting hit, on the left, every 3 turns,
+or on the right every 4 turns (an adjacent water fall will hit every 2 turns).
+
+- Cracked walls now can come in hidden, weaker versions that can be easily
+bashed or tunnelled through.
+
 ### Bug fixes ###
 
 - Prevented original graphic tiles from trying to use dark and lite tiles.
