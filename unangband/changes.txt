@@ -2,6 +2,8 @@
 
 - Snow, particularly deep snow, is riskier again.
 
+- The chance of tunnelling was out by a factor of 10 (Reported by Jeffrey
+Turner).
 
 UnAngband 0.5.4b: "Survival of the Fittest"
 

@@ -1013,7 +1013,7 @@ static bool do_cmd_tunnel_aux(int y, int x)
 	{
 
 		/* Dig */
-		if (p_ptr->skill_dig > rand_int(200 * j))
+		if (p_ptr->skill_dig > rand_int(20 * j))
 		{
 			sound(SOUND_DIG);
 
@@ -1054,7 +1054,7 @@ static bool do_cmd_tunnel_aux(int y, int x)
 	{
 
 		/* Tunnel -- much harder */
-		if (p_ptr->skill_dig > (j + rand_int(400 * j)))
+		if (p_ptr->skill_dig > (j + rand_int(40 * j)))
 		{
 			sound(SOUND_DIG);
 
