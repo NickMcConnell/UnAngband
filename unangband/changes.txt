@@ -1,3 +1,5 @@
+UnAngband 0.5.4b: "Survival of the Fittest"
+
 ### Game Play ###
 
 - The Dale now has a food supply (Bug 588).
@@ -75,6 +77,8 @@ provide when inspected or browsed.
 - Can correctly edit the displayed graphic for tree tops.
 
 - Flavoured items are now correctly displayed when unknown for all graphics.
+
+- Character dump version updated.
 
 ### Build / Platform ###
 
