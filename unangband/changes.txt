@@ -16,6 +16,9 @@ body armor. (Reported by Adam Horowitz).
 
 - Fix bug allowing artifacts to have runes inscribed.
 
+- Fix bug that crashed game if browsing a brand weapon spell (Reported
+by Adam Horowitz).
+
 Unangband 0.5.2a Bugfix release
 
 ### Game-play ###

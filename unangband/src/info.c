@@ -455,7 +455,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 
 	if ((s_ptr->type == SPELL_BRAND_WEAPON)
 		|| (s_ptr->type == SPELL_BRAND_ARMOR))
-			vp[vn++]=inscrip_text[INSCRIP_MIN_HIDDEN+s_ptr->param];
+			vp[vn++]=inscrip_text[INSCRIP_MIN_HIDDEN-INSCRIP_NULL+s_ptr->param];
 
 	if (s_ptr->type == SPELL_ENCHANT_TVAL) vp[vn++]="change its kind";
 
