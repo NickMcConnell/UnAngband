@@ -1013,6 +1013,9 @@ bool detect_objects_normal(void)
 			/* Hack -- have seen object */
 			if (!(k_info[o_ptr->k_idx].flavor)) k_info[o_ptr->k_idx].aware = TRUE;
 
+			/* XXX XXX - Mark monster objects as "seen" */
+			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights)) l_list[o_ptr->name3].sights++;
+
 			/* Redraw */
 			lite_spot(y, x);
 
@@ -1190,6 +1193,9 @@ bool detect_objects_magic(void)
 
 			/* Hack -- have seen object */
 			if (!(k_info[o_ptr->k_idx].flavor)) k_info[o_ptr->k_idx].aware = TRUE;
+
+			/* XXX XXX - Mark monster objects as "seen" */
+			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights)) l_list[o_ptr->name3].sights++
 
 			/* Redraw */
 			lite_spot(y, x);
@@ -1381,6 +1387,9 @@ bool detect_objects_cursed(void)
 
 			/* Hack -- have seen object */
 			if (!(k_info[o_ptr->k_idx].flavor)) k_info[o_ptr->k_idx].aware = TRUE;
+
+			/* XXX XXX - Mark monster objects as "seen" */
+			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights)) l_list[o_ptr->name3].sights++
 
 			/* Redraw */
 			lite_spot(y, x);
