@@ -2212,6 +2212,16 @@ void move_player(int dir, int jumping)
 			search();
 		}
 
+		/* Moving cautiously */
+		else
+		{
+			/* Rest after each step */
+			if (always_pickup) p_ptr->command_cmd = 'g';
+			else p_ptr->command_cmd = ',';
+			p_ptr->command_rep = 1;
+			p_ptr->command_dir = 5;
+		}
+
 		/* Handle "objects" */
 		py_pickup(jumping != always_pickup);
 
