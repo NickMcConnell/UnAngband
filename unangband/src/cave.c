@@ -1819,6 +1819,8 @@ void display_map(int *cy, int *cx)
 	view_special_lite = FALSE;
 	view_granite_lite = FALSE;
 
+	/* Change the way the grids are displayed */
+	if (Term->notice_grid) Term_xtra(TERM_XTRA_GRIDS, 2);
 
 	/* Nothing here */
 	ta = TERM_WHITE;

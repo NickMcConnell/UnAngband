@@ -409,8 +409,7 @@ struct _term_data
 	uint map_tile_wid;
 	uint map_tile_hgt;
 
-	bool map_active;
-	bool grid_active;
+	int grid_display;
 };
 
 
@@ -1724,7 +1723,7 @@ static void windows_map_aux(void);
  */
 static void term_data_redraw(term_data *td)
 {
-	if (td->map_active)
+	if (td->grid_display == 3)
 	{
 		/* Redraw the map */
 		windows_map_aux();
@@ -2135,19 +2134,13 @@ static int Term_xtra_win_delay(int v)
 
 
 /*
- * Notice screen saving. Set grid_active to false if saved.
+ * Notice grid display changing. Set grid_display to new value.
  */
-static int Term_xtra_win_saves(int v)
+static int Term_xtra_win_grids(int v)
 {
 	term_data *td = (term_data*)(Term->data);
 
-	if (v == 1) td->grid_active = FALSE;
-	else if (v == 3)
-	{
-		td->grid_active = TRUE;
-
-		Term_redraw();
-	}
+	td->grid_display = v;
 
 	/* Success */
 	return (0);
@@ -2211,9 +2204,9 @@ static errr Term_xtra_win(int n, int v)
 		}
 
 		/* Notice screen save / load */
-		case TERM_XTRA_SAVES:
+		case TERM_XTRA_GRIDS:
 		{
-			return (Term_xtra_win_saves(v));
+			return (Term_xtra_win_grids(v));
 		}
 	}
 
@@ -2237,7 +2230,7 @@ static errr Term_curs_win(int x, int y)
 
 	int tile_wid, tile_hgt;
 
-	if (td->map_active)
+	if (td->grid_display == 3)
 	{
 		tile_wid = td->map_tile_wid;
 		tile_hgt = td->map_tile_hgt;
@@ -2278,7 +2271,7 @@ static errr Term_bigcurs_win(int x, int y)
 
 	int tile_wid, tile_hgt;
 
-	if (td->map_active)
+	if (td->grid_display == 3)
 	{
 		/* Normal cursor in map window */
 		Term_curs_win(x, y);
@@ -2468,7 +2461,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 	h1 = infGraph.CellHeight;
 
 	/* Size of window cell */
-	if (td->map_active)
+	if (td->grid_display == 3)
 	{
 		w2 = td->map_tile_wid;
 		h2 = td->map_tile_hgt;
@@ -2498,9 +2491,9 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 
 	/* Hack -- isometric location */
 	/*
-	 * Note check on grid_active flag.
+	 * Note check on grid_display.
        */
-	if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_active))
+	if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_display))
 	{
 		x = (x - COL_MAP);
 		y = (y - ROW_MAP);
@@ -2573,7 +2566,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 				BitBlt(hdc, x2, y2, tw2, h2, hdcSrc, x3, y3, SRCCOPY);
 #endif
 
-				if ((arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO) || !(td->grid_active))
+				if ((arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO) || !(td->grid_display))
 				{ 
 					/* Copy the blank picture from the bitmap to the window */
 					BitBlt(hdc, x2, y2, tw2, th2, hdcSrc, 0, 0, SRCCOPY);
@@ -2603,7 +2596,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 				StretchBlt(hdc, x2, y2, tw2, th2, hdcSrc, x3, y3, w1, h1, SRCCOPY);
 #endif
 
-				if ((arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO) || !(td->grid_active))
+				if ((arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO) || !(td->grid_display))
 				{ 
 					/* Copy the blank picture from the bitmap to the window */
 					StretchBlt(hdc, x2, y2, tw2, th2, hdcSrc, 0, 0, w1, h1, SRCCOPY);
@@ -2744,6 +2737,8 @@ static void windows_map(void)
 	term_data *td = &data[0];
 	char ch;
 
+	int old_display = td->grid_display;
+
 	/* Only in graphics mode since the fonts can't be scaled */
 	if (!use_graphics) return;
 
@@ -2753,7 +2748,7 @@ static void windows_map(void)
 	/* Clear screen */
 	Term_xtra_win_clear();
 
-	td->map_active = TRUE;
+	td->grid_display = 3;
 
 	/* Draw the map */
 	windows_map_aux();
@@ -2763,7 +2758,7 @@ static void windows_map(void)
 	Term_flush();
 
 	/* Switch off the map display */
-	td->map_active = FALSE;
+	td->grid_display = old_display;
 
 	/* Restore screen */
 	Term_xtra_win_clear();
@@ -2812,8 +2807,8 @@ static void term_data_link(term_data *td)
 	t->text_hook = Term_text_win;
 	t->pict_hook = Term_pict_win;
 
-	/* Notice screen saves */
-	t->note_screen = TRUE;
+	/* Notice when grid display changes */
+	t->notice_grid = TRUE;
 
 	/* Remember where we came from */
 	t->data = td;
@@ -2852,7 +2847,7 @@ static void init_windows(void)
 	td->size_oh2 = 2;
 	td->pos_x = 30;
 	td->pos_y = 20;
-	td->grid_active = TRUE;
+	td->grid_display = 1;
 
 	/* Sub windows */
 	for (i = 1; i < MAX_TERM_DATA; i++)
@@ -2870,6 +2865,7 @@ static void init_windows(void)
 		td->size_oh2 = 1;
 		td->pos_x = (7 - i) * 30;
 		td->pos_y = (7 - i) * 20;
+		td->grid_display = 0;
 	}
 
 	/* Load prefs */
@@ -4170,7 +4166,7 @@ static void handle_wm_paint(HWND hWnd)
 
 	BeginPaint(hWnd, &ps);
 
-	if (td->map_active)
+	if (td->grid_display == 3)
 	{
 		/* Redraw the map */
 		/* ToDo: Only redraw the necessary parts */

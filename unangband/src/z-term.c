@@ -2006,14 +2006,11 @@ errr Term_save(void)
 		term_win_init(Term->mem, w, h);
 	}
 
-	/* Tell term we're about to save */
-	if (Term->note_screen) Term_xtra(TERM_XTRA_SAVES,0);
-
 	/* Grab */
 	term_win_copy(Term->mem, Term->scr, w, h);
 
-	/* Tell term we've saved */
-	if (Term->note_screen) Term_xtra(TERM_XTRA_SAVES,1);
+	/* Tell term we're not displaying the main map */
+	if (Term->notice_grid) Term_xtra(TERM_XTRA_GRIDS, 0);
 
 	/* Success */
 	return (0);
@@ -2042,14 +2039,11 @@ errr Term_load(void)
 		term_win_init(Term->mem, w, h);
 	}
 
-	/* Tell term we've saved */
-	if (Term->note_screen) Term_xtra(TERM_XTRA_SAVES,2);
-
 	/* Load */
 	term_win_copy(Term->scr, Term->mem, w, h);
 
-	/* Tell term we've saved */
-	if (Term->note_screen) Term_xtra(TERM_XTRA_SAVES,3);
+	/* Tell term we're displaying the main map */
+	if (Term->notice_grid) Term_xtra(TERM_XTRA_GRIDS, 1);
 
 	/* Assume change */
 	for (y = 0; y < h; y++)
