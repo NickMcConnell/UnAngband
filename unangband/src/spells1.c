@@ -3271,7 +3271,6 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 					if (!(l_ptr->flags3 & (RF3_UNDEAD))) note = " is unaffected.";
 					l_ptr->flags3 |= (RF3_UNDEAD);
 				}
-				if (seen) l_ptr->flags3 |= (RF3_UNDEAD);
 
 				obvious = FALSE;
 				dam=0;
@@ -3283,7 +3282,6 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 					if (!(l_ptr->flags3 & (RF3_DEMON))) note = " is unaffected.";
 					l_ptr->flags3 |= (RF3_DEMON);
 				}
-				if (seen) l_ptr->flags3 |= (RF3_DEMON);
 
 				obvious = FALSE;
 				dam = 0;
@@ -3292,10 +3290,9 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			{
 				if (seen)
 				{
-					if (!(l_ptr->flags3 & (RF3_UNDEAD))) note = " is unaffected.";
-					l_ptr->flags3 |= (RF3_UNDEAD);
+					if (!(l_ptr->flags3 & (RF3_NONLIVING))) note = " is unaffected.";
+					l_ptr->flags3 |= (RF3_NONLIVING);
 				}
-				if (seen) l_ptr->flags3 |= (RF3_UNDEAD);
 
 				obvious = FALSE;
 				dam = 0;
