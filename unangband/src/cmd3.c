@@ -1765,6 +1765,8 @@ void ang_sort_swap_hook(vptr u, vptr v, int a, int b)
 
 	u16b holder;
 
+	(void)v;
+
 	/* Swap */
 	holder = who[a];
 	who[a] = who[b];

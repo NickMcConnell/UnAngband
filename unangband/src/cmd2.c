@@ -2068,7 +2068,8 @@ static bool do_cmd_walk_test(int y, int x)
 #endif /* ALLOW_EASY_ALTER */
 
 		/* Message */
-		msg_format("There is a %s in the way.",name);
+		msg_format("There is %s %s in the way.",
+				(is_a_vowel(name[0]) ? "an" : "a"),name);
 
 		/* Nope */
 		return (FALSE);
