@@ -5187,6 +5187,7 @@ static int collect_features(int grp_cur, int *feat_idx)
 	return feat_cnt;
 }
 
+
 /*
  * Display the features in a group.
  */
@@ -5194,6 +5195,15 @@ static void display_feature_list(int col, int row, int per_page, int *feat_idx,
 	int feat_cur, int feat_top)
 {
 	int i;
+	int col2 = 70;
+	int col3 = 72;
+
+	/* Correct columns 1 and 3 */
+	if (use_bigtile)
+	{
+		col2++; col3++; col3++;
+	}
+
 
 	/* Display lines until done */
 	for (i = 0; i < per_page && feat_idx[i]; i++)
@@ -5222,6 +5232,59 @@ static void display_feature_list(int col, int row, int per_page, int *feat_idx,
 			else
 				Term_putch(68 + 1, row + i, 0, ' ');
 		}
+
+		/* Tile supports special lighting? */
+		if (!(f_ptr->flags2 & (FF2_ATTR_LITE)))
+		{
+			prt("       ", row + i, col2);
+			continue;
+		}
+
+		Term_putch(col2, row + i, TERM_SLATE, '(');
+
+		Term_putch(col3, row + i, TERM_SLATE, '/');
+
+		if (use_bigtile)
+			Term_putch(col3 + 3, row + i, TERM_SLATE, ')');
+		else
+			Term_putch(col3 + 2, row + i, TERM_SLATE, ')');
+
+
+		/* Mega-hack */
+		if (f_ptr->x_attr & 0x80)
+		{
+			/* Use a brightly lit tile */
+			if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
+				Term_putch(col2+1, row + i, f_ptr->x_attr, f_ptr->x_char-1);
+			else
+				Term_putch(col2+1, row + i, f_ptr->x_attr, f_ptr->x_char+2);
+
+			/* Use a dark tile */
+			Term_putch(col3+1, row + i, f_ptr->x_attr, f_ptr->x_char+1);
+
+		}
+		else
+		{
+			/* Use "yellow" */
+			Term_putch(col2+1, row + i, lite_attr[f_ptr->x_attr], f_ptr->x_char);
+
+			/* Use "grey" */
+			Term_putch(col3+1, row + i, dark_attr[f_ptr->x_attr], f_ptr->x_char);
+		}
+
+		if (use_bigtile)
+		{
+			if ((f_ptr->x_attr) & 0x80)
+				Term_putch(col2 + 2, row + i, 255, -1);
+			else
+				Term_putch(col2 + 2, row + i, 0, ' ');
+
+			if ((f_ptr->x_attr) & 0x80)
+				Term_putch(col3 + 2, row + i, 255, -1);
+			else
+				Term_putch(col3 + 2, row + i, 0, ' ');
+		}
+
 	}
 
 	/* Clear remaining lines */
@@ -5359,11 +5422,7 @@ static void do_cmd_knowledge_features(void)
 		}
 
 		/* Prompt */
-#ifdef JP
-		prt(format("<方向>%s%s, ESC", visual_list ? ", ENTERで決定" : ", 'v'でシンボル変更", (attr_idx||char_idx) ? ", 'c', 'p'でペースト" : ", 'c'でコピー"), hgt - 1, 0);
-#else
-		prt(format("<dir>%s%s, ESC", visual_list ? ", ENTER to accept" : ", 'v' for visuals", (attr_idx||char_idx) ? ", 'c', 'p' to paste" : ", 'c' to copy"), hgt - 1, 0);
-#endif
+		prt(format("<dir>%s%s, ESC", visual_list ? ", ENTER to accept" : ", 'v' for visuals, 'a' for lite", (attr_idx||char_idx) ? ", 'c', 'p' to paste" : ", 'c' to copy"), hgt - 1, 0);
 
 		/* Get the current feature */
 		f_ptr = &f_info[feat_idx[feat_cur]];
@@ -5392,6 +5451,18 @@ static void do_cmd_knowledge_features(void)
 			{
 				flag = TRUE;
 				break;
+			}
+
+			case 'a': case 'A':
+			{
+				if (f_ptr->flags2 & (FF2_ATTR_LITE))
+				{
+					f_ptr->flags2 &= ~(FF2_ATTR_LITE);
+				}
+				else
+				{
+					f_ptr->flags2 |= (FF2_ATTR_LITE);
+				}
 			}
 
 			default:
