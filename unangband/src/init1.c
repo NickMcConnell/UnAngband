@@ -364,10 +364,10 @@ static cptr f_info_flags3[] =
 	"TREE_BIG",
 	"XXX3",
 	"FULL_MOVE",
-	"COLLAPSE",
+	"TIMED",
 	"ERUPT",
 	"STRIKE",
-	"DYNAMIC"
+	"SPREAD"
 };
 
 /*

@@ -1518,6 +1518,8 @@ u16b limit;
 		}
 	}
 
+	/* Hack -- not fully dynamic */
+	dyna_full = FALSE;
 
 	/*** Run length decoding ***/
 
@@ -1549,6 +1551,21 @@ u16b limit;
 				cave_info[y][x] |= (CAVE_WALL);
 			}
 
+			/* Handle dynamic grids */
+			if (f_info[cave_feat[y][x]].flags3 & (FF3_DYNAMIC_MASK))
+			{
+				if (dyna_n < (DYNA_MAX-1))
+				{
+					dyna_g[dyna_n++] = GRID(y,x);
+				}
+				else
+				{
+					dyna_full = TRUE;
+					dyna_cent_y = 255;
+					dyna_cent_x = 255;
+				}
+			}
+
 			/* Advance/Wrap */
 			if (++x >= DUNGEON_WID)
 			{
@@ -1560,7 +1577,6 @@ u16b limit;
 			}
 		}
 	}
-
 
 	/*** Player ***/
 

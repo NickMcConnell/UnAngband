@@ -3321,6 +3321,209 @@ void update_view(void)
 	view_n = fast_view_n;
 }
 
+/*
+ * Update the features that have DYNAMIC | ERUPT | STRIKE flags. These grids
+ * need to be checked every turn to see if they affected adjacent grids with
+ * an attack of some kind.
+ *
+ * DYNAMIC grids will 80% of the time affect an adjacent grid with an attack
+ * equal to their blow attack. They will also 80% of the time affect their own grid
+ * with an additional blow attack.
+ *
+ * ERUPT grids will 5% of the time project a radius 2 ball attack equal to twice
+ * the damage of their blow attack, centred on their grid.
+ *
+ * STRIKE grids will 5% of the time project a radius 0 ball attack equal to ten times
+ * the damage of their blow attack, centred on their grid. At some point, it'd be
+ * nice to change this to a beam attack in a random direction, but this will require
+ * changes to the project function.
+ *
+ * Examples of dynamic attacks include fire, smoke, steam, acidic vapours and
+ * poison gas.  Examples of erupt attacks include vents. Examples of strike
+ * attacks include charged clouds.
+ *
+ * Because we can potentially have the whole level consisting of features of
+ * this type, we maintain an array of 'nearby' grids, that is a list of all
+ * grids out to an approximate distance of 20 away. We update the list of grids
+ * whenever we move 5 or more distance away from the current location.
+ *
+ * As an efficiency gain, we only do the above, when we note such a level is
+ * 'dyna_full', that is, we have tried adding a dyna_grid that would overflow
+ * the array. In instances where we are not dyna_full, the dyna_grid array contains
+ * every instance of a dynamic feature of some kind on the level. Once a level
+ * has been noted as being 'dyna_full', we do not reset this information until
+ * the start of level generation on a new level.
+ *
+ * We also update this list by adding and removing features that are either
+ * DYNAMIC, ERUPT or STRIKE as they are created/destroyed. However, this requires
+ * that we create a temporary copy of this list when we are applying the attacks in
+ * this function.
+ * This may prove not to be such an efficiency gain.
+ */
+void update_dyna(void)
+{
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int dist, y, x, g, i;
+
+	int dam, flg;
+
+	int fast_dyna_n = dyna_n;
+	u16b *fast_dyna_g = dyna_g;
+
+	s16b *fast_cave_feat = &cave_feat[0][0];
+
+	s16b feat;
+
+	feature_type *f_ptr;
+
+	bool full = FALSE;
+
+	/* Efficiency */
+	if (dyna_full)
+	{
+		dist = ABS(p_ptr->py - dyna_cent_y);
+		if (ABS(p_ptr->px - dyna_cent_x) > dist)
+			dist = ABS(p_ptr->px - dyna_cent_x);
+
+		/*
+		 * Character is far enough away from the previous dyna center - 
+		 * do a full rebuild.
+		 */
+		if (dist >= 5) full = TRUE;
+	}
+
+	/* Fully update */
+	if (full)
+	{
+		int min_y = MAX(0, py - MAX_SIGHT);
+		int max_y = MIN(DUNGEON_HGT, py + MAX_SIGHT + 1);
+		int min_x = MAX(0, px - MAX_SIGHT);
+		int max_x = MIN(DUNGEON_WID, px + MAX_SIGHT + 1);
+
+		fast_dyna_n = 0;
+
+		/* Scan the potentially visible area of the dungeon */
+		for (y = min_y; y < max_y; y++)
+		{
+			for (x = min_x; x < max_x; x++)
+			{
+				/* Check distance */
+				if (distance(y,x,py,px) > MAX_SIGHT) continue;
+
+				/* Grid */
+				g = GRID(y,x);
+
+				/* Get grid feat */
+				feat = fast_cave_feat[g];
+
+				/* Get the feature */
+				f_ptr = &f_info[feat];
+
+				/* Check for dynamic */
+				if (f_ptr->flags3 & (FF3_DYNAMIC | FF3_STRIKE | FF3_ERUPT))
+				{
+					fast_dyna_g[fast_dyna_n++] = g;
+				}
+			}
+		}
+
+		dyna_cent_y = py;
+		dyna_cent_x = px;
+	}
+
+	/* Create a temporary copy for this function */
+	COPY(fast_dyna_g, dyna_g, u16b);
+
+	/* Actually apply the attacks */
+	for (i = 0; i < fast_dyna_n; i++)
+	{
+		feature_type *f_ptr;
+
+		/* Grid */
+		g = fast_dyna_g[i];
+
+		/* Get grid feat */
+		feat = fast_cave_feat[g];
+
+		/* Get the feature */
+		f_ptr = &f_info[feat];
+
+		/* Dynamic */
+		if (f_ptr->flags3 & (FF3_DYNAMIC))
+		{
+			int dir = rand_int(10);
+
+			if (dir < 8)
+			{
+				y = GRID_Y(g) + ddy_ddd[dir];
+				x = GRID_X(g) + ddx_ddd[dir];
+
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+
+				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
+   
+				/* Apply the blow */
+				project(0, 0, y, x, dam, f_ptr->blow.effect, flg);
+			}
+
+			if (rand_int(10) < 8)
+			{
+				y = GRID_Y(g);
+				x = GRID_X(g);
+
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+
+				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
+   
+				/* Apply the blow */
+				project(0, 0, y, x, dam, f_ptr->blow.effect, flg);
+			}
+
+		}
+
+		/* Erupt */
+		if (f_ptr->flags3 & (FF3_ERUPT))
+		{
+			if (!(rand_int(20)))
+			{
+				y = GRID_Y(g);
+				x = GRID_X(g);
+
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+
+				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice) * 2;
+   
+				/* Apply the blow */
+				project(0, 2, y, x, dam, f_ptr->blow.effect, flg);
+			}
+		}
+
+		/* Strike */
+		if (f_ptr->flags3 & (FF3_STRIKE))
+		{
+			if (!(rand_int(20)))
+			{
+				y = GRID_Y(g);
+				x = GRID_X(g);
+
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+
+				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice) * 10;
+   
+				/* Apply the blow */
+				project(0, 0, y, x, dam, f_ptr->blow.effect, flg);
+			}
+		}
+	}
+
+	/* Free up copied memory */
+	FREE(fast_dyna_g);
+
+}
+
+
 
 /*
  * Every so often, the character makes enough noise that nearby 
@@ -4040,6 +4243,9 @@ static void cave_set_feat_aux(int y, int x, int feat)
 	/* Get feature */
 	feature_type *f_ptr = &f_info[feat];
 
+	/* Set if dynamic */
+	bool dyna = (f_info[cave_feat[y][x]].flags3 & (FF3_DYNAMIC | FF3_STRIKE | FF3_ERUPT)) != 0;
+
 	bool hide_item = (f_info[cave_feat[y][x]].flags2 & (FF2_HIDE_ITEM)) != 0;
 
 	s16b this_o_idx, next_o_idx = 0;
@@ -4065,6 +4271,43 @@ static void cave_set_feat_aux(int y, int x, int feat)
 	/* Check for change to out of sight grid */
 	else if (!(player_can_see_bold(y,x))) cave_info[y][x] &= ~(CAVE_MARK);
 
+	/* Check if adding to dynamic list */
+	if (!dyna && (f_ptr->flags3 & (FF3_DYNAMIC | FF3_STRIKE | FF3_ERUPT)))
+	{
+		if (dyna_full)
+		{
+                        if (distance(y,x,p_ptr->py,p_ptr->px) < MAX_SIGHT)
+			{
+				dyna_g[dyna_n++] = GRID(y,x);
+			}
+		}
+		else if (dyna_n == (DYNA_MAX -1))
+		{
+			dyna_full = TRUE;
+
+			/* Hack to force rebuild */
+			dyna_cent_y = 255;
+			dyna_cent_x = 255;
+		}
+		else
+		{
+			dyna_g[dyna_n++] = GRID(y,x);			
+		}
+	}
+	/* Check if removing from dynamic list */
+	else if (dyna && !(f_ptr->flags3 & (FF3_DYNAMIC | FF3_STRIKE | FF3_ERUPT)))
+	{
+		int i, new_i = 0;
+
+		for (i = 0; i < dyna_n; i++)
+		{
+			if (dyna_g[i] == GRID(y,x)) continue;
+
+			dyna_g[new_i++] = dyna_g[i];
+		}
+
+		dyna_n = new_i;
+	}
 
 	/* Check to see if monster exposed by change */
 	if (cave_m_idx[y][x] > 0)
@@ -4126,7 +4369,6 @@ static void cave_set_feat_aux(int y, int x, int feat)
 			o_ptr->marked = FALSE;
 		}
 	}
-
 
 	/* Check if los has changed */
 	if ((los) && (player_has_los_bold(y,x)) && !(cave_floor_bold(y,x)))
@@ -5137,8 +5379,3 @@ bool is_quest(int level)
 	/* Nope */
 	return (FALSE);
 }
-
-
-
-
-

@@ -5139,6 +5139,9 @@ void generate_cave(void)
 	/* The dungeon is not ready */
 	character_dungeon = FALSE;
 
+        /* There is no dynamic terrain */
+        dyna_full = FALSE;
+
 	/* Generate */
 	for (num = 0; TRUE; num++)
 	{

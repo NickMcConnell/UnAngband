@@ -70,7 +70,11 @@ smoother transition from end of Moria/Isengard/Caradhras.
 - Removed escorts from Tom Bombadil, and summon kin, as
 it felt a little 'wrong' (Not as bad as killing him of
 course ;)
-
+- Made dynamic terrain allowing forests to burn down,
+seas to have waves and various other effects, poison gas
+and smoke to spread and disappate.
+- Added waves and rough water to allow sea water to have
+waves in it. (Should probably do for all water).
 
 Andrew Sidwell has volunteered to help out while I'm
 on holiday, as a 'caretaker' rather than fully fledged
