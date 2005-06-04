@@ -459,7 +459,6 @@ static void player_wipe(void)
 		object_wipe(&inventory[i]);
 	}
 
-
 	/* Start with no artifacts made yet */
 	for (i = 0; i < z_info->a_max; i++)
 	{
@@ -552,7 +551,6 @@ static void player_outfit(void)
 	object_aware(i_ptr);
 	object_known(i_ptr);
 	(void)inven_carry(i_ptr);
-
 
 	/* Get local object */
 	i_ptr = &object_type_body;

@@ -538,6 +538,13 @@ object_type *inventory;
 
 
 /*
+ * Array[INVEN_TOTAL] of items listed at the bottom of the screen
+ * This is used to track player items in a pointer-based user interface
+ */
+int itemlist[INVEN_TOTAL+1];
+
+
+/*
  * The size of "alloc_kind_table" (at most z_info->k_max * 4)
  */
 s16b alloc_kind_size;

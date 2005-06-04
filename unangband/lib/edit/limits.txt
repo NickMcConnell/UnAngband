@@ -20,7 +20,7 @@ M:F:607
 M:D:255
 
 # Maximum number of object kinds
-M:K:745
+M:K:749
 
 # Maximum number of artifacts
 M:A:137
@@ -29,7 +29,7 @@ M:A:137
 M:E:128
 
 # Maximum number of flavors
-M:X:450
+M:X:460
 
 # Maximum number of monster races
 M:R:1111
@@ -56,7 +56,7 @@ M:C:10
 M:W:127
 
 # Maximum number of spells
-M:S:415
+M:S:416
 
 # Maximum number of runes
 M:Y:30

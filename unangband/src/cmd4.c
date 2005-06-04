@@ -4072,6 +4072,15 @@ static bool visual_mode_command(char ch, bool *visual_list_ptr,
 
 			return TRUE;
 		}
+		else
+		{
+			/* Cancel change */
+			*cur_attr_ptr = attr_old;
+			*cur_char_ptr = char_old;
+			*visual_list_ptr = FALSE;
+
+			return TRUE;
+		}
 		break;
 
 	case 'C':
@@ -4482,10 +4491,10 @@ static void desc_ego_fake(int e_idx)
 	Term_gotoxy(0, 1);
 
 	/* List can flags */
-	list_object_flags(n_ptr->can_flags1,n_ptr->can_flags2,n_ptr->can_flags3,1);
+	list_object_flags(n_ptr->can_flags1,n_ptr->can_flags2,n_ptr->can_flags3,n_ptr->may_flags4,1);
 
 	/* List may flags */
-	list_object_flags(n_ptr->may_flags1,n_ptr->may_flags2,n_ptr->may_flags3,2);
+	list_object_flags(n_ptr->may_flags1,n_ptr->may_flags2,n_ptr->may_flags3,n_ptr->may_flags4,2);
 
 	/* Clear the top line */
 	Term_erase(0, 0, 255);

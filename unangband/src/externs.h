@@ -68,9 +68,9 @@ extern const cptr option_desc[OPT_MAX];
 extern const bool option_norm[OPT_MAX];
 extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 extern const cptr inscrip_text[MAX_INSCRIP];
-extern const u32b object_xtra_base[MAX_HIDDEN];
-extern const int object_xtra_what[MAX_HIDDEN];
-extern const int object_xtra_size[MAX_HIDDEN];
+extern const u32b object_xtra_base[OBJECT_XTRA_MAX_HIDDEN];
+extern const int object_xtra_what[OBJECT_XTRA_MAX_HIDDEN];
+extern const int object_xtra_size[OBJECT_XTRA_MAX_HIDDEN];
 extern const cptr object_group_text[];
 extern const byte object_group_tval[];
 
@@ -308,6 +308,7 @@ extern void print_rel(char c, byte a, int y, int x);
 extern void note_spot(int y, int x);
 extern void lite_spot(int y, int x);
 extern void prt_map(void);
+extern void prt_item_list(void);
 extern void display_map(int *cy, int *cx);
 extern void do_cmd_view_map(void);
 extern errr vinfo_init(void);
@@ -432,6 +433,7 @@ extern void do_cmd_apply_rune(void);
 /* dungeon.c */
 extern bool dun_level_mon(int r_idx);
 extern void play_game(bool new_game);
+extern int value_check_aux1(object_type *o_ptr);
 
 /* files.c */
 extern void safe_setuid_drop(void);
@@ -444,7 +446,7 @@ extern errr check_time(void);
 extern errr check_time_init(void);
 extern errr check_load(void);
 extern errr check_load_init(void);
-extern void player_flags(u32b *f1, u32b *f2, u32b *f3);
+extern void player_flags(u32b *f1, u32b *f2, u32b *f3, u32b *f4);
 extern void display_player(int mode);
 extern errr file_character(cptr name, bool full);
 extern bool show_file(cptr name, cptr what, int line, int mode);
@@ -472,23 +474,23 @@ extern void generate_cave(void);
 /* info.c */
 extern bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detail, int target);
 extern void spell_info(char *p, int spell, bool use_level);
-extern bool list_object_flags(u32b f1, u32b f2, u32b f3, int mode);
+extern bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode);
 extern void list_object(const object_type *o_ptr, int mode);
 extern void screen_object(object_type *o_ptr);
 extern void print_powers(const s16b *book, int num, int y, int x);
 extern void print_spells(const s16b *book, int num, int y, int x);
 extern bool make_fake_artifact(object_type *o_ptr, byte name1);
 extern void display_koff(const object_type *o_ptr);
-extern void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3);
-extern void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3);
-extern void object_may_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3);
+extern void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4);
+extern void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4);
+extern void object_may_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4);
 extern void drop_may_flags(object_type *o_ptr);
 extern void drop_all_flags(object_type *o_ptr);
 extern void object_usage(int slot);
 extern void object_guess_name(object_type *o_ptr);
-extern void update_slot_flags(int slot, u32b f1, u32b f2, u32b f3);
-extern void equip_can_flags(u32b f1,u32b f2,u32b f3);
-extern void equip_not_flags(u32b f1,u32b f2,u32b f3);
+extern void update_slot_flags(int slot, u32b f1, u32b f2, u32b f3, u32b f4);
+extern void equip_can_flags(u32b f1,u32b f2,u32b f3, u32b f4);
+extern void equip_not_flags(u32b f1,u32b f2,u32b f3, u32b f4);
 extern void inven_drop_flags(object_type *o_ptr);
 
 /* init2.c */
@@ -550,9 +552,9 @@ extern void update_smart_learn(int m_idx, int what);
 /* object1.c */
 extern void flavor_init(void);
 extern void reset_visuals(bool unused);
-extern void object_flags(const object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3);
+extern void object_flags(const object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3, u32b *f4);
 extern void object_obvious_flags(object_type *o_ptr);
-extern void object_flags_known(object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3);
+extern void object_flags_known(object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3, u32b *f4);
 extern void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int mode);
 extern void object_desc_spoil(char *buf, size_t max, const object_type *o_ptr, int pref, int mode);
 extern void identify_random_gen(const object_type *o_ptr);

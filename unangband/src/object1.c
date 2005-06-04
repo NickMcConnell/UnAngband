@@ -566,7 +566,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 	char tmp_buf[128];
 
-	u32b f1, f2, f3;
+	u32b f1, f2, f3, f4;
 
 	object_kind *k_ptr = &k_info[o_ptr->k_idx];
 
@@ -575,7 +575,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	(void)max;
 
 	/* Extract some flags */
-	object_flags(o_ptr, &f1, &f2, &f3);
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 
 	/* See if the object is "aware" */

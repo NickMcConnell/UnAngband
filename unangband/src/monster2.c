@@ -1070,7 +1070,7 @@ void update_mon(int m_idx, bool full)
 	if (d <= MAX_SIGHT)
 	{
 		/* Basic telepathy */
-		if (p_ptr->telepathy)
+		if (p_ptr->cur_flags3 & (TR3_TELEPATHY))
 		{
 			/* Empty mind, no telepathy */
 			if (r_ptr->flags2 & (RF2_EMPTY_MIND))
@@ -1113,84 +1113,84 @@ void update_mon(int m_idx, bool full)
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			if (flag) equip_can_flags(0x0L,0x0L,TR3_TELEPATHY);
+			if (flag) equip_can_flags(0x0L,0x0L,TR3_TELEPATHY,0x0L);
 #endif
 		}
 
 		/* Magical sensing */
-		if ((p_ptr->esp_orc) && (r_ptr->flags3 & (RF3_ORC)))
+		if ((p_ptr->cur_flags3 & (TR3_ESP_ORC)) && (r_ptr->flags3 & (RF3_ORC)))
 		{
 			flag = TRUE;
 			l_ptr->flags3 |= (RF3_ORC);
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			equip_can_flags(0x0L,0x0L,TR3_ESP_ORC);
+			equip_can_flags(0x0L,0x0L,TR3_ESP_ORC,0x0L);
 #endif
 		}
 
 		/* Magical sensing */
-		if ((p_ptr->esp_giant) && (r_ptr->flags3 & (RF3_GIANT)))
+		if ((p_ptr->cur_flags3 & (TR3_ESP_GIANT)) && (r_ptr->flags3 & (RF3_GIANT)))
 		{
 			flag = TRUE;
 			l_ptr->flags3 |= (RF3_GIANT);
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			equip_can_flags(0x0L,0x0L,TR3_ESP_GIANT);
+			equip_can_flags(0x0L,0x0L,TR3_ESP_GIANT,0x0L);
 #endif
 		}
 
 		/* Magical sensing */
-		if ((p_ptr->esp_troll) && (r_ptr->flags3 & (RF3_TROLL)))
+		if ((p_ptr->cur_flags3 & (TR3_ESP_TROLL)) && (r_ptr->flags3 & (RF3_TROLL)))
 		{
 			flag = TRUE;
 			l_ptr->flags3 |= (RF3_TROLL);
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			equip_can_flags(0x0L,0x0L,TR3_ESP_TROLL);
+			equip_can_flags(0x0L,0x0L,TR3_ESP_TROLL,0x0L);
 #endif
 		}
 
 		/* Magical sensing */
-		if ((p_ptr->esp_dragon) && (r_ptr->flags3 & (RF3_DRAGON)))
+		if ((p_ptr->cur_flags3 & (TR3_ESP_DRAGON)) && (r_ptr->flags3 & (RF3_DRAGON)))
 		{
 			flag = TRUE;
 			l_ptr->flags3 |= (RF3_DRAGON);
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			equip_can_flags(0x0L,0x0L,TR3_ESP_DRAGON);
+			equip_can_flags(0x0L,0x0L,TR3_ESP_DRAGON,0x0L);
 #endif
 		}
 
 		/* Magical sensing */
-		if ((p_ptr->esp_demon) && (r_ptr->flags3 & (RF3_DEMON)))
+		if ((p_ptr->cur_flags3 & (TR3_ESP_DRAGON)) && (r_ptr->flags3 & (RF3_DEMON)))
 		{
 			flag = TRUE;
 			l_ptr->flags3 |= (RF3_DEMON);
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			equip_can_flags(0x0L,0x0L,TR3_ESP_DEMON);
+			equip_can_flags(0x0L,0x0L,TR3_ESP_DEMON,0x0L);
 #endif
 		}
 
 		/* Magical sensing */
-		if ((p_ptr->esp_undead) && (r_ptr->flags3 & (RF3_UNDEAD)))
+		if ((p_ptr->cur_flags3 & (TR3_ESP_UNDEAD)) && (r_ptr->flags3 & (RF3_UNDEAD)))
 		{
 			flag = TRUE;
 			l_ptr->flags3 |= (RF3_UNDEAD);
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			equip_can_flags(0x0L,0x0L,TR3_ESP_UNDEAD);
+			equip_can_flags(0x0L,0x0L,TR3_ESP_UNDEAD,0x0L);
 #endif
 		}
 
 		/* Magical sensing */
-		if ((p_ptr->esp_nature) && (r_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT)))
+		if ((p_ptr->cur_flags3 & (TR3_ESP_NATURE)) && (r_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT)))
 		{
 			flag = TRUE;
 			if (r_ptr->flags3 & (RF3_ANIMAL)) l_ptr->flags3 |= (RF3_ANIMAL);
@@ -1199,7 +1199,7 @@ void update_mon(int m_idx, bool full)
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			equip_can_flags(0x0L,0x0L,TR3_ESP_NATURE);
+			equip_can_flags(0x0L,0x0L,TR3_ESP_NATURE,0x0L);
 #endif
 		}
 
@@ -1310,14 +1310,14 @@ void update_mon(int m_idx, bool full)
 #endif
 
 #ifdef ALLOW_OBJECT_INFO_MORE
-					if (!flag && !(r_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND))) equip_not_flags(0x0L,0x0L,TR3_TELEPATHY);
-					if (!flag && (l_ptr->flags3 & (RF3_ORC))) equip_not_flags(0x0L,0x0L,TR3_ESP_ORC);
-					if (!flag && (l_ptr->flags3 & (RF3_TROLL))) equip_not_flags(0x0L,0x0L,TR3_ESP_TROLL);
-					if (!flag && (l_ptr->flags3 & (RF3_GIANT))) equip_not_flags(0x0L,0x0L,TR3_ESP_GIANT);
-					if (!flag && (l_ptr->flags3 & (RF3_DRAGON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DRAGON);
-					if (!flag && (l_ptr->flags3 & (RF3_DEMON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DEMON);
-					if (!flag && (l_ptr->flags3 & (RF3_UNDEAD))) equip_not_flags(0x0L,0x0L,TR3_ESP_UNDEAD);
-					if (!flag && (l_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT))) equip_not_flags(0x0L,0x0L,TR3_ESP_NATURE);
+					if (!flag && !(r_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND))) equip_not_flags(0x0L,0x0L,TR3_TELEPATHY,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_ORC))) equip_not_flags(0x0L,0x0L,TR3_ESP_ORC,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_TROLL))) equip_not_flags(0x0L,0x0L,TR3_ESP_TROLL,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_GIANT))) equip_not_flags(0x0L,0x0L,TR3_ESP_GIANT,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_DRAGON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DRAGON,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_DEMON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DEMON,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_UNDEAD))) equip_not_flags(0x0L,0x0L,TR3_ESP_UNDEAD,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT))) equip_not_flags(0x0L,0x0L,TR3_ESP_NATURE,0x0L);
 #endif
 					/* Easy to see */
 					easy = flag = TRUE;
@@ -1339,20 +1339,20 @@ void update_mon(int m_idx, bool full)
 					do_invisible = TRUE;
 
 					/* See invisible */
-					if (p_ptr->see_inv)
+					if (p_ptr->cur_flags3 & (TR3_SEE_INVIS))
 					{
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 						if (!flag && !(r_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND)) &&
-							!(l_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND))) equip_not_flags(0x0L,0x0L,TR3_TELEPATHY);
+							!(l_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND))) equip_not_flags(0x0L,0x0L,TR3_TELEPATHY,0x0L);
 
-						if (!flag && (l_ptr->flags3 & (RF3_ORC))) equip_not_flags(0x0L,0x0L,TR3_ESP_ORC);
-						if (!flag && (l_ptr->flags3 & (RF3_TROLL))) equip_not_flags(0x0L,0x0L,TR3_ESP_TROLL);
-						if (!flag && (l_ptr->flags3 & (RF3_GIANT))) equip_not_flags(0x0L,0x0L,TR3_ESP_GIANT);
-						if (!flag && (l_ptr->flags3 & (RF3_DRAGON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DRAGON);
-						if (!flag && (l_ptr->flags3 & (RF3_DEMON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DEMON);
-						if (!flag && (l_ptr->flags3 & (RF3_UNDEAD))) equip_not_flags(0x0L,0x0L,TR3_ESP_UNDEAD);
-						if (!flag && (l_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT))) equip_not_flags(0x0L,0x0L,TR3_ESP_NATURE);
+						if (!flag && (l_ptr->flags3 & (RF3_ORC))) equip_not_flags(0x0L,0x0L,TR3_ESP_ORC,0x0L);
+						if (!flag && (l_ptr->flags3 & (RF3_TROLL))) equip_not_flags(0x0L,0x0L,TR3_ESP_TROLL,0x0L);
+						if (!flag && (l_ptr->flags3 & (RF3_GIANT))) equip_not_flags(0x0L,0x0L,TR3_ESP_GIANT,0x0L);
+						if (!flag && (l_ptr->flags3 & (RF3_DRAGON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DRAGON,0x0L);
+						if (!flag && (l_ptr->flags3 & (RF3_DEMON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DEMON,0x0L);
+						if (!flag && (l_ptr->flags3 & (RF3_UNDEAD))) equip_not_flags(0x0L,0x0L,TR3_ESP_UNDEAD,0x0L);
+						if (!flag && (l_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT))) equip_not_flags(0x0L,0x0L,TR3_ESP_NATURE,0x0L);
 #endif
 						/* Easy to see */
 						easy = flag = TRUE;
@@ -1364,15 +1364,15 @@ void update_mon(int m_idx, bool full)
 				{
 #ifdef ALLOW_OBJECT_INFO_MORE
 					if (!flag && !(r_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND)) &&
-						!(l_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND))) equip_not_flags(0x0L,0x0L,TR3_TELEPATHY);
+						!(l_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND))) equip_not_flags(0x0L,0x0L,TR3_TELEPATHY,0x0L);
 
-					if (!flag && (l_ptr->flags3 & (RF3_ORC))) equip_not_flags(0x0L,0x0L,TR3_ESP_ORC);
-					if (!flag && (l_ptr->flags3 & (RF3_TROLL))) equip_not_flags(0x0L,0x0L,TR3_ESP_TROLL);
-					if (!flag && (l_ptr->flags3 & (RF3_GIANT))) equip_not_flags(0x0L,0x0L,TR3_ESP_GIANT);
-					if (!flag && (l_ptr->flags3 & (RF3_DRAGON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DRAGON);
-					if (!flag && (l_ptr->flags3 & (RF3_DEMON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DEMON);
-					if (!flag && (l_ptr->flags3 & (RF3_UNDEAD))) equip_not_flags(0x0L,0x0L,TR3_ESP_UNDEAD);
-					if (!flag && (l_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT))) equip_not_flags(0x0L,0x0L,TR3_ESP_NATURE);
+					if (!flag && (l_ptr->flags3 & (RF3_ORC))) equip_not_flags(0x0L,0x0L,TR3_ESP_ORC,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_TROLL))) equip_not_flags(0x0L,0x0L,TR3_ESP_TROLL,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_GIANT))) equip_not_flags(0x0L,0x0L,TR3_ESP_GIANT,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_DRAGON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DRAGON,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_DEMON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DEMON,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_UNDEAD))) equip_not_flags(0x0L,0x0L,TR3_ESP_UNDEAD,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT))) equip_not_flags(0x0L,0x0L,TR3_ESP_NATURE,0x0L);
 #endif
 
 					/* Easy to see */
@@ -1388,14 +1388,14 @@ void update_mon(int m_idx, bool full)
 				{
 					l_ptr->flags2 |= (RF2_INVISIBLE);
 #ifdef ALLOW_OBJECT_INFO_MORE
-					if (p_ptr->see_inv) equip_can_flags(0x0L,0x0L,TR3_SEE_INVIS);
+					if (p_ptr->cur_flags3 & (TR3_SEE_INVIS)) equip_can_flags(0x0L,0x0L,TR3_SEE_INVIS,0x0L);
 #endif
 				}
 				if (do_cold_blood) l_ptr->flags2 |= (RF2_COLD_BLOOD);
 #ifdef ALLOW_OBJECT_INFO_MORE
 				if (do_warm_blood)
 				{
-					if (rp_ptr->infra < d) equip_can_flags(TR1_INFRA,0x0L,0x0L);
+					if (rp_ptr->infra < d) equip_can_flags(TR1_INFRA,0x0L,0x0L,0x0L);
 				}
 #endif
 				if (r_ptr->flags2 & (RF2_HAS_LITE)) l_ptr->flags2 |= (RF2_HAS_LITE);
@@ -3501,7 +3501,7 @@ void update_smart_learn(int m_idx, int what)
 	{
 		case DRS_FREE:
 		{
-			if (p_ptr->free_act) m_ptr->smart |= (SM_IMM_FREE);
+			if (p_ptr->cur_flags3 & (TR3_FREE_ACT)) m_ptr->smart |= (SM_IMM_FREE);
 			break;
 		}
 
@@ -3513,108 +3513,108 @@ void update_smart_learn(int m_idx, int what)
 
 		case DRS_RES_ACID:
 		{
-			if (p_ptr->resist_acid) m_ptr->smart |= (SM_RES_ACID);
 			if (p_ptr->oppose_acid) m_ptr->smart |= (SM_OPP_ACID);
-			if (p_ptr->immune_acid) m_ptr->smart |= (SM_IMM_ACID);
+			if (p_ptr->cur_flags2 & (TR2_RES_ACID)) m_ptr->smart |= (SM_RES_ACID);
+			if (p_ptr->cur_flags2 & (TR2_IM_ACID)) m_ptr->smart |= (SM_IMM_ACID);
 			break;
 		}
 
 		case DRS_RES_ELEC:
 		{
-			if (p_ptr->resist_elec) m_ptr->smart |= (SM_RES_ELEC);
 			if (p_ptr->oppose_elec) m_ptr->smart |= (SM_OPP_ELEC);
-			if (p_ptr->immune_elec) m_ptr->smart |= (SM_IMM_ELEC);
+			if (p_ptr->cur_flags2 & (TR2_RES_ELEC)) m_ptr->smart |= (SM_RES_ELEC);
+			if (p_ptr->cur_flags2 & (TR2_IM_ELEC)) m_ptr->smart |= (SM_IMM_ELEC);
 			break;
 		}
 
 		case DRS_RES_FIRE:
 		{
-			if (p_ptr->resist_fire) m_ptr->smart |= (SM_RES_FIRE);
+			if (p_ptr->cur_flags2 & (TR2_RES_FIRE)) m_ptr->smart |= (SM_RES_FIRE);
 			if (p_ptr->oppose_fire) m_ptr->smart |= (SM_OPP_FIRE);
-			if (p_ptr->immune_fire) m_ptr->smart |= (SM_IMM_FIRE);
+			if (p_ptr->cur_flags2 & (TR2_IM_FIRE)) m_ptr->smart |= (SM_IMM_FIRE);
 			break;
 		}
 
 		case DRS_RES_COLD:
 		{
-			if (p_ptr->resist_cold) m_ptr->smart |= (SM_RES_COLD);
+			if (p_ptr->cur_flags2 & (TR2_RES_COLD)) m_ptr->smart |= (SM_RES_COLD);
 			if (p_ptr->oppose_cold) m_ptr->smart |= (SM_OPP_COLD);
-			if (p_ptr->immune_cold) m_ptr->smart |= (SM_IMM_COLD);
+			if (p_ptr->cur_flags2 & (TR2_IM_COLD)) m_ptr->smart |= (SM_IMM_COLD);
 			break;
 		}
 
 		case DRS_RES_POIS:
 		{
-			if (p_ptr->resist_pois) m_ptr->smart |= (SM_RES_POIS);
+			if (p_ptr->cur_flags2 & (TR2_RES_POIS)) m_ptr->smart |= (SM_RES_POIS);
 			if (p_ptr->oppose_pois) m_ptr->smart |= (SM_OPP_POIS);
 			break;
 		}
 
 		case DRS_RES_FEAR:
 		{
-			if (p_ptr->resist_fear) m_ptr->smart |= (SM_RES_FEAR);
-			if (p_ptr->hero) m_ptr->smart |= (SM_RES_FEAR);
-			if (p_ptr->shero) m_ptr->smart |= (SM_RES_FEAR);
+			if (p_ptr->cur_flags2 & (TR2_RES_FEAR)) m_ptr->smart |= (SM_RES_FEAR);
+			if (p_ptr->hero) m_ptr->smart |= (SM_OPP_FEAR);
+			if (p_ptr->shero) m_ptr->smart |= (SM_OPP_FEAR);
 			break;
 		}
 
 		case DRS_RES_LITE:
 		{
-			if (p_ptr->resist_lite) m_ptr->smart |= (SM_RES_LITE);
+			if (p_ptr->cur_flags2 & (TR2_RES_LITE)) m_ptr->smart |= (SM_RES_LITE);
 			break;
 		}
 
 		case DRS_RES_DARK:
 		{
-			if (p_ptr->resist_dark) m_ptr->smart |= (SM_RES_DARK);
+			if (p_ptr->cur_flags2 & (TR2_RES_FIRE)) m_ptr->smart |= (SM_RES_DARK);
 			break;
 		}
 
 		case DRS_RES_BLIND:
 		{
-			if (p_ptr->resist_blind) m_ptr->smart |= (SM_RES_BLIND);
+			if (p_ptr->cur_flags2 & (TR2_RES_BLIND)) m_ptr->smart |= (SM_RES_BLIND);
 			break;
 		}
 
 		case DRS_RES_CONFU:
 		{
-			if (p_ptr->resist_confu) m_ptr->smart |= (SM_RES_CONFU);
+			if (p_ptr->cur_flags2 & (TR2_RES_CONFU)) m_ptr->smart |= (SM_RES_CONFU);
 			break;
 		}
 
 		case DRS_RES_SOUND:
 		{
-			if (p_ptr->resist_sound) m_ptr->smart |= (SM_RES_SOUND);
+			if (p_ptr->cur_flags2 & (TR2_RES_SOUND)) m_ptr->smart |= (SM_RES_SOUND);
 			break;
 		}
 
 		case DRS_RES_SHARD:
 		{
-			if (p_ptr->resist_shard) m_ptr->smart |= (SM_RES_SHARD);
+			if (p_ptr->cur_flags2 & (TR2_RES_SHARD)) m_ptr->smart |= (SM_RES_SHARD);
 			break;
 		}
 
 		case DRS_RES_NEXUS:
 		{
-			if (p_ptr->resist_nexus) m_ptr->smart |= (SM_RES_NEXUS);
+			if (p_ptr->cur_flags2 & (TR2_RES_NEXUS)) m_ptr->smart |= (SM_RES_NEXUS);
 			break;
 		}
 
 		case DRS_RES_NETHR:
 		{
-			if (p_ptr->resist_nethr) m_ptr->smart |= (SM_RES_NETHR);
+			if (p_ptr->cur_flags2 & (TR2_RES_NETHR)) m_ptr->smart |= (SM_RES_NETHR);
 			break;
 		}
 
 		case DRS_RES_CHAOS:
 		{
-			if (p_ptr->resist_chaos) m_ptr->smart |= (SM_RES_CHAOS);
+			if (p_ptr->cur_flags2 & (TR2_RES_CHAOS)) m_ptr->smart |= (SM_RES_CHAOS);
 			break;
 		}
 
 		case DRS_RES_DISEN:
 		{
-			if (p_ptr->resist_disen) m_ptr->smart |= (SM_RES_DISEN);
+			if (p_ptr->cur_flags2 & (TR2_RES_DISEN)) m_ptr->smart |= (SM_RES_DISEN);
 			break;
 		}
 	}

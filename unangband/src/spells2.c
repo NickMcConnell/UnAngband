@@ -148,28 +148,15 @@ static cptr desc_stat_neg[] =
  */
 bool do_dec_stat(int stat)
 {
-	bool sust = FALSE;
-
-	/* Get the "sustain" */
-	switch (stat)
-	{
-		case A_STR: if (p_ptr->sustain_str) sust = TRUE; break;
-		case A_INT: if (p_ptr->sustain_int) sust = TRUE; break;
-		case A_WIS: if (p_ptr->sustain_wis) sust = TRUE; break;
-		case A_DEX: if (p_ptr->sustain_dex) sust = TRUE; break;
-		case A_CON: if (p_ptr->sustain_con) sust = TRUE; break;
-		case A_CHR: if (p_ptr->sustain_chr) sust = TRUE; break;
-	}
-
 	/* Sustain */
-	if (sust)
+	if (p_ptr->cur_flags2 & (TR2_SUST_STR << stat))
 	{
 		/* Message */
 		msg_format("You feel very %s for a moment, but the feeling passes.",
 			   desc_stat_neg[stat]);
 
 		/* Always notice */
-		equip_can_flags(0x0L,(1L<<stat),0x0L);
+		equip_can_flags(0x0L,(TR2_SUST_STR<<stat),0x0L,0x0L);
 
 		/* Notice effect */
 		return (TRUE);
@@ -182,7 +169,7 @@ bool do_dec_stat(int stat)
 		msg_format("You feel very %s.", desc_stat_neg[stat]);
 
 		/* Always notice */
-		equip_not_flags(0x0L,(1L<<stat),0x0L);
+		equip_not_flags(0x0L,(TR2_SUST_STR<<stat),0x0L,0x0L);
 
 		/* Notice effect */
 		return (TRUE);
@@ -330,7 +317,7 @@ static int remove_curse_aux(int all)
 	/* Attempt to uncurse items being worn */
 	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
 	{
-		u32b f1, f2, f3;
+		u32b f1, f2, f3, f4;
 
 		object_type *o_ptr = &inventory[i];
 
@@ -341,13 +328,13 @@ static int remove_curse_aux(int all)
 		if (!cursed_p(o_ptr)) continue;
 
 		/* Extract the flags */
-		object_flags(o_ptr, &f1, &f2, &f3);
+		object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 		/* Heavily Cursed Items need a special spell */
 		if (!all && (f3 & (TR3_HEAVY_CURSE)))
 		{
 			/* Learn about the object */
-			object_can_flags(o_ptr,0x0L,0x0L,TR3_HEAVY_CURSE);
+			object_can_flags(o_ptr,0x0L,0x0L,TR3_HEAVY_CURSE,0x0L);
 
 			continue;
 		}
@@ -356,16 +343,16 @@ static int remove_curse_aux(int all)
 		if (f3 & (TR3_PERMA_CURSE))
 		{
 			/* Learn about the object */
-			if (all) object_can_flags(o_ptr,0x0L,0x0L,TR3_PERMA_CURSE);
+			if (all) object_can_flags(o_ptr,0x0L,0x0L,TR3_PERMA_CURSE,0x0L);
 
 			continue;
 		}
 
 		/* Learn about the object */
-		if (!all) object_not_flags(o_ptr,0x0L,0x0L,TR3_HEAVY_CURSE);
+		if (!all) object_not_flags(o_ptr,0x0L,0x0L,TR3_HEAVY_CURSE,0x0L);
 
 		/* Learn about the object */
-		object_not_flags(o_ptr,0x0L,0x0L,TR3_PERMA_CURSE);
+		object_not_flags(o_ptr,0x0L,0x0L,TR3_PERMA_CURSE,0x0L);
 
 		/* Uncurse the object */
 		uncurse_object(o_ptr);
@@ -439,6 +426,10 @@ bool restore_level(void)
 
 #define TR3_WEAPON_FLAGS (TR3_IMPACT)
 
+#define TR4_WEAPON_FLAGS (TR4_VAMP_HP | TR4_VAMP_EXP | TR4_VAMP_MANA | TR4_VAMP_FOOD |\
+			  TR4_BRAND_LITE | TR4_BRAND_DARK | TR4_SLAY_MAN | TR4_SLAY_ELF |\
+			  TR4_SLAY_DWARF)
+
 /*
  * Hack -- acquire self knowledge
  *
@@ -448,9 +439,9 @@ void self_knowledge(void)
 {
 	int i;
 
-	u32b f1 = 0L, f2 = 0L, f3 = 0L;
+	u32b f1 = 0L, f2 = 0L, f3 = 0L, f4 = 0L;
 
-	u32b t1, t2, t3;
+	u32b t1, t2, t3, t4;
 
 	object_type *o_ptr;
 
@@ -569,28 +560,28 @@ void self_knowledge(void)
 	}
 
 	/* Hack -- racial effects */
-	if (rp_ptr->flags1 || rp_ptr->flags2 || rp_ptr->flags3)
+	if (rp_ptr->flags1 || rp_ptr->flags2 || rp_ptr->flags3 || rp_ptr->flags4)
 	{
 		text_out("Your race affects you.  ");
 
-		list_object_flags(rp_ptr->flags1,rp_ptr->flags1,rp_ptr->flags1,1);
+		list_object_flags(rp_ptr->flags1,rp_ptr->flags1,rp_ptr->flags1,rp_ptr->flags4,1);
 	}
 
 	/* Get player flags */
-	player_flags(&t1,&t2,&t3);
+	player_flags(&t1,&t2,&t3,&t4);
 
 	/* Eliminate race flags */
 	t1 &= ~(rp_ptr->flags1);
 	t2 &= ~(rp_ptr->flags2);
 	t3 &= ~(rp_ptr->flags3);
+	t4 &= ~(rp_ptr->flags4);
 
 	/* Hack -- class effects */
-	if (f1 || f2 || f3)
+	if (t1 || t2 || t3 || t4)
 	{
 		text_out("Your training affects you.  ");
 
-		list_object_flags(f1,f2,f3,1);
-
+		list_object_flags(t1,t2,t3,t4,1);
 	}
 
 	/* Get item flags from equipment */
@@ -602,47 +593,49 @@ void self_knowledge(void)
 		if (!o_ptr->k_idx) continue;
 
 		/* Extract the flags */
-		object_flags(o_ptr, &t1, &t2, &t3);
+		object_flags(o_ptr, &t1, &t2, &t3, &t4);
 
 		/* Extract flags */
 		f1 |= t1 & ~(TR1_WEAPON_FLAGS);
 		f2 |= t2 & ~(TR2_WEAPON_FLAGS);
 		f3 |= t3 & ~(TR3_WEAPON_FLAGS);
+		f4 |= t4 & ~(TR4_WEAPON_FLAGS);
 	}
 
 	/* Hack -- other equipment effects */
-	if (f1 || f2 || f3)
+	if (f1 || f2 || f3 || f4)
 	{
 		text_out("Your equipment affects you.  ");
 
-		list_object_flags(f1,f2,f3,1);
+		list_object_flags(f1,f2,f3,f4,1);
 
-		equip_can_flags(f1,f2,f3);
+		equip_can_flags(f1,f2,f3,f4);
 
-		equip_not_flags(~(f1 | TR1_WEAPON_FLAGS),~(f2 | TR2_WEAPON_FLAGS),~(f3 | TR3_WEAPON_FLAGS));
+		equip_not_flags(~(f1 | TR1_WEAPON_FLAGS),~(f2 | TR2_WEAPON_FLAGS),~(f3 | TR3_WEAPON_FLAGS), ~(f4 | TR4_WEAPON_FLAGS));
 	}
 
 	o_ptr = &inventory[INVEN_WIELD];
 
 	if (o_ptr->k_idx)
 	{
-		object_flags(o_ptr,&f1,&f2,&f3);
+		object_flags(o_ptr,&t1,&t2,&t3,&t4);
 
 		/* Extract flags */
-		f1 |= t1 & (TR1_WEAPON_FLAGS);
-		f2 |= t2 & (TR2_WEAPON_FLAGS);
-		f3 |= t3 & (TR3_WEAPON_FLAGS);
+		t1 = t1 & (TR1_WEAPON_FLAGS);
+		t2 = t2 & (TR2_WEAPON_FLAGS);
+		t3 = t3 & (TR3_WEAPON_FLAGS);
+		t4 = t4 & (TR4_WEAPON_FLAGS);
 
 		/* Hack -- other equipment effects */
-		if (f1 || f2 || f3)
+		if (t1 || t2 || t3 || t4)
 		{
 			text_out("Your weapon has special powers.  ");
 	
-			list_object_flags(f1,f2,f3,1);
+			list_object_flags(t1,t2,t3,t4,1);
 	
-			object_can_flags(o_ptr,f1,f2,f3);
+			object_can_flags(o_ptr,t1,t2,t3,t4);
 	
-			object_not_flags(o_ptr,TR1_WEAPON_FLAGS & ~(f1),TR2_WEAPON_FLAGS & ~(f2),TR3_WEAPON_FLAGS & ~(f3));
+			object_not_flags(o_ptr,TR1_WEAPON_FLAGS & ~(t1),TR2_WEAPON_FLAGS & ~(t2),TR3_WEAPON_FLAGS & ~(t3), TR4_WEAPON_FLAGS & ~(t4));
 		}
 
 	}
@@ -2197,11 +2190,10 @@ bool enchant(object_type *o_ptr, int n, int eflag)
 
 	bool a = artifact_p(o_ptr);
 
-	u32b f1, f2, f3;
+	u32b f1, f2, f3, f4;
 
 	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3);
-
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 	/* Large piles resist enchantment */
 	prob = o_ptr->number * 100;
@@ -2507,15 +2499,19 @@ bool brand_item(int brand, cptr act)
 
 		if (object_xtra_what[brand] == 1)
 		{
-    			object_can_flags(o_ptr,object_xtra_base[brand] << o_ptr->xtra2,0x0L,0x0L);
+    			object_can_flags(o_ptr,object_xtra_base[brand] << o_ptr->xtra2,0x0L,0x0L,0x0L);
 		}
 		else if (object_xtra_what[brand] == 2)
 		{
-	    		object_can_flags(o_ptr,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L);
+	    		object_can_flags(o_ptr,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L,0x0L);
 		}
 		else if (object_xtra_what[brand] == 3)
 		{
-    			object_can_flags(o_ptr,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2);
+    			object_can_flags(o_ptr,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L);
+		}
+		else if (object_xtra_what[brand] == 4)
+		{
+    			object_can_flags(o_ptr,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L);
 		}
 
 		/* Remove special inscription, if any */
@@ -2718,7 +2714,7 @@ bool ident_spell_rumor(void)
 
 	bool done;
 
-	u32b f1,f2,f3;
+	u32b f1,f2,f3,f4;
 
 	/* Only un-id'ed items */
 	item_tester_hook = item_tester_known_rumor;
@@ -2770,15 +2766,16 @@ bool ident_spell_rumor(void)
 	}
 
 	/* Examine the item */
-	object_flags(o_ptr, &f1, &f2, &f3);
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 	/* Remove known flags */
 	f1 &= ~(o_ptr->can_flags1);
 	f2 &= ~(o_ptr->can_flags2);
 	f3 &= ~(o_ptr->can_flags3); 
+	f4 &= ~(o_ptr->can_flags4); 
 
 	/* We know everything? */
-	done = ((f1 | f2 | f3) ? FALSE : TRUE);
+	done = ((f1 | f2 | f3 | f4) ? FALSE : TRUE);
 
 	/* Clear some flags1 */
 	if (f1)	for (i = 0;i<32;i++)
@@ -2798,7 +2795,13 @@ bool ident_spell_rumor(void)
 		if ((f3 & (1L<<i)) && (rand_int(100)<25)) f3 &= ~(1L<<i);
 	}
 
-	if (done || (f1 | f2 | f3))
+	/* Clear some flags3 */
+	if (f4)	for (i = 0;i<32;i++)
+	{
+		if ((f4 & (1L<<i)) && (rand_int(100)<25)) f4 &= ~(1L<<i);
+	}
+
+	if (done || (f1 | f2 | f3 | f4))
 	{
 		char o_name[80];
 
@@ -2818,7 +2821,7 @@ bool ident_spell_rumor(void)
 		}
 
 		/* Learn more about the item */
-		object_can_flags(o_ptr,f1,f2,f3);
+		object_can_flags(o_ptr,f1,f2,f3,f4);
 
 		/* Description */
 		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
@@ -2852,7 +2855,7 @@ bool ident_spell_rumor(void)
 		msg_format("You feel you know all %s secrets.",(o_ptr->number>0?"their":"its"));
 
 	}
-	else if (f1 | f2 | f3)
+	else if (f1 | f2 | f3 | f4)
 	{
 		/* Set text_out hook */
 		text_out_hook = text_out_to_screen;
@@ -2864,7 +2867,7 @@ bool ident_spell_rumor(void)
 		Term_gotoxy(0, 1);
 
 		/* Actually display the item */
-		list_object_flags(f1, f2, f3, 1);
+		list_object_flags(f1, f2, f3, f4, 1);
 
 		(void)inkey();
 	
@@ -3554,24 +3557,24 @@ void destroy_area(int y1, int x1, int r, bool full)
 		msg_print("There is a searing blast of light!");
 
 		/* Blind the player */
-		if (!p_ptr->resist_blind && !p_ptr->resist_lite)
+		if (!p_ptr->cur_flags2 & (TR2_RES_BLIND | TR2_RES_LITE))
 		{
 			/* Become blind */
 			(void)set_blind(p_ptr->blind + 10 + randint(10));
 
 			/* Always notice */
-			equip_not_flags(0x0L,TR2_RES_BLIND,0x0L);
+			equip_not_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
 
 			/* Always notice */
-			equip_not_flags(0x0L,TR2_RES_LITE,0x0L);
+			equip_not_flags(0x0L,TR2_RES_LITE,0x0L,0x0L);
 		}
 		else
 		{
 			/* Sometimes notice */
-			if ((p_ptr->resist_blind) && (rand_int(100)<30)) equip_can_flags(0x0L,TR2_RES_BLIND,0x0L);
+			if ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) && (rand_int(100)<30)) equip_can_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
 
 			/* Sometimes notice */
-			if ((p_ptr->resist_lite) && (rand_int(100)<30)) equip_can_flags(0x0L,TR2_RES_LITE,0x0L);
+			if ((p_ptr->cur_flags2 & (TR2_RES_LITE)) && (rand_int(100)<30)) equip_can_flags(0x0L,TR2_RES_LITE,0x0L,0x0L);
 		}
 	}
 
@@ -5087,171 +5090,173 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 
 	if (s_ptr->flags2 & (SF2_CUT))
 	{
-		if (!p_ptr->resist_shard)
+		if (!p_ptr->cur_flags2 & (TR2_RES_SHARD))
 		{
 			if (set_cut(p_ptr->cut + lasts))
 			{
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_SHARD,0x0L);
+				equip_not_flags(0x0L,TR2_RES_SHARD,0x0L,0x0L);
 			}
 		}
-		else
+		else /* if (obvious) */
 		{
 			/* Always notice */
-			equip_can_flags(0x0L,TR2_RES_SHARD,0x0L);
+			equip_can_flags(0x0L,TR2_RES_SHARD,0x0L,0x0L);
 		}
 	}
 
 	if (s_ptr->flags2 & (SF2_STUN))
 	{
-		if (!p_ptr->resist_sound)
+		if (!p_ptr->cur_flags2 & (TR2_RES_SOUND))
 		{
 			if (set_stun(p_ptr->stun + lasts))
 			{
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_SOUND,0x0L);
+				equip_not_flags(0x0L,TR2_RES_SOUND,0x0L,0x0L);
 			}
 		}
-		else
+		else /* if (obvious)*/
 		{
 			/* Always notice */
-			equip_can_flags(0x0L,TR2_RES_SHARD,0x0L);
+			equip_can_flags(0x0L,TR2_RES_SHARD,0x0L,0x0L);
 		}
 	}
 
 	if (s_ptr->flags2 & (SF2_POISON))
 	{
-		if (!(p_ptr->resist_pois || p_ptr->oppose_pois))
+		if (!(p_ptr->cur_flags2 & (TR2_RES_POIS)) || p_ptr->oppose_pois)
 		{
 			if (set_poisoned(p_ptr->poisoned + lasts))
 			{
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_POIS,0x0L);
+				equip_not_flags(0x0L,TR2_RES_POIS,0x0L,0x0L);
 			}
 		}
-		else
+		else if (!p_ptr->oppose_pois) /* && (obvious) */
 		{
 			/* Always notice */
-			equip_can_flags(0x0L,TR2_RES_POIS,0x0L);
+			equip_can_flags(0x0L,TR2_RES_POIS,0x0L,0x0L);
 		}
 	}
 
 	if (s_ptr->flags2 & (SF2_BLIND))
 	{
-		if (!p_ptr->resist_blind)
+		if (!p_ptr->cur_flags2 & (TR2_RES_BLIND))
 		{
 			if (set_blind(p_ptr->blind + lasts))
 			{
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_BLIND,0x0L);
+				equip_not_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
 			}
 		}
-		else
+		else /* if (obvious)*/
 		{
 			/* Always notice */
-			equip_can_flags(0x0L,TR2_RES_BLIND,0x0L);
+			equip_can_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
 		}
 	}
 
 	if (s_ptr->flags2 & (SF2_FEAR))
 	{
-		if ((!p_ptr->resist_fear)&&(!p_ptr->hero)&&(!p_ptr->shero))
+		if ((!p_ptr->cur_flags2 & (TR2_RES_FEAR)) && (!p_ptr->hero) && (!p_ptr->shero))
 		{
 			if (set_afraid(p_ptr->afraid + lasts))
 			{
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_FEAR,0x0L);
+				equip_not_flags(0x0L,TR2_RES_FEAR,0x0L,0x0L);
 			}
 		}
-		else
+		else if ((!p_ptr->hero)&&(!p_ptr->shero)) /* && (obvious) */
 		{
 			/* Always notice */
-			if (p_ptr->resist_fear) equip_can_flags(0x0L,TR2_RES_FEAR,0x0L);
+			equip_can_flags(0x0L,TR2_RES_FEAR,0x0L,0x0L);
 		}
 	}
 
 	if (s_ptr->flags2 & (SF2_CONFUSE))
 	{
-		if (!p_ptr->resist_confu)
+		if (!p_ptr->cur_flags2 & (TR2_RES_CONFU))
 		{
 			if (set_confused(p_ptr->confused + lasts))
 			{
 				obvious = TRUE;
 				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_CONFU,0x0L);
+				equip_not_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 			}
 		}
-		else
+		else /* if (obvious) */
 		{
 				/* Always notice */
-				equip_can_flags(0x0L,TR2_RES_CONFU,0x0L);
+				equip_can_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 		}
 	}
 
 	if (s_ptr->flags2 & (SF2_HALLUC))
 	{
-		if (!p_ptr->resist_chaos)
+		if (!p_ptr->cur_flags2 & (TR2_RES_CHAOS))
 		{
 			if (set_image(p_ptr->image + lasts))
 			{
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_CHAOS,0x0L);
+				equip_not_flags(0x0L,TR2_RES_CHAOS,0x0L,0x0L);
 			}
 		}
-		else
+		else /* if (obvious) */
 		{
-				/* Always notice */
-				equip_can_flags(0x0L,TR2_RES_CHAOS,0x0L);
+			/* Always notice */
+			equip_can_flags(0x0L,TR2_RES_CHAOS,0x0L,0x0L);
 		}
 	}
 
 	if (s_ptr->flags2 & (SF2_PARALYZE))
 	{
 
-		if (!p_ptr->free_act)
+		if (!p_ptr->cur_flags3 & (TR3_FREE_ACT))
 		{
 			if (set_paralyzed(p_ptr->paralyzed + lasts))
 			{
 				obvious = TRUE;
+
 				/* Always notice */
-				equip_not_flags(0x0L,0x0L,TR3_FREE_ACT);
+				equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 			}
 		}
-		else
+		else /* if (obvious) */
 		{
 				/* Always notice */
-				equip_can_flags(0x0L,0x0L,TR3_FREE_ACT);
+				equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 		}
 	}
 
 	if (s_ptr->flags2 & (SF2_SLOW))
 	{
 
-		if (!p_ptr->free_act)
+		if (!p_ptr->cur_flags3 & (TR3_FREE_ACT))
 		{
 			if (set_slow(p_ptr->slow + lasts))
 			{
 				obvious = TRUE;
+
 				/* Always notice */
-				equip_not_flags(0x0L,0x0L,TR3_FREE_ACT);
+				equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 			}
 		}
-		else
+		else /* if (obvious) */
 		{
 				/* Always notice */
-				equip_can_flags(0x0L,0x0L,TR3_FREE_ACT);
+				equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 		}
 	}
 
@@ -5300,15 +5305,18 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 
 	if (s_ptr->flags3 & (SF3_DEC_EXP))
 	{
-		if (!p_ptr->hold_life && !p_ptr->blessed && (p_ptr->exp > 0))
+		if (!p_ptr->cur_flags3 & (TR3_HOLD_LIFE) && !p_ptr->blessed && (p_ptr->exp > 0))
 		{
 			lose_exp(p_ptr->exp / 4);
 			obvious = TRUE;
+
+			/* Always notice */
+			equip_not_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
 		}
-		else
+		else if (p_ptr->cur_flags3 & (TR3_HOLD_LIFE))
 		{
 			/* Always notice */
-			if (p_ptr->hold_life) equip_can_flags(0x0L,0x0L,TR3_HOLD_LIFE);
+			equip_can_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
 		}
 	}
 

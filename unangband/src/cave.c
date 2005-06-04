@@ -1062,7 +1062,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			c = f_ptr->x_char;
 
 			/* Special lighting effects */
-			if ((view_special_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)) && (f_ptr->flags1 & (FF1_REMEMBER)))
+			if ((view_special_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
 			{
 				/* Modify lighting */
 				modify_grid_boring(&a, &c, y, x, cinfo, pinfo);
@@ -1132,7 +1132,6 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 	(*tap) = a;
 	(*tcp) = c;
 
-
 	/* Terrain over terrain */
 	if (under)
 	{
@@ -1149,12 +1148,56 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		c = f_ptr->x_char;
 
 		/* Special lighting effects */
-		if ((view_granite_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
+		if ((view_special_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
+		{
+			/* Modify lighting */
+			modify_grid_boring(&a, &c, y, x, cinfo, pinfo);
+		}
+
+		/* Special lighting effects */
+		else if ((view_granite_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
 		{
 			/* Modify lighting */
 			modify_grid_interesting(&a, &c, cinfo, pinfo);
 		}
 	}
+
+#if 0
+	/* Room decoration -- should really be '3rd/ego' layer */
+	if ((view_special_lite) && (pinfo & (PLAY_SEEN)) &&
+		(cinfo & (CAVE_ROOM)) &&
+		(f_info[cave_feat[y][x]] & (FF1_WALL)) &&
+		(f_info[cave_feat[y][x]] & (FF1_OUTER | FF1_INNER | FF1_SOLID)))
+	{
+		/* Hack -- move towards player */
+		int yy = (y < py) ? (y + 1) : (y > py) ? (y - 1) : y;
+		int xx = (x < px) ? (x + 1) : (x > px) ? (x - 1) : x;
+
+		/* Check for "complex" illumination */
+		if ((!(cave_info[yy][xx] & (CAVE_ROOM)) &&
+		      (play_info[yy][xx] & (PLAY_SEEN))) ||
+		    (!(cave_info[y][xx] & (CAVE_ROOM)) &&
+		      (play_info[y][xx] & (PLAY_SEEN))) ||
+		    (!(cave_info[yy][x] & (CAVE_ROOM)) &&
+		      (play_info[yy][x] & (PLAY_SEEN))))
+		{
+			int i = (f_ptr->flags & (FF1_OUTER) ? 1 : (f_ptr->flags & (FF1_INNER) ? 2 : (f_ptr->flags & (FF1_INNER) ? 3);
+
+			/* Special rooms affect some of this */
+			int by = y/BLOCK_HGT;
+			int bx = x/BLOCK_HGT;
+
+			/* Get the room */
+			room_info_type *d_ptr = &room_info[dun_room[by][bx]];
+
+			/* Room dependent attr */
+			a = d_ptr->x_attr[i];
+
+			/* Room dependent char */
+			c = d_ptr->x_char[i];
+		}
+	}
+#endif
 
 
 	/* Objects */
@@ -1869,6 +1912,85 @@ void prt_map(void)
 	}
 }
 
+
+/*
+ * Display item list (below the map)
+ */
+void prt_item_list(void)
+{
+	int i, j;
+
+	int x = 1;
+	int y = Term->hgt - (use_trptile ? 3 : (use_dbltile ? 2 : 1));
+
+	byte a, ta;
+	char c, tc;
+
+	byte na = f_info[FEAT_NONE].x_attr;
+
+	char nc = f_info[FEAT_NONE].x_char;
+
+	if (show_itemlist)
+	{
+		for (i = 0; i < SHOWN_TOTAL; i++)
+		{
+			for (j = 0; j < INVEN_TOTAL; j++)
+			{
+				if (!inventory[j].k_idx) continue;
+
+				if (inventory[j].show_idx - 1 == i) break;
+			}
+
+			/* Invalid item */
+			if (j >= INVEN_TOTAL)
+			{
+				/* Nothing */
+				ta = a = na;
+				tc = c = nc;
+			}
+			else
+			{
+
+				msg_format("%d %d %d",i, j, inventory[j].k_idx);
+
+				a = k_info[inventory[j].k_idx].x_attr;
+				c = k_info[inventory[j].k_idx].x_char;
+
+				if (j < INVEN_WIELD)
+				{
+					ta = na;
+					tc = nc;
+				}
+				else
+				{
+					ta = f_info[FEAT_FLOOR].x_attr;
+					tc = f_info[FEAT_FLOOR].x_char;
+				}
+			}
+
+			/* Hack -- Queue it */
+			Term_queue_char(x, y, a, c, ta, tc);
+
+			if (use_bigtile || use_dbltile || use_trptile)
+			{
+				big_queue_char(x, y, a, c, TERM_WHITE, ' ');
+			}
+
+			/* Advance the column */
+			if (use_trptile)
+			{
+				x += (use_bigtile ? 6 : 3);
+
+			}
+			else if (use_dbltile)
+			{
+				x += (use_bigtile ? 4 : 2);
+			}
+			else if (use_bigtile) x += 2;
+			else x++;
+		}
+	}
+}
 
 /*
  * Hack -- a priority function (rewritten by ANDY)
@@ -3227,8 +3349,8 @@ void update_view(void)
 		monster_type *m_ptr = &m_list[i];
 		monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
-	      /* Skip dead monsters */
-      	if (!m_ptr->r_idx) continue;
+		/* Skip dead monsters */
+	      	if (!m_ptr->r_idx) continue;
 
 		/* Skip sleeping monsters */
 		if (m_ptr->csleep) continue;

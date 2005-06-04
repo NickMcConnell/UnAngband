@@ -230,10 +230,18 @@ struct desc_type
 
 struct room_info_type
 {
-	byte type;							/* Type of room (normal/pit) */
+	byte type;				/* Type of room (normal/pit) */
 	s16b section[ROOM_DESC_SECTIONS];	/* Array of room descriptions */
 
 	byte flags;		/* Room flags */
+
+	/* Decorations */
+
+	byte d_attr[5];    	/* Desired feature attribute (basic / inner / outer / solid) */
+	char d_char[5];    	/* Desired feature character (basic / inner / outer / solid) */
+
+	byte x_attr[5];    	/* Desired feature attribute (basic / inner / outer / solid) */
+	char x_char[5];    	/* Desired feature character (basic / inner / outer / solid) */
 };
 
 
@@ -326,14 +334,17 @@ struct object_info
 	u32b can_flags1;
 	u32b can_flags2;
 	u32b can_flags3;
+	u32b can_flags4;
 
 	u32b may_flags1;
 	u32b may_flags2;
 	u32b may_flags3;
+	u32b may_flags4;
 
 	u32b not_flags1;
 	u32b not_flags2;
 	u32b not_flags3;
+	u32b not_flags4;
 
 	s16b usage;
 };
@@ -369,6 +380,7 @@ struct object_kind
 	u32b flags1;    /* Flags, set 1 */
 	u32b flags2;    /* Flags, set 2 */
 	u32b flags3;    /* Flags, set 3 */
+	u32b flags4;    /* Flags, set 4 */
 
 	byte locale[4]; /* Allocation level(s) */
 	byte chance[4]; /* Allocation chance(s) */
@@ -410,14 +422,17 @@ struct object_lore
 	u32b can_flags1;
 	u32b can_flags2;
 	u32b can_flags3;
+	u32b can_flags4;
 
 	u32b may_flags1;
 	u32b may_flags2;
 	u32b may_flags3;
+	u32b may_flags4;
 
 	u32b not_flags1;
 	u32b not_flags2;
 	u32b not_flags3;
+	u32b not_flags4;
 };
 
 
@@ -454,6 +469,7 @@ struct artifact_type
 	u32b flags1;    /* Artifact Flags, set 1 */
 	u32b flags2;    /* Artifact Flags, set 2 */
 	u32b flags3;    /* Artifact Flags, set 3 */
+	u32b flags4;    /* Artifact Flags, set 4 */
 
 	byte level;     /* Artifact level */
 	byte rarity;    /* Artifact rarity */
@@ -498,10 +514,12 @@ struct ego_item_type
 	u32b flags1;    /* Ego-Item Flags, set 1 */
 	u32b flags2;    /* Ego-Item Flags, set 2 */
 	u32b flags3;    /* Ego-Item Flags, set 3 */
+	u32b flags4;    /* Ego-Item Flags, set 4 */
 
 	u32b obv_flags1;    /* Obvious Ego-Item Flags, set 1 */
 	u32b obv_flags2;    /* Obvious Ego-Item Flags, set 2 */
 	u32b obv_flags3;    /* Obvious Ego-Item Flags, set 3 */
+	u32b obv_flags4;    /* Obvious Ego-Item Flags, set 3 */
 
 	u16b note;     /* Auto-inscription */
 
@@ -744,6 +762,7 @@ struct object_type
 	u16b note;      /* Inscription index */
 
 	byte stackc;    /* Stack count */
+	byte show_idx;	/* Index into show item list */
 
 	s16b next_o_idx;/* Next object in stack (if any) */
 
@@ -754,14 +773,17 @@ struct object_type
 	u32b can_flags1;
 	u32b can_flags2;
 	u32b can_flags3;
+	u32b can_flags4;
 
 	u32b may_flags1;
 	u32b may_flags2;
 	u32b may_flags3;
+	u32b may_flags4;
 
 	u32b not_flags1;
 	u32b not_flags2;
 	u32b not_flags3;
+	u32b not_flags4;
 
 	s16b usage;
 	byte guess1;
@@ -979,6 +1001,7 @@ struct player_race
 	u32b flags1;    /* Racial Flags, set 1 */
 	u32b flags2;    /* Racial Flags, set 2 */
 	u32b flags3;    /* Racial Flags, set 3 */
+	u32b flags4;    /* Racial Flags, set 4 */
 };
 
 
@@ -1387,61 +1410,10 @@ struct player_type
 	s16b stat_add[A_MAX];   /* Equipment stat bonuses */
 	s16b stat_ind[A_MAX];   /* Indexes into stat tables */
 
-	bool immune_acid;       /* Immunity to acid */
-	bool immune_elec;       /* Immunity to lightning */
-	bool immune_fire;       /* Immunity to fire */
-	bool immune_cold;       /* Immunity to cold */
-
-	bool resist_acid;       /* Resist acid */
-	bool resist_elec;       /* Resist lightning */
-	bool resist_fire;       /* Resist fire */
-	bool resist_cold;       /* Resist cold */
-	bool resist_pois;       /* Resist poison */
-
-	bool resist_fear;       /* Resist fear */
-	bool resist_lite;       /* Resist light */
-	bool resist_dark;       /* Resist darkness */
-	bool resist_blind;      /* Resist blindness */
-	bool resist_confu;      /* Resist confusion */
-	bool resist_sound;      /* Resist sound */
-	bool resist_shard;      /* Resist shards */
-	bool resist_nexus;      /* Resist nexus */
-	bool resist_nethr;      /* Resist nether */
-	bool resist_chaos;      /* Resist chaos */
-	bool resist_disen;      /* Resist disenchant */
-
-	bool sustain_str;       /* Keep strength */
-	bool sustain_int;       /* Keep intelligence */
-	bool sustain_wis;       /* Keep wisdom */
-	bool sustain_dex;       /* Keep dexterity */
-	bool sustain_con;       /* Keep constitution */
-	bool sustain_chr;       /* Keep charisma */
-
-	bool slow_digest;       /* Slower digestion */
-	bool ffall;     /* Feather falling */
-	bool lite;      /* Permanent light */
-	bool regenerate;/* Regeneration */
-	bool telepathy; /* Telepathy */
-	bool see_inv;   /* See invisible */
-	bool free_act;  /* Free action */
-	bool hold_life; /* Hold life */
-
-	bool esp_orc;   /* Magical sensing */
-	bool esp_giant;
-	bool esp_troll;
-	bool esp_dragon;
-	bool esp_undead;
-	bool esp_demon;
-	bool esp_nature;
-
-	bool impact;    /* Earthquake blows */
-	bool aggravate; /* Aggravate monsters */
-	bool teleport;  /* Random teleporting */
-	bool exp_drain; /* Experience draining */
-	bool hp_drain; /* Experience draining */
-	bool mana_drain; /* Experience draining */
-
-	bool bless_blade;       /* Blessed blade */
+	u32b cur_flags1;
+	u32b cur_flags2;
+	u32b cur_flags3;
+	u32b cur_flags4;
 
 	u32b disease;	/* Disease types */
 

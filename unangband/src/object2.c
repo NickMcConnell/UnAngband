@@ -717,17 +717,17 @@ s16b get_obj_num(int level)
  */
 void object_mental(object_type *o_ptr)
 {
-	u32b f1,f2,f3;
+	u32b f1,f2,f3,f4;
 
 	/* Now we know about the item */
 	o_ptr->ident |= (IDENT_MENTAL);
 
 	/* Spoil the object */
-	object_flags(o_ptr,&f1,&f2,&f3);
+	object_flags(o_ptr,&f1,&f2,&f3,&f4);
 
-	object_can_flags(o_ptr,f1,f2,f3);
+	object_can_flags(o_ptr,f1,f2,f3,f4);
 
-	object_not_flags(o_ptr,~(f1),~(f2),~(f3));
+	object_not_flags(o_ptr,~(f1),~(f2),~(f3),~(f4));
 }
 
 
@@ -785,11 +785,13 @@ void object_known(object_type *o_ptr)
 	{
 		object_can_flags(o_ptr,a_list[o_ptr->name1].can_flags1,
 				a_list[o_ptr->name1].can_flags2,
-				a_list[o_ptr->name1].can_flags3);
+				a_list[o_ptr->name1].can_flags3,
+				a_list[o_ptr->name1].can_flags4);
 
 		object_not_flags(o_ptr,a_list[o_ptr->name1].not_flags1,
 				a_list[o_ptr->name1].not_flags2,
-				a_list[o_ptr->name1].not_flags3);
+				a_list[o_ptr->name1].not_flags3,
+				a_list[o_ptr->name1].not_flags4);
 	}
 	else
 	{
@@ -799,16 +801,19 @@ void object_known(object_type *o_ptr)
 			/* Obvious flags */
 			object_can_flags(o_ptr,e_info[o_ptr->name2].obv_flags1,
 					 e_info[o_ptr->name2].obv_flags2,
-					 e_info[o_ptr->name2].obv_flags3);
+					 e_info[o_ptr->name2].obv_flags3,
+					 e_info[o_ptr->name2].obv_flags4);
 
 			/* Known flags */
 			object_can_flags(o_ptr,e_list[o_ptr->name2].can_flags1,
 					 e_list[o_ptr->name2].can_flags2,
-					 e_list[o_ptr->name2].can_flags3);
+					 e_list[o_ptr->name2].can_flags3,
+					 e_list[o_ptr->name2].can_flags4);
 			
 			object_not_flags(o_ptr,e_list[o_ptr->name2].not_flags1,
 					 e_list[o_ptr->name2].not_flags2,
-					 e_list[o_ptr->name2].not_flags3);
+					 e_list[o_ptr->name2].not_flags3,
+					 e_list[o_ptr->name2].not_flags4);
 		}
 		else
 			object_obvious_flags(o_ptr);
@@ -817,15 +822,18 @@ void object_known(object_type *o_ptr)
 	/* Now we know what it is, update what we know about it */
 	object_can_flags(o_ptr,o_ptr->can_flags1,
 			o_ptr->can_flags2,
-			o_ptr->can_flags3);
+			o_ptr->can_flags3,
+			o_ptr->can_flags4);
 
 	object_not_flags(o_ptr,o_ptr->not_flags1,
 			o_ptr->not_flags2,
-			o_ptr->not_flags3);
+			o_ptr->not_flags3,
+			o_ptr->not_flags4);
 
 	object_may_flags(o_ptr,o_ptr->may_flags1,
 			o_ptr->may_flags2,
-			o_ptr->may_flags3);
+			o_ptr->may_flags3,
+			o_ptr->may_flags4);
 
 	/* Know about ego-type */
 	if ((o_ptr->name2) && !(o_ptr->ident & (IDENT_STORE)))
@@ -1091,7 +1099,7 @@ static s32b object_value_real(const object_type *o_ptr)
 {
 	s32b value;
 
-	u32b f1, f2, f3;
+	u32b f1, f2, f3, f4;
 
 	object_kind *k_ptr = &k_info[o_ptr->k_idx];
 
@@ -1104,7 +1112,7 @@ static s32b object_value_real(const object_type *o_ptr)
 
 
 	/* Extract some flags */
-	object_flags(o_ptr, &f1, &f2, &f3);
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 
 	/* Artifact */
@@ -1958,9 +1966,9 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 	if (j_ptr->note != 0) o_ptr->note = j_ptr->note;
 
 	/* Hack -- Blend flags */
-	object_can_flags(o_ptr,j_ptr->can_flags1,j_ptr->can_flags2,j_ptr->can_flags3);
-	object_not_flags(o_ptr,j_ptr->not_flags1,j_ptr->not_flags2,j_ptr->not_flags3);
-	object_may_flags(o_ptr,j_ptr->may_flags1,j_ptr->may_flags2,j_ptr->may_flags3);
+	object_can_flags(o_ptr,j_ptr->can_flags1,j_ptr->can_flags2,j_ptr->can_flags3,j_ptr->can_flags4);
+	object_not_flags(o_ptr,j_ptr->not_flags1,j_ptr->not_flags2,j_ptr->not_flags3,j_ptr->not_flags4);
+	object_may_flags(o_ptr,j_ptr->may_flags1,j_ptr->may_flags2,j_ptr->may_flags3,j_ptr->may_flags4);
 
 	/* Mega-Hack -- Blend "discounts" */
 	if (o_ptr->discount < j_ptr->discount) o_ptr->discount = j_ptr->discount;
@@ -6070,6 +6078,8 @@ void inven_item_optimize(int item)
 {
 	object_type *o_ptr = &inventory[item];
 
+	int i;
+
 	/* Only optimize real items */
 	if (!o_ptr->k_idx) return;
 
@@ -6079,8 +6089,6 @@ void inven_item_optimize(int item)
 	/* The item is in the pack */
 	if (item < INVEN_WIELD)
 	{
-		int i;
-
 		/* One less item */
 		p_ptr->inven_cnt--;
 
@@ -6096,6 +6104,9 @@ void inven_item_optimize(int item)
 
 		/* Recalculate runes */
 		p_ptr->update |= (PU_RUNES);
+
+		/* Redraw stuff */
+		p_ptr->redraw |= (PR_ITEM_LIST);
 
 		/* Window stuff */
 		p_ptr->window |= (PW_INVEN);
@@ -6229,9 +6240,6 @@ void floor_item_optimize(int item)
 }
 
 
-
-
-
 /*
  * Check if we have space for an item in the pack without overflow
  */
@@ -6311,7 +6319,6 @@ s16b inven_carry(object_type *o_ptr)
 		if (object_similar(j_ptr, o_ptr))
 		{
 
-
 			/* Combine the items */
 			object_absorb(j_ptr, o_ptr);
 
@@ -6376,10 +6383,8 @@ s16b inven_carry(object_type *o_ptr)
 			return (INVEN_WIELD);
 	}
 
-
 	/* Paranoia */
 	if (p_ptr->inven_cnt > INVEN_PACK) return (-1);
-
 
 	/* Find an empty slot */
 	for (j = 0; j <= INVEN_PACK; j++)
@@ -6475,6 +6480,37 @@ s16b inven_carry(object_type *o_ptr)
 		object_wipe(&inventory[i]);
 	}
 
+	/* Find if the show index is already in use */
+	if (o_ptr->show_idx)
+	{	
+		/* Check all items */
+		for (k = 0; k < INVEN_TOTAL; k++) if ((inventory[k].k_idx) && (inventory[k].show_idx == o_ptr->show_idx)) o_ptr->show_idx = 0;
+	}
+
+	/* Need a show index? */
+	if (!o_ptr->show_idx)
+	{
+		/* Find the next free show index */
+		for (j = 0; j < SHOWN_TOTAL; j++)
+		{
+			bool used = FALSE;
+
+			/* Check all items */
+			for (k = 0; k < INVEN_TOTAL; k++) if ((inventory[k].k_idx) && (inventory[k].show_idx -1 == j)) used = TRUE;
+
+			/* Already an item using this slot? */
+			if (used) continue;
+
+			/* Use this slot */
+			break;
+		}
+
+		/* Set the show index for the item */
+		o_ptr->show_idx = j + 1;
+
+		/* Redraw stuff */
+		p_ptr->redraw |= (PR_ITEM_LIST);
+	}
 
 	/* Copy the item */
 	object_copy(&inventory[i], o_ptr);
@@ -6540,7 +6576,6 @@ s16b inven_takeoff(int item, int amt)
 	cptr act;
 
 	char o_name[80];
-
 
 	/* Get the item to take off */
 	o_ptr = &inventory[item];
@@ -6739,9 +6774,6 @@ void inven_drop(int item, int amt)
 	/* Forget information on dropped object */
 	drop_may_flags(i_ptr);
 
-	/* Forget guessed information */
-	if (o_ptr->number == amt) inven_drop_flags(o_ptr);
-
 	/* Describe local object */
 	object_desc(o_name, sizeof(o_name), i_ptr, TRUE, 3);
 
@@ -6755,6 +6787,7 @@ void inven_drop(int item, int amt)
 	inven_item_increase(item, -amt);
 	inven_item_describe(item);
 	inven_item_optimize(item);
+
 }
 
 

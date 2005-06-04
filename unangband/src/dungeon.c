@@ -125,10 +125,12 @@ static void sense_inventory(void)
 	u32b f1=0x0L;
 	u32b f2=0x0L;
 	u32b f3=0x0L;
+	u32b f4=0x0L;
 
 	u32b af1=0x0L;
 	u32b af2=0x0L;
 	u32b af3=0x0L;
+	u32b af4=0x0L;
 
 	object_type *o_ptr;
 
@@ -169,29 +171,31 @@ static void sense_inventory(void)
 		/* Skip empty slots */
 		if (!o_ptr->k_idx) continue;
 
-		/* Always sense flags to see if we have ability */
+		/* Sense flags to see if we have ability */
 		if ((i >= INVEN_WIELD) && (i != INVEN_BELT))
 		{
-			u32b if1,if2,if3;
+			u32b if1,if2,if3,if4;
 
-			object_flags(o_ptr,&if1,&if2,&if3);
+			object_flags(o_ptr,&if1,&if2,&if3,&if4);
 
 			af1 |= if1;
 			af2 |= if2;
 			af3 |= if3;
+			af4 |= if4;
 
 		}
 
-		/* Sometimes sense flags to see if we gain ability */
-		if (!(o_ptr->ident & (IDENT_MENTAL)) && (i >= INVEN_WIELD) && (i != INVEN_BELT) && (rand_int(100)<30))
+		/* Sense flags to see if we gain ability */
+		if (!(o_ptr->ident & (IDENT_MENTAL)) && (i >= INVEN_WIELD) && (i != INVEN_BELT))
 		{
-			u32b if1,if2,if3;
+			u32b if1,if2,if3,if4;
 
-			object_flags(o_ptr,&if1,&if2,&if3);
+			object_flags(o_ptr,&if1,&if2,&if3,&if4);
 
 			f1 |= (if1 & ~(o_ptr->may_flags1)) & ~(o_ptr->can_flags1);
 			f2 |= (if2 & ~(o_ptr->may_flags2)) & ~(o_ptr->can_flags2);
 			f3 |= (if3 & ~(o_ptr->may_flags3)) & ~(o_ptr->can_flags3);
+			f4 |= (if4 & ~(o_ptr->may_flags4)) & ~(o_ptr->can_flags4);
 		}
 
 		/* Valid "tval" codes */
@@ -281,38 +285,20 @@ static void sense_inventory(void)
 	}
 
 	/* Hack --- silently notice stuff */
-	if ((f1 & (TR1_STR)) && (rand_int(100)<30)) equip_can_flags(TR1_STR,0x0L,0x0L);
-	else if (!(af1 & (TR1_STR))) equip_not_flags(TR1_STR,0x0L,0x0L);
+	if (f1 & (TR1_STEALTH)) equip_can_flags(TR1_STEALTH,0x0L,0x0L,0x0L);
+	else if (!(af1 & (TR1_STEALTH)) ) equip_not_flags(TR1_STEALTH,0x0L,0x0L,0x0L);
 
-	if ((f1 & (TR1_INT)) && (rand_int(100)<30)) equip_can_flags(TR1_INT,0x0L,0x0L);
-	else if (!(af1 & (TR1_INT))) equip_not_flags(TR1_INT,0x0L,0x0L);
+	if (f1 & (TR1_SEARCH)) equip_can_flags(TR1_SEARCH,0x0L,0x0L,0x0L);
+	else if (!(af1 & (TR1_SEARCH)) ) equip_not_flags(TR1_SEARCH,0x0L,0x0L,0x0L);
 
-	if ((f1 & (TR1_WIS)) && (rand_int(100)<30)) equip_can_flags(TR1_WIS,0x0L,0x0L);
-	else if (!(af1 & (TR1_WIS)) ) equip_not_flags(TR1_WIS,0x0L,0x0L);
+	if (f3 & (TR3_SLOW_DIGEST)) equip_can_flags(0x0L,0x0L,TR3_SLOW_DIGEST,0x0L);
+	else if (!(af3 & (TR3_SLOW_DIGEST))) equip_not_flags(0x0L,0x0L,TR3_SLOW_DIGEST,0x0L);
 
-	if ((f1 & (TR1_DEX)) && (rand_int(100)<30)) equip_can_flags(TR1_DEX,0x0L,0x0L);
-	else if (!(af1 & (TR1_DEX)) ) equip_not_flags(TR1_DEX,0x0L,0x0L);
+	if (f3 & (TR3_REGEN)) equip_can_flags(0x0L,0x0L,TR3_REGEN,0x0L);
+	else if (!(af3 & (TR3_REGEN))) equip_not_flags(0x0L,0x0L,TR3_REGEN,0x0L);
 
-	if ((f1 & (TR1_CON)) && (rand_int(100)<30)) equip_can_flags(TR1_CON,0x0L,0x0L);
-	else if (!(af1 & (TR1_CON)) ) equip_not_flags(TR1_CON,0x0L,0x0L);
-
-	if ((f1 & (TR1_CHR)) && (rand_int(100)<30)) equip_can_flags(TR1_CHR,0x0L,0x0L);
-	else if (!(af1 & (TR1_CHR)) ) equip_not_flags(TR1_CHR,0x0L,0x0L);
-
-	if ((f1 & (TR1_STEALTH)) && (rand_int(100)<30)) equip_can_flags(TR1_STEALTH,0x0L,0x0L);
-	else if (!(af1 & (TR1_STEALTH)) ) equip_not_flags(TR1_STEALTH,0x0L,0x0L);
-
-	if ((f1 & (TR1_SEARCH)) && (rand_int(100)<30)) equip_can_flags(TR1_SEARCH,0x0L,0x0L);
-	else if (!(af1 & (TR1_SEARCH)) ) equip_not_flags(TR1_SEARCH,0x0L,0x0L);
-
-	if ((f1 & (TR1_SPEED)) && (rand_int(100)<30)) equip_can_flags(TR1_SPEED,0x0L,0x0L);
-	else if (!(af1 & (TR1_SPEED))) equip_not_flags(TR1_SPEED,0x0L,0x0L);
-
-	if ((f3 & (TR3_SLOW_DIGEST)) && (rand_int(100)<30)) equip_can_flags(0x0L,0x0L,TR3_SLOW_DIGEST);
-	else if (!(af3 & (TR3_SLOW_DIGEST))) equip_not_flags(0x0L,0x0L,TR3_SLOW_DIGEST);
-
-	if ((f3 & (TR3_REGEN)) && (rand_int(100)<30)) equip_can_flags(0x0L,0x0L,TR3_REGEN);
-	else if (!(af3 & (TR3_REGEN))) equip_not_flags(0x0L,0x0L,TR3_REGEN);
+	if (f4 & (TR4_HUNGER)) equip_can_flags(0x0L,0x0L,0x0L,TR4_HUNGER);
+	else if (!(af4 & (TR4_HUNGER))) equip_not_flags(0x0L,0x0L,0x0L,TR4_HUNGER);
 }
 
 
@@ -772,11 +758,14 @@ static void process_world(void)
 			/* Basic digestion rate based on speed */
 			i = extract_energy[p_ptr->pspeed] * 2;
 
+			/* Hunger takes more food */
+			if (p_ptr->cur_flags4 & (TR4_HUNGER)) i += 100;
+
 			/* Regeneration takes more food */
-			if (p_ptr->regenerate) i += 30;
+			if (p_ptr->cur_flags3 & (TR3_REGEN)) i += 30;
 
 			/* Slow digestion takes less food */
-			if (p_ptr->slow_digest) i -= 10;
+			if (p_ptr->cur_flags3 & (TR3_SLOW_DIGEST)) i -= 10;
 
 			/* Minimal digestion */
 			if (i < 1) i = 1;
@@ -855,7 +844,7 @@ static void process_world(void)
 	}	
 
 	/* Regeneration ability */
-	if (p_ptr->regenerate)
+	if (p_ptr->cur_flags3 & (TR3_REGEN))
 	{
 		regen_amount = regen_amount * 2;
 	}
@@ -871,7 +860,7 @@ static void process_world(void)
 	/* Regenerate the mana */
 	if (p_ptr->csp < p_ptr->msp)
 	{
-		if (!p_ptr->mana_drain) regenmana(regen_amount);
+		if (!(p_ptr->cur_flags3 & (TR3_DRAIN_MANA))) regenmana(regen_amount);
 	}
 
 	/* Various things interfere with healing */
@@ -879,7 +868,7 @@ static void process_world(void)
 	if (p_ptr->poisoned) regen_amount = 0;
 	if (p_ptr->stun) regen_amount = 0;
 	if (p_ptr->cut) regen_amount = 0;
-	if (p_ptr->hp_drain) regen_amount = 0;
+	if (p_ptr->cur_flags3 & (TR3_DRAIN_HP)) regen_amount = 0;
 	if (p_ptr->disease) regen_amount = 0;
 	if ((room) && (d_ptr->flags & (ROOM_BLOODY))) regen_amount = 0;
 
@@ -1101,12 +1090,12 @@ static void process_world(void)
 	/*** Process Inventory ***/
 
 	/* Handle experience draining */
-	if ((p_ptr->exp_drain) || (p_ptr->disease & (DISEASE_DRAIN_EXP)))
+	if ((p_ptr->cur_flags3 & (TR3_DRAIN_EXP)) || (p_ptr->disease & (DISEASE_DRAIN_EXP)))
 	{
 		if ((rand_int(100) < 10) && (p_ptr->exp > 0))
 		{
 			/* Always notice */
-			if (!(p_ptr->disease & (DISEASE_DRAIN_EXP))) equip_can_flags(0x0L,0x0L,TR3_DRAIN_EXP);
+			if (!(p_ptr->disease & (DISEASE_DRAIN_EXP))) equip_can_flags(0x0L,0x0L,TR3_DRAIN_EXP,0x0L);
 
 			p_ptr->exp--;
 			p_ptr->max_exp--;
@@ -1117,12 +1106,12 @@ static void process_world(void)
 	}
 
 	/* Handle hit point draining */
-	if ((p_ptr->hp_drain) || (p_ptr->disease & (DISEASE_DRAIN_HP)))
+	if ((p_ptr->cur_flags3 & (TR3_DRAIN_HP)) || (p_ptr->disease & (DISEASE_DRAIN_HP)))
 	{
 		if ((rand_int(100) < 10) && (p_ptr->chp > 0))
 		{
 			/* Always notice */
-			if (!(p_ptr->disease & (DISEASE_DRAIN_HP))) equip_can_flags(0x0L,0x0L,TR3_DRAIN_HP);
+			if (!(p_ptr->disease & (DISEASE_DRAIN_HP))) equip_can_flags(0x0L,0x0L,TR3_DRAIN_HP,0x0L);
 
 			if (p_ptr->disease & (DISEASE_DRAIN_HP))
 				take_hit(1, "disease");
@@ -1133,12 +1122,12 @@ static void process_world(void)
 	}
 
 	/* Handle mana draining */
-	if ((p_ptr->mana_drain) || (p_ptr->disease & (DISEASE_DRAIN_MANA)))
+	if ((p_ptr->cur_flags3 & (TR3_DRAIN_MANA)) || (p_ptr->disease & (DISEASE_DRAIN_MANA)))
 	{
 		if ((rand_int(100) < 10) && (p_ptr->csp > 0))
 		{
 			/* Always notice */
-			if (!(p_ptr->disease & (DISEASE_DRAIN_MANA))) equip_can_flags(0x0L,0x0L,TR3_DRAIN_MANA);
+			if (!(p_ptr->disease & (DISEASE_DRAIN_MANA))) equip_can_flags(0x0L,0x0L,TR3_DRAIN_MANA,0x0L);
 
 			p_ptr->csp--;
 			p_ptr->csp_frac = 0;
@@ -1172,10 +1161,10 @@ static void process_world(void)
 			{
 				char o_name[80];
 
-				u32b f1, f2, f3;
+				u32b f1, f2, f3, f4;
 
 				/* Get the flags */
-				object_flags(o_ptr,&f1, &f2, &f3);
+				object_flags(o_ptr,&f1, &f2, &f3, &f4);
 
 				/* Get a description */
 				object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
@@ -1296,10 +1285,10 @@ static void process_world(void)
 			if (!(o_ptr->timeout) || ((o_ptr->stackc) ? (o_ptr->timeout < o_ptr->stackc) :
 				(o_ptr->timeout < o_ptr->number) ))
 			{
-				u32b f1, f2, f3;
+				u32b f1, f2, f3, f4;
 
 				/* Get the flags */
-				object_flags(o_ptr,&f1, &f2, &f3);
+				object_flags(o_ptr,&f1, &f2, &f3, &f4);
 
 				/* Spells run out */
 				if (o_ptr->tval == TV_SPELL)
@@ -1484,13 +1473,13 @@ static void process_world(void)
 	/*** Involuntary Movement ***/
 
 	/* Mega-Hack -- Random teleportation XXX XXX XXX */
-	if ((p_ptr->teleport) && (rand_int(100) < 1))
+	if ((p_ptr->cur_flags3 & (TR3_TELEPORT)) && (rand_int(100) < 1))
 	{
 		/* Teleport player */
 		teleport_player(40);
 
 		/* Always notice */
-		equip_can_flags(0x0L,0x0L,TR3_TELEPORT);
+		equip_can_flags(0x0L,0x0L,TR3_TELEPORT,0x0L);
 
 	}
 	/* Mega-Hack -- Portal room */

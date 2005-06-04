@@ -1466,7 +1466,7 @@ const cptr option_text[OPT_MAX] =
 	"view_surface_lite",			/* OPT_view_surface_lite */
 	"variant_study_more",		   /* xxx */
 	"show_sidebar",						/* xxx */
-	NULL,						/* xxx */
+	"show_itemlist",						/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
@@ -1723,14 +1723,14 @@ const cptr option_desc[OPT_MAX] =
 	"Display room names",					/* xxx */
 	"Verify critical mana",					/* xxx */
 	"Reseed random artifacts on death",			/* xxx */
-      "Automatically inscribe all objects",
-	"Start searching if not disturbed",										/* xxx */
+	"Automatically inscribe all objects",			/* xxx */
+	"Start searching if not disturbed",			/* xxx */
 	"Save new features in save-file",			/* xxx */
 	"Use special colours for glowing lite (slow)",	/* OPT_view_glowing_lite */
 	"Use special colours for surface lite",		/* OPT_view_surface_lite */
 	"Learn more than 64 spells",				/* xxx */
 	"Display stats in main window",			/* OPT_show_sidebar */							/* xxx */
-	NULL,										/* xxx */
+	"Display all items in main window",		/* OPT_show_itemlist */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
@@ -1994,7 +1994,7 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* OPT_view_surface_lite */
 	TRUE,	  /* OPT_variant_study_more */
 	TRUE,		/* OPT_show_sidebar */
-	FALSE,		/* xxx */
+	FALSE,		/* OPT_show_itemlist */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
@@ -2250,6 +2250,8 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 	{
 		OPT_view_reduce_lite,
 		OPT_hidden_player,
+ 		OPT_center_player,
+ 		OPT_run_avoid_center,
 		OPT_avoid_abort,
 		OPT_avoid_other,
 		OPT_flush_failure,
@@ -2265,15 +2267,14 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		255,
 		255,
 		255,
-		255,
-		255,
-		255,
+		255
 	},
 
 	/*** Display ***/
 
 	{
 		OPT_show_sidebar,
+		OPT_show_itemlist,
 		OPT_depth_in_feet,
 		OPT_show_labels,
 		OPT_show_weights,
@@ -2288,11 +2289,10 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_view_special_lite,
 		OPT_view_glowing_lite,
 		OPT_view_surface_lite,
- 		OPT_center_player,
- 		OPT_run_avoid_center,
 		OPT_show_piles,
 		OPT_room_names,
-		OPT_room_descriptions
+		OPT_room_descriptions,
+		255
 	},
 
 	/*** Birth ***/
@@ -2429,10 +2429,11 @@ const cptr inscrip_text[MAX_INSCRIP] =
 	"acidproof",
 	"fireproof",
 	"waterproof",
-	"theftproof"
+	"theftproof",
+	"vampiric"
 };
 
-const int object_xtra_what[MAX_HIDDEN] =
+const int object_xtra_what[OBJECT_XTRA_MAX_HIDDEN] =
 {
 	0,
 	2,
@@ -2448,10 +2449,11 @@ const int object_xtra_what[MAX_HIDDEN] =
 	2,
 	2,
 	2,
-	  2
+	2,
+	4
 };
 
-const u32b object_xtra_base[MAX_HIDDEN] =
+const u32b object_xtra_base[OBJECT_XTRA_MAX_HIDDEN] =
 {
 	0,
 	TR2_SUST_STR,
@@ -2467,11 +2469,12 @@ const u32b object_xtra_base[MAX_HIDDEN] =
 	TR2_IGNORE_ACID,
 	TR2_IGNORE_FIRE,
 	TR2_IGNORE_WATER,
-	  TR2_IGNORE_THEFT
+        TR2_IGNORE_THEFT,
+	TR4_HURT_LITE
 };
 
 
-const int object_xtra_size[MAX_HIDDEN] =
+const int object_xtra_size[OBJECT_XTRA_MAX_HIDDEN] =
 {
 	0,
 	6,
@@ -2487,7 +2490,8 @@ const int object_xtra_size[MAX_HIDDEN] =
 	1,
 	1,
 	1,
-	1
+	1,
+        10
 };
 
 

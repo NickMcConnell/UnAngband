@@ -2424,7 +2424,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 				else
 				{
 					msg_print("Your mind is blasted by psionic energy.");
-					if (!p_ptr->resist_confu)
+					if (!p_ptr->cur_flags2 & (TR2_RES_CONFU))
 					{
 						(void)set_confused(p_ptr->confused + rand_int(4) + 4);
 					}
@@ -2470,41 +2470,41 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 				{
 					msg_print("Your mind is blasted by psionic energy.");
 					take_hit(damroll(12, 15), ddesc);
-					if (!p_ptr->resist_blind)
+					if (!p_ptr->cur_flags2 & (TR2_RES_BLIND))
 					{
 						(void)set_blind(p_ptr->blind + 8 + rand_int(8));
 
 						/* Always notice */
-						equip_not_flags(0x0L,TR2_RES_BLIND,0x0L);
+						equip_not_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
 					}
 					else
 					{
 						/* Always notice */
-						equip_can_flags(0x0L,TR2_RES_BLIND,0x0L);
+						equip_can_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
 					}
-					if (!p_ptr->resist_confu)
+					if (!p_ptr->cur_flags2 & (TR2_RES_CONFU))
 					{
 						(void)set_confused(p_ptr->confused + rand_int(4) + 4);
 
 						/* Always notice */
-						equip_not_flags(0x0L,TR2_RES_CONFU,0x0L);
+						equip_not_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 					}
 					else
 					{
 						/* Always notice */
-						equip_can_flags(0x0L,TR2_RES_CONFU,0x0L);
+						equip_can_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 					}
-					if (!p_ptr->free_act)
+					if (!p_ptr->cur_flags3 & (TR3_FREE_ACT))
 					{
 						(void)set_paralyzed(p_ptr->paralyzed + rand_int(4) + 4);
 
 						/* Always notice */
-						equip_not_flags(0x0L,0x0L,TR3_FREE_ACT);
+						equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 					}
 					else
 					{
 						/* Always notice */
-						equip_can_flags(0x0L,0x0L,TR3_FREE_ACT);
+						equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 					}
 					(void)set_slow(p_ptr->slow + rand_int(4) + 4);
 				}
@@ -2955,12 +2955,12 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 
 			if (target < 0)
 			{
-				if (p_ptr->resist_fear)
+				if (p_ptr->cur_flags2 & (TR2_RES_FEAR))
 				{
 					msg_print("You refuse to be frightened.");
 
 					/* Sometimes notice */
-					if (rand_int(100) < 30) equip_can_flags(0x0L,TR2_RES_FEAR,0x0L);
+					if (rand_int(100) < 30) equip_can_flags(0x0L,TR2_RES_FEAR,0x0L,0x0L);
 				}
 				else if (rand_int(100) < p_ptr->skill_sav)
 				{
@@ -2971,7 +2971,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 					(void)set_afraid(p_ptr->afraid + rand_int(4) + 4);
 
 					/* Always notice */
-					equip_not_flags(0x0L,TR2_RES_FEAR,0x0L);
+					equip_not_flags(0x0L,TR2_RES_FEAR,0x0L,0x0L);
 				}
 				if (who > 0) update_smart_learn(who, DRS_RES_FEAR);
 			}
@@ -2997,12 +2997,12 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 
 			if (target < 0)
 			{
-				if (p_ptr->resist_blind)
+				if (p_ptr->cur_flags2 & (TR2_RES_BLIND))
 				{
 					msg_print("You are unaffected!");
 
 					/* Always notice */
-					if (rand_int(100)<30) equip_can_flags(0x0L,TR2_RES_BLIND,0x0L);
+					if (rand_int(100)<30) equip_can_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
 				}
 				else if (rand_int(100) < p_ptr->skill_sav)
 				{
@@ -3013,7 +3013,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 					(void)set_blind(12 + rand_int(4));
 
 					/* Always notice */
-					equip_not_flags(0x0L,TR2_RES_BLIND,0x0L);
+					equip_not_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
 				}
 				if (who > 0) update_smart_learn(who, DRS_RES_BLIND);
 	
@@ -3042,12 +3042,12 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 
 			if (target < 0)
 			{
-				if (p_ptr->resist_confu)
+				if (p_ptr->cur_flags2 & (TR2_RES_CONFU))
 				{
 					msg_print("You disbelieve the feeble spell.");
 
 					/* Sometimes notice */
-					if (rand_int(100)<30) equip_can_flags(0x0L,TR2_RES_CONFU,0x0L);
+					if (rand_int(100)<30) equip_can_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 				}
 				else if (rand_int(100) < p_ptr->skill_sav)
 				{
@@ -3058,7 +3058,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 					(void)set_confused(p_ptr->confused + rand_int(4) + 4);
 
 					/* Always notice */
-					equip_not_flags(0x0L,TR2_RES_CONFU,0x0L);
+					equip_not_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 				}
 				if (who > 0) update_smart_learn(who, DRS_RES_CONFU);
 	
@@ -3086,12 +3086,12 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 
 			if (target < 0)
 			{
-				if (p_ptr->free_act)
+				if (p_ptr->cur_flags3 & (TR3_FREE_ACT))
 				{
 					msg_print("You are unaffected!");
 
 					/* Always notice */
-					equip_can_flags(0x0L,0x0L,TR3_FREE_ACT);
+					equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 				}
 				else if (rand_int(100) < p_ptr->skill_sav)
 				{
@@ -3102,7 +3102,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 					(void)set_slow(p_ptr->slow + rand_int(4) + 4);
 
 					/* Always notice */
-					equip_not_flags(0x0L,0x0L,TR3_FREE_ACT);
+					equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 				}
 				if (who > 0) update_smart_learn(who, DRS_FREE);
 			}
@@ -3128,12 +3128,12 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 
 			if (target < 0)
 			{
-				if (p_ptr->free_act)
+				if (p_ptr->cur_flags3 & (TR3_FREE_ACT))
 				{
 					msg_print("You are unaffected!");
 
 					/* Always notice */
-					equip_can_flags(0x0L,0x0L,TR3_FREE_ACT);
+					equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 				}
 				else if (rand_int(100) < p_ptr->skill_sav)
 				{
@@ -3144,7 +3144,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 					(void)set_paralyzed(p_ptr->paralyzed + rand_int(4) + 4);
 
 					/* Always notice */
-					equip_not_flags(0x0L,0x0L,TR3_FREE_ACT);
+					equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 				}
 				if (who > 0) update_smart_learn(who, DRS_FREE);
 			}
@@ -3361,12 +3361,12 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 					if ((blind) && (known)) msg_format("%^s mumbles strangely.", m_name);
 					else if (known) msg_format("%^s gestures at your feet.", m_name);
 				}
-				if (p_ptr->resist_nexus)
+				if (p_ptr->cur_flags2 & (TR2_RES_NEXUS))
 				{
 					msg_print("You are unaffected!");
 
 					/* Always notice */
-					equip_can_flags(0x0L,TR2_RES_NEXUS,0x0L);
+					equip_can_flags(0x0L,TR2_RES_NEXUS,0x0L,0x0L);
 				}
 				else if (rand_int(100) < p_ptr->skill_sav)
 				{
@@ -3377,7 +3377,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 					teleport_player_level();
 
 					/* Always notice */
-					equip_not_flags(0x0L,TR2_RES_NEXUS,0x0L);
+					equip_not_flags(0x0L,TR2_RES_NEXUS,0x0L,0x0L);
 				}
 				update_smart_learn(who, DRS_RES_NEXUS);
 			}
@@ -7030,7 +7030,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				if ((r_ptr->flags2 & (RF2_TAKE_ITEM)) ||
 				    (r_ptr->flags2 & (RF2_KILL_ITEM)))
 				{
-					u32b f1, f2, f3;
+					u32b f1, f2, f3, f4;
 	
 					u32b flg3 = 0L;
 	
@@ -7038,15 +7038,13 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					char o_name[120];
 	
 					/* Extract some flags */
-					object_flags(o_ptr, &f1, &f2, &f3);
+					object_flags(o_ptr, &f1, &f2, &f3, &f4);
 	
 					/* Acquire the object name */
 					object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 	
 					/* Acquire the monster name */
 					monster_desc(m_name, m_ptr, 0x04);
-	
-	
 	
 					/* React to objects that hurt the monster */
 					if (f1 & (TR1_SLAY_DRAGON)) flg3 |= (RF3_DRAGON);
@@ -7615,7 +7613,7 @@ static void recover_monster(int m_idx, bool regen)
 		notice = rand_int(1024);
 
 		/* Aggravated by the player */
-		if (p_ptr->aggravate)
+		if (p_ptr->cur_flags3 & (TR3_AGGRAVATE))
 		{
 			/* Reset sleep counter */
 			m_ptr->csleep = 0;

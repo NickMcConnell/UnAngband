@@ -251,7 +251,7 @@ static errr rd_item(object_type *o_ptr)
 	byte old_dd;
 	byte old_ds;
 
-	u32b f1, f2, f3;
+	u32b f1, f2, f3, f4;
 
 	object_kind *k_ptr;
 
@@ -279,6 +279,7 @@ static errr rd_item(object_type *o_ptr)
 	/* Special stack counter */
 	if ((variant_pval_stacks)||(variant_time_stacks)) rd_byte(&o_ptr->stackc);
 
+	rd_byte(&o_ptr->show_idx);
 	rd_byte(&o_ptr->discount);
 
 	rd_byte(&o_ptr->number);
@@ -330,14 +331,17 @@ static errr rd_item(object_type *o_ptr)
 		rd_u32b(&o_ptr->can_flags1);
 		rd_u32b(&o_ptr->can_flags2);
 		rd_u32b(&o_ptr->can_flags3);
+		rd_u32b(&o_ptr->can_flags4);
 
 		rd_u32b(&o_ptr->may_flags1);
 		rd_u32b(&o_ptr->may_flags2);
 		rd_u32b(&o_ptr->may_flags3);
+		rd_u32b(&o_ptr->may_flags4);
 
 		rd_u32b(&o_ptr->not_flags1);
 		rd_u32b(&o_ptr->not_flags2);
 		rd_u32b(&o_ptr->not_flags3);
+		rd_u32b(&o_ptr->not_flags4);
 	}
 
 	/* Times we have used an item */
@@ -399,7 +403,7 @@ static errr rd_item(object_type *o_ptr)
 
 
 	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3);
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 
 	/* Paranoia */
@@ -1263,6 +1267,7 @@ static errr rd_randarts(void)
 				rd_u32b(&a_ptr->flags1);
 				rd_u32b(&a_ptr->flags2);
 				rd_u32b(&a_ptr->flags3);
+				rd_u32b(&a_ptr->flags4);
 
 				rd_byte(&a_ptr->level);
 				rd_byte(&a_ptr->rarity);
@@ -1299,6 +1304,7 @@ static errr rd_randarts(void)
 				rd_u32b(&tmp32u); /* a_ptr->flags1 */
 				rd_u32b(&tmp32u); /* a_ptr->flags2 */
 				rd_u32b(&tmp32u); /* a_ptr->flags3 */
+				rd_u32b(&tmp32u); /* a_ptr->flags4 */
 
 				rd_byte(&tmp8u); /* a_ptr->level */
 				rd_byte(&tmp8u); /* a_ptr->rarity */
@@ -2056,11 +2062,12 @@ static errr rd_savefile_new_aux(void)
 			rd_u32b(&n_ptr->can_flags1);
 			rd_u32b(&n_ptr->can_flags2);
 			rd_u32b(&n_ptr->can_flags3);
+			rd_u32b(&n_ptr->can_flags4);
 
 			rd_u32b(&n_ptr->not_flags1);
 			rd_u32b(&n_ptr->not_flags2);
 			rd_u32b(&n_ptr->not_flags3);
-
+			rd_u32b(&n_ptr->not_flags4);
 		}
 
 		/* Activations */
@@ -2096,14 +2103,17 @@ static errr rd_savefile_new_aux(void)
 				rd_u32b(&n_ptr->can_flags1);
 				rd_u32b(&n_ptr->can_flags2);
 				rd_u32b(&n_ptr->can_flags3);
+				rd_u32b(&n_ptr->can_flags4);
 
 				rd_u32b(&n_ptr->may_flags1);
 				rd_u32b(&n_ptr->may_flags2);
 				rd_u32b(&n_ptr->may_flags3);
+				rd_u32b(&n_ptr->may_flags4);
 
 				rd_u32b(&n_ptr->not_flags1);
 				rd_u32b(&n_ptr->not_flags2);
 				rd_u32b(&n_ptr->not_flags3);
+				rd_u32b(&n_ptr->not_flags4);
 			}
 
 			/* Oops */
@@ -2152,10 +2162,12 @@ static errr rd_savefile_new_aux(void)
 			n_ptr->can_flags1 = n2_ptr->can_flags1;
 			n_ptr->can_flags2 = n2_ptr->can_flags2;
 			n_ptr->can_flags3 = n2_ptr->can_flags3;
+			n_ptr->can_flags4 = n2_ptr->can_flags4;
 
 			n_ptr->not_flags1 = n2_ptr->not_flags1;
 			n_ptr->not_flags2 = n2_ptr->not_flags2;
 			n_ptr->not_flags3 = n2_ptr->not_flags3;
+			n_ptr->not_flags4 = n2_ptr->not_flags4;
 		}
 
 		/* Activations */

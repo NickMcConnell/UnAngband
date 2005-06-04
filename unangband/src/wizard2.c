@@ -223,13 +223,13 @@ static void wiz_display_item(const object_type *o_ptr)
 {
 	int j = 0;
 
-	u32b f1, f2, f3;
+	u32b f1, f2, f3, f4;
 
 	char buf[256];
 
 
 	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3);
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 	/* Clear screen */
 	Term_clear();
@@ -370,7 +370,7 @@ static int wiz_create_itemtype(void)
 	/* Clear screen */
 	Term_clear();
 
-	/* We have to search the whole itemlist. */
+	/* We have to search the whole item list. */
 	for (num = 0, i = 1; (num < 60) && (i < z_info->k_max); i++)
 	{
 		object_kind *k_ptr = &k_info[i];

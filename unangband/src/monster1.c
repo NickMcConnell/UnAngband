@@ -425,11 +425,11 @@ static void describe_monster_drop(int r_idx, const monster_lore *l_ptr)
 	/* Drops gold and/or items */
 	if (l_ptr->drop_gold || l_ptr->drop_item)
 	{
-		/* Intro */
-		text_out(format("%^s may carry", wd_he[msex]));
-
 		/* Count maximum drop */
 		n = MAX(l_ptr->drop_gold, l_ptr->drop_item);
+
+		/* Intro */
+		text_out(format("%^s may carry", wd_he[msex]));
 
 		/* One drop (may need an "n") */
 		if (n == 1)
@@ -473,27 +473,33 @@ static void describe_monster_drop(int r_idx, const monster_lore *l_ptr)
 
 		/* Collect special abilities. */
 		vn = 0;
-		if (l_ptr->flags7 & (RF7_DROP_CHEST)) vp[vn++] = "chest";
-		if (l_ptr->flags7 & (RF7_DROP_TOOL)) vp[vn++] = "tool";
-		if (l_ptr->flags7 & (RF7_DROP_LITE)) vp[vn++] = "lite";
-		if (l_ptr->flags7 & (RF7_DROP_WEAPON)) vp[vn++] = "weapon";
-		if (l_ptr->flags7 & (RF7_DROP_MISSILE)) vp[vn++] = "missile weapon";
-		if (l_ptr->flags7 & (RF7_DROP_ARMOR)) vp[vn++] = "armour";
-		if (l_ptr->flags7 & (RF7_DROP_CLOTHES)) vp[vn++] = "garment";
-		if (l_ptr->flags7 & (RF7_DROP_JEWELRY)) vp[vn++] = "adornment";
-		if (l_ptr->flags7 & (RF7_DROP_RSW)) vp[vn++] = "magical device";
-		if (l_ptr->flags7 & (RF7_DROP_WRITING)) vp[vn++] = "written item";
-		if (l_ptr->flags7 & (RF7_DROP_MUSIC)) vp[vn++] = "musical item";
-		if (l_ptr->flags7 & (RF7_DROP_POTION)) vp[vn++] = "potion";
-		if (l_ptr->flags7 & (RF7_DROP_FOOD)) vp[vn++] = "edible item";
-		if (l_ptr->flags7 & (RF7_DROP_JUNK)) vp[vn++] = "junk item";
 
 		/* Objects */
-		if (((!n) || (!vn))&& (l_ptr->drop_item))
+		if (l_ptr->drop_item)
 		{
-			/* Dump "object(s)" */
-			if (get_food_type(r_ptr)) { vp[0] = "mushroom"; vn = 1; }
-			else vp[vn++] = "object";
+			if (l_ptr->flags7 & (RF7_DROP_CHEST)) vp[vn++] = "chest";
+			if (l_ptr->flags7 & (RF7_DROP_WEAPON)) vp[vn++] = "weapon";
+			if (l_ptr->flags7 & (RF7_DROP_MISSILE)) vp[vn++] = "missile weapon";
+			if (l_ptr->flags7 & (RF7_DROP_ARMOR)) vp[vn++] = "armour";
+			if (l_ptr->flags7 & (RF7_DROP_CLOTHES)) vp[vn++] = "garment";
+			if (l_ptr->flags7 & (RF7_DROP_TOOL)) vp[vn++] = "tool";
+			if (l_ptr->flags7 & (RF7_DROP_LITE)) vp[vn++] = "lite";
+			if (l_ptr->flags7 & (RF7_DROP_JEWELRY)) vp[vn++] = "adornment";
+			if (l_ptr->flags7 & (RF7_DROP_RSW)) vp[vn++] = "magical device";
+			if (l_ptr->flags7 & (RF7_DROP_WRITING)) vp[vn++] = "written item";
+			if (l_ptr->flags7 & (RF7_DROP_MUSIC)) vp[vn++] = "musical item";
+			if (l_ptr->flags7 & (RF7_DROP_POTION)) vp[vn++] = "potion";
+			if (l_ptr->flags7 & (RF7_DROP_FOOD)) vp[vn++] = "edible item";
+			if (l_ptr->flags7 & (RF7_DROP_JUNK)) vp[vn++] = "junk item";
+
+			/* Only drop mushrooms? */
+			if (get_food_type(r_ptr))
+			{
+				vn = 0;
+				vp[vn++] = "mushroom";
+			}
+
+			if (!vn) vp[vn++] = "special object";
 		}
 
 		/* Treasures */

@@ -170,6 +170,7 @@ static void wr_item(const object_type *o_ptr)
 	
 	if ((variant_pval_stacks) || (variant_time_stacks)) wr_byte(o_ptr->stackc);
 
+	wr_byte(o_ptr->show_idx);
 	wr_byte(o_ptr->discount);
 
 	wr_byte(o_ptr->number);
@@ -208,14 +209,17 @@ static void wr_item(const object_type *o_ptr)
 		wr_u32b(o_ptr->can_flags1);
 		wr_u32b(o_ptr->can_flags2);
 		wr_u32b(o_ptr->can_flags3);
+		wr_u32b(o_ptr->can_flags4);
 
 		wr_u32b(o_ptr->may_flags1);
 		wr_u32b(o_ptr->may_flags2);
 		wr_u32b(o_ptr->may_flags3);
+		wr_u32b(o_ptr->may_flags4);
 
 		wr_u32b(o_ptr->not_flags1);
 		wr_u32b(o_ptr->not_flags2);
 		wr_u32b(o_ptr->not_flags3);
+		wr_u32b(o_ptr->not_flags4);
 	}
 
 	if (variant_usage_id) wr_s16b(o_ptr->usage);
@@ -734,6 +738,7 @@ static void wr_randarts(void)
 		wr_u32b(a_ptr->flags1);
 		wr_u32b(a_ptr->flags2);
 		wr_u32b(a_ptr->flags3);
+		wr_u32b(a_ptr->flags4);
 
 		wr_byte(a_ptr->level);
 		wr_byte(a_ptr->rarity);
@@ -1110,10 +1115,12 @@ static bool wr_savefile_new(void)
 			wr_u32b(n_ptr->can_flags1);
 			wr_u32b(n_ptr->can_flags2);
 			wr_u32b(n_ptr->can_flags3);
+			wr_u32b(n_ptr->can_flags4);
 
 			wr_u32b(n_ptr->not_flags1);
 			wr_u32b(n_ptr->not_flags2);
 			wr_u32b(n_ptr->not_flags3);
+			wr_u32b(n_ptr->not_flags4);
 		}
 
 		/* Activations */
@@ -1136,14 +1143,17 @@ static bool wr_savefile_new(void)
                         wr_u32b(n_ptr->can_flags1);
                         wr_u32b(n_ptr->can_flags2);
                         wr_u32b(n_ptr->can_flags3);
+                        wr_u32b(n_ptr->can_flags4);
 
                         wr_u32b(n_ptr->may_flags1);
                         wr_u32b(n_ptr->may_flags2);
                         wr_u32b(n_ptr->may_flags3);
+                        wr_u32b(n_ptr->may_flags4);
 
                         wr_u32b(n_ptr->not_flags1);
                         wr_u32b(n_ptr->not_flags2);
                         wr_u32b(n_ptr->not_flags3);
+                        wr_u32b(n_ptr->not_flags4);
                 }
 
                 /* Oops */

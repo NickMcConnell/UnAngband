@@ -117,7 +117,8 @@
  * Number of grids in each screen (vertically)
  * Must be a multiple of PANEL_HGT (at least 2x)
  */
-#define SCREEN_HGT	((Term->hgt - ROW_MAP - 1 - (show_sidebar ? 0 : 1)) / (use_trptile ? 3 : (use_dbltile ? 2 : 1)))
+#define SCREEN_HGT	(((Term->hgt - ROW_MAP - 1 - (show_sidebar ? 0 : 1)) / \
+				(use_trptile ? 3 : (use_dbltile ? 2 : 1)) - (show_itemlist ? 1 : 0)))
 
 /*
  * Number of grids in each screen (horizontally)
@@ -459,7 +460,7 @@
 /*
  * Indexes used for various "equipment" slots (hard-coded by savefiles, etc).
  */
-#define INVEN_WIELD		24
+#define INVEN_WIELD	24
 #define INVEN_BOW       25
 #define INVEN_LEFT      26
 #define INVEN_RIGHT     27
@@ -477,6 +478,11 @@
  * Total number of inventory slots (hard-coded).
  */
 #define INVEN_TOTAL	36
+
+/*
+ * Total number of show item slots (hard-coded).
+ */
+#define SHOWN_TOTAL	36
 
 
 /*
@@ -535,67 +541,86 @@
 #define ROW_TITLE		3
 #define COL_TITLE		0	/* <title> or <mode> */
 
-#define ROW_LEVEL		(show_sidebar ? 4 : Term->hgt - 1)
+#define ROW_LEVEL		(show_sidebar ? 4 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
+					: (use_dbltile ? 3 : 2)) : 1))
 #define COL_LEVEL		0	/* "LEVEL xxxxxx" */
 
-#define ROW_EXP		(show_sidebar ? 5 : Term->hgt - 1)
+#define ROW_EXP		(show_sidebar ? 5 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
+					: (use_dbltile ? 3 : 2)) : 1))
 #define COL_EXP		(show_sidebar ? 0 : 7)	/* "EXP xxxxxxxx" */
 
-#define ROW_GOLD		(show_sidebar ? 6 : Term->hgt - 1)
+#define ROW_GOLD		(show_sidebar ? 6 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
+					: (use_dbltile ? 3 : 2)): 1))
 #define COL_GOLD		(show_sidebar ? 0 : 20)	/* "AU xxxxxxxxx" */
 
-#define ROW_STAT		(show_sidebar ? 8 : Term->hgt - 2)
+#define ROW_STAT		(show_sidebar ? 8 : Term->hgt - (show_itemlist ? (use_trptile ? 5 \
+					: (use_dbltile ? 4 : 3)): 2))
 #define COL_STAT		0	/* "xxx   xxxxxx" */
 
-#define ROW_AC		(show_sidebar ? 15 : Term->hgt - 1)
+#define ROW_AC		(show_sidebar ? 15 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
+					: (use_dbltile ? 3 : 2)): 1))
 #define COL_AC		(show_sidebar ? 0 : 33)	/* "Cur AC xxxxx" */
 
-#define ROW_MAXHP		(show_sidebar ? 16 : Term->hgt - 1)
+#define ROW_MAXHP		(show_sidebar ? 16 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
+					: (use_dbltile ? 3 : 2)): 1))
 #define COL_MAXHP		(show_sidebar ? 0 : 48)	/* "Max HP xxxxx" */
 
-#define ROW_CURHP		(show_sidebar ? 17 : Term->hgt - 1)
+#define ROW_CURHP		(show_sidebar ? 17 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
+					: (use_dbltile ? 3 : 2)): 1))
 #define COL_CURHP		(show_sidebar ? 0 : 40)	/* "Cur HP xxxxx" */
 
-#define ROW_MAXSP		(show_sidebar ? 18 : Term->hgt - 1)
+#define ROW_MAXSP		(show_sidebar ? 18 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
+					: (use_dbltile ? 3 : 2)): 1))
 #define COL_MAXSP		(show_sidebar ? 0 : 63)	/* "Max SP xxxxx" */
 
-#define ROW_CURSP		(show_sidebar ? 19 : Term->hgt - 1)
+#define ROW_CURSP		(show_sidebar ? 19 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
+					: (use_dbltile ? 3 : 2)): 1))
 #define COL_CURSP		(show_sidebar ? 0 : 55)	/* "Cur SP xxxxx" */
 
 #define ROW_INFO		20
 #define COL_INFO		0	/* "xxxxxxxxxxxx" */
 
-#define ROW_CUT		(show_sidebar ? 21 : Term->hgt -2)
+#define ROW_CUT		(show_sidebar ? 21 : Term->hgt - (show_itemlist ? (use_trptile ? 5 \
+					: (use_dbltile ? 4 : 3)): 2))
 #define COL_CUT		(show_sidebar ? 0 : 18)	/* <cut> */
 
-#define ROW_STUN		(show_sidebar ? 22 : Term->hgt -2)
+#define ROW_STUN		(show_sidebar ? 22 : Term->hgt - (show_itemlist ? (use_trptile ? 5 \
+					: (use_dbltile ? 4 : 3)): 2))
 #define COL_STUN		(show_sidebar ? 0 : 22)	/* <stun> */
 
-#define ROW_HUNGRY	(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define ROW_HUNGRY	(show_sidebar ? Term->hgt - 1 : Term->hgt - (show_itemlist ? (use_trptile ? 5 \
+					: (use_dbltile ? 4 : 3)): 2))
 #define COL_HUNGRY	(show_sidebar ? 0 : 26)	/* "Weak" / "Hungry" / "Full" / "Gorged" */
 
-#define ROW_BLIND		(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define ROW_BLIND		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
+					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)): 2))
 #define COL_BLIND		(show_sidebar ? 7 : 30)	/* "Blind" */
 
-#define ROW_CONFUSED	(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define ROW_CONFUSED	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
+					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
 #define COL_CONFUSED	(show_sidebar ? 13 : 34)	/* "Confused" */
 
-#define ROW_AFRAID	(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define ROW_AFRAID	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
+					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
 #define COL_AFRAID	(show_sidebar ? 22 : 38)	/* "Afraid" */
 
-#define ROW_POISONED	(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define ROW_POISONED	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
+					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
 #define COL_POISONED	(show_sidebar ? 29 : 42)	/* "Poisoned" */
 
-#define ROW_STATE		(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define ROW_STATE		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
+					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
 #define COL_STATE		(show_sidebar ? 38 : 67)	/* <state> */
 
-#define ROW_SPEED		(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define ROW_SPEED		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
+					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
 #define COL_SPEED		(show_sidebar ? 49 : 52)	/* "Slow (-NN)" or "Fast (+NN)" */
 
-#define ROW_STUDY		(show_sidebar ? Term->hgt - 1 : Term->hgt - 2)
+#define ROW_STUDY		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
+					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
 #define COL_STUDY		(show_sidebar ? 64 : 46)	/* "Study" */
 
-#define ROW_DEPTH		Term->hgt - 1
+#define ROW_DEPTH		Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1)
 #define COL_DEPTH		(show_sidebar ? 70 : 72)	/* "Lev NNN" / "NNNN ft" */
 
 
@@ -2368,6 +2393,7 @@
 #define PR_EXTRA		0x01000000L	/* Display Extra Info */
 #define PR_BASIC		0x02000000L	/* Display Basic Info */
 /* xxx */
+#define PR_ITEM_LIST		0x04000000L     /* Display Item List */
 #define PR_MAP			0x08000000L	/* Display Map */
 /* xxx (many) */
 
@@ -2508,7 +2534,7 @@
 /*
  * Number of special inscriptions, plus one.
  */
-#define MAX_INSCRIP			29
+#define MAX_INSCRIP			30
 
 
 /*
@@ -2521,7 +2547,7 @@
 #define SM_OPP_FIRE		0x00000004
 #define SM_OPP_COLD		0x00000008
 #define SM_OPP_POIS		0x00000010
-#define SM_OPP_XXX1		0x00000020
+#define SM_OPP_FEAR		0x00000020
 #define SM_OPP_XXX2		0x00000040
 #define SM_OPP_XXX3		0x00000080
 #define SM_IMM_XXX5		0x00000100
@@ -2574,8 +2600,8 @@
 #define TR1_DEX    0x00000008L     /* DEX += "pval" */
 #define TR1_CON    0x00000010L     /* CON += "pval" */
 #define TR1_CHR    0x00000020L     /* CHR += "pval" */
-#define TR1_XXX1   0x00000040L     /* (reserved) */
-#define TR1_XXX2   0x00000080L     /* (reserved) */
+#define TR1_HP   0x00000040L     /* HP += "pval" */
+#define TR1_SP   0x00000080L     /* SP += "pval" */
 #define TR1_STEALTH       0x00000100L     /* Stealth += "pval" */
 #define TR1_SEARCH 0x00000200L     /* Search += "pval" */
 #define TR1_INFRA  0x00000400L     /* Infra += "pval" */
@@ -2667,6 +2693,40 @@
 #define TR3_HEAVY_CURSE  0x40000000L     /* Item has Heavy Curse */
 #define TR3_PERMA_CURSE  0x80000000L     /* Item has Perma Curse */
 
+#define TR4_BRAND_DARK	0x000000001L	/* Weapon has dark brand */
+#define TR4_BRAND_LITE	0x000000002L	/* Weapon has lite brand */
+#define TR4_HURT_LITE	0x000000004L    /* Item makes wielder vulnerible to lite */
+#define TR4_HURT_WATER	0x000000008L    /* Item makes wielder vulnerible to water */
+#define TR4_VAMP_HP   	0x00000010L     /* Weapon restores user hp when does damage  */
+#define TR4_VAMP_MANA  	0x00000020L     /* Weapon restores user sp when does damage  */
+#define TR4_VAMP_EXP   	0x00000040L     /* Weapon restores user experience when does damage  */
+#define TR4_VAMP_FOOD   0x00000080L     /* Weapon feeds user when does damage  */
+#define TR4_HUNGER      0x00000100L     /* Item makes user eat more food */
+#define TR4_SLAY_MAN 	0x00000200L     	/* Weapon slays humans */
+#define TR4_SLAY_ELF  	0x00000400L     	/* Weapon slays elves */
+#define TR4_SLAY_DWARF 	0x00000800L     	/* Weapon slays dwarves */
+#define TR4_ANCHOR  	0x00001000L     	/* Item prevents teleportation */
+#define TR4_SILENT  	0x00002000L     	/* Item prevents spell casting*/
+#define TR4_STATIC  	0x00004000L     	/* Item prevents item activation */
+#define TR4_WINDY  	0x00008000L     	/* Item prevents missiles / thrown items */
+#define TR4_ANIMAL  	0x00010000L     	/* Item makes wielder animal */
+#define TR4_EVIL    	0x00020000L     	/* Item makes wielder evil */
+#define TR4_UNDEAD  	0x00040000L     	/* Item makes wielder undead */
+#define TR4_DEMON   	0x00080000L     	/* Item makes wielder demon */
+#define TR4_ORC     	0x00100000L     	/* Item makes wielder orc */
+#define TR4_TROLL   	0x00200000L     	/* Item makes wielder troll */
+#define TR4_GIANT   	0x00400000L     	/* Item makes wielder giant */
+#define TR4_DRAGON  	0x00800000L     	/* Item makes wielder dragon */
+#define TR4_MAN     	0x01000000L     /* Item makes wielder man */
+#define TR4_DWARF   	0x02000000L	 /* Item makes wielder dwarf */
+#define TR4_ELF   	0x04000000L	/* Item makes wielder elf */
+#define TR4_HURT_POIS   0x08000000L     /* Item makes wielder vulnerible to acid */
+#define TR4_HURT_ACID   0x10000000L     /* Item makes wielder vulnerible to acid */
+#define TR4_HURT_ELEC   0x20000000L     /* Item makes wielder vulnerible to elec */
+#define TR4_HURT_FIRE   0x40000000L     /* Item makes wielder vulnerible to fire */
+#define TR4_HURT_COLD   0x80000000L     /* Item makes wielder vulnerible to cold */
+
+
 
 /*
  * Hack -- flag set 1 -- mask for "pval-dependant" flags.
@@ -2674,7 +2734,7 @@
  */
 #define TR1_PVAL_MASK \
 	(TR1_STR | TR1_INT | TR1_WIS | TR1_DEX | \
-	 TR1_CON | TR1_CHR | TR1_XXX1 | TR1_XXX2 | \
+	 TR1_CON | TR1_CHR | TR1_HP | TR1_SP | \
 	 TR1_STEALTH | TR1_SEARCH | TR1_INFRA | TR1_TUNNEL | \
 	 TR1_SPEED | TR1_BLOWS | TR1_SHOTS | TR1_MIGHT)
 
@@ -2685,85 +2745,24 @@
  (TR2_IGNORE_ACID | TR2_IGNORE_ELEC | TR2_IGNORE_FIRE | \
   TR2_IGNORE_COLD | TR2_IGNORE_WATER | TR2_IGNORE_THEFT)
 
+/*
+ * Flag set 3 -- mask for "sense" flags.
+ */
+
+#define TR3_SENSE_MASK \
+	(TR3_TELEPATHY | TR3_ESP_DEMON | TR3_ESP_DRAGON | \
+	 TR3_ESP_GIANT | TR3_ESP_ORC | TR3_ESP_TROLL | \
+	 TR3_ESP_UNDEAD | TR3_ESP_NATURE | TR3_SEE_INVIS)
 
 /*
  * Hack -- special "xtra" object flag info (type)
  */
-#define OBJECT_XTRA_TYPE_SUSTAIN 1
-#define OBJECT_XTRA_TYPE_RESIST  2
-#define OBJECT_XTRA_TYPE_POWER   3
-#define OBJECT_XTRA_TYPE_ELEMENT	4	/* Base 4 resists */
-#define OBJECT_XTRA_TYPE_IGNORE  5       /* Ignore 5 damage */
-#define OBJECT_XTRA_TYPE_BLESSED	6
-#define OBJECT_XTRA_TYPE_SLAY		7
-#define OBJECT_XTRA_TYPE_BRAND   8       /* Fire/frost brand */
-#define OBJECT_XTRA_TYPE_POISON  9
-#define OBJECT_XTRA_TYPE_LITE    10
-#define OBJECT_XTRA_TYPE_PROOF_ACID     11      /* Specific ignores */
-#define OBJECT_XTRA_TYPE_PROOF_FIRE     12
-#define OBJECT_XTRA_TYPE_PROOF_WATER    13
-#define OBJECT_XTRA_TYPE_PROOF_THEFT    14
+#define OBJECT_XTRA_MAX_HIDDEN 16
 
-#define MAX_HIDDEN 15
-
-#define OBJECT_XTRA_MIN_RUNES    16
+#define OBJECT_XTRA_MIN_RUNES    32	/* Take advantage of future proofing */
 
 #define MAX_RUNE_FLAGS    4
 
-/*
- * Hack -- special "xtra" object flag info (what flag set)
- */
-#define OBJECT_XTRA_WHAT_SUSTAIN 2
-#define OBJECT_XTRA_WHAT_RESIST  2
-#define OBJECT_XTRA_WHAT_POWER   3
-#define OBJECT_XTRA_WHAT_ELEMENT	2	/* Base 4 resists */
-#define OBJECT_XTRA_WHAT_IGNORE  2       /* Ignore 4 elements */
-#define OBJECT_XTRA_WHAT_BLESSED	3
-#define OBJECT_XTRA_WHAT_SLAY		1
-#define OBJECT_XTRA_WHAT_BRAND		1
-#define OBJECT_XTRA_WHAT_POISON  1
-#define OBJECT_XTRA_WHAT_LITE    3
-#define OBJECT_XTRA_WHAT_PROOF_ACID     2
-#define OBJECT_XTRA_WHAT_PROOF_FIRE     2      /* Specific ignores */
-#define OBJECT_XTRA_WHAT_PROOF_WATER    2
-#define OBJECT_XTRA_WHAT_PROOF_THEFT    2
-
-
-/*
- * Hack -- special "xtra" object flag info (base flag value)
- */
-#define OBJECT_XTRA_BASE_SUSTAIN TR2_SUST_STR
-#define OBJECT_XTRA_BASE_RESIST  TR2_RES_POIS
-#define OBJECT_XTRA_BASE_POWER   TR3_SLOW_DIGEST
-#define OBJECT_XTRA_BASE_ELEMENT TR2_RES_ACID    /* Base 4 resists */
-#define OBJECT_XTRA_BASE_IGNORE  TR3_IGNORE_ACID /* Ignore 4 elements */
-#define OBJECT_XTRA_BASE_BLESSED TR3_BLESSED
-#define OBJECT_XTRA_BASE_SLAY    TR1_SLAY_NATURAL
-#define OBJECT_XTRA_BASE_BRAND   TR1_BRAND_COLD
-#define OBJECT_XTRA_BASE_POISON  TR1_BRAND_POIS
-#define OBJECT_XTRA_BASE_LITE    TR3_LITE
-#define OBJECT_XTRA_BASE_PROOF_ACID     TR2_IGNORE_ACID
-#define OBJECT_XTRA_BASE_PROOF_FIRE     TR2_IGNORE_FIRE      /* Specific ignores */
-#define OBJECT_XTRA_BASE_PROOF_WATER    TR2_IGNORE_WATER
-#define OBJECT_XTRA_BASE_PROOF_THEFT	TR2_IGNORE_THEFT
-
-/*
- * Hack -- special "xtra" object flag info (number of flags)
- */
-#define OBJECT_XTRA_SIZE_SUSTAIN 6
-#define OBJECT_XTRA_SIZE_RESIST  12
-#define OBJECT_XTRA_SIZE_POWER   15
-#define OBJECT_XTRA_SIZE_ELEMENT 4       /* Base 4 resists */
-#define OBJECT_XTRA_SIZE_IGNORE  4       /* Ignore damage */
-#define OBJECT_XTRA_SIZE_BLESSED 1
-#define OBJECT_XTRA_SIZE_SLAY    8
-#define OBJECT_XTRA_SIZE_BRAND   3	/* Brands except acid brand */
-#define OBJECT_XTRA_SIZE_POISON  1
-#define OBJECT_XTRA_SIZE_LITE    1
-#define OBJECT_XTRA_SIZE_PROOF_ACID     1
-#define OBJECT_XTRA_SIZE_PROOF_FIRE     1       /* Specific ignores */
-#define OBJECT_XTRA_SIZE_PROOF_WATER    1
-#define OBJECT_XTRA_SIZE_PROOF_THEFT    1
 
 /*** Monster flags ***/
 
@@ -3405,6 +3404,7 @@
 #define OPT_view_surface_lite 85
 #define OPT_variant_study_more   86
 #define OPT_show_sidebar	87
+#define OPT_show_itemlist	88
 /* xxx xxx */
 #define OPT_birth_point_based    (OPT_BIRTH+0)
 #define OPT_birth_auto_roller    (OPT_BIRTH+1)
@@ -3641,6 +3641,7 @@
 #define variant_save_feats op_ptr->opt[OPT_variant_save_feats]
 #define variant_study_more op_ptr->opt[OPT_variant_study_more]
 #define show_sidebar op_ptr->opt[OPT_show_sidebar]
+#define show_itemlist op_ptr->opt[OPT_show_itemlist]
 
 
 /*

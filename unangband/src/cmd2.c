@@ -1867,10 +1867,10 @@ void do_cmd_alter(void)
  */
 static bool item_tester_hook_throwing(const object_type *o_ptr)
 {
-	u32b f1, f2, f3;
+	u32b f1, f2, f3, f4;
 
 	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3);
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 	/* Check activation flag */
 	if (f3 & (TR3_THROWING)) return (TRUE);

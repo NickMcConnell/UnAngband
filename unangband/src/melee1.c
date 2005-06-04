@@ -705,7 +705,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 			case TV_BOW:
 			{
 				object_type *j_ptr;
-				u32b f1,f2,f3;
+				u32b f1,f2,f3,f4;
 
 				int i, shots = 1;
 
@@ -713,7 +713,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 				j_ptr = o_ptr;
 
 				/* Get bow flags */
-				object_flags(o_ptr,&f1,&f2,&f3);
+				object_flags(o_ptr,&f1,&f2,&f3,&f4);
 
 				/* Apply extra shots */
 				if (f1 & (TR1_SHOTS)) shots += j_ptr->pval;

@@ -1215,13 +1215,13 @@ static int assembly_name3;
  */
 static bool item_tester_hook_assemble(const object_type *o_ptr)
 {
-	u32b f1, f2, f3;
+	u32b f1, f2, f3, f4;
 
 	/* Not assembly */
 	if (o_ptr->tval != TV_ASSEMBLY) return (FALSE);
 
 	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3);
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 	/* Check activation flag */
 	if (f3 & (TR3_ACTIVATE)) return (TRUE);
@@ -1466,7 +1466,7 @@ void do_cmd_assemble(void)
  */
 static bool item_tester_hook_activate(const object_type *o_ptr)
 {
-	u32b f1, f2, f3;
+	u32b f1, f2, f3, f4;
 
 	/* Not known */
 	if (!object_known_p(o_ptr)) return (FALSE);
@@ -1475,7 +1475,7 @@ static bool item_tester_hook_activate(const object_type *o_ptr)
 	if ((o_ptr->timeout) && ((!o_ptr->stackc) || (o_ptr->stackc >= o_ptr->number))) return (FALSE);
 
 	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3);
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 	/* Check activation flag */
 	if (f3 & (TR3_ACTIVATE)) return (TRUE);
@@ -1646,7 +1646,7 @@ void do_cmd_activate(void)
 		}
 
 		/* We know it activates */
-		object_can_flags(o_ptr,0x0L,0x0L,TR3_ACTIVATE);
+		object_can_flags(o_ptr,0x0L,0x0L,TR3_ACTIVATE,0x0L);
 
 		/* Count activations */
 		if (a_ptr->activated < MAX_SHORT) a_ptr->activated++;

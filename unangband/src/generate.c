@@ -1820,7 +1820,8 @@ static void get_room_info(int y, int x)
 		while ((chart != d_info[i].chart) || (roll > d_info[i].roll)) i++;
 
 		/* If not allowed on this level, drop to maximum result */
-		if ((p_ptr->depth < d_info[i].level) || ((d_info[i].l_flag) && !(level_flag & d_info[i].l_flag)))
+		if ((p_ptr->depth < d_info[i].level)
+			|| ((d_info[i].l_flag) && !(level_flag & d_info[i].l_flag)))
 		{
 			while ((chart != d_info[i].chart) || (100 > d_info[i].roll)) i++;
 		}
@@ -1840,7 +1841,7 @@ static void get_room_info(int y, int x)
 		/* Place monster if needed */
 		if ((d_info[i].r_flag) || (d_info[i].r_char))
 		{
-		  room_info_mon_flag = d_info[i].r_flag -1;
+			room_info_mon_flag = d_info[i].r_flag -1;
 			room_info_mon_char = d_info[i].r_char;
 
 			get_mon_num_hook = room_info_mon;

@@ -33,16 +33,21 @@ parts.
 
 - Added statues of varying values. These are all extremely heavy however.
 
-- Added flying skulls of various types.
+- Added item abilities including vampiric weapons of various flavours, light and dark
+brands, anti-teleport items, racial-based items including slay human, slay elf and
+slay dwarf items, and items that cause vulneribilities to various elements. Much back-
+end code still to be fixed. In particular, you cannot wield both a racial flag item
+and its equivelent slay, or a vulneribility item and its equivelent brand.
 
-- Upgraded unique cats.
-
-- Amended various monster types to do battering and wounding damage as per Sangband.
 
 ### User Interface ###
 
 - Monster recall now reports what particular types of items are dropped by each
 monster.
+
+- 'v' toggles visual mode off as well as on.
+
+- Show list of all items at the bottom of the screen.
 
 ### Bug fixes ###
 
@@ -79,6 +84,7 @@ projection algorithms. This has to be done differently from Sangband et al.
 as there can be terrain in Unangband that blocks line of sight but not 
 spells or arrows (eg smoke). At the moment, most of these new flags are
 not used. WARNING: AT THE MOMENT THIS BREAKS SAVE FILE COMPATIBILITY!!!!
+
 
 Unangband 0.5.5: "New Years Resolution"
 
