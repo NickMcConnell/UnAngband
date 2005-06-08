@@ -1499,9 +1499,7 @@ static const o_flag_desc brand_flags4_desc[] =
 static const o_flag_desc vamp_flags4_desc[] =
 {
 	{ TR4_VAMP_HP,		"hit points" },
-	{ TR4_VAMP_MANA,	"mana" },
-	{ TR4_VAMP_EXP,		"experience" },
-	{ TR4_VAMP_FOOD,	"sustenance" }
+	{ TR4_VAMP_MANA,	"mana" }
 };
 
 
@@ -1623,15 +1621,15 @@ static const o_flag_desc sense_flags3_desc[] =
  */
 static const o_flag_desc racial_flags4_desc[] =
 {
-	{ TR4_ANIMAL,	"animalistic" },
+	{ TR4_ANIMAL,	"an animal" },
 	{ TR4_EVIL,	"evil" },
 	{ TR4_UNDEAD,	"undead" },
 	{ TR4_DEMON,	"demonic" },
 	{ TR4_ORC,	"orcish" },
-	{ TR4_TROLL,	"trollish" },
+	{ TR4_TROLL,	"a troll" },
 	{ TR4_GIANT,	"gigantic" },
 	{ TR4_DRAGON,	"draconic" },
-	{ TR4_MAN,	"mannish" },
+	{ TR4_MAN,	"a man" },
 	{ TR4_DWARF,	"dwarven" },
 	{ TR4_ELF,	"elven" }
 };
@@ -2069,7 +2067,7 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 		/*
 		 * Special flags
 		 */
-		list_ptr = spoiler_flag_aux(f4, bad_flags4_desc, list_ptr, N_ELEMENTS(bad_flags4_desc));
+		list_ptr = spoiler_flag_aux(f4, vulner_flags4_desc, list_ptr, N_ELEMENTS(vulner_flags4_desc));
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -2234,7 +2232,7 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 		/*
 		 * Special flags
 		 */
-		list_ptr = spoiler_flag_aux(f4, racial_flags4_desc, list_ptr, N_ELEMENTS(bad_flags4_desc));
+		list_ptr = spoiler_flag_aux(f4, racial_flags4_desc, list_ptr, N_ELEMENTS(racial_flags4_desc));
 
 		/* Terminate the description list */
 		*list_ptr = NULL;

@@ -638,7 +638,7 @@ static cptr names_list =
 
 /* Total number of different slay types used */
 
-#define SLAY_MAX 0x00010000L
+#define SLAY_MAX 0x00200000L
 
 /*
  * Average damage for good ego ammo of various types, used for balance
@@ -753,8 +753,12 @@ static cptr names_list =
 #define ART_IDX_BOW_SENSE 76
 #define ART_IDX_NONWEAPON_SENSE 77
 
+#define ART_IDX_MELEE_RESTRICT 78
+#define ART_IDX_BOW_RESTRICT 79
+#define ART_IDX_NONWEAPON_RESTRICT 80
+
 /* Total of abilities */
-#define ART_IDX_TOTAL 78
+#define ART_IDX_TOTAL 81
 
 /* End of ESP_IDX defines ARD_ESP */
 
@@ -777,18 +781,18 @@ static cptr names_list =
 
 /* ARD_ESP -- following changed to include ARD_IDX_BOW_SENSE */
 static s16b art_idx_bow[] =
-	{ART_IDX_BOW_SHOTS, ART_IDX_BOW_MIGHT, ART_IDX_BOW_SENSE};
+	{ART_IDX_BOW_SHOTS, ART_IDX_BOW_MIGHT, ART_IDX_BOW_SENSE, ART_IDX_BOW_RESTRICT};
 static s16b art_idx_weapon[] =
 	{ART_IDX_WEAPON_HIT, ART_IDX_WEAPON_DAM, ART_IDX_WEAPON_AGGR};
 /* ARD_ESP -- following changed to include ARD_IDX_NONWEAPON_SENSE */
 static s16b art_idx_nonweapon[] =
 	{ART_IDX_NONWEAPON_HIT, ART_IDX_NONWEAPON_DAM, ART_IDX_NONWEAPON_AGGR,
-	ART_IDX_NONWEAPON_SENSE};
+	ART_IDX_NONWEAPON_SENSE, ART_IDX_NONWEAPON_RESTRICT};
 /* ARD_ESP -- following changed to include ARD_IDX_MELEE_SENSE */
 static s16b art_idx_melee[] =
 	{ART_IDX_MELEE_BLESS, ART_IDX_MELEE_BRAND_SLAY, ART_IDX_MELEE_SINV,
 	ART_IDX_MELEE_BLOWS, ART_IDX_MELEE_AC, ART_IDX_MELEE_DICE,
-	ART_IDX_MELEE_WEIGHT, ART_IDX_MELEE_TUNN, ART_IDX_MELEE_SENSE};
+	ART_IDX_MELEE_WEIGHT, ART_IDX_MELEE_TUNN, ART_IDX_MELEE_SENSE, ART_IDX_MELEE_RESTRICT};
 static s16b art_idx_allarmor[] =
 	{ART_IDX_ALLARMOR_WEIGHT};
 static s16b art_idx_boot[] =
@@ -927,7 +931,7 @@ static long *mon_power;
 static long tot_mon_power;
 
 /* Global just for convenience. */
-static int randart_verbose = 0;
+static int randart_verbose = 1;
 
 
 /*ARD_RAND - Extra global variable.
@@ -1555,23 +1559,31 @@ static s32b slay_power(int a_idx)
 	 * but this could be added
 	 */
 
-	if (a_ptr->flags1 & TR1_SLAY_NATURAL) s_index |= 0x0001;
-	if (a_ptr->flags1 & TR1_SLAY_EVIL) s_index |= 0x0002;
-	if (a_ptr->flags1 & TR1_SLAY_UNDEAD) s_index |= 0x0004;
-	if (a_ptr->flags1 & TR1_SLAY_DEMON) s_index |= 0x0008;
-	if (a_ptr->flags1 & TR1_SLAY_ORC) s_index |= 0x0010;
-	if (a_ptr->flags1 & TR1_SLAY_TROLL) s_index |= 0x0020;
-	if (a_ptr->flags1 & TR1_SLAY_GIANT) s_index |= 0x0040;
-	if (a_ptr->flags1 & TR1_SLAY_DRAGON) s_index |= 0x0080;
-	if (a_ptr->flags1 & TR1_KILL_DRAGON) s_index |= 0x0100;
-	if (a_ptr->flags1 & TR1_KILL_DEMON) s_index |= 0x0200;
-	if (a_ptr->flags1 & TR1_KILL_UNDEAD) s_index |= 0x0400;
+	if (a_ptr->flags1 & TR1_SLAY_NATURAL) s_index |= 0x00000001;
+	if (a_ptr->flags1 & TR1_SLAY_EVIL) s_index |= 0x00000002;
+	if (a_ptr->flags1 & TR1_SLAY_UNDEAD) s_index |= 0x00000004;
+	if (a_ptr->flags1 & TR1_SLAY_DEMON) s_index |= 0x00000008;
+	if (a_ptr->flags1 & TR1_SLAY_ORC) s_index |= 0x00000010;
+	if (a_ptr->flags1 & TR1_SLAY_TROLL) s_index |= 0x00000020;
+	if (a_ptr->flags1 & TR1_SLAY_GIANT) s_index |= 0x00000040;
+	if (a_ptr->flags1 & TR1_SLAY_DRAGON) s_index |= 0x00000080;
+	if (a_ptr->flags1 & TR1_KILL_DRAGON) s_index |= 0x00000100;
+	if (a_ptr->flags1 & TR1_KILL_DEMON) s_index |= 0x00000200;
+	if (a_ptr->flags1 & TR1_KILL_UNDEAD) s_index |= 0x00000400;
 
-	if (a_ptr->flags1 & TR1_BRAND_POIS) s_index |= 0x0800;
-	if (a_ptr->flags1 & TR1_BRAND_ACID) s_index |= 0x1000;
-	if (a_ptr->flags1 & TR1_BRAND_ELEC) s_index |= 0x2000;
-	if (a_ptr->flags1 & TR1_BRAND_FIRE) s_index |= 0x4000;
-	if (a_ptr->flags1 & TR1_BRAND_COLD) s_index |= 0x8000;
+	if (a_ptr->flags1 & TR1_BRAND_POIS) s_index |= 0x00000800;
+	if (a_ptr->flags1 & TR1_BRAND_ACID) s_index |= 0x00001000;
+	if (a_ptr->flags1 & TR1_BRAND_ELEC) s_index |= 0x00002000;
+	if (a_ptr->flags1 & TR1_BRAND_FIRE) s_index |= 0x00004000;
+	if (a_ptr->flags1 & TR1_BRAND_COLD) s_index |= 0x00008000;
+
+	if (a_ptr->flags4 & TR4_BRAND_LITE) s_index |= 0x00010000;
+	if (a_ptr->flags4 & TR4_BRAND_DARK) s_index |= 0x00020000;
+
+	if (a_ptr->flags4 & TR4_SLAY_MAN) s_index |= 0x00040000;
+	if (a_ptr->flags4 & TR4_SLAY_ELF) s_index |= 0x00080000;
+	if (a_ptr->flags4 & TR4_SLAY_DWARF) s_index |= 0x00100000;
+
 
 	/* Look in the cache to see if we know this one yet */
 
@@ -1602,6 +1614,17 @@ static s32b slay_power(int a_idx)
 		if ( (r_ptr->flags3 & (RF3_ANIMAL | RF3_INSECT | RF3_PLANT))
 			&& (a_ptr->flags1 & TR1_SLAY_NATURAL) )
 				mult = 2;
+
+		/* New brand - brand_lite */
+		if ( (r_ptr->flags3 & (RF3_HURT_LITE))
+			&& (a_ptr->flags4 & TR4_BRAND_LITE) )
+				mult = 2;
+
+		/* New brand - brand_dark */
+		if ( ((r_ptr->flags4 & (RF4_BR_DARK)) || (r_ptr->flags3 & (RF3_ORC)))
+			&& (a_ptr->flags4 & TR4_BRAND_DARK) )
+				mult = 2;
+
 		if ( (r_ptr->flags3 & RF3_EVIL)
 			&& (a_ptr->flags1 & TR1_SLAY_EVIL) )
 				mult = 2;
@@ -1623,6 +1646,24 @@ static s32b slay_power(int a_idx)
 		if ( (r_ptr->flags3 & RF3_DRAGON)
 			&& (a_ptr->flags1 & TR1_SLAY_DRAGON) )
 				mult = 3;
+
+		/* New slay - slay man */
+		if ( (strchr("pqt", r_ptr->d_char))
+			&& (a_ptr->flags4 & TR4_SLAY_MAN) )
+				mult = 3;
+
+		/* New slay - slay elf */
+		if ( (strchr("l", r_ptr->d_char))
+			&& (a_ptr->flags4 & TR4_SLAY_MAN) )
+				mult = 3;
+
+		/* New slay - slay dwarf */
+		if ( (strchr("h", r_ptr->d_char))
+			&& ((strstr(r_name + r_ptr->name, "warf")) || (strstr(r_name + r_ptr->name, "warven")))
+			&& (a_ptr->flags4 & TR4_SLAY_DWARF) )
+				mult = 3;
+
+
 
 		/* Brands get the multiple if monster is NOT resistant */
 
@@ -1689,6 +1730,12 @@ static s32b slay_power(int a_idx)
 		if (a_ptr->flags1 & TR1_BRAND_FIRE) fprintf(randart_log,"Fir ");
 		if (a_ptr->flags1 & TR1_BRAND_COLD) fprintf(randart_log,"Cld ");
 		if (a_ptr->flags1 & TR1_BRAND_POIS) fprintf(randart_log,"Poi ");
+
+		if (a_ptr->flags4 & TR4_BRAND_LITE) fprintf(randart_log,"Lit ");
+		if (a_ptr->flags4 & TR4_BRAND_DARK) fprintf(randart_log,"Drk ");
+		if (a_ptr->flags4 & TR4_SLAY_MAN) fprintf(randart_log,"Man ");
+		if (a_ptr->flags4 & TR4_SLAY_ELF) fprintf(randart_log,"Elf ");
+		if (a_ptr->flags4 & TR4_SLAY_DWARF) fprintf(randart_log,"Dwf ");
 
 		fprintf(randart_log,"times 1000 is: %d\n", (int)((1000 * sv) / tot_mon_power));
 		fflush(randart_log);
@@ -2139,6 +2186,8 @@ static s32b artifact_power(int a_idx)
 	ADD_POWER("regeneration",	 4, TR3_REGEN, 3,);
 	ADD_POWER("blessed",		 1, TR3_BLESSED, 3,);
 
+	ADD_POWER("blood vampire",	 4, TR4_VAMP_HP, 4,);
+	ADD_POWER("mana vampire",	 1, TR4_VAMP_MANA, 4,);
 
 	if (a_ptr->flags3 & TR3_TELEPORT)
 	{
@@ -2169,6 +2218,98 @@ static s32b artifact_power(int a_idx)
 		p -= 4;
 	}
 /*	if (a_ptr->flags3 & TR3_PERMA_CURSE) p -= 40; */
+	if (a_ptr->flags4 & TR4_HURT_LITE)
+	{
+		p -= 20;
+	}
+	if (a_ptr->flags4 & TR4_HURT_WATER)
+	{
+		p -= 20;
+	}
+	if (a_ptr->flags4 & TR4_HUNGER)
+	{
+		p -= 10;
+	}
+	if (a_ptr->flags4 & TR4_ANCHOR)
+	{
+		p -= 1;
+	}
+	if (a_ptr->flags4 & TR4_SILENT)
+	{
+		p -= 20;
+	}
+	if (a_ptr->flags4 & TR4_STATIC)
+	{
+		p -= 15;
+	}
+	if (a_ptr->flags4 & TR4_WINDY)
+	{
+		p -= 15;
+	}
+	if (a_ptr->flags4 & TR4_ANIMAL)
+	{
+		p -= 5;
+	}
+	if (a_ptr->flags4 & TR4_EVIL)
+	{
+		p -= 5;
+	}
+	if (a_ptr->flags4 & TR4_UNDEAD)
+	{
+		p -= 10;
+	}
+	if (a_ptr->flags4 & TR4_DEMON)
+	{
+		p -= 10;
+	}
+	if (a_ptr->flags4 & TR4_ORC)
+	{
+		p -= 3;
+	}
+	if (a_ptr->flags4 & TR4_TROLL)
+	{
+		p -= 3;
+	}
+	if (a_ptr->flags4 & TR4_GIANT)
+	{
+		p -= 5;
+	}
+	if (a_ptr->flags4 & TR4_DRAGON)
+	{
+		p -= 10;
+	}
+	if (a_ptr->flags4 & TR4_MAN)
+	{
+		p -= 3;
+	}
+	if (a_ptr->flags4 & TR4_DWARF)
+	{
+		p -= 3;
+	}
+	if (a_ptr->flags4 & TR4_ELF)
+	{
+		p -= 3;
+	}
+	if (a_ptr->flags4 & TR4_HURT_POIS)
+	{
+		p -= 50;
+	}
+	if (a_ptr->flags4 & TR4_HURT_ACID)
+	{
+		p -= 30;
+	}
+	if (a_ptr->flags4 & TR4_HURT_ELEC)
+	{
+		p -= 40;
+	}
+	if (a_ptr->flags4 & TR4_HURT_FIRE)
+	{
+		p -= 40;
+	}
+	if (a_ptr->flags4 & TR4_HURT_COLD)
+	{
+		p -= 40;
+	}
 
 	return (p);
 }
@@ -2489,6 +2630,7 @@ static s16b choose_item(int a_idx)
 	a_ptr->flags1 = k_ptr->flags1;
 	a_ptr->flags2 = k_ptr->flags2;
 	a_ptr->flags3 = k_ptr->flags3;
+	a_ptr->flags4 = k_ptr->flags4;
 
 	/*
 	 * Dragon armor: remove activation flag.  This is because the current
@@ -2497,8 +2639,10 @@ static s16b choose_item(int a_idx)
 	 * reset later.
 	 */
 	if (a_ptr->tval == TV_DRAG_ARMOR)
+	{
 		a_ptr->flags3 &= ~TR3_ACTIVATE;
-
+		a_ptr->pval = 0;
+	}
 
 	/* Artifacts ignore everything */
 	a_ptr->flags2 |= TR2_IGNORE_MASK;
@@ -2593,6 +2737,17 @@ static void remove_contradictory(artifact_type *a_ptr)
 	if (a_ptr->flags2 & TR2_IM_FIRE) a_ptr->flags2 &= ~(TR2_RES_FIRE);
 	if (a_ptr->flags2 & TR2_IM_COLD) a_ptr->flags2 &= ~(TR2_RES_COLD);
 
+	if (a_ptr->flags2 & TR2_IM_ACID) a_ptr->flags4 &= ~(TR4_HURT_ACID);
+	if (a_ptr->flags2 & TR2_IM_ELEC) a_ptr->flags4 &= ~(TR4_HURT_ELEC);
+	if (a_ptr->flags2 & TR2_IM_FIRE) a_ptr->flags4 &= ~(TR4_HURT_FIRE);
+	if (a_ptr->flags2 & TR2_IM_COLD) a_ptr->flags4 &= ~(TR4_HURT_COLD);
+
+	if (a_ptr->flags2 & TR2_RES_ACID) a_ptr->flags4 &= ~(TR4_HURT_ACID);
+	if (a_ptr->flags2 & TR2_RES_ELEC) a_ptr->flags4 &= ~(TR4_HURT_ELEC);
+	if (a_ptr->flags2 & TR2_RES_FIRE) a_ptr->flags4 &= ~(TR4_HURT_FIRE);
+	if (a_ptr->flags2 & TR2_RES_COLD) a_ptr->flags4 &= ~(TR4_HURT_COLD);
+	if (a_ptr->flags2 & TR2_RES_LITE) a_ptr->flags4 &= ~(TR4_HURT_LITE);
+
 	if (a_ptr->pval < 0)
 	{
 		if (a_ptr->flags1 & TR1_STR) a_ptr->flags2 &= ~(TR2_SUST_STR);
@@ -2610,7 +2765,37 @@ static void remove_contradictory(artifact_type *a_ptr)
 	if (a_ptr->flags1 & TR1_KILL_UNDEAD) a_ptr->flags1 &= ~(TR1_SLAY_UNDEAD);
 	if (a_ptr->flags3 & TR3_DRAIN_EXP) a_ptr->flags3 &= ~(TR3_HOLD_LIFE);
 	if (a_ptr->flags3 & TR3_DRAIN_HP) a_ptr->flags3 &= ~(TR3_REGEN);
-/*	if (a_ptr->flags3 & TR3_DRAIN_MANA) a_ptr->flags3 &= ~(TR3_REGEN);*/
+	if (a_ptr->flags3 & TR3_DRAIN_MANA) a_ptr->flags3 &= ~(TR3_REGEN);
+
+	if (a_ptr->flags1 & TR1_SLAY_NATURAL) a_ptr->flags4 &= ~(TR4_ANIMAL);
+	if (a_ptr->flags1 & TR1_SLAY_EVIL) a_ptr->flags4 &= ~(TR4_EVIL);
+	if (a_ptr->flags1 & TR1_SLAY_UNDEAD) a_ptr->flags4 &= ~(TR4_UNDEAD);
+	if (a_ptr->flags1 & TR1_SLAY_DEMON) a_ptr->flags4 &= ~(TR4_DEMON);
+	if (a_ptr->flags1 & TR1_SLAY_ORC) a_ptr->flags4 &= ~(TR4_ORC);
+	if (a_ptr->flags1 & TR1_SLAY_TROLL) a_ptr->flags4 &= ~(TR4_TROLL);
+	if (a_ptr->flags1 & TR1_SLAY_GIANT) a_ptr->flags4 &= ~(TR4_GIANT);
+	if (a_ptr->flags1 & TR1_SLAY_DRAGON) a_ptr->flags4 &= ~(TR4_DRAGON);
+	if (a_ptr->flags1 & TR1_KILL_DRAGON) a_ptr->flags4 &= ~(TR4_DRAGON);
+	if (a_ptr->flags1 & TR1_KILL_DEMON) a_ptr->flags4 &= ~(TR4_DEMON);
+	if (a_ptr->flags1 & TR1_KILL_UNDEAD) a_ptr->flags4 &= ~(TR4_UNDEAD);
+
+	if (a_ptr->flags1 & TR1_SLAY_ORC) a_ptr->flags4 &= ~(TR4_SLAY_ELF);
+	if (a_ptr->flags1 & TR1_SLAY_GIANT) a_ptr->flags4 &= ~(TR4_SLAY_DWARF);
+
+	if (a_ptr->flags1 & TR1_BRAND_POIS) a_ptr->flags4 &= ~(TR4_HURT_POIS);
+	if (a_ptr->flags1 & TR1_BRAND_ACID) a_ptr->flags4 &= ~(TR4_HURT_ACID);
+	if (a_ptr->flags1 & TR1_BRAND_ELEC) a_ptr->flags4 &= ~(TR4_HURT_ELEC);
+	if (a_ptr->flags1 & TR1_BRAND_FIRE) a_ptr->flags4 &= ~(TR4_HURT_FIRE);
+	if (a_ptr->flags1 & TR1_BRAND_COLD) a_ptr->flags4 &= ~(TR4_HURT_COLD);
+
+	if (a_ptr->flags4 & TR4_BRAND_LITE) a_ptr->flags4 &= ~(TR4_HURT_LITE);
+
+	if (a_ptr->flags4 & TR4_SLAY_MAN) a_ptr->flags4 &= ~(TR4_MAN);
+	if (a_ptr->flags4 & TR4_SLAY_ELF) a_ptr->flags4 &= ~(TR4_ELF);
+	if (a_ptr->flags4 & TR4_SLAY_DWARF) a_ptr->flags4 &= ~(TR4_DWARF);
+
+	if (a_ptr->flags3 & TR3_TELEPORT) a_ptr->flags4 &= ~(TR4_ANCHOR);
+
 }
 
 /*
@@ -2723,8 +2908,6 @@ static void parse_frequencies ()
 				}
 			}
 
-/* Start of ESP frequenty run -- for bows ARD_ESP */
-/* Note that weird constant is just all ESP_ flags OR'ed together */
 			if (a_ptr->flags3 & 0x00300F00)
 			{
 				/* We have some sensing - count them */
@@ -2737,18 +2920,29 @@ static void parse_frequencies ()
 				if (a_ptr->flags3 & TR3_ESP_UNDEAD) temp++;
 				if (a_ptr->flags3 & TR3_ESP_NATURE) temp++;
 
-
-
 				/* Add these to the frequency count */
 				artprobs[ART_IDX_BOW_SENSE] += temp;
 			}
-/* Cumulative frequency of ESP for bows  ARD_ESP */
-/* Note I do weapons, bows and other stuff seperately to best match
- * the existing if-statements
- */
 
+			if (a_ptr->flags4 & 0x07FF0000)
+			{
+				/* We have some restrictions - count them */
+				temp = 0;
+				if (a_ptr->flags4 & TR4_ANIMAL) temp++;
+				if (a_ptr->flags4 & TR4_EVIL) temp++;
+				if (a_ptr->flags4 & TR4_UNDEAD) temp++;
+				if (a_ptr->flags4 & TR4_DEMON) temp++;
+				if (a_ptr->flags4 & TR4_ORC) temp++;
+				if (a_ptr->flags4 & TR4_TROLL) temp++;
+				if (a_ptr->flags4 & TR4_GIANT) temp++;
+				if (a_ptr->flags4 & TR4_DRAGON) temp++;
+				if (a_ptr->flags4 & TR4_MAN) temp++;
+				if (a_ptr->flags4 & TR4_DWARF) temp++;
+				if (a_ptr->flags4 & TR4_ELF) temp++;
 
-		}
+				/* Add these to the frequency count */
+				artprobs[ART_IDX_BOW_RESTRICT] += temp;
+			}		}
 
 		/* Handle hit / dam ratings - are they higher than normal? */
 		/* Also handle other weapon/nonweapon abilities */
@@ -2825,11 +3019,9 @@ static void parse_frequencies ()
 				(artprobs[ART_IDX_NONWEAPON_AGGR])++;
 			}
 
-/* Start of ESP frequencies for non-weapons ARD_ESP */
 			if (a_ptr->flags3 & 0x00300F00)
 			{
 				/* We have some sensing - count them */
-
 				temp = 0;
 				if (a_ptr->flags3 & TR3_ESP_ORC) temp++;
 				if (a_ptr->flags3 & TR3_ESP_TROLL) temp++;
@@ -2839,13 +3031,42 @@ static void parse_frequencies ()
 				if (a_ptr->flags3 & TR3_ESP_UNDEAD) temp++;
 				if (a_ptr->flags3 & TR3_ESP_NATURE) temp++;
 
-
-
 				/* Add these to the frequency count */
 				artprobs[ART_IDX_NONWEAPON_SENSE] += temp;
 			}
-/* End of ESP frequencies for non-weapons ARD_ESP */
 
+			if ((a_ptr->flags1 & 0x00FF0000) || (a_ptr->flags4 & 0x07FF0E00))
+			{
+				/* We have some restrictions - count them */
+				/* Note that the only reason slay flags are on non-weapons is for restrictions */
+
+				temp = 0;
+				if (a_ptr->flags1 & TR1_SLAY_NATURAL) temp++;
+				if (a_ptr->flags1 & TR1_SLAY_EVIL) temp++;
+				if (a_ptr->flags1 & TR1_SLAY_UNDEAD) temp++;
+				if (a_ptr->flags1 & TR1_SLAY_DEMON) temp++;
+				if (a_ptr->flags1 & TR1_SLAY_ORC) temp++;
+				if (a_ptr->flags1 & TR1_SLAY_TROLL) temp++;
+				if (a_ptr->flags1 & TR1_SLAY_GIANT) temp++;
+				if (a_ptr->flags1 & TR1_SLAY_DRAGON) temp++;
+				if (a_ptr->flags4 & TR4_SLAY_MAN) temp++;
+				if (a_ptr->flags4 & TR4_SLAY_ELF) temp++;
+				if (a_ptr->flags4 & TR4_SLAY_DWARF) temp++;
+				if (a_ptr->flags4 & TR4_ANIMAL) temp++;
+				if (a_ptr->flags4 & TR4_EVIL) temp++;
+				if (a_ptr->flags4 & TR4_UNDEAD) temp++;
+				if (a_ptr->flags4 & TR4_DEMON) temp++;
+				if (a_ptr->flags4 & TR4_ORC) temp++;
+				if (a_ptr->flags4 & TR4_TROLL) temp++;
+				if (a_ptr->flags4 & TR4_GIANT) temp++;
+				if (a_ptr->flags4 & TR4_DRAGON) temp++;
+				if (a_ptr->flags4 & TR4_MAN) temp++;
+				if (a_ptr->flags4 & TR4_DWARF) temp++;
+				if (a_ptr->flags4 & TR4_ELF) temp++;
+
+				/* Add these to the frequency count */
+				artprobs[ART_IDX_NONWEAPON_RESTRICT] += temp;
+			}
 		}
 
 		if (a_ptr->tval == TV_DIGGING || a_ptr->tval == TV_HAFTED ||
@@ -2864,7 +3085,7 @@ static void parse_frequencies ()
 			 * nothing at all
 			 */
 
-			if (a_ptr->flags1 & 0xFFFF0000)
+			if ((a_ptr->flags1 & 0xFFFF0000) || (a_ptr->flags4 & 0x00000E03))
 			{
 				/* We have some brands or slays - count them */
 
@@ -2885,16 +3106,21 @@ static void parse_frequencies ()
 				if (a_ptr->flags1 & TR1_BRAND_FIRE) temp++;
 				if (a_ptr->flags1 & TR1_BRAND_COLD) temp++;
 
+				if (a_ptr->flags4 & TR4_BRAND_LITE) temp++;
+				if (a_ptr->flags4 & TR4_BRAND_DARK) temp++;
+
+				if (a_ptr->flags4 & TR4_SLAY_MAN) temp++;
+				if (a_ptr->flags4 & TR4_SLAY_ELF) temp++;
+				if (a_ptr->flags4 & TR4_SLAY_DWARF) temp++;
+
+
 				/* Add these to the frequency count */
 				artprobs[ART_IDX_MELEE_BRAND_SLAY] += temp;
 			}
 
-/* Start of ESP frequencies for weapons ARD_ESP */
-
 			if (a_ptr->flags3 & 0x00300F00)
 			{
 				/* We have some sensing - count them */
-
 				temp = 0;
 				if (a_ptr->flags3 & TR3_ESP_ORC) temp++;
 				if (a_ptr->flags3 & TR3_ESP_TROLL) temp++;
@@ -2909,7 +3135,25 @@ static void parse_frequencies ()
 				artprobs[ART_IDX_MELEE_SENSE] += temp;
 			}
 
-/* End of ESP frequencies for weapons ARD_ESP */
+			if (a_ptr->flags4 & 0x07FF0000)
+			{
+				/* We have some restrictions - count them */
+				temp = 0;
+				if (a_ptr->flags4 & TR4_ANIMAL) temp++;
+				if (a_ptr->flags4 & TR4_EVIL) temp++;
+				if (a_ptr->flags4 & TR4_UNDEAD) temp++;
+				if (a_ptr->flags4 & TR4_DEMON) temp++;
+				if (a_ptr->flags4 & TR4_ORC) temp++;
+				if (a_ptr->flags4 & TR4_TROLL) temp++;
+				if (a_ptr->flags4 & TR4_GIANT) temp++;
+				if (a_ptr->flags4 & TR4_DRAGON) temp++;
+				if (a_ptr->flags4 & TR4_MAN) temp++;
+				if (a_ptr->flags4 & TR4_DWARF) temp++;
+				if (a_ptr->flags4 & TR4_ELF) temp++;
+
+				/* Add these to the frequency count */
+				artprobs[ART_IDX_MELEE_RESTRICT] += temp;
+			}
 
 			/* See invisible? */
 			if(a_ptr->flags3 & TR3_SEE_INVIS)
@@ -3789,6 +4033,13 @@ static void add_low_resist(artifact_type *a_ptr)
 		(a_ptr->flags2 & TR2_RES_FIRE) && (a_ptr->flags2 & TR2_RES_COLD) )
 			return;
 
+	/* Hack -- branded weapons prefer same kinds of resist as brand */
+	r = rand_int(4);
+	if ((r == 0) && (a_ptr->flags1 & (TR1_BRAND_ACID))) success = add_resist_acid(a_ptr);
+	else if ((r == 1) && (a_ptr->flags1 & (TR1_BRAND_ELEC))) success = add_resist_lightning(a_ptr);
+	else if ((r == 2) && (a_ptr->flags1 & (TR1_BRAND_FIRE))) success = add_resist_fire(a_ptr);
+	else if ((r == 3) && (a_ptr->flags1 & (TR1_BRAND_COLD))) success = add_resist_cold(a_ptr);
+
 	while (!success)
 	{
 		r = rand_int(4);
@@ -3895,6 +4146,12 @@ static void add_high_resist(artifact_type *a_ptr)
 	{
 		temp += artprobs[art_idx_high_resist[i]];
 	}
+
+	/* Hack -- brands prefer same kind of resist as their brand */
+	r = rand_int(3);
+	if ((r == 0) && (a_ptr->flags1 & (TR1_BRAND_POIS))) success = add_resist_poison(a_ptr);
+	else if ((r == 1) && (a_ptr->flags4 & (TR4_BRAND_LITE))) success = add_resist_light(a_ptr);
+	else if ((r == 2) && (a_ptr->flags4 & (TR4_BRAND_DARK))) success = add_resist_dark(a_ptr);
 
 	/* The following will fail (cleanly) if all high resists already added */
 	while ( (!success) && (count < MAX_TRIES) )
@@ -4195,6 +4452,41 @@ static bool add_poison_brand(artifact_type *a_ptr)
 	return TRUE;
 }
 
+static bool add_lite_brand(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_BRAND_LITE) return FALSE;
+	a_ptr->flags4 |= TR4_BRAND_LITE;
+	return TRUE;
+}
+
+static bool add_dark_brand(artifact_type *a_ptr)
+{
+ 	if (a_ptr->flags4 & TR4_BRAND_DARK) return FALSE;
+	a_ptr->flags4 |= TR4_BRAND_DARK;
+	return TRUE;
+}
+
+static bool add_slay_man(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_SLAY_MAN) return FALSE;
+	a_ptr->flags4 |= TR4_SLAY_MAN;
+	return TRUE;
+}
+
+static bool add_slay_elf(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_SLAY_ELF) return FALSE;
+	a_ptr->flags4 |= TR4_SLAY_ELF;
+	return TRUE;
+}
+
+static bool add_slay_dwarf(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_SLAY_DWARF) return FALSE;
+	a_ptr->flags4 |= TR4_SLAY_DWARF;
+	return TRUE;
+}
+
 static void add_brand_or_slay(artifact_type *a_ptr)
 {
 	/* Pick a brand or slay at random */
@@ -4205,7 +4497,7 @@ static void add_brand_or_slay(artifact_type *a_ptr)
 
 	while ( (!success) & (count < MAX_TRIES) )
 	{
-		r = rand_int(16);
+		r = rand_int(21);
 		if (r == 0) success = add_slay_evil(a_ptr);
 		else if (r == 1) success = add_kill_dragon(a_ptr);
 		else if (r == 2) success = add_slay_natural(a_ptr);
@@ -4222,10 +4514,137 @@ static void add_brand_or_slay(artifact_type *a_ptr)
 		else if (r == 13) success = add_poison_brand(a_ptr);
 		else if (r == 14) success = add_kill_demon(a_ptr);
 		else if (r == 15) success = add_kill_undead(a_ptr);
+		else if (r == 16) success = add_lite_brand(a_ptr);
+		else if (r == 17) success = add_dark_brand(a_ptr);
+		else if (r == 18) success = add_slay_man(a_ptr);
+		else if (r == 19) success = add_slay_elf(a_ptr);
+		else if (r == 20) success = add_slay_dwarf(a_ptr);
 
 		count++;
 	}
 }
+
+static bool add_restrict_orc(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_ORC) return FALSE;
+	a_ptr->flags4 |= TR4_ORC;
+
+	return TRUE;
+}
+
+static bool add_restrict_giant(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_GIANT) return FALSE;
+	a_ptr->flags4 |= TR4_GIANT;
+
+	return TRUE;
+}
+
+static bool add_restrict_troll(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_TROLL) return FALSE;
+	a_ptr->flags4 |= TR4_TROLL;
+
+	return TRUE;
+}
+
+static bool add_restrict_dragon(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_DRAGON) return FALSE;
+	a_ptr->flags4 |= TR4_DRAGON;
+
+	return TRUE;
+}
+
+
+static bool add_restrict_demon(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_DEMON) return FALSE;
+	a_ptr->flags4 |= TR4_DEMON;
+
+	return TRUE;
+}
+
+static bool add_restrict_undead(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_UNDEAD) return FALSE;
+	a_ptr->flags4 |= TR4_UNDEAD;
+
+	return TRUE;
+}
+
+static bool add_restrict_man(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_MAN) return FALSE;
+	a_ptr->flags4 |= TR4_MAN;
+
+	return TRUE;
+}
+
+static bool add_restrict_elf(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_ELF) return FALSE;
+	a_ptr->flags4 |= TR4_ELF;
+
+	return TRUE;
+}
+
+static bool add_restrict_dwarf(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_DWARF) return FALSE;
+	a_ptr->flags4 |= TR4_DWARF;
+
+	return TRUE;
+}
+
+static bool add_restrict_animal(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_ANIMAL) return FALSE;
+	a_ptr->flags4 |= TR4_ANIMAL;
+
+	return TRUE;
+}
+
+static bool add_restrict_evil(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_EVIL) return FALSE;
+	a_ptr->flags4 |= TR4_EVIL;
+
+	return TRUE;
+}
+
+static void add_restrict_rand(artifact_type *a_ptr)
+{
+	/* Pick a restriction at random, as long as item has some related abilities or slays */
+
+	int r;
+	int count = 0;
+	bool success = FALSE;
+
+	while ( (!success) & (count < MAX_TRIES) )
+	{
+		r = rand_int(9);
+		if ((r == 0) && ((a_ptr->flags2 & TR2_RES_DARK) || (a_ptr->flags4 & TR4_SLAY_ELF))) success = add_restrict_orc(a_ptr);
+		else if ((r == 1) && ((a_ptr->flags1 & TR1_STR) || (a_ptr->flags4 & TR4_SLAY_DWARF))) success = add_restrict_giant(a_ptr);
+		else if ((r == 2) && (a_ptr->flags3 & TR3_REGEN)) success = add_restrict_troll(a_ptr);
+		else if ((r == 3) && (a_ptr->flags2 & TR2_RES_ACID) && (a_ptr->flags2 & TR2_RES_FIRE) && (a_ptr->flags2 & TR2_RES_ELEC) && (a_ptr->flags2 & TR2_RES_COLD)) success = add_restrict_dragon(a_ptr);
+		else if ((r == 4) && (a_ptr->flags2 & (TR2_RES_FIRE | TR2_IM_FIRE))) success = add_restrict_demon(a_ptr);
+		else if ((r == 5) && ((a_ptr->flags2 & TR2_RES_NETHR) || (a_ptr->flags3 & (TR3_SEE_INVIS | TR3_HOLD_LIFE)))) success = add_restrict_undead(a_ptr);
+		else if ((r == 6) && ((a_ptr->flags1 & (TR1_SLAY_ORC | TR1_STEALTH)) || (a_ptr->flags2 & TR2_RES_LITE) || (a_ptr->flags3 & TR3_SEE_INVIS))) success = add_restrict_elf(a_ptr);
+		else if ((r == 7) && ((a_ptr->flags2 & TR2_RES_BLIND) || (a_ptr->flags3 & (TR3_FREE_ACT | TR3_HOLD_LIFE)) || (a_ptr->flags4 & TR4_SLAY_DWARF))) success = add_restrict_dwarf(a_ptr);
+		else if ((r == 8) && ((a_ptr->flags1 & TR1_STEALTH) || (a_ptr->flags3 & (TR3_SLOW_DIGEST | TR3_FEATHER)))) success = add_restrict_animal(a_ptr);
+
+		count++;
+	}
+
+	if (!success)
+	{
+		if (rand_int(3)) (void)add_restrict_man(a_ptr);
+		else (void)add_restrict_evil(a_ptr);
+	}
+}
+
+
 
 static void add_bless_weapon(artifact_type *a_ptr)
 {
@@ -4325,6 +4744,8 @@ static void add_weight_mod(artifact_type *a_ptr)
 static void add_immunity(artifact_type *a_ptr)
 {
 	int imm_type = rand_int(4);
+
+	int count = 0;
 
 	switch(imm_type)
 	{
@@ -4637,7 +5058,6 @@ static void add_ability_aux(artifact_type *a_ptr, int r)
 			add_telepathy(a_ptr);
 			break;
 
-/* Start of ESP cases ARD_ESP */
 		case ART_IDX_MELEE_SENSE:
 			add_sense_slay(a_ptr);
 			break;
@@ -4646,7 +5066,12 @@ static void add_ability_aux(artifact_type *a_ptr, int r)
 		case ART_IDX_NONWEAPON_SENSE:
 			add_sense_rand(a_ptr);
 			break;
-/* End of ESP cases ARD_ESP */
+
+		case ART_IDX_MELEE_RESTRICT:
+		case ART_IDX_BOW_RESTRICT:
+		case ART_IDX_NONWEAPON_RESTRICT:
+			add_restrict_rand(a_ptr);
+			break;
 
 		case ART_IDX_HELM_WIS:
 			add_wis(a_ptr);
@@ -4848,16 +5273,31 @@ static void try_supercharge(artifact_type *a_ptr)
  */
 static void do_curse(artifact_type *a_ptr)
 {
-	if (rand_int(3) == 0)
-		a_ptr->flags3 |= TR3_AGGRAVATE;
-	if (rand_int(7) == 0)
-		a_ptr->flags3 |= TR3_DRAIN_EXP;
-	if (rand_int(5) == 0)
-		a_ptr->flags3 |= TR3_DRAIN_HP;
-	if (rand_int(4) == 0)
-		a_ptr->flags3 |= TR3_DRAIN_MANA;
-	if (rand_int(7) == 0)
-		a_ptr->flags3 |= TR3_TELEPORT;
+
+	int r = rand_int(21);
+
+	r = rand_int(21);
+	if (r == 0) a_ptr->flags3 |= TR3_AGGRAVATE;
+	else if (r == 1) a_ptr->flags3 |= TR3_DRAIN_EXP;
+	else if (r == 2) a_ptr->flags3 |= TR3_DRAIN_HP;
+	else if (r == 3) a_ptr->flags3 |= TR3_DRAIN_MANA;
+	else if (r == 4) a_ptr->flags3 |= TR3_TELEPORT;
+	else if (r == 5) a_ptr->flags4 |= TR4_HURT_LITE;
+	else if (r == 6) a_ptr->flags4 |= TR4_HURT_WATER;
+	else if (r == 7) a_ptr->flags4 |= TR4_HUNGER;
+	else if (r == 8) a_ptr->flags4 |= TR4_ANCHOR;
+	else if (r == 9) a_ptr->flags4 |= TR4_SILENT;
+	else if (r == 10) a_ptr->flags4 |= TR4_STATIC;
+	else if (r == 11) a_ptr->flags4 |= TR4_WINDY;
+	else if (r == 12) a_ptr->flags4 |= TR4_EVIL;
+	else if (r == 13) a_ptr->flags4 |= TR4_UNDEAD;
+	else if (r == 14) a_ptr->flags4 |= TR4_DRAGON;
+	else if (r == 15) a_ptr->flags4 |= TR4_DEMON;
+	else if (r == 16) a_ptr->flags4 |= TR4_HURT_POIS;
+	else if (r == 17) a_ptr->flags4 |= TR4_HURT_ACID;
+	else if (r == 18) a_ptr->flags4 |= TR4_HURT_ELEC;
+	else if (r == 19) a_ptr->flags4 |= TR4_HURT_FIRE;
+	else if (r == 20) a_ptr->flags4 |= TR4_HURT_COLD;
 
 	if ((a_ptr->pval > 0) && (rand_int(2) == 0))
 		a_ptr->pval = -a_ptr->pval;
@@ -4956,6 +5396,7 @@ static void scramble_artifact(int a_idx)
 			if (power > 0 && power < 10 && count > MAX_TRIES / 2)
 			{
 				do_curse(a_ptr);
+				remove_contradictory(a_ptr);
 			}
 			ap2 = artifact_power(a_idx);
 			count++;
@@ -5048,6 +5489,7 @@ static void scramble_artifact(int a_idx)
 			add_ability(a_ptr);
 			ap = artifact_power(a_idx);
 
+
 			/* CR 11/14/01 - pushed both limits up by about 5% */
 			if (ap > (power * 23) / 20 + 1)
 			{
@@ -5058,6 +5500,14 @@ static void scramble_artifact(int a_idx)
 
 			else if (ap >= (power * 19) / 20)	/* just right */
 			{
+
+				/* Hack -- add a restriction on the most powerful artifacts */
+				if (ap > 100)
+				{
+					add_restrict_rand(a_ptr);
+					remove_contradictory(a_ptr);
+				}
+
 				break;
 			}
 

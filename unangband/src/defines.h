@@ -2697,10 +2697,10 @@
 #define TR4_BRAND_LITE	0x000000002L	/* Weapon has lite brand */
 #define TR4_HURT_LITE	0x000000004L    /* Item makes wielder vulnerible to lite */
 #define TR4_HURT_WATER	0x000000008L    /* Item makes wielder vulnerible to water */
-#define TR4_VAMP_HP   	0x00000010L     /* Weapon restores user hp when does damage  */
-#define TR4_VAMP_MANA  	0x00000020L     /* Weapon restores user sp when does damage  */
-#define TR4_VAMP_EXP   	0x00000040L     /* Weapon restores user experience when does damage  */
-#define TR4_VAMP_FOOD   0x00000080L     /* Weapon feeds user when does damage  */
+#define TR4_VAMP_HP   	0x00000010L     /* Weapon restores user hp when kills a creature with blood  */
+#define TR4_VAMP_MANA  	0x00000020L     /* Weapon restores user sp when kills a creature with mana  */
+#define TR4_XXX1   	0x00000040L     /* Weapon ????  */
+#define TR4_XXX2        0x00000080L     /* Weapon ????  */
 #define TR4_HUNGER      0x00000100L     /* Item makes user eat more food */
 #define TR4_SLAY_MAN 	0x00000200L     	/* Weapon slays humans */
 #define TR4_SLAY_ELF  	0x00000400L     	/* Weapon slays elves */

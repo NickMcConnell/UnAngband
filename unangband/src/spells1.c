@@ -942,14 +942,48 @@ void acid_dam(int dam, cptr kb_str, bool inven)
 {
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
+	/* Vulneribility */
+	if (p_ptr->cur_flags4 & (TR4_HURT_ACID))
+	{
+		/* Always notice */
+		equip_can_flags(0x0L,0x0L,0x0L,TR4_HURT_ACID);
+
+		/* Immunity reduced to partial protection */
+		if (p_ptr->cur_flags2 & (TR2_IM_ACID))
+		{
+			/* Always notice */
+			equip_can_flags(0x0L,TR2_IM_ACID,0x0L,0x0L);	
+
+			/* Hack -- always assume 'armor hit' */
+			dam = (dam + 5) / 6;
+
+			/* Take damage */
+			take_hit(dam, kb_str);
+
+			return;
+		}
+
+		/* Increase damage */
+		else dam *= 2;
+	}
+
 	/* Total Immunity */
-	if (p_ptr->cur_flags2 & (TR2_IM_ACID))
+	else if (p_ptr->cur_flags2 & (TR2_IM_ACID))
 	{
 		/* Always notice */
 		equip_can_flags(0x0L,TR2_IM_ACID,0x0L,0x0L);
+		equip_not_flags(0x0L,0x0L,0x0L,TR4_HURT_ACID);
 
 		return;
 	}
+
+	/* Not vulnerible */
+	else if (p_ptr->cur_flags2 & (TR2_IM_ACID))
+	{
+		/* Always notice */
+		equip_not_flags(0x0L,0x0L,0x0L,TR4_HURT_ACID);
+	}
+
 
 	/* No damage */
 	if (dam <= 0) return;
@@ -988,13 +1022,46 @@ void elec_dam(int dam, cptr kb_str, bool inven)
 {
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
-	/* Total immunity */
-	if (p_ptr->cur_flags2 & (TR2_IM_ELEC))
+	/* Vulneribility */
+	if (p_ptr->cur_flags4 & (TR4_HURT_ELEC))
+	{
+		/* Always notice */
+		equip_can_flags(0x0L,0x0L,0x0L,TR4_HURT_ELEC);
+
+		/* Immunity reduced to partial protection */
+		if (p_ptr->cur_flags2 & (TR2_IM_ELEC))
+		{
+			/* Always notice */
+			equip_can_flags(0x0L,TR2_IM_ELEC,0x0L,0x0L);	
+
+			/* Reduce effect to basic resistance */
+			dam = (dam + 2) / 3;
+
+			/* Take damage */
+			take_hit(dam, kb_str);
+
+			return;
+		}
+
+		/* Increase damage */
+		else dam *= 2;
+	}
+
+	/* Total Immunity */
+	else if (p_ptr->cur_flags2 & (TR2_IM_ELEC))
 	{
 		/* Always notice */
 		equip_can_flags(0x0L,TR2_IM_ELEC,0x0L,0x0L);
+		equip_not_flags(0x0L,0x0L,0x0L,TR4_HURT_ELEC);
 
 		return;
+	}
+
+	/* Not vulnerible */
+	else if (p_ptr->cur_flags2 & (TR2_IM_ELEC))
+	{
+		/* Always notice */
+		equip_not_flags(0x0L,0x0L,0x0L,TR4_HURT_ELEC);
 	}
 
 	/* No damage */
@@ -1032,13 +1099,46 @@ void fire_dam(int dam, cptr kb_str, bool inven)
 {
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
-	/* Totally immune */
-	if (p_ptr->cur_flags2 & (TR2_IM_FIRE))
+	/* Vulneribility */
+	if (p_ptr->cur_flags4 & (TR4_HURT_FIRE))
+	{
+		/* Always notice */
+		equip_can_flags(0x0L,0x0L,0x0L,TR4_HURT_FIRE);
+
+		/* Immunity reduced to partial protection */
+		if (p_ptr->cur_flags2 & (TR2_IM_FIRE))
+		{
+			/* Always notice */
+			equip_can_flags(0x0L,TR2_IM_FIRE,0x0L,0x0L);	
+
+			/* Hack -- always assume 'armor hit' */
+			dam = (dam + 2) / 3;
+
+			/* Take damage */
+			take_hit(dam, kb_str);
+
+			return;
+		}
+
+		/* Increase damage */
+		else dam *= 3;
+	}
+
+	/* Total Immunity */
+	else if (p_ptr->cur_flags2 & (TR2_IM_FIRE))
 	{
 		/* Always notice */
 		equip_can_flags(0x0L,TR2_IM_FIRE,0x0L,0x0L);
+		equip_not_flags(0x0L,0x0L,0x0L,TR4_HURT_FIRE);
 
 		return;
+	}
+
+	/* Not vulnerible */
+	else if (p_ptr->cur_flags2 & (TR2_IM_FIRE))
+	{
+		/* Always notice */
+		equip_not_flags(0x0L,0x0L,0x0L,TR4_HURT_FIRE);
 	}
 
 	/* No damage */
@@ -1075,13 +1175,46 @@ void cold_dam(int dam, cptr kb_str, bool inven)
 {
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
-	/* Total immunity */
-	if (p_ptr->cur_flags2 & (TR2_IM_COLD))
+	/* Vulneribility */
+	if (p_ptr->cur_flags4 & (TR4_HURT_COLD))
+	{
+		/* Always notice */
+		equip_can_flags(0x0L,0x0L,0x0L,TR4_HURT_COLD);
+
+		/* Immunity reduced to partial protection */
+		if (p_ptr->cur_flags2 & (TR2_IM_COLD))
+		{
+			/* Always notice */
+			equip_can_flags(0x0L,TR2_IM_COLD,0x0L,0x0L);	
+
+			/* Hack -- always assume 'armor hit' */
+			dam = (dam + 2) / 3;
+
+			/* Take damage */
+			take_hit(dam, kb_str);
+
+			return;
+		}
+
+		/* Increase damage */
+		else dam *= 3;
+	}
+
+	/* Total Immunity */
+	else if (p_ptr->cur_flags2 & (TR2_IM_COLD))
 	{
 		/* Always notice */
 		equip_can_flags(0x0L,TR2_IM_COLD,0x0L,0x0L);
+		equip_not_flags(0x0L,0x0L,0x0L,TR4_HURT_COLD);
 
 		return;
+	}
+
+	/* Not vulnerible */
+	else if (p_ptr->cur_flags2 & (TR2_IM_COLD))
+	{
+		/* Always notice */
+		equip_not_flags(0x0L,0x0L,0x0L,TR4_HURT_COLD);
 	}
 
 	/* No damage */
@@ -1120,7 +1253,7 @@ void water_dam(int dam, cptr kb_str, bool inven)
 	object_type *o_ptr = &inventory[INVEN_LITE];
 
 	/* Burn some fuel in the current lite */
-	if (o_ptr->tval == TV_LITE)
+	if ((inven) && (o_ptr->tval == TV_LITE))
 	{
 		/* Hack -- Use up fuel (except on artifacts) */
 		if (!artifact_p(o_ptr) && (o_ptr->pval > 0))
@@ -4972,6 +5105,19 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				equip_can_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 			}
 
+			if (p_ptr->cur_flags4 & (TR4_HURT_WATER))
+			{
+				/* Always notice */
+				equip_can_flags(0x0L,0x0L,0x0L,TR4_HURT_WATER);
+
+				dam *= 2;
+			}
+			else
+			{
+				/* Always notice */
+				equip_not_flags(0x0L,0x0L,0x0L,TR4_HURT_WATER);
+			}
+
 			water_dam(dam, killer, TRUE);
 
 			break;
@@ -4983,7 +5129,21 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		case GF_WATER_WEAK:
 		{
 			if (fuzzy) msg_print("You are hit by something!");
-			water_dam(0, killer, TRUE);
+
+			if (p_ptr->cur_flags4 & (TR4_HURT_WATER))
+			{
+				/* Always notice */
+				equip_can_flags(0x0L,0x0L,0x0L,TR4_HURT_WATER);
+			}
+			else
+			{
+				/* Always notice */
+				equip_not_flags(0x0L,0x0L,0x0L,TR4_HURT_WATER);
+
+				dam = 0;
+			}
+
+			water_dam(dam, killer, TRUE);
 
 			break;
 		}
@@ -5228,14 +5388,35 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Weak lite -- only dangerous if vulnerible */
+		case GF_LITE_WEAK:
+		{
+			if (!(p_ptr->cur_flags4 & (TR4_HURT_LITE)))
+			{
+				equip_not_flags(0x0L,0x0L,0x0L,TR4_HURT_LITE);
+
+				break;
+			}
+		}
+
 		/* Lite -- blinding */
 		case GF_LITE:
 		{
 			if (fuzzy) msg_print("You are hit by something!");
+			if (p_ptr->cur_flags4 & (TR4_HURT_LITE))
+			{
+				/* Always notice */
+				equip_can_flags(0x0L,0x0L,0x0L,TR4_HURT_LITE);
+
+				/* Extra damage */
+				if (typ != GF_LITE_WEAK) dam *= 2;
+			}
+			else if (!fuzzy) equip_not_flags(0x0L,0x0L,0x0L,TR4_HURT_LITE);
+
 			if (p_ptr->cur_flags2 & (TR2_RES_LITE))
 			{
-				/* Sometimes notice */
-				if (rand_int(100)<dam) equip_can_flags(0x0L,TR2_RES_LITE,0x0L,0x0L);
+				/* Always notice */
+				if (!fuzzy) equip_can_flags(0x0L,TR2_RES_LITE,0x0L,0x0L);
 
 				dam *= 4; dam /= (randint(6) + 6);
 			}
@@ -5256,8 +5437,8 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			if (fuzzy) msg_print("You are hit by something!");
 			if (p_ptr->cur_flags2 & (TR2_RES_DARK))
 			{
-				/* Sometimes notice */
-				if (rand_int(100)<dam) equip_can_flags(0x0L,TR2_RES_DARK,0x0L,0x0L);
+				/* Always notice */
+				if (!fuzzy) equip_can_flags(0x0L,TR2_RES_DARK,0x0L,0x0L);
 
 				dam *= 4; dam /= (randint(6) + 6);
 			}
@@ -6390,9 +6571,23 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				equip_can_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 			}
 
+			fire_dam(dam/3,killer, FALSE);
+
+			if (p_ptr->cur_flags4 & (TR4_HURT_WATER))
+			{
+				/* Always notice */
+				equip_can_flags(0x0L,0x0L,0x0L,TR4_HURT_WATER);
+
+				dam *= 2;
+			}
+			else
+			{
+				/* Always notice */
+				equip_not_flags(0x0L,0x0L,0x0L,TR4_HURT_WATER);
+			}
 
 			water_dam((dam*2)/3,killer, TRUE);
-			fire_dam(dam/3,killer, FALSE);
+
 
 			break;
 		}
@@ -6459,7 +6654,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 
 		}
 
-		case GF_STEAM: /* Fire, water damage */
+		case GF_STEAM: /* Fire and water damage */
 		{
 			msg_print("You are scalded by steam.");
 

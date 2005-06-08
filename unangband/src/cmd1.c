@@ -574,13 +574,14 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 			/* Brand (Dark) */
 			if (f4 & (TR4_BRAND_DARK))
 			{
-				/* Notice immunity */
-				if (r_ptr->flags4 & (RF4_BR_DARK))
+				/* Notice immunity  - orcs and dark breathers immune */
+				if ((r_ptr->flags4 & (RF4_BR_DARK)) || (r_ptr->flags3 & (RF3_ORC)))
 				{
 					if (m_ptr->ml)
 					{
 						object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_BRAND_DARK);
-						l_ptr->flags4 |= (RF4_BR_DARK);
+						if (r_ptr->flags4 & (RF4_BR_DARK)) l_ptr->flags4 |= (RF4_BR_DARK);
+						if (r_ptr->flags3 & (RF3_ORC)) l_ptr->flags4 |= (RF3_ORC);
 					}
 				}
 
@@ -644,6 +645,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 			{
 				object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_SLAY_DWARF);
 			}
+
 			break;
 
 		}
@@ -1946,18 +1948,7 @@ void py_attack(int y, int x)
 
 				k = damroll(o_ptr->dd, o_ptr->ds);
 				k = tot_dam_aux(o_ptr, k, m_ptr);
-				if ((p_ptr->cur_flags3 & (TR3_IMPACT)) && (k > 50))
-				{
-					do_quake = TRUE;
 
-					/* Always notice */
-					object_can_flags(o_ptr,0x0L,0x0L,TR3_IMPACT,0x0L);
-				}
-				else if (!(p_ptr->cur_flags3 & (TR3_IMPACT)))
-				{
-					/* Sometimes notice */
-					if (rand_int(100)<50) object_not_flags(o_ptr,0x0L,0x0L,TR3_IMPACT,0x0L);
-				}
 				k = critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
 				k += o_ptr->to_d;
 
@@ -1970,7 +1961,21 @@ void py_attack(int y, int x)
 				if (n1 || n2 || n3 || n4) update_slot_flags(slot, n1, n2, n3, n4);
 
 				/* Check usage */
-				object_usage(INVEN_WIELD);
+				object_usage(slot);
+
+				/* Note -- must happen after above flags updated */
+				if ((p_ptr->cur_flags3 & (TR3_IMPACT)) && (k > 50))
+				{
+					do_quake = TRUE;
+
+					/* Always notice */
+					equip_can_flags(0x0L,0x0L,TR3_IMPACT,0x0L);
+				}
+				else if (!(p_ptr->cur_flags3 & (TR3_IMPACT)))
+				{
+					/* Sometimes notice */
+					if (rand_int(100)<50) equip_not_flags(0x0L,0x0L,TR3_IMPACT,0x0L);
+				}
 
 			}
 			/* Handle bare-hand/bare-foot attack */
@@ -2010,7 +2015,50 @@ void py_attack(int y, int x)
 			}
 
 			/* Damage, check for fear and death */
-			if (mon_take_hit(cave_m_idx[y][x], k, &fear, NULL)) break;
+			if (mon_take_hit(cave_m_idx[y][x], k, &fear, NULL))
+			{
+				u32b f1, f2, f3, f4;
+
+				/* Extract the flags */
+				object_flags(o_ptr, &f1, &f2, &f3, &f4);
+
+				/* Taste blood */
+				if ((f4 & (TR4_VAMP_HP)) & (r_ptr->flags7 & (RF7_HAS_BLOOD)))
+				{
+					hp_player(r_ptr->level);
+
+					object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_HP);
+					l_ptr->flags7 |= (RF7_HAS_BLOOD);
+				}
+				else if (l_ptr->flags7 & (RF7_HAS_BLOOD))
+				{
+					object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_HP);
+				}
+
+				/* Drain mana */
+				if ((f4 & (TR4_VAMP_MANA)) & (r_ptr->freq_spell > 0))
+				{
+					if (p_ptr->csp < p_ptr->msp)
+					{
+						p_ptr->csp = p_ptr->csp + r_ptr->level / 2;
+						if (p_ptr->csp >= p_ptr->msp)
+						{
+							p_ptr->csp = p_ptr->msp;
+							p_ptr->csp_frac = 0;
+						}
+						p_ptr->redraw |= (PR_MANA);
+						p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
+					}
+
+					object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_MANA);
+				}
+				else if (l_ptr->cast_spell)
+				{
+					object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_MANA);
+				}
+
+				break;
+			}			
 
 		}
 

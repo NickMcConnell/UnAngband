@@ -39,9 +39,8 @@ slay dwarf items, and items that cause vulneribilities to various elements. Much
 end code still to be fixed. In particular, you cannot wield both a racial flag item
 and its equivelent slay, or a vulneribility item and its equivelent brand.
 
-- You know learn about all brands and slays as if you were checking your monster memory
-after each hit. You also know randomly notice execution slays and brands or the absence
-of brands, based on the damage delivered by the weapon per blow.
+- Steam and other water damage that does not affect inventory items no longer douses
+your light.
 
 ### User Interface ###
 
@@ -51,6 +50,10 @@ monster.
 - 'v' toggles visual mode off as well as on.
 
 - Show list of all items at the bottom of the screen.
+
+- You know learn about all brands and slays as if you were checking your monster memory
+after each hit. You also know randomly notice execution slays and brands or the absence
+of brands, based on the damage delivered by the weapon per blow.
 
 ### Bug fixes ###
 
@@ -77,6 +80,8 @@ learn it (randomly) but cannot cast it.  (Fixed by kobayasi)
 - The effect of experience was as same as self knowledge.  (Fixed by kobayasi)
 
 - Brands were frequently not applying their brand multiplier.
+
+- Random artifact dragon armour no longer has ridiculously high pvals.
 
 
 ### Build / Platform ###
