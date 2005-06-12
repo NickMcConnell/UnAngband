@@ -64,6 +64,9 @@ of brands, based on the damage delivered by the weapon per blow.
 
 - Guessed (Blessed) weapons and so on should now display as (Blessed?) not ((Blessed)?).
 
+- When displaying equipment, proper immunities are displayed differently from flags that
+protect the character against the side effects of attacks.
+
 ### Bug fixes ###
 
 - Prevented original graphic tiles from trying to use dark and lite tiles.

@@ -842,24 +842,6 @@ static s16b art_idx_high_resist[] =
 	ART_IDX_GEN_RNEXUS, ART_IDX_GEN_RNETHER, ART_IDX_GEN_RCHAOS,
 	ART_IDX_GEN_RDISEN};
 
-/*
- * Table giving speed power ratings
- * We go up to +20 here, but in practice it will never get above +15
- */
-
-static s16b speed_power[21] =
-	{0, 1, 3, 6, 9, 13, 17, 22, 27, 33, 39,
-	46, 53, 61, 69, 77, 85, 93, 101, 109, 117};
-
-/*
- * Boost ratings for combinations of ability bonuses
- * We go up to +24 here - anything higher is inhibited
- */
-
-static s16b ability_power[25] =
-	{0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4,
-	6, 8, 10, 12, 15, 18, 21, 24, 28, 32,
-	37, 42, 48, 55};
 
 /* Initialize the data structures for learned probabilities */
 
@@ -1755,6 +1737,79 @@ static int bow_multiplier(int sval)
 }
 
 
+static void remove_contradictory(artifact_type *a_ptr)
+{
+	if (a_ptr->flags3 & TR3_AGGRAVATE) a_ptr->flags1 &= ~(TR1_STEALTH);
+	if (a_ptr->flags2 & TR2_IM_ACID) a_ptr->flags2 &= ~(TR2_RES_ACID);
+	if (a_ptr->flags2 & TR2_IM_ELEC) a_ptr->flags2 &= ~(TR2_RES_ELEC);
+	if (a_ptr->flags2 & TR2_IM_FIRE) a_ptr->flags2 &= ~(TR2_RES_FIRE);
+	if (a_ptr->flags2 & TR2_IM_COLD) a_ptr->flags2 &= ~(TR2_RES_COLD);
+
+	if (a_ptr->flags2 & TR2_IM_ACID) a_ptr->flags4 &= ~(TR4_HURT_ACID);
+	if (a_ptr->flags2 & TR2_IM_ELEC) a_ptr->flags4 &= ~(TR4_HURT_ELEC);
+	if (a_ptr->flags2 & TR2_IM_FIRE) a_ptr->flags4 &= ~(TR4_HURT_FIRE);
+	if (a_ptr->flags2 & TR2_IM_COLD) a_ptr->flags4 &= ~(TR4_HURT_COLD);
+
+	if (a_ptr->flags2 & TR2_RES_ACID) a_ptr->flags4 &= ~(TR4_HURT_ACID);
+	if (a_ptr->flags2 & TR2_RES_ELEC) a_ptr->flags4 &= ~(TR4_HURT_ELEC);
+	if (a_ptr->flags2 & TR2_RES_FIRE) a_ptr->flags4 &= ~(TR4_HURT_FIRE);
+	if (a_ptr->flags2 & TR2_RES_COLD) a_ptr->flags4 &= ~(TR4_HURT_COLD);
+	if (a_ptr->flags2 & TR2_RES_LITE) a_ptr->flags4 &= ~(TR4_HURT_LITE);
+
+	if (a_ptr->pval < 0)
+	{
+		if (a_ptr->flags1 & TR1_STR) a_ptr->flags2 &= ~(TR2_SUST_STR);
+		if (a_ptr->flags1 & TR1_INT) a_ptr->flags2 &= ~(TR2_SUST_INT);
+		if (a_ptr->flags1 & TR1_WIS) a_ptr->flags2 &= ~(TR2_SUST_WIS);
+		if (a_ptr->flags1 & TR1_DEX) a_ptr->flags2 &= ~(TR2_SUST_DEX);
+		if (a_ptr->flags1 & TR1_CON) a_ptr->flags2 &= ~(TR2_SUST_CON);
+		if (a_ptr->flags1 & TR1_CHR) a_ptr->flags2 &= ~(TR2_SUST_CHR);
+		a_ptr->flags1 &= ~(TR1_BLOWS);
+	}
+
+	if (a_ptr->flags3 & TR3_LIGHT_CURSE) a_ptr->flags3 &= ~(TR3_BLESSED);
+	if (a_ptr->flags1 & TR1_KILL_DRAGON) a_ptr->flags1 &= ~(TR1_SLAY_DRAGON);
+	if (a_ptr->flags1 & TR1_KILL_DEMON) a_ptr->flags1 &= ~(TR1_SLAY_DEMON);
+	if (a_ptr->flags1 & TR1_KILL_UNDEAD) a_ptr->flags1 &= ~(TR1_SLAY_UNDEAD);
+	if (a_ptr->flags3 & TR3_DRAIN_EXP) a_ptr->flags3 &= ~(TR3_HOLD_LIFE);
+	if (a_ptr->flags3 & TR3_DRAIN_HP) a_ptr->flags3 &= ~(TR3_REGEN);
+	if (a_ptr->flags3 & TR3_DRAIN_MANA) a_ptr->flags3 &= ~(TR3_REGEN);
+
+	if (!(a_ptr->flags4 & TR4_EVIL))
+	{
+		if (a_ptr->flags1 & TR1_SLAY_NATURAL) a_ptr->flags4 &= ~(TR4_ANIMAL);
+		if (a_ptr->flags1 & TR1_SLAY_EVIL) a_ptr->flags4 &= ~(TR4_EVIL);
+		if (a_ptr->flags1 & TR1_SLAY_UNDEAD) a_ptr->flags4 &= ~(TR4_UNDEAD);
+		if (a_ptr->flags1 & TR1_SLAY_DEMON) a_ptr->flags4 &= ~(TR4_DEMON);
+		if (a_ptr->flags1 & TR1_SLAY_ORC) a_ptr->flags4 &= ~(TR4_ORC);
+		if (a_ptr->flags1 & TR1_SLAY_TROLL) a_ptr->flags4 &= ~(TR4_TROLL);
+		if (a_ptr->flags1 & TR1_SLAY_GIANT) a_ptr->flags4 &= ~(TR4_GIANT);
+		if (a_ptr->flags1 & TR1_SLAY_DRAGON) a_ptr->flags4 &= ~(TR4_DRAGON);
+		if (a_ptr->flags1 & TR1_KILL_DRAGON) a_ptr->flags4 &= ~(TR4_DRAGON);
+		if (a_ptr->flags1 & TR1_KILL_DEMON) a_ptr->flags4 &= ~(TR4_DEMON);
+		if (a_ptr->flags1 & TR1_KILL_UNDEAD) a_ptr->flags4 &= ~(TR4_UNDEAD);
+
+		if (a_ptr->flags1 & TR1_SLAY_ORC) a_ptr->flags4 &= ~(TR4_SLAY_ELF);
+		if (a_ptr->flags1 & TR1_SLAY_GIANT) a_ptr->flags4 &= ~(TR4_SLAY_DWARF);
+
+		if (a_ptr->flags4 & TR4_SLAY_MAN) a_ptr->flags4 &= ~(TR4_MAN);
+		if (a_ptr->flags4 & TR4_SLAY_ELF) a_ptr->flags4 &= ~(TR4_ELF);
+		if (a_ptr->flags4 & TR4_SLAY_DWARF) a_ptr->flags4 &= ~(TR4_DWARF);
+	}
+
+	if (a_ptr->flags1 & TR1_BRAND_POIS) a_ptr->flags4 &= ~(TR4_HURT_POIS);
+	if (a_ptr->flags1 & TR1_BRAND_ACID) a_ptr->flags4 &= ~(TR4_HURT_ACID);
+	if (a_ptr->flags1 & TR1_BRAND_ELEC) a_ptr->flags4 &= ~(TR4_HURT_ELEC);
+	if (a_ptr->flags1 & TR1_BRAND_FIRE) a_ptr->flags4 &= ~(TR4_HURT_FIRE);
+	if (a_ptr->flags1 & TR1_BRAND_COLD) a_ptr->flags4 &= ~(TR4_HURT_COLD);
+
+	if (a_ptr->flags4 & TR4_BRAND_LITE) a_ptr->flags4 &= ~(TR4_HURT_LITE);
+
+	if (a_ptr->flags3 & TR3_TELEPORT) a_ptr->flags4 &= ~(TR4_ANCHOR);
+
+}
+
+
 /*
  * Evaluate the artifact's overall power level.
  */
@@ -1765,7 +1820,9 @@ static s32b artifact_power(int a_idx)
 	s16b k_idx;
 	object_kind *k_ptr;
 	int immunities = 0;
-	int extra_stat_bonus = 0;
+	int sustains = 0;
+	int low_resists = 0;
+	int high_resists = 0;
 
 	LOG_PRINT("********** ENTERING EVAL POWER ********\n");
 	LOG_PRINT1("Artifact index is %d\n", a_idx);
@@ -1802,25 +1859,6 @@ static s32b artifact_power(int a_idx)
 		{
 			int mult;
 
-			/*
-			 * Damage multiplier for bows should be weighted less than that
-			 * for melee weapons, since players typically get fewer shots
-			 * than hits (note, however, that the multipliers are applied
-			 * afterwards in the bow calculation, not before as for melee
-			 * weapons, which tends to bring these numbers back into line).
-			 */
-
-			if (a_ptr->to_d < 9)
-			{
-				/* Could enchant this up - just use to_d value of 9 */
-				p += 9;
-				LOG_PRINT("Damage too low, adding 9\n");
-			}
-			else
-			{
-				p += (a_ptr->to_d);
-				LOG_PRINT1("Adding power from to_dam, total is %d\n", p);
-			}
 			/*
 			 * Add the average damage of fully enchanted (good) ammo for this
 			 * weapon.  Could make this dynamic based on k_info if desired.
@@ -1893,7 +1931,29 @@ static s32b artifact_power(int a_idx)
 				}
 
 			}
-			p += sign(a_ptr->to_h) * (ABS(a_ptr->to_h) / 3);
+
+			/*
+			 * Damage multiplier for bows should be weighted less than that
+			 * for melee weapons, since players typically get fewer shots
+			 * than hits (note, however, that the multipliers are applied
+			 * afterwards in the bow calculation, not before as for melee
+			 * weapons, which tends to bring these numbers back into line).
+			 */
+
+			if (a_ptr->to_d < 9)
+			{
+				/* Could enchant this up - just use to_d value of 9 */
+				p += 9;
+				LOG_PRINT("Damage too low, adding 9\n");
+			}
+			else
+			{
+				p += (a_ptr->to_d);
+				LOG_PRINT1("Adding power from to_dam, total is %d\n", p);
+			}
+
+			/* To hit uses a percentage */
+			p += p * (5 * sign(a_ptr->to_h) * (ABS(a_ptr->to_h))) / 100;
 
 			LOG_PRINT1("Adding power from to_hit, total is %d\n", p);
 
@@ -1974,7 +2034,9 @@ static s32b artifact_power(int a_idx)
 				}
 			}
 
-			p += sign(a_ptr->to_h) * (ABS(a_ptr->to_h) / 3);
+			/* To hit uses a percentage */
+			p += p * (5 * sign(a_ptr->to_h) * (ABS(a_ptr->to_h))) / 100;
+
 			LOG_PRINT1("Adding power for to hit, total is %d\n", p);
 
 			/* Remember, weight is in 0.1 lb. units. */
@@ -2078,79 +2140,40 @@ static s32b artifact_power(int a_idx)
 	{
 		if (a_ptr->flags1 & TR1_STR)
 		{
-			p += 3 * a_ptr->pval;
+			p += 3 * a_ptr->pval * a_ptr->pval / 4;
 			LOG_PRINT2("Adding power for STR bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		if (a_ptr->flags1 & TR1_INT)
 		{
-			p += 2 * a_ptr->pval;
+			p += a_ptr->pval * a_ptr->pval / 2;
 			LOG_PRINT2("Adding power for INT bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		if (a_ptr->flags1 & TR1_WIS)
 		{
-			p += 2 * a_ptr->pval;
+			p += a_ptr->pval * a_ptr->pval / 2;
 			LOG_PRINT2("Adding power for WIS bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		if (a_ptr->flags1 & TR1_DEX)
 		{
-			p += 3 * a_ptr->pval;
+			p += 3 * a_ptr->pval * a_ptr->pval / 4;
 			LOG_PRINT2("Adding power for DEX bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		if (a_ptr->flags1 & TR1_CON)
 		{
-			p += 4 * a_ptr->pval;
+			p += a_ptr->pval * a_ptr->pval;
 			LOG_PRINT2("Adding power for CON bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		if (a_ptr->flags1 & TR1_STEALTH)
 		{
-			p += a_ptr->pval;
+			p += a_ptr->pval * a_ptr->pval / 4;
 			LOG_PRINT2("Adding power for stealth bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		/* For now add very small amount for searching */
 		if (a_ptr->flags1 & TR1_SEARCH)
 		{
-			p += a_ptr->pval / 6;
+			p += a_ptr->pval * a_ptr->pval / 24;
 			LOG_PRINT2("Adding power for searching bonus %d, total is %d\n", a_ptr->pval , p);
 		}
-		/* Add extra power term if there are a lot of ability bonuses */
-		if (a_ptr->pval > 0)
-		{
-			extra_stat_bonus += ( (a_ptr->flags1 & TR1_STR) ? a_ptr->pval: 0);
-			extra_stat_bonus += ( (a_ptr->flags1 & TR1_INT) ? 3 * a_ptr->pval / 4: 0);
-			extra_stat_bonus += ( (a_ptr->flags1 & TR1_WIS) ? 3 * a_ptr->pval / 4: 0);
-			extra_stat_bonus += ( (a_ptr->flags1 & TR1_DEX) ? a_ptr->pval: 0);
-			extra_stat_bonus += ( (a_ptr->flags1 & TR1_CON) ? a_ptr->pval: 0);
-			extra_stat_bonus += ( (a_ptr->flags1 & TR1_CHR) ? 0 * a_ptr->pval: 0);
-			extra_stat_bonus += ( (a_ptr->flags1 & TR1_STEALTH) ? 3 * a_ptr->pval / 4: 0);
-			extra_stat_bonus += ( (a_ptr->flags1 & TR1_INFRA) ? 0 * a_ptr->pval: 0);
-			extra_stat_bonus += ( (a_ptr->flags1 & TR1_TUNNEL) ? 0 * a_ptr->pval: 0);
-			extra_stat_bonus += ( (a_ptr->flags1 & TR1_SEARCH) ? 0 * a_ptr->pval: 0);
-			extra_stat_bonus += ( (a_ptr->flags1 & TR1_SPEED) ? 0 * a_ptr->pval: 0);
-
-			if (a_ptr->tval == TV_BOW)
-			{
-				extra_stat_bonus += ( (a_ptr->flags1 & TR1_MIGHT) ? 5 * a_ptr->pval / 2: 0);
-				extra_stat_bonus += ( (a_ptr->flags1 & TR1_SHOTS) ? 3 * a_ptr->pval: 0);
-			}
-			else if ( (a_ptr->tval == TV_DIGGING) || (a_ptr->tval == TV_HAFTED) ||
-				(a_ptr->tval == TV_POLEARM) || (a_ptr->tval == TV_SWORD) )
-			{
-				extra_stat_bonus += ( (a_ptr->flags1 & TR1_BLOWS) ? 3 * a_ptr->pval: 0);
-			}
-
-			if (extra_stat_bonus > 24)
-			{
-				/* Inhibit */
-				p += 20000;
-				LOG_PRINT1("Inhibiting!  (Total ability bonus of %d is too high)\n", extra_stat_bonus);
-			}
-			else
-			{
-				p += ability_power[extra_stat_bonus];
-				LOG_PRINT2("Adding power for combination of %d, total is %d\n", ability_power[extra_stat_bonus], p);
-			}
-		}
-
 	}
 	else if (a_ptr->pval < 0)	/* hack: don't give large negatives */
 	{
@@ -2174,7 +2197,21 @@ static s32b artifact_power(int a_idx)
 	}
 	if (a_ptr->flags1 & TR1_SPEED)
 	{
-		p += sign(a_ptr->pval) * speed_power[ABS(a_ptr->pval)];
+		/* Big bonuses use constant increase */
+		if (a_ptr->pval > 10)
+		{
+			p += a_ptr->pval * 10;
+		}
+		/* Ramp up increase quickly */
+		else if (a_ptr->pval > 0)
+		{
+			p += a_ptr->pval * a_ptr->pval;
+		}
+		/* Otherwise */
+		else
+		{
+			p += 3 * a_ptr->pval;
+		}
 		LOG_PRINT2("Adding power for speed bonus/penalty %d, total is %d\n", a_ptr->pval, p);
 	}
 
@@ -2185,12 +2222,19 @@ static s32b artifact_power(int a_idx)
 		LOG_PRINT1("Modifying power for " string ", total is %d\n", p); \
 	}
 
-	ADD_POWER("sustain STR",	 5, TR2_SUST_STR, 2,);
-	ADD_POWER("sustain INT",	 2, TR2_SUST_INT, 2,);
-	ADD_POWER("sustain WIS",	 2, TR2_SUST_WIS, 2,);
-	ADD_POWER("sustain DEX",	 4, TR2_SUST_DEX, 2,);
-	ADD_POWER("sustain CON",	 3, TR2_SUST_CON, 2,);
-	ADD_POWER("sustain CHR",	 0, TR2_SUST_CHR, 2,);
+	ADD_POWER("sustain STR",	 5, TR2_SUST_STR, 2,sustains++);
+	ADD_POWER("sustain INT",	 2, TR2_SUST_INT, 2,sustains++);
+	ADD_POWER("sustain WIS",	 2, TR2_SUST_WIS, 2,sustains++);
+	ADD_POWER("sustain DEX",	 4, TR2_SUST_DEX, 2,sustains++);
+	ADD_POWER("sustain CON",	 3, TR2_SUST_CON, 2,sustains++);
+	ADD_POWER("sustain CHR",	 0, TR2_SUST_CHR, 2,sustains++);
+
+	/* Add bonus for sustains getting 'sustain-lock' */
+	if (sustains > 1)
+	{
+		p += sustains * sustains / 2;
+		LOG_PRINT1("Adding power for multiple sustains, total is %d\n", p); \
+	}
 
 	ADD_POWER("acid immunity",	17, TR2_IM_ACID, 2, immunities++);
 	ADD_POWER("elec immunity",	14, TR2_IM_ELEC, 2, immunities++);
@@ -2204,7 +2248,7 @@ static s32b artifact_power(int a_idx)
 	}
 	if (immunities > 2)
 	{
-		p += 15;
+		p += 45;
 		LOG_PRINT1("Adding power for three or more immunities, total is %d\n", p);
 	}
 	if (immunities > 3)
@@ -2213,8 +2257,10 @@ static s32b artifact_power(int a_idx)
 		LOG_PRINT("INHIBITING: Too many immunities\n");
 	}
 
-	ADD_POWER("free action",	 7, TR3_FREE_ACT, 3,);
-	ADD_POWER("hold life",		 6, TR3_HOLD_LIFE, 3,);
+	low_resists += immunities;
+
+	ADD_POWER("free action",	 7, TR3_FREE_ACT, 3, high_resists++);
+	ADD_POWER("hold life",		 6, TR3_HOLD_LIFE, 3, high_resists++);
 	ADD_POWER("feather fall",	 0, TR3_FEATHER, 3,); /* was 2 */
 	ADD_POWER("permanent light",     2, TR3_LITE, 3,); /* was 2 */
 
@@ -2232,21 +2278,36 @@ static s32b artifact_power(int a_idx)
 	/* Digging moved to general section since it can be on anything now */
 	ADD_POWER("tunnelling",	 a_ptr->pval, TR1_TUNNEL, 1,);
 
-	ADD_POWER("resist acid",	 2, TR2_RES_ACID, 2,);
-	ADD_POWER("resist elec",	 3, TR2_RES_ELEC, 2,);
-	ADD_POWER("resist fire",	 3, TR2_RES_FIRE, 2,);
-	ADD_POWER("resist cold",	 3, TR2_RES_COLD, 2,);
-	ADD_POWER("resist poison",	14, TR2_RES_POIS, 2,);
-	ADD_POWER("resist light",	 3, TR2_RES_LITE, 2,);
-	ADD_POWER("resist dark",	 8, TR2_RES_DARK, 2,);
-	ADD_POWER("resist blindness",	 8, TR2_RES_BLIND, 2,);
-	ADD_POWER("resist confusion",	12, TR2_RES_CONFU, 2,);
-	ADD_POWER("resist sound",	 7, TR2_RES_SOUND, 2,);
-	ADD_POWER("resist shards",	 4, TR2_RES_SHARD, 2,);
-	ADD_POWER("resist nexus",	 5, TR2_RES_NEXUS, 2,);
-	ADD_POWER("resist nether",	10, TR2_RES_NETHR, 2,);
-	ADD_POWER("resist chaos",	10, TR2_RES_CHAOS, 2,);
-	ADD_POWER("resist disenchantment", 10, TR2_RES_DISEN, 2,);
+	ADD_POWER("resist acid",	 2, TR2_RES_ACID, 2, low_resists++);
+	ADD_POWER("resist elec",	 3, TR2_RES_ELEC, 2, low_resists++);
+	ADD_POWER("resist fire",	 3, TR2_RES_FIRE, 2, low_resists++);
+	ADD_POWER("resist cold",	 3, TR2_RES_COLD, 2, low_resists++);
+
+	/* Add bonus for getting 'low resist-lock' */
+	if (low_resists > 1)
+	{
+		p += low_resists * low_resists;
+		LOG_PRINT1("Adding power for multiple low resists, total is %d\n", p); \
+	}
+
+	ADD_POWER("resist poison",	14, TR2_RES_POIS, 2, high_resists++);
+	ADD_POWER("resist light",	 3, TR2_RES_LITE, 2, high_resists++);
+	ADD_POWER("resist dark",	 8, TR2_RES_DARK, 2, high_resists++);
+	ADD_POWER("resist blindness",	 8, TR2_RES_BLIND, 2, high_resists++);
+	ADD_POWER("resist confusion",	12, TR2_RES_CONFU, 2, high_resists++);
+	ADD_POWER("resist sound",	 7, TR2_RES_SOUND, 2, high_resists++);
+	ADD_POWER("resist shards",	 4, TR2_RES_SHARD, 2, high_resists++);
+	ADD_POWER("resist nexus",	 5, TR2_RES_NEXUS, 2, high_resists++);
+	ADD_POWER("resist nether",	10, TR2_RES_NETHR, 2, high_resists++);
+	ADD_POWER("resist chaos",	10, TR2_RES_CHAOS, 2, high_resists++);
+	ADD_POWER("resist disenchantment", 10, TR2_RES_DISEN, 2, high_resists++);
+
+	/* Add bonus for getting 'high resist-lock' */
+	if (high_resists > 1)
+	{
+		p += high_resists * high_resists / 2;
+		LOG_PRINT1("Adding power for multiple high resists, total is %d\n", p); \
+	}
 
 	ADD_POWER("regeneration",	 4, TR3_REGEN, 3,);
 	ADD_POWER("blessed",		 1, TR3_BLESSED, 3,);
@@ -2290,6 +2351,7 @@ static s32b artifact_power(int a_idx)
 	return (p);
 }
 
+
 /*
  * Store the original artifact power ratings as a baseline
  */
@@ -2303,8 +2365,9 @@ static void store_base_power (void)
 
 	for(i = 0; i < z_info->a_max; i++)
 	{
-		base_power[i] = artifact_power(i);
 		a_ptr = &a_info[i];
+		remove_contradictory(a_ptr);
+		base_power[i] = artifact_power(i);
 		a_ptr->power = base_power[i];
 	}
 
@@ -2430,7 +2493,7 @@ static s16b choose_item(int a_idx)
 	}
 
 	tval = item_choices[i].tval;
-	LOG_PRINT(format("Creating item%s\n", item_choices[i].report));
+	LOG_PRINT(format("Creating item: %s\n", item_choices[i].report));
 
 
 	switch (tval)
@@ -2682,7 +2745,7 @@ static s16b choose_item(int a_idx)
  */
 static void do_pval(artifact_type *a_ptr)
 {
-	int factor = 1;
+	int factor = 2;
 	/* Track whether we have blows, might or shots on this item */
 	if (a_ptr->flags1 & TR1_BLOWS) factor++;
 	if (a_ptr->flags1 & TR1_MIGHT) factor++;
@@ -2691,7 +2754,7 @@ static void do_pval(artifact_type *a_ptr)
 	if (a_ptr->pval == 0)
 	{
 		/* Blows, might, shots handled separately */
-		if (factor > 1)
+		if (factor > 2)
 		{
 			a_ptr->pval = (s16b)(1 + rand_int(2));
 			/* Give it a shot at +3 */
@@ -2719,75 +2782,6 @@ static void do_pval(artifact_type *a_ptr)
 	}
 }
 
-
-static void remove_contradictory(artifact_type *a_ptr)
-{
-	if (a_ptr->flags3 & TR3_AGGRAVATE) a_ptr->flags1 &= ~(TR1_STEALTH);
-	if (a_ptr->flags2 & TR2_IM_ACID) a_ptr->flags2 &= ~(TR2_RES_ACID);
-	if (a_ptr->flags2 & TR2_IM_ELEC) a_ptr->flags2 &= ~(TR2_RES_ELEC);
-	if (a_ptr->flags2 & TR2_IM_FIRE) a_ptr->flags2 &= ~(TR2_RES_FIRE);
-	if (a_ptr->flags2 & TR2_IM_COLD) a_ptr->flags2 &= ~(TR2_RES_COLD);
-
-	if (a_ptr->flags2 & TR2_IM_ACID) a_ptr->flags4 &= ~(TR4_HURT_ACID);
-	if (a_ptr->flags2 & TR2_IM_ELEC) a_ptr->flags4 &= ~(TR4_HURT_ELEC);
-	if (a_ptr->flags2 & TR2_IM_FIRE) a_ptr->flags4 &= ~(TR4_HURT_FIRE);
-	if (a_ptr->flags2 & TR2_IM_COLD) a_ptr->flags4 &= ~(TR4_HURT_COLD);
-
-	if (a_ptr->flags2 & TR2_RES_ACID) a_ptr->flags4 &= ~(TR4_HURT_ACID);
-	if (a_ptr->flags2 & TR2_RES_ELEC) a_ptr->flags4 &= ~(TR4_HURT_ELEC);
-	if (a_ptr->flags2 & TR2_RES_FIRE) a_ptr->flags4 &= ~(TR4_HURT_FIRE);
-	if (a_ptr->flags2 & TR2_RES_COLD) a_ptr->flags4 &= ~(TR4_HURT_COLD);
-	if (a_ptr->flags2 & TR2_RES_LITE) a_ptr->flags4 &= ~(TR4_HURT_LITE);
-
-	if (a_ptr->pval < 0)
-	{
-		if (a_ptr->flags1 & TR1_STR) a_ptr->flags2 &= ~(TR2_SUST_STR);
-		if (a_ptr->flags1 & TR1_INT) a_ptr->flags2 &= ~(TR2_SUST_INT);
-		if (a_ptr->flags1 & TR1_WIS) a_ptr->flags2 &= ~(TR2_SUST_WIS);
-		if (a_ptr->flags1 & TR1_DEX) a_ptr->flags2 &= ~(TR2_SUST_DEX);
-		if (a_ptr->flags1 & TR1_CON) a_ptr->flags2 &= ~(TR2_SUST_CON);
-		if (a_ptr->flags1 & TR1_CHR) a_ptr->flags2 &= ~(TR2_SUST_CHR);
-		a_ptr->flags1 &= ~(TR1_BLOWS);
-	}
-
-	if (a_ptr->flags3 & TR3_LIGHT_CURSE) a_ptr->flags3 &= ~(TR3_BLESSED);
-	if (a_ptr->flags1 & TR1_KILL_DRAGON) a_ptr->flags1 &= ~(TR1_SLAY_DRAGON);
-	if (a_ptr->flags1 & TR1_KILL_DEMON) a_ptr->flags1 &= ~(TR1_SLAY_DEMON);
-	if (a_ptr->flags1 & TR1_KILL_UNDEAD) a_ptr->flags1 &= ~(TR1_SLAY_UNDEAD);
-	if (a_ptr->flags3 & TR3_DRAIN_EXP) a_ptr->flags3 &= ~(TR3_HOLD_LIFE);
-	if (a_ptr->flags3 & TR3_DRAIN_HP) a_ptr->flags3 &= ~(TR3_REGEN);
-	if (a_ptr->flags3 & TR3_DRAIN_MANA) a_ptr->flags3 &= ~(TR3_REGEN);
-
-	if (a_ptr->flags1 & TR1_SLAY_NATURAL) a_ptr->flags4 &= ~(TR4_ANIMAL);
-	if (a_ptr->flags1 & TR1_SLAY_EVIL) a_ptr->flags4 &= ~(TR4_EVIL);
-	if (a_ptr->flags1 & TR1_SLAY_UNDEAD) a_ptr->flags4 &= ~(TR4_UNDEAD);
-	if (a_ptr->flags1 & TR1_SLAY_DEMON) a_ptr->flags4 &= ~(TR4_DEMON);
-	if (a_ptr->flags1 & TR1_SLAY_ORC) a_ptr->flags4 &= ~(TR4_ORC);
-	if (a_ptr->flags1 & TR1_SLAY_TROLL) a_ptr->flags4 &= ~(TR4_TROLL);
-	if (a_ptr->flags1 & TR1_SLAY_GIANT) a_ptr->flags4 &= ~(TR4_GIANT);
-	if (a_ptr->flags1 & TR1_SLAY_DRAGON) a_ptr->flags4 &= ~(TR4_DRAGON);
-	if (a_ptr->flags1 & TR1_KILL_DRAGON) a_ptr->flags4 &= ~(TR4_DRAGON);
-	if (a_ptr->flags1 & TR1_KILL_DEMON) a_ptr->flags4 &= ~(TR4_DEMON);
-	if (a_ptr->flags1 & TR1_KILL_UNDEAD) a_ptr->flags4 &= ~(TR4_UNDEAD);
-
-	if (a_ptr->flags1 & TR1_SLAY_ORC) a_ptr->flags4 &= ~(TR4_SLAY_ELF);
-	if (a_ptr->flags1 & TR1_SLAY_GIANT) a_ptr->flags4 &= ~(TR4_SLAY_DWARF);
-
-	if (a_ptr->flags1 & TR1_BRAND_POIS) a_ptr->flags4 &= ~(TR4_HURT_POIS);
-	if (a_ptr->flags1 & TR1_BRAND_ACID) a_ptr->flags4 &= ~(TR4_HURT_ACID);
-	if (a_ptr->flags1 & TR1_BRAND_ELEC) a_ptr->flags4 &= ~(TR4_HURT_ELEC);
-	if (a_ptr->flags1 & TR1_BRAND_FIRE) a_ptr->flags4 &= ~(TR4_HURT_FIRE);
-	if (a_ptr->flags1 & TR1_BRAND_COLD) a_ptr->flags4 &= ~(TR4_HURT_COLD);
-
-	if (a_ptr->flags4 & TR4_BRAND_LITE) a_ptr->flags4 &= ~(TR4_HURT_LITE);
-
-	if (a_ptr->flags4 & TR4_SLAY_MAN) a_ptr->flags4 &= ~(TR4_MAN);
-	if (a_ptr->flags4 & TR4_SLAY_ELF) a_ptr->flags4 &= ~(TR4_ELF);
-	if (a_ptr->flags4 & TR4_SLAY_DWARF) a_ptr->flags4 &= ~(TR4_DWARF);
-
-	if (a_ptr->flags3 & TR3_TELEPORT) a_ptr->flags4 &= ~(TR4_ANCHOR);
-
-}
 
 /*
  * Adjust the parsed frequencies for any peculiarities of the
@@ -5669,12 +5663,20 @@ static void scramble_artifact(int a_idx)
 			 * that we get a base item for borderline cases like Wormtongue.
 			 */
 
-			if (power > 0 && power < 10 && count > MAX_TRIES / 2)
+			if (power > 0 && power < 15 && count > MAX_TRIES / 2)
 			{
 				LOG_PRINT("Cursing base item to help get a match.\n");
 				do_curse(a_ptr);
 				remove_contradictory(a_ptr);
 			}
+
+			else if (power >= 15 && power < 20 && count > MAX_TRIES / 2)
+			{
+				LOG_PRINT("Restricting base item to help get a match.\n");
+				add_restrict_rand(a_ptr);
+				remove_contradictory(a_ptr);
+			}
+
 			ap2 = artifact_power(a_idx);
 			count++;
 			/*
@@ -5781,7 +5783,7 @@ static void scramble_artifact(int a_idx)
 			{
 
 				/* Hack -- add a restriction on the most powerful artifacts */
-				if (ap > 100)
+				if (ap > 150)
 				{
 					add_restrict_rand(a_ptr);
 					remove_contradictory(a_ptr);

@@ -614,9 +614,9 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 				object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_SLAY_MAN);
 			}
 
-			/* Slay elf */
+			/* Slay elf - includes Maia */
 			if ((f4 & (TR4_SLAY_ELF)) &&
-			    (strchr("l", r_ptr->d_char)))
+			    (strchr("lM", r_ptr->d_char)))
 			{
 				if (m_ptr->ml)
 				{

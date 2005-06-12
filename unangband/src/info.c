@@ -1655,23 +1655,30 @@ static const o_flag_desc immune_flags2_desc[] =
 	{ TR2_IM_ACID,  "acid" },
 	{ TR2_IM_ELEC,  "electricity" },
 	{ TR2_IM_FIRE,  "fire" },
-	{ TR2_IM_COLD,  "cold" },
+	{ TR2_IM_COLD,  "cold" }
+};
+
+/*
+ * Protections
+ */
+static const o_flag_desc protect_flags2_desc[] =
+{
+	{ TR2_RES_POIS,	 	"the effects of poison" },
 	{ TR2_RES_BLIND,	"blindness" },
 	{ TR2_RES_SOUND,	"stunning" },
 	{ TR2_RES_SHARD,	"cuts" },
 	{ TR2_RES_CHAOS,	"hallucination" },
-	{ TR2_RES_POIS,	 "the effects of poison" },
-	{ TR2_RES_CONFU,	"the effects of confusion" }
+	{ TR2_RES_CONFU,	"confusion" }
 };
+
 /*
- * Immunities
+ * Protections
  */
-static const o_flag_desc immune_flags3_desc[] =
+static const o_flag_desc protect_flags3_desc[] =
 {
 	{ TR3_FREE_ACT, "paralysis" },
 	{ TR3_FREE_ACT, "magical slowness" }
 };
-
 
 /*
  * Vulneribility
@@ -2133,12 +2140,11 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 	}
 
 	/* Immunity flags */
-	if ((f2) || (f3))
+	if (f2)
 	{
 		list_ptr = list;
 
 		list_ptr = spoiler_flag_aux(f2, immune_flags2_desc, list_ptr, N_ELEMENTS(immune_flags2_desc));
-		list_ptr = spoiler_flag_aux(f3, immune_flags3_desc, list_ptr, N_ELEMENTS(immune_flags3_desc));
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -2153,6 +2159,31 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 				break;
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not provide immunity to", list, TERM_SLATE);
+				break;
+		} 
+	}
+
+	/* Protects flags */
+	if ((f2) || (f3))
+	{
+		list_ptr = list;
+
+		list_ptr = spoiler_flag_aux(f2, protect_flags2_desc, list_ptr, N_ELEMENTS(protect_flags2_desc));
+		list_ptr = spoiler_flag_aux(f3, protect_flags3_desc, list_ptr, N_ELEMENTS(protect_flags3_desc));
+
+		/* Terminate the description list */
+		*list_ptr = NULL;
+		
+		switch (mode)
+		{
+			case LIST_FLAGS_CAN:
+				anything |= outlist("It protects you from", list, TERM_WHITE);
+				break;
+			case LIST_FLAGS_MAY:
+				anything |= outlist("It may protect you from", list, TERM_L_WHITE);
+				break;
+			case LIST_FLAGS_NOT:
+				anything |= outlist("It does not protect you from", list, TERM_SLATE);
 				break;
 		} 
 	}
@@ -4164,25 +4195,6 @@ static int bow_multiplier(int sval)
 }
 
 /*
- * Table giving speed power ratings
- * We go up to +20 here, but in practice it will never get above +15
- */
-
-static s16b speed_power[21] =
-	{0, 1, 3, 6, 9, 13, 17, 22, 27, 33, 39,
-	46, 53, 61, 69, 77, 85, 93, 101, 109, 117};
-
-/*
- * Boost ratings for combinations of ability bonuses
- * We go up to +24 here - anything higher is inhibited
- */
-
-static s16b ability_power[25] =
-	{0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4,
-	6, 8, 10, 12, 15, 18, 21, 24, 28, 32,
-	37, 42, 48, 55};
-
-/*
  * Convert all slay and brand flags into a single index value. This is used in randart.c.
  */
 u32b slay_index(const u32b f1, const u32b f2, const u32b f3, const u32b f4)
@@ -4232,7 +4244,9 @@ s32b object_power(const object_type *o_ptr)
 	s16b k_idx;
 	object_kind *k_ptr;
 	int immunities = 0;
-	int extra_stat_bonus = 0;
+	int sustains = 0;
+	int low_resists = 0;
+	int high_resists = 0;
 	u32b f1, f2, f3, f4;
 
 	/* If artifact, already computed */
@@ -4262,15 +4276,6 @@ s32b object_power(const object_type *o_ptr)
 			 * weapons, which tends to bring these numbers back into line).
 			 */
 
-			if (o_ptr->to_d < 9)
-			{
-				/* Could enchant this up - just use to_d value of 9 */
-				p += 9;
-			}
-			else
-			{
-				p += (o_ptr->to_d);
-			}
 			/*
 			 * Add the average damage of fully enchanted (good) ammo for this
 			 * weapon.  Could make this dynamic based on k_info if desired.
@@ -4307,6 +4312,9 @@ s32b object_power(const object_type *o_ptr)
 			}
 			p *= mult;
 
+			/* Add damage. Don't assume 9 like artifacts */
+			p += (o_ptr->to_d);
+
 			if (f1 & TR1_SHOTS)
 			{
 				/*
@@ -4332,7 +4340,9 @@ s32b object_power(const object_type *o_ptr)
 				}
 
 			}
-			p += sign(o_ptr->to_h) * (ABS(o_ptr->to_h) / 3);
+
+			/* To hit uses a percentage */
+			p += p * (5 * sign(o_ptr->to_h) * (ABS(o_ptr->to_h))) / 100;
 
 			if (o_ptr->weight < k_ptr->weight)
 			{
@@ -4397,15 +4407,8 @@ s32b object_power(const object_type *o_ptr)
 				if (i < 32) p = (p * magic_slay_power[i]) / tot_mon_power;
 			}
 
-			if (o_ptr->to_d < 9)
-			{
-				/* This could be enchanted up, so just assume to_d of +9 */
-				p += 9;
-			}
-			else
-			{
-				p += o_ptr->to_d;
-			}
+			/* Add damage. Don't assume 9 like artifacts */
+			p += o_ptr->to_d;
 
 			if (f1 & TR1_BLOWS)
 			{
@@ -4422,8 +4425,8 @@ s32b object_power(const object_type *o_ptr)
 				}
 			}
 
-			p += sign(o_ptr->to_h) * (ABS(o_ptr->to_h) / 3);
-
+			/* To hit uses a percentage */
+			p += p * (5 * sign(o_ptr->to_h) * (ABS(o_ptr->to_h))) / 100;
 
 			/* Remember, weight is in 0.1 lb. units. */
 			if (o_ptr->weight != k_ptr->weight)
@@ -4480,15 +4483,11 @@ s32b object_power(const object_type *o_ptr)
 				if (i < 32) p = (p * magic_slay_power[i]) / tot_mon_power;
 			}
 
-			if (o_ptr->to_d < 9)
-			{
-				/* This could be enchanted up, so just assume to_d of +9 */
-				p += 9;
-			}
-			else
-			{
-				p += o_ptr->to_d;
-			}
+			/* Add damage. Don't assume 9 like artifacts */
+			p += o_ptr->to_d;
+
+			/* To hit uses a percentage */
+			p += p * (5 * sign(o_ptr->to_h) * (ABS(o_ptr->to_h))) / 100;
 
 			/* Bonus as we carry arrows in inventory and fire them */
 			if (f2 & (TR2_IGNORE_FIRE)) p += 2;
@@ -4637,71 +4636,35 @@ s32b object_power(const object_type *o_ptr)
 	{
 		if (f1 & TR1_STR)
 		{
-			p += 3 * o_ptr->pval;
+			p += 3 * o_ptr->pval * o_ptr->pval / 4;  /* Was 3 * o_ptr->pval */
 		}
 		if (f1 & TR1_INT)
 		{
-			p += 2 * o_ptr->pval;
+			p += o_ptr->pval * o_ptr->pval / 2;  /* Was 2 * o_ptr->pval */
 		}
 		if (f1 & TR1_WIS)
 		{
-			p += 2 * o_ptr->pval;
+			p += o_ptr->pval * o_ptr->pval / 2;  /* Was 2 * o_ptr->pval */
 		}
 		if (f1 & TR1_DEX)
 		{
-			p += 3 * o_ptr->pval;
+			p += 3 * o_ptr->pval * o_ptr->pval / 4;  /* Was 3 * o_ptr->pval */
 		}
 		if (f1 & TR1_CON)
 		{
-			p += 4 * o_ptr->pval;
+			p += o_ptr->pval * o_ptr->pval;  /* Was 4 * o_ptr->pval */
 		}
 		if (f1 & TR1_STEALTH)
 		{
-			p += o_ptr->pval;
+			p += o_ptr->pval * o_ptr->pval / 4; /* Was o_ptr->pval */
 		}
 		/* For now add very small amount for searching */
 		if (f1 & TR1_SEARCH)
 		{
-			p += o_ptr->pval / 6;
+			p += (o_ptr->pval * o_ptr->pval) / 24; /* Was o_ptr->pval / 6 */
 		}
-		/* Add extra power term if there are a lot of ability bonuses */
-		if (o_ptr->pval > 0)
-		{
-			extra_stat_bonus += ( (f1 & TR1_STR) ? o_ptr->pval: 0);
-			extra_stat_bonus += ( (f1 & TR1_INT) ? 3 * o_ptr->pval / 4: 0);
-			extra_stat_bonus += ( (f1 & TR1_WIS) ? 3 * o_ptr->pval / 4: 0);
-			extra_stat_bonus += ( (f1 & TR1_DEX) ? o_ptr->pval: 0);
-			extra_stat_bonus += ( (f1 & TR1_CON) ? o_ptr->pval: 0);
-			extra_stat_bonus += ( (f1 & TR1_CHR) ? 0 * o_ptr->pval: 0);
-			extra_stat_bonus += ( (f1 & TR1_STEALTH) ? 3 * o_ptr->pval / 4: 0);
-			extra_stat_bonus += ( (f1 & TR1_INFRA) ? 0 * o_ptr->pval: 0);
-			extra_stat_bonus += ( (f1 & TR1_TUNNEL) ? 0 * o_ptr->pval: 0);
-			extra_stat_bonus += ( (f1 & TR1_SEARCH) ? 0 * o_ptr->pval: 0);
-			extra_stat_bonus += ( (f1 & TR1_SPEED) ? 0 * o_ptr->pval: 0);
-
-			if (o_ptr->tval == TV_BOW)
-			{
-				extra_stat_bonus += ( (f1 & TR1_MIGHT) ? 5 * o_ptr->pval / 2: 0);
-				extra_stat_bonus += ( (f1 & TR1_SHOTS) ? 3 * o_ptr->pval: 0);
-			}
-			else if ( (o_ptr->tval == TV_DIGGING) || (o_ptr->tval == TV_HAFTED) ||
-				(o_ptr->tval == TV_POLEARM) || (o_ptr->tval == TV_SWORD) )
-			{
-				extra_stat_bonus += ( (f1 & TR1_BLOWS) ? 3 * o_ptr->pval: 0);
-			}
-
-			if (extra_stat_bonus > 24)
-			{
-				/* Inhibit */
-				p += 20000;
-			}
-			else
-			{
-				p += ability_power[extra_stat_bonus];
-			}
-		}
-
 	}
+
 	else if (o_ptr->pval < 0)	/* hack: don't give large negatives */
 	{
 		if (f1 & TR1_STR) p += 4 * o_ptr->pval;
@@ -4721,7 +4684,21 @@ s32b object_power(const object_type *o_ptr)
 	}
 	if (f1 & TR1_SPEED)
 	{
-		p += sign(o_ptr->pval) * speed_power[ABS(o_ptr->pval)];
+		/* Big bonuses use constant increase */
+		if (o_ptr->pval > 10)
+		{
+			p += o_ptr->pval * 10;
+		}
+		/* Ramp up increase quickly */
+		else if (o_ptr->pval > 0)
+		{
+			p += o_ptr->pval * o_ptr->pval;
+		}
+		/* Otherwise */
+		else
+		{
+			p += 3 * o_ptr->pval;
+		}
 	}
 
 #define ADD_POWER(string, val, flag, flgnum, extra) \
@@ -4730,12 +4707,15 @@ s32b object_power(const object_type *o_ptr)
 		extra; \
 	}
 
-	ADD_POWER("sustain STR",	 5, TR2_SUST_STR, 2,);
-	ADD_POWER("sustain INT",	 2, TR2_SUST_INT, 2,);
-	ADD_POWER("sustain WIS",	 2, TR2_SUST_WIS, 2,);
-	ADD_POWER("sustain DEX",	 4, TR2_SUST_DEX, 2,);
-	ADD_POWER("sustain CON",	 3, TR2_SUST_CON, 2,);
-	ADD_POWER("sustain CHR",	 0, TR2_SUST_CHR, 2,);
+	ADD_POWER("sustain STR",	 5, TR2_SUST_STR, 2, sustains++);
+	ADD_POWER("sustain INT",	 2, TR2_SUST_INT, 2, sustains++);
+	ADD_POWER("sustain WIS",	 2, TR2_SUST_WIS, 2, sustains++);
+	ADD_POWER("sustain DEX",	 4, TR2_SUST_DEX, 2, sustains++);
+	ADD_POWER("sustain CON",	 3, TR2_SUST_CON, 2, sustains++);
+	ADD_POWER("sustain CHR",	 0, TR2_SUST_CHR, 2, sustains++);
+
+	/* Add bonus for sustains getting 'sustain-lock' */
+	if (sustains > 1) p += sustains * sustains / 2;
 
 	ADD_POWER("acid immunity",	17, TR2_IM_ACID, 2, immunities++);
 	ADD_POWER("elec immunity",	14, TR2_IM_ELEC, 2, immunities++);
@@ -4748,15 +4728,15 @@ s32b object_power(const object_type *o_ptr)
 	}
 	if (immunities > 2)
 	{
-		p += 15;
+		p += 45;
 	}
 	if (immunities > 3)
 	{
 		p += 20000;		/* inhibit */
 	}
 
-	ADD_POWER("free action",	 7, TR3_FREE_ACT, 3,);
-	ADD_POWER("hold life",		 6, TR3_HOLD_LIFE, 3,);
+	ADD_POWER("free action",	 7, TR3_FREE_ACT, 3, high_resists++);
+	ADD_POWER("hold life",		 6, TR3_HOLD_LIFE, 3, high_resists++);
 	ADD_POWER("feather fall",	 0, TR3_FEATHER, 3,); /* was 2 */
 	ADD_POWER("permanent light",     2, TR3_LITE, 3,); /* was 2 */
 
@@ -4774,21 +4754,28 @@ s32b object_power(const object_type *o_ptr)
 	/* Digging moved to general section since it can be on anything now */
 	ADD_POWER("tunnelling",	 o_ptr->pval, TR1_TUNNEL, 1,);
 
-	ADD_POWER("resist acid",	 2, TR2_RES_ACID, 2,);
-	ADD_POWER("resist elec",	 3, TR2_RES_ELEC, 2,);
-	ADD_POWER("resist fire",	 3, TR2_RES_FIRE, 2,);
-	ADD_POWER("resist cold",	 3, TR2_RES_COLD, 2,);
-	ADD_POWER("resist poison",	14, TR2_RES_POIS, 2,);
-	ADD_POWER("resist light",	 3, TR2_RES_LITE, 2,);
-	ADD_POWER("resist dark",	 8, TR2_RES_DARK, 2,);
-	ADD_POWER("resist blindness",	 8, TR2_RES_BLIND, 2,);
-	ADD_POWER("resist confusion",	12, TR2_RES_CONFU, 2,);
-	ADD_POWER("resist sound",	 7, TR2_RES_SOUND, 2,);
-	ADD_POWER("resist shards",	 4, TR2_RES_SHARD, 2,);
-	ADD_POWER("resist nexus",	 5, TR2_RES_NEXUS, 2,);
-	ADD_POWER("resist nether",	10, TR2_RES_NETHR, 2,);
-	ADD_POWER("resist chaos",	10, TR2_RES_CHAOS, 2,);
-	ADD_POWER("resist disenchantment", 10, TR2_RES_DISEN, 2,);
+	ADD_POWER("resist acid",	 2, TR2_RES_ACID, 2, low_resists++);
+	ADD_POWER("resist elec",	 3, TR2_RES_ELEC, 2, low_resists++);
+	ADD_POWER("resist fire",	 3, TR2_RES_FIRE, 2, low_resists++);
+	ADD_POWER("resist cold",	 3, TR2_RES_COLD, 2, low_resists++);
+
+	/* Add bonus for sustains getting 'low_resists-lock' */
+	if (low_resists > 1) p += low_resists * low_resists;
+
+	ADD_POWER("resist poison",	14, TR2_RES_POIS, 2, high_resists++);
+	ADD_POWER("resist light",	 3, TR2_RES_LITE, 2, high_resists++);
+	ADD_POWER("resist dark",	 8, TR2_RES_DARK, 2, high_resists++);
+	ADD_POWER("resist blindness",	 8, TR2_RES_BLIND, 2, high_resists++);
+	ADD_POWER("resist confusion",	12, TR2_RES_CONFU, 2, high_resists++);
+	ADD_POWER("resist sound",	 7, TR2_RES_SOUND, 2, high_resists++);
+	ADD_POWER("resist shards",	 4, TR2_RES_SHARD, 2, high_resists++);
+	ADD_POWER("resist nexus",	 5, TR2_RES_NEXUS, 2, high_resists++);
+	ADD_POWER("resist nether",	10, TR2_RES_NETHR, 2, high_resists++);
+	ADD_POWER("resist chaos",	10, TR2_RES_CHAOS, 2, high_resists++);
+	ADD_POWER("resist disenchantment", 10, TR2_RES_DISEN, 2, high_resists++);
+
+	/* Add bonus for sustains getting 'high_resists-lock' */
+	if (high_resists > 1) p += high_resists * high_resists / 2;
 
 	ADD_POWER("regeneration",	 4, TR3_REGEN, 3,);
 	ADD_POWER("blessed",		 1, TR3_BLESSED, 3,);
