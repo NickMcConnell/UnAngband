@@ -7071,6 +7071,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 								/* Dump a message */
 								msg_format("%^s tries to pick up %s, but fails.",
 									   m_name, o_name);
+
 								/* Mark object as ungettable? */
 								if ((o_ptr->discount == 0) &&
 									!(o_ptr->ident & (IDENT_SENSE))

@@ -194,18 +194,116 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 		if (object_xtra_what[o_ptr->xtra1] == 1)
 		{
 			(*f1) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+
+			/* Guarantee some other flags */
+			switch (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2)
+			{
+				case TR1_STR:
+					if (o_ptr->pval > 0) (*f2) |= TR2_SUST_STR;
+					break;
+				case TR1_INT:
+					if (o_ptr->pval > 0) (*f2) |= TR2_SUST_INT;
+					break;
+				case TR1_WIS:
+					if (o_ptr->pval > 0) (*f2) |= TR2_SUST_WIS;
+					break;
+				case TR1_DEX:
+					if (o_ptr->pval > 0) (*f2) |= TR2_SUST_DEX;
+					break;
+				case TR1_CON:
+					if (o_ptr->pval > 0) (*f2) |= TR2_SUST_CON;
+					break;
+				case TR1_CHR:
+					if (o_ptr->pval > 0) (*f2) |= TR2_SUST_CHR;
+					break;
+				case TR1_BRAND_ACID:
+					(*f2) |= TR2_IGNORE_ACID;
+					break;
+				case TR1_BRAND_FIRE:
+					(*f2) |= TR2_IGNORE_FIRE;
+					break;
+				case TR1_BRAND_ELEC:
+					(*f2) |= TR2_IGNORE_ELEC;
+					break;
+				case TR1_BRAND_COLD:
+					(*f2) |= TR2_IGNORE_COLD;
+					break;
+			}
 		}
+
 		else if (object_xtra_what[o_ptr->xtra1] == 2)
 		{
 			(*f2) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+
+			/* Guarantee some other flags */
+			switch (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2)
+			{
+				case TR2_IM_ACID:
+				case TR2_RES_ACID:
+					(*f2) |= TR2_IGNORE_ACID;
+					break;
+				case TR2_IM_FIRE:
+				case TR2_RES_FIRE:
+					(*f2) |= TR2_IGNORE_FIRE;
+					break;
+				case TR2_IM_ELEC:
+				case TR2_RES_ELEC:
+					(*f2) |= TR2_IGNORE_ELEC;
+					break;
+				case TR2_IM_COLD:
+				case TR2_RES_COLD:
+					(*f2) |= TR2_IGNORE_COLD;
+					break;
+			}
 		}
 		else if (object_xtra_what[o_ptr->xtra1] == 3)
 		{
 			(*f3) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+
+			/* Guarantee some other flags */
+			switch (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2)
+			{
+				case TR3_PERMA_CURSE:
+					(*f3) |= TR3_HEAVY_CURSE;
+					/* Fall through */
+				case TR3_TELEPORT:
+				case TR3_DRAIN_MANA:
+				case TR3_DRAIN_HP:
+				case TR3_DRAIN_EXP:
+				case TR3_AGGRAVATE:
+				case TR3_HEAVY_CURSE:
+					(*f3) |= TR3_LIGHT_CURSE;
+					break;
+			}
 		}
 		else if (object_xtra_what[o_ptr->xtra1] == 4)
 		{
 			(*f4) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+
+			/* Guarantee some other flags */
+			switch (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2)
+			{
+				case TR4_VAMP_HP:
+					(*f3) |= (TR3_DRAIN_HP | TR3_LIGHT_CURSE);
+					break;
+				case TR4_VAMP_MANA:
+					(*f3) |= (TR3_DRAIN_MANA | TR3_LIGHT_CURSE);
+					break;
+				case TR4_HURT_WATER:
+				case TR4_HURT_LITE:
+				case TR4_HUNGER:
+				case TR4_ANCHOR:
+				case TR4_SILENT:
+				case TR4_STATIC:
+				case TR4_WINDY:
+				case TR4_HURT_POIS:
+				case TR4_HURT_ACID:
+				case TR4_HURT_ELEC:
+				case TR4_HURT_FIRE:
+				case TR4_HURT_COLD:
+					(*f3) |= TR3_LIGHT_CURSE;
+					break;
+			}
 		}
 	}
 }
@@ -4030,4 +4128,708 @@ void inven_drop_flags(object_type *o_ptr)
 		i_ptr->may_flags4 &= ~(f4);
 	}
 }
+
+
+#define sign(x)	((x) > 0 ? 1 : ((x) < 0 ? -1 : 0))
+
+/*
+ * Average damage for good ego ammo of various types, used for balance
+ * The current values assume normal (non-seeker) ammo enchanted to +9
+ */
+
+#define AVG_SLING_AMMO_DAMAGE 11
+#define AVG_BOW_AMMO_DAMAGE 12
+#define AVG_XBOW_AMMO_DAMAGE 12
+
+/*
+ * Calculate the multiplier we'll get with a given bow type.
+ */
+static int bow_multiplier(int sval)
+{
+	switch (sval)
+	{
+		case SV_SLING:
+		case SV_SHORT_BOW:
+			return (2);
+		case SV_LONG_BOW:
+		case SV_LIGHT_XBOW:
+			return (3);
+		case SV_HEAVY_XBOW:
+			return (4);
+		default:
+			msg_format("Illegal bow sval %s", sval);
+	}
+
+	return (0);
+}
+
+/*
+ * Table giving speed power ratings
+ * We go up to +20 here, but in practice it will never get above +15
+ */
+
+static s16b speed_power[21] =
+	{0, 1, 3, 6, 9, 13, 17, 22, 27, 33, 39,
+	46, 53, 61, 69, 77, 85, 93, 101, 109, 117};
+
+/*
+ * Boost ratings for combinations of ability bonuses
+ * We go up to +24 here - anything higher is inhibited
+ */
+
+static s16b ability_power[25] =
+	{0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4,
+	6, 8, 10, 12, 15, 18, 21, 24, 28, 32,
+	37, 42, 48, 55};
+
+/*
+ * Convert all slay and brand flags into a single index value. This is used in randart.c.
+ */
+u32b slay_index(const u32b f1, const u32b f2, const u32b f3, const u32b f4)
+{
+	u32b s_index = 0x00000000L;
+
+	(void)f2; (void)f3;
+
+	if (f1 & TR1_SLAY_NATURAL) s_index |= 0x00000001;
+	if (f1 & TR1_SLAY_EVIL) s_index |= 0x00000002;
+	if (f1 & TR1_SLAY_UNDEAD) s_index |= 0x00000004;
+	if (f1 & TR1_SLAY_DEMON) s_index |= 0x00000008;
+	if (f1 & TR1_SLAY_ORC) s_index |= 0x00000010;
+	if (f1 & TR1_SLAY_TROLL) s_index |= 0x00000020;
+	if (f1 & TR1_SLAY_GIANT) s_index |= 0x00000040;
+	if (f1 & TR1_SLAY_DRAGON) s_index |= 0x00000080;
+	if (f1 & TR1_KILL_DRAGON) s_index |= 0x00000100;
+	if (f1 & TR1_KILL_DEMON) s_index |= 0x00000200;
+	if (f1 & TR1_KILL_UNDEAD) s_index |= 0x00000400;
+
+	if (f1 & TR1_BRAND_POIS) s_index |= 0x00000800;
+	if (f1 & TR1_BRAND_ACID) s_index |= 0x00001000;
+	if (f1 & TR1_BRAND_ELEC) s_index |= 0x00002000;
+	if (f1 & TR1_BRAND_FIRE) s_index |= 0x00004000;
+	if (f1 & TR1_BRAND_COLD) s_index |= 0x00008000;
+
+	if (f4 & TR4_BRAND_LITE) s_index |= 0x00010000;
+	if (f4 & TR4_BRAND_DARK) s_index |= 0x00020000;
+
+	if (f4 & TR4_SLAY_MAN) s_index |= 0x00040000;
+	if (f4 & TR4_SLAY_ELF) s_index |= 0x00080000;
+	if (f4 & TR4_SLAY_DWARF) s_index |= 0x00100000;
+
+	return s_index;
+} 
+
+
+
+/*
+ * Evaluate the objects's overall power level.
+ *
+ * Adopted from the randart.c patch by Chris Carr / Chris Robertson.
+ */
+s32b object_power(const object_type *o_ptr)
+{
+	s32b p = 0;
+	s16b k_idx;
+	object_kind *k_ptr;
+	int immunities = 0;
+	int extra_stat_bonus = 0;
+	u32b f1, f2, f3, f4;
+
+	/* If artifact, already computed */
+	if (o_ptr->name1) return (a_info[o_ptr->name1].power);
+
+	/* Get the flags */
+	object_flags(o_ptr,&f1,&f2,&f3,&f4);
+
+	/* Lookup the item if not yet cached */
+	k_idx = lookup_kind(o_ptr->tval, o_ptr->sval);
+
+	/* Get the object */
+	k_ptr = &k_info[k_idx];
+
+	/* Evaluate certain abilities based on type of object. */
+	switch (o_ptr->tval)
+	{
+		case TV_BOW:
+		{
+			int mult;
+
+			/*
+			 * Damage multiplier for bows should be weighted less than that
+			 * for melee weapons, since players typically get fewer shots
+			 * than hits (note, however, that the multipliers are applied
+			 * afterwards in the bow calculation, not before as for melee
+			 * weapons, which tends to bring these numbers back into line).
+			 */
+
+			if (o_ptr->to_d < 9)
+			{
+				/* Could enchant this up - just use to_d value of 9 */
+				p += 9;
+			}
+			else
+			{
+				p += (o_ptr->to_d);
+			}
+			/*
+			 * Add the average damage of fully enchanted (good) ammo for this
+			 * weapon.  Could make this dynamic based on k_info if desired.
+			 */
+
+			if (o_ptr->sval == SV_SLING)
+			{
+				p += AVG_SLING_AMMO_DAMAGE;
+			}
+			else if (o_ptr->sval == SV_SHORT_BOW ||
+				o_ptr->sval == SV_LONG_BOW)
+			{
+				p += AVG_BOW_AMMO_DAMAGE;
+			}
+			else if (o_ptr->sval == SV_LIGHT_XBOW ||
+				o_ptr->sval == SV_HEAVY_XBOW)
+			{
+				p += AVG_XBOW_AMMO_DAMAGE;
+			}
+
+			mult = bow_multiplier(o_ptr->sval);
+
+			if (f1 & TR1_MIGHT)
+			{
+				if (o_ptr->pval > 3 || o_ptr->pval < 0)
+				{
+					p += 20000;	/* inhibit */
+					mult = 1;	/* don't overflow */
+				}
+				else
+				{
+					mult += o_ptr->pval;
+				}
+			}
+			p *= mult;
+
+			if (f1 & TR1_SHOTS)
+			{
+				/*
+				 * Extra shots are calculated differently for bows than for
+				 * slings or crossbows, because of rangers ... not any more CC 13/8/01
+				 */
+
+				if (o_ptr->pval > 3 || o_ptr->pval < 0)
+				{
+					p += 20000;	/* inhibit */
+				}
+				else if (o_ptr->pval > 0)
+				{
+					if (o_ptr->sval == SV_SHORT_BOW ||
+						o_ptr->sval == SV_LONG_BOW)
+					{
+						p = (p * (1 + o_ptr->pval));
+					}
+					else
+					{
+						p = (p * (1 + o_ptr->pval));
+					}
+				}
+
+			}
+			p += sign(o_ptr->to_h) * (ABS(o_ptr->to_h) / 3);
+
+			if (o_ptr->weight < k_ptr->weight)
+			{
+				p++;
+			}
+
+			/*
+			 * Correction to match ratings to melee damage ratings.
+			 * We multiply all missile weapons by 1.5 in order to compare damage.
+			 * (CR 11/20/01 - changed this to 1.25).
+			 * Melee weapons assume 5 attacks per turn, so we must also divide
+			 * by 5 to get equal ratings.
+			 */
+
+			if (o_ptr->sval == SV_SHORT_BOW ||
+				o_ptr->sval == SV_LONG_BOW)
+			{
+				p = sign(p) * (ABS(p) / 4);
+			}
+			else
+			{
+				p = sign(p) * (ABS(p) / 4);
+			}
+
+			/* Slight bonus as we may choose to use a swap bow */
+			if (f2 & (TR2_IGNORE_FIRE)) p++;
+			if (f2 & (TR2_IGNORE_ACID)) p++;
+			if (f2 & (TR2_IGNORE_THEFT)) p++;
+			break;
+		}
+
+		case TV_HAFTED:
+		case TV_STAFF:
+		{
+			/* Bonus as we may use a swap weapon */
+			if (f2 & (TR2_IGNORE_FIRE)) p++;
+
+			/* Fall through */
+		}
+		case TV_DIGGING:
+		case TV_POLEARM:
+		case TV_SWORD:
+		{
+			p += o_ptr->dd * (o_ptr->ds + 1) / 2;
+
+			/* Apply the correct ego slay multiplier */
+			if (o_ptr->name2)
+			{
+				p = (p * e_info[o_ptr->name2].slay_power) / tot_mon_power;
+			}
+
+			/* Hack -- For efficiency, compute for first slay or brand flag only */
+			else
+			{
+				int i;
+				u32b j, s_index;
+
+				s_index = slay_index(f1, f2, f3, f4);
+
+				for (i = 0, j = 0x00000001L;(i < 32) && (j != s_index); i++, j<<=1);
+
+				if (i < 32) p = (p * magic_slay_power[i]) / tot_mon_power;
+			}
+
+			if (o_ptr->to_d < 9)
+			{
+				/* This could be enchanted up, so just assume to_d of +9 */
+				p += 9;
+			}
+			else
+			{
+				p += o_ptr->to_d;
+			}
+
+			if (f1 & TR1_BLOWS)
+			{
+				if (o_ptr->pval > 3 || o_ptr->pval < 0)
+				{
+					p += 20000;	/* inhibit */
+				}
+				else if (o_ptr->pval > 0)
+				{
+					p = sign(p) * ((ABS(p) * (5 + o_ptr->pval)) / 5);
+					/* Add an extra +5 per blow to account for damage rings */
+					/* (The +5 figure is a compromise here - could be adjusted) */
+					p += 5 * o_ptr->pval;
+				}
+			}
+
+			p += sign(o_ptr->to_h) * (ABS(o_ptr->to_h) / 3);
+
+
+			/* Remember, weight is in 0.1 lb. units. */
+			if (o_ptr->weight != k_ptr->weight)
+			{
+			/*	p += (k_ptr->weight - o_ptr->weight) / 20; */
+			}
+
+			/* Bonuses as we may choose to use a swap weapon */
+			if (f2 & (TR2_IGNORE_ACID)) p++;
+			if (f2 & (TR2_IGNORE_THEFT)) p++;
+
+			/* Bonus if throwing weapon */
+			if (f3 & (TR3_THROWING))
+			{
+				p += 2;
+
+				/* Bonus as we carry thrown weapons in inventory and throw them */
+				if (f2 & (TR2_IGNORE_ACID)) p++;
+				if (f2 & (TR2_IGNORE_FIRE)) p++;
+			}
+
+
+			break;
+		}
+
+		case TV_BOLT:
+		{
+			/* Bonus as we carry arrows in inventory and fire them */
+			if (f2 & (TR2_IGNORE_ACID)) p += 2;
+
+			/* Fall through */
+		}
+
+		case TV_ARROW:
+		{
+			p += o_ptr->dd * (o_ptr->ds + 1) / 2;
+
+			/* Apply the correct ego slay multiplier */
+			if (o_ptr->name2)
+			{
+				p += (p * e_info[o_ptr->name2].slay_power) / tot_mon_power;
+			}
+
+			/* Hack -- For efficiency, compute for first slay or brand flag only */
+			else
+			{
+				int i;
+				u32b j, s_index;
+
+				s_index = slay_index(f1, f2, f3, f4);
+
+				for (i = 0, j = 0x00000001L;(i < 32) && (j != s_index); i++, j<<=1);
+
+				if (i < 32) p = (p * magic_slay_power[i]) / tot_mon_power;
+			}
+
+			if (o_ptr->to_d < 9)
+			{
+				/* This could be enchanted up, so just assume to_d of +9 */
+				p += 9;
+			}
+			else
+			{
+				p += o_ptr->to_d;
+			}
+
+			/* Bonus as we carry arrows in inventory and fire them */
+			if (f2 & (TR2_IGNORE_FIRE)) p += 2;
+			if (f2 & (TR2_IGNORE_THEFT)) p++;
+
+			break;
+		}
+
+		case TV_BOOTS:
+		case TV_GLOVES:
+		case TV_CLOAK:
+		case TV_SOFT_ARMOR:
+		{
+			/* Bonus as we may choose to use a swap armour */
+			if (f2 & (TR2_IGNORE_FIRE)) p++;
+
+			/* Fall through */
+		}
+		case TV_HELM:
+		case TV_CROWN:
+		case TV_SHIELD:
+		case TV_HARD_ARMOR:
+		case TV_DRAG_ARMOR:
+		{
+			p += sign(o_ptr->ac) * ((ABS(o_ptr->ac) * 2) / 3);
+
+			p += sign(o_ptr->to_h) * ((ABS(o_ptr->to_h) * 2) / 3);
+
+			p += o_ptr->to_d * 2;
+
+			if (o_ptr->weight < k_ptr->weight)
+			{
+				p += (k_ptr->weight - o_ptr->weight) / 10;
+			}
+
+			/* Big bonus as it protects against acid damage */
+			if (f2 & (TR2_IGNORE_ACID)) p+= 3;
+
+			/* Bonus as we may choose to use a swap armour */
+			if (f2 & (TR2_IGNORE_THEFT)) p++;
+
+			break;
+		}
+
+		case TV_LITE:
+		{
+			p += sign(o_ptr->to_h) * ((ABS(o_ptr->to_h) * 2) / 3);
+
+			p += o_ptr->to_d * 2;
+
+			/* Bonuses as we may choose to use a swap light */
+			if (f2 & (TR2_IGNORE_FIRE)) p++;
+			if (f2 & (TR2_IGNORE_THEFT)) p++;
+
+			/* Bonus as light will not go out in water */
+			if (f2 & (TR2_IGNORE_WATER)) p += 3;
+			break;
+		}
+
+		case TV_RING:
+		{
+			/* Bonuses as we may choose to use a swap ring */
+			if (f2 & (TR2_IGNORE_ELEC)) p++;
+
+			/* Fall through */
+		}
+		case TV_AMULET:
+		{
+
+			p += sign(o_ptr->to_h) * ((ABS(o_ptr->to_h) * 2) / 3);
+
+			p += o_ptr->to_d * 2;
+
+			p += 0;
+
+			/* Bonuses as we may choose to use a swap amulet / ring */
+			if (f2 & (TR2_IGNORE_THEFT)) p++;
+			break;
+		}
+
+		case TV_WAND:
+		{
+			if (f2 & (TR2_IGNORE_ELEC)) p+= 2;
+			if (f2 & (TR2_IGNORE_THEFT)) p++;
+
+			break;
+		}
+
+
+		case TV_MAGIC_BOOK:
+		case TV_PRAYER_BOOK:
+		case TV_SONG_BOOK:
+		case TV_INSTRUMENT:
+		case TV_SCROLL:
+		case TV_MAP:
+		{
+			/* Bonus as we carry items in inventory */
+			if (f2 & (TR2_IGNORE_FIRE)) p += 2;
+
+			/* Fall through */
+		}
+		case TV_FOOD:
+		{
+			if (f2 & (TR2_IGNORE_WATER)) p += 2;
+			if (f2 & (TR2_IGNORE_THEFT)) p++;
+
+			break;
+		}
+
+		case TV_FLASK:
+		case TV_POTION:
+		{
+			if (f2 & (TR2_IGNORE_COLD)) p += 2;
+			if (f2 & (TR2_IGNORE_THEFT)) p++;
+		}
+
+	}
+
+	/* Remainder must be wieldable or wearable item */
+	if ((o_ptr->tval != TV_SWORD) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_STAFF)
+		&& (o_ptr->tval != TV_HAFTED) && (o_ptr->tval != TV_POLEARM) && (o_ptr->tval != TV_BOW)
+		&& (o_ptr->tval != TV_HELM) && (o_ptr->tval != TV_BOOTS) && (o_ptr->tval != TV_GLOVES)
+		&& (o_ptr->tval != TV_CLOAK) && (o_ptr->tval != TV_SOFT_ARMOR) && (o_ptr->tval != TV_HARD_ARMOR)
+		&& (o_ptr->tval != TV_DRAG_ARMOR) && (o_ptr->tval != TV_CROWN) && (o_ptr->tval != TV_SHIELD)
+		&& (o_ptr->tval != TV_INSTRUMENT) && (o_ptr->tval != TV_RING) && (o_ptr->tval != TV_AMULET)
+		&& (o_ptr->tval != TV_LITE))
+		return (p);
+
+	/* Other abilities are evaluated independent of the object type. */
+	p += sign(o_ptr->to_a) * (ABS(o_ptr->to_a) / 2);
+
+	if (o_ptr->to_a > 20)
+	{
+		p += (o_ptr->to_a - 19);
+	}
+	if (o_ptr->to_a > 30)
+	{
+		p += (o_ptr->to_a - 29);
+	}
+	if (o_ptr->to_a > 40)
+	{
+		p += 20000;	/* inhibit */
+	}
+
+	if (o_ptr->pval > 0)
+	{
+		if (f1 & TR1_STR)
+		{
+			p += 3 * o_ptr->pval;
+		}
+		if (f1 & TR1_INT)
+		{
+			p += 2 * o_ptr->pval;
+		}
+		if (f1 & TR1_WIS)
+		{
+			p += 2 * o_ptr->pval;
+		}
+		if (f1 & TR1_DEX)
+		{
+			p += 3 * o_ptr->pval;
+		}
+		if (f1 & TR1_CON)
+		{
+			p += 4 * o_ptr->pval;
+		}
+		if (f1 & TR1_STEALTH)
+		{
+			p += o_ptr->pval;
+		}
+		/* For now add very small amount for searching */
+		if (f1 & TR1_SEARCH)
+		{
+			p += o_ptr->pval / 6;
+		}
+		/* Add extra power term if there are a lot of ability bonuses */
+		if (o_ptr->pval > 0)
+		{
+			extra_stat_bonus += ( (f1 & TR1_STR) ? o_ptr->pval: 0);
+			extra_stat_bonus += ( (f1 & TR1_INT) ? 3 * o_ptr->pval / 4: 0);
+			extra_stat_bonus += ( (f1 & TR1_WIS) ? 3 * o_ptr->pval / 4: 0);
+			extra_stat_bonus += ( (f1 & TR1_DEX) ? o_ptr->pval: 0);
+			extra_stat_bonus += ( (f1 & TR1_CON) ? o_ptr->pval: 0);
+			extra_stat_bonus += ( (f1 & TR1_CHR) ? 0 * o_ptr->pval: 0);
+			extra_stat_bonus += ( (f1 & TR1_STEALTH) ? 3 * o_ptr->pval / 4: 0);
+			extra_stat_bonus += ( (f1 & TR1_INFRA) ? 0 * o_ptr->pval: 0);
+			extra_stat_bonus += ( (f1 & TR1_TUNNEL) ? 0 * o_ptr->pval: 0);
+			extra_stat_bonus += ( (f1 & TR1_SEARCH) ? 0 * o_ptr->pval: 0);
+			extra_stat_bonus += ( (f1 & TR1_SPEED) ? 0 * o_ptr->pval: 0);
+
+			if (o_ptr->tval == TV_BOW)
+			{
+				extra_stat_bonus += ( (f1 & TR1_MIGHT) ? 5 * o_ptr->pval / 2: 0);
+				extra_stat_bonus += ( (f1 & TR1_SHOTS) ? 3 * o_ptr->pval: 0);
+			}
+			else if ( (o_ptr->tval == TV_DIGGING) || (o_ptr->tval == TV_HAFTED) ||
+				(o_ptr->tval == TV_POLEARM) || (o_ptr->tval == TV_SWORD) )
+			{
+				extra_stat_bonus += ( (f1 & TR1_BLOWS) ? 3 * o_ptr->pval: 0);
+			}
+
+			if (extra_stat_bonus > 24)
+			{
+				/* Inhibit */
+				p += 20000;
+			}
+			else
+			{
+				p += ability_power[extra_stat_bonus];
+			}
+		}
+
+	}
+	else if (o_ptr->pval < 0)	/* hack: don't give large negatives */
+	{
+		if (f1 & TR1_STR) p += 4 * o_ptr->pval;
+		if (f1 & TR1_INT) p += 2 * o_ptr->pval;
+		if (f1 & TR1_WIS) p += 2 * o_ptr->pval;
+		if (f1 & TR1_DEX) p += 3 * o_ptr->pval;
+		if (f1 & TR1_CON) p += 4 * o_ptr->pval;
+		if (f1 & TR1_STEALTH) p += o_ptr->pval;
+	}
+	if (f1 & TR1_CHR)
+	{
+		p += o_ptr->pval;
+	}
+	if (f1 & TR1_INFRA)
+	{
+		p += o_ptr->pval;
+	}
+	if (f1 & TR1_SPEED)
+	{
+		p += sign(o_ptr->pval) * speed_power[ABS(o_ptr->pval)];
+	}
+
+#define ADD_POWER(string, val, flag, flgnum, extra) \
+	if (f##flgnum & flag) { \
+		p += (val); \
+		extra; \
+	}
+
+	ADD_POWER("sustain STR",	 5, TR2_SUST_STR, 2,);
+	ADD_POWER("sustain INT",	 2, TR2_SUST_INT, 2,);
+	ADD_POWER("sustain WIS",	 2, TR2_SUST_WIS, 2,);
+	ADD_POWER("sustain DEX",	 4, TR2_SUST_DEX, 2,);
+	ADD_POWER("sustain CON",	 3, TR2_SUST_CON, 2,);
+	ADD_POWER("sustain CHR",	 0, TR2_SUST_CHR, 2,);
+
+	ADD_POWER("acid immunity",	17, TR2_IM_ACID, 2, immunities++);
+	ADD_POWER("elec immunity",	14, TR2_IM_ELEC, 2, immunities++);
+	ADD_POWER("fire immunity",	22, TR2_IM_FIRE, 2, immunities++);
+	ADD_POWER("cold immunity",	17, TR2_IM_COLD, 2, immunities++);
+
+	if (immunities > 1)
+	{
+		p += 15;
+	}
+	if (immunities > 2)
+	{
+		p += 15;
+	}
+	if (immunities > 3)
+	{
+		p += 20000;		/* inhibit */
+	}
+
+	ADD_POWER("free action",	 7, TR3_FREE_ACT, 3,);
+	ADD_POWER("hold life",		 6, TR3_HOLD_LIFE, 3,);
+	ADD_POWER("feather fall",	 0, TR3_FEATHER, 3,); /* was 2 */
+	ADD_POWER("permanent light",     2, TR3_LITE, 3,); /* was 2 */
+
+	ADD_POWER("see invisible",	 4, TR3_SEE_INVIS, 3,);
+	ADD_POWER("sense orcs",	  	1, TR3_ESP_ORC, 3,);
+	ADD_POWER("sense trolls",	1, TR3_ESP_TROLL, 3,);
+	ADD_POWER("sense giants",	2, TR3_ESP_GIANT, 3,);
+	ADD_POWER("sense demons",	4, TR3_ESP_DEMON, 3,);
+	ADD_POWER("sense undead",	5, TR3_ESP_UNDEAD, 3,);
+	ADD_POWER("sense dragons",       5, TR3_ESP_DRAGON, 3,);
+	ADD_POWER("sense nature",	4, TR3_ESP_NATURE, 3,);
+	ADD_POWER("telepathy",	  18, TR3_TELEPATHY, 3,);
+	ADD_POWER("slow digestion",	 1, TR3_SLOW_DIGEST, 3,);
+
+	/* Digging moved to general section since it can be on anything now */
+	ADD_POWER("tunnelling",	 o_ptr->pval, TR1_TUNNEL, 1,);
+
+	ADD_POWER("resist acid",	 2, TR2_RES_ACID, 2,);
+	ADD_POWER("resist elec",	 3, TR2_RES_ELEC, 2,);
+	ADD_POWER("resist fire",	 3, TR2_RES_FIRE, 2,);
+	ADD_POWER("resist cold",	 3, TR2_RES_COLD, 2,);
+	ADD_POWER("resist poison",	14, TR2_RES_POIS, 2,);
+	ADD_POWER("resist light",	 3, TR2_RES_LITE, 2,);
+	ADD_POWER("resist dark",	 8, TR2_RES_DARK, 2,);
+	ADD_POWER("resist blindness",	 8, TR2_RES_BLIND, 2,);
+	ADD_POWER("resist confusion",	12, TR2_RES_CONFU, 2,);
+	ADD_POWER("resist sound",	 7, TR2_RES_SOUND, 2,);
+	ADD_POWER("resist shards",	 4, TR2_RES_SHARD, 2,);
+	ADD_POWER("resist nexus",	 5, TR2_RES_NEXUS, 2,);
+	ADD_POWER("resist nether",	10, TR2_RES_NETHR, 2,);
+	ADD_POWER("resist chaos",	10, TR2_RES_CHAOS, 2,);
+	ADD_POWER("resist disenchantment", 10, TR2_RES_DISEN, 2,);
+
+	ADD_POWER("regeneration",	 4, TR3_REGEN, 3,);
+	ADD_POWER("blessed",		 1, TR3_BLESSED, 3,);
+
+	ADD_POWER("blood vampire",	 4, TR4_VAMP_HP, 4,);
+	ADD_POWER("mana vampire",	 1, TR4_VAMP_MANA, 4,);
+
+	ADD_POWER("teleportation",	 -40, TR3_TELEPORT, 3,);
+	ADD_POWER("drain experience",	 -20, TR3_DRAIN_EXP, 3,);
+
+	ADD_POWER("drain health",	 -20, TR3_DRAIN_HP, 3,);
+	ADD_POWER("drain mana",	 	 -10, TR3_DRAIN_MANA, 3,);
+	ADD_POWER("aggravation",	 -15, TR3_AGGRAVATE, 3,);
+	ADD_POWER("light curse",	 -1,  TR3_LIGHT_CURSE, 3,);
+	ADD_POWER("heavy curse",	 -4, TR3_HEAVY_CURSE, 3,);
+/*	ADD_POWER("permanent curse",	 -40, TR3_PERMA_CURSE, 3,);*/
+	ADD_POWER("light vulneribility", -30, TR4_HURT_LITE, 4,);
+	ADD_POWER("water vulneribility", -30, TR4_HURT_WATER, 4,);
+	ADD_POWER("hunger",	 	 -15, TR4_HUNGER, 4,);
+	ADD_POWER("anchor",	 	 -4, TR4_ANCHOR, 4,);
+	ADD_POWER("silent",	 	 -20, TR4_SILENT, 4,);
+	ADD_POWER("static",	 	 -15, TR4_STATIC, 4,);
+	ADD_POWER("windy",	 	 -15, TR4_WINDY, 4,);
+	ADD_POWER("animal",	 	 -5, TR4_ANIMAL, 4,);
+	ADD_POWER("evil",	 	 -5, TR4_EVIL, 4,);
+	ADD_POWER("undead",	 	 -10, TR4_UNDEAD, 4,);
+	ADD_POWER("demon",	 	 -10, TR4_DEMON, 4,);
+	ADD_POWER("orc",	 	 -3, TR4_ORC, 4,);
+	ADD_POWER("troll",	 	 -3, TR4_TROLL, 4,);
+	ADD_POWER("giant",	 	 -5, TR4_GIANT, 4,);
+	ADD_POWER("dragon",	 	 -10, TR4_DRAGON, 4,);
+	ADD_POWER("man",	 	 -3, TR4_MAN, 4,);
+	ADD_POWER("dwarf",	 	 -3, TR4_DWARF, 4,);
+	ADD_POWER("elf",	 	 -3, TR4_ELF, 4,);
+	ADD_POWER("hurt poison",	 -50, TR4_HURT_POIS, 4,);
+	ADD_POWER("hurt acid",	 	 -30, TR4_HURT_ACID, 4,);
+	ADD_POWER("hurt lightning",	 -40, TR4_HURT_ELEC, 4,);
+	ADD_POWER("hurt fire",	 -40, TR4_HURT_FIRE, 4,);
+	ADD_POWER("hurt cold",	 -40, TR4_HURT_COLD, 4,);
+
+	return (p);
+}
+
 

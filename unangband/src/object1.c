@@ -1046,6 +1046,18 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			object_desc_chr_macro(t, ' ');
 			object_desc_str_macro(t, (e_name + e_ptr->name));
 		}
+
+		/* Grab any magic-item name */
+		else if ((o_ptr->xtra1) && (o_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES) && (o_ptr->discount < INSCRIP_MIN_HIDDEN))
+		{
+			int i;
+			u32b j;
+
+			for (i = 0, j = 0x00000001L; (i< 32) && (j != object_xtra_base[o_ptr->xtra1]);i++, j <<= 1);
+
+			object_desc_chr_macro(t, ' ');
+			object_desc_str_macro(t, magic_name[object_xtra_what[o_ptr->xtra1]-1][i + o_ptr->xtra2]);
+		}
 	}
 	/* Hack -- Append guessed names */
 	else
@@ -1056,8 +1068,16 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			artifact_type *a_ptr = &a_info[o_ptr->guess1];
 
 			object_desc_str_macro(t, " (");
-			object_desc_str_macro(t, (a_name + a_ptr->name));
-			object_desc_str_macro(t, "?)");			
+			if (*(a_name + a_ptr->name) == '(')
+			{
+				object_desc_str_macro(t, (a_name + a_ptr->name) + 1);
+				*(t)-- = '\0';
+			}
+			else
+			{
+				object_desc_str_macro(t, (a_name + a_ptr->name));
+			}
+			object_desc_str_macro(t, "?)");
 		}
 
 		/* Grab any ego-item name */
@@ -1066,18 +1086,109 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			ego_item_type *e_ptr = &e_info[o_ptr->guess2];
 
 			object_desc_str_macro(t, " (");
-			object_desc_str_macro(t, (e_name + e_ptr->name));
+			if (*(e_name + e_ptr->name) == '(')
+			{
+				object_desc_str_macro(t, (e_name + e_ptr->name) + 1);
+				*(t)-- = '\0';
+			}
+			else
+			{
+				object_desc_str_macro(t, (e_name + e_ptr->name));
+			}
 			object_desc_str_macro(t, "?)");
 		}
 
 		/* Grab any kind name */
 		else if (k_ptr->guess)
 		{
-			object_kind *k1_ptr = &k_info[lookup_kind(o_ptr->tval,k_ptr->guess-1)];
+			object_kind *k_ptr = &k_info[lookup_kind(o_ptr->tval,k_ptr->guess-1)];
 
 			object_desc_str_macro(t, " (of ");
-			object_desc_str_macro(t, (k_name + k1_ptr->name));
+			object_desc_str_macro(t, (k_name + k_ptr->name));
 			object_desc_str_macro(t, "?)");
+		}
+
+		/* Grab any magic name */
+		else if (o_ptr->discount < INSCRIP_MIN_HIDDEN)
+		{
+			int i;
+			int x1, x2; /* Fake xtra flags */
+			u32b j;
+
+			x1 = 0;
+			x2 = 0;
+
+			/* Loop through first flags */
+			for (i = 0, j = 0x00000001L; i < 32; i++, j<<=1)
+			{
+				/* Found a flag */
+				if ((j & o_ptr->can_flags1) != 0)
+				{
+					/* First flag */
+					if (!x1) { x1 = 1; x2 = i; }
+
+					/* More than one flag - can't guess magic name */
+					else {x1 = -1; }
+				}
+			}
+
+			/* Loop through second flags */
+			for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)
+			{
+				/* Found a flag */
+				if ((j & o_ptr->can_flags2) != 0)
+				{
+					/* First flag */
+					if (!x1) { x1 = 2; x2 = i; }
+
+					/* More than one flag - can't guess magic name */
+					else {x1 = -1; }
+				}
+			}
+
+			/* Loop through third flags */
+			for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)
+			{
+				/* Found a flag */
+				if ((j & o_ptr->can_flags3) != 0)
+				{
+					/* First flag */
+					if (!x1) { x1 = 3; x2 = i; }
+
+					/* More than one flag - can't guess magic name */
+					else {x1 = -1; }
+				}
+			}
+
+			/* Loop through fourth flags */
+			for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)
+			{
+				/* Found a flag */
+				if ((j & o_ptr->can_flags4) != 0)
+				{
+					/* First flag */
+					if (!x1) { x1 = 4; x2 = i; }
+
+					/* More than one flag - can't guess magic name */
+					else {x1 = -1; }
+				}
+			}
+
+			if (x1 > 0)
+			{
+				object_desc_str_macro(t, " (");
+				if (*(magic_name[x1-1][x2]) == '(')
+				{
+					object_desc_str_macro(t, (magic_name[x1-1][x2]) + 1);
+					*(t)-- = '\0';			
+				}
+				else
+				{
+					object_desc_str_macro(t, magic_name[x1-1][x2]);
+				}
+
+				object_desc_str_macro(t, "?)");
+			}	
 		}
 	}
 
@@ -1417,6 +1528,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	if (o_ptr->discount >= INSCRIP_NULL)
 	{
 		v = inscrip_text[o_ptr->discount - INSCRIP_NULL];
+		if (strlen(v) == 0) v = NULL;
 	}
 
 	/* Use "cursed" if the item is known to be cursed */

@@ -1255,8 +1255,12 @@ void water_dam(int dam, cptr kb_str, bool inven)
 	/* Burn some fuel in the current lite */
 	if ((inven) && (o_ptr->tval == TV_LITE))
 	{
-		/* Hack -- Use up fuel (except on artifacts) */
-		if (!artifact_p(o_ptr) && (o_ptr->pval > 0))
+		u32b f1, f2, f3, f4;
+
+		object_flags(o_ptr,&f1,&f2,&f3,&f4);
+
+		/* Hack -- Use up fuel (except on artifacts and lites unaffected by water) */
+		if (!artifact_p(o_ptr) && (o_ptr->pval > 0) && !(f2 & TR2_IGNORE_WATER))
 		{
 			/* Douse light */
 			o_ptr->pval = 0;

@@ -482,6 +482,8 @@ struct artifact_type
 	u16b randtime;  /* Activation time dice */
 
 	s16b activated; /* Count of times activated */
+
+	s32b power;	/* Pre-computed power */
 };
 
 /*
@@ -527,6 +529,8 @@ struct ego_item_type
 	byte runesc;   /* Rune count */
 
         byte aware;
+
+	s32b slay_power;	/* Pre-computed power from brands/slays */
 };
 
 struct flavor_type

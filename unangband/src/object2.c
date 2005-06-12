@@ -2204,6 +2204,198 @@ static void object_mention(object_type *o_ptr)
 
 
 /*
+ * Attempt to change an object into an magic-item
+ * This function picks a magic item that has 95% to 100% of the power supplied to this
+ * function, in a manner similar to random artifacts.
+ */
+static bool make_magic_item(object_type *o_ptr, int power)
+{
+	int i;
+	u32b j;
+
+	int count = 0;
+
+	int x1 = 0;
+	int x2 = 0;
+
+	int obj_pow1 = object_power(o_ptr);
+	int obj_pow2, obj_pow3;
+
+	int old_pval;
+	int new_pval = 0;
+
+	/* Fail if object already is ego or artifact */
+	if (o_ptr->name1) return (FALSE);
+	if (o_ptr->name2) return (FALSE);
+
+	/* Sanity check */
+	if (!power) return (FALSE);
+
+	/* Reverse sign */
+	if (power < 0) obj_pow1 = -obj_pow1;
+
+	/* Already too magical */
+	if (obj_pow1 >= power) return (FALSE);
+
+	/* Iterate through flags 1 */
+	for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)
+	{
+		o_ptr->xtra1 = 16;
+		o_ptr->xtra2 = i;
+
+		/* Evaluate power */
+		obj_pow2 = object_power(o_ptr);
+
+		/* Reverse sign */
+		if (power < 0) obj_pow2 = -obj_pow2;
+
+		/* Pick this flag? */
+		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
+#if 0
+			(obj_pow2 >= ((power * 19) / 20)) && 	/* At least 95% */
+			(obj_pow2 <= power) &&			/* No more than 100% */
+#endif
+			(rand_int(++count) == 0))		/* Sometimes pick */
+		{
+			x1 = 16;
+			x2 = i;
+			new_pval = 0;
+		}
+
+		/* Hack -- try increasing pval */
+		else
+		{
+			old_pval = o_ptr->pval;
+
+			do
+			{
+				if (power > 0)
+				{
+					/* Increase pval */
+					o_ptr->pval++;
+
+					/* Evaluate power */
+					obj_pow3 = object_power(o_ptr);
+				}
+				else
+				{
+					/* Decrease pval */
+					o_ptr->pval--;
+
+					/* Evaluate power - sign reversed */
+					obj_pow3 = -object_power(o_ptr);
+				}
+
+			} while ((obj_pow3 > obj_pow2) && (obj_pow3 < ((power * 19) / 20)));
+
+			/* Can find valid pval? */
+			if ((o_ptr->pval > old_pval) && (obj_pow3 < power) && (rand_int(++count) == 0))
+			{
+				x1 = 16;
+				x2 = i;
+				new_pval = o_ptr->pval;
+			}
+
+			/* Reset pval */
+			o_ptr->pval = old_pval;
+		}
+	}
+
+
+	/* Iterate through flags 2 */
+	for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)
+	{
+		o_ptr->xtra1 = 17;
+		o_ptr->xtra2 = i;
+
+		/* Evaluate power */
+		obj_pow2 = object_power(o_ptr);
+
+		/* Reverse sign */
+		if (power < 0) obj_pow2 = -obj_pow2;
+
+		/* Pick this flag? */
+		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
+			(obj_pow2 >= ((power * 19) / 20)) && 	/* At least 95% */
+			(obj_pow2 <= power) &&			/* No more than 100% */
+			(rand_int(++count) == 0))		/* Sometimes pick */
+		{
+			x1 = 17;
+			x2 = i;
+			new_pval = 0;
+		}
+	}
+
+	/* Iterate through flags 3 */
+	for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)
+	{
+		o_ptr->xtra1 = 18;
+		o_ptr->xtra2 = i;
+
+		/* Evaluate power */
+		obj_pow2 = object_power(o_ptr);
+
+		/* Reverse sign */
+		if (power < 0) obj_pow2 = -obj_pow2;
+
+		/* Pick this flag? */
+		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
+			(obj_pow2 >= ((power * 19) / 20)) && 	/* At least 95% */
+			(obj_pow2 <= power) &&			/* No more than 100% */
+			(rand_int(++count) == 0))		/* Sometimes pick */
+		{
+			x1 = 18;
+			x2 = i;
+			new_pval = 0;
+		}
+	}
+
+	/* Iterate through flags 4 */
+	for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)
+	{
+		o_ptr->xtra1 = 19;
+		o_ptr->xtra2 = i;
+
+		/* Evaluate power */
+		obj_pow2 = object_power(o_ptr);
+
+		/* Reverse sign */
+		if (power < 0) obj_pow2 = -obj_pow2;
+
+		/* Pick this flag? */
+		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
+			(obj_pow2 >= ((power * 19) / 20)) && 	/* At least 95% */
+			(obj_pow2 <= power) &&			/* No more than 100% */
+			(rand_int(++count) == 0))		/* Sometimes pick */
+		{
+			x1 = 19;
+			x2 = i;
+			new_pval = 0;
+		}
+	}
+
+	/* Valid choice */
+	if (x1)
+	{
+		o_ptr->xtra1 = x1;
+		o_ptr->xtra2 = x2;
+
+		/* Restore new pval */
+		if (new_pval) o_ptr->pval = new_pval;
+
+		return(TRUE);
+	}
+	else
+	{
+		o_ptr->xtra1 = 0;
+		o_ptr->xtra2 = 0;
+
+		return(FALSE);
+	}
+}
+
+
+/*
  * Attempt to change an object into an ego-item -MWK-
  * Better only called by apply_magic()
  * The return value is currently unused, but a wizard might be interested in it.
@@ -2272,6 +2464,13 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 		/* Test if this is a great item or continue */
 		if (great && (e_ptr->cost < 1000) && (e_ptr->level == 0)) continue;
 
+		/* Fake ego power */
+		o_ptr->name2 = e_idx;
+		j = object_power(o_ptr);
+
+		/* Test if permitted ego power */
+		if ((j < (level * 3) / 4) || (j > (level * 3) / 2)) continue;
+
 		/* Test if this is a legal ego-item type for this object */
 		for (j = 0; j < 3; j++)
 		{
@@ -2298,7 +2497,6 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 
 	/* No legal ego-items */
 	if (total <= 0) return (FALSE);
-
 
 	/* Pick an ego-item */
 	value = rand_int(total);
@@ -2445,6 +2643,12 @@ static bool make_artifact(object_type *o_ptr)
 
 			/* Roll for out-of-depth creation */
 			if (rand_int(d) != 0) continue;
+		}
+
+		/* XXX Enfore acceptable "power" */
+		if ((a_ptr->power < p_ptr->depth) || (a_ptr->power > p_ptr->depth * 2))
+		{
+			continue;
 		}
 
 		/* We must make the "rarity roll" */
@@ -3222,9 +3426,17 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		case TV_ARROW:
 		case TV_BOLT:
 		{
-			if (power) a_m_aux_1(o_ptr, lev, power);
-			if (((power > 1) ? TRUE : FALSE) || ((power < -1) ? TRUE : FALSE))
-				(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
+			if (power)
+			{
+				a_m_aux_1(o_ptr, lev, power);
+
+#if 0
+				if (((power > 1) ? TRUE : FALSE) || ((power < -1) ? TRUE : FALSE))
+					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
+#endif
+				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 2) / 3 + 10 : ((lev * power) - 2) / 3 - 10);
+			}
+
 			break;
 		}
 
@@ -3238,16 +3450,30 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		case TV_GLOVES:
 		case TV_BOOTS:
 		{
-			if (power) a_m_aux_2(o_ptr, lev, power);
-			if (((power > 1) ? TRUE : FALSE) || (power < -1))
-				(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
+			if (power)
+			{
+				a_m_aux_2(o_ptr, lev, power);
+#if 0
+				if (((power > 1) ? TRUE : FALSE) || (power < -1))
+					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
+#endif
+				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 2) / 3 : ((lev * power) - 2) / 3);
+			}
+
 			break;
 		}
 
 		case TV_INSTRUMENT:
 		{
-			if (((power > 1) ? TRUE : FALSE) || (power < -1))
-				(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
+			if (power)
+			{
+#if 0
+				if (((power > 1) ? TRUE : FALSE) || (power < -1))
+					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
+#endif
+				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 2) / 3 : ((lev * power) - 2) / 3);
+			}
+
 			break;
 		}
 
@@ -3256,6 +3482,10 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		{
 			if (!power && (rand_int(100) < 50)) power = -1;
 			a_m_aux_3(o_ptr, lev, power);
+
+#if 0
+			if (power) (void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 2) / 3 : ((lev * power) - 2) / 3);
+#endif
 			break;
 		}
 
@@ -3265,7 +3495,13 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			if (!(k_info[o_ptr->k_idx].cost)) power = -1;
 			else if (power < 0) power = 0;
 
-			if (power) a_m_aux_1(o_ptr, lev, power);
+			if (power)
+			{
+				a_m_aux_1(o_ptr, lev, power);
+#if 0
+				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 2) / 3 : ((lev * power) - 2) / 3);
+#endif
+			}
 			a_m_aux_4(o_ptr, lev, power);
 			break;
 		}

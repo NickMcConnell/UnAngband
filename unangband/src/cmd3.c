@@ -156,6 +156,7 @@ void do_cmd_wield(void)
 
 	/* Hack -- Prevent player from wielding conflicting items */
 	bool burn = FALSE;
+	bool curse = FALSE;
 
 	/* Hack -- Allow multiple rings to be wielded */
 	int amt=1;
@@ -296,7 +297,7 @@ void do_cmd_wield(void)
 	/* Get object flags */
 	object_flags(o_ptr,&f1,&f2,&f3,&f4);
 
-	/* Check for conflicts */
+	/* Check for racial conflicts */
 	burn |= (f1 & (TR1_SLAY_NATURAL)) & (p_ptr->cur_flags4 & (TR4_ANIMAL));
 	burn |= (f1 & (TR1_SLAY_EVIL)) & (p_ptr->cur_flags4 & (TR4_EVIL));
 	burn |= (f1 & (TR1_SLAY_UNDEAD)) & (p_ptr->cur_flags4 & (TR4_UNDEAD));
@@ -308,7 +309,29 @@ void do_cmd_wield(void)
 	burn |= (f1 & (TR1_KILL_DRAGON)) & (p_ptr->cur_flags4 & (TR4_DRAGON));
 	burn |= (f1 & (TR1_KILL_DEMON)) & (p_ptr->cur_flags4 & (TR4_DEMON));
 	burn |= (f1 & (TR1_KILL_UNDEAD)) & (p_ptr->cur_flags4 & (TR4_UNDEAD));
+	burn |= (f4 & (TR4_SLAY_MAN)) & (p_ptr->cur_flags4 & (TR4_MAN));
+	burn |= (f4 & (TR4_SLAY_ELF)) & (p_ptr->cur_flags4 & (TR4_ELF));
+	burn |= (f4 & (TR4_SLAY_DWARF)) & (p_ptr->cur_flags4 & (TR4_DWARF));
+	burn |= (f4 & (TR4_ANIMAL)) & (p_ptr->cur_flags1 & (TR1_SLAY_NATURAL));
+	burn |= (f4 & (TR4_EVIL)) & (p_ptr->cur_flags1 & (TR1_SLAY_EVIL));
+	burn |= (f4 & (TR4_UNDEAD)) & (p_ptr->cur_flags1 & (TR1_SLAY_UNDEAD));
+	burn |= (f4 & (TR4_DEMON)) & (p_ptr->cur_flags1 & (TR1_SLAY_DEMON));
+	burn |= (f4 & (TR4_ORC)) & (p_ptr->cur_flags1 & (TR1_SLAY_ORC));
+	burn |= (f4 & (TR4_TROLL)) & (p_ptr->cur_flags1 & (TR1_SLAY_TROLL));
+	burn |= (f4 & (TR4_GIANT)) & (p_ptr->cur_flags1 & (TR1_SLAY_GIANT));
+	burn |= (f4 & (TR4_DRAGON)) & (p_ptr->cur_flags1 & (TR1_SLAY_DRAGON));
+	burn |= (f4 & (TR4_MAN)) & (p_ptr->cur_flags4 & (TR4_SLAY_MAN));
+	burn |= (f4 & (TR4_DWARF)) & (p_ptr->cur_flags4 & (TR4_SLAY_DWARF));
+	burn |= (f4 & (TR4_ELF)) & (p_ptr->cur_flags4 & (TR4_SLAY_ELF));
 
+	/* Evil players can wield racial conflict items but get cursed instead of burning */
+	if ((burn) && ((f4 & (TR4_EVIL)) || (p_ptr->cur_flags4 & (TR4_EVIL))))
+	{
+		curse = TRUE;
+		burn = FALSE;
+	}
+
+	/* Check for elemental conflicts */
 	burn |= (f1 & (TR1_BRAND_POIS)) & (p_ptr->cur_flags4 & (TR4_HURT_POIS));
 	burn |= (f1 & (TR1_BRAND_ACID)) & (p_ptr->cur_flags4 & (TR4_HURT_ACID));
 	burn |= (f1 & (TR1_BRAND_COLD)) & (p_ptr->cur_flags4 & (TR4_HURT_COLD));
@@ -322,26 +345,23 @@ void do_cmd_wield(void)
 	burn |= (f4 & (TR4_HURT_ELEC)) & (p_ptr->cur_flags1 & (TR1_BRAND_ELEC));
 	burn |= (f4 & (TR4_HURT_FIRE)) & (p_ptr->cur_flags1 & (TR1_BRAND_FIRE));
 
-	burn |= (f4 & (TR4_SLAY_MAN)) & (p_ptr->cur_flags4 & (TR4_MAN));
-	burn |= (f4 & (TR4_SLAY_ELF)) & (p_ptr->cur_flags4 & (TR4_ELF));
-	burn |= (f4 & (TR4_SLAY_DWARF)) & (p_ptr->cur_flags4 & (TR4_DWARF));
-
-	burn |= (f4 & (TR4_ANIMAL)) & (p_ptr->cur_flags1 & (TR1_SLAY_NATURAL));
-	burn |= (f4 & (TR4_EVIL)) & (p_ptr->cur_flags1 & (TR1_SLAY_EVIL));
-	burn |= (f4 & (TR4_UNDEAD)) & (p_ptr->cur_flags1 & (TR1_SLAY_UNDEAD));
-	burn |= (f4 & (TR4_DEMON)) & (p_ptr->cur_flags1 & (TR1_SLAY_DEMON));
-	burn |= (f4 & (TR4_ORC)) & (p_ptr->cur_flags1 & (TR1_SLAY_ORC));
-	burn |= (f4 & (TR4_TROLL)) & (p_ptr->cur_flags1 & (TR1_SLAY_TROLL));
-	burn |= (f4 & (TR4_GIANT)) & (p_ptr->cur_flags1 & (TR1_SLAY_GIANT));
-	burn |= (f4 & (TR4_DRAGON)) & (p_ptr->cur_flags1 & (TR1_SLAY_DRAGON));
-	burn |= (f4 & (TR4_MAN)) & (p_ptr->cur_flags4 & (TR4_SLAY_MAN));
-	burn |= (f4 & (TR4_DWARF)) & (p_ptr->cur_flags4 & (TR4_SLAY_DWARF));
-	burn |= (f4 & (TR4_ELF)) & (p_ptr->cur_flags4 & (TR4_SLAY_ELF));
-
 	if (burn)
 	{
 		/* Warn the player */
 		msg_print("Aiee! It feels burning hot!");
+
+		/* Mark object as ungettable? */
+		if ((o_ptr->discount == 0) &&
+			!(o_ptr->ident & (IDENT_SENSE))
+			&& !(object_known_p(o_ptr)))
+		{
+	
+			/* Sense the object */
+			o_ptr->discount = INSCRIP_UNGETTABLE;
+	
+			/* The object has been "sensed" */
+			o_ptr->ident |= (IDENT_SENSE);
+		}
 
 		return;
 	}
@@ -505,7 +525,7 @@ void do_cmd_wield(void)
 	msg_format("%s %s (%c).", act, o_name, index_to_label(slot));
 
 	/* Cursed! */
-	if (cursed_p(o_ptr))
+	if (curse || cursed_p(o_ptr))
 	{
 		/* Warn the player */
 		msg_print("Oops! It feels deathly cold!");
@@ -604,7 +624,7 @@ void do_cmd_wield(void)
 	n1 = o_ptr->can_flags1 & ~(k1);
 	n2 = o_ptr->can_flags2 & ~(k2);
 	n3 = o_ptr->can_flags3 & ~(k3);
-	n4 = o_ptr->can_flags3 & ~(k4);
+	n4 = o_ptr->can_flags4 & ~(k4);
 
 	if (n1 || n2 || n3 || n4) update_slot_flags(slot, n1, n2, n3, n4);
 

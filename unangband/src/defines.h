@@ -2527,7 +2527,7 @@
 #define INSCRIP_GREAT    100+11
 #define INSCRIP_SUPERB   100+12
 #define INSCRIP_UNBREAKABLE	100+13 /* Artifact */
-#define INSCRIP_UNGETTABLE	100+14 /* Has flag preventing monster getting it */
+#define INSCRIP_UNGETTABLE	100+14 /* Has flag preventing player / monster getting it */
 #define INSCRIP_MIN_HIDDEN      100+15 /* Minimum inscription for hidden */
 
 
@@ -2757,10 +2757,9 @@
 /*
  * Hack -- special "xtra" object flag info (type)
  */
-#define OBJECT_XTRA_MAX_HIDDEN 16
+#define OBJECT_XTRA_MAX_HIDDEN 22
 
-#define OBJECT_XTRA_MIN_RUNES    32	/* Take advantage of future proofing */
-
+#define OBJECT_XTRA_MIN_RUNES    36
 #define MAX_RUNE_FLAGS    4
 
 

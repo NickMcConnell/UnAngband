@@ -40,7 +40,14 @@ end code still to be fixed. In particular, you cannot wield both a racial flag i
 and its equivelent slay, or a vulneribility item and its equivelent brand.
 
 - Steam and other water damage that does not affect inventory items no longer douses
-your light.
+your light. Lights that ignore water also ignore the effect.
+
+- Weapons you brand now ignore that element, preventing destruction by it.
+
+- Added magic items, which are ego items which only have a single flag. This is
+currently in heavy development and balancing, but is intended to provide a more
+interesting transition between enchanted equipment and ego items. Ego items are 
+temporarily disabled for testing purposes.
 
 ### User Interface ###
 
@@ -54,6 +61,8 @@ monster.
 - You know learn about all brands and slays as if you were checking your monster memory
 after each hit. You also know randomly notice execution slays and brands or the absence
 of brands, based on the damage delivered by the weapon per blow.
+
+- Guessed (Blessed) weapons and so on should now display as (Blessed?) not ((Blessed)?).
 
 ### Bug fixes ###
 

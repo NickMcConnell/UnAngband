@@ -73,6 +73,7 @@ extern const int object_xtra_what[OBJECT_XTRA_MAX_HIDDEN];
 extern const int object_xtra_size[OBJECT_XTRA_MAX_HIDDEN];
 extern const cptr object_group_text[];
 extern const byte object_group_tval[];
+extern const cptr magic_name[4][32];
 
 /* variable.c */
 extern cptr copyright;
@@ -284,6 +285,8 @@ extern int text_out_indent;
 extern int text_out_lines;
 extern int highscore_fd;
 extern bool use_transparency;
+extern s32b magic_slay_power[32];
+extern long tot_mon_power;
 
 
 /*
@@ -492,6 +495,8 @@ extern void update_slot_flags(int slot, u32b f1, u32b f2, u32b f3, u32b f4);
 extern void equip_can_flags(u32b f1,u32b f2,u32b f3, u32b f4);
 extern void equip_not_flags(u32b f1,u32b f2,u32b f3, u32b f4);
 extern void inven_drop_flags(object_type *o_ptr);
+extern u32b slay_index(const u32b f1, const u32b f2, const u32b f3, const u32b f4);
+extern s32b object_power(const object_type *o_ptr);
 
 /* init2.c */
 extern void init_file_paths(char *path);

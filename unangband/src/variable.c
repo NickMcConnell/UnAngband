@@ -968,3 +968,19 @@ bool use_transparency = FALSE;
  * Game can be saved
  */
 bool can_save = TRUE;
+
+
+/*
+ * Slay power
+ *
+ * This is a precomputed table of slay powers for weapons with single slay or brand
+ * flags. Derived from calculations in randart.c.
+ */
+
+s32b magic_slay_power[32];
+
+/*
+ * Total monster power
+ */
+
+long tot_mon_power;

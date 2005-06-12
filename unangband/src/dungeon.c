@@ -3281,6 +3281,8 @@ void play_game(bool new_game)
 
 #endif
 
+		tot_mon_power = 1000;
+
 		/* Roll up a new character */
 		player_birth();
 

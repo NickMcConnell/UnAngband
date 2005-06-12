@@ -2450,6 +2450,10 @@ const int object_xtra_what[OBJECT_XTRA_MAX_HIDDEN] =
 	2,
 	2,
 	2,
+	4,
+	1,
+	2,
+	3,
 	4
 };
 
@@ -2470,7 +2474,11 @@ const u32b object_xtra_base[OBJECT_XTRA_MAX_HIDDEN] =
 	TR2_IGNORE_FIRE,
 	TR2_IGNORE_WATER,
         TR2_IGNORE_THEFT,
-	TR4_HURT_LITE
+	TR4_HURT_LITE,
+	TR1_STR,	/* Magic item - flag 1 */
+	TR2_SUST_STR,	/* Magic item - flag 2 */
+	TR3_SLOW_DIGEST,/* Magic item - flag 3 */
+	TR4_BRAND_DARK	/* Magic item - flag 4 */
 };
 
 
@@ -2491,7 +2499,11 @@ const int object_xtra_size[OBJECT_XTRA_MAX_HIDDEN] =
 	1,
 	1,
 	1,
-        10
+        10,
+	32,	/* Magic item - flag 1 */
+	32,	/* Magic item - flag 2 */
+	32,	/* Magic item - flag 3 */
+	32	/* Magic item - flag 4 */
 };
 
 
@@ -2596,5 +2608,149 @@ const byte object_group_tval[] =
 	0
 };
 
+const cptr magic_name[4][32] =
+{
+	/* TR1_ */
+	{
+		"of Strength",
+		"of Intelligence",
+		"of Wisdom",
+		"of Dexterity",
+		"of Constitution",
+		"of Charisma",
+		"of Health",
+		"of Mana",
+		"of Stealth",
+		"of Searching",
+		"of Infravision",
+		"of Tunnelling",
+		"of Speed",
+		"of Extra Attacks",
+		"of Extra Shots",
+		"of Extra Might",
+		"of Slay Nature",
+		"of Slay Evil",
+		"of Slay Undead",
+		"of Slay Demon",
+		"of Slay Orc",
+		"of Slay Troll",
+		"of Slay Giant",
+		"of Slay Dragon",
+		"of Execute Dragon",
+		"of Execute Demon",
+		"of Execute Undead",
+		"of Poison",
+		"of Acid",
+		"of Lightning",
+		"of Fire",
+		"of Cold"
+	},
 
+	/* TR2_ */
+	{
+		"of Sustain Strength",
+		"of Sustain Intelligence",
+		"of Sustain Wisdom",
+		"of Sustain Dexterity",
+		"of Sustain Constitution",
+		"of Sustain Charisma",
+		"(Acid proof)",
+		"(Lightning proof)",
+		"(Fire proof)",
+		"(Frost proof)",
+		"(Water proof)",
+		"(Theft proof)",
+		"of Acid Immunity",
+		"of Lightening Immunity",
+		"of Fire Immunity",
+		"of Frost Immunity",
+		"of Resist Acid",
+		"of Resist Electricity",
+		"of Resist Fire",
+		"of Resist Cold",
+		"of Resist Poison",
+		"of Resist Fear",
+		"of Resist Light",
+		"of Resist Darkness",
+		"of Resist Blindness",
+		"of Resist Confusion",
+		"of Resist Sound",
+		"of Resist Shards",
+		"of Resist Nexus",
+		"of Resist Nether",
+		"of Resist Chaos",
+		"of Resist Disenchantment"
+	},
 
+	/* TR3_ */
+	{
+		"of Slow Digestion",
+		"of Feather Falling",
+		"of Light",
+		"of Regeneration",
+		"of Telepathy",
+		"of See Invisible",
+		"of Free Action",
+		"of Hold Life",
+		"of Sense Demons",
+		"of Sense Dragons",
+		"of Sense Giants",
+		"of Sense Orcs",
+		"of Sense Trolls",
+		"of Sense Undead",
+		"of Sense Nature",
+		"of Impact",
+		"(Drains Health)",
+		"(Drains Mana)",
+		"(Drains Experience)",
+		"of Aggravation",
+		"of Teleportation",
+		"", /* Random activation */
+		"", /* Activates */
+		"(Blessed)",
+		"", /* Artifact */
+		"", /* Easily Known */
+		"", /* Hide Type */
+		"", /* Show Mods */
+		"of Throwing",
+		"",	/* Light curse */
+		"",	/* Heavy curse */
+		""	/* Permanently cursed */
+	},
+
+	/* TR4_ */
+	{
+		"of Darkness",
+		"of Light",
+		"of Light Vulneribility",
+		"of Water Vulneribility",
+		"of Bloodlust",
+		"of Manathirst",
+		"",
+		"",
+		"of Hunger",
+		"of Slay Man",
+		"of Slay Elf",
+		"of Slay Dwarf",
+		"of Anchoring",
+		"of Silence",
+		"of Static",
+		"of Ill Winds",
+		"(Animal)",
+		"(Evil)",
+		"(Undead)",
+		"(Demonic)",
+		"(Orcish)",
+		"(Troll)",
+		"(Giant)",
+		"(Dragon)",
+		"of Man",
+		"(Dwarven)",
+		"(Elvish)",
+		"of Poison Vulneribility",
+		"of Acid Vulneribility",
+		"of Lightning Vulneribility",
+		"of Fire Vulneribility",
+		"of Frost Vulneribility"	
+	}
+};
