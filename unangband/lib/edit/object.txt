@@ -1361,14 +1361,19 @@ A:20/1
 F:RES_ACID | IGNORE_ACID | EASY_KNOW
 Y:1:1
 
-N:169:Adornment
+N:169:Spell Resistance
 G:":w
-I:40:2:0
-W:15:0:3:20
-A:15/1
-F:EASY_KNOW
+I:40:5:0
+W:25:0:3:1200
+A:25/1
+F:SAVE | HIDE_TYPE
 
-## XXX 170 XXX ##
+N:170:Device Mastery
+G:":w
+I:40:5:0
+W:25:0:3:1200
+A:25/1
+F:DEVICE | HIDE_TYPE
 
 N:171:the Magi
 G:":w
@@ -5526,3 +5531,4 @@ I:70:72:0
 W:60:0:5:4500
 A:50/1
 Y:13:2
+

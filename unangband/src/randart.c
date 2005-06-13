@@ -772,8 +772,11 @@ static cptr names_list =
 #define ART_IDX_BOW_RESTRICT 79
 #define ART_IDX_NONWEAPON_RESTRICT 80
 
+#define ART_IDX_GEN_SAVE 81
+#define ART_IDX_GEN_DEVICE 82
+
 /* Total of abilities */
-#define ART_IDX_TOTAL 81
+#define ART_IDX_TOTAL 83
 
 /* End of ESP_IDX defines ARD_ESP */
 
@@ -834,7 +837,8 @@ static s16b art_idx_gen[] =
 	ART_IDX_GEN_RLITE, ART_IDX_GEN_RDARK, ART_IDX_GEN_RBLIND,
 	ART_IDX_GEN_RCONF, ART_IDX_GEN_RSOUND, ART_IDX_GEN_RSHARD,
 	ART_IDX_GEN_RNEXUS, ART_IDX_GEN_RNETHER, ART_IDX_GEN_RCHAOS,
-	ART_IDX_GEN_RDISEN, ART_IDX_GEN_AC, ART_IDX_GEN_TUNN};
+	ART_IDX_GEN_RDISEN, ART_IDX_GEN_AC, ART_IDX_GEN_TUNN,
+	ART_IDX_GEN_SAVE, ART_IDX_GEN_DEVICE};
 static s16b art_idx_high_resist[] =
 	{ART_IDX_GEN_RPOIS, ART_IDX_GEN_RFEAR,
 	ART_IDX_GEN_RLITE, ART_IDX_GEN_RDARK, ART_IDX_GEN_RBLIND,
@@ -2163,10 +2167,25 @@ static s32b artifact_power(int a_idx)
 			p += a_ptr->pval * a_ptr->pval;
 			LOG_PRINT2("Adding power for CON bonus %d, total is %d\n", a_ptr->pval, p);
 		}
+		if (a_ptr->flags1 & TR1_SAVE)
+		{
+			p += a_ptr->pval * a_ptr->pval / 4;
+			LOG_PRINT2("Adding power for save bonus %d, total is %d\n", a_ptr->pval, p);
+		}
+		if (a_ptr->flags1 & TR1_DEVICE)
+		{
+			p += a_ptr->pval * a_ptr->pval / 6;
+			LOG_PRINT2("Adding power for device bonus %d, total is %d\n", a_ptr->pval, p);
+		}
 		if (a_ptr->flags1 & TR1_STEALTH)
 		{
 			p += a_ptr->pval * a_ptr->pval / 4;
 			LOG_PRINT2("Adding power for stealth bonus %d, total is %d\n", a_ptr->pval, p);
+		}
+		if (a_ptr->flags1 & TR1_TUNNEL)
+		{
+			p += a_ptr->pval * a_ptr->pval / 6;
+			LOG_PRINT2("Adding power for tunnel bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		/* For now add very small amount for searching */
 		if (a_ptr->flags1 & TR1_SEARCH)
@@ -3426,6 +3445,27 @@ static void parse_frequencies ()
 			(artprobs[ART_IDX_GEN_SUST]) += temp;
 		}
 
+		if (a_ptr->flags1 & TR1_SAVE)
+		{
+			/* General case */
+			LOG_PRINT("Adding 1 for spell resistance bonus - general.\n");
+
+			(artprobs[ART_IDX_GEN_SAVE])++;
+
+			/* Done with magical devices */
+		}
+
+		if (a_ptr->flags1 & TR1_DEVICE)
+		{
+			/* General case */
+			LOG_PRINT("Adding 1 for magical device bonus - general.\n");
+
+			(artprobs[ART_IDX_GEN_DEVICE])++;
+
+			/* Done with magical devices */
+		}
+
+
 		if (a_ptr->flags1 & TR1_STEALTH)
 		{
 			/* Handle stealth, including a couple of special cases */
@@ -4102,6 +4142,20 @@ static void add_sustain(artifact_type *a_ptr)
 		else if (r == 4) success = add_sus_con(a_ptr);
 		else if (r == 5) success = add_sus_chr(a_ptr);
 	}
+}
+
+static void add_spell_resistance(artifact_type *a_ptr)
+{
+	a_ptr->flags1 |= TR1_SAVE;
+	do_pval(a_ptr);
+	LOG_PRINT1("Adding ability: spell resistance (now %+d)\n", a_ptr->pval);
+}
+
+static void add_magical_device(artifact_type *a_ptr)
+{
+	a_ptr->flags1 |= TR1_DEVICE;
+	do_pval(a_ptr);
+	LOG_PRINT1("Adding ability: magical devices (now %+d)\n", a_ptr->pval);
 }
 
 static void add_stealth(artifact_type *a_ptr)
@@ -5285,6 +5339,14 @@ static void add_ability_aux(artifact_type *a_ptr, int r)
 		case ART_IDX_BOOT_FEATHER:
 		case ART_IDX_GEN_FEATHER:
 			add_feather_falling(a_ptr);
+			break;
+
+		case ART_IDX_GEN_SAVE:
+			add_spell_resistance(a_ptr);
+			break;
+
+		case ART_IDX_GEN_DEVICE:
+			add_magical_device(a_ptr);
 			break;
 
 		case ART_IDX_BOOT_STEALTH:

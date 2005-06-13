@@ -49,6 +49,8 @@ currently in heavy development and balancing, but is intended to provide a more
 interesting transition between enchanted equipment and ego items. Ego items are 
 temporarily disabled for testing purposes.
 
+- Modified some existing artifacts to add magical device skill or spell resistance.
+
 ### User Interface ###
 
 - Monster recall now reports what particular types of items are dropped by each

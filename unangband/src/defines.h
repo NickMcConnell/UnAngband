@@ -2600,9 +2600,9 @@
 #define TR1_DEX    0x00000008L     /* DEX += "pval" */
 #define TR1_CON    0x00000010L     /* CON += "pval" */
 #define TR1_CHR    0x00000020L     /* CHR += "pval" */
-#define TR1_HP   0x00000040L     /* HP += "pval" */
-#define TR1_SP   0x00000080L     /* SP += "pval" */
-#define TR1_STEALTH       0x00000100L     /* Stealth += "pval" */
+#define TR1_SAVE   0x00000040L     /* Saves += "pval" */
+#define TR1_DEVICE 0x00000080L     /* Devices += "pval" */
+#define TR1_STEALTH  0x00000100L   /* Stealth += "pval" */
 #define TR1_SEARCH 0x00000200L     /* Search += "pval" */
 #define TR1_INFRA  0x00000400L     /* Infra += "pval" */
 #define TR1_TUNNEL 0x00000800L     /* Tunnel += "pval" */
@@ -2734,7 +2734,7 @@
  */
 #define TR1_PVAL_MASK \
 	(TR1_STR | TR1_INT | TR1_WIS | TR1_DEX | \
-	 TR1_CON | TR1_CHR | TR1_HP | TR1_SP | \
+	 TR1_CON | TR1_CHR | TR1_SAVE | TR1_DEVICE | \
 	 TR1_STEALTH | TR1_SEARCH | TR1_INFRA | TR1_TUNNEL | \
 	 TR1_SPEED | TR1_BLOWS | TR1_SHOTS | TR1_MIGHT)
 

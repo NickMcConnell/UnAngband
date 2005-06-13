@@ -1514,6 +1514,8 @@ static const o_flag_desc stat_flags_desc[A_MAX] =
  */
 static const o_flag_desc pval_flags1_desc[] =
 {
+	{ TR1_SAVE,       "spell resistance" },
+	{ TR1_DEVICE,     "magical devices" },
 	{ TR1_STEALTH,    "stealth" },
 	{ TR1_SEARCH,     "searching" },
 	{ TR1_INFRA,      "infravision" },
@@ -4654,9 +4656,21 @@ s32b object_power(const object_type *o_ptr)
 		{
 			p += o_ptr->pval * o_ptr->pval;  /* Was 4 * o_ptr->pval */
 		}
+		if (f1 & TR1_SAVE)
+		{
+			p += o_ptr->pval * o_ptr->pval / 4; /* Was o_ptr->pval */
+		}
+		if (f1 & TR1_DEVICE)
+		{
+			p += o_ptr->pval * o_ptr->pval / 6; /* Was o_ptr->pval */
+		}
 		if (f1 & TR1_STEALTH)
 		{
 			p += o_ptr->pval * o_ptr->pval / 4; /* Was o_ptr->pval */
+		}
+		if (f1 & TR1_TUNNEL)
+		{
+			p += o_ptr->pval * o_ptr->pval / 6; /* Was o_ptr->pval */
 		}
 		/* For now add very small amount for searching */
 		if (f1 & TR1_SEARCH)
@@ -4672,6 +4686,8 @@ s32b object_power(const object_type *o_ptr)
 		if (f1 & TR1_WIS) p += 2 * o_ptr->pval;
 		if (f1 & TR1_DEX) p += 3 * o_ptr->pval;
 		if (f1 & TR1_CON) p += 4 * o_ptr->pval;
+		if (f1 & TR1_SAVE) p += o_ptr->pval;
+		if (f1 & TR1_DEVICE) p += o_ptr->pval;
 		if (f1 & TR1_STEALTH) p += o_ptr->pval;
 	}
 	if (f1 & TR1_CHR)

@@ -2490,6 +2490,12 @@ static void calc_bonuses(void)
 		if (f1 & (TR1_CON)) p_ptr->stat_add[A_CON] += o_ptr->pval;
 		if (f1 & (TR1_CHR)) p_ptr->stat_add[A_CHR] += o_ptr->pval;
 
+		/* Affect saves */
+		if (f1 & (TR1_SAVE)) p_ptr->skill_sav += o_ptr->pval;
+
+		/* Affect devices */
+		if (f1 & (TR1_DEVICE)) p_ptr->skill_dev += o_ptr->pval;
+
 		/* Affect stealth */
 		if (f1 & (TR1_STEALTH)) p_ptr->skill_stl += o_ptr->pval;
 
