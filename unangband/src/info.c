@@ -4314,8 +4314,15 @@ s32b object_power(const object_type *o_ptr)
 			}
 			p *= mult;
 
-			/* Add damage. Don't assume 9 like artifacts */
-			p += (o_ptr->to_d);
+			/* Increase power for to-dam */
+			if (o_ptr->to_d > 9)
+			{
+				p += o_ptr->to_d;
+			}
+			else
+			{
+				p += 9;
+			}
 
 			if (f1 & TR1_SHOTS)
 			{
@@ -4343,12 +4350,45 @@ s32b object_power(const object_type *o_ptr)
 
 			}
 
-			/* To hit uses a percentage */
-			p += p * (5 * sign(o_ptr->to_h) * (ABS(o_ptr->to_h))) / 100;
-
-			if (o_ptr->weight < k_ptr->weight)
+			if (o_ptr->to_h > 9)
 			{
-				p++;
+				p+= (o_ptr->to_h) * 2 / 3;
+			}
+			else
+			{
+				p+= 6;
+			}
+
+			/* Normalise power back */
+			/* We now only count power as 'above' having the basic weapon at the same level */
+			if (o_ptr->sval == SV_SLING)
+			{
+				int q = AVG_SLING_AMMO_DAMAGE * bow_multiplier(k_ptr->sval) + 15;
+
+				if (ABS(p) > q)
+					p -= sign(p) * q;
+				else
+					p = 0;
+			}
+			else if (o_ptr->sval == SV_SHORT_BOW ||
+				o_ptr->sval == SV_LONG_BOW)
+			{
+				int q = AVG_BOW_AMMO_DAMAGE * bow_multiplier(k_ptr->sval) + 15;
+
+				if (ABS(p) > q)
+					p -= sign(p) * q;
+				else
+					p = 0;
+			}
+			else if (o_ptr->sval == SV_LIGHT_XBOW ||
+				o_ptr->sval == SV_HEAVY_XBOW)
+			{
+				int q = AVG_XBOW_AMMO_DAMAGE * bow_multiplier(k_ptr->sval) + 15;
+
+				if (ABS(p) > q)
+					p -= sign(p) * q;
+				else
+					p = 0;
 			}
 
 			/*
@@ -4367,6 +4407,11 @@ s32b object_power(const object_type *o_ptr)
 			else
 			{
 				p = sign(p) * (ABS(p) / 4);
+			}
+
+			if (o_ptr->weight < k_ptr->weight)
+			{
+				p++;
 			}
 
 			/* Slight bonus as we may choose to use a swap bow */
@@ -4388,7 +4433,8 @@ s32b object_power(const object_type *o_ptr)
 		case TV_POLEARM:
 		case TV_SWORD:
 		{
-			p += o_ptr->dd * (o_ptr->ds + 1) / 2;
+			/* Note this is 'uncorrected' */
+			p += o_ptr->dd * (o_ptr->ds + 1);
 
 			/* Apply the correct ego slay multiplier */
 			if (o_ptr->name2)
@@ -4409,8 +4455,17 @@ s32b object_power(const object_type *o_ptr)
 				if (i < 32) p = (p * magic_slay_power[i]) / tot_mon_power;
 			}
 
-			/* Add damage. Don't assume 9 like artifacts */
-			p += o_ptr->to_d;
+			/* Correction factor for damage */
+			p /= 2;
+
+			if (o_ptr->to_d > 9)
+			{
+				p += o_ptr->to_d;
+			}
+			else
+			{
+				p += 9;
+			}
 
 			if (f1 & TR1_BLOWS)
 			{
@@ -4427,8 +4482,34 @@ s32b object_power(const object_type *o_ptr)
 				}
 			}
 
-			/* To hit uses a percentage */
-			p += p * (5 * sign(o_ptr->to_h) * (ABS(o_ptr->to_h))) / 100;
+			if (o_ptr->to_h > 9)
+			{
+				p+= (o_ptr->to_h) * 2 / 3;
+			}
+			else
+			{
+				p+= 6;
+			}
+
+
+			/* Normalise power back */
+			/* We remove the weapon base damage to get 'true' power */
+			/* This makes e.g. a sword that provides fire immunity the same value as
+			   a ring that provides fire immunity */
+			if (ABS(p) > k_ptr->dd * (k_ptr->ds + 1) / 2 + 15)
+				p -= sign(p) * (k_ptr->dd * (k_ptr->ds + 1) / 2 + 15);
+			else
+				p = 0;
+
+			if (o_ptr->ac != k_ptr->ac)
+			{
+				p += o_ptr->ac - k_ptr->ac;
+			}
+
+			if (o_ptr->weight < k_ptr->weight)
+			{
+				p++;
+			}
 
 			/* Remember, weight is in 0.1 lb. units. */
 			if (o_ptr->weight != k_ptr->weight)
@@ -4449,27 +4530,27 @@ s32b object_power(const object_type *o_ptr)
 				if (f2 & (TR2_IGNORE_ACID)) p++;
 				if (f2 & (TR2_IGNORE_FIRE)) p++;
 			}
-
-
 			break;
-		}
-
-		case TV_BOLT:
-		{
-			/* Bonus as we carry arrows in inventory and fire them */
-			if (f2 & (TR2_IGNORE_ACID)) p += 2;
-
-			/* Fall through */
 		}
 
 		case TV_ARROW:
 		{
-			p += o_ptr->dd * (o_ptr->ds + 1) / 2;
+			/* Bonus as we carry arrows in inventory and fire them */
+			if (f2 & (TR2_IGNORE_FIRE)) p += 2;
+
+			/* Fall through */
+		}
+
+		case TV_SHOT:
+		case TV_BOLT:
+		{
+			/* Not this is 'uncorrected' */
+			p += o_ptr->dd * (o_ptr->ds + 1);
 
 			/* Apply the correct ego slay multiplier */
 			if (o_ptr->name2)
 			{
-				p += (p * e_info[o_ptr->name2].slay_power) / tot_mon_power;
+				p = (p * e_info[o_ptr->name2].slay_power) / tot_mon_power;
 			}
 
 			/* Hack -- For efficiency, compute for first slay or brand flag only */
@@ -4485,14 +4566,77 @@ s32b object_power(const object_type *o_ptr)
 				if (i < 32) p = (p * magic_slay_power[i]) / tot_mon_power;
 			}
 
-			/* Add damage. Don't assume 9 like artifacts */
-			p += o_ptr->to_d;
+			/* Correct damage */
+			p /= 2;
 
-			/* To hit uses a percentage */
-			p += p * (5 * sign(o_ptr->to_h) * (ABS(o_ptr->to_h))) / 100;
+			if (o_ptr->to_d > 9)
+			{
+				p += o_ptr->to_d;
+			}
+			else
+			{
+				p += 9;
+			}
 
-			/* Bonus as we carry arrows in inventory and fire them */
-			if (f2 & (TR2_IGNORE_FIRE)) p += 2;
+			if (o_ptr->tval == TV_SHOT)
+			{
+				p *= 2;
+			}
+			else if (o_ptr->tval == TV_ARROW)
+			{
+				p *= 5 / 2;
+			}
+			else if (o_ptr->tval == TV_SHOT)
+			{
+				p *= 7 / 2;
+			}
+
+			if (o_ptr->to_h > 9)
+			{
+				p+= (o_ptr->to_h) * 2 / 3;
+			}
+			else
+			{
+				p+= 6;
+			}
+
+			/* Normalise power back */
+			/* We remove the ammo base damage to get 'true' power */
+			if (o_ptr->tval == TV_SHOT)
+			{
+				int q = (ABS(p) > k_ptr->dd * (k_ptr->ds + 1) / 2 + 15) * 2;
+
+				if (ABS(p) > q)
+					p -= sign(p) * q;
+				else
+					p = 0;
+			}
+			else if (o_ptr->tval == TV_ARROW)
+			{
+				int q = (ABS(p) > k_ptr->dd * (k_ptr->ds + 1) / 2 + 15) * 2;
+
+				if (ABS(p) > q)
+					p -= sign(p) * q;
+				else
+					p = 0;
+			}
+			else if (o_ptr->tval == TV_BOLT)
+			{
+				int q = (ABS(p) > k_ptr->dd * (k_ptr->ds + 1) / 2 + 15) * 2;
+
+				if (ABS(p) > q)
+					p -= sign(p) * q;
+				else
+					p = 0;
+			}
+
+			if (o_ptr->weight < k_ptr->weight)
+			{
+				p++;
+			}
+
+			/* Bonus as we carry ammo in inventory and fire them */
+			if (f2 & (TR2_IGNORE_ACID)) p += 2;
 			if (f2 & (TR2_IGNORE_THEFT)) p++;
 
 			break;
@@ -4508,17 +4652,27 @@ s32b object_power(const object_type *o_ptr)
 
 			/* Fall through */
 		}
+
 		case TV_HELM:
 		case TV_CROWN:
 		case TV_SHIELD:
 		case TV_HARD_ARMOR:
 		case TV_DRAG_ARMOR:
 		{
-			p += sign(o_ptr->ac) * ((ABS(o_ptr->ac) * 2) / 3);
+			if (o_ptr->ac != k_ptr->ac)
+			{
+				p += o_ptr->ac - k_ptr->ac;
+			}
 
 			p += sign(o_ptr->to_h) * ((ABS(o_ptr->to_h) * 2) / 3);
 
 			p += o_ptr->to_d * 2;
+
+			/* We assume rings of damage +5 */
+			if (o_ptr->to_d > 5)
+			{
+				p += (o_ptr->to_d - 5) * 2;
+			}
 
 			if (o_ptr->weight < k_ptr->weight)
 			{
@@ -4539,6 +4693,12 @@ s32b object_power(const object_type *o_ptr)
 			p += sign(o_ptr->to_h) * ((ABS(o_ptr->to_h) * 2) / 3);
 
 			p += o_ptr->to_d * 2;
+
+			/* We assume rings of damage +5 */
+			if (o_ptr->to_d > 5)
+			{
+				p += (o_ptr->to_d - 5) * 2;
+			}
 
 			/* Bonuses as we may choose to use a swap light */
 			if (f2 & (TR2_IGNORE_FIRE)) p++;
@@ -4563,7 +4723,11 @@ s32b object_power(const object_type *o_ptr)
 
 			p += o_ptr->to_d * 2;
 
-			p += 0;
+			/* We assume rings of damage +5 */
+			if (o_ptr->to_d > 5)
+			{
+				p += (o_ptr->to_d - 5) * 2;
+			}
 
 			/* Bonuses as we may choose to use a swap amulet / ring */
 			if (f2 & (TR2_IGNORE_THEFT)) p++;
@@ -4608,32 +4772,90 @@ s32b object_power(const object_type *o_ptr)
 
 	}
 
-	/* Remainder must be wieldable or wearable item */
-	if ((o_ptr->tval != TV_SWORD) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_STAFF)
-		&& (o_ptr->tval != TV_HAFTED) && (o_ptr->tval != TV_POLEARM) && (o_ptr->tval != TV_BOW)
-		&& (o_ptr->tval != TV_HELM) && (o_ptr->tval != TV_BOOTS) && (o_ptr->tval != TV_GLOVES)
-		&& (o_ptr->tval != TV_CLOAK) && (o_ptr->tval != TV_SOFT_ARMOR) && (o_ptr->tval != TV_HARD_ARMOR)
-		&& (o_ptr->tval != TV_DRAG_ARMOR) && (o_ptr->tval != TV_CROWN) && (o_ptr->tval != TV_SHIELD)
-		&& (o_ptr->tval != TV_INSTRUMENT) && (o_ptr->tval != TV_RING) && (o_ptr->tval != TV_AMULET)
-		&& (o_ptr->tval != TV_LITE))
-		return (p);
+	/* Compute weight discount percentage */
+	/*
+	 * If an item weighs more than 5 pounds, we discount its power.
+	 *
+	 * This figure is from 30 lb weight limit for mages divided by 6 slots;
+	 * but we do it for all items as they may be used as swap items, but use a divisor of 10 lbs instead.
+	 */
+
+	/* Evaluate ac bonus and weight differentl for armour and non-armour. */
+	switch (o_ptr->tval)
+	{
+		case TV_BOOTS:
+		case TV_GLOVES:
+		case TV_HELM:
+		case TV_CROWN:
+		case TV_SHIELD:
+		case TV_CLOAK:
+		case TV_SOFT_ARMOR:
+		case TV_HARD_ARMOR:
+		case TV_DRAG_ARMOR:
+		{
+			if (o_ptr->weight >= 50)
+			{
+				p -= o_ptr->weight / 50; 
+			}
+
+			if (o_ptr->to_a > 9)
+			{
+				p+= (o_ptr->to_a - 9);
+			}
+
+			if (o_ptr->to_a > 19)
+			{
+				p += (o_ptr->to_a - 19);
+			}
+
+			if (o_ptr->to_a > 29)
+			{
+				p += (o_ptr->to_a - 29);
+			}
+
+			if (o_ptr->to_a > 39)
+			{
+				p += 20000;	/* inhibit */
+			}
+			break;
+
+		case TV_SWORD:
+		case TV_DIGGING:
+		case TV_STAFF:
+		case TV_HAFTED:
+		case TV_POLEARM:
+		case TV_BOW:
+		case TV_INSTRUMENT:
+		case TV_LITE:
+			if (o_ptr->weight >= 100)
+			{
+				p -= o_ptr->weight / 100; 
+			}
+
+			p += sign(o_ptr->to_a) * (ABS(o_ptr->to_a) / 2);
+
+			if (o_ptr->to_a > 9)
+			{
+				p+= (o_ptr->to_a - 9);
+			}
+
+			if (o_ptr->to_a > 19)
+			{
+				p += (o_ptr->to_a - 19);
+			}
+
+			if (o_ptr->to_a > 29)
+			{
+				p += 20000;	/* inhibit */
+			}
+			break;
+
+		default:
+			return(p);
+		}
+	}
 
 	/* Other abilities are evaluated independent of the object type. */
-	p += sign(o_ptr->to_a) * (ABS(o_ptr->to_a) / 2);
-
-	if (o_ptr->to_a > 20)
-	{
-		p += (o_ptr->to_a - 19);
-	}
-	if (o_ptr->to_a > 30)
-	{
-		p += (o_ptr->to_a - 29);
-	}
-	if (o_ptr->to_a > 40)
-	{
-		p += 20000;	/* inhibit */
-	}
-
 	if (o_ptr->pval > 0)
 	{
 		if (f1 & TR1_STR)
@@ -4700,21 +4922,7 @@ s32b object_power(const object_type *o_ptr)
 	}
 	if (f1 & TR1_SPEED)
 	{
-		/* Big bonuses use constant increase */
-		if (o_ptr->pval > 10)
-		{
-			p += o_ptr->pval * 10;
-		}
-		/* Ramp up increase quickly */
-		else if (o_ptr->pval > 0)
-		{
-			p += o_ptr->pval * o_ptr->pval;
-		}
-		/* Otherwise */
-		else
-		{
-			p += 3 * o_ptr->pval;
-		}
+		p += 5 * o_ptr->pval;
 	}
 
 #define ADD_POWER(string, val, flag, flgnum, extra) \
@@ -4753,13 +4961,13 @@ s32b object_power(const object_type *o_ptr)
 
 	ADD_POWER("free action",	 7, TR3_FREE_ACT, 3, high_resists++);
 	ADD_POWER("hold life",		 6, TR3_HOLD_LIFE, 3, high_resists++);
-	ADD_POWER("feather fall",	 0, TR3_FEATHER, 3,); /* was 2 */
-	ADD_POWER("permanent light",     2, TR3_LITE, 3,); /* was 2 */
+	ADD_POWER("feather fall",	 1, TR3_FEATHER, 3,); /* was 2 */
+	ADD_POWER("permanent light",     4, TR3_LITE, 3,); /* was 2 */
 
 	ADD_POWER("see invisible",	 4, TR3_SEE_INVIS, 3,);
-	ADD_POWER("sense orcs",	  	1, TR3_ESP_ORC, 3,);
-	ADD_POWER("sense trolls",	1, TR3_ESP_TROLL, 3,);
-	ADD_POWER("sense giants",	2, TR3_ESP_GIANT, 3,);
+	ADD_POWER("sense orcs",	  	3, TR3_ESP_ORC, 3,);
+	ADD_POWER("sense trolls",	3, TR3_ESP_TROLL, 3,);
+	ADD_POWER("sense giants",	3, TR3_ESP_GIANT, 3,);
 	ADD_POWER("sense demons",	4, TR3_ESP_DEMON, 3,);
 	ADD_POWER("sense undead",	5, TR3_ESP_UNDEAD, 3,);
 	ADD_POWER("sense dragons",       5, TR3_ESP_DRAGON, 3,);
@@ -4796,8 +5004,8 @@ s32b object_power(const object_type *o_ptr)
 	ADD_POWER("regeneration",	 4, TR3_REGEN, 3,);
 	ADD_POWER("blessed",		 1, TR3_BLESSED, 3,);
 
-	ADD_POWER("blood vampire",	 4, TR4_VAMP_HP, 4,);
-	ADD_POWER("mana vampire",	 1, TR4_VAMP_MANA, 4,);
+	ADD_POWER("blood vampire",	 25, TR4_VAMP_HP, 4,);
+	ADD_POWER("mana vampire",	 14, TR4_VAMP_MANA, 4,);
 
 	ADD_POWER("teleportation",	 -40, TR3_TELEPORT, 3,);
 	ADD_POWER("drain experience",	 -20, TR3_DRAIN_EXP, 3,);

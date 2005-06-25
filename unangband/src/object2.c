@@ -2206,8 +2206,7 @@ static void object_mention(object_type *o_ptr)
 /*
  * Attempt to change an object into an magic-item
  * This function picks a magic item that has 95% to 100% of the power supplied to this
- * function, in a manner similar to random artifacts. It ensures that the magic item is
- * at least 2 'power' better than the non-magic item equivelent.
+ * function, in a manner similar to random artifacts.
  */
 static bool make_magic_item(object_type *o_ptr, int power)
 {
@@ -2246,7 +2245,7 @@ static bool make_magic_item(object_type *o_ptr, int power)
 		/* Skip non-weapons -- we have to do this because brands grant ignore flags XXX */
 		if ((j >= TR1_BRAND_ACID) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_HAFTED)
 			&& (o_ptr->tval != TV_SWORD) && (o_ptr->tval != TV_POLEARM) && (o_ptr->tval != TV_ARROW)
-			&& (o_ptr->tval != TV_SHOT) && (o_ptr->tval != TV_BOLT) && (o_ptr->tval != TV_STAFF))
+			&& (o_ptr->tval != TV_SHOT) && (o_ptr->tval != TV_BOLT) && (o_ptr->tval != TV_STAFF)) continue;
 
 		/* Evaluate power */
 		obj_pow2 = object_power(o_ptr);
@@ -2469,16 +2468,16 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 		if (!cursed && (e_ptr->flags3 & TR3_LIGHT_CURSE)) continue;
 		if (cursed && !(e_ptr->flags3 & TR3_LIGHT_CURSE)) continue;
 
-		/* Test if this is a great item or continue */
-		if (great && (e_ptr->cost < 1000) && (e_ptr->level == 0)) continue;
-
 		/* Fake ego power */
 		o_ptr->name2 = e_idx;
 		j = object_power(o_ptr);
 		if (j < 0) j = -j;
 
 		/* Test if permitted ego power */
-		if ((j < level / 2) || (j > (level * 3) / 2)) continue;
+		if ((great) && (j < level / 2)) continue;
+
+		/* Test if permitted ego power */
+		if (j > level) continue;
 
 		/* Test if this is a legal ego-item type for this object */
 		for (j = 0; j < 3; j++)
@@ -3442,7 +3441,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 				if (((power > 1) ? TRUE : FALSE) || ((power < -1) ? TRUE : FALSE))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
 
-				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 2) / 3 + 10 : ((lev * power) - 2) / 3 - 10);
+				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 1) / 2 : ((lev * power) - 1) / 2);
 			}
 
 			break;
@@ -3465,7 +3464,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 				if (((power > 1) ? TRUE : FALSE) || (power < -1))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
 
-				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 2) / 3 : ((lev * power) - 2) / 3);
+				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 1) / 2 : ((lev * power) - 1) / 2);
 			}
 
 			break;
@@ -3479,7 +3478,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 				if (((power > 1) ? TRUE : FALSE) || (power < -1))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
 
-				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 2) / 3 : ((lev * power) - 2) / 3);
+				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 1) / 2 : ((lev * power) - 1) / 2);
 			}
 
 			break;
@@ -3491,7 +3490,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			if (!power && (rand_int(100) < 50)) power = -1;
 			a_m_aux_3(o_ptr, lev, power);
 
-			if (power) (void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 2) / 3 : ((lev * power) - 2) / 3);
+			if (power) (void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 1) / 2 : ((lev * power) - 1) / 2);
 
 			break;
 		}
@@ -3564,7 +3563,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 
 		/* Choose extra power appropriate to ego item - if under powered
 		 * XXX Always give cursed items xtra power */
-		if ((e_ptr->xtra) && (ego_power < (lev * 3 / 2)))
+		if ((e_ptr->xtra) && (ego_power < lev))
 		{
 			int choice = 0;
 			int x2 = -1;
@@ -3593,7 +3592,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		}
 
 		/* Boost under-powered ego items if possible */
-		if (ego_power < (lev * 3 / 2))
+		if (ego_power < lev)
 		{
 			int old_ego_power;
 			int sign = (power >= 0 ? 1 : -1);
@@ -3636,7 +3635,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 					if (ego_power < 0) ego_power = -ego_power;
 				}
 
-			} while (!(ego_power <= old_ego_power) && (ego_power < (lev * 3 / 2)));
+			} while (!(ego_power <= old_ego_power) && (ego_power < lev));
 		}
 
 		/* Hack -- apply rating bonus */

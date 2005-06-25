@@ -1888,6 +1888,17 @@ static s32b artifact_power(int a_idx)
 			mult = bow_multiplier(a_ptr->sval);
 			LOG_PRINT1("Base multiplier for this weapon is %d\n", mult);
 
+			if (a_ptr->to_h > 9)
+			{
+				p+= (a_ptr->to_h - 9) * 2 / 3;
+				LOG_PRINT1("Adding power from high to_hit, total is %d\n", p);
+			}
+			else
+			{
+				p += 6;
+				LOG_PRINT1("Adding power from base to_hit, total is %d\n", p);
+			}
+
 			if (a_ptr->flags1 & TR1_MIGHT)
 			{
 				if (a_ptr->pval > 3 || a_ptr->pval < 0)
@@ -1905,6 +1916,27 @@ static s32b artifact_power(int a_idx)
 			p *= mult;
 
 			LOG_PRINT2("Multiplying power by %d, total is %d\n", mult, p);
+
+			/*
+			 * Damage multiplier for bows should be weighted less than that
+			 * for melee weapons, since players typically get fewer shots
+			 * than hits (note, however, that the multipliers are applied
+			 * afterwards in the bow calculation, not before as for melee
+			 * weapons, which tends to bring these numbers back into line).
+			 */
+
+			if (a_ptr->to_d > 9)
+			{
+				p += a_ptr->to_d;
+				LOG_PRINT1("Adding power from to_dam greater than 9, total is %d\n", p);
+			}
+			else
+			{
+				p += 9;
+				LOG_PRINT1("Adding power for base to_dam, total is %d\n", p);
+			}
+
+			LOG_PRINT1("Adding power from to_dam, total is %d\n", p);
 
 			if (a_ptr->flags1 & TR1_SHOTS)
 			{
@@ -1936,30 +1968,31 @@ static s32b artifact_power(int a_idx)
 
 			}
 
-			/*
-			 * Damage multiplier for bows should be weighted less than that
-			 * for melee weapons, since players typically get fewer shots
-			 * than hits (note, however, that the multipliers are applied
-			 * afterwards in the bow calculation, not before as for melee
-			 * weapons, which tends to bring these numbers back into line).
-			 */
-
-			if (a_ptr->to_d < 9)
+			/* Normalise power back */
+			/* We now only count power as 'above' having the basic weapon at the same level */
+			if (a_ptr->sval == SV_SLING)
 			{
-				/* Could enchant this up - just use to_d value of 9 */
-				p += 9;
-				LOG_PRINT("Damage too low, adding 9\n");
+				if (ABS(p) > AVG_SLING_AMMO_DAMAGE)
+					p -= sign(p) * AVG_SLING_AMMO_DAMAGE * bow_multiplier(k_ptr->sval);
+				else
+					p = 0;
 			}
-			else
+			else if (a_ptr->sval == SV_SHORT_BOW ||
+				a_ptr->sval == SV_LONG_BOW)
 			{
-				p += (a_ptr->to_d);
-				LOG_PRINT1("Adding power from to_dam, total is %d\n", p);
+				if (ABS(p) > AVG_BOW_AMMO_DAMAGE)
+					p -= sign(p) * AVG_BOW_AMMO_DAMAGE * bow_multiplier(k_ptr->sval);
+				else
+					p = 0;
 			}
-
-			/* To hit uses a percentage */
-			p += p * (5 * sign(a_ptr->to_h) * (ABS(a_ptr->to_h))) / 100;
-
-			LOG_PRINT1("Adding power from to_hit, total is %d\n", p);
+			else if (a_ptr->sval == SV_LIGHT_XBOW ||
+				a_ptr->sval == SV_HEAVY_XBOW)
+			{
+				if (ABS(p) > AVG_XBOW_AMMO_DAMAGE)
+					p -= sign(p) * AVG_XBOW_AMMO_DAMAGE * bow_multiplier(k_ptr->sval);
+				else
+					p = 0;
+			}
 
 			if (a_ptr->weight < k_ptr->weight)
 			{
@@ -1998,27 +2031,41 @@ static s32b artifact_power(int a_idx)
 		case TV_POLEARM:
 		case TV_SWORD:
 		{
-			p += a_ptr->dd * (a_ptr->ds + 1) / 2;
+			/* Not this is 'uncorrected' */
+			p += a_ptr->dd * (a_ptr->ds + 1);
 			LOG_PRINT1("Adding power for dam dice, total is %d\n", p);
-
 
 			/* Apply the correct slay multiplier */
 
 			p = (p * slay_power(slay_index(a_ptr->flags1, a_ptr->flags2, a_ptr->flags3, a_ptr->flags4))) / tot_mon_power;
 			LOG_PRINT1("Adjusted for slay power, total is %d\n", p);
 
+			p /= 2;
+			LOG_PRINT1("Correcting damage, total is %d\n", p);
 
-			if (a_ptr->to_d < 9)
+			/* To hit uses a percentage - up to 65%*/
+			if (a_ptr->to_h > 9)
 			{
-				/* This could be enchanted up, so just assume to_d of +9 */
-				p += 9;
-				LOG_PRINT("Base damage too low, increasing to +9\n");
+				p+= a_ptr->to_h * 2 / 3;
+				LOG_PRINT1("Adding power for to_hit greater than 9, total is %d\n", p);
 			}
 			else
 			{
-				p += a_ptr->to_d;
-				LOG_PRINT1("Adding power for to_dam, total is %d\n", p);
+				p+= 6;
+				LOG_PRINT1("Adding power for base to_hit, total is %d\n", p);
 			}
+
+			if (a_ptr->to_d > 9)
+			{
+				p += a_ptr->to_d;
+				LOG_PRINT1("Adding power for to_dam greater than 9, total is %d\n", p);
+			}
+			else
+			{
+				p+= 9;
+				LOG_PRINT1("Adding power for base to_dam, total is %d\n", p);
+			}
+
 
 			if (a_ptr->flags1 & TR1_BLOWS)
 			{
@@ -2038,10 +2085,22 @@ static s32b artifact_power(int a_idx)
 				}
 			}
 
-			/* To hit uses a percentage */
-			p += p * (5 * sign(a_ptr->to_h) * (ABS(a_ptr->to_h))) / 100;
+			/* Normalise power back */
+			/* We remove the weapon base damage to get 'true' power */
+			/* This makes e.g. a sword that provides fire immunity the same value as
+			   a ring that provides fire immunity */
+			if (ABS(p) > k_ptr->dd * (k_ptr->ds + 1) / 2 + 15)
+				p -= sign(p) * (k_ptr->dd * (k_ptr->ds + 1) / 2 + 15);
+			else
+				p = 0;
 
-			LOG_PRINT1("Adding power for to hit, total is %d\n", p);
+			LOG_PRINT1("Normalising power against base item, total is %d\n", p);
+
+			if (a_ptr->ac != k_ptr->ac)
+			{
+				p += a_ptr->ac - k_ptr->ac;
+				LOG_PRINT1("Adding power for non-standard AC value, total is %d\n", p);
+			}
 
 			/* Remember, weight is in 0.1 lb. units. */
 			if (a_ptr->weight != k_ptr->weight)
@@ -2051,8 +2110,8 @@ static s32b artifact_power(int a_idx)
 			}
 
 			/* Ignore theft / acid / fire -- Bonus as may choose to swap melee weapons */
-			LOG_PRINT1("Adding power for ignore theft / acid / fire, total is %d\n", p);
 			p += 3;
+			LOG_PRINT1("Adding power for ignore theft / acid / fire, total is %d\n", p);
 
 			break;
 		}
@@ -2066,8 +2125,11 @@ static s32b artifact_power(int a_idx)
 		case TV_HARD_ARMOR:
 		case TV_DRAG_ARMOR:
 		{
-			p += sign(a_ptr->ac) * ((ABS(a_ptr->ac) * 2) / 3);
-			LOG_PRINT1("Adding power for base AC value, total is %d\n", p);
+			if (a_ptr->ac != k_ptr->ac)
+			{
+				p += a_ptr->ac - k_ptr->ac;
+			}
+			LOG_PRINT1("Adding power for non-standard AC value, total is %d\n", p);
 
 			p += sign(a_ptr->to_h) * ((ABS(a_ptr->to_h) * 2) / 3);
 			LOG_PRINT1("Adding power for to_hit, total is %d\n", p);
@@ -2082,8 +2144,8 @@ static s32b artifact_power(int a_idx)
 			}
 
 			/* Ignore theft / acid / fire -- Big bonus for ignore acid */
-			LOG_PRINT1("Adding power for ignore theft / *acid* / fire, total is %d\n", p);
 			p += 5;
+			LOG_PRINT1("Adding power for ignore theft / *acid* / fire, total is %d\n", p);
 
 			break;
 		}
@@ -2112,34 +2174,100 @@ static s32b artifact_power(int a_idx)
 			LOG_PRINT1("Adding power for to_dam, total is %d\n", p);
 
 			/* Ignore theft -- Very slight bonus for ignore ignore */
-			LOG_PRINT1("Adding power for ignore theft, total is %d\n", p);
-
 			p += 1;
+			LOG_PRINT1("Adding power for ignore theft, total is %d\n", p);
 
 			break;
 		}
 	}
 
+	/* Compute weight discount percentage */
+	/*
+	 * If an item weighs more than 5 pounds, we discount its power.
+	 *
+	 * This figure is from 30 lb weight limit for mages divided by 6 slots;
+	 * but we do it for all items as they may be used as swap items, but use a divisor of 10 lbs instead.
+	 */
+
+	/* Evaluate ac bonus and weight differentl for armour and non-armour. */
+	switch (a_ptr->tval)
+	{
+		case TV_BOOTS:
+		case TV_GLOVES:
+		case TV_HELM:
+		case TV_CROWN:
+		case TV_SHIELD:
+		case TV_CLOAK:
+		case TV_SOFT_ARMOR:
+		case TV_HARD_ARMOR:
+		case TV_DRAG_ARMOR:
+		{
+			if (a_ptr->weight >= 50)
+			{
+				p -= a_ptr->weight / 50; 
+
+				LOG_PRINT2("Reducing power for armour weight of %d, total is %d\n", a_ptr->weight, p);
+			}
+
+			if (a_ptr->to_a > 9)
+			{
+				p+= (a_ptr->to_a - 9);
+				LOG_PRINT2("Adding power for to_ac of %d, total is %d\n", a_ptr->to_a, p);
+			}
+
+			if (a_ptr->to_a > 19)
+			{
+				p += (a_ptr->to_a - 19);
+				LOG_PRINT1("Adding power for high to_ac value, total is %d\n", p);
+			}
+
+			if (a_ptr->to_a > 29)
+			{
+				p += (a_ptr->to_a - 29);
+				LOG_PRINT1("Adding power for very high to_ac value, total is %d\n", p);
+			}
+
+			if (a_ptr->to_a > 39)
+			{
+				p += 20000;	/* inhibit */
+				LOG_PRINT("INHIBITING: AC bonus too high\n");
+			}
+			break;
+
+		default:
+			if (a_ptr->weight >= 100)
+			{
+				p -= a_ptr->weight / 100; 
+
+				LOG_PRINT2("Reducing power for swap item weight of %d, total is %d\n", a_ptr->weight, p);
+
+			}
+
+			p += sign(a_ptr->to_a) * (ABS(a_ptr->to_a) / 2);
+
+			if (a_ptr->to_a > 9)
+			{
+				p+= (a_ptr->to_a - 9);
+				LOG_PRINT2("Adding power for high to_ac of %d, total is %d\n", a_ptr->to_a, p);
+
+			}
+
+			if (a_ptr->to_a > 19)
+			{
+				p += (a_ptr->to_a - 19);
+				LOG_PRINT1("Adding power for very high to_ac value, total is %d\n", p);
+			}
+
+			if (a_ptr->to_a > 29)
+			{
+				p += 20000;	/* inhibit */
+				LOG_PRINT("INHIBITING: AC bonus too high\n");
+			}
+			break;
+		}
+	}
+
 	/* Other abilities are evaluated independent of the object type. */
-	p += sign(a_ptr->to_a) * (ABS(a_ptr->to_a) / 2);
-	LOG_PRINT2("Adding power for to_ac of %d, total is %d\n", a_ptr->to_a, p);
-
-	if (a_ptr->to_a > 20)
-	{
-		p += (a_ptr->to_a - 19);
-		LOG_PRINT1("Adding power for high to_ac value, total is %d\n", p);
-	}
-	if (a_ptr->to_a > 30)
-	{
-		p += (a_ptr->to_a - 29);
-		LOG_PRINT1("Adding power for very high to_ac value, total is %d\n", p);
-	}
-	if (a_ptr->to_a > 40)
-	{
-		p += 20000;	/* inhibit */
-		LOG_PRINT("INHIBITING: AC bonus too high\n");
-	}
-
 	if (a_ptr->pval > 0)
 	{
 		if (a_ptr->flags1 & TR1_STR)
@@ -2216,21 +2344,7 @@ static s32b artifact_power(int a_idx)
 	}
 	if (a_ptr->flags1 & TR1_SPEED)
 	{
-		/* Big bonuses use constant increase */
-		if (a_ptr->pval > 10)
-		{
-			p += a_ptr->pval * 10;
-		}
-		/* Ramp up increase quickly */
-		else if (a_ptr->pval > 0)
-		{
-			p += a_ptr->pval * a_ptr->pval;
-		}
-		/* Otherwise */
-		else
-		{
-			p += 3 * a_ptr->pval;
-		}
+		p += 5 * a_ptr->pval;
 		LOG_PRINT2("Adding power for speed bonus/penalty %d, total is %d\n", a_ptr->pval, p);
 	}
 
@@ -2251,7 +2365,7 @@ static s32b artifact_power(int a_idx)
 	/* Add bonus for sustains getting 'sustain-lock' */
 	if (sustains > 1)
 	{
-		p += sustains * sustains / 2;
+		p += (sustains -1);
 		LOG_PRINT1("Adding power for multiple sustains, total is %d\n", p); \
 	}
 
@@ -2280,13 +2394,13 @@ static s32b artifact_power(int a_idx)
 
 	ADD_POWER("free action",	 7, TR3_FREE_ACT, 3, high_resists++);
 	ADD_POWER("hold life",		 6, TR3_HOLD_LIFE, 3, high_resists++);
-	ADD_POWER("feather fall",	 0, TR3_FEATHER, 3,); /* was 2 */
-	ADD_POWER("permanent light",     2, TR3_LITE, 3,); /* was 2 */
+	ADD_POWER("feather fall",	 1, TR3_FEATHER, 3,); /* was 2 */
+	ADD_POWER("permanent light",     4, TR3_LITE, 3,); /* was 2 */
 
 	ADD_POWER("see invisible",	 4, TR3_SEE_INVIS, 3,);
-	ADD_POWER("sense orcs",	  	1, TR3_ESP_ORC, 3,);
-	ADD_POWER("sense trolls",	1, TR3_ESP_TROLL, 3,);
-	ADD_POWER("sense giants",	2, TR3_ESP_GIANT, 3,);
+	ADD_POWER("sense orcs",	  	3, TR3_ESP_ORC, 3,);
+	ADD_POWER("sense trolls",	3, TR3_ESP_TROLL, 3,);
+	ADD_POWER("sense giants",	3, TR3_ESP_GIANT, 3,);
 	ADD_POWER("sense demons",	4, TR3_ESP_DEMON, 3,);
 	ADD_POWER("sense undead",	5, TR3_ESP_UNDEAD, 3,);
 	ADD_POWER("sense dragons",       5, TR3_ESP_DRAGON, 3,);
@@ -2305,7 +2419,7 @@ static s32b artifact_power(int a_idx)
 	/* Add bonus for getting 'low resist-lock' */
 	if (low_resists > 1)
 	{
-		p += low_resists * low_resists;
+		p += (low_resists-1) * 2;
 		LOG_PRINT1("Adding power for multiple low resists, total is %d\n", p); \
 	}
 
@@ -2324,15 +2438,15 @@ static s32b artifact_power(int a_idx)
 	/* Add bonus for getting 'high resist-lock' */
 	if (high_resists > 1)
 	{
-		p += high_resists * high_resists / 2;
+		p += (high_resists-1) * 3;
 		LOG_PRINT1("Adding power for multiple high resists, total is %d\n", p); \
 	}
 
 	ADD_POWER("regeneration",	 4, TR3_REGEN, 3,);
 	ADD_POWER("blessed",		 1, TR3_BLESSED, 3,);
 
-	ADD_POWER("blood vampire",	 4, TR4_VAMP_HP, 4,);
-	ADD_POWER("mana vampire",	 1, TR4_VAMP_MANA, 4,);
+	ADD_POWER("blood vampire",	 25, TR4_VAMP_HP, 4,);
+	ADD_POWER("mana vampire",	 14, TR4_VAMP_MANA, 4,);
 
 	ADD_POWER("teleportation",	 -40, TR3_TELEPORT, 3,);
 	ADD_POWER("drain experience",	 -20, TR3_DRAIN_EXP, 3,);
@@ -2368,6 +2482,7 @@ static s32b artifact_power(int a_idx)
 	ADD_POWER("hurt cold",	 -40, TR4_HURT_COLD, 4,);
 
 	return (p);
+
 }
 
 
@@ -2764,7 +2879,7 @@ static s16b choose_item(int a_idx)
  */
 static void do_pval(artifact_type *a_ptr)
 {
-	int factor = 2;
+	int factor = 1;
 	/* Track whether we have blows, might or shots on this item */
 	if (a_ptr->flags1 & TR1_BLOWS) factor++;
 	if (a_ptr->flags1 & TR1_MIGHT) factor++;
@@ -2773,13 +2888,13 @@ static void do_pval(artifact_type *a_ptr)
 	if (a_ptr->pval == 0)
 	{
 		/* Blows, might, shots handled separately */
-		if (factor > 2)
+		if (factor > 1)
 		{
 			a_ptr->pval = (s16b)(1 + rand_int(2));
 			/* Give it a shot at +3 */
 			if (rand_int(INHIBIT_STRONG) == 0) a_ptr->pval = 3;
 		}
-		else a_ptr->pval = (s16b)(1 + rand_int(4));
+		else a_ptr->pval = (s16b)(1 + rand_int(5));
 		LOG_PRINT1("Assigned initial pval, value is: %d\n", a_ptr->pval);
 	}
 	else if (a_ptr->pval < 0)
