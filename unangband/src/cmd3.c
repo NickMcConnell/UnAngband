@@ -325,7 +325,7 @@ void do_cmd_wield(void)
 	burn |= (f4 & (TR4_ELF)) & (p_ptr->cur_flags4 & (TR4_SLAY_ELF));
 
 	/* Evil players can wield racial conflict items but get cursed instead of burning */
-	if ((burn) && ((f4 & (TR4_EVIL)) || (p_ptr->cur_flags4 & (TR4_EVIL))))
+	if ((burn != 0) && ((f4 & (TR4_EVIL)) || ((p_ptr->cur_flags4 & (TR4_EVIL)) != 0)))
 	{
 		curse = TRUE;
 		burn = FALSE;
@@ -345,7 +345,7 @@ void do_cmd_wield(void)
 	burn |= (f4 & (TR4_HURT_ELEC)) & (p_ptr->cur_flags1 & (TR1_BRAND_ELEC));
 	burn |= (f4 & (TR4_HURT_FIRE)) & (p_ptr->cur_flags1 & (TR1_BRAND_FIRE));
 
-	if (burn)
+	if (burn != 0)
 	{
 		/* Warn the player */
 		msg_print("Aiee! It feels burning hot!");

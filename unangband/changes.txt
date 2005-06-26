@@ -51,6 +51,9 @@ temporarily disabled for testing purposes.
 
 - Modified some existing artifacts to add magical device skill or spell resistance.
 
+- Added spells, scrolls and rods of feedback, which allow the player to detect hidden
+resistances on high level items, and act as a limited attack weapon.
+
 ### User Interface ###
 
 - Monster recall now reports what particular types of items are dropped by each

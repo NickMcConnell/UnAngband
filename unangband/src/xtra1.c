@@ -2252,7 +2252,7 @@ static void calc_torch(void)
 	}
 
 	/* Player is glowing */
-	if (p_ptr->cur_flags3 & (TR3_LITE))
+	if ((p_ptr->cur_flags3 & (TR3_LITE)) != 0)
 	{
 #ifdef ALLOW_OBJECT_INFO_MORE
 		equip_can_flags(0x0L,0x0L,TR3_LITE,0x0L);
@@ -2465,9 +2465,9 @@ static void calc_bonuses(void)
 	player_flags(&f1, &f2, &f3, &f4);
 
 	p_ptr->cur_flags1 = f1;
-	p_ptr->cur_flags1 = f2;
-	p_ptr->cur_flags1 = f3;
-	p_ptr->cur_flags1 = f4;
+	p_ptr->cur_flags2 = f2;
+	p_ptr->cur_flags3 = f3;
+	p_ptr->cur_flags4 = f4;
 
 	/*** Analyze equipment ***/
 
@@ -2525,9 +2525,9 @@ static void calc_bonuses(void)
 
 		/* Affect flags */
 		p_ptr->cur_flags1 |= f1;
-		p_ptr->cur_flags1 |= f2;
-		p_ptr->cur_flags1 |= f3;
-		p_ptr->cur_flags1 |= f4;
+		p_ptr->cur_flags2 |= f2;
+		p_ptr->cur_flags3 |= f3;
+		p_ptr->cur_flags4 |= f4;
 
 		/* Modify the base armor class */
 		p_ptr->ac += o_ptr->ac;
@@ -3164,7 +3164,7 @@ static void calc_bonuses(void)
 					break;
 
 				case WB_ICKY_WIELD:
-					if ((inventory[INVEN_WIELD].k_idx) && (!p_ptr->cur_flags3 & (TR3_BLESSED))) p_ptr->icky_wield = TRUE;
+					if ((inventory[INVEN_WIELD].k_idx) && ((p_ptr->cur_flags3 & (TR3_BLESSED)) == 0)) p_ptr->icky_wield = TRUE;
 					break;
 
 				case WB_BLESSED:

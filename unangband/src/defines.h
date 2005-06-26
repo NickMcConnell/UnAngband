@@ -1994,11 +1994,11 @@
 #define SV_ROD_HEALING			9
 #define SV_ROD_RESTORATION		10
 #define SV_ROD_SPEED			11
-/* xxx (aimed) */
-#define SV_ROD_TELEPORT_AWAY	13
+#define SV_ROD_DOWSING			12
+#define SV_ROD_FEEDBACK			13
 #define SV_ROD_DISARMING		14
-#define SV_ROD_LITE				15
-#define SV_ROD_SLEEP_MONSTER	16
+#define SV_ROD_LITE			15
+#define SV_ROD_SLEEP_MONSTER		16
 #define SV_ROD_SLOW_MONSTER		17
 #define SV_ROD_DRAIN_LIFE		18
 #define SV_ROD_POLYMORPH		19
@@ -2010,6 +2010,7 @@
 #define SV_ROD_ELEC_BALL		25
 #define SV_ROD_FIRE_BALL		26
 #define SV_ROD_COLD_BALL		27
+#define SV_ROD_TELEPORT_AWAY		28
 
 
 /* The "sval" codes for TV_SCROLL */
@@ -2179,7 +2180,7 @@
 /*
  * Special "sval" limit -- first "aimed" rod
  */
-#define SV_ROD_MIN_DIRECTION	12
+#define SV_ROD_MIN_DIRECTION	14
 
 /*
  * Special "sval" limit -- first "large" chest
@@ -2254,6 +2255,7 @@
 #define RBM_LEVEL		49
 #define RBM_CROSS       50
 #define RBM_STRIKE      51
+#define RBM_EXPLODE	52
 
 #define RBM_MAX_NORMAL  23
 #define RBM_MIN_RANGED  15

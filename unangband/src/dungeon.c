@@ -759,13 +759,13 @@ static void process_world(void)
 			i = extract_energy[p_ptr->pspeed] * 2;
 
 			/* Hunger takes more food */
-			if (p_ptr->cur_flags4 & (TR4_HUNGER)) i += 100;
+			if ((p_ptr->cur_flags4 & (TR4_HUNGER)) != 0) i += 100;
 
 			/* Regeneration takes more food */
-			if (p_ptr->cur_flags3 & (TR3_REGEN)) i += 30;
+			if ((p_ptr->cur_flags3 & (TR3_REGEN)) != 0) i += 30;
 
 			/* Slow digestion takes less food */
-			if (p_ptr->cur_flags3 & (TR3_SLOW_DIGEST)) i -= 10;
+			if ((p_ptr->cur_flags3 & (TR3_SLOW_DIGEST)) != 0) i -= 10;
 
 			/* Minimal digestion */
 			if (i < 1) i = 1;
@@ -844,7 +844,7 @@ static void process_world(void)
 	}	
 
 	/* Regeneration ability */
-	if (p_ptr->cur_flags3 & (TR3_REGEN))
+	if ((p_ptr->cur_flags3 & (TR3_REGEN)) != 0)
 	{
 		regen_amount = regen_amount * 2;
 	}
@@ -860,7 +860,7 @@ static void process_world(void)
 	/* Regenerate the mana */
 	if (p_ptr->csp < p_ptr->msp)
 	{
-		if (!(p_ptr->cur_flags3 & (TR3_DRAIN_MANA))) regenmana(regen_amount);
+		if ((p_ptr->cur_flags3 & (TR3_DRAIN_MANA)) == 0) regenmana(regen_amount);
 	}
 
 	/* Various things interfere with healing */
@@ -868,7 +868,7 @@ static void process_world(void)
 	if (p_ptr->poisoned) regen_amount = 0;
 	if (p_ptr->stun) regen_amount = 0;
 	if (p_ptr->cut) regen_amount = 0;
-	if (p_ptr->cur_flags3 & (TR3_DRAIN_HP)) regen_amount = 0;
+	if ((p_ptr->cur_flags3 & (TR3_DRAIN_HP)) != 0) regen_amount = 0;
 	if (p_ptr->disease) regen_amount = 0;
 	if ((room) && (d_ptr->flags & (ROOM_BLOODY))) regen_amount = 0;
 
@@ -1090,7 +1090,7 @@ static void process_world(void)
 	/*** Process Inventory ***/
 
 	/* Handle experience draining */
-	if ((p_ptr->cur_flags3 & (TR3_DRAIN_EXP)) || (p_ptr->disease & (DISEASE_DRAIN_EXP)))
+	if (((p_ptr->cur_flags3 & (TR3_DRAIN_EXP)) != 0) || (p_ptr->disease & (DISEASE_DRAIN_EXP)))
 	{
 		if ((rand_int(100) < 10) && (p_ptr->exp > 0))
 		{
@@ -1106,7 +1106,7 @@ static void process_world(void)
 	}
 
 	/* Handle hit point draining */
-	if ((p_ptr->cur_flags3 & (TR3_DRAIN_HP)) || (p_ptr->disease & (DISEASE_DRAIN_HP)))
+	if (((p_ptr->cur_flags3 & (TR3_DRAIN_HP)) != 0) || (p_ptr->disease & (DISEASE_DRAIN_HP)))
 	{
 		if ((rand_int(100) < 10) && (p_ptr->chp > 0))
 		{
@@ -1122,7 +1122,7 @@ static void process_world(void)
 	}
 
 	/* Handle mana draining */
-	if ((p_ptr->cur_flags3 & (TR3_DRAIN_MANA)) || (p_ptr->disease & (DISEASE_DRAIN_MANA)))
+	if (((p_ptr->cur_flags3 & (TR3_DRAIN_MANA)) != 0) || (p_ptr->disease & (DISEASE_DRAIN_MANA)))
 	{
 		if ((rand_int(100) < 10) && (p_ptr->csp > 0))
 		{
@@ -1473,7 +1473,7 @@ static void process_world(void)
 	/*** Involuntary Movement ***/
 
 	/* Mega-Hack -- Random teleportation XXX XXX XXX */
-	if ((p_ptr->cur_flags3 & (TR3_TELEPORT)) && (rand_int(100) < 1))
+	if (((p_ptr->cur_flags3 & (TR3_TELEPORT)) != 0) && (rand_int(100) < 1))
 	{
 		/* Teleport player */
 		teleport_player(40);

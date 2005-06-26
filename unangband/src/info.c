@@ -1068,6 +1068,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 		{
 			case RBM_AURA: p = "surrounds you with an aura";  t = "your enemies"; rad = 2; break;
 			case RBM_SELF: t = "you";break;
+			case RBM_EXPLODE: t = "you and all enemies adjacent to you"; break;
 			case RBM_ADJACENT: t = "all enemies adjacent to you"; break;
 			case RBM_HANDS: t = "an adjacent target"; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
 			case RBM_MISSILE: t = "your enemies"; if ((level > 5) && (d2)) d1+= (level-1)/5;break;

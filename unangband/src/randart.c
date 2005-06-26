@@ -5840,14 +5840,14 @@ static void scramble_artifact(int a_idx)
 			 * that we get a base item for borderline cases like Wormtongue.
 			 */
 
-			if (power > 0 && power < 15 && count > MAX_TRIES / 2)
+			if (power > 0 && power < 10 && count > MAX_TRIES / 2)
 			{
 				LOG_PRINT("Cursing base item to help get a match.\n");
 				do_curse(a_ptr);
 				remove_contradictory(a_ptr);
 			}
 
-			else if (power >= 15 && power < 20 && count > MAX_TRIES / 2)
+			else if (power >= 10 && power < 20 && count > MAX_TRIES / 2)
 			{
 				LOG_PRINT("Restricting base item to help get a match.\n");
 				add_restrict_rand(a_ptr);

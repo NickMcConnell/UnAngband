@@ -46,6 +46,10 @@
 # If dice is > 0 and sides == 0, we use dice * level + bonus, or
 # dice * 25 + bonus, if the spell is the result of using an object.
 
+# Note that if you are applying blows to a player, you should apply the blow
+# that blinds them last, if possible, because they will not know the results
+# of the other blows.
+
 # 'L' indicates how long the duration component of the spell lasts.
 
 # 'S' indicates another parametised effect. The parameter value
@@ -413,7 +417,7 @@ S:RECHARGE:40
 N:29:Teleport Other
 A:65:3:1
 A:65:24:3
-A:66:13:1
+A:66:28:1
 A:90:3:2
 A:92:3:4
 A:93:7:26
@@ -2858,7 +2862,7 @@ B:SELF:LOSE_CHR
 
 N:296:Detonations
 A:75:22:1
-B:AURA:EXPLODE:50d20+0
+B:EXPLODE:EXPLODE:50d20+0
 L:1d100+0
 F:CUT | STUN
 D:Massive explosions rupture your body.
@@ -3624,3 +3628,18 @@ C:3:37:60:80:120
 C:4:31:60:95:180
 C:8:32:60:95:120
 S:BRAND_WEAPON:15
+
+N:416:Feedback
+A:66:13:1
+A:70:73:1
+A:90:17:10
+A:93:11:21
+C:1:15:17:40:29
+C:3:22:24:40:29
+C:8:15:17:40:29
+B:EXPLODE:NETHER:3d6
+B:EXPLODE:NEXUS:3d6
+B:EXPLODE:DARK:3d6
+B:EXPLODE:LITE:3d6
+L:1d5
+F:CUT | STUN | BLIND | CONFUSE | HALLUC

@@ -142,6 +142,7 @@ static cptr r_info_blow_method[] =
 	"LEVEL",
 	"CROSS",
 	"STRIKE",
+	"EXPLODE",
 	NULL
 };
 

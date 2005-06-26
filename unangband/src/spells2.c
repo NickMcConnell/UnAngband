@@ -149,7 +149,7 @@ static cptr desc_stat_neg[] =
 bool do_dec_stat(int stat)
 {
 	/* Sustain */
-	if (p_ptr->cur_flags2 & (TR2_SUST_STR << stat))
+	if ((p_ptr->cur_flags2 & (TR2_SUST_STR << stat)) != 0)
 	{
 		/* Message */
 		msg_format("You feel very %s for a moment, but the feeling passes.",
@@ -3557,7 +3557,7 @@ void destroy_area(int y1, int x1, int r, bool full)
 		msg_print("There is a searing blast of light!");
 
 		/* Blind the player */
-		if (!p_ptr->cur_flags2 & (TR2_RES_BLIND | TR2_RES_LITE))
+		if ((p_ptr->cur_flags2 & (TR2_RES_BLIND | TR2_RES_LITE)) == 0)
 		{
 			/* Become blind */
 			(void)set_blind(p_ptr->blind + 10 + randint(10));
@@ -3571,10 +3571,10 @@ void destroy_area(int y1, int x1, int r, bool full)
 		else
 		{
 			/* Sometimes notice */
-			if ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) && (rand_int(100)<30)) equip_can_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
+			if (((p_ptr->cur_flags2 & (TR2_RES_BLIND)) != 0) && (rand_int(100)<50)) equip_can_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
 
 			/* Sometimes notice */
-			if ((p_ptr->cur_flags2 & (TR2_RES_LITE)) && (rand_int(100)<30)) equip_can_flags(0x0L,TR2_RES_LITE,0x0L,0x0L);
+			if (((p_ptr->cur_flags2 & (TR2_RES_LITE)) != 0) && (rand_int(100)<50)) equip_can_flags(0x0L,TR2_RES_LITE,0x0L,0x0L);
 		}
 	}
 
@@ -4875,502 +4875,6 @@ static bool curse_weapon(void)
  *      We should make summoned monsters friendly if plev is > 0. XXX
  *
  */
-bool process_spell_flags(int spell, int level, bool *cancel)
-{
-	spell_type *s_ptr = &s_info[spell];
-
-	bool obvious = FALSE;
-
-	int lasts;
-
-	int ench_toh = 0;
-	int ench_tod = 0;
-	int ench_toa = 0;
-
-	/* Roll out the duration */
-	if ((s_ptr->l_dice) && (s_ptr->l_side))
-	{
-		lasts = damroll(s_ptr->l_dice, s_ptr->l_side) + s_ptr->l_plus;
-	}
-	else
-	{
-		lasts = s_ptr->l_plus;
-	}
-
-	/* Process the flags that apply to equipment */
-	if (s_ptr->flags1 & (SF1_IDENT_SENSE)) obvious = TRUE;
-	if (s_ptr->flags1 & (SF1_IDENT_BONUS))
-	{
-		if (!ident_spell_bonus() && (*cancel)) return (TRUE);
-		*cancel = FALSE;
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags1 & (SF1_IDENT))
-	{
-		if (!ident_spell() && (*cancel)) return (TRUE);
-		*cancel = FALSE;
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags1 & (SF1_IDENT_RUMOR))
-	{
-		if (!ident_spell_rumor() && (*cancel)) return (TRUE);
-		*cancel = FALSE;
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags1 & (SF1_IDENT_FULLY))
-	{
-		if (!identify_fully() && (*cancel)) return (TRUE);
-		*cancel = FALSE;
-		obvious = TRUE;
-	}
-
-	/* Process enchantment */
-	if (s_ptr->flags1 & (SF1_ENCHANT_TOH))
-	{
-		if (s_ptr->flags1 & (SF1_ENCHANT_HIGH)) ench_toh = 3+rand_int(4);
-		else ench_toh = 1;
-	}
-	if (s_ptr->flags1 & (SF1_ENCHANT_TOD))
-	{
-		if (s_ptr->flags1 & (SF1_ENCHANT_HIGH)) ench_tod = 3+rand_int(4);
-		else ench_tod = 1;
-	}
-	if (s_ptr->flags1 & (SF1_ENCHANT_TOA))
-	{
-		if (s_ptr->flags1 & (SF1_ENCHANT_HIGH)) ench_toa = 3+rand_int(4);
-		else ench_toa = 1;
-	}
-
-	/* Apply enchantment */
-	if (ench_toh || ench_tod || ench_toa)
-	{
-		if (!(enchant_spell(ench_toh, ench_tod, ench_toa)) && (*cancel))
-		{
-			return (TRUE);
-		}
-		
-		*cancel = FALSE;
-		obvious = TRUE;
-	}
-
-	/* Process the flags */
-	if ((s_ptr->flags1 & (SF1_DETECT_DOORS)) && (detect_doors())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_TRAPS)) && (detect_traps())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_STAIRS)) && (detect_stairs())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_WATER)) && (detect_water())) obvious = TRUE;
-	if (s_ptr->flags1 & (SF1_DETECT_GOLD))
-        {
-                if (detect_treasure()) obvious = TRUE;
-                if (detect_objects_gold()) obvious = TRUE;
-        }
-	if (s_ptr->flags1 & (SF1_DETECT_OBJECT))
-        {
-                if (detect_objects_buried()) obvious = TRUE;
-                if (detect_objects_normal()) obvious = TRUE;
-        }
-	if ((s_ptr->flags1 & (SF1_DETECT_MAGIC)) && (detect_objects_magic())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_CURSE)) && (detect_objects_cursed())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_MONSTER)) && (detect_monsters_normal())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_EVIL)) && (detect_monsters_evil())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_INVIS)) && (detect_monsters_invis())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_ANIMAL)) && (detect_monsters_animal())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_UNDEAD)) && (detect_monsters_undead())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_DEMON)) && (detect_monsters_demon())) obvious = TRUE;
-
-	if (s_ptr->flags1 & (SF1_MAP_AREA))
-	{
-		map_area();
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags1 & (SF1_WIZ_LITE))
-	{
-		wiz_lite();
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags1 & (SF1_LITE_ROOM))
-	{
-		lite_room(p_ptr->py,p_ptr->px);
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags1 & (SF1_DARK_ROOM))
-	{
-		unlite_room(p_ptr->py,p_ptr->px);
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags1 & (SF1_FORGET))
-	{
-		lose_all_info();
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags1 & (SF1_SELF_KNOW))
-	{
-		self_knowledge();
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags1 & (SF1_IDENT_PACK))
-	{
-		identify_pack();
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags1 & (SF1_ACQUIREMENT))
-	{
-		acquirement(p_ptr->py,p_ptr->px, 1, TRUE);
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags1 & (SF1_STAR_ACQUIREMENT))
-	{
-		acquirement(p_ptr->py,p_ptr->px, rand_int(2)+1, TRUE);
-		obvious = TRUE;
-	}
-
-
-	/* SF2 - timed abilities and modifying level */
-	if ((s_ptr->flags2 & (SF2_CURSE_WEAPON)) && (curse_weapon())) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_CURSE_ARMOR)) && (curse_armor())) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_INFRA)) && (set_tim_infra(p_ptr->tim_infra + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_HERO)) && (set_hero(p_ptr->hero + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_SHERO)) && (set_shero(p_ptr->shero + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_BLESS)) && (set_blessed(p_ptr->blessed + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_SHIELD)) && (set_shield(p_ptr->shield + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_INVULN)) && (set_invuln(p_ptr->invuln + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_SEE_INVIS)) && (set_tim_invis(p_ptr->tim_invis + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_PROT_EVIL)) && (set_protevil(p_ptr->protevil + lasts + (level== 0 ? 3 * p_ptr->lev : 0)))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_OPP_FIRE)) && (set_oppose_fire(p_ptr->oppose_fire + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_OPP_COLD)) && (set_oppose_cold(p_ptr->oppose_cold + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_OPP_ACID)) && (set_oppose_acid(p_ptr->oppose_acid + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_OPP_ELEC)) && (set_oppose_elec(p_ptr->oppose_elec + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_OPP_POIS)) && (set_oppose_pois(p_ptr->oppose_pois + lasts))) obvious = TRUE;
-
-	if (s_ptr->flags2 & (SF2_AGGRAVATE))
-	{
-		aggravate_monsters(0);
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags2 & (SF2_CREATE_STAIR))
-	{
-		stair_creation();
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags2 & (SF2_TELE_LEVEL))
-	{
-		(void)teleport_player_level();
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags2 & (SF2_ALTER_LEVEL))
-	{
-		p_ptr->leaving = TRUE;
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags2 & (SF2_BANISHMENT))
-	{
-		(void)banishment();
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags2 & (SF2_MASS_BANISHMENT))
-	{
-		mass_banishment();
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags2 & (SF2_CUT))
-	{
-		if (!p_ptr->cur_flags2 & (TR2_RES_SHARD))
-		{
-			if (set_cut(p_ptr->cut + lasts))
-			{
-				obvious = TRUE;
-
-				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_SHARD,0x0L,0x0L);
-			}
-		}
-		else /* if (obvious) */
-		{
-			/* Always notice */
-			equip_can_flags(0x0L,TR2_RES_SHARD,0x0L,0x0L);
-		}
-	}
-
-	if (s_ptr->flags2 & (SF2_STUN))
-	{
-		if (!p_ptr->cur_flags2 & (TR2_RES_SOUND))
-		{
-			if (set_stun(p_ptr->stun + lasts))
-			{
-				obvious = TRUE;
-
-				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_SOUND,0x0L,0x0L);
-			}
-		}
-		else /* if (obvious)*/
-		{
-			/* Always notice */
-			equip_can_flags(0x0L,TR2_RES_SHARD,0x0L,0x0L);
-		}
-	}
-
-	if (s_ptr->flags2 & (SF2_POISON))
-	{
-		if (!(p_ptr->cur_flags2 & (TR2_RES_POIS)) || p_ptr->oppose_pois)
-		{
-			if (set_poisoned(p_ptr->poisoned + lasts))
-			{
-				obvious = TRUE;
-
-				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_POIS,0x0L,0x0L);
-			}
-		}
-		else if (!p_ptr->oppose_pois) /* && (obvious) */
-		{
-			/* Always notice */
-			equip_can_flags(0x0L,TR2_RES_POIS,0x0L,0x0L);
-		}
-	}
-
-	if (s_ptr->flags2 & (SF2_BLIND))
-	{
-		if (!p_ptr->cur_flags2 & (TR2_RES_BLIND))
-		{
-			if (set_blind(p_ptr->blind + lasts))
-			{
-				obvious = TRUE;
-
-				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
-			}
-		}
-		else /* if (obvious)*/
-		{
-			/* Always notice */
-			equip_can_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
-		}
-	}
-
-	if (s_ptr->flags2 & (SF2_FEAR))
-	{
-		if ((!p_ptr->cur_flags2 & (TR2_RES_FEAR)) && (!p_ptr->hero) && (!p_ptr->shero))
-		{
-			if (set_afraid(p_ptr->afraid + lasts))
-			{
-				obvious = TRUE;
-
-				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_FEAR,0x0L,0x0L);
-			}
-		}
-		else if ((!p_ptr->hero)&&(!p_ptr->shero)) /* && (obvious) */
-		{
-			/* Always notice */
-			equip_can_flags(0x0L,TR2_RES_FEAR,0x0L,0x0L);
-		}
-	}
-
-	if (s_ptr->flags2 & (SF2_CONFUSE))
-	{
-		if (!p_ptr->cur_flags2 & (TR2_RES_CONFU))
-		{
-			if (set_confused(p_ptr->confused + lasts))
-			{
-				obvious = TRUE;
-				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
-			}
-		}
-		else /* if (obvious) */
-		{
-				/* Always notice */
-				equip_can_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
-		}
-	}
-
-	if (s_ptr->flags2 & (SF2_HALLUC))
-	{
-		if (!p_ptr->cur_flags2 & (TR2_RES_CHAOS))
-		{
-			if (set_image(p_ptr->image + lasts))
-			{
-				obvious = TRUE;
-
-				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_CHAOS,0x0L,0x0L);
-			}
-		}
-		else /* if (obvious) */
-		{
-			/* Always notice */
-			equip_can_flags(0x0L,TR2_RES_CHAOS,0x0L,0x0L);
-		}
-	}
-
-	if (s_ptr->flags2 & (SF2_PARALYZE))
-	{
-
-		if (!p_ptr->cur_flags3 & (TR3_FREE_ACT))
-		{
-			if (set_paralyzed(p_ptr->paralyzed + lasts))
-			{
-				obvious = TRUE;
-
-				/* Always notice */
-				equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
-			}
-		}
-		else /* if (obvious) */
-		{
-				/* Always notice */
-				equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
-		}
-	}
-
-	if (s_ptr->flags2 & (SF2_SLOW))
-	{
-
-		if (!p_ptr->cur_flags3 & (TR3_FREE_ACT))
-		{
-			if (set_slow(p_ptr->slow + lasts))
-			{
-				obvious = TRUE;
-
-				/* Always notice */
-				equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
-			}
-		}
-		else /* if (obvious) */
-		{
-				/* Always notice */
-				equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
-		}
-	}
-
-	if (s_ptr->flags2 & (SF2_HASTE))
-	{
-		if ((p_ptr->fast) && (set_fast(p_ptr->fast + rand_int(s_ptr->l_side/3)))) obvious = TRUE;
-		else if (set_fast(p_ptr->fast + lasts + level)) obvious = TRUE;
-	}
-
-	if (s_ptr->flags2 & (SF2_RECALL))
-	{
-		set_recall();
-		obvious = TRUE;
-	}
-
-
-
-	/* SF3 - healing self, and untimed improvements */
-
-	if ((s_ptr->flags3 & (SF3_INC_STR)) && (do_inc_stat(A_STR))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_INC_INT)) && (do_inc_stat(A_INT))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_INC_WIS)) && (do_inc_stat(A_WIS))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_INC_DEX)) && (do_inc_stat(A_DEX))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_INC_CON)) && (do_inc_stat(A_CON))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_INC_CHR)) && (do_inc_stat(A_CHR))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_STR)) && (do_res_stat(A_STR))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_INT)) && (do_res_stat(A_INT))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_WIS)) && (do_res_stat(A_WIS))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_DEX))  && (do_res_stat(A_DEX))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_CON))  && (do_res_stat(A_CON))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_CHR))  && (do_res_stat(A_CHR))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_EXP)) && (restore_level())) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_SLOW_CURSE)) && (remove_curse())) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_CURSE)) && (remove_all_curse())) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_SLOW_POIS)) && (set_poisoned(p_ptr->poisoned / 2))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_POIS)) && (set_poisoned(0))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_SLOW_CUTS)) && (set_cut(p_ptr->cut / 2))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_CUTS)) && (set_cut(0))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_STUN)) && (set_stun(0))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_CONF)) && (set_confused(0))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_FOOD)) && (set_food(PY_FOOD_MAX -1))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_FEAR)) && (set_afraid(0))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_BLIND)) && (set_blind(0))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_IMAGE)) && (set_image(0))) obvious = TRUE;
-
-
-	if (s_ptr->flags3 & (SF3_DEC_EXP))
-	{
-		if (!p_ptr->cur_flags3 & (TR3_HOLD_LIFE) && !p_ptr->blessed && (p_ptr->exp > 0))
-		{
-			lose_exp(p_ptr->exp / 4);
-			obvious = TRUE;
-
-			/* Always notice */
-			equip_not_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-		}
-		else if (p_ptr->cur_flags3 & (TR3_HOLD_LIFE))
-		{
-			/* Always notice */
-			equip_can_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-		}
-	}
-
-	
-
-	if (s_ptr->flags3 & (SF3_DEC_FOOD))
-	{
-		(void)set_food(PY_FOOD_STARVE - 1);
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags3 & (SF3_INC_EXP))
-	{
-		s32b ee = (p_ptr->exp / 2) + 10;
-		if (ee > 100000L) ee = 100000L;
-		gain_exp(ee);
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags3 & (SF3_SLOW_MANA))
-	{
-		if (p_ptr->csp < p_ptr->msp)
-		{
-			p_ptr->csp = p_ptr->csp + damroll(2,5);
-			if (p_ptr->csp >= p_ptr->msp)
-			{
-				p_ptr->csp = p_ptr->msp;
-				p_ptr->csp_frac = 0;
-			}
-			p_ptr->redraw |= (PR_MANA);
-			p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
-	
-			obvious = TRUE;
-		}
-	}
-
-	if (s_ptr->flags3 & (SF3_CURE_MANA))
-	{
-
-		if (p_ptr->csp < p_ptr->msp)
-		{
-			p_ptr->csp = p_ptr->msp;
-			p_ptr->csp_frac = 0;
-			p_ptr->redraw |= (PR_MANA);
-			p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
-			obvious = TRUE;
-		}
-	}
-
-	if (s_ptr->flags1 || s_ptr->flags2 || s_ptr->flags3) *cancel = FALSE;
-
-	return (obvious);
-
-}
 
 bool process_spell_blows(int spell, int level, bool *cancel)
 {
@@ -5661,6 +5165,16 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				if (project(-1, 2, py, px, damage, effect, flg)) obvious = TRUE;
 				break;
 			}
+			case RBM_EXPLODE:
+			/* Radius 1, centred on self -- affects self */
+			{
+				int py = p_ptr->py;
+				int px = p_ptr->px;
+			
+				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+				if (project(-2, 1, py, px, damage, effect, flg)) obvious = TRUE;
+				break;
+			}
 			case RBM_SPHERE:
 			/* Variable radius */
 			{
@@ -5714,6 +5228,507 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 	return (obvious);
 
 }
+
+
+
+
+
+bool process_spell_flags(int spell, int level, bool *cancel)
+{
+	spell_type *s_ptr = &s_info[spell];
+
+	bool obvious = FALSE;
+
+	int lasts;
+
+	int ench_toh = 0;
+	int ench_tod = 0;
+	int ench_toa = 0;
+
+	/* Roll out the duration */
+	if ((s_ptr->l_dice) && (s_ptr->l_side))
+	{
+		lasts = damroll(s_ptr->l_dice, s_ptr->l_side) + s_ptr->l_plus;
+	}
+	else
+	{
+		lasts = s_ptr->l_plus;
+	}
+
+	/* Process the flags that apply to equipment */
+	if (s_ptr->flags1 & (SF1_IDENT_SENSE)) obvious = TRUE;
+	if (s_ptr->flags1 & (SF1_IDENT_BONUS))
+	{
+		if (!ident_spell_bonus() && (*cancel)) return (TRUE);
+		*cancel = FALSE;
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags1 & (SF1_IDENT))
+	{
+		if (!ident_spell() && (*cancel)) return (TRUE);
+		*cancel = FALSE;
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags1 & (SF1_IDENT_RUMOR))
+	{
+		if (!ident_spell_rumor() && (*cancel)) return (TRUE);
+		*cancel = FALSE;
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags1 & (SF1_IDENT_FULLY))
+	{
+		if (!identify_fully() && (*cancel)) return (TRUE);
+		*cancel = FALSE;
+		obvious = TRUE;
+	}
+
+	/* Process enchantment */
+	if (s_ptr->flags1 & (SF1_ENCHANT_TOH))
+	{
+		if (s_ptr->flags1 & (SF1_ENCHANT_HIGH)) ench_toh = 3+rand_int(4);
+		else ench_toh = 1;
+	}
+	if (s_ptr->flags1 & (SF1_ENCHANT_TOD))
+	{
+		if (s_ptr->flags1 & (SF1_ENCHANT_HIGH)) ench_tod = 3+rand_int(4);
+		else ench_tod = 1;
+	}
+	if (s_ptr->flags1 & (SF1_ENCHANT_TOA))
+	{
+		if (s_ptr->flags1 & (SF1_ENCHANT_HIGH)) ench_toa = 3+rand_int(4);
+		else ench_toa = 1;
+	}
+
+	/* Apply enchantment */
+	if (ench_toh || ench_tod || ench_toa)
+	{
+		if (!(enchant_spell(ench_toh, ench_tod, ench_toa)) && (*cancel))
+		{
+			return (TRUE);
+		}
+		
+		*cancel = FALSE;
+		obvious = TRUE;
+	}
+
+	/* Process the flags */
+	if ((s_ptr->flags1 & (SF1_DETECT_DOORS)) && (detect_doors())) obvious = TRUE;
+	if ((s_ptr->flags1 & (SF1_DETECT_TRAPS)) && (detect_traps())) obvious = TRUE;
+	if ((s_ptr->flags1 & (SF1_DETECT_STAIRS)) && (detect_stairs())) obvious = TRUE;
+	if ((s_ptr->flags1 & (SF1_DETECT_WATER)) && (detect_water())) obvious = TRUE;
+	if (s_ptr->flags1 & (SF1_DETECT_GOLD))
+        {
+                if (detect_treasure()) obvious = TRUE;
+                if (detect_objects_gold()) obvious = TRUE;
+        }
+	if (s_ptr->flags1 & (SF1_DETECT_OBJECT))
+        {
+                if (detect_objects_buried()) obvious = TRUE;
+                if (detect_objects_normal()) obvious = TRUE;
+        }
+	if ((s_ptr->flags1 & (SF1_DETECT_MAGIC)) && (detect_objects_magic())) obvious = TRUE;
+	if ((s_ptr->flags1 & (SF1_DETECT_CURSE)) && (detect_objects_cursed())) obvious = TRUE;
+	if ((s_ptr->flags1 & (SF1_DETECT_MONSTER)) && (detect_monsters_normal())) obvious = TRUE;
+	if ((s_ptr->flags1 & (SF1_DETECT_EVIL)) && (detect_monsters_evil())) obvious = TRUE;
+	if ((s_ptr->flags1 & (SF1_DETECT_INVIS)) && (detect_monsters_invis())) obvious = TRUE;
+	if ((s_ptr->flags1 & (SF1_DETECT_ANIMAL)) && (detect_monsters_animal())) obvious = TRUE;
+	if ((s_ptr->flags1 & (SF1_DETECT_UNDEAD)) && (detect_monsters_undead())) obvious = TRUE;
+	if ((s_ptr->flags1 & (SF1_DETECT_DEMON)) && (detect_monsters_demon())) obvious = TRUE;
+
+	if (s_ptr->flags1 & (SF1_MAP_AREA))
+	{
+		map_area();
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags1 & (SF1_WIZ_LITE))
+	{
+		wiz_lite();
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags1 & (SF1_LITE_ROOM))
+	{
+		lite_room(p_ptr->py,p_ptr->px);
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags1 & (SF1_DARK_ROOM))
+	{
+		unlite_room(p_ptr->py,p_ptr->px);
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags1 & (SF1_FORGET))
+	{
+		lose_all_info();
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags1 & (SF1_SELF_KNOW))
+	{
+		self_knowledge();
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags1 & (SF1_IDENT_PACK))
+	{
+		identify_pack();
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags1 & (SF1_ACQUIREMENT))
+	{
+		acquirement(p_ptr->py,p_ptr->px, 1, TRUE);
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags1 & (SF1_STAR_ACQUIREMENT))
+	{
+		acquirement(p_ptr->py,p_ptr->px, rand_int(2)+1, TRUE);
+		obvious = TRUE;
+	}
+
+
+	/* SF2 - timed abilities and modifying level */
+	if ((s_ptr->flags2 & (SF2_CURSE_WEAPON)) && (curse_weapon())) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_CURSE_ARMOR)) && (curse_armor())) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_INFRA)) && (set_tim_infra(p_ptr->tim_infra + lasts))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_HERO)) && (set_hero(p_ptr->hero + lasts))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_SHERO)) && (set_shero(p_ptr->shero + lasts))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_BLESS)) && (set_blessed(p_ptr->blessed + lasts))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_SHIELD)) && (set_shield(p_ptr->shield + lasts))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_INVULN)) && (set_invuln(p_ptr->invuln + lasts))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_SEE_INVIS)) && (set_tim_invis(p_ptr->tim_invis + lasts))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_PROT_EVIL)) && (set_protevil(p_ptr->protevil + lasts + (level== 0 ? 3 * p_ptr->lev : 0)))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_OPP_FIRE)) && (set_oppose_fire(p_ptr->oppose_fire + lasts))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_OPP_COLD)) && (set_oppose_cold(p_ptr->oppose_cold + lasts))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_OPP_ACID)) && (set_oppose_acid(p_ptr->oppose_acid + lasts))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_OPP_ELEC)) && (set_oppose_elec(p_ptr->oppose_elec + lasts))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_OPP_POIS)) && (set_oppose_pois(p_ptr->oppose_pois + lasts))) obvious = TRUE;
+
+	if (s_ptr->flags2 & (SF2_AGGRAVATE))
+	{
+		aggravate_monsters(0);
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags2 & (SF2_CREATE_STAIR))
+	{
+		stair_creation();
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags2 & (SF2_TELE_LEVEL))
+	{
+		(void)teleport_player_level();
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags2 & (SF2_ALTER_LEVEL))
+	{
+		p_ptr->leaving = TRUE;
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags2 & (SF2_BANISHMENT))
+	{
+		(void)banishment();
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags2 & (SF2_MASS_BANISHMENT))
+	{
+		mass_banishment();
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags2 & (SF2_CUT))
+	{
+		if ((p_ptr->cur_flags2 & (TR2_RES_SHARD)) == 0)
+		{
+			if (set_cut(p_ptr->cut + lasts))
+			{
+				obvious = TRUE;
+
+				/* Always notice */
+				equip_not_flags(0x0L,TR2_RES_SHARD,0x0L,0x0L);
+			}
+		}
+		else /* if (obvious) */
+		{
+			/* Always notice */
+			equip_can_flags(0x0L,TR2_RES_SHARD,0x0L,0x0L);
+		}
+	}
+
+	if (s_ptr->flags2 & (SF2_STUN))
+	{
+		if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) == 0)
+		{
+			if (set_stun(p_ptr->stun + lasts))
+			{
+				obvious = TRUE;
+
+				/* Always notice */
+				equip_not_flags(0x0L,TR2_RES_SOUND,0x0L,0x0L);
+			}
+		}
+		else /* if (obvious)*/
+		{
+			/* Always notice */
+			equip_can_flags(0x0L,TR2_RES_SHARD,0x0L,0x0L);
+		}
+	}
+
+	if (s_ptr->flags2 & (SF2_POISON))
+	{
+		if (((p_ptr->cur_flags2 & (TR2_RES_POIS)) == 0) || p_ptr->oppose_pois)
+		{
+			if (set_poisoned(p_ptr->poisoned + lasts))
+			{
+				obvious = TRUE;
+
+				/* Always notice */
+				equip_not_flags(0x0L,TR2_RES_POIS,0x0L,0x0L);
+			}
+		}
+		else if (!p_ptr->oppose_pois) /* && (obvious) */
+		{
+			/* Always notice */
+			equip_can_flags(0x0L,TR2_RES_POIS,0x0L,0x0L);
+		}
+	}
+
+	if (s_ptr->flags2 & (SF2_BLIND))
+	{
+		if ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) == 0)
+		{
+			if (set_blind(p_ptr->blind + lasts))
+			{
+				obvious = TRUE;
+
+				/* Always notice */
+				equip_not_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
+			}
+		}
+		else /* if (obvious)*/
+		{
+			/* Always notice */
+			equip_can_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
+		}
+	}
+
+	if (s_ptr->flags2 & (SF2_FEAR))
+	{
+		if (((p_ptr->cur_flags2 & (TR2_RES_FEAR)) == 0) && (!p_ptr->hero) && (!p_ptr->shero))
+		{
+			if (set_afraid(p_ptr->afraid + lasts))
+			{
+				obvious = TRUE;
+
+				/* Always notice */
+				equip_not_flags(0x0L,TR2_RES_FEAR,0x0L,0x0L);
+			}
+		}
+		else if ((!p_ptr->hero)&&(!p_ptr->shero)) /* && (obvious) */
+		{
+			/* Always notice */
+			equip_can_flags(0x0L,TR2_RES_FEAR,0x0L,0x0L);
+		}
+	}
+
+	if (s_ptr->flags2 & (SF2_CONFUSE))
+	{
+		if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) == 0)
+		{
+			if (set_confused(p_ptr->confused + lasts))
+			{
+				obvious = TRUE;
+
+				/* Always notice */
+				equip_not_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
+			}
+		}
+		else /* if (obvious) */
+		{
+			/* Always notice */
+			equip_can_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
+		}
+	}
+
+	if (s_ptr->flags2 & (SF2_HALLUC))
+	{
+		if ((p_ptr->cur_flags2 & (TR2_RES_CHAOS)) == 0)
+		{
+			if (set_image(p_ptr->image + lasts))
+			{
+				obvious = TRUE;
+
+				/* Always notice */
+				equip_not_flags(0x0L,TR2_RES_CHAOS,0x0L,0x0L);
+			}
+		}
+		else /* if (obvious) */
+		{
+			/* Always notice */
+			equip_can_flags(0x0L,TR2_RES_CHAOS,0x0L,0x0L);
+		}
+	}
+
+	if (s_ptr->flags2 & (SF2_PARALYZE))
+	{
+		if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) == 0)
+		{
+			if (set_paralyzed(p_ptr->paralyzed + lasts))
+			{
+				obvious = TRUE;
+
+				/* Always notice */
+				equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
+			}
+		}
+		else /* if (obvious) */
+		{
+			/* Always notice */
+			equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
+		}
+	}
+
+	if (s_ptr->flags2 & (SF2_SLOW))
+	{
+		if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) == 0)
+		{
+			if (set_slow(p_ptr->slow + lasts))
+			{
+				obvious = TRUE;
+
+				/* Always notice */
+				equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
+			}
+		}
+		else /* if (obvious) */
+		{
+			/* Always notice */
+			equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
+		}
+	}
+
+	if (s_ptr->flags2 & (SF2_HASTE))
+	{
+		if ((p_ptr->fast) && (set_fast(p_ptr->fast + rand_int(s_ptr->l_side/3)))) obvious = TRUE;
+		else if (set_fast(p_ptr->fast + lasts + level)) obvious = TRUE;
+	}
+
+	if (s_ptr->flags2 & (SF2_RECALL))
+	{
+		set_recall();
+		obvious = TRUE;
+	}
+
+
+
+	/* SF3 - healing self, and untimed improvements */
+
+	if ((s_ptr->flags3 & (SF3_INC_STR)) && (do_inc_stat(A_STR))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_INC_INT)) && (do_inc_stat(A_INT))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_INC_WIS)) && (do_inc_stat(A_WIS))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_INC_DEX)) && (do_inc_stat(A_DEX))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_INC_CON)) && (do_inc_stat(A_CON))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_INC_CHR)) && (do_inc_stat(A_CHR))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_STR)) && (do_res_stat(A_STR))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_INT)) && (do_res_stat(A_INT))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_WIS)) && (do_res_stat(A_WIS))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_DEX))  && (do_res_stat(A_DEX))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_CON))  && (do_res_stat(A_CON))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_CHR))  && (do_res_stat(A_CHR))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_EXP)) && (restore_level())) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_SLOW_CURSE)) && (remove_curse())) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_CURSE)) && (remove_all_curse())) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_SLOW_POIS)) && (set_poisoned(p_ptr->poisoned / 2))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_POIS)) && (set_poisoned(0))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_SLOW_CUTS)) && (set_cut(p_ptr->cut / 2))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_CUTS)) && (set_cut(0))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_STUN)) && (set_stun(0))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_CONF)) && (set_confused(0))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_FOOD)) && (set_food(PY_FOOD_MAX -1))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_FEAR)) && (set_afraid(0))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_BLIND)) && (set_blind(0))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_IMAGE)) && (set_image(0))) obvious = TRUE;
+
+
+	if (s_ptr->flags3 & (SF3_DEC_EXP))
+	{
+		if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) == 0) && !p_ptr->blessed && (p_ptr->exp > 0))
+		{
+			lose_exp(p_ptr->exp / 4);
+			obvious = TRUE;
+
+			/* Always notice */
+			equip_not_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
+		}
+		else if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0)
+		{
+			/* Always notice */
+			equip_can_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
+		}
+	}
+
+	
+
+	if (s_ptr->flags3 & (SF3_DEC_FOOD))
+	{
+		(void)set_food(PY_FOOD_STARVE - 1);
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags3 & (SF3_INC_EXP))
+	{
+		s32b ee = (p_ptr->exp / 2) + 10;
+		if (ee > 100000L) ee = 100000L;
+		gain_exp(ee);
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags3 & (SF3_SLOW_MANA))
+	{
+		if (p_ptr->csp < p_ptr->msp)
+		{
+			p_ptr->csp = p_ptr->csp + damroll(2,5);
+			if (p_ptr->csp >= p_ptr->msp)
+			{
+				p_ptr->csp = p_ptr->msp;
+				p_ptr->csp_frac = 0;
+			}
+			p_ptr->redraw |= (PR_MANA);
+			p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
+	
+			obvious = TRUE;
+		}
+	}
+
+	if (s_ptr->flags3 & (SF3_CURE_MANA))
+	{
+
+		if (p_ptr->csp < p_ptr->msp)
+		{
+			p_ptr->csp = p_ptr->msp;
+			p_ptr->csp_frac = 0;
+			p_ptr->redraw |= (PR_MANA);
+			p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
+			obvious = TRUE;
+		}
+	}
+
+	if (s_ptr->flags1 || s_ptr->flags2 || s_ptr->flags3) *cancel = FALSE;
+
+	return (obvious);
+
+}
+
 
 
 
@@ -5973,8 +5988,10 @@ bool process_spell(int spell, int level, bool *cancel)
 		obvious = TRUE;
 	}
 
-	if (process_spell_flags(spell,level,cancel)) obvious = TRUE;
+	/* Note the order is important -- because of the impact of blinding a character on their subsequent
+		ability to see spell blows that affect themselves */
 	if (process_spell_blows(spell,level,cancel)) obvious = TRUE;
+	if (process_spell_flags(spell,level,cancel)) obvious = TRUE;
 	if (process_spell_types(spell,level,cancel)) obvious = TRUE;
 
 	/* Return result */

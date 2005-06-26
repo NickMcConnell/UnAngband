@@ -2424,7 +2424,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 				else
 				{
 					msg_print("Your mind is blasted by psionic energy.");
-					if (!p_ptr->cur_flags2 & (TR2_RES_CONFU))
+					if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) == 0)
 					{
 						(void)set_confused(p_ptr->confused + rand_int(4) + 4);
 					}
@@ -2470,7 +2470,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 				{
 					msg_print("Your mind is blasted by psionic energy.");
 					take_hit(damroll(12, 15), ddesc);
-					if (!p_ptr->cur_flags2 & (TR2_RES_BLIND))
+					if ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) != 0)
 					{
 						(void)set_blind(p_ptr->blind + 8 + rand_int(8));
 
@@ -2482,7 +2482,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 						/* Always notice */
 						equip_can_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
 					}
-					if (!p_ptr->cur_flags2 & (TR2_RES_CONFU))
+					if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) != 0)
 					{
 						(void)set_confused(p_ptr->confused + rand_int(4) + 4);
 
@@ -2494,7 +2494,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 						/* Always notice */
 						equip_can_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 					}
-					if (!p_ptr->cur_flags3 & (TR3_FREE_ACT))
+					if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0)
 					{
 						(void)set_paralyzed(p_ptr->paralyzed + rand_int(4) + 4);
 
@@ -2955,7 +2955,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 
 			if (target < 0)
 			{
-				if (p_ptr->cur_flags2 & (TR2_RES_FEAR))
+				if ((p_ptr->cur_flags2 & (TR2_RES_FEAR)) != 0)
 				{
 					msg_print("You refuse to be frightened.");
 
@@ -2997,7 +2997,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 
 			if (target < 0)
 			{
-				if (p_ptr->cur_flags2 & (TR2_RES_BLIND))
+				if ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) != 0)
 				{
 					msg_print("You are unaffected!");
 
@@ -3042,7 +3042,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 
 			if (target < 0)
 			{
-				if (p_ptr->cur_flags2 & (TR2_RES_CONFU))
+				if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) != 0)
 				{
 					msg_print("You disbelieve the feeble spell.");
 
@@ -3086,7 +3086,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 
 			if (target < 0)
 			{
-				if (p_ptr->cur_flags3 & (TR3_FREE_ACT))
+				if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0)
 				{
 					msg_print("You are unaffected!");
 
@@ -3128,7 +3128,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 
 			if (target < 0)
 			{
-				if (p_ptr->cur_flags3 & (TR3_FREE_ACT))
+				if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0)
 				{
 					msg_print("You are unaffected!");
 
@@ -3361,7 +3361,7 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 					if ((blind) && (known)) msg_format("%^s mumbles strangely.", m_name);
 					else if (known) msg_format("%^s gestures at your feet.", m_name);
 				}
-				if (p_ptr->cur_flags2 & (TR2_RES_NEXUS))
+				if ((p_ptr->cur_flags2 & (TR2_RES_NEXUS)) != 0)
 				{
 					msg_print("You are unaffected!");
 
@@ -7614,7 +7614,7 @@ static void recover_monster(int m_idx, bool regen)
 		notice = rand_int(1024);
 
 		/* Aggravated by the player */
-		if (p_ptr->cur_flags3 & (TR3_AGGRAVATE))
+		if ((p_ptr->cur_flags3 & (TR3_AGGRAVATE)) != 0)
 		{
 			/* Reset sleep counter */
 			m_ptr->csleep = 0;

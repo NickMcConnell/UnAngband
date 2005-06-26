@@ -1964,14 +1964,14 @@ void py_attack(int y, int x)
 				object_usage(slot);
 
 				/* Note -- must happen after above flags updated */
-				if ((p_ptr->cur_flags3 & (TR3_IMPACT)) && (k > 50))
+				if (((p_ptr->cur_flags3 & (TR3_IMPACT)) != 0) && (k > 50))
 				{
 					do_quake = TRUE;
 
 					/* Always notice */
 					equip_can_flags(0x0L,0x0L,TR3_IMPACT,0x0L);
 				}
-				else if (!(p_ptr->cur_flags3 & (TR3_IMPACT)))
+				else if ((p_ptr->cur_flags3 & (TR3_IMPACT)) == 0)
 				{
 					/* Sometimes notice */
 					if (rand_int(100)<50) equip_not_flags(0x0L,0x0L,TR3_IMPACT,0x0L);
