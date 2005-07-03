@@ -5394,21 +5394,22 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
-		/* Weak lite -- only dangerous if vulnerible */
+		/* Weak lite -- blinding, plus damage if vulnerible */
 		case GF_LITE_WEAK:
 		{
 			if ((p_ptr->cur_flags4 & (TR4_HURT_LITE)) == 0)
 			{
-				equip_not_flags(0x0L,0x0L,0x0L,TR4_HURT_LITE);
-
-				break;
+				if (!fuzzy) equip_not_flags(0x0L,0x0L,0x0L,TR4_HURT_LITE);
+				dam = 0;
 			}
+
+			/* Fall through */
 		}
 
 		/* Lite -- blinding */
 		case GF_LITE:
 		{
-			if (fuzzy) msg_print("You are hit by something!");
+			if ((fuzzy) && (typ == GF_LITE)) msg_print("You are hit by something!");
 			if ((p_ptr->cur_flags4 & (TR4_HURT_LITE)) != 0)
 			{
 				/* Always notice */
@@ -5433,14 +5434,27 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 
 				(void)set_blind(p_ptr->blind + randint(5) + 2);
 			}
+			else if (!blind)
+			{
+				/* Always notice */
+				equip_not_flags(0x0L,(TR2_RES_LITE),0x0L,0x0L);
+			}
 			take_hit(dam, killer);
 			break;
+		}
+
+		/* Weak darkness -- blinding only */
+		case GF_DARK_WEAK:
+		{
+			dam = 0;
+
+			/* Fall through */
 		}
 
 		/* Dark -- blinding */
 		case GF_DARK:
 		{
-			if (fuzzy) msg_print("You are hit by something!");
+			if ((fuzzy) && (typ == GF_DARK)) msg_print("You are hit by something!");
 			if ((p_ptr->cur_flags2 & (TR2_RES_DARK)) != 0)
 			{
 				/* Always notice */
@@ -5448,12 +5462,17 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 
 				dam *= 4; dam /= (randint(6) + 6);
 			}
-			else if (!blind && ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) != 0))
+			else if (!blind && ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) == 0))
 			{
 				/* Always notice */
 				equip_not_flags(0x0L,(TR2_RES_BLIND|TR2_RES_DARK),0x0L,0x0L);
 
 				(void)set_blind(p_ptr->blind + randint(5) + 2);
+			}
+			else if (!blind)
+			{
+				/* Always notice */
+				equip_not_flags(0x0L,(TR2_RES_DARK),0x0L,0x0L);
 			}
 			take_hit(dam, killer);
 			break;

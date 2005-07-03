@@ -4939,7 +4939,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				int py = p_ptr->py;
 				int px = p_ptr->px;
 
-				if (project_p(0, 0, py, px, damage, effect)) obvious = TRUE;
+				if (project_p(-2, 0, py, px, damage, effect)) obvious = TRUE;
 				break;
 			}
 
