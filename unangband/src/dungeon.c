@@ -923,6 +923,30 @@ static void process_world(void)
 		(void)set_afraid(p_ptr->afraid - 1);
 	}
 
+	/* Temporary stat increase */
+	for (i = 0; i < A_MAX; i++)
+	{
+		if (p_ptr->stat_inc_tim[i])
+		{
+			(void)set_stat_inc_tim(p_ptr->stat_inc_tim[i] - 1, i);
+		}
+	}
+
+	/* Temporary stat decrease */
+	for (i = 0; i < A_MAX; i++)
+	{
+		if (p_ptr->stat_dec_tim[i])
+		{
+			(void)set_stat_dec_tim(p_ptr->stat_dec_tim[i] - 1, i);
+		}
+	}
+
+	/* Fast */
+	if (p_ptr->fast)
+	{
+		(void)set_fast(p_ptr->fast - 1);
+	}
+
 	/* Fast */
 	if (p_ptr->fast)
 	{

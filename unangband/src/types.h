@@ -1260,6 +1260,9 @@ struct player_type
 	s16b stat_max[A_MAX];   /* Current "maximal" stat values */
 	s16b stat_cur[A_MAX];   /* Current "natural" stat values */
 
+	s16b stat_inc_tim[A_MAX];      /* Timed -- Stat increase */
+	s16b stat_dec_tim[A_MAX];      /* Timed -- Stat decrease */
+
 	s16b fast;      /* Timed -- Fast */
 	s16b slow;      /* Timed -- Slow */
 	s16b blind;     /* Timed -- Blindness */

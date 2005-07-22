@@ -833,6 +833,8 @@ extern bool set_poisoned(int v);
 extern bool set_afraid(int v);
 extern bool set_paralyzed(int v);
 extern bool set_image(int v);
+extern bool set_stat_inc_tim(int v, int i);
+extern bool set_stat_dec_tim(int v, int i);
 extern bool set_fast(int v);
 extern bool set_slow(int v);
 extern bool set_shield(int v);

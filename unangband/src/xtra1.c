@@ -2574,6 +2574,12 @@ static void calc_bonuses(void)
 			add += (rp_ptr->r_adj[i] + cp_ptr->c_adj[i]);
 		}
 
+		/* Extract timed increase */
+		if (p_ptr->stat_inc_tim[i]) add += 5;
+
+		/* Extract timed decrease */
+		if (p_ptr->stat_dec_tim[i]) add -= 5;
+
 		/* Extract the new "stat_top" value for the stat */
 		top = modify_stat_value(p_ptr->stat_max[i], add);
 

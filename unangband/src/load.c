@@ -977,6 +977,8 @@ static errr rd_extra(void)
 	/* Read the stat info */
 	for (i = 0; i < A_MAX; i++) rd_s16b(&p_ptr->stat_max[i]);
 	for (i = 0; i < A_MAX; i++) rd_s16b(&p_ptr->stat_cur[i]);
+	for (i = 0; i < A_MAX; i++) rd_s16b(&p_ptr->stat_inc_tim[i]);
+	for (i = 0; i < A_MAX; i++) rd_s16b(&p_ptr->stat_dec_tim[i]);
 
 	strip_bytes(24);	/* oops */
 

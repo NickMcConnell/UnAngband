@@ -54,6 +54,8 @@ temporarily disabled for testing purposes.
 - Added spells, scrolls and rods of feedback, which allow the player to detect hidden
 resistances on high level items, and act as a limited attack weapon.
 
+- Stat potions only provide a temporary stat increase. Removed restore stat potions.
+
 ### User Interface ###
 
 - Monster recall now reports what particular types of items are dropped by each

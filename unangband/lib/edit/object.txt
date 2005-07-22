@@ -1756,8 +1756,8 @@ F:THROWING
 N:225:Strength
 G:!:w
 I:75:48:0
-W:30:0:4:8000
-A:30/1
+W:20:0:4:400
+A:20/1
 P:0:1d1:0:0:0
 F:THROWING
 
@@ -1769,20 +1769,13 @@ A:3/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:227:Restore Strength
-G:!:w
-I:75:42:0
-W:25:0:4:300
-A:25/1
-P:0:1d1:0:0:0
-Y:25:1
-F:THROWING
+# 227 - Was Restore Strength
 
 N:228:Intelligence
 G:!:w
 I:75:49:0
-W:30:0:4:8000
-A:30/1
+W:20:0:4:400
+A:20/1
 P:0:1d1:0:0:0
 Y:17:2
 F:THROWING
@@ -1795,20 +1788,13 @@ A:20/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:230:Restore Intelligence
-G:!:w
-I:75:43:0
-W:25:0:4:300
-A:25/1
-P:0:1d1:0:0:0
-Y:17:1
-F:THROWING
+# 230 - Was Restore Intelligence
 
 N:231:Wisdom
 G:!:w
 I:75:50:0
-W:30:0:4:8000
-A:30/1
+W:20:0:4:400
+A:20/1
 P:0:1d1:0:0:0
 Y:5:2
 F:THROWING
@@ -1821,19 +1807,12 @@ A:20/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:233:Restore Wisdom
-G:!:w
-I:75:44:0
-W:25:0:4:300
-A:25/1
-P:0:1d1:0:0:0
-Y:5:1
-F:THROWING
+# 233 - Was Restore Wisdom
 
 N:234:Charisma
 G:!:w
 I:75:53:0
-W:20:0:4:1000
+W:20:0:4:350
 A:20/1
 P:0:1d1:0:0:0
 Y:19:2
@@ -1847,14 +1826,7 @@ A:20/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:236:Restore Charisma
-G:!:w
-I:75:47:0
-W:20:0:4:300
-A:20/1
-P:0:1d1:0:0:0
-Y:19:1
-F:THROWING
+# 236 - Was Restore Charisma
 
 N:237:Cure Light Wounds
 G:!:w
@@ -1911,8 +1883,8 @@ F:THROWING
 N:243:Constitution
 G:!:w
 I:75:52:0
-W:30:0:4:8000
-A:30/1
+W:20:0:4:400
+A:20/1
 P:0:1d1:0:0:0
 Y:24:2
 F:THROWING
@@ -1980,29 +1952,15 @@ F:THROWING
 N:251:Dexterity
 G:!:w
 I:75:51:0
-W:30:0:4:8000
-A:30/1
+W:20:0:4:400
+A:20/1
 P:0:1d1:0:0:0
 Y:26:2
 F:THROWING
 
-N:252:Restore Dexterity
-G:!:w
-I:75:45:0
-W:25:0:4:300
-A:25/1
-P:0:1d1:0:0:0
-Y:26:1
-F:THROWING
+# 252 - Was Restore Dexterity
 
-N:253:Restore Constitution
-G:!:w
-I:75:46:0
-W:25:0:4:300
-A:25/1
-P:0:1d1:0:0:0
-Y:24:1
-F:THROWING
+# 253 - Was Restore Constitution
 
 N:254:Lose Memories
 G:!:w

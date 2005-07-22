@@ -337,6 +337,160 @@ bool set_image(int v)
 	return (TRUE);
 }
 
+/*
+ * Array of stat "descriptions"
+ */
+static cptr desc_stat_imp[] =
+{
+	"stronger",
+	"smarter",
+	"wiser",
+	"more dextrous",
+	"healthier",
+	"cuter"
+};
+
+
+/*
+ * Array of stat "descriptions"
+ */
+static cptr desc_stat_imp_end[] =
+{
+	"strong",
+	"smart",
+	"wise",
+	"dextrous",
+	"healthy",
+	"cute"
+};
+
+
+/*
+ * Set "p_ptr->stat_inc_tim", notice observable changes
+ */
+bool set_stat_inc_tim(int v, int i)
+{
+	bool notice = FALSE;
+
+	/* Hack -- Force good values */
+	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
+
+	/* Open */
+	if (v)
+	{
+		if (!p_ptr->stat_inc_tim[i])
+		{
+			msg_format("You feel temporarily %s!",desc_stat_imp[i]);
+			notice = TRUE;
+		}
+	}
+
+	/* Shut */
+	else
+	{
+		if (p_ptr->stat_inc_tim[i])
+		{
+			msg_format("You feel less %s.", desc_stat_imp_end[i]);
+			notice = TRUE;
+		}
+	}
+
+	/* Use the value */
+	p_ptr->stat_inc_tim[i] = v;
+
+	/* Nothing to notice */
+	if (!notice) return (FALSE);
+
+	/* Disturb */
+	if (disturb_state) disturb(0, 0);
+
+	/* Recalculate bonuses */
+	p_ptr->update |= (PU_BONUS);
+
+	/* Handle stuff */
+	handle_stuff();
+
+	/* Result */
+	return (TRUE);
+}
+
+
+/*
+ * Array of stat "descriptions"
+ */
+static cptr desc_stat_dec[] =
+{
+	"weaker",
+	"stupider",
+	"more naive",
+	"clumsier",
+	"sicklier",
+	"uglier"
+};
+
+
+/*
+ * Array of stat "descriptions"
+ */
+static cptr desc_stat_dec_end[] =
+{
+	"weak",
+	"stupid",
+	"naive",
+	"clumsy",
+	"sickly",
+	"ugly"
+};
+
+/*
+ * Set "p_ptr->stat_dec_tim", notice observable changes
+ */
+bool set_stat_dec_tim(int v, int i)
+{
+	bool notice = FALSE;
+
+	/* Hack -- Force good values */
+	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
+
+	/* Open */
+	if (v)
+	{
+		if (!p_ptr->stat_dec_tim[i])
+		{
+			msg_format("You feel temporarily %s!", desc_stat_dec[i]);
+			notice = TRUE;
+		}
+	}
+
+	/* Shut */
+	else
+	{
+		if (p_ptr->stat_dec_tim[i])
+		{
+			msg_format("You no longer feel so %s.", desc_stat_dec_end[i]);
+			notice = TRUE;
+		}
+	}
+
+	/* Use the value */
+	p_ptr->stat_dec_tim[i] = v;
+
+	/* Nothing to notice */
+	if (!notice) return (FALSE);
+
+	/* Disturb */
+	if (disturb_state) disturb(0, 0);
+
+	/* Recalculate bonuses */
+	p_ptr->update |= (PU_BONUS);
+
+	/* Handle stuff */
+	handle_stuff();
+
+	/* Result */
+	return (TRUE);
+}
+
 
 /*
  * Set "p_ptr->fast", notice observable changes
@@ -1798,19 +1952,6 @@ bool set_rest(int v)
 }
 
 
-
-/*
- * Array of stat "descriptions"
- */
-static cptr desc_stat_imp[] =
-{
-	"stronger",
-	"smarter",
-	"wiser",
-	"more dextrous",
-	"healthier",
-	"cuter"
-};
 
 /*
  * Mark items as aware as a result of gaining a level.
