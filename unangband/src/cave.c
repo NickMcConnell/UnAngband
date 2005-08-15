@@ -3893,7 +3893,7 @@ void update_dyna(void)
 
 	bool full = FALSE;
 
-	int alter = 0;
+	int alter;
 
 	/* Must be able to modify features */
 	if (!variant_hurt_feats) return;
@@ -3974,6 +3974,9 @@ void update_dyna(void)
 
 		/* Get the feature */
 		f_ptr = &f_info[feat];
+
+		/* Default action */
+		alter = 0;
 
 		/* Erupt */
 		if (f_ptr->flags3 & (FF3_ERUPT))
@@ -4064,8 +4067,6 @@ void update_dyna(void)
 		/* Adjacent */
 		if (f_ptr->flags3 & (FF3_ADJACENT))
 		{
-			bool adjacent = TRUE;
-
 			int yy, xx, adjfeat, dir;
 
 			for (dir = 0; dir < 8; dir ++)
@@ -4091,8 +4092,6 @@ void update_dyna(void)
 				{
 					int j;
 
-					adjacent = TRUE;
-					
 					for (j = i + 1; j < temp_dyna_n; j++)
 					if (temp_dyna_g[j] == GRID(yy,xx))
 					{
@@ -4103,7 +4102,7 @@ void update_dyna(void)
 				}
 			}
 
-			if (adjacent == TRUE) alter = FS_ADJACENT;
+			alter = FS_ADJACENT;
 		}
 
 		if (alter > 0)
