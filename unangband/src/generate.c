@@ -5174,6 +5174,7 @@ void generate_cave(void)
 
         /* There is no dynamic terrain */
         dyna_full = FALSE;
+	dyna_n = 0;
 
 	/* Generate */
 	for (num = 0; TRUE; num++)

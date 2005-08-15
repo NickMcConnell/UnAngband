@@ -56,6 +56,8 @@ resistances on high level items, and act as a limited attack weapon.
 
 - Stat potions only provide a temporary stat increase. Removed restore stat potions.
 
+- Most terrain now floods when hit by water.
+
 ### User Interface ###
 
 - Monster recall now reports what particular types of items are dropped by each
@@ -102,6 +104,7 @@ learn it (randomly) but cannot cast it.  (Fixed by kobayasi)
 
 - Random artifact dragon armour no longer has ridiculously high pvals.
 
+- Significant fixes to the way dynamic terrain worked.
 
 ### Build / Platform ###
 

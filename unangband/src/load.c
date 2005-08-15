@@ -1594,6 +1594,9 @@ u16b limit;
 	/* Hack -- not fully dynamic */
 	dyna_full = FALSE;
 
+	/* No dynamic grids */
+	dyna_n = 0;
+
 	/*** Run length decoding ***/
 
 	/* Load the dungeon data */

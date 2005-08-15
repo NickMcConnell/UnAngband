@@ -1560,6 +1560,10 @@ static void process_world(void)
 			}
 		}
 	}
+
+	/* Update dynamic terrain */
+	update_dyna();
+
 }
 
 
@@ -2776,9 +2780,6 @@ static void process_player(void)
 		}
 	}
 	while (!p_ptr->energy_use && !p_ptr->leaving);
-
-	/* Update dynamic terrain */
-	update_dyna();
 
 	/* Update noise flow information */
 	update_noise();

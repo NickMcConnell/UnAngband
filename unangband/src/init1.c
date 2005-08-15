@@ -370,7 +370,7 @@ static cptr f_info_flags3[] =
 	"LIVING",
 	"FLAVOR",
 	"INSTANT",
-	"EXPLODE",
+	"ADJACENT",
 	"TIMED",
 	"ERUPT",
 	"STRIKE",

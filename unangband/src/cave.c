@@ -3833,8 +3833,8 @@ void update_view(void)
  *
  * INSTANT grids always alter themselves.
  *
- * EXPLODE grids always explode for a radius 1 ball attack equal to twice the
- * damage of their blow attack.
+ * ADJACENT grids always affect cardinally adjacent grids with an attack equal to their blow
+ * attack. They will affect diagonally adjacent grids 50% of the time (checked per grid).
  *
  * TIMED grids will 2% of the time alter themselves.
  *
@@ -3884,6 +3884,7 @@ void update_dyna(void)
 	int fast_dyna_n = dyna_n;
 	u16b *fast_dyna_g = dyna_g;
 
+	int temp_dyna_n;
 	u16b temp_dyna_g[DYNA_MAX];
 
 	s16b feat;
@@ -3891,6 +3892,8 @@ void update_dyna(void)
 	feature_type *f_ptr;
 
 	bool full = FALSE;
+
+	int alter = 0;
 
 	/* Must be able to modify features */
 	if (!variant_hurt_feats) return;
@@ -3952,13 +3955,15 @@ void update_dyna(void)
 		temp_dyna_g[i] = fast_dyna_g[i];
 	}
 
+	temp_dyna_n = fast_dyna_n;
+
 	/* Actually apply the attacks */
-	for (i = 0; i < fast_dyna_n; i++)
+	for (i = 0; i < temp_dyna_n; i++)
 	{
 		feature_type *f_ptr;
 
 		/* Grid */
-		g = fast_dyna_g[i];
+		g = temp_dyna_g[i];
 
 		/* Coordinates */
 		y = GRID_Y(g);
@@ -3969,32 +3974,6 @@ void update_dyna(void)
 
 		/* Get the feature */
 		f_ptr = &f_info[feat];
-
-		/* Instant */
-		if (f_ptr->flags3 & (FF3_INSTANT))
-		{
-			cave_alter_feat(y,x,FS_INSTANT);
-		}
-
-		/* Explode */
-		if (f_ptr->flags3 & (FF3_EXPLODE))
-		{
-			flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_HIDE;
-
-			dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice) * 10;
-   
-			/* Apply the blow */
-			project(0, 1, y, x, dam, f_ptr->blow.effect, flg);
-		}
-
-		/* Timed */
-		if (f_ptr->flags3 & (FF3_TIMED))
-		{
-			if (!(rand_int(50)))
-			{
-				cave_alter_feat(y,x,FS_TIMED);
-			}
-		}
 
 		/* Erupt */
 		if (f_ptr->flags3 & (FF3_ERUPT))
@@ -4024,7 +4003,22 @@ void update_dyna(void)
 			}
 		}
 
-		/* Dynamic */
+		/* Timed */
+		if (f_ptr->flags3 & (FF3_TIMED))
+		{
+			if (rand_int(50) == 0)
+			{
+				alter = FS_TIMED;
+			}
+		}
+
+		/* Instant */
+		if (f_ptr->flags3 & (FF3_INSTANT))
+		{
+			alter = FS_INSTANT;
+		}
+
+		/* Spread */
 		if (f_ptr->flags3 & (FF3_SPREAD))
 		{
 			int dir = rand_int(12);
@@ -4045,12 +4039,76 @@ void update_dyna(void)
 
 				/* Hack -- require smoke/acid clouds to move */
 				if (adjfeat == cave_feat[yy][xx]) dir = 12;
+
+				/* Hack -- remove altered grids from further processing this iteration */
+				else
+				{
+					int j;
+
+					for (j = i + 1; j < temp_dyna_n; j++)
+					if (temp_dyna_g[j] == GRID(yy,xx))
+					{
+						temp_dyna_n--;
+
+						temp_dyna_g[j] = temp_dyna_g[temp_dyna_n];
+					}
+				}
 			}
 
 			if (dir < 9)
 			{
-				cave_alter_feat(y,x,FS_SPREAD);
+				alter = FS_SPREAD;
 			}
+		}
+
+		/* Adjacent */
+		if (f_ptr->flags3 & (FF3_ADJACENT))
+		{
+			bool adjacent = TRUE;
+
+			int yy, xx, adjfeat, dir;
+
+			for (dir = 0; dir < 8; dir ++)
+			{
+				/* Hack -- skip diagonals 50% of the time */
+				if ((dir > 3) && (rand_int(100) < 50)) continue;
+
+				yy = y + ddy_ddd[dir];
+				xx = x + ddx_ddd[dir];
+
+				adjfeat = cave_feat[yy][xx];
+
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_HIDE;
+
+				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
+   
+				/* Apply the blow */
+				project(0, 0, yy, xx, dam, f_ptr->blow.effect, flg);
+
+				/* Hack -- require one adjacent grid affected. Also remove adjacent grids
+				   from further processing */
+				if (adjfeat != cave_feat[yy][xx]) 
+				{
+					int j;
+
+					adjacent = TRUE;
+					
+					for (j = i + 1; j < temp_dyna_n; j++)
+					if (temp_dyna_g[j] == GRID(yy,xx))
+					{
+						temp_dyna_n--;
+
+						temp_dyna_g[j] = temp_dyna_g[temp_dyna_n];
+					}
+				}
+			}
+
+			if (adjacent == TRUE) alter = FS_ADJACENT;
+		}
+
+		if (alter > 0)
+		{
+			cave_alter_feat(y,x,alter);
 		}
 	}
 }
@@ -4835,14 +4893,7 @@ static void cave_set_feat_aux(int y, int x, int feat)
 	/* Check if adding to dynamic list */
 	if (!dyna && (f_ptr->flags3 & (FF3_DYNAMIC_MASK)))
 	{
-		if (dyna_full)
-		{
-			if (distance(y,x,p_ptr->py,p_ptr->px) < MAX_SIGHT)
-			{
-				dyna_g[dyna_n++] = GRID(y,x);
-			}
-		}
-		else if (dyna_n == (DYNA_MAX -1))
+		if (dyna_n >= (DYNA_MAX -1))
 		{
 			dyna_full = TRUE;
 
@@ -4858,16 +4909,14 @@ static void cave_set_feat_aux(int y, int x, int feat)
 	/* Check if removing from dynamic list */
 	else if (dyna && !(f_ptr->flags3 & (FF3_DYNAMIC_MASK)))
 	{
-		int i, new_i = 0;
+		int i;
 
 		for (i = 0; i < dyna_n; i++)
+		if (dyna_g[i] == GRID(y,x))
 		{
-			if (dyna_g[i] == GRID(y,x)) continue;
-
-			dyna_g[new_i++] = dyna_g[i];
+			dyna_n--;
+			dyna_g[i] = dyna_g[dyna_n];
 		}
-
-		dyna_n = new_i;
 	}
 
 	/* Check to see if monster exposed by change */

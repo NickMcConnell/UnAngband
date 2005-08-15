@@ -1121,7 +1121,7 @@
 #define FF3_LIVING 		0x01000000
 #define FF3_FLAVOR        0x02000000
 #define FF3_INSTANT	0x04000000
-#define FF3_EXPLODE 	0x08000000
+#define FF3_ADJACENT 	0x08000000
 #define FF3_TIMED       0x10000000
 #define FF3_ERUPT       0x20000000
 #define FF3_STRIKE      0x40000000
@@ -1129,7 +1129,7 @@
 
 /* Which features are dynamic */
 #define FF3_DYNAMIC_MASK \
- (FF3_INSTANT | FF3_EXPLODE | FF3_TIMED | FF3_ERUPT | FF3_STRIKE | FF3_SPREAD)
+ (FF3_INSTANT | FF3_ADJACENT | FF3_TIMED | FF3_ERUPT | FF3_STRIKE | FF3_SPREAD)
 
 /* Feature actions -- used to define actions performed on features */
 
@@ -1181,7 +1181,7 @@
 #define FS_TREE		83
 #define FS_NEED_TREE	84
 #define FS_INSTANT	90
-#define FS_EXPLODE	91
+#define FS_ADJACENT	91
 #define FS_TIMED		92
 #define FS_SPREAD		95
 
