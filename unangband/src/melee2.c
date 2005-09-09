@@ -786,7 +786,6 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 		/* RF4_SPORE */
 		case 96+1:
 		{
-			if (!variant_dis_attacks) break;
 			if (target < 0) disturb(1,0);
 
 			if (who > 0)
@@ -845,8 +844,6 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 		case 96+2:
 		{
 			if (!direct) break;
-			if (!variant_dis_attacks) break;
-
 			if (target < 0) disturb(1,0);
 
 			if (who > 0)
@@ -922,7 +919,6 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 		/* RF4_WAIL */
 		case 96+3:
 		{
-			if (!variant_dis_attacks) break;
 			if (target < 0) disturb(1,0);
 			
 
@@ -1001,8 +997,6 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 		/* RF4_SPIT */
 		case 96+4:
 		{
-			if (!variant_dis_attacks) break;
-
 			if (target < 0) disturb(1,0);
 			
 
@@ -1149,7 +1143,6 @@ bool make_attack_spell_aux(int who, int y, int x, int spell)
 		/* RF4_AURA */
 		case 96+7:
 		{
-			if (!variant_dis_attacks) break;
 			if (target < 0) disturb(1,0);
 
 			if (who > 0)
@@ -4046,38 +4039,6 @@ bool make_attack_spell(int m_idx)
 		f4 &= ~(RF4_ATTACK_MASK);
 		f5 &= ~(RF5_ATTACK_MASK);
 		f6 &= ~(RF6_ATTACK_MASK);
-
-		/* Remove escape spells if required */
-		if (!variant_oos_escapes)
-		{
-			f4 &= ~(RF4_ESCAPE_MASK);
-			f5 &= ~(RF5_ESCAPE_MASK);
-			f6 &= ~(RF6_ESCAPE_MASK);
-		}
-
-		/* Remove summon spells if required */
-		if (!variant_oos_summons)
-		{
-			f4 &= ~(RF4_SUMMON_MASK);
-			f5 &= ~(RF5_SUMMON_MASK);
-			f6 &= ~(RF6_SUMMON_MASK);
-		}
-
-		/* Remove healing spells if required */
-		if (!variant_oos_heals)
-		{
-			f4 &= ~(RF4_HEAL_MASK);
-			f5 &= ~(RF5_HEAL_MASK);
-			f6 &= ~(RF6_HEAL_MASK);
-		}
-
-		/* Remove 'extra' spells if required */
-		if (!variant_oos_xtra)
-		{
-			f4 &= ~(RF4_HASTE_MASK | RF6_ANNOY_MASK);
-			f5 &= ~(RF5_HASTE_MASK | RF6_ANNOY_MASK);
-			f6 &= ~(RF6_HASTE_MASK | RF6_ANNOY_MASK);
-		}
 
 		/* No spells left */
 		if (!f4 && !f5 && !f6) return (FALSE);

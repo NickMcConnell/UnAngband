@@ -653,9 +653,6 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 	bool fear;
 
-	/* Option */
-	if (!variant_hit_traps) return;
-
 	/* Hack --- don't activate unknown invisible traps */
 	if (cave_feat[y][x] == FEAT_INVIS) return;
 
@@ -886,10 +883,9 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 					/* XXX Hack -- unstack if necessary */
 					if ((o_ptr->number > 1) &&
-					((!variant_pval_stacks) || 
 					((!object_known_p(o_ptr) && (o_ptr->pval == 2) && (o_ptr->stackc > 1)) ||
 					  (!object_known_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
-					  (o_ptr->stackc != 1) && (o_ptr->pval > 2)))))
+					  (o_ptr->stackc != 1) && (o_ptr->pval > 2))))
 					{
 						object_type *i_ptr;
 						object_type object_type_body;

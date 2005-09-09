@@ -2182,7 +2182,7 @@ void check_experience(void)
 		p_ptr->lev++;
 
 		/* Improve a stat */
-		if ((variant_free_stats) && (p_ptr->lev > p_ptr->max_lev)) improve_stat();
+		if (p_ptr->lev > p_ptr->max_lev) improve_stat();
 
 		/* Improve awareness */
 		if (p_ptr->lev > p_ptr->max_lev) improve_aware();
@@ -2407,42 +2407,36 @@ void monster_death(int m_idx)
 	/* Forget objects */
 	m_ptr->hold_o_idx = 0;
 
-
-	/* Drop corpses */
-	if (variant_drop_body)
+	/* Hack -- only sometimes drop bodies */
+	if ((rand_int(100)<30) || (r_ptr->flags1 & (RF1_UNIQUE)) ||
+		(r_ptr->flags2 & (RF2_REGENERATE)) ||
+		(r_ptr->level > p_ptr->depth) ||
+		(r_ptr->flags7 & (RF7_ASSEMBLY)))
 	{
-		/* Hack -- only sometimes drop bodies */
-		if ((rand_int(100)<30) || (r_ptr->flags1 & (RF1_UNIQUE)) ||
-			(r_ptr->flags2 & (RF2_REGENERATE)) ||
-			(r_ptr->level > p_ptr->depth) ||
-			(r_ptr->flags7 & (RF7_ASSEMBLY)))
+		/* Get local object */
+		i_ptr = &object_type_body;
+
+		/* Wipe the object */ 
+		object_wipe(i_ptr);
+
+		/* Drop a body? */
+		if (make_body(i_ptr, m_ptr->r_idx))
 		{
-			/* Get local object */
-			i_ptr = &object_type_body;
+			/* Note who dropped it */
+			i_ptr->name3 = m_ptr->r_idx;
 
-			/* Wipe the object */ 
-			object_wipe(i_ptr);
+			/* I'll be back, Bennett */
+			if (r_ptr->flags2 & (RF2_REGENERATE)) i_ptr->timeout = damroll(3,6);
 
-			/* Drop a body? */
-			if (make_body(i_ptr, m_ptr->r_idx))
-			{
-
-				/* Note who dropped it */
-				i_ptr->name3 = m_ptr->r_idx;
-
-				/* I'll be back, Bennett */
-				if (r_ptr->flags2 & (RF2_REGENERATE)) i_ptr->timeout = damroll(3,6);
-
-				/* Drop it in the dungeon */
-				drop_near(i_ptr, -1, y, x);
-			}
+			/* Drop it in the dungeon */
+			drop_near(i_ptr, -1, y, x);
 		}
-
-		/* Add some residue */
-		if (r_ptr->flags3 & (RF3_DEMON)) feat_near(FEAT_FLOOR_FIRE_T,m_ptr->fy,m_ptr->fx);
-		if (r_ptr->flags3 & (RF3_UNDEAD)) feat_near(FEAT_FLOOR_DUST_T,m_ptr->fy,m_ptr->fx);
-		if (r_ptr->flags7 & (RF7_HAS_SLIME)) feat_near(FEAT_FLOOR_SLIME_T,m_ptr->fy,m_ptr->fx);
 	}
+
+	/* Add some residue */
+	if (r_ptr->flags3 & (RF3_DEMON)) feat_near(FEAT_FLOOR_FIRE_T,m_ptr->fy,m_ptr->fx);
+	if (r_ptr->flags3 & (RF3_UNDEAD)) feat_near(FEAT_FLOOR_DUST_T,m_ptr->fy,m_ptr->fx);
+	if (r_ptr->flags7 & (RF7_HAS_SLIME)) feat_near(FEAT_FLOOR_SLIME_T,m_ptr->fy,m_ptr->fx);
 
 	/* Do we drop more treasure? */
 	if (m_ptr->mflag & (MFLAG_MADE)) return;
@@ -2803,7 +2797,7 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 	m_ptr->csleep = 0;
 
 	/* Are we hurting it badly? */
-	if ((variant_drop_body) && ((m_ptr->maxhp / 3) < dam) && (m_ptr->maxhp > rand_int(100)))
+	if (((m_ptr->maxhp / 3) < dam) && (m_ptr->maxhp > rand_int(100)))
 	{
 		object_type *i_ptr;
 		object_type object_type_body;

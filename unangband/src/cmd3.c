@@ -191,23 +191,6 @@ void do_cmd_wield(void)
 	/* Hack -- slot not allowed */
 	if (slot < 0) return;
 
-	/* Hack -- wield from belt to equip */
-	if ((variant_belt_slot) && (item == INVEN_BELT))
-	{
-		/* Swap items? */
-		if (inventory[slot].k_idx) swap = TRUE;
-	}
-	/* Hack -- wield from equip to belt */
-	else if ((variant_belt_slot) && (item >= INVEN_WIELD) && (item < INVEN_TOTAL+1))
-	{
-		/* Pick the slot */
-		slot = INVEN_BELT;
-
-		/* Swap items? */
-		if ((inventory[INVEN_BELT].k_idx) &&
-		    (wield_slot(&inventory[INVEN_BELT]) == item)) swap = TRUE;
-	}
-
 	/* Hack -- don't dual wield */
 	if ((slot == INVEN_ARM) && (o_ptr->tval != TV_SHIELD))
 	{
@@ -217,32 +200,8 @@ void do_cmd_wield(void)
 		}
 	}
 
-	/* Hack -- wield amount */
-	else if ((variant_fast_equip) && (slot == INVEN_WIELD))
-	{
-		/* Get a quantity */
-		amt = get_quantity(NULL, o_ptr->number);
-
-		/* Allow user abort */
-		if (amt <= 0) return;
-
-		/* Cancel swap items */
-		if (amt < o_ptr->number) swap = FALSE;
-	}
-	/* Hack -- belt amount */
-	else if ((variant_belt_slot) && (slot == INVEN_BELT))
-	{
-		/* Get a quantity */
-		amt = get_quantity(NULL, o_ptr->number);
-
-		/* Allow user abort */
-		if (amt <= 0) return;
-
-		/* Cancel swap items */
-		if (amt < o_ptr->number) swap = FALSE;
-	}
 	/* Hack -- multiple rings */
-	else if ((variant_many_rings) && (o_ptr->tval == TV_RING))
+	else if (o_ptr->tval == TV_RING)
 	{
 		i_ptr = &inventory[slot];
 
@@ -263,7 +222,7 @@ void do_cmd_wield(void)
 	if (item == slot) return;
 
 	/* Prevent wielding into a cursed slot */
-	if (cursed_p(&inventory[slot]) && (slot < INVEN_BELT))
+	if (cursed_p(&inventory[slot]))
 	{
 		/* Describe it */
 		object_desc(o_name, sizeof(o_name), &inventory[slot], FALSE, 0);
@@ -276,7 +235,7 @@ void do_cmd_wield(void)
 		return;
 	}
 	/* Prevent wielding from cursed slot */
-	else if ((item >= INVEN_WIELD) && cursed_p(&inventory[item]) && (item != INVEN_BELT))
+	else if ((item >= INVEN_WIELD) && cursed_p(&inventory[item]))
 	{
 		/* Describe it */
 		object_desc(o_name, sizeof(o_name), &inventory[item], FALSE, 0);
@@ -289,10 +248,8 @@ void do_cmd_wield(void)
 		return;
 	}
 
-	/* Take a (partial) turn */
-	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-	else p_ptr->energy_use = 100;
+	/* Take a turn */
+	p_ptr->energy_use = 100;
 
 	/* Get object flags */
 	object_flags(o_ptr,&f1,&f2,&f3,&f4);
@@ -460,17 +417,8 @@ void do_cmd_wield(void)
 	/* Take off existing item */
 	else if ((o_ptr->k_idx) && (!rings))
 	{
-                /* variant_fast_floor? */
-                if (p_ptr->energy_use == 50)
-                {
-                        /* Drop existing item */
-                        (void)inven_drop(slot, 255);
-                }
-                else
-                {
-                        /* Take off existing item */
-                        (void)inven_takeoff(slot, 255);
-                }
+		/* Take off existing item */
+		(void)inven_takeoff(slot, 255);
 	}
 
 	/* Wear the new rings */
@@ -486,11 +434,7 @@ void do_cmd_wield(void)
 	p_ptr->equip_cnt++;
 
 	/* Where is the item now */
-	if (((slot == INVEN_WIELD) && (o_ptr->number > 1)) || (slot == INVEN_BELT))
-	{
-		act = "You are carrying";
-	}
-	else if ((o_ptr->tval == TV_SWORD) || (o_ptr->tval == TV_POLEARM)
+	if ((o_ptr->tval == TV_SWORD) || (o_ptr->tval == TV_POLEARM)
 		|| (o_ptr->tval == TV_HAFTED) || (o_ptr->tval == TV_STAFF) ||
 		(o_ptr->tval == TV_DIGGING))
 	{
@@ -803,10 +747,8 @@ void do_cmd_destroy(void)
 		if (!get_check(out_val)) return;
 	}
 
-	/* Take a (partial) turn */
-	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-	else p_ptr->energy_use = 100;
+	/* Take a turn */
+	p_ptr->energy_use = 100;
 
 	/* Containers release contents */
 	if ((o_ptr->tval == TV_HOLD) && (o_ptr->name3 > 0))

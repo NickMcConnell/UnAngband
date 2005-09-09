@@ -2485,7 +2485,7 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp)
 	}
 
 	/* Hack -- Enforce no summoning if needed */
-	if (!slp && variant_unsummon)
+	if (!slp)
 	{
 		n_ptr->summoned = 100;
 	}
@@ -2502,14 +2502,9 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp)
 	}
 
 	/* Hack -- Scale down hit points by monster armour */
-	if ((variant_scale_hp) && (variant_scale_dam))
-	{
-		int ac = r_ptr->ac;
+	n_ptr->maxhp -= (n_ptr->maxhp * ((r_ptr->ac < 150) ? r_ptr->ac : 150) / 250);
 
-		n_ptr->maxhp -= (n_ptr->maxhp * ((ac < 150) ? ac : 150) / 250);
-
-		if (n_ptr->maxhp <= 0) n_ptr->maxhp = 1;
-	}
+	if (n_ptr->maxhp <= 0) n_ptr->maxhp = 1;
 
 	/* And start out fully healthy */
 	n_ptr->hp = n_ptr->maxhp;

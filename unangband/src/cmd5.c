@@ -596,8 +596,6 @@ void do_cmd_study(void)
 
 	int max_spells = PY_MAX_SPELLS;
 
-	if (!variant_study_more) max_spells = 64;
-
 	/* Cannot cast spells if illiterate */
 	if (c_info[p_ptr->pclass].spell_first > 50)
 	{
@@ -1196,10 +1194,8 @@ void do_cmd_cast(void)
 		return;
 	}
 
-	/* Take a (partial) turn */
-	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-	else p_ptr->energy_use = 100;
+	/* Take a turn */
+	p_ptr->energy_use = 100;
 
 	/* Hold a song if possible */
 	if (s_info[spell].flags3 & (SF3_HOLD_SONG))

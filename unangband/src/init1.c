@@ -1128,8 +1128,7 @@ static cptr s_info_types[] =
 	"INVEN_ARM",
 	"INVEN_HEAD",
 	"INVEN_HANDS",
-	"INVEN_FEET",
-	"INVEN_BELT"
+	"INVEN_FEET"
 };
 
 

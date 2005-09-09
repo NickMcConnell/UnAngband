@@ -63,6 +63,9 @@ resistances on high level items, and act as a limited attack weapon.
 
 - Most terrain now floods when hit by water.
 
+- No longer have partial moves or tiredness from normal movement, as this created
+unnessary bookkeeping.
+
 ### User Interface ###
 
 - Monster recall now reports what particular types of items are dropped by each
@@ -115,6 +118,8 @@ learn it (randomly) but cannot cast it.  (Fixed by kobayasi)
 
 - Makefile.std was reporting errors if the files it tries to clean are not
 there (Reported by Robert Ruehlmann).
+
+- Removed all variant options from code.
 
 - Separated out cave flags that are specific to the cave (cave_info) and
 specific to the player (play_info) in preperation for implementing 4GAI

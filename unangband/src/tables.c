@@ -1461,10 +1461,10 @@ const cptr option_text[OPT_MAX] =
 	"reseed_artifacts",						/* xxx */
         "easy_autos",                                      /* xxx */
 	"easy_search",						/* xxx */
-	"variant_save_feats",		   /* xxx */
+	NULL,		   /* xxx */
 	"view_glowing_lite",			/* xxx */
 	"view_surface_lite",			/* OPT_view_surface_lite */
-	"variant_study_more",		   /* xxx */
+	NULL,		   /* xxx */
 	"show_sidebar",						/* xxx */
 	"show_itemlist",						/* xxx */
 	NULL,						/* xxx */
@@ -1475,37 +1475,37 @@ const cptr option_text[OPT_MAX] =
 	NULL,						/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
-	"variant_mushrooms",						/* xxx */
-	"variant_hit_traps",						/* xxx */
-	"variant_room_info",						/* xxx */
-	"variant_free_stats",						/* xxx */
-	"variant_fast_kills",						/* xxx */
-	"variant_scale_dam",						/* xxx */
-	"variant_scale_hp",						/* xxx */
-	"variant_pval_stacks",						/* xxx */
-	"variant_oos_summons",						/* xxx */
-	"variant_oos_escapes",						/* xxx */
-	"variant_oos_heals",						/* xxx */
-	"variant_oos_xtra",						/* xxx */
-	"variant_hurt_feats",						/* xxx */
-	"variant_lake_feats",						/* xxx */
-	"variant_big_feats",						/* xxx */
-	"variant_new_feats",					   /* xxx */
-	"variant_learn_id",						/* xxx */
-	"variant_guess_id",						/* xxx */
-	"variant_usage_id",						/* xxx */
-	"variant_great_id",						/* xxx */
-	"variant_dis_attacks",					   /* xxx */
-	"variant_time_stacks",					  /* xxx */
-	"variant_many_rings",						/* xxx */
-	"variant_fast_floor",					   /* xxx */
-	"variant_fast_equip",					   /* xxx */
-	"variant_belt_slot",					   /* xxx */
-	"variant_fast_moves",					   /* xxx */
-	"variant_unsummon",					   /* xxx */
-	"variant_friendly",					   /* xxx */
-	"variant_more_spells",					   /* xxx */
-	"variant_drop_body",					   /* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,					   /* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
+	NULL,					   /* xxx */
+	NULL,					  /* xxx */
+	NULL,						/* xxx */
+	NULL,					   /* xxx */
+	NULL,					   /* xxx */
+	NULL,					   /* xxx */
+	NULL,					   /* xxx */
+	NULL,					   /* xxx */
+	NULL,					   /* xxx */
+	NULL,					   /* xxx */
+	NULL,					   /* xxx */
 	"birth_point_based",		/* OPT_birth_point_based */
 	"birth_auto_roller",		/* OPT_birth_auto_roller */
 	"birth_maximize",			/* OPT_birth_maximize */
@@ -1989,10 +1989,10 @@ const bool option_norm[OPT_MAX] =
 	TRUE,		/* OPT_reseed_artifacts */
       FALSE,	   /* OPT_easy_autos */
 	FALSE,		/* OPT_easy_search */
-	TRUE,	  /* OPT_variant_save_feats */
+	FALSE,	  /* xxx */
 	FALSE,		/* OPT_view_glowing_lite */
 	FALSE,		/* OPT_view_surface_lite */
-	TRUE,	  /* OPT_variant_study_more */
+	FALSE,	  /* xxx */
 	TRUE,		/* OPT_show_sidebar */
 	FALSE,		/* OPT_show_itemlist */
 	FALSE,		/* xxx */
@@ -2003,37 +2003,37 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	FALSE,	  /* OPT_variant_town */
-	TRUE,	   /* OPT_variant_mushroom */
-	TRUE,	   /* OPT_variant_mon_hit_trap */
-	TRUE,	  /* OPT_variant_room_info */
-	TRUE,	   /* OPT_variant_free_stats */
-	TRUE,	   /* OPT_variant_fast_kills */
-	TRUE,	   /* OPT_variant_scale_damage */
-	TRUE,	   /* OPT_variant_scale_hp */
-	TRUE,	  /* OPT_variant_pval_stacks */
-	TRUE,	   /* OPT_variant_oos_summons */
-	TRUE,	   /* OPT_variant_oos_teleports */
-	TRUE,	   /* OPT_variant_oos_heals */
-	TRUE,	   /* OPT_variant_oos_xtra */
-	TRUE,	   /* OPT_variant_hurt_feats */
-	TRUE,	   /* OPT_variant_lake_feats */
-	TRUE,	   /* OPT_variant_big_feats */
-	TRUE,	   /* OPT_variant_new_feats */
-	TRUE,	  /* OPT_variant_learn_id */
-	TRUE,	  /* OPT_variant_guess_id */
-	TRUE,	  /* OPT_variant_usage_id */
-	TRUE,	   /* OPT_variant_great_id */
-	TRUE,	   /* OPT_variant_dis_attacks */
-	TRUE,	  /* OPT_variant_time_stacks */
-	TRUE,		/* OPT_variant_many_rings */
-	TRUE,	  /* OPT_variant_fast_floor */
-	TRUE,	   /* OPT_variant_fast_equip */
-	TRUE,	  /* OPT_variant_belt_slot */
-	TRUE,	  /* OPT_variant_fast_moves */
-	TRUE,	  /* OPT_variant_unsummon */
+	FALSE,	   /* OPT_variant_mushroom */
+	FALSE,	   /* OPT_variant_mon_hit_trap */
+	FALSE,	  /* OPT_variant_room_info */
+	FALSE,	   /* OPT_variant_free_stats */
+	FALSE,	   /* OPT_variant_fast_kills */
+	FALSE,	   /* OPT_variant_scale_damage */
+	FALSE,	   /* OPT_variant_scale_hp */
+	FALSE,	  /* OPT_variant_pval_stacks */
+	FALSE,	   /* OPT_variant_oos_summons */
+	FALSE,	   /* OPT_variant_oos_teleports */
+	FALSE,	   /* OPT_variant_oos_heals */
+	FALSE,	   /* OPT_variant_oos_xtra */
+	FALSE,	   /* OPT_variant_hurt_feats */
+	FALSE,	   /* OPT_variant_lake_feats */
+	FALSE,	   /* OPT_variant_big_feats */
+	FALSE,	   /* OPT_variant_new_feats */
+	FALSE,	  /* OPT_variant_learn_id */
+	FALSE,	  /* OPT_variant_guess_id */
+	FALSE,	  /* OPT_variant_usage_id */
+	FALSE,	   /* OPT_variant_great_id */
+	FALSE,	   /* OPT_variant_dis_attacks */
+	FALSE,	  /* OPT_variant_time_stacks */
+	FALSE,		/* OPT_variant_many_rings */
+	FALSE,	  /* OPT_variant_fast_floor */
+	FALSE,	   /* OPT_variant_fast_equip */
+	FALSE,	  /* OPT_variant_belt_slot */
+	FALSE,	  /* OPT_variant_fast_moves */
+	FALSE,	  /* OPT_variant_unsummon */
 	FALSE,	  /* OPT_variant_friendly */
-	TRUE,	  /* OPT_variant_more_spells */
-	TRUE,	  /* OPT_variant_drop_body */
+	FALSE,	  /* OPT_variant_more_spells */
+	FALSE,	  /* OPT_variant_drop_body */
 	FALSE,		/* OPT_birth_point_based */
 	FALSE,		/* OPT_birth_auto_roller */
 	TRUE,		/* OPT_birth_maximize */
@@ -2344,59 +2344,6 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		255,
 		255
 	}
-#if 0
-,
-
-	/*** Variant game-play ***/
-
-	{
-		OPT_variant_mushrooms,
-		OPT_variant_free_stats,
-		OPT_variant_fast_kills,
-		OPT_variant_scale_dam,
-		OPT_variant_scale_hp,
-		OPT_variant_hit_traps,
-		OPT_variant_oos_summons,
-		OPT_variant_oos_escapes,
-		OPT_variant_oos_heals,
-		OPT_variant_oos_xtra,
-		OPT_variant_dis_attacks,
-		OPT_variant_hurt_feats,
-		OPT_variant_new_feats,
-		OPT_variant_lake_feats,
-		OPT_variant_big_feats,
-		OPT_variant_great_id,
-		OPT_variant_many_rings,
-		OPT_variant_fast_floor,
-		OPT_variant_fast_equip,
-		255
-	},
-
-	/*** Variant save-file ***/
-
-	{
-		OPT_variant_learn_id,
-		OPT_variant_guess_id,
-		OPT_variant_usage_id,
-		OPT_variant_pval_stacks,
-		OPT_variant_time_stacks,
-		OPT_variant_room_info,
-		OPT_variant_belt_slot,
-		OPT_variant_fast_moves,
-		OPT_variant_unsummon,
-		OPT_variant_more_spells,
-		OPT_variant_study_more,
-		OPT_variant_drop_body,
-		OPT_variant_save_feats,
-		255,
-		255,
-		255,
-		255,
-		255,
-		255,
-		255
-	}
-#endif
 };
 
 const cptr inscrip_text[MAX_INSCRIP] =

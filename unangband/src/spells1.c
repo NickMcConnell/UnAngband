@@ -1777,8 +1777,6 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 	r = 0;
 #endif
 
-	if (!variant_hurt_feats) dam = 0;
-
 	/* Hack -- prevent smoke/vapour etc on floors */
 	if ((typ != GF_FEATURE) && (who) &&
 		(f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR)))
@@ -4211,7 +4209,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		case GF_HURT:
 
 			/* Hack -- Monster armor reduces total damage */
-			if (variant_scale_dam) dam -= (dam * ((r_ptr->ac < 150) ? r_ptr->ac : 150) / 250);
+			dam -= (dam * ((r_ptr->ac < 150) ? r_ptr->ac : 150) / 250);
 
 
 		/* Melee attack - unbonus */

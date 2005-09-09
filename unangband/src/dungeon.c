@@ -39,7 +39,7 @@ int value_check_aux1(object_type *o_ptr)
 		if (cursed_p(o_ptr) || broken_p(o_ptr)) return (INSCRIP_WORTHLESS);
 
 		/* Superb */
-		if ((variant_great_id) && (o_ptr->xtra1)) return (INSCRIP_SUPERB);
+		if (o_ptr->xtra1) return (INSCRIP_SUPERB);
 
 		/* Normal */
 		return (INSCRIP_EXCELLENT);
@@ -52,22 +52,22 @@ int value_check_aux1(object_type *o_ptr)
 	if (broken_p(o_ptr)) return (INSCRIP_BROKEN);
 
 	/* Great "armor" bonus */
-	if ((variant_great_id) && (o_ptr->to_a > 8)) return (INSCRIP_GREAT);
+	if (o_ptr->to_a > 8) return (INSCRIP_GREAT);
 
 	/* Great "weapon" bonus */
-	if ((variant_great_id) && (o_ptr->to_h + o_ptr->to_d > 14)) return (INSCRIP_GREAT);
+	if (o_ptr->to_h + o_ptr->to_d > 14) return (INSCRIP_GREAT);
 
 	/* Great "weapon" dice */
-	if ((variant_great_id) && (o_ptr->dd > k_info[o_ptr->k_idx].dd)) return (INSCRIP_GREAT);
+	if (o_ptr->dd > k_info[o_ptr->k_idx].dd) return (INSCRIP_GREAT);
 
 	/* Great "weapon" sides */
-	if ((variant_great_id) && (o_ptr->ds > k_info[o_ptr->k_idx].ds)) return (INSCRIP_GREAT);
+	if (o_ptr->ds > k_info[o_ptr->k_idx].ds) return (INSCRIP_GREAT);
 
 	/* Very good "armor" bonus */
-	if ((variant_great_id) && (o_ptr->to_a > 4)) return (INSCRIP_VERY_GOOD);
+	if (o_ptr->to_a > 4) return (INSCRIP_VERY_GOOD);
 
 	/* Good "weapon" bonus */
-	if ((variant_great_id) && (o_ptr->to_h + o_ptr->to_d > 7)) return (INSCRIP_VERY_GOOD);
+	if (o_ptr->to_h + o_ptr->to_d > 7) return (INSCRIP_VERY_GOOD);
 
 	/* Good "armor" bonus */
 	if (o_ptr->to_a > 0) return (INSCRIP_GOOD);
@@ -172,7 +172,7 @@ static void sense_inventory(void)
 		if (!o_ptr->k_idx) continue;
 
 		/* Sense flags to see if we have ability */
-		if ((i >= INVEN_WIELD) && (i != INVEN_BELT))
+		if (i >= INVEN_WIELD)
 		{
 			u32b if1,if2,if3,if4;
 
@@ -186,7 +186,7 @@ static void sense_inventory(void)
 		}
 
 		/* Sense flags to see if we gain ability */
-		if (!(o_ptr->ident & (IDENT_MENTAL)) && (i >= INVEN_WIELD) && (i != INVEN_BELT))
+		if (!(o_ptr->ident & (IDENT_MENTAL)) && (i >= INVEN_WIELD))
 		{
 			u32b if1,if2,if3,if4;
 
@@ -740,13 +740,10 @@ static void process_world(void)
 
 	/* Tire normally */
 	/* XXX We exclude situations where we adjust this counter elsewhere */
-	if (variant_fast_moves)
-	{
-		if (!(p_ptr->resting || p_ptr->searching || p_ptr->running || p_ptr->paralyzed || (p_ptr->stun >= 100)) ||
+	if (!(p_ptr->resting || p_ptr->searching || p_ptr->running || p_ptr->paralyzed || (p_ptr->stun >= 100)) ||
 			(f_ptr->flags2 & (FF2_FILLED)))
-		{
-			(void)set_rest(p_ptr->rest - p_ptr->tiring);
-		}
+	{
+		(void)set_rest(p_ptr->rest - p_ptr->tiring);
 	}
 
 	/* Digest normally */

@@ -964,10 +964,6 @@ void object_aware(object_type *o_ptr)
 
 	int i;
 
-	int inven_max = INVEN_TOTAL;
-
-	if (variant_belt_slot) inven_max++;
-
 	/* No longer guessing */
 	k_ptr->guess = 0;
 
@@ -995,7 +991,7 @@ void object_aware(object_type *o_ptr)
 	}
 
 	/* Process objects */
-	for (i = 1; i < inven_max; i++)
+	for (i = 1; i < INVEN_TOTAL; i++)
 	{
 		/* Get the object */
 		object_type *i_ptr = &inventory[i];
@@ -1463,7 +1459,7 @@ s32b object_value(const object_type *o_ptr)
 		{
 			s32b bonus=0L;
 
-			if (variant_great_id) switch (o_ptr->discount)
+			switch (o_ptr->discount)
 			{
 				case INSCRIP_SPECIAL:
 				{
@@ -1600,7 +1596,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 				&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) )
 			{
 				if ((o_ptr->timeout != 0) && (j_ptr->timeout != 0)) return (0);
-				if (!variant_time_stacks) return (0);
 			}
 
 			/* Probably okay */
@@ -1632,9 +1627,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			/* Require 'similar' pvals */
 			if ((o_ptr->pval != j_ptr->pval))
 			{
-				/* Check for stacks allowed */
-				if (!variant_pval_stacks) return (0);
-
 				/* Check for sign difference */
 				if ((o_ptr->pval > 0)&&(j_ptr->pval <= 0)) return (0);
 				if ((o_ptr->pval < 0)&&(j_ptr->pval >= 0)) return (0);
@@ -1665,7 +1657,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 				&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) )
 			{
 				if ((o_ptr->timeout != 0) && (j_ptr->timeout != 0)) return (0);
-				if (!variant_time_stacks) return (0);
 			}
 
 			/* Probably okay */
@@ -1695,13 +1686,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		case TV_RING:
 		case TV_AMULET:
 		case TV_LITE:
-		{
-			/* Require knowledge */
-			if ((!variant_pval_stacks) &&
-				(!object_known_p(o_ptr)
-				  || !object_known_p(j_ptr))) return (0);
-			/* Fall through */
-		}
 
 		/* Missiles */
 		case TV_BOLT:
@@ -1719,9 +1703,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			/* Require similar "pval" code */
 			if (o_ptr->pval != j_ptr->pval)
 			{
-
-				if (!variant_pval_stacks) return (0);
-
 				/* Check for sign difference */
 				if ((o_ptr->pval > 0)&&(j_ptr->pval <= 0)) return (0);
 				if ((o_ptr->pval < 0)&&(j_ptr->pval >= 0)) return (0);
@@ -1750,7 +1731,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 				&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) )
 			{
 				if ((o_ptr->timeout != 0) && (j_ptr->timeout != 0)) return (0);
-				if (!variant_pval_stacks) return (0);
 			}
 
 			/* Require identical "values" */
@@ -4235,9 +4215,6 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 	{
 		int k_idx;
 
-		/* Hack -- handle no type */
-		if (!(variant_mushrooms)) return (FALSE);
-
 		if (food_type > 0)
 		{
 			k_idx = lookup_kind(TV_FOOD,food_type-1);
@@ -5705,9 +5682,6 @@ static bool vault_trap_floor(int f_idx)
 	/* Decline allocated */
 	if (f_ptr->flags3 & (FF3_ALLOC)) return (FALSE);
 
-	/* Decline high traps */
-	if ((!variant_new_feats) && (f_idx > 63)) return (FALSE);
-
 	/* Okay */
 	return (TRUE);
 }
@@ -6050,9 +6024,6 @@ static bool vault_closed_door(int f_idx)
 	/* Decline open/secret/known jammed doors/broken */
 	if (!(f_ptr->flags1 & (FF1_OPEN))) return (FALSE);
 
-	/* Decline unknown trapped doors */
-	if ((!variant_new_feats) && (f_ptr->flags1 & (FF1_TRAP))) return (FALSE);
-
 	/* Okay */
 	return (TRUE);
 }
@@ -6114,9 +6085,6 @@ static bool vault_locked_door(int f_idx)
 
 	/* Decline unlocked doors */
 	if (f_idx == FEAT_DOOR_HEAD) return (FALSE);
-
-	/* Decline unknown trapped doors */
-	if ((!variant_new_feats) && (f_ptr->flags1 & (FF1_TRAP))) return (FALSE);
 
 	/* Okay */
 	return (TRUE);
@@ -6580,17 +6548,6 @@ bool inven_carry_okay(const object_type *o_ptr)
 		if (object_similar(j_ptr, o_ptr)) return (TRUE);
 	}
 
-	/* Hack -- check belt slot */
-	if ((variant_belt_slot)
-	     && (inventory[INVEN_BELT].k_idx)
-		&& (object_similar(&inventory[INVEN_BELT],o_ptr))) return (TRUE);
-
-	if ((variant_belt_slot)
-	     && (inventory[INVEN_WIELD].k_idx)
-		&& (object_similar(&inventory[INVEN_WIELD],o_ptr))
-		&& (inventory[INVEN_WIELD].number > 1)) return (TRUE);
-
-
 	/* Nope */
 	return (FALSE);
 }
@@ -6653,52 +6610,6 @@ s16b inven_carry(object_type *o_ptr)
 			return (j);
 		}
 
-	}
-
-	/* Hack -- check for combining - belt */
-	if ((variant_belt_slot)
-	     && (inventory[INVEN_BELT].k_idx)
-		&& (object_similar(&inventory[INVEN_BELT],o_ptr)))
-	{
-
-			/* Combine the items */
-			object_absorb(&inventory[INVEN_BELT], o_ptr);
-
-			/* Increase the weight */
-			p_ptr->total_weight += (o_ptr->number * o_ptr->weight);
-
-			/* Recalculate bonuses */
-			p_ptr->update |= (PU_BONUS);
-
-			/* Window stuff */
-			p_ptr->window |= (PW_INVEN);
-
-			/* Success */
-			return (INVEN_BELT);
-	}
-
-	/* Hack -- check for combining - wielded */
-	/* MegaHack -- only combine when wielding more than 1 */
-	if ((variant_belt_slot)
-	     && (inventory[INVEN_WIELD].k_idx)
-		&& (object_similar(&inventory[INVEN_WIELD],o_ptr))
-		&& (inventory[INVEN_WIELD].number > 1))
-	{
-
-			/* Combine the items */
-			object_absorb(&inventory[INVEN_WIELD], o_ptr);
-
-			/* Increase the weight */
-			p_ptr->total_weight += (o_ptr->number * o_ptr->weight);
-
-			/* Recalculate bonuses */
-			p_ptr->update |= (PU_BONUS);
-
-			/* Window stuff */
-			p_ptr->window |= (PW_INVEN);
-
-			/* Success */
-			return (INVEN_WIELD);
 	}
 
 	/* Paranoia */
@@ -6948,12 +6859,6 @@ s16b inven_takeoff(int item, int amt)
 	if (i_ptr->tval == TV_SPELL)
 	{
 		act = "You were enchanted with";
-	}
-
-	/* Where is the item now */
-	else if (((item == INVEN_WIELD) && (i_ptr->number > 1)) || (item == INVEN_BELT))
-	{
-		act = "You were carrying";
 	}
 	else if ((i_ptr->tval == TV_SWORD) || (i_ptr->tval == TV_POLEARM)
 			|| (i_ptr->tval == TV_HAFTED) || (i_ptr->tval== TV_STAFF))

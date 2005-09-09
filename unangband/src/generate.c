@@ -1047,7 +1047,7 @@ static void build_feature(int y, int x, int feat, bool do_big_lake)
 	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
 
 	/* Hack -- increase the 'big'ness */
-	if ((f_info[feat1].flags1 & (FF1_WALL)) && (variant_big_feats))
+	if (f_info[feat1].flags1 & (FF1_WALL))
 	{
 		/* Make small go big */
 		do_big_lake = TRUE;
@@ -1834,9 +1834,6 @@ static void get_room_info(int y, int x)
 
 		/* Place flags except SEEN */
 		room_info[room].flags |= (d_info[i].flags & ~(ROOM_SEEN));
-
-		/* Option */
-		if (!(variant_room_info)) continue;
 		
 		/* Place monster if needed */
 		if ((d_info[i].r_flag) || (d_info[i].r_char))
@@ -4292,7 +4289,7 @@ static void cave_gen(void)
 	dun->cent_n = 0;
 
 	/* No features on destroyed level */
-	if ((!destroyed) && (variant_lake_feats) && (!(zone->tower) || (p_ptr->depth <=min_depth(p_ptr->dungeon))) )
+	if ((!destroyed) && (!(zone->tower) || (p_ptr->depth <=min_depth(p_ptr->dungeon))) )
 	{
 		bool big = FALSE;
 		bool done_big = FALSE;
@@ -4324,7 +4321,7 @@ static void cave_gen(void)
 
 			if (feat)
 			{			     
-				if ((!done_big) && (variant_big_feats))
+				if (!done_big)
 				{
 					big = randint(150) < p_ptr->depth;
 
@@ -4678,13 +4675,13 @@ static void cave_gen(void)
 	}
 
 	/* Hack -- Add a rich mineral vein very rarely */
-	if ((variant_new_feats) && (!rand_int(DUN_STR_GOL)))
+	if (!rand_int(DUN_STR_GOL))
 	{
 		build_streamer(FEAT_QUARTZ, DUN_STR_GC);
 	}
 
 	/* Hack -- Add cracks through the dungeon occasionally */
-	if ((variant_new_feats) && !(rand_int(DUN_STR_CRA)))
+	if (!(rand_int(DUN_STR_CRA)))
 	{
 		build_streamer(FEAT_WALL_C, DUN_STR_CC);
 	}

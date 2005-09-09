@@ -103,11 +103,8 @@ void do_cmd_eat_food(void)
 	/* Sound */
 	sound(MSG_EAT);
 
-
-	/* Take a (partial) turn */
-	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-	else p_ptr->energy_use = 100;
+	/* Take a turn */
+	p_ptr->energy_use = 100;
 
 	/* Identity not known yet */
 	ident = FALSE;
@@ -208,11 +205,8 @@ void do_cmd_quaff_potion(void)
 	/* Sound */
 	sound(MSG_QUAFF);
 
-
-	/* Take a (partial) turn */
-	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-	else p_ptr->energy_use = 100;
+	/* Take a turn */
+	p_ptr->energy_use = 100;
 
 	/* Not identified yet */
 	ident = FALSE;
@@ -330,10 +324,8 @@ void do_cmd_read_scroll(void)
 	/* Use feat */
 	if (o_ptr->ident & (IDENT_STORE)) use_feat = TRUE;
 
-	/* Take a (partial) turn */
-	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-	else p_ptr->energy_use = 100;
+	/* Take a turn */
+	p_ptr->energy_use = 100;
 
 	/* Not identified yet */
 	ident = FALSE;
@@ -440,10 +432,8 @@ void do_cmd_use_staff(void)
 	}
 
 
-	/* Take a (partial) turn */
-	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-	else p_ptr->energy_use = 100;
+	/* Take a turn */
+	p_ptr->energy_use = 100;
 
 	/* Not identified yet */
 	ident = FALSE;
@@ -566,11 +556,10 @@ void do_cmd_use_staff(void)
 	}
 
 	/* XXX Hack -- unstack if necessary */
-	if ((o_ptr->number > 1) &&
-	((!variant_pval_stacks) || 
+	if ((o_ptr->number > 1) && 
 	((!object_known_p(o_ptr) && (o_ptr->pval == 2) && (o_ptr->stackc > 1)) ||
 	  (!object_known_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
-	  (o_ptr->stackc != 1) && (o_ptr->pval > 2)))))
+	  (o_ptr->stackc != 1) && (o_ptr->pval > 2))))
 	{
 		object_type *i_ptr;
 		object_type object_type_body;
@@ -696,10 +685,8 @@ void do_cmd_aim_wand(void)
 	}
 
 
-	/* Take a (partial) turn */
-	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-	else p_ptr->energy_use = 100;
+	/* Take a turn */
+	p_ptr->energy_use = 100;
 
 	/* Not identified yet */
 	ident = FALSE;
@@ -822,11 +809,10 @@ void do_cmd_aim_wand(void)
 	}
 
 	/* XXX Hack -- unstack if necessary */
-	if ((o_ptr->number > 1) &&
-	((!variant_pval_stacks) || 
+	if ((o_ptr->number > 1) && 
 	((!object_known_p(o_ptr) && (o_ptr->pval == 2) && (o_ptr->stackc > 1)) ||
 	  (!object_known_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
-	  (o_ptr->stackc != 1) && (o_ptr->pval > 2)))))
+	  (o_ptr->stackc != 1) && (o_ptr->pval > 2))))
 	{
 		object_type *i_ptr;
 		object_type object_type_body;
@@ -955,10 +941,8 @@ void do_cmd_zap_rod(void)
 		return;
 	}
 
-	/* Take a (partial) turn */
-	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-	else p_ptr->energy_use = 100;
+	/* Take a turn */
+	p_ptr->energy_use = 100;
 
 	/* Not identified yet */
 	ident = FALSE;
@@ -1288,11 +1272,8 @@ void do_cmd_assemble(void)
 		o_ptr = &o_list[0 - item];
 	}
 
-
-	/* Take a (partial) turn */
-	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-	else p_ptr->energy_use = 100;
+	/* Take a turn */
+	p_ptr->energy_use = 100;
 
 	/* Extract the item level */
 	lev = k_info[o_ptr->k_idx].level;
@@ -1533,11 +1514,8 @@ void do_cmd_activate(void)
 		o_ptr = &o_list[0 - item];
 	}
 
-
-	/* Take a (partial) turn */
-	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-	else p_ptr->energy_use = 100;
+	/* Take a turn */
+	p_ptr->energy_use = 100;
 
 	/* Extract the item level */
 	lev = k_info[o_ptr->k_idx].level;

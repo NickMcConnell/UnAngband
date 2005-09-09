@@ -277,7 +277,7 @@ static errr rd_item(object_type *o_ptr)
 	rd_s16b(&o_ptr->pval);
 
 	/* Special stack counter */
-	if ((variant_pval_stacks)||(variant_time_stacks)) rd_byte(&o_ptr->stackc);
+	rd_byte(&o_ptr->stackc);
 
 	rd_byte(&o_ptr->show_idx);
 	rd_byte(&o_ptr->discount);
@@ -325,40 +325,30 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&o_ptr->xtra2);
 
 	/* Flags we have learnt about an item */
-	if (variant_learn_id)
-	{
-		/* Knowledge */
-		rd_u32b(&o_ptr->can_flags1);
-		rd_u32b(&o_ptr->can_flags2);
-		rd_u32b(&o_ptr->can_flags3);
-		rd_u32b(&o_ptr->can_flags4);
+	rd_u32b(&o_ptr->can_flags1);
+	rd_u32b(&o_ptr->can_flags2);
+	rd_u32b(&o_ptr->can_flags3);
+	rd_u32b(&o_ptr->can_flags4);
 
-		rd_u32b(&o_ptr->may_flags1);
-		rd_u32b(&o_ptr->may_flags2);
-		rd_u32b(&o_ptr->may_flags3);
-		rd_u32b(&o_ptr->may_flags4);
+	rd_u32b(&o_ptr->may_flags1);
+	rd_u32b(&o_ptr->may_flags2);
+	rd_u32b(&o_ptr->may_flags3);
+	rd_u32b(&o_ptr->may_flags4);
 
-		rd_u32b(&o_ptr->not_flags1);
-		rd_u32b(&o_ptr->not_flags2);
-		rd_u32b(&o_ptr->not_flags3);
-		rd_u32b(&o_ptr->not_flags4);
-	}
+	rd_u32b(&o_ptr->not_flags1);
+	rd_u32b(&o_ptr->not_flags2);
+	rd_u32b(&o_ptr->not_flags3);
+	rd_u32b(&o_ptr->not_flags4);
 
 	/* Times we have used an item */
-	if (variant_usage_id) rd_s16b(&o_ptr->usage);
+	rd_s16b(&o_ptr->usage);
 
 	/* Guessed an item as */
-	if (variant_guess_id)
-	{
-		rd_byte(&o_ptr->guess1);
-		rd_byte(&o_ptr->guess2);
-	}
+	rd_byte(&o_ptr->guess1);
+	rd_byte(&o_ptr->guess2);
 
 	/* Item has a monster 'flavor' */
-	if (variant_drop_body)
-	{
-		rd_s16b(&o_ptr->name3);
-	}
+	rd_s16b(&o_ptr->name3);
 
 	/* Inscription */
 	rd_string(buf, 128);
@@ -539,36 +529,14 @@ static void rd_monster(monster_type *m_ptr)
 	rd_byte(&m_ptr->monfear);
 
 	/* Summoned monsters timeout */
-	if (variant_unsummon)
-	{
-		if (older_than(3,0,1))
-		{
-			rd_s16b(&tmp16s);
-			m_ptr->summoned = (byte)tmp16s;
-			rd_byte(&tmp8u);
-			m_ptr->mflag = tmp8u;
-		}
-		else
-		{
-			rd_byte(&m_ptr->summoned);
-			rd_u16b(&m_ptr->mflag);
-		}
-
-		if (!(older_than(2,9,6)))
-		{
-			rd_byte(&m_ptr->min_range);
-			rd_byte(&m_ptr->best_range);
-			rd_byte(&m_ptr->ty);
-			rd_byte(&m_ptr->tx);
-		}
-	}
-
-	/* Saved mflags - should really be another option XXX */
-	if ((variant_drop_body) && (older_than(2,9,6)))
-	{
-		rd_byte(&tmp8u);
-		m_ptr->mflag = tmp8u;
-	}
+	rd_s16b(&tmp16s);
+	m_ptr->summoned = (byte)tmp16s;
+	rd_byte(&tmp8u);
+	m_ptr->mflag = tmp8u;
+	rd_byte(&m_ptr->min_range);
+	rd_byte(&m_ptr->best_range);
+	rd_byte(&m_ptr->ty);
+	rd_byte(&m_ptr->tx);
 
 	rd_byte(&tmp8u);
 }
@@ -623,7 +591,7 @@ static void rd_lore(int r_idx)
 	rd_u32b(&l_ptr->flags4);
 	rd_u32b(&l_ptr->flags5);
 	rd_u32b(&l_ptr->flags6);
-	if (variant_drop_body && !(older_than(2,9,6))) rd_u32b(&l_ptr->flags7);
+	rd_u32b(&l_ptr->flags7);
 
 	/* Read the "Racial" monster limit per level */
 	rd_byte(&r_ptr->max_num);
@@ -903,10 +871,6 @@ static errr rd_extra(void)
 	byte tmp8u;
 	u16b tmp16u;
 
-	int max_spells = PY_MAX_SPELLS;
-
-	if (!variant_study_more) max_spells = 64;
-
 	rd_string(op_ptr->full_name, 32);
 
 	rd_string(p_ptr->died_from, 80);
@@ -1055,15 +1019,8 @@ static errr rd_extra(void)
 	rd_s16b(&p_ptr->paralyzed);
 	rd_s16b(&p_ptr->confused);
 	rd_s16b(&p_ptr->food);
-
-	/* Read in 'rest' */
-	if (variant_fast_moves) rd_s16b(&p_ptr->rest);
-	else
-	{
-		strip_bytes(2);
-		p_ptr->rest = PY_REST_FULL;
-	}
-	strip_bytes(2); /* Old "food_digested" / "protection" */
+	rd_s16b(&p_ptr->rest);
+	strip_bytes(2); /* Old "protection" */
 
 	/* Read more flags */
 	rd_s16b(&p_ptr->energy);
@@ -1158,27 +1115,21 @@ static errr rd_extra(void)
 	/* Read spell info */
 	rd_u32b(&p_ptr->spell_learned1);
 	rd_u32b(&p_ptr->spell_learned2);
-	if (variant_more_spells) rd_u32b(&p_ptr->spell_learned3);
-	if (variant_more_spells) rd_u32b(&p_ptr->spell_learned4);
+	rd_u32b(&p_ptr->spell_learned3);
+	rd_u32b(&p_ptr->spell_learned4);
 	rd_u32b(&p_ptr->spell_worked1);
 	rd_u32b(&p_ptr->spell_worked2);
-	if (variant_more_spells) rd_u32b(&p_ptr->spell_worked3);
-	if (variant_more_spells) rd_u32b(&p_ptr->spell_worked4);
+	rd_u32b(&p_ptr->spell_worked3);
+	rd_u32b(&p_ptr->spell_worked4);
 	rd_u32b(&p_ptr->spell_forgotten1);
 	rd_u32b(&p_ptr->spell_forgotten2);
-	if (variant_more_spells) rd_u32b(&p_ptr->spell_forgotten3);
-	if (variant_more_spells) rd_u32b(&p_ptr->spell_forgotten4);
+	rd_u32b(&p_ptr->spell_forgotten3);
+	rd_u32b(&p_ptr->spell_forgotten4);
 
 	/* Read in the spells */
-	for (i = 0; i < max_spells; i++)
+	for (i = 0; i < PY_MAX_SPELLS; i++)
 	{
-		if (variant_more_spells) rd_s16b(&p_ptr->spell_order[i]);
-		else
-		{
-			rd_byte(&tmp8u);
-
-			p_ptr->spell_order[i] = tmp8u;
-		}
+		rd_s16b(&p_ptr->spell_order[i]);
 	} 
 
 	return (0);
@@ -1348,10 +1299,6 @@ static errr rd_inventory(void)
 	object_type *i_ptr;
 	object_type object_type_body;
 
-	int inven_total = INVEN_TOTAL;
-
-	if (variant_belt_slot) inven_total++;
-
 	/* Read until done */
 	while (1)
 	{
@@ -1380,7 +1327,7 @@ static errr rd_inventory(void)
 		if (!i_ptr->k_idx) return (-1);
 
 		/* Verify slot */
-		if (n >= inven_total) return (-1);
+		if (n >= INVEN_TOTAL) return (-1);
 
 		/* Wield equipment */
 		if (n >= INVEN_WIELD)
@@ -1605,15 +1552,13 @@ u16b limit;
 		/* Grab RLE info */
 		rd_byte(&count);
 
-		if (variant_save_feats) rd_u16b(&tmp16u);
-		else rd_byte(&tmp8u);
+		rd_u16b(&tmp16u);
 
 		/* Apply the RLE info */
 		for (i = count; i > 0; i--)
 		{
 			/* Save the feat */
-			if (variant_save_feats) cave_feat[y][x] = tmp16u;
-			else cave_feat[y][x] = tmp8u;
+			cave_feat[y][x] = tmp16u;
 
 			/* Check for los flag set*/
 			if (f_info[cave_feat[y][x]].flags1 & (FF1_LOS))
@@ -1689,47 +1634,28 @@ u16b limit;
 
 
 	/*** Room descriptions ***/
-   
-	if (!variant_room_info)
+	for (bx = 0; bx < MAX_ROOMS_ROW; bx++)
 	{
-		/* Initialize the room table */
-		for (by = 0; by < MAX_ROOMS_ROW; by++)
+		for (by = 0; by < MAX_ROOMS_COL; by++)
 		{
-			for (bx = 0; bx < MAX_ROOMS_COL; bx++)
-			{
-				dun_room[by][bx] = 0;
-			}
+			rd_byte(&dun_room[bx][by]);
 		}
-
-		/* Initialise 'zeroeth' room description */
-		room_info[0].flags = 0;
 	}
-	else
+
+	for (i = 1; i < DUN_ROOMS; i++)
 	{
+		int j;
 
-		for (bx = 0; bx < MAX_ROOMS_ROW; bx++)
+		rd_byte(&room_info[i].type);
+		rd_byte(&room_info[i].flags);
+
+		if (room_info[i].type == ROOM_NORMAL)
 		{
-			for (by = 0; by < MAX_ROOMS_COL; by++)
+			for (j = 0; j < ROOM_DESC_SECTIONS; j++)
 			{
-				rd_byte(&dun_room[bx][by]);
-			}
-		}
+				rd_s16b(&room_info[i].section[j]);
 
-		for (i = 1; i < DUN_ROOMS; i++)
-		{
-			int j;
-
-			rd_byte(&room_info[i].type);
-			rd_byte(&room_info[i].flags);
-
-			if (room_info[i].type == ROOM_NORMAL)
-			{
-				for (j = 0; j < ROOM_DESC_SECTIONS; j++)
-				{
-					rd_s16b(&room_info[i].section[j]);
-
-					if (room_info[i].section[j] == -1) break;
-				}
+				if (room_info[i].section[j] == -1) break;
 			}
 		}
 	}
@@ -2001,10 +1927,10 @@ static errr rd_savefile_new_aux(void)
 		k_ptr->aware = (tmp8u == 1) ? TRUE: FALSE;
 		k_ptr->tried = (tmp8u >= 2) ? TRUE: FALSE;
 
-		if ((variant_guess_id) && (tmp8u > 2)) k_ptr->guess = (tmp8u - 2);
+		if (tmp8u > 2) k_ptr->guess = (tmp8u - 2);
 
 		/* Activations */
-		if ((variant_usage_id) && !(older_than(2,9,6))) rd_s16b(&k_ptr->used);
+		rd_s16b(&k_ptr->used);
 
 	}
 	if (arg_fiddle) note("Loaded Object Memory");
@@ -2061,75 +1987,63 @@ static errr rd_savefile_new_aux(void)
 		rd_byte(&tmp8u);
 		rd_byte(&tmp8u);
 
-		if (variant_learn_id)
-		{
-			/* Knowledge */
-			rd_u32b(&n_ptr->can_flags1);
-			rd_u32b(&n_ptr->can_flags2);
-			rd_u32b(&n_ptr->can_flags3);
-			rd_u32b(&n_ptr->can_flags4);
+		/* Knowledge */
+		rd_u32b(&n_ptr->can_flags1);
+		rd_u32b(&n_ptr->can_flags2);
+		rd_u32b(&n_ptr->can_flags3);
+		rd_u32b(&n_ptr->can_flags4);
 
-			rd_u32b(&n_ptr->not_flags1);
-			rd_u32b(&n_ptr->not_flags2);
-			rd_u32b(&n_ptr->not_flags3);
-			rd_u32b(&n_ptr->not_flags4);
-		}
+		rd_u32b(&n_ptr->not_flags1);
+		rd_u32b(&n_ptr->not_flags2);
+		rd_u32b(&n_ptr->not_flags3);
+		rd_u32b(&n_ptr->not_flags4);
 
 		/* Activations */
-		if (variant_usage_id) rd_s16b(&a_info_new[i].activated);
+		rd_s16b(&a_info_new[i].activated);
 
 		/* Oops */
-		if (variant_learn_id) rd_byte(&tmp8u);
-		if (variant_learn_id) rd_byte(&tmp8u);
+		rd_byte(&tmp8u);
+		rd_byte(&tmp8u);
 	}
 
 	if (arg_fiddle) note("Loaded Artifacts");
 
-	if (variant_learn_id || variant_usage_id)
+	/* Load the Ego items */
+	rd_u16b(&tmp16u);
+
+	/* Incompatible save files */
+	if (tmp16u > z_info->e_max)
 	{
-		/* Load the Ego items */
-		rd_u16b(&tmp16u);
+		note(format("Too many (%u) ego items!", tmp16u));
+		return (24);
+	}
 
-		/* Incompatible save files */
-		if (tmp16u > z_info->e_max)
-		{
-			note(format("Too many (%u) ego items!", tmp16u));
-			return (24);
-		}
+	/* Read the ego item flags */
+	for (i = 0; i < tmp16u; i++)
+	{
+		object_lore *n_ptr = &e_list[i];
 
-		/* Read the ego item flags */
-		for (i = 0; i < tmp16u; i++)
-		{
-			object_lore *n_ptr = &e_list[i];
+		rd_u32b(&n_ptr->can_flags1);
+		rd_u32b(&n_ptr->can_flags2);
+		rd_u32b(&n_ptr->can_flags3);
+		rd_u32b(&n_ptr->can_flags4);
 
-			/* Knowledge */
-			if (variant_learn_id)
-			{
-				rd_u32b(&n_ptr->can_flags1);
-				rd_u32b(&n_ptr->can_flags2);
-				rd_u32b(&n_ptr->can_flags3);
-				rd_u32b(&n_ptr->can_flags4);
+		rd_u32b(&n_ptr->may_flags1);
+		rd_u32b(&n_ptr->may_flags2);
+		rd_u32b(&n_ptr->may_flags3);
+		rd_u32b(&n_ptr->may_flags4);
 
-				rd_u32b(&n_ptr->may_flags1);
-				rd_u32b(&n_ptr->may_flags2);
-				rd_u32b(&n_ptr->may_flags3);
-				rd_u32b(&n_ptr->may_flags4);
+		rd_u32b(&n_ptr->not_flags1);
+		rd_u32b(&n_ptr->not_flags2);
+		rd_u32b(&n_ptr->not_flags3);
+		rd_u32b(&n_ptr->not_flags4);
 
-				rd_u32b(&n_ptr->not_flags1);
-				rd_u32b(&n_ptr->not_flags2);
-				rd_u32b(&n_ptr->not_flags3);
-				rd_u32b(&n_ptr->not_flags4);
-			}
+		rd_byte(&e_info[i].aware);
+		rd_byte(&tmp8u);
 
-			/* Oops */
-			if (variant_usage_id) rd_byte(&e_info[i].aware);
-			if (variant_usage_id) rd_byte(&tmp8u);
-
-			/* Oops */
-			if (variant_learn_id) rd_byte(&tmp8u);
-			if (variant_learn_id) rd_byte(&tmp8u);
-		}
-
+		/* Oops */
+		rd_byte(&tmp8u);
+		rd_byte(&tmp8u);
 	}
 
 	if (arg_fiddle) note("Loaded Ego Items");
@@ -2161,22 +2075,19 @@ static errr rd_savefile_new_aux(void)
 
 		a_info[i].cur_num = a_info_new[i].cur_num;
 
-		if (variant_learn_id)
-		{
-			/* Knowledge */
-			n_ptr->can_flags1 = n2_ptr->can_flags1;
-			n_ptr->can_flags2 = n2_ptr->can_flags2;
-			n_ptr->can_flags3 = n2_ptr->can_flags3;
-			n_ptr->can_flags4 = n2_ptr->can_flags4;
+		/* Knowledge */
+		n_ptr->can_flags1 = n2_ptr->can_flags1;
+		n_ptr->can_flags2 = n2_ptr->can_flags2;
+		n_ptr->can_flags3 = n2_ptr->can_flags3;
+		n_ptr->can_flags4 = n2_ptr->can_flags4;
 
-			n_ptr->not_flags1 = n2_ptr->not_flags1;
-			n_ptr->not_flags2 = n2_ptr->not_flags2;
-			n_ptr->not_flags3 = n2_ptr->not_flags3;
-			n_ptr->not_flags4 = n2_ptr->not_flags4;
-		}
+		n_ptr->not_flags1 = n2_ptr->not_flags1;
+		n_ptr->not_flags2 = n2_ptr->not_flags2;
+		n_ptr->not_flags3 = n2_ptr->not_flags3;
+		n_ptr->not_flags4 = n2_ptr->not_flags4;
 
 		/* Activations */
-		if (variant_usage_id) a_info[i].activated = a_info_new[i].activated;
+		a_info[i].activated = a_info_new[i].activated;
 	}
 
 	FREE(a_info_new);
@@ -2254,10 +2165,6 @@ static errr rd_savefile_new_aux(void)
 
 	/* Hack -- no ghosts */
 	r_info[z_info->r_max-1].max_num = 0;
-
-        /* Set important Save-File Option */
-        variant_save_feats = TRUE;
-
 
 	/* Success */
 	return (0);

@@ -1576,10 +1576,7 @@ static void calc_spells(void)
 	spell_type *s_ptr;
 	spell_cast *sc_ptr = &(s_info[0].cast[0]);
 
-	int max_spells = PY_MAX_SPELLS;
 	cptr p;
-
-	if (!variant_study_more) max_spells = 64;
 
 	/* Hack --- We don't know which book it comes from */
 	switch (c_info[p_ptr->pclass].spell_stat)
@@ -1617,7 +1614,7 @@ static void calc_spells(void)
 		       levels / 2);
 
 	/* Hack --- adjust num_allowed */
-	if (num_allowed > max_spells) num_allowed = max_spells;
+	if (num_allowed >  PY_MAX_SPELLS) num_allowed = PY_MAX_SPELLS;
 
 	/* Hack --- Assume no spells available */
 	k = 0;
@@ -2757,7 +2754,8 @@ static void calc_bonuses(void)
 	}
 
 	/* Set the rate of tiring */
-	p_ptr->tiring = k;
+	if (k > 10) p_ptr->tiring = k - 10;
+	else p_ptr->tiring = 0;
 
 	/* Apply "encumbrance" from weight */
 	if (j > i/2) p_ptr->pspeed -= ((j - (i/2)) / (i / 10));

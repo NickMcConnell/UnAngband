@@ -1841,12 +1841,8 @@ static void display_player_equippy(int y, int x)
 
 	object_type *o_ptr;
 
-	int inven_max = INVEN_TOTAL;
-
-	if (variant_belt_slot) inven_max++;
-
 	/* Dump equippy chars */
-	for (i = INVEN_WIELD; i < inven_max; ++i)
+	for (i = INVEN_WIELD; i < INVEN_TOTAL; ++i)
 	{
 		/* Object */
 		o_ptr = &inventory[i];
@@ -2493,12 +2489,8 @@ errr file_character(cptr name, bool full)
 	/* Dump the equipment */
 	if (p_ptr->equip_cnt)
 	{
-		int inven_max = INVEN_TOTAL;
-
-		if (variant_belt_slot) inven_max++;
-
 		fprintf(fff, "  [Character Equipment]\n\n");
-		for (i = INVEN_WIELD; i < inven_max; i++)
+		for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
 		{
 			object_desc(o_name, sizeof(o_name), &inventory[i], TRUE, 3);
 			fprintf(fff, "%c) %s\n",
@@ -3489,12 +3481,8 @@ static void death_knowledge(void)
 
 	store_type *st_ptr = &store[STORE_HOME];
 
-	int inven_max = INVEN_TOTAL;
-
-	if (variant_belt_slot) inven_max++;
-
 	/* Hack -- Know everything in the inven/equip */
-	for (i = 0; i < inven_max; i++)
+	for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		o_ptr = &inventory[i];
 

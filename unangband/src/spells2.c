@@ -1046,7 +1046,7 @@ int value_check_aux3(const object_type *o_ptr)
 		if (cursed_p(o_ptr) || broken_p(o_ptr)) return (0);
 
 		/* Superb */
-		if ((variant_great_id) && (o_ptr->xtra1)) return (INSCRIP_SUPERB);
+		if (o_ptr->xtra1) return (INSCRIP_SUPERB);
 
 		/* Normal */
 		return (INSCRIP_EXCELLENT);
@@ -1059,22 +1059,22 @@ int value_check_aux3(const object_type *o_ptr)
 	if (broken_p(o_ptr)) return (0);
 
 	/* Great "armor" bonus */
-	if ((variant_great_id) && (o_ptr->to_a > 8)) return (INSCRIP_GREAT);
+	if (o_ptr->to_a > 8) return (INSCRIP_GREAT);
 
 	/* Great "weapon" bonus */
-	if ((variant_great_id) && (o_ptr->to_h + o_ptr->to_d > 14)) return (INSCRIP_GREAT);
+	if (o_ptr->to_h + o_ptr->to_d > 14) return (INSCRIP_GREAT);
 
 	/* Great "weapon" dice */
-	if ((variant_great_id) && (o_ptr->dd > k_info[o_ptr->k_idx].dd)) return (INSCRIP_GREAT);
+	if (o_ptr->dd > k_info[o_ptr->k_idx].dd) return (INSCRIP_GREAT);
 
 	/* Great "weapon" sides */
-	if ((variant_great_id) && (o_ptr->ds > k_info[o_ptr->k_idx].ds)) return (INSCRIP_GREAT);
+	if (o_ptr->ds > k_info[o_ptr->k_idx].ds) return (INSCRIP_GREAT);
 
 	/* Very good "armor" bonus */
-	if ((variant_great_id) && (o_ptr->to_a > 4)) return (INSCRIP_VERY_GOOD);
+	if (o_ptr->to_a > 4) return (INSCRIP_VERY_GOOD);
 
 	/* Good "weapon" bonus */
-	if ((variant_great_id) && (o_ptr->to_h + o_ptr->to_d > 7)) return (INSCRIP_VERY_GOOD);
+	if (o_ptr->to_h + o_ptr->to_d > 7) return (INSCRIP_VERY_GOOD);
 
 	/* Good "armor" bonus */
 	if (o_ptr->to_a > 0) return (INSCRIP_GOOD);
@@ -4457,11 +4457,7 @@ static void wield_spell(int item, int k_idx, int time)
 	p_ptr->equip_cnt++;
 
 	/* Where is the item now */
-	if (((item == INVEN_WIELD) && (o_ptr->number > 1)) || (item == INVEN_BELT))
-	{
-		act = "You are carrying";
-	}
-	else if ((o_ptr->tval == TV_SWORD) || (o_ptr->tval == TV_POLEARM)
+	if ((o_ptr->tval == TV_SWORD) || (o_ptr->tval == TV_POLEARM)
 		|| (o_ptr->tval == TV_HAFTED) || (o_ptr->tval == TV_STAFF) ||
 		(o_ptr->tval == TV_DIGGING))
 	{

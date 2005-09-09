@@ -721,7 +721,6 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 	if (s_ptr->type ==SPELL_INVEN_HEAD) vp[vn++]="creates magical headgear";
 	if (s_ptr->type ==SPELL_INVEN_HANDS) vp[vn++]="creates magical gloves";
 	if (s_ptr->type ==SPELL_INVEN_FEET) vp[vn++]="creates magical boots";
-	if (s_ptr->type ==SPELL_INVEN_BELT) vp[vn++]="creates a magical belt";
 
 
 	/* Describe timed effects */
@@ -2973,9 +2972,6 @@ void object_guess_name(object_type *o_ptr)
 	byte guess2=0;
 	byte guess3=0;
 
-	/* Variant? */
-	if (!variant_guess_id) return;
-
 	/* Do not guess identified items */
 	if (object_known_p(o_ptr)) return;
 
@@ -3386,9 +3382,6 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 	u32b xf1 = 0, xf2 = 0, xf3 = 0, xf4 = 0;
 	int i;
 
-	/* Variant? */
-	if (!variant_learn_id) return;
-
 	/* Clear not flags */
 	o_ptr->not_flags1 &= ~(f1);
 	o_ptr->not_flags2 &= ~(f2);
@@ -3715,9 +3708,6 @@ static void equip_may_flags(u32b f1, u32b f2, u32b f3, u32b f4)
  */
 void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 {
-	/* Variant? */
-	if (!variant_learn_id) return;
-
 	/* No change */
 	if (!(f1 & ~(o_ptr->not_flags1)) && !(f2 & ~(o_ptr->not_flags2)) && !(f3 & ~(o_ptr->not_flags3)) && !(f4 & ~(o_ptr->not_flags4))) return;
 	
@@ -3789,9 +3779,6 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
  */
 void object_may_flags(object_type *o_ptr, u32b f1,u32b f2,u32b f3, u32b f4)
 {
-	/* Variant? */
-	if (!variant_learn_id) return;
-
 	/* Clear bits with not flags */
 	f1 &= ~(o_ptr->not_flags1);
 	f2 &= ~(o_ptr->not_flags2);
@@ -3870,9 +3857,6 @@ void object_usage(int slot)
 	object_type *o_ptr;
 
 	char o_name[80];
-
-	/* Variant? */
-	if (!variant_usage_id) return;
 
 	if (slot >=0) o_ptr =&inventory[slot];
 	else o_ptr=&o_list[0-slot];
@@ -3980,9 +3964,6 @@ void update_slot_flags(int slot, u32b f1, u32b f2, u32b f3, u32b f4)
 
 	object_type *i_ptr;
 
-	/* Variant? */
-	if (!variant_learn_id) return;
-
 	/* Get the item */
 	if (slot >=0) i_ptr = &inventory[slot];
 	else i_ptr= &o_list[0-slot];
@@ -4030,9 +4011,6 @@ void equip_can_flags(u32b f1,u32b f2,u32b f3, u32b f4)
 	int i;
 
 	object_type *i_ptr;
-
-	/* Variant? */
-	if (!variant_learn_id) return;
 
 	/* Hack --- exclude player flags */
 	player_flags(&nf1,&nf2,&nf3,&nf4);
@@ -4115,9 +4093,6 @@ void equip_not_flags(u32b f1,u32b f2,u32b f3, u32b f4)
 	int i;
 
 	object_type *i_ptr;
-
-	/* Variant? */
-	if (!variant_learn_id) return;
 
 	/* Mark equipment with not flags*/
 	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)

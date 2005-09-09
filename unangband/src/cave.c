@@ -986,8 +986,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		else if (p_ptr->outside)
 		{
 			/* Get the feature */
-			if (variant_save_feats) feat = f_info[feat].unseen;
-			else feat = f_info[feat].mimic;
+			feat = f_info[feat].unseen;
 
 			/* Get the feature*/
 			f_ptr = &f_info[feat];
@@ -1080,8 +1079,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		else if (p_ptr->outside)
 		{
 			/* Get the feature */
-			if (variant_save_feats) feat = f_info[feat].unseen;
-			else feat = f_info[feat].mimic;
+			feat = f_info[feat].unseen;
 
 			/* Get the feature*/
 			f_ptr = &f_info[feat];
@@ -3894,9 +3892,6 @@ void update_dyna(void)
 	bool full = FALSE;
 
 	int alter;
-
-	/* Must be able to modify features */
-	if (!variant_hurt_feats) return;
 
 	/* Efficiency */
 	if (dyna_full)

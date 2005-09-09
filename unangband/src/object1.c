@@ -1679,15 +1679,11 @@ s16b label_to_equip(int c)
 {
 	int i;
 
-	int inven_max = INVEN_TOTAL;
-
-	if (variant_belt_slot) inven_max++;
-
 	/* Convert */
 	i = (islower(c) ? A2I(c) : -1) + INVEN_WIELD;
 
 	/* Verify the index */
-	if ((i < INVEN_WIELD) || (i >= inven_max)) return (-1);
+	if ((i < INVEN_WIELD) || (i >= INVEN_TOTAL)) return (-1);
 
 	/* Empty slots can never be chosen */
 	if (!inventory[i].k_idx) return (-1);
@@ -1833,10 +1829,6 @@ s16b wield_slot(const object_type *o_ptr)
 
 		default:
 		{
-			/* Wield in primary hand */
-			if ((variant_fast_equip) &&
-			 (!(inventory[INVEN_ARM].k_idx) ||
-				(inventory[INVEN_ARM].tval == TV_SHIELD))) return (INVEN_WIELD);
 			break;
 		}
 
@@ -1869,7 +1861,6 @@ cptr mention_use(int i)
 		case INVEN_HEAD:  p = "On head"; break;
 		case INVEN_HANDS: p = "On hands"; break;
 		case INVEN_FEET:  p = "On feet"; break;
-		case INVEN_BELT:  p = "On belt"; break;
 		default:	  p = "In pack"; break;
 	}
 
@@ -1953,7 +1944,6 @@ cptr describe_use(int i)
 		case INVEN_HEAD:  p = "wearing on your head"; break;
 		case INVEN_HANDS: p = "wearing on your hands"; break;
 		case INVEN_FEET:  p = "wearing on your feet"; break;
-		case INVEN_BELT:  p = "carrying on your belt"; break;
 		default:	  p = "carrying in your pack"; break;
 	}
 
@@ -2243,12 +2233,8 @@ void display_equip(void)
 
 	char o_name[80];
 
-	int inven_max = INVEN_TOTAL;
-
-	if (variant_belt_slot) inven_max++;
-
 	/* Display the equipment */
-	for (i = INVEN_WIELD; i < inven_max; i++)
+	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
 	{
 		/* Examine the item */
 		o_ptr = &inventory[i];
@@ -2302,7 +2288,7 @@ void display_equip(void)
 	}
 
 	/* Erase the rest of the window */
-	for (i = inven_max - INVEN_WIELD; i < Term->hgt; i++)
+	for (i = INVEN_TOTAL - INVEN_WIELD; i < Term->hgt; i++)
 	{
 		/* Clear that line */
 		Term_erase(0, i, 255);
@@ -2445,12 +2431,6 @@ void show_equip(void)
 	byte out_color[24];
 	char out_desc[24][80];
 
-
-	int inven_max = INVEN_TOTAL;
-
-	if (variant_belt_slot) inven_max++;
-
-
 	/* Default length */
 	len = 79 - 50;
 
@@ -2464,7 +2444,7 @@ void show_equip(void)
 	if (show_weights) lim -= 9;
 
 	/* Scan the equipment list */
-	for (k = 0, i = INVEN_WIELD; i < inven_max; i++)
+	for (k = 0, i = INVEN_WIELD; i < INVEN_TOTAL; i++)
 	{
 		o_ptr = &inventory[i];
 
@@ -2827,12 +2807,8 @@ static int get_tag(int *cp, char tag)
 	int i;
 	cptr s;
 
-	int inven_max = INVEN_TOTAL;
-
-	if (variant_belt_slot) inven_max++;
-
 	/* Check every object */
-	for (i = 0; i < inven_max; ++i)
+	for (i = 0; i < INVEN_TOTAL; ++i)
 	{
 		object_type *o_ptr = &inventory[i];
 
@@ -3024,17 +3000,8 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 	e1 = INVEN_WIELD;
 	e2 = INVEN_TOTAL - 1;
 
-	/* Allow equipment */
-	if ((variant_belt_slot) && (use_inven)) use_equip = TRUE;
-
-	/* Allow equipment */
-	if ((variant_fast_equip) && (use_inven)) use_equip = TRUE;
-
 	/* Forbid equipment */
 	if (!use_equip) e2 = -1;
-
-	/* Hack -- belt slot */
-	if (variant_belt_slot && use_equip) e2 = INVEN_TOTAL;
 
 	/* Restrict equipment indexes */
 	while ((e1 <= e2) && (!get_item_okay(e1))) e1++;

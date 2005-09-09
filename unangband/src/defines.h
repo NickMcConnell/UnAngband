@@ -472,7 +472,6 @@
 #define INVEN_HEAD      33
 #define INVEN_HANDS     34
 #define INVEN_FEET      35
-#define INVEN_BELT	36
 
 /*
  * Total number of inventory slots (hard-coded).
@@ -1362,7 +1361,6 @@
 #define SPELL_INVEN_HEAD      33
 #define SPELL_INVEN_HANDS     34
 #define SPELL_INVEN_FEET      35
-#define SPELL_INVEN_BELT      36
 
 
 
@@ -3401,10 +3399,10 @@
 #define OPT_reseed_artifacts		80
 #define OPT_easy_autos    81
 #define OPT_easy_search			82
-#define OPT_variant_save_feats   83
+/* xxx xxx */
 #define OPT_view_glowing_lite 84
 #define OPT_view_surface_lite 85
-#define OPT_variant_study_more   86
+/* xxx xxx */
 #define OPT_show_sidebar	87
 #define OPT_show_itemlist	88
 /* xxx xxx */
@@ -3446,38 +3444,6 @@
 #define OPT_score_live     (OPT_SCORE+5)
 #define OPT_score_lore     (OPT_SCORE+6)
 #define OPT_score_auto     (OPT_SCORE+7)
-
-#define OPT_variant_mushrooms		(OPT_VARIANT+1)
-#define OPT_variant_hit_traps    (OPT_VARIANT+2)
-#define OPT_variant_room_info		(OPT_VARIANT+3)
-#define OPT_variant_free_stats		(OPT_VARIANT+4)
-#define OPT_variant_fast_kills		(OPT_VARIANT+5)
-#define OPT_variant_scale_dam		(OPT_VARIANT+6)
-#define OPT_variant_scale_hp		(OPT_VARIANT+7)
-#define OPT_variant_pval_stacks		(OPT_VARIANT+8)
-#define OPT_variant_oos_summons		(OPT_VARIANT+9)
-#define OPT_variant_oos_escapes		(OPT_VARIANT+10)
-#define OPT_variant_oos_heals		(OPT_VARIANT+11)
-#define OPT_variant_oos_xtra		(OPT_VARIANT+12)
-#define OPT_variant_hurt_feats	(OPT_VARIANT+13)
-#define OPT_variant_lake_feats	(OPT_VARIANT+14)
-#define OPT_variant_big_feats	(OPT_VARIANT+15)
-#define OPT_variant_new_feats	(OPT_VARIANT+16)
-#define OPT_variant_learn_id		(OPT_VARIANT+17)
-#define OPT_variant_guess_id		(OPT_VARIANT+18)
-#define OPT_variant_usage_id		(OPT_VARIANT+19)
-#define OPT_variant_great_id		(OPT_VARIANT+20)
-#define OPT_variant_dis_attacks  (OPT_VARIANT+21)
-#define OPT_variant_time_stacks	(OPT_VARIANT+22)
-#define OPT_variant_many_rings  (OPT_VARIANT+23)
-#define OPT_variant_fast_floor  (OPT_VARIANT+24)
-#define OPT_variant_fast_equip  (OPT_VARIANT+25)
-#define OPT_variant_belt_slot   (OPT_VARIANT+26)
-#define OPT_variant_fast_moves  (OPT_VARIANT+27)
-#define OPT_variant_unsummon    (OPT_VARIANT+28)
-#define OPT_variant_friendly    (OPT_VARIANT+29)
-#define OPT_variant_more_spells (OPT_VARIANT+30)
-#define OPT_variant_drop_body (OPT_VARIANT+31)
 
 /*
  * Hack -- Option symbols
@@ -3609,39 +3575,6 @@
 #define score_auto  op_ptr->opt[OPT_score_auto]
 
 /* XXX XXX */
-#define variant_mushrooms  op_ptr->opt[OPT_variant_mushrooms]
-#define variant_hit_traps  op_ptr->opt[OPT_variant_hit_traps]
-#define variant_room_info  op_ptr->opt[OPT_variant_room_info]
-#define variant_free_stats op_ptr->opt[OPT_variant_free_stats]
-#define variant_fast_kills op_ptr->opt[OPT_variant_fast_kills]
-#define variant_scale_dam  op_ptr->opt[OPT_variant_scale_dam]
-#define variant_scale_hp   op_ptr->opt[OPT_variant_scale_hp]
-#define variant_pval_stacks       op_ptr->opt[OPT_variant_pval_stacks]
-#define variant_oos_summons       op_ptr->opt[OPT_variant_oos_summons]
-#define variant_oos_escapes       op_ptr->opt[OPT_variant_oos_escapes]
-#define variant_oos_heals  op_ptr->opt[OPT_variant_oos_heals]
-#define variant_oos_xtra   op_ptr->opt[OPT_variant_oos_xtra]
-#define variant_hurt_feats op_ptr->opt[OPT_variant_hurt_feats]
-#define variant_lake_feats op_ptr->opt[OPT_variant_lake_feats]
-#define variant_big_feats  op_ptr->opt[OPT_variant_big_feats]
-#define variant_new_feats  op_ptr->opt[OPT_variant_new_feats]
-#define variant_guess_id   op_ptr->opt[OPT_variant_guess_id]
-#define variant_learn_id   op_ptr->opt[OPT_variant_learn_id]
-#define variant_great_id   op_ptr->opt[OPT_variant_great_id]
-#define variant_usage_id   op_ptr->opt[OPT_variant_usage_id]
-#define variant_dis_attacks   op_ptr->opt[OPT_variant_dis_attacks]
-#define variant_time_stacks       op_ptr->opt[OPT_variant_time_stacks]
-#define variant_many_rings			op_ptr->opt[OPT_variant_many_rings]
-#define variant_fast_floor op_ptr->opt[OPT_variant_fast_floor]
-#define variant_fast_equip op_ptr->opt[OPT_variant_fast_equip]
-#define variant_belt_slot  op_ptr->opt[OPT_variant_belt_slot]
-#define variant_fast_moves op_ptr->opt[OPT_variant_fast_moves]
-#define variant_unsummon op_ptr->opt[OPT_variant_unsummon]
-#define variant_friendly op_ptr->opt[OPT_variant_friendly]
-#define variant_more_spells op_ptr->opt[OPT_variant_more_spells]
-#define variant_drop_body op_ptr->opt[OPT_variant_drop_body]
-#define variant_save_feats op_ptr->opt[OPT_variant_save_feats]
-#define variant_study_more op_ptr->opt[OPT_variant_study_more]
 #define show_sidebar op_ptr->opt[OPT_show_sidebar]
 #define show_itemlist op_ptr->opt[OPT_show_itemlist]
 

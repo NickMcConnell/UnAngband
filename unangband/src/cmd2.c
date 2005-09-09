@@ -1957,12 +1957,8 @@ void do_cmd_set_trap_or_spike(void)
 	/* Verify legality */
 	if (!do_cmd_test(y, x, action)) return;
 
-
-	/* Take a (partial) turn */
-	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-	else p_ptr->energy_use = 100;
-
+	/* Take a turn */
+	p_ptr->energy_use = 100;
 
 	/* Apply stuck / confusion */
 	if (dir && confuse_dir(&dir))
@@ -2220,8 +2216,7 @@ static void do_cmd_walk_or_jump(int jumping)
 	if (!do_cmd_walk_test(y, x)) return;
 
 	/* Take time */
-	if ((variant_fast_moves) && !(p_ptr->searching)) p_ptr->energy_use = 50;
-	else p_ptr->energy_use = 100;
+	p_ptr->energy_use = 100;
 
 	/* Hack -- handle stuck players */
 	if (stuck_player(&dir))
@@ -2369,8 +2364,7 @@ static void do_cmd_hold_or_stay(int pickup)
 	}
 
 	/* Take time */
-	if ((variant_fast_moves) && !(p_ptr->searching)) p_ptr->energy_use = 50;
-	else p_ptr->energy_use = 100;
+	p_ptr->energy_use = 100;
 
 	/* Catch breath */
 	if (!(f_ptr->flags2 & (FF2_FILLED)))
@@ -2768,10 +2762,8 @@ void do_cmd_fire(void)
 	tdis = 10 + 5 * tmul;
 
 
-	/* Take a (partial) turn */
-	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = (50 / thits);
-	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = (50 / thits);
-	else p_ptr->energy_use = (100 / thits);
+	/* Take a turn */
+	p_ptr->energy_use = (100 / thits);
 
 	/* Start at the player */
 	y = py;
@@ -3124,10 +3116,8 @@ void do_cmd_throw(void)
 	/* Chance of hitting */
 	chance = (p_ptr->skill_tht + (p_ptr->to_h * BTH_PLUS_ADJ));
 
-	/* Take a (partial) turn */
-	if ((variant_fast_floor) && (item < 0)) p_ptr->energy_use = 50;
-	else if ((variant_fast_equip) && (item >= INVEN_WIELD)) p_ptr->energy_use = 50;
-	else p_ptr->energy_use = 100;
+	/* Take a turn */
+	p_ptr->energy_use = 100;
 
 	/* Start at the player */
 	y = py;

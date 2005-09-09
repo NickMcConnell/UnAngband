@@ -1474,11 +1474,10 @@ void hit_trap(int y, int x)
 					}
 
 					/* XXX Hack -- unstack if necessary */
-					if ((o_ptr->number > 1) &&
-					((!variant_pval_stacks) || 
+					if ((o_ptr->number > 1) &&					 
 					((!object_known_p(o_ptr) && (o_ptr->pval == 2) && (o_ptr->stackc > 1)) ||
 					  (!object_known_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
-					  (o_ptr->stackc != 1) && (o_ptr->pval > 2)))))
+					  (o_ptr->stackc != 1) && (o_ptr->pval > 2))))
 					{
 						object_type *i_ptr;
 						object_type object_type_body;
@@ -2003,7 +2002,7 @@ void py_attack(int y, int x)
 			 */
 
 			/* Hack -- Monster armor reduces total damage */
-			if (variant_scale_dam) k -= (k * ((r_ptr->ac < 150) ? r_ptr->ac : 150) / 250);
+			k -= (k * ((r_ptr->ac < 150) ? r_ptr->ac : 150) / 250);
 
 			/* No negative damage */
 			if (k < 0) k = 0;
