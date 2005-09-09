@@ -1595,6 +1595,7 @@
 #define TV_PRAYER_BOOK  91
 #define TV_SONG_BOOK    92
 #define TV_RUNESTONE    93
+#define TV_SERVICE	99	/* Services have special meanings in stores */
 #define TV_GOLD  100     /* Gold can only be picked up by players */
 
 /* The "sval" codes for TV_SKELETON */

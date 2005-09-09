@@ -5495,6 +5495,224 @@ Y:13:4
 N:749:Feedback
 G:?:w
 I:70:73:0
-W:20:0:5:500
+W:20:0:5:250
 A:20/1
 Y:21:2
+
+# Store Services
+
+N:750:Satisfy Hunger
+G:?:v
+I:99:1:0
+W:0:0:0:10
+
+N:751:Gauge Magic
+G:?:v
+I:99:2:0
+W:0:0:0:40
+
+N:752:Identify
+G:?:v
+I:99:3:0
+W:0:0:0:60
+
+N:753:Recharge Item I
+G:?:v
+I:99:4:0
+W:0:0:0:150
+
+N:754:Word of Recall
+G:?:v
+I:99:5:0
+W:0:0:0:75
+
+N:755:Detect Magic
+G:?:v
+I:99:6:0
+W:0:0:0:120
+
+N:756:Recharge Item II
+G:?:v
+I:99:7:0
+W:0:0:0:500
+
+N:757:Remove Curse
+G:?:v
+I:99:8:0
+W:0:0:0:120
+
+N:758:Perception
+G:?:v
+I:99:9:0
+W:0:0:0:180
+
+N:759:Restoration
+G:?:v
+I:99:10:0
+W:0:0:0:1500
+
+N:760:Remembrance
+G:?:v
+I:99:11:0
+W:0:0:0:2500
+
+N:761:Recharging
+G:?:v
+I:99:12:0
+W:0:0:0:120
+
+N:762:Dispel Curse
+G:?:v
+I:99:13:0
+W:0:0:0:2500
+
+N:763:Enchant Weapon
+G:?:v
+I:99:14:0
+W:0:0:0:500
+
+N:764:Enchant Armor
+G:?:v
+I:99:15:0
+W:0:0:0:150
+
+N:765:Enchant Weapon Brand
+G:?:v
+I:99:16:0
+W:0:0:0:1000
+
+N:766:Word of Recall
+G:?:v
+I:99:17:0
+W:0:0:0:75
+
+N:767:Detect Curse
+G:?:v
+I:99:18:0
+W:0:0:0:100
+
+N:768:Enchant Food
+G:?:v
+I:99:19:0
+W:0:0:0:500
+
+N:769:Bless Weapon
+G:?:v
+I:99:20:0
+W:0:0:0:250
+
+N:770:Enchant Armour To-Resist
+G:?:v
+I:99:21:0
+W:0:0:0:5000
+
+N:771:Analyze Magic
+G:?:v
+I:99:22:0
+W:0:0:0:40
+
+N:772:Strength Serum
+G:?:v
+I:99:23:0
+W:0:0:0:500
+
+N:773:Enchant Potion
+G:?:v
+I:99:24:0
+W:0:0:0:500
+
+N:774:Create Gold
+G:?:v
+I:99:25:0
+W:0:0:0:500
+
+N:775:Charisma
+G:?:v
+I:99:26:0
+W:0:0:0:500
+
+N:776:Read Magic
+G:?:v
+I:99:27:0
+W:0:0:0:40
+
+N:777:*Identify*
+G:?:v
+I:99:28:0
+W:0:0:0:2500
+
+N:778:Enchant Wand
+G:?:v
+I:99:29:0
+W:0:0:0:2500
+
+N:779:Enchant Staff
+G:?:v
+I:99:30:0
+W:0:0:0:2500
+
+N:780:Enchant Rod
+G:?:v
+I:99:31:0
+W:0:0:0:2500
+
+N:781:Poison Weapon
+G:?:v
+I:99:32:0
+W:0:0:0:500
+
+N:782:Poison Arrows
+G:?:v
+I:99:33:0
+W:0:0:0:750
+
+N:783:Continual Light
+G:?:v
+I:99:34:0
+W:0:0:0:600
+
+N:784:Acid Proofing
+G:?:v
+I:99:35:0
+W:0:0:0:400
+
+N:785:Fire Proofing
+G:?:v
+I:99:36:0
+W:0:0:0:300
+
+N:786:Water Proofing
+G:?:v
+I:99:37:0
+W:0:0:0:400
+
+N:787:Theft Proofing
+G:?:v
+I:99:38:0
+W:0:0:0:500
+
+N:788:Enchant Weapon
+G:?:v
+I:99:39:0
+W:0:0:0:250
+
+N:789:Enchant Armour
+G:?:v
+I:99:40:0
+W:0:0:0:150
+
+N:790:Enchant Weapon Brand
+G:?:v
+I:99:41:0
+W:0:0:0:1000
+
+N:791:Vampire's Kiss
+G:?:v
+I:99:42:0
+W:0:0:0:5000
+
+N:792:Feedback
+G:?:v
+I:99:43:0
+W:0:0:0:200
+

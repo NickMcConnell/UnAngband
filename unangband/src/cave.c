@@ -4006,19 +4006,50 @@ void update_dyna(void)
 			}
 		}
 
-		/* Timed */
-		if (f_ptr->flags3 & (FF3_TIMED))
-		{
-			if (rand_int(50) == 0)
-			{
-				alter = FS_TIMED;
-			}
-		}
-
 		/* Instant */
 		if (f_ptr->flags3 & (FF3_INSTANT))
 		{
 			alter = FS_INSTANT;
+		}
+
+		/* Adjacent */
+		if (f_ptr->flags3 & (FF3_ADJACENT))
+		{
+			int yy, xx, adjfeat, dir;
+
+			for (dir = 0; dir < 8; dir ++)
+			{
+				/* Hack -- skip diagonals 50% of the time */
+				if ((dir > 3) && (rand_int(100) < 50)) continue;
+
+				yy = y + ddy_ddd[dir];
+				xx = x + ddx_ddd[dir];
+
+				adjfeat = cave_feat[yy][xx];
+
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_HIDE;
+
+				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
+   
+				/* Apply the blow */
+				project(0, 0, yy, xx, dam, f_ptr->blow.effect, flg);
+
+				/* Hack -- Remove adjacent grids from further processing */
+				if (adjfeat != cave_feat[yy][xx]) 
+				{
+					int j;
+
+					for (j = i + 1; j < temp_dyna_n; j++)
+					if (temp_dyna_g[j] == GRID(yy,xx))
+					{
+						temp_dyna_n--;
+
+						temp_dyna_g[j] = temp_dyna_g[temp_dyna_n];
+					}
+				}
+			}
+
+			alter = FS_ADJACENT;
 		}
 
 		/* Spread */
@@ -4064,47 +4095,16 @@ void update_dyna(void)
 			}
 		}
 
-		/* Adjacent */
-		if (f_ptr->flags3 & (FF3_ADJACENT))
+		/* Timed */
+		if (f_ptr->flags3 & (FF3_TIMED))
 		{
-			int yy, xx, adjfeat, dir;
-
-			for (dir = 0; dir < 8; dir ++)
+			if (rand_int(50) == 0)
 			{
-				/* Hack -- skip diagonals 50% of the time */
-				if ((dir > 3) && (rand_int(100) < 50)) continue;
-
-				yy = y + ddy_ddd[dir];
-				xx = x + ddx_ddd[dir];
-
-				adjfeat = cave_feat[yy][xx];
-
-				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_HIDE;
-
-				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
-   
-				/* Apply the blow */
-				project(0, 0, yy, xx, dam, f_ptr->blow.effect, flg);
-
-				/* Hack -- require one adjacent grid affected. Also remove adjacent grids
-				   from further processing */
-				if (adjfeat != cave_feat[yy][xx]) 
-				{
-					int j;
-
-					for (j = i + 1; j < temp_dyna_n; j++)
-					if (temp_dyna_g[j] == GRID(yy,xx))
-					{
-						temp_dyna_n--;
-
-						temp_dyna_g[j] = temp_dyna_g[temp_dyna_n];
-					}
-				}
+				alter = FS_TIMED;
 			}
-
-			alter = FS_ADJACENT;
 		}
 
+		/* Alter terrain */
 		if (alter > 0)
 		{
 			cave_alter_feat(y,x,alter);

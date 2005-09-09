@@ -1,5 +1,10 @@
 ### Game Play ###
 
+- Stores now stock various services.
+
+- You can now sell books to various stores to allow you to unlock additional store
+services.
+
 - Vents now act as conduits for water, acid, steam, fire or gas through walls.
 Vents can also be climbed through, but block vision and ranged attacks.
 

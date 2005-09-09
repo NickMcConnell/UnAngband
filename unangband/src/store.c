@@ -596,6 +596,7 @@ static s16b label_to_store(int c)
  */
 static bool store_object_similar(object_type *o_ptr, object_type *j_ptr)
 {
+
 	/* Hack -- Identical items cannot be stacked */
 	if (o_ptr == j_ptr) return (0);
 
@@ -644,6 +645,13 @@ static void store_object_absorb(object_type *o_ptr, object_type *j_ptr)
 
 	/* Combine quantity, lose excess items */
 	o_ptr->number = (total > 99) ? 99 : total;
+
+	/* Mega-hack - services */
+	if ((o_ptr->tval == TV_SERVICE) && (store_num_fake != STORE_HOME) && (store_num_fake != -1))
+	{
+		o_ptr->number = 1;
+	}
+
 }
 
 
@@ -1010,7 +1018,6 @@ static int store_carry(object_type *o_ptr)
 	/* No space? */
 	if (st_ptr->stock_num >= st_ptr->stock_size) return (-1);
 
-
 	/* Check existing slots to see if we must "slide" */
 	for (slot = 0; slot < st_ptr->stock_num; slot++)
 	{
@@ -1053,6 +1060,69 @@ static int store_carry(object_type *o_ptr)
 	return (slot);
 }
 
+static bool store_services(object_type *i_ptr)
+{
+	int i, ii;
+	object_type *j_ptr;
+	object_type object_type_body;
+	bool service = FALSE;
+
+	/* No services in black market */
+	if (store_num == STORE_B_MARKET) return (FALSE);
+
+	/* No services in quest locations */
+	if (store_num_fake == -1) return (FALSE);
+
+	/* No services in home */
+	if (store_num_fake == STORE_HOME) return (FALSE);
+
+	/* Must be a book */
+	if ((i_ptr->tval != TV_PRAYER_BOOK) && (i_ptr->tval != TV_MAGIC_BOOK) && (i_ptr->tval != TV_SONG_BOOK)) return (FALSE);
+
+	/* Check for services */
+	for (i = 0; i < z_info->s_max; i++)
+	{
+		bool in_item = FALSE;
+		int service_sval = 0;
+
+		for (ii = 0; ii < MAX_SPELL_APPEARS; ii++)
+		{
+			spell_appears *s_object = &s_info[i].appears[ii];
+
+			if ((s_object->tval == i_ptr->tval) && (s_object->sval == i_ptr->sval)) in_item = TRUE;
+
+			if (s_object->tval == TV_SERVICE)
+			{
+				service_sval = s_object->sval;
+			}
+		}
+
+		/* Create service object */
+		if ((in_item == TRUE) && (service_sval > 0))
+		{
+			int k_idx = lookup_kind(TV_SERVICE,service_sval);
+
+			/* Get local object */
+			j_ptr = &object_type_body;
+
+			/* Create a new object of the chosen kind */
+			object_prep(j_ptr, k_idx);
+
+			/* Item belongs to a store */
+			j_ptr->ident |= IDENT_STORE;
+
+			/* The object is "known" */
+			object_known(j_ptr);
+
+			/* Carry the object in the store */
+			if (store_carry(j_ptr) >= 0) service = TRUE;
+
+		}
+	}
+
+	return (service);
+}
+
 
 /*
  * Increase, by a given amount, the number of a certain item
@@ -1065,6 +1135,13 @@ static void store_item_increase(int item, int num)
 
 	/* Get the object */
 	o_ptr = &st_ptr->stock[item];
+
+	/* Mega-hack - services */
+	if ((o_ptr->tval == TV_SERVICE) && (store_num_fake != STORE_HOME) && (store_num_fake != -1))
+	{
+		o_ptr->number = 1;
+		return;
+	}
 
 	/* Verify the number */
 	cnt = o_ptr->number + num;
@@ -1339,6 +1416,9 @@ static void store_create(void)
 
 		/* Attempt to carry the (known) object */
 		(void)store_carry(i_ptr);
+
+		/* Check for services */
+		(void)store_services(i_ptr);
 
 		/* Definitely done */
 		break;
@@ -2505,8 +2585,52 @@ static void store_purchase(void)
 			o_ptr->ident |= (IDENT_FIXED);
 		}
 
-		/* Player wants it */
-		if (choice == 0)
+		/* Player wants a service */
+		if ((choice == 0) && (i_ptr->tval == TV_SERVICE))
+		{
+			/* Player can afford it */
+			if (p_ptr->au >= price)
+			{
+				int power;
+
+				bool cancel;
+
+				/* Get service effect */
+				get_spell(&power, "use", o_ptr, FALSE);
+
+				/* Paranoia */
+				if (power < 0) return;
+
+				/* Apply service effect */
+				(void)process_spell(power, 0, &cancel);
+
+				/* Hack -- allow certain services to be cancelled */
+				if (cancel) return;
+
+				/* Say "okay" */
+				say_comment_1();
+
+				/* Be happy */
+				decrease_insults();
+
+				/* Spend the money */
+				p_ptr->au -= price;
+
+				/* Update the display */
+				store_prt_gold();
+
+			}
+
+			/* Player cannot afford it */
+			else
+			{
+				/* Simple message (no insult) */
+				msg_print("You do not have enough gold.");
+			}		
+		}
+
+		/* Player wants anything else */
+		else if (choice == 0)
 		{
 			/* Player can afford it */
 			if (p_ptr->au >= price)
@@ -2880,6 +3004,9 @@ static void store_sell(void)
 
 			/* The store gets that (known) object */
 			item_pos = store_carry(i_ptr);
+
+			/* (Maybe) Add store services */
+			if (store_services(i_ptr)) item_pos = 0;
 
 			/* Update the display */
 			if (item_pos >= 0)
@@ -3818,6 +3945,35 @@ void store_init(int which)
 	for (k = 0; k < st_ptr->stock_size; k++)
 	{
 		object_wipe(&st_ptr->stock[k]);
+	}
+
+	/* Stock services */
+	for (k = 0;k < STORE_CHOICES;k++)
+	{
+		int k_idx;
+		object_type *i_ptr;
+		object_type object_type_body;
+
+		if (su_ptr->tval[k] == TV_SERVICE)
+		{
+			k_idx = lookup_kind(su_ptr->tval[k],su_ptr->sval[k]);
+
+			/* Get local object */
+			i_ptr = &object_type_body;
+
+			/* Create a new object of the chosen kind */
+			object_prep(i_ptr, k_idx);
+
+			/* Item belongs to a store */
+			i_ptr->ident |= IDENT_STORE;
+
+			/* The object is "known" */
+			object_known(i_ptr);
+
+			/* Carry the object in the store */
+			(void) store_carry(i_ptr);
+
+		}
 	}
 
 	if ((store_num_fake == -1) && (store_num_real > 0))
