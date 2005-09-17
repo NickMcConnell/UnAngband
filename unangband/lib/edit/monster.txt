@@ -13,7 +13,7 @@
 # N: serial number : monster name
 # G: symbol : color
 # I: speed : hit points : vision : armor class : alertness
-# W: depth : rarity : unused (always 0) : experience for kill
+# W: depth : rarity : race index : experience for kill
 # B: attack method : attack effect : damage
 # S: spell frequency |
 # S: spell type | spell type | etc
@@ -484,10 +484,10 @@ F:WEIRD_MIND | BASH_DOOR
 F:INSECT | ATTR_METAL
 D:It is about four feet long and carnivorous.
 
-N:35:Novice warrior
+N:35:Apprentice warrior
 G:t:u
 I:110:9d4:20:16:5
-W:2:1:0:6
+W:2:1:1:6
 B:HIT:HURT:1d7
 B:HIT:HURT:1d7
 F:MALE
@@ -496,10 +496,10 @@ F:OPEN_DOOR | BASH_DOOR
 F:WARRIOR | HAS_LITE | NEED_LITE
 D:He looks inexperienced but tough.
 
-N:36:Novice rogue
+N:36:Apprentice rogue
 G:t:b
 I:110:8d4:20:12:5
-W:2:1:0:6
+W:2:1:1:6
 B:HIT:HURT:1d6
 B:TOUCH:EAT_GOLD
 F:MALE
@@ -509,10 +509,10 @@ F:EVIL |
 F:SNEAKY
 D:A rather shifty individual.
 
-N:37:Novice priest
+N:37:Apprentice priest
 G:p:b
 I:110:7d4:20:10:10
-W:2:1:0:6
+W:2:1:1:6
 B:HIT:HURT:1d5
 F:MALE
 F:FORCE_SLEEP
@@ -523,10 +523,10 @@ S:1_IN_12
 S:HEAL | SCARE | WOUND
 D:He is tripping over his priestly robes.
 
-N:38:Novice mage
+N:38:Apprentice mage
 G:q:r
 I:110:6d4:20:6:5
-W:2:1:0:6
+W:2:1:1:6
 B:HIT:HURT:1d4
 F:MALE
 F:FORCE_SLEEP
@@ -895,10 +895,10 @@ B:BITE:HURT:1d5
 F:ANIMAL
 D:It is an armoured lizard with a powerful bite.
 
-N:69:Novice ranger
+N:69:Apprentice ranger
 G:q:W
 I:110:6d8:20:8:5
-W:4:1:0:18
+W:4:1:1:18
 B:HIT:HURT:1d5
 B:HIT:HURT:1d5
 B:SHOOT:ARROW:1d6
@@ -911,10 +911,10 @@ S:1_IN_9
 S:SHOOT | MISSILE
 D:An agile hunter, ready and relaxed.
 
-N:70:Novice paladin
+N:70:Apprentice paladin
 G:p:w
 I:110:6d8:20:16:5
-W:4:1:0:18
+W:4:1:1:18
 B:HIT:HURT:1d7
 B:HIT:HURT:1d7
 F:MALE | FORCE_SLEEP | DROP_60
@@ -996,7 +996,7 @@ D: vigour.  He can prove a troublesome opponent.
 N:77:Novice mage
 G:q:r
 I:110:6d4:20:6:10
-W:6:2:0:6
+W:6:2:2:6
 B:HIT:HURT:1d4
 F:MALE
 F:FORCE_SLEEP
@@ -1144,7 +1144,7 @@ D:Yum!  It looks quite tasty.
 N:89:Novice priest
 G:p:b
 I:110:7d4:20:10:5
-W:6:2:0:6
+W:6:2:2:6
 B:HIT:HURT:1d5
 F:MALE
 F:FORCE_SLEEP
@@ -1158,7 +1158,7 @@ D:He is tripping over his priestly robes.
 N:90:Novice warrior
 G:t:u
 I:110:9d4:20:16:5
-W:6:2:0:6
+W:6:2:2:6
 B:HIT:HURT:1d7
 B:HIT:HURT:1d7
 F:MALE
@@ -1170,7 +1170,7 @@ D:He looks inexperienced but tough.
 N:91:Novice rogue
 G:t:b
 I:110:8d4:20:12:5
-W:6:2:0:6
+W:6:2:2:6
 B:HIT:HURT:1d6
 B:TOUCH:EAT_GOLD
 F:MALE
@@ -1463,7 +1463,7 @@ D:It is a strange small humanoid.
 N:114:Novice ranger
 G:q:W
 I:110:6d8:20:8:5
-W:8:2:0:18
+W:8:2:2:18
 B:HIT:HURT:1d5
 B:HIT:HURT:1d5
 B:SHOOT:ARROW:1d6
@@ -1516,7 +1516,7 @@ D:It is an animated orc skeleton.
 N:118:Novice paladin
 G:p:w
 I:110:6d8:20:16:5
-W:8:2:0:18
+W:8:2:2:18
 B:HIT:HURT:1d7
 B:HIT:HURT:1d7
 F:MALE
@@ -14753,10 +14753,10 @@ S:1_IN_12 |
 S:HEAL | SCARE
 D:He is bumbling and ineffectual at the best of times.
 
-N:1019:Novice shaman
+N:1019:Apprentice shaman
 G:p:W
 I:110:6d4:20:6:5
-W:3:1:0:8
+W:3:1:1:8
 B:HIT:HURT:1d4
 F:MALE | 
 F:FORCE_SLEEP | 
@@ -14769,7 +14769,7 @@ D:He waves a magical talisman at you.
 N:1020:Novice shaman
 G:p:W
 I:110:6d4:20:6:10
-W:6:2:0:8
+W:6:2:2:8
 B:HIT:HURT:1d4
 F:MALE | 
 F:FORCE_SLEEP | 

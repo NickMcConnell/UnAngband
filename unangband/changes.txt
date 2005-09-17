@@ -66,6 +66,8 @@ resistances on high level items, and act as a limited attack weapon.
 - No longer have partial moves or tiredness from normal movement, as this created
 unnessary bookkeeping.
 
+- Renamed individually appearing novice monsters to apprentice monsters.
+
 ### User Interface ###
 
 - Monster recall now reports what particular types of items are dropped by each
