@@ -4860,8 +4860,8 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			if (fuzzy) msg_print("You are hit by poison!");
 			if ((p_ptr->cur_flags2 & (TR2_RES_POIS)) != 0)
 			{
-				/* Sometimes notice */
-				if (rand_int(100)<dam) equip_can_flags(0x0L,TR2_RES_POIS,0x0L,0x0L);
+				/* Always notice */
+				equip_can_flags(0x0L,TR2_RES_POIS,0x0L,0x0L);
 
 				dam = (dam + 2) / 3;
 			}
@@ -4890,7 +4890,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Critical disease - multiple effects either quickly, powerfully or heavily */
-			if (dam > 15)
+			if (dam > 45)
 			{
 				while (dam > 0)
 				{
@@ -4924,7 +4924,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				if (dam < 0) dam = 0;
 			}
 			/* Serious disease - multiple mutating disease effects for long time */
-			else if (dam > 10)
+			else if (dam > 25)
 			{
 				if (!p_ptr->disease)
 				{
@@ -4934,19 +4934,12 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				else if (!p_ptr->disease & (DISEASE_HEAVY | DISEASE_QUICK | DISEASE_POWER)) p_ptr->disease |= (DISEASE_DISEASE);
 				p_ptr->disease &= ~(DISEASE_LIGHT);
 			}
-			/* Moderate disease - 1 or more disease effects for long time */
-			else if (dam > 5)
+			/* Moderate disease - 1 disease effect for a long time, or multiple for a short time */
+			else if (dam > 10)
 			{
-				if (!p_ptr->disease)
+				if ((!p_ptr->disease) || ((p_ptr->disease & (DISEASE_LIGHT)) != 0))
 				{
 					p_ptr->disease |= (1 << rand_int(DISEASE_TYPES));
-				}
-				else if (p_ptr->disease & (DISEASE_LIGHT))
-				{
-					if (!rand_int(3))
-						p_ptr->disease |= (1 << rand_int(DISEASE_TYPES));
-					else
-						p_ptr->disease &= ~(DISEASE_LIGHT);
 				}
 			}
 			/* Light disease - 1 disease effect for limited time */
@@ -5019,15 +5012,15 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			{
 				int k = (randint((dam > 40) ? 35 : (dam * 3 / 4 + 5)));
 
-				/* Sometimes notice */
-				if (rand_int(100)<dam) equip_not_flags(0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				/* Notice */
+				equip_not_flags(0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
-				(void)set_stun(p_ptr->stun + k);
+				(void)set_stun(p_ptr->stun ? p_ptr->stun + randint(MIN(10,k)) : k);
 			}
 			else
 			{
 				/* Sometimes notice */
-				if (rand_int(100)<dam) equip_can_flags(0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				if (!fuzzy) equip_can_flags(0x0L,TR2_RES_SOUND,0x0L,0x0L);
 			}
 			break;
 		}
@@ -5038,15 +5031,15 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			if (fuzzy) msg_print("You are hit by something strange!");
 			if ((p_ptr->cur_flags2 & (TR2_RES_NETHR)) != 0)
 			{
-				/* Sometimes notice */
-				if (rand_int(100)<dam) equip_can_flags(0x0L,TR2_RES_NETHR,0x0L,0x0L);
+				/* Notice */
+				if (!fuzzy) equip_can_flags(0x0L,TR2_RES_NETHR,0x0L,0x0L);
 
 				dam *= 6; dam /= (randint(6) + 6);
 			}
 			else
 			{
-				/* Sometimes notice */
-				if (rand_int(100)<dam) equip_not_flags(0x0L,TR2_RES_NETHR,0x0L,0x0L);
+				/* Always notice */
+				equip_not_flags(0x0L,TR2_RES_NETHR,0x0L,0x0L);
 
 				if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0) && (rand_int(100) < 75))
 				{
@@ -5086,7 +5079,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
-				(void)set_stun(p_ptr->stun + randint(40));
+				(void)set_stun(p_ptr->stun ? p_ptr->stun + randint(10) : randint(40));
 			}
 			else
 			{
@@ -5098,7 +5091,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 
-				(void)set_confused(p_ptr->confused + randint(5) + 5);
+				(void)set_confused(p_ptr->confused ? p_ptr->confused + 1 : randint(5) + 5);
 			}
 			else
 			{
@@ -5165,7 +5158,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 
-				(void)set_confused(p_ptr->confused + rand_int(20) + 10);
+				(void)set_confused(p_ptr->confused ? p_ptr->confused + 1: rand_int(20) + 10);
 			}
 			else
 			{
@@ -5178,7 +5171,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_CHAOS,0x0L,0x0L);
 
-				(void)set_image(p_ptr->image + randint(10));
+				(void)set_image(p_ptr->image ? p_ptr->image + 1 : randint(10));
 			}
 			else
 			{
@@ -5188,8 +5181,8 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 
 			if (((p_ptr->cur_flags2 & (TR2_RES_NETHR)) == 0) && ((p_ptr->cur_flags2 & (TR2_RES_CHAOS)) == 0))
 			{
-				/* Sometimes notice */
-				if (rand_int(100)<dam) equip_not_flags(0x0L,TR2_RES_NETHR,0x0L,0x0L);
+				/* Notice */
+				if (!fuzzy) equip_not_flags(0x0L,TR2_RES_NETHR,0x0L,0x0L);
 
 				if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0) && (rand_int(100) < 75))
 				{
@@ -5217,8 +5210,8 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 			else if ((p_ptr->cur_flags2 & (TR2_RES_NETHR)) != 0)
 			{
-				/* Sometimes notice */
-				if (rand_int(100)<dam) equip_not_flags(0x0L,TR2_RES_NETHR,0x0L,0x0L);
+				/* Notice */
+				if (!fuzzy) equip_not_flags(0x0L,TR2_RES_NETHR,0x0L,0x0L);
 			}
 
 			take_hit(dam, killer);
@@ -5241,6 +5234,22 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_SHARD,0x0L,0x0L);
 
+				/* Inflict disease */
+				if ((p_ptr->cut) && (randint(150) < dam))
+				{
+					/* Serious affliction */
+					if (dam > 50)
+					{
+						if (p_ptr->disease == (DISEASE_CUT | DISEASE_LIGHT)) p_ptr->disease = 0;
+						p_ptr->disease |= (DISEASE_CUT);
+					}
+					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					{
+						p_ptr->disease |= (DISEASE_CUT | DISEASE_LIGHT);
+					}
+				}
+
+				/* Inflict cuts */
 				(void)set_cut(p_ptr->cut + dam);
 			}
 			take_hit(dam, killer);
@@ -5265,7 +5274,23 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
-				(void)set_stun(p_ptr->stun + k);
+				/* Inflict disease */
+				if ((p_ptr->stun) && (randint(100) < k))
+				{
+					/* Serious affliction */
+					if (k > 20)
+					{
+						if (p_ptr->disease == (DISEASE_STUN | DISEASE_LIGHT)) p_ptr->disease = 0;
+						p_ptr->disease |= (DISEASE_STUN);
+					}
+					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					{
+						p_ptr->disease |= (DISEASE_STUN | DISEASE_LIGHT);
+					}
+				}
+
+				/* Inflict stun */
+				(void)set_stun(p_ptr->stun ? p_ptr->stun + randint(MIN(10, k)) : k);
 			}
 			take_hit(dam, killer);
 			break;
@@ -5284,10 +5309,29 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 			else
 			{
+				int k = randint(20) + 10;
+
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 
-				(void)set_confused(p_ptr->confused + randint(20) + 10);
+				/* Inflict disease */
+				if ((p_ptr->confused) && (randint(300) < dam))
+				{
+					/* Serious affliction */
+					if (k > 20)
+					{
+						if (p_ptr->disease == (DISEASE_CONFUSE | DISEASE_LIGHT)) p_ptr->disease = 0;
+						p_ptr->disease |= (DISEASE_CONFUSE);
+					}
+					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					{
+						p_ptr->disease |= (DISEASE_CONFUSE | DISEASE_LIGHT);
+					}
+				}
+
+				/* Inflict confusion */
+				(void)set_confused(p_ptr->confused ? p_ptr->confused + 1 : k);
+
 			}
 
 			take_hit(dam, killer);
@@ -5304,7 +5348,25 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			/* Increase "image" */
 			if ((p_ptr->cur_flags2 & (TR2_RES_CHAOS)) == 0)
 			{
-				if (set_image(p_ptr->image + 6 + randint(dam / 2)))
+				int k = 6 + randint(dam / 2);
+
+				/* Inflict disease */
+				if ((p_ptr->image) && (randint(100) < k))
+				{
+					/* Serious affliction */
+					if (k > 20)
+					{
+						if (p_ptr->disease == (DISEASE_HALLUC | DISEASE_LIGHT)) p_ptr->disease = 0;
+						p_ptr->disease |= (DISEASE_HALLUC);
+					}
+					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					{
+						p_ptr->disease |= (DISEASE_HALLUC | DISEASE_LIGHT);
+					}
+				}
+
+				/* Inflict hallucination */
+				if (set_image(p_ptr->image ? p_ptr->image+1 : k))
 				{
 					obvious = TRUE;
 				}
@@ -5373,7 +5435,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
-				(void)set_stun(p_ptr->stun + randint(20));
+				(void)set_stun(p_ptr->stun ? p_ptr->stun + randint(10) : randint(20));
 			}
 			else
 			{
@@ -5937,14 +5999,28 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			/* Take damage */
 			take_hit(dam, killer);
 
-			msg_print("Your eyes begin to sting.");
-
 			/* Increase "blind" */
 			if ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) == 0)
 			{
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
 
+				/* Inflict disease */
+				if ((p_ptr->blind) && (randint(400) < dam))
+				{
+					/* Serious affliction */
+					if (dam > 50)
+					{
+						if (p_ptr->disease == (DISEASE_BLIND | DISEASE_LIGHT)) p_ptr->disease = 0;
+						p_ptr->disease |= (DISEASE_BLIND);
+					}
+					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					{
+						p_ptr->disease |= (DISEASE_BLIND | DISEASE_LIGHT);
+					}
+				}
+
+				/* Inflict blindness -- always cumulative */
 				if (set_blind(p_ptr->blind + 10 + randint(dam)))
 				{
 					obvious = TRUE;
@@ -5968,7 +6044,6 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 
 		case GF_TERRIFY:
 		{
-
 			/* Apply resistance */
 			if ((p_ptr->cur_flags2 & (TR2_RES_FEAR)) != 0)
 			{
@@ -5982,7 +6057,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Increase "afraid" */
-			if (!(p_ptr->cur_flags2 & (TR2_RES_FEAR)) != 0)
+			if ((p_ptr->cur_flags2 & (TR2_RES_FEAR)) != 0)
 			{
 				/* Sometimes notice */
 				if (!(p_ptr->hero || p_ptr->shero) &&(rand_int(100)<30)) equip_can_flags(0x0L,TR2_RES_FEAR,0x0L,0x0L);
@@ -6000,6 +6075,22 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_FEAR,0x0L,0x0L);
 
+				/* Inflict disease */
+				if ((p_ptr->afraid) && (randint(400) < dam))
+				{
+					/* Serious affliction */
+					if (dam > 50)
+					{
+						if (p_ptr->disease == (DISEASE_FEAR | DISEASE_LIGHT)) p_ptr->disease = 0;
+						p_ptr->disease |= (DISEASE_FEAR);
+					}
+					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					{
+						p_ptr->disease |= (DISEASE_FEAR | DISEASE_LIGHT);
+					}
+				}
+
+				/* Inflict fear - always cumulative */
 				if (set_afraid(p_ptr->afraid + 3 + randint(dam)))
 				{
 					obvious = TRUE;
@@ -6040,12 +6131,32 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				msg_print("You resist the effects!");
 				obvious = TRUE;
 			}
+			else if (p_ptr->paralyzed)
+			{
+				/* Inflict disease */
+				if (randint(20) < dam)
+				{
+					/* Serious affliction */
+					if (dam > 50)
+					{
+						if (p_ptr->disease == (DISEASE_PARALYZE | DISEASE_LIGHT)) p_ptr->disease = 0;
+						p_ptr->disease |= (DISEASE_PARALYZE);
+					}
+					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					{
+						p_ptr->disease |= (DISEASE_PARALYZE | DISEASE_LIGHT);
+					}
+				}
+			}
 			else
 			{
+				int k = randint((dam / 3) + 2);
+
 				/* Always notice */
 				equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 
-				if (set_paralyzed(p_ptr->paralyzed + 3 + randint(dam)))
+				/* Inflict paralyzation */
+				if (set_paralyzed(k))
 				{
 					obvious = TRUE;
 				}
@@ -6087,7 +6198,24 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Always notice */
 				equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 
+				/* Inflict disease */
+				if ((p_ptr->slow) && (randint(200) < k))
+				{
+					/* Serious affliction */
+					if (dam > 50)
+					{
+						if (p_ptr->disease == (DISEASE_SLOW | DISEASE_LIGHT)) p_ptr->disease = 0;
+						p_ptr->disease |= (DISEASE_SLOW);
+					}
+					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					{
+						p_ptr->disease |= (DISEASE_SLOW | DISEASE_LIGHT);
+					}
+				}
+
+				/* Inflict slowness -- always cumulative */
 				if (set_slow(p_ptr->slow + randint(25) + 15)) obvious = TRUE;
+
 				{
 					obvious = TRUE;
 				}
@@ -6539,7 +6667,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
-				(void)set_stun(p_ptr->stun + randint(40));
+				(void)set_stun(p_ptr->stun ? p_ptr->stun + randint(10) : randint(40));
 			}
 			else
 			{
@@ -6551,7 +6679,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 
-				(void)set_confused(p_ptr->confused + randint(5) + 5);
+				(void)set_confused(p_ptr->confused ? p_ptr->confused + 1 : randint(5) + 5);
 			}
 			else
 			{
@@ -6574,7 +6702,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
-				(void)set_stun(p_ptr->stun + randint(40));
+				(void)set_stun(p_ptr->stun ? p_ptr->stun + randint(10) : randint(40));
 			}
 			else
 			{
@@ -6586,7 +6714,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 
-				(void)set_confused(p_ptr->confused + randint(5) + 5);
+				(void)set_confused(p_ptr->confused ? p_ptr->confused + 1 : randint(5) + 5);
 			}
 			else
 			{
@@ -6623,7 +6751,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
-				(void)set_stun(p_ptr->stun + randint(40));
+				(void)set_stun(p_ptr->stun ? p_ptr->stun + randint(10) : randint(40));
 			}
 			else
 			{
@@ -6635,14 +6763,13 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Always notice */
 				equip_not_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 
-				(void)set_confused(p_ptr->confused + randint(5) + 5);
+				(void)set_confused(p_ptr->confused ? p_ptr->confused + 1 : randint(5) + 5);
 			}
 			else
 			{
 				/* Always notice */
 				equip_can_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
 			}
-
 
 			water_dam((dam*2)/3,killer, FALSE);
 			fire_dam(dam/3,killer, FALSE);

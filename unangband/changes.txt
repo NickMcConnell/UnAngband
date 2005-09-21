@@ -5,6 +5,28 @@
 - You can now sell books to various stores to allow you to unlock additional store
 services.
 
+- The player can now be infected with various diseases. A number of disease causing
+monsters from Eyangband have been added.
+
+- Various attacks, particularly paralyze, stun, confuse are less cumulative or not
+cumulative - however, if you already are suffering the ill-effects that the attack
+would cause, you now run the risk of getting the related effect recurring every 100 turns
+or so. This now makes paralysis melee attacks survivable at depth provided you can
+outlast the initial paralyzation, and have sufficiently high ac.
+
+- Added item abilities including vampiric weapons of various flavours, light and dark
+brands, anti-teleport items, racial-based items including slay human, slay elf and
+slay dwarf items, and items that cause vulneribilities to various elements. Much back-
+end code still to be fixed. In particular, you cannot wield both a racial flag item
+and its equivelent slay, or a vulneribility item and its equivelent brand.
+
+- Added magic items, which are ego items which only have a single flag. This is
+currently in heavy development and balancing, but is intended to provide a more
+interesting transition between enchanted equipment and ego items. Ego items are 
+temporarily disabled for testing purposes.
+
+- Stat potions only provide a temporary stat increase. Removed restore stat potions.
+
 - Vents now act as conduits for water, acid, steam, fire or gas through walls.
 Vents can also be climbed through, but block vision and ranged attacks.
 
@@ -24,9 +46,6 @@ or on the right every 4 turns (an adjacent water fall will hit every 2 turns).
 - Cracked walls now can come in hidden, weaker versions that can be easily
 bashed or tunnelled through.
 
-- The player can now be infected with various diseases. A number of disease causing
-monsters from Eyangband have been added.
-
 - Statues of hybrids can now occur. Figurines removed from the back end code.
 
 - Spores and potions will explode when thrown (Potions used to just affect the target).
@@ -38,28 +57,15 @@ parts.
 
 - Added statues of varying values. These are all extremely heavy however.
 
-- Added item abilities including vampiric weapons of various flavours, light and dark
-brands, anti-teleport items, racial-based items including slay human, slay elf and
-slay dwarf items, and items that cause vulneribilities to various elements. Much back-
-end code still to be fixed. In particular, you cannot wield both a racial flag item
-and its equivelent slay, or a vulneribility item and its equivelent brand.
-
 - Steam and other water damage that does not affect inventory items no longer douses
 your light. Lights that ignore water also ignore the effect.
 
 - Weapons you brand now ignore that element, preventing destruction by it.
 
-- Added magic items, which are ego items which only have a single flag. This is
-currently in heavy development and balancing, but is intended to provide a more
-interesting transition between enchanted equipment and ego items. Ego items are 
-temporarily disabled for testing purposes.
-
 - Modified some existing artifacts to add magical device skill or spell resistance.
 
 - Added spells, scrolls and rods of feedback, which allow the player to detect hidden
 resistances on high level items, and act as a limited attack weapon.
-
-- Stat potions only provide a temporary stat increase. Removed restore stat potions.
 
 - Most terrain now floods when hit by water.
 
@@ -86,8 +92,6 @@ of brands, based on the damage delivered by the weapon per blow.
 - When displaying equipment, proper immunities are displayed differently from flags that
 protect the character against the side effects of attacks.
 
-### Bug fixes ###
-
 - Prevented original graphic tiles from trying to use dark and lite tiles.
 
 - Added Triple tile mode, which is like Double tile mode, but intended for
@@ -100,6 +104,8 @@ In particular, all tiles are correctly drawn and redrawn after every refresh.
 However, many more monsters/objects etc. need to have the correct tiles
 assigned to them and there are still visual artefacts that need to be
 cleaned up.
+
+### Bug fixes ###
 
 - Priest spell righteous fury was for mages, paladins, shamans and bards but
 not for priests.  Now it is for priests, paladins, shamans and bards.  (Fixed
@@ -115,6 +121,8 @@ learn it (randomly) but cannot cast it.  (Fixed by kobayasi)
 - Random artifact dragon armour no longer has ridiculously high pvals.
 
 - Significant fixes to the way dynamic terrain worked.
+
+- Fixed some instances where resistance to fear didn't work.
 
 ### Build / Platform ###
 

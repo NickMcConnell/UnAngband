@@ -1109,7 +1109,7 @@ static cptr s_info_types[] =
 	"CREATE_KIND",
 	"EARTHQUAKE",
 	"DESTRUCTION",
-	"XXX1",
+	"CURE_DISEASE",
 	"XXX2",
 	"XXX3",
 	"XXX4",

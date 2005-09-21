@@ -584,7 +584,7 @@ bool make_attack_normal(int m_idx)
 				}
 
 				/* Apply the stun */
-				if (k) (void)set_stun(p_ptr->stun + k);
+				if (k) (void)set_stun(p_ptr->stun ? p_ptr->stun + randint(MIN(k,10)) : k);
 			}
 		}
 

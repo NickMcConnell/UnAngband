@@ -788,7 +788,8 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 	if (s_ptr->flags3 & (SF3_CURE_BLIND)) vp[vn++]="blindness";
 	if (s_ptr->flags3 & (SF3_CURE_IMAGE)) vp[vn++]="hallucinations";
 	if (s_ptr->flags3 & (SF3_CURE_CONF)) vp[vn++]="confusion";
-	if (s_ptr->flags3 & (SF3_CURE_FEAR)) vp[vn++]="fear";
+	if (s_ptr->flags3 & (SF3_CURE_FEAR)) vp[vn++]="fear";	
+	if (s_ptr->type == SPELL_CURE_DISEASE) vp[vn++] = disease_name[s_ptr->param];
 
 	/* Describe cure effects */
 	if (vn)

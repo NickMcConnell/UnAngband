@@ -1348,23 +1348,24 @@ static void process_world(void)
 	/*** Handle disease ***/
 	if ((p_ptr->disease & (DISEASE_BLOWS)) && (rand_int(300) < ((p_ptr->disease & (DISEASE_QUICK | DISEASE_LIGHT)) ? 3 : 1)))
 	{
-		int cnt, flg, effect;
+		int i, n, effect = 0;
 
 		msg_print("You feel an illness eat away at you.");
 
-		cnt = 1;
+		disturb(0,0);
+
+		n = 1;
 
 		/* Select one of the possible effects that the player can suffer */
-		for (flg = 1; flg < DISEASE_BLOWS; flg*=2)
+		for (i = 1; i < DISEASE_BLOWS; i <<=1)
 		{
-			if (!(p_ptr->disease & flg)) continue;
+			if (!(p_ptr->disease & i)) continue;
 			
-			if (!rand_int(cnt++)) effect = flg;
+			if (!rand_int(n++)) effect = i;
 		}
 
-		switch (flg)
+		switch (effect)
 		{
-
 			case DISEASE_LOSE_STR:
 			{
 				dec_stat(A_STR, p_ptr->disease & (DISEASE_POWER) ? randint(3) : 1, 0);
@@ -1472,17 +1473,17 @@ static void process_world(void)
 
 		if ((p_ptr->disease & (DISEASE_DISEASE)) && !(rand_int(3)))
 		{
-			if ((cnt < 3) && (p_ptr->disease & (DISEASE_HEAVY)))
+			if ((n < 3) && (p_ptr->disease & (DISEASE_HEAVY)))
 				p_ptr->disease |= (1 << rand_int(DISEASE_TYPES_HEAVY));
-			else if (cnt < 3)
+			else if (n < 3)
 				p_ptr->disease |= (1 << rand_int(DISEASE_TYPES));
 			
-			if (cnt > 1) p_ptr->disease &= ~(1 << rand_int(DISEASE_TYPES));
-			if (!rand_int(20)) p_ptr->disease &= ~(DISEASE_DISEASE);
+			if (n > 1) p_ptr->disease &= ~(1 << rand_int(DISEASE_TYPES));
+			if (!rand_int(20)) p_ptr->disease |= (DISEASE_LIGHT);
 		}
 
 		/* The player is on the mend */
-		if ((p_ptr->disease & (DISEASE_LIGHT)) & !rand_int(3))
+		if ((p_ptr->disease & (DISEASE_LIGHT)) && !(rand_int(6)))
 		{
 			msg_print("The illness has subsided.");
 			p_ptr->disease = 0;

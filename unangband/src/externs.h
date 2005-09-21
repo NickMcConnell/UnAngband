@@ -74,6 +74,7 @@ extern const int object_xtra_size[OBJECT_XTRA_MAX_HIDDEN];
 extern const cptr object_group_text[];
 extern const byte object_group_tval[];
 extern const cptr magic_name[4][32];
+extern const cptr disease_name[32];
 
 /* variable.c */
 extern cptr copyright;
@@ -833,7 +834,9 @@ extern bool set_poisoned(int v);
 extern bool set_afraid(int v);
 extern bool set_paralyzed(int v);
 extern bool set_image(int v);
+extern cptr desc_stat_imp[];
 extern bool set_stat_inc_tim(int v, int i);
+extern cptr desc_stat_dec[];
 extern bool set_stat_dec_tim(int v, int i);
 extern bool set_fast(int v);
 extern bool set_slow(int v);

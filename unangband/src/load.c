@@ -1056,8 +1056,10 @@ static errr rd_extra(void)
 	rd_byte(&tmp8u);	/* oops */
 	rd_byte(&tmp8u);	/* oops */
 
+	rd_u32b(&p_ptr->disease);
+
 	/* Future use */
-	strip_bytes(40);
+	strip_bytes(36);
 
 	/* Read the randart version */
 	rd_u32b(&randart_version);

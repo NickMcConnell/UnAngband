@@ -1349,6 +1349,7 @@
 #define SPELL_CREATE_KIND     13
 #define SPELL_EARTHQUAKE      14
 #define SPELL_DESTRUCTION     15
+#define SPELL_CURE_DISEASE	16
 #define SPELL_INVEN_WIELD      24
 #define SPELL_INVEN_BOW       25
 #define SPELL_INVEN_LEFT      26

@@ -437,13 +437,19 @@ bool restore_level(void)
  */
 void self_knowledge(void)
 {
-	int i;
+	int i, n;
 
 	u32b f1 = 0L, f2 = 0L, f3 = 0L, f4 = 0L;
 
 	u32b t1, t2, t3, t4;
 
 	object_type *o_ptr;
+
+	cptr vp[64];
+
+	int vn;
+
+	bool healthy = TRUE;
 
 	/* Save screen */
 	screen_save();
@@ -453,34 +459,96 @@ void self_knowledge(void)
 
 	/* Set text_out hook */
 	text_out_hook = text_out_to_screen;
+	
+	text_out_c(TERM_L_BLUE, "Self-knowledge\n");
 
 	if (p_ptr->blind)
 	{
 		text_out("You cannot see.  ");
+		healthy = FALSE;
 	}
 	if (p_ptr->confused)
 	{
 		text_out("You are confused.  ");
+		healthy = FALSE;
 	}
 	if (p_ptr->afraid)
 	{
 		text_out("You are terrified.  ");
+		healthy = FALSE;
 	}
 	if (p_ptr->cut)
 	{
 		text_out("You are bleeding.  ");
+		healthy = FALSE;
 	}
 	if (p_ptr->stun)
 	{
 		text_out("You are stunned.  ");
+		healthy = FALSE;
 	}
 	if (p_ptr->poisoned)
 	{
 		text_out("You are poisoned.  ");
+		healthy = FALSE;
 	}
 	if (p_ptr->image)
 	{
 		text_out("You are hallucinating.  ");
+		healthy = FALSE;
+	}
+
+	if (p_ptr->disease)
+	{
+		text_out("You are afflicted with ");
+		healthy = FALSE;
+
+		/* Collect symptoms */
+		vn = 0;
+		for (i = 1, n = 0; n < DISEASE_TYPES_HEAVY; i <<= 1, n++)
+		{
+			if ((p_ptr->disease & i) != 0) vp[vn++] = disease_name[n];
+		}
+
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (n == 0) { }
+			else if (n < vn-1) text_out(", ");
+			else text_out(" and ");
+
+			/* Dump */
+			text_out(vp[n]);
+		}
+
+		/* Collect causes */
+		vn = 0;
+		for (i = (1 << DISEASE_TYPES_HEAVY), n = DISEASE_TYPES_HEAVY; n < 32; i <<= 1, n++)
+		{
+			if ((p_ptr->disease & i) != 0) vp[vn++] = disease_name[n];
+		}
+
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (n == 0) { if ((p_ptr->disease & ((1 << DISEASE_TYPES_HEAVY) -1)) != 0) text_out (" caused by "); }
+			else if (n < vn-1) text_out(", ");
+			else text_out(" and ");
+
+			/* Dump */
+			text_out(vp[n]);
+		}
+
+		/* Dump */
+		text_out(".  ");
+
+	}
+
+	if (healthy)
+	{
+		text_out("You suffer from no afflictions.  ");
 	}
 
 	if (p_ptr->blessed)
@@ -495,17 +563,37 @@ void self_knowledge(void)
 	{
 		text_out("You are in a battle rage.  ");
 	}
-	if (p_ptr->protevil)
+	if ((p_ptr->protevil) || (p_ptr->shield) || (p_ptr->hero) || (p_ptr->shero))
 	{
-		text_out("You are protected from evil.  ");
+
+		text_out("You are protected ");
+
+		/* Collect protections */
+		vn = 0;
+
+		if (p_ptr->protevil) vp[vn++]="from evil";
+		if ((p_ptr->hero) || (p_ptr->shero)) vp[vn++]="from fear";
+		if (p_ptr->shield) vp[vn++]="by a mystic sheild";
+
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (n == 0) { }
+			else if (n < vn-1) text_out(", ");
+			else text_out(" and ");
+
+			/* Dump */
+			text_out(vp[n]);
+		}
+
+		if (n) text_out(".  ");
+
 	}
-	if (p_ptr->shield)
+
+	if (p_ptr->climbing)
 	{
-		text_out("You are protected by a mystic shield.  ");
-	}
-	if (p_ptr->invuln)
-	{
-		text_out("You are temporarily invulnerable.  ");
+		text_out("You are climbing over an obstacle.  ");
 	}
 	if (p_ptr->searching)
 	{
@@ -533,31 +621,67 @@ void self_knowledge(void)
 
 	}
 
-	if (p_ptr->oppose_acid)
+	/* Collect temporary effects */
+	vn = 0;
+
+	if (p_ptr->invuln) vp[vn++] = "invulnerible";
+	for (n = 0; n < A_CHR; n++)
 	{
-		text_out("You are temporarily resistant to acid.  ");
+		if (p_ptr->stat_inc_tim[n]) vp[vn++] = desc_stat_imp[n];
+	}
+	for (n = 0; n < A_CHR; n++)
+	{
+		if (p_ptr->stat_dec_tim[n]) vp[vn++] = desc_stat_dec[n];
+	}
+
+	if ((p_ptr->oppose_acid) || (p_ptr->oppose_elec) || (p_ptr->oppose_fire) || (p_ptr->oppose_cold)) vp[vn++]= "resistant to";
+
+	/* Introduce */
+	if (vn) text_out("You are temporarily ");
+
+	/* Scan */
+	for (n = 0; n < vn; n++)
+	{
+		/* Intro */
+		if (n == 0) { }
+		else if (n < vn-1) text_out(", ");
+		else text_out(" and ");
+
+		/* Dump */
+		text_out(vp[n]);
+	}
+
+	if ((p_ptr->oppose_acid) || (p_ptr->oppose_elec) || (p_ptr->oppose_fire) || (p_ptr->oppose_cold))
+	{
+		/* Collect temporary resistances */
+		vn = 0;
+
+		if (p_ptr->oppose_acid) vp[vn++]= "acid";
+		if (p_ptr->oppose_elec) vp[vn++]= "electricity";
+		if (p_ptr->oppose_fire) vp[vn++]= "fire";
+		if (p_ptr->oppose_cold) vp[vn++]= "cold";
+
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (n == 0) { }
+			else if (n < vn-1) text_out(", ");
+			else text_out(" and ");
+
+			/* Dump */
+			text_out(vp[n]);
+		}
+
+		text_out(".  ");
 
 	}
-	if (p_ptr->oppose_elec)
+	else if (vn)
 	{
-		text_out("You are temporarily resistant to electricity.  ");
-
+		text_out(".  ");
 	}
-	if (p_ptr->oppose_fire)
-	{
-		text_out("You are temporarily resistant to fire.  ");
 
-	}
-	if (p_ptr->oppose_cold)
-	{
-		text_out("You are temporarily resistant to cold.  ");
-
-	}
-	if (p_ptr->oppose_pois)
-	{
-		text_out("You are temporarily resistant to poison.  ");
-
-	}
+	text_out("\n");
 
 	/* Hack -- racial effects */
 	if (rp_ptr->flags1 || rp_ptr->flags2 || rp_ptr->flags3 || rp_ptr->flags4)
@@ -565,6 +689,8 @@ void self_knowledge(void)
 		text_out("Your race affects you.  ");
 
 		list_object_flags(rp_ptr->flags1,rp_ptr->flags1,rp_ptr->flags1,rp_ptr->flags4,1);
+
+		text_out("\n");
 	}
 
 	/* Get player flags */
@@ -582,6 +708,8 @@ void self_knowledge(void)
 		text_out("Your training affects you.  ");
 
 		list_object_flags(t1,t2,t3,t4,1);
+
+		text_out("\n");
 	}
 
 	/* Get item flags from equipment */
@@ -612,6 +740,8 @@ void self_knowledge(void)
 		equip_can_flags(f1,f2,f3,f4);
 
 		equip_not_flags(~(f1 | TR1_WEAPON_FLAGS),~(f2 | TR2_WEAPON_FLAGS),~(f3 | TR3_WEAPON_FLAGS), ~(f4 | TR4_WEAPON_FLAGS));
+
+		text_out("\n");
 	}
 
 	o_ptr = &inventory[INVEN_WIELD];
@@ -626,7 +756,7 @@ void self_knowledge(void)
 		t3 = t3 & (TR3_WEAPON_FLAGS);
 		t4 = t4 & (TR4_WEAPON_FLAGS);
 
-		/* Hack -- other equipment effects */
+		/* Hack -- weapon effects */
 		if (t1 || t2 || t3 || t4)
 		{
 			text_out("Your weapon has special powers.  ");
@@ -636,11 +766,11 @@ void self_knowledge(void)
 			object_can_flags(o_ptr,t1,t2,t3,t4);
 	
 			object_not_flags(o_ptr,TR1_WEAPON_FLAGS & ~(t1),TR2_WEAPON_FLAGS & ~(t2),TR3_WEAPON_FLAGS & ~(t3), TR4_WEAPON_FLAGS & ~(t4));
+
+			text_out("\n");
 		}
 
 	}
-
-	text_out("\n");
 
 	inkey();
 
@@ -5878,6 +6008,26 @@ bool process_spell_types(int spell, int level, bool *cancel)
 				destroy_area(p_ptr->py,p_ptr->px, s_ptr->param, TRUE);
 				*cancel = FALSE;
 				obvious = TRUE;
+				break;
+			}
+			case SPELL_CURE_DISEASE:
+			{
+				int v = (1 << s_ptr->param);
+
+				if ((p_ptr->disease & v) != 0)
+				{
+					obvious = TRUE;
+					*cancel = FALSE;
+					p_ptr->disease &= ~(v);
+
+					/* Hack -- cured all symptoms or cured all origins of disease */
+					if ( ((s_ptr->param >= DISEASE_TYPES_HEAVY) && (p_ptr->disease < (1 << DISEASE_TYPES_HEAVY)))
+						|| ((p_ptr->disease & ((1 << DISEASE_TYPES_HEAVY) -1)) == 0) )
+					{
+						p_ptr->disease = 0;
+					}
+				}
+
 				break;
 			}
 			default:

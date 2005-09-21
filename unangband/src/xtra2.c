@@ -38,7 +38,7 @@ bool set_blind(int v)
 	{
 		if (!p_ptr->blind)
 		{
-			msg_print("You are blind!");
+			msg_print("You are blinded!");
 			notice = TRUE;
 		}
 	}
@@ -340,7 +340,7 @@ bool set_image(int v)
 /*
  * Array of stat "descriptions"
  */
-static cptr desc_stat_imp[] =
+cptr desc_stat_imp[] =
 {
 	"stronger",
 	"smarter",
@@ -418,7 +418,7 @@ bool set_stat_inc_tim(int v, int i)
 /*
  * Array of stat "descriptions"
  */
-static cptr desc_stat_dec[] =
+cptr desc_stat_dec[] =
 {
 	"weaker",
 	"stupider",

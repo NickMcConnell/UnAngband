@@ -618,8 +618,10 @@ static void wr_extra(void)
 	wr_byte(0);	/* oops */
 	wr_byte(0);
 
+	wr_u32b(p_ptr->disease);
+
 	/* Future use */
-	for (i = 0; i < 10; i++) wr_u32b(0L);
+	for (i = 0; i < 9; i++) wr_u32b(0L);
 
 	/* Random artifact version */
 	wr_u32b(RANDART_VERSION);

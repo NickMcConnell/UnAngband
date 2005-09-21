@@ -2701,3 +2701,39 @@ const cptr magic_name[4][32] =
 		"of Frost Vulneribility"	
 	}
 };
+
+const cptr disease_name[32] =
+{
+	"pink rot",
+	"black brain",
+	"wit loss",
+	"fumblefinger",
+	"illweather",
+	"warts",
+	"orcbelly",
+	"dry throat",
+	"shards",
+	"ringing in ears",
+	"green rot",
+	"magic eye",
+	"slow stumble",
+	"black eye",
+	"drunk belly",
+	"paranoia",
+	"palsy",
+	"leeches",
+	"mana mites",
+	"black breath",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"the plague",
+	"fast-acting viruses",
+	"magical parasites",
+	"minor ailments",
+	"Morgoth's curse",
+	"incurable illnesses"
+};
