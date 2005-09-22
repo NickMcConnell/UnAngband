@@ -1769,7 +1769,13 @@ A:3/1
 P:0:1d1:0:0:0
 F:THROWING
 
-# 227 - Was Restore Strength
+N:227:Cure Minor Disease
+G:!:w
+I:75:42:0
+W:10:0:4:100
+A:10/1
+P:0:1d1:0:0:0
+F:THROWING
 
 N:228:Intelligence
 G:!:w
@@ -1788,7 +1794,13 @@ A:20/1
 P:0:1d1:0:0:0
 F:THROWING
 
-# 230 - Was Restore Intelligence
+N:230:Cure Plague
+G:!:w
+I:75:43:0
+W:40:0:4:2000
+A:40/2
+P:0:1d1:0:0:0
+F:THROWING
 
 N:231:Wisdom
 G:!:w
@@ -5715,4 +5727,5 @@ N:792:Feedback
 G:?:v
 I:99:43:0
 W:0:0:0:200
+
 

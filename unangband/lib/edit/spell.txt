@@ -239,6 +239,7 @@ C:3:21:9:90:1
 C:4:11:9:45:3
 C:8:5:5:35:4
 F:CURE_POIS
+S:CURE_DISEASE:10
 
 N:15:Teleport Self
 A:55:4:1
@@ -1316,6 +1317,7 @@ C:2:25:40:80:160
 C:5:30:50:80:130
 C:8:25:40:80:160
 F:CURE_CURSE
+S:CURE_DISEASE:30
 
 N:109:Enchant Weapon
 A:91:7:5
@@ -2761,6 +2763,7 @@ N:260:Hallucination
 A:80:4:1
 L:1d10+10
 F:HALLUC
+S:CURE_DISEASE:16
 
 N:261:Paralyzation
 A:80:5:1
@@ -2794,24 +2797,27 @@ B:SELF:DISEASE:10d10+0
 N:268:Cure Blindness
 A:80:13:1
 F:CURE_BLIND
+S:CURE_DISEASE:13
 
 N:269:Cure Confusion
 A:80:15:1
 F:CURE_CONF
+S:CURE_DISEASE:14
 
 N:270:Restore Strength
-A:75:42:1
 A:80:17:1
 F:CURE_STR
+S:CURE_DISEASE:0
 
 N:271:Restore Constition
-A:75:46:1
 A:80:18:1
 F:CURE_CON
+S:CURE_DISEASE:4
 
 N:280:Mana
 A:80:20:1
 F:SLOW_MANA
+S:CURE_DISEASE:18
 
 N:281:Ration
 A:80:32:1
@@ -2823,12 +2829,14 @@ D:That tastes good.
 N:282:Fine Wine
 A:80:38:1
 A:80:39:1
+S:CURE_DISEASE:14
 D:That tastes good.
 
 N:283:Waybread
 A:80:37:1
 F:CURE_POIS
 B:SELF:HEAL:4d8+0
+S:CURE_DISEASE:12
 D:That tastes good.
 
 # Additional Potion effects.
@@ -2836,6 +2844,7 @@ D:That tastes good.
 N:284:Water
 A:75:0:1
 A:75:1:1
+S:CURE_DISEASE:7
 D:You feel less thirsty.
 
 N:285:Slowness
@@ -2848,6 +2857,7 @@ N:286:Salt Water
 A:75:5:1
 F:DEC_FOOD
 B:VOMIT:SALT_WATER:2d6
+S:CURE_DISEASE:17
 D:The potion makes you vomit!
 
 N:287:Sleep
@@ -2855,15 +2865,18 @@ A:75:11:1
 L:1d4+4
 F:PARALYZE
 D:You fall asleep.
+S:CURE_DISEASE:9
 
 N:288:Lose Memories
 A:75:13:1
 D:You feel your memories fade.
 F:DEC_EXP
+S:CURE_DISEASE:15
 
 N:289:Ruination
 A:75:15:1
 B:SELF:LOSE_ALL:10d10+0
+S:CURE_DISEASE:27
 D:Your nerves and muscles feel weak and lifeless.
 
 N:290:Weakness
@@ -2907,6 +2920,7 @@ N:298:Infravision
 A:75:24:1
 L:1d100+100+1
 F:INFRA
+S:CURE_DISEASE:11
 
 N:299:Cure Critical Wounds
 A:75:36:1
@@ -2928,6 +2942,7 @@ A:75:39:1
 B:SELF:HEAL:0d0+5000
 F:CURE_CUTS | CURE_STUN | CURE_POIS | CURE_BLIND | CURE_CONF | CURE_IMAGE
 F:CURE_STR | CURE_INT | CURE_WIS | CURE_DEX | CURE_CON | CURE_CHR
+S:CURE_DISEASE:28
 D:You feel life flow through your body.
 
 N:303:Restore Mana
@@ -2935,21 +2950,30 @@ A:75:40:1
 F:CURE_MANA
 D:You feel your head clear.
 
-N:304:Restore Intelligence
+N:304:Cure Minor Disease
+A:75:42:1
+A:91:1:10
+C:2:13:5:38:4
+C:5:19:10:45:3
+S:CURE_DISEASE:29
+
+N:305:Cure Plague
 A:75:43:1
-F:CURE_INT
+A:91:6:10
+C:2:35:70:90:230
+C:5:40:80:90:200
+C:8:37:75:90:215
+S:CURE_DISEASE:26
 
-N:305:Restore Wisdom
-A:75:44:1
-F:CURE_INT
+#N:306:Restore Dexterity
+#A:75:45:1
+#F:CURE_DEX
+#S:CURE_DISEASE:3
 
-N:306:Restore Dexterity
-A:75:45:1
-F:CURE_DEX
-
-N:307:Restore Charisma
-A:75:47:1
-F:CURE_CHR
+#N:307:Restore Charisma
+#A:75:47:1
+#F:CURE_CHR
+#S:CURE_DISEASE:5
 
 N:308:Strength
 A:75:48:1
@@ -2992,11 +3016,13 @@ A:75:57:1
 F:INC_INT | INC_WIS |
 F:WIZ_LITE | DETECT_DOORS | DETECT_STAIRS | DETECT_GOLD | DETECT_OBJECT
 F:DETECT_TRAPS | IDENT_PACK | SELF_KNOW
+S:CURE_DISEASE:1
 D:You begin to feel more enlightened...
 
 N:316:Self Knowledge
 A:75:58:1
 F:SELF_KNOW
+S:CURE_DISEASE:2
 D:You feel you know yourself a little better...
 
 N:317:Experience
@@ -3042,6 +3068,7 @@ A:80:42:1
 B:SPIT:FIRE:4d6+0
 B:SELF:FIRE:1d6+0
 D:You spit out the burning liquor.
+S:CURE_DISEASE:6
 
 N:326:Enchant Weapon To-Hit
 A:70:17:1
