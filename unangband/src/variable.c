@@ -133,6 +133,9 @@ s16b o_cnt = 0;		 /* Number of live objects */
 s16b m_max = 1;		 /* Number of allocated monsters */
 s16b m_cnt = 0;		 /* Number of live monsters */
 
+s16b q_max = 1;		 /* Number of allocated quests */
+s16b q_cnt = 0;		 /* Number of live quests */
+
 /*
  * Hack - Trackees for term windows
  */
@@ -521,9 +524,9 @@ object_lore *k_list;
 
 
 /*
- * Hack -- Array[MAX_Q_IDX] of quests
+ * Hack -- Array[MAX_Q_IDX] of random quests
  */
-quest *q_list;
+quest_type *q_list;
 
 
 /*
@@ -776,6 +779,13 @@ byte *g_info;
 char *g_name;
 char *g_text;
 
+
+/*
+ * The fixed quest arrays
+ */
+quest_type *q_info;
+char *q_name;
+char *q_text;
 
 /*
  * Hack -- The special Angband "System Suffix"

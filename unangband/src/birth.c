@@ -466,20 +466,6 @@ static void player_wipe(void)
 		a_ptr->cur_num = 0;
 	}
 
-
-	/* Start with no quests */
-	for (i = 0; i < MAX_Q_IDX; i++)
-	{
-		q_list[i].level = 0;
-	}
-
-	/* Add a special quest */
-	q_list[0].level = 99;
-
-	/* Add a second quest */
-	q_list[1].level = 100;
-
-
 	/* Reset the "objects" */
 	for (i = 1; i < z_info->k_max; i++)
 	{

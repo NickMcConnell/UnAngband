@@ -679,6 +679,88 @@ static errr rd_store(int n)
 
 
 /*
+ * Read a random quest
+ */
+static errr rd_quest(int n)
+{
+	quest_type *q_ptr = &q_list[n];
+
+	int i;
+	s16b quest_races;
+
+	/* Read the quest flags */
+	rd_u16b(&q_ptr->flags);
+	rd_u16b(&q_ptr->known);
+
+	/* Read the quest pre-requisites */
+	rd_s16b(&q_ptr->pre_quest);
+	rd_s16b(&q_ptr->pre_r_idx);
+	rd_byte(&q_ptr->pre_dungeon);
+	rd_byte(&q_ptr->pre_level);
+	rd_byte(&q_ptr->pre_shop);
+	rd_byte(&q_ptr->pre_unused);
+
+	/* Read the quest requirements */
+	rd_byte(&q_ptr->req_dungeon);
+	rd_byte(&q_ptr->req_level);
+	rd_byte(&q_ptr->req_shop);
+	rd_byte(&q_ptr->req_artifact);
+	rd_s16b(&q_ptr->req_kind);
+	rd_s16b(&q_ptr->req_kind_needs);
+	rd_s16b(&q_ptr->req_kind_found);
+	rd_s16b(&q_ptr->req_feat);
+	rd_byte(&q_ptr->req_feat_action);
+	rd_byte(&q_ptr->unused2);
+	rd_s16b(&q_ptr->req_feat_needs);
+	rd_s16b(&q_ptr->req_feat_altered);
+
+
+	/* Count of monster races */
+	rd_s16b(&quest_races);
+
+	/* Paranoia */
+	if (quest_races > MAX_QUEST_RACES)
+	{
+		note("Exceeded maximum quest monster races!");
+		return (-1);
+	}
+
+	/* Read quest required monster race information */
+	for (i = 0; i < quest_races; i++)
+	{
+		rd_s16b(&q_ptr->req_race[i]);
+		rd_s16b(&q_ptr->req_race_needs[i]);
+		rd_s16b(&q_ptr->req_race_kills[i]);
+		rd_s16b(&q_ptr->req_race_parts[i]);
+
+	}
+
+	/* Read the reward information */
+	rd_s16b(&q_ptr->fin_kind);
+	rd_s16b(&q_ptr->fin_kind_num);
+	rd_s16b(&q_ptr->fin_ego_item);
+	rd_s16b(&q_ptr->fin_artifact);
+	rd_s16b(&q_ptr->fin_experience);
+	rd_s16b(&q_ptr->fin_power);
+	rd_s16b(&q_ptr->fin_gold);
+	rd_byte(&q_ptr->fin_stock_dungeon);
+	rd_byte(&q_ptr->fin_stock_shop);
+	rd_s16b(&q_ptr->fin_stock_kind);
+	rd_s16b(&q_ptr->fin_stock_kind_num);
+	rd_s16b(&q_ptr->fin_banish);
+	rd_s16b(&q_ptr->fin_summon);
+	rd_s16b(&q_ptr->fin_friend);
+	rd_s16b(&q_ptr->fin_enemy);
+	rd_s16b(&q_ptr->fin_leaving);
+	rd_s16b(&q_ptr->fin_lose_art);
+
+	/* Success */
+	return(0);
+
+}
+
+
+/*
  * Read RNG state
  */
 static void rd_randomizer(void)
@@ -1938,26 +2020,40 @@ static errr rd_savefile_new_aux(void)
 	if (arg_fiddle) note("Loaded Object Memory");
 
 
-	/* Load the Quests */
+	/* Load the Random Quests */
 	rd_u16b(&tmp16u);
 
 	/* Incompatible save files */
 	if (tmp16u > MAX_Q_IDX)
 	{
-		note(format("Too many (%u) quests!", tmp16u));
+		note(format("Too many (%u) random quests!", tmp16u));
 		return (-1);
 	}
 
-	/* Load the Quests */
+	/* Load the Random Quests */
 	for (i = 0; i < tmp16u; i++)
 	{
-		rd_byte(&tmp8u);
-		q_list[i].level = tmp8u;
-		rd_byte(&tmp8u);
-		rd_byte(&tmp8u);
-		rd_byte(&tmp8u);
+		rd_quest(i);
 	}
-	if (arg_fiddle) note("Loaded Quests");
+	if (arg_fiddle) note("Loaded Random Quests");
+
+
+	/* Load the Fixed Quests */
+	rd_u16b(&tmp16u);
+
+	/* Incompatible save files */
+	if (tmp16u > z_info->q_max)
+	{
+		note(format("Too many (%u) fixed quests!", tmp16u));
+		return (-1);
+	}
+
+	/* Load the Fixed Quests */
+	for (i = 0; i < tmp16u; i++)
+	{
+		rd_u16b(&q_info[i].known);
+	}
+	if (arg_fiddle) note("Loaded Fixed Quests");
 
 
 	/* Load the Artifacts */

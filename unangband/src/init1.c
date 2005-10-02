@@ -5284,6 +5284,328 @@ errr parse_g_info(char *buf, header *head)
 }
 
 
+/*
+ * Grab an action in an quest_type from a textual string
+ */
+static errr grab_one_quest_action(quest_type *q_ptr, cptr what)
+{
+	if (grab_one_offset(&q_ptr->req_feat_action, f_info_flags1, what) == 0)
+		return (0);
+
+	if (grab_one_offset(&q_ptr->req_feat_action, f_info_flags2, what) == 0)
+		return (0);
+
+	if (grab_one_offset(&q_ptr->req_feat_action, f_info_flags3, what) == 0)
+		return (0);
+
+	/* Oops */
+	msg_format("Unknown quest action '%s'.", what);
+
+	/* Error */
+	return (PARSE_ERROR_GENERIC);
+}
+
+/*
+ * Initialize the "q_info" array, by parsing an ascii "template" file
+ */
+errr parse_q_info(char *buf, header *head)
+{
+	int i;
+
+	char *s, *t;
+
+	/* Current entry */
+	static quest_type *q_ptr = NULL;
+
+	/* Process 'N' for "New/Number/Name" */
+	if (buf[0] == 'N')
+	{
+		/* Find the colon before the name */
+		s = strchr(buf+2, ':');
+
+		/* Verify that colon */
+		if (!s) return (PARSE_ERROR_GENERIC);
+
+		/* Nuke the colon, advance to the name */
+		*s++ = '\0';
+
+		/* Paranoia -- require a name */
+		if (!*s) return (PARSE_ERROR_GENERIC);
+
+		/* Get the index */
+		i = atoi(buf+2);
+
+		/* Verify information */
+		if (i <= error_idx) return (PARSE_ERROR_NON_SEQUENTIAL_RECORDS);
+
+		/* Verify information */
+		if (i >= head->info_num) return (PARSE_ERROR_TOO_MANY_ENTRIES);
+
+		/* Save the index */
+		error_idx = i;
+
+		/* Point at the "info" */
+		q_ptr = (quest_type*)head->info_ptr + i;
+
+		/* Store the name */
+		if (!(q_ptr->name = add_name(head, s)))
+			return (PARSE_ERROR_OUT_OF_MEMORY);
+	}
+
+	/* Process 'Q' for "Quest" (one line only) */
+	else if (buf[0] == 'Q')
+	{
+		int quest;
+
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (1 != sscanf(buf+2, "%d",
+			    &quest)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		q_ptr->pre_quest = quest;
+	}
+
+	/* Process 'P' for "Pre-requsites" (one line only) */
+	else if (buf[0] == 'P')
+	{
+		int r_idx, dungeon, level, shop, unused;
+		
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (5 != sscanf(buf+2, "%d:%d:%d:%d:%d",
+				&r_idx, &dungeon, &level, &shop, &unused)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		q_ptr->pre_r_idx = r_idx;
+		q_ptr->pre_dungeon = dungeon;
+		q_ptr->pre_level = level;
+		q_ptr->pre_shop = shop;
+		q_ptr->pre_unused = unused;
+	}
+
+	/* Process 'T' for "Travel to" (one line only) */
+	else if (buf[0] == 'T')
+	{
+		int dungeon, level, shop;
+		
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (3 != sscanf(buf+2, "%d:%d:%d",
+				&dungeon, &level, &shop)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		q_ptr->req_dungeon = dungeon;
+		q_ptr->req_level = level;
+		q_ptr->req_shop = shop;
+
+		q_ptr->flags |= (QUEST_DUNGEON);
+		q_ptr->flags |= (QUEST_LEVEL);
+		q_ptr->flags |= (QUEST_SHOP);
+
+	}
+
+	/* Process 'A' for "Artifact" (one line only) */
+	else if (buf[0] == 'O')
+	{
+		int artifact;
+
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (1 != sscanf(buf+2, "%d",
+			    &artifact)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		q_ptr->req_artifact = artifact;
+
+		q_ptr->flags |= (QUEST_ARTIFACT);
+	}
+	
+	/* Process 'K' for "Kinds" (one line only) */
+	else if (buf[0] == 'K')
+	{
+		int kind, kind_needs;
+		
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (2 != sscanf(buf+2, "%d:%d",
+				&kind, &kind_needs)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		q_ptr->req_kind = kind;
+		q_ptr->req_kind_needs = kind_needs;
+		q_ptr->req_kind_found = 0;
+
+		q_ptr->flags |= (QUEST_KIND);
+	}
+
+	/* Process 'R' for "Races" (up to four lines ) */
+	else if (buf[0] == 'R')
+	{
+		int race, race_needs, race_parts;
+
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Find the next empty state slot (if any) */
+		for (i = 0; i < MAX_QUEST_RACES; i++) if (q_ptr->req_race[i] == 0) break;
+
+		/* Oops, no more slots */
+		if (i == MAX_QUEST_RACES) return (PARSE_ERROR_GENERIC);
+
+		/* Scan for the values */
+		if (3 != sscanf(buf+2, "%d:%d:%d",
+				&race, &race_needs, &race_parts)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		q_ptr->req_race[i] = race;
+		q_ptr->req_race_needs[i] = race_needs;
+		q_ptr->req_race_kills[i] = 0;
+		q_ptr->req_race_parts[i] = race_parts;
+
+		q_ptr->flags |= (QUEST_RACE_1) << i;
+	}
+
+	/* Process 'F' for "Features" */
+	else if (buf[0] == 'F')
+	{
+		int feat, feat_needs;
+
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Analyze the first field */
+		for (s = t = buf+2; *t && (*t != ':'); t++) /* loop */;
+
+		/* Terminate the field (if necessary) */
+		if (*t == ':') *t++ = '\0';
+
+		/* Parse this entry */
+		if (0 != grab_one_quest_action(q_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
+
+		/* Scan for the values */
+		if (2 != sscanf(t, "%d:%d",
+				&feat, &feat_needs)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		q_ptr->req_feat = feat;
+		q_ptr->req_feat_needs = feat;
+		q_ptr->req_feat_altered = 0;
+
+	}
+
+	/* Process 'G' for "Gifts" (one line only) */
+	else if (buf[0] == 'G')
+	{
+		int kind, kind_num, ego_item, artifact;
+		
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
+				&kind, &kind_num, &ego_item, &artifact)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		q_ptr->fin_kind = kind;
+		q_ptr->fin_kind_num = kind_num;
+		q_ptr->fin_ego_item = ego_item;
+		q_ptr->fin_artifact = artifact;
+	}
+
+	/* Process 'W' for "Worth" (one line only) */
+	else if (buf[0] == 'W')
+	{
+		int experience, power, gold;
+		
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (3 != sscanf(buf+2, "%d:%d:%d",
+				&experience, &power, &gold)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		q_ptr->fin_experience = experience;
+		q_ptr->fin_power = power;
+		q_ptr->fin_gold = gold;
+	}
+
+	/* Process 'S' for "Stock" (one line only) */
+	else if (buf[0] == 'S')
+	{
+		int dungeon, shop, kind, kind_num;
+		
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
+				&dungeon, &shop, &kind, &kind_num)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		q_ptr->fin_stock_dungeon = dungeon;
+		q_ptr->fin_stock_shop = shop;
+		q_ptr->fin_stock_kind = kind;
+		q_ptr->fin_stock_kind_num = kind_num;
+	}
+
+	/* Process 'B' for "Bad things" (one line only) */
+	else if (buf[0] == 'B')
+	{
+		int banish, summon, friend, enemy, leaving, lose_art;
+		
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (6 != sscanf(buf+2, "%d:%d:%d:%d:%d:%d",
+				&banish, &summon, &friend, &enemy, &leaving, &lose_art)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		q_ptr->fin_banish = banish;
+		q_ptr->fin_summon = summon;
+		q_ptr->fin_friend = friend;
+		q_ptr->fin_enemy = enemy;
+		q_ptr->fin_leaving = leaving;
+		q_ptr->fin_lose_art = lose_art;
+	}
+
+	/* Process 'D' for "Description" */
+	else if (buf[0] == 'D')
+	{
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Get the text */
+		s = buf+2;
+
+		/* Store the text */
+		if (!add_text(&q_ptr->text, head, s))
+			return (PARSE_ERROR_OUT_OF_MEMORY);
+	}
+	else
+	{
+		/* Oops */
+		return (PARSE_ERROR_UNDEFINED_DIRECTIVE);
+	}
+
+	/* Success */
+	return (0);
+}
+
+
+
 
 #else	/* ALLOW_TEMPLATES */
 

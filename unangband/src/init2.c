@@ -295,6 +295,7 @@ header u_head;
 header h_head;
 header b_head;
 header g_head;
+header q_head;
 
 
 
@@ -1153,6 +1154,33 @@ static errr init_g_info(void)
 }
 
 
+/*
+ * Initialize the "q_info" array
+ */
+static errr init_q_info(void)
+{
+	errr err;
+
+	/* Init the header */
+	init_header(&q_head, z_info->q_max, sizeof(quest_type));
+
+#ifdef ALLOW_TEMPLATES
+
+	/* Save a pointer to the parsing function */
+	q_head.parse_info_txt = parse_q_info;
+
+#endif /* ALLOW_TEMPLATES */
+
+	err = init_info("quest", &f_head);
+
+	/* Set the global variables */
+	q_info = q_head.info_ptr;
+	q_name = q_head.name_ptr;
+	q_text = q_head.text_ptr;
+
+	return (err);
+}
+
 /*** Initialize others ***/
 
 
@@ -1246,7 +1274,7 @@ static errr init_other(void)
 	/*** Prepare quest array ***/
 
 	/* Quests */
-	C_MAKE(q_list, MAX_Q_IDX, quest);
+	C_MAKE(q_list, MAX_Q_IDX, quest_type);
 
 
 	/*** Prepare the inventory ***/
@@ -1916,6 +1944,10 @@ void init_angband(void)
 	note("[Initializing arrays... (prices)]");
 	if (init_g_info()) quit("Cannot initialize prices");
 	
+	/* Initialize price info */
+	note("[Initializing arrays... (quests)]");
+	if (init_q_info()) quit("Cannot initialize quests");
+
 	/* Initialize some other arrays */
 	note("[Initializing arrays... (other)]");
 	if (init_other()) quit("Cannot initialize other stuff");

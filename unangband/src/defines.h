@@ -813,6 +813,11 @@
 #define MAX_FEAT_STATES	 8
 
 /*
+ * Number of quest monster races we can have in a quest. Used in r_info.txt.
+ */
+#define MAX_QUEST_RACES	 4
+
+/*
  * Maximum number of 
  */
 #define MAX_SPELL_APPEARS	10
@@ -2495,6 +2500,28 @@
 #define ROOM_LAIR		0x20000000L	   /* room requires monsters contained destroyed */
 #define ROOM_OBJECT	0x40000000L	   /* room requires objects contained destroyed */
 #define ROOM_TRAP		0x80000000L	   /* whole room is a trap */
+
+
+/*** Quest flags ***/
+
+
+/*
+ * Special quest flags
+ */
+
+#define QUEST_ASSIGNED	0x0001		/* quest assigned */
+#define	QUEST_FINISHED	0x0002		/* quest completed */
+#define QUEST_DUNGEON	0x0004		/* quest requires a particular dungeon */
+#define QUEST_LEVEL	0x0008		/* quest requires a particular level */
+#define QUEST_SHOP	0x0010		/* quest requires a particular shop */
+#define QUEST_ARTIFACT	0x0020		/* quest requires a particular artifact */
+#define	QUEST_KIND	0x0040		/* quest requries a particular object kind found */
+#define QUEST_FEAT	0x0080		/* quest requries a particular feature type altered */
+#define QUEST_RACE_1	0x0100		/* quest requires a particular monster race killed */
+#define QUEST_RACE_2	0x0200		/* quest requires a particular monster race killed */
+#define QUEST_RACE_3	0x0400		/* quest requires a particular monster race killed */
+#define QUEST_RACE_4	0x0800		/* quest requires a particular monster race killed */
+#define QUEST_REPEATS	0x1000		/* quest is repeatable */
 
 /*** Object flags ***/
 

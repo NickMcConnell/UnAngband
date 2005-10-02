@@ -5957,14 +5957,14 @@ bool is_quest(int level)
 
 	/* Town is never a quest */
 	if (!level) return (FALSE);
-
+#if 0
 	/* Check quests */
 	for (i = 0; i < MAX_Q_IDX; i++)
 	{
 		/* Check for quest */
 		if (q_list[i].level == level) return (TRUE);
 	}
-
+#endif
 	/* Nope */
 	return (FALSE);
 }

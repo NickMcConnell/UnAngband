@@ -2689,7 +2689,7 @@ void monster_death(int m_idx)
 	{
 		return;
 	}
-#endif
+
 
 	/* Hack -- Mark quests as complete */
 	if (r_ptr->flags1 & (RF1_QUESTOR)) for (i = 0; i < MAX_Q_IDX; i++)
@@ -2700,7 +2700,7 @@ void monster_death(int m_idx)
 		/* Count incomplete quests */
 		if (q_list[i].level) total++;
 	}
-
+#endif
 	/* Hack -- campaign mode has quest monsters without stairs */
 	if (!(r_ptr->flags1 & (RF1_QUESTOR)) &&
 	    ((p_ptr->depth != max_depth(p_ptr->dungeon)) ||
