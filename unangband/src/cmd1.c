@@ -740,6 +740,7 @@ void search(void)
 
 /*
  * Determine if the object can be picked up, and has "=g" in its inscription.
+ * If "=g" is followed by a number, pick up if the player has less than this number of similar objects in their inventory.
  */
 static bool auto_pickup_okay(const object_type *o_ptr)
 {
@@ -758,7 +759,33 @@ static bool auto_pickup_okay(const object_type *o_ptr)
 	while (s)
 	{
 		/* Auto-pickup on "=g" */
-		if (s[1] == 'g') return (TRUE);
+		if (s[1] == 'g')
+		{
+			if ((s[2] >= '0') && (s[2] <= '9'))
+			{
+				int i, n;
+
+				n = atoi(s+2);
+
+				if (o_ptr->number > n) return (FALSE);
+
+				for (i = 0; i < INVEN_WIELD; i++)
+				{
+					if (object_similar(o_ptr, &inventory[i]))
+					{
+						/* If too many, don't pick up */
+						if (inventory[i].number > n) return (FALSE);
+					}
+				}
+
+				/* Pick up */
+				return (TRUE);
+			}
+
+			/* No number specified */
+			else return (TRUE);
+
+		}
 
 		/* Find another '=' */
 		s = strchr(s + 1, '=');
@@ -771,6 +798,7 @@ static bool auto_pickup_okay(const object_type *o_ptr)
 
 /*
  * Determine if the object has a "=d" in its inscription.
+ * If "=d" is followed by a number, don't pick up if the player has this number or more in their inventory.
  */
 static bool auto_pickup_never(const object_type *o_ptr)
 {
@@ -786,7 +814,31 @@ static bool auto_pickup_never(const object_type *o_ptr)
 	while (s)
 	{
 		/* Never pickup on "=d" */
-		if (s[1] == 'd') return (TRUE);
+		if (s[1] == 'd')
+		{
+			if ((s[2] >= '0') && (s[2] <= '9'))
+			{
+				int i, n;
+
+				n = atoi(s+2);
+
+				for (i = 0; i < INVEN_WIELD; i++)
+				{
+					if (object_similar(o_ptr, &inventory[i]))
+					{
+						/* If sufficient, don't pickup */
+						if (inventory[i].number > n) return (TRUE);
+					}
+				}
+
+				/* Allow pickup */
+				return (FALSE);
+			}
+
+			/* No number specified */
+			else return (TRUE);
+
+		}
 
 		/* Find another '=' */
 		s = strchr(s + 1, '=');
@@ -799,6 +851,7 @@ static bool auto_pickup_never(const object_type *o_ptr)
 
 /*
  * Determine if the object can be destroyed, and has "=k" in its inscription.
+ * If "=k" is followed by a number, destroy if the player has more than this number of similar objects in their inventory.
  */
 static bool auto_destroy_okay(const object_type *o_ptr)
 {
@@ -814,7 +867,30 @@ static bool auto_destroy_okay(const object_type *o_ptr)
 	while (s)
 	{
 		/* Auto-destroy on "=k" */
-		if (s[1] == 'k') return (TRUE);
+		if (s[1] == 'k')
+		{
+			if ((s[2] >= '0') && (s[2] <= '9'))
+			{
+				int i, n;
+
+				n = atoi(s+2);
+
+				for (i = 0; i < INVEN_WIELD; i++)
+				{
+					if (object_similar(o_ptr, &inventory[i]))
+					{
+						/* If too many, allow destroy */
+						if (inventory[i].number > n) return (TRUE);
+					}
+				}
+
+				/* Don't auto destroy */
+				return (FALSE);
+			}
+
+			/* No number specified */
+			else return (TRUE);
+		}
 
 		/* Find another '=' */
 		s = strchr(s + 1, '=');
@@ -827,6 +903,7 @@ static bool auto_destroy_okay(const object_type *o_ptr)
 
 /*
  * Determine if the object has "=i" in its inscription.
+ * If "=i" is followed by a number, ignore if the player has more than this number of similar objects in their inventory.
  */
 bool auto_pickup_ignore(const object_type *o_ptr)
 {
@@ -842,13 +919,36 @@ bool auto_pickup_ignore(const object_type *o_ptr)
 	while (s)
 	{
 		/* Auto-ignore on "=i" */
-		if (s[1] == 'i') return (TRUE);
+		if (s[1] == 'i')
+		{
+			if ((s[2] >= '0') && (s[2] <= '9'))
+			{
+				int i, n;
+
+				n = atoi(s+2);
+
+				for (i = 0; i < INVEN_WIELD; i++)
+				{
+					if (object_similar(o_ptr, &inventory[i]))
+					{
+						/* If too many, allow destroy */
+						if (inventory[i].number > n) return (TRUE);
+					}
+				}
+
+				/* Don't auto-ignore */
+				return (FALSE);
+			}
+
+			/* No number specified */
+			else return (TRUE);
+		}
 
 		/* Find another '=' */
 		s = strchr(s + 1, '=');
 	}
 
-	/* Don't auto destroy */
+	/* Don't auto ignore */
 	return (FALSE);
 }
 

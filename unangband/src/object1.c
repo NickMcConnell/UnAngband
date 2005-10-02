@@ -2720,6 +2720,8 @@ static bool verify_item(cptr prompt, int item)
 /*
  * Hack -- allow user to "prevent" certain choices.
  *
+ * Now can use '<n' to confirm if stack is less than size 'n' or '>n' if stack is more than size 'n'.
+ *
  * The item can be negative to mean "item on floor".
  */
 static bool get_item_allow(int item)
@@ -2727,6 +2729,8 @@ static bool get_item_allow(int item)
 	cptr s;
 
 	object_type *o_ptr;
+
+	int n;
 
 	/* Inventory */
 	if (item >= 0)
@@ -2758,6 +2762,75 @@ static bool get_item_allow(int item)
 
 		/* Find another '!' */
 		s = strchr(s + 1, '!');
+	}
+
+	/* Find a '<' */
+	s = strchr(quark_str(o_ptr->note), '<');
+
+	/* Process preventions */
+	while (s)
+	{
+
+		/* Check the "restriction" */
+		if ((s[1] >= '0') || (s[1] <= '9'))
+		{
+			n = atoi(s+1);
+
+			/* Verify the choice */
+			if ((o_ptr->number < n) && (!verify_item("Really try", item))) return (FALSE);
+		}
+
+		/* Check the "restriction" */
+		else if ((s[1] == p_ptr->command_cmd) || (s[1] == '*'))
+		{
+			/* Check the "restriction" */
+			if ((s[2] >= '0') || (s[2] <= '9'))
+			{
+				n = atoi(s+2);
+
+				/* Verify the choice */
+				if ((o_ptr->number < n) && (!verify_item("Really try", item))) return (FALSE);
+			}
+			
+		}
+
+		/* Find another '!' */
+		s = strchr(s + 1, '<');
+	}
+
+
+	/* Find a '>' */
+	s = strchr(quark_str(o_ptr->note), '>');
+
+	/* Process preventions */
+	while (s)
+	{
+
+		/* Check the "restriction" */
+		if ((s[1] >= '0') || (s[1] <= '9'))
+		{
+			n = atoi(s+1);
+
+			/* Verify the choice */
+			if ((o_ptr->number > n) && (!verify_item("Really try", item))) return (FALSE);
+		}
+
+		/* Check the "restriction" */
+		else if ((s[1] == p_ptr->command_cmd) || (s[1] == '*'))
+		{
+			/* Check the "restriction" */
+			if ((s[2] >= '0') || (s[2] <= '9'))
+			{
+				n = atoi(s+2);
+
+				/* Verify the choice */
+				if ((o_ptr->number > n) && (!verify_item("Really try", item))) return (FALSE);
+			}
+			
+		}
+
+		/* Find another '!' */
+		s = strchr(s + 1, '>');
 	}
 
 	/* Allow it */

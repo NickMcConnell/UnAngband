@@ -76,6 +76,16 @@ unnessary bookkeeping.
 
 ### User Interface ###
 
+- You can now inscribe an item with =g5 to mean pick up this item unless I already have
+5 of it in my inventory. You can also inscribe it with =d5 to mean don't pick up this item
+if I have 5 or more of it in my inventory. You can also inscribe it with =k5 to mean destroy
+it on pick-up if I have 5 or more of it in my inventory. You also inscribe it with =i5 to
+mean ignore it if I have 5 or more of it in my inventory. (Suggested by Willem Siemelink on
+rec.games.roguelike.angband).
+
+- You can now inscribe an item with <5 to mean confirm if I have less than 5 of this in my
+inventory and >5 to mean confirm if I have more than 5 of this in my inventory.
+
 - Monster recall now reports what particular types of items are dropped by each
 monster.
 
