@@ -338,13 +338,14 @@ static void wr_quest(int n)
 	wr_byte(q_ptr->pre_dungeon);
 	wr_byte(q_ptr->pre_level);
 	wr_byte(q_ptr->pre_shop);
-	wr_byte(q_ptr->pre_unused);
+	wr_byte(q_ptr->pre_room);
 
 	/* Read the quest requirements */
 	wr_byte(q_ptr->req_dungeon);
 	wr_byte(q_ptr->req_level);
 	wr_byte(q_ptr->req_shop);
 	wr_byte(q_ptr->req_artifact);
+	wr_s16b(q_ptr->req_room_type);
 	wr_s16b(q_ptr->req_kind);
 	wr_s16b(q_ptr->req_kind_needs);
 	wr_s16b(q_ptr->req_kind_found);

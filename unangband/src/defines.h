@@ -197,7 +197,7 @@
 /*
  * Hack -- Maximum number of quests
  */
-#define MAX_Q_IDX	4
+#define MAX_Q_IDX	100
 
 /*
  * Maximum number of high scores in the high score file
@@ -2472,8 +2472,8 @@
 #define ROOM_HEARD	0x00000002L	   /* room has been heard */
 #define ROOM_ENTER	0x00000004L	   /* room has been entered */
 #define ROOM_QUEST	0x00000008L	   /* room is a quest */
-#define ROOM_LITE		0x00000010L	   /* room is lit */
-#define ROOM_DARK		0x00000020L	   /* room is dark */
+#define ROOM_LITE	0x00000010L	   /* room is lit */
+#define ROOM_DARK	0x00000020L	   /* room is dark */
 #define ROOM_SURFACE	0x00000040L	   /* room is on surface */
 #define ROOM_BOTTOM	0x00000080L	   /* room is bottom of dungeon */
 #define ROOM_DAYLITE	0x00000100L	   /* room is lit during daytime */ 
@@ -2497,31 +2497,58 @@
 #define ROOM_DISPEL	0x04000000L	   /* room dispels enchantments */
 #define ROOM_RANDOM	0x08000000L	   /* room activates randomly for effect */
 #define ROOM_PUZZLE	0x10000000L	   /* room requires features contained destroyed */
-#define ROOM_LAIR		0x20000000L	   /* room requires monsters contained destroyed */
+#define ROOM_LAIR	0x20000000L	   /* room requires monsters contained destroyed */
 #define ROOM_OBJECT	0x40000000L	   /* room requires objects contained destroyed */
-#define ROOM_TRAP		0x80000000L	   /* whole room is a trap */
+#define ROOM_TRAP	0x80000000L	   /* whole room is a trap */
 
 
-/*** Quest flags ***/
+/*** Quest event types ***/
+
+#define EVENT_TRAVEL		0x00000001L	/* Travels to a location */
+#define EVENT_LEAVE		0x00000002L	/* Leave a location */
+#define EVENT_STAY		0x00000004L	/* Stay in location */
+#define EVENT_BEFORE		0x00000008L	/* Valid until this time */
+#define EVENT_AFTER		0x00000010L	/* Valid after this time */
+#define EVENT_FIND_ROOM		0x00000020L	/* Locate room */
+#define EVENT_FLAG_ROOM		0x00000040L	/* Add flags to room*/
+#define EVENT_UNFLAG_ROOM	0x00000080L	/* Remove flags from room */
+#define EVENT_ALTER_FEAT	0x00000100L	/* Alters a feature */
+#define EVENT_DEFEND_FEAT	0x00000200L	/* Don't alter a feat */
+#define EVENT_FIND_ITEM		0x00000400L	/* Give an item */
+#define EVENT_GET_ITEM		0x00000800L	/* Have an item */
+#define EVENT_DESTROY_ITEM	0x00001000L	/* Destroy an item */
+#define EVENT_LOSE_ITEM		0x00002000L	/* Leave an item behind */
+#define EVENT_TALK_STORE		0x00004000L	/* Talks to the owner of a shop */
+#define EVENT_BUY_STORE		0x00008000L	/* Buys an item from a shop */
+#define EVENT_SELL_STORE		0x00010000L	/* Sells an item to a shop */
+#define EVENT_GIVE_STORE		0x00020000L	/* Give an item to an owner of a shop */
+#define EVENT_STOCK_STORE	0x00040000L	/* Stocks an item in a shop */
+#define EVENT_GET_STORE		0x00080000L	/* Steal an item from a shop */
+#define EVENT_DEFEND_STORE	0x00100000L	/* Get kicked out of a shop */
+#define EVENT_TALK_RACE		0x00200000L	/* Defend a shop */
+#define EVENT_GIVE_RACE		0x00400000L	/* Talks to a monster race */
+#define EVENT_GET_RACE		0x00800000L	/* Give an item to a monster */
+#define EVENT_FIND_RACE		0x01000000L	/* Sees a monster race */
+#define EVENT_KILL_RACE		0x02000000L	/* Kill a monster race */
+#define EVENT_ALLY_RACE		0x04000000L	/* Befriend a monster race */
+#define EVENT_HATE_RACE		0x08000000L	/* Make enemies with a monster race */
+#define EVENT_FEAR_RACE		0x10000000L	/* Scares a monster race */
+#define EVENT_HEAL_RACE		0x20000000L	/* Heals a monster race */
+#define EVENT_TELE_RACE		0x40000000L	/* Teleports a monster race */
+#define EVENT_DEFEND_RACE	0x80000000L	/* Defend a race */
+
+/*** Quest event sequence ***/
+
+#define QUEST_ASSIGN	0	/* Event describes quest assignment */
+#define QUEST_LOCATE	1	/* Event describes quest location */
+#define QUEST_ACTION	2	/* Event describes quest actions */
+#define	QUEST_FINISH	3	/* Event describes quest finish */
+#define	QUEST_REWARD	4	/* Event describes quest reward */
+#define	QUEST_FAILED	5	/* Event describes quest failure */
+#define	QUEST_PENALTY	6	/* Event describes quest failure */
+#define MAX_QUEST_EVENTS 7	/* Maximum events in a quest */
 
 
-/*
- * Special quest flags
- */
-
-#define QUEST_ASSIGNED	0x0001		/* quest assigned */
-#define	QUEST_FINISHED	0x0002		/* quest completed */
-#define QUEST_DUNGEON	0x0004		/* quest requires a particular dungeon */
-#define QUEST_LEVEL	0x0008		/* quest requires a particular level */
-#define QUEST_SHOP	0x0010		/* quest requires a particular shop */
-#define QUEST_ARTIFACT	0x0020		/* quest requires a particular artifact */
-#define	QUEST_KIND	0x0040		/* quest requries a particular object kind found */
-#define QUEST_FEAT	0x0080		/* quest requries a particular feature type altered */
-#define QUEST_RACE_1	0x0100		/* quest requires a particular monster race killed */
-#define QUEST_RACE_2	0x0200		/* quest requires a particular monster race killed */
-#define QUEST_RACE_3	0x0400		/* quest requires a particular monster race killed */
-#define QUEST_RACE_4	0x0800		/* quest requires a particular monster race killed */
-#define QUEST_REPEATS	0x1000		/* quest is repeatable */
 
 /*** Object flags ***/
 

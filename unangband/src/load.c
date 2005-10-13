@@ -698,13 +698,14 @@ static errr rd_quest(int n)
 	rd_byte(&q_ptr->pre_dungeon);
 	rd_byte(&q_ptr->pre_level);
 	rd_byte(&q_ptr->pre_shop);
-	rd_byte(&q_ptr->pre_unused);
+	rd_byte(&q_ptr->pre_room);
 
 	/* Read the quest requirements */
 	rd_byte(&q_ptr->req_dungeon);
 	rd_byte(&q_ptr->req_level);
 	rd_byte(&q_ptr->req_shop);
 	rd_byte(&q_ptr->req_artifact);
+	rd_s16b(&q_ptr->req_room_type);
 	rd_s16b(&q_ptr->req_kind);
 	rd_s16b(&q_ptr->req_kind_needs);
 	rd_s16b(&q_ptr->req_kind_found);

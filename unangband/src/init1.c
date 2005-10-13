@@ -1490,6 +1490,18 @@ errr parse_z_info(char *buf, header *head)
 		z_info->b_max = max;
 	}
 
+	/* Process 'B' for "Maximum q_info[] subindex" */
+	else if (buf[2] == 'Q')
+	{
+		int max;
+
+		/* Scan for the value */
+		if (1 != sscanf(buf+4, "%d", &max)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the value */
+		z_info->q_max = max;
+	}
+
 	/* Process 'O' for "Maximum o_list[] index" */
 	else if (buf[2] == 'O')
 	{
@@ -5371,39 +5383,40 @@ errr parse_q_info(char *buf, header *head)
 	/* Process 'P' for "Pre-requsites" (one line only) */
 	else if (buf[0] == 'P')
 	{
-		int r_idx, dungeon, level, shop, unused;
+		int r_idx, dungeon, level, shop, room;
 		
 		/* There better be a current q_ptr */
 		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
 		if (5 != sscanf(buf+2, "%d:%d:%d:%d:%d",
-				&r_idx, &dungeon, &level, &shop, &unused)) return (PARSE_ERROR_GENERIC);
+				&r_idx, &dungeon, &level, &shop, &room)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		q_ptr->pre_r_idx = r_idx;
 		q_ptr->pre_dungeon = dungeon;
 		q_ptr->pre_level = level;
 		q_ptr->pre_shop = shop;
-		q_ptr->pre_unused = unused;
+		q_ptr->pre_room = room;
 	}
 
 	/* Process 'T' for "Travel to" (one line only) */
 	else if (buf[0] == 'T')
 	{
-		int dungeon, level, shop;
+		int dungeon, level, shop, room_type;
 		
 		/* There better be a current q_ptr */
 		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (3 != sscanf(buf+2, "%d:%d:%d",
-				&dungeon, &level, &shop)) return (PARSE_ERROR_GENERIC);
+		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
+				&dungeon, &level, &shop, &room_type)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		q_ptr->req_dungeon = dungeon;
 		q_ptr->req_level = level;
 		q_ptr->req_shop = shop;
+		q_ptr->req_room_type = room_type;
 
 		q_ptr->flags |= (QUEST_DUNGEON);
 		q_ptr->flags |= (QUEST_LEVEL);
@@ -5473,7 +5486,7 @@ errr parse_q_info(char *buf, header *head)
 		q_ptr->req_race_kills[i] = 0;
 		q_ptr->req_race_parts[i] = race_parts;
 
-		q_ptr->flags |= (QUEST_RACE_1) << i;
+		q_ptr->flags |= (QUEST_RACE);
 	}
 
 	/* Process 'F' for "Features" */

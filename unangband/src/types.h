@@ -93,6 +93,7 @@ typedef struct vault_type vault_type;
 typedef struct object_type object_type;
 typedef struct monster_type monster_type;
 typedef struct alloc_entry alloc_entry;
+typedef struct quest_event quest_event;
 typedef struct quest_type quest_type;
 typedef struct owner_type owner_type;
 typedef struct store_type store_type;
@@ -871,6 +872,43 @@ struct alloc_entry
 
 
 
+
+
+/*
+ * Structure for quest events
+ */
+struct quest_event
+{
+	u32b flags;		/* Flags */
+
+	byte dungeon;		/* Dungeon */
+	byte level;		/* Level */
+	byte room;		/* Room number */
+	byte action;		/* Feature action */
+
+	s16b feat;		/* Feature */
+	s16b store;		/* Shop */
+
+	s16b race;		/* Monster race */
+	s16b kind;		/* Object kind */
+
+	s16b number;		/* Number still needed */
+	byte artifact;		/* Artifact */
+	byte ego_item_type;	/* Ego item */
+
+	s16b room_type_a;	/* Room adjective */
+	s16b room_type_b;	/* Room noun */
+
+	u32b room_flags;	/* Room flags */
+
+	s16b owner;		/* Shop owner */
+	s16b power;		/* Power */
+
+	s16b experience;	/* Experience */
+	s16b gold;		/* Gold */
+};
+
+
 /*
  * Structure for the "quests"
  */
@@ -879,60 +917,10 @@ struct quest_type
 	u32b name;		/* Quest name */
 	u32b text;		/* Quest text */
 
-	u16b flags;		/* Quest flags */
-	u16b known;		/* Quest flags known */
+	quest_event event[MAX_QUEST_EVENTS];	/* Quest events */
 
-	s16b pre_quest;		/* Pre-requisite quest completed */
-	s16b pre_r_idx;		/* Pre-requisite race assigning quest */
-
-	byte pre_dungeon;	/* Dungeon assigning quest */
-	byte pre_level;		/* Level assigning quest */
-	byte pre_shop;		/* Shop assigning quest */
-	byte pre_unused;	/* Unused (guild / faction?) */
-
-	byte req_dungeon;	/* Go to shop */
-	byte req_level;		/* Go to level */
-	byte req_shop;		/* Go to shop */
-	byte req_artifact;	/* Find artifact */
-
-	s16b req_kind;		/* Find object kind */
-	s16b req_kind_needs;	/* Find object kind number needed */
-	s16b req_kind_found;	/* Find object kind number found */
-
-	s16b req_feat;		/* Destroy feature */
-	byte req_feat_action;	/* Destroy feature how? */
-	byte unused2;		
-	s16b req_feat_needs;	/* Destroy feature needed */
-	s16b req_feat_altered;	/* Destroy feature altered */
-
-	s16b req_race[MAX_QUEST_RACES];	/* Kill race */
-	s16b req_race_needs[MAX_QUEST_RACES];	/* Kill race needed */
-	s16b req_race_kills[MAX_QUEST_RACES];	/* Kill race already killed */
-	s16b req_race_parts[MAX_QUEST_RACES];	/* Kill race required body part */
-
-	s16b fin_kind;		/* Give object kind */
-	s16b fin_kind_num;	/* Give object number */
-	s16b fin_ego_item;	/* Give object ego type */
-	s16b fin_artifact;	/* Give artifact */
-
-	s16b fin_experience;	/* Give experience */
-	s16b fin_power;		/* Give power */
-	s16b fin_gold;		/* Give gold */
-
-	byte fin_stock_dungeon;	/* Stock item in dungeon */
-	byte fin_stock_shop;	/* Stock item in shop */
-	s16b fin_stock_kind;	/* Stock item */
-	s16b fin_stock_kind_num;/* Stock item num */
-
-	s16b fin_banish;	/* Banish race -- never appear again */
-	s16b fin_summon;	/* Summon monster race */
-	s16b fin_friend;	/* Set race to friendly */
-	s16b fin_enemy;		/* Set race to be enemies */
-	s16b fin_leaving;	/* Set race to leaving */
-	s16b fin_lose_art;	/* Remove artifact -- never appear again */
+	byte stage;
 };
-
-
 
 
 /*
