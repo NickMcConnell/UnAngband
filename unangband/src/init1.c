@@ -61,13 +61,37 @@
 static cptr d_info_sflags[] =
 {
 	"SEEN",
+	"HEAR",
+	"ENTERED",
+	"QUEST",
+	"LITE",
+	"DARK",
+	"SURFACE",
+	"BOTTOM",
+	"DAYLITE",
 	"ICKY",
 	"BLOODY",
 	"CURSED",
 	"GLOOMY",
 	"PORTAL",
 	"SILENT",
-	"STATIC"
+	"STATIC",
+	"STATIS",
+	"SEALED",
+	"HIDDEN",
+	"ANCHOR",
+	"ECHOES",
+	"STENCH",
+	"NOISY",
+	"WINDY",
+	"GRAVE",
+	"STORE",
+	"DISPEL",
+	"RANDOM",
+	"PUZZLE",
+	"LAIR",
+	"OBJECT",
+	"TRAP"
 };
 
 /*
@@ -1133,6 +1157,47 @@ static cptr s_info_types[] =
 
 
 
+/*
+ * Quest event flags
+ */
+static cptr quest_event_info_flags[] =
+{
+	"TRAVEL",
+	"LEAVE",
+	"STAY",
+	"PASS_QUEST",
+	"FAIL_QUEST",
+	"FIND_ROOM",
+	"FLAG_ROOM",
+	"UNFLAG_ROOM",
+	"ALTER_FEAT",
+	"DEFEND_FEAT",
+	"FIND_ITEM",
+	"GET_ITEM",
+	"DESTROY_ITEM",
+	"LOSE_ITEM",
+	"TALK_STORE",
+	"BUY_STORE",
+	"SELL_STORE",
+	"GIVE_STORE",
+	"STOCK_STORE",
+	"GET_STORE",
+	"DEFEND_STORE",
+	"TALK_RACE",
+	"GIVE_RACE",
+	"GET_RACE",
+	"FIND_RACE",
+	"KILL_RACE",
+	"ALLY_RACE",
+	"HATE_RACE",
+	"FEAR_RACE",
+	"HEAL_RACE",
+	"BANISH_RACE",
+	"DEFEND_RACE"
+};
+
+
+
 /*** Initialize from ascii template files ***/
 
 
@@ -1658,6 +1723,27 @@ errr parse_v_info(char *buf, header *head)
 
 
 /*
+ * Grab one flag from a textual string
+ */
+static errr grab_one_flag(u32b *flags, cptr names[], cptr what)
+{
+	int i;
+
+	/* Check flags */
+	for (i = 0; i < 32; i++)
+	{
+		if (streq(what, names[i]))
+		{
+			*flags |= (1L << i);
+			return (0);
+		}
+	}
+
+	return (-1);
+}
+
+
+/*
  * Grab one byte flag from a textual string
  */
 static errr grab_one_bflag(byte *flags, cptr names[], cptr what)
@@ -1705,7 +1791,7 @@ static errr grab_one_offset(byte *offset, cptr names[], cptr what)
  */
 static errr grab_one_special_flag(desc_type *d_ptr, cptr what)
 {
-	if (grab_one_bflag(&d_ptr->flags, d_info_sflags, what) == 0)
+	if (grab_one_flag(&d_ptr->flags, d_info_sflags, what) == 0)
 		return (0);
 
 	/* Oops */
@@ -1967,27 +2053,6 @@ errr parse_d_info(char *buf, header *head)
 
 	/* Success */
 	return (0);
-}
-
-
-/*
- * Grab one flag from a textual string
- */
-static errr grab_one_flag(u32b *flags, cptr names[], cptr what)
-{
-	int i;
-
-	/* Check flags */
-	for (i = 0; i < 32; i++)
-	{
-		if (streq(what, names[i]))
-		{
-			*flags |= (1L << i);
-			return (0);
-		}
-	}
-
-	return (-1);
 }
 
 
@@ -5299,15 +5364,15 @@ errr parse_g_info(char *buf, header *head)
 /*
  * Grab an action in an quest_type from a textual string
  */
-static errr grab_one_quest_action(quest_type *q_ptr, cptr what)
+static errr grab_one_quest_action(quest_event *qe_ptr, cptr what)
 {
-	if (grab_one_offset(&q_ptr->req_feat_action, f_info_flags1, what) == 0)
+	if (grab_one_offset(&qe_ptr->action, f_info_flags1, what) == 0)
 		return (0);
 
-	if (grab_one_offset(&q_ptr->req_feat_action, f_info_flags2, what) == 0)
+	if (grab_one_offset(&qe_ptr->action, f_info_flags2, what) == 0)
 		return (0);
 
-	if (grab_one_offset(&q_ptr->req_feat_action, f_info_flags3, what) == 0)
+	if (grab_one_offset(&qe_ptr->action, f_info_flags3, what) == 0)
 		return (0);
 
 	/* Oops */
@@ -5316,6 +5381,39 @@ static errr grab_one_quest_action(quest_type *q_ptr, cptr what)
 	/* Error */
 	return (PARSE_ERROR_GENERIC);
 }
+
+
+/*
+ * Grab one flag in an quest_event_info_flags from a textual string
+ */
+static errr grab_one_quest_flag(quest_event *qe_ptr, cptr what)
+{
+	if (grab_one_flag(&qe_ptr->flags, quest_event_info_flags, what) == 0)
+		return (0);
+
+	/* Oops */
+	msg_format("Unknown quest event flag '%s'.", what);
+
+	/* Error */
+	return (PARSE_ERROR_GENERIC);
+}
+
+
+/*
+ * Grab one flag in an room_type from a textual string
+ */
+static errr grab_one_quest_room_flag(quest_event *qe_ptr, cptr what)
+{
+	if (grab_one_flag(&qe_ptr->flags, d_info_sflags, what) == 0)
+		return (0);
+
+	/* Oops */
+	msg_format("Unknown quest event flag '%s'.", what);
+
+	/* Error */
+	return (PARSE_ERROR_GENERIC);
+}
+
 
 /*
  * Initialize the "q_info" array, by parsing an ascii "template" file
@@ -5328,6 +5426,9 @@ errr parse_q_info(char *buf, header *head)
 
 	/* Current entry */
 	static quest_type *q_ptr = NULL;
+
+	/* Current entry */
+	static quest_event *qe_ptr = NULL;
 
 	/* Process 'N' for "New/Number/Name" */
 	if (buf[0] == 'N')
@@ -5359,12 +5460,98 @@ errr parse_q_info(char *buf, header *head)
 		/* Point at the "info" */
 		q_ptr = (quest_type*)head->info_ptr + i;
 
+		/* Point at the first event */
+		qe_ptr = &(q_ptr->event[0]);
+
 		/* Store the name */
 		if (!(q_ptr->name = add_name(head, s)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
 	}
 
-	/* Process 'Q' for "Quest" (one line only) */
+	/* Process 'S' for "Stage" (up to MAX_QUEST_EVENT lines) */
+	else if (buf[0] == 'S')
+	{
+		int stage;
+
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (1 != sscanf(buf+2, "%d",
+				&stage)) return (PARSE_ERROR_GENERIC);
+
+		/* Paranoia */
+		if (stage < 0) return (PARSE_ERROR_NON_SEQUENTIAL_RECORDS);
+
+		/* Paranoia */
+		if (stage >= MAX_QUEST_EVENTS) return (PARSE_ERROR_TOO_MANY_ENTRIES);
+		
+		/* Point at the first event */
+		qe_ptr = &q_ptr->event[stage];
+	}
+
+	/* Hack -- Process 'F' for flags */
+	else if (buf[0] == 'F')
+	{
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Parse every entry textually */
+		for (s = buf + 2; *s; )
+		{
+			/* Find the end of this entry */
+			for (t = s; *t && (*t != ' ') && (*t != '|'); ++t) /* loop */;
+
+			/* Nuke and skip any dividers */
+			if (*t)
+			{
+				*t++ = '\0';
+				while (*t == ' ' || *t == '|') t++;
+			}
+
+			/* Parse this entry */
+			if (0 != grab_one_quest_flag(qe_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
+
+			/* Start the next entry */
+			s = t;
+		}
+	}
+
+	/* Process 'T' for "Travel to" (one line per stage) */
+	else if (buf[0] == 'T')
+	{
+		int dungeon, level, store;
+		
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (3 != sscanf(buf+2, "%d:%d:%d",
+				&dungeon, &level, &store)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		qe_ptr->dungeon = dungeon;
+		qe_ptr->level = level;
+		qe_ptr->store = store;
+	}
+
+	/* Process 'A' for "Artifact" (one line per stage) */
+	else if (buf[0] == 'A')
+	{
+		int artifact;
+
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (1 != sscanf(buf+2, "%d",
+			    &artifact)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		qe_ptr->artifact = artifact;
+	}
+	
+	/* Process 'Q' for "Quest" (one line per stage) */
 	else if (buf[0] == 'Q')
 	{
 		int quest;
@@ -5377,122 +5564,77 @@ errr parse_q_info(char *buf, header *head)
 			    &quest)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		q_ptr->pre_quest = quest;
+		qe_ptr->quest = quest;
 	}
 
-	/* Process 'P' for "Pre-requsites" (one line only) */
-	else if (buf[0] == 'P')
+	/* Process 'Z' for "Number" (one line per stage) */
+	else if (buf[0] == 'Z')
 	{
-		int r_idx, dungeon, level, shop, room;
-		
-		/* There better be a current q_ptr */
-		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* Scan for the values */
-		if (5 != sscanf(buf+2, "%d:%d:%d:%d:%d",
-				&r_idx, &dungeon, &level, &shop, &room)) return (PARSE_ERROR_GENERIC);
-
-		/* Save the values */
-		q_ptr->pre_r_idx = r_idx;
-		q_ptr->pre_dungeon = dungeon;
-		q_ptr->pre_level = level;
-		q_ptr->pre_shop = shop;
-		q_ptr->pre_room = room;
-	}
-
-	/* Process 'T' for "Travel to" (one line only) */
-	else if (buf[0] == 'T')
-	{
-		int dungeon, level, shop, room_type;
-		
-		/* There better be a current q_ptr */
-		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* Scan for the values */
-		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
-				&dungeon, &level, &shop, &room_type)) return (PARSE_ERROR_GENERIC);
-
-		/* Save the values */
-		q_ptr->req_dungeon = dungeon;
-		q_ptr->req_level = level;
-		q_ptr->req_shop = shop;
-		q_ptr->req_room_type = room_type;
-
-		q_ptr->flags |= (QUEST_DUNGEON);
-		q_ptr->flags |= (QUEST_LEVEL);
-		q_ptr->flags |= (QUEST_SHOP);
-
-	}
-
-	/* Process 'A' for "Artifact" (one line only) */
-	else if (buf[0] == 'O')
-	{
-		int artifact;
+		int number;
 
 		/* There better be a current q_ptr */
 		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
 		if (1 != sscanf(buf+2, "%d",
-			    &artifact)) return (PARSE_ERROR_GENERIC);
+			    &number)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		q_ptr->req_artifact = artifact;
-
-		q_ptr->flags |= (QUEST_ARTIFACT);
+		qe_ptr->number = number;
 	}
-	
-	/* Process 'K' for "Kinds" (one line only) */
+
+	/* Process 'K' for "Kinds" (one line per stage) */
 	else if (buf[0] == 'K')
 	{
-		int kind, kind_needs;
+		int kind;
 		
 		/* There better be a current q_ptr */
 		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (2 != sscanf(buf+2, "%d:%d",
-				&kind, &kind_needs)) return (PARSE_ERROR_GENERIC);
+		if (1 != sscanf(buf+2, "%d",
+				&kind)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		q_ptr->req_kind = kind;
-		q_ptr->req_kind_needs = kind_needs;
-		q_ptr->req_kind_found = 0;
-
-		q_ptr->flags |= (QUEST_KIND);
+		qe_ptr->kind = kind;
 	}
 
-	/* Process 'R' for "Races" (up to four lines ) */
+	/* Process 'E' for "Ego item" (one line per stage) */
+	else if (buf[0] == 'E')
+	{
+		int ego_item_type;
+		
+		/* There better be a current q_ptr */
+		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (1 != sscanf(buf+2, "%d",
+				&ego_item_type)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		qe_ptr->ego_item_type = ego_item_type;
+	}
+
+	/* Process 'R' for "Races" (one line per stage) */
 	else if (buf[0] == 'R')
 	{
-		int race, race_needs, race_parts;
+		int race;
 
 		/* There better be a current q_ptr */
 		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
-		/* Find the next empty state slot (if any) */
-		for (i = 0; i < MAX_QUEST_RACES; i++) if (q_ptr->req_race[i] == 0) break;
-
-		/* Oops, no more slots */
-		if (i == MAX_QUEST_RACES) return (PARSE_ERROR_GENERIC);
-
 		/* Scan for the values */
-		if (3 != sscanf(buf+2, "%d:%d:%d",
-				&race, &race_needs, &race_parts)) return (PARSE_ERROR_GENERIC);
+		if (1 != sscanf(buf+2, "%d",
+				&race)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		q_ptr->req_race[i] = race;
-		q_ptr->req_race_needs[i] = race_needs;
-		q_ptr->req_race_kills[i] = 0;
-		q_ptr->req_race_parts[i] = race_parts;
-
-		q_ptr->flags |= (QUEST_RACE);
+		qe_ptr->race = race;
 	}
 
-	/* Process 'F' for "Features" */
-	else if (buf[0] == 'F')
+	/* Process 'O' for "Rooms" (one line per stage) */
+	else if (buf[0] == 'O')
 	{
-		int feat, feat_needs;
+		int room_type_a, room_type_b;
 
 		/* There better be a current q_ptr */
 		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -5504,39 +5646,44 @@ errr parse_q_info(char *buf, header *head)
 		if (*t == ':') *t++ = '\0';
 
 		/* Parse this entry */
-		if (0 != grab_one_quest_action(q_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
+		if (0 != grab_one_quest_room_flag(qe_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
 
 		/* Scan for the values */
 		if (2 != sscanf(t, "%d:%d",
-				&feat, &feat_needs)) return (PARSE_ERROR_GENERIC);
+				&room_type_a, &room_type_b)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		q_ptr->req_feat = feat;
-		q_ptr->req_feat_needs = feat;
-		q_ptr->req_feat_altered = 0;
-
+		qe_ptr->room_type_a = room_type_a;
+		qe_ptr->room_type_b = room_type_b;
 	}
 
-	/* Process 'G' for "Gifts" (one line only) */
-	else if (buf[0] == 'G')
+	/* Process 'X' for "Features" (one line per stage) */
+	else if (buf[0] == 'X')
 	{
-		int kind, kind_num, ego_item, artifact;
-		
+		int feat;
+
 		/* There better be a current q_ptr */
 		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
+		/* Analyze the first field */
+		for (s = t = buf+2; *t && (*t != ':'); t++) /* loop */;
+
+		/* Terminate the field (if necessary) */
+		if (*t == ':') *t++ = '\0';
+
+		/* Parse this entry */
+		if (0 != grab_one_quest_action(qe_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
+
 		/* Scan for the values */
-		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
-				&kind, &kind_num, &ego_item, &artifact)) return (PARSE_ERROR_GENERIC);
+		if (1 != sscanf(t, "%d",
+				&feat)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		q_ptr->fin_kind = kind;
-		q_ptr->fin_kind_num = kind_num;
-		q_ptr->fin_ego_item = ego_item;
-		q_ptr->fin_artifact = artifact;
+		qe_ptr->feat = feat;
+
 	}
 
-	/* Process 'W' for "Worth" (one line only) */
+	/* Process 'W' for "Worth" (one line per stage) */
 	else if (buf[0] == 'W')
 	{
 		int experience, power, gold;
@@ -5549,49 +5696,9 @@ errr parse_q_info(char *buf, header *head)
 				&experience, &power, &gold)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		q_ptr->fin_experience = experience;
-		q_ptr->fin_power = power;
-		q_ptr->fin_gold = gold;
-	}
-
-	/* Process 'S' for "Stock" (one line only) */
-	else if (buf[0] == 'S')
-	{
-		int dungeon, shop, kind, kind_num;
-		
-		/* There better be a current q_ptr */
-		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* Scan for the values */
-		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
-				&dungeon, &shop, &kind, &kind_num)) return (PARSE_ERROR_GENERIC);
-
-		/* Save the values */
-		q_ptr->fin_stock_dungeon = dungeon;
-		q_ptr->fin_stock_shop = shop;
-		q_ptr->fin_stock_kind = kind;
-		q_ptr->fin_stock_kind_num = kind_num;
-	}
-
-	/* Process 'B' for "Bad things" (one line only) */
-	else if (buf[0] == 'B')
-	{
-		int banish, summon, friend, enemy, leaving, lose_art;
-		
-		/* There better be a current q_ptr */
-		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* Scan for the values */
-		if (6 != sscanf(buf+2, "%d:%d:%d:%d:%d:%d",
-				&banish, &summon, &friend, &enemy, &leaving, &lose_art)) return (PARSE_ERROR_GENERIC);
-
-		/* Save the values */
-		q_ptr->fin_banish = banish;
-		q_ptr->fin_summon = summon;
-		q_ptr->fin_friend = friend;
-		q_ptr->fin_enemy = enemy;
-		q_ptr->fin_leaving = leaving;
-		q_ptr->fin_lose_art = lose_art;
+		qe_ptr->experience = experience;
+		qe_ptr->power = power;
+		qe_ptr->gold = gold;
 	}
 
 	/* Process 'D' for "Description" */

@@ -813,11 +813,6 @@
 #define MAX_FEAT_STATES	 8
 
 /*
- * Number of quest monster races we can have in a quest. Used in r_info.txt.
- */
-#define MAX_QUEST_RACES	 4
-
-/*
  * Maximum number of 
  */
 #define MAX_SPELL_APPEARS	10
@@ -2470,7 +2465,7 @@
  */
 #define ROOM_SEEN 	0x00000001L    /* room has been seen */
 #define ROOM_HEARD	0x00000002L	   /* room has been heard */
-#define ROOM_ENTER	0x00000004L	   /* room has been entered */
+#define ROOM_ENTERED	0x00000004L	   /* room has been entered */
 #define ROOM_QUEST	0x00000008L	   /* room is a quest */
 #define ROOM_LITE	0x00000010L	   /* room is lit */
 #define ROOM_DARK	0x00000020L	   /* room is dark */
@@ -2502,13 +2497,16 @@
 #define ROOM_TRAP	0x80000000L	   /* whole room is a trap */
 
 
-/*** Quest event types ***/
+/*** Quest flags ***/
 
+/*
+ * Quest event flags
+ */
 #define EVENT_TRAVEL		0x00000001L	/* Travels to a location */
 #define EVENT_LEAVE		0x00000002L	/* Leave a location */
 #define EVENT_STAY		0x00000004L	/* Stay in location */
-#define EVENT_BEFORE		0x00000008L	/* Valid until this time */
-#define EVENT_AFTER		0x00000010L	/* Valid after this time */
+#define EVENT_PASS_QUEST	0x00000008L	/* Valid until this time */
+#define EVENT_FAIL_QUEST	0x00000010L	/* Valid after this time */
 #define EVENT_FIND_ROOM		0x00000020L	/* Locate room */
 #define EVENT_FLAG_ROOM		0x00000040L	/* Add flags to room*/
 #define EVENT_UNFLAG_ROOM	0x00000080L	/* Remove flags from room */
@@ -2518,10 +2516,10 @@
 #define EVENT_GET_ITEM		0x00000800L	/* Have an item */
 #define EVENT_DESTROY_ITEM	0x00001000L	/* Destroy an item */
 #define EVENT_LOSE_ITEM		0x00002000L	/* Leave an item behind */
-#define EVENT_TALK_STORE		0x00004000L	/* Talks to the owner of a shop */
+#define EVENT_TALK_STORE	0x00004000L	/* Talks to the owner of a shop */
 #define EVENT_BUY_STORE		0x00008000L	/* Buys an item from a shop */
-#define EVENT_SELL_STORE		0x00010000L	/* Sells an item to a shop */
-#define EVENT_GIVE_STORE		0x00020000L	/* Give an item to an owner of a shop */
+#define EVENT_SELL_STORE	0x00010000L	/* Sells an item to a shop */
+#define EVENT_GIVE_STORE	0x00020000L	/* Give an item to an owner of a shop */
 #define EVENT_STOCK_STORE	0x00040000L	/* Stocks an item in a shop */
 #define EVENT_GET_STORE		0x00080000L	/* Steal an item from a shop */
 #define EVENT_DEFEND_STORE	0x00100000L	/* Get kicked out of a shop */
@@ -2534,7 +2532,7 @@
 #define EVENT_HATE_RACE		0x08000000L	/* Make enemies with a monster race */
 #define EVENT_FEAR_RACE		0x10000000L	/* Scares a monster race */
 #define EVENT_HEAL_RACE		0x20000000L	/* Heals a monster race */
-#define EVENT_TELE_RACE		0x40000000L	/* Teleports a monster race */
+#define EVENT_BANISH_RACE	0x40000000L	/* Banish a monster race */
 #define EVENT_DEFEND_RACE	0x80000000L	/* Defend a race */
 
 /*** Quest event sequence ***/

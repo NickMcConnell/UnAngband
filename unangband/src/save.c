@@ -322,72 +322,32 @@ static void wr_lore(int r_idx)
 /*
  * Read a random quest
  */
-static void wr_quest(int n)
+static void wr_event(int n, int s)
 {
-	quest_type *q_ptr = &q_list[n];
-
-	int i;
+	quest_event *qe_ptr = &q_list[n].event[s];
 
 	/* Read the quest flags */
-	wr_u16b(q_ptr->flags);
-	wr_u16b(q_ptr->known);
+	wr_u32b(qe_ptr->flags);
 
-	/* Read the quest pre-requisites */
-	wr_s16b(q_ptr->pre_quest);
-	wr_s16b(q_ptr->pre_r_idx);
-	wr_byte(q_ptr->pre_dungeon);
-	wr_byte(q_ptr->pre_level);
-	wr_byte(q_ptr->pre_shop);
-	wr_byte(q_ptr->pre_room);
-
-	/* Read the quest requirements */
-	wr_byte(q_ptr->req_dungeon);
-	wr_byte(q_ptr->req_level);
-	wr_byte(q_ptr->req_shop);
-	wr_byte(q_ptr->req_artifact);
-	wr_s16b(q_ptr->req_room_type);
-	wr_s16b(q_ptr->req_kind);
-	wr_s16b(q_ptr->req_kind_needs);
-	wr_s16b(q_ptr->req_kind_found);
-	wr_s16b(q_ptr->req_feat);
-	wr_byte(q_ptr->req_feat_action);
-	wr_byte(q_ptr->unused2);
-	wr_s16b(q_ptr->req_feat_needs);
-	wr_s16b(q_ptr->req_feat_altered);
-
-
-	/* Count of monster races */
-	wr_byte(MAX_QUEST_RACES);
-
-	/* Read quest required monster race information */
-	for (i = 0; i < MAX_QUEST_RACES; i++)
-	{
-		wr_s16b(q_ptr->req_race[i]);
-		wr_s16b(q_ptr->req_race_needs[i]);
-		wr_s16b(q_ptr->req_race_kills[i]);
-		wr_s16b(q_ptr->req_race_parts[i]);
-
-	}
-
-	/* Read the reward information */
-	wr_s16b(q_ptr->fin_kind);
-	wr_s16b(q_ptr->fin_kind_num);
-	wr_s16b(q_ptr->fin_ego_item);
-	wr_s16b(q_ptr->fin_artifact);
-	wr_s16b(q_ptr->fin_experience);
-	wr_s16b(q_ptr->fin_power);
-	wr_s16b(q_ptr->fin_gold);
-	wr_byte(q_ptr->fin_stock_dungeon);
-	wr_byte(q_ptr->fin_stock_shop);
-	wr_s16b(q_ptr->fin_stock_kind);
-	wr_s16b(q_ptr->fin_stock_kind_num);
-	wr_s16b(q_ptr->fin_banish);
-	wr_s16b(q_ptr->fin_summon);
-	wr_s16b(q_ptr->fin_friend);
-	wr_s16b(q_ptr->fin_enemy);
-	wr_s16b(q_ptr->fin_leaving);
-	wr_s16b(q_ptr->fin_lose_art);
-
+	/* Read the quest  */
+	wr_byte(qe_ptr->dungeon);
+	wr_byte(qe_ptr->level);
+	wr_byte(qe_ptr->room);
+	wr_byte(qe_ptr->action);
+	wr_s16b(qe_ptr->feat);
+	wr_s16b(qe_ptr->store);
+	wr_s16b(qe_ptr->race);
+	wr_s16b(qe_ptr->kind);
+	wr_s16b(qe_ptr->number);
+	wr_byte(qe_ptr->artifact);
+	wr_byte(qe_ptr->ego_item_type);
+	wr_s16b(qe_ptr->room_type_a);
+	wr_s16b(qe_ptr->room_type_b);
+	wr_u32b(qe_ptr->room_flags);
+	wr_s16b(qe_ptr->owner);
+	wr_s16b(qe_ptr->power);
+	wr_s16b(qe_ptr->experience);
+	wr_s16b(qe_ptr->gold);
 }
 
 
@@ -976,7 +936,7 @@ static void wr_dungeon(void)
 		int j;
 
 		wr_byte(room_info[i].type);
-		wr_byte(room_info[i].flags);
+		wr_u32b(room_info[i].flags);
 
 		if (room_info[i].type == ROOM_NORMAL)
 		{
@@ -1125,17 +1085,22 @@ static bool wr_savefile_new(void)
 	wr_u16b(tmp16u);
 	for (i = 0; i < tmp16u; i++) wr_xtra(i);
 
-	/* Hack -- Dump the random quests */
-	tmp16u = z_info->q_max;
-	wr_u16b(tmp16u);
-	for (i = 0; i < tmp16u; i++) wr_quest(i);
-
-	/* Hack -- Dump the fixed quests */
+	/* Hack -- Dump the quests */
 	tmp16u = MAX_Q_IDX;
 	wr_u16b(tmp16u);
 	for (i = 0; i < tmp16u; i++)
 	{
-		wr_s16b(q_info[i].known);
+		int j;
+
+		wr_byte(MAX_QUEST_EVENTS);
+
+		for (j = 0; j < MAX_QUEST_EVENTS; j++)
+		{
+
+			wr_event(i, j);
+		}
+
+		wr_byte(q_list[i].stage);
 	}
 
 	/* Hack -- Dump the artifacts */

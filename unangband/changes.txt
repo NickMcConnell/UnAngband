@@ -136,6 +136,8 @@ learn it (randomly) but cannot cast it.  (Fixed by kobayasi)
 
 ### Build / Platform ###
 
+- Added quest.txt in lib\edit which is used to defined fixed texts.
+
 - Makefile.std was reporting errors if the files it tries to clean are not
 there (Reported by Robert Ruehlmann).
 

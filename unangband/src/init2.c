@@ -1171,7 +1171,7 @@ static errr init_q_info(void)
 
 #endif /* ALLOW_TEMPLATES */
 
-	err = init_info("quest", &f_head);
+	err = init_info("quest", &q_head);
 
 	/* Set the global variables */
 	q_info = q_head.info_ptr;
@@ -1943,8 +1943,8 @@ void init_angband(void)
 	/* Initialize price info */
 	note("[Initializing arrays... (prices)]");
 	if (init_g_info()) quit("Cannot initialize prices");
-	
-	/* Initialize price info */
+
+	/* Initialize quest info */
 	note("[Initializing arrays... (quests)]");
 	if (init_q_info()) quit("Cannot initialize quests");
 

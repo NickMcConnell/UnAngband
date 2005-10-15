@@ -212,10 +212,12 @@ struct desc_type
 	u32b name2;
 	u32b text;      /* Text (offset) */
 
-	byte flags;      /* Room flags */
+	u32b flags;      /* Room flags */
+
 	byte roll;  /* Frequency of this entry */
 	byte chart; /* Chart index */
 	byte next;  /* Next chart index */
+	byte unused;
 	
 	u16b level; /* Minimum */
 
@@ -234,7 +236,7 @@ struct room_info_type
 	byte type;				/* Type of room (normal/pit) */
 	s16b section[ROOM_DESC_SECTIONS];	/* Array of room descriptions */
 
-	byte flags;		/* Room flags */
+	u32b flags;		/* Room flags */
 
 	/* Decorations */
 
@@ -880,6 +882,8 @@ struct alloc_entry
 struct quest_event
 {
 	u32b flags;		/* Flags */
+
+	s16b quest;		/* Quest */
 
 	byte dungeon;		/* Dungeon */
 	byte level;		/* Level */

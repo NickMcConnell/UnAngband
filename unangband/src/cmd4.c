@@ -2940,7 +2940,7 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 			if (event->flags & (EVENT_FIND_ROOM)) vp[vn++] = "find";
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_HIDDEN))) vp[vn++] = "reveal";
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_SEALED))) vp[vn++] = "unseal";
-			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_ENTER))) vp[vn++] = "enter";
+			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_ENTERED))) vp[vn++] = "enter";
 			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_LITE))) vp[vn++] = "light up";
 			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_SEEN))) vp[vn++] = "explore";
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_LAIR))) vp[vn++] = "clear of monsters";
@@ -2953,7 +2953,7 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 			if (event->flags & (EVENT_FIND_ROOM)) vp[vn++] = "found";
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_HIDDEN))) vp[vn++] = "revealed";
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_SEALED))) vp[vn++] = "unsealed";
-			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_ENTER))) vp[vn++] = "entered";
+			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_ENTERED))) vp[vn++] = "entered";
 			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_LITE))) vp[vn++] = "lit up";
 			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_SEEN))) vp[vn++] = "explored";
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_LAIR))) vp[vn++] = "cleared of monsters";
@@ -3170,7 +3170,7 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 			if (event->flags & (EVENT_HATE_RACE)) vp[vn++] = "offend";
 			if (event->flags & (EVENT_FEAR_RACE)) vp[vn++] = "terrify";
 			if (event->flags & (EVENT_HEAL_RACE)) vp[vn++] = "heal";
-			if (event->flags & (EVENT_TELE_RACE)) vp[vn++] = "teleport away";
+			if (event->flags & (EVENT_BANISH_RACE)) vp[vn++] = "banish";
 			if (event->flags & (EVENT_KILL_RACE)) vp[vn++] = "kill";
 		}
 		else
@@ -3182,7 +3182,7 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 			if (event->flags & (EVENT_HATE_RACE)) vp[vn++] = "offended";
 			if (event->flags & (EVENT_FEAR_RACE)) vp[vn++] = "terrified";
 			if (event->flags & (EVENT_HEAL_RACE)) vp[vn++] = "healed";
-			if (event->flags & (EVENT_TELE_RACE)) vp[vn++] = "teleported away";
+			if (event->flags & (EVENT_BANISH_RACE)) vp[vn++] = "banished";
 			if (event->flags & (EVENT_KILL_RACE)) vp[vn++] = "killed";
 		}
 

@@ -681,79 +681,32 @@ static errr rd_store(int n)
 /*
  * Read a random quest
  */
-static errr rd_quest(int n)
+static errr rd_event(int n, int s)
 {
-	quest_type *q_ptr = &q_list[n];
-
-	int i;
-	s16b quest_races;
+	quest_event *qe_ptr = &q_list[n].event[s];
 
 	/* Read the quest flags */
-	rd_u16b(&q_ptr->flags);
-	rd_u16b(&q_ptr->known);
+	rd_u32b(&qe_ptr->flags);
 
-	/* Read the quest pre-requisites */
-	rd_s16b(&q_ptr->pre_quest);
-	rd_s16b(&q_ptr->pre_r_idx);
-	rd_byte(&q_ptr->pre_dungeon);
-	rd_byte(&q_ptr->pre_level);
-	rd_byte(&q_ptr->pre_shop);
-	rd_byte(&q_ptr->pre_room);
-
-	/* Read the quest requirements */
-	rd_byte(&q_ptr->req_dungeon);
-	rd_byte(&q_ptr->req_level);
-	rd_byte(&q_ptr->req_shop);
-	rd_byte(&q_ptr->req_artifact);
-	rd_s16b(&q_ptr->req_room_type);
-	rd_s16b(&q_ptr->req_kind);
-	rd_s16b(&q_ptr->req_kind_needs);
-	rd_s16b(&q_ptr->req_kind_found);
-	rd_s16b(&q_ptr->req_feat);
-	rd_byte(&q_ptr->req_feat_action);
-	rd_byte(&q_ptr->unused2);
-	rd_s16b(&q_ptr->req_feat_needs);
-	rd_s16b(&q_ptr->req_feat_altered);
-
-
-	/* Count of monster races */
-	rd_s16b(&quest_races);
-
-	/* Paranoia */
-	if (quest_races > MAX_QUEST_RACES)
-	{
-		note("Exceeded maximum quest monster races!");
-		return (-1);
-	}
-
-	/* Read quest required monster race information */
-	for (i = 0; i < quest_races; i++)
-	{
-		rd_s16b(&q_ptr->req_race[i]);
-		rd_s16b(&q_ptr->req_race_needs[i]);
-		rd_s16b(&q_ptr->req_race_kills[i]);
-		rd_s16b(&q_ptr->req_race_parts[i]);
-
-	}
-
-	/* Read the reward information */
-	rd_s16b(&q_ptr->fin_kind);
-	rd_s16b(&q_ptr->fin_kind_num);
-	rd_s16b(&q_ptr->fin_ego_item);
-	rd_s16b(&q_ptr->fin_artifact);
-	rd_s16b(&q_ptr->fin_experience);
-	rd_s16b(&q_ptr->fin_power);
-	rd_s16b(&q_ptr->fin_gold);
-	rd_byte(&q_ptr->fin_stock_dungeon);
-	rd_byte(&q_ptr->fin_stock_shop);
-	rd_s16b(&q_ptr->fin_stock_kind);
-	rd_s16b(&q_ptr->fin_stock_kind_num);
-	rd_s16b(&q_ptr->fin_banish);
-	rd_s16b(&q_ptr->fin_summon);
-	rd_s16b(&q_ptr->fin_friend);
-	rd_s16b(&q_ptr->fin_enemy);
-	rd_s16b(&q_ptr->fin_leaving);
-	rd_s16b(&q_ptr->fin_lose_art);
+	/* Read the quest  */
+	rd_byte(&qe_ptr->dungeon);
+	rd_byte(&qe_ptr->level);
+	rd_byte(&qe_ptr->room);
+	rd_byte(&qe_ptr->action);
+	rd_s16b(&qe_ptr->feat);
+	rd_s16b(&qe_ptr->store);
+	rd_s16b(&qe_ptr->race);
+	rd_s16b(&qe_ptr->kind);
+	rd_s16b(&qe_ptr->number);
+	rd_byte(&qe_ptr->artifact);
+	rd_byte(&qe_ptr->ego_item_type);
+	rd_s16b(&qe_ptr->room_type_a);
+	rd_s16b(&qe_ptr->room_type_b);
+	rd_u32b(&qe_ptr->room_flags);
+	rd_s16b(&qe_ptr->owner);
+	rd_s16b(&qe_ptr->power);
+	rd_s16b(&qe_ptr->experience);
+	rd_s16b(&qe_ptr->gold);
 
 	/* Success */
 	return(0);
@@ -1732,7 +1685,7 @@ u16b limit;
 		int j;
 
 		rd_byte(&room_info[i].type);
-		rd_byte(&room_info[i].flags);
+		rd_u32b(&room_info[i].flags);
 
 		if (room_info[i].type == ROOM_NORMAL)
 		{
@@ -2021,41 +1974,41 @@ static errr rd_savefile_new_aux(void)
 	if (arg_fiddle) note("Loaded Object Memory");
 
 
-	/* Load the Random Quests */
+	/* Load the Quests */
 	rd_u16b(&tmp16u);
 
 	/* Incompatible save files */
 	if (tmp16u > MAX_Q_IDX)
 	{
-		note(format("Too many (%u) random quests!", tmp16u));
+		note(format("Too many (%u) quests!", tmp16u));
 		return (-1);
 	}
 
-	/* Load the Random Quests */
+	/* Load the Quests */
 	for (i = 0; i < tmp16u; i++)
 	{
-		rd_quest(i);
+		int j;
+
+		rd_byte(&tmp8u);
+
+		if (tmp8u > MAX_QUEST_EVENTS)
+		{
+			note(format("Too many (%u) quest stages!", tmp16u));
+			return (-1);
+		}
+
+		for (j = 0; j < tmp8u; j++)
+		{
+
+			rd_event(i, j);
+		}
+
+		rd_byte(&tmp8u);
+
+		q_list[i].stage = tmp8u;
 	}
-	if (arg_fiddle) note("Loaded Random Quests");
 
-
-	/* Load the Fixed Quests */
-	rd_u16b(&tmp16u);
-
-	/* Incompatible save files */
-	if (tmp16u > z_info->q_max)
-	{
-		note(format("Too many (%u) fixed quests!", tmp16u));
-		return (-1);
-	}
-
-	/* Load the Fixed Quests */
-	for (i = 0; i < tmp16u; i++)
-	{
-		rd_u16b(&q_info[i].known);
-	}
-	if (arg_fiddle) note("Loaded Fixed Quests");
-
+	if (arg_fiddle) note("Loaded Quests");
 
 	/* Load the Artifacts */
 	rd_u16b(&tmp16u);	
