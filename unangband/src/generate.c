@@ -4209,8 +4209,6 @@ static void cave_gen(void)
 	/* Get the zone */
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
-
-
 	/* Create air */
 	if ((zone->tower) && (p_ptr->depth > min_depth(p_ptr->dungeon)))
 	{
@@ -5157,11 +5155,9 @@ static void town_gen(void)
  */
 void generate_cave(void)
 {
-	int y, x, num;
+	int i, y, x, num;
 
 	dungeon_zone *zone=&t_info[0].zone[0];
-
-	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
 
 	/* Get the zone */
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
@@ -5247,6 +5243,185 @@ void generate_cave(void)
 			cave_gen();
 		}
 
+		/* Hack -- ensure quest components */
+		for (i = 0; i < MAX_Q_IDX; i++)
+		{
+			quest_type *q_ptr = &q_list[i];
+			quest_event *qe_ptr = &(q_ptr->event[q_ptr->stage]);
+
+			/* Hack -- player's actions don't change level */
+			if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_LOCATE]);
+
+			/* Quest occurs on this level */
+			if ((qe_ptr->dungeon == p_ptr->dungeon) && (qe_ptr->level == (p_ptr->depth - min_depth(p_ptr->dungeon))))
+			{
+				int n, j;
+
+				n = 0;
+
+				/* Hack -- quest partially completed */
+				if (q_ptr->stage == QUEST_ACTION) n = q_ptr->event[QUEST_ACTION].number;
+
+				/* Require features */
+				if (qe_ptr->feat)
+				{
+					/* Check for feature type */
+					while (n < qe_ptr->number)
+					{
+						/* Count quest features */
+						for (y = 0; y < DUNGEON_HGT; y++)
+						{
+							for (x = 0; x < DUNGEON_WID; x++)
+							{
+								/* Check if feat okay */
+								if (cave_feat[y][x] == qe_ptr->feat) n++;
+							}
+						}
+
+						/* Try placing remaining features */
+						for ( ; n < qe_ptr->number; n++)
+						{
+							/* Pick a "legal" spot */
+							while (TRUE)
+							{
+								/* Location */
+								y = rand_int(DUNGEON_HGT);
+								x = rand_int(DUNGEON_WID);
+
+								/* Require empty, clean, floor grid */
+								if (!cave_naked_bold(y, x)) continue;
+
+								/* Accept it */
+								break;
+							}
+
+							/* Create the feature */
+							cave_set_feat(y, x, qe_ptr->feat);
+
+							/* Guard the feature */
+							if (qe_ptr->race) race_near(qe_ptr->race, y, x);
+
+							/* XXX Hide item in the feature */
+						}
+					}
+
+					/* Amend quest numbers */
+					if (n > qe_ptr->number) qe_ptr->number = n;
+				}
+
+				/* Require race */
+				else if (qe_ptr->race)
+				{
+					n = 0;
+
+					/* Check for monster race */
+					while (n < qe_ptr->number)
+					{
+						/* Count quest races */
+						for (j = 0; j < z_info->m_max; j++)
+						{
+							/* Check if feat okay */
+							if (m_list[j].r_idx == qe_ptr->race) n++;
+						}
+
+						/* Try placing remaining monsters */
+						for ( ; n < qe_ptr->number; n++)
+						{
+							/* Pick a "legal" spot */
+							while (TRUE)
+							{
+								/* Location */
+								y = rand_int(DUNGEON_HGT);
+								x = rand_int(DUNGEON_WID);
+
+								/* Require empty grid */
+								if (!cave_empty_bold(y, x)) continue;
+
+								/* Require monster can survive on terrain */
+								if (!place_monster_here(y, x, qe_ptr->race)) continue;
+
+								/* Accept it */
+								break;
+							}
+
+							/* Create a new monster (awake, no groups) */
+							(void)place_monster_aux(y, x, qe_ptr->race, FALSE, FALSE);
+
+							/* XXX Monster should carry item */
+						}
+					}
+
+					/* Amend quest numbers */
+					if (n > qe_ptr->number) qe_ptr->number = n;
+				}
+
+				/* Require object */
+				else if ((qe_ptr->artifact) || (qe_ptr->ego_item_type) || (qe_ptr->kind))
+				{
+					n = 0;
+
+					/* Check for object kind */
+					while (n < qe_ptr->number)
+					{
+						/* Count quest objects */
+						for (j = 0; j < z_info->m_max; j++)
+						{
+							/* Check if feat okay */
+							if (o_list[j].k_idx)
+							{
+								if ((qe_ptr->artifact) && (o_list[j].name1 != qe_ptr->artifact)) continue;
+								if ((qe_ptr->ego_item_type) && (o_list[j].name2 != qe_ptr->ego_item_type)) continue;
+								if ((qe_ptr->kind) && (o_list[j].k_idx != qe_ptr->kind)) continue;
+
+								n++;
+							}
+						}
+
+						/* Try placing remaining objects */
+						for ( ; n < qe_ptr->number; n++)
+						{
+							object_type object_type_body;
+							object_type *o_ptr = &object_type_body;
+
+							/* Pick a "legal" spot */
+							while (TRUE)
+							{
+								/* Location */
+								y = rand_int(DUNGEON_HGT);
+								x = rand_int(DUNGEON_WID);
+
+								/* Require empty grid */
+								if (!cave_naked_bold(y, x)) continue;
+
+								/* Prepare artifact */
+								if (qe_ptr->artifact) qe_ptr->kind = lookup_kind(a_info[qe_ptr->artifact].tval, a_info[qe_ptr->artifact].sval);
+
+								/* Prepare ego item */
+								if ((qe_ptr->ego_item_type) && !(qe_ptr->kind)) qe_ptr->kind =
+									lookup_kind(e_info[qe_ptr->ego_item_type].tval[0],
+										e_info[qe_ptr->ego_item_type].min_sval[0]);
+
+								/* Prepare object */
+								object_prep(o_ptr, qe_ptr->kind);
+
+								/* Apply magic -- hack: use player level as reward level */
+								apply_magic(o_ptr, p_ptr->max_lev * 2, FALSE, FALSE, FALSE);
+
+								/* Several objects */
+								if (o_ptr->number > 1) n += o_ptr->number -1;
+
+								/* Accept it */
+								break;
+							}
+						}
+					}
+
+					/* Amend quest numbers */
+					if (n > qe_ptr->number) qe_ptr->number = n;
+				}
+			}
+		}
+
 		/* Extract the feeling */
 		if (rating > 100) feeling = 2;
 		else if (rating > 80) feeling = 3;
@@ -5285,34 +5460,11 @@ void generate_cave(void)
 
 			/* Message */
 			okay = FALSE;
-		}
 
-		/* Mega-Hack -- "auto-scum" */
-		if (auto_scum && (num < 100) && !surface)
-		{
-			/* Require "goodness" */
-			if ((feeling > 9) ||
-			    ((p_ptr->depth >= 5) && (feeling > 8)) ||
-			    ((p_ptr->depth >= 10) && (feeling > 7)) ||
-			    ((p_ptr->depth >= 20) && (feeling > 6)) ||
-			    ((p_ptr->depth >= 40) && (feeling > 5)))
-			{
-				/* Give message to cheaters */
-				if (cheat_room || cheat_hear ||
-				    cheat_peek || cheat_xtra)
-				{
-					/* Message */
-					why = "boring level";
-				}
-
-				/* Try again */
-				okay = FALSE;
-			}
 		}
 
 		/* Accept */
 		if (okay) break;
-
 
 		/* Message */
 		if (why) msg_format("Generation restarted (%s)", why);
