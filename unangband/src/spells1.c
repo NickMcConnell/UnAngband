@@ -2656,6 +2656,168 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 	return (obvious);
 }
 
+
+
+/*
+ * Check if enough monsters are terrified by the player.
+ */
+static void check_fear_quest(int m_idx)
+{
+	int i, j, n;
+
+	/* Check quests for completion */
+	for (i = 0; i < MAX_Q_IDX; i++)
+	{
+		quest_type *q_ptr = &(q_list[i]);
+		quest_event *qe_ptr = &(q_ptr->event[q_ptr->stage]);
+
+		/* Local object */
+		object_type object_type_body;
+
+		/* Get local object */
+		object_type *o_ptr;
+
+		if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_LOCATE]);
+
+		if ((qe_ptr->dungeon != p_ptr->dungeon) ||
+			(qe_ptr->level != p_ptr->depth - min_depth(p_ptr->dungeon))) continue;
+
+		if (!(qe_ptr->race) || (qe_ptr->race != m_list[m_idx].r_idx)) continue;
+
+		/* Assign quest */
+		if (q_ptr->stage == QUEST_ASSIGN)
+		{
+			/* Wipe the structure */
+			(void)WIPE(qe_ptr, quest_event);
+
+			qe_ptr->dungeon = p_ptr->dungeon;
+			qe_ptr->level = p_ptr->depth - min_depth(p_ptr->dungeon);
+			qe_ptr->race = m_list[m_idx].r_idx;
+			qe_ptr->number = 1;
+			qe_ptr->flags |= (EVENT_FEAR_RACE);
+
+			quest_assign(i);
+
+			continue;
+		}
+
+		if (q_ptr->stage != QUEST_ACTION) continue;
+
+		for (j = 0; j < z_info->m_max; j++)
+		{
+			monster_type *m_ptr = &m_list[j];
+
+			if (m_ptr->r_idx != qe_ptr->race) continue;
+
+			if (!m_ptr->monfear) continue;
+
+			n++;
+		}
+
+		/* If last monster terrified, drop artifact */
+		if ((q_ptr->event[QUEST_ACTION].number + n >= qe_ptr->number) && (qe_ptr->artifact))
+		{
+			/* Get local object */
+			o_ptr = &object_type_body;
+
+			/* Wipe the object */
+			object_wipe(o_ptr);
+
+			/* Prepare artifact */
+			qe_ptr->kind = lookup_kind(a_info[qe_ptr->artifact].tval, a_info[qe_ptr->artifact].sval);
+
+			/* Prepare object */
+			object_prep(o_ptr, qe_ptr->kind);
+
+			/* Prepare artifact */
+			o_ptr->name1 = qe_ptr->artifact;
+
+			/* Apply magic */
+			apply_magic(o_ptr, object_level, FALSE, FALSE, FALSE);
+
+			/* Drop it in the dungeon */
+			drop_near(o_ptr, -1, m_list[m_idx].fy, m_list[m_idx].fx);
+		}
+
+		/* Hack -- If last monster terrified, all monsters drop items */
+		else if ((qe_ptr->kind) || (qe_ptr->ego_item_type))
+		{
+			for (j = 0; j < z_info->m_max; j++)
+			{
+				monster_type *m_ptr = &m_list[j];
+
+				if (m_ptr->r_idx != qe_ptr->race) continue;
+
+				if (!m_ptr->monfear) continue;
+
+				/* Get local object */
+				o_ptr = &object_type_body;
+
+				/* Wipe the object */
+				object_wipe(o_ptr);
+
+				/* Prepare ego item */
+				if ((qe_ptr->ego_item_type) && !(qe_ptr->kind)) qe_ptr->kind =
+					lookup_kind(e_info[qe_ptr->ego_item_type].tval[0],
+						e_info[qe_ptr->ego_item_type].min_sval[0]);
+
+				/* Prepare object */
+				object_prep(o_ptr, qe_ptr->kind);
+
+				/* Prepare ego item */
+				o_ptr->name2 = qe_ptr->ego_item_type;
+
+				/* Apply magic */
+				apply_magic(o_ptr, object_level, FALSE, FALSE, FALSE);
+
+				/* Drop it in the dungeon */
+				drop_near(o_ptr, -1, m_ptr->fy, m_ptr->fx);
+			}
+		}
+
+		/* Update actions */
+		qe_ptr = &(q_ptr->event[QUEST_ACTION]);
+
+		/* Fail quest because we terrified someone */
+		if (q_ptr->event[QUEST_FAILED].flags & (EVENT_FEAR_RACE))
+		{
+			/* Wipe the structure */
+			(void)WIPE(qe_ptr, quest_event);
+
+			/* Set action details */
+			qe_ptr->dungeon = p_ptr->dungeon;
+			qe_ptr->level = p_ptr->depth - min_depth(p_ptr->dungeon);
+			qe_ptr->race = m_list[m_idx].r_idx;
+			qe_ptr->number = 1;
+			qe_ptr->flags |= (EVENT_FEAR_RACE);
+
+			quest_penalty(i);
+		}
+
+		/* Get closer to success because we need to terrify someone */
+		else if ((qe_ptr->flags & (EVENT_FEAR_RACE)) && (qe_ptr->number + n >= q_ptr->event[QUEST_LOCATE].number))
+		{
+			qe_ptr->number = q_ptr->event[QUEST_LOCATE].number;
+
+			qe_ptr->flags |= (EVENT_FEAR_RACE);
+
+			/* Have completed quest? */
+			if ((qe_ptr->flags == q_ptr->event[QUEST_LOCATE].flags) && (qe_ptr->number <= q_ptr->event[QUEST_LOCATE].number))
+			{
+				msg_print("Congratulations. You have succeeded at your quest.");
+
+				quest_reward(i);
+			}
+			/* Partially completed quest */
+			else
+			{
+				msg_print("You have xxx to go.");
+			}
+		}
+	}
+}
+
+
 /*
  * Helper function for "project()" below.
  *
@@ -4604,6 +4766,9 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 
 		/* Set fear */
 		m_ptr->monfear = (tmp < 200) ? tmp : 200;
+
+		/* Quest monster */
+		if (r_ptr->flags1 & (RF1_QUESTOR)) check_fear_quest(cave_m_idx[y][x]);
 	}
 
 

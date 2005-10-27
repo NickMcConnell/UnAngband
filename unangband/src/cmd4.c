@@ -3389,7 +3389,7 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
  * Output all quests between certain stages
  *
  * Example - print all quests min = QUEST_ASSIGN, max = QUEST_PENALTY
- *         - print live quests min = QUEST_ASSIGN, max = QUEST_FINISH
+ *         - print live quests min = QUEST_ASSIGN, max = QUEST_REWARD
  *         - print quests on current level min = QUEST_LOCATE, max = QUEST_ACTION
  *
  * Returns true if anything output.
@@ -3429,18 +3429,18 @@ bool print_quests(int min_stage, int max_stage)
 					if (q_info[i].stage < QUEST_LOCATE) continue;
 					else if (q_info[i].stage == QUEST_ASSIGN) { tense = 3; intro = TRUE; }
 					else if (q_info[i].stage == QUEST_LOCATE) { tense = 1; intro = TRUE; }
-					else if (q_info[i].stage == QUEST_REWARD) { tense = 2; intro = TRUE; }
+					else if (q_info[i].stage == QUEST_FINISH) { tense = 2; intro = TRUE; }
 					else { tense = 0; intro = TRUE; }
 					break;
 				case QUEST_FINISH:
 					if (q_info[i].stage == QUEST_FINISH) { tense = 1; intro = TRUE; }
-					else if (q_info[i].stage == QUEST_REWARD) { tense = 0; intro = TRUE; }
-					else if (q_info[i].stage > QUEST_REWARD) continue;
+					else if (q_info[i].stage == QUEST_FINISH) { tense = 0; intro = TRUE; }
+					else if (q_info[i].stage > QUEST_FINISH) continue;
 					else { tense = 3; intro = TRUE; }
 					break;
 				case QUEST_REWARD:
-					if (q_info[i].stage == QUEST_REWARD) { tense = 2; intro = TRUE; }
-					else if (q_info[i].stage > QUEST_REWARD) continue;
+					if (q_info[i].stage == QUEST_FINISH) { tense = 2; intro = TRUE; }
+					else if (q_info[i].stage > QUEST_FINISH) continue;
 					else { tense = 4; intro = TRUE; }
 					break;
 				case QUEST_FAILED:
@@ -3454,15 +3454,15 @@ bool print_quests(int min_stage, int max_stage)
 					else continue;
 					break;
 				case QUEST_PENALTY:
-					if (q_info[i].stage < QUEST_FINISH) { tense = 4; intro = FALSE; }
-					if (q_info[i].stage == QUEST_FINISH) continue;
+					if (q_info[i].stage < QUEST_REWARD) { tense = 4; intro = FALSE; }
 					if (q_info[i].stage == QUEST_REWARD) continue;
+					if (q_info[i].stage == QUEST_FINISH) continue;
 					break;
 			}
 
 			print_event(&q_info[i].event[j], 2,  tense, intro);
 
-			if ((j == QUEST_FAILED) && (q_info[i].stage < QUEST_FINISH)) text_out(" ");
+			if ((j == QUEST_FAILED) && (q_info[i].stage < QUEST_REWARD)) text_out(" ");
 			else text_out(".  ");
 
 			newline = TRUE;

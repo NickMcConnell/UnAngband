@@ -173,6 +173,203 @@ void print_routes(const s16b *route, int num, int y, int x)
 }
 
 
+/*
+ * Check quests caused by travelling from the current level to another destination.
+ *
+ * XXX This includes travelling to the 'final' location and completely the first quest.
+ *
+ * Confirm indicates if the player is allowed to cancel this.
+ *
+ */
+static bool check_travel_quest(int dungeon, int level, bool confirm)
+{
+	int i;
+	quest_type *q_ptr;
+	quest_event *qe_ptr;
+
+	bool cancel = FALSE;
+
+	/* Check quests for cancellation */
+	if (confirm) for (i = 0; i < MAX_Q_IDX; i++)
+	{
+		q_ptr = &q_list[i];
+		qe_ptr = &(q_ptr->event[q_ptr->stage]);
+
+		/* if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_LOCATE]); */
+
+		/* Check destination */
+		if (q_ptr->stage == QUEST_LOCATE)
+		{
+			if ((qe_ptr->dungeon != dungeon) ||
+				(qe_ptr->level != level - min_depth(dungeon))) continue;
+
+			/* Allow cancellation */
+			if (q_ptr->event[QUEST_FAILED].flags & (EVENT_TRAVEL))
+			{
+				/* Permit cancellation */
+				cancel = TRUE;
+			}
+
+			continue;
+		}
+
+		if (q_ptr->stage != QUEST_ACTION) continue;
+
+		if ((qe_ptr->dungeon != p_ptr->dungeon) ||
+			(qe_ptr->level != p_ptr->depth - min_depth(p_ptr->dungeon))) continue;
+
+		/* Fail quest because we left the level */
+		if (q_ptr->event[QUEST_FAILED].flags & (EVENT_LEAVE))
+		{
+			/* Permit cancellation */
+			cancel = TRUE;
+		}
+	}
+
+	/* Permit cancellation */
+	if ((cancel) && (get_check("Really fail the quest? "))) return (FALSE);
+
+	/* Check quests for completion */
+	for (i = 0; i < MAX_Q_IDX; i++)
+	{
+		q_ptr = &q_list[i];
+		qe_ptr = &(q_ptr->event[q_ptr->stage]);
+
+		if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_LOCATE]);
+
+		/* Check quest allocation */
+		if (q_ptr->stage == QUEST_ASSIGN)
+		{
+			/* Allocate quest travelling to location */
+			if ((qe_ptr->flags & (EVENT_TRAVEL)) && 
+				(qe_ptr->dungeon == dungeon) &&
+				(qe_ptr->level == level - min_depth(dungeon)))
+			{
+				/* Wipe the structure */
+				(void)WIPE(qe_ptr, quest_event);
+
+				qe_ptr->dungeon = dungeon;
+				qe_ptr->level = level - min_depth(dungeon);
+				qe_ptr->flags |= (EVENT_TRAVEL);
+
+				quest_assign(i);
+			}
+
+			/* Allocate quest leaving location */
+			else if ((qe_ptr->flags & (EVENT_LEAVE)) && 
+				(qe_ptr->dungeon == p_ptr->dungeon) &&
+				(qe_ptr->level == p_ptr->depth - min_depth(p_ptr->dungeon)))
+			{
+				/* Wipe the structure */
+				(void)WIPE(qe_ptr, quest_event);
+
+				qe_ptr->dungeon = dungeon;
+				qe_ptr->level = level - min_depth(dungeon);
+				qe_ptr->flags |= (EVENT_LEAVE);
+
+				quest_assign(i);
+			}
+		}
+
+		if ((qe_ptr->dungeon != dungeon) ||
+			(qe_ptr->level != level - min_depth(dungeon))) continue;
+
+		/* Check destination */
+		if (q_ptr->stage == QUEST_LOCATE)
+		{
+			/* Update actions */
+			qe_ptr = &(q_ptr->event[QUEST_ACTION]);
+
+			/* Fail quest because we travelled to the level */
+			if (q_ptr->event[QUEST_FAILED].flags & (EVENT_TRAVEL))
+			{
+				/* Wipe the structure */
+				(void)WIPE(qe_ptr, quest_event);
+
+				qe_ptr->dungeon = dungeon;
+				qe_ptr->level = level - min_depth(dungeon);
+				qe_ptr->flags |= (EVENT_TRAVEL);
+
+				/* Set quest penalty immedately */
+				q_ptr->stage = QUEST_PENALTY;
+			}
+
+			/* Get closer to success because we travelled to level */
+			else if (q_ptr->event[QUEST_LOCATE].flags & (EVENT_TRAVEL))
+			{
+				qe_ptr->dungeon = dungeon;
+				qe_ptr->level = level - min_depth(dungeon);
+				qe_ptr->flags |= (EVENT_TRAVEL);
+
+				/* Have completed quest? */
+				if (qe_ptr->flags == q_ptr->event[QUEST_LOCATE].flags)
+				{
+					msg_print("Congratulations. You have succeeded at your quest.");
+
+					/* XXX - Tell player next step */
+					q_ptr->stage = QUEST_REWARD;
+				}
+			}
+
+			continue;
+		}
+
+		if (q_ptr->stage != QUEST_ACTION) continue;
+
+		/* Update actions */
+		qe_ptr = &(q_ptr->event[QUEST_ACTION]);
+
+		/* Fail quest because we left the level */
+		if (q_ptr->event[QUEST_FAILED].flags & (EVENT_LEAVE))
+		{
+			/* Wipe the structure */
+			(void)WIPE(qe_ptr, quest_event);
+
+			qe_ptr->dungeon = p_ptr->dungeon;
+			qe_ptr->level = p_ptr->depth - min_depth(p_ptr->dungeon);
+			qe_ptr->flags |= (EVENT_LEAVE);
+
+			/* Set quest penalty immediately */
+			q_ptr->stage = QUEST_PENALTY;
+		}
+
+		/* Get closer to success because we need to leave level */
+		else if (q_ptr->event[QUEST_LOCATE].flags & (EVENT_LEAVE))
+		{
+			qe_ptr->dungeon = p_ptr->dungeon;
+			qe_ptr->level = p_ptr->depth - min_depth(p_ptr->dungeon);
+			qe_ptr->flags |= (EVENT_LEAVE);
+
+			/* Have completed quest? */
+			if (qe_ptr->flags == qe_ptr->flags)
+			{
+				msg_print("Congratulations. You have succeeded at your quest.");
+
+				/* XXX - Tell player next step */
+				q_ptr->stage = QUEST_REWARD;
+			}
+		}
+	}
+
+	/* Mega-hack */
+	if ((adult_campaign) && (p_ptr->dungeon == z_info->t_max -1))
+	{
+
+		p_ptr->total_winner = TRUE;
+
+		/* Redraw the "title" */
+		p_ptr->redraw |= (PR_TITLE);
+
+		/* Congratulations */
+		msg_print("*** CONGRATULATIONS ***");
+		msg_print("You have won the game!");
+		msg_print("You may retire (commit suicide) when you are ready.");
+	}
+
+	return (TRUE);
+}
+
+
 
 /*
  * Travel to a different dungeon.
@@ -417,6 +614,9 @@ static void do_cmd_travel(void)
 
 			/* XXX Recharges, stop temporary speed etc. */
 
+			/* Check quests due to travelling - cancel if requested */
+			if (!check_travel_quest(selection, min_depth(p_ptr->dungeon), TRUE)) return;
+
 			/* Change the dungeon */
 			p_ptr->dungeon = selection;
 
@@ -427,21 +627,6 @@ static void do_cmd_travel(void)
 			/* Reset the recall depth */
 			p_ptr->max_depth = min_depth(p_ptr->dungeon);
 #endif
-
-			/* Mega-hack */
-			if ((adult_campaign) && (p_ptr->dungeon == z_info->t_max -1))
-			{
-
-				p_ptr->total_winner = TRUE;
-
-				/* Redraw the "title" */
-				p_ptr->redraw |= (PR_TITLE);
-
-				/* Congratulations */
-				msg_print("*** CONGRATULATIONS ***");
-				msg_print("You have won the game!");
-				msg_print("You may retire (commit suicide) when you are ready.");
-			}
 
 			/* Leaving */
 			p_ptr->leaving = TRUE;
@@ -482,6 +667,16 @@ void do_cmd_go_up(void)
 	{
 		msg_print("Nothing happens!");
 		return;
+	}
+
+	/* Check quests due to travelling - cancel if requested */
+	if (t_info[p_ptr->dungeon].zone[0].tower)
+	{
+		if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth + 1, TRUE)) return;
+	}
+	else
+	{
+		if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth - 1, TRUE)) return;
 	}
 
 	/* Hack -- take a turn */
@@ -533,7 +728,10 @@ void do_cmd_go_down(void)
 	/* Hack -- travel through wilderness */
 	if ((adult_campaign) && (p_ptr->depth == max_depth(p_ptr->dungeon)))
 	{
+		/* Check quests due to travelling - cancel if requested */
+		if (!check_travel_quest(t_info[p_ptr->dungeon].distant, min_depth(p_ptr->dungeon), TRUE)) return;
 
+		/* Success */
 		message(MSG_STAIRS,0,format("You have found a way through %s.",t_name + t_info[p_ptr->dungeon].name));
 
 		/* Change the dungeon */
@@ -547,6 +745,15 @@ void do_cmd_go_down(void)
 	}
 	else
 	{
+		/* Check quests due to travelling - cancel if requested */
+		if (t_info[p_ptr->dungeon].zone[0].tower)
+		{
+			if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth + 1, TRUE)) return;
+		}
+		else
+		{
+			if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth - 1, TRUE)) return;
+		}
 
 		/* Success */
 		message(MSG_STAIRS, 0, "You enter a maze of down staircases.");

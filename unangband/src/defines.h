@@ -2540,8 +2540,8 @@
 #define QUEST_ASSIGN	0	/* Event describes quest assignment */
 #define QUEST_LOCATE	1	/* Event describes quest location */
 #define QUEST_ACTION	2	/* Event describes quest actions */
-#define	QUEST_FINISH	3	/* Event describes quest finish */
-#define	QUEST_REWARD	4	/* Event describes quest reward */
+#define	QUEST_REWARD	3	/* Event describes quest finish */
+#define	QUEST_FINISH	4	/* Event describes quest reward */
 #define	QUEST_FAILED	5	/* Event describes quest failure */
 #define	QUEST_PENALTY	6	/* Event describes quest failure */
 #define MAX_QUEST_EVENTS 7	/* Maximum events in a quest */

@@ -5348,6 +5348,7 @@ void generate_cave(void)
 							(void)place_monster_aux(y, x, qe_ptr->race, FALSE, FALSE);
 
 							/* XXX Monster should carry item */
+							/* This is done as a part of death / fear etc. routine */
 						}
 					}
 
@@ -5403,6 +5404,12 @@ void generate_cave(void)
 
 								/* Prepare object */
 								object_prep(o_ptr, qe_ptr->kind);
+
+								/* Prepare artifact */
+								o_ptr->name1 = qe_ptr->artifact;
+
+								/* Prepare ego item */
+								o_ptr->name2 = qe_ptr->ego_item_type;
 
 								/* Apply magic -- hack: use player level as reward level */
 								apply_magic(o_ptr, p_ptr->max_lev * 2, FALSE, FALSE, FALSE);
