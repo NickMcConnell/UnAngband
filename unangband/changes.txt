@@ -76,6 +76,8 @@ unnessary bookkeeping.
 
 ### User Interface ###
 
+- Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.
+
 - You can now inscribe an item with =g5 to mean pick up this item unless I already have
 5 of it in my inventory. You can also inscribe it with =d5 to mean don't pick up this item
 if I have 5 or more of it in my inventory. You can also inscribe it with =k5 to mean destroy

@@ -2520,10 +2520,10 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 			tw2 = w2;
 	}
 
-	/* Hack -- isometric location */
 	/*
-	 * Note check on grid_display.
-       */
+         * Hack -- isometric location.
+	 * Note check on grid_display
+         */
 	if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_display))
 	{
 		x = (x - COL_MAP);
@@ -2543,7 +2543,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 			x /= 2;
 
 		x2 = (x - y) * tw2 / 2 + ((td->rows - ROW_MAP) * tw2 / (use_trptile ? 6 : (use_dbltile ? 4 : 2))) + w2 * (COL_MAP-1) + td->size_ow1;
-		y2 = (y + x) * th2 / 4 + h2 * ROW_MAP + td->size_ow2; 
+		y2 = (y + x) * th2 / 4 + h2 * ROW_MAP + td->size_ow2 - (y + x) / 2; 
 	}
 	else
 	{
