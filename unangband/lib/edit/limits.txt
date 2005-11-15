@@ -64,6 +64,9 @@ M:Y:30
 # Maximum number of owners per store
 M:B:4
 
+# Maximum number of fixed quests
+M:Q:8
+
 # Maximum number of objects
 M:O:512
 

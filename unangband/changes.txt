@@ -117,6 +117,12 @@ However, many more monsters/objects etc. need to have the correct tiles
 assigned to them and there are still visual artefacts that need to be
 cleaned up.
 
+- Additional categories in knowledge menus to display missing monster type (trees) and
+the majority of remaining features.
+
+- Only dump feature graphics to pref file that are actually used (and do not mimic another
+feature). This misses invisible traps.
+
 ### Bug fixes ###
 
 - Priest spell righteous fury was for mages, paladins, shamans and bards but

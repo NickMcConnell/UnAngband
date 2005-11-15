@@ -1930,6 +1930,9 @@ void do_cmd_visuals(void)
 				/* Skip non-entries */
 				if (!f_ptr->name) continue;
 
+				/* Skip mimic entries */
+				if (f_ptr->mimic != i) continue;
+
 				/* Dump a comment */
 				fprintf(fff, "# %s\n", (f_name + f_ptr->name));
 
@@ -3904,6 +3907,7 @@ static cptr monster_group_text[] =
 	"Scorpions/Spiders",
 	"Skeletons",
 	"Snakes",
+	"Trees",
 	"Trolls",
 	"Vampires",
 	"Vortices",
@@ -3962,6 +3966,7 @@ static cptr monster_group_char[] =
 	"S",
 	"s",
 	"J",
+	":",
 	"T",
 	"V",
 	"v",
@@ -6083,6 +6088,7 @@ static cptr feature_group_text[] =
 	"Sand/Earth",
 	"Ground",
 	"Trees/Plants",
+	"Smoke/Fire",
 	"Wilderness",
 	NULL
 };
@@ -6102,7 +6108,7 @@ static u32b feature_group_flag[] =
 	0, 0, FF3_CHEST,
 	0, 0, FF3_ALLOC,
 	0, FF2_BRIDGED, 0,
-	0, FF2_WATER, 0,
+	0, FF2_WATER | FF2_CAN_SWIM, 0,
 	0, FF2_LAVA, 0,
 	0, FF2_ICE, 0,
 	0, FF2_ACID, 0,
@@ -6111,6 +6117,7 @@ static u32b feature_group_flag[] =
 	0, FF2_CAN_DIG, 0,
 	0, 0, FF3_GROUND,
 	0, 0, FF3_LIVING,
+	0, 0, FF3_SPREAD,
 	0, 0, FF3_OUTSIDE,
 	0,0,0
 };
