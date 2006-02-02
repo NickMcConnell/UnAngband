@@ -90,29 +90,27 @@
 V:3.0.1
 
 
-# Completing quest 1 finishes the game.
+# Completing quest 0 finishes the game.
 
-N:1:Your quest to kill Morgoth, Lord of Darkness
+N:0:Your quest to kill Morgoth, Lord of Darkness
 S:1
 F:TRAVEL
 T:0:100:0
 F:KILL_RACE
 R:547
 
-N:2:Your quest to find Morgoth, Lord of Darkness
+N:1:Your quest to find Sauron
 S:1
 F:TRAVEL
 T:0:99:0
 F:KILL_RACE
 R:546
 
-
 # Farmer Maggot wants you to find Grip, Fang and Wolf. This is worth the same experience as killing them, and
 # causes them to be banished. In return, you qualify for a quest where you can trade 3 mushrooms of mana for a
 # potion of mana. You fail the quest and make Farmer Maggot your enemy and leave if you kill any of them.
 
-N:3:Farmer Maggot's quest for his dogs (Grip)
-
+N:2:Farmer Maggot's quest for his dogs (Grip)
 S:0
 F:TALK_RACE
 R:4
@@ -133,30 +131,7 @@ S:6
 F:HATE_RACE | BANISH_RACE
 R:4
 
-N:4:Farmer Maggot's quest for his dogs (Fang)
-S:0
-F:TALK_RACE
-R:4
-F:PASS_QUEST
-Q:1
-S:1
-F:FIND_RACE
-R:47
-S:3
-F:TALK_RACE
-R:4
-S:4
-F:BANISH_RACE
-R:47
-W:30:0:0
-S:5
-F:KILL_RACE
-R:47
-S:6
-F:HATE_RACE | BANISH_RACE
-R:4
-
-N:6:Farmer Maggot's quest for his dogs (Wolf)
+N:3:Farmer Maggot's quest for his dogs (Fang)
 S:0
 F:TALK_RACE
 R:4
@@ -164,6 +139,29 @@ F:PASS_QUEST
 Q:2
 S:1
 F:FIND_RACE
+R:47
+S:3
+F:TALK_RACE
+R:4
+S:4
+F:BANISH_RACE
+R:47
+W:30:0:0
+S:5
+F:KILL_RACE
+R:47
+S:6
+F:HATE_RACE | BANISH_RACE
+R:4
+
+N:4:Farmer Maggot's quest for his dogs (Wolf)
+S:0
+F:TALK_RACE
+R:4
+F:PASS_QUEST
+Q:3
+S:1
+F:FIND_RACE
 R:618
 S:3
 F:TALK_RACE
@@ -179,12 +177,12 @@ S:6
 F:HATE_RACE | BANISH_RACE
 R:4
 
-N:7:Farmer Maggot's quest for his mushrooms
+N:5:Farmer Maggot's quest for his mushrooms
 S:0
 F:TALK_RACE
 R:4
 F:PASS_QUEST
-Q:3
+Q:4
 S:1
 F:FIND_ITEM
 Z:3
@@ -196,4 +194,3 @@ S:4
 F:GET_ITEM
 K:266
 W:100:0:0
-

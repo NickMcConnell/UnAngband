@@ -40,9 +40,9 @@
  }  Uninscribe an object                ^L  (alter - east)
  [  (unused)                            ^M  (special - return)
  ]  Dump html screen dump               ^N  (alter - south east)
- -  Walk (flip pickup)                  ^O  (unused)
+ -  Walk (flip pickup)                  ^O  Operate a part
  _  Enter store                         ^P  Show previous messages
- +  Alter grid                          ^Q  (unused)
+ +  Alter grid                          ^Q  Display current quest
  =  Set options                         ^R  Redraw the screen
  ;  Walk (with pickup)                  ^S  Save and don't quit
  :  Take notes                          ^T  Dig a Tunnel

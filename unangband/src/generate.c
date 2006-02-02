@@ -5250,7 +5250,7 @@ void generate_cave(void)
 			quest_event *qe_ptr = &(q_ptr->event[q_ptr->stage]);
 
 			/* Hack -- player's actions don't change level */
-			if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_LOCATE]);
+			if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_ACTIVE]);
 
 			/* Quest occurs on this level */
 			if ((qe_ptr->dungeon == p_ptr->dungeon) && (qe_ptr->level == (p_ptr->depth - min_depth(p_ptr->dungeon))))

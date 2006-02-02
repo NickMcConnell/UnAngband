@@ -975,7 +975,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			c = f_ptr->x_char;
 
 			/* Special lighting effects */
-			if ((view_special_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
+			if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
 			{
 				/* Modify the lighting */
 				modify_grid_boring(&a, &c, y, x, cinfo, pinfo);
@@ -998,7 +998,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			c = f_ptr->x_char;
 
 			/* Special lighting effects */
-			if (f_ptr->flags2 & (FF2_ATTR_LITE))
+			if (f_ptr->flags3 & (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
 			{
 				/* Modify lighting */
 				modify_grid_unseen(&a, &c);
@@ -1061,14 +1061,14 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			c = f_ptr->x_char;
 
 			/* Special lighting effects */
-			if ((view_special_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
+			if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
 			{
 				/* Modify lighting */
 				modify_grid_boring(&a, &c, y, x, cinfo, pinfo);
 			}
 
 			/* Special lighting effects */
-			else if ((view_granite_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
+			else if ((view_granite_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
 			{
 				/* Modify lighting */
 				modify_grid_interesting(&a, &c, cinfo, pinfo);
@@ -1091,7 +1091,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			c = f_ptr->x_char;
 
 			/* Special lighting effects */
-			if (f_ptr->flags2 & (FF2_ATTR_LITE))
+			if (f_ptr->flags2 & (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
 			{
 				/* Modify lighting */
 				modify_grid_unseen(&a, &c);
@@ -1146,14 +1146,14 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		c = f_ptr->x_char;
 
 		/* Special lighting effects */
-		if ((view_special_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
+		if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
 		{
 			/* Modify lighting */
 			modify_grid_boring(&a, &c, y, x, cinfo, pinfo);
 		}
 
 		/* Special lighting effects */
-		else if ((view_granite_lite) && (f_ptr->flags2 & (FF2_ATTR_LITE)))
+		else if ((view_granite_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
 		{
 			/* Modify lighting */
 			modify_grid_interesting(&a, &c, cinfo, pinfo);

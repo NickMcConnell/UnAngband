@@ -1,12 +1,7 @@
 === New Options ===
 
-Unangband attempts to implement most of its new features as options or
-info.txt file modifications (see the lib\edit\ directory). Switch the
-Variant and Save-file options on to play the full Unangband experience,
-or switch off those new features you dislike.
+Unangband provides a number of new options.
 
-There are also a number of options under other menus that can be used
-to modify various new features in the game.
 
 === New User Interface options ===
 
@@ -19,8 +14,7 @@ Merge pvals when stacking    [stack_force_pvals]
     keeps an internal record of how many objects have the next lowest pval.
     You can force this behaviour by inscribing both objects with {=s} even
     without this option set.
-    This object is the least 'realistic' of all the stacking options. It
-    requires that the Save-file option variant_pval_stacks is set.
+    This object is the least 'realistic' of all the stacking options.
 
 ***** <stack_force_times>
 Merge timeouts when stacking    [stack_force_times]
@@ -30,8 +24,6 @@ Merge timeouts when stacking    [stack_force_times]
     resulting stack has the largest timeout of any item in the stack. You
     can force this behaviour by inscribing both objects with {=s} even
     without this option set.
-    This option requires that the Save-file option variant_time_stacks is
-    set.
 
 ***** <easy_autos>
 Automatically inscribe all objects
@@ -44,10 +36,7 @@ Automatically inscribe all objects
 ***** <easy_search>
 Start searching if not disturbed
     After 20 turns without being disturbed, the character will auto-
-    matically enter Search mode. This is most useful for characters
-    using the new variant_fast_moves option, as this allows them to
-    recover from being tired without additional keypresses.
-
+    matically enter Search mode.
 
 === Disturbance options ===
 
@@ -83,8 +72,7 @@ Reseed random artifacts on death    [reseed_artifacts]
 Display room names
      When entering a lit room, the name of the room will be displayed as
      a brief message. Room names can indicate what types of creatures,
-     treasures or traps can be encountered in that room if the
-     variant_room_info option is switched on.
+     treasures or traps can be encountered in that room.
 
 ***** <room_descriptions>
      When entering a room, a description of the contents of the room will
@@ -94,8 +82,7 @@ Display room names
      at yourself while in the room, or at the contents of the room while
      outside it. The room description will provide important information
      about what types of creatures, treasure, traps or magical effects are
-     in the room if the variant_room_info option is switched on.
-
+     in the room.
 
 
 === Display options ===
@@ -148,6 +135,15 @@ Birth: Play in Lord of the Rings campaign    [birth_campaign]
      Be prepared for out of depth uniques (Especially at night), dungeon
      guardians you have to defeat in order to progress further, quest
      rewards in set locations, and dangerous battlefields and towers.
+
+***** <birth_no_stacking>
+Birth: Don't stack objects on the floor    [birth_no_stacking]
+     For players used to older versions of Moria and Angband, this option
+     prevents objects stacking together on the floor. This will result in
+     objects spreading out further when dropped by a monster, as well as
+     more objects being 'destroyed' because they cannot fit on the floor.
+     It may cause better objects to be created overall, which is why this
+     is a birth option as it affects game balance.
 
 === Cheating options ===
 

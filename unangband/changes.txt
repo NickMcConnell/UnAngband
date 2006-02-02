@@ -74,6 +74,12 @@ unnessary bookkeeping.
 
 - Renamed individually appearing novice monsters to apprentice monsters.
 
+- Added fixed quests that can be configured in the lib\edit\quests.txt file. These
+allow a reasonably complicated set of actions. See the example Farmer Maggot quest.
+However, scripting is not possible - the quests are data-driven.
+
+- Added random quests. These use the same backend as the fixed quests code.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.
@@ -122,6 +128,13 @@ the majority of remaining features.
 
 - Only dump feature graphics to pref file that are actually used (and do not mimic another
 feature). This misses invisible traps.
+
+- Added command ^Q to display the current quests.
+
+- Add ATTR_DOOR / ATTR_WALL / ATTR_ITEM to allow 2 way doors, 24 way walls, and 'item-like'
+terrain (e.g. stuff that requires a floor graphic underneath) to pref file initialisation
+and visual edit mode. In visual edit mode, use 'd', 'w' and 'f' (for floor) to toggle the
+options on and off.
 
 ### Bug fixes ###
 

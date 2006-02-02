@@ -466,6 +466,15 @@ static void player_wipe(void)
 		a_ptr->cur_num = 0;
 	}
 
+	/* Reset the quests */
+	for (i = 0; i < MAX_Q_IDX; i++)
+	{
+		quest_type *q_ptr = &q_list[i];
+
+		/* Wipe the structure */
+		(void)WIPE(q_ptr, quest_type);
+	}
+
 	/* Reset the "objects" */
 	for (i = 1; i < z_info->k_max; i++)
 	{
@@ -501,7 +510,6 @@ static void player_wipe(void)
 
 	/* Hack -- no ghosts */
 	r_info[z_info->r_max-1].max_num = 0;
-
 
 	/* Hack -- Well fed player */
 	p_ptr->food = PY_FOOD_FULL - 1;
@@ -1971,6 +1979,13 @@ void player_birth(void)
 
 		/* Maintain the shop (ten times) */
 		for (i = 0; i < 10; i++) store_maint(n);
+	}
+
+	/* Quests */
+	for (n = 0; n < z_info->q_max; n++)
+	{
+		/* Copy the structure */
+		COPY(&q_list[n], &q_info[n], quest_type);
 	}
 }
 

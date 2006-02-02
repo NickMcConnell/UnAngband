@@ -195,10 +195,10 @@ static bool check_travel_quest(int dungeon, int level, bool confirm)
 		q_ptr = &q_list[i];
 		qe_ptr = &(q_ptr->event[q_ptr->stage]);
 
-		/* if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_LOCATE]); */
+		/* if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_ACTIVE]); */
 
 		/* Check destination */
-		if (q_ptr->stage == QUEST_LOCATE)
+		if (q_ptr->stage == QUEST_ACTIVE)
 		{
 			if ((qe_ptr->dungeon != dungeon) ||
 				(qe_ptr->level != level - min_depth(dungeon))) continue;
@@ -235,7 +235,7 @@ static bool check_travel_quest(int dungeon, int level, bool confirm)
 		q_ptr = &q_list[i];
 		qe_ptr = &(q_ptr->event[q_ptr->stage]);
 
-		if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_LOCATE]);
+		if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_ACTIVE]);
 
 		/* Check quest allocation */
 		if (q_ptr->stage == QUEST_ASSIGN)
@@ -275,7 +275,7 @@ static bool check_travel_quest(int dungeon, int level, bool confirm)
 			(qe_ptr->level != level - min_depth(dungeon))) continue;
 
 		/* Check destination */
-		if (q_ptr->stage == QUEST_LOCATE)
+		if (q_ptr->stage == QUEST_ACTIVE)
 		{
 			/* Update actions */
 			qe_ptr = &(q_ptr->event[QUEST_ACTION]);
@@ -295,14 +295,14 @@ static bool check_travel_quest(int dungeon, int level, bool confirm)
 			}
 
 			/* Get closer to success because we travelled to level */
-			else if (q_ptr->event[QUEST_LOCATE].flags & (EVENT_TRAVEL))
+			else if (q_ptr->event[QUEST_ACTIVE].flags & (EVENT_TRAVEL))
 			{
 				qe_ptr->dungeon = dungeon;
 				qe_ptr->level = level - min_depth(dungeon);
 				qe_ptr->flags |= (EVENT_TRAVEL);
 
 				/* Have completed quest? */
-				if (qe_ptr->flags == q_ptr->event[QUEST_LOCATE].flags)
+				if (qe_ptr->flags == q_ptr->event[QUEST_ACTIVE].flags)
 				{
 					msg_print("Congratulations. You have succeeded at your quest.");
 
@@ -334,7 +334,7 @@ static bool check_travel_quest(int dungeon, int level, bool confirm)
 		}
 
 		/* Get closer to success because we need to leave level */
-		else if (q_ptr->event[QUEST_LOCATE].flags & (EVENT_LEAVE))
+		else if (q_ptr->event[QUEST_ACTIVE].flags & (EVENT_LEAVE))
 		{
 			qe_ptr->dungeon = p_ptr->dungeon;
 			qe_ptr->level = p_ptr->depth - min_depth(p_ptr->dungeon);

@@ -2071,6 +2071,7 @@ void cleanup_angband(void)
 	free_info(&k_head);
 	free_info(&f_head);
 	free_info(&d_head);
+	free_info(&q_head);
 	free_info(&z_head);
 
 	/* Free the format() buffer */

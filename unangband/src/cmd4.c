@@ -1937,8 +1937,11 @@ void do_cmd_visuals(void)
 				fprintf(fff, "# %s\n", (f_name + f_ptr->name));
 
 				/* Dump the feature attr/char info */
-				fprintf(fff, "F:%d:0x%02X:0x%02X:%s\n\n", i,
-					(byte)(f_ptr->x_attr), (byte)(f_ptr->x_char),(f_ptr->flags2 & (FF2_ATTR_LITE)) ? "YES" : "NO");
+				fprintf(fff, "F:%d:0x%02X:0x%02X:%s%s%s%s\n\n", i,
+					(byte)(f_ptr->x_attr), (byte)(f_ptr->x_char),(f_ptr->flags3 & (FF3_ATTR_LITE)) ? "A" : "",
+						(f_ptr->flags3 & (FF3_ATTR_ITEM)) ? "F" : "",
+						(f_ptr->flags3 & (FF3_ATTR_DOOR)) ? "D" : "",
+						(f_ptr->flags3 & (FF3_ATTR_WALL)) ? "W" : "");
 			}
 
 			/* All done */
@@ -2790,7 +2793,7 @@ static cptr event_tense_text[8] =
 	"have ",
 	"had to ",
 	"must ",
-	"will  ",
+	"will ",
 	" ",
 	"can ",
 	"may "
@@ -2799,7 +2802,7 @@ static cptr event_tense_text[8] =
 /*
  * Display a quest event.
  */
-void print_event(quest_event *event, int pronoun, int tense, bool intro)
+bool print_event(quest_event *event, int pronoun, int tense, cptr prefix)
 {
 	int vn, n;
 	cptr vp[64];
@@ -2809,6 +2812,8 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 	bool reflex_object = FALSE;
 	bool used_num = FALSE;
 	bool used_race = FALSE;
+	bool output = FALSE;
+	bool intro = FALSE;
 
 	/* Describe location */
 	if ((event->dungeon) || (event->level))
@@ -2845,7 +2850,15 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 				/* Intro */
 				if (n == 0)
 				{
-					text_out(event_pronoun_text_caps[pronoun]);
+					if (prefix)
+					{
+						text_out(prefix);
+						text_out(event_pronoun_text[pronoun]);
+					}
+					else
+					{
+						text_out(event_pronoun_text_caps[pronoun]);
+					}
 					text_out(event_tense_text[tense]);
 				}
 				else if (n < vn-1) text_out(", ");
@@ -2854,6 +2867,14 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 				/* Dump */
 				text_out(vp[n]);
 			}
+
+			text_out(" ");
+		}
+
+		if ((!vn) && (prefix))
+		{
+			text_out(prefix);
+			intro = TRUE;
 		}
 
 		if (event->level)
@@ -2878,14 +2899,25 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 		}
 
 		intro = TRUE;
+		output = TRUE;
 	}
 
 	/* Visit a store */	
 	if ((event->owner) || (event->store) || (event->flags & (EVENT_TALK_STORE | EVENT_DEFEND_STORE)))
 	{
+		output = TRUE;
+
 		if (!intro)
 		{
-			text_out(event_pronoun_text_caps[pronoun]);
+			if (prefix)
+			{
+				text_out(prefix);
+				text_out(event_pronoun_text[pronoun]);
+			}
+			else
+			{
+				text_out(event_pronoun_text_caps[pronoun]);
+			}
 			text_out(event_tense_text[tense]);
 
 			intro = TRUE;
@@ -2931,7 +2963,9 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 			text_out(" and ");
 		}
 		else text_out(" ");
-	}
+
+		output = TRUE;
+	}	
 
 	/* Affect room */
 	if ((event->room_type_a) || (event->room_type_b) || (event->room_flags))
@@ -2967,30 +3001,36 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 
 		if (vn)
 		{
+			output = TRUE;
+
 			if (!intro)
 			{
-				text_out(event_pronoun_text_caps[pronoun]);
+				if (prefix)
+				{
+					text_out(prefix);
+					text_out(event_pronoun_text[pronoun]);
+				}
+				else
+				{
+					text_out(event_pronoun_text_caps[pronoun]);
+				}
 				text_out(event_tense_text[tense]);
 
 				intro = TRUE;
 			}
-		}
 
-		/* Scan */
-		for (n = 0; n < vn; n++)
-		{
-			/* Intro */
-			if (n == 0) ;
-			else if (n < vn-1) text_out(", ");
-			else text_out(" or ");
+			/* Scan */
+			for (n = 0; n < vn; n++)
+			{
+				/* Intro */
+				if (n == 0) ;
+				else if (n < vn-1) text_out(", ");
+				else text_out(" or ");
 
-			/* Dump */
-			text_out(vp[n]);
-		}
+				/* Dump */
+				text_out(vp[n]);
+			}
 
-
-		if (vn)
-		{
 			text_out(" a ");
 
 			/* Room adjective */
@@ -3086,6 +3126,8 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 		/* Introduce feature */
 		if (vn)
 		{
+			output = TRUE;
+
 			if (reflex_feature)
 			{
 				if ((!used_num) && (event->number > 0)) text_out(format("%d ",event->number));
@@ -3100,66 +3142,55 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 			}
 			else if (!intro)
 			{
-				text_out(event_pronoun_text_caps[pronoun]);
+				if (prefix)
+				{
+					text_out(prefix);
+					text_out(event_pronoun_text[pronoun]);
+				}
+				else
+				{
+					text_out(event_pronoun_text_caps[pronoun]);
+				}
 				text_out(event_tense_text[tense]);
 
 				intro = TRUE;
 			}
-		}
 
-		/* Scan */
-		for (n = 0; n < vn; n++)
-		{
-			/* Intro */
-			if (n == 0) ;
-			else if (n < vn-1) text_out(", ");
-			else text_out(" or ");
+			/* Scan */
+			for (n = 0; n < vn; n++)
+			{
+				/* Intro */
+				if (n == 0) ;
+				else if (n < vn-1) text_out(", ");
+				else text_out(" or ");
 
-			/* Dump */
-			text_out(vp[n]);
-		}
+				/* Dump */
+				text_out(vp[n]);
+			}
 
-		if ((vn) && !(reflex_feature))
-		{
-			text_out(" ");
+			if (!(reflex_feature))
+			{
+				if ((!used_num) && (event->number > 0)) text_out(format(" %d",event->number));
 
-			if ((!used_num) && (event->number > 0)) text_out(format("%d ",event->number));
+				text_out(" ");
+				text_out(f_name + f_info[event->feat].name);
+				if ((!used_num) && (event->number > 0)) text_out("s");
 
-			text_out(f_name + f_info[event->feat].name);
-			if ((!used_num) && (event->number > 0)) text_out("s");
+				used_num = TRUE;
+			}
 
-			used_num = TRUE;
-		}
-
-		if ((vn) && ((event->race) || (event->kind) || (event->ego_item_type) || (event->artifact)))
-		{
-			if (reflex_feature) { text_out(".  "); intro = FALSE; reflex_monster = FALSE; reflex_object = FALSE; }
-			else if (event->race) { text_out(" guarded by "); used_race = TRUE; }
-			else text_out(" and ");
-
-		}
-		
+			if ((event->race) || (event->kind) || (event->ego_item_type) || (event->artifact))
+			{
+				if (reflex_feature) { text_out(".  "); intro = FALSE; reflex_monster = FALSE; reflex_object = FALSE; }
+				else if (event->race) { text_out(" guarded by "); used_race = TRUE; }
+				else text_out(" and ");
+			}
+		}		
 	}
 
 	/* Kill a monster */	
 	if ((event->race) && ((used_race) || !((event->kind) || (event->ego_item_type) || (event->artifact))))
 	{
-		monster_type m_temp;
-		char m_name[80];
-
-		/* Prepare monster */
-		m_temp.r_idx = event->race;
-
-		/* Describe monster */
-		if (!(used_num) && (event->number == 1))
-		{
-			monster_desc(m_name,&m_temp, 0x88);
-		}
-		else
-		{
-			strcpy(m_name,r_name + r_info[event->race].name);
-		}
-
 		used_race = TRUE;
 
 		/* Collect monster actions */
@@ -3192,18 +3223,20 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 		/* Hack -- monster race */
 		if (vn)
 		{
+			output = TRUE;
+
 			if (reflex_monster)
 			{
 				if ((!used_num) && (event->number > 0))
 				{
-					text_out(format("%d ",event->number));
+					if (!(r_info[event->race].flags1 & (RF1_UNIQUE)) ) text_out(format(" %d",event->number));
 				}
 
-				text_out(m_name);
+				text_out(r_name + r_info[event->race].name);
 
 				if ((used_num) || (event->number != 1))
 				{
-					text_out("s");
+					if (!(r_info[event->race].flags1 & (RF1_UNIQUE)) ) text_out("s");
 				}
 
 				text_out(event_pronoun_text_which[pronoun]);
@@ -3213,49 +3246,58 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 			}
 			else if (!intro)
 			{
-				text_out(event_pronoun_text_caps[pronoun]);
+				if (prefix)
+				{
+					text_out(prefix);
+					text_out(event_pronoun_text[pronoun]);
+				}
+				else
+				{
+					text_out(event_pronoun_text_caps[pronoun]);
+				}
 
 				if ((event->flags & (EVENT_GET_STORE)) && (tense > 1)) text_out("will ");
 				else text_out(event_tense_text[tense]);
 
 				intro = TRUE;
 			}
-		}
 
-		/* Scan */
-		for (n = 0; n < vn; n++)
-		{
-			/* Intro */
-			if (n == 0) ;
-			else if (n < vn-1) text_out(", ");
-			else text_out(" or ");
-
-			/* Dump */
-			text_out(vp[n]);
-		}
-
-		if ((vn) && !(reflex_monster))
-		{
-			if ((!used_num) && (event->number > 0))
+			/* Scan */
+			for (n = 0; n < vn; n++)
 			{
-				text_out(format("%d ",event->number));
+				/* Intro */
+				if (n == 0) ;
+				else if (n < vn-1) text_out(", ");
+				else text_out(" or ");
+
+				/* Dump */
+				text_out(vp[n]);
 			}
 
-			text_out(m_name);
-
-			if ((used_num) || (event->number != 1))
+			if (!(reflex_monster))
 			{
-				text_out("s");
+				if ((!used_num) && (event->number > 0))
+				{
+					if (!(r_info[event->race].flags1 & (RF1_UNIQUE)) ) text_out(format(" %d",event->number));
+				}
+
+				text_out(" ");
+				text_out(r_name + r_info[event->race].name);
+
+				if ((used_num) || (event->number != 1))
+				{
+					if (!(r_info[event->race].flags1 & (RF1_UNIQUE)) ) text_out("s");
+				}
+
+				used_num = TRUE;
 			}
 
-			used_num = TRUE;
-		}
-
-		if ((vn) && ((event->kind) || (event->ego_item_type) || (event->artifact)))
-		{
-			if (reflex_monster) { text_out(".  "); intro = FALSE; reflex_object = FALSE; }
-			else if (event->number > 1) text_out(" and each carrying ");
-			else text_out(" and carrying ");
+			if ((event->kind) || (event->ego_item_type) || (event->artifact))
+			{
+				if (reflex_monster) { text_out(".  "); intro = FALSE; prefix = NULL; reflex_object = FALSE; }
+				else if (event->number > 1) text_out(" and each carrying ");
+				else text_out(" and carrying ");
+			}
 		}
 	}
 
@@ -3331,6 +3373,8 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 
 		if (vn)
 		{
+			output = TRUE;
+
 			if (event->flags & (EVENT_STOCK_STORE))
 			{
 				if (intro) text_out("he ");
@@ -3355,45 +3399,108 @@ void print_event(quest_event *event, int pronoun, int tense, bool intro)
 			}
 			else if (!intro)
 			{
-				text_out(event_pronoun_text_caps[pronoun]);
+				if (prefix)
+				{
+					text_out(prefix);
+					text_out(event_pronoun_text[pronoun]);
+				}
+				else
+				{
+					text_out(event_pronoun_text_caps[pronoun]);
+				}
 				if ((event->flags & (EVENT_DEFEND_STORE)) && (tense > 1)) text_out("can ");
 				else if ((event->flags & (EVENT_GET_STORE)) && (tense > 1)) text_out("will ");
 				else text_out(event_tense_text[tense]);
 			}
 
 			intro = TRUE;
+
+			/* Scan */
+			for (n = 0; n < vn; n++)
+			{
+				/* Intro */
+				if (n == 0) ;
+				else if (n < vn-1) text_out(", ");
+				else text_out(" or ");
+
+				/* Dump */
+				text_out(vp[n]);
+			}
+
+			if (!(reflex_object))
+			{
+				text_out(" ");
+				text_out(o_name);
+			}
 		}
-
-		/* Scan */
-		for (n = 0; n < vn; n++)
-		{
-			/* Intro */
-			if (n == 0) ;
-			else if (n < vn-1) text_out(", ");
-			else text_out(" or ");
-
-			/* Dump */
-			text_out(vp[n]);
-		}
-
-		if ((vn) && !(reflex_object)) text_out(o_name);
-
-#if 0
-		if (vn)
-		{
-			if (reflex_object) { text_out(".  "); intro = FALSE; }
-			else text_out(" and ");
-		}
-#endif
 	}
+
+	/* Collect rewards */
+	if ((event->gold) || (event->experience))
+	{
+		output = TRUE;
+
+		if (!intro)
+		{
+			if (prefix)
+			{
+				text_out(prefix);
+				text_out(event_pronoun_text[pronoun]);
+			}
+			else
+			{
+				text_out(event_pronoun_text_caps[pronoun]);
+			}
+		}
+		else
+		{
+			text_out(" and ");
+		}
+
+
+		if ((event->gold > 0) || (event->experience > 0))
+		{
+			text_out("gain ");
+
+			if (event->gold > 0)
+			{
+				text_out(format("%d gold",event->gold));
+				if (event->experience) text_out(" and ");
+			}
+
+			if (event->experience > 0)
+			{
+				text_out(format("%d experience",event->experience));
+				if (event->gold < 0) text_out(" and ");
+			}
+		}
+
+		if ((event->gold < 0) || (event->experience < 0))
+		{
+			text_out("cost ");
+
+			if (event->gold < 0)
+			{
+				text_out(format("%d gold",-event->gold));
+				if (event->experience < 0) text_out(" and ");
+			}
+
+			if (event->experience < 0)
+			{
+				text_out(format("%d experience",-event->experience));
+			}
+		}
+	}
+
+	return (output);
+
 }
 
 /*
  * Output all quests between certain stages
  *
  * Example - print all quests min = QUEST_ASSIGN, max = QUEST_PENALTY
- *         - print live quests min = QUEST_ASSIGN, max = QUEST_REWARD
- *         - print quests on current level min = QUEST_LOCATE, max = QUEST_ACTION
+ *         - print known/live quests min = QUEST_ACTIVE, max = QUEST_REWARD
  *
  * Returns true if anything output.
  */
@@ -3402,76 +3509,96 @@ bool print_quests(int min_stage, int max_stage)
 	int i, j;
 
 	int tense = 0;
-	bool intro = FALSE;
 	bool newline = FALSE;
 	bool output = FALSE;
+	bool event_out;
 
-	for (i = 0; i < MAX_Q_IDX; i++)
+	cptr prefix = NULL;
+
+	for (i = 0; i < 5; i++)
 	{
 		newline = FALSE;
 
 		/* Quest not in range */
 		if ((q_list[i].stage >= min_stage) && (q_list[i].stage <= max_stage)) continue;
 
-		for (j = 0; j <= MAX_QUEST_EVENTS; j++)
+		event_out = FALSE;
+
+		for (j = 0; j < MAX_QUEST_EVENTS; j++)
 		{
 			switch(j)
 			{
 				case QUEST_ASSIGN:
-					if (q_info[i].stage == QUEST_ASSIGN) { tense = 1; intro = TRUE; }
-					else { tense = 0; intro = TRUE; }
+					if (q_info[i].stage == QUEST_ASSIGN) { tense = 6; }
+					else if (q_info[i].stage == QUEST_ACTIVE) { tense = 1; }
+					else { tense = 0; }
 					break;
-				case QUEST_LOCATE:
-					if (q_info[i].stage == QUEST_ASSIGN) { tense = 3; intro = TRUE; }
-					else if (q_info[i].stage == QUEST_LOCATE) { tense = 1; intro = TRUE; }
-					else if (q_info[i].stage == QUEST_FAILED) { tense = 2; intro = TRUE; }
-					else if (q_info[i].stage == QUEST_PENALTY) { tense = 2; intro = TRUE; }
+				case QUEST_ACTIVE:
+					if (q_info[i].stage == QUEST_ACTIVE) { tense = 1; }
+					else if (q_info[i].stage == QUEST_ACTION) { tense = 1; }
+					else if (q_info[i].stage == QUEST_FAILED) { tense = 2; }
+					else if (q_info[i].stage == QUEST_PENALTY) { tense = 2; }
 					else continue;
 					break;
 				case QUEST_ACTION:
-					if (q_info[i].stage < QUEST_LOCATE) continue;
-					else if (q_info[i].stage == QUEST_ASSIGN) { tense = 3; intro = TRUE; }
-					else if (q_info[i].stage == QUEST_LOCATE) { tense = 1; intro = TRUE; }
-					else if (q_info[i].stage == QUEST_FINISH) { tense = 2; intro = TRUE; }
-					else { tense = 0; intro = TRUE; }
-					break;
-				case QUEST_FINISH:
-					if (q_info[i].stage == QUEST_FINISH) { tense = 1; intro = TRUE; }
-					else if (q_info[i].stage == QUEST_FINISH) { tense = 0; intro = TRUE; }
-					else if (q_info[i].stage > QUEST_FINISH) continue;
-					else { tense = 3; intro = TRUE; }
+					if (q_info[i].stage < QUEST_ACTION) continue;
+					else if (q_info[i].stage == QUEST_ASSIGN) { tense = 3; }
+					else if (q_info[i].stage == QUEST_ACTIVE) { tense = 1; }
+					else if (q_info[i].stage == QUEST_FINISH) { tense = 2; }
+					else { tense = 0; }
 					break;
 				case QUEST_REWARD:
-					if (q_info[i].stage == QUEST_FINISH) { tense = 2; intro = TRUE; }
+					if (q_info[i].stage < QUEST_ACTION) continue;
+					else if (q_info[i].stage == QUEST_REWARD) { tense = 3; }
+					else if (q_info[i].stage == QUEST_FINISH) { tense = 0; }
 					else if (q_info[i].stage > QUEST_FINISH) continue;
-					else { tense = 4; intro = TRUE; }
+					else { tense = 3; prefix = "To claim your reward, "; }
+					break;
+				case QUEST_FINISH:
+					if (q_info[i].stage < QUEST_ACTION) continue;
+					else if (q_info[i].stage == QUEST_FINISH) { tense = 0; prefix = "and "; }
+					else if (q_info[i].stage > QUEST_FINISH) continue;
+					else { tense = 4; prefix = "and ";}
 					break;
 				case QUEST_FAILED:
-					if (q_info[i].stage < QUEST_FINISH)
+					if (q_info[i].stage < QUEST_ACTION) continue;
+					else if (q_info[i].stage < QUEST_REWARD)
 					{
 						tense = 5;
-						text_out("If you ");
-						intro = FALSE;
+						prefix = ".  You will fail the quest if ";
 					}
-					else if (q_info[i].stage == QUEST_PENALTY) { tense = 0; intro = TRUE; }
+					else if (q_info[i].stage == QUEST_PENALTY) { tense = 0; }
 					else continue;
 					break;
 				case QUEST_PENALTY:
-					if (q_info[i].stage < QUEST_REWARD) { tense = 4; intro = FALSE; }
-					if (q_info[i].stage == QUEST_REWARD) continue;
-					if (q_info[i].stage == QUEST_FINISH) continue;
+					if (q_info[i].stage < QUEST_ACTION) continue;
+					else if (q_info[i].stage < QUEST_REWARD) { tense = 4; prefix = ". If this happens "; }
+					else if (q_info[i].stage == QUEST_PENALTY) { tense = 0; prefix = "causing you to fail the quest and "; }
+					else continue;
 					break;
 			}
 
-			print_event(&q_info[i].event[j], 2,  tense, intro);
+			if (event_out)
+			{
+				if ((prefix) && (prefix[0] != '.'))
+				{
+					text_out(" ");
+				}
+				else if (!prefix)
+				{
+					text_out(".  ");
+				}
+			}
 
-			if ((j == QUEST_FAILED) && (q_info[i].stage < QUEST_REWARD)) text_out(" ");
-			else text_out(".  ");
+			event_out = print_event(&q_info[i].event[j], 2, tense, prefix);
+			output |= event_out;
 
-			newline = TRUE;
+			prefix = NULL;
+
+			if (output) newline = TRUE;
 		}
 
-		if (newline) text_out("\n");
+		if (newline) text_out(".\n\n");
 
 		output = TRUE;
 	}
@@ -3500,7 +3627,7 @@ void do_cmd_quest(void)
 	text_out_c(TERM_L_BLUE, "Current Quests\n");
 
 	/* Either print live quests on level, or if nothing live, display current quests */
-	if (print_quests(QUEST_LOCATE , QUEST_ACTION)) no_quests = FALSE;
+	if (print_quests(QUEST_ACTIVE , QUEST_REWARD)) no_quests = FALSE;
 	else no_quests = !print_quests(QUEST_ASSIGN , QUEST_FINISH);
 
 	/* No quests? */
@@ -3749,7 +3876,7 @@ void do_cmd_save_screen_html(void)
 
 		/* Dump the attr/char info */
 		fprintf(fff, "F:%d:0x%02X:0x%02X:%s\n\n", i,
-			(byte)(f_ptr->x_attr), (byte)(f_ptr->x_char), (f_ptr->flags2 & (FF2_ATTR_LITE) ? "YES" : "NO"));
+			(byte)(f_ptr->x_attr), (byte)(f_ptr->x_char), (f_ptr->flags3 & (FF3_ATTR_LITE) ? "YES" : "NO"));
 
 		/* Assume we will use the underlying values */
 		f_ptr->x_attr = f_ptr->d_attr;
@@ -6233,7 +6360,7 @@ static void display_feature_list(int col, int row, int per_page, int *feat_idx,
 			}
 
 			/* Tile supports special lighting? */
-			if (!(f_ptr->flags2 & (FF2_ATTR_LITE)) ||
+			if (!(f_ptr->flags3 & (FF3_ATTR_LITE)) ||
 				((f_ptr->x_attr) && (arg_graphics = GRAPHICS_DAVID_GERVAIS_ISO)))
 			{
 				prt("       ", row + i, col2);
@@ -6422,7 +6549,7 @@ static void do_cmd_knowledge_features(void)
 		}
 
 		/* Prompt */
-		prt(format("<dir>%s%s, ESC", visual_list ? ", ENTER to accept" : ", 'v' for visuals, 'a' for lite", (attr_idx||char_idx) ? ", 'c', 'p' to paste" : ", 'c' to copy"), hgt - 1, 0);
+		prt(format("<dir>%s%s, ESC", visual_list ? ", ENTER to accept" : ", 'v' for visuals, 'a'/'f'/'d'/'w' for special displays", (attr_idx||char_idx) ? ", 'c', 'p' to paste" : ", 'c' to copy"), hgt - 1, 0);
 
 		/* Get the current feature */
 		f_ptr = &f_info[feat_idx[feat_cur]];
@@ -6455,13 +6582,49 @@ static void do_cmd_knowledge_features(void)
 
 			case 'a': case 'A':
 			{
-				if (f_ptr->flags2 & (FF2_ATTR_LITE))
+				if (f_ptr->flags3 & (FF3_ATTR_LITE))
 				{
-					f_ptr->flags2 &= ~(FF2_ATTR_LITE);
+					f_ptr->flags3 &= ~(FF3_ATTR_LITE);
 				}
 				else
 				{
-					f_ptr->flags2 |= (FF2_ATTR_LITE);
+					f_ptr->flags3 |= (FF3_ATTR_LITE);
+				}
+			}
+
+			case 'f': case 'F':
+			{
+				if (f_ptr->flags3 & (FF3_ATTR_ITEM))
+				{
+					f_ptr->flags3 &= ~(FF3_ATTR_ITEM);
+				}
+				else
+				{
+					f_ptr->flags3 |= (FF3_ATTR_ITEM);
+				}
+			}
+
+			case 'd': case 'D':
+			{
+				if (f_ptr->flags3 & (FF3_ATTR_DOOR))
+				{
+					f_ptr->flags3 &= ~(FF3_ATTR_DOOR);
+				}
+				else
+				{
+					f_ptr->flags3 |= (FF3_ATTR_DOOR);
+				}
+			}
+
+			case 'w': case 'W':
+			{
+				if (f_ptr->flags3 & (FF3_ATTR_WALL))
+				{
+					f_ptr->flags3 &= ~(FF3_ATTR_WALL);
+				}
+				else
+				{
+					f_ptr->flags3 |= (FF3_ATTR_WALL);
 				}
 			}
 

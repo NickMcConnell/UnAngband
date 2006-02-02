@@ -2712,7 +2712,7 @@ void monster_death(int m_idx)
 		quest_type *q_ptr = &(q_list[i]);
 		quest_event *qe_ptr = &(q_ptr->event[q_ptr->stage]);
 
-		if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_LOCATE]);
+		if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_ACTIVE]);
 
 		if ((qe_ptr->dungeon != p_ptr->dungeon) ||
 			(qe_ptr->level != p_ptr->depth - min_depth(p_ptr->dungeon))) continue;
@@ -2810,7 +2810,7 @@ void monster_death(int m_idx)
 		}
 
 		/* Get closer to success because we need to terrify someone */
-		else if ((qe_ptr->flags & (EVENT_KILL_RACE)) && (qe_ptr->number + 1 >= q_ptr->event[QUEST_LOCATE].number))
+		else if ((qe_ptr->flags & (EVENT_KILL_RACE)) && (qe_ptr->number + 1 >= q_ptr->event[QUEST_ACTIVE].number))
 		{
 			/* Don't count terrified monsters if we can kill _or_ terrify them */
 			if (!m_ptr->monfear || !(qe_ptr->flags & (EVENT_FEAR_RACE))) qe_ptr->number++;
@@ -2818,7 +2818,7 @@ void monster_death(int m_idx)
 			qe_ptr->flags |= (EVENT_KILL_RACE);
 
 			/* Have completed quest? */
-			if ((qe_ptr->flags == q_ptr->event[QUEST_LOCATE].flags) && (qe_ptr->number >= q_ptr->event[QUEST_LOCATE].number))
+			if ((qe_ptr->flags == q_ptr->event[QUEST_ACTIVE].flags) && (qe_ptr->number >= q_ptr->event[QUEST_ACTIVE].number))
 			{
 				msg_print("Congratulations. You have succeeded at your quest.");
 

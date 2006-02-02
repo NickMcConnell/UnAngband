@@ -1062,23 +1062,23 @@
 
 #define FF2_BRIDGE      0x00000001
 #define FF2_RIVER       0x00000002
-#define FF2_LAKE 0x00000004
+#define FF2_LAKE	0x00000004
 #define FF2_BRIDGED     0x00000008
 #define FF2_COVERED     0x00000010
-#define FF2_GLOW 0x00000020
-#define FF2_ATTR_LITE   0x00000040
+#define FF2_GLOW	0x00000020
+#define FF2_LAVA	0x00000040
 #define FF2_WATER       0x00000080
-#define FF2_LAVA 0x00000100
+#define FF2_FLAVOR	0x00000100
 #define FF2_SHALLOW     0x00000200
-#define FF2_DEEP 0x00000400
+#define FF2_DEEP 	0x00000400
 #define FF2_FILLED      0x00000800
 #define FF2_HURT_ROCK   0x00001000
 #define FF2_HURT_FIRE   0x00002000
 #define FF2_HURT_COLD   0x00004000
 #define FF2_HURT_ACID   0x00008000
-#define FF2_ICE  0x00010000
-#define FF2_ACID 0x00020000
-#define FF2_OIL  0x00040000
+#define FF2_ICE  	0x00010000
+#define FF2_ACID 	0x00020000
+#define FF2_OIL  	0x00040000
 #define FF2_CHASM       0x00080000
 #define FF2_CAN_CLIMB   0x00100000
 #define FF2_CAN_FLY     0x00200000
@@ -1112,13 +1112,13 @@
 #define FF3_EASY_HIDE   0x00010000
 #define FF3_EASY_CLIMB  0x00020000
 #define FF3_MUST_CLIMB  0x00040000
-#define FF3_TREE        0x00080000
-#define FF3_NEED_TREE	0x00100000
-#define FF3_BLOOD		0x00200000
-#define FF3_DUST		0x00400000
-#define FF3_SLIME		0x00800000
-#define FF3_LIVING 		0x01000000
-#define FF3_FLAVOR        0x02000000
+#define FF3_LIVING      0x00080000
+#define FF3_TREE	0x00100000
+#define FF3_NEED_TREE	0x00200000
+#define FF3_ATTR_LITE	0x00400000
+#define FF3_ATTR_ITEM	0x00800000
+#define FF3_ATTR_DOOR	0x01000000
+#define FF3_ATTR_WALL 	0x02000000
 #define FF3_INSTANT	0x04000000
 #define FF3_ADJACENT 	0x08000000
 #define FF3_TIMED       0x10000000
@@ -1177,12 +1177,13 @@
 #define FS_USE_FEAT	76
 #define FS_GET_FEAT	77
 #define FS_GROUND       79
-#define FS_TREE		83
-#define FS_NEED_TREE	84
+#define FS_LIVING	83
+#define FS_TREE		84
+#define FS_NEED_TREE	85
 #define FS_INSTANT	90
 #define FS_ADJACENT	91
-#define FS_TIMED		92
-#define FS_SPREAD		95
+#define FS_TIMED	92
+#define FS_SPREAD	95
 
 #define FS_FLAGS_END    96
 
@@ -2538,13 +2539,21 @@
 /*** Quest event sequence ***/
 
 #define QUEST_ASSIGN	0	/* Event describes quest assignment */
-#define QUEST_LOCATE	1	/* Event describes quest location */
+#define QUEST_ACTIVE	1	/* Event describes quest */
 #define QUEST_ACTION	2	/* Event describes quest actions */
-#define	QUEST_REWARD	3	/* Event describes quest finish */
-#define	QUEST_FINISH	4	/* Event describes quest reward */
+#define	QUEST_REWARD	3	/* Event describes quest reward */
+#define	QUEST_FINISH	4	/* Event describes quest finish */
 #define	QUEST_FAILED	5	/* Event describes quest failure */
-#define	QUEST_PENALTY	6	/* Event describes quest failure */
+#define	QUEST_PENALTY	6	/* Event describes quest penalty */
 #define MAX_QUEST_EVENTS 7	/* Maximum events in a quest */
+
+/* When stage is 0, character has not been assigned quest.
+   When stage is 1, character has been assigned quest, but not completed any actions
+   When stage is 2, character has completed some actions
+   When stage is 3, character has completed all the required actions, but not collected the reward
+   When stage is 4, character has collected the reward
+   When stage is 5, character has failed the quest
+   When stage is 6, character has failed the quest, and the penalty has been applied */
 
 
 

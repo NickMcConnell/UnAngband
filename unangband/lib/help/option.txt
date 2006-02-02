@@ -627,6 +627,14 @@ Birth: Play in Lord of the Rings campaign    [birth_campaign]
      guardians you have to defeat in order to progress further, quest
      rewards in set locations, and dangerous battlefields and towers.
 
+***** <birth_no_stacking>
+Birth: Don't stack objects on the floor    [birth_no_stacking]
+     For players used to older versions of Moria and Angband, this option
+     prevents objects stacking together on the floor. This will result in
+     objects spreading out further when dropped by a monster, as well as
+     more objects being 'destroyed' because they cannot fit on the floor.
+     It may cause better objects to be created overall, which is why this
+     is a birth option as it affects game balance.
 
 === Cheating options ===
 

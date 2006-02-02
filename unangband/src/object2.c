@@ -4671,7 +4671,7 @@ bool make_feat(object_type *j_ptr, int y, int x)
 	}
 
 	/* Hack -- Pick random flavor, if flavored */
-	if (f_ptr->flags3 & (FF3_FLAVOR))
+	if (f_ptr->flags2 & (FF2_FLAVOR))
 	{
 		/* Set restriction */
 		feat_tval = k_info[k_idx].tval;

@@ -334,9 +334,9 @@ static cptr f_info_flags2[] =
 	"BRIDGED",
 	"COVERED",
 	"GLOW",
-	"ATTR_LITE",
-	"WATER",
 	"LAVA",
+	"WATER",
+	"FLAVOR",
 	"SHALLOW",
 	"DEEP",
 	"FILLED",
@@ -386,13 +386,13 @@ static cptr f_info_flags3[] =
 	"EASY_HIDE",
 	"EASY_CLIMB",
 	"MUST_CLIMB",
+	"LIVING",
 	"TREE",
 	"NEED_TREE",
-	"BLOOD",
-	"DUST",
-	"SLIME",
-	"LIVING",
-	"FLAVOR",
+	"ATTR_LITE",
+	"ATTR_ITEM",
+	"ATTR_DOOR",
+	"ATTR_WALL",
 	"INSTANT",
 	"ADJACENT",
 	"TIMED",
@@ -2186,7 +2186,7 @@ errr parse_f_info(char *buf, header *head)
 		 * for all features' will set this flag for all features, and the features that are
 		 * dynamically lit in vanilla Angband will have this flag in terrain.txt.
 		 */
-		f_ptr->flags2 |= (FF2_ATTR_LITE);
+		f_ptr->flags3 |= (FF3_ATTR_LITE);
 	}
 
 	/* Process 'M' for "Mimic" (one line only) */
@@ -5466,6 +5466,9 @@ errr parse_q_info(char *buf, header *head)
 		/* Store the name */
 		if (!(q_ptr->name = add_name(head, s)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
+
+		/* Hack -- quest stage */
+		q_ptr->stage = 100;
 	}
 
 	/* Process 'S' for "Stage" (up to MAX_QUEST_EVENT lines) */
@@ -5488,6 +5491,12 @@ errr parse_q_info(char *buf, header *head)
 		
 		/* Point at the first event */
 		qe_ptr = &q_ptr->event[stage];
+
+		/* Hack -- set first quest stage */
+		if (q_ptr->stage == 100) q_ptr->stage = stage;
+
+		/* Hack -- set default number */
+		qe_ptr->number = 1;
 	}
 
 	/* Hack -- Process 'F' for flags */

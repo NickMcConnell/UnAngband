@@ -262,7 +262,7 @@ s16b tokenize(char *buf, s16b num, char **tokens)
  *   K:<num>:<a>/<c>
  *
  * Specify the attr/char values for "features" by feature index.
- *   F:<num>:<a>/<c>
+ *   F:<num>:<a>/<c>:<flags>
  *
  * Specify the attr/char values for "special" things.
  *   S:<num>:<a>/<c>
@@ -362,13 +362,14 @@ errr process_pref_file_command(char *buf)
 	}
 
 
-	/* Process "F:<num>:<a>/<c>" -- attr/char for terrain features */
+	/* Process "F:<num>:<a>/<c>:<flags>" -- attr/char for terrain features, plus flags for lighting etc. */
 	else if (buf[0] == 'F')
 	{
 		/* Mega-hack -- feat supports lighting 'yes' or 'no' */
 		if (tokenize(buf+2, 4, zz) == 4)
 		{
 			feature_type *f_ptr;
+
 			i = (huge)strtol(zz[0], NULL, 0);
 			n1 = strtol(zz[1], NULL, 0);
 			n2 = strtol(zz[2], NULL, 0);
@@ -376,19 +377,15 @@ errr process_pref_file_command(char *buf)
 			f_ptr = &f_info[i];
 			if (n1) f_ptr->x_attr = n1;
 			if (n2) f_ptr->x_char = n2;
-			switch (zz[3][0])
-			{
-				case 0: case 'N': case 'n':
-				{
-					f_ptr->flags2 &= ~(FF2_ATTR_LITE);
-					break;
-				}
-				default:
-				{
-					f_ptr->flags2 |= (FF2_ATTR_LITE);
-					break;
-				}
-			}
+
+			/* Clear current flags */
+			f_ptr->flags3 &= ~(FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL);
+
+			if (strstr("A", zz[3])) f_ptr->flags3 |= (FF3_ATTR_LITE);
+			else if (strstr("F", zz[3])) f_ptr->flags3 |= (FF3_ATTR_ITEM);
+			else if (strstr("D", zz[3])) f_ptr->flags3 |= (FF3_ATTR_DOOR);
+			else if (strstr("W", zz[3])) f_ptr->flags3 |= (FF3_ATTR_WALL);
+
 			return (0);
 		}
 	}

@@ -2187,6 +2187,13 @@ static void process_command(void)
 			break;
 		}
 
+		/* List quests */
+		case KTRL('Q'):
+		{
+			do_cmd_quest();
+			break;
+		}
+
 		/* Repeat level feeling */
 		case KTRL('F'):
 		{
