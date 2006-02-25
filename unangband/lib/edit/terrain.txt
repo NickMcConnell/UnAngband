@@ -336,7 +336,7 @@
 # move on terrain than are technically immune to the damage. We allow IM_FIRE
 # & CAN_SWIM monsters on BWATER blows, IM_FIRE and CAN_DIG monsters on BMUD
 # blows. There is no ICE damage that can be caused by floor terrain
-# currently. We allow BR_FIRE monsters on LAVA. Otherwise we would have to
+# currently. We allow BRTH_FIRE monsters on LAVA. Otherwise we would have to
 # check monsters for elemental type and prefix, which adds expense to the
 # movement computation.
 
@@ -3975,7 +3975,7 @@ M:70
 U:56
 G:^:W
 W:30:2:20:0
-S:BA_ACID
+S:BALL_ACID
 K:DEFAULT:1
 K:HIT_TRAP:272
 F:TRAP | HIDE_ITEM | HIT_TRAP | DISARM | LOS | MOVE | PROJECT |
@@ -3988,7 +3988,7 @@ M:70
 U:56
 G:^:W
 W:15:2:20:0
-S:BA_ELEC
+S:BALL_ELEC
 K:DEFAULT:1
 K:HIT_TRAP:273
 F:TRAP | HIDE_ITEM | HIT_TRAP | DISARM | LOS | MOVE | PROJECT |
@@ -4001,7 +4001,7 @@ M:70
 U:56
 G:^:W
 W:25:2:20:0
-S:BA_FIRE
+S:BALL_FIRE
 K:DEFAULT:1
 K:HIT_TRAP:274
 F:TRAP | HIDE_ITEM | HIT_TRAP | DISARM | LOS | MOVE | PROJECT |
@@ -4014,7 +4014,7 @@ M:70
 G:^:W
 U:56
 W:20:2:20:0
-S:BA_COLD
+S:BALL_COLD
 K:DEFAULT:1
 K:HIT_TRAP:275
 F:TRAP | HIDE_ITEM | HIT_TRAP | DISARM | LOS | MOVE | PROJECT |
@@ -4027,7 +4027,7 @@ M:70
 G:^:W
 U:56
 W:10:2:20:0
-S:BA_POIS
+S:BALL_POIS
 K:DEFAULT:1
 K:HIT_TRAP:276
 F:TRAP | HIDE_ITEM | HIT_TRAP | DISARM | LOS | MOVE | PROJECT |
@@ -4040,7 +4040,7 @@ M:70
 G:^:W
 W:60:2:20:0
 U:56
-S:BA_NETH
+S:BALL_NETHR
 K:DEFAULT:1
 K:HIT_TRAP:277
 F:TRAP | HIDE_ITEM | HIT_TRAP | DISARM | LOS | MOVE | PROJECT |
@@ -4052,7 +4052,7 @@ N:278:stone face
 M:70
 G:^:W
 W:80:2:20:0
-S:BA_MANA
+S:BALL_MANA
 U:56
 K:DEFAULT:1
 K:HIT_TRAP:278
@@ -4066,7 +4066,7 @@ M:70
 G:^:W
 W:70:2:20:0
 U:56
-S:BA_DARK
+S:BALL_DARK
 K:DEFAULT:1
 K:HIT_TRAP:279
 F:TRAP | HIDE_ITEM | HIT_TRAP | DISARM | LOS | MOVE | PROJECT |

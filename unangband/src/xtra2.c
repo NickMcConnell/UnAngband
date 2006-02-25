@@ -2394,7 +2394,7 @@ void monster_death(int m_idx)
 
 	bool do_gold = (!(r_ptr->flags1 & (RF1_ONLY_ITEM)));
 	bool do_item = (!(r_ptr->flags1 & (RF1_ONLY_GOLD)));
-	bool do_chest = (r_ptr->flags7 & (RF7_DROP_CHEST) ? TRUE : FALSE);
+	bool do_chest = (r_ptr->flags8 & (RF8_DROP_CHEST) ? TRUE : FALSE);
 
 	int force_food = get_food_type(r_ptr);
 	int force_coin = get_coin_type(r_ptr);
@@ -2448,7 +2448,7 @@ void monster_death(int m_idx)
 	if ((rand_int(100)<30) || (r_ptr->flags1 & (RF1_UNIQUE)) ||
 		(r_ptr->flags2 & (RF2_REGENERATE)) ||
 		(r_ptr->level > p_ptr->depth) ||
-		(r_ptr->flags7 & (RF7_ASSEMBLY)))
+		(r_ptr->flags8 & (RF8_ASSEMBLY)))
 	{
 		/* Get local object */
 		i_ptr = &object_type_body;
@@ -2473,7 +2473,7 @@ void monster_death(int m_idx)
 	/* Add some residue */
 	if (r_ptr->flags3 & (RF3_DEMON)) feat_near(FEAT_FLOOR_FIRE_T,m_ptr->fy,m_ptr->fx);
 	if (r_ptr->flags3 & (RF3_UNDEAD)) feat_near(FEAT_FLOOR_DUST_T,m_ptr->fy,m_ptr->fx);
-	if (r_ptr->flags7 & (RF7_HAS_SLIME)) feat_near(FEAT_FLOOR_SLIME_T,m_ptr->fy,m_ptr->fx);
+	if (r_ptr->flags8 & (RF8_HAS_SLIME)) feat_near(FEAT_FLOOR_SLIME_T,m_ptr->fy,m_ptr->fx);
 
 	/* Do we drop more treasure? */
 	if (m_ptr->mflag & (MFLAG_MADE)) return;
@@ -2551,7 +2551,7 @@ void monster_death(int m_idx)
 			/* Drop it in the dungeon */
 			if (make_chest(&chest)) feat_near(chest,y,x);
 
-			l_ptr->flags7 |= (RF7_DROP_CHEST);
+			l_ptr->flags8 |= (RF8_DROP_CHEST);
 
 			continue;
 		}
@@ -2577,7 +2577,7 @@ void monster_death(int m_idx)
 			{
 				case TV_JUNK:
 				{
-					l_ptr->flags7 |= (RF7_DROP_JUNK);
+					l_ptr->flags8 |= (RF8_DROP_JUNK);
 					break;
 				}
 
@@ -2586,7 +2586,7 @@ void monster_death(int m_idx)
 				case TV_BOLT:
 				case TV_BOW:
 				{
-					l_ptr->flags7 |= (RF7_DROP_MISSILE);
+					l_ptr->flags8 |= (RF8_DROP_MISSILE);
 					break;
 				}
 
@@ -2594,7 +2594,7 @@ void monster_death(int m_idx)
 				case TV_SPIKE:
 				case TV_FLASK:
 				{
-					l_ptr->flags7 |= (RF7_DROP_TOOL);
+					l_ptr->flags8 |= (RF8_DROP_TOOL);
 					break;
 				}
 
@@ -2602,14 +2602,14 @@ void monster_death(int m_idx)
 				case TV_POLEARM:
 				case TV_SWORD:
 				{
-					l_ptr->flags7 |= (RF7_DROP_WEAPON);
+					l_ptr->flags8 |= (RF8_DROP_WEAPON);
 					break;
 				}
 
 				case TV_INSTRUMENT:
 				case TV_SONG_BOOK:
 				{
-					l_ptr->flags7 |= (RF7_DROP_MUSIC);
+					l_ptr->flags8 |= (RF8_DROP_MUSIC);
 					break;
 				}
 
@@ -2617,7 +2617,7 @@ void monster_death(int m_idx)
 				case TV_GLOVES:
 				case TV_CLOAK:
 				{
-					l_ptr->flags7 |= (RF7_DROP_CLOTHES);
+					l_ptr->flags8 |= (RF8_DROP_CLOTHES);
 					break;
 				}
 
@@ -2626,7 +2626,7 @@ void monster_death(int m_idx)
 				case TV_SOFT_ARMOR:
 				case TV_HARD_ARMOR:
 				{
-					l_ptr->flags7 |= (RF7_DROP_ARMOR);
+					l_ptr->flags8 |= (RF8_DROP_ARMOR);
 					break;
 				}
 
@@ -2634,13 +2634,13 @@ void monster_death(int m_idx)
 				case TV_AMULET:
 				case TV_RING:
 				{
-					l_ptr->flags7 |= (RF7_DROP_JEWELRY);
+					l_ptr->flags8 |= (RF8_DROP_JEWELRY);
 					break;
 				}
 
 				case TV_LITE:
 				{
-					l_ptr->flags7 |= (RF7_DROP_LITE);
+					l_ptr->flags8 |= (RF8_DROP_LITE);
 					break;
 				}
 
@@ -2648,7 +2648,7 @@ void monster_death(int m_idx)
 				case TV_STAFF:
 				case TV_WAND:
 				{
-					l_ptr->flags7 |= (RF7_DROP_RSW);
+					l_ptr->flags8 |= (RF8_DROP_RSW);
 					break;
 				}
 
@@ -2658,19 +2658,19 @@ void monster_death(int m_idx)
 				case TV_PRAYER_BOOK:
 				case TV_RUNESTONE:
 				{
-					l_ptr->flags7 |= (RF7_DROP_WRITING);
+					l_ptr->flags8 |= (RF8_DROP_WRITING);
 					break;
 				}
 
 				case TV_POTION:
 				{
-					l_ptr->flags7 |= (RF7_DROP_POTION);
+					l_ptr->flags8 |= (RF8_DROP_POTION);
 					break;
 				}
 
 				case TV_FOOD:
 				{
-					l_ptr->flags7 |= (RF7_DROP_FOOD);
+					l_ptr->flags8 |= (RF8_DROP_FOOD);
 					break;
 				}
 			}
@@ -2961,9 +2961,8 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 			drop_near(i_ptr, -1, m_ptr->fy, m_ptr->fx);
 		}
 
-
 		/* Add some blood */
-		if (r_ptr->flags7 & (RF7_HAS_BLOOD)) feat_near(FEAT_FLOOR_BLOOD_T,m_ptr->fy,m_ptr->fx);
+		if (r_ptr->flags8 & (RF8_HAS_BLOOD)) feat_near(FEAT_FLOOR_BLOOD_T,m_ptr->fy,m_ptr->fx);
 	}
 
 	/* Hurt it */
@@ -3055,9 +3054,6 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 		return (TRUE);
 	}
 
-
-#ifdef ALLOW_FEAR
-
 	/* Mega-Hack -- Pain cancels fear */
 	if (m_ptr->monfear && (dam > 0))
 	{
@@ -3074,7 +3070,7 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 		else
 		{
 			/* Cure fear */
-			m_ptr->monfear = 0;
+			set_monster_fear(m_ptr, 0, FALSE);
 
 			/* No more fear */
 			(*fear) = FALSE;
@@ -3082,7 +3078,7 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 	}
 
 	/* Sometimes a monster gets scared by damage */
-	if (!m_ptr->monfear && !(r_ptr->flags3 & (RF3_NO_FEAR)))
+	if (!m_ptr->monfear && !(r_ptr->flags3 & (RF3_NO_FEAR)) && (dam > 0))
 	{
 		int percentage;
 
@@ -3093,21 +3089,27 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 		 * Run (sometimes) if at 10% or less of max hit points,
 		 * or (usually) when hit for half its current hit points
 		 */
-		if (((percentage <= 10) && (rand_int(10) < percentage)) ||
-		    ((dam >= m_ptr->hp) && (rand_int(100) < 80)))
+		if ((randint(10) >= percentage) ||
+		    ((dam >= m_ptr->hp) && (rand_int(5))))
 		{
+			int fear_amt;
+
 			/* Hack -- note fear */
 			(*fear) = TRUE;
 
 			/* Hack -- Add some timed fear */
-			m_ptr->monfear = (randint(10) +
-					  (((dam >= m_ptr->hp) && (percentage > 7)) ?
-					   20 : ((11 - percentage) * 5)));
+			fear_amt = rand_range(20, 30);
+
+			/* Get frightened */
+			set_monster_fear(m_ptr, fear_amt, TRUE);
 		}
 	}
 
-#endif
+	/* Monster will always go active */
+	m_ptr->mflag |= (MFLAG_ACTV);
 
+	/* Recalculate desired minimum range */
+	if (dam > 0) m_ptr->min_range = 0;
 
 	/* Not dead yet */
 	return (FALSE);
@@ -3779,6 +3781,8 @@ cptr look_mon_desc(int m_idx)
 	if (m_ptr->confused) return("confused");
 	if (m_ptr->monfear) return("afraid");
 	if (m_ptr->stunned) return("stunned");
+	if (m_ptr->cut) return("bleeding");
+	if (m_ptr->poisoned) return("poisoned");
 }
 
 
@@ -3968,7 +3972,7 @@ bool target_able(int m_idx)
 	if (!m_ptr->ml) return (FALSE);
 
 	/* Monster must be projectable */
-	if (!projectable(py, px, m_ptr->fy, m_ptr->fx)) return (FALSE);
+	if (!projectable(py, px, m_ptr->fy, m_ptr->fx, 0)) return (FALSE);
 
 	/* Hack -- no targeting hallucinations */
 	if (p_ptr->image) return (FALSE);

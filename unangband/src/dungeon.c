@@ -398,54 +398,6 @@ static void regenmana(int percent)
 
 
 
-
-
-/*
- * Regenerate the monsters (once per 100 game turns)
- *
- * XXX XXX XXX Should probably be done during monster turns.
- */
-static void regen_monsters(void)
-{
-	int i, frac;
-
-	/* Regenerate everyone */
-	for (i = 1; i < m_max; i++)
-	{
-		/* Check the i'th monster */
-		monster_type *m_ptr = &m_list[i];
-		monster_race *r_ptr = &r_info[m_ptr->r_idx];
-
-		/* Skip dead monsters */
-		if (!m_ptr->r_idx) continue;
-
-		/* Allow regeneration (if needed) */
-		if (m_ptr->hp < m_ptr->maxhp)
-		{
-			/* Hack -- Base regeneration */
-			frac = m_ptr->maxhp / 100;
-
-			/* Hack -- Minimal regeneration rate */
-			if (!frac) frac = 1;
-
-			/* Hack -- Some monsters regenerate quickly */
-			if (r_ptr->flags2 & (RF2_REGENERATE)) frac *= 2;
-
-			/* Uniques recover faster */
-			if (r_ptr->flags1 & (RF1_UNIQUE)) frac *= 2;
-
-			/* Hack -- Regenerate */
-			m_ptr->hp += frac;
-
-			/* Do not over-regenerate */
-			if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
-
-			/* Redraw (later) if needed */
-			if (p_ptr->health_who == i) p_ptr->redraw |= (PR_HEALTH);
-		}
-	}
-}
-
 /*
  * Monster hook to use for 'wandering' monsters.
  */
@@ -647,10 +599,6 @@ static void process_world(void)
 		/* Prepare allocation table */
 		get_mon_num_prep();
 	}
-
-	/* Hack -- Check for creature regeneration */
-	if (!(turn % 100)) regen_monsters();
-
 
 	/*** Damage over Time ***/
 

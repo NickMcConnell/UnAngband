@@ -595,8 +595,7 @@ struct monster_race
 	byte hdice;     /* Creatures hit dice count */
 	byte hside;     /* Creatures hit dice sides */
 
-	s16b ac;/* Armour Class */
-	s16b mana; /* Mana */
+	s16b ac;	/* Armour Class */
 
 	s16b sleep;     /* Inactive counter (base) */
 	byte aaf;       /* Area affect radius (1-100) */
@@ -608,6 +607,9 @@ struct monster_race
 
 	byte freq_innate;/* Inate spell frequency */
 	byte freq_spell;/* Other spell frequency */
+	byte mana;	/* Mana */
+	byte spell_power;/* Spell power */
+
 
 	u32b flags1;    /* Flags 1 (general) */
 	u32b flags2;    /* Flags 2 (abilities) */
@@ -615,7 +617,8 @@ struct monster_race
 	u32b flags4;    /* Flags 4 (inate/breath) */
 	u32b flags5;    /* Flags 5 (normal spells) */
 	u32b flags6;    /* Flags 6 (special spells) */
-	u32b flags7;    /* Flags 7 (drops) */
+	u32b flags7;    /* Flags 7 (summons) */
+	u32b flags8;	/* Flags 8 (drops) */
 
 	monster_blow blow[4];   /* Up to four blows per round */
 
@@ -679,6 +682,7 @@ struct monster_lore
 	u32b flags5;  /* Observed racial flags */
 	u32b flags6;  /* Observed racial flags */
 	u32b flags7;  /* Observed racial flags */
+	u32b flags8;  /* Observed racial flags */
 };
 
 
@@ -811,13 +815,11 @@ struct monster_type
 {
 	s16b r_idx;     /* Monster race index */
 
-	byte fy;/* Y location on map */
-	byte fx;/* X location on map */
+	byte fy;	/* Y location on map */
+	byte fx;	/* X location on map */
 
 	s16b hp;/* Current Hit points */
 	s16b maxhp;     /* Max Hit points */
-
-	s16b mana; /* Current Mana */
 
 	s16b csleep;    /* Inactive counter */
 
@@ -827,27 +829,40 @@ struct monster_type
 	byte stunned;   /* Monster is stunned */
 	byte confused;  /* Monster is confused */
 	byte monfear;   /* Monster is afraid */
+	byte slowed;	/* Monster is slowed */
 
-	byte cdis;      /* Current dis from player */
+	byte hasted;	/* Monster is hasted */
+	byte cut;	/* Monster is bleeding */
+	byte poisoned;	/* Monster is poisoned */
+	byte blind;	/* Monster is blind */
 
-	u16b mflag;     /* Extra monster flags */
+	byte tim_invis;	/* Monster is temporarily invisible */
+	byte tim_passw;	/* Monster is temporarily passwall */
+	byte hero;	/* Monster is temporarily heroic */
+	byte shero;	/* Monster is temporarily beserk */
 
-	bool ml;/* Monster is "visible" */
+	byte shield;	/* Monster is temporarily shielded */
+	byte oppose_elem; /* Monster is temporarily resistant to elements */
 
-	s16b hold_o_idx;/* Object being held (if any) */
+	byte ty;	/* Current target */
+	byte tx;
 
-#ifdef DRS_SMART_OPTIONS
-
+	u32b mflag;     /* Extra monster flags */
 	u32b smart;     /* Field for "smart_learn" */
-
-#endif
 
 	byte summoned;  /* Monster is/has summoned */
 	byte min_range;
 	byte best_range;
+	byte mana; 	/* Current Mana */
 
-	byte ty;
-	byte tx;
+	s16b hold_o_idx;/* Object being held (if any) */
+
+	/* Computed values from here */
+
+	byte cdis;      /* Current dis from player */
+
+	bool ml;	/* Monster is "visible" */
+
 };
 
 

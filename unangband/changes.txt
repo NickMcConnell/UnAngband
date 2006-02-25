@@ -1,12 +1,16 @@
 ### Game Play ###
 
+- Updated monster spell attacks to use the 4GAI from Sangband/Oangband via NPPAngband,
+include numerous new and modified spell attacks and improve projection code.
+
 - Stores now stock various services.
 
 - You can now sell books to various stores to allow you to unlock additional store
 services.
 
 - The player can now be infected with various diseases. A number of disease causing
-monsters from Eyangband have been added.
+monsters from Eyangband have been added. The disease implementation is different from
+any other variant.
 
 - Various attacks, particularly paralyze, stun, confuse are less cumulative or not
 cumulative - however, if you already are suffering the ill-effects that the attack
@@ -18,7 +22,7 @@ outlast the initial paralyzation, and have sufficiently high ac.
 brands, anti-teleport items, racial-based items including slay human, slay elf and
 slay dwarf items, and items that cause vulneribilities to various elements. Much back-
 end code still to be fixed. In particular, you cannot wield both a racial flag item
-and its equivelent slay, or a vulneribility item and its equivelent brand.
+and its equivalent slay, or a vulneribility item and its equivalent brand.
 
 - Added magic items, which are ego items which only have a single flag. This is
 currently in heavy development and balancing, but is intended to provide a more
@@ -27,21 +31,27 @@ temporarily disabled for testing purposes.
 
 - Stat potions only provide a temporary stat increase. Removed restore stat potions.
 
+- Monsters now breath in arcs, have additional bolt, ball, beam and summon spells
+and a variety of miscellaneous spells as per NPPAngband.
+
+- Monsters now can intelligently use their ranged melee blows at a distance (e.g.
+gaze, wail, lash). These either have limited range (lash), require ammunition
+(arrow, shot, bolt) or require mana to use (gaze, wail).
+
+- Monsters can now bleed or get poisoned by the player.
+
+- Monsters can cast spells that turn themselves invisible, allow them to temporarily
+pass walls, make them heroic or beserk, shield themselves or allow them to temporarily
+resist all elements.
+
+- Monsters can cast spells which curse the player, dispel enchantments on the player
+and probe the player for weaknesses.
+
 - Vents now act as conduits for water, acid, steam, fire or gas through walls.
 Vents can also be climbed through, but block vision and ranged attacks.
 
 - Falling water, lava, and so on now only cause damage to adjacent terrain every
 second turn.
-
-- It should now be possible to create trapped areas as follows (where < is falling
-terrain and % is a vent):
-
-####.      #####.
-#<%%.   or #<%%%.
-####.      #####.
-
-This results in the the floor locations getting hit, on the left, every 3 turns,
-or on the right every 4 turns (an adjacent water fall will hit every 2 turns).
 
 - Cracked walls now can come in hidden, weaker versions that can be easily
 bashed or tunnelled through.
@@ -169,7 +179,7 @@ specific to the player (play_info) in preperation for implementing 4GAI
 projection algorithms. This has to be done differently from Sangband et al.
 as there can be terrain in Unangband that blocks line of sight but not 
 spells or arrows (eg smoke). At the moment, most of these new flags are
-not used. WARNING: AT THE MOMENT THIS BREAKS SAVE FILE COMPATIBILITY!!!!
+not used.
 
 
 Unangband 0.5.5: "New Years Resolution"

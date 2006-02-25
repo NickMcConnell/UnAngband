@@ -3380,7 +3380,7 @@ static bool project_hack(int typ, int dam)
 {
 	int i, x, y;
 
-	int flg = PROJECT_JUMP | PROJECT_KILL | PROJECT_HIDE;
+	int flg = PROJECT_JUMP | PROJECT_KILL | PROJECT_HIDE | PROJECT_PLAY;
 
 	bool obvious = FALSE;
 
@@ -3401,7 +3401,7 @@ static bool project_hack(int typ, int dam)
 		if (!player_has_los_bold(y, x)) continue;
 
 		/* Jump directly to the target monster */
-		if (project(-1, 0, y, x, dam, typ, flg)) obvious = TRUE;
+		if (project(-1, 0, y, x, y, x, dam, typ, flg, 0, 0)) obvious = TRUE;
 	}
 
 	/* Result */
@@ -3721,101 +3721,53 @@ void destroy_area(int y1, int x1, int r, bool full)
 
 
 /*
- * Induce an "earthquake" of the given radius at the given location.
+ * Entomb a player or monster in a location known to be impassable.
  *
- * This will turn some walls into floors and some floors into walls.
- *
- * The player will take damage and "jump" into a safe grid if possible,
- * otherwise, he will "tunnel" through the rubble instantaneously.
- *
+ * Players take a lot of damage.
+ * 
  * Monsters will take damage, and "jump" into a safe grid if possible,
  * otherwise they will be "buried" in the rubble, disappearing from
  * the level in the same way that they do when banished.
  *
  * Note that players and monsters (except eaters of walls and passers
  * through walls) will never occupy the same grid as a wall (or door).
+ *
+ * This is not 'strictly' true, as it is now possible to get stuck in
+ * cages, blocks of ice and so on, and locations such as rubble that
+ * are not strictly empty. So we should technically check for FF1_MOVE
+ * and FF3_EASY_CLIMB both not existing before calling this function.
+ *
+ * Note we encode a boolean value of invalid directions around the
+ * grid to prevent monsters getting hit twice by earthquakes.
+ *
+ * XXX Consider passing a damage value and/or flavor so that getting
+ * stuck in ice is different from granite wall is different from 
+ * (impassable) rubble. Of course, we could just pull this from the
+ * feature at this location.
  */
-void earthquake(int cy, int cx, int r)
+void entomb(int cy, int cx, byte invalid)
 {
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
-	int i, t, y, x, yy, xx, dy, dx;
-
+	int i;
+	int y, x;
+	int sy = 0, sx = 0, sn = 0;
 	int damage = 0;
 
-	int sn = 0, sy = 0, sx = 0;
-
-	bool hurt = FALSE;
-
-	bool map[32][32];
-
-
-	/* Paranoia -- Enforce maximum range */
-	if (r > 12) r = 12;
-
-	/* Clear the "maximal blast" area */
-	for (y = 0; y < 32; y++)
+	/* Entomb the player */
+	if (cave_m_idx[cy][cx] < 0)
 	{
-		for (x = 0; x < 32; x++)
-		{
-			map[y][x] = FALSE;
-		}
-	}
 
-	/* Check around the epicenter */
-	for (dy = -r; dy <= r; dy++)
-	{
-		for (dx = -r; dx <= r; dx++)
-		{
-			/* Extract the location */
-			yy = cy + dy;
-			xx = cx + dx;
-
-			/* Skip illegal grids */
-			if (!in_bounds_fully(yy, xx)) continue;
-
-			/* Skip distant grids */
-			if (distance(cy, cx, yy, xx) > r) continue;
-
-			/* Lose room and vault */
-			cave_info[yy][xx] &= ~(CAVE_ROOM);
-
-			/* Lose light */
-			cave_info[y][x] &= ~(CAVE_GLOW);
-
-			/* Lose light */
-			play_info[y][x] &= ~(PLAY_MARK);
-
-			/* Skip the epicenter */
-			if (!dx && !dy) continue;
-
-			/* Skip most grids */
-			if (rand_int(100) < 85) continue;
-
-			/* Damage this grid */
-			map[16+yy-cy][16+xx-cx] = TRUE;
-
-			/* Hack -- Take note of player damage */
-			if ((yy == py) && (xx == px)  && !(f_info[cave_feat[yy][xx]].flags3 & (FF3_OUTSIDE))) hurt = TRUE;
-		}
-	}
-
-	/* First, affect the player (if necessary) */
-	if (hurt)
-	{
 		/* Check around the player */
 		for (i = 0; i < 8; i++)
 		{
 			/* Get the location */
-			y = py + ddy_ddd[i];
-			x = px + ddx_ddd[i];
+			y = cy + ddy_ddd[i];
+			x = cx + ddx_ddd[i];
 
 			/* Skip non-empty grids */
 			if (!cave_empty_bold(y, x)) continue;
 
 			/* Important -- Skip "quake" grids */
-			if (map[16+y-cy][16+x-cx]) continue;
+			if ((invalid & (1 << i)) != 0) continue;
 
 			/* Count "safe" grids, apply the randomizer */
 			if ((++sn > 1) && (rand_int(sn) != 0)) continue;
@@ -3882,13 +3834,178 @@ void earthquake(int cy, int cx, int r)
 			}
 
 			/* Move player */
-			monster_swap(py, px, sy, sx);
+			monster_swap(cy, cx, sy, sx);
 		}
 
 		/* Take some damage */
 		if (damage) take_hit(damage, "an earthquake");
 	}
+	/* Entomb a monster */
+	else if (cave_m_idx[cy][cx] > 0)
+	{
+		monster_type *m_ptr = &m_list[cave_m_idx[cy][cx]];
+		monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
+		/* Most monsters cannot co-exist with rock */
+		if (!(r_ptr->flags2 & (RF2_KILL_WALL)) &&
+		    !(r_ptr->flags2 & (RF2_PASS_WALL)) &&
+			!(f_info[cave_feat[cy][cx]].flags3 & (FF3_OUTSIDE)))
+		{
+			char m_name[80];
+
+			/* Assume not safe */
+			sn = 0;
+
+			/* Monster can move to escape the wall */
+			if (!(r_ptr->flags1 & (RF1_NEVER_MOVE)))
+			{
+				/* Look for safety */
+				for (i = 0; i < 8; i++)
+				{
+					/* Get the grid */
+					y = cy + ddy_ddd[i];
+					x = cx + ddx_ddd[i];
+
+					/* Skip non-empty grids */
+					if (!cave_empty_bold(y, x)) continue;
+
+					/* Hack -- no safety on glyph of warding */
+					if (f_info[cave_feat[y][x]].flags1 & (FF1_GLYPH)) continue;
+
+					/* Important -- Skip "quake" grids */
+					if ((invalid & (1 << i)) != 0) continue;
+
+					/* Count "safe" grids, apply the randomizer */
+					if ((++sn > 1) && (rand_int(sn) != 0)) continue;
+
+					/* Save the safe grid */
+					sy = y;
+					sx = x;
+				}
+			}
+
+			/* Describe the monster */
+			monster_desc(m_name, m_ptr, 0);
+
+			/* Scream in pain */
+			msg_format("%^s wails out in pain!", m_name);
+
+			/* Take damage from the quake */
+			damage = (sn ? (int)damroll(4, 8) : (m_ptr->hp + 1));
+
+			/* Monster is certainly awake */
+			m_ptr->csleep = 0;
+
+			/* Apply damage directly */
+			m_ptr->hp -= damage;
+
+			/* Delete (not kill) "dead" monsters */
+			if (m_ptr->hp < 0)
+			{
+				/* Message */
+				msg_format("%^s is embedded in the rock!", m_name);
+
+				/* Delete the monster */
+				delete_monster(cy, cx);
+
+				/* No longer safe */
+				sn = 0;
+			}
+
+			/* Hack -- Escape from the rock */
+			if (sn)
+			{
+				/* Move the monster */
+				monster_swap(cy, cx, sy, sx);
+			}
+		}
+	}
+}
+
+
+
+/*
+ * Induce an "earthquake" of the given radius at the given location.
+ *
+ * This will turn some walls into floors and some floors into walls.
+ *
+ * The player will take damage and "jump" into a safe grid if possible,
+ * otherwise, he will "tunnel" through the rubble instantaneously.
+ *
+ * Monsters will take damage, and "jump" into a safe grid if possible,
+ * otherwise they will be "buried" in the rubble, disappearing from
+ * the level in the same way that they do when banished.
+ *
+ * Note that players and monsters (except eaters of walls and passers
+ * through walls) will never occupy the same grid as a wall (or door).
+ */
+void earthquake(int cy, int cx, int r)
+{
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int t, y, x, yy, xx, dy, dx;
+
+	bool hurt = FALSE;
+
+	bool map[32][32];
+
+
+	/* Paranoia -- Enforce maximum range */
+	if (r > 12) r = 12;
+
+	/* Clear the "maximal blast" area */
+	for (y = 0; y < 32; y++)
+	{
+		for (x = 0; x < 32; x++)
+		{
+			map[y][x] = FALSE;
+		}
+	}
+
+	/* Check around the epicenter */
+	for (dy = -r; dy <= r; dy++)
+	{
+		for (dx = -r; dx <= r; dx++)
+		{
+			/* Extract the location */
+			yy = cy + dy;
+			xx = cx + dx;
+
+			/* Skip illegal grids */
+			if (!in_bounds_fully(yy, xx)) continue;
+
+			/* Skip distant grids */
+			if (distance(cy, cx, yy, xx) > r) continue;
+
+			/* Lose room and vault */
+			cave_info[yy][xx] &= ~(CAVE_ROOM);
+
+			/* Lose light */
+			cave_info[y][x] &= ~(CAVE_GLOW);
+
+			/* Lose light */
+			play_info[y][x] &= ~(PLAY_MARK);
+
+			/* Skip the epicenter */
+			if (!dx && !dy) continue;
+
+			/* Skip most grids */
+			if (rand_int(100) < 85) continue;
+
+			/* Damage this grid */
+			map[16+yy-cy][16+xx-cx] = TRUE;
+
+			/* Hack -- Take note of player damage */
+			if ((yy == py) && (xx == px)  && !(f_info[cave_feat[yy][xx]].flags3 & (FF3_OUTSIDE))) hurt = TRUE;
+		}
+	}
+
+	if (hurt)
+	{
+		/* Entomb the player */
+		entomb(py,px, 0x00);
+	}
 
 	/* Examine the quaked region */
 	for (dy = -r; dy <= r; dy++)
@@ -3902,89 +4019,22 @@ void earthquake(int cy, int cx, int r)
 			/* Skip unaffected grids */
 			if (!map[16+yy-cy][16+xx-cx]) continue;
 
-			/* Process monsters */
+			/* Entomb monster */
 			if (cave_m_idx[yy][xx] > 0)
 			{
-				monster_type *m_ptr = &m_list[cave_m_idx[yy][xx]];
-				monster_race *r_ptr = &r_info[m_ptr->r_idx];
+				byte invalid = 0x00;
 
-				/* Most monsters cannot co-exist with rock */
-				if (!(r_ptr->flags2 & (RF2_KILL_WALL)) &&
-				    !(r_ptr->flags2 & (RF2_PASS_WALL)) &&
-					!(f_info[cave_feat[yy][xx]].flags3 & (FF3_OUTSIDE)))
-				{
-					char m_name[80];
+				int i;
 
-					/* Assume not safe */
-					sn = 0;
+				/* Determine invalid directions */
+				for (i = 0; i < 8; i++)
+					if (map[16+yy-cy+ddy_ddd[i]][16+xx-cx+ddx_ddd[i]]) invalid |= 1 << i;
 
-					/* Monster can move to escape the wall */
-					if (!(r_ptr->flags1 & (RF1_NEVER_MOVE)))
-					{
-						/* Look for safety */
-						for (i = 0; i < 8; i++)
-						{
-							/* Get the grid */
-							y = yy + ddy_ddd[i];
-							x = xx + ddx_ddd[i];
-
-							/* Skip non-empty grids */
-							if (!cave_empty_bold(y, x)) continue;
-
-							/* Hack -- no safety on glyph of warding */
-							if (f_info[cave_feat[y][x]].flags1 & (FF1_GLYPH)) continue;
-
-							/* Important -- Skip "quake" grids */
-							if (map[16+y-cy][16+x-cx]) continue;
-
-							/* Count "safe" grids, apply the randomizer */
-							if ((++sn > 1) && (rand_int(sn) != 0)) continue;
-
-							/* Save the safe grid */
-							sy = y;
-							sx = x;
-						}
-					}
-
-					/* Describe the monster */
-					monster_desc(m_name, m_ptr, 0);
-
-					/* Scream in pain */
-					msg_format("%^s wails out in pain!", m_name);
-
-					/* Take damage from the quake */
-					damage = (sn ? (int)damroll(4, 8) : (m_ptr->hp + 1));
-
-					/* Monster is certainly awake */
-					m_ptr->csleep = 0;
-
-					/* Apply damage directly */
-					m_ptr->hp -= damage;
-
-					/* Delete (not kill) "dead" monsters */
-					if (m_ptr->hp < 0)
-					{
-						/* Message */
-						msg_format("%^s is embedded in the rock!", m_name);
-
-						/* Delete the monster */
-						delete_monster(yy, xx);
-
-						/* No longer safe */
-						sn = 0;
-					}
-
-					/* Hack -- Escape from the rock */
-					if (sn)
-					{
-						/* Move the monster */
-						monster_swap(yy, xx, sy, sx);
-					}
-				}
+				/* Entomb the monster */
+				entomb(yy, xx, invalid);
 			}
 		}
 	}
-
 
 	/* XXX XXX XXX */
 
@@ -3994,7 +4044,6 @@ void earthquake(int cy, int cx, int r)
 
 	/* Important -- no wall on player */
 	map[16+py-cy][16+px-cx] = FALSE;
-
 
 	/* Examine the quaked region */
 	for (dy = -r; dy <= r; dy++)
@@ -4076,6 +4125,90 @@ void earthquake(int cy, int cx, int r)
 	/* Window stuff */
 	p_ptr->window |= (PW_OVERHEAD);
 }
+
+
+
+
+/*
+ * This routine clears the entire "temp" set.
+ */
+void clear_temp_array(void)
+{
+	int i;
+
+	/* Apply flag changes */
+	for (i = 0; i < temp_n; i++)
+	{
+		int y = temp_y[i];
+		int x = temp_x[i];
+
+		/* No longer in the array */
+		play_info[y][x] &= ~(PLAY_TEMP);
+	}
+
+	/* None left */
+	temp_n = 0;
+}
+
+
+/*
+ * Aux function -- see below
+ */
+void cave_temp_mark(int y, int x, bool room)
+{
+	/* Avoid infinite recursion */
+	if (play_info[y][x] & (PLAY_TEMP)) return;
+
+	/* Option -- do not leave the current room */
+	if ((room) && (!(cave_info[y][x] & (CAVE_ROOM)))) return;
+
+	/* Verify space */
+	if (temp_n == TEMP_MAX) return;
+
+	/* Mark the grid */
+	play_info[y][x] |= (PLAY_TEMP);
+
+	/* Add it to the marked set */
+	temp_y[temp_n] = y;
+	temp_x[temp_n] = x;
+	temp_n++;
+}
+
+/*
+ * Mark the nearby area with CAVE_TEMP flags.  Allow limited range.
+ */
+void spread_cave_temp(int y1, int x1, int range, bool room)
+{
+	int i, y, x;
+
+	/* Add the initial grid */
+	cave_temp_mark(y1, x1, room);
+
+	/* While grids are in the queue, add their neighbors */
+	for (i = 0; i < temp_n; i++)
+	{
+		x = temp_x[i], y = temp_y[i];
+
+		/* Walls get marked, but stop further spread */
+		if (!cave_project_bold(y, x)) continue;
+
+		/* Note limited range (note:  we spread out one grid further) */
+		if ((range) && (distance(y1, x1, y, x) >= range)) continue;
+
+		/* Spread adjacent */
+		cave_temp_mark(y + 1, x, room);
+		cave_temp_mark(y - 1, x, room);
+		cave_temp_mark(y, x + 1, room);
+		cave_temp_mark(y, x - 1, room);
+
+		/* Spread diagonal */
+		cave_temp_mark(y + 1, x + 1, room);
+		cave_temp_mark(y - 1, x - 1, room);
+		cave_temp_mark(y - 1, x + 1, room);
+		cave_temp_mark(y + 1, x - 1, room);
+	}
+}
+
 
 
 
@@ -4246,59 +4379,26 @@ static void cave_temp_room_unlite(void)
 }
 
 
-
-
-/*
- * Aux function -- see below
- */
-static void cave_temp_room_aux(int y, int x)
-{
-	/* Avoid infinite recursion */
-	if (play_info[y][x] & (PLAY_TEMP)) return;
-
-	/* Do not "leave" the current room */
-	if (!(cave_info[y][x] & (CAVE_ROOM))) return;
-
-	/* Paranoia -- verify space */
-	if (temp_n == TEMP_MAX) return;
-
-	/* Mark the grid as "seen" */
-	play_info[y][x] |= (PLAY_TEMP);
-
-	/* Add it to the "seen" set */
-	temp_y[temp_n] = y;
-	temp_x[temp_n] = x;
-	temp_n++;
-
-
-}
-
-
-
-
 /*
  * Illuminate any room containing the given location.
  */
-void lite_room(int y1, int x1)
+void lite_room(int y, int x)
 {
-	int i, x, y;
-
-	/* Hack --- Have we seen this room before? */
-	if (!(room_info[dun_room[y1/BLOCK_HGT][x1/BLOCK_WID]].flags & (ROOM_SEEN)))
+	/* Check the room */
+	if (cave_info[y][x] & (CAVE_ROOM))
 	{
-		p_ptr->update |= (PU_ROOM_INFO);
-		p_ptr->window |= (PW_ROOM_INFO);
-	}
+		int by = y/BLOCK_HGT;
+		int bx = x/BLOCK_HGT;
 
-	/* Some rooms cannot be completely lit */
-	if (cave_info[y1][x1] & (CAVE_ROOM))
-	{
-		/* Special rooms affect some of this */
-		int by = y1/BLOCK_HGT;
-		int bx = x1/BLOCK_HGT;
+		/* Hack --- Have we seen this room before? */
+		if (!(room_info[dun_room[by][bx]].flags & (ROOM_SEEN)))
+		{
+			p_ptr->update |= (PU_ROOM_INFO);
+			p_ptr->window |= (PW_ROOM_INFO);
+		}
 
-		/* Get the room */
-		if(room_info[dun_room[by][bx]].flags & (ROOM_GLOOMY))
+		/* Some rooms cannot be completely lit */
+		if (room_info[dun_room[by][bx]].flags & (ROOM_GLOOMY))
 		{
 
 			/* Warn the player */
@@ -4306,73 +4406,28 @@ void lite_room(int y1, int x1)
 
 			return;
 		}
-	}							    
-
-
-	/* Add the initial grid */
-	cave_temp_room_aux(y1, x1);
-
-	/* While grids are in the queue, add their neighbors */
-	for (i = 0; ((i < temp_n) && (i<TEMP_MAX)); i++)
-	{
-		x = temp_x[i], y = temp_y[i];
-
-		/* Walls get lit, but stop light */
-		if (!cave_floor_bold(y, x)) continue;
-
-		/* Spread adjacent */
-		cave_temp_room_aux(y + 1, x);
-		cave_temp_room_aux(y - 1, x);
-		cave_temp_room_aux(y, x + 1);
-		cave_temp_room_aux(y, x - 1);
-
-		/* Spread diagonal */
-		cave_temp_room_aux(y + 1, x + 1);
-		cave_temp_room_aux(y - 1, x - 1);
-		cave_temp_room_aux(y - 1, x + 1);
-		cave_temp_room_aux(y + 1, x - 1);
 	}
 
-	/* Now, lite them all up at once */
-	cave_temp_room_lite();
+	/* Add the initial grid */
+	spread_cave_temp(y, x, MAX_SIGHT, TRUE);
 
+	/* Lite the (part of) room */
+	cave_temp_room_lite();
 }
 
 
 /*
  * Darken all rooms containing the given location
  */
-void unlite_room(int y1, int x1)
+void unlite_room(int y, int x)
 {
-	int i, x, y;
-
 	/* Add the initial grid */
-	cave_temp_room_aux(y1, x1);
+	spread_cave_temp(y, x, MAX_SIGHT, TRUE);
 
-	/* Spread, breadth first */
-	for (i = 0; ((i < temp_n) && (i<TEMP_MAX)); i++)
-	{
-		x = temp_x[i], y = temp_y[i];
-
-		/* Walls get dark, but stop darkness */
-		if (!cave_floor_bold(y, x)) continue;
-
-		/* Spread adjacent */
-		cave_temp_room_aux(y + 1, x);
-		cave_temp_room_aux(y - 1, x);
-		cave_temp_room_aux(y, x + 1);
-		cave_temp_room_aux(y, x - 1);
-
-		/* Spread diagonal */
-		cave_temp_room_aux(y + 1, x + 1);
-		cave_temp_room_aux(y - 1, x - 1);
-		cave_temp_room_aux(y - 1, x + 1);
-		cave_temp_room_aux(y + 1, x - 1);
-	}
-
-	/* Now, darken them all at once */
+	/* Lite the (part of) room */
 	cave_temp_room_unlite();
 }
+
 
 /*
  * Cast a ball spell
@@ -4387,7 +4442,7 @@ bool fire_ball(int typ, int dir, int dam, int rad)
 
 	int ty, tx;
 
-	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
 	/* Use the given direction */
 	ty = py + 99 * ddy[dir];
@@ -4403,7 +4458,7 @@ bool fire_ball(int typ, int dir, int dam, int rad)
 	}
 
 	/* Analyze the "dir" and the "target".  Hurt items on floor. */
-	return (project(-1, rad, ty, tx, dam, typ, flg));
+	return (project(-1, rad, py, px, ty, tx, dam, typ, flg, 0, 0));
 }
 
 
@@ -4420,7 +4475,7 @@ bool fire_cloud(int typ, int dir, int dam, int rad)
 
 	int ty, tx;
 
-	int flg = PROJECT_STOP | PROJECT_KILL;
+	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_BOOM | PROJECT_PLAY;
 
 	/* Use the given direction */
 	ty = py + 99 * ddy[dir];
@@ -4436,7 +4491,7 @@ bool fire_cloud(int typ, int dir, int dam, int rad)
 	}
 
 	/* Analyze the "dir" and the "target".  Hurt items on floor. */
-	return (project(-1, rad, ty, tx, dam, typ, flg));
+	return (project(-1, rad, py, px, ty, tx, dam, typ, flg, 0, 0));
 }
 
 
@@ -4465,7 +4520,7 @@ static bool project_hook(int typ, int dir, int dam, int flg)
 	}
 
 	/* Analyze the "dir" and the "target", do NOT explode */
-	return (project(-1, 0, ty, tx, dam, typ, flg));
+	return (project(-1, 0, py, px, ty, tx, dam, typ, flg, 0, 0));
 }
 
 
@@ -4476,7 +4531,7 @@ static bool project_hook(int typ, int dir, int dam, int flg)
  */
 bool fire_bolt(int typ, int dir, int dam)
 {
-	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_GRID;
+	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_GRID | PROJECT_PLAY;
 	return (project_hook(typ, dir, dam, flg));
 }
 
@@ -4514,11 +4569,14 @@ bool fire_bolt_or_beam(int prob, int typ, int dir, int dam)
  */
 bool fire_blast(int typ, int dir, int dam)
 {
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
 	int ty = p_ptr->py+ddy[dir];
 	int tx = p_ptr->px+ddx[dir];
 
-	int flg = PROJECT_KILL | PROJECT_GRID | PROJECT_ITEM;
-	return (project(-1, 1, ty, tx, dam, typ, flg));
+	int flg = PROJECT_KILL | PROJECT_GRID | PROJECT_ITEM | PROJECT_BOOM | PROJECT_PLAY;
+	return (project(-1, 1, py, px, ty, tx, dam, typ, flg, 0, 0));
 
 }
 
@@ -4538,7 +4596,6 @@ bool fire_hands(int typ, int dir, int dam)
  */
 static void wield_spell(int item, int k_idx, int time)
 {
-
 	object_type *i_ptr;
 	object_type object_type_body;
 
@@ -5050,15 +5107,6 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 		/* Apply spell method */
 		switch (method)
 		{
-			case RBM_SHOOT:
-			{
-				/* Allow direction to be cancelled for free */
-				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
-					  
-				if (fire_bolt(effect, dir, damage)) obvious = TRUE;
-				break;
-			}
-
 			/* Affect self directly */
 			case RBM_SELF:
 			{
@@ -5076,7 +5124,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				int px = p_ptr->px;
 			
 				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL;
-				if (project(-1, 1, py, px, damage, effect, flg)) obvious = TRUE;
+				if (project(-1, 1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
 				break;
 			}
 			case RBM_HANDS:
@@ -5217,8 +5265,8 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				int py = p_ptr->py;
 				int px = p_ptr->px;
 			
-				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL;
-				if (project(-1, (level / 10)+1, py, px, damage, effect, flg)) obvious = TRUE;
+				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL | PROJECT_BOOM;
+				if (project(-1, (level / 10)+1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
 				break;
 			}
 			case RBM_LOS:
@@ -5287,8 +5335,8 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				int py = p_ptr->py;
 				int px = p_ptr->px;
 			
-				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL;
-				if (project(-1, 2, py, px, damage, effect, flg)) obvious = TRUE;
+				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL | PROJECT_BOOM;
+				if (project(-1, 2, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
 				break;
 			}
 			case RBM_EXPLODE:
@@ -5297,8 +5345,8 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				int py = p_ptr->py;
 				int px = p_ptr->px;
 			
-				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
-				if (project(-2, 1, py, px, damage, effect, flg)) obvious = TRUE;
+				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_BOOM;
+				if (project(-2, 1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
 				break;
 			}
 			case RBM_SPHERE:
@@ -5754,7 +5802,6 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 		set_recall();
 		obvious = TRUE;
 	}
-
 
 	/* SF3 - duration specified, so temporary stat increase */
 	if (lasts)

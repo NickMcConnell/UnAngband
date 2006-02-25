@@ -1614,7 +1614,7 @@ void monster_swap(int y1, int x1, int y2, int x2)
 		/* Some monsters radiate damage when moving */
 		if (r_ptr->flags2 & (RF2_HAS_AURA))
 		{
-			(void)make_attack_spell_aux(m1,y2,x2,96+7);
+			(void)make_attack_ranged(m1,96+7,y2,x2);
 		}
 
 		/* Update monster */
@@ -1687,15 +1687,12 @@ void monster_swap(int y1, int x1, int y2, int x2)
 			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 		}
 
-
-
 		/* Some monsters radiate damage when moving */
 		if (r_ptr->flags2 & (RF2_HAS_AURA))
 		{
-			(void)make_attack_spell_aux(m2,y1,x1,96+7);
+			(void)make_attack_ranged(m2,96+7,y1,x1);
 
 		}
-
 
 		/* Update monster */
 		update_mon(m2, TRUE);
@@ -2335,6 +2332,136 @@ static bool no_threat(const monster_race *r_ptr)
 }
 
 
+/*calculate the monster_speed of a monster at a given location*/
+void calc_monster_speed(int y, int x)
+{
+	int speed, i;
+
+	/*point to the monster at the given location & the monster race*/
+	monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	/* Paranoia XXX XXX */
+	if (cave_m_idx[y][x] == 0) return;
+
+	/* Get the monster base speed */
+	speed = r_ptr->speed;
+
+	/*note: a monster should only have one of these flags*/
+	if (m_ptr->mflag & (MFLAG_SLOW))
+	{
+		/* Allow some small variation each time to make pillar dancing harder */
+		i = extract_energy[r_ptr->speed] / 10;
+		speed -= rand_spread(0, i);
+	}
+	else if (m_ptr->mflag & (MFLAG_FAST))
+	{
+		/* Allow some small variation each time to make pillar dancing harder */
+		i = extract_energy[r_ptr->speed] / 10;
+		speed += rand_spread(0, i);
+	}
+
+	/*factor in the hasting and slowing counters*/
+	if (m_ptr->hasted) speed += 10;
+	if (m_ptr->slowed) speed -= 10;
+
+	/*set the speed and return*/
+	m_ptr->mspeed = speed;
+
+	return;
+}
+
+void set_monster_haste(s16b m_idx, s16b counter, bool message)
+{
+	/*get the monster at the given location*/
+	monster_type *m_ptr = &m_list[m_idx];
+
+	bool recalc = FALSE;
+
+	char m_name[80];
+
+	/* Get monster name*/
+	monster_desc(m_name, m_ptr, 0);
+
+	/*see if we need to recalculate speed*/
+	if (m_ptr->hasted)
+	{
+		/*monster is no longer hasted and speed needs to be recalculated*/
+		if (counter == 0)
+		{
+			recalc = TRUE;
+
+			/*give a message*/
+			if (message) msg_format("%^s slows down.", m_name);
+		}
+	}
+	else
+	{
+		/*monster is now hasted and speed needs to be recalculated*/
+		if (counter > 0)
+		{
+			recalc = TRUE;
+
+			/*give a message*/
+			if (message) msg_format("%^s starts moving faster.", m_name);
+		}
+	}
+
+	/*update the counter*/
+	m_ptr->hasted = counter;
+
+	/*re-calculate speed if necessary*/
+	if (recalc) calc_monster_speed(m_ptr->fy, m_ptr->fx);
+
+	return;
+}
+
+void set_monster_slow(s16b m_idx, s16b counter, bool message)
+{
+	/*get the monster at the given location*/
+	monster_type *m_ptr = &m_list[m_idx];
+
+	bool recalc = FALSE;
+
+	char m_name[80];
+
+	/* Get monster name*/
+	monster_desc(m_name, m_ptr, 0);
+
+	/*see if we need to recalculate speed*/
+	if (m_ptr->slowed)
+	{
+		/*monster is no longer slowed and speed needs to be recalculated*/
+		if (counter == 0)
+		{
+			recalc = TRUE;
+
+			/*give a message*/
+			if (message) msg_format("%^s speeds up.", m_name);
+		}
+	}
+	else
+	{
+		/*monster is now slowed and speed needs to be recalculated*/
+		if (counter > 0)
+		{
+			recalc = TRUE;
+
+			/*give a message*/
+			if (message) msg_format("%^s starts moving slower.", m_name);
+		}
+	}
+
+	/*update the counter*/
+	m_ptr->slowed = counter;
+
+	/*re-calculate speed if necessary*/
+	if (recalc) calc_monster_speed(m_ptr->fy, m_ptr->fx);
+
+	return;
+}
+
+
 
 /*
  * Attempt to place a monster of the given race at the given location.
@@ -2535,6 +2662,9 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp)
 
 	/* Place the monster in the dungeon */
 	if (!monster_place(y, x, n_ptr)) return (FALSE);
+
+	/*calculate the monster_speed*/
+	calc_monster_speed(y, x);
 
 	/* Success */
 	return (TRUE);
@@ -2929,7 +3059,6 @@ static bool summon_specific_okay(int r_idx)
 
 	bool okay = FALSE;
 
-
 	/* Hack -- no specific type specified */
 	if (!summon_specific_type) return (TRUE);
 
@@ -2937,38 +3066,41 @@ static bool summon_specific_okay(int r_idx)
 	/* Check our requirements */
 	switch (summon_specific_type)
 	{
-		case SUMMON_ANIMAL:
+
+		case SUMMON_ANT:
 		{
-			okay = ((r_ptr->flags3 & (RF3_ANIMAL)) &&
+			okay = ((r_ptr->d_char == 'a') &&
 				!(r_ptr->flags1 & (RF1_UNIQUE)));
-			break;
-		}
+ 			break;
+ 		}
+
 
 		case SUMMON_SPIDER:
 		{
 			okay = ((r_ptr->d_char == 'S') &&
-				!(r_ptr->flags1 & (RF1_UNIQUE)));
+			        !(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
 
 		case SUMMON_HOUND:
 		{
 			okay = (((r_ptr->d_char == 'C') || (r_ptr->d_char == 'Z')) &&
-				!(r_ptr->flags1 & (RF1_UNIQUE)));
+			        !(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
 
 		case SUMMON_HYDRA:
 		{
 			okay = ((r_ptr->d_char == 'y') &&
-				!(r_ptr->flags1 & (RF1_UNIQUE)));
+			        !(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
 
-		case SUMMON_ANGEL:
+		case SUMMON_MAIA:
 		{
 			okay = ((r_ptr->d_char == 'M') &&
 				!(r_ptr->flags1 & (RF1_UNIQUE)));
+
 			break;
 		}
 
@@ -2979,10 +3111,12 @@ static bool summon_specific_okay(int r_idx)
 			break;
 		}
 
+
 		case SUMMON_UNDEAD:
 		{
 			okay = ((r_ptr->flags3 & (RF3_UNDEAD)) &&
 				!(r_ptr->flags1 & (RF1_UNIQUE)));
+
 			break;
 		}
 
@@ -2993,6 +3127,49 @@ static bool summon_specific_okay(int r_idx)
 			break;
 		}
 
+		case SUMMON_HI_DEMON:
+		{
+			okay = ((r_ptr->d_char == 'U') &&
+					(r_ptr->flags3 & (RF3_DEMON)));
+			break;
+		}
+
+		case SUMMON_HI_UNDEAD:
+		{
+			okay = ((r_ptr->d_char == 'L') ||
+			        (r_ptr->d_char == 'V') ||
+			        (r_ptr->d_char == 'W'));
+			break;
+		}
+
+
+		case SUMMON_HI_DRAGON:
+		{
+			okay = (r_ptr->d_char == 'D');
+			break;
+		}
+
+		case SUMMON_WRAITH:
+		{
+			okay = ((r_ptr->d_char == 'W') &&
+			        (r_ptr->flags1 & (RF1_UNIQUE)));
+			break;
+		}
+
+		case SUMMON_UNIQUE:
+		{
+			if ((r_ptr->flags1 & (RF1_UNIQUE)) != 0) okay = TRUE;
+			break;
+		}
+
+		case SUMMON_HI_UNIQUE:
+		{
+			if (((r_ptr->flags1 & (RF1_UNIQUE)) != 0) &&
+				(r_ptr->level > (MAX_DEPTH / 2))) okay = TRUE;
+			break;
+		}
+
+
 		case SUMMON_KIN:
 		{
 			okay = ((r_ptr->d_char == summon_kin_type) &&
@@ -3000,38 +3177,36 @@ static bool summon_specific_okay(int r_idx)
 			break;
 		}
 
-		case SUMMON_HI_UNDEAD:
+		case SUMMON_ANIMAL:
 		{
-			okay = ((r_ptr->d_char == 'L') ||
-				(r_ptr->d_char == 'V') ||
-				(r_ptr->d_char == 'W'));
+			okay = ((r_ptr->flags3 & (RF3_ANIMAL)) &&
+			        !(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
 
-		case SUMMON_HI_DRAGON:
+		case SUMMON_BERTBILLTOM:
 		{
-			okay = (r_ptr->d_char == 'A');
+			okay = ((r_ptr->d_char == 'T') &&
+				(r_ptr->flags1 & (RF1_UNIQUE)) &&
+				  ((strstr((r_name + r_ptr->name), "Bert")) ||
+				   (strstr((r_name + r_ptr->name), "Bill")) ||
+				   (strstr((r_name + r_ptr->name), "Tom" ))));
 			break;
 		}
 
-		case SUMMON_HI_DEMON:
+
+		case SUMMON_THIEF:
 		{
-			okay = (r_ptr->d_char == 'U');
+			okay = ((r_ptr->flags2 & (RF2_SNEAKY)) &&
+			        !(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
 
-		case SUMMON_WRAITH:
+		default:
 		{
-			okay = ((r_ptr->d_char == 'W') &&
-				(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
 
-		case SUMMON_UNIQUE:
-		{
-			okay = (r_ptr->flags1 & (RF1_UNIQUE)) ? TRUE : FALSE;
-			break;
-		}
 	}
 
 	/* Result */
@@ -3284,6 +3459,31 @@ bool animate_object(int item)
 }
 
 /*
+ * Change monster fear.
+ *
+ * Monsters can be frightened or panicking.  In both cases, they try to
+ * retreat, but when actually panicking, they cannot cast spells that don't
+ * either heal or move them.
+ */
+void set_monster_fear(monster_type *m_ptr, int v, bool panic)
+{
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	/*hack - monsters who cannot be scared are unaffected*/
+	if (r_ptr->flags3 & (RF3_NO_FEAR)) v = 0;
+
+	/* Set monfear */
+	m_ptr->monfear = v;
+
+	/* Monster is panicking */
+	if ((m_ptr->monfear) && (panic)) m_ptr->min_range = PANIC_RANGE;
+
+	/* Otherwise, reset monster combat ranges (later) */
+	else m_ptr->min_range = 0;
+}
+
+
+/*
  * Let the given monster attempt to reproduce.
  *
  * Note that "reproduction" REQUIRES empty space.
@@ -3463,159 +3663,3 @@ void message_pain(int m_idx, int dam)
 			msg_format("%^s cries out feebly.", m_name);
 	}
 }
-
-
-
-/*
- * Learn about an "observed" resistance.
- */
-void update_smart_learn(int m_idx, int what)
-{
-
-#ifdef DRS_SMART_OPTIONS
-
-	monster_type *m_ptr = &m_list[m_idx];
-
-	monster_race *r_ptr = &r_info[m_ptr->r_idx];
-
-
-	/* Not allowed to learn */
-	if (!smart_learn) return;
-
-	/* Too stupid to learn anything */
-	if (r_ptr->flags2 & (RF2_STUPID)) return;
-
-	/* Not intelligent, only learn sometimes */
-	if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return;
-
-
-	/* XXX XXX XXX */
-
-	/* Analyze the knowledge */
-	switch (what)
-	{
-		case DRS_FREE:
-		{
-			if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) m_ptr->smart |= (SM_IMM_FREE);
-			break;
-		}
-
-		case DRS_MANA:
-		{
-			if (!p_ptr->msp) m_ptr->smart |= (SM_IMM_MANA);
-			break;
-		}
-
-		case DRS_RES_ACID:
-		{
-			if (p_ptr->oppose_acid) m_ptr->smart |= (SM_OPP_ACID);
-			if ((p_ptr->cur_flags2 & (TR2_RES_ACID)) != 0) m_ptr->smart |= (SM_RES_ACID);
-			if ((p_ptr->cur_flags2 & (TR2_IM_ACID)) != 0) m_ptr->smart |= (SM_IMM_ACID);
-			break;
-		}
-
-		case DRS_RES_ELEC:
-		{
-			if (p_ptr->oppose_elec) m_ptr->smart |= (SM_OPP_ELEC);
-			if ((p_ptr->cur_flags2 & (TR2_RES_ELEC)) != 0) m_ptr->smart |= (SM_RES_ELEC);
-			if ((p_ptr->cur_flags2 & (TR2_IM_ELEC)) != 0) m_ptr->smart |= (SM_IMM_ELEC);
-			break;
-		}
-
-		case DRS_RES_FIRE:
-		{
-			if ((p_ptr->cur_flags2 & (TR2_RES_FIRE)) != 0) m_ptr->smart |= (SM_RES_FIRE);
-			if (p_ptr->oppose_fire) m_ptr->smart |= (SM_OPP_FIRE);
-			if ((p_ptr->cur_flags2 & (TR2_IM_FIRE)) != 0) m_ptr->smart |= (SM_IMM_FIRE);
-			break;
-		}
-
-		case DRS_RES_COLD:
-		{
-			if ((p_ptr->cur_flags2 & (TR2_RES_COLD)) != 0) m_ptr->smart |= (SM_RES_COLD);
-			if (p_ptr->oppose_cold) m_ptr->smart |= (SM_OPP_COLD);
-			if ((p_ptr->cur_flags2 & (TR2_IM_COLD)) != 0) m_ptr->smart |= (SM_IMM_COLD);
-			break;
-		}
-
-		case DRS_RES_POIS:
-		{
-			if ((p_ptr->cur_flags2 & (TR2_RES_POIS)) != 0) m_ptr->smart |= (SM_RES_POIS);
-			if (p_ptr->oppose_pois) m_ptr->smart |= (SM_OPP_POIS);
-			break;
-		}
-
-		case DRS_RES_FEAR:
-		{
-			if ((p_ptr->cur_flags2 & (TR2_RES_FEAR)) != 0) m_ptr->smart |= (SM_RES_FEAR);
-			if (p_ptr->hero) m_ptr->smart |= (SM_OPP_FEAR);
-			if (p_ptr->shero) m_ptr->smart |= (SM_OPP_FEAR);
-			break;
-		}
-
-		case DRS_RES_LITE:
-		{
-			if ((p_ptr->cur_flags2 & (TR2_RES_LITE)) != 0) m_ptr->smart |= (SM_RES_LITE);
-			break;
-		}
-
-		case DRS_RES_DARK:
-		{
-			if ((p_ptr->cur_flags2 & (TR2_RES_FIRE)) != 0) m_ptr->smart |= (SM_RES_DARK);
-			break;
-		}
-
-		case DRS_RES_BLIND:
-		{
-			if ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) != 0) m_ptr->smart |= (SM_RES_BLIND);
-			break;
-		}
-
-		case DRS_RES_CONFU:
-		{
-			if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) != 0) m_ptr->smart |= (SM_RES_CONFU);
-			break;
-		}
-
-		case DRS_RES_SOUND:
-		{
-			if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) != 0) m_ptr->smart |= (SM_RES_SOUND);
-			break;
-		}
-
-		case DRS_RES_SHARD:
-		{
-			if ((p_ptr->cur_flags2 & (TR2_RES_SHARD)) != 0) m_ptr->smart |= (SM_RES_SHARD);
-			break;
-		}
-
-		case DRS_RES_NEXUS:
-		{
-			if ((p_ptr->cur_flags2 & (TR2_RES_NEXUS)) != 0) m_ptr->smart |= (SM_RES_NEXUS);
-			break;
-		}
-
-		case DRS_RES_NETHR:
-		{
-			if ((p_ptr->cur_flags2 & (TR2_RES_NETHR)) != 0) m_ptr->smart |= (SM_RES_NETHR);
-			break;
-		}
-
-		case DRS_RES_CHAOS:
-		{
-			if ((p_ptr->cur_flags2 & (TR2_RES_CHAOS)) != 0) m_ptr->smart |= (SM_RES_CHAOS);
-			break;
-		}
-
-		case DRS_RES_DISEN:
-		{
-			if ((p_ptr->cur_flags2 & (TR2_RES_DISEN)) != 0) m_ptr->smart |= (SM_RES_DISEN);
-			break;
-		}
-	}
-
-#endif /* DRS_SMART_OPTIONS */
-
-}
-
-

@@ -1146,18 +1146,18 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 			case GF_AWAY_ALL: q = "teleport"; u = "away";break;
 			case GF_TURN_UNDEAD: q = "turn"; u="if undead"; break;
 			case GF_TURN_EVIL: q = "turn"; u="if evil"; break;
-			case GF_TURN_ALL: q = "turn";break;
+			case GF_FEAR_WEAK: q = "scare";break;
 			case GF_DISP_UNDEAD: q = "dispel"; u="if undead"; break;
 			case GF_DISP_EVIL: q = "dispel"; u="if evil"; break;
 			case GF_DISP_ALL: q = "dispel";break;
-			case GF_OLD_CLONE: q = "clone";break;
-			case GF_OLD_POLY: q = "polymorph";break;
-			case GF_OLD_HEAL: q = "heal";break;
-			case GF_OLD_SPEED: q = "hasten";break;
-			case GF_OLD_SLOW: q = "slow";break;
-			case GF_OLD_CONF: q = "confuse";break;
-			case GF_OLD_SLEEP: q = "send"; u="to sleep";break;
-			case GF_OLD_DRAIN: q = "drain"; s="life from";break;
+			case GF_CLONE: q = "clone";break;
+			case GF_POLY: q = "polymorph";break;
+			case GF_HEAL: q = "heal";break;
+			case GF_HASTE: q = "hasten";break;
+			case GF_SLOW_WEAK: q = "slow";break;
+			case GF_CONF_WEAK: q = "confuse";break;
+			case GF_SLEEP: q = "send"; u="to sleep";break;
+			case GF_DRAIN_LIFE: q = "drain"; s="life from";break;
 			case GF_LAVA: q = "burn"; u="with lava";break;
 			case GF_BWATER: q = "scald"; u="with boiling water";break;
 			case GF_BMUD: q = "splash"; u="with boiling mud";break;
@@ -1192,6 +1192,16 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 			case GF_PROBE: q = "probe"; q = NULL; break;
 			case GF_LOCK_DOOR: q = "magically lock"; s = "doors on"; break;
 			case GF_HALLU: q = "space out"; break;
+			case GF_STEAM:	q = "scald"; u="with steam"; break;
+			case GF_VAPOUR:	q = "dissolve"; u="with acidic vapour"; break;
+			case GF_SMOKE:	q = "burn"; u="with smoke"; break;
+			case GF_SUFFOCATE:	q = "suffocate"; break;
+			case GF_HUNGER:		q = "starve"; break;
+			case GF_DISEASE:	q = "infect"; u="with disease"; break;
+			case GF_LOSE_MANA:	q = "drain"; s= "mana from"; break;
+			case GF_WOUND:		q = "wound"; break;
+			case GF_BATTER:		q = "batter"; break;
+			case GF_BLIND_WEAK:		q = "blind"; break;
 
 			/* Hack -- handle features */
 			case GF_FEATURE:
@@ -1313,15 +1323,16 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 			case GF_BLIND: text_out("damage, doubled against eye monsters"); break;
 			case GF_TURN_UNDEAD: text_out("power"); break;
 			case GF_TURN_EVIL: text_out("power");  break;
-			case GF_TURN_ALL: text_out("power"); break;
-			case GF_OLD_CLONE: text_out("power"); break;
-			case GF_OLD_POLY: text_out("power"); break;
-			case GF_OLD_HEAL: text_out("hit points"); break;
+			case GF_FEAR_WEAK: text_out("power"); break;
+			case GF_CLONE: text_out("power"); break;
+			case GF_POLY: text_out("power"); break;
+			case GF_HEAL: text_out("hit points"); break;
 			case GF_AWAY_ALL: text_out("distance on average"); break;
-			case GF_OLD_SPEED: text_out("power"); break;
-			case GF_OLD_SLOW: text_out("power"); break;
-			case GF_OLD_CONF: text_out("power"); break;
-			case GF_OLD_SLEEP: text_out("power"); break;
+			case GF_HASTE: text_out("power"); break;
+			case GF_SLOW_WEAK: text_out("power"); break;
+			case GF_CONF_WEAK: text_out("power"); break;
+			case GF_SLEEP: text_out("power"); break;
+			case GF_BLIND_WEAK: text_out("power"); break;
 			default: text_out("damage"); break;
 
 		}
@@ -1405,7 +1416,7 @@ void spell_info(char *p, int spell, bool use_level)
 		rad = 0;
 
 		/* Hack -- heroism/berserk strength */
-		if (((s_ptr->l_dice) || (s_ptr->l_side) || (s_ptr->l_plus)) && (effect == GF_OLD_HEAL)) continue;
+		if (((s_ptr->l_dice) || (s_ptr->l_side) || (s_ptr->l_plus)) && (effect == GF_HEAL)) continue;
 
 		/* Hack -- use level as modifier */
 		if ((!d2) && (!level))
@@ -1444,15 +1455,16 @@ void spell_info(char *p, int spell, bool use_level)
 		{
 			case GF_TURN_UNDEAD: q="pow"; break;
 			case GF_TURN_EVIL: q="pow";  break;
-			case GF_TURN_ALL: q="pow"; break;
-			case GF_OLD_CLONE: q="pow"; break;
-			case GF_OLD_POLY: q="pow"; break;
-			case GF_OLD_HEAL: q="heal"; break;
+			case GF_FEAR_WEAK: q="pow"; break;
+			case GF_CLONE: q="pow"; break;
+			case GF_POLY: q="pow"; break;
+			case GF_HEAL: q="heal"; break;
 			case GF_AWAY_ALL: q="range"; break;
-			case GF_OLD_SPEED: q="pow"; break;
-			case GF_OLD_SLOW: q="pow"; break;
-			case GF_OLD_CONF: q="pow"; break;
-			case GF_OLD_SLEEP: q="pow"; break;
+			case GF_HASTE: q="pow"; break;
+			case GF_SLOW_WEAK: q="pow"; break;
+			case GF_CONF_WEAK: q="pow"; break;
+			case GF_SLEEP: q="pow"; break;
+			case GF_BLIND_WEAK: q="pow"; break;
 			default: q="dam"; break;
 		}
 

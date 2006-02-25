@@ -800,6 +800,12 @@ static void health_redraw(void)
 		/* Healthy */
 		if (pct >= 100) attr = TERM_L_GREEN;
 
+		/* Bleeding - if not too badly wounded */
+		if ((m_ptr->cut) && (pct >= 60)) attr = TERM_L_UMBER;
+
+		/* Poisoned - if not too badly wounded */
+		if ((m_ptr->poisoned) && (pct >= 60)) attr = TERM_GREEN;
+
 		/* Afraid */
 		if (m_ptr->monfear) attr = TERM_VIOLET;
 

@@ -683,7 +683,7 @@ void do_cmd_go_up(void)
 	p_ptr->energy_use = 100;
 
 	/* Success */
-	message(MSG_STAIRS, 0, "You enter a maze of up staircases.");
+	message(MSG_STAIRS_UP, 0, "You enter a maze of up staircases.");
 
 	/* Create a way back */
 	p_ptr->create_down_stair = TRUE;
@@ -732,7 +732,7 @@ void do_cmd_go_down(void)
 		if (!check_travel_quest(t_info[p_ptr->dungeon].distant, min_depth(p_ptr->dungeon), TRUE)) return;
 
 		/* Success */
-		message(MSG_STAIRS,0,format("You have found a way through %s.",t_name + t_info[p_ptr->dungeon].name));
+		message(MSG_STAIRS_DOWN,0,format("You have found a way through %s.",t_name + t_info[p_ptr->dungeon].name));
 
 		/* Change the dungeon */
 		p_ptr->dungeon = t_info[p_ptr->dungeon].distant;
@@ -756,7 +756,7 @@ void do_cmd_go_down(void)
 		}
 
 		/* Success */
-		message(MSG_STAIRS, 0, "You enter a maze of down staircases.");
+		message(MSG_STAIRS_DOWN, 0, "You enter a maze of down staircases.");
 
 		/* Create a way back */
 		p_ptr->create_up_stair = TRUE;
@@ -1358,7 +1358,7 @@ static bool do_cmd_tunnel_aux(int y, int x)
 		/* Dig */
 		if (p_ptr->skill_dig > rand_int(20 * j))
 		{
-			sound(SOUND_DIG);
+			sound(MSG_DIG);
 
 			/* Get mimiced feature */
 			feat = f_info[feat].mimic;
@@ -1399,7 +1399,7 @@ static bool do_cmd_tunnel_aux(int y, int x)
 		/* Tunnel -- much harder */
 		if (p_ptr->skill_dig > (j + rand_int(40 * j)))
 		{
-			sound(SOUND_DIG);
+			sound(MSG_DIG);
 
 			/* Get mimiced feature */
 			feat = f_info[feat].mimic;
@@ -1817,7 +1817,7 @@ static bool do_cmd_bash_aux(int y, int x)
 		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 
 		/* Sound */
-		sound(SOUND_OPENDOOR);
+		sound(MSG_OPENDOOR);
 
 	}
 
@@ -2988,7 +2988,7 @@ void do_cmd_fire(void)
 	}
 
 	/* Calculate the path */
-	path_n = project_path(path_g, tdis, py, px, ty, tx, 0);
+	path_n = project_path(path_g, tdis, py, px, &ty, &tx, 0);
 
 
 	/* Hack -- Handle stuff */
@@ -3001,7 +3001,7 @@ void do_cmd_fire(void)
 		int nx = GRID_X(path_g[i]);
 
 		/* Hack -- Stop before hitting walls */
-		if (!cave_floor_bold(ny, nx)) break;
+		if (!cave_project_bold(ny, nx)) break;
 
 		/* Advance */
 		x = nx;
@@ -3342,7 +3342,7 @@ void do_cmd_throw(void)
 	}
 
 	/* Calculate the path */
-	path_n = project_path(path_g, tdis, py, px, ty, tx, 0);
+	path_n = project_path(path_g, tdis, py, px, &ty, &tx, 0);
 
 	/* Hack -- Handle stuff */
 	handle_stuff();
@@ -3354,7 +3354,7 @@ void do_cmd_throw(void)
 		int nx = GRID_X(path_g[i]);
 
 		/* Hack -- Stop before hitting walls */
-		if (!cave_floor_bold(ny, nx)) break;
+		if (!cave_project_bold(ny, nx)) break;
 
 		/* Advance */
 		x = nx;

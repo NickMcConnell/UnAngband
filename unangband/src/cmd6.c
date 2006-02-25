@@ -509,7 +509,7 @@ void do_cmd_use_staff(void)
 
 
 	/* Sound */
-	sound(MSG_ZAP);
+	sound(MSG_USE_STAFF);
 
 
 	/* Get rod effect */
@@ -763,7 +763,7 @@ void do_cmd_aim_wand(void)
 
 
 	/* Sound */
-	sound(MSG_ZAP);
+	sound(MSG_ZAP_ROD);
 
 	/* Get wand effect */
 	get_spell(&power, "use", o_ptr, FALSE);
@@ -1003,7 +1003,7 @@ void do_cmd_zap_rod(void)
 	tmpval = o_ptr->timeout;
 
 	/* Sound */
-	sound(MSG_ZAP);
+	sound(MSG_ZAP_ROD);
 
 	/* Hack -- get fake direction */
 	if (!object_aware_p(o_ptr) && (o_ptr->sval < SV_ROD_MIN_DIRECTION)) get_aim_dir(&dir);
@@ -1137,14 +1137,14 @@ static void assemble_parts(int *src_sval, int *tgt_sval, const int r_idx)
 			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_L) {*tgt_sval = SV_ASSEMBLY_PART_HAND_L;} 
 			else if (*tgt_sval == SV_ASSEMBLY_PART_ARMS)  {*tgt_sval = SV_ASSEMBLY_MISS_HAND_R;}
 			else if (*tgt_sval == SV_ASSEMBLY_MISS_HAND_L) {*tgt_sval = SV_ASSEMBLY_PART_HANDS;}
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) &&!(r_info[r_idx].flags7 & (RF7_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_MISS_HAND_R;}
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) &&!(r_info[r_idx].flags8 & (RF8_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_MISS_HAND_R;}
 			break;
 		case SV_ASSEMBLY_HAND_R:
 			if (*tgt_sval == SV_ASSEMBLY_HAND_L) {*tgt_sval = SV_ASSEMBLY_HANDS;} 
 			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_R) {*tgt_sval = SV_ASSEMBLY_PART_HAND_R;} 
 			else if (*tgt_sval == SV_ASSEMBLY_PART_ARMS)  {*tgt_sval = SV_ASSEMBLY_MISS_HAND_L;}
 			else if (*tgt_sval == SV_ASSEMBLY_MISS_HAND_R) {*tgt_sval = SV_ASSEMBLY_PART_HANDS;} 
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_MISS_HAND_L;}
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags8 & (RF8_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_MISS_HAND_L;}
 			break;
 		case SV_ASSEMBLY_ARMS:
 			if (*tgt_sval == SV_ASSEMBLY_NONE) {*tgt_sval = SV_ASSEMBLY_PART_ARMS;} 
@@ -1157,23 +1157,23 @@ static void assemble_parts(int *src_sval, int *tgt_sval, const int r_idx)
 			else if (*tgt_sval == SV_ASSEMBLY_PART_ARMS) {*tgt_sval = SV_ASSEMBLY_PART_HANDS;}
 			else if (*tgt_sval == SV_ASSEMBLY_MISS_HAND_R) {*tgt_sval = SV_ASSEMBLY_PART_HANDS; *src_sval = SV_ASSEMBLY_HAND_L;}
 			else if (*tgt_sval == SV_ASSEMBLY_MISS_HAND_L) {*tgt_sval = SV_ASSEMBLY_PART_HANDS; *src_sval = SV_ASSEMBLY_HAND_R;}
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_PART_HANDS;}
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_PART_HAND_L; *src_sval = SV_ASSEMBLY_HAND_R;}
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_PART_HAND_R; *src_sval = SV_ASSEMBLY_HAND_L;}
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags8 & (RF8_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_PART_HANDS;}
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags8 & (RF8_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_PART_HAND_L; *src_sval = SV_ASSEMBLY_HAND_R;}
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags8 & (RF8_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_PART_HAND_R; *src_sval = SV_ASSEMBLY_HAND_L;}
 			break;
 		case SV_ASSEMBLY_LEG_L:
 			if (*tgt_sval == SV_ASSEMBLY_PART_HANDS) {*tgt_sval = SV_ASSEMBLY_PART_LEG_L;}
 			else if (*tgt_sval == SV_ASSEMBLY_LEG_R) {*tgt_sval = SV_ASSEMBLY_LEGS;}
 			else if (*tgt_sval == SV_ASSEMBLY_PART_LEG_R) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM | RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_L;}
-			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_L;}
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags8 & (RF8_HAS_ARM | RF8_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_L;}
+			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && (r_idx) && !(r_info[r_idx].flags8 & (RF8_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_L;}
 			break;
 		case SV_ASSEMBLY_LEG_R:
 			if (*tgt_sval == SV_ASSEMBLY_PART_HANDS) {*tgt_sval = SV_ASSEMBLY_PART_LEG_R;}
 			else if (*tgt_sval == SV_ASSEMBLY_LEG_L) {*tgt_sval = SV_ASSEMBLY_LEGS;}
 			else if (*tgt_sval == SV_ASSEMBLY_PART_LEG_L) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM | RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_R;}
-			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_R;}
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags8 & (RF8_HAS_ARM | RF8_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_R;}
+			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && (r_idx) && !(r_info[r_idx].flags8 & (RF8_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEG_R;}
 			break;
 		case SV_ASSEMBLY_LEGS:
 			if (*tgt_sval == SV_ASSEMBLY_PART_HANDS) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
@@ -1181,12 +1181,12 @@ static void assemble_parts(int *src_sval, int *tgt_sval, const int r_idx)
 			else if (*tgt_sval == SV_ASSEMBLY_LEG_R) {*tgt_sval = SV_ASSEMBLY_LEGS; *src_sval = SV_ASSEMBLY_LEG_L; }
 			else if (*tgt_sval == SV_ASSEMBLY_PART_LEG_L) {*tgt_sval = SV_ASSEMBLY_PART_LEGS; *src_sval = SV_ASSEMBLY_LEG_R; }
 			else if (*tgt_sval == SV_ASSEMBLY_PART_LEG_R) {*tgt_sval = SV_ASSEMBLY_PART_LEGS; *src_sval = SV_ASSEMBLY_LEG_L; }
-			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM | RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
-			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
+			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags8 & (RF8_HAS_ARM | RF8_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
+			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && (r_idx) && !(r_info[r_idx].flags8 & (RF8_HAS_HAND))) {*tgt_sval = SV_ASSEMBLY_PART_LEGS;}
 			break;
 		case SV_ASSEMBLY_HEAD:
-			if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_ARM | RF7_HAS_HAND | RF7_HAS_LEG))) {*tgt_sval = SV_ASSEMBLY_FULL;}
-			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && (r_idx) && !(r_info[r_idx].flags7 & (RF7_HAS_HAND | RF7_HAS_LEG))) {*tgt_sval = SV_ASSEMBLY_FULL;}
+			if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags8 & (RF8_HAS_ARM | RF8_HAS_HAND | RF8_HAS_LEG))) {*tgt_sval = SV_ASSEMBLY_FULL;}
+			else if ((*tgt_sval == SV_ASSEMBLY_PART_ARMS) && (r_idx) && !(r_info[r_idx].flags8 & (RF8_HAS_HAND | RF8_HAS_LEG))) {*tgt_sval = SV_ASSEMBLY_FULL;}
 			break;
 	}
 }
@@ -1589,7 +1589,7 @@ void do_cmd_activate(void)
 	tmpval = o_ptr->timeout;
 
 	/* Activate the artifact */
-	message(MSG_ZAP, 0, "You activate it...");
+	message(MSG_ACT_ARTIFACT, 0, "You activate it...");
 
 	/* Artifacts */
 	if (o_ptr->name1)

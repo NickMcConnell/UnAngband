@@ -510,9 +510,6 @@ static errr rd_item(object_type *o_ptr)
  */
 static void rd_monster(monster_type *m_ptr)
 {
-	byte tmp8u;
-	s16b tmp16s;
-
 	/* Read the monster race */
 	rd_s16b(&m_ptr->r_idx);
 
@@ -527,18 +524,27 @@ static void rd_monster(monster_type *m_ptr)
 	rd_byte(&m_ptr->stunned);
 	rd_byte(&m_ptr->confused);
 	rd_byte(&m_ptr->monfear);
+	rd_byte(&m_ptr->slowed);
+	rd_byte(&m_ptr->hasted);
+	rd_byte(&m_ptr->cut);
+	rd_byte(&m_ptr->poisoned);
+	rd_byte(&m_ptr->blind);
+	rd_byte(&m_ptr->tim_invis);
+	rd_byte(&m_ptr->tim_passw);
+	rd_byte(&m_ptr->hero);
+	rd_byte(&m_ptr->shero);
+	rd_byte(&m_ptr->shield);
+	rd_byte(&m_ptr->oppose_elem);
+	rd_byte(&m_ptr->summoned);
 
-	/* Summoned monsters timeout */
-	rd_s16b(&tmp16s);
-	m_ptr->summoned = (byte)tmp16s;
-	rd_byte(&tmp8u);
-	m_ptr->mflag = tmp8u;
+	rd_u32b(&m_ptr->mflag);
+	rd_u32b(&m_ptr->smart);
+
 	rd_byte(&m_ptr->min_range);
 	rd_byte(&m_ptr->best_range);
 	rd_byte(&m_ptr->ty);
 	rd_byte(&m_ptr->tx);
 
-	rd_byte(&tmp8u);
 }
 
 

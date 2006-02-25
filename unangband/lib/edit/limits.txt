@@ -20,7 +20,7 @@ M:F:637
 M:D:255
 
 # Maximum number of object kinds
-M:K:793
+M:K:796
 
 # Maximum number of artifacts
 M:A:137

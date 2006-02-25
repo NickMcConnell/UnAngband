@@ -3744,18 +3744,18 @@ static bool name_drop_okay(int r_idx)
 	if (j_ptr->tval == TV_BONE)
 	{
 		/* Skip if monster does not have body part */
-		if ((j_ptr->sval == SV_BONE_SKULL) && !(r_ptr->flags7 & (RF7_HAS_SKULL))) return (FALSE);
-		else if ((j_ptr->sval == SV_BONE_BONE) && !(r_ptr->flags7 & (RF7_HAS_SKELETON))) return (FALSE);
-		else if ((j_ptr->sval == SV_BONE_SKELETON) && !(r_ptr->flags7 & (RF7_HAS_SKELETON))) return (FALSE);
-		else if ((j_ptr->sval == SV_BONE_TEETH) && !(r_ptr->flags7 & (RF7_HAS_TEETH))) return (FALSE);
+		if ((j_ptr->sval == SV_BONE_SKULL) && !(r_ptr->flags8 & (RF8_HAS_SKULL))) return (FALSE);
+		else if ((j_ptr->sval == SV_BONE_BONE) && !(r_ptr->flags8 & (RF8_HAS_SKELETON))) return (FALSE);
+		else if ((j_ptr->sval == SV_BONE_SKELETON) && !(r_ptr->flags8 & (RF8_HAS_SKELETON))) return (FALSE);
+		else if ((j_ptr->sval == SV_BONE_TEETH) && !(r_ptr->flags8 & (RF8_HAS_TEETH))) return (FALSE);
 	}
 	else if (j_ptr->tval == TV_EGG)
 	{
 		/* Spore shooters have spores */
-		if ((j_ptr->sval == SV_EGG_SPORE) && !(r_ptr->flags7 & (RF7_HAS_SPORE))) return (FALSE);
+		if ((j_ptr->sval == SV_EGG_SPORE) && !(r_ptr->flags8 & (RF8_HAS_SPORE))) return (FALSE);
 
 		/* Egg-layers shed their skin or have feathers or scales */
-		else if ((j_ptr->sval == SV_EGG_EGG) || (!(r_ptr->flags7 & (RF7_HAS_SKIN | RF7_HAS_FEATHER | RF7_HAS_SCALE)))) return (FALSE);
+		else if ((j_ptr->sval == SV_EGG_EGG) || (!(r_ptr->flags8 & (RF8_HAS_SKIN | RF8_HAS_FEATHER | RF8_HAS_SCALE)))) return (FALSE);
 
 		/* Undead/demons never have eggs */
 		if (r_ptr->flags3 & (RF3_UNDEAD | RF3_DEMON)) return (FALSE);
@@ -3767,50 +3767,50 @@ static bool name_drop_okay(int r_idx)
 	else if (j_ptr->tval == TV_SKIN)
 	{
 		/* Skip if monster does not have body part */
-		if ((j_ptr->sval == SV_SKIN_FEATHER) && !(r_ptr->flags7 & (RF7_HAS_FEATHER))) return (FALSE);
-		else if ((j_ptr->sval == SV_SKIN_SCALE) && !(r_ptr->flags7 & (RF7_HAS_SCALE))) return (FALSE);
-		else if ((j_ptr->sval == SV_SKIN_FUR) && !(r_ptr->flags7 & (RF7_HAS_FUR))) return (FALSE);
+		if ((j_ptr->sval == SV_SKIN_FEATHER) && !(r_ptr->flags8 & (RF8_HAS_FEATHER))) return (FALSE);
+		else if ((j_ptr->sval == SV_SKIN_SCALE) && !(r_ptr->flags8 & (RF8_HAS_SCALE))) return (FALSE);
+		else if ((j_ptr->sval == SV_SKIN_FUR) && !(r_ptr->flags8 & (RF8_HAS_FUR))) return (FALSE);
 
 		/* Hack -- we allow lots of skins, Mr Lecter */
-		else if ((j_ptr->sval == SV_SKIN_SKIN) && !(r_ptr->flags7 & (RF7_HAS_SLIME | RF7_HAS_FEATHER | RF7_HAS_SCALE | RF7_HAS_FUR))
-			&& (r_ptr->flags7 & (RF7_HAS_CORPSE))) return (FALSE);
+		else if ((j_ptr->sval == SV_SKIN_SKIN) && !(r_ptr->flags8 & (RF8_HAS_SLIME | RF8_HAS_FEATHER | RF8_HAS_SCALE | RF8_HAS_FUR))
+			&& (r_ptr->flags8 & (RF8_HAS_CORPSE))) return (FALSE);
 
 	}
 	else if (j_ptr->tval == TV_BODY)
 	{
 		/* Skip if monster does not have body part */
-		if ((j_ptr->sval == SV_BODY_HEAD) && !(r_ptr->flags7 & (RF7_HAS_HEAD))) return (FALSE);
-		else if ((j_ptr->sval == SV_BODY_HAND) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
-		else if ((j_ptr->sval == SV_BODY_ARM) && !(r_ptr->flags7 & (RF7_HAS_ARM))) return (FALSE);
-		else if ((j_ptr->sval == SV_BODY_LEG) && !(r_ptr->flags7 & (RF7_HAS_LEG))) return (FALSE);
-		else if ((j_ptr->sval == SV_BODY_WING) && !(r_ptr->flags7 & (RF7_HAS_WING))) return (FALSE);
-		else if ((j_ptr->sval == SV_BODY_CLAW) && !(r_ptr->flags7 & (RF7_HAS_CLAW))) return (FALSE);
+		if ((j_ptr->sval == SV_BODY_HEAD) && !(r_ptr->flags8 & (RF8_HAS_HEAD))) return (FALSE);
+		else if ((j_ptr->sval == SV_BODY_HAND) && !(r_ptr->flags8 & (RF8_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_BODY_ARM) && !(r_ptr->flags8 & (RF8_HAS_ARM))) return (FALSE);
+		else if ((j_ptr->sval == SV_BODY_LEG) && !(r_ptr->flags8 & (RF8_HAS_LEG))) return (FALSE);
+		else if ((j_ptr->sval == SV_BODY_WING) && !(r_ptr->flags8 & (RF8_HAS_WING))) return (FALSE);
+		else if ((j_ptr->sval == SV_BODY_CLAW) && !(r_ptr->flags8 & (RF8_HAS_CLAW))) return (FALSE);
 	}
 	else if (j_ptr->tval == TV_ASSEMBLY)
 	{
 		/* Skip if monster does not have body part */
-		if ((j_ptr->sval == SV_ASSEMBLY_NONE) && !(r_ptr->flags7 & (RF7_HAS_CORPSE))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_HEAD) && !(r_ptr->flags7 & (RF7_HAS_HEAD))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_HANDS) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_HAND_L) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_HAND_R) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_PART_HANDS) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_PART_HAND_L) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_PART_HAND_R) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_MISS_HAND_L) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_MISS_HAND_R) && !(r_ptr->flags7 & (RF7_HAS_HAND))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_ARMS) && !(r_ptr->flags7 & (RF7_HAS_ARM))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_ARM_L) && !(r_ptr->flags7 & (RF7_HAS_ARM))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_ARM_R) && !(r_ptr->flags7 & (RF7_HAS_ARM))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_PART_ARMS) && !(r_ptr->flags7 & (RF7_HAS_ARM))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_PART_ARM_L) && !(r_ptr->flags7 & (RF7_HAS_ARM))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_PART_ARM_R) && !(r_ptr->flags7 & (RF7_HAS_ARM))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_LEG_L) && !(r_ptr->flags7 & (RF7_HAS_LEG))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_LEG_R) && !(r_ptr->flags7 & (RF7_HAS_LEG))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_LEGS) && !(r_ptr->flags7 & (RF7_HAS_LEG))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_PART_LEG_L) && !(r_ptr->flags7 & (RF7_HAS_LEG))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_PART_LEG_R) && !(r_ptr->flags7 & (RF7_HAS_LEG))) return (FALSE);
-		else if ((j_ptr->sval == SV_ASSEMBLY_PART_LEGS) && !(r_ptr->flags7 & (RF7_HAS_LEG))) return (FALSE);
+		if ((j_ptr->sval == SV_ASSEMBLY_NONE) && !(r_ptr->flags8 & (RF8_HAS_CORPSE))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_HEAD) && !(r_ptr->flags8 & (RF8_HAS_HEAD))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_HANDS) && !(r_ptr->flags8 & (RF8_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_HAND_L) && !(r_ptr->flags8 & (RF8_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_HAND_R) && !(r_ptr->flags8 & (RF8_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_HANDS) && !(r_ptr->flags8 & (RF8_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_HAND_L) && !(r_ptr->flags8 & (RF8_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_HAND_R) && !(r_ptr->flags8 & (RF8_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_MISS_HAND_L) && !(r_ptr->flags8 & (RF8_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_MISS_HAND_R) && !(r_ptr->flags8 & (RF8_HAS_HAND))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_ARMS) && !(r_ptr->flags8 & (RF8_HAS_ARM))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_ARM_L) && !(r_ptr->flags8 & (RF8_HAS_ARM))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_ARM_R) && !(r_ptr->flags8 & (RF8_HAS_ARM))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_ARMS) && !(r_ptr->flags8 & (RF8_HAS_ARM))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_ARM_L) && !(r_ptr->flags8 & (RF8_HAS_ARM))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_ARM_R) && !(r_ptr->flags8 & (RF8_HAS_ARM))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_LEG_L) && !(r_ptr->flags8 & (RF8_HAS_LEG))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_LEG_R) && !(r_ptr->flags8 & (RF8_HAS_LEG))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_LEGS) && !(r_ptr->flags8 & (RF8_HAS_LEG))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_LEG_L) && !(r_ptr->flags8 & (RF8_HAS_LEG))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_LEG_R) && !(r_ptr->flags8 & (RF8_HAS_LEG))) return (FALSE);
+		else if ((j_ptr->sval == SV_ASSEMBLY_PART_LEGS) && !(r_ptr->flags8 & (RF8_HAS_LEG))) return (FALSE);
 	}
 	else if (j_ptr->tval == TV_HOLD)
 	{
@@ -4019,7 +4019,7 @@ static bool kind_is_race(int k_idx)
 		case TV_SHIELD:
 		case TV_HELM:
 		{
-			if (r_ptr->flags7 & (RF7_DROP_ARMOR)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_ARMOR)) return (TRUE);
 			return (FALSE);
 		}
 		/* Soft armor/boots/cloaks/gloves */
@@ -4032,7 +4032,7 @@ static bool kind_is_race(int k_idx)
 		case TV_CLOAK:
 		case TV_BOOTS:
 		{
-			if (r_ptr->flags7 & (RF7_DROP_CLOTHES)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_CLOTHES)) return (TRUE);
 			return (FALSE);
 		}
 		/* Weapons */
@@ -4052,7 +4052,7 @@ static bool kind_is_race(int k_idx)
 			/* Hack -- warriors only carry weapons >= 7 lbs */
 			if ((r_ptr->flags2 & (RF2_ARMOR)) && (k_ptr->weight < 70)) return (FALSE);
 
-			if (r_ptr->flags7 & (RF7_DROP_WEAPON)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_WEAPON)) return (TRUE);
 			return (FALSE);
 		}
 
@@ -4062,7 +4062,7 @@ static bool kind_is_race(int k_idx)
 		case TV_BOLT:
 		case TV_ARROW:
 		{
-			if (r_ptr->flags7 & (RF7_DROP_MISSILE)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_MISSILE)) return (TRUE);
 			return (FALSE);
 		}
 
@@ -4075,7 +4075,7 @@ static bool kind_is_race(int k_idx)
 			/* Mega hack -- priests and paladins other than shamans do not carry magic books */
 			if ((r_ptr->d_char == 'p') && !(r_ptr->flags2 & (RF2_MAGE))) return (FALSE);                            
 
-			if (r_ptr->flags7 & (RF7_DROP_WRITING)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_WRITING)) return (TRUE);
 			return (FALSE);
 		}
 		case TV_PRAYER_BOOK:
@@ -4086,7 +4086,7 @@ static bool kind_is_race(int k_idx)
 			/* Mega hack -- mages and rangers other than shamans do not carry priest books */
 			if ((r_ptr->d_char == 'q') && !(r_ptr->flags2 & (RF2_PRIEST))) return (FALSE);                          
 
-			if (r_ptr->flags7 & (RF7_DROP_WRITING)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_WRITING)) return (TRUE);
 			return (FALSE);
 		}
 		case TV_SCROLL:
@@ -4097,7 +4097,7 @@ static bool kind_is_race(int k_idx)
 		case TV_RUNESTONE:
 		case TV_MAP:
 		{
-			if (r_ptr->flags7 & (RF7_DROP_WRITING)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_WRITING)) return (TRUE);
 			return (FALSE);
 		}
 
@@ -4109,7 +4109,7 @@ static bool kind_is_race(int k_idx)
 		case TV_AMULET:
 		case TV_CROWN:
 		{
-			if (r_ptr->flags7 & (RF7_DROP_JEWELRY)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_JEWELRY)) return (TRUE);
 			return (FALSE);
 		}
 
@@ -4117,14 +4117,14 @@ static bool kind_is_race(int k_idx)
 		case TV_POTION:
 		{
 			if (r_ptr->d_char == '!') return (TRUE);
-			if (r_ptr->flags7 & (RF7_DROP_POTION)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_POTION)) return (TRUE);
 			return (FALSE);
 		}
 
 		/* Food */
 		case TV_FOOD:
 		{
-			if (r_ptr->flags7 & (RF7_DROP_FOOD)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_FOOD)) return (TRUE);
 			return (FALSE);
 		}
 
@@ -4132,13 +4132,13 @@ static bool kind_is_race(int k_idx)
 		case TV_LITE:
 		{
 			if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE)) return (TRUE);
-			if (r_ptr->flags7 & (RF7_DROP_LITE)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_LITE)) return (TRUE);
 			return (FALSE);
 		}
 
 		case TV_HOLD:
 		{
-			if (r_ptr->flags7 & (RF7_DROP_CHEST)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_CHEST)) return (TRUE);
 			return (FALSE);
 		}
 
@@ -4148,7 +4148,7 @@ static bool kind_is_race(int k_idx)
 		case TV_JUNK:
 		case TV_SKIN:
 		{
-			if (r_ptr->flags7 & (RF7_DROP_JUNK)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_JUNK)) return (TRUE);
 			return (FALSE);
 
 		}
@@ -4158,7 +4158,7 @@ static bool kind_is_race(int k_idx)
 		case TV_SPIKE:
 		case TV_FLASK:
 		{
-			if (r_ptr->flags7 & (RF7_DROP_TOOL)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_TOOL)) return (TRUE);
 			return (FALSE);
 
 		}
@@ -4167,7 +4167,7 @@ static bool kind_is_race(int k_idx)
 		case TV_SONG_BOOK:
 		case TV_INSTRUMENT:
 		{
-			if (r_ptr->flags7 & (RF7_DROP_MUSIC)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_MUSIC)) return (TRUE);
 			return (FALSE);
 		}
 
@@ -4176,7 +4176,7 @@ static bool kind_is_race(int k_idx)
 		case TV_STAFF:
 		case TV_WAND:
 		{
-			if (r_ptr->flags7 & (RF7_DROP_RSW)) return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_RSW)) return (TRUE);
 			return (FALSE);
 		}
 
@@ -4401,22 +4401,22 @@ bool make_body(object_type *j_ptr, int r_idx)
 	}
 
 	/* No body */
-	if (!(r_ptr->flags7 & (RF7_HAS_CORPSE | RF7_HAS_SKELETON | RF7_HAS_SKULL | RF7_ASSEMBLY))) return (FALSE);
+	if (!(r_ptr->flags8 & (RF8_HAS_CORPSE | RF8_HAS_SKELETON | RF8_HAS_SKULL | RF8_ASSEMBLY))) return (FALSE);
 
 	/* Living hurt rock monsters turn to stone */
 	if ((r_ptr->flags3 & (RF3_HURT_ROCK)) && !(r_ptr->flags3 & (RF3_NONLIVING))) k_idx = lookup_kind(TV_STATUE,SV_STATUE_STONE);
 
 	/* Hack -- golems leave behind assemblies */
-	else if (r_ptr->flags7 & (RF7_ASSEMBLY)) k_idx = lookup_kind(TV_ASSEMBLY, SV_ASSEMBLY_NONE);
+	else if (r_ptr->flags8 & (RF8_ASSEMBLY)) k_idx = lookup_kind(TV_ASSEMBLY, SV_ASSEMBLY_NONE);
 
 	/* Monsters with corpses produce corpses */
-	else if (r_ptr->flags7 & (RF7_HAS_CORPSE)) k_idx = lookup_kind(TV_BODY,SV_BODY_CORPSE);
+	else if (r_ptr->flags8 & (RF8_HAS_CORPSE)) k_idx = lookup_kind(TV_BODY,SV_BODY_CORPSE);
 
 	/* Monsters without corpses may produce skeletons */
-	else if (r_ptr->flags7 & (RF7_HAS_SKELETON)) k_idx = lookup_kind(TV_BONE,SV_BONE_SKELETON);
+	else if (r_ptr->flags8 & (RF8_HAS_SKELETON)) k_idx = lookup_kind(TV_BONE,SV_BONE_SKELETON);
 
 	/* Monsters without corpses or skeletons may produce skulls */
-	else if (r_ptr->flags7 & (RF7_HAS_SKULL)) k_idx = lookup_kind(TV_BONE,SV_BONE_SKULL);
+	else if (r_ptr->flags8 & (RF8_HAS_SKULL)) k_idx = lookup_kind(TV_BONE,SV_BONE_SKULL);
 
 	if (!k_idx) return (FALSE);
 
@@ -4448,7 +4448,7 @@ bool make_head(object_type *j_ptr, int r_idx)
 	monster_race *r_ptr = &r_info[r_idx];
 
 	/* No body */
-	if (!(r_ptr->flags7 & (RF7_HAS_HEAD))) return (FALSE);
+	if (!(r_ptr->flags8 & (RF8_HAS_HEAD))) return (FALSE);
 
 	/* Usually produce a head */
 	k_idx = lookup_kind(TV_BODY,SV_BODY_HEAD);
@@ -4459,7 +4459,7 @@ bool make_head(object_type *j_ptr, int r_idx)
 	if ((r_ptr->flags3 & (RF3_HURT_ROCK)) && !(r_ptr->flags3 & (RF3_NONLIVING))) k_idx = lookup_kind(TV_ASSEMBLY,SV_ASSEMBLY_HEAD);
 
 	/* Hack -- golems leave behind assemblies */
-	else if (r_ptr->flags7 & (RF7_ASSEMBLY)) k_idx = lookup_kind(TV_ASSEMBLY, SV_ASSEMBLY_HEAD);
+	else if (r_ptr->flags8 & (RF8_ASSEMBLY)) k_idx = lookup_kind(TV_ASSEMBLY, SV_ASSEMBLY_HEAD);
 
 	if (!k_idx) return (FALSE);
 
@@ -4507,23 +4507,23 @@ bool make_part(object_type *j_ptr, int r_idx)
 	}
 
 	/* Usually hack off a hand or nearest approximation */
-	if (r_ptr->flags7 & (RF7_HAS_CLAW)) k_idx = lookup_kind(TV_BODY,SV_BODY_CLAW);
-	else if (r_ptr->flags7 & (RF7_HAS_HAND)) k_idx = lookup_kind(TV_BODY,SV_BODY_HAND);
-	else if (r_ptr->flags7 & (RF7_HAS_WING)) k_idx = lookup_kind(TV_BODY,SV_BODY_WING);
-	else if (r_ptr->flags7 & (RF7_HAS_ARM)) k_idx = lookup_kind(TV_BODY,SV_BODY_ARM);
-	else if (r_ptr->flags7 & (RF7_HAS_LEG)) k_idx = lookup_kind(TV_BODY,SV_BODY_LEG);
+	if (r_ptr->flags8 & (RF8_HAS_CLAW)) k_idx = lookup_kind(TV_BODY,SV_BODY_CLAW);
+	else if (r_ptr->flags8 & (RF8_HAS_HAND)) k_idx = lookup_kind(TV_BODY,SV_BODY_HAND);
+	else if (r_ptr->flags8 & (RF8_HAS_WING)) k_idx = lookup_kind(TV_BODY,SV_BODY_WING);
+	else if (r_ptr->flags8 & (RF8_HAS_ARM)) k_idx = lookup_kind(TV_BODY,SV_BODY_ARM);
+	else if (r_ptr->flags8 & (RF8_HAS_LEG)) k_idx = lookup_kind(TV_BODY,SV_BODY_LEG);
 
 	/* Sometimes hack off something else */
-	if ((rand_int(100)<30) &&(r_ptr->flags7 & (RF7_HAS_ARM))) k_idx = lookup_kind(TV_BODY,SV_BODY_ARM);
-	if ((rand_int(100)<30) &&(r_ptr->flags7 & (RF7_HAS_LEG))) k_idx = lookup_kind(TV_BODY,SV_BODY_LEG);
-	if ((rand_int(100)<30) &&(r_ptr->flags7 & (RF7_HAS_WING))) k_idx = lookup_kind(TV_BODY,SV_BODY_WING);
-	if ((rand_int(100)<30) &&(r_ptr->flags7 & (RF7_HAS_TEETH))) k_idx = lookup_kind(TV_BONE,SV_BONE_TEETH);
+	if ((rand_int(100)<30) &&(r_ptr->flags8 & (RF8_HAS_ARM))) k_idx = lookup_kind(TV_BODY,SV_BODY_ARM);
+	if ((rand_int(100)<30) &&(r_ptr->flags8 & (RF8_HAS_LEG))) k_idx = lookup_kind(TV_BODY,SV_BODY_LEG);
+	if ((rand_int(100)<30) &&(r_ptr->flags8 & (RF8_HAS_WING))) k_idx = lookup_kind(TV_BODY,SV_BODY_WING);
+	if ((rand_int(100)<30) &&(r_ptr->flags8 & (RF8_HAS_TEETH))) k_idx = lookup_kind(TV_BONE,SV_BONE_TEETH);
 
 	/* Have a part */
 	if (!k_idx) return(FALSE);
 
 	/* Handle assembly monsters */
-	if (r_ptr->flags7 & (RF7_ASSEMBLY))
+	if (r_ptr->flags8 & (RF8_ASSEMBLY))
 	{
 		if ((k_info[k_idx].tval == TV_BODY) && (k_info[k_idx].sval == SV_BODY_HAND))
 		{
@@ -4595,10 +4595,10 @@ bool make_skin(object_type *j_ptr, int m_idx)
 	}
 
 	/* Usually produce a skin */
-	if (r_ptr->flags7 & (RF7_HAS_SKIN)) k_idx = lookup_kind(TV_SKIN,SV_SKIN_SKIN);
-	else if (r_ptr->flags7 & (RF7_HAS_FUR)) k_idx = lookup_kind(TV_SKIN,SV_SKIN_FUR);
-	else if (r_ptr->flags7 & (RF7_HAS_FEATHER)) k_idx = lookup_kind(TV_SKIN,SV_SKIN_FEATHER);
-	else if (r_ptr->flags7 & (RF7_HAS_SCALE)) k_idx = lookup_kind(TV_SKIN,SV_SKIN_SCALE);
+	if (r_ptr->flags8 & (RF8_HAS_SKIN)) k_idx = lookup_kind(TV_SKIN,SV_SKIN_SKIN);
+	else if (r_ptr->flags8 & (RF8_HAS_FUR)) k_idx = lookup_kind(TV_SKIN,SV_SKIN_FUR);
+	else if (r_ptr->flags8 & (RF8_HAS_FEATHER)) k_idx = lookup_kind(TV_SKIN,SV_SKIN_FEATHER);
+	else if (r_ptr->flags8 & (RF8_HAS_SCALE)) k_idx = lookup_kind(TV_SKIN,SV_SKIN_SCALE);
 
 	/* No object? */
 	if (!k_idx) return (FALSE);
@@ -4932,11 +4932,11 @@ bool break_near(object_type *j_ptr, int y, int x)
 						damage = d_plus;
 					}
 
-					flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+					flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
 					/* Hit with radiate attack */
-					obvious |= project(0, (j_ptr->tval == TV_POTION ? 2 : 1), y, x, damroll(d_side, d_dice),
-						 effect, flg);
+					obvious |= project(0, (j_ptr->tval == TV_POTION ? 2 : 1), y, x, y, x, damroll(d_side, d_dice),
+						 effect, flg, 0, 0);
 
 				}
 
@@ -4979,11 +4979,11 @@ bool break_near(object_type *j_ptr, int y, int x)
 						/* Skip if not spores */
 						if (method != RBM_SPORE) continue;
 
-						flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+						flg = PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
 						/* Hit with radiate attack */
-						obvious = project(0, 1, y, x, damroll(d_side, d_dice),
-							 effect, flg);
+						obvious = project(0, 1, y, x, y, x, damroll(d_side, d_dice),
+							 effect, flg, 0, 0);
 
 						/* Count "obvious" attacks */
 						if (obvious || (l_ptr->blows[i] > 10))
@@ -5002,7 +5002,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 				break;
 
 			}
-			else if ((j_ptr->name3 > 0) && (r_info[j_ptr->name3].flags7 & (RF7_HAS_CORPSE)))
+			else if ((j_ptr->name3 > 0) && (r_info[j_ptr->name3].flags8 & (RF8_HAS_CORPSE)))
 			{
 				j_ptr->tval = TV_BODY;
 				j_ptr->sval = SV_BODY_CORPSE;
@@ -5096,8 +5096,8 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 			/* Skip illegal grids */
 			if (!in_bounds_fully(ty, tx)) continue;
 
-			/* Require line of sight */
-			if (!los(y, x, ty, tx)) continue;
+			/* Require line of fire */
+			if (!generic_los(y, x, ty, tx, CAVE_XLOF)) continue;
 
 			/* Require drop space */
 			if (!(f_info[cave_feat[ty][tx]].flags1 & (FF1_DROP))) continue;
@@ -5231,7 +5231,6 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 			   o_name, (plural ? "" : "s"));
 	}
 
-
 	/* Sound */
 	sound(MSG_DROP);
 
@@ -5293,8 +5292,8 @@ void feat_near(int feat, int y, int x)
 			/* Skip illegal grids */
 			if (!in_bounds_fully(ty, tx)) continue;
 
-			/* Require line of sight */
-			if (!los(y, x, ty, tx)) continue;
+			/* Require line of fire */
+			if (!generic_los(y, x, ty, tx, CAVE_XLOF)) continue;
 
 			/* Prevent overwriting permanets */
 			if (f_info[cave_feat[ty][tx]].flags1 & (FF1_PERMANENT)) continue;

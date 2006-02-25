@@ -551,7 +551,7 @@ N:6:7:16:10
 A:
 B:
 D:badly burned by powerful fire.  
-R:BR_FIRE
+R:BRTH_FIRE
 S:SEEN
 F:308
 
@@ -559,7 +559,7 @@ N:6:2:17:11
 A:
 B:
 D:badly melted by powerful acid.  
-R:BR_ACID
+R:BRTH_ACID
 S:SEEN
 F:309
 
@@ -567,7 +567,7 @@ N:6:2:18:11
 A:
 B:
 D:covered in a thick layer of frost.  
-R:BR_COLD
+R:BRTH_COLD
 S:SEEN
 F:132
 
@@ -1517,7 +1517,7 @@ N:17:2:35:10
 A:
 B:
 D:Burn marks cover 
-R:BR_FIRE
+R:BRTH_FIRE
 F:308
 S:SEEN
 
@@ -1525,7 +1525,7 @@ N:17:2:36:11
 A:
 B:
 D:Acid marks cover 
-R:BR_ACID
+R:BRTH_ACID
 F:309
 S:SEEN
 
@@ -1533,7 +1533,7 @@ N:17:2:37:11
 A:
 B:
 D:Frost covers 
-R:BR_COLD
+R:BRTH_COLD
 L:ICE
 F:132
 S:SEEN

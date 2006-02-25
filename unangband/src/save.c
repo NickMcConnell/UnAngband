@@ -242,7 +242,10 @@ static void wr_item(const object_type *o_ptr)
  */
 static void wr_monster(const monster_type *m_ptr)
 {
+	/* Read the monster race */
 	wr_s16b(m_ptr->r_idx);
+
+	/* Read the other information */
 	wr_byte(m_ptr->fy);
 	wr_byte(m_ptr->fx);
 	wr_s16b(m_ptr->hp);
@@ -253,14 +256,27 @@ static void wr_monster(const monster_type *m_ptr)
 	wr_byte(m_ptr->stunned);
 	wr_byte(m_ptr->confused);
 	wr_byte(m_ptr->monfear);
+	wr_byte(m_ptr->slowed);
+	wr_byte(m_ptr->hasted);
+	wr_byte(m_ptr->cut);
+	wr_byte(m_ptr->poisoned);
+	wr_byte(m_ptr->blind);
+	wr_byte(m_ptr->tim_invis);
+	wr_byte(m_ptr->tim_passw);
+	wr_byte(m_ptr->hero);
+	wr_byte(m_ptr->shero);
+	wr_byte(m_ptr->shield);
+	wr_byte(m_ptr->oppose_elem);
 	wr_byte(m_ptr->summoned);
-	wr_u16b(m_ptr->mflag);
+
+	wr_u32b(m_ptr->mflag);
+	wr_u32b(m_ptr->smart);
+
 	wr_byte(m_ptr->min_range);
 	wr_byte(m_ptr->best_range);
 	wr_byte(m_ptr->ty);
 	wr_byte(m_ptr->tx);
 
-	wr_byte(0);
 }
 
 

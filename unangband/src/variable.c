@@ -361,10 +361,17 @@ const cptr angband_sound_name[SOUND_MAX] =
 
 
 /*
- * Array[VIEW_MAX] used by "update_view()"
+ * Array[VIEW_MAX] used by "update_view()" for los calculation
  */
 sint view_n = 0;
 u16b *view_g;
+
+/*
+ * Array[VIEW_MAX] used by "update_view()" for lof calculation
+ */
+sint fire_n = 0;
+u16b *fire_g;
+
 
 /*
  * Arrays[TEMP_MAX] used for various things

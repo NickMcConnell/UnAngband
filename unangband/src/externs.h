@@ -75,6 +75,14 @@ extern const cptr object_group_text[];
 extern const byte object_group_tval[];
 extern const cptr magic_name[4][32];
 extern const cptr disease_name[32];
+extern byte spell_info_RF4[32][5];
+extern byte spell_info_RF5[32][5];
+extern byte spell_info_RF6[32][5];
+extern byte spell_info_RF7[32][5];
+extern byte spell_desire_RF4[32][8];
+extern byte spell_desire_RF5[32][8];
+extern byte spell_desire_RF6[32][8];
+extern byte spell_desire_RF7[32][8];
 
 /* variable.c */
 extern cptr copyright;
@@ -156,6 +164,8 @@ extern byte angband_color_table[256][4];
 extern const cptr angband_sound_name[MSG_MAX];
 extern sint view_n;
 extern u16b *view_g;
+extern sint fire_n;
+extern u16b *fire_g;
 extern sint temp_n;
 extern u16b *temp_g;
 extern byte *temp_y;
@@ -304,7 +314,7 @@ extern void player_birth(void);
 
 /* cave.c */
 extern sint distance(int y1, int x1, int y2, int x2);
-extern bool los(int y1, int x1, int y2, int x2);
+extern bool generic_los(int y1, int x1, int y2, int x2, byte flg);
 extern bool no_lite(void);
 extern bool cave_valid_bold(int y, int x);
 extern bool feat_supports_lighting(byte feat);
@@ -333,9 +343,8 @@ extern void town_illuminate(bool daytime);
 extern void cave_set_feat(int y, int x, int feat);
 extern int feat_state(int feat, int action);
 extern void cave_alter_feat(int y, int x, int action);
-extern sint project_path(u16b *gp, int range, \
-                         int y1, int x1, int y2, int x2, int flg);
-extern bool projectable(int y1, int x1, int y2, int x2);
+extern int  project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg);
+extern byte projectable(int y1, int x1, int y2, int x2, u32b flg);
 extern void scatter(int *yp, int *xp, int y, int x, int d, int m);
 extern void health_track(int m_idx);
 extern void monster_race_track(int r_idx);
@@ -514,12 +523,12 @@ extern void cleanup_angband(void);
 extern bool load_player(void);
 
 /* melee1.c */
+extern int get_breath_dam(s16b hit_points, int gf_type, bool powerful);
 extern bool make_attack_normal(int m_idx);
+extern bool make_attack_ranged(int who, int attack, int py, int px);
 extern void mon_hit_trap(int m_idx, int y, int x);
 
 /* melee2.c */
-extern bool make_attack_spell_aux(int who, int y, int x, int thrown_spell);
-extern bool make_attack_spell(int m_idx);
 extern void process_monsters(byte minimum_energy);
 extern int get_scent(int y, int x);
 extern bool cave_exist_mon(int r_idx, int y, int x, bool occupied_ok);
@@ -550,6 +559,8 @@ extern s16b player_place(int y, int x);
 extern void monster_hide(int y, int x, int mmove, monster_type *n_ptr);
 extern s16b monster_place(int y, int x, monster_type *n_ptr);
 extern bool mon_resist_feat(int feat, int r_idx);
+extern void set_monster_haste(s16b m_idx, s16b counter, bool message);
+extern void set_monster_slow(s16b m_idx, s16b counter, bool message);
 extern int place_monster_here(int y, int x, int r_idx);
 extern bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp);
 extern bool place_monster(int y, int x, bool slp, bool grp);
@@ -557,9 +568,9 @@ extern bool alloc_monster(int dis, bool slp);
 extern bool summon_specific(int y1, int x1, int lev, int type);
 extern bool summon_specific_one(int y1, int x1, int r_idx, bool slp);
 extern bool animate_object(int item);
+extern void set_monster_fear(monster_type *m_ptr, int v, bool panic);
 extern bool multiply_monster(int m_idx);
 extern void message_pain(int m_idx, int dam);
-extern void update_smart_learn(int m_idx, int what);
 
 /* object1.c */
 extern void flavor_init(void);
@@ -661,10 +672,14 @@ extern bool spell_okay(int spell, bool known);
 extern bool save_player(void);
 
 /* spells1.c */
+extern void update_smart_cheat(int who);
+extern void update_smart_racial(int who);
+extern void update_smart_learn(int who, u32b flag);
 extern s16b poly_r_idx(int r_idx);
 extern void teleport_away(int m_idx, int dis);
 extern void teleport_player(int dis);
 extern void teleport_player_to(int ny, int nx);
+extern void teleport_towards(int oy, int ox, int ny, int nx);
 extern void teleport_player_level(void);
 extern void take_hit(int dam, cptr kb_str);
 extern bool inc_stat(int stat);
@@ -674,7 +689,8 @@ extern bool apply_disenchant(int mode);
 extern bool project_f(int who, int rad, int y, int x, int dam, int typ);
 extern bool project_m(int who, int rad, int y, int x, int dam, int typ);
 extern bool project_p(int who, int rad, int y, int x, int dam, int typ);
-extern bool project(int who, int rad, int y, int x, int dam, int typ, int flg);
+extern bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
+			 u32b flg, int degrees, byte source_diameter);
 
 /* spells2.c */
 extern bool hp_player(int num);
@@ -720,7 +736,11 @@ extern bool banishment(void);
 extern bool mass_banishment(void);
 extern bool probing(void);
 extern void destroy_area(int y1, int x1, int r, bool full);
+extern void entomb(int cy, int cx, byte invalid);
 extern void earthquake(int cy, int cx, int r);
+extern void clear_temp_array(void);
+extern void cave_temp_mark(int y, int x, bool room);
+extern void spread_cave_temp(int y1, int x1, int range, bool room);
 extern void lite_room(int y1, int x1);
 extern void unlite_room(int y1, int x1);
 extern bool lite_area(int dam, int rad);
@@ -820,6 +840,12 @@ extern cptr attr_to_text(byte a);
 extern void build_gamma_table(int gamma);
 extern byte gamma_table[256];
 #endif /* SUPPORT_GAMMA */
+
+extern byte get_angle_to_grid[41][41];
+extern int get_angle_to_target(int y0, int x0, int y1, int x1, int dir);
+extern void get_grid_using_angle(int angle, int y0, int x0,
+	int *ty, int *tx);
+
 
 /* xtra1.c */
 extern void cnv_stat(int val, char *out_val);

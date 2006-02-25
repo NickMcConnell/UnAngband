@@ -189,15 +189,9 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	/* Collect innate attacks */
 	vn = 0;
 	if (l_ptr->flags4 & (RF4_SHRIEK))      vp[vn++] = "shriek for help";
-	if (l_ptr->flags4 & (RF4_SPORE))vp[vn++] = "release spores";
-	if (l_ptr->flags4 & (RF4_GAZE))vp[vn++] = "gaze at you";
-	if (l_ptr->flags4 & (RF4_WAIL))vp[vn++] = "wail at you";
-	if (l_ptr->flags4 & (RF4_SPIT))     vp[vn++] = "spit on you";
-	if (l_ptr->flags4 & (RF4_LASH))     vp[vn++] = "lash at you";
-	if (l_ptr->flags4 & (RF4_SHOOT))     vp[vn++] = "shoot at you";
+	if (l_ptr->flags4 & (RF4_SHRIEK))      vp[vn++] = "create earthquakes";
 	if (l_ptr->flags4 & (RF4_EXPLODE))     vp[vn++] = "explode";
 	if (l_ptr->flags4 & (RF4_AURA)) vp[vn++] = "radiate a powerful aura";
-	if (l_ptr->flags4 & (RF4_THROW)) vp[vn++] = "throw things at you";
 
 
 	/* Describe innate attacks */
@@ -225,28 +219,29 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 
 	/* Collect breaths */
 	vn = 0;
-	if (l_ptr->flags4 & RF4_BR_ACID)		vp[vn++] = "acid";
-	if (l_ptr->flags4 & RF4_BR_ELEC)		vp[vn++] = "lightning";
-	if (l_ptr->flags4 & RF4_BR_FIRE)		vp[vn++] = "fire";
-	if (l_ptr->flags4 & RF4_BR_COLD)		vp[vn++] = "frost";
-	if (l_ptr->flags4 & RF4_BR_POIS)		vp[vn++] = "poison";
-	if (l_ptr->flags4 & RF4_BR_NETH)		vp[vn++] = "nether";
-	if (l_ptr->flags4 & RF4_BR_LITE)		vp[vn++] = "light";
-	if (l_ptr->flags4 & RF4_BR_DARK)		vp[vn++] = "darkness";
-	if (l_ptr->flags4 & RF4_BR_CONF)		vp[vn++] = "confusion";
-	if (l_ptr->flags4 & RF4_BR_SOUN)		vp[vn++] = "sound";
-	if (l_ptr->flags4 & RF4_BR_CHAO)		vp[vn++] = "chaos";
-	if (l_ptr->flags4 & RF4_BR_DISE)		vp[vn++] = "disenchantment";
-	if (l_ptr->flags4 & RF4_BR_NEXU)		vp[vn++] = "nexus";
-	if (l_ptr->flags4 & RF4_BR_TIME)		vp[vn++] = "time";
-	if (l_ptr->flags4 & RF4_BR_INER)		vp[vn++] = "inertia";
-	if (l_ptr->flags4 & RF4_BR_GRAV)		vp[vn++] = "gravity";
-	if (l_ptr->flags4 & RF4_BR_SHAR)		vp[vn++] = "shards";
-	if (l_ptr->flags4 & RF4_BR_PLAS)		vp[vn++] = "plasma";
-	if (l_ptr->flags4 & RF4_BR_WALL)		vp[vn++] = "force";
-	if (l_ptr->flags4 & RF4_BR_MANA)		vp[vn++] = "mana";
-	if (l_ptr->flags4 & RF4_BR_FEAR)		vp[vn++] = "fear";
-	if (l_ptr->flags4 & RF4_XXX6)		vp[vn++] = "something";
+	if (l_ptr->flags4 & RF4_BRTH_ACID)		vp[vn++] = "acid";
+	if (l_ptr->flags4 & RF4_BRTH_ELEC)		vp[vn++] = "lightning";
+	if (l_ptr->flags4 & RF4_BRTH_FIRE)		vp[vn++] = "fire";
+	if (l_ptr->flags4 & RF4_BRTH_COLD)		vp[vn++] = "frost";
+	if (l_ptr->flags4 & RF4_BRTH_POIS)		vp[vn++] = "poison";
+	if (l_ptr->flags4 & RF4_BRTH_PLAS)		vp[vn++] = "plasma";
+	if (l_ptr->flags4 & RF4_BRTH_LITE)		vp[vn++] = "light";
+	if (l_ptr->flags4 & RF4_BRTH_DARK)		vp[vn++] = "darkness";
+	if (l_ptr->flags4 & RF4_BRTH_CONFU)		vp[vn++] = "confusion";
+	if (l_ptr->flags4 & RF4_BRTH_SOUND)		vp[vn++] = "sound";
+	if (l_ptr->flags4 & RF4_BRTH_SHARD)		vp[vn++] = "shards";
+	if (l_ptr->flags4 & RF4_BRTH_INER)		vp[vn++] = "inertia";
+	if (l_ptr->flags4 & RF4_BRTH_GRAV)		vp[vn++] = "gravity";
+	if (l_ptr->flags4 & RF4_BRTH_FORCE)		vp[vn++] = "force";
+	if (l_ptr->flags4 & RF4_BRTH_CHAOS)		vp[vn++] = "chaos";
+	if (l_ptr->flags4 & RF4_BRTH_DISEN)		vp[vn++] = "disenchantment";
+	if (l_ptr->flags4 & RF4_BRTH_NEXUS)		vp[vn++] = "nexus";
+	if (l_ptr->flags4 & RF4_BRTH_NETHR)		vp[vn++] = "nether";
+	if (l_ptr->flags4 & RF4_BRTH_TIME)		vp[vn++] = "time";
+	if (l_ptr->flags4 & RF4_BRTH_MANA)		vp[vn++] = "mana";
+	if (l_ptr->flags4 & RF4_BRTH_FEAR)		vp[vn++] = "holiness";
+	if (l_ptr->flags4 & RF4_BRTH_FEAR)		vp[vn++] = "fear";
+	if (l_ptr->flags4 & RF4_BRTH_DISEA)		vp[vn++] = "disease";
 
 	/* Describe breaths */
 	if (vn)
@@ -273,70 +268,92 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 
 	/* Collect spells */
 	vn = 0;
-	if (l_ptr->flags5 & RF5_BA_ACID)     vp[vn++] = "produce acid balls";
-	if (l_ptr->flags5 & RF5_BA_ELEC)     vp[vn++] = "produce lightning balls";
-	if (l_ptr->flags5 & RF5_BA_FIRE)     vp[vn++] = "produce fire balls";
-	if (l_ptr->flags5 & RF5_BA_COLD)     vp[vn++] = "produce frost balls";
-	if (l_ptr->flags5 & RF5_BA_POIS)     vp[vn++] = "produce poison balls";
-	if (l_ptr->flags5 & RF5_BA_NETH)     vp[vn++] = "produce nether balls";
-	if (l_ptr->flags5 & RF5_BA_WATE)     vp[vn++] = "produce water balls";
-	if (l_ptr->flags5 & RF5_BA_MANA)     vp[vn++] = "invoke mana storms";
-	if (l_ptr->flags5 & RF5_BA_DARK)     vp[vn++] = "invoke darkness storms";
-	if (l_ptr->flags5 & RF5_DRAIN_MANA)  vp[vn++] = "drain mana";
-	if (l_ptr->flags5 & RF5_MIND_BLAST)  vp[vn++] = "cause mind blasting";
-	if (l_ptr->flags5 & RF5_BRAIN_SMASH) vp[vn++] = "cause brain smashing";
-	if (l_ptr->flags5 & RF5_WOUND)       vp[vn++] = "cause wounds";
-	if (l_ptr->flags5 & RF5_HUNGER)      vp[vn++] = "cause hunger";
-	if (l_ptr->flags5 & RF5_XXX3)        vp[vn++] = "do something";
-	if (l_ptr->flags5 & RF5_XXX4)        vp[vn++] = "do something";
-	if (l_ptr->flags5 & RF5_BO_ACID)     vp[vn++] = "produce acid bolts";
-	if (l_ptr->flags5 & RF5_BO_ELEC)     vp[vn++] = "produce lightning bolts";
-	if (l_ptr->flags5 & RF5_BO_FIRE)     vp[vn++] = "produce fire bolts";
-	if (l_ptr->flags5 & RF5_BO_COLD)     vp[vn++] = "produce frost bolts";
-	if (l_ptr->flags5 & RF5_BO_POIS)     vp[vn++] = "produce poison bolts";
-	if (l_ptr->flags5 & RF5_BO_NETH)     vp[vn++] = "produce nether bolts";
-	if (l_ptr->flags5 & RF5_BO_WATE)     vp[vn++] = "produce water bolts";
-	if (l_ptr->flags5 & RF5_BO_MANA)     vp[vn++] = "produce mana bolts";
-	if (l_ptr->flags5 & RF5_BO_PLAS)     vp[vn++] = "produce plasma bolts";
-	if (l_ptr->flags5 & RF5_BO_ICEE)     vp[vn++] = "produce ice bolts";
-	if (l_ptr->flags5 & RF5_MISSILE)     vp[vn++] = "produce magic missiles";
-	if (l_ptr->flags5 & RF5_SCARE)       vp[vn++] = "terrify";
-	if (l_ptr->flags5 & RF5_BLIND)       vp[vn++] = "blind";
-	if (l_ptr->flags5 & RF5_CONF)vp[vn++] = "confuse";
-	if (l_ptr->flags5 & RF5_SLOW)vp[vn++] = "slow";
-	if (l_ptr->flags5 & RF5_HOLD)vp[vn++] = "paralyze";
+	if (l_ptr->flags5 & RF5_BALL_ACID)   vp[vn++] = "produce acid balls";
+	if (l_ptr->flags5 & RF5_BALL_ELEC)   vp[vn++] = "produce lightning balls";
+	if (l_ptr->flags5 & RF5_BALL_FIRE)   vp[vn++] = "produce fire balls";
+	if (l_ptr->flags5 & RF5_BALL_COLD)   vp[vn++] = "produce frost balls";
+	if (l_ptr->flags5 & RF5_BALL_POIS)   vp[vn++] = "produce poison balls";
+	if (l_ptr->flags5 & RF5_BALL_LITE)   vp[vn++] = "produce balls of light";
+	if (l_ptr->flags5 & RF5_BALL_DARK)   vp[vn++] = "invoke darkness storms";
+	if (l_ptr->flags5 & RF5_BALL_CONFU)  vp[vn++] = "produce confusion balls";
+	if (l_ptr->flags5 & RF5_BALL_CONFU)  vp[vn++] = "produce sound balls";
+	if (l_ptr->flags5 & RF5_BALL_CONFU)  vp[vn++] = "produce shard balls";
+	if (l_ptr->flags5 & RF5_BALL_NETHR)  vp[vn++] = "produce nether balls";
+	if (l_ptr->flags5 & RF5_BALL_WATER)  vp[vn++] = "produce chaos balls";
+	if (l_ptr->flags5 & RF5_BALL_MANA)   vp[vn++] = "invoke mana storms";
+	if (l_ptr->flags5 & RF5_BALL_WATER)  vp[vn++] = "produce water balls";
+	if (l_ptr->flags5 & RF5_BOLT_ACID)   vp[vn++] = "produce acid bolts";
+	if (l_ptr->flags5 & RF5_BOLT_ELEC)   vp[vn++] = "produce lightning bolts";
+	if (l_ptr->flags5 & RF5_BOLT_FIRE)   vp[vn++] = "produce fire bolts";
+	if (l_ptr->flags5 & RF5_BOLT_COLD)   vp[vn++] = "produce frost bolts";
+	if (l_ptr->flags5 & RF5_BOLT_POIS)   vp[vn++] = "produce poison bolts";
+	if (l_ptr->flags5 & RF5_BOLT_PLAS)   vp[vn++] = "produce plasma bolts";
+	if (l_ptr->flags5 & RF5_BOLT_ICE)    vp[vn++] = "produce ice bolts";
+	if (l_ptr->flags5 & RF5_BOLT_NETHR)  vp[vn++] = "produce nether bolts";
+	if (l_ptr->flags5 & RF5_BOLT_WATER)  vp[vn++] = "produce water bolts";
+	if (l_ptr->flags5 & RF5_BOLT_MANA)   vp[vn++] = "produce mana bolts";
+	if (l_ptr->flags5 & RF5_BEAM_ELEC)   vp[vn++] = "produce lightening beams";
+	if (l_ptr->flags5 & RF5_BEAM_ICE)    vp[vn++] = "produce ice beams";
+	if (l_ptr->flags5 & RF5_BEAM_NETHR)  vp[vn++] = "produce nether beams";
+
+
 	if (l_ptr->flags6 & RF6_HASTE)       vp[vn++] = "haste-self";
-	if (l_ptr->flags6 & RF6_ADD_MANA)vp[vn++] = "recover mana";
-	if (l_ptr->flags6 & RF6_HEAL)vp[vn++] = "heal-self";
-	if (l_ptr->flags6 & RF6_CURE)vp[vn++] = "cure-self";
+	if (l_ptr->flags6 & RF6_ADD_MANA)    vp[vn++] = "recover mana";
+	if (l_ptr->flags6 & RF6_HEAL)        vp[vn++] = "heal-self";
+	if (l_ptr->flags6 & RF6_CURE)        vp[vn++] = "cure-self";
 	if (l_ptr->flags6 & RF6_BLINK)       vp[vn++] = "blink-self";
 	if (l_ptr->flags6 & RF6_TPORT)       vp[vn++] = "teleport-self";
-	if (l_ptr->flags6 & RF6_XXX3)vp[vn++] = "do something";
+	if (l_ptr->flags6 & RF6_INVIS)       vp[vn++] = "become invisible";
 	if (l_ptr->flags6 & RF6_TELE_SELF_TO)vp[vn++] = "teleport-self to";
 	if (l_ptr->flags6 & RF6_TELE_TO)     vp[vn++] = "teleport to";
 	if (l_ptr->flags6 & RF6_TELE_AWAY)   vp[vn++] = "teleport away";
 	if (l_ptr->flags6 & RF6_TELE_LEVEL)  vp[vn++] = "teleport level";
-	if (l_ptr->flags6 & RF6_XXX5)vp[vn++] = "do something";
+	if (l_ptr->flags6 & RF6_WRAITHFORM)  vp[vn++] = "assume wraithform";
 	if (l_ptr->flags6 & RF6_DARKNESS)    vp[vn++] = "create darkness";
 	if (l_ptr->flags6 & RF6_TRAPS)       vp[vn++] = "create traps";
 	if (l_ptr->flags6 & RF6_FORGET)      vp[vn++] = "cause amnesia";
-	if (l_ptr->flags6 & RF6_XXX6)vp[vn++] = "do something";
-	if (l_ptr->flags6 & RF6_S_KIN)       vp[vn++] = "summon similar monsters";
-	if (l_ptr->flags6 & RF6_S_MONSTER)   vp[vn++] = "summon a monster";
-	if (l_ptr->flags6 & RF6_S_MONSTERS)  vp[vn++] = "summon monsters";
-	if (l_ptr->flags6 & RF6_S_ANIMAL)    vp[vn++] = "summon animals";
-	if (l_ptr->flags6 & RF6_S_SPIDER)    vp[vn++] = "summon spiders";
-	if (l_ptr->flags6 & RF6_S_HOUND)     vp[vn++] = "summon hounds";
-	if (l_ptr->flags6 & RF6_S_HYDRA)     vp[vn++] = "summon hydras";
-	if (l_ptr->flags6 & RF6_S_ANGEL)     vp[vn++] = "summon an angel";
-	if (l_ptr->flags6 & RF6_S_DEMON)     vp[vn++] = "summon a demon";
-	if (l_ptr->flags6 & RF6_S_UNDEAD)    vp[vn++] = "summon an undead";
-	if (l_ptr->flags6 & RF6_S_DRAGON)    vp[vn++] = "summon a dragon";
-	if (l_ptr->flags6 & RF6_S_HI_UNDEAD) vp[vn++] = "summon Greater Undead";
-	if (l_ptr->flags6 & RF6_S_HI_DRAGON) vp[vn++] = "summon Ancient Dragons";
-	if (l_ptr->flags6 & RF6_S_HI_DEMON)  vp[vn++] = "summon Greater Demons";
-	if (l_ptr->flags6 & RF6_S_WRAITH)    vp[vn++] = "summon Ring Wraiths";
-	if (l_ptr->flags6 & RF6_S_UNIQUE)    vp[vn++] = "summon Unique Monsters";
+	if (l_ptr->flags6 & RF6_DRAIN_MANA)  vp[vn++] = "drain mana";
+	if (l_ptr->flags6 & RF6_CURSE)       vp[vn++] = "curse you";
+	if (l_ptr->flags6 & RF6_DISPEL)      vp[vn++] = "dispel enchantments";
+	if (l_ptr->flags6 & RF6_MIND_BLAST)  vp[vn++] = "cause mind blasting";
+	if (l_ptr->flags6 & RF6_BRAIN_SMASH) vp[vn++] = "cause brain smashing";
+	if (l_ptr->flags6 & RF6_WOUND)       vp[vn++] = "cause wounds";
+	if (l_ptr->flags6 & RF6_HERO)        vp[vn++] = "become heroic";
+	if (l_ptr->flags6 & RF6_BESERK)      vp[vn++] = "become beserk";
+	if (l_ptr->flags6 & RF6_SHIELD)      vp[vn++] = "create a shield";
+	if (l_ptr->flags6 & RF6_OPPOSE_ELEM) vp[vn++] = "become resistant to the elements";
+	if (l_ptr->flags6 & RF6_HUNGER)      vp[vn++] = "cause hunger";
+	if (l_ptr->flags6 & RF6_PROBE)       vp[vn++] = "probe your weaknesses";
+	if (l_ptr->flags6 & RF6_SCARE)       vp[vn++] = "terrify";
+	if (l_ptr->flags6 & RF6_BLIND)       vp[vn++] = "blind";
+	if (l_ptr->flags6 & RF6_CONF)        vp[vn++] = "confuse";
+	if (l_ptr->flags6 & RF6_SLOW)        vp[vn++] = "slow";
+	if (l_ptr->flags6 & RF6_HOLD)        vp[vn++] = "paralyze";
+
+	if (l_ptr->flags6 & RF7_S_KIN)       vp[vn++] = "summon similar monsters";
+	if (l_ptr->flags6 & RF7_R_KIN)       vp[vn++] = "raise similar monsters from the dead";
+	if (l_ptr->flags6 & RF7_S_MONSTER)   vp[vn++] = "summon a monster";
+	if (l_ptr->flags6 & RF7_S_MONSTERS)  vp[vn++] = "summon monsters";
+	if (l_ptr->flags6 & RF7_R_MONSTER)   vp[vn++] = "raise a monster from the dead";
+	if (l_ptr->flags6 & RF7_R_MONSTERS)  vp[vn++] = "raise monsters from the dead";
+	if (l_ptr->flags6 & RF7_S_ANT)       vp[vn++] = "summon ants";
+	if (l_ptr->flags6 & RF7_S_ANIMAL)    vp[vn++] = "summon animals";
+	if (l_ptr->flags6 & RF7_S_HOUND)     vp[vn++] = "summon hounds";
+	if (l_ptr->flags6 & RF7_S_SPIDER)    vp[vn++] = "summon spiders";
+	if (l_ptr->flags6 & RF7_S_HYDRA)     vp[vn++] = "summon hydras";
+	if (l_ptr->flags6 & RF7_S_THIEF)     vp[vn++] = "summon thieves";
+	if (l_ptr->flags6 & RF7_S_BERTBILLTOM) vp[vn++] = "summon his friends";
+	if (l_ptr->flags6 & RF7_S_AINU)      vp[vn++] = "summon a maia";
+	if (l_ptr->flags6 & RF7_S_DRAGON)    vp[vn++] = "summon a dragon";
+	if (l_ptr->flags6 & RF7_S_HI_DRAGON) vp[vn++] = "summon Ancient Dragons";
+	if (l_ptr->flags6 & RF7_S_DEMON)     vp[vn++] = "summon a demon";
+	if (l_ptr->flags6 & RF7_S_HI_DEMON)  vp[vn++] = "summon Greater Demons";
+	if (l_ptr->flags6 & RF7_R_UNIQUE)    vp[vn++] = "raise Unique Monsters from the dead";
+	if (l_ptr->flags6 & RF7_S_UNIQUE)    vp[vn++] = "summon Unique Monsters";
+	if (l_ptr->flags6 & RF7_S_HI_UNIQUE) vp[vn++] = "summon Legendary and Unique Monsters";
+	if (l_ptr->flags6 & RF7_S_UNDEAD)    vp[vn++] = "summon an undead";
+	if (l_ptr->flags6 & RF7_S_HI_UNDEAD) vp[vn++] = "summon Greater Undead";
+	if (l_ptr->flags6 & RF7_S_WRAITH)    vp[vn++] = "summon Ring Wraiths";
 
 	/* Describe spells */
 	if (vn)
@@ -477,20 +494,20 @@ static void describe_monster_drop(int r_idx, const monster_lore *l_ptr)
 		/* Objects */
 		if (l_ptr->drop_item)
 		{
-			if (l_ptr->flags7 & (RF7_DROP_CHEST)) vp[vn++] = "chest";
-			if (l_ptr->flags7 & (RF7_DROP_WEAPON)) vp[vn++] = "weapon";
-			if (l_ptr->flags7 & (RF7_DROP_MISSILE)) vp[vn++] = "missile weapon";
-			if (l_ptr->flags7 & (RF7_DROP_ARMOR)) vp[vn++] = "armour";
-			if (l_ptr->flags7 & (RF7_DROP_CLOTHES)) vp[vn++] = "garment";
-			if (l_ptr->flags7 & (RF7_DROP_TOOL)) vp[vn++] = "tool";
-			if (l_ptr->flags7 & (RF7_DROP_LITE)) vp[vn++] = "lite";
-			if (l_ptr->flags7 & (RF7_DROP_JEWELRY)) vp[vn++] = "adornment";
-			if (l_ptr->flags7 & (RF7_DROP_RSW)) vp[vn++] = "magical device";
-			if (l_ptr->flags7 & (RF7_DROP_WRITING)) vp[vn++] = "written item";
-			if (l_ptr->flags7 & (RF7_DROP_MUSIC)) vp[vn++] = "musical item";
-			if (l_ptr->flags7 & (RF7_DROP_POTION)) vp[vn++] = "potion";
-			if (l_ptr->flags7 & (RF7_DROP_FOOD)) vp[vn++] = "edible item";
-			if (l_ptr->flags7 & (RF7_DROP_JUNK)) vp[vn++] = "junk item";
+			if (l_ptr->flags8 & (RF8_DROP_CHEST)) vp[vn++] = "chest";
+			if (l_ptr->flags8 & (RF8_DROP_WEAPON)) vp[vn++] = "weapon";
+			if (l_ptr->flags8 & (RF8_DROP_MISSILE)) vp[vn++] = "missile weapon";
+			if (l_ptr->flags8 & (RF8_DROP_ARMOR)) vp[vn++] = "armour";
+			if (l_ptr->flags8 & (RF8_DROP_CLOTHES)) vp[vn++] = "garment";
+			if (l_ptr->flags8 & (RF8_DROP_TOOL)) vp[vn++] = "tool";
+			if (l_ptr->flags8 & (RF8_DROP_LITE)) vp[vn++] = "lite";
+			if (l_ptr->flags8 & (RF8_DROP_JEWELRY)) vp[vn++] = "adornment";
+			if (l_ptr->flags8 & (RF8_DROP_RSW)) vp[vn++] = "magical device";
+			if (l_ptr->flags8 & (RF8_DROP_WRITING)) vp[vn++] = "written item";
+			if (l_ptr->flags8 & (RF8_DROP_MUSIC)) vp[vn++] = "musical item";
+			if (l_ptr->flags8 & (RF8_DROP_POTION)) vp[vn++] = "potion";
+			if (l_ptr->flags8 & (RF8_DROP_FOOD)) vp[vn++] = "edible item";
+			if (l_ptr->flags8 & (RF8_DROP_JUNK)) vp[vn++] = "junk item";
 
 			/* Only drop mushrooms? */
 			if (get_food_type(r_ptr))
@@ -606,9 +623,9 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr)
 			case RBM_BEG:	p = "beg"; break;
 			case RBM_INSULT:	p = "insult"; break;
 			case RBM_MOAN:	p = "moan"; break;
-			case RBM_THROW:	p = "throw"; break;
+			case RBM_SHOT:	p = "shoot you with a slingshot"; break;
 			case RBM_TRAP: p = "trap"; break;
-			case RBM_SHOOT: p = "shoot"; break;
+			case RBM_BOULDER: p = "throw a boulder at you"; break;
 			case RBM_AURA: p = "radiate"; break;
 			case RBM_SELF: p = "affect itself";break;
 			case RBM_ADJACENT: p = "affect all adjacent"; break;
@@ -629,10 +646,17 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr)
 			case RBM_AIM: p = "affect a target"; break;
 			case RBM_ORB: p = "create an orb"; break;
 			case RBM_STAR: p = "create a star"; break;
-			case RBM_CROSS: p = "create a cross"; break;
 			case RBM_SPHERE: p = "create a sphere"; break;
 			case RBM_PANEL: p = "affect the current panel"; break;
 			case RBM_LEVEL: p = "affect the current level"; break;
+			case RBM_CROSS: p = "create a cross"; break;
+			case RBM_STRIKE: p = "strike"; break;
+			case RBM_EXPLODE: p = "explode"; break;
+			case RBM_ARROW:	p = "shoot you with a bow"; break;
+			case RBM_XBOLT:	p = "shoot you with a crossbow"; break;
+			case RBM_SPIKE:	p = "shoot you with a spike"; break;
+			case RBM_DART:	p = "shoot you with a dart"; break;
+
 		}
 
 
@@ -684,18 +708,18 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr)
 			case GF_AWAY_ALL: q = "teleport away";break;
 			case GF_TURN_UNDEAD: q = "turn undead";break;
 			case GF_TURN_EVIL: q = "turn evil";break;
-			case GF_TURN_ALL: q = "turn all";break;
+			case GF_FEAR_WEAK: q = "terrify";break;
 			case GF_DISP_UNDEAD: q = "dispel undead";break;
 			case GF_DISP_EVIL: q = "dispel evil";break;
 			case GF_DISP_ALL: q = "dispel all";break;
-			case GF_OLD_CLONE: q = "clone";break;
-			case GF_OLD_POLY: q = "polymorph";break;
-			case GF_OLD_HEAL: q = "heal";break;
-			case GF_OLD_SPEED: q = "hasten";break;
-			case GF_OLD_SLOW: q = "slow";break;
-			case GF_OLD_CONF: q = "confuse";break;
-			case GF_OLD_SLEEP: q = "send to sleep";break;
-			case GF_OLD_DRAIN: q = "drain life";break;
+			case GF_CLONE: q = "clone";break;
+			case GF_POLY: q = "polymorph";break;
+			case GF_HEAL: q = "heal";break;
+			case GF_HASTE: q = "hasten";break;
+			case GF_SLOW_WEAK: q = "slow";break;
+			case GF_CONF_WEAK: q = "confuse";break;
+			case GF_SLEEP: q = "send to sleep";break;
+			case GF_DRAIN_LIFE: q = "drain life";break;
 			case GF_LAVA: q = "burn with lava";break;
 			case GF_BWATER: q = "scald with boiling water";break;
 			case GF_BMUD: q = "splash with boiling mud";break;
@@ -739,6 +763,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr)
 			case GF_LOSE_MANA:	q = "drain mana"; break;
 			case GF_WOUND:		q = "wound"; break;
 			case GF_BATTER:		q = "batter"; break;
+			case GF_BLIND_WEAK:		q = "blind"; break;
 		}
 
 

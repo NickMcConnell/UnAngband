@@ -3049,7 +3049,7 @@ static void build_type6(int y0, int x0)
 				name = "acid dragon";
 
 				/* Restrict dragon breath type */
-				vault_aux_dragon_mask4 = RF4_BR_ACID;
+				vault_aux_dragon_mask4 = RF4_BRTH_ACID;
 
 				/* Done */
 				break;
@@ -3062,7 +3062,7 @@ static void build_type6(int y0, int x0)
 				name = "electric dragon";
 
 				/* Restrict dragon breath type */
-				vault_aux_dragon_mask4 = RF4_BR_ELEC;
+				vault_aux_dragon_mask4 = RF4_BRTH_ELEC;
 
 				/* Done */
 				break;
@@ -3075,7 +3075,7 @@ static void build_type6(int y0, int x0)
 				name = "fire dragon";
 
 				/* Restrict dragon breath type */
-				vault_aux_dragon_mask4 = RF4_BR_FIRE;
+				vault_aux_dragon_mask4 = RF4_BRTH_FIRE;
 
 				/* Done */
 				break;
@@ -3088,7 +3088,7 @@ static void build_type6(int y0, int x0)
 				name = "cold dragon";
 
 				/* Restrict dragon breath type */
-				vault_aux_dragon_mask4 = RF4_BR_COLD;
+				vault_aux_dragon_mask4 = RF4_BRTH_COLD;
 
 				/* Done */
 				break;
@@ -3101,7 +3101,7 @@ static void build_type6(int y0, int x0)
 				name = "poison dragon";
 
 				/* Restrict dragon breath type */
-				vault_aux_dragon_mask4 = RF4_BR_POIS;
+				vault_aux_dragon_mask4 = RF4_BRTH_POIS;
 
 				/* Done */
 				break;
@@ -3114,9 +3114,9 @@ static void build_type6(int y0, int x0)
 				name = "multi-hued dragon";
 
 				/* Restrict dragon breath type */
-				vault_aux_dragon_mask4 = (RF4_BR_ACID | RF4_BR_ELEC |
-							  RF4_BR_FIRE | RF4_BR_COLD |
-							  RF4_BR_POIS);
+				vault_aux_dragon_mask4 = (RF4_BRTH_ACID | RF4_BRTH_ELEC |
+							  RF4_BRTH_FIRE | RF4_BRTH_COLD |
+							  RF4_BRTH_POIS);
 
 				/* Done */
 				break;
@@ -3129,7 +3129,7 @@ static void build_type6(int y0, int x0)
 				name = "brass dragon";
 
 				/* Restrict dragon breath type */
-				vault_aux_dragon_mask4 = (RF4_BR_ACID | RF4_BR_DISE);
+				vault_aux_dragon_mask4 = (RF4_BRTH_ACID | RF4_BRTH_DISEN);
 
 				/* Done */
 				break;
@@ -3143,7 +3143,7 @@ static void build_type6(int y0, int x0)
 				name = "copper dragon";
 
 				/* Restrict dragon breath type */
-				vault_aux_dragon_mask4 = (RF4_BR_ELEC | RF4_BR_NEXU);
+				vault_aux_dragon_mask4 = (RF4_BRTH_ELEC | RF4_BRTH_NEXUS);
 
 				/* Done */
 				break;
@@ -3156,7 +3156,7 @@ static void build_type6(int y0, int x0)
 				name = "bronze dragon";
 
 				/* Restrict dragon breath type */
-				vault_aux_dragon_mask4 = (RF4_BR_FIRE | RF4_BR_CONF);
+				vault_aux_dragon_mask4 = (RF4_BRTH_FIRE | RF4_BRTH_CONFU);
 
 				/* Done */
 				break;
@@ -3169,7 +3169,7 @@ static void build_type6(int y0, int x0)
 				name = "silver dragon";
 
 				/* Restrict dragon breath type */
-				vault_aux_dragon_mask4 = (RF4_BR_COLD | RF4_BR_NEXU);
+				vault_aux_dragon_mask4 = (RF4_BRTH_COLD | RF4_BRTH_NEXUS);
 
 				/* Done */
 				break;
@@ -3182,7 +3182,7 @@ static void build_type6(int y0, int x0)
 				name = "gold dragon";
 
 				/* Restrict dragon breath type */
-				vault_aux_dragon_mask4 = (RF4_BR_COLD | RF4_BR_SOUN);
+				vault_aux_dragon_mask4 = (RF4_BRTH_COLD | RF4_BRTH_SOUND);
 
 				/* Done */
 				break;

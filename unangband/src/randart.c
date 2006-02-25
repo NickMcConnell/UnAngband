@@ -1157,257 +1157,470 @@ static errr init_names(void)
 
 static long eval_max_dam(int r_idx)
 {
-	int i;
-	long dam = 0;
-	long hp;
-	long breath_dam, melee_dam, atk_dam;
+	int i, x;
+	u32b dam = 1;
+	u32b hp;
+	u32b melee_dam, atk_dam, spell_dam;
 	byte rlev;
-	monster_race *rptr;
+	monster_race *r_ptr;
+	u32b flag, breath_mask, attack_mask;
+	u32b flag_counter;
 
-	rptr = &r_info[r_idx];
+	r_ptr = &r_info[r_idx];
+
+	/*clear the counters*/
+	melee_dam = atk_dam = spell_dam = 0;
 
 	/* Evaluate average HP for this monster */
+	if (r_ptr->flags1 & (RF1_FORCE_MAXHP)) hp = r_ptr->hdice * r_ptr->hside;
+	else hp = r_ptr->hdice * (r_ptr->hside + 1) / 2;
 
-	if (rptr->flags1 & (RF1_FORCE_MAXHP)) hp = rptr->hdice * rptr->hside;
-	else hp = rptr->hdice * (rptr->hside + 1) / 2;
+	/* Extract the monster level, force 1 for town monsters */
+	rlev = ((r_ptr->level >= 1) ? r_ptr->level : 1);
 
-	/* Extract the monster level */
-	rlev = ((rptr->level >= 1) ? rptr->level : 1);
+	for (x = 0; x < 4; x++)
+	{
 
-	/* Note the following code for average damage depends on
-	 * a lot of "magic numbers" in melee2.c.  This is
-	 * unavoidable.  Any change to the damage calculations
-	 * in melee2.c may render the following inaccurate or
-	 * obsolete.
-	 *
-	 * To do: (perhaps) change melee2.c to work with #define
-	 * statements or separate methods that can be called from
-	 * here, eliminating the need for duplication.
-	 */
+		/*Get the flags 4 monster flags and masks*/
+		switch (x)
+		{
+			case 0:
+			{
+		 		flag = r_ptr->flags4;
+				attack_mask = RF4_ATTACK_MASK;
+				breath_mask = RF4_BREATH_MASK;
+				break;
+			}
+			case 1:
+			{
+		 		flag = r_ptr->flags5;
+				attack_mask = RF5_ATTACK_MASK;
+				breath_mask = RF5_BREATH_MASK;
+				break;
+			}
+			case 2:
+			{
+		 		flag = r_ptr->flags6;
+				attack_mask = RF6_ATTACK_MASK;
+				breath_mask = RF6_BREATH_MASK;
+				break;
+			}
+			case 3:
+			default:
+			{
+		 		flag = r_ptr->flags7;
+				attack_mask = RF7_ATTACK_MASK;
+				breath_mask = RF7_BREATH_MASK;
+				break;
+			}
+		}
 
-	/* Assume single resist for the elemental attacks */
-	breath_dam = ((hp / 3) > 1600 ? 533 : (hp / 9));
-	if ((rptr->flags4 & RF4_BR_ACID) && dam < breath_dam) dam = breath_dam;
-	if ((rptr->flags4 & RF4_BR_ELEC) && dam < breath_dam) dam = breath_dam;
-	if ((rptr->flags4 & RF4_BR_FIRE) && dam < breath_dam) dam = breath_dam;
-	if ((rptr->flags4 & RF4_BR_COLD) && dam < breath_dam) dam = breath_dam;
-	/* Same for poison, but lower damage cap */
-	breath_dam = ((hp / 3) > 800 ? 266 : (hp / 9));
-	if ((rptr->flags4 & RF4_BR_POIS) && dam < breath_dam) dam = breath_dam;
-	/*
-	 * Different formulae for the high resist attacks
-	 * (remember, we are assuming maximum resisted damage)
-	 * See also: melee2.c, spells1.c
-	 */
-	breath_dam = ((hp / 6) > 550 ? 471 : ((hp * 6) / 42));
-	if ((rptr->flags4 & RF4_BR_NETH) && dam < breath_dam) dam = breath_dam;
-	breath_dam = ((hp / 6) > 500 ? 428 : ((hp * 6) / 42));
-	if ((rptr->flags4 & RF4_BR_CHAO) && dam < breath_dam) dam = breath_dam;
-	if ((rptr->flags4 & RF4_BR_DISE) && dam < breath_dam) dam = breath_dam;
-	if ((rptr->flags4 & RF4_BR_SHAR) && dam < breath_dam) dam = breath_dam;
-	breath_dam = ((hp / 6) > 400 ? 228 : ((hp * 4) / 42));
-	if ((rptr->flags4 & RF4_BR_LITE) && dam < breath_dam) dam = breath_dam;
-	if ((rptr->flags4 & RF4_BR_DARK) && dam < breath_dam) dam = breath_dam;
-	breath_dam = ((hp / 6) > 400 ? 285 : ((hp * 5) / 42));
-	if ((rptr->flags4 & RF4_BR_CONF) && dam < breath_dam) dam = breath_dam;
-	breath_dam = ((hp / 6) > 500 ? 357 : ((hp * 5) / 42));
-	if ((rptr->flags4 & RF4_BR_SOUN) && dam < breath_dam) dam = breath_dam;
-	breath_dam = ((hp / 6) > 400 ? 342 : ((hp * 6) / 42));
-	if ((rptr->flags4 & RF4_BR_NEXU) && dam < breath_dam) dam = breath_dam;
-	breath_dam = ((hp / 3) > 150 ? 150 : (hp / 9));
-	if ((rptr->flags4 & RF4_BR_TIME) && dam < breath_dam) dam = breath_dam;
-	breath_dam = ((hp / 6) > 200 ? 200 : (hp / 6));
-	if ((rptr->flags4 & RF4_BR_INER) && dam < breath_dam) dam = breath_dam;
-	breath_dam = ((hp / 3) > 200 ? 200 : (hp / 3));
-	if ((rptr->flags4 & RF4_BR_GRAV) && dam < breath_dam) dam = breath_dam;
-	breath_dam = ((hp / 6) > 150 ? 150 : (hp / 6));
-	if ((rptr->flags4 & RF4_BR_PLAS) && dam < breath_dam) dam = breath_dam;
-	breath_dam = ((hp / 6) > 200 ? 200 : (hp / 6));
-	if ((rptr->flags4 & RF4_BR_WALL) && dam < breath_dam) dam = breath_dam;
+		/*no spells here, continue*/
+		if (!flag) continue;
 
-	/* Handle the attack spells, again assuming single resists */
+		flag_counter = 0x00000001;
 
-	if ((rptr->flags5 & RF5_BA_ACID) && dam < (rlev * 3 + 15) / 3)
-		dam = (rlev * 3 + 15) / 3;
-	if ((rptr->flags5 & RF5_BA_ELEC) && dam < ((rlev * 3 / 2) + 8) / 3)
-		dam = ((rlev * 3 / 2) + 8) / 3;
-	if ((rptr->flags5 & RF5_BA_FIRE) && dam < ((rlev * 7 / 2) + 10) / 3)
-		dam = ((rlev * 7 / 2) + 10) / 3;
-	if ((rptr->flags5 & RF5_BA_COLD) && dam < ((rlev * 3 / 2) + 10) / 3)
-		dam = ((rlev * 3 / 2) + 10) / 3;
-	if ((rptr->flags5 & RF5_BA_POIS) && dam < 8)
-		dam = 8;
-	if ((rptr->flags5 & RF5_BA_NETH) && dam < ((rlev + 150) * 6) / 7)
-		dam = ((rlev + 150) * 6) / 7;
-	if ((rptr->flags5 & RF5_BA_WATE) && dam < ((rlev * 5) / 2) + 50)
-		dam = ((rlev * 5) / 2) + 50;
-	if ((rptr->flags5 & RF5_BA_MANA) && dam < rlev * 5 + 100)
-		dam = rlev * 5 + 100;
-	if ((rptr->flags5 & RF5_BA_DARK) && dam < ((rlev * 5 + 100) * 4) / 7)
-		dam = (rlev * 20 + 400) / 7;
-	/* Small annoyance value */
-	if ((rptr->flags5 & RF5_DRAIN_MANA) && dam < 5)
-		dam = 5;
-	/* For all attack forms the player can save against, damage is halved */
-	if ((rptr->flags5 & RF5_MIND_BLAST) && dam < 32)
-		dam = 32;
-	if ((rptr->flags5 & RF5_BRAIN_SMASH) && dam < 90)
-		dam = 90;
-	if ((rptr->flags5 & RF5_BO_ACID) && dam < ((rlev / 3) + 56) / 3)
-		dam = ((rlev / 3) + 56) / 3;
-	if ((rptr->flags5 & RF5_BO_ELEC) && dam < ((rlev / 3) + 32) / 3)
-		dam = ((rlev / 3) + 32) / 3;
-	if ((rptr->flags5 & RF5_BO_FIRE) && dam < ((rlev / 3) + 72) / 3)
-		dam = ((rlev / 3) + 72) / 3;
-	if ((rptr->flags5 & RF5_BO_COLD) && dam < ((rlev / 3) + 48) / 3)
-		dam = ((rlev / 3) + 48) / 3;
-	if ((rptr->flags5 & RF5_BO_NETH) && dam < ((rlev * 18) / 2 + 330) / 7)
-		dam = ((rlev * 18) / 2 + 330) / 7;
-	if ((rptr->flags5 & RF5_BO_WATE) && dam < rlev + 100)
-		dam = rlev + 100;
-	if ((rptr->flags5 & RF5_BO_MANA) && dam < (rlev * 7) / 2 + 50)
-		dam = (rlev * 7) / 2 + 50;
-	if ((rptr->flags5 & RF5_BO_PLAS) && dam < rlev + 66)
-		dam = rlev + 66;
-	if ((rptr->flags5 & RF5_BO_ICEE) && dam < (rlev + 36) / 3)
-		dam = (rlev + 36) / 3;
-	/* Small annoyance value */
-	if ((rptr->flags5 & RF5_SCARE) && dam < 5)
-		dam = 5;
-	/* Somewhat higher annoyance values */
-	if ((rptr->flags5 & RF5_BLIND) && dam < 10)
-		dam = 8;
-	if ((rptr->flags5 & RF5_CONF) && dam < 10)
-		dam = 10;
-	/* A little more dangerous */
-	if ((rptr->flags5 & RF5_SLOW) && dam < 15)
-		dam = 15;
-	/* Quite dangerous at an early level */
-	if ((rptr->flags5 & RF5_HOLD) && dam < 25)
-		dam = 25;
-	/* Arbitrary values along similar lines from here on */
-	if ((rptr->flags6 & RF6_HASTE) && dam < 70)
-		dam = 70;
-	if ((rptr->flags6 & RF6_HEAL) && dam < 30)
-		dam = 30;
-	if ((rptr->flags6 & RF6_BLINK) && dam < 5)
-		dam = 15;
-	if ((rptr->flags6 & RF6_TELE_TO) && dam < 25)
-		dam = 25;
-	if ((rptr->flags6 & RF6_TELE_AWAY) && dam < 25)
-		dam = 25;
-	if ((rptr->flags6 & RF6_TELE_LEVEL) && dam < 40)
-		dam = 25;
-	if ((rptr->flags6 & RF6_DARKNESS) && dam < 5)
-		dam = 6;
-	if ((rptr->flags6 & RF6_TRAPS) && dam < 10)
-		dam = 5;
-	if ((rptr->flags6 & RF6_FORGET) && dam < 25)
-		dam = 5;
-	/* All summons are assigned arbitrary values */
-	/* Summon kin is more dangerous at deeper levels */
-	if ((rptr->flags6 & RF6_S_KIN) && dam < rlev * 2)
-		dam = rlev * 2;
-	/* Dangerous! */
-	if ((rptr->flags6 & RF6_S_HI_DEMON) && dam < 250)
-		dam = 250;
-	/* Somewhat dangerous */
-	if ((rptr->flags6 & RF6_S_MONSTER) && dam < 40)
-		dam = 40;
-	/* More dangerous */
-	if ((rptr->flags6 & RF6_S_MONSTERS) && dam < 80)
-		dam = 80;
-	/* Mostly just annoying */
-	if ((rptr->flags6 & RF6_S_ANIMAL) && dam < 30)
-		dam = 30;
-	if ((rptr->flags6 & RF6_S_SPIDER) && dam < 20)
-		dam = 20;
-	/* Can be quite dangerous */
-	if ((rptr->flags6 & RF6_S_HOUND) && dam < 100)
-		dam = 100;
-	/* Dangerous! */
-	if ((rptr->flags6 & RF6_S_HYDRA) && dam < 150)
-		dam = 150;
-	/* Can be quite dangerous */
-	if ((rptr->flags6 & RF6_S_ANGEL) && dam < 150)
-		dam = 150;
-	/* All of these more dangerous at higher levels */
-	if ((rptr->flags6 & RF6_S_DEMON) && dam < (rlev * 3) / 2)
-		dam = (rlev * 3) / 2;
-	if ((rptr->flags6 & RF6_S_UNDEAD) && dam < (rlev * 3) / 2)
-		dam = (rlev * 3) / 2;
-	if ((rptr->flags6 & RF6_S_DRAGON) && dam < (rlev * 3) / 2)
-		dam = (rlev * 3) / 2;
-	/* Extremely dangerous */
-	if ((rptr->flags6 & RF6_S_HI_UNDEAD) && dam < 400)
-		dam = 400;
-	/* Extremely dangerous */
-	if ((rptr->flags6 & RF6_S_HI_DRAGON) && dam < 400)
-		dam = 400;
-	/* Extremely dangerous */
-	if ((rptr->flags6 & RF6_S_WRAITH) && dam < 450)
-		dam = 450;
-	/* Most dangerous summon */
-	if ((rptr->flags6 & RF6_S_UNIQUE) && dam < 500)
-		dam = 500;
+		/* using 32 assumes a u32b flag size*/
+		for (i = 0; i < 32; i++)
+		{
+			u16b this_dam = 0;
 
-	/* Do melee attacks now */
+			/* First make sure monster has the flag*/
+			if (flag & flag_counter)
+			{
+				/*Is it a breath? Should only be flag 4*/
+				if (breath_mask & flag_counter)
+				{
+					int which_gf = 0;
+					int mult = 1;
+					int div_by = 1;
 
-	melee_dam = 0;
+					/*hack - all breaths are in flag 4*/
+
+					if (flag_counter == RF4_BRTH_ACID) 		which_gf = GF_ACID;
+					else if (flag_counter == RF4_BRTH_ELEC) which_gf = GF_ELEC;
+					else if (flag_counter == RF4_BRTH_FIRE) which_gf = GF_FIRE;
+					else if (flag_counter == RF4_BRTH_COLD) which_gf = GF_COLD;
+					else if (flag_counter == RF4_BRTH_POIS)
+					{
+						which_gf = GF_POIS;
+						mult = 10;
+						div_by = 9;
+					}
+					else if (flag_counter == RF4_BRTH_PLAS)
+					{
+						which_gf = GF_PLASMA;
+						mult = 5;
+						div_by = 4;
+					}
+					else if (flag_counter == RF4_BRTH_LITE)
+					{
+						which_gf = GF_LITE;
+						mult = 5;
+						div_by = 4;
+					}
+					else if (flag_counter == RF4_BRTH_DARK)
+					{
+						which_gf = GF_DARK;
+						mult = 5;
+						div_by = 4;
+					}
+					else if (flag_counter == RF4_BRTH_CONFU)
+					{
+						which_gf = GF_CONFUSION;
+						mult = 4;
+						div_by = 3;
+					}
+					else if (flag_counter == RF4_BRTH_SOUND)
+					{
+						which_gf = GF_SOUND;
+						mult = 6;
+						div_by = 5;
+					}
+					else if (flag_counter == RF4_BRTH_SHARD)
+					{
+						which_gf = GF_SHARD;
+						mult = 8;
+						div_by = 7;
+					}
+					else if (flag_counter == RF4_BRTH_INER)
+					{
+						which_gf = GF_INERTIA;
+						mult = 3;
+						div_by = 2;
+					}
+					else if (flag_counter == RF4_BRTH_GRAV)
+					{
+						which_gf = GF_GRAVITY;
+						mult = 3;
+						div_by = 2;
+					}
+					else if (flag_counter == RF4_BRTH_FORCE)
+					{
+						which_gf = GF_FORCE;
+						mult = 6;
+						div_by = 5;
+					}
+					else if (flag_counter == RF4_BRTH_NEXUS)
+					{
+						which_gf = GF_NEXUS;
+						mult = 5;
+						div_by = 4;
+					}
+					else if (flag_counter == RF4_BRTH_NETHR)
+					{
+						which_gf = GF_NETHER;
+						mult = 5;
+						div_by = 4;
+					}
+					else if (flag_counter == RF4_BRTH_CHAOS)
+					{
+						which_gf = GF_CHAOS;
+						mult = 4;
+						div_by = 3;
+					}
+					else if (flag_counter == RF4_BRTH_DISEN)
+					{
+						which_gf = GF_DISENCHANT;
+						mult = 4;
+						div_by = 3;
+					}
+					else if (flag_counter == RF4_BRTH_TIME)
+					{
+						which_gf = GF_TIME;
+						mult = 3;
+						div_by = 2;
+					}
+					else if (flag_counter == RF4_BRTH_MANA) which_gf = GF_MANA;
+
+					if (which_gf)
+					{
+						this_dam = get_breath_dam(hp, which_gf,
+									(r_ptr->flags2 & (RF2_POWERFUL) ? TRUE : FALSE));
+
+						/* handle elemental breaths*/
+						switch (which_gf)
+					    {
+							case GF_ACID:
+							case GF_FIRE:
+							case GF_COLD:
+							case GF_ELEC:
+							case GF_POIS:
+							{
+								/* Lets just pretend the player has the right base resist*/
+								this_dam /= 3;
+
+								break;
+							}
+
+							default: break;
+						}
+
+						this_dam = (this_dam * mult) / div_by;
+
+						/*slight bonus for cloud_surround*/
+						if (r_ptr->flags2 & RF2_HAS_AURA) this_dam = this_dam * 11 / 10;
+					}
+				}
+
+				/*Is it an arrow, bolt, beam, or ball?*/
+				else if (attack_mask & flag_counter)
+				{
+					switch (x)
+					{
+						case 0:
+						{
+							this_dam = r_ptr->spell_power * spell_info_RF4[i][COL_SPELL_DAM_MULT];
+							this_dam /=  MAX(1, spell_info_RF4[i][COL_SPELL_DAM_DIV]);
+							break;
+						}
+						case 1:
+						{
+							this_dam = r_ptr->spell_power * spell_info_RF5[i][COL_SPELL_DAM_MULT];
+							this_dam /=  MAX(1, spell_info_RF5[i][COL_SPELL_DAM_DIV]);
+							break;
+						}
+						case 2:
+						{
+							this_dam = r_ptr->spell_power * spell_info_RF6[i][COL_SPELL_DAM_MULT];
+							this_dam /=  MAX(1, spell_info_RF6[i][COL_SPELL_DAM_DIV]);
+							break;
+						}
+						case 3:
+						{
+							this_dam = r_ptr->spell_power * spell_info_RF7[i][COL_SPELL_DAM_MULT];
+							this_dam /=  MAX(1, spell_info_RF7[i][COL_SPELL_DAM_DIV]);
+							break;
+						}
+					}
+				}
+
+				else switch (x)
+				{
+					/*Misc flag4 flags*/
+					case 0:
+					{
+						if (flag_counter == RF4_SHRIEK) this_dam = rlev / 2;
+						break;
+					}
+
+					case 1:
+					{
+						/*Right now all flag5 are attack mask spells*/
+						break;
+					}
+
+					case 2:
+					{
+						/*Misc flag6 flags*/
+						if (flag_counter == RF6_ADD_MANA) this_dam = MAX(r_ptr->mana, 30);
+						else if (flag_counter == RF6_BLINK) this_dam = rlev / 3;
+						else if (flag_counter == RF6_TELE_SELF_TO) this_dam = rlev * 2;
+						else if (flag_counter == RF6_TELE_TO) this_dam = rlev;
+						else if (flag_counter == RF6_DARKNESS) this_dam = rlev;
+						else if (flag_counter == RF6_TRAPS) this_dam = rlev;
+						else if (flag_counter == RF6_FORGET) this_dam = rlev / 3;
+						else if (flag_counter == RF6_DRAIN_MANA) this_dam = rlev * 2;
+						else if (flag_counter == RF6_HUNGER) this_dam = rlev;
+						else if (flag_counter == RF6_SCARE) this_dam = rlev;
+						else if (flag_counter == RF6_BLIND) this_dam = rlev;
+						else if (flag_counter == RF6_CONF) this_dam = rlev;
+						else if (flag_counter == RF6_SLOW) this_dam = rlev;
+						else if (flag_counter == RF6_HOLD) this_dam = 25;
+						break;
+					}
+					/*All flag7 flags*/
+					case 3:
+					{
+						/*Right now all flag7 are summon spells*/
+						/* All summons are assigned arbitrary values according to their levels*/
+						if 		(flag_counter == RF7_S_KIN) 	this_dam = rlev * 2;
+						else if (flag_counter == RF7_S_MONSTER)	this_dam = rlev * 2 / 5;
+						else if (flag_counter == RF7_S_MONSTERS)this_dam = rlev * 4 / 5;
+						else if (flag_counter == RF7_S_ANT)		this_dam = rlev / 5;
+						else if (flag_counter == RF7_S_SPIDER)	this_dam = rlev / 5;
+						else if (flag_counter == RF7_S_HOUND)	this_dam = rlev;
+						else if (flag_counter == RF7_S_ANIMAL)	this_dam = rlev / 2;
+						else if (flag_counter == RF7_S_HYDRA)	this_dam = rlev * 3 / 2;
+						else if (flag_counter == RF7_S_THIEF)	this_dam = rlev / 2;
+						else if (flag_counter == RF7_S_BERTBILLTOM)	this_dam = rlev * 3 / 4;
+						else if (flag_counter == RF7_S_AINU)	this_dam = rlev * 3 / 2;
+						else if (flag_counter == RF7_S_DRAGON)	this_dam = rlev * 3 / 2;
+						else if (flag_counter == RF7_S_HI_DRAGON) this_dam = rlev * 4;
+						else if (flag_counter == RF7_S_DEMON)	this_dam = rlev * 3 / 2;
+						else if (flag_counter == RF7_S_HI_DEMON)this_dam = rlev * 3;
+						else if (flag_counter == RF7_S_UNDEAD)	this_dam = rlev * 3 / 2;
+						else if (flag_counter == RF7_S_HI_UNDEAD)this_dam = rlev * 4;
+						else if (flag_counter == RF7_S_WRAITH)	this_dam = rlev * 9 / 2;
+						else if (flag_counter == RF7_S_UNIQUE)	this_dam = rlev * 3;
+						else if (flag_counter == RF7_S_HI_UNIQUE)	this_dam = rlev * 5;
+						break;
+					}
+				}
+
+			}
+
+			if (this_dam > spell_dam) spell_dam = this_dam;
+
+			/*shift one bit*/
+			flag_counter = flag_counter << 1;
+		}
+	}
 
 	/* Only do if it has attacks */
-	if (!(rptr->flags1 & (RF1_NEVER_BLOW)))
+	if (!(r_ptr->flags1 & (RF1_NEVER_BLOW)))
 	{
 		for (i = 0; i < 4; i++)
 		{
 			/* Extract the attack infomation */
-#if 0 /* Unused */
-			int effect = rptr->blow[i].effect;
-#endif
-			int method = rptr->blow[i].method;
-			int d_dice = rptr->blow[i].d_dice;
-			int d_side = rptr->blow[i].d_side;
+			int effect = r_ptr->blow[i].effect;
+			int method = r_ptr->blow[i].method;
+			int d_dice = r_ptr->blow[i].d_dice;
+			int d_side = r_ptr->blow[i].d_side;
 
 			/* Hack -- no more attacks */
-			if (!method) break;
+			if (!method) continue;
 
-			/* Assume maximum damage for now */
+			/* Assume average damage*/
+			atk_dam = d_dice * (d_side + 1) / 2;
 
-			atk_dam = d_dice * d_side;
+			switch (method)
+			{
+				/*possible stun*/
+				case RBM_HIT:
+				{
+					if ((effect == GF_WOUND) || (effect == GF_BATTER))
+					{
+						atk_dam *= 5;
+						atk_dam /= 4;
+					}
+					break;
+				}
+				/*stun definitely most dangerous*/
+				case RBM_PUNCH:
+				case RBM_KICK:
+				case RBM_BUTT:
+				case RBM_CRUSH:
+				{
+					atk_dam *= 4;
+					atk_dam /= 3;
+					break;
+				}
+				/*cut*/
+				case RBM_CLAW:
+				case RBM_BITE:
+				case RBM_PECK:
+				{
+					atk_dam *= 7;
+					atk_dam /= 5;
+					break;
+				}
+				default: break;
+			}
 
-			/*
-			 * Ignore other effects for the moment
-			 * To do: adjust for resistances and add factors for non-damaging
-			 * effects like confusion, exp drain etc.
-			 */
+			switch (effect)
+			{
+				/*other bad effects - minor*/
+				case GF_EAT_GOLD:
+				case GF_EAT_ITEM:
+				case GF_EAT_FOOD:
+				case GF_HUNGER:
+				case GF_EAT_LITE:
+				case GF_TERRIFY:
+				{
+					atk_dam *= 11;
+					atk_dam /= 10;
+					break;
+				}
+				/*other bad effects - major*/
+				case GF_UN_BONUS:
+				case GF_UN_POWER:
+				case GF_LOSE_MANA:
+				case GF_POIS:
+				case GF_ACID:
+				case GF_ELEC:
+				case GF_FIRE:
+				case GF_COLD:
+				case GF_BLIND:
+				case GF_CONFUSION:
+				case GF_PARALYZE:
+				case GF_DISEASE:
+				case GF_LOSE_STR:
+				case GF_LOSE_INT:
+				case GF_LOSE_WIS:
+				case GF_LOSE_DEX:
+				case GF_LOSE_CON:
+				case GF_LOSE_CHR:
+				case GF_LOSE_ALL:
+				case GF_EXP_10:
+				case GF_EXP_20:
+				case GF_EXP_40:
+				case GF_EXP_80:
+				case GF_HALLU:
+				{
+					atk_dam *= 5;
+					atk_dam /= 4;
+					break;
+				}
+				/*Earthquakes*/
+				case GF_SHATTER:
+				{
+					atk_dam *= 7;
+					atk_dam /= 6;
+					break;
+				}
+				/*nothing special*/
+				default: break;
+			}
 
+			/*keep a running total*/
 			melee_dam += atk_dam;
 		}
+
+		/*Reduce damamge potential for monsters that move randomly*/
+		if ((r_ptr->flags1 & (RF1_RAND_25)) || (r_ptr->flags1 & (RF1_RAND_50)))
+		{
+			int reduce = 100;
+
+			if (r_ptr->flags1 & (RF1_RAND_25)) reduce -= 25;
+			if (r_ptr->flags1 & (RF1_RAND_50)) reduce -= 50;
+
+			/*even moving randomly one in 8 times will hit the player*/
+			reduce += (100 - reduce) / 8;
+
+			/* adjust the melee damage*/
+			melee_dam = (melee_dam * reduce) / 100;
+		}
+
+		/*monsters who can't move aren't nearly as much of a combat threat*/
+		if (r_ptr->flags1 & (RF1_NEVER_MOVE))
+		{
+			melee_dam /= 4;
+		}
+
+		/*but keep a minimum*/
+		if (melee_dam < 1) melee_dam = 1;
 	}
 
 	/*
-	 * Check to see whether max melee damage is higher than
-	 * max spell damage; if so, use it instead
+	 * Get the max damage attack
 	 */
 
-	dam = (melee_dam > dam) ? melee_dam: dam;
+	if (dam < spell_dam) dam = spell_dam;
+	if (dam < melee_dam) dam = melee_dam;
 
 	/*
 	 * Adjust for speed.  Monster at speed 120 will do double damage,
-	 * monster at speed 100 will do half, etc.
+	 * monster at speed 100 will do half, etc.  Bonus for monsters who can haste self.
 	 */
+	dam = (dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) / 10;
 
-	dam = (dam * extract_energy[rptr->speed]) / 10;
-
-	/* If dam is zero, set it to 1 */
-
-	if (dam < 1) dam = 1;
+	/*but deep in a minimum*/
+	if (dam < 1) dam  = 1;
 
 	/* We're done */
-
-	return dam;
+	return (dam);
 }
-
 /*
  * Initialize the data structures for the monster power ratings
  * ToDo: Add handling and return codes for error conditions if any.
@@ -1589,7 +1802,7 @@ static s32b slay_power(u32b s_index)
 				mult = 2;
 
 		/* New brand - brand_dark */
-		if ( ((r_ptr->flags4 & (RF4_BR_DARK)) || (r_ptr->flags3 & (RF3_ORC)))
+		if ( ((r_ptr->flags4 & (RF4_BRTH_DARK)) || (r_ptr->flags3 & (RF3_ORC)))
 			&& (s_index & 0x00020000L) )
 				mult = 2;
 

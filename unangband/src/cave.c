@@ -79,7 +79,7 @@ sint distance(int y1, int x1, int y2, int x2)
  * determining which grids are illuminated by the player's torch, and which
  * grids and monsters can be "seen" by the player, etc).
  */
-bool los(int y1, int x1, int y2, int x2)
+bool generic_los(int y1, int x1, int y2, int x2, byte flg)
 {
 	/* Delta */
 	int dx, dy;
@@ -102,6 +102,8 @@ bool los(int y1, int x1, int y2, int x2)
 	/* Slope, or 1/Slope, of LOS */
 	int m;
 
+	/* Paranoia */
+	if (!flg) flg = CAVE_XLOS;
 
 	/* Extract the offset */
 	dy = y2 - y1;
@@ -124,7 +126,7 @@ bool los(int y1, int x1, int y2, int x2)
 		{
 			for (ty = y1 + 1; ty < y2; ty++)
 			{
-				if (!cave_floor_bold(ty, x1)) return (FALSE);
+				if (!cave_flag_bold(ty, x1, flg)) return (FALSE);
 			}
 		}
 
@@ -133,7 +135,7 @@ bool los(int y1, int x1, int y2, int x2)
 		{
 			for (ty = y1 - 1; ty > y2; ty--)
 			{
-				if (!cave_floor_bold(ty, x1)) return (FALSE);
+				if (!cave_flag_bold(ty, x1, flg)) return (FALSE);
 			}
 		}
 
@@ -149,7 +151,7 @@ bool los(int y1, int x1, int y2, int x2)
 		{
 			for (tx = x1 + 1; tx < x2; tx++)
 			{
-				if (!cave_floor_bold(y1, tx)) return (FALSE);
+				if (!cave_flag_bold(y1, tx, flg)) return (FALSE);
 			}
 		}
 
@@ -158,7 +160,7 @@ bool los(int y1, int x1, int y2, int x2)
 		{
 			for (tx = x1 - 1; tx > x2; tx--)
 			{
-				if (!cave_floor_bold(y1, tx)) return (FALSE);
+				if (!cave_flag_bold(y1, tx, flg)) return (FALSE);
 			}
 		}
 
@@ -177,7 +179,7 @@ bool los(int y1, int x1, int y2, int x2)
 	{
 		if (ay == 2)
 		{
-			if (cave_floor_bold(y1 + sy, x1)) return (TRUE);
+			if (cave_flag_bold(y1 + sy, x1, flg)) return (TRUE);
 		}
 	}
 
@@ -186,7 +188,7 @@ bool los(int y1, int x1, int y2, int x2)
 	{
 		if (ax == 2)
 		{
-			if (cave_floor_bold(y1, x1 + sx)) return (TRUE);
+			if (cave_flag_bold(y1, x1 + sx, flg)) return (TRUE);
 		}
 	}
 
@@ -196,7 +198,6 @@ bool los(int y1, int x1, int y2, int x2)
 
 	/* Calculate scale factor */
 	f1 = f2 << 1;
-
 
 	/* Travel horizontally */
 	if (ax >= ay)
@@ -222,7 +223,7 @@ bool los(int y1, int x1, int y2, int x2)
 		/* the LOS exactly meets the corner of a tile. */
 		while (x2 - tx)
 		{
-			if (!cave_floor_bold(ty, tx)) return (FALSE);
+			if (!cave_flag_bold(ty, tx, flg)) return (FALSE);
 
 			qy += m;
 
@@ -233,7 +234,7 @@ bool los(int y1, int x1, int y2, int x2)
 			else if (qy > f2)
 			{
 				ty += sy;
-				if (!cave_floor_bold(ty, tx)) return (FALSE);
+				if (!cave_flag_bold(ty, tx, flg)) return (FALSE);
 				qy -= f1;
 				tx += sx;
 			}
@@ -269,7 +270,7 @@ bool los(int y1, int x1, int y2, int x2)
 		/* the LOS exactly meets the corner of a tile. */
 		while (y2 - ty)
 		{
-			if (!cave_floor_bold(ty, tx)) return (FALSE);
+			if (!cave_flag_bold(ty, tx, flg)) return (FALSE);
 
 			qx += m;
 
@@ -280,7 +281,7 @@ bool los(int y1, int x1, int y2, int x2)
 			else if (qx > f2)
 			{
 				tx += sx;
-				if (!cave_floor_bold(ty, tx)) return (FALSE);
+				if (!cave_flag_bold(ty, tx, flg)) return (FALSE);
 				qx -= f1;
 				ty += sy;
 			}
@@ -296,7 +297,6 @@ bool los(int y1, int x1, int y2, int x2)
 	/* Assume los */
 	return (TRUE);
 }
-
 
 
 
@@ -2635,10 +2635,17 @@ struct vinfo_type
 {
 	s16b grid[8];
 
+	/* LOS slopes (up to 128) */
 	u32b bits_3;
 	u32b bits_2;
 	u32b bits_1;
 	u32b bits_0;
+
+	/* Index of the first LOF slope */
+	byte slope_fire_index1;
+
+	/* Index of the (possible) second LOF slope */
+	byte slope_fire_index2;
 
 	vinfo_type *next_0;
 	vinfo_type *next_1;
@@ -3045,25 +3052,88 @@ errr vinfo_init(void)
 		vinfo[e].grid[7] = GRID(-y,+x);
 
 
-		/* Analyze slopes */
-		for (i = 0; i < hack->num_slopes; ++i)
+		/* Skip player grid */
+		if (e > 0)
 		{
-			m = hack->slopes[i];
+			long slope_fire;
 
-			/* Memorize intersection slopes (for non-player-grids) */
-			if ((e > 0) &&
-			    (hack->slopes_min[y][x] < m) &&
-			    (m < hack->slopes_max[y][x]))
+			long tmp0 = 0;
+			long tmp1 = 0;
+			long tmp2 = 999999L;
+
+			/* Determine LOF slope for this grid */
+			if (x == 0) slope_fire = SCALE;
+			else slope_fire = SCALE * (1000L * y) / (1000L * x);
+
+			/* Analyze LOS slopes */
+			for (i = 0; i < hack->num_slopes; ++i)
 			{
-				switch (i / 32)
+				m = hack->slopes[i];
+
+				/* Memorize intersecting slopes */
+				if ((hack->slopes_min[y][x] < m) &&
+				    (hack->slopes_max[y][x] > m))
 				{
-					case 3: vinfo[e].bits_3 |= (1L << (i % 32)); break;
-					case 2: vinfo[e].bits_2 |= (1L << (i % 32)); break;
-					case 1: vinfo[e].bits_1 |= (1L << (i % 32)); break;
-					case 0: vinfo[e].bits_0 |= (1L << (i % 32)); break;
+					/* Add it to the LOS slope set */
+					switch (i / 32)
+					{
+						case 3: vinfo[e].bits_3 |= (1L << (i % 32)); break;
+						case 2: vinfo[e].bits_2 |= (1L << (i % 32)); break;
+						case 1: vinfo[e].bits_1 |= (1L << (i % 32)); break;
+						case 0: vinfo[e].bits_0 |= (1L << (i % 32)); break;
+					}
+
+					/* Check for exact match with the LOF slope */
+					if (m == slope_fire) tmp0 = i;
+
+					/* Remember index of nearest LOS slope < than LOF slope */
+					else if ((m < slope_fire) && (m > tmp1)) tmp1 = i;
+
+					/* Remember index of nearest LOS slope > than LOF slope */
+					else if ((m > slope_fire) && (m < tmp2)) tmp2 = i;
 				}
 			}
+
+			/* There is a perfect match with one of the LOS slopes */
+			if (tmp0)
+			{
+				/* Save the (unique) slope */
+				vinfo[e].slope_fire_index1 = tmp0;
+
+				/* Mark the other empty */
+				vinfo[e].slope_fire_index2 = 0;
+			}
+
+			/* The LOF slope lies between two LOS slopes */
+			else
+			{
+				/* Save the first slope */
+				vinfo[e].slope_fire_index1 = tmp1;
+
+				/* Save the second slope */
+				vinfo[e].slope_fire_index2 = tmp2;
+			}
 		}
+
+		/* Default */
+		vinfo[e].next_0 = &vinfo[0];
+
+		/* Grid next child */
+		if (distance(0, 0, y, x+1) <= MAX_SIGHT)
+		{
+			g = GRID(y,x+1);
+
+			if (queue[queue_tail-1]->grid[0] != g)
+			{
+				vinfo[queue_tail].grid[0] = g;
+				queue[queue_tail] = &vinfo[queue_tail];
+				queue_tail++;
+			}
+
+			vinfo[e].next_0 = &vinfo[queue_tail - 1];
+		}
+
+
 
 
 		/* Default */
@@ -3108,7 +3178,7 @@ errr vinfo_init(void)
 		if (y == x) vinfo[e].next_0 = vinfo[e].next_1;
 
 
-		/* Extra values */
+		/* Grid coordinates, approximate distance  */
 		vinfo[e].y = y;
 		vinfo[e].x = x;
 		vinfo[e].d = ((y > x) ? (y + x/2) : (x + y/2));
@@ -3148,7 +3218,6 @@ void forget_view(void)
 
 	byte *fast_play_info = &play_info[0][0];
 
-
 	/* None to forget */
 	if (!fast_view_n) return;
 
@@ -3177,9 +3246,22 @@ void forget_view(void)
 	/* None left */
 	fast_view_n = 0;
 
-
 	/* Save 'view_n' */
 	view_n = fast_view_n;
+
+	/* Clear the PLAY_FIRE flag */
+	for (i = 0; i < fire_n; i++)
+	{
+		/* Grid */
+		g = fire_g[i];
+
+		/* Clear */
+		fast_play_info[g] &= ~(PLAY_FIRE);
+	}
+
+	/* None left */
+	fire_n = 0;
+
 }
 
 
@@ -3331,6 +3413,19 @@ void update_view(void)
 	/* Reset the "view" array */
 	fast_view_n = 0;
 
+	/* Clear the CAVE_FIRE flag */
+	for (i = 0; i < fire_n; i++)
+	{
+		/* Grid */
+		g = fire_g[i];
+
+		/* Clear */
+		fast_play_info[g] &= ~(PLAY_FIRE);
+	}
+
+	/* Reset the "fire" array */
+	fire_n = 0;
+
 	/* Extract "radius" value */
 	radius = p_ptr->cur_lite;
 
@@ -3366,7 +3461,7 @@ void update_view(void)
                   && !(fast_cave_info[pg] & (CAVE_GLOW))))
 		{
 			/* monster grid */
-			if (los(py,px,fy,fx))
+			if (generic_los(py,px,fy,fx, CAVE_XLOS))
 			{
 				g = GRID(fy,fx);
 				pinfo = fast_play_info[g];
@@ -3384,7 +3479,7 @@ void update_view(void)
 			/* Radius 1 -- torch radius */
 
 			/* Adjacent grid */
-			if (los(py,px,fy+1,fx))
+			if (generic_los(py,px,fy+1,fx, CAVE_XLOS))
 			{
 				g = GRID(fy+1,fx);
 				pinfo = fast_play_info[g];
@@ -3399,7 +3494,7 @@ void update_view(void)
 				fast_view_g[fast_view_n++] = g;
 			}
 
-			if (los(py,px,fy-1,fx))
+			if (generic_los(py,px,fy-1,fx, CAVE_XLOS))
 			{
 				g = GRID(fy-1,fx);
 				pinfo = fast_play_info[g];
@@ -3414,7 +3509,7 @@ void update_view(void)
 				fast_view_g[fast_view_n++] = g;
 			}
 
-			if (los(py,px,fy,fx+1))
+			if (generic_los(py,px,fy,fx+1, CAVE_XLOS))
 			{
 				g = GRID(fy,fx+1);
 				pinfo = fast_play_info[g];
@@ -3429,7 +3524,7 @@ void update_view(void)
 				fast_view_g[fast_view_n++] = g;
 			}
 
-			if (los(py,px,fy,fx-1))
+			if (generic_los(py,px,fy,fx-1, CAVE_XLOS))
 			{
 				g = GRID(fy,fx-1);
 				pinfo = fast_play_info[g];
@@ -3445,7 +3540,7 @@ void update_view(void)
 			}
 
 			/* Diagonal grids */
-			if (los(py,px,fy+1,fx+1))
+			if (generic_los(py,px,fy+1,fx+1, CAVE_XLOS))
 			{
 				g = GRID(fy+1,fx+1);
 				pinfo = fast_play_info[g];
@@ -3460,7 +3555,7 @@ void update_view(void)
 				fast_view_g[fast_view_n++] = g;
 			}
 
-			if (los(py,px,fy+1,fx-1))
+			if (generic_los(py,px,fy+1,fx-1, CAVE_XLOS))
 			{
 				g = GRID(fy+1,fx-1);
 				pinfo = fast_play_info[g];
@@ -3475,7 +3570,7 @@ void update_view(void)
 				fast_view_g[fast_view_n++] = g;
 			}
 
-			if (los(py,px,fy-1,fx+1))
+			if (generic_los(py,px,fy-1,fx+1, CAVE_XLOS))
 			{
 				g = GRID(fy-1,fx+1);
 				pinfo = fast_play_info[g];
@@ -3490,7 +3585,7 @@ void update_view(void)
 				fast_view_g[fast_view_n++] = g;
 			}
 
-			if (los(py,px,fy-1,fx-1))
+			if (generic_los(py,px,fy-1,fx-1, CAVE_XLOS))
 			{
 				g = GRID(fy-1,fx-1);
 				pinfo = fast_play_info[g];
@@ -3520,8 +3615,8 @@ void update_view(void)
 	/* Get grid info */
 	pinfo = fast_play_info[g];
 
-	/* Assume viewable */
-	pinfo |= (PLAY_VIEW);
+	/* Assume viewable & shootable */
+	pinfo |= (PLAY_VIEW | PLAY_FIRE);
 
 	/* Torch-lit grid */
 	if (0 < radius)
@@ -3556,7 +3651,7 @@ void update_view(void)
 	fast_view_g[fast_view_n++] = g;
 
 
-	/*** Step 2 -- octants ***/
+	/*** Step 2a -- octants (PLAY_VIEW | PLAY_SEEN) ***/
 
 	/* Scan each octant */
 	for (o2 = 0; o2 < 8; o2++)
@@ -3736,6 +3831,141 @@ void update_view(void)
 
 						/* Save in array */
 						fast_view_g[fast_view_n++] = g;
+					}
+				}
+			}
+		}
+	}
+
+
+	/*** Step 2b -- octants (CAVE_FIRE) ***/
+
+	/* Scan each octant */
+	for (o2 = 0; o2 < 8; o2++)
+	{
+		vinfo_type *p;
+
+		/* Last added */
+		vinfo_type *last = &vinfo[0];
+
+		/* Grid queue */
+		int queue_head = 0;
+		int queue_tail = 0;
+		vinfo_type *queue[VINFO_MAX_GRIDS*2];
+
+		/* Slope bit vector */
+		u32b bits0 = VINFO_BITS_0;
+		u32b bits1 = VINFO_BITS_1;
+		u32b bits2 = VINFO_BITS_2;
+		u32b bits3 = VINFO_BITS_3;
+
+		/* Reset queue */
+		queue_head = queue_tail = 0;
+
+		/* Initial grids */
+		queue[queue_tail++] = &vinfo[1];
+		queue[queue_tail++] = &vinfo[2];
+
+		/* Process queue */
+		while (queue_head < queue_tail)
+		{
+			/* Assume no line of fire */
+			bool line_fire = FALSE;
+
+			/* Dequeue next grid */
+			p = queue[queue_head++];
+
+			/* Check bits */
+			if ((bits0 & (p->bits_0)) ||
+			    (bits1 & (p->bits_1)) ||
+			    (bits2 & (p->bits_2)) ||
+			    (bits3 & (p->bits_3)))
+			{
+				/* Extract grid value XXX XXX XXX */
+				g = pg + p->grid[o2];
+
+				/* Get grid info */
+				cinfo = fast_cave_info[g];
+
+				/* Get grid info */
+				pinfo = fast_play_info[g];
+
+				/* Check for first possible line of fire */
+				i = p->slope_fire_index1;
+
+				/* Check line(s) of fire */
+				while (TRUE)
+				{
+					switch (i / 32)
+					{
+						case 3:
+						{
+							if (bits3 & (1L << (i % 32))) line_fire = TRUE;
+							break;
+						}
+						case 2:
+						{
+							if (bits2 & (1L << (i % 32))) line_fire = TRUE;
+							break;
+						}
+						case 1:
+						{
+							if (bits1 & (1L << (i % 32))) line_fire = TRUE;
+							break;
+						}
+						case 0:
+						{
+							if (bits0 & (1L << (i % 32))) line_fire = TRUE;
+							break;
+						}
+					}
+
+					/* Check second LOF slope if necessary */
+					if ((!p->slope_fire_index2) || (line_fire) ||
+					    (i == p->slope_fire_index2))
+					{
+						break;
+					}
+
+					/* Check second possible line of fire */
+					i = p->slope_fire_index2;
+				}
+
+				/* Note line of fire */
+				if (line_fire)
+				{
+					pinfo |= (PLAY_FIRE);
+
+					/* Save in array */
+					fire_g[fire_n++] = g;
+
+					/* Save player info */
+					fast_play_info[g] = pinfo;
+				}
+
+				/* Handle non-projectable grids */
+				if (!(cinfo & (CAVE_XLOF)))
+				{
+					/* Clear bits */
+					bits0 &= ~(p->bits_0);
+					bits1 &= ~(p->bits_1);
+					bits2 &= ~(p->bits_2);
+					bits3 &= ~(p->bits_3);
+				}
+
+				/* Handle projectable grids */
+				else
+				{
+					/* Enqueue child */
+					if (last != p->next_0)
+					{
+						queue[queue_tail++] = last = p->next_0;
+					}
+
+					/* Enqueue child */
+					if (last != p->next_1)
+					{
+						queue[queue_tail++] = last = p->next_1;
 					}
 				}
 			}
@@ -3978,12 +4208,12 @@ void update_dyna(void)
 		{
 			if (!(rand_int(20)))
 			{
-				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+				flg = PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY;
 
 				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice) * 2;
    
 				/* Apply the blow */
-				project(0, 2, y, x, dam, f_ptr->blow.effect, flg);
+				project(0, 2, y, x, y, x, dam, f_ptr->blow.effect, flg, 0, 0);
 			}
 		}
 
@@ -3992,12 +4222,12 @@ void update_dyna(void)
 		{
 			if (!(rand_int(20)))
 			{
-				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL;
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY;
 
 				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice) * 10;
    
 				/* Apply the blow */
-				project(0, 0, y, x, dam, f_ptr->blow.effect, flg);
+				project(0, 0, y, x, y, x, dam, f_ptr->blow.effect, flg, 0, 0);
 			}
 		}
 
@@ -4022,12 +4252,12 @@ void update_dyna(void)
 
 				adjfeat = cave_feat[yy][xx];
 
-				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_HIDE;
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_HIDE | PROJECT_PLAY;
 
 				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
    
 				/* Apply the blow */
-				project(0, 0, yy, xx, dam, f_ptr->blow.effect, flg);
+				project(0, 0, yy, xx, yy, xx, dam, f_ptr->blow.effect, flg, 0, 0);
 
 				/* Hack -- Remove adjacent grids from further processing */
 				if (adjfeat != cave_feat[yy][xx]) 
@@ -4059,12 +4289,12 @@ void update_dyna(void)
 
 				int adjfeat = cave_feat[yy][xx];
 
-				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_HIDE;
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_HIDE | PROJECT_PLAY;
 
 				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
    
 				/* Apply the blow */
-				project(0, 0, yy, xx, dam, f_ptr->blow.effect, flg);
+				project(0, 0, yy, xx, yy, xx, dam, f_ptr->blow.effect, flg, 0, 0);
 
 				/* Hack -- require smoke/acid clouds to move */
 				if (adjfeat == cave_feat[yy][xx]) dir = 12;
@@ -4186,8 +4416,8 @@ void update_noise(void)
 			else if (dist < 5)
 			{
 				/* We're in LOS of the last update - don't update again */
-				if (los(p_ptr->py, p_ptr->px, update_center_y, 
-		 		    update_center_x)) return;
+				if (generic_los(p_ptr->py, p_ptr->px, update_center_y, 
+		 		    update_center_x, CAVE_XLOS)) return;
 
 				/* We're not in LOS - update */
 				else full = FALSE;
@@ -4502,7 +4732,7 @@ void update_smell(void)
 			}
 
 			/* Grid must not be blocked by walls from the character */
-			if (!los(p_ptr->py, p_ptr->px, y, x)) continue;
+			if (!generic_los(p_ptr->py, p_ptr->px, y, x, CAVE_XLOF)) continue;
 
 			/* Note grids that are too far away */
 			if (scent_adjust[i][j] == 250) continue;
@@ -5446,16 +5676,26 @@ void cave_alter_feat(int y, int x, int action)
 
 
 /*
- * Determine the path taken by a projection.
+ * Determine the path taken by a projection.  -BEN-, -LM-
  *
- * The projection will always start from the grid (y1,x1), and will travel
- * towards the grid (y2,x2), touching one grid per unit of distance along
- * the major axis, and stopping when it enters the destination grid or a
- * wall grid, or has travelled the maximum legal distance of "range".
+ * Updated slightly for Unangband.
  *
- * Note that "distance" in this function (as in the "update_view()" code)
- * is defined as "MAX(dy,dx) + MIN(dy,dx)/2", which means that the player
- * actually has an "octagon of projection" not a "circle of projection".
+ * The projection will always start one grid from the grid (y1,x1), and will
+ * travel towards the grid (y2,x2), touching one grid per unit of distance
+ * along the major axis, and stopping when it satisfies certain conditions
+ * or has travelled the maximum legal distance of "range".  Projections
+ * cannot extend further than MAX_SIGHT (at least at present).
+ *
+ * A projection only considers those grids which contain the line(s) of fire
+ * from the start to the end point.  Along any step of the projection path,
+ * either one or two grids may be valid options for the next step.  When a
+ * projection has a choice of grids, it chooses that which offers the least
+ * resistance.  Given a choice of clear grids, projections prefer to move
+ * orthogonally.
+ *
+ * Also, projections to or from the character must stay within the pre-
+ * calculated field of fire ("play_info & (PLAY_FIRE)").  This is a hack.
+ * XXX XXX
  *
  * The path grids are saved into the grid array pointed to by "gp", and
  * there should be room for at least "range" grids in "gp".  Note that
@@ -5465,337 +5705,564 @@ void cave_alter_feat(int y, int x, int action)
  * that the initial grid (y1,x1) is never saved into the grid array, not
  * even if the initial grid is also the final grid.  XXX XXX XXX
  *
- * The "flg" flags can be used to modify the behavior of this function.
+ * We modify y2 and x2 if they are too far away, or (for PROJECT_PASS only)
+ * if the projection threatens to leave the dungeon.
  *
- * In particular, the "PROJECT_STOP" and "PROJECT_THRU" flags have the same
- * semantics as they do for the "project" function, namely, that the path
- * will stop as soon as it hits a monster, or that the path will continue
- * through the destination grid, respectively.
- *
- * The "PROJECT_JUMP" flag, which for the "project()" function means to
- * start at a special grid (which makes no sense in this function), means
- * that the path should be "angled" slightly if needed to avoid any wall
- * grids, allowing the player to "target" any grid which is in "view".
- * This flag is non-trivial and has not yet been implemented, but could
- * perhaps make use of the "vinfo" array (above).  XXX XXX XXX
+ * The "flg" flags can be used to modify the behavior of this function:
+ *    PROJECT_STOP:  projection stops when it cannot bypass a monster.
+ *    PROJECT_CHCK:  projection notes when it cannot bypass a monster.
+ *    PROJECT_THRU:  projection extends past destination grid
+ *    PROJECT_PASS:  projection passes through walls
  *
  * This function returns the number of grids (if any) in the path.  This
- * function will return zero if and only if (y1,x1) and (y2,x2) are equal.
- *
- * This algorithm is similar to, but slightly different from, the one used
- * by "update_view_los()", and very different from the one used by "los()".
+ * may be zero if no grids are legal except for the starting one.
  */
-sint project_path(u16b *gp, int range, int y1, int x1, int y2, int x2, int flg)
+int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg)
 {
-	int y, x;
+	int i, j, k;
+	int dy, dx;
+	int num, dist, octant;
+	int grids = 0;
+	bool line_fire;
+	bool full_stop = FALSE;
 
-	int n = 0;
-	int k = 0;
+	int y_a, x_a, y_b, x_b;
+	int y = 0, old_y = 0;
+	int x = 0, old_x = 0;
 
-	/* Absolute */
-	int ay, ax;
+	/* Start with all lines of sight unobstructed */
+	u32b bits0 = VINFO_BITS_0;
+	u32b bits1 = VINFO_BITS_1;
+	u32b bits2 = VINFO_BITS_2;
+	u32b bits3 = VINFO_BITS_3;
 
-	/* Offsets */
-	int sy, sx;
+	int slope_fire1 = -1, slope_fire2 = 0;
 
-	/* Fractions */
-	int frac;
+	/* Projections are either vertical or horizontal */
+	bool vertical;
 
-	/* Scale factors */
-	int full, half;
+	/* Require projections to be strictly LOF when possible  XXX XXX */
+	bool require_strict_lof = FALSE;
 
-	/* Slope */
-	int m;
+	/* Count of grids in LOF, storage of LOF grids */
+	u16b tmp_grids[80];
 
+	/* Count of grids in projection path */
+	int step;
 
-	/* No path necessary (or allowed) */
-	if ((x1 == x2) && (y1 == y2)) return (0);
+	/* Remember whether and how a grid is blocked */
+	int blockage[2];
 
+	/* Assume no monsters in way */
+	bool monster_in_way = FALSE;
 
-	/* Analyze "dy" */
-	if (y2 < y1)
+	/* Initial grid */
+	s16b g0 = GRID(y1, x1);
+
+	s16b g;
+
+	/* Pointer to vinfo data */
+	vinfo_type *p;
+
+	/* Handle projections of zero length */
+	if ((range <= 0) || ((*y2 == y1) && (*x2 == x1))) return (0);
+
+	/* Note that the character is the source or target of the projection */
+	if ((( y1 == p_ptr->py) && ( x1 == p_ptr->px)) ||
+	    ((*y2 == p_ptr->py) && (*x2 == p_ptr->px)))
 	{
-		ay = (y1 - y2);
-		sy = -1;
+		/* Require strict LOF */
+		require_strict_lof = TRUE;
 	}
-	else
+
+	/* Get position change (signed) */
+	dy = *y2 - y1;
+	dx = *x2 - x1;
+
+	/* Get distance from start to finish */
+	dist = distance(y1, x1, *y2, *x2);
+
+	/* Must stay within the field of sight XXX XXX */
+	if (dist > MAX_SIGHT)
 	{
-		ay = (y2 - y1);
-		sy = 1;
+		/* Always watch your (+/-) when doing rounded integer math. */
+		int round_y = (dy < 0 ? -(dist / 2) : (dist / 2));
+		int round_x = (dx < 0 ? -(dist / 2) : (dist / 2));
+
+		/* Rescale the endpoints */
+		dy = ((dy * (MAX_SIGHT - 1)) + round_y) / dist;
+		dx = ((dx * (MAX_SIGHT - 1)) + round_x) / dist;
+		*y2 = y1 + dy;
+		*x2 = x1 + dx;
 	}
 
-	/* Analyze "dx" */
-	if (x2 < x1)
+	/* Get the correct octant */
+	if (dy < 0)
 	{
-		ax = (x1 - x2);
-		sx = -1;
-	}
-	else
-	{
-		ax = (x2 - x1);
-		sx = 1;
-	}
-
-
-	/* Number of "units" in one "half" grid */
-	half = (ay * ax);
-
-	/* Number of "units" in one "full" grid */
-	full = half << 1;
-
-
-	/* Vertical */
-	if (ay > ax)
-	{
-		/* Start at tile edge */
-		frac = ax * ax;
-
-		/* Let m = ((dx/dy) * full) = (dx * dx * 2) = (frac * 2) */
-		m = frac << 1;
-
-		/* Start */
-		y = y1 + sy;
-		x = x1;
-
-		/* Create the projection path */
-		while (1)
+		/* Up and to the left */
+		if (dx < 0)
 		{
-			/* Save grid */
-			gp[n++] = GRID(y,x);
+			/* More upwards than to the left - octant 4 */
+			if (ABS(dy) > ABS(dx)) octant = 5;
+
+			/* At least as much left as upwards - octant 3 */
+			else                   octant = 4;
+		}
+		else
+		{
+			if (ABS(dy) > ABS(dx)) octant = 6;
+			else                   octant = 7;
+		}
+	}
+	else
+	{
+		if (dx < 0)
+		{
+			if (ABS(dy) > ABS(dx)) octant = 2;
+			else                   octant = 3;
+		}
+		else
+		{
+			if (ABS(dy) > ABS(dx)) octant = 1;
+			else                   octant = 0;
+		}
+	}
+
+	/* Determine whether the major axis is vertical or horizontal */
+	if ((octant == 5) || (octant == 6) || (octant == 2) || (octant == 1))
+	{
+		vertical = TRUE;
+	}
+	else
+	{
+		vertical = FALSE;
+	}
+
+
+	/* Scan the octant, find the grid corresponding to the end point */
+	for (j = 1; j < VINFO_MAX_GRIDS; j++)
+	{
+		s16b vy, vx;
+
+		/* Point to this vinfo record */
+		p = &vinfo[j];
+
+		/* Extract grid value */
+		g = g0 + p->grid[octant];
+
+		/* Get axis coordinates */
+		vy = GRID_Y(g);
+		vx = GRID_X(g);
+
+		/* Allow for negative values XXX XXX XXX */
+		if (vy > 256 * 127) vy = vy - (256 * 256);
+		if (vx > x1 + 127)
+		{
+			vy++;
+			vx = vx - 256;
+		}
+
+		/* Require that grid be correct */
+		if ((vy != *y2) || (vx != *x2)) continue;
+
+		/* Store lines of fire */
+		slope_fire1 = p->slope_fire_index1;
+		slope_fire2 = p->slope_fire_index2;
+
+		break;
+	}
+
+	/* Note failure XXX XXX */
+	if (slope_fire1 == -1) return (0);
+
+	/* Scan the octant, collect all grids having the correct line of fire */
+	for (j = 1; j < VINFO_MAX_GRIDS; j++)
+	{
+		line_fire = FALSE;
+
+		/* Point to this vinfo record */
+		p = &vinfo[j];
+
+		/* See if any lines of sight pass through this grid */
+		if (!((bits0 & (p->bits_0)) ||
+			   (bits1 & (p->bits_1)) ||
+			   (bits2 & (p->bits_2)) ||
+			   (bits3 & (p->bits_3))))
+		{
+			continue;
+		}
+
+		/*
+		 * Extract grid value.  Use pointer shifting to get the
+		 * correct grid offset for this octant.
+		 */
+		g = g0 + *((s16b*)(((byte*)(p)) + (octant * 2)));
+
+		y = GRID_Y(g);
+		x = GRID_X(g);
+
+		/* Must be legal (this is important) */
+		if (!in_bounds_fully(y, x)) continue;
+
+		/* Check for first possible line of fire */
+		i = slope_fire1;
+
+		/* Check line(s) of fire */
+		while (TRUE)
+		{
+			switch (i / 32)
+			{
+				case 3:
+				{
+					if (bits3 & (1L << (i % 32)))
+					{
+						if (p->bits_3 & (1L << (i % 32))) line_fire = TRUE;
+					}
+					break;
+				}
+				case 2:
+				{
+					if (bits2 & (1L << (i % 32)))
+					{
+						if (p->bits_2 & (1L << (i % 32))) line_fire = TRUE;
+					}
+					break;
+				}
+				case 1:
+				{
+					if (bits1 & (1L << (i % 32)))
+					{
+						if (p->bits_1 & (1L << (i % 32))) line_fire = TRUE;
+					}
+					break;
+				}
+				case 0:
+				{
+					if (bits0 & (1L << (i % 32)))
+					{
+						if (p->bits_0 & (1L << (i % 32))) line_fire = TRUE;
+					}
+					break;
+				}
+			}
+
+			/* We're done if no second LOF exists, or when we've checked it */
+			if ((!slope_fire2) || (i == slope_fire2)) break;
+
+			/* Check second possible line of fire */
+			i = slope_fire2;
+		}
+
+		/* This grid contains at least one of the lines of fire */
+		if (line_fire)
+		{
+			/* Do not accept breaks in the series of grids  XXX XXX */
+			if ((grids) && ((ABS(y - old_y) > 1) || (ABS(x - old_x) > 1)))
+			{
+				break;
+			}
+
+			/* Optionally, require strict line of fire */
+			if ((!require_strict_lof) || (play_info[y][x] & (PLAY_FIRE)))
+			{
+				/* Store grid value */
+				tmp_grids[grids++] = g;
+			}
+
+			/* Remember previous coordinates */
+			old_y = y;
+			old_x = x;
+		}
+
+		/*
+		 * Handle wall (unless ignored).  Walls can be in a projection path,
+		 * but the path cannot pass through them.
+		 */
+		if (!(flg & (PROJECT_PASS)) && !cave_project_bold(y, x))
+		{
+			/* Clear any lines of sight passing through this grid */
+			bits0 &= ~(p->bits_0);
+			bits1 &= ~(p->bits_1);
+			bits2 &= ~(p->bits_2);
+			bits3 &= ~(p->bits_3);
+		}
+	}
+
+	/* Scan the grids along the line(s) of fire */
+	for (step = 0, j = 0; j < grids;)
+	{
+		/* Get the coordinates of this grid */
+		y_a = GRID_Y(tmp_grids[j]);
+		x_a = GRID_X(tmp_grids[j]);
+
+		/* Get the coordinates of the next grid, if legal */
+		if (j < grids - 1)
+		{
+			y_b = GRID_Y(tmp_grids[j+1]);
+			x_b = GRID_X(tmp_grids[j+1]);
+		}
+		else
+		{
+			y_b = -1;
+			x_b = -1;
+		}
+
+		/*
+		 * We always have at least one legal grid, and may have two.  Allow
+		 * the second grid if its position differs only along the minor axis.
+		 */
+		if (vertical ? y_a == y_b : x_a == x_b) num = 2;
+		else                                    num = 1;
+
+
+		/* Scan one or both grids */
+		for (i = 0; i < num; i++)
+		{
+			blockage[i] = 0;
+
+			/* Get the coordinates of this grid */
+			y = (i == 0 ? y_a : y_b);
+			x = (i == 0 ? x_a : x_b);
+
+			/* Determine perpendicular distance */
+			k = (vertical ? ABS(x - x1) : ABS(y - y1));
 
 			/* Hack -- Check maximum range */
-			if ((n + (k >> 1)) >= range) break;
+			if ((i == num-1) && (step + (k >> 1)) >= range-1)
+			{
+				/* End of projection */
+				full_stop = TRUE;
+			}
 
 			/* Sometimes stop at destination grid */
 			if (!(flg & (PROJECT_THRU)))
 			{
-				if ((x == x2) && (y == y2)) break;
-			}
-
-			/* Always stop at non-initial wall grids */
-			if ((n > 0) && (!(f_info[cave_feat[y][x]].flags1 & (FF1_PROJECT)))) break;
-
-			/* Sometimes stop at non-initial monsters/players */
-			if (flg & (PROJECT_STOP))
-			{
-				/* Don't stop if monster is hidden */
-				if ((n > 0) && (cave_m_idx[y][x] != 0))
+				if ((y == *y2) && (x == *x2))
 				{
-					/* Player */
-					if (cave_m_idx[y][x] < 0)
-					{
-						break;										
-					}
-					/* Non-hidden monster */
-					else if (!(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)))
-					{
-						break;
-					}
+					/* End of projection */
+					full_stop = TRUE;
 				}
 			}
 
-			/* Slant */
-			if (m)
+			/* Usually stop at wall grids */
+			if (!(flg & (PROJECT_PASS)))
 			{
-				/* Advance (X) part 1 */
-				frac += m;
-
-				/* Horizontal change */
-				if (frac >= half)
-				{
-					/* Advance (X) part 2 */
-					x += sx;
-
-					/* Advance (X) part 3 */
-					frac -= full;
-
-					/* Track distance */
-					k++;
-				}
+				if (!cave_project_bold(y, x)) blockage[i] = 2;
 			}
 
-			/* Advance (Y) */
-			y += sy;
+			/* If we don't stop at wall grids, we must explicitly check legality */
+			else if (!in_bounds_fully(y, x))
+			{
+				/* End of projection */
+				full_stop = TRUE;
+				blockage[i] = 3;
+			}
+
+			/* Try to avoid monsters/players between the endpoints */
+			if ((cave_m_idx[y][x] != 0) && (blockage[i] < 2))
+			{
+				if      (flg & (PROJECT_STOP)) blockage[i] = 2;
+				else if (flg & (PROJECT_CHCK)) blockage[i] = 1;
+			}
 		}
-	}
 
-	/* Horizontal */
-	else if (ax > ay)
-	{
-		/* Start at tile edge */
-		frac = ay * ay;
-
-		/* Let m = ((dy/dx) * full) = (dy * dy * 2) = (frac * 2) */
-		m = frac << 1;
-
-		/* Start */
-		y = y1;
-		x = x1 + sx;
-
-		/* Create the projection path */
-		while (1)
+		/* Pick the first grid if possible, the second if necessary */
+		if ((num == 1) || (blockage[0] <= blockage[1]))
 		{
-			/* Save grid */
-			gp[n++] = GRID(y,x);
+			/* Store the first grid, advance */
+			if (blockage[0] < 3) gp[step++] = tmp_grids[j];
 
-			/* Hack -- Check maximum range */
-			if ((n + (k >> 1)) >= range) break;
+			/* Blockage of 2 or greater means the projection ends */
+			if (blockage[0] >= 2) break;
 
-			/* Sometimes stop at destination grid */
-			if (!(flg & (PROJECT_THRU)))
+			/* Blockage of 1 means a monster bars the path */
+			if (blockage[0] == 1)
 			{
-				if ((x == x2) && (y == y2)) break;
+				/* Endpoints are always acceptable */
+				if ((y != *y2) || (x != *x2)) monster_in_way = TRUE;
 			}
 
-			/* Always stop at non-initial wall grids */
-			if ((n > 0) && (!(f_info[cave_feat[y][x]].flags1 & (FF1_PROJECT)))) break;
-
-			/* Sometimes stop at non-initial monsters/players */
-			if (flg & (PROJECT_STOP))
-			{
-				/* Don't stop if monster is hidden */
-				if ((n > 0) && (cave_m_idx[y][x] != 0))
-				{
-					/* Player */
-					if (cave_m_idx[y][x] < 0)
-					{
-						break;										
-					}
-					/* Non-hidden monster */
-					else if (!(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)))
-					{
-						break;
-					}
-				}
-			}
-
-			/* Slant */
-			if (m)
-			{
-				/* Advance (Y) part 1 */
-				frac += m;
-
-				/* Vertical change */
-				if (frac >= half)
-				{
-					/* Advance (Y) part 2 */
-					y += sy;
-
-					/* Advance (Y) part 3 */
-					frac -= full;
-
-					/* Track distance */
-					k++;
-				}
-			}
-
-			/* Advance (X) */
-			x += sx;
+			/* Handle end of projection */
+			if (full_stop) break;
 		}
-	}
-
-	/* Diagonal */
-	else
-	{
-		/* Start */
-		y = y1 + sy;
-		x = x1 + sx;
-
-		/* Create the projection path */
-		while (1)
+		else
 		{
-			/* Save grid */
-			gp[n++] = GRID(y,x);
+			/* Store the second grid, advance */
+			if (blockage[1] < 3) gp[step++] = tmp_grids[j + 1];
 
-			/* Hack -- Check maximum range */
-			if ((n + (n >> 1)) >= range) break;
+			/* Blockage of 2 or greater means the projection ends */
+			if (blockage[1] >= 2) break;
 
-			/* Sometimes stop at destination grid */
-			if (!(flg & (PROJECT_THRU)))
+			/* Blockage of 1 means a monster bars the path */
+			if (blockage[1] == 1)
 			{
-				if ((x == x2) && (y == y2)) break;
+				/* Endpoints are always acceptable */
+				if ((y != *y2) || (x != *x2)) monster_in_way = TRUE;
 			}
 
-			/* Always stop at non-initial wall grids */
-			if ((n > 0) && (!(f_info[cave_feat[y][x]].flags1 & (FF1_PROJECT)))) break;
-
-			/* Sometimes stop at non-initial monsters/players */
-			if (flg & (PROJECT_STOP))
-			{
-				/* Don't stop if monster is hidden */
-				if ((n > 0) && (cave_m_idx[y][x] != 0))
-				{
-					/* Player */
-					if (cave_m_idx[y][x] < 0)
-					{
-						break;										
-					}
-					/* Non-hidden monster */
-					else if (!(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)))
-					{
-						break;
-					}
-				}
-			}
-
-			/* Advance (Y) */
-			y += sy;
-
-			/* Advance (X) */
-			x += sx;
+			/* Handle end of projection */
+			if (full_stop) break;
 		}
+
+		/*
+		 * Hack -- If we require orthogonal movement, but are moving
+		 * diagonally, we have to plot an extra grid.  XXX XXX
+		 */
+		if ((flg & (PROJECT_ORTH)) && (step > 1))
+		{
+			/* Get grids for this projection step and the last */
+			y_a = GRID_Y(gp[step-1]);
+			x_a = GRID_X(gp[step-1]);
+
+			y_b = GRID_Y(gp[step-2]);
+			x_b = GRID_X(gp[step-2]);
+
+			/* The grids differ along both axis -- we moved diagonally */
+			if ((y_a != y_b) && (x_a != x_b))
+			{
+				/* Get locations for the connecting grids */
+				int y_c = y_a;
+				int x_c = x_b;
+				int y_d = y_b;
+				int x_d = x_a;
+
+				/* Back up one step */
+				step--;
+
+				/* Assume both grids are available */
+				blockage[0] = 0;
+				blockage[1] = 0;
+
+				/* Hack -- Check legality */
+				if (!in_bounds_fully(y_c, x_c)) blockage[0] = 2;
+				if (!in_bounds_fully(y_d, x_d)) blockage[1] = 2;
+
+				/* Usually stop at wall grids */
+				if (!(flg & (PROJECT_PASS)))
+				{
+					if (!cave_project_bold(y_c, x_c)) blockage[0] = 2;
+					if (!cave_project_bold(y_d, x_d)) blockage[1] = 2;
+				}
+
+				/* Try to avoid non-initial monsters/players */
+				if (cave_m_idx[y_c][x_c] != 0)
+				{
+					if      (flg & (PROJECT_STOP)) blockage[0] = 2;
+					else if (flg & (PROJECT_CHCK)) blockage[0] = 1;
+				}
+				if (cave_m_idx[y_d][x_d] != 0)
+				{
+					if      (flg & (PROJECT_STOP)) blockage[1] = 2;
+					else if (flg & (PROJECT_CHCK)) blockage[1] = 1;
+				}
+
+				/* Both grids are blocked -- we have to stop now */
+				if ((blockage[0] >= 2) && (blockage[1] >= 2)) break;
+
+				/* Accept the first grid if possible, the second if necessary */
+				if (blockage[0] <= blockage[1]) gp[step++] = GRID(y_c, x_c);
+				else                            gp[step++] = GRID(y_d, x_d);
+
+				/* Re-insert the original grid, take an extra step */
+				gp[step++] = GRID(y_a, x_a);
+
+				/* Increase range to accommodate this extra step */
+				range++;
+			}
+		}
+
+		/* Advance to the next unexamined LOF grid */
+		j += num;
 	}
 
+	/* Accept last grid as the new endpoint */
+	*y2 = GRID_Y(gp[step -1]);
+	*x2 = GRID_X(gp[step -1]);
 
-	/* Length */
-	return (n);
+	/* Return count of grids in projection path */
+	if (monster_in_way) return (-step);
+	else return (step);
 }
 
 
 /*
  * Determine if a bolt spell cast from (y1,x1) to (y2,x2) will arrive
- * at the final destination, assuming that no monster gets in the way,
- * using the "project_path()" function to check the projection path.
+ * at the final destination, using the "project_path()" function to check
+ * the projection path.
+ *
+ * Accept projection flags, and pass them onto "project_path()".
  *
  * Note that no grid is ever "projectable()" from itself.
- *
  * This function is used to determine if the player can (easily) target
- * a given grid, and if a monster can target the player.
+ * a given grid, if a monster can target the player, and if a clear shot
+ * exists from monster to player.
  */
-bool projectable(int y1, int x1, int y2, int x2)
+
+byte projectable(int y1, int x1, int y2, int x2, u32b flg)
 {
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
 	int y, x;
 
 	int grid_n = 0;
 	u16b grid_g[512];
 
+	int old_y2 = y2;
+	int old_x2 = x2;
+
+	/* We do not have permission to pass through walls */
+	if (!(flg & (PROJECT_WALL | PROJECT_PASS)))
+	{
+		/* The character is the source of the projection */
+		if ((y1 == py) && (x1 == px))
+		{
+			/* Require that destination be in line of fire */
+			if (!(play_info[y2][x2] & (PLAY_FIRE))) return (PROJECT_NO);
+		}
+
+		/* The character is the target of the projection */
+		else if ((y2 == py) && (x2 == px))
+		{
+			/* Require that source be in line of fire */
+			if (!(play_info[y1][x1] & (PLAY_FIRE))) return (PROJECT_NO);
+		}
+	}
+
 	/* Check the projection path */
-	grid_n = project_path(grid_g, MAX_RANGE, y1, x1, y2, x2, 0);
+	grid_n = project_path(grid_g, MAX_RANGE, y1, x1, &y2, &x2, flg);
 
 	/* No grid is ever projectable from itself */
-	if (!grid_n) return (FALSE);
+	if (!grid_n) return (PROJECT_NO);
 
-	/* Final grid */
-	y = GRID_Y(grid_g[grid_n-1]);
-	x = GRID_X(grid_g[grid_n-1]);
-
-	/* May not end in a wall grid */
-	if (!(f_info[cave_feat[y][x]].flags1 & (FF1_PROJECT))) return (FALSE);
+	/* Final grid.  As grid_n may be negative, use absolute value.  */
+	y = GRID_Y(grid_g[ABS(grid_n) - 1]);
+	x = GRID_X(grid_g[ABS(grid_n) - 1]);
 
 	/* May not end in an unrequested grid */
-	if ((y != y2) || (x != x2)) return (FALSE);
+	if ((y != old_y2) || (x != old_x2)) return (PROJECT_NO);
 
-	/* Assume okay */
-	return (TRUE);
+	/* May not end in a wall */
+	if (!cave_project_bold(y, x)) return (PROJECT_NO);
+
+	/* Promise a clear bolt shot if we have verified that there is one */
+	if ((flg & (PROJECT_STOP)) || (flg & (PROJECT_CHCK)))
+	{
+		/* Positive value for grid_n mean no obstacle was found. */
+		if (grid_n > 0) return (PROJECT_CLEAR);
+	}
+
+	/* Assume projectable, but make no promises about clear shots */
+	return (PROJECT_NOT_CLEAR);
+
 }
-
 
 
 /*
  * Standard "find me a location" function
  *
  * Obtains a legal location within the given distance of the initial
- * location, and with "los()" from the source to destination location.
+ * location, and with "lof()" from the source to destination location.
  *
  * This function is often called from inside a loop which searches for
  * locations while increasing the "d" distance.
@@ -5823,8 +6290,8 @@ void scatter(int *yp, int *xp, int y, int x, int d, int m)
 		/* Ignore "excessively distant" locations */
 		if ((d > 1) && (distance(y, x, ny, nx) > d)) continue;
 
-		/* Require "line of sight" */
-		if (los(y, x, ny, nx)) break;
+		/* Require "line of fire" */
+		if (generic_los(y, x, ny, nx, CAVE_XLOF)) break;
 	}
 
 	/* Save the location */

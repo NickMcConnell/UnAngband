@@ -575,12 +575,12 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 			if (f4 & (TR4_BRAND_DARK))
 			{
 				/* Notice immunity  - orcs and dark breathers immune */
-				if ((r_ptr->flags4 & (RF4_BR_DARK)) || (r_ptr->flags3 & (RF3_ORC)))
+				if ((r_ptr->flags4 & (RF4_BRTH_DARK)) || (r_ptr->flags3 & (RF3_ORC)))
 				{
 					if (m_ptr->ml)
 					{
 						object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_BRAND_DARK);
-						if (r_ptr->flags4 & (RF4_BR_DARK)) l_ptr->flags4 |= (RF4_BR_DARK);
+						if (r_ptr->flags4 & (RF4_BRTH_DARK)) l_ptr->flags4 |= (RF4_BRTH_DARK);
 						if (r_ptr->flags3 & (RF3_ORC)) l_ptr->flags4 |= (RF3_ORC);
 					}
 				}
@@ -593,7 +593,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 					if (mult < 2) mult = 2;
 				}
 			}
-			else if ((m_ptr->ml) && ((l_ptr->flags4 & (RF4_BR_DARK)) || (rand_int(100)<tdam*3)))
+			else if ((m_ptr->ml) && ((l_ptr->flags4 & (RF4_BRTH_DARK)) || (rand_int(100)<tdam*3)))
 			{
 				object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_BRAND_DARK);
 			}
@@ -723,7 +723,7 @@ void search(void)
 
 			/* Require that grid be fully in bounds and in LOS */
 			if (!in_bounds_fully(y, x)) continue;
-			if (!los(py, px, y, x)) continue;
+			if (!generic_los(py, px, y, x, CAVE_XLOS)) continue;
 
 			/* Sometimes, notice things */
 			if (rand_int(100) < chance2)
@@ -1816,7 +1816,7 @@ void hit_trap(int y, int x)
 
 		if (f_ptr->spell)
 		{
-      		make_attack_spell_aux(0,y,x,f_ptr->spell);
+      			make_attack_ranged(0,f_ptr->spell,y,x);
 		}
 		else if (f_ptr->blow.method)
 		{
@@ -1902,7 +1902,7 @@ void py_attack(int y, int x)
 	/* Some monsters radiate damage when attacked */
 	if (r_ptr->flags2 & (RF2_HAS_AURA))
 	{
-		(void)make_attack_spell_aux(cave_m_idx[y][x],p_ptr->py,p_ptr->px,96+7);
+		(void)make_attack_ranged(cave_m_idx[y][x],96+7,p_ptr->py,p_ptr->px);
 	}
 
 	/* Handle player fear */
@@ -2122,14 +2122,14 @@ void py_attack(int y, int x)
 				object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 				/* Taste blood */
-				if ((f4 & (TR4_VAMP_HP)) & (r_ptr->flags7 & (RF7_HAS_BLOOD)))
+				if ((f4 & (TR4_VAMP_HP)) & (r_ptr->flags8 & (RF8_HAS_BLOOD)))
 				{
 					hp_player(r_ptr->level);
 
 					object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_HP);
-					l_ptr->flags7 |= (RF7_HAS_BLOOD);
+					l_ptr->flags8 |= (RF8_HAS_BLOOD);
 				}
-				else if (l_ptr->flags7 & (RF7_HAS_BLOOD))
+				else if (l_ptr->flags8 & (RF8_HAS_BLOOD))
 				{
 					object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_HP);
 				}
