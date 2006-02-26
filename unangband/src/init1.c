@@ -171,6 +171,7 @@ static cptr r_info_blow_method[] =
 	"XBOLT",
 	"SPIKE",
 	"DART",
+	"SING",
 	NULL
 };
 
@@ -181,8 +182,8 @@ static cptr r_info_blow_method[] =
 static cptr r_info_blow_effect[] =
 {
 	"",
-	"XXX1",
-	"ARROW",
+	"STORM",
+	"WIND",
 	"MISSILE",
 	"MANA",
 	"HOLY_ORB",
@@ -632,7 +633,7 @@ static cptr r_info_flags6[] =
 	"SHIELD",
 	"OPPOSE_ELEM",
 	"HUNGER",
-	"DISEASE",
+	"PROBE",
 	"SCARE",
 	"BLIND",
 	"CONF",
@@ -662,7 +663,7 @@ static cptr r_info_flags7[] =
 	"S_THIEF",
 	"S_BERTBILLTOM",
 	"RF7XXX7",
-	"S_AINU",
+	"S_MAIA",
 	"RF7XX10",
 	"RF7XX11",
 	"S_DRAGON",
@@ -3418,7 +3419,7 @@ static errr grab_one_spell_flag(monster_race *r_ptr, cptr what)
 		return (0);
 
 	/* Oops */
-	msg_format("Unknown monster flag '%s'.", what);
+	msg_format("Unknown monster spell '%s'.", what);
 
 	/* Failure */
 	return (PARSE_ERROR_GENERIC);

@@ -343,7 +343,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags6 & RF7_S_HYDRA)     vp[vn++] = "summon hydras";
 	if (l_ptr->flags6 & RF7_S_THIEF)     vp[vn++] = "summon thieves";
 	if (l_ptr->flags6 & RF7_S_BERTBILLTOM) vp[vn++] = "summon his friends";
-	if (l_ptr->flags6 & RF7_S_AINU)      vp[vn++] = "summon a maia";
+	if (l_ptr->flags6 & RF7_S_MAIA)      vp[vn++] = "summon a maia";
 	if (l_ptr->flags6 & RF7_S_DRAGON)    vp[vn++] = "summon a dragon";
 	if (l_ptr->flags6 & RF7_S_HI_DRAGON) vp[vn++] = "summon Ancient Dragons";
 	if (l_ptr->flags6 & RF7_S_DEMON)     vp[vn++] = "summon a demon";
@@ -667,7 +667,8 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr)
 		switch (effect)
 		{
 			case GF_NOTHING: q = "nothing"; break;
-			case GF_ARROW: p= "hurt with arrows"; break;
+			case GF_STORM: p= "lash with wind and rain"; break;
+			case GF_WIND: p= "blast with wind"; break;
 			case GF_MISSILE: q="blast with magic missiles";break;
 			case GF_MANA: q="blast with magic";break;       
 			case GF_HOLY_ORB: q="blast with holy magic";break;

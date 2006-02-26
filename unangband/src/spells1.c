@@ -631,7 +631,8 @@ static byte spell_color(int type)
 		case GF_POIS:	   return (TERM_GREEN);
 		case GF_HOLY_ORB:       return (TERM_L_DARK);
 		case GF_MANA:	   return (TERM_L_DARK);
-		case GF_ARROW:	  return (TERM_WHITE);
+		case GF_STORM:	  return (TERM_L_BLUE);
+		case GF_WIND:	  return (TERM_WHITE);
 		case GF_WATER_WEAK:	return (TERM_SLATE);
 		case GF_WATER:	  return (TERM_SLATE);
 		case GF_BWATER:	 return (TERM_VIOLET);
@@ -3407,19 +3408,6 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
-		/* Arrow -- armored monsters defend */
-		case GF_ARROW:
-		{
-			if (seen) obvious = TRUE;
-			if ((r_ptr->flags2 & (RF2_ARMOR)) && (rand_int(100) < r_ptr->ac /3))
-			{
-				note = " blocks it with a shield.";
-				dam = 0;
-				if (seen) l_ptr->flags3 |= (RF2_ARMOR);
-			}
-			break;
-		}
-
 		/* Plasma -- perhaps check ELEC or FIRE XXX */
 		case GF_PLASMA:
 		{
@@ -5523,25 +5511,6 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			take_hit(dam, killer);
-			break;
-		}
-
-		/* Arrow -- no dodging XXX */
-		/* Shields have a % chance equal to total ac of stopping attack */
-		case GF_ARROW:
-		{
-			object_type *i_ptr = &inventory[INVEN_ARM];
-
-			if ((i_ptr->k_idx) && (i_ptr->tval == TV_SHIELD) && (rand_int(100) < i_ptr->ac + i_ptr->to_a))
-			{
-				msg_print("Your shield stops an arrow.");
-				dam = 0; 
-			}
-			else
-			{
-				if (fuzzy) msg_print("You are hit by something sharp!");
-				take_hit(dam, killer);
-			}
 			break;
 		}
 

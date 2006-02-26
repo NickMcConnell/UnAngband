@@ -667,8 +667,8 @@
  * Spell types used by project(), and related functions.
  */
 #define GF_NOTHING      0
-#define GF_XXX1		1
-#define GF_ARROW		2
+#define GF_STORM	1
+#define GF_WIND		2
 #define GF_MISSILE      3
 #define GF_MANA		4
 #define GF_HOLY_ORB     5
@@ -2262,6 +2262,7 @@
 #define RBM_XBOLT	54		/* Crossbow bolt */
 #define RBM_SPIKE	55
 #define RBM_DART	56
+#define RBM_SING	57
 
 #define RBM_MAX_NORMAL  23
 #define RBM_MIN_RANGED  15
@@ -3192,7 +3193,7 @@
 #define RF7_S_THIEF        0x00004000  /* Summon Thieves */
 #define RF7_S_BERTBILLTOM  0x00008000  /* Summon Bert, Bill, and Tom */
 #define RF7_RF7XXX8        0x00010000  /* */
-#define RF7_S_AINU         0x00020000  /* Summon Ainu */
+#define RF7_S_MAIA         0x00020000  /* Summon Ainu */
 #define RF7_RF7XX10        0x00040000  /*  */
 #define RF7_RF7XX11        0x00080000  /*  */
 #define RF7_S_DRAGON       0x00100000  /* Summon Dragon */
@@ -3402,7 +3403,7 @@
 #define RF7_SUMMON_MASK \
 	(RF7_S_KIN |  RF7_S_MONSTER | RF7_S_MONSTERS | RF7_S_ANT | RF7_S_SPIDER | \
 	 RF7_S_HOUND | RF7_S_ANIMAL | RF7_S_HYDRA | RF7_S_THIEF | RF7_S_BERTBILLTOM | \
-	 RF7_S_AINU | RF7_S_DRAGON | RF7_S_HI_DRAGON | RF7_S_DEMON | RF7_S_HI_DEMON | \
+	 RF7_S_MAIA | RF7_S_DRAGON | RF7_S_HI_DRAGON | RF7_S_DEMON | RF7_S_HI_DEMON | \
 	 RF7_S_UNIQUE | RF7_S_HI_UNIQUE |  RF7_S_UNDEAD | RF7_S_HI_UNDEAD | RF7_S_WRAITH)
 
 

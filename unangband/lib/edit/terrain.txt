@@ -1789,7 +1789,7 @@ N:91:murder hole
 U:56
 G:^:R
 W:2:1:20:0
-T:ARROW:1d6
+T:HURT:1d6
 O:78
 D:An arrow hits you.
 K:DEFAULT:1
@@ -1806,7 +1806,7 @@ M:91
 U:56
 G:^:R
 W:5:1:20:0
-T:ARROW:3d6
+T:HURT:3d6
 O:80
 D:An arrow hits you.
 K:DEFAULT:1
@@ -1823,7 +1823,7 @@ M:91
 U:56
 G:^:R
 W:8:1:20:0
-T:ARROW:5d6
+T:HURT:5d6
 O:79
 D:An arrow hits you.
 K:DEFAULT:1
@@ -1840,7 +1840,7 @@ M:91
 U:56
 G:^:R
 W:11:1:20:0
-T:ARROW:7d6
+T:HURT:7d6
 O:81
 D:An arrow hits you.
 K:DEFAULT:1

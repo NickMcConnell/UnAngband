@@ -1444,7 +1444,7 @@ static long eval_max_dam(int r_idx)
 						else if (flag_counter == RF7_S_HYDRA)	this_dam = rlev * 3 / 2;
 						else if (flag_counter == RF7_S_THIEF)	this_dam = rlev / 2;
 						else if (flag_counter == RF7_S_BERTBILLTOM)	this_dam = rlev * 3 / 4;
-						else if (flag_counter == RF7_S_AINU)	this_dam = rlev * 3 / 2;
+						else if (flag_counter == RF7_S_MAIA)	this_dam = rlev * 3 / 2;
 						else if (flag_counter == RF7_S_DRAGON)	this_dam = rlev * 3 / 2;
 						else if (flag_counter == RF7_S_HI_DRAGON) this_dam = rlev * 4;
 						else if (flag_counter == RF7_S_DEMON)	this_dam = rlev * 3 / 2;

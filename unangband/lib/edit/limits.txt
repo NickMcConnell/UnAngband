@@ -32,7 +32,7 @@ M:E:128
 M:X:460
 
 # Maximum number of monster races
-M:R:1111
+M:R:1168
 
 # Maximum number of vaults
 M:V:51
@@ -84,5 +84,5 @@ M:N:20000
 
 # Size of the "fake" array for reading in the descriptions of monsters,
 # vaults, and the player-histories
-M:I:90000
+M:I:100000
 
