@@ -4,7 +4,7 @@
  * Copyright (c) 1997 Ben Harrison, James E. Wilson, Robert A. Koeneke
  *
  * This software may be copied and distributed for educational, research,
- * and not for profit purposes provided that tefhis copyright and statement
+ * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
  * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
@@ -395,6 +395,12 @@
 
 
 /*
+ * Maximum size of a group of monsters
+ */
+#define GROUP_MAX       18
+
+
+/*
  * A monster can only "multiply" (reproduce) if there are fewer than 100
  * monsters on the level capable of such spontaneous reproduction.  This
  * is a hack which prevents the "m_list[]" array from exploding due to
@@ -638,29 +644,38 @@
 /*
  * Legal restrictions for "summon_specific()"
  */
-#define SUMMON_ANT	    11
-#define SUMMON_SPIDER       12
-#define SUMMON_HOUND        13
-#define SUMMON_HYDRA        14
-#define SUMMON_MAIA	    15
-#define SUMMON_DEMON        16
-#define SUMMON_UNDEAD       17
-#define SUMMON_DRAGON       18
-/* xxx */
-#define SUMMON_HI_DEMON     26
-#define SUMMON_HI_UNDEAD    27
-#define SUMMON_HI_DRAGON    28
-/* xxx */
-#define SUMMON_WRAITH       31
-#define SUMMON_UNIQUE       32
-#define SUMMON_HI_UNIQUE    33
-#define SUMMON_KIN          34
-
-#define SUMMON_ANIMAL       50
-#define SUMMON_BERTBILLTOM  51
-#define SUMMON_THIEF        53
-
-#define SUMMON_INDEX        60
+#define SUMMON_KIN	1
+#define RAISE_KIN	2
+#define ANIMATE_DEAD	3
+/* XXX */
+#define RAISE_MONSTER   6
+/* XXX */
+#define SUMMON_PLANT    8
+#define SUMMON_INSECT   9
+#define SUMMON_ANIMAL  10
+#define SUMMON_HOUND   11
+#define SUMMON_SPIDER  12
+#define SUMMON_CLASS   13
+#define SUMMON_RACE    14
+#define SUMMON_ELEMENT 15
+#define SUMMON_FRIEND  16
+#define SUMMON_UNIQUE_FRIEND  17
+#define SUMMON_ORC     18
+#define SUMMON_TROLL   19
+#define SUMMON_GIANT   20
+#define SUMMON_DRAGON  21
+#define SUMMON_HI_DRAGON  22
+#define ANIMATE_ELEMENT   23
+#define ANIMATE_OBJECT    24
+#define SUMMON_DEMON      25
+#define SUMMON_HI_DEMON   26
+#define RAISE_UNIQUE      27
+#define SUMMON_UNIQUE     28
+#define SUMMON_HI_UNIQUE  29
+#define SUMMON_UNDEAD     30
+#define SUMMON_HI_UNDEAD  31
+#define SUMMON_WRAITH     32
+#define RAISE_HI_UNIQUE   33
 
 
 /*
@@ -1538,6 +1553,13 @@
 /*** Object "tval" and "sval" codes ***/
 
 
+
+/*
+ * XXX XXX XXX Do not use these hard-coded values.
+ */
+#define OBJ_GOLD_LIST   480     /* First "gold" entry */
+#define MAX_GOLD        18      /* Number of "gold" entries */
+
 /*
  * The values for the "tval" field of various objects.
  *
@@ -1597,7 +1619,8 @@
 #define TV_SONG_BOOK    92
 #define TV_RUNESTONE    93
 #define TV_SERVICE	99	/* Services have special meanings in stores */
-#define TV_GOLD  100     /* Gold can only be picked up by players */
+#define TV_GOLD  100     /* Gold or higher tvals can only be picked up by players */
+#define TV_GEMS  101
 
 /* The "sval" codes for TV_SKELETON */
 #define SV_BONE_SKULL 1
@@ -2820,10 +2843,10 @@
 #define TR3_HEAVY_CURSE  0x40000000L     /* Item has Heavy Curse */
 #define TR3_PERMA_CURSE  0x80000000L     /* Item has Perma Curse */
 
-#define TR4_BRAND_DARK	0x000000001L	/* Weapon has dark brand */
-#define TR4_BRAND_LITE	0x000000002L	/* Weapon has lite brand */
-#define TR4_HURT_LITE	0x000000004L    /* Item makes wielder vulnerible to lite */
-#define TR4_HURT_WATER	0x000000008L    /* Item makes wielder vulnerible to water */
+#define TR4_BRAND_DARK	0x00000001L	/* Weapon has dark brand */
+#define TR4_BRAND_LITE	0x00000002L	/* Weapon has lite brand */
+#define TR4_HURT_LITE	0x00000004L    /* Item makes wielder vulnerible to lite */
+#define TR4_HURT_WATER	0x00000008L    /* Item makes wielder vulnerible to water */
 #define TR4_VAMP_HP   	0x00000010L     /* Weapon restores user hp when kills a creature with blood  */
 #define TR4_VAMP_MANA  	0x00000020L     /* Weapon restores user sp when kills a creature with mana  */
 #define TR4_IM_POIS   	0x00000040L     /* Immune to poison  */
@@ -2963,7 +2986,7 @@
 #define RF1_FORCE_MAXHP  0x00000200      /* Start with max hitpoints */
 #define RF1_FORCE_SLEEP  0x00000400      /* Start out sleeping */
 #define RF1_GUARDIAN     0x00000800      /* Dungeon guardian*/
-#define RF1_ATTR_METAL   0x00001000      /* Lightens color occasionally */
+#define RF1_FRIEND   0x00001000      /* Arrive with a friend */
 #define RF1_FRIENDS       0x00002000      /* Arrive with some friends */
 #define RF1_ESCORT 0x00004000      	/* Arrive with an escort */
 #define RF1_ESCORTS       0x00008000      /* Arrive with some escorts */
@@ -3023,38 +3046,38 @@
 /*
  * New monster race bit flags
  */
-#define RF3_ORC    0x00000001      /* Orc */
-#define RF3_TROLL  0x00000002      /* Troll */
-#define RF3_GIANT  0x00000004      /* Giant */
-#define RF3_DRAGON 0x00000008      /* Dragon */
-#define RF3_DEMON  0x00000010      /* Demon */
-#define RF3_UNDEAD 0x00000020      /* Undead */
-#define RF3_EVIL   0x00000040      /* Evil */
-#define RF3_ANIMAL 0x00000080      /* Animal */
-#define RF3_OOZE   0x00000100      /* Oozes through things */
-#define RF3_HUGE   0x00000200      /* Huge (breaks things?) */
-#define RF3_NONVOCAL      0x00000400      /* Non-Vocal */
-#define RF3_NONLIVING     0x00000800      /* Non-Living */
-#define RF3_HURT_LITE    0x00001000      /* Hurt by lite */
-#define RF3_HURT_ROCK    0x00002000      /* Hurt by rock remover */
-#define RF3_PLANT    0x00004000      /* Plant */
-#define RF3_INSECT    0x00008000      /* Insect */
-#define RF3_IM_ACID       0x00010000      /* Resist acid a lot */
-#define RF3_IM_ELEC       0x00020000      /* Resist elec a lot */
-#define RF3_IM_FIRE       0x00040000      /* Resist fire a lot */
-#define RF3_IM_COLD       0x00080000      /* Resist cold a lot */
-#define RF3_IM_POIS       0x00100000      /* Resist poison a lot */
-#define RF3_IM_WATER      0x00200000      /* Resist water a lot */
-#define RF3_RES_NETH     0x00400000      /* Resist nether a lot */
-#define RF3_RES_LAVA     0x00800000      /* Resist lava */
-#define RF3_RES_PLAS     0x01000000      /* Resist plasma */
-#define RF3_RES_NEXU     0x02000000      /* Resist nexus */
-#define RF3_RES_DISE     0x04000000      /* Resist disenchantment */
-#define RF3_HURT_WATER   0x08000000        /* Hurt by water remover */
-#define RF3_NO_FEAR       0x10000000      /* Cannot be scared */
-#define RF3_NO_STUN       0x20000000      /* Cannot be stunned */
-#define RF3_NO_CONF       0x40000000      /* Cannot be confused */
-#define RF3_NO_SLEEP     0x80000000      /* Cannot be slept */
+#define RF3_ORC            0x00000001      /* Orc */
+#define RF3_TROLL          0x00000002      /* Troll */
+#define RF3_GIANT          0x00000004      /* Giant */
+#define RF3_DRAGON         0x00000008      /* Dragon */
+#define RF3_DEMON          0x00000010      /* Demon */
+#define RF3_UNDEAD         0x00000020      /* Undead */
+#define RF3_EVIL           0x00000040      /* Evil */
+#define RF3_ANIMAL         0x00000080      /* Animal */
+#define RF3_OOZE           0x00000100      /* Oozes through things */
+#define RF3_HUGE           0x00000200      /* Huge (breaks things?) */
+#define RF3_NONVOCAL       0x00000400      /* Non-Vocal */
+#define RF3_NONLIVING      0x00000800      /* Non-Living */
+#define RF3_HURT_LITE      0x00001000      /* Hurt by lite */
+#define RF3_HURT_ROCK      0x00002000      /* Hurt by rock remover */
+#define RF3_PLANT          0x00004000      /* Plant */
+#define RF3_INSECT         0x00008000      /* Insect */
+#define RF3_IM_ACID        0x00010000      /* Resist acid a lot */
+#define RF3_IM_ELEC        0x00020000      /* Resist elec a lot */
+#define RF3_IM_FIRE        0x00040000      /* Resist fire a lot */
+#define RF3_IM_COLD        0x00080000      /* Resist cold a lot */
+#define RF3_IM_POIS        0x00100000      /* Resist poison a lot */
+#define RF3_RES_WATER      0x00200000      /* Resist water a lot */
+#define RF3_RES_NETHR      0x00400000      /* Resist nether a lot */
+#define RF3_RES_LAVA       0x00800000      /* Resist lava */
+#define RF3_RES_PLAS       0x01000000      /* Resist plasma */
+#define RF3_RES_NEXUS      0x02000000      /* Resist nexus */
+#define RF3_RES_DISEN      0x04000000      /* Resist disenchantment */
+#define RF3_HURT_WATER     0x08000000      /* Hurt by water remover */
+#define RF3_NO_FEAR        0x10000000      /* Cannot be scared */
+#define RF3_NO_STUN        0x20000000      /* Cannot be stunned */
+#define RF3_NO_CONF        0x40000000      /* Cannot be confused */
+#define RF3_NO_SLEEP       0x80000000      /* Cannot be slept */
 
 
 /*
@@ -3082,9 +3105,9 @@
 #define RF4_BRTH_CONFU     0x00010000  /* Breathe Confusion */
 #define RF4_BRTH_SOUND     0x00020000  /* Breathe Sound */
 #define RF4_BRTH_SHARD     0x00040000  /* Breathe Shards */
-#define RF4_BRTH_INER      0x00080000  /* Breathe Inertia */
+#define RF4_BRTH_INERT     0x00080000  /* Breathe Inertia */
 #define RF4_BRTH_GRAV      0x00100000  /* Breathe Gravity */
-#define RF4_XXX2	   0x00200000  /* Unused */
+#define RF4_BRTH_WIND	   0x00200000  /* Breathe Wind */
 #define RF4_BRTH_FORCE     0x00400000  /* Breathe Force */
 #define RF4_BRTH_NEXUS     0x00800000  /* Breathe Nexus */
 #define RF4_BRTH_NETHR     0x01000000  /* Breathe Nether */
@@ -3110,7 +3133,7 @@
 #define RF5_BALL_CONFU     0x00000080  /* Confusion Ball -> Conf Storm */
 #define RF5_BALL_SOUND     0x00000100  /* Sound Ball -> Sound Storm */
 #define RF5_BALL_SHARD     0x00000200  /* Shard Ball -> Shard Storm */
-#define RF5_XXX2           0x00000400  /* Unused */
+#define RF5_BALL_WIND      0x00000400  /* Wind Ball -> Hurricane */
 #define RF5_BALL_STORM     0x00000800  /* Storm Ball -> Tempest */
 #define RF5_BALL_NETHR     0x00001000  /* Nether Ball -> Nether Storm */
 #define RF5_BALL_CHAOS     0x00002000  /* Chaos Ball -> Chaos Storm */
@@ -3126,12 +3149,12 @@
 #define RF5_BOLT_WATER     0x00800000  /* Water Bolt */
 #define RF5_BOLT_NETHR     0x01000000  /* Nether Bolt */
 #define RF5_BOLT_MANA      0x02000000  /* Magic Missile -> Mana Bolt */
-#define RF5_XXX4           0x04000000  /* Unused */
+#define RF5_HOLY_ORB       0x04000000  /* Orb of Draining */
 #define RF5_BEAM_ELEC      0x08000000  /* Electric spark */
 #define RF5_BEAM_ICE       0x10000000  /* Ice Lance */
 #define RF5_BEAM_NETHR     0x20000000  /* Spear of Nether */
-#define RF5_XXX5	   0x40000000  /* Unused */
-#define RF5_HOLY_ORB       0x80000000  /* Orb of Draining */
+#define RF5_ARC_HFIRE	   0x40000000  /* Cone of hellfire */
+#define RF5_ARC_FORCE      0x80000000  /* Cone of force */
 
 /*
  * Monster racial flags - help self, hinder character, and special magics
@@ -3156,9 +3179,9 @@
 #define RF6_CURSE          0x00010000  /* Curse player */
 #define RF6_DISPEL         0x00020000  /* Dispel player */
 #define RF6_MIND_BLAST     0x00040000  /* Blast Mind  */
-#define RF6_BRAIN_SMASH    0x00080000  /* Brain Smash*/
+#define RF6_ILLUSION       0x00080000  /* Hallucinate player */
 #define RF6_WOUND          0x00100000  /* Cause Wounds */
-#define RF6_HERO           0x00200000  /* Heroism */
+#define RF6_BLESS          0x00200000  /* Bless */
 #define RF6_BESERK         0x00400000  /* Beserk strength */
 #define RF6_SHIELD         0x00800000  /* Shield */
 #define RF6_OPPOSE_ELEM    0x01000000  /* Temporary elemental resist */
@@ -3178,28 +3201,28 @@
 
 #define RF7_S_KIN          0x00000001  /* Summon Similar */
 #define RF7_R_KIN          0x00000002  /* Raise Similar from dead*/
-#define RF7_RF7XXX2        0x00000004  /*  */
+#define RF7_A_DEAD         0x00000004  /* Animate dead */
 #define RF7_S_MONSTER      0x00000008  /* Summon Monster */
 #define RF7_S_MONSTERS     0x00000010  /* Summon Monsters */
 #define RF7_R_MONSTER      0x00000020  /* Raise Monster from dead */
 #define RF7_R_MONSTERS     0x00000040  /* Raise Monsters from dead */
-#define RF7_RF7XXX5	   0x00000080  /*  */
-#define RF7_S_ANT          0x00000100  /* Summon Ants */
-#define RF7_S_SPIDER       0x00000200  /* Summon Spiders */
+#define RF7_S_PLANT	   0x00000080  /* Summon Plants */
+#define RF7_S_INSECT       0x00000100  /* Summon Insects */
+#define RF7_S_ANIMAL       0x00000200  /* Summon Animals */
 #define RF7_S_HOUND        0x00000400  /* Summon Hounds */
-#define RF7_S_ANIMAL       0x00000800  /* Summon Animals */
-#define RF7_S_HYDRA        0x00001000  /* Summon Hydras */
-#define RF7_RF7XXX7        0x00002000  /*  */
-#define RF7_S_THIEF        0x00004000  /* Summon Thieves */
-#define RF7_S_BERTBILLTOM  0x00008000  /* Summon Bert, Bill, and Tom */
-#define RF7_RF7XXX8        0x00010000  /* */
-#define RF7_S_MAIA         0x00020000  /* Summon Ainu */
-#define RF7_RF7XX10        0x00040000  /*  */
-#define RF7_RF7XX11        0x00080000  /*  */
+#define RF7_S_SPIDER       0x00000800  /* Summon Spiders */
+#define RF7_S_CLASS        0x00001000  /* Summon Monsters of similar class (Warrior/Mage/Thief etc)*/
+#define RF7_S_RACE         0x00002000  /* Summon Monsters of similar race (Elf/Man/Dwarf etc) */
+#define RF7_S_ELEMENT      0x00004000  /* Summon Monsters of similar element (Fire/Water etc) */
+#define RF7_S_FRIEND       0x00008000  /* Summon a Friend */
+#define RF7_S_FRIENDS      0x00010000  /* Summon Friends*/
+#define RF7_S_ORC          0x00020000  /* Summon Orc */
+#define RF7_S_TROLL        0x00040000  /* Summon Troll */
+#define RF7_S_GIANT        0x00080000  /* Summon Giant */
 #define RF7_S_DRAGON       0x00100000  /* Summon Dragon */
 #define RF7_S_HI_DRAGON    0x00200000  /* Summon Ancient Dragons */
-#define RF7_RF7XX12        0x00400000  /*  */
-#define RF7_RF7XX13        0x00800000  /*  */
+#define RF7_A_ELEMENT      0x00400000  /* Animate an element */
+#define RF7_A_OBJECT       0x00800000  /* Animate an object */
 #define RF7_S_DEMON        0x01000000  /* Summon Demon(s) */
 #define RF7_S_HI_DEMON     0x02000000  /* Summon Greater Demons */
 #define RF7_R_UNIQUE       0x04000000  /* Raise Unique Monster from dead */
@@ -3212,63 +3235,144 @@
 /*
  * Monster racial flags - dropped objects and body parts
  */
-#define RF8_HAS_SKULL	0x00000001
-#define RF8_HAS_SKELETON     0x00000002
-#define RF8_HAS_TEETH	0x00000004
-#define RF8_HAS_CORPSE       0x00000008
-#define RF8_HAS_HEAD	 0x00000010
-#define RF8_HAS_HAND	 0x00000020
-#define RF8_HAS_ARM	  0x00000040
-#define RF8_HAS_LEG	  0x00000080
-#define RF8_HAS_WING	 0x00000100
-#define RF8_HAS_BLOOD	0x00000200      /* Leave bloody trails if injured */
-#define RF8_ASSEMBLY	 0x00000400	/* Assembly of component parts */
-#define RF8_HAS_SKIN	 0x00000800
-#define RF8_HAS_SCALE	0x00001000
-#define RF8_HAS_FEATHER      0x00002000
-#define RF8_HAS_FUR	  0x00004000
-#define RF8_HAS_SLIME	0x00008000      /* Leave slimy trails */
-#define RF8_DROP_JUNK	0x00010000      /* Sticks, Pottery, etc ('~') */
-#define RF8_DROP_CHEST       0x00020000      /* Chests ('*') */
-#define RF8_DROP_MISSILE     0x00040000      /* Slings/Bows/Xbows/Ammo */
-#define RF8_DROP_TOOL	0x00080000      /* Shovels/Picks/Spikes */
-#define RF8_DROP_WEAPON      0x00100000      /* Weapons */
-#define RF8_DROP_MUSIC       0x00200000      /* Musical instruments/Song books */
-#define RF8_DROP_CLOTHES     0x00400000      /* Boots/Gloves/Cloaks/Soft Armor */
-#define RF8_DROP_ARMOR       0x00800000      /* Hard Armor/Helms/Shields/Dragon Armor */
-#define RF8_DROP_LITE	0x01000000      /* Lites/Flasks */
-#define RF8_DROP_JEWELRY     0x02000000      /* Rings/Amulets/Crowns */
-#define RF8_DROP_RSW	 0x04000000      /* Rod/staff/wand */
-#define RF8_DROP_WRITING     0x08000000      /* Books/scrolls */
-#define RF8_DROP_POTION      0x10000000
-#define RF8_DROP_FOOD	0x20000000
-#define RF8_HAS_CLAW	 0x40000000
-#define RF8_HAS_SPORE	0x80000000
+#define RF8_HAS_SKULL      0x00000001
+#define RF8_HAS_SKELETON   0x00000002
+#define RF8_HAS_TEETH      0x00000004
+#define RF8_HAS_CORPSE     0x00000008
+#define RF8_HAS_HEAD       0x00000010
+#define RF8_HAS_HAND       0x00000020
+#define RF8_HAS_CLAW       0x00000040
+#define RF8_HAS_ARM        0x00000080
+#define RF8_HAS_LEG        0x00000100
+#define RF8_HAS_WING       0x00000200
+#define RF8_HAS_SKIN       0x00000400
+#define RF8_HAS_SCALE      0x00000800
+#define RF8_HAS_FEATHER    0x00001000
+#define RF8_HAS_FUR        0x00002000
+#define RF8_HAS_BLOOD      0x00004000      /* Leave bloody trails if injured */
+#define RF8_HAS_SLIME      0x00008000      /* Leave slimy trails */
+#define RF8_HAS_SPORE      0x00010000
+#define RF8_DROP_CHEST     0x00020000      /* Chests ('&') */
+#define RF8_DROP_MISSILE   0x00040000      /* Slings/Bows/Xbows/Ammo */
+#define RF8_DROP_TOOL      0x00080000      /* Shovels/Picks/Spikes */
+#define RF8_DROP_WEAPON    0x00100000      /* Weapons */
+#define RF8_DROP_MUSIC     0x00200000      /* Musical instruments/Song books */
+#define RF8_DROP_CLOTHES   0x00400000      /* Boots/Gloves/Cloaks/Soft Armor */
+#define RF8_DROP_ARMOR     0x00800000      /* Hard Armor/Helms/Shields/Dragon Armor */
+#define RF8_DROP_LITE      0x01000000      /* Lites/Flasks */
+#define RF8_DROP_JEWELRY   0x02000000      /* Rings/Amulets/Crowns */
+#define RF8_DROP_RSW       0x04000000      /* Rod/staff/wand */
+#define RF8_DROP_WRITING   0x08000000      /* Books/scrolls */
+#define RF8_DROP_POTION    0x10000000
+#define RF8_DROP_FOOD      0x20000000
+#define RF8_DROP_JUNK      0x40000000      /* Sticks, Pottery, etc ('~') */
+#define RF8_ASSEMBLY       0x80000000	/* Assembly of component parts */
 
+
+/*
+ * Monster racial flags - extra flags from Sangband etc.
+ */
+#define RF9_PLAYER_GHOST   0x00000001      /* Ghost of a former player */
+#define RF9_NEVER_MISS     0x00000002      /* Never miss when attacking */
+#define RF9_SAME_SPEED     0x00000004      /* Move at same speed as player */
+#define RF9_EVASIVE        0x00000008      /* Evade melee blows / missiles / bolts */
+#define RF9_SCENT          0x00000010      /* Track player by scent */
+#define RF9_SUPER_SCENT    0x00000020      /* Track player by scent - better range */
+#define RF9_WATER_SCENT    0x00000040      /* Track player by scent through water */
+#define RF9_RES_BLIND      0x00000080      /* Resist blindness */
+#define RF9_RES_LITE       0x00000100      /* Resist lite */
+#define RF9_RES_DARK       0x00000200      /* Resist darkness */
+#define RF9_RES_CHAOS      0x00000400      /* Resist chaos */
+#define RF9_RES_TPORT      0x00000800      /* Resist teleportation */
+#define RF9_RES_EDGED      0x00001000      /* Resist edged weapons */
+#define RF9_RES_BLUNT      0x00002000      /* Resist blunt weapons */
+#define RF9_IM_EDGED       0x00004000      /* Immune to edged weapons / resist shards*/
+#define RF9_IM_BLUNT       0x00008000      /* Immune to blunt weapons / resist sound/force */
+#define RF9_NO_CUTS        0x00010000      /* Cannot be cut */
+#define RF9_NO_SLOW        0x00020000      /* Cannot be slowed / paralyzed */
+#define RF9_FAMILY         0x00040000      /* Member of the player's family */
+#define RF9_GOOD           0x00080000      /* Good - never summon evil / never summoned by evil */
+#define RF9_NEUTRAL        0x00100000      /* Neutral - don't interact with player unless attacked */
+#define RF9_DWARF          0x00200000      /* Hurt by slay dwarf */
+#define RF9_ELF            0x00400000      /* Hurt by slay elf */
+#define RF9_MAN            0x00800000      /* Hurt by slay man */
+#define RF9_TOWNSFOLK      0x01000000      /* Use townsfolk AI */
+#define RF9_DROP_ESSENCE   0x02000000      /* Drop essences */
+#define RF9_DROP_MUSHROOM  0x04000000      /* Drop specific mushrooms */
+#define RF9_DROP_COINS     0x08000000      /* Drop specific gold */
+#define RF9_ATTR_METAL     0x10000000      /* Changes color 'brighter' */
+#define RF9_ATTR_INDEX     0x20000000      /* Changes color by index */
+#define RF9_MORGUL_MAGIC   0x40000000      /* Morgul magic */
+#define RF9_UDUN_MAGIC     0x80000000	   /* Udund magic */
 
 /*
  * Some flags are obvious
  */
 #define RF1_OBVIOUS_MASK \
 	(RF1_UNIQUE | RF1_QUESTOR | RF1_MALE | RF1_FEMALE | \
-	 RF1_GUARDIAN | RF1_FRIENDS | RF1_ESCORT | RF1_ESCORTS)
+	 RF1_GUARDIAN | RF1_FRIEND | RF1_FRIENDS | RF1_ESCORT | RF1_ESCORTS)
+
+/*
+ *  Match race, class or skin for summoning.
+ */
 
 /*
  * "race" flags
  */
 #define RF3_RACE_MASK \
 	(RF3_ORC | RF3_TROLL | RF3_GIANT | RF3_DRAGON | \
-	 RF3_DEMON | RF3_UNDEAD | RF3_EVIL | RF3_ANIMAL)
+	 RF3_DEMON | RF3_UNDEAD | RF3_EVIL | RF3_ANIMAL | \
+	 RF3_INSECT | RF3_PLANT)
+
+#define RF9_RACE_MASK \
+	(RF9_DWARF | RF9_ELF | RF9_MAN)
 
 /*
  * "class" flags
  */
-#define RF3_CLASS_MASK \
-	(RF3_ARMOR | RF3_SNEAKY | RF3_PRIEST | RF3_MAGE)
+#define RF2_CLASS_MASK \
+	(RF2_ARMOR | RF2_SNEAKY | RF2_PRIEST | RF2_MAGE)
 
- /*
-  * Hack -- Bit masks to control what spells are considered
-  */
+
+/*
+ * "skin" flags - used for summon animal
+ */
+#define RF8_SKIN_MASK \
+	(RF8_HAS_FUR | RF8_HAS_FEATHER | RF8_HAS_SCALE)
+
+
+/*
+ * Elements - used for summon elemental
+ */
+#define ELEM_FIRE     0
+#define ELEM_EARTH    1
+#define ELEM_WATER    2
+#define ELEM_AIR      3
+#define ELEM_MAGMA    4
+#define ELEM_OOZE     5
+#define ELEM_ICE      6
+#define ELEM_SMOKE    7
+#define ELEM_LITE     8
+
+#define MAX_ELEMENTS   9
+
+
+/*
+ * Hack -- Bit masks to control what spells are considered
+ */
+
+/*
+ * Innate spells are controlled by chance innate, all others by chance cast
+ */
+#define RF4_INNATE_MASK (0xFFFFFFFFL)
+
+#define RF5_INNATE_MASK (0L)
+
+#define RF6_INNATE_MASK (0L)
+
+#define RF7_INNATE_MASK (0L)
+
+
 
  /*
   * Attack spells.
@@ -3280,7 +3384,8 @@
 	(RF5_BALL_ACID | RF5_BALL_ELEC | RF5_BALL_FIRE | RF5_BALL_COLD | \
 	 RF5_BALL_POIS | RF5_BALL_LITE | RF5_BALL_DARK | RF5_BALL_CONFU | \
 	 RF5_BALL_SOUND | RF5_BALL_SHARD | RF5_BALL_STORM | RF5_BALL_NETHR | \
-	 RF5_BALL_CHAOS | RF5_BALL_MANA | RF5_BALL_WATER | RF5_HOLY_ORB)
+	 RF5_BALL_CHAOS | RF5_BALL_MANA | RF5_BALL_WATER | RF5_HOLY_ORB | \
+	 RF5_BALL_WIND)
 
 #define RF6_BALL_MASK (0L)
 
@@ -3320,13 +3425,31 @@
  * Archery attacks
  * Need special treatment in AI.
   */
-#define RF4_ARCHERY_MASK	(0L)
+#define RF4_ARCHERY_MASK	(RF4_BLOW_1 | RF4_BLOW_2 | RF4_BLOW_3 | RF4_BLOW_4)
 
 #define RF5_ARCHERY_MASK 	(0L)
 
 #define RF6_ARCHERY_MASK 	(0L)
 
 #define RF7_ARCHERY_MASK 	(0L)
+
+/*
+ * Arc attacks.
+ * Need special treatment in movement AI.
+ */
+
+#define RF4_ARC_MASK \
+        (0L)
+
+#define RF5_ARC_MASK \
+ 	(RF5_ARC_HFIRE | RF5_ARC_FORCE)
+
+#define RF6_ARC_MASK \
+	(0L)
+
+#define RF7_ARC_MASK \
+	(0L)
+
 
 /*
  * Breath attacks.
@@ -3336,10 +3459,10 @@
 #define RF4_BREATH_MASK \
         (RF4_BRTH_ACID | RF4_BRTH_ELEC | RF4_BRTH_FIRE | RF4_BRTH_COLD | \
 	 RF4_BRTH_POIS | RF4_BRTH_PLAS | RF4_BRTH_LITE | RF4_BRTH_DARK | \
-         RF4_BRTH_CONFU | RF4_BRTH_SOUND | RF4_BRTH_SHARD | RF4_BRTH_INER | \
+         RF4_BRTH_CONFU | RF4_BRTH_SOUND | RF4_BRTH_SHARD | RF4_BRTH_INERT | \
          RF4_BRTH_GRAV | RF4_BRTH_FORCE | RF4_BRTH_NEXUS | RF4_BRTH_NETHR | \
          RF4_BRTH_CHAOS | RF4_BRTH_DISEN | RF4_BRTH_TIME | RF4_BRTH_MANA | \
-	 RF4_BRTH_HOLY | RF4_BRTH_FEAR | RF4_BRTH_DISEA)
+	 RF4_BRTH_HOLY | RF4_BRTH_FEAR | RF4_BRTH_DISEA | RF4_BRTH_WIND)
 
 #define RF5_BREATH_MASK \
  	(0L)
@@ -3355,17 +3478,20 @@
   * Need special treatment in movement AI.
   */
 #define RF4_ATTACK_MASK \
-        (RF4_ARCHERY_MASK | RF4_BOLT_MASK | RF4_BEAM_MASK | RF4_BALL_MASK)
+        (RF4_ARCHERY_MASK | RF4_BOLT_MASK | RF4_BEAM_MASK | RF4_BALL_MASK | \
+	RF4_ARC_MASK)
 
 #define RF5_ATTACK_MASK \
-		(RF5_ARCHERY_MASK | RF5_BOLT_MASK | RF5_BEAM_MASK | RF5_BALL_MASK)
+	(RF5_ARCHERY_MASK | RF5_BOLT_MASK | RF5_BEAM_MASK | RF5_BALL_MASK | \
+	RF5_ARC_MASK)
 
 #define RF6_ATTACK_MASK \
-		(RF6_ARCHERY_MASK | RF6_BOLT_MASK | RF6_BEAM_MASK | RF6_BALL_MASK | \
-		RF6_WOUND | RF6_BRAIN_SMASH | RF6_MIND_BLAST)
+	(RF6_ARCHERY_MASK | RF6_BOLT_MASK | RF6_BEAM_MASK | RF6_BALL_MASK | \
+	RF6_ARC_MASK | RF6_WOUND | RF6_MIND_BLAST)
 
 #define RF7_ATTACK_MASK \
-		(RF7_ARCHERY_MASK | RF7_BOLT_MASK | RF7_BEAM_MASK | RF7_BALL_MASK)
+	(RF7_ARCHERY_MASK | RF7_BOLT_MASK | RF7_BEAM_MASK | RF7_BALL_MASK | \
+	RF7_ARC_MASK)
 
 
 /*
@@ -3381,7 +3507,7 @@
 #define RF6_HARASS_MASK \
 	(RF6_DARKNESS | RF6_TRAPS | RF6_FORGET | RF6_HUNGER | RF6_DRAIN_MANA | \
          RF6_SCARE | RF6_BLIND | RF6_CONF | RF6_SLOW | RF6_HOLD | RF6_CURSE | \
-	 RF6_DISEASE | RF6_DISPEL)
+	 RF6_DISEASE | RF6_DISPEL | RF6_ILLUSION)
 
 #define RF7_HARASS_MASK \
 	(0L)
@@ -3401,10 +3527,42 @@
 	(0L)
 
 #define RF7_SUMMON_MASK \
-	(RF7_S_KIN |  RF7_S_MONSTER | RF7_S_MONSTERS | RF7_S_ANT | RF7_S_SPIDER | \
-	 RF7_S_HOUND | RF7_S_ANIMAL | RF7_S_HYDRA | RF7_S_THIEF | RF7_S_BERTBILLTOM | \
-	 RF7_S_MAIA | RF7_S_DRAGON | RF7_S_HI_DRAGON | RF7_S_DEMON | RF7_S_HI_DEMON | \
-	 RF7_S_UNIQUE | RF7_S_HI_UNIQUE |  RF7_S_UNDEAD | RF7_S_HI_UNDEAD | RF7_S_WRAITH)
+	(0xFFFFFFFFL)
+
+
+
+/*
+ * Spells that increase the caster's relative speed
+ */
+#define RF4_HASTE_MASK \
+	(0L)
+
+#define RF5_HASTE_MASK \
+	(RF5_HOLD | RF5_SLOW)
+
+#define RF6_HASTE_MASK \
+	(RF6_HASTE)
+
+#define RF7_HASTE_MASK \
+	(0L)
+
+
+/*
+ * Assist spells - monsters only cast these on self or allies
+ */
+#define RF4_ASSIST_MASK \
+	(RF4_QUAKE)
+
+#define RF5_ASSIST_MASK \
+	(0L)
+
+#define RF6_ASSIST_MASK \
+        (RF6_HEAL | RF6_ADD_MANA | RF6_TELE_SELF_TO | RF6_CURE | RF6_HASTE | \
+	RF6_BLINK | RF6_TPORT | RF6_TELE_TO | RF6_TRAPS | RF6_INVIS | RF6_WRAITHFORM | \
+	RF6_BLESS | RF6_BESERK | RF6_SHIELD | RF6_OPPOSE_ELEM)
+
+#define RF7_ASSIST_MASK \
+	(0L)
 
 
 /*
@@ -3412,17 +3570,16 @@
  * Need special treatment in AI.
  */
 #define RF4_NO_PLAYER_MASK \
-        (RF4_SUMMON_MASK)
+        (RF4_ASSIST_MASK)
 
 #define RF5_NO_PLAYER_MASK \
-        (RF5_SUMMON_MASK)
+        (RF5_ASSIST_MASK)
 
 #define RF6_NO_PLAYER_MASK \
-        (RF6_SUMMON_MASK | RF6_HEAL | RF6_ADD_MANA | RF6_TELE_SELF_TO | RF6_CURE | \
-	RF6_BLINK | RF6_TPORT | RF6_TELE_TO | RF6_TRAPS)
+        (RF6_ASSIST_MASK)
 
 #define RF7_NO_PLAYER_MASK \
-        (RF7_SUMMON_MASK)
+        (RF7_ASSIST_MASK)
 
 
 /*
@@ -3456,21 +3613,6 @@
 
 
 /*
- * Spells that increase the caster's relative speed
- */
-#define RF4_HASTE_MASK \
-	(0L)
-
-#define RF5_HASTE_MASK \
-	(RF5_SLOW | RF5_HOLD)
-
-#define RF6_HASTE_MASK \
-	(RF6_HASTE)
-
-#define RF7_HASTE_MASK \
-	(0L)
-
-/*
  * Healing spells
  */
 #define RF4_HEAL_MASK \
@@ -3484,6 +3626,7 @@
 
 #define RF7_HEAL_MASK \
 	(0L)
+
 
 /*
  * Spells that can destroy doors
@@ -4122,6 +4265,20 @@
  */
 #define cave_perma_bold(Y,X) \
  (f_info[cave_feat[Y][X]].flags1  & (FF1_PERMANENT))
+
+
+
+/*
+ * Determine if a "room" grid has a flag
+ *
+ * Line 1 -- permanent flag
+ */
+#define room_has_flag(Y,X,FLAG) \
+ ((cave_info[Y][X] & (CAVE_ROOM)) ? \
+	 (room_info[dun_room[Y/BLOCK_HGT][X/BLOCK_WID]].flags & (FLAG)) : \
+	 (room_info[0].flags & (FLAG)))
+
+
 
 
 /*

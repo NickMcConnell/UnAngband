@@ -2712,6 +2712,7 @@ static void calc_bonuses(void)
 
 	/* ANDY - Modify the weight for terrain underneath */
 
+
 	/* Ignore annoying locations */
 	if (in_bounds_fully(p_ptr->py, p_ptr->px))
 	{
@@ -3412,10 +3413,8 @@ void update_stuff(void)
 	/* Character is not ready yet, no screen updates */
 	if (!character_generated) return;
 
-
 	/* Character is in "icky" mode, no screen updates */
 	if (character_icky) return;
-
 
 	if (p_ptr->update & (PU_FORGET_VIEW))
 	{
@@ -3453,7 +3452,6 @@ void update_stuff(void)
 		p_ptr->update &= ~(PU_ROOM_INFO);
 		describe_room();
 	}
-
 }
 
 

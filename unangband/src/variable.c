@@ -89,7 +89,11 @@ s16b num_repro;		 /* Current reproducer count */
 s16b object_level;	      /* Current object creation level */
 s16b monster_level;	     /* Current monster creation level */
 
-char summon_kin_type;	   /* Hack -- See summon_specific() */
+char summon_char_type;	   /* Hack -- See summon_specific() */
+byte summon_attr_type;	   /* Hack -- See summon_specific() */
+byte summon_element_type;  /* Hack -- See summon_specific() */
+u32b summon_flag_type;	   /* Hack -- See summon_specific() */
+s16b summon_race_type;	   /* Hack -- See summon_specific() */
 
 s32b turn;			      /* Current game turn */
 

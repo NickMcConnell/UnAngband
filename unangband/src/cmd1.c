@@ -574,14 +574,13 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 			/* Brand (Dark) */
 			if (f4 & (TR4_BRAND_DARK))
 			{
-				/* Notice immunity  - orcs and dark breathers immune */
-				if ((r_ptr->flags4 & (RF4_BRTH_DARK)) || (r_ptr->flags3 & (RF3_ORC)))
+				/* Notice immunity */
+				if (r_ptr->flags9 & (RF9_RES_DARK))
 				{
 					if (m_ptr->ml)
 					{
 						object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_BRAND_DARK);
-						if (r_ptr->flags4 & (RF4_BRTH_DARK)) l_ptr->flags4 |= (RF4_BRTH_DARK);
-						if (r_ptr->flags3 & (RF3_ORC)) l_ptr->flags4 |= (RF3_ORC);
+						l_ptr->flags9 |= (RF9_RES_DARK);
 					}
 				}
 
@@ -600,11 +599,12 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 
 			/* Slay man */
 			if ((f4 & (TR4_SLAY_MAN)) &&
-			    (strchr("pqt", r_ptr->d_char)))
+			    (r_ptr->flags9 & (RF9_MAN)))
 			{
 				if (m_ptr->ml)
 				{
 					object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_SLAY_MAN);
+					l_ptr->flags9 |= (RF9_MAN);
 				}
 
 				if (mult < 3) mult = 3;
@@ -616,11 +616,12 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 
 			/* Slay elf - includes Maia */
 			if ((f4 & (TR4_SLAY_ELF)) &&
-			    (strchr("lM", r_ptr->d_char)))
+			    (r_ptr->flags9 & (RF9_ELF)))
 			{
 				if (m_ptr->ml)
 				{
 					object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_SLAY_ELF);
+					l_ptr->flags9 |= (RF9_ELF);
 				}
 
 				if (mult < 3) mult = 3;
@@ -632,11 +633,12 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 
 			/* Slay dwarf */
 			if ((f4 & (TR4_SLAY_DWARF)) &&
-			    (strchr("h", r_ptr->d_char)) && ((strstr(r_name + r_ptr->name, "warf")) || (strstr(r_name + r_ptr->name, "warven"))))
+			    (r_ptr->flags9 & (RF9_DWARF)))
 			{
 				if (m_ptr->ml)
 				{
 					object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_SLAY_DWARF);
+					l_ptr->flags9 |= (RF9_DWARF);
 				}
 
 				if (mult < 3) mult = 3;
@@ -1120,14 +1122,17 @@ void py_pickup(int pickup)
 		disturb(0, 0);
 
 		/* Pick up gold */
-		if (o_ptr->tval == TV_GOLD)
+		if (o_ptr->tval >= TV_GOLD)
 		{
+			long value = o_ptr->number * o_ptr->pval - o_ptr->stackc;
+
 			/* Message */
-			msg_format("You have found %ld gold pieces worth of %s.",
-			   (long)o_ptr->pval, o_name);
+			if (o_ptr->tval == TV_GOLD) msg_format("You have found %ld gold pieces worth of %s.",
+			   			value, o_name);
+			else msg_format("You have found %s worth %ld.", o_name, value);
 
 			/* Collect the gold */
-			p_ptr->au += o_ptr->pval;
+			p_ptr->au += value;
 
 			/* Redraw gold */
 			p_ptr->redraw |= (PR_GOLD);
@@ -2121,7 +2126,7 @@ void py_attack(int y, int x)
 				/* Extract the flags */
 				object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
-				/* Taste blood */
+				/* We've killed it - Suck blood from the corpse */
 				if ((f4 & (TR4_VAMP_HP)) & (r_ptr->flags8 & (RF8_HAS_BLOOD)))
 				{
 					hp_player(r_ptr->level);
@@ -2134,12 +2139,12 @@ void py_attack(int y, int x)
 					object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_HP);
 				}
 
-				/* Drain mana */
-				if ((f4 & (TR4_VAMP_MANA)) & (r_ptr->freq_spell > 0))
+				/* We've killed it - Drain mana from the corpse*/
+				if ((f4 & (TR4_VAMP_MANA)) & (r_ptr->mana > 0))
 				{
 					if (p_ptr->csp < p_ptr->msp)
 					{
-						p_ptr->csp = p_ptr->csp + r_ptr->level / 2;
+						p_ptr->csp = p_ptr->csp + r_ptr->mana;
 						if (p_ptr->csp >= p_ptr->msp)
 						{
 							p_ptr->csp = p_ptr->msp;
@@ -2157,8 +2162,7 @@ void py_attack(int y, int x)
 				}
 
 				break;
-			}			
-
+			}
 		}
 
 		/* Player misses */
@@ -3256,4 +3260,3 @@ void run_step(int dir)
 
 	return;
 }
-

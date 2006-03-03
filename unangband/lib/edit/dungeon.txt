@@ -357,8 +357,6 @@ L:1:56:0:0:0:0
 L:3:56:0:0:620:0
 S:508:9:10:11:12:13:0:0
 
-# Need a barrow wight unique.
-
 N:38:Barrow-downs
 X:37:40
 L:1:407:407:56:0:0
@@ -367,9 +365,9 @@ L:20:56:0:0:1081:0
 
 N:39:Trollshaw Forest
 X:37:2
-L:4:420:420:155:343:0
-L:5:56:0:0:344:0
-L:6:56:0:0:345:0
+L:4:420:420:155:0:0
+L:5:56:0:0:0:0
+L:6:56:0:0:343:0
 
 N:40:the Old Forest
 X:10:11
@@ -379,7 +377,6 @@ L:10:0:135:0:307:0
 S:28:0:0:0:0:0:0:0
 
 # And the same dungeon accessible from the LOtR quest.
-# Need a barrow-wight unique.
 
 N:41:Barrow-downs
 X:12:40

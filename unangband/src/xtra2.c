@@ -2295,24 +2295,24 @@ int get_food_type(const monster_race *r_ptr)
  */
 int get_coin_type(const monster_race *r_ptr)
 {
+	int i;
 	cptr name = (r_name + r_ptr->name);
 
 	/* Analyze "coin" monsters */
-	if ((r_ptr->d_char == '$') || (r_ptr->d_char == 'g'))
+	if (strchr("$gdDA", r_ptr->d_char))
 	{
-		/* Look for textual clues */
-		if (strstr(name, " copper ")) return (2);
-		if (strstr(name, " silver ")) return (5);
-		if (strstr(name, " gold ")) return (10);
-		if (strstr(name, " mithril ")) return (16);
-		if (strstr(name, " adamantite ")) return (17);
+		for (i = OBJ_GOLD_LIST; i < OBJ_GOLD_LIST + MAX_GOLD; i++)
+		{
+			object_kind *k_ptr = &k_info[i];
 
-		/* Look for textual clues */
-		if (strstr(name, "Copper ")) return (2);
-		if (strstr(name, "Silver ")) return (5);
-		if (strstr(name, "Gold ")) return (10);
-		if (strstr(name, "Mithril ")) return (16);
-		if (strstr(name, "Adamantite ")) return (17);
+			/* Look for textual clues */
+			if (strstr(name, format(" %s ",k_name + k_ptr->name))) return (i);
+			if (strstr(name, format("%^s ", k_name + k_ptr->name))) return (i);
+			if (strstr(name, format(" %ss",k_name + k_ptr->name))) return (i);
+		}
+
+		/* Hack -- rubies */
+		if (strstr(name, " rubies")) return(13);
 	}
 
 	/* Assume nothing */
@@ -2963,6 +2963,9 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 
 		/* Add some blood */
 		if (r_ptr->flags8 & (RF8_HAS_BLOOD)) feat_near(FEAT_FLOOR_BLOOD_T,m_ptr->fy,m_ptr->fx);
+
+		/* Add some slime */
+		if (r_ptr->flags8 & (RF8_HAS_SLIME)) feat_near(FEAT_FLOOR_SLIME_T,m_ptr->fy,m_ptr->fx);
 	}
 
 	/* Hurt it */

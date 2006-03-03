@@ -753,13 +753,13 @@ static void remove_expensive_spells(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, 
  */
 static void remove_useless_spells(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, u32b *f7p, bool require_los)
 {
-	monster_type *m_ptr = &m_list[m_idx];
-	monster_race *r_ptr = &r_info[m_ptr->r_idx];
-
 	u32b f4 = (*f4p);
 	u32b f5 = (*f5p);
 	u32b f6 = (*f6p);
 	u32b f7 = (*f7p);
+
+	monster_type *m_ptr = &m_list[m_idx];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	/* Don't regain mana if full */
 	if (m_ptr->mana >= r_ptr->mana) f6 &= ~(RF6_ADD_MANA);
@@ -770,9 +770,27 @@ static void remove_useless_spells(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, u3
 	/* Don't Haste if Hasted */
 	if (m_ptr->hasted > 10) f6 &= ~(RF6_HASTE);
 
+	/* Don't Invisible if Invisible */
+	if (m_ptr->tim_invis > 10) f6 &= ~(RF6_INVIS);
+
+	/* Don't Wraithform if Wraithform */
+	if (m_ptr->tim_passw > 10) f6 &= ~(RF6_WRAITHFORM);
+
+	/* Don't Bless if Blessed */
+	if (m_ptr->bless > 10) f6 &= ~(RF6_BLESS);
+
+	/* Don't Beserk if Beserk */
+	if (m_ptr->hasted > 10) f6 &= ~(RF6_BESERK);
+
+	/* Don't Shield if Shielded */
+	if (m_ptr->shield > 10) f6 &= ~(RF6_SHIELD);
+
+	/* Don't Oppose elements if Oppose Elements */
+	if (m_ptr->oppose_elem > 10) f6 &= ~(RF6_OPPOSE_ELEM);
+
 	/* Don't cure if not needed */
-	if (!((m_ptr->stunned) ||(m_ptr->monfear) ||
-	      (m_ptr->slowed)))	f6 &= ~(RF6_CURE);
+	if (!((m_ptr->stunned) ||(m_ptr->monfear) || (m_ptr->confused) || (m_ptr->blind) ||
+	      (m_ptr->cut) || (m_ptr->poisoned)))	f6 &= ~(RF6_CURE);
 
 	/* Don't jump in already close, or don't want to be close */
 	if (!(m_ptr->cdis > m_ptr->best_range) && require_los)
@@ -788,6 +806,7 @@ static void remove_useless_spells(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, u3
 	(*f5p) = f5;
 	(*f6p) = f6;
 	(*f7p) = f7;
+
 }
 
 /*
@@ -881,6 +900,40 @@ static int choose_attack_spell_fast(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, 
 	return (spells[rand_int(num)]);
 }
 
+
+/*
+ * Choose the "real" ty, tx for the spell.
+ *
+ * At the moment, we either leave the ty, tx as is, or
+ * point it back at the casting monster, for spells that
+ * assist them.
+ */
+static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
+{
+	monster_type *m_ptr = &m_list[m_idx];
+
+	/* Do we even have this spell? */
+	if (i < 32)
+	{
+		if (RF4_ASSIST_MASK &(1L << (i   ))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
+	}
+	else if (i < 64)
+	{
+		if (RF5_ASSIST_MASK &(1L << (i-32))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
+	}
+	else if (i < 96)
+	{
+		if (RF6_ASSIST_MASK &(1L << (i-64))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
+	}
+	else
+	{
+		if (RF7_ASSIST_MASK &(1L << (i-96))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
+	}
+
+	return(i);
+}
+
+
 /*
  * Have a monster choose a spell.
  *
@@ -897,13 +950,17 @@ static int choose_attack_spell_fast(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, 
  * Returns the spell number, of '0' if no spell is selected.
  *
  *-BR-
+ *
+ * byte choice
+ * 0x01   Choose innate spells
+ * 0x02   Choose casteable spells
  */
-static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x)
+static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 {
 	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
-	byte *spell_desire;
+	const byte *spell_desire;
 
 	u32b f4, f5, f6, f7;
 
@@ -930,6 +987,30 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x)
 	f6 = r_ptr->flags6;
 	f7 = r_ptr->flags7;
 
+	/* Eliminate innate spells if not set */
+	if (!(choose & 0x01))
+	{
+		f4 &= (RF4_INNATE_MASK);
+		f5 &= (RF5_INNATE_MASK);
+		f6 &= (RF6_INNATE_MASK);
+		f7 &= (RF7_INNATE_MASK);
+
+		/* No spells left */
+		if (!f4 && !f5 && !f6 && !f7) return (0);
+	}
+
+	/* Eliminate other spells if not set */
+	if (!(choose & 0x02))
+	{
+		f4 &= ~(RF4_INNATE_MASK);
+		f5 &= ~(RF5_INNATE_MASK);
+		f6 &= ~(RF6_INNATE_MASK);
+		f7 &= ~(RF7_INNATE_MASK);
+
+		/* No spells left */
+		if (!f4 && !f5 && !f6 && !f7) return (0);
+	}
+
 	/*default: target the player*/
 	*tar_y = p_ptr->py;
 	*tar_x = p_ptr->px;
@@ -941,16 +1022,17 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x)
 	if (path == PROJECT_NO)
 	{
 		bool clear_ball_spell = TRUE;
+		bool clear_summon_spell = TRUE;
 
-		/*are we in range smart or annoyed (and not stupid), and have access to ball spells?*/
+		/*are we in range smart or annoyed (and not stupid), and have access to ball spells
+		  or summon spells */
 		if ((m_ptr->cdis < MAX_RANGE) && ((r_ptr->flags2 & (RF2_SMART)) ||
 			 ((m_ptr->mflag & (MFLAG_AGGR)) && (!(r_ptr->flags2 & (RF2_STUPID))))) &&
-			 ((r_ptr->flags4 & (RF4_BALL_MASK)) ||
-			  (r_ptr->flags5 & (RF5_BALL_MASK)) ||
-			  (r_ptr->flags6 & (RF6_BALL_MASK)) ||
-			  (r_ptr->flags7 & (RF7_BALL_MASK))))
+			 ((r_ptr->flags4 & (RF4_BALL_MASK | RF4_SUMMON_MASK)) ||
+			  (r_ptr->flags5 & (RF5_BALL_MASK | RF5_SUMMON_MASK)) ||
+			  (r_ptr->flags6 & (RF6_BALL_MASK | RF6_SUMMON_MASK)) ||
+			  (r_ptr->flags7 & (RF7_BALL_MASK | RF7_SUMMON_MASK))))
 		{
-
 			int alt_y, alt_x, alt_path, best_y, best_x, best_path;
 
 			/*start with no alternate shot*/
@@ -993,7 +1075,14 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x)
 				*tar_y = best_y;
 				*tar_x = best_x;
 			}
+			else
+			{
+				/* Target themselves with a summon spell */
+				*tar_y = m_ptr->fy;
+				*tar_x = m_ptr->fx;
 
+				clear_summon_spell = FALSE;
+			}
 		}
 
 		/*We don't have a reason to try a ball spell*/
@@ -1003,6 +1092,15 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x)
 			f5 &= ~(RF5_BALL_MASK);
 			f6 &= ~(RF6_BALL_MASK);
 			f7 &= ~(RF7_BALL_MASK);
+		}
+
+		/*We don't have a reason to try a summoning spell*/
+		if (clear_summon_spell)
+		{
+			f4 &= ~(RF4_SUMMON_MASK);
+			f5 &= ~(RF5_SUMMON_MASK);
+			f6 &= ~(RF6_SUMMON_MASK);
+			f7 &= ~(RF7_SUMMON_MASK);
 		}
 
 		/* Flat out 75% chance of not casting if the player is not in sight */
@@ -1016,11 +1114,11 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x)
 	/* Spells that require LOS */
 	if ((!require_los) || (m_ptr->cdis > MAX_RANGE))
 	{
-		/*(ball spells would have been filtered out above if not usable*/
-		f4 &= (RF4_NO_PLAYER_MASK | RF4_BALL_MASK);
-		f5 &= (RF5_NO_PLAYER_MASK | RF5_BALL_MASK);
-		f6 &= (RF6_NO_PLAYER_MASK | RF6_BALL_MASK);
-		f7 &= (RF7_NO_PLAYER_MASK | RF7_BALL_MASK);
+		/* Ball spells and summon spells would have been filtered out above if not usable */
+		f4 &= (RF4_NO_PLAYER_MASK | RF4_BALL_MASK | RF4_SUMMON_MASK);
+		f5 &= (RF5_NO_PLAYER_MASK | RF5_BALL_MASK | RF5_SUMMON_MASK);
+		f6 &= (RF6_NO_PLAYER_MASK | RF6_BALL_MASK | RF6_SUMMON_MASK);
+		f7 &= (RF7_NO_PLAYER_MASK | RF7_BALL_MASK | RF7_SUMMON_MASK);
 	}
 
 	/*remove bolts and archery shots*/
@@ -1042,16 +1140,11 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x)
 	/* Spells we can not afford */
 	remove_expensive_spells(m_idx, &f4, &f5, &f6, &f7);
 
-#if 0
-	/* Don't lash if too far or close */
-	if ((m_ptr->cdis > 3) || (m_ptr->cdis < 2)) f4 &= ~(RF4_LASH);
-#endif
-
 	/* No spells left */
 	if (!f4 && !f5 && !f6 && !f7) return (0);
 
 	/* Stupid monsters choose at random. */
-	if (r_ptr->flags2 & (RF2_STUPID)) return (choose_attack_spell_fast(m_idx, &f4, &f5, &f6, &f7, TRUE));
+	if (r_ptr->flags2 & (RF2_STUPID)) return(pick_target(m_idx, tar_y, tar_x, choose_attack_spell_fast(m_idx, &f4, &f5, &f6, &f7, TRUE)));
 
 	/* Remove spells that have no benefit
 	 * Does not include the effects of player resists/immunities */
@@ -1072,7 +1165,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x)
 	 * Otherwise fail, and let the AI choose.
 	 */
 	best_spell = choose_attack_spell_fast(m_idx, &f4, &f5, &f6, &f7, do_random);
-	if (best_spell) return (best_spell);
+	if (best_spell) return (pick_target(m_idx, tar_y, tar_x, best_spell));
 
 	/* If we get this far, we are using the full-up AI.  Calculate
 	   some parameters. */
@@ -1099,7 +1192,8 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x)
 	if (want_tactic > 3) want_tactic=3;
 
 	/* Check terrain for purposes of summoning spells */
-	spaces = summon_possible(m_ptr->fy, m_ptr->fx);
+	spaces = summon_possible(*tar_y, *tar_x);
+
 	if (spaces > 10) want_summon=3;
 	else if (spaces > 3) want_summon=2;
 	else if (spaces > 0) want_summon=1;
@@ -1109,7 +1203,6 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x)
 		f5 &= ~(RF5_SUMMON_MASK);
 		f6 &= ~(RF6_SUMMON_MASK);
 		f7 &= ~(RF7_SUMMON_MASK);
-
 	}
 
 	/* Check if no spells left */
@@ -1124,9 +1217,9 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x)
 	{
 		update_smart_cheat(m_idx);
 	}
-	/* Know player racial abilities if smart or a monster race */
-	else if ((r_ptr->flags2 & (RF2_SMART)) || (r_ptr->flags3 & (RF3_ORC | RF3_TROLL)) || (r_ptr->d_char = 'p') ||
-		(r_ptr->d_char = 't') || (r_ptr->d_char = 'h') || (r_ptr->d_char = 'l') || (r_ptr->d_char = 'p'))
+	/* Know player racial abilities if smart or a playable race */
+	else if ((r_ptr->flags2 & (RF2_SMART)) || (r_ptr->flags3 & (RF3_ORC | RF3_TROLL)) ||
+		(r_ptr->flags9 & (RF9_MAN | RF9_ELF | RF9_DWARF)) || (r_ptr->d_char = 'h'))
 	{
 		update_smart_racial(m_idx);
 	}
@@ -1229,7 +1322,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x)
 	}
 
 	/* Return Best Spell */
-	return (best_spell);
+	return (pick_target(m_idx, tar_y, tar_x, best_spell));
 }
 
 
@@ -4258,7 +4351,8 @@ static void process_monster(int m_idx)
 	int i, k, y, x;
 	int ty, tx;
 
-	int chance = 0;
+	int chance_innate = 0;
+	int chance_spell = 0;
 	int choice = 0;
 
 	int dir;
@@ -4364,22 +4458,34 @@ static void process_monster(int m_idx)
 	/*** Ranged attacks ***/
 
 	/* Extract the ranged attack probability. */
-	chance = r_ptr->freq_spell;
+	chance_innate = r_ptr->freq_innate;
+	chance_spell = r_ptr->freq_spell;
 
 	/* Cannot use ranged attacks beyond maximum range. */
-	if ((chance) && (m_ptr->cdis > MAX_RANGE)) chance = 0;
+	if ((chance_innate) && (m_ptr->cdis > MAX_RANGE)) chance_innate = 0;
+	if ((chance_spell) && (m_ptr->cdis > MAX_RANGE)) chance_spell = 0;
 
-	/* Cannot use ranged attacks when confused or not aware. */
-	if ((chance) && ((m_ptr->confused) || (!aware))) chance = 0;
+	/* Cannot use spell attacks when blind, confused or not aware. */
+	if ((chance_spell) && ((m_ptr->blind) || (m_ptr->confused) || (!aware))) chance_spell = 0;
 
-	/* Stunned monsters use ranged attacks half as often. */
-	if ((chance) && (m_ptr->stunned)) chance /= 2;
+	/* Cannot use innate attacks when not aware. */
+	if ((chance_innate) && (!aware)) chance_innate = 0;
+
+	/* Stunned monsters use spell attacks half as often. */
+	if ((chance_spell) && (m_ptr->stunned)) chance_spell /= 2;
+
+	/* Blind, confused or stunned monsters use innate attacks half as often. */
+	if ((chance_innate) && ((m_ptr->blind) || (m_ptr->confused) || (m_ptr->stunned))) chance_innate /= 2;
 
 	/* Monster can use ranged attacks */
-	if ((chance) && (rand_int(100) < chance))
+	if ((chance_innate) || (chance_spell))
 	{
+		int roll = rand_int(100);
+
 		/* Pick a ranged attack */
-		choice = choose_ranged_attack(m_idx, &ty, &tx);
+		if ((roll < chance_innate) || (roll < chance_spell))
+			choice = choose_ranged_attack(m_idx, &ty, &tx, (roll < chance_innate ? 0x01 : 0x00) | (roll < chance_spell ? 0x02: 0x00));
+
 	}
 
 	/* Selected a ranged attack? */
@@ -5068,36 +5174,26 @@ static void recover_monster(int m_idx, bool regen)
 
 
 	/*
-	 * Handle heroism counter
+	 * Handle blessing counter
 	 */
-	if (m_ptr->hero)
+	if (m_ptr->bless)
 	{
 		int d = 1;
 
-		/* Still invisible */
-		if (m_ptr->hero > d)
+		/* Still blessed */
+		if (m_ptr->bless > d)
 		{
 			/* Reduce the confusion */
-			m_ptr->tim_invis -= d;
+			m_ptr->bless -= d;
 		}
 
 		/* Expired */
 		else
 		{
-			/* No longer invisible */
-			m_ptr->hero = 0;
+			/* No longer blessed */
+			m_ptr->bless = 0;
 
-			/* Message if visible */
-			if (m_ptr->ml)
-			{
-				char m_name[80];
-
-				/* Acquire the monster name */
-				monster_desc(m_name, m_ptr, 0);
-
-				/* Dump a message */
-				msg_format("%^s is no longer heroic.", m_name);
-			}
+			/* Silently expires */
 		}
 	}
 
@@ -5105,22 +5201,22 @@ static void recover_monster(int m_idx, bool regen)
 	/*
 	 * Handle beserk counter
 	 */
-	if (m_ptr->shero)
+	if (m_ptr->beserk)
 	{
 		int d = 1;
 
 		/* Still invisible */
-		if (m_ptr->shero > d)
+		if (m_ptr->beserk > d)
 		{
 			/* Reduce the confusion */
-			m_ptr->shero -= d;
+			m_ptr->beserk -= d;
 		}
 
 		/* Expired */
 		else
 		{
 			/* No longer invisible */
-			m_ptr->shero = 0;
+			m_ptr->beserk = 0;
 
 			/* Message if visible */
 			if (m_ptr->ml)
@@ -5147,7 +5243,7 @@ static void recover_monster(int m_idx, bool regen)
 		if (m_ptr->shield > d)
 		{
 			/* Reduce the confusion */
-			m_ptr->tim_invis -= d;
+			m_ptr->shield -= d;
 		}
 
 		/* Expired */

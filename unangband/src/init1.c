@@ -424,7 +424,7 @@ static cptr r_info_flags1[] =
 	"FORCE_MAXHP",
 	"FORCE_SLEEP",
 	"GUARDIAN",
-	"ATTR_METAL",
+	"FRIEND",
 	"FRIENDS",
 	"ESCORT",
 	"ESCORTS",
@@ -510,12 +510,12 @@ static cptr r_info_flags3[] =
 	"IM_FIRE",
 	"IM_COLD",
 	"IM_POIS",
-	"IM_WATER",
-	"RES_NETH",
+	"RES_WATER",
+	"RES_NETHR",
 	"RES_LAVA",
 	"RES_PLAS",
-	"RES_NEXU",
-	"RES_DISE",
+	"RES_NEXUS",
+	"RES_DISEN",
 	"HURT_WATER",
 	"NO_FEAR",
 	"NO_STUN",
@@ -547,9 +547,9 @@ static cptr r_info_flags4[] =
 	"BRTH_CONFU",
 	"BRTH_SOUND",
 	"BRTH_SHARD",
-	"BRTH_INER",
+	"BRTH_INERT",
 	"BRTH_GRAV",
-	"BRTH_XXX1",
+	"BRTH_WIND",
 	"BRTH_FORCE",
 	"BRTH_NEXUS",
 	"BRTH_NETHR",
@@ -578,7 +578,7 @@ static cptr r_info_flags5[] =
 	"BALL_CONFU",
 	"BALL_SOUND",
 	"BALL_SHARD",
-	"RF5XXX2",
+	"BALL_WIND",
 	"BALL_STORM",
 	"BALL_NETHR",
 	"BALL_CHAOS",
@@ -594,12 +594,12 @@ static cptr r_info_flags5[] =
 	"BOLT_WATER",
 	"BOLT_NETHR",
 	"BOLT_MANA",
-	"RF5XXX3",
+	"HOLY_ORB",
 	"BEAM_ELEC",
 	"BEAM_ICE",
 	"BEAM_NETHR",
-	"RF5XXX4",
-	"HOLY_ORB"
+	"ARC_HFIRE",
+	"ARC_FORCE"
 };
 
 /*
@@ -626,9 +626,9 @@ static cptr r_info_flags6[] =
 	"CURSE",
 	"DISPEL",
 	"MIND_BLAST",
-	"BRAIN_SMASH",
+	"ILLUSION",
 	"WOUND",
-	"HERO",
+	"BLESS",
 	"BESERK",
 	"SHIELD",
 	"OPPOSE_ELEM",
@@ -648,28 +648,28 @@ static cptr r_info_flags7[] =
 {
 	"S_KIN",
 	"R_KIN",
-	"RF7XXX2",
+	"A_DEAD",
 	"S_MONSTER",
 	"S_MONSTERS",
 	"R_MONSTER",
 	"R_MONSTERS",
-	"RF7XXX5",
-	"S_ANT",
-	"S_SPIDER",
-	"S_HOUND",
+	"S_PLANT",
+	"S_INSECT",
 	"S_ANIMAL",
-	"S_HYDRA",
-	"RF7XXX7",
-	"S_THIEF",
-	"S_BERTBILLTOM",
-	"RF7XXX7",
-	"S_MAIA",
-	"RF7XX10",
-	"RF7XX11",
+	"S_HOUND",
+	"S_SPIDER",
+	"S_CLASS",
+	"S_RACE",
+	"S_ELEMENT",
+	"S_FRIEND",
+	"S_FRIENDS",
+	"S_ORC",
+	"S_TROLL",
+	"S_GIANT",
 	"S_DRAGON",
 	"S_HI_DRAGON",
-	"RF7XX12",
-	"RF7XX13",
+	"A_ELEMENT",
+	"A_OBJECT",
 	"S_DEMON",
 	"S_HI_DEMON",
 	"R_UNIQUE",
@@ -691,16 +691,17 @@ static cptr r_info_flags8[] =
 	"HAS_CORPSE",
 	"HAS_HEAD",
 	"HAS_HAND",
+	"HAS_CLAW",
 	"HAS_ARM",
 	"HAS_LEG",
 	"HAS_WING",
-	"HAS_BLOOD",
-	"ASSEMBLY",
 	"HAS_SKIN",
 	"HAS_SCALE",
 	"HAS_FEATHER",
 	"HAS_FUR",
+	"HAS_BLOOD",
 	"HAS_SLIME",
+	"HAS_SPORE",
 	"DROP_JUNK",
 	"DROP_CHEST",
 	"DROP_MISSILE",
@@ -715,8 +716,47 @@ static cptr r_info_flags8[] =
 	"DROP_WRITING",
 	"DROP_POTION",
 	"DROP_FOOD",
-	"HAS_CLAW",
-	"HAS_SPORE"
+	"ASSEMBLE"
+};
+
+
+/*
+ * Monster race flags
+ */
+static cptr r_info_flags9[] =
+{
+	"PLAYER_GHOST",
+	"NEVER_MISS",
+	"SAME_SPEED",
+	"EVASIVE",
+	"SCENT",
+	"SUPER_SCENT",
+	"WATER_SCENT",
+	"RES_BLIND",
+	"RES_LITE",
+	"RES_DARK",
+	"RES_CHAOS",
+	"RES_TPORT",
+	"RES_EDGED",
+	"RES_BLUNT",
+	"IM_EDGED",
+	"IM_BLUNT",
+	"NO_CUTS",
+	"NO_SLOW",
+	"FAMILY",
+	"GOOD",
+	"NEUTRAL",
+	"DWARF",
+	"ELF",
+	"MAN",
+	"TOWNSFOLK",
+	"DROP_ESSENCE",
+	"DROP_MUSHROOM",
+	"DROP_COINS",
+	"ATTR_METAL",
+	"ATTR_INDEX",
+	"MORGUL_MAGIC",
+	"UDUN_MAGIC"
 };
 
 
@@ -1933,6 +1973,9 @@ static errr grab_one_room_race_flag(desc_type *d_ptr, cptr what)
 		return (0);
 
 	if (grab_one_offset(&d_ptr->r_flag, r_info_flags8, what) == 0)
+		return (0);
+
+	if (grab_one_offset(&d_ptr->r_flag, r_info_flags9, what) == 0)
 		return (0);
 
 	/* Oops */
@@ -3393,6 +3436,9 @@ static errr grab_one_basic_flag(monster_race *r_ptr, cptr what)
 	if (grab_one_flag(&r_ptr->flags8, r_info_flags8, what) == 0)
 		return (0);
 
+	if (grab_one_flag(&r_ptr->flags9, r_info_flags9, what) == 0)
+		return (0);
+
 	/* Oops */
 	msg_format("Unknown monster flag '%s'.", what);
 
@@ -3534,8 +3580,50 @@ errr parse_r_info(char *buf, header *head)
 			r_ptr->flags3 |= RF3_NONLIVING;
 		}
 
-	}
+		/* Canines and hounds and ring wraiths have super scent */
+		if ((strchr("CZ", r_ptr->d_char)) || ((r_ptr->d_char == 'W') && (r_ptr->flags1 & (RF1_UNIQUE))))
+		{
+			r_ptr->flags9 |= (RF9_SUPER_SCENT | RF9_SCENT);
+		}
 
+		/* Normal sense of smell */
+		if (strchr("AfkoQyHORTY", r_ptr->d_char))
+		{
+			r_ptr->flags9 |= RF9_SCENT;
+		}
+
+		/* Mark men */
+		if (strchr("tpq", r_ptr->d_char))
+		{
+			r_ptr->flags9 |= RF9_MAN;
+		}
+
+		/* Mark elves and maia */
+		if (strchr("lM", r_ptr->d_char))
+		{
+			r_ptr->flags9 |= RF9_ELF;
+		}
+
+#if 0		/* XXX Can't use the below, as name not currently valid */
+		/* Mark dwarves */
+		if (strstr(r_name + r_ptr->name, "warven") || strstr(r_name + r_ptr->name, "warf"))
+		{
+			r_ptr->flags9 |= RF9_DWARF;
+		}
+
+		/* Mark mushrooms */
+		if (get_food_type(r_ptr))
+		{
+			r_ptr->flags9 |= RF9_DROP_MUSHROOM;
+		}
+
+		/* Mark coins */
+		if (get_coin_type(r_ptr))
+		{
+			r_ptr->flags9 |= RF9_DROP_COINS;
+		}
+#endif
+	}
 	/* Process 'I' for "Info" (one line only) */
 	else if (buf[0] == 'I')
 	{
@@ -3672,7 +3760,6 @@ errr parse_r_info(char *buf, header *head)
 		r_ptr->blow[i].d_dice = atoi(s);
 		r_ptr->blow[i].d_side = atoi(t);
 	}
-
 	/* Process 'F' for "Basic Flags" (multiple lines) */
 	else if (buf[0] == 'F')
 	{

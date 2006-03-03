@@ -472,22 +472,26 @@ void do_cmd_use_staff(void)
 		chance = USE_DEVICE;
 	}
 
-	/* Some rooms only give a (slight) chance */
-	if (cave_info[p_ptr->py][p_ptr->px] & (CAVE_ROOM))
+	/* Some items and some rooms interfere with this */
+	if ((p_ptr->cur_flags4 & (TR4_STATIC)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_STATIC)))
 	{
-		/* Special rooms affect some of this */
-		int by = p_ptr->py/BLOCK_HGT;
-		int bx = p_ptr->px/BLOCK_HGT;
+		chance = USE_DEVICE;
+
+		/* Warn the player */
+		msg_print("There is a static feeling in the air.");
 
 		/* Get the room */
-		if(room_info[dun_room[by][bx]].flags & (ROOM_STATIC))
+		if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_STATIC)))
 		{
-			chance = USE_DEVICE;
-
-			/* Warn the player */
-			msg_print("There is a static feeling in the air.");
+			/* Always notice */
+			equip_can_flags(0x0L,0x0L,0x0L,TR4_STATIC);
 		}
-	}    
+	}
+	else
+	{
+		/* Always notice */
+		equip_not_flags(0x0L,0x0L,0x0L,TR4_STATIC);
+	}
 
 	/* Roll for usage */
 	if ((chance < USE_DEVICE) || (randint(chance) < USE_DEVICE))
@@ -726,22 +730,26 @@ void do_cmd_aim_wand(void)
 		chance = USE_DEVICE;
 	}
 
-	/* Some rooms only give a (slight) chance */
-	if (cave_info[p_ptr->py][p_ptr->px] & (CAVE_ROOM))
+	/* Some items and some rooms interfere with this */
+	if ((p_ptr->cur_flags4 & (TR4_STATIC)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_STATIC)))
 	{
-		/* Special rooms affect some of this */
-		int by = p_ptr->py/BLOCK_HGT;
-		int bx = p_ptr->px/BLOCK_HGT;
+		chance = USE_DEVICE;
+
+		/* Warn the player */
+		msg_print("There is a static feeling in the air.");
 
 		/* Get the room */
-		if(room_info[dun_room[by][bx]].flags & (ROOM_STATIC))
+		if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_STATIC)))
 		{
-			chance = USE_DEVICE;
-
-			/* Warn the player */
-			msg_print("There is a static feeling in the air.");
+			/* Always notice */
+			equip_can_flags(0x0L,0x0L,0x0L,TR4_STATIC);
 		}
-	}    
+	}
+	else
+	{
+		/* Always notice */
+		equip_not_flags(0x0L,0x0L,0x0L,TR4_STATIC);
+	}
 
 	/* Roll for usage */
 	if ((chance < USE_DEVICE) || (randint(chance) < USE_DEVICE))
@@ -965,22 +973,26 @@ void do_cmd_zap_rod(void)
 		chance = USE_DEVICE;
 	}
 
-	/* Some rooms only give a (slight) chance */
-	if (cave_info[p_ptr->py][p_ptr->px] & (CAVE_ROOM))
+	/* Some items and some rooms interfere with this */
+	if ((p_ptr->cur_flags4 & (TR4_STATIC)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_STATIC)))
 	{
-		/* Special rooms affect some of this */
-		int by = p_ptr->py/BLOCK_HGT;
-		int bx = p_ptr->px/BLOCK_HGT;
+		chance = USE_DEVICE;
+
+		/* Warn the player */
+		msg_print("There is a static feeling in the air.");
 
 		/* Get the room */
-		if (room_info[dun_room[by][bx]].flags & (ROOM_STATIC))
+		if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_STATIC)))
 		{
-			chance = USE_DEVICE;
-
-			/* Warn the player */
-			msg_print("There is a static feeling in the air.");
+			/* Always notice */
+			equip_can_flags(0x0L,0x0L,0x0L,TR4_STATIC);
 		}
-	}    
+	}
+	else
+	{
+		/* Always notice */
+		equip_not_flags(0x0L,0x0L,0x0L,TR4_STATIC);
+	}
 
 	/* Roll for usage */
 	if ((chance < USE_DEVICE) || (randint(chance) < USE_DEVICE))

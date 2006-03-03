@@ -1701,14 +1701,12 @@ F:REMEMBER | NOTICE | PLACE |
 F:CAN_CLIMB | CAN_FLY |
 F:POWER_6
 
-# ---> visible trap -- ancient hex
-
-N:86:ancient hex
+N:86:magic symbol
+M:81
 U:56
-G:^:G
-W:2:3:20:0
-S:DARKNESS
-D:You are lost in shadows.
+G:^:B
+W:6:3:20:0
+T:HALLU
 K:DEFAULT:1
 K:HIT_TRAP:86
 K:CHASM:141
@@ -1716,15 +1714,16 @@ K:TREE:541
 F:TRAP | HIDE_ITEM | HIT_TRAP | DISARM | LOS | MOVE | PROJECT |
 F:REMEMBER | NOTICE | PLACE |
 F:CAN_CLIMB | CAN_FLY |
-F:POWER_5
+F:POWER_6
+
+# ---> visible trap -- ancient hex
 
 N:87:ancient hex
-M:86
 U:56
 G:^:G
-W:4:3:20:0
-S:FORGET
-D:Your memories fade away.
+W:2:3:20:0
+S:DARKNESS
+D:You are lost in shadows.
 K:DEFAULT:1
 K:HIT_TRAP:87
 K:CHASM:141
@@ -1738,9 +1737,9 @@ N:88:ancient hex
 M:86
 U:56
 G:^:G
-W:8:3:20:0
-S:DRAIN_MANA
-D:You are drained of psionic energy.
+W:4:3:20:0
+S:FORGET
+D:Your memories fade away.
 K:DEFAULT:1
 K:HIT_TRAP:88
 K:CHASM:141
@@ -1748,15 +1747,15 @@ K:TREE:541
 F:TRAP | HIDE_ITEM | HIT_TRAP | DISARM | LOS | MOVE | PROJECT |
 F:REMEMBER | NOTICE | PLACE |
 F:CAN_CLIMB | CAN_FLY |
-F:POWER_8
+F:POWER_5
 
 N:89:ancient hex
 M:86
 U:56
 G:^:G
-W:16:3:20:0
-S:MIND_BLAST
-D:You are blasted with psionic energy.
+W:8:3:20:0
+S:DRAIN_MANA
+D:You are drained of psionic energy.
 K:DEFAULT:1
 K:HIT_TRAP:89
 K:CHASM:141
@@ -1764,14 +1763,14 @@ K:TREE:541
 F:TRAP | HIDE_ITEM | HIT_TRAP | DISARM | LOS | MOVE | PROJECT |
 F:REMEMBER | NOTICE | PLACE |
 F:CAN_CLIMB | CAN_FLY |
-F:POWER_16
+F:POWER_8
 
 N:90:ancient hex
 M:86
 U:56
 G:^:G
-W:24:3:20:0
-S:BRAIN_SMASH
+W:16:3:20:0
+S:MIND_BLAST
 D:You are blasted with psionic energy.
 K:DEFAULT:1
 K:HIT_TRAP:90
@@ -1780,7 +1779,7 @@ K:TREE:541
 F:TRAP | HIDE_ITEM | HIT_TRAP | DISARM | LOS | MOVE | PROJECT |
 F:REMEMBER | NOTICE | PLACE |
 F:CAN_CLIMB | CAN_FLY |
-F:POWER_24
+F:POWER_16
 
 
 # ---> visible trap -- murder hole

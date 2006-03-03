@@ -76,13 +76,14 @@ extern const byte object_group_tval[];
 extern const cptr magic_name[4][32];
 extern const cptr disease_name[32];
 extern byte spell_info_RF4[32][5];
-extern byte spell_info_RF5[32][5];
-extern byte spell_info_RF6[32][5];
-extern byte spell_info_RF7[32][5];
+extern const byte spell_info_RF5[32][5];
+extern const byte spell_info_RF6[32][5];
+extern const byte spell_info_RF7[32][5];
 extern byte spell_desire_RF4[32][8];
-extern byte spell_desire_RF5[32][8];
-extern byte spell_desire_RF6[32][8];
-extern byte spell_desire_RF7[32][8];
+extern const byte spell_desire_RF5[32][8];
+extern const byte spell_desire_RF6[32][8];
+extern const byte spell_desire_RF7[32][8];
+extern const element_type element[MAX_ELEMENTS];
 
 /* variable.c */
 extern cptr copyright;
@@ -116,7 +117,11 @@ extern u32b seed_town;
 extern s16b num_repro;
 extern s16b object_level;
 extern s16b monster_level;
-extern char summon_kin_type;
+extern char summon_char_type;
+extern byte summon_attr_type;
+extern byte summon_element_type;
+extern u32b summon_flag_type;
+extern s16b summon_race_type;
 extern s32b turn;
 extern s32b old_turn;
 extern bool use_sound;
@@ -672,6 +677,8 @@ extern bool spell_okay(int spell, bool known);
 extern bool save_player(void);
 
 /* spells1.c */
+extern void player_can_flags(int who, u32b f1,u32b f2,u32b f3, u32b f4);
+extern void player_not_flags(int who, u32b f1,u32b f2,u32b f3, u32b f4);
 extern void update_smart_cheat(int who);
 extern void update_smart_racial(int who);
 extern void update_smart_learn(int who, u32b flag);

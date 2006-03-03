@@ -84,5 +84,5 @@ M:N:20000
 
 # Size of the "fake" array for reading in the descriptions of monsters,
 # vaults, and the player-histories
-M:I:100000
+M:I:120000
 

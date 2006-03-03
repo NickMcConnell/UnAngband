@@ -702,3 +702,20 @@ givers, however, if the player is evil, they will spit, insult, and wail at
 the player. (Considering vomit on, but it might be a bit much).
 
 
+TODO: Allow trolls and other monster to eat monster bodies to heal themselves, and vampires to
+suck the blood from monster bodies to improve their mana.
+
+TODO: Forget should cause spell casters to forget their spells, as opposed to forgetting what
+objects do.
+
+TODO: Summoning for animals should be flavored into furred animals, feathered animals and
+scaled animals, depending on the summoning monster. You need feathers to summon feathers,
+you need fur to summon furred, you need scales to summon scales. 'Underground' monsters
+(orcs, trolls, dwarves) don't summon feathered, 'above ground' monsters (humans, elves,
+hobbits) don't summon scaled. We include animals that don't have fur or scales (e.g. frogs)
+in with scales for this discussion.
+
+TODO: Higher level birds, for bird summoners.
+
+TODO: 'Good' monsters don't summon evil. 'Evil' monsters don't summon good.
+

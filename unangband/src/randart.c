@@ -774,9 +774,10 @@ static cptr names_list =
 
 #define ART_IDX_GEN_SAVE 81
 #define ART_IDX_GEN_DEVICE 82
+#define ART_IDX_GEN_RDISEA 83
 
 /* Total of abilities */
-#define ART_IDX_TOTAL 83
+#define ART_IDX_TOTAL 84
 
 /* End of ESP_IDX defines ARD_ESP */
 
@@ -793,7 +794,7 @@ static cptr names_list =
 #define ART_IDX_CLOAK_COUNT 2
 #define ART_IDX_ARMOR_COUNT 7
 #define ART_IDX_GEN_COUNT 30
-#define ART_IDX_HIGH_RESIST_COUNT 12
+#define ART_IDX_HIGH_RESIST_COUNT 13
 
 /* Arrays of indices by item type, used in frequency generation */
 
@@ -844,7 +845,7 @@ static s16b art_idx_high_resist[] =
 	ART_IDX_GEN_RLITE, ART_IDX_GEN_RDARK, ART_IDX_GEN_RBLIND,
 	ART_IDX_GEN_RCONF, ART_IDX_GEN_RSOUND, ART_IDX_GEN_RSHARD,
 	ART_IDX_GEN_RNEXUS, ART_IDX_GEN_RNETHER, ART_IDX_GEN_RCHAOS,
-	ART_IDX_GEN_RDISEN};
+	ART_IDX_GEN_RDISEN, ART_IDX_GEN_RDISEA};
 
 
 /* Initialize the data structures for learned probabilities */
@@ -1283,9 +1284,15 @@ static long eval_max_dam(int r_idx)
 						mult = 8;
 						div_by = 7;
 					}
-					else if (flag_counter == RF4_BRTH_INER)
+					else if (flag_counter == RF4_BRTH_INERT)
 					{
 						which_gf = GF_INERTIA;
+						mult = 3;
+						div_by = 2;
+					}
+					else if (flag_counter == RF4_BRTH_WIND)
+					{
+						which_gf = GF_WIND;
 						mult = 3;
 						div_by = 2;
 					}
@@ -1420,6 +1427,7 @@ static long eval_max_dam(int r_idx)
 						else if (flag_counter == RF6_DARKNESS) this_dam = rlev;
 						else if (flag_counter == RF6_TRAPS) this_dam = rlev;
 						else if (flag_counter == RF6_FORGET) this_dam = rlev / 3;
+						else if (flag_counter == RF6_ILLUSION) this_dam = rlev;
 						else if (flag_counter == RF6_DRAIN_MANA) this_dam = rlev * 2;
 						else if (flag_counter == RF6_HUNGER) this_dam = rlev;
 						else if (flag_counter == RF6_SCARE) this_dam = rlev;
@@ -1435,18 +1443,32 @@ static long eval_max_dam(int r_idx)
 						/*Right now all flag7 are summon spells*/
 						/* All summons are assigned arbitrary values according to their levels*/
 						if 		(flag_counter == RF7_S_KIN) 	this_dam = rlev * 2;
+						else if (flag_counter == RF7_R_KIN) 	this_dam = rlev / 2;
+						else if (flag_counter == RF7_A_DEAD) 	this_dam = rlev / 5;
 						else if (flag_counter == RF7_S_MONSTER)	this_dam = rlev * 2 / 5;
 						else if (flag_counter == RF7_S_MONSTERS)this_dam = rlev * 4 / 5;
-						else if (flag_counter == RF7_S_ANT)		this_dam = rlev / 5;
+						else if (flag_counter == RF7_R_MONSTER)	this_dam = rlev * 1 / 5;
+						else if (flag_counter == RF7_R_MONSTERS)this_dam = rlev * 2 / 5;
+						else if (flag_counter == RF7_S_PLANT)		this_dam = rlev / 5;
+						else if (flag_counter == RF7_S_INSECT)		this_dam = rlev / 5;
+						else if (flag_counter == RF7_S_ANIMAL)
+						{
+							/* XXX Feathers, fur or skin? */
+							this_dam = rlev * 3 / 2;  /* Includes hydras */
+							/* this_dam = rlev / 2;   Fur includes canines / cats */
+							/* this_dam = rlev / 2;   Feathers includes birds / hybrids */
+						}
 						else if (flag_counter == RF7_S_SPIDER)	this_dam = rlev / 5;
 						else if (flag_counter == RF7_S_HOUND)	this_dam = rlev;
-						else if (flag_counter == RF7_S_ANIMAL)	this_dam = rlev / 2;
-						else if (flag_counter == RF7_S_HYDRA)	this_dam = rlev * 3 / 2;
-						else if (flag_counter == RF7_S_THIEF)	this_dam = rlev / 2;
-						else if (flag_counter == RF7_S_BERTBILLTOM)	this_dam = rlev * 3 / 4;
-						else if (flag_counter == RF7_S_MAIA)	this_dam = rlev * 3 / 2;
+						else if (flag_counter == RF7_S_CLASS)	this_dam = rlev / 2;
+						else if (flag_counter == RF7_S_RACE)	this_dam = rlev / 2;
+						else if (flag_counter == RF7_S_ELEMENT)	this_dam = rlev;
+						else if (flag_counter == RF7_S_FRIEND)	this_dam = rlev * 3 / 4;
+						else if (flag_counter == RF7_S_FRIENDS)	this_dam = rlev * 3 / 4;
 						else if (flag_counter == RF7_S_DRAGON)	this_dam = rlev * 3 / 2;
 						else if (flag_counter == RF7_S_HI_DRAGON) this_dam = rlev * 4;
+						else if (flag_counter == RF7_A_ELEMENT) this_dam = rlev / 3;
+						else if (flag_counter == RF7_A_OBJECT) 	this_dam = rlev / 5;
 						else if (flag_counter == RF7_S_DEMON)	this_dam = rlev * 3 / 2;
 						else if (flag_counter == RF7_S_HI_DEMON)this_dam = rlev * 3;
 						else if (flag_counter == RF7_S_UNDEAD)	this_dam = rlev * 3 / 2;
@@ -1577,25 +1599,29 @@ static long eval_max_dam(int r_idx)
 			melee_dam += atk_dam;
 		}
 
-		/*Reduce damamge potential for monsters that move randomly*/
-		if ((r_ptr->flags1 & (RF1_RAND_25)) || (r_ptr->flags1 & (RF1_RAND_50)))
+		/* Monsters that multiply ignore the following reductions */
+		if (!(r_ptr->flags2 & (RF2_MULTIPLY)))
 		{
-			int reduce = 100;
+			/*Reduce damamge potential for monsters that move randomly */
+			if ((r_ptr->flags1 & (RF1_RAND_25)) || (r_ptr->flags1 & (RF1_RAND_50)))
+			{
+				int reduce = 100;
 
-			if (r_ptr->flags1 & (RF1_RAND_25)) reduce -= 25;
-			if (r_ptr->flags1 & (RF1_RAND_50)) reduce -= 50;
+				if (r_ptr->flags1 & (RF1_RAND_25)) reduce -= 25;
+				if (r_ptr->flags1 & (RF1_RAND_50)) reduce -= 50;
 
-			/*even moving randomly one in 8 times will hit the player*/
-			reduce += (100 - reduce) / 8;
+				/*even moving randomly one in 8 times will hit the player*/
+				reduce += (100 - reduce) / 8;
 
-			/* adjust the melee damage*/
-			melee_dam = (melee_dam * reduce) / 100;
-		}
+				/* adjust the melee damage*/
+				melee_dam = (melee_dam * reduce) / 100;
+			}
 
-		/*monsters who can't move aren't nearly as much of a combat threat*/
-		if (r_ptr->flags1 & (RF1_NEVER_MOVE))
-		{
-			melee_dam /= 4;
+			/*monsters who can't move aren't nearly as much of a combat threat*/
+			if (r_ptr->flags1 & (RF1_NEVER_MOVE))
+			{
+				melee_dam /= 4;
+			}
 		}
 
 		/*but keep a minimum*/
@@ -1621,6 +1647,8 @@ static long eval_max_dam(int r_idx)
 	/* We're done */
 	return (dam);
 }
+
+
 /*
  * Initialize the data structures for the monster power ratings
  * ToDo: Add handling and return codes for error conditions if any.
@@ -1635,7 +1663,7 @@ static bool init_mon_power (void)
 	long dam, dmg;
 	long tot_dam[MAX_DEPTH];
 	s16b mon_count[MAX_DEPTH];
-	monster_race *rptr;
+	monster_race *r_ptr;
 
 	/* Reset the sum of all monster power values */
 
@@ -1656,16 +1684,21 @@ static bool init_mon_power (void)
 
 	for (i = 0; i < z_info->r_max; i++)
 	{
-		rptr = &r_info[i];
+		r_ptr = &r_info[i];
 
 		/* Set the current level */
 
-		lvl = rptr->level;
+		lvl = r_ptr->level;
 
 		/* Evaluate average HP for this monster */
 
-		if (rptr->flags1 & (RF1_FORCE_MAXHP)) hp = rptr->hdice * rptr->hside;
-		else hp = rptr->hdice * (rptr->hside + 1) / 2;
+		if (r_ptr->flags1 & (RF1_FORCE_MAXHP)) hp = r_ptr->hdice * r_ptr->hside;
+		else hp = r_ptr->hdice * (r_ptr->hside + 1) / 2;
+
+		/* XXX Adjust hp for common resistances */
+		/* Although we later scale down monster power by brands that affect them, if
+		   a monster is resistant to other weapons, this makes the slay/brand
+		   even more important */
 
 		/* Maximum damage this monster can do in 10 game turns */
 
@@ -1675,22 +1708,38 @@ static bool init_mon_power (void)
 
 		mon_power[i] = hp * dam;
 
-		/* Adjust for group monsters.  Average in-level group size is 7 */
+		/* Adjust for group monsters.  Average in-level group size is 5 */
+		if (r_ptr->flags1 & RF1_UNIQUE) ;
 
-		if (rptr->flags1 & RF1_FRIENDS) mon_power[i] *= 7;
+		else if (r_ptr->flags1 & RF1_FRIEND) mon_power[i] *= 2;
+
+		else if (r_ptr->flags1 & RF1_FRIENDS) mon_power[i] *= 5;
+
+		/* Adjust for multiplying monsters. This is modified by the speed,
+                 * as fast multipliers are much worse than slow ones.
+                 */
+		else if (r_ptr->flags2 & RF2_MULTIPLY) 
+			mon_power[i] = mon_power[i] * MAX(1, extract_energy[r_ptr->speed
+				+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
 
 		/* Adjust for rarity.  Monsters with rarity > 1 appear less often */
 		/* Paranoia */
-		if (rptr->rarity != 0) mon_power[i] /= rptr->rarity;
+		if (r_ptr->rarity != 0) mon_power[i] /= r_ptr->rarity;
 
 		/*
 		 * Update the running totals - these will be used as divisors later
 		 * Total HP / dam / count for everything up to the current level
 		 */
 
-		for (j = lvl; j < MAX_DEPTH; j++)
+		/*
+		 * Mega Hack -- only let monsters appear for up to 2* level plus 10
+		 * levels deeper XXX We should actually determine power per dungeon, as opposed
+                 * to this. e.g. Slay animals is better where game has dungeons
+		 * full of animals. We also exclude townsfolk from the dungeon.
+		 * Was 	for (j = lvl; j < MAX_DEPTH; j++)
+		 */
+		for (j = lvl; j < (lvl == 0 ? 1 : MIN((lvl * 2) + 10, MAX_DEPTH)); j++)
 		{
-
 			tot_hp[j] += hp;
 			tot_dam[j] += dam;
 
@@ -1698,31 +1747,37 @@ static bool init_mon_power (void)
 			 * Hack - if it's a group monster, add several to the count
 			 * so that the averages don't get thrown off
 			 */
-			if (rptr->flags1 & RF1_FRIENDS) mon_count[j] += 7;
+
+			if (r_ptr->flags1 & RF1_UNIQUE) mon_count[j] += 1;
+			else if (r_ptr->flags1 & RF1_FRIEND) mon_count[j] += 2;
+			else if (r_ptr->flags1 & RF1_FRIENDS) mon_count[j] += 5;
+			else if (r_ptr->flags2 & RF2_MULTIPLY) mon_count[i] += MAX(1, extract_energy[r_ptr->speed
+				+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
+
 			else mon_count[j] += 1;
 		}
 
 	}
 
 	/* Apply divisors now */
-
 	for (i = 0; i < z_info->r_max; i++)
 	{
-		rptr = &r_info[i];
+		r_ptr = &r_info[i];
 
 		/* Extract level */
 
-		lvl = rptr->level;
+		lvl = r_ptr->level;
 
 		/* Paranoia */
 		if (tot_hp[lvl] != 0 && tot_dam[lvl] != 0)
 		{
-
 			/* Divide by average HP and av damage for all in-level monsters */
 			av_hp = tot_hp[lvl] / mon_count[lvl];
 			av_dam = tot_dam[lvl] / mon_count[lvl];
 
-			mon_power[i] = mon_power[i] / (av_hp * av_dam);
+			/* XXX Justifiable paranoia - avoid divide by zero errors */
+			if (av_hp > 0) mon_power[i] = mon_power[i] / av_hp;
+			if (av_dam > 0) mon_power[i] = mon_power[i] / av_dam;
 
 			/* Never less than 1 */
 			if (mon_power[i] < 1) mon_power[i] = 1;
@@ -1738,7 +1793,7 @@ static bool init_mon_power (void)
 			fprintf(randart_log, "Power rating for monster %d: ", i);
 			dmg = eval_max_dam(i);
 			fprintf(randart_log, "Max dam: %i ", (int)dmg);
-			fprintf(randart_log, "Rating: %i\n", (int)mon_power[i]);
+			fprintf(randart_log, "Rating: %i %s\n", (int)mon_power[i], r_name + r_info[i].name);
 			fflush(randart_log);
 		}
 
@@ -1796,14 +1851,9 @@ static s32b slay_power(u32b s_index)
 			&& (s_index & 0x00000001L) )
 				mult = 2;
 
-		/* New brand - brand_lite */
+		/* New brand - brand_lite - acts like slay */
 		if ( (r_ptr->flags3 & (RF3_HURT_LITE))
 			&& (s_index & 0x00010000L) )
-				mult = 2;
-
-		/* New brand - brand_dark */
-		if ( ((r_ptr->flags4 & (RF4_BRTH_DARK)) || (r_ptr->flags3 & (RF3_ORC)))
-			&& (s_index & 0x00020000L) )
 				mult = 2;
 
 		if ( (r_ptr->flags3 & RF3_EVIL)
@@ -1827,26 +1877,22 @@ static s32b slay_power(u32b s_index)
 		if ( (r_ptr->flags3 & RF3_DRAGON)
 			&& (s_index & 0x00000080L) )
 				mult = 3;
-
-		/* New slay - slay man */
-		if ( (strchr("pqt", r_ptr->d_char))
+		if ( (r_ptr->flags9 & RF9_MAN)
 			&& (s_index & 0x00040000L) )
 				mult = 3;
-
-		/* New slay - slay elf */
-		if ( (strchr("l", r_ptr->d_char))
-			&& (s_index & 0x00080001L) )
+		if ( (r_ptr->flags9 & RF9_ELF)
+			&& (s_index & 0x00080000L) )
 				mult = 3;
-
-		/* New slay - slay dwarf */
-		if ( (strchr("h", r_ptr->d_char))
-			&& ((strstr(r_name + r_ptr->name, "warf")) || (strstr(r_name + r_ptr->name, "warven")))
+		if ( (r_ptr->flags9 & RF9_DWARF)
 			&& (s_index & 0x00100000L) )
 				mult = 3;
 
-
-
 		/* Brands get the multiple if monster is NOT resistant */
+
+
+		if ( !(r_ptr->flags9 & RF9_RES_DARK)
+			&& (s_index & 0x00020000L) )
+				mult = 2;
 
 		if ( !(r_ptr->flags3 & RF3_IM_ACID)
 			&& (s_index & 0x00001000L) )
@@ -1961,6 +2007,7 @@ static void remove_contradictory(artifact_type *a_ptr)
 	if (a_ptr->flags2 & TR2_IM_ELEC) a_ptr->flags2 &= ~(TR2_RES_ELEC);
 	if (a_ptr->flags2 & TR2_IM_FIRE) a_ptr->flags2 &= ~(TR2_RES_FIRE);
 	if (a_ptr->flags2 & TR2_IM_COLD) a_ptr->flags2 &= ~(TR2_RES_COLD);
+	if (a_ptr->flags4 & TR4_IM_POIS) a_ptr->flags2 &= ~(TR2_RES_POIS);
 
 	if (a_ptr->flags2 & TR2_IM_ACID) a_ptr->flags4 &= ~(TR4_HURT_ACID);
 	if (a_ptr->flags2 & TR2_IM_ELEC) a_ptr->flags4 &= ~(TR4_HURT_ELEC);
@@ -2586,6 +2633,7 @@ static s32b artifact_power(int a_idx)
 	ADD_POWER("elec immunity",	14, TR2_IM_ELEC, 2, immunities++);
 	ADD_POWER("fire immunity",	22, TR2_IM_FIRE, 2, immunities++);
 	ADD_POWER("cold immunity",	17, TR2_IM_COLD, 2, immunities++);
+	ADD_POWER("poison immunity",	14, TR4_IM_POIS, 4, immunities++);
 
 	if (immunities > 1)
 	{
@@ -2647,6 +2695,7 @@ static s32b artifact_power(int a_idx)
 	ADD_POWER("resist nether",	10, TR2_RES_NETHR, 2, high_resists++);
 	ADD_POWER("resist chaos",	10, TR2_RES_CHAOS, 2, high_resists++);
 	ADD_POWER("resist disenchantment", 10, TR2_RES_DISEN, 2, high_resists++);
+	ADD_POWER("resist disease",	10, TR4_RES_DISEASE, 4, high_resists++);
 
 	/* Add bonus for getting 'high resist-lock' */
 	if (high_resists > 1)
@@ -2673,13 +2722,13 @@ static s32b artifact_power(int a_idx)
 	ADD_POWER("light vulneribility", -30, TR4_HURT_LITE, 4,);
 	ADD_POWER("water vulneribility", -30, TR4_HURT_WATER, 4,);
 	ADD_POWER("hunger",	 	 -15, TR4_HUNGER, 4,);
-	ADD_POWER("anchor",	 	 -4, TR4_ANCHOR, 4,);
+	ADD_POWER("anchor",	 	 -1, TR4_ANCHOR, 4,);
 	ADD_POWER("silent",	 	 -20, TR4_SILENT, 4,);
 	ADD_POWER("static",	 	 -15, TR4_STATIC, 4,);
 	ADD_POWER("windy",	 	 -15, TR4_WINDY, 4,);
 	ADD_POWER("animal",	 	 -5, TR4_ANIMAL, 4,);
 	ADD_POWER("evil",	 	 -5, TR4_EVIL, 4,);
-	ADD_POWER("undead",	 	 -10, TR4_UNDEAD, 4,);
+	ADD_POWER("undead",	 	 -30, TR4_UNDEAD, 4,);
 	ADD_POWER("demon",	 	 -10, TR4_DEMON, 4,);
 	ADD_POWER("orc",	 	 -3, TR4_ORC, 4,);
 	ADD_POWER("troll",	 	 -3, TR4_TROLL, 4,);
@@ -3879,7 +3928,8 @@ static void parse_frequencies ()
 		}
 
 		if ( (a_ptr->flags2 & TR2_IM_ACID) || (a_ptr->flags2 & TR2_IM_ELEC) ||
-			(a_ptr->flags2 & TR2_IM_FIRE) || (a_ptr->flags2 & TR2_IM_COLD) )
+			(a_ptr->flags2 & TR2_IM_FIRE) || (a_ptr->flags2 & TR2_IM_COLD) ||
+			(a_ptr->flags4 & TR4_IM_POIS))
 		{
 			/* Count up immunities for this item, if any */
 			temp = 0;
@@ -3887,6 +3937,7 @@ static void parse_frequencies ()
 			if (a_ptr->flags2 & TR2_IM_ELEC) temp++;
 			if (a_ptr->flags2 & TR2_IM_FIRE) temp++;
 			if (a_ptr->flags2 & TR2_IM_COLD) temp++;
+			if (a_ptr->flags4 & TR4_IM_POIS) temp++;
 
 			LOG_PRINT1("Adding %d for immunities.\n", temp);
 
@@ -4080,6 +4131,7 @@ static void parse_frequencies ()
 			if (a_ptr->flags2 & TR2_RES_NETHR) temp++;
 			if (a_ptr->flags2 & TR2_RES_CHAOS) temp++;
 			if (a_ptr->flags2 & TR2_RES_DISEN) temp++;
+			if (a_ptr->flags4 & TR4_RES_DISEASE) temp++;
 
 			LOG_PRINT1("Adding %d for high resists on body armor.\n", temp);
 
@@ -4192,6 +4244,15 @@ static void parse_frequencies ()
 
 			(artprobs[ART_IDX_GEN_RDISEN])++;
 		}
+
+		if (a_ptr->flags4 & TR4_RES_DISEASE)
+		{
+			/* Resist disenchantment ability */
+			LOG_PRINT("Adding 1 for resist disease - general.\n");
+
+			(artprobs[ART_IDX_GEN_RDISEA])++;
+		}
+
 		/* Done with parsing of frequencies for this item */
 	}
 	/* End for loop */
@@ -4701,7 +4762,15 @@ static bool add_resist_disenchantment(artifact_type *a_ptr)
 {
 	if (a_ptr->flags2 & TR2_RES_DISEN) return FALSE;
 	a_ptr->flags2 |= TR2_RES_DISEN;
-	LOG_PRINT("Adding ability: resist chaos\n");
+	LOG_PRINT("Adding ability: resist disenchantment\n");
+	return TRUE;
+}
+
+static bool add_resist_disease(artifact_type *a_ptr)
+{
+	if (a_ptr->flags4 & TR4_RES_DISEASE) return FALSE;
+	a_ptr->flags4 |= TR4_RES_DISEASE;
+	LOG_PRINT("Adding ability: resist disease\n");
 	return TRUE;
 }
 
@@ -4753,6 +4822,7 @@ static void add_high_resist(artifact_type *a_ptr)
 		else if (i == 9) success = add_resist_nether(a_ptr);
 		else if (i == 10) success = add_resist_chaos(a_ptr);
 		else if (i == 11) success = add_resist_disenchantment(a_ptr);
+		else if (i == 12) success = add_resist_disease(a_ptr);
 
 		count++;
 	}
@@ -5379,7 +5449,7 @@ static void add_weight_mod(artifact_type *a_ptr)
  */
 static void add_immunity(artifact_type *a_ptr)
 {
-	int imm_type = rand_int(4);
+	int imm_type = rand_int(5);
 
 	switch(imm_type)
 	{
@@ -5405,6 +5475,12 @@ static void add_immunity(artifact_type *a_ptr)
 		{
 			a_ptr->flags2 |= TR2_IM_COLD;
 			LOG_PRINT("Adding ability: immunity to cold\n");
+			break;
+		}
+		case 4:
+		{
+			a_ptr->flags4 |= TR4_IM_POIS;
+			LOG_PRINT("Adding ability: immunity to poison\n");
 			break;
 		}
 	}

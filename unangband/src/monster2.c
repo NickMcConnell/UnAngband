@@ -2285,7 +2285,7 @@ s16b monster_place(int y, int x, monster_type *n_ptr)
 		r_ptr = &r_info[m_ptr->r_idx];
 
 		/* Hack -- Notice new multi-hued monsters */
-		if ((r_ptr->flags1 & (RF1_ATTR_MULTI)) || !(r_ptr->flags1 & (RF1_ATTR_METAL))) shimmer_monsters = TRUE;
+		if ((r_ptr->flags1 & (RF1_ATTR_MULTI)) || !(r_ptr->flags9 & (RF9_ATTR_METAL))) shimmer_monsters = TRUE;
 
 		/* Hack -- Count the number of "reproducers" */
 		if (r_ptr->flags2 & (RF2_MULTIPLY)) num_repro++;
@@ -2296,39 +2296,6 @@ s16b monster_place(int y, int x, monster_type *n_ptr)
 
 	/* Result */
 	return (m_idx);
-}
-
-
-/*
- * Determine if a town-dweller is not a threat.
- *
- * Freely admitted:  this whole concept is a hack.
- */
-static bool no_threat(const monster_race *r_ptr)
-{
-	int i;
-
-	/* Scan blows */
-	for (i = 0; i < 4; i++)
-	{
-		/* Extract the attack information */
-		int effect = r_ptr->blow[i].effect;
-		int method = r_ptr->blow[i].method;
-		int d_dice = r_ptr->blow[i].d_dice;
-		int d_side = r_ptr->blow[i].d_side;
-
-		/* Hack -- no more attacks */
-		if (!method) break;
-
-		/* Can hurt the character (more than a little bit)  XXX XXX */
-		if (d_dice * d_side > 3) return (FALSE);
-
-		/* Can steal from the character */
-		if ((effect == GF_EAT_GOLD) || (effect == GF_EAT_ITEM)) return (FALSE);
-	}
-
-	/* Harmless */
-	return (TRUE);
 }
 
 
@@ -2594,11 +2561,10 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp)
 	n_ptr->r_idx = r_idx;
 
 	/* Town level has some special rules */
-	if ((!zone->fill) && !(r_ptr->flags1 & (RF1_UNIQUE)))
+	if (!zone->fill)
 	{
 		/* Hack -- harmless townsmen are not threatening */
-		if (no_threat(r_ptr))
-			n_ptr->mflag |= (MFLAG_TOWN);
+		if (r_ptr->flags9 & (RF9_TOWNSFOLK)) n_ptr->mflag |= (MFLAG_TOWN);
 
 		/* Mega-hack -- no nasty town dwellers when starting out */
 		else if (!p_ptr->max_exp) return (FALSE);
@@ -2671,11 +2637,6 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp)
 }
 
 
-/*
- * Maximum size of a group of monsters
- */
-#define GROUP_MAX       18
-
 
 /*
  * Attempt to place a group of monsters around the given location.
@@ -2690,7 +2651,7 @@ static bool place_monster_group(int y, int x, int r_idx, bool slp,
 
 	int old, n, i;
 	int start;
-	int reduce;
+	int adjust;
 
 	int hack_n = 0;
 
@@ -2700,8 +2661,15 @@ static bool place_monster_group(int y, int x, int r_idx, bool slp,
 	/* Hard monsters, smaller groups */
 	if (r_ptr->level > p_ptr->depth)
 	{
-		reduce = (r_ptr->level - p_ptr->depth) / 2;
-		group_size -= randint(reduce);
+		adjust = (r_ptr->level - p_ptr->depth) / 2;
+		group_size -= randint(adjust);
+	}
+
+	/* Easier monsters, bigger groups */
+	if (p_ptr->depth > r_ptr->level)
+	{
+		adjust = (p_ptr->depth - r_ptr->level) / 2;
+		group_size += randint(adjust);
 	}
 
 	/* Minimum size */
@@ -2852,7 +2820,7 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp)
 
 			/* Place a group of escorts if needed */
 			if ((r_info[escort_idx].flags1 & (RF1_FRIENDS)) &&
-				!place_monster_group(my, mx, escort_idx, slp, (rand_range(4, 8))))
+				!place_monster_group(my, mx, escort_idx, slp, (rand_range(3, 5))))
 			{
 				continue;
 			}
@@ -2883,6 +2851,360 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp)
 	(void)get_mon_num(monster_level);
 }
 
+
+
+/*
+ * Hack -- the "type" of the current "summon specific"
+ */
+static int summon_specific_type = 0;
+
+
+/*
+ * Hack -- help decide if a monster race is "okay" to summon
+ *
+ * XXX We pass through a number of parameters as global
+ * variables. If these are not set, it means we are looking
+ * for a candidate race, which all subsequent summonings from
+ * this spell will be based on. e.g. Find me a monster, and
+ * summon one or more of its kin.
+ */
+static bool summon_specific_okay(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	bool okay = FALSE;
+
+	/* Hack -- no specific type specified */
+	if (!summon_specific_type) return (TRUE);
+
+	/* Check our requirements */
+	switch (summon_specific_type)
+	{
+		case SUMMON_KIN:
+		case RAISE_KIN:
+		{
+			if (summon_char_type)
+			{
+				okay = ((r_ptr->d_char == summon_char_type) && 
+					!(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			else
+			{
+				okay = TRUE;
+			}
+			break;
+		}
+
+		/* Hack -- we combine two different flag types */
+		case ANIMATE_DEAD:
+		{
+			if (summon_flag_type)
+			{
+				u32b summon_flag3_type = summon_flag_type & (0x0000FFFFL);
+				u32b summon_flag9_type = summon_flag_type & (0xFFFF0000L);
+
+				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
+
+					/* Match 'animated' undead */
+					(strchr("szLN", r_ptr->d_char)) &&
+
+					/* Match any */
+					((r_ptr->flags3 & (summon_flag3_type)) ||
+
+					/* Match any */
+					(r_ptr->flags9 & (summon_flag9_type)) ));
+			}
+			else
+			{
+				/* Match 'animated' undead */
+				okay = ((strchr("szLN", r_ptr->d_char)) &&
+					!(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			break;
+		}
+
+		case SUMMON_PLANT:
+		{
+			okay = ((r_ptr->flags3 & (RF3_PLANT)) &&
+				!(r_ptr->flags1 & (RF1_UNIQUE)));
+			break;
+		}
+
+		case SUMMON_INSECT:
+		{
+			okay = ((r_ptr->flags3 & (RF3_INSECT)) &&
+				!(r_ptr->flags1 & (RF1_UNIQUE)));
+			break;
+		}
+
+		/* Hack -- try to summon birds, beasts or reptiles based on summoner */
+		case SUMMON_ANIMAL:
+		{
+			if (summon_flag_type)
+			{
+				okay = ((r_ptr->flags3 & (RF3_ANIMAL)) &&
+					!(r_ptr->flags1 & (RF1_UNIQUE)) &&
+
+					/* Check 'skin' */
+					((r_ptr->flags8 & (RF8_SKIN_MASK)) ?
+
+					/* Has feathers, scales or fur? */
+					((r_ptr->flags8 & (summon_flag_type)) ? TRUE : FALSE) :
+
+					/* Has none of the above - treat as scales... */
+					((r_ptr->flags8 & (RF8_HAS_SCALE)) ? TRUE : FALSE)));
+			}
+			else
+			{
+				okay = ((r_ptr->flags3 & (RF3_ANIMAL)) &&
+					!(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			break;
+		}
+
+		case SUMMON_HOUND:
+		{
+			okay = (((r_ptr->d_char == 'C') || (r_ptr->d_char == 'Z')) &&
+			        !(r_ptr->flags1 & (RF1_UNIQUE)));
+			break;
+		}
+
+		case SUMMON_SPIDER:
+		{
+			okay = ((r_ptr->d_char == 'S') &&
+			        !(r_ptr->flags1 & (RF1_UNIQUE)));
+			break;
+		}
+
+		/* Hack -- mage priests only hang out with mage priests, but
+			warrior priests hang out with warriors and priests */
+		case SUMMON_CLASS:
+		{
+			if (summon_char_type)
+			{
+				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
+
+					/* Check 'class' is mage or priest and we want a mage and/or priest */
+					((r_ptr->flags2 & (RF2_MAGE | RF2_PRIEST)) && (summon_flag_type & (RF2_MAGE | RF2_PRIEST)) ?
+
+					/* Exact match on mage / priest component */
+					((r_ptr->flags2 & (RF2_MAGE | RF2_PRIEST)) == (summon_flag_type & (RF2_MAGE | RF2_PRIEST)) ? TRUE : FALSE) :
+
+					/* Match any other */
+					((r_ptr->flags2 & (summon_flag_type)) ? TRUE : FALSE) ));
+			}
+			else
+			{
+				okay = ((r_ptr->flags2 & (RF2_CLASS_MASK)) &&
+					!(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			break;
+		}
+
+		/* Hack -- we combined two different flag types */
+		case SUMMON_RACE:
+		{
+			if (summon_flag_type)
+			{
+				u32b summon_flag3_type = summon_flag_type & (0x0000FFFFL);
+				u32b summon_flag9_type = summon_flag_type & (0xFFFF0000L);
+
+				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
+
+					/* Match any */
+					((r_ptr->flags3 & (summon_flag3_type)) ||
+
+					/* Match any */
+					(r_ptr->flags9 & (summon_flag9_type)) ));
+			}
+			else
+			{
+				okay = ((r_ptr->flags3 & (RF3_RACE_MASK)) &&
+					!(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			break;
+		}
+
+		/* Mega Hack -- this whole thing is ugly */
+		case SUMMON_ELEMENT:
+		case ANIMATE_ELEMENT:
+		{
+			if (summon_element_type < MAX_ELEMENTS)
+			{
+				okay = FALSE;
+
+				if (strchr("EvgZ", r_ptr->d_char) &&
+					!(r_ptr->flags1 & (RF1_UNIQUE)))
+				{
+					int i, k, element_idx = MAX_ELEMENTS;
+
+					/* Mega Hack -- attempt to match an element */
+					/* XXX The table is laid out in such a way that we should pick the correct element
+					   for most hounds, vortexes and elementals. We cheat particularly with vortexes and
+					   hounds and relate more of them to a single type of elemental (e.g acid hounds
+					   associate with ooze elementals, dark hounds with smoke elementals). */
+					for (i = 0; i < MAX_ELEMENTS; i++)
+					{
+						/* Match on blow effects */
+						for (k = 0; k < 4; k++)
+						{
+							if (r_ptr->blow[k].effect == element[i].effect) element_idx = i;
+						}
+
+						/* Match on monster flags */
+						if ((r_ptr->flags2 & (element[i].race_flags2)) != 0) element_idx = i;
+						if ((r_ptr->flags3 & (element[i].race_flags3)) != 0) element_idx = i;
+						if ((r_ptr->flags4 & (element[i].race_flags4)) != 0) element_idx = i;
+						if ((r_ptr->flags5 & (element[i].race_flags5)) != 0) element_idx = i;
+						if ((r_ptr->flags6 & (element[i].race_flags6)) != 0) element_idx = i;
+					}
+
+					okay = (element_idx == summon_element_type);
+				}
+			}
+			else
+			{
+				okay = (strchr("EvgZ", r_ptr->d_char) &&
+					!(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			break;
+		}
+
+		case SUMMON_FRIEND:
+		{
+			if (summon_race_type)
+			{
+				okay = (r_idx == summon_race_type);
+			}
+			else
+			{
+				okay = TRUE;
+			}
+			break;
+		}
+
+		case SUMMON_UNIQUE_FRIEND:
+		{
+			if (summon_attr_type && summon_char_type)
+			{
+				okay = ((r_ptr->d_attr == summon_attr_type) && 
+					(r_ptr->d_char == summon_char_type) && 
+					(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			else if (summon_attr_type)
+			{
+				okay = ((r_ptr->d_attr == summon_attr_type) && 
+					(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			else if (summon_char_type)
+			{
+				okay = ((r_ptr->d_char == summon_char_type) && 
+					(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			else
+			{
+				okay = (r_ptr->flags1 & (RF1_UNIQUE));
+			}
+			break;
+		}
+
+		case SUMMON_ORC:
+		{
+			okay = ((r_ptr->flags3 & (RF3_ORC)) &&
+				!(r_ptr->flags1 & (RF1_UNIQUE)));
+			break;
+		}
+
+		case SUMMON_TROLL:
+		{
+			okay = ((r_ptr->flags3 & (RF3_TROLL)) &&
+				!(r_ptr->flags1 & (RF1_UNIQUE)));
+			break;
+		}
+
+		case SUMMON_GIANT:
+		{
+			okay = ((r_ptr->flags3 & (RF3_TROLL)) &&
+				!(r_ptr->flags1 & (RF1_UNIQUE)));
+			break;
+		}
+
+		case SUMMON_DEMON:
+		{
+			okay = ((r_ptr->flags3 & (RF3_DEMON)) &&
+				!(r_ptr->flags1 & (RF1_UNIQUE)));
+			break;
+		}
+
+		case SUMMON_UNDEAD:
+		{
+			okay = ((r_ptr->flags3 & (RF3_UNDEAD)) &&
+				!(r_ptr->flags1 & (RF1_UNIQUE)));
+
+			break;
+		}
+
+		case SUMMON_DRAGON:
+		{
+			okay = ((r_ptr->flags3 & (RF3_DRAGON)) &&
+				!(r_ptr->flags1 & (RF1_UNIQUE)));
+			break;
+		}
+
+		case SUMMON_HI_DEMON:
+		{
+			okay = ((r_ptr->d_char == 'U') &&
+					(r_ptr->flags3 & (RF3_DEMON)));
+			break;
+		}
+
+		case SUMMON_HI_UNDEAD:
+		{
+			okay = ((r_ptr->d_char == 'L') ||
+			        (r_ptr->d_char == 'V') ||
+			        (r_ptr->d_char == 'W'));
+			break;
+		}
+
+		case SUMMON_HI_DRAGON:
+		{
+			okay = (r_ptr->d_char == 'D');
+			break;
+		}
+
+		case SUMMON_WRAITH:
+		{
+			okay = ((r_ptr->d_char == 'W') &&
+			        (r_ptr->flags1 & (RF1_UNIQUE)));
+			break;
+		}
+
+		case SUMMON_UNIQUE:
+		{
+			if ((r_ptr->flags1 & (RF1_UNIQUE)) != 0) okay = TRUE;
+			break;
+		}
+
+		case SUMMON_HI_UNIQUE:
+		{
+			if (((r_ptr->flags1 & (RF1_UNIQUE)) != 0) &&
+				(r_ptr->level > (MAX_DEPTH / 2))) okay = TRUE;
+			break;
+		}
+
+
+		default:
+		{
+			break;
+		}
+
+	}
+
+	/* Result */
+	return (okay);
+}
+
+
 /*
  * Attempt to place a monster of the given race at the given location
  *
@@ -2902,12 +3224,60 @@ bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp)
 	/* Require the "group" flag */
 	if (!grp) return (TRUE);
 
+	/* Friends for uniques - we have to reallocate separately to avoid recursion */
+	if ((r_ptr->flags1 & (RF1_UNIQUE)) && (r_ptr->flags1 & (RF1_FRIEND | RF1_FRIENDS)))
+	{
+		int i, s_idx;
 
+		/* Save the unique attr and char */
+		summon_attr_type = r_ptr->d_attr;
+		summon_char_type = r_ptr->d_char;
+
+		/* Save the "summon" type */
+		summon_specific_type = SUMMON_UNIQUE_FRIEND;
+
+		/* Place friend or friends */
+		for (i = 0; i < (r_ptr->flags1 & (RF1_FRIENDS) ? 4 : 1); i++)
+		{
+			/* Require "okay" monsters */
+			get_mon_num_hook = summon_specific_okay;
+
+			/* Prepare allocation table */
+			get_mon_num_prep();
+
+			/* Pick a monster, using the monster race level */
+			s_idx = get_mon_num(r_ptr->level);
+
+			/* Remove restriction */
+			get_mon_num_hook = NULL;
+
+			/* Prepare allocation table */
+			get_mon_num_prep();
+
+			/* Handle failure */
+			if (!s_idx) continue;
+
+			/* Place one monster, or fail */
+			if (!place_monster_one(y, x, s_idx, slp)) return (FALSE);
+
+			/* Escorts for certain monsters */
+			if ((r_info[s_idx].flags1 & (RF1_ESCORT)) || (r_info[s_idx].flags1 & (RF1_ESCORTS)))
+			{
+				place_monster_escort(y, x, s_idx, slp);
+			}
+		}
+	}
 	/* Friends for certain monsters */
-	if (r_ptr->flags1 & (RF1_FRIENDS))
+	else if (r_ptr->flags1 & (RF1_FRIENDS))
+	{
+		/* Attempt to place a second monster */
+		(void)place_monster_group(y, x, r_idx, slp, 1);
+	}
+	/* Friends for certain monsters */
+	else if (r_ptr->flags1 & (RF1_FRIENDS))
 	{
 		/* Attempt to place a large group */
-		(void)place_monster_group(y, x, r_idx, slp, (s16b)rand_range(6, 10));
+		(void)place_monster_group(y, x, r_idx, slp, (s16b)rand_range(3, 5));
 	}
 
 	/* Escorts for certain monsters */
@@ -3044,174 +3414,6 @@ bool alloc_monster(int dis, bool slp)
 
 
 
-/*
- * Hack -- the "type" of the current "summon specific"
- */
-static int summon_specific_type = 0;
-
-
-/*
- * Hack -- help decide if a monster race is "okay" to summon
- */
-static bool summon_specific_okay(int r_idx)
-{
-	monster_race *r_ptr = &r_info[r_idx];
-
-	bool okay = FALSE;
-
-	/* Hack -- no specific type specified */
-	if (!summon_specific_type) return (TRUE);
-
-
-	/* Check our requirements */
-	switch (summon_specific_type)
-	{
-
-		case SUMMON_ANT:
-		{
-			okay = ((r_ptr->d_char == 'a') &&
-				!(r_ptr->flags1 & (RF1_UNIQUE)));
- 			break;
- 		}
-
-
-		case SUMMON_SPIDER:
-		{
-			okay = ((r_ptr->d_char == 'S') &&
-			        !(r_ptr->flags1 & (RF1_UNIQUE)));
-			break;
-		}
-
-		case SUMMON_HOUND:
-		{
-			okay = (((r_ptr->d_char == 'C') || (r_ptr->d_char == 'Z')) &&
-			        !(r_ptr->flags1 & (RF1_UNIQUE)));
-			break;
-		}
-
-		case SUMMON_HYDRA:
-		{
-			okay = ((r_ptr->d_char == 'y') &&
-			        !(r_ptr->flags1 & (RF1_UNIQUE)));
-			break;
-		}
-
-		case SUMMON_MAIA:
-		{
-			okay = ((r_ptr->d_char == 'M') &&
-				!(r_ptr->flags1 & (RF1_UNIQUE)));
-
-			break;
-		}
-
-		case SUMMON_DEMON:
-		{
-			okay = ((r_ptr->flags3 & (RF3_DEMON)) &&
-				!(r_ptr->flags1 & (RF1_UNIQUE)));
-			break;
-		}
-
-
-		case SUMMON_UNDEAD:
-		{
-			okay = ((r_ptr->flags3 & (RF3_UNDEAD)) &&
-				!(r_ptr->flags1 & (RF1_UNIQUE)));
-
-			break;
-		}
-
-		case SUMMON_DRAGON:
-		{
-			okay = ((r_ptr->flags3 & (RF3_DRAGON)) &&
-				!(r_ptr->flags1 & (RF1_UNIQUE)));
-			break;
-		}
-
-		case SUMMON_HI_DEMON:
-		{
-			okay = ((r_ptr->d_char == 'U') &&
-					(r_ptr->flags3 & (RF3_DEMON)));
-			break;
-		}
-
-		case SUMMON_HI_UNDEAD:
-		{
-			okay = ((r_ptr->d_char == 'L') ||
-			        (r_ptr->d_char == 'V') ||
-			        (r_ptr->d_char == 'W'));
-			break;
-		}
-
-
-		case SUMMON_HI_DRAGON:
-		{
-			okay = (r_ptr->d_char == 'D');
-			break;
-		}
-
-		case SUMMON_WRAITH:
-		{
-			okay = ((r_ptr->d_char == 'W') &&
-			        (r_ptr->flags1 & (RF1_UNIQUE)));
-			break;
-		}
-
-		case SUMMON_UNIQUE:
-		{
-			if ((r_ptr->flags1 & (RF1_UNIQUE)) != 0) okay = TRUE;
-			break;
-		}
-
-		case SUMMON_HI_UNIQUE:
-		{
-			if (((r_ptr->flags1 & (RF1_UNIQUE)) != 0) &&
-				(r_ptr->level > (MAX_DEPTH / 2))) okay = TRUE;
-			break;
-		}
-
-
-		case SUMMON_KIN:
-		{
-			okay = ((r_ptr->d_char == summon_kin_type) &&
-				!(r_ptr->flags1 & (RF1_UNIQUE)));
-			break;
-		}
-
-		case SUMMON_ANIMAL:
-		{
-			okay = ((r_ptr->flags3 & (RF3_ANIMAL)) &&
-			        !(r_ptr->flags1 & (RF1_UNIQUE)));
-			break;
-		}
-
-		case SUMMON_BERTBILLTOM:
-		{
-			okay = ((r_ptr->d_char == 'T') &&
-				(r_ptr->flags1 & (RF1_UNIQUE)) &&
-				  ((strstr((r_name + r_ptr->name), "Bert")) ||
-				   (strstr((r_name + r_ptr->name), "Bill")) ||
-				   (strstr((r_name + r_ptr->name), "Tom" ))));
-			break;
-		}
-
-
-		case SUMMON_THIEF:
-		{
-			okay = ((r_ptr->flags2 & (RF2_SNEAKY)) &&
-			        !(r_ptr->flags1 & (RF1_UNIQUE)));
-			break;
-		}
-
-		default:
-		{
-			break;
-		}
-
-	}
-
-	/* Result */
-	return (okay);
-}
 
 
 /*
@@ -3276,18 +3478,13 @@ bool summon_specific(int y1, int x1, int lev, int type)
 	get_mon_num_prep();
 
 	/* Pick a monster, using the level calculation */
-	/* XXX Calculation changed from average to minimum. This should
-	prevent out-of-depth monsters having as great an impact when
-	they summon, and weak summoning monsters from being as dangerous
-	deep in the dungeon. */
-	r_idx = get_mon_num(MIN(p_ptr->depth,lev)+ 5);
+	r_idx = get_mon_num(lev);
 
 	/* Remove restriction */
 	get_mon_num_hook = NULL;
 
 	/* Prepare allocation table */
 	get_mon_num_prep();
-
 
 	/* Handle failure */
 	if (!r_idx) return (FALSE);
@@ -3412,11 +3609,10 @@ bool animate_object(int item)
 			break;
 
 		case TV_BODY:
-		case TV_BONE:
 			p = "come back from the dead!";
 			break;
 
-		    case TV_HOLD:
+	        case TV_HOLD:
 			p = "broken open!";
 			break;
 
@@ -3457,6 +3653,8 @@ bool animate_object(int item)
 
 	return (TRUE);
 }
+
+
 
 /*
  * Change monster fear.

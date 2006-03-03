@@ -1209,6 +1209,9 @@ static errr init_other(void)
 	C_MAKE(view_g, VIEW_MAX, u16b);
 
 	/* Array of grids */
+	C_MAKE(fire_g, VIEW_MAX, u16b);
+
+	/* Array of grids */
 	C_MAKE(temp_g, TEMP_MAX, u16b);
 
 	/* Hack -- use some memory twice */
@@ -2042,6 +2045,9 @@ void cleanup_angband(void)
 
 	/* Free the "update_view()" array */
 	FREE(view_g);
+
+	/* Free the "update_view()" array */
+	FREE(fire_g);
 
 	/* Free the temp array */
 	FREE(temp_g);

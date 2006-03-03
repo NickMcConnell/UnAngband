@@ -446,8 +446,6 @@ static void process_world(void)
 
 	feature_type *f_ptr;
 
-	room_info_type *d_ptr;
-
 	int mimic;
 
 	int regen_amount;
@@ -455,10 +453,6 @@ static void process_world(void)
 	object_type *o_ptr;
 
 	cptr name;
-
-	int by,bx;
-
-	bool room;
 
 	/* Every 10 game turns */
 	if (turn % 10) return;
@@ -676,16 +670,6 @@ static void process_world(void)
 
 	/*** Check the Food, Rest, and Regenerate ***/
 
-	/* Special rooms affect some of this */
-	by = p_ptr->py/BLOCK_HGT;
-	bx = p_ptr->px/BLOCK_HGT;
-
-	/* In a room */
-	room = (cave_info[p_ptr->py][p_ptr->px] & (CAVE_ROOM)) ? TRUE : FALSE;
-
-	/* Get the room */
-	d_ptr = &room_info[dun_room[by][bx]];
-
 	/* Tire normally */
 	/* XXX We exclude situations where we adjust this counter elsewhere */
 	if (!(p_ptr->resting || p_ptr->searching || p_ptr->running || p_ptr->paralyzed || (p_ptr->stun >= 100)) ||
@@ -800,12 +784,11 @@ static void process_world(void)
 		regen_amount = regen_amount * 2;
 	}
 
-	if (p_ptr->disease & (DISEASE_DRAIN_MANA)) regen_amount = 0;
-
 	/* Regenerate the mana */
 	if (p_ptr->csp < p_ptr->msp)
 	{
-		if ((p_ptr->cur_flags3 & (TR3_DRAIN_MANA)) == 0) regenmana(regen_amount);
+		if ((p_ptr->cur_flags3 & (TR3_DRAIN_MANA)) &&
+			!(p_ptr->disease & (DISEASE_DRAIN_MANA))) regenmana(regen_amount);
 	}
 
 	/* Various things interfere with healing */
@@ -813,9 +796,12 @@ static void process_world(void)
 	if (p_ptr->poisoned) regen_amount = 0;
 	if (p_ptr->stun) regen_amount = 0;
 	if (p_ptr->cut) regen_amount = 0;
+
+	/* If disease has no other effect, prevent regeneration */
+	if (!(p_ptr->disease & (DISEASE_BLOWS))) regen_amount = 0;
+
 	if ((p_ptr->cur_flags3 & (TR3_DRAIN_HP)) != 0) regen_amount = 0;
-	if (p_ptr->disease) regen_amount = 0;
-	if ((room) && (d_ptr->flags & (ROOM_BLOODY))) regen_amount = 0;
+	if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) regen_amount = 0;
 
 	/* Regenerate Hit Points if needed */
 	if (p_ptr->chp < p_ptr->mhp)
@@ -979,7 +965,7 @@ static void process_world(void)
 		int adjust = (adj_con_fix[p_ptr->stat_ind[A_CON]] + 1);
 
 		/* Some rooms make wounds magically worse */
-		if ((room) && (d_ptr->flags & (ROOM_BLOODY))) adjust = -1;
+		if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) adjust = -1;
 
 		/* Apply some healing */
 		(void)set_poisoned(p_ptr->poisoned - adjust);
@@ -1003,7 +989,7 @@ static void process_world(void)
 		if (p_ptr->cut > 1000) adjust = 0;
 
 		/* Some rooms make wounds magically worse */
-		if ((room) && (d_ptr->flags & (ROOM_BLOODY))) adjust = -1;
+		if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) adjust = -1;
 		
 		/* Apply some healing */
 		(void)set_cut(p_ptr->cut - adjust);
@@ -1453,7 +1439,7 @@ static void process_world(void)
 
 	}
 	/* Mega-Hack -- Portal room */
-	else if ((room) && (d_ptr->flags & (ROOM_PORTAL)) && (rand_int(100)<1))
+	else if ((room_has_flag(p_ptr->py, p_ptr->px, ROOM_PORTAL)) && (rand_int(100)<1))
 	{
 		/* Warn the player */
 		msg_print("There is a brilliant flash of light.");
@@ -2255,6 +2241,9 @@ static void process_player_aux(void)
 	static u32b     old_flags4 = 0L;
 	static u32b     old_flags5 = 0L;
 	static u32b     old_flags6 = 0L;
+	static u32b     old_flags7 = 0L;
+	static u32b     old_flags8 = 0L;
+	static u32b     old_flags9 = 0L;
 
 	static byte	old_r_blows0 = 0;
 	static byte	old_r_blows1 = 0;
@@ -2279,6 +2268,9 @@ static void process_player_aux(void)
 		    (old_flags4 != l_ptr->flags4) ||
 		    (old_flags5 != l_ptr->flags5) ||
 		    (old_flags6 != l_ptr->flags6) ||
+		    (old_flags7 != l_ptr->flags7) ||
+		    (old_flags8 != l_ptr->flags8) ||
+		    (old_flags9 != l_ptr->flags9) ||
 		    (old_r_blows0 != l_ptr->blows[0]) ||
 		    (old_r_blows1 != l_ptr->blows[1]) ||
 		    (old_r_blows2 != l_ptr->blows[2]) ||
@@ -2296,6 +2288,9 @@ static void process_player_aux(void)
 			old_flags4 = l_ptr->flags4;
 			old_flags5 = l_ptr->flags5;
 			old_flags6 = l_ptr->flags6;
+			old_flags6 = l_ptr->flags7;
+			old_flags6 = l_ptr->flags8;
+			old_flags6 = l_ptr->flags9;
 
 			/* Memorize blows */
 			old_r_blows0 = l_ptr->blows[0];
@@ -2660,7 +2655,7 @@ static void process_player(void)
 					r_ptr = &r_info[m_ptr->r_idx];
 
 					/* Skip non-multi-hued monsters */
-					if (!(r_ptr->flags1 & (RF1_ATTR_MULTI)) && !(r_ptr->flags1 & (RF1_ATTR_METAL))) continue;
+					if (!(r_ptr->flags1 & (RF1_ATTR_MULTI)) && !(r_ptr->flags9 & (RF9_ATTR_METAL))) continue;
 
 					/* Reset the flag */
 					shimmer_monsters = TRUE;
@@ -2762,7 +2757,6 @@ static void dungeon(void)
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
-
 	/* Hack -- enforce illegal panel */
 	p_ptr->wy = DUNGEON_HGT;
 	p_ptr->wx = DUNGEON_WID;
@@ -2856,6 +2850,7 @@ static void dungeon(void)
 		p_ptr->create_down_stair = p_ptr->create_up_stair = FALSE;
 	}
 
+
 	/* Choose panel */
 	verify_panel();
 
@@ -2870,7 +2865,6 @@ static void dungeon(void)
 
 	/* Clear */
 	Term_clear();
-
 
 	/* Update stuff */
 	p_ptr->update |= (PU_BONUS | PU_HP | PU_MANA | PU_SPELLS);
@@ -2904,7 +2898,6 @@ static void dungeon(void)
 
 	/* Redraw stuff */
 	window_stuff();
-
 
 	/* Hack -- Decrease "xtra" depth */
 	character_xtra--;

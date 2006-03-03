@@ -531,8 +531,8 @@ static void rd_monster(monster_type *m_ptr)
 	rd_byte(&m_ptr->blind);
 	rd_byte(&m_ptr->tim_invis);
 	rd_byte(&m_ptr->tim_passw);
-	rd_byte(&m_ptr->hero);
-	rd_byte(&m_ptr->shero);
+	rd_byte(&m_ptr->bless);
+	rd_byte(&m_ptr->beserk);
 	rd_byte(&m_ptr->shield);
 	rd_byte(&m_ptr->oppose_elem);
 	rd_byte(&m_ptr->summoned);
@@ -1092,10 +1092,10 @@ static errr rd_extra(void)
 	rd_byte(&tmp8u);  /* Was p_ptr->confusing */
 	rd_byte(&tmp8u);	/* oops */
 	rd_byte(&tmp8u);	/* oops */
-	rd_byte(&tmp8u);	/* oops */
+	rd_byte(&p_ptr->climbing);
 	rd_byte(&p_ptr->searching);
-	rd_byte(&tmp8u);	/* oops */
-	rd_byte(&tmp8u);	/* oops */
+	rd_byte(&p_ptr->dodging);
+	rd_byte(&p_ptr->blocking);
 	rd_byte(&tmp8u);	/* oops */
 
 	rd_u32b(&p_ptr->disease);

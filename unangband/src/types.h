@@ -112,6 +112,7 @@ typedef struct player_other player_other;
 typedef struct player_type player_type;
 typedef struct start_item start_item;
 typedef struct tval_desc tval_desc;
+typedef struct element_type element_type;
 
 
 
@@ -619,9 +620,9 @@ struct monster_race
 	u32b flags6;    /* Flags 6 (special spells) */
 	u32b flags7;    /* Flags 7 (summons) */
 	u32b flags8;	/* Flags 8 (drops) */
+	u32b flags9;	/* Flags 9 (extra) */
 
 	monster_blow blow[4];   /* Up to four blows per round */
-
 
 	byte level;     /* Level of creature */
 	byte rarity;    /* Rarity of creature */
@@ -683,6 +684,8 @@ struct monster_lore
 	u32b flags6;  /* Observed racial flags */
 	u32b flags7;  /* Observed racial flags */
 	u32b flags8;  /* Observed racial flags */
+	u32b flags9;	/* Flags 9 (extra) */
+
 };
 
 
@@ -838,8 +841,8 @@ struct monster_type
 
 	byte tim_invis;	/* Monster is temporarily invisible */
 	byte tim_passw;	/* Monster is temporarily passwall */
-	byte hero;	/* Monster is temporarily heroic */
-	byte shero;	/* Monster is temporarily beserk */
+	byte bless;	/* Monster is temporarily blessed */
+	byte beserk;	/* Monster is temporarily beserk */
 
 	byte shield;	/* Monster is temporarily shielded */
 	byte oppose_elem; /* Monster is temporarily resistant to elements */
@@ -1342,8 +1345,11 @@ struct player_type
 	s16b rest;      /* Current rest */
 	s16b water;     /* Current water */
 
-	byte climbing; /* Glowing hands */
+	byte climbing; /* Currently climbing */
 	byte searching; /* Currently searching */
+
+	byte dodging;   /* Currently dodging */
+	byte blocking;   /* Currently blocking */
 
 	u32b spell_learned1;    /* Spell flags */
 	u32b spell_learned2;    /* Spell flags */
@@ -1572,3 +1578,16 @@ struct tval_desc
 
 
 
+/*
+ * A structure to hold flags to match element types
+ */
+struct element_type
+{
+	int effect;
+	u32b feat_flags2;
+	u32b race_flags2;
+	u32b race_flags3;
+	u32b race_flags4;
+	u32b race_flags5;
+	u32b race_flags6;
+};

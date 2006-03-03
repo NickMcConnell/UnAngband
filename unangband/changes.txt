@@ -47,6 +47,18 @@ resist all elements.
 - Monsters can cast spells which curse the player, dispel enchantments on the player
 and probe the player for weaknesses.
 
+- Monsters can resist more effects, such as darkness, or be resistant to either blunt
+or edged weapons, as well as evade player blows and missiles (From Sangband).
+
+- Monsters can cast spells which animate the dead, animate objects or animate terrain
+around them. Monsters can also cast spells that bring other monsters back to life.  A
+much wider variety of summoning spells is also possible.
+
+- Added a variety of monsters from Sangband and NPPAngband.
+
+- Undead are now hurt by healing spells, and cured by drain life. Golems are now hurt
+by haste spells and not hasted very well, if at all.
+
 - Vents now act as conduits for water, acid, steam, fire or gas through walls.
 Vents can also be climbed through, but block vision and ranged attacks.
 
@@ -58,7 +70,7 @@ bashed or tunnelled through.
 
 - Statues of hybrids can now occur. Figurines removed from the back end code.
 
-- Spores and potions will explode when thrown (Potions used to just affect the target).
+- Spores and potions will explode when thrown.
 
 - Added golem parts which can be assembled into a complete golem by activating the
 parts.
@@ -86,9 +98,8 @@ unnessary bookkeeping.
 
 - Added fixed quests that can be configured in the lib\edit\quests.txt file. These
 allow a reasonably complicated set of actions. See the example Farmer Maggot quest.
-However, scripting is not possible - the quests are data-driven.
-
-- Added random quests. These use the same backend as the fixed quests code.
+However, scripting is not possible - the quests are data-driven. At the moment
+the quests can be created, but have no in game functionality.
 
 ### User Interface ###
 
@@ -181,6 +192,8 @@ as there can be terrain in Unangband that blocks line of sight but not
 spells or arrows (eg smoke). At the moment, most of these new flags are
 not used.
 
+- Cleaned up code somewhat by using monster flags more often instead of
+depending on matching monster names.
 
 Unangband 0.5.5: "New Years Resolution"
 

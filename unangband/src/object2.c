@@ -1574,6 +1574,17 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 	/* Analyze the items */
 	switch (o_ptr->tval)
 	{
+		/* Money */
+		case TV_GEMS:
+		case TV_GOLD:
+		{
+			/* Avoid overflow */
+			if (o_ptr->pval >= (2 << 15) - j_ptr->pval) return (0);
+
+			/* Probably okay */
+			break;
+		}
+
 		/* Spells */
 		case TV_SPELL:
 		{

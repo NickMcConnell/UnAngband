@@ -5660,20 +5660,24 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 
 	if (s_ptr->flags2 & (SF2_POISON))
 	{
-		if (((p_ptr->cur_flags2 & (TR2_RES_POIS)) == 0) || p_ptr->oppose_pois)
+		if (((p_ptr->cur_flags2 & (TR2_RES_POIS)) == 0) && !(p_ptr->oppose_pois) &&
+			(p_ptr->cur_flags4 & (TR4_IM_POIS)) == 0)
 		{
 			if (set_poisoned(p_ptr->poisoned + lasts))
 			{
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_POIS,0x0L,0x0L);
+				equip_not_flags(0x0L,TR2_RES_POIS,0x0L,TR4_IM_POIS);
 			}
 		}
 		else if (!p_ptr->oppose_pois) /* && (obvious) */
 		{
 			/* Always notice */
-			equip_can_flags(0x0L,TR2_RES_POIS,0x0L,0x0L);
+			if (p_ptr->cur_flags4 & (TR4_IM_POIS)) equip_can_flags(0x0L,TR2_RES_POIS,0x0L,0x0L);
+
+			/* Always notice */
+			else equip_can_flags(0x0L,TR2_RES_POIS,0x0L,0x0L);
 		}
 	}
 

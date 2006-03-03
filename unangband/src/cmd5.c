@@ -930,22 +930,26 @@ void do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 	/* Spell failure chance */
 	chance = spell_chance(spell);
 
-	/* Some rooms only give a (slight) chance */
-	if (cave_info[p_ptr->py][p_ptr->px] & (CAVE_ROOM))
+	/* Some items and some rooms silence the player */
+	if ((p_ptr->cur_flags4 & (TR4_SILENT)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_SILENT)))
 	{
-		/* Special rooms affect some of this */
-		int by = p_ptr->py/BLOCK_HGT;
-		int bx = p_ptr->px/BLOCK_HGT;
+		/* Some items silence the player */
+		chance = 99;
+
+		/* Warn the player */
+		msg_print("You are engulfed in magical silence.");
 
 		/* Get the room */
-		if(room_info[dun_room[by][bx]].flags & (ROOM_SILENT))
+		if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_SILENT)))
 		{
-			chance = 99;
-
-			/* Warn the player */
-			msg_print("You are engulfed in magical silence.");
-
+			/* Always notice */
+			equip_can_flags(0x0L,0x0L,0x0L,TR4_SILENT);
 		}
+	}
+	else
+	{
+		/* Always notice */
+		equip_not_flags(0x0L,0x0L,0x0L,TR4_SILENT);
 	}
 
 	/* Failed spell */

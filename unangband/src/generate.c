@@ -339,15 +339,7 @@ static void new_player_spot(void)
 		if (!cave_start_bold(y, x)) continue;
 
 		/* Refuse to start in anti-teleport rooms */
-		if (cave_info[y][x] & (CAVE_ROOM))
-		{
-			/* Don't allow teleport here */
-			int by = y/BLOCK_HGT;
-			int bx = x/BLOCK_HGT;
-			int room = dun_room[by][bx];
-
-			if (room_info[room].flags & (ROOM_ICKY)) continue;
-		}
+		if (room_has_flag(y, x, ROOM_ICKY)) continue;
 
 		/* Done */
 		break;

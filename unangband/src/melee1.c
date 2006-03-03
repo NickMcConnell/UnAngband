@@ -82,22 +82,10 @@ static int check_hit(int power, int level, int m_idx)
 	i = (power + (m_ptr->stunned ? level * 2 : level * 3));
 
 	/* Total armor */
-	ac = p_ptr->ac + p_ptr->to_a;
+	ac = p_ptr->ac + p_ptr->to_a + p_ptr->blocking;
 
 	/* Some rooms make the player vulnerible */
-	if (cave_info[p_ptr->py][p_ptr->px] & (CAVE_ROOM))
-	{
-		/* Special rooms affect some of this */
-		int by = p_ptr->py/BLOCK_HGT;
-		int bx = p_ptr->px/BLOCK_HGT;
-
-		/* Get the room */
-		if(room_info[dun_room[by][bx]].flags & (ROOM_CURSED))
-		{
-			/* Halve the effective armor class */
-			ac /= 2;
-		}
-	}							    
+	if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_CURSED)) ac /= 2;
 
 	/* Power and Level compete against Armor */
 	if ((i > 0) && (randint(i) > ((ac * 3) / 4))) return (TRUE);
@@ -1152,8 +1140,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	/* Summon count */
 	int count = 0;
 
-	/* Summon level */
-	int summon_lev;
+	/* Summon count */
+	int summon_lev = 0;
 
 	/* Is the player blind */
 	bool blind = (p_ptr->blind ? TRUE : FALSE);
@@ -1226,7 +1214,13 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		rlev = f_info[cave_feat[y][x]].power;
 
 		/* Fake the spell power */
-		spower = 2 + p_ptr->lev / 10;
+		spower = 2 + p_ptr->depth / 10;
+
+		/* Fake the powerfulness */
+		powerful = (p_ptr->depth > 50 ? TRUE : FALSE);
+
+		/* Fake the summoning level */
+		summon_lev = p_ptr->depth + 3;
 	}
 	else
 	{
@@ -1251,6 +1245,15 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 		/* Extract the "see-able-ness" */
 		seen = (!blind && m_ptr->ml);
+
+		/* Extract the monster level.  Must be at least 1. */
+		rlev = MAX(1, r_ptr->level);
+
+		/* Extract the powerfulness */
+		powerful = (r_ptr->flags1 & (RF2_POWERFUL) ? TRUE : FALSE);
+
+		/* Extract the summoning level.  Must be at least 1. */
+		summon_lev = MAX(1 ,(r_ptr->level + p_ptr->depth) / 2 - 1);
 
 		/* Determine mana cost */
 		if (attack >= 224) return (FALSE);
@@ -1279,9 +1282,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			return (TRUE);
 		}
-
-		/* Extract the monster level.  Must be at least 1. */
-		rlev = MAX(1, r_ptr->level);
 
 		/* Extract the monster's spell power.  Must be at least 1. */
 		spower = MAX(1, r_ptr->spell_power);
@@ -1747,7 +1747,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			break;
 		}
 
-		/* RF4_BRTH_INER */
+		/* RF4_BRTH_INERT */
 		case 96+19:
 		{
 			disturb(1, 0);
@@ -1771,9 +1771,14 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			break;
 		}
 
-		/* RF4_XXX2 */
+		/* RF4_BRTH_WIND */
 		case 96+21:
 		{
+			disturb(1, 0);
+			if (blind) result = format("%^s breathes.", m_name);
+			else result = format("%^s breathes wind.", m_name);
+			mon_arc(who, y, x, GF_WIND, get_breath_dam(m_ptr->hp, GF_WIND, powerful),
+				   0, (powerful ? 40 : 20), result);
 			break;
 		}
 
@@ -2177,9 +2182,33 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			break;
 		}
 
-		/* RF5_Unused */
+		/* RF5_BALL_WIND */
 		case 128+10:
 		{
+			disturb(1, 0);
+
+			if (spower < 22)
+			{
+				if (blind) result = format("%^s mumbles.", m_name);
+				else result = format("%^s gestures fluidly.", m_name);
+				msg_print("You are surrounded by a dust devil.");
+				rad = 2;
+			}
+			else if (spower < 40)
+			{
+				if (blind) result = format("%^s mumbles.", m_name);
+				else result = format("%^s gestures fluidly.", m_name);
+				msg_print("You are engulfed in a twister.");
+				rad = 3;
+			}
+			else
+			{
+				if (blind) result = format("%^s chants powerfully.", m_name);
+				else result = format("%^s gestures fluidly.", m_name);
+				msg_print("You are lost in a raging tornado!");
+				rad = 5;
+			}
+			mon_ball(who, y, x, GF_WIND, get_dam(spower, attack), rad, result);
 			break;
 		}
 
@@ -2838,6 +2867,36 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					if (n_ptr->ml) msg_format("%^s is no longer confused.", t_name);
 				}
 
+				/* Cancel cuts */
+				if (n_ptr->cut)
+				{
+					/* Cancel fear */
+					n_ptr->cut = 0;
+
+					/* Message */
+					if (n_ptr->ml) msg_format("%^s is no longer bleeding.", t_name);
+				}
+
+				/* Cancel confusion */
+				if (n_ptr->poisoned)
+				{
+					/* Cancel fear */
+					n_ptr->poisoned = 0;
+
+					/* Message */
+					if (n_ptr->ml) msg_format("%^s is no longer poisoned.", t_name);
+				}
+
+				/* Cancel blindness */
+				if (n_ptr->blind)
+				{
+					/* Cancel fear */
+					n_ptr->blind = 0;
+
+					/* Message */
+					if (n_ptr->ml) msg_format("%^s is no longer blind.", t_name);
+				}
+
 				/* Redraw (later) if needed */
 				if (p_ptr->health_who == who) p_ptr->redraw |= (PR_HEALTH);
 			}
@@ -2921,26 +2980,21 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if (!direct && m_ptr->ml)
 				{
 					seen = TRUE;
-					msg_format("%^s blinks into view.", m_name);
+					msg_format("%^s blinks into view.", t_name);
 				}
 
 				/* Normal message */
 				else if (direct)
 				{
-					msg_format("%^s blinks away.", m_name);
+					msg_format("%^s blinks away.", t_name);
 				}
 
 				/* Telepathic message */
 				else if (known)
 				{
-					msg_format("%^s blinks.", m_name);
+					msg_format("%^s blinks.", t_name);
 				}
 			}
-			else if (target < 0)
-			{
-				teleport_player(10);
-			}
-
 			break;
 		}
 
@@ -2960,32 +3014,68 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if (!direct && m_ptr->ml)
 				{
 					seen = TRUE;
-					msg_format("%^s teleports into view.", m_name);
+					msg_format("%^s teleports into view.", t_name);
 				}
 
 				/* Normal message */
 				else if (direct)
 				{
-					msg_format("%^s teleports away.", m_name);
+					msg_format("%^s teleports away.", t_name);
 				}
 
 				/* Telepathic message */
 				else if (known)
 				{
-					msg_format("%^s teleports.", m_name);
+					msg_format("%^s teleports.", t_name);
+				}
+			}
+			break;
+		}
+
+		/* RF6_INVIS */
+		case 160+6:
+		{
+			if (target == 0) break;
+
+			if (known)
+			{
+				disturb(1,0);
+
+				if (blind)
+				{
+					msg_format("%^s mumbles.", m_name);
+				}
+				else if (who != target)
+				{
+					msg_format("%^s concentrates on %s.", m_name, t_name);
+				}
+				else
+				{
+					msg_format("%^s concentrates on %s appearance.", m_name, m_poss);
+				}
+			}
+
+			if (target > 0)
+			{
+				/* Add to the monster invisibility counter */
+				n_ptr->tim_invis += n_ptr->tim_invis + rlev + rand_int(rlev);
+
+				/* Notify player */
+				if (n_ptr->ml)
+				{
+					update_mon(target, FALSE);
+
+					if (!n_ptr->ml)
+					{
+						msg_format("%^s disppears!", m_name);
+					}
 				}
 			}
 			else if (target < 0)
 			{
-				teleport_player(MAX_SIGHT * 2 + 5);
+				set_fast(p_ptr->tim_invis + rlev);
 			}
 
-			break;
-		}
-
-		/* RF6_XXX3 */
-		case 160+6:
-		{
 			break;
 		}
 
@@ -3043,8 +3133,19 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if (!direct) break;
 				disturb(1, 0);
+
 				msg_format("%^s commands you to return.", m_name);
-				teleport_player_to(m_ptr->fy, m_ptr->fx);
+
+				if ((p_ptr->cur_flags4 & (TR4_ANCHOR)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR)))
+				{
+					msg_print("You remain anchored in place.");
+					if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR))) player_can_flags(who, 0x0L, 0x0L, 0x0L, TR4_ANCHOR);
+				}
+				else
+				{
+					player_not_flags(who, 0x0L, 0x0L, 0x0L, TR4_ANCHOR);
+					teleport_player_to(m_ptr->fy, m_ptr->fx);
+				}
 			}
 		}
 
@@ -3055,14 +3156,26 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if (!direct) break;
 				disturb(1, 0);
-				msg_format("%^s teleports you away.", m_name);
-				teleport_player(100);
+
+				if ((p_ptr->cur_flags4 & (TR4_ANCHOR)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR)))
+				{
+					msg_format("%^s fails to teleport you away.", m_name);
+					if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR))) player_can_flags(who, 0x0L, 0x0L, 0x0L, TR4_ANCHOR);
+				}
+				else
+				{
+					player_not_flags(who, 0x0L, 0x0L, 0x0L, TR4_ANCHOR);
+					teleport_player(100);
+				}
 			}
 			else if (target > 0)
 			{
-				disturb(1, 0);
-				msg_format("%^s teleports %s away.", m_name, t_name);
-				teleport_away(target, MAX_SIGHT * 2 + 5);
+				if (!(s_ptr->flags9 & (RF9_RES_TPORT)))
+				{
+					disturb(1, 0);
+					msg_format("%^s teleports %s away.", m_name, t_name);
+					teleport_away(target, MAX_SIGHT * 2 + 5);
+				}
 			}
 			break;
 		}
@@ -3079,12 +3192,14 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					if ((blind) && (known)) msg_format("%^s mumbles strangely.", m_name);
 					else if (known) msg_format("%^s gestures at your feet.", m_name);
 				}
-				if ((p_ptr->cur_flags2 & (TR2_RES_NEXUS)) != 0)
+
+				if ((p_ptr->cur_flags2 & (TR2_RES_NEXUS)) || (p_ptr->cur_flags4 & (TR4_ANCHOR)))
 				{
 					msg_print("You are unaffected!");
 
 					/* Always notice */
-					equip_can_flags(0x0L,TR2_RES_NEXUS,0x0L,0x0L);
+					if ((p_ptr->cur_flags2 & (TR2_RES_NEXUS))) player_can_flags(who, 0x0L,TR2_RES_NEXUS,0x0L,0x0L);
+					if ((p_ptr->cur_flags4 & (TR4_ANCHOR))) player_can_flags(who, 0x0L,0x0L,0x0L,TR4_ANCHOR);
 				}
 				else if (rand_int(100) < p_ptr->skill_sav)
 				{
@@ -3095,15 +3210,51 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					teleport_player_level();
 
 					/* Always notice */
-					equip_not_flags(0x0L,TR2_RES_NEXUS,0x0L,0x0L);
+					player_not_flags(who, 0x0L,TR2_RES_NEXUS,0x0L,TR4_ANCHOR);
 				}
 			}
 			break;
 		}
 
-		/* RF6_XXX5 */
+		/* RF6_WRAITHFORM */
 		case 160+11:
 		{
+			if (target == 0) break;
+
+			if (known)
+			{
+				disturb(1,0);
+
+				if (blind)
+				{
+					msg_format("%^s mumbles.", m_name);
+				}
+				else if (who != target)
+				{
+					msg_format("%^s concentrates on %s.", m_name, t_name);
+				}
+				else
+				{
+					msg_format("%^s concentrates on %s body.", m_name, m_poss);
+				}
+			}
+
+			if (target > 0)
+			{
+				/* Notify player */
+				if ((n_ptr->ml) && !(n_ptr->tim_passw))
+				{
+					msg_format("%^s becomes more insubstantial!", t_name);
+				}
+
+				/* Add to the monster haste counter */
+				n_ptr->tim_passw += n_ptr->tim_passw + rlev + rand_int(rlev);
+			}
+			else if (target < 0)
+			{
+				/* Nothing, yet */
+			}
+
 			break;
 		}
 
@@ -3299,11 +3450,11 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) == 0)
 					{
 						(void)set_confused(p_ptr->confused + rand_int(4) + 4);
-						equip_not_flags(0x0L, TR2_RES_CONFU, 0x0L, 0x0L);
+						player_not_flags(who, 0x0L, TR2_RES_CONFU, 0x0L, 0x0L);
 					}
 					else
 					{
-						equip_can_flags(0x0L, TR2_RES_CONFU, 0x0L, 0x0L);
+						player_can_flags(who, 0x0L, TR2_RES_CONFU, 0x0L, 0x0L);
 					}
 					take_hit(get_dam(spower, attack), ddesc);
 				}
@@ -3325,85 +3476,47 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			break;
 		}
 
-		/* RF6_BRAIN_SMASH */
+		/* RF6_ILLUSION */
 		case 160+19:
 		{
 			if (!direct) break;
 			if (target < 0) disturb(1, 0);
-			if ((who > 0) && (!seen))
+
+			if (known) sound(MSG_CAST_FEAR);
+			if (who > 0)
 			{
-				if (target < 0) msg_print("You feel something focusing on your mind.");
-			}
-			else if (who > 0) 
-			{
-				msg_format("%^s looks deep into %s eyes.", m_name, t_poss);
+				if (((blind) && (known)) && (target < 0)) msg_format("%^s mumbles, and you hear deceptive noises.", m_name);
+				else if ((blind) && (known)) msg_format("%^s mumbles.",m_name);
+				else if ((target < 0) || ((target ==0) && (known))) msg_format("%^s casts a deceptive illusion.", m_name);
+				else if (known) msg_format("%^s casts a deceptive illusion at %s.",m_name,t_name);
 			}
 
 			if (target < 0)
 			{
-				if (rand_int(100) < p_ptr->skill_sav)
+				if ((p_ptr->cur_flags2 & (TR2_RES_CHAOS)) != 0)
 				{
-					msg_print("You resist the effects!");
+					msg_print("You refuse to be deceived.");
+
+					/* Sometimes notice */
+					player_can_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
+				}
+				else if (rand_int(100) < p_ptr->skill_sav)
+				{
+					msg_print("You refuse to be deceived.");
 				}
 				else
 				{
-					msg_print("Your mind is blasted by psionic energy.");
-					take_hit(damroll(12, 15), ddesc);
-					if ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) != 0)
-					{
-						(void)set_blind(p_ptr->blind + 8 + rand_int(8));
+					(void)set_image(p_ptr->image + rand_int(4) + 4);
 
-						/* Always notice */
-						equip_not_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
-					}
-					else
-					{
-						/* Always notice */
-						equip_can_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
-					}
-					if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) != 0)
-					{
-						(void)set_confused(p_ptr->confused + rand_int(4) + 4);
-
-						/* Always notice */
-						equip_not_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
-					}
-					else
-					{
-						/* Always notice */
-						equip_can_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
-					}
-					if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0)
-					{
-						(void)set_paralyzed(p_ptr->paralyzed + rand_int(4) + 4);
-
-						/* Always notice */
-						equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
-					}
-					else
-					{
-						/* Always notice */
-						equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
-					}
-					(void)set_slow(p_ptr->slow + rand_int(4) + 4);
+					/* Always notice */
+					player_not_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
 				}
-				break;
 			}
 			else if (target > 0)
 			{
-				if (!(r_ptr->flags2 & (RF2_EMPTY_MIND)))
-				{
-					if (known) msg_format ("&^s mind is blasted by psionic energy.",t_poss);
-
-					/* Hack --- Use GF_CONFUSION */
-					project_m(who, 0, y, x, damroll(12,15), GF_CONFUSION);
-				}
-				else if (n_ptr->ml)
-				{
-					k_ptr->flags2 |= (RF2_EMPTY_MIND);
-				}
+				/* Hack --- Use GF_HALLU */
+				project_m(who, 0, y, x, rlev, GF_HALLU);
 			}
-
 			break;
 		}
 
@@ -3514,27 +3627,179 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			break;
 		}
 
-		/* RF6_XXX6 */
+		/* RF6_BLESS */
 		case 160+21:
 		{
+			if (target == 0) break;
+
+			if (known)
+			{
+				disturb(1,0);
+
+				if (blind)
+				{
+					msg_format("%^s mumbles.", m_name);
+				}
+				else if (who != target)
+				{
+					msg_format("%^s blesses %s.", m_name, t_name);
+				}
+				else
+				{
+					msg_format("%^s invokes %s diety.", m_name, m_poss);
+				}
+			}
+
+			if (target > 0)
+			{
+				/* Notify player */
+				if ((n_ptr->ml) && !(n_ptr->bless))
+				{
+					msg_format("%^s appears righteous!", t_name);
+				}
+
+				/* Add to the monster bless counter */
+				n_ptr->bless += n_ptr->bless + rlev + rand_int(rlev);
+			}
+			else if (target < 0)
+			{
+				/* Set blessing */
+				set_blessed(p_ptr->blessed + rlev);
+			}
+
 			break;
 		}
 
-		/* RF6_XXX7 */
+		/* RF6_BESERK */
 		case 160+22:
 		{
+			if (target == 0) break;
+
+			if (known)
+			{
+				disturb(1,0);
+
+				if (blind)
+				{
+					msg_format("%^s mumbles.", m_name);
+				}
+				else if (who != target)
+				{
+					msg_format("%^s concentrates on %s.", m_name, t_name);
+				}
+				else
+				{
+					msg_format("%^s concentrates on %s emotions.", m_name, m_poss);
+				}
+			}
+
+			if (target > 0)
+			{
+				/* Notify player */
+				if ((n_ptr->ml) && !(n_ptr->beserk))
+				{
+					msg_format("%^s goes beserk!", t_name);
+				}
+
+				/* Add to the monster haste counter */
+				n_ptr->beserk += n_ptr->beserk + rlev + rand_int(rlev);
+			}
+			else if (target < 0)
+			{
+				/* Set blessing */
+				set_shero(p_ptr->shero + rlev);
+			}
+
 			break;
 		}
 
-		/* RF6_XXX8 */
+		/* RF6_SHIELD */
 		case 160+23:
 		{
+			if (target == 0) break;
+
+			if (known)
+			{
+				disturb(1,0);
+
+				if (blind)
+				{
+					msg_format("%^s mumbles.", m_name);
+				}
+				else if (who != target)
+				{
+					msg_format("%^s concentrates on the air around %s.", m_name, t_name);
+				}
+				else
+				{
+					msg_format("%^s concentrates on the air around %s.", m_name, m_poss);
+				}
+			}
+
+			if (target > 0)
+			{
+				/* Notify player */
+				if ((n_ptr->ml) && !(n_ptr->shield))
+				{
+					msg_format("%^s becomes magically shielded.", t_name);
+				}
+
+				/* Add to the monster shield counter */
+				n_ptr->shield += n_ptr->shield + rlev + rand_int(rlev);
+			}
+			else if (target < 0)
+			{
+				/* Set blessing */
+				set_shield(p_ptr->shield + rlev);
+			}
+
 			break;
 		}
 
-		/* RF6_XXX9 */
+		/* RF6_OPPOSE_ELEM */
 		case 160+24:
 		{
+			if (target == 0) break;
+
+			if (known)
+			{
+				disturb(1,0);
+
+				if (blind)
+				{
+					msg_format("%^s mumbles.", m_name);
+				}
+				else if (who != target)
+				{
+					msg_format("%^s concentrates on %s.", m_name, t_name);
+				}
+				else
+				{
+					msg_format("%^s concentrates on %s body.", m_name, m_poss);
+				}
+			}
+
+			if (target > 0)
+			{
+				/* Notify player */
+				if ((n_ptr->ml) && !(n_ptr->oppose_elem))
+				{
+					msg_format("%^s becomes temporarily resistant to the elements.", t_name);
+				}
+
+				/* Add to the monster haste counter */
+				n_ptr->oppose_elem += n_ptr->oppose_elem + rlev + rand_int(rlev);
+			}
+			else if (target < 0)
+			{
+				/* Set opposition */
+				set_oppose_acid(p_ptr->oppose_acid + rlev);
+				set_oppose_cold(p_ptr->oppose_cold + rlev);
+				set_oppose_elec(p_ptr->oppose_elec + rlev);
+				set_oppose_fire(p_ptr->oppose_fire + rlev);
+				set_oppose_pois(p_ptr->oppose_pois + rlev);
+			}
+
 			break;
 		}
 
@@ -3587,7 +3852,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					msg_print("You refuse to be frightened.");
 
 					/* Sometimes notice */
-					if (rand_int(100) < 30) equip_can_flags(0x0L,TR2_RES_FEAR,0x0L,0x0L);
+					player_can_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L);
 				}
 				else if (rand_int(100) < p_ptr->skill_sav)
 				{
@@ -3598,7 +3863,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					(void)set_afraid(p_ptr->afraid + rand_int(4) + 4);
 
 					/* Always notice */
-					equip_not_flags(0x0L,TR2_RES_FEAR,0x0L,0x0L);
+					player_not_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L);
 				}
 			}
 			else if (target > 0)
@@ -3628,7 +3893,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					msg_print("You are unaffected!");
 
 					/* Always notice */
-					if (rand_int(100)<30) equip_can_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
+					player_can_flags(who, 0x0L,TR2_RES_BLIND,0x0L,0x0L);
 				}
 				else if (rand_int(100) < p_ptr->skill_sav)
 				{
@@ -3639,7 +3904,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					(void)set_blind(p_ptr->blind + 12 + rlev / 4 + rand_int(4));
 
 					/* Always notice */
-					equip_not_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
+					player_not_flags(who, 0x0L,TR2_RES_BLIND,0x0L,0x0L);
 				}
 			}
 			else if (target > 0)
@@ -3660,7 +3925,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if (((blind) && (known)) && (target < 0)) msg_format("%^s mumbles, and you hear puzzling noises.", m_name);
 				else if ((blind) && (known)) msg_format ("%^s mumbles.",m_name);
-				else if ((target < 0) || ((target ==0) && (known))) msg_format("%^s casts a mesmerising illusion.", m_name);
+				else if ((target < 0) || ((target == 0) && (known))) msg_format("%^s casts a mesmerising illusion.", m_name);
 				else if (known) msg_format("%^s creates a mesmerising illusion for %s.", m_name, t_poss);
 			}
 
@@ -3671,7 +3936,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					msg_print("You disbelieve the feeble spell.");
 
 					/* Sometimes notice */
-					if (rand_int(100)<30) equip_can_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
+					player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
 				}
 				else if (rand_int(100) < p_ptr->skill_sav)
 				{
@@ -3682,7 +3947,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					(void)set_confused(p_ptr->confused + rlev / 8 + 4 + rand_int(4));
 
 					/* Always notice */
-					equip_not_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
+					player_not_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
 				}
 			}
 			else if (target > 0)
@@ -3713,7 +3978,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					msg_print("You are unaffected!");
 
 					/* Always notice */
-					equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
+					player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
 				}
 				else if (rand_int(100) < p_ptr->skill_sav)
 				{
@@ -3724,7 +3989,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					(void)set_slow(p_ptr->slow + rand_int(4) + 4 + rlev / 25);
 
 					/* Always notice */
-					equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
+					player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
 				}
 			}
 			else if (target > 0)
@@ -3754,7 +4019,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					msg_print("You are unaffected!");
 
 					/* Always notice */
-					equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
+					player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
 				}
 				else if (rand_int(100) < p_ptr->skill_sav)
 				{
@@ -3765,7 +4030,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					(void)set_paralyzed(p_ptr->paralyzed + rand_int(4) + 4);
 
 					/* Always notice */
-					equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
+					player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
 				}
 			}
 			else if (target > 0)
@@ -3781,6 +4046,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			if (surface) break;
 			disturb(1, 0);
+
 			if (who > 0)
 			{
 				if (((blind) && (known)) && (target < 0)) msg_format("%^s mumbles.", m_name);
@@ -3789,28 +4055,74 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						 "minions" : "kin"));
 				else msg_print("You hear distant chanting.");
 
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
+				/* Hack -- Set the letter of the monsters to summon */
+				summon_char_type = r_ptr->d_char;
+			}
+			else
+			{
+				/* MegaHack -- Determine letter later */
+				summon_char_type = '\0';
 			}
 
-			/* Hack -- Set the letter of the monsters to summon */
-			summon_kin_type = r_ptr->d_char;
-
+			/* Count them for later */
 			for (k = 0; k < 6; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_KIN);
+				count += summon_specific(y, x, rlev - 1, SUMMON_KIN);
 			}
 
-			if (blind && count && (target < 0))
+			break;
+		}
+
+		/* RF7_R_KIN */
+		case 192 + 1:
+		{
+			if (surface) break;
+			disturb(1, 0);
+			if (who > 0)
 			{
-				msg_print("You hear many things appear nearby.");
+				if (((blind) && (known)) && (target < 0)) msg_format("%^s mumbles.", m_name);
+				else if (known) msg_format("%^s magically reanimates %s %s from %s.", m_name, m_poss,
+						((r_ptr->flags1) & RF1_UNIQUE ? "minions" : "kin"),
+						((r_ptr->flags3) & RF3_NONLIVING ? "spare parts" : "death"));
+				else msg_print("You hear distant chanting.");
+
+				/* Hack -- Set the letter of the monsters to summon */
+				summon_char_type = r_ptr->d_char;
+			}
+			else
+			{
+				/* MegaHack -- Determine letter later */
+				summon_char_type = '\0';
+			}
+
+			/* Count them for later */
+			for (k = 0; k < 6; k++)
+			{
+				count += summon_specific(y, x, rlev - 1, RAISE_KIN);
 			}
 			break;
 		}
 
-		/* RF7_XXX */
-		case 192 + 1:  break;
-		case 192 + 2:  break;
+
+		/* RF7_A_DEAD */
+		case 192 + 2:
+		{
+			if (surface) break;
+			disturb(1, 0);
+			if (who > 0)
+			{
+				if (((blind) && (known)) && (target < 0)) msg_format("%^s mumbles.", m_name);
+				else if (known) msg_format("%^s animates dead bodies near %s.", m_name, t_name);
+				else msg_print("You hear distant chanting.");
+			}
+
+			/* Count them for later */
+			for (k = 0; k < 6; k++)
+			{
+				count += summon_specific(y, x, rlev, ANIMATE_DEAD);
+			}
+			break;
+		}
 
 
 		/* RF7_S_MONSTER */
@@ -3823,17 +4135,12 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons help!", m_name);
 				else msg_print("You hear distant chanting.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
 			}
+
+			/* Count them for later */
 			for (k = 0; k < 1; k++)
 			{
-				count += summon_specific(y, x, rlev, 0);
-			}
-			if (blind && count && (target < 0))
-			{
-				msg_print("You hear something appear nearby.");
+				count += summon_specific(y, x, rlev - 1, RAISE_MONSTER);
 			}
 			break;
 		}
@@ -3848,27 +4155,76 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons monsters.", m_name);
 				else msg_print("You hear distant chanting.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
 			}
+
+			/* Count them for later */
 			for (k = 0; k < 4; k++)
 			{
-				count += summon_specific(y, x, rlev, 0);
-			}
-			if (blind && count && (target < 0))
-			{
-				msg_print("You hear many things appear nearby.");
+				count += summon_specific(y, x, rlev - 1, 0);
 			}
 			break;
 		}
 
-		/* RF7_XXX */
-		case 192 + 5:  break;
-		case 192 + 6:  break;
-		case 192 + 7:  break;
+		/* RF7_R_MONSTER */
+		case 192 + 5:
+		{
+			if (surface) break;
+			disturb(1, 0);
+			if (who > 0)
+			{
+				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
+				else if (known) msg_format("%^s magically reanimates a monster!", m_name);
+				else msg_print("You hear distant chanting.");
+			}
 
-		/* RF7_S_ANT */
+			/* Count them for later */
+			for (k = 0; k < 1; k++)
+			{
+				count += summon_specific(y, x, rlev - 1, 0);
+			}
+			break;
+		}
+
+		/* RF7_R_MONSTERS */
+		case 192 + 6:
+		{
+			if (surface) break;
+			disturb(1, 0);
+			if (who > 0)
+			{
+				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
+				else if (known) msg_format("%^s magically reanimates monsters.", m_name);
+				else msg_print("You hear distant chanting.");
+			}
+
+			for (k = 0; k < 4; k++)
+			{
+				count += summon_specific(y, x, rlev - 1, 0);
+			}
+			break;
+		}
+
+		/* RF7_S_PLANT */
+		case 192 + 7:
+		{
+			if (surface) break;
+			disturb(1, 0);
+			if (who > 0)
+			{
+				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
+				else if (known) msg_format("%^s magically summons plants.", m_name);
+				else msg_print("You hear distant chanting.");
+			}
+
+			/* Count them for later */
+			for (k = 0; k < 4; k++)
+			{
+				count += summon_specific(y, x, rlev - 1, SUMMON_PLANT);
+			}
+			break;
+		}
+
+		/* RF7_S_INSECT */
 		case 192 + 8:
 		{
 			if (surface) break;
@@ -3876,24 +4232,19 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (who > 0)
 			{
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
-				else if (known) msg_format("%^s magically summons ants.", m_name);
+				else if (known) msg_format("%^s magically summons insects.", m_name);
 				else msg_print("You hear distant chittering.");
+			}
 
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-			for (k = 0; k < 4; k++)
+			/* Count them for later */
+			for (k = 0; k < 3; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_ANT);
-			}
-			if (blind && count && (target < 0))
-			{
-				msg_print("You hear many things appear nearby.");
+				count += summon_specific(y, x, rlev - 1, SUMMON_INSECT);
 			}
 			break;
 		}
 
-		/* RF7_S_SPIDER */
+		/* RF7_S_ANIMALS */
 		case 192 + 9:
 		{
 			if (surface) break;
@@ -3901,19 +4252,36 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (who > 0)
 			{
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
-				else if (known) msg_format("%^s magically summons spiders.", m_name);
-				else msg_print("You hear distant chittering.");
+				else if (known) msg_format("%^s magically summons animals.", m_name);
+				else msg_print("You hear distant chanting.");
 
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
+				/* Hack -- Set the class flags to summon */
+				summon_flag_type = (r_ptr->flags8 & (RF8_SKIN_MASK));
+
+				/* Mega Hack -- Other racial preferences for animals */
+				if (!summon_flag_type)
+				{
+					/* Everyone likes lions, tigers, wolves */
+					summon_flag_type |= RF8_HAS_FUR;
+
+					/* Surface dwellers like birds */
+					if ((r_ptr->flags9 & (RF9_RACE_MASK)) && ! (r_ptr->flags3 & (RF3_RACE_MASK))) 
+						summon_flag_type |= RF8_HAS_FEATHER;
+
+					/* Dungeon dwellers like reptiles, fish and worse */
+					else summon_flag_type |= RF8_HAS_SCALE;
+				}
 			}
-			for (k = 0; k < 4; k++)
+			else
 			{
-				count += summon_specific(y, x, rlev, SUMMON_SPIDER);
+				/* MegaHack -- Determine letter later */
+				summon_flag_type = 0L;
 			}
-			if (blind && count && (target < 0))
+
+			/* Count them for later */
+			for (k = 0; k < 3; k++)
 			{
-				msg_print("You hear many things appear nearby.");
+				count += summon_specific(y, x, rlev - 1, SUMMON_ANIMAL);
 			}
 			break;
 		}
@@ -3928,22 +4296,17 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons hounds.", m_name);
 				else msg_print("You hear distant howling.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
 			}
+
+			/* Count them for later */
 			for (k = 0; k < 2; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_HOUND);
-			}
-			if (blind && count && (target < 0))
-			{
-				msg_print("You hear many things appear nearby.");
+				count += summon_specific(y, x, rlev - 1, SUMMON_HOUND);
 			}
 			break;
 		}
 
-		/* RF7_S_ANIMAL */
+		/* RF7_S_SPIDER */
 		case 192 + 11:
 		{
 			if (surface) break;
@@ -3951,24 +4314,19 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (who > 0)
 			{
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
-				else if (known) msg_format("%^s magically summons animals.", m_name);
-				else msg_print("You hear distant chanting.");
+				else if (known) msg_format("%^s magically summons spiders.", m_name);
+				else msg_print("You hear distant chittering.");
+			}
 
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-			for (k = 0; k < 3; k++)
+			/* Count them for later */
+			for (k = 0; k < 4; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_ANIMAL);
-			}
-			if (blind && count && (target < 0))
-			{
-				msg_print("You hear many things appear nearby.");
+				count += summon_specific(y, x, rlev - 1, SUMMON_SPIDER);
 			}
 			break;
 		}
 
-		/* RF7_S_HYDRA */
+		/* RF7_S_CLASS */
 		case 192 + 12:
 		{
 			if (surface) break;
@@ -3976,123 +4334,268 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (who > 0)
 			{
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
-				else if (known) msg_format("%^s magically summons hydras.", m_name);
-				else msg_print("You hear distant hissing.");
+				else if (known) msg_format("%^s magically summons allies.", m_name);
+				else msg_print("You hear distant chanting.");
 
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
+				/* Hack -- Set the class flags to summon */
+				summon_flag_type = (r_ptr->flags2 & (RF2_CLASS_MASK));
 			}
+			else
+			{
+				/* MegaHack -- Determine letter later */
+				summon_flag_type = 0L;
+			}
+
+			/* Count them for later */
 			for (k = 0; k < 3; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_HYDRA);
-			}
-			if (blind && count && (target < 0))
-			{
-				msg_print("You hear many things appear nearby.");
+				count += summon_specific(y, x, rlev - 1, SUMMON_CLASS);
 			}
 			break;
 		}
 
-		/* RF7_XXX */
-		case 192 + 13:	break;
+		/* RF7_S_RACE */
+		case 192 + 13:
+		{
+			if (surface) break;
+			disturb(1, 0);
+			if (who > 0)
+			{
+				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
+				else if (known) msg_format("%^s magically summons allies.", m_name);
+				else msg_print("You hear distant chanting.");
 
-		/* RF7_S_THIEF */
+				/* Hack -- Set the class flags to summon */
+				summon_flag_type = (r_ptr->flags3 & (RF3_RACE_MASK));
+
+				/* Mega Hack -- Combine two flags XXX */
+				summon_flag_type |= (r_ptr->flags9 & (RF9_RACE_MASK));
+			}
+			else
+			{
+				/* MegaHack -- Determine letter later */
+				summon_flag_type = 0L;
+
+				/* MegaHack -- Determine letter later */
+				summon_flag_type = 0L;
+			}
+
+			/* Count them for later */
+			for (k = 0; k < 3; k++)
+			{
+				count += summon_specific(y, x, rlev - 1, SUMMON_RACE);
+			}
+			break;
+		}
+
+		/* RF7_S_ELEMENT */
 		case 192 + 14:
 		{
 			if (surface) break;
 			disturb(1, 0);
+
+			summon_element_type = MAX_ELEMENTS;
+
 			if (who > 0)
 			{
-				if ((blind) && (known)) msg_format("%^s whistles.", m_name);
-				else if (known) msg_format("%^s whistles up a den of thieves!", m_name);
-				else msg_print("You hear a distant whistle.");
+				int i, n = 0, pick = 0;
 
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
+				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
+				else if (known) msg_format("%^s magically summons allies.", m_name);
+				else msg_print("You hear distant chanting.");
+
+				/* Mega Hack -- attempt to match an element */
+				/* XXX The table is laid out in such a way that we should pick the correct element
+				   for most hounds, vortexes and elementals. We cheat particularly with vortexes and
+				   hounds and relate more of them to a single type of elemental (e.g acid hounds
+				   associate with ooze elementals, dark hounds with smoke elementals). */
+				for (i = 0; i < MAX_ELEMENTS; i++)
+				{
+					/* Match on blow effects */
+					for (k = 0; k < 4; k++)
+					{
+						if (r_ptr->blow[k].effect == element[i].effect) pick = i;
+					}
+
+					/* Match on monster flags */
+					if ((r_ptr->flags2 & (element[i].race_flags2)) != 0) pick = i;
+					if ((r_ptr->flags3 & (element[i].race_flags3)) != 0) pick = i;
+					if ((r_ptr->flags4 & (element[i].race_flags4)) != 0) pick = i;
+					if ((r_ptr->flags5 & (element[i].race_flags5)) != 0) pick = i;
+					if ((r_ptr->flags6 & (element[i].race_flags6)) != 0) pick = i;
+
+					if ((pick == i) && !(rand_int(++n))) summon_element_type = i;
+				}
 			}
-			for (k = 0; k < 1; k++)
+
+			/* Count them for later */
+			for (k = 0; k < 3; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_THIEF);
-			}
-			if (blind && count && (target < 0))
-			{
-				msg_print("You hear footsteps and the whetting of knives.");
+				count += summon_specific(y, x, rlev - 1, SUMMON_ELEMENT);
 			}
 			break;
 		}
 
-		/* Summon Bert, Bill, and Tom */
-		/* No messages unless sucessful */
-		/* RF7_S_BERTBILLTOM */
+		/* RF7_S_FRIEND */
 		case 192 + 15:
 		{
+			int summon_type = SUMMON_FRIEND;
+
 			if (surface) break;
+			disturb(1, 0);
+
+			if (who > 0)
+			{
+				if (((blind) && (known)) && (target < 0)) msg_format("%^s mumbles.", m_name);
+				else if (known) msg_format("%^s magically summons a friend.", m_name);
+				else msg_print("You hear distant chanting.");
+
+				/* Mega Hack -- uniques summon other uniques with the same d_char and d_attr */
+				if (r_ptr->flags1 & (RF1_UNIQUE))
+				{
+					summon_char_type = r_ptr->d_char;
+					summon_attr_type = r_ptr->d_attr;
+					summon_type = SUMMON_UNIQUE_FRIEND;
+				}
+				else
+				{
+					summon_race_type = m_ptr->r_idx;
+				}
+			}
+			else
+			{
+				/* MegaHack -- Determine race later */
+				summon_race_type = 0;
+			}
+
+			/* Count them for later */
 			for (k = 0; k < 1; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_BERTBILLTOM);
+				count += summon_specific(y, x, rlev, summon_type);
 			}
 
-			/* No messages unless successful */
-			if (count)
-			{
-				disturb(1, 0);
-
-				if ((blind) && (known)) msg_format("Heavy footsteps approach!", m_name);
-				else if (known) msg_format("%^s calls up his friends!", m_name);
-				/* else msg_print("You hear a heavy footsteps."); */
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
 			break;
 		}
 
-		/* RF7_XXX */
-		case 192 + 16:	break;
+		/* RF7_S_FRIENDS */
+		case 192 + 16:
+		{
+			int summon_type = SUMMON_FRIEND;
 
-		/* RF6_S_AINU */
+			if (surface) break;
+			disturb(1, 0);
+
+			if (who > 0)
+			{
+				if (((blind) && (known)) && (target < 0)) msg_format("%^s mumbles.", m_name);
+				else if (known) msg_format("%^s magically summons friends.", m_name);
+				else msg_print("You hear distant chanting.");
+
+				/* Mega Hack -- uniques summon other uniques with the same d_char and d_attr */
+				if (r_ptr->flags1 & (RF1_UNIQUE))
+				{
+					summon_char_type = r_ptr->d_char;
+					summon_attr_type = r_ptr->d_attr;
+					summon_type = SUMMON_UNIQUE_FRIEND;
+				}
+				else
+				{
+					summon_race_type = m_ptr->r_idx;
+				}
+			}
+			else
+			{
+				/* MegaHack -- Determine race later */
+				summon_race_type = 0;
+			}
+
+			/* Count them for later */
+			for (k = 0; k < 6; k++)
+			{
+				count += summon_specific(y, x, rlev, summon_type);
+			}
+
+			break;
+		}
+
+		/* RF7_S_ORC */
 		case 192 + 17:
 		{
 			if (surface) break;
 			disturb(1, 0);
-
-			sound(MSG_SUM_MAIA);
 			if (who > 0)
 			{
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
-				else if (known) msg_format("%^s magically summons a maia!", m_name);
-				else msg_print("Majestic songs of the Ainur fill the dungeon!");
+				else if (known) msg_format("%^s magically summons orcs.", m_name);
+				else msg_print("You hear distant chanting.");
+			}
 
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-			for (k = 0; k < 1; k++)
+			/* Count them for later */
+			for (k = 0; k < 4; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_MAIA);
-			}
-			if (blind && count && (target < 0))
-			{
-				msg_print("You hear something appear nearby.");
+				count += summon_specific(y, x, rlev - 1, SUMMON_ORC);
 			}
 			break;
 		}
 
-		case 192 + 18:	break;
-		case 192 + 19:	break;
+		/* RF7_S_TROLL */
+		case 192 + 18:
+		{
+			if (surface) break;
+			disturb(1, 0);
+			if (who > 0)
+			{
+				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
+				else if (known) msg_format("%^s magically summons trolls.", m_name);
+				else msg_print("You hear distant chanting.");
+			}
+
+			/* Count them for later */
+			for (k = 0; k < 4; k++)
+			{
+				count += summon_specific(y, x, rlev - 1, SUMMON_TROLL);
+			}
+			break;
+		}
+
+		/* RF7_S_GIANT */
+		case 192 + 19:
+		{
+			if (surface) break;
+			disturb(1, 0);
+			if (who > 0)
+			{
+				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
+				else if (known) msg_format("%^s magically summons giants.", m_name);
+				else msg_print("You hear distant chanting.");
+			}
+
+			/* Count them for later */
+			for (k = 0; k < 4; k++)
+			{
+				count += summon_specific(y, x, rlev - 1, SUMMON_GIANT);
+			}
+			break;
+		}
 
 		/* RF7_S_DRAGON */
 		case 192 + 20:
 		{
 			disturb(1, 0);
 			sound(MSG_SUM_DRAGON);
-			if (blind) msg_format("%^s mumbles.", m_name);
-			else msg_format("%^s magically summons a dragon!", m_name);
+			if (who > 0)
+			{
+				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
+				else if (known) msg_format("%^s magically summons a dragon.", m_name);
+				else msg_print("You hear distant chanting.");
+			}
+
 			for (k = 0; k < 1; k++)
 			{
 				count += summon_specific(m_ptr->fy, m_ptr->fx,
-					summon_lev, SUMMON_DRAGON);
+					rlev - 1 - 1, SUMMON_DRAGON);
 			}
-			if (blind && count) msg_print("You feel something breathing on you...");
+
 			break;
 		}
 
@@ -4107,24 +4610,56 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons ancient dragons!", m_name);
 				else msg_print("You hear cacophonous chanting.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
 			}
+
 			for (k = 0; k < 4; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_HI_DRAGON);
-			}
-			if (blind && count && (target < 0))
-			{
-				msg_print("You hear many powerful things appear nearby.");
+				count += summon_specific(y, x, rlev - 1, SUMMON_HI_DRAGON);
 			}
 			break;
 		}
 
-		/* RF7_XXX */
-		case 192 + 22:	break;
-		case 192 + 23:	break;
+		/* RF7_A_ELEMENT */
+		case 192 + 22:
+		{
+			if (surface) break;
+			disturb(1, 0);
+
+			if (who > 0)
+			{
+				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
+				else if (known) msg_format("%^s magically animates the elements around %s.", m_name, t_name);
+				else msg_print("You hear distant chanting.");
+			}
+
+			/* Count them for later */
+			for (k = 0; k < 6; k++)
+			{
+				count += summon_specific(y, x, rlev - 1, ANIMATE_ELEMENT);
+			}
+			break;
+		}
+
+		/* RF7_A_OBJECT */
+		case 192 + 23:
+		{
+			if (surface) break;
+			disturb(1, 0);
+
+			if (who > 0)
+			{
+				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
+				else if (known) msg_format("%^s magically animates the objects around %s.", m_name, t_name);
+				else msg_print("You hear distant chanting.");
+			}
+
+			/* Count them for later */
+			for (k = 0; k < 3; k++)
+			{
+				count += summon_specific(y, x, rlev, ANIMATE_OBJECT);
+			}
+			break;
+		}
 
 		/* RF7_S_DEMON */
 		case 192 + 24:
@@ -4137,17 +4672,11 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons a hellish adversary!", m_name);
 				else msg_print("You hear infernal chanting.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
 			}
+
 			for (k = 0; k < 1; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_DEMON);
-			}
-			if (blind && count && (target < 0))
-			{
-				msg_print("You hear something appear nearby.");
+				count += summon_specific(y, x, rlev - 1, SUMMON_DEMON);
 			}
 			break;
 		}
@@ -4158,6 +4687,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (surface) break;
 			disturb(1, 0);
 			sound(MSG_SUM_HI_DEMON);
+
 			if (who > 0)
 			{
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
@@ -4167,19 +4697,37 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Hack -- prevent summoning for a short while */
 				m_ptr->summoned = 20;
 			}
+
 			for (k = 0; k < 4; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_HI_DEMON);
-			}
-			if (blind && count && (target < 0))
-			{
-				msg_print("You hear something appear nearby.");
+				count += summon_specific(y, x, rlev - 1, SUMMON_HI_DEMON);
 			}
 			break;
 		}
 
-		/* RF7_XXX */
-		case 192 + 26:	break;
+		/* Summon a dead unique */
+		/* RF7_R_UNIQUE */
+		case 192 + 26:
+		{
+			int summon_type = RAISE_UNIQUE;
+
+			disturb(1, 0);
+			sound(MSG_SUM_UNIQUE);
+			if (who > 0)
+			{
+				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
+				else if (known) msg_format("%^s magically raises one of your former opponents!", m_name);
+				else msg_print("You hear powerful, invocative chanting.");
+
+				if (r_ptr->flags7 & (RF7_S_HI_UNIQUE)) summon_type = RAISE_HI_UNIQUE;
+			}
+
+			for (k = 0; k < 1; k++)
+			{
+				count += summon_specific(y, x, rlev - 1, summon_type);
+			}
+			break;
+		}
 
 		/* Summon Uniques */
 		/* RF7_S_UNIQUE */
@@ -4192,19 +4740,11 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons special opponents!", m_name);
 				else msg_print("You hear powerful, invocative chanting.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
 			}
 
 			for (k = 0; k < 3; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_UNIQUE);
-			}
-
-			if (blind && (count > 1) && (target < 0))
-			{
-				msg_print("You hear many powerful things appear nearby.");
+				count += summon_specific(y, x, rlev - 1, SUMMON_UNIQUE);
 			}
 			break;
 		}
@@ -4227,12 +4767,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			for (k = 0; k < 3; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_HI_UNIQUE);
-			}
-
-			if (blind && (count > 1) && (target < 0))
-			{
-				msg_print("You hear many powerful things appear nearby.");
+				count += summon_specific(y, x, rlev - 1, SUMMON_HI_UNIQUE);
 			}
 			break;
 		}
@@ -4249,17 +4784,11 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if ((blind) && (known)) msg_format("%^s whispers.", m_name);
 				else if (known) msg_format("%^s magically summons an undead adversary!", m_name);
 				else msg_print("You hear distant whispering.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
 			}
+
 			for (k = 0; k < 1; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_UNDEAD);
-			}
-			if (blind && count && (target < 0))
-			{
-				msg_print("You hear something creepy appear nearby.");
+				count += summon_specific(y, x, rlev - 1, SUMMON_UNDEAD);
 			}
 			break;
 		}
@@ -4283,12 +4812,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			for (k = 0; k < 4; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_HI_UNDEAD);
+				count += summon_specific(y, x, rlev - 1, SUMMON_HI_UNDEAD);
 			}
-			if (blind && count && (target < 0))
-			{
-				msg_print("You hear many creepy things appear nearby.");
-			}
+
 			break;
 		}
 
@@ -4311,18 +4837,14 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			for (k = 0; k < 6; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_WRAITH);
+				count += summon_specific(y, x, rlev - 1, SUMMON_WRAITH);
 			}
 
 			for (k = 0; k < 6; k++)
 			{
-				count += summon_specific(y, x, rlev, SUMMON_HI_UNDEAD);
+				count += summon_specific(y, x, rlev - 1, SUMMON_HI_UNDEAD);
 			}
 
-			if (blind && count && (target < 0))
-			{
-				msg_print("You hear many creepy things appear nearby.");
-			}
 			break;
 		}
 
@@ -4336,10 +4858,26 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		}
 	}
 
+	/* Hack - Inform a blind player about monsters appearing nearby */
+	if (blind && count && (target < 0))
+	{
+		if (count == 1)
+		{
+			msg_print("You hear something appear nearby.");
+		}
+		else if (count < 4)
+		{
+			msg_print("You hear several things appear nearby.");
+		}
+		else
+		{
+			msg_print("You hear many things appear nearby.");
+		}
+	}
+
 	/* Monster updates */
 	if (who > 0)
 	{
-
 		/* Learn Player Resists */
 		if (attack < 128)
 		{
@@ -4356,6 +4894,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		else if (attack < 224)
 		{
 			  update_smart_learn(who, spell_desire_RF7[attack-192][D_RES]);
+
+			  /* Hack -- prevent summoning for a while */
+			  m_ptr->summoned = 20;
 		}
 
 		/* Mark minimum desired range for recalculation */

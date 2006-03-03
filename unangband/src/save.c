@@ -263,8 +263,8 @@ static void wr_monster(const monster_type *m_ptr)
 	wr_byte(m_ptr->blind);
 	wr_byte(m_ptr->tim_invis);
 	wr_byte(m_ptr->tim_passw);
-	wr_byte(m_ptr->hero);
-	wr_byte(m_ptr->shero);
+	wr_byte(m_ptr->bless);
+	wr_byte(m_ptr->beserk);
 	wr_byte(m_ptr->shield);
 	wr_byte(m_ptr->oppose_elem);
 	wr_byte(m_ptr->summoned);
@@ -661,10 +661,10 @@ static void wr_extra(void)
 	wr_byte(0);
 	wr_byte(0);	/* oops */
 	wr_byte(0);	/* oops */
-	wr_byte(0);	/* oops */
+	wr_byte(p_ptr->climbing);
 	wr_byte(p_ptr->searching);
-	wr_byte(0);	/* oops */
-	wr_byte(0);	/* oops */
+	wr_byte(p_ptr->dodging);
+	wr_byte(p_ptr->blocking);
 	wr_byte(0);
 
 	wr_u32b(p_ptr->disease);

@@ -420,7 +420,7 @@ static u16b image_random(void)
  */
 byte lite_attr[16] =
 {
-	TERM_L_DARK,	/* TERM_DARK */
+	TERM_L_DARK,	/* TERM_DARK - ebony */
 	TERM_YELLOW, 	/* TERM_WHITE - silver */
 	TERM_L_WHITE, 	/* TERM_SLATE - iron */
 	TERM_YELLOW, 	/* TERM_ORANGE - brass */
@@ -432,7 +432,7 @@ byte lite_attr[16] =
 	TERM_WHITE, 	/* TERM_L_WHITE - diamond */
 	TERM_YELLOW, 	/* TERM_VIOLET - amethyst */
 	TERM_WHITE, 	/* TERM_YELLOW - gold */
-	TERM_YELLOW, 	/* TERM_L_RED */
+	TERM_YELLOW, 	/* TERM_L_RED - garnet */
 	TERM_YELLOW, 	/* TERM_L_GREEN - adamantite*/
 	TERM_YELLOW, 	/* TERM_L_BLUE - mithril*/
 	TERM_YELLOW 	/* TERM_L_UMBER - bronze */
@@ -1311,7 +1311,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			}
 
 			/* Metallic monster */
-			else if (r_ptr->flags1 & (RF1_ATTR_METAL))
+			else if (r_ptr->flags9 & (RF9_ATTR_METAL))
 			{
 				/* Flickering metallic attr - predominate base color */
 				if (!rand_int(3)) a = lite_attr[da];
@@ -2962,7 +2962,7 @@ errr vinfo_init(void)
 			if (num_grids >= VINFO_MAX_GRIDS)
 			{
 				quit_fmt("Too many grids (%d >= %d)!",
-				 num_grids, VINFO_MAX_GRIDS);
+					num_grids, VINFO_MAX_GRIDS);
 			}
 
 			/* Count grids */
@@ -2994,19 +2994,18 @@ errr vinfo_init(void)
 		}
 	}
 
-
-	/* Enforce maximal efficiency */
+	/* Enforce maximal efficiency (grids) */
 	if (num_grids < VINFO_MAX_GRIDS)
 	{
 		quit_fmt("Too few grids (%d < %d)!",
-		 num_grids, VINFO_MAX_GRIDS);
+			num_grids, VINFO_MAX_GRIDS);
 	}
 
-	/* Enforce maximal efficiency */
+	/* Enforce maximal efficiency (line of sight slopes) */
 	if (hack->num_slopes < VINFO_MAX_SLOPES)
 	{
-		quit_fmt("Too few slopes (%d < %d)!",
-		 hack->num_slopes, VINFO_MAX_SLOPES);
+		quit_fmt("Too few LOS slopes (%d < %d)!",
+			hack->num_slopes, VINFO_MAX_SLOPES);
 	}
 
 
@@ -3016,9 +3015,8 @@ errr vinfo_init(void)
 	/* Sort slopes numerically */
 	ang_sort_swap = ang_sort_swap_hook_longs;
 
-	/* Sort the (unique) slopes */
+	/* Sort the (unique) LOS slopes */
 	ang_sort(hack->slopes, NULL, hack->num_slopes);
-
 
 
 	/* Enqueue player grid */
@@ -3028,7 +3026,6 @@ errr vinfo_init(void)
 	while (queue_head < queue_tail)
 	{
 		int e;
-
 
 		/* Index */
 		e = queue_head++;
@@ -3134,27 +3131,6 @@ errr vinfo_init(void)
 		}
 
 
-
-
-		/* Default */
-		vinfo[e].next_0 = &vinfo[0];
-
-		/* Grid next child */
-		if (distance(0, 0, y, x+1) <= MAX_SIGHT)
-		{
-			g = GRID(y,x+1);
-
-			if (queue[queue_tail-1]->grid[0] != g)
-			{
-				vinfo[queue_tail].grid[0] = g;
-				queue[queue_tail] = &vinfo[queue_tail];
-				queue_tail++;
-			}
-
-			vinfo[e].next_0 = &vinfo[queue_tail - 1];
-		}
-
-
 		/* Default */
 		vinfo[e].next_1 = &vinfo[0];
 
@@ -3185,7 +3161,6 @@ errr vinfo_init(void)
 		vinfo[e].r = ((!y) ? x : (!x) ? y : (y == x) ? y : 0);
 	}
 
-
 	/* Verify maximal bits XXX XXX XXX */
 	if (((vinfo[1].bits_3 | vinfo[2].bits_3) != VINFO_BITS_3) ||
 	    ((vinfo[1].bits_2 | vinfo[2].bits_2) != VINFO_BITS_2) ||
@@ -3203,7 +3178,6 @@ errr vinfo_init(void)
 	/* Success */
 	return (0);
 }
-
 
 
 /*
@@ -3375,9 +3349,8 @@ void update_view(void)
 	byte pinfo;
 	byte cinfo;
 
-#ifdef MONSTER_LITE
+	/* Used for monster lite patch */
 	int fy,fx;
-#endif
 
 	/*** Step 0 -- Begin ***/
 
@@ -3390,10 +3363,10 @@ void update_view(void)
 		/* Get grid info */
 		pinfo = fast_play_info[g];
 
-		/* Save "CAVE_SEEN" grids */
+		/* Save "PLAY_SEEN" grids */
 		if (pinfo & (PLAY_SEEN))
 		{
-			/* Set "CAVE_TEMP" flag */
+			/* Set "PLAY_TEMP" flag */
 			pinfo |= (PLAY_TEMP);
 
 			/* Save grid for later */
@@ -3432,7 +3405,6 @@ void update_view(void)
 	/* Handle real light */
 	if (radius > 0) ++radius;
 
-#ifdef MONSTER_LITE
 	/*** Step 1A -- monster lites ***/
 	/* Scan monster list and add monster lites */
 	for ( i = 1; i < z_info->m_max; i++)
@@ -3603,7 +3575,7 @@ void update_view(void)
 		}
 
 	}
-#endif
+
 	/*** Step 1B -- player grid ***/
 
 	/* Player grid */
@@ -3641,18 +3613,16 @@ void update_view(void)
 		pinfo |= (PLAY_SEEN);
 	}
 
-	/* Save cave info */
-	fast_cave_info[g] = cinfo;
-
 	/* Save player info */
 	fast_play_info[g] = pinfo;
 
 	/* Save in array */
 	fast_view_g[fast_view_n++] = g;
 
+	/* Save in the "fire" array */
+	fire_g[fire_n++] = g;
 
 	/*** Step 2a -- octants (PLAY_VIEW | PLAY_SEEN) ***/
-
 	/* Scan each octant */
 	for (o2 = 0; o2 < 8; o2++)
 	{
@@ -3837,9 +3807,7 @@ void update_view(void)
 		}
 	}
 
-
-	/*** Step 2b -- octants (CAVE_FIRE) ***/
-
+	/*** Step 2b -- octants (PLAY_FIRE) ***/
 	/* Scan each octant */
 	for (o2 = 0; o2 < 8; o2++)
 	{
@@ -3944,7 +3912,7 @@ void update_view(void)
 				}
 
 				/* Handle non-projectable grids */
-				if (!(cinfo & (CAVE_XLOF)))
+				if (cinfo & (CAVE_XLOF))
 				{
 					/* Clear bits */
 					bits0 &= ~(p->bits_0);
@@ -3971,7 +3939,6 @@ void update_view(void)
 			}
 		}
 	}
-
 
 	/*** Step 3 -- Complete the algorithm ***/
 

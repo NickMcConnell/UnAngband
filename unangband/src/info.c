@@ -1612,7 +1612,7 @@ static const o_flag_desc brand_flags4_desc[] =
  */
 static const o_flag_desc vamp_flags4_desc[] =
 {
-	{ TR4_VAMP_HP,		"hit points" },
+	{ TR4_VAMP_HP,		"blood" },
 	{ TR4_VAMP_MANA,	"mana" }
 };
 
@@ -1662,6 +1662,14 @@ static const o_flag_desc resist_flags3_desc[] =
 };
 
 
+/*
+ * Resistances
+ */
+static const o_flag_desc resist_flags4_desc[] =
+{
+	{ TR4_RES_DISEASE,	"disease" }	
+};
+
 
 /*
  * Immunities
@@ -1673,6 +1681,16 @@ static const o_flag_desc immune_flags2_desc[] =
 	{ TR2_IM_FIRE,  "fire" },
 	{ TR2_IM_COLD,  "cold" }
 };
+
+
+/*
+ * Immunities
+ */
+static const o_flag_desc immune_flags4_desc[] =
+{
+	{ TR4_IM_POIS,  "poison" }
+};
+
 
 /*
  * Protections
@@ -1687,6 +1705,7 @@ static const o_flag_desc protect_flags2_desc[] =
 	{ TR2_RES_CONFU,	"confusion" }
 };
 
+
 /*
  * Protections
  */
@@ -1695,6 +1714,16 @@ static const o_flag_desc protect_flags3_desc[] =
 	{ TR3_FREE_ACT, "paralysis" },
 	{ TR3_FREE_ACT, "magical slowness" }
 };
+
+
+/*
+ * Protections
+ */
+static const o_flag_desc protect_flags4_desc[] =
+{
+	{ TR4_ANCHOR,	 	"involuntary teleporation" }
+};
+
 
 /*
  * Vulneribility
@@ -2131,12 +2160,13 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 	}
 
 	/* Resistance flags */
-	if ((f2) || (f3))
+	if ((f2) || (f3) || (f4))
 	{
 		list_ptr = list;
 
 		list_ptr = spoiler_flag_aux(f2, resist_flags2_desc, list_ptr, N_ELEMENTS(resist_flags2_desc));
 		list_ptr = spoiler_flag_aux(f3, resist_flags3_desc, list_ptr, N_ELEMENTS(resist_flags3_desc));
+		list_ptr = spoiler_flag_aux(f4, resist_flags4_desc, list_ptr, N_ELEMENTS(resist_flags4_desc));
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -2156,11 +2186,12 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 	}
 
 	/* Immunity flags */
-	if (f2)
+	if ((f2) || (f4))
 	{
 		list_ptr = list;
 
 		list_ptr = spoiler_flag_aux(f2, immune_flags2_desc, list_ptr, N_ELEMENTS(immune_flags2_desc));
+		list_ptr = spoiler_flag_aux(f4, immune_flags4_desc, list_ptr, N_ELEMENTS(immune_flags4_desc));
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -2180,12 +2211,13 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 	}
 
 	/* Protects flags */
-	if ((f2) || (f3))
+	if ((f2) || (f3) || (f4))
 	{
 		list_ptr = list;
 
 		list_ptr = spoiler_flag_aux(f2, protect_flags2_desc, list_ptr, N_ELEMENTS(protect_flags2_desc));
 		list_ptr = spoiler_flag_aux(f3, protect_flags3_desc, list_ptr, N_ELEMENTS(protect_flags3_desc));
+		list_ptr = spoiler_flag_aux(f4, protect_flags4_desc, list_ptr, N_ELEMENTS(protect_flags4_desc));
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
