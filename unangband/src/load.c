@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
+ * UnAngband (c) 2001-6 Andrew Doull. Modifications to the Angband 2.9.6
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -917,30 +917,7 @@ static errr rd_extra(void)
 
 	rd_string(p_ptr->died_from, 80);
 
-	if (older_than(3, 0, 1))
-	{
-		char *hist = p_ptr->history;
-
-		for (i = 0; i < 4; i++)
-		{
-			/* Read a part of the history */
-			rd_string(hist, 60);
-
-			/* Advance */
-			hist += strlen(hist);
-
-			/* Separate by spaces */
-			hist[0] = ' ';
-			hist++;
-		}
-
-		/* Make sure it is terminated */
-		hist[0] = '\0';
-	}
-	else
-	{
-		rd_string(p_ptr->history, 250);
-	}
+	rd_string(p_ptr->history, 250);
 
 	/* Player race */
 	rd_byte(&p_ptr->prace);
@@ -965,11 +942,8 @@ static errr rd_extra(void)
 	/* Player gender */
 	rd_byte(&p_ptr->psex);
 
-	/* Hack -- record style in stripped bytes */
-	rd_byte(&tmp8u); /* Oops */
-
-	/* Ignore old redundant info */
-	p_ptr->pstyle=tmp8u;
+	/* Player style */
+	rd_byte(&p_ptr->pstyle);
 
 	/* Special Race/Class info */
 	rd_byte(&p_ptr->hitdie);
@@ -1189,132 +1163,50 @@ static errr rd_randarts(void)
 #ifdef GJW_RANDART
 
 	int i;
-	byte tmp8u;
-	s16b tmp16s;
-	u16b tmp16u;
 	u16b artifact_count;
-	s32b tmp32s;
-	u32b tmp32u;
 
-	if (older_than(2, 9, 3))
+	/* Read the number of artifacts */
+	rd_u16b(&artifact_count);
+
+	/* Incompatible save files */
+	if (artifact_count > z_info->a_max)
 	{
-		/*
-		 * XXX XXX XXX
-		 * Importing old savefiles with random artifacts is dangerous
-		 * since the randart-generators differ and produce different
-		 * artifacts from the same random seed.
-		 *
-		 * Switching off the check for incompatible randart versions
-		 * allows to import such a savefile - do it at your own risk.
-		 */
-
-		/* Check for incompatible randart version */
-		if (randart_version != RANDART_VERSION)
-		{
-			note(format("Incompatible random artifacts version!"));
-			return (-1);
-		}
-
-		/* Alive or cheating death */
-		if (!p_ptr->is_dead || arg_wizard)
-		{
-			/* Initialize randarts */
-			do_randart(seed_randart, TRUE);
-		}	
+		note(format("Too many (%u) random artifacts!", artifact_count));
+		return (-1);
 	}
-	else
+
+	/* Read the artifacts */
+	for (i = 0; i < artifact_count; i++)
 	{
-		/* Read the number of artifacts */
-		rd_u16b(&artifact_count);
+		artifact_type *a_ptr = &a_info[i];
 
-		/* Alive or cheating death */
-		if (!p_ptr->is_dead || arg_wizard)
-		{
-			/* Initialize randarts */
-			do_randart(seed_randart, TRUE);
+		rd_byte(&a_ptr->tval);
+		rd_byte(&a_ptr->sval);
+		rd_s16b(&a_ptr->pval);
 
-			/* Incompatible save files */
-			if (artifact_count > z_info->a_max)
-			{
-				note(format("Too many (%u) random artifacts!", artifact_count));
-				return (-1);
-			}
+		rd_s16b(&a_ptr->to_h);
+		rd_s16b(&a_ptr->to_d);
+		rd_s16b(&a_ptr->to_a);
+		rd_s16b(&a_ptr->ac);
 
-			/* Read the artifacts */
-			for (i = 0; i < artifact_count; i++)
-			{
-				artifact_type *a_ptr = &a_info[i];
+		rd_byte(&a_ptr->dd);
+		rd_byte(&a_ptr->ds);
 
-				rd_byte(&a_ptr->tval);
-				rd_byte(&a_ptr->sval);
-				rd_s16b(&a_ptr->pval);
+		rd_s16b(&a_ptr->weight);
+		rd_s32b(&a_ptr->cost);
 
-				rd_s16b(&a_ptr->to_h);
-				rd_s16b(&a_ptr->to_d);
-				rd_s16b(&a_ptr->to_a);
-				rd_s16b(&a_ptr->ac);
+		rd_u32b(&a_ptr->flags1);
+		rd_u32b(&a_ptr->flags2);
+		rd_u32b(&a_ptr->flags3);
+		rd_u32b(&a_ptr->flags4);
 
-				rd_byte(&a_ptr->dd);
-				rd_byte(&a_ptr->ds);
+		rd_byte(&a_ptr->level);
+		rd_byte(&a_ptr->rarity);
 
-				rd_s16b(&a_ptr->weight);
+		rd_s16b(&a_ptr->activation);
 
-				rd_s32b(&a_ptr->cost);
-
-				rd_u32b(&a_ptr->flags1);
-				rd_u32b(&a_ptr->flags2);
-				rd_u32b(&a_ptr->flags3);
-				rd_u32b(&a_ptr->flags4);
-
-				rd_byte(&a_ptr->level);
-				rd_byte(&a_ptr->rarity);
-
-				/* Hack -- Unangband requires 2 bytes to store activation */
-				if (z_info->a_max == 256) rd_s16b(&a_ptr->activation);
-				else rd_byte(&tmp8u);
-
-				rd_u16b(&a_ptr->time);
-				rd_u16b(&a_ptr->randtime);
-			}
-		}
-		else
-		{
-			/* Read the artifacts */
-			for (i = 0; i < artifact_count; i++)
-			{
-				rd_byte(&tmp8u); /* a_ptr->tval */
-				rd_byte(&tmp8u); /* a_ptr->sval */
-				rd_s16b(&tmp16s); /* a_ptr->pval */
-
-				rd_s16b(&tmp16s); /* a_ptr->to_h */
-				rd_s16b(&tmp16s); /* a_ptr->to_d */
-				rd_s16b(&tmp16s); /* a_ptr->to_a */
-				rd_s16b(&tmp16s); /* a_ptr->ac */
-
-				rd_byte(&tmp8u); /* a_ptr->dd */
-				rd_byte(&tmp8u); /* a_ptr->ds */
-
-				rd_s16b(&tmp16s); /* a_ptr->weight */
-
-				rd_s32b(&tmp32s); /* a_ptr->cost */
-
-				rd_u32b(&tmp32u); /* a_ptr->flags1 */
-				rd_u32b(&tmp32u); /* a_ptr->flags2 */
-				rd_u32b(&tmp32u); /* a_ptr->flags3 */
-				rd_u32b(&tmp32u); /* a_ptr->flags4 */
-
-				rd_byte(&tmp8u); /* a_ptr->level */
-				rd_byte(&tmp8u); /* a_ptr->rarity */
-
-				/* Hack -- Unangband requires 2 bytes to store activation */
-				if (artifact_count == 256) rd_u16b(&tmp16u);
-				else rd_byte(&tmp8u);
-
-				rd_u16b(&tmp16u); /* a_ptr->time */
-				rd_u16b(&tmp16u); /* a_ptr->randtime */
-			}
-		}
-
+		rd_u16b(&a_ptr->time);
+		rd_u16b(&a_ptr->randtime);
 	}
 
 	return (0);
@@ -1439,11 +1331,7 @@ static void rd_messages(void)
 		/* Read the message */
 		rd_string(buf, 128);
 
-		/* Read the message type */
-		if (!older_than(2, 9, 1))
-			rd_u16b(&tmp16u);
-		else
-			tmp16u = MSG_GENERIC;
+		rd_u16b(&tmp16u);
 
 		/* Save the message */
 		message_add(buf, tmp16u);
@@ -2111,19 +1999,15 @@ static errr rd_savefile_new_aux(void)
 	if (rd_extra()) return (-1);
 	if (arg_fiddle) note("Loaded extra information");
 
+	/* Hack -- initialise various things used in rand artifacts */
+	do_randart(seed_randart, adult_rand_artifacts);
 
 	/* Read random artifacts */
-	if ((adult_rand_artifacts) || (a_max == 256))
+	if (adult_rand_artifacts)
 	{
 		if (rd_randarts()) return (-1);
 		if (arg_fiddle) note("Loaded Random Artifacts");
 	}
-
-	/* Only restore fixed arts if dead */
-	if (a_max > z_info->a_max) a_max = z_info->a_max;
-
-	/* Don't restore fixed art knowledge if all random */
-	else if (p_ptr->is_dead) a_max = 0;
 
 	/* Copy over the artifact flags */
 	for (i = 0; i < a_max; i++)

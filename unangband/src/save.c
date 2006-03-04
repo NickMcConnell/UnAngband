@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
+ * UnAngband (c) 2001-6 Andrew Doull. Modifications to the Angband 2.9.6
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -1119,7 +1119,7 @@ static bool wr_savefile_new(void)
 		wr_byte(q_list[i].stage);
 	}
 
-	/* Hack -- Dump the artifacts */
+	/* Hack -- Dump the artifact lore */
 	tmp16u = z_info->a_max;
 	wr_u16b(tmp16u);
 	for (i = 0; i < tmp16u; i++)
@@ -1186,7 +1186,7 @@ static bool wr_savefile_new(void)
 	/* Write the "extra" information */
 	wr_extra();
 
-	wr_randarts();
+	if (adult_rand_artifacts) wr_randarts();
 
 	/* Write the inventory */
 	for (i = 0; i < INVEN_TOTAL; i++)

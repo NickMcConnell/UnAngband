@@ -8,7 +8,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
+ * UnAngband (c) 2001-6 Andrew Doull. Modifications to the Angband 2.9.6
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -487,6 +487,8 @@ static errr init_info(cptr filename, header *head)
 		/* Errors */
 		if (err) display_parse_error(filename, err, buf);
 
+		/* Post processing the data */
+		if (head->eval_info_power) eval_info(head->eval_info_power, head);
 
 		/*** Dump the binary image file ***/
 
@@ -803,6 +805,9 @@ static errr init_e_info(void)
 	/* Save a pointer to the parsing function */
 	e_head.parse_info_txt = parse_e_info;
 
+	/* Save a pointer to the evaluate power function*/
+	r_head.eval_info_power = eval_e_power;
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("ego_item", &e_head);
@@ -858,6 +863,9 @@ static errr init_r_info(void)
 
 	/* Save a pointer to the parsing function */
 	r_head.parse_info_txt = parse_r_info;
+
+	/* Save a pointer to the evaluate power function*/
+	r_head.eval_info_power = eval_r_power;
 
 #endif /* ALLOW_TEMPLATES */
 
@@ -1209,6 +1217,25 @@ static errr init_q_info(void)
 
 /*** Initialize others ***/
 
+errr init_slays(void)
+{
+	int err = 0;
+
+	int i, j;
+
+	/* Allocate the "slay values" array - now used to compute magic item power */
+	C_MAKE(slays, SLAY_MAX, s32b);
+
+	/* Precompute values for single flag slays for magic items */
+	for (i = 0, j = 0x00000001L; (i < 32) && (j < 0x00200000L); i++, j <<=1)
+	{
+		/* Compute slay power for single flags */
+		magic_slay_power[i] = slay_power(j);
+	}
+
+	return (err);
+}
+
 
 /*
  * Initialize some other arrays
@@ -1351,7 +1378,7 @@ static errr init_other(void)
 	/*** Pre-allocate space for the "format()" buffer ***/
 
 	/* Hack -- Just call the "format()" function */
-	(void)format("%s (%s).", "Robert Ruehlmann", MAINTAINER);
+	(void)format("%s (%s).", "Andrew Doull", MAINTAINER);
 
 
 	/* Success */
@@ -1909,6 +1936,14 @@ void init_angband(void)
 	note("[Initializing arrays... (features)]");
 	if (init_f_info()) quit("Cannot initialize features");
 
+	/* Initialize monster info */
+	note("[Initializing arrays... (monsters)]");
+	if (init_r_info()) quit("Cannot initialize monsters");
+
+	/* Initialize slay info */
+	note("[Initializing arrays... (slays)]");
+	if (init_slays()) quit("Cannot initialize slays");
+
 	/* Initialize object info */
 	note("[Initializing arrays... (objects)]");
 	if (init_k_info()) quit("Cannot initialize objects");
@@ -1928,10 +1963,6 @@ void init_angband(void)
 	/* Initialize flavor info */
 	note("[Initializing arrays... (flavors)]");
 	if (init_x_info()) quit("Cannot initialize flavors");
-
-	/* Initialize monster info */
-	note("[Initializing arrays... (monsters)]");
-	if (init_r_info()) quit("Cannot initialize monsters");
 
 	/* Initialize feature info */
 	note("[Initializing arrays... (vaults)]");

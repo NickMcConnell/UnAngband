@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
+ * UnAngband (c) 2001-6 Andrew Doull. Modifications to the Angband 2.9.6
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -914,14 +914,31 @@ static void describe_monster_abilities(int r_idx, const monster_lore *l_ptr)
 	if ((l_ptr->flags2 & RF2_CAN_FLY) && !(l_ptr->flags2 & RF2_MUST_FLY)) vp[vn++] = "fly over obstacles";
 	if (l_ptr->flags9 & RF9_EVASIVE) vp[vn++] = "easily evade blows and missiles";
 
-	if (l_ptr->flags9 & (RF9_SCENT | RF9_WATER_SCENT))
+	if (l_ptr->flags9 & (RF9_SUPER_SCENT))
 	{
-		vp[vn++] = format("%strack the player%s through water",
-			(l_ptr->flags9 & (RF9_SUPER_SCENT) ? "unerringly " : ""),
-			((l_ptr->flags9 & (RF9_WATER_SCENT)) != 0 ? "over land, but not" : 
-			(l_ptr->flags9 & (RF9_SCENT) ? "over land and" : "" ) ));
+		if (l_ptr->flags9 & (RF9_WATER_SCENT))
+		{
+			if (l_ptr->flags9 & (RF9_SCENT)) vp[vn++] = "track you unerringly over land and through water";
+			else vp[vn++] = "track you unerringly through water";
+		}
+		else
+		{
+			if (l_ptr->flags9 & (RF9_SCENT)) vp[vn++] = "track you unerringly over land, but not through water";
+			else vp[vn++] = "track you unerringly over land, but not through water";
+		}
 	}
-
+	else
+	{
+		if (l_ptr->flags9 & (RF9_WATER_SCENT))
+		{
+			if (l_ptr->flags9 & (RF9_SCENT)) vp[vn++] = "track you over land and through water";
+			else vp[vn++] = "track you through water";
+		}
+		else
+		{
+			if (l_ptr->flags9 & (RF9_SCENT)) vp[vn++] = "track you over land, but not through water";
+		}
+	}
 
 	/* Describe special abilities. */
 	if (vn)
@@ -1032,8 +1049,8 @@ static void describe_monster_abilities(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags3 & RF3_IM_FIRE) vp[vn++] = "fire";
 	if (l_ptr->flags3 & RF3_IM_COLD) vp[vn++] = "cold";
 	if (l_ptr->flags3 & RF3_IM_POIS) vp[vn++] = "poison";
-	if (l_ptr->flags9 & RF9_IM_EDGED) vp[vn++] = format("edged%s",
-		(l_ptr->flags9 & RF9_IM_BLUNT) ? "" : " weapons"); 
+	if ((l_ptr->flags9 & RF9_IM_EDGED) && (l_ptr->flags9 & RF9_IM_BLUNT)) vp[vn++] = "edged";
+	else if (l_ptr->flags9 & RF9_IM_EDGED) vp[vn++] = "edged weapons";
 	if (l_ptr->flags9 & RF9_IM_BLUNT) vp[vn++] = "blunt weapons";
 
 	/* Describe immunities */
@@ -1072,8 +1089,8 @@ static void describe_monster_abilities(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags9 & RF9_RES_DARK) vp[vn++] = "darkness";
 	if (l_ptr->flags9 & RF9_RES_CHAOS) vp[vn++] = "chaos";
 	if (l_ptr->flags9 & RF9_RES_TPORT) vp[vn++] = "teleportation";
-	if (l_ptr->flags9 & RF9_RES_EDGED) vp[vn++] = format("edged%s",
-		(l_ptr->flags9 & RF9_RES_BLUNT) ? "" : " weapons"); 
+	if ((l_ptr->flags9 & RF9_RES_EDGED) && (l_ptr->flags9 & RF9_RES_BLUNT)) vp[vn++] = "edged";
+	else if (l_ptr->flags9 & RF9_RES_EDGED) vp[vn++] = "edged weapons";
 	if (l_ptr->flags9 & RF9_RES_BLUNT) vp[vn++] = "blunt weapons";
 
 	/* Describe resistances */
@@ -1405,6 +1422,33 @@ static void describe_monster_exp(int r_idx, const monster_lore *l_ptr)
 }
 
 
+static void describe_monster_power(int r_idx, const monster_lore *l_ptr)
+{
+	const monster_race *r_ptr = &r_info[r_idx];
+
+	int msex = 0;
+
+	/* Extract a gender (if applicable) */
+	if (r_ptr->flags1 & RF1_FEMALE) msex = 2;
+	else if (r_ptr->flags1 & RF1_MALE) msex = 1;
+
+	/* Describe experience if known */
+	if (l_ptr->tkills)
+	{
+		text_out(format("%^s is ", wd_he[msex]));
+
+		if (r_ptr->power > 100) text_out("over powered");
+		else if (r_ptr->power > 50) text_out("deadly");
+		else if (r_ptr->power > 10) text_out("dangerous");
+		else if (r_ptr->power > 5) text_out("challenging");
+		else if (r_ptr->power > 1) text_out("threatening");
+		else text_out("not threatening");
+
+		text_out(format(" at %s native depth.  ", wd_he[msex]));
+	}
+}
+
+
 static void describe_monster_movement(int r_idx, const monster_lore *l_ptr)
 {
 	const monster_race *r_ptr = &r_info[r_idx];
@@ -1696,7 +1740,10 @@ void describe_monster(int r_idx, bool spoilers)
 	describe_monster_movement(r_idx, &lore);
 
 	/* Describe experience */
-	if (!spoilers) describe_monster_exp(r_idx, &lore);
+	describe_monster_exp(r_idx, &lore);
+
+	/* Describe power */
+	describe_monster_power(r_idx, &lore);
 
 	/* Describe spells and innate attacks */
 	describe_monster_spells(r_idx, &lore);

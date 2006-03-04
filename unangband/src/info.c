@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
+ * UnAngband (c) 2001-6 Andrew Doull. Modifications to the Angband 2.9.6
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -4216,6 +4216,156 @@ static int bow_multiplier(int sval)
 	}
 
 	return (0);
+}
+
+
+/*
+ * Calculate the rating for a given slay combination.
+ *
+ * The returned value needs to be divided by tot_mon_power to
+ * give a normalised value.
+ *
+ * XXX Note we should be careful using this function, as it
+ * is expensive. When we look it up frequently, such as during
+ * initialisation and generation of random artifacts we
+ * maintain a cache of values, so that we minimise the number
+ * of calculations required.
+ *
+ * After this, we should never have to call it again, as we
+ * cache the relevant values for magic items and ego items,
+ * and store the computed artifact power with the artifact.
+ */
+s32b slay_power(u32b s_index)
+{
+	s32b sv;
+	int i;
+	int mult;
+	monster_race *r_ptr;
+
+	/* s_index combines the slay bytes into an index value
+	 * For now we do not support the two undefined slays (XXX),
+	 * but this could be added
+	 */
+
+	/* Check the cache */
+	if (slays)
+	{
+		/* Look in the cache to see if we know this one yet */
+		sv = slays[s_index];
+
+		/* If it's cached, return its value */
+		if (sv) return slays[s_index];
+	}
+
+	/* Otherwise we need to calculate the expected average multiplier
+	 * for this combination (multiplied by the total number of
+	 * monsters, which we'll divide out later).
+	 */
+
+	sv = 0;
+
+	for(i = 0; i < z_info->r_max; i++) {
+
+		mult = 1;
+
+		r_ptr = &r_info[i];
+
+		/*
+		 * Do the following in ascending order so that the best
+		 * multiple is retained
+		 */
+
+		if ( (r_ptr->flags3 & (RF3_ANIMAL | RF3_INSECT | RF3_PLANT))
+			&& (s_index & 0x00000001L) )
+				mult = 2;
+
+		/* New brand - brand_lite - acts like slay */
+		if ( (r_ptr->flags3 & (RF3_HURT_LITE))
+			&& (s_index & 0x00010000L) )
+				mult = 2;
+
+		if ( (r_ptr->flags3 & RF3_EVIL)
+			&& (s_index & 0x00000002L) )
+				mult = 2;
+		if ( (r_ptr->flags3 & RF3_UNDEAD)
+			&& (s_index & 0x00000004L) )
+				mult = 3;
+		if ( (r_ptr->flags3 & RF3_DEMON)
+			&& (s_index & 0x00000008L) )
+				mult = 3;
+		if ( (r_ptr->flags3 & RF3_ORC)
+			&& (s_index & 0x00000010L) )
+				mult = 3;
+		if ( (r_ptr->flags3 & RF3_TROLL)
+			&& (s_index & 0x00000020L) )
+				mult = 3;
+		if ( (r_ptr->flags3 & RF3_GIANT)
+			&& (s_index & 0x00000040L) )
+				mult = 3;
+		if ( (r_ptr->flags3 & RF3_DRAGON)
+			&& (s_index & 0x00000080L) )
+				mult = 3;
+		if ( (r_ptr->flags9 & RF9_MAN)
+			&& (s_index & 0x00040000L) )
+				mult = 3;
+		if ( (r_ptr->flags9 & RF9_ELF)
+			&& (s_index & 0x00080000L) )
+				mult = 3;
+		if ( (r_ptr->flags9 & RF9_DWARF)
+			&& (s_index & 0x00100000L) )
+				mult = 3;
+
+		/* Brands get the multiple if monster is NOT resistant */
+
+
+		if ( !(r_ptr->flags9 & RF9_RES_DARK)
+			&& (s_index & 0x00020000L) )
+				mult = 2;
+
+		if ( !(r_ptr->flags3 & RF3_IM_ACID)
+			&& (s_index & 0x00001000L) )
+				mult = 3;
+		if ( !(r_ptr->flags3 & RF3_IM_FIRE)
+			&& (s_index & 0x00002000L) )
+				mult = 3;
+		if ( !(r_ptr->flags3 & RF3_IM_COLD)
+			&& (s_index & 0x00004000L) )
+				mult = 3;
+		if ( !(r_ptr->flags3 & RF3_IM_ELEC)
+			&& (s_index & 0x00008000L) )
+				mult = 3;
+		if ( !(r_ptr->flags3 & RF3_IM_POIS)
+			&& (s_index & 0x00000800L) )
+				mult = 3;
+
+		/* Do kill flags last since they have the highest multiplier */
+
+		if ( (r_ptr->flags3 & RF3_DRAGON)
+			&& (s_index & 0x00000100L) )
+				mult = 5;
+		if ( (r_ptr->flags3 & RF3_DEMON)
+			&& (s_index & 0x00000200L) )
+				mult = 5;
+		if ( (r_ptr->flags3 & RF3_UNDEAD)
+			&& (s_index & 0x00000400L) )
+				mult = 5;
+
+		/* Add the multiple to sv */
+		sv += mult * r_info[i].power;
+
+		/* End loop */
+	}
+
+	/* Caching the values? */
+	if (slays)
+	{
+		/* Add to the cache */
+		slays[s_index] = sv;
+	}
+
+	return sv;
+
+	/* End method */
 }
 
 /*

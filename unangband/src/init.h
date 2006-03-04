@@ -39,6 +39,7 @@
 typedef struct header header;
 
 typedef errr (*parse_info_txt_func)(char *buf, header *head);
+typedef errr (*eval_info_power_func)(header *head);
 
 /*
  * Template file header information (see "init.c").  16 bytes.
@@ -92,11 +93,16 @@ struct header
 	char *name_ptr;
 	char *text_ptr;
 
-	parse_info_txt_func parse_info_txt;
+	parse_info_txt_func  parse_info_txt;
+	eval_info_power_func eval_info_power;	/* Evaluate after parsing */
+
 };
 
 extern errr init_info_txt(FILE *fp, char *buf, header *head,
                           parse_info_txt_func parse_info_txt_line);
+
+extern errr eval_info(eval_info_power_func eval_info_process, header *head);
+
 
 #ifdef ALLOW_TEMPLATES
 extern errr parse_z_info(char *buf, header *head);
@@ -121,6 +127,9 @@ extern errr parse_g_info(char *buf, header *head);
 extern errr parse_q_info(char *buf, header *head);
 extern errr parse_n_info(char *buf, header *head);
 extern errr parse_flavor_info(char *buf, header *head);
+extern errr eval_r_power(header *head);
+extern errr eval_e_power(header *head);
+
 
 /*
  * Error tracking

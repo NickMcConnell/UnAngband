@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
+ * UnAngband (c) 2001-6 Andrew Doull. Modifications to the Angband 2.9.6
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -53,7 +53,7 @@
 /*
  * Current version string
  */
-#define VERSION_STRING	"0.5.5"
+#define VERSION_STRING	"0.6.0"
 
 /*
  * Hack -- note use of new version name/string but old version
@@ -64,17 +64,17 @@
 /*
  * Current version numbers
  */
-#define VERSION_MAJOR	3
-#define VERSION_MINOR	0
-#define VERSION_PATCH	1
+#define VERSION_MAJOR	0
+#define VERSION_MINOR	6
+#define VERSION_PATCH	0
 #define VERSION_EXTRA	0
 
 
 /*
  * Oldest version number that can still be imported
  */
-#define OLD_VERSION_MAJOR	2
-#define OLD_VERSION_MINOR	9
+#define OLD_VERSION_MAJOR	0
+#define OLD_VERSION_MINOR	6
 #define OLD_VERSION_PATCH	0
 
 
@@ -2919,6 +2919,11 @@
 
 #define OBJECT_XTRA_MIN_RUNES    36
 #define MAX_RUNE_FLAGS    4
+
+/* Total number of different slay types used */
+
+#define SLAY_MAX 0x00200000L
+
 
 
 /*** Monster flags ***/

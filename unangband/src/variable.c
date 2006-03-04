@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
+ * UnAngband (c) 2001-6 Andrew Doull. Modifications to the Angband 2.9.6
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -1000,13 +1000,18 @@ bool can_save = TRUE;
  * Slay power
  *
  * This is a precomputed table of slay powers for weapons with single slay or brand
- * flags. Derived from calculations in randart.c.
+ * flags.
  */
-
 s32b magic_slay_power[32];
+
+/*
+ * Cache the results of slay_value(), which is expensive and would
+ * otherwise be called much too often. We create this as a part of initialisation,
+ * then free it after we have either loaded or randomly generated the artifacts.
+ */
+s32b *slays = NULL;
 
 /*
  * Total monster power
  */
-
 long tot_mon_power;

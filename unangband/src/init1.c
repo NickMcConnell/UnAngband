@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
- * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.1
+ * UnAngband (c) 2001-6 Andrew Doull. Modifications to the Angband 2.9.1
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -3670,15 +3670,15 @@ errr parse_r_info(char *buf, header *head)
 		}
 
 		/* Normal sense of smell */
-		if (strchr("AfkoQyHORTY", r_ptr->d_char))
+		if (strchr("ADdfkoQyHORTY", r_ptr->d_char))
 		{
-			r_ptr->flags9 |= RF9_SCENT;
+			r_ptr->flags9 |= (RF9_SCENT);
 		}
 
 		/* Mark men */
 		if (strchr("tpq", r_ptr->d_char))
 		{
-			r_ptr->flags9 |= RF9_MAN;
+			r_ptr->flags9 |= (RF9_MAN);
 		}
 
 		/* Mark elves and maia */
@@ -3744,7 +3744,7 @@ errr parse_r_info(char *buf, header *head)
 		/* Save the values */
 		r_ptr->level = lev;
 		r_ptr->rarity = rar;
-		r_ptr->extra = pad;
+		(void)pad;
 		r_ptr->mexp = exp;
 	}
 
@@ -6031,6 +6031,893 @@ errr parse_q_info(char *buf, header *head)
 }
 
 
+/*
+ * Initialise the info
+ */
+errr eval_info(eval_info_power_func eval_info_process, header *head)
+{
+	int err;
+
+	/* Process the info */
+	err = (*eval_info_process)(head);
+
+	return(err);
+}
+
+
+/*
+ * Go through the attack types for this monster.
+ * We look for the maximum possible maximum damage that this
+ * monster can inflict in 10 game turns.
+ *
+ * We try to scale this based on assumed resists,
+ * chance of casting spells and of spells failing,
+ * chance of hitting in melee, and particularly speed.
+ */
+
+static long eval_max_dam(monster_race *r_ptr)
+{
+	int i, x;
+	u32b dam = 1;
+	u32b hp;
+	u32b melee_dam, atk_dam, spell_dam;
+	byte rlev;
+	u32b flag, breath_mask, attack_mask, innate_mask;
+	u32b flag_counter;
+
+	/*clear the counters*/
+	melee_dam = atk_dam = spell_dam = 0;
+
+	/* Evaluate average HP for this monster */
+	if (r_ptr->flags1 & (RF1_FORCE_MAXHP)) hp = r_ptr->hdice * r_ptr->hside;
+	else hp = r_ptr->hdice * (r_ptr->hside + 1) / 2;
+
+	/* Extract the monster level, force 1 for town monsters */
+	rlev = ((r_ptr->level >= 1) ? r_ptr->level : 1);
+
+	for (x = 0; x < 4; x++)
+	{
+
+		/*Get the flags 4 monster flags and masks*/
+		switch (x)
+		{
+			case 0:
+			{
+		 		flag = r_ptr->flags4;
+				attack_mask = RF4_ATTACK_MASK;
+				breath_mask = RF4_BREATH_MASK;
+				innate_mask = RF4_INNATE_MASK;
+				break;
+			}
+			case 1:
+			{
+		 		flag = r_ptr->flags5;
+				attack_mask = RF5_ATTACK_MASK;
+				breath_mask = RF5_BREATH_MASK;
+				innate_mask = RF5_INNATE_MASK;
+				break;
+			}
+			case 2:
+			{
+		 		flag = r_ptr->flags6;
+				attack_mask = RF6_ATTACK_MASK;
+				breath_mask = RF6_BREATH_MASK;
+				innate_mask = RF6_INNATE_MASK;
+				break;
+			}
+			case 3:
+			default:
+			{
+		 		flag = r_ptr->flags7;
+				attack_mask = RF7_ATTACK_MASK;
+				breath_mask = RF7_BREATH_MASK;
+				innate_mask = RF7_INNATE_MASK;
+				break;
+			}
+		}
+
+		/*no spells here, continue*/
+		if (!flag) continue;
+
+		flag_counter = 0x00000001;
+
+		/* using 32 assumes a u32b flag size*/
+		for (i = 0; i < 32; i++)
+		{
+			u16b this_dam = 0;
+
+			/* First make sure monster has the flag*/
+			if (flag & flag_counter)
+			{
+				/*Is it a breath? Should only be flag 4*/
+				if (breath_mask & flag_counter)
+				{
+					int which_gf = 0;
+					int mult = 1;
+					int div_by = 1;
+
+					/*hack - all breaths are in flag 4*/
+
+					if (flag_counter == RF4_BRTH_ACID) 		which_gf = GF_ACID;
+					else if (flag_counter == RF4_BRTH_ELEC) which_gf = GF_ELEC;
+					else if (flag_counter == RF4_BRTH_FIRE) which_gf = GF_FIRE;
+					else if (flag_counter == RF4_BRTH_COLD) which_gf = GF_COLD;
+					else if (flag_counter == RF4_BRTH_POIS)
+					{
+						which_gf = GF_POIS;
+						mult = 10;
+						div_by = 9;
+					}
+					else if (flag_counter == RF4_BRTH_PLAS)
+					{
+						which_gf = GF_PLASMA;
+						mult = 5;
+						div_by = 4;
+					}
+					else if (flag_counter == RF4_BRTH_LITE)
+					{
+						which_gf = GF_LITE;
+						mult = 5;
+						div_by = 4;
+					}
+					else if (flag_counter == RF4_BRTH_DARK)
+					{
+						which_gf = GF_DARK;
+						mult = 5;
+						div_by = 4;
+					}
+					else if (flag_counter == RF4_BRTH_CONFU)
+					{
+						which_gf = GF_CONFUSION;
+						mult = 4;
+						div_by = 3;
+					}
+					else if (flag_counter == RF4_BRTH_SOUND)
+					{
+						which_gf = GF_SOUND;
+						mult = 6;
+						div_by = 5;
+					}
+					else if (flag_counter == RF4_BRTH_SHARD)
+					{
+						which_gf = GF_SHARD;
+						mult = 8;
+						div_by = 7;
+					}
+					else if (flag_counter == RF4_BRTH_INERT)
+					{
+						which_gf = GF_INERTIA;
+						mult = 3;
+						div_by = 2;
+					}
+					else if (flag_counter == RF4_BRTH_WIND)
+					{
+						which_gf = GF_WIND;
+						mult = 3;
+						div_by = 2;
+					}
+					else if (flag_counter == RF4_BRTH_GRAV)
+					{
+						which_gf = GF_GRAVITY;
+						mult = 3;
+						div_by = 2;
+					}
+					else if (flag_counter == RF4_BRTH_FORCE)
+					{
+						which_gf = GF_FORCE;
+						mult = 6;
+						div_by = 5;
+					}
+					else if (flag_counter == RF4_BRTH_NEXUS)
+					{
+						which_gf = GF_NEXUS;
+						mult = 5;
+						div_by = 4;
+					}
+					else if (flag_counter == RF4_BRTH_NETHR)
+					{
+						which_gf = GF_NETHER;
+						mult = 5;
+						div_by = 4;
+					}
+					else if (flag_counter == RF4_BRTH_CHAOS)
+					{
+						which_gf = GF_CHAOS;
+						mult = 4;
+						div_by = 3;
+					}
+					else if (flag_counter == RF4_BRTH_DISEN)
+					{
+						which_gf = GF_DISENCHANT;
+						mult = 4;
+						div_by = 3;
+					}
+					else if (flag_counter == RF4_BRTH_TIME)
+					{
+						which_gf = GF_TIME;
+						mult = 3;
+						div_by = 2;
+					}
+					else if (flag_counter == RF4_BRTH_MANA) which_gf = GF_MANA;
+
+					if (which_gf)
+					{
+						this_dam = get_breath_dam(hp, which_gf,
+									(r_ptr->flags2 & (RF2_POWERFUL) ? TRUE : FALSE));
+
+						/* handle elemental breaths*/
+						switch (which_gf)
+					    {
+							case GF_ACID:
+							case GF_FIRE:
+							case GF_COLD:
+							case GF_ELEC:
+							case GF_POIS:
+							{
+								/* Lets just pretend the player has the right base resist*/
+								this_dam /= 3;
+
+								break;
+							}
+
+							default: break;
+						}
+
+						this_dam = (this_dam * mult) / div_by;
+
+						/*slight bonus for cloud_surround*/
+						if (r_ptr->flags2 & RF2_HAS_AURA) this_dam = this_dam * 11 / 10;
+					}
+				}
+
+				/*Is it an arrow, bolt, beam, or ball?*/
+				else if (attack_mask & flag_counter)
+				{
+					switch (x)
+					{
+						case 0:
+						{
+							this_dam = r_ptr->spell_power * spell_info_RF4[i][COL_SPELL_DAM_MULT];
+							this_dam /=  MAX(1, spell_info_RF4[i][COL_SPELL_DAM_DIV]);
+							break;
+						}
+						case 1:
+						{
+							this_dam = r_ptr->spell_power * spell_info_RF5[i][COL_SPELL_DAM_MULT];
+							this_dam /=  MAX(1, spell_info_RF5[i][COL_SPELL_DAM_DIV]);
+							break;
+						}
+						case 2:
+						{
+							this_dam = r_ptr->spell_power * spell_info_RF6[i][COL_SPELL_DAM_MULT];
+							this_dam /=  MAX(1, spell_info_RF6[i][COL_SPELL_DAM_DIV]);
+							break;
+						}
+						case 3:
+						{
+							this_dam = r_ptr->spell_power * spell_info_RF7[i][COL_SPELL_DAM_MULT];
+							this_dam /=  MAX(1, spell_info_RF7[i][COL_SPELL_DAM_DIV]);
+							break;
+						}
+					}
+				}
+
+				else switch (x)
+				{
+					/*Misc flag4 flags*/
+					case 0:
+					{
+						if (flag_counter == RF4_SHRIEK) this_dam = rlev / 2;
+						break;
+					}
+
+					case 1:
+					{
+						/*Right now all flag5 are attack mask spells*/
+						break;
+					}
+
+					case 2:
+					{
+						/*Misc flag6 flags*/
+						if (flag_counter == RF6_ADD_MANA) this_dam = MAX(r_ptr->mana, 30);
+						else if (flag_counter == RF6_BLINK) this_dam = rlev / 3;
+						else if (flag_counter == RF6_TELE_SELF_TO) this_dam = rlev * 2;
+						else if (flag_counter == RF6_TELE_TO) this_dam = rlev;
+						else if (flag_counter == RF6_DARKNESS) this_dam = rlev;
+						else if (flag_counter == RF6_TRAPS) this_dam = rlev;
+						else if (flag_counter == RF6_FORGET) this_dam = rlev / 3;
+						else if (flag_counter == RF6_ILLUSION) this_dam = rlev;
+						else if (flag_counter == RF6_DRAIN_MANA) this_dam = rlev * 2;
+						else if (flag_counter == RF6_HUNGER) this_dam = rlev;
+						else if (flag_counter == RF6_SCARE) this_dam = rlev;
+						else if (flag_counter == RF6_BLIND) this_dam = rlev;
+						else if (flag_counter == RF6_CONF) this_dam = rlev;
+						else if (flag_counter == RF6_SLOW) this_dam = rlev;
+						else if (flag_counter == RF6_HOLD) this_dam = 25;
+						break;
+					}
+					/*All flag7 flags*/
+					case 3:
+					{
+						/*Right now all flag7 are summon spells*/
+						/* All summons are assigned arbitrary values according to their levels*/
+						if 		(flag_counter == RF7_S_KIN) 	this_dam = rlev * 2;
+						else if (flag_counter == RF7_R_KIN) 	this_dam = rlev / 2;
+						else if (flag_counter == RF7_A_DEAD) 	this_dam = rlev / 5;
+						else if (flag_counter == RF7_S_MONSTER)	this_dam = rlev * 2 / 5;
+						else if (flag_counter == RF7_S_MONSTERS)this_dam = rlev * 4 / 5;
+						else if (flag_counter == RF7_R_MONSTER)	this_dam = rlev * 1 / 5;
+						else if (flag_counter == RF7_R_MONSTERS)this_dam = rlev * 2 / 5;
+						else if (flag_counter == RF7_S_PLANT)		this_dam = rlev / 5;
+						else if (flag_counter == RF7_S_INSECT)		this_dam = rlev / 5;
+						else if (flag_counter == RF7_S_ANIMAL)
+						{
+							/* XXX Feathers, fur or skin? */
+							this_dam = rlev * 3 / 2;  /* Includes hydras */
+							/* this_dam = rlev / 2;   Fur includes canines / cats */
+							/* this_dam = rlev / 2;   Feathers includes birds / hybrids */
+						}
+						else if (flag_counter == RF7_S_SPIDER)	this_dam = rlev / 5;
+						else if (flag_counter == RF7_S_HOUND)	this_dam = rlev;
+						else if (flag_counter == RF7_S_CLASS)	this_dam = rlev / 2;
+						else if (flag_counter == RF7_S_RACE)	this_dam = rlev / 2;
+						else if (flag_counter == RF7_S_ELEMENT)	this_dam = rlev;
+						else if (flag_counter == RF7_S_FRIEND)	this_dam = rlev * 3 / 4;
+						else if (flag_counter == RF7_S_FRIENDS)	this_dam = rlev * 3 / 4;
+						else if (flag_counter == RF7_S_DRAGON)	this_dam = rlev * 3 / 2;
+						else if (flag_counter == RF7_S_HI_DRAGON) this_dam = rlev * 4;
+						else if (flag_counter == RF7_A_ELEMENT) this_dam = rlev / 3;
+						else if (flag_counter == RF7_A_OBJECT) 	this_dam = rlev / 5;
+						else if (flag_counter == RF7_S_DEMON)	this_dam = rlev * 3 / 2;
+						else if (flag_counter == RF7_S_HI_DEMON)this_dam = rlev * 3;
+						else if (flag_counter == RF7_S_UNDEAD)	this_dam = rlev * 3 / 2;
+						else if (flag_counter == RF7_S_HI_UNDEAD)this_dam = rlev * 4;
+						else if (flag_counter == RF7_S_WRAITH)	this_dam = rlev * 9 / 2;
+						else if (flag_counter == RF7_S_UNIQUE)	this_dam = rlev * 3;
+						else if (flag_counter == RF7_S_HI_UNIQUE)	this_dam = rlev * 5;
+						break;
+					}
+				}
+
+			}
+
+			/* Hack - Apply over 10 rounds */
+			this_dam *= 10;
+
+			/* Scale for frequency */
+			if (flag_counter & innate_mask)	this_dam = this_dam * r_ptr->freq_innate / 100;
+			else this_dam = this_dam * r_ptr->freq_spell / 100;
+
+			/* Incorporate spell failure chance */
+			if (!(r_ptr->flags2 & RF2_STUPID) && (x > 0)) this_dam = this_dam * MIN(75 + (rlev + 3) / 4, 100) / 100;
+
+			if (this_dam > spell_dam) spell_dam = this_dam;
+
+			/*shift one bit*/
+			flag_counter = flag_counter << 1;
+		}
+	}
+
+	/* Only do if it has attacks */
+	if (!(r_ptr->flags1 & (RF1_NEVER_BLOW)))
+	{
+		for (i = 0; i < 4; i++)
+		{
+			/* Extract the attack infomation */
+			int effect = r_ptr->blow[i].effect;
+			int method = r_ptr->blow[i].method;
+			int d_dice = r_ptr->blow[i].d_dice;
+			int d_side = r_ptr->blow[i].d_side;
+
+			/* Hack -- no more attacks */
+			if (!method) continue;
+
+			/* Assume maximum damage*/
+			atk_dam = d_dice * d_side;
+
+			switch (method)
+			{
+				/*possible stun*/
+				case RBM_HIT:
+				{
+					if ((effect == GF_WOUND) || (effect == GF_BATTER))
+					{
+						atk_dam *= 5;
+						atk_dam /= 4;
+					}
+					break;
+				}
+				/*stun definitely most dangerous*/
+				case RBM_PUNCH:
+				case RBM_KICK:
+				case RBM_BUTT:
+				case RBM_CRUSH:
+				{
+					atk_dam *= 4;
+					atk_dam /= 3;
+					break;
+				}
+				/*cut*/
+				case RBM_CLAW:
+				case RBM_BITE:
+				case RBM_PECK:
+				{
+					atk_dam *= 7;
+					atk_dam /= 5;
+					break;
+				}
+				default: break;
+			}
+
+			switch (effect)
+			{
+				/*other bad effects - minor*/
+				case GF_EAT_GOLD:
+				case GF_EAT_ITEM:
+				case GF_EAT_FOOD:
+				case GF_HUNGER:
+				case GF_EAT_LITE:
+				{
+					atk_dam += 5;
+					break;
+				}
+				/*other bad effects - poison / disease */
+				case GF_DISEASE:
+				case GF_POIS:
+				{
+					atk_dam *= 5;
+					atk_dam /= 4;
+					atk_dam += 5;
+					break;
+				}
+				/*other bad effects - elements / sustains*/
+				case GF_TERRIFY:
+				case GF_ACID:
+				case GF_ELEC:
+				case GF_FIRE:
+				case GF_COLD:
+				{
+					atk_dam += 10;
+					break;
+				}
+				/*other bad effects - major*/
+				case GF_UN_BONUS:
+				case GF_UN_POWER:
+				case GF_LOSE_MANA:
+				case GF_BLIND:
+				case GF_CONFUSION:
+				case GF_PARALYZE:
+				case GF_LOSE_STR:
+				case GF_LOSE_INT:
+				case GF_LOSE_WIS:
+				case GF_LOSE_DEX:
+				case GF_LOSE_CON:
+				case GF_LOSE_CHR:
+				case GF_LOSE_ALL:
+				case GF_EXP_10:
+				case GF_EXP_20:
+				case GF_EXP_40:
+				case GF_EXP_80:
+				case GF_HALLU:
+				{
+					atk_dam += 20;
+					break;
+				}
+				/*Earthquakes*/
+				case GF_SHATTER:
+				{
+					atk_dam += 300;
+					break;
+				}
+				/*nothing special*/
+				default: break;
+			}
+
+			/*keep a running total*/
+			melee_dam += atk_dam;
+		}
+
+		/* 
+		 * Apply damage over 10 rounds. We assume that the monster has to make contact first.
+		 * Hack - speed has more impact on melee as has to stay in contact with player
+		 */
+		if (!(r_ptr->flags9 & (RF9_SAME_SPEED)))
+		{
+			melee_dam = melee_dam * 3 + melee_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 7;
+		}
+		else
+		{
+			melee_dam *= 5;
+		}
+
+		/*
+		 * Scale based on attack accuracy. We make a massive number of assumptions here and just use monster level.
+		 */
+		if (!(r_ptr->flags9 & (RF9_NEVER_MISS)))
+		{
+			melee_dam = melee_dam * MIN(45 + rlev * 3, 95) / 100;
+		}
+
+		/* Monsters that multiply ignore the following reductions */
+		if (!(r_ptr->flags2 & (RF2_MULTIPLY)))
+		{
+			/*Reduce damamge potential for monsters that move randomly */
+			if ((r_ptr->flags1 & (RF1_RAND_25)) || (r_ptr->flags1 & (RF1_RAND_50)))
+			{
+				int reduce = 100;
+
+				if (r_ptr->flags1 & (RF1_RAND_25)) reduce -= 25;
+				if (r_ptr->flags1 & (RF1_RAND_50)) reduce -= 50;
+
+				/*even moving randomly one in 8 times will hit the player*/
+				reduce += (100 - reduce) / 8;
+
+				/* adjust the melee damage*/
+				melee_dam = (melee_dam * reduce) / 100;
+			}
+
+			/*monsters who can't move aren't nearly as much of a combat threat*/
+			if (r_ptr->flags1 & (RF1_NEVER_MOVE))
+			{
+				if (r_ptr->flags6 & (RF6_TELE_TO | RF6_TELE_SELF_TO | RF6_BLINK))
+				{
+					/* Scale for frequency */
+					melee_dam = melee_dam / 5 + 4 * melee_dam * r_ptr->freq_spell / 500;
+
+					/* Incorporate spell failure chance */
+					if (!(r_ptr->flags2 & RF2_STUPID)) melee_dam = melee_dam / 5 + 4 * melee_dam * MIN(75 + (rlev + 3) / 4, 100) / 500;
+				}
+				else if (r_ptr->flags2 & (RF2_HAS_AURA)) melee_dam /= 3;
+				else if (r_ptr->flags2 & (RF2_INVISIBLE)) melee_dam /= 5;
+				else melee_dam /= 10;
+			}
+		}
+
+		/* But keep at a minimum */
+		if (melee_dam < 1) melee_dam = 1;
+	}
+
+	/*
+	 * Get the max damage attack
+	 */
+
+	if (dam < spell_dam) dam = spell_dam;
+	if (dam < melee_dam) dam = melee_dam;
+
+	/*
+	 * Adjust for speed.  Monster at speed 120 will do double damage,
+	 * monster at speed 100 will do half, etc.  Bonus for monsters who can haste self.
+	 */
+	dam = (dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) / 10;
+
+	/*but deep in a minimum*/
+	if (dam < 1) dam  = 1;
+
+	/* We're done */
+	return (dam);
+}
+
+
+/* Evaluate and adjust a monsters hit points for how easily the monster is damaged */
+static long eval_hp_adjust(monster_race *r_ptr)
+{
+	long hp;
+	int resists = 0;
+	int ac = 0;
+	int hide_bonus = 0;
+
+	/* Get the monster base hitpoints */
+	if (r_ptr->flags1 & (RF1_FORCE_MAXHP)) hp = r_ptr->hdice * r_ptr->hside;
+	else hp = r_ptr->hdice * (r_ptr->hside + 1) / 2;
+
+	/* Just assume healers have more staying power */
+	if (r_ptr->flags6 & RF6_HEAL) hp = (hp * 6) / 5;
+	else if (r_ptr->flags6 & RF6_CURE) hp = (hp * 15) / 14;
+
+	/* Miscellaneous improvements */
+	if (r_ptr->flags2 & RF2_REGENERATE) {hp *= 10; hp /= 9;}
+	if (r_ptr->flags9 & RF9_EVASIVE) 	{hp *= 3; hp /= 2;}
+	if (r_ptr->flags2 & RF2_PASS_WALL) 	{hp *= 3; hp /= 2;}
+	else if (r_ptr->flags6 & RF6_WRAITHFORM) {hp *= 6; hp /= 5;}
+
+	/* Calculate hide bonus */
+	if (r_ptr->flags2 & RF2_EMPTY_MIND) hide_bonus += 2;
+	else
+	{
+		if (r_ptr->flags2 & RF2_COLD_BLOOD) hide_bonus += 1;
+		if (r_ptr->flags2 & RF2_WEIRD_MIND) hide_bonus += 1;
+	}
+
+	/* Invisibility */
+	if (r_ptr->flags2 & RF2_INVISIBLE)
+	{
+		hp = (hp * (r_ptr->level + hide_bonus + 1)) / r_ptr->level;
+	}
+	if (r_ptr->flags6 & RF6_INVIS)
+	{
+		hp = (hp * (r_ptr->level + hide_bonus)) / r_ptr->level;
+	}
+
+	/* Monsters that can teleport are a hassle, and can easily run away */
+	if 	((r_ptr->flags6 & RF6_TPORT) ||
+		 (r_ptr->flags6 & RF6_TELE_AWAY)||
+		 (r_ptr->flags6 & RF6_TELE_LEVEL)) hp = (hp * 6) / 5;
+
+	/* Monsters with resistances are harder to kill.
+	   Therefore effective slays / brands against them are worth more. */
+	if (r_ptr->flags3 & RF3_IM_ACID)	resists += 2;
+	if (r_ptr->flags3 & RF3_IM_FIRE) 	resists += 2;
+	if (r_ptr->flags3 & RF3_IM_COLD)	resists += 2;
+	if (r_ptr->flags3 & RF3_IM_ELEC)	resists += 2;
+	if (r_ptr->flags3 & RF3_IM_POIS)	resists += 2;
+
+	/* Oppose elements */
+	if (r_ptr->flags6 & RF6_OPPOSE_ELEM)
+	{
+		if (resists < 5)	resists = 5;
+		else if (resists < 10)  resists++;
+	}
+
+	/* Hack - Immune to weapons & basic resists = tough */
+	if (r_ptr->flags9 & RF9_IM_EDGED)	resists += 5;
+	else if (r_ptr->flags9 & RF9_RES_EDGED)	resists += 2;
+	if (r_ptr->flags9 & RF9_IM_BLUNT) 	resists += 5;
+	else if (r_ptr->flags9 & RF9_RES_BLUNT) resists += 2;
+
+	/* Bonus for multiple basic resists and weapon resists */
+	if (resists >= 10) resists *= 6;
+	else if (resists >= 10) resists *= 4;
+	else if (resists >= 8) resists *= 3;
+	else if (resists >= 6) resists *= 2;
+
+	/* Reduce resists by vulneribilities */
+	if (r_ptr->flags3 & RF3_HURT_LITE)	resists -= 3;
+	if (r_ptr->flags3 & RF3_HURT_ROCK)	resists -= 3;
+	if (r_ptr->flags3 & RF3_HURT_WATER)	resists -= 1;
+	if (r_ptr->flags2 & RF2_MUST_FLY)	resists -= 1;
+	if (r_ptr->flags2 & RF2_MUST_SWIM)	resists -= 1;
+
+	/* If quite resistant, reduce resists by defense holes */
+	if (resists >= 5)
+	{
+		if (!(r_ptr->flags3 & RF3_NO_SLEEP))	resists -= 3;
+		if (!(r_ptr->flags3 & RF3_NO_FEAR))	resists -= 2;
+		if (!(r_ptr->flags3 & RF3_NO_CONF))	resists -= 2;
+		if (!(r_ptr->flags3 & RF3_NO_STUN))	resists -= 1;
+		if (!(r_ptr->flags9 & RF9_NO_SLOW))	resists -= 2;
+		if (!(r_ptr->flags3 & RF9_RES_BLIND))	resists -= 2;
+		if (!(r_ptr->flags9 & RF9_NO_CUTS))	resists -= 1;
+		if (!(r_ptr->flags9 & RF9_RES_TPORT))	resists -= 2;
+
+		if (resists < 0) resists = 0;
+	}
+
+	/* If quite resistant, bonus for high resists */
+	if (resists >= 5)
+	{
+		if (r_ptr->flags9 & RF9_RES_DARK)	resists += 1;
+		if (r_ptr->flags9 & RF9_RES_CHAOS)	resists += 1;
+		if (r_ptr->flags9 & RF9_RES_LITE)	resists += 1;
+		if (r_ptr->flags3 & RF3_RES_WATER)	resists += 1;
+		if (r_ptr->flags3 & RF3_RES_NETHR)	resists += 1;
+		if (r_ptr->flags3 & RF3_RES_LAVA)	resists += 1;
+		if (r_ptr->flags3 & RF3_RES_NEXUS)	resists += 1;
+		if (r_ptr->flags3 & RF3_RES_DISEN)	resists += 1;
+	}
+
+	/* Scale resists to ac */
+	resists = resists * 25;
+
+	/* Get the monster ac */
+	ac = r_ptr->ac;
+
+	/* Some abilities modify armour */
+	if (r_ptr->flags2 & RF2_ARMOR) ac = ac * 4 / 3;
+	if (r_ptr->flags6 & RF6_SHIELD) ac += 50;
+	if (r_ptr->flags6 & RF6_BESERK) ac -= 10;
+
+	/* Upper limit on ac */
+	if (ac > 150) ac = 150;
+
+	/* Immune to weapons */
+	if (r_ptr->flags9 & RF9_IM_EDGED)	ac += 500;
+	else if (r_ptr->flags9 & RF9_RES_EDGED)	ac += 200;
+	if (r_ptr->flags9 & RF9_IM_BLUNT) 	ac += 500;
+	else if (r_ptr->flags9 & RF9_RES_BLUNT) ac += 200;
+
+	/* Sanity check */
+	if (ac < 0) ac = 0;
+
+	/* Easier to kill monster with magic */
+	if (resists < ac)
+	{
+		/* Modify hit points by ac */
+		hp += hp * resists / 250;
+	}
+	else
+	{
+		/* Modify hit points by ac */
+		hp += hp * ac / 250;
+	}
+
+	/*boundry control*/
+	if (hp < 1) hp = 1;
+
+	return (hp);
+
+}
+
+
+
+/*
+ * Evaluate the monster power ratings to be stored in r_info.raw
+ */
+errr eval_r_power(header *head)
+{
+	int i, j;
+	byte lvl;
+	long hp, av_hp, av_dam;
+	long tot_hp[MAX_DEPTH];
+	long dam;
+	long *power;
+	long tot_dam[MAX_DEPTH];
+	s16b mon_count[MAX_DEPTH];
+	monster_race *r_ptr = NULL;
+
+	/* Reset the sum of all monster power values */
+	tot_mon_power = 0;
+
+	/* Allocate space for power */
+	C_MAKE(power, z_info->r_max, long);
+
+	/* Make sure all arrays start at zero */
+
+	for (i = 0; i < MAX_DEPTH; i++)
+	{
+		tot_hp[i] = 0;
+		tot_dam[i] = 0;
+		mon_count[i] = 0;
+	}
+
+	/*
+	 * Go through r_info and evaluate power ratings.
+	 */
+	for (i = 0; i < z_info->r_max; i++)
+	{
+		/* Point at the "info" */
+		r_ptr = (monster_race*)head->info_ptr + i;
+
+		/* Set the current level */
+		lvl = r_ptr->level;
+
+		/* Maximum damage this monster can do in 10 game turns */
+		dam = eval_max_dam(r_ptr);
+
+		/* Adjust hit points based on resistances */
+		hp = eval_hp_adjust(r_ptr);
+
+		/* Define the power rating */
+		power[i] = hp * dam;
+
+		/* Adjust for group monsters.  Average in-level group size is 5 */
+		if (r_ptr->flags1 & RF1_UNIQUE) ;
+
+		else if (r_ptr->flags1 & RF1_FRIEND) power[i] *= 2;
+
+		else if (r_ptr->flags1 & RF1_FRIENDS) power[i] *= 5;
+
+		/* Adjust for multiplying monsters. This is modified by the speed,
+                 * as fast multipliers are much worse than slow ones.
+                 */
+		else if (r_ptr->flags2 & RF2_MULTIPLY) 
+			power[i] = power[i] * MAX(1, extract_energy[r_ptr->speed
+				+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
+
+#if 0
+		/* Adjust for rarity.  Monsters with rarity > 1 appear less often */
+		/* Paranoia */
+		if (r_ptr->rarity != 0) power[i] /= r_ptr->rarity;
+#endif
+		/*
+		 * Update the running totals - these will be used as divisors later
+		 * Total HP / dam / count for everything up to the current level
+		 */
+
+		/*
+		 * Mega Hack -- only let monsters appear for up to 2* level plus 10
+		 * levels deeper XXX We should actually determine power per dungeon, as opposed
+                 * to this. e.g. Slay animals is better where game has dungeons
+		 * full of animals. We also exclude townsfolk from the dungeon.
+		 * We also only count uniques once, on the level they appear...
+		 * Was 	for (j = lvl; j < MAX_DEPTH; j++)
+		 *
+		 * Also tried for (j = lvl; j < (lvl == 0 ? 1 : MIN((lvl * 2) + 10, MAX_DEPTH)); j++)
+		 */
+		for (j = lvl; j < (lvl == 0 ? lvl + 1: MAX_DEPTH); j++)
+		{
+			/*
+			 * Uniques don't count towards total monster power on the level.
+			 */
+			if (r_ptr->flags1 & RF1_UNIQUE) continue;
+
+			tot_hp[j] += hp;
+			tot_dam[j] += dam;
+
+			/*
+			 * Hack - if it's a group monster, add several to the count
+			 * so that the averages don't get thrown off
+			 */
+
+			if (r_ptr->flags1 & RF1_FRIEND) mon_count[j] += 2;
+			else if (r_ptr->flags1 & RF1_FRIENDS) mon_count[j] += 5;
+			else if (r_ptr->flags2 & RF2_MULTIPLY) mon_count[i] += MAX(1, extract_energy[r_ptr->speed
+				+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
+
+			else mon_count[j] += 1;
+		}
+
+	}
+
+	/* Apply divisors now */
+	for (i = 0; i < z_info->r_max; i++)
+	{
+		/* Point at the "info" */
+		r_ptr = (monster_race*)head->info_ptr + i;
+
+		/* Extract level */
+		lvl = r_ptr->level;
+
+		/* Paranoia */
+		if (tot_hp[lvl] != 0 && tot_dam[lvl] != 0)
+		{
+			/* Divide by average HP and av damage for all in-level monsters */
+			av_hp = tot_hp[lvl] / mon_count[lvl];
+			av_dam = tot_dam[lvl] / mon_count[lvl];
+
+			/* XXX Justifiable paranoia - avoid divide by zero errors */
+			if (av_hp > 0) power[i] = power[i] / av_hp;
+			if (av_dam > 0) power[i] = power[i] / av_dam;
+
+			/* Assign monster power */
+			r_ptr->power = (s16b)power[i];
+
+			/* Never less than 1 */
+			if (r_ptr->power < 1) r_ptr->power = 1;
+
+			/* Now we have the proper rating, add it to the total */
+			tot_mon_power += r_ptr->power;
+		}
+	}
+
+	/* Free power array */
+	FREE(power);
+
+	/* Success */
+	return(0);
+}
+
+
+/*
+ * Evaluate the ego slay ratings to be stored in e_info.raw
+ */
+errr eval_e_power(header *head)
+{
+	int i;
+	ego_item_type *e_ptr = NULL;
+
+	/* Precompute values for ego item slays for ego items */
+	for (i = 0; i < z_info->e_max; i++);
+	{
+		/* Point at the "info" */
+		e_ptr = (ego_item_type*)head->info_ptr + i;
+
+		e_ptr->slay_power = slay_power(slay_index(e_ptr->flags1, e_ptr->flags2, e_ptr->flags3, e_ptr->flags4));
+	}
+
+	/* Success */
+	return(0);
+}
 
 
 #else	/* ALLOW_TEMPLATES */

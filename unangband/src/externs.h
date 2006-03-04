@@ -7,7 +7,7 @@
  * and not for profit purposes provided that this copyright and statement
  * are included in all such copies.
  *
- * UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6
+ * UnAngband (c) 2001-6 Andrew Doull. Modifications to the Angband 2.9.6
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
@@ -309,7 +309,7 @@ extern int highscore_fd;
 extern bool use_transparency;
 extern s32b magic_slay_power[32];
 extern long tot_mon_power;
-
+extern s32b *slays;
 
 /*
  * Automatically generated "function declarations"
@@ -517,6 +517,7 @@ extern void update_slot_flags(int slot, u32b f1, u32b f2, u32b f3, u32b f4);
 extern void equip_can_flags(u32b f1,u32b f2,u32b f3, u32b f4);
 extern void equip_not_flags(u32b f1,u32b f2,u32b f3, u32b f4);
 extern void inven_drop_flags(object_type *o_ptr);
+extern s32b slay_power(u32b s_index);
 extern u32b slay_index(const u32b f1, const u32b f2, const u32b f3, const u32b f4);
 extern s32b object_power(const object_type *o_ptr);
 
