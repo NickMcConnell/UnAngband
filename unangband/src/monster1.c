@@ -176,7 +176,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	const monster_race *r_ptr = &r_info[r_idx];
 	int m, n;
 	int msex = 0;
-	bool breath = FALSE;
+	bool innate = FALSE;
 	bool magic = FALSE;
 	int vn;
 	cptr vp[128];
@@ -210,9 +210,6 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 			/* Dump */
 			text_out(vp[n]);
 		}
-
-		/* End */
-		text_out(".  ");
 	}
 
 	/* Collect breaths */
@@ -244,11 +241,14 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	/* Describe breaths */
 	if (vn)
 	{
-		/* Note breath */
-		breath = TRUE;
+		/* Already innate? */
+		if (innate) text_out(" or");
 
 		/* Intro */
-		text_out(format("%^s", wd_he[msex]));
+		else text_out(format("%^s", wd_he[msex]));
+
+		/* Note breath */
+		innate = TRUE;
 
 		/* Scan */
 		for (n = 0; n < vn; n++)
@@ -262,6 +262,30 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 			text_out(vp[n]);
 		}
 	}
+
+	/* End the sentence about innate spells */
+	if (innate)
+	{
+		/* Total casting */
+		m = l_ptr->cast_innate;
+
+		/* Get frequency */
+		n = r_ptr->freq_innate;
+
+		/* Describe the spell frequency */
+		if ((m > 100) && (n > 0))
+		{
+			text_out(format("; 1 time in %d", 100 / n));
+		}
+
+		/* Guess at the frequency */
+		else if ((m) && (n > 0))
+		{
+			n = ((n + 9) / 10) * 10;
+			text_out(format("; about 1 time in %d", 100 / n));
+		}
+	}
+
 
 	/* Collect spells */
 	vn = 0;
@@ -371,7 +395,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 		magic = TRUE;
 
 		/* Intro */
-		if (breath)
+		if (innate)
 		{
 			text_out(", and is also");
 		}
@@ -399,14 +423,14 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 		}
 	}
 
-	/* End the sentence about innate/other spells */
-	if (breath || magic)
+	/* End the sentence about magic spells */
+	if (magic)
 	{
 		/* Total casting */
-		m = l_ptr->cast_innate + l_ptr->cast_spell;
+		m = l_ptr->cast_spell;
 
 		/* Average frequency */
-		n = (r_ptr->freq_innate + r_ptr->freq_spell) / 2;
+		n = r_ptr->freq_spell;
 
 		/* Describe the spell frequency */
 		if ((m > 100) && (n > 0))
@@ -420,7 +444,10 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 			n = ((n + 9) / 10) * 10;
 			text_out(format("; about 1 time in %d", 100 / n));
 		}
+	}
 
+	if (innate || magic)
+	{
 		/* End this sentence */
 		text_out(".  ");
 	}
@@ -871,7 +898,7 @@ static void describe_monster_abilities(int r_idx, const monster_lore *l_ptr)
 
 	/* Collect special abilities. */
 	vn = 0;
-	if (l_ptr->flags2 & RF2_HAS_LITE) vp[vn++] = "illuminate the dungeon";
+	if ((l_ptr->flags2 & RF2_NEED_LITE) && !(l_ptr->flags2 & RF2_HAS_LITE)) vp[vn++] = "carry a lite to see you";
 	if (l_ptr->flags2 & RF2_OPEN_DOOR) vp[vn++] = "open doors";
 	if (l_ptr->flags2 & RF2_BASH_DOOR) vp[vn++] = "bash down doors";
 	if (l_ptr->flags2 & RF2_PASS_WALL) vp[vn++] = "pass through walls";
@@ -885,7 +912,7 @@ static void describe_monster_abilities(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags2 & RF2_SNEAKY) vp[vn++] = "hide in unusual places";
 	if ((l_ptr->flags2 & RF2_CAN_SWIM) && !(l_ptr->flags2 & RF2_MUST_SWIM)) vp[vn++] = "swim under water";
 	if ((l_ptr->flags2 & RF2_CAN_FLY) && !(l_ptr->flags2 & RF2_MUST_FLY)) vp[vn++] = "fly over obstacles";
-	if (l_ptr->flags9 & RF9_EVASIVE) vp[vn++] = "easy evade blows and missiles";
+	if (l_ptr->flags9 & RF9_EVASIVE) vp[vn++] = "easily evade blows and missiles";
 
 	if (l_ptr->flags9 & (RF9_SCENT | RF9_WATER_SCENT))
 	{
@@ -919,12 +946,6 @@ static void describe_monster_abilities(int r_idx, const monster_lore *l_ptr)
 	}
 
 	/* Describe special abilities. */
-	if (l_ptr->flags2 & (RF2_NEED_LITE))
-	{
-		text_out(format("%^s needs light to see you.  ", wd_he[msex]));
-	}
-
-	/* Describe special abilities. */
 	if (l_ptr->flags2 & (RF2_MUST_SWIM))
 	{
 		text_out(format("%^s must swim and cannot move out of water.  ", wd_he[msex]));
@@ -935,6 +956,18 @@ static void describe_monster_abilities(int r_idx, const monster_lore *l_ptr)
 	{
 		text_out(format("%^s must fly and cannot move underwater or through webs.  ", wd_he[msex]));
 	}
+
+	/* Describe special abilities. */
+	if (l_ptr->flags2 & (RF2_HAS_LITE))
+	{
+		if (l_ptr->flags2 & RF2_NEED_LITE) text_out(format("%^s always carries a lite to see you.  ", wd_he[msex]));
+		else text_out(format("%^s lights up the surroundings.  ", wd_he[msex]));
+	}
+	else if (l_ptr->flags2 & (RF2_NEED_LITE))
+	{
+		text_out(format("%^s needs lite to see you.  ", wd_he[msex]));
+	}
+
 
 	/* Describe special abilities. */
 	if (l_ptr->flags2 & RF2_INVISIBLE)
@@ -1392,7 +1425,8 @@ static void describe_monster_movement(int r_idx, const monster_lore *l_ptr)
 	vn = 0;
 
 	/* Describe the "race" */
-	if (l_ptr->flags9 & (RF9_MAN)) vp[vn++] ="man";
+	if ((l_ptr->flags1 & (RF1_FEMALE)) && (l_ptr->flags9 & (RF9_MAN))) vp[vn++] = "woman";
+	else if (l_ptr->flags9 & (RF9_MAN)) vp[vn++] ="man";
 	if (l_ptr->flags9 & (RF9_ELF)) vp[vn++] ="elf";
 	if (l_ptr->flags9 & (RF9_DWARF)) vp[vn++] ="dwarf";
 	if (l_ptr->flags3 & (RF3_ORC)) vp[vn++] ="orc";
@@ -1606,6 +1640,8 @@ static void cheat_monster_lore(int r_idx, monster_lore *l_ptr)
 	l_ptr->flags5 = r_ptr->flags5;
 	l_ptr->flags6 = r_ptr->flags6;
 	l_ptr->flags7 = r_ptr->flags7;
+	l_ptr->flags8 = r_ptr->flags8;
+	l_ptr->flags9 = r_ptr->flags9;
 }
 
 

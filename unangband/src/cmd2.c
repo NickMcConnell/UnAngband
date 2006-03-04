@@ -3031,13 +3031,47 @@ void do_cmd_fire(void)
 		{
 			monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
 			monster_race *r_ptr = &r_info[m_ptr->r_idx];
+			monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
 			int chance2 = chance - distance(py, px, y, x);
 
 			int visible = m_ptr->ml;
 
-			/* Did we hit it (penalize distance travelled) */
-			if (!(m_ptr->mflag & (MFLAG_HIDE)) && (test_hit_fire(chance2, r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 2 : 1), m_ptr->ml)))
+			bool hit_or_near_miss;
+			bool genuine_hit;
+
+			/* Ignore hidden monsters */
+			if (m_ptr->mflag & (MFLAG_HIDE)) continue;
+
+			/* Some monsters are great at dodging  -EZ- */
+			if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!m_ptr->csleep) &&
+				(!m_ptr->stunned) && (!m_ptr->blind) && (!m_ptr->confused) && (!m_ptr->monfear)
+				&& (rand_int(5 + m_ptr->cdis) >= 3))
+			{
+				if (visible)
+				{
+					char m_name[80];
+
+					/* Get "the monster" or "it" */
+					monster_desc(m_name, m_ptr, 0);
+
+					message_format(MSG_MISS, 0, "%^s dodges!", m_name);
+
+					/* Learn that monster can dodge */
+					l_ptr->flags9 |= (RF9_EVASIVE);
+				}
+
+				continue;
+			}
+
+			/* Test hit fire */
+			hit_or_near_miss = test_hit_fire(chance2, r_ptr->ac, m_ptr->ml);
+
+			/* Genuine hit */
+			genuine_hit = test_hit_fire(chance2, r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 2 : 1) + (m_ptr->shield ? 100 : 0), m_ptr->ml);
+
+			/* Did we hit it or get close? */
+			if (hit_or_near_miss || genuine_hit)
 			{
 				bool fear = FALSE;
 
@@ -3055,31 +3089,6 @@ void do_cmd_fire(void)
 					note_dies = " is destroyed.";
 				}
 
-				/* Handle unseen monster */
-				if (!visible)
-				{
-					/* Invisible monster */
-					msg_format("The %s finds a mark.", o_name);
-				}
-
-				/* Handle visible monster */
-				else
-				{
-					char m_name[80];
-
-					/* Get "the monster" or "it" */
-					monster_desc(m_name, m_ptr, 0);
-
-					/* Message */
-					msg_format("The %s hits %s.", o_name, m_name);
-
-					/* Hack -- Track this monster race */
-					if (m_ptr->ml) monster_race_track(m_ptr->r_idx);
-
-					/* Hack -- Track this monster */
-					if (m_ptr->ml) health_track(cave_m_idx[y][x]);
-				}
-
 				/* Apply special damage XXX XXX XXX */
 				tdam = tot_dam_aux(i_ptr, tdam, m_ptr);
 
@@ -3091,6 +3100,49 @@ void do_cmd_fire(void)
 
 				/* No negative damage */
 				if (tdam < 0) tdam = 0;
+
+				/* Handle unseen monster */
+				if (!visible)
+				{
+					/* Invisible monster */
+					msg_format("The %s finds a mark.", o_name);
+
+					/* Near miss? */
+					if (!genuine_hit) tdam = 0;
+				}
+
+				/* Handle visible monster */
+				else
+				{
+					char m_name[80];
+
+					/* Get "the monster" or "it" */
+					monster_desc(m_name, m_ptr, 0);
+
+					/* Near miss */
+					if (!genuine_hit)
+					{
+						/* Missile was stopped */
+						msg_format("%^s blocks the %s with a %sshield.", m_name, o_name, m_ptr->shield ? "magical " : "");
+
+						/* Notice armour */
+						if (r_ptr->flags2 & (RF2_ARMOR)) l_ptr->flags2 |= (RF2_ARMOR);
+
+						/* No normal damage */
+						tdam = 0;
+					}
+					/* Successful hit */
+					else
+					{
+						msg_format("The %s hits %s.", o_name, m_name);
+					}
+
+					/* Hack -- Track this monster race */
+					if (m_ptr->ml) monster_race_track(m_ptr->r_idx);
+
+					/* Hack -- Track this monster */
+					if (m_ptr->ml) health_track(cave_m_idx[y][x]);
+				}
 
 				/* Complex message */
 				if (p_ptr->wizard)
@@ -3384,13 +3436,47 @@ void do_cmd_throw(void)
 		{
 			monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
 			monster_race *r_ptr = &r_info[m_ptr->r_idx];
+			monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
 			int chance2 = chance - distance(py, px, y, x);
 
 			int visible = m_ptr->ml;
 
-			/* Did we hit it (penalize range) */
-			if (!(m_ptr->mflag & (MFLAG_HIDE)) && (test_hit_fire(chance2, r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 2 : 1), m_ptr->ml)))
+			bool hit_or_near_miss;
+			bool genuine_hit;
+
+			/* Ignore hidden monsters */
+			if (m_ptr->mflag & (MFLAG_HIDE)) continue;
+
+			/* Some monsters are great at dodging  -EZ- */
+			if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!m_ptr->csleep) &&
+				(!m_ptr->stunned) && (!m_ptr->blind) && (!m_ptr->confused) && (!m_ptr->monfear)
+				&& (rand_int(5 + m_ptr->cdis) >= 3))
+			{
+				if (visible)
+				{
+					char m_name[80];
+
+					/* Get "the monster" or "it" */
+					monster_desc(m_name, m_ptr, 0);
+
+					message_format(MSG_MISS, 0, "%^s dodges!", m_name);
+
+					/* Learn that monster can dodge */
+					l_ptr->flags9 |= (RF9_EVASIVE);
+				}
+
+				continue;
+			}
+
+			/* Test hit fire */
+			hit_or_near_miss = test_hit_fire(chance2, r_ptr->ac, m_ptr->ml);
+
+			/* Genuine hit */
+			genuine_hit = test_hit_fire(chance2, r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 2 : 1) + (m_ptr->shield ? 100 : 0), m_ptr->ml);
+
+			/* Did we hit it or get close? */
+			if (hit_or_near_miss || genuine_hit)
 			{
 				bool fear = FALSE;
 
@@ -3408,32 +3494,6 @@ void do_cmd_throw(void)
 					note_dies = " is destroyed.";
 				}
 
-
-				/* Handle unseen monster */
-				if (!visible)
-				{
-					/* Invisible monster */
-					msg_format("The %s finds a mark.", o_name);
-				}
-
-				/* Handle visible monster */
-				else
-				{
-					char m_name[80];
-
-					/* Get "the monster" or "it" */
-					monster_desc(m_name, m_ptr, 0);
-
-					/* Message */
-					msg_format("The %s hits %s.", o_name, m_name);
-
-					/* Hack -- Track this monster race */
-					if (m_ptr->ml) monster_race_track(m_ptr->r_idx);
-
-					/* Hack -- Track this monster */
-					if (m_ptr->ml) health_track(cave_m_idx[y][x]);
-				}
-
 				/* Apply special damage XXX XXX XXX */
 				tdam = tot_dam_aux(i_ptr, tdam, m_ptr);
 
@@ -3445,6 +3505,50 @@ void do_cmd_throw(void)
 
 				/* No negative damage */
 				if (tdam < 0) tdam = 0;
+
+
+				/* Handle unseen monster */
+				if (!visible)
+				{
+					/* Invisible monster */
+					msg_format("The %s finds a mark.", o_name);
+
+					/* Near miss? */
+					if (!genuine_hit) tdam = 0;
+				}
+
+				/* Handle visible monster */
+				else
+				{
+					char m_name[80];
+
+					/* Get "the monster" or "it" */
+					monster_desc(m_name, m_ptr, 0);
+
+					/* Near miss */
+					if (!genuine_hit)
+					{
+						/* Missile was stopped */
+						msg_format("%^s blocks the %s with a %sshield.", m_name, o_name, m_ptr->shield ? "magical " : "");
+
+						/* Notice armour */
+						if (r_ptr->flags2 & (RF2_ARMOR)) l_ptr->flags2 |= (RF2_ARMOR);
+
+						/* No normal damage */
+						tdam = 0;
+					}
+					/* Successful hit */
+					else
+					{
+						msg_format("The %s hits %s.", o_name, m_name);
+					}
+
+					/* Hack -- Track this monster race */
+					if (m_ptr->ml) monster_race_track(m_ptr->r_idx);
+
+					/* Hack -- Track this monster */
+					if (m_ptr->ml) health_track(cave_m_idx[y][x]);
+				}
 
 				/* Complex message */
 				if (p_ptr->wizard)

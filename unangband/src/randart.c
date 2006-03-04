@@ -13,6 +13,8 @@
 
 #include "init.h"
 
+#ifdef GJW_RANDART
+
 #define LOG_PRINT(string) \
 	do { if (randart_verbose) \
 		fprintf(randart_log, (string)); \
@@ -28,626 +30,12 @@
 		fprintf(randart_log, (string), (int)(val1), (int)(val2)); \
 	} while (0);
 
-/*
- * Original random artifact generator (randart) by Greg Wooledge.
- * Updated by Chris Carr / Chris Robertson in 2001.
- *
- * The external "names.txt" file was sucked into this file for simplicity.
- */
-
-#ifdef GJW_RANDART
-
-static cptr names_list =
-"adanedhel\n"
-"adurant\n"
-"aeglos\n"
-"aegnor\n"
-"aelin\n"
-"aeluin\n"
-"aerandir\n"
-"aerin\n"
-"agarwaen\n"
-"aglareb\n"
-"aglarond\n"
-"aglon\n"
-"ainulindale\n"
-"ainur\n"
-"alcarinque\n"
-"aldaron\n"
-"aldudenie\n"
-"almaren\n"
-"alqualonde\n"
-"aman\n"
-"amandil\n"
-"amarie\n"
-"amarth\n"
-"amlach\n"
-"amon\n"
-"amras\n"
-"amrod\n"
-"anach\n"
-"anar\n"
-"anarion\n"
-"ancalagon\n"
-"ancalimon\n"
-"anarrima\n"
-"andor\n"
-"andram\n"
-"androth\n"
-"anduin\n"
-"andunie\n"
-"anfauglir\n"
-"anfauglith\n"
-"angainor\n"
-"angband\n"
-"anghabar\n"
-"anglachel\n"
-"angrenost\n"
-"angrim\n"
-"angrist\n"
-"angrod\n"
-"anguirel\n"
-"annael\n"
-"annatar\n"
-"annon\n"
-"annuminas\n"
-"apanonar\n"
-"aradan\n"
-"aragorn\n"
-"araman\n"
-"aranel\n"
-"aranruth\n"
-"aranwe\n"
-"aras\n"
-"aratan\n"
-"aratar\n"
-"arathorn\n"
-"arda\n"
-"ard-galen\n"
-"aredhel\n"
-"ar-feiniel\n"
-"argonath\n"
-"arien\n"
-"armenelos\n"
-"arminas\n"
-"arnor\n"
-"aros\n"
-"arossiach\n"
-"arthad\n"
-"arvernien\n"
-"arwen\n"
-"ascar\n"
-"astaldo\n"
-"atalante\n"
-"atanamir\n"
-"atanatari\n"
-"atani\n"
-"aule\n"
-"avallone\n"
-"avari\n"
-"avathar\n"
-"balan\n"
-"balar\n"
-"balrog\n"
-"barad\n"
-"baragund\n"
-"barahir\n"
-"baran\n"
-"baranduin\n"
-"bar\n"
-"bauglir\n"
-"beleg\n"
-"belegaer\n"
-"belegost\n"
-"belegund\n"
-"beleriand\n"
-"belfalas\n"
-"belthil\n"
-"belthronding\n"
-"beor\n"
-"beraid\n"
-"bereg\n"
-"beren\n"
-"boromir\n"
-"boron\n"
-"bragollach\n"
-"brandir\n"
-"bregolas\n"
-"bregor\n"
-"brethil\n"
-"brilthor\n"
-"brithiach\n"
-"brithombar\n"
-"brithon\n"
-"cabed\n"
-"calacirya\n"
-"calaquendi\n"
-"calenardhon\n"
-"calion\n"
-"camlost\n"
-"caragdur\n"
-"caranthir\n"
-"carcharoth\n"
-"cardolan\n"
-"carnil\n"
-"celeborn\n"
-"celebrant\n"
-"celebrimbor\n"
-"celebrindal\n"
-"celebros\n"
-"celegorm\n"
-"celon\n"
-"cirdan\n"
-"cirith\n"
-"cirth\n"
-"ciryatan\n"
-"ciryon\n"
-"coimas\n"
-"corollaire\n"
-"crissaegrim\n"
-"cuarthal\n"
-"cuivienen\n"
-"culurien\n"
-"curufin\n"
-"curufinwe\n"
-"curunir\n"
-"cuthalion\n"
-"daedeloth\n"
-"daeron\n"
-"dagnir\n"
-"dagor\n"
-"dagorlad\n"
-"dairuin\n"
-"danwedh\n"
-"delduwath\n"
-"denethor\n"
-"dimbar\n"
-"dimrost\n"
-"dinen\n"
-"dior\n"
-"dirnen\n"
-"dolmed\n"
-"doriath\n"
-"dorlas\n"
-"dorthonion\n"
-"draugluin\n"
-"drengist\n"
-"duath\n"
-"duinath\n"
-"duilwen\n"
-"dunedain\n"
-"dungortheb\n"
-"earendil\n"
-"earendur\n"
-"earnil\n"
-"earnur\n"
-"earrame\n"
-"earwen\n"
-"echor\n"
-"echoriath\n"
-"ecthelion\n"
-"edain\n"
-"edrahil\n"
-"eglador\n"
-"eglarest\n"
-"eglath\n"
-"eilinel\n"
-"eithel\n"
-"ekkaia\n"
-"elbereth\n"
-"eldalie\n"
-"eldalieva\n"
-"eldamar\n"
-"eldar\n"
-"eledhwen\n"
-"elemmire\n"
-"elende\n"
-"elendil\n"
-"elendur\n"
-"elenna\n"
-"elentari\n"
-"elenwe\n"
-"elerrina\n"
-"elleth\n"
-"elmoth\n"
-"elostirion\n"
-"elrond\n"
-"elros\n"
-"elu\n"
-"eluchil\n"
-"elured\n"
-"elurin\n"
-"elwe\n"
-"elwing\n"
-"emeldir\n"
-"endor\n"
-"engrin\n"
-"engwar\n"
-"eol\n"
-"eonwe\n"
-"ephel\n"
-"erchamion\n"
-"ereb\n"
-"ered\n"
-"erech\n"
-"eregion\n"
-"ereinion\n"
-"erellont\n"
-"eressea\n"
-"eriador\n"
-"eru\n"
-"esgalduin\n"
-"este\n"
-"estel\n"
-"estolad\n"
-"ethir\n"
-"ezellohar\n"
-"faelivrin\n"
-"falas\n"
-"falathar\n"
-"falathrim\n"
-"falmari\n"
-"faroth\n"
-"fauglith\n"
-"feanor\n"
-"feanturi\n"
-"felagund\n"
-"finarfin\n"
-"finduilas\n"
-"fingolfin\n"
-"fingon\n"
-"finwe\n"
-"firimar\n"
-"formenos\n"
-"fornost\n"
-"frodo\n"
-"fuin\n"
-"fuinur\n"
-"gabilgathol\n"
-"galad\n"
-"galadriel\n"
-"galathilion\n"
-"galdor\n"
-"galen\n"
-"galvorn\n"
-"gandalf\n"
-"gaurhoth\n"
-"gelion\n"
-"gelmir\n"
-"gelydh\n"
-"gil\n"
-"gildor\n"
-"giliath\n"
-"ginglith\n"
-"girith\n"
-"glaurung\n"
-"glingal\n"
-"glirhuin\n"
-"gloredhel\n"
-"glorfindel\n"
-"golodhrim\n"
-"gondolin\n"
-"gondor\n"
-"gonnhirrim\n"
-"gorgoroth\n"
-"gorlim\n"
-"gorthaur\n"
-"gorthol\n"
-"gothmog\n"
-"guilin\n"
-"guinar\n"
-"guldur\n"
-"gundor\n"
-"gurthang\n"
-"gwaith\n"
-"gwareth\n"
-"gwindor\n"
-"hadhodrond\n"
-"hador\n"
-"haladin\n"
-"haldad\n"
-"haldan\n"
-"haldar\n"
-"haldir\n"
-"haleth\n"
-"halmir\n"
-"handir\n"
-"harad\n"
-"hareth\n"
-"hathaldir\n"
-"hathol\n"
-"haudh\n"
-"helcar\n"
-"helcaraxe\n"
-"helevorn\n"
-"helluin\n"
-"herumor\n"
-"herunumen\n"
-"hildorien\n"
-"himlad\n"
-"himring\n"
-"hirilorn\n"
-"hisilome\n"
-"hithaeglir\n"
-"hithlum\n"
-"hollin\n"
-"huan\n"
-"hunthor\n"
-"huor\n"
-"hurin\n"
-"hyarmendacil\n"
-"hyarmentir\n"
-"iant\n"
-"iaur\n"
-"ibun\n"
-"idril\n"
-"illuin\n"
-"ilmare\n"
-"ilmen\n"
-"iluvatar\n"
-"imlach\n"
-"imladris\n"
-"indis\n"
-"ingwe\n"
-"irmo\n"
-"isil\n"
-"isildur\n"
-"istari\n"
-"ithil\n"
-"ivrin\n"
-"kelvar\n"
-"kementari\n"
-"ladros\n"
-"laiquendi\n"
-"lalaith\n"
-"lamath\n"
-"lammoth\n"
-"lanthir\n"
-"laurelin\n"
-"leithian\n"
-"legolin\n"
-"lembas\n"
-"lenwe\n"
-"linaewen\n"
-"lindon\n"
-"lindorie\n"
-"loeg\n"
-"lomelindi\n"
-"lomin\n"
-"lomion\n"
-"lorellin\n"
-"lorien\n"
-"lorindol\n"
-"losgar\n"
-"lothlann\n"
-"lothlorien\n"
-"luin\n"
-"luinil\n"
-"lumbar\n"
-"luthien\n"
-"mablung\n"
-"maedhros\n"
-"maeglin\n"
-"maglor\n"
-"magor\n"
-"mahanaxar\n"
-"mahtan\n"
-"maiar\n"
-"malduin\n"
-"malinalda\n"
-"mandos\n"
-"manwe\n"
-"mardil\n"
-"melian\n"
-"melkor\n"
-"menegroth\n"
-"meneldil\n"
-"menelmacar\n"
-"meneltarma\n"
-"minas\n"
-"minastir\n"
-"mindeb\n"
-"mindolluin\n"
-"mindon\n"
-"minyatur\n"
-"mirdain\n"
-"miriel\n"
-"mithlond\n"
-"mithrandir\n"
-"mithrim\n"
-"mordor\n"
-"morgoth\n"
-"morgul\n"
-"moria\n"
-"moriquendi\n"
-"mormegil\n"
-"morwen\n"
-"nahar\n"
-"naeramarth\n"
-"namo\n"
-"nandor\n"
-"nargothrond\n"
-"narog\n"
-"narsil\n"
-"narsilion\n"
-"narya\n"
-"nauglamir\n"
-"naugrim\n"
-"ndengin\n"
-"neithan\n"
-"neldoreth\n"
-"nenar\n"
-"nenning\n"
-"nenuial\n"
-"nenya\n"
-"nerdanel\n"
-"nessa\n"
-"nevrast\n"
-"nibin\n"
-"nienna\n"
-"nienor\n"
-"nimbrethil\n"
-"nimloth\n"
-"nimphelos\n"
-"nimrais\n"
-"nimras\n"
-"ningloron\n"
-"niniel\n"
-"ninniach\n"
-"ninquelote\n"
-"niphredil\n"
-"nirnaeth\n"
-"nivrim\n"
-"noegyth\n"
-"nogrod\n"
-"noldolante\n"
-"noldor\n"
-"numenor\n"
-"nurtale\n"
-"obel\n"
-"ohtar\n"
-"oiolosse\n"
-"oiomure\n"
-"olorin\n"
-"olvar\n"
-"olwe\n"
-"ondolinde\n"
-"orfalch\n"
-"ormal\n"
-"orocarni\n"
-"orodreth\n"
-"orodruin\n"
-"orome\n"
-"oromet\n"
-"orthanc\n"
-"osgiliath\n"
-"osse\n"
-"ossiriand\n"
-"palantir\n"
-"pelargir\n"
-"pelori\n"
-"periannath\n"
-"quendi\n"
-"quenta\n"
-"quenya\n"
-"radagast\n"
-"radhruin\n"
-"ragnor\n"
-"ramdal\n"
-"rana\n"
-"rathloriel\n"
-"rauros\n"
-"region\n"
-"rerir\n"
-"rhovanion\n"
-"rhudaur\n"
-"rhun\n"
-"rhunen\n"
-"rian\n"
-"ringil\n"
-"ringwil\n"
-"romenna\n"
-"rudh\n"
-"rumil\n"
-"saeros\n"
-"salmar\n"
-"saruman\n"
-"sauron\n"
-"serech\n"
-"seregon\n"
-"serinde\n"
-"shelob\n"
-"silmarien\n"
-"silmaril\n"
-"silpion\n"
-"sindar\n"
-"singollo\n"
-"sirion\n"
-"soronume\n"
-"sul\n"
-"sulimo\n"
-"talath\n"
-"taniquetil\n"
-"tar\n"
-"taras\n"
-"tarn\n"
-"tathren\n"
-"taur\n"
-"tauron\n"
-"teiglin\n"
-"telchar\n"
-"telemnar\n"
-"teleri\n"
-"telperion\n"
-"telumendil\n"
-"thalion\n"
-"thalos\n"
-"thangorodrim\n"
-"thargelion\n"
-"thingol\n"
-"thoronath\n"
-"thorondor\n"
-"thranduil\n"
-"thuringwethil\n"
-"tilion\n"
-"tintalle\n"
-"tinuviel\n"
-"tirion\n"
-"tirith\n"
-"tol\n"
-"tulkas\n"
-"tumhalad\n"
-"tumladen\n"
-"tuna\n"
-"tuor\n"
-"turambar\n"
-"turgon\n"
-"turin\n"
-"uial\n"
-"uilos\n"
-"uinen\n"
-"ulairi\n"
-"ulmo\n"
-"ulumuri\n"
-"umanyar\n"
-"umarth\n"
-"umbar\n"
-"ungoliant\n"
-"urthel\n"
-"uruloki\n"
-"utumno\n"
-"vaire\n"
-"valacirca\n"
-"valandil\n"
-"valaquenta\n"
-"valar\n"
-"valaraukar\n"
-"valaroma\n"
-"valier\n"
-"valimar\n"
-"valinor\n"
-"valinoreva\n"
-"valmar\n"
-"vana\n"
-"vanyar\n"
-"varda\n"
-"vasa\n"
-"vilya\n"
-"vingilot\n"
-"vinyamar\n"
-"voronwe\n"
-"wethrin\n"
-"wilwarin\n"
-"yavanna\n"
-;
 
 #define MAX_TRIES 200
 #define BUFLEN 1024
 
 #define MIN_NAME_LEN 5
 #define MAX_NAME_LEN 9
-#define S_WORD 26
-#define E_WORD S_WORD
 
 #define sign(x)	((x) > 0 ? 1 : ((x) < 0 ? -1 : 0))
 
@@ -850,8 +238,6 @@ static s16b art_idx_high_resist[] =
 
 /* Initialize the data structures for learned probabilities */
 
-static unsigned short lprobs[S_WORD+1][S_WORD+1][S_WORD+1];
-static unsigned short ltotal[S_WORD+1][S_WORD+1];
 static s16b artprobs[ART_IDX_TOTAL];
 static s16b art_bow_total = 0;
 static s16b art_melee_total = 0;
@@ -938,44 +324,6 @@ static int randart_verbose = 1;
 byte a_max;
 
 /*
- * Use W. Sheldon Simms' random name generator.  This function builds
- * probability tables which are used later on for letter selection.  It
- * relies on the ASCII character set.
- */
-static void build_prob(cptr learn)
-{
-	int c_prev, c_cur, c_next;
-
-	/* Build raw frequencies */
-	do
-	{
-		c_prev = c_cur = S_WORD;
-
-		do
-		{
-			c_next = *learn++;
-		} while (!isalpha(c_next) && (c_next != '\0'));
-
-		if (c_next == '\0') break;
-
-		do
-		{
-			c_next = A2I(tolower(c_next));
-			lprobs[c_prev][c_cur][c_next]++;
-			ltotal[c_prev][c_cur]++;
-			c_prev = c_cur;
-			c_cur = c_next;
-			c_next = *learn++;
-		} while (isalpha(c_next));
-
-		lprobs[c_prev][c_cur][E_WORD]++;
-		ltotal[c_prev][c_cur]++;
-	}
-	while (c_next != '\0');
-}
-
-
-/*
  * Use W. Sheldon Simms' random name generator.  Generate a random word using
  * the probability tables we built earlier.  Relies on the ASCII character
  * set.  Relies on European vowels (a, e, i, o, u).  The generated name should
@@ -1000,13 +348,14 @@ startover:
 	{
 	    getletter:
 		c_next = 0;
-		r = rand_int(ltotal[c_prev][c_cur]);
-		totalfreq = lprobs[c_prev][c_cur][c_next];
+		r = rand_int(n_info->ltotal[c_prev][c_cur]);
+		totalfreq = n_info->lprobs[c_prev][c_cur][c_next];
 
+		/*find the letter*/
 		while (totalfreq <= r)
 		{
 			c_next++;
-			totalfreq += lprobs[c_prev][c_cur][c_next];
+			totalfreq += n_info->lprobs[c_prev][c_cur][c_next];
 		}
 
 		if (c_next == E_WORD)
@@ -1033,10 +382,11 @@ startover:
 		c_cur = c_next;
 	}
 
-	word_buf[0] = toupper(word_buf[0]);
+	word_buf[0] = toupper((unsigned char)word_buf[0]);
 
 	return (word_buf);
 }
+
 
 
 /*
@@ -1052,8 +402,6 @@ static errr init_names(void)
 
 	/* Temporary space for names, while reading and randomizing them. */
 	cptr *names;
-
-	build_prob(names_list);
 
 	/* Allocate the "names" array */
 	/* ToDo: Make sure the memory is freed correctly in case of errors */
@@ -1142,18 +490,11 @@ static errr init_names(void)
 /*
  * Go through the attack types for this monster.
  * We look for the maximum possible maximum damage that this
- * monster can inflict in 10 game turns.  For melee
- * attacks we use the maximum damage assuming all attacks hit.
- * Spells are handled on a case by case basis.  For random
- * damage spells with multiple dice, we take the maximum.
- * For breaths we assume the monster has maximum HP.  In general
- * we assume all low and high resists - but assume maximum
- * resisted damage for the high resists.  Special spells like
- * summoning that don't cause damage are arbitrarily assigned a
- * 'fake' damage rating.
+ * monster can inflict in 10 game turns.
  *
- * To do: Add a factor for attack types that have side effects,
- * like confusion / blindness / nether / etc.
+ * We try to scale this based on assumed resists,
+ * chance of casting spells and of spells failing,
+ * chance of hitting in melee, and particularly speed.
  */
 
 static long eval_max_dam(int r_idx)
@@ -1164,7 +505,7 @@ static long eval_max_dam(int r_idx)
 	u32b melee_dam, atk_dam, spell_dam;
 	byte rlev;
 	monster_race *r_ptr;
-	u32b flag, breath_mask, attack_mask;
+	u32b flag, breath_mask, attack_mask, innate_mask;
 	u32b flag_counter;
 
 	r_ptr = &r_info[r_idx];
@@ -1190,6 +531,7 @@ static long eval_max_dam(int r_idx)
 		 		flag = r_ptr->flags4;
 				attack_mask = RF4_ATTACK_MASK;
 				breath_mask = RF4_BREATH_MASK;
+				innate_mask = RF4_INNATE_MASK;
 				break;
 			}
 			case 1:
@@ -1197,6 +539,7 @@ static long eval_max_dam(int r_idx)
 		 		flag = r_ptr->flags5;
 				attack_mask = RF5_ATTACK_MASK;
 				breath_mask = RF5_BREATH_MASK;
+				innate_mask = RF5_INNATE_MASK;
 				break;
 			}
 			case 2:
@@ -1204,6 +547,7 @@ static long eval_max_dam(int r_idx)
 		 		flag = r_ptr->flags6;
 				attack_mask = RF6_ATTACK_MASK;
 				breath_mask = RF6_BREATH_MASK;
+				innate_mask = RF6_INNATE_MASK;
 				break;
 			}
 			case 3:
@@ -1212,6 +556,7 @@ static long eval_max_dam(int r_idx)
 		 		flag = r_ptr->flags7;
 				attack_mask = RF7_ATTACK_MASK;
 				breath_mask = RF7_BREATH_MASK;
+				innate_mask = RF7_INNATE_MASK;
 				break;
 			}
 		}
@@ -1482,6 +827,16 @@ static long eval_max_dam(int r_idx)
 
 			}
 
+			/* Hack - Apply over 10 rounds */
+			this_dam *= 10;
+
+			/* Scale for frequency */
+			if (flag_counter & innate_mask)	this_dam = this_dam * r_ptr->freq_innate / 100;
+			else this_dam = this_dam * r_ptr->freq_spell / 100;
+
+			/* Incorporate spell failure chance */
+			if (!(r_ptr->flags2 & RF2_STUPID) && (x > 0)) this_dam = this_dam * (25 - (rlev + 3) / 4) / 100;
+
 			if (this_dam > spell_dam) spell_dam = this_dam;
 
 			/*shift one bit*/
@@ -1503,8 +858,8 @@ static long eval_max_dam(int r_idx)
 			/* Hack -- no more attacks */
 			if (!method) continue;
 
-			/* Assume average damage*/
-			atk_dam = d_dice * (d_side + 1) / 2;
+			/* Assume maximum damage*/
+			atk_dam = d_dice * d_side;
 
 			switch (method)
 			{
@@ -1548,25 +903,36 @@ static long eval_max_dam(int r_idx)
 				case GF_EAT_FOOD:
 				case GF_HUNGER:
 				case GF_EAT_LITE:
-				case GF_TERRIFY:
 				{
-					atk_dam *= 11;
-					atk_dam /= 10;
+					atk_dam += 5;
+					break;
+				}
+				/*other bad effects - poison / disease */
+				case GF_DISEASE:
+				case GF_POIS:
+				{
+					atk_dam *= 5;
+					atk_dam /= 4;
+					atk_dam += 5;
+					break;
+				}
+				/*other bad effects - elements / sustains*/
+				case GF_TERRIFY:
+				case GF_ACID:
+				case GF_ELEC:
+				case GF_FIRE:
+				case GF_COLD:
+				{
+					atk_dam += 10;
 					break;
 				}
 				/*other bad effects - major*/
 				case GF_UN_BONUS:
 				case GF_UN_POWER:
 				case GF_LOSE_MANA:
-				case GF_POIS:
-				case GF_ACID:
-				case GF_ELEC:
-				case GF_FIRE:
-				case GF_COLD:
 				case GF_BLIND:
 				case GF_CONFUSION:
 				case GF_PARALYZE:
-				case GF_DISEASE:
 				case GF_LOSE_STR:
 				case GF_LOSE_INT:
 				case GF_LOSE_WIS:
@@ -1580,15 +946,13 @@ static long eval_max_dam(int r_idx)
 				case GF_EXP_80:
 				case GF_HALLU:
 				{
-					atk_dam *= 5;
-					atk_dam /= 4;
+					atk_dam += 20;
 					break;
 				}
 				/*Earthquakes*/
 				case GF_SHATTER:
 				{
-					atk_dam *= 7;
-					atk_dam /= 6;
+					atk_dam += 300;
 					break;
 				}
 				/*nothing special*/
@@ -1597,6 +961,27 @@ static long eval_max_dam(int r_idx)
 
 			/*keep a running total*/
 			melee_dam += atk_dam;
+		}
+
+		/* 
+		 * Apply damage over 10 rounds. We assume that the monster has to make contact first.
+		 * Hack - speed has more impact on melee as has to stay in contact with player
+		 */
+		if (!(r_ptr->flags9 & (RF9_SAME_SPEED)))
+		{
+			melee_dam = melee_dam * 3 + melee_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 7;
+		}
+		else
+		{
+			melee_dam *= 5;
+		}
+
+		/*
+		 * Scale based on attack accuracy. We make a massive number of assumptions here and just use monster level.
+		 */
+		if (!(r_ptr->flags9 & (RF9_NEVER_MISS)))
+		{
+			melee_dam = melee_dam * MIN(45 + rlev * 3, 95) / 100;
 		}
 
 		/* Monsters that multiply ignore the following reductions */
@@ -1620,11 +1005,21 @@ static long eval_max_dam(int r_idx)
 			/*monsters who can't move aren't nearly as much of a combat threat*/
 			if (r_ptr->flags1 & (RF1_NEVER_MOVE))
 			{
-				melee_dam /= 4;
+				if (r_ptr->flags6 & (RF6_TELE_TO | RF6_TELE_SELF_TO | RF6_BLINK))
+				{
+					/* Scale for frequency */
+					melee_dam = melee_dam / 5 + 4 * melee_dam * r_ptr->freq_spell / 500;
+
+					/* Incorporate spell failure chance */
+					if (r_ptr->flags2 & RF2_STUPID) melee_dam = melee_dam / 5 + 4 * melee_dam * (25 - (rlev + 3) / 4) / 500;
+				}
+				else if (r_ptr->flags2 & (RF2_HAS_AURA)) melee_dam /= 3;
+				else if (r_ptr->flags2 & (RF2_INVISIBLE)) melee_dam /= 5;
+				else melee_dam /= 10;
 			}
 		}
 
-		/*but keep a minimum*/
+		/* But keep at a minimum */
 		if (melee_dam < 1) melee_dam = 1;
 	}
 
@@ -1647,6 +1042,159 @@ static long eval_max_dam(int r_idx)
 	/* We're done */
 	return (dam);
 }
+
+
+/* Evaluate and adjust a monsters hit points for how easily the monster is damaged */
+static int eval_hp_adjust(int r_idx)
+{
+	long hp;
+	int resists = 0;
+	int ac = 0;
+	int hide_bonus = 0;
+
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Get the monster base hitpoints */
+	if (r_ptr->flags1 & (RF1_FORCE_MAXHP)) hp = r_ptr->hdice * r_ptr->hside;
+	else hp = r_ptr->hdice * (r_ptr->hside + 1) / 2;
+
+	/* Just assume healers have more staying power */
+	if (r_ptr->flags6 & RF6_HEAL) hp = (hp * 6) / 5;
+	else if (r_ptr->flags6 & RF6_CURE) hp = (hp * 15) / 14;
+
+	/* Miscellaneous improvements */
+	if (r_ptr->flags2 & RF2_REGENERATE) {hp *= 10; hp /= 9;}
+	if (r_ptr->flags9 & RF9_EVASIVE) 	{hp *= 3; hp /= 2;}
+	if (r_ptr->flags2 & RF2_PASS_WALL) 	{hp *= 3; hp /= 2;}
+	else if (r_ptr->flags6 & RF6_WRAITHFORM) {hp *= 6; hp /= 5;}
+
+	/* Calculate hide bonus */
+	if (r_ptr->flags2 & RF2_EMPTY_MIND) hide_bonus += 2;
+	else
+	{
+		if (r_ptr->flags2 & RF2_COLD_BLOOD) hide_bonus += 1;
+		if (r_ptr->flags2 & RF2_WEIRD_MIND) hide_bonus += 1;
+	}
+
+	/* Invisibility */
+	if (r_ptr->flags2 & RF2_INVISIBLE)
+	{
+		hp = (hp * (r_ptr->level + hide_bonus + 1)) / r_ptr->level;
+	}
+	if (r_ptr->flags6 & RF6_INVIS)
+	{
+		hp = (hp * (r_ptr->level + hide_bonus)) / r_ptr->level;
+	}
+
+	/* Monsters that can teleport are a hassle, and can easily run away */
+	if 	((r_ptr->flags6 & RF6_TPORT) ||
+		 (r_ptr->flags6 & RF6_TELE_AWAY)||
+		 (r_ptr->flags6 & RF6_TELE_LEVEL)) hp = (hp * 6) / 5;
+
+	/* Monsters with resistances are harder to kill.
+	   Therefore effective slays / brands against them are worth more. */
+	if (r_ptr->flags3 & RF3_IM_ACID)	resists += 2;
+	if (r_ptr->flags3 & RF3_IM_FIRE) 	resists += 2;
+	if (r_ptr->flags3 & RF3_IM_COLD)	resists += 2;
+	if (r_ptr->flags3 & RF3_IM_ELEC)	resists += 2;
+	if (r_ptr->flags3 & RF3_IM_POIS)	resists += 2;
+
+	/* Oppose elements */
+	if (r_ptr->flags6 & RF6_OPPOSE_ELEM)
+	{
+		if (resists < 5)	resists = 5;
+		else if (resists < 10)  resists++;
+	}
+
+	/* Hack - Immune to weapons & basic resists = tough */
+	if (r_ptr->flags9 & RF9_IM_EDGED)	resists += 5;
+	else if (r_ptr->flags9 & RF9_RES_EDGED)	resists += 2;
+	if (r_ptr->flags9 & RF9_IM_BLUNT) 	resists += 5;
+	else if (r_ptr->flags9 & RF9_RES_BLUNT) resists += 2;
+
+	/* Bonus for multiple basic resists and weapon resists */
+	if (resists >= 10) resists *= 6;
+	else if (resists >= 10) resists *= 4;
+	else if (resists >= 8) resists *= 3;
+	else if (resists >= 6) resists *= 2;
+
+	/* Reduce resists by vulneribilities */
+	if (r_ptr->flags3 & RF3_HURT_LITE)	resists -= 3;
+	if (r_ptr->flags3 & RF3_HURT_ROCK)	resists -= 3;
+	if (r_ptr->flags3 & RF3_HURT_WATER)	resists -= 1;
+	if (r_ptr->flags2 & RF2_MUST_FLY)	resists -= 1;
+	if (r_ptr->flags2 & RF2_MUST_SWIM)	resists -= 1;
+
+	/* If quite resistant, reduce resists by defense holes */
+	if (resists >= 5)
+	{
+		if (!(r_ptr->flags3 & RF3_NO_SLEEP))	resists -= 3;
+		if (!(r_ptr->flags3 & RF3_NO_FEAR))	resists -= 2;
+		if (!(r_ptr->flags3 & RF3_NO_CONF))	resists -= 2;
+		if (!(r_ptr->flags3 & RF3_NO_STUN))	resists -= 1;
+		if (!(r_ptr->flags9 & RF9_NO_SLOW))	resists -= 2;
+		if (!(r_ptr->flags3 & RF9_RES_BLIND))	resists -= 2;
+		if (!(r_ptr->flags9 & RF9_NO_CUTS))	resists -= 1;
+		if (!(r_ptr->flags9 & RF9_RES_TPORT))	resists -= 2;
+
+		if (resists < 0) resists = 0;
+	}
+
+	/* If quite resistant, bonus for high resists */
+	if (resists >= 5)
+	{
+		if (r_ptr->flags9 & RF9_RES_DARK)	resists += 1;
+		if (r_ptr->flags9 & RF9_RES_CHAOS)	resists += 1;
+		if (r_ptr->flags9 & RF9_RES_LITE)	resists += 1;
+		if (r_ptr->flags3 & RF3_RES_WATER)	resists += 1;
+		if (r_ptr->flags3 & RF3_RES_NETHR)	resists += 1;
+		if (r_ptr->flags3 & RF3_RES_LAVA)	resists += 1;
+		if (r_ptr->flags3 & RF3_RES_NEXUS)	resists += 1;
+		if (r_ptr->flags3 & RF3_RES_DISEN)	resists += 1;
+	}
+
+	/* Scale resists to ac */
+	resists = resists * 25;
+
+	/* Get the monster ac */
+	ac = r_ptr->ac;
+
+	/* Some abilities modify armour */
+	if (r_ptr->flags2 & RF2_ARMOR) ac = ac * 4 / 3;
+	if (r_ptr->flags6 & RF6_SHIELD) ac += 50;
+	if (r_ptr->flags6 & RF6_BESERK) ac -= 10;
+
+	/* Upper limit on ac */
+	if (ac > 150) ac = 150;
+
+	/* Immune to weapons */
+	if (r_ptr->flags9 & RF9_IM_EDGED)	ac += 500;
+	else if (r_ptr->flags9 & RF9_RES_EDGED)	ac += 200;
+	if (r_ptr->flags9 & RF9_IM_BLUNT) 	ac += 500;
+	else if (r_ptr->flags9 & RF9_RES_BLUNT) ac += 200;
+
+	/* Sanity check */
+	if (ac < 0) ac = 0;
+
+	/* Easier to kill monster with magic */
+	if (resists < ac)
+	{
+		/* Modify hit points by ac */
+		hp += hp * resists / 250;
+	}
+	else
+	{
+		/* Modify hit points by ac */
+		hp += hp * ac / 250;
+	}
+
+	/*boundry control*/
+	if (hp < 1) hp = 1;
+
+	return (hp);
+
+}
+
 
 
 /*
@@ -1690,19 +1238,11 @@ static bool init_mon_power (void)
 
 		lvl = r_ptr->level;
 
-		/* Evaluate average HP for this monster */
-
-		if (r_ptr->flags1 & (RF1_FORCE_MAXHP)) hp = r_ptr->hdice * r_ptr->hside;
-		else hp = r_ptr->hdice * (r_ptr->hside + 1) / 2;
-
-		/* XXX Adjust hp for common resistances */
-		/* Although we later scale down monster power by brands that affect them, if
-		   a monster is resistant to other weapons, this makes the slay/brand
-		   even more important */
-
 		/* Maximum damage this monster can do in 10 game turns */
-
 		dam = eval_max_dam(i);
+
+		/* Adjust hit points based on resistances */
+		hp = eval_hp_adjust(i);
 
 		/* Define the power rating */
 
@@ -1722,10 +1262,11 @@ static bool init_mon_power (void)
 			mon_power[i] = mon_power[i] * MAX(1, extract_energy[r_ptr->speed
 				+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
 
+#if 0
 		/* Adjust for rarity.  Monsters with rarity > 1 appear less often */
 		/* Paranoia */
 		if (r_ptr->rarity != 0) mon_power[i] /= r_ptr->rarity;
-
+#endif
 		/*
 		 * Update the running totals - these will be used as divisors later
 		 * Total HP / dam / count for everything up to the current level
@@ -1736,10 +1277,18 @@ static bool init_mon_power (void)
 		 * levels deeper XXX We should actually determine power per dungeon, as opposed
                  * to this. e.g. Slay animals is better where game has dungeons
 		 * full of animals. We also exclude townsfolk from the dungeon.
+		 * We also only count uniques once, on the level they appear...
 		 * Was 	for (j = lvl; j < MAX_DEPTH; j++)
+		 *
+		 * Also tried for (j = lvl; j < (lvl == 0 ? 1 : MIN((lvl * 2) + 10, MAX_DEPTH)); j++)
 		 */
-		for (j = lvl; j < (lvl == 0 ? 1 : MIN((lvl * 2) + 10, MAX_DEPTH)); j++)
+		for (j = lvl; j < (lvl == 0 ? lvl + 1: MAX_DEPTH); j++)
 		{
+			/*
+			 * Uniques don't count towards total monster power on the level.
+			 */
+			if (r_ptr->flags1 & RF1_UNIQUE) continue;
+
 			tot_hp[j] += hp;
 			tot_dam[j] += dam;
 
@@ -1748,8 +1297,7 @@ static bool init_mon_power (void)
 			 * so that the averages don't get thrown off
 			 */
 
-			if (r_ptr->flags1 & RF1_UNIQUE) mon_count[j] += 1;
-			else if (r_ptr->flags1 & RF1_FRIEND) mon_count[j] += 2;
+			if (r_ptr->flags1 & RF1_FRIEND) mon_count[j] += 2;
 			else if (r_ptr->flags1 & RF1_FRIENDS) mon_count[j] += 5;
 			else if (r_ptr->flags2 & RF2_MULTIPLY) mon_count[i] += MAX(1, extract_energy[r_ptr->speed
 				+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
@@ -1765,7 +1313,6 @@ static bool init_mon_power (void)
 		r_ptr = &r_info[i];
 
 		/* Extract level */
-
 		lvl = r_ptr->level;
 
 		/* Paranoia */
@@ -1786,17 +1333,33 @@ static bool init_mon_power (void)
 
 			tot_mon_power += mon_power[i];
 		}
+	}
 
-		if (randart_verbose)
+	/* List monsters by level */
+	if (randart_verbose)
+	{
+		for (i = 0; i < MAX_DEPTH; i++)
 		{
-			/* Write the monster power rating, hp and damage to file */
-			fprintf(randart_log, "Power rating for monster %d: ", i);
-			dmg = eval_max_dam(i);
-			fprintf(randart_log, "Max dam: %i ", (int)dmg);
-			fprintf(randart_log, "Rating: %i %s\n", (int)mon_power[i], r_name + r_info[i].name);
-			fflush(randart_log);
-		}
+			fprintf(randart_log, "[Rating][Max dam][Adj hp] Level %d ==============\n", i);
 
+			for (j = 0; j < z_info->r_max; j++)
+			{
+				r_ptr = &r_info[j];
+
+				/* Check level */
+				if (r_ptr->level != i) continue;
+
+				/* Write the monster power rating, hp and damage to file */
+				fprintf(randart_log, " %5i    ", (int)mon_power[j]);
+				dmg = eval_max_dam(j);
+				fprintf(randart_log, "%5i    ", (int)dmg);
+				hp = eval_hp_adjust(j);
+				fprintf(randart_log, "%5i   ", (int)hp);
+				fprintf(randart_log, "%s (%d)\n", r_name + r_info[j].name, j);
+				fflush(randart_log);
+			}
+			fprintf(randart_log, "\n\n\n");
+		}
 	}
 
 	/* Now we have all the ratings */
@@ -6592,11 +6155,16 @@ errr do_randart(u32b randart_seed, bool full)
 		KILL(base_power);
 		KILL(base_item_level);
 		KILL(base_item_rarity);
+		KILL(base_art_rarity);
 
 	}
 
 	/* Free the "slay values" array */
 	KILL(slays);
+
+	/* Free the "mon power" array */
+	KILL(mon_power);
+
 
 	/* When done, resume use of the Angband "complex" RNG. */
 	Rand_quick = FALSE;

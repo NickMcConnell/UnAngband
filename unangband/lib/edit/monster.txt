@@ -251,7 +251,7 @@ B:HIT:HURT:1d3
 F:MALE
 F:RAND_25
 F:ONLY_GOLD | DROP_60
-F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
+F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | FRIEND
 F:HAS_LITE | NEED_LITE | FORCE_DEPTH
 D:The typical ponce around town, with purse jingling, and looking for more
 D: amulets of adornment to buy.
@@ -451,7 +451,7 @@ G:b:o
 I:120:1d6:20:3:10
 W:1:1:0:1
 B:BITE:HURT:1d1
-F:ANIMAL
+F:ANIMAL | RAND_25 | RAND_50
 F:FRIENDS | CAN_FLY | MUST_FLY
 D:A fast-moving pest.
 
@@ -494,7 +494,7 @@ D:It is about four feet long and carnivorous.
 N:35:Apprentice warrior
 G:t:u
 I:110:9d4:20:16:5
-W:2:1:1:6
+W:3:1:1:6
 B:HIT:HURT:1d7
 B:HIT:HURT:1d7
 F:MALE
@@ -817,7 +817,7 @@ B:TOUCH:EAT_GOLD
 F:MALE
 F:DROP_60
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
-F:EVIL | HAS_LITE
+F:EVIL | HAS_LITE | NEED_LITE
 F:SNEAKY
 D:A short little guy, in bedraggled clothes.  He appears to be looking
 D: for a good tavern.
@@ -990,7 +990,7 @@ B:HIT:HURT:1d8
 F:UNIQUE | MALE | FORCE_MAXHP
 F:ONLY_ITEM | DROP_2D2 | DROP_GOOD
 F:OPEN_DOOR | BASH_DOOR
-F:HAS_LITE
+F:HAS_LITE | NEED_LITE
 D:He is a sturdy hobbit who is renowned for his unusual strength and
 D: vigour.  He can prove a troublesome opponent.
 
@@ -2650,7 +2650,7 @@ F:OPEN_DOOR | BASH_DOOR
 F:EVIL | DEMON | IM_FIRE | NO_FEAR
 D:It is a small demonic spirit full of malevolence.
 
-N:202:Gnome counciller
+N:202:Gnome academic
 G:h:R
 I:110:7d8:20:20:20
 W:15:2:0:40
@@ -2662,7 +2662,7 @@ F:OPEN_DOOR | BASH_DOOR | LOW_MANA_RUN
 F:EVIL
 S:BLINK | DARKNESS | BOLT_COLD
 S:S_MONSTER | BOLT_MANA | ADD_MANA
-D:A counciller of short stature.
+D:An academic of short stature.
 
 N:203:Clear hound
 G:Z:w
@@ -3258,6 +3258,18 @@ S:BRTH_FIRE
 D:It is a strange concoction of goat, lion and dragon, with the heads of all
 D: three beasts.
 
+N:243:Busy-looking merchant
+G:t:B
+I:110:3d3:100:1:0
+W:0:1:0:0
+B:HIT:HURT:1d3
+F:MALE
+F:RAND_25
+F:ONLY_GOLD | DROP_60
+F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | FRIEND
+F:HAS_LITE | NEED_LITE | FORCE_DEPTH | TOWNSFOLK
+D:The typical ponce around town, with purse jingling, and looking for more
+D: amulets of adornment to buy.
 
 N:244:Sasquatch
 G:Y:g
@@ -9527,7 +9539,7 @@ B:HIT:HURT:1d8
 F:UNIQUE | MALE
 F:FORCE_MAXHP | 
 F:ONLY_ITEM | DROP_2D2 | DROP_GOOD | 
-F:OPEN_DOOR | BASH_DOOR | HAS_LITE
+F:OPEN_DOOR | BASH_DOOR | HAS_LITE | NEED_LITE
 D:A surly grimy-faced and black-handed hobbit.
 
 #Needs new stats. Using Bullroarer.
@@ -9557,7 +9569,7 @@ B:HIT:HURT:1d8
 F:UNIQUE | MALE
 F:FORCE_MAXHP | 
 F:ONLY_ITEM | DROP_2D2 | DROP_GOOD | 
-F:OPEN_DOOR | BASH_DOOR | HAS_LITE
+F:OPEN_DOOR | BASH_DOOR | HAS_LITE | NEED_LITE
 D:The `Chief Shiriff' of Bag End.  Using money obtained from Isengard and
 D: the sale of pipe-weed, he bought up much property in the Shire and supported
 D: the ruffians known as `The Chief's Men'.  After imprisoning Will Whitfoot,
@@ -12934,7 +12946,7 @@ W:0:2:0:0
 B:BEG
 F:MALE | 
 F:FRIENDS | RAND_50
-F:ONLY_GOLD | DROP_60 | HAS_LITE |
+F:ONLY_GOLD | DROP_60 | HAS_LITE | NEED_LITE
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | FORCE_DEPTH
 D:He makes you glad to be sober.
 
@@ -12944,7 +12956,7 @@ I:110:3d3:10:1:255
 W:0:2:0:0
 B:HIT:HURT:1d3
 F:MALE | 
-F:RAND_25 | HAS_LITE |
+F:RAND_25 | HAS_LITE | NEED_LITE
 F:ONLY_GOLD | DROP_60 | TOWNSFOLK 
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | FORCE_DEPTH
 D:The typical ponce around town, with purse jingling, and looking for more
@@ -12956,7 +12968,7 @@ I:110:5d8:10:20:250
 W:0:1:0:0
 B:HIT:HURT:1d10
 F:MALE | RAND_25
-F:DROP_90 | HAS_LITE |
+F:DROP_90 | HAS_LITE | NEED_LITE
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | 
 F:EVIL | FORCE_DEPTH | TOWNSFOLK
 D:A stalwart defender of the town.
@@ -12964,7 +12976,7 @@ D:A stalwart defender of the town.
 N:874:Surly looking dwarf
 G:h:U
 I:110:10d4:16:20:10
-W:3:3:0:7
+W:4:2:0:7
 B:HIT:HURT:1d7
 B:HIT:HURT:1d7
 F:MALE | 
@@ -12976,7 +12988,7 @@ D: to sharpen his axe.
 N:875:Haughty looking elf
 G:l:W
 I:110:6d6:18:16:10
-W:3:1:0:10
+W:4:2:0:10
 B:HIT:HURT:1d5
 B:HIT:HURT:1d5
 B:ARROW:HURT:2d6
@@ -13003,7 +13015,7 @@ I:110:9d8:18:28:10
 W:10:2:0:35
 B:HIT:HURT:2d4
 B:TOUCH:EAT_GOLD
-F:MALE | 
+F:MALE |
 F:DROP_1D2 | 
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | SNEAKY |
 F:EVIL
@@ -13484,7 +13496,7 @@ D:This glistening ruby dragonfly doesn't seem to move at all.
 N:917:Giant may fly
 G:I:g
 I:120:3d8:12:14:20
-W:4:1:0:14
+W:6:4:0:14
 B:BITE:HURT:1d4
 F:RAND_50 | RAND_25
 F:MULTIPLY | WEIRD_MIND
@@ -14333,9 +14345,9 @@ D:It is a strange violet growth on the dungeon floor.
 N:984:White naga
 G:n:w
 I:110:8d8:17:40:120
-W:4:1:0:25
+W:4:2:0:25
 B:CRUSH:HURT:1d8
-B:STING:POISON:1d6
+B:STING:HURT:1d6
 F:FEMALE | 
 F:RAND_25 | DROP_60 | 
 F:BASH_DOOR | 
@@ -15166,7 +15178,7 @@ G:t:G
 I:110:1d4:4:1:40
 W:0:1:0:0
 F:MALE
-F:TAKE_ITEM | OPEN_DOOR | HAS_LITE | FORCE_DEPTH | TOWNSFOLK
+F:TAKE_ITEM | OPEN_DOOR | HAS_LITE | FORCE_DEPTH | TOWNSFOLK | NEED_LITE
 D:He has no time to talk to you.
 
 N:1049:Hobbit good wife
@@ -15174,7 +15186,7 @@ G:h:G
 I:110:1d4:4:1:40
 W:0:1:0:0
 F:FEMALE
-F:OPEN_DOOR | HAS_LITE | FORCE_DEPTH | TOWNSFOLK
+F:OPEN_DOOR | HAS_LITE | FORCE_DEPTH | TOWNSFOLK | NEED_LITE
 D:She is a merry looking woman on an errand.
 
 

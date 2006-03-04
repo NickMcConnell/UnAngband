@@ -1880,6 +1880,7 @@ void py_attack(int y, int x)
 
 	bool do_quake = FALSE;
 
+	bool was_asleep;
 
 	/* Get the monster */
 	m_ptr = &m_list[cave_m_idx[y][x]];
@@ -1890,10 +1891,11 @@ void py_attack(int y, int x)
 	/* Disturb the player */
 	disturb(0, 0);
 
+	/* Check if monster asleep */
+	was_asleep = (m_ptr->csleep == 0);
 
 	/* Disturb the monster */
 	m_ptr->csleep = 0;
-
 
 	/* Extract monster name (or "it") */
 	monster_desc(m_name, m_ptr, 0);
@@ -1925,7 +1927,7 @@ void py_attack(int y, int x)
 	melee_style = p_ptr->cur_style & (WS_WIELD_FLAGS);
 
 	/* Check backstab if monster sleeping or fleeing */
-	if (((m_ptr->csleep)||(m_ptr->monfear)) && (p_ptr->cur_style & (1L<<WS_SWORD)) &&
+	if (((was_asleep) || (m_ptr->monfear)) && (p_ptr->cur_style & (1L<<WS_SWORD)) &&
 		  (p_ptr->pstyle ==WS_BACKSTAB) && (inventory[INVEN_WIELD].weight < 100)) melee_style |= (1L <<WS_BACKSTAB);
 
 	/* Check slay orc if monster is an orc */
@@ -1979,9 +1981,7 @@ void py_attack(int y, int x)
 
 			}
 		}
-
 	}
-
 
 	/* Only allow criticals against living opponents */
 	if ((r_ptr->flags3 & (RF3_NONLIVING)) || (r_ptr->flags2 & (RF2_STUPID)))
@@ -1992,6 +1992,9 @@ void py_attack(int y, int x)
 	/* Only allow criticals against visible opponents */
 	if (!(m_ptr->ml)) style_crit = 0;
 
+	/* Mark the monster as attacked by melee */
+	m_ptr->mflag |= (MFLAG_HIT_BLOW);
+
 	/* Attack once for each legal blow */
 	while (num++ < p_ptr->num_blow)
 	{
@@ -1999,6 +2002,20 @@ void py_attack(int y, int x)
 
 		/* Deliver a blow */
 		blows++;
+
+		/* Some monsters are great at dodging  -EZ- */
+		if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!was_asleep) &&
+			(!m_ptr->stunned) && (!m_ptr->confused) && (!m_ptr->blind) && (!m_ptr->monfear)
+			&& (rand_int(2)))
+		{
+			message_format(MSG_MISS, 0, "%^s evades your blow!",
+				m_name);
+
+			/* Learn that monster can dodge */
+			l_ptr->flags9 |= (RF9_EVASIVE);
+
+			continue;
+		}
 
 		/* Get secondary weapon instead */
 		if (!(blows % 2) && (melee_style & (1L << WS_TWO_WEAPON))) slot = INVEN_ARM;
@@ -2026,7 +2043,7 @@ void py_attack(int y, int x)
 		chance = (p_ptr->skill_thn + (bonus * BTH_PLUS_ADJ));
 
 		/* Test for hit */
-		if (test_hit_norm(chance, r_ptr->ac, m_ptr->ml))
+		if (test_hit_norm(chance, r_ptr->ac + (m_ptr->shield ? 50 : 0), m_ptr->ml))
 		{
 			/* Hack --- backstab. Weapon of 10 lbs or less */
 			if (melee_style & (1L << WS_BACKSTAB))
@@ -2181,9 +2198,11 @@ void py_attack(int y, int x)
 		message_format(MSG_FLEE, m_ptr->r_idx, "%^s flees in terror!", m_name);
 	}
 
-
 	/* Mega-Hack -- apply earthquake brand */
 	if (do_quake) earthquake(p_ptr->py, p_ptr->px, 10);
+
+	/* Only use required energy to kill monster */
+	p_ptr->energy_use = 100 * blows / p_ptr->num_blow;
 }
 
 /*

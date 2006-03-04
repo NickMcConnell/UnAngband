@@ -282,6 +282,7 @@ header d_head;
 header f_head;
 header k_head;
 header a_head;
+header n_head;
 header e_head;
 header x_head;
 header r_head;
@@ -760,6 +761,31 @@ static errr init_a_info(void)
 	return (err);
 }
 
+
+
+/*
+ * Initialize the "n_info" structure
+ */
+static errr init_n_info(void)
+{
+  errr err;
+
+  /* Init the header */
+  init_header(&n_head, 1, sizeof(names_type));
+
+#ifdef ALLOW_TEMPLATES
+
+  /* Save a pointer to the parsing function */
+  n_head.parse_info_txt = parse_n_info;
+
+#endif /* ALLOW_TEMPLATES */
+
+  err = init_info("names", &n_head);
+
+  n_info = n_head.info_ptr;
+
+  return (err);
+}
 
 
 /*
@@ -1891,6 +1917,10 @@ void init_angband(void)
 	note("[Initializing arrays... (artifacts)]");
 	if (init_a_info()) quit("Cannot initialize artifacts");
 
+	/* Initialize name info */
+	note("[Initializing arrays... (names)]");
+	if (init_n_info()) quit("Cannot initialize names");
+
 	/* Initialize ego-item info */
 	note("[Initializing arrays... (ego-items)]");
 	if (init_e_info()) quit("Cannot initialize ego-items");
@@ -2073,6 +2103,7 @@ void cleanup_angband(void)
 	free_info(&r_head);
 	free_info(&x_head);
 	free_info(&e_head);
+	free_info(&n_head);
 	free_info(&a_head);
 	free_info(&k_head);
 	free_info(&f_head);

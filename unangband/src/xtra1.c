@@ -3259,6 +3259,23 @@ static void calc_bonuses(void)
 	{
 		/* Redraw speed */
 		p_ptr->redraw |= (PR_SPEED);
+
+		/* Hack -- check for monster speed changes */
+		for (i = 0; i < z_info->m_max; i++)
+		{
+			monster_type *m_ptr = &m_list[i];
+			monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+			/* Skip dead monsters */
+		      	if (!m_ptr->r_idx) continue;
+
+			/* Monster always has same speed as player */
+			if (r_ptr->flags9 & (RF9_SAME_SPEED))
+			{
+				/* Sanity check */
+				calc_monster_speed(m_ptr->fy, m_ptr->fx);
+			}
+		}
 	}
 
 	/* Redraw armor (if needed) */

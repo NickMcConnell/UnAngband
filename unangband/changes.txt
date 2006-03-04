@@ -176,6 +176,10 @@ learn it (randomly) but cannot cast it.  (Fixed by kobayasi)
 
 - Fixed some instances where resistance to fear didn't work.
 
+- It is now possible to backstab sleeping monsters.
+
+- You should only use enough energy in melee to kill a monster, again.
+
 ### Build / Platform ###
 
 - Added quest.txt in lib\edit which is used to defined fixed texts.
@@ -194,6 +198,15 @@ not used.
 
 - Cleaned up code somewhat by using monster flags more often instead of
 depending on matching monster names.
+
+- Temporarily disabled random artifacts to prevent crashing once game run.
+This is possibly an out of memory issue on windows, or failure to free
+allocated resources correctly. Can also be fixed by reducing the size of
+the monster list.
+
+- Significantly improved the monster metrics used for computing relative
+monster power, for determining artifact and object slays. Some of this
+from NPPAngband.
 
 Unangband 0.5.5: "New Years Resolution"
 

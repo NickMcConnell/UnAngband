@@ -700,6 +700,11 @@ char *a_name;
 char *a_text;
 
 /*
+ * The random name generator tables
+ */
+names_type *n_info;
+
+/*
  * The ego-item arrays
  */
 ego_item_type *e_info;

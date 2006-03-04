@@ -1390,6 +1390,14 @@
 
 
 /*
+ * Maximum length of artifact names
+ */
+#define MAX_LEN_ART_NAME 30
+
+#define S_WORD 26
+#define E_WORD S_WORD
+
+/*
  * Hack -- first "normal" artifact in the artifact list.  All of
  * the artifacts with indexes from 1 to 15 are "special" (lights,
  * rings, amulets), and the ones from 16 to 127 are "normal".

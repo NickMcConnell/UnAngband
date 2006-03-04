@@ -2311,6 +2311,13 @@ void calc_monster_speed(int y, int x)
 	/* Paranoia XXX XXX */
 	if (cave_m_idx[y][x] == 0) return;
 
+	/* Monster has same speed as player? */
+	if (r_ptr->flags9 & (RF9_SAME_SPEED))
+	{
+		speed = p_ptr->pspeed;
+		return;
+	}
+
 	/* Get the monster base speed */
 	speed = r_ptr->speed;
 

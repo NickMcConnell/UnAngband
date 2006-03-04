@@ -84,6 +84,7 @@ typedef struct feature_type feature_type;
 typedef struct object_kind object_kind;
 typedef struct object_lore object_lore;
 typedef struct artifact_type artifact_type;
+typedef struct names_type names_type;
 typedef struct ego_item_type ego_item_type;
 typedef struct flavor_type flavor_type;
 typedef struct monster_blow monster_blow;
@@ -489,6 +490,16 @@ struct artifact_type
 
 	s32b power;	/* Pre-computed power */
 };
+
+
+/*structure of letter probabilitiesfor the random name generator*/
+struct names_type
+{
+	u16b lprobs[S_WORD+1][S_WORD+1][S_WORD+1];
+	u16b ltotal[S_WORD+1][S_WORD+1];
+};
+
+
 
 /*
  * Information about "ego-items".

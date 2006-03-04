@@ -71,6 +71,10 @@ static int check_hit(int power, int level, int m_idx)
 	int i, k, ac;
 
 	monster_type *m_ptr = &m_list[m_idx];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	/* Monster never misses */
+	if (r_ptr->flags9 & (RF9_NEVER_MISS)) return (TRUE);
 
 	/* Percentile dice */
 	k = rand_int(100);
@@ -78,8 +82,8 @@ static int check_hit(int power, int level, int m_idx)
 	/* Hack -- Always miss or hit */
 	if (k < 10) return (k < 5);
 
-	/* Calculate the "attack quality".  Stunned monsters are hindered. */
-	i = (power + (m_ptr->stunned ? level * 2 : level * 3));
+	/* Calculate the "attack quality".  Blind monsters are greatly hindered. Stunned monsters are hindered. */
+	i = (power + (m_ptr->blind ? level * 1 : (m_ptr->stunned ? level * 2 : level * 3)));
 
 	/* Total armor */
 	ac = p_ptr->ac + p_ptr->to_a + p_ptr->blocking;
@@ -4960,16 +4964,22 @@ void mon_hit_trap(int m_idx, int y, int x)
 	feature_type *f_ptr;
 	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+	monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
 	int feat = cave_feat[y][x];
 
 	bool fear;
+
+	char m_name[80];
 
 	/* Hack --- don't activate unknown invisible traps */
 	if (cave_feat[y][x] == FEAT_INVIS) return;
 
 	/* Get feature */
 	f_ptr = &f_info[cave_feat[y][x]];
+
+	/* Get "the monster" or "it" */
+	monster_desc(m_name, m_ptr, 0);
 
 	/* Hack --- trapped doors */
 	/* XXX XXX Dangerous */
@@ -5000,8 +5010,28 @@ void mon_hit_trap(int m_idx, int y, int x)
 		monster_swap(m_ptr->fy, m_ptr->fx, y, x);
 	}
 
+	/* Hack -- evasive monsters may ignore trap */
+	if ((r_ptr->flags9 & (RF9_EVASIVE)) && (rand_int(3)))
+	{
+		if (m_ptr->ml)
+		{
+			/* Message */
+			msg_format("%^s dodges a trap.", m_name);
+
+			/* Note that monster is evasive */
+			l_ptr->flags9 |= (RF9_EVASIVE);
+
+			if (f_ptr->flags1 & (FF1_SECRET))
+			{
+				/* Discover */
+				cave_alter_feat(y,x,FS_SECRET);
+			}
+		}
+		return;
+	}
+
 	/* Apply the object */
-	if ((cave_o_idx[y][x]) && (f_ptr->flags1 & (FF1_HIT_TRAP)))
+	else if ((cave_o_idx[y][x]) && (f_ptr->flags1 & (FF1_HIT_TRAP)))
 	{
 		object_type *o_ptr = &o_list[cave_o_idx[y][x]];
 
@@ -5042,7 +5072,8 @@ void mon_hit_trap(int m_idx, int y, int x)
 						/* Describe ammo */
 						object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
 
-						if ((ammo) && (test_hit_fire((j_ptr->to_h + o_ptr->to_h)* BTH_PLUS_ADJ + f_ptr->power,  r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 2 : 1), TRUE)))
+						/* Did we hit? */
+						if (test_hit_fire((j_ptr->to_h + o_ptr->to_h)* BTH_PLUS_ADJ + f_ptr->power,  r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 2 : 1) + (m_ptr->shield ? 100 : 0), TRUE))
 						{
 							int k, mult;
 
@@ -5081,6 +5112,11 @@ void mon_hit_trap(int m_idx, int y, int x)
 							/* Damage, check for fear and death */
 							(void)mon_take_hit(cave_m_idx[y][x], k, &fear, NULL);
 
+						}
+						else
+						{
+							/* Trap description */
+							if (m_ptr->ml) msg_format("%^s narrowly misses %s.",o_name, m_name);					
 						}
 
 						/* Get local object */
@@ -5123,7 +5159,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
 
 				/* Test for hit */
-				if (test_hit_norm(o_ptr->to_h * BTH_PLUS_ADJ + f_ptr->power, r_ptr->ac, TRUE))
+				if (test_hit_norm(o_ptr->to_h * BTH_PLUS_ADJ + f_ptr->power, r_ptr->ac  + (m_ptr->shield ? 50 : 0), TRUE))
 				{
 					int k;
 
@@ -5147,7 +5183,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 				else
 				{
 					/* Trap description */
-					msg_format("%^s narrowly misses you.",o_name);					
+					if (m_ptr->ml) msg_format("%^s narrowly misses %s.",o_name, m_name);					
 				}
 
 				/* Get local object */

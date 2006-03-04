@@ -3257,9 +3257,10 @@ void play_game(bool new_game)
 		/* Roll up a new character */
 		player_birth();
 
+#if 0
                 /* Random artifacts */
                 do_randart(seed_randart, TRUE);
-
+#endif
 		/* Hack -- enter the world */
 		turn = 1;
 

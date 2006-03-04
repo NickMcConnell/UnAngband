@@ -119,6 +119,7 @@ extern errr parse_h_info(char *buf, header *head);
 extern errr parse_b_info(char *buf, header *head);
 extern errr parse_g_info(char *buf, header *head);
 extern errr parse_q_info(char *buf, header *head);
+extern errr parse_n_info(char *buf, header *head);
 extern errr parse_flavor_info(char *buf, header *head);
 
 /*
@@ -153,5 +154,6 @@ extern header h_head;
 extern header b_head;
 extern header g_head;
 extern header q_head;
+extern header n_head;
 
 #endif /* INCLUDED_INIT_H */
