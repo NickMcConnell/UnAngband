@@ -90,17 +90,14 @@ sint critical_shot(int weight, int plus, int dam)
 
 		if (k < 500)
 		{
-			msg_print("It was a good hit!");
 			dam = dam * 2 + 5;
 		}
 		else if (k < 1000)
 		{
-			msg_print("It was a great hit!");
 			dam = ((dam * 5) / 2) + 10;
 		}
 		else
 		{
-			msg_print("It was a superb hit!");
 			dam = dam * 3 + 15;
 		}
 	}
@@ -129,27 +126,22 @@ sint critical_norm(int weight, int plus, int dam)
 
 		if (k < 400)
 		{
-			msg_print("It was a good hit!");
 			dam = dam * 2 + 5;
 		}
 		else if (k < 700)
 		{
-			msg_print("It was a great hit!");
 			dam = ((dam * 5) / 2) + 10;
 		}
 		else if (k < 900)
 		{
-			msg_print("It was a superb hit!");
 			dam = dam * 3 + 15;
 		}
 		else if (k < 1300)
 		{
-			msg_print("It was a *GREAT* hit!");
 			dam = ((dam * 7) / 2) + 20;
 		}
 		else
 		{
-			msg_print("It was a *SUPERB* hit!");
 			dam = dam * 4 + 25;
 		}
 	}
@@ -1493,9 +1485,6 @@ void hit_trap(int y, int x)
 				}
 			}
 
-			case TV_SHOT:
-			case TV_ARROW:
-			case TV_BOLT:
 			case TV_HAFTED:
 			case TV_SWORD:
 			case TV_POLEARM:
@@ -1867,6 +1856,8 @@ void py_attack(int y, int x)
 	int blows = 0; /* Number of blows actually delivered */
 
 	int i;
+	int do_cuts = 0;
+	int do_stun = 0;
 	
 	monster_type *m_ptr;
 	monster_race *r_ptr;
@@ -2043,20 +2034,19 @@ void py_attack(int y, int x)
 		chance = (p_ptr->skill_thn + (bonus * BTH_PLUS_ADJ));
 
 		/* Test for hit */
-		if (test_hit_norm(chance, r_ptr->ac + (m_ptr->shield ? 50 : 0), m_ptr->ml))
+		if (!test_hit_norm(chance, r_ptr->ac + (m_ptr->shield ? 50 : 0) + (m_ptr->bless ? 5 : 0) - (m_ptr->beserk ? 10 : 0), m_ptr->ml))
 		{
-			/* Hack --- backstab. Weapon of 10 lbs or less */
-			if (melee_style & (1L << WS_BACKSTAB))
-			{
-				/* Message */
-				message_format(MSG_HIT, m_ptr->r_idx, "You backstab %s.", m_name);
-			}
-			else
-			{
-				/* Message */
-				message_format(MSG_HIT, m_ptr->r_idx, "You hit %s.", m_name);
-			}
-
+			/* Message */
+			message_format(MSG_MISS, m_ptr->r_idx, "You miss %s.", m_name);
+		}
+		else if (mon_resist_object(m_ptr, o_ptr))
+		{
+			/* No need for message */
+			continue;
+		}
+		/* Player hits */
+		else
+		{
 			/* Handle normal weapon/gauntlets/boots */
 			if (o_ptr->k_idx)
 			{
@@ -2070,7 +2060,29 @@ void py_attack(int y, int x)
 				k = damroll(o_ptr->dd, o_ptr->ds);
 				k = tot_dam_aux(o_ptr, k, m_ptr);
 
-				k = critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
+				switch (o_ptr->tval)
+				{
+					case TV_POLEARM:
+					{
+						int j = rand_int(100);
+
+						if (j < 33)
+							do_cuts = critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
+						else if (j < 66)
+							do_stun = critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
+						else
+							k = critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
+					}
+					case TV_SWORD:
+					{
+						do_cuts = critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
+					}
+					default:
+					{
+						do_stun = critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
+					}
+				}
+
 				k += o_ptr->to_d;
 
 				/* Check for new flags */
@@ -2095,7 +2107,7 @@ void py_attack(int y, int x)
 				else if ((p_ptr->cur_flags3 & (TR3_IMPACT)) == 0)
 				{
 					/* Sometimes notice */
-					if (rand_int(100)<50) equip_not_flags(0x0L,0x0L,TR3_IMPACT,0x0L);
+					equip_not_flags(0x0L,0x0L,TR3_IMPACT,0x0L);
 				}
 
 			}
@@ -2103,36 +2115,80 @@ void py_attack(int y, int x)
 			else
 			{
 				k = 1;
-				k = critical_norm(c_info[p_ptr->pclass].min_weight, (style_crit * 30),k);
+				do_stun += critical_norm(c_info[p_ptr->pclass].min_weight, (style_crit * 30),k);
 			}
 
+			/* Adjust for style */
 			k += p_ptr->to_d + style_dam;
 
-			/* ANDY - On the road to making player and monster attacks
-			 * symetric. That is, we want monster damage to be applied
-			 * roughly similiarly to player damage.
-			 *
-			 * We decrease monster hit points by the inverse of the equation
-			 * below so that melee stays as effective as previous.
-			 *
-			 * This has the effect of increasing the effectiveness of spells
-			 * against heavily armoured opponents by up to 1 2/3 times.
-			 *
-			 * Note that player missiles ignore armour, but do not multiply
-			 * damage bonus anymore.
-			 * In particular, for ammo, the base damage counts for more.
-			 */
-
-			/* Hack -- Monster armor reduces total damage */
+			/* Monster armor reduces total damage */
 			k -= (k * ((r_ptr->ac < 150) ? r_ptr->ac : 150) / 250);
 
 			/* No negative damage */
 			if (k < 0) k = 0;
 
+			/* Some monsters resist stun */
+			if (r_ptr->flags3 & (RF3_NO_STUN)) do_stun = 0;
+
+			/* Some monsters resist cuts */
+			if (r_ptr->flags9 & (RF9_NO_CUTS)) do_stun = 0;
+
+			/* Hack --- backstab. Weapon of 10 lbs or less */
+			if (melee_style & (1L << WS_BACKSTAB))
+			{
+				/* Message */
+				message_format(MSG_HIT, m_ptr->r_idx, "You backstab %s.", m_name);
+			}
+			else if (do_stun)
+			{
+				/* Message */
+				message_format(MSG_HIT, m_ptr->r_idx, "You batter %s.", m_name);
+			}
+			else if (do_cuts)
+			{
+				/* Message */
+				message_format(MSG_HIT, m_ptr->r_idx, "You wound %s.", m_name);
+			}
+			else
+			{
+				/* Message */
+				message_format(MSG_HIT, m_ptr->r_idx, "You hit %s.", m_name);
+			}
+
 			/* Complex message */
 			if (p_ptr->wizard)
 			{
 				msg_format("You do %d (out of %d) damage.", k, m_ptr->hp);
+			}
+
+			/* Apply stun effect */
+			if (do_stun)
+			{
+				/* Avoid overflow */
+				if ((do_stun + m_ptr->stunned) / (r_ptr->level / 10 + 1) > 875)
+				{
+					k+= 4 * ((do_stun + m_ptr->stunned) / (r_ptr->level / 10 + 1) - 100) / 5;
+					m_ptr->stunned = 255;
+				}
+
+				/* Convert some stun damage to damage */
+				else if ((do_stun + m_ptr->stunned) / (r_ptr->level / 10 + 1) > 100)
+				{
+					k+= 4 * ((do_stun + m_ptr->stunned) / (r_ptr->level / 10 + 1) - 100) / 5;
+					m_ptr->stunned = (100 + (do_stun + m_ptr->stunned - 100) / 5) ;
+				}
+				else m_ptr->stunned += do_stun / (r_ptr->level / 10 + 1);
+			}
+
+			/* Apply cuts effect */
+			if (do_cuts)
+			{
+				if ((m_ptr->cut + do_cuts) / (r_ptr->level / 10 + 1) > 255)
+				{
+					k+= ((m_ptr->cut + do_cuts) / (r_ptr->level / 10 + 1)) - 255;
+					m_ptr->cut = 255;
+				}
+				else m_ptr->cut += do_cuts / (r_ptr->level / 10 + 1);
 			}
 
 			/* Damage, check for fear and death */
@@ -2181,15 +2237,7 @@ void py_attack(int y, int x)
 				break;
 			}
 		}
-
-		/* Player misses */
-		else
-		{
-			/* Message */
-			message_format(MSG_MISS, m_ptr->r_idx, "You miss %s.", m_name);
-		}
 	}
-
 
 	/* Hack -- delay fear messages */
 	if (fear && m_ptr->ml)

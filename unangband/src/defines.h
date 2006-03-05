@@ -889,6 +889,7 @@
 
 /* More traps */
 #define FEAT_TRAP_HEAD_2 0x0040
+#define FEAT_TRAP_ROCK_NONE 0x005F
 #define FEAT_TRAP_TAIL_2 0x005F
 
 #define FEAT_RUBBLE_H    0x0060
@@ -2352,13 +2353,13 @@
 #define PROJECT_KILL         0x00002000
 #define PROJECT_PLAY         0x00004000
 #define PROJECT_SAFE         0x00008000 /*(unused)*/
-#define PROJECT_XXX6         0x00010000
+#define PROJECT_LITE         0x00010000
 #define PROJECT_XXX7         0x00020000
 
 /* Graphics */
 #define PROJECT_HIDE         0x00040000
 #define PROJECT_NO_REDRAW    0x00080000
-#define PROJECT_XXX9         0x00100000
+#define PROJECT_XXX         0x00100000
 
 /* How projections travel */
 #define PROJECT_STOP         0x00200000
@@ -3312,7 +3313,7 @@
 #define RF9_TOWNSFOLK      0x01000000      /* Use townsfolk AI */
 #define RF9_DROP_ESSENCE   0x02000000      /* Drop essences */
 #define RF9_DROP_MUSHROOM  0x04000000      /* Drop specific mushrooms */
-#define RF9_DROP_COINS     0x08000000      /* Drop specific gold */
+#define RF9_DROP_MINERAL   0x08000000      /* Drop specific gold */
 #define RF9_ATTR_METAL     0x10000000      /* Changes color 'brighter' */
 #define RF9_ATTR_INDEX     0x20000000      /* Changes color by index */
 #define RF9_MORGUL_MAGIC   0x40000000      /* Morgul magic */

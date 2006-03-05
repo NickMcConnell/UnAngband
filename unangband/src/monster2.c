@@ -1333,7 +1333,7 @@ void update_mon(int m_idx, bool full)
 				}
 
 				/* Handle "invisible" monsters */
-				else if (r_ptr->flags2 & (RF2_INVISIBLE))
+				else if ((r_ptr->flags2 & (RF2_INVISIBLE)) || (m_ptr->tim_invis))
 				{
 					/* Take note */
 					do_invisible = TRUE;
@@ -1386,7 +1386,7 @@ void update_mon(int m_idx, bool full)
 				/* Memorize flags */
 				if (do_invisible)
 				{
-					l_ptr->flags2 |= (RF2_INVISIBLE);
+					if (r_ptr->flags2 & RF2_INVISIBLE) l_ptr->flags2 |= (RF2_INVISIBLE);
 #ifdef ALLOW_OBJECT_INFO_MORE
 					if ((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) equip_can_flags(0x0L,0x0L,TR3_SEE_INVIS,0x0L);
 #endif

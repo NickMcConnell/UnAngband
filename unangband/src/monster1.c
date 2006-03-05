@@ -559,7 +559,7 @@ static void describe_monster_drop(int r_idx, const monster_lore *l_ptr)
 		if (l_ptr->drop_gold)
 		{
 			/* Dump "treasure(s)" */
-			if (l_ptr->flags9 & (RF9_DROP_COINS))
+			if (l_ptr->flags9 & (RF9_DROP_MINERAL))
 			{
 				int coin_type = get_coin_type(r_ptr);
 

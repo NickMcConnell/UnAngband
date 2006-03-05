@@ -1733,7 +1733,7 @@ static void get_move_advance(monster_type *m_ptr, int *ty, int *tx)
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	/* Monster can go through rocks - head straight for character */
-	if ((r_ptr->flags2 & (RF2_PASS_WALL)) || 
+	if ((r_ptr->flags2 & (RF2_PASS_WALL)) || (m_ptr->tim_passw > 10) ||
 	   (r_ptr->flags2 & (RF2_KILL_WALL)))
 	{
 		*ty = py;
@@ -2166,7 +2166,7 @@ static bool get_move_retreat(monster_type *m_ptr, int *ty, int *tx)
 	if (!player_has_los_bold(m_ptr->fy, m_ptr->fx))
 	{
 		/* Monster cannot pass through walls */
-		if (!((r_ptr->flags2 & (RF2_PASS_WALL)) || 
+		if (!((r_ptr->flags2 & (RF2_PASS_WALL)) || (m_ptr->tim_passw > 10) ||
 	      	 (r_ptr->flags2 & (RF2_KILL_WALL))))
 		{
 			/* Run away from noise */
@@ -2465,7 +2465,7 @@ static bool get_move(monster_type *m_ptr, int *ty, int *tx, bool *fear,
 	/* Animal packs try to lure the character into the open. */
 	if ((!*fear) && (r_ptr->flags1 & (RF1_FRIENDS)) && 
 			(r_ptr->flags3 & (RF3_ANIMAL))  && 
-		      (!((r_ptr->flags2 & (RF2_PASS_WALL)) || 
+		      (!((r_ptr->flags2 & (RF2_PASS_WALL)) || (m_ptr->tim_passw > 10) ||
 		      (r_ptr->flags2 & (RF2_KILL_WALL)))))
 	{
 		/* Animal has to be willing to melee */
@@ -2597,7 +2597,7 @@ static bool get_move(monster_type *m_ptr, int *ty, int *tx, bool *fear,
 
 
 	/* Monster can go through rocks - head straight for character */
-	if ((!*fear) && ((r_ptr->flags2 & (RF2_PASS_WALL)) || 
+	if ((!*fear) && ((r_ptr->flags2 & (RF2_PASS_WALL)) || (m_ptr->tim_passw > 10) ||
 			 (r_ptr->flags2 & (RF2_KILL_WALL))))
 	{
 		*ty = py;
@@ -3565,6 +3565,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 	/* Get the move */
 	mmove = place_monster_here(ny,nx,m_ptr->r_idx);
 
+	/* Temporary pass wall */
+	if ((m_ptr->tim_passw) && (mon_resist_feat(m_idx, m_ptr->r_idx))) mmove = MM_PASS;
+
 	/* The monster is stuck in terrain */
 	if (!(m_ptr->mflag & (MFLAG_OVER)) && !(f_info[cave_feat[oy][ox]].flags1 & (FF1_MOVE)) &&
 		(place_monster_here(oy,ox,m_ptr->r_idx)<= 0) && (mmove != MM_PASS))
@@ -4299,7 +4302,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		if (did_kill_body) l_ptr->flags2 |= (RF2_KILL_BODY);
 
 		/* Monster passed through a wall */
-		if (did_pass_wall) l_ptr->flags2 |= (RF2_PASS_WALL);
+		if ((did_pass_wall) && !(m_ptr->tim_passw)) l_ptr->flags2 |= (RF2_PASS_WALL);
 
 		/* Monster destroyed a wall */
 		if (did_kill_wall) l_ptr->flags2 |= (RF2_KILL_WALL);
@@ -4333,7 +4336,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		if (mmove == MM_OOZE) l_ptr->flags3 |= (RF3_OOZE);
 
 		/* Monster is passing */
-		if (mmove == MM_PASS) l_ptr->flags2 |= (RF2_PASS_WALL);
+		if ((mmove == MM_PASS)  && !(m_ptr->tim_passw)) l_ptr->flags2 |= (RF2_PASS_WALL);
 
 	}
 }
@@ -5132,6 +5135,13 @@ static void recover_monster(int m_idx, bool regen)
 		{
 			/* Reduce the confusion */
 			m_ptr->tim_passw -= d;
+		}
+
+ 		/* Hack -- second chance for unseen monsters */
+		else if (!m_ptr->ml)
+		{
+			/* Keep passing wall */
+			m_ptr->tim_passw = 1;
 		}
 
 		/* Expired */

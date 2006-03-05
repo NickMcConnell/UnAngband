@@ -533,6 +533,7 @@ extern bool load_player(void);
 extern int get_breath_dam(s16b hit_points, int gf_type, bool powerful);
 extern bool make_attack_normal(int m_idx);
 extern bool make_attack_ranged(int who, int attack, int py, int px);
+extern bool mon_resist_object(const monster_type *m_ptr, const object_type *o_ptr);
 extern void mon_hit_trap(int m_idx, int y, int x);
 
 /* melee2.c */

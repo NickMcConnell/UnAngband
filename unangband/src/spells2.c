@@ -1700,7 +1700,7 @@ bool detect_monsters_normal(void)
 		if (!panel_contains(y, x)) continue;
 
 		/* Detect all non-invisible monsters */
-		if (!(r_ptr->flags2 & (RF2_INVISIBLE)))
+		if (!(r_ptr->flags2 & (RF2_INVISIBLE)) && !(m_ptr->tim_invis))
 		{
 			/* Optimize -- Repair flags */
 			repair_mflag_mark = repair_mflag_show = TRUE;
@@ -1755,7 +1755,7 @@ bool detect_monsters_invis(void)
 		/* Only detect nearby monsters */
 		if (!panel_contains(y, x)) continue;
 
-		/* Detect invisible monsters */
+		/* Note invisible monsters */
 		if (r_ptr->flags2 & (RF2_INVISIBLE))
 		{
 			/* Take note that they are invisible */
@@ -1768,6 +1768,11 @@ bool detect_monsters_invis(void)
 				p_ptr->window |= (PW_MONSTER);
 			}
 
+		}
+
+		/* Detect invisible monsters */
+		if ((r_ptr->flags2 & (RF2_INVISIBLE)) || (m_ptr->tim_invis))
+		{
 			/* Optimize -- Repair flags */
 			repair_mflag_mark = repair_mflag_show = TRUE;
 
@@ -3847,7 +3852,7 @@ void entomb(int cy, int cx, byte invalid)
 		monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 		/* Most monsters cannot co-exist with rock */
-		if (!(r_ptr->flags2 & (RF2_KILL_WALL)) &&
+		if (!(r_ptr->flags2 & (RF2_KILL_WALL)) && !(m_ptr->tim_passw) &&
 		    !(r_ptr->flags2 & (RF2_PASS_WALL)) &&
 			!(f_info[cave_feat[cy][cx]].flags3 & (FF3_OUTSIDE)))
 		{

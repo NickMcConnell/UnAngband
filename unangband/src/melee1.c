@@ -449,7 +449,7 @@ bool make_attack_normal(int m_idx)
 		}
 
 		/* Monster hits player */
-		if (!effect || check_hit(power, rlev, m_idx))
+		if (!effect || check_hit(power + (m_ptr->bless ? 10 : 0) + (m_ptr->beserk ? 24 : 0), rlev, m_idx))
 		{
 			/* Always disturbing */
 			disturb(1, 0);
@@ -4955,6 +4955,159 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 
 
+/*
+ * Determine if monster evades or resists a blow.  -LM-
+ *
+ * Return TRUE if blow was avoided.
+ */
+bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
+{
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+	monster_lore *l_ptr = &l_list[m_ptr->r_idx];
+
+	int resist = 0;
+	bool learn = FALSE;
+
+	cptr note = "";
+
+	char m_name[80];
+	char o_name[80];
+
+	/* Get "the monster" or "it" */
+	monster_desc(m_name, m_ptr, 0x40);
+
+	/* Describe object */
+	if (o_ptr->k_idx) object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
+	else (strcpy(o_name,"the attack"));
+
+	/*
+	 * Handle monsters that resist blunt and/or edged weapons. We include
+	 * martial arts as a blunt attack, as well as any unusual thrown objects.
+	 */
+	switch (o_ptr->tval)
+	{
+		case TV_ARROW:
+		case TV_BOLT:
+		case TV_POLEARM:
+		case TV_SWORD:
+		case TV_DIGGING:
+		case TV_SPIKE:
+		{
+			/* Resist */
+			if (r_ptr->flags9 & (RF9_IM_EDGED))
+			{
+				/* Resist */
+				resist = 85;
+
+				/* Learn */
+				if (!(l_ptr->flags9 & (RF9_IM_EDGED)) &&
+					(m_ptr->ml))
+				{
+					l_ptr->flags9 |= (RF9_IM_EDGED);
+					learn = TRUE;
+				}
+
+				/* Take note */
+				note = "glances off of";
+			}
+			else if (r_ptr->flags9 & (RF9_RES_EDGED))
+			{
+				resist = 60;
+
+				if (!(l_ptr->flags9 & (RF9_RES_EDGED)) &&
+					(m_ptr->ml))
+				{
+					l_ptr->flags9 |= (RF9_RES_EDGED);
+					learn = TRUE;
+				}
+
+				note = "glances off of";
+			}
+
+			break;
+		}
+
+		default:
+		{
+			if (r_ptr->flags9 & (RF9_IM_BLUNT))
+			{
+				resist = 85;
+
+				if (!(l_ptr->flags9 & (RF9_IM_BLUNT)) &&
+					(m_ptr->ml))
+				{
+					l_ptr->flags9 |= (RF9_IM_BLUNT);
+					learn = TRUE;
+				}
+
+				if (strchr("GvE", r_ptr->d_char))
+					note = "passes harmlessly through";
+				else
+					note = "bounces off of";
+			}
+			else if (r_ptr->flags9 & (RF9_RES_BLUNT))
+			{
+				resist = 60;
+
+				if (!(l_ptr->flags9 & (RF9_RES_BLUNT)) &&
+					(m_ptr->ml))
+				{
+					l_ptr->flags9 |= (RF9_RES_BLUNT);
+					learn = TRUE;
+				}
+
+				if (strchr("GvE", r_ptr->d_char))
+					note = "passes harmlessly through";
+				else
+					note = "bounces off of";
+			}
+
+			break;
+		}
+	}
+
+	/* Hack -- more accurate weapons reduce resistance */
+	resist -= o_ptr->to_h;
+
+	/* Try for a miss */
+	if (resist > rand_int(100))
+	{
+		/* Monster is fully visible */
+		if (m_ptr->ml)
+		{
+			/* Take note of new resist */
+			if (learn)
+			{
+				if (resist >= 80)
+					msg_format("%^s does almost no damage to %s!",
+						o_name, m_name);
+				else if (resist >= 70)
+					msg_format("%^s does very little damage to %s!",
+						o_name, m_name);
+				else if (resist >= 50)
+					msg_format("%^s does little damage to %s!",
+						o_name, m_name);
+				else
+					msg_format("%^s is resisted by %s.",
+						o_name, m_name);
+			}
+
+			/* Note already known resistance */
+			else
+			{
+				msg_format("%^s %s %s.", o_name, note, m_name);
+			}
+		}
+
+		/* Can't hurt me! */
+		return (TRUE);
+	}
+
+	/* Can hurt me */
+	return (FALSE);
+}
+
+
 
 /*
  * Handle monster hitting a real trap.
@@ -5073,7 +5226,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 						object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
 
 						/* Did we hit? */
-						if (test_hit_fire((j_ptr->to_h + o_ptr->to_h)* BTH_PLUS_ADJ + f_ptr->power,  r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 2 : 1) + (m_ptr->shield ? 100 : 0), TRUE))
+						if (test_hit_fire((j_ptr->to_h + o_ptr->to_h)* BTH_PLUS_ADJ + f_ptr->power,  r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 2 : 1) + (m_ptr->shield ? 100 : 0) + (m_ptr->bless ? 5 : 0) - (m_ptr->beserk ? 10 : 0), TRUE))
 						{
 							int k, mult;
 
@@ -5110,13 +5263,13 @@ void mon_hit_trap(int m_idx, int y, int x)
 							if (k < 0) k = 0;
 
 							/* Damage, check for fear and death */
-							(void)mon_take_hit(cave_m_idx[y][x], k, &fear, NULL);
+							if (!mon_resist_object(m_ptr, o_ptr)) (void)mon_take_hit(cave_m_idx[y][x], k, &fear, NULL);
 
 						}
 						else
 						{
 							/* Trap description */
-							if (m_ptr->ml) msg_format("%^s narrowly misses %s.",o_name, m_name);					
+							if (m_ptr->ml) msg_format("%^s narrowly misses %s.",o_name, m_name);
 						}
 
 						/* Get local object */
@@ -5143,69 +5296,6 @@ void mon_hit_trap(int m_idx, int y, int x)
 						cave_alter_feat(y,x,FS_DISARM);
 					}
 				}
-			}
-
-			case TV_SHOT:
-			case TV_ARROW:
-			case TV_BOLT:
-			case TV_HAFTED:
-			case TV_SWORD:
-			case TV_POLEARM:
-			{
-				object_type *i_ptr;
-				object_type object_type_body;
-
-				/* Describe ammo */
-				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
-
-				/* Test for hit */
-				if (test_hit_norm(o_ptr->to_h * BTH_PLUS_ADJ + f_ptr->power, r_ptr->ac  + (m_ptr->shield ? 50 : 0), TRUE))
-				{
-					int k;
-
-					k = damroll(o_ptr->dd, o_ptr->ds);
-
-					k = tot_dam_aux(o_ptr, k, m_ptr);
-
-					k = critical_norm(o_ptr->weight, o_ptr->to_h, k);
-					k += o_ptr->to_d;
-
-					/* Armour reduces total damage */
-					k -= (k * ((p_ptr->ac < 150) ? p_ptr->ac : 150) / 250);
-
-					/* No negative damage */
-					if (k < 0) k = 0;
-
-					/* Damage, check for fear and death */
-					(void)mon_take_hit(cave_m_idx[y][x], k, &fear, NULL);
-
-				}
-				else
-				{
-					/* Trap description */
-					if (m_ptr->ml) msg_format("%^s narrowly misses %s.",o_name, m_name);					
-				}
-
-				/* Get local object */
-				i_ptr = &object_type_body;
-
-				/* Obtain a local object */
-				object_copy(i_ptr, o_ptr);
-
-				/* Modify quantity */
-				i_ptr->number = 1;
-
-				/* Drop nearby - some chance of breakage */
-				drop_near(i_ptr,y,x,breakage_chance(i_ptr));
-
-				/* Decrease the item */
-				floor_item_increase(cave_o_idx[y][x], -1);
-				floor_item_optimize(cave_o_idx[y][x]);
-
-				/* Disarm if runs out */
-				if (!cave_o_idx[y][x]) cave_alter_feat(y,x,FS_DISARM);
-
-				break;
 			}
 
 			case TV_WAND:
@@ -5397,12 +5487,70 @@ void mon_hit_trap(int m_idx, int y, int x)
 				break;
 			}
 
+			case TV_SWORD:
+			case TV_POLEARM:
+			case TV_HAFTED:
+			{
+				object_type *i_ptr;
+				object_type object_type_body;
+
+				/* Describe ammo */
+				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
+
+				/* Test for hit */
+				if (test_hit_norm(o_ptr->to_h * BTH_PLUS_ADJ + f_ptr->power, r_ptr->ac  + (m_ptr->shield ? 50 : 0) + (m_ptr->bless ? 5 : 0) - (m_ptr->beserk ? 10 : 0), TRUE))
+				{
+					int k;
+
+					k = damroll(o_ptr->dd, o_ptr->ds);
+
+					k = tot_dam_aux(o_ptr, k, m_ptr);
+
+					k = critical_norm(o_ptr->weight, o_ptr->to_h, k);
+					k += o_ptr->to_d;
+
+					/* Armour reduces total damage */
+					k -= (k * ((p_ptr->ac < 150) ? p_ptr->ac : 150) / 250);
+
+					/* No negative damage */
+					if (k < 0) k = 0;
+
+					/* Damage, check for fear and death */
+					if (!mon_resist_object(m_ptr, o_ptr)) (void)mon_take_hit(cave_m_idx[y][x], k, &fear, NULL);
+
+				}
+				else
+				{
+					/* Trap description */
+					if (m_ptr->ml) msg_format("%^s narrowly misses %s.",o_name, m_name);					
+				}
+
+				/* Get local object */
+				i_ptr = &object_type_body;
+
+				/* Obtain a local object */
+				object_copy(i_ptr, o_ptr);
+
+				/* Modify quantity */
+				i_ptr->number = 1;
+
+				/* Drop nearby - some chance of breakage */
+				drop_near(i_ptr,y,x,breakage_chance(i_ptr));
+
+				/* Decrease the item */
+				floor_item_increase(cave_o_idx[y][x], -1);
+				floor_item_optimize(cave_o_idx[y][x]);
+
+				/* Disarm if runs out */
+				if (!cave_o_idx[y][x]) cave_alter_feat(y,x,FS_DISARM);
+
+				break;
+			}
+
 			default:
 			{
 				/* Disarm */
 				cave_alter_feat(y,x,FS_DISARM);
-
-				break;
 			}
 		}
 

@@ -253,8 +253,8 @@ void teleport_away(int m_idx, int dis)
 	if (!m_ptr->r_idx) return;
 
 	/* Save the old location */
-	oy = m_ptr->fy;
-	ox = m_ptr->fx;
+	ny = oy = m_ptr->fy;
+	nx = ox = m_ptr->fx;
 
 	/* Handle anti-teleport room */
 	if (room_has_flag(oy, ox, ROOM_ICKY))
@@ -2140,33 +2140,43 @@ static int project_m_y;
  */
 static bool temp_lite(int y, int x)
 {
-	/* Grid is in line of sight */
-	if (player_has_los_bold(y, x))
+	int i;
+
+	/* Lite this grid and adjacent grids */
+	for (i = 0; i < 8; i++)
 	{
-		if (!(play_info[y][x] & (PLAY_SEEN))
+		int yy = y + ddy_ddd[i];
+		int xx = x + ddx_ddd[i];
+
+		/* Ignore annoying locations */
+		if (!(in_bounds_fully(yy, xx))) continue;
+
+		/* Player can see grid, hasn't already seen it, and not blind */
+		if ((player_has_los_bold(yy, xx)) && !(play_info[yy][xx] & (PLAY_SEEN))
 		    && !(p_ptr->blind))
 		{
 			/* Temporarily seen */
-			play_info[y][x] |= (PLAY_SEEN);
+			play_info[yy][xx] |= (PLAY_SEEN);
 
 			/* Remember? */
-			note_spot(y,x);
+			note_spot(yy,xx);
 
 			/* Temporarily seen */
-			play_info[y][x] &= ~(PLAY_SEEN);
+			play_info[yy][xx] &= ~(PLAY_SEEN);
 
 			/* Light? */
-			lite_spot(y,x);
+			lite_spot(yy,xx);
 
-			/* Get monster */
-			if (cave_m_idx[y][x] > 0 )
+			/* Player can see grid, not blind and it contains a monster */
+			if (cave_m_idx[yy][xx] > 0)
 			{
-				monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
+				monster_type *m_ptr = &m_list[cave_m_idx[yy][xx]];
 				monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
-				/* Detect all non-invisible monsters */
-				if ((!(r_ptr->flags2 & (RF2_INVISIBLE)) || (p_ptr->tim_invis) || ((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0))
-							&& !(m_ptr->mflag & (MFLAG_HIDE)))
+				/* Detect all unseen non-invisible non-hidden monsters */
+				if (!(m_ptr->ml) &&
+					(!(r_ptr->flags2 & (RF2_INVISIBLE)) || !(m_ptr->tim_invis) || (p_ptr->tim_invis) || ((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0))
+						&& !(m_ptr->mflag & (MFLAG_HIDE)))
 				{
 					/* Optimize -- Repair flags */
 					repair_mflag_mark = repair_mflag_show = TRUE;
@@ -2175,13 +2185,13 @@ static bool temp_lite(int y, int x)
 					m_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
 		
 					/* Update the monster */
-					update_mon(cave_m_idx[y][x], FALSE);
+					update_mon(cave_m_idx[yy][xx], FALSE);
 				}
 			}
-		}
 
-		/* Something seen */
-		return (TRUE);
+			/* Something seen */
+			return (TRUE);
+		}
 	}
 
 	return (FALSE);
@@ -2284,7 +2294,7 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 				cave_alter_feat(y, x, FS_HURT_FIRE);
 			}
 
-			obvious |= temp_lite(y,x);
+			if (temp_lite(y,x)) obvious = TRUE;
 
 			break;
 		}
@@ -2355,7 +2365,7 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 
 			}
 
-			obvious |= temp_lite(y,x);
+			if (temp_lite(y,x)) obvious = TRUE;
 			break;
 		}
 
@@ -3412,7 +3422,6 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 
 	/* Get the monster name (BEFORE polymorphing) */
 	monster_desc(m_name, m_ptr, 0);
-
 
 
 	/* Some monsters get "destroyed" */
@@ -7739,6 +7748,90 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 
 
 
+/*
+ * Calculate and store the arcs used to make starbursts.
+ */
+static void calc_starburst(int height, int width, byte *arc_first,
+	byte *arc_dist, int *arc_num)
+{
+	int i;
+	int size, dist, vert_factor;
+	int degree_first, center_of_arc;
+
+
+	/* Note the "size" */
+	size = 2 + (width + height/ 22);
+
+	/* Ask for a reasonable number of arcs. */
+	*arc_num = 8 + (height * width / 80);
+	*arc_num = rand_spread(*arc_num, 3);
+	if (*arc_num < 8)  *arc_num = 8;
+	if (*arc_num > 45) *arc_num = 45;
+
+	/* Determine the start degrees and expansion distance for each arc. */
+	for (degree_first = 0, i = 0; i < *arc_num; i++)
+	{
+		/* Get the first degree for this arc (using 180-degree circles). */
+		arc_first[i] = degree_first;
+
+		/* Get a slightly randomized start degree for the next arc. */
+		degree_first += (180 / *arc_num);
+
+		/* Do not entirely leave the usual range */
+		if (degree_first < 180 * (i+1) / *arc_num)
+		    degree_first = 180 * (i+1) / *arc_num;
+		if (degree_first > (180 + *arc_num) * (i+1) / *arc_num)
+		    degree_first = (180 + *arc_num) * (i+1) / *arc_num;
+
+
+		/* Get the center of the arc (convert from 180 to 360 circle). */
+		center_of_arc = degree_first + arc_first[i];
+
+		/* Get arc distance from the horizontal (0 and 180 degrees) */
+		if      (center_of_arc <=  90) vert_factor = center_of_arc;
+		else if (center_of_arc >= 270) vert_factor = ABS(center_of_arc - 360);
+		else                           vert_factor = ABS(center_of_arc - 180);
+
+		/*
+		 * Usual case -- Calculate distance to expand outwards.  Pay more
+		 * attention to width near the horizontal, more attention to height
+		 * near the vertical.
+		 */
+		dist = ((height * vert_factor) + (width * (90 - vert_factor))) / 90;
+
+		/* Randomize distance (should never be greater than radius) */
+		arc_dist[i] = rand_range(dist / 4, dist / 2);
+
+		/* Keep variability under control (except in special cases). */
+		if ((dist != 0) && (i != 0))
+		{
+			int diff = arc_dist[i] - arc_dist[i-1];
+
+			if (ABS(diff) > size)
+			{
+				if (diff > 0)
+					arc_dist[i] = arc_dist[i-1] + size;
+				else
+					arc_dist[i] = arc_dist[i-1] - size;
+			}
+		}
+	}
+
+	/* Neaten up final arc of circle by comparing it to the first. */
+	if (TRUE)
+	{
+		int diff = arc_dist[*arc_num - 1] - arc_dist[0];
+
+		if (ABS(diff) > size)
+		{
+			if (diff > 0)
+				arc_dist[*arc_num - 1] = arc_dist[0] + size;
+			else
+				arc_dist[*arc_num - 1] = arc_dist[0] - size;
+		}
+	}
+}
+
 
 
 /*
@@ -7969,6 +8062,14 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 		flg |= (PROJECT_WALL);
 	}
 
+	/* Some projection types always PROJECT_LITE */
+	if ((typ == GF_FIRE) || (typ == GF_LITE) ||
+		(typ == GF_PLASMA) || (typ == GF_LAVA) ||
+		(typ == GF_ELEC))
+	{
+		flg |= (PROJECT_LITE);
+	}
+
 	/* Hack -- Jump to target, but require a valid target */
 	if ((flg & (PROJECT_JUMP)) && (y1) && (x1))
 	{
@@ -7977,6 +8078,12 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 
 		/* Clear the flag */
 		flg &= ~(PROJECT_JUMP);
+	}
+
+	/* Lite up source grid */
+	if (flg & (PROJECT_LITE))
+	{
+		if (temp_lite(y, x)) notice = TRUE;
 	}
 
 	/* If a single grid is both source and destination, store it. */
@@ -8016,6 +8123,12 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 			/* Advance */
 			y = ny;
 			x = nx;
+
+			/* Lite up the path if required */
+			if (flg & (PROJECT_LITE))
+			{
+				notice |= temp_lite(y, x);
+			}
 
 			/* If a beam, collect all grids in the path. */
 			if (flg & (PROJECT_BEAM))
@@ -8108,7 +8221,7 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 	/* Handle explosions */
 	else if (flg & (PROJECT_BOOM))
 	{
-#if 0
+
 		/* Pre-calculate some things for starbursts. */
 		if (flg & (PROJECT_STAR))
 		{
@@ -8119,7 +8232,7 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 			spread_cave_temp(y0, x0, rad, FALSE);
 
 		}
-#endif
+
 		/* Pre-calculate some things for arcs. */
 		if (flg & (PROJECT_ARC))
 		{
@@ -8443,6 +8556,20 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 		}
 	}
 
+	/* Temporarily lite up grids */
+	if (flg & (PROJECT_LITE))
+	{
+		/* Scan grids */
+		for (i = 0; i < grids; i++)
+		{
+			/* Get the grid location */
+			y = gy[i];
+			x = gx[i];
+
+			/* Temporarily lite up the grid */
+			if (temp_lite(y, x)) notice = TRUE;
+		}	
+	}
 
 	/* Check features */
 	if (flg & (PROJECT_GRID))
@@ -8562,3 +8689,4 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 	/* Return "something was noticed" */
 	return (notice);
 }
+

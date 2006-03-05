@@ -752,7 +752,7 @@ static cptr r_info_flags9[] =
 	"TOWNSFOLK",
 	"DROP_ESSENCE",
 	"DROP_MUSHROOM",
-	"DROP_COINS",
+	"DROP_MINERAL",
 	"ATTR_METAL",
 	"ATTR_INDEX",
 	"MORGUL_MAGIC",

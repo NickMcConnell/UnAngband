@@ -134,12 +134,6 @@ than HURT_FIRE, HURT_ACID.
 TODO: Should be able to traverse chasms/pits once fallen in without damage
 (Actually all MUST_CLIMB terrain).
 
-TODO: Have the monster TRAPS spell have a chance of triggering any adjacent
-traps after creating traps, to affect the target. This is based on monster
-level, but we need to be careful to pick such activated traps at a reduced
-difficulty (eg 2/3 level) as traps can be dangerous. This also applies for
-chests.
-
 TODO: Add phases of the moon. During a full moon, light all outside
 locations (but not adjacent locations - so still darker than daylight).
 During a new moon, treat outside like inside.  Should treat one phase
@@ -642,11 +636,6 @@ Hitting the blue crystal in this instance, causes a chain reaction...
 
 
 
-TODO: A unique with FRIEND will be accompanied by 1 other unique of the same
-attr and char when generated.
-A unique with FRIENDS will be accompanied by up to 4 other uniques of the same
-attr and char when generated.
-
 TODO: Have impassable trees and rubble which are hidden and found by either attempting to
 cross them or search them.
 
@@ -701,21 +690,36 @@ TODO: Have uniques corresponding to the players family. They are primarily quest
 givers, however, if the player is evil, they will spit, insult, and wail at
 the player. (Considering vomit on, but it might be a bit much).
 
-
 TODO: Allow trolls and other monster to eat monster bodies to heal themselves, and vampires to
 suck the blood from monster bodies to improve their mana.
 
 TODO: Forget should cause spell casters to forget their spells, as opposed to forgetting what
 objects do.
 
-TODO: Summoning for animals should be flavored into furred animals, feathered animals and
-scaled animals, depending on the summoning monster. You need feathers to summon feathers,
-you need fur to summon furred, you need scales to summon scales. 'Underground' monsters
-(orcs, trolls, dwarves) don't summon feathered, 'above ground' monsters (humans, elves,
-hobbits) don't summon scaled. We include animals that don't have fur or scales (e.g. frogs)
-in with scales for this discussion.
-
 TODO: Higher level birds, for bird summoners.
 
 TODO: 'Good' monsters don't summon evil. 'Evil' monsters don't summon good.
 
+TODO: I like the idea of being able to get onto the roof of a building. In which case, the line of
+sight algorithm needs to be special cased, so that all 'roof' grids block line of sight in
+the traditional sense, and the player only has line of sight and line of fire to monsters with
+MFLAG_OVER set.
+
+
+e.g. ......,,,
+     .#####,,,
+     .##b##,,,
+     .#a##@,,,
+     .#####,,,
+     ......,,,
+
+The player gets LOS calculated to the grids marked with a , normally. However,
+all the roof grids block LOS in the traditional sense (otherwise the player would
+see the floors underneath the roof). The player can't see or project to the 'a' ant, because
+the ant does not have the MFLAG_OVER set. e.g. the ant is on
+the real floor underneath the roof.
+
+However the player can see and the 'b' bat, because the bat has the MFLAG_OVER set (e.g. is
+flying over the building). Furthermore, if the player throws a fireball at the bat, the ant
+won't be affected. This requires setting some kind of PROJECT_OVER flag set when projecting
+at a target when you are climbing or MFLAG_OVER, and the first step is covered...

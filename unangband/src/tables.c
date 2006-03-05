@@ -2042,7 +2042,7 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* OPT_birth_no_stores */
 	FALSE,		/* OPT_birth_no_artifacts */
 	FALSE,		/* OPT_birth_rand_artifacts */
-	FALSE,	  /* OPT_birth_campaign */
+	TRUE,	  /* OPT_birth_campaign */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */

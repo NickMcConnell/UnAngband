@@ -2309,8 +2309,36 @@ void do_cmd_set_trap_or_spike(void)
 				}
 			}
 
+			/* Hack -- Dig trap? */
+			if (j_ptr->tval == TV_DIGGING)
+			{
+				/* Hack */
+				int tmp = p_ptr->skill_dis;
+
+				/* Hack -- use tunnelling skill to build trap */
+				p_ptr->skill_dis = p_ptr->skill_dig;
+
+				/* Hack -- base trap directly on digging skill */
+				object_level = MIN(128, p_ptr->skill_dig * 3);
+
+				/* Set the floor trap */
+				cave_set_feat(y,x,FEAT_TRAP_ROCK_NONE);
+
+				/* Set the trap */
+				pick_trap(y,x);
+
+				/* Reset object level */
+				object_level = p_ptr->depth;
+
+				/* Check if we can arm it? */
+				do_cmd_disarm_aux(y,x, FALSE);
+
+				/* Reset disarm skill */
+				p_ptr->skill_dis = tmp;
+			}
+
 			/* Trap allowed? */
-			if ((trap_allowed) && (floor_carry(y,x,j_ptr)))
+			else if ((trap_allowed) && (floor_carry(y,x,j_ptr)))
 			{
 				/* Hack -- ensure trap is created */
 				object_level = 128;
@@ -2327,7 +2355,7 @@ void do_cmd_set_trap_or_spike(void)
 				/* Check if we can arm it? */
 				do_cmd_disarm_aux(y,x, FALSE);
 	
-				/* Destroy a food in the pack */
+				/* Destroy an item in the pack */
 				if (item >= 0)
 				{
 					inven_item_increase(item, -1);
@@ -2335,13 +2363,18 @@ void do_cmd_set_trap_or_spike(void)
 					inven_item_optimize(item);
 				}
 
-				/* Destroy a food on the floor */
+				/* Destroy an item on the floor */
 				else
 				{
 					floor_item_increase(0 - item, -1);
 					floor_item_describe(0 - item);
 					floor_item_optimize(0 - item);
 				}
+			}
+			/* Message */
+			else
+			{
+				msg_print("You can't set this trap here.");
 			}
 		}
 	}
@@ -2990,7 +3023,6 @@ void do_cmd_fire(void)
 	/* Calculate the path */
 	path_n = project_path(path_g, tdis, py, px, &ty, &tx, 0);
 
-
 	/* Hack -- Handle stuff */
 	handle_stuff();
 
@@ -3045,8 +3077,8 @@ void do_cmd_fire(void)
 
 			/* Some monsters are great at dodging  -EZ- */
 			if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!m_ptr->csleep) &&
-				(!m_ptr->stunned) && (!m_ptr->blind) && (!m_ptr->confused) && (!m_ptr->monfear)
-				&& (rand_int(5 + m_ptr->cdis) >= 3))
+				(!m_ptr->blind) && (!m_ptr->confused) && (!m_ptr->monfear)
+				&& (rand_int(5 + m_ptr->cdis) >= (m_ptr->stunned ? 4 : 3)))
 			{
 				if (visible)
 				{
@@ -3065,10 +3097,18 @@ void do_cmd_fire(void)
 			}
 
 			/* Test hit fire */
-			hit_or_near_miss = test_hit_fire(chance2, r_ptr->ac, m_ptr->ml);
+			hit_or_near_miss = test_hit_fire(chance2, r_ptr->ac + (m_ptr->bless ? 5 : 0) - (m_ptr->beserk ? 10 : 0), m_ptr->ml);
 
 			/* Genuine hit */
-			genuine_hit = test_hit_fire(chance2, r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 2 : 1) + (m_ptr->shield ? 100 : 0), m_ptr->ml);
+			genuine_hit = test_hit_fire(chance2, r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 3 : 2) / 2 + (m_ptr->shield ? 100 : 0) + (m_ptr->bless ? 5 : 0) - (m_ptr->beserk ? 10 : 0), m_ptr->ml);
+
+			/* Missiles bounce off resistant monsters */
+			if ((genuine_hit) && (mon_resist_object(m_ptr, o_ptr)))
+			{
+				/* XXX Rewrite remaining path of missile */
+
+				continue;
+			}
 
 			/* Did we hit it or get close? */
 			if (hit_or_near_miss || genuine_hit)
@@ -3123,7 +3163,7 @@ void do_cmd_fire(void)
 					if (!genuine_hit)
 					{
 						/* Missile was stopped */
-						msg_format("%^s blocks the %s with a %sshield.", m_name, o_name, m_ptr->shield ? "magical " : "");
+						if ((r_ptr->flags2 & (RF2_ARMOR)) || (m_ptr->shield)) msg_format("%^s blocks the %s with a %sshield.", m_name, o_name, m_ptr->shield ? "mystic " : "");
 
 						/* Notice armour */
 						if (r_ptr->flags2 & (RF2_ARMOR)) l_ptr->flags2 |= (RF2_ARMOR);
@@ -3450,8 +3490,8 @@ void do_cmd_throw(void)
 
 			/* Some monsters are great at dodging  -EZ- */
 			if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!m_ptr->csleep) &&
-				(!m_ptr->stunned) && (!m_ptr->blind) && (!m_ptr->confused) && (!m_ptr->monfear)
-				&& (rand_int(5 + m_ptr->cdis) >= 3))
+				(!m_ptr->blind) && (!m_ptr->confused) && (!m_ptr->monfear)
+				&& (rand_int(5 + m_ptr->cdis) >= (m_ptr->stunned ? 4 : 3)))
 			{
 				if (visible)
 				{
@@ -3470,10 +3510,18 @@ void do_cmd_throw(void)
 			}
 
 			/* Test hit fire */
-			hit_or_near_miss = test_hit_fire(chance2, r_ptr->ac, m_ptr->ml);
+			hit_or_near_miss = test_hit_fire(chance2, r_ptr->ac + (m_ptr->bless ? 5 : 0) - (m_ptr->beserk ? 10 : 0), m_ptr->ml);
 
 			/* Genuine hit */
-			genuine_hit = test_hit_fire(chance2, r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 2 : 1) + (m_ptr->shield ? 100 : 0), m_ptr->ml);
+			genuine_hit = test_hit_fire(chance2, r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 3 : 2) / 2 + (m_ptr->shield ? 100 : 0) + (m_ptr->bless ? 5 : 0) - (m_ptr->beserk ? 10 : 0), m_ptr->ml);
+
+			/* Missiles bounce off resistant monsters */
+			if ((genuine_hit) && (mon_resist_object(m_ptr, o_ptr)))
+			{
+				/* XXX Rewrite remaining path of missile */
+
+				continue;
+			}
 
 			/* Did we hit it or get close? */
 			if (hit_or_near_miss || genuine_hit)
@@ -3529,7 +3577,7 @@ void do_cmd_throw(void)
 					if (!genuine_hit)
 					{
 						/* Missile was stopped */
-						msg_format("%^s blocks the %s with a %sshield.", m_name, o_name, m_ptr->shield ? "magical " : "");
+						if ((r_ptr->flags2 & (RF2_ARMOR)) || (m_ptr->shield)) msg_format("%^s blocks the %s with a %sshield.", m_name, o_name, m_ptr->shield ? "mystic " : "");
 
 						/* Notice armour */
 						if (r_ptr->flags2 & (RF2_ARMOR)) l_ptr->flags2 |= (RF2_ARMOR);

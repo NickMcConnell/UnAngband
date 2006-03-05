@@ -101,6 +101,9 @@ allow a reasonably complicated set of actions. See the example Farmer Maggot que
 However, scripting is not possible - the quests are data-driven. At the moment
 the quests can be created, but have no in game functionality.
 
+- You can now use diggers to create rock traps using the 'S' set trap command.
+The power of the trap depends on the digging ability of the player.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.
