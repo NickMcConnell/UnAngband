@@ -20,9 +20,9 @@ outlast the initial paralyzation, and have sufficiently high ac.
 
 - Added item abilities including vampiric weapons of various flavours, light and dark
 brands, anti-teleport items, racial-based items including slay human, slay elf and
-slay dwarf items, and items that cause vulneribilities to various elements. Much back-
-end code still to be fixed. In particular, you cannot wield both a racial flag item
-and its equivalent slay, or a vulneribility item and its equivalent brand.
+slay dwarf items, and items that cause vulneribilities to various elements. In particular,
+you cannot wield both a racial flag item and its equivalent slay, or a vulneribility
+item and its equivalent brand.
 
 - Added magic items, which are ego items which only have a single flag. This is
 currently in heavy development and balancing, but is intended to provide a more
@@ -39,6 +39,9 @@ gaze, wail, lash). These either have limited range (lash), require ammunition
 (arrow, shot, bolt) or require mana to use (gaze, wail).
 
 - Monsters can now bleed or get poisoned by the player.
+
+- Monsters can now lose strength, intelligence, wisdom, dexterity or constitution if
+hit by various stat loss effects.
 
 - Monsters can cast spells that turn themselves invisible, allow them to temporarily
 pass walls, make them heroic or beserk, shield themselves or allow them to temporarily
@@ -103,6 +106,8 @@ the quests can be created, but have no in game functionality.
 
 - You can now use diggers to create rock traps using the 'S' set trap command.
 The power of the trap depends on the digging ability of the player.
+
+- You now start playing the Lord of the Rings campaign by default.
 
 ### User Interface ###
 

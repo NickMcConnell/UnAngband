@@ -2034,7 +2034,7 @@ void py_attack(int y, int x)
 		chance = (p_ptr->skill_thn + (bonus * BTH_PLUS_ADJ));
 
 		/* Test for hit */
-		if (!test_hit_norm(chance, r_ptr->ac + (m_ptr->shield ? 50 : 0) + (m_ptr->bless ? 5 : 0) - (m_ptr->beserk ? 10 : 0), m_ptr->ml))
+		if (!test_hit_norm(chance, calc_monster_ac(m_ptr, FALSE), m_ptr->ml))
 		{
 			/* Message */
 			message_format(MSG_MISS, m_ptr->r_idx, "You miss %s.", m_name);

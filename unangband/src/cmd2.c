@@ -3097,10 +3097,10 @@ void do_cmd_fire(void)
 			}
 
 			/* Test hit fire */
-			hit_or_near_miss = test_hit_fire(chance2, r_ptr->ac + (m_ptr->bless ? 5 : 0) - (m_ptr->beserk ? 10 : 0), m_ptr->ml);
+			hit_or_near_miss = test_hit_fire(chance2, calc_monster_ac(m_ptr, FALSE), m_ptr->ml);
 
 			/* Genuine hit */
-			genuine_hit = test_hit_fire(chance2, r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 3 : 2) / 2 + (m_ptr->shield ? 100 : 0) + (m_ptr->bless ? 5 : 0) - (m_ptr->beserk ? 10 : 0), m_ptr->ml);
+			genuine_hit = test_hit_fire(chance2, calc_monster_ac(m_ptr, TRUE), m_ptr->ml);
 
 			/* Missiles bounce off resistant monsters */
 			if ((genuine_hit) && (mon_resist_object(m_ptr, o_ptr)))
@@ -3164,9 +3164,6 @@ void do_cmd_fire(void)
 					{
 						/* Missile was stopped */
 						if ((r_ptr->flags2 & (RF2_ARMOR)) || (m_ptr->shield)) msg_format("%^s blocks the %s with a %sshield.", m_name, o_name, m_ptr->shield ? "mystic " : "");
-
-						/* Notice armour */
-						if (r_ptr->flags2 & (RF2_ARMOR)) l_ptr->flags2 |= (RF2_ARMOR);
 
 						/* No normal damage */
 						tdam = 0;
@@ -3510,10 +3507,10 @@ void do_cmd_throw(void)
 			}
 
 			/* Test hit fire */
-			hit_or_near_miss = test_hit_fire(chance2, r_ptr->ac + (m_ptr->bless ? 5 : 0) - (m_ptr->beserk ? 10 : 0), m_ptr->ml);
+			hit_or_near_miss = test_hit_fire(chance2, calc_monster_ac(m_ptr, FALSE), m_ptr->ml);
 
 			/* Genuine hit */
-			genuine_hit = test_hit_fire(chance2, r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 3 : 2) / 2 + (m_ptr->shield ? 100 : 0) + (m_ptr->bless ? 5 : 0) - (m_ptr->beserk ? 10 : 0), m_ptr->ml);
+			genuine_hit = test_hit_fire(chance2, calc_monster_ac(m_ptr, TRUE), m_ptr->ml);
 
 			/* Missiles bounce off resistant monsters */
 			if ((genuine_hit) && (mon_resist_object(m_ptr, o_ptr)))
@@ -3554,7 +3551,6 @@ void do_cmd_throw(void)
 				/* No negative damage */
 				if (tdam < 0) tdam = 0;
 
-
 				/* Handle unseen monster */
 				if (!visible)
 				{
@@ -3578,9 +3574,6 @@ void do_cmd_throw(void)
 					{
 						/* Missile was stopped */
 						if ((r_ptr->flags2 & (RF2_ARMOR)) || (m_ptr->shield)) msg_format("%^s blocks the %s with a %sshield.", m_name, o_name, m_ptr->shield ? "mystic " : "");
-
-						/* Notice armour */
-						if (r_ptr->flags2 & (RF2_ARMOR)) l_ptr->flags2 |= (RF2_ARMOR);
 
 						/* No normal damage */
 						tdam = 0;

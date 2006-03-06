@@ -3273,7 +3273,7 @@ static void calc_bonuses(void)
 			if (r_ptr->flags9 & (RF9_SAME_SPEED))
 			{
 				/* Sanity check */
-				calc_monster_speed(m_ptr->fy, m_ptr->fx);
+				m_ptr->mspeed = calc_monster_speed(m_ptr);
 			}
 		}
 	}

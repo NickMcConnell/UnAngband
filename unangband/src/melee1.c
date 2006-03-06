@@ -250,6 +250,16 @@ bool make_attack_normal(int m_idx)
 			/* Need to add extra flavours in here */
 		}
 
+		/* Apply monster stats */
+		if (d_side > 1)
+		{
+			/* Apply monster stats */
+			if (m_ptr->mflag & (MFLAG_WEAK)) d_side = MIN(d_side - 2, d_side * 9 / 10);
+			else if (m_ptr->mflag & (MFLAG_STRONG)) d_side += MAX(d_side + 2, d_side * 11 / 10);
+
+			if (d_side <= 0) d_side = 1;
+		}
+
 		/* Roll out the damage */
 		damage = damroll(d_dice, d_side);
 
@@ -448,8 +458,16 @@ bool make_attack_normal(int m_idx)
 			}
 		}
 
+		/* Apply monster stats */
+		if (m_ptr->mflag & (MFLAG_CLUMSY)) power -= 5;
+		else if (m_ptr->mflag & (MFLAG_SKILLFUL)) power += 5;
+
+		/* Apply temporary conditions */
+		if (m_ptr->bless) power += 10;
+		if (m_ptr->beserk) power += 24;
+
 		/* Monster hits player */
-		if (!effect || check_hit(power + (m_ptr->bless ? 10 : 0) + (m_ptr->beserk ? 24 : 0), rlev, m_idx))
+		if (!effect || check_hit(power, rlev, m_idx))
 		{
 			/* Always disturbing */
 			disturb(1, 0);
@@ -1277,6 +1295,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 		/* Hack -- Stupid monsters will never fail (for jellies and such) */
 		if (r_ptr->flags2 & (RF2_STUPID)) failrate = 0;
+
+		/* Apply monster intelligence stat */
+		if (m_ptr->mflag & (MFLAG_STUPID)) failrate = failrate * 3 / 2;
+		else if (m_ptr->mflag & (MFLAG_SMART)) failrate /= 2;
 
 		/* Check for spell failure (breath/shot attacks never fail) */
 		if ((attack >= 128) && (rand_int(100) < failrate))
@@ -5226,7 +5248,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 						object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
 
 						/* Did we hit? */
-						if (test_hit_fire((j_ptr->to_h + o_ptr->to_h)* BTH_PLUS_ADJ + f_ptr->power,  r_ptr->ac * (r_ptr->flags2 & (RF2_ARMOR) ? 2 : 1) + (m_ptr->shield ? 100 : 0) + (m_ptr->bless ? 5 : 0) - (m_ptr->beserk ? 10 : 0), TRUE))
+						if (test_hit_fire((j_ptr->to_h + o_ptr->to_h)* BTH_PLUS_ADJ + f_ptr->power,  calc_monster_ac(m_ptr, TRUE), TRUE))
 						{
 							int k, mult;
 
@@ -5498,7 +5520,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
 
 				/* Test for hit */
-				if (test_hit_norm(o_ptr->to_h * BTH_PLUS_ADJ + f_ptr->power, r_ptr->ac  + (m_ptr->shield ? 50 : 0) + (m_ptr->bless ? 5 : 0) - (m_ptr->beserk ? 10 : 0), TRUE))
+				if (test_hit_norm(o_ptr->to_h * BTH_PLUS_ADJ + f_ptr->power, calc_monster_ac(m_ptr, FALSE), TRUE))
 				{
 					int k;
 

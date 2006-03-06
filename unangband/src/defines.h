@@ -2960,7 +2960,7 @@
 #define MFLAG_FAST	0x00020000    /* Monster is faster than average for race */
 #define MFLAG_WEAK      0x00040000    /* Monster is weaker than average for race */
 #define MFLAG_STRONG	0x00080000    /* Monster is stronger than average for race */
-#define MFLAG_DUMB	0x00100000    /* Monster is dumber than average for race */
+#define MFLAG_STUPID	0x00100000    /* Monster is dumber than average for race */
 #define MFLAG_SMART	0x00200000    /* Monster is smarter than average for race */
 #define MFLAG_NAIVE     0x00400000    /* Monster is more naive than average for race */
 #define MFLAG_WISE	0x00800000    /* Monster is wiser than average for race */

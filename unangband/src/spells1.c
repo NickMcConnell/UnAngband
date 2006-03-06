@@ -3279,6 +3279,48 @@ static void check_fear_quest(int m_idx)
 
 
 /*
+ *  Monster saving throw.
+ *
+ *  Hack -- we manipulate wisdom to indicate the player is nearly affecting the
+ *  monster to encourage them to have another go...
+ */
+static bool monster_save(monster_type *m_ptr, int power, bool *near)
+{
+	int save;
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	/* Assume monster is too powerful */
+	*near = FALSE;
+
+	/* Get monster resistance */
+	save = r_ptr->level;
+
+	/* Uniques are tough */
+	if (r_ptr->flags1 & (RF1_UNIQUE)) save += 10;
+
+	/* Are we close? */
+	if ((power + 10 < save) && ((power * 10 / 8) + 10 > save)) *near = TRUE;
+
+	/* Modify based on current wisdom */
+	if (m_ptr->mflag & (MFLAG_NAIVE)) save = save * 8 / 10;
+	else if (m_ptr->mflag & (MFLAG_WISE)) save = save * 12 / 10;
+
+	/* Check save */
+	if (power + 10 < save)
+	{
+		/* Hack -- reduce wisdom */
+		if (m_ptr->mflag & (MFLAG_WISE)) m_ptr->mflag &= ~(MFLAG_WISE);
+		else m_ptr->mflag |= (MFLAG_NAIVE);
+
+		return (TRUE);
+	}
+
+	/* Monster fails to save */
+	return (FALSE);
+}
+
+
+/*
  * Helper function for "project()" below.
  *
  * Handle a beam/bolt/ball causing damage to a monster.
@@ -3349,6 +3391,9 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 
 	/* Were the effects "irrelevant"? */
 	bool skipped = FALSE;
+
+	/* Were the effects "nearly successful"? */
+	bool near = FALSE;
 
 	/* Trapdoor setting (true or false) */
 	int do_more = 0;
@@ -4156,12 +4201,16 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			/* Powerful monsters can resist */
-			if ((r_ptr->flags1 & (RF1_UNIQUE)) ||
-			    (rand_int(r_ptr->level+10) > dam))
+			if (monster_save(m_ptr, dam, &near))
 			{
-				if (seen) note = " is unaffected!";
-				do_poly = FALSE;
-				obvious = FALSE;
+				if ((near) && (seen)) note = " seems ready to change.";
+				else
+				{
+					if (seen) note = " is unaffected!";
+
+					do_poly = FALSE;
+					obvious = FALSE;
+				}
 			}
 
 			/* No "real" damage */
@@ -4262,10 +4311,15 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			/* Powerful monsters can resist */
-			else if (rand_int(r_ptr->level+10) > dam)
+			else if (monster_save(m_ptr, dam, &near))
 			{
-				note = " is unaffected!";
-				obvious = FALSE;
+				if ((near) && (seen)) note = " appears sluggish.";
+				else
+				{
+					if (seen) note = " is unaffected!";
+
+					obvious = FALSE;
+				}
 			}
 
 			/* Normal monsters slow down */
@@ -4296,12 +4350,15 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			/* Attempt a saving throw */
-			else if (rand_int(r_ptr->level+10) > dam)
+			else if (monster_save(m_ptr, dam, &near))
 			{
-				/* Memorize a flag */
-				/* No obvious effect */
-				note = " is unaffected!";
-				obvious = FALSE;
+				if ((near) && (seen)) note = " appears drowsy.";
+				else
+				{
+					if (seen) note = " is unaffected!";
+
+					obvious = FALSE;
+				}
 			}
 			else
 			{
@@ -4332,14 +4389,15 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			/* Attempt a saving throw */
-			else if (rand_int(r_ptr->level+10) > dam)
+			else if (monster_save(m_ptr, dam, &near))
 			{
-				/* Resist */
-				do_conf = 0;
+				if ((near) && (seen)) note = " appears dizzy.";
+				else
+				{
+					if (seen) note = " is unaffected!";
 
-				/* No obvious effect */
-				note = " is unaffected!";
-				obvious = FALSE;
+					obvious = FALSE;
+				}
 			}
 			else
 			{
@@ -4561,12 +4619,20 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 				do_fear = damroll(3, (dam / 2)) + 1;
 
 				/* Attempt a saving throw */
-				if (rand_int(r_ptr->level+10) > dam)
+				if (monster_save(m_ptr, dam, &near))
 				{
-					/* No obvious effect */
-					note = " is unaffected!";
-					obvious = FALSE;
-					do_fear = 0;
+					if ((near) && (seen))
+					{
+						note = " appears to recoil.";
+						do_fear = 1;
+					}
+					else
+					{
+						if (seen) note = " is unaffected!";
+
+						obvious = FALSE;
+						do_fear = 0;
+					}
 				}
 			}
 
@@ -4599,12 +4665,20 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 				do_fear = damroll(3, (dam / 2)) + 1;
 
 				/* Attempt a saving throw */
-				if (rand_int(r_ptr->level+10) > dam)
+				if (monster_save(m_ptr, dam, &near))
 				{
-					/* No obvious effect */
-					note = " is unaffected!";
-					obvious = FALSE;
-					do_fear = 0;
+					if ((near) && (seen))
+					{
+						note = " appears to recoil.";
+						do_fear = 1;
+					}
+					else
+					{
+						if (seen) note = " is unaffected!";
+
+						obvious = FALSE;
+						do_fear = 0;
+					}
 				}
 			}
 
@@ -4631,13 +4705,28 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			do_fear = damroll(3, (dam / 2)) + 1;
 
 			/* Attempt a saving throw */
-			if ((r_ptr->flags3 & (RF3_NO_FEAR)) ||
-			    (rand_int(r_ptr->level+10) > dam))
+			if (r_ptr->flags3 & (RF3_NO_FEAR))
 			{
-				/* No obvious effect */
-				note = " is unaffected!";
-				obvious = FALSE;
-				do_fear = 0;
+				if ((seen) && !(l_ptr->flags3 & (RF3_NO_FEAR)))
+				{
+					l_ptr->flags3 |= (RF3_NO_FEAR);
+					note = " is immune to fear.";
+				}
+			}
+			else if (monster_save(m_ptr, dam, &near))
+			{
+				if ((near) && (seen))
+				{
+					note = " appears to recoil.";
+					do_fear = 1;
+				}
+				else
+				{
+					if (seen) note = " is unaffected!";
+					do_fear = 0;
+
+					obvious = FALSE;
+				}
 			}
 
 			/* No "real" damage */
@@ -4733,9 +4822,6 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		{
 			if (seen) obvious = TRUE;
 
-			/* Get blinded later */
-			do_blind = damroll(3, (dam / 2)) + 1;
-
 			/* Hurt eyes alot */
 			if (r_ptr->d_char == 'e')
 			{
@@ -4744,23 +4830,29 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			/* Attempt a saving throw */
-			if ((r_ptr->flags9 & (RF9_RES_BLIND)) ||
-			    (rand_int(r_ptr->level+10) > dam))
+			if (r_ptr->flags9 & (RF9_RES_BLIND))
 			{
-				/* Memorize a flag */
-				if (r_ptr->flags9 & (RF9_RES_BLIND))
+				if ((seen) && !(l_ptr->flags9 & (RF9_RES_BLIND)))
 				{
-					if (seen) l_ptr->flags3 |= (RF3_NONLIVING);
+					l_ptr->flags9 |= (RF9_RES_BLIND);
+					note = " resists blindness.";
 				}
-
-				/* Resist */
-				do_blind = 0;
-
-				/* No obvious effect */
-				note = " is unaffected!";
-				obvious = FALSE;
 			}
+			else if (monster_save(m_ptr, dam, &near))
+			{
+				if ((near) && (seen)) note = " appears cross-eyed.";
+				else
+				{
+					if (seen) note = " is unaffected!";
 
+					obvious = FALSE;
+				}
+			}
+			else
+			{
+				/* Get blinded later */
+				do_blind = damroll(3, (dam / 2)) + 1;
+			}
 		}
 
 		/* Melee attack - fear */
@@ -4786,8 +4878,8 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 				{
 					if (seen)
 					{
-						if (!(l_ptr->flags3 & (RF3_NO_FEAR))) note = " resists fear.";
-						l_ptr->flags3 |= (RF3_NO_FEAR);
+						if (!(l_ptr->flags4 & (RF4_BRTH_FEAR))) note = " resists fear.";
+						l_ptr->flags4 |= (RF4_BRTH_FEAR);
 					}
 					l_ptr->flags4 |= (RF4_BRTH_FEAR);
 				}
@@ -4810,12 +4902,16 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 				}
 			}
 			/* Attempt a saving throw */
-			else if (rand_int(r_ptr->level+10) > dam)
+			else if (monster_save(m_ptr, dam, &near))
 			{
+				if ((near) && (seen)) note = " appears sluggish.";
+				else
+				{
+					if (seen) note = " is unaffected!";
 
-				/* No obvious effect */
-				note = " is unaffected!";
-				obvious = FALSE;
+					do_blind = FALSE;
+					obvious = FALSE;
+				}
 			}
 			else
 			{
@@ -4843,12 +4939,16 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 				}
 			}
 			/* Attempt a saving throw */
-			else if (rand_int(r_ptr->level+10) > dam)
+			else if (monster_save(m_ptr, dam, &near))
 			{
+				if ((near) && (seen)) note = " appears sluggish.";
+				else
+				{
+					if (seen) note = " is unaffected!";
 
-				/* No obvious effect */
-				note = " is unaffected!";
-				obvious = FALSE;
+					do_blind = FALSE;
+					obvious = FALSE;
+				}
 			}
 			else
 			{
@@ -4926,24 +5026,140 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 
 		/* Melee attack - lose strength */
 		case GF_LOSE_STR:
+		{
+			if (m_ptr->mflag & (MFLAG_STRONG))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag &= ~(MFLAG_STRONG);
+			}
+			else if (!(m_ptr->mflag & (MFLAG_WEAK)))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag |= (MFLAG_WEAK);
+			}
+
+			if (obvious) note = " appears weaker.";
+			break;
+		}
 
 		/* Melee attack - lose int */
 		case GF_LOSE_INT:
+		{
+			if (m_ptr->mflag & (MFLAG_SMART))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag &= ~(MFLAG_SMART);
+			}
+			else if (!(m_ptr->mflag & (MFLAG_STUPID)))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag |= (MFLAG_STUPID);
+			}
+
+			if (obvious) note = " appears stupider.";
+			break;
+		}
 
 		/* Melee attack - lose wisdom */
 		case GF_LOSE_WIS:
+		{
+			if (m_ptr->mflag & (MFLAG_WISE))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag &= ~(MFLAG_WISE);
+			}
+			else if (!(m_ptr->mflag & (MFLAG_NAIVE)))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag |= (MFLAG_NAIVE);
+			}
+
+			if (obvious) note = " appears more naive.";
+			break;
+		}
 
 		/* Melee attack - lose dex */
 		case GF_LOSE_DEX:
+		{
+			if (m_ptr->mflag & (MFLAG_SKILLFUL))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag &= ~(MFLAG_SKILLFUL);
+			}
+			else if (!(m_ptr->mflag & (MFLAG_CLUMSY)))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag |= (MFLAG_CLUMSY);
+			}
+
+			if (obvious) note = " appears clumsier.";
+			break;
+		}
 
 		/* Melee attack - lose con */
 		case GF_LOSE_CON:
+		{
+			int new_maxhp;
+
+			if (m_ptr->mflag & (MFLAG_HEALTHY))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag &= ~(MFLAG_HEALTHY);
+			}
+			else if (!(m_ptr->mflag & (MFLAG_SICK)))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag |= (MFLAG_SICK);
+			}
+
+			if (obvious) note = " appears sicklier.";
+
+			new_maxhp = calc_monster_hp(m_ptr);
+
+			if (new_maxhp < m_ptr->maxhp)
+			{
+				note = " appears sicklier.";
+
+				/* Scale down hit points */
+				m_ptr->hp = m_ptr->hp * new_maxhp / m_ptr->maxhp;
+
+				/* To a minimum */
+				if (m_ptr->hp < 0) m_ptr->hp = 1;
+
+				/* Permanently reduce maximum hp */
+				m_ptr->maxhp = new_maxhp;
+			}
+			break;
+		}
 
 		/* Melee attack - lose cha */
 		case GF_LOSE_CHR:
+		{
+			if (seen) obvious = TRUE;
+			note = " can't get any uglier.";
+			break;
+		}
 
 		/* Melee attack - lose all */
 		case GF_LOSE_ALL:
+		{
+			/* Hack -- just completely ruin monster */
+			if (seen) obvious = TRUE;
+			note = " is ruined.";
+			m_ptr->mflag &= ~(MFLAG_STRONG | MFLAG_SMART | MFLAG_WISE | MFLAG_SKILLFUL | MFLAG_HEALTHY);
+			m_ptr->mflag |= (MFLAG_WEAK | MFLAG_STUPID | MFLAG_NAIVE | MFLAG_CLUMSY | MFLAG_SICK);
+			break;
+		}
 
 		/* Melee attack - shatter */
 		case GF_SHATTER:
@@ -5073,16 +5289,21 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			/* Powerful monsters can resist */
-			else if (rand_int(r_ptr->level+10) > dam)
+			else if (monster_save(m_ptr, dam, &near))
 			{
-				note = " is unaffected!";
-				obvious = FALSE;
+				if ((near) && (seen)) note = " appears cross-eyed.";
+				else
+				{
+					if (seen) note = " is unaffected!";
+
+					obvious = FALSE;
+				}
 			}
 
 			/* Normal monsters slow down */
 			else
 			{
-				/* Speed up */
+				/* Blind */
 				do_blind = 50 + rand_int(50);
 			}
 

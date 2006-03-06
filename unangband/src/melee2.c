@@ -3395,8 +3395,138 @@ static bool make_move(monster_type *m_ptr, int *ty, int *tx, bool fear, bool *ba
 }
 
 
+/*
+ * Bash or tunnel up from under various terrain.
+ */
+static bool bash_from_under(int m_idx, int y, int x, bool *bash)
+{
+	monster_type *m_ptr = &m_list[m_idx];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	feature_type *f_ptr = &f_info[cave_feat[y][x]];
+
+	bool emerge = FALSE;
+
+	/* Check variety of ways of breaking up through terrain */
+	if (((r_ptr->flags2 & (RF2_BASH_DOOR | RF2_KILL_WALL)) || (r_ptr->flags3 & (RF3_HUGE))) && (f_ptr->flags1 & (FF1_BASH)))
+	{
+		/* Bash through the terrain */
+		cave_alter_feat(y, x, FS_BASH);
+
+		/* Bashed */
+		if (r_ptr->flags2 & (RF2_BASH_DOOR)) *bash = TRUE;
+
+		/* Emerges */
+		emerge = TRUE;
+	}
+	else if (((r_ptr->flags2 & (RF2_KILL_WALL)) || (r_ptr->flags3 & (RF3_HUGE))) && (f_ptr->flags1 & (FF1_TUNNEL)))
+	{
+		/* Tunnel through the terrain */
+		cave_alter_feat(y, x, FS_TUNNEL);
+
+		/* Emerges */
+		emerge = TRUE;
+	}
+	else if (((r_ptr->flags2 & (RF2_KILL_WALL)) || (r_ptr->flags3 & (RF3_HUGE))) && (f_ptr->flags2 & (FF2_KILL_HUGE)))
+	{
+		/* Tunnel through the terrain */
+		cave_alter_feat(y, x, FS_KILL_HUGE);
+
+		/* Emerges */
+		emerge = TRUE;
+	}
+	else if (f_ptr->flags2 & (FF2_KILL_MOVE))
+	{
+		/* Tunnel through the terrain */
+		cave_alter_feat(y, x, FS_KILL_MOVE);
+
+		/* Emerges */
+		emerge = TRUE;
+	}
+
+	/* Hack -- ensure we now have uncovered terrain */
+	if (f_info[cave_feat[y][x]].flags2 & (FF2_COVERED)) return (FALSE);
+
+	/* Monster emerges from hiding if required */
+	if ((emerge) && (m_ptr->mflag & (MFLAG_HIDE)))
+	{
+		/* Unhide the monster */
+		m_ptr->mflag &= ~(MFLAG_HIDE);
+
+		/* And reveal */
+		update_mon(m_idx,FALSE);
+
+		/* Get new feature */
+		f_ptr = &f_info[cave_feat[y][x]];
+
+		/* Hack --- tell the player if something unhides */
+		if (m_ptr->ml)
+		{
+			char m_name[80];
+
+			/* Get the monster name */
+			monster_desc(m_name, m_ptr, 0);
+
+			msg_format("%^s emerges from %s%s.",m_name,
+				((f_ptr->flags2 & (FF2_FILLED))?"":"the "),
+				f_name+f_ptr->name);
+
+			if (disturb_move || ((m_ptr->mflag & (MFLAG_VIEW)) &&
+		      		disturb_near))
+			{
+				/* Disturb */
+				disturb(0, 0);
+			}
+		}
+	}
+
+	return (emerge);
+}
 
 
+/*
+ * Crash through the ceiling.
+ */
+static bool crash_from_above(int m_idx, int y, int x)
+{
+	monster_type *m_ptr = &m_list[m_idx];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	/* Check variety of ways of breaking through ceiling */
+	if (r_ptr->flags2 & (RF2_KILL_WALL) || (r_ptr->flags3 & (RF3_HUGE)))
+	{
+		/* Crash through the ceiling */
+		feat_near(FEAT_RUBBLE, y, x); 
+
+		/* Unhide the monster */
+		m_ptr->mflag &= ~(MFLAG_HIDE | MFLAG_OVER);
+
+		/* And reveal */
+		update_mon(m_idx,FALSE);
+
+		/* Hack --- tell the player if something unhides */
+		if (m_ptr->ml)
+		{
+			char m_name[80];
+
+			/* Get the monster name */
+			monster_desc(m_name, m_ptr, 0);
+
+			msg_format("%^s crashes through the ceiling.",m_name);
+
+			if (disturb_move || ((m_ptr->mflag & (MFLAG_VIEW)) &&
+		      		disturb_near))
+			{
+				/* Disturb */
+				disturb(0, 0);
+			}
+		}
+
+		return (TRUE);
+	}
+
+	return (FALSE);
+}
 
 /*
  * Process a monster's move.
@@ -3441,6 +3571,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 	bool did_kill_wall = FALSE;
 	bool did_smart = FALSE;
 	bool did_sneak = FALSE;
+	bool did_huge = FALSE;
 
 	/* Remember where monster is */
 	oy = m_ptr->fy;
@@ -3457,56 +3588,45 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 	/* The monster is hidden in terrain, trying to attack the player.*/
 	if (do_move && (m_ptr->mflag & (MFLAG_HIDE)) && (cave_m_idx[ny][nx] < 0))
 	{
-		/* We can't get out of hiding */
-		if ((f_info[cave_feat[ny][nx]].flags2 & (FF2_COVERED)) ||
-			(m_ptr->mflag & (MFLAG_OVER)))
+		/* Monster is under covered terrain and can't slip out */
+		if (!(r_ptr->flags2 & (RF2_PASS_WALL)) && !(m_ptr->tim_passw) && 
+			(f_info[cave_feat[ny][nx]].flags2 & (FF2_COVERED)))
 		{
-			if ((r_ptr->flags2 & (RF2_BASH_DOOR)) &&  (f_info[cave_feat[ny][nx]].flags1 & (FF1_BASH)))
+			/* Get at player */
+			if (bash_from_under(m_idx, ny, nx, &bash))
 			{
-				/* Don't move*/
-				do_move = FALSE;
-
-				/* Bash through the floor */
-				cave_alter_feat(ny, nx, FS_BASH);
-
-				/* Unhide the monster */
-				m_ptr->mflag &= ~(MFLAG_HIDE);
-
-				/* And reveal */
-				update_mon(m_idx,FALSE);
-
-				/* Hack --- tell the player if something unhides */
-				if ((m_ptr->mflag & (MFLAG_HIDE)) && (m_ptr->ml))
-				{
-					char m_name[80];
-
-					/* Get the monster name */
-					monster_desc(m_name, m_ptr, 0);
-
-					msg_format("%^s emerges from %s%s.",m_name,
-						((f_info[cave_feat[oy][ox]].flags2 & (FF2_FILLED))?"":"the "),
-						f_name+f_info[cave_feat[oy][ox]].name);
+				/* Can now see monster */
+				if (m_ptr->ml)
+				{	
+					/* Notice */
+					if (bash) did_bash_door = TRUE;
+					else if (r_ptr->flags2 & (RF2_KILL_WALL)) did_kill_wall = TRUE;
+					else if (r_ptr->flags3 & (RF3_HUGE)) did_huge = TRUE;
 				}
-
-				/* We saw it, maybe */
-				did_bash_door = TRUE;
-
-				/* Disturb on "move" */
-				if (m_ptr->ml &&
-				    (disturb_move ||
-				     ((m_ptr->mflag & (MFLAG_VIEW)) &&
-				      disturb_near)))
-				{
-					/* Disturb */
-					disturb(0, 0);
-				}
-
 			}
-
 			/* Can't get out, can't attack */
 			else
 			{
-
+				return;
+			}
+		}
+		/* Monster is in or over the ceiling and can't slip through */
+		else if (!(r_ptr->flags2 & (RF2_PASS_WALL)) && !(m_ptr->tim_passw) && 
+				(m_ptr->mflag & (MFLAG_HIDE)) && (m_ptr->mflag & (MFLAG_OVER)))
+		{
+			/* Get at player - through roof */
+			if (crash_from_above(m_idx, ny, nx))
+			{
+				/* Can now see monster? */
+				if (m_ptr->ml)
+				{
+					if (r_ptr->flags2 & (RF2_KILL_WALL)) did_kill_wall = TRUE;
+					else if (r_ptr->flags3 & (RF3_HUGE)) did_huge = TRUE;
+				}
+			}
+			/* Can't get out, can't attack */
+			else
+			{
 				return;
 			}
 		}
@@ -3541,8 +3661,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				disturb(0, 0);
 			}
 
+			/* Hack -- always notice pass wall */
+			if (r_ptr->flags2 & (RF2_PASS_WALL)) did_pass_wall = TRUE;
 		}
-
 	}
 
 	/* The grid is occupied by the player. */
@@ -3558,7 +3679,6 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		do_move = FALSE;
 	}
 
-
 	/* Get the feature in the grid that the monster is trying to enter. */
 	feat = cave_feat[ny][nx];
 
@@ -3566,167 +3686,93 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 	mmove = place_monster_here(ny,nx,m_ptr->r_idx);
 
 	/* Temporary pass wall */
-	if ((m_ptr->tim_passw) && (mon_resist_feat(m_idx, m_ptr->r_idx))) mmove = MM_PASS;
+	if ((m_ptr->tim_passw) && (mon_resist_feat(feat, m_ptr->r_idx))) mmove = MM_PASS;
 
-	/* The monster is stuck in terrain */
+	/* The monster is stuck in terrain e.g. cages */
 	if (!(m_ptr->mflag & (MFLAG_OVER)) && !(f_info[cave_feat[oy][ox]].flags1 & (FF1_MOVE)) &&
-		(place_monster_here(oy,ox,m_ptr->r_idx)<= 0) && (mmove != MM_PASS))
+		(place_monster_here(oy,ox,m_ptr->r_idx) <= 0) && (mmove != MM_PASS))
 	{
-		if (((r_ptr->flags2 & (RF2_BASH_DOOR)) &&  (f_info[cave_feat[oy][ox]].flags1 & (FF1_BASH)))
-				|| (r_ptr->flags2 & (RF2_KILL_WALL)))
-		{
-			/* Bash through the terrain */
-			cave_alter_feat(oy, ox, FS_BASH);
+		/* Hack -- check old location */
+		feat = cave_feat[oy][ox];
+		ny = oy;
+		nx = ox;
 
-			/* Unhide the monster */
-			m_ptr->mflag &= ~(MFLAG_HIDE);
+		/* Hack -- try to bash if allowed */
+		if (r_ptr->flags1 & (FF1_BASH)) bash = TRUE;
 
-			/* And reveal */
-			update_mon(m_idx,FALSE);
-
-			/* Hack --- tell the player if something unhides */
-			if (m_ptr->ml)
-			{
-				char m_name[80];
-
-				/* Get the monster name */
-				monster_desc(m_name, m_ptr, 0);
-
-				msg_format("%^s emerges from %s%s.",m_name,
-				((f_info[cave_feat[oy][ox]].flags2 & (FF2_FILLED))?"":"the "),
-				f_name+f_info[cave_feat[oy][ox]].name);
-			}
-
-			/* We saw it, maybe */
-			if (r_ptr->flags2 & (RF2_KILL_WALL)) did_kill_wall = TRUE;
-				else did_bash_door = TRUE;
-
-			/* Disturb on "move" */
-			if (m_ptr->ml &&
-			    (disturb_move ||
-			     ((m_ptr->mflag & (MFLAG_VIEW)) &&
-			      disturb_near)))
-			{
-				/* Disturb */
-				disturb(0, 0);
-			}
-
-			do_move = FALSE;
-		}
-		else
-		{
-			do_move = FALSE;
-		}			
+		mmove = MM_FAIL;
 	}
 
-	/* The monster is under covered terrain, moving to uncovered terrain. */
-	else if ((m_ptr->mflag & (MFLAG_HIDE)) && (f_info[cave_feat[oy][ox]].flags2 & (FF2_COVERED)) &&
-		!(f_info[cave_feat[ny][nx]].flags2 & (FF2_COVERED)) && (mmove != MM_FAIL))
+	/*
+         * Monster is under covered terrain, moving to uncovered terrain.
+         *
+	 * This is for situations where a monster might be swimming around under ice, next to a floor square.
+         * We don't allow it to easily move to the second location, but require that it bash up through the ice
+	 * first. However, we do want to allow it to easily move from ice to normal deep water.
+	 *
+	 */
+	if ((m_ptr->mflag & (MFLAG_HIDE)) && (f_info[cave_feat[oy][ox]].flags2 & (FF2_COVERED)) &&
+		!(f_info[feat].flags2 & (FF2_COVERED)) && (mmove != MM_FAIL))
 	{
+		/* We can move normally */
 		if ((mmove == MM_SWIM) || (mmove == MM_DIG) || (mmove == MM_PASS) || (mmove == MM_UNDER))
 		{
-				/* Move harmlessly */
+			/* Move normally */
 		}
-
-		else if (((r_ptr->flags2 & (RF2_BASH_DOOR)) &&  (f_info[cave_feat[oy][ox]].flags1 & (FF1_BASH)))
-				|| (r_ptr->flags2 & (RF2_KILL_WALL)))
+		/* We can bash up */
+		else if (bash_from_under(m_idx, oy, ox, &bash))
 		{
-			/* Bash through the floor */
-			cave_alter_feat(oy, ox, FS_BASH);
-
-			/* Unhide the monster */
-			m_ptr->mflag &= ~(MFLAG_HIDE);
-
-			/* And reveal */
-			update_mon(m_idx,FALSE);
-
-			/* Hack --- tell the player if something unhides */
+			/* Can now see monster? */
 			if (m_ptr->ml)
 			{
-				char m_name[80];
-
-				/* Get the monster name */
-				monster_desc(m_name, m_ptr, 0);
-
-				msg_format("%^s emerges from %s%s.",m_name,
-				((f_info[cave_feat[oy][ox]].flags2 & (FF2_FILLED))?"":"the "),
-				f_name+f_info[cave_feat[oy][ox]].name);
+				/* Notice */
+				if (bash) did_bash_door = TRUE;
+				else if (r_ptr->flags2 & (RF2_KILL_WALL)) did_kill_wall = TRUE;
+				else if (r_ptr->flags3 & (RF3_HUGE)) did_huge = TRUE;
 			}
 
-			/* We saw it, maybe */
-			if (r_ptr->flags2 & (RF2_KILL_WALL)) did_kill_wall = TRUE;
-				else did_bash_door = TRUE;
-
-			/* Disturb on "move" */
-			if (m_ptr->ml &&
-			    (disturb_move ||
-			     ((m_ptr->mflag & (MFLAG_VIEW)) &&
-			      disturb_near)))
-			{
-				/* Disturb */
-				disturb(0, 0);
-			}
-
+			/* Do instead of moving */
 			do_move = FALSE;
+		}
+		/* We can't otherwise move */
+		else
+		{
+			return;
 		}
 	}
 
-	/* Monster is on covered terrain, moving to covered terrain */
+	/*
+         * Monster is on covered terrain, moving to covered terrain.
+         *
+	 * This is for situations where a monster might be stuck on the surface of ice over water, but wants to get
+         * back under so it can swim around in hiding.
+	 *
+	 */
 	else if (!(m_ptr->mflag & (MFLAG_HIDE)) && (f_info[cave_feat[oy][ox]].flags2 & (FF2_COVERED)) &&
-		(f_info[cave_feat[ny][nx]].flags2 & (FF2_COVERED)) &&
+		(f_info[feat].flags2 & (FF2_COVERED)) &&
 			((mmove == MM_SWIM) || (mmove == MM_DIG)))
 	{
-
-		if ((r_ptr->flags2 & (RF2_BASH_DOOR)) &&  (f_info[cave_feat[ny][nx]].flags1 & (FF1_BASH)))
+		/* Bash into new terrain */
+		if (bash_from_under(m_idx, ny, nx, &bash))
 		{
-			/* Bash through the floor */
-			cave_alter_feat(ny, nx, FS_BASH);
-
-			/* We saw it, maybe */
-			did_bash_door = TRUE;
-
-			/* Disturb on "move" */
-			if (m_ptr->ml &&
-			    (disturb_move ||
-			     ((m_ptr->mflag & (MFLAG_VIEW)) &&
-			      disturb_near)))
-			{
-				/* Disturb */
-				disturb(0, 0);
+			/* Can now see monster */
+			if (m_ptr->ml)
+			{	
+				/* Notice */
+				if (bash) did_bash_door = TRUE;
+				else if (r_ptr->flags2 & (RF2_KILL_WALL)) did_kill_wall = TRUE;
+				else if (r_ptr->flags3 & (RF3_HUGE)) did_huge = TRUE;
 			}
-
-			mmove = MM_WALK;
-		}
-
-		else if ((r_ptr->flags2 & (RF2_BASH_DOOR)) &&  (f_info[cave_feat[oy][ox]].flags1 & (FF1_BASH)))
-		{
-			/* Bash through the floor */
-			cave_alter_feat(oy, ox, FS_BASH);
-
-			/* We saw it, maybe */
-			did_bash_door = TRUE;
-
-			/* Disturb on "move" */
-			if (m_ptr->ml &&
-			    (disturb_move ||
-			     ((m_ptr->mflag & (MFLAG_VIEW)) &&
-			      disturb_near)))
-			{
-				/* Disturb */
-				disturb(0, 0);
-			}
-
-			do_move = FALSE;
 		}
 
 		else if ((r_ptr->flags2 & (RF2_CAN_FLY)) &&
-			 (f_info[cave_feat[ny][nx]].flags2 & (FF2_CAN_FLY)))
+			 (f_info[feat].flags2 & (FF2_CAN_FLY)))
 		{
 			mmove = MM_FLY;
 		}
 
 		else if (!(r_ptr->flags2 & (RF2_MUST_SWIM)) &&
-			(mon_resist_feat(f_info[cave_feat[ny][nx]].mimic,m_ptr->r_idx)))
+			(mon_resist_feat(f_info[feat].mimic,m_ptr->r_idx)))
 		{
 			mmove = MM_WALK;
 		}
@@ -3736,6 +3782,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		}
 	}
 
+	/* Monster has to interact with terrain to try and pass it */
 	else if (mmove <= MM_FAIL)
 	{
 		/* Glyphs */
@@ -3749,19 +3796,51 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 	
 			/* Break the rune */
 			cave_alter_feat(ny, nx, FS_GLYPH);
-	
+
 		}
 
 		/* Doors */
 		if ((f_info[feat].flags1 & (FF1_BASH)) || (f_info[feat].flags1 & (FF1_OPEN)) ||
 			  (f_info[feat].flags1 & (FF1_SECRET)))
 		{
-
 			/* Hack --- monsters find secrets */
 			if (f_info[feat].flags1 & (FF1_SECRET)) cave_alter_feat(ny,nx,FS_SECRET);
 
+			/* Monster walks through the door */
+			if ((r_ptr->flags3 & (RF3_HUGE)) && (f_info[feat].flags1 & (FF1_TUNNEL)))
+			{
+				/* Character is not too far away */
+				if (m_ptr->cdis < 30)
+				{
+					/* Message */
+					msg_print("You hear a door burst open!");
+
+					/* Disturb (sometimes) */
+					if (disturb_minor) disturb(0, 0);
+				}
+
+				/* Break down the door */
+				cave_alter_feat(ny, nx, FS_TUNNEL);
+
+				/* Paranoia -- make sure we have bashed it */
+				if (!(f_info[feat].flags1 & (FF1_MOVE)) && !(f_info[feat].flags3 & (FF3_EASY_CLIMB))) do_move = FALSE;
+
+				/* Handle viewable doors */
+				if (play_info[ny][nx] & (PLAY_SEEN)) 
+				{
+					/* Always disturb */
+					disturb(0, 0);
+
+					do_view = TRUE;
+				}
+
+				/* Optional disturb for non-viewable doors */
+				else if (disturb_minor) disturb(0, 0);
+	
+			}
+
 			/* Monster bashes the door down */
-			if ((bash) && (f_info[feat].flags1 & (FF1_BASH)))
+			else if ((bash) && (f_info[feat].flags1 & (FF1_BASH)))
 			{
 				/* Character is not too far away */
 				if (m_ptr->cdis < 30)
@@ -3779,6 +3858,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				/* Break down the door */
 				if (rand_int(100) < 50) cave_alter_feat(ny, nx, FS_OPEN);
 				else cave_alter_feat(ny, nx, FS_BASH);
+
+				/* Paranoia -- make sure we have bashed it */
+				if (!(f_info[feat].flags1 & (FF1_MOVE)) && !(f_info[feat].flags3 & (FF3_EASY_CLIMB))) do_move = FALSE;
 
 				/* Handle viewable doors */
 				if (play_info[ny][nx] & (PLAY_SEEN)) 
@@ -3805,28 +3887,31 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		}
 
 		/* Hack --- smart monsters try to disarm traps */
-		else if ((f_info[cave_feat[ny][nx]].flags1 & (FF1_TRAP)) &&
+		else if ((f_info[feat].flags1 & (FF1_TRAP)) &&
 			(r_ptr->flags2 & (RF2_SMART)))
 		{
-			int power;
+			int power, chance;
 
 			/* Get trap "power" */
 			power = f_info[cave_feat[ny][nx]].power;
 
-			/* Player trap */
-			if (cave_o_idx[ny][nx])
-			{
-				/* Use object level instead */
-				power = k_info[o_list[cave_o_idx[ny][nx]].k_idx].level;
-			}
+			/* Base chance */
+			chance = r_ptr->level;
+
+			/* Apply intelligence */
+			if (m_ptr->mflag & (MFLAG_STUPID)) chance /= 2;
+			else if (m_ptr->mflag & (MFLAG_SMART)) chance = chance * 3 / 2;
+
+			/* Apply dexterity */
+			if (m_ptr->mflag & (MFLAG_CLUMSY)) chance /= 2;
+			else if (m_ptr->mflag & (MFLAG_SKILLFUL)) chance = chance * 3 / 2;
 
 			/* Break the ward */
-			if (randint(r_ptr->level) > power)
+			if (randint(chance) > power)
 			{
 				/* Describe hidden trap breakage */
-				if ((cave_feat[ny][nx] == FEAT_INVIS) || (cave_feat[ny][nx] == FEAT_DOOR_INVIS))
+				if ((feat == FEAT_INVIS) || (feat == FEAT_DOOR_INVIS))
 				{
-
 					/* Pick a trap */
 					pick_trap(ny,nx);
 
@@ -3865,7 +3950,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			}
 
 			/* Don't set off the ward */
-			else if (randint(r_ptr->level) > f_info[cave_feat[ny][nx]].power)
+			else if (randint(chance) > power)
 			{
 				do_move = FALSE;	
 			}
@@ -3881,16 +3966,39 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			did_kill_wall = TRUE;
 		}
 
-
+		/* Uncrossable terrain */
 		else if (!(f_info[feat].flags1 & (FF1_MOVE))) return;
-
 	}
+
+	/* Re-get the feature in the grid that the monster is trying to enter. */
+	feat = cave_feat[ny][nx];
 
 	/* Monster is allowed to move */
 	if (do_move)
 	{
+		/* Monster has to climb the grid slowly */
+		if ((mmove == MM_CLIMB) && !(r_ptr->flags2 & (RF2_CAN_CLIMB)) && !(m_ptr->mflag & (MFLAG_OVER))
+			&& !(m_ptr->mflag & (MFLAG_HIDE)))
+		{
+			/* Climb */
+			m_ptr->mflag |= (MFLAG_OVER);
+
+			/* Climbing takes a turn */
+			do_move = FALSE;
+		}
+
+		/* Monster flies or climbs over other monsters */
+		else if ((mmove == MM_FLY) || (mmove == MM_CLIMB))
+		{
+			/* Move over, but not through ceiling */
+			if (!(m_ptr->mflag & (MFLAG_HIDE))) m_ptr->mflag |= (MFLAG_OVER);
+
+			/* Don't move monsters underneath ceiling otherwise */
+			else do_move = FALSE;
+		}
+
 		/* The grid is occupied by a monster. */
-		if (cave_m_idx[ny][nx] > 0)
+		else if (cave_m_idx[ny][nx] > 0)
 		{
 			monster_type *n_ptr = &m_list[cave_m_idx[ny][nx]];
 			monster_race *nr_ptr = &r_info[n_ptr->r_idx];
@@ -3992,8 +4100,8 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			monster_desc(m_name, m_ptr, 0);
 
 			msg_format("%^s hides in %s%s.",m_name,
-			((f_info[cave_feat[ny][nx]].flags2 & (FF2_FILLED))?"":"the "),
-			f_name+f_info[cave_feat[ny][nx]].name);
+			((f_info[feat].flags2 & (FF2_FILLED))?"":"the "),
+			f_name+f_info[feat].name);
 		}
 
 		/* Move the monster */
@@ -4017,6 +4125,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			msg_format("%^s emerges from %s%s.",m_name,
 			((f_info[cave_feat[oy][ox]].flags2 & (FF2_FILLED))?"":"the "),
 			f_name+f_info[cave_feat[oy][ox]].name);
+
+			/* If flying or climbing, start over */
+			if ((mmove == MM_CLIMB) || (mmove == MM_FLY)) m_ptr->mflag |= (MFLAG_OVER);
 		}
 
 		/* Possible disturb */
@@ -4030,13 +4141,13 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		}
 
 		/* Hit traps */
-		if (f_info[cave_feat[ny][nx]].flags1 & (FF1_HIT_TRAP) &&
+		if (f_info[feat].flags1 & (FF1_HIT_TRAP) &&
 			!(m_ptr->mflag & (MFLAG_OVER)))
 		{
 			mon_hit_trap(m_idx,ny,nx);
 		}
 		/* Hit other terrain */
-		else if ((!mon_resist_feat(cave_feat[ny][nx],m_ptr->r_idx))&&
+		else if ((!mon_resist_feat(feat,m_ptr->r_idx)) &&
 			!(m_ptr->mflag & (MFLAG_OVER)))
 		{
 			mon_hit_trap(m_idx,ny,nx);
@@ -4045,14 +4156,20 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		/* XXX XXX Note we don't hit the old monster with traps/terrain */
 
 		/* Leave tracks */
-		if (f_info[cave_feat[ny][nx]].flags2 & (FF2_KILL_MOVE))
+		if ((f_info[feat].flags2 & (FF2_KILL_HUGE)) && (r_ptr->flags3 & (RF3_HUGE)))
+		{
+			if (!(m_ptr->mflag & (MFLAG_OVER))) cave_alter_feat(ny, nx, FS_KILL_HUGE);
+		}
+		else if (f_info[feat].flags2 & (FF2_KILL_MOVE))
 		{
 			if (!(m_ptr->mflag & (MFLAG_OVER))) cave_alter_feat(ny, nx, FS_KILL_MOVE);
 		}
-		else if (f_info[cave_feat[oy][ox]].flags1 & (FF1_FLOOR))
+		else if ((f_info[cave_feat[oy][ox]].flags1 & (FF1_FLOOR)) && (!(m_ptr->mflag & (MFLAG_HIDE))))
 		{
-			if ((r_ptr->flags8 & (RF8_HAS_BLOOD)) && (m_ptr->hp < m_ptr->maxhp/3) && (rand_int(100)<30))
+			if ((r_ptr->flags8 & (RF8_HAS_BLOOD)) && (m_ptr->hp < m_ptr->maxhp / 3) && (rand_int(100) < 30))
 				cave_set_feat(oy, ox, FEAT_FLOOR_BLOOD_T);
+			else if (!(r_ptr->flags9 & (RF9_NO_CUTS)) && (m_ptr->hp < m_ptr->maxhp / 3) && (rand_int(100) < 30))
+				cave_set_feat(oy, ox, FEAT_FLOOR_SLIME_T);
 			else if (r_ptr->flags8 & (RF8_HAS_SLIME))
 				cave_set_feat(oy, ox, FEAT_FLOOR_SLIME_T);
 			else if (r_ptr->flags2 & (RF2_HAS_WEB))
@@ -4063,6 +4180,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			if (r_ptr->flags2 & (RF2_HAS_WEB))
 				cave_set_feat(oy, ox, FEAT_CHASM_WEB);
 		}
+
+		/* Reget the feature */
+		feat = cave_feat[ny][nx];
 
 		/*
 		 * If a member of a monster group capable of smelling hits a 
@@ -4127,7 +4247,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		/* Scan all objects in the grid */
 
 		/* Can we get the objects */
-		if ((f_info[cave_feat[ny][nx]].flags1 & (FF1_DROP)) &&
+		if ((f_info[feat].flags1 & (FF1_DROP)) &&
 			!(m_ptr->mflag & (MFLAG_OVER | MFLAG_HIDE)))
 		{
 			for (this_o_idx = cave_o_idx[ny][nx]; this_o_idx; this_o_idx = next_o_idx)
@@ -4146,7 +4266,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				/* Sneaky monsters hide behind big objects */
 				if ((o_ptr->weight > 1500)
 					&& (r_ptr->flags2 & (RF2_SNEAKY))
-					&& !(m_ptr->mflag & (MFLAG_HIDE)))
+					&& !(m_ptr->mflag & (MFLAG_HIDE | MFLAG_OVER)))
 				{
 					char m_name[80];
 					char o_name[80];
@@ -4159,10 +4279,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 	
 					msg_format("%^s hides behind %s.",m_name, o_name);
 	
-					m_ptr->mflag |=(MFLAG_HIDE);
+					m_ptr->mflag |= (MFLAG_HIDE);
 	
 					did_sneak = TRUE;
-	
 				}
 	
 				/* Take or kill objects on the floor */
@@ -4302,7 +4421,8 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		if (did_kill_body) l_ptr->flags2 |= (RF2_KILL_BODY);
 
 		/* Monster passed through a wall */
-		if ((did_pass_wall) && !(m_ptr->tim_passw)) l_ptr->flags2 |= (RF2_PASS_WALL);
+		/* XXX Temporary spell to pass wall so need to check */
+		if ((did_pass_wall)  && (r_ptr->flags2 & RF2_PASS_WALL)) l_ptr->flags2 |= (RF2_PASS_WALL);
 
 		/* Monster destroyed a wall */
 		if (did_kill_wall) l_ptr->flags2 |= (RF2_KILL_WALL);
@@ -4312,6 +4432,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 
 		/* Monster hide behind an object */
 		if (did_sneak) l_ptr->flags2 |= (RF2_SNEAKY);
+
+		/* Monster utilised its 'hugeness' */
+		if (did_huge) l_ptr->flags3 |= (RF3_HUGE);
 
 		/* Monster is climbing */
 		/* XXX Rubble, trees, webs will always result in climbing, so need to check */
@@ -4337,7 +4460,6 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 
 		/* Monster is passing */
 		if ((mmove == MM_PASS)  && !(m_ptr->tim_passw)) l_ptr->flags2 |= (RF2_PASS_WALL);
-
 	}
 }
 
@@ -4956,6 +5078,16 @@ static void recover_monster(int m_idx, bool regen)
 		{
 			/* Recover somewhat */
 			m_ptr->cut -= d;
+
+			/* Bleed in place */
+			if ((f_info[cave_feat[m_ptr->fy][m_ptr->fy]].flags1 & (FF1_FLOOR)) &&
+				(rand_int(100) < m_ptr->cut))
+			{
+				if (r_ptr->flags8 & (RF8_HAS_BLOOD))
+					cave_set_feat(m_ptr->fy, m_ptr->fx, FEAT_FLOOR_BLOOD_T);
+				else
+					cave_set_feat(m_ptr->fy, m_ptr->fx, FEAT_FLOOR_SLIME_T);
+			}
 
 			/* Take damage - only players can cut monsters */
 			mon_take_hit(m_idx, (m_ptr->cut > 200 ? 3 : (m_ptr->cut > 100 ? 2 : 1)), &fear, NULL);

@@ -2098,7 +2098,7 @@ int place_monster_here(int y, int x, int r_idx)
 	}
 
 	/* Hack -- check for climbing */
-	if ((r_ptr->flags2 & (RF2_CAN_CLIMB)) &&
+	if ((r_ptr->flags2 & (RF2_CAN_CLIMB)) && 
 		(f_ptr->flags3 & (FF3_EASY_CLIMB)))
 	{
 		return(MM_CLIMB);
@@ -2158,6 +2158,14 @@ void monster_hide(int y, int x, int mmove, monster_type *m_ptr)
         /* Get the race */
         monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
+	/* Over the ceiling of a building */
+	if ((m_ptr->mflag & (MFLAG_OVER)) &&
+		(m_ptr->mflag & (MFLAG_HIDE)))
+	{
+		/* Don't change state or update further */
+		return;
+	}
+
 	/* Update flags */
 	if (((m_ptr->mflag & (MFLAG_OVER))==0)
 	       && !(f_ptr->flags1 & (FF1_MOVE))
@@ -2179,8 +2187,13 @@ void monster_hide(int y, int x, int mmove, monster_type *m_ptr)
 		m_ptr->mflag &= ~(MFLAG_OVER);
 	}
 
+	/* Never hide if over terrain, except on surface, and outside */
+	if (m_ptr->mflag & (MFLAG_OVER))
+	{
+		m_ptr->mflag &= ~(MFLAG_HIDE);
+	}
 	/* Never hide in terrain we don't resist */
-	if (!mon_resist_feat(cave_feat[y][x],m_ptr->r_idx))
+	else if (!mon_resist_feat(cave_feat[y][x],m_ptr->r_idx))
 	{
 		m_ptr->mflag &= ~(MFLAG_HIDE);
 	}
@@ -2299,23 +2312,95 @@ s16b monster_place(int y, int x, monster_type *n_ptr)
 }
 
 
-/*calculate the monster_speed of a monster at a given location*/
-void calc_monster_speed(int y, int x)
+/*
+ *  Calculate monster armour class. Takes into account temporary conditions and stats.
+ *
+ *  We return two different values, depending on ranged or melee ac. Temporary
+ *  shield spells and monsters with shields have twice as much effect at range.
+ */
+int calc_monster_ac(const monster_type *m_ptr, bool ranged)
+{
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+	monster_lore *l_ptr = &l_list[m_ptr->r_idx];
+
+	int ac;
+
+	/* Get the base ac */
+	ac = r_ptr->ac;
+
+	/* Modify by dexterity */
+	if (m_ptr->mflag & (MFLAG_CLUMSY)) ac -= 5;
+	else if (m_ptr->mflag & (MFLAG_SKILLFUL)) ac += 5;
+
+	/* Hack -- Armoured monsters carry shields at range */
+	if ((r_ptr->flags2 & (RF2_ARMOR)) && (ranged))
+	{
+		/* Notice this */
+		if ((m_ptr->ml) && (!l_ptr->flags2 & (RF2_ARMOR))) l_ptr->flags2 |= (RF2_ARMOR);
+
+		/* Hack -- assume a shield provides 1/4 of overall base ac */
+		ac += r_ptr->ac / 4;
+	}
+
+	/* Shield spell counts for double at range */
+	if ((m_ptr->shield) && (ranged)) ac += 100;
+	else if (m_ptr->shield) ac += 50;
+
+	/* Modify by temporary conditions */
+	if (m_ptr->beserk) ac -= 10;
+	if (m_ptr->bless) ac += 5;
+	if (m_ptr->stunned) ac -= 10;
+	if (m_ptr->blind) ac -= 10;
+
+	if (ac <= 0) ac = 1;
+
+	return(ac);
+}
+
+
+/*
+ *  Calculate monster maximum hit points.
+ */
+int calc_monster_hp(const monster_type *m_ptr)
+{
+	int hp;
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	/* Assign maximal hitpoints */
+	if (r_ptr->flags1 & (RF1_FORCE_MAXHP))
+	{
+		hp = maxroll(r_ptr->hdice, r_ptr->hside);
+	}
+	else
+	{
+		hp = damroll(r_ptr->hdice, r_ptr->hside);
+	}
+
+	/* Hack -- Scale down hit points by monster armour */
+	hp -= (hp * ((r_ptr->ac < 150) ? r_ptr->ac : 150) / 250);
+
+	/* Adjust for monster constitution stat */
+	if (m_ptr->mflag & (MFLAG_SICK)) hp = hp * 9 / 10;
+	else if (m_ptr->mflag & (MFLAG_HEALTHY)) hp = hp * 11 / 10;
+
+	if (hp <= 0) hp = 1;
+
+	return(hp);
+}
+
+
+/* Calculate the monster_speed of a monster */
+byte calc_monster_speed(const monster_type *m_ptr)
 {
 	int speed, i;
 
-	/*point to the monster at the given location & the monster race*/
-	monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
+	/* Get the monster race */
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
-
-	/* Paranoia XXX XXX */
-	if (cave_m_idx[y][x] == 0) return;
 
 	/* Monster has same speed as player? */
 	if (r_ptr->flags9 & (RF9_SAME_SPEED))
 	{
-		speed = p_ptr->pspeed;
-		return;
+		return (p_ptr->pspeed);
 	}
 
 	/* Get the monster base speed */
@@ -2335,14 +2420,11 @@ void calc_monster_speed(int y, int x)
 		speed += rand_spread(0, i);
 	}
 
-	/*factor in the hasting and slowing counters*/
+	/* Factor in the hasting and slowing counters*/
 	if (m_ptr->hasted) speed += 10;
 	if (m_ptr->slowed) speed -= 10;
 
-	/*set the speed and return*/
-	m_ptr->mspeed = speed;
-
-	return;
+	return (speed);
 }
 
 void set_monster_haste(s16b m_idx, s16b counter, bool message)
@@ -2385,7 +2467,7 @@ void set_monster_haste(s16b m_idx, s16b counter, bool message)
 	m_ptr->hasted = counter;
 
 	/*re-calculate speed if necessary*/
-	if (recalc) calc_monster_speed(m_ptr->fy, m_ptr->fx);
+	if (recalc) m_ptr->mspeed = calc_monster_speed(m_ptr);
 
 	return;
 }
@@ -2430,7 +2512,7 @@ void set_monster_slow(s16b m_idx, s16b counter, bool message)
 	m_ptr->slowed = counter;
 
 	/*re-calculate speed if necessary*/
-	if (recalc) calc_monster_speed(m_ptr->fy, m_ptr->fx);
+	if (recalc) m_ptr->mspeed = calc_monster_speed(m_ptr);
 
 	return;
 }
@@ -2584,45 +2666,42 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp)
 		n_ptr->csleep = ((val * 2) + randint(val * 10));
 	}
 
-	/* Hack -- Enforce no summoning if needed */
-	if (!slp)
+	/* Hack -- allow uniques to have their stats drained multiple times */
+	if (r_ptr->flags1 & (RF1_UNIQUE))
 	{
-		n_ptr->summoned = 100;
+		/* Uniques always start out the best possible */
+		n_ptr->mflag |= (MFLAG_STRONG | MFLAG_SMART | MFLAG_WISE | MFLAG_SKILLFUL | MFLAG_HEALTHY);
 	}
-
-
-	/* Assign maximal hitpoints */
-	if (r_ptr->flags1 & (RF1_FORCE_MAXHP))
-	{
-		n_ptr->maxhp = maxroll(r_ptr->hdice, r_ptr->hside);
-	}
+	/* Hack -- small racial variety - see the mflag defines */
 	else
 	{
-		n_ptr->maxhp = damroll(r_ptr->hdice, r_ptr->hside);
+		u32b variety = rand_int(0x1000);
+
+		/* Set initially variation */
+		n_ptr->mflag |= variety << 16;
+
+		/* Reroll */
+		variety = rand_int(32);
+
+		/* Adjust frequencies so 1/4 better, 1/2 average, 1/4 worse */
+		if ((n_ptr->mflag & (MFLAG_SLOW)) && (variety & 0x01)) n_ptr->mflag &= ~(MFLAG_SLOW | MFLAG_FAST);
+		if ((n_ptr->mflag & (MFLAG_WEAK)) && (variety & 0x02))  n_ptr->mflag &= ~(MFLAG_WEAK | MFLAG_STRONG);
+		if ((n_ptr->mflag & (MFLAG_STUPID)) && (variety & 0x04))  n_ptr->mflag &= ~(MFLAG_STUPID | MFLAG_SMART);
+		if ((n_ptr->mflag & (MFLAG_NAIVE)) && (variety & 0x08)) n_ptr->mflag &= ~(MFLAG_NAIVE | MFLAG_WISE);
+		if ((n_ptr->mflag & (MFLAG_CLUMSY)) && (variety & 0x10))  n_ptr->mflag &= ~(MFLAG_CLUMSY | MFLAG_SKILLFUL);
+		if ((n_ptr->mflag & (MFLAG_SICK))  && (variety & 0x20)) n_ptr->mflag &= ~(MFLAG_SICK | MFLAG_HEALTHY);
 	}
 
-	/* Hack -- Scale down hit points by monster armour */
-	n_ptr->maxhp -= (n_ptr->maxhp * ((r_ptr->ac < 150) ? r_ptr->ac : 150) / 250);
-
-	if (n_ptr->maxhp <= 0) n_ptr->maxhp = 1;
+	/* Calculate the monster hp */
+	n_ptr->maxhp = calc_monster_hp(n_ptr);
 
 	/* And start out fully healthy */
 	n_ptr->hp = n_ptr->maxhp;
 
+	/* Calculate the monster_speed*/
+	n_ptr->mspeed = calc_monster_speed(n_ptr);
 
-	/* Extract the monster base speed */
-	n_ptr->mspeed = r_ptr->speed;
-
-	/* Hack -- small racial variety */
-	if (!(r_ptr->flags1 & (RF1_UNIQUE)))
-	{
-		/* Allow some small variation per monster */
-		i = extract_energy[r_ptr->speed] / 10;
-		if (i) n_ptr->mspeed += rand_spread(0, i);
-	}
-
-
-	/* Give a random starting energy */
+	/* And start with random energy */
 	n_ptr->energy = (byte)rand_int(100);
 
 	/* Some monsters radiate lite when born */
@@ -2635,9 +2714,6 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp)
 
 	/* Place the monster in the dungeon */
 	if (!monster_place(y, x, n_ptr)) return (FALSE);
-
-	/*calculate the monster_speed*/
-	calc_monster_speed(y, x);
 
 	/* Success */
 	return (TRUE);
