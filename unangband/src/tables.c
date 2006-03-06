@@ -3145,3 +3145,24 @@ const element_type element[MAX_ELEMENTS] =
 		  (RF5_BALL_LITE),
 		  0L }
 };
+
+/*
+ * Define which items all starting characters get.
+ */
+const start_item common_items[MAX_COMMON_ITEMS]=
+{
+	{	TV_FOOD, SV_FOOD_SLIME_MOLD, 6, 7, 0, 0, 0, 20},
+	{	TV_FOOD, SV_FOOD_PINT_OF_ALE, 1, 1, 0, 0, 5, 40},
+	{	TV_FOOD, SV_FOOD_BISCUIT, 6, 7, 0, 0, 21, 40},
+	{	TV_FOOD, SV_FOOD_RATION, 3, 7, 0, 0, 41, 100},
+	{	TV_FOOD, SV_FOOD_PINT_OF_WINE, 1, 1, 0, 0, 60, 95},
+	{	TV_LITE, SV_LITE_TORCH, 3, 7, 500, 3500, 0, 75},
+	{	TV_LITE, SV_LITE_LANTERN, 1, 1, 500, 3500, 76, 100},
+	{	TV_FLASK, SV_FLASK_OIL, 2, 5, 0, 0, 80, 100},
+	{	TV_HELM, SV_HARD_LEATHER_CAP, 1, 1, 0, 0, 60, 99},
+	{	TV_CROWN, SV_GOLDEN_CROWN, 1, 1, 0, 0, 100, 100},
+	{	TV_BOOTS, SV_PAIR_OF_HARD_LEATHER_BOOTS, 1, 1, 0, 0, 50, 70},
+	{	TV_BOOTS, SV_PAIR_OF_SOFT_LEATHER_BOOTS, 1, 1, 0, 0, 70, 100},
+	{	TV_HELM, SV_SET_OF_LEATHER_GLOVES, 1, 1, 0, 0, 90, 100},
+	{	TV_CLOAK, SV_CLOAK, 1, 1, 0, 0, 90, 100}
+};

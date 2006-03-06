@@ -4452,7 +4452,7 @@ errr parse_c_info(char *buf, header *head)
 	/* Process 'E' for "Starting Equipment" */
 	else if (buf[0] == 'E')
 	{
-		int tval, sval, min, max;
+		int tval, sval, number_min, number_max, pval_min, pval_max, social_min, social_max;
 
 		start_item *e_ptr;
 
@@ -4463,23 +4463,27 @@ errr parse_c_info(char *buf, header *head)
 		e_ptr = &pc_ptr->start_items[cur_equip];
 
 		/* Scan for the values */
-		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
-			    &tval, &sval, &min, &max)) return (PARSE_ERROR_GENERIC);
+		if (8 != sscanf(buf+2, "%d:%d:%d:%d:%d:%d:%d:%d",
+			    &tval, &sval, &number_min, &number_max, &pval_min, &pval_max, &social_min, &social_max)) return (PARSE_ERROR_GENERIC);
 
-		if ((min < 0) || (max < 0) || (min > 99) || (max > 99))
+		if ((number_min < 0) || (number_max < 0) || (number_min > 99) || (number_max > 99))
 			return (PARSE_ERROR_INVALID_ITEM_NUMBER);
 
 		/* Save the values */
 		e_ptr->tval = tval;
 		e_ptr->sval = sval;
-		e_ptr->min = min;
-		e_ptr->max = max;
+		e_ptr->number_min = number_min;
+		e_ptr->number_max = number_max;
+		e_ptr->pval_min = pval_min;
+		e_ptr->pval_max = pval_max;
+		e_ptr->social_min = social_min;
+		e_ptr->social_max = social_max;
 
 		/* Next item */
 		cur_equip++;
 
 		/* Limit number of starting items */
-		if (cur_equip > MAX_START_ITEMS)
+		if (cur_equip > MAX_CLASS_ITEMS)
 			return (PARSE_ERROR_GENERIC);
 	}
 

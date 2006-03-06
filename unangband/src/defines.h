@@ -191,7 +191,8 @@
 /*
  * Maximum amount of starting equipment
  */
-#define MAX_START_ITEMS	4
+#define MAX_CLASS_ITEMS	4
+#define MAX_COMMON_ITEMS 16
 
 
 /*

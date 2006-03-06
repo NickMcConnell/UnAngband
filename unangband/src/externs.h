@@ -84,6 +84,7 @@ extern const byte spell_desire_RF5[32][8];
 extern const byte spell_desire_RF6[32][8];
 extern const byte spell_desire_RF7[32][8];
 extern const element_type element[MAX_ELEMENTS];
+const start_item common_items[MAX_COMMON_ITEMS];
 
 /* variable.c */
 extern cptr copyright;

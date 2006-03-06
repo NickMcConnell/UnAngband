@@ -522,7 +522,6 @@ static void player_wipe(void)
 }
 
 
-
 /*
  * Init players with some belongings
  *
@@ -535,33 +534,17 @@ static void player_outfit(void)
 	object_type *i_ptr;
 	object_type object_type_body;
 
-
-	/* Get local object */
-	i_ptr = &object_type_body;
-
-	/* Hack -- Give the player some food */
-	object_prep(i_ptr, lookup_kind(TV_FOOD, SV_FOOD_RATION));
-	i_ptr->number = (byte)rand_range(3, 7);
-	object_aware(i_ptr);
-	object_known(i_ptr);
-	(void)inven_carry(i_ptr);
-
-	/* Get local object */
-	i_ptr = &object_type_body;
-
-	/* Hack -- Give the player some torches */
-	object_prep(i_ptr, lookup_kind(TV_LITE, SV_LITE_TORCH));
-	i_ptr->number = (byte)rand_range(3, 7);
-	i_ptr->pval = rand_range(3, 7) * 500;
-	object_aware(i_ptr);
-	object_known(i_ptr);
-	(void)inven_carry(i_ptr);
-
 	/* Hack -- Give the player his equipment */
-	for (i = 0; i < MAX_START_ITEMS; i++)
+	for (i = 0; i < MAX_CLASS_ITEMS + MAX_COMMON_ITEMS + 1; i++)
 	{
+		object_type *o_ptr;
+
 		/* Access the item */
-		e_ptr = &(cp_ptr->start_items[i]);
+		if (i < MAX_CLASS_ITEMS) e_ptr = &(cp_ptr->start_items[i]);
+		else e_ptr = &(common_items[i - MAX_CLASS_ITEMS]);
+
+		/* Check the social class */
+		if ((p_ptr->sc < e_ptr->social_min) || (p_ptr->sc > e_ptr->social_max)) continue;
 
 		/* Get local object */
 		i_ptr = &object_type_body;
@@ -569,20 +552,153 @@ static void player_outfit(void)
 		/* Hack	-- Give the player an object */
 		if (e_ptr->tval > 0)
 		{
+			int slot;
+
 			/* Get the object_kind */
-			int k_idx = lookup_kind(e_ptr->tval, e_ptr->sval);
+			s16b k_idx = lookup_kind(e_ptr->tval, e_ptr->sval);
+
+			/* Hack -- style lookups to change basic equipment */
+			if (p_ptr->pstyle) switch (e_ptr->tval)
+			{
+				case TV_SWORD:
+				case TV_HAFTED:
+				case TV_POLEARM:
+				{
+					switch (p_ptr->pstyle)
+					{
+						case WS_UNARMED:
+						{
+							k_idx = lookup_kind(TV_GLOVES, SV_SET_OF_CESTI);
+							break;
+						}
+						case WS_SWORD:
+						{
+							k_idx = lookup_kind(TV_SWORD, SV_LONG_SWORD);
+							break;
+						}
+						case WS_HAFTED:
+						{
+							k_idx = lookup_kind(TV_HAFTED, SV_WAR_HAMMER);
+							break;
+						}
+						case WS_POLEARM:
+						{
+							k_idx = lookup_kind(TV_POLEARM, SV_PIKE);
+							break;
+						}
+					}
+					break;
+				}
+
+				case TV_BOW:
+				{
+					switch (p_ptr->pstyle)
+					{
+						case WS_TWO_WEAPON:
+						case WS_THROWN:
+						{
+							k_idx = lookup_kind(TV_SWORD, SV_DAGGER);
+							break;
+						}
+						case WS_SLING:
+						{
+							k_idx = lookup_kind(TV_BOW, SV_SLING);
+							break;
+						}
+						case WS_BOW:
+						{
+							k_idx = lookup_kind(TV_BOW, SV_LONG_BOW);
+							break;
+						}
+						case WS_XBOW:
+						{
+							k_idx = lookup_kind(TV_BOW, SV_LIGHT_XBOW);
+							break;
+						}
+					}
+					break;	
+				}
+
+				case TV_SHOT:
+				case TV_ARROW:
+				case TV_BOLT:
+				{
+					switch (p_ptr->pstyle)
+					{
+						case WS_TWO_WEAPON:
+						case WS_THROWN:
+						{
+							k_idx = lookup_kind(TV_SWORD, SV_DAGGER);
+							break;
+						}
+						case WS_SLING:
+						{
+							k_idx = lookup_kind(TV_SHOT, SV_AMMO_NORMAL);
+							break;
+						}
+						case WS_BOW:
+						{
+							k_idx = lookup_kind(TV_ARROW, SV_AMMO_NORMAL);
+							break;
+						}
+						case WS_XBOW:
+						{
+							k_idx = lookup_kind(TV_BOLT, SV_AMMO_NORMAL);
+							break;
+						}	break;
+					}
+					break;
+				}
+			}
 
 			/* Valid item? */
 			if (!k_idx) continue;
 
 			/* Prepare the item */
 			object_prep(i_ptr, k_idx);
-			i_ptr->number = (byte)rand_range(e_ptr->min, e_ptr->max);
+			i_ptr->number = (byte)rand_range(e_ptr->number_min, e_ptr->number_max);
+
+			/* Modify the pval */
+			if ((e_ptr->pval_min) && (e_ptr->pval_max)) i_ptr->pval = rand_range(e_ptr->pval_min, e_ptr->pval_max);
 
 			object_aware(i_ptr);
 			object_known(i_ptr);
-			(void)inven_carry(i_ptr);
+
+			/* Check the slot */
+			slot = wield_slot(i_ptr);
+
+			/*if player can wield an item, and slot not already occupied, do so*/
+			if ((slot >= INVEN_WIELD) && !(inventory[slot].k_idx))
+			{
+				/* Get the wield slot */
+				o_ptr = &inventory[slot];
+
+				/* Wear the new stuff */
+				object_copy(o_ptr, i_ptr);
+
+				/* Wield one */
+				o_ptr->number = 1;
+
+				/* Reduce stack size */
+				i_ptr->number--;
+
+				/* Increment the equip counter by hand */
+				p_ptr->equip_cnt++;
+
+				/* Increase the weight */
+				p_ptr->total_weight += i_ptr->weight;
+			}
+
+			/* Any left to carry? */
+			if (i_ptr->number > 0)
+			{
+				/*put it in the inventory*/
+				(void)inven_carry(i_ptr);
+			}
 		}
+
+		/*Bugfix:  So we don't get duplicate objects*/
+		object_wipe (i_ptr);
 	}
 }
 

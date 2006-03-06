@@ -1073,10 +1073,12 @@ struct start_item
 {
 	byte tval;	/* Item's tval */
 	byte sval;	/* Item's sval */
-	byte min;	/* Minimum starting amount */
-	byte max;	/* Maximum starting amount */
-};
-
+	byte number_min;/* Minimum starting amount */
+	byte number_max;/* Maximum starting amount */
+	s16b pval_min;	/* Minimum pval */
+	s16b pval_max;	/* Maximum pval */
+	byte social_min;/* Minimum social class to be given this */
+	byte social_max;/* Maximum social class to be given this */};
 
 /*
  * Player class info
@@ -1124,7 +1126,7 @@ struct player_class
 	u32b sense_base;	/* Base pseudo-id value */
 	u16b sense_div;		/* Pseudo-id divisor */
 
-	start_item start_items[MAX_START_ITEMS];/* The starting inventory */
+	start_item start_items[MAX_CLASS_ITEMS];/* The starting inventory */
 };
 
 /*
@@ -1283,7 +1285,7 @@ struct player_type
 	byte hitdie;    /* Hit dice (sides) */
 	byte expfact;   /* Experience factor */
 
-	byte psval;		 /* Sytle sub-specialization*/
+	byte psval;		 /* Style sub-specialization*/
 	byte held_song;  /* Hack --- Song being sung */
 
 	u16b dungeon;		/* Current dungeon number */
