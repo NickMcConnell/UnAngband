@@ -793,10 +793,29 @@ static bool auto_pickup_okay(const object_type *o_ptr)
 /*
  * Determine if the object has a "=d" in its inscription.
  * If "=d" is followed by a number, don't pick up if the player has this number or more in their inventory.
+ *
+ * Hack -- treat all monster body parts as having a =d, if the option is set.
  */
 static bool auto_pickup_never(const object_type *o_ptr)
 {
 	cptr s;
+
+	/* Ignore corpses */
+	if (easy_corpses)
+	{
+		switch (o_ptr->tval)
+		{
+			case TV_BONE:
+			case TV_BODY:
+			case TV_SKIN:
+			case TV_STATUE:
+			case TV_ASSEMBLY:
+			case TV_JUNK:
+			{
+				return (TRUE);
+			}
+		}
+	}
 
 	/* No inscription */
 	if (!o_ptr->note) return (FALSE);

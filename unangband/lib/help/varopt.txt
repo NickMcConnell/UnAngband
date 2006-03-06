@@ -38,6 +38,11 @@ Start searching if not disturbed
     After 20 turns without being disturbed, the character will auto-
     matically enter Search mode.
 
+***** <easy_corpses>
+Ignore corpses by default          [easy_corpses]
+    The player will not pick up corpses, bones and other junk. Junk can
+    still be inscribed with =g to pick it up automatically if required.
+
 === Disturbance options ===
 
 ***** <verify_mana>
@@ -98,6 +103,12 @@ Show attributes in sidebar     [show_sidebar]
 Show flavors in object descriptions    [view_flavors]
     Display "flavors" (color or variety) in object graphics, even for
     objects whose type is known.
+
+***** <view_player_lite>
+Use special colors for player grid    [view_player_lite]
+    Change the color of the player depending on the percentage of hit points.
+    White is 90-100%, yellow is 70-89%, orange is 50-69%, pink (light red) is
+    30-49% and red is 0% - 29% of maximum hit points.
 
 ***** <view_glowing_lite>
 Use special colors for glowing lite (slow)   [view_glowing_lite]

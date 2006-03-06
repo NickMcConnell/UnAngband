@@ -3789,7 +3789,7 @@
 #define OPT_verify_destroy 28
 #define OPT_verify_special 29
 #define OPT_allow_quantity 30
-/* xxx */
+#define OPT_easy_corpses 31
 #define OPT_auto_haggle    32
 #define OPT_auto_scum      33
 #define OPT_expand_look    36
@@ -3798,11 +3798,11 @@
 #define OPT_view_torch_grids     39
 #define OPT_dungeon_align  40
 #define OPT_dungeon_stair  41
-#define OPT_flow_by_sound  42
-#define OPT_flow_by_smell  43
+/* xxx flow_by_smell */
+/* xxx flow_by_sound */
 /* xxx track_follow */
 /* xxx track_target */
-#define OPT_smart_learn    46
+/* xxx smart_learn */
 #define OPT_smart_cheat    47
 #define OPT_view_reduce_lite     48
 #define OPT_hidden_player  49
@@ -3813,7 +3813,7 @@
 /* xxx */
 #define OPT_fresh_before   55
 #define OPT_fresh_after    56
-/* xxx */
+#define OPT_view_player_lite     57
 #define OPT_compress_savefile    58
 #define OPT_hilite_player  59
 #define OPT_view_yellow_lite     60
@@ -3919,7 +3919,7 @@
 #define verify_destroy    op_ptr->opt[OPT_verify_destroy]
 #define verify_special    op_ptr->opt[OPT_verify_special]
 #define allow_quantity    op_ptr->opt[OPT_allow_quantity]
-/* xxx */
+#define easy_corpses      op_ptr->opt[OPT_easy_corpses]
 #define auto_haggle op_ptr->opt[OPT_auto_haggle]
 #define auto_scum   op_ptr->opt[OPT_auto_scum]
 /* xxx testing_stack */
@@ -3930,11 +3930,11 @@
 #define view_torch_grids  op_ptr->opt[OPT_view_torch_grids]
 #define dungeon_align     op_ptr->opt[OPT_dungeon_align]
 #define dungeon_stair     op_ptr->opt[OPT_dungeon_stair]
-#define flow_by_sound     op_ptr->opt[OPT_flow_by_sound]
-#define flow_by_smell     op_ptr->opt[OPT_flow_by_smell]
+/* xxx flow_by_smell */
+/* xxx flow_by_sound */
 /* xxx track_follow */
 /* xxx track_target */
-#define smart_learn op_ptr->opt[OPT_smart_learn]
+/* xxx smart_learn */
 #define smart_cheat op_ptr->opt[OPT_smart_cheat]
 #define view_reduce_lite  op_ptr->opt[OPT_view_reduce_lite]
 #define hidden_player     op_ptr->opt[OPT_hidden_player]
@@ -3945,7 +3945,7 @@
 /* xxx */
 #define fresh_before      op_ptr->opt[OPT_fresh_before]
 #define fresh_after op_ptr->opt[OPT_fresh_after]
-/* xxx */
+#define view_player_lite  op_ptr->opt[OPT_view_player_lite]
 #define compress_savefile op_ptr->opt[OPT_compress_savefile]
 #define hilite_player     op_ptr->opt[OPT_hilite_player]
 #define view_yellow_lite  op_ptr->opt[OPT_view_yellow_lite]

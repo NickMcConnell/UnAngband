@@ -3578,6 +3578,17 @@ void redraw_stuff(void)
 	{
 		p_ptr->redraw &= ~(PR_HP);
 		prt_hp();
+
+		/*
+		 * hack:  redraw player, since the player's color
+		 * now indicates approximate health.  Note that
+		 * using this command when graphics mode is on
+		 * causes the character to be a black square.
+		 */
+		if ((view_player_lite) && (arg_graphics == GRAPHICS_NONE))
+		{
+		 	lite_spot(p_ptr->py, p_ptr->px);
+		}
 	}
 
 	if (p_ptr->redraw & (PR_MANA))

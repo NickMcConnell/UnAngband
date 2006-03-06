@@ -165,6 +165,12 @@ terrain (e.g. stuff that requires a floor graphic underneath) to pref file initi
 and visual edit mode. In visual edit mode, use 'd', 'w' and 'f' (for floor) to toggle the
 options on and off.
 
+- Added option to ignore corpses and other junk on the ground. Switched on by default.
+With the option on, these items still honour the =g flag.
+
+- Added option to color the player depending on health (From several other variants).
+Switched on by default.
+
 ### Bug fixes ###
 
 - Priest spell righteous fury was for mages, paladins, shamans and bards but

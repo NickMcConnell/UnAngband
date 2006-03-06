@@ -1409,7 +1409,7 @@ const cptr option_text[OPT_MAX] =
 	"verify_destroy",			/* OPT_verify_destroy */
 	"verify_special",			/* OPT_verify_special */
 	"allow_quantity",			/* OPT_allow_quantity */
-	NULL,						/* xxx */
+	"easy_corpses",			/* OPT_easy_corpses */
 	"auto_haggle",				/* OPT_auto_haggle */
 	"auto_scum",				/* OPT_auto_scum */
 	NULL,						/* xxx testing_stack */
@@ -1420,11 +1420,11 @@ const cptr option_text[OPT_MAX] =
 	"view_torch_grids",			/* OPT_view_torch_grids */
 	"dungeon_align",			/* OPT_dungeon_align */
 	"dungeon_stair",			/* OPT_dungeon_stair */
-	"flow_by_sound",			/* OPT_flow_by_sound */
-	"flow_by_smell",			/* OPT_flow_by_smell */
-	NULL,						/* xxx track_follow */
-	NULL,						/* xxx track_target */
-	"smart_learn",				/* OPT_smart_learn */
+	NULL,					/* xxx flow_by_sound */
+	NULL,					/* xxx flow_by_smell */
+	NULL,					/* xxx track_follow */
+	NULL,					/* xxx track_target */
+	NULL,					/* xxx smart_learn */
 	"smart_cheat",				/* OPT_smart_cheat */
 	"view_reduce_lite",			/* OPT_view_reduce_lite */
 	"hidden_player",			/* OPT_hidden_player */
@@ -1435,7 +1435,7 @@ const cptr option_text[OPT_MAX] =
 	NULL,						/* xxx flush_command */
 	"fresh_before",				/* OPT_fresh_before */
 	"fresh_after",				/* OPT_fresh_after */
-	NULL,						/* xxx fresh_message */
+	"view_player_lite",		/* OPT_view_player_lite */
 	"compress_savefile",		/* OPT_compress_savefile */
 	"hilite_player",			/* OPT_hilite_player */
 	"view_yellow_lite",			/* OPT_view_yellow_lite */
@@ -1673,8 +1673,8 @@ const cptr option_desc[OPT_MAX] =
 	"Verify destruction of objects",			/* OPT_verify_destroy */
 	"Verify use of special commands",			/* OPT_verify_special */
 	"Allow quantity specification",				/* OPT_allow_quantity */
-	NULL,										/* xxx */
-	"Auto-haggle in stores",					/* OPT_auto_haggle */
+	"Ignore corpses by default",				/* OPT_easy_corpses */
+	"Auto-haggle in stores",				/* OPT_auto_haggle */
 	"Auto-scum for good levels",				/* OPT_auto_scum */
 	NULL,										/* xxx testing_stack */
 	NULL,										/* xxx testing_carry */
@@ -1699,7 +1699,7 @@ const cptr option_desc[OPT_MAX] =
 	NULL,										/* xxx */
 	"Flush output before every command",		/* OPT_fresh_before */
 	"Flush output after various things",		/* OPT_fresh_after */
-	NULL,										/* xxx */
+	"Use special colors for player grid",			/* OPT_view_player_lite */
 	"Compress messages in savefiles",			/* OPT_compress_savefile */
 	"Hilite the player with the cursor",		/* OPT_hilite_player */
 	"Use special colors for torch lite",		/* OPT_view_yellow_lite */
@@ -1937,7 +1937,7 @@ const bool option_norm[OPT_MAX] =
 	TRUE,		/* OPT_verify_destroy */
 	TRUE,		/* OPT_verify_special */
 	TRUE,		/* OPT_allow_quantity */
-	FALSE,		/* xxx */
+	TRUE,		/* OPT_easy_corpses */
 	TRUE,		/* OPT_auto_haggle */
 	FALSE,		/* OPT_auto_scum */
 	FALSE,		/* xxx */
@@ -1948,11 +1948,11 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* OPT_view_torch_grids */
 	TRUE,		/* OPT_dungeon_align */
 	TRUE,		/* OPT_dungeon_stair */
-	FALSE,		/* OPT_flow_by_sound */
-	FALSE,		/* OPT_flow_by_smell */
+	FALSE,		/* xxx flow_by_sound */
+	FALSE,		/* xxx flow_by_smell */
 	FALSE,		/* xxx track_follow */
 	FALSE,		/* xxx track_target */
-	FALSE,		/* OPT_smart_learn */
+	FALSE,		/* xxx smart_learn */
 	FALSE,		/* OPT_smart_cheat */
 	FALSE,		/* OPT_view_reduce_lite */
 	FALSE,		/* OPT_hidden_player */
@@ -1963,13 +1963,13 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* xxx */
 	TRUE,		/* OPT_fresh_before */
 	FALSE,		/* OPT_fresh_after */
-	FALSE,		/* xxx */
+	TRUE,		/* OPT_view_player_lite */
 	TRUE,		/* OPT_compress_savefile */
 	FALSE,		/* OPT_hilite_player */
-	FALSE,		/* OPT_view_yellow_lite */
-	FALSE,		/* OPT_view_bright_lite */
-	FALSE,		/* OPT_view_granite_lite */
-	FALSE,		/* OPT_view_special_lite */
+	TRUE,		/* OPT_view_yellow_lite */
+	TRUE,		/* OPT_view_bright_lite */
+	TRUE,		/* OPT_view_granite_lite */
+	TRUE,		/* OPT_view_special_lite */
 	FALSE,		/* OPT_easy_open */
 	FALSE,		/* OPT_easy_alter */
 	FALSE,		/* OPT_easy_floor */
@@ -2191,7 +2191,7 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_stack_force_times,
 		OPT_easy_autos,
 		OPT_easy_search,
-		255,
+		OPT_easy_corpses,
 		255
 	},
 
@@ -2283,6 +2283,7 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_show_flavors,
 		OPT_view_flavors,
 		OPT_hilite_player,
+		OPT_view_player_lite,
 		OPT_view_yellow_lite,
 		OPT_view_bright_lite,
 		OPT_view_granite_lite,
@@ -2292,7 +2293,6 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_show_piles,
 		OPT_room_names,
 		OPT_room_descriptions,
-		255
 	},
 
 	/*** Birth ***/

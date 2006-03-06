@@ -128,7 +128,7 @@ Merge timeouts when stacking    [stack_force_times]
     set.
 
 ***** <easy_autos>
-Automatically inscribe all objects
+Automatically inscribe all objects [easy_search]
     Whenever you inscribe or uninscribe an object, all objects of the same
     kind will be inscribed or uninscribed, including objects that are
     subsequently created. To edit this, use the ~ command and display the
@@ -136,10 +136,14 @@ Automatically inscribe all objects
     inscriptions, and save them to a preference file.
 
 ***** <easy_search>
-Start searching if not disturbed
+Start searching if not disturbed   [easy_autos]
     After 20 turns without being disturbed, the character will auto-
     matically enter Search mode.
 
+***** <easy_corpses>
+Ignore corpses by default          [easy_corpses]
+    The player will not pick up corpses, bones and other junk. Junk can
+    still be inscribed with =g to pick it up automatically if required.
 
 === Disturbance options ===
 
@@ -443,6 +447,12 @@ Hilite the player with the cursor    [hilite_player]
     machines, but horrible on most graphics machines.  Note that only some
     machines are able to *not* show the cursor, but on those machines, hiding
     the cursor often speeds up the game and looks better.
+
+***** <view_player_lite>
+Use special colors for player grid    [view_player_lite]
+    Change the color of the player depending on the percentage of hit points.
+    White is 90-100%, yellow is 70-89%, orange is 50-69%, pink (light red) is
+    30-49% and red is 0% - 29% of maximum hit points.
 
 ***** <view_yellow_lite>
 Use special colors for torch-lit grids    [view_yellow_lite]
