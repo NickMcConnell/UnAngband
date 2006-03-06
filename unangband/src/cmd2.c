@@ -3133,7 +3133,7 @@ void do_cmd_fire(void)
 				tdam = tot_dam_aux(i_ptr, tdam, m_ptr);
 
 				/* Apply critical damage */
-				tdam = critical_shot(i_ptr->weight, (i_ptr->to_h + j_ptr->to_h + style_crit *30), tdam);
+				tdam += critical_shot(i_ptr->weight, (i_ptr->to_h + j_ptr->to_h + style_crit *30), tdam);
 
 				/* Apply launcher and missile bonus */
 				tdam += i_ptr->to_d + j_ptr->to_d + style_dam;
@@ -3543,7 +3543,7 @@ void do_cmd_throw(void)
 				tdam = tot_dam_aux(i_ptr, tdam, m_ptr);
 
 				/* Apply critical damage */
-				tdam = critical_shot(i_ptr->weight, i_ptr->to_h, tdam);
+				tdam += critical_shot(i_ptr->weight, i_ptr->to_h, tdam);
 
 				/* Apply launcher and missile bonus */
 				tdam += i_ptr->to_d;

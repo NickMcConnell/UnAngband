@@ -5278,7 +5278,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 							k = tot_dam_aux(o_ptr, k, m_ptr);
 
-							k = critical_shot(o_ptr->weight, o_ptr->to_h + j_ptr->to_h, k);
+							k += critical_shot(o_ptr->weight, o_ptr->to_h + j_ptr->to_h, k);
 							k += o_ptr->to_d + j_ptr->to_d;
 
 							/* No negative damage */
@@ -5528,7 +5528,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 					k = tot_dam_aux(o_ptr, k, m_ptr);
 
-					k = critical_norm(o_ptr->weight, o_ptr->to_h, k);
+					k += critical_norm(o_ptr->weight, o_ptr->to_h, k);
 					k += o_ptr->to_d;
 
 					/* Armour reduces total damage */
