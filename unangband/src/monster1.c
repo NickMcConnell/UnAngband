@@ -176,6 +176,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	const monster_race *r_ptr = &r_info[r_idx];
 	int m, n;
 	int msex = 0;
+	bool ranged = ((l_ptr->flags4 & (RF4_BLOW_1 | RF4_BLOW_2 | RF4_BLOW_3 | RF4_BLOW_4)) ? TRUE : FALSE);
 	bool innate = FALSE;
 	bool magic = FALSE;
 	int vn;
@@ -190,14 +191,17 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	vn = 0;
 	if (l_ptr->flags4 & (RF4_SHRIEK))      vp[vn++] = "shriek for help";
 	if (l_ptr->flags4 & (RF4_QUAKE))      vp[vn++] = "create earthquakes";
-	if (l_ptr->flags4 & (RF4_EXPLODE))     vp[vn++] = "explode";
-	if (l_ptr->flags4 & (RF4_AURA)) vp[vn++] = "radiate a powerful aura";
+	/*if (l_ptr->flags4 & (RF4_EXPLODE))     vp[vn++] = "explode";*/
+	/*if (l_ptr->flags4 & (RF4_AURA)) vp[vn++] = "radiate a powerful aura";*/
 
 	/* Describe innate attacks */
 	if (vn)
 	{
+		innate = TRUE;
+
 		/* Intro */
-		text_out(format("%^s", wd_he[msex]));
+		if (ranged) text_out(" and");
+		else text_out(format("%^s", wd_he[msex]));
 
 		/* Scan */
 		for (n = 0; n < vn; n++)
@@ -242,7 +246,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	if (vn)
 	{
 		/* Already innate? */
-		if (innate) text_out(" or");
+		if ((innate) || (l_ptr->flags4 & (RF4_BLOW_1 | RF4_BLOW_2 | RF4_BLOW_3 | RF4_BLOW_4))) text_out(" or");
 
 		/* Intro */
 		else text_out(format("%^s", wd_he[msex]));
@@ -264,7 +268,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	}
 
 	/* End the sentence about innate spells */
-	if (innate)
+	if ((innate) || (ranged))
 	{
 		/* Total casting */
 		m = l_ptr->cast_innate;
@@ -395,7 +399,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 		magic = TRUE;
 
 		/* Intro */
-		if (innate)
+		if ((innate) || (ranged))
 		{
 			text_out(", and is also");
 		}
@@ -446,7 +450,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 		}
 	}
 
-	if (innate || magic)
+	if (innate || magic || ranged)
 	{
 		/* End this sentence */
 		text_out(".  ");
@@ -601,7 +605,7 @@ static void describe_monster_drop(int r_idx, const monster_lore *l_ptr)
 }
 
 
-static void describe_monster_attack(int r_idx, const monster_lore *l_ptr)
+static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool ranged)
 {
 	const monster_race *r_ptr = &r_info[r_idx];
 	int m, n, r;
@@ -635,13 +639,20 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr)
 		/* Skip unknown attacks */
 		if (!l_ptr->blows[m]) continue;
 
-
 		/* Extract the attack info */
 		method = r_ptr->blow[m].method;
 		effect = r_ptr->blow[m].effect;
 		d1 = r_ptr->blow[m].d_dice;
 		d2 = r_ptr->blow[m].d_side;
 
+		/* Ranged? */
+		if ((ranged) && (method < RBM_MIN_RANGED)) continue;
+
+		/* Confirm ranged blow */
+		if ((ranged) && !(l_ptr->flags4 & (RF4_BLOW_1 << m))) continue;
+
+		/* Melee? */
+		if (!(ranged) && (method > RBM_MAX_NORMAL)) continue;
 
 		/* No method yet */
 		p = NULL;
@@ -820,17 +831,21 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr)
 		/* Introduce the attack description */
 		if (!r)
 		{
-			text_out(format("%^s can ", wd_he[msex]));
+			if (ranged) text_out(format("%^s may ", wd_he[msex]));
+			else text_out(format("%^s can ", wd_he[msex]));
 		}
 		else if (r < n-1)
 		{
 			text_out(", ");
 		}
+		else if (ranged)
+		{
+			text_out(", or ");
+		}
 		else
 		{
 			text_out(", and ");
 		}
-
 
 		/* Hack -- force a method */
 		if (!p) p = "do something weird";
@@ -860,8 +875,13 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr)
 		r++;
 	}
 
+	/* Continue with spells after this */
+	if (ranged)
+	{
+		/* Nothing */
+	}
 	/* Finish sentence above */
-	if (r)
+	else if (r)
 	{
 		text_out(".  ");
 	}
@@ -1444,7 +1464,7 @@ static void describe_monster_power(int r_idx, const monster_lore *l_ptr)
 		else if (r_ptr->power > 1) text_out("threatening");
 		else text_out("not threatening");
 
-		text_out(format(" at %s native depth.  ", wd_he[msex]));
+		text_out(format(" at %s native depth.  ", wd_his[msex]));
 	}
 }
 
@@ -1745,6 +1765,9 @@ void describe_monster(int r_idx, bool spoilers)
 	/* Describe power */
 	describe_monster_power(r_idx, &lore);
 
+	/* Describe the known ranged attacks */
+	describe_monster_attack(r_idx, &lore, TRUE);
+
 	/* Describe spells and innate attacks */
 	describe_monster_spells(r_idx, &lore);
 
@@ -1758,7 +1781,7 @@ void describe_monster(int r_idx, bool spoilers)
 	describe_monster_drop(r_idx, &lore);
 
 	/* Describe the known attacks */
-	describe_monster_attack(r_idx, &lore);
+	describe_monster_attack(r_idx, &lore, FALSE);
 
 	/* Notice "Quest" monsters */
 	if (lore.flags1 & RF1_QUESTOR)

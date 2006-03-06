@@ -2756,14 +2756,14 @@ const cptr disease_name[32] =
 /*{Mana_cost,dam_mult,dam_div,dam_var,best_range}*/
 byte spell_info_RF4[32][5]=
 {
-	{1,     0,     0,     0,     0},        /* RF4_SHIEIK */
-	{0,     0,     0,     0,     0},        /* RF4_LASH */
-	{0,     3,     1,     4,     4},        /* RF4_BOULDER */
-	{0,     4,     1,     4,     4},        /* RF4_SHOT */
-	{0,     4,     1,     4,     4},        /* RF4_ARROW */
-	{0,     4,     1,     4,     4},        /* RF4_BOLT */
-	{0,     3,     1,     4,     4},        /* RF4_MISSL */
-	{0,     3,     1,     6,     6},        /* RF4_PMISSLE */
+	{0,     0,     0,     0,     0},        /* RF4_BLOW_1 */
+	{0,     0,     0,     0,     0},        /* RF4_BLOW_2 */
+	{0,     0,     0,     0,     0},        /* RF4_BLOW_3 */
+	{0,     0,     0,     0,     0},        /* RF4_BLOW_4 */
+	{1,     0,     0,     0,     MAX_SIGHT},/* RF4_SHRIEK */
+	{0,     0,     0,     0,     8},        /* RF4_QUAKE */
+	{0,     0,     0,     0,     1},        /* RF4_EXPLODE */
+	{0,     0,     0,     0,     1},        /* RF4_AURA */  /* Last spell with fixed maximum range */
 	{0,     0,     0,     0,     0},        /* RF4_BRTH_ACID */
 	{0,     0,     0,     0,     0},        /* RF4_BRTH_ELEC */
 	{0,     0,     0,     0,     0},        /* RF4_BRTH_FIRE */
@@ -2777,6 +2777,7 @@ byte spell_info_RF4[32][5]=
 	{0,     0,     0,     0,     0},        /* RF4_BRTH_SHARD */
 	{0,     0,     0,     0,     0},        /* RF4_BRTH_INER */
 	{0,     0,     0,     0,     0},        /* RF4_BRTH_GRAV */
+	{0,     0,     0,     0,     0},        /* RF4_BRTH_WIND */
 	{0,     0,     0,     0,     0},        /* RF4_BRTH_FORCE */
 	{0,     0,     0,     0,     0},        /* RF4_BRTH_NEXUS */
 	{0,     0,     0,     0,     0},        /* RF4_BRTH_NETHR */
@@ -2784,10 +2785,9 @@ byte spell_info_RF4[32][5]=
 	{0,     0,     0,     0,     0},        /* RF4_BRTH_DISEN */
 	{0,     0,     0,     0,     0},        /* RF4_BRTH_TIME */
 	{0,     0,     0,     0,     0},        /* RF4_BRTH_MANA */
-	{0,     0,     0,     0,     0},        /* RF4_XXX3 */
-	{0,     0,     0,     0,     0},        /* RF4_XXX4 */
-	{0,     0,     0,     0,     0},        /* RF4_XXX5 */
-	{0,     0,     0,     0,     0}        /* RF4_XXX6 */
+	{0,     0,     0,     0,     0},        /* RF4_BRTH_HOLY */
+	{0,     0,     0,     0,     0},        /* RF4_BRTH_FEAR */
+	{0,     0,     0,     0,     0}         /* RF4_BRTH_DISEA */
 };
 
  /*{Mana_cost,dam_mult,dam_div,dam_var,best_range}*/
@@ -2803,7 +2803,7 @@ const byte spell_info_RF5[32][5]=
 	{6,     3,     1,     6,     6},        /* RF5_BALL_CONFU */
 	{4,     2,     1,     6,     6},        /* RF5_BALL_SOUND */
 	{4,     3,     1,     6,     6},        /* RF5_BALL_SHARD */
-	{0,     0,     0,     0,     0},        /* RF5_XXX2 */
+	{4,     2,     1,     6,     6},        /* RF5_BALL_WIND */
 	{5,     3,     1,     4,     4},        /* RF5_BALL_STORM */
 	{6,     3,     1,     6,     6},        /* RF5_BALL_NETHR */
 	{7,     3,     1,     4,     4},        /* RF5_BALL_CHAOS */
@@ -2819,12 +2819,12 @@ const byte spell_info_RF5[32][5]=
 	{5,     3,     1,     6,     6},        /* RF5_BOLT_WATER */
 	{5,     3,     1,     6,     6},        /* RF5_BOLT_NETHER */
 	{5,     2,     1,     6,     6},        /* RF5_BOLT_MANA */
-	{0,     0,     0,     0,     0},        /* RF5_XXX3 */
+	{5,     5,     2,     8,     8},        /* RF5_HOLY_ORB */
 	{6,     3,     1,     6,     6},        /* RF5_BEAM_ELEC */
 	{6,     4,     1,     6,     6},        /* RF5_BEAM_ICE */
 	{6,     3,     1,     6,     6},        /* RF5_BEAM_NETHER */
-	{0,     0,     0,     0,     0},        /* RF5_XXX4 */
-	{5,     5,     2,     8,     8}        /* RF5_HOLY_ORB */
+	{0,     0,     0,     0,     0},        /* RF5_ARC_HFIRE */
+	{0,     0,     0,     0,     0}         /* RF5_ARC_FORCE */
 };
 
  /*{Mana_cost,dam_mult,dam_div,dam_var,best_range}*/
@@ -2929,7 +2929,7 @@ byte spell_desire_RF4[32][8] =
 	{ 40,  0,   0,   5,	0,   0,    0      ,  100}, /* RF4_SHOT	    */
 	{ 40,  0,   0,   5,	0,   0,    0      ,  100}, /* RF4_SHRIEK    */
 	{ 40,  0,   0,   5,	0,   0,    0      ,  100}, /* RF4_QUAKE	    */
-	{ 40,  0,   0,   5,	0,   0, GF_EXPLODE  ,  100}, /* RF4_EXPLODE   */
+	{ 20,  0,   0,   5,	0,   0, GF_EXPLODE  ,  100}, /* RF4_EXPLODE   */
 	{ 40,  0,   0,   5,	0,   0,    0      ,  100}, /* RF4_AURA      */
 	{ 75,  0,   0,   5,	0,   0, GF_ACID   ,   90}, /* RF4_BRTH_ACID */
 	{ 75,  0,   0,   5,	0,   0, GF_ELEC  ,   90}, /* RF4_BRTH_ELEC */

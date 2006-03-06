@@ -2261,8 +2261,8 @@
 #define RBM_LASH		20
 #define RBM_BEG  		21
 #define RBM_INSULT      22
-#define RBM_MOAN 		23	/* Maximum normal attacks */
-#define RBM_SHOT 	24
+#define RBM_MOAN 		23
+#define RBM_SING		24	/* Maximum normal attacks */
 #define RBM_TRAP 		25
 #define RBM_BOULDER       26
 #define RBM_AURA 		27
@@ -2295,7 +2295,9 @@
 #define RBM_XBOLT	54		/* Crossbow bolt */
 #define RBM_SPIKE	55
 #define RBM_DART	56
-#define RBM_SING	57
+#define RBM_SHOT 	57
+#define RBM_ARC_20	58
+#define RBM_ARC_30	59
 
 #define RBM_MAX_NORMAL  23
 #define RBM_MIN_RANGED  15

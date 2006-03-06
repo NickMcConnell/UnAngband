@@ -935,6 +935,124 @@ static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 
 
 /*
+ *  Fake RF4_ masks to be used for ranged melee attacks;
+ */
+
+static u32b rf4_ball_mask;
+static u32b rf4_no_player_mask;
+static u32b rf4_beam_mask;
+static u32b rf4_bolt_mask;
+static u32b rf4_archery_mask;
+
+/*
+ * Initialise spell_info and spell_desire tables for monster blows 1-4, plus
+ * aura and explode attacks. We do this before calling choose_ranged_attack
+ * and make_attack_ranged, so that the monster will be able to correctly use
+ * their blows at range.
+ *
+ * Note that huge monsters can use all their blows at range 1-2.
+ */
+static void init_ranged_attack(int m_idx)
+{
+	monster_type *m_ptr = &m_list[m_idx];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	int ap_cnt;
+
+	/* Paranoia - clear the fake masks */
+	rf4_ball_mask = RF4_BALL_MASK;
+	rf4_no_player_mask = RF4_NO_PLAYER_MASK;
+	rf4_beam_mask = RF4_BEAM_MASK;
+	rf4_bolt_mask = RF4_BOLT_MASK;
+	rf4_archery_mask = RF4_ARCHERY_MASK;
+
+	/* Scan through all four blows */
+	for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
+	{
+		int hack = ap_cnt;
+		int mana = 0;
+		int range = 0;
+
+		/* Extract the attack infomation */
+		int effect = r_ptr->blow[ap_cnt].effect;
+		int method = r_ptr->blow[ap_cnt].method;
+		int d_dice = r_ptr->blow[ap_cnt].d_dice;
+		int d_side = r_ptr->blow[ap_cnt].d_side;
+
+		/* Skip 'tricky' attacks */
+		if ((method < RBM_MIN_RANGED) && !(r_ptr->flags3 & (RF3_HUGE))) continue;
+
+		/* Should have already initialised blows */
+		/* r_ptr->flags4 |= (RF4_BLOW_1 << ap_cnt); */
+
+		/* Initialise mana cost and range based on blow type.
+		   Also apply hack for explode and aura if required. */
+		switch(method)
+		{
+			case RBM_SPIT:	mana = 0; range = 3; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_GAZE:	mana = 3; range = MIN(MAX_SIGHT, r_ptr->aaf); break;
+			case RBM_WAIL:  mana = 5; range = 4; break;
+			case RBM_SPORE:	mana = 0; range = 3; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_LASH:  mana = 0; range = 3; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_BEG:	mana = 0; range = 4; break;
+			case RBM_INSULT: mana = 0; range = 4; break;
+			case RBM_SING:  mana = 0; range = 4; break;
+			case RBM_TRAP:  mana = 0; range = 1; break;
+			case RBM_BOULDER: mana = 0; range = 8; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_AURA:	mana = 4; range = 2; hack = 7; break;
+			case RBM_SELF:	mana = 3; range = 0; rf4_no_player_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_ADJACENT: mana = 3; range = 1; break;
+			case RBM_HANDS: mana = 4; range = 3; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_MISSILE: mana = 2; range = MAX_SIGHT; rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_BOLT_10: mana = 5; range = MAX_SIGHT; rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_BOLT: mana = 4; range = MAX_SIGHT; rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_BEAM: mana = 6; range = 10; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_BLAST: mana = 3; range = 5; break;
+			case RBM_WALL: mana = 6; range = MAX_SIGHT; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_BALL: mana = 4; range = MAX_SIGHT; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_CLOUD: mana = 5; range = MAX_SIGHT; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_STORM: mana = 6; range = MAX_SIGHT; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_BREATH: mana = 0; range = 6; break;
+			case RBM_AREA: mana = 3; range = (r_ptr->level / 10) + 1; break;
+			case RBM_LOS: mana = 6; range = MAX_SIGHT; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_LINE: mana = 4; range = MAX_SIGHT; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_AIM: mana = 4; range = MAX_SIGHT; break;
+			case RBM_ORB: mana = 5; range = MAX_SIGHT; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_STAR: mana = 5; range = MAX_SIGHT; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_SPHERE: mana = 6; range = MAX_SIGHT; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_PANEL: mana = 6; range = MAX_SIGHT; rf4_no_player_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_LEVEL: mana = 8; range = 255; rf4_no_player_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_CROSS: mana = 4; range = MAX_SIGHT; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_STRIKE: mana = 5; range = MAX_SIGHT; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_EXPLODE: mana = 0; range = 1; hack = 6; break;
+			case RBM_ARROW: mana = 0; range = 10; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_XBOLT: mana = 0; range = 12; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_SPIKE: mana = 0; range = 4; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_DART: mana = 0; range = 8; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_SHOT: mana = 0; range = 8; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_ARC_20: mana = 6; range = 8; break;
+			case RBM_ARC_30: mana = 5; range = 6; break;
+			default: mana = 0; range = 2; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break; /* For all hurt huge attacks */
+		}
+
+		/* Initialise the table */
+		spell_info_RF4[hack][COL_SPELL_MANA_COST] = mana;
+		spell_info_RF4[hack][COL_SPELL_DAM_MULT] = d_dice * (d_side + 1) / 2;
+		spell_info_RF4[hack][COL_SPELL_DAM_DIV] = MAX(r_ptr->spell_power, 1);
+		spell_info_RF4[hack][COL_SPELL_DAM_VAR] = d_side;
+		spell_info_RF4[hack][COL_SPELL_BEST_RANGE] = range;
+		spell_desire_RF4[hack][D_BASE] = (mana ? 40 : 50);	/* Hack -- 40 for all blows, 50 for spells */
+		spell_desire_RF4[hack][D_SUMM] = 0;
+		spell_desire_RF4[hack][D_HURT] = 0;
+		spell_desire_RF4[hack][D_MANA] = (mana ? 0 : 5);
+		spell_desire_RF4[hack][D_ESC] = 0;
+		spell_desire_RF4[hack][D_TACT] = 0;
+		spell_desire_RF4[hack][D_RES] = effect;
+		spell_desire_RF4[hack][D_RANGE] = 0;
+	}
+}
+
+/*
  * Have a monster choose a spell.
  *
  * Monster at m_idx uses this function to select a legal attack spell.
@@ -990,18 +1108,6 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	/* Eliminate innate spells if not set */
 	if (!(choose & 0x01))
 	{
-		f4 &= (RF4_INNATE_MASK);
-		f5 &= (RF5_INNATE_MASK);
-		f6 &= (RF6_INNATE_MASK);
-		f7 &= (RF7_INNATE_MASK);
-
-		/* No spells left */
-		if (!f4 && !f5 && !f6 && !f7) return (0);
-	}
-
-	/* Eliminate other spells if not set */
-	if (!(choose & 0x02))
-	{
 		f4 &= ~(RF4_INNATE_MASK);
 		f5 &= ~(RF5_INNATE_MASK);
 		f6 &= ~(RF6_INNATE_MASK);
@@ -1011,9 +1117,33 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		if (!f4 && !f5 && !f6 && !f7) return (0);
 	}
 
+	/* Eliminate other spells if not set */
+	if (!(choose & 0x02))
+	{
+		f4 &= (RF4_INNATE_MASK);
+		f5 &= (RF5_INNATE_MASK);
+		f6 &= (RF6_INNATE_MASK);
+		f7 &= (RF7_INNATE_MASK);
+
+		/* No spells left */
+		if (!f4 && !f5 && !f6 && !f7) return (0);
+	}
+
 	/*default: target the player*/
 	*tar_y = p_ptr->py;
 	*tar_x = p_ptr->px;
+
+	/* Melee attacks and some others have a hard maximum range */
+	for (i = 0; i < 8; i++)
+	{
+		/* XXX Fire a ball spell just short of player */
+
+		/* Out of range - eliminate spell */
+		if (m_ptr->cdis > spell_info_RF4[i][COL_SPELL_BEST_RANGE]) f4 &= ~(RF4_BLOW_1 << i);
+	}
+	
+	/* No spells left */
+	if (!f4 && !f5 && !f6 && !f7) return (0);
 
 	/* Check what kinds of spells can hit player */
 	path = projectable(m_ptr->fy, m_ptr->fx, p_ptr->py, p_ptr->px, PROJECT_CHCK);
@@ -1024,11 +1154,11 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		bool clear_ball_spell = TRUE;
 		bool clear_summon_spell = TRUE;
 
-		/*are we in range smart or annoyed (and not stupid), and have access to ball spells
-		  or summon spells */
+		/* Are we in range smart or annoyed (and not stupid), and have access to ball spells
+		  or summon spells? */
 		if ((m_ptr->cdis < MAX_RANGE) && ((r_ptr->flags2 & (RF2_SMART)) ||
 			 ((m_ptr->mflag & (MFLAG_AGGR)) && (!(r_ptr->flags2 & (RF2_STUPID))))) &&
-			 ((r_ptr->flags4 & (RF4_BALL_MASK | RF4_SUMMON_MASK)) ||
+			 ((r_ptr->flags4 & (rf4_ball_mask | RF4_SUMMON_MASK)) ||
 			  (r_ptr->flags5 & (RF5_BALL_MASK | RF5_SUMMON_MASK)) ||
 			  (r_ptr->flags6 & (RF6_BALL_MASK | RF6_SUMMON_MASK)) ||
 			  (r_ptr->flags7 & (RF7_BALL_MASK | RF7_SUMMON_MASK))))
@@ -1088,7 +1218,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		/*We don't have a reason to try a ball spell*/
 		if (clear_ball_spell)
 		{
-			f4 &= ~(RF4_BALL_MASK);
+			f4 &= ~(rf4_ball_mask);
 			f5 &= ~(RF5_BALL_MASK);
 			f6 &= ~(RF6_BALL_MASK);
 			f7 &= ~(RF7_BALL_MASK);
@@ -1115,7 +1245,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	if ((!require_los) || (m_ptr->cdis > MAX_RANGE))
 	{
 		/* Ball spells and summon spells would have been filtered out above if not usable */
-		f4 &= (RF4_NO_PLAYER_MASK | RF4_BALL_MASK | RF4_SUMMON_MASK);
+		f4 &= (rf4_no_player_mask | rf4_ball_mask | RF4_SUMMON_MASK);
 		f5 &= (RF5_NO_PLAYER_MASK | RF5_BALL_MASK | RF5_SUMMON_MASK);
 		f6 &= (RF6_NO_PLAYER_MASK | RF6_BALL_MASK | RF6_SUMMON_MASK);
 		f7 &= (RF7_NO_PLAYER_MASK | RF7_BALL_MASK | RF7_SUMMON_MASK);
@@ -1124,8 +1254,8 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	/*remove bolts and archery shots*/
 	else if (path == PROJECT_NOT_CLEAR)
 	{
-		f4 &= ~(RF4_BOLT_MASK);
-		f4 &= ~(RF4_ARCHERY_MASK);
+		f4 &= ~(rf4_bolt_mask);
+		f4 &= ~(rf4_archery_mask);
 		f5 &= ~(RF5_BOLT_MASK);
 		f5 &= ~(RF5_ARCHERY_MASK);
 		f6 &= ~(RF6_BOLT_MASK);
@@ -1152,7 +1282,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 
 	/* No spells left */
 	if (!f4 && !f5 && !f6 && !f7) return (0);
-
+ 
 	/* Sometimes non-dumb monsters cast randomly (though from the
 	 * restricted list)
 	 */
@@ -1213,7 +1343,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	breath_maxhp = (m_ptr->maxhp > 2000 ? m_ptr->maxhp : 2000);
 
 	/* Cheat if requested. */
-	if (smart_cheat)
+	if ((smart_cheat) || (r_ptr->flags9 & (RF9_PLAYER_GHOST)))
 	{
 		update_smart_cheat(m_idx);
 	}
@@ -4586,6 +4716,9 @@ static void process_monster(int m_idx)
 	chance_innate = r_ptr->freq_innate;
 	chance_spell = r_ptr->freq_spell;
 
+	/* Hack for huge monsters */
+	if (!(chance_innate) && (r_ptr->flags3 & (RF3_HUGE))) chance_innate = 75;
+
 	/* Cannot use ranged attacks beyond maximum range. */
 	if ((chance_innate) && (m_ptr->cdis > MAX_RANGE)) chance_innate = 0;
 	if ((chance_spell) && (m_ptr->cdis > MAX_RANGE)) chance_spell = 0;
@@ -4609,18 +4742,22 @@ static void process_monster(int m_idx)
 
 		/* Pick a ranged attack */
 		if ((roll < chance_innate) || (roll < chance_spell))
+		{
+			/* Set up ranged melee attacks */
+			init_ranged_attack(m_idx);
+
 			choice = choose_ranged_attack(m_idx, &ty, &tx, (roll < chance_innate ? 0x01 : 0x00) | (roll < chance_spell ? 0x02: 0x00));
+		}
 
-	}
+		/* Selected a ranged attack? */
+		if (choice != 0)
+		{
+			/* Execute said attack */
+			make_attack_ranged(m_idx, choice, ty, tx);
 
-	/* Selected a ranged attack? */
-	if (choice != 0)
-	{
-		/* Execute said attack */
-		make_attack_ranged(m_idx, choice, ty, tx);
-
-		/* End turn */
-		return;
+			/* End turn */
+			return;
+		}
 	}
 
 	/*** Movement ***/

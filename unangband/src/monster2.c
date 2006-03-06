@@ -2696,6 +2696,9 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp)
 	/* And start out fully healthy */
 	n_ptr->hp = n_ptr->maxhp;
 
+	/* And start out with full mana */
+	n_ptr->mana = r_ptr->mana;
+
 	/* Calculate the monster_speed*/
 	n_ptr->mspeed = calc_monster_speed(n_ptr);
 

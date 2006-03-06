@@ -3796,6 +3796,9 @@ errr parse_r_info(char *buf, header *head)
 		/* Invalid method */
 		if (!r_info_blow_method[n1]) return (PARSE_ERROR_GENERIC);
 
+		/* Update the rf4 flags */
+		if (n1 > RBM_MIN_RANGED) r_ptr->flags4 |= (RF4_BLOW_1 << i);
+
 		/* Hack -- update the rf7 flags */
 		switch (n1)
 		{
