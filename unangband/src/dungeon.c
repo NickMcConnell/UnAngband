@@ -3221,8 +3221,6 @@ void play_game(bool new_game)
 		/* Hack -- seed for town layout */
 		seed_town = rand_int(0x10000000);
 
-#ifdef GJW_RANDART
-
 		/* Hack -- seed for random artifacts */
 		if (reseed_artifacts) seed_randart = rand_int(0x10000000);
 
@@ -3250,15 +3248,11 @@ void play_game(bool new_game)
 
 		}
 
-#endif
-
-		tot_mon_power = 1000;
-
 		/* Roll up a new character */
 		player_birth();
 
 		/* Randomize the artifact names */
-		do_randart(seed_randart, FALSE);
+		do_randart(seed_randart, TRUE);
 
 		/* Hack -- enter the world */
 		turn = 1;

@@ -1223,8 +1223,24 @@ errr init_slays(void)
 
 	int i, j;
 
+	/* No monster power to start with */
+	tot_mon_power = 0;
+
+	/* Compute total monster power */
+	for (i = 0; i < z_info->r_max; i++)
+	{
+		/* Point at the "info" */
+		monster_race *r_ptr = &r_info[i];
+
+		/* Total power */
+		tot_mon_power += r_ptr->power;
+	}
+
 	/* Allocate the "slay values" array - now used to compute magic item power */
 	C_MAKE(slays, SLAY_MAX, s32b);
+
+	/* Clear values */
+	for (i = 0; i < SLAY_MAX; i++) slays[i] = 0L;
 
 	/* Precompute values for single flag slays for magic items */
 	for (i = 0, j = 0x00000001L; (i < 32) && (j < 0x00200000L); i++, j <<=1)

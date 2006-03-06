@@ -6888,9 +6888,6 @@ errr eval_r_power(header *head)
 
 			/* Never less than 1 */
 			if (r_ptr->power < 1) r_ptr->power = 1;
-
-			/* Now we have the proper rating, add it to the total */
-			tot_mon_power += r_ptr->power;
 		}
 	}
 

@@ -298,7 +298,7 @@ static byte *base_item_rarity;
 static byte *base_art_rarity;
 
 /* Global just for convenience. */
-static int randart_verbose = 1;
+static int randart_verbose = 0;
 
 /*ARD_RAND - Extra global variable.
  * Used to create random artifacts along side existing artifacts.
@@ -4949,9 +4949,18 @@ errr do_randart(u32b randart_seed, bool full)
 			msg_format("Error - can't open randart.log for writing.");
 			exit(1);
 		}
+
+		LOG_PRINT("===============================\n");
+		LOG_PRINT1("Total monster power is %d.\n", tot_mon_power);
+
+
+		for (j = 1L; j < SLAY_MAX; j <<= 2)
+		{
+			LOG_PRINT1("Slay index is %d.\n", slay_power(j) * 1000 / tot_mon_power);
+		}
 	}
 
-#if 0
+
 	/* Only do all the following if full randomization requested */
 	if (full)
 	{
@@ -5054,8 +5063,6 @@ errr do_randart(u32b randart_seed, bool full)
 		KILL(base_art_rarity);
 
 	}
-#endif
-
 
 	/* Close the log file */
 	if (randart_verbose)

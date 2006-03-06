@@ -2540,8 +2540,6 @@ void set_monster_slow(s16b m_idx, s16b counter, bool message)
  */
 static bool place_monster_one(int y, int x, int r_idx, bool slp)
 {
-	int i;
-
 	monster_race *r_ptr;
 
 	monster_type *n_ptr;
