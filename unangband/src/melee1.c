@@ -27,7 +27,6 @@ static int monster_critical(int dice, int sides, int dam, int effect)
 	int bonus;
 	int total = dice * sides;
 
-
 	/* Special case -- wounding/battering attack */
 	if ((effect == GF_WOUND) || (effect == GF_BATTER))
 	{
@@ -66,15 +65,37 @@ static int monster_critical(int dice, int sides, int dam, int effect)
  * Always miss 5% of the time, Always hit 5% of the time.
  * Otherwise, match monster power against player armor.
  */
-static int check_hit(int power, int level, int m_idx)
+static bool check_hit(int power, int level, int who, bool ranged)
 {
-	int i, k, ac;
+	int k, ac;
 
-	monster_type *m_ptr = &m_list[m_idx];
-	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+	if (who > 0)
+	{
+		monster_type *m_ptr = &m_list[who];
+		monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
-	/* Monster never misses */
-	if (r_ptr->flags9 & (RF9_NEVER_MISS)) return (TRUE);
+		/* Monster never misses */
+		if (r_ptr->flags9 & (RF9_NEVER_MISS)) return (TRUE);
+
+		/* Calculate the "attack quality".  Blind monsters are greatly hindered. Stunned monsters are hindered. */
+		power = (power + (m_ptr->blind ? level * 1 : (m_ptr->stunned ? level * 2 : level * 3)));
+
+		/* Apply monster stats */
+		if (m_ptr->mflag & (MFLAG_CLUMSY)) power -= 5;
+		else if (m_ptr->mflag & (MFLAG_SKILLFUL)) power += 5;
+
+		/* Apply temporary conditions */
+		if (m_ptr->bless) power += 10;
+		if (m_ptr->beserk) power += 24;
+
+		/* Blind monsters almost always miss at ranged combat */
+		if ((ranged) && (m_ptr->blind)) power /= 10;
+	}
+	else
+	{
+		/* Level counts for full amount */
+		power += level * 3;
+	}
 
 	/* Percentile dice */
 	k = rand_int(100);
@@ -82,17 +103,34 @@ static int check_hit(int power, int level, int m_idx)
 	/* Hack -- Always miss or hit */
 	if (k < 10) return (k < 5);
 
-	/* Calculate the "attack quality".  Blind monsters are greatly hindered. Stunned monsters are hindered. */
-	i = (power + (m_ptr->blind ? level * 1 : (m_ptr->stunned ? level * 2 : level * 3)));
-
 	/* Total armor */
 	ac = p_ptr->ac + p_ptr->to_a + p_ptr->blocking;
+
+	/* Some items and effects count for more at range */
+	if (ranged)
+	{
+		object_type *o_ptr = &inventory[INVEN_ARM];
+
+		/* No secondary weapon or shield, use primary weapon */
+		if (!o_ptr->k_idx) o_ptr = &inventory[INVEN_WIELD];
+
+		/* Count for double */
+		if (o_ptr->k_idx)
+		{
+			/* Shield or secondary weapon counts for double? */
+			ac += o_ptr->ac;
+			ac += o_ptr->to_a;
+		}
+
+		/* Shield counts for double */
+		if (p_ptr->shield) ac += 50;
+	}
 
 	/* Some rooms make the player vulnerible */
 	if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_CURSED)) ac /= 2;
 
 	/* Power and Level compete against Armor */
-	if ((i > 0) && (randint(i) > ((ac * 3) / 4))) return (TRUE);
+	if ((power > 0) && (randint(power) > ((ac * 3) / 4))) return (TRUE);
 
 	/* Assume miss */
 	return (FALSE);
@@ -104,14 +142,14 @@ static int check_hit(int power, int level, int m_idx)
  */
 static cptr desc_insult[] =
 {
-	"insults you",
-	"insults your mother",
-	"gives you the finger",
-	"humiliates you",
-	"defiles you",
-	"dances around you",
-	"makes obscene gestures",
-	"moons you"
+	"insults you!",
+	"insults your mother!",
+	"gives you the finger!",
+	"humiliates you!",
+	"defiles you!",
+	"dances around you!",
+	"makes obscene gestures!",
+	"moons you!!!"
 };
 
 
@@ -121,10 +159,10 @@ static cptr desc_insult[] =
  */
 static cptr desc_moan[] =
 {
-	"seems sad about something",
-	"asks if you have seen his dogs",
-	"tells you to get off his land",
-	"mumbles something about mushrooms"
+	"seems sad about something.",
+	"asks if you have seen his dogs.",
+	"tells you to get off his land.",
+	"mumbles something about mushrooms."
 };
 
 
@@ -133,18 +171,54 @@ static cptr desc_moan[] =
  */
 static cptr desc_sing[] =
 {
-	"starts to read you a poem",
-	"sings a happy tune",
-	"picks a flower for you",
-	"skips in a circle"
+	"starts to read you a poem.",
+	"sings a happy tune.",
+	"picks a flower for you.",
+	"skips in a circle."
 };
 
 
 /*
  * Describe attack
  */
-static void attack_method(int method, int damage, cptr *act, bool *touched, bool *do_cut, bool *do_stun)
+static void attack_desc(int who, int target, int method, int damage, bool *do_cut, bool *do_stun)
 {
+	char m_name[80];
+	char t_name[80];
+
+	cptr prefix = "";
+	cptr suffix = "";
+
+	/* Describe source */
+	if (who > 0)
+	{
+		/* Get the monster name (or "it") */
+		monster_desc(m_name, &m_list[who], 0x00);
+	}
+	else if (who < 0)
+	{
+		strcpy(m_name,"you");
+	}
+	else
+	{
+		strcpy(m_name,"it");
+	}
+
+	/* Describe target */
+	if (target > 0)
+	{
+		/* Get the monster name (or "it") */
+		monster_desc(t_name, &m_list[target], 0x00);
+	}
+	else if (target < 0)
+	{
+		strcpy(t_name,"you");
+	}
+	else
+	{
+		strcpy(t_name,"it");
+	}
+
 	/* Describe the attack method */
 	switch (method)
 	{
@@ -153,36 +227,33 @@ static void attack_method(int method, int damage, cptr *act, bool *touched, bool
 			/* Handle special effect types */
 			if (*do_cut)
 			{
-				if      (damage >= 30) *act = "gouges you";
-				else if (damage >= 20) *act = "slashes you";
-				else if (damage >= 5)  *act = "cuts you";
-				else                *act = "scratches you";
+				if      (damage >= 30) prefix = "gouges ";
+				else if (damage >= 20) prefix = "slashes ";
+				else if (damage >= 5)  prefix = "cuts ";
+				else                prefix = "scratches ";
 
 				/* Usually don't stun */
 				if (!rand_int(5)) *do_stun = TRUE;
 
 				*do_cut = TRUE;
-				*touched = TRUE;
 			}
 			else if (*do_stun)
 			{
-				if      (damage >= 30) *act = "bludgeons you";
-					else if (damage >= 20) *act = "batters you";
-					else if (damage >= 5)  *act = "bashes you";
-					else                *act = "hits you";
+				if      (damage >= 30) prefix = "bludgeons ";
+					else if (damage >= 20) prefix = "batters ";
+					else if (damage >= 5)  prefix = "bashes ";
+					else                prefix = "hits ";
 
 					/* Usually don't cut */
 					if (!rand_int(5)) *do_cut = TRUE;
 
 					*do_stun = TRUE;
-					*touched = TRUE;
 			}
 			else
 			{
-				*act = "hits you";
+				prefix = "hits ";
 				*do_cut = TRUE;
 				*do_stun = TRUE;
-				*touched = TRUE;
 			}
 
 			break;
@@ -190,178 +261,250 @@ static void attack_method(int method, int damage, cptr *act, bool *touched, bool
 
 		case RBM_TOUCH:
 		{
-			*act = "touches you";
-			*touched = TRUE;
+			prefix = "touches ";
 			break;
 		}
 
 		case RBM_PUNCH:
 		{
-			*act = "punches you";
+			prefix = "punches ";
 			*do_stun = TRUE;
-			*touched = 1;
 			break;
 		}
 
 		case RBM_KICK:
 		{
-			*act = "kicks you";
+			prefix = "kicks ";
 			*do_stun = TRUE;
-			*touched = TRUE;
 			break;
 		}
 
 		case RBM_CLAW:
 		{
-			if      (damage >= 25) *act = "slashes you";
-			else if (damage >=  5) *act = "claws you";
-			else                *act = "scratches you";
+			if      (damage >= 25) prefix = "slashes ";
+			else if (damage >=  5) prefix = "claws ";
+			else                prefix = "scratches ";
 			*do_cut = TRUE;
-			*touched = TRUE;
 			break;
 		}
 
 		case RBM_BITE:
 		{
-			if (damage >= 5) *act = "bites you";
-			else          *act = "nips you";
+			if (damage >= 5) prefix = "bites ";
+			else          prefix = "nips ";
 			*do_cut = TRUE;
-			*touched = TRUE;
 			break;
 		}
 
 		case RBM_PECK:
 		{
-			*act = "pecks you";
+			prefix = "pecks ";
 			*do_stun  = TRUE;
-			*touched = TRUE;
 			break;
 		}
 
 		case RBM_STING:
 		{
-			*act = "stings you";
-			*touched = TRUE;
+			prefix = "stings ";
 			break;
 		}
 
 		case RBM_VOMIT:
 		{
-			*act = "vomits on you";
-			*touched = TRUE;
+			prefix = "vomits on ";
 			break;
 		}
 
 		case RBM_BUTT:
 		{
-			if (damage >= rand_range(10, 20)) *act = "tramples you";
-			else                           *act = "butts you";
+			if (damage >= rand_range(10, 20)) prefix = "tramples ";
+			else                           prefix = "butts ";
 			*do_stun  = TRUE;
-			*touched = TRUE;
 			break;
 		}
 
 		case RBM_CRUSH:
 		{
-			if (damage >= 10) *act = "crushes you";
-			else           *act = "squeezes you";
+			if (damage >= 10) prefix = "crushes ";
+			else           prefix = "squeezes ";
 			*do_stun  = TRUE;
-			*touched = TRUE;
 			break;
 		}
 
 		case RBM_ENGULF:
 		{
-			if (damage >= randint(50)) *act = "envelops you";
-			else                    *act = "engulfs you";
-			*touched = TRUE;
+			if (damage >= randint(50)) prefix = "envelops ";
+			else                    prefix = "engulfs ";
 			break;
 		}
 
 		case RBM_CRAWL:
 		{
-			*act = "crawls on you";
-			*touched = TRUE;
+			prefix = "crawls on ";
 			break;
 		}
 
 		case RBM_DROOL:
 		{
-			*act = "drools on you";
+			prefix = "drools on ";
 			break;
 		}
 
 		case RBM_SLIME:
 		{
-			*act = "slimes you";
+			prefix = "slimes ";
 			break;
 		}
 
 		case RBM_SPIT:
 		{
-			*act = "spits on you";
+			prefix = "spits on ";
 			break;
 		}
 
 		case RBM_GAZE:
 		{
 			if      (damage >= rand_range(20, 30))
-				*act = "glares at you terribly";
+			{
+				prefix = "glares at ";
+				suffix = " terribly";
+			}
 			else if (damage >= rand_range(5, 30))
-				*act = "gazes upon you";
-			else *act = "gazes at you";
+				prefix = "gazes upon ";
+			else prefix = "gazes at ";
 			break;
 		}
 
 		case RBM_WAIL:
 		{
-			*act = "wails horribly";
+			prefix = "wails horribly";
+			strcpy(t_name, "");
 			break;
 		}
 
 		case RBM_SPORE:
 		{
-			*act = "releases a cloud of spores";
+			prefix = "releases a cloud of spores";
+			strcpy(t_name, "");
 			break;
 		}
 
 		case RBM_LASH:
 		{
-			*act = "lashes you with a whip";
-			*touched = TRUE;
+			prefix = "lashes ";
+			suffix = " with a whip";
 			break;
 		}
 
 		case RBM_BEG:
 		{
-			*act = "begs you for money";
+			prefix = "begs ";
+			suffix = " for money";
 			break;
 		}
 
 		case RBM_INSULT:
 		{
-			*act = desc_insult[rand_int(8)];
-			break;
+			if (target < 0) msg_format("%^s %s", m_name, desc_insult[rand_int(8)]);
+			return;
 		}
 
 		case RBM_MOAN:
 		{
-			*act = desc_moan[rand_int(4)];
-			break;
+			if (target < 0) msg_format("%^s %s", m_name, desc_moan[rand_int(8)]);
+			return;
 		}
 
 		case RBM_SING:
 		{
-			*act = desc_sing[rand_int(4)];
-			break;
+			if (target < 0) msg_format("%^s %s", m_name, desc_sing[rand_int(8)]);
+			return;
 		}
 
 		default:
 		{
-			*act = "casts a spell";
+			prefix = "casts a spell at ";
 		}
 	}
+
+	/* Message */
+	if ((target < 0) && (method == RBM_SLIME))
+	{
+		msg_format("%^s %syou%s!", m_name, prefix, suffix);
+
+		/* Slime player */
+		if (f_info[cave_feat[p_ptr->py][p_ptr->px]].flags1 & (FF1_FLOOR))
+			feat_near(p_ptr->py, p_ptr->px, FEAT_FLOOR_SLIME_T);
+	}
+	else if ((target < 0) && (damage > p_ptr->chp / 3))
+	{
+		msg_format("%^s %syou%s!", m_name, prefix, suffix);
+
+		/* Player loses blood */
+		if (f_info[cave_feat[p_ptr->py][p_ptr->px]].flags1 & (FF1_FLOOR))
+			feat_near(p_ptr->py, p_ptr->px, FEAT_FLOOR_BLOOD_T);
+	}
+	else /* XXX Have option to hide monster fighting messages */
+	{
+		msg_format("%^s %s%s%s.", m_name, prefix, t_name, suffix);
+	}
 }
+
+/*
+ * Get attack power based on effect.
+ */
+static int attack_power(int effect)
+{
+	int power = 0;
+
+	/* Extract the attack "power". Elemental attacks upgraded. */
+	switch (effect)
+	{
+		case GF_HURT: power = 60; break;
+		case GF_WOUND: power = 60; break;
+		case GF_BATTER: power = 60; break;
+		case GF_SHATTER: power = 60; break;
+
+		case GF_UN_BONUS:	power = 20; break;
+		case GF_UN_POWER:	power = 15; break;
+		case GF_LOSE_MANA: power = 45; break;
+		case GF_EAT_GOLD:	power =  5; break;
+		case GF_EAT_ITEM:	power =  5; break;
+		case GF_EAT_FOOD:	power =  45; break;
+		case GF_EAT_LITE:	power =  45; break;
+		case GF_HUNGER: power = 45; break;
+
+		case GF_POIS:	power =  25; break;
+		case GF_ACID:		power = 50; break;
+		case GF_ELEC:		power = 50; break;
+		case GF_FIRE:		power = 50; break;
+		case GF_COLD:		power = 50; break;
+
+		case GF_BLIND:	power =  5; break;
+		case GF_CONFUSION:	power = 10; break;
+		case GF_TERRIFY:	power = 10; break;
+		case GF_PARALYZE:	power =  5; break;
+		case GF_HALLU:     power = 10; break;
+		case GF_DISEASE:	power = 10; break;
+
+		case GF_LOSE_STR:	power =  0; break;
+		case GF_LOSE_DEX:	power =  0; break;
+		case GF_LOSE_CON:	power =  0; break;
+		case GF_LOSE_INT:	power =  0; break;
+		case GF_LOSE_WIS:	power =  0; break;
+		case GF_LOSE_CHR:	power =  0; break;
+		case GF_LOSE_ALL:	power =  2; break;
+
+		case GF_EXP_10:	power =  5; break;
+		case GF_EXP_20:	power =  5; break;
+		case GF_EXP_40:	power =  5; break;
+		case GF_EXP_80:	power =  5; break;
+
+		/* Need to add extra flavours in here */
+	}
+	return power;
+}
+
 
 /*
  * Attack the player via physical attacks.
@@ -411,10 +554,7 @@ bool make_attack_normal(int m_idx)
 		bool visible = FALSE;
 		bool obvious = FALSE;
 
-		int power = 0;
 		int damage = 0;
-
-		cptr act = NULL;
 
 		/* Extract the attack infomation */
 		int effect = r_ptr->blow[ap_cnt].effect;
@@ -439,52 +579,6 @@ bool make_attack_normal(int m_idx)
 		do_stun = TRUE;
 		touched = TRUE;
 
-		/* Extract the attack "power". Elemental attacks upgraded. */
-		switch (effect)
-		{
-			case GF_HURT: power = 60; break;
-			case GF_WOUND: power = 60; break;
-			case GF_BATTER: power = 60; break;
-			case GF_SHATTER: power = 60; break;
-
-			case GF_UN_BONUS:	power = 20; break;
-			case GF_UN_POWER:	power = 15; break;
-			case GF_LOSE_MANA: power = 45; break;
-			case GF_EAT_GOLD:	power =  5; break;
-			case GF_EAT_ITEM:	power =  5; break;
-			case GF_EAT_FOOD:	power =  45; break;
-			case GF_EAT_LITE:	power =  45; break;
-			case GF_HUNGER: power = 45; break;
-
-			case GF_POIS:	power =  25; break;
-			case GF_ACID:		power = 50; break;
-			case GF_ELEC:		power = 50; break;
-			case GF_FIRE:		power = 50; break;
-			case GF_COLD:		power = 50; break;
-
-			case GF_BLIND:	power =  5; break;
-			case GF_CONFUSION:	power = 10; break;
-			case GF_TERRIFY:	power = 10; break;
-			case GF_PARALYZE:	power =  5; break;
-			case GF_HALLU:     power = 10; break;
-			case GF_DISEASE:	power = 10; break;
-
-			case GF_LOSE_STR:	power =  0; break;
-			case GF_LOSE_DEX:	power =  0; break;
-			case GF_LOSE_CON:	power =  0; break;
-			case GF_LOSE_INT:	power =  0; break;
-			case GF_LOSE_WIS:	power =  0; break;
-			case GF_LOSE_CHR:	power =  0; break;
-			case GF_LOSE_ALL:	power =  2; break;
-
-			case GF_EXP_10:	power =  5; break;
-			case GF_EXP_20:	power =  5; break;
-			case GF_EXP_40:	power =  5; break;
-			case GF_EXP_80:	power =  5; break;
-
-			/* Need to add extra flavours in here */
-		}
-
 		/* Apply monster stats */
 		if (d_side > 1)
 		{
@@ -498,23 +592,30 @@ bool make_attack_normal(int m_idx)
 		/* Roll out the damage */
 		damage = damroll(d_dice, d_side);
 
-		/* Hack -- save passing effect for batter and wound */
-		if (effect == GF_BATTER) do_stun = TRUE;
-		else if (effect == GF_WOUND) do_cut = TRUE;
-
-		/* Get the attack string */
-		attack_method (method, damage, &act, &touched, &do_cut, &do_stun);
-
-		/* Apply monster stats */
-		if (m_ptr->mflag & (MFLAG_CLUMSY)) power -= 5;
-		else if (m_ptr->mflag & (MFLAG_SKILLFUL)) power += 5;
-
-		/* Apply temporary conditions */
-		if (m_ptr->bless) power += 10;
-		if (m_ptr->beserk) power += 24;
+		/* See if we notice attack */
+		switch (method)
+		{
+			case RBM_HIT:
+			case RBM_TOUCH:
+			case RBM_PUNCH:
+			case RBM_KICK:
+			case RBM_CLAW:
+			case RBM_BITE:
+			case RBM_PECK:
+			case RBM_STING:
+			case RBM_VOMIT:
+			case RBM_BUTT:
+			case RBM_CRUSH:
+			case RBM_ENGULF:
+			case RBM_CRAWL:
+			case RBM_DROOL:
+			case RBM_LASH:
+				touched = TRUE;
+				break;
+		}
 
 		/* Monster hits player */
-		if (!effect || check_hit(power, rlev, m_idx))
+		if (!effect || check_hit(attack_power(effect), rlev, m_idx, FALSE))
 		{
 			/* Always disturbing */
 			disturb(1, 0);
@@ -538,42 +639,12 @@ bool make_attack_normal(int m_idx)
 				continue;
 			}
 
+			/* Hack -- save passing effect for batter and wound */
+			if (effect == GF_BATTER) do_stun = TRUE;
+			else if (effect == GF_WOUND) do_cut = TRUE;
 
-			/* Message */
-			if (act)
-			{
-				/* Hack -- random insult punctuation */
-				if (method == RBM_INSULT)
-				{
-					switch(rand_int(3))
-					{
-						case 0:
-						msg_format("%^s %s!", m_name, act);
-						break;
-
-						case 1:
-						msg_format("%^s %s!!!", m_name, act);
-						break;
-
-						case 2:
-						msg_format("%^s %s!?!", m_name, act);
-						break;
-					}
-				}
-				else if (method == RBM_SLIME)
-				{
-					msg_format("%^s you!");
-
-					/* Hack -- slime player */
-					if (f_info[cave_feat[p_ptr->py][p_ptr->px]].flags1 & (FF1_FLOOR))
-						feat_near(p_ptr->py, p_ptr->px, FEAT_FLOOR_SLIME_T);
-				}
-				else if (damage > p_ptr->chp / 3)
-					msg_format("%^s %s!", m_name, act);
-				else
-					msg_format("%^s %s.", m_name, act);
-
-			}
+			/* Get the attack string */
+			attack_desc(m_idx, -1, method, damage, &do_cut, &do_stun);
 
 			/* Check for usage */
 			if (rand_int(100)<damage)
@@ -598,7 +669,7 @@ bool make_attack_normal(int m_idx)
 			if (effect)
 			{
 				/* New result routine */
-				obvious = project_p(m_idx,0,p_ptr->py,p_ptr->px,damage,effect);
+				obvious = project_p(m_idx, 0, p_ptr->py, p_ptr->px, damage, effect);
 			}
 			else
 			{
@@ -701,7 +772,6 @@ bool make_attack_normal(int m_idx)
 			}
 		}
 	}
-
 
 	/* Blink away */
 	if (blinked)
@@ -997,6 +1067,33 @@ static void mon_bolt(int who, int y, int x, int typ, int dam, cptr result)
 	}
 }
 
+
+/*
+ * Cast a bolt at the target
+ * Stop if we hit a monster
+ * Affect monsters and the player
+ * Can miss the first target
+ */
+static void mon_shot(int who, int y, int x, int typ, int dam, bool hit, cptr result)
+{
+	/* Message */
+	if (result) msg_print(result);
+
+	if (who > 0)
+	{
+		monster_type *m_ptr = &m_list[who];
+		int fy = m_ptr->fy;
+		int fx = m_ptr->fx;
+
+		/* Aim at target with a bolt attack */
+		(void)project(who, 0, fy, fx, y, x, dam, typ, FLG_MON_BOLT | (hit ? 0L : PROJECT_MISS), 0 , 0);
+	}
+	else
+	{
+		/* Affect single grid with a bolt attack */
+		(void)project(0, 0, y, x, y, x, dam, typ, FLG_MON_BOLT, 0 , 0);
+	}
+}
 
 
 /*
@@ -1460,12 +1557,11 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		case 96+3:
 		{
 			int method, effect, d_dice, d_side;
-			int dam = 0;
-			cptr act = NULL;
+			int dam = 0, power = 0;
 
-			bool touched = FALSE;
 			bool do_cut = FALSE;
 			bool do_stun = FALSE;
+			bool hit = TRUE;
 
 			/* Requires a monster */
 			if (who <= 0) break;
@@ -1479,60 +1575,34 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Get the damage */
 			if ((d_dice) && (d_side)) dam = damroll(d_dice, d_side);
 
-			/* Get the attack string */
+			/* Hack -- save passing effect for batter and wound */
+			if (effect == GF_BATTER) do_stun = TRUE;
+			else if (effect == GF_WOUND) do_cut = TRUE;
+
+			/* Apply monster stats */
+			if (m_ptr->mflag & (MFLAG_CLUMSY)) power -= 5;
+			else if (m_ptr->mflag & (MFLAG_SKILLFUL)) power += 5;
+
+			/* Apply temporary conditions */
+			if (m_ptr->bless) power += 10;
+			if (m_ptr->beserk) power += 24;
+
+			/* Player has chance of being missed by various ranged attacks */
 			if (target < 0)
 			{
-				/* Hack -- save passing effect for batter and wound */
-				if (effect == GF_BATTER) do_stun = TRUE;
-				else if (effect == GF_WOUND) do_cut = TRUE;
-
-				/* Get attack */
-				attack_method(method, dam, &act, &touched, &do_cut, &do_stun);
-
-				/* Message */
-				if (act)
-				{
-					/* Hack -- random insult punctuation */
-					if (method == RBM_INSULT)
-					{
-						switch(rand_int(3))
-						{
-							case 0:
-							result = format("%^s %s!", m_name, act);
-							break;
-
-							case 1:
-							result = format("%^s %s!!!", m_name, act);
-							break;
-
-							case 2:
-							result = format("%^s %s!?!", m_name, act);
-							break;
-						}
-					}
-					else if (method == RBM_SLIME)
-					{
-						result = format("%^s you!");
-
-						/* Hack -- slime player */
-						if (f_info[cave_feat[p_ptr->py][p_ptr->px]].flags1 & (FF1_FLOOR))
-							feat_near(p_ptr->py, p_ptr->px, FEAT_FLOOR_SLIME_T);
-					}
-					else if (dam > p_ptr->chp / 3)
-						result = format("%^s %s!", m_name, act);
-					else
-						result = format("%^s %s.", m_name, act);
-
-				}
+				hit = check_hit(attack_power(effect), rlev - m_ptr->cdis, who, TRUE);
 			}
 
-			/* Clear message */
-			if ((blind) && !(touched)) result = NULL;
+			/* Get attack */
+			if (!blind) attack_desc(who, target, method, dam, &do_cut, &do_stun);
+
+			/* Already displayed result */
+			result = NULL;
 
 			/* Only do if damage */
 			if (dam) switch (method)
 			{
-				case RBM_SPIT:	mon_bolt(who, y, x, effect, dam, result); break;
+				case RBM_SPIT:	mon_shot(who, y, x, effect, dam, hit, result); break;
 				case RBM_GAZE:	msg_print(result);(void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_WAIL: msg_print(result);(void)project(0, 4, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
 				case RBM_SPORE:	mon_ball(who, y, x, effect, dam, 1, result); break;
@@ -1541,7 +1611,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_INSULT: msg_print(result);(void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_SING:  msg_print(result);(void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_TRAP:  msg_print(result);(void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
-				case RBM_BOULDER: mon_bolt(who, y, x, effect, dam, result); break;
+				case RBM_BOULDER: mon_shot(who, y, x, effect, dam, hit, result); break;
 				case RBM_AURA:	msg_print(result);(void)project(0, 2, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_CLOUD, 0, 0);  break;
 				case RBM_SELF:	msg_print(result);(void)project(0, 0, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_DIRECT, 0, 0); break;
 				case RBM_ADJACENT: msg_print(result);(void)project(0, (rlev / 10) + 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
@@ -1568,11 +1638,11 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_CROSS: mon_beam(who, y, x, effect, dam, 10, result); break;
 				case RBM_STRIKE: mon_ball(who, y, x, effect, dam, 1, result); break;
 				case RBM_EXPLODE: msg_print(result);(void)project(0, 2, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, damroll(5,8), GF_EXPLODE, FLG_MON_BALL, 0, 0); break;
-				case RBM_ARROW: mon_bolt(who, y, x, effect, dam, result); break;
-				case RBM_XBOLT: mon_bolt(who, y, x, effect, dam, result); break;
-				case RBM_SPIKE: mon_bolt(who, y, x, effect, dam, result); break;
-				case RBM_DART: mon_bolt(who, y, x, effect, dam, result); break;
-				case RBM_SHOT: mon_bolt(who, y, x, effect, dam, result); break;
+				case RBM_ARROW: mon_shot(who, y, x, effect, dam, hit, result); break;
+				case RBM_XBOLT: mon_shot(who, y, x, effect, dam, hit, result); break;
+				case RBM_SPIKE: mon_shot(who, y, x, effect, dam, hit, result); break;
+				case RBM_DART: mon_shot(who, y, x, effect, dam, hit, result); break;
+				case RBM_SHOT: mon_shot(who, y, x, effect, dam, hit, result); break;
 				case RBM_ARC_20: mon_arc(who, y, x, effect, dam, 0, (powerful ? 40 : 20), result); break;
 				case RBM_ARC_30: mon_arc(who, y, x, effect, dam, 0, (powerful ? 60 : 40), result); break;
 				default: mon_beam(who, y, x, effect, dam, 2, result); /* For all hurt huge attacks */
@@ -1595,7 +1665,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			}
 
 			/* Handle cut */
-			if (do_cut)
+			if ((do_cut) && (target < 0))
 			{
 				int k, tmp;
 
@@ -1620,7 +1690,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			}
 
 			/* Handle stun */
-			if (do_stun)
+			if ((do_stun) && (target < 0))
 			{
 				int k, tmp;
 
@@ -2527,7 +2597,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else result = format("%^s casts a frost bolt.", m_name);
 			}
 			else
-		{
+			{
 				if (blind) result = format("%^s murmurs deeply.", m_name);
 				else result = format("%^s casts a frost bolt.", m_name);
 			}

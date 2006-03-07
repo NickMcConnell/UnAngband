@@ -5734,6 +5734,7 @@ void cave_alter_feat(int y, int x, int action)
  *    PROJECT_CHCK:  projection notes when it cannot bypass a monster.
  *    PROJECT_THRU:  projection extends past destination grid
  *    PROJECT_PASS:  projection passes through walls
+ *    PROJECT_MISS:  projection misses the first monster or player.
  *
  * This function returns the number of grids (if any) in the path.  This
  * may be zero if no grids are legal except for the starting one.
@@ -6082,7 +6083,8 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 			/* Try to avoid monsters/players between the endpoints */
 			if ((cave_m_idx[y][x] != 0) && (blockage[i] < 2))
 			{
-				if      (flg & (PROJECT_STOP)) blockage[i] = 2;
+				if      (flg & (PROJECT_MISS)) flg &= ~(PROJECT_MISS);
+				else if (flg & (PROJECT_STOP)) blockage[i] = 2;
 				else if (flg & (PROJECT_CHCK)) blockage[i] = 1;
 			}
 		}

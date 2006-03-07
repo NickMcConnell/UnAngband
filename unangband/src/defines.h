@@ -2348,7 +2348,7 @@
 #define PROJECT_BOOM         0x00000040
 #define PROJECT_WALL         0x00000080
 #define PROJECT_PASS         0x00000100  /*Ignore walls*/
-#define PROJECT_XXX4         0x00000200
+#define PROJECT_MISS         0x00000200  /*Misses the first target*/
 #define PROJECT_XXX5         0x00000400
 
 /* What projections affect */

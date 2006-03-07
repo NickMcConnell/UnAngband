@@ -4968,42 +4968,39 @@ bool break_near(object_type *j_ptr, int y, int x)
 			/* Spores explode */
 			if ((j_ptr->sval == SV_EGG_SPORE) && (j_ptr->name3 > 0))
 			{
-				while (j_ptr->number)
+				monster_race *r_ptr = &r_info[j_ptr->name3];
+				monster_lore *l_ptr = &l_list[j_ptr->name3];
+
+				/* Scan through all four blows */
+				for (i = 0; i < 4; i++)
 				{
-					monster_race *r_ptr = &r_info[j_ptr->name3];
-					monster_lore *l_ptr = &l_list[j_ptr->name3];
+					effect = r_ptr->blow[i].effect;
+					method = r_ptr->blow[i].method;
+					d_dice = r_ptr->blow[i].d_dice;
+					d_side = r_ptr->blow[i].d_side;
 
-					/* Scan through all four blows */
-					for (i = 0; i < 4; i++)
+					/* End of attacks */
+					if (!method) break;
+
+					/* Message */
+					if (!i) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
+
+					/* Skip if not spores */
+					if (method != RBM_SPORE) continue;
+
+					flg = PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
+
+					/* Hit with radiate attack */
+					obvious = project(0, 1, y, x, y, x, damroll(d_side, d_dice),
+						 effect, flg, 0, 0);
+
+					/* Count "obvious" attacks */
+					if (obvious || (l_ptr->blows[i] > 10))
 					{
-						effect = r_ptr->blow[i].effect;
-						method = r_ptr->blow[i].method;
-						d_dice = r_ptr->blow[i].d_dice;
-						d_side = r_ptr->blow[i].d_side;
-
-						/* End of attacks */
-						if (!method) break;
-
-						/* Message */
-						if (!i) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
-
-						/* Skip if not spores */
-						if (method != RBM_SPORE) continue;
-
-						flg = PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
-
-						/* Hit with radiate attack */
-						obvious = project(0, 1, y, x, y, x, damroll(d_side, d_dice),
-							 effect, flg, 0, 0);
-
-						/* Count "obvious" attacks */
-						if (obvious || (l_ptr->blows[i] > 10))
+						/* Count attacks of this type */
+						if (l_ptr->blows[i] < MAX_UCHAR)
 						{
-							/* Count attacks of this type */
-							if (l_ptr->blows[i] < MAX_UCHAR)
-							{
-								l_ptr->blows[i]++;
-							}
+							l_ptr->blows[i]++;
 						}
 					}
 				}
@@ -5019,7 +5016,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 				j_ptr->sval = SV_BODY_CORPSE;
 
 				/* Hack - do not adjust weight. Also, if in process of hatching, will 're-animate'. */
-				return FALSE;
+				return (FALSE);
 			}
 		}
 	}
