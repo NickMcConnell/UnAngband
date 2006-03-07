@@ -35,8 +35,9 @@ temporarily disabled for testing purposes.
 and a variety of miscellaneous spells as per NPPAngband.
 
 - Monsters now can intelligently use their ranged melee blows at a distance (e.g.
-gaze, wail, lash). These either have limited range (lash), require ammunition
-(arrow, shot, bolt) or require mana to use (gaze, wail).
+gaze, wail, lash). These usually have limited range (lash) and require ammunition
+(arrow, shot, bolt) or require mana to use (gaze, wail). Monsters will carry the
+appropriate ammunition and drop it on their death.
 
 - Monsters can now bleed or get poisoned by the player.
 
@@ -193,6 +194,8 @@ learn it (randomly) but cannot cast it.  (Fixed by kobayasi)
 - It is now possible to backstab sleeping monsters.
 
 - You should only use enough energy in melee to kill a monster, again.
+
+- Status effects are now properly seen when looking at a monster.
 
 ### Build / Platform ###
 

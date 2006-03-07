@@ -2517,6 +2517,174 @@ void set_monster_slow(s16b m_idx, s16b counter, bool message)
 	return;
 }
 
+/*
+ * Given a monster and possibly a blow number, return the 
+ * first object index that it can use as ammunition. If
+ * created is set to true, create ammunition for the monster
+ * if there is none.
+ *
+ * blow == -1: Check all blows. Return ammo slot for monster
+ * ammunition. If created set true, create ammunition for
+ * all blows which require it. If return 0, monster does
+ * not require ammuntion.
+ * blow == 0..3: Check this one blow. Return -1 if there
+ * is no ammunition for this blow. If created set true,
+ * create ammunition for this one blow which requires it.
+ * Return 0 if monster does not require ammunition for this
+ * blow.
+ *
+ * XXX Hack: we used hard-coded kinds for efficiency
+ * purposes to save unnecessary lookups to lookup_kind()
+ *
+ * XXX Maybe coat ammunition with an appropriate potion
+ * in order that the player can use it later on.
+ */
+int find_monster_ammo(int m_idx, int blow, bool created)
+{
+	monster_type *m_ptr = &m_list[m_idx];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	int ammo = 0;
+	int ammo_tval = 0;
+	int ammo_sval = 0;
+	int ammo_kind = 0;
+	int this_o_idx, next_o_idx, i;
+
+	object_type *o_ptr;
+	object_type object_type_body;
+
+	/* Examine the attacks */
+	for (i = (blow < 0 ? 0 : blow); i < (blow < 0 ? 4 : blow + 1); i++)
+	{
+		int method, effect, d_dice, d_side;
+
+		/* Skip non-attacks */
+		if (!r_ptr->blow[i].method) continue;
+
+		/* Extract the attack info */
+		method = r_ptr->blow[i].method;
+		effect = r_ptr->blow[i].effect;
+		d_dice = r_ptr->blow[i].d_dice;
+		d_side = r_ptr->blow[i].d_side;
+
+		/* Ranged? */
+		if (method < RBM_MIN_RANGED) continue;
+
+		switch (method)
+		{
+			case RBM_SPORE:
+			{
+				ammo_kind = 596;
+				ammo_tval = TV_EGG;
+				ammo_sval = SV_EGG_SPORE;
+				break;
+			}
+			case RBM_BOULDER:
+			{
+				ammo_kind = 598;
+				ammo_tval = TV_JUNK;
+				ammo_sval = SV_JUNK_ROCK;
+				break;
+			}
+			case RBM_ARROW:
+			{
+				ammo_tval = TV_ARROW;
+				if (d_dice <= 3)  ammo_sval = SV_AMMO_NORMAL;
+				else if (d_dice <= 12) ammo_sval = SV_AMMO_STEEL;
+				else if (d_dice <= 27) ammo_sval = SV_AMMO_SPECIAL;
+				else ammo_sval = SV_AMMO_HEAVY;
+				break;
+			}
+			case RBM_XBOLT:
+			{
+				ammo_tval = TV_BOLT;
+				if (d_dice <= 4)  ammo_sval = SV_AMMO_NORMAL;
+				else if (d_dice <= 16) ammo_sval = SV_AMMO_STEEL;
+				else if (d_dice <= 36) ammo_sval = SV_AMMO_SPECIAL;
+				else ammo_sval = SV_AMMO_HEAVY;
+				break;
+			}
+			case RBM_SPIKE:
+			{
+				ammo_kind = 345;
+				ammo_tval = TV_SPIKE;
+				ammo_sval = 0;
+				break;
+			}
+			case RBM_DART:
+			{
+				ammo_kind = 434;
+				ammo_tval = TV_POLEARM;
+				ammo_sval = SV_DART;
+				break;
+			}
+			case RBM_SHOT:
+			{
+				ammo_tval = TV_SHOT;
+				if (d_dice < 2)  ammo_sval = SV_AMMO_NORMAL;
+				else if (d_dice < 8) ammo_sval = SV_AMMO_STEEL;
+				else if (d_dice < 18) ammo_sval = SV_AMMO_SPECIAL;
+				else ammo_sval = SV_AMMO_HEAVY;
+				break;
+			}
+		}
+
+		/* Blow doesn't need ammo */
+		if (!ammo_tval) continue;
+
+		/* Scan monster inventory */
+		for (this_o_idx = m_ptr->hold_o_idx; this_o_idx; this_o_idx = next_o_idx)
+		{
+			/* Get the object */
+			o_ptr = &o_list[this_o_idx];
+
+			/* Get the next object */
+			next_o_idx = o_ptr->next_o_idx;
+
+			/* Check if ammo */
+			if (o_ptr->tval == ammo_tval) ammo = this_o_idx;
+
+			/* Prefer correct ammo */
+			if (o_ptr->sval == ammo_sval) break;
+		}
+
+		/* Hack - Checking a single blow */
+		if ((blow >= 0) && !(ammo)) return (-1);
+
+		/* Monster has ammo */
+		if (!created || (ammo != 0)) continue;
+
+		/* Create some ammo for the monster */
+		if (!ammo_kind) ammo_kind = lookup_kind(ammo_tval, ammo_sval);
+
+		/* Get the object body */
+		o_ptr = &object_type_body;
+
+		/* Prepare the item */
+		object_prep(o_ptr, ammo_kind);
+
+		/* Give the monster some shots */
+		o_ptr->number = (byte)rand_range(1, r_ptr->level);
+
+		/* Archers get more shots */
+		if (r_ptr->flags2 & (RF2_ARCHER)) o_ptr->number += (byte)rand_range(1, r_ptr->level);
+
+		/* Boulder throwers get less shots */
+		if (ammo_tval == TV_JUNK) o_ptr->number = (o_ptr->number + 1) / 2;
+
+		/* Mark the object as specific to the monster */
+		o_ptr->name3 = m_ptr->r_idx;
+
+		/* Monster carries the object */
+		ammo = monster_carry(m_idx, o_ptr);
+	}
+
+	/* Monster has no ammo and needs it */
+	if (ammo_tval && !ammo) return (-1);
+
+	return (ammo);
+}
+
 
 
 /*
@@ -2715,6 +2883,9 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp)
 
 	/* Place the monster in the dungeon */
 	if (!monster_place(y, x, n_ptr)) return (FALSE);
+
+	/* Give the monster some ammunition */
+	(void)find_monster_ammo(cave_m_idx[y][x], -1, TRUE);
 
 	/* Success */
 	return (TRUE);

@@ -1729,7 +1729,8 @@
 #define SV_AMMO_LIGHT		0	/* pebbles */
 #define SV_AMMO_NORMAL		1	/* shots, arrows, bolts */
 #define SV_AMMO_HEAVY		2	/* seeker arrows and bolts */
-#define SV_AMMO_SILVER		3	/* silver arrows and bolts */
+#define SV_AMMO_SPECIAL		3	/* special arrows and bolts */
+#define SV_AMMO_STEEL		5	/* steel arrows and bolts */
 
 /* The "sval" codes for TV_BOW (note information in "sval") */
 #define SV_SLING			2	/* (x2) */

@@ -3752,12 +3752,19 @@ cptr look_mon_desc(int m_idx)
 
 	bool living = TRUE;
 
+	/* Report status effects */
+	if (m_ptr->csleep) return("asleep");
+	if (m_ptr->confused) return("confused");
+	if (m_ptr->monfear) return("afraid");
+	if (m_ptr->stunned) return("stunned");
+	if (m_ptr->cut) return("bleeding");
+	if (m_ptr->poisoned) return("poisoned");
+	if (find_monster_ammo(m_idx, -1, FALSE) < 0) return("out of ammo");
 
 	/* Determine if the monster is "living" (vs "undead") */
 	if (r_ptr->flags3 & (RF3_UNDEAD)) living = FALSE;
 	if (r_ptr->flags3 & (RF3_DEMON)) living = FALSE;
 	if (r_ptr->flags3 & (RF3_NONLIVING)) living = FALSE;
-
 
 	/* Healthy monsters */
 	if (m_ptr->hp >= m_ptr->maxhp)
@@ -3779,13 +3786,6 @@ cptr look_mon_desc(int m_idx)
 		else
 			return(living ? "almost dead" : "almost destroyed");
 	}
-
-	if (m_ptr->csleep) return("asleep");
-	if (m_ptr->confused) return("confused");
-	if (m_ptr->monfear) return("afraid");
-	if (m_ptr->stunned) return("stunned");
-	if (m_ptr->cut) return("bleeding");
-	if (m_ptr->poisoned) return("poisoned");
 }
 
 

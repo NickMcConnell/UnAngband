@@ -1321,7 +1321,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	else
 	{
 		/* Monsters can fail spells and run out of mana*/
-		int failrate, manacost;
+		int failrate, manacost, ammo;
 
 		m_ptr = &m_list[who];
 		l_ptr = &l_list[m_ptr->r_idx];
@@ -1360,6 +1360,24 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		else return (FALSE);		/* Spend the mana */
 
 		m_ptr->mana -= manacost;
+
+		/* Use ammunition */
+		ammo = find_monster_ammo(who, attack - 96, FALSE);
+
+		/* Reduce ammunition */
+		if (ammo > 0)
+		{
+			floor_item_increase(ammo, -1);
+			floor_item_optimize(ammo);
+		}
+		/* Out of ammunition */
+		else if (ammo < 0)
+		{
+			/* Message */
+			msg_format("%^s is out of ammunition.", m_name);
+
+			return (TRUE);
+		}
 
 		/* Calculate spell failure rate */
 		failrate = 25 - (rlev + 3) / 4;
@@ -5070,8 +5088,8 @@ bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
 	monster_desc(m_name, m_ptr, 0x40);
 
 	/* Describe object */
-	if (o_ptr->k_idx) object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
-	else (strcpy(o_name,"the attack"));
+	if (o_ptr->k_idx) object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
+	else (strcpy(o_name,"attack"));
 
 	/*
 	 * Handle monsters that resist blunt and/or edged weapons. We include
@@ -5172,23 +5190,23 @@ bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
 			if (learn)
 			{
 				if (resist >= 80)
-					msg_format("%^s does almost no damage to %s!",
+					msg_format("Your %s does almost no damage to %s!",
 						o_name, m_name);
 				else if (resist >= 70)
-					msg_format("%^s does very little damage to %s!",
+					msg_format("Your %s does very little damage to %s!",
 						o_name, m_name);
 				else if (resist >= 50)
-					msg_format("%^s does little damage to %s!",
+					msg_format("Your %s does little damage to %s!",
 						o_name, m_name);
 				else
-					msg_format("%^s is resisted by %s.",
+					msg_format("Your %s is resisted by %s.",
 						o_name, m_name);
 			}
 
 			/* Note already known resistance */
 			else
 			{
-				msg_format("%^s %s %s.", o_name, note, m_name);
+				msg_format("Your %s %s %s.", o_name, note, m_name);
 			}
 		}
 

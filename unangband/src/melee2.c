@@ -93,7 +93,6 @@ static void find_range(monster_type *m_ptr)
 
 	else
 	{
-
 		/* Minimum distance - stay at least this far if possible */
 		m_ptr->min_range=1;
 
@@ -705,6 +704,12 @@ static void remove_expensive_spells(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, 
 	u32b f5 = (*f5p);
 	u32b f6 = (*f6p);
 	u32b f7 = (*f7p);
+
+	/* Remove spells that require ammunition if the caster doesn't have any */
+	for (i = 0; i < 4; i++)
+	{
+		if (find_monster_ammo(m_idx, i, FALSE) < 0) f4 &= ~(RF4_BLOW_1 << i);
+	}
 
 	/* Determine maximum amount of mana to be spent */
 	/* Smart monsters will usually not blow all their mana on one spell.
@@ -4902,6 +4907,11 @@ static void recover_monster(int m_idx, bool regen)
 	int y = m_ptr->fy;
 	int x = m_ptr->fx;
 
+	/* Monster name */
+	char m_name[80];
+	char m_poss[80];
+
+
 	/* Handle "summoned" */
 	if (m_ptr->summoned)
 	{
@@ -4916,7 +4926,6 @@ static void recover_monster(int m_idx, bool regen)
 	/* Get hit by terrain continuously */
 	if (place_monster_here(y,x,m_ptr->r_idx) < 0)
 	{
-
 		bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
 
 		bool daytime = ((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2));
@@ -4957,9 +4966,6 @@ static void recover_monster(int m_idx, bool regen)
 			/* Hack --- tell the player if something unhides */
 			if (m_ptr->ml)
 			{
-
-				char m_name[80];
-
 				/* Get the monster name */
 				monster_desc(m_name, m_ptr, 0);
 
@@ -5013,8 +5019,6 @@ static void recover_monster(int m_idx, bool regen)
 			/* Notice the "waking up" */
 			if (m_ptr->ml)
 			{
-				char m_name[80];
-
 				/* Acquire the monster name */
 				monster_desc(m_name, m_ptr, 0);
 
@@ -5057,8 +5061,6 @@ static void recover_monster(int m_idx, bool regen)
 				/* Notice the "waking up" */
 				if (m_ptr->ml)
 				{
-					char m_name[80];
-
 					/* Get the monster name */
 					monster_desc(m_name, m_ptr, 0);
 
@@ -5113,8 +5115,6 @@ static void recover_monster(int m_idx, bool regen)
 			/* Message if visible */
 			if (m_ptr->ml)
 			{
-				char m_name[80];
-
 				/* Acquire the monster name */
 				monster_desc(m_name, m_ptr, 0);
 
@@ -5146,8 +5146,6 @@ static void recover_monster(int m_idx, bool regen)
 			/* Message if visible */
 			if (m_ptr->ml)
 			{
-				char m_name[80];
-
 				/* Acquire the monster name */
 				monster_desc(m_name, m_ptr, 0);
 
@@ -5183,9 +5181,6 @@ static void recover_monster(int m_idx, bool regen)
 			/* Visual note - only if monster isn't terrified */
 			if ((m_ptr->ml) && (m_ptr->min_range != FLEE_RANGE))
 			{
-				char m_name[80];
-				char m_poss[80];
-
 				/* Acquire the monster name/poss */
 				monster_desc(m_name, m_ptr, 0);
 				monster_desc(m_poss, m_ptr, 0x22);
@@ -5226,6 +5221,16 @@ static void recover_monster(int m_idx, bool regen)
 					cave_set_feat(m_ptr->fy, m_ptr->fx, FEAT_FLOOR_SLIME_T);
 			}
 
+			/* Notice if bleeding would kill monster */
+			if ((m_ptr->ml) && (m_ptr->hp < (m_ptr->cut > 200 ? 3 : (m_ptr->cut > 100 ? 2 : 1))))
+			{
+				/* Acquire the monster name */
+				monster_desc(m_name, m_ptr, 0);
+
+				/* Dump a message */
+				msg_format("%^s bleeds to death.", m_name);
+			}
+
 			/* Take damage - only players can cut monsters */
 			mon_take_hit(m_idx, (m_ptr->cut > 200 ? 3 : (m_ptr->cut > 100 ? 2 : 1)), &fear, NULL);
 		}
@@ -5239,8 +5244,6 @@ static void recover_monster(int m_idx, bool regen)
 			/* Message if visible */
 			if (m_ptr->ml)
 			{
-				char m_name[80];
-
 				/* Acquire the monster name */
 				monster_desc(m_name, m_ptr, 0);
 
@@ -5264,6 +5267,16 @@ static void recover_monster(int m_idx, bool regen)
 			/* Recover somewhat */
 			m_ptr->poisoned -= d;
 
+			/* Notice if poison would kill monster */
+			if ((m_ptr->ml) && (m_ptr->hp < 1))
+			{
+				/* Acquire the monster name */
+				monster_desc(m_name, m_ptr, 0);
+
+				/* Dump a message */
+				msg_format("%^s expires from poisoning.", m_name);
+			}
+
 			/* Take damage - only players can poison monsters */
 			mon_take_hit(m_idx, 1, &fear, NULL);
 		}
@@ -5277,8 +5290,6 @@ static void recover_monster(int m_idx, bool regen)
 			/* Message if visible */
 			if (m_ptr->ml)
 			{
-				char m_name[80];
-
 				/* Acquire the monster name */
 				monster_desc(m_name, m_ptr, 0);
 
@@ -5311,8 +5322,6 @@ static void recover_monster(int m_idx, bool regen)
 			/* Message if visible */
 			if (m_ptr->ml)
 			{
-				char m_name[80];
-
 				/* Acquire the monster name */
 				monster_desc(m_name, m_ptr, 0);
 
@@ -5378,8 +5387,6 @@ static void recover_monster(int m_idx, bool regen)
 			/* Hack --- tell the player if something unhides */
 			if (m_ptr->ml)
 			{
-				char m_name[80];
-
 				/* Get the monster name */
 				monster_desc(m_name, m_ptr, 0);
 
@@ -5433,8 +5440,6 @@ static void recover_monster(int m_idx, bool regen)
 				/* Hack --- tell the player if something unhides */
 				if (m_ptr->ml)
 				{
-					char m_name[80];
-
 					/* Get the monster name */
 					monster_desc(m_name, m_ptr, 0);
 
@@ -5500,8 +5505,6 @@ static void recover_monster(int m_idx, bool regen)
 			/* Message if visible */
 			if (m_ptr->ml)
 			{
-				char m_name[80];
-
 				/* Acquire the monster name */
 				monster_desc(m_name, m_ptr, 0);
 
