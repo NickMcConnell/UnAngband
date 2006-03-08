@@ -4480,7 +4480,7 @@ bool fire_cloud(int typ, int dir, int dam, int rad)
 
 	int ty, tx;
 
-	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_BOOM | PROJECT_PLAY;
+	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_BOOM | PROJECT_PLAY | PROJECT_BOOM;
 
 	/* Use the given direction */
 	ty = py + 99 * ddy[dir];
@@ -4536,19 +4536,62 @@ static bool project_hook(int typ, int dir, int dam, int flg)
  */
 bool fire_bolt(int typ, int dir, int dam)
 {
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int ty, tx;
+
 	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_GRID | PROJECT_PLAY;
-	return (project_hook(typ, dir, dam, flg));
+
+	/* Use the given direction */
+	ty = py + 99 * ddy[dir];
+	tx = px + 99 * ddx[dir];
+
+	/* Hack -- Use an actual "target" */
+	if ((dir == 5) && target_okay())
+	{
+		flg &= ~(PROJECT_STOP);
+
+		ty = p_ptr->target_row;
+		tx = p_ptr->target_col;
+	}
+
+	/* Analyze the "dir" and the "target".  Hurt items on floor. */
+	return (project(-1, 0, py, px, ty, tx, dam, typ, flg, 0, 0));
 }
 
 /*
  * Cast a beam spell
  * Pass through monsters, as a "beam"
  * Affect monsters (not grids or objects)
+ * Now only range 10.
  */
 bool fire_beam(int typ, int dir, int dam)
 {
-	int flg = PROJECT_BEAM | PROJECT_KILL | PROJECT_GRID;
-	return (project_hook(typ, dir, dam, flg));
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int ty, tx;
+
+	int flg = PROJECT_BEAM | PROJECT_KILL | PROJECT_GRID | PROJECT_THRU;
+
+	int range = 10;
+
+	/* Use the given direction */
+	ty = py + 99 * ddy[dir];
+	tx = px + 99 * ddx[dir];
+
+	/* Hack -- Use an actual "target" */
+	if ((dir == 5) && target_okay())
+	{
+		flg &= ~(PROJECT_STOP);
+
+		ty = p_ptr->target_row;
+		tx = p_ptr->target_col;
+	}
+
+	/* Analyze the "dir" and the "target".  Hurt items on floor. */
+	return (project(-1, range, py, px, ty, tx, dam, typ, flg, 0, 0));
 }
 
 /*
@@ -4586,14 +4629,35 @@ bool fire_blast(int typ, int dir, int dam)
 }
 
 /*
- * Affect an adjacent monster with an attack 
+ * Hands is now a range 3 beam, similar to lightening spark from Sangband.
+ * It does not affect the grid however.
  */
 bool fire_hands(int typ, int dir, int dam)
 {
-	int ty = p_ptr->py +ddy[dir];
-	int tx = p_ptr->px +ddx[dir];
+	int py = p_ptr->py;
+	int px = p_ptr->px;
 
-	return (project_m(-1, 0, ty, tx, dam, typ));
+	int ty, tx;
+
+	int flg = PROJECT_BEAM | PROJECT_KILL | PROJECT_THRU;
+
+	int range = 3;
+
+	/* Use the given direction */
+	ty = py + 99 * ddy[dir];
+	tx = px + 99 * ddx[dir];
+
+	/* Hack -- Use an actual "target" */
+	if ((dir == 5) && target_okay())
+	{
+		flg &= ~(PROJECT_STOP);
+
+		ty = p_ptr->target_row;
+		tx = p_ptr->target_col;
+	}
+
+	/* Analyze the "dir" and the "target".  Hurt items on floor. */
+	return (project(-1, range, py, px, ty, tx, dam, typ, flg, 0, 0));
 }
 
 /*
@@ -5135,7 +5199,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 			case RBM_HANDS:
 			{
 				/* Allow direction to be cancelled for free */
-				if ((!get_rep_dir(&dir)) && (*cancel)) return (FALSE);
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
 
 				/* Hack - scale damage */
 				if ((level > 5) && (d_side)) damage+= damroll((level-1)/5, d_side);
@@ -5147,7 +5211,6 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 			{
 				/* Allow direction to be cancelled for free */
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
-					  
 
 				/* Hack - scale damage */
 				if ((level > 5) && (d_side)) damage += damroll((level-1)/5, d_side);

@@ -74,10 +74,10 @@ A:65:15:1
 A:65:24:15
 A:90:0:1
 A:93:2:2
-C:1:1:1:22:4
-C:4:3:1:30:1
-C:8:1:1:30:1
-B:MISSILE:MISSILE:3d4+0
+C:1:1:2:22:4
+C:4:3:2:30:1
+C:8:2:2:30:1
+B:MISSILE:MANA:3d4+0
 
 N:2:Detect Monsters
 A:90:0:2
@@ -1683,7 +1683,7 @@ A:90:9:1
 A:93:13:16
 C:1:1:2:26:4
 C:4:5:3:35:1
-C:8:1:2:26:4
+C:8:2:2:26:4
 B:HANDS:FIRE:3d8+0
 
 N:147:Fire Trap
@@ -1755,7 +1755,7 @@ C:4:43:51:95:11
 C:8:37:37:80:18
 B:STORM:FIRE:2d0+95
 
-N:154:Melting Hands
+N:154:Melting Ray
 A:90:10:1
 A:93:1:16
 C:1:1:2:26:4
@@ -1829,12 +1829,12 @@ B:BOLT:ACID:8d16
 B:BOLT:ACID:8d16
 B:BOLT:ACID:8d16
 
-N:162:Shocking Hands
+N:162:Lightning Spark
 A:90:12:1
 A:93:22:16
 C:1:1:2:26:4
 C:4:5:3:35:1
-C:8:1:2:26:4
+C:8:2:2:26:4
 B:HANDS:ELEC:3d8
 
 N:163:Resist Electricity
@@ -1914,12 +1914,12 @@ C:4:39:47:90:10
 C:8:32:31:75:16
 B:STORM:ELEC:2d0+115
 
-N:171:Freezing Hands
+N:171:Freeze
 A:90:11:1
 A:93:14:16
 C:1:1:2:26:4
 C:4:5:3:35:1
-C:8:1:2:26:4
+C:8:2:2:26:4
 B:HANDS:COLD:3d8
 
 N:172:Frost Trap
@@ -3385,7 +3385,7 @@ D:You breathe light.
 
 N:381:Breathe Power
 A:38:30:1
-B:BREATH:MISSILE:3d0+225
+B:BREATH:MANA:3d0+225
 D:You breathe the elements.
 
 # Elemental ring activations

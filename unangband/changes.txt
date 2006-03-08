@@ -100,6 +100,12 @@ unnessary bookkeeping.
 
 - Renamed individually appearing novice monsters to apprentice monsters.
 
+- The cost of the cheapest magical attacks, such as magic missile, has been increased
+to two mana. The low level elemental attacks have been renamed slightly, and beam
+up to 3 distance now.
+
+- Mages, rogues and rangers now get more starting mana.
+
 - Added fixed quests that can be configured in the lib\edit\quests.txt file. These
 allow a reasonably complicated set of actions. See the example Farmer Maggot quest.
 However, scripting is not possible - the quests are data-driven. At the moment
@@ -172,6 +178,9 @@ With the option on, these items still honour the =g flag.
 - Added option to color the player depending on health (From several other variants).
 Switched on by default.
 
+- Shop entrances made to be outside locations, so new players don't get confused by
+change in graphics when leaving a shop (Commented on by Hilke Reiter).
+
 ### Bug fixes ###
 
 - Priest spell righteous fury was for mages, paladins, shamans and bards but
@@ -215,11 +224,6 @@ not used.
 
 - Cleaned up code somewhat by using monster flags more often instead of
 depending on matching monster names.
-
-- Temporarily disabled random artifacts to prevent crashing once game run.
-This is possibly an out of memory issue on windows, or failure to free
-allocated resources correctly. Can also be fixed by reducing the size of
-the monster list.
 
 - Significantly improved the monster metrics used for computing relative
 monster power, for determining artifact and object slays. Some of this

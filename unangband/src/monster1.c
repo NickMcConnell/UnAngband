@@ -729,7 +729,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_NOTHING: q = "nothing"; break;
 			case GF_STORM: p= "lash with wind and rain"; break;
 			case GF_WIND: p= "blast with wind"; break;
-			case GF_MISSILE: q="blast with magic missiles";break;
+			case GF_XXX1: q="blast with XXX1";break;
 			case GF_MANA: q="blast with magic";break;       
 			case GF_HOLY_ORB: q="blast with holy magic";break;
 			case GF_LITE_WEAK: q="light up";break;

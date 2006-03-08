@@ -685,7 +685,7 @@
 #define GF_NOTHING      0
 #define GF_STORM	1
 #define GF_WIND		2
-#define GF_MISSILE      3
+#define GF_XXX1         3
 #define GF_MANA		4
 #define GF_HOLY_ORB     5
 #define GF_LITE_WEAK    6

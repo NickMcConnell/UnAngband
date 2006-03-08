@@ -1070,7 +1070,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 			case RBM_SELF: t = "you";break;
 			case RBM_EXPLODE: t = "you and all enemies adjacent to you"; break;
 			case RBM_ADJACENT: t = "all enemies adjacent to you"; break;
-			case RBM_HANDS: t = "an adjacent target"; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
+			case RBM_HANDS: t = "a beam of 3 grids"; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
 			case RBM_MISSILE: t = "your enemies"; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
 			case RBM_BOLT_10: p = "creates a bolt"; t = "your enemies"; if ((level > 8) && (d2)) d1+= (level-5)/4;break;
 			case RBM_BOLT: p = "creates a powerful bolt";  t = "your enemies"; if ((level > 8) && (d2)) d1+= (level-5)/4;break;
@@ -1107,7 +1107,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 			case GF_NOTHING: q = "do"; u = "nothing"; break;
 			case GF_STORM: q= "lash"; u = "with wind and rain"; break;
 			case GF_WIND: q= "blast"; u = "with wind"; break;
-			case GF_MISSILE: q="blast"; u = "with magic missiles";break;
+			case GF_XXX1: q="blast"; u = "with XXX1";break;
 			case GF_MANA: q="blast"; u = "with magic";break;       
 			case GF_HOLY_ORB: q="blast"; u = "with holy magic";break;
 			case GF_LITE_WEAK: q="light"; s ="up";break;

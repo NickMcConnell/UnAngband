@@ -667,7 +667,6 @@ static byte spell_color(int type)
 	/* Analyze */
 	switch (type)
 	{
-		case GF_MISSILE:	return (TERM_VIOLET);
 		case GF_EXPLODE:	return (TERM_VIOLET);
 		case GF_ACID:	   return (TERM_SLATE);
 		case GF_ELEC:	   return (TERM_BLUE);
@@ -3482,13 +3481,6 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 	switch (typ)
 	{
 
-		/* Magic missile -- pure damage */
-		case GF_MISSILE:
-		{
-			if (seen) obvious = TRUE;
-			break;
-		}
-
 		/* Explosion -- destructive -- pure damage */
 		case GF_EXPLODE:
 		{
@@ -5954,14 +5946,6 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				if (!p_ptr->disease)
 					p_ptr->disease |= (DISEASE_LIGHT);
 			}
-			break;
-		}
-
-		/* Standard damage */
-		case GF_MISSILE:
-		{
-			if (fuzzy) msg_print("You are hit by something!");
-			take_hit(dam, killer);
 			break;
 		}
 

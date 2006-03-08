@@ -1971,7 +1971,7 @@ static void calc_mana(void)
 	/* Extract total mana */
 	msp = adj_mag_mana[p_ptr->stat_ind[pc_ptr->spell_stat]] * levels / 2;
 
-	/* Hack -- usually add one mana */
+	/* Hack -- usually add 1 mana */
 	if (msp) msp++;
 
 	/* Assume player is not encumbered by gloves */
@@ -2043,6 +2043,8 @@ static void calc_mana(void)
 		msp -= ((cur_wgt - max_wgt) / 10);
 	}
 
+	/* Hack -- mage types start with higher mana */
+	if ((msp) && (icky_hands)) msp += 4;
 
 	/* Mana can never be negative */
 	if (msp < 0) msp = 0;

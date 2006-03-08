@@ -4846,7 +4846,10 @@ void race_near(int r_idx, int y1, int x1)
  * Used to apply object breakage special effects.
  *
  * Currently only applies for containers, potions, flasks and eggs.
- *
+ * 
+ * XXX We assume all such breakage is player initiated, to prevent
+ * smoke forming from thrown oil flasks, and to give the player
+ * experience for using spores, oil etc to kill monsters.
  */
 bool break_near(object_type *j_ptr, int y, int x)
 {
@@ -4946,7 +4949,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 					flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
 					/* Hit with radiate attack */
-					obvious |= project(0, (j_ptr->tval == TV_POTION ? 2 : 1), y, x, y, x, damroll(d_side, d_dice),
+					obvious |= project(-1, (j_ptr->tval == TV_POTION ? 2 : 1), y, x, y, x, damroll(d_side, d_dice),
 						 effect, flg, 0, 0);
 
 				}
@@ -4991,7 +4994,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 					flg = PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
 					/* Hit with radiate attack */
-					obvious = project(0, 1, y, x, y, x, damroll(d_side, d_dice),
+					obvious = project(-1, 1, y, x, y, x, damroll(d_side, d_dice),
 						 effect, flg, 0, 0);
 
 					/* Count "obvious" attacks */

@@ -184,7 +184,7 @@ static cptr r_info_blow_effect[] =
 	"",
 	"STORM",
 	"WIND",
-	"MISSILE",
+	"XXX1",
 	"MANA",
 	"HOLY_ORB",
 	"LITE_WEAK",

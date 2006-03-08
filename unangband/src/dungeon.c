@@ -787,7 +787,7 @@ static void process_world(void)
 	/* Regenerate the mana */
 	if (p_ptr->csp < p_ptr->msp)
 	{
-		if ((p_ptr->cur_flags3 & (TR3_DRAIN_MANA)) &&
+		if (!(p_ptr->cur_flags3 & (TR3_DRAIN_MANA)) &&
 			!(p_ptr->disease & (DISEASE_DRAIN_MANA))) regenmana(regen_amount);
 	}
 
