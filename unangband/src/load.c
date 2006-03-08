@@ -1757,11 +1757,6 @@ static errr rd_savefile_new_aux(void)
 	u16b tmp16u;
 	u32b tmp32u;
 
-	int a_max;
-
-	artifact_type *a_info_new;
-	object_lore *a_list_new;
-
 #ifdef VERIFY_CHECKSUMS
 	u32b n_x_check, n_v_check;
 	u32b o_x_check, o_v_check;
@@ -1904,31 +1899,30 @@ static errr rd_savefile_new_aux(void)
 
 	if (arg_fiddle) note("Loaded Quests");
 
+	/* Hack -- do the random artifacts now. These will be over-written
+	   by the save file data. */
+	do_randart(0x10000000, TRUE);
+
 	/* Load the Artifacts */
 	rd_u16b(&tmp16u);	
 
-	a_max = tmp16u;
-
 	/* Incompatible save files */
-	if (a_max > 256)
+	if (tmp16u > z_info->a_max)
 	{
 		note(format("Too many (%u) artifacts!", tmp16u));
 		return (-1);
 	}
 
-	/* Allocate the new artifact range */
-	C_MAKE(a_info_new, a_max, artifact_type);
-
-	/* Allocate the new artifact range */
-	C_MAKE(a_list_new, a_max, object_lore);
+	/* Set the new artifact max */
+	z_info->a_max = tmp16u;
 
 	/* Read the artifact flags */
-	for (i = 0; i < a_max; i++)
+	for (i = 0; i < z_info->a_max; i++)
 	{
-		object_lore *n_ptr = &a_list_new[i];
+		object_lore *n_ptr = &a_list[i];
 
 		rd_byte(&tmp8u);
-		a_info_new[i].cur_num = (tmp8u != 0);
+		a_info[i].cur_num = (tmp8u != 0);
 		rd_byte(&tmp8u);
 		rd_byte(&tmp8u);
 		rd_byte(&tmp8u);
@@ -1945,7 +1939,7 @@ static errr rd_savefile_new_aux(void)
 		rd_u32b(&n_ptr->not_flags4);
 
 		/* Activations */
-		rd_s16b(&a_info_new[i].activated);
+		rd_s16b(&a_info[i].activated);
 
 		/* Oops */
 		rd_byte(&tmp8u);
@@ -1999,41 +1993,12 @@ static errr rd_savefile_new_aux(void)
 	if (rd_extra()) return (-1);
 	if (arg_fiddle) note("Loaded extra information");
 
-	/* Hack -- initialise various things used in rand artifacts */
-	do_randart(seed_randart, adult_rand_artifacts);
-
 	/* Read random artifacts */
 	if (adult_rand_artifacts)
 	{
 		if (rd_randarts()) return (-1);
 		if (arg_fiddle) note("Loaded Random Artifacts");
 	}
-
-	/* Copy over the artifact flags */
-	for (i = 0; i < a_max; i++)
-	{
-		object_lore *n_ptr = &a_list[i];
-		object_lore *n2_ptr = &a_list_new[i];
-
-		a_info[i].cur_num = a_info_new[i].cur_num;
-
-		/* Knowledge */
-		n_ptr->can_flags1 = n2_ptr->can_flags1;
-		n_ptr->can_flags2 = n2_ptr->can_flags2;
-		n_ptr->can_flags3 = n2_ptr->can_flags3;
-		n_ptr->can_flags4 = n2_ptr->can_flags4;
-
-		n_ptr->not_flags1 = n2_ptr->not_flags1;
-		n_ptr->not_flags2 = n2_ptr->not_flags2;
-		n_ptr->not_flags3 = n2_ptr->not_flags3;
-		n_ptr->not_flags4 = n2_ptr->not_flags4;
-
-		/* Activations */
-		a_info[i].activated = a_info_new[i].activated;
-	}
-
-	FREE(a_info_new);
-	FREE(a_list_new);
 
 	/* Important -- Initialize the sex */
 	sp_ptr = &sex_info[p_ptr->psex];

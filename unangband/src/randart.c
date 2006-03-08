@@ -4937,6 +4937,9 @@ errr do_randart(u32b randart_seed, bool full)
 	int i;
 	u32b j;
 
+	/* Hack -- already initialised full randarts */
+	if (z_info->a_max == 256) return (err);
+
 	/* Prepare to use the Angband "simple" RNG. */
 	Rand_value = randart_seed;
 	Rand_quick = TRUE;
