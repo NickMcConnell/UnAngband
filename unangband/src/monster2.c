@@ -2733,7 +2733,7 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp)
 	}
 
 	/* Require monster can survive on terrain */
-	if (place_monster_here(y, x, r_idx) <= 0)
+	if (place_monster_here(y, x, r_idx) <= MM_FAIL)
 	{
 		return (FALSE);
 	}
@@ -2742,7 +2742,7 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp)
 	if (f_ptr->flags1 & (FF1_GLYPH)) return (FALSE);
 
 
-	if (!r_idx) msg_print("no monster");
+	if (!r_idx) msg_print("Bug: no monster!");
 
 	/* Paranoia */
 	if (!r_idx) return (FALSE);
@@ -2913,18 +2913,22 @@ static bool place_monster_group(int y, int x, int r_idx, bool slp,
 	byte hack_y[GROUP_MAX];
 	byte hack_x[GROUP_MAX];
 
-	/* Hard monsters, smaller groups */
-	if (r_ptr->level > p_ptr->depth)
+	/* Hack -- don't adjust if one monster */
+	if (group_size > 1)
 	{
-		adjust = (r_ptr->level - p_ptr->depth) / 2;
-		group_size -= randint(adjust);
-	}
+		/* Hard monsters, smaller groups */
+		if (r_ptr->level > p_ptr->depth)
+		{
+			adjust = (r_ptr->level - p_ptr->depth) / 2;
+			group_size -= randint(adjust);
+		}
 
-	/* Easier monsters, bigger groups */
-	if (p_ptr->depth > r_ptr->level)
-	{
-		adjust = (p_ptr->depth - r_ptr->level) / 2;
-		group_size += randint(adjust);
+		/* Easier monsters, bigger groups */
+		if (p_ptr->depth > r_ptr->level)
+		{
+			adjust = (p_ptr->depth - r_ptr->level) / 2;
+			group_size += randint(adjust);
+		}
 	}
 
 	/* Minimum size */
@@ -3076,6 +3080,13 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp)
 			/* Place a group of escorts if needed */
 			if ((r_info[escort_idx].flags1 & (RF1_FRIENDS)) &&
 				!place_monster_group(my, mx, escort_idx, slp, (rand_range(3, 5))))
+			{
+				continue;
+			}
+
+			/* Place a group of escorts if needed */
+			if ((r_info[escort_idx].flags1 & (RF1_FRIEND)) &&
+				!place_monster_group(my, mx, escort_idx, slp, 2))
 			{
 				continue;
 			}
@@ -3522,8 +3533,8 @@ bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp)
 			}
 		}
 	}
-	/* Friends for certain monsters */
-	else if (r_ptr->flags1 & (RF1_FRIENDS))
+	/* A friend for certain monsters */
+	else if (r_ptr->flags1 & (RF1_FRIEND))
 	{
 		/* Attempt to place a second monster */
 		(void)place_monster_group(y, x, r_idx, slp, 1);
@@ -3961,7 +3972,7 @@ bool multiply_monster(int m_idx)
 		if (!cave_empty_bold(y, x)) continue;
 
 		/* Require monster can survive on terrain */
-		if (place_monster_here(y, x, m_ptr->r_idx) <= 0) continue;
+		if (place_monster_here(y, x, m_ptr->r_idx) <= MM_FAIL) continue;
 
 		/* Create a new monster (awake, no groups) */
 		result = place_monster_aux(y, x, m_ptr->r_idx, FALSE, FALSE);
@@ -4019,6 +4030,10 @@ void message_pain(int m_idx, int dam)
 	/* Hack -- avoid mentioning minor damage */
 	if (!(m_ptr->ml) && (percentage > 95)) return;
 
+	/* Hack -- avoid mentioning if out of sight */
+	if (m_ptr->cdis > MAX_SIGHT) return;
+
+#if 0
 	/* Hack -- if seen, only report changes in 'damage state'*/
 	if (m_ptr->ml)
 	{
@@ -4035,11 +4050,11 @@ void message_pain(int m_idx, int dam)
 			|| ((percentage >= 25) && (percentage2 < 25))
 			|| ((percentage >= 10) && (percentage2 < 10)))
 		{
-			msg_format("%^s is %s", m_name, look_mon_desc(m_idx));
+			msg_format("%^s is %s.", m_name, look_mon_desc(m_idx));
 		}
 		return;
 	}
-
+#endif
 	/* Jelly's, Mold's, Vortex's, Quthl's */
 	if (strchr("jmvQ", r_ptr->d_char))
 	{
