@@ -1290,6 +1290,10 @@ static errr init_other(void)
 	/* Array of grids */
 	C_MAKE(dyna_g, DYNA_MAX, u16b);
 
+	/*** Set the default modify_grids ***/
+	modify_grid_boring_hook = modify_grid_boring_view;
+	modify_grid_unseen_hook = modify_grid_unseen_view;
+	modify_grid_interesting_hook = modify_grid_interesting_view;
 
 	/*** Prepare dungeon arrays ***/
 

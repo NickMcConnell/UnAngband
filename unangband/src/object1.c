@@ -2021,7 +2021,7 @@ bool item_tester_okay(const object_type *o_ptr)
 	if (!o_ptr->k_idx) return (FALSE);
 
 	/* Hack -- ignore "gold" */
-	if (o_ptr->tval == TV_GOLD) return (FALSE);
+	if (o_ptr->tval >= TV_GOLD) return (FALSE);
 
 	/* Check the tval */
 	if (item_tester_tval)

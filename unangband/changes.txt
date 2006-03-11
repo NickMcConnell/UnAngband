@@ -181,6 +181,8 @@ Switched on by default.
 - Shop entrances made to be outside locations, so new players don't get confused by
 change in graphics when leaving a shop (Commented on by Hilke Reiter).
 
+- Improved targetting code so it displays the line of fire, when selecting a target.
+
 ### Bug fixes ###
 
 - Priest spell righteous fury was for mages, paladins, shamans and bards but

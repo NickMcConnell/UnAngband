@@ -4465,8 +4465,6 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 				if (r_ptr->flags1 & (RF1_FEMALE)) s1 = "She is ";
 				else if (r_ptr->flags1 & (RF1_MALE)) s1 = "He is ";
 
-#if 1
-
 				/* Use a preposition */
 				s2 = "carrying ";
 
@@ -4547,8 +4545,6 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 
 				/* Double break */
 				if (this_o_idx) break;
-
-#endif
 
 				/* Use a preposition */
 				if (m_ptr->mflag && (MFLAG_OVER))
@@ -4909,7 +4905,228 @@ static int target_set_interactive_aux(int y, int x, int mode, cptr info)
 	return (query);
 }
 
+/*
+ * Variables used to highlight project path to target.
+ */
+static int target_path_n;
+static u16b target_path_g[256];
 
+
+/*
+ * Modify a 'boring' grid appearance based on the 'projectability'
+ */
+void modify_grid_boring_project(byte *a, char *c, int y, int x, byte cinfo, byte pinfo)
+{
+	(void)y;
+	(void)x;
+	(void)cinfo;
+
+	/* Handle "blind" first*/
+	if (p_ptr->blind)
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+			{
+				/* Use a dark tile */
+				*c += 1;
+			}
+		}
+		else
+		{
+			/* Use "dark gray" */
+			*a = dark_attr[dark_attr[*a]];
+		}
+	}
+
+	/* Handle "fire" grids */
+	else if (pinfo & (PLAY_FIRE))
+	{
+		int i;
+
+		for (i = 0; i < target_path_n; i++)
+		{
+			int path_y = GRID_Y(target_path_g[i]);
+			int path_x = GRID_X(target_path_g[i]);
+
+			/* Hack -- Stop before hitting walls */
+			if (!cave_project_bold(y, x)) break;
+
+			/* X, Y on projection path? */
+			if ((path_y == y) && (path_x == x))
+			{
+				/* Mega-hack */
+				if (*a & 0x80)
+				{
+					/* Use a brightly lit tile */
+					if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
+						*c -= 1;
+					else if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+						*c += 2;
+				}
+				else
+				{
+					/* Use "yellow" */
+					*a = lite_attr[*a];
+				}
+
+				/* Important -- exit loop */
+				break;
+			}
+		}
+
+		/* Use normal */
+	}
+
+	/* Handle "dark" grids */
+	else
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+			{
+				/* Use a dark tile */
+				*c += 1;
+			}
+		}
+		else
+		{
+			/* Use "dark tile" */
+			*a = dark_attr[*a];
+		}
+	}
+}
+
+/*
+ * Modify an 'unseen' grid appearance based on  'projectability'
+ */
+void modify_grid_unseen_project(byte *a, char *c)
+{
+	/* Handle "blind" first */
+	if (p_ptr->blind)
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+			{
+				/* Use a dark tile */
+				*c += 1;
+			}
+		}
+		else
+		{
+			/* Use "dark gray" */
+			*a = dark_attr[dark_attr[*a]];
+		}
+	}
+
+	/* Handle "dark" grids */
+	else
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+			{
+				/* Use a dark tile */
+				*c += 1;
+			}
+		}
+		else
+		{
+			/* Use "dark tile" */
+			*a = dark_attr[*a];
+		}
+	}
+}
+
+/*
+ * Modify an 'interesting' grid appearance based on 'projectability'
+ */
+void modify_grid_interesting_project(byte *a, char *c, int y, int x, byte cinfo, byte pinfo)
+{
+	(void)cinfo;
+
+	/* Handle "blind" and night time*/
+	if (p_ptr->blind)
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+			{
+				/* Use a dark tile */
+				*c += 1;
+			}
+		}
+		else
+		{
+			/* Use "dark gray" */
+			*a = dark_attr[dark_attr[*a]];
+		}
+	}
+
+	/* Handle "fire" grids */
+	else if (pinfo & (PLAY_FIRE))
+	{
+		int i;
+
+		for (i = 0; i < target_path_n; i++)
+		{
+			int path_y = GRID_Y(target_path_g[i]);
+			int path_x = GRID_X(target_path_g[i]);
+
+			/* Hack -- Stop before hitting walls */
+			if (!cave_project_bold(y, x)) break;
+
+			/* X, Y on projection path? */
+			if ((path_y == y) && (path_x == x))
+			{
+				/* Mega-hack */
+				if (*a & 0x80)
+				{
+					/* Use a brightly lit tile */
+					if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
+						*c -= 1;
+					else if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+						*c += 2;
+				}
+				else
+				{
+					/* Use "yellow" */
+					*a = lite_attr[*a];
+				}
+
+				/* Important -- exit loop */
+				break;
+			}
+		}
+
+		/* Use normal */
+	}
+
+	/* Handle "dark" grids */
+	else
+	{
+		/* Mega-hack */
+		if (*a & 0x80)
+		{
+			if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
+			{
+				/* Use a dark tile */
+				*c += 1;
+			}
+		}
+		else
+		{
+			/* Use "dark tile" */
+			*a = dark_attr[*a];
+		}
+	}
+}
 
 
 /*
@@ -4965,6 +5182,9 @@ bool target_set_interactive(int mode)
 	int y = py;
 	int x = px;
 
+	int ty = y;
+	int tx = x;
+
 	bool done = FALSE;
 
 	bool flag = TRUE;
@@ -4972,7 +5192,6 @@ bool target_set_interactive(int mode)
 	char query;
 
 	char info[80];
-
 
 	/* Cancel target */
 	target_set_monster(0);
@@ -4985,6 +5204,27 @@ bool target_set_interactive(int mode)
 	/* Prepare the "temp" array */
 	target_set_interactive_prepare(mode);
 
+	/* If targetting monsters, display projectable grids */
+	if (mode == TARGET_KILL)
+	{
+		/* Set path */
+		target_path_n = 0;
+
+		/* Use the projection hook functions */
+		modify_grid_boring_hook = modify_grid_boring_project;
+		modify_grid_unseen_hook = modify_grid_unseen_project;
+		modify_grid_interesting_hook = modify_grid_interesting_project;
+
+		/* Redraw map */
+		p_ptr->redraw |= (PR_MAP);
+
+		/* Hack -- Window stuff */
+		p_ptr->window |= (PW_OVERHEAD);
+
+		/* Handle stuff */
+		handle_stuff();
+	}
+
 	/* Start near the player */
 	m = 0;
 
@@ -4994,8 +5234,23 @@ bool target_set_interactive(int mode)
 		/* Interesting grids */
 		if (flag && temp_n)
 		{
-			y = temp_y[m];
-			x = temp_x[m];
+			ty = y = temp_y[m];
+			tx = x = temp_x[m];
+
+			/* Calculate the path */
+			if (mode == TARGET_KILL)
+			{
+				target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
+
+				/* Redraw map */
+				p_ptr->redraw |= (PR_MAP);
+
+				/* Hack -- Window stuff */
+				p_ptr->window |= (PW_OVERHEAD);
+
+				/* Handle stuff */
+				handle_stuff();					
+			}
 
 			/* Allow target */
 			if ((cave_m_idx[y][x] > 0) && target_able(cave_m_idx[y][x]))
@@ -5052,6 +5307,9 @@ bool target_set_interactive(int mode)
 
 				case 'p':
 				{
+					y = py;
+					x = px;
+
 					if (scroll_target)
 					{
 						/* Recenter around player */
@@ -5060,9 +5318,6 @@ bool target_set_interactive(int mode)
 						/* Handle stuff */
 						handle_stuff();
 					}
-
-					y = py;
-					x = px;
 				}
 
 				case 'o':
@@ -5185,6 +5440,24 @@ bool target_set_interactive(int mode)
 
 				case 'p':
 				{
+					y = py;
+					x = px;
+
+					/* Calculate the path */
+					if (mode == TARGET_KILL)
+					{
+						target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
+
+						/* Redraw map */
+						p_ptr->redraw |= (PR_MAP);
+
+						/* Hack -- Window stuff */
+						p_ptr->window |= (PW_OVERHEAD);
+
+						/* Handle stuff */
+						handle_stuff();					
+					}
+
 					if (scroll_target)
 					{
 						/* Recenter around player */
@@ -5193,9 +5466,6 @@ bool target_set_interactive(int mode)
 						/* Handle stuff */
 						handle_stuff();
 					}
-
-					y = py;
-					x = px;
 				}
 
 				case 'o':
@@ -5289,6 +5559,24 @@ bool target_set_interactive(int mode)
 					if (y >= p_ptr->wy + SCREEN_HGT) y--;
 					else if (y < p_ptr->wy) y++;
 				}
+
+				ty = y;
+				tx = x;
+
+				/* Calculate the path */
+				if (mode == TARGET_KILL)
+				{
+					target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
+
+					/* Redraw map */
+					p_ptr->redraw |= (PR_MAP);
+
+					/* Hack -- Window stuff */
+					p_ptr->window |= (PW_OVERHEAD);
+
+					/* Handle stuff */
+					handle_stuff();					
+				}
 			}
 		}
 	}
@@ -5298,6 +5586,23 @@ bool target_set_interactive(int mode)
 
 	/* Clear the top line */
 	prt("", 0, 0);
+
+	/* Paranoia - reset the modify_grid functions */
+	modify_grid_boring_hook = modify_grid_boring_view;
+	modify_grid_unseen_hook = modify_grid_unseen_view;
+	modify_grid_interesting_hook = modify_grid_interesting_view;
+
+	if (mode == TARGET_KILL)
+	{
+		/* Redraw map */
+		p_ptr->redraw |= (PR_MAP);
+
+		/* Hack -- Window stuff */
+		p_ptr->window |= (PW_OVERHEAD);
+
+		/* Handle stuff */
+		handle_stuff();
+	}
 
 	if (scroll_target)
 	{

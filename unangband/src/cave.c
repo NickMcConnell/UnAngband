@@ -467,7 +467,7 @@ byte dark_attr[16] =
 /*
  * Modify a 'boring' grid appearance based on the ambient light
  */
-void modify_grid_boring(byte *a, char *c, int y, int x, byte cinfo, byte pinfo)
+void modify_grid_boring_view(byte *a, char *c, int y, int x, byte cinfo, byte pinfo)
 {
 	/* Handle "seen" grids */
 	if (pinfo & (PLAY_SEEN))
@@ -530,7 +530,6 @@ void modify_grid_boring(byte *a, char *c, int y, int x, byte cinfo, byte pinfo)
 					/* Mega-hack */
 					if (*a & 0x80)
 					{
-
 						/* Use a brightly lit tile */
 						if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
 							*c -= 1;
@@ -611,7 +610,7 @@ void modify_grid_boring(byte *a, char *c, int y, int x, byte cinfo, byte pinfo)
 /*
  * Modify an 'unseen' grid appearance based on the ambient light
  */
-void modify_grid_unseen(byte *a, char *c)
+void modify_grid_unseen_view(byte *a, char *c)
 {
 	/* Handle "blind" and night time*/
 	if (p_ptr->blind  || !(((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))))
@@ -655,8 +654,11 @@ void modify_grid_unseen(byte *a, char *c)
 /*
  * Modify an 'interesting' grid appearance based on the ambient light
  */
-void modify_grid_interesting(byte *a, char *c, byte cinfo, byte pinfo)
+void modify_grid_interesting_view(byte *a, char *c, int y, int x, byte cinfo, byte pinfo)
 {
+	(void)y;
+	(void)x;
+
 	/* Handle "seen" grids */
 	if (pinfo & (PLAY_SEEN))
 	{
@@ -744,6 +746,8 @@ void modify_grid_interesting(byte *a, char *c, byte cinfo, byte pinfo)
 		}
 	}
 }
+
+
 
 /*
  * Extract the attr/char to display at the given (legal) map location
@@ -978,7 +982,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
 			{
 				/* Modify the lighting */
-				modify_grid_boring(&a, &c, y, x, cinfo, pinfo);
+				(*modify_grid_boring_hook)(&a, &c, y, x, cinfo, pinfo);
 			}
 		}
 
@@ -1001,7 +1005,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			if (f_ptr->flags3 & (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
 			{
 				/* Modify lighting */
-				modify_grid_unseen(&a, &c);
+				(*modify_grid_unseen_hook)(&a, &c);
 			}
 		}
 
@@ -1064,14 +1068,14 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
 			{
 				/* Modify lighting */
-				modify_grid_boring(&a, &c, y, x, cinfo, pinfo);
+				(*modify_grid_boring_hook)(&a, &c, y, x, cinfo, pinfo);
 			}
 
 			/* Special lighting effects */
 			else if ((view_granite_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
 			{
 				/* Modify lighting */
-				modify_grid_interesting(&a, &c, cinfo, pinfo);
+				(*modify_grid_interesting_hook)(&a, &c, y, x, cinfo, pinfo);
 			}
 		}
 
@@ -1094,7 +1098,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			if (f_ptr->flags2 & (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
 			{
 				/* Modify lighting */
-				modify_grid_unseen(&a, &c);
+				(*modify_grid_unseen_hook)(&a, &c);
 			}
 		}
 
@@ -1149,14 +1153,14 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
 		{
 			/* Modify lighting */
-			modify_grid_boring(&a, &c, y, x, cinfo, pinfo);
+			(*modify_grid_boring_hook)(&a, &c, y, x, cinfo, pinfo);
 		}
 
 		/* Special lighting effects */
 		else if ((view_granite_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
 		{
 			/* Modify lighting */
-			modify_grid_interesting(&a, &c, cinfo, pinfo);
+			(*modify_grid_interesting_hook)(&a, &c, y, x, cinfo, pinfo);
 		}
 	}
 

@@ -465,6 +465,14 @@ s16b (*cave_m_idx)[DUNGEON_WID];
 
 
 
+/*
+ * The follow functions allow for 'alternate' modes of display the main map.
+ */
+void (*modify_grid_boring_hook)(byte *a, char *c, int y, int x, byte cinfo, byte pinfo);
+void (*modify_grid_unseen_hook)(byte *a, char *c);
+void (*modify_grid_interesting_hook)(byte *a, char *c, int y, int x, byte cinfo, byte pinfo);
+
+
 #ifdef MONSTER_FLOW
 
 /*
