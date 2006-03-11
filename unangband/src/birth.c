@@ -667,8 +667,9 @@ static void player_outfit(void)
 			/* Check the slot */
 			slot = wield_slot(i_ptr);
 
-			/*if player can wield an item, and slot not already occupied, do so*/
-			if ((slot >= INVEN_WIELD) && !(inventory[slot].k_idx))
+			/* If player can wield an item, and slot not already occupied, do so */
+			/* Hack -- Temporarily don't wield lites until lite on/off code working */
+			if ((slot >= INVEN_WIELD) && (slot != INVEN_LITE) && !(inventory[slot].k_idx))
 			{
 				/* Get the wield slot */
 				o_ptr = &inventory[slot];
