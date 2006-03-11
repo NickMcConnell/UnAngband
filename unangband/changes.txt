@@ -182,6 +182,7 @@ Switched on by default.
 change in graphics when leaving a shop (Commented on by Hilke Reiter).
 
 - Improved targetting code so it displays the line of fire, when selecting a target.
+(Requires view_special_lite option enabled).
 
 ### Bug fixes ###
 

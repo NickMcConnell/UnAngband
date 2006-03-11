@@ -5310,6 +5310,21 @@ bool target_set_interactive(int mode)
 					y = py;
 					x = px;
 
+					/* Calculate the path */
+					if (mode == TARGET_KILL)
+					{
+						target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
+
+						/* Redraw map */
+						p_ptr->redraw |= (PR_MAP);
+
+						/* Hack -- Window stuff */
+						p_ptr->window |= (PW_OVERHEAD);
+
+						/* Handle stuff */
+						handle_stuff();					
+					}
+
 					if (scroll_target)
 					{
 						/* Recenter around player */
