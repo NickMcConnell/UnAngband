@@ -6052,6 +6052,7 @@ errr eval_info(eval_info_power_func eval_info_process, header *head)
 }
 
 
+
 /*
  * Go through the attack types for this monster.
  * We look for the maximum possible maximum damage that this
@@ -6132,6 +6133,9 @@ static long eval_max_dam(monster_race *r_ptr)
 		for (i = 0; i < 32; i++)
 		{
 			u16b this_dam = 0;
+
+			/* We count ranged blows later */
+			if (!(x) && ((flag <= RF4_BLOW_4) || (flag == RF4_EXPLODE) || (flag == RF4_AURA))) continue;
 
 			/* First make sure monster has the flag*/
 			if (flag & flag_counter)
@@ -6389,6 +6393,9 @@ static long eval_max_dam(monster_race *r_ptr)
 
 			}
 
+			/* Hack - always allow one attack at maximum */
+			if (this_dam > spell_dam) spell_dam = this_dam;
+
 			/* Hack - Apply over 10 rounds */
 			this_dam *= 10;
 
@@ -6396,8 +6403,26 @@ static long eval_max_dam(monster_race *r_ptr)
 			if (flag_counter & innate_mask)	this_dam = this_dam * r_ptr->freq_innate / 100;
 			else this_dam = this_dam * r_ptr->freq_spell / 100;
 
-			/* Incorporate spell failure chance */
+			/* Scale for spell failure chance */
 			if (!(r_ptr->flags2 & RF2_STUPID) && (x > 0)) this_dam = this_dam * MIN(75 + (rlev + 3) / 4, 100) / 100;
+
+			/* Scale for mana requirement */
+			if ((x == 0) && (spell_info_RF4[i][0] * 10 > r_ptr->mana))
+			{
+				this_dam = this_dam * r_ptr->mana / (spell_info_RF4[i][0] * 10);
+			}
+			else if ((x == 1) && (spell_info_RF5[i][0] * 10 > r_ptr->mana))
+			{
+				this_dam = this_dam * r_ptr->mana / (spell_info_RF5[i][0] * 10);
+			}
+			else if ((x == 2) && (spell_info_RF6[i][0] * 10 > r_ptr->mana))
+			{
+				this_dam = this_dam * r_ptr->mana / (spell_info_RF6[i][0] * 10);
+			}
+			else if ((x == 3) && (spell_info_RF7[i][0] * 10 > r_ptr->mana))
+			{
+				this_dam = this_dam * r_ptr->mana / (spell_info_RF7[i][0] * 10);
+			}
 
 			if (this_dam > spell_dam) spell_dam = this_dam;
 
@@ -6521,21 +6546,114 @@ static long eval_max_dam(monster_race *r_ptr)
 				default: break;
 			}
 
-			/*keep a running total*/
-			melee_dam += atk_dam;
+
+			/* Normal melee attack */
+			if (method < RBM_MAX_NORMAL)
+			{
+				/* Keep a running total */
+				melee_dam += atk_dam;
+			}
+
+			/* Ranged attacks can also apply spell dam */
+			if (method > RBM_MIN_RANGED)
+			{
+				int range = MAX_SIGHT, mana = 0;
+				bool must_hit = FALSE;
+
+				/* Hack -- always allow one attack at maximum */
+				if (spell_dam < atk_dam) spell_dam = atk_dam;
+
+				/* Scale for frequency of innate attacks */
+				atk_dam = atk_dam * r_ptr->freq_innate / 100;
+
+				/* Some ranged blows can miss */
+				switch(method)
+				{
+					case RBM_SPIT:	mana = 0; must_hit = TRUE; break;
+					case RBM_GAZE:	mana = 3; range = MIN(MAX_SIGHT, r_ptr->aaf);break;
+					case RBM_WAIL:  mana = 5; range = 4; break;
+					case RBM_SPORE:	mana = 0; range = 3; break;
+					case RBM_LASH:  mana = 0; range = 3; break;
+					case RBM_BEG:	mana = 0; range = 4; break;
+					case RBM_INSULT: mana = 0; range = 4; break;
+					case RBM_SING:  mana = 0; range = 4; break;
+					case RBM_TRAP:  mana = 0; range = 1; break;
+					case RBM_BOULDER: mana = 0; range = 8; must_hit = TRUE; break;
+					case RBM_AURA:	mana = 4; range = 2; break;
+					case RBM_SELF:	mana = 3; range = 0; break;
+					case RBM_ADJACENT: mana = 3; range = 1; break;
+					case RBM_HANDS: mana = 4; range = 3; break;
+					case RBM_MISSILE: mana = 2; range = MAX_SIGHT; break;
+					case RBM_BOLT_10: mana = 5; range = MAX_SIGHT; break;
+					case RBM_BOLT: mana = 4; range = MAX_SIGHT; break;
+					case RBM_BEAM: mana = 6; range = 10; break;
+					case RBM_BLAST: mana = 3; range = 5; break;
+					case RBM_WALL: mana = 6; range = MAX_SIGHT; break;
+					case RBM_BALL: mana = 4; range = MAX_SIGHT; break;
+					case RBM_CLOUD: mana = 5; range = MAX_SIGHT; break;
+					case RBM_STORM: mana = 6; range = MAX_SIGHT; break;
+					case RBM_BREATH: mana = 0; range = 6; break;
+					case RBM_AREA: mana = 3; range = (r_ptr->level / 10) + 1; break;
+					case RBM_LOS: mana = 6; range = MAX_SIGHT; break;
+					case RBM_LINE: mana = 4; range = MAX_SIGHT; break;
+					case RBM_AIM: mana = 4; range = MAX_SIGHT; break;
+					case RBM_ORB: mana = 5; range = MAX_SIGHT; break;
+					case RBM_STAR: mana = 5; range = MAX_SIGHT; break;
+					case RBM_SPHERE: mana = 6; range = MAX_SIGHT; break;
+					case RBM_PANEL: mana = 6; range = MAX_SIGHT; break;
+					case RBM_LEVEL: mana = 8; range = 255; break;
+					case RBM_CROSS: mana = 4; range = MAX_SIGHT; break;
+					case RBM_STRIKE: mana = 5; range = MAX_SIGHT; break;
+					case RBM_EXPLODE: mana = 0; range = 1; break;
+					case RBM_ARROW: mana = 0; range = 10; must_hit = TRUE; break;
+					case RBM_XBOLT: mana = 0; range = 12; must_hit = TRUE; break;
+					case RBM_SPIKE: mana = 0; range = 4; must_hit = TRUE; break;
+					case RBM_DART: mana = 0; range = 8; must_hit = TRUE; break;
+					case RBM_SHOT: mana = 0; range = 8; must_hit = TRUE; break;
+					case RBM_ARC_20: mana = 6; range = 8; break;
+					case RBM_ARC_30: mana = 5; range = 6; break;
+				}
+
+				/* Scale if needs to hit */
+				if (must_hit && !(r_ptr->flags9 & (RF9_NEVER_MISS)))
+				{
+					atk_dam = atk_dam * MIN(45 + rlev * 3, 95) / 100;
+				}
+
+				/* Scale for maximum range */
+				if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL)) atk_dam *= 10;
+				else if (range >= 7) atk_dam *= 10;
+				else if (r_ptr->flags9 & (RF9_SAME_SPEED)) atk_dam *= MIN(4 + range, 10);
+				else
+					atk_dam = atk_dam * (3 + range) + atk_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / (7 - range);
+
+				/* Scale for mana requirement */
+				if (mana * 10 > r_ptr->mana) atk_dam = atk_dam * r_ptr->mana / (mana * 10);
+
+				if (spell_dam < atk_dam) spell_dam = atk_dam;
+			}
+
 		}
 
 		/* 
 		 * Apply damage over 10 rounds. We assume that the monster has to make contact first.
-		 * Hack - speed has more impact on melee as has to stay in contact with player
+		 * Hack - speed has more impact on melee as has to stay in contact with player.
+		 * Hack - this is except for pass wall and kill wall monsters which can always get to the player.
+		 * Hack - use different values for huge monsters as they strike out to range 2.
 		 */
-		if (!(r_ptr->flags9 & (RF9_SAME_SPEED)))
+		if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL))
+				melee_dam *= 10;
+		else if (r_ptr->flags3 & (RF3_HUGE))
 		{
-			melee_dam = melee_dam * 3 + melee_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 7;
+			if (r_ptr->flags9 & (RF9_SAME_SPEED)) melee_dam *= 6;
+			else
+				melee_dam = melee_dam * 4 + melee_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 6;
 		}
 		else
 		{
-			melee_dam *= 5;
+			if (r_ptr->flags9 & (RF9_SAME_SPEED)) melee_dam *= 5;
+			else
+				melee_dam = melee_dam * 3 + melee_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 7;
 		}
 
 		/*
@@ -6543,10 +6661,12 @@ static long eval_max_dam(monster_race *r_ptr)
 		 */
 		if (!(r_ptr->flags9 & (RF9_NEVER_MISS)))
 		{
-			melee_dam = melee_dam * MIN(45 + rlev * 3, 95) / 100;
+			int power = rlev + (r_ptr->flags6 & (RF6_BLESS) ? 5 : 0) + (r_ptr->flags6 & (RF6_BESERK) ? 12 : 0);
+
+			melee_dam = melee_dam * MIN(45 + power * 3, 95) / 100;
 		}
 
-		/* Monsters that multiply ignore the following reductions */
+		/* Hack -- Monsters that multiply ignore the following reductions */
 		if (!(r_ptr->flags2 & (RF2_MULTIPLY)))
 		{
 			/*Reduce damamge potential for monsters that move randomly */
@@ -6575,9 +6695,9 @@ static long eval_max_dam(monster_race *r_ptr)
 					/* Incorporate spell failure chance */
 					if (!(r_ptr->flags2 & RF2_STUPID)) melee_dam = melee_dam / 5 + 4 * melee_dam * MIN(75 + (rlev + 3) / 4, 100) / 500;
 				}
-				else if (r_ptr->flags2 & (RF2_HAS_AURA)) melee_dam /= 3;
-				else if (r_ptr->flags2 & (RF2_INVISIBLE)) melee_dam /= 5;
-				else melee_dam /= 10;
+				else if (r_ptr->flags2 & (RF2_HAS_AURA)) melee_dam /= 2;
+				else if (r_ptr->flags2 & (RF2_INVISIBLE)) melee_dam /= 3;
+				else melee_dam /= 5;
 			}
 		}
 
@@ -6618,6 +6738,10 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	if (r_ptr->flags1 & (RF1_FORCE_MAXHP)) hp = r_ptr->hdice * r_ptr->hside;
 	else hp = r_ptr->hdice * (r_ptr->hside + 1) / 2;
 
+	/* Breeders get pals quickly */
+	hp = hp * MAX(1, extract_energy[r_ptr->speed
+		+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
+
 	/* Just assume healers have more staying power */
 	if (r_ptr->flags6 & RF6_HEAL) hp = (hp * 6) / 5;
 	else if (r_ptr->flags6 & RF6_CURE) hp = (hp * 15) / 14;
@@ -6639,11 +6763,11 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	/* Invisibility */
 	if (r_ptr->flags2 & RF2_INVISIBLE)
 	{
-		hp = (hp * (r_ptr->level + hide_bonus + 1)) / r_ptr->level;
+		hp = (hp * (r_ptr->level + hide_bonus + 1)) / MAX(1, r_ptr->level);
 	}
 	if (r_ptr->flags6 & RF6_INVIS)
 	{
-		hp = (hp * (r_ptr->level + hide_bonus)) / r_ptr->level;
+		hp = (hp * (r_ptr->level + hide_bonus)) / MAX(1, r_ptr->level);
 	}
 
 	/* Monsters that can teleport are a hassle, and can easily run away */
@@ -6721,8 +6845,9 @@ static long eval_hp_adjust(monster_race *r_ptr)
 
 	/* Some abilities modify armour */
 	if (r_ptr->flags2 & RF2_ARMOR) ac = ac * 4 / 3;
-	if (r_ptr->flags6 & RF6_SHIELD) ac += 50;
-	if (r_ptr->flags6 & RF6_BESERK) ac -= 10;
+	if (r_ptr->flags6 & RF6_SHIELD) ac += 25;
+	if (r_ptr->flags6 & RF6_BLESS) ac += 5;
+	if (r_ptr->flags6 & RF6_BESERK) ac -= 5;
 
 	/* Upper limit on ac */
 	if (ac > 150) ac = 150;
@@ -6804,9 +6929,39 @@ errr eval_r_power(header *head)
 		/* Adjust hit points based on resistances */
 		hp = eval_hp_adjust(r_ptr);
 
+		/*
+		 * Hack - at level 50 & above and 75 & above, we have to use an adjustment
+		 * factor to prevent overflow.
+                 */
+		if (lvl >= 100)
+		{
+			hp /= 1000;
+			dam /= 1000;
+		}
+		else if (lvl >= 75)
+		{
+			hp /= 100;
+			dam /= 100;
+		}
+		else if (lvl >= 50)
+		{
+			hp /= 10;
+			dam /= 10;
+		}
+
 		/* Define the power rating */
 		power[i] = hp * dam;
 
+#if 0
+		/* Hack -- set exp including adjustment factor */
+		if (lvl == 0) r_ptr->mexp = 0L;
+		else if (lvl >= 100) r_ptr->mexp = hp * dam * 400000L / lvl;
+		else if (lvl >= 75) r_ptr->mexp = hp * dam * 4000L / lvl;
+		else if (lvl >= 50) r_ptr->mexp = hp * dam * 4L / lvl;
+		else r_ptr->mexp = (hp * dam) / (lvl * 25);
+
+		if ((lvl) && (r_ptr->mexp < 1L)) r_ptr->mexp = 1L;
+#endif
 		/* Adjust for group monsters.  Average in-level group size is 5 */
 		if (r_ptr->flags1 & RF1_UNIQUE) ;
 
@@ -6817,7 +6972,7 @@ errr eval_r_power(header *head)
 		/* Adjust for multiplying monsters. This is modified by the speed,
                  * as fast multipliers are much worse than slow ones.
                  */
-		else if (r_ptr->flags2 & RF2_MULTIPLY) 
+		if (r_ptr->flags2 & RF2_MULTIPLY) 
 			power[i] = power[i] * MAX(1, extract_energy[r_ptr->speed
 				+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
 
@@ -6848,6 +7003,32 @@ errr eval_r_power(header *head)
 			 */
 			if (r_ptr->flags1 & RF1_UNIQUE) continue;
 
+			/*
+			 * While we fix the monster list, only count up to Morgoth
+			 */
+			if (i > 547) continue;
+
+			/*
+			 * Hack -- provide adjustment factor to prevent overflow
+			 */
+			if ((j == 100) && (r_ptr->level < 100))
+			{
+				hp /= 10;
+				dam /= 10;
+			}
+
+			if ((j == 75) && (r_ptr->level < 75))
+			{
+				hp /= 10;
+				dam /= 10;
+			}
+
+			if ((j == 50) && (r_ptr->level < 50))
+			{
+				hp /= 10;
+				dam /= 10;
+			}
+
 			tot_hp[j] += hp;
 			tot_dam[j] += dam;
 
@@ -6858,7 +7039,8 @@ errr eval_r_power(header *head)
 
 			if (r_ptr->flags1 & RF1_FRIEND) mon_count[j] += 2;
 			else if (r_ptr->flags1 & RF1_FRIENDS) mon_count[j] += 5;
-			else if (r_ptr->flags2 & RF2_MULTIPLY) mon_count[i] += MAX(1, extract_energy[r_ptr->speed
+
+			if (r_ptr->flags2 & RF2_MULTIPLY) mon_count[i] += MAX(1, extract_energy[r_ptr->speed
 				+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
 
 			else mon_count[j] += 1;
@@ -6879,6 +7061,7 @@ errr eval_r_power(header *head)
 		if (tot_hp[lvl] != 0 && tot_dam[lvl] != 0)
 		{
 			/* Divide by average HP and av damage for all in-level monsters */
+			/* Note we have factored in the above 'adjustment factor' */
 			av_hp = tot_hp[lvl] / mon_count[lvl];
 			av_dam = tot_dam[lvl] / mon_count[lvl];
 

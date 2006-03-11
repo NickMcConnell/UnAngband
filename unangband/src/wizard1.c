@@ -715,10 +715,12 @@ static void spoil_mon_desc(cptr fname)
 	char nam[80];
 	char lev[80];
 	char rar[80];
+	char pow[80];
+	char exp[80];
 	char spd[80];
 	char ac[80];
 	char hp[80];
-	char exp[80];
+	char vis[80];
 
 	u16b *who;
 	u16b why = 2;
@@ -746,10 +748,10 @@ static void spoil_mon_desc(cptr fname)
 	fprintf(fff, "------------------------------------------\n\n");
 
 	/* Dump the header */
-	fprintf(fff, "%-40.40s%4s%4s%6s%8s%4s  %11.11s\n",
-		"Name", "Lev", "Rar", "Spd", "Hp", "Ac", "Visual Info");
-	fprintf(fff, "%-40.40s%4s%4s%6s%8s%4s  %11.11s\n",
-		"----", "---", "---", "---", "--", "--", "-----------");
+	fprintf(fff, "%-40.40s%4s%4s%8s%8s%6s%8s%4s  %11.11s\n",
+		"Name", "Lev", "Rar", "Power", "Exper", "Spd", "Hp", "Ac", "Visual Info");
+	fprintf(fff, "%-40.40s%4s%4s%8s%8s%6s%8s%4s  %11.11s\n",
+		"----", "---", "---", "-----", "-----", "---", "--", "--", "-----------");
 
 	/* Allocate the "who" array */
 	C_MAKE(who, z_info->r_max, u16b);
@@ -798,6 +800,12 @@ static void spoil_mon_desc(cptr fname)
 		/* Rarity */
 		sprintf(rar, "%d", r_ptr->rarity);
 
+		/* Rarity */
+		sprintf(pow, "%d", r_ptr->power);
+
+		/* Experience */
+		sprintf(exp, "%ld", (long)(r_ptr->mexp));
+
 		/* Speed */
 		if (r_ptr->speed >= 110)
 		{
@@ -822,15 +830,12 @@ static void spoil_mon_desc(cptr fname)
 		}
 
 
-		/* Experience */
-		sprintf(exp, "%ld", (long)(r_ptr->mexp));
-
 		/* Hack -- use visual instead */
-		sprintf(exp, "%s '%c'", attr_to_text(r_ptr->d_attr), r_ptr->d_char);
+		sprintf(vis, "%s '%c'", attr_to_text(r_ptr->d_attr), r_ptr->d_char);
 
 		/* Dump the info */
-		fprintf(fff, "%-40.40s%4s%4s%6s%8s%4s  %11.11s\n",
-			nam, lev, rar, spd, hp, ac, exp);
+		fprintf(fff, "%-40.40s%4s%4s%8s%8s%6s%8s%4s  %11.11s\n",
+			nam, lev, rar, pow, exp, spd, hp, ac, vis);
 	}
 
 	/* End it */

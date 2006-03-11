@@ -957,11 +957,8 @@ static u32b rf4_archery_mask;
  *
  * Note that huge monsters can use all their blows at range 1-2.
  */
-static void init_ranged_attack(int m_idx)
+static void init_ranged_attack(monster_race *r_ptr)
 {
-	monster_type *m_ptr = &m_list[m_idx];
-	monster_race *r_ptr = &r_info[m_ptr->r_idx];
-
 	int ap_cnt;
 
 	/* Paranoia - clear the fake masks */
@@ -4749,7 +4746,7 @@ static void process_monster(int m_idx)
 		if ((roll < chance_innate) || (roll < chance_spell))
 		{
 			/* Set up ranged melee attacks */
-			init_ranged_attack(m_idx);
+			init_ranged_attack(r_ptr);
 
 			choice = choose_ranged_attack(m_idx, &ty, &tx, (roll < chance_innate ? 0x01 : 0x00) | (roll < chance_spell ? 0x02: 0x00));
 		}
