@@ -1726,7 +1726,7 @@ static const o_flag_desc protect_flags4_desc[] =
 
 
 /*
- * Vulneribility
+ * Vulnerability
  */
 static const o_flag_desc vulner_flags4_desc[] =
 {
@@ -2236,7 +2236,7 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 		} 
 	}
 
-	/* Vulneribility flags */
+	/* Vulnerability flags */
 	if (f4)
 	{
 		list_ptr = list;
@@ -3440,7 +3440,7 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 		u32b if1 = o_ptr->may_flags1 & (f1);
 		u32b if2 = o_ptr->may_flags2 & (f2);
 		u32b if3 = o_ptr->may_flags3 & (f3);
-		u32b if4 = o_ptr->may_flags3 & (f4);
+		u32b if4 = o_ptr->may_flags4 & (f4);
 
 		object_type *i_ptr = &inventory[i];
 
@@ -3657,7 +3657,7 @@ static void inven_may_flags()
 		if (!i_ptr->k_idx) continue;
 
 		if ((f1 & (i_ptr->may_flags1)) || (f2 & (i_ptr->may_flags2))
-			|| (f3 & (i_ptr->may_flags3)) || (f4 & (i_ptr->may_flags3)))
+			|| (f3 & (i_ptr->may_flags3)) || (f4 & (i_ptr->may_flags4)))
 			update_slot_flags(i,f1 & (i_ptr->may_flags1),f2 & (i_ptr->may_flags2),f3 & (i_ptr->may_flags3),f4 & (i_ptr->may_flags4));
 	}
 }
@@ -3767,13 +3767,13 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 	o_ptr->may_flags1 &= ~(f1);
 	o_ptr->may_flags2 &= ~(f2);
 	o_ptr->may_flags3 &= ~(f3);
-	o_ptr->may_flags3 &= ~(f4);
+	o_ptr->may_flags4 &= ~(f4);
 
 	/* Clear can flags */
 	o_ptr->can_flags1 &= ~(f1);
 	o_ptr->can_flags2 &= ~(f2);
 	o_ptr->can_flags3 &= ~(f3);
-	o_ptr->can_flags3 &= ~(f4);
+	o_ptr->can_flags4 &= ~(f4);
 
 	/* Check inventory */
 	inven_may_flags();
@@ -3814,8 +3814,8 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 
 		n_ptr->can_flags1 &= ~(f1);
 		n_ptr->can_flags2 &= ~(f2);
-		n_ptr->can_flags2 &= ~(f3);
-		n_ptr->can_flags2 &= ~(f4);
+		n_ptr->can_flags3 &= ~(f3);
+		n_ptr->can_flags4 &= ~(f4);
 	}
 }
 
@@ -5188,8 +5188,8 @@ s32b object_power(const object_type *o_ptr)
 	ADD_POWER("light curse",	 -1,  TR3_LIGHT_CURSE, 3,);
 	ADD_POWER("heavy curse",	 -4, TR3_HEAVY_CURSE, 3,);
 /*	ADD_POWER("permanent curse",	 -40, TR3_PERMA_CURSE, 3,);*/
-	ADD_POWER("light vulneribility", -30, TR4_HURT_LITE, 4,);
-	ADD_POWER("water vulneribility", -30, TR4_HURT_WATER, 4,);
+	ADD_POWER("light vulnerability", -30, TR4_HURT_LITE, 4,);
+	ADD_POWER("water vulnerability", -30, TR4_HURT_WATER, 4,);
 	ADD_POWER("hunger",	 	 -15, TR4_HUNGER, 4,);
 	ADD_POWER("anchor",	 	 -4, TR4_ANCHOR, 4,);
 	ADD_POWER("silent",	 	 -20, TR4_SILENT, 4,);
@@ -5206,11 +5206,11 @@ s32b object_power(const object_type *o_ptr)
 	ADD_POWER("man",	 	 -3, TR4_MAN, 4,);
 	ADD_POWER("dwarf",	 	 -3, TR4_DWARF, 4,);
 	ADD_POWER("elf",	 	 -3, TR4_ELF, 4,);
-	ADD_POWER("hurt poison",	 -50, TR4_HURT_POIS, 4,);
-	ADD_POWER("hurt acid",	 	 -30, TR4_HURT_ACID, 4,);
-	ADD_POWER("hurt lightning",	 -40, TR4_HURT_ELEC, 4,);
-	ADD_POWER("hurt fire",	 -40, TR4_HURT_FIRE, 4,);
-	ADD_POWER("hurt cold",	 -40, TR4_HURT_COLD, 4,);
+	ADD_POWER("poison vulnerability", -50, TR4_HURT_POIS, 4,);
+	ADD_POWER("acid vulnerability",	  -30, TR4_HURT_ACID, 4,);
+	ADD_POWER("lightning vulnerability", -40, TR4_HURT_ELEC, 4,);
+	ADD_POWER("fire vulnerability",	 -40, TR4_HURT_FIRE, 4,);
+	ADD_POWER("cold vulnerability",	 -40, TR4_HURT_COLD, 4,);
 
 	return (p);
 }

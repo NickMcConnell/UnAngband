@@ -2669,8 +2669,8 @@ const cptr magic_name[4][32] =
 	{
 		"of Darkness",
 		"of Light",
-		"of Light Vulneribility",
-		"of Water Vulneribility",
+		"of Light Vulnerability",
+		"of Water Vulnerability",
 		"of Bloodlust",
 		"of Manathirst",
 		"",
@@ -2694,11 +2694,11 @@ const cptr magic_name[4][32] =
 		"of Man",
 		"(Dwarven)",
 		"(Elvish)",
-		"of Poison Vulneribility",
-		"of Acid Vulneribility",
-		"of Lightning Vulneribility",
-		"of Fire Vulneribility",
-		"of Frost Vulneribility"	
+		"of Poison Vulnerability",
+		"of Acid Vulnerability",
+		"of Lightning Vulnerability",
+		"of Fire Vulnerability",
+		"of Frost Vulnerability"	
 	}
 };
 

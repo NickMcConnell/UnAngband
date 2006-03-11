@@ -206,6 +206,11 @@ learn it (randomly) but cannot cast it.  (Fixed by kobayasi)
 
 - Status effects are now properly seen when looking at a monster.
 
+- Objects should no longer misreport the various new abilities (Reported by
+ekolis).
+
+- Fixed spelling of vulnerability (Reported by ekolis)
+
 ### Build / Platform ###
 
 - Added quest.txt in lib\edit which is used to defined fixed texts.

@@ -1247,7 +1247,7 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 {
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
-	/* Vulneribility */
+	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_ACID)) != 0)
 	{
 		/* Always notice */
@@ -1339,7 +1339,7 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 {
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
-	/* Vulneribility */
+	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_ELEC)) != 0)
 	{
 		/* Always notice */
@@ -1428,7 +1428,7 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 {
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
-	/* Vulneribility */
+	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_FIRE)) != 0)
 	{
 		/* Always notice */
@@ -1516,7 +1516,7 @@ static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 {
 	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
 
-	/* Vulneribility */
+	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_COLD)) != 0)
 	{
 		/* Always notice */
@@ -1603,7 +1603,7 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 {
 	(void)inven;
 
-	/* Vulneribility */
+	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_POIS)) != 0)
 	{
 		/* Always notice */
@@ -1613,7 +1613,7 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 		if ((p_ptr->cur_flags4 & (TR4_IM_POIS)) != 0)
 		{
 			/* Always notice */
-			player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
+			player_can_flags(who, 0x0L,0x0L,0x0L,TR4_IM_POIS);
 
 			/* Reduce effect to basic resistance */
 			dam = (dam + 2) / 3;
