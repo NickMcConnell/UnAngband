@@ -2050,13 +2050,13 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 		switch (mode)
 		{
 			case LIST_FLAGS_CAN:
-				anything |= outlist("It feeds you stolen ", list, TERM_WHITE);
+				anything |= outlist("It feeds you stolen", list, TERM_WHITE);
 				break;
 			case LIST_FLAGS_MAY:
-				anything |= outlist("It may feed you stolen ", list, TERM_L_WHITE);
+				anything |= outlist("It may feed you stolen", list, TERM_L_WHITE);
 				break;
 			case LIST_FLAGS_NOT:
-				anything |= outlist("It does not feed you stolen ", list, TERM_SLATE);
+				anything |= outlist("It does not feed you stolen", list, TERM_SLATE);
 				break;
 		} 
 	}
@@ -2098,20 +2098,20 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 		if (!(*list == NULL))
 		{
 			byte attr = TERM_WHITE;
-		switch (mode)
-		{
-			case LIST_FLAGS_CAN:
-				text_out_c(TERM_WHITE,"It modifies ");
-				break;
-			case LIST_FLAGS_MAY:
-				text_out_c(TERM_L_WHITE,"It may modify ");
-				attr= TERM_L_WHITE;
-				break;
-			case LIST_FLAGS_NOT:
-				text_out_c(TERM_SLATE,"It does not modify ");
-				attr = TERM_SLATE;
-				break;
-		} 
+			switch (mode)
+			{
+				case LIST_FLAGS_CAN:
+					text_out_c(TERM_WHITE,"It modifies");
+					break;
+				case LIST_FLAGS_MAY:
+					text_out_c(TERM_L_WHITE,"It may modify");
+					attr= TERM_L_WHITE;
+					break;
+				case LIST_FLAGS_NOT:
+					text_out_c(TERM_SLATE,"It does not modify");
+					attr = TERM_SLATE;
+					break;
+			} 
 			anything |= outlist(NULL, list,attr);
 		}
 	}
@@ -2124,16 +2124,16 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 		/* Simplify things if an item sustains all stats */
 		if ((f2 & all_sustains) == all_sustains)
 		{
-		switch (mode)
-		{
-			case LIST_FLAGS_CAN:
-			case LIST_FLAGS_MAY:
-				*list_ptr++ = "all stats";
-				break;
-			case LIST_FLAGS_NOT:
-				*list_ptr++ = "any stats";
-				break;
-		} 
+			switch (mode)
+			{
+				case LIST_FLAGS_CAN:
+				case LIST_FLAGS_MAY:
+					*list_ptr++ = "all stats";
+					break;
+				case LIST_FLAGS_NOT:
+					*list_ptr++ = "any stats";
+					break;
+			} 
 		}
 
 		/* Should we bother? */
@@ -2675,10 +2675,12 @@ void list_object(const object_type *o_ptr, int mode)
 		/* Display the flags */
 		anything |= list_object_flags(o_ptr->may_flags1, o_ptr->may_flags2, o_ptr->may_flags3, o_ptr->may_flags4, 2); 
 
+#if 0
                 /* Equipment only */
                 if (wield_slot(o_ptr) >= INVEN_WIELD)
                         /* Display the flags */
-                        anything |= list_object_flags(o_ptr->not_flags1, o_ptr->not_flags2, o_ptr->not_flags3, o_ptr->not_flags4, 3); 
+                        anything |= list_object_flags(o_ptr->not_flags1, o_ptr->not_flags2, o_ptr->not_flags3, o_ptr->not_flags4, 3);
+#endif
 	}
 
         /* *Identified* object */

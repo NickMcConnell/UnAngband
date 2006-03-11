@@ -175,6 +175,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 	/* Some "weapons" and "ammo" do extra damage */
 	switch (o_ptr->tval)
 	{
+#if 0
 		case TV_SHOT:
 		case TV_ARROW:
 		case TV_BOLT:
@@ -643,6 +644,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 			break;
 
 		}
+#endif
 	}
 
 
@@ -2111,7 +2113,7 @@ void py_attack(int y, int x)
 				n1 = o_ptr->can_flags1 & ~(k1);
 				n2 = o_ptr->can_flags2 & ~(k2);
 				n3 = o_ptr->can_flags3 & ~(k3);
-				n4 = o_ptr->can_flags3 & ~(k4);
+				n4 = o_ptr->can_flags4 & ~(k4);
 
 				if (n1 || n2 || n3 || n4) update_slot_flags(slot, n1, n2, n3, n4);
 
