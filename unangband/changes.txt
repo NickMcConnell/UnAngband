@@ -216,6 +216,10 @@ ekolis).
 
 - Don't wield lites on player birth (Reported by ekolis).
 
+- Don't allow player to know object flavors in the knowledge screen (Reported
+by ekolis).
+
+
 ### Build / Platform ###
 
 - Added quest.txt in lib\edit which is used to defined fixed texts.

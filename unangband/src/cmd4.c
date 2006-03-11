@@ -5841,7 +5841,7 @@ static void desc_obj_fake(int k_idx)
 	object_prep(o_ptr, k_idx);
 
 	/* Hack -- its in the store */
-	o_ptr->ident |= (IDENT_STORE);
+	if (k_info[k_idx].aware) o_ptr->ident |= (IDENT_STORE);
 
 	/* It's fully know */
 	if (!k_info[k_idx].flavor) object_known(o_ptr);
