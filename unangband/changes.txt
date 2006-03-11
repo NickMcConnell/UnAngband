@@ -211,6 +211,9 @@ ekolis).
 
 - Fixed spelling of vulnerability (Reported by ekolis)
 
+- Detect curse should only detect cursed and not broken items (Reported by
+ekolis).
+
 ### Build / Platform ###
 
 - Added quest.txt in lib\edit which is used to defined fixed texts.

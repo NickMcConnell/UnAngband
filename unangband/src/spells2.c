@@ -1253,7 +1253,7 @@ int value_check_aux4(const object_type *o_ptr)
 	if (cursed_p(o_ptr)) return (INSCRIP_CURSED);
 
 	/* Broken items */
-	if (broken_p(o_ptr)) return (INSCRIP_BROKEN);
+	/* if (broken_p(o_ptr)) return (INSCRIP_BROKEN); */
 
 	/* Default to nothing */
 	return (0);
@@ -1307,12 +1307,12 @@ bool detect_objects_magic(void)
 		tv = o_ptr->tval;
 
 		/* Artifacts, misc magic items, or enchanted wearables */
-		if (artifact_p(o_ptr) || ego_item_p(o_ptr) ||
+		if (!(cursed_p(o_ptr)) && !(broken_p(o_ptr)) && (artifact_p(o_ptr) || ego_item_p(o_ptr) ||
 		    (tv == TV_AMULET) || (tv == TV_RING) ||
 		    (tv == TV_STAFF) || (tv == TV_WAND) || (tv == TV_ROD) ||
 		    (tv == TV_SCROLL) || (tv == TV_POTION) ||
 		    (tv == TV_MAGIC_BOOK) || (tv == TV_PRAYER_BOOK) ||
-		    ((o_ptr->to_a > 0) || (o_ptr->to_h + o_ptr->to_d > 0)))
+		    ((o_ptr->to_a > 0) || (o_ptr->to_h + o_ptr->to_d > 0))))
 		{
 			/* Memorize the item */
 			if (!auto_pickup_ignore(o_ptr)) o_ptr->marked = TRUE;
@@ -1510,7 +1510,7 @@ bool detect_objects_cursed(void)
 		if (!panel_contains(y, x)) continue;
 
 		/* Cursed items */
-		if (cursed_p(o_ptr) || broken_p(o_ptr))
+		if (cursed_p(o_ptr) /* || broken_p(o_ptr) */)
 		{
 			/* Memorize the item */
 			if (!auto_pickup_ignore(o_ptr)) o_ptr->marked = TRUE;
@@ -1526,36 +1526,6 @@ bool detect_objects_cursed(void)
 
 			/* Detect */
 			detect = TRUE;
-		}
-
-		/* Valid "tval" codes */
-		switch (o_ptr->tval)
-		{
-			case TV_SHOT:
-			case TV_ARROW:
-			case TV_BOLT:
-			case TV_BOW:
-			case TV_DIGGING:
-			case TV_HAFTED:
-			case TV_POLEARM:
-			case TV_SWORD:
-			case TV_BOOTS:
-			case TV_GLOVES:
-			case TV_HELM:
-			case TV_CROWN:
-			case TV_SHIELD:
-			case TV_CLOAK:
-			case TV_SOFT_ARMOR:
-			case TV_HARD_ARMOR:
-			case TV_DRAG_ARMOR:
-			case TV_AMULET:
-			case TV_RING:
-			case TV_STAFF:
-			case TV_INSTRUMENT:
-			{
-				okay = TRUE;
-				break;
-			}
 		}
 
 		/* Skip objects */
@@ -1582,7 +1552,6 @@ bool detect_objects_cursed(void)
 		/* The object has been "sensed" */
 		/* Hack -- allow non-cursed items to be re-sensed */
 		o_ptr->ident |= (IDENT_SENSE);
-
 	}
 
 	/* Sense inventory */
