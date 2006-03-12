@@ -748,8 +748,28 @@ void display_monlist(void)
 		/* Obtain the length of the description */
 		n = strlen(m_name);
 
-		/* Display the entry itself */
-		Term_putstr(0, line, n, TERM_WHITE, m_name);
+		/* Display multiple monsters */
+		if (race_counts[m_ptr->r_idx] > 1)
+		{
+			/* Add race count */
+			sprintf(buf, "%d", race_counts[m_ptr->r_idx]);
+			Term_putstr(0, line, strlen(buf), TERM_WHITE, buf);
+			Term_addstr(-1, TERM_WHITE, " ");
+
+			/* Display the entry itself */
+			Term_addstr(-1, TERM_WHITE, m_name);
+
+			/* XXX Need to pluralise this properly */
+			Term_addstr(-1, TERM_WHITE, "s");
+
+			n+= strlen(buf) + 2;
+		}
+		/* Display single monsters */
+		else
+		{
+			/* Display the entry itself */
+			Term_putstr(0, line, n, TERM_WHITE, m_name);
+		}
 
 		/* Append the "standard" attr/char info */
 		Term_addstr(-1, TERM_WHITE, " ('");
@@ -775,22 +795,15 @@ void display_monlist(void)
 				n++;
 			}
 
-			Term_addstr(-1, TERM_WHITE, "'):");
-			n += 7;
+			Term_addstr(-1, TERM_WHITE, "')");
+			n += 6;
 		}
-
-		/* Add race count */
-		sprintf(buf, "%d", race_counts[m_ptr->r_idx]);
-		Term_addch(TERM_WHITE, '[');
-		Term_addstr(strlen(buf), TERM_WHITE, buf);
-		Term_addch(TERM_WHITE, ']');
-		n += strlen(buf) + 2;
-
-		/* Don't do this race again */
-		race_counts[m_ptr->r_idx] = 0;
 
 		/* Erase the rest of the line */
 		Term_erase(n, line, 255);
+
+		/* Don't display again */
+		race_counts[m_ptr->r_idx] = 0;
 
 		/* Bump line counter */
 		line++;
