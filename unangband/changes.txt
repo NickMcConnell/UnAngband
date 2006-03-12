@@ -231,6 +231,7 @@ ekolis).
 - Don't allow player to know object flavors in the knowledge screen (Reported
 by ekolis).
 
+- Fixed hit point and mana regeneration.
 
 ### Build / Platform ###
 

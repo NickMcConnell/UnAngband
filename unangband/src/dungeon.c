@@ -732,7 +732,7 @@ static void process_world(void)
 		{
 			regen_amount = 0;
 		}
-		else if ((p_ptr->food < PY_FOOD_FAINT) || (p_ptr->rest < PY_REST_FAINT))
+		else if (p_ptr->food < PY_FOOD_FAINT)
 		{
 			regen_amount = PY_REGEN_FAINT;
 		}
@@ -798,7 +798,7 @@ static void process_world(void)
 	if (p_ptr->cut) regen_amount = 0;
 
 	/* If disease has no other effect, prevent regeneration */
-	if (!(p_ptr->disease & (DISEASE_BLOWS))) regen_amount = 0;
+	if ((p_ptr->disease) && !(p_ptr->disease & (DISEASE_BLOWS))) regen_amount = 0;
 
 	if ((p_ptr->cur_flags3 & (TR3_DRAIN_HP)) != 0) regen_amount = 0;
 	if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) regen_amount = 0;
