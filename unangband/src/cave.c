@@ -4917,7 +4917,7 @@ void wiz_lite(void)
 	p_ptr->redraw |= (PR_MAP);
 
 	/* Window stuff */
-	p_ptr->window |= (PW_OVERHEAD);
+	p_ptr->window |= (PW_OVERHEAD | PW_MAP | PW_MONLIST);
 }
 
 
@@ -4961,7 +4961,7 @@ void wiz_dark(void)
 	p_ptr->redraw |= (PR_MAP);
 
 	/* Window stuff */
-	p_ptr->window |= (PW_OVERHEAD);
+	p_ptr->window |= (PW_OVERHEAD | PW_MAP | PW_MONLIST);
 }
 
 
@@ -5081,7 +5081,7 @@ void town_illuminate(bool daytime)
 	p_ptr->redraw |= (PR_MAP);
 
 	/* Window stuff */
-	p_ptr->window |= (PW_OVERHEAD);
+	p_ptr->window |= (PW_OVERHEAD | PW_MONLIST | PW_MAP);
 }
 
 
@@ -5261,6 +5261,8 @@ static void cave_set_feat_aux(int y, int x, int feat)
 		if (outside != p_ptr->outside)
 		{
  			p_ptr->redraw |= (PR_MAP);
+
+ 			p_ptr->window |= (PW_OVERHEAD | PW_MAP);
 		}
 
 		/* Change state */

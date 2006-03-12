@@ -62,11 +62,11 @@ void do_cmd_redraw(void)
 	/* Redraw everything */
 	p_ptr->redraw |= (PR_BASIC | PR_EXTRA | PR_MAP);
 
-	/* Window stuff */
-	p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
-
-	/* Window stuff */
-	p_ptr->window |= (PW_MESSAGE | PW_OVERHEAD | PW_MONSTER | PW_OBJECT);
+	/* Window everything */
+	p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1 |
+			  PW_PLAYER_2 | PW_PLAYER_3 | PW_MESSAGE | PW_MAP |
+			  PW_OVERHEAD | PW_MONSTER | PW_OBJECT | PW_FEATURE |
+			  PW_SNAPSHOT | PW_MONLIST | PW_HELP);
 
 	/* Clear screen */
 	Term_clear();
@@ -640,7 +640,7 @@ static void do_cmd_options_win(void)
 		}
 
 		/* Display the options */
-		for (i = 0; i < 16; i++)
+		for (i = 0; i < PW_MAX_FLAGS; i++)
 		{
 			byte a = TERM_WHITE;
 
@@ -713,8 +713,8 @@ static void do_cmd_options_win(void)
 		/* Move */
 		if (d != 0)
 		{
-			x = (x + ddx[d] + 8) % 8;
-			y = (y + ddy[d] + 16) % 16;
+			x = (x + ddx[d] + 8) % ANGBAND_TERM_MAX;
+			y = (y + ddy[d] + 16) % PW_MAX_FLAGS;
 		}
 
 		/* Oops */
@@ -4789,8 +4789,9 @@ static void do_cmd_knowledge_artifacts(void)
 			}
 		}
 	}
+
 	/* Prompt */
-	if (!grp_cnt) msg_print("No artifacts known.");
+	if (!grp_cnt) prt("No artifacts known.", 15, 0);
 
 	/* XXX XXX Free the "object_idx" array */
 	FREE(object_idx);
@@ -5329,7 +5330,7 @@ static void do_cmd_knowledge_monsters(void)
 	}
 
 	/* Prompt */
-	if (!grp_cnt) msg_print("No monsters known.");
+	if (!grp_cnt) prt("No monsters known.", 15, 0);
 
 	/* XXX XXX Free the "mon_idx" array */
 	FREE(mon_idx);
@@ -5736,7 +5737,7 @@ static void do_cmd_knowledge_ego_items(void)
 	}
 
 	/* Prompt */
-	if (!grp_cnt)  msg_print("No ego items known.");
+	if (!grp_cnt) prt("No ego items known.", 15, 0);
 
 	/* XXX XXX Free the "object_idx" array */
 	FREE(object_idx);
@@ -6185,7 +6186,7 @@ static void do_cmd_knowledge_objects(void)
 	}
 
 	/* Prompt */
-	if (!grp_cnt) prt("No object kinds known.", 14, 0);
+	if (!grp_cnt) prt("No object kinds known.", 15, 0);
 
 	/* XXX XXX Free the "object_idx" array */
 	FREE(object_idx);
@@ -6638,7 +6639,7 @@ static void do_cmd_knowledge_features(void)
 	}
 
 	/* Prompt */
-	if (!grp_cnt) msg_print("No features known.");
+	if (!grp_cnt) prt("No features known.", 15, 0);
 
 	/* XXX XXX Free the "feat_idx" array */
 	FREE(feat_idx);
@@ -6724,13 +6725,14 @@ void do_cmd_knowledge(void)
 		prt("(3) Display known ego-items", 6, 5);
 		prt("(4) Display known objects", 7, 5);
 		prt("(5) Display known features", 8, 5);
-		prt("(6) Display contents of your home", 9, 5);
-		prt("(7) Load a user pref file", 10, 5);
-		prt("(8) Dump auto-inscriptions", 11, 5);
-		prt("(9) Interact with visuals", 12, 5);
+		prt("(6) Display self-knowledge", 9, 5);
+		prt("(7) Display contents of your home", 10, 5);
+		prt("(8) Load a user pref file", 11, 5);
+		prt("(9) Dump auto-inscriptions", 12, 5);
+		prt("(0) Interact with visuals", 13, 5);
 
 		/* Prompt */
-		prt("Command: ", 14, 0);
+		prt("Command: ", 15, 0);
 
 		/* Prompt */
 		ch = inkey();
@@ -6773,15 +6775,22 @@ void do_cmd_knowledge(void)
 			do_cmd_knowledge_features();
 		}
 
-		/* Home */
+		/* Features */
 		else if (ch == '6')
+		{
+			/* Spawn */
+			self_knowledge(FALSE);
+		}
+
+		/* Home */
+		else if (ch == '7')
 		{
 			/* Spawn */
 			do_cmd_knowledge_home();
 		}
 
 		/* Load a user pref file */
-		else if (ch == '7')
+		else if (ch == '8')
 		{
 			/* Ask for and load a user pref file */
 			do_cmd_pref_file_hack(13);
@@ -6793,7 +6802,7 @@ void do_cmd_knowledge(void)
 		}
 
 		/* Dump colors */
-		else if (ch == '8')
+		else if (ch == '9')
 		{
 			char ftmp[80];
 
@@ -6823,7 +6832,7 @@ void do_cmd_knowledge(void)
 		}
 
 		/* Visuals */
-		else if (ch == '9')
+		else if (ch == '0')
 		{
 			/* Spawn */
 			do_cmd_visuals();

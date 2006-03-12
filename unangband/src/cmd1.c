@@ -175,7 +175,6 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 	/* Some "weapons" and "ammo" do extra damage */
 	switch (o_ptr->tval)
 	{
-#if 0
 		case TV_SHOT:
 		case TV_ARROW:
 		case TV_BOLT:
@@ -644,7 +643,6 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 			break;
 
 		}
-#endif
 	}
 
 

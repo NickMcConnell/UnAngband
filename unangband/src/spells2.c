@@ -40,7 +40,7 @@ bool hp_player(int num)
 		p_ptr->redraw |= (PR_HP);
 
 		/* Window stuff */
-		p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
+		p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1 | PW_PLAYER_2 | PW_PLAYER_3);
 
 		/* Heal 0-4 */
 		if (num < 5)
@@ -415,6 +415,9 @@ bool restore_level(void)
 	return (FALSE);
 }
 
+/*
+ *  Hack -- exclude the following flags from equipment self-knowledge except weapons.
+ */
 #define TR1_WEAPON_FLAGS (TR1_SLAY_ORC | TR1_SLAY_TROLL | TR1_SLAY_GIANT |\
 			TR1_SLAY_DRAGON | TR1_SLAY_UNDEAD | TR1_SLAY_DEMON |\
 			TR1_SLAY_NATURAL | TR1_SLAY_EVIL | TR1_KILL_DRAGON |\
@@ -424,18 +427,32 @@ bool restore_level(void)
 
 #define TR2_WEAPON_FLAGS 0x0L
 
-#define TR3_WEAPON_FLAGS (TR3_IMPACT)
+#define TR3_WEAPON_FLAGS (TR3_IMPACT | TR3_BLESSED | TR3_THROWING)
 
 #define TR4_WEAPON_FLAGS (TR4_VAMP_HP | TR4_VAMP_MANA |\
 			  TR4_BRAND_LITE | TR4_BRAND_DARK | TR4_SLAY_MAN | TR4_SLAY_ELF |\
 			  TR4_SLAY_DWARF)
+/*
+ *  Hack -- exclude the following flags from equipment self-knowledge as they never apply
+ *  directly to the player.
+ */
+#define TR1_IGNORE_FLAGS (TR1_WEAPON_FLAGS)
+
+#define TR2_IGNORE_FLAGS (TR2_WEAPON_FLAGS | TR2_IGNORE_MASK)
+
+#define TR3_IGNORE_FLAGS (TR3_WEAPON_FLAGS | TR3_ACTIVATE | TR3_RANDOM | TR3_INSTA_ART |\
+			  TR3_EASY_KNOW | TR3_HIDE_TYPE | TR3_SHOW_MODS)
+
+#define TR4_IGNORE_FLAGS (TR4_WEAPON_FLAGS)
+
+
 
 /*
  * Hack -- acquire self knowledge
  *
  * List various information about the player and/or his current equipment.
  */
-void self_knowledge(void)
+void self_knowledge(bool spoil)
 {
 	int i, n;
 
@@ -717,29 +734,36 @@ void self_knowledge(void)
 	{
 		o_ptr = &inventory[i];
 
+		/* Clear the flags */
+		t1 = t2 = t3 = t4 = 0L;
+
 		/* Skip non-objects */
 		if (!o_ptr->k_idx) continue;
 
 		/* Extract the flags */
-		object_flags(o_ptr, &t1, &t2, &t3, &t4);
+		if (spoil) object_flags(o_ptr, &t1, &t2, &t3, &t4);
+		else object_flags_known(o_ptr, &t1, &t2, &t3, &t4);
 
 		/* Extract flags */
-		f1 |= t1 & ~(TR1_WEAPON_FLAGS);
-		f2 |= t2 & ~(TR2_WEAPON_FLAGS);
-		f3 |= t3 & ~(TR3_WEAPON_FLAGS);
-		f4 |= t4 & ~(TR4_WEAPON_FLAGS);
+		f1 |= t1 & ~(TR1_IGNORE_FLAGS);
+		f2 |= t2 & ~(TR2_IGNORE_FLAGS);
+		f3 |= t3 & ~(TR3_IGNORE_FLAGS);
+		f4 |= t4 & ~(TR4_IGNORE_FLAGS);
 	}
 
 	/* Hack -- other equipment effects */
-	if (f1 || f2 || f3 || f4)
+	if ((f1) || (f2) || (f3) || (f4))
 	{
 		text_out("Your equipment affects you.  ");
 
 		list_object_flags(f1,f2,f3,f4,1);
 
-		equip_can_flags(f1,f2,f3,f4);
+		if (spoil)
+		{
+			equip_can_flags(f1,f2,f3,f4);
 
-		equip_not_flags(~(f1 | TR1_WEAPON_FLAGS),~(f2 | TR2_WEAPON_FLAGS),~(f3 | TR3_WEAPON_FLAGS), ~(f4 | TR4_WEAPON_FLAGS));
+			equip_not_flags(~(f1 | TR1_IGNORE_FLAGS),~(f2 | TR2_IGNORE_FLAGS),~(f3 | TR3_IGNORE_FLAGS), ~(f4 | TR4_IGNORE_FLAGS));
+		}
 
 		text_out("\n");
 	}
@@ -748,9 +772,14 @@ void self_knowledge(void)
 
 	if (o_ptr->k_idx)
 	{
-		object_flags(o_ptr,&t1,&t2,&t3,&t4);
+		/* Clear the flags */
+		t1 = t2 = t3 = t4 = 0L;
 
-		/* Extract flags */
+		/* Extract the flags */
+		if (spoil) object_flags(o_ptr, &t1, &t2, &t3, &t4);
+		else object_flags_known(o_ptr, &t1, &t2, &t3, &t4);
+
+		/* Extract weapon flags */
 		t1 = t1 & (TR1_WEAPON_FLAGS);
 		t2 = t2 & (TR2_WEAPON_FLAGS);
 		t3 = t3 & (TR3_WEAPON_FLAGS);
@@ -762,10 +791,13 @@ void self_knowledge(void)
 			text_out("Your weapon has special powers.  ");
 	
 			list_object_flags(t1,t2,t3,t4,1);
+
+			if (spoil)
+			{	
+				object_can_flags(o_ptr,t1,t2,t3,t4);
 	
-			object_can_flags(o_ptr,t1,t2,t3,t4);
-	
-			object_not_flags(o_ptr,TR1_WEAPON_FLAGS & ~(t1),TR2_WEAPON_FLAGS & ~(t2),TR3_WEAPON_FLAGS & ~(t3), TR4_WEAPON_FLAGS & ~(t4));
+				object_not_flags(o_ptr,TR1_WEAPON_FLAGS & ~(t1),TR2_WEAPON_FLAGS & ~(t2),TR3_WEAPON_FLAGS & ~(t3), TR4_WEAPON_FLAGS & ~(t4));
+			}
 
 			text_out("\n");
 		}
@@ -3478,6 +3510,9 @@ bool banishment(void)
 		result = TRUE;
 	}
 
+	/* Update monster list window */
+	p_ptr->window |= PW_MONLIST;
+
 	return (result);
 }
 
@@ -3516,6 +3551,9 @@ bool mass_banishment(void)
 		/* Note effect */
 		result = TRUE;
 	}
+
+	/* Update monster list window */
+	p_ptr->window |= PW_MONLIST;
 
 	return (result);
 }
@@ -3690,7 +3728,7 @@ void destroy_area(int y1, int x1, int r, bool full)
 	p_ptr->redraw |= (PR_MAP);
 
 	/* Window stuff */
-	p_ptr->window |= (PW_OVERHEAD);
+	p_ptr->window |= (PW_OVERHEAD | PW_MONLIST | PW_MAP);
 }
 
 
@@ -4097,7 +4135,7 @@ void earthquake(int cy, int cx, int r)
 	p_ptr->redraw |= (PR_HEALTH);
 
 	/* Window stuff */
-	p_ptr->window |= (PW_OVERHEAD);
+	p_ptr->window |= (PW_OVERHEAD | PW_MONLIST | PW_MAP);
 }
 
 
@@ -5581,7 +5619,7 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 
 	if (s_ptr->flags1 & (SF1_SELF_KNOW))
 	{
-		self_knowledge();
+		self_knowledge(TRUE);
 		obvious = TRUE;
 	}
 
@@ -5931,7 +5969,7 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 				p_ptr->csp_frac = 0;
 			}
 			p_ptr->redraw |= (PR_MANA);
-			p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
+			p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1 | PW_PLAYER_2 | PW_PLAYER_3);
 	
 			obvious = TRUE;
 		}
@@ -5945,7 +5983,7 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 			p_ptr->csp = p_ptr->msp;
 			p_ptr->csp_frac = 0;
 			p_ptr->redraw |= (PR_MANA);
-			p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
+			p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1 | PW_PLAYER_2 | PW_PLAYER_3);
 			obvious = TRUE;
 		}
 	}

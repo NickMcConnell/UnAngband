@@ -9,7 +9,178 @@ This file describes my basic to do list for Unangband.
 Also see Lib\Todo, which is a dumping group for
 various files and ideas.
 
-And new features:
+
+Release v0.6.1
+==============
+TODO: Implement Ego lights.
+
+TODO: Allow potions to be applied to sharp weapons (swords / polearms) and arrows/bolts.
+
+TODO: Have impassable trees and rubble which are hidden and found by either attempting to
+cross them or search them.
+
+TODO: Have light spells use line of sight, as opposed to line of fire, for their
+projections.
+
+TODO: Have loose rocks 'searched' to find the hidden object.
+
+TODO: Allow trolls and other monster to eat monster bodies to heal themselves, and vampires to
+suck the blood from monster bodies to improve their mana.
+
+TODO: Stores should preferentially stock items that the player actually buys.
+
+TODO: Good items should not include the high-level books.
+
+
+Release v0.6.5
+==============
+TODO: Re-balancing of objects and removal of 'useless' or less useful objects.
+
+TODO: Implement monster spells the same way as player spells.
+
+TODO: Make mushrooms and other mimic monsters 'hide' in objects that they
+mimic.
+
+TODO: Add monster ability 'reflect/beams' and 'reflect shots/thrown'.
+
+TODO: Add sleep effect.
+
+TODO: Add statis effect.
+
+TODO: Allow trolls and other monster to eat monster bodies to heal themselves, and vampires to
+suck the blood from monster bodies to improve their mana.
+
+TODO: Forget should cause spell casters to forget their spells, as opposed to forgetting what
+objects do.
+
+TODO: Higher level birds, for bird summoners.
+
+TODO: 'Good' monsters don't summon evil. 'Evil' monsters don't summon good.
+
+TODO: Mouse interaction with game.
+
+TODO: Commands from menus.
+
+
+Release v0.7.0
+==============
+TODO: Implement friendly monsters and uniques.
+
+TODO: Give monsters some AI patterns.
+
+TODO: Implement room descriptions version 2.
+
+TODO: Allow research of spells without a spellbook.
+
+TODO: Player buffs defined in a text file as opposed to code.
+
+TODO: Have an option birth_evil that automatically flags the player as evil.
+
+TODO: Have uniques corresponding to the players family.
+
+TODO: Create set items as per Sangband, but including sets of dragon armor.
+
+TODO: Assemblies that can be build into objects of any type.
+
+TODO: Complete quest code.
+
+TODO: Additional store functions. If a store is sold an empty wand / staff, it charges it.
+If a store is sold the constituents for an object it attempts to make it.
+
+TODO: Stores, in conjunction with the character's charisma, offer additional quests based
+on what the player state is.
+
+
+
+Release v0.8.0
+==============
+TODO:Implement alchemy/manufacturing items.
+
+TODO:Implement revised bard spell list.
+
+TODO:Implement all magic spells so that they are level dependent.
+
+TODO:Implement mana regeneration, searching, detection etc. as a spell effect.
+
+TODO:Implement monster spellbooks, so that monsters can cast all ACID_MAGIC
+etc. spells.
+
+TODO: Players pick their own stats when they advance a level.
+
+TODO: Drop chunks of metals and large jewels for manufacturing purposes.
+
+TODO: Mystics carry essences.
+
+
+Release v0.9.0
+==============
+TODO: Have two layers of terrain - wall/feature and 'underlying terrain'.
+
+TODO: Implement the player hiding in terrain, and items of
+invisibility.
+
+TODO: Walk on terrain flags.
+
+TODO: Storm clouds should now be created by GF_WIND.
+
+TODO: All magically created terrain should create a timer on it.
+
+TODO: Have electrical projections get 'conducted' by acid, water or metal.
+
+TODO: Have various metal terrains.
+
+TODO: Have the concept of pushing and pulling when interacting with terrain.
+
+TODO: Have machines which can be filled with oil and switched on.
+
+TODO: Have crystals of various colours and types, which cause interaction between sound,
+electricity and light.
+
+TODO: Add tents (G:<:R), sails (G:>:R).
+
+TODO: Replace wooden floors with wooden decks.
+
+TODO: Allow player to dig shallow pits, which fill with water etc to become
+shallow water.
+
+TODO: Let pits and deep pits fill with water to become deep water etc.
+
+TODO: As previous points, but let water flow into a chasm to become a
+waterfall, similiarly lava etc.
+
+TODO: Should be able to traverse chasms/pits once fallen in without damage
+(Actually all MUST_CLIMB terrain).
+
+TODO: Add phases of the moon. During a full moon, light all outside
+locations (but not adjacent locations - so still darker than daylight).
+During a new moon, treat outside like inside.  Should treat one phase
+darker if the night is overcast, and two phases darker if it is
+stormy (2 phases darker during daytime treats like a full moon).
+
+TODO: Add before sunrise and after sunset phases of night. During
+before sunrise, do not light locations to the west. During
+after sunset, do not light locations to the east. These time last
+for half an hour.
+
+TODO: Add an eclipse, which lasts 5 minutes and occurs once... light
+like a full moon.
+
+TODO: I like the idea of being able to get onto the roof of a building. 
+
+
+Release v0.10.0
+===============
+TODO: Revised dungeon generation.
+
+TODO: Revised wilderness generation.
+
+
+
+
+
+Notes
+=====
+
 TODO: Implement Ego lights.
 I was also thinking about doing magical candles, and haven't decided
 whether lanterns will be done in e_info.txt or k_info.txt.
@@ -23,7 +194,6 @@ or wandered around the room, if they weren't aware of you. Acting
 confused if they are aware of you might be a possibility.
 
 TODO: Give monsters some AI patterns. eg
-
 Hunt - move to a random room exit, or move down corridor.
 Make decision again when encountering another room exit.
 Attack anyone from another room. Get the bodies and bring
@@ -48,7 +218,6 @@ patrol when satiated).
 
 Rest - never leave room. Remains stationary until detects target.
 Return to room if outside it.
-
 
 TODO: Implement friendly monsters and uniques.
 	Long overdue, but its a reasonably big job.
@@ -178,10 +347,10 @@ Wyrms		helm	Res blind, breath.					Immunity.
 S:set:tval:sval:number required of set:flag(s)
 S:set:tval:sval:number required of set:flags
 
-TODO: Note that only coloured and metallic dragons get gloves / boots / shield / armour / helm
+Note that only coloured and metallic dragons get gloves / boots / shield / armour / helm
 and have sets.
 
-TODO: Metallic dragons also drop their coin type. They only provide immunity, branding, walk
+Metallic dragons also drop their coin type. They only provide immunity, branding, walk
 on terrain and temporary resistance to the base element they prefer.
 Gem dragons drop gems of their type only.
 Drakes drop shields, armour and helms only and do not have sets. However, the shields,
@@ -263,13 +432,13 @@ smoke    ------>   thinning smoke  ------->    chasm
 This gives the player one turn (or more for faster players) in order to move off the
 cloud space.
 
-TODO: Because chasms are not floors, it is possible to use ball spells and beam spells to
+Because chasms are not floors, it is possible to use ball spells and beam spells to
 create clouds in the chasms very easily.
 
-TODO: In order to create temporary bridges, allow mist to be frozen to create an icy bridge - 
+In order to create temporary bridges, allow mist to be frozen to create an icy bridge - 
 which times out and collapses.
 
-TODO: Create cloud levels, which are levels that are 95% unbridged chasms. Have each room
+Create cloud levels, which are levels that are 95% unbridged chasms. Have each room
 contain either boots of cloud walking or wands of bridge building or web building. Have
 each cloud walking room surrounded by a lump of irregular rock that contains a waterfall
 of either oil, water, lava or acid, next to the room exit. This forces the player to
@@ -299,10 +468,10 @@ it around on a floor. Pushing or pulling on a block (a new feature) pushes or pu
 a shallow pit (which we can use to restrict the path of the block). Pushing or pulling a deck
 moves it around. All of the above objects move around on chain.
 
-TODO: This can be used to move objects around in various puzzle situations. This can be used
+This can be used to move objects around in various puzzle situations. This can be used
 to move a wooden deck along chain over a chasm to make it cross-able.
 
-TODO: We can have wooden blocks and stone blocks. These block site and movement, but can
+We can have wooden blocks and stone blocks. These block site and movement, but can
 be moved around to solve puzzles.
 
 TODO: Have machines, which are terrain types which when filled with oil and then hurt by
@@ -311,10 +480,10 @@ electricity. A pump moves oil/water/acid around. An engine pushes or pulls or op
 closes stuff. Two adjacent generators in alternate turns when feed by oil can continuously
 run together. 
 
-TODO: Machines can be manually operated by opening and closing them, as opposed to having
+Machines can be manually operated by opening and closing them, as opposed to having
 to hurt them with electricity. However, they require oil.
 
-TODO: Create puzzle rooms, using machines. e.g. a pump has to be used to fill a furnace,
+Create puzzle rooms, using machines. e.g. a pump has to be used to fill a furnace,
 because if oil is moved directly next to the furnace, it is set on fire by the furnace and
 no longer usable. e.g. an engine has to be run to open a valve to feed oil to a machine.
 e.g. an engine has to open an otherwise inaccessible door to let out a monster that the

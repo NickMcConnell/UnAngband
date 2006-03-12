@@ -186,6 +186,13 @@ change in graphics when leaving a shop (Commented on by Hilke Reiter).
 - Removed display of attributes an item is known not to have (Commented on by Joshua
 Rodman).
 
+- Added self-knowledge command in the knowledge menu that acts like self-knowledge potion
+but only for attributes you know you have.
+
+- Added monster list from NPPAngband (Suggested by Joshua Rodman).
+
+- Added disturb_near option.
+
 ### Bug fixes ###
 
 - Priest spell righteous fury was for mages, paladins, shamans and bards but

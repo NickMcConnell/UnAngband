@@ -2503,23 +2503,24 @@
 /*
  * Bit flags for the "p_ptr->window" variable (etc)
  */
-#define PW_INVEN	    0x00000001L /* Display inven/equip */
-#define PW_EQUIP	    0x00000002L /* Display equip/inven */
-#define PW_PLAYER_0	 0x00000004L /* Display player (basic) */
-#define PW_PLAYER_1	 0x00000008L /* Display player (extra) */
-/* xxx */
-/* xxx */
-#define PW_MESSAGE	  0x00000040L /* Display messages */
-#define PW_OVERHEAD	 0x00000080L /* Display overhead view */
-#define PW_MONSTER	  0x00000100L /* Display monster recall */
-#define PW_OBJECT	   0x00000200L /* Display object recall */
-#define PW_ROOM_INFO	    0x00000400L     /* Display room description */
-#define PW_SNAPSHOT	 0x00000800L /* Display snap-shot */
-#define PW_SCRIPT_VARS      0x00001000L /* Display script variables */
-#define PW_SCRIPT_SOURCE    0x00002000L /* Display script source */
-#define PW_BORG_1	   0x00004000L /* Display borg messages */
-#define PW_BORG_2	   0x00008000L /* Display borg status */
+#define PW_INVEN	   	0x00000001L /* Display inven/equip */
+#define PW_EQUIP	    	0x00000002L /* Display equip/inven */
+#define PW_PLAYER_0	 	0x00000004L /* Display player (basic) */
+#define PW_PLAYER_1	 	0x00000008L /* Display player (extra) */
+#define PW_PLAYER_2         	0x00000010L /* Display player (compact) */
+#define PW_PLAYER_3            	0x00000020L /* Display player (status) */
+#define PW_MESSAGE	  	0x00000040L /* Display messages */
+#define PW_OVERHEAD	 	0x00000080L /* Display overhead view */
+#define PW_MAP           	0x00000100L /* Display dungeon map */
+#define PW_MONSTER	  	0x00000200L /* Display monster recall */
+#define PW_OBJECT	   	0x00000400L /* Display object recall */
+#define PW_FEATURE		0x00000800L /* Display feature */
+#define PW_ROOM_INFO	    	0x00001000L /* Display room description */
+#define PW_SNAPSHOT	 	0x00002000L /* Display snap-shot */
+#define PW_MONLIST          	0x00004000L /* Display monster list */
+#define PW_HELP			0x00008000L /* Display self-knowledge */
 
+#define PW_MAX_FLAGS		16
 
 /*** Cave flags ***/
 
@@ -3787,7 +3788,7 @@
 #define OPT_disturb_state  23
 #define OPT_disturb_minor  24
 #define OPT_view_flavors   25
-/* #define OPT_alert_hitpoint */
+#define OPT_disturb_new    26
 /* #define OPT_alert_failure */
 #define OPT_verify_destroy 28
 #define OPT_verify_special 29
@@ -3917,7 +3918,7 @@
 #define disturb_state     op_ptr->opt[OPT_disturb_state]
 #define disturb_minor     op_ptr->opt[OPT_disturb_minor]
 #define view_flavors      op_ptr->opt[OPT_view_flavors]
-#define alert_hitpoint    op_ptr->opt[OPT_alert_hitpoint]
+#define disturb_new       op_ptr->opt[OPT_disturb_new]
 #define alert_failure     op_ptr->opt[OPT_alert_failure]
 #define verify_destroy    op_ptr->opt[OPT_verify_destroy]
 #define verify_special    op_ptr->opt[OPT_verify_special]

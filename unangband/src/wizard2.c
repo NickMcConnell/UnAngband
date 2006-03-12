@@ -1258,6 +1258,9 @@ static void do_cmd_wiz_zap(int d)
 		/* Delete the monster */
 		delete_monster_idx(i);
 	}
+
+	/* Update monster list window */
+	p_ptr->window |= PW_MONLIST;
 }
 
 
@@ -1534,7 +1537,7 @@ void do_cmd_debug(void)
 		/* Self-Knowledge */
 		case 'k':
 		{
-			self_knowledge();
+			self_knowledge(TRUE);
 			break;
 		}
 

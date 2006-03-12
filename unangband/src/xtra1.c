@@ -502,17 +502,8 @@ static void prt_state(void)
 
 	char text[16];
 
-
-	/* Paralysis */
-	if (p_ptr->paralyzed)
-	{
-		attr = TERM_RED;
-
-		strcpy(text, "Paralyzed!");
-	}
-
 	/* Resting */
-	else if (p_ptr->resting)
+	if (p_ptr->resting)
 	{
 		int i;
 		int n = p_ptr->resting;
@@ -619,7 +610,16 @@ static void prt_state(void)
 	/* Hack -- handle some other stuff here. Don't change attr, so we inherit it from above. */
 	if (p_ptr->searching) strcpy(text, "Searching ");
 	if (p_ptr->held_song) strcpy(text, "Singing   ");
+	if (p_ptr->blocking) strcpy(text,  "Blocking  ");
+	if (p_ptr->dodging) strcpy(text,   "Dodging   ");
 
+	/* Paralysis - attr and text always overrides */
+	if (p_ptr->paralyzed)
+	{
+		attr = TERM_VIOLET;
+
+		strcpy(text, "Paralyzed!");
+	}
 
 	/* Display the info (or blanks) */
 	c_put_str(attr, text, ROW_STATE, COL_STATE);
@@ -1146,7 +1146,7 @@ void lookup_prettyname(char name[60], int style, int sval, bool long_name, bool 
 
 
 /*
- * Display basic info (mostly left of map)
+ * Display basic info (mostly left of map, unless show_sidebar is on)
  */
 static void prt_frame_basic(void)
 {
@@ -1364,6 +1364,85 @@ static void fix_player_1(void)
 
 
 /*
+ * Hack -- display player in sub-windows (compact)
+ */
+static void fix_player_2(void)
+{
+	int j;
+
+	/* Scan windows */
+	for (j = 0; j < ANGBAND_TERM_MAX; j++)
+	{
+		term *old = Term;
+
+		/* No window */
+		if (!angband_term[j]) continue;
+
+		/* No relevant flags */
+		if (!(op_ptr->window_flag[j] & (PW_PLAYER_2))) continue;
+
+		/* Activate */
+		Term_activate(angband_term[j]);
+
+		/* Display player */
+		prt_frame_basic();
+
+		/* Fresh */
+		Term_fresh();
+
+		/* Restore */
+		Term_activate(old);
+	}
+}
+
+
+/*
+ * Hack -- display status in sub-windows. We use a hack to get two lines of status
+ */
+static void fix_player_3(void)
+{
+	int j;
+
+	/* Hack -- force second status line */
+	bool hack_sidebar = (show_sidebar ? TRUE : FALSE);
+
+	/* Overwrite existing value */
+	show_sidebar = TRUE;
+
+	/* Scan windows */
+	for (j = 0; j < ANGBAND_TERM_MAX; j++)
+	{
+		term *old = Term;
+
+		/* No window */
+		if (!angband_term[j]) continue;
+
+		/* No relevant flags */
+		if (!(op_ptr->window_flag[j] & (PW_PLAYER_3))) continue;
+
+		/* Activate */
+		Term_activate(angband_term[j]);
+
+		/* Display player */
+		prt_frame_basic();
+
+		/* Display status line */
+		prt_frame_extra();
+
+		/* Fresh */
+		Term_fresh();
+
+		/* Restore */
+		Term_activate(old);
+	}
+
+	/* Finish hack */
+	show_sidebar = hack_sidebar;
+}
+
+
+
+/*
  * Hack -- display recent messages in sub-windows
  *
  * Adjust for width and split messages.  XXX XXX XXX
@@ -1405,6 +1484,38 @@ static void fix_message(void)
 			/* Clear to end of line */
 			Term_erase(x, y, 255);
 		}
+
+		/* Fresh */
+		Term_fresh();
+
+		/* Restore */
+		Term_activate(old);
+	}
+}
+
+
+/*
+ * Hack -- display dungeon map view in sub-windows.
+ */
+static void fix_map(void)
+{
+	int j;
+
+	/* Scan windows */
+	for (j = 0; j < ANGBAND_TERM_MAX; j++)
+	{
+		term *old = Term;
+
+		/* No window */
+		if (!angband_term[j]) continue;
+
+		/* No relevant flags */
+		if (!(op_ptr->window_flag[j] & (PW_MAP))) continue;
+
+		/* Activate */
+		Term_activate(angband_term[j]);
+
+		/*** The maps are always up-to-date ***/
 
 		/* Fresh */
 		Term_fresh();
@@ -1521,6 +1632,42 @@ static void fix_object(void)
 	}
 }
 
+
+/*
+ * Hack -- display feature recall in sub-windows
+ */
+static void fix_feature(void)
+{
+	int j;
+/*
+	object_type *f_ptr = &term_feature;
+*/
+	/* Scan windows */
+	for (j = 0; j < ANGBAND_TERM_MAX; j++)
+	{
+		term *old = Term;
+
+		/* No window */
+		if (!angband_term[j]) continue;
+
+		/* No relevant flags */
+		if (!(op_ptr->window_flag[j] & (PW_FEATURE))) continue;
+
+		/* Activate */
+		Term_activate(angband_term[j]);
+
+		/* Display feature info */
+		/* display_foff(f_ptr); */
+
+		/* Fresh */
+		Term_fresh();
+
+		/* Restore */
+		Term_activate(old);
+	}
+}
+
+
 /*
  * Hack -- display room recall in sub-windows
  */
@@ -1549,6 +1696,103 @@ static void fix_room_info(void)
 
 		/* Display room info */
 		display_room_info(room);
+
+		/* Fresh */
+		Term_fresh();
+
+		/* Restore */
+		Term_activate(old);
+	}
+}
+
+
+/*
+ * Hack -- display monster list in sub-windows
+ */
+static void fix_monlist(void)
+{
+	int j;
+
+	/* Scan windows */
+	for (j = 0; j < ANGBAND_TERM_MAX; j++)
+	{
+		term *old = Term;
+
+		/* No window */
+		if (!angband_term[j]) continue;
+
+		/* No relevant flags */
+		if (!(op_ptr->window_flag[j] & (PW_MONLIST))) continue;
+
+		/* Activate */
+		Term_activate(angband_term[j]);
+
+		/* Display visible monsters */
+		display_monlist();
+
+		/* Fresh */
+		Term_fresh();
+
+		/* Restore */
+		Term_activate(old);
+	}
+}
+
+
+/*
+ * Hack -- display screenshot in sub-windows
+ */
+static void fix_snapshot(void)
+{
+	int j;
+
+	/* Scan windows */
+	for (j = 0; j < ANGBAND_TERM_MAX; j++)
+	{
+		term *old = Term;
+
+		/* No window */
+		if (!angband_term[j]) continue;
+
+		/* No relevant flags */
+		if (!(op_ptr->window_flag[j] & (PW_SNAPSHOT))) continue;
+
+		/* Activate */
+		Term_activate(angband_term[j]);
+
+		/* XXX Display snapshot in subwindow */
+
+		/* Fresh */
+		Term_fresh();
+
+		/* Restore */
+		Term_activate(old);
+	}
+}
+
+
+/*
+ * Hack -- display help in sub-windows
+ */
+static void fix_help(void)
+{
+	int j;
+
+	/* Scan windows */
+	for (j = 0; j < ANGBAND_TERM_MAX; j++)
+	{
+		term *old = Term;
+
+		/* No window */
+		if (!angband_term[j]) continue;
+
+		/* No relevant flags */
+		if (!(op_ptr->window_flag[j] & (PW_HELP))) continue;
+
+		/* Activate */
+		Term_activate(angband_term[j]);
+
+		/* XXX Display last helpfile in subwindow */
 
 		/* Fresh */
 		Term_fresh();
@@ -3493,6 +3737,29 @@ void redraw_stuff(void)
 	/* Character is in "icky" mode, no screen updates */
 	if (character_icky) return;
 
+	/* HACK - Redraw window "Display player (compact)" if necessary */
+	if (p_ptr->redraw & (PR_MISC | PR_TITLE | PR_LEV | PR_EXP |
+	                     PR_STATS | PR_ARMOR | PR_HP | PR_MANA |
+	                     PR_GOLD | PR_HEALTH | PR_CUT | PR_STUN))
+	{
+		p_ptr->window |= (PW_PLAYER_2);
+	}
+
+	/* HACK - Redraw window "Display player (status)" if necessary */
+	if (p_ptr->redraw & (PR_HUNGER | PR_BLIND | PR_CONFUSED | PR_AFRAID |
+	                     PR_POISONED | PR_STATE | PR_SPEED | PR_STUDY |
+	                     PR_DEPTH))
+	{
+		p_ptr->window |= (PW_PLAYER_3);
+	}
+
+	/* HACK - Redraw window "Display player (status)" if necessary */
+	if ((p_ptr->redraw & (PR_LEV | PR_EXP | PR_STATS | PR_ARMOR |
+			     PR_HP | PR_MANA | PR_GOLD | PR_HEALTH |
+			     PR_CUT | PR_STUN)) && (!show_sidebar))
+	{
+		p_ptr->window |= (PW_PLAYER_3);
+	}
 
 	if (p_ptr->redraw & (PR_MAP))
 	{
@@ -3749,11 +4016,32 @@ void window_stuff(void)
 		fix_player_1();
 	}
 
+	/* Display player (mode 2) */
+	if (p_ptr->window & (PW_PLAYER_2))
+	{
+		p_ptr->window &= ~(PW_PLAYER_2);
+		fix_player_2();
+	}
+
+	/* Display player (mode 3) */
+	if (p_ptr->window & (PW_PLAYER_3))
+	{
+		p_ptr->window &= ~(PW_PLAYER_3);
+		fix_player_3();
+	}
+
 	/* Display overhead view */
 	if (p_ptr->window & (PW_MESSAGE))
 	{
 		p_ptr->window &= ~(PW_MESSAGE);
 		fix_message();
+	}
+
+	/* Display overhead view */
+	if (p_ptr->window & (PW_MAP))
+	{
+		p_ptr->window &= ~(PW_MAP);
+		fix_map();
 	}
 
 	/* Display overhead view */
@@ -3777,6 +4065,13 @@ void window_stuff(void)
 		fix_object();
 	}
 
+	/* Display feature recall */
+	if (p_ptr->window & (PW_FEATURE))
+	{
+		p_ptr->window &= ~(PW_FEATURE);
+		fix_feature();
+	}
+
 	/* Display room info */
 	if (p_ptr->window & (PW_ROOM_INFO))
 	{
@@ -3784,6 +4079,26 @@ void window_stuff(void)
 		fix_room_info();
 	}
 
+	/* Display snapshot */
+	if (p_ptr->window & (PW_SNAPSHOT))
+	{
+		p_ptr->window &= ~(PW_SNAPSHOT);
+		fix_snapshot();
+	}
+
+	/* Display monster list */
+	if (p_ptr->window & (PW_MONLIST))
+	{
+		p_ptr->window &= ~(PW_MONLIST);
+		fix_monlist();
+	}
+
+	/* Display help */
+	if (p_ptr->window & (PW_HELP))
+	{
+		p_ptr->window &= ~(PW_HELP);
+		fix_help();
+	}
 }
 
 

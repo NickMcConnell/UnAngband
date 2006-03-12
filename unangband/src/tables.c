@@ -1342,18 +1342,18 @@ const cptr window_flag_desc[32] =
 	"Display equip/inven",
 	"Display player (basic)",
 	"Display player (extra)",
-	NULL,
-	NULL,
+	"Display player (compact)",
+	"Display player (status)",
 	"Display messages",
+	"Display dungeon map",
 	"Display overhead view",
 	"Display monster recall",
 	"Display object recall",
+	"Display feature recall (not used)",
 	"Display room description",
-	"Display snap-shot",
-	NULL,
-	NULL,
-	"Display borg messages",
-	"Display borg status",
+	"Display snap-shot (not used)",
+	"Display visible monsters",
+	"Display help (not used)",
 	NULL,
 	NULL,
 	NULL,
@@ -1404,7 +1404,7 @@ const cptr option_text[OPT_MAX] =
 	"disturb_state",			/* OPT_disturb_state */
 	"disturb_minor",			/* OPT_disturb_minor */
 	"view_flavors",				/* OPT_view_flavors */
-	"",			/* OPT_alert_hitpoint */
+	"disturb_new",				/* OPT_disturb_new */
 	"",			/* OPT_alert_failure */
 	"verify_destroy",			/* OPT_verify_destroy */
 	"verify_special",			/* OPT_verify_special */
@@ -1668,7 +1668,7 @@ const cptr option_desc[OPT_MAX] =
 	"Disturb whenever player state changes",	/* OPT_disturb_state */
 	"Disturb whenever boring things happen",	/* OPT_disturb_minor */
 	"Show flavors in object graphics",	/* OPT_view_flavors */
-	"",			/* OPT_alert_hitpoint */
+	"Disturb whenever a new monster race seen",	/* OPT_alert_hitpoint */
 	"",			/* OPT_alert_failure */
 	"Verify destruction of objects",			/* OPT_verify_destroy */
 	"Verify use of special commands",			/* OPT_verify_special */
@@ -1932,7 +1932,7 @@ const bool option_norm[OPT_MAX] =
 	TRUE,		/* OPT_disturb_state */
 	TRUE,		/* OPT_disturb_minor */
 	TRUE,		/* OPT_view_flavors */
-	FALSE,		/* xxx */
+	TRUE,		/* OPT_disturb_new */
 	FALSE,		/* xxx */
 	TRUE,		/* OPT_verify_destroy */
 	TRUE,		/* OPT_verify_special */
@@ -2204,6 +2204,7 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_run_use_corners,
 		OPT_disturb_move,
 		OPT_disturb_near,
+		OPT_disturb_new,
 		OPT_disturb_panel,
 		OPT_disturb_state,
 		OPT_disturb_minor,
@@ -2212,7 +2213,6 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_allow_quantity,
 		OPT_auto_more,
 		OPT_verify_mana,
-		255,
 		255,
 		255,
 		255,
