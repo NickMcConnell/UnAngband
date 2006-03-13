@@ -85,6 +85,7 @@ extern const byte spell_desire_RF6[32][8];
 extern const byte spell_desire_RF7[32][8];
 extern const element_type element[MAX_ELEMENTS];
 const start_item common_items[MAX_COMMON_ITEMS];
+const cptr vocalize[MAX_LANGUAGES];
 
 /* variable.c */
 extern cptr copyright;
@@ -544,6 +545,10 @@ extern bool mon_resist_object(const monster_type *m_ptr, const object_type *o_pt
 extern void mon_hit_trap(int m_idx, int y, int x);
 
 /* melee2.c */
+extern void monster_speech(int m_idx, cptr saying, bool understand);
+extern void tell_allies_player_can(int y, int x, u32b flag);
+extern void tell_allies_player_not(int y, int x, u32b flag);
+extern void tell_allies_mflag(int y, int x, u32b flag, cptr saying);
 extern void process_monsters(byte minimum_energy);
 extern int get_scent(int y, int x);
 extern bool cave_exist_mon(int r_idx, int y, int x, bool occupied_ok);

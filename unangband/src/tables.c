@@ -3166,3 +3166,71 @@ const start_item common_items[MAX_COMMON_ITEMS]=
 	{	TV_HELM, SV_SET_OF_LEATHER_GLOVES, 1, 1, 0, 0, 90, 100},
 	{	TV_CLOAK, SV_CLOAK, 1, 1, 0, 0, 90, 100}
 };
+
+const cptr vocalize[MAX_LANGUAGES] =
+{
+	"says",		/* LANG_COMMON */
+	"says",		/* LANG_ELF */
+	"says",		/* LANG_DWARF */
+	"barks",	/* LANG_ORC */
+	"roars",	/* LANG_TROLL */
+	"thunders",	/* LANG_GIANT */
+	"roars",	/* LANG_DRAGON */
+	"utters",	/* LANG_DEMON */
+	"whispers",	/* LANG_UNDEAD */
+	"creaks",	/* LANG_FOREST */
+	"releases",	/* LANG_MUSHROOM */
+	"says",		/* LANG_NATURAL */
+	"roars", 	/* 'A' */
+	"squawks",
+	"growls",
+	"roars",
+	"shudders",
+	"croaks", 	/* 'F' */
+	"says",
+	"roars",
+	"says",
+	"hisses",
+	"clicks", 	/* 'K' */
+	"whispers",
+	"says",
+	"whispers",
+	"says",
+	"says", 	/* 'P' */
+	"roars",
+	"hisses",
+	"says",
+	"roars",
+	"utters", 	/* 'U' */
+	"whispers",
+	"whispers",
+	"grunts",
+	"hoots",
+	"howls", 	/* 'Z' */
+	"releases", 	/* 'a' */
+	"screeches",
+	"clicks",
+	"roars",
+	"blinks",
+	"chirps", 	/* 'f' */
+	"beeps",
+	"says",
+	"squelches",
+	"squelches",
+	"barks", 	/* 'k' */
+	"says",
+	"releases",
+	"hisses",
+	"barks",
+	"says", 	/* 'p' */
+	"says",
+	"screeches",
+	"whispers",
+	"says",
+	"utters", 	/* 'u' */
+	"drones",
+	"writhes",
+	"says",
+	"hisses",
+	"drools"	/* 'z' */
+};

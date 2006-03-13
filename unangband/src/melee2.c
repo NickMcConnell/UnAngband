@@ -259,8 +259,6 @@ static bool monster_can_smell(monster_type *m_ptr)
 }
 
 
-#ifdef MONSTER_AI
-
 /*
  * Determine if there is a space near the player in which
  * a summoned creature can appear
@@ -293,9 +291,6 @@ static bool summon_possible(int y1, int x1)
 
 	return FALSE;
 }
-
-#endif /* MONSTER_AI */
-
 
 
 
@@ -3043,6 +3038,328 @@ static bool push_aside(monster_type *m_ptr, monster_type *n_ptr)
 }
 
 
+int monster_language(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Hack -- there are many natural languages */
+	if (r_ptr->flags3 & (RF3_ANIMAL | RF3_INSECT | RF3_PLANT))
+	{
+		/* Hack -- language depends on graphic */
+		int language = LANG_NATURAL;
+
+		if (r_ptr->d_char == ':') language = LANG_FOREST;
+		else if (r_ptr->d_char == ',') language = LANG_MUSHROOM;
+		else if ((r_ptr->d_char >= 'A') && (r_ptr->d_char <= 'Z')) language += r_ptr->d_char - 'A' + 1;
+		else if ((r_ptr->d_char >= 'a') && (r_ptr->d_char <= 'z')) language += r_ptr->d_char - 'a' + 26 + 1;
+
+		return (language);
+	}
+	else if (r_ptr->flags3 & (RF3_UNDEAD)) return (LANG_UNDEAD);
+	else if (r_ptr->flags3 & (RF3_DEMON)) return (LANG_DEMON);
+	else if (r_ptr->flags3 & (RF3_DRAGON)) return (LANG_DRAGON);
+	else if (r_ptr->flags3 & (RF3_ORC)) return (LANG_ORC);
+	else if (r_ptr->flags3 & (RF3_TROLL)) return (LANG_TROLL);
+	else if (r_ptr->flags3 & (RF3_GIANT)) return (LANG_GIANT);
+	else if (r_ptr->flags9 & (RF9_ELF)) return (LANG_ELF);
+	else if (r_ptr->flags9 & (RF9_DWARF)) return (LANG_DWARF);
+
+	return (LANG_COMMON);
+}
+
+
+void monster_speech(int m_idx, cptr saying, bool understand)
+{
+	monster_type *m_ptr = &m_list[m_idx];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	int language = monster_language(m_ptr->r_idx);
+	int speech = language;
+
+	char m_name[80];
+
+	/* Monster never speaks */
+	if (r_ptr->flags3 & (RF3_NONVOCAL)) return;
+
+	/* Check if player understands language */
+	if (language == LANG_COMMON) understand = TRUE;
+	else if ((language == LANG_ELF) && (p_ptr->cur_flags4 & (TR4_ELF))) understand = TRUE;
+	else if ((language == LANG_DWARF) && (p_ptr->cur_flags4 & (TR4_DWARF))) understand = TRUE;
+	else if ((language == LANG_ORC) && (p_ptr->cur_flags4 & (TR4_ORC))) understand = TRUE;
+	else if ((language == LANG_TROLL) && (p_ptr->cur_flags4 & (TR4_TROLL))) understand = TRUE;
+	else if ((language == LANG_GIANT) && (p_ptr->cur_flags4 & (TR4_GIANT))) understand = TRUE;
+	else if ((language == LANG_DRAGON) && (p_ptr->cur_flags4 & (TR4_DRAGON))) understand = TRUE;
+	else if ((language == LANG_DEMON) && (p_ptr->cur_flags4 & (TR4_DEMON))) understand = TRUE;
+	else if ((language == LANG_UNDEAD) && (p_ptr->cur_flags4 & (TR4_UNDEAD))) understand = TRUE;
+	else if ((language >= LANG_NATURAL) && (p_ptr->cur_flags4 & (TR4_ANIMAL))) understand = TRUE;
+
+	/* Get accent */
+	if (!speech)
+	{
+		speech = LANG_NATURAL;
+
+		if (r_ptr->d_char == ':') speech = LANG_FOREST;
+		else if (r_ptr->d_char == ',') speech = LANG_MUSHROOM;
+		else if ((r_ptr->d_char >= 'A') && (r_ptr->d_char <= 'Z')) speech += r_ptr->d_char - 'A' + 1;
+		else if ((r_ptr->d_char >= 'a') && (r_ptr->d_char <= 'z')) speech += r_ptr->d_char - 'a' + 26 + 1;
+	}
+
+	/* Paranoia */
+	if (speech >= MAX_LANGUAGES) return;
+
+	/* Get the monster name */
+	monster_desc(m_name, m_ptr, 0);
+
+	/* Dump a message */
+	if (!understand) msg_format("%^s %s something.", m_name, vocalize[speech]);
+	else
+	{
+		char buf[256];
+
+		char *t = buf;
+		cptr s = saying;
+		cptr u;
+
+		/* Copy the string */
+		for (; *s; s++)
+		{
+			/* Player name */
+			if (*s == '&')
+			{
+				/* Hack -- townsfolk know the players name */
+				if ((m_ptr->mflag & (MFLAG_TOWN)) && (strlen(op_ptr->full_name)))
+				{
+					u = op_ptr->full_name;
+
+					/* Copy the string */
+					while (*u) *t++ = *u++;
+				}
+				else
+				{
+					u = "The ";
+
+					/* Copy the string */
+					while (*u) *t++ = *u++;
+
+					u = p_name + rp_ptr->name;
+
+					/* Copy the string */
+					while (*u) *t++ = *u++;
+
+					*t++ = ' ';
+
+					u = c_name + cp_ptr->name;
+
+					/* Copy the string */
+					while (*u) *t++ = *u++;
+				}
+			}
+			/* Normal */
+			else
+			{
+				/* Copy */
+				*t++ = *s;
+			}
+		}
+
+		msg_format("%^s %s '%s'", m_name, vocalize[speech], buf);
+	}
+}
+
+
+/* Alert others around the monster that the player has a resistance, and wake them up */
+void tell_allies_player_can(int y, int x, u32b flag)
+{
+	int i,language;
+	bool vocal = FALSE;
+
+	cptr saying = NULL;
+
+	language = monster_language(m_list[cave_m_idx[y][x]].r_idx);
+
+	/* Scan all other monsters */
+	for (i = 1; i < z_info->m_max; i++)
+	{
+		/* Access the monster */
+		monster_type *n_ptr = &m_list[i];
+
+		/* Ignore dead monsters */
+		if (!n_ptr->r_idx) continue;
+
+		/* Ignore itself */
+		if (i == cave_m_idx[y][x]) continue;
+
+		/* Ignore monsters who speak different language */
+		if (monster_language(n_ptr->r_idx) != language) continue;
+
+		/* Ignore monsters not in LOF */
+		if (!generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
+
+		/* Vocalise? */
+		if (!(n_ptr->csleep) && (n_ptr->mflag & (MFLAG_ACTV)) && (n_ptr->smart & (flag))) continue;
+
+		/* Activate all other monsters and communicate to them */
+		n_ptr->csleep = 0;
+		n_ptr->mflag |= (MFLAG_ACTV);
+		n_ptr->smart |= (flag);
+		vocal = TRUE;
+	}
+
+	/* Nothing to say? */
+	if (!vocal) return;
+
+	/* Define saying */
+	if ((flag & (SM_OPP_ACID)) || (flag & (SM_RES_ACID))) saying = "& resists acid.";
+	else if ((flag & (SM_OPP_ELEC)) || (flag & (SM_RES_ELEC))) saying = "& resists electricity.";
+	else if ((flag & (SM_OPP_FIRE)) || (flag & (SM_RES_FIRE))) saying = "& resists fire.";
+	else if ((flag & (SM_OPP_COLD)) || (flag & (SM_RES_COLD))) saying = "& resists cold.";
+	else if ((flag & (SM_OPP_POIS)) || (flag & (SM_RES_POIS))) saying = "& resists poison.";
+	else if ((flag & (SM_OPP_FEAR)) || (flag & (SM_RES_FEAR))) saying = "& resists fear.";
+	else if (flag & (SM_SEE_INVIS)) saying = "& can see invisible.";
+	else if (flag & (SM_GOOD_SAVE)) saying = "& can easily resist magic.";
+	else if (flag & (SM_PERF_SAVE)) saying = "& can always resist magic.";
+	else if (flag & (SM_FREE_ACT)) saying = "& resists paralyzation.";
+	else if (flag & (SM_IMM_POIS)) saying = "& is immune to poison.";
+	else if (flag & (SM_IMM_MANA)) saying = "& has no mana.";
+	else if (flag & (SM_IMM_ACID)) saying = "& is immune to acid.";
+	else if (flag & (SM_IMM_ELEC)) saying = "& is immune to electricity.";
+	else if (flag & (SM_IMM_FIRE)) saying = "& is immune to fire.";
+	else if (flag & (SM_IMM_COLD)) saying = "& is immune to cold.";
+	else if (flag & (SM_RES_ACID)) saying = "& is immune to acid.";
+	else if (flag & (SM_RES_LITE)) saying = "& resists lite.";
+	else if (flag & (SM_RES_DARK)) saying = "& resists darkness.";
+	else if (flag & (SM_RES_BLIND)) saying = "& resists blindness.";
+	else if (flag & (SM_RES_CONFU)) saying = "& resists confusion.";
+	else if (flag & (SM_RES_SOUND)) saying = "& resists sound.";
+	else if (flag & (SM_RES_SHARD)) saying = "& resists shard.";
+	else if (flag & (SM_RES_NEXUS)) saying = "& resists nexus.";
+	else if (flag & (SM_RES_NETHR)) saying = "& resists nether.";
+	else if (flag & (SM_RES_CHAOS)) saying = "& resists chaos.";
+	else if (flag & (SM_RES_DISEN)) saying = "& resists disenchantment.";
+
+	/* Speak */
+	monster_speech(cave_m_idx[y][x], saying, FALSE);
+}
+
+
+/* Alert others around the monster that the player does not have a resistance, and wake them up */
+void tell_allies_player_not(int y, int x, u32b flag)
+{
+	int i, language;
+	bool vocal = FALSE;
+
+	cptr saying = NULL;
+
+	language = monster_language(m_list[cave_m_idx[y][x]].r_idx);
+
+	/* Scan all other monsters */
+	for (i = 1; i < z_info->m_max; i++)
+	{
+		/* Access the monster */
+		monster_type *n_ptr = &m_list[i];
+
+		/* Ignore dead monsters */
+		if (!n_ptr->r_idx) continue;
+
+		/* Ignore itself */
+		if (i == cave_m_idx[y][x]) continue;
+
+		/* Ignore monsters who speak different language */
+		if (monster_language(n_ptr->r_idx) != language) continue;
+
+		/* Ignore monsters not in LOF */
+		if (!generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
+
+		/* Vocalise? */
+		if (!(n_ptr->csleep) && (n_ptr->mflag & (MFLAG_ACTV)) && !(n_ptr->smart & (flag))) continue;
+
+		/* Activate all other monsters and communicate to them */
+		n_ptr->csleep = 0;
+		n_ptr->mflag |= (MFLAG_ACTV);
+		n_ptr->smart &= ~(flag);
+		vocal = TRUE;
+	}
+
+	/* Nothing to say? */
+	if (!vocal) return;
+
+	/* Define saying */
+	if ((flag & (SM_OPP_ACID)) || (flag & (SM_RES_ACID))) saying = "& no longer resists acid.";
+	else if ((flag & (SM_OPP_ELEC)) || (flag & (SM_RES_ELEC))) saying = "& no longer resists electricity.";
+	else if ((flag & (SM_OPP_FIRE)) || (flag & (SM_RES_FIRE))) saying = "& no longer resists fire.";
+	else if ((flag & (SM_OPP_COLD)) || (flag & (SM_RES_COLD))) saying = "& no longer resists cold.";
+	else if ((flag & (SM_OPP_POIS)) || (flag & (SM_RES_POIS))) saying = "& no longer resists poison.";
+	else if ((flag & (SM_OPP_FEAR)) || (flag & (SM_RES_FEAR))) saying = "& no longer resists fear.";
+	else if (flag & (SM_SEE_INVIS)) saying = "& cannot see invisible.";
+	else if (flag & (SM_GOOD_SAVE)) saying = "& no longer easily resists magic.";
+	else if (flag & (SM_PERF_SAVE)) saying = "& no longer always resists magic.";
+	else if (flag & (SM_FREE_ACT)) saying = "& no longer resists paralyzation.";
+	else if (flag & (SM_IMM_POIS)) saying = "& no longer is immune to poison.";
+	else if (flag & (SM_IMM_MANA)) saying = "& no longer has no mana.";
+	else if (flag & (SM_IMM_ACID)) saying = "& no longer is immune to acid.";
+	else if (flag & (SM_IMM_ELEC)) saying = "& no longer is immune to electricity.";
+	else if (flag & (SM_IMM_FIRE)) saying = "& no longer is immune to fire.";
+	else if (flag & (SM_IMM_COLD)) saying = "& no longer is immune to cold.";
+	else if (flag & (SM_RES_ACID)) saying = "& no longer is immune to acid.";
+	else if (flag & (SM_RES_LITE)) saying = "& no longer resists lite.";
+	else if (flag & (SM_RES_DARK)) saying = "& no longer resists darkness.";
+	else if (flag & (SM_RES_BLIND)) saying = "& no longer resists blindness.";
+	else if (flag & (SM_RES_CONFU)) saying = "& no longer resists confusion.";
+	else if (flag & (SM_RES_SOUND)) saying = "& no longer resists sound.";
+	else if (flag & (SM_RES_SHARD)) saying = "& no longer resists shard.";
+	else if (flag & (SM_RES_NEXUS)) saying = "& no longer resists nexus.";
+	else if (flag & (SM_RES_NETHR)) saying = "& no longer resists nether.";
+	else if (flag & (SM_RES_CHAOS)) saying = "& no longer resists chaos.";
+	else if (flag & (SM_RES_DISEN)) saying = "& no longer resists disenchantment.";
+
+	/* Speak */
+	monster_speech(cave_m_idx[y][x], saying, FALSE);
+}
+
+
+/* Alert others around the monster about something using the m_flag, and wake them up*/
+void tell_allies_mflag(int y, int x, u32b flag, cptr saying)
+{
+	int i, language;
+	bool vocal = FALSE;
+
+	language = monster_language(m_list[cave_m_idx[y][x]].r_idx);
+
+	/* Scan all other monsters */
+	for (i = 1; i < z_info->m_max; i++)
+	{
+		/* Access the monster */
+		monster_type *n_ptr = &m_list[i];
+
+		/* Ignore dead monsters */
+		if (!n_ptr->r_idx) continue;
+
+		/* Ignore itself */
+		if (i == cave_m_idx[y][x]) continue;
+
+		/* Ignore monsters who speak different language */
+		if (monster_language(n_ptr->r_idx) != language) continue;
+
+		/* Ignore monsters not in LOF */
+		if (!generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
+
+		/* Vocalise? */
+		if (!(n_ptr->csleep) && (n_ptr->mflag & (MFLAG_ACTV)) && (n_ptr->mflag & (flag))) continue;
+
+		/* Activate all other monsters and communicate to them */
+		n_ptr->csleep = 0;
+		n_ptr->mflag |= (MFLAG_ACTV | flag);
+		vocal = TRUE;
+	}
+
+	/* Nothing to say? */
+	if (!vocal) return;
+
+	/* Speak */
+	monster_speech(cave_m_idx[y][x], saying, FALSE);
+}
+
+
 /*
  * Given a target grid, calculate the grid the monster will actually 
  * attempt to move into.
@@ -4624,7 +4941,6 @@ static void process_monster(int m_idx)
 	/* Will the monster move randomly? */
 	bool random = FALSE;
 
-
 	/* Monster can act - Reset push flag */
 	m_ptr->mflag &= ~(MFLAG_PUSH);
 
@@ -4667,6 +4983,85 @@ static void process_monster(int m_idx)
 		{
 			if (monster_can_smell(m_ptr)) m_ptr->mflag |= (MFLAG_ACTV);
 		}
+	}
+
+	/*
+	 * Special handling if the first turn a monster has after
+	 * being attacked by the player, but the player is out of sight
+	 */
+	if (m_ptr->mflag & (MFLAG_HIT_RANGE))
+	{
+		/* Monster will be very upset if it can't see the player
+		   or wasn't expecting player attack. */
+		if ((!player_has_los_bold(m_ptr->fy, m_ptr->fx)) || (m_ptr->mflag & (MFLAG_TOWN | MFLAG_IGNORE | MFLAG_ALLY)))
+		{
+			m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
+
+			/*if part of a pack, let them know*/
+			if ((r_ptr->flags1 & (RF1_FRIENDS)) ||
+				(r_ptr->flags1 & (RF1_FRIEND)) ||
+				(r_ptr->flags1 & (RF1_ESCORT)) ||
+				(r_ptr->flags2 & (RF2_SMART)) ||
+				(m_ptr->mflag & (MFLAG_TOWN)))
+			{
+				tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
+			}
+
+			/*Tweak the monster speed*/
+			if (!player_has_los_bold(m_ptr->fy, m_ptr->fx))
+			{
+				/*Monsters with ranged attacks will try to cast a spell, shoot or breath*/
+				if (r_ptr->freq_spell || r_ptr->freq_innate) m_ptr->mflag |= (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH);
+
+				m_ptr->mflag &= ~(MFLAG_SLOW | MFLAG_FAST);
+				if (!rand_int(3))	m_ptr->mflag |= (MFLAG_SLOW);
+				else if (rand_int(2)) m_ptr->mflag |= (MFLAG_FAST);
+				m_ptr->mspeed = calc_monster_speed(m_ptr);
+			}
+		}
+
+		/* Clear the flag unless player is murderer or traitor */
+		if (!(m_ptr->mflag & (MFLAG_TOWN | MFLAG_IGNORE | MFLAG_ALLY))) m_ptr->mflag &= ~(MFLAG_HIT_RANGE);
+
+	}
+
+	/*This if the first turn a monster has after being attacked by the player*/
+	if (m_ptr->mflag & (MFLAG_HIT_BLOW))
+	{
+		/*
+		 * Monster will be very upset if it isn't next to the
+		 * player (pillar dance, hack-n-back, etc)
+		 */
+		if ((m_ptr->cdis > 1) || (m_ptr->mflag & (MFLAG_TOWN | MFLAG_IGNORE | MFLAG_ALLY)))
+		{
+			m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
+
+			/* If part of a pack, let them know */
+			if ((r_ptr->flags1 & (RF1_FRIENDS)) ||
+				(r_ptr->flags1 & (RF1_FRIEND)) ||
+				(r_ptr->flags1 & (RF1_ESCORT)) ||
+				(r_ptr->flags1 & (RF1_ESCORTS)) ||
+				(r_ptr->flags2 & (RF2_SMART)) ||
+				(m_ptr->mflag & (MFLAG_TOWN)))
+			{
+				tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
+			}
+
+			/*Tweak the monster speed*/
+			if (m_ptr->cdis > 1)
+			{
+				/* Monsters with ranged attacks will try to cast a spell*/
+				if (r_ptr->freq_spell || r_ptr->freq_innate) m_ptr->mflag |= (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH);
+
+				m_ptr->mflag &= ~(MFLAG_SLOW | MFLAG_FAST);
+				if (!rand_int(3))	m_ptr->mflag |= (MFLAG_SLOW);
+				else if (rand_int(2)) m_ptr->mflag |= (MFLAG_FAST);
+				m_ptr->mspeed = calc_monster_speed(m_ptr);
+			}
+		}
+
+		/* Clear the flag unless player is murderer or traitor */
+		if (!(m_ptr->mflag & (MFLAG_TOWN | MFLAG_IGNORE | MFLAG_ALLY))) m_ptr->mflag &= ~(MFLAG_HIT_BLOW);
 	}
 
 	/* A monster in passive mode will end its turn at this point. */
@@ -4754,6 +5149,35 @@ static void process_monster(int m_idx)
 		/* Selected a ranged attack? */
 		if (choice != 0)
 		{
+			/* The monster is hidden */
+			if (m_ptr->mflag & (MFLAG_HIDE))
+			{
+				/* Reveal the monster */
+				m_ptr->mflag &= ~(MFLAG_HIDE);
+
+				/* And update */
+				update_mon(cave_m_idx[m_ptr->fy][m_ptr->fx], FALSE);
+
+				/* Hack --- tell the player if something unhides */
+				if (m_ptr->ml)
+				{
+					char m_name[80];
+
+					/* Get the monster name */
+					monster_desc(m_name, m_ptr, 0);
+
+					msg_format("%^s emerges from the %s.", m_name, f_name + f_info[cave_feat[m_ptr->fy][m_ptr->fx]].name);
+				}
+
+				/* Disturb on "move" */
+				if (m_ptr->ml && (disturb_move ||
+					((m_ptr->mflag & (MFLAG_VIEW)) && disturb_near)))
+				{
+					/* Disturb */
+					disturb(0, 0);
+				}
+			}
+
 			/* Execute said attack */
 			make_attack_ranged(m_idx, choice, ty, tx);
 
@@ -4767,7 +5191,6 @@ static void process_monster(int m_idx)
 	/* Assume no movement */
 	ty = 0;
 	tx = 0;
-
 
 	/*
 	 * Innate semi-random movement.  Monsters adjacent to the character 
@@ -4794,29 +5217,60 @@ static void process_monster(int m_idx)
 	}
 
 
-	/* Monster cannot perceive the character */
+	/* Monster isnt' moving randomly, isnt' running away
+	 * doesn't hear or smell the character
+	 */
 	if ((!aware) && (!random))
 	{
 		/* Monster has a known target */
 		if ((m_ptr->ty) && (m_ptr->tx)) must_use_target = TRUE;
 
-		/* Monster is just going to have to search at random */
+		/* Monster has to move randomly */
 		else random = TRUE;
 	}
 
 	/* Monster is using the special "townsman" AI */
 	else if (m_ptr->mflag & (MFLAG_TOWN))
 	{
+		/* Town monster been attacked */
+		if (m_ptr->mflag & (MFLAG_AGGR))
+		{
+			int i, dam = 0;
+
+			/* Check blows for any ability to hurt the player */
+			for (i = 0; i < 4; i++)
+			{
+				if (!r_ptr->blow[i].method) continue;
+				if (!r_ptr->blow[i].d_dice) continue;
+
+				dam = 1;
+			}
+
+			/* Can't hurt the player - flee */
+			if (!dam) m_ptr->min_range = FLEE_RANGE;
+
+			/* Advance on the character */
+		}
+
 		/* Always have somewhere to go */
-		if ((!m_ptr->ty) || (!m_ptr->tx) ||
+		else if ((!m_ptr->ty) || (!m_ptr->tx) ||
 		    (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags1 & (FF1_ENTER)))
 		{
 			/* Get a new target */
 			get_town_target(m_ptr);
-		}
 
-		/* Not interested in the character */
-		must_use_target = TRUE;
+			/* Not interested in the character */
+			must_use_target = TRUE;
+		}
+		else if ((m_ptr->ty == m_ptr->fy) &&
+				 (m_ptr->tx == m_ptr->fx))
+		{
+			/* go to a new target */
+			get_town_target(m_ptr);
+
+			/* Not interested in the character */
+			must_use_target = TRUE;
+		}
 	}
 
 

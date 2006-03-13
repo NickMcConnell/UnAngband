@@ -116,6 +116,9 @@ The power of the trap depends on the digging ability of the player.
 
 - You now start playing the Lord of the Rings campaign by default.
 
+- Monsters speak to each other about the player resistances, and whether they have
+been attacked by the player. This is particularly noticeable in town.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.

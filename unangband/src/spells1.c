@@ -76,14 +76,22 @@ void player_can_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
 	 	monster_type *m_ptr = &m_list[who];
 	 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
+		u32b smart;
+
 	 	/* Too stupid to learn anything */
  		if (r_ptr->flags2 & (RF2_STUPID)) return;
 
 	 	/* Not intelligent, only learn sometimes */
  		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return;
 
+		/* Get the flags */
+		smart = player_smart_flags(f1, f2, f3, f4);
+
 		/* Learn the flags */
-		m_ptr->smart |= player_smart_flags(f1, f2, f3, f4);
+		m_ptr->smart |= smart;
+
+		/* Tell the allies */
+		tell_allies_player_can(m_ptr->fy, m_ptr->fx, smart);
 	}
 }
 
@@ -104,6 +112,8 @@ void player_not_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
 	 	monster_type *m_ptr = &m_list[who];
 	 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
+		u32b smart;
+
 	 	/* Too stupid to learn anything */
  		if (r_ptr->flags2 & (RF2_STUPID)) return;
 
@@ -111,7 +121,13 @@ void player_not_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
  		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return;
 
 		/* Learn the flags */
-		m_ptr->smart &= ~(player_smart_flags(f1, f2, f3, f4));
+		smart = player_smart_flags(f1, f2, f3, f4);
+
+		/* Learn the flags */
+		m_ptr->smart &= ~(smart);
+
+		/* Tell the allies */
+		tell_allies_player_not(m_ptr->fy, m_ptr->fx, smart);
 	}
 }
 

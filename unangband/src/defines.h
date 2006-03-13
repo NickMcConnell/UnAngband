@@ -2973,6 +2973,10 @@
 #define MFLAG_SKILLFUL	0x02000000    /* Monster is more skillful than average for race */
 #define MFLAG_SICK      0x04000000    /* Monster is sicker than average for race */
 #define MFLAG_HEALTHY	0x08000000    /* Monster is healthier than average for race */
+#define MFLAG_SHOT	0x10000000    /* Monster will shoot at first opportunity */
+#define MFLAG_BREATH	0x20000000    /* Monster will breath at first opportunity */
+#define MFLAG_ALLY	0x40000000    /* Monster is ally of player */
+#define MFLAG_IGNORE	0x80000000    /* Monster will ignore the player until provoked */
 
 
 /*
@@ -3374,6 +3378,24 @@
 #define ELEM_LITE     8
 
 #define MAX_ELEMENTS   9
+
+
+/*
+ * Languages - used for monster to monster communication
+ */
+#define LANG_COMMON	0
+#define LANG_ELF	1
+#define LANG_DWARF	2
+#define LANG_ORC	3
+#define LANG_TROLL	4
+#define LANG_GIANT	5
+#define LANG_DRAGON	6
+#define LANG_DEMON	7
+#define LANG_UNDEAD	8
+#define LANG_FOREST	9
+#define LANG_MUSHROOM	10
+#define LANG_NATURAL	11
+#define MAX_LANGUAGES	65
 
 
 /*

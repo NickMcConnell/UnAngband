@@ -3121,6 +3121,9 @@ void do_cmd_fire(void)
 				/* Note the collision */
 				hit_body = TRUE;
 
+				/*Mark the monster as attacked by the player*/
+				m_ptr->mflag |= (MFLAG_HIT_RANGE);
+
 				/* Some monsters get "destroyed" */
 				if ((r_ptr->flags3 & (RF3_NONLIVING)) ||
 				    (r_ptr->flags2 & (RF2_STUPID)))
@@ -3530,6 +3533,9 @@ void do_cmd_throw(void)
 
 				/* Note the collision */
 				hit_body = TRUE;
+
+				/*Mark the monster as attacked by the player*/
+				m_ptr->mflag |= (MFLAG_HIT_RANGE);
 
 				/* Some monsters get "destroyed" */
 				if ((r_ptr->flags3 & (RF3_NONLIVING)) ||
