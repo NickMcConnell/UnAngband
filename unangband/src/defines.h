@@ -3811,7 +3811,7 @@
 #define OPT_disturb_minor  24
 #define OPT_view_flavors   25
 #define OPT_disturb_new    26
-/* #define OPT_alert_failure */
+#define OPT_verify_safe   27
 #define OPT_verify_destroy 28
 #define OPT_verify_special 29
 #define OPT_allow_quantity 30
@@ -3824,8 +3824,8 @@
 #define OPT_view_torch_grids     39
 #define OPT_dungeon_align  40
 #define OPT_dungeon_stair  41
-/* xxx flow_by_smell */
-/* xxx flow_by_sound */
+#define OPT_view_unsafe_grids 42
+#define OPT_view_detect_grids 43
 /* xxx track_follow */
 /* xxx track_target */
 /* xxx smart_learn */
@@ -3858,7 +3858,7 @@
 #define OPT_smart_packs    73
 #define OPT_stack_force_pvals			74
 #define OPT_stack_force_times		75
-#define OPT_view_safe_grids			76
+/* xxx */
 #define OPT_room_descriptions			77
 #define OPT_room_names				78
 #define OPT_verify_mana			79
@@ -3941,7 +3941,7 @@
 #define disturb_minor     op_ptr->opt[OPT_disturb_minor]
 #define view_flavors      op_ptr->opt[OPT_view_flavors]
 #define disturb_new       op_ptr->opt[OPT_disturb_new]
-#define alert_failure     op_ptr->opt[OPT_alert_failure]
+#define verify_safe       op_ptr->opt[OPT_verify_safe]
 #define verify_destroy    op_ptr->opt[OPT_verify_destroy]
 #define verify_special    op_ptr->opt[OPT_verify_special]
 #define allow_quantity    op_ptr->opt[OPT_allow_quantity]
@@ -3956,8 +3956,8 @@
 #define view_torch_grids  op_ptr->opt[OPT_view_torch_grids]
 #define dungeon_align     op_ptr->opt[OPT_dungeon_align]
 #define dungeon_stair     op_ptr->opt[OPT_dungeon_stair]
-/* xxx flow_by_smell */
-/* xxx flow_by_sound */
+#define view_unsafe_grids op_ptr->opt[OPT_view_unsafe_grids]
+#define view_detect_grids op_ptr->opt[OPT_view_detect_grids]
 /* xxx track_follow */
 /* xxx track_target */
 /* xxx smart_learn */
@@ -3990,7 +3990,7 @@
 #define smart_packs op_ptr->opt[OPT_smart_packs]
 #define stack_force_pvals  op_ptr->opt[OPT_stack_force_pvals]
 #define stack_force_times  op_ptr->opt[OPT_stack_force_times]
-#define view_safe_grids    op_ptr->opt[OPT_view_safe_grids]
+/* xxx */
 #define verify_mana      op_ptr->opt[OPT_verify_mana]
 #define room_descriptions    op_ptr->opt[OPT_room_descriptions]
 #define room_names      op_ptr->opt[OPT_room_names]

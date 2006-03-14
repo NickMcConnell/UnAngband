@@ -893,24 +893,36 @@ void set_recall(void)
 
 
 /*
- * Detect all traps on current panel
+ * Detect all features on current panel
  */
-bool detect_feat_flags(u32b flags1, u32b flags2)
+bool detect_feat_flags(u32b flags1, u32b flags2, int r)
 {
 	int y, x;
 
 	bool detect = FALSE;
 
-	/* Scan the current panel */
-	for (y = p_ptr->wy; y < p_ptr->wy+SCREEN_HGT; y++)
+	/* Scan the grids out to radius */
+	for (y = MAX(p_ptr->py - r, 0); y < MIN(p_ptr->py + r, DUNGEON_HGT); y++)
 	{
-		for (x = p_ptr->wx; x < p_ptr->wx+SCREEN_WID; x++)
+		for (x = MAX(p_ptr->px - r, 0); x < MIN(p_ptr->px+r, DUNGEON_WID); x++)
 		{
-			/* Hack -- Safe */
-			if (flags1 & (FF1_TRAP))
+			/* Check distance */
+			if (distance(p_ptr->py, p_ptr->px, y, x) > r) continue;
+
+			/* Safe from traps */
+			if (view_unsafe_grids && (flags1 & (FF1_TRAP)))
 			{
 				play_info[y][x] |= (PLAY_SAFE);
-				if (view_safe_grids) lite_spot(y,x);
+				lite_spot(y,x);
+
+				detect = TRUE;
+			}
+
+			/* Safe from monsters */
+			if (view_detect_grids && !(flags1) && !(flags2))
+			{
+				play_info[y][x] |= (PLAY_SAFE);
+				lite_spot(y,x);
 
 				detect = TRUE;
 			}
@@ -922,7 +934,6 @@ bool detect_feat_flags(u32b flags1, u32b flags2)
 				/* Detect secrets */
 				if (f_info[cave_feat[y][x]].flags1 & (FF1_SECRET))
 				{
-
 					/*Find secrets*/
 					cave_alter_feat(y,x,FS_SECRET);
 				}
@@ -950,11 +961,10 @@ bool detect_feat_flags(u32b flags1, u32b flags2)
  */
 bool detect_traps(void)
 {
-
 	bool detect = FALSE;
 
 	/* Describe */
-	if (detect_feat_flags(FF1_TRAP,0x00))
+	if (detect_feat_flags(FF1_TRAP,0x00, 2 * MAX_SIGHT))
 	{
 		msg_print("You sense the presence of traps!");
 
@@ -977,7 +987,7 @@ bool detect_doors(void)
 
 
 	/* Describe */
-	if (detect_feat_flags(FF1_DOOR,0x00))
+	if (detect_feat_flags(FF1_DOOR,0x00, 2 * MAX_SIGHT))
 	{
 		msg_print("You sense the presence of doors!");
 
@@ -998,7 +1008,7 @@ bool detect_stairs(void)
 	bool detect = FALSE;
 
 	/* Describe */
-	if (detect_feat_flags(FF1_STAIRS,0x00))
+	if (detect_feat_flags(FF1_STAIRS,0x00, 2 * MAX_SIGHT))
 	{
 		msg_print("You sense the presence of stairs!");
 
@@ -1018,7 +1028,7 @@ bool detect_water(void)
 	bool detect = FALSE;
 
 	/* Describe */
-	if (detect_feat_flags(0x00,FF2_WATER))
+	if (detect_feat_flags(0x00,FF2_WATER, 2 * MAX_SIGHT))
 	{
 		msg_print("You sense the presence of running water!");
 
@@ -1041,7 +1051,7 @@ bool detect_treasure(void)
 
 
 	/* Describe */
-	if (detect_feat_flags(FF1_HAS_GOLD,0x00))
+	if (detect_feat_flags(FF1_HAS_GOLD,0x00, 2 * MAX_SIGHT))
 	{
 		msg_print("You sense the presence of buried treasure!");
 
@@ -1062,7 +1072,7 @@ bool detect_objects_buried(void)
 	bool detect = FALSE;
 
 	/* Describe */
-	if (detect_feat_flags(FF1_HAS_ITEM,0x00))
+	if (detect_feat_flags(FF1_HAS_ITEM,0x00, 2 * MAX_SIGHT))
 	{
 		msg_print("You sense the presence of buried objects!");
 
@@ -1084,7 +1094,6 @@ bool detect_objects_gold(void)
 
 	bool detect = FALSE;
 
-
 	/* Scan objects */
 	for (i = 1; i < o_max; i++)
 	{
@@ -1101,10 +1110,10 @@ bool detect_objects_gold(void)
 		x = o_ptr->ix;
 
 		/* Only detect nearby objects */
-		if (!panel_contains(y, x)) continue;
+		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
 
 		/* Detect "gold" objects */
-		if (o_ptr->tval == TV_GOLD)
+		if (o_ptr->tval >= TV_GOLD)
 		{
 			/* Hack -- memorize it */
 			o_ptr->marked = TRUE;
@@ -1154,10 +1163,10 @@ bool detect_objects_normal(void)
 		x = o_ptr->ix;
 
 		/* Only detect nearby objects */
-		if (!panel_contains(y, x)) continue;
+		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
 
 		/* Detect "real" objects */
-		if (o_ptr->tval != TV_GOLD)
+		if (o_ptr->tval < TV_GOLD)
 		{
 			/* Hack -- memorize it */
 			if (!auto_pickup_ignore(o_ptr)) o_ptr->marked = TRUE;
@@ -1333,7 +1342,7 @@ bool detect_objects_magic(void)
 		x = o_ptr->ix;
 
 		/* Only detect nearby objects */
-		if (!panel_contains(y, x)) continue;
+		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
 
 		/* Examine the tval */
 		tv = o_ptr->tval;
@@ -1539,7 +1548,7 @@ bool detect_objects_cursed(void)
 		x = o_ptr->ix;
 
 		/* Only detect nearby objects */
-		if (!panel_contains(y, x)) continue;
+		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
 
 		/* Cursed items */
 		if (cursed_p(o_ptr) /* || broken_p(o_ptr) */)
@@ -1698,7 +1707,7 @@ bool detect_monsters_normal(void)
 		x = m_ptr->fx;
 
 		/* Only detect nearby monsters */
-		if (!panel_contains(y, x)) continue;
+		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
 
 		/* Detect all non-invisible monsters */
 		if (!(r_ptr->flags2 & (RF2_INVISIBLE)) && !(m_ptr->tim_invis))
@@ -1716,6 +1725,9 @@ bool detect_monsters_normal(void)
 			flag = TRUE;
 		}
 	}
+
+	/* Hack -- mark as safe */
+	if (view_detect_grids) detect_feat_flags(0L, 0L, 2 * MAX_SIGHT);
 
 	/* Describe */
 	if (flag)
@@ -1754,7 +1766,7 @@ bool detect_monsters_invis(void)
 		x = m_ptr->fx;
 
 		/* Only detect nearby monsters */
-		if (!panel_contains(y, x)) continue;
+		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
 
 		/* Note invisible monsters */
 		if (r_ptr->flags2 & (RF2_INVISIBLE))
@@ -1787,6 +1799,9 @@ bool detect_monsters_invis(void)
 			flag = TRUE;
 		}
 	}
+
+	/* Hack -- mark as safe */
+	if (view_detect_grids) detect_feat_flags(0L, 0L, 2 * MAX_SIGHT);
 
 	/* Describe */
 	if (flag)
@@ -1826,7 +1841,7 @@ bool detect_monsters_evil(void)
 		x = m_ptr->fx;
 
 		/* Only detect nearby monsters */
-		if (!panel_contains(y, x)) continue;
+		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
 
 		/* Detect evil monsters */
 		if (r_ptr->flags3 & (RF3_EVIL))
@@ -1854,6 +1869,9 @@ bool detect_monsters_evil(void)
 			flag = TRUE;
 		}
 	}
+
+	/* Hack -- mark as safe */
+	if (view_detect_grids) detect_feat_flags(0L, 0L, 2 * MAX_SIGHT);
 
 	/* Describe */
 	if (flag)
@@ -1891,7 +1909,7 @@ bool detect_monsters_undead(void)
 		x = m_ptr->fx;
 
 		/* Only detect nearby monsters */
-		if (!panel_contains(y, x)) continue;
+		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
 
 		/* Detect evil monsters */
 		if (r_ptr->flags3 & (RF3_UNDEAD))
@@ -1919,6 +1937,9 @@ bool detect_monsters_undead(void)
 			flag = TRUE;
 		}
 	}
+
+	/* Hack -- mark as safe */
+	if (view_detect_grids) detect_feat_flags(0L, 0L, 2 * MAX_SIGHT);
 
 	/* Describe */
 	if (flag)
@@ -1956,12 +1977,12 @@ bool detect_monsters_animal(void)
 		x = m_ptr->fx;
 
 		/* Only detect nearby monsters */
-		if (!panel_contains(y, x)) continue;
+		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
 
 		/* Detect evil monsters */
 		if (r_ptr->flags3 & (RF3_ANIMAL))
 		{
-			/* Take note that they are evil */
+			/* Take note that they are animals */
 			l_ptr->flags3 |= (RF3_ANIMAL);
 
 			/* Update monster recall window */
@@ -1984,6 +2005,9 @@ bool detect_monsters_animal(void)
 			flag = TRUE;
 		}
 	}
+
+	/* Hack -- mark as safe */
+	if (view_detect_grids) detect_feat_flags(0L, 0L, 2 * MAX_SIGHT);
 
 	/* Describe */
 	if (flag)
@@ -2021,7 +2045,7 @@ bool detect_monsters_demon(void)
 		x = m_ptr->fx;
 
 		/* Only detect nearby monsters */
-		if (!panel_contains(y, x)) continue;
+		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
 
 		/* Detect evil monsters */
 		if (r_ptr->flags3 & (RF3_DEMON))
@@ -2049,6 +2073,9 @@ bool detect_monsters_demon(void)
 			flag = TRUE;
 		}
 	}
+
+	/* Hack -- mark as safe */
+	if (view_detect_grids) detect_feat_flags(0L, 0L, 2 * MAX_SIGHT);
 
 	/* Describe */
 	if (flag)

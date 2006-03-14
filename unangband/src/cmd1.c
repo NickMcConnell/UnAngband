@@ -2364,7 +2364,6 @@ void move_player(int dir, int jumping)
 		|| (!(f_ptr->flags3 & (FF3_MUST_CLIMB)) 
                 && (f_info[cave_feat[py][px]].flags3 & (FF3_MUST_CLIMB)))) != 0;
 
-
 	/* Hack -- attack monsters --- except hidden ones */
 	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)))
 	{
@@ -2414,6 +2413,14 @@ void move_player(int dir, int jumping)
 	&& (!(f_ptr->flags3 & (FF3_EASY_CLIMB))
 	|| !(play_info[y][x] & (PLAY_MARK))))
 	{
+		if ((verify_safe) && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
+		{
+			disturb(1,0);
+			msg_print("This doesn't feel safe.");
+
+			if (!get_check("Are you sure?")) return;
+		}
+
 		/* Disturb the player */
 		disturb(0, 0);
 
@@ -2466,6 +2473,14 @@ void move_player(int dir, int jumping)
 	/* Partial movement */
 	else if ((climb) && (dir !=p_ptr->climbing))
 	{
+		if ((verify_safe) && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
+		{
+			disturb(1,0);
+			msg_print("This doesn't feel safe.");		
+
+			if (!get_check("Are you sure?")) return;
+		}
+
 		/* Get the mimiced feature */
 		mimic = f_ptr->mimic;
 
@@ -2491,6 +2506,14 @@ void move_player(int dir, int jumping)
 	/* Normal movement */
 	else
 	{
+		if ((verify_safe) && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
+		{
+			disturb(1,0);
+			msg_print("This doesn't feel safe.");		
+
+			if (!get_check("Are you sure?")) return;
+		}
+
 		/* Sound XXX XXX XXX */
 		/* sound(MSG_WALK); */
 

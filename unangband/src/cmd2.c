@@ -32,6 +32,17 @@ bool do_cmd_test(int y, int x, int action)
 	feature_type *f_ptr;
 	int feat;
 
+	if ((verify_safe) && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
+	{
+		disturb(1,0);
+		msg_print("This doesn't feel safe.");
+
+		if (!get_check("Are you sure?")) return (FALSE);
+
+		/* Hack -- mark the target safe */
+		play_info[y][x] |= (PLAY_SAFE);
+	}
+
 	/* Must have knowledge */
 	if (!(play_info[y][x] & (PLAY_MARK)))
 	{
@@ -91,7 +102,7 @@ bool do_cmd_test(int y, int x, int action)
 	else if (action < FS_FLAGS_END)
 	{       
 		flag = bitzero << (action - FS_FLAGS3);
-		if (!(f_ptr->flags2 & flag))
+		if (!(f_ptr->flags3 & flag))
 		{
 		 msg_format("You see nothing %s%s.",here,act);
 		 return (FALSE);
@@ -952,11 +963,6 @@ static bool do_cmd_open_aux(int y, int x)
 	int i, j;
 
 	bool more = FALSE;
-
-
-	/* Verify legality */
-	if (!do_cmd_test(y, x,FS_OPEN)) return (FALSE);
-
 
 	/* Verify legality */
 	if (!do_cmd_test(y, x, FS_OPEN)) return (FALSE);

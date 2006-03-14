@@ -1010,7 +1010,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		}
 
 		/* Hack -- Safe cave grid -- now use 'invisible trap' */
-		else if (view_safe_grids && !(pinfo & (PLAY_SAFE)))
+		else if ((view_unsafe_grids || view_detect_grids) && !(pinfo & (PLAY_SAFE)))
 		{
 			/* Get the darkness feature */
 			f_ptr = &f_info[FEAT_INVIS];
@@ -1103,7 +1103,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		}
 
 		/* Hack -- Safe cave grid -- now use 'invisible trap' */
-		else if (view_safe_grids && !(pinfo & (PLAY_SAFE)))
+		else if ((view_unsafe_grids || view_detect_grids) && !(pinfo & (PLAY_SAFE)))
 		{
 			/* Get the darkness feature */
 			f_ptr = &f_info[FEAT_INVIS];
@@ -1788,7 +1788,7 @@ void note_spot(int y, int x)
 	if (!(pinfo & (PLAY_SEEN))) return;
 
 	/* Mark it */
-	play_info[y][x] |= (PLAY_SAFE);
+	if (!verify_safe) play_info[y][x] |= (PLAY_SAFE);
 
 	/* Hack -- memorize objects */
 	/* ANDY -- Only memorise objects if they are not hidden by the feature */

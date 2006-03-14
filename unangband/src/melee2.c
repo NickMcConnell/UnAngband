@@ -3085,13 +3085,13 @@ void monster_speech(int m_idx, cptr saying, bool understand)
 	if (language == LANG_COMMON) understand = TRUE;
 	else if ((language == LANG_ELF) && (p_ptr->cur_flags4 & (TR4_ELF))) understand = TRUE;
 	else if ((language == LANG_DWARF) && (p_ptr->cur_flags4 & (TR4_DWARF))) understand = TRUE;
-	else if ((language == LANG_ORC) && (p_ptr->cur_flags4 & (TR4_ORC))) understand = TRUE;
-	else if ((language == LANG_TROLL) && (p_ptr->cur_flags4 & (TR4_TROLL))) understand = TRUE;
-	else if ((language == LANG_GIANT) && (p_ptr->cur_flags4 & (TR4_GIANT))) understand = TRUE;
-	else if ((language == LANG_DRAGON) && (p_ptr->cur_flags4 & (TR4_DRAGON))) understand = TRUE;
-	else if ((language == LANG_DEMON) && (p_ptr->cur_flags4 & (TR4_DEMON))) understand = TRUE;
-	else if ((language == LANG_UNDEAD) && (p_ptr->cur_flags4 & (TR4_UNDEAD))) understand = TRUE;
-	else if ((language >= LANG_NATURAL) && (p_ptr->cur_flags4 & (TR4_ANIMAL))) understand = TRUE;
+	else if ((language == LANG_ORC) && ((p_ptr->cur_flags4 & (TR4_ORC)) || (p_ptr->cur_flags3 & (TR3_ESP_ORC)))) understand = TRUE;
+	else if ((language == LANG_TROLL) && ((p_ptr->cur_flags4 & (TR4_TROLL)) || (p_ptr->cur_flags3 & (TR3_ESP_TROLL)))) understand = TRUE;
+	else if ((language == LANG_GIANT) && ((p_ptr->cur_flags4 & (TR4_GIANT)) || (p_ptr->cur_flags3 & (TR3_ESP_GIANT)))) understand = TRUE;
+	else if ((language == LANG_DRAGON) && ((p_ptr->cur_flags4 & (TR4_DRAGON)) || (p_ptr->cur_flags3 & (TR3_ESP_DRAGON)))) understand = TRUE;
+	else if ((language == LANG_DEMON) && ((p_ptr->cur_flags4 & (TR4_DEMON)) || (p_ptr->cur_flags3 & (TR3_ESP_DEMON)))) understand = TRUE;
+	else if ((language == LANG_UNDEAD) && ((p_ptr->cur_flags4 & (TR4_UNDEAD)) || (p_ptr->cur_flags3 & (TR3_ESP_UNDEAD)))) understand = TRUE;
+	else if ((language >= LANG_NATURAL) && ((p_ptr->cur_flags4 & (TR4_ANIMAL)) || (p_ptr->cur_flags3 & (TR3_ESP_NATURE)))) understand = TRUE;
 
 	/* Get accent */
 	if (!speech)

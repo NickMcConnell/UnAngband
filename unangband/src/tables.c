@@ -1405,7 +1405,7 @@ const cptr option_text[OPT_MAX] =
 	"disturb_minor",			/* OPT_disturb_minor */
 	"view_flavors",				/* OPT_view_flavors */
 	"disturb_new",				/* OPT_disturb_new */
-	"",			/* OPT_alert_failure */
+	"verify_safe",				/* OPT_verify_safe */
 	"verify_destroy",			/* OPT_verify_destroy */
 	"verify_special",			/* OPT_verify_special */
 	"allow_quantity",			/* OPT_allow_quantity */
@@ -1420,8 +1420,8 @@ const cptr option_text[OPT_MAX] =
 	"view_torch_grids",			/* OPT_view_torch_grids */
 	"dungeon_align",			/* OPT_dungeon_align */
 	"dungeon_stair",			/* OPT_dungeon_stair */
-	NULL,					/* xxx flow_by_sound */
-	NULL,					/* xxx flow_by_smell */
+	"view_unsafe_grids",			/* OPT_view_unsafe_grids */
+	"view_detect_grids",			/* OPT_view_detect_grids */
 	NULL,					/* xxx track_follow */
 	NULL,					/* xxx track_target */
 	NULL,					/* xxx smart_learn */
@@ -1454,7 +1454,7 @@ const cptr option_text[OPT_MAX] =
 	"smart_packs",				/* OPT_smart_packs */
 	"stack_force_pvals",						/* xxx */
 	"stack_force_times",						/* xxx */
-	"view_unsafe_grids",						/* xxx */
+	NULL,						/* xxx */
 	"room_descriptions",						/* xxx */
 	"room_names",						/* xxx */
 	"verify_mana",						/* xxx */
@@ -1668,8 +1668,8 @@ const cptr option_desc[OPT_MAX] =
 	"Disturb whenever player state changes",	/* OPT_disturb_state */
 	"Disturb whenever boring things happen",	/* OPT_disturb_minor */
 	"Show flavors in object graphics",	/* OPT_view_flavors */
-	"Disturb whenever a new monster race seen",	/* OPT_alert_hitpoint */
-	"",			/* OPT_alert_failure */
+	"Disturb whenever a new monster race seen",	/* OPT_disturb_new */
+	"Verify whenever you leave a safe grid",		/* OPT_verify_safe */
 	"Verify destruction of objects",			/* OPT_verify_destroy */
 	"Verify use of special commands",			/* OPT_verify_special */
 	"Allow quantity specification",				/* OPT_allow_quantity */
@@ -1684,8 +1684,8 @@ const cptr option_desc[OPT_MAX] =
 	"Map remembers all torch-lit grids",		/* OPT_view_torch_grids */
 	"Generate dungeons with aligned rooms",		/* OPT_dungeon_align */
 	"Generate dungeons with connected stairs",	/* OPT_dungeon_stair */
-	NULL,								/* xxx */
-	NULL,								/* xxx */
+	"Mark where you have detected traps",		/* OPT_view_unsafe_grids */
+	"Mark where you have detected monsters",	/* OPT_view_unsafe_grids */
 	NULL,								/* xxx */
 	NULL,								/* xxx */
 	NULL,								/* xxx */
@@ -1716,11 +1716,11 @@ const cptr option_desc[OPT_MAX] =
 	"Automatically clear '-more-' prompts",		/* OPT_auto_more */
 	"Monsters behave more intelligently",		/* OPT_smart_monsters */
 	NULL,								/* xxx */
-	"Merge pvals when stacking",				/* xxx */
-	"Merge timeouts when stacking",			/* xxx */
-	"Map marked by detect traps",				/* xxx */
-	"Display room descriptions",				/* xxx */
-	"Display room names",					/* xxx */
+	"Merge pvals when stacking",				/* OPT_stack_force_pvals */
+	"Merge timeouts when stacking",			/* OPT_stack_force_timeouts */
+	NULL,							/* xxx */
+	"Display room descriptions",				/* OPT_room_descriptions */
+	"Display room names",					/* OPT_room_names */
 	"Verify critical mana",					/* xxx */
 	"Reseed random artifacts on death",			/* xxx */
 	"Automatically inscribe all objects",			/* xxx */
@@ -1739,37 +1739,37 @@ const cptr option_desc[OPT_MAX] =
 	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
-	"Magic mushroom patch",								/* xxx */
-	"Monsters hit traps",								/* xxx */
-	"Generate themed rooms",							/* xxx */
-	"Stat gain with each new level",						/* xxx */
-	"Kills don't waste blows",							/* xxx */
-	"Scale down melee damage",							/* xxx */
-	"Scale down monster hit points",						/* xxx */
-	"Object pval stacking (wands/staffs)",					  /* xxx */
-	"Monsters summon out of sight",							/* xxx */
-	"Monsters teleport out of sight",						/* xxx */
-	"Monsters heal out of sight",							/* xxx */
-	"Monsters aggravate out of sight",						/* xxx */
-	"Spells can destroy features",							/* xxx */
-	"Generate lakes and rivers",							/* xxx */
-	"Generate big lakes and rivers",						/* xxx */
-	"Generate trapped doors",							/* xxx */
-	"Object memory",								/* xxx */
-	"Object types guessed",								/* xxx */
-	"Object usage count",								/* xxx */
-	"Object sensing improved",							/* xxx */
-	"Monsters use ranged attacks",							/* xxx */
-	"Object timeout stacking (rods)",					       /* xxx */
-	"Wield multiple rings",								/* xxx */
-	"Use objects faster from floor",									   /* xxx */
-	"Use objects faster when wielded",
-	"Add belt slot to equipment",									   /* xxx */
-	"Move faster but get tired",									   /* xxx */
-	"Limit power of summoning",									   /* xxx */
-	"Generate friendly uniques",									   /* xxx */
-	"Allow more than 256 kind of spells",									   /* xxx */
-	"Monsters drop corpses",									   /* xxx */
+	NULL,								/* xxx */
+	NULL,								/* xxx */
+	NULL,							/* xxx */
+	NULL,						/* xxx */
+	NULL,							/* xxx */
+	NULL,							/* xxx */
+	NULL,						/* xxx */
+	NULL,					  /* xxx */
+	NULL,							/* xxx */
+	NULL,						/* xxx */
+	NULL,							/* xxx */
+	NULL,						/* xxx */
+	NULL,							/* xxx */
+	NULL,							/* xxx */
+	NULL,						/* xxx */
+	NULL,							/* xxx */
+	NULL,								/* xxx */
+	NULL,								/* xxx */
+	NULL,								/* xxx */
+	NULL,							/* xxx */
+	NULL,							/* xxx */
+	NULL,					       /* xxx */
+	NULL,								/* xxx */
+	NULL,									   /* xxx */
+	NULL,
+	NULL,									   /* xxx */
+	NULL,									   /* xxx */
+	NULL,									   /* xxx */
+	NULL,									   /* xxx */
+	NULL,									   /* xxx */
+	NULL,									   /* xxx */
 	"Birth: Allow purchase of stats using points",	/* OPT_birth_point_based */
 	"Birth: Allow specification of minimal stats",	/* OPT_birth_auto_roller */
 	"Birth: Maximize effect of race/class bonuses",	/* OPT_birth_maximize */
@@ -1933,7 +1933,7 @@ const bool option_norm[OPT_MAX] =
 	TRUE,		/* OPT_disturb_minor */
 	TRUE,		/* OPT_view_flavors */
 	TRUE,		/* OPT_disturb_new */
-	FALSE,		/* xxx */
+	FALSE,		/* OPT_verify_safe */
 	TRUE,		/* OPT_verify_destroy */
 	TRUE,		/* OPT_verify_special */
 	TRUE,		/* OPT_allow_quantity */
@@ -1948,8 +1948,8 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* OPT_view_torch_grids */
 	TRUE,		/* OPT_dungeon_align */
 	TRUE,		/* OPT_dungeon_stair */
-	FALSE,		/* xxx flow_by_sound */
-	FALSE,		/* xxx flow_by_smell */
+	TRUE,		/* OPT_view_unsafe_grids */
+	TRUE,		/* OPT_view_detect_grids */
 	FALSE,		/* xxx track_follow */
 	FALSE,		/* xxx track_target */
 	FALSE,		/* xxx smart_learn */
@@ -1982,8 +1982,8 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* OPT_smart_packs */
 	FALSE,	  /* OPT_stack_force_pvals */
 	FALSE,	  /* OPT_stack_force_times */
-	TRUE,	   /* OPT_stack_view_safe_grids */
-	TRUE,	   /* OPT_room_descriptions */
+	FALSE,	   /* xxx */
+	FALSE,	   /* OPT_room_descriptions */
 	TRUE,	   /* OPT_room_names */
 	FALSE,	  /* OPT_verify_mana */
 	TRUE,		/* OPT_reseed_artifacts */
@@ -2213,7 +2213,7 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_allow_quantity,
 		OPT_auto_more,
 		OPT_verify_mana,
-		255,
+		OPT_verify_safe,
 		255,
 		255,
 		255,
@@ -2229,13 +2229,13 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_expand_list,
 		OPT_view_perma_grids,
 		OPT_view_torch_grids,
+		OPT_view_detect_grids,
 		OPT_dungeon_align,
 		OPT_dungeon_stair,
 		OPT_smart_monsters,
-		OPT_view_safe_grids,
+		OPT_view_unsafe_grids,
+		OPT_view_detect_grids,
 		OPT_reseed_artifacts,
-		255,
-		255,
 		255,
 		255,
 		255,
