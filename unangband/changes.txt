@@ -119,6 +119,11 @@ The power of the trap depends on the digging ability of the player.
 - Monsters speak to each other about the player resistances, and whether they have
 been attacked by the player. This is particularly noticeable in town.
 
+- Level feelings will always be display when leaving a town.
+
+- Implemented circular detection. The same area should be detected approximately
+as for players using the 'standard' screen size.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.
@@ -182,11 +187,11 @@ With the option on, these items still honour the =g flag.
 Switched on by default.
 
 - Shop entrances made to be outside locations, so new players don't get confused by
-change in graphics when leaving a shop (Commented on by Hilke Reiter).
+change in graphics when leaving a shop (Suggested by Hilke Reiter).
 
 - Improved targetting code so it displays the line of fire, when selecting a target.
 
-- Removed display of attributes an item is known not to have (Commented on by Joshua
+- Removed display of attributes an item is known not to have (Suggested on by Joshua
 Rodman).
 
 - Added self-knowledge command in the knowledge menu that acts like self-knowledge potion
@@ -195,6 +200,11 @@ but only for attributes you know you have.
 - Added monster list from NPPAngband (Suggested by Joshua Rodman).
 
 - Added disturb_near option.
+
+- Only display room names by default, not full descriptions (Suggested by Joshua Rodman).
+
+- Added options to verify whenever moving from a 'safe' to an 'unsafe' grid, and to mark
+grids as safe when detect monster spell (of any time) has been cast.
 
 ### Bug fixes ###
 
@@ -258,6 +268,10 @@ depending on matching monster names.
 - Significantly improved the monster metrics used for computing relative
 monster power, for determining artifact and object slays. Some of this
 from NPPAngband.
+
+- Added an FAQ to the game for questions that have been asked on
+rec.games.roguelike.angband. As most questions were only asked once, I'm
+considering calling it the uniquely asked questions instead.
 
 Unangband 0.5.5: "New Years Resolution"
 

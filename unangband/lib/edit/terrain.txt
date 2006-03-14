@@ -5496,107 +5496,107 @@ F:POWER_12
 
 N:372:broken altar
 U:56
-G:0:D
+G:0:B
 W:20:1:20:0
-K:DEFAULT:1
 O:386
-F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE | HURT_FIRE | HURT_ACID |
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
 F:USE_FEAT | POWER_2 | ALLOC
 
 # wooden altar - equivalent to Prayer Book of the Way of God
 
 N:373:wooden altar
 U:56
-G:0:U
+G:0:B
 W:30:1:20:0
-K:DEFAULT:1
+K:DEFAULT:372
 K:BASH:372
 O:384
-F:CAN_CLIMB | MOVE | REMEMBER | NOTICE | BASH | HURT_FIRE | HURT_ACID |
+F:CAN_CLIMB | MOVE | REMEMBER | NOTICE | BASH |
 F:USE_FEAT | POWER_2 | ALLOC | USE_FEAT
 
 # stone altar - equivalent to Prayer Book of Abjurations
 
 N:374:stone altar
 U:56
-G:0:w
+G:0:B
 W:17:1:20:0
-K:DEFAULT:1
+K:DEFAULT:372
 K:HURT_FIRE:378
 O:537
-F:CAN_CLIMB | MOVE | REMEMBER | NOTICE | HURT_ROCK | HURT_FIRE |
+F:CAN_CLIMB | MOVE | REMEMBER | NOTICE | HURT_FIRE |
 F:USE_FEAT | POWER_3 | ALLOC
 
 #  blood-stained altar - equivalent to Prayer Book of Accursed Ways
 
 N:375:blood-stained altar
 U:56
-G:0:r
+G:0:B
 W:40:1:20:0
-K:DEFAULT:1
+K:DEFAULT:372
 K:HURT_WATER:374
 K:HURT_FIRE:378
 O:539
-F:CAN_CLIMB | MOVE | REMEMBER | NOTICE | HURT_ROCK | HURT_FIRE |
+F:CAN_CLIMB | MOVE | REMEMBER | NOTICE | HURT_WATER | HURT_FIRE |
 F:HURT_WATER | ALLOC
 F:USE_FEAT | POWER_5
 
 #  dusty altar - equivalent to Prayer Book of Most Holy Relics
 
 N:376:dusty altar
-G:0:W
+G:0:B
 U:56
 W:40:2:20:0
-K:DEFAULT:1
 K:HURT_WATER:374
 K:HURT_FIRE:378
+K:DEFAULT:372
 O:387
-F:CAN_CLIMB | MOVE | REMEMBER | NOTICE | HURT_ROCK | HURT_FIRE |
+F:CAN_CLIMB | MOVE | REMEMBER | NOTICE | HURT_WATER | HURT_FIRE |
 F:HURT_WATER | ALLOC | USE_FEAT |
 F:USE_FEAT | POWER_5
 
 #  corroded altar - equivalent to Prayer Book of Holy Wrath
 
 N:377:corroded altar
-G:0:g
+G:0:B
 U:56
 W:50:4:20:0
-K:DEFAULT:1
 O:388
+K:DEFAULT:372
 F:CAN_CLIMB | MOVE | REMEMBER | NOTICE | ALLOC |
 F:USE_FEAT | POWER_4
 
 #  ashen altar - equivalent to Prayer Book of Retribution
 
 N:378:ashen altar
-G:0:D
+G:0:B
 U:56
 W:35:2:20:0
-K:DEFAULT:1
+K:DEFAULT:372
 K:HURT_WATER:374
 O:541
-F:CAN_CLIMB | MOVE | REMEMBER | NOTICE | HURT_ROCK | HURT_WATER | ALLOC
+F:CAN_CLIMB | MOVE | REMEMBER | NOTICE | HURT_WATER | ALLOC
 F:USE_FEAT | POWER_4
 
 #  golden altar - equivalent to Prayer Book of Miracles
 
 N:379:golden altar
-G:0:y
+G:0:B
 U:56
 W:22:1:20:0
-K:DEFAULT:1
 O:538
+K:DEFAULT:372
 F:CAN_CLIMB | MOVE | REMEMBER | NOTICE | ALLOC |
 F:USE_FEAT | POWER_4
 
 #  iron altar - equivalent to Prayer Book of Battle Hymns
 
 N:380:iron altar
-G:0:s
+G:0:B
 U:56
 W:45:2:20:0
-K:DEFAULT:1
+K:DEFAULT:372
 K:HURT_ACID:377
+K:HURT_WATER:377
 O:542
 F:CAN_CLIMB | MOVE | REMEMBER | NOTICE | HURT_ACID | ALLOC |
 F:USE_FEAT | POWER_5
@@ -5604,22 +5604,23 @@ F:USE_FEAT | POWER_5
 #  bone altar - equivalent to Prayer Book of the Dead
 
 N:381:bone altar
-G:0:w
+G:0:B
 U:56
 W:22:1:20:0
-K:DEFAULT:1
+K:DEFAULT:372
 K:BASH:372
+K:HURT_WATER:372
 O:540
-F:CAN_CLIMB | MOVE | REMEMBER | NOTICE | BASH | HURT_ACID | ALLOC |
+F:CAN_CLIMB | MOVE | REMEMBER | NOTICE | BASH | HURT_WATER | ALLOC |
 F:USE_FEAT | POWER_3
 
 #  glass altar - equivalent to Prayer Book of Divine Insights
 
 N:382:glass altar
-G:0:G
+G:0:B
 U:56
 W:25:1:20:0
-K:DEFAULT:1
+K:DEFAULT:372
 K:BASH:372
 O:385
 F:CAN_CLIMB | LOS | MOVE | REMEMBER | NOTICE | BASH | ALLOC |
@@ -5647,7 +5648,7 @@ F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE | HURT_ROCK | HURT_WATER 
 # clear fountain - equivalent to potion of water
 
 N:385:clear fountain
-G:0:B
+G:0:b
 U:56
 W:1:1:20:0
 K:DEFAULT:1
@@ -5662,7 +5663,7 @@ F:POWER_5
 
 N:386:cloudy fountain
 U:56
-G:0:B
+G:0:b
 W:10:3:20:0
 K:DEFAULT:1
 K:BASH:383
@@ -5676,7 +5677,7 @@ F:POWER_5
 
 N:387:bubbling fountain
 U:56
-G:0:B
+G:0:b
 W:10:3:20:0
 K:DEFAULT:1
 K:BASH:383
@@ -5691,7 +5692,7 @@ F:POWER_5
 
 N:388:misty fountain
 U:56
-G:0:B
+G:0:b
 W:30:3:20:0
 K:DEFAULT:1
 K:BASH:383
@@ -5705,7 +5706,7 @@ F:POWER_5
 
 N:389:smoky fountain
 U:56
-G:0:B
+G:0:b
 W:20:3:20:0
 K:DEFAULT:1
 K:BASH:383
@@ -5728,7 +5729,7 @@ F:CAN_CLIMB | CAN_FLY | HURT_WATER
 
 N:391:stone well
 U:56
-G:0:b
+G:0:w
 W:0:1:20:0
 K:DEFAULT:1
 K:USE_FEAT:391
@@ -7281,7 +7282,7 @@ F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW | OUTSIDE
 F:POWER_23
 
 N:510:Mirror of Galadriel
-G:0:B
+G:0:G
 W:80:1:20:0
 F:ENTER | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW | OUTSIDE
 F:POWER_24
@@ -8886,3 +8887,600 @@ D:The water covers deep mud.
 F:WATER | DEEP | LAKE | HIDE_DIG | DROP | GET_FEAT | MUST_CLIMB
 F:BRIDGE | LOS | MOVE | PROJECT | REMEMBER | OUTSIDE | SECRET
 F:CAN_FLY | HIDE_ITEM | CAN_DIG | HURT_COLD | HURT_WATER
+
+# Magic circles are for mage books
+
+# of Resistances
+
+N:637:magic circle
+U:56
+G:0:R
+W:30:1:20:0
+O:379
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Escapes
+
+N:638:magic triangle
+U:56
+G:0:R
+W:40:1:20:0
+O:380
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Power
+
+N:639:magic square
+U:56
+G:0:R
+W:50:1:20:0
+O:381
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Transformations
+
+N:640:magic pentagram
+U:56
+G:0:R
+W:70:2:20:0
+O:382
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Destruction
+
+N:641:magic hexagram
+U:56
+G:0:R
+W:60:2:20:0
+O:383
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Glamours
+
+N:642:magic circle
+U:56
+G:0:R
+W:23:1:20:0
+O:520
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Life Magic
+
+N:643:magic circle
+U:56
+G:0:R
+W:26:1:20:0
+O:521
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Rune Magic
+
+N:644:magic triangle
+U:56
+G:0:R
+W:30:1:20:0
+O:522
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Celestial Magic
+
+N:645:magic triangle
+U:56
+G:0:R
+W:33:1:20:0
+O:523
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Earth Magic
+
+N:646:magic triangle
+U:56
+G:0:R
+W:36:1:20:0
+O:524
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Air Magic
+
+N:647:magic square
+U:56
+G:0:R
+W:40:1:20:0
+O:525
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Water Magic
+
+N:648:magic square
+U:56
+G:0:R
+W:43:1:20:0
+O:526
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Fire Magic
+
+N:649:magic square
+U:56
+G:0:R
+W:56:1:20:0
+O:527
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Frost Magic
+
+N:650:magic pentagram
+U:56
+G:0:R
+W:60:1:20:0
+O:528
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Acid Magic
+
+N:651:magic pentagram
+U:56
+G:0:R
+W:63:1:20:0
+O:529
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Storm Magic
+
+N:652:magic pentagram
+U:56
+G:0:R
+W:66:1:20:0
+O:530
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Alchemy
+
+N:653:magic hexagram
+U:56
+G:0:R
+W:70:1:20:0
+O:531
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Necromancy
+
+N:654:magic hexagram
+U:56
+G:0:R
+W:70:2:20:0
+O:532
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Artifice
+
+N:655:magic hexagram
+U:56
+G:0:R
+W:73:2:20:0
+O:533
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Lore
+
+N:656:magic hexagram
+U:56
+G:0:R
+W:76:2:20:0
+O:534
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Animal Magic
+
+N:657:magic circle
+U:56
+G:0:R
+W:33:2:20:0
+O:535
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# of Illusions
+
+N:658:magic circle
+U:56
+G:0:R
+W:36:2:20:0
+O:536
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+
+# Musical furnishings are for bardic magic. These can
+# be more easily destroyed.
+
+# of Progressions
+
+N:659:harpsichord
+U:56
+G:0:y
+W:26:2:20:0
+K:DEFAULT:1
+O:546
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC | KILL_HUGE
+
+# of Soothing
+
+N:660:grand harp
+U:56
+G:0:y
+W:30:2:20:0
+K:DEFAULT:1
+O:547
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC | KILL_HUGE
+
+# of Drills
+
+N:661:iron bell
+U:56
+G:0:y
+W:33:2:20:0
+K:DEFAULT:1
+O:548
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC | KILL_HUGE
+
+# of Snake Charming
+
+N:662:snake basket
+U:56
+G:0:y
+W:36:2:20:0
+K:DEFAULT:1
+O:549
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC | KILL_HUGE
+
+# of Shanties
+
+N:663:great horn
+U:56
+G:0:y
+W:40:2:20:0
+K:DEFAULT:1
+O:550
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC | KILL_HUGE
+
+# of Dirges
+
+N:664:pipe organ
+U:56
+G:0:y
+W:43:2:20:0
+K:DEFAULT:1
+O:551
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC | KILL_HUGE
+
+# of Pandemonium
+
+N:665:giant war drum
+U:56
+G:0:y
+W:46:2:20:0
+K:DEFAULT:1
+O:552
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC | KILL_HUGE
+
+# of Discordance
+
+N:666:brass gong
+U:56
+G:0:y
+W:50:2:20:0
+K:DEFAULT:1
+O:549
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC | KILL_HUGE
+
+# of Symphonies
+
+N:667:grand piano
+U:56
+G:0:y
+W:60:2:20:0
+O:549
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC | KILL_HUGE
+
+# Shrines are for rune magic. Described to allow decision
+# as to whether to apply the rune or not.
+
+N:668:shrine
+U:56
+G:0:g
+W:10:2:20:0
+O:600
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to acid.
+
+N:669:shrine
+U:56
+G:0:g
+W:50:2:20:0
+O:601
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to arrows.
+
+N:670:shrine
+U:56
+G:0:g
+W:5:2:20:0
+O:602
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to blood.
+
+N:671:shrine
+U:56
+G:0:g
+W:30:3:20:0
+O:603
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to clouds.
+
+N:672:shrine
+U:56
+G:0:g
+W:15:2:20:0
+O:604
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to the cross.
+
+N:673:shrine
+U:56
+G:0:g
+W:15:2:20:0
+O:605
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to demons.
+
+N:674:shrine
+U:56
+G:0:g
+W:5:2:20:0
+O:606
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to doors.
+
+N:675:shrine
+U:56
+G:0:g
+W:40:3:20:0
+O:607
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to dragons.
+
+N:676:shrine
+U:56
+G:0:g
+W:20:3:20:0
+O:608
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to dwarves.
+
+N:677:shrine
+U:56
+G:0:g
+W:25:3:20:0
+O:609
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to elves.
+
+N:678:shrine
+U:56
+G:0:g
+W:15:2:20:0
+O:610
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to explosives.
+
+N:679:shrine
+U:56
+G:0:g
+W:15:2:20:0
+O:611
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to the eye.
+
+N:680:shrine
+U:56
+G:0:g
+W:5:2:20:0
+O:612
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to flame.
+
+N:681:shrine
+U:56
+G:0:g
+W:5:2:20:0
+O:613
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to frost.
+
+N:682:shrine
+U:56
+G:0:g
+W:5:2:20:0
+O:614
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to summoning.
+
+N:683:shrine
+U:56
+G:0:g
+W:15:2:20:0
+O:615
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to the hand.
+
+N:684:shrine
+U:56
+G:0:g
+W:40:4:20:0
+O:616
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to magic.
+
+N:685:shrine
+U:56
+G:0:g
+W:40:3:20:0
+O:617
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to the moon.
+
+N:686:shrine
+U:56
+G:0:g
+W:15:2:20:0
+O:618
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to the mouth.
+
+N:687:shrine
+U:56
+G:0:g
+W:30:3:20:0
+O:619
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to shields.
+
+N:688:shrine
+U:56
+G:0:g
+W:5:2:20:0
+O:620
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to the stars.
+
+N:689:shrine
+U:56
+G:0:g
+W:5:2:20:0
+O:621
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to storms.
+
+N:690:shrine
+U:56
+G:0:g
+W:25:3:20:0
+O:622
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to swords.
+
+N:691:shrine
+U:56
+G:0:g
+W:20:3:20:0
+O:623
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to trees.
+
+N:692:shrine
+U:56
+G:0:g
+W:5:2:20:0
+O:624
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to the earth.
+
+N:693:shrine
+U:56
+G:0:g
+W:5:2:20:0
+O:627
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to waves.
+
+N:694:shrine
+U:56
+G:0:g
+W:5:2:20:0
+O:628
+K:DEFAULT:1
+F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE |
+F:USE_FEAT | POWER_2 | ALLOC
+D:A shrine dedicated to the wheel.
