@@ -5436,7 +5436,7 @@ void generate_cave(void)
 		if (good_item_flag && !adult_preserve) feeling = 1;
 
 		/* It takes 1000 game turns for "feelings" to recharge */
-		if ((turn - old_turn) < 1000) feeling = 0;
+		if ((old_turn) && ((turn - old_turn) < 1000)) feeling = 0;
 
 		/* Hack -- no feeling in the town */
 		if (!zone->fill) feeling = 0;
@@ -5479,7 +5479,9 @@ void generate_cave(void)
 	/* The dungeon is ready */
 	character_dungeon = TRUE;
 
-	/* Remember when this level was "created" */
-	old_turn = turn;
+	/* Remember when this level was "created", except in town */
+	if (zone->fill) old_turn = turn;
 
+	/* Hack -- always get a feeling leaving town */
+	else old_turn = 0;
 }
