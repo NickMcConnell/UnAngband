@@ -3369,15 +3369,6 @@ void run_step(int dir)
 				return;
 			}
 			p_ptr->run_cur_dir = pf_result[pf_result_index--] - '0';
-			x = p_ptr->px + ddx[p_ptr->run_cur_dir];
-			y = p_ptr->py + ddy[p_ptr->run_cur_dir];
-
-			if (!(f_info[cave_feat[y][x]].flags1 & (FF1_MOVE))
-				&& !(f_info[cave_feat[y][x]].flags3 & (FF3_EASY_CLIMB)))
-			{
-				disturb(0,0);
-				return;
-			}
 		}
 	}
 

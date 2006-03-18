@@ -2439,7 +2439,7 @@ errr term_init(term *t, int w, int h, int k)
 	t->key_size = k;
 
 	/* Allocate the input queue */
-	C_MAKE(t->key_queue, t->key_size, char);
+	C_MAKE(t->key_queue, t->key_size, key_event);
 
 
 	/* Save the size */
