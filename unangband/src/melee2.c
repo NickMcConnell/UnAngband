@@ -3162,6 +3162,9 @@ void monster_speech(int m_idx, cptr saying, bool understand)
 			}
 		}
 
+		/* Terminate the buffer */
+		*t = '\0';
+
 		msg_format("%^s %s '%s'", m_name, vocalize[speech], buf);
 	}
 }
