@@ -27,7 +27,7 @@ cptr copyright =
 	"and not for profit purposes provided that this copyright and statement\n"
 	"are included in all such copies.  Other copyrights may also apply.\n"
 	"\n"
-	"UnAngband (c) 2001-3 Andrew Doull. Modifications to the Angband 2.9.6\n"
+	"UnAngband (c) 2001-6 Andrew Doull. Modifications to the Angband 2.9.6\n"
 	"source code are released under the Gnu Public License. See www.fsf.org\n"
 	"for current GPL license details. Addition permission granted to\n"
 	"incorporate modifications in all Angband variants as defined in the\n"
@@ -1023,3 +1023,10 @@ s32b *slays = NULL;
  * Total monster power
  */
 long tot_mon_power;
+
+
+/* Path finding variables
+ *
+ */
+char pf_result[MAX_PF_LENGTH];
+int pf_result_index;

@@ -2585,6 +2585,54 @@ void do_cmd_run(void)
 
 
 /*
+ * Start running with pathfinder.
+ *
+ * Note that running while confused is not allowed.
+ */
+void do_cmd_pathfind(int y, int x)
+{
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int dir;
+
+	/* Hack XXX XXX XXX */
+	if (p_ptr->confused)
+	{
+		msg_print("You are too confused!");
+		return;
+	}
+
+	/* Hack -- handle stuck players */
+	if (stuck_player(&dir))
+	{
+		int mimic = f_info[cave_feat[py][px]].mimic;
+
+		/* Get the feature name */
+		cptr name = (f_name + f_info[mimic].name);
+
+		/* Use up energy */
+		p_ptr->energy_use = 100;
+
+		/* Tell the player */
+		msg_format("You are stuck %s%s.",
+			((f_info[mimic].flags2 & (FF2_FILLED)) ? "" :
+				(is_a_vowel(name[0]) ? "inside an " : "inside a ")),name);
+	}
+
+	if (findpath(y, x))
+	{
+		p_ptr->running = 1000;
+		/* Calculate torch radius */
+		p_ptr->update |= (PU_TORCH);
+		p_ptr->running_withpathfind = TRUE;
+		run_step(0);
+	}
+}
+
+
+
+/*
  * Stay still.  Search.  Enter stores.
  * Pick up treasure if "pickup" is true.
  */

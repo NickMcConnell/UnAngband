@@ -4642,3 +4642,15 @@ extern int PlayerUID;
  * Given an array, determine how many elements are in the array.
  */
 #define N_ELEMENTS(a) (sizeof(a) / sizeof((a)[0]))
+
+
+
+/*
+ * Maximum size around the player to consider in the pathfinder
+ */
+#define MAX_PF_RADIUS 50
+
+/*
+ * Maximum distance to consider in the pathfinder
+ */
+#define MAX_PF_LENGTH 250

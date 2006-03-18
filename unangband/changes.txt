@@ -206,6 +206,8 @@ but only for attributes you know you have.
 - Added options to verify whenever moving from a 'safe' to an 'unsafe' grid, and to mark
 grids as safe when detect monster spell (of any time) has been cast.
 
+- Added Christophe Cavalaria's mouse support patch.
+
 ### Bug fixes ###
 
 - Priest spell righteous fury was for mages, paladins, shamans and bards but

@@ -2215,6 +2215,18 @@ static void process_command(void)
 			break;
 		}
 
+		/* Mouse click */
+		case '\xff':
+		{
+			if (p_ptr->command_cmd_ex.mousebutton)
+			{
+				int x = p_ptr->command_cmd_ex.mousex + p_ptr->wx;
+				int y = p_ptr->command_cmd_ex.mousey + p_ptr->wy;
+				do_cmd_pathfind(y,x);
+			}
+			break;
+		}
+
 		/* Hack -- Unknown command */
 		default:
 		{

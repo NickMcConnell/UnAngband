@@ -3555,7 +3555,7 @@ static void show_info(void)
 		item_tester_full = TRUE;
 		show_equip();
 		prt("You are using: -more-", 0, 0);
-		if (inkey() == ESCAPE) return;
+		if (inkey_ex().key == ESCAPE) return;
 	}
 
 	/* Inventory -- if any */
@@ -3565,7 +3565,7 @@ static void show_info(void)
 		item_tester_full = TRUE;
 		show_inven();
 		prt("You are carrying: -more-", 0, 0);
-		if (inkey() == ESCAPE) return;
+		if (inkey_ex().key == ESCAPE) return;
 	}
 
 
@@ -3608,7 +3608,7 @@ static void show_info(void)
 			prt(format("Your home contains (page %d): -more-", k+1), 0, 0);
 
 			/* Wait for it */
-			if (inkey() == ESCAPE) return;
+			if (inkey_ex().key == ESCAPE) return;
 		}
 	}
 }

@@ -3346,14 +3346,38 @@ void run_step(int dir)
 	/* Continue run */
 	else
 	{
-		/* Update run */
-		if (run_test())
+		if (!p_ptr->running_withpathfind)
 		{
-			/* Disturb */
-			disturb(0, 0);
+			/* Update run */
+			if (run_test())
+			{
+				/* Disturb */
+				disturb(0, 0);
+	
+				/* Done */
+				return;
+			}
+		}
+		else
+		{
+			int y, x;
 
-			/* Done */
-			return;
+			if (pf_result_index < 0)
+			{
+				disturb(0, 0);
+				p_ptr->running_withpathfind = 0;
+				return;
+			}
+			p_ptr->run_cur_dir = pf_result[pf_result_index--] - '0';
+			x = p_ptr->px + ddx[p_ptr->run_cur_dir];
+			y = p_ptr->py + ddy[p_ptr->run_cur_dir];
+
+			if (!(f_info[cave_feat[y][x]].flags1 & (FF1_MOVE))
+				&& !(f_info[cave_feat[y][x]].flags3 & (FF3_EASY_CLIMB)))
+			{
+				disturb(0,0);
+				return;
+			}
 		}
 	}
 

@@ -312,6 +312,8 @@ extern bool use_transparency;
 extern s32b magic_slay_power[32];
 extern long tot_mon_power;
 extern s32b *slays;
+extern char pf_result[MAX_PF_LENGTH];
+extern int pf_result_index;
 
 /*
  * Automatically generated "function declarations"
@@ -398,6 +400,7 @@ extern void do_cmd_alter(void);
 extern void do_cmd_set_trap_or_spike(void);
 extern void do_cmd_walk(void);
 extern void do_cmd_jump(void);
+extern void do_cmd_pathfind(int y, int x);
 extern void do_cmd_run(void);
 extern void do_cmd_hold(void);
 extern void do_cmd_stay(void);
@@ -817,6 +820,7 @@ extern errr macro_add(cptr pat, cptr act);
 extern errr macro_init(void);
 extern void flush(void);
 extern char inkey(void);
+extern key_event inkey_ex(void);
 extern void bell(cptr reason);
 extern void sound(int val);
 extern s16b quark_add(cptr str);
@@ -853,6 +857,7 @@ extern bool get_string(cptr prompt, char *buf, int len);
 extern s16b get_quantity(cptr prompt, int max);
 extern bool get_check(cptr prompt);
 extern bool get_com(cptr prompt, char *command);
+extern bool get_com_ex(cptr prompt, key_event *command);
 extern void pause_line(int row);
 extern void request_command(bool shopping);
 extern uint damroll(uint num, uint sides);
@@ -861,6 +866,7 @@ extern bool is_a_vowel(int ch);
 extern int color_char_to_attr(char c);
 extern int color_text_to_attr(cptr name);
 extern cptr attr_to_text(byte a);
+extern bool findpath(int y, int x);
 
 
 #ifdef SUPPORT_GAMMA
