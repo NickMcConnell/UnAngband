@@ -210,6 +210,8 @@ grids as safe when detect monster spell (of any time) has been cast.
 
 - Automatically generate a random name at player birth. This can be overwritten.
 
+- Allow any key press to load the last save file used at the start screen on Windows.
+
 ### Bug fixes ###
 
 - Priest spell righteous fury was for mages, paladins, shamans and bards but

@@ -487,12 +487,15 @@ static bool screensaver_active = FALSE;
 static HANDLE screensaverSemaphore;
 
 static char saverfilename[1024];
-
 static HMENU main_menu;
 
 #define MOUSE_SENS 10
 
 #endif /* USE_SAVER */
+
+
+static char arg_lastsavefile[1024];
+
 
 
 #ifdef USE_GRAPHICS
@@ -1048,6 +1051,15 @@ static void save_prefs(void)
 	strcpy(buf, arg_sound ? "1" : "0");
 	WritePrivateProfileString("Angband", "Sound", buf, ini_file);
 
+	/* Save the "arg_lastsavefile" flag */
+	if (strlen(savefile))
+	{
+		sprintf(buf, "%s", savefile);
+		WritePrivateProfileString("Angband", "LastSaveFile", buf, ini_file);
+	}
+
+	WritePrivateProfileString("Angband", "Sound", buf, ini_file);
+
 	/* Save window prefs */
 	for (i = 0; i < MAX_TERM_DATA; i++)
 	{
@@ -1121,6 +1133,9 @@ static void load_prefs(void)
 
 	/* Extract the "arg_sound" flag */
 	arg_sound = (GetPrivateProfileInt("Angband", "Sound", 0, ini_file) != 0);
+
+	/* Extract the "arg_savefile" flag */
+	GetPrivateProfileString("Angband", "LastSaveFile", NULL, arg_lastsavefile, sizeof(arg_lastsavefile), ini_file);
 
 	/* Extract the "arg_fiddle" flag */
 	arg_fiddle = (GetPrivateProfileInt("Angband", "Fiddle", 0, ini_file) != 0);
@@ -3617,6 +3632,10 @@ static void process_menus(WORD wCmd)
 				game_in_progress = TRUE;
 				Term_flush();
 				play_game(TRUE);
+
+				/* Hack -- set as last file name */
+				
+
 				quit(NULL);
 			}
 			break;
@@ -4386,36 +4405,50 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 			}
 #endif /* USE_SAVER */
 
-			/* Extract the modifiers */
-			if (GetKeyState(VK_CONTROL) & 0x8000) mc = TRUE;
-			if (GetKeyState(VK_SHIFT)   & 0x8000) ms = TRUE;
-			if (GetKeyState(VK_MENU)    & 0x8000) ma = TRUE;
-
-			/* Handle "special" keys */
-			if (special_key[(byte)(wParam)])
+			if (game_in_progress)
 			{
-				/* Begin the macro trigger */
-				Term_keypress(31);
+				/* Extract the modifiers */
+				if (GetKeyState(VK_CONTROL) & 0x8000) mc = TRUE;
+				if (GetKeyState(VK_SHIFT)   & 0x8000) ms = TRUE;
+				if (GetKeyState(VK_MENU)    & 0x8000) ma = TRUE;
 
-				/* Send the modifiers */
-				if (mc) Term_keypress('C');
-				if (ms) Term_keypress('S');
-				if (ma) Term_keypress('A');
+				/* Handle "special" keys */
+				if (special_key[(byte)(wParam)])
+				{
+					/* Begin the macro trigger */
+					Term_keypress(31);
 
-				/* Extract "scan code" */
-				i = LOBYTE(HIWORD(lParam));
+					/* Send the modifiers */
+					if (mc) Term_keypress('C');
+					if (ms) Term_keypress('S');
+					if (ma) Term_keypress('A');
 
-				/* Introduce the scan code */
-				Term_keypress('x');
+					/* Extract "scan code" */
+					i = LOBYTE(HIWORD(lParam));
 
-				/* Encode the hexidecimal scan code */
-				Term_keypress(hexsym[i/16]);
-				Term_keypress(hexsym[i%16]);
+					/* Introduce the scan code */
+					Term_keypress('x');
 
-				/* End the macro trigger */
-				Term_keypress(13);
+					/* Encode the hexidecimal scan code */
+					Term_keypress(hexsym[i/16]);
+					Term_keypress(hexsym[i%16]);
 
-				return 0;
+					/* End the macro trigger */
+					Term_keypress(13);
+
+					return 0;
+				}
+			}
+			else if (strlen(arg_lastsavefile))
+			{
+				strcpy(savefile,arg_lastsavefile);
+
+				/* Load 'savefile' */
+				validate_file(savefile);
+				game_in_progress = TRUE;
+				Term_flush();
+				play_game(FALSE);
+				quit(NULL);
 			}
 
 			break;
@@ -5205,8 +5238,6 @@ static void init_stuff(void)
 	strcpy(path + strlen(path) - 4, ".INI");
 
 #ifdef USE_SAVER
-
-	/* Try to get the path to the Angband folder */
 	if (screensaver)
 	{
 		/* Extract the filename of the savefile for the screensaver */
@@ -5216,8 +5247,7 @@ static void init_stuff(void)
 
 		sprintf(path, "%sangband.ini", tmp);
 	}
-
-#endif /* USE_SAVER */
+#endif
 
 	/* Save the the name of the ini-file */
 	ini_file = string_make(path);
@@ -5489,7 +5519,12 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	check_for_save_file(lpCmdLine);
 
 	/* Prompt the user */
-	prt("[Choose 'New' or 'Open' from the 'File' menu]", 23, 17);
+	if (strlen(arg_lastsavefile))
+	{
+	     c_prt(TERM_L_BLUE, format("[Press any key to load '%s']",arg_lastsavefile), Term->hgt - 1, MAX(1, (Term->wid - 26 - strlen(arg_lastsavefile)) / 2));
+	     
+	}
+	else c_prt(TERM_L_BLUE, "[Choose 'New' or 'Open' from the 'File' menu]", Term->hgt - 1, MAX(1, (Term->wid - 45) / 2));
 	Term_fresh();
 
 	/* Process messages forever */
