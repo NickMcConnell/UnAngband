@@ -338,12 +338,12 @@ void do_cmd_wield(void)
 		int j, k;
 
 		/* Find the next free show index */
-		for (j = 0; j < SHOWN_TOTAL; j++)
+		for (j = 1; j < SHOWN_TOTAL; j++)
 		{
 			bool used = FALSE;
 
 			/* Check all items */
-			for (k = 0; k < INVEN_TOTAL; k++) if ((inventory[k].k_idx) && (inventory[k].show_idx -1 == j)) used = TRUE;
+			for (k = 0; k < INVEN_TOTAL; k++) if ((inventory[k].k_idx) && (inventory[k].show_idx == j)) used = TRUE;
 
 			/* Already an item using this slot? */
 			if (used) continue;
@@ -353,7 +353,8 @@ void do_cmd_wield(void)
 		}
 
 		/* Set the show index for the item */
-		i_ptr->show_idx = j + 1;
+		if (j < SHOWN_TOTAL) i_ptr->show_idx = j;
+		else i_ptr->show_idx = 0;
 
 		/* Redraw stuff */
 		p_ptr->redraw |= (PR_ITEM_LIST);
@@ -583,6 +584,9 @@ void do_cmd_wield(void)
 
 	/* Window stuff */
 	p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
+
+	/* Update item list */
+	p_ptr->redraw |= (PR_ITEM_LIST);
 }
 
 

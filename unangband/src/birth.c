@@ -533,6 +533,7 @@ static void player_outfit(void)
 	const start_item *e_ptr;
 	object_type *i_ptr;
 	object_type object_type_body;
+	int show_idx = 1;
 
 	/* Hack -- Give the player his equipment */
 	for (i = 0; i < MAX_CLASS_ITEMS + MAX_COMMON_ITEMS + 1; i++)
@@ -688,6 +689,9 @@ static void player_outfit(void)
 
 				/* Increase the weight */
 				p_ptr->total_weight += i_ptr->weight;
+
+				/* Hack -- Set a unique show_idx */
+				o_ptr->show_idx = show_idx++;
 			}
 
 			/* Any left to carry? */
@@ -695,6 +699,9 @@ static void player_outfit(void)
 			{
 				/*put it in the inventory*/
 				(void)inven_carry(i_ptr);
+
+				/* Hack -- Assume we use the next slot */
+				show_idx++;
 			}
 		}
 

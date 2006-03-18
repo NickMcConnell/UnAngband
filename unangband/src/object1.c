@@ -981,11 +981,19 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	/* Hack -- display debug stack info in cheat_xtra mode */
 	if ((cheat_xtra) && (o_ptr->stackc))
 	{
-		object_desc_str_macro(t, "(");
+		object_desc_str_macro(t, "(stack ");
 		object_desc_num_macro(t,o_ptr->stackc);
 		object_desc_str_macro(t, ") ");
 	}
 
+
+	/* Hack -- display debug show_idx info in cheat_xtra mode */
+	if ((cheat_xtra) && (o_ptr->show_idx))
+	{
+		object_desc_str_macro(t, "(show_idx ");
+		object_desc_num_macro(t,o_ptr->show_idx);
+		object_desc_str_macro(t, ") ");
+	}
 
 	/* Paranoia XXX XXX XXX */
 	/* ASSERT(*s != '~'); */

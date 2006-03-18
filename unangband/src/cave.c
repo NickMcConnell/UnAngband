@@ -1988,13 +1988,13 @@ void prt_item_list(void)
 
 	if (show_itemlist)
 	{
-		for (i = 0; i < SHOWN_TOTAL; i++)
+		for (i = 1; i < SHOWN_TOTAL; i++)
 		{
 			for (j = 0; j < INVEN_TOTAL; j++)
 			{
 				if (!inventory[j].k_idx) continue;
 
-				if (inventory[j].show_idx - 1 == i) break;
+				if (inventory[j].show_idx == i) break;
 			}
 
 			/* Invalid item */
@@ -2006,9 +2006,6 @@ void prt_item_list(void)
 			}
 			else
 			{
-
-				msg_format("%d %d %d",i, j, inventory[j].k_idx);
-
 				a = k_info[inventory[j].k_idx].x_attr;
 				c = k_info[inventory[j].k_idx].x_char;
 

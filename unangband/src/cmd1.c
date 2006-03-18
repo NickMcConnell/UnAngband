@@ -1021,7 +1021,6 @@ static void py_destroy_aux(int o_idx)
 
 			/* Window stuff */
 			p_ptr->window |= (PW_INVEN | PW_EQUIP);
-
 		}
 
 		/* Done */
@@ -3360,8 +3359,6 @@ void run_step(int dir)
 		}
 		else
 		{
-			int y, x;
-
 			if (pf_result_index < 0)
 			{
 				disturb(0, 0);

@@ -2891,7 +2891,7 @@ static void dungeon(void)
 	p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_DISTANCE);
 
 	/* Redraw dungeon */
-	p_ptr->redraw |= (PR_BASIC | PR_EXTRA | PR_MAP);
+	p_ptr->redraw |= (PR_BASIC | PR_EXTRA | PR_MAP | PR_ITEM_LIST);
 
 	/* Window stuff */
 	p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
@@ -3165,10 +3165,6 @@ void play_game(bool new_game)
 	{
 		quit("main window is too small");
 	}
-
-	/* Forbid resizing */
-	Term->fixed_shape = TRUE;
-
 
 	/* Hack -- Turn off the cursor */
 	(void)Term_set_cursor(0);

@@ -6428,6 +6428,9 @@ void inven_item_optimize(int item)
 
 		/* Window stuff */
 		p_ptr->window |= (PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
+
+		/* Redraw stuff */
+		p_ptr->redraw |= (PR_ITEM_LIST);
 	}
 }
 
@@ -6730,12 +6733,12 @@ s16b inven_carry(object_type *o_ptr)
 	if (!o_ptr->show_idx)
 	{
 		/* Find the next free show index */
-		for (j = 0; j < SHOWN_TOTAL; j++)
+		for (j = 1; j < SHOWN_TOTAL; j++)
 		{
 			bool used = FALSE;
 
 			/* Check all items */
-			for (k = 0; k < INVEN_TOTAL; k++) if ((inventory[k].k_idx) && (inventory[k].show_idx -1 == j)) used = TRUE;
+			for (k = 0; k < INVEN_TOTAL; k++) if ((inventory[k].k_idx) && (inventory[k].show_idx == j)) used = TRUE;
 
 			/* Already an item using this slot? */
 			if (used) continue;
@@ -6745,7 +6748,8 @@ s16b inven_carry(object_type *o_ptr)
 		}
 
 		/* Set the show index for the item */
-		o_ptr->show_idx = j + 1;
+		if (j < SHOWN_TOTAL) o_ptr->show_idx = j;
+		else o_ptr->show_idx = 0;
 
 		/* Redraw stuff */
 		p_ptr->redraw |= (PR_ITEM_LIST);
@@ -6783,6 +6787,9 @@ s16b inven_carry(object_type *o_ptr)
 
 	/* Window stuff */
 	p_ptr->window |= (PW_INVEN);
+
+	/* Redraw stuff */
+	p_ptr->redraw |= (PR_ITEM_LIST);
 
 	/* Return the slot */
 	return (i);
@@ -7020,7 +7027,6 @@ void inven_drop(int item, int amt)
 	inven_item_increase(item, -amt);
 	inven_item_describe(item);
 	inven_item_optimize(item);
-
 }
 
 
