@@ -3152,6 +3152,78 @@ void process_player_name(bool sf)
 }
 
 
+
+/*
+ * Use W. Sheldon Simms' random name generator.  Generate a random word using
+ * the probability tables we built earlier.  Relies on the ASCII character
+ * set.  Relies on European vowels (a, e, i, o, u).  The generated name should
+ * be copied/used before calling this function again.
+ */
+char *make_word(int min_len, int max_len)
+{
+	static char word_buf[90];
+	int r, totalfreq;
+	int tries, lnum, vow;
+	int c_prev, c_cur, c_next;
+	char *cp;
+
+startover:
+	vow = 0;
+	lnum = 0;
+	tries = 0;
+	cp = word_buf;
+	c_prev = c_cur = S_WORD;
+
+	/* Paranoia */
+	if (min_len > max_len) return "(Bad name)";
+
+	/* Paranoia */
+	if (max_len > 90) return "(Bad name)";
+
+	while (1)
+	{
+	    getletter:
+		c_next = 0;
+		r = rand_int(n_info->ltotal[c_prev][c_cur]);
+		totalfreq = n_info->lprobs[c_prev][c_cur][c_next];
+
+		/*find the letter*/
+		while (totalfreq <= r)
+		{
+			c_next++;
+			totalfreq += n_info->lprobs[c_prev][c_cur][c_next];
+		}
+
+		if (c_next == E_WORD)
+		{
+			if ((lnum < min_len) || vow == 0)
+			{
+				tries++;
+				if (tries < 10) goto getletter;
+				goto startover;
+			}
+			*cp = '\0';
+			break;
+		}
+
+		if (lnum >= max_len) goto startover;
+
+		*cp = I2A(c_next);
+
+		if (is_a_vowel(*cp)) vow++;
+
+		cp++;
+		lnum++;
+		c_prev = c_cur;
+		c_cur = c_next;
+	}
+
+	word_buf[0] = toupper((unsigned char)word_buf[0]);
+
+	return (word_buf);
+}
+
+
 /*
  * Gets a name for the character, reacting to name changes.
  *
@@ -3166,6 +3238,12 @@ void get_name(void)
 
 	/* Save the player name */
 	strcpy(tmp, op_ptr->full_name);
+
+	/* Offer a random name */
+	if (!strlen(tmp))
+	{
+		strcpy(tmp, make_word(7, 15));
+	}
 
 	/* Prompt for a new name */
 	if (get_string("Enter a name for your character: ", tmp, sizeof(tmp)))

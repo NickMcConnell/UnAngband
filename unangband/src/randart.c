@@ -34,8 +34,8 @@
 #define MAX_TRIES 200
 #define BUFLEN 1024
 
-#define MIN_NAME_LEN 5
-#define MAX_NAME_LEN 9
+#define MIN_ART_NAME_LEN 5
+#define MAX_ART_NAME_LEN 9
 
 #define sign(x)	((x) > 0 ? 1 : ((x) < 0 ? -1 : 0))
 
@@ -308,73 +308,6 @@ static int randart_verbose = 0;
 byte a_max;
 
 
-
-/*
- * Use W. Sheldon Simms' random name generator.  Generate a random word using
- * the probability tables we built earlier.  Relies on the ASCII character
- * set.  Relies on European vowels (a, e, i, o, u).  The generated name should
- * be copied/used before calling this function again.
- */
-static char *make_word(void)
-{
-	static char word_buf[90];
-	int r, totalfreq;
-	int tries, lnum, vow;
-	int c_prev, c_cur, c_next;
-	char *cp;
-
-startover:
-	vow = 0;
-	lnum = 0;
-	tries = 0;
-	cp = word_buf;
-	c_prev = c_cur = S_WORD;
-
-	while (1)
-	{
-	    getletter:
-		c_next = 0;
-		r = rand_int(n_info->ltotal[c_prev][c_cur]);
-		totalfreq = n_info->lprobs[c_prev][c_cur][c_next];
-
-		/*find the letter*/
-		while (totalfreq <= r)
-		{
-			c_next++;
-			totalfreq += n_info->lprobs[c_prev][c_cur][c_next];
-		}
-
-		if (c_next == E_WORD)
-		{
-			if ((lnum < MIN_NAME_LEN) || vow == 0)
-			{
-				tries++;
-				if (tries < 10) goto getletter;
-				goto startover;
-			}
-			*cp = '\0';
-			break;
-		}
-
-		if (lnum >= MAX_NAME_LEN) goto startover;
-
-		*cp = I2A(c_next);
-
-		if (is_a_vowel(*cp)) vow++;
-
-		cp++;
-		lnum++;
-		c_prev = c_cur;
-		c_cur = c_next;
-	}
-
-	word_buf[0] = toupper((unsigned char)word_buf[0]);
-
-	return (word_buf);
-}
-
-
-
 /*
  * Use W. Sheldon Simms' random name generator.
  */
@@ -395,7 +328,7 @@ static errr init_names(void)
 
 	for (i = 1 ; i < z_info->a_max; i++)
 	{
-		char *word = make_word();
+		char *word = make_word(MIN_ART_NAME_LEN, MAX_ART_NAME_LEN);
 
 		if (i == ART_POWER)
 		{

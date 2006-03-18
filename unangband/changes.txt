@@ -208,6 +208,8 @@ grids as safe when detect monster spell (of any time) has been cast.
 
 - Added Christophe Cavalaria's mouse support patch.
 
+- Automatically generate a random name at player birth. This can be overwritten.
+
 ### Bug fixes ###
 
 - Priest spell righteous fury was for mages, paladins, shamans and bards but

@@ -488,6 +488,7 @@ extern errr file_character(cptr name, bool full);
 extern bool show_file(cptr name, cptr what, int line, int mode);
 extern void do_cmd_help(void);
 extern void process_player_name(bool sf);
+extern char *make_word(int min_len, int max_len);
 extern void get_name(void);
 extern void do_cmd_suicide(void);
 extern void do_cmd_save_game(void);
