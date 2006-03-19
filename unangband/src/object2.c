@@ -793,30 +793,42 @@ void object_known(object_type *o_ptr)
 				a_list[o_ptr->name1].not_flags3,
 				a_list[o_ptr->name1].not_flags4);
 	}
+	/* Now we know what it is, update what we know about it from our ego item memory */
+	else if (o_ptr->name2)
+	{
+		/* Obvious flags */
+		object_can_flags(o_ptr,e_info[o_ptr->name2].obv_flags1,
+				 e_info[o_ptr->name2].obv_flags2,
+				 e_info[o_ptr->name2].obv_flags3,
+				 e_info[o_ptr->name2].obv_flags4);
+
+		/* Known flags */
+		object_can_flags(o_ptr,e_list[o_ptr->name2].can_flags1,
+				 e_list[o_ptr->name2].can_flags2,
+				 e_list[o_ptr->name2].can_flags3,
+				 e_list[o_ptr->name2].can_flags4);
+			
+		object_not_flags(o_ptr,e_list[o_ptr->name2].not_flags1,
+				 e_list[o_ptr->name2].not_flags2,
+				 e_list[o_ptr->name2].not_flags3,
+				 e_list[o_ptr->name2].not_flags4);
+	}
+	/* Hack -- Magic items have an 'obvious' ability for which they are named */
+	else if ((o_ptr->xtra1) && (o_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES) && (o_ptr->discount < INSCRIP_MIN_HIDDEN))
+	{
+		if (object_xtra_what[o_ptr->xtra1] == 1)
+			(o_ptr->can_flags1) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+		else if (object_xtra_what[o_ptr->xtra1] == 1)
+			(o_ptr->can_flags2) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+		else if (object_xtra_what[o_ptr->xtra1] == 1)
+			(o_ptr->can_flags3) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+		else if (object_xtra_what[o_ptr->xtra1] == 1)
+			(o_ptr->can_flags4) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+	}
+	/* Everything else has obvious flags */
 	else
 	{
-		/* Now we know what it is, update what we know about it from our ego item memory */
-		if (o_ptr->name2)
-		{
-			/* Obvious flags */
-			object_can_flags(o_ptr,e_info[o_ptr->name2].obv_flags1,
-					 e_info[o_ptr->name2].obv_flags2,
-					 e_info[o_ptr->name2].obv_flags3,
-					 e_info[o_ptr->name2].obv_flags4);
-
-			/* Known flags */
-			object_can_flags(o_ptr,e_list[o_ptr->name2].can_flags1,
-					 e_list[o_ptr->name2].can_flags2,
-					 e_list[o_ptr->name2].can_flags3,
-					 e_list[o_ptr->name2].can_flags4);
-			
-			object_not_flags(o_ptr,e_list[o_ptr->name2].not_flags1,
-					 e_list[o_ptr->name2].not_flags2,
-					 e_list[o_ptr->name2].not_flags3,
-					 e_list[o_ptr->name2].not_flags4);
-		}
-		else
-			object_obvious_flags(o_ptr);
+		object_obvious_flags(o_ptr);
 	}
 
 	/* Now we know what it is, update what we know about it */

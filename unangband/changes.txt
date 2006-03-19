@@ -252,6 +252,17 @@ by ekolis).
 
 - Fixed hit point and mana regeneration.
 
+- Magic objects should now have the ability they are named after automatically
+known (Reported by ekolis).
+
+- You should now be able to buy a service when your inventory is full
+(Reported by David Justiss).
+
+- Stupid monsters shouldn't report when they are out of ammunition (Reported
+by David Justiss).
+
+
+
 ### Build / Platform ###
 
 - Added quest.txt in lib\edit which is used to defined fixed texts.

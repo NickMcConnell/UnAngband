@@ -2555,7 +2555,7 @@ static void store_purchase(void)
 	i_ptr->number = amt;
 
 	/* Hack -- require room in pack */
-	if (!inven_carry_okay(i_ptr))
+	if ((i_ptr->tval != TV_SERVICE) && (!inven_carry_okay(i_ptr)))
 	{
 		msg_print("You cannot carry that many items.");
 		return;

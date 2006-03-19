@@ -1470,8 +1470,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* Out of ammunition */
 		else if (ammo < 0)
 		{
-			/* Message */
-			msg_format("%^s is out of ammunition.", m_name);
+			/* Message -- only stupid monsters get this and not really applicable to them*/
+			/*if (m_ptr->ml) msg_format("%^s is out of ammunition.", m_name);*/
 
 			return (TRUE);
 		}
