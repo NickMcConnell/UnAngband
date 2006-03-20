@@ -261,6 +261,12 @@ known (Reported by ekolis).
 - Stupid monsters shouldn't report when they are out of ammunition (Reported
 by David Justiss).
 
+- Fixed pickup bug where items could prevented from being picked up by objects
+stored in the grid.
+
+- Spell casters now buff themselves, not the player.
+
+- Fixed bug where objects were destroyed incorrectly when a grid was changed.
 
 
 ### Build / Platform ###

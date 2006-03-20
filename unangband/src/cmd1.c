@@ -1106,6 +1106,9 @@ void py_pickup(int pickup)
 		/* Get the object */
 		o_ptr = &o_list[this_o_idx];
 
+		/* Get the next object */
+		next_o_idx = o_ptr->next_o_idx;
+
 		/* Ignore 'store' items */
 		if (o_ptr->ident & (IDENT_STORE)) continue;
 
@@ -1124,9 +1127,6 @@ void py_pickup(int pickup)
 
 		/* Describe the object */
 		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
-
-		/* Get the next object */
-		next_o_idx = o_ptr->next_o_idx;
 
 		/* Hack -- disturb */
 		disturb(0, 0);

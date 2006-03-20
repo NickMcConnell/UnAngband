@@ -5226,7 +5226,7 @@ static void cave_set_feat_aux(int y, int x, int feat)
 		}
 
 		/* Destroy stored items */
-		if (o_ptr->ident & ~(IDENT_STORE))
+		if (o_ptr->ident & (IDENT_STORE))
 		{
 			delete_object_idx(this_o_idx);
 		}

@@ -901,6 +901,17 @@ static int choose_attack_spell_fast(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, 
 }
 
 
+
+/*
+ *  Fake RF4_ masks to be used for ranged melee attacks;
+ */
+
+static u32b rf4_ball_mask;
+static u32b rf4_no_player_mask;
+static u32b rf4_beam_mask;
+static u32b rf4_bolt_mask;
+static u32b rf4_archery_mask;
+
 /*
  * Choose the "real" ty, tx for the spell.
  *
@@ -915,34 +926,25 @@ static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 	/* Do we even have this spell? */
 	if (i < 32)
 	{
-		if (RF4_ASSIST_MASK &(1L << (i   ))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
+		if ((RF4_ASSIST_MASK | RF4_SUMMON_MASK) &(1L << (i   ))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
 	}
 	else if (i < 64)
 	{
-		if (RF5_ASSIST_MASK &(1L << (i-32))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
+		if ((RF5_ASSIST_MASK | RF5_SUMMON_MASK) &(1L << (i-32))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
 	}
 	else if (i < 96)
 	{
-		if (RF6_ASSIST_MASK &(1L << (i-64))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
+		if ((RF6_ASSIST_MASK | RF6_SUMMON_MASK) &(1L << (i-64))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
 	}
 	else
 	{
-		if (RF7_ASSIST_MASK &(1L << (i-96))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
+		if ((RF7_ASSIST_MASK | RF7_SUMMON_MASK) &(1L << (i-96))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
 	}
 
 	return(i);
 }
 
 
-/*
- *  Fake RF4_ masks to be used for ranged melee attacks;
- */
-
-static u32b rf4_ball_mask;
-static u32b rf4_no_player_mask;
-static u32b rf4_beam_mask;
-static u32b rf4_bolt_mask;
-static u32b rf4_archery_mask;
 
 /*
  * Initialise spell_info and spell_desire tables for monster blows 1-4, plus
@@ -1149,7 +1151,6 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	if (path == PROJECT_NO)
 	{
 		bool clear_ball_spell = TRUE;
-		bool clear_summon_spell = TRUE;
 
 		/* Are we in range smart or annoyed (and not stupid), and have access to ball spells
 		  or summon spells? */
@@ -1202,14 +1203,6 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 				*tar_y = best_y;
 				*tar_x = best_x;
 			}
-			else
-			{
-				/* Target themselves with a summon spell */
-				*tar_y = m_ptr->fy;
-				*tar_x = m_ptr->fx;
-
-				clear_summon_spell = FALSE;
-			}
 		}
 
 		/*We don't have a reason to try a ball spell*/
@@ -1219,15 +1212,6 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 			f5 &= ~(RF5_BALL_MASK);
 			f6 &= ~(RF6_BALL_MASK);
 			f7 &= ~(RF7_BALL_MASK);
-		}
-
-		/*We don't have a reason to try a summoning spell*/
-		if (clear_summon_spell)
-		{
-			f4 &= ~(RF4_SUMMON_MASK);
-			f5 &= ~(RF5_SUMMON_MASK);
-			f6 &= ~(RF6_SUMMON_MASK);
-			f7 &= ~(RF7_SUMMON_MASK);
 		}
 
 		/* Flat out 75% chance of not casting if the player is not in sight */
