@@ -411,13 +411,13 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 
 		case RBM_MOAN:
 		{
-			if (target < 0) msg_format("%^s %s", m_name, desc_moan[rand_int(8)]);
+			if (target < 0) msg_format("%^s %s", m_name, desc_moan[rand_int(4)]);
 			return;
 		}
 
 		case RBM_SING:
 		{
-			if (target < 0) msg_format("%^s %s", m_name, desc_sing[rand_int(8)]);
+			if (target < 0) msg_format("%^s %s", m_name, desc_sing[rand_int(4)]);
 			return;
 		}
 

@@ -4309,7 +4309,7 @@ void get_grid_using_angle(int angle, int y0, int x0, int *ty, int *tx)
 static int terrain[MAX_PF_RADIUS][MAX_PF_RADIUS];
 static int ox,oy,ex,ey;
 
-static bool is_valid_pf(int y, int x)
+bool is_valid_pf(int y, int x)
 {
 	int feat;
 
@@ -4319,14 +4319,11 @@ static bool is_valid_pf(int y, int x)
 	/* Get mimiced feat */
 	feat = f_info[cave_feat[y][x]].mimic;
 
-	/* Require moveable space*/
-	if (!(f_info[feat].flags1 & (FF1_MOVE)) && !(f_info[feat].flags3 & (FF3_EASY_CLIMB))) return (FALSE);
-
 #ifdef ALLOW_EASY_ALTER
 
 	/* Optionally alter known traps/doors on (non-jumping) movement */
-	if (easy_alter &&
-		 ( (f_info[feat].flags1 & (FF1_DISARM)) ||
+	if ((easy_alter)
+		 && ( (f_info[feat].flags1 & (FF1_DISARM)) ||
 		 ( !(f_info[feat].flags1 & (FF1_MOVE)) &&
 		 !(f_info[feat].flags3 & (FF3_EASY_CLIMB)) && 
 		 ( (f_info[feat].flags1 & (FF1_BASH)) ||       
@@ -4337,8 +4334,14 @@ static bool is_valid_pf(int y, int x)
 
 #endif /* ALLOW_EASY_ALTER */
 
+	/* Require moveable space*/
+	if (!(f_info[feat].flags1 & (FF1_MOVE)) && !(f_info[feat].flags3 & (FF3_EASY_CLIMB))) return (FALSE);
+
 	/* Don't move over known dangerous terrain */
-	if ((f_info[feat].blow.method) || (f_info[feat].spell)) return (TRUE);
+	if ((f_info[feat].blow.method) || (f_info[feat].spell)) return (FALSE);
+
+	/* Don't move over known deep or filled terrain */
+	if (f_info[feat].flags2 & (FF2_DEEP | FF2_FILLED)) return (FALSE);
 
 	/* Otherwise good */
 	return (TRUE);

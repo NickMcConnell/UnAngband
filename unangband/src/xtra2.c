@@ -2832,8 +2832,8 @@ void monster_death(int m_idx)
 		}
 	}
 
-	/* Guardian defeated - need some stairs */
-	if (r_ptr->flags1 & (RF1_GUARDIAN))
+	/* Dungeon guardian defeated - need some stairs except on surface */
+	if ((r_ptr->flags1 & (RF1_GUARDIAN)) && (p_ptr->depth != min_depth(p_ptr->dungeon)))
 	{
 		/* Stagger around */
 		while (!cave_valid_bold(y, x))

@@ -989,8 +989,8 @@ static void build_terrain(int y, int x, int feat)
 
 	/*
 	 * Handle creation of big trees.
-       *
-       * Note hack to minimise number of calls to rand_int.
+         *
+         * Note hack to minimise number of calls to rand_int.
 	 */
 	if (f_info[newfeat].flags3 & (FF3_TREE))
 	{

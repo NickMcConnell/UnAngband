@@ -867,6 +867,7 @@ extern bool is_a_vowel(int ch);
 extern int color_char_to_attr(char c);
 extern int color_text_to_attr(cptr name);
 extern cptr attr_to_text(byte a);
+extern bool is_valid_pf(int y, int x);
 extern bool findpath(int y, int x);
 
 
