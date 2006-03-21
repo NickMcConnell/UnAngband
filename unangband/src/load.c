@@ -1736,10 +1736,6 @@ u16b limit;
 	/* The dungeon is ready */
 	character_dungeon = TRUE;
 
-	/* Regenerate town in post 2.9.3 versions */
-	if (older_than(2, 9, 4) && (p_ptr->depth == 0))
-		character_dungeon = FALSE;
-
 	/* Success */
 	return (0);
 }

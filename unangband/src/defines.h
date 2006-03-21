@@ -595,13 +595,16 @@
 #define ROW_INFO		20
 #define COL_INFO		0	/* "xxxxxxxxxxxx" */
 
-#define ROW_CUT		Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1)
+#define ROW_CUT		(show_sidebar ? 21 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
+					: (use_dbltile ? 4 : 3)): 2))
 #define COL_CUT		(show_sidebar ? 0 : 18)	/* <cut> */
 
-#define ROW_STUN	Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1)
+#define ROW_STUN	(show_sidebar ? 22 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
+					: (use_dbltile ? 4 : 3)): 2))
 #define COL_STUN		(show_sidebar ? 0 : 22)	/* <stun> */
 
-#define ROW_HUNGRY	Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1)
+#define ROW_HUNGRY	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
+					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)): 2))
 #define COL_HUNGRY	(show_sidebar ? 0 : 26)	/* "Weak" / "Hungry" / "Full" / "Gorged" */
 
 #define ROW_BLIND		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
@@ -4186,14 +4189,14 @@
  * Convert a "key event" into a "location" (Y)
  */
 #define KEY_GRID_Y(K) \
-	((int) ((p_ptr->wy) + ( ((K.mousey) - 1) / \
+	((int) ((p_ptr->wy) + ( ((K.mousey) - ROW_MAP) / \
 		(use_trptile ? 3 : (use_dbltile ? 2 : 1)) )))
 
 /*
  * Convert a "key event" into a "location" (X)
  */
 #define KEY_GRID_X(K) \
-	((int) ((p_ptr->wx) + ( ((K.mousex) - (show_sidebar ? 13 : 0)) / \
+	((int) ((p_ptr->wx) + ( ((K.mousex) - COL_MAP) / \
 		((use_trptile ? 3 : (use_dbltile ? 2 : 1)) * (use_bigtile ? 2 : 1)) )))
 
 
