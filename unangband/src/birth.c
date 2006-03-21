@@ -791,11 +791,12 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 {
 	int top = 0, cur = 0;
 	int i, dir;
-	char c;
+	key_event ke;
 	char buf[80];
 	bool done = FALSE;
 	int hgt;
 	byte attr;
+	int delay = 0;
 
 	/* Autoselect if able */
 	if (num == 1) done = TRUE;
@@ -852,18 +853,29 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 		/* Move the cursor */
 		put_str("", TABLE_ROW + cur - top, col);
 
-		c = inkey();
+		if (delay)
+		{
+			/* Force screen update */
+			Term_fresh();
 
-		if (c == KTRL('X'))
+			/* Delay */
+			Term_xtra(TERM_XTRA_DELAY, delay);
+
+			delay = 0;
+		}
+
+		ke = inkey_ex();
+
+		if (ke.key == KTRL('X'))
 		{
 			quit(NULL);
 		}
-		if (c == ESCAPE)
+		if (ke.key == ESCAPE)
 		{
 			/* Mega Hack - go back. */
 			return (INVALID_CHOICE);
 		}
-		if (c == '*')
+		if (ke.key == '*')
 		{
 			/* Select a legal choice at random */
 			while (TRUE)
@@ -881,7 +893,7 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 			/* Done */
 			done = TRUE;
 		}
-		else if (c == '?')
+		else if (ke.key == '?')
 		{
 			sprintf(buf, "%s#%s", helpfile, choices[cur].name);
 
@@ -889,19 +901,56 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 			(void)show_file(buf, NULL, 0, 0);
 			screen_load();
 		}
-		else if (c == '=')
+		else if (ke.key == '=')
 		{
                         do_cmd_options();
 		}
-		else if ((c == '\n') || (c == '\r'))
+		else if ((ke.key == '\n') || (ke.key == '\r'))
 		{
 			/* Done */
 			return (cur);
 		}
-		else if (isdigit(c))
+		else if (ke.key == '\xff')
+		{
+			int choice = ke.mousey - TABLE_ROW + top;
+
+			if (ke.mousebutton)
+			{
+				if ((choice >= 0) && (choice < num))
+				{
+					cur = choice;
+					done = TRUE;
+				}
+			}
+			else
+			{
+				if ((choice >= 0) && (choice < num)) cur = choice;
+
+				/* Scroll up */
+				if ((top > 0) && ((cur - top) < 4))
+				{
+					/* Scroll up */
+					top--;
+
+					/* Delay after update */
+					delay = 100;
+				}
+
+				/* Scroll down */
+				if ((top + hgt < (num - 1)) && ((top + hgt - cur) < 4))
+				{
+					/* Scroll down */
+					top++;
+
+					/* Delay after update */
+					delay = 100;
+				}
+			}
+		}
+		else if (isdigit(ke.key))
 		{
 			/* Get a direction from the key */
-			dir = target_dir(c);
+			dir = target_dir(ke.key);
 
 			/* Going up? */
 			if (dir == 8)
@@ -935,17 +984,17 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 				}
 			}
 		}
-		else if (isalpha(c))
+		else if (isalpha(ke.key))
 		{
 			int choice;
 
-			if (islower(c))
+			if (islower(ke.key))
 			{
-				choice = A2I(c);
+				choice = A2I(ke.key);
 			}
 			else
 			{
-				choice = c - 'A' + 26;
+				choice = ke.key - 'A' + 26;
 			}
 
 			/* Validate input */
@@ -1640,7 +1689,7 @@ static bool player_birth_aux_3(void)
 	bool flag;
 	bool prev = FALSE;
 
-	char ch;
+	key_event ke;
 
 	char b1 = '[';
 	char b2 = ']';
@@ -1879,7 +1928,7 @@ static bool player_birth_aux_3(void)
 					inkey_scan = TRUE;
 
 					/* Check for a keypress */
-					if (inkey()) break;
+					if (anykey().key) break;
 				}
 			}
 		}
@@ -1936,29 +1985,36 @@ static bool player_birth_aux_3(void)
 			Term_addch(TERM_WHITE, b2);
 
 			/* Prompt and get a command */
-			ch = inkey();
+			ke = anykey();
 
 			/* Quit */
-			if (ch == 'Q') quit(NULL);
+			if (ke.key == 'Q') quit(NULL);
 
 			/* Start over */
-			if ((ch == 'S')||(ch == ESCAPE)) return (FALSE);
+			if ((ke.key == 'S')||(ke.key == ESCAPE)) return (FALSE);
 
 			/* Enter accepts the roll */
-			if ((ch == '\n') || (ch == '\r')) break;
+			if ((ke.key == '\n') || (ke.key == '\r')) break;
 
 			/* Reroll this character */
-			if ((ch == ' ') || (ch == 'r')) break;
+			if ((ke.key == ' ') || (ke.key == 'r')) break;
+
+			/* Hack -- left click to reroll, other click to accept */
+			if (ke.key == '\xff')
+			{
+				if (ke.mousebutton != 1) ke.key = '\n';
+				break;
+			}
 
 			/* Previous character */
-			if (prev && (ch == 'p'))
+			if (prev && (ke.key == 'p'))
 			{
 				load_prev_data();
 				continue;
 			}
 
 			/* Help */
-			if (ch == '?')
+			if (ke.key == '?')
 			{
 				do_cmd_help();
 				continue;
@@ -1969,7 +2025,7 @@ static bool player_birth_aux_3(void)
 		}
 
 		/* Are we done? */
-		if ((ch == '\n') || (ch == '\r')) break;
+		if ((ke.key == '\n') || (ke.key == '\r')) break;
 
 		/* Save this for the "previous" character */
 		save_prev_data();
@@ -1995,7 +2051,7 @@ static bool player_birth_aux(void)
 {
         int i;
 
-	char ch;
+	key_event ke;
 
 	/* Ask questions */
 	if (!player_birth_aux_1()) return (FALSE);
@@ -2036,13 +2092,13 @@ static bool player_birth_aux(void)
 	prt("['Q' to suicide, 'S' to start over, or Enter to continue]", 23, 10);
 
 	/* Get a key */
-	ch = inkey();
+	ke = anykey();
 
 	/* Quit */
-	if (ch == 'Q') quit(NULL);
+	if (ke.key == 'Q') quit(NULL);
 
 	/* Start over */
-	if ((ch == 'S')||(ch == ESCAPE)) return (FALSE);
+	if ((ke.key == 'S')||(ke.key == ESCAPE)) return (FALSE);
 
 	/* Accept */
 	return (TRUE);

@@ -4037,7 +4037,7 @@ void update_slot_flags(int slot, u32b f1, u32b f2, u32b f3, u32b f4)
 	/* Actually display the item */
 	list_object_flags(f1, f2, f3, f4, 1);
 
-	(void)inkey();
+	(void)anykey();
 	
 	/* Load screen */
 	screen_load();

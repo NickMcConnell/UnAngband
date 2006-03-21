@@ -101,7 +101,7 @@ void do_cmd_redraw(void)
  */
 void do_cmd_change_name(void)
 {
-	char ch;
+	key_event ke;
 
 	int mode = 0;
 
@@ -123,19 +123,19 @@ void do_cmd_change_name(void)
 		Term_putstr(2, 23, -1, TERM_WHITE, p);
 
 		/* Query */
-		ch = inkey();
+		ke = anykey();
 
 		/* Exit */
-		if (ch == ESCAPE) break;
+		if (ke.key == ESCAPE) break;
 
 		/* Change name */
-		if (ch == 'c')
+		if ((ke.key == 'c') || ((ke.key == '\xff') && (ke.mousey == 2) && (ke.mousex < 26)))
 		{
 			get_name();
 		}
 
 		/* File dump */
-		else if (ch == 'f')
+		else if (ke.key == 'f')
 		{
 			char ftmp[80];
 
@@ -158,7 +158,7 @@ void do_cmd_change_name(void)
 		}
 
 		/* Toggle mode */
-		else if (ch == 'h')
+		else if ((ke.key == 'h') || (ke.key == '\xff'))
 		{
 			mode = !mode;
 		}
@@ -205,7 +205,7 @@ void do_cmd_message_one(void)
  */
 void do_cmd_messages(void)
 {
-	char ch;
+	key_event ke;
 
 	int i, j, n, q;
 	int wid, hgt;
@@ -281,16 +281,16 @@ void do_cmd_messages(void)
 		prt("[Press 'p' for older, 'n' for newer, ..., or ESCAPE]", hgt - 1, 0);
 
 		/* Get a command */
-		ch = inkey();
+		ke = anykey();
 
 		/* Exit on Escape */
-		if (ch == ESCAPE) break;
+		if (ke.key == ESCAPE) break;
 
 		/* Hack -- Save the old index */
 		j = i;
 
 		/* Horizontal scroll */
-		if (ch == '4')
+		if (ke.key == '4')
 		{
 			/* Scroll left */
 			q = (q >= wid / 2) ? (q - wid / 2) : 0;
@@ -300,7 +300,7 @@ void do_cmd_messages(void)
 		}
 
 		/* Horizontal scroll */
-		if (ch == '6')
+		if (ke.key == '6')
 		{
 			/* Scroll right */
 			q = q + wid / 2;
@@ -310,7 +310,7 @@ void do_cmd_messages(void)
 		}
 
 		/* Hack -- handle show */
-		if (ch == '=')
+		if (ke.key == '=')
 		{
 			/* Prompt */
 			prt("Show: ", hgt - 1, 0);
@@ -323,7 +323,7 @@ void do_cmd_messages(void)
 		}
 
 		/* Hack -- handle find */
-		if (ch == '/')
+		if (ke.key == '/')
 		{
 			s16b z;
 
@@ -354,45 +354,63 @@ void do_cmd_messages(void)
 		}
 
 		/* Recall 20 older messages */
-		if ((ch == 'p') || (ch == KTRL('P')) || (ch == ' '))
+		if ((ke.key == 'p') || (ke.key == KTRL('P')) || (ke.key == ' '))
 		{
 			/* Go older if legal */
 			if (i + 20 < n) i += 20;
 		}
 
 		/* Recall 10 older messages */
-		if (ch == '+')
+		if (ke.key == '+')
 		{
 			/* Go older if legal */
 			if (i + 10 < n) i += 10;
 		}
 
 		/* Recall 1 older message */
-		if ((ch == '8') || (ch == '\n') || (ch == '\r'))
+		if ((ke.key == '8') || (ke.key == '\n') || (ke.key == '\r'))
 		{
-			/* Go newer if legal */
+			/* Go older if legal */
 			if (i + 1 < n) i += 1;
 		}
 
 		/* Recall 20 newer messages */
-		if ((ch == 'n') || (ch == KTRL('N')))
+		if ((ke.key == 'n') || (ke.key == KTRL('N')))
 		{
 			/* Go newer (if able) */
 			i = (i >= 20) ? (i - 20) : 0;
 		}
 
 		/* Recall 10 newer messages */
-		if (ch == '-')
+		if (ke.key == '-')
 		{
 			/* Go newer (if able) */
 			i = (i >= 10) ? (i - 10) : 0;
 		}
 
 		/* Recall 1 newer messages */
-		if (ch == '2')
+		if (ke.key == '2')
 		{
 			/* Go newer (if able) */
 			i = (i >= 1) ? (i - 1) : 0;
+		}
+
+		/* Scroll forwards or backwards using mouse clicks */
+		if (ke.key == '\xff')
+		{
+			if (ke.mousebutton)
+			{
+				if (ke.mousey <= hgt / 2)
+				{
+					/* Go older if legal */
+					if (i + 20 < n) i += 20;
+				}
+				else
+				{
+					/* Go newer (if able) */
+					i = (i >= 20) ? (i - 20) : 0;
+				}
+			}
 		}
 
 		/* Hack -- Error of some kind */
@@ -467,7 +485,7 @@ static void do_cmd_pref_file_hack(int row)
  */
 static void do_cmd_options_aux(int page, cptr info)
 {
-	char ch;
+	key_event ke;
 
 	int i, k = 0, n = 0;
 
@@ -517,10 +535,10 @@ static void do_cmd_options_aux(int page, cptr info)
 		move_cursor(k + 2, 50);
 
 		/* Get a key */
-		ch = inkey();
+		ke = inkey_ex();
 
 		/* Analyze */
-		switch (ch)
+		switch (ke.key)
 		{
 			case ESCAPE:
 			{
@@ -584,6 +602,19 @@ static void do_cmd_options_aux(int page, cptr info)
 				break;
 			}
 
+			case '\xff':
+			{
+				int choice = ke.mousey - 2;
+
+				if ((choice >= 0) && (choice < n)) k = choice;
+
+				if (ke.mousebutton)
+				{
+					op_ptr->opt[opt[k]] = !op_ptr->opt[opt[k]];
+				}
+				break;
+			}
+
 			default:
 			{
 				bell("Illegal command for normal options!");
@@ -604,7 +635,7 @@ static void do_cmd_options_win(void)
 	int y = 0;
 	int x = 0;
 
-	char ch;
+	key_event ke;
 
 	u32b old_flag[ANGBAND_TERM_MAX];
 
@@ -677,13 +708,31 @@ static void do_cmd_options_win(void)
 		Term_gotoxy(35 + x * 5, y + 5);
 
 		/* Get key */
-		ch = inkey();
+		ke = inkey_ex();
 
 		/* Allow escape */
-		if ((ch == ESCAPE) || (ch == 'q')) break;
+		if ((ke.key == ESCAPE) || (ke.key == 'q')) break;
+
+		/* Mouse interaction */
+		if (ke.key == '\xff')
+		{
+			int choicey = ke.mousey - 5;
+			int choicex = (ke.mousex - 35)/5;
+
+			if ((choicey >= 0) && (choicey < PW_MAX_FLAGS)
+				&& (choicex > 0) && (choicex < ANGBAND_TERM_MAX)
+				&& !(ke.mousex % 5))
+			{
+				y = choicey;
+				x = (ke.mousex - 35)/5;
+			}
+
+			/* Toggle using mousebutton later */
+			if (!ke.mousebutton) continue;
+		}
 
 		/* Toggle */
-		if ((ch == '5') || (ch == 't'))
+		if ((ke.key == '5') || (ke.key == 't') || ((ke.key == '\xff') && (ke.mousebutton)))
 		{
 			/* Hack -- ignore the main window */
 			if (x == 0)
@@ -708,7 +757,7 @@ static void do_cmd_options_win(void)
 		}
 
 		/* Extract direction */
-		d = target_dir(ch);
+		d = target_dir(ke.key);
 
 		/* Move */
 		if (d != 0)
@@ -851,7 +900,7 @@ static errr option_dump(cptr fname)
  */
 void do_cmd_options(void)
 {
-	char ch;
+	key_event ke;
 
 
 	/* Save screen */
@@ -891,80 +940,68 @@ void do_cmd_options(void)
 		prt("Command: ", 19, 0);
 
 		/* Get command */
-		ch = inkey();
+		ke = anykey();
 
 		/* Exit */
-		if (ch == ESCAPE) break;
+		if (ke.key == ESCAPE) break;
 
 		/* General Options */
-		else if (ch == '1')
+		else if ((ke.key == '1') || ((ke.key == '\xff') && (ke.mousey == 4)))
 		{
 			do_cmd_options_aux(0, "User Interface Options");
 		}
 
 		/* Disturbance Options */
-		else if (ch == '2')
+		else if ((ke.key == '2') || ((ke.key == '\xff') && (ke.mousey == 5)))
 		{
 			do_cmd_options_aux(1, "Disturbance Options");
 		}
 
 		/* Inventory Options */
-		else if (ch == '3')
+		else if ((ke.key == '3') || ((ke.key == '\xff') && (ke.mousey == 6)))
 		{
 			do_cmd_options_aux(2, "Game-Play Options");
 		}
 
 		/* Efficiency Options */
-		else if (ch == '4')
+		else if ((ke.key == '4') || ((ke.key == '\xff') && (ke.mousey == 7)))
 		{
 			do_cmd_options_aux(3, "Efficiency Options");
 		}
 
 		/* Display Options */
-		else if (ch == '5')
+		else if ((ke.key == '5') || ((ke.key == '\xff') && (ke.mousey == 8)))
 		{
 			do_cmd_options_aux(4, "Display Options");
 		}
 
 		/* Birth Options */
-		else if (ch == '6')
+		else if ((ke.key == '6') || ((ke.key == '\xff') && (ke.mousey == 9)))
 		{
 			do_cmd_options_aux(5, "Birth Options");
 		}
 
 		/* Cheating Options */
-		else if (ch == '7')
+		else if ((ke.key == '7') || ((ke.key == '\xff') && (ke.mousey == 10)))
 		{
 			do_cmd_options_aux(6, "Cheat Options");
 		}
-#if 0
-		/* Variant Options */
-		else if (ch == '8')
-		{
-			do_cmd_options_aux(7, "Variant Options");
-		}
 
-		/* Save-File Options */
-		else if (ch == '9')
-		{
-			do_cmd_options_aux(8, "Save-File Options");
-		}
-#endif
 		/* Window flags */
-		else if ((ch == 'W') || (ch == 'w'))
+		else if ((ke.key == 'W') || (ke.key == 'w') || ((ke.key == '\xff') && (ke.mousey == 12)))
 		{
 			do_cmd_options_win();
 		}
 
 		/* Load a user pref file */
-		else if ((ch == 'L') || (ch == 'l'))
+		else if ((ke.key == 'L') || (ke.key == 'l') || ((ke.key == '\xff') && (ke.mousey == 13)))
 		{
 			/* Ask for and load a user pref file */
 			do_cmd_pref_file_hack(20);
 		}
 
 		/* Append options to a file */
-		else if ((ch == 'A') || (ch == 'a'))
+		else if ((ke.key == 'A') || (ke.key == 'a') || ((ke.key == '\xff') && (ke.mousey == 14)))
 		{
 			char ftmp[80];
 
@@ -994,7 +1031,7 @@ void do_cmd_options(void)
 		}
 
 		/* Hack -- Base Delay Factor */
-		else if ((ch == 'D') || (ch == 'd'))
+		else if ((ke.key == 'D') || (ke.key == 'd') || ((ke.key == '\xff') && (ke.mousey == 16)))
 		{
 			/* Prompt */
 			prt("Command: Base Delay Factor", 20, 0);
@@ -1016,7 +1053,7 @@ void do_cmd_options(void)
 		}
 
 		/* Hack -- hitpoint warning factor */
-		else if ((ch == 'H') || (ch == 'h'))
+		else if ((ke.key == 'H') || (ke.key == 'h') || ((ke.key == '\xff') && (ke.mousey == 17)))
 		{
 			/* Prompt */
 			prt("Command: Hitpoint Warning", 20, 0);
@@ -1312,7 +1349,7 @@ static errr keymap_dump(cptr fname)
  */
 void do_cmd_macros(void)
 {
-	char ch;
+	key_event ke;
 
 	char tmp[1024];
 
@@ -1380,13 +1417,13 @@ void do_cmd_macros(void)
 		prt("Command: ", 16, 0);
 
 		/* Get a command */
-		ch = inkey();
+		ke = anykey();
 
 		/* Leave */
-		if (ch == ESCAPE) break;
+		if (ke.key == ESCAPE) break;
 
 		/* Load a user pref file */
-		if (ch == '1')
+		if ((ke.key == '1') || ((ke.key == '\xff') && (ke.mousey == 4)))
 		{
 			/* Ask for and load a user pref file */
 			do_cmd_pref_file_hack(16);
@@ -1395,7 +1432,7 @@ void do_cmd_macros(void)
 #ifdef ALLOW_MACROS
 
 		/* Save macros */
-		else if (ch == '2')
+		else if ((ke.key == '2') || ((ke.key == '\xff') && (ke.mousey == 5)))
 		{
 			char ftmp[80];
 
@@ -1419,7 +1456,7 @@ void do_cmd_macros(void)
 		}
 
 		/* Query a macro */
-		else if (ch == '3')
+		else if ((ke.key == '3') || ((ke.key == '\xff') && (ke.mousey == 6)))
 		{
 			int k;
 
@@ -1460,7 +1497,7 @@ void do_cmd_macros(void)
 		}
 
 		/* Create a macro */
-		else if (ch == '4')
+		else if ((ke.key == '4') || ((ke.key == '\xff') && (ke.mousey == 7)))
 		{
 			/* Prompt */
 			prt("Command: Create a macro", 16, 0);
@@ -1495,7 +1532,7 @@ void do_cmd_macros(void)
 		}
 
 		/* Remove a macro */
-		else if (ch == '5')
+		else if ((ke.key == '5') || ((ke.key == '\xff') && (ke.mousey == 8)))
 		{
 			/* Prompt */
 			prt("Command: Remove a macro", 16, 0);
@@ -1514,7 +1551,7 @@ void do_cmd_macros(void)
 		}
 
 		/* Save keymaps */
-		else if (ch == '6')
+		else if ((ke.key == '6') || ((ke.key == '\xff') && (ke.mousey == 9)))
 		{
 			char ftmp[80];
 
@@ -1538,7 +1575,7 @@ void do_cmd_macros(void)
 		}
 
 		/* Query a keymap */
-		else if (ch == '7')
+		else if ((ke.key == '7') || ((ke.key == '\xff') && (ke.mousey == 10)))
 		{
 			cptr act;
 
@@ -1579,7 +1616,7 @@ void do_cmd_macros(void)
 		}
 
 		/* Create a keymap */
-		else if (ch == '8')
+		else if ((ke.key == '8') || ((ke.key == '\xff') && (ke.mousey == 11)))
 		{
 			/* Prompt */
 			prt("Command: Create a keymap", 16, 0);
@@ -1617,7 +1654,7 @@ void do_cmd_macros(void)
 		}
 
 		/* Remove a keymap */
-		else if (ch == '9')
+		else if ((ke.key == '9') || ((ke.key == '\xff') && (ke.mousey == 12)))
 		{
 			/* Prompt */
 			prt("Command: Remove a keymap", 16, 0);
@@ -1639,7 +1676,7 @@ void do_cmd_macros(void)
 		}
 
 		/* Enter a new action */
-		else if (ch == '0')
+		else if ((ke.key == '0') || ((ke.key == '\xff') && (ke.mousey == 13)))
 		{
 			/* Prompt */
 			prt("Command: Enter a new action", 16, 0);
@@ -1685,7 +1722,7 @@ void do_cmd_macros(void)
  */
 void do_cmd_visuals(void)
 {
-	int ch;
+	key_event ke;
 	int cx;
 
 	int i;
@@ -1757,13 +1794,13 @@ void do_cmd_visuals(void)
 		prt("Command: ", 15, 0);
 
 		/* Prompt */
-		ch = inkey();
+		ke = anykey();
 
 		/* Done */
-		if (ch == ESCAPE) break;
+		if (ke.key == ESCAPE) break;
 
 		/* Load a user pref file */
-		if (ch == '1')
+		if ((ke.key == '1') || ((ke.key == '\xff') && (ke.mousey == 4)))
 		{
 			/* Ask for and load a user pref file */
 			do_cmd_pref_file_hack(15);
@@ -1772,7 +1809,7 @@ void do_cmd_visuals(void)
 #ifdef ALLOW_VISUALS
 
 		/* Dump monster attr/chars */
-		else if (ch == '2')
+		else if ((ke.key == '2') || ((ke.key == '\xff') && (ke.mousey == 5)))
 		{
 			char ftmp[80];
 
@@ -1831,7 +1868,7 @@ void do_cmd_visuals(void)
 		}
 
 		/* Dump object attr/chars */
-		else if (ch == '3')
+		else if ((ke.key == '3') || ((ke.key == '\xff') && (ke.mousey == 6)))
 		{
 			char ftmp[80];
 
@@ -1890,7 +1927,7 @@ void do_cmd_visuals(void)
 		}
 
 		/* Dump feature attr/chars */
-		else if (ch == '4')
+		else if ((ke.key == '4') || ((ke.key == '\xff') && (ke.mousey == 7)))
 		{
 			char ftmp[80];
 
@@ -1955,7 +1992,7 @@ void do_cmd_visuals(void)
 		}
 
 		/* Dump flavor attr/chars */
-		else if (ch == '5')
+		else if ((ke.key == '5') || ((ke.key == '\xff') && (ke.mousey == 8)))
 		{
 			char ftmp[80];
 
@@ -2011,7 +2048,7 @@ void do_cmd_visuals(void)
 		}
 
 		/* Modify monster attr/chars */
-		else if (ch == '6')
+		else if ((ke.key == '6') || ((ke.key == '\xff') && (ke.mousey == 9)))
 		{
 			static int r = 0;
 
@@ -2084,7 +2121,7 @@ void do_cmd_visuals(void)
 		}
 
 		/* Modify object attr/chars */
-		else if (ch == '7')
+		else if ((ke.key == '7') || ((ke.key == '\xff') && (ke.mousey == 10)))
 		{
 			static int k = 0;
 
@@ -2157,7 +2194,7 @@ void do_cmd_visuals(void)
 		}
 
 		/* Modify feature attr/chars */
-		else if (ch == '8')
+		else if ((ke.key == '8') || ((ke.key == '\xff') && (ke.mousey == 11)))
 		{
 			static int f = 0;
 
@@ -2230,7 +2267,7 @@ void do_cmd_visuals(void)
 		}
 
 		/* Modify flavor attr/chars */
-		else if (ch == '9')
+		else if ((ke.key == '9') || ((ke.key == '\xff') && (ke.mousey == 12)))
 		{
 			static int f = 0;
 
@@ -2305,7 +2342,7 @@ void do_cmd_visuals(void)
 #endif /* ALLOW_VISUALS */
 
 		/* Reset visuals */
-		else if (ch == '0')
+		else if ((ke.key == '0') || ((ke.key == '\xff') && (ke.mousey == 13)))
 		{
 			/* Reset */
 			reset_visuals(TRUE);
@@ -2335,7 +2372,7 @@ void do_cmd_visuals(void)
  */
 void do_cmd_colors(void)
 {
-	int ch;
+	key_event ke;
 	int cx;
 
 	int i;
@@ -2373,13 +2410,13 @@ void do_cmd_colors(void)
 		prt("Command: ", 8, 0);
 
 		/* Prompt */
-		ch = inkey();
+		ke = anykey();
 
 		/* Done */
-		if (ch == ESCAPE) break;
+		if (ke.key == ESCAPE) break;
 
 		/* Load a user pref file */
-		if (ch == '1')
+		if ((ke.key == '1') || ((ke.key == '\xff') && (ke.mousey == 4)))
 		{
 			/* Ask for and load a user pref file */
 			do_cmd_pref_file_hack(8);
@@ -2396,7 +2433,7 @@ void do_cmd_colors(void)
 #ifdef ALLOW_COLORS
 
 		/* Dump colors */
-		else if (ch == '2')
+		else if ((ke.key == '2') || ((ke.key == '\xff') && (ke.mousey == 5)))
 		{
 			char ftmp[80];
 
@@ -2463,7 +2500,7 @@ void do_cmd_colors(void)
 		}
 
 		/* Edit colors */
-		else if (ch == '3')
+		else if ((ke.key == '3') || ((ke.key == '\xff') && (ke.mousey == 6)))
 		{
 			static byte a = 0;
 
@@ -3633,7 +3670,7 @@ void do_cmd_quest(void)
 	/* No quests? */
 	if (no_quests) text_out("You currently have no quests.\n");
 
-	inkey();
+	anykey();
 
 	/* Load screen */
 	screen_load();
@@ -4447,6 +4484,55 @@ static void display_group_list(int col, int row, int wid, int per_page,
 	}
 }
 
+
+/*
+ * Move the cursor using the mouse in a browser window
+ */
+static void browser_mouse(key_event ke, int *column, int *grp_cur, int grp_cnt, 
+						   int *list_cur, int list_cnt, int col0, int row0, int grp0, int list0, int *delay)
+{
+	int my = ke.mousey - row0;
+	int mx = ke.mousex;
+	int wid;
+	int hgt;
+
+	int grp = *grp_cur;
+	int list = *list_cur;
+
+	/* Get size */
+	Term_get_size(&wid, &hgt);
+
+	if (mx < col0)
+	{
+		int old_grp = grp;
+
+		*column = 0;
+		if ((my >= 0) && (my < grp_cnt - grp0) && (my < hgt - row0 - 2)) grp = my + grp0;
+		else if (my < 0) { grp--; *delay = 100; }
+		else if (my >= hgt - row0 - 2) { grp++; *delay = 100; }
+
+		/* Verify */
+		if (grp >= grp_cnt)	grp = grp_cnt - 1;
+		if (grp < 0) grp = 0;
+		if (grp != old_grp)	list = 0;
+
+	}
+	else
+	{
+		*column = 1;
+		if ((my >= 0) && (my < list_cnt - list0) && (my < hgt - row0 - 2)) list = my + list0;
+		else if (my < 0) { list--; *delay = 100; }
+		else if (my >= hgt - row0 - 2) { list++; *delay = 100; }
+
+		/* Verify */
+		if (list >= list_cnt) list = list_cnt - 1;
+		if (list < 0) list = 0;
+	}
+
+	(*grp_cur) = grp;
+	(*list_cur) = list;
+} 
+
 /* 
  * Move the cursor in a browser window 
  */
@@ -4634,7 +4720,7 @@ static void desc_art_fake(int a_idx)
 	/* Load the screen */
 	screen_load();
 
-	(void)inkey();
+	(void)anykey();
 }
 
 /*
@@ -4648,6 +4734,7 @@ static void do_cmd_knowledge_artifacts(void)
 	int grp_cnt, grp_idx[100];
 	int object_cnt;
 	int *object_idx;
+	int delay = 0;
 
 	int column = 0;
 	bool flag;
@@ -4696,7 +4783,7 @@ static void do_cmd_knowledge_artifacts(void)
 
 	while ((!flag) && (grp_cnt))
 	{
-		char ch;
+		key_event ke;
 
 		if (redraw)
 		{
@@ -4722,16 +4809,20 @@ static void do_cmd_knowledge_artifacts(void)
 		/* Scroll group list */
 		if (grp_cur < grp_top) grp_top = grp_cur;
 		if (grp_cur >= grp_top + browser_rows) grp_top = grp_cur - browser_rows + 1;
-
-		/* Scroll artifact list */
-		if (object_cur < object_top) object_top = object_cur;
-		if (object_cur >= object_top + browser_rows) object_top = object_cur - browser_rows + 1;
+		if (grp_top + browser_rows >= grp_cnt) grp_top = grp_cnt - browser_rows;
+		if (grp_top < 0) grp_top = 0;
 
 		/* Display a list of object groups */
 		display_group_list(0, 6, max, browser_rows, grp_idx, object_group_text, grp_cur, grp_top);
 
 		/* Get a list of objects in the current group */
 		object_cnt = collect_artifacts(grp_idx[grp_cur], object_idx);
+
+		/* Scroll artifact list */
+		if (object_cur < object_top) object_top = object_cur;
+		if (object_cur >= object_top + browser_rows) object_top = object_cur - browser_rows + 1;
+		if (object_top + browser_rows >= object_cnt) object_top = object_cnt - browser_rows;
+		if (object_top < 0) object_top = 0;
 
 		/* Display a list of objects in the current group */
 		display_artifact_list(max + 3, 6, browser_rows, object_idx, object_cur, object_top);
@@ -4761,14 +4852,32 @@ static void do_cmd_knowledge_artifacts(void)
 			Term_gotoxy(max + 3, 6 + (object_cur - object_top));
 		}
 	
-		ch = inkey();
+		if (delay)
+		{
+			/* Force screen update */
+			Term_fresh();
 
-		switch (ch)
+			/* Delay */
+			Term_xtra(TERM_XTRA_DELAY, delay);
+
+			delay = 0;
+		}
+
+		ke = inkey_ex();
+
+		switch (ke.key)
 		{
 			case ESCAPE:
 			{
 				flag = TRUE;
 				break;
+			}
+
+			case '\xff':
+			{
+				/* Move the cursor */
+				browser_mouse(ke, &column, &grp_cur, grp_cnt, &object_cur, object_cnt, max + 3, 6, grp_top, object_top, &delay);
+				if (!ke.mousebutton) break;
 			}
 
 			case 'R':
@@ -4784,7 +4893,7 @@ static void do_cmd_knowledge_artifacts(void)
 			default:
 			{
 				/* Move the cursor */
-				browser_cursor(ch, &column, &grp_cur, grp_cnt, &object_cur, object_cnt);
+				browser_cursor(ke.key, &column, &grp_cur, grp_cnt, &object_cur, object_cnt);
 				break;
 			}
 		}
@@ -4911,10 +5020,11 @@ static byte char_idx = 0;
 /*
  *  Do visual mode command -- Change symbols
  */
-static bool visual_mode_command(char ch, bool *visual_list_ptr, 
+static bool visual_mode_command(key_event ke, bool *visual_list_ptr, 
 				int height, int width, 
 				byte *attr_top_ptr, char *char_left_ptr, 
-				byte *cur_attr_ptr, char *cur_char_ptr)
+				byte *cur_attr_ptr, char *cur_char_ptr,
+				int col, int row, int *delay)
 {
 	static byte attr_old = 0;
 	static char char_old = 0;
@@ -4938,121 +5048,165 @@ static bool visual_mode_command(char ch, bool *visual_list_ptr,
 	if (use_trptile) frame_bottom /= 3;
 	else if (use_dbltile) frame_bottom /= 2;
 
-	switch (ch)
+	switch (ke.key)
 	{
-	case ESCAPE:
-		if (*visual_list_ptr)
-		{
-			/* Cancel change */
-			*cur_attr_ptr = attr_old;
-			*cur_char_ptr = char_old;
-			*visual_list_ptr = FALSE;
+		case ESCAPE:
+			if (*visual_list_ptr)
+			{
+				/* Cancel change */
+				*cur_attr_ptr = attr_old;
+				*cur_char_ptr = char_old;
+				*visual_list_ptr = FALSE;
 
-			return TRUE;
-		}
+				return TRUE;
+			}
+			break;
 
-		break;
+		case '\n':
+		case '\r':
+			if (*visual_list_ptr)
+			{
+				/* Accept change */
+				*visual_list_ptr = FALSE;
 
-	case '\n':
-	case '\r':
-		if (*visual_list_ptr)
-		{
-			/* Accept change */
-			*visual_list_ptr = FALSE;
+				return TRUE;
+			}
+			break;
 
-			return TRUE;
-		}
-		break;
+		case 'V':
+		case 'v':
+			if (!*visual_list_ptr)
+			{
+				*visual_list_ptr = TRUE;
 
-	case 'V':
-	case 'v':
-		if (!*visual_list_ptr)
-		{
-			*visual_list_ptr = TRUE;
+				*attr_top_ptr = (byte)MAX(0, (int)*cur_attr_ptr - frame_top);
+				*char_left_ptr = (char)MAX(-128, (int)*cur_char_ptr - frame_left);
 
-			*attr_top_ptr = (byte)MAX(0, (int)*cur_attr_ptr - frame_top);
-			*char_left_ptr = (char)MAX(-128, (int)*cur_char_ptr - frame_left);
+				attr_old = *cur_attr_ptr;
+				char_old = *cur_char_ptr;
 
-			attr_old = *cur_attr_ptr;
-			char_old = *cur_char_ptr;
+				return TRUE;
+			}
+			else
+			{
+				/* Cancel change */
+				*cur_attr_ptr = attr_old;
+				*cur_char_ptr = char_old;
+				*visual_list_ptr = FALSE;
 
-			return TRUE;
-		}
-		else
-		{
-			/* Cancel change */
-			*cur_attr_ptr = attr_old;
-			*cur_char_ptr = char_old;
-			*visual_list_ptr = FALSE;
+				return TRUE;
+			}
+			break;
 
-			return TRUE;
-		}
-		break;
-
-	case 'C':
-	case 'c':
-		/* Set the visual */
-		attr_idx = *cur_attr_ptr;
-		char_idx = *cur_char_ptr;
-
-		return TRUE;
-
-	case 'P':
-	case 'p':
-		if (attr_idx)
-		{
-			/* Set the char */
-			*cur_attr_ptr = attr_idx;
-			*attr_top_ptr = (byte)MAX(0, (int)*cur_attr_ptr - frame_top);
-		}
-
-		if (char_idx)
-		{
-			/* Set the char */
-			*cur_char_ptr = char_idx;
-			*char_left_ptr = (char)MAX(-128, (int)*cur_char_ptr - frame_left);
-		}
-
-		return TRUE;
-
-	default:
-		if (*visual_list_ptr)
-		{
-			int eff_width, eff_height;
-			int d = target_dir(ch);
-			byte a = *cur_attr_ptr;
-			char c = *cur_char_ptr;
-
-			if (use_trptile) eff_width = width / (use_bigtile ? 6 : 3);
-			else if (use_dbltile) eff_width = width / (use_bigtile ? 4 : 2);
-			else if (use_bigtile) eff_width = width / 2;
-			else eff_width = width;
-
-			if (use_trptile) eff_height = height / 3;
-			else if (use_dbltile) eff_height = height / 2;
-			else eff_height = height;
-					
-			/* Restrict direction */
-			if ((a == 0) && (ddy[d] < 0)) d = 0;
-			if ((c == -128) && (ddx[d] < 0)) d = 0;
-			if ((a == 255) && (ddy[d] > 0)) d = 0;
-			if ((c == 127) && (ddx[d] > 0)) d = 0;
-
-			a += ddy[d];
-			c += ddx[d];
-
+		case 'C':
+		case 'c':
 			/* Set the visual */
-			*cur_attr_ptr = a;
-			*cur_char_ptr = c;
+			attr_idx = *cur_attr_ptr;
+			char_idx = *cur_char_ptr;
 
-
-			/* Move the frame */
-			if ((ddx[d] < 0) && *char_left_ptr > MAX(-128, (int)c - frame_left)) (*char_left_ptr)--;
-			if ((ddx[d] > 0) && *char_left_ptr + eff_width < MIN(127, (int)c + frame_right)) (*char_left_ptr)++;
-			if ((ddy[d] < 0) && *attr_top_ptr > MAX(0, (int)a - frame_top)) (*attr_top_ptr)--;
-			if ((ddy[d] > 0) && *attr_top_ptr + eff_height < MIN(255, (int)a + frame_bottom)) (*attr_top_ptr)++;
 			return TRUE;
-		}
+
+		case 'P':
+		case 'p':
+			if (attr_idx)
+			{
+				/* Set the char */
+				*cur_attr_ptr = attr_idx;
+				*attr_top_ptr = (byte)MAX(0, (int)*cur_attr_ptr - frame_top);
+			}
+
+			if (char_idx)
+			{
+				/* Set the char */
+				*cur_char_ptr = char_idx;
+				*char_left_ptr = (char)MAX(-128, (int)*cur_char_ptr - frame_left);
+			}
+
+			return TRUE;
+
+		default:
+			if (*visual_list_ptr)
+			{
+				int eff_width, eff_height;
+				int d = target_dir(ke.key);
+				byte a = *cur_attr_ptr;
+				char c = *cur_char_ptr;
+
+				if (use_trptile) eff_width = width / (use_bigtile ? 6 : 3);
+				else if (use_dbltile) eff_width = width / (use_bigtile ? 4 : 2);
+				else if (use_bigtile) eff_width = width / 2;
+				else eff_width = width;
+
+				if (use_trptile) eff_height = height / 3;
+				else if (use_dbltile) eff_height = height / 2;
+				else eff_height = height;
+					
+				/* Get mouse movement */
+				if (ke.key == '\xff')
+				{
+					int my = ke.mousey - row;
+					int mx = ke.mousex - col;
+
+					if (use_trptile) { my /= 3; mx /=3; }
+					else if (use_dbltile) {my /=2; mx /=2; }
+
+					if (use_bigtile) mx /= 2;
+
+					if ((my >= 0) && (my < eff_height) && (mx >= 0) && (mx < eff_width)
+						&& ((ke.mousebutton) || (a != *attr_top_ptr + my) || (c != *char_left_ptr + mx)) )
+					{
+						/* Set the visual */
+						*cur_attr_ptr = a = *attr_top_ptr + my;
+						*cur_char_ptr = c = *char_left_ptr + mx;
+
+						/* Move the frame */
+						if (*char_left_ptr > MAX(-128, (int)c - frame_left)) (*char_left_ptr)--;
+						if (*char_left_ptr + eff_width < MIN(127, (int)c + frame_right)) (*char_left_ptr)++;
+						if (*attr_top_ptr > MAX(0, (int)a - frame_top)) (*attr_top_ptr)--;
+						if (*attr_top_ptr + eff_height < MIN(255, (int)a + frame_bottom)) (*attr_top_ptr)++;
+
+						/* Delay */
+						*delay = 100;
+
+						/* Accept change */
+						if (ke.mousebutton) *visual_list_ptr = FALSE;
+
+						return TRUE;
+					}
+					/* Cancel change */
+					else if (ke.mousebutton)
+					{
+						*cur_attr_ptr = attr_old;
+						*cur_char_ptr = char_old;
+						*visual_list_ptr = FALSE;
+
+						return TRUE;
+					}
+				}
+				else
+				{
+					/* Restrict direction */
+					if ((a == 0) && (ddy[d] < 0)) d = 0;
+					if ((c == -128) && (ddx[d] < 0)) d = 0;
+					if ((a == 255) && (ddy[d] > 0)) d = 0;
+					if ((c == 127) && (ddx[d] > 0)) d = 0;
+
+					a += ddy[d];
+					c += ddx[d];
+
+					/* Set the visual */
+					*cur_attr_ptr = a;
+					*cur_char_ptr = c;
+
+					/* Move the frame */
+					if ((ddx[d] < 0) && *char_left_ptr > MAX(-128, (int)c - frame_left)) (*char_left_ptr)--;
+					if ((ddx[d] > 0) && *char_left_ptr + eff_width < MIN(127, (int)c + frame_right)) (*char_left_ptr)++;
+					if ((ddy[d] < 0) && *attr_top_ptr > MAX(0, (int)a - frame_top)) (*attr_top_ptr)--;
+					if ((ddy[d] > 0) && *attr_top_ptr + eff_height < MIN(255, (int)a + frame_bottom)) (*attr_top_ptr)++;
+
+					if (d != 0) return TRUE;
+				}
+			}
 				
 		break;
 	}
@@ -5142,6 +5296,7 @@ static void do_cmd_knowledge_monsters(void)
 	int grp_cnt, grp_idx[100];
 	int mon_cnt;
 	int *mon_idx;
+	int delay = 0;
 	
 	int column = 0;
 	bool flag;
@@ -5197,7 +5352,7 @@ static void do_cmd_knowledge_monsters(void)
 
 	while ((!flag) && (grp_cnt))
 	{
-		char ch;
+		key_event ke;
 
 		if (redraw)
 		{
@@ -5224,6 +5379,8 @@ static void do_cmd_knowledge_monsters(void)
 		/* Scroll group list */
 		if (grp_cur < grp_top) grp_top = grp_cur;
 		if (grp_cur >= grp_top + browser_rows) grp_top = grp_cur - browser_rows + 1;
+		if (grp_top + browser_rows >= grp_cnt) grp_top = grp_cnt - browser_rows;
+		if (grp_top < 0) grp_top = 0;
 
 		/* Display a list of monster groups */
 		display_group_list(0, 6, max, browser_rows, grp_idx, monster_group_text, grp_cur, grp_top);
@@ -5237,10 +5394,10 @@ static void do_cmd_knowledge_monsters(void)
 		}
 
 		/* Scroll monster list */
-		while (mon_cur < mon_top)
-			mon_top = MAX(0, mon_top - browser_rows/2);
-		while (mon_cur >= mon_top + browser_rows)
-			mon_top = MIN(mon_cnt - browser_rows, mon_top + browser_rows/2);
+		if (mon_cur < mon_top) mon_top = mon_cur;
+		if (mon_cur >= mon_top + browser_rows) mon_top = mon_cur - browser_rows + 1;
+		if (mon_top + browser_rows >= mon_cnt) mon_top = mon_cnt - browser_rows;
+		if (mon_top < 0) mon_top = 0;
 
 		if (!visual_list)
 		{
@@ -5291,17 +5448,35 @@ static void do_cmd_knowledge_monsters(void)
 			Term_gotoxy(max + 3, 6 + (mon_cur - mon_top));
 		}
 	
-		ch = inkey();
+		if (delay)
+		{
+			/* Force screen update */
+			Term_fresh();
+
+			/* Delay */
+			Term_xtra(TERM_XTRA_DELAY, delay);
+
+			delay = 0;
+		}
+
+		ke = inkey_ex();
 
 		/* Do visual mode command if needed */
-		if (visual_mode_command(ch, &visual_list, browser_rows-1, wid - (max + 3), &attr_top, &char_left, &r_ptr->x_attr, &r_ptr->x_char)) continue;
+		if (visual_mode_command(ke, &visual_list, browser_rows-1, wid - (max + 3), &attr_top, &char_left, &r_ptr->x_attr, &r_ptr->x_char, max + 3, 7, &delay)) continue;
 
-		switch (ch)
+		switch (ke.key)
 		{
 			case ESCAPE:
 			{
 				flag = TRUE;
 				break;
+			}
+
+			case '\xff':
+			{
+				/* Move the cursor */
+				browser_mouse(ke, &column, &grp_cur, grp_cnt, &mon_cur, mon_cnt, max + 3, 6, grp_top, mon_top, &delay);
+				if (!ke.mousebutton) break;
 			}
 
 			case 'R':
@@ -5312,7 +5487,7 @@ static void do_cmd_knowledge_monsters(void)
 				{
 					screen_roff(mon_idx[mon_cur]);
 
-					(void)inkey();
+					(void)anykey();
 	
 					redraw = TRUE;
 				}
@@ -5322,8 +5497,7 @@ static void do_cmd_knowledge_monsters(void)
 			default:
 			{
 				/* Move the cursor */
-				browser_cursor(ch, &column, &grp_cur, grp_cnt, &mon_cur, mon_cnt);
-
+				browser_cursor(ke.key, &column, &grp_cur, grp_cnt, &mon_cur, mon_cnt);
 				break;
 			}
 		}
@@ -5411,7 +5585,7 @@ static void desc_ego_fake(int e_idx)
 	/* Dump the name */
 	Term_addstr(-1, TERM_L_BLUE, format("Ego Item %s",e_name+e_info[e_idx].name));
 
-	inkey();
+	anykey();
 
 	screen_load();
 }
@@ -5487,6 +5661,7 @@ static void do_cmd_knowledge_ego_items(void)
 	int grp_cnt, grp_idx[100];
 	int object_cnt;
 	int *object_idx;
+	int delay;
 
 	int column = 0;
 	bool flag;
@@ -5538,7 +5713,7 @@ static void do_cmd_knowledge_ego_items(void)
 
 	while ((!flag) && (grp_cnt))
 	{
-		char ch;
+		key_event ke;
 
 		if (redraw)
 		{
@@ -5566,16 +5741,20 @@ static void do_cmd_knowledge_ego_items(void)
 		/* Scroll group list */
 		if (grp_cur < grp_top) grp_top = grp_cur;
 		if (grp_cur >= grp_top + browser_rows) grp_top = grp_cur - browser_rows + 1;
-
-		/* Scroll ego item list */
-		if (object_cur < object_top) object_top = object_cur;
-		if (object_cur >= object_top + browser_rows) object_top = object_cur - browser_rows + 1;
+		if (grp_top + browser_rows >= grp_cnt) grp_top = grp_cnt - browser_rows;
+		if (grp_top < 0) grp_top = 0;
 
 		/* Display a list of object groups */
 		display_group_list(0, 6, max, browser_rows, grp_idx, object_group_text, grp_cur, grp_top);
 
 		/* Get a list of objects in the current group */
 		object_cnt = collect_ego_items(grp_idx[grp_cur], object_idx);
+
+		/* Scroll ego item list */
+		if (object_cur < object_top) object_top = object_cur;
+		if (object_cur >= object_top + browser_rows) object_top = object_cur - browser_rows + 1;
+		if (object_top + browser_rows >= object_cnt) object_top = object_cnt - browser_rows;
+		if (object_top < 0) object_top = 0;
 
 		/* Display a list of objects in the current group */
 		display_ego_item_list(max + 3, 6, browser_rows, object_idx, object_cur, object_top);
@@ -5596,14 +5775,32 @@ static void do_cmd_knowledge_ego_items(void)
 			Term_gotoxy(max + 3, 6 + (object_cur - object_top));
 		}
 	
-		ch = inkey();
+		if (delay)
+		{
+			/* Force screen update */
+			Term_fresh();
 
-		switch (ch)
+			/* Delay */
+			Term_xtra(TERM_XTRA_DELAY, delay);
+
+			delay = 0;
+		}
+
+		ke = inkey_ex();
+
+		switch (ke.key)
 		{
 			case ESCAPE:
 			{
 				flag = TRUE;
 				break;
+			}
+
+			case '\xff':
+			{
+				/* Move the cursor */
+				browser_mouse(ke, &column, &grp_cur, grp_cnt, &object_cur, object_cnt, max + 3, 6, grp_top, object_top, &delay);
+				if (!ke.mousebutton) break;
 			}
 
 			case 'R':
@@ -5721,14 +5918,14 @@ static void do_cmd_knowledge_ego_items(void)
 
 			default:
 			{
-				if (target_dir(ch))
+				if (target_dir(ke.key))
 				{
 					/* Move the cursor */
-					browser_cursor(ch, &column, &grp_cur, grp_cnt, &object_cur, object_cnt);
+					browser_cursor(ke.key, &column, &grp_cur, grp_cnt, &object_cur, object_cnt);
 				}
 				else
 				{
-					note_idx = auto_note_modify(e_ptr->note,ch);
+					note_idx = auto_note_modify(e_ptr->note,ke.key);
 					e_ptr->note = note_idx;
 				}
 				break;
@@ -5865,7 +6062,7 @@ static void desc_obj_fake(int k_idx)
 	/* Load the screen */
 	screen_load();
 
-	(void)inkey();
+	(void)anykey();
 }
 
 
@@ -5880,6 +6077,7 @@ static void do_cmd_knowledge_objects(void)
 	int grp_cnt, grp_idx[100];
 	int object_cnt;
 	int *object_idx;
+	int delay = 0;
 
 	int column = 0;
 	bool flag;
@@ -5938,7 +6136,7 @@ static void do_cmd_knowledge_objects(void)
 
 	while ((!flag) && (grp_cnt))
 	{
-		char ch;
+		key_event ke;
 
 		if (redraw)
 		{
@@ -5962,9 +6160,12 @@ static void do_cmd_knowledge_objects(void)
 
 			redraw = FALSE;
 		}
+
 		/* Scroll group list */
 		if (grp_cur < grp_top) grp_top = grp_cur;
-		if (grp_cur >= grp_top + browser_rows) grp_top = grp_cur - browser_rows + 1;
+		if (grp_cur > grp_top + browser_rows) grp_top = grp_cur - browser_rows + 1;
+		if (grp_top + browser_rows >= grp_cnt) grp_top = grp_cnt - browser_rows;
+		if (grp_top < 0) grp_top = 0;
 
 		/* Display a list of object groups */
 		display_group_list(0, 6, max, browser_rows, grp_idx, object_group_text, grp_cur, grp_top);
@@ -5978,10 +6179,10 @@ static void do_cmd_knowledge_objects(void)
 		}
 
 		/* Scroll object list */
-		while (object_cur < object_top)
-			object_top = MAX(0, object_top - browser_rows/2);
-		while (object_cur >= object_top + browser_rows)
-			object_top = MIN(object_cnt - browser_rows, object_top + browser_rows/2);
+		if (object_cur < object_top) object_top = object_cur;
+		if (object_cur > object_top + browser_rows) object_top = object_cur - browser_rows + 1;
+		if (object_top + browser_rows >= object_cnt) object_top = object_cnt - browser_rows;
+		if (object_top < 0) object_top = 0;
 
 		if (!visual_list)
 		{
@@ -6034,17 +6235,35 @@ static void do_cmd_knowledge_objects(void)
 			Term_gotoxy(max + 3, 6 + (object_cur - object_top));
 		}
 	
-		ch = inkey();
+		if (delay)
+		{
+			/* Force screen update */
+			Term_fresh();
+
+			/* Delay */
+			Term_xtra(TERM_XTRA_DELAY, delay);
+
+			delay = 0;
+		}
+
+		ke = inkey_ex();
 
 		/* Do visual mode command if needed */
-		if (visual_mode_command(ch, &visual_list, browser_rows-1, wid - (max + 3), &attr_top, &char_left, k_ptr->flavor ? &(x_info[k_ptr->flavor].x_attr) : &k_ptr->x_attr, k_ptr->flavor ? &(x_info[k_ptr->flavor].x_char) :&k_ptr->x_char)) continue;
+		if (visual_mode_command(ke, &visual_list, browser_rows-1, wid - (max + 3), &attr_top, &char_left, k_ptr->flavor ? &(x_info[k_ptr->flavor].x_attr) : &k_ptr->x_attr, k_ptr->flavor ? &(x_info[k_ptr->flavor].x_char) :&k_ptr->x_char, max + 3, 7, &delay)) continue;
 
-		switch (ch)
+		switch (ke.key)
 		{
 			case ESCAPE:
 			{
 				flag = TRUE;
 				break;
+			}
+
+			case '\xff':
+			{
+				/* Move the cursor */
+				browser_mouse(ke, &column, &grp_cur, grp_cnt, &object_cur, object_cnt, max + 3, 6, grp_top, object_top, &delay);
+				if (!ke.mousebutton) break;
 			}
 
 			case 'R':
@@ -6168,20 +6387,18 @@ static void do_cmd_knowledge_objects(void)
 
 			default:
 			{
-				if (target_dir(ch))
+				if (target_dir(ke.key))
 				{
 					/* Move the cursor */
-					browser_cursor(ch, &column, &grp_cur, grp_cnt, &object_cur, object_cnt);
+					browser_cursor(ke.key, &column, &grp_cur, grp_cnt, &object_cur, object_cnt);
 				}
 				else
 				{
-					note_idx = auto_note_modify(k_ptr->note,ch);
+					note_idx = auto_note_modify(k_ptr->note,ke.key);
 					k_ptr->note = note_idx;
 				}
-
 				break;
 			}
-
 		}
 	}
 
@@ -6433,6 +6650,7 @@ static void do_cmd_knowledge_features(void)
 	int grp_cnt, grp_idx[100];
 	int feat_cnt;
 	int *feat_idx;
+	int delay = 0;
 	
 	int column = 0;
 	bool flag;
@@ -6488,7 +6706,7 @@ static void do_cmd_knowledge_features(void)
 
 	while ((!flag) && (grp_cnt))
 	{
-		char ch;
+		key_event ke;
 
 		if (redraw)
 		{
@@ -6515,6 +6733,8 @@ static void do_cmd_knowledge_features(void)
 		/* Scroll group list */
 		if (grp_cur < grp_top) grp_top = grp_cur;
 		if (grp_cur >= grp_top + browser_rows) grp_top = grp_cur - browser_rows + 1;
+		if (grp_top + browser_rows >= grp_cnt) grp_top = grp_cnt - browser_rows;
+		if (grp_top < 0) grp_top = 0;
 
 		/* Display a list of feature groups */
 		display_group_list(0, 6, max, browser_rows, grp_idx, feature_group_text, grp_cur, grp_top);
@@ -6528,10 +6748,10 @@ static void do_cmd_knowledge_features(void)
 		}
 
 		/* Scroll feature list */
-		while (feat_cur < feat_top)
-			feat_top = MAX(0, feat_top - browser_rows/2);
-		while (feat_cur >= feat_top + browser_rows)
-			feat_top = MIN(feat_cnt - browser_rows, feat_top + browser_rows/2);
+		if (feat_cur < feat_top) feat_top = feat_cur;
+		if (feat_cur >= feat_top + browser_rows) feat_top = feat_cur - browser_rows + 1;
+		if (feat_top + browser_rows >= feat_cnt) feat_top = feat_cnt - browser_rows;
+		if (feat_top < 0) feat_top = 0;
 
 		if (!visual_list)
 		{
@@ -6568,12 +6788,23 @@ static void do_cmd_knowledge_features(void)
 			Term_gotoxy(max + 3, 6 + (feat_cur - feat_top));
 		}
 	
-		ch = inkey();
+		if (delay)
+		{
+			/* Force screen update */
+			Term_fresh();
+
+			/* Delay */
+			Term_xtra(TERM_XTRA_DELAY, delay);
+
+			delay = 0;
+		}
+
+		ke = inkey_ex();
 
 		/* Do visual mode command if needed */
-		if (visual_mode_command(ch, &visual_list, browser_rows-1, wid - (max + 3), &attr_top, &char_left, &f_ptr->x_attr, &f_ptr->x_char)) continue;
+		if (visual_mode_command(ke, &visual_list, browser_rows-1, wid - (max + 3), &attr_top, &char_left, &f_ptr->x_attr, &f_ptr->x_char, max + 3, 7, &delay)) continue;
 
-		switch (ch)
+		switch (ke.key)
 		{
 			case ESCAPE:
 			{
@@ -6629,10 +6860,17 @@ static void do_cmd_knowledge_features(void)
 				}
 			}
 
+			case '\xff':
+			{
+				/* Move the cursor */
+				browser_mouse(ke, &column, &grp_cur, grp_cnt, &feat_cur, feat_cnt, max + 3, 6, grp_top, feat_top, &delay);
+				break;
+			}
+
 			default:
 			{
 				/* Move the cursor */
-				browser_cursor(ch, &column, &grp_cur, grp_cnt, &feat_cur, feat_cnt);
+				browser_cursor(ke.key, &column, &grp_cur, grp_cnt, &feat_cur, feat_cnt);
 				break;
 			}
 		}
@@ -6702,7 +6940,7 @@ static void do_cmd_knowledge_home(void)
  */
 void do_cmd_knowledge(void)
 {
-	char ch;
+	key_event ke;
 
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
@@ -6735,62 +6973,62 @@ void do_cmd_knowledge(void)
 		prt("Command: ", 15, 0);
 
 		/* Prompt */
-		ch = inkey();
+		ke = anykey();
 
 		/* Done */
-		if (ch == ESCAPE) break;
+		if (ke.key == ESCAPE) break;
 
 		/* Artifacts */
-		if (ch == '1')
+		if ((ke.key == '1') || ((ke.key == '\xff') && (ke.mousey == 4)))
 		{
 			/* Spawn */
 			do_cmd_knowledge_artifacts();
 		}
 
 		/* Uniques */
-		else if (ch == '2')
+		else if ((ke.key == '2') || ((ke.key == '\xff') && (ke.mousey == 5)))
 		{
 			/* Spawn */
 			do_cmd_knowledge_monsters();
 		}
 
 		/* Ego Items */
-		else if (ch == '3')
+		else if ((ke.key == '3') || ((ke.key == '\xff') && (ke.mousey == 6)))
 		{
 			/* Spawn */
 			do_cmd_knowledge_ego_items();
 		}
 
 		/* Objects */
-		else if (ch == '4')
+		else if ((ke.key == '4') || ((ke.key == '\xff') && (ke.mousey == 7)))
 		{
 			/* Spawn */
 			do_cmd_knowledge_objects();
 		}
 
 		/* Features */
-		else if (ch == '5')
+		else if ((ke.key == '5') || ((ke.key == '\xff') && (ke.mousey == 8)))
 		{
 			/* Spawn */
 			do_cmd_knowledge_features();
 		}
 
 		/* Features */
-		else if (ch == '6')
+		else if ((ke.key == '6') || ((ke.key == '\xff') && (ke.mousey == 9)))
 		{
 			/* Spawn */
 			self_knowledge(FALSE);
 		}
 
 		/* Home */
-		else if (ch == '7')
+		else if ((ke.key == '7') || ((ke.key == '\xff') && (ke.mousey == 10)))
 		{
 			/* Spawn */
 			do_cmd_knowledge_home();
 		}
 
 		/* Load a user pref file */
-		else if (ch == '8')
+		else if ((ke.key == '8') || ((ke.key == '\xff') && (ke.mousey == 11)))
 		{
 			/* Ask for and load a user pref file */
 			do_cmd_pref_file_hack(13);
@@ -6802,7 +7040,7 @@ void do_cmd_knowledge(void)
 		}
 
 		/* Dump colors */
-		else if (ch == '9')
+		else if ((ke.key == '9') || ((ke.key == '\xff') && (ke.mousey == 12)))
 		{
 			char ftmp[80];
 
@@ -6832,7 +7070,7 @@ void do_cmd_knowledge(void)
 		}
 
 		/* Visuals */
-		else if (ch == '0')
+		else if ((ke.key == '0') || ((ke.key == '\xff') && (ke.mousey == 13)))
 		{
 			/* Spawn */
 			do_cmd_visuals();

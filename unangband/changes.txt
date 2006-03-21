@@ -212,6 +212,11 @@ grids as safe when detect monster spell (of any time) has been cast.
 
 - Allow any key press to load the last save file used at the start screen on Windows.
 
+- Added mouse support to the majority of the game.
+
+- It is now possible to specify '!' while targetting to automatically target the location
+under the mouse pointer. This is intended for macros.
+
 ### Bug fixes ###
 
 - Priest spell righteous fury was for mages, paladins, shamans and bards but

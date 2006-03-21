@@ -1606,6 +1606,7 @@ extern void do_cmd_borg(void);
 
 
 
+
 /*
  * Parse and execute the current command
  * Give "Warning" on illegal commands.
@@ -2220,8 +2221,9 @@ static void process_command(void)
 		{
 			if (p_ptr->command_cmd_ex.mousebutton)
 			{
-				int x = p_ptr->command_cmd_ex.mousex + p_ptr->wx;
-				int y = p_ptr->command_cmd_ex.mousey + p_ptr->wy;
+				int y = KEY_GRID_Y(p_ptr->command_cmd_ex);
+				int x = KEY_GRID_X(p_ptr->command_cmd_ex);
+
 				do_cmd_pathfind(y,x);
 			}
 			break;
@@ -2421,7 +2423,7 @@ static void process_player(void)
 			inkey_scan = TRUE;
 
 			/* Check for a key */
-			if (inkey())
+			if (anykey().key)
 			{
 				/* Flush input */
 				flush();

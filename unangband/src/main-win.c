@@ -493,9 +493,9 @@ static HMENU main_menu;
 
 #endif /* USE_SAVER */
 
-
 static char arg_lastsavefile[1024];
-
+static int yOldPos = 0;
+static int xOldPos = 0;
 
 
 #ifdef USE_GRAPHICS
@@ -3114,6 +3114,7 @@ static void init_windows(void)
 
 	/* Process pending messages */
 	(void)Term_xtra_win_flush();
+
 }
 
 
@@ -4470,41 +4471,46 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 				stop_screensaver();
 				return 0;
 			}
-			break;
-#else
-			xPos = GET_X_LPARAM(lParam);
-			yPos = GET_Y_LPARAM(lParam);
-			xPos = (xPos - 13 * td->font_wid) / td->tile_wid;
-			yPos = yPos / td->tile_hgt - 1;
-			if (use_bigtile)
-				xPos /= 2;
-			if (use_trptile)
-			{
-				yPos /= 3;
-				yPos /= 3;
-			}
-			else if (use_dbltile)
-			{
-				yPos /= 2;
-				yPos /= 2;
-			}
-			if (uMsg == WM_LBUTTONDOWN)
-				button = 1;
-			else if (uMsg == WM_RBUTTONDOWN)
-				button = 2;
 			else
-				button = 3;
-			Term_mousepress(xPos,yPos,button);
-			break;
 #endif /* USE_SAVER */
+			if ((game_in_progress) && (td->tile_wid) && (td->tile_hgt))
+			{
+				/* Get the text grid */
+				xPos = GET_X_LPARAM(lParam);
+				yPos = GET_Y_LPARAM(lParam);
+				xPos /= td->tile_wid;
+				yPos /= td->tile_hgt;
+
+				/* XXX TODO Translate iso-coords back to normal if required */
+
+				if (uMsg == WM_LBUTTONDOWN)
+					button = 1;
+				else if (uMsg == WM_RBUTTONDOWN)
+					button = 2;
+				else
+					button = 3;
+				Term_mousepress(xPos,yPos,button);
+			}
+			else if ((!game_in_progress) && (strlen(arg_lastsavefile)))
+			{
+				strcpy(savefile,arg_lastsavefile);
+
+				/* Load 'savefile' */
+				validate_file(savefile);
+				game_in_progress = TRUE;
+				Term_flush();
+				play_game(FALSE);
+				quit(NULL);
+			}
+			break;
 		}
 
-#ifdef USE_SAVER
+
 		case WM_MOUSEMOVE:
 		{
-			if (!screensaver_active) break;
 
-			if (iMouse)
+#ifdef USE_SAVER
+			if ((screensaver_active) && (iMouse))
 			{
 				dx = LOWORD(lParam) - xMouse;
 				dy = HIWORD(lParam) - yMouse;
@@ -4516,16 +4522,38 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 				{
 					stop_screensaver();
 				}
+
+
+				/* Save last location */
+				iMouse = 1;
+				xMouse = LOWORD(lParam);
+				yMouse = HIWORD(lParam);
+
+				return 0;
 			}
-
-			/* Save last location */
-			iMouse = 1;
-			xMouse = LOWORD(lParam);
-			yMouse = HIWORD(lParam);
-
-			return 0;
-		}
+			else
 #endif /* USE_SAVER */
+			if ((game_in_progress) && (td->tile_wid) && (td->tile_hgt))
+			{
+				/* Get the text grid */
+				xPos = GET_X_LPARAM(lParam);
+				yPos = GET_Y_LPARAM(lParam);
+				xPos /= td->tile_wid;
+				yPos /= td->tile_hgt;
+
+				/* Have we changed grid? */
+				if ((xPos != xOldPos) ||
+					(xPos != yOldPos))
+				{
+					Term_mousepress(xPos,yPos,0);
+				}
+
+				/* Save last location */
+				xOldPos = xPos;
+				yOldPos = yPos;
+			}			
+		}
+
 
 		case WM_INITMENU:
 		{

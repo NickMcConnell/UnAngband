@@ -891,7 +891,7 @@ void do_cmd_observe(void)
 	/* Describe */
 	screen_object(o_ptr);
 
-	(void)inkey();
+	(void)anykey();
 
 	/* Load the screen */
 	screen_load();
@@ -1971,7 +1971,7 @@ void do_cmd_query_symbol(void)
 	put_str("Recall details? (k/p/y/n): ", 0, 40);
 
 	/* Query */
-	query = inkey();
+	query = anykey().key;
 
 	/* Restore */
 	prt(buf, 0, 0);
@@ -2050,7 +2050,7 @@ void do_cmd_query_symbol(void)
 			}
 
 			/* Command */
-			query = inkey();
+			query = anykey().key;
 
 			/* Unrecall */
 			if (recall)

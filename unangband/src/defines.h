@@ -4183,6 +4183,21 @@
 
 
 /*
+ * Convert a "key event" into a "location" (Y)
+ */
+#define KEY_GRID_Y(K) \
+	((int) ((p_ptr->wy) + ( ((K.mousey) - 1) / \
+		(use_trptile ? 3 : (use_dbltile ? 2 : 1)) )))
+
+/*
+ * Convert a "key event" into a "location" (X)
+ */
+#define KEY_GRID_X(K) \
+	((int) ((p_ptr->wx) + ( ((K.mousex) - (show_sidebar ? 13 : 0)) / \
+		((use_trptile ? 3 : (use_dbltile ? 2 : 1)) * (use_bigtile ? 2 : 1)) )))
+
+
+/*
  * Determines if a map location is "meaningful"
  */
 #define in_bounds(Y,X) \

@@ -2604,7 +2604,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 {
 	int i, k, n;
 
-	char ch;
+	key_event ke;
 
 	/* Number of "real" lines passed by */
 	int next = 0;
@@ -2929,19 +2929,19 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		}
 
 		/* Get a keypress */
-		ch = inkey();
+		ke = anykey();
 
 		/* Return to last screen */
-		if (ch == '?') break;
+		if (ke.key == '?') break;
 
 		/* Toggle case sensitive on/off */
-		if (ch == '!')
+		if (ke.key == '!')
 		{
 			case_sensitive = !case_sensitive;
 		}
 
 		/* Try showing */
-		if (ch == '&')
+		if (ke.key == '&')
 		{
 			/* Get "shower" */
 			prt("Show: ", hgt - 1, 0);
@@ -2952,7 +2952,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		}
 
 		/* Try finding */
-		if (ch == '/')
+		if (ke.key == '/')
 		{
 			/* Get "finder" */
 			prt("Find: ", hgt - 1, 0);
@@ -2972,7 +2972,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		}
 
 		/* Go to a specific line */
-		if (ch == '#')
+		if (ke.key == '#')
 		{
 			char tmp[80];
 			prt("Goto Line: ", hgt - 1, 0);
@@ -2984,73 +2984,92 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		}
 
 		/* Go to a specific file */
-		if (ch == '%')
+		if (ke.key == '%')
 		{
 			char ftmp[80];
 			prt("Goto File: ", hgt - 1, 0);
 			strcpy(ftmp, "help.hlp");
 			if (askfor_aux(ftmp, 80))
 			{
-				if (!show_file(ftmp, NULL, 0, mode)) ch = ESCAPE;
+				if (!show_file(ftmp, NULL, 0, mode)) ke.key = ESCAPE;
 			}
 		}
 
 		/* Back up one line */
-		if (ch == '=')
+		if (ke.key == '=')
 		{
 			line = line - 1;
 			if (line < 0) line = 0;
 		}
 
 		/* Back up one half page */
-		if (ch == '_')
+		if (ke.key == '_')
 		{
 			line = line - ((hgt - 4) / 2);
 			if (line < 0) line = 0;
 		}
 
 		/* Back up one full page */
-		if (ch == '-')
+		if (ke.key == '-')
 		{
 			line = line - (hgt - 4);
 			if (line < 0) line = 0;
 		}
 
 		/* Advance one line */
-		if ((ch == '\n') || (ch == '\r'))
+		if ((ke.key == '\n') || (ke.key == '\r'))
 		{
 			line = line + 1;
 		}
 
 		/* Advance one half page */
-		if (ch == '+')
+		if (ke.key == '+')
 		{
 			line = line + ((hgt - 4) / 2);
 			if (line < 0) line = 0;
 		}
 
 		/* Advance one full page */
-		if (ch == ' ')
+		if (ke.key == ' ')
 		{
 			line = line + (hgt - 4);
 		}
 
+		/* Scroll forwards or backwards using mouse clicks */
+		if (ke.key == '\xff')
+		{
+			if (ke.mousebutton)
+			{
+				if (ke.mousey <= hgt / 2)
+				{
+					/* Back up one full page */
+					line = line - (hgt - 4);
+					if (line < 0) line = 0;
+				}
+				else
+				{
+					/* Advance one full page */
+					line = line + (hgt - 4);
+				}
+			}
+		}
+
 		/* Recurse on numbers */
-		if (menu && isdigit(ch) && hook[D2I(ch)][0])
+		if (menu && isdigit(ke.key) && hook[D2I(ke.key)][0])
 		{
 			/* Recurse on that file */
-			if (!show_file(hook[D2I(ch)], NULL, 0, mode)) ch = ESCAPE;
+			if (!show_file(hook[D2I(ke.key)], NULL, 0, mode)) ke.key = ESCAPE;
 		}
 
 		/* Exit on escape */
-		if (ch == ESCAPE) break;
+		if (ke.key == ESCAPE) break;
 	}
 
 	/* Close the file */
 	my_fclose(fff);
 
 	/* Done */
-	return (ch != ESCAPE);
+	return (ke.key != ESCAPE);
 }
 
 
@@ -3276,7 +3295,7 @@ void do_cmd_suicide(void)
 	/* Verify Suicide */
 	else
 	{
-		char ch;
+		key_event ke;
 
 		/* Verify */
 		if (!get_check("Do you really want to quit? ")) return;
@@ -3284,9 +3303,9 @@ void do_cmd_suicide(void)
 		/* Special Verification for suicide */
 		prt("Please verify QUITTING by typing the '@' sign: ", 0, 0);
 		flush();
-		ch = inkey();
+		ke = anykey();
 		prt("", 0, 0);
-		if (ch != '@') return;
+		if (ke.key != '@') return;
 	}
 
 	/* Commit suicide */
@@ -3621,7 +3640,7 @@ static void show_info(void)
 	prt("Hit any key to see more information (ESC to abort): ", 23, 0);
 
 	/* Allow abort at this point */
-	if (inkey() == ESCAPE) return;
+	if (anykey().key == ESCAPE) return;
 
 
 	/* Show equipment and inventory */
@@ -3633,7 +3652,7 @@ static void show_info(void)
 		item_tester_full = TRUE;
 		show_equip();
 		prt("You are using: -more-", 0, 0);
-		if (inkey_ex().key == ESCAPE) return;
+		if (anykey().key == ESCAPE) return;
 	}
 
 	/* Inventory -- if any */
@@ -3643,7 +3662,7 @@ static void show_info(void)
 		item_tester_full = TRUE;
 		show_inven();
 		prt("You are carrying: -more-", 0, 0);
-		if (inkey_ex().key == ESCAPE) return;
+		if (anykey().key == ESCAPE) return;
 	}
 
 
@@ -3686,7 +3705,7 @@ static void show_info(void)
 			prt(format("Your home contains (page %d): -more-", k+1), 0, 0);
 
 			/* Wait for it */
-			if (inkey_ex().key == ESCAPE) return;
+			if (anykey().key == ESCAPE) return;
 		}
 	}
 }
@@ -3737,7 +3756,7 @@ static void death_examine(void)
 		/* Describe */
 		screen_object(o_ptr);
 
-		(void)inkey();
+		(void)anykey();
 
 		/* Load the screen */
 		screen_load();
@@ -3859,7 +3878,7 @@ static int highscore_add(const high_score *score)
  */
 void display_scores_aux(int from, int to, int note, high_score *score)
 {
-	char ch;
+	key_event ke;
 
 	int j, k, n, place;
 	int count;
@@ -4008,11 +4027,11 @@ void display_scores_aux(int from, int to, int note, high_score *score)
 
 		/* Wait for response */
 		prt("[Press ESC to quit, any other key to continue.]", 23, 17);
-		ch = inkey();
+		ke = anykey();
 		prt("", 23, 0);
 
 		/* Hack -- notice Escape */
-		if (ch == ESCAPE) break;
+		if (ke.key == ESCAPE) break;
 	}
 }
 
@@ -4050,7 +4069,7 @@ void display_scores(int from, int to)
 
 	/* Wait for response */
 	prt("[Press any key to quit.]", 23, 17);
-	(void)inkey();
+	(void)anykey();
 	prt("", 23, 0);
 
 	/* Quit */
@@ -4391,7 +4410,8 @@ static void kingly(void)
  */
 static void close_game_aux(void)
 {
-	int ch;
+	key_event ke;
+
 	bool wants_to_quit = FALSE;
 	cptr p = "[(i)nformation, (m)essages, (f)ile dump, (v)iew scores, e(x)amine item, ESC]";
 
@@ -4431,9 +4451,9 @@ static void close_game_aux(void)
 		Term_putstr(1, 23, -1, TERM_WHITE, p);
 
 		/* Query */
-		ch = inkey();
+		ke = anykey();
 
-		switch (ch)
+		switch (ke.key)
 		{
 			/* Exit */
 			case ESCAPE:
@@ -4623,7 +4643,7 @@ void close_game(void)
 		prt("Press Return (or Escape).", 0, 40);
 
 		/* Predict score (or ESCAPE) */
-		if (inkey() != ESCAPE) predict_score();
+		if (anykey().key != ESCAPE) predict_score();
 	}
 
 

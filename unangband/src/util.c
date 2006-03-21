@@ -1478,25 +1478,7 @@ char (*inkey_hack)(int flush_first) = NULL;
 
 
 /*
- * Get a keypress from the user.
- */
-char inkey(void)
-{
-	key_event ke;
-
-	/* Only accept a keypress */
-	do
-	{
-		ke = inkey_ex();
-	} while (ke.key == '\xff');
-
-	return ke.key;
-}
-
-
-
-/*
- * Get a keypress or mouse press from the user
+ * Get a keypress, mouse click or mouse move from the user
  *
  * This function recognizes a few "global parameters".  These are variables
  * which, if set to TRUE before calling this function, will have an effect
@@ -1789,7 +1771,38 @@ key_event inkey_ex(void)
 }
 
 
+/*
+ * Get a keypress or mouse click from the user.
+ */
+key_event anykey(void)
+{
+	key_event ke;
 
+	/* Only accept a keypress or mouse click*/
+	do
+	{
+		ke = inkey_ex();
+	} while ((ke.key == '\xff') && !(ke.mousebutton));
+
+	return ke;
+}
+
+
+/*
+ * Get a keypress from the user.
+ */
+char inkey(void)
+{
+	key_event ke;
+
+	/* Only accept a keypress */
+	do
+	{
+		ke = inkey_ex();
+	} while (ke.key == '\xff');
+
+	return ke.key;
+}
 
 
 /*
@@ -2418,7 +2431,7 @@ static void msg_flush(int x)
 	while (1)
 	{
 		key_event ke;
-		ke = inkey_ex();
+		ke = anykey();
 		if ((ke.key == '\xff') && !(ke.mousebutton)) continue;
 		if (quick_messages) break;
 		if ((ke.key == ESCAPE) || (ke.key == ' ')) break;
@@ -3320,7 +3333,7 @@ bool get_com(cptr prompt, char *command)
 	*command = ke.key;
 
 	/* Hack -- ignore mouse */
-	if (ke.key == '\xff')
+	if ((ke.key == '\xff') && (ke.mousebutton))
      		bell("Potential loss of mouse input");
 	return result;
 }
@@ -3369,7 +3382,7 @@ void pause_line(int row)
 {
 	prt("", row, 0);
 	put_str("[Press any key to continue]", row, 23);
-	(void)inkey_ex();
+	(void)anykey();
 	prt("", row, 0);
 }
 

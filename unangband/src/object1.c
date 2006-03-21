@@ -2998,7 +2998,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
-	char which;
+	key_event ke;
 
 	int i, j, k;
 
@@ -3388,12 +3388,72 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 		/* Show the prompt */
 		prt(tmp_val, 0, 0);
 
-
 		/* Get a key */
-		which = inkey();
+		ke = anykey();
+
+		/* Hack -- apply mouse input as a modifier */
+		if (ke.key == '\xff')
+		{
+			if (p_ptr->command_see)
+			{
+				int my = ke.mousey;
+
+				if (p_ptr->command_wrk == (USE_INVEN))
+				{
+					for (i = i1; i <= i2; i++)
+					{
+						object_type *o_ptr = &inventory[i];
+
+						/* Is this item acceptable? */
+						if (!item_tester_okay(o_ptr)) continue;
+
+						/* Is this the line clicked */
+						if (--my == 0) ke.key = 'a' + i;
+					}
+				}
+				else if (p_ptr->command_wrk == (USE_EQUIP))
+				{
+					for (i = e1; i <= e2; i++)
+					{
+						object_type *o_ptr = &inventory[i];
+
+						/* Is this item acceptable? */
+						if (!item_tester_okay(o_ptr)) continue;
+
+						/* Is this the line clicked */
+						if (--my == 0) ke.key = 'a' + i - INVEN_WIELD;
+					}
+				}
+				else if (p_ptr->command_wrk == (USE_FLOOR))
+				{
+					for (i = 0; i <= floor_num; i++)
+					{
+						object_type *o_ptr = &o_list[floor_list[i]];
+
+						/* Is this item acceptable? */
+						if (!item_tester_okay(o_ptr)) continue;
+
+						/* Is this the line clicked */
+						if (--my == 0) ke.key = 'a' + i;
+					}
+				}
+
+				/* Hack -- swap between equip and inven */
+				if (ke.key == '\xff')
+				{
+					if (ke.mousebutton == 1) ke.key = '/';
+					else ke.key = '-';
+				}
+			}
+			/* Display the list */
+			else
+			{
+				ke.key = ' ';
+			}
+		}
 
 		/* Parse it */
-		switch (which)
+		switch (ke.key)
 		{
 			case ESCAPE:
 			{
@@ -3550,7 +3610,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 			case '7': case '8': case '9':
 			{
 				/* Look up the tag */
-				if (!get_tag(&k, which))
+				if (!get_tag(&k, ke.key))
 				{
 					bell("Illegal object choice (tag)!");
 					break;
@@ -3677,6 +3737,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 			default:
 			{
 				bool verify;
+				int which = ke.key;
 
 				/* Note verify */
 				verify = (isupper(which) ? TRUE : FALSE);

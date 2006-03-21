@@ -804,7 +804,7 @@ void self_knowledge(bool spoil)
 
 	}
 
-	inkey();
+	(void)anykey();
 
 	/* Load screen */
 	screen_load();
@@ -3032,7 +3032,7 @@ bool ident_spell_rumor(void)
 		/* Actually display the item */
 		list_object_flags(f1, f2, f3, f4, 1);
 
-		(void)inkey();
+		(void)anykey();
 	
 		/* Load screen */
 		screen_load();
@@ -3206,7 +3206,7 @@ bool identify_fully(void)
 	/* Describe */
 	screen_object(o_ptr);
 
-	(void)inkey();
+	(void)anykey();
 
 	/* Load the screen */
 	screen_load();

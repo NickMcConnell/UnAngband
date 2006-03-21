@@ -1750,7 +1750,7 @@ static bool get_stock(int *com_val, cptr pmt)
 {
 	int item;
 
-	char which;
+	key_event ke;
 
 	char buf[160];
 
@@ -1787,9 +1787,29 @@ static bool get_stock(int *com_val, cptr pmt)
 	while (TRUE)
 	{
 		bool verify;
+		char which;
 
 		/* Escape */
-		if (!get_com(buf, &which)) return (FALSE);
+		if (!get_com_ex(buf, &ke)) return (FALSE);
+
+		/* Hack -- handle mouse input */
+		if (ke.key == '\xff')
+		{
+			if (ke.mousebutton)
+			{
+				/* Hack -- fake a letter */
+				if ((ke.mousey >= 6) && (ke.mousey < 20))
+					ke.key = 'a' + ke.mousey - 6 + store_top;
+
+				/* Hack -- force error */
+				else ke.key = 'z';
+			}
+			/* Ignore anything else */
+			else continue;
+		}
+
+		/* Get the choice */
+		which = ke.key;
 
 		/* Note verify */
 		verify = (isupper(which) ? TRUE : FALSE);
@@ -3108,7 +3128,7 @@ static void store_examine(void)
 	/* Describe */
 	screen_object(o_ptr);
 
-	(void)inkey();
+	(void)anykey();
 
 	/* Load the screen */
 	screen_load();
@@ -3136,7 +3156,7 @@ static bool leave_store = FALSE;
  * which is needed to prevent the "redraw" from affecting
  * the display of the store.  XXX XXX XXX
  */
-static void store_process_command(void)
+static void store_process_command(char *choice)
 {
 
 #ifdef ALLOW_REPEAT
@@ -3145,6 +3165,28 @@ static void store_process_command(void)
 	repeat_check();
 
 #endif /* ALLOW_REPEAT */
+
+	/* MegaHack -- have sensitive areas of the store to click */
+	if (p_ptr->command_cmd == '\xff')
+	{
+		int y = p_ptr->command_cmd_ex.mousey;
+		int x = p_ptr->command_cmd_ex.mousex;
+
+		if ((y >= 6) && (y <= 20) && (*choice != 'g') && (*choice != 'l')) *choice = 'g';
+		if ((y == 22) && (x < 31)) *choice = ESCAPE;
+		else if ((y == 22) && (x < 55)) *choice = 'g';
+		else if (y == 22) *choice = 'l';
+		else if ((y == 23) && (x < 31)) *choice = ' ';
+		else if ((y == 23) && (x < 55)) *choice = 'd';
+
+		/* Hack -- execute command */
+		if (p_ptr->command_cmd_ex.mousebutton)
+		{
+			p_ptr->command_cmd = *choice;
+		}
+
+		else return;
+	}
 
 	/* Parse the command */
 	switch (p_ptr->command_cmd)
@@ -3206,6 +3248,7 @@ static void store_process_command(void)
 		case 'g':
 		{
 			store_purchase();
+			*choice = 'g';
 			break;
 		}
 
@@ -3213,6 +3256,7 @@ static void store_process_command(void)
 		case 'd':
 		{
 			store_sell();
+			*choice = 'd';
 			break;
 		}
 
@@ -3220,6 +3264,7 @@ static void store_process_command(void)
 		case 'l':
 		{
 			store_examine();
+			*choice = 'x';
 			break;
 		}
 
@@ -3520,6 +3565,8 @@ void do_cmd_store(void)
 
 	dungeon_zone *zone = &t_info[0].zone[0];
 
+	char choice = '\0';
+
 	/* Get the zone */	
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
@@ -3548,7 +3595,7 @@ void do_cmd_store(void)
 		p_ptr->town = p_ptr->dungeon;		
 
 		/* Initialise the stores -- except for home */
-		for (i = 0; i < MAX_STORES; i++)
+		for (i = 0; i < MAX_STORES - 1; i++)
 		{
 			store_num_real = t_info[p_ptr->town].store[i];
 
@@ -3624,23 +3671,23 @@ void do_cmd_store(void)
 		clear_from(21);
 
 		/* Basic commands */
-		prt(" ESC) Exit from Building.", 22, 0);
+		c_prt(choice == ESCAPE ? TERM_L_BLUE : TERM_WHITE, " ESC) Exit from Building.", 22, 0);
 
 		/* Browse if necessary */
 		if (st_ptr->stock_num > 12)
 		{
-			prt(" SPACE) Next page of stock", 23, 0);
+			c_prt(choice == ' ' ? TERM_L_BLUE : TERM_WHITE, " SPACE) Next page of stock", 23, 0);
 		}
 
 		/* Commands */
-		prt(" g) Get/Purchase an item.", 22, 31);
-		prt(" d) Drop/Sell an item.", 23, 31);
+		c_prt(choice == 'g' ? TERM_L_BLUE : TERM_WHITE, " g) Get/Purchase an item.", 22, 31);
+		c_prt(choice == 'd' ? TERM_L_BLUE : TERM_WHITE, " d) Drop/Sell an item.", 23, 31);
 
 		/* Add in the eXamine option */
 		if (rogue_like_commands)
-			prt(" x) eXamine an item.", 22, 56);
+			c_prt(choice == 'l' ? TERM_L_BLUE : TERM_WHITE, " x) eXamine an item.", 22, 56);
 		else
-			prt(" l) Look at an item.", 22, 56);
+			c_prt(choice == 'l' ? TERM_L_BLUE : TERM_WHITE, " l) Look at an item.", 22, 56);
 
 		/* Prompt */
 		prt("You may: ", 21, 0);
@@ -3649,7 +3696,7 @@ void do_cmd_store(void)
 		request_command(TRUE);
 
 		/* Process the command */
-		store_process_command();
+		store_process_command(&choice);
 
 		/* Notice stuff */
 		notice_stuff();

@@ -4370,7 +4370,7 @@ static key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 			sprintf(out_val, "%s%s%s%s [%s]", s1, s2, s3, name, info);
 			prt(out_val, 0, 0);
 			move_cursor_relative(y, x);
-			query = inkey_ex();
+			query = anykey();
 
 			/* Stop on everything but "return" */
 			if ((query.key != '\n') && (query.key != '\r')) break;
@@ -5346,13 +5346,14 @@ bool target_set_interactive(int mode)
 					break;
 				}
 
+				case '!':
 				case '\xff':
 				{
-					x = query.mousex + p_ptr->wx;
-					y = query.mousey + p_ptr->wy;
+					ty = y = KEY_GRID_Y(query);
+					tx = x = KEY_GRID_X(query);
 
 					/* Set target if clicked */
-					if (query.mousebutton)
+					if ((query.mousebutton) || (query.key == '!'))
 					{
 						target_set_location(y, x);
 						done = TRUE;
@@ -5371,7 +5372,10 @@ bool target_set_interactive(int mode)
 							p_ptr->window |= (PW_OVERHEAD);
 
 							/* Handle stuff */
-							handle_stuff();					
+							handle_stuff();	
+
+							/* Force an update */
+							Term_fresh();
 						}
 					}
 					break;
@@ -5384,10 +5388,10 @@ bool target_set_interactive(int mode)
 					break;
 				}
 
+				case '.':
 				case 't':
 				case '5':
 				case '0':
-				case '.':
 				{
 					int m_idx = cave_m_idx[y][x];
 
@@ -5552,13 +5556,14 @@ bool target_set_interactive(int mode)
 					break;
 				}
 
+				case '!':
 				case '\xff':
 				{
-					x = query.mousex + p_ptr->wx;
-					y = query.mousey + p_ptr->wy;
+					ty = y = KEY_GRID_Y(query);
+					tx = x = KEY_GRID_X(query);
 
 					/* Set target if clicked */
-					if (query.mousebutton)
+					if ((query.mousebutton) || (query.key == '!'))
 					{
 						target_set_location(y, x);
 						done = TRUE;
@@ -5577,7 +5582,10 @@ bool target_set_interactive(int mode)
 							p_ptr->window |= (PW_OVERHEAD);
 
 							/* Handle stuff */
-							handle_stuff();					
+							handle_stuff();
+
+							/* Force an update */
+							Term_fresh();			
 						}
 					}
 					break;
@@ -5590,10 +5598,10 @@ bool target_set_interactive(int mode)
 					break;
 				}
 
+				case '.':
 				case 't':
 				case '5':
 				case '0':
-				case '.':
 				{
 					target_set_location(y, x);
 					done = TRUE;
