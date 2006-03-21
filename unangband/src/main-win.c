@@ -193,6 +193,8 @@
 #define IDM_OPTIONS_DBLTILE         408
 #define IDM_OPTIONS_BIGTILE         409
 #define IDM_OPTIONS_SOUND           410
+#define IDM_OPTIONS_MOUSE           411
+#define IDM_OPTIONS_TRACKMOUSE      412
 #define IDM_OPTIONS_LOW_PRIORITY    420
 #define IDM_OPTIONS_SAVER           430
 #define IDM_OPTIONS_MAP             440
@@ -1051,6 +1053,14 @@ static void save_prefs(void)
 	strcpy(buf, arg_sound ? "1" : "0");
 	WritePrivateProfileString("Angband", "Sound", buf, ini_file);
 
+	/* Save the "arg_mouse" flag */
+	strcpy(buf, arg_mouse ? "1" : "0");
+	WritePrivateProfileString("Angband", "EnableMouse", buf, ini_file);
+
+	/* Save the "arg_trackmouse" flag */
+	strcpy(buf, arg_trackmouse ? "1" : "0");
+	WritePrivateProfileString("Angband", "TrackMouseMove", buf, ini_file);
+
 	/* Save the "arg_lastsavefile" flag */
 	if (strlen(savefile))
 	{
@@ -1133,6 +1143,12 @@ static void load_prefs(void)
 
 	/* Extract the "arg_sound" flag */
 	arg_sound = (GetPrivateProfileInt("Angband", "Sound", 0, ini_file) != 0);
+
+	/* Extract the "arg_mouse" flag */
+	arg_mouse = (GetPrivateProfileInt("Angband", "EnableMouse", TRUE, ini_file) != 0);
+
+	/* Extract the "arg_trackmouse" flag */
+	arg_trackmouse = (GetPrivateProfileInt("Angband", "TrackMouseMove", TRUE, ini_file) != 0);
 
 	/* Extract the "arg_savefile" flag */
 	GetPrivateProfileString("Angband", "LastSaveFile", NULL, arg_lastsavefile, sizeof(arg_lastsavefile), ini_file);
@@ -1908,6 +1924,19 @@ static errr Term_xtra_win_react(void)
 
 #endif /* USE_SOUND */
 
+	/* Handle "arg_mouse" */
+	if (use_mouse != arg_mouse)
+	{
+		/* Change setting */
+		use_mouse = arg_mouse;
+	}
+
+	/* Handle "arg_trackmouse" */
+	if (use_trackmouse != arg_trackmouse)
+	{
+		/* Change setting */
+		use_trackmouse = arg_trackmouse;
+	}
 
 #ifdef USE_GRAPHICS
 
@@ -3303,6 +3332,10 @@ static void setup_menus(void)
 	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 	EnableMenuItem(hm, IDM_OPTIONS_SOUND,
 	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+	EnableMenuItem(hm, IDM_OPTIONS_MOUSE,
+	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+	EnableMenuItem(hm, IDM_OPTIONS_TRACKMOUSE,
+	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 	EnableMenuItem(hm, IDM_OPTIONS_SAVER,
 	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 	EnableMenuItem(hm, IDM_OPTIONS_LOW_PRIORITY,
@@ -3335,6 +3368,10 @@ static void setup_menus(void)
 	              (use_bigtile ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(hm, IDM_OPTIONS_SOUND,
 	              (arg_sound ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(hm, IDM_OPTIONS_MOUSE,
+	              (arg_mouse ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(hm, IDM_OPTIONS_TRACKMOUSE,
+	              (arg_trackmouse ? MF_CHECKED : MF_UNCHECKED));
 #ifdef USE_SAVER
 	CheckMenuItem(hm, IDM_OPTIONS_SAVER,
 	              (hwndSaver ? MF_CHECKED : MF_UNCHECKED));
@@ -3365,6 +3402,13 @@ static void setup_menus(void)
 		EnableMenuItem(hm, IDM_OPTIONS_SOUND, MF_ENABLED);
 	}
 #endif /* USE_SOUND */
+
+	if (inkey_flag && initialized)
+	{
+		/* Menu "Options", Item "Sound" */
+		EnableMenuItem(hm, IDM_OPTIONS_MOUSE, MF_ENABLED);
+		EnableMenuItem(hm, IDM_OPTIONS_TRACKMOUSE, MF_ENABLED);
+	}
 
 #ifdef USE_SAVER
 	/* Menu "Options", Item "ScreenSaver" */
@@ -4169,6 +4213,48 @@ static void process_menus(WORD wCmd)
 			break;
 		}
 
+		case IDM_OPTIONS_MOUSE:
+		{
+			/* Paranoia */
+			if (!inkey_flag || !initialized)
+			{
+				plog("You may not do that right now.");
+				break;
+			}
+
+			/* Toggle "arg_mouse" */
+			arg_mouse = !arg_mouse;
+
+			/* React to changes */
+			Term_xtra_win_react();
+
+			/* Hack -- Force redraw */
+			Term_key_push(KTRL('R'));
+
+			break;
+		}
+
+		case IDM_OPTIONS_TRACKMOUSE:
+		{
+			/* Paranoia */
+			if (!inkey_flag || !initialized)
+			{
+				plog("You may not do that right now.");
+				break;
+			}
+
+			/* Toggle "arg_trackmouse" */
+			arg_trackmouse = !arg_trackmouse;
+
+			/* React to changes */
+			Term_xtra_win_react();
+
+			/* Hack -- Force redraw */
+			Term_key_push(KTRL('R'));
+
+			break;
+		}
+
 #ifdef USE_SAVER
 
 		case IDM_OPTIONS_SAVER:
@@ -4473,7 +4559,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 			}
 			else
 #endif /* USE_SAVER */
-			if ((game_in_progress) && (td->tile_wid) && (td->tile_hgt))
+			if ((game_in_progress) && (td->tile_wid) && (td->tile_hgt) && (use_mouse))
 			{
 				/* Get the text grid */
 				xPos = GET_X_LPARAM(lParam);
@@ -4491,6 +4577,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 					button = 3;
 				Term_mousepress(xPos,yPos,button);
 			}
+			/* Hack -- use_mouse not initialised yet */
 			else if ((!game_in_progress) && (strlen(arg_lastsavefile)))
 			{
 				strcpy(savefile,arg_lastsavefile);
@@ -4533,7 +4620,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 			}
 			else
 #endif /* USE_SAVER */
-			if ((game_in_progress) && (td->tile_wid) && (td->tile_hgt))
+			if ((game_in_progress) && (td->tile_wid) && (td->tile_hgt) && (use_trackmouse))
 			{
 				/* Get the text grid */
 				xPos = GET_X_LPARAM(lParam);

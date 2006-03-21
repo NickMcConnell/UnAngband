@@ -2631,7 +2631,6 @@ void do_cmd_pathfind(int y, int x)
 }
 
 
-
 /*
  * Stay still.  Search.  Enter stores.
  * Pick up treasure if "pickup" is true.

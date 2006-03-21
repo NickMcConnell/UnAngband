@@ -4509,7 +4509,7 @@ static void browser_mouse(key_event ke, int *column, int *grp_cur, int grp_cnt,
 		*column = 0;
 		if ((my >= 0) && (my < grp_cnt - grp0) && (my < hgt - row0 - 2)) grp = my + grp0;
 		else if (my < 0) { grp--; *delay = 100; }
-		else if (my >= hgt - row0 - 2) { grp++; *delay = 100; }
+		else if (my >= hgt - row0 - 2) { grp++; *delay = 50; }
 
 		/* Verify */
 		if (grp >= grp_cnt)	grp = grp_cnt - 1;
@@ -4522,7 +4522,7 @@ static void browser_mouse(key_event ke, int *column, int *grp_cur, int grp_cnt,
 		*column = 1;
 		if ((my >= 0) && (my < list_cnt - list0) && (my < hgt - row0 - 2)) list = my + list0;
 		else if (my < 0) { list--; *delay = 100; }
-		else if (my >= hgt - row0 - 2) { list++; *delay = 100; }
+		else if (my >= hgt - row0 - 2) { list++; *delay = 50; }
 
 		/* Verify */
 		if (list >= list_cnt) list = list_cnt - 1;

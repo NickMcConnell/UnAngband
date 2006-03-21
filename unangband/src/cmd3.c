@@ -1506,7 +1506,6 @@ void do_cmd_look(void)
 }
 
 
-
 /*
  * Allow the player to examine other sectors on the map
  */

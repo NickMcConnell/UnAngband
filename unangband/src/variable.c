@@ -64,6 +64,8 @@ u16b sf_saves;		  /* Number of "saves" during this life */
 bool arg_fiddle;			/* Command arg -- Request fiddle mode */
 bool arg_wizard;			/* Command arg -- Request wizard mode */
 bool arg_sound;			 /* Command arg -- Request special sounds */
+bool arg_mouse;			 /* Command arg -- Request mouse */
+bool arg_trackmouse;			 /* Command arg -- Request constant mouse tracking */
 bool arg_graphics;		      /* Command arg -- Request graphics mode */
 bool arg_force_original;	/* Command arg -- Request original keyset */
 bool arg_force_roguelike;       /* Command arg -- Request roguelike keyset */
@@ -103,6 +105,8 @@ bool surface;
 bool daytime;
 
 bool use_sound;		 /* The "sound" mode is enabled */
+bool use_mouse;		 /* The "mouse" mode is enabled */
+bool use_trackmouse;	 /* The "trackmouse" mode is enabled */
 bool use_graphics;	      /* The "graphics" mode is enabled */
 bool use_trptile = FALSE;
 bool use_dbltile = FALSE;
