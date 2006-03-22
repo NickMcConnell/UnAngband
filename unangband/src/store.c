@@ -1798,7 +1798,7 @@ static bool get_stock(int *com_val, cptr pmt)
 			if (ke.mousebutton)
 			{
 				/* Hack -- fake a letter */
-				if ((ke.mousey >= 6) && (ke.mousey < 20))
+				if ((ke.mousey >= 6) && (ke.mousey < 18))
 					ke.key = 'a' + ke.mousey - 6 + store_top;
 
 				/* Hack -- force error */
@@ -2093,7 +2093,7 @@ static bool receive_offer(cptr pmt, s32b *poffer,
  *
  * Return TRUE if purchase is NOT successful
  */
-static bool purchase_haggle(object_type *o_ptr, s32b *price)
+static bool purchase_haggle(object_type *o_ptr, s32b *price, cptr buying, char label)
 {
 	s32b cur_ask, final_ask;
 	s32b last_offer, offer;
@@ -2124,29 +2124,9 @@ static bool purchase_haggle(object_type *o_ptr, s32b *price)
 	/* No need to haggle */
 	if (auto_haggle || noneed || (o_ptr->ident & (IDENT_FIXED)))
 	{
-		/* Already haggled */
-		if (o_ptr->ident & (IDENT_FIXED))
-		{
-			/* Message summary */
-			msg_print("You instantly agree upon the price.");
-			msg_print(NULL);
-		}
-
-		/* No need to haggle */
-		else if (noneed)
-		{
-			/* Message summary */
-			msg_print("You eventually agree upon the price.");
-			msg_print(NULL);
-		}
-
 		/* Auto-haggle */
-		else
+		if (auto_haggle)
 		{
-			/* Message summary */
-			msg_print("You quickly agree upon the price.");
-			msg_print(NULL);
-
 			/* Ignore haggling */
 			ignore = TRUE;
 
@@ -2190,7 +2170,7 @@ static bool purchase_haggle(object_type *o_ptr, s32b *price)
 
 		while (!flag && loop_flag)
 		{
-			sprintf(out_val, "%s :  %ld", pmt, (long)cur_ask);
+			sprintf(out_val, "%s :  %ld for %s (%c)", pmt, (long)cur_ask, buying, label);
 			put_str(out_val, 1, 0);
 			cancel = receive_offer("What do you offer? ",
 					       &offer, last_offer, 1, cur_ask, final);
@@ -2259,12 +2239,14 @@ static bool purchase_haggle(object_type *o_ptr, s32b *price)
 
 			if (!flag)
 			{
+				int col = strlen(out_val) + 2;
+
 				last_offer = offer;
 				allow_inc = TRUE;
 				prt("", 1, 0);
 				sprintf(out_val, "Your last offer: %ld",
 					      (long)last_offer);
-				put_str(out_val, 1, 39);
+				put_str(out_val, 1, col);
 				say_comment_2(cur_ask, annoyed);
 			}
 		}
@@ -2297,7 +2279,7 @@ static bool purchase_haggle(object_type *o_ptr, s32b *price)
  *
  * Return TRUE if purchase is NOT successful
  */
-static bool sell_haggle(object_type *o_ptr, s32b *price)
+static bool sell_haggle(object_type *o_ptr, s32b *price, cptr selling, char label)
 {
 	s32b purse, cur_ask, final_ask;
 	s32b last_offer, offer = 0;
@@ -2338,35 +2320,9 @@ static bool sell_haggle(object_type *o_ptr, s32b *price)
 			final_ask -= final_ask / 10;
 		}
 
-		/* No reason to haggle */
-		if (final_ask >= purse)
-		{
-			/* Message */
-			msg_print("You instantly agree upon the price.");
-			msg_print(NULL);
-
-			/* Ignore haggling */
-			ignore = TRUE;
-
-			/* Offer full purse */
-			final_ask = purse;
-		}
-
-		/* No need to haggle */
-		else if (noneed)
-		{
-			/* Message */
-			msg_print("You eventually agree upon the price.");
-			msg_print(NULL);
-		}
-
 		/* No haggle option */
-		else
+		if (auto_haggle)
 		{
-			/* Message summary */
-			msg_print("You quickly agree upon the price.");
-			msg_print(NULL);
-
 			/* Ignore haggling */
 			ignore = TRUE;
 		}
@@ -2407,7 +2363,7 @@ static bool sell_haggle(object_type *o_ptr, s32b *price)
 		{
 			loop_flag = TRUE;
 
-			sprintf(out_val, "%s :  %ld", pmt, (long)cur_ask);
+			sprintf(out_val, "%s :  %ld for %s (%c)", pmt, (long)cur_ask, selling, label);
 			put_str(out_val, 1, 0);
 			cancel = receive_offer("What price do you ask? ",
 					       &offer, last_offer, -1, cur_ask, final);
@@ -2587,13 +2543,8 @@ static void store_purchase(void)
 		/* Describe the object (fully) */
 		object_desc(o_name, sizeof(o_name), i_ptr, TRUE, 3);
 
-		/* Message */
-		msg_format("Buying %s (%c).",
-			   o_name, store_to_label(item));
-		msg_print(NULL);
-
 		/* Haggle for a final price */
-		choice = purchase_haggle(i_ptr, &price);
+		choice = purchase_haggle(i_ptr, &price, o_name, store_to_label(item));
 
 		/* Hack -- Got kicked out */
 		if (st_ptr->store_open >= turn) return;
@@ -2615,6 +2566,9 @@ static void store_purchase(void)
 
 				bool cancel;
 
+				/* Say "okay" */
+				say_comment_1();
+
 				/* Get service effect */
 				get_spell(&power, "use", o_ptr, FALSE);
 
@@ -2626,9 +2580,6 @@ static void store_purchase(void)
 
 				/* Hack -- allow certain services to be cancelled */
 				if (cancel) return;
-
-				/* Say "okay" */
-				say_comment_1();
 
 				/* Be happy */
 				decrease_insults();
@@ -2940,12 +2891,8 @@ static void store_sell(void)
 	/* Real store */
 	if ((store_num_fake != STORE_HOME) && (store_num_fake != -1))
 	{
-		/* Describe the transaction */
-		msg_format("Selling %s (%c).", o_name, index_to_label(item));
-		msg_print(NULL);
-
 		/* Haggle for it */
-		choice = sell_haggle(i_ptr, &price);
+		choice = sell_haggle(i_ptr, &price, o_name, index_to_label(item));
 
 		/* Kicked out */
 		if (st_ptr->store_open >= turn) return;
@@ -3158,7 +3105,6 @@ static bool leave_store = FALSE;
  */
 static void store_process_command(char *choice)
 {
-
 #ifdef ALLOW_REPEAT
 
 	/* Handle repeating the last command */
@@ -3172,8 +3118,9 @@ static void store_process_command(char *choice)
 		int y = p_ptr->command_cmd_ex.mousey;
 		int x = p_ptr->command_cmd_ex.mousex;
 
-		if ((y >= 6) && (y <= 20) && (*choice != 'g') && (*choice != 'l')) *choice = 'g';
-		if ((y == 22) && (x < 31)) *choice = ESCAPE;
+		if ((y >= 6) && (y < 18) && (*choice != 'g') && (*choice != 'l')) *choice = 'g';
+		else if ((y == 18) && (x > 2) && (x < 10) && (!store_top)) *choice = ' ';
+		else if ((y == 22) && (x < 31)) *choice = ESCAPE;
 		else if ((y == 22) && (x < 55)) *choice = 'g';
 		else if (y == 22) *choice = 'l';
 		else if ((y == 23) && (x < 31)) *choice = ' ';

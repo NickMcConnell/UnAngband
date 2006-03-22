@@ -4318,7 +4318,7 @@ static void target_set_interactive_prepare(int mode)
  *
  * This function must handle blindness/hallucination.
  */
-key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
+static key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 {
 	s16b this_o_idx, next_o_idx = 0;
 
@@ -4424,7 +4424,7 @@ key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 						Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
 
 						/* Command */
-						if (!(mode & (TARGET_PEEK))) query = inkey_ex();
+						query = inkey_ex();
 
 						/* Load screen */
 						screen_load();
@@ -4442,7 +4442,7 @@ key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 						move_cursor_relative(y, x);
 
 						/* Command */
-						if (!(mode & (TARGET_PEEK))) query = inkey_ex();
+						query = inkey_ex();
 					}
 
 					/* Normal commands */
@@ -4506,7 +4506,7 @@ key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 							Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
 
 							/* Command */
-							if (!(mode & (TARGET_PEEK))) query = inkey_ex();
+							query = inkey_ex();
 
 							/* Load screen */
 							screen_load();
@@ -4523,7 +4523,7 @@ key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 							move_cursor_relative(y, x);
 
 							/* Command */
-							if (!(mode & (TARGET_PEEK))) query = inkey_ex();
+							query = inkey_ex();
 						}
 
 						/* Normal commands */
@@ -4591,7 +4591,7 @@ key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 						s1, s2, s3, floor_num, info);
 					prt(out_val, 0, 0);
 					move_cursor_relative(y, x);
-					if (!(mode & (TARGET_PEEK))) query = inkey_ex();
+					query = inkey_ex();
 
 					/* Display objects */
 					if (query.key == 'r')
@@ -4604,7 +4604,7 @@ key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 
 						/* Describe the pile */
 						prt(out_val, 0, 0);
-						if (!(mode & (TARGET_PEEK))) query = inkey_ex();
+						query = inkey_ex();
 
 						/* Load screen */
 						screen_load();
@@ -4680,7 +4680,7 @@ key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 						Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
 
 						/* Command */
-						if (!(mode & (TARGET_PEEK))) query = inkey_ex();
+						query = inkey_ex();
 
 						/* Load screen */
 						screen_load();
@@ -4697,7 +4697,7 @@ key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 						move_cursor_relative(y, x);
 
 						/* Command */
-						if (!(mode & (TARGET_PEEK))) query = inkey_ex();
+						query = inkey_ex();
 					}
 
 					/* Normal commands */
@@ -4796,7 +4796,7 @@ key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 			sprintf(out_val, "%s%s%s%s [%s]", s1, s2, s3, name, info);
 			prt(out_val, 0, 0);
 			move_cursor_relative(y, x);
-			if (!(mode & (TARGET_PEEK))) query = inkey_ex();
+			query = inkey_ex();
 
 			/* Stop on everything but "return"/"space" */
 			if ((query.key != '\n') && (query.key != '\r') && (query.key != ' ')) break;
@@ -4867,7 +4867,7 @@ key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 					Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
 
 					/* Command */
-					if (!(mode & (TARGET_PEEK))) query = inkey_ex();
+					query = inkey_ex();
 
 					/* Load screen */
 					screen_load();
@@ -4885,7 +4885,7 @@ key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 					move_cursor_relative(y, x);
 
 					/* Command */
-					if (!(mode & (TARGET_PEEK))) query = inkey_ex();
+					query = inkey_ex();
 				}
 
 				/* Normal commands */

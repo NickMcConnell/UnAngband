@@ -3080,10 +3080,12 @@ bool askfor_aux(char *buf, int len)
 
 	int k = 0;
 
-	char ch = '\0';
+	key_event ke;
 
 	bool done = FALSE;
 
+
+	ke.key = '\0';
 
 	/* Locate the cursor */
 	Term_locate(&x, &y);
@@ -3114,10 +3116,10 @@ bool askfor_aux(char *buf, int len)
 		Term_gotoxy(x + k, y);
 
 		/* Get a key */
-		ch = inkey();
+		ke = inkey_ex();
 
 		/* Analyze the key */
-		switch (ch)
+		switch (ke.key)
 		{
 			case ESCAPE:
 			{
@@ -3141,11 +3143,30 @@ bool askfor_aux(char *buf, int len)
 				break;
 			}
 
+			case '\xff':
+			{
+				if ((ke.mousebutton) && !(k))
+				{
+					if (ke.mousebutton == 1)
+					{
+						k = strlen(buf);
+						done = TRUE;
+					}
+					else if (ke.mousebutton == 2)
+					{
+						ke.key = ESCAPE;
+						done = TRUE;
+					}
+					break;
+				}
+				else continue;
+			}
+
 			default:
 			{
-				if ((k < len-1) && (isprint(ch)))
+				if ((k < len-1) && (isprint(ke.key)))
 				{
-					buf[k++] = ch;
+					buf[k++] = ke.key;
 				}
 				else
 				{
@@ -3164,7 +3185,7 @@ bool askfor_aux(char *buf, int len)
 	}
 
 	/* Done */
-	return (ch != ESCAPE);
+	return (ke.key != ESCAPE);
 }
 
 
@@ -3478,7 +3499,7 @@ void request_command(bool shopping)
 		}
 
 		/* Clear top line */
-		prt("", 0, 0);
+		if ((ke.key != '\xff') || (ke.mousebutton)) prt("", 0, 0);
 
 
 		/* Command Count */
@@ -3690,7 +3711,7 @@ void request_command(bool shopping)
 
 
 	/* Hack -- erase the message line. */
-	prt("", 0, 0);
+	if ((ke.key != '\xff') || (ke.mousebutton)) prt("", 0, 0);
 
 	/* Hack again -- apply the modified key command */
 	p_ptr->command_cmd_ex.key = p_ptr->command_cmd;

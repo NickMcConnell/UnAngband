@@ -954,7 +954,6 @@ extern bool target_able(int m_idx);
 extern bool target_okay(void);
 extern void target_set_monster(int m_idx);
 extern void target_set_location(int y, int x);
-extern key_event target_set_interactive_aux(int y, int x, int mode, cptr info);
 extern bool target_set_interactive(int mode);
 extern bool get_aim_dir(int *dp);
 extern bool get_rep_dir(int *dp);

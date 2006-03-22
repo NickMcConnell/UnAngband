@@ -217,6 +217,8 @@ grids as safe when detect monster spell (of any time) has been cast.
 - It is now possible to specify '!' while targetting to automatically target the location
 under the mouse pointer. This is intended for macros.
 
+- Cut down slightly the number of key presses required to buy anything in a store.
+
 ### Bug fixes ###
 
 - Priest spell righteous fury was for mages, paladins, shamans and bards but
