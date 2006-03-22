@@ -3350,12 +3350,16 @@ bool get_com(cptr prompt, char *command)
 {
 	key_event ke;
 	bool result;
-	result = get_com_ex(prompt, &ke);
-	*command = ke.key;
 
-	/* Hack -- ignore mouse */
-	if ((ke.key == '\xff') && (ke.mousebutton))
-     		bell("Potential loss of mouse input");
+	while (1)
+	{
+		result = get_com_ex(prompt, &ke);
+		*command = ke.key;
+
+		/* Ignore mouse */
+		if (ke.key != '\xff') break;
+	}
+
 	return result;
 }
 

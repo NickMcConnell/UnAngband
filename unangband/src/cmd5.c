@@ -50,7 +50,7 @@ int i,ii;
 	int okay = 0;
 
 	bool flag, redraw;
-	char choice;
+	key_event ke;
 
 	spell_type *s_ptr;
 	spell_cast *sc_ptr = &(s_info[0].cast[0]);
@@ -176,10 +176,22 @@ int i,ii;
 	p, I2A(0), I2A(num - 1), prompt, p);
 
 	/* Get a spell from the user */
-	while (!flag && get_com(out_val, &choice))
+	while (!flag && get_com_ex(out_val, &ke))
 	{
+		char choice;
+
+		if (ke.key == '\xff')
+		{
+			if (ke.mousebutton)
+			{
+				if (redraw) ke.key = 'a' + ke.mousey - 2;
+				else ke.key = ' ';
+			}
+			else continue;
+		}
+
 		/* Request redraw */
-		if ((choice == ' ') || (choice == '*') || (choice == '?'))
+		if ((ke.key == ' ') || (ke.key == '*') || (ke.key == '?'))
 		{
 			/* Hide the list */
 			if (redraw)
@@ -221,6 +233,7 @@ int i,ii;
 			continue;
 		}
 
+		choice = ke.key;
 
 		/* Note verify */
 		verify = (isupper(choice) ? TRUE : FALSE);

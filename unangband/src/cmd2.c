@@ -436,7 +436,7 @@ static void do_cmd_travel(void)
 		}
 		else if (!edge_y && !edge_x && zone1->fill)
 		{
-			msg_format("You need to be further from %s.",t_name + t_ptr->name);
+			msg_format("You need close to the edge of %s.",t_name + t_ptr->name);
 		}
 		else
 		{
@@ -450,7 +450,7 @@ static void do_cmd_travel(void)
 				int i, num = 0;
 
 				bool flag, redraw;
-				char choice;
+				key_event ke;
 
 				/* Add nearby route */
 				routes[num++] = t_ptr->nearby;
@@ -495,10 +495,22 @@ static void do_cmd_travel(void)
 				redraw = FALSE;
 
 				/* Get a spell from the user */
-				while (!flag && get_com(out_val, &choice))
+				while (!flag && get_com_ex(out_val, &ke))
 				{
+					char choice;
+
+					if (ke.key == '\xff')
+					{
+						if (ke.mousebutton)
+						{
+							if (redraw) ke.key = 'a' + ke.mousey - 2;
+							else ke.key = ' ';
+						}
+						else continue;
+					}
+
 					/* Request redraw */
-					if ((choice == ' ') || (choice == '*') || (choice == '?'))
+					if ((ke.key == ' ') || (ke.key == '*') || (ke.key == '?'))
 					{
 						/* Hide the list */
 						if (redraw)
@@ -529,7 +541,7 @@ static void do_cmd_travel(void)
 					}
 
 					/* Lowercase 1+*/
-					choice = tolower(choice);
+					choice = tolower(ke.key);
 
 					/* Extract request */
 					i = (islower(choice) ? A2I(choice) : -1);

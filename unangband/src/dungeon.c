@@ -2229,6 +2229,7 @@ static void process_command(void)
 			else if (p_ptr->command_cmd_ex.mousebutton == 2)
 			{
 				target_set_location(y, x);
+				msg_print("Target set.");
 			}
 			else
 			{
