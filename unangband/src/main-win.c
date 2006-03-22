@@ -4559,7 +4559,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 			}
 			else
 #endif /* USE_SAVER */
-			if ((game_in_progress) && (td->tile_wid) && (td->tile_hgt) && (use_mouse))
+			if ((game_in_progress) && (td->tile_wid) && (td->tile_hgt) && (use_mouse || !character_generated))
 			{
 				/* Get the text grid */
 				xPos = GET_X_LPARAM(lParam);
@@ -4620,7 +4620,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 			}
 			else
 #endif /* USE_SAVER */
-			if ((game_in_progress) && (td->tile_wid) && (td->tile_hgt) && (use_trackmouse))
+			if ((game_in_progress) && (td->tile_wid) && (td->tile_hgt) && (use_trackmouse || !character_generated))
 			{
 				/* Get the text grid */
 				xPos = GET_X_LPARAM(lParam);
