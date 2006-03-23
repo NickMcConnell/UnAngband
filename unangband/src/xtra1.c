@@ -100,11 +100,17 @@ s16b modify_stat_value(int value, int amount)
 
 /*
  * Print character info at given row, column in a 13 char field
+ *
+ * XXX We actually have to vary this, depending on the triple tile,
+ * double tile or big tile settings
  */
 static void prt_field(cptr info, int row, int col)
 {
+	/* Dump 12 spaces to clear */
+	if (SIDEBAR_WID == 12) c_put_str(TERM_WHITE, "            ", row, col);
+
 	/* Dump 13 spaces to clear */
-	c_put_str(TERM_WHITE, "	     ", row, col);
+	else c_put_str(TERM_WHITE, "             ", row, col);
 
 	/* Dump the info itself */
 	c_put_str(TERM_L_BLUE, info, row, col);

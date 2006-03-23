@@ -110,8 +110,19 @@
 #define PANEL_WID ((use_trptile && use_bigtile) ?  5 : (use_trptile ? 11 : \
 		((use_dbltile && use_bigtile) ? 8 : ((use_dbltile || use_bigtile) ? 16 : 33))))
 
+/*
+ * Number of spaces used by the sidebar
+ * This is normally 13, unless the sidebar is disabled in which case it is 0.
+ * XXX Note, however, that we have to make it be a neat multiplier of 2 or 3 (or 4 or 6)
+ * in double tile and triple tile mode (with big tile) or we get ugly black spacing running
+ * into the main window. So in these instances, we cheat, and shrink it slightly to 12.
+ *
+ */
+#define SIDEBAR_WID		(show_sidebar ? (use_dbltile || use_trptile ? 12 : 13) : 0)
+
+
 #define ROW_MAP			1
-#define COL_MAP			(show_sidebar ? 13 : 0)
+#define COL_MAP			SIDEBAR_WID
 
 /*
  * Number of grids in each screen (vertically)

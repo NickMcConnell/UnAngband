@@ -901,46 +901,53 @@ static errr option_dump(cptr fname)
 void do_cmd_options(void)
 {
 	key_event ke;
+	int line = 0;
 
 
 	/* Save screen */
 	screen_save();
 
+	/* Clear screen */
+	Term_clear();
 
 	/* Interact */
 	while (1)
 	{
-		/* Clear screen */
-		Term_clear();
-
 		/* Why are we here */
 		prt(format("%s options", VERSION_NAME), 2, 0);
 
 		/* Give some choices */
-		prt("(1) User Interface Options", 4, 5);
-		prt("(2) Disturbance Options", 5, 5);
-		prt("(3) Game-Play Options", 6, 5);
-		prt("(4) Efficiency Options", 7, 5);
-		prt("(5) Display Options", 8, 5);
-		prt("(6) Birth Options", 9, 5);
-		prt("(7) Cheat Options", 10, 5);
+		c_prt(line == 4 ? TERM_L_BLUE : TERM_WHITE, "(1) User Interface Options", 4, 5);
+		c_prt(line == 5 ? TERM_L_BLUE : TERM_WHITE, "(2) Disturbance Options", 5, 5);
+		c_prt(line == 6 ? TERM_L_BLUE : TERM_WHITE, "(3) Game-Play Options", 6, 5);
+		c_prt(line == 7 ? TERM_L_BLUE : TERM_WHITE, "(4) Efficiency Options", 7, 5);
+		c_prt(line == 8 ? TERM_L_BLUE : TERM_WHITE, "(5) Display Options", 8, 5);
+		c_prt(line == 9 ? TERM_L_BLUE : TERM_WHITE, "(6) Birth Options", 9, 5);
+		c_prt(line == 10 ? TERM_L_BLUE : TERM_WHITE, "(7) Cheat Options", 10, 5);
 
 		/* Window flags */
-		prt("(W) Window flags", 12, 5);
+		c_prt(line == 12 ? TERM_L_BLUE : TERM_WHITE, "(W) Window flags", 12, 5);
 
 		/* Load and Append */
-		prt("(L) Load a user pref file", 13, 5);
-		prt("(A) Append options to a file", 14, 5);
+		c_prt(line == 13 ? TERM_L_BLUE : TERM_WHITE, "(L) Load a user pref file", 13, 5);
+		c_prt(line == 14 ? TERM_L_BLUE : TERM_WHITE, "(A) Append options to a file", 14, 5);
 
 		/* Special choices */
-		prt("(D) Base Delay Factor", 16, 5);
-		prt("(H) Hitpoint Warning", 17, 5);
+		c_prt(line == 16 ? TERM_L_BLUE : TERM_WHITE, "(D) Base Delay Factor", 16, 5);
+		c_prt(line == 17 ? TERM_L_BLUE : TERM_WHITE, "(H) Hitpoint Warning", 17, 5);
 
 		/* Prompt */
 		prt("Command: ", 19, 0);
 
 		/* Get command */
-		ke = anykey();
+		ke = inkey_ex();
+
+		/* React to mouse movement */
+		if ((ke.key == '\xff') && !(ke.mousebutton))
+		{
+			line = ke.mousey;
+			continue;
+		}
 
 		/* Exit */
 		if (ke.key == ESCAPE) break;
@@ -1082,6 +1089,9 @@ void do_cmd_options(void)
 
 		/* Flush messages */
 		message_flush();
+
+		/* Clear screen */
+		Term_clear();
 	}
 
 
@@ -1357,6 +1367,7 @@ void do_cmd_macros(void)
 
 	int mode;
 
+	int line = 0;
 
 	/* Roguelike */
 	if (rogue_like_commands)
@@ -1378,13 +1389,12 @@ void do_cmd_macros(void)
 	/* Save screen */
 	screen_save();
 
+	/* Clear screen */
+	Term_clear();
 
 	/* Process requests until done */
 	while (1)
 	{
-		/* Clear screen */
-		Term_clear();
-
 		/* Describe */
 		prt("Interact with Macros", 2, 0);
 
@@ -1400,24 +1410,31 @@ void do_cmd_macros(void)
 
 
 		/* Selections */
-		prt("(1) Load a user pref file", 4, 5);
+		c_prt(line == 4 ? TERM_L_BLUE : TERM_WHITE, "(1) Load a user pref file", 4, 5);
 #ifdef ALLOW_MACROS
-		prt("(2) Append macros to a file", 5, 5);
-		prt("(3) Query a macro", 6, 5);
-		prt("(4) Create a macro", 7, 5);
-		prt("(5) Remove a macro", 8, 5);
-		prt("(6) Append keymaps to a file", 9, 5);
-		prt("(7) Query a keymap", 10, 5);
-		prt("(8) Create a keymap", 11, 5);
-		prt("(9) Remove a keymap", 12, 5);
-		prt("(0) Enter a new action", 13, 5);
+		c_prt(line == 5 ? TERM_L_BLUE : TERM_WHITE, "(2) Append macros to a file", 5, 5);
+		c_prt(line == 6 ? TERM_L_BLUE : TERM_WHITE, "(3) Query a macro", 6, 5);
+		c_prt(line == 7 ? TERM_L_BLUE : TERM_WHITE, "(4) Create a macro", 7, 5);
+		c_prt(line == 8 ? TERM_L_BLUE : TERM_WHITE, "(5) Remove a macro", 8, 5);
+		c_prt(line == 9 ? TERM_L_BLUE : TERM_WHITE, "(6) Append keymaps to a file", 9, 5);
+		c_prt(line == 10 ? TERM_L_BLUE : TERM_WHITE, "(7) Query a keymap", 10, 5);
+		c_prt(line == 11 ? TERM_L_BLUE : TERM_WHITE, "(8) Create a keymap", 11, 5);
+		c_prt(line == 12 ? TERM_L_BLUE : TERM_WHITE, "(9) Remove a keymap", 12, 5);
+		c_prt(line == 13 ? TERM_L_BLUE : TERM_WHITE, "(0) Enter a new action", 13, 5);
 #endif /* ALLOW_MACROS */
 
 		/* Prompt */
 		prt("Command: ", 16, 0);
 
 		/* Get a command */
-		ke = anykey();
+		ke = inkey_ex();
+
+		/* React to mouse movement */
+		if ((ke.key == '\xff') && !(ke.mousebutton))
+		{
+			line = ke.mousey;
+			continue;
+		}
 
 		/* Leave */
 		if (ke.key == ESCAPE) break;
@@ -1706,6 +1723,9 @@ void do_cmd_macros(void)
 
 		/* Flush messages */
 		message_flush();
+
+		/* Clear screen */
+		Term_clear();
 	}
 
 
@@ -1734,6 +1754,8 @@ void do_cmd_visuals(void)
 	const char *empty_symbol = "<< ? >>";
 	const char *empty_symbol2 = "\0";
 	const char *empty_symbol3 = "\0";
+
+	int line = 0;
 
 	if (use_trptile && use_bigtile)
 	{
@@ -1767,34 +1789,41 @@ void do_cmd_visuals(void)
 	screen_save();
 
 
+	/* Clear screen */
+	Term_clear();
+
 	/* Interact until done */
 	while (1)
 	{
-		/* Clear screen */
-		Term_clear();
-
 		/* Ask for a choice */
 		prt("Interact with Visuals", 2, 0);
 
 		/* Give some choices */
-		prt("(1) Load a user pref file", 4, 5);
+		c_prt(line == 4 ? TERM_L_BLUE : TERM_WHITE, "(1) Load a user pref file", 4, 5);
 #ifdef ALLOW_VISUALS
-		prt("(2) Dump monster attr/chars", 5, 5);
-		prt("(3) Dump object attr/chars", 6, 5);
-		prt("(4) Dump feature attr/chars", 7, 5);
-		prt("(5) Dump flavor attr/chars", 8, 5);
-		prt("(6) Change monster attr/chars", 9, 5);
-		prt("(7) Change object attr/chars", 10, 5);
-		prt("(8) Change feature attr/chars", 11, 5);
-		prt("(9) Change flavor attr/chars", 12, 5);
+		c_prt(line == 5 ? TERM_L_BLUE : TERM_WHITE, "(2) Dump monster attr/chars", 5, 5);
+		c_prt(line == 6 ? TERM_L_BLUE : TERM_WHITE, "(3) Dump object attr/chars", 6, 5);
+		c_prt(line == 7 ? TERM_L_BLUE : TERM_WHITE, "(4) Dump feature attr/chars", 7, 5);
+		c_prt(line == 8 ? TERM_L_BLUE : TERM_WHITE, "(5) Dump flavor attr/chars", 8, 5);
+		c_prt(line == 9 ? TERM_L_BLUE : TERM_WHITE, "(6) Change monster attr/chars", 9, 5);
+		c_prt(line == 10 ? TERM_L_BLUE : TERM_WHITE, "(7) Change object attr/chars", 10, 5);
+		c_prt(line == 11 ? TERM_L_BLUE : TERM_WHITE, "(8) Change feature attr/chars", 11, 5);
+		c_prt(line == 12 ? TERM_L_BLUE : TERM_WHITE, "(9) Change flavor attr/chars", 12, 5);
 #endif
-		prt("(0) Reset visuals", 13, 5);
+		c_prt(line == 13 ? TERM_L_BLUE : TERM_WHITE, "(0) Reset visuals", 13, 5);
 
 		/* Prompt */
 		prt("Command: ", 15, 0);
 
 		/* Prompt */
-		ke = anykey();
+		ke = inkey_ex();
+
+		/* React to mouse movement */
+		if ((ke.key == '\xff') && !(ke.mousebutton))
+		{
+			line = ke.mousey;
+			continue;
+		}
 
 		/* Done */
 		if (ke.key == ESCAPE) break;
@@ -2359,6 +2388,9 @@ void do_cmd_visuals(void)
 
 		/* Flush messages */
 		message_flush();
+
+		/* Clear screen */
+		Term_clear();
 	}
 
 
@@ -2381,6 +2413,7 @@ void do_cmd_colors(void)
 
 	char buf[1024];
 
+	int line = 0;
 
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
@@ -2389,28 +2422,34 @@ void do_cmd_colors(void)
 	/* Save screen */
 	screen_save();
 
+	/* Clear screen */
+	Term_clear();
 
 	/* Interact until done */
 	while (1)
 	{
-		/* Clear screen */
-		Term_clear();
-
 		/* Ask for a choice */
 		prt("Interact with Colors", 2, 0);
 
 		/* Give some choices */
-		prt("(1) Load a user pref file", 4, 5);
+		c_prt(line == 4 ? TERM_L_BLUE : TERM_WHITE, "(1) Load a user pref file", 4, 5);
 #ifdef ALLOW_COLORS
-		prt("(2) Dump colors", 5, 5);
-		prt("(3) Modify colors", 6, 5);
+		c_prt(line == 5 ? TERM_L_BLUE : TERM_WHITE, "(2) Dump colors", 5, 5);
+		c_prt(line == 6 ? TERM_L_BLUE : TERM_WHITE, "(3) Modify colors", 6, 5);
 #endif /* ALLOW_COLORS */
 
 		/* Prompt */
 		prt("Command: ", 8, 0);
 
 		/* Prompt */
-		ke = anykey();
+		ke = inkey_ex();
+
+		/* React to mouse movement */
+		if ((ke.key == '\xff') && !(ke.mousebutton))
+		{
+			line = ke.mousey;
+			continue;
+		}
 
 		/* Done */
 		if (ke.key == ESCAPE) break;
@@ -2580,6 +2619,9 @@ void do_cmd_colors(void)
 
 		/* Flush messages */
 		message_flush();
+
+		/* Clear screen */
+		Term_clear();
 	}
 
 
@@ -6942,38 +6984,47 @@ void do_cmd_knowledge(void)
 {
 	key_event ke;
 
+	int line = 0;
+
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
 
 	/* Save screen */
 	screen_save();
 
+	/* Clear screen */
+	Term_clear();
+
 	/* Interact until done */
 	while (TRUE)
 	{
-		/* Clear screen */
-		Term_clear();
-
 		/* Ask for a choice */
 		prt("Display current knowledge", 2, 0);
 
 		/* Give some choices */
-		prt("(1) Display known artifacts", 4, 5);
-		prt("(2) Display known monsters", 5, 5);
-		prt("(3) Display known ego-items", 6, 5);
-		prt("(4) Display known objects", 7, 5);
-		prt("(5) Display known features", 8, 5);
-		prt("(6) Display self-knowledge", 9, 5);
-		prt("(7) Display contents of your home", 10, 5);
-		prt("(8) Load a user pref file", 11, 5);
-		prt("(9) Dump auto-inscriptions", 12, 5);
-		prt("(0) Interact with visuals", 13, 5);
+		c_prt(line == 4 ? TERM_L_BLUE : TERM_WHITE, "(1) Display known artifacts", 4, 5);
+		c_prt(line == 5 ? TERM_L_BLUE : TERM_WHITE, "(2) Display known monsters", 5, 5);
+		c_prt(line == 6 ? TERM_L_BLUE : TERM_WHITE, "(3) Display known ego-items", 6, 5);
+		c_prt(line == 7 ? TERM_L_BLUE : TERM_WHITE, "(4) Display known objects", 7, 5);
+		c_prt(line == 8 ? TERM_L_BLUE : TERM_WHITE, "(5) Display known features", 8, 5);
+		c_prt(line == 9 ? TERM_L_BLUE : TERM_WHITE, "(6) Display self-knowledge", 9, 5);
+		c_prt(line == 10 ? TERM_L_BLUE : TERM_WHITE, "(7) Display contents of your home", 10, 5);
+		c_prt(line == 11 ? TERM_L_BLUE : TERM_WHITE, "(8) Load a user pref file", 11, 5);
+		c_prt(line == 12 ? TERM_L_BLUE : TERM_WHITE, "(9) Dump auto-inscriptions", 12, 5);
+		c_prt(line == 13 ? TERM_L_BLUE : TERM_WHITE, "(0) Interact with visuals", 13, 5);
 
 		/* Prompt */
 		prt("Command: ", 15, 0);
 
 		/* Prompt */
-		ke = anykey();
+		ke = inkey_ex();
+
+		/* React to mouse movement */
+		if ((ke.key == '\xff') && !(ke.mousebutton))
+		{
+			line = ke.mousey;
+			continue;
+		}
 
 		/* Done */
 		if (ke.key == ESCAPE) break;
@@ -7084,6 +7135,9 @@ void do_cmd_knowledge(void)
 
 		/* Flush messages */
 		message_flush();
+
+		/* Clear screen */
+		Term_clear();
 	}
 
 	/* Load screen */
