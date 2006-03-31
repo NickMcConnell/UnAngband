@@ -3336,7 +3336,6 @@ void play_game(bool new_game)
 	/* Window stuff */
 	window_stuff();
 
-
 	/* Process some user pref files */
 	process_some_user_pref_files();
 

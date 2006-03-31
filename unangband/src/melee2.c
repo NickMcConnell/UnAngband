@@ -5258,6 +5258,12 @@ static void process_monster(int m_idx)
 			/* Not interested in the character */
 			must_use_target = TRUE;
 		}
+		/* Has target, not interested in character */
+		else if ((m_ptr->ty) && (m_ptr->tx))
+		{
+			/* Not interested in the character */
+			must_use_target = TRUE;
+		}
 	}
 
 

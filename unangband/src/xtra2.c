@@ -3760,6 +3760,7 @@ cptr look_mon_desc(int m_idx)
 	if (m_ptr->cut) return("bleeding");
 	if (m_ptr->poisoned) return("poisoned");
 	if (find_monster_ammo(m_idx, -1, FALSE) < 0) return("out of ammo");
+	if (m_ptr->mflag & (MFLAG_TOWN)) return("townsfolk");
 
 	/* Determine if the monster is "living" (vs "undead") */
 	if (r_ptr->flags3 & (RF3_UNDEAD)) living = FALSE;

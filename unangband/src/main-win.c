@@ -498,6 +498,8 @@ static HMENU main_menu;
 static char arg_lastsavefile[1024];
 static int yOldPos = 0;
 static int xOldPos = 0;
+static bool term_initialised = FALSE;
+static bool term_readytoload = FALSE;
 
 
 #ifdef USE_GRAPHICS
@@ -3144,6 +3146,8 @@ static void init_windows(void)
 	/* Process pending messages */
 	(void)Term_xtra_win_flush();
 
+	term_initialised = TRUE;
+
 }
 
 
@@ -4492,42 +4496,41 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 			}
 #endif /* USE_SAVER */
 
-			if (game_in_progress)
+			/* Extract the modifiers */
+			if (GetKeyState(VK_CONTROL) & 0x8000) mc = TRUE;
+			if (GetKeyState(VK_SHIFT)   & 0x8000) ms = TRUE;
+			if (GetKeyState(VK_MENU)    & 0x8000) ma = TRUE;
+
+			/* Handle "special" keys */
+			if (special_key[(byte)(wParam)])
 			{
-				/* Extract the modifiers */
-				if (GetKeyState(VK_CONTROL) & 0x8000) mc = TRUE;
-				if (GetKeyState(VK_SHIFT)   & 0x8000) ms = TRUE;
-				if (GetKeyState(VK_MENU)    & 0x8000) ma = TRUE;
+				/* Begin the macro trigger */
+				Term_keypress(31);
 
-				/* Handle "special" keys */
-				if (special_key[(byte)(wParam)])
-				{
-					/* Begin the macro trigger */
-					Term_keypress(31);
+				/* Send the modifiers */
+				if (mc) Term_keypress('C');
+				if (ms) Term_keypress('S');
+				if (ma) Term_keypress('A');
 
-					/* Send the modifiers */
-					if (mc) Term_keypress('C');
-					if (ms) Term_keypress('S');
-					if (ma) Term_keypress('A');
+				/* Extract "scan code" */
+				i = LOBYTE(HIWORD(lParam));
 
-					/* Extract "scan code" */
-					i = LOBYTE(HIWORD(lParam));
+				/* Introduce the scan code */
+				Term_keypress('x');
 
-					/* Introduce the scan code */
-					Term_keypress('x');
+				/* Encode the hexidecimal scan code */
+				Term_keypress(hexsym[i/16]);
+				Term_keypress(hexsym[i%16]);
 
-					/* Encode the hexidecimal scan code */
-					Term_keypress(hexsym[i/16]);
-					Term_keypress(hexsym[i%16]);
+				/* End the macro trigger */
+				Term_keypress(13);
 
-					/* End the macro trigger */
-					Term_keypress(13);
-
-					return 0;
-				}
+				return 0;
 			}
-			else if (strlen(arg_lastsavefile))
+
+			if (term_readytoload)		
 			{
+				term_readytoload = FALSE;
 				strcpy(savefile,arg_lastsavefile);
 
 				/* Load 'savefile' */
@@ -4537,7 +4540,6 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 				play_game(FALSE);
 				quit(NULL);
 			}
-
 			break;
 		}
 
@@ -4559,7 +4561,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 			}
 			else
 #endif /* USE_SAVER */
-			if ((game_in_progress) && (td->tile_wid) && (td->tile_hgt) && (use_mouse || !character_generated))
+			if ((term_initialised) && (td->tile_wid) && (td->tile_hgt) && (use_mouse || !character_generated))
 			{
 				/* Get the text grid */
 				xPos = GET_X_LPARAM(lParam);
@@ -4577,9 +4579,10 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 					button = 3;
 				Term_mousepress(xPos,yPos,button);
 			}
-			/* Hack -- use_mouse not initialised yet */
-			else if ((!game_in_progress) && (strlen(arg_lastsavefile)))
+
+			if (term_readytoload)		
 			{
+				term_readytoload = FALSE;
 				strcpy(savefile,arg_lastsavefile);
 
 				/* Load 'savefile' */
@@ -4589,6 +4592,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 				play_game(FALSE);
 				quit(NULL);
 			}
+
 			break;
 		}
 
@@ -4620,7 +4624,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 			}
 			else
 #endif /* USE_SAVER */
-			if ((game_in_progress) && (td->tile_wid) && (td->tile_hgt) && (use_trackmouse || !character_generated))
+			if ((term_initialised) && (td->tile_wid) && (td->tile_hgt) && (use_trackmouse || !character_generated))
 			{
 				/* Get the text grid */
 				xPos = GET_X_LPARAM(lParam);
@@ -4638,7 +4642,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 				/* Save last location */
 				xOldPos = xPos;
 				yOldPos = yPos;
-			}			
+			}
 		}
 
 
@@ -5637,7 +5641,8 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	if (strlen(arg_lastsavefile))
 	{
 	     c_prt(TERM_L_BLUE, format("[Press any key to load '%s']",arg_lastsavefile), Term->hgt - 1, MAX(1, (Term->wid - 26 - strlen(arg_lastsavefile)) / 2));
-	     
+
+		term_readytoload = TRUE;    
 	}
 	else c_prt(TERM_L_BLUE, "[Choose 'New' or 'Open' from the 'File' menu]", Term->hgt - 1, MAX(1, (Term->wid - 45) / 2));
 	Term_fresh();

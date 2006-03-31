@@ -107,10 +107,10 @@ s16b modify_stat_value(int value, int amount)
 static void prt_field(cptr info, int row, int col)
 {
 	/* Dump 12 spaces to clear */
-	if (SIDEBAR_WID == 12) c_put_str(TERM_WHITE, "            ", row, col);
+	if (SIDEBAR_WID == 12) c_put_str(TERM_WHITE, "           ", row, col);
 
 	/* Dump 13 spaces to clear */
-	else c_put_str(TERM_WHITE, "             ", row, col);
+	else c_put_str(TERM_WHITE, "            ", row, col);
 
 	/* Dump the info itself */
 	c_put_str(TERM_L_BLUE, info, row, col);
