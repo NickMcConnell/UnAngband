@@ -438,7 +438,7 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 	}
 	else if ((target < 0) && (damage > p_ptr->chp / 3))
 	{
-		msg_format("%^s %syou%s!", m_name, prefix, suffix);
+		msg_format("%^s %s%s%s!", m_name, prefix, t_name, suffix);
 
 		/* Player loses blood */
 		if (f_info[cave_feat[p_ptr->py][p_ptr->px]].flags1 & (FF1_FLOOR))

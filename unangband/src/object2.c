@@ -1640,8 +1640,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			break;
 		}
 
-		/* Staffs and Wands */
-		case TV_STAFF:
+		/* Wands */
 		case TV_WAND:
 		{
 			/* Require identical knowledge of both items */
@@ -1687,6 +1686,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		}
 
 		/* Weapons and Armor */
+		case TV_STAFF:
 		case TV_BOW:
 		case TV_DIGGING:
 		case TV_HAFTED:
@@ -1738,7 +1738,8 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 				if ((!stack_force_pvals) &&
 					((o_ptr->pval != j_ptr->pval-1) || (o_ptr->stackc))  &&
 					((o_ptr->pval != j_ptr->pval+1) || (j_ptr->stackc))
-					&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) ) return (0);             }
+					&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) ) return (0);
+			}
 
 			/* Require identical "artifact" names */
 			if (o_ptr->name1 != j_ptr->name1) return (FALSE);

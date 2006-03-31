@@ -4528,7 +4528,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 				return 0;
 			}
 
-			if (term_readytoload)		
+			if ((term_readytoload) && !(game_in_progress))	
 			{
 				term_readytoload = FALSE;
 				strcpy(savefile,arg_lastsavefile);
@@ -4580,7 +4580,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 				Term_mousepress(xPos,yPos,button);
 			}
 
-			if (term_readytoload)		
+			if ((term_readytoload) && !(game_in_progress))	
 			{
 				term_readytoload = FALSE;
 				strcpy(savefile,arg_lastsavefile);

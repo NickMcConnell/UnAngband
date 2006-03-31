@@ -2101,14 +2101,14 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 			switch (mode)
 			{
 				case LIST_FLAGS_CAN:
-					text_out_c(TERM_WHITE,"It modifies");
+					text_out_c(TERM_WHITE,"It modifies ");
 					break;
 				case LIST_FLAGS_MAY:
-					text_out_c(TERM_L_WHITE,"It may modify");
+					text_out_c(TERM_L_WHITE,"It may modify ");
 					attr= TERM_L_WHITE;
 					break;
 				case LIST_FLAGS_NOT:
-					text_out_c(TERM_SLATE,"It does not modify");
+					text_out_c(TERM_SLATE,"It does not modify ");
 					attr = TERM_SLATE;
 					break;
 			} 
@@ -4409,6 +4409,12 @@ u32b slay_index(const u32b f1, const u32b f2, const u32b f3, const u32b f4)
 
 
 
+#define ADD_POWER(string, val, flag, flgnum, extra) \
+	if (f##flgnum & flag) { \
+		p += (val); \
+		extra; \
+	}
+
 /*
  * Evaluate the objects's overall power level.
  *
@@ -4704,6 +4710,11 @@ s32b object_power(const object_type *o_ptr)
 				if (f2 & (TR2_IGNORE_ACID)) p++;
 				if (f2 & (TR2_IGNORE_FIRE)) p++;
 			}
+
+			/* Add some specific powers here only */
+			ADD_POWER("blessed",		 1, TR3_BLESSED, 3,);
+			ADD_POWER("blood vampire",	 25, TR4_VAMP_HP, 4,);
+			ADD_POWER("mana vampire",	 14, TR4_VAMP_MANA, 4,);
 			break;
 		}
 
@@ -5099,12 +5110,6 @@ s32b object_power(const object_type *o_ptr)
 		p += 5 * o_ptr->pval;
 	}
 
-#define ADD_POWER(string, val, flag, flgnum, extra) \
-	if (f##flgnum & flag) { \
-		p += (val); \
-		extra; \
-	}
-
 	ADD_POWER("sustain STR",	 5, TR2_SUST_STR, 2, sustains++);
 	ADD_POWER("sustain INT",	 2, TR2_SUST_INT, 2, sustains++);
 	ADD_POWER("sustain WIS",	 2, TR2_SUST_WIS, 2, sustains++);
@@ -5176,10 +5181,6 @@ s32b object_power(const object_type *o_ptr)
 	if (high_resists > 1) p += high_resists * high_resists / 2;
 
 	ADD_POWER("regeneration",	 4, TR3_REGEN, 3,);
-	ADD_POWER("blessed",		 1, TR3_BLESSED, 3,);
-
-	ADD_POWER("blood vampire",	 25, TR4_VAMP_HP, 4,);
-	ADD_POWER("mana vampire",	 14, TR4_VAMP_MANA, 4,);
 
 	ADD_POWER("teleportation",	 -40, TR3_TELEPORT, 3,);
 	ADD_POWER("drain experience",	 -20, TR3_DRAIN_EXP, 3,);

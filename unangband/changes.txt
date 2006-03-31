@@ -281,6 +281,13 @@ more. (Reported by Hilke Reiter).
 - Farmer Maggot should no longer sing. Tom Bombadil will no longer crash the
 game (Reported by darkDrone).
 
+- Staffs should not stack incorrectly (Reported by will_asher).
+
+- Non-weapon blessed or vampiric items should no longer be generated (Reported
+by ekolis).
+
+- Monsters releasing spores or wailing should do so with correct messages
+(Reported by ekolis).
 
 ### Build / Platform ###
 
