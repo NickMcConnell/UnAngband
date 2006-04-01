@@ -124,6 +124,8 @@ been attacked by the player. This is particularly noticeable in town.
 - Implemented circular detection. The same area should be detected approximately
 as for players using the 'standard' screen size.
 
+- Monster experience is now computed via a power algorithm.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.

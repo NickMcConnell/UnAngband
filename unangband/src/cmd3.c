@@ -1763,7 +1763,6 @@ bool ang_sort_comp_hook(vptr u, vptr v, int a, int b)
 		if (z1 > z2) return (FALSE);
 	}
 
-
 	/* Sort by monster level */
 	if (*why >= 2)
 	{
@@ -1775,7 +1774,6 @@ bool ang_sort_comp_hook(vptr u, vptr v, int a, int b)
 		if (z1 < z2) return (TRUE);
 		if (z1 > z2) return (FALSE);
 	}
-
 
 	/* Sort by monster experience */
 	if (*why >= 1)

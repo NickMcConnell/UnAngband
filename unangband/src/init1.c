@@ -3687,7 +3687,8 @@ errr parse_r_info(char *buf, header *head)
 			r_ptr->flags9 |= RF9_ELF;
 		}
 
-#if 0		/* XXX Can't use the below, as name not currently valid */
+#if 0
+		/* XXX Can't use the below, as name not currently valid */
 		/* Mark dwarves */
 		if (strstr(r_name + r_ptr->name, "warven") || strstr(r_name + r_ptr->name, "warf"))
 		{
@@ -6258,19 +6259,119 @@ static long eval_max_dam(monster_race *r_ptr)
 
 						/* handle elemental breaths*/
 						switch (which_gf)
-					    {
+						{
 							case GF_ACID:
 							case GF_FIRE:
 							case GF_COLD:
 							case GF_ELEC:
+							{
+								/* Lets just pretend the player has the right base resist*/
+								this_dam /= 3 + 10;
+
+								break;
+							}
 							case GF_POIS:
 							{
 								/* Lets just pretend the player has the right base resist*/
-								this_dam /= 3;
+								this_dam = (this_dam * 5 / 12) + 5;
 
 								break;
 							}
 
+							/*other bad effects - minor*/
+							case GF_EAT_GOLD:
+							case GF_EAT_ITEM:
+							case GF_EAT_FOOD:
+							case GF_EAT_LITE:
+							case GF_LOSE_CHR:
+							case GF_WIND:
+							{
+								this_dam += 5;
+								break;
+							}
+							/*other bad effects - poison / disease */
+							case GF_DISEASE:
+							case GF_ICE:
+							case GF_SHARD:
+							{
+								this_dam *= 5;
+								this_dam /= 4;
+								this_dam += 5;
+								break;
+							}
+							/*other bad effects - elements / sustains*/
+							case GF_TERRIFY:
+							case GF_HUNGER:
+							case GF_LOSE_MANA:
+							case GF_LITE:
+							case GF_DARK:
+							case GF_SLOW:
+							{
+								this_dam += 10;
+								break;
+							}
+							/*other bad effects - major*/
+							case GF_PLASMA:
+							case GF_WATER:
+							case GF_SOUND:
+							case GF_NEXUS:
+							case GF_BLIND:
+							case GF_LAVA:
+							case GF_CONFUSION:
+							case GF_LOSE_STR:
+							case GF_LOSE_INT:
+							case GF_LOSE_WIS:
+							case GF_LOSE_DEX:
+							case GF_EXP_10:
+							case GF_HALLU:
+							{
+								this_dam += 20;
+								break;
+							}
+							/*other bad effects - major*/
+							case GF_GRAVITY:
+							case GF_INERTIA:
+							case GF_FORCE:
+							case GF_NETHER:
+							case GF_CHAOS:
+							case GF_DISENCHANT:
+							case GF_UN_BONUS:
+							case GF_UN_POWER:
+							case GF_LOSE_CON:
+							case GF_EXP_20:
+							{
+								this_dam += 30;
+								break;
+							}
+							/*other bad effects - major*/
+							case GF_TIME:
+							case GF_PARALYZE:
+							case GF_LOSE_ALL:
+							case GF_EXP_40:
+							case GF_EXP_80:
+							{
+								this_dam += 40;
+								break;
+							}
+
+							/*Earthquakes*/
+							case GF_SHATTER:
+							{
+								this_dam += 300;
+								break;
+							}
+
+							/* No damage normally */
+							case GF_LITE_WEAK:
+							case GF_DARK_WEAK:
+							case GF_WATER_WEAK:
+							case GF_SALT_WATER:
+							case GF_BLIND_WEAK:
+							{
+								this_dam = 5;
+							}
+
+							/*nothing special*/
 							default: break;
 						}
 
@@ -6450,16 +6551,6 @@ static long eval_max_dam(monster_race *r_ptr)
 
 			switch (method)
 			{
-				/*possible stun*/
-				case RBM_HIT:
-				{
-					if ((effect == GF_WOUND) || (effect == GF_BATTER))
-					{
-						atk_dam *= 5;
-						atk_dam /= 4;
-					}
-					break;
-				}
 				/*stun definitely most dangerous*/
 				case RBM_PUNCH:
 				case RBM_KICK:
@@ -6479,7 +6570,15 @@ static long eval_max_dam(monster_race *r_ptr)
 					atk_dam /= 5;
 					break;
 				}
-				default: break;
+				default: 
+				{
+					if ((effect == GF_WOUND) || (effect == GF_BATTER))
+					{
+						atk_dam *= 5;
+						atk_dam /= 4;
+					}
+					break;
+				}
 			}
 
 			switch (effect)
@@ -6488,8 +6587,9 @@ static long eval_max_dam(monster_race *r_ptr)
 				case GF_EAT_GOLD:
 				case GF_EAT_ITEM:
 				case GF_EAT_FOOD:
-				case GF_HUNGER:
 				case GF_EAT_LITE:
+				case GF_LOSE_CHR:
+				case GF_WIND:
 				{
 					atk_dam += 5;
 					break;
@@ -6497,6 +6597,8 @@ static long eval_max_dam(monster_race *r_ptr)
 				/*other bad effects - poison / disease */
 				case GF_DISEASE:
 				case GF_POIS:
+				case GF_ICE:
+				case GF_SHARD:
 				{
 					atk_dam *= 5;
 					atk_dam /= 4;
@@ -6509,39 +6611,77 @@ static long eval_max_dam(monster_race *r_ptr)
 				case GF_ELEC:
 				case GF_FIRE:
 				case GF_COLD:
+				case GF_HUNGER:
+				case GF_LOSE_MANA:
+				case GF_LITE:
+				case GF_DARK:
+				case GF_SLOW:
 				{
 					atk_dam += 10;
 					break;
 				}
 				/*other bad effects - major*/
-				case GF_UN_BONUS:
-				case GF_UN_POWER:
-				case GF_LOSE_MANA:
+				case GF_PLASMA:
+				case GF_WATER:
+				case GF_SOUND:
+				case GF_NEXUS:
 				case GF_BLIND:
+				case GF_LAVA:
 				case GF_CONFUSION:
-				case GF_PARALYZE:
 				case GF_LOSE_STR:
 				case GF_LOSE_INT:
 				case GF_LOSE_WIS:
 				case GF_LOSE_DEX:
-				case GF_LOSE_CON:
-				case GF_LOSE_CHR:
-				case GF_LOSE_ALL:
 				case GF_EXP_10:
-				case GF_EXP_20:
-				case GF_EXP_40:
-				case GF_EXP_80:
 				case GF_HALLU:
 				{
 					atk_dam += 20;
 					break;
 				}
+				/*other bad effects - major*/
+				case GF_GRAVITY:
+				case GF_INERTIA:
+				case GF_FORCE:
+				case GF_NETHER:
+				case GF_CHAOS:
+				case GF_DISENCHANT:
+				case GF_UN_BONUS:
+				case GF_UN_POWER:
+				case GF_LOSE_CON:
+				case GF_EXP_20:
+				{
+					atk_dam += 30;
+					break;
+				}
+				/*other bad effects - major*/
+				case GF_TIME:
+				case GF_PARALYZE:
+				case GF_LOSE_ALL:
+				case GF_EXP_40:
+				case GF_EXP_80:
+				{
+					atk_dam += 40;
+					break;
+				}
+
+
 				/*Earthquakes*/
 				case GF_SHATTER:
 				{
 					atk_dam += 300;
 					break;
 				}
+
+				/* No damage normally */
+				case GF_LITE_WEAK:
+				case GF_DARK_WEAK:
+				case GF_WATER_WEAK:
+				case GF_SALT_WATER:
+				case GF_BLIND_WEAK:
+				{
+					atk_dam = 5;
+				}
+
 				/*nothing special*/
 				default: break;
 			}
@@ -6552,6 +6692,13 @@ static long eval_max_dam(monster_race *r_ptr)
 			{
 				/* Keep a running total */
 				melee_dam += atk_dam;
+			}
+
+			/* Hack -- aura is extra tough in melee */
+			if (method == RBM_AURA) 
+			{
+				/* Keep a running total */
+				melee_dam += 3 * atk_dam;
 			}
 
 			/* Ranged attacks can also apply spell dam */
@@ -6738,9 +6885,12 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	if (r_ptr->flags1 & (RF1_FORCE_MAXHP)) hp = r_ptr->hdice * r_ptr->hside;
 	else hp = r_ptr->hdice * (r_ptr->hside + 1) / 2;
 
-	/* Breeders get pals quickly */
-	hp = hp * MAX(1, extract_energy[r_ptr->speed
-		+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
+	/* Never moves with no ranged attacks - high hit points count for less */
+	if ((r_ptr->flags1 & (RF1_NEVER_MOVE)) && !(r_ptr->freq_innate || r_ptr->freq_spell))
+	{
+		hp /= 2;
+		if (hp < 1) hp = 1;
+	}
 
 	/* Just assume healers have more staying power */
 	if (r_ptr->flags6 & RF6_HEAL) hp = (hp * 6) / 5;
@@ -6933,7 +7083,7 @@ errr eval_r_power(header *head)
 		 * Hack - at level 50 & above and 75 & above, we have to use an adjustment
 		 * factor to prevent overflow.
                  */
-		if (lvl >= 100)
+		if (lvl >= 90)
 		{
 			hp /= 1000;
 			dam /= 1000;
@@ -6952,16 +7102,15 @@ errr eval_r_power(header *head)
 		/* Define the power rating */
 		power[i] = hp * dam;
 
-#if 0
 		/* Hack -- set exp including adjustment factor */
 		if (lvl == 0) r_ptr->mexp = 0L;
-		else if (lvl >= 100) r_ptr->mexp = hp * dam * 400000L / lvl;
+		else if (lvl >= 90) r_ptr->mexp = hp * dam * 400000L / lvl;
 		else if (lvl >= 75) r_ptr->mexp = hp * dam * 4000L / lvl;
 		else if (lvl >= 50) r_ptr->mexp = hp * dam * 4L / lvl;
 		else r_ptr->mexp = (hp * dam) / (lvl * 25);
 
 		if ((lvl) && (r_ptr->mexp < 1L)) r_ptr->mexp = 1L;
-#endif
+
 		/* Adjust for group monsters.  Average in-level group size is 5 */
 		if (r_ptr->flags1 & RF1_UNIQUE) ;
 
@@ -6970,11 +7119,21 @@ errr eval_r_power(header *head)
 		else if (r_ptr->flags1 & RF1_FRIENDS) power[i] *= 5;
 
 		/* Adjust for multiplying monsters. This is modified by the speed,
-                 * as fast multipliers are much worse than slow ones.
+                 * as fast multipliers are much worse than slow ones. We also adjust for
+		 * ability to bypass walls or doors.
                  */
-		if (r_ptr->flags2 & RF2_MULTIPLY) 
-			power[i] = power[i] * MAX(1, extract_energy[r_ptr->speed
-				+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
+		if (r_ptr->flags2 & RF2_MULTIPLY)
+		{
+			if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL))
+				power[i] = MAX(power[i], power[i] * extract_energy[r_ptr->speed
+					+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]);
+			else if (r_ptr->flags2 & (RF2_OPEN_DOOR | RF2_BASH_DOOR))
+				power[i] = MAX(power[i], power[i] *  extract_energy[r_ptr->speed
+					+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] * 3 / 2);
+			else
+				power[i] = MAX(power[i], power[i] * extract_energy[r_ptr->speed
+					+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
+		}
 
 #if 0
 		/* Adjust for rarity.  Monsters with rarity > 1 appear less often */
@@ -6985,33 +7144,22 @@ errr eval_r_power(header *head)
 		 * Update the running totals - these will be used as divisors later
 		 * Total HP / dam / count for everything up to the current level
 		 */
-
-		/*
-		 * Mega Hack -- only let monsters appear for up to 2* level plus 10
-		 * levels deeper XXX We should actually determine power per dungeon, as opposed
-                 * to this. e.g. Slay animals is better where game has dungeons
-		 * full of animals. We also exclude townsfolk from the dungeon.
-		 * We also only count uniques once, on the level they appear...
-		 * Was 	for (j = lvl; j < MAX_DEPTH; j++)
-		 *
-		 * Also tried for (j = lvl; j < (lvl == 0 ? 1 : MIN((lvl * 2) + 10, MAX_DEPTH)); j++)
-		 */
 		for (j = lvl; j < (lvl == 0 ? lvl + 1: MAX_DEPTH); j++)
 		{
 			/*
 			 * Uniques don't count towards total monster power on the level.
 			 */
 			if (r_ptr->flags1 & RF1_UNIQUE) continue;
-
+#if 0
 			/*
 			 * While we fix the monster list, only count up to Morgoth
 			 */
 			if (i > 547) continue;
-
+#endif
 			/*
 			 * Hack -- provide adjustment factor to prevent overflow
 			 */
-			if ((j == 100) && (r_ptr->level < 100))
+			if ((j == 90) && (r_ptr->level < 90))
 			{
 				hp /= 10;
 				dam /= 10;
@@ -7033,17 +7181,30 @@ errr eval_r_power(header *head)
 			tot_dam[j] += dam;
 
 			/*
-			 * Hack - if it's a group monster, add several to the count
+			 * Hack - if it's a group monster or multiplying monster, add several to the count
 			 * so that the averages don't get thrown off
 			 */
+			if (r_ptr->flags2 & RF2_MULTIPLY)
+			{
+				int mod = 1;
 
-			if (r_ptr->flags1 & RF1_FRIEND) mon_count[j] += 2;
+				if (r_ptr->flags1 & RF1_FRIEND) mod = 2;
+				else if (r_ptr->flags1 & RF1_FRIENDS) mod = 5;				
+
+				if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL))
+					mon_count[i] += MAX(1, extract_energy[r_ptr->speed
+						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) * mod;
+				else if (r_ptr->flags2 & (RF2_OPEN_DOOR | RF2_BASH_DOOR))
+					mon_count[i] += MAX(1, extract_energy[r_ptr->speed
+						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] * 3 / 2) * mod;
+				else
+					mon_count[i] += MAX(1, extract_energy[r_ptr->speed
+						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2) * mod;
+			}
+			else if (r_ptr->flags1 & RF1_FRIEND) mon_count[j] += 2;
 			else if (r_ptr->flags1 & RF1_FRIENDS) mon_count[j] += 5;
-
-			if (r_ptr->flags2 & RF2_MULTIPLY) mon_count[i] += MAX(1, extract_energy[r_ptr->speed
-				+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
-
 			else mon_count[j] += 1;
+
 		}
 
 	}
