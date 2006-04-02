@@ -2222,7 +2222,12 @@ static void process_command(void)
 			int y = KEY_GRID_Y(p_ptr->command_cmd_ex);
 			int x = KEY_GRID_X(p_ptr->command_cmd_ex);
 
-			if (p_ptr->command_cmd_ex.mousebutton == 1)
+			/* Hack -- we could try various things here like travelling or going up/down stairs */
+			if ((p_ptr->py == y) && (p_ptr->px == x) && (p_ptr->command_cmd_ex.mousebutton))
+			{
+				do_cmd_rest();
+			}
+			else if (p_ptr->command_cmd_ex.mousebutton == 1)
 			{
 				do_cmd_pathfind(y, x);
 			}
