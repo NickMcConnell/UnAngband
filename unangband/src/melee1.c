@@ -916,11 +916,13 @@ int get_breath_dam(s16b hit_points, int gf_type, bool powerful)
 		case GF_LITE:
 		case GF_DARK:
 		case GF_CONFUSION:
+		case GF_TERRIFY:
 		{
 			dam = hit_points / 6;
 			max_dam = 400;
 			break;
 		}
+		case GF_WIND:
 		case GF_SOUND:
 		{
 			if (powerful)
@@ -989,6 +991,7 @@ int get_breath_dam(s16b hit_points, int gf_type, bool powerful)
 			max_dam = 450;
 			break;
 		}
+		case GF_HOLY_ORB:
 		case GF_NETHER:
 		{
 			dam = hit_points / 6;
@@ -1002,6 +1005,7 @@ int get_breath_dam(s16b hit_points, int gf_type, bool powerful)
 			max_dam = 500;
 			break;
 		}
+		case GF_DISEASE:
 		case GF_TIME:
 		{
 			dam = hit_points / 3;

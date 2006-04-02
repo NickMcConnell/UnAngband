@@ -6157,8 +6157,8 @@ static long eval_max_dam(monster_race *r_ptr)
 					else if (flag_counter == RF4_BRTH_POIS)
 					{
 						which_gf = GF_POIS;
-						mult = 10;
-						div_by = 9;
+						mult = 8;
+						div_by = 7;
 					}
 					else if (flag_counter == RF4_BRTH_PLAS)
 					{
@@ -6205,8 +6205,8 @@ static long eval_max_dam(monster_race *r_ptr)
 					else if (flag_counter == RF4_BRTH_WIND)
 					{
 						which_gf = GF_WIND;
-						mult = 3;
-						div_by = 2;
+						mult = 6;
+						div_by = 5;
 					}
 					else if (flag_counter == RF4_BRTH_GRAV)
 					{
@@ -6251,6 +6251,23 @@ static long eval_max_dam(monster_race *r_ptr)
 						div_by = 2;
 					}
 					else if (flag_counter == RF4_BRTH_MANA) which_gf = GF_MANA;
+					else if (flag_counter == RF4_BRTH_HOLY)
+					{
+						which_gf = GF_HOLY_ORB;
+						div_by = 2;
+					}
+					else if (flag_counter == RF4_BRTH_FEAR)
+					{
+						which_gf = GF_TERRIFY;
+						mult = 5;
+						div_by = 4;
+					}
+					else if (flag_counter == RF4_BRTH_DISEA)
+					{
+						which_gf = GF_DISEASE;
+						mult = 5;
+						div_by = 4;
+					}
 
 					if (which_gf)
 					{
@@ -6264,121 +6281,20 @@ static long eval_max_dam(monster_race *r_ptr)
 							case GF_FIRE:
 							case GF_COLD:
 							case GF_ELEC:
-							{
-								/* Lets just pretend the player has the right base resist*/
-								this_dam /= 3 + 10;
-
-								break;
-							}
 							case GF_POIS:
 							{
 								/* Lets just pretend the player has the right base resist*/
-								this_dam = (this_dam * 5 / 12) + 5;
+								div_by *= 3;
 
 								break;
 							}
 
-							/*other bad effects - minor*/
-							case GF_EAT_GOLD:
-							case GF_EAT_ITEM:
-							case GF_EAT_FOOD:
-							case GF_EAT_LITE:
-							case GF_LOSE_CHR:
-							case GF_WIND:
-							{
-								this_dam += 5;
-								break;
-							}
-							/*other bad effects - poison / disease */
-							case GF_DISEASE:
-							case GF_ICE:
-							case GF_SHARD:
-							{
-								this_dam *= 5;
-								this_dam /= 4;
-								this_dam += 5;
-								break;
-							}
-							/*other bad effects - elements / sustains*/
-							case GF_TERRIFY:
-							case GF_HUNGER:
-							case GF_LOSE_MANA:
-							case GF_LITE:
-							case GF_DARK:
-							case GF_SLOW:
-							{
-								this_dam += 10;
-								break;
-							}
-							/*other bad effects - major*/
-							case GF_PLASMA:
-							case GF_WATER:
-							case GF_SOUND:
-							case GF_NEXUS:
-							case GF_BLIND:
-							case GF_LAVA:
-							case GF_CONFUSION:
-							case GF_LOSE_STR:
-							case GF_LOSE_INT:
-							case GF_LOSE_WIS:
-							case GF_LOSE_DEX:
-							case GF_EXP_10:
-							case GF_HALLU:
-							{
-								this_dam += 20;
-								break;
-							}
-							/*other bad effects - major*/
-							case GF_GRAVITY:
-							case GF_INERTIA:
-							case GF_FORCE:
-							case GF_NETHER:
-							case GF_CHAOS:
-							case GF_DISENCHANT:
-							case GF_UN_BONUS:
-							case GF_UN_POWER:
-							case GF_LOSE_CON:
-							case GF_EXP_20:
-							{
-								this_dam += 30;
-								break;
-							}
-							/*other bad effects - major*/
-							case GF_TIME:
-							case GF_PARALYZE:
-							case GF_LOSE_ALL:
-							case GF_EXP_40:
-							case GF_EXP_80:
-							{
-								this_dam += 40;
-								break;
-							}
-
-							/*Earthquakes*/
-							case GF_SHATTER:
-							{
-								this_dam += 300;
-								break;
-							}
-
-							/* No damage normally */
-							case GF_LITE_WEAK:
-							case GF_DARK_WEAK:
-							case GF_WATER_WEAK:
-							case GF_SALT_WATER:
-							case GF_BLIND_WEAK:
-							{
-								this_dam = 5;
-							}
-
-							/*nothing special*/
-							default: break;
 						}
 
 						this_dam = (this_dam * mult) / div_by;
 
-						/*slight bonus for cloud_surround*/
-						if (r_ptr->flags2 & RF2_HAS_AURA) this_dam = this_dam * 11 / 10;
+						/* Slight bonus for being powerful */
+						if (r_ptr->flags2 & (RF2_POWERFUL)) this_dam = this_dam * 8 / 7;
 					}
 				}
 
@@ -6447,6 +6363,8 @@ static long eval_max_dam(monster_race *r_ptr)
 						else if (flag_counter == RF6_CONF) this_dam = rlev;
 						else if (flag_counter == RF6_SLOW) this_dam = rlev;
 						else if (flag_counter == RF6_HOLD) this_dam = 25;
+
+						if (r_ptr->flags2 & (RF2_POWERFUL)) this_dam = this_dam * 3 / 2;
 						break;
 					}
 					/*All flag7 flags*/
