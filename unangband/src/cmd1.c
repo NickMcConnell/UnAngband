@@ -2013,9 +2013,9 @@ void py_attack(int y, int x)
 		blows++;
 
 		/* Some monsters are great at dodging  -EZ- */
-		if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!was_asleep) &&
-			(!m_ptr->stunned) && (!m_ptr->confused) && (!m_ptr->blind) && (!m_ptr->monfear)
-			&& (rand_int(2)))
+		if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!was_asleep)
+			&& (!m_ptr->confused) && (!m_ptr->blind) && (!m_ptr->monfear)
+			&& (rand_int(m_ptr->stunned ? 2 : 3)))
 		{
 			message_format(MSG_MISS, 0, "%^s evades your blow!",
 				m_name);

@@ -138,7 +138,7 @@ static cptr r_info_blow_method[] =
 	"BEG",
 	"INSULT",
 	"MOAN",
-	"SHOT",
+	"SING",
 	"TRAP",
 	"BOULDER",
 	"AURA",
@@ -171,7 +171,7 @@ static cptr r_info_blow_method[] =
 	"XBOLT",
 	"SPIKE",
 	"DART",
-	"SING",
+	"SHOT",
 	NULL
 };
 
@@ -185,7 +185,7 @@ static cptr r_info_blow_effect[] =
 	"STORM",
 	"WIND",
 	"XXX1",
-	"MANA",
+	"HELLFIRE",
 	"HOLY_ORB",
 	"LITE_WEAK",
 	"DARK_WEAK",

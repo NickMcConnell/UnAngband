@@ -17846,13 +17846,13 @@ D:A vicarious spirit of the high clouds, winged and casting spells whistfuly.
 
 N:1241:Kobold
 G:E:u
-I:110:10d10:18:12:10
+I:110:15d10:18:12:10
 W:27:1:0:20
 M:0:25:27:33
 B:HIT:HURT:1d6
 B:HIT:HURT:1d6
 F:OPEN_DOOR | BASH_DOOR | DROP_1D2
-F:IM_EDGED | RES_BLUNT | EVASIVE | IM_ACID | ATTR_METAL
+F:IM_EDGED | RES_BLUNT | IM_ACID | ATTR_METAL
 S:BLINK | SLOW | BLIND | ADD_MANA | BOLT_ACID
 D:A malicious spirit of the deep mines, set in stone and casting spells ponderously.
 

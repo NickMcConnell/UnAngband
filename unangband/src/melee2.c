@@ -227,24 +227,15 @@ static bool monster_can_smell(monster_type *m_ptr)
 	/* Scent is too old */
 	if (age > SMELL_STRENGTH) return (FALSE);
 
-	/* Canines and Zephyer Hounds are amazing trackers */
-	if (strchr("CZ", r_ptr->d_char))
+	/* Super scent are amazing trackers */
+	if (r_ptr->flags9 & (RF9_SUPER_SCENT))
 	{
 		/* I smell a character! */
 		return (TRUE);
 	}
 
-	/* So are the Nazgul */
-	else if ((strchr("W", r_ptr->d_char)) && 
-		 (r_ptr->flags1 & (RF1_UNIQUE)))
-	{
-		/* Bloodscent! */
-		return (TRUE);
-	}
-
 	/* Other monsters can sometimes make good use of scent */
-	/* Now include ancient dragons */
-	else if (strchr("AfkoQyHORTY", r_ptr->d_char))
+	else if (r_ptr->flags9 & (RF9_SCENT))
 	{
 		if (age <= SMELL_STRENGTH - 10)
 		{
@@ -252,7 +243,6 @@ static bool monster_can_smell(monster_type *m_ptr)
 			return (TRUE);
 		}
 	}
-
 
 	/* You're imagining things. */
 	return (FALSE);
@@ -444,6 +434,24 @@ static int find_resist(u32b smart, int effect)
 			return (a);
 		}
 
+		/* Storm Spells */
+		case GF_STORM:
+		{
+			if (smart & (SM_IMM_ELEC)) a += 33;
+			else if ((smart & (SM_OPP_ELEC)) && (smart & (SM_RES_ELEC))) a += 22;
+			else if ((smart & (SM_OPP_ELEC)) || (smart & (SM_RES_ELEC))) a += 11;
+			if (smart & (SM_RES_CONFU)) a += 3;
+			if (smart & (SM_RES_SOUND)) a += 2;
+			return (a);
+		}
+
+		/* Wind spells */
+		case GF_WIND:
+		{
+			/* Maybe should notice feather fall */
+			return (0);
+		}
+
 		/* Chaos Spells */
 		case GF_CHAOS:
 		{
@@ -475,11 +483,17 @@ static int find_resist(u32b smart, int effect)
 			else return (0);
 		}
 
-		/* Hallucination */
+		/* Hallucination or save */
 		case GF_HALLU:
 		{
-			if (smart & (SM_RES_CHAOS)) return(30);
-			else return (a);
+			if (smart & (SM_RES_CHAOS)) a = 100;
+			else if (smart & (SM_PERF_SAVE)) a = 100;
+			else
+			{
+				if (smart & (SM_GOOD_SAVE)) a += 30;
+				if (p_ptr->afraid) a += 50;
+			}
+			return (a);
 		}
 
 		/* Disenchantment Spells */
@@ -669,6 +683,25 @@ static int find_resist(u32b smart, int effect)
 			return (a);
 		}
 
+		/* Spells that require the player be evil */
+		case GF_HOLY_ORB:
+		{
+			if (!(p_ptr->cur_flags4 & (TR4_EVIL))) return (50);
+			return(0);
+		}
+
+		/* Spells that require the player not be evil or fire resistant */
+		case GF_HELLFIRE:
+		{
+			if (smart & (SM_IMM_FIRE)) a = 66;
+			else if ((smart & (SM_OPP_FIRE)) && (smart & (SM_RES_FIRE))) a = 44;
+			else if ((smart & (SM_OPP_FIRE)) || (smart & (SM_RES_FIRE))) a = 22;
+
+			if (p_ptr->cur_flags4 & (TR4_EVIL)) a += 33;
+			else if (smart & (SM_RES_DARK)) a += 22;
+			return(a);
+		}
+
 		/* Anything else */
 		default:
 		{
@@ -763,6 +796,9 @@ static void remove_useless_spells(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, u3
 
 	/* Don't regain mana if full */
 	if (m_ptr->mana >= r_ptr->mana) f6 &= ~(RF6_ADD_MANA);
+
+	/* Don't regain ammo if has some */
+	if (find_monster_ammo(m_idx, -1, FALSE)) f6 &= ~(RF6_ADD_AMMO);
 
 	/* Don't heal if full */
 	if (m_ptr->hp >= m_ptr->maxhp) f6 &= ~(RF6_HEAL);

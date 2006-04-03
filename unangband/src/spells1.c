@@ -671,56 +671,288 @@ void teleport_player_level(void)
 }
 
 
+/*
+ * Draw some projections in multi-hued colors.
+ * -TY-, -EB-
+ */
+static byte mh_attr(void)
+{
+	switch (randint(9))
+	{
+		case 1:  return (TERM_RED);
+		case 2:  return (TERM_GREEN);
+		case 3:  return (TERM_BLUE);
+		case 4:  return (TERM_YELLOW);
+		case 5:  return (TERM_ORANGE);
+		case 6:  return (TERM_VIOLET);
+		case 7:  return (TERM_L_RED);
+		case 8:  return (TERM_L_GREEN);
+		case 9:  return (TERM_L_BLUE);
+	}
 
+	return (TERM_WHITE);
+}
 
+static byte acid_color(void)
+{
+	switch (rand_int(3))
+	{
+		case 0: case 1: return (TERM_GREEN);
+		case 2: return (TERM_L_GREEN);
+	}
+	return (TERM_WHITE);
+}
+
+static byte elec_color(void)
+{
+	switch (rand_int(3))
+	{
+		case 0: case 1: return (TERM_YELLOW);
+		case 2: return (TERM_L_BLUE);
+	}
+	return (TERM_WHITE);
+}
+
+static byte fire_color(void)
+{
+	switch (rand_int(3))
+	{
+		case 0: case 1: return (TERM_ORANGE);
+		case 2: return (TERM_L_DARK);
+	}
+	return (TERM_WHITE);
+}
+
+static byte cold_color(void)
+{
+	switch (rand_int(3))
+	{
+		case 0: case 1: return (TERM_WHITE);
+		case 2: return (TERM_L_WHITE);
+	}
+	return (TERM_WHITE);
+}
+
+static byte pois_color(void)
+{
+	switch (rand_int(3))
+	{
+		case 0: case 1: return (TERM_VIOLET);
+		case 2: return (TERM_GREEN);
+	}
+	return (TERM_WHITE);
+}
+
+static byte water_color(void)
+{
+	switch (rand_int(3))
+	{
+		case 0: case 1: return (TERM_BLUE);
+		case 2: return (TERM_WHITE);
+	}
+	return (TERM_WHITE);
+}
+
+static byte lava_color(void)
+{
+	switch (rand_int(3))
+	{
+		case 0: case 1: return (TERM_L_DARK);
+		case 2: return (TERM_RED);
+	}
+	return (TERM_WHITE);
+}
+
+static byte plasma_color(void)
+{
+	switch (rand_int(4))
+	{
+		case 0: case 1: return (TERM_WHITE);
+		case 2: return (TERM_L_RED);
+		case 3: return (TERM_YELLOW);
+	}
+
+	return (TERM_WHITE);
+}
+
+static byte hellfire_color(void)
+{
+	switch (rand_int(4))
+	{
+		case 0: case 1: return (TERM_RED);
+		case 2: return (TERM_L_RED);
+		case 3: return (TERM_L_DARK);
+	}
+
+	return (TERM_WHITE);
+}
+
+static byte ice_color(void)
+{
+	switch (rand_int(3))
+	{
+		case 0: case 1: return (TERM_WHITE);
+		case 2: return (TERM_L_BLUE);
+	}
+
+	return (TERM_WHITE);
+}
+
+static byte lite_color(void)
+{
+	switch (rand_int(4))
+	{
+		case 0: case 1: case 2: return (TERM_YELLOW);
+		case 3: return (TERM_ORANGE);
+	}
+
+	return (TERM_WHITE);
+}
+
+static byte confu_color(void)
+{
+	switch (rand_int(5))
+	{
+		case 0: case 1: case 2: return (TERM_L_UMBER);
+		case 3: return (TERM_UMBER);
+		case 4: return (TERM_WHITE);
+	}
+
+	return (TERM_WHITE);
+}
+
+static byte grav_color(void)
+{
+	switch (rand_int(4))
+	{
+		case 0: case 1: return (TERM_DARK);
+		case 2: return (TERM_L_DARK);
+		case 3: return (TERM_SLATE);
+	}
+
+	return (TERM_WHITE);
+}
+
+static byte storm_color(void)
+{
+	switch (rand_int(7))
+	{
+		case 0: case 1: case 2: return (TERM_SLATE);
+		case 3: return (TERM_BLUE);
+		case 4: return (TERM_L_BLUE);
+		case 5: return (TERM_YELLOW);
+		case 6: return (TERM_WHITE);
+	}
+
+	return (TERM_WHITE);
+}
+
+static byte meteor_color(void)
+{
+	switch (rand_int(6))
+	{
+		case 0: case 1: return (TERM_L_DARK);
+		case 2: return (TERM_WHITE);
+		case 3: return (TERM_RED);
+		case 4: return (TERM_ORANGE);
+		case 5: return (TERM_YELLOW);
+	}
+
+	return (TERM_WHITE);
+}
+
+static byte orb_color(void)
+{
+	switch (rand_int(4))
+	{
+		case 0: case 1: case 2: return (TERM_L_DARK);
+		case 3: return (TERM_SLATE);
+	}
+
+	return (TERM_L_DARK);
+}
+
+static byte death_color(void)
+{
+	switch (rand_int(4))
+	{
+		case 0: case 1: case 2: return (TERM_L_DARK);
+		case 3: return (TERM_VIOLET);
+	}
+
+	return (TERM_L_DARK);
+}
+
+static byte mana_color(void)
+{
+	switch (rand_int(4))
+	{
+		case 0: case 1: return (TERM_VIOLET);
+		case 2: return (TERM_BLUE);
+		case 3: return (TERM_RED);
+	}
+
+	return (TERM_VIOLET);
+}
 
 
 /*
  * Return a color to use for the bolt/ball spells
  */
-static byte spell_color(int type)
+byte spell_color(int type)
 {
 	/* Analyze */
 	switch (type)
 	{
-		case GF_EXPLODE:	return (TERM_VIOLET);
-		case GF_ACID:	   return (TERM_SLATE);
-		case GF_ELEC:	   return (TERM_BLUE);
-		case GF_FIRE:	   return (TERM_RED);
-		case GF_COLD:	   return (TERM_WHITE);
-		case GF_POIS:	   return (TERM_GREEN);
-		case GF_HOLY_ORB:       return (TERM_L_DARK);
-		case GF_MANA:	   return (TERM_L_DARK);
-		case GF_STORM:	  return (TERM_L_BLUE);
-		case GF_WIND:	  return (TERM_WHITE);
-		case GF_WATER_WEAK:	return (TERM_SLATE);
-		case GF_WATER:	  return (TERM_SLATE);
-		case GF_BWATER:	 return (TERM_VIOLET);
-		case GF_BMUD:	   return (TERM_ORANGE);
-		case GF_LAVA:	   return (TERM_RED);
-		case GF_NETHER:	 return (TERM_L_GREEN);
-		case GF_CHAOS:	  return (TERM_VIOLET);
-		case GF_DISENCHANT:     return (TERM_VIOLET);
-		case GF_NEXUS:	  return (TERM_L_RED);
-		case GF_CONFUSION:      return (TERM_L_UMBER);
-		case GF_SOUND:	  return (TERM_YELLOW);
+		case GF_ACID:         return (acid_color());
+		case GF_ELEC:         return (elec_color());
+		case GF_FIRE:         return (fire_color());
+		case GF_COLD:         return (cold_color());
+		case GF_POIS:         return (pois_color());
+
+		case GF_PLASMA:       return (plasma_color());
+		case GF_HELLFIRE:     return (hellfire_color());
+		case GF_ICE:          return (ice_color());
+
+		case GF_LITE_WEAK:    return (TERM_YELLOW);
+		case GF_LITE:         return (lite_color());
+		case GF_DARK_WEAK:    return (TERM_L_DARK);
+		case GF_DARK:         return (TERM_L_DARK);
+
+		case GF_CONFUSION:    return (confu_color());
+		case GF_SOUND:        return (TERM_YELLOW);
+		case GF_SHARD:        return (TERM_L_UMBER);
+		case GF_INERTIA:      return (TERM_L_WHITE);
+		case GF_GRAVITY:      return (grav_color());
+		case GF_FORCE:        return (TERM_GREEN);
+
+		case GF_WATER_WEAK:	return (water_color());
+		case GF_WATER:        return (water_color());
+
+		case GF_WIND:         return (TERM_WHITE);
+		case GF_STORM:        return (storm_color());
+
+		case GF_NEXUS:        return (TERM_L_RED);
+		case GF_NETHER:       return (TERM_L_GREEN);
+		case GF_CHAOS:        return (mh_attr());
+		case GF_DISENCHANT:   return (TERM_VIOLET);
+		case GF_TIME:         return (TERM_L_BLUE);
+		case GF_MANA:         return (mana_color());
+		case GF_DRAIN_LIFE:   return (death_color());
+
+		case GF_METEOR:       return (meteor_color());
+		case GF_HOLY_ORB:     return (orb_color());
+
+		case GF_EXPLODE:	return (mh_attr());
+		case GF_BWATER:	 	return (TERM_VIOLET);
+		case GF_BMUD:	   	return (TERM_ORANGE);
+		case GF_LAVA:	   	return (lava_color());
+
 		case GF_TERRIFY:	return (TERM_L_WHITE);
-		case GF_SHARD:	  return (TERM_UMBER);
-		case GF_FORCE:	  return (TERM_UMBER);
-		case GF_INERTIA:	return (TERM_L_WHITE);
-		case GF_GRAVITY:	return (TERM_L_WHITE);
-		case GF_TIME:	   return (TERM_L_BLUE);
-		case GF_LITE_WEAK:      return (TERM_ORANGE);
-		case GF_LITE:	   return (TERM_ORANGE);
-		case GF_DARK_WEAK:      return (TERM_L_DARK);
-		case GF_DARK:	   return (TERM_L_DARK);
-		case GF_PLASMA:	 return (TERM_RED);
-		case GF_METEOR:	 return (TERM_RED);
-		case GF_ICE:	    return (TERM_WHITE);
 		case GF_SALT_WATER:     return (TERM_L_GREEN); /* Heh heh heh */
-		case GF_STEAM:	return (TERM_L_WHITE);
-		case GF_VAPOUR:	return (TERM_VIOLET);
-		case GF_SMOKE:	return (TERM_L_DARK);
+		case GF_STEAM:		return (TERM_L_WHITE);
+		case GF_VAPOUR:		return (TERM_L_GREEN);
+		case GF_SMOKE:		return (TERM_L_DARK);
 	}
 
 	/* Standard "color" */
@@ -2294,6 +2526,7 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		}
 		case GF_LAVA:
 		case GF_PLASMA:
+		case GF_HELLFIRE:
 		{
 			if ((f_info[cave_feat[y][x]].flags2 & (FF2_HURT_FIRE)) &&
 			       (dam > (f_info[cave_feat[y][x]].power*10)))
@@ -2827,8 +3060,11 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 		bool ignore = FALSE;
 		bool plural = FALSE;
 		bool do_kill = FALSE;
-
 		cptr note_kill = NULL;
+		bool do_move = FALSE;
+
+		int ny, nx;
+
 
 		/* Get the object */
 		o_ptr = &o_list[this_o_idx];
@@ -2844,6 +3080,17 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 
 		/* Check for artifact */
 		if (artifact_p(o_ptr)) is_art = TRUE;
+
+		/* Hack -- storm can do several things */
+		if (typ == GF_STORM)
+		{
+			switch(rand_int(3))
+			{
+				case 0: typ = GF_WIND; break;
+				case 1: typ = GF_WATER; break;
+				case 2: typ = GF_ELEC; break;
+			}
+		}
 
 		/* Analyze the type */
 		switch (typ)
@@ -2916,6 +3163,22 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 				break;
 			}
 
+			/* Water -- books, lites, scrolls, food */
+			case GF_WATER:
+			case GF_BWATER:
+			case GF_WATER_WEAK:
+			case GF_SALT_WATER:
+			{
+				if (hates_water(o_ptr))
+				{
+					note_kill = (plural ? " soak through!" : " soaks through!");
+					do_kill = TRUE;
+					if (f2 & (TR2_IGNORE_WATER)) ignore = TRUE;
+					if2 |= TR2_IGNORE_WATER;
+				}
+				break;
+			}
+
 			/* Fire + Elec */
 			case GF_PLASMA:
 			{
@@ -2961,7 +3224,6 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 			/* Hack -- break potions and such */
 			case GF_ICE:
 			case GF_SHARD:
-			case GF_FORCE:
 			case GF_SOUND:
 			{
 				if (hates_cold(o_ptr))
@@ -2972,6 +3234,7 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 				break;
 			}
 
+			/* Raise water -- water through if we are raising water */
 			case GF_RAISE:
 			{
 				if ((cave_feat[y][x] == FEAT_WATER) && (hates_water(o_ptr)))
@@ -2983,28 +3246,13 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 				}
 				break;
 			}
-			case GF_WATER:
-			case GF_BWATER:
-			case GF_WATER_WEAK:
-			case GF_SALT_WATER:
-			{
-				if (hates_water(o_ptr))
-				{
-					note_kill = (plural ? " soak through!" : " soaks through!");
-					do_kill = TRUE;
-					if (f2 & (TR2_IGNORE_WATER)) ignore = TRUE;
-					if2 |= TR2_IGNORE_WATER;
-				}
-				break;
-			}
 
-			/* Mana -- destroys everything */
 			/* Explosion -- very destructive to objects */
 			case GF_EXPLODE:
 			case GF_MANA:
 			{
 				do_kill = TRUE;
-				note_kill = (plural ? " melt!" : " melts!");
+				note_kill = (plural ? " shatters!" : " shatters!");
 				if ((f2 & (TR2_IGNORE_ACID)) &&
 				    (f2 & (TR2_IGNORE_COLD)) &&
 				    (f2 & (TR2_IGNORE_ELEC)) &&
@@ -3025,6 +3273,72 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 				break;
 			}
 
+			/* Hellfire -- destroys non-cursed non-artifacts */
+			case GF_HELLFIRE:
+			{
+				if (!cursed_p(o_ptr))
+				{
+					do_kill = TRUE;
+					note_kill = (plural ? " are destroyed!" : " is destroyed!");
+				}
+				break;
+			}
+
+			/* Force is magnetic */
+			case GF_FORCE:
+			{
+				if ((hates_acid(o_ptr)) && (o_ptr->weight <= dam))
+				{
+					int dist = 1 + (dam - o_ptr->weight) / 33;
+
+					if (who < 0)
+					{
+						ny = p_ptr->py;
+						nx = p_ptr->px;
+					}
+					else if (who > 0)
+					{
+						ny = m_list[who].fy;
+						nx = m_list[who].fx;
+					}
+
+					if (who)
+					{
+						int path_n;
+						u16b path_g[256];
+
+						/* Calculate the path */
+						path_n = project_path(path_g, dist, y, x, &ny, &nx, 0);
+
+						ny = GRID_Y(path_g[dist]);
+						nx = GRID_X(path_g[dist]);
+					}
+					else
+					{
+						nx = 0;
+						ny = 0;
+
+						scatter(&ny, &nx, y, x, dist, 0);
+					}
+
+					if (ny != y || nx != x) do_move = TRUE;
+				}
+				break;
+			}
+
+			/* Wind blows things around */
+			case GF_WIND:
+			{
+				if (o_ptr->weight <= dam)
+				{
+					nx = 0;
+					ny = 0;
+
+					scatter(&ny, &nx, y, x, 1 + (dam - o_ptr->weight) / 33, 0);
+					if (ny != y || nx != x) do_move = TRUE;
+				}
+				break;
+			}
 		}
 
 
@@ -3122,6 +3436,39 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 				/* Redraw */
 				lite_spot(y, x);
 			}
+		}
+
+		/* Move the object */
+		else if (do_move)
+		{
+			/* Local object */
+			object_type object_type_body;
+
+			/* Get local object */
+			object_type *i_ptr = &object_type_body;
+
+			/* Wipe the new object */
+			object_wipe(i_ptr);
+
+			/* Make a copy */
+			object_copy(i_ptr, o_ptr);
+
+			/* Effect "observed" */
+			if (o_ptr->marked)
+			{
+				obvious = TRUE;
+			}
+
+			/* Delete the object in its old location */
+			delete_object_idx(this_o_idx);
+
+			/* Drop it near the new location */
+			drop_near(i_ptr, -1, ny, nx);
+
+			/* Redraw */
+			lite_spot(y, x);
+
+			continue;
 		}
 	}
 
@@ -3492,6 +3839,16 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		note_dies = " is destroyed.";
 	}
 
+	/* Hack -- storm can do several things */
+	if (typ == GF_STORM)
+	{
+		switch(rand_int(3))
+		{
+			case 0: typ = GF_WIND; break;
+			case 1: typ = GF_WATER; break;
+			case 2: typ = GF_ELEC; break;
+		}
+	}
 
 	/* Analyze the damage type */
 	switch (typ)
@@ -3503,6 +3860,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			if (seen) obvious = TRUE;
 			break;
 		}
+
 		/* Acid */
 		case GF_ACID:
 		{
@@ -3634,6 +3992,89 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 					l_ptr->flags3 |= (RF3_EVIL);
 				}
 			}
+			else if (r_ptr->flags9 & (RF9_GOOD))
+			{
+				dam /= 9;
+				if ((seen) && !(l_ptr->flags9 & (RF9_GOOD)))
+				{
+					note = " is immune to holy damage.";
+					l_ptr->flags9 |= (RF9_GOOD);
+				}
+			}
+			break;
+		}
+
+		/* Hellfire -- fire, plus nastiness to non-evil */
+		case GF_HELLFIRE:
+		{
+			if (seen) obvious = TRUE;
+
+			/* Demons are healed */
+			if (r_ptr->flags3 & (RF3_DEMON))
+			{
+
+				if ((seen) && !(l_ptr->flags3 & (RF3_DEMON)))
+				{
+					note = " basks in the flames of Hell!";
+					l_ptr->flags3 |= (RF3_DEMON);
+				}
+
+				/* Heal */
+				do_heal = dam;
+
+				/* No damage */
+				dam = 0;
+			}
+
+			/* Can resist fire / darkness */
+			else if ((r_ptr->flags3 & (RF3_IM_FIRE)) || (r_ptr->flags9 & (RF9_RES_DARK)))
+			{
+				if ((seen) && !(l_ptr->flags3 & (RF3_IM_FIRE)))
+				{
+					note = " resists the evil fire.";
+					l_ptr->flags3 |= (RF3_IM_FIRE);
+				}
+
+				if ((seen) && !(l_ptr->flags9 & (RF9_RES_DARK)))
+				{
+					note = " resists the dark flames.";
+					l_ptr->flags9 |= (RF9_RES_DARK);
+				}
+
+				dam /= 2;
+			}
+
+			/* Evil creatures resist a little */
+			else if (r_ptr->flags3 & (RF3_EVIL))
+			{
+				if ((seen) && !(l_ptr->flags3 & (RF3_EVIL)))
+				{
+					note = " resists somewhat.";
+					l_ptr->flags3 |= (RF3_EVIL);
+				}
+
+				dam = 2 * dam / 3;
+			}
+
+			/* If the creature did not resist, it can have nasty done to it */
+			else if (randint(dam) > (2 * r_ptr->level / 3 + 30))
+			{
+				int choice = randint(4);
+
+				/* Effect 1 -- panic */
+				if (choice <= 3)
+				{
+					do_fear = 40;
+				}
+
+				/* Effect 2 -- blindess */
+				if (choice == 4)
+				{
+					/* Get blinded later */
+					do_blind = 20;
+				}
+			}
+
 			break;
 		}
 
@@ -3737,6 +4178,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 			break;
 		}
+
 		/* Weak water damage -- Heavily stunned/confused take damage */
 		/* Hack -- we stun monsters to make them slow down and drown */
 		case GF_WATER_WEAK:
@@ -3748,7 +4190,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 				do_conf = (10 + randint(15) + r) / (r + 1);
 				do_stun = (10 + randint(15) + r) / (r + 1);
 			}
-                        else if (!(r_ptr->flags2 & (RF2_CAN_SWIM)))
+                        else if (!(r_ptr->flags2 & (RF2_CAN_SWIM)) && !(r_ptr->flags3 & (RF3_RES_WATER)))
 			{
 				dam = 0;
 				do_stun = (10 + randint(15) + r) / (r + 1);
@@ -3776,7 +4218,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 				do_conf = (10 + randint(15) + r) / (r + 1);
 				do_stun = (10 + randint(15) + r) / (r + 1);
 			}
-                        else if (!(r_ptr->flags2 & (RF2_CAN_SWIM)))
+                        else if (!(r_ptr->flags2 & (RF2_CAN_SWIM)) && !(r_ptr->flags3 & (RF3_RES_WATER)))
 			{
 				dam = 0;
 				do_stun = (10 + randint(15) + r) / (r + 1);
@@ -4116,10 +4558,22 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
-		/* Pure damage */
+		/* Pure damage -- mana breathers are immune */
 		case GF_MANA:
 		{
 			if (seen) obvious = TRUE;
+
+			/* Mana breathers are immune */
+			if (r_ptr->flags4 & (RF4_BRTH_MANA))
+			{
+				dam /= 9;
+				if ((seen) && !(r_ptr->flags4 & (RF4_BRTH_MANA)))
+				{
+					note = " is immune to mana.";
+					l_ptr->flags4 |= (RF4_BRTH_MANA);
+				}
+			}
+
 			break;
 		}
 
@@ -4148,6 +4602,25 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Wind -- Stuns + throws monster around */
+		case GF_WIND:
+		{
+			if (seen) obvious = TRUE;
+			do_stun = (randint(15) + 1) / (r + 1);
+
+			/* Damage-variable throw distance */
+			do_dist = 1 + dam / 25;
+			if (do_dist > 8) do_dist = 8;
+
+			/* Big, heavy monsters, metallic monsters and ghosts */
+			if ((r_ptr->flags3 & (RF3_HUGE)) || (r_ptr->flags9 & (RF9_IM_BLUNT | RF9_IM_EDGED))) do_dist /= 3;
+			else if ((r_ptr->flags3 & (RF3_GIANT)) || (r_ptr->flags9 & (RF9_RES_BLUNT | RF9_RES_EDGED))) do_dist /= 2;
+
+			/* Scale down damage based on distance */
+			dam = dam * do_dist / 8;
+
+			break;
+		}
 
 		/* Drain Life */
 		case GF_DRAIN_LIFE:
@@ -4719,6 +5192,8 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 				{
 					l_ptr->flags3 |= (RF3_NO_FEAR);
 					note = " is immune to fear.";
+
+					do_fear = 0;
 				}
 			}
 			else if (monster_save(m_ptr, dam, &near))
@@ -4741,7 +5216,6 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			dam = 0;
 			break;
 		}
-
 
 		/* Dispel undead */
 		case GF_DISP_UNDEAD:
@@ -5010,10 +5484,6 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		case GF_WOUND:
 		case GF_HURT:
 
-			/* Hack -- Monster armor reduces total damage */
-			dam -= (dam * ((r_ptr->ac < 150) ? r_ptr->ac : 150) / 250);
-
-
 		/* Melee attack - unbonus */
 		case GF_UN_BONUS:
 
@@ -5032,7 +5502,10 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		/* Melee attack - eat lite */
 		case GF_EAT_LITE:
 
+			break;
+
 		/* Melee attack - lose strength */
+		case GF_HUNGER:
 		case GF_LOSE_STR:
 		{
 			if (m_ptr->mflag & (MFLAG_STRONG))
@@ -5160,17 +5633,6 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 
 		/* Melee attack - lose all */
 		case GF_LOSE_ALL:
-		{
-			/* Hack -- just completely ruin monster */
-			if (seen) obvious = TRUE;
-			note = " is ruined.";
-			m_ptr->mflag &= ~(MFLAG_STRONG | MFLAG_SMART | MFLAG_WISE | MFLAG_SKILLFUL | MFLAG_HEALTHY);
-			m_ptr->mflag |= (MFLAG_WEAK | MFLAG_STUPID | MFLAG_NAIVE | MFLAG_CLUMSY | MFLAG_SICK);
-			break;
-		}
-
-		/* Melee attack - shatter */
-		case GF_SHATTER:
 
 		/* Melee attack - exp 10 */
 		case GF_EXP_10:
@@ -5183,12 +5645,49 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 
 		/* Melee attack - exp 80 */
 		case GF_EXP_80:
+		{
+			/* Hack -- just completely ruin monster */
+			if (seen) obvious = TRUE;
+			note = " is ruined.";
+			m_ptr->mflag &= ~(MFLAG_STRONG | MFLAG_SMART | MFLAG_WISE | MFLAG_SKILLFUL | MFLAG_HEALTHY);
+			m_ptr->mflag |= (MFLAG_WEAK | MFLAG_STUPID | MFLAG_NAIVE | MFLAG_CLUMSY | MFLAG_SICK);
+			break;
+		}
+
+		/* Melee attack - shatter */
+		case GF_SHATTER:
+		{
+			earthquake(y, x, 8);			
+
+			break;
+		}
 
 		/* Melee attack - lose mana */
 		case GF_LOSE_MANA:
+		{
+			/* Monster may have mana */
+			if (r_ptr->mana)
+			{
+				/* Drain depends on maximum mana */
+				int drain = 2 + rand_int(r_ptr->mana / 10);
 
-		/* Melee attack - hunger */
-		case GF_HUNGER:
+				/* Monster still has mana */
+				if (m_ptr->mana > drain)
+				{
+					note = " loses mana.";
+					m_ptr->mana -= drain;
+				}
+				/* Monster has no more mana */
+				else
+				{
+					note = " is drained of mana.";
+					m_ptr->mana = 0;
+				}
+
+				if (seen) obvious = TRUE;
+			}
+			break;
+		}
 
 		/* Probe visible monsters */
 		case GF_PROBE:
@@ -5815,6 +6314,17 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		strcpy(killer, "yourself");
 	}
 
+	/* Hack -- storm can do several things */
+	if (typ == GF_STORM)
+	{
+		switch(rand_int(3))
+		{
+			case 0: typ = GF_WIND; break;
+			case 1: typ = GF_WATER; break;
+			case 2: typ = GF_ELEC; break;
+		}
+	}
+
 	/* Analyze the damage */
 	switch (typ)
 	{
@@ -5995,6 +6505,93 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			take_hit(dam, killer);
+			break;
+		}
+
+		case GF_HELLFIRE:
+		{
+			if (fuzzy) msg_print("You are hit by hellfire!");
+			fire_dam(2 * dam / 3, 0, killer, TRUE);
+
+			if (p_ptr->cur_flags4 & (TR4_EVIL))
+			{
+				/* Always notice */
+				player_can_flags(who, 0x0L,0x0L,0x0L,TR4_EVIL);
+
+				dam = 0;
+			}
+			else if (p_ptr->cur_flags2 & (TR2_RES_DARK))
+			{
+				/* Always notice */
+				player_can_flags(who, 0x0L,TR2_RES_DARK,0x0L,0x0L);
+
+				dam = dam / 3;
+			}
+			else
+			{
+				/* Always notice */
+				player_not_flags(who, 0x0L,TR2_RES_DARK,0x0L,0x0L);
+
+				/* Hack -- ignore resist blindness */
+				(void)set_blind(p_ptr->blind + rand_range(4, 8));
+			}
+			take_hit(dam /  3, killer);
+
+			/* Test player's saving throw. */
+			if (!(p_ptr->cur_flags4 & (TR4_EVIL)) || (rand_int(100) > p_ptr->skill_sav))
+			{
+				/* Always notice */
+				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_EVIL);
+
+				/* Note lack of resistance */
+				if (!(p_ptr->cur_flags2 & (TR2_RES_FEAR | TR2_RES_CHAOS | TR2_RES_CONFU)))
+				{
+					msg_print("Visions of hell invade your mind!");
+				}
+
+				/* Resist fear */
+				if (p_ptr->cur_flags2 & (TR2_RES_FEAR))
+				{
+					/* Sometimes notice */
+					if(!(p_ptr->hero || p_ptr->shero)) player_can_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L);
+				}
+				else
+				{
+					/* Always notice */
+					player_not_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L);
+
+					(void)set_afraid(p_ptr->afraid + rand_range(10, 20));
+				}
+
+				/* Resist chaos */
+				if (p_ptr->cur_flags2 & (TR2_RES_CHAOS))
+				{
+					/* Always notice */
+					player_can_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
+				}
+				else
+				{
+					/* Always notice */
+					player_not_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
+
+					(void)set_image(p_ptr->image + rand_range(40, 80));
+				}
+
+				/* Resist confusion */
+				if (p_ptr->cur_flags2 & (TR2_RES_CONFU))
+				{
+					/* Sometimes notice */
+					player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
+				}
+				else
+				{
+					/* Always notice */
+					player_not_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
+
+					(void)set_confused(p_ptr->confused + rand_range(15, 30));
+				}
+			}
+
 			break;
 		}
 
@@ -6235,8 +6832,9 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 					{
 						if (p_ptr->disease == (DISEASE_CUT | DISEASE_LIGHT)) p_ptr->disease = 0;
 						p_ptr->disease |= (DISEASE_CUT);
+
 					}
-					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
 					{
 						p_ptr->disease |= (DISEASE_CUT | DISEASE_LIGHT);
 					}
@@ -6276,7 +6874,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 						if (p_ptr->disease == (DISEASE_STUN | DISEASE_LIGHT)) p_ptr->disease = 0;
 						p_ptr->disease |= (DISEASE_STUN);
 					}
-					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
 					{
 						p_ptr->disease |= (DISEASE_STUN | DISEASE_LIGHT);
 					}
@@ -6302,8 +6900,6 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				int k = randint(20) + 10;
-
 				/* Always notice */
 				player_not_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
 
@@ -6311,19 +6907,19 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				if ((p_ptr->confused) && (randint(300) < dam))
 				{
 					/* Serious affliction */
-					if (k > 20)
+					if (dam > 50)
 					{
 						if (p_ptr->disease == (DISEASE_CONFUSE | DISEASE_LIGHT)) p_ptr->disease = 0;
 						p_ptr->disease |= (DISEASE_CONFUSE);
 					}
-					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
 					{
 						p_ptr->disease |= (DISEASE_CONFUSE | DISEASE_LIGHT);
 					}
 				}
 
 				/* Inflict confusion */
-				(void)set_confused(p_ptr->confused ? p_ptr->confused + 1 : k);
+				(void)set_confused(p_ptr->confused ? p_ptr->confused + 1 : randint(20) + 10);
 
 			}
 
@@ -6331,6 +6927,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Hallucination */
 		case GF_HALLU:
 		{
 			if (fuzzy) msg_print("You are hit by something!");
@@ -6352,14 +6949,14 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 						if (p_ptr->disease == (DISEASE_HALLUC | DISEASE_LIGHT)) p_ptr->disease = 0;
 						p_ptr->disease |= (DISEASE_HALLUC);
 					}
-					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
 					{
 						p_ptr->disease |= (DISEASE_HALLUC | DISEASE_LIGHT);
 					}
 				}
 
 				/* Inflict hallucination */
-				if (set_image(p_ptr->image ? p_ptr->image+1 : k))
+				if (set_image(p_ptr->image ? p_ptr->image + 1 : k))
 				{
 					obvious = TRUE;
 				}
@@ -6649,15 +7246,61 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Wind -- confusion, but rarely if res_confu */
+		case GF_WIND:
+		{
+			/* Throw distance depends on weight and strength */
+			int dist = 20 * dam / p_ptr->wt;
+			if (dist > 8) dist = 8;
+
+			/* Feather fall greatly reduces the effect of wind */
+			if (p_ptr->cur_flags3 & (TR3_FEATHER))
+			{
+				/* Always notice */
+				player_can_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+
+				dist = (dist + 2) / 3;
+			}
+			else
+			{
+				/* Always notice */
+				player_not_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+			}
+
+			/* Scale down damage based on distance */
+			dam = dam * dist / 8;
+
+			if (fuzzy) msg_print("You are buffeted by winds!");
+			if (dam > randint(200))
+			{
+				if ((!p_ptr->cur_flags2 & (TR2_RES_CONFU)) || (!rand_int(6)))
+				{
+					msg_print("You are spun until dizzy!");
+					(void)set_confused(p_ptr->confused + rand_range(2, 3));
+				}
+			}
+
+			/* Take damage */
+			take_hit(dam, killer);
+
+			/* Messages */
+			if (dist >= 6)
+				msg_print("The wind grabs you, and whirls you around!");
+			else if (dist >= 1)
+				msg_print("The wind buffets you about.");
+
+			/* Throw the player around unsafely. */
+			teleport_player(dist);
+
+			break;
+		}
+
 		case GF_BATTER:
 		case GF_WOUND:
 		case GF_HURT:
 		{
 			/* Obvious */
 			obvious = TRUE;
-
-			/* Hack -- Player armor reduces total damage */
-			dam -= (dam * ((p_ptr->ac < 150) ? p_ptr->ac : 150) / 250);
 
 			/* Take damage */
 			take_hit(dam, killer);
@@ -7022,7 +7665,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 						if (p_ptr->disease == (DISEASE_BLIND | DISEASE_LIGHT)) p_ptr->disease = 0;
 						p_ptr->disease |= (DISEASE_BLIND);
 					}
-					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
 					{
 						p_ptr->disease |= (DISEASE_BLIND | DISEASE_LIGHT);
 					}
@@ -7089,10 +7732,10 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 					/* Serious affliction */
 					if (dam > 50)
 					{
-						if (p_ptr->disease == (DISEASE_FEAR | DISEASE_LIGHT)) p_ptr->disease = 0;
+						if (p_ptr->disease == (DISEASE_FEAR | DISEASE_LIGHT)) p_ptr->disease =0;
 						p_ptr->disease |= (DISEASE_FEAR);
 					}
-					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
 					{
 						p_ptr->disease |= (DISEASE_FEAR | DISEASE_LIGHT);
 					}
@@ -7144,7 +7787,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 						if (p_ptr->disease == (DISEASE_PARALYZE | DISEASE_LIGHT)) p_ptr->disease = 0;
 						p_ptr->disease |= (DISEASE_PARALYZE);
 					}
-					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
 					{
 						p_ptr->disease |= (DISEASE_PARALYZE | DISEASE_LIGHT);
 					}
@@ -7195,7 +7838,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
 
 				/* Inflict disease */
-				if ((p_ptr->slow) && (randint(200) < k))
+				if ((p_ptr->slow) && (randint(200) < dam))
 				{
 					/* Serious affliction */
 					if (dam > 50)
@@ -7203,15 +7846,14 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 						if (p_ptr->disease == (DISEASE_SLOW | DISEASE_LIGHT)) p_ptr->disease = 0;
 						p_ptr->disease |= (DISEASE_SLOW);
 					}
-					else if ((p_ptr->disease == 0) || ((p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)) != 0))
+					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)))
 					{
 						p_ptr->disease |= (DISEASE_SLOW | DISEASE_LIGHT);
 					}
 				}
 
-				/* Inflict slowness -- always cumulative */
-				if (set_slow(p_ptr->slow + randint(25) + 15)) obvious = TRUE;
-
+				/* Inflict slowness */
+				if (set_slow(p_ptr->slow ? p_ptr->slow + 3 : randint(25) + 15)) obvious = TRUE;
 				{
 					obvious = TRUE;
 				}

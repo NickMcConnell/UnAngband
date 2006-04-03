@@ -696,7 +696,7 @@
 #define GF_NOTHING      0
 #define GF_STORM	1
 #define GF_WIND		2
-#define GF_XXX1         3
+#define GF_HELLFIRE     3
 #define GF_MANA		4
 #define GF_HOLY_ORB     5
 #define GF_LITE_WEAK    6
@@ -2310,6 +2310,7 @@
 #define RBM_SHOT 	57
 #define RBM_ARC_20	58
 #define RBM_ARC_30	59
+#define RBM_ARC_60	60
 
 #define RBM_MAX_NORMAL  23
 #define RBM_MIN_RANGED  15
@@ -3216,7 +3217,7 @@
 #define RF6_FORGET         0x00004000  /* Cause amnesia */
 #define RF6_DRAIN_MANA     0x00008000  /* Drain Mana */
 #define RF6_CURSE          0x00010000  /* Curse player */
-#define RF6_DISPEL         0x00020000  /* Dispel player */
+#define RF6_ADD_AMMO       0x00020000  /* Dispel player */
 #define RF6_MIND_BLAST     0x00040000  /* Blast Mind  */
 #define RF6_ILLUSION       0x00080000  /* Hallucinate player */
 #define RF6_WOUND          0x00100000  /* Cause Wounds */

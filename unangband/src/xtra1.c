@@ -2896,6 +2896,7 @@ static void calc_bonuses(void)
 		p_ptr->to_h += 10;
 		p_ptr->dis_to_h += 10;
 		p_ptr->cur_flags3 |= (TR3_HOLD_LIFE | TR3_BLESSED);
+		p_ptr->skill_sav += 5;
 	}
 
 	/* Temprory shield */
@@ -2944,7 +2945,15 @@ static void calc_bonuses(void)
 	/* Temporary infravision boost */
 	if (p_ptr->tim_infra)
 	{
-		p_ptr->see_infra+=5;
+		p_ptr->see_infra += 5;
+	}
+
+	/* Temporary "Curse" */
+	if (p_ptr->cursed)
+	{
+		p_ptr->to_a -= (p_ptr->ac + p_ptr->to_a) / 2;
+		p_ptr->dis_to_a -= (p_ptr->ac + p_ptr->to_a) / 2;
+		p_ptr->skill_sav /= 2;
 	}
 
 

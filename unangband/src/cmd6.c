@@ -1506,6 +1506,13 @@ void do_cmd_activate(void)
 
 	int i;
 
+	/* Amnesia */
+	if (p_ptr->amnesia)
+	{
+		msg_print("You have forgotten how!");
+		return;
+	}
+
 	/* Prepare the hook */
 	item_tester_hook = item_tester_hook_activate;
 

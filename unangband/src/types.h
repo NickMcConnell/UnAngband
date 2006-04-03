@@ -1332,6 +1332,8 @@ struct player_type
 	s16b poisoned;  /* Timed -- Poisoned */
 	s16b cut;       /* Timed -- Cut */
 	s16b stun;      /* Timed -- Stun */
+	s16b cursed;    /* Timed -- Curse */
+	s16b amnesia;	/* Timed -- Amnesia */
 
 	s16b protevil;  /* Timed -- Protection */
 	s16b invuln;    /* Timed -- Invulnerable */

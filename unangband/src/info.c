@@ -1105,9 +1105,9 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 		switch (effect)
 		{
 			case GF_NOTHING: q = "do"; u = "nothing"; break;
-			case GF_STORM: q= "lash"; u = "with wind and rain"; break;
+			case GF_STORM: q= "lash"; u = "with wind, rain and lightning"; break;
 			case GF_WIND: q= "blast"; u = "with wind"; break;
-			case GF_XXX1: q="blast"; u = "with XXX1";break;
+			case GF_HELLFIRE: q="blast"; u = "with hellfire";break;
 			case GF_MANA: q="blast"; u = "with magic";break;       
 			case GF_HOLY_ORB: q="blast"; u = "with holy magic";break;
 			case GF_LITE_WEAK: q="light"; s ="up";break;

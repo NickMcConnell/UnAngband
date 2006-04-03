@@ -420,6 +420,12 @@ void do_cmd_browse(void)
 		return;
 	}
 
+	/* Amnesia */
+	if (p_ptr->amnesia)
+	{
+		msg_print("You have forgotten all your spells!");
+		return;
+	}
 #endif
 
 	item_tester_hook = inven_book_okay;
@@ -626,6 +632,13 @@ void do_cmd_study(void)
 	if (p_ptr->confused)
 	{
 		msg_print("You are too confused!");
+		return;
+	}
+
+	/* Amnesia */
+	if (p_ptr->amnesia)
+	{
+		msg_print("You have forgotten how to read!");
 		return;
 	}
 
@@ -1131,6 +1144,12 @@ void do_cmd_cast(void)
 		return;
 	}
 
+	/* Amnesia */
+	if (p_ptr->amnesia)
+	{
+		msg_print("You have forgotten how to read!");
+		return;
+	}
 
 	/* Restrict choices to spells we can cast */
 	item_tester_hook = inven_cast_okay;

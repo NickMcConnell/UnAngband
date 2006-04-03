@@ -178,10 +178,12 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	int msex = 0;
 	bool ranged = ((l_ptr->flags4 & (RF4_BLOW_1 | RF4_BLOW_2 | RF4_BLOW_3 | RF4_BLOW_4)) ? TRUE : FALSE);
 	bool innate = FALSE;
+	bool breath = FALSE;
 	bool magic = FALSE;
 	int vn;
 	cptr vp[128];
 
+	bool powerful = FALSE;
 
 	/* Extract a gender (if applicable) */
 	if (r_ptr->flags1 & RF1_FEMALE) msex = 2;
@@ -252,7 +254,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 		else text_out(format("%^s", wd_he[msex]));
 
 		/* Note breath */
-		innate = TRUE;
+		breath = TRUE;
 
 		/* Scan */
 		for (n = 0; n < vn; n++)
@@ -268,8 +270,10 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	}
 
 	/* End the sentence about innate spells */
-	if ((innate) || (ranged))
+	if ((innate) || (ranged) || (breath))
 	{
+		if ((l_ptr->flags2 & RF2_POWERFUL) && (breath)) text_out(" powerfully");
+
 		/* Total casting */
 		m = l_ptr->cast_innate;
 
@@ -340,12 +344,10 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags6 & RF6_WRAITHFORM)  vp[vn++] = "assume wraithform";
 	if (l_ptr->flags6 & RF6_DARKNESS)    vp[vn++] = "create darkness";
 	if (l_ptr->flags6 & RF6_TRAPS)       vp[vn++] = "create traps";
-	if (l_ptr->flags6 & RF6_FORGET)      vp[vn++] = "cause amnesia";
 	if (l_ptr->flags6 & RF6_DRAIN_MANA)  vp[vn++] = "drain mana";
 	if (l_ptr->flags6 & RF6_CURSE)       vp[vn++] = "curse you";
-	if (l_ptr->flags6 & RF6_DISPEL)      vp[vn++] = "dispel enchantments";
+	if (l_ptr->flags6 & RF6_ADD_AMMO)    vp[vn++] = "grow back ammunition";
 	if (l_ptr->flags6 & RF6_MIND_BLAST)  vp[vn++] = "cause mind blasting";
-	if (l_ptr->flags6 & RF6_ILLUSION)    vp[vn++] = "cause hallucinations";
 	if (l_ptr->flags6 & RF6_WOUND)       vp[vn++] = "cause wounds";
 	if (l_ptr->flags6 & RF6_BLESS)       vp[vn++] = "become heroic";
 	if (l_ptr->flags6 & RF6_BESERK)      vp[vn++] = "become beserk";
@@ -353,11 +355,6 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags6 & RF6_OPPOSE_ELEM) vp[vn++] = "become resistant to the elements";
 	if (l_ptr->flags6 & RF6_HUNGER)      vp[vn++] = "cause hunger";
 	if (l_ptr->flags6 & RF6_PROBE)       vp[vn++] = "probe your weaknesses";
-	if (l_ptr->flags6 & RF6_SCARE)       vp[vn++] = "terrify";
-	if (l_ptr->flags6 & RF6_BLIND)       vp[vn++] = "blind";
-	if (l_ptr->flags6 & RF6_CONF)        vp[vn++] = "confuse";
-	if (l_ptr->flags6 & RF6_SLOW)        vp[vn++] = "slow";
-	if (l_ptr->flags6 & RF6_HOLD)        vp[vn++] = "paralyze";
 
 	if (l_ptr->flags7 & RF7_S_KIN)       vp[vn++] = "summon similar monsters";
 	if (l_ptr->flags7 & RF7_R_KIN)       vp[vn++] = "raise similar monsters from the dead";
@@ -392,6 +389,15 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags7 & RF7_S_HI_UNDEAD) vp[vn++] = "summon Greater Undead";
 	if (l_ptr->flags7 & RF7_S_WRAITH)    vp[vn++] = "summon Ring Wraiths";
 
+	/* Hack -- powerful spells here */
+	if (l_ptr->flags6 & RF6_FORGET)     { vp[vn++] = "cause amnesia"; powerful = TRUE; }
+	if (l_ptr->flags6 & RF6_ILLUSION)   { vp[vn++] = "cause hallucinations"; powerful = TRUE; }
+	if (l_ptr->flags6 & RF6_SCARE)      { vp[vn++] = "terrify"; powerful = TRUE; }
+	if (l_ptr->flags6 & RF6_BLIND)      {  vp[vn++] = "blind"; powerful = TRUE; }
+	if (l_ptr->flags6 & RF6_CONF)       { vp[vn++] = "confuse"; powerful = TRUE; }
+	if (l_ptr->flags6 & RF6_SLOW)       { vp[vn++] = "slow"; powerful = TRUE; }
+	if (l_ptr->flags6 & RF6_HOLD)       { vp[vn++] = "paralyze"; powerful = TRUE; }
+
 	/* Describe spells */
 	if (vn)
 	{
@@ -399,7 +405,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 		magic = TRUE;
 
 		/* Intro */
-		if ((innate) || (ranged))
+		if ((innate) || (ranged) || (breath))
 		{
 			text_out(", and is also");
 		}
@@ -430,6 +436,9 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	/* End the sentence about magic spells */
 	if (magic)
 	{
+		/* Adverb */
+		if ((l_ptr->flags2 & RF2_POWERFUL) && (powerful)) text_out(" powerfully enough to overcome your resistance");
+
 		/* Total casting */
 		m = l_ptr->cast_spell;
 
@@ -450,7 +459,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 		}
 	}
 
-	if (innate || magic || ranged)
+	if (innate || magic || ranged || breath)
 	{
 		/* End this sentence */
 		text_out(".  ");
@@ -683,7 +692,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case RBM_BEG:	p = "beg"; break;
 			case RBM_INSULT:	p = "insult"; break;
 			case RBM_MOAN:	p = "moan"; break;
-			case RBM_SHOT:	p = "shoot you with a slingshot"; break;
+			case RBM_SING:	p = "sing magical spells"; break;
 			case RBM_TRAP: p = "trap"; break;
 			case RBM_BOULDER: p = "throw a boulder at you"; break;
 			case RBM_AURA: p = "radiate"; break;
@@ -716,6 +725,11 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case RBM_XBOLT:	p = "shoot you with a crossbow"; break;
 			case RBM_SPIKE:	p = "shoot you with a spike"; break;
 			case RBM_DART:	p = "shoot you with a dart"; break;
+			case RBM_SHOT:	p = "sling a shot at you"; break;
+			case RBM_ARC_20:	p = "create a 20 degree arc"; break;
+			case RBM_ARC_30:	p = "create a 30 degree arc"; break;
+			case RBM_ARC_60:	p = "create a 60 degree arc"; break;
+
 
 		}
 
@@ -727,9 +741,9 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 		switch (effect)
 		{
 			case GF_NOTHING: q = "nothing"; break;
-			case GF_STORM: p= "lash with wind and rain"; break;
+			case GF_STORM: p= "lash with wind, rain and lightning"; break;
 			case GF_WIND: p= "blast with wind"; break;
-			case GF_XXX1: q="blast with XXX1";break;
+			case GF_HELLFIRE: q="blast with hellfire";break;
 			case GF_MANA: q="blast with magic";break;       
 			case GF_HOLY_ORB: q="blast with holy magic";break;
 			case GF_LITE_WEAK: q="light up";break;
@@ -1083,7 +1097,7 @@ static void describe_monster_abilities(int r_idx, const monster_lore *l_ptr)
 		for (n = 0; n < vn; n++)
 		{
 			/* Intro */
-			if (n == 0) text_out(" resists ");
+			if (n == 0) text_out(" is immune to ");
 			else if (n < vn-1) text_out(", ");
 			else text_out(" and ");
 

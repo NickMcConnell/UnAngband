@@ -906,6 +906,8 @@ extern bool set_poisoned(int v);
 extern bool set_afraid(int v);
 extern bool set_paralyzed(int v);
 extern bool set_image(int v);
+extern bool set_amnesia(int v);
+extern bool set_cursed(int v);
 extern cptr desc_stat_imp[];
 extern bool set_stat_inc_tim(int v, int i);
 extern cptr desc_stat_dec[];

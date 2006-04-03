@@ -1447,7 +1447,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		rlev = MAX(1, r_ptr->level);
 
 		/* Extract the powerfulness */
-		powerful = (r_ptr->flags1 & (RF2_POWERFUL) ? TRUE : FALSE);
+		powerful = (r_ptr->flags2 & (RF2_POWERFUL) ? TRUE : FALSE);
 
 		/* Extract the summoning level.  Must be at least 1. */
 		summon_lev = MAX(1 ,(r_ptr->level + p_ptr->depth) / 2 - 1);
@@ -2717,10 +2717,29 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			break;
 		}
 
-		/* RF5_RF5_XXX3 */
+		/* RF5_HOLY_ORB */
 		case 128+26:
 		{
-			break;
+			disturb(1, 0);
+			if (spower < 40)
+			{
+				if (blind) result = format("%^s mumbles.", m_name);
+				else result = format("%^s casts an orb of draining.", m_name);
+				rad = 1;
+			}
+			else if (spower < 90)
+			{
+				if (blind) result = format("%^s murmurs deeply.", m_name);
+				else result = format("%^s casts a powerful orb of draining.", m_name);
+				rad = 2;
+			}
+			else
+			{
+				if (blind) result = format("%^s chants powerfully.", m_name);
+				else result = format("%^s casts a large orb of holy might.", m_name);
+				rad = 3;
+			}
+			mon_ball(who, y, x, GF_HOLY_ORB, get_dam(spower, attack), rad, result);
 		}
 
 		/* RF5_BEAM_ELEC */
@@ -2775,39 +2794,38 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			break;
 		}
 
-		/* RF5_RF5XXX4 */
+		/* RF5_ARC_HFIRE */
 		case 128+30:
 		{
-			break;
-		}
-
-		/* RF5_HOLY_ORB */
-		case 128+31:
-		{
 			disturb(1, 0);
-			if (spower < 40)
+			/* Must be powerful to get an arc. */
+			if (spower > 50)
 			{
-				if (blind) result = format("%^s mumbles.", m_name);
-				else result = format("%^s casts an orb of draining.", m_name);
-				rad = 1;
-			}
-			else if (spower < 90)
-			{
-				if (blind) result = format("%^s murmurs deeply.", m_name);
-				else result = format("%^s casts a powerful orb of draining.", m_name);
-				rad = 2;
+				if (blind) result = format("%^s speaks a word of peril.", m_name);
+				else result = format("%^s invokes a hellfire blast!", m_name);
+
+				/* Absolutely formidable close up, less so at range. */
+				mon_arc(who, y, x, GF_HELLFIRE, get_dam(7 * spower, 6), 6, 60, result);
 			}
 			else
 			{
-				if (blind) result = format("%^s chants powerfully.", m_name);
-				else result = format("%^s casts a large orb of holy might.", m_name);
-				rad = 3;
+				if (blind) result = format("%^s murmurs darkly.", m_name);
+				else result = format("%^s gestures, and you are enveloped in hellfire.", m_name);
+				mon_ball(who, y, x, GF_HELLFIRE, get_dam(5 * spower, 6), 3, result);
 			}
-			mon_ball(who, y, x, GF_HOLY_ORB, get_dam(spower, attack), rad, result);
 
 			break;
 		}
 
+		/* RF5_ARC_FORCE */
+		case 128+31:
+		{
+			disturb(1, 0);
+			if (blind) result = format("%^s mutters.", m_name);
+			else result = format("%^s calls up a wall of force.", m_name);
+			mon_arc(who, y, x, GF_FORCE, get_dam(3 * spower, 10), 8, 60, result);
+			break;
+		}
 
 		/* RF6_HASTE */
 		case 160+0:
@@ -2892,7 +2910,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
 				}
 			}
-
 			break;
 		}
 
@@ -3503,13 +3520,17 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			msg_format("%^s tries to blank your mind.", m_name);
 
-			if (rand_int(100) < p_ptr->skill_sav)
+			if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
 			{
 				msg_print("You resist the effects!");
 			}
-			else if (lose_all_info())
+			else if (who > 0)
 			{
-				msg_print("Your memories fade away.");
+				(void)set_amnesia(p_ptr->amnesia + rlev / 8 + 4 + rand_int(4));
+			}
+			else
+			{
+				msg_print("Your memories fade.");
 			}
 			break;
 		}
@@ -3600,15 +3621,56 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			break;
 		}
 
-		/* RF6_XXX6 */
+		/* RF6_CURSE */
 		case 160+16:
 		{
+			if (!direct) break;
+			if (target < 0) disturb(1, 0);
+
+			if ((blind) && (known)) msg_format("%^s curses %s.", m_name, t_name);
+			else msg_format("%^s points at %s and curses.", m_name, t_poss);
+
+			if (target < 0)
+			{
+				if (p_ptr->blessed)
+				{
+					msg_print("The gods protect you.");
+				}
+				else
+				{
+					(void)set_cursed(p_ptr->cursed + rlev / 8 + 4 + rand_int(4));
+				}
+			}
+			else if (target > 0)
+			{
+				/* No effect yet */
+			}
 			break;
 		}
 
-		/* RF6_XXX7 */
+		/* RF6_ADD_AMMO */
 		case 160+17:
 		{
+			int ammo = 0;
+			if (target <= 0) break;
+			if (who <= 0) break;
+
+			/* Grow ammunition */
+			ammo = find_monster_ammo(who, -1, TRUE);
+
+			if (ammo)
+			{
+				switch(o_list[ammo].tval)
+				{
+					case TV_EGG: msg_format("%^s grows more spores.", m_name); break;
+					case TV_JUNK: msg_format("%^s grows more rocks.", m_name); break;
+					case TV_ARROW: msg_format("%^s grows more arrows.", m_name); break;
+					case TV_BOLT: msg_format("%^s grows more bolts.", m_name); break;
+					case TV_SPIKE: msg_format("%^s grows more spikes.", m_name); break;
+					case TV_POLEARM: msg_format("%^s grows more darts.", m_name); break;
+					case TV_SHOT: msg_format("%^s grows more shots.", m_name); break;
+				}
+			}
 			break;
 		}
 
@@ -3682,14 +3744,20 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (target < 0)
 			{
-				if ((p_ptr->cur_flags2 & (TR2_RES_CHAOS)) != 0)
+				if (p_ptr->cur_flags2 & (TR2_RES_CHAOS))
 				{
-					msg_print("You refuse to be deceived.");
+					if (powerful && (rand_int(100) > p_ptr->skill_sav))
+					{
+						msg_format("%^s power overcomes your resistance.", m_poss);
+
+						(void)set_image(p_ptr->image + rand_int(4) + 1);
+					}
+					else msg_print("You refuse to be deceived.");
 
 					/* Sometimes notice */
 					player_can_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
 				}
-				else if (rand_int(100) < p_ptr->skill_sav)
+				else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
 				{
 					msg_print("You refuse to be deceived.");
 				}
@@ -4013,9 +4081,19 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			break;
 		}
 
-		/* RF6_XX11 */
+		/* RF6_PROBE */
 		case 160+26:
 		{
+			if (!direct) break;
+			if (target >= 0) break;
+
+			msg_format("%^s probes your weaknesses.", m_name);
+
+			if (who > 0)
+			{
+				update_smart_cheat(who);
+			}
+
 			break;
 		}
 
@@ -4038,12 +4116,18 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((p_ptr->cur_flags2 & (TR2_RES_FEAR)) != 0)
 				{
-					msg_print("You refuse to be frightened.");
+					if (powerful && (rand_int(100) > p_ptr->skill_sav))
+					{
+						msg_format("%^s power overcomes your resistance.", m_poss);
+
+						(void)set_afraid(p_ptr->afraid + rand_int(4) + 1);
+					}
+					else msg_print("You refuse to be frightened.");
 
 					/* Sometimes notice */
 					player_can_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L);
 				}
-				else if (rand_int(100) < p_ptr->skill_sav)
+				else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
 				{
 					msg_print("You refuse to be frightened.");
 				}
@@ -4079,12 +4163,18 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) != 0)
 				{
-					msg_print("You are unaffected!");
+					if (powerful && (rand_int(100) > p_ptr->skill_sav))
+					{
+						msg_format("%^s power overcomes your resistance.", m_poss);
+
+						(void)set_blind(p_ptr->blind + rand_int(6) + 1);
+					}
+					else msg_print("You are unaffected!");
 
 					/* Always notice */
 					player_can_flags(who, 0x0L,TR2_RES_BLIND,0x0L,0x0L);
 				}
-				else if (rand_int(100) < p_ptr->skill_sav)
+				else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
 				{
 					msg_print("You resist the effects!");
 				}
@@ -4122,12 +4212,18 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) != 0)
 				{
-					msg_print("You disbelieve the feeble spell.");
+					if (powerful && (rand_int(100) > p_ptr->skill_sav))
+					{
+						msg_format("%^s power overcomes your resistance.", m_poss);
+
+						(void)set_confused(p_ptr->confused + rand_int(5) + 1);
+					}
+					else msg_print("You disbelieve the feeble spell.");
 
 					/* Sometimes notice */
 					player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
 				}
-				else if (rand_int(100) < p_ptr->skill_sav)
+				else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
 				{
 					msg_print("You disbelieve the feeble spell.");
 				}
@@ -4164,12 +4260,18 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0)
 				{
-					msg_print("You are unaffected!");
+					if (powerful && (rand_int(100) > p_ptr->skill_sav))
+					{
+						msg_format("%^s power overcomes your resistance.", m_poss);
+
+						(void)set_slow(p_ptr->slow + rand_int(3) + 1);
+					}
+					else msg_print("You are unaffected!");
 
 					/* Always notice */
 					player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
 				}
-				else if (rand_int(100) < p_ptr->skill_sav)
+				else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
 				{
 					msg_print("You resist the effects!");
 				}
@@ -4205,12 +4307,21 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0)
 				{
-					msg_print("You are unaffected!");
+					if (powerful && (rand_int(100) > p_ptr->skill_sav))
+					{
+						msg_format("%^s power overcomes your resistance.", m_poss);
+
+						if (!p_ptr->slow) (void)set_slow(p_ptr->slow + rand_int(4) + 1);
+						else set_paralyzed(p_ptr->paralyzed + 1);
+
+						
+					}
+					else msg_print("You are unaffected!");
 
 					/* Always notice */
 					player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
 				}
-				else if (rand_int(100) < p_ptr->skill_sav)
+				else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
 				{
 					msg_print("You resist the effects!");
 				}
@@ -5099,6 +5210,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				l_ptr->flags4 |= (1L << (attack - 32*3));
 				if (l_ptr->cast_spell < MAX_UCHAR) l_ptr->cast_spell++;
+
+				/* Hack -- always notice if powerful */
+				if (r_ptr->flags2 & (RF2_POWERFUL)) l_ptr->flags2 |= (RF2_POWERFUL);
 			}
 
 			/* Bolt or Ball */
@@ -5113,6 +5227,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				l_ptr->flags6 |= (1L << (attack - 32*5));
 				if (l_ptr->cast_spell < MAX_UCHAR) l_ptr->cast_spell++;
+
+				/* Hack -- always notice if powerful */
+				if (r_ptr->flags2 & (RF2_POWERFUL)) l_ptr->flags2 |= (RF2_POWERFUL);
 			}
 
 			/* Summon spell */
@@ -5121,7 +5238,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				l_ptr->flags7 |= (1L << (attack - 32*6));
 				if (l_ptr->cast_spell < MAX_UCHAR) l_ptr->cast_spell++;
 			}
-
 		}
 
 		if (seen && p_ptr->wizard)
@@ -5349,7 +5465,8 @@ void mon_hit_trap(int m_idx, int y, int x)
 	}
 
 	/* Hack -- evasive monsters may ignore trap */
-	if ((r_ptr->flags9 & (RF9_EVASIVE)) && (rand_int(3)))
+	if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!m_ptr->confused) && (!m_ptr->blind)
+		&& (!rand_int(m_ptr->stunned ? 2 : 3)))
 	{
 		if (m_ptr->ml)
 		{

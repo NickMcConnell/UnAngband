@@ -1116,10 +1116,10 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		/* Grab any kind name */
 		else if (k_ptr->guess)
 		{
-			object_kind *k_ptr = &k_info[lookup_kind(o_ptr->tval,k_ptr->guess-1)];
+			object_kind *j_ptr = &k_info[lookup_kind(o_ptr->tval,k_ptr->guess-1)];
 
 			object_desc_str_macro(t, " (of ");
-			object_desc_str_macro(t, (k_name + k_ptr->name));
+			object_desc_str_macro(t, (k_name + j_ptr->name));
 			object_desc_str_macro(t, "?)");
 		}
 

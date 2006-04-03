@@ -337,6 +337,101 @@ bool set_image(int v)
 	return (TRUE);
 }
 
+
+/*
+ * Set "p_ptr->confused", notice observable changes
+ */
+bool set_amnesia(int v)
+{
+	bool notice = FALSE;
+
+	/* Hack -- Force good values */
+	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
+
+	/* Open */
+	if (v)
+	{
+		if (!p_ptr->amnesia)
+		{
+			msg_print("Your memories temporarily fade.");
+			notice = TRUE;
+		}
+	}
+
+	/* Shut */
+	else
+	{
+		if (p_ptr->confused)
+		{
+			msg_print("You feel less forgetful now.");
+			notice = TRUE;
+		}
+	}
+
+	/* Use the value */
+	p_ptr->amnesia = v;
+
+	/* Nothing to notice */
+	if (!notice) return (FALSE);
+
+	/* Disturb */
+	if (disturb_state) disturb(0, 0);
+
+	/* Result */
+	return (TRUE);
+}
+
+
+/*
+ * Set "p_ptr->cursed", notice observable changes
+ */
+bool set_cursed(int v)
+{
+	bool notice = FALSE;
+
+	/* Hack -- Force good values */
+	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
+
+	/* Open */
+	if (v)
+	{
+		if (!p_ptr->cursed)
+		{
+			msg_print("You feel cursed!");
+			notice = TRUE;
+		}
+	}
+
+	/* Shut */
+	else
+	{
+		if (p_ptr->cursed)
+		{
+			msg_print("The curse has expired.");
+			notice = TRUE;
+		}
+	}
+
+	/* Use the value */
+	p_ptr->cursed = v;
+
+	/* Nothing to notice */
+	if (!notice) return (FALSE);
+
+	/* Disturb */
+	if (disturb_state) disturb(0, 0);
+
+	/* Recalculate bonuses */
+	p_ptr->update |= (PU_BONUS);
+
+	/* Handle stuff */
+	handle_stuff();
+
+	/* Result */
+	return (TRUE);
+}
+
+
 /*
  * Array of stat "descriptions"
  */
@@ -2329,6 +2424,7 @@ void quest_assign(int q_idx)
 {
 	int i;
 
+	(void)q_idx;
 }
 
 
@@ -2341,6 +2437,8 @@ void quest_reward(int q_idx)
 {
 	int i;
 
+	(void)q_idx;
+
 }
 
 /*
@@ -2352,6 +2450,7 @@ void quest_penalty(int q_idx)
 {
 	int i;
 
+	(void)q_idx;
 }
 
 
