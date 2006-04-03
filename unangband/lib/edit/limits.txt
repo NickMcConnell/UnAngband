@@ -31,8 +31,8 @@ M:E:128
 # Maximum number of flavors
 M:X:460
 
-# Maximum number of monster races
-M:R:1237
+# Maximum number of monster races (needs to be max + 2 for player ghost)
+M:R:1245
 
 # Maximum number of vaults
 M:V:51
