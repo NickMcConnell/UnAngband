@@ -12,12 +12,11 @@ various files and ideas.
 
 Release v0.6.1
 ==============
+TODO: Re-balancing of objects and removal of 'useless' or less useful objects.
+
 TODO: Implement Ego lights.
 
 TODO: Allow potions to be applied to sharp weapons (swords / polearms) and arrows/bolts.
-
-TODO: Have impassable trees and rubble which are hidden and found by either attempting to
-cross them or search them.
 
 TODO: Have light spells use line of sight, as opposed to line of fire, for their
 projections.
@@ -31,10 +30,11 @@ TODO: Stores should preferentially stock items that the player actually buys.
 
 TODO: Good items should not include the high-level books.
 
+TODO: Have bags of various kinds.
 
-Release v0.6.5
-==============
-TODO: Re-balancing of objects and removal of 'useless' or less useful objects.
+TODO: Have keys of various kinds.
+
+TODO: SILENCE monster spell prevents you casting.
 
 TODO: Implement monster spells the same way as player spells.
 
@@ -50,39 +50,70 @@ TODO: Add statis effect.
 TODO: Allow trolls and other monster to eat monster bodies to heal themselves, and vampires to
 suck the blood from monster bodies to improve their mana.
 
-TODO: Forget should cause spell casters to forget their spells, as opposed to forgetting what
-objects do.
-
 TODO: Higher level birds, for bird summoners.
 
 TODO: 'Good' monsters don't summon evil. 'Evil' monsters don't summon good.
 
-TODO: Mouse interaction with game.
-
 TODO: Commands from menus.
+
+TODO: Potions of free action.
+
+TODO: Free action, see invis, res blind etc. appear deeper in the dungeon then at present. 
+
+TODO: Create set items as per Sangband, but including sets of dragon armor.
+
+TODO: Assemblies that can be build into objects of any type.
+
+TODO: Allow research of spells without a spellbook.
+
+TODO: DISPEL effect cast on you/by you removes temporary spell effects (except from potions / monster
+attacks?) whether positive or negative.
+
+TODO: SHIELD blocks magic missiles completely.
+
+TODO: Improve self-knowledge so that it tells you what the impact of an effect is: You are blind,
+which prevents you reading scrolls or casting spells from books or rune-stones. 
+
+TODO: DEAFEN effect? STENCH effect (vomit up your food randomly). BLOAT effect (causes you to be
+bloated). POLYMORPH player. SLEEP effect. STASTIS effect.  FURY effect (no spellcasting or
+throwing/missile weapons). 
+
+TODO: Berserk should prevent you and monsters from spellcasting or throwing/missile weapons.
+
+TODO: PETRIFY effect prevents you moving (“You are petrified with fear?”) Maybe check out Eyangband 
+variable effects.
+
+TODO: Elemental effects that cause more than 100 hp damage should prevent you using certain types
+of objects the next round.
+
+TODO: Electrical attacks should cause rings and rods to discharge as opposed to being destroyed.
+
+TODO: Allow monsters to ride other monsters.
+
+TODO: Allow small monsters to stack on each other.
+
+Release v0.6.5
+==============
+
+TODO: Improve dungeon generation algorithms.
+
+TODO: Implement room descriptions version 2.
 
 
 Release v0.7.0
 ==============
+
+TODO: Complete quest code.
+
 TODO: Implement friendly monsters and uniques.
 
 TODO: Give monsters some AI patterns.
-
-TODO: Implement room descriptions version 2.
-
-TODO: Allow research of spells without a spellbook.
 
 TODO: Player buffs defined in a text file as opposed to code.
 
 TODO: Have an option birth_evil that automatically flags the player as evil.
 
 TODO: Have uniques corresponding to the players family.
-
-TODO: Create set items as per Sangband, but including sets of dragon armor.
-
-TODO: Assemblies that can be build into objects of any type.
-
-TODO: Complete quest code.
 
 TODO: Additional store functions. If a store is sold an empty wand / staff, it charges it.
 If a store is sold the constituents for an object it attempts to make it.
@@ -138,8 +169,6 @@ electricity and light.
 
 TODO: Add tents (G:<:R), sails (G:>:R).
 
-TODO: Replace wooden floors with wooden decks.
-
 TODO: Allow player to dig shallow pits, which fill with water etc to become
 shallow water.
 
@@ -170,7 +199,6 @@ TODO: I like the idea of being able to get onto the roof of a building.
 
 Release v0.10.0
 ===============
-TODO: Revised dungeon generation.
 
 TODO: Revised wilderness generation.
 
@@ -892,3 +920,91 @@ However the player can see and the 'b' bat, because the bat has the MFLAG_OVER s
 flying over the building). Furthermore, if the player throws a fireball at the bat, the ant
 won't be affected. This requires setting some kind of PROJECT_OVER flag set when projecting
 at a target when you are climbing or MFLAG_OVER, and the first step is covered...
+
+
+TODO: Have bags of various kinds. A bag holds up to objects of up to 22 tval and sval combinations.
+It can only hold objects that have limited sets of properties; either number, or (for wands)
+number and charges. Up to u16b items and/or charges can be held.
+
+The bag array is an array of u16b p_ptr->bag[MAX_NUM_BAGS][22] (Each wand bag needs two rows).
+In addition, fake inscriptions can be specified for 0-9 to allow the number keys to select items
+as well. 
+
+Total cost is about 1 K to allow an inventory of 374 different types of objects to be carried
+by a single player.
+
+To provide some inventory management balance, spell books cannot be put in magical bags.
+
+Magical bags do not count the weight of their contents and just have a fixed weight approximately
+equal to 10 * the base item type they hold.
+
+Magical Bag of Enchantments – holds non-elemental wands
+
+Magical Bag of the Elements – holds elemental attack wands + trans rock to mud
+
+Magical Bag of the Four Winds – holds high powered elemental attack wands
+
+Magical Bag of Six Demons – holds high-powered non-elemental (e.g. gravity etc) attack wands
+
+Magical Bag of Antidotes – holds low powered curing potions (e.g. restore strength)
+
+Magical Bag of Poisons – holds non-helpful potions
+
+Magical Bag of Philtres – holds improvement potions
+
+Magical Bag of Elixirs – holds high powered potions
+
+Magical Bag of Provisions – holds food
+
+Magical Bag of Supplies – holds flasks, torches, spikes, lock picks, flints. Torches are handled
+specially.
+
+Magical Bag of Mushrooms – holds mushrooms
+
+Magical Bag of Scrying – holds identify / detect scrolls
+
+Magical Bag of Hedge Magics – holds less useful scrolls
+
+Magical Bag of Eldritch Magics – holds powerful scrolls
+
+Magical Bag of Lesser Runes – holds some runes
+
+Magical Bag of Greater Runes – holds more powerful runes
+
+Magical Bag of Maps – holds maps
+
+When selecting an item, if the command specifies USE_BAGS, a bag may be selected. If this is
+returned by the item picking routine, then a temporary inventory is created which the contents
+of the bag is copied to and an item is selected. The bag array is then edited directly to use
+up the item/charge, and apply the effect.
+ 
+TODO: Elemental effects that cause more than 100 hp damage (before resistance) “The air around you
+is superheated/frozen.” “There is a static feeling in the air.” “Water swirls about you.” “Acid
+swirls about you.” These mean that when you attempt to use  an item vulnerable to the effect
+e.g. potion it is destroyed (Or for electricity, discharged), unless the item ignores the effect.
+This occurs even if you are immune. This can also be associated with room types, or
+when you activate an item / cast a spell that does more than this in damage. Wind causes windy
+effect preventing missiles/throwing.
+
+TODO: High level bird from Zangband.
+
+The Shantak (L.Dark 'B')
+=== Num:434 Lev:27 Rar:2 Spd:+10 Hp:25d20 Ac:55 Exp:280
+A scaly bird larger than an elephants, with a horse-like head. It is normally found on dungeon level 27, and moves quickly. A kill of this sanity-blasting natural evil creature is worth about 2520.00 points for a 1st level character. It is magical, casting spells which terrify or haste-self; 1 time in 6. It is suitable for riding. It resists acid. it won't evolve. It is fairly observant of intruders, which it may notice from 120 feet. It can bite to attack with damage 1d6, bite to attack with damage 1d6, and bite to attack with damage 1d6. (Hengband 1.6.0)
+
+TODO: Allow monsters to ride other monsters.
+
+We display this by 'shimmering' both the ATTR and CHAR of both the riding and ridden monster.
+The ridden monster moves for both monsters. The riding monster can choose to jump off,
+or make ranged or melee attacks. Mature dragons (but not ancient or wyrms), drakes, horses,
+large wolves, bears, large birds etc. can be ridden. Majority of attacks are aginst the ridden
+monster, as opposed to the riding but PROJECT_BOOM affects all monsters in the stack.
+
+The ridden monster sits at the top of the stack...
+
+Should allow player to ride friendly or unfriendly monsters. Similarly, player may choose to
+jump off at any time, or 'order' the monster around. May have easy_rider option to allow 
+movement keys to order the monster around. We deliberately make ridden monsters hard to
+control by the player, and not correspond to the player speed.
+
+TODO: Allow small monsters to stack on each other.
