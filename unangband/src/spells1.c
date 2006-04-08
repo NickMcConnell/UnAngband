@@ -757,8 +757,8 @@ static byte lava_color(void)
 {
 	switch (rand_int(3))
 	{
-		case 0: case 1: return (TERM_L_DARK);
-		case 2: return (TERM_RED);
+		case 0: case 1: return (TERM_RED);
+		case 2: return (TERM_ORANGE);
 	}
 	return (TERM_WHITE);
 }
@@ -851,8 +851,8 @@ static byte meteor_color(void)
 {
 	switch (rand_int(6))
 	{
-		case 0: case 1: return (TERM_L_DARK);
-		case 2: return (TERM_WHITE);
+		case 0: case 1: return (TERM_WHITE);
+		case 2: return (TERM_L_BLUE);
 		case 3: return (TERM_RED);
 		case 4: return (TERM_ORANGE);
 		case 5: return (TERM_YELLOW);
@@ -949,7 +949,7 @@ byte spell_color(int type)
 		case GF_LAVA:	   	return (lava_color());
 
 		case GF_TERRIFY:	return (TERM_L_WHITE);
-		case GF_SALT_WATER:     return (TERM_L_GREEN); /* Heh heh heh */
+		case GF_SALT_WATER:     return (TERM_L_GREEN);
 		case GF_STEAM:		return (TERM_L_WHITE);
 		case GF_VAPOUR:		return (TERM_L_GREEN);
 		case GF_SMOKE:		return (TERM_L_DARK);

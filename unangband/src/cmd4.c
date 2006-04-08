@@ -5530,7 +5530,7 @@ static void do_cmd_knowledge_monsters(void)
 					screen_roff(mon_idx[mon_cur]);
 
 					(void)anykey();
-	
+
 					redraw = TRUE;
 				}
 				break;
@@ -6900,6 +6900,21 @@ static void do_cmd_knowledge_features(void)
 				{
 					f_ptr->flags3 |= (FF3_ATTR_WALL);
 				}
+			}
+
+			case 'R':
+			case 'r':
+			{
+				/* Recall on screen */
+				if (grp_cnt > 0)
+				{
+					screen_feature_roff(feat_idx[feat_cur]);
+
+					(void)anykey();
+
+					redraw = TRUE;
+				}
+				break;
 			}
 
 			case '\xff':

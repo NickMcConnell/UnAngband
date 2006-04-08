@@ -1212,6 +1212,8 @@
 #define FS_INSTANT	90
 #define FS_ADJACENT	91
 #define FS_TIMED	92
+#define FS_ERUPT	93
+#define FS_STRIKE	94
 #define FS_SPREAD	95
 
 #define FS_FLAGS_END    96

@@ -1319,7 +1319,8 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 		if ((d1 || d2 || d3) && (detail)) switch (effect)
 		{
 			case GF_LITE_WEAK: text_out("damage to monsters vulnerible to light"); break;
-			case GF_KILL_WALL: text_out("damage to monsters vulnerible to rock remover"); break;
+			case GF_KILL_WALL: text_out("damage to monsters made from rock"); break;
+			case GF_RAISE: case GF_LOWER: text_out("damage to monsters made from water"); break;
 			case GF_HOLY_ORB: text_out("damage, doubled against evil monsters"); break;
 			case GF_BLIND: text_out("damage, doubled against eye monsters"); break;
 			case GF_TURN_UNDEAD: text_out("power"); break;
@@ -5218,4 +5219,1146 @@ s32b object_power(const object_type *o_ptr)
 	return (p);
 }
 
+
+/* Describe the type of feature */
+static void describe_feature_type(const feature_type *f_ptr)
+{
+	if (f_ptr->flags1 & FF1_ENTER)			text_out(" shop entrance");
+	else if (f_ptr->flags1 & FF1_DOOR)	text_out(" door");
+	else if (f_ptr->flags3 & FF3_CHEST)	text_out(" chest");
+	else if (f_ptr->flags1 & FF1_TRAP)	text_out(" trap");
+	else if (f_ptr->flags1 & FF1_STAIRS)	text_out(" staircase");
+	else if (f_ptr->flags1 & FF1_GLYPH)	text_out(" glyph");
+	else if (f_ptr->flags1 & FF1_FLOOR)	text_out(" floor");
+	else if (f_ptr->flags1 & FF1_WALL)	text_out(" wall");
+	else if (f_ptr->flags3 & FF3_TREE)	text_out(" tree");
+	else if (f_ptr->flags1 & FF3_GROUND)	text_out(" ground");
+
+	/*Default*/
+	else text_out(" feature");
+}
+
+
+
+static void describe_feature_basic(int f_idx)
+{
+	const feature_type *f_ptr = &f_info[f_idx];
+
+	int n, vn;
+	cptr vp[128];
+
+	text_out("This is a");
+
+	if (f_ptr->flags2 & FF2_SHALLOW) 	text_out(" shallow");
+	if (f_ptr->flags2 & FF2_DEEP) 	text_out(" deep");
+
+	if (f_ptr->flags2 & FF2_GLOW)
+	{
+	     if (f_ptr->flags1 & FF1_ENTER)	text_out("well-lit");
+		else	text_out(" glowing");
+	}
+
+	if (f_ptr->flags2 & FF2_LAVA)
+	{
+		if (f_ptr->flags2 & FF2_WATER) text_out(" boiling");
+		else text_out(" lava");
+	}
+	if (f_ptr->flags2 & FF2_ICE) 	text_out(" icy");
+	if (f_ptr->flags2 & FF2_ACID) 	text_out(" acid");
+	if (f_ptr->flags2 & FF2_OIL) 	text_out(" fuel");
+
+	if (f_ptr->flags2 & FF2_WATER)
+	{
+		if (f_ptr->flags2 & FF2_CAN_DIG) text_out(" mud");
+	 	text_out(" water");
+	}
+
+	/*Describe the feature type*/
+	describe_feature_type(f_ptr);
+
+	/* Describe location */
+	if (f_ptr->flags1 & FF1_ENTER)
+	{
+		text_out(" that is found in the town");
+	}
+	else if (f_ptr->flags1 & FF1_GLYPH)
+	{
+		text_out(" that is set by the player");
+	}
+	else
+	{
+		text_out(" that");
+
+		if (f_ptr->rarity >= 4) text_out(" rarely");
+		else if (f_ptr->rarity >= 2) text_out(" occasionally");
+		else text_out(" commonly");
+
+		if (f_ptr->level == 0)
+		{
+			text_out(" appears in both the town and dungeon");
+		}
+		else if (f_ptr->level == 1)
+		{
+			text_out(" appears throughout the dungeon");
+		}
+		else
+		{
+			text_out(" appears");
+
+			if (depth_in_feet)
+			{
+				text_out(format(" at depths of %d feet and below",
+			                            f_ptr->level * 50));
+			}
+			else
+			{
+				text_out(format(" on dungeon level %d and below",
+			                            f_ptr->level));
+			}
+		}
+
+
+	}
+
+
+
+	/* Allocation */
+	vn = 0;
+
+	if (f_ptr->flags3 & (FF3_ALLOC)) vp[vn++] = "as a specially placed item";
+	if (f_ptr->flags3 & (FF3_CHEST)) vp[vn++] = "as a item carried by monsters";
+	if (f_ptr->flags2 & (FF2_LAKE)) vp[vn++] = "as a 'lake' of terrain";
+	if (f_ptr->flags2 & (FF2_RIVER)) vp[vn++] = "as a 'river' of terrain";
+	if (f_ptr->flags1 & (FF1_STREAMER)) vp[vn++] = "as a 'streams' of terrain through the dungeon walls";
+	if (f_ptr->flags1 & (FF1_DOOR)) vp[vn++] = "placed in a doorway";
+	if (f_ptr->flags1 & (FF1_INNER)) vp[vn++] = "as part of the inner wall of a room";
+	if (f_ptr->flags1 & (FF1_OUTER)) vp[vn++] = "as part of the outer wall of a room";
+	if (f_ptr->flags1 & (FF1_SOLID)) vp[vn++] = "next to the entrance of a corridor in a room";
+
+	/* Describe innate attacks */
+	if (vn)
+	{
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (!n) text_out(" ");
+			else if ((n) && (n < vn-1)) text_out(", ");
+			else text_out(" or ");
+
+			/* Dump */
+			text_out(vp[n]);
+		}
+	}
+
+	if (f_ptr->flags1 & (FF1_TRAP)) text_out(" with a hidden trap");
+
+	/* End this sentence */
+	text_out(".  ");
+
+}
+
+
+
+
+/*
+ * Describe the player ability to move, see and cast on or through the feature.
+ */
+static void describe_feature_player_moves(int f_idx)
+{
+	const feature_type *f_ptr = &f_info[f_idx];
+
+	int n, vn;
+	cptr vp[128];
+
+	bool intro = FALSE;
+	bool effect = FALSE;
+	bool impede = TRUE;
+
+	/* Collect sight and movement */
+	vn = 0;
+
+	if (!(f_ptr->flags1 & (FF1_FLOOR)) && !(f_ptr->flags3 & (FF3_GROUND)))
+	{
+		if (f_ptr->flags1 & (FF1_LOS)) vp[vn++] = "see";
+		if (f_ptr->flags1 & (FF1_PROJECT)) vp[vn++] = "cast spells";
+		if (f_ptr->flags1 & (FF1_PROJECT)) vp[vn++] = "fire missiles";
+
+		impede = FALSE;
+	}
+
+	if (f_ptr->flags1 & (FF1_MOVE)) vp[vn++] = "walk";
+	if (f_ptr->flags1 & (FF1_RUN)) vp[vn++] = "run";
+	if (f_ptr->flags3 & (FF3_EASY_CLIMB)) vp[vn++] = "climb";
+
+	/* Describe sight and movement */
+	if (vn)
+	{
+		/* Intro */
+		text_out("You");
+
+		intro = TRUE;
+
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (n == 0) text_out(" can ");
+			else if (n < vn-1) text_out(", ");
+			else text_out(" and ");
+
+			/* Dump */
+			text_out(vp[n]);
+		}
+
+		if ((f_ptr->flags1 & (FF1_FLOOR)) || (f_ptr->flags3 & (FF3_GROUND))) text_out(" on");
+		else text_out(" through");
+
+		text_out(" this");
+
+		describe_feature_type(f_ptr);
+	}
+
+	/* Have to climb in or out of the grid */
+	if ((intro) && (f_ptr->flags3 & (FF3_EASY_CLIMB | FF3_MUST_CLIMB)))
+	{
+		text_out(" taking an extra turn to ");
+		if (f_ptr->flags3 & (FF3_EASY_CLIMB))
+		{
+			text_out("enter ");
+
+			if (f_ptr->flags3 & (FF3_MUST_CLIMB)) text_out("and ");
+		}
+
+		if (f_ptr->flags3 & (FF3_MUST_CLIMB))
+		{
+			text_out("leave ");
+		}
+
+		text_out("the grid");
+		effect = TRUE;
+		impede = TRUE;
+	}
+
+	if ((intro) && (f_ptr->flags2 & (FF2_SHALLOW | FF2_DEEP | FF2_FILLED)))
+	{
+		if (effect) text_out(" and");
+		text_out(" making your equipment ");
+		
+		if (f_ptr->flags2 & (FF2_FILLED)) text_out("significantly");
+		else if (!(f_ptr->flags2 & (FF2_DEEP))) text_out("slightly");
+		text_out(" heavier");
+		impede = TRUE;
+	}
+
+	if ((f_ptr->flags1 & (FF1_FLOOR)) || (f_ptr->flags3 & (FF3_GROUND)))
+	{
+		vn = 0;
+
+		if (f_ptr->flags1 & (FF1_LOS)) vp[vn++] = "see";
+		if (f_ptr->flags1 & (FF1_PROJECT)) vp[vn++] = "cast spells";
+		if (f_ptr->flags1 & (FF1_PROJECT)) vp[vn++] = "fire missiles";
+
+		/* Describe sight and movement */
+		if (vn)
+		{
+			/* Intro */
+			if (!intro) text_out("You");
+			else text_out(" and");
+
+			/* Scan */
+			for (n = 0; n < vn; n++)
+			{
+				/* Intro */
+				if (n == 0) text_out(" can ");
+				else if (n < vn-1) text_out(", ");
+				else text_out(" and ");
+
+				/* Dump */
+				text_out(vp[n]);
+			}
+
+			if (!intro)
+			{
+				text_out(" through this");
+
+				describe_feature_type(f_ptr);
+
+			}
+			else
+			{
+				text_out(" through it");
+			}
+
+			intro = TRUE;
+			impede = FALSE;
+		}
+	}
+
+	if (!impede) text_out(" without impediment");
+
+
+	/* Collect innate attacks */
+	vn = 0;
+	effect = FALSE;
+	impede = FALSE;
+
+	if (!(f_ptr->flags1 & (FF1_MOVE)))
+	{
+		if (!(f_ptr->flags3 & (FF3_EASY_CLIMB)))
+		{
+			vp[vn++] = "you from moving through it";
+			impede = TRUE;
+			if (!(f_ptr->flags2 & (FF2_CAN_PASS))) { vp[vn++] = "pass through walls"; effect = TRUE; }
+			if (f_ptr->flags1 & (FF1_PERMANENT)) { vp[vn++] = "bore through walls"; effect = TRUE; }
+			if (!(f_ptr->flags2 & (FF2_CAN_CLIMB))) { vp[vn++] = "climb"; effect = TRUE; }
+		}
+	}
+	else
+	{
+		if ((f_ptr->flags2 & (FF2_COVERED)) && !(f_ptr->flags1 & (FF1_BASH))) { vp[vn++] = "lie underneath from surfacing"; effect = TRUE; }
+		else if (f_ptr->flags2 & (FF2_COVERED)) { vp[vn++] = "lie underneath from surfacing without bashing through"; effect = TRUE; }
+		if (!(f_ptr->flags2 & (FF2_CAN_FLY))) { vp[vn++] = "must fly"; effect = TRUE; }
+		if (!(f_ptr->flags1 & (FF2_CAN_SWIM))) { vp[vn++] = "must swim"; effect = TRUE; }
+	}
+	if (!(f_ptr->flags1 & (FF1_LOS))) vp[vn++] = "line of sight";
+	if (!(f_ptr->flags1 & (FF1_PROJECT))) vp[vn++] = "casting spells";
+	if (!(f_ptr->flags1 & (FF1_PROJECT))) vp[vn++] = "firing missiles";
+
+	/* Describe innate attacks */
+	if (vn)
+	{
+		/* Intro */
+		if (!intro)
+		{
+			text_out("This ");
+			describe_feature_type(f_ptr);
+		}
+		else text_out(" but it");
+
+		intro = TRUE;
+
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (!n) text_out(" blocks ");
+			else if ((n == 1) && (impede)) text_out(" and ");
+			else if (n < vn-1) text_out(", ");
+			else text_out(" and ");
+
+			if ((effect) && ((n == 1) || (!impede)))
+			{
+				effect = FALSE;
+				text_out("monsters that ");
+			}
+
+
+			/* Dump */
+			text_out(vp[n]);
+		}
+	}
+
+	/* End sentence */
+	if (intro) text_out(".  ");
+
+	/* Collect innate attacks */
+	vn = 0;
+	intro = FALSE;
+
+
+}
+
+
+
+/*
+ * Describe the monster ability to move and hide on or through the feature.
+ */
+static void describe_feature_monster_moves(int f_idx)
+{
+	const feature_type *f_ptr = &f_info[f_idx];
+
+	int n, vn;
+	cptr vp[128];
+
+	bool intro = FALSE;
+
+	vn = 0;
+
+	if (!(f_ptr->flags1 & (FF1_MOVE)) || (f_ptr->blow.method) || (f_ptr->spell))
+	{
+		if ((f_ptr->flags2 & (FF2_CAN_FLY))) vp[vn++] = "fly"; 
+		if ((f_ptr->flags1 & (FF2_CAN_SWIM))) vp[vn++] = "swim";
+		if ((f_ptr->flags2 & (FF2_CAN_CLIMB))) vp[vn++] = "climb";
+		if ((f_ptr->flags2 & (FF2_CAN_DIG))) vp[vn++] = "dig";
+		if ((f_ptr->flags2 & (FF2_CAN_OOZE))) vp[vn++] = "ooze";
+		if ((f_ptr->flags2 & (FF2_CAN_PASS))) vp[vn++] = "pass through walls";
+		if (!(f_ptr->flags1 & (FF1_PERMANENT))) vp[vn++] = "bore through walls";
+	}
+
+	/* Describe monster moves */
+	if (vn)
+	{
+		/* Intro */
+		if (!intro)
+		{
+			text_out("This");
+			describe_feature_type(f_ptr);
+		}
+
+		intro = TRUE;
+
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (!n) text_out(" lets monsters that can ");
+			else if (n < vn-1) text_out(", ");
+			else text_out(" and ");
+
+			/* Dump */
+			text_out(vp[n]);
+		}
+
+		text_out(" pass ");
+		if ((f_ptr->flags1 & (FF1_FLOOR)) || (f_ptr->flags3 & (FF3_GROUND))) text_out("over");
+		else text_out("through");
+
+		text_out(" without impediment");
+	}
+
+	if ((vn) && (f_ptr->blow.method))
+	{
+		text_out(" provided they resist");
+	}
+
+	/* Collect innate attacks */
+	vn = 0;
+
+	if ((f_ptr->flags2 & (FF2_HIDE_SNEAK))) vp[vn++] = "sneak"; 
+	if ((f_ptr->flags2 & (FF2_HIDE_SWIM))) vp[vn++] = "swim";
+	if ((f_ptr->flags2 & (FF2_HIDE_DIG))) vp[vn++] = "dig";
+	if ((f_ptr->flags3 & (FF3_EASY_HIDE))) vp[vn++] = "stay still";
+	if ((f_ptr->flags2 & (FF2_HIDE_SWIM))) vp[vn++] = "survive without breathing";
+	if ((f_ptr->flags2 & (FF2_CAN_PASS))) vp[vn++] = "pass through walls";
+
+	/* Describe innate attacks */
+	if (vn)
+	{
+		/* Intro */
+		if (!intro)
+		{
+			text_out("This");
+			describe_feature_type(f_ptr);
+		}
+		else text_out(" and");
+
+		intro = TRUE;
+
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (!n) text_out(" hides monsters that can ");
+			else if (n < vn-1) text_out(", ");
+			else text_out(" and ");
+
+			/* Dump */
+			text_out(vp[n]);
+		}
+	}
+	/* End sentence */
+	if (intro) text_out(".  ");
+}
+
+
+/*
+ * Describe the player miscellaneous notes on the feature.
+ */
+static void describe_feature_misc(int f_idx)
+{
+	const feature_type *f_ptr = &f_info[f_idx];
+
+	/* Other player actions */
+	if (f_ptr->flags1 & (FF1_DROP))
+	{
+		text_out("You can drop objects here");
+		if (f_ptr->flags2 & (FF2_HIDE_ITEM))
+		{
+			text_out(" but they will disappear from view");
+		}
+		text_out(".  ");
+	}
+	
+	/* Other player actions */
+	if (f_ptr->flags1 & (FF1_REMEMBER))
+	{
+		text_out("You will remember this");
+		describe_feature_type(f_ptr);
+		text_out(" on your overhead map.  ");
+	}
+
+	/* Other player actions */
+	if (f_ptr->flags1 & (FF1_NOTICE))
+	{
+		text_out("You stop running next to this");
+		describe_feature_type(f_ptr);
+
+		if (f_ptr->flags1 & (FF1_STAIRS))
+		{
+			text_out(" unless you have the ignore_stairs option on");
+		}
+		text_out(".  ");
+	}
+
+	/* Other player actions */
+	if (!(f_ptr->flags1 & (FF1_MOVE)))
+	{
+		text_out("You can get stuck inside this");
+		describe_feature_type(f_ptr);
+		text_out(" should it appear around you.  ");
+	}
+
+	/* Other player actions */
+	if (f_ptr->flags1 & (FF2_FILLED))
+	{
+		text_out("You can't breath in this.  ");
+	}
+
+	/* Take damage if trap */
+	if (!(f_ptr->flags1 & (FF1_HIT_TRAP)))
+	{
+		bool effect = FALSE;
+
+		if (f_ptr->blow.method)
+		{
+			effect = TRUE;
+
+			text_out("Whilst in this");
+			describe_feature_type(f_ptr);
+
+			/* Hack -- should really describe blow */
+			text_out(format("you take %dd%d damage", f_ptr->blow.d_dice, f_ptr->blow.d_side));
+		}
+
+		if (f_ptr->spell)
+		{
+			if (effect) text_out(" and");
+			else
+			{
+				text_out("Whilst in this");
+				describe_feature_type(f_ptr);
+			}
+
+			effect = TRUE;
+
+			/* Hack -- should really describe spell */
+			text_out(" suffer its effects");
+		}
+
+		if (effect) text_out(" continuously.  ");
+	}
+}
+
+
+
+/*
+ * Return true if player can do this action to the feature.
+ */
+static bool is_player_action_valid(int f_idx, int action)
+{
+	const feature_type *f_ptr = &f_info[f_idx];
+
+	/* Feature flag 1 actions */
+	if ((action < 32) && (f_ptr->flags1 & (1L << action)) &&
+			((1L << action) & (FF1_SECRET | FF1_OPEN | FF1_CLOSE | FF1_BASH |
+				FF1_DISARM | FF1_SPIKE | FF1_ENTER | FF1_TUNNEL | FF1_FLOOR | FF1_HIT_TRAP)))
+				return (TRUE);
+
+	/* Hack -- bashable features are opened 50% of the time */
+	else if ((action < 32) && (f_ptr->flags1 & (FF1_BASH)) &&
+			((1L << action) & (FF1_OPEN)))
+				return (TRUE);
+
+	/* Hack -- glyphs can be set on a floor */
+	else if ((action < 32) && (f_ptr->flags1 & (FF1_FLOOR)) &&
+			((1L << action) & (FF1_GLYPH)))
+				return (TRUE);
+
+	/* Feature flag 2 actions */
+	else if ((action < 64) && (f_ptr->flags2 & (1L << (action - 32))) &&
+			((1L << (action - 32)) & (FF2_HURT_ROCK | FF2_HURT_FIRE | FF2_HURT_COLD | FF2_HURT_ACID | 
+				FF2_KILL_HUGE | FF2_KILL_MOVE)))
+				return (TRUE);
+
+	/* Feature flag 3 actions */
+	else if ((action < 96) && (f_ptr->flags3 & (1L << (action - 64))) &&
+			((1L << (action - 64)) & (FF3_HURT_POIS | FF3_HURT_ELEC | FF3_HURT_WATER | 
+				FF3_HURT_BWATER | FF3_USE_FEAT | FF3_GET_FEAT | FF3_NEED_TREE)))
+				return (TRUE);
+
+	/* Player action not valid */
+	return (FALSE);
+}
+
+/*
+ * Describe the player initiated transitions for this feature, and the resulting features.
+ */
+static void describe_feature_actions(int f_idx)
+{
+	const feature_type *f_ptr = &f_info[f_idx];
+
+	int n, vn;
+	cptr vp[128];
+
+	int i;
+
+	bool intro = FALSE;
+
+	/* Permanent stuff never gets changed */
+	if (f_ptr->flags1 & FF1_PERMANENT) return;
+
+	/* Check all the actions */
+	for (i=0; i<96;i++)
+	{
+		/* Do we have a known transition */
+		if (is_player_action_valid(f_idx, i))
+		{
+			int newfeat = feat_state(f_idx, i);
+
+			vn = 0;
+
+			switch (i)
+			{
+				case FS_SECRET: vp[vn++] = "search"; break;
+				case FS_OPEN: if (f_ptr->flags1 & (FF1_OPEN)) vp[vn++] = "open";
+					      if (f_ptr->flags1 & (FF1_BASH)) vp[vn++] = "bash"; break;    
+				case FS_CLOSE: vp[vn++] = "close"; break;
+				case FS_BASH: vp[vn++] = "bash"; break;
+				case FS_DISARM: vp[vn++] ="disarm"; break;
+				case FS_SPIKE: vp[vn++] ="spike"; break;
+				case FS_ENTER: vp[vn++] ="enter"; break;
+				case FS_TUNNEL: if (f_ptr->flags2 & (FF2_CAN_DIG)) vp[vn++] ="dig";
+						else vp[vn++] ="tunnel"; break;
+				case FS_FLOOR: vp[vn++] ="set traps on"; break;
+				case FS_GLYPH: vp[vn++] ="create glyphs on"; break;
+				case FS_HIT_TRAP: vp[vn++] = "stumble on"; break;
+				case FS_HURT_ROCK: vp[vn++] = "magically remove rock from"; break;
+				case FS_HURT_FIRE: vp[vn++] = "burn"; break;
+				case FS_HURT_COLD: vp[vn++] = "freeze"; break;
+				case FS_HURT_ACID: vp[vn++] = "melt"; break;
+				case FS_KILL_HUGE: vp[vn++] = "magically destroy"; break;
+				case FS_KILL_MOVE: vp[vn++] ="disturb"; break;
+				case FS_HURT_POIS: vp[vn++] = "poison"; break;
+				case FS_HURT_ELEC: vp[vn++] = "electrify"; break;
+				case FS_HURT_WATER: vp[vn++] = "flood"; break;
+				case FS_HURT_BWATER: vp[vn++] = "boil"; vp[vn++] = "steam"; break;
+				case FS_USE_FEAT: vp[vn++] = "use"; break;
+				case FS_GET_FEAT: vp[vn++] = "pick"; break;
+				case FS_NEED_TREE: vp[vn++] = "cut down"; break;
+				default: break;
+			}
+
+			/* Hack -- handle some transitions */
+			if (i == FS_GLYPH) newfeat = FEAT_GLYPH;
+			else if (i == FS_FLOOR) newfeat = FEAT_INVIS;
+			else if (i == FS_ENTER) newfeat = f_idx;
+
+			/* Describe transitions */
+			if (vn)
+			{
+				bool effect = FALSE;
+
+				/* Intro */
+				if (!intro)
+				{
+					text_out("You");
+				}
+
+				/* Note */
+				intro = TRUE;
+
+				/* Scan */
+				for (n = 0; n < vn; n++)
+				{
+					/* Intro */
+					if (n == 0) text_out(" can ");
+					else if (n < vn-1) text_out(", ");
+					else text_out(" or ");
+
+					/* Dump */
+					text_out(vp[n]);
+				}
+
+				text_out(" it to");
+
+				/* Take damage if trap */
+				if (f_ptr->flags1 & (FF1_HIT_TRAP))
+				{
+					if (f_ptr->blow.method)
+					{
+						if (effect) text_out(" and");
+						effect = TRUE;
+
+						/* Hack -- should really describe blow */
+						text_out(format(" take %dd%d damage", f_ptr->blow.d_dice, f_ptr->blow.d_side));
+					}
+
+					if (f_ptr->spell)
+					{
+						if (effect) text_out(" and");
+						effect = TRUE;
+
+						/* Hack -- should really describe spell */
+						text_out(" suffer its effects");
+					}
+				}
+
+				/* Describe new feature */
+				if ((newfeat != f_idx) || (f_info[newfeat].flags3 & (FF3_PICK_TRAP | FF3_PICK_DOOR)))
+				{
+					if (effect) text_out(" and");
+					effect = TRUE;
+
+					if (i == FS_SECRET) text_out(" find ");
+					else text_out(" make it ");
+
+					if (f_info[newfeat].flags3 & (FF3_PICK_TRAP)) text_out("a random trap");
+					else if (f_info[newfeat].flags3 & (FF3_PICK_DOOR)) text_out("a random door");
+					else text_out(f_name + f_info[newfeat].name);
+
+					if (cheat_xtra) text_out(format(" (%d)", newfeat));
+
+					/* Side effects -- stop glow */
+					if ((f_ptr->flags2 & (FF2_GLOW))
+						&& !(f_ptr[newfeat].flags2 & (FF2_GLOW)))
+					{
+						text_out(" and darken the surrounding grids");
+					}
+
+					/* Side effects -- start glow */
+					if (!(f_ptr->flags2 & (FF2_GLOW))
+						&& (f_ptr[newfeat].flags2 & (FF2_GLOW)))
+					{
+						text_out(" and light up the surrounding grids");
+					}
+
+					/* Side effects -- remove branches */
+					if ((f_ptr->flags3 & (FF3_TREE))
+						&& !(f_ptr[newfeat].flags3 & (FF3_TREE)))
+					{
+						text_out(" and remove the surrounding branches");
+					}
+
+					/* Side effects -- remove branches */
+					if (!(f_ptr->flags3 & (FF3_TREE))
+						&& (f_ptr[newfeat].flags3 & (FF3_TREE)))
+					{
+						text_out(" and cover the surrounding grids with branches");
+					}
+
+					/* Side effects -- remove outside */
+					if ((f_ptr->flags3 & (FF3_OUTSIDE))
+						&& !(f_ptr[newfeat].flags3 & (FF3_OUTSIDE)))
+					{
+						text_out(" and hide the surrounding grids from the sun");
+					}
+
+					/* Side effects -- remove outside */
+					if (!(f_ptr->flags3 & (FF3_OUTSIDE))
+						&& (f_ptr[newfeat].flags3 & (FF3_OUTSIDE)))
+					{
+						text_out(" and expose the surrounding grids to daylight");
+					}
+				}
+
+				/* Side effects -- drop / use / get object */
+				if (((f_ptr->flags1 & (FF1_HAS_GOLD | FF1_HAS_ITEM))
+					&& !(f_ptr[newfeat].flags1 & (FF1_HAS_GOLD | FF1_HAS_ITEM)))
+					|| (f_ptr->k_idx && ((i == FS_USE_FEAT) || (i == FS_GET_FEAT) || (i == FS_HIT_TRAP))))
+				{
+					int count = 0;
+
+					if (effect) text_out(" and ");
+					else text_out(" ");
+
+					effect = TRUE;
+
+					if (f_ptr->flags3 & (FF3_DROP_1D2)) count += 2;
+					if (f_ptr->flags3 & (FF3_DROP_2D2)) count += 4;
+
+					if (count) text_out(format("find up to %d ", count));
+					else if ((f_ptr->flags1 & (FF1_HAS_GOLD | FF1_HAS_ITEM)) || (i == FS_GET_FEAT))
+					{
+						text_out("find ");
+					}
+					else if (i == FS_USE_FEAT)
+					{
+						switch(k_info[f_ptr->k_idx].tval)
+						{
+							case TV_RUNESTONE:
+								text_out("apply, "); /* Fall through */
+							case TV_SONG_BOOK:
+							case TV_MAGIC_BOOK:
+							case TV_PRAYER_BOOK:
+								text_out("study or cast from "); break;
+							case TV_INSTRUMENT:
+								text_out("play "); break;
+							case TV_FLASK:
+							case TV_POTION:
+								text_out("fill a bottle or flask to get "); break;
+							default: text_out("use "); break;
+						}
+					}
+
+					if ((f_ptr->k_idx) && ((i == FS_USE_FEAT) || (i == FS_GET_FEAT) || (i == FS_HIT_TRAP)))
+					{
+						object_type object_type_body;
+						char o_name[80];
+
+						object_type *o_ptr = &object_type_body;
+
+						object_prep(o_ptr, f_ptr->k_idx);
+
+						object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 1);
+
+						text_out(o_name);
+					}
+
+					if (f_ptr->flags1 & (FF1_HAS_ITEM))
+					{
+						if (!count) text_out("an ");
+						text_out(format("object%s", count > 1 ? "s" : ""));
+					}
+
+					if (f_ptr->flags1 & (FF1_HAS_GOLD))
+					{
+						if (f_ptr->flags1 & (FF1_HAS_ITEM)) text_out(" or ");
+						else if (!count) text_out("a ");
+						text_out(format("treasure%s", count > 1 ? "s" : ""));
+					}
+				}
+
+				/* Side effects -- set traps or make feature dangerous */
+				if ((i == FS_FLOOR) || (!(f_ptr->blow.method) && (f_info[newfeat].blow.method)))
+				{
+					if (effect) text_out(" and");
+					effect = TRUE;
+
+					text_out(" potentially harm monsters");
+				}
+
+				/* Side effects -- enter shop */
+				if (i == FS_ENTER)
+				{
+					if (effect) text_out(" and");
+					effect = TRUE;
+					text_out(" find useful items");
+				}
+
+				/* No effect */
+				if (!effect)
+				{
+					text_out(" no effect");
+				}
+
+				/* End sentence */
+				text_out(".  ");
+
+				/* Need intro */
+				intro = FALSE;
+			}
+		}
+	}
+}
+
+
+/*
+ * Return true if feature does this action to itself when placed or dynamically
+ */
+static bool is_feature_action_valid(int f_idx, int action)
+{
+	const feature_type *f_ptr = &f_info[f_idx];
+
+	/* Feature flag 1 actions that always occur */
+	if ((action < 32) && ((1L << action) & (FF1_TUNNEL)))
+				return (TRUE);
+
+	/* Feature flag 2 actions */
+	else if ((action < 64) && (f_ptr->flags2 & (1L << (action - 32))) &&
+			((1L << action) & (FF2_HURT_FIRE)))
+				return (TRUE);
+
+	/* Feature flag 2 actions that always occur */
+	else if ((action < 64) && ((1L << (action - 32)) & (FF2_CHASM)))
+				return (TRUE);
+
+	/* Feature flag 3 actions */
+	else if ((action < 96) && (f_ptr->flags3 & (1L << (action - 64))) &&
+			((1L << (action - 64)) & (FF3_PICK_TRAP | FF3_PICK_DOOR | FF3_NEED_TREE | FF3_INSTANT |
+				FF3_ADJACENT | FF3_TIMED | FF3_ERUPT | FF3_STRIKE | FF3_SPREAD)))
+				return (TRUE);
+
+	/* Feature flag 3 actions that always occur*/
+	else if ((action < 96) && ((1L << (action - 64)) & (FF3_TREE)))
+				return (TRUE);
+
+
+	/* Player action not valid */
+	return (FALSE);
+}
+
+/*
+ * Describe the feature initiated transitions and resulting features.
+ */
+static void describe_feature_transitions(int f_idx)
+{
+	const feature_type *f_ptr = &f_info[f_idx];
+
+	int n, vn;
+	cptr vp[128];
+
+	int i;
+
+	bool intro = FALSE;
+
+	/* Permanent stuff never gets changed */
+	if (f_ptr[f_idx].flags1 & FF1_PERMANENT) return;
+
+	/* Get the new feature */
+	for (i=0;i<MAX_FEAT_STATES;i++)
+	{
+		/* Do we have a known transition */
+		if (is_feature_action_valid(f_idx, i))
+		{
+			int newfeat = feat_state(f_idx, i);
+
+			vn = 0;
+
+			switch (i)
+			{
+				case FS_TUNNEL: vp[vn++] ="tunnelled through"; break;
+				case FS_BRIDGE: vp[vn++] = "on the safe path"; break;
+				case FS_HURT_FIRE: vp[vn++] = "on destroyed levels"; break;
+				case FS_TREE: vp[vn++] = "near a tree"; break;
+				case FS_NEED_TREE: vp[vn++] = "not near a tree"; break;
+				case FS_INSTANT: case FS_ADJACENT: vp[vn++] = "a moment passes"; break;
+				case FS_TIMED: vp[vn++] = "time passes"; break;
+				case FS_SPREAD: vp[vn++] = "it spreads"; break;
+				case FS_STRIKE: case FS_ERUPT: vp[vn++] = "chance dictates"; break;
+				default: break;
+			}
+
+			/* Describe transitions */
+			if (vn)
+			{
+				bool effect = FALSE;
+
+				/* Intro */
+				if (!intro)
+				{
+					text_out("When ");
+				}
+
+				/* Note */
+				intro = TRUE;
+
+				/* Scan */
+				for (n = 0; n < vn; n++)
+				{
+					/* Intro */
+					if ((n) && (n < vn-1)) text_out(", ");
+					else text_out(" or ");
+
+					/* Dump */
+					text_out(vp[n]);
+				}
+
+				/* Describe new feature */
+				if ((newfeat != f_idx) || (f_info[newfeat].flags3 & (FF3_PICK_TRAP | FF3_PICK_DOOR)))
+				{
+					text_out(" it becomes ");
+
+					if (f_info[newfeat].flags3 & (FF3_PICK_TRAP)) text_out("a random trap");
+					else if (f_info[newfeat].flags3 & (FF3_PICK_DOOR)) text_out("a random door");
+					else text_out(f_name + f_info[newfeat].name);
+
+					if (cheat_xtra) text_out(format(" (%d)", newfeat));
+				}
+
+				/* Side effects -- dynamic */
+				if (i == FS_ADJACENT)
+				{
+					if (effect) text_out(" and");
+					effect = TRUE;
+
+					text_out(" it affects all adjacent grids");
+				}
+
+				/* Side effects -- erupts */
+				if (i == FS_ERUPT)
+				{
+					if (effect) text_out(" and");
+					effect = TRUE;
+
+					text_out(" it erupts in a radius 2 ball");
+				}
+
+				/* Side effects -- erupts */
+				if (i == FS_STRIKE)
+				{
+					if (effect) text_out(" and");
+					effect = TRUE;
+
+					text_out(" strikes a random grid nearby");
+				}
+
+				/* No effect */
+				if (!effect)
+				{
+					text_out(" it remains unchanged");
+				}
+
+				/* End sentence */
+				text_out(".  ");
+
+				/* Need intro */
+				intro = FALSE;
+			}
+		}
+	}
+}
+
+
+
+
+/*
+ * Hack -- display feature information using "roff()"
+ *
+ *
+ * This function should only be called with the cursor placed at the
+ * left edge of the screen or line, on a cleared line, in which the output is
+ * to take place.  One extra blank line is left after the recall.
+ */
+void describe_feature(int f_idx)
+{
+	/* Describe the movement and level of the monster */
+	describe_feature_basic(f_idx);
+
+	/* Describe the movement, LOS, and projection for player and monsters */
+	describe_feature_player_moves(f_idx);
+
+	/* Describe the movement, LOS, and projection for player and monsters */
+	describe_feature_monster_moves(f_idx);
+
+	/* Describe the movement, LOS, and projection for player and monsters */
+	describe_feature_misc(f_idx);
+
+	/* Describe feature actions */
+	describe_feature_actions(f_idx);
+
+	/* Describe feature transitions */
+	describe_feature_transitions(f_idx);
+
+	/* All done */
+	text_out("\n");
+}
+
+
+
+
+
+/*
+ * Hack -- Display the "name" and "attr/chars" of a feature
+ */
+void feature_roff_top(int f_idx)
+{
+	feature_type *f_ptr = &f_info[f_idx];
+
+	byte a1, a2;
+	char c1, c2;
+
+	/* Get the chars */
+	c1 = f_ptr->d_char;
+	c2 = f_ptr->x_char;
+
+	/* Get the attrs */
+	a1 = f_ptr->d_attr;
+	a2 = f_ptr->x_attr;
+
+	/* Clear the top line */
+	Term_erase(0, 0, 255);
+
+	/* Reset the cursor */
+	Term_gotoxy(0, 0);
+
+	/* Dump the name */
+	Term_addstr(-1, TERM_WHITE, format("%^s",f_name + f_ptr->name));
+
+
+	/* Append the "standard" attr/char info */
+	Term_addstr(-1, TERM_WHITE, " ('");
+	Term_addch(a1, c1);
+	Term_addstr(-1, TERM_WHITE, "')");
+
+	if (!(use_trptile) && !(use_dbltile))
+	{
+		/* Append the "optional" attr/char info */
+		Term_addstr(-1, TERM_WHITE, "/('");
+		Term_addch(a2, c2);
+		if (use_bigtile && (a2 & 0x80)) Term_addch(255, -1);
+		Term_addstr(-1, TERM_WHITE, "'):");
+	}
+}
+
+
+
+/*
+ * Hack -- describe the given feature at the top of the screen
+ */
+void screen_feature_roff(int f_idx)
+{
+	/* Flush messages */
+	message_flush();
+
+	/* Begin recall */
+	Term_erase(0, 1, 255);
+
+	/* Output to the screen */
+	text_out_hook = text_out_to_screen;
+
+	/* Recall feature */
+	describe_feature(f_idx);
+
+	/* Describe feature */
+	feature_roff_top(f_idx);
+
+}
+
+/*
+ * Hack -- describe the given feature in the current "term" window
+ */
+void display_feature_roff(int f_idx)
+{
+	int y;
+
+	/* Erase the window */
+	for (y = 0; y < Term->hgt; y++)
+	{
+		/* Erase the line */
+		Term_erase(0, y, 255);
+	}
+
+	/* Begin recall */
+	Term_gotoxy(0, 1);
+
+	/* Output to the screen */
+	text_out_hook = text_out_to_screen;
+
+	/* Recall feature */
+	describe_feature(f_idx);
+
+	/* Describe feature  */
+	feature_roff_top(f_idx);
+}
 

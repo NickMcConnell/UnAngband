@@ -280,7 +280,7 @@ static void spoil_obj_desc(cptr fname)
 	char dam[80];
 	char pow[80];
 
-        cptr format = "%-37s  %7s%6s%4s%9s %-12s\n";
+        cptr formatter = "%-37s  %7s%6s%4s%9s %-12s\n";
 
 	/* Build the filename */
 	path_build(buf, 1024, ANGBAND_DIR_USER, fname);
@@ -303,8 +303,8 @@ static void spoil_obj_desc(cptr fname)
 	fprintf(fff, "Spoiler File -- Basic Items (%s)\n\n\n", VERSION_STRING);
 
 	/* More Header */
-	fprintf(fff, format, "Description", "Dam/AC", "Wgt","Lev", "Cost", "Info");
-        fprintf(fff, format, "-------------------------------------",
+	fprintf(fff, formatter, "Description", "Dam/AC", "Wgt","Lev", "Cost", "Info");
+        fprintf(fff, formatter, "-------------------------------------",
 		"------", "---","---", "----", "---------");
 
 	/* List the groups */
@@ -863,7 +863,6 @@ static void spoil_mon_desc(cptr fname)
  * Monster spoilers originally by: smchorse@ringer.cs.utsa.edu (Shawn McHorse)
  */
 
-
 /*
  * Create a spoiler file for monsters (-SHAWN-)
  */
@@ -1024,6 +1023,311 @@ static void spoil_mon_info(cptr fname)
 
 
 /*
+ * Description of each feature group.
+ */
+static cptr feature_group_text[] = 
+{
+	"Floors",
+	"Traps",
+	"Doors",
+	"Stairs",
+	"Walls",
+	"Streamers",
+	"Stores",
+	"Chests",
+	"Furnishings",
+	"Bridges",
+	"Water",
+	"Lava",
+	"Ice",
+	"Acid",
+	"Oil",
+	"Chasms",
+	"Sand/Earth",
+	"Ground",
+	"Trees/Plants",
+	"Smoke/Fire",
+	"Wilderness",
+	NULL
+};
+
+
+/*
+ * Return a specific ordering for the features
+ */
+static int feat_order(int feat)
+{
+	feature_type *f_ptr = &f_info[feat];
+
+	if (f_ptr->mimic) f_ptr = &f_info[f_ptr->mimic];
+
+	if (f_ptr->flags1 & (FF1_FLOOR)) return (1);
+	else if (f_ptr->flags1 & (FF2_CAN_DIG)) return (17);
+	else if (f_ptr->flags1 & (FF2_LAVA)) return (12);
+	else if (f_ptr->flags1 & (FF2_ICE)) return (13);
+	else if (f_ptr->flags1 & (FF2_ACID)) return (14);
+	else if (f_ptr->flags1 & (FF2_OIL)) return (15);
+	else if ((f_ptr->flags2 & (FF2_WATER | FF2_CAN_SWIM))) return (11);
+	else if (f_ptr->flags1 & (FF2_CHASM)) return (16);
+	else if (f_ptr->flags1 & (FF1_SECRET)) return (1);
+	else if (f_ptr->flags1 & (FF1_STREAMER)) return (6);
+	else if (f_ptr->flags1 & (FF1_WALL)) return (5);
+	else if (f_ptr->flags3 & (FF3_CHEST)) return (8);
+	else if (f_ptr->flags1 & (FF1_DOOR)) return (3);
+	else if (f_ptr->flags1 & (FF1_TRAP)) return (2);
+	else if (f_ptr->flags1 & (FF1_STAIRS)) return (4);
+	else if (f_ptr->flags1 & (FF1_ENTER)) return (7);
+	else if (f_ptr->flags3 & (FF3_ALLOC)) return (9);
+	else if (f_ptr->flags2 & (FF2_BRIDGED)) return (10);
+	else if (f_ptr->flags1 & (FF3_GROUND)) return (18);
+	else if (f_ptr->flags1 & (FF3_LIVING)) return (19);
+	else if (f_ptr->flags1 & (FF3_SPREAD)) return (20);
+	else if (f_ptr->flags1 & (FF3_OUTSIDE)) return (21);
+
+	return (22);
+}
+
+
+/*
+ * Create a spoiler file for terrain
+ */
+static void spoil_feat_desc(cptr fname)
+{
+	int i, k, s, t, n = 0;
+
+	u16b who[200];
+
+	char buf[1024];
+
+        cptr formatter = "%-37s  %7s%4s%4s\n";
+
+	/* Build the filename */
+	path_build(buf, 1024, ANGBAND_DIR_USER, fname);
+
+	/* File type is "TEXT" */
+	FILE_TYPE(FILE_TYPE_TEXT);
+
+	/* Open the file */
+	fff = my_fopen(buf, "w");
+
+	/* Oops */
+	if (!fff)
+	{
+		msg_print("Cannot create spoiler file.");
+		return;
+	}
+
+
+	/* Header */
+	fprintf(fff, "Spoiler File -- Terrain (%s)\n\n\n", VERSION_STRING);
+
+	/* More Header */
+	fprintf(fff, formatter, "Description", "Dam", "Lev", "Rar");
+        fprintf(fff, formatter, "-------------------------------------",
+		"---", "---","---");
+
+	/* List the groups */
+	for (i = 0; i < 22; i++)
+	{
+		/* Write out the group title */
+		if (TRUE)
+		{
+			/* Hack -- bubble-sort by level then by rarity*/
+			for (s = 0; s < n - 1; s++)
+			{
+				for (t = 0; t < n - 1; t++)
+				{
+					int i1 = t;
+					int i2 = t + 1;
+
+					int e1;
+					int e2;
+
+					s32b t1;
+					s32b t2;
+
+					t1 = f_info[who[i1]].level;
+					t2 = f_info[who[i2]].level;
+
+					e1 = f_info[who[i1]].rarity;
+					e2 = f_info[who[i2]].rarity;
+
+					if ((t1 > t2) || ((t1 == t2) && (e1 > e2)))
+					{
+						int tmp = who[i1];
+						who[i1] = who[i2];
+						who[i2] = tmp;
+					}
+				}
+			}
+
+			/* Spoil each item */
+			for (s = 0; s < n; s++)
+			{
+				feature_type *f_ptr = &f_info[who[s]];
+
+				/* Dump it */
+                                fprintf(fff, formatter,
+					buf, f_ptr->blow.method ? format("%dd%d", f_ptr->blow.d_dice, f_ptr->blow.d_side) : "",
+					f_ptr->level, f_ptr->rarity);
+
+			}
+
+			/* Start a new set */
+			n = 0;
+
+			/* Start a new set */
+			fprintf(fff, "\n\n%s\n\n", feature_group_text[i]);
+		}
+
+		/* Get legal item types */
+		for (k = 1; k < z_info->f_max; k++)
+		{
+			/* Skip wrong tval's */
+			if (feat_order(k) != i) continue;
+
+			/* Save the index */
+			who[n++] = k;
+		}
+	}
+
+
+	/* Check for errors */
+	if (ferror(fff) || my_fclose(fff))
+	{
+		msg_print("Cannot close spoiler file.");
+		return;
+	}
+
+	/* Message */
+	msg_print("Successfully created a spoiler file.");
+}
+
+
+
+/*
+ * Create a spoiler file for terrain
+ */
+static void spoil_feat_info(cptr fname)
+{
+	int i, k, s, t, n = 0;
+
+	u16b who[200];
+
+	char buf[1024];
+
+	/* Build the filename */
+	path_build(buf, 1024, ANGBAND_DIR_USER, fname);
+
+	/* File type is "TEXT" */
+	FILE_TYPE(FILE_TYPE_TEXT);
+
+	/* Open the file */
+	fff = my_fopen(buf, "w");
+
+	/* Oops */
+	if (!fff)
+	{
+		msg_print("Cannot create spoiler file.");
+		return;
+	}
+
+
+	/* Dump to the spoiler file */
+	text_out_hook = text_out_to_file;
+	text_out_file = fff;
+
+	/* Dump the header */
+	spoiler_underline(format("Terrain Spoilers for %s %s",
+                         VERSION_NAME, VERSION_STRING), '=');
+
+
+	/* List the groups */
+	for (i = 0; i < 22; i++)
+	{
+		/* Write out the group title */
+		if (TRUE)
+		{
+			/* Hack -- bubble-sort by cost and then level */
+			for (s = 0; s < n - 1; s++)
+			{
+				for (t = 0; t < n - 1; t++)
+				{
+					int i1 = t;
+					int i2 = t + 1;
+
+					int e1;
+					int e2;
+
+					s32b t1;
+					s32b t2;
+
+					t1 = f_info[who[i1]].level;
+					t2 = f_info[who[i2]].level;
+
+					e1 = f_info[who[i1]].rarity;
+					e2 = f_info[who[i2]].rarity;
+
+					if ((t1 > t2) || ((t1 == t2) && (e1 > e2)))
+					{
+						int tmp = who[i1];
+						who[i1] = who[i2];
+						who[i2] = tmp;
+					}
+				}
+			}
+
+			/* Spoil each item */
+			for (s = 0; s < n; s++)
+			{
+				/* Grab feature name */
+				sprintf(buf, "%s", f_name + f_info[who[s]].name);
+
+				/* Print name and underline */
+				spoiler_underline(buf, '-');
+
+				/* Write out the feature description to the spoiler file */
+				describe_feature(who[s]);
+
+				/* Terminate the entry */
+				spoiler_blanklines(2);
+
+			}
+
+			/* Start a new set */
+			n = 0;
+
+			spoiler_blanklines(2);
+			spoiler_underline(feature_group_text[i], '-');
+			spoiler_blanklines(1);
+
+		}
+
+		/* Get legal item types */
+		for (k = 1; k < z_info->k_max; k++)
+		{
+			/* Skip wrong tval's */
+			if (feat_order(k) != i) continue;
+
+			/* Save the index */
+			who[n++] = k;
+		}
+	}
+
+
+	/* Check for errors */
+	if (ferror(fff) || my_fclose(fff))
+	{
+		msg_print("Cannot close spoiler file.");
+		return;
+	}
+
+	/* Message */
+	msg_print("Successfully created a spoiler file.");
+}
+
+
+/*
  * Create Spoiler files
  */
 void do_cmd_spoilers(void)
@@ -1050,9 +1354,11 @@ void do_cmd_spoilers(void)
                 prt("(3) Full Artifact Info (art-info.spo)", 7, 5);
                 prt("(4) Brief Monster Info (mon-desc.spo)", 8, 5);
                 prt("(5) Full Monster Info (mon-info.spo)", 9, 5);
+                prt("(6) Brief Terrain Info (ter-desc.spo)", 10, 5);
+                prt("(7) Full Terrain Info (ter-info.spo)", 11, 5);
 
 		/* Prompt */
-		prt("Command: ", 12, 0);
+		prt("Command: ", 14, 0);
 
 		/* Get a choice */
 		ch = inkey();
@@ -1091,6 +1397,18 @@ void do_cmd_spoilers(void)
                 else if (ch == '5')
 		{
 			spoil_mon_info("mon-info.spo");
+		}
+
+		/* Option (6) */
+                else if (ch == '6')
+		{
+			spoil_feat_desc("trn_desc.spo");
+		}
+
+		/* Option (7) */
+                else if (ch == '7')
+		{
+			spoil_feat_info("trn-info.spo");
 		}
 
 		/* Oops */

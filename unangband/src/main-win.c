@@ -1070,8 +1070,6 @@ static void save_prefs(void)
 		WritePrivateProfileString("Angband", "LastSaveFile", buf, ini_file);
 	}
 
-	WritePrivateProfileString("Angband", "Sound", buf, ini_file);
-
 	/* Save window prefs */
 	for (i = 0; i < MAX_TERM_DATA; i++)
 	{
