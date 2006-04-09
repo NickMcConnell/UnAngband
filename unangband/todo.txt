@@ -121,6 +121,8 @@ If a store is sold the constituents for an object it attempts to make it.
 TODO: Stores, in conjunction with the character's charisma, offer additional quests based
 on what the player state is.
 
+TODO: Have a primative economy.
+
 
 
 Release v0.8.0
@@ -1008,3 +1010,54 @@ movement keys to order the monster around. We deliberately make ridden monsters 
 control by the player, and not correspond to the player speed.
 
 TODO: Allow small monsters to stack on each other.
+
+
+TODO: Have a primative economy.
+
+Store purse size increases by the profit they make from sales, and reduces by the cost they make
+from purchases. Cycling stock out earns the store 50% of the stock value; new stock in costs the
+store 50% (maybe 40% - test) of the stock value. The stock costs and profits on the blackmarket
+are likely to be different... services of course, never cost the store anything.
+
+Prices inflate based on the total purse size of the town / divided by the default purse size of
+each store.
+e.g. if the player has bought lots of stuff, prices go up. If they sell lots of stuff, prices go
+down. However costs don't go down as fast as prices, if at all.
+
+A store can go bankrupt if they run out of money, and are unable to sell their stock. To make this
+more likely, a store with a small purse size is more likely to put stuff on sale to try to make a
+profit. Note that the costs of purchasing this stock do not get discounted so they are likely to
+continue to lose money this way. When a store bankrupts, the inflation in the economy is affected
+implicitly, because there is a smaller total purse size in the town.
+
+A new shopkeeper will come in after a short while after a store is bankrupted. The new shop has a
+chance of being in competition with an existing shop, as opposed to being the same type of store
+as previously.
+
+A store keeps track of player purchases and sales. A sale decreases the frequency of a store
+restocking an item. A purchase increases the frequency. High frequencies have the following impact:
+ *  the store is more likely to stock multiples of the item
+ *  the store increases the price of the item (special orders, increased demand)
+ *  very high frequencies cause multiple shops to stock an item. The threshold is likely to be
+initial shop, then general store, then black market (the black market always charges a premium).
+ *  when this happens, overall prices drop again (production has increased)
+
+Low frequencies have the following impact:
+ *  the item is more likely to be discounted
+ *  the shopkeeper may stop stocking the item
+ *  the shopkeeper may refuse to purchase the item
+
+If multiple stores in a town stock the same item, the player gets an advantage whilst haggling
+and the shopkeeper is likely to arrive at the final price sooner and this price will be closer
+to the cost. If only one store stocks the item, the reverse happens (this is the Angband default -
+be sure to balance it correctly).
+
+Each town has a separate currency, that the player must conver their money to in order to buy
+anything. The player collects money in which ever currency they last had. The conversion rate
+is affected by the inflation of the old and new towns, with an overhead tax, depending on how
+usurous the money changer is.
+
+The player can donate to certain stores (the temple, the magic shop - for research), and tip others.
+Some shopkeepers are are too proud to accept. Potentially though e.g. the general store may have
+a Village Idiot fund etc.
+
