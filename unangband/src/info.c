@@ -5254,7 +5254,7 @@ static void describe_feature_basic(int f_idx)
 
 	if (f_ptr->flags2 & FF2_GLOW)
 	{
-	     if (f_ptr->flags1 & FF1_ENTER)	text_out("well-lit");
+	     if (f_ptr->flags1 & FF1_ENTER)	text_out(" well-lit");
 		else	text_out(" glowing");
 	}
 
@@ -5384,7 +5384,7 @@ static void describe_feature_player_moves(int f_idx)
 		if (f_ptr->flags1 & (FF1_PROJECT)) vp[vn++] = "cast spells";
 		if (f_ptr->flags1 & (FF1_PROJECT)) vp[vn++] = "fire missiles";
 
-		impede = FALSE;
+		if (vn) impede = FALSE;
 	}
 
 	if (f_ptr->flags1 & (FF1_MOVE)) vp[vn++] = "walk";
@@ -5720,7 +5720,7 @@ static void describe_feature_misc(int f_idx)
 	}
 
 	/* Other player actions */
-	if (f_ptr->flags1 & (FF2_FILLED))
+	if (f_ptr->flags2 & (FF2_FILLED))
 	{
 		text_out("You can't breath in this.  ");
 	}
@@ -5738,7 +5738,7 @@ static void describe_feature_misc(int f_idx)
 			describe_feature_type(f_ptr);
 
 			/* Hack -- should really describe blow */
-			text_out(format("you take %dd%d damage", f_ptr->blow.d_dice, f_ptr->blow.d_side));
+			text_out(format(" you take %dd%d damage", f_ptr->blow.d_dice, f_ptr->blow.d_side));
 		}
 
 		if (f_ptr->spell)
@@ -5770,32 +5770,46 @@ static bool is_player_action_valid(int f_idx, int action)
 	const feature_type *f_ptr = &f_info[f_idx];
 
 	/* Feature flag 1 actions */
-	if ((action < 32) && (f_ptr->flags1 & (1L << action)) &&
+	if (action < 32)
+	{
+		if ((f_ptr->flags1 & (1L << action)) &&
 			((1L << action) & (FF1_SECRET | FF1_OPEN | FF1_CLOSE | FF1_BASH |
 				FF1_DISARM | FF1_SPIKE | FF1_ENTER | FF1_TUNNEL | FF1_FLOOR | FF1_HIT_TRAP)))
 				return (TRUE);
-
-	/* Hack -- bashable features are opened 50% of the time */
-	else if ((action < 32) && (f_ptr->flags1 & (FF1_BASH)) &&
+		/* Hack -- bashable features are opened 50% of the time */
+		else if ((f_ptr->flags1 & (FF1_BASH)) &&
 			((1L << action) & (FF1_OPEN)))
 				return (TRUE);
 
-	/* Hack -- glyphs can be set on a floor */
-	else if ((action < 32) && (f_ptr->flags1 & (FF1_FLOOR)) &&
+		/* Hack -- glyphs can be set on a floor */
+		else if ((f_ptr->flags1 & (FF1_FLOOR)) &&
 			((1L << action) & (FF1_GLYPH)))
 				return (TRUE);
 
+		return (FALSE);
+	}
+
 	/* Feature flag 2 actions */
-	else if ((action < 64) && (f_ptr->flags2 & (1L << (action - 32))) &&
+	else if (action < 64)
+	{
+		if ((f_ptr->flags2 & (1L << (action - 32))) &&
 			((1L << (action - 32)) & (FF2_HURT_ROCK | FF2_HURT_FIRE | FF2_HURT_COLD | FF2_HURT_ACID | 
 				FF2_KILL_HUGE | FF2_KILL_MOVE)))
 				return (TRUE);
 
+		return (FALSE);
+	}
+
 	/* Feature flag 3 actions */
-	else if ((action < 96) && (f_ptr->flags3 & (1L << (action - 64))) &&
+	else if (action < 96)
+	{
+		if((f_ptr->flags3 & (1L << (action - 64))) &&
 			((1L << (action - 64)) & (FF3_HURT_POIS | FF3_HURT_ELEC | FF3_HURT_WATER | 
 				FF3_HURT_BWATER | FF3_USE_FEAT | FF3_GET_FEAT | FF3_NEED_TREE)))
 				return (TRUE);
+
+		return (FALSE);
+	}
 
 	/* Player action not valid */
 	return (FALSE);
@@ -5854,7 +5868,7 @@ static void describe_feature_actions(int f_idx)
 				case FS_HURT_WATER: vp[vn++] = "flood"; break;
 				case FS_HURT_BWATER: vp[vn++] = "boil"; vp[vn++] = "steam"; break;
 				case FS_USE_FEAT: vp[vn++] = "use"; break;
-				case FS_GET_FEAT: vp[vn++] = "pick"; break;
+				case FS_GET_FEAT: vp[vn++] = "gather"; break;
 				case FS_NEED_TREE: vp[vn++] = "cut down"; break;
 				default: break;
 			}
@@ -5893,7 +5907,7 @@ static void describe_feature_actions(int f_idx)
 				text_out(" it to");
 
 				/* Take damage if trap */
-				if (f_ptr->flags1 & (FF1_HIT_TRAP))
+				if (((f_ptr->flags1 & (FF1_HIT_TRAP)) != 0) && ((i == FS_OPEN) || (i == FS_CLOSE) || (i == FS_BASH) || (i == FS_TUNNEL) || (i == FS_HIT_TRAP)))
 				{
 					if (f_ptr->blow.method)
 					{
@@ -5912,10 +5926,15 @@ static void describe_feature_actions(int f_idx)
 						/* Hack -- should really describe spell */
 						text_out(" suffer its effects");
 					}
+
+					if ((f_ptr->flags3 & (FF3_PICK_TRAP | FF3_PICK_DOOR)) != 0)
+					{
+						newfeat = f_idx;
+					}
 				}
 
 				/* Describe new feature */
-				if ((newfeat != f_idx) || (f_info[newfeat].flags3 & (FF3_PICK_TRAP | FF3_PICK_DOOR)))
+				if ((newfeat != f_idx) || ((f_info[newfeat].flags3 & (FF3_PICK_TRAP | FF3_PICK_DOOR)) != 0))
 				{
 					if (effect) text_out(" and");
 					effect = TRUE;
@@ -5930,52 +5949,52 @@ static void describe_feature_actions(int f_idx)
 					if (cheat_xtra) text_out(format(" (%d)", newfeat));
 
 					/* Side effects -- stop glow */
-					if ((f_ptr->flags2 & (FF2_GLOW))
-						&& !(f_ptr[newfeat].flags2 & (FF2_GLOW)))
+					if (((f_ptr->flags2 & (FF2_GLOW)) != 0)
+						&& ((f_ptr[newfeat].flags2 & (FF2_GLOW)) == 0))
 					{
 						text_out(" and darken the surrounding grids");
 					}
 
 					/* Side effects -- start glow */
-					if (!(f_ptr->flags2 & (FF2_GLOW))
-						&& (f_ptr[newfeat].flags2 & (FF2_GLOW)))
+					if (((f_ptr->flags2 & (FF2_GLOW)) == 0)
+						&& ((f_ptr[newfeat].flags2 & (FF2_GLOW)) != 0))
 					{
 						text_out(" and light up the surrounding grids");
 					}
 
 					/* Side effects -- remove branches */
-					if ((f_ptr->flags3 & (FF3_TREE))
-						&& !(f_ptr[newfeat].flags3 & (FF3_TREE)))
+					if (((f_ptr->flags3 & (FF3_TREE)) == 0)
+						&& ((f_ptr[newfeat].flags3 & (FF3_TREE)) != 0))
 					{
 						text_out(" and remove the surrounding branches");
 					}
 
 					/* Side effects -- remove branches */
-					if (!(f_ptr->flags3 & (FF3_TREE))
-						&& (f_ptr[newfeat].flags3 & (FF3_TREE)))
+					if (((f_ptr->flags3 & (FF3_TREE)) != 0)
+						&& ((f_ptr[newfeat].flags3 & (FF3_TREE)) == 0))
 					{
 						text_out(" and cover the surrounding grids with branches");
 					}
 
 					/* Side effects -- remove outside */
-					if ((f_ptr->flags3 & (FF3_OUTSIDE))
-						&& !(f_ptr[newfeat].flags3 & (FF3_OUTSIDE)))
+					if (((f_ptr->flags3 & (FF3_OUTSIDE)) != 0)
+						&& ((f_ptr[newfeat].flags3 & (FF3_OUTSIDE)) == 0))
 					{
 						text_out(" and hide the surrounding grids from the sun");
 					}
 
 					/* Side effects -- remove outside */
-					if (!(f_ptr->flags3 & (FF3_OUTSIDE))
-						&& (f_ptr[newfeat].flags3 & (FF3_OUTSIDE)))
+					if (((f_ptr->flags3 & (FF3_OUTSIDE)) == 0)
+						&& ((f_ptr[newfeat].flags3 & (FF3_OUTSIDE)) != 0))
 					{
 						text_out(" and expose the surrounding grids to daylight");
 					}
 				}
 
 				/* Side effects -- drop / use / get object */
-				if (((f_ptr->flags1 & (FF1_HAS_GOLD | FF1_HAS_ITEM))
-					&& !(f_ptr[newfeat].flags1 & (FF1_HAS_GOLD | FF1_HAS_ITEM)))
-					|| (f_ptr->k_idx && ((i == FS_USE_FEAT) || (i == FS_GET_FEAT) || (i == FS_HIT_TRAP))))
+				if ((((f_ptr->flags1 & (FF1_HAS_GOLD | FF1_HAS_ITEM)) != 0)
+					&& ((f_ptr[newfeat].flags1 & (FF1_HAS_GOLD | FF1_HAS_ITEM)) == 0))
+					|| (f_ptr->k_idx && ((i == FS_USE_FEAT) || (i == FS_GET_FEAT) || (i == FS_DISARM))))
 				{
 					int count = 0;
 
@@ -5987,12 +6006,7 @@ static void describe_feature_actions(int f_idx)
 					if (f_ptr->flags3 & (FF3_DROP_1D2)) count += 2;
 					if (f_ptr->flags3 & (FF3_DROP_2D2)) count += 4;
 
-					if (count) text_out(format("find up to %d ", count));
-					else if ((f_ptr->flags1 & (FF1_HAS_GOLD | FF1_HAS_ITEM)) || (i == FS_GET_FEAT))
-					{
-						text_out("find ");
-					}
-					else if (i == FS_USE_FEAT)
+					if (i == FS_USE_FEAT)
 					{
 						switch(k_info[f_ptr->k_idx].tval)
 						{
@@ -6011,7 +6025,13 @@ static void describe_feature_actions(int f_idx)
 						}
 					}
 
-					if ((f_ptr->k_idx) && ((i == FS_USE_FEAT) || (i == FS_GET_FEAT) || (i == FS_HIT_TRAP)))
+					if (((f_ptr->flags1 & (FF1_HAS_GOLD | FF1_HAS_ITEM)) != 0) || (i == FS_DISARM) || (i == FS_GET_FEAT))
+					{
+						if (i == FS_USE_FEAT) text_out("or ");
+						text_out("find ");
+					}
+
+					if ((f_ptr->k_idx) && ((i == FS_USE_FEAT) || (i == FS_GET_FEAT) || (i == FS_DISARM)))
 					{
 						object_type object_type_body;
 						char o_name[80];
@@ -6020,9 +6040,20 @@ static void describe_feature_actions(int f_idx)
 
 						object_prep(o_ptr, f_ptr->k_idx);
 
-						object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 1);
+						if (count)
+						{
+							text_out("up to ");
+							o_ptr->number = count;
+						}
+						else o_ptr->number = 1;
+
+						object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
 
 						text_out(o_name);
+					}
+					else if (count)
+					{
+						text_out(format("up to %d ", count));
 					}
 
 					if (f_ptr->flags1 & (FF1_HAS_ITEM))
@@ -6081,30 +6112,44 @@ static bool is_feature_action_valid(int f_idx, int action)
 	const feature_type *f_ptr = &f_info[f_idx];
 
 	/* Feature flag 1 actions that always occur */
-	if ((action < 32) && ((1L << action) & (FF1_TUNNEL)))
+	if (action < 32)
+	{
+		if (((1L << action) & (FF1_TUNNEL)) != 0)
 				return (TRUE);
+
+		return (FALSE);
+	}
 
 	/* Feature flag 2 actions */
-	else if ((action < 64) && (f_ptr->flags2 & (1L << (action - 32))) &&
-			((1L << action) & (FF2_HURT_FIRE)))
+	else if (action < 64)
+	{
+		if (((f_ptr->flags2 & (1L << (action - 32))) != 0) &&
+			(((1L << action) & (FF2_HURT_FIRE)) != 0))
 				return (TRUE);
 
-	/* Feature flag 2 actions that always occur */
-	else if ((action < 64) && ((1L << (action - 32)) & (FF2_CHASM)))
+		/* Feature flag 2 actions that always occur */
+		else if (((1L << (action - 32)) & (FF2_CHASM)) != 0) 
 				return (TRUE);
+
+		return (FALSE);
+	}
 
 	/* Feature flag 3 actions */
-	else if ((action < 96) && (f_ptr->flags3 & (1L << (action - 64))) &&
-			((1L << (action - 64)) & (FF3_PICK_TRAP | FF3_PICK_DOOR | FF3_NEED_TREE | FF3_INSTANT |
-				FF3_ADJACENT | FF3_TIMED | FF3_ERUPT | FF3_STRIKE | FF3_SPREAD)))
+	else if (action < 96)
+	{
+		if (((f_ptr->flags3 & (1L << (action - 64))) != 0) &&
+			(((1L << (action - 64)) & (FF3_PICK_TRAP | FF3_PICK_DOOR | FF3_NEED_TREE | FF3_INSTANT |
+				FF3_ADJACENT | FF3_TIMED | FF3_ERUPT | FF3_STRIKE | FF3_SPREAD)) != 0))
 				return (TRUE);
 
-	/* Feature flag 3 actions that always occur*/
-	else if ((action < 96) && ((1L << (action - 64)) & (FF3_TREE)))
+		/* Feature flag 3 actions that always occur*/
+		else if (((1L << (action - 64)) & (FF3_TREE)) != 0)
 				return (TRUE);
 
+		return (FALSE);
+	}
 
-	/* Player action not valid */
+	/* Feature action not valid */
 	return (FALSE);
 }
 

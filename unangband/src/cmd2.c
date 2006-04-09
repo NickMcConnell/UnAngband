@@ -2211,7 +2211,7 @@ void do_cmd_set_trap_or_spike(void)
 		/* Verify legality */
 		if (!do_cmd_test(y, x, action)) return;
 
-
+#if 0
 		/* Trapped door */
 		if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
 		{
@@ -2221,10 +2221,11 @@ void do_cmd_set_trap_or_spike(void)
 			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 
 		}
+#endif
 
 
 		/* Secrets on door/permanent doors */
-		else if ((f_info[cave_feat[y][x]].flags1 & (FF1_SECRET)) ||
+		/* else */ if ((f_info[cave_feat[y][x]].flags1 & (FF1_SECRET)) ||
 			(f_info[cave_feat[y][x]].flags1 & (FF1_PERMANENT)))
 		{
 			/* Stuck */

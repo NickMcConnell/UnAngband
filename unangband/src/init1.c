@@ -184,8 +184,8 @@ static cptr r_info_blow_effect[] =
 	"",
 	"STORM",
 	"WIND",
-	"XXX1",
 	"HELLFIRE",
+	"MANA",
 	"HOLY_ORB",
 	"LITE_WEAK",
 	"DARK_WEAK",
@@ -2459,13 +2459,13 @@ errr parse_f_info(char *buf, header *head)
 				&level, &rarity, &priority, &edge)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		f_ptr->level = level;
-		f_ptr->rarity = rarity;
-		f_ptr->priority = priority;
-		f_ptr->edge = edge;
+		f_ptr->level = (u16b)level;
+		f_ptr->rarity = (u16b)rarity;
+		f_ptr->priority = (u16b)priority;
+		f_ptr->edge = (s16b)edge;
 	}
 
-	/* Process 'K' for "States" (up to four lines + default (which cannot be last)) */
+	/* Process 'K' for "States" (up to six lines + default (which cannot be last)) */
 	else if (buf[0] == 'K')
 	{
 		/* There better be a current f_ptr */

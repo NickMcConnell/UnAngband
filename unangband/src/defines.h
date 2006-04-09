@@ -1056,17 +1056,17 @@
 /*Feature flags - should be used instead of feature indexes unless generating.*/
 
 
-#define FF1_LOS  0x00000001
+#define FF1_LOS  	0x00000001
 #define FF1_PROJECT     0x00000002
-#define FF1_MOVE 0x00000004
+#define FF1_MOVE 	0x00000004
 #define FF1_PLACE       0x00000008
-#define FF1_DROP 0x00000010
+#define FF1_DROP 	0x00000010
 #define FF1_SECRET      0x00000020
 #define FF1_NOTICE      0x00000040
 #define FF1_REMEMBER    0x00000080
-#define FF1_OPEN 0x00000100
+#define FF1_OPEN 	0x00000100
 #define FF1_CLOSE       0x00000200
-#define FF1_BASH 0x00000400
+#define FF1_BASH 	0x00000400
 #define FF1_SPIKE       0x00000800
 #define FF1_DISARM      0x00001000
 #define FF1_ENTER       0x00002000
@@ -1074,15 +1074,15 @@
 #define FF1_STREAMER    0x00008000
 #define FF1_HAS_GOLD    0x00010000
 #define FF1_HAS_ITEM    0x00020000
-#define FF1_DOOR 0x00040000
-#define FF1_TRAP 0x00080000
+#define FF1_DOOR 	0x00040000
+#define FF1_TRAP 	0x00080000
 #define FF1_STAIRS      0x00100000
 #define FF1_GLYPH       0x00200000
-#define FF1_LESS 0x00400000
-#define FF1_MORE 0x00800000
-#define FF1_RUN  0x01000000
+#define FF1_LESS 	0x00400000
+#define FF1_MORE 	0x00800000
+#define FF1_RUN  	0x01000000
 #define FF1_FLOOR       0x02000000
-#define FF1_WALL 0x04000000
+#define FF1_WALL 	0x04000000
 #define FF1_PERMANENT   0x08000000
 #define FF1_INNER       0x10000000
 #define FF1_OUTER       0x20000000

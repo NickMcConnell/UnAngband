@@ -283,10 +283,6 @@ struct feature_blow
 
 /*
  * Information about terrain "features"
- *
- * Have added 64 flags, spell/power bytes, blow structure (4 bytes), 4 state structures (9 bytes),
- * level, rarity, priority, edge (9 bytes) for a total of 32 extra bytes per feature. With 64 features
- * -> 256 features, we use an extra (64 * 32 = 2096) + (192 * (X + 32)) = 8K + .
  */
 struct feature_type
 {

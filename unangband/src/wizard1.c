@@ -1028,6 +1028,7 @@ static void spoil_mon_info(cptr fname)
 static cptr feature_group_text[] = 
 {
 	"Floors",
+	"Secrets",
 	"Traps",
 	"Doors",
 	"Stairs",
@@ -1047,7 +1048,7 @@ static cptr feature_group_text[] =
 	"Ground",
 	"Trees/Plants",
 	"Smoke/Fire",
-	"Wilderness",
+	"Other",
 	NULL
 };
 
@@ -1059,32 +1060,29 @@ static int feat_order(int feat)
 {
 	feature_type *f_ptr = &f_info[feat];
 
-	if (f_ptr->mimic) f_ptr = &f_info[f_ptr->mimic];
-
-	if (f_ptr->flags1 & (FF1_FLOOR)) return (1);
-	else if (f_ptr->flags1 & (FF2_CAN_DIG)) return (17);
-	else if (f_ptr->flags1 & (FF2_LAVA)) return (12);
-	else if (f_ptr->flags1 & (FF2_ICE)) return (13);
-	else if (f_ptr->flags1 & (FF2_ACID)) return (14);
-	else if (f_ptr->flags1 & (FF2_OIL)) return (15);
-	else if ((f_ptr->flags2 & (FF2_WATER | FF2_CAN_SWIM))) return (11);
-	else if (f_ptr->flags1 & (FF2_CHASM)) return (16);
-	else if (f_ptr->flags1 & (FF1_SECRET)) return (1);
-	else if (f_ptr->flags1 & (FF1_STREAMER)) return (6);
-	else if (f_ptr->flags1 & (FF1_WALL)) return (5);
+	if (f_ptr->flags1 & (FF1_STAIRS)) return (4);
+	else if (f_ptr->flags1 & (FF1_ENTER)) return (7);
 	else if (f_ptr->flags3 & (FF3_CHEST)) return (8);
 	else if (f_ptr->flags1 & (FF1_DOOR)) return (3);
 	else if (f_ptr->flags1 & (FF1_TRAP)) return (2);
-	else if (f_ptr->flags1 & (FF1_STAIRS)) return (4);
-	else if (f_ptr->flags1 & (FF1_ENTER)) return (7);
 	else if (f_ptr->flags3 & (FF3_ALLOC)) return (9);
+	else if (f_ptr->flags1 & (FF1_FLOOR)) return (0);
+	else if (f_ptr->flags1 & (FF1_STREAMER)) return (6);
 	else if (f_ptr->flags2 & (FF2_BRIDGED)) return (10);
-	else if (f_ptr->flags1 & (FF3_GROUND)) return (18);
-	else if (f_ptr->flags1 & (FF3_LIVING)) return (19);
-	else if (f_ptr->flags1 & (FF3_SPREAD)) return (20);
-	else if (f_ptr->flags1 & (FF3_OUTSIDE)) return (21);
+	else if (f_ptr->flags2 & (FF2_LAVA)) return (12);
+	else if (f_ptr->flags2 & (FF2_ICE)) return (13);
+	else if (f_ptr->flags2 & (FF2_CAN_DIG)) return (17);
+	else if (f_ptr->flags2 & (FF2_ACID)) return (14);
+	else if (f_ptr->flags2 & (FF2_OIL)) return (15);
+	else if ((f_ptr->flags2 & (FF2_WATER | FF2_CAN_SWIM))) return (11);
+	else if (f_ptr->flags2 & (FF2_CHASM)) return (16);
+	else if (f_ptr->flags1 & (FF1_SECRET)) return (1);
+	else if (f_ptr->flags3 & (FF3_LIVING)) return (19);
+	else if (f_ptr->flags3 & (FF3_SPREAD | FF3_ADJACENT | FF3_INSTANT | FF3_TIMED)) return (20);
+	else if (f_ptr->flags1 & (FF1_WALL)) return (5);
+	else if (f_ptr->flags3 & (FF3_GROUND)) return (18);
 
-	return (22);
+	return (21);
 }
 
 
@@ -1095,7 +1093,7 @@ static void spoil_feat_desc(cptr fname)
 {
 	int i, k, s, t, n = 0;
 
-	u16b who[200];
+	u16b who[600];
 
 	char buf[1024];
 
@@ -1167,8 +1165,8 @@ static void spoil_feat_desc(cptr fname)
 				feature_type *f_ptr = &f_info[who[s]];
 
 				/* Dump it */
-                                fprintf(fff, formatter,
-					buf, f_ptr->blow.method ? format("%dd%d", f_ptr->blow.d_dice, f_ptr->blow.d_side) : "",
+                                fprintf(fff, "%-37s  %7s%4d%4d\n",
+					f_name + f_ptr->name, f_ptr->blow.method ? format("%dd%d", f_ptr->blow.d_dice, f_ptr->blow.d_side) : "",
 					f_ptr->level, f_ptr->rarity);
 
 			}
@@ -1180,8 +1178,8 @@ static void spoil_feat_desc(cptr fname)
 			fprintf(fff, "\n\n%s\n\n", feature_group_text[i]);
 		}
 
-		/* Get legal item types */
-		for (k = 1; k < z_info->f_max; k++)
+		/* Get legal terrain */
+		for (k = 0; k < z_info->f_max; k++)
 		{
 			/* Skip wrong tval's */
 			if (feat_order(k) != i) continue;
@@ -1212,7 +1210,7 @@ static void spoil_feat_info(cptr fname)
 {
 	int i, k, s, t, n = 0;
 
-	u16b who[200];
+	u16b who[600];
 
 	char buf[1024];
 
@@ -1240,7 +1238,6 @@ static void spoil_feat_info(cptr fname)
 	/* Dump the header */
 	spoiler_underline(format("Terrain Spoilers for %s %s",
                          VERSION_NAME, VERSION_STRING), '=');
-
 
 	/* List the groups */
 	for (i = 0; i < 22; i++)
@@ -1303,8 +1300,8 @@ static void spoil_feat_info(cptr fname)
 
 		}
 
-		/* Get legal item types */
-		for (k = 1; k < z_info->k_max; k++)
+		/* Get legal terrain */
+		for (k = 0; k < z_info->f_max; k++)
 		{
 			/* Skip wrong tval's */
 			if (feat_order(k) != i) continue;
@@ -1402,13 +1399,13 @@ void do_cmd_spoilers(void)
 		/* Option (6) */
                 else if (ch == '6')
 		{
-			spoil_feat_desc("trn_desc.spo");
+			spoil_feat_desc("ter-desc.spo");
 		}
 
 		/* Option (7) */
                 else if (ch == '7')
 		{
-			spoil_feat_info("trn-info.spo");
+			spoil_feat_info("ter-info.spo");
 		}
 
 		/* Oops */
