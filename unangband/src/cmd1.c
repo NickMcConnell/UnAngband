@@ -1222,7 +1222,7 @@ void py_pickup(int pickup)
 		/* Describe the object */
 		if ((!pickup) || auto_pickup_never(o_ptr))
 		{
-			msg_format("You see %s.", o_name);
+			msg_format("You %s %s.", p_ptr->blind || no_lite() ? "feel" : "see", o_name);
 
 			/* Check the next object */
 			continue;
@@ -1267,14 +1267,14 @@ void py_pickup(int pickup)
 				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 				/* Message */
-				msg_format("You see %s.", o_name);
+				msg_format("You %s %s.", p_ptr->blind || no_lite()? "feel" : "see", o_name);
 			}
 
 			/* Multiple objects */
 			else
 			{
 				/* Message */
-				msg_format("You see a pile of %d objects.", not_pickup);
+				msg_format("You %s a pile of %d objects.", p_ptr->blind || no_lite() ? "feel" : "see", not_pickup);
 			}
 
 			/* Done */
@@ -2013,7 +2013,7 @@ void py_attack(int y, int x)
 		blows++;
 
 		/* Some monsters are great at dodging  -EZ- */
-		if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!was_asleep)
+		if (((r_ptr->flags9 & (RF9_EVASIVE)) != 0) && (!was_asleep)
 			&& (!m_ptr->confused) && (!m_ptr->blind) && (!m_ptr->monfear)
 			&& (rand_int(m_ptr->stunned ? 2 : 3)))
 		{

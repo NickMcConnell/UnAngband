@@ -449,6 +449,8 @@ extern void do_cmd_room_desc(void);
 extern void do_cmd_load_screen(void);
 extern void do_cmd_save_screen(void);
 extern void do_cmd_save_screen_html(void);
+extern const cptr feature_group_text[];
+extern int feat_order(int feat);
 extern void do_cmd_knowledge(void);
 
 /* cmd5.c */

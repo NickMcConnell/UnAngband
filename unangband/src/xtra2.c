@@ -2513,6 +2513,9 @@ void monster_death(int m_idx)
 		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 	}
 
+	/* Monster death updates visible monsters */
+	p_ptr->window |= (PW_MONLIST);
+
 	/* Drop objects being carried */
 	for (this_o_idx = m_ptr->hold_o_idx; this_o_idx; this_o_idx = next_o_idx)
 	{
@@ -2954,9 +2957,6 @@ void monster_death(int m_idx)
 
 		/* Create stairs down */
 		cave_set_feat(y, x, FEAT_MORE);
-
-		/* Update the visuals */
-		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 	}
 
 
@@ -4769,8 +4769,8 @@ static key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 						/* Save screen */
 						screen_save();
 
-						/* Recall monster on screen */
-						/* Except for containers holding 'something' */
+						/* Recall monster on screen when a monster corpse or statue */
+						/* XXX Except for containers holding 'something' */
 						if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_known_p(o_ptr)))) screen_roff(o_ptr->name3);
 
 						/* Recall on screen */
@@ -4843,6 +4843,8 @@ static key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 		{
 			cptr name = f_name + f_info[feat].name;
 
+			bool recall = FALSE;
+
 			/* Hack -- handle unknown grids */
 			if (feat == FEAT_NONE) name = "unknown grid";
 
@@ -4892,11 +4894,47 @@ static key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 				s3 = "the entrance to the ";
 			}
 
-			/* Display a message */
-			sprintf(out_val, "%s%s%s%s [%s]", s1, s2, s3, name, info);
-			prt(out_val, 0, 0);
-			move_cursor_relative(y, x);
-			query = inkey_ex();
+
+			/* Interact */
+			while (1)
+			{
+				/* Recall */
+				if (recall)
+				{
+					/* Save screen */
+					screen_save();
+
+					/* Recall on screen */
+					screen_feature_roff(feat);
+
+					/* Hack -- Complete the prompt (again) */
+					Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
+
+					/* Command */
+					query = inkey_ex();
+
+					/* Load screen */
+					screen_load();
+				}
+
+				/* Normal */
+				else
+				{
+
+					/* Display a message */
+					sprintf(out_val, "%s%s%s%s [r,%s]", s1, s2, s3, name, info);
+					prt(out_val, 0, 0);
+					move_cursor_relative(y, x);
+					query = inkey_ex();
+				}
+
+				/* Normal commands */
+				if (query.key != 'r') break;
+
+				/* Toggle recall */
+				recall = !recall;
+			}
+
 
 			/* Stop on everything but "return"/"space" */
 			if ((query.key != '\n') && (query.key != '\r') && (query.key != ' ')) break;
@@ -4908,12 +4946,12 @@ static key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 		/* Room description if needed */
 		/* We describe a room if we are looking at ourselves, or something in a room when we are
 		 * not in a room, or in a different room. */
-		if ((play_info[y][x] & (PLAY_MARK)) &&
-			(cave_info[y][x] & (CAVE_ROOM)) &&
-			(room_info[dun_room[y/BLOCK_HGT][x/BLOCK_WID]].flags & (ROOM_SEEN)) &&
+		if (((play_info[y][x] & (PLAY_MARK)) != 0) &&
+			((cave_info[y][x] & (CAVE_ROOM)) != 0) &&
+			((room_info[dun_room[y/BLOCK_HGT][x/BLOCK_WID]].flags & (ROOM_SEEN)) != 0) &&
 			(room_names) &&
 			((cave_m_idx[y][x] < 0) ||
-				!(cave_info[p_ptr->py][p_ptr->px] & (CAVE_ROOM)) ||
+				((cave_info[p_ptr->py][p_ptr->px] & (CAVE_ROOM)) == 0) ||
 			 ( dun_room[y/BLOCK_HGT][x/BLOCK_WID]!= dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID])) )
 		{
 			int i;

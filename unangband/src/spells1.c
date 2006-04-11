@@ -2574,7 +2574,6 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		case GF_METEOR:
 		case GF_SHARD:
 		case GF_FORCE:
-		case GF_MANA:
 		case GF_SOUND:
 		{
 			if ((f_info[cave_feat[y][x]].flags2 & (FF2_KILL_HUGE)) &&

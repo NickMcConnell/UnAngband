@@ -6454,9 +6454,10 @@ static void do_cmd_knowledge_objects(void)
 /*
  * Description of each feature group.
  */
-static cptr feature_group_text[] = 
+const cptr feature_group_text[] = 
 {
 	"Floors",
+	"Secrets",
 	"Traps",
 	"Doors",
 	"Stairs",
@@ -6476,38 +6477,42 @@ static cptr feature_group_text[] =
 	"Ground",
 	"Trees/Plants",
 	"Smoke/Fire",
-	"Wilderness",
+	"Other",
 	NULL
 };
 
+
 /*
- * Flags of features in each group.
+ * Return a specific ordering for the features
  */
-static u32b feature_group_flag[] = 
+int feat_order(int feat)
 {
-	FF1_FLOOR, 0, 0,
-	FF1_TRAP, 0, 0,
-	FF1_DOOR, 0, 0,
-	FF1_STAIRS, 0, 0,
-	FF1_WALL, 0, 0,
-	FF1_STREAMER, 0, 0,
-	FF1_ENTER, 0, 0,
-	0, 0, FF3_CHEST,
-	0, 0, FF3_ALLOC,
-	0, FF2_BRIDGED, 0,
-	0, FF2_WATER | FF2_CAN_SWIM, 0,
-	0, FF2_LAVA, 0,
-	0, FF2_ICE, 0,
-	0, FF2_ACID, 0,
-	0, FF2_OIL, 0,
-	0, FF2_CHASM, 0,
-	0, FF2_CAN_DIG, 0,
-	0, 0, FF3_GROUND,
-	0, 0, FF3_LIVING,
-	0, 0, FF3_SPREAD,
-	0, 0, FF3_OUTSIDE,
-	0,0,0
-};
+	feature_type *f_ptr = &f_info[feat];
+
+	if (f_ptr->flags1 & (FF1_STAIRS)) return (4);
+	else if (f_ptr->flags1 & (FF1_ENTER)) return (7);
+	else if (f_ptr->flags3 & (FF3_CHEST)) return (8);
+	else if (f_ptr->flags1 & (FF1_DOOR)) return (3);
+	else if (f_ptr->flags1 & (FF1_TRAP)) return (2);
+	else if (f_ptr->flags3 & (FF3_ALLOC)) return (9);
+	else if (f_ptr->flags1 & (FF1_FLOOR)) return (0);
+	else if (f_ptr->flags1 & (FF1_STREAMER)) return (6);
+	else if (f_ptr->flags2 & (FF2_BRIDGED)) return (10);
+	else if (f_ptr->flags2 & (FF2_LAVA)) return (12);
+	else if (f_ptr->flags2 & (FF2_ICE)) return (13);
+	else if (f_ptr->flags2 & (FF2_CAN_DIG)) return (17);
+	else if (f_ptr->flags2 & (FF2_ACID)) return (14);
+	else if (f_ptr->flags2 & (FF2_OIL)) return (15);
+	else if ((f_ptr->flags2 & (FF2_WATER | FF2_CAN_SWIM))) return (11);
+	else if (f_ptr->flags2 & (FF2_CHASM)) return (16);
+	else if (f_ptr->flags1 & (FF1_SECRET)) return (1);
+	else if (f_ptr->flags3 & (FF3_LIVING)) return (19);
+	else if (f_ptr->flags3 & (FF3_SPREAD | FF3_ADJACENT | FF3_INSTANT | FF3_TIMED)) return (20);
+	else if (f_ptr->flags1 & (FF1_WALL)) return (5);
+	else if (f_ptr->flags3 & (FF3_GROUND)) return (18);
+
+	return (21);
+}
 
 /*
  * Build a list of feature indexes in the given group. Return the number
@@ -6516,10 +6521,6 @@ static u32b feature_group_flag[] =
 static int collect_features(int grp_cur, int *feat_idx)
 {
 	int i, feat_cnt = 0;
-
-	u32b flags1 = feature_group_flag[grp_cur*3+0];
-	u32b flags2 = feature_group_flag[grp_cur*3+1];
-	u32b flags3 = feature_group_flag[grp_cur*3+2];
 
 	/* Check every feature */
 	for (i = 0; i < z_info->f_max; i++)
@@ -6530,11 +6531,8 @@ static int collect_features(int grp_cur, int *feat_idx)
 		/* Skip empty race */
 		if (!f_ptr->name) continue;
 
-		/* Skip features we never see */
-		if (f_ptr->mimic != i) continue;
-
 		/* Check for any flags matching in the group */
-		if ((f_ptr->flags1 & (flags1)) || (f_ptr->flags2 & (flags2)) || (f_ptr->flags3 & (flags3)))
+		if (feat_order(i) == grp_cur)
 		{
 			int idx, ii, tmp;
 
@@ -6552,6 +6550,7 @@ static int collect_features(int grp_cur, int *feat_idx)
 			/* Add the race */
 			feat_idx[feat_cnt++] = idx;
 		}
+
 	}
 
 	/* Terminate the list */
@@ -6902,6 +6901,13 @@ static void do_cmd_knowledge_features(void)
 				}
 			}
 
+			case '\xff':
+			{
+				/* Move the cursor */
+				browser_mouse(ke, &column, &grp_cur, grp_cnt, &feat_cur, feat_cnt, max + 3, 6, grp_top, feat_top, &delay);
+				if (!ke.mousebutton) break;
+			}
+
 			case 'R':
 			case 'r':
 			{
@@ -6914,13 +6920,6 @@ static void do_cmd_knowledge_features(void)
 
 					redraw = TRUE;
 				}
-				break;
-			}
-
-			case '\xff':
-			{
-				/* Move the cursor */
-				browser_mouse(ke, &column, &grp_cur, grp_cnt, &feat_cur, feat_cnt, max + 3, 6, grp_top, feat_top, &delay);
 				break;
 			}
 

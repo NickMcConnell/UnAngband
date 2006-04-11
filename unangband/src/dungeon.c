@@ -2229,7 +2229,14 @@ static void process_command(void)
 			}
 			else if (p_ptr->command_cmd_ex.mousebutton == 1)
 			{
-				do_cmd_pathfind(y, x);
+				if (p_ptr->confused)
+				{
+					do_cmd_walk();
+				}
+				else
+				{
+					do_cmd_pathfind(y, x);
+				}
 			}
 			else if (p_ptr->command_cmd_ex.mousebutton == 2)
 			{

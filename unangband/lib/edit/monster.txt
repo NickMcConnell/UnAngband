@@ -6166,7 +6166,7 @@ F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_2D2 | DROP_GOOD
 F:OPEN_DOOR | BASH_DOOR
 F:EVIL | NO_CONF | NO_SLEEP | LOW_MANA_RUN | SMART
-F:MAGE | NEED_LITE
+F:MAGE | NEED_LITE | POWERFUL
 S:BLIND | ADD_MANA | SHIELD | HASTE | BOLT_MANA | TPORT | CONF | HOLD
 S:S_DRAGON | ILLUSION
 D:This elusive female spellcaster has a special affinity for dragons, whom
@@ -6942,7 +6942,7 @@ B:HIT:BATTER:24d12
 B:HIT:CONFUSE:24d12
 B:BOULDER:HURT:20d10
 F:FORCE_SLEEP | FORCE_MAXHP
-F:ONLY_ITEM | DROP_4D2 | DROP_1D2 | DROP_GOOD
+F:ONLY_ITEM | DROP_4D2 | DROP_1D2 | DROP_GOOD | DROP_GREAT
 F:SMART | TAKE_ITEM | BASH_DOOR | HUGE
 F:EVIL | GIANT | NEED_LITE | POWERFUL
 S:HEAL | TELE_TO | S_MONSTERS | SCARE
@@ -7233,7 +7233,7 @@ B:HIT:POISON:20d1
 B:PUNCH:PARALYZE:15d1
 F:MALE
 F:FORCE_SLEEP | FORCE_MAXHP
-F:ONLY_ITEM | DROP_4D2
+F:ONLY_ITEM | DROP_2D2 | DROP_GOOD | DROP_GREAT
 F:OPEN_DOOR | BASH_DOOR
 F:IM_ACID | IM_FIRE | IM_COLD | IM_ELEC | IM_POIS | NO_CONF | NO_SLEEP
 F:PRIEST | MAGE
@@ -8362,7 +8362,7 @@ F:ANIMAL | CAN_FLY
 D:Larger than a crow, and pitch black.
 
 N:561:Crebain
-G:B:D
+G:B:v
 I:120:8d5:40:12:0
 W:16:4:0:20
 M:15:0:0:15
@@ -8376,7 +8376,7 @@ D: rudimentary intelligence guided by an evil mind has tracked you down,
 D: and now they seek to alert other evil creatures to your presence.
 
 N:562:Winged Horror
-G:B:D
+G:B:U
 I:120:25d80:30:80:5
 W:58:3:0:4000
 M:18:0:0:0
@@ -8416,7 +8416,7 @@ F:BASH_DOOR | ANIMAL
 D:A huge, beastly bear, more savage than most of its kind.
 
 N:565:Werebear
-G:Q:D
+G:Q:y
 I:110:25d25:20:50:20
 W:28:2:0:200
 B:CLAW:HURT:1d10
@@ -12389,7 +12389,7 @@ F:FORCE_SLEEP |
 F:ONLY_ITEM | DROP_1D2 | CAN_FLY |
 F:COLD_BLOOD | PASS_WALL | IM_BLUNT | POWERFUL | NO_CUTS | NO_STUN
 F:EVIL | UNDEAD | IM_COLD | IM_POIS | NO_CONF | NO_SLEEP | CAN_FLY
-S:BLIND | WOUND | TELE_TO
+S:BLIND | WOUND | TELE_TO | ILLUSION
 D:An unholy creature from beyond, half-real and half-nightmare. You are
 D: caught in the fever of dreams.
 
@@ -12406,7 +12406,7 @@ F:FORCE_SLEEP |
 F:ONLY_ITEM | DROP_1D2 | CAN_FLY |
 F:COLD_BLOOD | PASS_WALL | IM_BLUNT | POWERFUL | NO_CUTS | NO_STUN
 F:EVIL | UNDEAD | IM_COLD | IM_POIS | NO_CONF | NO_SLEEP | CAN_FLY
-S:FORGET | BLIND | WOUND | DRAIN_MANA | TPORT
+S:FORGET | BLIND | WOUND | DRAIN_MANA | TPORT | ILLUSION
 D:A creature of the darkest terrors of night, all claws and fangs and chains
 D: and knives.
 
@@ -12423,7 +12423,7 @@ F:FORCE_SLEEP | ATTR_MULTI |
 F:ONLY_ITEM | DROP_1D2 | CAN_FLY |
 F:COLD_BLOOD | PASS_WALL | IM_BLUNT | POWERFUL | NO_CUTS | NO_STUN
 F:EVIL | UNDEAD | IM_COLD | IM_POIS | NO_CONF | NO_SLEEP | CAN_FLY
-S:BLIND | HOLD | SCARE | MIND_BLAST | MIND_BLAST | FORGET
+S:BLIND | HOLD | SCARE | MIND_BLAST | MIND_BLAST | FORGET | ILLUSION
 D:You have not dreamed such a dark and terrible evil, boiling forth with images
 D: of hideous destruction.
 
@@ -12432,7 +12432,7 @@ G:G:D
 I:120:24d100:20:140:10
 W:93:3:0:16000
 M:18:18:38:80
-B:HIT:HURT:18d6
+B:HIT:WOUND:18d6
 B:TOUCH:EXP_80
 B:TOUCH:LOSE_ALL
 F:FORCE_SLEEP | FORCE_MAXHP | CAN_FLY |
@@ -12873,7 +12873,7 @@ F:MALE |
 F:FORCE_SLEEP | DROP_1D2 | 
 F:OPEN_DOOR | BASH_DOOR | SMART | DWARF
 F:EVIL | LOW_MANA_RUN | MAGE
-S:HASTE | BLINK | BLIND | SLOW | CONF | DARKNESS | ADD_MANA
+S:HASTE | BLINK | BLIND | SLOW | CONF | DARKNESS | ADD_MANA | ILLUSION
 D:An illusionist of short stature.
 
 N:880:Gnome wizard
@@ -17130,7 +17130,7 @@ D:A disgusting mass of worms, indistinguishable from the stone around them
 D:until they move.  Acid drips from the worms and eats through the floor.
 
 N:1192:Stormcrow
-G:B:s
+G:B:b
 I:120:16d9:25:20:15
 W:22:5:0:110
 M:0:90:3:200
@@ -17878,4 +17878,30 @@ F:RES_EDGED | RES_BLUNT | EVASIVE | IM_COLD | ATTR_METAL
 S:BLINK | SLOW | HOLD | ADD_MANA | BOLT_COLD
 D:A sensuous spirit of water, awash with emotion and casting spells passionately.
 
+N:1244:Shantak
+G:B:y
+I:120:25d20:55:12:10
+W:34:2:0:280
+M:18:18:18:45
+B:BITE:HURT:3d6
+B:GAZE:LOSE_INT
+F:ANIMAL | EVIL | IM_ACID | BASH_DOOR
+S:SCARE | HASTE
+
+N:1245:Chicken
+G:B:w
+I:115:1d2:30:1:10
+W:0:3:0:0
+B:PECK:HURT
+F:RAND_25
+F:ANIMAL | CAN_FLY
+D:A barnyard chicken.
+
+N:1246:Cow
+G:Q:w
+I:105:2d6:30:1:10
+W:0:3:0:0
+B:BUTT:HURT
+F:ANIMAL
+D:A peacefully grazing bovine.
 

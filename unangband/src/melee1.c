@@ -666,10 +666,14 @@ bool make_attack_normal(int m_idx)
 				object_usage(slot);
 			}
 
+			/* Player armor reduces total damage */
+			damage -= (damage * ((p_ptr->ac + p_ptr->to_a < 150) ? p_ptr->ac + p_ptr->to_a: 150) / 250);
+
+
 			if (effect)
 			{
 				/* New result routine */
-				obvious = project_p(m_idx, 0, p_ptr->py, p_ptr->px, damage, effect);
+				(void)project_p(m_idx, 0, p_ptr->py, p_ptr->px, damage, effect);
 			}
 			else
 			{
@@ -5295,13 +5299,13 @@ bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
 		case TV_SPIKE:
 		{
 			/* Resist */
-			if (r_ptr->flags9 & (RF9_IM_EDGED))
+			if ((r_ptr->flags9 & (RF9_IM_EDGED)) != 0)
 			{
 				/* Resist */
 				resist = 85;
 
 				/* Learn */
-				if (!(l_ptr->flags9 & (RF9_IM_EDGED)) &&
+				if (((l_ptr->flags9 & (RF9_IM_EDGED)) == 0) &&
 					(m_ptr->ml))
 				{
 					l_ptr->flags9 |= (RF9_IM_EDGED);
@@ -5311,11 +5315,11 @@ bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
 				/* Take note */
 				note = "glances off of";
 			}
-			else if (r_ptr->flags9 & (RF9_RES_EDGED))
+			else if ((r_ptr->flags9 & (RF9_RES_EDGED)) != 0)
 			{
 				resist = 60;
 
-				if (!(l_ptr->flags9 & (RF9_RES_EDGED)) &&
+				if (((l_ptr->flags9 & (RF9_RES_EDGED)) == 0) &&
 					(m_ptr->ml))
 				{
 					l_ptr->flags9 |= (RF9_RES_EDGED);
@@ -5330,11 +5334,11 @@ bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
 
 		default:
 		{
-			if (r_ptr->flags9 & (RF9_IM_BLUNT))
+			if ((r_ptr->flags9 & (RF9_IM_BLUNT)) != 0)
 			{
 				resist = 85;
 
-				if (!(l_ptr->flags9 & (RF9_IM_BLUNT)) &&
+				if (((l_ptr->flags9 & (RF9_IM_BLUNT)) == 0) &&
 					(m_ptr->ml))
 				{
 					l_ptr->flags9 |= (RF9_IM_BLUNT);
@@ -5346,11 +5350,11 @@ bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
 				else
 					note = "bounces off of";
 			}
-			else if (r_ptr->flags9 & (RF9_RES_BLUNT))
+			else if ((r_ptr->flags9 & (RF9_RES_BLUNT)) != 0)
 			{
 				resist = 60;
 
-				if (!(l_ptr->flags9 & (RF9_RES_BLUNT)) &&
+				if (((l_ptr->flags9 & (RF9_RES_BLUNT)) == 0) &&
 					(m_ptr->ml))
 				{
 					l_ptr->flags9 |= (RF9_RES_BLUNT);

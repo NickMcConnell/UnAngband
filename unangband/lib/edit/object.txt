@@ -2764,6 +2764,7 @@ I:5:0:0
 W:1:0:10:1
 A:1/1
 P:0:1d1:0:0:0
+F:THROWING
 
 N:346:& Wooden Torch~
 G:~:U

@@ -3142,7 +3142,7 @@ void do_cmd_fire(void)
 			if (m_ptr->mflag & (MFLAG_HIDE)) continue;
 
 			/* Some monsters are great at dodging  -EZ- */
-			if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!m_ptr->csleep) &&
+			if (((r_ptr->flags9 & (RF9_EVASIVE))!= 0) && (!m_ptr->csleep) &&
 				(!m_ptr->blind) && (!m_ptr->confused) && (!m_ptr->monfear)
 				&& (rand_int(5 + m_ptr->cdis) >= (m_ptr->stunned ? 4 : 3)))
 			{

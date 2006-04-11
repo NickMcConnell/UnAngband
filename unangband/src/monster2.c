@@ -1800,6 +1800,27 @@ void monster_swap(int y1, int x1, int y2, int x2)
 		/* Change state */
 		p_ptr->outside = outside;
 
+		/* Hack -- display 'furnishings' */
+		if ((f_info[cave_feat[y2][x2]].flags3 & (FF3_ALLOC)) != 0)
+		{
+			feature_type *f_ptr = &f_info[cave_feat[y2][x2]];
+
+			msg_format("You %s %s %s.", p_ptr->blind || no_lite()? "feel" : "see", is_a_vowel((f_name + f_ptr->name)[0]) ? "an" : "a",
+				f_name + f_ptr->name);
+
+			play_info[y2][x2] |= (PLAY_MARK);
+
+			lite_spot(y2, x2);
+		}
+
+		/* If blind, silently notice what the player is on */
+		else if ((p_ptr->blind || no_lite()) && ((play_info[y2][x2] & (PLAY_MARK)) == 0) &&
+			((f_info[cave_feat[y2][x2]].flags1 & (FF1_NOTICE)) != 0))
+		{
+			play_info[y2][x2] |= (PLAY_MARK);
+
+			lite_spot(y2, x2);
+		}
 	}
 
 	/* Monster 2 */
@@ -1877,6 +1898,27 @@ void monster_swap(int y1, int x1, int y2, int x2)
 		/* Change state */
 		p_ptr->outside = outside;
 
+		/* Hack -- display 'furnishings' */
+		if ((f_info[cave_feat[y1][x1]].flags3 & (FF3_ALLOC)) != 0)
+		{
+			feature_type *f_ptr = &f_info[cave_feat[y1][x1]];
+
+			msg_format("You %s %s %s.", p_ptr->blind || no_lite()? "feel" : "see", is_a_vowel((f_name + f_ptr->name)[0]) ? "an" : "a",
+				f_name + f_ptr->name);
+
+			play_info[y1][x1] |= (PLAY_MARK);
+
+			lite_spot(y1, x1);
+		}
+
+		/* If blind, silently notice what the player is on */
+		else if ((p_ptr->blind || no_lite()) && ((play_info[y1][x1] & (PLAY_MARK)) == 0) &&
+			((f_info[cave_feat[y1][x1]].flags1 & (FF1_NOTICE)) != 0))
+		{
+			play_info[y1][x1] |= (PLAY_MARK);
+
+			lite_spot(y1, x1);
+		}
 	}
 
 

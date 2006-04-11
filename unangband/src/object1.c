@@ -3426,7 +3426,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 				}
 				else if (p_ptr->command_wrk == (USE_FLOOR))
 				{
-					for (i = 0; i <= floor_num; i++)
+					for (i = f1; i <= f2; i++)
 					{
 						object_type *o_ptr = &o_list[floor_list[i]];
 
