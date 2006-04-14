@@ -760,6 +760,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_FIRE:   q = "burn"; break;
 			case GF_COLD:   q = "freeze"; break;
 			case GF_POIS: q = "poison"; break;
+			case GF_ANIM_DEAD: q="animate dead"; break;
 			case GF_LITE: q = "blast with powerful light";break;
 			case GF_DARK: q = "blast with powerful darkness";break;
 			case GF_WATER: q="blast with water";break;
@@ -777,6 +778,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_MAKE_DOOR: q = "create doors";break;
 			case GF_MAKE_TRAP: q = "create traps";break;
 			case GF_BRIDGE: q = "create a stone bridge"; break;
+			case GF_ANIM_ELEMENT: q= "animate elements"; break;
 			case GF_AWAY_UNDEAD: q = "teleport away undead";break;
 			case GF_AWAY_EVIL: q = "teleport away evil";break;
 			case GF_AWAY_ALL: q = "teleport away";break;
@@ -786,6 +788,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_DISP_UNDEAD: q = "dispel undead";break;
 			case GF_DISP_EVIL: q = "dispel evil";break;
 			case GF_DISP_ALL: q = "dispel all";break;
+			case GF_ANIM_OBJECT: q = "animate objects"; break;
 			case GF_CLONE: q = "clone";break;
 			case GF_POLY: q = "polymorph";break;
 			case GF_HEAL: q = "heal";break;
@@ -838,6 +841,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_WOUND:		q = "wound"; break;
 			case GF_BATTER:		q = "batter"; break;
 			case GF_BLIND_WEAK:		q = "blind"; break;
+			case GF_RAISE_DEAD:	q = "raise dead"; break;
 		}
 
 

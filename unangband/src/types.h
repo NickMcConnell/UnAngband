@@ -1592,10 +1592,6 @@ struct tval_desc
 struct element_type
 {
 	int effect;
-	u32b feat_flags2;
-	u32b race_flags2;
-	u32b race_flags3;
-	u32b race_flags4;
-	u32b race_flags5;
-	u32b race_flags6;
+	u32b flags2;
+	int grp_idx;
 };

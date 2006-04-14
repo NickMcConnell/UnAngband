@@ -3336,7 +3336,7 @@ static bool summon_specific_okay(int r_idx)
 	switch (summon_specific_type)
 	{
 		case SUMMON_KIN:
-		case RAISE_KIN:
+		case RAISE_DEAD:
 		{
 			if (summon_char_type)
 			{
@@ -3353,7 +3353,58 @@ static bool summon_specific_okay(int r_idx)
 		/* Hack -- we combine two different flag types */
 		case ANIMATE_DEAD:
 		{
-			if (summon_flag_type)
+			/* Hack -- animate skulls */
+			if ((summon_char_type == '~') && (summon_attr_type == TERM_WHITE))
+			{
+				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
+
+					/* Match on undead */
+					(r_ptr->flags3 & (RF3_UNDEAD)) &&
+
+					/* Match on name */
+					((strstr(r_name + r_ptr->name, "Skull")) ||
+
+					/* Match on name */
+					(strstr(r_name + r_ptr->name, "skull")) ));
+
+			}
+			/* Hack -- animate hands */
+			else if ((summon_char_type == '~') && (summon_attr_type == TERM_RED))
+			{
+				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
+
+					/* Match on undead */
+					(r_ptr->flags3 & (RF3_UNDEAD)) &&
+
+					/* Match on name */
+					((strstr(r_name + r_ptr->name, "Hand")) ||
+
+					/* Match on name */
+					(strstr(r_name + r_ptr->name, "hand")) ));
+
+			}
+			else if (summon_char_type && summon_flag_type)
+			{
+				u32b summon_flag3_type = summon_flag_type & (0x0000FFFFL);
+				u32b summon_flag9_type = summon_flag_type & (0xFFFF0000L);
+
+				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
+
+					/* Match char */
+					(((r_ptr->d_char == summon_char_type) &&
+
+					/* Match flag */
+					((r_ptr->flags3 & (summon_flag3_type)) ||
+
+					/* Match flag */
+					(r_ptr->flags9 & (summon_flag9_type)) )) ||
+
+					/* Also can match some high level undead */
+					((summon_char_type == 's') && (r_ptr->d_char == 'L')) ||
+
+					((summon_char_type == 'z') && (r_ptr->d_char == 'N'))) );
+			}
+			else if (summon_flag_type)
 			{
 				u32b summon_flag3_type = summon_flag_type & (0x0000FFFFL);
 				u32b summon_flag9_type = summon_flag_type & (0xFFFF0000L);
@@ -3361,13 +3412,24 @@ static bool summon_specific_okay(int r_idx)
 				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
 
 					/* Match 'animated' undead */
-					(strchr("szLN", r_ptr->d_char)) &&
+					( ((strchr("sz", r_ptr->d_char)) &&
 
 					/* Match any */
 					((r_ptr->flags3 & (summon_flag3_type)) ||
 
 					/* Match any */
-					(r_ptr->flags9 & (summon_flag9_type)) ));
+					(r_ptr->flags9 & (summon_flag9_type)) )) ||
+
+					/* Also can match some high level undead without restriction */
+					(strchr("LN", r_ptr->d_char)) ));
+			}
+			else if (summon_char_type)
+			{
+				/* Match char */
+				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
+
+					/* Match char */
+					(r_ptr->d_char == summon_char_type));
 			}
 			else
 			{
@@ -3497,6 +3559,36 @@ static bool summon_specific_okay(int r_idx)
 			{
 				okay = ((r_ptr->grp_idx) &&
 					!(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			break;
+		}
+
+		case ANIMATE_OBJECT:
+		{
+			if (summon_attr_type && summon_char_type)
+			{
+				okay = (((r_ptr->d_attr == summon_attr_type) ||
+					(r_ptr->flags1 & (RF1_ATTR_CLEAR)) ||
+					(r_ptr->flags9 & (RF9_ATTR_INDEX))) && 
+					(r_ptr->d_char == summon_char_type) && 
+					!(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			else if (summon_attr_type)
+			{
+				okay = (((r_ptr->d_attr == summon_attr_type) ||
+					(r_ptr->flags1 & (RF1_ATTR_CLEAR)) ||
+					(r_ptr->flags9 & (RF9_ATTR_INDEX))) && 
+					!(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			else if (summon_char_type)
+			{
+				okay = ((r_ptr->d_char == summon_char_type) && 
+					!(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			else
+			{
+				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
+					strchr("&:;.,'!_-\\/[]~$%^*(){}+=<>?#",r_ptr->d_char));
 			}
 			break;
 		}
@@ -3927,7 +4019,6 @@ bool summon_specific(int y1, int x1, int lev, int type)
 	switch (summon_specific_type)
 	{
 		case SUMMON_KIN:
-		case RAISE_KIN:
 		{
 			if (!summon_char_type) summon_char_type = r_info[r_idx].d_char;
 			break;
@@ -3935,7 +4026,6 @@ bool summon_specific(int y1, int x1, int lev, int type)
 
 		/* Hack -- we combine two different flag types */
 		case SUMMON_RACE:
-		case ANIMATE_DEAD:
 		{
 			if (!summon_flag_type)
 			{
@@ -3953,7 +4043,6 @@ bool summon_specific(int y1, int x1, int lev, int type)
 				summon_flag_type |= r_info[r_idx].flags8 & (RF8_SKIN_MASK);
 
 				if (!summon_flag_type) summon_flag_type = RF8_HAS_SCALE;
-
 			}
 			break;
 		}

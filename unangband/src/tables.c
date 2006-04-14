@@ -3089,68 +3089,28 @@ const byte spell_desire_RF7[32][8] =
 const element_type element[MAX_ELEMENTS] =
 {
 	/* ELEM_FIRE */
-	{GF_FIRE, 0L,
-		  0L,
-		  (RF3_RES_LAVA),
-		  (RF4_BRTH_FIRE),
-		  (RF5_BALL_FIRE | RF5_BOLT_FIRE),
-		  0L },
+	{GF_FIRE, 0L, 14},
+
 	/* ELEM_EARTH */
-	{GF_SHARD, (FF2_HURT_ROCK | FF2_CAN_DIG),
-		   (RF2_CAN_DIG),
-		   (RF3_HURT_ROCK),
-		   (RF4_QUAKE | RF4_BRTH_SHARD),
-		   (RF5_BALL_SHARD),
-		  0L },
+	{0, (FF2_CAN_DIG), 13},
+
 	/* ELEM_AIR */
-	{GF_WIND, (FF2_CHASM),
-		  (RF2_CAN_FLY | RF2_MUST_FLY),
-		  0L,
-		  (RF4_BRTH_WIND),
-		  (RF5_BALL_WIND),
-		  0L },
+	{GF_WIND, (FF2_CHASM), 11 },
+
 	/* ELEM_WATER */
-	{GF_WATER, (FF2_WATER | FF2_CAN_SWIM),
-		  (RF2_CAN_SWIM | RF2_MUST_SWIM),
-		  (RF3_HURT_WATER | RF3_RES_WATER),
-		  0L,
-		  (RF5_BALL_WATER | RF5_BOLT_WATER),
-		  0L },
+	{GF_WATER, (FF2_WATER | FF2_CAN_SWIM), 12},
+
 	/* ELEM_MAGMA */
-	{GF_LAVA, (FF2_LAVA),
-		  0L,
-		  (RF3_DEMON | RF3_RES_PLAS),
-		  (RF4_BRTH_PLAS),
-		  (RF5_BOLT_PLAS | RF5_ARC_HFIRE),
-		  0L },
+	{GF_LAVA, (FF2_LAVA), 19},
+
 	/* ELEM_OOZE */
-	{GF_ACID, (FF2_ACID),
-		  0L,
-		  (RF3_OOZE),
-		  (RF4_BRTH_ACID),
-		  (RF5_BALL_ACID | RF5_BOLT_ACID),
-		  0L },
+	{GF_ACID, (FF2_ACID), 16},
+
 	/* ELEM_ICE */
-	{GF_ICE, (FF2_ICE),
-		  0L,
-		  0L,
-		  (RF4_BRTH_COLD),
-		  (RF5_BALL_COLD | RF5_BOLT_ICE | RF5_BEAM_ICE),
-		  0L },
+	{GF_ICE, (FF2_ICE), 18},
+
 	/* ELEM_SMOKE */
-	{GF_SMOKE, (FF2_OIL),
-		  0L,
-		  (RF3_HURT_LITE),
-		  (RF4_BRTH_DARK),
-		  (RF5_BALL_DARK),
-		  (RF6_DARKNESS) },
-	/* ELEM_LITE */
-	{GF_LITE, 0L,
-		  0L,
-		  0L,
-		  (RF4_BRTH_LITE),
-		  (RF5_BALL_LITE),
-		  0L }
+	{GF_SMOKE, (FF2_OIL), 17}
 };
 
 /*

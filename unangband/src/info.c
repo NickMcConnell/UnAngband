@@ -1125,6 +1125,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 			case GF_FIRE:   q = "burn"; break;
 			case GF_COLD:   q = "freeze"; break;
 			case GF_POIS: q = "poison"; break;
+			case GF_ANIM_DEAD: q = "animate dead"; break;
 			case GF_LITE: q = "blast"; u = "with powerful light";break;
 			case GF_DARK: q = "blast"; u = "with powerful darkness";break;
 			case GF_WATER: q="blast"; u = "with water";break;
@@ -1142,6 +1143,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 			case GF_MAKE_DOOR: q = "create"; s = "doors around"; break;
 			case GF_MAKE_TRAP: q = "create"; s = "traps around"; break;
 			case GF_BRIDGE: q = "create"; s = "a stone bridge under"; break;
+			case GF_ANIM_ELEMENT: q = "animate elements"; break;
 			case GF_AWAY_UNDEAD: q = "teleport"; u="away if undead";break;
 			case GF_AWAY_EVIL: q = "teleport"; u="away if evil";break;
 			case GF_AWAY_ALL: q = "teleport"; u = "away";break;
@@ -1151,6 +1153,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 			case GF_DISP_UNDEAD: q = "dispel"; u="if undead"; break;
 			case GF_DISP_EVIL: q = "dispel"; u="if evil"; break;
 			case GF_DISP_ALL: q = "dispel";break;
+			case GF_ANIM_OBJECT: q = "animate objects"; break;
 			case GF_CLONE: q = "clone";break;
 			case GF_POLY: q = "polymorph";break;
 			case GF_HEAL: q = "heal";break;
@@ -1203,6 +1206,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 			case GF_WOUND:		q = "wound"; break;
 			case GF_BATTER:		q = "batter"; break;
 			case GF_BLIND_WEAK:		q = "blind"; break;
+			case GF_RAISE_DEAD: q = "raise dead"; break;
 
 			/* Hack -- handle features */
 			case GF_FEATURE:

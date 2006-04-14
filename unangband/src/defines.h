@@ -657,7 +657,7 @@
  * Legal restrictions for "summon_specific()"
  */
 #define SUMMON_KIN	1
-#define RAISE_KIN	2
+#define RAISE_DEAD	2
 #define ANIMATE_DEAD	3
 /* XXX */
 #define RAISE_MONSTER   6
@@ -707,23 +707,23 @@
 #define GF_ICE		11
 #define GF_GRAVITY      12
 #define GF_INERTIA      13
-#define GF_FORCE		14
+#define GF_FORCE	14
 #define GF_TIME		15
 #define GF_ACID		16
 #define GF_ELEC		17
 #define GF_FIRE		18
 #define GF_COLD		19
 #define GF_POIS		20
-#define GF_XXX2		21
+#define GF_ANIM_DEAD	21
 #define GF_LITE		22
 #define GF_DARK		23
-#define GF_WATER		24
+#define GF_WATER	24
 #define GF_CONFUSION    25
-#define GF_SOUND		26
-#define GF_SHARD		27
-#define GF_NEXUS		28
+#define GF_SOUND	26
+#define GF_SHARD	27
+#define GF_NEXUS	28
 #define GF_NETHER       29
-#define GF_CHAOS		30
+#define GF_CHAOS	30
 #define GF_DISENCHANT   31
 #define GF_EXPLODE      32
 #define GF_KILL_WALL    33
@@ -733,7 +733,7 @@
 #define GF_MAKE_DOOR    37
 #define GF_MAKE_TRAP    38
 #define GF_BRIDGE       39
-#define GF_XXX6		40
+#define GF_ANIM_ELEMENT	40
 #define GF_AWAY_UNDEAD  41
 #define GF_AWAY_EVIL    42
 #define GF_AWAY_ALL	43
@@ -743,7 +743,7 @@
 #define GF_DISP_UNDEAD  47
 #define GF_DISP_EVIL    48
 #define GF_DISP_ALL	49
-#define GF_XXX7		50
+#define GF_ANIM_OBJECT	50
 #define GF_CLONE    	51
 #define GF_POLY		52
 #define GF_HEAL		53
@@ -782,23 +782,24 @@
 #define GF_EXP_20 	86
 #define GF_EXP_40 	87
 #define GF_EXP_80 	88
-#define GF_RAISE		89
-#define GF_LOWER		90
-#define GF_PROBE		91
+#define GF_RAISE	89
+#define GF_LOWER	90
+#define GF_PROBE	91
 #define GF_LOCK_DOOR	92
 #define GF_SALT_WATER	93
-#define GF_HALLU		94
+#define GF_HALLU	94
 #define GF_FEATURE	95
-#define GF_STEAM		96
-#define GF_VAPOUR		97
-#define GF_SMOKE		98
+#define GF_STEAM	96
+#define GF_VAPOUR	97
+#define GF_SMOKE	98
 #define GF_SUFFOCATE 	99
-#define GF_HUNGER		100
+#define GF_HUNGER	100
 #define GF_DISEASE	101
 #define GF_LOSE_MANA	102
-#define GF_WOUND		103
-#define GF_BATTER		104
-#define GF_BLIND_WEAK		105
+#define GF_WOUND	103
+#define GF_BATTER	104
+#define GF_BLIND_WEAK	105
+#define GF_RAISE_DEAD	106
 
 /*
  * Columns for the spell cost or damage flags

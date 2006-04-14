@@ -2476,8 +2476,10 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 
 	cptr f;
 
+	feature_type *f_ptr = &f_info[cave_feat[y][x]];
+
 	/* Set feature name */
-	f = (f_name + f_info[cave_feat[y][x]].name);
+	f = (f_name + f_ptr->name);
 
 	/* This is dangerous when creating features at the moment */
 #if 0
@@ -2490,7 +2492,7 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 
 	/* Hack -- prevent smoke/vapour etc on floors */
 	if ((typ != GF_FEATURE) && (who) &&
-		(f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR)))
+		(f_ptr->flags1 & (FF1_FLOOR)))
 	{
 		burnout = TRUE;
 	}
@@ -2504,14 +2506,14 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		{
 
 			/* Hack -- halve acid damage in water */
-			if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam /= 2;
+			if (f_ptr->flags2 & (FF2_WATER)) dam /= 2;
 		
 			/* Destroy hurt by acid */
-			if ((f_info[cave_feat[y][x]].flags2 & (FF2_HURT_ACID))  &&
-			       (dam > (f_info[cave_feat[y][x]].power*10)))
+			if ((f_ptr->flags2 & (FF2_HURT_ACID))  &&
+			       (dam > (f_ptr->power*10)))
 			{
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_info[cave_feat[y][x]].flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s dissolves.",f);
 					obvious = TRUE;
@@ -2526,7 +2528,7 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		case GF_SMOKE:
 		{
 			/* Hack -- halve fire damage in water */
-			if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam /= 2;
+			if (f_ptr->flags2 & (FF2_WATER)) dam /= 2;
 		
 			/* Drop through */
 		}
@@ -2534,11 +2536,11 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		case GF_PLASMA:
 		case GF_HELLFIRE:
 		{
-			if ((f_info[cave_feat[y][x]].flags2 & (FF2_HURT_FIRE)) &&
-			       (dam > (f_info[cave_feat[y][x]].power*10)))
+			if ((f_ptr->flags2 & (FF2_HURT_FIRE)) &&
+			       (dam > (f_ptr->power*10)))
 			{
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_info[cave_feat[y][x]].flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s burns up.",f);
 					obvious = TRUE;
@@ -2555,17 +2557,17 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		case GF_COLD:
 		{
 			/* Hack -- double cold damage in water */
-			if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam *= 2;
+			if (f_ptr->flags2 & (FF2_WATER)) dam *= 2;
 
 			/* Drop through */
 		}
 		case GF_ICE:
 		{
-			if ((f_info[cave_feat[y][x]].flags2 & (FF2_HURT_COLD)) &&
-			       (dam > (f_info[cave_feat[y][x]].power*10)))
+			if ((f_ptr->flags2 & (FF2_HURT_COLD)) &&
+			       (dam > (f_ptr->power*10)))
 			{
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_info[cave_feat[y][x]].flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s freezes.",f);
 					obvious = TRUE;
@@ -2582,11 +2584,11 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		case GF_FORCE:
 		case GF_SOUND:
 		{
-			if ((f_info[cave_feat[y][x]].flags2 & (FF2_KILL_HUGE)) &&
-			       (dam > (f_info[cave_feat[y][x]].power*10)))
+			if ((f_ptr->flags2 & (FF2_KILL_HUGE)) &&
+			       (dam > (f_ptr->power*10)))
 			{
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_info[cave_feat[y][x]].flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s shatters.",f);
 					obvious = TRUE;
@@ -2601,13 +2603,13 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		case GF_ELEC:
 		{
 			/* Hack -- double electricy damage in water */
-			if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam *= 2;
+			if (f_ptr->flags2 & (FF2_WATER)) dam *= 2;
 		
-			if ((f_info[cave_feat[y][x]].flags3 & (FF3_HURT_ELEC)) &&
-			       (dam > (f_info[cave_feat[y][x]].power*10)))
+			if ((f_ptr->flags3 & (FF3_HURT_ELEC)) &&
+			       (dam > (f_ptr->power*10)))
 			{
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_info[cave_feat[y][x]].flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s is struck by lightening.",f);
 					obvious = TRUE;
@@ -2627,11 +2629,11 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		case GF_SALT_WATER:
 		case GF_WATER:
 		{
-			if ((f_info[cave_feat[y][x]].flags3 & (FF3_HURT_WATER)) &&
-			       (dam > (f_info[cave_feat[y][x]].power*10)))
+			if ((f_ptr->flags3 & (FF3_HURT_WATER)) &&
+			       (dam > (f_ptr->power*10)))
 			{
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_info[cave_feat[y][x]].flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s floods.",f);
 					obvious = TRUE;
@@ -2648,11 +2650,11 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		case GF_BWATER:
 		{
 
-			if ((f_info[cave_feat[y][x]].flags3 & (FF3_HURT_BWATER)) &&
-			       (dam > (f_info[cave_feat[y][x]].power*10)))
+			if ((f_ptr->flags3 & (FF3_HURT_BWATER)) &&
+			       (dam > (f_ptr->power*10)))
 			{
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_info[cave_feat[y][x]].flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s evapourates.",f);
 					obvious = TRUE;
@@ -2665,11 +2667,11 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		}
 		case GF_POIS:
 		{
-			if ((f_info[cave_feat[y][x]].flags3 & (FF3_HURT_POIS)) &&
-			       (dam > (f_info[cave_feat[y][x]].power*10)))
+			if ((f_ptr->flags3 & (FF3_HURT_POIS)) &&
+			       (dam > (f_ptr->power*10)))
 			{
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_info[cave_feat[y][x]].flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s is poisoned.",f);
 					obvious = TRUE;
@@ -2705,10 +2707,10 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			/* Destroy traps */
-			if (f_info[cave_feat[y][x]].flags1 & (FF1_TRAP))
+			if (f_ptr->flags1 & (FF1_TRAP))
 			{
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_info[cave_feat[y][x]].flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_print("There is a bright flash of light!");
 					obvious = TRUE;
@@ -2719,10 +2721,10 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			/* Disarm other traps */
-			else if (f_info[cave_feat[y][x]].flags1 & (FF1_DISARM))
+			else if (f_ptr->flags1 & (FF1_DISARM))
 			{
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_info[cave_feat[y][x]].flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_print("Click!");
 					obvious = TRUE;
@@ -2733,13 +2735,13 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			/* Locked doors are unlocked */
-			else if (f_info[cave_feat[y][x]].flags1 & (FF1_OPEN))
+			else if (f_ptr->flags1 & (FF1_OPEN))
 			{
 				/* Unlock the door */
 				cave_alter_feat(y, x, FS_OPEN);
 
 				/* Check line of sound */
-				if ((player_has_los_bold(y, x)) && (f_info[cave_feat[y][x]].flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_print("Click!");
 					obvious = TRUE;
@@ -2754,10 +2756,10 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		{
 
 			/* Destroy traps */
-			if (f_info[cave_feat[y][x]].flags1 & (FF1_DOOR | FF1_TRAP))
+			if (f_ptr->flags1 & (FF1_DOOR | FF1_TRAP))
 			{
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_info[cave_feat[y][x]].flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_print("There is a bright flash of light!");
 					obvious = TRUE;
@@ -2775,10 +2777,10 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		{
 
 			/* Close doors/traps/chests */
-			if (f_info[cave_feat[y][x]].flags1 & (FF1_CLOSE))
+			if (f_ptr->flags1 & (FF1_CLOSE))
 			{
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_info[cave_feat[y][x]].flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					obvious = TRUE;
 				}
@@ -2788,12 +2790,12 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			/* Jam doors */
-			while (f_info[cave_feat[y][x]].flags1 & (FF1_SPIKE))
+			while (f_ptr->flags1 & (FF1_SPIKE))
 			{
 				int feat = cave_feat[y][x];
 
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_info[cave_feat[y][x]].flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					obvious = TRUE;
 				}
@@ -2814,10 +2816,10 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		{
 
 			/* Destroy walls/doors */
-			if (f_info[cave_feat[y][x]].flags2 & (FF2_HURT_ROCK))
+			if (f_ptr->flags2 & (FF2_HURT_ROCK))
 			{
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_info[cave_feat[y][x]].flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s turns to mud.", f);
 					obvious = TRUE;
@@ -2858,8 +2860,8 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		case GF_FEATURE:
 		{
 			/* Require a "floor or ground" grid */
-			if (!(f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR))
-			 && !(f_info[cave_feat[y][x]].flags3 & (FF3_GROUND))) break;
+			if (!(f_ptr->flags1 & (FF1_FLOOR))
+			 && !(f_ptr->flags3 & (FF3_GROUND))) break;
 
 			/* Don't hit caster */
 			if (cave_m_idx[y][x]== who) break;
@@ -2882,11 +2884,11 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 			int old_feat = cave_feat[y][x];
 			char name[80];
 
-			if (f_info[cave_feat[y][x]].flags1 & (FF1_SECRET)) cave_alter_feat(y,x,FS_SECRET);
+			if (f_ptr->flags1 & (FF1_SECRET)) cave_alter_feat(y,x,FS_SECRET);
 
 			cave_alter_feat(y,x,FS_BRIDGE);
 
-			strcpy(name,f_name+f_info[cave_feat[y][x]].name);
+			strcpy(name,f_name+f_ptr->name);
 
 			if (!(strstr(name,"stone bridge"))) cave_set_feat(y,x,old_feat);
 
@@ -2997,17 +2999,107 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 			/* All done */
 			break;
 		}
+
+		/* Animate elements */
+		case GF_ANIM_ELEMENT:
+		{
+			int i;
+
+			bool change = FALSE;
+
+			summon_group_type = 0;
+
+			for (i = 0; i < MAX_ELEMENTS; i++)
+			{
+				if ((element[i].effect == f_ptr->blow.effect) || (f_ptr->flags2 & (element[i].flags2)))
+				{
+					summon_group_type = element[i].grp_idx;
+					break;
+				}
+			}
+
+			if (summon_group_type)
+			{
+				if (summon_specific(y, x, who > 0 ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_ELEMENT)) change = TRUE;
+			}
+
+			if (change) cave_set_feat(y,x,FEAT_FLOOR_EARTH);
+
+			break;
+		}
+
+		/* Animate objects */
+		case GF_ANIM_OBJECT:
+		{
+			bool change = FALSE;
+
+			summon_attr_type = 0;
+			summon_char_type = 0;
+
+			/* Animate chests */
+			if (f_ptr->flags3 & (FF3_CHEST))
+			{
+				summon_char_type = '&';
+			}
+
+			/* Animate trees */
+			else if (f_ptr->flags3 & (FF3_TREE))
+			{
+				summon_char_type = ':';
+			}
+
+			/* Animate plants */
+			else if (f_ptr->flags3 & (FF3_LIVING))
+			{
+				summon_char_type = ';';
+			}
+
+			/* Animate embedded objects */
+			else if (f_ptr->k_idx)
+			{
+				object_kind *k_ptr = &k_info[f_ptr->k_idx];
+
+				/* XXX Be careful not to animate water as potion mimics */
+				if (k_ptr->tval != TV_POTION)
+				{
+					summon_attr_type = k_ptr->d_attr;
+					summon_char_type = k_ptr->d_char;
+				}
+			}
+
+			/* Animate anything else */
+			/* XXX Be careful not to animate rubble / deep terrain as trees / shallow terrain as plants / 
+				hidden objects as chest mimics */
+			else if ((f_ptr->d_char != ':') && (f_ptr->d_char != ';') && (f_ptr->d_char != '&'))
+			{
+				summon_attr_type = f_ptr->d_attr;
+				summon_char_type = f_ptr->d_char;
+			}
+
+			if (summon_attr_type || summon_char_type)
+			{
+				if (summon_specific(y, x, who > 0 ? r_info[who].level-1 : p_ptr->depth, ANIMATE_OBJECT)) change = TRUE;
+			}
+
+			if (change)
+			{
+				if (f_ptr->flags3 & (FF3_GET_FEAT)) cave_alter_feat(y, x, FS_GET_FEAT);
+				else if (f_ptr->flags3 & (FF3_OUTSIDE)) cave_set_feat(y,x, FEAT_GROUND);
+				else cave_set_feat(y,x,FEAT_FLOOR);
+			}
+
+			break;
+		}
+
 		case GF_NOTHING:
 
 			dam=0;
 			break;
-
-
 	}
 
 	/* Apply burnout */
 	if ((burnout) &&
-		(f_info[cave_feat[y][x]].flags3 & (FF3_SPREAD)))
+		(f_ptr->flags3 & (FF3_SPREAD)))
 	{
 		cave_alter_feat(y,x,FS_SPREAD);
 	}
@@ -3343,6 +3435,136 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 					if (ny != y || nx != x) do_move = TRUE;
 				}
 				break;
+			}
+
+			/* Animate objects */
+			case GF_ANIM_OBJECT:
+			{
+				if (!is_art)
+				{
+					summon_attr_type = k_info[o_ptr->k_idx].d_attr;
+					summon_char_type = k_info[o_ptr->k_idx].d_char;
+
+					/* Hack -- animate statues */
+					if (k_info[o_ptr->k_idx].tval == TV_STATUE) summon_char_type = 'g';
+
+					/* Hack -- animate assemblies */
+					if ((k_info[o_ptr->k_idx].tval == TV_ASSEMBLY) && (o_ptr->name3))
+					{
+						summon_race_type = o_ptr->name3;
+						if (summon_specific(y, x, 99, SUMMON_FRIEND)) do_kill = TRUE;
+					}
+					else
+					{
+						if (summon_specific(y, x, who > 0 ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_OBJECT)) do_kill = TRUE;
+					}
+				}
+				else
+				{
+					/* Hack -- force artifacts to be noticed */
+					do_kill = TRUE;
+				}
+				break;
+			}
+
+			/* Animate dead */
+			case GF_ANIM_DEAD:
+			{
+				summon_char_type = 0;
+				summon_attr_type = 0;
+
+				switch (k_info[o_ptr->k_idx].tval)
+				{
+					case TV_BONE:
+					{
+						if (k_info[o_ptr->k_idx].sval == SV_BONE_SKELETON) summon_char_type = 's';
+						else
+						{
+							summon_char_type = k_info[o_ptr->k_idx].d_char;
+							summon_attr_type = k_info[o_ptr->k_idx].d_attr;
+						}
+						break;
+					}
+					case TV_BODY:
+					{
+						if ((k_info[o_ptr->k_idx].sval == SV_BODY_CORPSE) || 
+							(k_info[o_ptr->k_idx].sval == SV_BODY_HEADLESS) ||
+							(k_info[o_ptr->k_idx].sval == SV_BODY_BUTCHERED))
+							 summon_char_type = 'z';
+						/* Hack -- animate hands and claws */
+						else if ((k_info[o_ptr->k_idx].sval == SV_BODY_HAND) ||
+							(k_info[o_ptr->k_idx].sval == SV_BODY_CLAW))
+						{
+							summon_char_type = k_info[o_ptr->k_idx].d_char;
+							summon_attr_type = k_info[o_ptr->k_idx].d_attr;
+						}
+						/* MegaHack -- animate heads */
+						else if (k_info[o_ptr->k_idx].sval == SV_BODY_HEAD)
+						{
+							summon_char_type = '~';
+							summon_attr_type = TERM_WHITE;
+						}
+						break;
+					}
+				}
+
+				/* Skeletons and zombies can be racially flavoured */
+				if ((summon_char_type) && !(summon_attr_type) && (o_ptr->name3))
+				{
+					summon_flag_type |= r_info[o_ptr->name3].flags3 & (RF3_RACE_MASK);
+					summon_flag_type |= r_info[o_ptr->name3].flags9 & (RF9_RACE_MASK);
+
+					/* Hack -- non-humanoids animate to undead of their own graphic */
+					if ((summon_flag_type & ~(RF3_ANIMAL | RF3_PLANT | RF3_INSECT | RF3_DRAGON)) == 0)
+					{
+						summon_flag_type = (RF3_UNDEAD);
+						summon_attr_type = 0;
+
+						summon_char_type = r_info[o_ptr->name3].d_char;
+					}
+				}
+
+				if (summon_char_type || summon_attr_type || summon_flag_type)
+				{
+					if (summon_specific(y, x, who > 0 ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_DEAD)) do_kill = TRUE;
+				}
+				break;
+			}
+
+			/* Raise dead */
+			case GF_RAISE_DEAD:
+			{
+				bool raise = FALSE;
+
+				switch (k_info[o_ptr->k_idx].tval)
+				{
+					case TV_BONE:
+					{
+						if (k_info[o_ptr->k_idx].sval == SV_BONE_SKELETON) raise = TRUE;
+						break;
+					}
+					case TV_BODY:
+					{
+						if ((k_info[o_ptr->k_idx].sval == SV_BODY_CORPSE) || 
+							(k_info[o_ptr->k_idx].sval == SV_BODY_HEADLESS) ||
+							(k_info[o_ptr->k_idx].sval == SV_BODY_BUTCHERED))
+							 raise = TRUE;
+						break;
+					}
+				}
+
+				if ((raise) && (o_ptr->name3) && !(summon_race_type))
+				{
+					summon_race_type = o_ptr->name3;
+
+					if (summon_specific(y, x, who > 0 ? r_info[who].level - 1 : p_ptr->depth, RAISE_DEAD)) do_kill = TRUE;
+
+					summon_race_type = 0;
+				}
+				else if ((raise) && (o_ptr->name3 == summon_race_type))
+				{
+					if (summon_specific(y, x, 99, RAISE_DEAD)) do_kill = TRUE;
+				}
 			}
 		}
 

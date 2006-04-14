@@ -4395,11 +4395,11 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			if (who > 0)
 			{
-				if (((blind) && (known)) && (target < 0)) msg_format("%^s mumbles.", m_name);
-				else if (known) msg_format("%^s magically reanimates %s %s from %s.", m_name, m_poss,
+				if (((blind) && (known)) && (target < 0)) result = format("%^s mumbles.", m_name);
+				else if (known) result = format("%^s magically reanimates %s %s from %s.", m_name, m_poss,
 						((r_ptr->flags1) & RF1_UNIQUE ? "minions" : "kin"),
 						((r_ptr->flags3) & RF3_NONLIVING ? "spare parts" : "death"));
-				else msg_print("You hear distant chanting.");
+				else result = "You hear distant chanting.";
 
 				/* Hack -- Set the letter of the monsters to summon */
 				summon_char_type = r_ptr->d_char;
@@ -4410,11 +4410,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				summon_char_type = '\0';
 			}
 
-			/* Count them for later */
-			for (k = 0; k < 6; k++)
-			{
-				count += summon_specific(y, x, rlev - 1, RAISE_KIN);
-			}
+			/* Raise the dead */
+			mon_ball(who, y, x, GF_RAISE_DEAD, 0, 3, TRUE, result);
 			break;
 		}
 
@@ -4426,16 +4423,13 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			if (who > 0)
 			{
-				if (((blind) && (known)) && (target < 0)) msg_format("%^s mumbles.", m_name);
-				else if (known) msg_format("%^s animates dead bodies near %s.", m_name, t_name);
-				else msg_print("You hear distant chanting.");
+				if (((blind) && (known)) && (target < 0)) result = format("%^s mumbles.", m_name);
+				else if (known) result = format("%^s animates dead bodies near %s.", m_name, t_name);
+				else result = "You hear distant chanting.";
 			}
 
-			/* Count them for later */
-			for (k = 0; k < 6; k++)
-			{
-				count += summon_specific(y, x, rlev, ANIMATE_DEAD);
-			}
+			/* Animate dead */
+			mon_ball(who, y, x, GF_ANIM_DEAD, 0, 3, TRUE, result);
 			break;
 		}
 
@@ -4487,16 +4481,13 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			if (who > 0)
 			{
-				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
-				else if (known) msg_format("%^s magically reanimates a monster!", m_name);
-				else msg_print("You hear distant chanting.");
+				if ((blind) && (known)) result = format("%^s mumbles.", m_name);
+				else if (known) result = format("%^s magically reanimates a monster!", m_name);
+				else result = "You hear distant chanting.";
 			}
 
-			/* Count them for later */
-			for (k = 0; k < 1; k++)
-			{
-				count += summon_specific(y, x, rlev - 1, 0);
-			}
+			/* Raise the dead */
+			mon_ball(who, y, x, GF_RAISE_DEAD, 0, 3, TRUE, result);
 			break;
 		}
 
@@ -4919,16 +4910,13 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (who > 0)
 			{
-				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
-				else if (known) msg_format("%^s magically animates the elements around %s.", m_name, t_name);
-				else msg_print("You hear distant chanting.");
+				if ((blind) && (known)) result = format("%^s mumbles.", m_name);
+				else if (known) result = format("%^s magically animates the elements around %s.", m_name, t_name);
+				else result = "You hear distant chanting.";
 			}
 
-			/* Count them for later */
-			for (k = 0; k < 6; k++)
-			{
-				count += summon_specific(y, x, rlev - 1, ANIMATE_ELEMENT);
-			}
+			/* Animate elements */
+			mon_ball(who, y, x, GF_ANIM_ELEMENT, 0, 3, TRUE, result);
 			break;
 		}
 
@@ -4940,16 +4928,13 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (who > 0)
 			{
-				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
-				else if (known) msg_format("%^s magically animates the objects around %s.", m_name, t_name);
-				else msg_print("You hear distant chanting.");
+				if ((blind) && (known)) result = format("%^s mumbles.", m_name);
+				else if (known) result = format("%^s magically animates the objects around %s.", m_name, t_name);
+				else result = "You hear distant chanting.";
 			}
 
-			/* Count them for later */
-			for (k = 0; k < 3; k++)
-			{
-				count += summon_specific(y, x, rlev, ANIMATE_OBJECT);
-			}
+			/* Animate objects */
+			mon_ball(who, y, x, GF_ANIM_OBJECT, 0, 3, TRUE, result);
 			break;
 		}
 

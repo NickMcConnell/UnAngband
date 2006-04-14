@@ -206,7 +206,7 @@ static cptr r_info_blow_effect[] =
 	"FIRE",
 	"COLD",
 	"POISON",
-	"XXX2",
+	"ANIM_DEAD",
 	"LITE",
 	"DARK",
 	"WATER",
@@ -225,7 +225,7 @@ static cptr r_info_blow_effect[] =
 	"MAKE_DOOR",
 	"MAKE_TRAP",
 	"BRIDGE",
-	"XXX6",
+	"ANIM_ELEMENT",
 	"AWAY_UNDEAD",
 	"AWAY_EVIL",
 	"AWAY_ALL",
@@ -235,7 +235,7 @@ static cptr r_info_blow_effect[] =
 	"DISPEL_UNDEAD",
 	"DISPEL_EVIL",
 	"DISPEL_ALL",
-	"XXX7",
+	"ANIM_OBJECT",
 	"CLONE",
 	"POLYMORPH",
 	"HEAL",
@@ -291,6 +291,7 @@ static cptr r_info_blow_effect[] =
 	"WOUND",
 	"BATTER",
 	"BLIND_WEAK",
+	"RAISE_DEAD",
 	NULL
 };
 

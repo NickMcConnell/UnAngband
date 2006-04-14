@@ -2445,13 +2445,13 @@ F:INSECT
 D:It makes you itch just to look at it.
 
 N:188:Lurker
-G:.:w
+G:^:w
 I:110:30d10:30:25:10
 W:22:3:0:80
 B:ENGULF:HURT:4d8
 B:ENGULF:HURT:4d8
 F:CHAR_CLEAR | ATTR_CLEAR
-F:NEVER_MOVE | FORCE_MAXHP
+F:NEVER_MOVE | FORCE_MAXHP | NEVER_MISS
 F:EMPTY_MIND | INVISIBLE | COLD_BLOOD
 F:NO_CONF | NO_SLEEP | NO_FEAR
 D:A strange creature that merges with the dungeon floor, trapping its
@@ -2907,7 +2907,7 @@ D:A whirlwind of sentient flame.
 N:221:Fire hound
 G:Z:r
 I:110:10d6:30:30:0
-W:17:2:0:70
+W:17:2:14:70
 M:10:0:0:0
 B:BITE:FIRE:2d6
 B:CLAW:FIRE:3d3
@@ -3160,7 +3160,7 @@ D:A strange reptilian hybrid with three heads.
 N:238:Earth hound
 G:Z:u
 I:110:15d8:30:30:0
-W:24:2:0:200
+W:24:2:13:200
 M:10:0:0:0
 B:BITE:HURT:1d12
 B:CLAW:HURT:3d3
@@ -3176,7 +3176,7 @@ D: clearly presents.  Your flesh tingles as it approaches.
 N:239:Air hound
 G:Z:g
 I:110:15d8:30:30:0
-W:24:2:0:200
+W:24:2:11:200
 M:10:0:0:0
 B:BITE:HURT:1d12
 B:CLAW:HURT:3d3
@@ -3203,7 +3203,7 @@ D: even the strongest armour.
 N:241:Acid hound
 G:Z:s
 I:110:15d8:30:30:0
-W:25:2:0:200
+W:25:2:16:200
 M:10:0:0:0
 B:BITE:ACID:1d8
 B:BITE:ACID:1d8
@@ -3368,7 +3368,7 @@ D: unsuspecting adventurers within reach of its venomous claws.
 N:252:Fire vortex
 G:v:r
 I:110:9d9:100:30:0
-W:21:1:0:100
+W:21:1:14:100
 M:18:0:0:0
 B:ENGULF:FIRE:3d3
 B:AURA:FIRE:3d3
@@ -3382,7 +3382,7 @@ D:A whirling maelstrom of fire.
 N:253:Water vortex
 G:v:s
 I:110:9d9:100:30:0
-W:21:1:0:100
+W:21:1:12:100
 M:18:0:0:0
 B:ENGULF:WATER:3d3
 B:AURA:WATER_WEAK:3d3
@@ -4520,7 +4520,7 @@ F:SNEAKY | SNEAKY
 D:A humanoid clothed in black who moves with blinding speed.
 
 N:332:Memory moss
-G:,:G
+G:;:G
 I:110:10d2:30:1:5
 W:5:5:0:150
 M:0:18:0:56
@@ -5249,7 +5249,7 @@ D: energy from your soul to feed its power.
 N:378:Phantom
 G:G:v
 I:120:20d25:30:30:20
-W:59:1:0:400
+W:60:1:0:400
 M:0:20:35:35
 B:TOUCH:EXP_80
 B:TOUCH:EXP_40
@@ -5417,12 +5417,12 @@ D:It has a form that legends are made of.  Its still-tender scales are a
 D: deepest red hue.  Heat radiates from its form.
 
 N:388:Trapper
-G:.:w
+G:^:w
 I:120:60d10:30:75:10
 W:26:3:0:580
 B:TRAP:HURT:4d17
 B:HIT:PARALYZE:40d2
-F:CHAR_CLEAR | ATTR_CLEAR
+F:CHAR_CLEAR | ATTR_CLEAR | NEVER_MISS
 F:NEVER_MOVE | FORCE_MAXHP
 F:INVISIBLE | EMPTY_MIND | COLD_BLOOD
 F:NO_CONF | NO_SLEEP | NO_FEAR
@@ -6524,7 +6524,7 @@ D: he exacts his retribution on everything that falls in his path.
 N:456:Glabrezu
 G:U:U
 I:110:70d10:20:40:80
-W:39:1:0:3000
+W:31:1:0:3000
 M:0:12:20:56
 B:HIT:HURT:3d4
 B:HIT:HURT:3d4
@@ -7345,7 +7345,7 @@ D:A skeletal hand floating in the air, motionless except for its flexing
 D: fingers.
 
 N:500:Eye druj
-G:s:r
+G:s:R
 I:130:10d100:20:90:10
 W:68:3:0:15000
 M:0:100:55:95
@@ -7815,6 +7815,49 @@ S:S_UNDEAD
 D:A humanoid form,  black as night, advancing steadily and unstoppably, even
 D: the very rock of the dungeon cannot prevent it reaching you.
 
+N:525:Penitent
+G:s:s
+I:110:25d10:30:35:40
+W:25:2:0:300
+M:0:25:20:45
+B:HIT:HURT:4d5
+B:TOUCH:LOSE_MANA:1d5
+F:DROP_1D2 |
+F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | RES_EDGED | UNDEAD
+F:EVIL | SMART | HAS_AURA | IM_ELEC | IM_POIS | IM_FIRE | IM_COLD | NO_CUTS
+S:A_DEAD | WOUND | CURSE | ADD_MANA
+D:A skeletal form, which brings back the dead from beyond the grave...
+
+N:526:Castigant
+G:s:g
+I:115:75d10:40:55:40
+W:34:2:0:500
+M:0:25:25:55
+B:HIT:HURT:6d5
+B:TOUCH:LOSE_MANA:3d5
+B:AURA:ANIM_DEAD
+F:DROP_1D2 |
+F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | RES_EDGED | UNDEAD
+F:EVIL | SMART | HAS_AURA | IM_ELEC | IM_POIS | IM_FIRE | IM_COLD | NO_CUTS
+S:BLINK | BOLT_FIRE | WOUND | CURSE | ADD_MANA
+S:S_DEMON
+D:A skeletal form, which conjures forth demons from beyond...
+
+N:527:Revenant
+G:s:v
+I:120:25d100:50:75:40
+W:58:2:0:1500
+M:0:25:30:65
+B:HIT:HURT:10d5
+B:TOUCH:LOSE_MANA:5d5
+B:AURA:ANIM_DEAD
+F:DROP_2D2 |
+F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | RES_EDGED | UNDEAD
+F:EVIL | SMART | HAS_AURA | IM_ELEC | IM_POIS | IM_FIRE | IM_COLD | NO_CUTS
+S:BLINK | TPORT | TELE_SELF_TO | TELE_TO | ADD_MANA
+S:CURSE | WOUND
+D:A skeletal form, around which the dead rise up in unlife...
+
 # Was Feagwath, the Undead Sorcerer
 
 N:528:The Lord of the Paths of the Dead
@@ -7822,23 +7865,23 @@ G:L:y
 I:130:50d100:20:85:50
 W:85:2:0:30000
 M:0:60:90:162
-B:TOUCH:EXP_80:6d12
-B:TOUCH:UN_POWER:6d12
-B:TOUCH:LOSE_DEX:6d12
-B:TOUCH:LOSE_DEX:6d12
+B:TOUCH:EXP_80:8d12
+B:TOUCH:UN_POWER:8d12
+B:TOUCH:LOSE_DEX:8d12
+B:AURA:ANIM_DEAD
 F:UNIQUE | MALE
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ESCORT
 F:ONLY_ITEM | DROP_2D2 | DROP_4D2 | DROP_GOOD | DROP_GREAT
 F:SMART | COLD_BLOOD | OPEN_DOOR | BASH_DOOR
 F:EVIL | UNDEAD | IM_COLD
-F:IM_POIS | NO_CONF | NO_SLEEP
+F:IM_POIS | NO_CONF | NO_SLEEP | HAS_AURA
 S:BLINK | TELE_TO | BLIND | HOLD | SCARE | WOUND
 S:MIND_BLAST | TRAPS | BALL_MANA
 S:BOLT_MANA | BALL_NETHR | S_KIN | S_MONSTERS | S_UNDEAD
 D:The mightiest of the oath breakers who lie in the Paths of the Dead.  His
-D:powerful blows and fell magic rain down on you, for you are not an heir 
-D:of Isildur.
+D: powerful blows and fell magic rain down on you, for you are not an heir
+D: of Isildur.
 
 # Was Ungoliant, the Unlight
 
@@ -7945,7 +7988,7 @@ D: is fated never to die by the hand of mortal man.
 N:537:Magma hound
 G:Z:r
 I:120:40d10:25:80:30
-W:51:3:0:600
+W:51:3:19:600
 M:20:0:0:0
 B:BITE:FIRE:3d12
 B:BITE:FIRE:3d12
@@ -10052,7 +10095,7 @@ F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT | NO_CUTS | NO_STUN | RES_BLIND
 D:Ugh! It quickly creeps along the dungeon floor.
 
 N:668:Many-eyed moss
-G:,:o
+G:;:o
 I:110:10d2:30:1:5
 W:6:5:0:40
 M:18:18:0:60
@@ -10067,7 +10110,7 @@ D:A mass of orange vegetation. Its many eyes follow your every
 D: movement.
 
 N:669:Moross moss
-G:,:y
+G:;:y
 I:110:10d2:30:1:5
 W:7:5:0:15
 M:0:18:0:40
@@ -10082,7 +10125,7 @@ D:A mass of yellow vegetation. You feel apathetic looking at
 D: its sluggish fronds.
 
 N:670:Mischievous moss
-G:,:B
+G:;:B
 I:120:10d2:30:1:5
 W:8:3:0:80
 M:0:25:2:70
@@ -10097,7 +10140,7 @@ D:A mass of bright blue vegetation. It wiggles its tiny fronds
 D: in mischevious anticipation.
 
 N:671:Machievallian moss
-G:,:u
+G:;:u
 I:120:10d2:30:1:5
 W:10:4:0:80
 M:0:40:3:80
@@ -10112,7 +10155,7 @@ D:A mass of brown vegetation. Its fronds move cloyingly
 D:towards you, then dart away.
 
 N:672:Maggoty moss
-G:,:s
+G:;:s
 I:110:10d2:30:1:5
 W:9:4:0:110
 M:0:50:3:90
@@ -10364,7 +10407,7 @@ D: cring away from its terrifying visage.
 N:695:Ancient brass dragon
 G:A:o
 I:120:10d100:20:100:70
-W:59:3:0:2750
+W:62:3:0:2750
 M:18:18:18:35
 B:CLAW:HURT:4d9
 B:CLAW:HURT:4d9
@@ -11819,7 +11862,7 @@ S:DRAIN_MANA | BALL_CHAOS
 D:A disembodied eye, surrounded by chaotic energies.
 
 N:800:Faerie light
-G:E:w
+G:~:B
 I:120:1d1:6:1:0
 W:0:3:0:0
 F:FORCE_SLEEP | 
@@ -12236,7 +12279,7 @@ D:It is a large brass statue cast in the shape of a monkey.
 N:834:Ice golem
 G:g:B
 I:120:70d8:10:60:10
-W:33:1:0:500
+W:33:1:18:500
 M:0:11:33:90
 B:HIT:HURT:4d6
 B:TOUCH:COLD:4d3
@@ -12473,7 +12516,7 @@ F:RAND_50 | DROP_60 | DROP_90 | CAN_FLY |
 F:COLD_BLOOD | TAKE_ITEM | PASS_WALL | 
 F:EVIL | UNDEAD | IM_BLUNT | NO_CUTS | NO_STUN
 F:IM_COLD | NO_CONF | NO_SLEEP | CAN_FLY
-S:TPORT | DRAIN_MANA
+S:TPORT | DRAIN_MANA | HUNGER
 D:It is thin and insubstantial.
 
 N:850:Bitter soul
@@ -12559,7 +12602,7 @@ F:RAND_25 | DROP_1D2 | CAN_FLY |
 F:COLD_BLOOD | TAKE_ITEM | PASS_WALL | 
 F:EVIL | UNDEAD | IM_POIS | IM_BLUNT | NO_CUTS | NO_STUN
 F:IM_COLD | NO_CONF | NO_SLEEP | CAN_FLY
-S:TPORT | DRAIN_MANA
+S:TPORT | DRAIN_MANA | HUNGER
 D:It is starved away to nothing.
 
 N:856:Hateful soul
@@ -14069,7 +14112,7 @@ F:EVIL | UNDEAD | IM_COLD | IM_POIS | RES_EDGED | IM_ELEC
 F:NO_CONF | NO_SLEEP | KILL_WALL | RES_NETHR | RES_NEXUS
 S:TELE_TO | BLIND | HOLD | CONF | WOUND | DRAIN_MANA | 
 S:MIND_BLAST | BALL_MANA | BALL_NETHR | CURSE
-S:S_UNDEAD
+S:S_UNDEAD | HUNGER
 D:A humanoid form,  black as night, advancing steadily and unstoppably, even
 D: the very rock of the dungeon cannot prevent it reaching you.
 
@@ -15168,7 +15211,7 @@ D:This shill seems a little out of place and down on his luck.
 N:1057:Grand Master thief
 G:t:v
 I:130:25d100:50:75:40
-W:60:2:0:1500
+W:57:2:0:1500
 M:25:25:30:65
 B:HIT:EAT_ITEM:5d5
 B:HIT:EAT_ITEM:5d5
@@ -15236,7 +15279,7 @@ D: and stronger than most other trolls.
 N:1062:Troll King
 G:T:o
 I:120:30d50:30:75:20
-W:59:1:0:2000
+W:61:1:0:2000
 B:HIT:BATTER:2d12
 B:HIT:BATTER:2d12
 B:BITE:HURT:3d10
@@ -15497,7 +15540,7 @@ D: clearly presents as it bores through the dungeon towards you.
 N:1080:Water hound
 G:Z:s
 I:110:15d6:30:30:0
-W:20:2:0:200
+W:20:2:12:200
 B:BITE:HURT:1d10
 B:CLAW:HURT:3d3
 F:FORCE_SLEEP | 
@@ -15864,7 +15907,7 @@ S:SLOW | SCARE | WOUND | BLINK | TELE_TO | ADD_MANA
 D:A floating skull possessed by a malignant spirit.
 
 N:1109:Flaming skull
-G:s:B
+G:s:r
 I:120:6d8:15:30:30
 W:15:2:0:45
 M:0:33:7:50
@@ -15879,7 +15922,7 @@ S:BOLT_FIRE | SCARE | BLINK | TELE_TO | ADD_MANA
 D:A fiery-wreathed skull possessed by an infernal spirit.
 
 N:1110:Screaming skull
-G:s:B
+G:s:G
 I:115:10d8:15:30:30
 W:20:2:0:30
 B:BITE:POISON:1d6
@@ -16883,6 +16926,7 @@ B:BITE:POISON:1d3
 F:COLD_BLOOD | FRIEND | RAND_25 | OPEN_DOOR | 
 F:UNDEAD | EVIL | RES_EDGED | HURT_LITE | IM_ELEC | IM_COLD | IM_POIS | 
 F:NO_STUN | NO_CONF | NO_SLEEP
+S:A_DEAD | WOUND | S_UNDEAD
 D:It is a frightening skeletal figures in black robes. 
 
 N:1169:Whirling hatchet
@@ -17009,7 +17053,7 @@ D:One of the smaller pythons; it is about ten feet long and quite muscular.
 N:1182:Whirlwind
 G:~:u
 I:115:2d5:25:5:0
-W:1:3:0:3
+W:1:3:11:3
 B:ENGULF:BATTER:1d1
 F:EMPTY_MIND | BASH_DOOR | RAND_25 | RAND_50 | CAN_FLY
 F:NO_FEAR | NO_CONF | NO_SLEEP | NO_CUTS | IM_POIS
@@ -17460,7 +17504,7 @@ D:She hunts you down patiently, ready with her poison-tipped blades.
 N:1216:Living tornado
 G:~:u
 I:130:40d10:15:60:0:1
-W:52:3:250:1000
+W:52:3:11:1000
 M:50:50:16:250
 B:ENGULF:HURT:10d3
 B:BOULDER:HURT:13d6
@@ -17474,9 +17518,9 @@ F:NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP | DROP_JUNK | HAS_AURA
 F:DROP_2D2 | DROP_3D2 | DROP_4D2
 S:BRTH_SHARD | BRTH_WIND | BRTH_FORCE | AURA 
 S:ARC_FORCE | ADD_MANA
-D:An intense storm, churning and roiling, powerful enough to pick up trees 
-D:and drive them through walls.  It holds missiles of every sort, and will 
-D:gladly fling them at you.
+D:An intense storm, churning and roiling, powerful enough to pick up trees
+D: and drive them through walls.  It holds missiles of every sort, and will
+D: gladly fling them at you.
 
 N:1217:Mana vortex
 G:v:v
@@ -17789,7 +17833,7 @@ D: tiny legs.
 N:1237:Marid
 G:E:B
 I:120:12d100:12:50:50
-W:59:2:12:3000
+W:60:2:12:3000
 M:0:10:50:60
 B:HIT:HURT:5d6
 B:HIT:HURT:5d6
@@ -17973,3 +18017,38 @@ F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:NEED_LITE | SMART
 S:TRAPS
 D:An expert with traps and explosives, he is missing only a couple of fingers.
+
+N:1252:Smoke hound
+G:Z:v
+I:110:15d10:30:30:0
+W:27:2:17:200
+M:20:0:0:0
+B:BITE:DARK:2d8
+B:BITE:FIRE:2d8
+F:FORCE_SLEEP
+F:FRIENDS
+F:BASH_DOOR
+F:ANIMAL | NO_CONF | NO_SLEEP
+F:RES_DARK | IM_FIRE | RES_BLUNT | CAN_FLY | SCENT | SUPER_SCENT
+S:BRTH_DARK | BRTH_FIRE
+D:A dark and furious shifting cloud that gathers for a moment in the shape of a hound.
+
+N:1253:Crystal vortex
+G:v:w
+I:120:40d10:15:60:0:1
+W:44:3:0:600
+M:25:25:16:50
+B:ENGULF:SHATTER:10d10
+B:BOULDER:HURT:13d6
+B:SPIKE:HURT:21d5
+B:AURA:SHARD:5d5
+F:FORCE_SLEEP | ATTR_METAL | ATTR_CLEAR
+F:EMPTY_MIND | COLD_BLOOD | 
+F:RAND_25 | RAND_50 | BASH_DOOR | KILL_ITEM | KILL_WALL 
+F:DROP_1D2 | RES_EDGED | RES_WATER | RES_CHAOS | NO_CUTS
+F:DROP_2D2 | DROP_3D2 | DROP_4D2 | ONLY_GOLD
+F:NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP | HAS_AURA
+S:BRTH_SHARD | QUAKE
+D:An thundering, grinding, churning vortex of razor-sharp rubble that tears through
+D: the dungeon leaving a ruined jumble of rock in its wake.
+
