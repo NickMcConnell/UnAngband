@@ -1964,7 +1964,7 @@ void py_attack(int y, int x)
 	if (r_ptr->flags3 & (RF3_DEMON)) melee_style |= (1L <<WS_SLAY_DEMON);
 
 	/*** Handle styles ***/
-	for (i = 0;i< z_info->w_max;i++)
+	if (!p_ptr->heavy_wield) for (i = 0;i< z_info->w_max;i++)
 	{
 		if (w_info[i].class != p_ptr->pclass) continue;
 
@@ -1987,7 +1987,6 @@ void py_attack(int y, int x)
 				case WB_CRITICAL:
 					style_crit++;
 					break;
-
 			}
 		}
 	}
@@ -2015,7 +2014,7 @@ void py_attack(int y, int x)
 		/* Some monsters are great at dodging  -EZ- */
 		if (((r_ptr->flags9 & (RF9_EVASIVE)) != 0) && (!was_asleep)
 			&& (!m_ptr->confused) && (!m_ptr->blind) && (!m_ptr->monfear)
-			&& (rand_int(m_ptr->stunned ? 2 : 3)))
+			&& (rand_int(m_ptr->stunned ? 2 : 4)))
 		{
 			message_format(MSG_MISS, 0, "%^s evades your blow!",
 				m_name);
@@ -2470,7 +2469,7 @@ void move_player(int dir, int jumping)
 	}
 
 	/* Partial movement */
-	else if ((climb) && (dir !=p_ptr->climbing))
+	else if ((climb) && (dir != p_ptr->climbing))
 	{
 		if ((verify_safe) && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
 		{
@@ -2546,14 +2545,20 @@ void move_player(int dir, int jumping)
 			search();
 		}
 
-		/* Moving cautiously */
+		/* Dodging */
 		else
 		{
-			/* Rest after each step */
-			if (always_pickup) p_ptr->command_cmd = 'g';
-			else p_ptr->command_cmd = ',';
-			p_ptr->command_rep = 1;
-			p_ptr->command_dir = 5;
+			/* Dodging */
+			p_ptr->dodging = ddd_180[dir];
+
+			/* Hack -- not blocking */
+			p_ptr->blocking = 0;
+
+			/* Redraw */
+			p_ptr->redraw |= (PR_STATE);
+
+			/* Hack -- redraw straight away */
+			redraw_stuff();
 		}
 
 		/* Handle "objects" */

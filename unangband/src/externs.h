@@ -31,6 +31,7 @@ extern const s16b ddx[10];
 extern const s16b ddy[10];
 extern const s16b ddx_ddd[9];
 extern const s16b ddy_ddd[9];
+extern const s16b ddd_180[9];
 extern const char hexsym[16];
 extern const byte adj_mag_study[];
 extern const byte adj_mag_mana[];

@@ -959,22 +959,56 @@ static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 {
 	monster_type *m_ptr = &m_list[m_idx];
 
-	/* Do we even have this spell? */
-	if (i < 32)
+	/* Check the spell */
+	if (i < 128) 
 	{
-		if ((RF4_ASSIST_MASK | RF4_SUMMON_MASK) &(1L << (i   ))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
+		u32b flag = 1L << (i - 96);
+
+		if ((flag & (RF4_ASSIST_MASK | RF4_SUMMON_MASK)) != 0)
+		{
+			*tar_y = m_ptr->fy;
+			*tar_x = m_ptr->fx;
+		}
 	}
-	else if (i < 64)
+	else if (i < 160)
 	{
-		if ((RF5_ASSIST_MASK | RF5_SUMMON_MASK) &(1L << (i-32))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
+		u32b flag = 1L << (i - 128);
+
+		if ((flag & (RF5_ASSIST_MASK | RF5_SUMMON_MASK)) != 0)
+		{
+			*tar_y = m_ptr->fy;
+			*tar_x = m_ptr->fx;
+		}
 	}
-	else if (i < 96)
+	else if (i < 192)
 	{
-		if ((RF6_ASSIST_MASK | RF6_SUMMON_MASK) &(1L << (i-64))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
+		u32b flag = 1L << (i - 160);
+
+		if ((flag & (RF6_ASSIST_MASK | RF6_SUMMON_MASK)) != 0)
+		{
+			*tar_y = m_ptr->fy;
+			*tar_x = m_ptr->fx;
+		}
 	}
 	else
 	{
-		if ((RF7_ASSIST_MASK | RF7_SUMMON_MASK) &(1L << (i-96))) {*tar_y = m_ptr->fy;*tar_x = m_ptr->fx;}
+		u32b flag = 1L << (i - 192);
+
+		if ((flag & (RF7_ASSIST_MASK | RF7_SUMMON_MASK)) != 0)
+		{
+			*tar_y = m_ptr->fy;
+			*tar_x = m_ptr->fx;
+		}
+	}
+
+	/* Player dodges -- point the target at their old location */
+	if ((p_ptr->dodging) && (*tar_y == p_ptr->py) && (*tar_x == p_ptr->px)
+		&& (rand_int(100) < (extract_energy[p_ptr->pspeed] + adj_dex_ta[p_ptr->stat_ind[A_DEX]] - 128)))
+	{
+		/* msg_print("You dodge the attack."); */
+
+		*tar_y = *tar_y + ddy_ddd[p_ptr->dodging];
+		*tar_x = *tar_x + ddx_ddd[p_ptr->dodging];
 	}
 
 	return(i);
@@ -1235,7 +1269,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 
 			if (best_y + best_x > 0)
 			{
-				/*default: target the player*/
+				/* Set to best target */
 				*tar_y = best_y;
 				*tar_x = best_x;
 			}
@@ -4953,7 +4987,7 @@ static void process_monster(int m_idx)
 	int choice = 0;
 
 	int dir;
-	bool fear;
+	bool fear = FALSE;
 
 	bool bash;
 

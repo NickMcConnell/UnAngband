@@ -442,6 +442,12 @@ void teleport_player(int dis)
 	/* Move player */
 	monster_swap(py, px, y, x);
 
+	/* Set dodging -- 'random direction' */
+	p_ptr->dodging = rand_int(8);
+
+	/* Redraw state */
+	p_ptr->redraw |= (PR_STATE);
+
 	/* Handle stuff XXX XXX XXX */
 	handle_stuff();
 }
@@ -4683,7 +4689,10 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			/* Powerful monsters can resist */
 			if (monster_save(m_ptr, dam, &near))
 			{
-				if ((near) && (seen)) note = " seems ready to change.";
+				if ((near) && (seen))
+				{
+					note = " seems ready to change.";
+				}
 				else
 				{
 					if (seen) note = " is unaffected!";
@@ -4727,11 +4736,11 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		/* Heal Monster (use "dam" as amount of healing, except on undead) */
 		case GF_HEAL:
 		{
-			/* Hack -- heal undead */
+			if (seen) obvious = TRUE;
+
+			/* Hack -- hurt undead */
 			if (r_ptr->flags3 & (RF3_UNDEAD))
 			{
-				if (seen) obvious = TRUE;
-
 				if ((seen) && !(l_ptr->flags3 & (RF3_UNDEAD)))
 				{
 					note = " cringes from the touch of life.";
@@ -4754,12 +4763,13 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		/* Speed Monster (Ignore "dam") */
 		case GF_HASTE:
 		{
+			if (seen) obvious = TRUE;
+
 			/* Hack -- damage golems */
 			if (r_ptr->d_char == 'g')
 			{
 				if (seen)
 				{
-					obvious = TRUE;
 					note = " shudders as gears spin uncontrollably.";
 				}
 				note_dies = " flies apart in a jumble of gears and cogs.";
@@ -4778,11 +4788,11 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		/* Slow Monster (Use "dam" as "power") */
 		case GF_SLOW_WEAK:
 		{
+			if (seen) obvious = TRUE;
+
 			/* Cannot be slowed */
 			if (r_ptr->flags9 & (RF9_NO_SLOW))
 			{
-				if (seen) obvious = TRUE;
-
 				if ((seen) && !(l_ptr->flags9 & (RF9_NO_SLOW)))
 				{
 					note = " cannot be slowed or paralyzed.";
@@ -4793,11 +4803,15 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			/* Powerful monsters can resist */
 			else if (monster_save(m_ptr, dam, &near))
 			{
-				if ((near) && (seen)) note = " appears sluggish.";
+				if ((near) && (seen))
+				{
+					note = " appears sluggish.";
+					if (m_ptr->energy > 25) m_ptr->energy -= 25;
+					else (m_ptr->energy = 0);
+				}
 				else
 				{
 					if (seen) note = " is unaffected!";
-
 					obvious = FALSE;
 				}
 			}
@@ -4817,11 +4831,11 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		/* Sleep (Use "dam" as "power") */
 		case GF_SLEEP:
 		{
+			if (seen) obvious = TRUE;
+
 			/* Cannot be charmed */
 			if (r_ptr->flags3 & (RF3_NO_SLEEP))
 			{
-				if (seen) obvious = TRUE;
-
 				if ((seen) && !(l_ptr->flags3 & (RF3_NO_SLEEP)))
 				{
 					note = " cannot be charmed or slept.";
@@ -4832,11 +4846,14 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			/* Attempt a saving throw */
 			else if (monster_save(m_ptr, dam, &near))
 			{
-				if ((near) && (seen)) note = " appears drowsy.";
+				if ((near) && (seen))
+				{
+					note = " appears drowsy.";
+					do_sleep = 1;
+				}
 				else
 				{
 					if (seen) note = " is unaffected!";
-
 					obvious = FALSE;
 				}
 			}
@@ -4856,11 +4873,11 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		/* Confusion (Use "dam" as "power") */
 		case GF_CONF_WEAK:
 		{
+			if (seen) obvious = TRUE;
+
 			/* Memorize a flag */
 			if (r_ptr->flags3 & (RF3_NO_CONF))
 			{
-				if (seen) obvious = TRUE;
-
 				if ((seen) && !(l_ptr->flags3 & (RF3_NO_CONF)))
 				{
 					note = " cannot be confused.";
@@ -4871,11 +4888,14 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			/* Attempt a saving throw */
 			else if (monster_save(m_ptr, dam, &near))
 			{
-				if ((near) && (seen)) note = " appears dizzy.";
+				if ((near) && (seen))
+				{
+					note = " appears dizzy.";
+					do_conf = 1;
+				}
 				else
 				{
 					if (seen) note = " is unaffected!";
-
 					obvious = FALSE;
 				}
 			}
@@ -5321,7 +5341,11 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 			else if (monster_save(m_ptr, dam, &near))
 			{
-				if ((near) && (seen)) note = " appears cross-eyed.";
+				if ((near) && (seen))
+				{
+					note = " appears cross-eyed.";
+					do_blind = 1;
+				}
 				else
 				{
 					if (seen) note = " is unaffected!";
@@ -5385,12 +5409,17 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			/* Attempt a saving throw */
 			else if (monster_save(m_ptr, dam, &near))
 			{
-				if ((near) && (seen)) note = " appears sluggish.";
+				if ((near) && (seen))
+				{
+					note = " appears sluggish.";
+					if (m_ptr->energy > 25) m_ptr->energy -= 25;
+					else (m_ptr->energy = 0);
+				}
 				else
 				{
 					if (seen) note = " is unaffected!";
 
-					do_blind = FALSE;
+					do_sleep = FALSE;
 					obvious = FALSE;
 				}
 			}
@@ -5422,7 +5451,12 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			/* Attempt a saving throw */
 			else if (monster_save(m_ptr, dam, &near))
 			{
-				if ((near) && (seen)) note = " appears sluggish.";
+				if ((near) && (seen))
+				{
+					note = " appears sluggish.";
+					if (m_ptr->energy > 25) m_ptr->energy -= 25;
+					else (m_ptr->energy = 0);
+				}
 				else
 				{
 					if (seen) note = " is unaffected!";
@@ -5797,7 +5831,11 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			/* Powerful monsters can resist */
 			else if (monster_save(m_ptr, dam, &near))
 			{
-				if ((near) && (seen)) note = " appears cross-eyed.";
+				if ((near) && (seen))
+				{
+					note = " appears cross-eyed.";
+					do_blind = 1;
+				}
 				else
 				{
 					if (seen) note = " is unaffected!";
@@ -5993,7 +6031,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			if (!m_ptr->blind)
 			{
 				if (seen) obvious = TRUE;
-				note = " is blinded.";
+				if (do_blind > 1) note = " is blinded.";
 
 				/* Apply blindness */
 				m_ptr->blind = MIN(do_blind, 200);
@@ -6063,7 +6101,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			/* Was not confused */
 			else
 			{
-				note = " looks confused.";
+				if (do_conf > 1) note = " looks confused.";
 				tmp = do_conf;
 			}
 

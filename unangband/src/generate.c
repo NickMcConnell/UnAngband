@@ -5484,4 +5484,10 @@ void generate_cave(void)
 
 	/* Hack -- always get a feeling leaving town */
 	else old_turn = 0;
+
+	/* Set dodging - 'just appeared' */
+	p_ptr->dodging = 9;
+
+	/* Redraw state */
+	p_ptr->redraw |= (PR_STATE);
 }

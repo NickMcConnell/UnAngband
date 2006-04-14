@@ -1322,6 +1322,9 @@ static key_event inkey_aux(void)
 
 	/* Initialize the no return */
 	ke0.key = 0;
+	ke0.mousebutton = 0; /* To fix GCC warnings on X11 */
+	ke0.mousey = 0;
+	ke0.mousex = 0;
 
 	/* Wait for a keypress */
 	(void)(Term_inkey(&ke, TRUE, TRUE));
@@ -3305,7 +3308,7 @@ s16b get_quantity(cptr prompt, int max)
  */
 bool get_check(cptr prompt)
 {
-	char ch;
+	key_event ke;
 
 	char buf[80];
 
@@ -3321,10 +3324,12 @@ bool get_check(cptr prompt)
 	/* Get an acceptable answer */
 	while (TRUE)
 	{
-		ch = inkey();
+		ke = anykey();
+		if (ke.mousebutton == 1) ke.key = 'y';
+		if (ke.mousebutton == 2) ke.key = 'n';
 		if (quick_messages) break;
-		if (ch == ESCAPE) break;
-		if (strchr("YyNn", ch)) break;
+		if (ke.key == ESCAPE) break;
+		if (strchr("YyNn", ke.key)) break;
 		bell("Illegal response to a 'yes/no' question!");
 	}
 
@@ -3332,7 +3337,7 @@ bool get_check(cptr prompt)
 	prt("", 0, 0);
 
 	/* Normal negation */
-	if ((ch != 'Y') && (ch != 'y')) return (FALSE);
+	if ((ke.key != 'Y') && (ke.key != 'y')) return (FALSE);
 
 	/* Success */
 	return (TRUE);

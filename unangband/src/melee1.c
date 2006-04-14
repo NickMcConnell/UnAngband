@@ -104,7 +104,12 @@ static bool check_hit(int power, int level, int who, bool ranged)
 	if (k < 10) return (k < 5);
 
 	/* Total armor */
-	ac = p_ptr->ac + p_ptr->to_a + p_ptr->blocking;
+	ac = p_ptr->ac + p_ptr->to_a;
+
+	if ((p_ptr->blind) || (p_ptr->confused) || (p_ptr->image))
+		ac += p_ptr->blocking / 2;
+	else
+		ac += p_ptr->blocking;
 
 	/* Some items and effects count for more at range */
 	if (ranged)
@@ -131,6 +136,9 @@ static bool check_hit(int power, int level, int who, bool ranged)
 
 	/* Power and Level compete against Armor */
 	if ((power > 0) && (randint(power) > ((ac * 3) / 4))) return (TRUE);
+
+	/* Give blocking message to encourage blocking */
+	if (randint(power) < ((p_ptr->blocking * 3) / 4)) msg_print("You block the attack.");
 
 	/* Assume miss */
 	return (FALSE);

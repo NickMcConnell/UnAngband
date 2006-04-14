@@ -126,6 +126,9 @@ as for players using the 'standard' screen size.
 
 - Monster experience is now computed via a power algorithm.
 
+- You can now move to dodge, which means monsters have a % chance of targetting your
+old location, and stand still to block, which increases your armour class temporarily.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.
@@ -221,6 +224,12 @@ under the mouse pointer. This is intended for macros.
 
 - Cut down slightly the number of key presses required to buy anything in a store.
 
+- Added code to describe features. This will ultimately involve into feature lore similar
+to NPPAngband's implementation.
+
+- Mouse-clicking whilst confused will allow you to walk one step.
+
+
 ### Bug fixes ###
 
 - Priest spell righteous fury was for mages, paladins, shamans and bards but
@@ -291,6 +300,10 @@ by ekolis).
 - Monsters releasing spores or wailing should do so with correct messages
 (Reported by ekolis).
 
+- Fixed crash bug when selecting an item from the floor using the mouse.
+
+- Fixed bug where monsters were incorrectly targetting themselves or the player.
+
 ### Build / Platform ###
 
 - Added quest.txt in lib\edit which is used to defined fixed texts.
@@ -317,6 +330,8 @@ from NPPAngband.
 - Added an FAQ to the game for questions that have been asked on
 rec.games.roguelike.angband. As most questions were only asked once, I'm
 considering calling it the uniquely asked questions instead.
+
+- Fixed some compiler warnings.
 
 Unangband 0.5.5: "New Years Resolution"
 

@@ -2700,6 +2700,82 @@ static void do_cmd_hold_or_stay(int pickup)
 		/* Free turn XXX XXX XXX */
 		p_ptr->energy_use = 0;
 	}
+
+	/* Blocking -- temporary bonus to ac */
+	if (!p_ptr->searching)
+	{
+		int i;
+
+		/* Slot */
+		int slot = INVEN_ARM;
+
+		/* Object  */
+		object_type *o_ptr = &inventory[INVEN_ARM];
+
+		/* Style */
+		int melee_style = p_ptr->cur_style & (WS_WIELD_FLAGS);
+
+		/* Hack -- not dodging */
+		p_ptr->dodging = 0;
+
+		/* Base blocking */
+		p_ptr->blocking = adj_dex_ta[p_ptr->stat_ind[A_DEX]] - 128;
+
+		/* No shield / secondary weapon */
+		if (!o_ptr->k_idx)
+		{
+			if (inventory[INVEN_WIELD].k_idx)
+			{
+				slot = INVEN_WIELD;
+			}
+			else if (inventory[INVEN_HANDS].k_idx)
+			{
+				slot = INVEN_HANDS;
+			}
+
+			o_ptr = &inventory[slot];
+		}
+
+		/* Modify by object */
+		if (o_ptr->k_idx)
+		{
+			/* Adjust by ac factor */
+			p_ptr->blocking += o_ptr->ac + o_ptr->to_a;
+
+			/* Adjust by to hit factor */
+			p_ptr->blocking += o_ptr->to_h;
+
+			/* Adjust by 'damage dice' -- secondary weapon / shield less effective */
+			p_ptr->blocking += damroll(o_ptr->dd, o_ptr->ds) / (slot == INVEN_ARM ? 2 : 1);
+		}
+
+		/* Modify by style */
+		if (!p_ptr->heavy_wield) for (i = 0;i< z_info->w_max;i++)
+		{
+			if (w_info[i].class != p_ptr->pclass) continue;
+
+			if (w_info[i].level > p_ptr->lev) continue;
+
+			/* Check for styles */
+			if ((w_info[i].styles==0) || (w_info[i].styles & (melee_style & (1L << p_ptr->pstyle))))
+			{
+				switch (w_info[i].benefit)
+				{
+					case WB_HIT:
+					case WB_DAM:
+					case WB_AC:
+						p_ptr->blocking += (p_ptr->lev - w_info[i].level) /2;
+						break;
+				}
+			}
+		}
+
+		/* Redraw state */
+		p_ptr->redraw |= (PR_STATE);
+
+		/* Hack -- redraw straight away */
+		redraw_stuff();
+	}
 }
 
 

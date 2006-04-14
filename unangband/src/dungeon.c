@@ -2471,9 +2471,27 @@ static void process_player(void)
 
 		/* Redraw the state */
 		p_ptr->redraw |= (PR_STATE);
-	
 	}
 
+	/*** Clear dodging ***/
+	if (p_ptr->dodging)
+	{
+		/* Clear dodging */
+		p_ptr->dodging = FALSE;
+
+		/* Redraw the state */
+		p_ptr->redraw |= (PR_STATE);
+	}
+
+	/*** Clear blocking ***/
+	if (p_ptr->blocking)
+	{
+		/* Clear blocking */
+		p_ptr->blocking = FALSE;
+
+		/* Redraw the state */
+		p_ptr->redraw |= (PR_STATE);
+	}
 
 	/*** Handle actual user input ***/
 
@@ -2651,7 +2669,6 @@ static void process_player(void)
 		/* Significant */
 		if (p_ptr->energy_use)
 		{
-
 			/* Hack -- sing song */
 			if (p_ptr->held_song)
 			{
