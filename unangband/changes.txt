@@ -129,6 +129,11 @@ as for players using the 'standard' screen size.
 - You can now move to dodge, which means monsters have a % chance of targetting your
 old location, and stand still to block, which increases your armour class temporarily.
 
+- Character styles for monster killing and backstabbing also apply when firing a
+weapon.
+
+- If you wake a monster and fail to kill it, it will alert those around it.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.

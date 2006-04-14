@@ -2971,9 +2971,7 @@ void do_cmd_fire(void)
 	int tdam, tdis, thits, tmul;
 	int bonus, chance, power;
 
-	int style_hit=0;
-	int style_dam=0;
-	int style_crit=0;
+	int style_hit, style_dam, style_crit;
 	u32b shoot_style;
 
 	object_type *o_ptr;
@@ -2997,6 +2995,7 @@ void do_cmd_fire(void)
 	int msec = op_ptr->delay_factor * op_ptr->delay_factor;
 
 	bool get_feat = FALSE;
+	bool was_asleep;
 
 	/* Get the "bow" (if any) */
 	j_ptr = &inventory[INVEN_BOW];
@@ -3090,40 +3089,6 @@ void do_cmd_fire(void)
 	missile_attr = object_attr(i_ptr);
 	missile_char = object_char(i_ptr);
 
-	/* Check shooting styles only */
-	shoot_style = p_ptr->cur_style & (WS_SHOOT_FLAGS);
-
-	/*** Handle styles ***/
-	for (i = 0;i< z_info->w_max;i++)
-	{
-		if (w_info[i].class != p_ptr->pclass) continue;
-
-		if (w_info[i].level > p_ptr->lev) continue;
-
-		/* Check for styles */
-		if ((w_info[i].styles==0) || (w_info[i].styles & (shoot_style & (1L << p_ptr->pstyle))))
-		{
-			switch (w_info[i].benefit)
-			{
-
-				case WB_HIT:
-					style_hit += (p_ptr->lev - w_info[i].level) /2;
-					break;
-
-				case WB_DAM:
-					style_dam += (p_ptr->lev - w_info[i].level) /2;
-					break;
-
-				case WB_CRITICAL:
-					style_crit++;
-					break;
-			}
-		}
-
-	}
-
-
-
 	/* Use the proper number of shots */
 	thits = p_ptr->num_fire;
 
@@ -3131,7 +3096,7 @@ void do_cmd_fire(void)
 	tdam = damroll(i_ptr->dd, i_ptr->ds);
 
 	/* Actually "fire" the object */
-	bonus = (p_ptr->to_h + i_ptr->to_h + j_ptr->to_h + style_hit);
+	bonus = (p_ptr->to_h + i_ptr->to_h + j_ptr->to_h);
 	chance = (p_ptr->skill_thb + (bonus * BTH_PLUS_ADJ));
 
 	/* Assume a base multiplier */
@@ -3142,7 +3107,6 @@ void do_cmd_fire(void)
 
 	/* Base range XXX XXX */
 	tdis = 10 + 5 * tmul;
-
 
 	/* Take a turn */
 	p_ptr->energy_use = (100 / thits);
@@ -3238,11 +3202,75 @@ void do_cmd_fire(void)
 				continue;
 			}
 
+			/* Reset style bonuses */
+			style_hit = 0;
+			style_dam = 0;
+			style_crit = 0;
+
+			/* Check shooting styles only */
+			shoot_style = p_ptr->cur_style & (WS_SHOOT_FLAGS);
+
+			/* Check backstab if monster sleeping or fleeing */
+			if (((m_ptr->csleep) || (m_ptr->monfear)) && (p_ptr->cur_style & (1L<<WS_SWORD)) &&
+				  (p_ptr->pstyle == WS_BACKSTAB) && (inventory[INVEN_WIELD].weight < 100)) shoot_style |= (1L <<WS_BACKSTAB);
+
+			/* Check slay orc if monster is an orc */
+			if (r_ptr->flags3 & (RF3_ORC)) shoot_style |= (1L <<WS_SLAY_ORC);
+
+			/* Check slay troll if monster is a troll */
+			if (r_ptr->flags3 & (RF3_TROLL)) shoot_style |= (1L <<WS_SLAY_TROLL);
+
+			/* Check slay giant if monster is a giant */
+			if (r_ptr->flags3 & (RF3_GIANT)) shoot_style |= (1L <<WS_SLAY_GIANT);
+
+			/* Check slay dragon if monster is a dragon */
+			if (r_ptr->flags3 & (RF3_DRAGON)) shoot_style |= (1L <<WS_SLAY_DRAGON);
+
+			/* Check slay evil if monster is evil */
+			if (r_ptr->flags3 & (RF3_EVIL)) shoot_style |= (1L <<WS_SLAY_EVIL);
+
+			/* Check slay giant if monster is undead */
+			if (r_ptr->flags3 & (RF3_UNDEAD)) shoot_style |= (1L <<WS_SLAY_UNDEAD);
+
+			/* Check slay giant if monster is an animal */
+			if (r_ptr->flags3 & (RF3_ANIMAL)) shoot_style |= (1L <<WS_SLAY_ANIMAL);
+
+			/* Check slay giant if monster is a demon */
+			if (r_ptr->flags3 & (RF3_DEMON)) shoot_style |= (1L <<WS_SLAY_DEMON);
+
+			/*** Handle styles ***/
+			for (i = 0;i< z_info->w_max;i++)
+			{
+				if (w_info[i].class != p_ptr->pclass) continue;
+
+				if (w_info[i].level > p_ptr->lev) continue;
+
+				/* Check for styles */
+				if ((w_info[i].styles==0) || (w_info[i].styles & (shoot_style & (1L << p_ptr->pstyle))))
+				{
+					switch (w_info[i].benefit)
+					{
+						case WB_HIT:
+							style_hit += (p_ptr->lev - w_info[i].level) /2;
+							break;
+
+						case WB_DAM:
+							style_dam += (p_ptr->lev - w_info[i].level) /2;
+							break;
+
+						case WB_CRITICAL:
+							style_crit++;
+							break;
+					}
+				}
+
+			}
+
 			/* Test hit fire */
-			hit_or_near_miss = test_hit_fire(chance2, calc_monster_ac(m_ptr, FALSE), m_ptr->ml);
+			hit_or_near_miss = test_hit_fire(chance2 + style_hit * BTH_PLUS_ADJ, calc_monster_ac(m_ptr, FALSE), m_ptr->ml);
 
 			/* Genuine hit */
-			genuine_hit = test_hit_fire(chance2, calc_monster_ac(m_ptr, TRUE), m_ptr->ml);
+			genuine_hit = test_hit_fire(chance2 + style_hit * BTH_PLUS_ADJ, calc_monster_ac(m_ptr, TRUE), m_ptr->ml);
 
 			/* Missiles bounce off resistant monsters */
 			if ((genuine_hit) && (mon_resist_object(m_ptr, o_ptr)))
@@ -3262,6 +3290,12 @@ void do_cmd_fire(void)
 
 				/* Note the collision */
 				hit_body = TRUE;
+
+				/* Check if monster asleep */
+				was_asleep = (m_ptr->csleep == 0);
+
+				/* Disturb the monster */
+				m_ptr->csleep = 0;
 
 				/*Mark the monster as attacked by the player*/
 				m_ptr->mflag |= (MFLAG_HIT_RANGE);
@@ -3356,6 +3390,15 @@ void do_cmd_fire(void)
 						/* Message */
 						message_format(MSG_FLEE, m_ptr->r_idx,
 							       "%^s flees in terror!", m_name);
+					}
+
+					/* Alert fellows */
+					if (was_asleep)
+					{
+						m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
+
+						/* Let allies know */
+						tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
 					}
 
 					/* Get item effect */
@@ -3466,6 +3509,8 @@ void do_cmd_throw(void)
 	cptr q, s;
 
 	int msec = op_ptr->delay_factor * op_ptr->delay_factor;
+
+	bool was_asleep = FALSE;
 
 	/* Get an item */
 	q = "Throw which item? ";
@@ -3676,6 +3721,12 @@ void do_cmd_throw(void)
 				/* Note the collision */
 				hit_body = TRUE;
 
+				/* Check if monster asleep */
+				was_asleep = (m_ptr->csleep == 0);
+
+				/* Disturb the monster */
+				m_ptr->csleep = 0;
+
 				/*Mark the monster as attacked by the player*/
 				m_ptr->mflag |= (MFLAG_HIT_RANGE);
 
@@ -3757,6 +3808,15 @@ void do_cmd_throw(void)
 				{
 					/* Message */
 					message_pain(cave_m_idx[y][x], tdam);
+
+					/* Alert fellows */
+					if (was_asleep)
+					{
+						m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
+
+						/* Let allies know */
+						tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
+					}
 
 					/* Take note */
 					if (fear && m_ptr->ml)

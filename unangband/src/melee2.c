@@ -1183,7 +1183,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	}
 
 	/* Eliminate innate spells if not set */
-	if (!(choose & 0x01))
+	if (!(choose & 0x01) && !(m_ptr->mflag & (MFLAG_SHOT | MFLAG_BREATH)))
 	{
 		f4 &= ~(RF4_INNATE_MASK);
 		f5 &= ~(RF5_INNATE_MASK);
@@ -1195,7 +1195,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	}
 
 	/* Eliminate other spells if not set */
-	if (!(choose & 0x02))
+	if (!(choose & 0x02) && !(m_ptr->mflag & (MFLAG_CAST)))
 	{
 		f4 &= (RF4_INNATE_MASK);
 		f5 &= (RF5_INNATE_MASK);
@@ -3099,7 +3099,9 @@ static bool push_aside(monster_type *m_ptr, monster_type *n_ptr)
 	return (FALSE);
 }
 
-
+/*
+ *  Determine the language a monster speaks.
+ */
 int monster_language(int r_idx)
 {
 	monster_race *r_ptr = &r_info[r_idx];
@@ -3129,7 +3131,9 @@ int monster_language(int r_idx)
 	return (LANG_COMMON);
 }
 
-
+/*
+ *  Monsters speak to each other in various situations.
+ */
 void monster_speech(int m_idx, cptr saying, bool understand)
 {
 	monster_type *m_ptr = &m_list[m_idx];
@@ -3160,7 +3164,7 @@ void monster_speech(int m_idx, cptr saying, bool understand)
 	{
 		speech = LANG_NATURAL;
 
-		if (r_ptr->d_char == ':') speech = LANG_FOREST;
+		if ((r_ptr->d_char == ':') || (r_ptr->d_char == ';')) speech = LANG_FOREST;
 		else if (r_ptr->d_char == ',') speech = LANG_MUSHROOM;
 		else if ((r_ptr->d_char >= 'A') && (r_ptr->d_char <= 'Z')) speech += r_ptr->d_char - 'A' + 1;
 		else if ((r_ptr->d_char >= 'a') && (r_ptr->d_char <= 'z')) speech += r_ptr->d_char - 'a' + 26 + 1;
@@ -3232,7 +3236,9 @@ void monster_speech(int m_idx, cptr saying, bool understand)
 }
 
 
-/* Alert others around the monster that the player has a resistance, and wake them up */
+/*
+ * Alert others around the monster that the player has a resistance, and wake them up.
+ */
 void tell_allies_player_can(int y, int x, u32b flag)
 {
 	int i,language;
@@ -3307,7 +3313,9 @@ void tell_allies_player_can(int y, int x, u32b flag)
 }
 
 
-/* Alert others around the monster that the player does not have a resistance, and wake them up */
+/*
+ * Alert others around the monster that the player does not have a resistance, and wake them up.
+ */
 void tell_allies_player_not(int y, int x, u32b flag)
 {
 	int i, language;
@@ -3382,7 +3390,9 @@ void tell_allies_player_not(int y, int x, u32b flag)
 }
 
 
-/* Alert others around the monster about something using the m_flag, and wake them up*/
+/*
+ * Alert others around the monster about something using the m_flag, and wake them up
+ */
 void tell_allies_mflag(int y, int x, u32b flag, cptr saying)
 {
 	int i, language;
@@ -5062,15 +5072,8 @@ static void process_monster(int m_idx)
 		{
 			m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
 
-			/*if part of a pack, let them know*/
-			if ((r_ptr->flags1 & (RF1_FRIENDS)) ||
-				(r_ptr->flags1 & (RF1_FRIEND)) ||
-				(r_ptr->flags1 & (RF1_ESCORT)) ||
-				(r_ptr->flags2 & (RF2_SMART)) ||
-				(m_ptr->mflag & (MFLAG_TOWN)))
-			{
-				tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
-			}
+			/* Tell allies */
+			tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
 
 			/*Tweak the monster speed*/
 			if (!player_has_los_bold(m_ptr->fy, m_ptr->fx))
@@ -5101,16 +5104,8 @@ static void process_monster(int m_idx)
 		{
 			m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
 
-			/* If part of a pack, let them know */
-			if ((r_ptr->flags1 & (RF1_FRIENDS)) ||
-				(r_ptr->flags1 & (RF1_FRIEND)) ||
-				(r_ptr->flags1 & (RF1_ESCORT)) ||
-				(r_ptr->flags1 & (RF1_ESCORTS)) ||
-				(r_ptr->flags2 & (RF2_SMART)) ||
-				(m_ptr->mflag & (MFLAG_TOWN)))
-			{
-				tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
-			}
+			/* Tell allies */
+			tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
 
 			/*Tweak the monster speed*/
 			if (m_ptr->cdis > 1)
@@ -5195,12 +5190,12 @@ static void process_monster(int m_idx)
 	if ((chance_innate) && ((m_ptr->blind) || (m_ptr->confused) || (m_ptr->stunned))) chance_innate /= 2;
 
 	/* Monster can use ranged attacks */
-	if ((chance_innate) || (chance_spell) || (r_ptr->flags3 & (RF3_HUGE)))
+	if ((chance_innate) || (chance_spell) || (r_ptr->flags3 & (RF3_HUGE)) || (m_ptr->mflag & (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH)))
 	{
 		int roll = rand_int(100);
 
 		/* Pick a ranged attack */
-		if ((roll < chance_innate) || (roll < chance_spell) || (r_ptr->flags3 & (RF3_HUGE)))
+		if ((roll < chance_innate) || (roll < chance_spell) || (r_ptr->flags3 & (RF3_HUGE)) || (m_ptr->mflag & (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH)))
 		{
 			/* Set up ranged melee attacks */
 			init_ranged_attack(r_ptr);

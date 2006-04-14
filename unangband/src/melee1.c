@@ -1519,7 +1519,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		spower = MAX(1, r_ptr->spell_power);
 
 		/* Monster has cast a spell */
-		m_ptr->mflag &= ~(MFLAG_CAST);
+		m_ptr->mflag &= ~(MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH);
 
 		if (target > 0)
 		{

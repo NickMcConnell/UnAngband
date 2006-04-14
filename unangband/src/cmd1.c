@@ -2249,14 +2249,25 @@ void py_attack(int y, int x)
 
 					object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_MANA);
 				}
-				else if (l_ptr->cast_spell)
+				else if (r_ptr->mana > 0)
 				{
 					object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_MANA);
 				}
 
+				/* Hack -- cancel wakeup call */
+				was_asleep = FALSE;
+
 				break;
 			}
 		}
+	}
+
+	/* Hack -- wake up nearby allies */
+	if (was_asleep)
+	{
+		m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
+
+		tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
 	}
 
 	/* Hack -- delay fear messages */
