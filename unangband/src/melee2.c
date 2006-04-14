@@ -1101,6 +1101,8 @@ static void init_ranged_attack(monster_race *r_ptr)
 			case RBM_SHOT: mana = 0; range = 8; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_ARC_20: mana = 6; range = 8; break;
 			case RBM_ARC_30: mana = 5; range = 6; break;
+			case RBM_ARC_60: mana = 6; range = 6; break;
+			case RBM_FLASK: mana = 0; range = 6; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			default: mana = 0; range = 2; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break; /* For all hurt huge attacks */
 		}
 
@@ -1173,6 +1175,12 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	f5 = r_ptr->flags5;
 	f6 = r_ptr->flags6;
 	f7 = r_ptr->flags7;
+
+	/* Always permit huge blows */
+	if (r_ptr->flags3 & (RF3_HUGE))
+	{
+		for (i = 0; i < 4; i++) if (r_ptr->blow[i].method < RBM_MIN_RANGED) f4 |= (1L << i);
+	}
 
 	/* Eliminate innate spells if not set */
 	if (!(choose & 0x01))
@@ -5170,9 +5178,6 @@ static void process_monster(int m_idx)
 	chance_innate = r_ptr->freq_innate;
 	chance_spell = r_ptr->freq_spell;
 
-	/* Hack for huge monsters */
-	if (!(chance_innate) && (r_ptr->flags3 & (RF3_HUGE))) chance_innate = 75;
-
 	/* Cannot use ranged attacks beyond maximum range. */
 	if ((chance_innate) && (m_ptr->cdis > MAX_RANGE)) chance_innate = 0;
 	if ((chance_spell) && (m_ptr->cdis > MAX_RANGE)) chance_spell = 0;
@@ -5190,12 +5195,12 @@ static void process_monster(int m_idx)
 	if ((chance_innate) && ((m_ptr->blind) || (m_ptr->confused) || (m_ptr->stunned))) chance_innate /= 2;
 
 	/* Monster can use ranged attacks */
-	if ((chance_innate) || (chance_spell))
+	if ((chance_innate) || (chance_spell) || (r_ptr->flags3 & (RF3_HUGE)))
 	{
 		int roll = rand_int(100);
 
 		/* Pick a ranged attack */
-		if ((roll < chance_innate) || (roll < chance_spell))
+		if ((roll < chance_innate) || (roll < chance_spell) || (r_ptr->flags3 & (RF3_HUGE)))
 		{
 			/* Set up ranged melee attacks */
 			init_ranged_attack(r_ptr);

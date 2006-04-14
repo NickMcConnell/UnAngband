@@ -172,6 +172,10 @@ static cptr r_info_blow_method[] =
 	"SPIKE",
 	"DART",
 	"SHOT",
+	"ARC_20",
+	"ARC_30",
+	"ARC_60",
+	"FLASK",
 	NULL
 };
 
@@ -660,7 +664,7 @@ static cptr r_info_flags7[] =
 	"S_SPIDER",
 	"S_CLASS",
 	"S_RACE",
-	"S_ELEMENT",
+	"S_GROUP",
 	"S_FRIEND",
 	"S_FRIENDS",
 	"S_ORC",
@@ -3686,27 +3690,6 @@ errr parse_r_info(char *buf, header *head)
 		{
 			r_ptr->flags9 |= RF9_ELF;
 		}
-
-#if 0
-		/* XXX Can't use the below, as name not currently valid */
-		/* Mark dwarves */
-		if (strstr(r_name + r_ptr->name, "warven") || strstr(r_name + r_ptr->name, "warf"))
-		{
-			r_ptr->flags9 |= RF9_DWARF;
-		}
-
-		/* Mark mushrooms */
-		if (get_food_type(r_ptr))
-		{
-			r_ptr->flags9 |= RF9_DROP_MUSHROOM;
-		}
-
-		/* Mark coins */
-		if (get_coin_type(r_ptr))
-		{
-			r_ptr->flags9 |= RF9_DROP_COINS;
-		}
-#endif
 	}
 	/* Process 'I' for "Info" (one line only) */
 	else if (buf[0] == 'I')
@@ -3732,7 +3715,7 @@ errr parse_r_info(char *buf, header *head)
 	/* Process 'W' for "More Info" (one line only) */
 	else if (buf[0] == 'W')
 	{
-		int lev, rar, pad;
+		int lev, rar, grp;
 		long exp;
 
 		/* There better be a current r_ptr */
@@ -3740,12 +3723,12 @@ errr parse_r_info(char *buf, header *head)
 
 		/* Scan for the values */
 		if (4 != sscanf(buf+2, "%d:%d:%d:%ld",
-			    &lev, &rar, &pad, &exp)) return (PARSE_ERROR_GENERIC);
+			    &lev, &rar, &grp, &exp)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		r_ptr->level = lev;
 		r_ptr->rarity = rar;
-		(void)pad;
+		r_ptr->grp_idx = grp;
 		r_ptr->mexp = exp;
 	}
 
@@ -6392,8 +6375,8 @@ static long eval_max_dam(monster_race *r_ptr)
 						else if (flag_counter == RF7_S_HOUND)	this_dam = rlev;
 						else if (flag_counter == RF7_S_CLASS)	this_dam = rlev / 2;
 						else if (flag_counter == RF7_S_RACE)	this_dam = rlev / 2;
-						else if (flag_counter == RF7_S_ELEMENT)	this_dam = rlev;
-						else if (flag_counter == RF7_S_FRIEND)	this_dam = rlev * 3 / 4;
+						else if (flag_counter == RF7_S_GROUP)	this_dam = rlev / 2;
+						else if (flag_counter == RF7_S_FRIEND)	this_dam = rlev / 3;
 						else if (flag_counter == RF7_S_FRIENDS)	this_dam = rlev * 3 / 4;
 						else if (flag_counter == RF7_S_DRAGON)	this_dam = rlev * 3 / 2;
 						else if (flag_counter == RF7_S_HI_DRAGON) this_dam = rlev * 4;
@@ -6637,7 +6620,7 @@ static long eval_max_dam(monster_race *r_ptr)
 					case RBM_SPIT:	mana = 0; must_hit = TRUE; break;
 					case RBM_GAZE:	mana = 3; range = MIN(MAX_SIGHT, r_ptr->aaf);break;
 					case RBM_WAIL:  mana = 5; range = 4; break;
-					case RBM_SPORE:	mana = 0; range = 3; break;
+					case RBM_SPORE:	mana = 0; range = 3; must_hit = TRUE; break;
 					case RBM_LASH:  mana = 0; range = 3; break;
 					case RBM_BEG:	mana = 0; range = 4; break;
 					case RBM_INSULT: mana = 0; range = 4; break;
@@ -6677,6 +6660,7 @@ static long eval_max_dam(monster_race *r_ptr)
 					case RBM_SHOT: mana = 0; range = 8; must_hit = TRUE; break;
 					case RBM_ARC_20: mana = 6; range = 8; break;
 					case RBM_ARC_30: mana = 5; range = 6; break;
+					case RBM_FLASK:	mana = 0; range = 6; must_hit = TRUE; break;
 				}
 
 				/* Scale if needs to hit */

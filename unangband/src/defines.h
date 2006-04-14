@@ -669,7 +669,7 @@
 #define SUMMON_SPIDER  12
 #define SUMMON_CLASS   13
 #define SUMMON_RACE    14
-#define SUMMON_ELEMENT 15
+#define SUMMON_GROUP   15
 #define SUMMON_FRIEND  16
 #define SUMMON_UNIQUE_FRIEND  17
 #define SUMMON_ORC     18
@@ -2313,6 +2313,7 @@
 #define RBM_ARC_20	58
 #define RBM_ARC_30	59
 #define RBM_ARC_60	60
+#define RBM_FLASK	61
 
 #define RBM_MAX_NORMAL  23
 #define RBM_MIN_RANGED  15
@@ -3255,7 +3256,7 @@
 #define RF7_S_SPIDER       0x00000800  /* Summon Spiders */
 #define RF7_S_CLASS        0x00001000  /* Summon Monsters of similar class (Warrior/Mage/Thief etc)*/
 #define RF7_S_RACE         0x00002000  /* Summon Monsters of similar race (Elf/Man/Dwarf etc) */
-#define RF7_S_ELEMENT      0x00004000  /* Summon Monsters of similar element (Fire/Water etc) */
+#define RF7_S_GROUP        0x00004000  /* Summon Monsters of similar group (Fire/Water/Green etc) */
 #define RF7_S_FRIEND       0x00008000  /* Summon a Friend */
 #define RF7_S_FRIENDS      0x00010000  /* Summon Friends*/
 #define RF7_S_ORC          0x00020000  /* Summon Orc */
@@ -3345,7 +3346,7 @@
 #define RF9_ATTR_METAL     0x10000000      /* Changes color 'brighter' */
 #define RF9_ATTR_INDEX     0x20000000      /* Changes color by index */
 #define RF9_MORGUL_MAGIC   0x40000000      /* Morgul magic */
-#define RF9_UDUN_MAGIC     0x80000000	   /* Udund magic */
+#define RF9_UDUN_MAGIC     0x80000000	   /* Udun magic */
 
 /*
  * Some flags are obvious

@@ -1144,8 +1144,9 @@ static void mon_beam(int who, int y, int x, int typ, int dam, int range, cptr re
  * Cast a ball spell at the target
  * Pass over any monsters that may be in the way
  * Affect grids, objects, monsters, and (specifically) the player
+ * Can miss the first target
  */
-static void mon_ball(int who, int y, int x, int typ, int dam, int rad, cptr result)
+static void mon_ball(int who, int y, int x, int typ, int dam, int rad, bool hit, cptr result)
 {
 	/* Message */
 	if (result) msg_print(result);
@@ -1157,7 +1158,7 @@ static void mon_ball(int who, int y, int x, int typ, int dam, int rad, cptr resu
 		int fx = m_ptr->fx;
 
 		/* Aim at target with a ball attack */
-		(void)project(who, rad, fy, fx, y, x, dam, typ, FLG_MON_BALL, 0, 0);
+		(void)project(who, rad, fy, fx, y, x, dam, typ, FLG_MON_BALL | (hit ? 0L : PROJECT_MISS), 0, 0);
 	}
 	else
 	{
@@ -1621,7 +1622,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_SPIT:	mon_shot(who, y, x, effect, dam, hit, result); break;
 				case RBM_GAZE:	msg_print(result);(void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_WAIL: msg_print(result);(void)project(0, 4, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
-				case RBM_SPORE:	mon_ball(who, y, x, effect, dam, 1, result); break;
+				case RBM_SPORE:	mon_ball(who, y, x, effect, dam, 1, hit, result); break;
 				case RBM_LASH:  mon_beam(who, y, x, effect, dam, 2, result); break;
 				case RBM_BEG:	msg_print(result);(void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_INSULT: msg_print(result);(void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
@@ -1638,21 +1639,21 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_BEAM: mon_beam(who, y, x, effect, dam, 10, result); break;
 				case RBM_BLAST: mon_arc(who, y, x, effect, dam, 0, 60, result); break;
 				case RBM_WALL: mon_beam(who, y, x, effect, dam, 12, result); break;
-				case RBM_BALL: mon_ball(who, y, x, effect, dam, 2, result); break;
-				case RBM_CLOUD: mon_ball(who, y, x, effect, dam, 3, result); break;
-				case RBM_STORM: mon_ball(who, y, x, effect, dam, 3, result); break;
+				case RBM_BALL: mon_ball(who, y, x, effect, dam, 2, TRUE, result); break;
+				case RBM_CLOUD: mon_ball(who, y, x, effect, dam, 3, TRUE, result); break;
+				case RBM_STORM: mon_ball(who, y, x, effect, dam, 3, TRUE, result); break;
 				case RBM_BREATH: mon_arc(who, y, x, effect, MIN(dam, m_ptr->hp / d_side), 0, (powerful ? 40 : 20), result); break;
 				case RBM_AREA: (void)project(0, (rlev / 10) + 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
 				case RBM_LOS: (void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_LINE: mon_beam(who, y, x, effect, dam, 8, result); break;
 				case RBM_AIM: (void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
-				case RBM_ORB: mon_ball(who, y, x, effect, dam, 2, result); break;
+				case RBM_ORB: mon_ball(who, y, x, effect, dam, 2, TRUE, result); break;
 				case RBM_STAR: mon_beam(who, y, x, effect, dam, 10, result); break;
-				case RBM_SPHERE: mon_ball(who, y, x, effect, dam, 4, result); break;
+				case RBM_SPHERE: mon_ball(who, y, x, effect, dam, 4, TRUE, result); break;
 				case RBM_PANEL: (void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT | PROJECT_WALL, 0, 0);  break;
 				case RBM_LEVEL: (void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT | PROJECT_WALL, 0, 0);  break;
 				case RBM_CROSS: mon_beam(who, y, x, effect, dam, 10, result); break;
-				case RBM_STRIKE: mon_ball(who, y, x, effect, dam, 1, result); break;
+				case RBM_STRIKE: mon_ball(who, y, x, effect, dam, 1, TRUE, result); break;
 				case RBM_EXPLODE: (void)project(0, 2, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, damroll(5,8), GF_EXPLODE, FLG_MON_BALL, 0, 0); break;
 				case RBM_ARROW: mon_shot(who, y, x, effect, dam, hit, result); break;
 				case RBM_XBOLT: mon_shot(who, y, x, effect, dam, hit, result); break;
@@ -1661,6 +1662,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_SHOT: mon_shot(who, y, x, effect, dam, hit, result); break;
 				case RBM_ARC_20: mon_arc(who, y, x, effect, dam, 0, (powerful ? 40 : 20), result); break;
 				case RBM_ARC_30: mon_arc(who, y, x, effect, dam, 0, (powerful ? 60 : 40), result); break;
+				case RBM_ARC_60: mon_arc(who, y, x, effect, dam, 0, 60, result); break;
+				case RBM_FLASK:	mon_ball(who, y, x, effect, dam, 1, hit, result); break;
 				default: mon_beam(who, y, x, effect, dam, 2, result); /* For all hurt huge attacks */
 			}
 
@@ -2122,7 +2125,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if (spower < 80) rad = 3;
 				else rad = 4;
 			}
-			mon_ball(who, y, x, GF_ACID, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_ACID, get_dam(spower, attack), rad, TRUE, result);
 			break;
 		}
 
@@ -2162,7 +2165,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					spower = 3 * spower / 2;
 				}
 			}
-			mon_ball(who, y, x, GF_ELEC, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_ELEC, get_dam(spower, attack), rad, TRUE, result);
 			break;
 		}
 
@@ -2194,7 +2197,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else result = format("%^s conjures up a maelstrom of fire!", m_name);
 				rad = 4;
 			}
-			mon_ball(who, y, x, GF_FIRE, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_FIRE, get_dam(spower, attack), rad, TRUE, result);
 			break;
 		}
 
@@ -2221,7 +2224,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if (spower < 80) rad = 3;
 				else rad = 4;
 			}
-			mon_ball(who, y, x, GF_COLD, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_COLD, get_dam(spower, attack), rad, TRUE, result);
 			break;
 		}
 
@@ -2248,7 +2251,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if (spower < 80) rad = 4;
 				else rad = 5;
 			}
-			mon_ball(who, y, x, GF_POIS, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_POIS, get_dam(spower, attack), rad, TRUE, result);
 			break;
 		}
 
@@ -2274,7 +2277,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else result = format("%^s invokes a powerful explosion of light.", m_name);
 				rad = 3;
 			}
-			mon_ball(who, y, x, GF_LITE, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_LITE, get_dam(spower, attack), rad, TRUE, result);
 			break;
 		}
 
@@ -2301,7 +2304,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if (spower < 110) rad = 3;
 				else rad = 4;
 			}
-			mon_ball(who, y, x, GF_DARK, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_DARK, get_dam(spower, attack), rad, TRUE, result);
 			break;
 		}
 
@@ -2327,7 +2330,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else result = format("%^s invokes a powerful storm of confusion.", m_name);
 				rad = 3;
 			}
-			mon_ball(who, y, x, GF_CONFUSION, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_CONFUSION, get_dam(spower, attack), rad, TRUE, result);
 			break;
 		}
 
@@ -2353,7 +2356,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else result = format("%^s unleashes a cacophony of sound.", m_name);
 				rad = 3;
 			}
-			mon_ball(who, y, x, GF_SOUND, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_SOUND, get_dam(spower, attack), rad, TRUE, result);
 			break;
 		}
 
@@ -2379,7 +2382,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else result = format("%^s invokes a storm of knives!", m_name);
 				rad = 3;
 			}
-			mon_ball(who, y, x, GF_SHARD, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_SHARD, get_dam(spower, attack), rad, TRUE, result);
 			break;
 		}
 
@@ -2409,7 +2412,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				msg_print("You are lost in a raging tornado!");
 				rad = 5;
 			}
-			mon_ball(who, y, x, GF_WIND, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_WIND, get_dam(spower, attack), rad, TRUE, result);
 			break;
 		}
 
@@ -2439,7 +2442,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				msg_print("You are lost in a raging tempest of wind and water!");
 				rad = 5;
 			}
-			mon_ball(who, y, x, GF_WATER, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_WATER, get_dam(spower, attack), rad, TRUE, result);
 			break;
 		}
 
@@ -2465,7 +2468,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else result = format("%^s calls up a storm of nether magics.", m_name);
 			rad = 3;
 			}
-			mon_ball(who, y, x, GF_NETHER, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_NETHER, get_dam(spower, attack), rad, TRUE, result);
 			break;
 		}
 
@@ -2491,7 +2494,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else result = format("%^s invokes a storm of chaos.", m_name);
 				rad = 3;
 			}
-			mon_ball(who, y, x, GF_CHAOS, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_CHAOS, get_dam(spower, attack), rad, TRUE, result);
 			break;
 		}
 
@@ -2517,7 +2520,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else result = format("%^s invokes a storm of mana.", m_name);
 				rad = 3;
 			}
-			mon_ball(who, y, x, GF_MANA, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_MANA, get_dam(spower, attack), rad, TRUE, result);
 
 			break;
 		}
@@ -2545,7 +2548,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if (spower < 120) rad = 3;
 				else rad = 4;
 			}
-			mon_ball(who, y, x, GF_WATER, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_WATER, get_dam(spower, attack), rad, TRUE, result);
 			break;
 		}
 
@@ -2751,7 +2754,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else result = format("%^s casts a large orb of holy might.", m_name);
 				rad = 3;
 			}
-			mon_ball(who, y, x, GF_HOLY_ORB, get_dam(spower, attack), rad, result);
+			mon_ball(who, y, x, GF_HOLY_ORB, get_dam(spower, attack), rad, TRUE, result);
 		}
 
 		/* RF5_BEAM_ELEC */
@@ -2823,7 +2826,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if (blind) result = format("%^s murmurs darkly.", m_name);
 				else result = format("%^s gestures, and you are enveloped in hellfire.", m_name);
-				mon_ball(who, y, x, GF_HELLFIRE, get_dam(5 * spower, 6), 3, result);
+				mon_ball(who, y, x, GF_HELLFIRE, get_dam(5 * spower, 6), 3, TRUE, result);
 			}
 
 			break;
@@ -4700,50 +4703,27 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			break;
 		}
 
-		/* RF7_S_ELEMENT */
+		/* RF7_S_GROUP */
 		case 192 + 14:
 		{
 			if (surface) break;
 			disturb(1, 0);
 
-			summon_element_type = MAX_ELEMENTS;
+			summon_group_type = 0;
 
 			if (who > 0)
 			{
-				int i, n = 0, pick = 0;
-
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons allies.", m_name);
 				else msg_print("You hear distant chanting.");
 
-				/* Mega Hack -- attempt to match an element */
-				/* XXX The table is laid out in such a way that we should pick the correct element
-				   for most hounds, vortexes and elementals. We cheat particularly with vortexes and
-				   hounds and relate more of them to a single type of elemental (e.g acid hounds
-				   associate with ooze elementals, dark hounds with smoke elementals). */
-				for (i = 0; i < MAX_ELEMENTS; i++)
-				{
-					/* Match on blow effects */
-					for (k = 0; k < 4; k++)
-					{
-						if (r_ptr->blow[k].effect == element[i].effect) pick = i;
-					}
-
-					/* Match on monster flags */
-					if ((r_ptr->flags2 & (element[i].race_flags2)) != 0) pick = i;
-					if ((r_ptr->flags3 & (element[i].race_flags3)) != 0) pick = i;
-					if ((r_ptr->flags4 & (element[i].race_flags4)) != 0) pick = i;
-					if ((r_ptr->flags5 & (element[i].race_flags5)) != 0) pick = i;
-					if ((r_ptr->flags6 & (element[i].race_flags6)) != 0) pick = i;
-
-					if ((pick == i) && !(rand_int(++n))) summon_element_type = i;
-				}
+				summon_group_type = r_ptr->grp_idx;
 			}
 
 			/* Count them for later */
 			for (k = 0; k < 3; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_ELEMENT);
+				count += summon_specific(y, x, rlev - 1, SUMMON_GROUP);
 			}
 			break;
 		}

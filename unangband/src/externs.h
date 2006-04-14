@@ -124,7 +124,7 @@ extern s16b object_level;
 extern s16b monster_level;
 extern char summon_char_type;
 extern byte summon_attr_type;
-extern byte summon_element_type;
+extern byte summon_group_type;
 extern u32b summon_flag_type;
 extern s16b summon_race_type;
 extern s32b turn;

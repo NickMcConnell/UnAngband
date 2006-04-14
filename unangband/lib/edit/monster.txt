@@ -154,6 +154,7 @@ N:4:Farmer Maggot
 G:h:W
 I:110:35d10:40:10:3
 W:0:4:0:0
+M:20:0:0:0
 B:MOAN
 B:MOAN
 F:UNIQUE | MALE
@@ -220,6 +221,7 @@ N:10:Squint-eyed rogue
 G:t:R
 I:110:2d8:10:8:99
 W:0:1:0:0
+M:20:0:0:0
 B:HIT:HURT:1d6
 B:TOUCH:EAT_ITEM
 B:INSULT
@@ -234,6 +236,7 @@ N:11:Singing, happy drunk
 G:t:b
 I:110:2d3:10:1:0
 W:0:1:0:0
+M:10:0:0:0
 B:BEG
 B:VOMIT
 F:MALE
@@ -1410,7 +1413,6 @@ M:0:20:8:56
 B:HIT:HURT:1d5
 B:HIT:HURT:1d5
 B:TOUCH:EAT_GOLD
-B:INSULT
 F:UNIQUE | MALE
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_1D2 | DROP_GOOD | DROP_GREAT
@@ -2114,7 +2116,7 @@ D: deliver your soul to hell.
 N:163:Air spirit
 G:E:G
 I:130:8d8:12:40:20
-W:14:3:0:40
+W:14:3:11:40
 B:HIT:HURT:1d3
 F:RAND_50 | RAND_25
 F:EMPTY_MIND | INVISIBLE | COLD_BLOOD | BASH_DOOR
@@ -2142,7 +2144,7 @@ W:12:1:0:34
 B:HIT:POISON:2d6
 B:HIT:HURT:2d6
 F:EMPTY_MIND | COLD_BLOOD | OPEN_DOOR | BASH_DOOR
-F:EVIL | UNDEAD | IM_COLD | IM_POIS
+F:EVIL | UNDEAD | IM_COLD | IM_POIS | MAN
 F:NO_CONF | NO_SLEEP | NO_FEAR
 D:It is a shambling human corpse dropping chunks of flesh behind it.
 
@@ -2553,7 +2555,7 @@ B:HIT:HURT:3d4
 F:MALE
 F:FRIENDS | DROP_60
 F:OPEN_DOOR | BASH_DOOR
-F:EVIL | ORC | NEED_LITE
+F:EVIL | ORC | NEED_LITE | MAN
 D:He is a hideous deformed cross-breed with man and orc, combining man's
 D: strength and cunning with orcish evil.  The traitorous wizard Saruman is
 D: generally believed to be responsible for this abomination.
@@ -2855,7 +2857,7 @@ D:A strange reptilian hybrid with two heads.
 N:217:Water spirit
 G:E:b
 I:120:9d8:12:28:40
-W:10:2:0:58
+W:10:2:12:58
 B:HIT:HURT:4d2
 B:HIT:HURT:4d2
 F:RAND_25
@@ -2878,7 +2880,7 @@ D:It is fast and poisonous.
 N:219:Earth spirit
 G:E:u
 I:110:13d8:10:40:50
-W:20:2:0:64
+W:20:2:13:64
 B:HIT:BATTER:2d7
 B:HIT:BATTER:2d7
 F:RAND_25
@@ -2892,7 +2894,7 @@ D:A whirling mass of sentient rock.
 N:220:Fire spirit
 G:E:r
 I:120:10d9:16:30:20
-W:17:2:0:75
+W:17:2:14:75
 B:HIT:FIRE:2d6
 B:HIT:FIRE:2d6
 F:RAND_25
@@ -3328,7 +3330,7 @@ F:FORCE_MAXHP
 F:ESCORT
 F:ONLY_ITEM | DROP_1D2 | DROP_GOOD
 F:OPEN_DOOR | BASH_DOOR | NEED_LITE
-F:EVIL | ORC | IM_FIRE | IM_COLD | IM_POIS | NO_CONF | NO_SLEEP
+F:EVIL | ORC | IM_FIRE | IM_COLD | IM_POIS | NO_CONF | NO_SLEEP | MAN
 D:A strong and cunning orc warrior, the commander of Saruman's orcish horde.
 
 N:250:Blue dragon bat
@@ -3642,7 +3644,7 @@ B:HIT:HURT:2d4
 B:HIT:HURT:2d4
 F:ONLY_ITEM | DROP_90
 F:EMPTY_MIND | COLD_BLOOD | OPEN_DOOR | BASH_DOOR
-F:EVIL | UNDEAD | IM_COLD | IM_POIS
+F:EVIL | UNDEAD | IM_COLD | IM_POIS | MAN
 F:NO_CONF | NO_SLEEP | NO_FEAR
 S:DARKNESS | CURSE | WOUND | SLOW
 D:It is a human form encased in mouldy wrappings.
@@ -4574,7 +4576,7 @@ F:MALE
 F:FRIENDS
 F:ONLY_ITEM | DROP_90
 F:OPEN_DOOR | BASH_DOOR | HUGE
-F:EVIL | TROLL | IM_POIS | NEED_LITE
+F:EVIL | TROLL | IM_POIS | NEED_LITE | MAN
 D:A huge, ugly, half-human in search of plunder.
 
 N:336:Mystic
@@ -4797,7 +4799,7 @@ D:He is a troll that reeks of brine.
 N:349:Fire elemental
 G:E:r
 I:120:30d8:12:50:50
-W:38:2:0:350
+W:38:2:14:350
 M:0:18:20:35
 B:HIT:FIRE:4d6
 B:ENGULF:FIRE:4d6
@@ -4835,7 +4837,7 @@ D: out angrily at the ugliness around him, not realising the source of its angui
 N:351:Water elemental
 G:E:b
 I:120:25d8:12:40:50
-W:34:2:0:325
+W:34:2:12:325
 M:0:18:17:63
 B:HIT:BATTER:1d10
 B:HIT:BATTER:1d10
@@ -4854,7 +4856,7 @@ D:It is a towering tempest of water.
 N:352:Invisible stalker
 G:E:y
 I:130:19d12:20:46:20
-W:26:4:0:300
+W:26:4:15:300
 B:HIT:HURT:3d6
 B:HIT:HURT:3d6
 B:HIT:HURT:3d6
@@ -4952,7 +4954,7 @@ D:It is a giant grey scorpion.  It looks poisonous.
 N:359:Earth elemental
 G:E:u
 I:110:30d10:10:60:90
-W:46:2:0:375
+W:46:2:13:375
 M:20:20:22:60
 B:HIT:BATTER:6d10
 B:HIT:BATTER:6d10
@@ -4969,7 +4971,7 @@ D:It is a towering form composed of rock with fists of awesome power.
 N:360:Air elemental
 G:E:G
 I:130:30d5:12:50:50
-W:42:2:0:390
+W:42:2:11:390
 M:0:15:25:35
 B:ENGULF:CONFUSE:3d12
 B:AURA:WIND:1d4
@@ -5124,7 +5126,7 @@ D: itself struggles to banish it.
 N:370:Ooze elemental
 G:E:g
 I:120:40d10:10:80:90
-W:40:2:0:300
+W:40:2:16:300
 M:0:20:32:80
 B:TOUCH:ACID:1d21
 B:TOUCH:ACID:1d21
@@ -5141,7 +5143,7 @@ D:It is a towering mass of filth, an eyesore of ooze.
 N:371:Smoke elemental
 G:E:s
 I:130:15d10:10:80:90
-W:39:3:0:375
+W:39:3:17:375
 M:20:20:25:35
 B:ENGULF:HURT:2d6
 B:ENGULF:HURT:2d6
@@ -5445,7 +5447,7 @@ D:It is a humanoid form composed of flames and hatred.
 N:390:Ice elemental
 G:E:w
 I:120:45d10:10:60:90
-W:41:2:0:650
+W:41:2:18:650
 M:20:20:36:35
 B:TOUCH:COLD:4d9
 B:HIT:ICE:4d6
@@ -5549,7 +5551,7 @@ D: strange dancing motion.
 N:397:Magma elemental
 G:E:o
 I:110:35d10:10:70:90
-W:45:2:0:950
+W:45:2:19:950
 M:15:15:30:35
 B:HIT:LAVA:6d7
 B:HIT:HURT:4d6
@@ -5873,7 +5875,7 @@ D: around him.
 N:416:The Tyrant of Fire
 G:E:r
 I:120:24d100:12:50:50
-W:57:3:0:4000
+W:57:3:14:4000
 M:0:25:60:78
 B:HIT:FIRE:5d6
 B:HIT:FIRE:5d6
@@ -5885,7 +5887,7 @@ F:EMPTY_MIND
 F:KILL_ITEM | KILL_BODY | BASH_DOOR | POWERFUL
 F:IM_FIRE | IM_POIS | IM_ACID | IM_ELEC
 F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_AURA | RES_LAVA | NONLIVING
-S:BOLT_PLAS | BALL_FIRE | ADD_MANA
+S:BOLT_PLAS | BALL_FIRE | ADD_MANA | S_GROUP
 D:A towering fire elemental, it burns everything beyond recognition.
 
 N:417:Black wraith
@@ -5980,7 +5982,7 @@ D: They are also living proof that two heads are not more intelligent than one..
 N:422:The King of Water
 G:E:b
 I:120:25d100:12:80:50
-W:56:3:0:4250
+W:56:3:12:4250
 M:0:25:60:91
 B:HIT:BATTER:6d5
 B:HIT:BATTER:6d5
@@ -6714,7 +6716,7 @@ D:She is a demon of female form with many arms, each bearing deadly weapons.
 N:466:The Master of Earth
 G:E:u
 I:110:28d100:10:97:90
-W:59:3:0:4500
+W:59:3:13:4500
 B:HIT:BATTER:9d6
 B:HIT:BATTER:9d6
 B:BOULDER:HURT:35d10
@@ -6753,7 +6755,7 @@ D:It is a massive humanoid demon wreathed in flames.
 N:468:The Queen of Air
 G:E:G
 I:130:27d100:12:50:50
-W:58:3:0:4750
+W:58:3:11:4750
 M:20:20:60:84
 B:HIT:BATTER:4d6
 B:HIT:BATTER:4d6
@@ -9305,6 +9307,7 @@ N:617:Harry Goatleaf, Gatekeeper of Bree
 G:t:w
 I:110:35d10:40:10:3
 W:0:4:0:0
+M:20:0:0:0
 B:GAZE
 B:INSULT
 F:UNIQUE | MALE | 
@@ -9348,8 +9351,10 @@ N:620:Bill Ferny, Agent of Saruman
 G:t:b
 I:120:6d10:16:8:10
 W:6:3:0:90
+M:20:0:0:0
 B:HIT:HURT:1d8
 B:HIT:HURT:1d8
+B:INSULT
 F:UNIQUE | MALE
 F:FORCE_MAXHP | 
 F:ONLY_ITEM | DROP_2D2 | DROP_GOOD | 
@@ -9536,7 +9541,7 @@ F:FORCE_MAXHP |
 F:ESCORT | 
 F:ONLY_ITEM | DROP_1D2 | DROP_GOOD | 
 F:OPEN_DOOR | BASH_DOOR | WARRIOR | NEED_LITE
-F:EVIL | ORC | IM_FIRE | IM_COLD | IM_POIS | NO_CONF | NO_SLEEP
+F:EVIL | ORC | IM_FIRE | IM_COLD | IM_POIS | NO_CONF | NO_SLEEP | MAN
 D:A strong and cunning orc warrior, a commander of Saruman's orcish horde.
 
 #Need new stats. Using Ugluk. Probably much more poweful.
@@ -10286,8 +10291,8 @@ D:A large ant with powerful mandibles.
 
 N:689:Giant shimmering ant
 G:a:b
-I:110:8d8:10:40:60
-W:25:2:0:0
+I:110:10d8:10:40:60
+W:21:2:0:0
 B:BITE:ELEC:5d5
 F:WEIRD_MIND | BASH_DOOR | RAND_25 | IM_ELEC |
 F:INSECT | FRIEND | RES_LITE | RES_DARK
@@ -11825,7 +11830,7 @@ D:A shimmering ball of light which dances around town.
 N:801:Unseen servant
 G:E:y
 I:110:9d8:12:28:40
-W:14:4:0:58
+W:14:4:15:58
 B:HIT:HURT:1d6
 B:HIT:HURT:1d6
 F:RAND_50 | 
@@ -11838,7 +11843,7 @@ D:It is impossible to define its form but it impends your progress.
 N:802:Hidden tracker
 G:E:y
 I:120:14d10:16:37:30
-W:25:4:0:179
+W:25:4:15:179
 B:HIT:HURT:2d6
 B:HIT:HURT:2d6
 B:HIT:HURT:2d6
@@ -11852,7 +11857,7 @@ D:It is impossible to define its form but it hunts you fearlessly.
 N:803:Silent killer
 G:E:y
 I:140:25d12:24:55:10
-W:54:5:0:480
+W:54:5:15:480
 B:HIT:HURT:4d6
 B:HIT:HURT:4d6
 B:HIT:HURT:4d6
@@ -11867,7 +11872,7 @@ D:It is impossible to define its form but its violence is legendary.
 N:804:Magma spirit
 G:E:o
 I:120:14d9:15:40:40
-W:20:2:0:105
+W:20:2:19:105
 B:HIT:FIRE:2d6
 B:HIT:HURT:3d5
 B:HIT:FIRE:2d6
@@ -11881,7 +11886,7 @@ D:A whirlwind of sentient magma.
 N:805:Smoke spirit
 G:E:R
 I:130:4d16:10:60:40
-W:17:2:0:40
+W:17:2:17:40
 B:HIT:FIRE:2d5 
 F:EMPTY_MIND | BASH_DOOR | CAN_FLY |
 F:EVIL | IM_POIS | IM_FIRE | IM_COLD | IM_ELEC |
@@ -11891,7 +11896,7 @@ D:A whirlwind of sentient smoke.
 N:806:Ooze spirit
 G:E:u
 I:130:7d8:10:55:50
-W:18:2:0:50
+W:18:2:16:50
 B:TOUCH:ACID:1d6
 B:TOUCH:ACID:1d6
 F:RAND_25 | 
@@ -11904,7 +11909,7 @@ D:A whirling form of sentient ooze.
 N:807:Ice spirit
 G:E:w
 I:120:14d10:10:42:60
-W:16:2:0:100
+W:16:2:18:100
 B:HIT:ICE:3d4
 F:EMPTY_MIND | COLD_BLOOD | BASH_DOOR | 
 F:EVIL | IM_POIS | IM_COLD | IM_ELEC |
@@ -11914,7 +11919,7 @@ D:A whirlpool of sentient ice.
 N:808:Djinn
 G:E:g
 I:120:10d100:12:50:50
-W:57:2:0:3000
+W:57:2:11:3000
 M:0:10:40:50
 B:HIT:HURT:4d6
 B:HIT:HURT:4d6
@@ -11924,7 +11929,7 @@ F:RAND_25 | DROP_60 | DROP_GOOD
 F:KILL_ITEM | KILL_BODY | BASH_DOOR | POWERFUL | 
 F:EVIL | IM_BLUNT | IM_EDGED | IM_POIS | NO_STUN | IM_ELEC
 F:NO_CONF | NO_SLEEP | SMART | ATTR_METAL
-S:S_ELEMENT | BALL_WIND | ADD_MANA
+S:S_GROUP | BALL_WIND | ADD_MANA
 D:A powerful air elemental, it is eternally angered at humanity. Flee it
 D: while you can, for legends tell that a djinn cannot be hurt by
 D: mere mortals.
@@ -12770,7 +12775,8 @@ N:871:Hobbit reveller
 G:h:b
 I:110:2d3:10:1:0
 W:0:2:0:0
-B:BEG
+M:10:0:0:0
+B:SING
 F:MALE | 
 F:FRIENDS | RAND_50
 F:ONLY_GOLD | DROP_60 | HAS_LITE | NEED_LITE | SMART
@@ -14625,7 +14631,7 @@ B:HIT:BATTER:1d8
 B:HIT:BATTER:1d8
 F:FRIENDS | DROP_90 | 
 F:OPEN_DOOR | BASH_DOOR | 
-F:EVIL | GIANT | ORC | NEED_LITE
+F:EVIL | GIANT | ORC | NEED_LITE | MAN
 D:A giant half-human orc-like figure.
 
 N:1014:Ogre sergant
@@ -17187,7 +17193,7 @@ D: accuracy.
 N:1196:Spectral hunter
 G:E:R
 I:110:30d10:30:20:0
-W:32:5:0:270
+W:32:5:15:270
 B:HIT:HURT:4d6
 F:FORCE_DEPTH | 
 F:NEVER_MISS | SAME_SPEED | COLD_BLOOD | 
@@ -17783,7 +17789,7 @@ D: tiny legs.
 N:1237:Marid
 G:E:B
 I:120:12d100:12:50:50
-W:59:2:0:3000
+W:59:2:12:3000
 M:0:10:50:60
 B:HIT:HURT:5d6
 B:HIT:HURT:5d6
@@ -17793,7 +17799,7 @@ F:RAND_25 | DROP_90 | DROP_GOOD
 F:KILL_ITEM | KILL_BODY | BASH_DOOR | POWERFUL | 
 F:EVIL | IM_BLUNT | IM_EDGED | IM_COLD | RES_WATER | NO_STUN
 F:NO_CONF | NO_SLEEP | SMART | ATTR_METAL
-S:S_ELEMENT | BOLT_WATER | ADD_MANA
+S:S_GROUP | BOLT_WATER | ADD_MANA
 D:A powerful water elemental, it is eternally angered at humanity. Flee it
 D: while you can, for legends tell that a marid cannot be hurt by
 D: mere mortals.
@@ -17801,7 +17807,7 @@ D: mere mortals.
 N:1238:Efreet
 G:E:R
 I:120:12d100:12:50:50
-W:61:2:0:3000
+W:61:2:14:3000
 M:0:10:60:70
 B:HIT:HURT:6d6
 B:HIT:HURT:6d6
@@ -17811,7 +17817,7 @@ F:RAND_25 | DROP_90 | DROP_GOOD
 F:KILL_ITEM | KILL_BODY | BASH_DOOR | POWERFUL | 
 F:EVIL | IM_BLUNT | IM_EDGED | IM_FIRE | RES_PLAS | NO_STUN
 F:NO_CONF | NO_SLEEP | SMART | ATTR_METAL
-S:S_ELEMENT | BALL_FIRE | ADD_MANA
+S:S_GROUP | BALL_FIRE | ADD_MANA
 D:A powerful fire elemental, it is eternally angered at humanity. Flee it
 D: while you can, for legends tell that an efreet cannot be hurt by
 D: mere mortals.
@@ -17819,7 +17825,7 @@ D: mere mortals.
 N:1239:Dao
 G:E:U
 I:120:12d100:12:50:50
-W:63:2:0:3000
+W:63:2:13:3000
 M:0:10:70:80
 B:HIT:HURT:7d6
 B:HIT:HURT:7d6
@@ -17829,7 +17835,7 @@ F:RAND_25 | DROP_90 | DROP_GOOD
 F:KILL_ITEM | KILL_BODY | BASH_DOOR | POWERFUL | 
 F:EVIL | IM_BLUNT | IM_EDGED | IM_ACID | NO_STUN | NO_CUTS
 F:NO_CONF | NO_SLEEP | SMART | ATTR_METAL
-S:S_ELEMENT | BALL_SHARD | ADD_MANA
+S:S_GROUP | BALL_SHARD | ADD_MANA
 D:A powerful earth elemental, it is eternally angered at humanity. Flee it
 D: while you can, for legends tell that a dao cannot be hurt by
 D: mere mortals.
@@ -17837,7 +17843,7 @@ D: mere mortals.
 N:1240:Sylph
 G:E:G
 I:130:5d10:18:12:10
-W:24:1:0:20
+W:24:1:11:20
 M:0:25:24:30
 F:OPEN_DOOR | BASH_DOOR | DROP_1D2 | CAN_FLY | EVASIVE | NEVER_BLOW
 F:RES_EDGED | RES_BLUNT | IM_ELEC | ATTR_METAL
@@ -17847,7 +17853,7 @@ D:A vicarious spirit of the high clouds, winged and casting spells whistfuly.
 N:1241:Kobold
 G:E:u
 I:110:15d10:18:12:10
-W:27:1:0:20
+W:27:1:13:20
 M:0:25:27:33
 B:HIT:HURT:1d6
 B:HIT:HURT:1d6
@@ -17859,7 +17865,7 @@ D:A malicious spirit of the deep mines, set in stone and casting spells ponderou
 N:1242:Sprite
 G:E:r
 I:120:12d10:18:12:10
-W:30:1:0:20
+W:30:1:14:20
 M:0:25:30:36
 B:TOUCH:FIRE:1d6
 F:OPEN_DOOR | BASH_DOOR | DROP_1D2
@@ -17870,7 +17876,7 @@ D:A viscious spirit of hot flames, burning brightly and casting spells furiously
 N:1243:Naiad
 G:E:b
 I:120:14d10:18:12:10
-W:33:1:0:20
+W:33:1:13:20
 M:0:25:33:39
 B:TOUCH:WATER:1d6
 F:OPEN_DOOR | BASH_DOOR | DROP_1D2 | CAN_SWIM
@@ -17898,10 +17904,72 @@ F:ANIMAL | CAN_FLY
 D:A barnyard chicken.
 
 N:1246:Cow
-G:Q:w
+G:Q:o
 I:105:2d6:30:1:10
 W:0:3:0:0
 B:BUTT:HURT
-F:ANIMAL
+F:ANIMAL | FRIEND
 D:A peacefully grazing bovine.
 
+N:1247:Sheep
+G:Q:w
+I:110:2d3:30:1:10
+W:0:3:0:0
+B:BUTT:HURT
+F:ANIMAL | FRIENDS
+D:A bleating but harmless animal.
+
+N:1248:Zombified dwarf
+G:z:r
+I:110:14d8:20:24:20
+W:13:1:0:34
+M:15:0:0:0
+B:HIT:HURT:2d6
+B:HIT:HURT:2d6
+B:FLASK:EXPLODE:6d6
+F:EMPTY_MIND | COLD_BLOOD | OPEN_DOOR | BASH_DOOR | HAS_LITE
+F:EVIL | UNDEAD | IM_COLD | IM_POIS | IM_FIRE | DWARF
+F:NO_CONF | NO_SLEEP | NO_FEAR
+D:It is a shambling dwarven corpse, with a burnt beard and skin peeling and red, armed with rusted grenades.
+
+N:1249:Drowned dead
+G:z:w
+I:110:20d9:20:34:60
+W:20:1:0:70
+M:0:18:9:60
+B:HIT:HURT:3d4
+B:HIT:HURT:3d4
+B:VOMIT:WATER:4d6
+B:SPIT:POISON:3d6
+F:ONLY_ITEM | DROP_90
+F:EMPTY_MIND | COLD_BLOOD | OPEN_DOOR | BASH_DOOR
+F:EVIL | UNDEAD | IM_POIS | IM_FIRE | RES_WATER
+F:NO_CONF | NO_SLEEP | NO_FEAR | CAN_SWIM | FRIEND
+D:It is a bloated human form decomposing and leaking foul water.
+
+N:1250:Goblin grenadier
+G:k:r
+I:110:12d5:24:13:20:1
+W:9:3:20:12
+M:20:0:0:0
+B:HIT:HURT:1d8
+B:FLASK:EXPLODE:6d5
+B:EXPLODE:EXPLODE:12d5
+F:OPEN_DOOR | BASH_DOOR | 
+F:DROP_90 | EVIL | IM_POIS
+D:A slightly-singed ugly humanoid liable to blow himself up as much as anyone else.
+
+N:1251:Demolitions expert
+G:t:g
+I:110:12d10:20:40:40
+W:25:2:0:145
+M:20:20:8:30
+B:HIT:HURT:3d5
+B:HIT:HURT:3d5
+B:FLASK:EXPLODE:12d7
+F:MALE
+F:DROP_1D2
+F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
+F:NEED_LITE | SMART
+S:TRAPS
+D:An expert with traps and explosives, he is missing only a couple of fingers.

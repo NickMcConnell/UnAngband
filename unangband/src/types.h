@@ -617,7 +617,6 @@ struct monster_race
 	byte mana;	/* Mana */
 	byte spell_power;/* Spell power */
 
-
 	u32b flags1;    /* Flags 1 (general) */
 	u32b flags2;    /* Flags 2 (abilities) */
 	u32b flags3;    /* Flags 3 (race/resist) */
@@ -632,19 +631,17 @@ struct monster_race
 
 	byte level;     /* Level of creature */
 	byte rarity;    /* Rarity of creature */
-
-
 	byte d_attr;    /* Default monster attribute */
 	char d_char;    /* Default monster character */
 
-
 	byte x_attr;    /* Desired monster attribute */
 	char x_char;    /* Desired monster character */
-
-
 	byte max_num;   /* Maximum population allowed per level */
-
 	byte cur_num;   /* Monster population on current level */
+
+	byte grp_idx;	/* Monster group index */
+	byte pad;
+	s16b pad2;
 #if 0
 	s16b note;      /* Inscribe body parts with */
 #endif

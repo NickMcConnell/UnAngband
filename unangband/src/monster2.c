@@ -2802,6 +2802,20 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 				else ammo_sval = SV_AMMO_HEAVY;
 				break;
 			}
+			case RBM_FLASK:
+			{
+				if (d_dice < 7)
+				{
+					ammo_tval = TV_FLASK;
+					ammo_sval = SV_FLASK_OIL;
+				}
+				else
+				{
+					ammo_tval = TV_POTION;
+					ammo_sval = SV_POTION_DETONATIONS;
+				}
+				break;
+			}
 		}
 
 		/* Blow doesn't need ammo */
@@ -2844,8 +2858,8 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		/* Archers get more shots */
 		if (r_ptr->flags2 & (RF2_ARCHER)) o_ptr->number += (byte)rand_range(1, r_ptr->level);
 
-		/* Boulder throwers get less shots */
-		if (ammo_tval == TV_JUNK) o_ptr->number = (o_ptr->number + 1) / 2;
+		/* Boulder / flask throwers get less shots */
+		if ((ammo_tval == TV_JUNK) || (ammo_tval == TV_FLASK) || (ammo_tval == TV_POTION)) o_ptr->number = (o_ptr->number + 1) / 2;
 
 		/* Mark the object as specific to the monster */
 		o_ptr->name3 = m_ptr->r_idx;
@@ -3421,7 +3435,7 @@ static bool summon_specific_okay(int r_idx)
 			warrior priests hang out with warriors and priests */
 		case SUMMON_CLASS:
 		{
-			if (summon_char_type)
+			if (summon_flag_type)
 			{
 				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
 
@@ -3466,46 +3480,22 @@ static bool summon_specific_okay(int r_idx)
 			break;
 		}
 
-		/* Mega Hack -- this whole thing is ugly */
-		case SUMMON_ELEMENT:
+		case SUMMON_GROUP:
 		case ANIMATE_ELEMENT:
 		{
-			if (summon_element_type < MAX_ELEMENTS)
+			if (summon_group_type)
 			{
-				okay = FALSE;
+				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
 
-				if (strchr("EvgZ", r_ptr->d_char) &&
-					!(r_ptr->flags1 & (RF1_UNIQUE)))
-				{
-					int i, k, element_idx = MAX_ELEMENTS;
+					/* Has a group */
+					(r_ptr->grp_idx) && 
 
-					/* Mega Hack -- attempt to match an element */
-					/* XXX The table is laid out in such a way that we should pick the correct element
-					   for most hounds, vortexes and elementals. We cheat particularly with vortexes and
-					   hounds and relate more of them to a single type of elemental (e.g acid hounds
-					   associate with ooze elementals, dark hounds with smoke elementals). */
-					for (i = 0; i < MAX_ELEMENTS; i++)
-					{
-						/* Match on blow effects */
-						for (k = 0; k < 4; k++)
-						{
-							if (r_ptr->blow[k].effect == element[i].effect) element_idx = i;
-						}
-
-						/* Match on monster flags */
-						if ((r_ptr->flags2 & (element[i].race_flags2)) != 0) element_idx = i;
-						if ((r_ptr->flags3 & (element[i].race_flags3)) != 0) element_idx = i;
-						if ((r_ptr->flags4 & (element[i].race_flags4)) != 0) element_idx = i;
-						if ((r_ptr->flags5 & (element[i].race_flags5)) != 0) element_idx = i;
-						if ((r_ptr->flags6 & (element[i].race_flags6)) != 0) element_idx = i;
-					}
-
-					okay = (element_idx == summon_element_type);
-				}
+					/* Match group index */
+					(r_ptr->grp_idx == summon_group_type));
 			}
 			else
 			{
-				okay = (strchr("EvgZ", r_ptr->d_char) &&
+				okay = ((r_ptr->grp_idx) &&
 					!(r_ptr->flags1 & (RF1_UNIQUE)));
 			}
 			break;
@@ -3932,6 +3922,82 @@ bool summon_specific(int y1, int x1, int lev, int type)
 
 	/* Attempt to place the monster (awake, allow groups) */
 	if (!place_monster_aux(y, x, r_idx, FALSE, TRUE)) return (FALSE);
+
+	/* Hack -- Set specific summoning parameters if not currently set */
+	switch (summon_specific_type)
+	{
+		case SUMMON_KIN:
+		case RAISE_KIN:
+		{
+			if (!summon_char_type) summon_char_type = r_info[r_idx].d_char;
+			break;
+		}
+
+		/* Hack -- we combine two different flag types */
+		case SUMMON_RACE:
+		case ANIMATE_DEAD:
+		{
+			if (!summon_flag_type)
+			{
+				summon_flag_type |= r_info[r_idx].flags3 & (RF3_RACE_MASK);
+				summon_flag_type |= r_info[r_idx].flags9 & (RF9_RACE_MASK);
+			}
+			break;
+		}
+
+		/* Hack -- try to summon birds, beasts or reptiles based on summoner */
+		case SUMMON_ANIMAL:
+		{
+			if (!summon_flag_type)
+			{
+				summon_flag_type |= r_info[r_idx].flags8 & (RF8_SKIN_MASK);
+
+				if (!summon_flag_type) summon_flag_type = RF8_HAS_SCALE;
+
+			}
+			break;
+		}
+
+		/* Hack -- mage priests only hang out with mage priests, but
+			warrior priests hang out with warriors and priests */
+		case SUMMON_CLASS:
+		{
+			if (!summon_flag_type)
+			{
+				summon_flag_type = r_info[r_idx].flags2 & (RF2_CLASS_MASK);
+			}
+			break;
+		}
+
+		case SUMMON_GROUP:
+		case ANIMATE_ELEMENT:
+		{
+			if (!summon_group_type)
+			{
+				summon_group_type = r_info[r_idx].grp_idx;
+			}
+			break;
+		}
+
+		case SUMMON_FRIEND:
+		{
+			if (!summon_race_type)
+			{
+				summon_race_type = r_idx;
+			}
+			break;
+		}
+
+		case SUMMON_UNIQUE_FRIEND:
+		{
+			if (!summon_attr_type && !summon_char_type)
+			{
+				summon_char_type = r_info[r_idx].d_char;
+				summon_attr_type = r_info[r_idx].d_attr;
+			}
+			break;
+		}
+	}
 
 	/* Success */
 	return (TRUE);

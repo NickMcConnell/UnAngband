@@ -370,7 +370,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags7 & RF7_S_SPIDER)    vp[vn++] = "summon spiders";
 	if (l_ptr->flags7 & RF7_S_CLASS)     vp[vn++] = "summon monsters of the same class";
 	if (l_ptr->flags7 & RF7_S_RACE)      vp[vn++] = "summon monsters of the same race";
-	if (l_ptr->flags7 & RF7_S_ELEMENT)   vp[vn++] = "summon monsters of the same element";
+	if (l_ptr->flags7 & RF7_S_GROUP)     vp[vn++] = "summon monsters of the same group";
 	if (l_ptr->flags7 & RF7_S_FRIEND)    vp[vn++] = "summon a friend";
 	if (l_ptr->flags7 & RF7_S_FRIENDS)   vp[vn++] = "summon several friends";
 	if (l_ptr->flags7 & RF7_S_ORC)       vp[vn++] = "summon orcs";
@@ -729,8 +729,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case RBM_ARC_20:	p = "create a 20 degree arc"; break;
 			case RBM_ARC_30:	p = "create a 30 degree arc"; break;
 			case RBM_ARC_60:	p = "create a 60 degree arc"; break;
-
-
+			case RBM_FLASK:	p = "throw a grenade at you"; break;
 		}
 
 

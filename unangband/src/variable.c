@@ -93,7 +93,7 @@ s16b monster_level;	     /* Current monster creation level */
 
 char summon_char_type;	   /* Hack -- See summon_specific() */
 byte summon_attr_type;	   /* Hack -- See summon_specific() */
-byte summon_element_type;  /* Hack -- See summon_specific() */
+byte summon_group_type;  /* Hack -- See summon_specific() */
 u32b summon_flag_type;	   /* Hack -- See summon_specific() */
 s16b summon_race_type;	   /* Hack -- See summon_specific() */
 

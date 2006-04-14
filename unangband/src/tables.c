@@ -2888,7 +2888,7 @@ const byte spell_info_RF7[32][5]=
 	{15,    0,     0,     0,     0},        /* RF7_S_SPIDER */ /* Summon - 6 */
 	{10,    0,     0,     0,     0},        /* RF7_S_CLASS */
 	{10,    0,     0,     0,     0},        /* RF7_S_RACE */
-	{15,    0,     0,     0,     0},        /* RF7_S_ELEMENT */ /* Summon - 6 */
+	{15,    0,     0,     0,     0},        /* RF7_S_GROUP */ /* Summon - 6 */
 	{5,     0,     0,     0,     0},        /* RF7_S_FRIEND */ /* Summon - 2 */
 	{10,    0,     0,     0,     0},        /* RF7_S_FRIENDS */
 	{10,    0,     0,     0,     0},        /* RF7_S_ORC */
