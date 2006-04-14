@@ -2269,6 +2269,10 @@ void py_attack(int y, int x)
 
 		tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
 	}
+	else if (fear)
+	{
+		tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has hurt me badly!");
+	}
 
 	/* Hack -- delay fear messages */
 	if (fear && m_ptr->ml)

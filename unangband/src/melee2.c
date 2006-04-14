@@ -3203,6 +3203,7 @@ void monster_speech(int m_idx, cptr saying, bool understand)
 				else
 				{
 					u = "The ";
+					if (s != saying) u = "the ";
 
 					/* Copy the string */
 					while (*u) *t++ = *u++;

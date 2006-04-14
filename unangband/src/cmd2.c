@@ -3379,6 +3379,19 @@ void do_cmd_fire(void)
 					/* Message */
 					message_pain(cave_m_idx[y][x], tdam);
 
+					/* Alert fellows */
+					if (was_asleep)
+					{
+						m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
+
+						/* Let allies know */
+						tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
+					}
+					else if (fear)
+					{
+						tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has hurt me badly!");
+					}
+
 					/* Take note */
 					if (fear && m_ptr->ml)
 					{
@@ -3390,15 +3403,6 @@ void do_cmd_fire(void)
 						/* Message */
 						message_format(MSG_FLEE, m_ptr->r_idx,
 							       "%^s flees in terror!", m_name);
-					}
-
-					/* Alert fellows */
-					if (was_asleep)
-					{
-						m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
-
-						/* Let allies know */
-						tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
 					}
 
 					/* Get item effect */
@@ -3816,6 +3820,10 @@ void do_cmd_throw(void)
 
 						/* Let allies know */
 						tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
+					}
+					else if (fear)
+					{
+						tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has hurt me badly!");
 					}
 
 					/* Take note */
