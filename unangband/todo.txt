@@ -92,6 +92,10 @@ TODO: Allow monsters to ride other monsters.
 
 TODO: Allow small monsters to stack on each other.
 
+TODO: Update to safe string handling routines from latest Angband builds.
+
+TODO: Update to latest X11 and GCU Angband files to fix compiler warnings.
+
 Release v0.6.5
 ==============
 
