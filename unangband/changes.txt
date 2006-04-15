@@ -134,6 +134,11 @@ weapon.
 
 - If you wake a monster and fail to kill it, it will alert those around it.
 
+- Monsters that correspond to player races now have similar abilities: dwarves resist
+blindness, goblins are immune to poison, gnomes cannot be slowed or paralyzed. To
+distinguish goblins from orcs, they have become the union of a love that dare not
+speak its name.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.

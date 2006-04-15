@@ -702,6 +702,14 @@ static int find_resist(u32b smart, int effect)
 			return(a);
 		}
 
+		/* Spells that probe the player */
+		case GF_PROBE:
+		{
+			if (smart) return(50);
+
+			return(0);
+		}
+
 		/* Anything else */
 		default:
 		{

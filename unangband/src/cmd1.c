@@ -417,8 +417,10 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 					/* Water reduces acid damage */
 					else if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
 					{
-						if (mult < 2 ) mult = 2;
+						if (m_ptr->oppose_elem) /* Do nothing */;
+						else if (mult < 2 ) mult = 2;
 					}
+					else if ((m_ptr->oppose_elem) && (mult < 2)) mult = 2;
 					else if (mult < 3) mult = 3;
 				}
 			}
@@ -448,8 +450,10 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 					/* Water increases damage */
 					if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
 					{
-						if (mult < 4 ) mult = 4;
+						if ((m_ptr->oppose_elem) && (mult < 2)) mult = 3;
+						else if (mult < 4 ) mult = 4;
 					}
+					else if ((m_ptr->oppose_elem) && (mult < 2)) mult = 2;
 					else if (mult < 3) mult = 3;
 				}
 			}
@@ -479,8 +483,10 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 					/* Water decreases damage */
 					if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
 					{
-						if (mult < 2 ) mult = 2;
+						if (m_ptr->oppose_elem) /* Do nothing */;
+						else if (mult < 2 ) mult = 2;
 					}
+					else if ((m_ptr->oppose_elem) && (mult < 2)) mult = 2;
 					else if (mult < 3) mult = 3;
 				}
 			}
@@ -510,8 +516,10 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 					/* Water increases damage */
 					if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
 					{
-						if (mult < 4 ) mult = 4;
+						if ((m_ptr->oppose_elem) && (mult < 2)) mult = 3;
+						else if (mult < 4 ) mult = 4;
 					}
+					else if ((m_ptr->oppose_elem) && (mult < 2)) mult = 2;
 					else if (mult < 3) mult = 3;
 				}
 			}

@@ -4104,6 +4104,11 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 					l_ptr->flags3 |= (RF3_IM_ACID);
 				}
 			}
+			else if (m_ptr->oppose_elem)
+			{
+				dam /= 3;
+				note = " is temporarily resistant to acid.";
+			}
 			else if (r_ptr->flags3 & (RF2_ARMOR))
 			{
 				dam /= 2;
@@ -4132,6 +4137,11 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 					l_ptr->flags3 |= (RF3_IM_ELEC);
 				}
 			}
+			else if (m_ptr->oppose_elem)
+			{
+				dam /= 3;
+				note = " is temporarily resistant to lightning.";
+			}
 			break;
 		}
 
@@ -4151,6 +4161,11 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 					l_ptr->flags3 |= (RF3_IM_FIRE);
 				}
 			}
+			else if (m_ptr->oppose_elem)
+			{
+				dam /= 3;
+				note = " is temporarily resistant to fire.";
+			}
 			break;
 		}
 
@@ -4169,6 +4184,11 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 					note = " is immune to cold.";
 					l_ptr->flags3 |= (RF3_IM_COLD);
 				}
+			}
+			else if (m_ptr->oppose_elem)
+			{
+				dam /= 3;
+				note = " is temporarily resistant to cold.";
 			}
 			break;
 		}
@@ -4256,13 +4276,13 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			/* Can resist fire / darkness */
 			else if ((r_ptr->flags3 & (RF3_IM_FIRE)) || (r_ptr->flags9 & (RF9_RES_DARK)))
 			{
-				if ((seen) && !(l_ptr->flags3 & (RF3_IM_FIRE)))
+				if ((seen) && (r_ptr->flags3 & (RF3_IM_FIRE)) && !(l_ptr->flags3 & (RF3_IM_FIRE)))
 				{
 					note = " resists the evil fire.";
 					l_ptr->flags3 |= (RF3_IM_FIRE);
 				}
 
-				if ((seen) && !(l_ptr->flags9 & (RF9_RES_DARK)))
+				if ((seen) && (r_ptr->flags9 & (RF9_RES_DARK)) && !(l_ptr->flags9 & (RF9_RES_DARK)))
 				{
 					note = " resists the dark flames.";
 					l_ptr->flags9 |= (RF9_RES_DARK);
@@ -4272,9 +4292,13 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			/* Evil creatures resist a little */
-			else if (r_ptr->flags3 & (RF3_EVIL))
+			else if ((r_ptr->flags3 & (RF3_EVIL)) || (m_ptr->oppose_elem))
 			{
-				if ((seen) && !(l_ptr->flags3 & (RF3_EVIL)))
+				if (m_ptr->oppose_elem)
+				{
+					note = " is temporarily resistant to fire.";
+				}
+				if ((seen) && (r_ptr->flags3 & (RF3_EVIL)) && !(l_ptr->flags3 & (RF3_EVIL)))
 				{
 					note = " resists somewhat.";
 					l_ptr->flags3 |= (RF3_EVIL);
@@ -4468,6 +4492,11 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 					l_ptr->flags3 |= (RF3_IM_FIRE);
 				}
 			}
+			else if (m_ptr->oppose_elem)
+			{
+				dam *= 3; dam /= (randint(3)+3);
+				note = " is temporarily resistant to fire.";
+			}
 
 			if (r_ptr->flags3 & (RF3_RES_WATER))
 			{
@@ -4502,6 +4531,11 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 					l_ptr->flags3 |= (RF3_IM_FIRE);
 				}
 			}
+			else if (m_ptr->oppose_elem)
+			{
+				dam *= 3; dam /= (randint(3)+3);
+				note = " is temporarily resistant to fire.";
+			}
 
 			if (r_ptr->flags3 & (RF3_RES_LAVA))
 			{
@@ -4532,6 +4566,11 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 					note = " somewhat resists boiling mud.";
 					l_ptr->flags3 |= (RF3_IM_FIRE);
 				}
+			}
+			else if (m_ptr->oppose_elem)
+			{
+				dam *= 3; dam /= (randint(3)+3);
+				note = " is temporarily resistant to fire.";
 			}
 
 			if (r_ptr->flags2 & (RF2_CAN_DIG))
@@ -4819,13 +4858,19 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			do_cuts = (randint(15) + r) / (r + 1);
 			if (r_ptr->flags3 & (RF3_IM_COLD))
 			{
-				dam /= 9;
+				dam /= 3;
 				if ((seen) && !(l_ptr->flags3 & (RF3_IM_COLD)))
 				{
 					note = " resists ice.";
 					l_ptr->flags3 |= (RF3_IM_COLD);
 				}
 			}
+			else if (m_ptr->oppose_elem)
+			{
+				dam /= 2;
+				note = " is temporarily resistant to fire.";
+			}
+
 			break;
 		}
 
@@ -5992,6 +6037,11 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 					l_ptr->flags3 |= (RF3_IM_FIRE);
 				}
 			}
+			else if (m_ptr->oppose_elem)
+			{
+				dam *= 3; dam /= (randint(3)+3);
+				note = " is temporarily resistant to fire.";
+			}
 
 			if (r_ptr->flags3 & (RF3_RES_WATER))
 			{
@@ -6004,6 +6054,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 			break;
 		}
+
 		/* Vapour -- weak acid */
 		case GF_VAPOUR:
 		{
@@ -6017,8 +6068,15 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 					l_ptr->flags3 |= (RF3_IM_ACID);
 				}
 			}
+			else if (m_ptr->oppose_elem)
+			{
+				dam /= 3;
+				note = " is temporarily resistant to acid.";
+			}
+
 			break;
 		}
+
 		/* Smoke -- weak fire */
 		case GF_SMOKE:
 		{
@@ -6032,6 +6090,12 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 					l_ptr->flags3 |= (RF3_IM_FIRE);
 				}
 			}
+			else if (m_ptr->oppose_elem)
+			{
+				dam /= 3;
+				note = " is temporarily resistant to fire.";
+			}
+
 			break;
 		}
 
