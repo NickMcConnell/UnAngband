@@ -6142,8 +6142,8 @@ D: and hate.
 
 N:434:9-headed hydra
 G:y:b
-I:120:100d22:25:100:25
-W:62:2:0:8000
+I:125:100d22:25:100:25
+W:64:2:0:8000
 M:25:25:35:75
 B:BITE:ELEC:4d9
 B:BITE:ELEC:4d9
@@ -6153,7 +6153,7 @@ F:FORCE_SLEEP | ONLY_GOLD | DROP_2D2 | DROP_4D2 | HAS_LITE
 F:OPEN_DOOR | BASH_DOOR | ANIMAL | IM_ELEC
 S:BRTH_ELEC | BALL_ELEC | BOLT_ELEC | BEAM_ELEC | SCARE
 S:BLIND
-D:A strange reptilian hybrid with nine heads.
+D:A strange reptilian hybrid with nine heads.  It is lightning fast.
 
 N:435:Enchantress
 G:q:B
@@ -7034,7 +7034,7 @@ D: the definition of dragonfire.
 N:482:Master mystic
 G:p:U
 I:130:11d100:30:60:5
-W:62:2:0:6000
+W:64:2:0:6000
 M:0:33:50:84
 B:PUNCH:BATTER:2d10
 B:KICK:HURT:20d2
@@ -7333,7 +7333,7 @@ D: down your spine as you face it.
 N:499:Hand druj
 G:s:y
 I:130:60d10:20:110:10
-W:63:4:0:12000
+W:64:4:0:12000
 M:0:100:45:78
 F:FORCE_SLEEP | FORCE_MAXHP | NEVER_MOVE | NEVER_BLOW
 F:SMART | COLD_BLOOD
@@ -10408,7 +10408,7 @@ D: and there is a static feeling in the air.
 N:696:Ancient amethyst dragon
 G:A:v
 I:120:21d100:20:100:70
-W:68:4:0:13000
+W:73:4:0:13000
 M:20:20:20:40
 B:CLAW:HURT:4d10
 B:CLAW:HURT:4d10
@@ -10425,7 +10425,7 @@ D: while you feel the weight of years press down on you.
 N:697:Ancient diamond dragon
 G:A:w
 I:120:21d100:20:100:70
-W:65:4:0:13000
+W:73:4:0:13000
 M:20:20:20:40
 B:CLAW:HURT:4d10
 B:CLAW:HURT:4d10
@@ -10442,7 +10442,7 @@ D: lights the dungon around you with crackles and sparks.
 N:698:Ancient emerald dragon
 G:A:g
 I:120:21d100:20:100:70
-W:65:5:0:13000
+W:73:5:0:13000
 M:20:20:20:40
 B:CLAW:HURT:4d10
 B:CLAW:HURT:4d10
@@ -10459,7 +10459,7 @@ D: force and you feel stunned just looking at it.
 N:699:Ancient sapphire dragon
 G:A:s
 I:120:21d100:20:100:70
-W:67:5:0:13000
+W:73:5:0:13000
 M:20:20:20:40
 B:CLAW:HURT:4d10
 B:CLAW:HURT:4d10
@@ -10476,7 +10476,7 @@ D: down as its oppressive gravity overwhelms you.
 N:700:Ancient ruby dragon
 G:A:r
 I:120:21d100:20:100:70
-W:67:5:0:13000
+W:73:5:0:13000
 M:20:20:20:40
 B:CLAW:HURT:4d10
 B:CLAW:HURT:4d10
@@ -10493,7 +10493,7 @@ D: moving... slower...
 N:701:Sun dragon
 G:A:y
 I:120:21d100:25:100:15
-W:70:7:0:10000
+W:72:7:0:10000
 M:20:20:30:70
 B:CLAW:HURT:4d10
 B:CLAW:HURT:4d10
@@ -10513,7 +10513,7 @@ D: out your retinae.
 N:702:Star dragon
 G:A:B
 I:120:21d100:25:100:15
-W:70:7:0:10000
+W:72:7:0:10000
 M:20:20:30:70
 B:CLAW:HURT:4d10
 B:CLAW:HURT:4d10
@@ -13914,7 +13914,7 @@ D:It is a skeletal form dressed in robes.  It radiates vastly evil power.
 N:964:Spirit lich
 G:L:W
 I:110:20d55:20:72:60
-W:62:2:0:4000
+W:64:2:0:4000
 M:0:25:45:80
 B:TOUCH:EXP_40
 B:TOUCH:UN_POWER
@@ -15276,7 +15276,7 @@ D: but fortunately blessed with trollish brains.
 N:1063:Troll High Priest
 G:T:y
 I:120:30d80:30:80:20
-W:63:1:0:3000
+W:67:1:0:3000
 M:0:33:40:84
 B:HIT:BATTER:2d12
 B:HIT:BATTER:2d12
@@ -15393,7 +15393,7 @@ D:A strange reptilian hybrid with eight heads.
 N:1071:10-headed hydra
 G:y:D
 I:125:100d25:25:105:20
-W:66:2:0:9000
+W:68:2:0:9000
 M:25:25:45:80
 B:BITE:ACID:5d9
 B:BITE:ACID:5d9
@@ -17563,7 +17563,7 @@ D:spells.
 N:1221:Legendary hobbit rogue
 G:h:D
 I:140:120d10:25:35:0
-W:63:3:0:4400
+W:64:3:0:4400
 M:20:20:38:50
 B:HIT:BLIND:4d11
 B:HIT:PARALYZE:4d11
@@ -17753,7 +17753,7 @@ D:A large dragon, scales gleaming a pure garnet.
 N:1233:Ancient garnet dragon
 G:A:R
 I:120:21d100:20:100:70
-W:63:4:0:13000
+W:64:4:0:13000
 M:20:20:20:40
 B:CLAW:HURT:4d10
 B:CLAW:HURT:4d10
