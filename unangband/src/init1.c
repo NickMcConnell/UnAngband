@@ -6947,7 +6947,7 @@ errr eval_r_power(header *head)
 	long dam;
 	long *power;
 	long tot_dam[MAX_DEPTH];
-	s16b mon_count[MAX_DEPTH];
+	long mon_count[MAX_DEPTH];
 	monster_race *r_ptr = NULL;
 
 	/* Reset the sum of all monster power values */
@@ -7053,7 +7053,11 @@ errr eval_r_power(header *head)
 			 * Uniques don't count towards total monster power on the level.
 			 */
 			if (r_ptr->flags1 & RF1_UNIQUE) continue;
-#if 0
+
+/*
+ * MegaHack -- calculating the entire monster list causes non-windows systems to crash horribly.
+ */
+#ifndef WINDOWS
 			/*
 			 * While we fix the monster list, only count up to Morgoth
 			 */

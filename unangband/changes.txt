@@ -343,6 +343,9 @@ considering calling it the uniquely asked questions instead.
 
 - Fixed some compiler warnings.
 
+- Implemented a horrible hack to work around a buffer overflow bug that was
+causing non-windows systems to crash on start up.
+
 Unangband 0.5.5: "New Years Resolution"
 
 ### Game Play ###
