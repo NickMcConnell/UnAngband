@@ -135,10 +135,14 @@ static bool check_hit(int power, int level, int who, bool ranged)
 	if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_CURSED)) ac /= 2;
 
 	/* Power and Level compete against Armor */
-	if ((power > 0) && (randint(power) > ((ac * 3) / 4))) return (TRUE);
+	if (power > 0)
+	{
+		/* Armour or blocking protects */
+		if (randint(power) > ((ac * 3) / 4)) return (TRUE);
 
-	/* Give blocking message to encourage blocking */
-	if (randint(power) < ((p_ptr->blocking * 3) / 4)) msg_print("You block the attack.");
+		/* Give blocking message to encourage blocking */
+		if (randint(power) < ((p_ptr->blocking * 3) / 4)) msg_print("You block the attack.");
+	}
 
 	/* Assume miss */
 	return (FALSE);

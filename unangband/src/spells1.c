@@ -4032,6 +4032,8 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 	/* Assume a default death */
 	cptr note_dies = " dies.";
 
+	bool was_asleep;
+
 	/* No monster here */
 	if (!(cave_m_idx[y][x] > 0)) return (FALSE);
 
@@ -4046,6 +4048,8 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 	name = (r_name + r_ptr->name);
 	if (m_ptr->ml) seen = TRUE;
 
+	/* Check if monster asleep */
+	was_asleep = (m_ptr->csleep == 0);
 
 	/* Reduce damage by distance */
 	dam = (dam + r) / (r + 1);
@@ -6510,6 +6514,18 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 
 			/* Hack -- handle sleep */
 			if (do_sleep) m_ptr->csleep = do_sleep;
+		}
+
+		/* Hack -- wake up nearby allies */
+		if (was_asleep)
+		{
+			m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
+
+			tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
+		}
+		else if (fear)
+		{
+			tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has hurt me badly!");
 		}
 	}
 

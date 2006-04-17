@@ -321,6 +321,18 @@ by ekolis).
 
 - Fixed bug where monsters were incorrectly targetting themselves or the player.
 
+- Fixed bug where slime molds could be understood by player.
+
+- Fixed infinite torch bug (reported by ekolis).
+
+- Fixed bug where Bert, Bill & Tom were being generated outside the Trollshaw
+forest.
+
+- Fixed bug where monsters would not alert each other if attacked by magic.
+
+- Fixed crash bug caused by monsters trying to attack you with no power (reported
+by Mikolaj).
+
 ### Build / Platform ###
 
 - Added quest.txt in lib\edit which is used to defined fixed texts.

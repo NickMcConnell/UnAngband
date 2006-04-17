@@ -4196,10 +4196,17 @@ static bool kind_is_race(int k_idx)
 		}
 
 		/* Rod/staff/wand */
-		case TV_ROD:
 		case TV_STAFF:
+		{
+			if (r_ptr->d_char == '_') return (TRUE);
+			if (r_ptr->flags8 & (RF8_DROP_RSW)) return (TRUE);
+			return (FALSE);
+		}
+
+		case TV_ROD:
 		case TV_WAND:
 		{
+			if (r_ptr->d_char == '-') return (TRUE);
 			if (r_ptr->flags8 & (RF8_DROP_RSW)) return (TRUE);
 			return (FALSE);
 		}
@@ -4998,11 +5005,11 @@ bool break_near(object_type *j_ptr, int y, int x)
 					/* End of attacks */
 					if (!method) break;
 
-					/* Message */
-					if (!i) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
-
 					/* Skip if not spores */
 					if (method != RBM_SPORE) continue;
+
+					/* Message */
+					if (!i) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
 
 					flg = PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 

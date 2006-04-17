@@ -854,6 +854,8 @@ void do_cmd_observe(void)
 
 	cptr q, s;
 
+	bool stored = FALSE;
+
 	/* Get an item */
 	q = "Examine which item? ";
 	s = "You have nothing to examine.";
@@ -872,10 +874,15 @@ void do_cmd_observe(void)
 	}
 
 	/* Hack - obviously interested enough in item */
-	if (o_ptr->ident & (IDENT_STORE)) o_ptr->marked = TRUE;
+	if (o_ptr->ident & (IDENT_STORE))
+	{
+		o_ptr->marked = TRUE;
 
-	/* No longer 'stored' */
-	o_ptr->ident &= ~(IDENT_STORE);
+		/* No longer 'stored' */
+		o_ptr->ident &= ~(IDENT_STORE);
+
+		stored = TRUE;
+	}
 
 	/* Description */
 	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
@@ -892,6 +899,9 @@ void do_cmd_observe(void)
 	screen_object(o_ptr);
 
 	(void)anykey();
+
+	/* Store item again */
+	if (stored) o_ptr->ident |= (IDENT_STORE);
 
 	/* Load the screen */
 	screen_load();
