@@ -141,6 +141,8 @@ speak its name.
 
 - Tree trunks now block line of sight.
 
+- Improved starting shops available in Hobbiton to try and make the start game easier.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.

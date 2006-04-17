@@ -827,6 +827,9 @@ static bool store_will_buy(const object_type *o_ptr)
 			/* Analyze the type */
 			switch (o_ptr->tval)
 			{
+				case TV_FOOD:
+				if (o_ptr->sval >= SV_FOOD_MIN_FOOD) return (FALSE);
+				
 				case TV_SCROLL:
 				case TV_POTION:
 				case TV_RUNESTONE:

@@ -76,7 +76,7 @@ N:1:Hobbiton
 X:10:37
 G:h
 L:0:0:411:435:0:0
-S:264:515:265:266:0:0:0:0
+S:264:515:265:266:772:773:0:0
 D:Tip: Press '<' to travel elsewhere.
 
 #The following quests are from the hobbit.
@@ -344,7 +344,7 @@ N:36:Hobbiton, rebuilt
 X:36:0
 G:h
 L:0:0:407:419:0:0
-S:264:515:265:266:0:0:0:0
+S:264:515:265:266:772:773:0:0
 
 # The following are accessible from the first Hobbiton for consistency
 
