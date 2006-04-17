@@ -438,7 +438,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 		}
 
 		/* End */
-		text_out(" on the current panel");
+		text_out(format(" within %d grids", 2 * MAX_SIGHT));
 	}
 
 	/* Some identifies assume earlier IDs */
@@ -2489,7 +2489,7 @@ void list_object(const object_type *o_ptr, int mode)
 	bool spoil = (mode == OBJECT_FLAGS_FULL) ? TRUE : FALSE;
 
 	/* Basic stats */
-	if (!random) for (i = 0; object_group_tval[i]; i++)
+	if ((!random) && (o_ptr->tval < TV_SERVICE)) for (i = 0; object_group_tval[i]; i++)
 	{
 		if (o_ptr->tval == object_group_tval[i])
 		{
@@ -2610,6 +2610,9 @@ void list_object(const object_type *o_ptr, int mode)
 			case TV_SHOT:
 				p = "When fired, it ";
 				target = SPELL_TARGET_AIMED;
+				break;
+			case TV_SERVICE:
+				p = "When purchased, it ";
 				break;
 		}
 

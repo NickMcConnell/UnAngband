@@ -246,6 +246,8 @@ to NPPAngband's implementation.
 - Tree branches are now always displayed when you are outside.  This should prevent
 the map 'randomly' changing when you move through forested areas on the surface.
 
+- You can now examine a service in a store to determine what it does for you.
+
 
 ### Bug fixes ###
 

@@ -2508,6 +2508,7 @@ const cptr object_group_text[] =
 	"Egg"		 ,
 	"Skin"		 ,
 	"Junk"	,
+	"Service", 
 	NULL
 };
 
@@ -2558,7 +2559,8 @@ const byte object_group_tval[] =
 	TV_BODY,	
 	TV_EGG,	
 	TV_SKIN,	
-	TV_JUNK,	
+	TV_JUNK,
+	TV_SERVICE,
 	0
 };
 
