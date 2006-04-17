@@ -1060,7 +1060,7 @@ static void spoil_feat_desc(cptr fname)
 		"---", "---","---");
 
 	/* List the groups */
-	for (i = 0; i < 22; i++)
+	for (i = 0; i < 23; i++)
 	{
 		/* Write out the group title */
 		if (TRUE)
@@ -1110,7 +1110,7 @@ static void spoil_feat_desc(cptr fname)
 			n = 0;
 
 			/* Start a new set */
-			fprintf(fff, "\n\n%s\n\n", feature_group_text[i]);
+			if (feature_group_text[i]) fprintf(fff, "\n\n%s\n\n", feature_group_text[i]);
 		}
 
 		/* Get legal terrain */

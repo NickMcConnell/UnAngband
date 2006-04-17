@@ -1025,9 +1025,8 @@
 
 #define FEAT_GROUND 407
 #define FEAT_GRASS 411
-#define FEAT_TREE       420
-#define FEAT_TREE_BIG   419
-#define FEAT_TREE_HIDE  422
+#define FEAT_TREE      420
+#define FEAT_TREE_SHADE   421
 #define FEAT_TREE_APPLE  426
 #define FEAT_TREE_BROKEN 427
 #define FEAT_TREE_SHADE  421

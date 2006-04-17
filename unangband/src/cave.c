@@ -656,9 +656,6 @@ void modify_grid_unseen_view(byte *a, char *c)
  */
 void modify_grid_interesting_view(byte *a, char *c, int y, int x, byte cinfo, byte pinfo)
 {
-	(void)y;
-	(void)x;
-
 	/* Handle "seen" grids */
 	if (pinfo & (PLAY_SEEN))
 	{
@@ -962,6 +959,12 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 	/* Boring grids (floors, etc) */
 	else if (!(f_info[feat].flags1 & (FF1_REMEMBER)))
 	{
+		/* Mega Hack -- handle trees branches */
+		if (p_ptr->outside && (f_info[feat].flags3 & (FF3_NEED_TREE)))
+		{
+			feat = FEAT_TREE_SHADE;
+		}
+
 		/* Memorized (or seen) floor */
 		if ((pinfo & (PLAY_MARK)) ||
 		    (pinfo & (PLAY_SEEN)))
@@ -979,7 +982,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			c = f_ptr->x_char;
 
 			/* Special lighting effects */
-			if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
+			if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL | FF3_NEED_TREE)))
 			{
 				/* Modify the lighting */
 				(*modify_grid_boring_hook)(&a, &c, y, x, cinfo, pinfo);
@@ -1002,7 +1005,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			c = f_ptr->x_char;
 
 			/* Special lighting effects */
-			if (f_ptr->flags3 & (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
+			if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL | FF3_NEED_TREE)))
 			{
 				/* Modify lighting */
 				(*modify_grid_unseen_hook)(&a, &c);
@@ -1039,6 +1042,12 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 	/* Interesting grids (non-floors) */
 	else
 	{
+		/* Mega Hack -- handle trees branches */
+		if (p_ptr->outside && (f_info[feat].flags3 & (FF3_NEED_TREE)))
+		{
+			feat = FEAT_TREE_SHADE;
+		}
+
 		/* Memorized grids */
 		if (pinfo & (PLAY_MARK))
 		{
@@ -1065,14 +1074,14 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			c = f_ptr->x_char;
 
 			/* Special lighting effects */
-			if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
+			if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL | FF3_NEED_TREE)))
 			{
 				/* Modify lighting */
 				(*modify_grid_boring_hook)(&a, &c, y, x, cinfo, pinfo);
 			}
 
 			/* Special lighting effects */
-			else if ((view_granite_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
+			else if ((view_granite_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL | FF3_NEED_TREE)))
 			{
 				/* Modify lighting */
 				(*modify_grid_interesting_hook)(&a, &c, y, x, cinfo, pinfo);
@@ -1095,7 +1104,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			c = f_ptr->x_char;
 
 			/* Special lighting effects */
-			if (f_ptr->flags2 & (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
+			if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
 			{
 				/* Modify lighting */
 				(*modify_grid_unseen_hook)(&a, &c);
@@ -1183,7 +1192,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		    (!(cave_info[yy][x] & (CAVE_ROOM)) &&
 		      (play_info[yy][x] & (PLAY_SEEN))))
 		{
-			int i = (f_ptr->flags & (FF1_OUTER) ? 1 : (f_ptr->flags & (FF1_INNER) ? 2 : (f_ptr->flags & (FF1_INNER) ? 3);
+			int i = (f_ptr->flags & (FF1_OUTER) ? 1 : (f_ptr->flags & (FF1_INNER) ? 2 : (f_ptr->flags & (FF1_SOLID) ? 3);
 
 			/* Special rooms affect some of this */
 			int by = y/BLOCK_HGT;

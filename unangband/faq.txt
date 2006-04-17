@@ -230,4 +230,47 @@ to the river, and then south from the river to get to the barn.
 If someone does one for me, I'll include it in the game.
 
 
+[Q2.8]   Why do the shop keepers rotate whenever I go to a new town
+(Including places like Farmer Maggot's Farm)?
+
+At the moment, I only allocate enough space for 8 stores (7 + your home).
+As a result, any time you go to a new town (including towns with 1 store)
+all the stores are reset, including new contents and new shopkeepers. So
+it is possible to get infinite food from Farmer Maggot's Farm. This will
+change in the next version, so that you will only get the initial amount
+of food from the farm, and nothing more.
+
+I will allocate enough space for all the stores in the next version of
+Unangband (0.6.1). This will also allow me to potentially remove other
+hacks in the campaign mode.
+
+[Q2.9]   Why do forests and other surface locations keep hiding and
+showing the map at random?
+
+This is because you are stepping 'inside' and 'outside' the cover of tree
+branches. Unangband displays the surface map two different ways when you
+are on the surface, depending on whether you are inside or outside, which
+is controlled by the type of terrain you are standing on.
+
+When you are inside, the graphics are displayed exactly as if you were in
+the dungeon. You see known locations, and unknown locations are either
+displayed with a grey 'x' or an empty space, depending on what options you
+have set.
+
+When you are outside, a 'fake' terrain is displayed in unknown locations.
+This is similar to how Angband lites the whole town during day time, but
+allows you to discover paths and other interesting features by exploring,
+without making them automatically visible. The fake terrain is usually
+correct, but not always e.g. smoke is displayed in locations that are either
+filled with smoke or on fire. When you discover that the particular location
+is on fire the smoke graphic will be replaced with a fire graphic.
+
+Terrain covered by tree branches is considered 'inside' for these purposes.
+This allows an area which is heavily covered by tree branches to be treated
+as a dungeon location - the sun will only light the edges of the branches,
+for instance.
+
+Prior to this release of Unangband, you would not see the tree branches at
+all if you knew what the terrain underneath was. This has been changed to
+help 'clarify' when this graphical update occurs.
 

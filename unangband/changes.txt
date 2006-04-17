@@ -139,6 +139,8 @@ blindness, goblins are immune to poison, gnomes cannot be slowed or paralyzed. T
 distinguish goblins from orcs, they have become the union of a love that dare not
 speak its name.
 
+- Tree trunks now block line of sight.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.
@@ -238,6 +240,9 @@ under the mouse pointer. This is intended for macros.
 to NPPAngband's implementation.
 
 - Mouse-clicking whilst confused will allow you to walk one step.
+
+- Tree branches are now always displayed when you are outside.  This should prevent
+the map 'randomly' changing when you move through forested areas on the surface.
 
 
 ### Bug fixes ###

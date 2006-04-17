@@ -2470,7 +2470,7 @@ errr parse_f_info(char *buf, header *head)
 		f_ptr->edge = (s16b)edge;
 	}
 
-	/* Process 'K' for "States" (up to six lines + default (which cannot be last)) */
+	/* Process 'K' for "States" (up to eight lines + default (which cannot be last)) */
 	else if (buf[0] == 'K')
 	{
 		/* There better be a current f_ptr */
