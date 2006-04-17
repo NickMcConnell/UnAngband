@@ -333,13 +333,16 @@ forest.
 - Fixed bug where monsters would not alert each other if attacked by magic.
 
 - Fixed crash bug caused by monsters trying to attack you with no power (reported
-by Mikolaj).
+by Mikolaj Konarski).
 
 - Fixed bug where magic items of throwing could be created, when the base item
-was also of throwing (reported by Mikolaj).
+was also of throwing (reported by Mikolaj Konarski).
 
 - Fixed bug where creatures carrying mushrooms reported carrying special objects
-(reported by Mikolaj).
+(reported by Mikolaj Konarski).
+
+- Fixed a number of memory corruption and crash bugs by running Valgrind against
+the codebase (Many thanks to Andrew Sidwell for making this available).
 
 ### Build / Platform ###
 

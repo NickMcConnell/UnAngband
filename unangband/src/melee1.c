@@ -3816,7 +3816,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if (who > 0)
 				{
 					if (blind) msg_format("%^s mumbles deeply.", m_name);
-					else msg_format("%^s points at %s and curses horribly.", m_name);
+					else msg_format("%^s points at %s and curses horribly.", m_name, t_name);
 				}
 				k = 2;
 			}

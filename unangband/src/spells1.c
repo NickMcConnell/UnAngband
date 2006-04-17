@@ -4040,6 +4040,8 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 	/* Never affect projector */
 	if (cave_m_idx[y][x] == who) return (FALSE);
 
+	/* Don't affect hidden monsters */
+	if (m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)) return (FALSE);
 
 	/* Obtain monster info */
 	m_ptr = &m_list[cave_m_idx[y][x]];
@@ -9819,13 +9821,9 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 		/* Scan for monsters */
 		for (i = 0; i < grids; i++)
 		{
-
 			/* Get the grid location */
 			y = gy[i];
 			x = gx[i];
-
-			/* Don't affect hidden monsters */
-			if (m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)) continue;
 
 			/* Affect the monster in the grid */
 			if (project_m(who, gd[i], y, x, dam_at_dist[gd[i]], typ))

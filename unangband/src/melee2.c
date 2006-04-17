@@ -1582,6 +1582,9 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 	/* Check location */
 	feat = cave_feat[y][x];
 
+	/* Haven't had to bash it */
+	*bash = FALSE;
+
 	/* The grid is occupied by the player. */
 	if (cave_m_idx[y][x] < 0)
 	{
@@ -4117,13 +4120,15 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 	/* Check Bounds */
 	if (!in_bounds(ny, nx)) return;
 
+	/* Get the feature in the grid that the monster is trying to enter. */
+	feat = cave_feat[ny][nx];
 
 	/* The monster is hidden in terrain, trying to attack the player.*/
 	if (do_move && (m_ptr->mflag & (MFLAG_HIDE)) && (cave_m_idx[ny][nx] < 0))
 	{
 		/* Monster is under covered terrain and can't slip out */
 		if (!(r_ptr->flags2 & (RF2_PASS_WALL)) && !(m_ptr->tim_passw) && 
-			(f_info[cave_feat[ny][nx]].flags2 & (FF2_COVERED)))
+			(f_info[feat].flags2 & (FF2_COVERED)))
 		{
 			/* Get at player */
 			if (bash_from_under(m_idx, ny, nx, &bash))
@@ -4211,9 +4216,6 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		/* End move */
 		do_move = FALSE;
 	}
-
-	/* Get the feature in the grid that the monster is trying to enter. */
-	feat = cave_feat[ny][nx];
 
 	/* Get the move */
 	mmove = place_monster_here(ny,nx,m_ptr->r_idx);
@@ -4346,7 +4348,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				if (m_ptr->cdis < 30)
 				{
 					/* Message */
-					msg_print("You hear a door burst open!");
+					if (f_info[feat].flags1 & (FF1_DOOR)) msg_print("You hear a door burst open!");
+					else if (f_info[feat].flags3 & (FF3_TREE)) msg_print("You hear a tree crash down!");
+					else msg_print("You hear wood split asunder!");
 
 					/* Disturb (sometimes) */
 					if (disturb_minor) disturb(0, 0);
@@ -4379,7 +4383,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				if (m_ptr->cdis < 30)
 				{
 					/* Message */
-					msg_print("You hear a door burst open!");
+					if (f_info[feat].flags1 & (FF1_DOOR)) msg_print("You hear a door burst open!");
+					else if (f_info[feat].flags3 & (FF3_TREE)) msg_print("You hear a tree crash down!");
+					else msg_print("You hear wood split asunder!");
 
 					/* Disturb (sometimes) */
 					if (disturb_minor) disturb(0, 0);
@@ -4426,7 +4432,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			int power, chance;
 
 			/* Get trap "power" */
-			power = f_info[cave_feat[ny][nx]].power;
+			power = f_info[feat].power;
 
 			/* Base chance */
 			chance = r_ptr->level;
@@ -4456,7 +4462,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 						/* Get the monster name */
 						monster_desc(m_name, m_ptr, 0);
 
-						msg_format("%^s disarms the hidden %s.",m_name,f_name+f_info[cave_feat[ny][nx]].name);
+						msg_format("%^s disarms the hidden %s.",m_name,f_name+f_info[feat].name);
 					}
 
 				}
@@ -4469,7 +4475,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					/* Get the monster name */
 					monster_desc(m_name, m_ptr, 0);
 
-					msg_format("%^s disarms the %s.",m_name,f_name+f_info[cave_feat[ny][nx]].name);
+					msg_format("%^s disarms the %s.",m_name,f_name+f_info[feat].name);
 				}
 
 				/* Break the rune */
