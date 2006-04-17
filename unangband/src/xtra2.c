@@ -2376,6 +2376,12 @@ int get_food_type(const monster_race *r_ptr)
 	{
 		return (SV_FOOD_MANA+1);
 	}
+	/* Analyze "slime mold" monsters */
+	else if (strstr(name,"lime mold"))
+	{
+		return (SV_FOOD_SLIME_MOLD+1);
+	}
+
 
 	/* Assume nothing */
 	return (0);
@@ -2495,8 +2501,8 @@ void monster_death(int m_idx)
 	bool do_item = (!(r_ptr->flags1 & (RF1_ONLY_GOLD)));
 	bool do_chest = (r_ptr->flags8 & (RF8_DROP_CHEST) ? TRUE : FALSE);
 
-	int force_food = get_food_type(r_ptr);
-	int force_coin = get_coin_type(r_ptr);
+	int force_food = ((r_ptr->flags9 & (RF9_DROP_MUSHROOM)) != 0 ? get_food_type(r_ptr) : 0);
+	int force_coin = ((r_ptr->flags9 & (RF9_DROP_MINERAL)) != 0 ? get_coin_type(r_ptr) : 0);
 
 	object_type *i_ptr;
 	object_type object_type_body;

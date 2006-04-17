@@ -333,6 +333,12 @@ forest.
 - Fixed crash bug caused by monsters trying to attack you with no power (reported
 by Mikolaj).
 
+- Fixed bug where magic items of throwing could be created, when the base item
+was also of throwing (reported by Mikolaj).
+
+- Fixed bug where creatures carrying mushrooms reported carrying special objects
+(reported by Mikolaj).
+
 ### Build / Platform ###
 
 - Added quest.txt in lib\edit which is used to defined fixed texts.

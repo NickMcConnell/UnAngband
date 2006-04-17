@@ -656,6 +656,9 @@ void modify_grid_unseen_view(byte *a, char *c)
  */
 void modify_grid_interesting_view(byte *a, char *c, int y, int x, byte cinfo, byte pinfo)
 {
+	(void)y;
+	(void)x;
+
 	/* Handle "seen" grids */
 	if (pinfo & (PLAY_SEEN))
 	{

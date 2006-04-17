@@ -4415,7 +4415,7 @@ u32b slay_index(const u32b f1, const u32b f2, const u32b f3, const u32b f4)
 
 
 #define ADD_POWER(string, val, flag, flgnum, extra) \
-	if (f##flgnum & flag) { \
+	if (((f##flgnum & flag) != 0) && ((kf##flgnum & flag) == 0)) { \
 		p += (val); \
 		extra; \
 	}
@@ -4434,6 +4434,7 @@ s32b object_power(const object_type *o_ptr)
 	int sustains = 0;
 	int low_resists = 0;
 	int high_resists = 0;
+	u32b kf1, kf2, kf3, kf4;
 	u32b f1, f2, f3, f4;
 
 	/* If artifact, already computed */
@@ -4447,6 +4448,12 @@ s32b object_power(const object_type *o_ptr)
 
 	/* Get the object */
 	k_ptr = &k_info[k_idx];
+
+	/* Set the base kind flags */
+	kf1 = k_info[o_ptr->k_idx].flags1;
+	kf2 = k_info[o_ptr->k_idx].flags2;
+	kf3 = k_info[o_ptr->k_idx].flags3;
+	kf4 = k_info[o_ptr->k_idx].flags4;
 
 	/* Evaluate certain abilities based on type of object. */
 	switch (o_ptr->tval)
@@ -4600,8 +4607,8 @@ s32b object_power(const object_type *o_ptr)
 			}
 
 			/* Slight bonus as we may choose to use a swap bow */
-			if (f2 & (TR2_IGNORE_FIRE)) p++;
-			if (f2 & (TR2_IGNORE_ACID)) p++;
+			if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)) p++;
+			if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)) p++;
 			if (f2 & (TR2_IGNORE_THEFT)) p++;
 			break;
 		}
@@ -4703,17 +4710,17 @@ s32b object_power(const object_type *o_ptr)
 			}
 
 			/* Bonuses as we may choose to use a swap weapon */
-			if (f2 & (TR2_IGNORE_ACID)) p++;
+			if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)) p++;
 			if (f2 & (TR2_IGNORE_THEFT)) p++;
 
 			/* Bonus if throwing weapon */
-			if (f3 & (TR3_THROWING))
+			if (((f3 & (TR3_THROWING)) != 0) && ((kf3 & (TR3_THROWING)) == 0))
 			{
 				p += 2;
 
 				/* Bonus as we carry thrown weapons in inventory and throw them */
-				if (f2 & (TR2_IGNORE_ACID)) p++;
-				if (f2 & (TR2_IGNORE_FIRE)) p++;
+				if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)) p++;
+				if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)) p++;
 			}
 
 			/* Add some specific powers here only */
@@ -4726,7 +4733,7 @@ s32b object_power(const object_type *o_ptr)
 		case TV_ARROW:
 		{
 			/* Bonus as we carry arrows in inventory and fire them */
-			if (f2 & (TR2_IGNORE_FIRE)) p += 2;
+			if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)) p += 2;
 
 			/* Fall through */
 		}
@@ -4826,19 +4833,58 @@ s32b object_power(const object_type *o_ptr)
 			}
 
 			/* Bonus as we carry ammo in inventory and fire them */
-			if (f2 & (TR2_IGNORE_ACID)) p += 2;
-			if (f2 & (TR2_IGNORE_THEFT)) p++;
+			if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)) p += 2;
+			if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)) p++;
 
 			break;
 		}
 
-		case TV_BOOTS:
 		case TV_GLOVES:
+		{
+			/* Note this is 'uncorrected' */
+			p += o_ptr->dd * (o_ptr->ds + 1);
+
+			/* Apply the correct ego slay multiplier */
+			if (o_ptr->name2)
+			{
+				p = (p * e_info[o_ptr->name2].slay_power) / tot_mon_power;
+			}
+
+			/* Hack -- For efficiency, compute for first slay or brand flag only */
+			else
+			{
+				int i;
+				u32b j, s_index;
+
+				s_index = slay_index(f1, f2, f3, f4);
+
+				for (i = 0, j = 0x00000001L;(i < 32) && (j != s_index); i++, j<<=1);
+
+				if (i < 32) p = (p * magic_slay_power[i]) / tot_mon_power;
+			}
+
+			/* Correction factor for damage */
+			p /= 2;
+
+			/* Normalise power back */
+			/* We remove the weapon base damage to get 'true' power */
+			/* This makes e.g. a sword that provides fire immunity the same value as
+			   a ring that provides fire immunity */
+			if (ABS(p) > k_ptr->dd * (k_ptr->ds + 1) / 2)
+				p -= sign(p) * (k_ptr->dd * (k_ptr->ds + 1) / 2);
+			else
+				p = 0;
+
+			/* Fall through */
+
+		}
+
+		case TV_BOOTS:
 		case TV_CLOAK:
 		case TV_SOFT_ARMOR:
 		{
 			/* Bonus as we may choose to use a swap armour */
-			if (f2 & (TR2_IGNORE_FIRE)) p++;
+			if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)) p++;
 
 			/* Fall through */
 		}
@@ -4870,9 +4916,9 @@ s32b object_power(const object_type *o_ptr)
 			}
 
 			/* Big bonus as it protects against acid damage */
-			if (f2 & (TR2_IGNORE_ACID)) p+= 3;
+			if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)) p+= 3;
 
-			/* Bonus as we may choose to use a swap armour */
+			/* Bonus as we may want to use swap armour */
 			if (f2 & (TR2_IGNORE_THEFT)) p++;
 
 			break;
@@ -4891,11 +4937,11 @@ s32b object_power(const object_type *o_ptr)
 			}
 
 			/* Bonuses as we may choose to use a swap light */
-			if (f2 & (TR2_IGNORE_FIRE)) p++;
+			if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)) p++;
 			if (f2 & (TR2_IGNORE_THEFT)) p++;
 
 			/* Bonus as light will not go out in water */
-			if (f2 & (TR2_IGNORE_WATER)) p += 3;
+			if (((f2 & (TR2_IGNORE_WATER)) != 0) && ((kf2 & (TR2_IGNORE_WATER)) == 0)) p += 3;
 			break;
 		}
 
@@ -4941,13 +4987,13 @@ s32b object_power(const object_type *o_ptr)
 		case TV_MAP:
 		{
 			/* Bonus as we carry items in inventory */
-			if (f2 & (TR2_IGNORE_FIRE)) p += 2;
+			if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)) p += 2;
 
 			/* Fall through */
 		}
 		case TV_FOOD:
 		{
-			if (f2 & (TR2_IGNORE_WATER)) p += 2;
+			if (((f2 & (TR2_IGNORE_WATER)) != 0) && ((kf2 & (TR2_IGNORE_WATER)) == 0)) p += 2;
 			if (f2 & (TR2_IGNORE_THEFT)) p++;
 
 			break;
@@ -4958,6 +5004,8 @@ s32b object_power(const object_type *o_ptr)
 		{
 			if (f2 & (TR2_IGNORE_COLD)) p += 2;
 			if (f2 & (TR2_IGNORE_THEFT)) p++;
+
+			break;
 		}
 
 	}
@@ -4970,7 +5018,7 @@ s32b object_power(const object_type *o_ptr)
 	 * but we do it for all items as they may be used as swap items, but use a divisor of 10 lbs instead.
 	 */
 
-	/* Evaluate ac bonus and weight differentl for armour and non-armour. */
+	/* Evaluate ac bonus and weight differently for armour and non-armour. */
 	switch (o_ptr->tval)
 	{
 		case TV_BOOTS:
@@ -5068,6 +5116,10 @@ s32b object_power(const object_type *o_ptr)
 		{
 			p += o_ptr->pval * o_ptr->pval;  /* Was 4 * o_ptr->pval */
 		}
+		if (f1 & TR1_CHR)
+		{
+			p += o_ptr->pval * o_ptr->pval / 8; /* Was o_ptr->pval */
+		}
 		if (f1 & TR1_SAVE)
 		{
 			p += o_ptr->pval * o_ptr->pval / 4; /* Was o_ptr->pval */
@@ -5087,7 +5139,12 @@ s32b object_power(const object_type *o_ptr)
 		/* For now add very small amount for searching */
 		if (f1 & TR1_SEARCH)
 		{
-			p += (o_ptr->pval * o_ptr->pval) / 24; /* Was o_ptr->pval / 6 */
+			p += (o_ptr->pval * o_ptr->pval) / 12; /* Was o_ptr->pval / 6 */
+		}
+		/* For now add very small amount for infravision */
+		if (f1 & TR1_INFRA)
+		{
+			p += (o_ptr->pval * o_ptr->pval) / 8; /* Was o_ptr->pval */
 		}
 	}
 
@@ -5098,18 +5155,15 @@ s32b object_power(const object_type *o_ptr)
 		if (f1 & TR1_WIS) p += 2 * o_ptr->pval;
 		if (f1 & TR1_DEX) p += 3 * o_ptr->pval;
 		if (f1 & TR1_CON) p += 4 * o_ptr->pval;
+		if (f1 & TR1_CHR) p += o_ptr->pval;
 		if (f1 & TR1_SAVE) p += o_ptr->pval;
 		if (f1 & TR1_DEVICE) p += o_ptr->pval;
 		if (f1 & TR1_STEALTH) p += o_ptr->pval;
+		if (f1 & TR1_TUNNEL) p += o_ptr->pval;
+		if (f1 & TR1_SEARCH) p += o_ptr->pval;
+		if (f1 & TR1_INFRA) p += o_ptr->pval;
 	}
-	if (f1 & TR1_CHR)
-	{
-		p += o_ptr->pval;
-	}
-	if (f1 & TR1_INFRA)
-	{
-		p += o_ptr->pval;
-	}
+
 	if (f1 & TR1_SPEED)
 	{
 		p += 5 * o_ptr->pval;
