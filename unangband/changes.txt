@@ -142,6 +142,15 @@ speak its name.
 - Tree trunks now block line of sight.
 
 - Improved starting shops available in Hobbiton to try and make the start game easier.
+(Suggested by Mikolaj Konarski).
+
+- Added home (Actually the Inn of the Prancing Pony) and market place to Bree to make
+it identical to Angband, and to introduce the idea of the home 'moving' about and
+being available in other locations.
+
+- Made a home of some kind available in all major city locations. The home is taken
+away in enough circumstances already and there is more than enough need for it to be
+present to store additional useful equipment.
 
 ### User Interface ###
 
@@ -325,7 +334,7 @@ by ekolis).
 
 - Fixed bug where slime molds could be understood by player.
 
-- Fixed infinite torch bug (reported by ekolis).
+- Fixed infinite torch bug (Reported by ekolis).
 
 - Fixed bug where Bert, Bill & Tom were being generated outside the Trollshaw
 forest.

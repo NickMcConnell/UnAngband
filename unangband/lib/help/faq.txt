@@ -274,3 +274,27 @@ Prior to this release of Unangband, you would not see the tree branches at
 all if you knew what the terrain underneath was. This has been changed to
 help 'clarify' when this graphical update occurs.
 
+
+[Q2.10]   Why can I not get back to Hobbiton after I travel to Bree?
+
+This is a deliberate design decision. You can stay in Hobbiton and get a
+very easy first dungeon, and a useful guardian to kill at the end of it.
+Or you can travel to Bree and start the Book of Red March quest, which
+involves the events from the Hobbit taking place (Such as encountering
+stone trolls in Trollshaw forest, passing through the Misty Mountains and
+so on).
+
+If you do stay in Hobbiton, and complete the dungeon under Farmer Maggot's
+farm, you will take a much harder path from then on, as you will be
+travelling down the path that leads to the Lord of the Rings quests,
+including encounters with Tom Bombadil, and some very early and probably
+fatal encounters with Ring Wraiths.
+
+It is possible to cross-over from the Book of Red March quest to the
+Lord of the Rings quest by defeating the guardian at the end of the
+Barrow downs. So this is not a one-time deal. But you won't be getting
+back to Hobbiton for a little while yet otherwise.
+
+As of this version of Unangband, there is now a home in Bree for you to
+pick up your stuff that you may have left behind in Hobbiton.
+

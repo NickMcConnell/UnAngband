@@ -53,12 +53,9 @@
 
 # 'D' indicates the description displayed on the surface of the dungeon.
 
-
-
 #Version information
 
 V:0.6.0
-
 
 # Default starting dungeon.
 
@@ -84,7 +81,7 @@ D:Tip: Press '<' to travel elsewhere.
 N:2:Rivendell
 X:39:3
 L:0:0:420:126:0:0
-S:267:9:10:11:12:13:268:0
+S:267:9:10:11:12:13:268:513
 
 # Misty Mountains are quite wet (Underground rivers etc).
 
@@ -116,7 +113,7 @@ S:270:271:503:11:12:504:505:0
 N:6:Lake-town
 X:5:7
 L:0:0:407:0:0:0
-S:8:9:10:11:12:13:14:0
+S:8:9:10:11:12:13:14:508
 
 # We disturb Smaug while entering his lair...
 # Note Smaug is out of depth by 10 levels at bottom.
@@ -148,7 +145,7 @@ D:gather, angry at you for disturbing his lair...
 N:9:Lake-town, rebuilt
 X:42:14
 L:0:0:407:1:0:0
-S:509:516:517:11:12:13:506:0
+S:509:516:517:11:12:13:506:508
 D:Visit the statue to collect a reward from the 
 D:grateful townsfolk.
 
@@ -170,7 +167,7 @@ R:ANIMAL
 L:0:0:407:419:440:0
 L:1:56:0:0:0:0
 L:3:56:0:0:620:0
-S:508:9:10:11:12:13:0:0
+S:8:9:10:11:12:13:268:775
 
 N:12:Weathertop
 X:11:13
@@ -236,7 +233,7 @@ G:p
 R:WARRIOR
 L:51:0:407:0:0:0
 L:52:56:0:0:514:0
-S:271:516:517:519:504:511:509:0
+S:271:516:517:519:504:511:509:508
 
 N:22:Hornburg
 X:21:23
@@ -288,7 +285,7 @@ G:t
 R:WARRIOR
 L:54:0:407:0:0:0
 L:55:56:0:0:1085:0
-S:505:516:517:503:519:518:509:0
+S:505:516:517:503:519:518:509:508
 
 N:29:the Paths of the Dead
 X:28:30
@@ -310,7 +307,7 @@ G:t
 R:WARRIOR
 L:0:0:407:0:0:0
 L:1:56:0:0:0:0
-S:505:516:517:503:519:518:510:0
+S:505:516:517:503:519:518:510:508
 D:A white tree has found root in Minas Tirith.
 
 N:32:the Plains of Gorgoroth
@@ -355,7 +352,7 @@ R:ANIMAL
 L:0:0:407:419:617:0
 L:1:56:0:0:0:0
 L:3:56:0:0:620:0
-S:508:9:10:11:12:13:0:0
+S:8:9:10:11:12:13:268:775
 
 N:38:Barrow-downs
 X:37:40
@@ -470,7 +467,7 @@ L:80:407:218:208:511:0
 N:52:the Dale
 X:47:42
 L:0:0:411:0:0:0
-S:509:516:517:11:12:13:268:0
+S:509:516:517:11:12:13:268:508
 
 # Other alternate dungeons should be placed here
 
