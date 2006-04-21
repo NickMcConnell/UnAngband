@@ -1266,10 +1266,15 @@ static void store_delete(void)
  * items with a level approaching that of the given level...
  *
  * Should we check for "permission" to have the given object?
+ *
+ * Hack -- if the store frequency of an item is 100 or greater,
+ * we guarantee it will be created, if the store does not already
+ * carry it.
  */
 static void store_create(void)
 {
-	int k_idx, tries, level;
+	int k_idx = 0;
+	int tries, level;
 	int choice, total, i;
 
 	object_type *i_ptr;
@@ -1278,12 +1283,38 @@ static void store_create(void)
 	/* Paranoia -- no room left */
 	if (st_ptr->stock_num >= st_ptr->stock_size) return;
 
+	/* Fake level for apply_magic() */
+	level = rand_range(1, STORE_OBJ_LEVEL + f_info[store_num_real].level);
+
 	/* Total choices in store */
 	total = 0;
 
+	/* Build item choices or choose an unstocked item */
 	for (i = 0;i < STORE_CHOICES;i++)
 	{
-		if (su_ptr->tval[i])
+		/* Hack -- attempt to stock if item not available */
+		if ((su_ptr->tval[i]) && (rand_int(adj_chr_stock[p_ptr->stat_ind[A_CHR]]) < su_ptr->count[i]))
+		{
+			int j;
+
+			for (j = 0; j < st_ptr->stock_num; j++)
+			{
+				i_ptr = &(st_ptr->stock[j]);
+
+				if ((st_ptr->tval[i] == i_ptr->tval) &&
+					(st_ptr->sval[i] == i_ptr->sval)) break;
+			}
+
+			if (j >= st_ptr->stock_num)
+			{
+				k_idx = lookup_kind(su_ptr->tval[i],su_ptr->sval[i]);
+
+				if (k_idx) break;
+			}
+
+			total += su_ptr->count[i];
+		}
+		else if (su_ptr->tval[i])
 		{
 			total += su_ptr->count[i];
 		}
@@ -1345,10 +1376,8 @@ static void store_create(void)
 		}
 
 		/* Normal Store */
-		else
+		else if (!k_idx)
 		{
-			k_idx = 0;
-
 			choice = rand_int(total);
 
 			for (i = 0; i < STORE_CHOICES;i++)
@@ -1364,9 +1393,6 @@ static void store_create(void)
 			}
 
 			if (!k_idx) continue;
-
-			/* Hack -- fake level for apply_magic() */
-			level = rand_range(1, STORE_OBJ_LEVEL + f_info[store_num_real].level);
 		}
 
 		/* Get local object */

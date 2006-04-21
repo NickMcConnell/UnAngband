@@ -639,6 +639,9 @@ static errr init_z_info(void)
 	/* Save a pointer to the parsing function */
 	z_head.parse_info_txt = parse_z_info;
 
+	/* Save a pointer to the evaluate power function*/
+	z_head.eval_info_power = NULL;
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("limits", &z_head);
@@ -664,6 +667,9 @@ static errr init_d_info(void)
 
 	/* Save a pointer to the parsing function */
 	d_head.parse_info_txt = parse_d_info;
+
+	/* Save a pointer to the evaluate power function*/
+	d_head.eval_info_power = NULL;
 
 #endif /* ALLOW_TEMPLATES */
 
@@ -692,6 +698,9 @@ static errr init_f_info(void)
 
 	/* Save a pointer to the parsing function */
 	f_head.parse_info_txt = parse_f_info;
+
+	/* Save a pointer to the evaluate power function*/
+	f_head.eval_info_power = NULL;
 
 #endif /* ALLOW_TEMPLATES */
 
@@ -722,6 +731,9 @@ static errr init_k_info(void)
 	/* Save a pointer to the parsing function */
 	k_head.parse_info_txt = parse_k_info;
 
+	/* Save a pointer to the evaluate power function*/
+	k_head.eval_info_power = NULL;
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("object", &k_head);
@@ -750,6 +762,9 @@ static errr init_a_info(void)
 
 	/* Save a pointer to the parsing function */
 	a_head.parse_info_txt = parse_a_info;
+
+	/* Save a pointer to the evaluate power function*/
+	a_head.eval_info_power = NULL;
 
 #endif /* ALLOW_TEMPLATES */
 
@@ -780,6 +795,9 @@ static errr init_n_info(void)
   /* Save a pointer to the parsing function */
   n_head.parse_info_txt = parse_n_info;
 
+	/* Save a pointer to the evaluate power function*/
+	n_head.eval_info_power = NULL;
+
 #endif /* ALLOW_TEMPLATES */
 
   err = init_info("names", &n_head);
@@ -806,7 +824,7 @@ static errr init_e_info(void)
 	e_head.parse_info_txt = parse_e_info;
 
 	/* Save a pointer to the evaluate power function*/
-	r_head.eval_info_power = eval_e_power;
+	e_head.eval_info_power = eval_e_power;
 
 #endif /* ALLOW_TEMPLATES */
 
@@ -835,6 +853,9 @@ static errr init_x_info(void)
 
 	/* Save a pointer to the parsing function */
 	x_head.parse_info_txt = parse_x_info;
+
+	/* Save a pointer to the evaluate power function*/
+	x_head.eval_info_power = NULL;
 
 #endif /* ALLOW_TEMPLATES */
 
@@ -896,6 +917,9 @@ static errr init_v_info(void)
 	/* Save a pointer to the parsing function */
 	v_head.parse_info_txt = parse_v_info;
 
+	/* Save a pointer to the evaluate power function*/
+	v_head.eval_info_power = NULL;
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("vault", &v_head);
@@ -923,6 +947,9 @@ static errr init_p_info(void)
 
 	/* Save a pointer to the parsing function */
 	p_head.parse_info_txt = parse_p_info;
+
+	/* Save a pointer to the evaluate power function*/
+	p_head.eval_info_power = NULL;
 
 #endif /* ALLOW_TEMPLATES */
 
@@ -952,6 +979,9 @@ static errr init_c_info(void)
 	/* Save a pointer to the parsing function */
 	c_head.parse_info_txt = parse_c_info;
 
+	/* Save a pointer to the evaluate power function*/
+	c_head.eval_info_power = NULL;
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("p_class", &c_head);
@@ -980,6 +1010,9 @@ static errr init_w_info(void)
 	/* Save a pointer to the parsing function */
 	w_head.parse_info_txt = parse_w_info;
 
+	/* Save a pointer to the evaluate power function*/
+	w_head.eval_info_power = NULL;
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("style", &w_head);
@@ -1005,6 +1038,9 @@ static errr init_s_info(void)
 
 	/* Save a pointer to the parsing function */
 	s_head.parse_info_txt = parse_s_info;
+
+	/* Save a pointer to the evaluate power function*/
+	s_head.eval_info_power = NULL;
 
 #endif /* ALLOW_TEMPLATES */
 
@@ -1034,6 +1070,9 @@ static errr init_y_info(void)
 	/* Save a pointer to the parsing function */
 	y_head.parse_info_txt = parse_y_info;
 
+	/* Save a pointer to the evaluate power function*/
+	y_head.eval_info_power = NULL;
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("rune", &y_head);
@@ -1061,6 +1100,9 @@ static errr init_h_info(void)
 
 	/* Save a pointer to the parsing function */
 	h_head.parse_info_txt = parse_h_info;
+
+	/* Save a pointer to the evaluate power function*/
+	h_head.eval_info_power = NULL;
 
 #endif /* ALLOW_TEMPLATES */
 
@@ -1090,6 +1132,9 @@ static errr init_t_info(void)
 	/* Save a pointer to the parsing function */
 	t_head.parse_info_txt = parse_t_info;
 
+	/* Save a pointer to the evaluate power function*/
+	t_head.eval_info_power = NULL;
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("dungeon", &t_head);
@@ -1118,6 +1163,9 @@ static errr init_u_info(void)
 	/* Save a pointer to the parsing function */
 	u_head.parse_info_txt = parse_u_info;
 
+	/* Save a pointer to the evaluate power function*/
+	u_head.eval_info_power = NULL;
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("store", &u_head);
@@ -1145,6 +1193,9 @@ static errr init_b_info(void)
 
 	/* Save a pointer to the parsing function */
 	b_head.parse_info_txt = parse_b_info;
+
+	/* Save a pointer to the evaluate power function*/
+	b_head.eval_info_power = NULL;
 
 #endif /* ALLOW_TEMPLATES */
 
@@ -1175,6 +1226,9 @@ static errr init_g_info(void)
 	/* Save a pointer to the parsing function */
 	g_head.parse_info_txt = parse_g_info;
 
+	/* Save a pointer to the evaluate power function*/
+	g_head.eval_info_power = NULL;
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("cost_adj", &g_head);
@@ -1202,6 +1256,9 @@ static errr init_q_info(void)
 
 	/* Save a pointer to the parsing function */
 	q_head.parse_info_txt = parse_q_info;
+
+	/* Save a pointer to the evaluate power function*/
+	q_head.eval_info_power = NULL;
 
 #endif /* ALLOW_TEMPLATES */
 

@@ -96,6 +96,8 @@ TODO: Update to safe string handling routines from latest Angband builds.
 
 TODO: Update to latest X11 and GCU Angband files to fix compiler warnings.
 
+TODO: Add rope, rope bridges, grapples, elven rope, chains.
+
 Release v0.6.5
 ==============
 
@@ -1025,6 +1027,7 @@ are likely to be different... services of course, never cost the store anything.
 
 Prices inflate based on the total purse size of the town / divided by the default purse size of
 each store.
+
 e.g. if the player has bought lots of stuff, prices go up. If they sell lots of stuff, prices go
 down. However costs don't go down as fast as prices, if at all.
 
@@ -1064,4 +1067,20 @@ usurous the money changer is.
 The player can donate to certain stores (the temple, the magic shop - for research), and tip others.
 Some shopkeepers are are too proud to accept. Potentially though e.g. the general store may have
 a Village Idiot fund etc.
+
+TODO: Add rope, rope bridges, grapples, elven rope, chains.
+
+Rope allows you to 'spike' various terrain to build a rope bridge over it. These are equivelent
+to stone bridges but can be destroyed by fire and acid. A grapple is similar, but you throw
+it and it trails rope behind it to form a rope bridge. Elven rope is like a grapple but is
+thrown and uses itself up. When you get elven rope, it picks up all connected elven rope sqaures.
+Chains are similar to rope but heavier and can only be destroyed by acid.
+
+N:Rope bridge over chasm
+G:':y (currently used by storm cloud graphic but will be changed).
+
+Note that rope is particularly useful on cloud levels.
+
+Note that 'open' levels cannot have rope bridges built on them, because they have no ceiling.
+This includes outside, towers and cloud levels (e.g. forces player to use the grappel).
 

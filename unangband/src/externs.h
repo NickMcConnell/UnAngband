@@ -38,6 +38,7 @@ extern const byte adj_mag_mana[];
 extern const byte adj_mag_fail[];
 extern const byte adj_mag_stat[];
 extern const byte adj_chr_gold[];
+extern const byte adj_chr_stock[];
 extern const byte adj_int_dev[];
 extern const byte adj_wis_sav[];
 extern const byte adj_dex_dis[];

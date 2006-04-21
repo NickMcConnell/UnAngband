@@ -9121,7 +9121,7 @@ D:A large basilisk, whose shape resembles that of a great wyrm.
 N:602:Aranea
 G:S:R
 I:120:30d10:20:45:50
-W:38:2:0:250
+W:43:2:0:250
 M:0:18:20:43
 B:CLAW:POISON:2d8
 B:CLAW:POISON:2d8
@@ -18051,3 +18051,185 @@ S:BLIND | BLESS | ADD_MANA | HEAL | CURE
 S:BOLT_FIRE | BOLT_COLD | BOLT_ACID | WOUND | PROBE | OPPOSE_ELEM | CURSE
 D:A priest in a blood-red robe with blade heated red-hot.
 
+N:1255:Giant white jellyfish
+G:j:w
+I:120:8d8:2:1:99
+W:12:1:0:10
+B:TOUCH:POISON:1d3
+F:STUPID | EMPTY_MIND
+F:IM_POIS | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL | FRIENDS
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND | HAS_CORPSE | HAS_ARM
+D:It is a giant jellyfish glowing with pulsing white lights.
+
+N:1256:Giant silver jellyfish
+G:j:W
+I:120:10d8:2:1:99:0
+W:20:2:0:12
+M:0:6:0:0
+B:TOUCH:EAT_LITE:1d3
+B:TOUCH:EAT_LITE:1d3
+B:AURA:DARK_WEAK
+F:STUPID | EMPTY_MIND
+F:IM_POIS | CAN_SWIM | MUST_SWIM
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND | FRIENDS
+F:ATTR_METAL | HAS_AURA | HAS_CORPSE | HAS_ARM
+S:DRAIN_MANA | AURA
+D:It is a giant silver jellyfish that sucks all light from its
+D: surroundings.
+
+N:1257:Giant yellow jellyfish
+G:j:y
+I:120:10d8:2:1:99:0
+W:15:1:0:12
+M:0:6:0:0
+B:TOUCH:POISON:1d6
+F:STUPID | EMPTY_MIND
+F:IM_POIS | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL | FRIENDS
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND | HAS_CORPSE | HAS_ARM
+S:DRAIN_MANA
+D:It is a giant jellyfish glowing with pulsing yellow lights.
+
+N:1258:Giant blue jellyfish
+G:j:b
+I:110:12d8:2:1:99
+W:13:1:0:14
+B:TOUCH:COLD:1d6
+F:COLD_BLOOD
+F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL
+F:IM_COLD | HAS_CORPSE | HAS_ARM | FRIENDS
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
+D:It is a giant jellyfish glowing with pulsing blue lights.
+
+N:1259:Giant green jellyfish
+G:j:g
+I:120:22d8:2:1:99
+W:20:1:0:18
+B:TOUCH:ACID:1d5
+F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL
+F:IM_ACID | RES_BLIND | HAS_CORPSE | HAS_ARM | FRIENDS
+F:NO_CONF | NO_SLEEP | NO_FEAR
+D:It is a giant jellyfish glowing with pulsing green lights.
+
+N:1260:Giant pink jellyfish
+G:j:R
+I:110:26d8:2:1:99
+W:17:1:0:26
+B:TOUCH:LOSE_STR:1d5
+F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND | HAS_CORPSE | HAS_ARM | FRIENDS
+D:It is a giant jellyfish glowing with pulsing pink lights.
+
+N:1261:Giant purple jellyfish
+G:j:v
+I:110:52d8:2:1:99
+W:24:3:0:60
+M:0:9:0:0
+B:TOUCH:EXP_10
+F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL
+F:IM_POIS | HAS_CORPSE | HAS_ARM | FRIENDS
+F:NO_CONF | NO_SLEEP | NO_FEAR
+S:DRAIN_MANA
+D:It is a giant jellyfish glowing with pulsing purple lights.
+
+N:1262:Giant spotted jellyfish
+G:j:o
+I:120:13d8:12:18:1
+W:28:2:0:33
+B:TOUCH:ACID:2d6
+B:TOUCH:ACID:2d6
+B:TOUCH:ACID:2d6
+F:STUPID | EMPTY_MIND | COLD_BLOOD
+F:IM_ACID | IM_POIS | CAN_SWIM | MUST_SWIM | HAS_CORPSE | HAS_ARM
+F:NO_CONF | NO_SLEEP | NO_FEAR | FRIENDS
+D:It is a giant jellyfish covered in discoloured blotches.
+
+N:1263:Giant ochre jellyfish
+G:j:U
+I:120:13d8:12:18:1
+W:29:3:0:40
+M:20:0:0:0
+B:TOUCH:ACID:1d10
+B:TOUCH:ACID:1d10
+B:SPIT:ACID:1d10
+F:STUPID | EMPTY_MIND | COLD_BLOOD
+F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
+F:IM_ACID | IM_POIS | KILL_BODY | CAN_SWIM | MUST_SWIM | HAS_CORPSE | HAS_ARM
+F:NO_CONF | NO_SLEEP | NO_FEAR | FRIENDS
+D:It is a fast moving highly acidic giant jellyfish.
+
+N:1264:Giant rotting jellyfish
+G:j:u
+I:120:20d8:2:30:99
+W:22:1:0:15
+B:TOUCH:EAT_FOOD:2d3
+B:TOUCH:LOSE_CHR:2d3
+F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM
+F:IM_POIS | UNDEAD | IM_COLD | FRIENDS
+F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM
+D:It is a giant rotting jellyfish.
+
+N:1265:Giant clear jellyfish
+G:j:w
+I:110:24d8:2:1:99
+W:14:1:0:26
+M:0:9:0:0
+B:TOUCH:POISON:1d4
+F:ATTR_CLEAR | INVISIBLE
+F:STUPID | EMPTY_MIND
+F:CAN_SWIM | MUST_SWIM | HAS_LITE | FRIENDS
+F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM
+S:DRAIN_MANA
+D:It is a giant almost transparent jellyfish glowing with pulsing lights.
+
+N:1266:Giant brown jellyfish
+G:j:u
+I:110:31d8:2:1:99
+W:16:1:0:32
+B:TOUCH:LOSE_CHR:1d4
+B:TOUCH:LOSE_CHR:1d4
+F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL 
+F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | FRIENDS
+D:It is a giant jellyfish glowing with pulsing brown lights.
+
+N:1267:Giant red jellyfish
+G:j:r
+I:110:36d8:2:1:99
+W:16:1:0:38
+B:TOUCH:FIRE:1d8 
+F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL | 
+F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | FRIENDS
+D:It is a giant jellyfish glowing with pulsing red lights.
+
+N:1268:Giant bright blue jellyfish
+G:j:B
+I:110:41d8:2:1:99
+W:16:2:0:44
+M:0:11:3:40
+B:TOUCH:COLD:1d6 
+F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL
+F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | FRIENDS
+S:DRAIN_MANA | S_KIN | BLINK
+D:It is smarter than your average giant jellyfish.
+
+N:1269:Giant bright green jellyfish
+G:j:G
+I:120:46d8:2:1:99
+W:26:3:0:50
+M:0:11:4:50
+B:TOUCH:ACID:1d5 
+F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL
+F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | FRIENDS
+S:DRAIN_MANA | S_MONSTER | TPORT
+D:It is smarter than your average giant jellyfish.
+
+N:1270:Giant black jellyfish
+G:j:D
+I:120:50d8:2:1:99
+W:38:3:0:70
+M:0:9:0:0
+B:TOUCH:LOSE_ALL:2d8
+F:STUPID | EMPTY_MIND | 
+F:IM_POIS | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL
+F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | FRIENDS
+S:DRAIN_MANA
+D:It is a giant jellyfish glowing with pulsing black lights.

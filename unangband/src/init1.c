@@ -6982,6 +6982,12 @@ errr eval_r_power(header *head)
 		/* Adjust hit points based on resistances */
 		hp = eval_hp_adjust(r_ptr);
 
+		/* Hack -- set exp */
+		if (lvl == 0) r_ptr->mexp = 0L;
+		else r_ptr->mexp = (hp * dam) / (lvl * 25);
+
+		if ((lvl) && (r_ptr->mexp < 1L)) r_ptr->mexp = 1L;
+
 		/*
 		 * Hack - at level 50 & above and 75 & above, we have to use an adjustment
 		 * factor to prevent overflow.
@@ -6991,12 +6997,12 @@ errr eval_r_power(header *head)
 			hp /= 1000;
 			dam /= 1000;
 		}
-		else if (lvl >= 75)
+		else if (lvl >= 65)
 		{
 			hp /= 100;
 			dam /= 100;
 		}
-		else if (lvl >= 50)
+		else if (lvl >= 40)
 		{
 			hp /= 10;
 			dam /= 10;
@@ -7004,15 +7010,6 @@ errr eval_r_power(header *head)
 
 		/* Define the power rating */
 		power[i] = hp * dam;
-
-		/* Hack -- set exp including adjustment factor */
-		if (lvl == 0) r_ptr->mexp = 0L;
-		else if (lvl >= 90) r_ptr->mexp = hp * dam * 400000L / lvl;
-		else if (lvl >= 75) r_ptr->mexp = hp * dam * 4000L / lvl;
-		else if (lvl >= 50) r_ptr->mexp = hp * dam * 4L / lvl;
-		else r_ptr->mexp = (hp * dam) / (lvl * 25);
-
-		if ((lvl) && (r_ptr->mexp < 1L)) r_ptr->mexp = 1L;
 
 		/* Adjust for group monsters.  Average in-level group size is 5 */
 		if (r_ptr->flags1 & RF1_UNIQUE) ;
@@ -7038,21 +7035,23 @@ errr eval_r_power(header *head)
 					+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
 		}
 
-#if 0
-		/* Adjust for rarity.  Monsters with rarity > 1 appear less often */
-		/* Paranoia */
-		if (r_ptr->rarity != 0) power[i] /= r_ptr->rarity;
-#endif
 		/*
 		 * Update the running totals - these will be used as divisors later
 		 * Total HP / dam / count for everything up to the current level
 		 */
 		for (j = lvl; j < (lvl == 0 ? lvl + 1: MAX_DEPTH); j++)
 		{
+			int count = 10;
+
 			/*
-			 * Uniques don't count towards total monster power on the level.
+			 * Uniques don't count towards monster power on the level.
 			 */
 			if (r_ptr->flags1 & RF1_UNIQUE) continue;
+
+			/*
+			 * Specifically placed monsters don't count towards monster power on the level.
+			 */
+			if (!(r_ptr->rarity)) continue;
 
 /*
  * MegaHack -- calculating the entire monster list causes non-windows systems to crash horribly.
@@ -7072,46 +7071,54 @@ errr eval_r_power(header *head)
 				dam /= 10;
 			}
 
-			if ((j == 75) && (r_ptr->level < 75))
+			if ((j == 65) && (r_ptr->level < 65))
 			{
 				hp /= 10;
 				dam /= 10;
 			}
 
-			if ((j == 50) && (r_ptr->level < 50))
+			if ((j == 40) && (r_ptr->level < 40))
 			{
 				hp /= 10;
 				dam /= 10;
 			}
-
-			tot_hp[j] += hp;
-			tot_dam[j] += dam;
 
 			/*
 			 * Hack - if it's a group monster or multiplying monster, add several to the count
 			 * so that the averages don't get thrown off
 			 */
+
+			if (r_ptr->flags1 & RF1_FRIEND) count = 20;
+			else if (r_ptr->flags1 & RF1_FRIENDS) count = 50;
+
 			if (r_ptr->flags2 & RF2_MULTIPLY)
 			{
-				int mod = 1;
-
-				if (r_ptr->flags1 & RF1_FRIEND) mod = 2;
-				else if (r_ptr->flags1 & RF1_FRIENDS) mod = 5;				
-
 				if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL))
-					mon_count[i] += MAX(1, extract_energy[r_ptr->speed
-						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) * mod;
+					count = MAX(1, extract_energy[r_ptr->speed
+						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) * count;
 				else if (r_ptr->flags2 & (RF2_OPEN_DOOR | RF2_BASH_DOOR))
-					mon_count[i] += MAX(1, extract_energy[r_ptr->speed
-						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] * 3 / 2) * mod;
+					count = MAX(1, extract_energy[r_ptr->speed
+						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] * 3 / 2) * count;
 				else
-					mon_count[i] += MAX(1, extract_energy[r_ptr->speed
-						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2) * mod;
+					count = MAX(1, extract_energy[r_ptr->speed
+						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2) * count;
 			}
-			else if (r_ptr->flags1 & RF1_FRIEND) mon_count[j] += 2;
-			else if (r_ptr->flags1 & RF1_FRIENDS) mon_count[j] += 5;
-			else mon_count[j] += 1;
 
+			/*
+			 * Very rare monsters count less towards total monster power on the level.
+			 */
+			if (r_ptr->rarity > count)
+			{
+				hp = hp * count / r_ptr->rarity;
+				dam = dam * count / r_ptr->rarity;
+
+				count = r_ptr->rarity;
+			}
+
+			tot_hp[j] += hp;
+			tot_dam[j] += dam;
+
+			mon_count[j] += count / r_ptr->rarity;
 		}
 
 	}
@@ -7130,8 +7137,8 @@ errr eval_r_power(header *head)
 		{
 			/* Divide by average HP and av damage for all in-level monsters */
 			/* Note we have factored in the above 'adjustment factor' */
-			av_hp = tot_hp[lvl] / mon_count[lvl];
-			av_dam = tot_dam[lvl] / mon_count[lvl];
+			av_hp = tot_hp[lvl] * 10 / mon_count[lvl];
+			av_dam = tot_dam[lvl] * 10 / mon_count[lvl];
 
 			/* XXX Justifiable paranoia - avoid divide by zero errors */
 			if (av_hp > 0) power[i] = power[i] / av_hp;

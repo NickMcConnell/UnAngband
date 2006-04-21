@@ -11,6 +11,8 @@
 # N:store:store name (interior)
 # O:tval:sval:count - must offer at least 15 item types
 
+# Maximum number of O: entries is currently 32 lines.
+
 # Version stamp (required)
 
 V:0.6.0
@@ -441,6 +443,8 @@ O:17:1:2
 O:18:1:2
 O:20:1:1
 O:20:4:1
+O:23:4:2
+O:22:1:2
 
 #Service of Enchant Armour and Enchant Armour To-Resist
 N:30:Heavy Armoury
@@ -581,7 +585,7 @@ O:18:1:3
 O:77:0:3
 O:39:0:2
 O:39:1:1
-O:70:8:2
+O:70:8:3
 
 #Service of Satisfy Hunger
 N:35:Inn of the Green Dragon
@@ -596,6 +600,11 @@ O:35:1:3
 O:80:35:3
 O:80:38:3
 O:80:38:3
+O:75:34:2
+O:75:35:1
+O:75:42:1
+O:75:28:2
+
 
 N:36:tree hung with a banner 'Happy Elventy-One'
 
