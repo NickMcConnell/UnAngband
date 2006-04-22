@@ -164,6 +164,14 @@ in stock.
 Farm and Weathertop including an early quest reward location for the player
 (Suggested by Mikolaj Konarski).
 
+- Two-weapon style is more effective, giving additional blows at levels 15, 30 and 45,
+instead of 20 and 40, and better AC benefits (Suggested by Mikolaj Konarski).
+
+- Paladins now also start with a second blow and get an extra one at level fourty. To
+compensate, their maximum blows is reduced by 1. Warrior maximum blows are also reduced
+by one, as e.g. it is possible to get 9 blows with a two-handed weapon by forgoing a
+shield for a two-handed weapon specialist.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.
