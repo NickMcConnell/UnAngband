@@ -4823,7 +4823,7 @@ static void build_store(int feat, int yy, int xx)
 	byte d_char = f_info[feat].d_char;
 
 	/* Hack -- don't build building for some 'special locations' */
-	bool building = (((d_char >= '0') && (d_char <= '8')) || (d_char == '+'));
+	bool building = (((d_char > '0') && (d_char <= '8')) || (d_char == '+'));
 
 	/* Find the "center" of the store */
 	y0 = yy * 9 + 6;

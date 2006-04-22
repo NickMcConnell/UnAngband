@@ -152,7 +152,7 @@ D:grateful townsfolk.
 #The following levels are from the Fellowship of the Ring.
 
 N:10:Farmer Maggot's farm
-X:1:40
+X:1:53
 G:,
 R:ANIMAL
 L:0:0:435:419:4:0
@@ -161,7 +161,7 @@ L:5:114:0:0:111:0
 S:507:0:0:0:0:0:0:0
 
 N:11:Bree
-X:41:12
+X:41:56
 G:t
 R:ANIMAL
 L:0:0:407:419:440:0
@@ -170,7 +170,7 @@ L:3:56:0:0:620:0
 S:8:9:10:11:12:13:268:775
 
 N:12:Weathertop
-X:11:13
+X:56:13
 G:s
 R:ANIMAL
 L:20:420:56:49:449:31
@@ -213,7 +213,7 @@ X:19:20
 G:l
 L:0:0:420:420:0:0
 S:270:503:11:12:504:510:0:0
-D:Galadriel's gifts can be found at the White tree.
+D:Galadriel's gifts can be found at her mirror.
 
 N:19:Parth Galen
 X:20:24
@@ -307,7 +307,7 @@ G:t
 R:WARRIOR
 L:0:0:407:0:0:0
 L:1:56:0:0:0:0
-S:505:516:517:503:519:518:510:508
+S:505:516:517:503:519:518:777:508
 D:A white tree has found root in Minas Tirith.
 
 N:32:the Plains of Gorgoroth
@@ -341,7 +341,7 @@ N:36:Hobbiton, rebuilt
 X:36:0
 G:h
 L:0:0:407:419:0:0
-S:264:515:265:266:772:773:0:0
+S:264:515:265:266:772:773:774:0
 
 # The following are accessible from the first Hobbiton for consistency
 
@@ -367,11 +367,9 @@ L:5:56:0:0:344:0
 L:6:56:0:0:345:0
 
 N:40:the Old Forest
-X:10:11
-R:PLANT
-L:9:420:420:153:622:0
-L:10:0:135:0:307:0
-S:28:0:0:0:0:0:0:0
+X:53:41
+R:ANIMAL
+L:9:420:420:153:0:0
 
 # And the same dungeon accessible from the LOtR quest.
 
@@ -469,11 +467,43 @@ X:47:42
 L:0:0:411:0:0:0
 S:509:516:517:11:12:13:268:508
 
-# Other alternate dungeons should be placed here
+# Extend the LotR quests to give starters more
+# 'breathing space'.
+
+N:53:Buckland
+X:40:54
+G:h
+R:ANIMAL
+L:0:0:407:419:0:0
+S:8:9:10:11:12:13:268:778
+
+N:54:a clearing in the Old Forest
+X:40:55
+G::
+R:PLANT
+L:9:0:420:153:622:0
+L:10:56:1:420:622:0
+S:0:0:0:0:0:0:0:0
+
+N:55:the House of Tom Bombadil
+X:41:41
+G:H
+R:PLANT
+L:9:0:420:153:307:0
+L:10:56:1:420:307:0
+S:514:776:0:0:0:0:0:0
+D:Golberry's gifts can be found at her pool.
+
+N:56:the Midge Marshes
+X:11:12
+G:R
+R:INSECT
+L:11:435:153:199:0:0
+L:19:56:0:153:0:0
 
 # Must always be last position
 
-N:53:the West
+N:57:the West
 G:M
 L:0:0:420:0:0:0
-S:510:0:0:0:0:0:0:0
+S:777:0:0:0:0:0:0:0

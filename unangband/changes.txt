@@ -160,6 +160,10 @@ keeper will attempt to replace any item out of stock. This makes stores much mor
 useful for higher charisma players in that all items listed as being stock will be
 in stock.
 
+- There are now a number of further dungeons to explore between Farmer Maggot's
+Farm and Weathertop including an early quest reward location for the player
+(Suggested by Mikolaj Konarski).
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.
@@ -362,6 +366,10 @@ was also of throwing (reported by Mikolaj Konarski).
 the codebase (Many thanks to Andrew Sidwell for making this available).
 
 - Fixed a number of edit file initialisation bugs.
+
+- Fixed bugs with the House of Tom Bombadil, the Mirror of Galadriel and the White
+Tree.
+
 
 ### Build / Platform ###
 
