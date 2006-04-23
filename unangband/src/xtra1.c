@@ -3340,6 +3340,7 @@ static void calc_bonuses(void)
         else if (o_ptr->tval==TV_INSTRUMENT)
         {
                 p_ptr->cur_style |= (1L << WS_INSTRUMENT);
+		p_ptr->cur_style |= (1L << WS_THROWN);
         }
 	else if (o_ptr->tval==TV_BOW)
 	{
@@ -3410,9 +3411,16 @@ static void calc_bonuses(void)
 		{
 			switch (w_info[i].benefit)
 			{
-
 				case WB_HIT:
+					/* MegaHack -- we update the display, regardless of if melee or missile, but handle elsewhere */
+					p_ptr->dis_to_h += (p_ptr->lev-w_info[i].level) /2;
+					break;
+
 				case WB_DAM:
+					/* MegaHack -- we update the display, regardless of if melee or missile, but handle elsewhere */
+					p_ptr->dis_to_d += (p_ptr->lev-w_info[i].level) /2;
+					break;
+
 				case WB_CRITICAL:
 				case WB_POWER:
 				case WB_ICKY_HANDS:
@@ -3420,7 +3428,11 @@ static void calc_bonuses(void)
 				break;
 
 				case WB_AC:
-					if (!p_ptr->heavy_wield) p_ptr->to_a += (p_ptr->lev-w_info[i].level) /2;
+					if (!p_ptr->heavy_wield)
+					{
+						p_ptr->to_a += (p_ptr->lev-w_info[i].level) /2;
+						p_ptr->dis_to_a += (p_ptr->lev-w_info[i].level) /2;
+					}
 					break;
 
 				case WB_BLOW:

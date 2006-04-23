@@ -1196,7 +1196,7 @@ void do_cmd_cast(void)
 		}
 		case TV_PRAYER_BOOK:
 		{
-       		p="recite";
+       			p="recite";
 			t="prayer";
 			
 			break;
@@ -1211,6 +1211,7 @@ void do_cmd_cast(void)
 			{
 				p="sing";
 			}
+
 			t = "song";
 			break;
 		}
@@ -1275,6 +1276,5 @@ void do_cmd_cast(void)
 
 	/* Cast the spell - held songs get cast later*/
 	if (p_ptr->held_song != spell) do_cmd_cast_aux(spell,spell_power(spell),p,t);
-	
 }
 

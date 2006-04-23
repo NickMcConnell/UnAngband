@@ -8,13 +8,13 @@
 
 #NONE: No style.
 #UNARMED: Not wielding a weapon or shield.
-#ONE-HANDED: Wielding 1 weapon and no shield. Prefers light weapons.
-#TWO-HANDED: Wielding 1 weapon and no shield. Prefers heavy weapons.
+#ONE-HANDED: Wielding 1 weapon and no shield. Prefers light weapons, and nothing over 20 lbs.
+#TWO-HANDED: Wielding 1 weapon and no shield. Prefers heavy weapons, and nothing less than 10 lbs.
 #WEAPON&SHIELD: Wielding 1 weapon and shield.
 #TWO-WEAPON: Wielding 1 weapon and 2nd lighter weapon in place of shield. Requires
 #that 1st weapon light enough for multiple attacks. In this configuration, 2nd weapon
 #gets every 2nd attack.
-#THROWN: Not firing with an item.
+#THROWN: Not firing with an item (or whilst using a musical instrument in bow slow).
 #SLING: Firing with a sling.
 #BOW: Firing with a bow.
 #XBOW: Firing with a crossbow.
@@ -23,7 +23,6 @@
 #PRAYER_BOOK: Casting a spell from a prayer book.
 #SONG_BOOK: Casting a spell from a song book.
 #INSTRUMENT: Wielding an instrument.
-
 
 #The benefits are granted only when fighting in the particular style preferred.
 
@@ -53,9 +52,17 @@ S:RING
 B:ID
 
 W:0:1
+S:RING
+B:POWER
+
+W:0:1
 S:UNARMED | TWO-HANDED | ONE-HANDED | WEAPON&SHIELD | SWORD | HAFTED | POLEARM | NONE |
-S:SLAY_ORC | SLAY_TROLL | SLAY_DRAGON | SLAY_GIANT | TWO-WEAPON
+S:TWO-WEAPON
 B:XTRA_BLOW
+
+W:0:1
+S:SLAY_GIANT | SLAY_ORC | SLAY_DRAGON | SLAY_TROLL
+B:CRITICAL
 
 W:0:1
 S:BOW | THROWN 

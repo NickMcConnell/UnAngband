@@ -7360,8 +7360,9 @@ s16b spell_level(int spell)
 
 		if (w_info[i].benefit != WB_POWER) continue;
 
-		    /* Check for styles */
-		if ((w_info[i].styles==0) || (w_info[i].styles & (p_ptr->cur_style & (1L << p_ptr->pstyle))))
+		/* Check for styles */
+		/* Hack -- we don't check 'current' styles */
+		if ((w_info[i].styles==0) || (w_info[i].styles & (1L << p_ptr->pstyle)))
 		switch (p_ptr->pstyle)
 		{
 			case WS_MAGIC_BOOK:
@@ -7409,9 +7410,7 @@ s16b spell_level(int spell)
 				}
 				break;
 			}
-
 		}
-
 	}
 	return(level);
 }
@@ -7423,6 +7422,22 @@ s16b spell_power(int spell)
 
 	int plev = p_ptr->lev;
 
+	/* Hack -- instruments modify spell power per book for everyone */
+	if (p_ptr->cur_style & (1L << WS_INSTRUMENT)) for(i = 0; i < MAX_SPELL_APPEARS; i++)
+	{
+		/* Line 1 - has item wielded */
+		/* Line 2 - item is instrument */
+		/* Line 3 - instrument sval matches spellbook sval */
+		/* Line 4 - appears in spellbook */
+		if ((inventory[INVEN_BOW].k_idx) &&
+			(inventory[INVEN_BOW].tval == TV_INSTRUMENT) &&
+			(s_info[spell].appears[i].sval == inventory[INVEN_BOW].sval) &&
+			 (s_info[spell].appears[i].tval == TV_SONG_BOOK))
+		{
+			plev += p_ptr->lev + 5;
+		}
+	}
+
 	/* Modify the spell power */
 	for (i = 0;i< z_info->w_max;i++)
 	{
@@ -7432,7 +7447,9 @@ s16b spell_power(int spell)
 
 		if (w_info[i].benefit != WB_POWER) continue;
 
-		if ((w_info[i].styles==0) || (w_info[i].styles & (p_ptr->cur_style & (1L << p_ptr->pstyle))))
+		/* Check styles */
+		/* Hack -- we don't check 'current' styles except for rings, amulets, instruments, etc */
+		if ((w_info[i].styles==0) || (w_info[i].styles & (1L << p_ptr->pstyle)))
 		switch (p_ptr->pstyle)
 		{
 			case WS_MAGIC_BOOK:
@@ -7479,30 +7496,6 @@ s16b spell_power(int spell)
 
 				}
 				break;
-			}
-			case WS_INSTRUMENT:
-			{
-				int j;
-
-				if (!(p_ptr->cur_style & (1L << WS_INSTRUMENT))) break;
-
-				for(j=0;j<MAX_SPELL_APPEARS;j++)
-				{
-					/* Line 1 - has item wielded */
-					/* Line 2 - item is instrument */
-					/* Line 3 - instrument sval matches spellbook sval */
-					/* Line 4 - appears in spellbook */
-					if ((inventory[INVEN_BOW].k_idx) &&
-						(inventory[INVEN_BOW].tval == TV_INSTRUMENT) &&
-						(s_info[spell].appears[j].sval == inventory[INVEN_BOW].sval) &&
-						 (s_info[spell].appears[j].tval == TV_SONG_BOOK))
-					{
-						plev += (p_ptr->lev - w_info[i].level);
-					}
-	
-				}
-				break;
-
 			}
 			default:
 			{

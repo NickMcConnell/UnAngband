@@ -208,20 +208,21 @@ void do_cmd_quaff_potion(void)
 	/* Take a turn */
 	p_ptr->energy_use = 100;
 
-	/* Not identified yet */
-	ident = FALSE;
-
 	/* Object level */
 	lev = k_info[o_ptr->k_idx].level;
+
+	/* Set style */
+	p_ptr->cur_style |= (1L << WS_POTION);
 
 	/* Get potion effect */
 	get_spell(&power, "use", o_ptr, FALSE);
 
-	/* Paranoia */
-	if (power < 0) return;
-
 	/* Apply food effect */
-	if (process_spell_eaten(power,0,&cancel)) ident = TRUE;
+	if (power >= 0) ident = process_spell_eaten(power,0,&cancel);
+	else return;
+
+	/* Clear styles */
+	p_ptr->cur_style &= ~(1L << WS_POTION);
 
 	/* Combine / Reorder the pack (later) */
 	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -240,7 +241,6 @@ void do_cmd_quaff_potion(void)
 
 	/* Window stuff */
 	p_ptr->window |= (PW_INVEN | PW_EQUIP);
-
 
 	/* Potions can feed the player */
 	(void)set_food(p_ptr->food + o_ptr->pval);
@@ -333,14 +333,18 @@ void do_cmd_read_scroll(void)
 	/* Object level */
 	lev = k_info[o_ptr->k_idx].level;
 
+	/* Set style */
+	p_ptr->cur_style |= (1L << WS_SCROLL);
+
 	/* Get scroll effect */
 	get_spell(&power, "use", o_ptr, FALSE);
 
-	/* Paranoia */
-	if (power < 0) return;
-
 	/* Apply scroll effect */
-	ident = process_spell(power, 0, &cancel);
+	if (power >= 0) ident = process_spell(power, 0, &cancel);
+	else return;
+
+	/* Clear styles */
+	p_ptr->cur_style &= ~(1L << WS_SCROLL);
 
 	/* Combine / Reorder the pack (later) */
 	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -431,7 +435,6 @@ void do_cmd_use_staff(void)
 		return;
 	}
 
-
 	/* Take a turn */
 	p_ptr->energy_use = 100;
 
@@ -448,18 +451,18 @@ void do_cmd_use_staff(void)
 	if (p_ptr->confused) chance = chance / 2;
 
 	/* Check for speciality */
-	for (i = 0;i< z_info->w_max;i++)
+	if (p_ptr->pstyle == WS_STAFF)
 	{
-		if (w_info[i].class != p_ptr->pclass) continue;
-
-		if (w_info[i].level > p_ptr->lev) continue;
-
-		if (w_info[i].benefit != WB_ID) continue;
-
-		/* Check for styles */
-		if ((w_info[i].styles==WS_STAFF) && (p_ptr->pstyle == WS_STAFF))
+		for (i = 0;i< z_info->w_max;i++)
 		{
-			chance *=2;
+			if (w_info[i].class != p_ptr->pclass) continue;
+
+			if (w_info[i].level > p_ptr->lev) continue;
+
+			if (w_info[i].benefit != WB_POWER) continue;
+
+			/* Check for styles */
+			if (w_info[i].styles==WS_STAFF) chance *= 2;
 		}
 	}
 
@@ -511,19 +514,20 @@ void do_cmd_use_staff(void)
 		return;
 	}
 
-
 	/* Sound */
 	sound(MSG_USE_STAFF);
 
+	/* Set styles */
+	p_ptr->cur_style |= (1L << WS_STAFF);
 
 	/* Get rod effect */
 	get_spell(&power, "use", o_ptr, FALSE);
 
-	/* Paranoia */
-	if (power < 0) return;
+	/* Apply staff effect */
+	if (power >= 0) ident = process_spell(power, 0, &cancel);
 
-	/* Apply rod effect */
-	ident = process_spell(power, 0, &cancel);
+	/* Clear styles */
+	p_ptr->cur_style &= ~(1L << WS_STAFF);
 
 	/* Combine / Reorder the pack (later) */
 	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -705,21 +709,20 @@ void do_cmd_aim_wand(void)
 	if (p_ptr->confused) chance = chance / 2;
 
 	/* Check for speciality */
-	for (i = 0;i< z_info->w_max;i++)
+	if (p_ptr->pstyle == WS_WAND)
 	{
-		if (w_info[i].class != p_ptr->pclass) continue;
-
-		if (w_info[i].level > p_ptr->lev) continue;
-
-		if (w_info[i].benefit != WB_ID) continue;
-
-		/* Check for styles */
-		if ((w_info[i].styles==WS_WAND) && (p_ptr->pstyle == WS_WAND))
+		for (i = 0;i< z_info->w_max;i++)
 		{
-			chance *=2;
+			if (w_info[i].class != p_ptr->pclass) continue;
+
+			if (w_info[i].level > p_ptr->lev) continue;
+
+			if (w_info[i].benefit != WB_POWER) continue;
+
+			/* Check for styles */
+			if (w_info[i].styles==WS_WAND) chance *= 2;
 		}
 	}
-
 
 	/* High level objects are harder */
 	chance = chance - ((lev > 50) ? 50 : lev);
@@ -769,18 +772,21 @@ void do_cmd_aim_wand(void)
 		return;
 	}
 
-
 	/* Sound */
 	sound(MSG_ZAP_ROD);
+
+	/* Set styles */
+	p_ptr->cur_style |= (1L << WS_WAND);
 
 	/* Get wand effect */
 	get_spell(&power, "use", o_ptr, FALSE);
 
-	/* Paranoia */
-	if (power < 0) return;
-
 	/* Apply wand effect */
-	ident = process_spell(power, 0, &cancel);
+	if (power >= 0) ident = process_spell(power, 0, &cancel);
+	else return;
+
+	/* Clear styles */
+	p_ptr->cur_style &= ~(1L << WS_WAND);
 
 	/* Combine / Reorder the pack (later) */
 	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -1551,6 +1557,23 @@ void do_cmd_activate(void)
 	/* High level objects are harder */
 	chance = chance - ((lev > 50) ? 50 : lev);
 
+	/* Assign speciality */
+	switch (o_ptr->tval)
+	{
+/*		case TV_WAND:
+			p_ptr->cur_style |= 1L << WS_WAND;
+			break;
+		case TV_STAFF:
+			p_ptr->cur_style |= 1L << WS_STAFF;
+			break; */
+		case TV_AMULET:
+			p_ptr->cur_style |= 1L << WS_AMULET;
+			break;
+		case TV_RING:
+			p_ptr->cur_style |= 1L << WS_RING;
+			break;
+	}
+
 	/* Hack -- Check for speciality */
 	for (i = 0;i< z_info->w_max;i++)
 	{
@@ -1558,24 +1581,17 @@ void do_cmd_activate(void)
 
 		if (w_info[i].level > p_ptr->lev) continue;
 
-		if (w_info[i].benefit != WB_ID) continue;
+		if (w_info[i].benefit != WB_POWER) continue;
 
-		/* Check for styles */
-		if ((w_info[i].styles==WS_WAND) && (p_ptr->pstyle == WS_WAND) && (o_ptr->tval == TV_WAND))
+		if ((w_info[i].styles==0) || (w_info[i].styles & (p_ptr->cur_style & (1L << p_ptr->pstyle))))
+		switch (p_ptr->pstyle)
 		{
-			chance *=2;
-		}
-		else if ((w_info[i].styles==WS_STAFF) && (p_ptr->pstyle == WS_STAFF) && (o_ptr->tval == TV_STAFF))
-		{
-			chance *=2;
-		}
-		else if ((w_info[i].styles==WS_AMULET) && (p_ptr->pstyle == WS_AMULET) && (o_ptr->tval == TV_AMULET))
-		{
-			chance *=2;
-		}
-		else if ((w_info[i].styles==WS_RING) && (p_ptr->pstyle == WS_RING)  && (o_ptr->tval == TV_RING))
-		{
-			chance *=2;
+/*			case WS_WAND:
+			case WS_STAFF: */
+			case WS_AMULET:
+			case WS_RING:
+				chance *= 2;
+				break;
 		}
 	}
 
@@ -1590,6 +1606,9 @@ void do_cmd_activate(void)
 	{
 		if (flush_failure) flush();
 		msg_print("You failed to activate it properly.");
+		
+		/* Clear styles */
+		p_ptr->cur_style &= ~((1L << WS_WAND) | (1L << WS_STAFF) | (1L << WS_RING) | (1L << WS_AMULET));
 		return;
 	}
 
@@ -1659,7 +1678,7 @@ void do_cmd_activate(void)
 		int power;
 
 		/* Get object effect --- choose if required */
-	      get_spell(&power, "use", o_ptr, TRUE);
+		get_spell(&power, "use", o_ptr, TRUE);
 
 		/* Paranoia */
 		if (power < 0) return;
@@ -1738,6 +1757,9 @@ void do_cmd_activate(void)
 		/* Message */
 		msg_format("You unstack your %s.",o_name);
 	}
+
+	/* Clear styles */
+	p_ptr->cur_style &= ~((1L << WS_WAND) | (1L << WS_STAFF) | (1L << WS_RING) | (1L << WS_AMULET));
 
 }
 

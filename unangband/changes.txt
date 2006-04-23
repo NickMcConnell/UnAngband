@@ -172,6 +172,8 @@ compensate, their maximum blows is reduced by 1. Warrior maximum blows are also 
 by one, as e.g. it is possible to get 9 blows with a two-handed weapon by forgoing a
 shield for a two-handed weapon specialist.
 
+- All classes now benefit (slightly) from instruments.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.
@@ -277,6 +279,7 @@ the map 'randomly' changing when you move through forested areas on the surface.
 
 - You can now examine a service in a store to determine what it does for you.
 
+- To-hit, to-dam and to-ac benefits of a style are included in the character display.
 
 ### Bug fixes ###
 
@@ -377,6 +380,9 @@ the codebase (Many thanks to Andrew Sidwell for making this available).
 
 - Fixed bugs with the House of Tom Bombadil, the Mirror of Galadriel and the White
 Tree.
+
+- Fixed a number of bugs preventing style benefits from book and magical object
+specialisation being realised.
 
 
 ### Build / Platform ###
