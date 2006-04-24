@@ -4416,7 +4416,7 @@ static void target_set_interactive_prepare(int mode)
  *
  * This function must handle blindness/hallucination.
  */
-static key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
+static key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr info)
 {
 	s16b this_o_idx, next_o_idx = 0;
 
@@ -4431,7 +4431,6 @@ static key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 	key_event query;
 
 	char out_val[160];
-
 
 	/* Repeat forever */
 	while (1)
@@ -4593,12 +4592,8 @@ static key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 							/* Save screen */
 							screen_save();
 
-							/* Recall monster on screen */
-							/* Except for containers holding 'something' */
-							if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_known_p(o_ptr)))) screen_roff(o_ptr->name3);
-
 							/* Recall on screen */
-							else screen_object(o_ptr);
+							screen_object(o_ptr);
 
 							/* Hack -- Complete the prompt (again) */
 							Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
@@ -4767,12 +4762,8 @@ static key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 						/* Save screen */
 						screen_save();
 
-						/* Recall monster on screen when a monster corpse or statue */
-						/* XXX Except for containers holding 'something' */
-						if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_known_p(o_ptr)))) screen_roff(o_ptr->name3);
-
 						/* Recall on screen */
-						else screen_object(o_ptr);
+						screen_object(o_ptr);
 
 						/* Hack -- Complete the prompt (again) */
 						Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
@@ -4944,7 +4935,8 @@ static key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 		/* Room description if needed */
 		if (((play_info[y][x] & (PLAY_MARK)) != 0) &&
 			((cave_info[y][x] & (CAVE_ROOM)) != 0) &&
-			(room_has_flag(y, x, ROOM_SEEN) != 0))
+			(room_has_flag(y, x, ROOM_SEEN) != 0) &&
+			(room_names) && (*room != dun_room[y/BLOCK_HGT][x/BLOCK_HGT]))
 		{
 			int i;
 			bool edge = FALSE;
@@ -4954,14 +4946,14 @@ static key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 			int by = y/BLOCK_HGT;
 			int bx = x/BLOCK_HGT;
 
-			int room = dun_room[by][bx];
-
 			char name[32];
 			char text_visible[240];
 			char text_always[240];
 
+			*room = dun_room[by][bx];
+
 			/* Get the actual room description */
-			get_room_desc(room, name, text_visible, text_always);
+			get_room_desc(*room, name, text_visible, text_always);
 
 			/* Always in rooms */
 			s2 = "in ";
@@ -4980,7 +4972,6 @@ static key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 			/* Pick proper indefinite article */
 			s3 = (is_a_vowel(name[0])) ? "an " : "a ";
 
-
 			/* Interact */
 			while (1)
 			{
@@ -4991,7 +4982,7 @@ static key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 					screen_save();
 
 					/* Recall on screen */
-					screen_room_info(room);
+					screen_room_info(*room);
 
 					/* Hack -- Complete the prompt (again) */
 					Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
@@ -5323,6 +5314,8 @@ bool target_set_interactive(int mode)
 
 	char info[80];
 
+	int room = -1;
+
 	/* Cancel target */
 	target_set_monster(0);
 
@@ -5395,7 +5388,7 @@ bool target_set_interactive(int mode)
 			}
 
 			/* Describe and Prompt */
-			query = target_set_interactive_aux(y, x, mode, info);
+			query = target_set_interactive_aux(y, x, &room, mode, info);
 
 			/* Cancel tracking */
 			/* health_track(0); */
@@ -5601,7 +5594,7 @@ bool target_set_interactive(int mode)
 			strcpy(info, "q,t,p,m,+,-,<dir>");
 
 			/* Describe and Prompt (enable "TARGET_LOOK") */
-			query = target_set_interactive_aux(y, x, mode | TARGET_LOOK, info);
+			query = target_set_interactive_aux(y, x, &room, mode | TARGET_LOOK, info);
 
 			/* Cancel tracking */
 			/* health_track(0); */

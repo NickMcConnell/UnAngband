@@ -288,6 +288,9 @@ the map 'randomly' changing when you move through forested areas on the surface.
 
 - You can always see what room something is in whilst looking.
 
+- Examining a monster related item recalls the monster (Suggested by Mikolaj Konarski).
+
+
 ### Bug fixes ###
 
 - Priest spell righteous fury was for mages, paladins, shamans and bards but
@@ -393,6 +396,8 @@ specialisation being realised.
 
 - You can now pick up statues (Reported by Hilke Reiter).
 
+- Entering a new town or surface level of a new dungeon will display the full
+description of the area again.
 
 ### Build / Platform ###
 

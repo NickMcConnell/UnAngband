@@ -1902,6 +1902,9 @@ void screen_object(object_type *o_ptr)
         if (o_ptr->ident & (IDENT_MENTAL)) list_object(o_ptr, OBJECT_FLAGS_FULL);
         else list_object(o_ptr, OBJECT_FLAGS_KNOWN);
 
+	/* Display monster attributes */
+	if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_known_p(o_ptr)))) screen_roff(o_ptr->name3);
+
 	/* Display item name */
 	obj_top(o_ptr);
 }
@@ -2969,6 +2972,9 @@ void display_koff(const object_type *o_ptr)
 
 	/* Actually display the item */
 	list_object(o_ptr, OBJECT_FLAGS_KNOWN);
+
+	/* Display monster attributes */
+	if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_known_p(o_ptr)))) screen_roff(o_ptr->name3);
 
 	/* Display item name */
 	obj_top(o_ptr);
