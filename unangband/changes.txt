@@ -179,6 +179,9 @@ shield for a two-handed weapon specialist.
 - Branding an item causes you to carry it instead of dropping it (Reported by Hilke
 Reiter).
 
+- Added locations next to Hobbiton and Farmer Maggot's farm to clearly indicate that
+there is a choice to be made about which direction to go in next.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.

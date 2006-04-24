@@ -70,7 +70,7 @@ D:It feels like home...
 # Alternate starting dungeon.
 
 N:1:Hobbiton
-X:10:37
+X:10:57
 G:h
 L:0:0:411:435:0:0
 S:264:515:265:266:772:773:0:0
@@ -152,7 +152,7 @@ D:grateful townsfolk.
 #The following levels are from the Fellowship of the Ring.
 
 N:10:Farmer Maggot's farm
-X:1:53
+X:1:58
 G:,
 R:ANIMAL
 L:0:0:435:419:4:0
@@ -367,16 +367,16 @@ L:5:56:0:0:344:0
 L:6:56:0:0:345:0
 
 N:40:the Old Forest
-X:53:41
+X:53:54
 R:ANIMAL
-L:9:420:420:153:0:0
+L:6:420:420:153:0:0
 
 # And the same dungeon accessible from the LOtR quest.
 
 N:41:Barrow-downs
-X:12:40
-L:1:420:420:56:0:0
-L:2:56:0:0:0:0
+X:11:12
+L:7:420:420:56:0:0
+L:8:56:0:0:0:0
 L:20:56:0:0:1081:0
 
 # Alternate Lonely Mountain for 'There and Back again' map
@@ -481,7 +481,7 @@ N:54:a clearing in the Old Forest
 X:40:55
 G::
 R:PLANT
-L:9:0:420:153:622:0
+L:6:0:420:153:622:0
 L:10:56:1:420:622:0
 S:0:0:0:0:0:0:0:0
 
@@ -489,8 +489,8 @@ N:55:the House of Tom Bombadil
 X:41:41
 G:H
 R:PLANT
-L:9:0:420:153:307:0
-L:10:56:1:420:307:0
+L:11:0:420:153:307:0
+L:12:56:1:420:307:0
 S:514:776:0:0:0:0:0:0
 D:Golberry's gifts can be found at her pool.
 
@@ -501,9 +501,35 @@ R:INSECT
 L:11:435:153:199:0:0
 L:19:56:0:153:0:0
 
+# Make it clear that there is no easy way back to Hobbiton.
+
+N:57:the East Road
+X:1:37
+G:h
+R:ANIMAL
+L:0:0:414:435:0:0
+S:0:0:0:0:0:0:0:0
+D:The road ahead is long but straight; it takes you to beyond the
+D: edge of the Shire to Bree.  Choose your path carefully!  Once
+D: your feet take you further, it may be a while before you return
+D: to Hobbiton, older, wiser and wearier.  Elsewhere, dark clouds
+D: gather. At least the way ahead seems fair and true.
+
+N:58:the Brandywine Bridge
+X:1:53
+G:h
+R:ANIMAL
+L:0:0:414:153:0:0
+S:0:0:0:0:0:0:0:0
+D:This is the farthest you've been from the Shire - ahead, dark
+D: clouds gather.  Choose your path carefully! Once you cross the
+D: Brandywine to Buckland, it may be a while before you return to
+D: Hobbiton, and in some ways you can never come back.  The East
+D: Road from Hobbiton looks a fairer route, and safer too.
+
 # Must always be last position
 
-N:57:the West
+N:59:the West
 G:M
 L:0:0:420:0:0:0
 S:777:0:0:0:0:0:0:0

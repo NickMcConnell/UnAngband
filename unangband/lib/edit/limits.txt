@@ -38,7 +38,7 @@ M:R:1272
 M:V:51
 
 # Maximum number of towns
-M:T:58
+M:T:60
 
 # Maximum number of stores
 M:U:41
