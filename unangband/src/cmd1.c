@@ -816,8 +816,6 @@ static bool auto_pickup_never(const object_type *o_ptr)
 			case TV_BONE:
 			case TV_BODY:
 			case TV_SKIN:
-			case TV_STATUE:
-			case TV_ASSEMBLY:
 			case TV_JUNK:
 			{
 				return (TRUE);

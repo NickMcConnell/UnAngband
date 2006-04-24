@@ -1204,6 +1204,12 @@ static bool hates_fire(object_type *o_ptr)
 		{
 			return (TRUE);
 		}
+
+		/* Flasks burn */
+		case TV_FLASK:
+		{
+			return (TRUE);
+		}
 	}
 
 	return (FALSE);
@@ -1218,7 +1224,6 @@ static bool hates_cold(object_type *o_ptr)
 	switch (o_ptr->tval)
 	{
 		case TV_POTION:
-		case TV_FLASK:
 		{
 			return (TRUE);
 		}

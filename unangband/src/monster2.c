@@ -1704,16 +1704,94 @@ s16b monster_carry(int m_idx, object_type *j_ptr)
 
 
 /*
+ *  Helper function for monster swap. Update player based on moving y1, x1 to y2, x2
+ */
+static void player_swap(const int y1, const int x1, const int y2, const int x2)
+{
+	int by1 = y1/BLOCK_HGT;
+	int bx1 = x1/BLOCK_WID;
+	int by2 = y2/BLOCK_HGT;
+	int bx2 = x2/BLOCK_WID;
+
+	bool outside;
+
+	feature_type *f_ptr = &f_info[cave_feat[y2][x2]];
+
+	/* Move player */
+	p_ptr->py = y2;
+	p_ptr->px = x2;
+
+	/* Update the panel */
+	p_ptr->update |= (PU_PANEL);
+
+	/* Update the visuals (and monster distances) */
+	p_ptr->update |= (PU_UPDATE_VIEW | PU_DISTANCE);
+
+	/* Update the bonuses -- due to mud etc */
+	p_ptr->update |= (PU_BONUS | PU_RUNES); 
+
+	/* Window stuff */
+	p_ptr->window |= (PW_OVERHEAD);
+
+	/* Update room description (if needed) */
+	/* Line 1 -- we are entering a room */
+	/* Line 2 -- which is different from the last room */
+	/* Line 3 -- or we were not in a room */
+	/* Line 4 -- or we move to a lit portion of the room */
+	if ((cave_info[y2][x2] & (CAVE_ROOM)) &&
+	 ((dun_room[by1][bx1] != dun_room[by2][bx2]) ||
+		!(cave_info[y1][x1] & (CAVE_ROOM)) ||
+		((cave_info[y2][x2] & (CAVE_GLOW)) != (cave_info[y1][x1] & (CAVE_GLOW))) ))
+	{
+		p_ptr->window |= (PW_ROOM_INFO);
+		p_ptr->update |= (PU_ROOM_INFO);
+
+		/* Room is perma-lit */
+		if (cave_info[y2][x2] & (CAVE_GLOW)) room_info[dun_room[by2][bx2]].flags |= (ROOM_SEEN);
+	}
+
+	/* Update view if moved outside/inside */
+	outside = ((p_ptr->depth == min_depth(p_ptr->dungeon)) && 
+		(f_ptr->flags3 & (FF3_OUTSIDE)));
+
+	/* Changed inside/outside */
+	if (outside != p_ptr->outside)
+	{
+		p_ptr->redraw |= (PR_MAP);
+	}
+
+	/* Change state */
+	p_ptr->outside = outside;
+
+	/* Hack -- display 'furnishings' */
+	if (((f_ptr->flags3 & (FF3_ALLOC)) != 0) &&
+		((f_ptr->flags1 & (FF1_TRAP)) == 0))
+	{
+		msg_format("You %s %s %s.", p_ptr->blind || no_lite()? "feel" : "see", is_a_vowel((f_name + f_ptr->name)[0]) ? "an" : "a",
+			f_name + f_ptr->name);
+
+		play_info[y2][x2] |= (PLAY_MARK);
+
+		lite_spot(y2, x2);
+	}
+
+	/* If blind, silently notice what the player is on */
+	else if ((p_ptr->blind || no_lite()) && ((play_info[y2][x2] & (PLAY_MARK)) == 0) &&
+		((f_info[cave_feat[y2][x2]].flags1 & (FF1_NOTICE)) != 0))
+	{
+		play_info[y2][x2] |= (PLAY_MARK);
+
+		lite_spot(y2, x2);
+	}
+}
+
+
+/*
  * Swap the players/monsters (if any) at two locations XXX XXX XXX
  */
 void monster_swap(int y1, int x1, int y2, int x2)
 {
 	int m1, m2;
-
-	int by1 = y1/BLOCK_HGT;
-	int bx1 = x1/BLOCK_WID;
-	int by2 = y2/BLOCK_HGT;
-	int bx2 = x2/BLOCK_WID;
 
 	monster_type *m_ptr;
 	monster_race *r_ptr;
@@ -1757,70 +1835,7 @@ void monster_swap(int y1, int x1, int y2, int x2)
 	/* Player 1 */
 	else if (m1 < 0)
 	{
-		bool outside;
-
-		/* Move player */
-		p_ptr->py = y2;
-		p_ptr->px = x2;
-
-		/* Update the panel */
-		p_ptr->update |= (PU_PANEL);
-
-		/* Update the visuals (and monster distances) */
-		p_ptr->update |= (PU_UPDATE_VIEW | PU_DISTANCE);
-
-		/* Update the bonuses -- due to mud etc */
-		p_ptr->update |= (PU_BONUS | PU_RUNES); 
-
-		/* Window stuff */
-		p_ptr->window |= (PW_OVERHEAD);
-
-		/* Update room description (if needed) */
-		/* Line 1 -- we are entering a room */
-		/* Line 2 -- which is different from the last room */
-		/* Line 3 -- or we were not in a room */
-		if ((cave_info[y2][x2] & (CAVE_ROOM)) &&
-		 ((dun_room[by1][bx1] != dun_room[by2][bx2]) ||
-			!(cave_info[y1][x1] & (CAVE_ROOM))))
-		{
-			p_ptr->window |= (PW_ROOM_INFO);
-			p_ptr->update |= (PU_ROOM_INFO);
-		}
-
-		/* Update view if moved outside/inside */
-		outside = ((p_ptr->depth == min_depth(p_ptr->dungeon)) && 
-			(f_info[cave_feat[p_ptr->py][p_ptr->px]].flags3 & (FF3_OUTSIDE)));
-
-		/* Changed inside/outside */
-		if (outside != p_ptr->outside)
-		{
- 			p_ptr->redraw |= (PR_MAP);
-		}
-
-		/* Change state */
-		p_ptr->outside = outside;
-
-		/* Hack -- display 'furnishings' */
-		if ((f_info[cave_feat[y2][x2]].flags3 & (FF3_ALLOC)) != 0)
-		{
-			feature_type *f_ptr = &f_info[cave_feat[y2][x2]];
-
-			msg_format("You %s %s %s.", p_ptr->blind || no_lite()? "feel" : "see", is_a_vowel((f_name + f_ptr->name)[0]) ? "an" : "a",
-				f_name + f_ptr->name);
-
-			play_info[y2][x2] |= (PLAY_MARK);
-
-			lite_spot(y2, x2);
-		}
-
-		/* If blind, silently notice what the player is on */
-		else if ((p_ptr->blind || no_lite()) && ((play_info[y2][x2] & (PLAY_MARK)) == 0) &&
-			((f_info[cave_feat[y2][x2]].flags1 & (FF1_NOTICE)) != 0))
-		{
-			play_info[y2][x2] |= (PLAY_MARK);
-
-			lite_spot(y2, x2);
-		}
+		player_swap(y1, x1, y2, x2);
 	}
 
 	/* Monster 2 */
@@ -1855,70 +1870,7 @@ void monster_swap(int y1, int x1, int y2, int x2)
 	/* Player 2 */
 	else if (m2 < 0)
 	{
-		bool outside;
-
-		/* Move player */
-		p_ptr->py = y1;
-		p_ptr->px = x1;
-
-		/* Update the panel */
-		p_ptr->update |= (PU_PANEL);
-
-		/* Update the visuals (and monster distances) */
-		p_ptr->update |= (PU_UPDATE_VIEW | PU_DISTANCE);
-
-		/* Update the bonuses -- due to mud etc */
-		p_ptr->update |= (PU_BONUS | PU_RUNES); 
-
-		/* Window stuff */
-		p_ptr->window |= (PW_OVERHEAD);
-
-		/* Update room description (if needed) */
-		/* Line 1 -- we are entering a room */
-		/* Line 2 -- which is different from the last room */
-		/* Line 3 -- or we were not in a room */
-		if ((cave_info[y1][x1] & (CAVE_ROOM)) &&
-		 ((dun_room[by1][bx1] != dun_room[by2][bx2]) ||
-			!(cave_info[y2][x2] & (CAVE_ROOM))))
-		{
-			p_ptr->window |= (PW_ROOM_INFO);
-			p_ptr->update |= (PU_ROOM_INFO);
-		}
-
-		/* Update view if moved outside/inside */
-		outside = ((p_ptr->depth == min_depth(p_ptr->dungeon)) && 
-			(f_info[cave_feat[p_ptr->py][p_ptr->px]].flags3 & (FF3_OUTSIDE)));
-
-		/* Changed inside/outside */
-		if (outside != p_ptr->outside)
-		{
- 			p_ptr->redraw |= (PR_MAP);
-		}
-
-		/* Change state */
-		p_ptr->outside = outside;
-
-		/* Hack -- display 'furnishings' */
-		if ((f_info[cave_feat[y1][x1]].flags3 & (FF3_ALLOC)) != 0)
-		{
-			feature_type *f_ptr = &f_info[cave_feat[y1][x1]];
-
-			msg_format("You %s %s %s.", p_ptr->blind || no_lite()? "feel" : "see", is_a_vowel((f_name + f_ptr->name)[0]) ? "an" : "a",
-				f_name + f_ptr->name);
-
-			play_info[y1][x1] |= (PLAY_MARK);
-
-			lite_spot(y1, x1);
-		}
-
-		/* If blind, silently notice what the player is on */
-		else if ((p_ptr->blind || no_lite()) && ((play_info[y1][x1] & (PLAY_MARK)) == 0) &&
-			((f_info[cave_feat[y1][x1]].flags1 & (FF1_NOTICE)) != 0))
-		{
-			play_info[y1][x1] |= (PLAY_MARK);
-
-			lite_spot(y1, x1);
-		}
+		player_swap(y2, x2, y1, x1);
 	}
 
 

@@ -2689,8 +2689,9 @@ bool brand_item(int brand, cptr act)
 		/* Carry item again if split */
 		if (split)
 		{
-			/* Drop it near the player */
-			drop_near(o_ptr, 0, p_ptr->py, p_ptr->px);
+			/* Carry the item */
+			if (inven_carry_okay(o_ptr)) inven_carry(o_ptr);
+			else drop_near(o_ptr,0,p_ptr->py,p_ptr->px);
 		}
 	
 		/* Recalculate bonuses */
@@ -4426,18 +4427,15 @@ void lite_room(int y, int x)
 	/* Check the room */
 	if (cave_info[y][x] & (CAVE_ROOM))
 	{
-		int by = y/BLOCK_HGT;
-		int bx = x/BLOCK_HGT;
-
 		/* Hack --- Have we seen this room before? */
-		if (!(room_info[dun_room[by][bx]].flags & (ROOM_SEEN)))
+		if (!(room_has_flag(y, x, ROOM_SEEN)))
 		{
 			p_ptr->update |= (PU_ROOM_INFO);
 			p_ptr->window |= (PW_ROOM_INFO);
 		}
 
 		/* Some rooms cannot be completely lit */
-		if (room_info[dun_room[by][bx]].flags & (ROOM_GLOOMY))
+		if (room_has_flag(y, x, ROOM_GLOOMY))
 		{
 
 			/* Warn the player */

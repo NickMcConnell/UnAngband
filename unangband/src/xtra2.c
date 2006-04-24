@@ -3705,7 +3705,6 @@ void display_room_info(int room)
  */
 void describe_room(void)
 {
-
 	int by = p_ptr->py / BLOCK_HGT;
 	int bx = p_ptr->px / BLOCK_WID;
 	int room = dun_room[by][bx];
@@ -3731,48 +3730,41 @@ void describe_room(void)
 				 (is_a_vowel(name[0]) ? "an" : "a"),name);
 		}
 
-		if (!(room_descriptions) || (room_info[room].flags & (ROOM_SEEN)))
+		if (!(room_descriptions) || (room_info[room].flags & (ROOM_ENTERED)))
 		{
 		}
 		else if ((strlen(text_visible)) && (strlen(text_always)))
 		{
 			/* Message */
 			msg_format("%s  %s", text_visible, text_always);
-
-			/* Now seen */
-			room_info[room].flags |= ROOM_SEEN;
 		}
 		else if (strlen(text_visible))
 		{
 			/* Message */
 			msg_format("%s", text_visible);
-
-			/* Now seen */
-			room_info[room].flags |= ROOM_SEEN;
 		}
 		else if (strlen(text_always))
 		{
 			/* Message */
 			msg_format("%s", text_always);
-
-			/* Now seen */
-			room_info[room].flags |= ROOM_SEEN;
 		}
 		else
 		{
 			/* Message */
 			msg_print("There is nothing remarkable about it.");
-
-			/* Now seen */
-			room_info[room].flags |= ROOM_SEEN;
-
 		}
+
+		/* Room has been entered */
+		if (room_descriptions) room_info[room].flags |= (ROOM_ENTERED);
 	}
-	else if ((strlen(text_always)) &&
+	else if ((strlen(text_always)) && !(room_info[room].flags & (ROOM_HEARD)) &&
 	  (cave_info[p_ptr->py][p_ptr->px] & (CAVE_ROOM)))
 	{
 		/* Message */
 		if (room_descriptions) msg_format("%s", text_always);
+
+		/* Room has been heard */
+		if (room_descriptions) room_info[room].flags |= (ROOM_HEARD);
 	}
 	else if ((p_ptr->depth == town_depth(p_ptr->dungeon))
 		|| (p_ptr->depth == min_depth(p_ptr->dungeon)))
@@ -3780,7 +3772,7 @@ void describe_room(void)
 		msg_format("You have entered %s.",name);
 
 		/* Message */
-		if (room_descriptions) msg_format("%s", text_always);
+		msg_format("%s", text_always);
 	}
 
 	/* Window stuff */
@@ -4950,15 +4942,9 @@ static key_event target_set_interactive_aux(int y, int x, int mode, cptr info)
 		}
 
 		/* Room description if needed */
-		/* We describe a room if we are looking at ourselves, or something in a room when we are
-		 * not in a room, or in a different room. */
 		if (((play_info[y][x] & (PLAY_MARK)) != 0) &&
 			((cave_info[y][x] & (CAVE_ROOM)) != 0) &&
-			((room_info[dun_room[y/BLOCK_HGT][x/BLOCK_WID]].flags & (ROOM_SEEN)) != 0) &&
-			(room_names) &&
-			((cave_m_idx[y][x] < 0) ||
-				((cave_info[p_ptr->py][p_ptr->px] & (CAVE_ROOM)) == 0) ||
-			 ( dun_room[y/BLOCK_HGT][x/BLOCK_WID]!= dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID])) )
+			(room_has_flag(y, x, ROOM_SEEN) != 0))
 		{
 			int i;
 			bool edge = FALSE;
