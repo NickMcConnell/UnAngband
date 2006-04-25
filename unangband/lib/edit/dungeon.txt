@@ -306,7 +306,7 @@ L:85:56:0:0:528:0
 N:30:the Battle of Pelennor Fields
 X:28:31
 G:W
-R:ESCORTS
+R:ESCORT
 L:56:435:411:420:535:0
 
 N:31:Minas Tirith
@@ -490,16 +490,15 @@ S:8:9:10:11:12:13:268:778
 
 N:54:a clearing in the Old Forest
 X:40:55
-G::
 R:PLANT
 L:6:0:420:153:622:0
+L:7:56:1:420:0:0
 L:10:56:1:420:622:0
 S:0:0:0:0:0:0:0:0
 
 N:55:the House of Tom Bombadil
 X:41:41
 G:H
-R:PLANT
 L:11:0:420:153:307:0
 L:12:56:1:420:307:0
 S:514:776:0:0:0:0:0:0
@@ -510,6 +509,7 @@ X:11:12
 G:R
 R:INSECT
 L:11:435:153:199:0:0
+L:12:56:0:153:0:0
 L:19:56:0:153:0:0
 
 # Make it clear that there is no easy way back to Hobbiton.

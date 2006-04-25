@@ -407,29 +407,57 @@ static void place_down_stairs(int y, int x)
 
 
 
-
-
 /*
  * Place an up/down staircase at given location
  */
-static void place_random_stairs(int y, int x)
+static void place_random_stairs(int y, int x, int feat)
 {
 	/* Paranoia */
 	if (!cave_clean_bold(y, x)) return;
 
-	/* Choose a staircase */
-	if (p_ptr->depth == min_depth(p_ptr->dungeon))
+	/* No dungeon, no stairs */
+	if (min_depth(p_ptr->dungeon) == max_depth(p_ptr->dungeon))
+	{
+		return;
+	}
+
+	/* Top of tower -- must go down */
+	else if ((t_info[p_ptr->dungeon].zone[0].tower) && (p_ptr->depth >= max_depth(p_ptr->dungeon)))
 	{
 		place_down_stairs(y, x);
 	}
+
+	/* Bottom of tower dungeon -- must go up */
+	else if ((t_info[p_ptr->dungeon].zone[0].tower) && (p_ptr->depth <= min_depth(p_ptr->dungeon)))
+	{
+		place_up_stairs(y, x);
+	}
+
+	/* Surface -- must go down */
+	else if (p_ptr->depth == min_depth(p_ptr->dungeon))
+	{
+		cave_set_feat(y, x, FEAT_ENTRANCE);
+	}
+
+	/* Quest or bottom of dungeon -- must go up */
 	else if (is_quest(p_ptr->depth) || (p_ptr->depth >= max_depth(p_ptr->dungeon)))
 	{
 		place_up_stairs(y, x);
 	}
-	else if (rand_int(100) < 50)
+
+	/* Fixed stairs */
+	else if (feat)
+	{
+		cave_set_feat(y, x, feat);
+	}
+
+	/* Random stairs -- bias towards direction player is heading */
+	else if (rand_int(100) < ((p_ptr->create_up_stair) ? 75 : ((p_ptr->create_down_stair) ? 25 : 50)) )
 	{
 		place_down_stairs(y, x);
 	}
+
+	/* Random stairs */
 	else
 	{
 		place_up_stairs(y, x);
@@ -443,7 +471,6 @@ static void place_random_stairs(int y, int x)
 static void alloc_stairs(int feat, int num, int walls)
 {
 	int y, x, i, j, flag;
-
 
 	/* Place "num" stairs */
 	for (i = 0; i < num; i++)
@@ -464,46 +491,8 @@ static void alloc_stairs(int feat, int num, int walls)
 				/* Require a certain number of adjacent walls */
 				if (next_to_walls(y, x) < walls) continue;
 
-				/* No dungeon, no stairs */
-				if (min_depth(p_ptr->dungeon) == max_depth(p_ptr->dungeon))
-				{
-					/* Nothing */
-				}
-
-				/* Top of tower -- must go down */
-				else if ((t_info[p_ptr->dungeon].zone[0].tower) && (p_ptr->depth >= max_depth(p_ptr->dungeon)))
-				{
-					/* Clear previous contents, add down stairs */
-					cave_set_feat(y, x, FEAT_MORE);
-				}
-
-				/* Bottom of tower dungeon -- must go up */
-				else if ((t_info[p_ptr->dungeon].zone[0].tower) && (p_ptr->depth == 1))
-				{
-					/* Clear previous contents, add down stairs */
-					cave_set_feat(y, x, FEAT_LESS);
-				}
-
-				/* Surface -- must go down */
-				else if (p_ptr->depth == min_depth(p_ptr->dungeon))
-				{
-					/* Clear previous contents, add down stairs */
-					cave_set_feat(y, x, FEAT_MORE);
-				}
-
-				/* Quest or bottom of dungeon -- must go up */
-				else if (is_quest(p_ptr->depth) || (p_ptr->depth >= max_depth(p_ptr->dungeon)))
-				{
-					/* Clear previous contents, add up stairs */
-					cave_set_feat(y, x, FEAT_LESS);
-				}
-
-				/* Requested type */
-				else
-				{
-					/* Clear previous contents, add stairs */
-					cave_set_feat(y, x, feat);
-				}
+				/* Place fixed stairs */
+				place_random_stairs(y, x, feat);
 
 				/* All done */
 				flag = TRUE;
@@ -2305,7 +2294,7 @@ static void build_type4(int y0, int x0)
 			/* Stairs (20%) */
 			else
 			{
-				place_random_stairs(y0, x0);
+				place_random_stairs(y0, x0, 0);
 			}
 
 			/* Traps to protect the treasure */
@@ -4481,7 +4470,6 @@ static void cave_gen(void)
 		/* Battle-fields don't have rooms */
 		else if (battlefield)
 		{
-
 			/* Attempt a "non-existent" room */
 			if (room_build(by, bx, 0)) continue;
 
@@ -4684,22 +4672,25 @@ static void cave_gen(void)
 	/* Destroy the level if necessary */
 	if (destroyed) destroy_level();
 
-	k = 0;
+	/* Hack -- have more monsters at night */
+	if (surface && daytime) k = (p_ptr->depth / 6);
+	else k = (p_ptr->depth / 3);
+
+	if (k > 10) k = 10;
+	if (k < 2) k = 2;
 
 	/* Hack -- make sure we have rooms/corridors to place stuff */
 	if ((((!surface) || (destroyed)) && !(battlefield)) || (zone->tower))
-	{
-		/* Place 3 or 4 down stairs near some walls */
-		alloc_stairs(FEAT_MORE, rand_range(3, 4), 3);
-	
+	{	
+		/* Place 1 or 2 down stairs near some walls */
+		alloc_stairs(FEAT_MORE, rand_range(1, 2), 3);
+
 		/* Place 1 or 2 up stairs near some walls */
 		alloc_stairs(FEAT_LESS, rand_range(1, 2), 3);
-	
-		/* Basic "amount" */
-		k = (p_ptr->depth / 3);
-		if (k > 10) k = 10;
-		if (k < 2) k = 2;
-	
+
+		/* Place 2 random stairs near some walls */
+		alloc_stairs(0, 2, 3);
+
 		/* Put some rubble in corridors */
 		if (!zone->tower) alloc_object(ALLOC_SET_CORR, ALLOC_TYP_RUBBLE, randint(k));
 	
@@ -4709,13 +4700,20 @@ static void cave_gen(void)
 		/* Place some features in rooms */
 		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_FEATURE, 1);
 	}
-	/* Hack -- have more monsters at night */
-	else if (!daytime)
+	else if (!dun->entrance)
 	{
-		/* Basic "amount" */
-		k = (p_ptr->depth / 3);
-		if (k > 10) k = 10;
-		if (k < 2) k = 2;
+		/* Place the dungeon entrance */
+		while (TRUE)
+		{
+			/* Pick a location at least "three" from the outer walls */
+			y = rand_range(3, DUNGEON_HGT - 4);
+			x = rand_range(3, DUNGEON_WID - 4);
+
+			/* Require a "naked" floor grid */
+			if (cave_naked_bold(y, x)) break;
+		}
+
+		place_random_stairs(y, x, FEAT_ENTRANCE);
 	}
 
 	/* Determine the character location */
@@ -5020,7 +5018,7 @@ static void town_gen_hack(void)
 		}
 	}
 
-	/* Place the down stairs */
+	/* Place the dungeon entrance */
 	while (TRUE)
 	{
 		/* Pick a location at least "three" from the outer walls */
@@ -5031,31 +5029,31 @@ static void town_gen_hack(void)
 		if (cave_naked_bold(y, x)) break;
 	}
 
-	/* Clear previous contents, add down stairs */
-	if (p_ptr->depth < max_depth(p_ptr->dungeon))
-	{
-		if (t_info[p_ptr->dungeon].zone[0].tower) cave_set_feat(y, x, FEAT_LESS);
-		else if (p_ptr->depth == min_depth(p_ptr->dungeon)) cave_set_feat(y, x, FEAT_ENTRANCE);
-		else if (p_ptr->depth == max_depth(p_ptr->dungeon)) cave_set_feat(y, x, FEAT_LESS);
-		else cave_set_feat(y, x, FEAT_MORE);
-	}
+	/* Clear previous contents, add dungeon entrance */
+	place_random_stairs(y, x, FEAT_ENTRANCE);
 
 	/* Place the player */
 	player_place(y, x);
 
-	/* Place the up stairs */
-	while (TRUE)
+	/* Sometimes we have to place upstairs as well */
+	if (((t_info[p_ptr->dungeon].zone[0].tower) &&
+		(p_ptr->depth < max_depth(p_ptr->dungeon)) && (p_ptr->depth > min_depth(p_ptr->dungeon)))
+		|| (p_ptr->depth > min_depth(p_ptr->dungeon)))
 	{
-		/* Pick a location at least "three" from the outer walls */
-		y = rand_range(3, TOWN_HGT - 4);
-		x = rand_range(3, TOWN_WID - 4);
+		/* Place the up stairs */
+		while (TRUE)
+		{
+			/* Pick a location at least "three" from the outer walls */
+			y = rand_range(3, TOWN_HGT - 4);
+			x = rand_range(3, TOWN_WID - 4);
 
-		/* Require a "naked" floor grid */
-		if (cave_naked_bold(y, x)) break;
+			/* Require a "naked" floor grid */
+			if (cave_naked_bold(y, x)) break;
+		}
+
+		/* Clear previous contents, add up stairs */
+		cave_set_feat(y, x, FEAT_LESS);
 	}
-
-	/* Clear previous contents, add up stairs */
-	if (p_ptr->depth > min_depth(p_ptr->dungeon)) cave_set_feat(y, x, FEAT_LESS);
 
 	/* Hack -- use the "complex" RNG */
 	Rand_quick = FALSE;
