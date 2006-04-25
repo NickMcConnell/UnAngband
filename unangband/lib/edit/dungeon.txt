@@ -72,7 +72,7 @@ D:It feels like home...
 N:1:Hobbiton
 X:10:57
 G:h
-L:0:0:411:435:0:0
+L:0:0:411:155:0:0
 S:264:515:265:266:772:773:0:0
 D:Tip: Press '<' to travel elsewhere.
 
@@ -80,7 +80,7 @@ D:Tip: Press '<' to travel elsewhere.
 
 N:2:Rivendell
 X:39:3
-L:0:0:420:126:0:0
+L:0:0:420:155:0:0
 S:267:9:10:11:12:13:268:513
 
 # Misty Mountains are quite wet (Underground rivers etc).
@@ -106,13 +106,13 @@ G:l
 R:CAN_CLIMB
 L:14:420:56:153:637:0
 L:15:56:0:0:0:0
-L:25:0:1:0:0:0
+L:25:0:1:155:0:0
 L:26:56:155:0:1082:0
 S:270:271:503:11:12:504:505:0
 
 N:6:Lake-town
 X:5:7
-L:0:0:407:0:0:0
+L:0:0:155:152:0:0
 S:8:9:10:11:12:13:14:508
 
 # We disturb Smaug while entering his lair...
@@ -144,7 +144,7 @@ D:gather, angry at you for disturbing his lair...
 
 N:9:Lake-town, rebuilt
 X:42:14
-L:0:0:407:1:0:0
+L:0:0:155:152:0:0
 S:509:516:517:11:12:13:506:508
 D:Visit the statue to collect a reward from the 
 D:grateful townsfolk.
@@ -155,7 +155,7 @@ N:10:Farmer Maggot's farm
 X:1:58
 G:,
 R:ANIMAL
-L:0:0:435:419:4:0
+L:0:0:435:0:4:0
 L:1:114:0:0:0:0
 L:5:114:0:0:111:0
 S:507:0:0:0:0:0:0:0
@@ -164,7 +164,7 @@ N:11:Bree
 X:41:56
 G:t
 R:ANIMAL
-L:0:0:407:419:440:0
+L:0:0:407:408:440:0
 L:1:56:0:0:0:0
 L:3:56:0:0:620:0
 S:8:9:10:11:12:13:268:775
@@ -178,13 +178,13 @@ L:24:56:0:0:449:31
 
 N:13:the Ford to Rivendell
 X:12:14
-L:14:420:154:153:453:0
+L:14:420:154:126:453:0
 
 #Duplicate to allow acces to Moria.
 
 N:14:Rivendell
 X:15:17
-L:0:0:420:126:0:0
+L:0:0:420:155:0:0
 S:267:516:503:11:12:505:268:513
 
 N:15:Caradhras
@@ -212,7 +212,7 @@ N:18:Lothlorien
 X:19:20
 G:l
 L:0:0:420:420:0:0
-S:270:503:11:12:504:510:0:0
+S:270:503:11:12:13:504:510:0
 D:Galadriel's gifts can be found at her mirror.
 
 N:19:Parth Galen
@@ -228,12 +228,15 @@ R:PLANT
 L:20:420:420:420:634:0
 
 N:21:Edoras
-X:22:28
+X:22:29
 G:p
 R:WARRIOR
-L:51:0:407:0:0:0
-L:52:56:0:0:514:0
+L:51:0:533:529:0:49
+L:52:56:0:0:514:49
 S:271:516:517:519:504:511:509:508
+D:In the distance you see the watch-towers burning a signal to Minas Tirith.
+D:  The shortest path there lies on the Paths of the Dead; if you take it
+D: you may not return here.
 
 N:22:Hornburg
 X:21:23
@@ -242,10 +245,12 @@ R:ESCORT
 L:53:420:56:155:249:49
 
 N:23:Isengard
-X:20:22
+X:20:28
 L:21:420:141:141:514:31
 L:22:56:0:0:0:31
 L:50:56:0:0:532:31
+D:If you conquer Isengard, you open the easier path to Minas Tirith.  If you
+D: take it, you may not return here.
 
 N:24:the Marshes of the Dead
 X:19:25
@@ -259,7 +264,7 @@ X:26:49
 G:T
 R:WARRIOR
 L:20:420:155:199:0:0
-L:21:0:135:153:1084:0
+L:21:0:1:155:1084:0
 S:512:520:521:522:0:0:0:0
 
 N:26:Minas Morgul
@@ -280,12 +285,15 @@ L:65:56:1:0:597:11
 #King Denethor should guard Minas Tirith
 
 N:28:Minas Tirith
-X:29:30
+X:30:25
 G:t
-R:WARRIOR
-L:54:0:407:0:0:0
-L:55:56:0:0:1085:0
+R:MAGE
+L:0:0:410:56:0:46
+L:1:56:0:0:0:46
+L:55:56:0:0:1085:46
 S:505:516:517:503:519:518:509:508
+D:Should you defeat Denethor, you will open the path to Ithilien.  If you
+D: take it, you may not return here for some time.
 
 N:29:the Paths of the Dead
 X:28:30
@@ -296,7 +304,7 @@ L:57:56:0:0:0:0
 L:85:56:0:0:528:0
 
 N:30:the Battle of Pelennor Fields
-X:27:31
+X:28:31
 G:W
 R:ESCORTS
 L:56:435:411:420:535:0
@@ -304,11 +312,14 @@ L:56:435:411:420:535:0
 N:31:Minas Tirith
 X:25:26
 G:t
-R:WARRIOR
-L:0:0:407:0:0:0
-L:1:56:0:0:0:0
+R:MAGE
+L:0:0:410:56:0:46
+L:1:56:0:0:0:46
+L:55:56:0:0:0:46
 S:505:516:517:503:519:518:777:508
-D:A white tree has found root in Minas Tirith.
+D:A white tree has found root in Minas Tirith.  Claim your reward
+D: there.  This is your last chance to rest before the final
+D: confrontation with Mordor.
 
 N:32:the Plains of Gorgoroth
 X:51:33
@@ -334,13 +345,13 @@ L:99:56:218:216:546:20
 N:35:Hobbiton
 X:0:36
 G:h
-L:60:0:407:199:532:0
+L:60:0:407:159:532:0
 S:516:517:14:266:509:0:0:0
 
 N:36:Hobbiton, rebuilt
 X:36:0
 G:h
-L:0:0:407:419:0:0
+L:0:0:407:155:0:0
 S:264:515:265:266:772:773:774:0
 
 # The following are accessible from the first Hobbiton for consistency
@@ -349,7 +360,7 @@ N:37:Bree
 X:38:39
 G:t
 R:ANIMAL
-L:0:0:407:419:617:0
+L:0:0:407:408:617:0
 L:1:56:0:0:0:0
 L:3:56:0:0:620:0
 S:8:9:10:11:12:13:268:775
@@ -464,7 +475,7 @@ L:80:407:218:208:511:0
 
 N:52:the Dale
 X:47:42
-L:0:0:411:0:0:0
+L:0:0:530:153:0:0
 S:509:516:517:11:12:13:268:508
 
 # Extend the LotR quests to give starters more
@@ -474,7 +485,7 @@ N:53:Buckland
 X:40:54
 G:h
 R:ANIMAL
-L:0:0:407:419:0:0
+L:0:0:420:408:0:0
 S:8:9:10:11:12:13:268:778
 
 N:54:a clearing in the Old Forest
@@ -507,7 +518,7 @@ N:57:the East Road
 X:1:37
 G:h
 R:ANIMAL
-L:0:0:414:435:0:0
+L:0:0:435:420:0:0
 S:0:0:0:0:0:0:0:0
 D:The road ahead is long but straight; it takes you to beyond the
 D: edge of the Shire to Bree.  Choose your path carefully!  Once
@@ -519,7 +530,7 @@ N:58:the Brandywine Bridge
 X:1:53
 G:h
 R:ANIMAL
-L:0:0:414:153:0:0
+L:0:0:414:155:0:0
 S:0:0:0:0:0:0:0:0
 D:This is the farthest you've been from the Shire - ahead, dark
 D: clouds gather.  Choose your path carefully! Once you cross the

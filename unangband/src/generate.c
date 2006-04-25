@@ -469,31 +469,29 @@ static void alloc_stairs(int feat, int num, int walls)
 				{
 					/* Nothing */
 				}
-				/* Town -- must go down */
+
+				/* Top of tower -- must go down */
+				else if ((t_info[p_ptr->dungeon].zone[0].tower) && (p_ptr->depth >= max_depth(p_ptr->dungeon)))
+				{
+					/* Clear previous contents, add down stairs */
+					cave_set_feat(y, x, FEAT_MORE);
+				}
+
+				/* Bottom of tower dungeon -- must go up */
+				else if ((t_info[p_ptr->dungeon].zone[0].tower) && (p_ptr->depth == 1))
+				{
+					/* Clear previous contents, add down stairs */
+					cave_set_feat(y, x, FEAT_LESS);
+				}
+
+				/* Surface -- must go down */
 				else if (p_ptr->depth == min_depth(p_ptr->dungeon))
 				{
 					/* Clear previous contents, add down stairs */
 					cave_set_feat(y, x, FEAT_MORE);
 				}
 
-				/* Top of tower -- must go down */
-				else if ((t_info[p_ptr->dungeon].zone[0].tower) && (p_ptr->depth >= max_depth(p_ptr->dungeon)))
-				{
-
-					/* Clear previous contents, add down stairs */
-					cave_set_feat(y, x, FEAT_MORE);
-
-				}
-
-				/* Bottom of tower dungeon -- must go up */
-				else if ((t_info[p_ptr->dungeon].zone[0].tower) && (p_ptr->depth == 1))
-				{
-
-					/* Clear previous contents, add down stairs */
-					cave_set_feat(y, x, FEAT_LESS);
-
-				}
-				/* Quest -- must go up */
+				/* Quest or bottom of dungeon -- must go up */
 				else if (is_quest(p_ptr->depth) || (p_ptr->depth >= max_depth(p_ptr->dungeon)))
 				{
 					/* Clear previous contents, add up stairs */
@@ -700,6 +698,10 @@ static void build_terrain(int y, int x, int feat)
 		&& !(f_ptr->flags3 & (FF3_TREE)))
 	{
 		newfeat = feat;
+	}
+	else if (f2_ptr->flags2 & (FF2_BRIDGED))
+	{
+		newfeat = feat_state(oldfeat, FS_BRIDGE);
 	}
 	else if ((f_ptr->flags2 & (FF2_CHASM)) || (f2_ptr->flags2 & (FF2_CHASM)))
 	{
@@ -3598,6 +3600,9 @@ static void build_tower(int y0, int x0, int ymax, int xmax, cptr data)
 			/* Part of a vault */
 			cave_info[y][x] |= (CAVE_ROOM);
 
+			/* Hack -- always lite towers */
+			cave_info[y][x] |= (CAVE_GLOW);
+
 			/* Analyze the grid */
 			switch (*t)
 			{
@@ -4372,8 +4377,8 @@ static void cave_gen(void)
 		int typ = v_info[zone->tower].typ;
 
 		/* Hack - set to center of level */
-		int by0 = dun->row_rooms /2;
-		int bx0 = dun->col_rooms /2;
+		int by0 = (dun->row_rooms - (room[typ].dy1 + room[typ].dy2)) /2;
+		int bx0 = (dun->col_rooms - (room[typ].dx1 + room[typ].dx2)) /2;
 
 		/* Extract blocks */
 		int by1 = by0 + room[typ].dy1;
@@ -4825,6 +4830,12 @@ static void build_store(int feat, int yy, int xx)
 	/* Hack -- don't build building for some 'special locations' */
 	bool building = (((d_char > '0') && (d_char <= '8')) || (d_char == '+'));
 
+	town_type *t_ptr = &t_info[p_ptr->dungeon];
+	dungeon_zone *zone=&t_ptr->zone[0];;
+
+	/* Get the zone */
+	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+
 	/* Find the "center" of the store */
 	y0 = yy * 9 + 6;
 	x0 = xx * 14 + 12;
@@ -4834,6 +4845,16 @@ static void build_store(int feat, int yy, int xx)
 	y2 = y0 + randint((yy == 1) ? 3 : 2);
 	x1 = x0 - randint(5);
 	x2 = x0 + randint(5);
+
+	/* Hack -- decrease building size to create space for small terrain */
+	if (zone->small)
+	{
+		if (x2 == 31) x2--;
+		if (x1 == 35) x1++;
+		if (x1 == 36) x1++;
+		if (y2 == 9) y2--;
+		if (y1 == 12) y1++;
+	}
 
 	/* Create a building? */
 	if (building)
@@ -4940,13 +4961,44 @@ static void town_gen_hack(void)
 		}
 	}
 
-#if 0
-	/* Hack -- place small terrain */
+	/* MegaHack -- place small terrain north to south & bridge east to west */
 	if (zone->small)
 	{
-		build_feature(TOWN_HGT/2, TOWN_WID/2, zone->small, FALSE);
+		for (y = 10; y < 12; y++)
+		{
+			for (x = 1; x < TOWN_WID-1; x++)
+			{
+				/* Create terrain on top */
+				build_terrain(y, x, zone->small);
+			}
+		}
+
+		for (y = 1; y < TOWN_HGT-1; y++)
+		{
+			for (x = 32; x < 36; x++)
+			{
+				/* Create terrain on top */
+				cave_alter_feat(y, x, FS_BRIDGE);
+			}
+		}
+
+		/* Hack -- town square */
+		if (feat_state(zone->big, FS_BRIDGE) == zone->small)
+		{
+			for (y = 2; y < 20; y++)
+			{
+				for (x = 6; x < 61; x++)
+				{
+					/* Exclude already built terrain */
+					if ((y < 10) || (y >= 12) || (x< 32) || (x >= 36))
+					{
+						/* Create terrain on top */
+						build_terrain(y, x, zone->small);
+					}
+				}
+			}	
+		}
 	}
-#endif
 
 	/* Prepare an Array of "remaining stores", and count them */
 	for (n = 0; n < MAX_STORES; n++) rooms[n] = n;
@@ -4982,7 +5034,9 @@ static void town_gen_hack(void)
 	/* Clear previous contents, add down stairs */
 	if (p_ptr->depth < max_depth(p_ptr->dungeon))
 	{
-		if (p_ptr->depth == min_depth(p_ptr->dungeon)) cave_set_feat(y, x, FEAT_ENTRANCE);
+		if (t_info[p_ptr->dungeon].zone[0].tower) cave_set_feat(y, x, FEAT_LESS);
+		else if (p_ptr->depth == min_depth(p_ptr->dungeon)) cave_set_feat(y, x, FEAT_ENTRANCE);
+		else if (p_ptr->depth == max_depth(p_ptr->dungeon)) cave_set_feat(y, x, FEAT_LESS);
 		else cave_set_feat(y, x, FEAT_MORE);
 	}
 
