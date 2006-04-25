@@ -2740,34 +2740,40 @@ N:256:Poison
 A:75:6:1
 A:80:0:1
 L:1d10+10
+B:SELF:POISON:0d0+0
 F:POISON
 
 N:257:Blindness
 A:75:7:1
 A:80:1:1
 L:1d200+200
+B:SELF:BLIND_WEAK:0d0+0
 F:BLIND
 
 N:258:Paranoia
 A:80:2:1
 L:1d10+10
+B:SELF:FEAR_WEAK:0d0+0
 F:FEAR
 
 N:259:Confusion
 A:75:9:1
 A:80:3:1
 L:1d10+10
+B:SELF:CONFUSE:0d0+0
 F:CONFUSE
 
 N:260:Hallucination
 A:80:4:1
 L:1d10+10
 F:HALLUC
+B:SELF:HALLU:0d0+0
 S:CURE_DISEASE:16
 
 N:261:Paralyzation
 A:80:5:1
 L:1d10+10
+B:SELF:PARALYZE:0d0+0
 F:PARALYZE
 
 N:262:Poisonous Food
@@ -2851,6 +2857,7 @@ N:285:Slowness
 A:55:1:1
 A:75:4:1
 L:1d10+10
+B:SELF:SLOW_WEAK:0d0+0
 F:SLOW
 
 N:286:Salt Water
@@ -2864,6 +2871,7 @@ N:287:Sleep
 A:75:11:1
 L:1d4+4
 F:PARALYZE
+B:SELF:SLEEP:0d0+0
 D:You fall asleep.
 S:CURE_DISEASE:9
 
@@ -2871,6 +2879,7 @@ N:288:Lose Memories
 A:75:13:1
 D:You feel your memories fade.
 F:DEC_EXP
+B:SELF:LOSE_INT:0d0+0
 S:CURE_DISEASE:15
 
 N:289:Ruination
@@ -2918,7 +2927,7 @@ D:A feeling of Death flows through your body.
 
 N:298:Infravision
 A:75:24:1
-L:1d100+100+1
+L:1d100+100
 F:INFRA
 S:CURE_DISEASE:11
 

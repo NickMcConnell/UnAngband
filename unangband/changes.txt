@@ -186,6 +186,11 @@ there is a choice to be made about which direction to go in next.
 
 - Made towns more interesting.
 
+- Decrease the explosion radius of flasks and potions as they are otherwise too
+effective.
+
+- Detrimental potions now affect monsters when thrown.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.

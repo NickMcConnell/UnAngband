@@ -4964,18 +4964,18 @@ static void town_gen_hack(void)
 	/* MegaHack -- place small terrain north to south & bridge east to west */
 	if (zone->small)
 	{
-		for (y = 10; y < 12; y++)
+		for (y = 1; y < TOWN_HGT-1; y++)
 		{
-			for (x = 1; x < TOWN_WID-1; x++)
+			for (x = 32; x < 36; x++)
 			{
 				/* Create terrain on top */
 				build_terrain(y, x, zone->small);
 			}
 		}
 
-		for (y = 1; y < TOWN_HGT-1; y++)
+		for (y = 10; y < 12; y++)
 		{
-			for (x = 32; x < 36; x++)
+			for (x = 1; x < TOWN_WID-1; x++)
 			{
 				/* Create terrain on top */
 				cave_alter_feat(y, x, FS_BRIDGE);

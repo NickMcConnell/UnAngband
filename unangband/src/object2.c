@@ -4920,7 +4920,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 			return TRUE;
 		}
 
-		/* Potions and flasks explode. Potions have radius 2 explosions, flasks have radius 1. */
+		/* Potions and flasks explode. Potions have radius 1 explosions, flasks have radius 0. */
 		case TV_POTION:
 		case TV_FLASK:
 		{
@@ -4969,7 +4969,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 					flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
 					/* Hit with radiate attack */
-					obvious |= project(-1, (j_ptr->tval == TV_POTION ? 2 : 1), y, x, y, x, damroll(d_side, d_dice),
+					obvious |= project(-1, (j_ptr->tval == TV_POTION ? 1 : 0), y, x, y, x, damroll(d_side, d_dice),
 						 effect, flg, 0, 0);
 
 				}
@@ -4984,7 +4984,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 
 		}
 
-		/* Spores explode with radius 1 effect (Note monster spore attacks are radius 2). */
+		/* Spores explode with radius 1 effect. */
 		/* Eggs turn into bodies. */
 		case TV_EGG:
 		{
