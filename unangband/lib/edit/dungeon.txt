@@ -503,7 +503,7 @@ R:PLANT
 L:11:0:420:153:307:0
 L:12:56:1:420:307:0
 S:514:776:0:0:0:0:0:0
-D:Golberry's gifts can be found at her pool.
+D:Goldberry's gifts can be found at her pool.
 
 N:56:the Midge Marshes
 X:11:12
