@@ -191,6 +191,8 @@ effective.
 
 - Detrimental potions now affect monsters when thrown.
 
+- It is now possible to reset your recall depth (From Angband).
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.
@@ -301,6 +303,9 @@ the map 'randomly' changing when you move through forested areas on the surface.
 - You can always see what room something is in whilst looking.
 
 - Examining a monster related item recalls the monster (Suggested by Mikolaj Konarski).
+
+- Changed the way town and room descriptions are displayed when entering the room to cut
+down on key presses and make it easier to read.
 
 
 ### Bug fixes ###

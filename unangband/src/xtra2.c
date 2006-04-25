@@ -3732,26 +3732,36 @@ void describe_room(void)
 
 		if (!(room_descriptions) || (room_info[room].flags & (ROOM_ENTERED)))
 		{
+			/* Nothing more */
 		}
-		else if ((strlen(text_visible)) && (strlen(text_always)))
+		else if (strlen(text_visible) || strlen(text_always))
 		{
-			/* Message */
-			msg_format("%s  %s", text_visible, text_always);
-		}
-		else if (strlen(text_visible))
-		{
-			/* Message */
-			msg_format("%s", text_visible);
-		}
-		else if (strlen(text_always))
-		{
-			/* Message */
-			msg_format("%s", text_always);
-		}
-		else
-		{
-			/* Message */
-			msg_print("There is nothing remarkable about it.");
+			message_flush();
+
+			screen_save();
+
+			/* Set text_out hook */
+			text_out_hook = text_out_to_screen;
+
+			text_out_c(TERM_L_BLUE, name);
+			text_out("\n");
+
+			if (strlen(text_visible))
+			{
+				/* Message */
+				text_out(text_visible);
+			}
+
+			if (strlen(text_always))
+			{
+				/* Message */
+				msg_format(text_always);
+			}
+
+			(void)anykey();
+
+			/* Load screen */
+			screen_load();
 		}
 
 		/* Room has been entered */
@@ -3771,8 +3781,25 @@ void describe_room(void)
 	{
 		msg_format("You have entered %s.",name);
 
-		/* Message */
-		msg_format("%s", text_always);
+		if (strlen(text_always))
+		{
+			message_flush();
+
+			screen_save();
+
+			/* Set text_out hook */
+			text_out_hook = text_out_to_screen;
+
+			text_out_c(TERM_L_BLUE, name);
+			text_out("\n");
+
+			/* Message */
+			text_out(text_always);
+
+			(void)anykey();
+
+			screen_load();
+		}
 	}
 
 	/* Window stuff */
