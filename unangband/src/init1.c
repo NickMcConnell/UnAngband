@@ -929,7 +929,7 @@ static cptr k_info_flags1[] =
 	"SHOTS",
 	"MIGHT",
 	"SLAY_NATURAL",
-	"SLAY_EVIL",
+	"BRAND_HOLY",
 	"SLAY_UNDEAD",
 	"SLAY_DEMON",
 	"SLAY_ORC",
@@ -6934,7 +6934,6 @@ static long eval_hp_adjust(monster_race *r_ptr)
 }
 
 
-
 /*
  * Evaluate the monster power ratings to be stored in r_info.raw
  */
@@ -7169,7 +7168,7 @@ errr eval_e_power(header *head)
 	ego_item_type *e_ptr = NULL;
 
 	/* Precompute values for ego item slays for ego items */
-	for (i = 0; i < z_info->e_max; i++);
+	for (i = 0; i < z_info->e_max; i++)
 	{
 		/* Point at the "info" */
 		e_ptr = (ego_item_type*)head->info_ptr + i;

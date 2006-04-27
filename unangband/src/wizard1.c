@@ -1259,6 +1259,221 @@ static void spoil_feat_info(cptr fname)
 }
 
 
+
+/*
+ * Create a spoiler file for items
+ */
+static void spoil_ego_desc(cptr fname)
+{
+	int i, j, k, s, t, n = 0;
+
+	u16b who[200];
+
+	char buf[1024];
+
+        cptr formatter = "%-37s  %7s%4s%4s\n";
+
+	/* Build the filename */
+	path_build(buf, 1024, ANGBAND_DIR_USER, fname);
+
+	/* File type is "TEXT" */
+	FILE_TYPE(FILE_TYPE_TEXT);
+
+	/* Open the file */
+	fff = my_fopen(buf, "w");
+
+	/* Oops */
+	if (!fff)
+	{
+		msg_print("Cannot create spoiler file.");
+		return;
+	}
+
+	/* Header */
+	fprintf(fff, "Spoiler File -- Ego Items (%s)\n\n", VERSION_STRING);
+	fprintf(fff, "Note: 1000 power equals no benefit\n\n");
+
+	/* More Header */
+	fprintf(fff, formatter, "Description", "Power", "Lev", "Rar");
+        fprintf(fff, formatter, "-------------------------------------",
+		"-----", "---", "---");
+
+	/* List the groups */
+	for (i = 0; i < 15; i++)
+	{
+		/* Write out the group title */
+		if (group_artifact[i].name)
+		{
+			/* Hack -- bubble-sort by cost and then level */
+			for (s = 0; s < n - 1; s++)
+			{
+				for (t = 0; t < n - 1; t++)
+				{
+					int i1 = t;
+					int i2 = t + 1;
+
+					int e1;
+					int e2;
+
+					s32b t1;
+					s32b t2;
+
+					t1 = e_info[who[i1]].level;
+					t2 = e_info[who[i2]].level;
+
+					e1 = e_info[who[i1]].rarity;
+					e2 = e_info[who[i2]].rarity;
+
+					if ((t1 > t2) || ((t1 == t2) && (e1 > e2)))
+					{
+						int tmp = who[i1];
+						who[i1] = who[i2];
+						who[i2] = tmp;
+					}
+				}
+			}
+
+			/* Spoil each item */
+			for (s = 0; s < n; s++)
+			{
+				ego_item_type *e_ptr = &e_info[who[s]];
+
+				/* Dump it */
+                                fprintf(fff, "%-37s  %7ld%4d%4d\n",
+					e_name + e_ptr->name, e_ptr->slay_power * 1000 / tot_mon_power, 
+					e_ptr->level, e_ptr->rarity);
+
+			}
+
+			/* Start a new set */
+			n = 0;
+
+			/* Notice the end */
+			if (!group_artifact[i].tval) break;
+
+			/* Start a new set */
+			fprintf(fff, "\n\n%s\n\n", group_artifact[i].name);
+		}
+
+		/* Get legal item types */
+		for (k = 1; k < z_info->e_max; k++)
+		{
+			ego_item_type *e_ptr = &e_info[k];
+
+			for (j = 0; j < 3; j++)
+			{
+				/* Skip wrong tval's */
+				if (e_ptr->tval[j] != group_artifact[i].tval) continue;
+
+				/* Save the index */
+				who[n++] = k;
+			}
+		}
+	}
+
+
+	/* Check for errors */
+	if (ferror(fff) || my_fclose(fff))
+	{
+		msg_print("Cannot close spoiler file.");
+		return;
+	}
+
+	/* Message */
+	msg_print("Successfully created a spoiler file.");
+}
+
+
+/*
+ * Names for slay table
+ *
+ * Could probably be smart and extract this from magic item table.
+ *
+ */ 
+static const cptr slay_name[]=
+{
+	"Slay Nature",
+	"Brand Holy",
+	"Slay Undead",
+	"Slay Demon",
+	"Slay Orc",
+	"Slay Troll",
+	"Slay Giant",
+	"Slay Dragon",
+	"Execute Dragon",
+	"Execute Demon",
+	"Execute Undead",
+	"Brand Poison",
+	"Brand Acid",
+	"Brand Elec",
+	"Brand Fire",
+	"Brand Cold",
+	"Brand Lite",
+	"Brand Dark",
+	"Slay Man",
+	"Slay Elf",
+	"Slay Dwarf",
+	NULL
+};
+
+
+/*
+ * Create a spoiler file for relative slay power
+ */
+static void spoil_slay_table(cptr fname)
+{
+	int i;
+
+	char buf[1024];
+
+        cptr formatter = "%-37s  %7s\n";
+
+	/* Build the filename */
+	path_build(buf, 1024, ANGBAND_DIR_USER, fname);
+
+	/* File type is "TEXT" */
+	FILE_TYPE(FILE_TYPE_TEXT);
+
+	/* Open the file */
+	fff = my_fopen(buf, "w");
+
+	/* Oops */
+	if (!fff)
+	{
+		msg_print("Cannot create spoiler file.");
+		return;
+	}
+
+
+	/* Header */
+	fprintf(fff, "Spoiler File -- Relative Slay Power (%s)\n\n", VERSION_STRING);
+	fprintf(fff, "Note: 1000 power equals no benefit\n\n");
+	
+	/* More Header */
+	fprintf(fff, formatter, "Slay", "Power");
+        fprintf(fff, formatter, "-------------------------------------",
+		"-----");
+
+	/* List the groups */
+	for (i = 0; TRUE; i++)
+	{
+		if (!(slay_name[i])) break;
+	        fprintf(fff, "%-37s  %7ld\n", slay_name[i],magic_slay_power[i] * 1000 / tot_mon_power);
+	}
+
+
+	/* Check for errors */
+	if (ferror(fff) || my_fclose(fff))
+	{
+		msg_print("Cannot close spoiler file.");
+		return;
+	}
+
+	/* Message */
+	msg_print("Successfully created a spoiler file.");
+}
+
+
 /*
  * Create Spoiler files
  */
@@ -1288,9 +1503,11 @@ void do_cmd_spoilers(void)
                 prt("(5) Full Monster Info (mon-info.spo)", 9, 5);
                 prt("(6) Brief Terrain Info (ter-desc.spo)", 10, 5);
                 prt("(7) Full Terrain Info (ter-info.spo)", 11, 5);
+                prt("(8) Brief Ego Item Info (ego-desc.spo)", 12, 5);
+                prt("(9) Slay Table (slay-tbl.spo)", 13, 5);
 
 		/* Prompt */
-		prt("Command: ", 14, 0);
+		prt("Command: ", 16, 0);
 
 		/* Get a choice */
 		ch = inkey();
@@ -1341,6 +1558,18 @@ void do_cmd_spoilers(void)
                 else if (ch == '7')
 		{
 			spoil_feat_info("ter-info.spo");
+		}
+
+		/* Option (8) */
+                else if (ch == '8')
+		{
+			spoil_ego_desc("ego-desc.spo");
+		}
+
+		/* Option (9) */
+                else if (ch == '9')
+		{
+			spoil_slay_table("slay-tbl.spo");
 		}
 
 		/* Oops */

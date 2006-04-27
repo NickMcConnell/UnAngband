@@ -420,7 +420,7 @@ bool restore_level(void)
  */
 #define TR1_WEAPON_FLAGS (TR1_SLAY_ORC | TR1_SLAY_TROLL | TR1_SLAY_GIANT |\
 			TR1_SLAY_DRAGON | TR1_SLAY_UNDEAD | TR1_SLAY_DEMON |\
-			TR1_SLAY_NATURAL | TR1_SLAY_EVIL | TR1_KILL_DRAGON |\
+			TR1_SLAY_NATURAL | TR1_BRAND_HOLY | TR1_KILL_DRAGON |\
 			TR1_KILL_UNDEAD | TR1_KILL_DEMON | TR1_BRAND_ACID |\
 			TR1_BRAND_FIRE | TR1_BRAND_POIS | TR1_BRAND_ELEC |\
 			TR1_BRAND_COLD)
@@ -3425,7 +3425,7 @@ static bool project_hack(int typ, int dam)
 {
 	int i, x, y;
 
-	int flg = PROJECT_JUMP | PROJECT_KILL | PROJECT_HIDE | PROJECT_PLAY;
+	int flg = PROJECT_JUMP | PROJECT_KILL | PROJECT_HIDE | PROJECT_PLAY | PROJECT_ITEM | PROJECT_GRID;
 
 	bool obvious = FALSE;
 
@@ -4571,6 +4571,44 @@ static bool project_hook(int typ, int dir, int dam, int flg)
 	return (project(-1, 0, py, px, ty, tx, dam, typ, flg, 0, 0));
 }
 
+/*
+ * Apply an arc in a direction
+ */
+static bool fire_arc(int typ, int dir, int dam, int rad, int degrees_of_arc)
+{
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int ty, tx;
+
+	int flg = PROJECT_ARC | PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_WALL;
+
+	/* Diameter of source of energy is at least 20. */
+	int diameter_of_source = 20;
+
+	int degree_factor = 60;
+
+	/* Use the given direction */
+	ty = py + 99 * ddy[dir];
+	tx = px + 99 * ddx[dir];
+
+	/* Narrow arcs lose relatively little energy over distance. */
+	if (degrees_of_arc < degree_factor)
+	{
+		if (degrees_of_arc <= 6) diameter_of_source = rad * 10;
+		else diameter_of_source = diameter_of_source * degree_factor /
+			degrees_of_arc;
+	}
+
+	/* Radius of zero means no fixed limit. */
+	if (rad == 0) rad = MAX_SIGHT;
+
+	/* Analyze the "dir" and the "target" */
+	return (project(-1, rad, py, px, ty, tx, dam, typ, flg, degrees_of_arc,
+			(byte)diameter_of_source));
+}
+
+
 
 /*
  * Cast a bolt spell
@@ -5494,6 +5532,46 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 
 				break;
 			}
+
+			case RBM_ARC_20:
+			{
+				/* Allow direction to be cancelled for free */
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
+
+				/* Hack - scale damage */
+				if ((level > 5) && (d_side)) damage += damroll((level-1)/5, d_side);
+
+				if (fire_arc(effect, dir, damage, 0, 20)) obvious = TRUE;
+
+				break;
+			}
+
+			case RBM_ARC_30:
+			{
+				/* Allow direction to be cancelled for free */
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
+
+				/* Hack - scale damage */
+				if ((level > 5) && (d_side)) damage += damroll((level-1)/5, d_side);
+
+				if (fire_arc(effect, dir, damage, 0, 30)) obvious = TRUE;
+
+				break;
+			}
+
+			case RBM_ARC_60:
+			{
+				/* Allow direction to be cancelled for free */
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
+
+				/* Hack - scale damage */
+				if ((level > 5) && (d_side)) damage += damroll((level-1)/5, d_side);
+
+				if (fire_arc(effect, dir, damage, 0, 60)) obvious = TRUE;
+
+				break;
+			}
+
 			default:
 			{
 				/* Allow direction to be cancelled for free */

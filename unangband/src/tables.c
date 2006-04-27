@@ -2631,7 +2631,7 @@ const cptr magic_name[4][32] =
 		"of Extra Shots",
 		"of Extra Might",
 		"of Slay Nature",
-		"of Slay Evil",
+		"of Holy Might",
 		"of Slay Undead",
 		"of Slay Demon",
 		"of Slay Orc",
@@ -2688,7 +2688,7 @@ const cptr magic_name[4][32] =
 	{
 		"of Slow Digestion",
 		"of Feather Falling",
-		"of Light",
+		"(Glowing)",
 		"of Regeneration",
 		"of Telepathy",
 		"of See Invisible",
@@ -2728,8 +2728,8 @@ const cptr magic_name[4][32] =
 		"of Water Vulnerability",
 		"of Bloodlust",
 		"of Manathirst",
-		"",
-		"",
+		"of Poison Immunity",
+		"of Resist Disease",
 		"of Hunger",
 		"of Slay Man",
 		"of Slay Elf",
@@ -3167,19 +3167,20 @@ const element_type element[MAX_ELEMENTS] =
 const start_item common_items[MAX_COMMON_ITEMS]=
 {
 	{	TV_FOOD, SV_FOOD_SLIME_MOLD, 6, 7, 0, 0, 0, 20},
-	{	TV_FOOD, SV_FOOD_PINT_OF_ALE, 1, 1, 0, 0, 5, 40},
+	{	TV_FOOD, SV_FOOD_PINT_OF_SPIRITS, 1, 1, 0, 0, 0, 15},
+	{	TV_FOOD, SV_FOOD_PINT_OF_ALE, 1, 1, 0, 0, 16, 60},
 	{	TV_FOOD, SV_FOOD_BISCUIT, 6, 7, 0, 0, 21, 40},
 	{	TV_FOOD, SV_FOOD_RATION, 3, 7, 0, 0, 41, 100},
-	{	TV_FOOD, SV_FOOD_PINT_OF_WINE, 1, 1, 0, 0, 60, 95},
+	{	TV_FOOD, SV_FOOD_PINT_OF_WINE, 1, 1, 0, 0, 61, 95},
 	{	TV_LITE, SV_LITE_TORCH, 3, 7, 500, 3500, 0, 75},
 	{	TV_LITE, SV_LITE_LANTERN, 1, 1, 500, 3500, 76, 100},
-	{	TV_FLASK, SV_FLASK_OIL, 2, 5, 0, 0, 80, 100},
+	{	TV_FLASK, SV_FLASK_OIL, 2, 5, 0, 0, 76, 100},
 	{	TV_HELM, SV_HARD_LEATHER_CAP, 1, 1, 0, 0, 60, 99},
 	{	TV_CROWN, SV_GOLDEN_CROWN, 1, 1, 0, 0, 100, 100},
 	{	TV_BOOTS, SV_PAIR_OF_HARD_LEATHER_BOOTS, 1, 1, 0, 0, 50, 70},
-	{	TV_BOOTS, SV_PAIR_OF_SOFT_LEATHER_BOOTS, 1, 1, 0, 0, 70, 100},
-	{	TV_HELM, SV_SET_OF_LEATHER_GLOVES, 1, 1, 0, 0, 90, 100},
-	{	TV_CLOAK, SV_CLOAK, 1, 1, 0, 0, 90, 100}
+	{	TV_BOOTS, SV_PAIR_OF_SOFT_LEATHER_BOOTS, 1, 1, 0, 0, 71, 100},
+	{	TV_HELM, SV_SET_OF_LEATHER_GLOVES, 1, 1, 0, 0, 91, 100},
+	{	TV_CLOAK, SV_CLOAK, 1, 1, 0, 0, 81, 100}
 };
 
 const cptr vocalize[MAX_LANGUAGES] =

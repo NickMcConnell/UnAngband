@@ -471,7 +471,6 @@ static void remove_contradictory(artifact_type *a_ptr)
 	if (!(a_ptr->flags4 & TR4_EVIL))
 	{
 		if (a_ptr->flags1 & TR1_SLAY_NATURAL) a_ptr->flags4 &= ~(TR4_ANIMAL);
-		if (a_ptr->flags1 & TR1_SLAY_EVIL) a_ptr->flags4 &= ~(TR4_EVIL);
 		if (a_ptr->flags1 & TR1_SLAY_UNDEAD) a_ptr->flags4 &= ~(TR4_UNDEAD);
 		if (a_ptr->flags1 & TR1_SLAY_DEMON) a_ptr->flags4 &= ~(TR4_DEMON);
 		if (a_ptr->flags1 & TR1_SLAY_ORC) a_ptr->flags4 &= ~(TR4_ORC);
@@ -488,6 +487,8 @@ static void remove_contradictory(artifact_type *a_ptr)
 		if (a_ptr->flags4 & TR4_SLAY_MAN) a_ptr->flags4 &= ~(TR4_MAN);
 		if (a_ptr->flags4 & TR4_SLAY_ELF) a_ptr->flags4 &= ~(TR4_ELF);
 		if (a_ptr->flags4 & TR4_SLAY_DWARF) a_ptr->flags4 &= ~(TR4_DWARF);
+
+		if (a_ptr->flags1 & TR1_BRAND_HOLY) a_ptr->flags4 &= ~(TR4_EVIL);
 	}
 
 	if (a_ptr->flags1 & TR1_BRAND_POIS) a_ptr->flags4 &= ~(TR4_HURT_POIS);
@@ -1886,8 +1887,8 @@ static void parse_frequencies ()
 
 				temp = 0;
 				if (a_ptr->flags1 & TR1_SLAY_NATURAL) temp++;
-				if (a_ptr->flags1 & TR1_SLAY_EVIL) temp++;
 				if (a_ptr->flags1 & TR1_SLAY_UNDEAD) temp++;
+				if (a_ptr->flags1 & TR1_BRAND_HOLY) temp++;
 				if (a_ptr->flags1 & TR1_SLAY_DEMON) temp++;
 				if (a_ptr->flags1 & TR1_SLAY_ORC) temp++;
 				if (a_ptr->flags1 & TR1_SLAY_TROLL) temp++;
@@ -1938,7 +1939,6 @@ static void parse_frequencies ()
 				/* We have some brands or slays - count them */
 
 				temp = 0;
-				if (a_ptr->flags1 & TR1_SLAY_EVIL) temp++;
 				if (a_ptr->flags1 & TR1_KILL_DRAGON) temp++;
 				if (a_ptr->flags1 & TR1_KILL_DEMON) temp++;
 				if (a_ptr->flags1 & TR1_KILL_UNDEAD) temp++;
@@ -1949,6 +1949,8 @@ static void parse_frequencies ()
 				if (a_ptr->flags1 & TR1_SLAY_TROLL) temp++;
 				if (a_ptr->flags1 & TR1_SLAY_ORC) temp++;
 				if (a_ptr->flags1 & TR1_SLAY_GIANT) temp++;
+				if (a_ptr->flags1 & TR1_BRAND_HOLY) temp++;
+				if (a_ptr->flags1 & TR1_BRAND_POIS) temp++;
 				if (a_ptr->flags1 & TR1_BRAND_ACID) temp++;
 				if (a_ptr->flags1 & TR1_BRAND_ELEC) temp++;
 				if (a_ptr->flags1 & TR1_BRAND_FIRE) temp++;
@@ -3433,11 +3435,10 @@ static bool add_slay_natural(artifact_type *a_ptr)
 	return TRUE;
 }
 
-static bool add_slay_evil(artifact_type *a_ptr)
+static bool add_brand_holy(artifact_type *a_ptr)
 {
-	if (a_ptr->flags1 & TR1_SLAY_EVIL) return FALSE;
-	if (a_ptr->flags4 & (TR4_SLAY_MAN | TR4_SLAY_ELF | TR4_SLAY_DWARF)) return FALSE;
-	a_ptr->flags1 |= TR1_SLAY_EVIL;
+	if (a_ptr->flags1 & TR1_BRAND_HOLY) return FALSE;
+	a_ptr->flags1 |= TR1_BRAND_HOLY;
 	LOG_PRINT("Adding ability: slay evil\n");
 	return TRUE;
 }
@@ -3572,7 +3573,7 @@ static bool add_dark_brand(artifact_type *a_ptr)
 
 static bool add_slay_man(artifact_type *a_ptr)
 {
-	if (a_ptr->flags1 & TR1_SLAY_EVIL) return FALSE; 
+	if (a_ptr->flags1 & TR1_BRAND_HOLY) return FALSE;
 	if (a_ptr->flags4 & TR4_SLAY_MAN) return FALSE;
 	a_ptr->flags4 |= TR4_SLAY_MAN;
 	if (rand_int(3) == 0) a_ptr->flags4 |= TR4_EVIL;
@@ -3583,7 +3584,7 @@ static bool add_slay_man(artifact_type *a_ptr)
 
 static bool add_slay_elf(artifact_type *a_ptr)
 {
-	if (a_ptr->flags1 & TR1_SLAY_EVIL) return FALSE; 
+	if (a_ptr->flags1 & TR1_BRAND_HOLY) return FALSE; 
 	if (a_ptr->flags4 & TR4_SLAY_ELF) return FALSE;
 	a_ptr->flags4 |= TR4_SLAY_ELF;
 	if (rand_int(3) == 0) a_ptr->flags4 |= TR4_EVIL;
@@ -3594,7 +3595,7 @@ static bool add_slay_elf(artifact_type *a_ptr)
 
 static bool add_slay_dwarf(artifact_type *a_ptr)
 {
-	if (a_ptr->flags1 & TR1_SLAY_EVIL) return FALSE; 
+	if (a_ptr->flags1 & TR1_BRAND_HOLY) return FALSE; 
 	if (a_ptr->flags4 & TR4_SLAY_DWARF) return FALSE;
 	a_ptr->flags4 |= TR4_SLAY_DWARF;
 	LOG_PRINT("Adding ability: slay dwarf\n");
@@ -3613,9 +3614,8 @@ static void add_brand_or_slay(artifact_type *a_ptr)
 
 	while ( (!success) & (count < MAX_TRIES) )
 	{
-		r = rand_int(20);
-		if (r == 0) success = add_slay_evil(a_ptr);
-		else if (r == 1) success = add_kill_dragon(a_ptr);
+		r = rand_int(19) + 1;
+		if (r == 1) success = add_brand_holy(a_ptr);
 		else if (r == 2) success = add_slay_natural(a_ptr);
 		else if (r == 3) success = add_slay_undead(a_ptr);
 		else if (r == 4) success = add_slay_dragon(a_ptr);
@@ -3634,7 +3634,7 @@ static void add_brand_or_slay(artifact_type *a_ptr)
 		else if (r == 17) success = add_lite_brand(a_ptr);
 		else if (r == 18) success = add_dark_brand(a_ptr);
 
-		/* Note: must keep this equal to slay_evil */
+		/* Note: must keep this equal to brand_holy */
 		else if (r == 19)
 		{
 			if (rand_int(3) == 0) success = add_slay_man(a_ptr);

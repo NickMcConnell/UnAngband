@@ -9,6 +9,50 @@ This file describes my basic to do list for Unangband.
 Also see Lib\Todo, which is a dumping group for
 various files and ideas.
 
+Remaining blockers for release of v0.6.0
+========================================
+
+(nothing) items get created reasonably regularly.
+
+Some objects are still prevented from being picked up.
+
+Confirm that gauge magic is updating bonuses displayed.
+
+Magic items need to be identified correctly in stores.
+
+Learnt flags on normal items prevent stacking (e.g. thrown iron spikes).
+
+I sensed a dagger is good against Man. Nothing changed in its name,
+but the 'I' description said that it is good against Man.
+Then I gauged magic (by service) and saw:
+a Dagger of Slay Man (1d4) (+2,+6)
+Then, fighting a mage, I see:
+ You feel you know the Dagger of Slay Man you are attacking
+ monsters with better.
+and it again says it is good against man.
+Then again in the town, and again.
+
+Enchant weapon service is too expensive, compared to scrolls,
+even considering you do not have to scum for it.
+
+Cursed objects are guessing whichever cursed objects are not known
+yet - should not do this until we learn some other flags on the object
+except the presence of a curse.
+
+Shops have strange things in Buckland: armoury has daggers,
+weponmaster has ale and scrolls of object detection.
+
+Time of day command.
+
+    Again [6, -8] AC on the 'C' screen with no apparent cause.
+    After game reload I have [6, +2] AC (from DEX) again. 
+
+
+> You need to apply multiple runes to weapons (e.g. 3 crosses) to change the
+> weapon into an ego-item of some kind...
+
+Oh. That is totally unclear in the help files.
+
 
 Release v0.6.1
 ==============

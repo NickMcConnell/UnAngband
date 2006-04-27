@@ -1552,7 +1552,6 @@ static const o_flag_desc pval_flags1_desc[] =
 static const o_flag_desc slay_flags1_desc[] =
 {
 	{ TR1_SLAY_NATURAL,	"natural creatures" },
-	{ TR1_SLAY_EVIL,	"evil" },
 	{ TR1_SLAY_UNDEAD,	"undead" },
 	{ TR1_SLAY_DEMON,	"demons" },
 	{ TR1_SLAY_ORC,		"orcs" },
@@ -1591,7 +1590,8 @@ static const o_flag_desc brand_flags1_desc[] =
 	{ TR1_BRAND_ACID,       "acid" },
 	{ TR1_BRAND_ELEC,       "electricity" },
 	{ TR1_BRAND_FIRE,       "fire" },
-	{ TR1_BRAND_COLD,       "cold" }
+	{ TR1_BRAND_COLD,       "cold" },
+	{ TR1_BRAND_HOLY,	"holiness" }
 };
 
 /*
@@ -4291,68 +4291,68 @@ s32b slay_power(u32b s_index)
 		 * multiple is retained
 		 */
 
-		if ( (r_ptr->flags3 & (RF3_ANIMAL | RF3_INSECT | RF3_PLANT))
-			&& (s_index & 0x00000001L) )
+		/* Brands get the multiple if monster is NOT immune / resistant */
+		if ( !(r_ptr->flags9 & RF9_RES_DARK)
+			&& (s_index & 0x00020000L) )
+				mult = 2;
+		if ( !(r_ptr->flags3 & RF3_IM_ACID)
+			&& (s_index & 0x00001000L) )
+				mult = 2;
+		if ( !(r_ptr->flags3 & RF3_IM_FIRE)
+			&& (s_index & 0x00002000L) )
+				mult = 2;
+		if ( !(r_ptr->flags3 & RF3_IM_COLD)
+			&& (s_index & 0x00004000L) )
+				mult = 2;
+		if ( !(r_ptr->flags3 & RF3_IM_ELEC)
+			&& (s_index & 0x00008000L) )
+				mult = 2;
+		if ( !(r_ptr->flags3 & RF3_IM_POIS)
+			&& (s_index & 0x00000800L) )
 				mult = 2;
 
+		/* Holy brand -- acts like slay */
+		if ( (r_ptr->flags3 & RF3_EVIL)
+			&& (s_index & 0x00000002L) )
+				mult = 2;
 		/* New brand - brand_lite - acts like slay */
 		if ( (r_ptr->flags3 & (RF3_HURT_LITE))
 			&& (s_index & 0x00010000L) )
 				mult = 2;
 
-		if ( (r_ptr->flags3 & RF3_EVIL)
-			&& (s_index & 0x00000002L) )
-				mult = 2;
 		if ( (r_ptr->flags3 & RF3_UNDEAD)
 			&& (s_index & 0x00000004L) )
 				mult = 3;
 		if ( (r_ptr->flags3 & RF3_DEMON)
 			&& (s_index & 0x00000008L) )
 				mult = 3;
-		if ( (r_ptr->flags3 & RF3_ORC)
-			&& (s_index & 0x00000010L) )
-				mult = 3;
-		if ( (r_ptr->flags3 & RF3_TROLL)
-			&& (s_index & 0x00000020L) )
-				mult = 3;
-		if ( (r_ptr->flags3 & RF3_GIANT)
-			&& (s_index & 0x00000040L) )
-				mult = 3;
 		if ( (r_ptr->flags3 & RF3_DRAGON)
 			&& (s_index & 0x00000080L) )
 				mult = 3;
+
+		if ( (r_ptr->flags3 & (RF3_ANIMAL | RF3_INSECT | RF3_PLANT))
+			&& (s_index & 0x00000001L) )
+				mult = 4;
+		if ( (r_ptr->flags3 & RF3_ORC)
+			&& (s_index & 0x00000010L) )
+				mult = 4;
+		if ( (r_ptr->flags3 & RF3_TROLL)
+			&& (s_index & 0x00000020L) )
+				mult = 4;
+		if ( (r_ptr->flags3 & RF3_GIANT)
+			&& (s_index & 0x00000040L) )
+				mult = 4;
 		if ( (r_ptr->flags9 & RF9_MAN)
 			&& (s_index & 0x00040000L) )
-				mult = 3;
+				mult = 4;
 		if ( (r_ptr->flags9 & RF9_ELF)
 			&& (s_index & 0x00080000L) )
-				mult = 3;
+				mult = 4;
 		if ( (r_ptr->flags9 & RF9_DWARF)
 			&& (s_index & 0x00100000L) )
-				mult = 3;
-
-		/* Brands get the multiple if monster is NOT resistant */
+				mult = 4;
 
 
-		if ( !(r_ptr->flags9 & RF9_RES_DARK)
-			&& (s_index & 0x00020000L) )
-				mult = 2;
-
-		if ( !(r_ptr->flags3 & RF3_IM_ACID)
-			&& (s_index & 0x00001000L) )
-				mult = 3;
-		if ( !(r_ptr->flags3 & RF3_IM_FIRE)
-			&& (s_index & 0x00002000L) )
-				mult = 3;
-		if ( !(r_ptr->flags3 & RF3_IM_COLD)
-			&& (s_index & 0x00004000L) )
-				mult = 3;
-		if ( !(r_ptr->flags3 & RF3_IM_ELEC)
-			&& (s_index & 0x00008000L) )
-				mult = 3;
-		if ( !(r_ptr->flags3 & RF3_IM_POIS)
-			&& (s_index & 0x00000800L) )
-				mult = 3;
 
 		/* Do kill flags last since they have the highest multiplier */
 
@@ -4394,7 +4394,7 @@ u32b slay_index(const u32b f1, const u32b f2, const u32b f3, const u32b f4)
 	(void)f2; (void)f3;
 
 	if (f1 & TR1_SLAY_NATURAL) s_index |= 0x00000001;
-	if (f1 & TR1_SLAY_EVIL) s_index |= 0x00000002;
+	if (f1 & TR1_BRAND_HOLY) s_index |= 0x00000002;
 	if (f1 & TR1_SLAY_UNDEAD) s_index |= 0x00000004;
 	if (f1 & TR1_SLAY_DEMON) s_index |= 0x00000008;
 	if (f1 & TR1_SLAY_ORC) s_index |= 0x00000010;

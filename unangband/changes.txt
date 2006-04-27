@@ -1,3 +1,5 @@
+Unangband 0.6.0 "Where's the Tequila?" (The 'Did Tara Reid steal all the drinks?' Release)
+
 ### Game Play ###
 
 - Updated monster spell attacks to use the 4GAI from Sangband/Oangband via NPPAngband,
@@ -186,12 +188,24 @@ there is a choice to be made about which direction to go in next.
 
 - Made towns more interesting.
 
-- Decrease the explosion radius of flasks and potions as they are otherwise too
-effective.
+- Decrease the damage of flasks of oil as they are otherwise too effective. (Suggested
+by Bandoras).
 
 - Detrimental potions now affect monsters when thrown.
 
 - It is now possible to reset your recall depth (From Angband).
+
+- Line of sight effects (such as immoliation) now affect grids and items where there
+are monsters.
+
+- Low social status characters start with hard liquor.
+
+- Brands now only do double-damage, slays with high executions do triple damage, other
+slays do four times damage.  This should make slays and brands more equivalent in
+strength. Note that since the overall power rating of brands has dropped, ego items
+should compensate in other ways due to ego power distribution code.
+
+- Changed slay evil to brand holy.
 
 ### User Interface ###
 
@@ -307,6 +321,8 @@ the map 'randomly' changing when you move through forested areas on the surface.
 - Changed the way town and room descriptions are displayed when entering the room to cut
 down on key presses and make it easier to read.
 
+- Spoilers for ego item power and slay effectiveness.
+
 
 ### Bug fixes ###
 
@@ -415,6 +431,9 @@ specialisation being realised.
 
 - Entering a new town or surface level of a new dungeon will display the full
 description of the area again.
+
+- Fixed bug where ego items would be created too frequently and on items that did
+not support the particular ego value.
 
 ### Build / Platform ###
 

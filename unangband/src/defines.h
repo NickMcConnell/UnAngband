@@ -203,7 +203,7 @@
  * Maximum amount of starting equipment
  */
 #define MAX_CLASS_ITEMS	4
-#define MAX_COMMON_ITEMS 16
+#define MAX_COMMON_ITEMS 17
 
 
 /*
@@ -2214,6 +2214,7 @@
 #define SV_FOOD_WAYBREAD		37
 #define SV_FOOD_PINT_OF_ALE		38
 #define SV_FOOD_PINT_OF_WINE	39
+#define SV_FOOD_PINT_OF_SPIRITS	42
 
 
 /*
@@ -2795,7 +2796,7 @@
 #define TR1_SHOTS  0x00004000L     /* Shots += "pval" */
 #define TR1_MIGHT  0x00008000L     /* Might += "pval" */
 #define TR1_SLAY_NATURAL  0x00010000L     /* Weapon slays animals, plants, insects */
-#define TR1_SLAY_EVIL    0x00020000L     /* Weapon slays evil */
+#define TR1_BRAND_HOLY    0x00020000L     /* Weapon has holy brand */
 #define TR1_SLAY_UNDEAD  0x00040000L     /* Weapon slays undead */
 #define TR1_SLAY_DEMON   0x00080000L     /* Weapon slays demon */
 #define TR1_SLAY_ORC     0x00100000L     /* Weapon slays orc */
@@ -2803,9 +2804,9 @@
 #define TR1_SLAY_GIANT   0x00400000L     /* Weapon slays giant */
 #define TR1_SLAY_DRAGON  0x00800000L     /* Weapon slays dragon */
 #define TR1_KILL_DRAGON  0x01000000L     /* Weapon kills dragon */
-#define TR1_KILL_DEMON   0x02000000L
-#define TR1_KILL_UNDEAD   0x04000000L
-#define TR1_BRAND_POIS   0x08000000L
+#define TR1_KILL_DEMON   0x02000000L     /* Weapon kills demon */
+#define TR1_KILL_UNDEAD   0x04000000L     /* Weapon kills undead */
+#define TR1_BRAND_POIS   0x08000000L	 /* Weapon has poison brand */
 #define TR1_BRAND_ACID   0x10000000L     /* Weapon has acid brand */
 #define TR1_BRAND_ELEC   0x20000000L     /* Weapon has elec brand */
 #define TR1_BRAND_FIRE   0x40000000L     /* Weapon has fire brand */

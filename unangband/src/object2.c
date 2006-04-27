@@ -818,11 +818,11 @@ void object_known(object_type *o_ptr)
 	{
 		if (object_xtra_what[o_ptr->xtra1] == 1)
 			(o_ptr->can_flags1) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
-		else if (object_xtra_what[o_ptr->xtra1] == 1)
+		else if (object_xtra_what[o_ptr->xtra1] == 2)
 			(o_ptr->can_flags2) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
-		else if (object_xtra_what[o_ptr->xtra1] == 1)
+		else if (object_xtra_what[o_ptr->xtra1] == 3)
 			(o_ptr->can_flags3) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
-		else if (object_xtra_what[o_ptr->xtra1] == 1)
+		else if (object_xtra_what[o_ptr->xtra1] == 4)
 			(o_ptr->can_flags4) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
 	}
 	/* Everything else has obvious flags */
@@ -2304,11 +2304,9 @@ static bool make_magic_item(object_type *o_ptr, int power)
 				x2 = i;
 				new_pval = o_ptr->pval;
 			}
-			else
-			{
-				/* Reset pval */
-				o_ptr->pval = old_pval;
-			}
+
+			/* Reset pval */
+			o_ptr->pval = old_pval;
 		}
 	}
 
@@ -2478,7 +2476,18 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 		if (j < 0) j = -j;
 
 		/* Test if permitted ego power */
-		if ((great) && (j < level / 2)) continue;
+		if (j < level * 1 / 2) continue;
+
+		/* Force better if great */
+		if ((great) && (j < level * 3 / 4)) continue;
+
+		/* Force better if we can't modify power */
+		if (!(e_ptr->xtra) && (j < level * 5 / 6)) continue;
+
+		/* Force better for non-weapons as we can't modify power as easily */
+		else if ((j < level * 7 / 8) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_HAFTED)
+			&& (o_ptr->tval != TV_SWORD) && (o_ptr->tval != TV_POLEARM) && (o_ptr->tval != TV_ARROW)
+			&& (o_ptr->tval != TV_SHOT) && (o_ptr->tval != TV_BOLT) && (o_ptr->tval != TV_STAFF)) continue;
 
 		/* Test if permitted ego power */
 		if (j > level) continue;
@@ -2506,6 +2515,9 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 		/* Total */
 		total += table[i].prob3;
 	}
+
+	/* Remove fake ego power */
+	o_ptr->name2 = 0;
 
 	/* No legal ego-items */
 	if (total <= 0) return (FALSE);
@@ -3445,7 +3457,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 				if (((power > 1) ? TRUE : FALSE) || ((power < -1) ? TRUE : FALSE))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
 
-				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 1) / 2 : ((lev * power) - 1) / 2);
+				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 3) / 4 : ((lev * power) - 3) / 4);
 			}
 
 			break;
@@ -3468,7 +3480,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 				if (((power > 1) ? TRUE : FALSE) || (power < -1))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
 
-				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 1) / 2 : ((lev * power) - 1) / 2);
+				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 3) / 4 : ((lev * power) - 3) / 4);
 			}
 
 			break;
@@ -3482,7 +3494,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 				if (((power > 1) ? TRUE : FALSE) || (power < -1))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
 
-				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 1) / 2 : ((lev * power) - 1) / 2);
+				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 3) / 4 : ((lev * power) - 3) / 4);
 			}
 
 			break;
@@ -3494,7 +3506,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			if (!power && (rand_int(100) < 50)) power = -1;
 			a_m_aux_3(o_ptr, lev, power);
 
-			if (power) (void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 1) / 2 : ((lev * power) - 1) / 2);
+			if (power) (void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 3) / 4 : ((lev * power) - 3) / 4);
 
 			break;
 		}
@@ -3509,7 +3521,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			{
 				a_m_aux_1(o_ptr, lev, power);
 #if 0
-				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 2) / 3 : ((lev * power) - 2) / 3);
+				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 3) / 4 : ((lev * power) - 3) / 4);
 #endif
 			}
 			a_m_aux_4(o_ptr, lev, power);
@@ -3600,46 +3612,81 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		{
 			int old_ego_power;
 			int sign = (power >= 0 ? 1 : -1);
+			bool tryagain;
+			int tries = 0;
 
 			do
 			{
 				old_ego_power = ego_power;
 
-				switch(rand_int(10))
+				tryagain = FALSE;
+				tries++;
+
+				switch(rand_int(12))
 				{
 
 					case 0: case 1: case 2:
 
 						/* Increase to_h */
 						if (e_ptr->max_to_h) o_ptr->to_h+= sign;
+						else tryagain = TRUE;
 
 						break;
 
 					case 3: case 4: case 5:
-						/* Increase to_h */
+
+						/* Increase to_d */
 						if (e_ptr->max_to_d) o_ptr->to_d+= sign;
+						else tryagain = TRUE;
 
 						break;
 
 					case 6: case 7: case 8:
-						/* Increase to_h */
+
+						/* Increase to_a */
 						if (e_ptr->max_to_a) o_ptr->to_a+= sign;
+						else tryagain = TRUE;
 
 						break;
 
 					case 9:
+
 						/* Increase pval */
 						if (e_ptr->max_pval) o_ptr->pval+= sign;
+						else tryagain = TRUE;
 
 						break;
 
-					/* Evaluate power */
-					ego_power = object_power(o_ptr);
+					case 10:
 
-					if (ego_power < 0) ego_power = -ego_power;
+						/* Increase damage dice */
+						if ((o_ptr->tval == TV_DIGGING) || (o_ptr->tval == TV_HAFTED)
+						|| (o_ptr->tval == TV_SWORD) || (o_ptr->tval == TV_POLEARM) || (o_ptr->tval == TV_ARROW)
+						|| (o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_BOLT) || (o_ptr->tval == TV_STAFF))
+							 o_ptr->dd += sign;
+						else tryagain = TRUE;
+
+						break;
+
+					case 11:
+
+						/* Increase damage dice */
+						if ((o_ptr->tval == TV_DIGGING) || (o_ptr->tval == TV_HAFTED)
+						|| (o_ptr->tval == TV_SWORD) || (o_ptr->tval == TV_POLEARM) || (o_ptr->tval == TV_ARROW)
+						|| (o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_BOLT) || (o_ptr->tval == TV_STAFF))
+							 o_ptr->ds += sign;
+						else tryagain = TRUE;
+
+						break;
 				}
 
-			} while (!(ego_power <= old_ego_power) && (ego_power < lev));
+				/* Evaluate power */
+				ego_power = object_power(o_ptr);
+
+				if (ego_power < 0) ego_power = -ego_power;
+				if (tries > 40) tryagain = FALSE;
+
+			} while ((!(ego_power <= old_ego_power) && (ego_power < lev)) || (tryagain));
 		}
 
 		/* Hack -- apply rating bonus */
@@ -4920,7 +4967,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 			return TRUE;
 		}
 
-		/* Potions and flasks explode. Potions have radius 1 explosions, flasks have radius 0. */
+		/* Potions and flasks explode with radius 1. */
 		case TV_POTION:
 		case TV_FLASK:
 		{
@@ -4968,8 +5015,8 @@ bool break_near(object_type *j_ptr, int y, int x)
 
 					flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
-					/* Hit with radiate attack */
-					obvious |= project(-1, (j_ptr->tval == TV_POTION ? 1 : 0), y, x, y, x, damroll(d_side, d_dice),
+					/* Hit with radius 1 attack */
+					obvious |= project(-1, 1, y, x, y, x, damroll(d_side, d_dice),
 						 effect, flg, 0, 0);
 
 				}
