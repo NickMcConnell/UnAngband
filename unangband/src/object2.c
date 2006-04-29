@@ -2211,22 +2211,32 @@ static void object_mention(object_type *o_ptr)
  *
  *  We increase to_hit, to_dam, to_ac, pval, damage dice and/or sides
  */
-static void boost_item(object_type *o_ptr, int power, int lev)
+static void boost_item(object_type *o_ptr, int lev, int power)
 {
 	int boost_power, old_boost_power;
 	int sign = (power >= 0 ? 1 : -1);
 	bool tryagain;
+	bool supercharge = FALSE;
 	int tries = 0;
 	int choice;
+
+	/* Paranoia */
+	if (!power) return;
+
+	/* Nothing to boost */
+	if (!(o_ptr->to_h) && !(o_ptr->to_d) && !(o_ptr->to_a)) return;
 
 	/* Evaluate power */
 	boost_power = object_power(o_ptr);
 
 	/* Reverse sign */
-	if (boost_power < 0) boost_power = -boost_power;
+	if (power < 0) boost_power = -boost_power;
 
 	/* Too powerful already */
 	if (boost_power >= lev) return;
+
+	/* Occasionally supercharge up 1 ability */
+	if (!rand_int(10)) supercharge = TRUE;
 
 	do
 	{
@@ -2235,7 +2245,7 @@ static void boost_item(object_type *o_ptr, int power, int lev)
 		tryagain = FALSE;
 		tries++;
 
-		choice = rand_int(12);
+		if (!(tryagain) && !(supercharge)) choice = rand_int(12);
 
 		switch(choice)
 		{
@@ -2297,7 +2307,7 @@ static void boost_item(object_type *o_ptr, int power, int lev)
 		/* Evaluate power */
 		boost_power = object_power(o_ptr);
 
-		if (boost_power < 0) boost_power = -boost_power;
+		if (power < 0) boost_power = -boost_power;
 
 	} while ((!(boost_power <= old_boost_power) && (boost_power < lev)) || (tryagain && (tries < 40)));
 
@@ -2437,6 +2447,8 @@ static bool make_magic_item(object_type *o_ptr, int power, bool great)
 
 			/* Reset pval */
 			o_ptr->pval = old_pval;
+			if (old_pval > 0) max_pval -= old_pval;
+			else max_pval += old_pval;
 		}
 	}
 
@@ -2540,10 +2552,10 @@ static bool make_magic_item(object_type *o_ptr, int power, bool great)
 		/* Set new pval */
 		if (max_pval)
 		{
-			if (power > 0)
-				o_ptr->pval = rand_range(1, max_pval);
+			if (max_pval > 0)
+				o_ptr->pval += rand_range(1, max_pval);
 			else
-				o_ptr->pval = -rand_range(1, max_pval);
+				o_ptr->pval -= rand_range(1, -max_pval);
 		}
 
 		return(TRUE);
@@ -2628,9 +2640,6 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 		o_ptr->name2 = e_idx;
 		j = object_power(o_ptr);
 		if (j < 0) j = -j;
-
-		/* Test if permitted ego power */
-		if (j < level * 1 / 2) continue;
 
 		/* Force better for non-weapons as we can't modify power as easily */
 		if ((great) && (j < level / 2) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_HAFTED)
@@ -3608,7 +3617,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 				if (((power > 1) ? TRUE : FALSE) || ((power < -1) ? TRUE : FALSE))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
 
-				(void)make_magic_item(o_ptr, power > 0 ? (lev + 3) / 4 : (lev - 3) / 4, great);
+				if (lev > 9) (void)make_magic_item(o_ptr, power > 0 ? (lev - 7) / 3: (lev - 7) / 3, great);
 			}
 
 			break;
@@ -3631,7 +3640,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 				if (((power > 1) ? TRUE : FALSE) || (power < -1))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
 
-				(void)make_magic_item(o_ptr, power > 0 ? (lev + 3) / 4 : (lev - 3) / 4, great);
+				if (lev > 9) (void)make_magic_item(o_ptr, power > 0 ? (lev - 7) / 3: (lev - 7) / 3, great);
 			}
 
 			break;
@@ -3645,7 +3654,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 				if (((power > 1) ? TRUE : FALSE) || (power < -1))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
 
-				(void)make_magic_item(o_ptr, power > 0 ? (lev + 3) / 4 : (lev - 3) / 4, great);
+				if (lev > 9) (void)make_magic_item(o_ptr, power > 0 ? (lev - 7) / 3: (lev - 7) / 3, great);
 			}
 
 			break;
@@ -3656,6 +3665,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		{
 			if (!power && (rand_int(100) < 50)) power = -1;
 			a_m_aux_3(o_ptr, lev, power);
+			if ((power) && (lev > k_info[o_ptr->k_idx].level + 9)) boost_item(o_ptr, (lev - 7 / 3), power);
 			break;
 		}
 
@@ -3668,6 +3678,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			if (power)
 			{
 				a_m_aux_1(o_ptr, lev, power);
+				if (lev > k_info[o_ptr->k_idx].level + 9) boost_item(o_ptr, (lev - 7 / 3), power);
 			}
 			a_m_aux_4(o_ptr, lev, power);
 			break;
@@ -4439,7 +4450,7 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 	/* Apply magic (allow artifacts) */
 	apply_magic(j_ptr, object_level, TRUE, good, great);
 
-	/* Hack -- generate multiple spikes/missiles */
+	/* Generate multiple items */
 	switch (j_ptr->tval)
 	{
 		case TV_SPIKE:
@@ -4448,6 +4459,21 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		case TV_BOLT:
 		{
 			j_ptr->number = damroll(6, 7);
+			break;
+		}
+		case TV_POTION:
+		case TV_SCROLL:
+		case TV_FLASK:
+		{
+			if (object_level > k_info[j_ptr->k_idx].level + 9) j_ptr->number = damroll(3, 4);
+			else if (object_level > k_info[j_ptr->k_idx].level + 4) j_ptr->number = damroll(2, 3);
+			break;
+		}
+		default:
+		{
+			if ((k_info[j_ptr->k_idx].flags3 & (TR3_THROWING))
+				&& (object_level > k_info[j_ptr->k_idx].level + 4)) j_ptr->number = damroll(3, 4);
+			break;
 		}
 	}
 

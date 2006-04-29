@@ -381,28 +381,32 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 					}
 				}
 
-				/* Armour also protects the monster */
-				else if (r_ptr->flags2 & (RF2_ARMOR))
-				{
-					if (m_ptr->ml)
-					{
-						object_can_flags(o_ptr,TR1_BRAND_ACID,0x0L,0x0L,0x0L);
-						l_ptr->flags2 |= (RF2_ARMOR);
-					}
-				}
-
 				/* Otherwise, take the damage */
 				else
 				{
 					if ((rand_int(100)<tdam*3) && (m_ptr->ml)) object_can_flags(o_ptr,TR1_BRAND_ACID,0x0L,0x0L,0x0L);
 
+					/* Armour partially protects the monster */
+					if (r_ptr->flags2 & (RF2_ARMOR))
+					{
+						if (m_ptr->ml)
+						{
+							object_can_flags(o_ptr,TR1_BRAND_ACID,0x0L,0x0L,0x0L);
+							l_ptr->flags2 |= (RF2_ARMOR);
+						}
+
+						if (m_ptr->oppose_elem)/* Do nothing */;
+						else if (mult < 2) mult = 2;
+					}
+
 					/* Water decreases damage */
 					if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
 					{
-						/* Do nothing */;
+						if (m_ptr->oppose_elem)/* Do nothing */;
+						else if (mult < 2) mult = 2;
 					}
-					else if (m_ptr->oppose_elem) ;
-					else if (mult < 2) mult = 2;
+					else if ((m_ptr->oppose_elem) && (mult < 2)) mult = 2;
+					else if (mult < 3) mult = 3;
 				}
 			}
 			else if ((m_ptr->ml) && ((l_ptr->flags3 & (RF3_IM_ACID)) || (rand_int(100)<tdam*3)))
@@ -431,11 +435,11 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 					/* Water increases damage */
 					if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
 					{
-						if ((m_ptr->oppose_elem) && (mult < 2)) mult = 2;
-						else if (mult < 3) mult = 3;
+						if ((m_ptr->oppose_elem) && (mult < 3)) mult = 3;
+						else if (mult < 4) mult = 4;
 					}
-					else if (m_ptr->oppose_elem) ;
-					else if (mult < 2) mult = 2;
+					else if ((m_ptr->oppose_elem) && (mult < 2)) mult = 2;
+					else if (mult < 3) mult = 3;
 				}
 			}
 			else if ((m_ptr->ml) && ((l_ptr->flags3 & (RF3_IM_ELEC)) || (rand_int(100)<tdam*3)))
@@ -464,10 +468,11 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 					/* Water decreases damage */
 					if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
 					{
-						/* Do nothing */;
+						if (m_ptr->oppose_elem) ;
+						else if (mult < 2) mult = 2;
 					}
-					else if (m_ptr->oppose_elem) ;
-					else if (mult < 2) mult = 2;
+					else if ((m_ptr->oppose_elem) && (mult < 2)) mult = 2;
+					else if (mult < 3) mult = 3;
 				}
 			}
 			else if ((m_ptr->ml) && ((l_ptr->flags3 & (RF3_IM_FIRE)) || (rand_int(100)<tdam*3)))
@@ -496,11 +501,11 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 					/* Water increases damage */
 					if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
 					{
-						if ((m_ptr->oppose_elem) && (mult < 2)) mult = 2;
-						else if (mult < 3) mult = 3;
+						if ((m_ptr->oppose_elem) && (mult < 3)) mult = 3;
+						else if (mult < 4) mult = 4;
 					}
-					else if (m_ptr->oppose_elem) ;
-					else if (mult < 2) mult = 2;
+					else if ((m_ptr->oppose_elem) && (mult < 2)) mult = 2;
+					else if (mult < 3) mult = 3;
 				}
 			}
 			else if ((m_ptr->ml) && ((l_ptr->flags3 & (RF3_IM_COLD)) || (rand_int(100)<tdam*3)))
@@ -526,7 +531,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 				{
 					if ((rand_int(100)<tdam*3) && (m_ptr->ml)) object_can_flags(o_ptr,TR1_BRAND_POIS,0x0L,0x0L,0x0L);
 
-					if (mult < 2) mult = 2;
+					if (mult < 3) mult = 3;
 				}
 			}
 			else if ((m_ptr->ml) && ((l_ptr->flags3 & (RF3_IM_POIS)) || (rand_int(100)<tdam*3)))
@@ -544,7 +549,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 					l_ptr->flags3 |= (RF3_EVIL);
 				}
 
-				if (mult < 2) mult = 2;
+				if (mult < 3) mult = 3;
 			}
 			else if ((l_ptr->flags3 & (RF3_EVIL)) && (m_ptr->ml))
 			{
@@ -561,7 +566,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 					l_ptr->flags3 |= (RF3_HURT_LITE);
 				}
 
-				if (mult < 2) mult = 2;
+				if (mult < 3) mult = 3;
 			}
 			else if ((l_ptr->flags3 & (RF3_HURT_LITE)) && (m_ptr->ml))
 			{
@@ -586,7 +591,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 				{
 					if ((rand_int(100)<tdam*3) && (m_ptr->ml)) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_BRAND_DARK);
 
-					if (mult < 2) mult = 2;
+					if (mult < 3) mult = 3;
 				}
 			}
 			else if ((m_ptr->ml) && ((l_ptr->flags9 & (RF9_RES_DARK)) || (rand_int(100)<tdam*3)))

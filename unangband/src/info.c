@@ -4294,35 +4294,42 @@ s32b slay_power(u32b s_index)
 		 * multiple is retained
 		 */
 
-		/* Brands get the multiple if monster is NOT immune / resistant */
-		if ( !(r_ptr->flags9 & RF9_RES_DARK)
-			&& (s_index & 0x00020000L) )
-				mult = 2;
-		if ( !(r_ptr->flags3 & RF3_IM_ACID) && !(r_ptr->flags2 & RF2_ARMOR)
+		/* Armoured monsters get partial resistance to resist acid */
+		if ( !(r_ptr->flags3 & RF3_IM_ACID) && (r_ptr->flags2 & RF2_ARMOR)
 			&& (s_index & 0x00001000L) )
-				mult = 2;
-		if ( !(r_ptr->flags3 & RF3_IM_FIRE)
-			&& (s_index & 0x00002000L) )
-				mult = 2;
-		if ( !(r_ptr->flags3 & RF3_IM_COLD)
-			&& (s_index & 0x00004000L) )
-				mult = 2;
-		if ( !(r_ptr->flags3 & RF3_IM_ELEC)
-			&& (s_index & 0x00008000L) )
-				mult = 2;
-		if ( !(r_ptr->flags3 & RF3_IM_POIS)
-			&& (s_index & 0x00000800L) )
 				mult = 2;
 
 		/* Holy brand -- acts like slay */
 		if ( (r_ptr->flags3 & RF3_EVIL)
 			&& (s_index & 0x00000002L) )
-				mult = 2;
+				mult = 3;
+
 		/* New brand - brand_lite - acts like slay */
 		if ( (r_ptr->flags3 & (RF3_HURT_LITE))
 			&& (s_index & 0x00010000L) )
-				mult = 2;
+				mult = 3;
 
+		/* Brands get the multiple if monster is NOT immune / resistant */
+		if ( !(r_ptr->flags9 & RF9_RES_DARK)
+			&& (s_index & 0x00020000L) )
+				mult = 3;
+		if ( !(r_ptr->flags3 & RF3_IM_ACID) && !(r_ptr->flags2 & RF2_ARMOR)
+			&& (s_index & 0x00001000L) )
+				mult = 3;
+		if ( !(r_ptr->flags3 & RF3_IM_ELEC)
+			&& (s_index & 0x00002000L) )
+				mult = 3;
+		if ( !(r_ptr->flags3 & RF3_IM_FIRE)
+			&& (s_index & 0x00004000L) )
+				mult = 4;
+		if ( !(r_ptr->flags3 & RF3_IM_COLD)
+			&& (s_index & 0x00008000L) )
+				mult = 3;
+		if ( !(r_ptr->flags3 & RF3_IM_POIS)
+			&& (s_index & 0x00000800L) )
+				mult = 3;
+
+		/* Original slays */
 		if ( (r_ptr->flags3 & RF3_UNDEAD)
 			&& (s_index & 0x00000004L) )
 				mult = 3;
@@ -4333,6 +4340,7 @@ s32b slay_power(u32b s_index)
 			&& (s_index & 0x00000080L) )
 				mult = 3;
 
+		/* Increased slays */
 		if ( (r_ptr->flags3 & (RF3_ANIMAL | RF3_INSECT | RF3_PLANT))
 			&& (s_index & 0x00000001L) )
 				mult = 4;
@@ -4354,8 +4362,6 @@ s32b slay_power(u32b s_index)
 		if ( (r_ptr->flags9 & RF9_DWARF)
 			&& (s_index & 0x00100000L) )
 				mult = 4;
-
-
 
 		/* Do kill flags last since they have the highest multiplier */
 
@@ -5207,7 +5213,7 @@ s32b object_power(const object_type *o_ptr)
 	ADD_POWER("elec immunity",	22, TR2_IM_ELEC, 2, immunities++);
 	ADD_POWER("fire immunity",	22, TR2_IM_FIRE, 2, immunities++);
 	ADD_POWER("cold immunity",	17, TR2_IM_COLD, 2, immunities++);
-	ADD_POWER("poison immunity",	14, TR4_IM_POIS, 4, immunities++);
+	ADD_POWER("poison immunity",	22, TR4_IM_POIS, 4, immunities++);
 
 	if (immunities > 1)
 	{

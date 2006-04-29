@@ -200,12 +200,10 @@ are monsters.
 
 - Low social status characters start with hard liquor.
 
-- Brands now only do double-damage, slays with high executions do triple damage, other
-slays do four times damage.  This should make slays and brands more equivalent in
-strength. Note that since the overall power rating of brands has dropped, ego items
-should compensate in other ways due to ego power distribution code.
+- Slays do four times damage except where there is an equivelent execution slay.  This
+should make slays and brands more equivalent in strength.
 
-- Changed slay evil to brand holy.
+- Changed slay evil to brand holy, and now do triple damage to evil monsters.
 
 - Made ego-item names more interesting as opposed to *asterisked*.
 
@@ -214,6 +212,8 @@ between one half and one third as common.
 
 - Changed how some items are evaluated as 'good'. In particular, high-level spell books
 only count as good if you have not seen them previously.
+
+- Made scrolls, potions and throwing weapons somewhat out of depth appear in stacks.
 
 ### User Interface ###
 

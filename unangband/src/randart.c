@@ -1063,7 +1063,7 @@ static s32b artifact_power(int a_idx)
 	ADD_POWER("elec immunity",	22, TR2_IM_ELEC, 2, immunities++);
 	ADD_POWER("fire immunity",	22, TR2_IM_FIRE, 2, immunities++);
 	ADD_POWER("cold immunity",	17, TR2_IM_COLD, 2, immunities++);
-	ADD_POWER("poison immunity",	14, TR4_IM_POIS, 4, immunities++);
+	ADD_POWER("poison immunity",	17, TR4_IM_POIS, 4, immunities++);
 
 	if (immunities > 1)
 	{
