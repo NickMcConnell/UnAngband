@@ -283,6 +283,9 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 			/* Guarantee some other flags */
 			switch (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2)
 			{
+				case TR4_BRAND_LITE:
+					(*f3) |= (TR3_LITE);
+					break;
 				case TR4_VAMP_HP:
 					(*f3) |= (TR3_DRAIN_HP | TR3_LIGHT_CURSE);
 					break;
@@ -4641,6 +4644,9 @@ s32b object_power(const object_type *o_ptr)
 			if (o_ptr->name2)
 			{
 				p = (p * e_info[o_ptr->name2].slay_power) / tot_mon_power;
+
+				/* Hack -- we may use as a swap weapon */
+				if (e_info[o_ptr->name2].slay_power > tot_mon_power) p = p * 5 / 4;
 			}
 
 			/* Hack -- For efficiency, compute for first slay or brand flag only */
@@ -4653,7 +4659,13 @@ s32b object_power(const object_type *o_ptr)
 
 				for (i = 0, j = 0x00000001L;(i < 32) && (j != s_index); i++, j<<=1);
 
-				if (i < 32) p = (p * magic_slay_power[i]) / tot_mon_power;
+				if (i < 32)
+				{
+					p = (p * magic_slay_power[i]) / tot_mon_power;
+
+					/* Hack -- we may use as a swap weapon */
+					if (magic_slay_power[i] > tot_mon_power) p = p * 5 / 4;
+				}
 			}
 
 			/* Correction factor for damage */
@@ -4757,6 +4769,9 @@ s32b object_power(const object_type *o_ptr)
 			if (o_ptr->name2)
 			{
 				p = (p * e_info[o_ptr->name2].slay_power) / tot_mon_power;
+
+				/* Hack -- we usually have multiple stacks of ammo */
+				if (e_info[o_ptr->name2].slay_power > tot_mon_power) p = p * 3 / 2;
 			}
 
 			/* Hack -- For efficiency, compute for first slay or brand flag only */
@@ -4769,7 +4784,13 @@ s32b object_power(const object_type *o_ptr)
 
 				for (i = 0, j = 0x00000001L;(i < 32) && (j != s_index); i++, j<<=1);
 
-				if (i < 32) p = (p * magic_slay_power[i]) / tot_mon_power;
+				if (i < 32)
+				{
+					p = (p * magic_slay_power[i]) / tot_mon_power;
+
+					/* Hack -- we usually have multiple stacks of ammo */
+					if (magic_slay_power[i] > tot_mon_power) p = p * 3 / 2;
+				}
 			}
 
 			/* Correct damage */
@@ -5189,9 +5210,10 @@ s32b object_power(const object_type *o_ptr)
 	if (sustains > 1) p += sustains * sustains / 2;
 
 	ADD_POWER("acid immunity",	17, TR2_IM_ACID, 2, immunities++);
-	ADD_POWER("elec immunity",	14, TR2_IM_ELEC, 2, immunities++);
+	ADD_POWER("elec immunity",	22, TR2_IM_ELEC, 2, immunities++);
 	ADD_POWER("fire immunity",	22, TR2_IM_FIRE, 2, immunities++);
 	ADD_POWER("cold immunity",	17, TR2_IM_COLD, 2, immunities++);
+	ADD_POWER("poison immunity",	14, TR4_IM_POIS, 4, immunities++);
 
 	if (immunities > 1)
 	{

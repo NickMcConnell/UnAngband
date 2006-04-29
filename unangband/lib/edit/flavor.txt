@@ -1725,7 +1725,7 @@ D:Fizzing
 
 N:428:75
 G:!:r
-D:Surupy
+D:Syrupy
 
 N:429:75
 G:!:R

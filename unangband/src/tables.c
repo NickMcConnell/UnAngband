@@ -2475,10 +2475,10 @@ const u32b object_xtra_base[OBJECT_XTRA_MAX_HIDDEN] =
 	TR2_IGNORE_WATER,
         TR2_IGNORE_THEFT,
 	TR4_HURT_LITE,
-	TR1_STR,	/* Magic item - flag 1 */
-	TR2_SUST_STR,	/* Magic item - flag 2 */
-	TR3_SLOW_DIGEST,/* Magic item - flag 3 */
-	TR4_BRAND_DARK	/* Magic item - flag 4 */
+	1L,	/* Magic item - flag 1 */
+	1L,	/* Magic item - flag 2 */
+	1L,	/* Magic item - flag 3 */
+	1L	/* Magic item - flag 4 */
 };
 
 
@@ -2631,7 +2631,7 @@ const cptr magic_name[4][32] =
 		"of Extra Shots",
 		"of Extra Might",
 		"of Slay Nature",
-		"of Holy Might",
+		"of Slay Evil",
 		"of Slay Undead",
 		"of Slay Demon",
 		"of Slay Orc",
@@ -2643,7 +2643,7 @@ const cptr magic_name[4][32] =
 		"of Execute Undead",
 		"of Poison",
 		"of Acid",
-		"of Lightning",
+		"of Electricity",
 		"of Fire",
 		"of Cold"
 	},

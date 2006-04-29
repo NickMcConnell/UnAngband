@@ -207,6 +207,8 @@ should compensate in other ways due to ego power distribution code.
 
 - Changed slay evil to brand holy.
 
+- Made ego-item names more interesting as opposed to *asterisked*.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.
@@ -434,6 +436,11 @@ description of the area again.
 
 - Fixed bug where ego items would be created too frequently and on items that did
 not support the particular ego value.
+
+- Fixed bugs relating to distribution and power of ego items and normal items.
+
+- Fixed bug where magic items, particularly instruments, would not be sensed or
+noticed by detect magic (Reported by Mikolaj Konarski).
 
 ### Build / Platform ###
 

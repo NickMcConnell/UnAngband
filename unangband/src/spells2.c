@@ -1240,6 +1240,9 @@ int value_check_aux3(const object_type *o_ptr)
 	/* Broken items */
 	if (broken_p(o_ptr)) return (0);
 
+	/* Magic item */
+	if (o_ptr->xtra1) return (INSCRIP_EXCELLENT);
+
 	/* Great "armor" bonus */
 	if (o_ptr->to_a > 8) return (INSCRIP_GREAT);
 

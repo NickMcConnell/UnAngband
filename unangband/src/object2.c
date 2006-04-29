@@ -2212,7 +2212,7 @@ static void object_mention(object_type *o_ptr)
  * This function picks a magic item that has 95% to 100% of the power supplied to this
  * function, in a manner similar to random artifacts.
  */
-static bool make_magic_item(object_type *o_ptr, int power)
+static bool make_magic_item(object_type *o_ptr, int power, bool great)
 {
 	int i;
 	u32b j;
@@ -2225,7 +2225,7 @@ static bool make_magic_item(object_type *o_ptr, int power)
 	int obj_pow1 = object_power(o_ptr);
 	int obj_pow2 = 0;
 
-	int new_pval = 0;
+	int max_pval = 0;
 
 	/* Fail if object already is ego or artifact */
 	if (o_ptr->name1) return (FALSE);
@@ -2251,6 +2251,9 @@ static bool make_magic_item(object_type *o_ptr, int power)
 			&& (o_ptr->tval != TV_SWORD) && (o_ptr->tval != TV_POLEARM) && (o_ptr->tval != TV_ARROW)
 			&& (o_ptr->tval != TV_SHOT) && (o_ptr->tval != TV_BOLT) && (o_ptr->tval != TV_STAFF)) continue;
 
+		/* Hack -- don't allow tunnelling on missile weapons -- people seem to object to this somehow */
+		if ((j == TR1_TUNNEL) && (o_ptr->tval == TV_BOW)) continue;
+
 		/* Evaluate power */
 		obj_pow2 = object_power(o_ptr);
 
@@ -2259,13 +2262,13 @@ static bool make_magic_item(object_type *o_ptr, int power)
 
 		/* Pick this flag? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect? */
-			(obj_pow2 >= ((power * 19) / 20)) && 	/* At least 95% */
+			((!great) || (obj_pow2 >= ((power * 19) / 20))) && 	/* Great forces at least 95% */
 			(obj_pow2 <= power) &&			/* No more than 100% */
 			(rand_int(++count) == 0))		/* Sometimes pick */
 		{
 			x1 = 16;
 			x2 = i;
-			new_pval = 0;
+			max_pval = 0;
 		}
 
 		/* Hack -- try increasing pval */
@@ -2302,7 +2305,7 @@ static bool make_magic_item(object_type *o_ptr, int power)
 			{
 				x1 = 16;
 				x2 = i;
-				new_pval = o_ptr->pval;
+				max_pval = o_ptr->pval;
 			}
 
 			/* Reset pval */
@@ -2317,6 +2320,11 @@ static bool make_magic_item(object_type *o_ptr, int power)
 		o_ptr->xtra1 = 17;
 		o_ptr->xtra2 = i;
 
+		/* Hack -- play balance. Only allow immunities on armour, shields and cloaks XXX */
+		if ((j >= TR2_IM_ACID) && (j <= TR2_IM_COLD) && (o_ptr->tval != TV_HARD_ARMOR)
+			&& (o_ptr->tval != TV_SOFT_ARMOR) && (o_ptr->tval != TV_DRAG_ARMOR)
+			&& (o_ptr->tval != TV_SHIELD) && (o_ptr->tval != TV_CLOAK)) continue;
+
 		/* Evaluate power */
 		obj_pow2 = object_power(o_ptr);
 
@@ -2325,13 +2333,13 @@ static bool make_magic_item(object_type *o_ptr, int power)
 
 		/* Pick this flag? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
-			(obj_pow2 >= ((power * 19) / 20)) && 	/* At least 95% */
+			((!great) || (obj_pow2 >= ((power * 19) / 20))) && 	/* Great forces at least 95% */
 			(obj_pow2 <= power) &&			/* No more than 100% */
 			(rand_int(++count) == 0))		/* Sometimes pick */
 		{
 			x1 = 17;
 			x2 = i;
-			new_pval = 0;
+			max_pval = 0;
 		}
 	}
 
@@ -2349,13 +2357,13 @@ static bool make_magic_item(object_type *o_ptr, int power)
 
 		/* Pick this flag? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
-			(obj_pow2 >= ((power * 19) / 20)) && 	/* At least 95% */
+			((!great) || (obj_pow2 >= ((power * 19) / 20))) && 	/* Great forces at least 95% */
 			(obj_pow2 <= power) &&			/* No more than 100% */
 			(rand_int(++count) == 0))		/* Sometimes pick */
 		{
 			x1 = 18;
 			x2 = i;
-			new_pval = 0;
+			max_pval = 0;
 		}
 	}
 
@@ -2365,6 +2373,10 @@ static bool make_magic_item(object_type *o_ptr, int power)
 		o_ptr->xtra1 = 19;
 		o_ptr->xtra2 = i;
 
+		/* Hack -- play balance. Only allow immunities on armour, shields and cloaks XXX */
+		if ((j == TR4_IM_POIS) && (o_ptr->tval != TV_HARD_ARMOR) && (o_ptr->tval != TV_SOFT_ARMOR)
+			&& (o_ptr->tval != TV_DRAG_ARMOR) && (o_ptr->tval != TV_SHIELD) && (o_ptr->tval != TV_CLOAK)) continue;
+
 		/* Evaluate power */
 		obj_pow2 = object_power(o_ptr);
 
@@ -2373,13 +2385,13 @@ static bool make_magic_item(object_type *o_ptr, int power)
 
 		/* Pick this flag? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
-			(obj_pow2 >= ((power * 19) / 20)) && 	/* At least 95% */
+			((!great) || (obj_pow2 >= ((power * 19) / 20))) && 	/* Great forces at least 95% */
 			(obj_pow2 <= power) &&			/* No more than 100% */
 			(rand_int(++count) == 0))		/* Sometimes pick */
 		{
 			x1 = 19;
 			x2 = i;
-			new_pval = 0;
+			max_pval = 0;
 		}
 	}
 
@@ -2389,8 +2401,14 @@ static bool make_magic_item(object_type *o_ptr, int power)
 		o_ptr->xtra1 = x1;
 		o_ptr->xtra2 = x2;
 
-		/* Restore new pval */
-		if (new_pval) o_ptr->pval = new_pval;
+		/* Set new pval */
+		if (max_pval)
+		{
+			if (power > 0)
+				o_ptr->pval = rand_range(1, max_pval);
+			else
+				o_ptr->pval = -rand_range(1, max_pval);
+		}
 
 		return(TRUE);
 	}
@@ -2478,16 +2496,13 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 		/* Test if permitted ego power */
 		if (j < level * 1 / 2) continue;
 
-		/* Force better if great */
-		if ((great) && (j < level * 3 / 4)) continue;
-
-		/* Force better if we can't modify power */
-		if (!(e_ptr->xtra) && (j < level * 5 / 6)) continue;
-
 		/* Force better for non-weapons as we can't modify power as easily */
-		else if ((j < level * 7 / 8) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_HAFTED)
+		if ((great) && (j < level / 2) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_HAFTED)
 			&& (o_ptr->tval != TV_SWORD) && (o_ptr->tval != TV_POLEARM) && (o_ptr->tval != TV_ARROW)
 			&& (o_ptr->tval != TV_SHOT) && (o_ptr->tval != TV_BOLT) && (o_ptr->tval != TV_STAFF)) continue;
+
+		/* Force better if we can't modify power */
+		else if ((great) && !(e_ptr->xtra) && (j < level * 3 / 4)) continue;
 
 		/* Test if permitted ego power */
 		if (j > level) continue;
@@ -3457,7 +3472,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 				if (((power > 1) ? TRUE : FALSE) || ((power < -1) ? TRUE : FALSE))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
 
-				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 3) / 4 : ((lev * power) - 3) / 4);
+				(void)make_magic_item(o_ptr, power > 0 ? (lev + 3) / 4 : (lev - 3) / 4, great);
 			}
 
 			break;
@@ -3480,7 +3495,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 				if (((power > 1) ? TRUE : FALSE) || (power < -1))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
 
-				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 3) / 4 : ((lev * power) - 3) / 4);
+				(void)make_magic_item(o_ptr, power > 0 ? (lev + 3) / 4 : (lev - 3) / 4, great);
 			}
 
 			break;
@@ -3494,7 +3509,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 				if (((power > 1) ? TRUE : FALSE) || (power < -1))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
 
-				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 3) / 4 : ((lev * power) - 3) / 4);
+				(void)make_magic_item(o_ptr, power > 0 ? (lev + 3) / 4 : (lev - 3) / 4, great);
 			}
 
 			break;
@@ -3505,9 +3520,6 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		{
 			if (!power && (rand_int(100) < 50)) power = -1;
 			a_m_aux_3(o_ptr, lev, power);
-
-			if (power) (void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 3) / 4 : ((lev * power) - 3) / 4);
-
 			break;
 		}
 
@@ -3520,9 +3532,6 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			if (power)
 			{
 				a_m_aux_1(o_ptr, lev, power);
-#if 0
-				(void)make_magic_item(o_ptr, (power > 0) ? ((lev * power) + 3) / 4 : ((lev * power) - 3) / 4);
-#endif
 			}
 			a_m_aux_4(o_ptr, lev, power);
 			break;

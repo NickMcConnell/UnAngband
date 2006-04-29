@@ -3705,6 +3705,9 @@ void do_cmd_quest(void)
 	/* Print title */
 	text_out_c(TERM_L_BLUE, "Current Quests\n");
 
+	/* Warning */
+	text_out_c(TERM_YELLOW, "Quests will not be enabled until version 0.7.0. This command is currently for testing purposes only.\n");
+
 	/* Either print live quests on level, or if nothing live, display current quests */
 	if (print_quests(QUEST_ACTIVE , QUEST_REWARD)) no_quests = FALSE;
 	else no_quests = !print_quests(QUEST_ASSIGN , QUEST_FINISH);

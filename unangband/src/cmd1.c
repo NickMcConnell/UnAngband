@@ -381,6 +381,16 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 					}
 				}
 
+				/* Armour also protects the monster */
+				else if (r_ptr->flags2 & (RF2_ARMOR))
+				{
+					if (m_ptr->ml)
+					{
+						object_can_flags(o_ptr,TR1_BRAND_ACID,0x0L,0x0L,0x0L);
+						l_ptr->flags2 |= (RF2_ARMOR);
+					}
+				}
+
 				/* Otherwise, take the damage */
 				else
 				{
