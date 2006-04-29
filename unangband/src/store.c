@@ -898,9 +898,6 @@ static int home_carry(object_type *o_ptr)
 		/* The home acts just like the player */
 		if (object_similar(j_ptr, o_ptr))
 		{
-			/* Forget information on dropped object */
-			drop_may_flags(o_ptr);
-
 			/* Save the new number of items */
 			object_absorb(j_ptr, o_ptr);
 
@@ -956,9 +953,6 @@ static int home_carry(object_type *o_ptr)
 	/* More stuff now */
 	st_ptr->stock_num++;
 
-	/* Forget information on dropped object */
-	drop_may_flags(o_ptr);
-
 	/* Hack -- Insert the new object */
 	object_copy(&st_ptr->stock[slot], o_ptr);
 
@@ -1010,9 +1004,6 @@ static int store_carry(object_type *o_ptr)
 			/* Absorb (some of) the object */
 			store_object_absorb(j_ptr, o_ptr);
 
-			/* Forget information on dropped object */
-			drop_may_flags(o_ptr);
-
 			/* All done */
 			return (slot);
 		}
@@ -1053,15 +1044,13 @@ static int store_carry(object_type *o_ptr)
 	/* More stuff now */
 	st_ptr->stock_num++;
 
-	/* Forget information on dropped object */
-	drop_may_flags(o_ptr);
-
 	/* Hack -- Insert the new object */
 	object_copy(&st_ptr->stock[slot], o_ptr);
 
 	/* Return the location */
 	return (slot);
 }
+
 
 static bool store_services(object_type *i_ptr)
 {
@@ -2898,9 +2887,11 @@ static void store_sell(void)
 	/* Modify quantity */
 	i_ptr->number = amt;
 
+	/* Forget about object */
+	drop_may_flags(i_ptr);
+
 	/* Get a full description */
 	object_desc(o_name, sizeof(o_name), i_ptr, TRUE, 3);
-
 
 	/* Is there room in the store (or the home?) */
 	if (!store_check_num(i_ptr))
@@ -2915,7 +2906,6 @@ static void store_sell(void)
 		}
 		return;
 	}
-
 
 	/* Real store */
 	if ((store_num_fake != STORE_HOME) && (store_num_fake != -1))
@@ -2944,11 +2934,14 @@ static void store_sell(void)
 			/* Get the "apparent" value */
 			dummy = object_value(i_ptr) * i_ptr->number;
 
+			/* Forget about object */
+			if (amt == o_ptr->number) inven_drop_flags(o_ptr);
+
 			/* Erase the inscription */
 			i_ptr->note = 0;
 
 			/* Remove special inscription, if any */
-			if (o_ptr->discount >= INSCRIP_NULL) o_ptr->discount = 0;
+			if (i_ptr->discount >= INSCRIP_NULL) o_ptr->discount = 0;
 
 			/* Identify original object */
 			object_aware(o_ptr);
@@ -2959,15 +2952,6 @@ static void store_sell(void)
 
 			/* Window stuff */
 			p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
-
-			/* Get local object */
-			i_ptr = &object_type_body;
-
-			/* Get a copy of the object */
-			object_copy(i_ptr, o_ptr);
-
-			/* Modify quantity */
-			i_ptr->number = amt;
 
 			/* The object belongs to the store now */
 			i_ptr->ident |= IDENT_STORE;
@@ -3018,6 +3002,9 @@ static void store_sell(void)
 	{
 		/* Describe */
 		msg_format("You drop %s (%c).", o_name, index_to_label(item));
+
+		/* Forget about object */
+		if (amt == o_ptr->number) inven_drop_flags(o_ptr);
 
 		/* Take it from the players inventory */
 		inven_item_increase(item, -amt);
@@ -3717,9 +3704,11 @@ void do_cmd_store(void)
 
 				char o_name[80];
 
-
 				/* Give a message */
 				msg_print("Your pack overflows!");
+
+				/* Forget about item */
+				inven_drop_flags(o_ptr);
 
 				/* Get local object */
 				i_ptr = &object_type_body;

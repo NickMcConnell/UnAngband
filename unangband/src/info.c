@@ -699,7 +699,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 	if (s_ptr->flags2 & (SF2_SHERO)) vp[vn++]="makes you go berserk";
 	if (s_ptr->flags2 & (SF2_BLESS)) vp[vn++]="blesses you";
 	if (s_ptr->flags2 & (SF2_SHIELD)) vp[vn++]="shields you";
-	if (s_ptr->flags2 & (SF2_INVULN)) vp[vn++]="makes you invulnerible to damage";
+	if (s_ptr->flags2 & (SF2_INVULN)) vp[vn++]="makes you invulnerable to damage";
 	if (s_ptr->flags2 & (SF2_SEE_INVIS)) vp[vn++]="allows you to see invisible monsters";
 	if (s_ptr->flags2 & (SF2_PROT_EVIL)) vp[vn++]="protects your from evil monsters";
 	if (s_ptr->flags2 & (SF2_HASTE)) vp[vn++]="hastes you";
@@ -1325,7 +1325,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 		/* Get the effect */
 		if ((d1 || d2 || d3) && (detail)) switch (effect)
 		{
-			case GF_LITE_WEAK: text_out("damage to monsters vulnerible to light"); break;
+			case GF_LITE_WEAK: text_out("damage to monsters vulnerable to light"); break;
 			case GF_KILL_WALL: text_out("damage to monsters made from rock"); break;
 			case GF_RAISE: case GF_LOWER: text_out("damage to monsters made from water"); break;
 			case GF_HOLY_ORB: text_out("damage, doubled against evil monsters"); break;
@@ -2244,7 +2244,7 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not protect you from", list, TERM_SLATE);
 				break;
-		} 
+		}
 	}
 
 	/* Vulnerability flags */
@@ -2263,13 +2263,13 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 		switch (mode)
 		{
 			case LIST_FLAGS_CAN:
-				anything |= outlist("It makes you vulnerible to", list, TERM_WHITE);
+				anything |= outlist("It makes you vulnerable to", list, TERM_WHITE);
 				break;
 			case LIST_FLAGS_MAY:
-				anything |= outlist("It may make you vulnerible to", list, TERM_L_WHITE);
+				anything |= outlist("It may make you vulnerable to", list, TERM_L_WHITE);
 				break;
 			case LIST_FLAGS_NOT:
-				anything |= outlist("It does not make you vulnerible to", list, TERM_SLATE);
+				anything |= outlist("It does not make you vulnerable to", list, TERM_SLATE);
 				break;
 		} 
 	}
@@ -3123,6 +3123,9 @@ void object_guess_name(object_type *o_ptr)
 		/* Award points on matching powers: 3 for have, 1 for may */
 		for (ii=0;ii<32;ii++)
 		{
+			/* Hack -- don't match on curse flags */
+			if ((1L << ii) >= TR3_LIGHT_CURSE) continue;
+
 			if ((cheat_lore) || !(e_ptr->xtra))
 			{
 				if ((o_ptr->can_flags3 & (1L<<ii)) && (e_ptr->flags3 & (1L<<ii))) score +=3;

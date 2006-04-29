@@ -510,7 +510,7 @@ G:R
 R:INSECT
 L:11:435:153:199:0:0
 L:12:56:0:153:0:0
-L:19:56:0:153:0:0
+L:19:56:0:153:215:0
 
 # Make it clear that there is no easy way back to Hobbiton.
 

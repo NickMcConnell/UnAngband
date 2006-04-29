@@ -2880,8 +2880,8 @@
 
 #define TR4_BRAND_DARK	0x00000001L	/* Weapon has dark brand */
 #define TR4_BRAND_LITE	0x00000002L	/* Weapon has lite brand */
-#define TR4_HURT_LITE	0x00000004L    /* Item makes wielder vulnerible to lite */
-#define TR4_HURT_WATER	0x00000008L    /* Item makes wielder vulnerible to water */
+#define TR4_HURT_LITE	0x00000004L    /* Item makes wielder vulnerable to lite */
+#define TR4_HURT_WATER	0x00000008L    /* Item makes wielder vulnerable to water */
 #define TR4_VAMP_HP   	0x00000010L     /* Weapon restores user hp when kills a creature with blood  */
 #define TR4_VAMP_MANA  	0x00000020L     /* Weapon restores user sp when kills a creature with mana  */
 #define TR4_IM_POIS   	0x00000040L     /* Immune to poison  */
@@ -2905,11 +2905,11 @@
 #define TR4_MAN     	0x01000000L     /* Item makes wielder man */
 #define TR4_DWARF   	0x02000000L	/* Item makes wielder dwarf */
 #define TR4_ELF   	0x04000000L	/* Item makes wielder elf */
-#define TR4_HURT_POIS   0x08000000L     /* Item makes wielder vulnerible to acid */
-#define TR4_HURT_ACID   0x10000000L     /* Item makes wielder vulnerible to acid */
-#define TR4_HURT_ELEC   0x20000000L     /* Item makes wielder vulnerible to elec */
-#define TR4_HURT_FIRE   0x40000000L     /* Item makes wielder vulnerible to fire */
-#define TR4_HURT_COLD   0x80000000L     /* Item makes wielder vulnerible to cold */
+#define TR4_HURT_POIS   0x08000000L     /* Item makes wielder vulnerable to acid */
+#define TR4_HURT_ACID   0x10000000L     /* Item makes wielder vulnerable to acid */
+#define TR4_HURT_ELEC   0x20000000L     /* Item makes wielder vulnerable to elec */
+#define TR4_HURT_FIRE   0x40000000L     /* Item makes wielder vulnerable to fire */
+#define TR4_HURT_COLD   0x80000000L     /* Item makes wielder vulnerable to cold */
 
 
 

@@ -6855,7 +6855,7 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	else if (resists >= 8) resists *= 3;
 	else if (resists >= 6) resists *= 2;
 
-	/* Reduce resists by vulneribilities */
+	/* Reduce resists by vulnerabilities */
 	if (r_ptr->flags3 & RF3_HURT_LITE)	resists -= 3;
 	if (r_ptr->flags3 & RF3_HURT_ROCK)	resists -= 3;
 	if (r_ptr->flags3 & RF3_HURT_WATER)	resists -= 1;

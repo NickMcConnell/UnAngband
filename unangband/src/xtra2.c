@@ -3550,7 +3550,7 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 	{
 		if (room_info[room].flags & (ROOM_ICKY)) strcat(text_always,"  This room cannot be teleported into.");
 		if (room_info[room].flags & (ROOM_BLOODY)) strcat(text_always,"  This room prevent you naturally healing your wounds.");
-		if (room_info[room].flags & (ROOM_CURSED)) strcat(text_always,"  This room makes you vulnerible to being hit.");
+		if (room_info[room].flags & (ROOM_CURSED)) strcat(text_always,"  This room makes you vulnerable to being hit.");
 		if (room_info[room].flags & (ROOM_GLOOMY)) strcat(text_always,"  This room cannot be magically lit.");
 		if (room_info[room].flags & (ROOM_PORTAL)) strcat(text_always,"  This room magically teleports you occasionally.");
 		if (room_info[room].flags & (ROOM_SILENT)) strcat(text_always,"  This room prevents you casting spells.");
@@ -3734,7 +3734,7 @@ void describe_room(void)
 		{
 			/* Nothing more */
 		}
-		else if (strlen(text_visible) || strlen(text_always))
+		else if (strlen(text_visible) + strlen(text_always) > 80)
 		{
 			message_flush();
 
@@ -3762,6 +3762,18 @@ void describe_room(void)
 
 			/* Load screen */
 			screen_load();
+		}
+		else if (strlen(text_visible) && strlen(text_always))
+		{
+			msg_format("%s  %s", text_visible, text_always);
+		}
+		else if (strlen(text_visible))
+		{
+			msg_format("%s", text_visible);
+		}
+		else if (strlen(text_always))
+		{
+			msg_format("%s", text_always);
 		}
 
 		/* Room has been entered */

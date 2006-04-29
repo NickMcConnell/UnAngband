@@ -146,6 +146,8 @@ void do_cmd_eat_food(void)
 	/* Destroy a food in the pack */
 	if (item >= 0)
 	{
+		if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+
 		inven_item_increase(item, -1);
 		inven_item_describe(item);
 		inven_item_optimize(item);
@@ -248,6 +250,8 @@ void do_cmd_quaff_potion(void)
 	/* Destroy a potion in the pack */
 	if (item >= 0)
 	{
+		if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+
 		inven_item_increase(item, -1);
 		inven_item_describe(item);
 		inven_item_optimize(item);
@@ -370,6 +374,8 @@ void do_cmd_read_scroll(void)
 	/* Destroy a scroll in the pack */
 	if (item >= 0)
 	{
+		if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+
 		inven_item_increase(item, -1);
 		inven_item_describe(item);
 		inven_item_optimize(item);
@@ -1865,6 +1871,8 @@ void do_cmd_apply_rune(void)
 	/* Decrease the item (in the pack) */
 	if (item >= 0)
 	{
+		if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+
 		inven_item_increase(item, -1);
 		inven_item_describe(item);
 

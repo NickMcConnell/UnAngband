@@ -1140,9 +1140,23 @@ static void process_world(void)
 					   (o_ptr->number == 1) ? "has" : "have");
 
 					/* Destroy a spell if discharged */
-					if (o_ptr->timeout) inven_item_increase(i, -1);
-					else if (o_ptr->stackc) inven_item_increase(i, -(o_ptr->stackc));
-					else inven_item_increase(i,-(o_ptr->number));
+					if (o_ptr->timeout)
+					{
+						if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+
+						inven_item_increase(i, -1);
+					}
+					else if (o_ptr->stackc)
+					{
+						if (o_ptr->number == o_ptr->stackc) inven_drop_flags(o_ptr);
+
+						inven_item_increase(i, -(o_ptr->stackc));
+					}
+					else
+					{
+						inven_drop_flags(o_ptr);
+						inven_item_increase(i,-(o_ptr->number));
+					}
 
 					inven_item_optimize(i);
 
@@ -2520,7 +2534,6 @@ static void process_player(void)
 		/* Refresh (optional) */
 		if (fresh_before) Term_fresh();
 
-
 		/* Hack -- Pack Overflow */
 		if (inventory[INVEN_PACK].k_idx)
 		{
@@ -2544,6 +2557,9 @@ static void process_player(void)
 
 			/* Message */
 			msg_format("You drop %s (%c).", o_name, index_to_label(item));
+
+			/* Forget about it */
+			inven_drop_flags(o_ptr);
 
 			/* Drop it (carefully) near the player */
 			drop_near(o_ptr, 0, p_ptr->py, p_ptr->px);

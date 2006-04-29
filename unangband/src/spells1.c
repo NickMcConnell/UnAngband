@@ -1406,6 +1406,9 @@ static int inven_damage(inven_func typ, int perc)
 					   o_name, index_to_label(i),
 					   ((amt > 1) ? "were" : "was"));
 
+				/* Forget object */
+				if (o_ptr->number = amt) inven_drop_flags(o_ptr);
+
 				/* Destroy "amt" items */
 				inven_item_increase(i, -amt);
 				inven_item_optimize(i);
@@ -1541,7 +1544,7 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 		return;
 	}
 
-	/* Not vulnerible */
+	/* Not vulnerable */
 	else if ((p_ptr->cur_flags2 & (TR2_IM_ACID)) != 0)
 	{
 		/* Always notice */
@@ -1633,7 +1636,7 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 		return;
 	}
 
-	/* Not vulnerible */
+	/* Not vulnerable */
 	else if ((p_ptr->cur_flags2 & (TR2_IM_ELEC)) != 0)
 	{
 		/* Always notice */
@@ -1722,7 +1725,7 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 		return;
 	}
 
-	/* Not vulnerible */
+	/* Not vulnerable */
 	else if ((p_ptr->cur_flags2 & (TR2_IM_FIRE)) != 0)
 	{
 		/* Always notice */
@@ -1810,7 +1813,7 @@ static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 		return;
 	}
 
-	/* Not vulnerible */
+	/* Not vulnerable */
 	else if ((p_ptr->cur_flags2 & (TR2_IM_COLD)) != 0)
 	{
 		/* Always notice */
@@ -1897,7 +1900,7 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 		return;
 	}
 
-	/* Not vulnerible */
+	/* Not vulnerable */
 	else if ((p_ptr->cur_flags4 & (TR4_IM_POIS)) != 0)
 	{
 		/* Always notice */
@@ -7390,7 +7393,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
-		/* Weak lite -- blinding, plus damage if vulnerible */
+		/* Weak lite -- blinding, plus damage if vulnerable */
 		case GF_LITE_WEAK:
 		{
 			if ((p_ptr->cur_flags4 & (TR4_HURT_LITE)) == 0)
@@ -7884,6 +7887,9 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 					drop_near(i_ptr,20,p_ptr->py,p_ptr->px);
 				}
 
+				/* Forget about item */
+				if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+
 				/* Steal the items */
 				inven_item_increase(i, -1);
 				inven_item_optimize(i);
@@ -7928,6 +7934,9 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				msg_format("%sour %s (%c) was eaten!",
 					   ((o_ptr->number > 1) ? "One of y" : "Y"),
 					   o_name, index_to_label(i));
+
+				/* Forget about item */
+				if (o_ptr->number == 1) inven_drop_flags(o_ptr);
 
 				/* Steal the items */
 				inven_item_increase(i, -1);

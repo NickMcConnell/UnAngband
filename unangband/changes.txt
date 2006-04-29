@@ -217,6 +217,8 @@ only count as good if you have not seen them previously.
 
 - Made ammunition, including new steel-tipped ammunition, more common.
 
+- Nar the Dwarf now guards the Midge Marshes (Suggested by Mikolaj Konarski).
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.
@@ -451,6 +453,9 @@ not support the particular ego value.
 noticed by detect magic (Reported by Mikolaj Konarski).
 
 - Fixed bug where normal arrows and bolts would be counted as good.
+
+- Fixed further bugs with attempting to track when an item does or does not have
+an ability (Reported by Mikolaj Konarski).
 
 ### Build / Platform ###
 

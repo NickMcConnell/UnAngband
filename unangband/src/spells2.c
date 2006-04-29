@@ -641,7 +641,7 @@ void self_knowledge(bool spoil)
 	/* Collect temporary effects */
 	vn = 0;
 
-	if (p_ptr->invuln) vp[vn++] = "invulnerible";
+	if (p_ptr->invuln) vp[vn++] = "invulnerable";
 	for (n = 0; n < A_CHR; n++)
 	{
 		if (p_ptr->stat_inc_tim[n]) vp[vn++] = desc_stat_imp[n];
@@ -2655,6 +2655,9 @@ bool brand_item(int brand, cptr act)
 			/* Decrease the item (in the pack) */
 			if (item >= 0)
 			{
+				/* Forget about item */
+				if (o_ptr->number == qty) inven_drop_flags(o_ptr);
+
 				inven_item_increase(item, -qty);
 				inven_item_describe(item);
 				inven_item_optimize(item);
@@ -3364,6 +3367,9 @@ bool recharge(int num)
 			/* Reduce and describe inventory */
 			if (item >= 0)
 			{
+				/* Forget about item */
+				inven_drop_flags(o_ptr);
+
 				inven_item_increase(item, -999);
 				inven_item_describe(item);
 				inven_item_optimize(item);
@@ -4993,6 +4999,9 @@ static void enchant_item(byte tval, int plev)
 	/* Destroy an item in the pack */
 	if (item >= 0)
 	{
+		/* Forget about item */
+		if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+
 		inven_item_increase(item, -1);
 		inven_item_describe(item);
 		inven_item_optimize(item);

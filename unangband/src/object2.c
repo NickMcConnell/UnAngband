@@ -1626,6 +1626,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		}
 
 		/* Food and Potions and Scrolls */
+		case TV_SPIKE:
 		case TV_FOOD:
 		case TV_POTION:
 		case TV_SCROLL:
@@ -1799,7 +1800,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		/* Never combine different inscriptions */
 		if (o_ptr->note && j_ptr->note) return (0);
 	}
-
 
 	/* Hack -- Require compatible "discount" fields */
 	if (o_ptr->discount != j_ptr->discount)
@@ -6463,6 +6463,7 @@ void inven_item_describe(int item)
 	msg_format("You have %s (%c).", o_name, index_to_label(item));
 }
 
+
 /*
  * Increase the "number" of an item in the inventory
  */
@@ -6479,9 +6480,6 @@ void inven_item_increase(int item, int num)
 
 	/* Un-apply */
 	num -= o_ptr->number;
-
-	/* Forget about item */
-	if (!num) inven_drop_flags(o_ptr);
 
 	/* Change the number and weight */
 	if (num)
@@ -7021,7 +7019,6 @@ s16b inven_takeoff(int item, int amt)
 		i_ptr->stackc = amt - (o_ptr->number - o_ptr->stackc);
 	}
 
-
 	/* Describe the object */
 	object_desc(o_name, sizeof(o_name), i_ptr, TRUE, 3);
 
@@ -7065,16 +7062,19 @@ s16b inven_takeoff(int item, int amt)
 		act = "You were wearing";
 	}
 
-	/* Hack -- clear may flags to avoid forgetting them */
-	drop_may_flags(o_ptr);
-
 	/* Modify, Optimize */
 	inven_item_increase(item, -amt);
 	inven_item_optimize(item);
 
 	/* Carry the object - spells are destroyed */
 	if (i_ptr->tval != TV_SPELL) slot = inven_carry(i_ptr);
-	else slot = -1;
+	else
+	{
+		/* Forget the spell flags */
+		inven_drop_flags(i_ptr);
+
+		slot = -1;
+	}
 
 	/* Message */
 	msg_format("%s %s (%c).", act, o_name, index_to_label(slot));
@@ -7103,7 +7103,6 @@ void inven_drop(int item, int amt)
 
 	char o_name[80];
 
-
 	/* Get the original object */
 	o_ptr = &inventory[item];
 
@@ -7126,7 +7125,9 @@ void inven_drop(int item, int amt)
 		o_ptr = &inventory[item];
 	}
 
-	
+	/* Forget about object */
+	if (amt == o_ptr->number) inven_drop_flags(o_ptr);
+
 	/* Get local object */
 	i_ptr = &object_type_body;
 

@@ -383,14 +383,13 @@ void do_cmd_wield(void)
 		}
 	}
 
-	/* Hack -- clear may flags to avoid forgetting them */
-	/* This also prevents 2 identical stacks of the same item */
-	/* preventing identification of the wielded one */
-	drop_may_flags(o_ptr);
-
 	/* Decrease the item (from the pack) */
 	if (item >= 0)
 	{
+		/* Hack -- Forget what original stack may do */
+		/* This allows us to identify the wielded item's function */
+		if (o_ptr->number < amt) drop_may_flags(o_ptr);
+
 		inven_item_increase(item, -amt);
 		inven_item_optimize(item);
 
@@ -826,6 +825,8 @@ void do_cmd_destroy(void)
 	/* Eliminate the item (from the pack) */
 	if (item >= 0)
 	{
+		if (o_ptr->number == amt) inven_drop_flags(o_ptr);
+
 		inven_item_increase(item, -amt);
 		inven_item_describe(item);
 		inven_item_optimize(item);
@@ -1457,6 +1458,8 @@ void do_cmd_refill(void)
 	/* Decrease the item (in the pack) */
 	else if (item2 >= 0)
 	{
+		if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+
 		inven_item_increase(item2, -1);
 		inven_item_describe(item2);
 		inven_item_optimize(item2);

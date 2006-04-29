@@ -131,7 +131,7 @@ static bool check_hit(int power, int level, int who, bool ranged)
 		if (p_ptr->shield) ac += 50;
 	}
 
-	/* Some rooms make the player vulnerible */
+	/* Some rooms make the player vulnerable */
 	if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_CURSED)) ac /= 2;
 
 	/* Power and Level compete against Armor */

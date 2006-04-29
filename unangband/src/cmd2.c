@@ -2556,13 +2556,15 @@ void do_cmd_run(void)
 
 	int y, x, dir;
 
-
 	/* Hack XXX XXX XXX */
 	if (p_ptr->confused)
 	{
 		msg_print("You are too confused!");
 		return;
 	}
+
+	/* Get a direction (or abort) */
+	if (!get_rep_dir(&dir)) return;
 
 	/* Hack -- handle stuck players */
 	if (stuck_player(&dir))
@@ -2579,10 +2581,9 @@ void do_cmd_run(void)
 		msg_format("You are stuck %s%s.",
 			((f_info[mimic].flags2 & (FF2_FILLED)) ? "" :
 				(is_a_vowel(name[0]) ? "inside an " : "inside a ")),name);
-	}
 
-	/* Get a direction (or abort) */
-	if (!get_rep_dir(&dir)) return;
+		return;
+	}
 
 	/* Get location */
 	y = py + ddy[dir];
@@ -2607,7 +2608,8 @@ void do_cmd_pathfind(int y, int x)
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
-	int dir;
+	/* Must not be 0 or 5 */
+	int dummy = 1;
 
 	/* Hack XXX XXX XXX */
 	if (p_ptr->confused)
@@ -2617,7 +2619,7 @@ void do_cmd_pathfind(int y, int x)
 	}
 
 	/* Hack -- handle stuck players */
-	if (stuck_player(&dir))
+	if (stuck_player(&dummy))
 	{
 		int mimic = f_info[cave_feat[py][px]].mimic;
 
@@ -2631,6 +2633,8 @@ void do_cmd_pathfind(int y, int x)
 		msg_format("You are stuck %s%s.",
 			((f_info[mimic].flags2 & (FF2_FILLED)) ? "" :
 				(is_a_vowel(name[0]) ? "inside an " : "inside a ")),name);
+
+		return;
 	}
 
 	if (findpath(y, x))
@@ -3064,6 +3068,8 @@ void do_cmd_fire(void)
 	/* Reduce and describe inventory */
 	if (item >= 0)
 	{
+		if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+
 		inven_item_increase(item, -1);
 		inven_item_describe(item);
 		inven_item_optimize(item);
@@ -3567,6 +3573,8 @@ void do_cmd_throw(void)
 	/* Reduce and describe inventory */
 	if (item >= 0)
 	{
+		if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+
 		inven_item_increase(item, -1);
 		inven_item_describe(item);
 		inven_item_optimize(item);
@@ -3579,7 +3587,6 @@ void do_cmd_throw(void)
 		floor_item_optimize(0 - item);
 		if (get_feat && (scan_feat(py,px) < 0)) cave_alter_feat(py,px,FS_GET_FEAT);
 	}
-
 
 	/* Description */
 	object_desc(o_name, sizeof(o_name), i_ptr, FALSE, 3);

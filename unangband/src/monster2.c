@@ -4179,8 +4179,16 @@ bool animate_object(int item)
 		   "has" : "have")), p);
 
 		/* Destroy the item */
-		if (o_ptr->stackc) inven_item_increase(item, -(o_ptr->stackc));
-		else inven_item_increase(item,-(o_ptr->number));
+		if (o_ptr->stackc)
+		{
+			if (o_ptr->number == o_ptr->stackc) inven_drop_flags(o_ptr);
+			inven_item_increase(item, -(o_ptr->stackc));
+		}
+		else
+		{
+			inven_drop_flags(o_ptr);
+			inven_item_increase(item,-(o_ptr->number));
+		}
 
 		inven_item_optimize(item);
 	}

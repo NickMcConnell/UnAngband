@@ -1524,7 +1524,7 @@ struct player_type
 
 	s32b last_disturb;	/* Last time disturbed */
 
-	s16b vulnerability;     /* How vulnerible? */
+	s16b vulnerability;     /* How vulnerable? */
 
 	byte outside;	/* Player is outside? */
 
