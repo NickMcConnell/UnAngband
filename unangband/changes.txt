@@ -215,6 +215,8 @@ only count as good if you have not seen them previously.
 
 - Made scrolls, potions and throwing weapons somewhat out of depth appear in stacks.
 
+- Made ammunition, including new steel-tipped ammunition, more common.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.

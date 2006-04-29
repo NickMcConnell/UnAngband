@@ -4002,7 +4002,7 @@ void store_init(int which)
 	if ((store_num_fake == -1) && (store_num_real > 0))
 	{
 		/* Create some new items */
-		while (st_ptr->stock_num < (store_num_fake == -1 ? 20 : 8)) store_create();
+		while (st_ptr->stock_num < (store_num_fake == -1 ? 4 : 8)) store_create();
 	}
 
 }
