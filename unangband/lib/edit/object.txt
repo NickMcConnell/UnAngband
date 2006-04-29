@@ -19,7 +19,7 @@
 # N: serial number : & object name~
 # G: symbol : color
 # I: tval : sval : pval
-# W: depth : rarity (now always 0, see the "A:" line) : weight : cost
+# W: depth : rarity (now always 0, see the "A:" line) : weight : coste
 # P: base armor class : base damage : plus to-hit : plus to-dam : plus to-ac
 # A: depth/rarity : depth/rarity : etc
 # F: flag | flag | etc
@@ -262,7 +262,7 @@ P:0:1d1:0:0:0
 
 N:30:& Broken Dagger~
 G:|:D
-I:23:1:0
+I:23:3:0
 W:0:0:5:1
 A:0/1
 P:0:1d1:-2:-4:0
@@ -272,7 +272,7 @@ N:31:& Bastard Sword~
 G:|:W
 I:23:21:0
 W:15:0:140:350
-A:15/1
+A:15/3
 P:0:3d4:0:0:0
 F:SHOW_MODS
 
@@ -280,7 +280,7 @@ N:32:& Scimitar~
 G:|:W
 I:23:18:0
 W:10:0:130:250
-A:10/1
+A:10/3
 P:0:2d5:0:0:0
 F:SHOW_MODS
 
@@ -296,7 +296,7 @@ N:34:& Broad Sword~
 G:|:W
 I:23:16:0
 W:10:0:150:255
-A:10/1:15/1
+A:15/2
 P:0:2d5:0:0:0
 F:SHOW_MODS
 
@@ -304,7 +304,7 @@ N:35:& Short Sword~
 G:|:W
 I:23:10:0
 W:5:0:80:90
-A:5/1
+A:5/3
 P:0:1d7:0:0:0
 F:SHOW_MODS
 
@@ -320,7 +320,7 @@ N:37:& Two-Handed Sword~
 G:|:W
 I:23:25:0
 W:30:0:200:775
-A:30/1:40/1
+A:30/2
 P:0:3d6:0:0:0
 F:SHOW_MODS
 
@@ -328,7 +328,7 @@ N:38:& Main Gauche~
 G:|:W
 I:23:5:0
 W:3:0:30:25
-A:3/1
+A:3/3
 P:0:1d5:0:0:0
 F:SHOW_MODS
 
@@ -336,7 +336,7 @@ N:39:& Cutlass~
 G:|:W
 I:23:12:0
 W:5:0:110:85
-A:5/1
+A:5/3
 P:0:1d7:0:0:0
 F:SHOW_MODS
 
@@ -344,7 +344,7 @@ N:40:& Executioner's Sword~
 G:|:r
 I:23:28:0
 W:40:0:260:850
-A:40/1
+A:40/3
 P:0:4d5:0:0:0
 F:SHOW_MODS
 
@@ -352,7 +352,7 @@ N:41:& Katana~
 G:|:W
 I:23:20:0
 W:20:0:120:400
-A:20/1
+A:20/4
 P:0:3d4:0:0:0
 F:SHOW_MODS
 
@@ -360,7 +360,7 @@ N:42:& Long Sword~
 G:|:W
 I:23:17:0
 W:10:0:130:300
-A:10/1:20/1
+A:20/2
 P:0:2d5:0:0:0
 F:SHOW_MODS
 
@@ -368,7 +368,7 @@ N:43:& Dagger~
 G:|:W
 I:23:4:0
 W:0:0:12:10
-A:0/1:5/1:10/1:20/1
+A:0/2:5/2:10/2:20/2
 P:0:1d4:0:0:0
 F:SHOW_MODS | THROWING
 
@@ -376,7 +376,7 @@ N:44:& Rapier~
 G:|:W
 I:23:7:0
 W:5:0:40:42
-A:5/1
+A:5/3
 P:0:1d6:0:0:0
 F:SHOW_MODS
 
@@ -384,7 +384,7 @@ N:45:& Sabre~
 G:|:W
 I:23:11:0
 W:5:0:50:50
-A:5/1
+A:5/3
 P:0:1d7:0:0:0
 F:SHOW_MODS
 
@@ -392,7 +392,7 @@ N:46:& Small Sword~
 G:|:W
 I:23:8:0
 W:5:0:75:48
-A:5/1
+A:5/3
 P:0:1d6:0:0:0
 F:SHOW_MODS
 
@@ -410,7 +410,7 @@ N:48:& Ball-and-Chain~
 G:\:D
 I:21:6:0
 W:20:0:150:200
-A:20/1
+A:20/2
 P:0:2d4:0:0:0
 F:SHOW_MODS
 
@@ -418,7 +418,7 @@ N:49:& Whip~
 G:\:D
 I:21:2:0
 W:3:0:30:30
-A:3/1
+A:3/2
 P:0:1d4:0:0:0
 F:SHOW_MODS
 
@@ -426,7 +426,7 @@ N:50:& Flail~
 G:\:D
 I:21:13:0
 W:10:0:150:353
-A:10/1
+A:10/2
 P:0:2d6:0:0:0
 F:SHOW_MODS
 
@@ -434,7 +434,7 @@ N:51:& Two-Handed Flail~
 G:\:y
 I:21:18:0
 W:45:0:280:590
-A:45/1
+A:45/2
 P:0:3d6:0:0:0
 F:SHOW_MODS
 
@@ -442,7 +442,7 @@ N:52:& Morning Star~
 G:\:D
 I:21:12:0
 W:10:0:150:396
-A:10/1
+A:10/2
 P:0:2d6:0:0:0
 F:SHOW_MODS
 
@@ -450,7 +450,7 @@ N:53:& Mace~
 G:\:D
 I:21:5:0
 W:5:0:120:130
-A:5/1
+A:5/2
 P:0:2d4:0:0:0
 F:SHOW_MODS
 
@@ -458,7 +458,7 @@ N:54:& Quarterstaff~
 G:\:U
 I:21:3:0
 W:10:0:150:200
-A:10/1
+A:10/2
 P:0:1d9:0:0:0
 F:SHOW_MODS
 
@@ -466,7 +466,7 @@ N:55:& War Hammer~
 G:\:D
 I:21:8:0
 W:5:0:120:225
-A:5/1
+A:5/2
 P:0:3d3:0:0:0
 F:SHOW_MODS
 
@@ -474,7 +474,7 @@ N:56:& Lead-Filled Mace~
 G:\:D
 I:21:15:0
 W:15:0:180:502
-A:15/1
+A:15/2
 P:0:3d4:0:0:0
 F:SHOW_MODS
 
@@ -490,7 +490,7 @@ N:58:& Lucerne Hammer~
 G:\:B
 I:21:10:0
 W:10:0:120:376
-A:10/1
+A:10/2
 P:0:2d5:0:0:0
 F:SHOW_MODS
 
@@ -500,7 +500,7 @@ N:59:& Beaked Axe~
 G:/:s
 I:22:10:0
 W:15:0:180:408
-A:15/1
+A:15/2
 P:0:2d6:0:0:0
 F:SHOW_MODS
 
@@ -508,7 +508,7 @@ N:60:& Glaive~
 G:/:s
 I:22:13:0
 W:20:0:190:363
-A:20/1
+A:20/3
 P:0:2d6:0:0:0
 F:SHOW_MODS
 
@@ -516,7 +516,7 @@ N:61:& Halberd~
 G:/:s
 I:22:15:0
 W:25:0:190:430
-A:25/1
+A:25/3
 P:0:3d5:0:0:0
 F:SHOW_MODS
 
@@ -524,7 +524,7 @@ N:62:& Awl-Pike~
 G:/:s
 I:22:4:0
 W:10:0:160:340
-A:10/1
+A:10/3
 P:0:1d8:0:0:0
 F:SHOW_MODS
 
@@ -532,7 +532,7 @@ N:63:& Pike~
 G:/:s
 I:22:8:0
 W:15:0:160:358
-A:15/1
+A:15/3
 P:0:2d5:0:0:0
 F:SHOW_MODS
 
@@ -564,7 +564,7 @@ N:67:& Great Axe~
 G:/:s
 I:22:25:0
 W:40:0:230:500
-A:40/1
+A:40/3
 P:0:4d4:0:0:0
 F:SHOW_MODS
 
@@ -572,7 +572,7 @@ N:68:& Battle Axe~
 G:/:s
 I:22:22:0
 W:15:0:170:334
-A:15/1
+A:15/2
 P:0:2d8:0:0:0
 F:SHOW_MODS
 
@@ -580,7 +580,7 @@ N:69:& Lochaber Axe~
 G:/:D
 I:22:28:0
 W:45:0:250:750
-A:45/1
+A:45/3
 P:0:3d8:0:0:0
 F:SHOW_MODS
 
@@ -588,7 +588,7 @@ N:70:& Broad Axe~
 G:/:s
 I:22:11:0
 W:15:0:160:304
-A:15/1
+A:15/2
 P:0:2d6:0:0:0
 F:SHOW_MODS
 
@@ -596,7 +596,7 @@ N:71:& Scythe~
 G:/:s
 I:22:17:0
 W:45:0:250:800
-A:45/1
+A:45/2
 P:0:5d3:0:0:0
 F:SHOW_MODS
 
@@ -1616,8 +1616,8 @@ Y:11:1
 N:205:Enchant Armor To-Resist
 G:?:w
 I:70:49:0
-W:50:0:5:5000
-A:50/1
+W:45:0:5:5000
+A:45/1
 Y:20:3
 
 N:206:Recharging
@@ -1665,28 +1665,28 @@ Y:18:3
 N:212:*Enchant Weapon*
 G:?:w
 I:70:21:0
-W:50:0:5:500
-A:50/1
+W:45:0:5:500
+A:45/1
 Y:23:3
 
 N:213:Curse Weapon
 G:?:w
 I:70:3:0
-W:50:0:5:0
-A:50/1
+W:45:0:5:0
+A:45/1
 
 N:214:*Enchant Armor*
 G:?:w
 I:70:20:0
-W:50:0:5:500
-A:50/1:50/1
+W:45:0:5:500
+A:45/1:50/1
 Y:20:2
 
 N:215:Curse Armor
 G:?:w
 I:70:2:0
-W:50:0:5:0
-A:50/1
+W:45:0:5:0
+A:45/1
 
 N:216:Summon Undead
 G:?:w
@@ -2100,8 +2100,8 @@ F:THROWING
 N:268:Enchant Weapon Brand
 G:?:w
 I:70:50:0
-W:50:0:5:2500
-A:50/1
+W:45:0:5:2500
+A:45/1
 Y:13:2
 
 ##### Wands #####
@@ -2307,7 +2307,7 @@ Y:28:1
 N:293:Bless Weapon
 G:?:w
 I:70:51:0
-W:50:0:5:500
+W:45:0:5:500
 A:50/1
 
 N:294:Acid Bolts
@@ -3512,7 +3512,7 @@ N:434:& Dart~
 G:/:r
 I:22:1:0
 W:0:0:12:10
-A:0/1:5/1
+A:0/2
 P:0:1d4:0:0:0
 F:SHOW_MODS | THROWING
 
@@ -5166,7 +5166,7 @@ N:703:& Two-Handed Mace~
 G:\:D
 I:21:16:0
 W:30:0:240:900
-A:30/1
+A:30/2
 P:0:4d4:0:0:0
 F:SHOW_MODS
 
@@ -5174,7 +5174,7 @@ N:704:& Trident~
 G:/:B
 I:22:14:0
 W:20:0:140:300
-A:20/1
+A:20/2
 P:0:3d4:0:0:0
 F:SHOW_MODS
 
@@ -5182,7 +5182,7 @@ N:705:& Lance~
 G:/:s
 I:22:20:0
 W:35:0:300:460
-A:35/1
+A:35/3
 P:0:3d8:0:0:0
 F:SHOW_MODS
 
@@ -5190,7 +5190,7 @@ N:706:& Baton~
 G:\:u
 I:22:1:0
 W:0:0:45:25
-A:0/1:5/1
+A:0/2:5/2
 P:0:1d5:0:0:0
 F:SHOW_MODS | THROWING
 

@@ -2206,6 +2206,117 @@ static void object_mention(object_type *o_ptr)
 	}
 }
 
+/*
+ *  Try to boost an item up to the appropriate power for the level.
+ *
+ *  We increase to_hit, to_dam, to_ac, pval, damage dice and/or sides
+ */
+static void boost_item(object_type *o_ptr, int power, int lev)
+{
+	int boost_power, old_boost_power;
+	int sign = (power >= 0 ? 1 : -1);
+	bool tryagain;
+	int tries = 0;
+	int choice;
+
+	/* Evaluate power */
+	boost_power = object_power(o_ptr);
+
+	/* Reverse sign */
+	if (boost_power < 0) boost_power = -boost_power;
+
+	/* Too powerful already */
+	if (boost_power >= lev) return;
+
+	do
+	{
+		old_boost_power = boost_power;
+
+		tryagain = FALSE;
+		tries++;
+
+		choice = rand_int(12);
+
+		switch(choice)
+		{
+			case 0: case 1: case 2:
+
+				/* Increase to_h */
+				if (o_ptr->to_h) o_ptr->to_h+= sign;
+				else tryagain = TRUE;
+
+				break;
+
+			case 3: case 4: case 5:
+
+				/* Increase to_d */
+				if (o_ptr->to_d) o_ptr->to_d+= sign;
+				else tryagain = TRUE;
+
+				break;
+
+			case 6: case 7: case 8:
+
+				/* Increase to_a */
+				if (o_ptr->to_a) o_ptr->to_a+= sign;
+				else tryagain = TRUE;
+
+				break;
+
+			case 9:
+
+				/* Increase pval */
+				if (o_ptr->pval) o_ptr->pval+= sign;
+				else tryagain = TRUE;
+
+				break;
+
+			case 10:
+
+				/* Increase damage dice */
+				if ((power > 0) && ((o_ptr->tval == TV_DIGGING) || (o_ptr->tval == TV_HAFTED)
+				|| (o_ptr->tval == TV_SWORD) || (o_ptr->tval == TV_POLEARM) || (o_ptr->tval == TV_ARROW)
+				|| (o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_BOLT) || (o_ptr->tval == TV_STAFF)))
+					 o_ptr->dd++;
+				else tryagain = TRUE;
+
+				break;
+
+			case 11:
+
+				/* Increase damage dice */
+				if ((power > 0) && ((o_ptr->tval == TV_DIGGING) || (o_ptr->tval == TV_HAFTED)
+				|| (o_ptr->tval == TV_SWORD) || (o_ptr->tval == TV_POLEARM) || (o_ptr->tval == TV_ARROW)
+				|| (o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_BOLT) || (o_ptr->tval == TV_STAFF)))
+					 o_ptr->ds++;
+				else tryagain = TRUE;
+
+				break;
+		}
+
+		/* Evaluate power */
+		boost_power = object_power(o_ptr);
+
+		if (boost_power < 0) boost_power = -boost_power;
+
+	} while ((!(boost_power <= old_boost_power) && (boost_power < lev)) || (tryagain && (tries < 40)));
+
+	/* Hack -- undo the change that took us over the maximum power */
+	if (!tryagain)
+	{
+		switch(choice)
+		{
+			case 0: case 1: case 2:o_ptr->to_h -= sign; break;
+			case 3: case 4: case 5: o_ptr->to_d -= sign; break;
+			case 6: case 7: case 8: o_ptr->to_a -= sign; break;
+			case 9: o_ptr->pval -= sign; break;
+			case 10: o_ptr->dd--; break;
+			case 11: o_ptr->ds--; break;
+		}
+	}
+}
+
+
 
 /*
  * Attempt to change an object into an magic-item
@@ -2239,6 +2350,22 @@ static bool make_magic_item(object_type *o_ptr, int power, bool great)
 
 	/* Already too magical */
 	if (obj_pow1 >= power) return (FALSE);
+
+	/* Boost item most of the time unless great */
+	if (!(great) && rand_int(3))
+	{
+		/* Boost the item */
+		boost_item(o_ptr, power, power);
+
+		/* Recompute power */
+		obj_pow1 = object_power(o_ptr);
+
+		/* Reverse sign */
+		if (power < 0) obj_pow1 = -obj_pow1;
+
+		/* Already too magical */
+		if (obj_pow1 >= power) return (FALSE);
+	}
 
 	/* Iterate through flags 1 */
 	for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)
@@ -2320,6 +2447,10 @@ static bool make_magic_item(object_type *o_ptr, int power, bool great)
 		o_ptr->xtra1 = 17;
 		o_ptr->xtra2 = i;
 
+		/* Skip non-wearable items -- we have to do this because resistances and immunities grant ignore flags XXX */
+		if ((j >= TR2_IM_ACID) && ((o_ptr->tval == TV_ARROW)
+			|| (o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_BOLT))) continue;
+
 		/* Hack -- play balance. Only allow immunities on armour, shields and cloaks XXX */
 		if ((j >= TR2_IM_ACID) && (j <= TR2_IM_COLD) && (o_ptr->tval != TV_HARD_ARMOR)
 			&& (o_ptr->tval != TV_SOFT_ARMOR) && (o_ptr->tval != TV_DRAG_ARMOR)
@@ -2372,6 +2503,11 @@ static bool make_magic_item(object_type *o_ptr, int power, bool great)
 	{
 		o_ptr->xtra1 = 19;
 		o_ptr->xtra2 = i;
+
+		/* Skip non-weapons -- we have to do this because of the secondary lite flag on brand lite XXX */
+		if ((j == TR4_BRAND_LITE) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_HAFTED)
+			&& (o_ptr->tval != TV_SWORD) && (o_ptr->tval != TV_POLEARM) && (o_ptr->tval != TV_ARROW)
+			&& (o_ptr->tval != TV_SHOT) && (o_ptr->tval != TV_BOLT) && (o_ptr->tval != TV_STAFF)) continue;
 
 		/* Hack -- play balance. Only allow immunities on armour, shields and cloaks XXX */
 		if ((j == TR4_IM_POIS) && (o_ptr->tval != TV_HARD_ARMOR) && (o_ptr->tval != TV_SOFT_ARMOR)
@@ -3619,83 +3755,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		/* Boost under-powered ego items if possible */
 		if (ego_power < lev)
 		{
-			int old_ego_power;
-			int sign = (power >= 0 ? 1 : -1);
-			bool tryagain;
-			int tries = 0;
-
-			do
-			{
-				old_ego_power = ego_power;
-
-				tryagain = FALSE;
-				tries++;
-
-				switch(rand_int(12))
-				{
-
-					case 0: case 1: case 2:
-
-						/* Increase to_h */
-						if (e_ptr->max_to_h) o_ptr->to_h+= sign;
-						else tryagain = TRUE;
-
-						break;
-
-					case 3: case 4: case 5:
-
-						/* Increase to_d */
-						if (e_ptr->max_to_d) o_ptr->to_d+= sign;
-						else tryagain = TRUE;
-
-						break;
-
-					case 6: case 7: case 8:
-
-						/* Increase to_a */
-						if (e_ptr->max_to_a) o_ptr->to_a+= sign;
-						else tryagain = TRUE;
-
-						break;
-
-					case 9:
-
-						/* Increase pval */
-						if (e_ptr->max_pval) o_ptr->pval+= sign;
-						else tryagain = TRUE;
-
-						break;
-
-					case 10:
-
-						/* Increase damage dice */
-						if ((o_ptr->tval == TV_DIGGING) || (o_ptr->tval == TV_HAFTED)
-						|| (o_ptr->tval == TV_SWORD) || (o_ptr->tval == TV_POLEARM) || (o_ptr->tval == TV_ARROW)
-						|| (o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_BOLT) || (o_ptr->tval == TV_STAFF))
-							 o_ptr->dd += sign;
-						else tryagain = TRUE;
-
-						break;
-
-					case 11:
-
-						/* Increase damage dice */
-						if ((o_ptr->tval == TV_DIGGING) || (o_ptr->tval == TV_HAFTED)
-						|| (o_ptr->tval == TV_SWORD) || (o_ptr->tval == TV_POLEARM) || (o_ptr->tval == TV_ARROW)
-						|| (o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_BOLT) || (o_ptr->tval == TV_STAFF))
-							 o_ptr->ds += sign;
-						else tryagain = TRUE;
-
-						break;
-				}
-
-				/* Evaluate power */
-				ego_power = object_power(o_ptr);
-
-				if (ego_power < 0) ego_power = -ego_power;
-				if (tries > 40) tryagain = FALSE;
-
-			} while ((!(ego_power <= old_ego_power) && (ego_power < lev)) || (tryagain));
+			boost_item(o_ptr, power, lev);
 		}
 
 		/* Hack -- apply rating bonus */
@@ -4037,40 +4097,31 @@ static bool kind_is_good(int k_idx)
 			return (TRUE);
 		}
 
-		/* Books -- High level books are good */
+		/* Books -- high level books are good if not seen previously */
 		case TV_MAGIC_BOOK:
 		case TV_PRAYER_BOOK:
 		case TV_SONG_BOOK:
 		{
-			if (k_ptr->sval >= SV_BOOK_MIN_GOOD) return (TRUE);
+			if ((k_ptr->sval >= SV_BOOK_MIN_GOOD) && !(k_ptr->aware)) return (TRUE);
 			return (FALSE);
 		}
 
-		/* Rune stones are good */
+		/* Rune stones are good if not seen previously */
 		case TV_RUNESTONE:
 		{
-			return (TRUE);
+			if (!(k_ptr->aware)) return (TRUE);
+			return (FALSE);
 		}
 
-		/* Rings -- Rings of Speed are good */
+		/* Rods/Scrolls/Potions/Amulets/Wands/Rings -- Deep is good */
+		case TV_ROD:
 		case TV_RING:
-		{
-			if (k_ptr->sval == SV_RING_SPEED) return (TRUE);
-			return (FALSE);
-		}
-
-		/* Amulets -- Amulets of the Magi are good */
 		case TV_AMULET:
-		{
-			if (k_ptr->sval == SV_AMULET_THE_MAGI) return (TRUE);
-			return (FALSE);
-		}
-
-		/* Scrolls/Potions -- Deep is good */
 		case TV_SCROLL:
 		case TV_POTION:
+		case TV_WAND:
 		{
-			if (k_ptr->level >= 50) return (TRUE);
+			if ((k_ptr->level >= 50) && !(k_ptr->flags3 & (TR3_LIGHT_CURSE))) return (TRUE);
 			return (FALSE);
 		}
 

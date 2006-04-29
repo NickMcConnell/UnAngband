@@ -4298,7 +4298,7 @@ s32b slay_power(u32b s_index)
 		if ( !(r_ptr->flags9 & RF9_RES_DARK)
 			&& (s_index & 0x00020000L) )
 				mult = 2;
-		if ( !(r_ptr->flags3 & RF3_IM_ACID)
+		if ( !(r_ptr->flags3 & RF3_IM_ACID) && !(r_ptr->flags2 & RF2_ARMOR)
 			&& (s_index & 0x00001000L) )
 				mult = 2;
 		if ( !(r_ptr->flags3 & RF3_IM_FIRE)
@@ -4627,12 +4627,6 @@ s32b object_power(const object_type *o_ptr)
 
 		case TV_HAFTED:
 		case TV_STAFF:
-		{
-			/* Bonus as we may use a swap weapon */
-			if (f2 & (TR2_IGNORE_FIRE)) p++;
-
-			/* Fall through */
-		}
 		case TV_DIGGING:
 		case TV_POLEARM:
 		case TV_SWORD:
@@ -4646,7 +4640,7 @@ s32b object_power(const object_type *o_ptr)
 				p = (p * e_info[o_ptr->name2].slay_power) / tot_mon_power;
 
 				/* Hack -- we may use as a swap weapon */
-				if (e_info[o_ptr->name2].slay_power > tot_mon_power) p = p * 5 / 4;
+				if (e_info[o_ptr->name2].slay_power > tot_mon_power) p = p * 5 / 4 + 1;
 			}
 
 			/* Hack -- For efficiency, compute for first slay or brand flag only */
@@ -4664,7 +4658,7 @@ s32b object_power(const object_type *o_ptr)
 					p = (p * magic_slay_power[i]) / tot_mon_power;
 
 					/* Hack -- we may use as a swap weapon */
-					if (magic_slay_power[i] > tot_mon_power) p = p * 5 / 4;
+					if (magic_slay_power[i] > tot_mon_power) p = p * 5 / 4 + 1;
 				}
 			}
 
@@ -4730,6 +4724,10 @@ s32b object_power(const object_type *o_ptr)
 			/*	p += (k_ptr->weight - o_ptr->weight) / 20; */
 			}
 
+			/* Bonus as we may use a staff or hafted weapon as swap weapon */
+			if ((o_ptr->tval == TV_STAFF) && (f2 & (TR2_IGNORE_FIRE))) p+= 2;
+			if ((o_ptr->tval == TV_HAFTED) && (f2 & (TR2_IGNORE_FIRE))) p++;
+
 			/* Bonuses as we may choose to use a swap weapon */
 			if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)) p++;
 			if (f2 & (TR2_IGNORE_THEFT)) p++;
@@ -4752,13 +4750,6 @@ s32b object_power(const object_type *o_ptr)
 		}
 
 		case TV_ARROW:
-		{
-			/* Bonus as we carry arrows in inventory and fire them */
-			if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)) p += 2;
-
-			/* Fall through */
-		}
-
 		case TV_SHOT:
 		case TV_BOLT:
 		{
@@ -4771,7 +4762,7 @@ s32b object_power(const object_type *o_ptr)
 				p = (p * e_info[o_ptr->name2].slay_power) / tot_mon_power;
 
 				/* Hack -- we usually have multiple stacks of ammo */
-				if (e_info[o_ptr->name2].slay_power > tot_mon_power) p = p * 3 / 2;
+				if (e_info[o_ptr->name2].slay_power > tot_mon_power) p = p * 5 / 4 + 1;
 			}
 
 			/* Hack -- For efficiency, compute for first slay or brand flag only */
@@ -4789,21 +4780,12 @@ s32b object_power(const object_type *o_ptr)
 					p = (p * magic_slay_power[i]) / tot_mon_power;
 
 					/* Hack -- we usually have multiple stacks of ammo */
-					if (magic_slay_power[i] > tot_mon_power) p = p * 3 / 2;
+					if (magic_slay_power[i] > tot_mon_power) p = p * 5 / 4 + 1;
 				}
 			}
 
 			/* Correct damage */
 			p /= 2;
-
-			if (o_ptr->to_d > 9)
-			{
-				p += o_ptr->to_d;
-			}
-			else
-			{
-				p += 9;
-			}
 
 			if (o_ptr->tval == TV_SHOT)
 			{
@@ -4813,9 +4795,18 @@ s32b object_power(const object_type *o_ptr)
 			{
 				p *= 5 / 2;
 			}
-			else if (o_ptr->tval == TV_SHOT)
+			else if (o_ptr->tval == TV_BOLT)
 			{
 				p *= 7 / 2;
+			}
+
+			if (o_ptr->to_d > 9)
+			{
+				p += o_ptr->to_d;
+			}
+			else
+			{
+				p += 9;
 			}
 
 			if (o_ptr->to_h > 9)
@@ -4831,7 +4822,7 @@ s32b object_power(const object_type *o_ptr)
 			/* We remove the ammo base damage to get 'true' power */
 			if (o_ptr->tval == TV_SHOT)
 			{
-				int q = (ABS(p) > k_ptr->dd * (k_ptr->ds + 1) / 2 + 15) * 2;
+				int q = (k_ptr->dd * (k_ptr->ds + 1) / 2) * 2 + 15;
 
 				if (ABS(p) > q)
 					p -= sign(p) * q;
@@ -4840,7 +4831,7 @@ s32b object_power(const object_type *o_ptr)
 			}
 			else if (o_ptr->tval == TV_ARROW)
 			{
-				int q = (ABS(p) > k_ptr->dd * (k_ptr->ds + 1) / 2 + 15) * 2;
+				int q = (k_ptr->dd * (k_ptr->ds + 1) / 2) * 5 / 2 + 15;
 
 				if (ABS(p) > q)
 					p -= sign(p) * q;
@@ -4849,7 +4840,7 @@ s32b object_power(const object_type *o_ptr)
 			}
 			else if (o_ptr->tval == TV_BOLT)
 			{
-				int q = (ABS(p) > k_ptr->dd * (k_ptr->ds + 1) / 2 + 15) * 2;
+				int q = (k_ptr->dd * (k_ptr->ds + 1) / 2) * 7 / 2 + 15;
 
 				if (ABS(p) > q)
 					p -= sign(p) * q;
@@ -4861,6 +4852,9 @@ s32b object_power(const object_type *o_ptr)
 			{
 				p++;
 			}
+
+			/* Bonus as we carry arrows in inventory and fire them */
+			if ((o_ptr->tval == TV_ARROW) && ((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)) p += 2;
 
 			/* Bonus as we carry ammo in inventory and fire them */
 			if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)) p += 2;
@@ -4911,7 +4905,6 @@ s32b object_power(const object_type *o_ptr)
 
 		case TV_BOOTS:
 		case TV_CLOAK:
-		case TV_SOFT_ARMOR:
 		{
 			/* Bonus as we may choose to use a swap armour */
 			if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)) p++;
@@ -4919,6 +4912,7 @@ s32b object_power(const object_type *o_ptr)
 			/* Fall through */
 		}
 
+		case TV_SOFT_ARMOR:
 		case TV_HELM:
 		case TV_CROWN:
 		case TV_SHIELD:

@@ -209,6 +209,12 @@ should compensate in other ways due to ego power distribution code.
 
 - Made ego-item names more interesting as opposed to *asterisked*.
 
+- Made swords one third less common, made hafted weapons half as common and made polearms
+between one half and one third as common.
+
+- Changed how some items are evaluated as 'good'. In particular, high-level spell books
+only count as good if you have not seen them previously.
+
 ### User Interface ###
 
 - Added 54x54.bmp and mask54.bmp containing David Gervais' isometric 54x54 tiles.
@@ -441,6 +447,8 @@ not support the particular ego value.
 
 - Fixed bug where magic items, particularly instruments, would not be sensed or
 noticed by detect magic (Reported by Mikolaj Konarski).
+
+- Fixed bug where normal arrows and bolts would be counted as good.
 
 ### Build / Platform ###
 
