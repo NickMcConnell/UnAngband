@@ -2427,6 +2427,7 @@ static void msg_flush(int x)
 {
 	byte a = TERM_L_BLUE;
 
+#if 0
 	int warning = (p_ptr->mhp * op_ptr->hitpoint_warn / 10);
 
 	/* Pause for response */
@@ -2436,9 +2437,12 @@ static void msg_flush(int x)
 	}
 	else
 	{
+#endif
 		/* Pause for response */
 		Term_putstr(x, 0, -1, a, "-more-");
+#if 0
 	}
+#endif
 
 	/* Get an acceptable keypress */
 	while (1)
@@ -2446,8 +2450,10 @@ static void msg_flush(int x)
 		key_event ke;
 		ke = anykey();
 
-		if ((p_ptr->chp < warning) && (ke.key != 'c')) { bell("Press c to continue."); continue; }
 		if ((ke.key == '\xff') && !(ke.mousebutton)) continue;
+#if 0
+		if ((p_ptr->chp < warning) && (ke.key != 'c')) { bell("Press c to continue."); continue; }
+#endif
 		if (quick_messages) break;
 		if ((ke.key == ESCAPE) || (ke.key == ' ')) break;
 		if ((ke.key == '\n') || (ke.key == '\r')) break;
