@@ -3754,8 +3754,10 @@ void describe_room(void)
 
 			if (strlen(text_always))
 			{
+				if (strlen(text_visible)) text_out(" ");
+
 				/* Message */
-				msg_format(text_always);
+				text_out(text_always);
 			}
 
 			(void)anykey();
