@@ -3081,10 +3081,12 @@ S:CURE_DISEASE:6
 
 N:326:Enchant Weapon To-Hit
 A:70:17:1
+A:99:44:1
 F:ENCHANT_TOH
 
 N:327:Enchant Weapon To-Dam
 A:70:18:1
+A:99:45:1
 F:ENCHANT_TOD
 
 N:328:*Enchant Armour*

@@ -1407,7 +1407,7 @@ static int inven_damage(inven_func typ, int perc)
 					   ((amt > 1) ? "were" : "was"));
 
 				/* Forget object */
-				if (o_ptr->number = amt) inven_drop_flags(o_ptr);
+				if (o_ptr->number == amt) inven_drop_flags(o_ptr);
 
 				/* Destroy "amt" items */
 				inven_item_increase(i, -amt);

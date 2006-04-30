@@ -3279,7 +3279,7 @@ void tell_allies_player_can(int y, int x, u32b flag)
 		if (!generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
 
 		/* Vocalise? */
-		if (!(n_ptr->csleep) && (n_ptr->mflag & (MFLAG_ACTV)) && (n_ptr->smart & (flag))) continue;
+		if (!(n_ptr->csleep) && /* (n_ptr->mflag & (MFLAG_ACTV)) && */ ((n_ptr->smart & (flag)) != 0)) continue;
 
 		/* Activate all other monsters and communicate to them */
 		n_ptr->csleep = 0;
@@ -3356,7 +3356,7 @@ void tell_allies_player_not(int y, int x, u32b flag)
 		if (!generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
 
 		/* Vocalise? */
-		if (!(n_ptr->csleep) && (n_ptr->mflag & (MFLAG_ACTV)) && !(n_ptr->smart & (flag))) continue;
+		if (!(n_ptr->csleep) && /* (n_ptr->mflag & (MFLAG_ACTV)) && */ ((n_ptr->smart & (flag)) == 0)) continue;
 
 		/* Activate all other monsters and communicate to them */
 		n_ptr->csleep = 0;
@@ -3431,7 +3431,7 @@ void tell_allies_mflag(int y, int x, u32b flag, cptr saying)
 		if (!generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
 
 		/* Vocalise? */
-		if (!(n_ptr->csleep) && (n_ptr->mflag & (MFLAG_ACTV)) && (n_ptr->mflag & (flag))) continue;
+		if (!(n_ptr->csleep) && /* (n_ptr->mflag & (MFLAG_ACTV)) && */ (n_ptr->mflag & (flag))) continue;
 
 		/* Activate all other monsters and communicate to them */
 		n_ptr->csleep = 0;

@@ -304,7 +304,11 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 				case TR4_HURT_ELEC:
 				case TR4_HURT_FIRE:
 				case TR4_HURT_COLD:
+				case TR4_UNDEAD:
 					(*f3) |= TR3_LIGHT_CURSE;
+					break;
+				case TR4_DEMON:
+					(*f4) |= TR4_EVIL;
 					break;
 			}
 		}
@@ -2671,7 +2675,7 @@ void list_object(const object_type *o_ptr, int mode)
 	}
 
 	/* Unknown extra powers (ego-item with random extras or artifact) */
-	if (!spoil && !random && object_known_p(o_ptr) && ((o_ptr->xtra1) || artifact_p(o_ptr)) )
+	if (!spoil && !random && object_known_p(o_ptr) && (((o_ptr->xtra1) && (o_ptr->name2)) || artifact_p(o_ptr)) )
 	{
 		bool hidden = TRUE;
 	
@@ -3223,6 +3227,9 @@ void object_guess_name(object_type *o_ptr)
 		/* Award points on matching powers: 3 for have, 1 for may */
 		for (ii=0;ii<32;ii++)
 		{
+			/* Hack -- don't match on curse flags */
+			if ((1L << ii) >= TR3_LIGHT_CURSE) continue;
+
 			if ((o_ptr->can_flags3 & (1L<<ii)) && (k_ptr->flags3 & (1L<<ii))) score +=3;
 			if ((o_ptr->may_flags3 & (1L<<ii)) && (k_ptr->flags3 & (1L<<ii))) score +=1;
 		}
@@ -3517,7 +3524,7 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 				 && (y_info[rune].flag[i] < 96)) (f3) &= ~(1L << (y_info[rune].flag[i]-64));
 
 				if ((y_info[rune].flag[i] >= 96)
-				 && (y_info[rune].flag[i] < 128)) (f3) &= ~(1L << (y_info[rune].flag[i]-96));
+				 && (y_info[rune].flag[i] < 128)) (f4) &= ~(1L << (y_info[rune].flag[i]-96));
 			}
 		}
 	}
@@ -4628,9 +4635,15 @@ s32b object_power(const object_type *o_ptr)
 			}
 
 			/* Slight bonus as we may choose to use a swap bow */
-			if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)) p++;
-			if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)) p++;
-			if (f2 & (TR2_IGNORE_THEFT)) p++;
+			/* Hack -- only if it has other flags though */
+			if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)
+				&& ( (f1 & ~(kf1)) || (f2 & ~(TR2_IGNORE_MASK) & ~(kf2)) || (f3 & ~(kf3)) || (f4 & ~(kf4)) ) ) p++;
+
+			if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)
+				&& ( (f1 & ~(kf1)) || (f2 & ~(TR2_IGNORE_MASK) & ~(kf2)) || (f3 & ~(kf3)) || (f4 & ~(kf4)) ) ) p++;
+
+			if (((f2 & (TR2_IGNORE_THEFT)) != 0) && ((kf2 & (TR2_IGNORE_THEFT)) == 0)
+				&& ( (f1 & ~(kf1)) || (f2 & ~(TR2_IGNORE_MASK) & ~(kf2)) || (f3 & ~(kf3)) || (f4 & ~(kf4)) ) ) p++;
 			break;
 		}
 
@@ -4717,6 +4730,9 @@ s32b object_power(const object_type *o_ptr)
 			else
 				p = 0;
 
+			/* Hack -- small swords can be used as secondary weapons */
+			if ((p > 0) && (o_ptr->tval == TV_SWORD) && (o_ptr->weight < 100)) p++;
+
 			if (o_ptr->ac != k_ptr->ac)
 			{
 				p += o_ptr->ac - k_ptr->ac;
@@ -4739,7 +4755,7 @@ s32b object_power(const object_type *o_ptr)
 
 			/* Bonuses as we may choose to use a swap weapon */
 			if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)) p++;
-			if (f2 & (TR2_IGNORE_THEFT)) p++;
+			if (((f2 & (TR2_IGNORE_THEFT)) != 0) && ((kf2 & (TR2_IGNORE_THEFT)) == 0)) p++;
 
 			/* Bonus if throwing weapon */
 			if (((f3 & (TR3_THROWING)) != 0) && ((kf3 & (TR3_THROWING)) == 0))
@@ -4867,7 +4883,7 @@ s32b object_power(const object_type *o_ptr)
 
 			/* Bonus as we carry ammo in inventory and fire them */
 			if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)) p += 2;
-			if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)) p++;
+			if (((f2 & (TR2_IGNORE_THEFT)) != 0) && ((kf2 & (TR2_IGNORE_THEFT)) == 0)) p++;
 
 			break;
 		}
@@ -4916,7 +4932,9 @@ s32b object_power(const object_type *o_ptr)
 		case TV_CLOAK:
 		{
 			/* Bonus as we may choose to use a swap armour */
-			if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)) p++;
+			/* Hack -- only if it has other flags though */
+			if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)
+				&& ( (f1 & ~(kf1)) || (f2 & ~(TR2_IGNORE_MASK) & ~(kf2)) || (f3 & ~(kf3)) || (f4 & ~(kf4)) ) ) p++;
 
 			/* Fall through */
 		}
@@ -4949,10 +4967,12 @@ s32b object_power(const object_type *o_ptr)
 			}
 
 			/* Big bonus as it protects against acid damage */
-			if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)) p+= 3;
+			if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)) p += 3;
 
-			/* Bonus as we may want to use swap armour */
-			if (f2 & (TR2_IGNORE_THEFT)) p++;
+			/* Bonus as we may choose to use a swap armour */
+			/* Hack -- only if it has other flags though */
+			if (((f2 & (TR2_IGNORE_THEFT)) != 0) && ((kf2 & (TR2_IGNORE_THEFT)) == 0)
+				&& ( (f1 & ~(kf1)) || (f2 & ~(TR2_IGNORE_MASK) & ~(kf2)) || (f3 & ~(kf3)) || (f4 & ~(kf4)) ) ) p++;
 
 			break;
 		}
@@ -4970,6 +4990,7 @@ s32b object_power(const object_type *o_ptr)
 			}
 
 			/* Bonuses as we may choose to use a swap light */
+			/* Hack -- only if it has other flags though */
 			if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)) p++;
 			if (f2 & (TR2_IGNORE_THEFT)) p++;
 
@@ -4980,8 +5001,10 @@ s32b object_power(const object_type *o_ptr)
 
 		case TV_RING:
 		{
-			/* Bonuses as we may choose to use a swap ring */
-			if (f2 & (TR2_IGNORE_ELEC)) p++;
+			/* Bonus as we may choose to use a swap armour */
+			/* Hack -- only if it has other flags though */
+			if (((f2 & (TR2_IGNORE_ELEC)) != 0) && ((kf2 & (TR2_IGNORE_ELEC)) == 0)
+				&& ( (f1 & ~(kf1)) || (f2 & ~(TR2_IGNORE_MASK) & ~(kf2)) || (f3 & ~(kf3)) || (f4 & ~(kf4)) ) ) p++;
 
 			/* Fall through */
 		}
@@ -4998,8 +5021,10 @@ s32b object_power(const object_type *o_ptr)
 				p += (o_ptr->to_d - 5) * 2;
 			}
 
-			/* Bonuses as we may choose to use a swap amulet / ring */
-			if (f2 & (TR2_IGNORE_THEFT)) p++;
+			/* Bonus as we may choose to use a swap armour */
+			/* Hack -- only if it has other flags though */
+			if (((f2 & (TR2_IGNORE_THEFT)) != 0) && ((kf2 & (TR2_IGNORE_THEFT)) == 0)
+				&& ( (f1 & ~(kf1)) || (f2 & ~(TR2_IGNORE_MASK) & ~(kf2)) || (f3 & ~(kf3)) || (f4 & ~(kf4)) ) ) p++;
 			break;
 		}
 
@@ -5098,9 +5123,26 @@ s32b object_power(const object_type *o_ptr)
 		case TV_BOW:
 		case TV_INSTRUMENT:
 		case TV_LITE:
-			if (o_ptr->weight >= 100)
+			/* These are breaks for 1-handed, 2-handed, max 4 blows for warriors,
+				and max 3 blows for others */
+			if (o_ptr->weight >= 150)
 			{
-				p -= o_ptr->weight / 100; 
+				p -= 1; 
+			}
+
+			if (o_ptr->weight >= 200)
+			{
+				p -= 1; 
+			}
+
+			if (o_ptr->weight > 240)
+			{
+				p -= 1; 
+			}
+
+			if (o_ptr->weight > 960)
+			{
+				p -= 1; 
 			}
 
 			p += sign(o_ptr->to_a) * (ABS(o_ptr->to_a) / 2);

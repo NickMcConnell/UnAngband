@@ -2824,6 +2824,59 @@ void do_cmd_feeling(void)
 	msg_print(do_cmd_feeling_text[feeling]);
 }
 
+
+/*
+ * Display the time and date
+ *
+ * Note that "time of day" is important to determine when quest
+ * monsters appear in surface locations.
+ */
+void do_cmd_timeofday()
+{
+	int day = bst(DAY, turn);
+
+	int hour = bst(HOUR, turn);
+
+	int min = bst(MINUTE, turn);
+
+	char buf2[20];
+
+	/* Format time of the day */
+	strnfmt(buf2, 20, get_day(bst(YEAR, turn) + START_YEAR));
+
+	/* Display current date in the Elvish calendar */
+	msg_format("This is %s of the %s year of the third age.",
+	           get_month_name(day, cheat_xtra, FALSE), buf2);
+
+	/* Message */
+	if (cheat_xtra)
+	{
+		msg_format("The time is %d:%02d %s.",
+	           (hour % 12 == 0) ? 12 : (hour % 12),
+	           min, (hour < 12) ? "AM" : "PM");
+	}
+	else
+	{
+		if (hour == SUNRISE - 1)
+			msg_print("The sun is rising.");
+		else if (hour < SUNRISE)
+			msg_format("The sun rises in %d hours.", SUNRISE - hour);
+		else if (hour == MIDDAY - 1)
+			msg_print("It is almost midday.");
+		else if (hour < MIDDAY)
+			msg_format("There are %d hours until midday.", MIDDAY - hour);
+		else if (hour == SUNSET - 1)
+			msg_print("The sun is setting.");
+		else if (hour < SUNSET)
+			msg_format("The sun sets in %d hours.", SUNSET - hour);
+		else if (hour == MIDNIGHT - 1)
+			msg_print("It is almost midnight.");
+		else if (hour < MIDNIGHT)
+			msg_format("There are %d hours until midnight.", MIDDAY - hour);
+	}
+}
+
+
 /*
  * Array of event pronouns strings - initial caps
  */

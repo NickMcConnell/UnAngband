@@ -65,10 +65,11 @@ O:34:2:2
 O:34:4:1
 O:34:3:1
 
-#Service of Enchant Weapon
+#Services of Enchant Weapon To-Hit and To-Dam
 
 N:3:Weapon Smith
-O:99:14:0
+O:99:44:0
+O:99:45:0
 O:23:4:1
 O:23:5:1
 O:23:7:1
@@ -413,13 +414,15 @@ O:70:34:1
 N:27:Bilbo's House
 
 N:28:House of Tom Bombadil
-O:80:35:4
-O:80:32:1
-O:80:33:2
-O:80:39:1
-O:80:38:1
-O:80:40:1
-O:80:41:1
+O:75:30:1
+O:75:31:1
+O:70:12:3
+O:75:29:2
+O:75:32:1
+O:75:34:1
+O:75:35:2
+O:75:36:2
+O:75:41:3
 
 N:29:Small Goods Store
 O:30:2:2

@@ -2813,9 +2813,6 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		/* Boulder / flask throwers get less shots */
 		if ((ammo_tval == TV_JUNK) || (ammo_tval == TV_FLASK) || (ammo_tval == TV_POTION)) o_ptr->number = (o_ptr->number + 1) / 2;
 
-		/* Mark the object as specific to the monster */
-		o_ptr->name3 = m_ptr->r_idx;
-
 		/* Monster carries the object */
 		ammo = monster_carry(m_idx, o_ptr);
 	}

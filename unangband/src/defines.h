@@ -304,7 +304,18 @@
 /*
  * Misc constants
  */
-#define TOWN_DAWN		10000	/* Number of turns from dawn to dawn XXX */
+#define TOWN_DAWN		11520			/* Number of turns per day */
+#define DAY                     11520                   /* Number of turns per day */
+#define YEAR                    (DAY * 365)             /* Number of turns per year */
+#define HOUR                    (DAY / 24)              /* Number of turns per hour */
+#define MINUTE                  (HOUR / 60)             /* Number of turns per minute */
+#define SUNRISE                 6			/* Sunrise */
+#define SUNSET                  18			/* Sunset */
+#define MIDDAY			12			/* Midday */
+#define MIDNIGHT		24			/* Midnight */
+#define START_YEAR              2890                    /* Bilbo's birthday year */
+#define START_DAY               (DAY * (42 + 127))      /* Bilbo's birthday */
+
 #define BREAK_GLYPH		550		/* Rune of protection resistance */
 #define BTH_PLUS_ADJ    3       /* Adjust BTH per plus-to-hit */
 #define MON_MULT_ADJ	8		/* High value slows multiplication */
@@ -2880,8 +2891,8 @@
 
 #define TR4_BRAND_DARK	0x00000001L	/* Weapon has dark brand */
 #define TR4_BRAND_LITE	0x00000002L	/* Weapon has lite brand */
-#define TR4_HURT_LITE	0x00000004L    /* Item makes wielder vulnerable to lite */
-#define TR4_HURT_WATER	0x00000008L    /* Item makes wielder vulnerable to water */
+#define TR4_HURT_LITE	0x00000004L     /* Item makes wielder vulnerable to lite */
+#define TR4_HURT_WATER	0x00000008L     /* Item makes wielder vulnerable to water */
 #define TR4_VAMP_HP   	0x00000010L     /* Weapon restores user hp when kills a creature with blood  */
 #define TR4_VAMP_MANA  	0x00000020L     /* Weapon restores user sp when kills a creature with mana  */
 #define TR4_IM_POIS   	0x00000040L     /* Immune to poison  */

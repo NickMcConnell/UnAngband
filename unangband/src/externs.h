@@ -86,8 +86,11 @@ extern const byte spell_desire_RF5[32][8];
 extern const byte spell_desire_RF6[32][8];
 extern const byte spell_desire_RF7[32][8];
 extern const element_type element[MAX_ELEMENTS];
-const start_item common_items[MAX_COMMON_ITEMS];
-const cptr vocalize[MAX_LANGUAGES];
+extern const start_item common_items[MAX_COMMON_ITEMS];
+extern const cptr vocalize[MAX_LANGUAGES];
+extern const int month_day[9];
+extern const cptr month_name[9];
+
 
 /* variable.c */
 extern cptr copyright;
@@ -447,6 +450,7 @@ extern void do_cmd_note(void);
 extern void do_cmd_version(void);
 extern void do_cmd_quest(void);
 extern void do_cmd_feeling(void);
+extern void do_cmd_timeofday(void);
 extern void do_cmd_room_desc(void);
 extern void do_cmd_load_screen(void);
 extern void do_cmd_save_screen(void);
@@ -883,6 +887,9 @@ extern int color_text_to_attr(cptr name);
 extern cptr attr_to_text(byte a);
 extern bool is_valid_pf(int y, int x);
 extern bool findpath(int y, int x);
+extern s32b bst(s32b what, s32b t);
+extern cptr get_month_name(int day, bool full, bool compact);
+extern cptr get_day(int day);
 
 
 #ifdef SUPPORT_GAMMA

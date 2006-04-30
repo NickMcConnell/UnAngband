@@ -401,9 +401,6 @@ static errr rd_item(object_type *o_ptr)
 	{
 		artifact_type *a_ptr;
 
-		/* Paranoia */
-		if (o_ptr->name1 >= 256) return (-1);
-
 		/* Obtain the artifact info */
 		a_ptr = &a_info[o_ptr->name1];
 

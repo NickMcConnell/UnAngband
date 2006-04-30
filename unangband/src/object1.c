@@ -813,11 +813,19 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			break;
 		}
 
-		/* Hack -- Gold/Gems */
+		/* Hack -- Gold */
 		case TV_GOLD:
 		{
 			strcpy(buf, basenm);
 			return;
+		}
+
+		/* Gems */
+		case TV_GEMS:
+		{
+			modstr = basenm;
+			basenm = "& #~";
+			break;
 		}
 
 		case TV_HOLD:

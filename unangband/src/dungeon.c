@@ -52,7 +52,7 @@ int value_check_aux1(object_type *o_ptr)
 	if (broken_p(o_ptr)) return (INSCRIP_BROKEN);
 
 	/* Magic item */
-	if (o_ptr->xtra1) return (INSCRIP_EXCELLENT);
+	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_EXCELLENT);
 
 	/* Great "armor" bonus */
 	if (o_ptr->to_a > 8) return (INSCRIP_GREAT);
@@ -2150,6 +2150,13 @@ static void process_command(void)
 		case KTRL('F'):
 		{
 			do_cmd_feeling();
+			break;
+		}
+
+		/* Repeat time of day */
+		case KTRL('T'):
+		{
+			do_cmd_timeofday();
 			break;
 		}
 

@@ -1418,7 +1418,7 @@ Y:20:1
 N:176:Identify
 G:?:w
 I:70:12:0
-W:10:0:5:500
+W:10:0:5:150
 A:10/1:15/1:20/1:30/1
 Y:17:1
 
@@ -5756,3 +5756,15 @@ W:14:0:5:2
 A:14/1:24/1:34/1
 P:0:1d5:0:0:0
 F:SHOW_MODS | THROWING
+
+# Enchant Weapon services
+
+N:796:Enchant Weapon To-Hit
+G:?:v
+I:99:44:0
+W:15:0:5:150
+
+N:797:Enchant Weapon To-Dam
+G:?:v
+I:99:45:0
+W:15:0:5:150

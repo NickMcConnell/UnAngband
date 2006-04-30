@@ -391,16 +391,22 @@ Read a scroll (r)
 
 Apply rune (y) or Engrave a rune (^G)
         Apply a rune from a runestone to an object. Applying runes to
-        objects can have various effects, from transforming an object to a 
-        type more closely associated with that rune, to enchanting the object
-        with a magical effect or even an ego power. More runes applied to an
-        object will have additional, and often cumulative effects, up to 4 or 5
-        runes on most objects. Current applying a rune to another rune acts like
-        other objects: in a future version this will cause a magical effect.
-        If an object cannot have a rune applied to it, it is likely to be an
-        artifact or powerful ego item of some kind. Note that not all runes
-        have a beneficial effect, but applying more than one rune will have
-        additional effects.
+        objects can have various effects, depending on what type of object it
+	is.  Usually applying 1 or 2 of the same kind of rune to a weapon or
+        armour will have a minor beneficial effect, and 3, 4 or 5 runes will
+        transform the object into a powerful ego-item.  Note that some
+        combinations of runes and objects may result in a cursed object, as
+        opposed to a useful one.
+        Applying a rune to a potion, scroll, wand, staff, rod, ring or
+        amulet will transform it into another kind of object. Some
+        transformations significantly upgrade the power of the object,
+        particularly if you apply multiple runes to an object, or if you
+        apply a rune to an object that can be made from the kind of rune you
+        are applying.
+        Experiment with runes on objects that you don't particularly need
+        until you master the useful combinations.  If an object cannot have a
+        rune applied to it, it is likely to be an magic item, artifact or
+        powerful ego item of some kind.
 
 Assemble a part (Y) or operate a part (^O)
         Assemble parts of an object together. Some objects you may find in the

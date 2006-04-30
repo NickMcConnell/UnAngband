@@ -7052,15 +7052,6 @@ errr eval_r_power(header *head)
 			 */
 			if (!(r_ptr->rarity)) continue;
 
-/*
- * MegaHack -- calculating the entire monster list causes non-windows systems to crash horribly.
- */
-#ifndef WINDOWS
-			/*
-			 * While we fix the monster list, only count up to Morgoth
-			 */
-			if (i > 547) continue;
-#endif
 			/*
 			 * Hack -- provide adjustment factor to prevent overflow
 			 */

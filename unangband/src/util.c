@@ -2427,14 +2427,26 @@ static void msg_flush(int x)
 {
 	byte a = TERM_L_BLUE;
 
+	int warning = (p_ptr->mhp * op_ptr->hitpoint_warn / 10);
+
 	/* Pause for response */
-	Term_putstr(x, 0, -1, a, "-more-");
+	if (p_ptr->chp < warning)
+	{
+		Term_putstr(x, 0, -1, a, "-c to continue-");
+	}
+	else
+	{
+		/* Pause for response */
+		Term_putstr(x, 0, -1, a, "-more-");
+	}
 
 	/* Get an acceptable keypress */
 	while (1)
 	{
 		key_event ke;
 		ke = anykey();
+
+		if ((p_ptr->chp < warning) && (ke.key != 'c')) { bell("Press c to continue."); continue; }
 		if ((ke.key == '\xff') && !(ke.mousebutton)) continue;
 		if (quick_messages) break;
 		if ((ke.key == ESCAPE) || (ke.key == ' ')) break;
@@ -4515,3 +4527,90 @@ bool findpath(int y, int x)
 	return (TRUE);
 }
 
+
+/*
+ * Break scalar time from T.o.M.E
+ */
+s32b bst(s32b what, s32b t)
+{
+	s32b turns = t + (10 * TOWN_DAWN) + SUNRISE;
+
+	switch (what)
+	{
+	case MINUTE:
+		return ((turns / 10 / MINUTE) % 60);
+	case HOUR:
+		return (turns / 10 / (HOUR) % 24);
+	case DAY:
+		return (turns / 10 / (DAY) % 365);
+	case YEAR:
+		return (turns / 10 / (YEAR));
+	default:
+		return (0);
+	}
+}
+
+
+/*
+ * Get day name function from T.o.M.E
+ */
+cptr get_day(int day)
+{
+	static char buf[20];
+	cptr p = "th";
+
+	if ((day / 10) == 1) ;
+	else if ((day % 10) == 1) p = "st";
+	else if ((day % 10) == 2) p = "nd";
+	else if ((day % 10) == 3) p = "rd";
+
+	sprintf(buf, "%d%s", day, p);
+	return (buf);
+}
+
+
+/*
+ * Get month name function from T.o.M.E
+ */
+cptr get_month_name(int day, bool full, bool compact)
+{
+	int i = 8;
+	static char buf[40];
+
+	/* Find the period name */
+	while ((i > 0) && (day < month_day[i]))
+	{
+		i--;
+	}
+
+	switch (i)
+	{
+		/* Yestare/Mettare */
+	case 0:
+	case 8:
+		{
+			char buf2[20];
+
+			sprintf(buf2, get_day(day + 1));
+			if (full) sprintf(buf, "%s (%s day)", month_name[i], buf2);
+			else sprintf(buf, "%s", month_name[i]);
+			break;
+		}
+		/* 'Normal' months + Enderi */
+	default:
+		{
+			char buf2[20];
+			char buf3[20];
+
+			sprintf(buf2, get_day(day + 1 - month_day[i]));
+			sprintf(buf3, get_day(day + 1));
+
+			if (full) sprintf(buf, "%s day of %s (%s day)", buf2, month_name[i], buf3);
+			else if (compact) sprintf(buf, "%s day of %s", buf2, month_name[i]);
+			else sprintf(buf, "%s %s", buf2, month_name[i]);
+			break;
+		}
+	}
+
+	return (buf);
+}

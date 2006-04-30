@@ -1,4 +1,5 @@
-Unangband 0.6.0 "Where's the Tequila?" (The 'Did Tara Reid steal all the drinks?' Release)
+Unangband 0.6.0 "Where's the Tequila? Did Tara Reid steal all the drinks?" (The Ari
+Gold Release)
 
 ### Game Play ###
 
@@ -335,6 +336,8 @@ down on key presses and make it easier to read.
 
 - Spoilers for ego item power and slay effectiveness.
 
+- Change the more prompt and key press acknowledgement when you get below your warning
+hit points.
 
 ### Bug fixes ###
 
@@ -457,6 +460,9 @@ noticed by detect magic (Reported by Mikolaj Konarski).
 - Fixed further bugs with attempting to track when an item does or does not have
 an ability (Reported by Mikolaj Konarski).
 
+- No longer mark monster ammunition as being of that race as it meant you couldn't
+recall the item (Reported by Mikolaj Konarski)
+
 ### Build / Platform ###
 
 - Added quest.txt in lib\edit which is used to defined fixed texts.
@@ -486,8 +492,7 @@ considering calling it the uniquely asked questions instead.
 
 - Fixed some compiler warnings.
 
-- Implemented a horrible hack to work around a buffer overflow bug that was
-causing non-windows systems to crash on start up.
+
 
 Unangband 0.5.5: "New Years Resolution"
 

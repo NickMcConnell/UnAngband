@@ -2740,7 +2740,7 @@ const cptr magic_name[4][32] =
 		"of Ill Winds",
 		"(Animal)",
 		"(Evil)",
-		"(Undead)",
+		"(Ancient)",
 		"(Demonic)",
 		"(Orcish)",
 		"(Troll)",
@@ -2748,7 +2748,7 @@ const cptr magic_name[4][32] =
 		"(Dragon)",
 		"of Man",
 		"(Dwarven)",
-		"(Elvish)",
+		"(Elven)",
 		"of Poison Vulnerability",
 		"of Acid Vulnerability",
 		"of Lightning Vulnerability",
@@ -3249,4 +3249,47 @@ const cptr vocalize[MAX_LANGUAGES] =
 	"says",
 	"hisses",
 	"drools"	/* 'z' */
+};
+
+
+
+/*
+ * Months from T.o.M.E
+ */
+const int month_day[9] =
+{
+	0,        /* 1 day */
+
+	1,        /* 54 days */
+	55,       /* 72 days */
+	127,      /* 54 days */
+
+	181,      /* 3 days */
+
+	184,      /* 54 days */
+	238,      /* 72 days */
+	310,      /* 54 days */
+
+	364,      /* 1 day */
+};
+
+
+/*
+ * Month names from T.o.M.E
+ */
+const cptr month_name[9] =
+{
+	"Yestare",
+
+	"Tuile",
+	"Laire",
+	"Yavie",
+
+	"Enderi",
+
+	"Quelle",
+	"Hrive",
+	"Coire",
+
+	"Mettare",
 };

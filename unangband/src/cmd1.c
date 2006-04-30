@@ -1147,7 +1147,7 @@ void py_pickup(int pickup)
 			/* Message */
 			if (o_ptr->tval == TV_GOLD) msg_format("You have found %ld gold pieces worth of %s.",
 			   			value, o_name);
-			else msg_format("You have found %s worth %ld.", o_name, value);
+			else msg_format("You have found %s worth %ld gold pieces.", o_name, value);
 
 			/* Collect the gold */
 			p_ptr->au += value;
