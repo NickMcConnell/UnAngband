@@ -2215,10 +2215,10 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 {
 	int boost_power, old_boost_power;
 	int sign = (power >= 0 ? 1 : -1);
-	bool tryagain;
+	bool tryagain = TRUE;
 	bool supercharge = FALSE;
 	int tries = 0;
-	int choice;
+	int choice = 0;
 
 	/* Paranoia */
 	if (!power) return;
@@ -2242,10 +2242,10 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 	{
 		old_boost_power = boost_power;
 
+		if ((tryagain) || !(supercharge)) choice = rand_int(12);
+
 		tryagain = FALSE;
 		tries++;
-
-		if (!(tryagain) && !(supercharge)) choice = rand_int(12);
 
 		switch(choice)
 		{
