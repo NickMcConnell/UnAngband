@@ -724,11 +724,16 @@ Check knowledge (~)
         or ego item type. In a future version, this will be expanded to
         match the auto-squelch functions of other variants.
 
-Display current quests (^Q)
+Display current quests (^Q) or display current quests ($)
         This command displays all the quests you character currently knows
         about, including their rewards and penalties for failure. If you
         can start a quest by performing a set of actions, that information
         will be displayed here.
+
+Display time of day (^T) or display time of day (')
+        This command displays the current date and how many hours until either
+        sunrise, midday, sunset or midnight.  This is useful for locating
+        guardian monsters which only appear on the surface at night.
 
 Interact with the system (!)
         Allow the user to interact with the underlying visual system.

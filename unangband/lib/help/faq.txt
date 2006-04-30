@@ -244,6 +244,7 @@ I will allocate enough space for all the stores in the next version of
 Unangband (0.6.1). This will also allow me to potentially remove other
 hacks in the campaign mode.
 
+
 [Q2.9]   Why do forests and other surface locations keep hiding and
 showing the map at random?
 
@@ -275,7 +276,8 @@ all if you knew what the terrain underneath was. This has been changed to
 help 'clarify' when this graphical update occurs.
 
 
-[Q2.10]   Why can I not get back to Hobbiton after I travel to Bree?
+[Q2.10]   Why can I not get back to Hobbiton after I travel to Bree or
+Buckland?
 
 This is a deliberate design decision. You can stay in Hobbiton and get a
 very easy first dungeon, and a useful guardian to kill at the end of it.
@@ -292,9 +294,25 @@ fatal encounters with Ring Wraiths.
 
 It is possible to cross-over from the Book of Red March quest to the
 Lord of the Rings quest by defeating the guardian at the end of the
-Barrow downs. So this is not a one-time deal. But you won't be getting
+Barrow downs. So this is not a one-time deal.  But you won't be getting
 back to Hobbiton for a little while yet otherwise.
 
 As of this version of Unangband, there is now a home in Bree for you to
 pick up your stuff that you may have left behind in Hobbiton.
+
+
+[Q2.11]   Where is the dungeon guardian for (any wilderness dungeon)?
+
+Guardians for surface and towns on the surface will only appear at night.
+To determine how long until sunset, you can use the new time of day command.
+This is (^T) or (') in the roguelike keyset.
+
+
+[Q2.12]   The quest screen says I have to talk to Farmer Maggot. How do I
+do this?
+
+Quests are not enabled yet.  You can still use the quest command, but its
+only for testing purposes.  I expect to have quests implemented about
+version 0.7.0.
+
 

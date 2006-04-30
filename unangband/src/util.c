@@ -4529,11 +4529,11 @@ bool findpath(int y, int x)
 
 
 /*
- * Break scalar time from T.o.M.E
+ * Break scalar time -- from T.o.M.E
  */
 s32b bst(s32b what, s32b t)
 {
-	s32b turns = t + (10 * TOWN_DAWN) + SUNRISE;
+	s32b turns = t + (10 * TOWN_DAWN) + SUNRISE * HOUR * 10;
 
 	switch (what)
 	{
@@ -4552,7 +4552,7 @@ s32b bst(s32b what, s32b t)
 
 
 /*
- * Get day name function from T.o.M.E
+ * Get day name function -- from T.o.M.E
  */
 cptr get_day(int day)
 {
@@ -4570,7 +4570,7 @@ cptr get_day(int day)
 
 
 /*
- * Get month name function from T.o.M.E
+ * Get month name function -- from T.o.M.E
  */
 cptr get_month_name(int day, bool full, bool compact)
 {

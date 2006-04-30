@@ -30,11 +30,16 @@ Assemble a part (Y) or operate a part (^O)
         It may be necessary to assemble objects you'd rather not otherwise do,
         in order that you complete a quest.
 
-Display current quests (^Q)
+Display current quests (^Q) or display current quests ($)
         This command displays all the quests you character currently knows
         about, including their rewards and penalties for failure. If you
         can start a quest by performing a set of actions, that information
         will be displayed here.
+
+Display time of day (^T) or display time of day (')
+        This command displays the current date and how many hours until either
+        sunrise, midday, sunset or midnight.  This is useful for locating
+        guardian monsters which only appear on the surface at night.
 
 
 ==== Changed Commands ====
