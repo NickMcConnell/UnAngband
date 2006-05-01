@@ -9976,7 +9976,7 @@ D:Yum!  It looks quite tasty.
 
 N:659:White slime
 G:,:w
-I:120:2d4:4:1:0
+I:115:2d4:4:1:0
 W:13:2:0:4
 B:TOUCH:HURT:1d4
 F:RAND_50 | RAND_25 |
@@ -9987,7 +9987,7 @@ D:Ugh! It quickly creeps along the dungeon floor.
 
 N:660:Green slime
 G:,:g
-I:120:3d4:4:1:0
+I:115:3d4:4:1:0
 W:14:2:0:5
 B:TOUCH:POISON:1d4
 F:RAND_50 | RAND_25 |
@@ -9998,7 +9998,7 @@ D:Ugh! It quickly creeps along the dungeon floor.
 
 N:661:Yellow slime
 G:,:y
-I:120:4d4:4:1:0
+I:115:4d4:4:1:0
 W:15:3:0:6
 B:TOUCH:EAT_FOOD:1d4
 F:RAND_50 | RAND_25 |
@@ -10009,7 +10009,7 @@ D:Ugh! It quickly creeps along the dungeon floor.
 
 N:662:Silver slime
 G:,:W
-I:120:5d4:4:1:0
+I:115:5d4:4:1:0
 W:16:3:0:7
 B:TOUCH:EAT_LITE:1d4
 F:RAND_50 | RAND_25 |
@@ -10020,7 +10020,7 @@ D:Ugh! It quickly creeps along the dungeon floor.
 
 N:663:Clear slime
 G:,:w
-I:120:6d4:4:1:0
+I:115:6d4:4:1:0
 W:17:3:0:8
 B:TOUCH:HURT:1d4
 B:TOUCH:HURT:1d4
@@ -10032,7 +10032,7 @@ D:Ugh! It quickly creeps along the dungeon floor.
 
 N:664:Purple slime
 G:,:v
-I:120:7d4:4:1:0
+I:115:7d4:4:1:0
 W:28:2:0:9
 B:TOUCH:LOSE_CON:1d4
 B:TOUCH:LOSE_CON:1d4
@@ -10044,7 +10044,7 @@ D:Ugh! It quickly creeps along the dungeon floor.
 
 N:665:Pink slime
 G:,:w
-I:120:6d4:4:1:0
+I:115:6d4:4:1:0
 W:23:2:0:10
 B:TOUCH:LOSE_STR:1d4
 B:TOUCH:LOSE_STR:1d4
@@ -10056,7 +10056,7 @@ D:Ugh! It quickly creeps along the dungeon floor.
 
 N:666:Blue slime
 G:,:b
-I:120:10d4:4:1:0
+I:115:10d4:4:1:0
 W:30:3:0:12
 B:TOUCH:UN_BONUS:1d4
 B:TOUCH:UN_BONUS:1d4
@@ -10068,7 +10068,7 @@ D:Ugh! It quickly creeps along the dungeon floor.
 
 N:667:Black slime
 G:,:D
-I:120:12d4:4:1:0
+I:115:12d4:4:1:0
 W:35:4:0:15
 B:TOUCH:LOSE_ALL:1d4
 F:RAND_50 | RAND_25 |
