@@ -1,3 +1,18 @@
+### Game Play ###
+
+### User Interface ###
+
+- Created a nice graphics mode on windows that attempts to automagically fit
+the tiled graphics and fonts together on the screen without forcing the tiled
+graphics to scale.
+
+### Bug fixes ###
+
+### Build / Platform ###
+
+
+
+
 Unangband 0.6.0 "Where's the Tequila? Did Tara Reid steal all the drinks?" (The Ari
 Gold Release)
 

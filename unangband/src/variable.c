@@ -67,6 +67,7 @@ bool arg_sound;			 /* Command arg -- Request special sounds */
 bool arg_mouse;			 /* Command arg -- Request mouse */
 bool arg_trackmouse;			 /* Command arg -- Request constant mouse tracking */
 bool arg_graphics;		      /* Command arg -- Request graphics mode */
+bool arg_graphics_nice;		      /* Command arg -- Request 'nice' graphics mode */
 bool arg_force_original;	/* Command arg -- Request original keyset */
 bool arg_force_roguelike;       /* Command arg -- Request roguelike keyset */
 
@@ -108,6 +109,7 @@ bool use_sound;		 /* The "sound" mode is enabled */
 bool use_mouse;		 /* The "mouse" mode is enabled */
 bool use_trackmouse;	 /* The "trackmouse" mode is enabled */
 bool use_graphics;	      /* The "graphics" mode is enabled */
+bool use_graphics_nice;	      /* The 'nice' "graphics" mode is enabled */
 bool use_trptile = FALSE;
 bool use_dbltile = FALSE;
 bool use_bigtile = FALSE;
