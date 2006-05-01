@@ -8,6 +8,8 @@ graphics to scale.
 
 ### Bug fixes ###
 
+- Fix weapon branding.
+
 ### Build / Platform ###
 
 
