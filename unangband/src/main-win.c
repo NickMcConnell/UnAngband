@@ -1114,7 +1114,7 @@ static void save_prefs(void)
 	WritePrivateProfileString("Angband", "Graphics", buf, ini_file);
 
 	/* Save the "use_graphics_nice" flag */
-	strcpy(buf, use_graphics_nice ? "1" : "0");
+	strcpy(buf, arg_graphics_nice ? "1" : "0");
 	WritePrivateProfileString("Angband", "Graphics_Nice", buf, ini_file);
 
 	/* Save the "use_trptile" flag */
@@ -1211,7 +1211,7 @@ static void load_prefs(void)
 	arg_graphics = GetPrivateProfileInt("Angband", "Graphics", GRAPHICS_NONE, ini_file);
 
 	/* Extract the "arg_graphics" flag */
-	use_graphics = GetPrivateProfileInt("Angband", "Graphics_Nice", TRUE, ini_file);
+	arg_graphics_nice = GetPrivateProfileInt("Angband", "Graphics_Nice", TRUE, ini_file);
 
 	/* Extract the "use_trptile" flag */
 	use_trptile = GetPrivateProfileInt("Angband", "Trptile", FALSE, ini_file);
@@ -3476,7 +3476,7 @@ static void setup_menus(void)
 	              (arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO ? MF_CHECKED : MF_UNCHECKED));
 
 	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_NICE,
-	              (arg_trackmouse ? MF_CHECKED : MF_UNCHECKED));
+	              (arg_graphics_nice ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(hm, IDM_OPTIONS_TRPTILE,
 	              (use_trptile ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(hm, IDM_OPTIONS_DBLTILE,
@@ -4271,8 +4271,8 @@ static void process_menus(WORD wCmd)
 				break;
 			}
 
-			/* Toggle "use_trptile" */
-			use_graphics_nice = !use_graphics_nice;
+			/* Toggle "arg_graphics_nice" */
+			arg_graphics_nice = !arg_graphics_nice;
 
 			/* React to changes */
 			Term_xtra_win_react();
