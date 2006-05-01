@@ -10,6 +10,8 @@ graphics to scale.
 
 - Fix weapon branding.
 
+- Mushrooms should now drop spores of their type now.
+
 ### Build / Platform ###
 
 

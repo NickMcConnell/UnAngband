@@ -2807,6 +2807,9 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		/* Give the monster some shots */
 		o_ptr->number = (byte)rand_range(1, r_ptr->level);
 
+		/* Flavour spores */
+		if (o_ptr->tval == TV_EGG) o_ptr->name3 = m_ptr->r_idx;
+
 		/* Archers get more shots */
 		if (r_ptr->flags2 & (RF2_ARCHER)) o_ptr->number += (byte)rand_range(1, r_ptr->level);
 
