@@ -97,6 +97,16 @@ TODO: Update to latest X11 and GCU Angband files to fix compiler warnings.
 
 TODO: Add rope, rope bridges, grapples, elven rope, chains.
 
+TODO: Allow smart monsters to hide themselves in darkness, especially when fleeing,
+and alter terrain between them and the player to either permit los / lof / movement
+or prevent it, depending on whether they are fleeing or not.
+
+TODO: Work on isometric graphics. See http://www.gamedev.net/reference/articles/article742.asp
+and http://www.gamedev.net/reference/articles/article744.asp
+
+TODO: Add materials system.
+
+
 Release v0.6.5
 ==============
 
@@ -104,6 +114,13 @@ TODO: Improve dungeon generation algorithms.
 
 TODO: Implement room descriptions version 2.
 
+TODO: Add different corridor types.
+
+TODO: Add level theming.
+
+TODO: Add weird terrain types.
+
+TODO: Strike finds nearby terrain preferentially.
 
 Release v0.7.0
 ==============
@@ -1082,4 +1099,97 @@ Note that rope is particularly useful on cloud levels.
 
 Note that 'open' levels cannot have rope bridges built on them, because they have no ceiling.
 This includes outside, towers and cloud levels (e.g. forces player to use the grappel).
+
+
+TODO: Add a materials system.
+
+TV_MATERIAL
+
+SV_MATERIAL_WOOD – a bundle of #; staffs
+
+SV_MATERIAL_METAL – a chunk of #; wands
+
+SV_MATERIAL_STONE – a large #; rings
+
+Some items are generated with {empty socket}. This can have an SV_MATERIAL_STONE applied
+to it. The resulting item also gets the abilities of the ring applied to it that is
+associated with the stone.
+
+Mushrooms can be applied to 1 sword / polearm or up to 5 arrows/bolts. Potions can be
+applied to 1 sword/polearm or up to 20 arrows/bolts. These apply the mushroom or potion
+blow effects when swung / fired.
+
+Ego-items. Each ego item is associated with a wand sval. The ego item is ‘flavoured’ with
+the flavour of the wand. (e.g. Red Armour of Elvenkind).
+
+Item forging: this is a way of turning junk, bodies or materials into useful items. Forging
+needs a source of fire.
+
+You ‘add items’ to a forging session, and it comes up with a list of possible outcomes, from
+which you pick one item.
+
+Bodies and body parts can be turned into rations, potions, ink, skeletons or parts of bodies;
+skeletons into multiple bones.
+
+Skulls can be turned into empty bottles or potions (with body parts or other potions).
+
+Bones can be turned into batons, clubs or arrows.
+
+Branches can be turned into staffs, torches, bundles of wood, clubs, batons, arrows.
+
+Skin can be turned into scrolls (with feathers and ink), empty flasks, hafted weapons (with
+metal), soft armour, leather, cloaks.
+
+Wood can be turned into staffs, pole arms (with metal), arrows.
+
+Metal can be turned into wands, swords, hard armour and used to create higher level soft
+armour, ego-items, bolts, shot (but not pebbles).
+
+Stones can assist the creation of other items.
+
+Potions can be turned into other potions, ink.
+
+Extra powers can be based on the flavour and/or flags of associated with the objects
+creating an item (staff power for wood, wand power for metal, ring power for stone).
+
+Rods, amulets can be forged from a variety of materials, depending on flavour.
+
+TV_ESSENCE, SV_ESSENCE_attack effect (e.g. GF_ ).
+
+Essences can be used to add flags to item.
+
+
+TODO: Add different corridor types.
+
+Normal – as per existing
+
+Giant – width 2 corridor, occurs with giant/dwarf levels
+
+Crypt – width 2 corridor, with pillar filled corridors
+
+Pillared – width 3 corridor with pillars down the centre
+
+Natural – corridor changes direction 90 degrees every step…
+
+River – join with river instead of corridor
+
+Vent – join with vent instead of corridor
+
+Filled – corridor filled with terrain
+
+TODO: Add level theming.
+
+Lair – level based around a unique (unique hides in big pool
+
+Vault – level based around a vault
+
+
+TODO: Add weird terrain types.
+ 
+Chaos/ Nexus / Nether/Gravity terrain – hits to feature: Chaos/Nexus
+/Gravity/ Nether terrain, then adjacent to chaos feature… timed to expand…
+
+Gravity terrain only expands if hurt_huge…
+
+TODO: Strike finds nearby vulnerable terrain preferably…
 
