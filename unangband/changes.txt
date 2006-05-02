@@ -12,6 +12,9 @@ graphics to scale.
 
 - Mushrooms should now drop spores of their type now.
 
+- Fixed duplicate and erroneous entries in spell.txt and style.txt (Reported by
+Mikolaj Konarski).
+
 ### Build / Platform ###
 
 
@@ -175,7 +178,7 @@ away in enough circumstances already and there is more than enough need for it t
 present to store additional useful equipment.
 
 - Added some additional stock such as darts and daggers to Hobbiton to make start
-easier for some classes (Suggested by mikon).
+easier for some classes (Suggested by Mikolaj Konarski).
 
 - Added a charisma dependent check for every time a store stocks an item, the shop
 keeper will attempt to replace any item out of stock. This makes stores much more
