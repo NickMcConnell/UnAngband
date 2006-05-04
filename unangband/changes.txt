@@ -3,6 +3,8 @@
 - Improved metric for when monsters should cast probe spell (Reported by
 Bandobras).
 
+- Changed object value calculation to be based on object power.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

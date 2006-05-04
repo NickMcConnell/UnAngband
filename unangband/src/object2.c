@@ -1107,21 +1107,13 @@ static s32b object_value_real(const object_type *o_ptr)
 {
 	s32b value;
 
-	u32b f1, f2, f3, f4;
-
 	object_kind *k_ptr = &k_info[o_ptr->k_idx];
-
 
 	/* Hack -- "worthless" items */
 	if (!k_ptr->cost) return (0L);
 
 	/* Base cost */
 	value = k_ptr->cost;
-
-
-	/* Extract some flags */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
-
 
 	/* Artifact */
 	if (o_ptr->name1)
@@ -1133,6 +1125,11 @@ static s32b object_value_real(const object_type *o_ptr)
 
 		/* Hack -- Use the artifact cost instead */
 		value = a_ptr->cost;
+
+		/* No negative value */
+		if (value < 0) value = 0;
+
+		return (value);
 	}
 
 	/* Ego-Item */
@@ -1147,176 +1144,15 @@ static s32b object_value_real(const object_type *o_ptr)
 		value += e_ptr->cost;
 	}
 
-
-	/* Analyze pval bonus */
-	switch (o_ptr->tval)
+	/* Now evaluate object power */
+	if ((o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_ARROW) || (o_ptr->tval == TV_BOLT))
 	{
-		case TV_SHOT:
-		case TV_ARROW:
-		case TV_BOLT:
-		case TV_BOW:
-		case TV_DIGGING:
-		case TV_HAFTED:
-		case TV_POLEARM:
-		case TV_SWORD:
-		case TV_INSTRUMENT:
-		case TV_BOOTS:
-		case TV_GLOVES:
-		case TV_HELM:
-		case TV_CROWN:
-		case TV_SHIELD:
-		case TV_CLOAK:
-		case TV_SOFT_ARMOR:
-		case TV_HARD_ARMOR:
-		case TV_DRAG_ARMOR:
-		case TV_LITE:
-		case TV_AMULET:
-		case TV_RING:
-		{
-			/* Hack -- Negative "pval" is always bad */
-			if (o_ptr->pval < 0) return (0L);
-
-			/* No pval */
-			if (!o_ptr->pval) break;
-
-			/* Give credit for stat bonuses */
-			if (f1 & (TR1_STR)) value += (o_ptr->pval * 200L);
-			if (f1 & (TR1_INT)) value += (o_ptr->pval * 200L);
-			if (f1 & (TR1_WIS)) value += (o_ptr->pval * 200L);
-			if (f1 & (TR1_DEX)) value += (o_ptr->pval * 200L);
-			if (f1 & (TR1_CON)) value += (o_ptr->pval * 200L);
-			if (f1 & (TR1_CHR)) value += (o_ptr->pval * 200L);
-
-			/* Give credit for stealth and searching */
-			if (f1 & (TR1_STEALTH)) value += (o_ptr->pval * 100L);
-			if (f1 & (TR1_SEARCH)) value += (o_ptr->pval * 100L);
-
-			/* Give credit for infra-vision and tunneling */
-			if (f1 & (TR1_INFRA)) value += (o_ptr->pval * 50L);
-			if (f1 & (TR1_TUNNEL)) value += (o_ptr->pval * 50L);
-
-			/* Give credit for extra attacks */
-			if (f1 & (TR1_BLOWS)) value += (o_ptr->pval * 2000L);
-
-			/* Give credit for speed bonus */
-			if (f1 & (TR1_SPEED)) value += (o_ptr->pval * 30000L);
-
-			break;
-		}
+		value += object_power(o_ptr) * 5L;
 	}
-
-
-	/* Analyze the item */
-	switch (o_ptr->tval)
+	else
 	{
-		/* Wands/Staffs */
-		case TV_WAND:
-		{
-			/* Pay extra for charges */
-			value += ((value / 20) * o_ptr->pval);
-
-			/* Done */
-			break;
-		}
-
-		/* Rings/Amulets */
-		case TV_RING:
-		case TV_AMULET:
-		{
-			/* Hack -- negative bonuses are bad */
-			if (o_ptr->to_a < 0) return (0L);
-			if (o_ptr->to_h < 0) return (0L);
-			if (o_ptr->to_d < 0) return (0L);
-
-			/* Give credit for bonuses */
-			value += ((o_ptr->to_h + o_ptr->to_d + o_ptr->to_a) * 100L);
-
-			/* Done */
-			break;
-		}
-
-		/* Armor */
-		case TV_BOOTS:
-		case TV_GLOVES:
-		case TV_CLOAK:
-		case TV_CROWN:
-		case TV_HELM:
-		case TV_SHIELD:
-		case TV_SOFT_ARMOR:
-		case TV_HARD_ARMOR:
-		case TV_DRAG_ARMOR:
-		{
-			/* Give credit for hit bonus */
-			value += ((o_ptr->to_h - k_ptr->to_h) * 100L);
-
-			/* Give credit for damage bonus */
-			value += ((o_ptr->to_d - k_ptr->to_d) * 100L);
-
-			/* Give credit for armor bonus */
-			value += (o_ptr->to_a * 100L);
-
-			/* Done */
-			break;
-		}
-
-		/* Staffs */
-		case TV_STAFF:
-		{
-			/* Pay extra for charges */
-			value += ((value / 20) * o_ptr->pval);
-
-		/* Fall through */
-		}
-		/* Bows/Weapons */
-		case TV_BOW:
-		case TV_DIGGING:
-		case TV_HAFTED:
-		case TV_SWORD:
-		case TV_POLEARM:
-		{
-			/* Hack -- negative hit/damage bonuses */
-			if (o_ptr->to_h + o_ptr->to_d < 0) return (0L);
-
-			/* Factor in the bonuses */
-			value += ((o_ptr->to_h + o_ptr->to_d + o_ptr->to_a) * 100L);
-
-			/* Hack -- Factor in extra damage dice */
-			if ((o_ptr->dd > k_ptr->dd) && (o_ptr->ds == k_ptr->ds))
-			{
-				value += (o_ptr->dd - k_ptr->dd) * o_ptr->ds * 100L;
-			}
-
-			/* Hack -- Factor in extra damage sides */
-			if ((o_ptr->ds > k_ptr->ds) && (o_ptr->dd == k_ptr->dd))
-			{
-				value += (o_ptr->ds - k_ptr->ds) * o_ptr->dd * 100L;
-			}
-
-			/* Done */
-			break;
-		}
-
-		/* Ammo */
-		case TV_SHOT:
-		case TV_ARROW:
-		case TV_BOLT:
-		{
-			/* Hack -- negative hit/damage bonuses */
-			if (o_ptr->to_h + o_ptr->to_d < 0) return (0L);
-
-			/* Factor in the bonuses */
-			value += ((o_ptr->to_h + o_ptr->to_d) * 5L);
-
-			/* Hack -- Factor in extra damage dice */
-			if ((o_ptr->dd > k_ptr->dd) && (o_ptr->ds == k_ptr->ds))
-			{
-				value += (o_ptr->dd - k_ptr->dd) * o_ptr->ds * 5L;
-			}
-
-			/* Done */
-			break;
-		}
-	}
+		value += object_power(o_ptr) * 100;
+	}		
 
 	/* No negative value */
 	if (value < 0) value = 0;
