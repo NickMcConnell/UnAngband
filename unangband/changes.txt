@@ -1,5 +1,8 @@
 ### Game Play ###
 
+- Improved metric for when monsters should cast probe spell (Reported by
+Bandobras).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -14,6 +17,9 @@ graphics to scale.
 
 - Fixed duplicate and erroneous entries in spell.txt and style.txt (Reported by
 Mikolaj Konarski).
+
+- Fixed bug where monsters with shots were being generated with no ammunition
+ (Reported by Bandobras).
 
 ### Build / Platform ###
 

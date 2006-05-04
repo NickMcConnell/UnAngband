@@ -705,9 +705,10 @@ static int find_resist(u32b smart, int effect)
 		/* Spells that probe the player */
 		case GF_PROBE:
 		{
-			if (smart) return(50);
+			/* Hack -- do we still have abilities to learn */
+			if (((player_smart_flags(p_ptr->cur_flags1, p_ptr->cur_flags2, p_ptr->cur_flags3, p_ptr->cur_flags4)) & ~(smart)) != 0) return (0);
 
-			return(0);
+			return(100);
 		}
 
 		/* Anything else */

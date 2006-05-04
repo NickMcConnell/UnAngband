@@ -2748,9 +2748,9 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 			case RBM_SHOT:
 			{
 				ammo_tval = TV_SHOT;
-				if (d_dice < 2)  ammo_sval = SV_AMMO_NORMAL;
-				else if (d_dice < 8) ammo_sval = SV_AMMO_STEEL;
-				else if (d_dice < 18) ammo_sval = SV_AMMO_SPECIAL;
+				if (d_dice < 2)  ammo_sval = SV_AMMO_LIGHT;
+				else if (d_dice < 8) ammo_sval = SV_AMMO_NORMAL;
+				else if (d_dice < 18) ammo_sval = SV_AMMO_STEEL;
 				else ammo_sval = SV_AMMO_HEAVY;
 				break;
 			}

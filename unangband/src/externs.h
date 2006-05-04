@@ -720,6 +720,7 @@ extern bool spell_okay(int spell, bool known);
 extern bool save_player(void);
 
 /* spells1.c */
+extern u32b player_smart_flags(u32b f1,u32b f2,u32b f3, u32b f4);
 extern void player_can_flags(int who, u32b f1,u32b f2,u32b f3, u32b f4);
 extern void player_not_flags(int who, u32b f1,u32b f2,u32b f3, u32b f4);
 extern void update_smart_cheat(int who);
