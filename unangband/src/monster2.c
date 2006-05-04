@@ -1683,7 +1683,7 @@ s16b monster_carry(int m_idx, object_type *j_ptr)
 		object_copy(o_ptr, j_ptr);
 
 		/* Forget mark */
-		o_ptr->marked = FALSE;
+		o_ptr->ident &= ~(IDENT_MARKED);
 
 		/* Forget location */
 		o_ptr->iy = o_ptr->ix = 0;
@@ -4195,7 +4195,7 @@ bool animate_object(int item)
 	else
 	{
 		/* Message if object known */
-		if (o_ptr->marked) msg_format("The %s %s %s", o_name,
+		if (o_ptr->ident & (IDENT_MARKED)) msg_format("The %s %s %s", o_name,
 		   ((o_ptr->stackc == 1) ? "has" :
 		   ((!(o_ptr->stackc) && (o_ptr->number == 1)) ?
 		   "has" : "have")), p);

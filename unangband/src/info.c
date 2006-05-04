@@ -2573,7 +2573,7 @@ void list_object(const object_type *o_ptr, int mode)
 			text_out_c(TERM_RED, "It is heavily cursed.  ");
 			anything = TRUE;
 		}
-		else if (object_known_p(o_ptr) || (o_ptr->discount == INSCRIP_CURSED))
+		else if (object_known_p(o_ptr) || (o_ptr->feeling == INSCRIP_CURSED))
 		{
 			text_out_c(TERM_RED, "It is cursed.  ");
 			anything = TRUE;
@@ -3049,9 +3049,10 @@ void object_guess_name(object_type *o_ptr)
 
 	/* Check the ego item list */
 	/* Hack -- exclude artifacts */
-	if (!(o_ptr->discount == INSCRIP_SPECIAL) &&
-	       !(o_ptr->discount == INSCRIP_TERRIBLE) &&
-	       !(o_ptr->discount == INSCRIP_UNBREAKABLE))
+	if (!(o_ptr->feeling == INSCRIP_SPECIAL) &&
+	       !(o_ptr->feeling == INSCRIP_ARTIFACT) &&
+	       !(o_ptr->feeling == INSCRIP_TERRIBLE) &&
+	       !(o_ptr->feeling == INSCRIP_UNBREAKABLE))
 	for (i = 1; i < z_info->e_max; i++)
 	{
 		ego_item_type *e_ptr = &e_info[i];
@@ -3176,9 +3177,10 @@ void object_guess_name(object_type *o_ptr)
 
 	/* Check the normal item list */
 	/* Hack -- exclude artifacts */
-	if (!(o_ptr->discount == INSCRIP_SPECIAL) &&
-	       !(o_ptr->discount == INSCRIP_TERRIBLE) &&
-	       !(o_ptr->discount == INSCRIP_UNBREAKABLE))
+	if (!(o_ptr->feeling == INSCRIP_SPECIAL) &&
+	       !(o_ptr->feeling == INSCRIP_ARTIFACT) &&
+	       !(o_ptr->feeling == INSCRIP_TERRIBLE) &&
+	       !(o_ptr->feeling == INSCRIP_UNBREAKABLE))
 	for (i = 1; i < z_info->k_max; i++)
 	{
 		object_kind *k_ptr = &k_info[i];
@@ -3260,9 +3262,11 @@ void object_guess_name(object_type *o_ptr)
 
 	/* Check the artifact list */
 	/* Hack -- exclude ego items */
-	if (!(o_ptr->discount == INSCRIP_EXCELLENT) &&
-	       !(o_ptr->discount == INSCRIP_SUPERB) &&
-	       !(o_ptr->discount == INSCRIP_WORTHLESS))
+	if (!(o_ptr->feeling == INSCRIP_EXCELLENT) &&
+	       !(o_ptr->feeling == INSCRIP_SUPERB) &&
+	       !(o_ptr->feeling == INSCRIP_HIGH_EGO_ITEM) &&
+	       !(o_ptr->feeling == INSCRIP_EGO_ITEM) &&
+	       !(o_ptr->feeling == INSCRIP_WORTHLESS))
 		for (i = 1; i < z_info->a_max; i++)
 	{
 		artifact_type *a_ptr = &a_info[i];
@@ -3553,7 +3557,6 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 		}
 	}
 
-
 	/* Artifact */
 	if (o_ptr->name1)
 	{
@@ -3611,6 +3614,7 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 		n_ptr->may_flags3 &= ~(n_ptr->can_flags3);
 		n_ptr->may_flags4 &= ~(n_ptr->can_flags4);
 	}
+
 }
 
 /*
@@ -3977,7 +3981,7 @@ void object_usage(int slot)
 		p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
 
 	}
-	else if ((!o_ptr->discount) && (!o_ptr->ident & (IDENT_SENSE)) && (o_ptr->usage > 5) && (o_ptr->usage % 5 == 0)
+	else if ((!o_ptr->feeling) && (!o_ptr->ident & (IDENT_SENSE)) && (o_ptr->usage > 5) && (o_ptr->usage % 5 == 0)
 		&& (rand_int(100) < 30))
 	{	
 		/* Valid "tval" codes */
@@ -4012,7 +4016,7 @@ void object_usage(int slot)
 					msg_format("You feel you know more about the %s you are %s.",o_name,describe_use(slot));					
 
 					/* Sense the object */
-					o_ptr->discount = feel;
+					o_ptr->feeling = feel;
 
 					/* The object has been "sensed" */
 					o_ptr->ident |= (IDENT_SENSE);

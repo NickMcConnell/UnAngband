@@ -1489,7 +1489,7 @@ static int minus_ac(void)
 	o_ptr->ident &= ~(IDENT_SENSE);	
 
 	/* Remove special inscription, if any */
-	if (o_ptr->discount >= INSCRIP_NULL) o_ptr->discount = 0;
+	o_ptr->feeling = 0;
 
 	/* Calculate bonuses */
 	p_ptr->update |= (PU_BONUS);
@@ -2303,7 +2303,7 @@ bool apply_disenchant(int mode)
 	o_ptr->ident &= ~(IDENT_SENSE);	
 
 	/* Remove special inscription, if any */
-	if (o_ptr->discount >= INSCRIP_NULL) o_ptr->discount = 0;
+	o_ptr->feeling = 0;
 
 	/* Recalculate bonuses */
 	p_ptr->update |= (PU_BONUS);
@@ -3593,7 +3593,7 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			/* Effect "observed" */
-			if (o_ptr->marked)
+			if (o_ptr->ident & (IDENT_MARKED))
 			{
 				obvious = TRUE;
 				object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
@@ -3628,10 +3628,10 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 						if (!object_known_p(o_ptr))
 						{
 							/* Sense the object */
-							o_ptr->discount = INSCRIP_UNBREAKABLE;
+							o_ptr->feeling = INSCRIP_UNBREAKABLE;
 
 							/* Hack -- for holy orb */
-							if (typ == GF_HOLY_ORB) o_ptr->discount = INSCRIP_TERRIBLE;
+							if (typ == GF_HOLY_ORB) o_ptr->feeling = INSCRIP_TERRIBLE;
 
 							/* The object has been "sensed" */
 							o_ptr->ident |= (IDENT_SENSE);
@@ -3657,7 +3657,7 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 			else
 			{
 				/* Describe if needed */
-				if (o_ptr->marked && note_kill)
+				if (((o_ptr->ident & (IDENT_MARKED)) != 0) && note_kill)
 				{
 					msg_format("The %s%s", o_name, note_kill);
 				}
@@ -3689,7 +3689,7 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 			object_copy(i_ptr, o_ptr);
 
 			/* Effect "observed" */
-			if (o_ptr->marked)
+			if (o_ptr->ident & (IDENT_MARKED))
 			{
 				obvious = TRUE;
 			}

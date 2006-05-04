@@ -289,11 +289,8 @@ static void uncurse_object(object_type *o_ptr)
 	/* Uncurse it */
 	o_ptr->ident &= ~(IDENT_CURSED);
 
-	/* Remove special inscription, if any */
-	if (o_ptr->discount >= INSCRIP_NULL) o_ptr->discount = 0;
-
-	/* Take note if allowed */
-	if (o_ptr->discount == 0) o_ptr->discount = INSCRIP_UNCURSED;
+	/* Take note */
+	o_ptr->feeling = INSCRIP_UNCURSED;
 
 	/* The object has been "sensed" */
 	o_ptr->ident |= (IDENT_SENSE);
@@ -834,7 +831,7 @@ bool lose_all_info(void)
 		if (o_ptr->ident & (IDENT_MENTAL)) continue;
 
 		/* Remove special inscription, if any */
-		if (o_ptr->discount >= INSCRIP_NULL) o_ptr->discount = 0;
+		o_ptr->feeling = 0;
 
 		/* Hack -- Clear the "felt" flag */
 		o_ptr->ident &= ~(IDENT_SENSE);
@@ -1127,7 +1124,7 @@ bool detect_objects_gold(void)
 		if (o_ptr->tval >= TV_GOLD)
 		{
 			/* Hack -- memorize it */
-			o_ptr->marked = TRUE;
+			o_ptr->ident |= (IDENT_MARKED);
 
 			/* Redraw */
 			lite_spot(y, x);
@@ -1180,7 +1177,7 @@ bool detect_objects_normal(void)
 		if (o_ptr->tval < TV_GOLD)
 		{
 			/* Hack -- memorize it */
-			if (!auto_pickup_ignore(o_ptr)) o_ptr->marked = TRUE;
+			if (!auto_pickup_ignore(o_ptr)) o_ptr->ident |= (IDENT_MARKED);
 
 			/* Hack -- have seen object */
 			if (!(k_info[o_ptr->k_idx].flavor)) k_info[o_ptr->k_idx].aware = TRUE;
@@ -1206,16 +1203,27 @@ bool detect_objects_normal(void)
 	return (detect);
 }
 
+
 /*
  * Return a "feeling" (or NULL) about an item.  Method 3 (Magic).
  */
 int value_check_aux3(const object_type *o_ptr)
 {
+	/* If sensed cursed, have no more value to add */
+	if ((o_ptr->feeling == INSCRIP_CURSED) || (o_ptr->feeling == INSCRIP_TERRIBLE)
+		|| (o_ptr->feeling == INSCRIP_WORTHLESS)) return (0);
+
 	/* Artifacts */
 	if (artifact_p(o_ptr))
 	{
 		/* Cursed/Broken */
-		if (cursed_p(o_ptr) || broken_p(o_ptr)) return (0);
+		if (cursed_p(o_ptr) || broken_p(o_ptr))
+		{
+			if ((o_ptr->feeling == INSCRIP_UNBREAKABLE)
+				|| (o_ptr->feeling == INSCRIP_ARTIFACT)) return (INSCRIP_TERRIBLE);
+
+			return (INSCRIP_NONMAGICAL);
+		}
 
 		/* Normal */
 		return (INSCRIP_SPECIAL);
@@ -1225,7 +1233,7 @@ int value_check_aux3(const object_type *o_ptr)
 	if (ego_item_p(o_ptr))
 	{
 		/* Cursed/Broken */
-		if (cursed_p(o_ptr) || broken_p(o_ptr)) return (0);
+		if (cursed_p(o_ptr) || broken_p(o_ptr))	return (INSCRIP_NONMAGICAL);
 
 		/* Superb */
 		if (o_ptr->xtra1) return (INSCRIP_SUPERB);
@@ -1234,11 +1242,13 @@ int value_check_aux3(const object_type *o_ptr)
 		return (INSCRIP_EXCELLENT);
 	}
 
-	/* Cursed items */
-	if (cursed_p(o_ptr)) return (0);
+	/* Cursed or broken items */
+	if ((cursed_p(o_ptr)) || (broken_p(o_ptr)))
+	{
+		if (o_ptr->feeling == INSCRIP_POWERFUL) return (INSCRIP_CURSED);
 
-	/* Broken items */
-	if (broken_p(o_ptr)) return (0);
+		return (INSCRIP_NONMAGICAL);
+	}
 
 	/* Magic item */
 	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_EXCELLENT);
@@ -1267,28 +1277,40 @@ int value_check_aux3(const object_type *o_ptr)
 	/* Good "weapon" bonus */
 	if (o_ptr->to_h + o_ptr->to_d > 0) return (INSCRIP_GOOD);
 
+	/* Have already got nonmagical sensed */
+	if (o_ptr->feeling == INSCRIP_UNCURSED) return(INSCRIP_AVERAGE);
+
 	/* Default to nothing */
-	return (0);
+	return (INSCRIP_NONMAGICAL);
 }
 
 
 /*
  * Return a "feeling" (or NULL) about an item.  Method 4 (Cursed).
  *
- * Note we return INSCRIP_NONMAGICAL for items that we do not mark
+ * Note we return INSCRIP_UNCURSED for items that we do not mark
  * this way, but allow such items to be sensed again, elsewhere.
  * Hack -- we 'overload' this semantically with removed curses.
  */
 int value_check_aux4(const object_type *o_ptr)
 {
+	/* If sensed magical, have no more value to add */
+	if ((o_ptr->feeling == INSCRIP_GOOD) || (o_ptr->feeling == INSCRIP_VERY_GOOD)
+		|| (o_ptr->feeling == INSCRIP_GREAT) || (o_ptr->feeling == INSCRIP_EXCELLENT)
+		|| (o_ptr->feeling == INSCRIP_SUPERB) || (o_ptr->feeling == INSCRIP_SPECIAL)) return (0);
+
 	/* Artifacts */
 	if (artifact_p(o_ptr))
 	{
 		/* Cursed/Broken */
 		if (cursed_p(o_ptr) || broken_p(o_ptr)) return (INSCRIP_TERRIBLE);
 
+		/* Known to be artifact strength */
+		if ((o_ptr->feeling == INSCRIP_UNBREAKABLE)
+			|| (o_ptr->feeling == INSCRIP_ARTIFACT)) return (INSCRIP_SPECIAL);
+
 		/* Normal */
-		return (0);
+		return (INSCRIP_UNCURSED);
 	}
 
 	/* Ego-Items */
@@ -1297,11 +1319,14 @@ int value_check_aux4(const object_type *o_ptr)
 		/* Cursed/Broken */
 		if (cursed_p(o_ptr) || broken_p(o_ptr)) return (INSCRIP_WORTHLESS);
 
-		/* Superb */
-		if (o_ptr->xtra1) return (0);
+		/* Known to be high ego-item strength */
+		if ((o_ptr->feeling == INSCRIP_HIGH_EGO_ITEM)) return (INSCRIP_SUPERB);
+
+		/* Known to be high ego-item strength */
+		if ((o_ptr->feeling == INSCRIP_EGO_ITEM)) return (INSCRIP_EXCELLENT);
 
 		/* Normal */
-		return (0);
+		return (INSCRIP_UNCURSED);
 	}
 
 	/* Cursed items */
@@ -1310,12 +1335,72 @@ int value_check_aux4(const object_type *o_ptr)
 	/* Broken items */
 	/* if (broken_p(o_ptr)) return (INSCRIP_BROKEN); */
 
-	/* Default to nothing */
-	return (0);
+	/* Known to be powerful */
+	if ((o_ptr->feeling == INSCRIP_POWERFUL)) return (INSCRIP_MAGICAL);
+
+	/* Default to uncursed */
+	return (INSCRIP_UNCURSED);
 }
 
 
+/*
+ * Return a "feeling" (or NULL) about an item.  Method 5 (Power).
+ */
+int value_check_aux5(const object_type *o_ptr)
+{
+	/* Artifacts */
+	if (artifact_p(o_ptr))
+	{
+		if (o_ptr->feeling == INSCRIP_UNCURSED) return (INSCRIP_SPECIAL);
+		else if (o_ptr->feeling == INSCRIP_NONMAGICAL) return (INSCRIP_TERRIBLE);
 
+		/* Normal */
+		return (INSCRIP_ARTIFACT);
+	}
+
+	/* Ego-Items */
+	if (ego_item_p(o_ptr))
+	{
+		if (o_ptr->feeling == INSCRIP_NONMAGICAL) return (INSCRIP_WORTHLESS);
+		else if ((o_ptr->feeling == INSCRIP_UNCURSED) && (o_ptr->xtra1)) return (INSCRIP_EXCELLENT);
+		else if (o_ptr->feeling == INSCRIP_UNCURSED) return (INSCRIP_EXCELLENT);
+
+		/* Superb */
+		if (o_ptr->xtra1) return (INSCRIP_HIGH_EGO_ITEM);
+
+		/* Normal */
+		return (INSCRIP_EGO_ITEM);
+	}
+
+	/* Cursed items */
+	if (cursed_p(o_ptr))
+	{
+		if (o_ptr->feeling == INSCRIP_NONMAGICAL) return (INSCRIP_CURSED);
+
+		return (INSCRIP_POWERFUL);
+	}
+
+	/* Broken items */
+	/*if (broken_p(o_ptr)) return (INSCRIP_NONMAGICAL);*/
+
+	/* Magical item */
+	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_EGO_ITEM);
+
+	/* Good "armor" bonus */
+	if (o_ptr->to_a > 0)
+	{
+		return (INSCRIP_POWERFUL);
+	}
+
+	/* Good "weapon" bonus */
+	if (o_ptr->to_h + o_ptr->to_d > 0)
+	{
+		return (INSCRIP_POWERFUL);
+	}
+
+	/* Default to nothing */
+	return (INSCRIP_AVERAGE);
+}
 
 
 /*
@@ -1335,13 +1420,10 @@ bool detect_objects_magic(void)
 
 	bool detect = FALSE;
 
-
 	/* Scan all objects */
 	for (i = 1; i < o_max; i++)
 	{
 		int feel = 0;
-
-		bool okay = FALSE;
 
 		object_type *o_ptr = &o_list[i];
 
@@ -1363,14 +1445,15 @@ bool detect_objects_magic(void)
 
 		/* Artifacts, misc magic items, or enchanted wearables */
 		if (!(cursed_p(o_ptr)) && !(broken_p(o_ptr)) && (artifact_p(o_ptr) || ego_item_p(o_ptr) ||
+		    (o_ptr->xtra1) ||
 		    (tv == TV_AMULET) || (tv == TV_RING) ||
 		    (tv == TV_STAFF) || (tv == TV_WAND) || (tv == TV_ROD) ||
 		    (tv == TV_SCROLL) || (tv == TV_POTION) ||
 		    (tv == TV_MAGIC_BOOK) || (tv == TV_PRAYER_BOOK) ||
-		    ((o_ptr->to_a > 0) || (o_ptr->to_h + o_ptr->to_d > 0))))
+		    (o_ptr->to_a > 0) || (o_ptr->to_h + o_ptr->to_d > 0)))
 		{
 			/* Memorize the item */
-			if (!auto_pickup_ignore(o_ptr)) o_ptr->marked = TRUE;
+			if (!auto_pickup_ignore(o_ptr)) o_ptr->ident |= (IDENT_MARKED);
 
 			/* Hack -- have seen object */
 			if (!(k_info[o_ptr->k_idx].flavor)) k_info[o_ptr->k_idx].aware = TRUE;
@@ -1385,124 +1468,40 @@ bool detect_objects_magic(void)
 			detect = TRUE;
 		}
 
-		/* Valid "tval" codes */
-		switch (o_ptr->tval)
-		{
-			case TV_SHOT:
-			case TV_ARROW:
-			case TV_BOLT:
-			case TV_BOW:
-			case TV_DIGGING:
-			case TV_HAFTED:
-			case TV_POLEARM:
-			case TV_SWORD:
-			case TV_BOOTS:
-			case TV_GLOVES:
-			case TV_HELM:
-			case TV_CROWN:
-			case TV_SHIELD:
-			case TV_CLOAK:
-			case TV_SOFT_ARMOR:
-			case TV_HARD_ARMOR:
-			case TV_DRAG_ARMOR:
-			case TV_STAFF:
-			case TV_INSTRUMENT:
-			{
-				okay = TRUE;
-				break;
-			}
-		}
-
-		/* Skip objects */
-		if (!okay) continue;
-
-		/* It already has a discount */
-		if ((o_ptr->discount > 0)&&(o_ptr->discount<=INSCRIP_NULL)) continue;
-#if 0
-		/* It has already been sensed, do not sense it again */
-		if (o_ptr->ident & (IDENT_SENSE)) continue;
-#endif
-		/* It is fully known, no information needed */
-		if (object_known_p(o_ptr)) continue;
-
 		/* Get the inscription */
-		feel = value_check_aux3(o_ptr);
+		feel = sense_magic(o_ptr, 3);
 
-		/* Sense something? */
+		/* Sense something */
 		if (!feel) continue;
 
 		/* Sense the object */
-		o_ptr->discount = feel;
+		o_ptr->feeling = feel;
 
 		/* The object has been "sensed" */
 		o_ptr->ident |= (IDENT_SENSE);
-
 	}
-
 
 	/* Sense inventory */
 	for (i = 0; i < INVEN_TOTAL+1; i++)
 	{
 		int feel = 0;
 
-		bool okay = FALSE;
-
 		object_type *o_ptr = &inventory[i];
 
-		/* Skip empty slots */
-		if (!o_ptr->k_idx) continue;
-
-		/* Valid "tval" codes */
-		switch (o_ptr->tval)
-		{
-			case TV_SHOT:
-			case TV_ARROW:
-			case TV_BOLT:
-			case TV_BOW:
-			case TV_DIGGING:
-			case TV_HAFTED:
-			case TV_POLEARM:
-			case TV_SWORD:
-			case TV_BOOTS:
-			case TV_GLOVES:
-			case TV_HELM:
-			case TV_CROWN:
-			case TV_SHIELD:
-			case TV_CLOAK:
-			case TV_SOFT_ARMOR:
-			case TV_HARD_ARMOR:
-			case TV_DRAG_ARMOR:
-			case TV_STAFF:
-			case TV_INSTRUMENT:
-			{
-				okay = TRUE;
-				break;
-			}
-		}
-
-		/* Skip objects */
-		if (!okay) continue;
-
-		/* It already has a discount or special inscription */
-		if ((o_ptr->discount > 0)&&(o_ptr->discount<=INSCRIP_NULL)) continue;
-#if 0
-		/* It has already been sensed, do not sense it again */
-		if (o_ptr->ident & (IDENT_SENSE)) continue;
-#endif
-		/* It is fully known, no information needed */
-		if (object_known_p(o_ptr)) continue;
-
 		/* Get the inscription */
-		feel = value_check_aux3(o_ptr);
+		feel = sense_magic(o_ptr, 3);
 
 		/* Sense something */
 		if (!feel) continue;
 
-		/* Detected */
-		detect = TRUE;
+		/* Any different */
+		if (o_ptr->feeling == feel) continue;
+
+		/* Detect */
+		if (feel != INSCRIP_NONMAGICAL) detect = TRUE;
 
 		/* Sense the object */
-		o_ptr->discount = feel;
+		o_ptr->feeling = feel;
 
 		/* The object has been "sensed" */
 		o_ptr->ident |= (IDENT_SENSE);
@@ -1547,8 +1546,6 @@ bool detect_objects_cursed(void)
 	{
 		int feel;
 
-		bool okay = FALSE;
-
 		object_type *o_ptr = &o_list[i];
 
 		/* Skip dead objects */
@@ -1565,10 +1562,10 @@ bool detect_objects_cursed(void)
 		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
 
 		/* Cursed items */
-		if (cursed_p(o_ptr) /* || broken_p(o_ptr) */)
+		if (cursed_p(o_ptr) || broken_p(o_ptr))
 		{
 			/* Memorize the item */
-			if (!auto_pickup_ignore(o_ptr)) o_ptr->marked = TRUE;
+			if (!auto_pickup_ignore(o_ptr)) o_ptr->ident |= (IDENT_MARKED);
 
 			/* Hack -- have seen object */
 			if (!(k_info[o_ptr->k_idx].flavor)) k_info[o_ptr->k_idx].aware = TRUE;
@@ -1583,29 +1580,16 @@ bool detect_objects_cursed(void)
 			detect = TRUE;
 		}
 
-		/* Skip objects */
-		if (!okay) continue;
-
-		/* It already has a discount or special inscription */
-		if (o_ptr->discount > 0) continue;
-
-		/* It has already been sensed, do not sense it again */
-		if (o_ptr->ident & (IDENT_SENSE)) continue;
-
-		/* It is fully known, no information needed */
-		if (object_known_p(o_ptr)) continue;
-
 		/* Get the inscription */
-		feel = value_check_aux4(o_ptr);
+		feel = sense_magic(o_ptr, 4);
 
-		/* Sense something? */
+		/* Sense something */
 		if (!feel) continue;
 
 		/* Sense the object */
-		o_ptr->discount = feel;
+		o_ptr->feeling = feel;
 
 		/* The object has been "sensed" */
-		/* Hack -- allow non-cursed items to be re-sensed */
 		o_ptr->ident |= (IDENT_SENSE);
 	}
 
@@ -1614,66 +1598,22 @@ bool detect_objects_cursed(void)
 	{
 		int feel;
 
-		bool okay = FALSE;
-
 		object_type *o_ptr = &inventory[i];
 
-		/* Skip empty slots */
-		if (!o_ptr->k_idx) continue;
-
-		/* Valid "tval" codes */
-		switch (o_ptr->tval)
-		{
-			case TV_SHOT:
-			case TV_ARROW:
-			case TV_BOLT:
-			case TV_BOW:
-			case TV_DIGGING:
-			case TV_HAFTED:
-			case TV_POLEARM:
-			case TV_SWORD:
-			case TV_BOOTS:
-			case TV_GLOVES:
-			case TV_HELM:
-			case TV_CROWN:
-			case TV_SHIELD:
-			case TV_CLOAK:
-			case TV_SOFT_ARMOR:
-			case TV_HARD_ARMOR:
-			case TV_DRAG_ARMOR:
-			case TV_AMULET:
-			case TV_RING:
-			case TV_STAFF:
-			case TV_INSTRUMENT:
-			{
-				okay = TRUE;
-				break;
-			}
-		}
-
-		/* Skip objects */
-		if (!okay) continue;
-
-		/* It already has a discount or special inscription */
-		if (o_ptr->discount > 0) continue;
-
-		/* It has already been sensed, do not sense it again */
-		if (o_ptr->ident & (IDENT_SENSE)) continue;
-
-		/* It is fully known, no information needed */
-		if (object_known_p(o_ptr)) continue;
-
 		/* Get the inscription */
-		feel = value_check_aux4(o_ptr);
+		feel = sense_magic(o_ptr, 4);
 
 		/* Sense something? */
 		if (!feel) continue;
 
-		/* Detected */
-		detect = TRUE;
+		/* Any different */
+		if (o_ptr->feeling == feel) continue;
+
+		/* Detect */
+		if (feel != INSCRIP_UNCURSED) detect = TRUE;
 
 		/* Sense the object */
-		o_ptr->discount = feel;
+		o_ptr->feeling = feel;
 
 		/* The object has been "sensed" */
 		o_ptr->ident |= (IDENT_SENSE);
@@ -1689,6 +1629,126 @@ bool detect_objects_cursed(void)
 	if (detect)
 	{
 		msg_print("You sense the presence of cursed objects!");
+	}
+
+	/* Return result */
+	return (detect);
+}
+
+
+
+/*
+ * Detect all "powerful" objects on the current panel.
+ *
+ * This will light up all spaces with "magic" items, including artifacts,
+ * ego-items, potions, scrolls, books, rods, wands, staves, amulets, rings,
+ * and "enchanted" items of any time.
+ *
+ * Now also senses all powerful objects in the inventory.
+ */
+bool detect_objects_power(void)
+{
+	int i, y, x, tv;
+
+	bool detect = FALSE;
+
+	/* Scan all objects */
+	for (i = 1; i < o_max; i++)
+	{
+		int feel = 0;
+
+		object_type *o_ptr = &o_list[i];
+
+		/* Skip dead objects */
+		if (!o_ptr->k_idx) continue;
+
+		/* Skip held objects */
+		if (o_ptr->held_m_idx) continue;
+
+		/* Location */
+		y = o_ptr->iy;
+		x = o_ptr->ix;
+
+		/* Only detect nearby objects */
+		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
+
+		/* Examine the tval */
+		tv = o_ptr->tval;
+
+		/* Artifacts, misc magic items, or enchanted wearables */
+		if (artifact_p(o_ptr) || ego_item_p(o_ptr) ||
+		    (o_ptr->xtra1) ||
+		    (tv == TV_AMULET) || (tv == TV_RING) ||
+		    (tv == TV_STAFF) || (tv == TV_WAND) || (tv == TV_ROD) ||
+		    (tv == TV_SCROLL) || (tv == TV_POTION) ||
+		    (tv == TV_MAGIC_BOOK) || (tv == TV_PRAYER_BOOK) ||
+		    (o_ptr->to_a > 0) || (o_ptr->to_h + o_ptr->to_d > 0))
+		{
+			/* Memorize the item */
+			if (!auto_pickup_ignore(o_ptr)) o_ptr->ident |= (IDENT_MARKED);
+
+			/* Hack -- have seen object */
+			if (!(k_info[o_ptr->k_idx].flavor)) k_info[o_ptr->k_idx].aware = TRUE;
+
+			/* XXX XXX - Mark monster objects as "seen" */
+			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights)) l_list[o_ptr->name3].sights++;
+
+			/* Redraw */
+			lite_spot(y, x);
+
+			/* Detect */
+			detect = TRUE;
+		}
+
+		/* Get the inscription */
+		feel = sense_magic(o_ptr, 5);
+
+		/* Sense something */
+		if (!feel) continue;
+
+		/* Sense the object */
+		o_ptr->feeling = feel;
+
+		/* The object has been "sensed" */
+		o_ptr->ident |= (IDENT_SENSE);
+	}
+
+	/* Sense inventory */
+	for (i = 0; i < INVEN_TOTAL+1; i++)
+	{
+		int feel = 0;
+
+		object_type *o_ptr = &inventory[i];
+
+		/* Get the inscription */
+		feel = sense_magic(o_ptr, 5);
+
+		/* Sense something */
+		if (!feel) continue;
+
+		/* Any different */
+		if (o_ptr->feeling == feel) continue;
+
+		/* Detect */
+		if (feel != INSCRIP_AVERAGE) detect = TRUE;
+
+		/* Sense the object */
+		o_ptr->feeling = feel;
+
+		/* The object has been "sensed" */
+		o_ptr->ident |= (IDENT_SENSE);
+
+		/* Combine / Reorder the pack (later) */
+		p_ptr->notice |= (PN_COMBINE | PN_REORDER);
+
+		/* Window stuff */
+		p_ptr->window |= (PW_INVEN | PW_EQUIP);
+	}
+
+	/* Describe */
+	if (detect)
+	{
+		msg_print("You sense the presence of powerful objects!");
 	}
 
 	/* Return result */
@@ -2330,11 +2390,11 @@ static bool item_tester_known_rumor(const object_type *o_ptr)
 	if (o_ptr->ident & IDENT_MENTAL)
 		return FALSE;
 	else if ((!object_known_p(o_ptr))
-		&& !(o_ptr->discount == INSCRIP_SPECIAL)
-		&& !(o_ptr->discount == INSCRIP_EXCELLENT)
-		&& !(o_ptr->discount == INSCRIP_SUPERB)
-		&& !(o_ptr->discount == INSCRIP_WORTHLESS)
-		&& !(o_ptr->discount == INSCRIP_TERRIBLE))
+		&& !(o_ptr->feeling == INSCRIP_SPECIAL)
+		&& !(o_ptr->feeling == INSCRIP_EXCELLENT)
+		&& !(o_ptr->feeling == INSCRIP_SUPERB)
+		&& !(o_ptr->feeling == INSCRIP_WORTHLESS)
+		&& !(o_ptr->feeling == INSCRIP_TERRIBLE))
 		return FALSE;
 	else if (!(o_ptr->name1) && !(o_ptr->name2))
 		return FALSE;
@@ -2481,7 +2541,7 @@ bool enchant(object_type *o_ptr, int n, int eflag)
 	o_ptr->ident &= ~(IDENT_SENSE);	
 
 	/* Remove special inscription, if any */
-	if (o_ptr->discount >= INSCRIP_NULL) o_ptr->discount = 0;
+	o_ptr->feeling = 0;
 
 	/* Recalculate bonuses */
 	p_ptr->update |= (PU_BONUS);
@@ -2636,7 +2696,6 @@ bool brand_item(int brand, cptr act)
 		/* Mega-hack -- we allow 5 arrows/shots/bolts to be enchanted per application */
 		if ((o_ptr->number > 1) && ((!brand_ammo) || (o_ptr->number > 5)))
 		{
-
 			int qty = (brand_ammo) ? 5 : 1;
 			split = TRUE;
 
@@ -2691,17 +2750,14 @@ bool brand_item(int brand, cptr act)
 		}
 		else if (object_xtra_what[brand] == 4)
 		{
-    			object_can_flags(o_ptr,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L);
+    			object_can_flags(o_ptr,0x0L,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2);
 		}
 
 		/* Remove special inscription, if any */
-		if (o_ptr->discount >= INSCRIP_NULL) o_ptr->discount = 0;
+		o_ptr->feeling = INSCRIP_MIN_HIDDEN + brand - 1;
 
-		/* Take note if allowed */
-		if (o_ptr->discount == 0) o_ptr->discount = INSCRIP_MIN_HIDDEN + brand -1;
-	
 		/* The object has been "sensed" */
-		o_ptr->ident |= (IDENT_SENSE);
+		if (!object_known_p(o_ptr)) o_ptr->ident |= (IDENT_SENSE);
 
 		/* Carry item again if split */
 		if (split)
@@ -3400,7 +3456,7 @@ bool recharge(int num)
 			o_ptr->ident &= ~(IDENT_SENSE);
 
 			/* Hack -- the item is no longer empty */
-			if (o_ptr->discount < INSCRIP_MIN_HIDDEN) o_ptr->discount = 0;
+			if (o_ptr->feeling == INSCRIP_EMPTY) o_ptr->feeling = 0;
 
 			/* Hack -- round up */
 			o_ptr->stackc = 0;

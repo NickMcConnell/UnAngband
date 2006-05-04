@@ -1003,6 +1003,15 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		object_desc_str_macro(t, ") ");
 	}
 
+	/* Hack -- display debug xtra info in cheat_xtra mode */
+	if ((cheat_xtra) && (o_ptr->xtra1))
+	{
+		object_desc_str_macro(t, "(xtra ");
+		object_desc_num_macro(t,o_ptr->xtra1);
+		object_desc_str_macro(t, ":");
+		object_desc_num_macro(t,o_ptr->xtra2);
+		object_desc_str_macro(t, ") ");
+	}
 	/* Paranoia XXX XXX XXX */
 	/* ASSERT(*s != '~'); */
 
@@ -1071,7 +1080,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		}
 
 		/* Grab any magic-item name */
-		else if ((o_ptr->xtra1) && (o_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES) && (o_ptr->discount < INSCRIP_MIN_HIDDEN))
+		else if ((o_ptr->xtra1) && (o_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES)/* && (o_ptr->feeling < INSCRIP_MIN_HIDDEN)*/)
 		{
 			int i;
 			u32b j;
@@ -1132,7 +1141,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		}
 
 		/* Grab any magic name */
-		else if (o_ptr->discount < INSCRIP_MIN_HIDDEN)
+		else if (o_ptr->feeling < INSCRIP_MIN_HIDDEN)
 		{
 			int i;
 			int x1, x2; /* Fake xtra flags */
@@ -1548,9 +1557,9 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 
 	/* Use special inscription, if any */
-	if (o_ptr->discount >= INSCRIP_NULL)
+	if (o_ptr->feeling)
 	{
-		v = inscrip_text[o_ptr->discount - INSCRIP_NULL];
+		v = inscrip_text[o_ptr->feeling];
 		if (strlen(v) == 0) v = NULL;
 	}
 
@@ -2094,7 +2103,7 @@ sint scan_floor(int *items, int size, int y, int x, int mode)
 		if ((mode & 0x01) && !item_tester_okay(o_ptr)) continue;
 
 		/* Marked items only */
-		if ((mode & 0x02) && !o_ptr->marked) continue;
+		if ((mode & 0x02) && ((o_ptr->ident & (IDENT_MARKED)) == 0)) continue;
 
 		/* Accept this item */
 		items[num++] = this_o_idx;

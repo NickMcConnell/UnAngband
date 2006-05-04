@@ -166,12 +166,30 @@ static void wr_item(const object_type *o_ptr)
 
 	wr_byte(o_ptr->tval);
 	wr_byte(o_ptr->sval);
-	wr_s16b(o_ptr->pval);
+
+	/* Hack until we update game version number to 0.6.1 */
+	if ((o_ptr->tval == TV_WAND) || (o_ptr->tval == TV_STAFF) || (o_ptr->tval == TV_FOOD))
+	{
+		wr_s16b(o_ptr->charges);
+	}
+	else if (o_ptr->tval == TV_LITE)
+	{
+		wr_s16b(o_ptr->timeout);
+	}
+	else
+	{
+		wr_s16b(o_ptr->pval);
+	}
 	
 	wr_byte(o_ptr->stackc);
 
 	wr_byte(o_ptr->show_idx);
 	wr_byte(o_ptr->discount);
+#if 0
+	wr_byte(o_ptr->feeling);
+	wr_byte(o_ptr->spare);
+#endif
+
 
 	wr_byte(o_ptr->number);
 	wr_s16b(o_ptr->weight);
@@ -180,6 +198,9 @@ static void wr_item(const object_type *o_ptr)
 	wr_byte(o_ptr->name2);
 
 	wr_s16b(o_ptr->timeout);
+#if 0
+	wr_s16b(o_ptr->charges);
+#endif
 
 	wr_s16b(o_ptr->to_h);
 	wr_s16b(o_ptr->to_d);
@@ -188,9 +209,7 @@ static void wr_item(const object_type *o_ptr)
 	wr_byte(o_ptr->dd);
 	wr_byte(o_ptr->ds);
 
-	wr_byte(o_ptr->ident);
-
-	wr_byte(o_ptr->marked);
+	wr_u16b(o_ptr->ident);
 
 	/* Old flags */
 	wr_u32b(0L);

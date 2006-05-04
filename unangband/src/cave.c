@@ -1226,7 +1226,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		next_o_idx = o_ptr->next_o_idx;
 
 		/* Memorized objects */
-		if (o_ptr->marked)
+		if (o_ptr->ident & (IDENT_MARKED))
 		{
 			/* Hack -- object hallucination */
 			if (image)
@@ -1818,7 +1818,7 @@ void note_spot(int y, int x)
 			if (o_ptr->ident & (IDENT_STORE)) continue;
 
 			/* Memorize objects */
-			if (!auto_pickup_ignore(o_ptr)) o_ptr->marked = TRUE;
+			if (!auto_pickup_ignore(o_ptr)) o_ptr->ident |= (IDENT_MARKED);
 
 			/* Hack -- have seen object */
 			if (!(k_ptr->flavor)) k_ptr->aware = TRUE;
@@ -4880,7 +4880,7 @@ void wiz_lite(void)
 		if (o_ptr->held_m_idx) continue;
 
 		/* Memorize */
-		o_ptr->marked = TRUE;
+		o_ptr->ident |= (IDENT_MARKED);
 	}
 
 	/* Scan all normal grids */
@@ -4960,7 +4960,7 @@ void wiz_dark(void)
 		if (o_ptr->held_m_idx) continue;
 
 		/* Forget the object */
-		o_ptr->marked = FALSE;
+		o_ptr->ident &= ~(IDENT_MARKED);
 	}
 
 	/* Fully update the visuals */
@@ -5234,7 +5234,7 @@ static void cave_set_feat_aux(int y, int x, int feat)
 		if ((!hide_item) && (f_ptr->flags2 & (FF2_HIDE_ITEM)))
 		{
 			/* Hide it */
-			o_ptr->marked = FALSE;
+			o_ptr->ident &= ~(IDENT_MARKED);
 		}
 
 		/* Destroy stored items */

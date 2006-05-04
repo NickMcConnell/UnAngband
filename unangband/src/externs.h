@@ -483,7 +483,8 @@ extern void do_cmd_apply_rune(void);
 /* dungeon.c */
 extern bool dun_level_mon(int r_idx);
 extern void play_game(bool new_game);
-extern int value_check_aux1(object_type *o_ptr);
+extern int value_check_aux1(const object_type *o_ptr);
+extern int value_check_aux2(const object_type *o_ptr);
 
 /* files.c */
 extern void safe_setuid_drop(void);
@@ -667,6 +668,7 @@ extern s16b lookup_kind(int tval, int sval);
 extern void object_wipe(object_type *o_ptr);
 extern void object_copy(object_type *o_ptr, const object_type *j_ptr);
 extern void object_prep(object_type *o_ptr, int k_idx);
+extern int sense_magic(object_type *o_ptr, int sense_level);
 extern void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great);
 extern bool make_object(object_type *j_ptr, bool good, bool great);
 extern bool make_chest(int *feat);
@@ -764,6 +766,9 @@ extern bool detect_water(void);
 extern bool detect_treasure(void);
 extern bool detect_objects_gold(void);
 extern bool detect_objects_normal(void);
+extern int value_check_aux3(const object_type *o_ptr);
+extern int value_check_aux4(const object_type *o_ptr);
+extern int value_check_aux5(const object_type *o_ptr);
 extern bool detect_objects_magic(void);
 extern bool detect_monsters_normal(void);
 extern bool detect_objects_cursed(void);

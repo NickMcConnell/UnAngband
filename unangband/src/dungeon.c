@@ -20,7 +20,7 @@
 /*
  * Return a "feeling" (or NULL) about an item.  Method 1 (Heavy).
  */
-int value_check_aux1(object_type *o_ptr)
+int value_check_aux1(const object_type *o_ptr)
 {
 	/* Artifacts */
 	if (artifact_p(o_ptr))
@@ -86,7 +86,7 @@ int value_check_aux1(object_type *o_ptr)
 /*
  * Return a "feeling" (or NULL) about an item.  Method 2 (Light).
  */
-static int value_check_aux2(object_type *o_ptr)
+int value_check_aux2(const object_type *o_ptr)
 {
 	/* Cursed items (all of them) */
 	if (cursed_p(o_ptr)) return (INSCRIP_CURSED);
@@ -167,8 +167,6 @@ static void sense_inventory(void)
 	/* Check everything */
 	for (i = 0; i < INVEN_TOTAL+1; i++)
 	{
-		bool okay = FALSE;
-
 		o_ptr = &inventory[i];
 
 		/* Skip empty slots */
@@ -201,54 +199,14 @@ static void sense_inventory(void)
 			f4 |= (if4 & ~(o_ptr->may_flags4)) & ~(o_ptr->can_flags4);
 		}
 
-		/* Valid "tval" codes */
-		switch (o_ptr->tval)
-		{
-			case TV_SHOT:
-			case TV_ARROW:
-			case TV_BOLT:
-			case TV_BOW:
-			case TV_DIGGING:
-			case TV_HAFTED:
-			case TV_POLEARM:
-			case TV_SWORD:
-			case TV_BOOTS:
-			case TV_GLOVES:
-			case TV_HELM:
-			case TV_CROWN:
-			case TV_SHIELD:
-			case TV_CLOAK:
-			case TV_SOFT_ARMOR:
-			case TV_HARD_ARMOR:
-			case TV_DRAG_ARMOR:
-			case TV_INSTRUMENT:
-			case TV_STAFF:
-			{
-				okay = TRUE;
-				break;
-			}
-		}
-
-		/* Skip non-sense machines */
-		if (!okay) continue;
-
-		/* It already has a discount or special inscription */
-		if (o_ptr->discount > 0) continue;
-
-		/* It has already been sensed, do not sense it again */
-		if (o_ptr->ident & (IDENT_SENSE)) continue;
-
-		/* It is fully known, no information needed */
-		if (object_known_p(o_ptr)) continue;
-
-		/* Occasional failure on inventory items */
-		if ((i < INVEN_WIELD) && (0 != rand_int(5))) continue;
-
 		/* Check for a feeling */
-		feel = (cp_ptr->sense_heavy ? value_check_aux1(o_ptr) : value_check_aux2(o_ptr));
+		feel = sense_magic(o_ptr, (cp_ptr->sense_heavy ? 1 : 2));
 
 		/* Skip non-feelings */
 		if (!feel) continue;
+
+		/* Occasional failure on inventory items */
+		if ((i < INVEN_WIELD) && (0 != rand_int(5))) continue;
 
 		/* Stop everything */
 		if (disturb_minor) disturb(0, 0);
@@ -275,7 +233,7 @@ static void sense_inventory(void)
 		}
 
 		/* Sense the object */
-		o_ptr->discount = feel;
+		o_ptr->feeling = feel;
 
 		/* The object has been "sensed" */
 		o_ptr->ident |= (IDENT_SENSE);

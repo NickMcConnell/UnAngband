@@ -4871,13 +4871,13 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 									   m_name, o_name);
 
 								/* Mark object as ungettable? */
-								if ((o_ptr->discount == 0) &&
+								if (!(o_ptr->feeling) &&
 									!(o_ptr->ident & (IDENT_SENSE))
 									&& !(object_known_p(o_ptr)))
 								{
 	
 									/* Sense the object */
-									o_ptr->discount = INSCRIP_UNGETTABLE;
+									o_ptr->feeling = INSCRIP_UNGETTABLE;
 	
 									/* The object has been "sensed" */
 									o_ptr->ident |= (IDENT_SENSE);

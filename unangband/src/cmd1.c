@@ -1015,7 +1015,7 @@ static void py_destroy_aux(int o_idx)
 		msg_format("You cannot destroy %s.", o_name);
 
 		/* Sense the object if allowed, don't sense ID'ed stuff */
-		if ((o_ptr->discount == 0)
+		if (!(o_ptr->feeling)
 			&& !(o_ptr->ident & (IDENT_SENSE))
 			 && !(object_known_p(o_ptr)))
 		{
@@ -1123,7 +1123,7 @@ void py_pickup(int pickup)
 		/* Mark the object */
 		if (!auto_pickup_ignore(o_ptr))
 		{
-			o_ptr->marked = TRUE;
+			o_ptr->ident |= (IDENT_MARKED);
 
 			/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
 			if (!k_info[o_ptr->k_idx].flavor) k_info[o_ptr->k_idx].aware = TRUE;
@@ -3071,7 +3071,7 @@ static bool run_test(void)
 			next_o_idx = o_ptr->next_o_idx;
 
 			/* Visible object */
-			if (o_ptr->marked) return (TRUE);
+			if (o_ptr->ident & (IDENT_MARKED)) return (TRUE);
 		}
 
 

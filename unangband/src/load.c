@@ -257,7 +257,6 @@ static errr rd_item(object_type *o_ptr)
 
 	char buf[128];
 
-
 	/* Kind */
 	rd_s16b(&o_ptr->k_idx);
 
@@ -282,6 +281,25 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&o_ptr->show_idx);
 	rd_byte(&o_ptr->discount);
 
+	if (!(older_than(0, 6, 1)))
+	{
+		rd_byte(&o_ptr->feeling);
+		rd_byte(&o_ptr->spare);
+	}
+	else
+	{
+		if (o_ptr->discount >= 115)
+		{
+			o_ptr->feeling = o_ptr->discount - 115 + INSCRIP_MIN_HIDDEN;
+		}
+		else if (o_ptr->discount >= 100)
+		{
+			o_ptr->feeling = o_ptr->discount - 100;
+		}
+
+		o_ptr->discount = 0;
+	}
+
 	rd_byte(&o_ptr->number);
 	rd_s16b(&o_ptr->weight);
 
@@ -289,6 +307,34 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&o_ptr->name2);
 
 	rd_s16b(&o_ptr->timeout);
+
+	/* Get charges */
+	if (!(older_than(0, 6, 1)))
+	{
+		rd_s16b(&o_ptr->charges);
+	}
+
+	/* Fix charges / timeout */
+	else
+	{
+		/* Hack -- fix rod/ring/dragon armor charge so that timeout set correctly in future */
+		if ((o_ptr->tval == TV_ROD) || (o_ptr->tval == TV_DRAG_ARMOR) || ((o_ptr->tval == TV_RING) &&
+			((o_ptr->sval == SV_RING_FLAMES) || (o_ptr->sval == SV_RING_ACID) || (o_ptr->sval == SV_RING_ICE) ||
+				(o_ptr->sval == SV_RING_LIGHTNING))))
+		{
+			o_ptr->charges = k_info[o_ptr->k_idx].pval;
+		}
+		/* Hack -- change old wand / staff / food pvals to use charge */
+		else if ((o_ptr->tval == TV_WAND) || (o_ptr->tval == TV_STAFF) || (o_ptr->tval == TV_FOOD))
+		{
+			o_ptr->charges = o_ptr->pval;
+		}
+		/* Hack -- change old lite values to use timeout */
+		else if (o_ptr->tval == TV_LITE)
+		{
+			o_ptr->timeout = o_ptr->pval;
+		}
+	}
 
 	rd_s16b(&o_ptr->to_h);
 	rd_s16b(&o_ptr->to_d);
@@ -299,16 +345,16 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&old_dd);
 	rd_byte(&old_ds);
 
-	rd_byte(&o_ptr->ident);
+	rd_u16b(&o_ptr->ident);
 
-	rd_byte(&o_ptr->marked);
-
-	/* Hack -- fix rod/ring/dragon armor pval so that timeout set correctly in future */
-	if ((o_ptr->tval == TV_ROD) || (o_ptr->tval == TV_DRAG_ARMOR) || ((o_ptr->tval == TV_RING) &&
-		((o_ptr->sval == SV_RING_FLAMES) || (o_ptr->sval == SV_RING_ACID) || (o_ptr->sval == SV_RING_ICE) ||
-			(o_ptr->sval == SV_RING_LIGHTNING))))
+	/* Fix marked byte */
+	if (older_than(0, 6, 1))
 	{
-		o_ptr->pval = k_info[o_ptr->k_idx].pval;
+		if (o_ptr->ident & (0xFF00))
+		{
+			o_ptr->ident &= (0xFF);
+			o_ptr->ident |= (IDENT_MARKED);
+		}
 	}
 
 	/* Hack -- remove chests */

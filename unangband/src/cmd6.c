@@ -516,7 +516,7 @@ void do_cmd_use_staff(void)
 		if (flush_failure) flush();
 		msg_print("The staff has no charges left.");
 		o_ptr->ident |= (IDENT_SENSE);
-		o_ptr->discount = (INSCRIP_EMPTY);
+		o_ptr->feeling = (INSCRIP_EMPTY);
 		return;
 	}
 
@@ -774,7 +774,7 @@ void do_cmd_aim_wand(void)
 		if (flush_failure) flush();
 		msg_print("The wand has no charges left.");
 		o_ptr->ident |= (IDENT_SENSE);
-		o_ptr->discount = (INSCRIP_EMPTY);
+		o_ptr->feeling = (INSCRIP_EMPTY);
 		return;
 	}
 
@@ -1965,7 +1965,7 @@ void do_cmd_apply_rune(void)
 			i_ptr->xtra2 = k_ptr->runesc;
 
 			/* Remove special inscription, if any */
-			if (i_ptr->discount >= INSCRIP_NULL) i_ptr->discount = 0;
+			i_ptr->feeling = 0;
 
 			/* Hack -- Clear the "felt" flag */
 			i_ptr->ident &= ~(IDENT_SENSE);
@@ -2052,7 +2052,7 @@ void do_cmd_apply_rune(void)
 					}
 
 					/* Remove special inscription, if any */
-					if (i_ptr->discount >= INSCRIP_NULL) i_ptr->discount = 0;
+					i_ptr->feeling = 0;
 
 					/* Hack -- Clear the "felt" flag */
 					i_ptr->ident &= ~(IDENT_SENSE);

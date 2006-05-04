@@ -365,12 +365,13 @@ struct object_kind
 	byte sval;      /* Object sub type */
 
 	s16b pval;      /* Object extra info */
+	s16b charges;   /* Object charges info */
 
 	s16b to_h;      /* Bonus to hit */
 	s16b to_d;      /* Bonus to damage */
 	s16b to_a;      /* Bonus to armor */
 
-	s16b ac;/* Base armor */
+	s16b ac;	/* Base armor */
 
 	byte dd, ds;    /* Damage dice/sides */
 
@@ -751,8 +752,10 @@ struct object_type
 	s16b pval;      /* Item extra-parameter */
 
 	byte discount;  /* Discount (if any) */
+	byte feeling;   /* Feeling (if any) */
 
 	byte number;    /* Number of items */
+	byte spare;	/* Spare */
 
 	s16b weight;    /* Item weight */
 
@@ -770,12 +773,10 @@ struct object_type
 
 	byte dd, ds;    /* Damage dice/sides */
 
+	s16b charges;	/* Item charges */
 	s16b timeout;   /* Timeout Counter */
 
-	byte ident;     /* Special flags  */
-
-	byte marked;    /* Object is marked */
-
+	u16b ident;     /* Identify flags  */
 	u16b note;      /* Inscription index */
 
 	byte stackc;    /* Stack count */

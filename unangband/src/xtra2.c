@@ -4372,7 +4372,7 @@ static bool target_set_interactive_accept(int y, int x)
 		next_o_idx = o_ptr->next_o_idx;
 
 		/* Memorized object */
-		if (o_ptr->marked) return (TRUE);
+		if (o_ptr->ident & (IDENT_MARKED)) return (TRUE);
 	}
 
 	/* Interesting memorized features */
@@ -4782,7 +4782,7 @@ static key_event target_set_interactive_aux(int y, int x, int *room, int mode, c
 			if (floored) continue;
 
 			/* Describe it */
-			if (o_ptr->marked)
+			if (o_ptr->ident & (IDENT_MARKED))
 			{
 				bool recall = FALSE;
 

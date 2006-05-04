@@ -525,7 +525,7 @@ static void wiz_reroll_item(object_type *o_ptr)
 		i_ptr->iy = o_ptr->iy;
 		i_ptr->ix = o_ptr->ix;
 		i_ptr->next_o_idx = o_ptr->next_o_idx;
-		i_ptr->marked = o_ptr->marked;
+		i_ptr->ident = o_ptr->ident;
 
 		/* Apply changes */
 		object_copy(o_ptr, i_ptr);
@@ -917,6 +917,9 @@ static void wiz_create_item(void)
 
 	/* Apply magic (no messages, no artifacts) */
 	apply_magic(i_ptr, p_ptr->depth, FALSE, FALSE, FALSE);
+
+	/* Hack -- use repeat count to specify quantity */
+	if (p_ptr->command_arg) i_ptr->number = p_ptr->command_arg;
 
 	/* Drop the object from heaven */
 	drop_near(i_ptr, -1, py, px);

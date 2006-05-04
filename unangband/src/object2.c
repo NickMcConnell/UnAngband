@@ -752,7 +752,7 @@ void object_mental(object_type *o_ptr)
 void object_known(object_type *o_ptr)
 {
 	/* Remove special inscription, except special inscriptions */
-	if ((o_ptr->discount >= INSCRIP_NULL) && (o_ptr->discount < INSCRIP_MIN_HIDDEN)) o_ptr->discount = 0;
+	if ((o_ptr->feeling) && (o_ptr->feeling < INSCRIP_MIN_HIDDEN)) o_ptr->feeling = 0;
 
 	/* The object is not "sensed" */
 	o_ptr->ident &= ~(IDENT_SENSE);
@@ -814,7 +814,7 @@ void object_known(object_type *o_ptr)
 				 e_list[o_ptr->name2].not_flags4);
 	}
 	/* Hack -- Magic items have an 'obvious' ability for which they are named */
-	else if ((o_ptr->xtra1) && (o_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES) && (o_ptr->discount < INSCRIP_MIN_HIDDEN))
+	else if ((o_ptr->xtra1) && (o_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES) && (o_ptr->feeling < INSCRIP_MIN_HIDDEN))
 	{
 		if (object_xtra_what[o_ptr->xtra1] == 1)
 			(o_ptr->can_flags1) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
@@ -875,10 +875,10 @@ void object_bonus(object_type *o_ptr)
 		if (!cursed_p(o_ptr) && !broken_p(o_ptr)) return;
 
 		/* Remove special inscription, if any */
-		if (o_ptr->discount >= INSCRIP_NULL) o_ptr->discount = 0;
+		o_ptr->feeling = 0;
 
 		/* Sense the object if allowed */
-		if (cursed_p(o_ptr) || broken_p(o_ptr)) o_ptr->discount = INSCRIP_CURSED;
+		if (cursed_p(o_ptr) || broken_p(o_ptr)) o_ptr->feeling = INSCRIP_CURSED;
 
 		/* The object has been "sensed" */
 		o_ptr->ident |= (IDENT_SENSE);
@@ -944,7 +944,7 @@ void object_bonus(object_type *o_ptr)
 				{
 
 					/* Sense the object */
-					o_ptr->discount = feel;
+					o_ptr->feeling = feel;
 
 					/* The item has been sensed */
 					o_ptr->ident |= (IDENT_SENSE);
@@ -1238,7 +1238,7 @@ s32b object_value(const object_type *o_ptr)
 				case TV_SOFT_ARMOR:
 				case TV_HARD_ARMOR:
 				case TV_DRAG_ARMOR:
-
+				case TV_INSTRUMENT:
 				{
 					/* Give credit for hit bonus */
 					value += ((o_ptr->to_h) * 100L);
@@ -1307,7 +1307,7 @@ s32b object_value(const object_type *o_ptr)
 		{
 			s32b bonus=0L;
 
-			switch (o_ptr->discount)
+			switch (o_ptr->feeling)
 			{
 				case INSCRIP_SPECIAL:
 				{
@@ -1356,7 +1356,7 @@ s32b object_value(const object_type *o_ptr)
 
 
 	/* Apply discount (if any) */
-	if (o_ptr->discount > 0 && o_ptr->discount < INSCRIP_NULL)
+	if (o_ptr->discount > 0)
 	{
 		value -= (value * o_ptr->discount / 100L);
 	}
@@ -1640,30 +1640,18 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 	/* Hack -- Require compatible "discount" fields */
 	if (o_ptr->discount != j_ptr->discount)
 	{
+		/* Normally require matching discounts */
+		if (!stack_force_costs && !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr))) return (0);
+	}
+
+	/* Hack -- Require compatible "feeling" fields */
+	if (o_ptr->feeling != j_ptr->feeling)
+	{
 		/* Both are (different) special inscriptions */
-		if ((o_ptr->discount >= INSCRIP_NULL) &&
-		    (j_ptr->discount >= INSCRIP_NULL))
+		if ((o_ptr->feeling) && (j_ptr->feeling))
 		{
 			/* Normally require matching inscriptions */
 			return (0);
-		}
-
-		/* One is a special inscription, one is a discount or nothing */
-		else if ((o_ptr->discount >= INSCRIP_NULL) ||
-			 (j_ptr->discount >= INSCRIP_NULL))
-		{
-			/* Normally require matching inscriptions */
-			if (!stack_force_notes && !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) ) return (0);
-
-			/* Hack -- Never merge a special inscription with a discount */
-			if ((o_ptr->discount > 0) && (j_ptr->discount > 0)) return (0);
-		}
-
-		/* One is a discount, one is a (different) discount or nothing */
-		else
-		{
-			/* Normally require matching discounts */
-			if (!stack_force_costs && !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr))) return (0);
 		}
 	}
 
@@ -1812,6 +1800,9 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 
 	/* Mega-Hack -- Blend "discounts" */
 	if (o_ptr->discount < j_ptr->discount) o_ptr->discount = j_ptr->discount;
+
+	/* Mega-Hack -- Blend "feelings" */
+	if (!o_ptr->feeling) o_ptr->feeling = j_ptr->feeling;
 
 	/* Mega Hack -- Blend "usages" */
 	if (o_ptr->usage < j_ptr->usage) o_ptr->usage = j_ptr->usage;
@@ -3328,6 +3319,200 @@ static void a_m_aux_4(object_type *o_ptr, int level, int power)
 }
 
 
+/*
+ * Test player and item for a racial flag and update knowledge
+ */
+static void value_check_race_flag(object_type *o_ptr, u32b object_flag, u32b flag)
+{
+	/* Sense race flag */
+	if (object_flag & (flag))
+	{
+		if (p_ptr->cur_flags4 & (flag)) o_ptr->ident |= (IDENT_NAME);
+
+		object_can_flags(o_ptr, 0x0L, 0x0L, 0x0L, flag);
+	}
+	else
+	{
+		object_not_flags(o_ptr, 0x0L, 0x0L, 0x0L, flag);
+	}
+}
+
+
+/*
+ * Return a "feeling" (or NULL) about an item.  Method 0 (Racial).
+ */
+int value_check_aux0(object_type *o_ptr)
+{
+	u32b f1, f2, f3, f4;
+
+	/* Extract the flags */
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+
+	value_check_race_flag(o_ptr, f4, TR4_UNDEAD);
+	value_check_race_flag(o_ptr, f4, TR4_ORC);
+	value_check_race_flag(o_ptr, f4, TR4_TROLL);
+	value_check_race_flag(o_ptr, f4, TR4_GIANT);
+	value_check_race_flag(o_ptr, f4, TR4_MAN);
+	value_check_race_flag(o_ptr, f4, TR4_DWARF);
+	value_check_race_flag(o_ptr, f4, TR4_ELF);
+
+	/* No feeling */
+	return (0);
+}
+
+
+/*
+ * Return a "feeling" (or NULL) about an item.  Method 6 (Rune magic).
+ */
+int value_check_aux6(object_type *o_ptr)
+{
+	o_ptr->ident |= (IDENT_RUNES);
+
+	/* No feeling */
+	return (0);
+}
+
+
+/*
+ * Return a "feeling" (or NULL) about an item.  Method 7 (Value magic).
+ */
+int value_check_aux7(object_type *o_ptr)
+{
+	o_ptr->ident |= (IDENT_VALUE);
+
+	/* No feeling */
+	return (0);
+}
+
+
+/*
+ * Return a "feeling" (or NULL) about an item.  Method 8 (Name magic).
+ */
+int value_check_aux8(object_type *o_ptr)
+{
+	o_ptr->ident |= (IDENT_NAME);
+
+	/* No feeling */
+	return (0);
+}
+
+
+/*
+ * Return a "feeling" (or NULL) about an item.  Method 6 (Rune magic).
+ */
+int value_check_aux9(object_type *o_ptr)
+{
+	if ((o_ptr->tval == TV_BOW) || (o_ptr->tval == TV_ARROW) || (o_ptr->tval == TV_SHOT) ||
+		(o_ptr->tval == TV_BOLT)) object_known(o_ptr);
+
+	/* No feeling */
+	return (0);
+}
+
+
+
+/*
+ * The new item sensing routine.
+ *
+ * This routine is called at the following times:
+ *
+ * When an object is created.
+ * When an object is walked on
+ * When an object is wielded.
+ * When an object is carried or wielded for a certain length of time.
+ *
+ * The sense_level determines what abilities are determined.
+ *
+ * Level 0 senses only racial abilities.
+ * Level 1 is equivalent to old heavy pseudo-id.
+ * Level 2 is equivalent to old light pseudo-id.
+ * Level 3 is equivalent to detect magic.
+ * Level 4 is equivalent to detect curse.
+ * Level 5 is equivalent to detect power.
+ * Level 6 is equivalent to rune magic.
+ * Level 7 is equivalent to value magic.
+ * Level 8 is equivalent to identify name only.
+ * Level 9 is equivalent to full identify on restricted objects only.
+ */
+int sense_magic(object_type *o_ptr, int sense_level)
+{
+	int feel;
+
+	bool okay = FALSE;
+
+	/* Skip empty slots */
+	if (!o_ptr->k_idx) return (0);
+
+	/* Valid "tval" codes */
+	switch (o_ptr->tval)
+	{
+		case TV_SHOT:
+		case TV_ARROW:
+		case TV_BOLT:
+		case TV_BOW:
+		case TV_DIGGING:
+		case TV_HAFTED:
+		case TV_POLEARM:
+		case TV_SWORD:
+		case TV_BOOTS:
+		case TV_GLOVES:
+		case TV_HELM:
+		case TV_CROWN:
+		case TV_SHIELD:
+		case TV_CLOAK:
+		case TV_SOFT_ARMOR:
+		case TV_HARD_ARMOR:
+		case TV_DRAG_ARMOR:
+		case TV_STAFF:
+		case TV_INSTRUMENT:
+		{
+			okay = TRUE;
+			break;
+		}
+	}
+
+	/* Skip objects */
+	if (!okay) return (0);
+
+	/* It is fully known, no information needed */
+	if (object_known_p(o_ptr)) return (0);
+
+	/* Always update racial information */
+	(void)value_check_aux0(o_ptr);
+
+	switch (sense_level)
+	{
+		case 1:
+			feel = value_check_aux1(o_ptr);
+			break;
+		case 2:
+			feel = value_check_aux2(o_ptr);
+			break;
+		case 3:
+			feel = value_check_aux3(o_ptr);
+			break;
+		case 4:
+			feel = value_check_aux4(o_ptr);
+			break;
+		case 5:
+			feel = value_check_aux5(o_ptr);
+			break;
+		case 6:
+			feel = value_check_aux6(o_ptr);
+			break;
+		case 7:
+			feel = value_check_aux7(o_ptr);
+			break;
+		case 8:
+			feel = value_check_aux8(o_ptr);
+			break;
+		case 9:
+			feel = value_check_aux9(o_ptr);
+			break;
+	}
+
+	return (feel);
+}
 
 
 
@@ -3878,7 +4063,6 @@ static void name_drop(object_type *j_ptr)
 	if (j_ptr->name2) return;
 	if (j_ptr->xtra1) return;
 
-#if 0
 	/* Mark weapons and armour with racial flags */
 	switch (j_ptr->tval)
 	{
@@ -3925,7 +4109,7 @@ static void name_drop(object_type *j_ptr)
 			if ((r_info[r_idx].flags9 & (RF9_ELF)) && !(rand_int(count++))) { j_ptr->xtra1 = 19; j_ptr->xtra2 = 26;}
 		}
 	}
-#endif
+
 	/* Are we done? */
 	if ((j_ptr->tval != TV_BONE) && (j_ptr->tval != TV_EGG) && (j_ptr->tval != TV_STATUE)
 		&& (j_ptr->tval != TV_SKIN) && (j_ptr->tval != TV_BODY) &&
@@ -4278,8 +4462,6 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 {
 	int prob, base;
 
-	u32b f1, f2, f3, f4;
-
 	/* Chance of "special object" */
 	prob = (good ? 10 : 1000);
 
@@ -4404,79 +4586,6 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		}
 	}
 
-	/* Extract the flags */
-	object_flags(j_ptr, &f1, &f2, &f3, &f4);
-
-	/* Sense 'age' */
-	if (f4 & (TR4_UNDEAD))
-	{
-		object_can_flags(j_ptr, 0x0L, 0x0L, 0x0L, TR4_UNDEAD);
-	}
-	else
-	{
-		object_not_flags(j_ptr, 0x0L, 0x0L, 0x0L, TR4_UNDEAD);
-	}
-
-	/* Sense maker */
-	if (f4 & (TR4_ORC))
-	{
-		object_can_flags(j_ptr, 0x0L, 0x0L, 0x0L, TR4_ORC);
-	}
-	else
-	{
-		object_not_flags(j_ptr, 0x0L, 0x0L, 0x0L, TR4_ORC);
-	}
-
-	/* Sense maker */
-	if (f4 & (TR4_TROLL))
-	{
-		object_can_flags(j_ptr, 0x0L, 0x0L, 0x0L, TR4_TROLL);
-	}
-	else
-	{
-		object_not_flags(j_ptr, 0x0L, 0x0L, 0x0L, TR4_TROLL);
-	}
-
-	/* Sense maker */
-	if (f4 & (TR4_GIANT))
-	{
-		object_can_flags(j_ptr, 0x0L, 0x0L, 0x0L, TR4_GIANT);
-	}
-	else
-	{
-		object_not_flags(j_ptr, 0x0L, 0x0L, 0x0L, TR4_GIANT);
-	}
-
-	/* Sense maker */
-	if (f4 & (TR4_MAN))
-	{
-		object_can_flags(j_ptr, 0x0L, 0x0L, 0x0L, TR4_MAN);
-	}
-	else
-	{
-		object_not_flags(j_ptr, 0x0L, 0x0L, 0x0L, TR4_MAN);
-	}
-
-	/* Sense maker */
-	if (f4 & (TR4_ELF))
-	{
-		object_can_flags(j_ptr, 0x0L, 0x0L, 0x0L, TR4_ELF);
-	}
-	else
-	{
-		object_not_flags(j_ptr, 0x0L, 0x0L, 0x0L, TR4_ELF);
-	}
-
-	/* Sense maker */
-	if (f4 & (TR4_DWARF))
-	{
-		object_can_flags(j_ptr, 0x0L, 0x0L, 0x0L, TR4_DWARF);
-	}
-	else
-	{
-		object_not_flags(j_ptr, 0x0L, 0x0L, 0x0L, TR4_DWARF);
-	}
-
 	/* Notice "okay" out-of-depth objects */
 	if (!cursed_p(j_ptr) && !broken_p(j_ptr) &&
 	    (k_info[j_ptr->k_idx].level > p_ptr->depth))
@@ -4487,6 +4596,9 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		/* Cheat -- peek at items */
 		if (cheat_peek) object_mention(j_ptr);
 	}
+
+	/* Sense some magic on object at creation time */
+	sense_magic(j_ptr, 0);
 
 	/* Success */
 	return (TRUE);
@@ -6626,7 +6738,7 @@ void floor_item_describe(int item)
 	char o_name[80];
 
 	/* Hack -- haven't seen item on floor */
-	if (!(o_ptr->marked)) return;
+	if ((o_ptr->ident & (IDENT_MARKED)) == 0) return;
 
 	/* Get a description */
 	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
@@ -6922,7 +7034,7 @@ s16b inven_carry(object_type *o_ptr)
 	j_ptr->iy = j_ptr->ix = 0;
 
 	/* No longer marked */
-	j_ptr->marked = FALSE;
+	j_ptr->ident &= ~(IDENT_MARKED);
 
 	/* Increase the weight */
 	p_ptr->total_weight += (j_ptr->number * j_ptr->weight);

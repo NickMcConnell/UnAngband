@@ -1,9 +1,24 @@
+WARNING TO THOSE BUILDING FROM CVS
+
+In the lead up to version 0.6.1, I will endeavour to maintain save-file
+compatibility at any point, but cannot guarantee it. In addition, lots of
+stuff is likely to break. For instance, in this CVS update, torches will stop
+working after you save the game.
+
 ### Game Play ###
 
 - Improved metric for when monsters should cast probe spell (Reported by
 Bandobras).
 
 - Changed object value calculation to be based on object power.
+
+- A race and class-based pseudo-identify on creation of an item. This will
+distinguish whether an item is {average} or not and provide some 'additional'
+information, depending on the race and class of the character.
+
+- You can now coat your sharp weapons, arrows and bolts with potions,
+mushrooms or flasks of oil in order to do additional damage from the effects
+of these items.
 
 ### User Interface ###
 
@@ -22,6 +37,11 @@ Mikolaj Konarski).
 
 - Fixed bug where monsters with shots were being generated with no ammunition
  (Reported by Bandobras).
+
+- Separation out of charges from pvals to fix many 'pval-stacking problems'.
+Pval stacking is now replaced by charge stacking.
+
+- Separation of feelings from discounts.
 
 ### Build / Platform ###
 

@@ -309,7 +309,7 @@ void do_cmd_wield(void)
 		msg_print("Aiee! It feels burning hot!");
 
 		/* Mark object as ungettable? */
-		if ((o_ptr->discount == 0) &&
+		if (!(o_ptr->feeling) &&
 			!(o_ptr->ident & (IDENT_SENSE))
 			&& !(object_known_p(o_ptr)))
 		{
@@ -475,11 +475,8 @@ void do_cmd_wield(void)
 		/* Warn the player */
 		msg_print("Oops! It feels deathly cold!");
 
-		/* Remove special inscription, if any */
-		if (o_ptr->discount >= INSCRIP_NULL) o_ptr->discount = 0;
-
 		/* Sense the object if allowed */
-		if (o_ptr->discount == 0) o_ptr->discount = INSCRIP_CURSED;
+		o_ptr->feeling = INSCRIP_CURSED;
 
 		/* The object has been "sensed" */
 		o_ptr->ident |= (IDENT_SENSE);
@@ -878,7 +875,7 @@ void do_cmd_observe(void)
 	/* Hack - obviously interested enough in item */
 	if (o_ptr->ident & (IDENT_STORE))
 	{
-		o_ptr->marked = TRUE;
+		o_ptr->ident |= (IDENT_MARKED);
 
 		/* No longer 'stored' */
 		o_ptr->ident &= ~(IDENT_STORE);
@@ -1077,7 +1074,7 @@ void do_cmd_inscribe(void)
 	}
 
 	/* Inscribe */
-	if ((item < 0) && (auto_pickup_ignore(o_ptr))) o_ptr->marked = FALSE;
+	if ((item < 0) && (auto_pickup_ignore(o_ptr))) o_ptr->ident &= ~(IDENT_MARKED);
 
 	/* Prompt to always inscribe? */
 	if (!easy_autos) return;
@@ -1106,7 +1103,7 @@ void do_cmd_inscribe(void)
 			if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = e_info[o_ptr->name2].note;
 
 			/* Ignore */
-			if (auto_pickup_ignore(o_ptr)) o_ptr->marked = FALSE;
+			if (auto_pickup_ignore(o_ptr)) o_ptr->ident &= ~(IDENT_MARKED);
 
 		}
 
@@ -1135,7 +1132,7 @@ void do_cmd_inscribe(void)
 			if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = o_ptr->note;
 
 			/* Ignore */
-			if (auto_pickup_ignore(o_ptr)) o_ptr->marked = FALSE;
+			if (auto_pickup_ignore(o_ptr)) o_ptr->ident &= ~(IDENT_MARKED);
 
 		}
 

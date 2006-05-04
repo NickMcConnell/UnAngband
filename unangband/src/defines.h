@@ -2696,41 +2696,61 @@
 /*
  * Special Object Flags
  */
-#define IDENT_SENSE		0x01	/* Item has been "sensed" */
-#define IDENT_FIXED		0x02	/* Item has been "haggled" */
-#define IDENT_BONUS		0x04	/* Item bonuses are known */
-#define IDENT_KNOWN		0x08	/* Item abilities are known */
-#define IDENT_STORE	0x10	/* Item is in a store */
-#define IDENT_MENTAL	0x20	/* Item information is known */
-#define IDENT_CURSED	0x40	/* Item is temporarily cursed */
-#define IDENT_BROKEN	0x80	/* Item is permanently worthless */
-/* Space for implementation of multiple pvals */
+#define IDENT_SENSE	0x0001	/* Item has been "sensed" */
+#define IDENT_FIXED	0x0002	/* Item has been "haggled" */
+#define IDENT_BONUS	0x0004	/* Item bonuses are known */
+#define IDENT_KNOWN	0x0008	/* Item abilities are known */
+#define IDENT_STORE	0x0010	/* Item is in a store */
+#define IDENT_MENTAL	0x0020	/* Item information is known */
+#define IDENT_CURSED	0x0040	/* Item is temporarily cursed */
+#define IDENT_BROKEN	0x0080	/* Item is permanently worthless */
+#define IDENT_DAMAGE	0x0100	/* Item damage is known */
+#define IDENT_CHARGE	0x0200	/* Item charges are known */
+#define IDENT_VALUE	0x0400	/* Item value is known */
+#define IDENT_RUNES	0x0800	/* Item runes are known */
+#define IDENT_NAME	0x1000	/* Item name is known */
+#define IDENT_PVAL	0x2000	/* Item pval is known */
+#define IDENT_MARKED	0x4000	/* Item is visible */
+#define IDENT_FORGED	0x8000	/* Item has been forged by player */
 
 /*
  * The special inscriptions.
  */
-#define INSCRIP_NULL	    100
-#define INSCRIP_TERRIBLE	100+1
-#define INSCRIP_WORTHLESS       100+2
-#define INSCRIP_CURSED	  100+3
-#define INSCRIP_BROKEN	  100+4
-#define INSCRIP_EMPTY	 100+5
-#define INSCRIP_GOOD	    100+6
-#define INSCRIP_EXCELLENT       100+7
-#define INSCRIP_SPECIAL	 100+8
-#define INSCRIP_UNCURSED	100+9
-#define INSCRIP_VERY_GOOD       100+10
-#define INSCRIP_GREAT    100+11
-#define INSCRIP_SUPERB   100+12
-#define INSCRIP_UNBREAKABLE	100+13 /* Artifact */
-#define INSCRIP_UNGETTABLE	100+14 /* Has flag preventing player / monster getting it */
-#define INSCRIP_MIN_HIDDEN      100+15 /* Minimum inscription for hidden */
+#define INSCRIP_NULL	    	0
+#define INSCRIP_TERRIBLE	1
+#define INSCRIP_WORTHLESS       2
+#define INSCRIP_CURSED	  	3
+#define INSCRIP_BROKEN	  	4
+#define INSCRIP_EMPTY	 	5
+#define INSCRIP_GOOD	    	6
+#define INSCRIP_EXCELLENT       7
+#define INSCRIP_SPECIAL	 	8
+#define INSCRIP_UNCURSED	9  /* Uncursed, or has been detected to be not cursed or better */
+#define INSCRIP_VERY_GOOD       10
+#define INSCRIP_GREAT    	11
+#define INSCRIP_SUPERB   	12
+#define INSCRIP_UNBREAKABLE	13 /* Artifact */
+#define INSCRIP_UNGETTABLE	14 /* Has flag preventing player / monster getting it */
+#define INSCRIP_NONMAGICAL	15 /* Has been detected to be not magic or worse */
+#define INSCRIP_MAGICAL		16 /* Has been detected to be magical */
+#define INSCRIP_POWERFUL	17 /* Has been detected to be powerful */
+#define INSCRIP_EGO_ITEM	18 /* Has been detected to be ego item */
+#define INSCRIP_HIGH_EGO_ITEM	19 /* Has been detected to be high ego item */
+#define INSCRIP_ARTIFACT	20 /* Has been detected to be artifact */
+#define INSCRIP_UNRUNED		21 /* Does not have any runes */
+#define INSCRIP_RUNED		22 /* Does have runes */
+#define INSCRIP_AVERAGE		23 /* Has been detected to be average */
+#define INSCRIP_VALUABLE	24 /* Has been detected to be valuable */
+#define INSCRIP_COATED_POTION	25 /* Has been coated with a potion */
+#define INSCRIP_COATED_FOOD	26 /* Has been coated with a mushroom */
+#define INSCRIP_COATED_FLASK	27 /* Has been coated with a flask */
+#define INSCRIP_MIN_HIDDEN      28 /* Minimum inscription for hidden */
 
 
 /*
  * Number of special inscriptions, plus one.
  */
-#define MAX_INSCRIP			30
+#define MAX_INSCRIP			43
 
 
 /*
@@ -2953,7 +2973,7 @@
 /*
  * Hack -- special "xtra" object flag info (type)
  */
-#define OBJECT_XTRA_MAX_HIDDEN 22
+#define OBJECT_XTRA_MAX_HIDDEN 20
 
 #define OBJECT_XTRA_MIN_RUNES    36
 #define MAX_RUNE_FLAGS    4

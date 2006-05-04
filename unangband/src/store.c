@@ -990,7 +990,7 @@ static int store_carry(object_type *o_ptr)
 	o_ptr->note = 0;
 
 	/* Remove special inscription, if any */
-	if (o_ptr->discount >= INSCRIP_NULL) o_ptr->discount = 0;
+	o_ptr->feeling = 0;
 
 	/* Check each existing object (try to combine) */
 	for (slot = 0; slot < st_ptr->stock_num; slot++)
@@ -2663,7 +2663,7 @@ static void store_purchase(void)
 				i_ptr->note = 0;
 
 				/* Remove special inscription, if any */
-				if (o_ptr->discount >= INSCRIP_NULL) o_ptr->discount = 0;
+				o_ptr->feeling = 0;
 
 				/* Give it to the player */
 				item_new = inven_carry(i_ptr);
@@ -2941,7 +2941,7 @@ static void store_sell(void)
 			i_ptr->note = 0;
 
 			/* Remove special inscription, if any */
-			if (i_ptr->discount >= INSCRIP_NULL) o_ptr->discount = 0;
+			o_ptr->feeling = 0;
 
 			/* Identify original object */
 			object_aware(o_ptr);
