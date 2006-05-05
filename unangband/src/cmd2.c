@@ -3055,7 +3055,7 @@ void do_cmd_fire(void)
 	/* Sometimes use lower stack object */
 	if (!object_known_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
 	{
-		if (i_ptr->pval) i_ptr->pval--;
+		if (i_ptr->charges) i_ptr->charges--;
 
 		if (i_ptr->timeout) i_ptr->timeout = 0;
 
@@ -3560,7 +3560,7 @@ void do_cmd_throw(void)
 	/* Sometimes use lower stack object */
 	if (!object_known_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
 	{
-		if (i_ptr->pval) i_ptr->pval--;
+		if (i_ptr->charges) i_ptr->charges--;
 
 		if (i_ptr->timeout) i_ptr->timeout = 0;
 

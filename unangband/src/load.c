@@ -325,14 +325,12 @@ static errr rd_item(object_type *o_ptr)
 			o_ptr->charges = k_info[o_ptr->k_idx].pval;
 		}
 		/* Hack -- change old wand / staff / food pvals to use charge */
-		else if ((o_ptr->tval == TV_WAND) || (o_ptr->tval == TV_STAFF) || (o_ptr->tval == TV_FOOD))
+		else if ((o_ptr->tval == TV_WAND) || (o_ptr->tval == TV_STAFF) || (o_ptr->tval == TV_POTION)
+			 || (o_ptr->tval == TV_FOOD) || (o_ptr->tval == TV_GOLD)  || (o_ptr->tval == TV_GEMS)
+			 || ((o_ptr->tval == TV_LITE) && !(artifact_p(o_ptr))))
 		{
 			o_ptr->charges = o_ptr->pval;
-		}
-		/* Hack -- change old lite values to use timeout */
-		else if (o_ptr->tval == TV_LITE)
-		{
-			o_ptr->timeout = o_ptr->pval;
+			o_ptr->pval = 0;
 		}
 	}
 

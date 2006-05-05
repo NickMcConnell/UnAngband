@@ -2700,7 +2700,18 @@ errr parse_k_info(char *buf, header *head)
 		/* Save the values */
 		k_ptr->tval = tval;
 		k_ptr->sval = sval;
-		k_ptr->pval = pval;
+
+		/* Hack -- save having to change entire object.txt file */
+		if ((k_ptr->tval == TV_WAND) || (k_ptr->tval == TV_STAFF) || (k_ptr->tval == TV_POTION)
+			 || (k_ptr->tval == TV_FOOD) || (k_ptr->tval == TV_GOLD)  || (k_ptr->tval == TV_GEMS)
+			 || (k_ptr->tval == TV_LITE))
+		{
+			k_ptr->charges = pval;
+		}
+		else
+		{
+			k_ptr->pval = pval;
+		}
 	}
 
 	/* Process 'W' for "More Info" (one line only) */
@@ -4440,7 +4451,7 @@ errr parse_c_info(char *buf, header *head)
 	/* Process 'E' for "Starting Equipment" */
 	else if (buf[0] == 'E')
 	{
-		int tval, sval, number_min, number_max, pval_min, pval_max, social_min, social_max;
+		int tval, sval, number_min, number_max, charge_min, charge_max, social_min, social_max;
 
 		start_item *e_ptr;
 
@@ -4452,7 +4463,7 @@ errr parse_c_info(char *buf, header *head)
 
 		/* Scan for the values */
 		if (8 != sscanf(buf+2, "%d:%d:%d:%d:%d:%d:%d:%d",
-			    &tval, &sval, &number_min, &number_max, &pval_min, &pval_max, &social_min, &social_max)) return (PARSE_ERROR_GENERIC);
+			    &tval, &sval, &number_min, &number_max, &charge_min, &charge_max, &social_min, &social_max)) return (PARSE_ERROR_GENERIC);
 
 		if ((number_min < 0) || (number_max < 0) || (number_min > 99) || (number_max > 99))
 			return (PARSE_ERROR_INVALID_ITEM_NUMBER);
@@ -4462,8 +4473,8 @@ errr parse_c_info(char *buf, header *head)
 		e_ptr->sval = sval;
 		e_ptr->number_min = number_min;
 		e_ptr->number_max = number_max;
-		e_ptr->pval_min = pval_min;
-		e_ptr->pval_max = pval_max;
+		e_ptr->charge_min = charge_min;
+		e_ptr->charge_max = charge_max;
 		e_ptr->social_min = social_min;
 		e_ptr->social_max = social_max;
 

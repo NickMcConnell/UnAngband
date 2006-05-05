@@ -961,45 +961,6 @@ static void process_world(void)
 	/* Check for light being wielded */
 	o_ptr = &inventory[INVEN_LITE];
 
-	/* Burn some fuel in the current lite */
-	if (o_ptr->tval == TV_LITE)
-	{
-		/* Hack -- Use some fuel (except on artifacts) */
-		if (!artifact_p(o_ptr) && (o_ptr->pval > 0))
-		{
-			/* Decrease life-span */
-			o_ptr->pval--;
-
-			/* Hack -- Special treatment when blind */
-			if (p_ptr->blind)
-			{
-				/* Hack -- save some light for later */
-				if (o_ptr->pval == 0) o_ptr->pval++;
-			}
-
-			/* The light is now out */
-			else if (o_ptr->pval == 0)
-			{
-				disturb(0, 0);
-				msg_print("Your light has gone out!");
-			}
-
-			/* The light is getting faint */
-			else if ((o_ptr->pval < 100) && (!(o_ptr->pval % 10)))
-			{
-				if (disturb_minor) disturb(0, 0);
-				msg_print("Your light is growing faint.");
-			}
-
-			/* The light is getting dim */
-			else if ((o_ptr->pval == FUEL_LOW) && (o_ptr->sval == SV_LITE_TORCH))
-			{
-				if (disturb_minor) disturb(0, 0);
-				msg_print("Your torch flame dims.");
-			}
-		}
-	}
-
 	/* Calculate torch radius */
 	p_ptr->update |= (PU_TORCH);
 
@@ -1085,9 +1046,25 @@ static void process_world(void)
 				/* Get a description */
 				object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
 
-				/* Spells run out */
-				if (o_ptr->tval == TV_SPELL)
+				/* Hack -- lites */
+				if (o_ptr->tval == TV_LITE) strcpy(o_name,"light");
+
+				/* Hack -- update torch radius */
+				if (i == INVEN_LITE) p_ptr->update |= (PU_TORCH);
+
+				/* Lanterns run dry */
+				if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_LANTERN))
 				{
+					disturb(0, 0);
+					msg_print("Your light has gone out!");
+				}
+
+				/* Torches / Spells run out */
+				else if ((o_ptr->tval == TV_SPELL) || ((o_ptr->tval == TV_LITE) && !(artifact_p(o_ptr))))
+				{
+					/* Disturb */
+					disturb(0, 0);
+
 					/* Notice things */
 					if (i < INVEN_PACK) j++;
 					else k++;
@@ -1151,8 +1128,10 @@ static void process_world(void)
 				}
 			}
 
-			/* The spell is running low */
-			else if ((o_ptr->timeout < 50) && (!(o_ptr->timeout % 10)) && (o_ptr->tval == TV_SPELL))
+			/* The lantern / torch / spell is running low */
+			else if ((o_ptr->timeout < 100) && (!(o_ptr->timeout % 10)) &&
+				((o_ptr->tval == TV_SPELL) || (o_ptr->tval == TV_LITE)) &&
+				!(artifact_p(o_ptr)))
 			{
 				char o_name[80];
 
@@ -1161,9 +1140,13 @@ static void process_world(void)
 
 				if (disturb_minor) disturb(0, 0);
 
-				msg_format("Your %s is running out.", o_name);
-			}
+				if (o_ptr->tval == TV_SPELL) msg_format("Your %s is running out.", o_name);
+				else if (o_ptr->sval == SV_LITE_LANTERN) msg_print("Your light is growing faint.");
+				else msg_print("Your %s flame dims.");
 
+				/* Hack -- update torch radius */
+				if (i == INVEN_LITE) p_ptr->update |= (PU_TORCH);
+			}
 		}
 	}
 

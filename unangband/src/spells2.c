@@ -3381,7 +3381,7 @@ bool recharge(int num)
 			msg_print("The recharge backfires, draining the rod further!");
 
 			/* Hack -- decharge the rod */
-			if (o_ptr->pval < 10000) o_ptr->pval = (o_ptr->pval + 100) * 2;
+			if (o_ptr->charges < 10000) o_ptr->charges = (o_ptr->charges + 100) * 2;
 		}
 
 		/* Recharge */
@@ -3412,7 +3412,7 @@ bool recharge(int num)
 	else
 	{
 		/* Recharge power */
-		i = (num + 100 - lev - (10 * o_ptr->pval)) / 15;
+		i = (num + 100 - lev - (10 * o_ptr->charges)) / 15;
 
 		/* Back-fire XXX XXX XXX */
 		if ((i <= 1) || (rand_int(i) == 0))
@@ -3447,7 +3447,7 @@ bool recharge(int num)
 			t = (num / (lev + 2)) + 1;
 
 			/* Recharge based on the power */
-			if (t > 0) o_ptr->pval += 2 + randint(t);
+			if (t > 0) o_ptr->charges += 2 + randint(t);
 
 			/* Hack -- we no longer "know" the item */
 			o_ptr->ident &= ~(IDENT_KNOWN);
@@ -4833,16 +4833,14 @@ static void wield_spell(int item, int k_idx, int time)
 	/* Take off existing item */
 	if (o_ptr->k_idx)
 	{
-
 		/* Check if same spell */
 		if ((o_ptr->tval == TV_SPELL) && (o_ptr->sval))
 		{
 			/* Reset duration */
-			if (o_ptr->pval < time) o_ptr->pval = time;
+			if (o_ptr->timeout < time) o_ptr->timeout = time;
 
 			/* And done */
 			return;
-
 		}
 
 		/* Take off existing item */
@@ -5108,7 +5106,7 @@ static void create_gold(void)
 	base = k_info[i_ptr->k_idx].cost;
 
 	/* Determine how much the treasure is "worth" */
-	i_ptr->pval = (base + (8L * randint(base)) + randint(8));
+	i_ptr->charges = (base + (8L * randint(base)) + randint(8));
 
 	/* Floor carries the item */
 	drop_near(i_ptr, 0, p_ptr->py, p_ptr->px);

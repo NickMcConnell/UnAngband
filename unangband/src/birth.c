@@ -659,8 +659,8 @@ static void player_outfit(void)
 			object_prep(i_ptr, k_idx);
 			i_ptr->number = (byte)rand_range(e_ptr->number_min, e_ptr->number_max);
 
-			/* Modify the pval */
-			if ((e_ptr->pval_min) && (e_ptr->pval_max)) i_ptr->pval = rand_range(e_ptr->pval_min, e_ptr->pval_max);
+			/* Modify the charges */
+			if ((e_ptr->charge_min) && (e_ptr->charge_max)) i_ptr->charges = rand_range(e_ptr->charge_min, e_ptr->charge_max);
 
 			object_aware(i_ptr);
 			object_known(i_ptr);

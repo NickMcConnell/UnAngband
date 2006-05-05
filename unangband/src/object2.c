@@ -1290,10 +1290,10 @@ s32b object_value(const object_type *o_ptr)
 				case TV_STAFF:
 				{
 					/* Hack -- negative/zero hit/damage bonuses */
-					if (o_ptr->pval <= 0) return (0L);
+					if (o_ptr->charges <= 0) return (0L);
 
 					/* Factor in the bonuses */
-					value += (o_ptr->pval * 5L);
+					value += (o_ptr->charges * 5L);
 
 					/* Done */
 					break;
@@ -1427,7 +1427,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		case TV_GOLD:
 		{
 			/* Avoid overflow */
-			if (o_ptr->pval >= (2 << 15) - j_ptr->pval) return (0);
+			if (o_ptr->charges >= (2 << 15) - j_ptr->charges) return (0);
 
 			/* Always okay */
 			return (TRUE);
@@ -1483,21 +1483,21 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			/* Require identical knowledge of both items */
 			if (object_known_p(o_ptr) != object_known_p(j_ptr)) return (0);
 
-			/* Require 'similar' pvals */
-			if ((o_ptr->pval != j_ptr->pval))
+			/* Require 'similar' charges */
+			if ((o_ptr->charges != j_ptr->charges))
 			{
 				/* Check for sign difference */
-				if ((o_ptr->pval > 0)&&(j_ptr->pval <= 0)) return (0);
-				if ((o_ptr->pval < 0)&&(j_ptr->pval >= 0)) return (0);
-				if ((o_ptr->pval == 0)&&(j_ptr->pval != 0)) return (0);
+				if ((o_ptr->charges > 0)&&(j_ptr->charges <= 0)) return (0);
+				if ((o_ptr->charges < 0)&&(j_ptr->charges >= 0)) return (0);
+				if ((o_ptr->charges == 0)&&(j_ptr->charges != 0)) return (0);
 
-				/* Line 1 -- no force pval stacking option */
-				/* Line 2 -- 1st pval is not 1 less than 2nd pval, or 1st pval is a pval stack */
-				/* Line 3 -- 1st pval is not 1 greater than 2nd pval, or 2nd pval is a pval stack */
+				/* Line 1 -- no force charge stacking option */
+				/* Line 2 -- 1st charges is not 1 less than 2nd charges, or 1st charges is a charges stack */
+				/* Line 3 -- 1st charges is not 1 greater than 2nd charges, or 2nd charges is a charges stack */
 				/* Line 4 -- an item has auto_stack */
-				if ((!stack_force_pvals)
-					&& ((o_ptr->pval != j_ptr->pval-1) || (o_ptr->stackc))
-					&& ((o_ptr->pval != j_ptr->pval+1) || (j_ptr->stackc))
+				if ((!stack_force_charges)
+					&& ((o_ptr->charges != j_ptr->charges-1) || (o_ptr->stackc))
+					&& ((o_ptr->charges != j_ptr->charges+1) || (j_ptr->stackc))
 					&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr))) return (0);
 			}
 
@@ -1567,15 +1567,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 				if ((o_ptr->pval > 0)&&(j_ptr->pval <= 0)) return (0);
 				if ((o_ptr->pval < 0)&&(j_ptr->pval >= 0)) return (0);
 				if ((o_ptr->pval == 0)&&(j_ptr->pval != 0)) return (0);
-
-				/* Line 1 -- no force pval stacking option */
-				/* Line 2 -- 1st pval is not 1 less than 2nd pval, or 1st pval is a pval stack */
-				/* Line 3 -- 1st pval is not 1 greater than 2nd pval, or 2nd pval is a pval stack */
-				/* Line 4 -- an item has auto_stack */
-				if ((!stack_force_pvals) &&
-					((o_ptr->pval != j_ptr->pval-1) || (o_ptr->stackc))  &&
-					((o_ptr->pval != j_ptr->pval+1) || (j_ptr->stackc))
-					&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) ) return (0);
 			}
 
 			/* Require identical "artifact" names */
@@ -1681,12 +1672,12 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
  *
  * These assumptions are enforced by the "object_similar()" code.
  *
- * We now support 'blending' of timeouts and pvals. - ANDY
+ * We now support 'blending' of timeouts and charges. - ANDY
  *
- * With stack_force_pvals, pvals are averaged across a stack of items.
+ * With stack_force_charges, charges are averaged across a stack of items.
  *
- * Without, we only stack items that have 1 pval difference,
- * and use the pvals field to tell us how many of the higher pval
+ * Without, we only stack items that have 1 charge difference,
+ * and use the charges field to tell us how many of the higher charges
  * items are in the stack. This should be particularly helpful with
  * wands and staves as we will not unstack a pile of same charge items
  * by using them until a wand is emptied completely.
@@ -1696,10 +1687,10 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
  *
  * Without, we allow 1 charging item to stack with charged items.
  *
- * Note we treat rods like timeout items rather than pval items. This
+ * Note we treat rods like timeout items rather than charges items. This
  * unnecessarily complicates the code in a lot of places.
  *
- * Note for negative pval items, we don't use higher in the absolute
+ * Note for negative charge items, we don't use higher in the absolute
  * sense, and we have to mess around because division and modulo on
  * negative numbers is undefined in C.
  */
@@ -1710,12 +1701,12 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 
 	int number = ((total < MAX_STACK_SIZE) ? total : (MAX_STACK_SIZE - 1));
 
-	/* Blend "pval" if necessary*/
-	if (o_ptr->pval != j_ptr->pval)
+	/* Blend "charges" if necessary*/
+	if (o_ptr->charges != j_ptr->charges)
 	{
 		/* Weird calculation. But it works. */
-		s32b stackt = ((o_ptr->pval * o_ptr->number)
-				+ (j_ptr->pval * j_ptr->number)
+		s32b stackt = ((o_ptr->charges * o_ptr->number)
+				+ (j_ptr->charges * j_ptr->number)
 				- o_ptr->stackc
 				- j_ptr->stackc);
 
@@ -1724,32 +1715,32 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 		/* Modulo on negative signs undefined in C */
 		if (negative) stackt = -stackt;
 
-		/* Assign pval */
-		o_ptr->pval = stackt / total;
+		/* Assign charges */
+		o_ptr->charges = stackt / total;
 		o_ptr->stackc = number - (stackt % total);
 
-		/* Fix pval */
-		if ((o_ptr->stackc)) o_ptr->pval++;
+		/* Fix charges */
+		if ((o_ptr->stackc)) o_ptr->charges++;
 
 		/* Hack -- Fix stack count */
 		if (o_ptr->stackc >= number) o_ptr->stackc = 0;
 
-		/* Correction for negative pvals */
+		/* Correction for negative chargess */
 		if (negative)
 		{
 			/* Reverse sign */
-			o_ptr->pval = -o_ptr->pval;
+			o_ptr->charges = -o_ptr->charges;
 
 			/* Reverse stack count */
 			o_ptr->stackc = number - o_ptr->stackc;
 
-			/* Fix pval */
-			if ((o_ptr->stackc)) o_ptr->pval++;
+			/* Fix charges */
+			if ((o_ptr->stackc)) o_ptr->charges++;
 
 			/* Paranoia -- always ensure cursed items */
-			if (o_ptr->pval >=0)
+			if (o_ptr->charges >=0)
 			{
-				o_ptr->pval = -1;
+				o_ptr->charges = -1;
 				o_ptr->stackc = 0;
 			}
 
@@ -1877,6 +1868,9 @@ void object_prep(object_type *o_ptr, int k_idx)
 
 	/* Default "pval" */
 	o_ptr->pval = k_ptr->pval;
+
+	/* Default "charges" */
+	o_ptr->charges = k_ptr->charges;
 
 	/* Default number */
 	o_ptr->number = 1;
@@ -2720,31 +2714,31 @@ static void charge_item(object_type *o_ptr)
 {
 	if (k_info[o_ptr->k_idx].level < 2)
 	{
-		o_ptr->pval = randint(15)+8; 
+		o_ptr->charges = randint(15)+8; 
 	}
 	else if (k_info[o_ptr->k_idx].level < 4)
 	{
-		o_ptr->pval = randint(10)+6; 
+		o_ptr->charges = randint(10)+6; 
 	}
 	else if (k_info[o_ptr->k_idx].level < 40)
 	{
-		o_ptr->pval = randint(8)+6; 
+		o_ptr->charges = randint(8)+6; 
 	}
 	else if (k_info[o_ptr->k_idx].level < 50)
 	{
-		o_ptr->pval = randint(6)+2; 
+		o_ptr->charges = randint(6)+2; 
 	}
 	else if (k_info[o_ptr->k_idx].level < 60)
 	{
-		o_ptr->pval = randint(4)+2; 
+		o_ptr->charges = randint(4)+2; 
 	}
 	else if (k_info[o_ptr->k_idx].level < 70)
 	{
-		o_ptr->pval = randint(3)+1; 
+		o_ptr->charges = randint(3)+1; 
 	}
 	else
 	{
-		o_ptr->pval = randint(2)+1; 
+		o_ptr->charges = randint(2)+1; 
 	}
 
 }
@@ -3288,13 +3282,13 @@ static void a_m_aux_4(object_type *o_ptr, int level, int power)
 			/* Hack -- Torches -- random fuel */
 			if (o_ptr->sval == SV_LITE_TORCH)
 			{
-				if (o_ptr->pval > 0) o_ptr->pval = randint(o_ptr->pval);
+				if (o_ptr->charges > 0) o_ptr->charges = randint(o_ptr->charges);
 			}
 
 			/* Hack -- Lanterns -- random fuel */
 			if (o_ptr->sval == SV_LITE_LANTERN)
 			{
-				if (o_ptr->pval > 0) o_ptr->pval = randint(o_ptr->pval);
+				if (o_ptr->charges > 0) o_ptr->charges = randint(o_ptr->charges);
 			}
 
 			break;
@@ -3674,7 +3668,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 				if (((power > 1) || (o_ptr->xtra1) ? TRUE : FALSE) || ((power < -1) || (o_ptr->xtra1) ? TRUE : FALSE))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
 
-				if (lev > 9) (void)make_magic_item(o_ptr, power > 0 ? (lev - 7) / 3: (lev - 7) / 3, power);
+				if (lev > 3) (void)make_magic_item(o_ptr, lev / 4, power);
 			}
 
 			break;
@@ -3697,7 +3691,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 				if (((power > 1) || (o_ptr->xtra1) ? TRUE : FALSE) || (power < -1) || (o_ptr->xtra1))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
 
-				if (lev > 9) (void)make_magic_item(o_ptr, power > 0 ? (lev - 7) / 3: (lev - 7) / 3, power);
+				if (lev > 3) (void)make_magic_item(o_ptr, lev / 4, power);
 			}
 
 			break;
@@ -3711,7 +3705,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 				if (((power > 1) ? TRUE : FALSE) || (power < -1) || (o_ptr->xtra1))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),power);
 
-				if (lev > 9) (void)make_magic_item(o_ptr, power > 0 ? (lev - 7) / 3: (lev - 7) / 3, power);
+				if (lev > 3) (void)make_magic_item(o_ptr, lev / 4, power);
 			}
 
 			break;
@@ -3722,7 +3716,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		{
 			if (!power && (rand_int(100) < 50)) power = -1;
 			a_m_aux_3(o_ptr, lev, power);
-			if ((power) && (lev > k_info[o_ptr->k_idx].level + 9)) boost_item(o_ptr, (lev - 7 / 3), power);
+			if ((power) && (lev > k_info[o_ptr->k_idx].level + 3)) boost_item(o_ptr, lev / 4, power);
 			break;
 		}
 
@@ -3735,7 +3729,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			if (power)
 			{
 				a_m_aux_1(o_ptr, lev, power);
-				if (lev > k_info[o_ptr->k_idx].level + 9) boost_item(o_ptr, (lev - 7 / 3), power);
+				if (lev > k_info[o_ptr->k_idx].level + 3) boost_item(o_ptr, lev / 4, power);
 			}
 			a_m_aux_4(o_ptr, lev, power);
 			break;
@@ -4644,7 +4638,7 @@ bool make_gold(object_type *j_ptr)
 	base = k_info[OBJ_GOLD_LIST+i].cost;
 
 	/* Determine how much the treasure is "worth" */
-	j_ptr->pval = (base + (8L * randint(base)) + randint(8));
+	j_ptr->charges = (base + (8L * randint(base)) + randint(8));
 
 	/* Success */
 	return (TRUE);
@@ -6544,17 +6538,17 @@ void inven_item_charges(int item)
 	if (!object_known_p(o_ptr)) return;
 
 	/* Multiple charges */
-	if (o_ptr->pval != 1)
+	if (o_ptr->charges != 1)
 	{
 		/* Print a message */
-		msg_format("You have %d charges remaining.", o_ptr->pval);
+		msg_format("You have %d charges remaining.", o_ptr->charges);
 	}
 
 	/* Single charge */
 	else
 	{
 		/* Print a message */
-		msg_format("You have %d charge remaining.", o_ptr->pval);
+		msg_format("You have %d charge remaining.", o_ptr->charges);
 	}
 }
 
@@ -6605,8 +6599,8 @@ void inven_item_increase(int item, int num)
 			/* Reset stack counter */
 			o_ptr->stackc = 0;
 
-			/* Decrease pval */
-			if (o_ptr->pval) o_ptr->pval--;
+			/* Decrease charges */
+			if (o_ptr->charges) o_ptr->charges--;
 
 			/* Reset timeout */
 			if (o_ptr->timeout) o_ptr->timeout = 0;
@@ -6712,17 +6706,17 @@ void floor_item_charges(int item)
 	if (!object_known_p(o_ptr)) return;
 
 	/* Multiple charges */
-	if (o_ptr->pval != 1)
+	if (o_ptr->charges != 1)
 	{
 		/* Print a message */
-		msg_format("There are %d charges remaining.", o_ptr->pval);
+		msg_format("There are %d charges remaining.", o_ptr->charges);
 	}
 
 	/* Single charge */
 	else
 	{
 		/* Print a message */
-		msg_format("There is %d charge remaining.", o_ptr->pval);
+		msg_format("There is %d charge remaining.", o_ptr->charges);
 	}
 }
 
@@ -6774,8 +6768,8 @@ void floor_item_increase(int item, int num)
 		/* Reset stack counter */
 		o_ptr->stackc = 0;
 
-		/* Decrease pval */
-		if (o_ptr->pval) o_ptr->pval--;
+		/* Decrease charges */
+		if (o_ptr->charges) o_ptr->charges--;
 
 		/* Reset timeout */
 		if (o_ptr->timeout) o_ptr->timeout = 0;
@@ -6945,22 +6939,22 @@ s16b inven_carry(object_type *o_ptr)
 			/* Rods sort by increasing recharge time */
 			if (o_ptr->tval == TV_ROD)
 			{
-				if (o_ptr->pval < j_ptr->timeout) break;
-				if (o_ptr->pval > j_ptr->timeout) continue;
+				if (o_ptr->timeout < j_ptr->timeout) break;
+				if (o_ptr->timeout > j_ptr->timeout) continue;
 			}
 
 			/* Wands/Staffs sort by decreasing charges */
 			if ((o_ptr->tval == TV_WAND) || (o_ptr->tval == TV_STAFF))
 			{
-				if (o_ptr->pval > j_ptr->pval) break;
-				if (o_ptr->pval < j_ptr->pval) continue;
+				if (o_ptr->charges > j_ptr->charges) break;
+				if (o_ptr->charges < j_ptr->charges) continue;
 			}
 
 			/* Lites sort by decreasing fuel */
 			if (o_ptr->tval == TV_LITE)
 			{
-				if (o_ptr->pval > j_ptr->pval) break;
-				if (o_ptr->pval < j_ptr->pval) continue;
+				if (o_ptr->charges > j_ptr->charges) break;
+				if (o_ptr->charges < j_ptr->charges) continue;
 			}
 
 			/* Determine the "value" of the pack item */
@@ -7118,7 +7112,7 @@ s16b inven_takeoff(int item, int amt)
 		}
 		else
 		{
-			if (i_ptr->pval) i_ptr->pval--;
+			if (i_ptr->charges) i_ptr->charges--;
 			if (i_ptr->timeout) i_ptr->timeout = 0;
 
 			o_ptr->stackc -= amt;
@@ -7166,6 +7160,16 @@ s16b inven_takeoff(int item, int amt)
 	else if (item == INVEN_LITE)
 	{
 		act = "You were holding";
+
+		/* Snuff light */
+		if (!(artifact_p(o_ptr)))
+		{
+			if (!o_ptr->charges)
+			{
+				o_ptr->charges = o_ptr->timeout;
+				o_ptr->timeout = 0;
+			}
+		}
 	}
 
 	/* Took off something */
@@ -7263,7 +7267,7 @@ void inven_drop(int item, int amt)
 		}
 		else
 		{
-			if (i_ptr->pval) i_ptr->pval--;
+			if (i_ptr->charges) i_ptr->charges--;
 			if (i_ptr->timeout) i_ptr->timeout = 0;
 
 			o_ptr->stackc -= amt;
@@ -7444,15 +7448,15 @@ void reorder_pack(void)
 			/* Wands/Staffs sort by decreasing charges */
 			if ((o_ptr->tval == TV_WAND) || (o_ptr->tval == TV_STAFF))
 			{
-				if (o_ptr->pval > j_ptr->pval) break;
-				if (o_ptr->pval < j_ptr->pval) continue;
+				if (o_ptr->charges > j_ptr->charges) break;
+				if (o_ptr->charges < j_ptr->charges) continue;
 			}
 
 			/* Lites sort by decreasing fuel */
 			if (o_ptr->tval == TV_LITE)
 			{
-				if (o_ptr->pval > j_ptr->pval) break;
-				if (o_ptr->pval < j_ptr->pval) continue;
+				if (o_ptr->charges > j_ptr->charges) break;
+				if (o_ptr->charges < j_ptr->charges) continue;
 			}
 
 			/* Determine the "value" of the pack item */

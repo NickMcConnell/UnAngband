@@ -1142,7 +1142,7 @@ void py_pickup(int pickup)
 		/* Pick up gold */
 		if (o_ptr->tval >= TV_GOLD)
 		{
-			long value = o_ptr->number * o_ptr->pval - o_ptr->stackc;
+			long value = o_ptr->number * o_ptr->charges - o_ptr->stackc;
 
 			/* Message */
 			if (o_ptr->tval == TV_GOLD) msg_format("You have found %ld gold pieces worth of %s.",
@@ -1575,7 +1575,7 @@ void hit_trap(int y, int x)
 			case TV_WAND:
 			case TV_STAFF:
 			{
-				if (o_ptr->pval > 0)
+				if (o_ptr->charges > 0)
 				{
 					/* Get item effect */
 					get_spell(&power, "use", o_ptr, FALSE);
@@ -1587,7 +1587,7 @@ void hit_trap(int y, int x)
 					if (o_ptr->stackc >= o_ptr->number)
 					{
 						/* Use a charge off the stack */
-						o_ptr->pval--;
+						o_ptr->charges--;
 
 						/* Reset the stack count */
 						o_ptr->stackc = 0;
@@ -1595,9 +1595,9 @@ void hit_trap(int y, int x)
 
 					/* XXX Hack -- unstack if necessary */
 					if ((o_ptr->number > 1) &&					 
-					((!object_known_p(o_ptr) && (o_ptr->pval == 2) && (o_ptr->stackc > 1)) ||
+					((!object_known_p(o_ptr) && (o_ptr->charges == 2) && (o_ptr->stackc > 1)) ||
 					  (!object_known_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
-					  (o_ptr->stackc != 1) && (o_ptr->pval > 2))))
+					  (o_ptr->stackc != 1) && (o_ptr->charges > 2))))
 					{
 						object_type *i_ptr;
 						object_type object_type_body;
@@ -1620,13 +1620,13 @@ void hit_trap(int y, int x)
 						/* Reduce the charges on the new item */
 						if (o_ptr->stackc > 1)
 						{
-							i_ptr->pval-=2;
+							i_ptr->charges-=2;
 							o_ptr->stackc--;
 						}
 						else if (!o_ptr->stackc)
 						{
-							i_ptr->pval--;
-							o_ptr->pval++;
+							i_ptr->charges--;
+							o_ptr->charges++;
 							o_ptr->stackc = o_ptr->number-1;
 						}
 
@@ -1653,7 +1653,7 @@ void hit_trap(int y, int x)
 					tmpval = o_ptr->timeout;
 
 					/* Time rod out */
-					o_ptr->timeout = o_ptr->pval;
+					o_ptr->timeout = o_ptr->charges;
 
 					/* Get item effect */
 					get_spell(&power, "use", o_ptr, FALSE);

@@ -1972,24 +1972,16 @@ static void water_dam(int who, int dam, cptr kb_str, bool inven)
 		object_flags(o_ptr,&f1,&f2,&f3,&f4);
 
 		/* Hack -- Use up fuel (except on artifacts and lites unaffected by water) */
-		if (!artifact_p(o_ptr) && (o_ptr->pval > 0) && !(f2 & TR2_IGNORE_WATER))
+		if (!artifact_p(o_ptr) && ((o_ptr->charges > 0) || (o_ptr->timeout > 0)) && !(f2 & TR2_IGNORE_WATER))
 		{
 			/* Douse light */
-			o_ptr->pval = 0;
+			o_ptr->charges = 0;
 
-			/* Hack -- Special treatment when blind */
-			if (p_ptr->blind)
-			{
-				/* Hack -- save some light for later */
-				o_ptr->pval++;
-			}
+			/* Douse light */
+			o_ptr->timeout = 0;
 
-			/* The light is now out */
-			else
-			{
-				disturb(0, 0);
-				msg_print("Your light has gone out!");
-			}
+			disturb(0, 0);
+			msg_print("Your light has gone out!");
 		}
 	}
 
@@ -7699,7 +7691,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Drain charged wands/staffs */
 				if (((o_ptr->tval == TV_STAFF) ||
 				     (o_ptr->tval == TV_WAND)) &&
-				    (o_ptr->pval))
+				    (o_ptr->charges))
 				{
 					/* Message */
 					msg_print("Energy drains from your pack!");
@@ -7711,7 +7703,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 					{
 						/* Heal */
 						j = dam/10;
-						m_ptr->hp += j * o_ptr->pval * o_ptr->number;
+						m_ptr->hp += j * o_ptr->charges * o_ptr->number;
 						if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
 
 						/* Redraw (later) if needed */
@@ -7719,7 +7711,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 					}
 
 					/* Uncharge */
-					o_ptr->pval = 0;
+					o_ptr->charges = 0;
 
 					/* Combine / Reorder the pack */
 					p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -7866,7 +7858,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Sometimes use lower stack object */
 				if (!object_known_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
 				{
-					if (i_ptr->pval) i_ptr->pval--;
+					if (i_ptr->charges) i_ptr->charges--;
 
 					if (i_ptr->timeout) i_ptr->timeout = 0;
 
@@ -7961,11 +7953,11 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			o_ptr = &inventory[INVEN_LITE];
 
 			/* Drain fuel */
-			if ((o_ptr->pval > 0) && (!artifact_p(o_ptr)))
+			if ((o_ptr->timeout > 0) && (!artifact_p(o_ptr)))
 			{
 				/* Reduce fuel */
-				o_ptr->pval -= (250 + randint(250));
-				if (o_ptr->pval < 1) o_ptr->pval = 1;
+				o_ptr->timeout -= (250 + randint(250));
+				if (o_ptr->timeout < 1) o_ptr->timeout = 1;
 
 				/* Notice */
 				if (!p_ptr->blind)

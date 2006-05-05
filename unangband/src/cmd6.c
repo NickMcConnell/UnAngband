@@ -141,7 +141,7 @@ void do_cmd_eat_food(void)
 	p_ptr->window |= (PW_INVEN | PW_EQUIP);
 
 	/* Food can feed the player */
-	(void)set_food(p_ptr->food + o_ptr->pval);
+	(void)set_food(p_ptr->food + o_ptr->charges);
 
 	/* Destroy a food in the pack */
 	if (item >= 0)
@@ -245,7 +245,7 @@ void do_cmd_quaff_potion(void)
 	p_ptr->window |= (PW_INVEN | PW_EQUIP);
 
 	/* Potions can feed the player */
-	(void)set_food(p_ptr->food + o_ptr->pval);
+	(void)set_food(p_ptr->food + o_ptr->charges);
 
 	/* Destroy a potion in the pack */
 	if (item >= 0)
@@ -511,7 +511,7 @@ void do_cmd_use_staff(void)
 	}
 
 	/* Notice empty staffs */
-	if (o_ptr->pval <= 0)
+	if (o_ptr->charges <= 0)
 	{
 		if (flush_failure) flush();
 		msg_print("The staff has no charges left.");
@@ -563,7 +563,7 @@ void do_cmd_use_staff(void)
 	if (o_ptr->stackc >= o_ptr->number)
 	{
 		/* Use a charge off the stack */
-		o_ptr->pval--;
+		o_ptr->charges--;
 
 		/* Reset the stack count */
 		o_ptr->stackc = 0;
@@ -571,9 +571,9 @@ void do_cmd_use_staff(void)
 
 	/* XXX Hack -- unstack if necessary */
 	if ((o_ptr->number > 1) && 
-	((!object_known_p(o_ptr) && (o_ptr->pval == 2) && (o_ptr->stackc > 1)) ||
+	((!object_known_p(o_ptr) && (o_ptr->charges == 2) && (o_ptr->stackc > 1)) ||
 	  (!object_known_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
-	  (o_ptr->stackc != 1) && (o_ptr->pval > 2))))
+	  (o_ptr->stackc != 1) && (o_ptr->charges > 2))))
 	{
 		object_type *i_ptr;
 		object_type object_type_body;
@@ -596,13 +596,13 @@ void do_cmd_use_staff(void)
 		/* Reduce the charges on the new item */
 		if (o_ptr->stackc > 1)
 		{
-			i_ptr->pval-=2;
+			i_ptr->charges-=2;
 			o_ptr->stackc--;
 		}
 		else if (!o_ptr->stackc)
 		{
-			i_ptr->pval--;
-			o_ptr->pval++;
+			i_ptr->charges--;
+			o_ptr->charges++;
 			o_ptr->stackc = o_ptr->number-1;
 		}
 
@@ -769,7 +769,7 @@ void do_cmd_aim_wand(void)
 	}
 
 	/* The wand is already empty! */
-	if (o_ptr->pval <= 0)
+	if (o_ptr->charges <= 0)
 	{
 		if (flush_failure) flush();
 		msg_print("The wand has no charges left.");
@@ -822,7 +822,7 @@ void do_cmd_aim_wand(void)
 	if (o_ptr->stackc >= o_ptr->number)
 	{
 		/* Use a charge off the stack */
-		o_ptr->pval--;
+		o_ptr->charges--;
 
 		/* Reset the stack count */
 		o_ptr->stackc = 0;
@@ -830,9 +830,9 @@ void do_cmd_aim_wand(void)
 
 	/* XXX Hack -- unstack if necessary */
 	if ((o_ptr->number > 1) && 
-	((!object_known_p(o_ptr) && (o_ptr->pval == 2) && (o_ptr->stackc > 1)) ||
+	((!object_known_p(o_ptr) && (o_ptr->charges == 2) && (o_ptr->stackc > 1)) ||
 	  (!object_known_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
-	  (o_ptr->stackc != 1) && (o_ptr->pval > 2))))
+	  (o_ptr->stackc != 1) && (o_ptr->charges > 2))))
 	{
 		object_type *i_ptr;
 		object_type object_type_body;
@@ -855,13 +855,13 @@ void do_cmd_aim_wand(void)
 		/* Reduce the charges on the new item */
 		if (o_ptr->stackc > 1)
 		{
-			i_ptr->pval-=2;
+			i_ptr->charges-=2;
 			o_ptr->stackc--;
 		}
 		else if (!o_ptr->stackc)
 		{
-			i_ptr->pval--;
-			o_ptr->pval++;
+			i_ptr->charges--;
+			o_ptr->charges++;
 			o_ptr->stackc = o_ptr->number-1;
 		}
 
@@ -1023,7 +1023,7 @@ void do_cmd_zap_rod(void)
 	}
 #endif
 
-	/* Store pval */
+	/* Store charges */
 	tmpval = o_ptr->timeout;
 
 	/* Sound */
@@ -1042,7 +1042,7 @@ void do_cmd_zap_rod(void)
 	ident = process_spell(power, 0, &cancel);
 
 	/* Time rod out */
-	o_ptr->timeout = o_ptr->pval;
+	o_ptr->timeout = o_ptr->charges;
 
 	/* Combine / Reorder the pack (later) */
 	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -1426,7 +1426,7 @@ void do_cmd_assemble(void)
 		i_ptr->sval = tgt_sval;
 		if (src_sval != k_ptr->sval) i_ptr->weight += k_ptr->weight /2;
 		else i_ptr->weight += k_ptr->weight;
-		if (k_info[i_ptr->k_idx].pval) i_ptr->timeout = randint(k_info[i_ptr->k_idx].pval) + k_info[i_ptr->k_idx].pval;
+		if (k_info[i_ptr->k_idx].charges) i_ptr->timeout = randint(k_info[i_ptr->k_idx].charges) + k_info[i_ptr->k_idx].charges;
 
 		/* Adjust the weight and carry */
 		if (item2 >= 0)
@@ -1629,7 +1629,7 @@ void do_cmd_activate(void)
 #endif
 
 
-	/* Store pval */
+	/* Store charges */
 	tmpval = o_ptr->timeout;
 
 	/* Activate the artifact */
@@ -1695,7 +1695,7 @@ void do_cmd_activate(void)
 		if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
 
 		/* Time object out */
-		o_ptr->timeout = rand_int(o_ptr->pval)+o_ptr->pval;
+		o_ptr->timeout = rand_int(o_ptr->charges)+o_ptr->charges;
 
 		/* Window stuff */
 		p_ptr->window |= (PW_INVEN | PW_EQUIP);
@@ -2029,7 +2029,7 @@ void do_cmd_apply_rune(void)
 						if (e_ptr->max_to_a > 0) i_ptr->to_a = MIN(i_ptr->to_a,-randint(e_ptr->max_to_a));
 						else i_ptr->to_a = MIN(i_ptr->to_a,0);
 
-						/* Hack -- obtain pval */
+						/* Hack -- obtain charges */
 						if (e_ptr->max_pval > 0) i_ptr->pval = MIN(i_ptr->pval,-randint(e_ptr->max_pval));
 					}
 

@@ -2602,7 +2602,7 @@ void list_object(const object_type *o_ptr, int mode)
 				break;
 			case TV_ROD:
 				p = "When zapped, it ";
-				charge = (k_info[o_ptr->k_idx].used > o_ptr->pval) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
+				charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
 				break;
 			case TV_STAFF:
 				p = "When used, it ";
@@ -2629,7 +2629,7 @@ void list_object(const object_type *o_ptr, int mode)
 		if ((f3 & TR3_ACTIVATE) && !(p))
 		{
 			p = "When activated, it ";
-			charge = (k_info[o_ptr->k_idx].used > o_ptr->pval) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
+			charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
 		}
 
 		/* Artifacts */
@@ -2667,11 +2667,18 @@ void list_object(const object_type *o_ptr, int mode)
 				powers |= spell_desc(&s_info[book[i]],(i==0)?p:", or ",0,detail, target);
 			}
 
-			if ((charge) && (powers)) text_out(format(", recharging in d%d turns.  ",o_ptr->pval));
+			if ((charge) && (powers)) text_out(format(", recharging in d%d turns.  ",o_ptr->charges));
 			else if (powers) text_out(".  ");
 
 			anything |= powers;
 		}
+	}
+
+	/* Can enchant this further? */
+	if (!spoil && !random && object_known_p(o_ptr) && !(o_ptr->xtra1) && !artifact_p(o_ptr) )
+	{
+		text_out_c(TERM_VIOLET,"\nYou can apply runes to it or enchant it with additional powers.  ");
+		anything = TRUE;
 	}
 
 	/* Unknown extra powers (ego-item with random extras or artifact) */

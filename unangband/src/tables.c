@@ -1505,7 +1505,7 @@ const cptr option_text[OPT_MAX] =
 	"auto_more",				/* OPT_auto_more */
 	"smart_monsters",			/* OPT_smart_monsters */
 	"smart_packs",				/* OPT_smart_packs */
-	"stack_force_pvals",						/* xxx */
+	"stack_force_charges",						/* xxx */
 	"stack_force_times",						/* xxx */
 	NULL,						/* xxx */
 	"room_descriptions",						/* xxx */
@@ -1769,7 +1769,7 @@ const cptr option_desc[OPT_MAX] =
 	"Automatically clear '-more-' prompts",		/* OPT_auto_more */
 	"Monsters behave more intelligently",		/* OPT_smart_monsters */
 	NULL,								/* xxx */
-	"Merge pvals when stacking",				/* OPT_stack_force_pvals */
+	"Merge charges when stacking",				/* OPT_stack_force_charges */
 	"Merge timeouts when stacking",			/* OPT_stack_force_timeouts */
 	NULL,							/* xxx */
 	"Display room descriptions",				/* OPT_room_descriptions */
@@ -2033,7 +2033,7 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* OPT_auto_more */
 	FALSE,		/* OPT_smart_monsters */
 	FALSE,		/* OPT_smart_packs */
-	FALSE,	  /* OPT_stack_force_pvals */
+	FALSE,	  /* OPT_stack_force_charges */
 	FALSE,	  /* OPT_stack_force_times */
 	FALSE,	   /* xxx */
 	FALSE,	   /* OPT_room_descriptions */
@@ -2063,7 +2063,7 @@ const bool option_norm[OPT_MAX] =
 	FALSE,	   /* OPT_variant_fast_kills */
 	FALSE,	   /* OPT_variant_scale_damage */
 	FALSE,	   /* OPT_variant_scale_hp */
-	FALSE,	  /* OPT_variant_pval_stacks */
+	FALSE,	  /* OPT_variant_charge_stacks */
 	FALSE,	   /* OPT_variant_oos_summons */
 	FALSE,	   /* OPT_variant_oos_teleports */
 	FALSE,	   /* OPT_variant_oos_heals */
@@ -2240,7 +2240,7 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_easy_alter,
 		OPT_easy_floor,
 		OPT_scroll_target,
-		OPT_stack_force_pvals,
+		OPT_stack_force_charges,
 		OPT_stack_force_times,
 		OPT_easy_autos,
 		OPT_easy_search,

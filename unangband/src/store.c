@@ -603,8 +603,11 @@ static bool store_object_similar(object_type *o_ptr, object_type *j_ptr)
 	/* Different objects cannot be stacked */
 	if (o_ptr->k_idx != j_ptr->k_idx) return (0);
 
-	/* Different charges (etc) cannot be stacked */
+	/* Different pval cannot be stacked */
 	if (o_ptr->pval != j_ptr->pval) return (0);
+
+	/* Different charges (etc) cannot be stacked */
+	if (o_ptr->charges != j_ptr->charges) return (0);
 
 	/* Require many identical values */
 	if (o_ptr->to_h != j_ptr->to_h) return (0);
@@ -1396,8 +1399,8 @@ static void store_create(void)
 		/* Hack -- Charge lite's */
 		if (i_ptr->tval == TV_LITE)
 		{
-			if (i_ptr->sval == SV_LITE_TORCH) i_ptr->pval = FUEL_TORCH / 2;
-			if (i_ptr->sval == SV_LITE_LANTERN) i_ptr->pval = FUEL_LAMP / 2;
+			if (i_ptr->sval == SV_LITE_TORCH) i_ptr->charges = FUEL_TORCH / 2;
+			if (i_ptr->sval == SV_LITE_LANTERN) i_ptr->charges = FUEL_LAMP / 2;
 		}
 
 		/* Item belongs to a store */

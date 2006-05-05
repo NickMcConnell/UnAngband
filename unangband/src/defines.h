@@ -3908,7 +3908,7 @@
 #define OPT_auto_more      71
 #define OPT_smart_monsters 72
 #define OPT_smart_packs    73
-#define OPT_stack_force_pvals			74
+#define OPT_stack_force_charges			74
 #define OPT_stack_force_times		75
 /* xxx */
 #define OPT_room_descriptions			77
@@ -4040,7 +4040,7 @@
 #define auto_more   op_ptr->opt[OPT_auto_more]
 #define smart_monsters    op_ptr->opt[OPT_smart_monsters]
 #define smart_packs op_ptr->opt[OPT_smart_packs]
-#define stack_force_pvals  op_ptr->opt[OPT_stack_force_pvals]
+#define stack_force_charges  op_ptr->opt[OPT_stack_force_charges]
 #define stack_force_times  op_ptr->opt[OPT_stack_force_times]
 /* xxx */
 #define verify_mana      op_ptr->opt[OPT_verify_mana]

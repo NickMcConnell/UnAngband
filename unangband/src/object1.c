@@ -1390,9 +1390,9 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		/* Dump " (N charges)" */
 		object_desc_chr_macro(t, ' ');
 		object_desc_chr_macro(t, p1);
-		object_desc_num_macro(t, o_ptr->pval);
+		object_desc_num_macro(t, o_ptr->charges);
 		object_desc_str_macro(t, " charge");
-		if (o_ptr->pval != 1)
+		if (o_ptr->charges != 1)
 		{
 			object_desc_chr_macro(t, 's');
 		}
@@ -1403,9 +1403,18 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	else if ((o_ptr->tval == TV_LITE) && (!artifact_p(o_ptr)))
 	{
 		/* Hack -- Turns of light for normal lites */
-		object_desc_str_macro(t, " (with ");
-		object_desc_num_macro(t, o_ptr->pval);
-		object_desc_str_macro(t, " turns of light)");
+		if (o_ptr->charges)
+		{
+			object_desc_str_macro(t, " (with ");
+			object_desc_num_macro(t, o_ptr->charges);
+			object_desc_str_macro(t, " turns of light)");
+		}
+		else if (o_ptr->timeout)
+		{
+			object_desc_str_macro(t, " (with ");
+			object_desc_num_macro(t, o_ptr->timeout);
+			object_desc_str_macro(t, " turns of light left)");
+		}
 	}
 
 

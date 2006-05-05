@@ -376,7 +376,7 @@ void do_cmd_wield(void)
 		}
 		else
 		{
-			if (i_ptr->pval) i_ptr->pval--;
+			if (i_ptr->charges) i_ptr->charges--;
 			if (i_ptr->timeout) i_ptr->timeout = 0;
 
 			o_ptr->stackc -= amt;
@@ -457,6 +457,13 @@ void do_cmd_wield(void)
 	else if (slot == INVEN_LITE)
 	{
 		act = "Your light source is";
+
+		/* Light torch */
+		if (!(artifact_p(o_ptr)))
+		{
+			o_ptr->timeout = o_ptr->charges;
+			o_ptr->charges = 0;
+		}
 	}
 	else
 	{
@@ -1150,7 +1157,7 @@ static bool item_tester_refill_lantern(const object_type *o_ptr)
 	/* Non-empty lanterns are okay */
 	if ((o_ptr->tval == TV_LITE) &&
 	    (o_ptr->sval == SV_LITE_LANTERN) &&
-	    (o_ptr->pval > 0))
+	    (o_ptr->charges > 0))
 	{
 		return (TRUE);
 	}
@@ -1343,15 +1350,15 @@ void do_cmd_refill(void)
 		if (unstack) msg_print("You unstack your lantern.");
 
 		/* Refuel */
-		o_ptr->pval += j_ptr->pval;
+		o_ptr->charges += j_ptr->charges;
 
 		/* Message */
 		msg_print("You fuel the lamp.");
 
 		/* Comment */
-		if (o_ptr->pval >= FUEL_LAMP)
+		if (o_ptr->charges >= FUEL_LAMP)
 		{
-			o_ptr->pval = FUEL_LAMP;
+			o_ptr->charges = FUEL_LAMP;
 			msg_print("The lamp is full.");
 		}
 
@@ -1365,15 +1372,15 @@ void do_cmd_refill(void)
 		if (unstack) msg_print("You unstack your torch.");
 
 		/* Refuel */
-		o_ptr->pval += j_ptr->pval + 5;
+		o_ptr->charges += j_ptr->charges + 5;
 
 		/* Message */
 		msg_print("You combine the torches.");
 
 		/* Over-fuel message */
-		if (o_ptr->pval >= FUEL_TORCH)
+		if (o_ptr->charges >= FUEL_TORCH)
 		{
-			o_ptr->pval = FUEL_TORCH;
+			o_ptr->charges = FUEL_TORCH;
 			msg_print("Your torch is fully fueled.");
 		}
 
@@ -1430,8 +1437,8 @@ void do_cmd_refill(void)
 			/* Reset stack counter */
 			i_ptr->stackc = 0;
 
-			/* Reset the pval */
-			i_ptr->pval = 0;
+			/* Reset the charges */
+			i_ptr->charges = 0;
 
 			/* No longer 'stored' */
 			i_ptr->ident &= ~(IDENT_STORE);
@@ -1449,7 +1456,7 @@ void do_cmd_refill(void)
 		else
 		{
 			/* Use up last of fuel */
-			j_ptr->pval = 0;
+			j_ptr->charges = 0;
 		}
 	}
 	/* Decrease the item (in the pack) */

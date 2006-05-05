@@ -1069,8 +1069,8 @@ struct start_item
 	byte sval;	/* Item's sval */
 	byte number_min;/* Minimum starting amount */
 	byte number_max;/* Maximum starting amount */
-	s16b pval_min;	/* Minimum pval */
-	s16b pval_max;	/* Maximum pval */
+	s16b charge_min;/* Minimum charges */
+	s16b charge_max;/* Maximum charges */
 	byte social_min;/* Minimum social class to be given this */
 	byte social_max;/* Maximum social class to be given this */};
 
