@@ -4610,8 +4610,9 @@ extern int PlayerUID;
 #define MSG_KILL_KING       147
 #define MSG_DRAIN_STAT      148
 #define MSG_MULTIPLY        149
+#define MSG_SCREENDUMP	    150
 
-#define MSG_MAX             150
+#define MSG_MAX             151
 
 
 /*** Sound constants ***/

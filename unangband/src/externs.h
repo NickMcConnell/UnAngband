@@ -431,6 +431,7 @@ extern void do_cmd_observe(void);
 extern void do_cmd_uninscribe(void);
 extern void do_cmd_inscribe(void);
 extern void do_cmd_refill(void);
+extern void do_cmd_light_and_douse(void);
 extern void do_cmd_target(void);
 extern void do_cmd_look(void);
 extern void do_cmd_locate(void);

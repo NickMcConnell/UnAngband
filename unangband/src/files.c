@@ -984,15 +984,15 @@ errr process_pref_file(cptr name)
  * This may seem like laziness on my part, but the only clean way I can see of
  * doing this code-wise requires that I reset all the visuals anyway. So we do this
  * when we have to (Dumping as a command from the main map) and anywhere else, we
- * try and avoid it (Due to obvious problems with tryiing to redraw the screen
+ * try and avoid it (Due to obvious problems with trying to redraw the screen
  * mid-way through displaying a message/animation and so on). That way for someone
  * truely worried about getting everything via an html screenshot, they can reset
  * their pref file and avoid using font preferences that use non-ASCII characters.
  *
  * This also has the additional advantage that we can dump any screen to html,
  * rather than just the main map, which other variants do via duplication of the
- * map info code. We do this by hooking into the currently unused Ctrl-right carat
- * in util.c. This is probably dangerous, so we don't use screen_save/screen_load
+ * map info code. We do this by hooking into the currently unused Ctrl-right square
+ * bracket in util.c. This is probably dangerous, so we don't use screen_save/screen_load
  * or notify the player in any way that we have committed a screen_dump. Hopefully
  * by the time we call inkey() we don't have any issues with outputting a file.
  *
@@ -1008,6 +1008,8 @@ void dump_html(void)
 
 	char buf[1024];
 
+	/* Click! */
+	sound(MSG_SCREENDUMP);
 
 	/* Build the filename */
 	/* XXX Support .html vs. .htm file names. We dumb down for DOS */

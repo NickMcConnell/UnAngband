@@ -1711,6 +1711,9 @@ key_event inkey_ex(void)
 			/* Strip this key */
 			ke.key = 0;
 
+			/* Hack -- always do an html dump */
+			dump_html();
+
 			/* Continue */
 			continue;
 		}

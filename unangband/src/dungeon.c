@@ -1963,6 +1963,13 @@ static void process_command(void)
 			break;
 		}
 
+		/* Light or douse a light source */
+		case '|':
+		{
+			do_cmd_light_and_douse();
+			break;
+		}
+
 		/*** Looking at Things (nearby or on map) ***/
 
 		/* Full dungeon map */
@@ -2154,7 +2161,6 @@ static void process_command(void)
 
 		/* Check knowledge */
 		case '~':
-		case '|':
 		{
 			do_cmd_knowledge();
 			break;

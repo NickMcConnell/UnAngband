@@ -3895,6 +3895,8 @@ void do_cmd_save_screen(void)
 
 	char buf[1024];
 
+	/* Click! */
+	sound(MSG_SCREENDUMP);
 
 	/* Build the filename */
 	path_build(buf, 1024, ANGBAND_DIR_USER, "dump.txt");

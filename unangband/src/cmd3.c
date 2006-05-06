@@ -1490,6 +1490,88 @@ void do_cmd_refill(void)
 }
 
 
+/*
+ * An "item_tester_hook" for light sources
+ */
+static bool item_tester_light_source(const object_type *o_ptr)
+{
+	/* Return "is a non-artifact light source" */
+	return ((o_ptr->tval == TV_LITE) && !(artifact_p(o_ptr)));
+}
+
+/*
+ * Light or douse a light source.
+ */
+void do_cmd_light_and_douse(void)
+{
+	int item;
+
+	object_type *o_ptr;
+	char o_name[80];
+
+	cptr own_str = "";
+
+	cptr q, s;
+
+
+	/* Restrict the choices */
+	item_tester_hook = item_tester_light_source;
+
+	/* Get an item (not in the backpack) */
+	q = "Light or douse which light source?";
+	s = "You have no light sources.";
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_FLOOR))) return;
+
+	/* Get the item (in the pack) */
+	if (item >= 0)
+	{
+		o_ptr = &inventory[item];
+	}
+
+	/* Get the item (on the floor) */
+	else
+	{
+		o_ptr = &o_list[0 - item];
+	}
+
+	/* Get an object description */
+	object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 1);
+
+	/* Get an ownership string */
+	if (item >= 0) own_str = "your";
+	else if (o_ptr->number != 1) own_str = "some";
+	else own_str = "the";
+
+
+	/* Take a partial turn */
+	p_ptr->energy_use = 50;
+
+
+	/* Light the light source */
+	if (!(o_ptr->timeout))
+	{
+		msg_format("You light %s %s.", own_str, o_name);
+		o_ptr->timeout = o_ptr->charges;
+		o_ptr->charges = 0;
+	}
+
+	/* Douse the light source */
+	else
+	{
+		msg_format("You douse %s %s.", own_str, o_name);
+		o_ptr->charges = o_ptr->timeout;
+		o_ptr->timeout = 0;
+	}
+
+	/* Update torch */
+	p_ptr->update |= (PU_TORCH);
+
+	/* Fully update the visuals */
+	p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS);
+}
+
+
+
 
 /*
  * Target command

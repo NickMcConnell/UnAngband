@@ -168,13 +168,16 @@ static void wr_item(const object_type *o_ptr)
 	wr_byte(o_ptr->sval);
 
 	/* Hack until we update game version number to 0.6.1 */
-	if ((o_ptr->tval == TV_WAND) || (o_ptr->tval == TV_STAFF) || (o_ptr->tval == TV_FOOD))
+	if ((o_ptr->tval == TV_LITE) && !(artifact_p(o_ptr)) && (o_ptr->timeout))
+	{
+		/* Write timeout later */
+		wr_s16b(0);
+	}
+	else if ((o_ptr->tval == TV_WAND) || (o_ptr->tval == TV_STAFF) || (o_ptr->tval == TV_POTION)
+		 || (o_ptr->tval == TV_FOOD) || (o_ptr->tval == TV_GOLD)  || (o_ptr->tval == TV_GEMS)
+		 || ((o_ptr->tval == TV_LITE) && !(artifact_p(o_ptr))))
 	{
 		wr_s16b(o_ptr->charges);
-	}
-	else if (o_ptr->tval == TV_LITE)
-	{
-		wr_s16b(o_ptr->timeout);
 	}
 	else
 	{
@@ -189,8 +192,6 @@ static void wr_item(const object_type *o_ptr)
 	wr_byte(o_ptr->feeling);
 	wr_byte(o_ptr->spare);
 #endif
-
-
 	wr_byte(o_ptr->number);
 	wr_s16b(o_ptr->weight);
 
