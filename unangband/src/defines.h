@@ -1652,6 +1652,7 @@
 #define TV_PRAYER_BOOK  91
 #define TV_SONG_BOOK    92
 #define TV_RUNESTONE    93
+#define TV_BAG		98	/* Containers for other items */
 #define TV_SERVICE	99	/* Services have special meanings in stores */
 #define TV_GOLD  100     /* Gold or higher tvals can only be picked up by players */
 #define TV_GEMS  101
@@ -2252,6 +2253,13 @@
  * Special "sval" limit -- first "good" magic/prayer book
  */
 #define SV_BOOK_MIN_GOOD	4
+
+
+/*
+ * Special "sval" limit -- maximum number of bags
+ */
+#define SV_BAG_MAX_BAGS		30
+
 
 /*
  * Special "sval" value -- unknown "sval"

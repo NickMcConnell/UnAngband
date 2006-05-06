@@ -90,7 +90,7 @@ extern const start_item common_items[MAX_COMMON_ITEMS];
 extern const cptr vocalize[MAX_LANGUAGES];
 extern const int month_day[9];
 extern const cptr month_name[9];
-
+extern const s16b bag_contents[SV_BAG_MAX_BAGS][22][2];
 
 /* variable.c */
 extern cptr copyright;
