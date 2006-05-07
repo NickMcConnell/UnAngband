@@ -90,7 +90,7 @@ extern const start_item common_items[MAX_COMMON_ITEMS];
 extern const cptr vocalize[MAX_LANGUAGES];
 extern const int month_day[9];
 extern const cptr month_name[9];
-extern const s16b bag_contents[SV_BAG_MAX_BAGS][22][2];
+extern const s16b bag_holds[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL][2];
 
 /* variable.c */
 extern cptr copyright;
@@ -218,6 +218,7 @@ extern object_lore *k_list;
 extern quest_type *q_list;
 extern store_type *store;
 extern object_type *inventory;
+extern s16b bag_contents[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL];
 extern s16b alloc_kind_size;
 extern alloc_entry *alloc_kind_table;
 extern s16b alloc_ego_size;
@@ -646,6 +647,8 @@ extern void show_inven(void);
 extern void show_equip(void);
 extern void toggle_inven_equip(void);
 extern bool get_item(int *cp, cptr pmt, cptr str, int mode);
+extern void fake_bag_item(object_type *o_ptr, int sval, int slot);
+extern bool get_item_from_bag(int *cp, cptr pmt, cptr str, object_type *o_ptr);
 
 /* object2.c */
 extern void excise_object_idx(int o_idx);

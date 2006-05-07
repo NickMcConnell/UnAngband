@@ -433,7 +433,7 @@ void do_cmd_browse(void)
 	/* Get an item */
 	q = "Browse which book? ";
 	s = "You have no books that you can read.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -445,6 +445,16 @@ void do_cmd_browse(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	/* Get the item's sval */
@@ -655,7 +665,7 @@ void do_cmd_study(void)
 	/* Get an item */
 	q = "Study which book? ";
 	s = "You have no books that you can read.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -669,6 +679,15 @@ void do_cmd_study(void)
 		o_ptr = &o_list[0 - item];
 	}
 
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
 
 	/* Track the object kind */
 	object_kind_track(o_ptr->k_idx);
@@ -1157,7 +1176,7 @@ void do_cmd_cast(void)
 	/* Get an item */
 	q = "Use which book? ";
 	s = "You have nothing you have studied!";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -1168,6 +1187,16 @@ void do_cmd_cast(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	/* Track the object kind */

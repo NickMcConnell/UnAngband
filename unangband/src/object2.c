@@ -1416,6 +1416,27 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 {
 	int total = o_ptr->number + j_ptr->number;
 
+	/* Hack -- magical bags */
+	if ((o_ptr->tval == TV_BAG) || (j_ptr->tval == TV_BAG))
+	{
+		const object_type *i_ptr = j_ptr;
+
+		int i, sval = o_ptr->sval;
+
+		if (j_ptr->tval == TV_BAG)
+		{
+			i_ptr = o_ptr;
+			sval = j_ptr->sval;
+		}
+
+		/* Find slot */
+		for (i = 0; i < INVEN_BAG_TOTAL; i++)
+		{
+			if ((bag_holds[sval][i][0] == i_ptr->tval)
+				&& (bag_holds[sval][i][1] == i_ptr->sval)) return (TRUE);
+		}
+	}
+
 	/* Require identical object types */
 	if (o_ptr->k_idx != j_ptr->k_idx) return (0);
 
@@ -1700,6 +1721,67 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 	int total = o_ptr->number + j_ptr->number;
 
 	int number = ((total < MAX_STACK_SIZE) ? total : (MAX_STACK_SIZE - 1));
+
+	/* Hack -- magical bags -- bag swallows object */
+	if ((j_ptr->tval == TV_BAG) && (o_ptr->tval != TV_BAG))
+	{
+		object_type object_type_body;
+		object_type *i_ptr = &object_type_body;
+
+		/* Swap objects */
+		object_copy(i_ptr, o_ptr);
+		object_copy(o_ptr, j_ptr);
+		j_ptr = i_ptr;
+
+		/* Re-order again */
+		p_ptr->notice |= (PN_REORDER);
+	}
+
+	/* Hack -- magical bags -- object swallowed by bag */
+	if ((o_ptr->tval == TV_BAG) && (j_ptr->tval != TV_BAG))
+	{
+		int i;
+
+		/* Find slot */
+		for (i = 0; i < INVEN_BAG_TOTAL; i++)
+		{
+			if ((bag_holds[o_ptr->sval][i][0] != j_ptr->tval)
+				|| (bag_holds[o_ptr->sval][i][1] != j_ptr->sval)) continue;
+
+			/* Hack -- absorb wands */
+			if (j_ptr->tval == TV_WAND)
+			{
+				/* Set total number */
+				total = bag_contents[o_ptr->sval][i] + j_ptr->number;
+				number = ((total < ((2 << 15) - 1)) ? total : (((2 << 15) - 1) - 1));
+				bag_contents[o_ptr->sval][i] = total;
+
+				/* Set total charges */
+				total = bag_contents[o_ptr->sval+1][i] + j_ptr->charges * j_ptr->number + j_ptr->stackc;
+				number = ((total < ((2 << 15) - 1)) ? total : (((2 << 15) - 1) - 1));
+				bag_contents[o_ptr->sval+1][i] = total;
+			}
+			/* Hack -- absorb torches */
+			else if ((j_ptr->tval == TV_LITE) && (j_ptr->sval == SV_LITE_TORCH))
+			{
+				/* Set total charges */
+				total = bag_contents[o_ptr->sval][i] + j_ptr->charges * j_ptr->number + j_ptr->stackc;
+				number = ((total < ((2 << 15) - 1)) ? total : (((2 << 15) - 1) - 1));
+				bag_contents[o_ptr->sval][i] = total;
+			}
+			/* Hack -- absorb other */
+			else
+			{
+				/* Set total number */
+				total = bag_contents[o_ptr->sval][i] + j_ptr->number;
+				number = ((total < ((2 << 15) - 1)) ? total : (((2 << 15) - 1) - 1));
+				bag_contents[o_ptr->sval][i] = total;
+			}
+		}
+
+		/* Successful */
+		return;
+	}
 
 	/* Blend "charges" if necessary*/
 	if (o_ptr->charges != j_ptr->charges)
@@ -4220,7 +4302,8 @@ static bool kind_is_good(int k_idx)
 			return (FALSE);
 		}
 
-		/* Rune stones are good if not seen previously */
+		/* Rune stones and magical bags are good if not seen previously */
+		case TV_BAG:
 		case TV_RUNESTONE:
 		{
 			if (!(k_ptr->aware)) return (TRUE);
@@ -4381,12 +4464,19 @@ static bool kind_is_race(int k_idx)
 			return (FALSE);
 		}
 
+		/* Containers */
 		case TV_HOLD:
 		{
 			if (r_ptr->flags8 & (RF8_DROP_CHEST)) return (TRUE);
 			return (FALSE);
 		}
 
+		/* Magical Bags */
+		case TV_BAG:
+		{
+			if (r_ptr->flags8 & (RF8_DROP_CHEST)) return (TRUE);
+			return (FALSE);
+		}
 
 		/* Bottles/Skeletons/Broken Pottery */
 		case TV_BONE:
@@ -7044,9 +7134,6 @@ s16b inven_carry(object_type *o_ptr)
 
 	/* Window stuff */
 	p_ptr->window |= (PW_INVEN);
-
-	/* Redraw stuff */
-	p_ptr->redraw |= (PR_ITEM_LIST);
 
 	/* Return the slot */
 	return (i);

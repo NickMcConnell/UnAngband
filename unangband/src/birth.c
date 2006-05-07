@@ -440,23 +440,30 @@ static void get_money(void)
 }
 
 
-
 /*
  * Clear all the global "character" data
  */
 static void player_wipe(void)
 {
-	int i;
+	int i, j;
 
 
 	/* Wipe the player */
 	(void)WIPE(p_ptr, player_type);
 
-
 	/* Clear the inventory */
-	for (i = 0; i < INVEN_TOTAL + 1; i++)
+	for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		object_wipe(&inventory[i]);
+	}
+
+	/* Clear the bags */
+	for (i = 0; i < SV_BAG_MAX_BAGS; i++)
+	{
+		for (j = 0; j < INVEN_BAG_TOTAL; j++)
+		{
+			bag_contents[i][j] = 0;
+		}
 	}
 
 	/* Start with no artifacts made yet */

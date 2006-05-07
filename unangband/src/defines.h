@@ -495,6 +495,14 @@
  */
 #define INVEN_PACK		23
 
+
+/*
+ * Maximum number of "bag" slots. This is limited by the fact the screen can
+ * only show 23 items plus a one-line prompt.
+ */
+#define INVEN_BAG_TOTAL		23
+
+
 /*
  * Indexes used for various "equipment" slots (hard-coded by savefiles, etc).
  */
@@ -2258,7 +2266,7 @@
 /*
  * Special "sval" limit -- maximum number of bags
  */
-#define SV_BAG_MAX_BAGS		30
+#define SV_BAG_MAX_BAGS		24
 
 
 /*
@@ -2469,6 +2477,7 @@
 #define USE_FLOOR		0x04	/* Allow floor items */
 #define USE_FEATU		0x08	/* Allow features (usable) */
 #define USE_FEATG		0x10	/* Allow features (gettable) */
+#define USE_BAGS		0x20	/* Allow contents of bags */
 
 
 

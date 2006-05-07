@@ -116,6 +116,8 @@ static const grouper group_item[] =
 	{ TV_SONG_BOOK,	"Books (Bard)" },
 	{ TV_RUNESTONE,	"Books (Shaman)" },
 
+	  { TV_BAG,       "Bags" },
+	  { TV_SERVICE,       "Services" },
 	{ TV_SPIKE,		"Various" },
 	{ TV_LITE,		  NULL },
 	{ TV_FLASK,		  NULL },
@@ -127,6 +129,7 @@ static const grouper group_item[] =
 	{ TV_BODY,      NULL },
 	{ TV_ASSEMBLY,      NULL },
 	  { TV_MAP,       NULL },
+
 	{ 0, "" }
 };
 

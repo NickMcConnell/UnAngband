@@ -659,7 +659,7 @@ void do_cmd_drop(void)
 	/* Get an item */
 	q = "Drop which item? ";
 	s = "You have nothing to drop.";
-	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN))) return;
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -671,6 +671,13 @@ void do_cmd_drop(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag -- hack: cancel to pick the bag itself */
+		if (get_item_from_bag(&item, q, s, o_ptr)) o_ptr = &inventory[item];
 	}
 
 	/* Get a quantity */
@@ -865,7 +872,7 @@ void do_cmd_observe(void)
 	/* Get an item */
 	q = "Examine which item? ";
 	s = "You have nothing to examine.";
-	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG))) return;
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -877,6 +884,13 @@ void do_cmd_observe(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag -- hack: cancel to pick the bag itself */
+		if (get_item_from_bag(&item, q, s, o_ptr)) o_ptr = &inventory[item];
 	}
 
 	/* Hack - obviously interested enough in item */
@@ -1251,7 +1265,7 @@ void do_cmd_refill(void)
 	/* Get an item */
 	q = "Fill/fuel which item? ";
 	s = "You have nothing to fill or fuel.";
-	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return;
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -1265,6 +1279,16 @@ void do_cmd_refill(void)
 		o_ptr = &o_list[0 - item];
 	}
 
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+
 	if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_LANTERN))
 	{
 		/* Restrict the choices */
@@ -1274,7 +1298,7 @@ void do_cmd_refill(void)
 		q = "Refill with which source of oil? ";
 		s = "You have no sources of oil.";
 
-		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
+		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
 	}
 	else if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_TORCH))
 	{
@@ -1300,9 +1324,6 @@ void do_cmd_refill(void)
 		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 	}
 
-	/* Can't fuel self */
-	if (item == item2) return;
-
 	/* Get the item (in the pack) */
 	if (item2 >= 0)
 	{
@@ -1314,6 +1335,19 @@ void do_cmd_refill(void)
 	{
 		j_ptr = &o_list[0 - item2];
 	}
+
+	/* In a bag? */
+	if (j_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item2, q, s, j_ptr)) return;
+
+		/* Refer to the item */
+		j_ptr = &inventory[item2];
+	}
+
+	/* Can't fuel self */
+	if (item == item2) return;
 
 	/* Take a partial turn */
 	p_ptr->energy_use = 50;

@@ -805,7 +805,15 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			break;
 		}
 
-		/* Runestones */
+		/* Magical Bags */
+		case TV_BAG:
+		{
+			append_name = TRUE;
+			basenm = "& Magical Bag~";
+			break;
+		}
+
+		/* Services */
 		case TV_SERVICE:
 		{
 			append_name = TRUE;
@@ -828,6 +836,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			break;
 		}
 
+		/* Container */
 		case TV_HOLD:
 		{
 			if (o_ptr->name3 > 0) modstr = "sealed";
@@ -2893,6 +2902,32 @@ static bool get_item_okay(int item)
 		o_ptr = &o_list[0 - item];
 	}
 
+	/* Hack -- check bag contents */
+	if (o_ptr->tval == TV_BAG)
+	{
+		object_type object_type_body;
+		object_type *i_ptr = &object_type_body;
+
+		int i;
+
+		/* Check bag contents */
+		for (i = 0; i < INVEN_BAG_TOTAL; i++)
+		{
+			/* Empty slot */
+			if ((bag_holds[o_ptr->sval][i][0]) || !(bag_contents[o_ptr->sval][i]))
+			{
+				i_ptr->k_idx = 0;
+				continue;
+			}
+
+			/* Fake the item */
+			fake_bag_item(i_ptr, o_ptr->sval, i);
+
+			/* Check the item */
+			if (item_tester_okay(i_ptr)) return (TRUE);
+		}
+	}
+
 	/* Verify the item */
 	return (item_tester_okay(o_ptr));
 }
@@ -3895,3 +3930,234 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 }
 
 
+/*
+ * Create a fake item from the bag arrays
+ */
+void fake_bag_item(object_type *i_ptr, int sval, int slot)
+{
+	s16b number = 0;
+	s16b charges = 0;
+
+	/* Initially no item */
+	i_ptr->k_idx = 0;
+
+	/* Paranoia */
+	if ((sval >= SV_BAG_MAX_BAGS) || (slot >= INVEN_BAG_TOTAL)) return;
+
+	/* Get bag tval */
+	i_ptr->tval = bag_holds[sval][slot][0];
+
+	/* Get bag sval */
+	i_ptr->sval = bag_holds[sval][slot][1];
+
+	/* Lookup kind */
+	i_ptr->k_idx = lookup_kind(i_ptr->tval, i_ptr->sval);
+
+	/* Paranoia */
+	if (!i_ptr->k_idx) return;
+
+	/* Prepare object */
+	object_prep(i_ptr, i_ptr->k_idx);
+
+	/* Get bag number */
+	number = bag_contents[sval][slot];
+
+	/* Hack -- wand charges */
+	if (i_ptr->tval == TV_WAND)
+	{
+		charges = bag_contents[sval + 1][slot];
+
+		/* Get bag charges */
+		i_ptr->charges = charges / number;
+
+		/* Round up */
+		if (charges % number) i_ptr->charges++;
+	}
+	/* Hack -- torch charges */
+	else if ((i_ptr->tval == TV_LITE) && (i_ptr->sval == SV_LITE_TORCH))
+	{
+		charges = bag_contents[sval][slot];
+
+		/* Fake bag number */
+		number = charges / FUEL_TORCH;
+
+		/* Get bag charges */
+		i_ptr->charges = charges / number;
+
+		/* Round up */
+		if (charges % number) i_ptr->charges++;
+	}
+
+	/* Hack -- limit total number */
+	if (number > 99)
+	{
+		/* Maximum number */
+		i_ptr->number = 99;
+
+		/* Set stack counter */
+		i_ptr->stackc = (charges % number >= 99 ? 0 : charges % number);
+	}
+	else
+	{
+		/* Normal number */
+		i_ptr->number = number;
+
+		/* Set stack counter */
+		i_ptr->stackc = charges % number;
+	}
+
+	/* Awareness always gives full knowledge */
+	if (object_aware_p(i_ptr))
+	{
+		object_known(i_ptr);
+
+		/* Auto-inscribe */
+		if (!i_ptr->note) i_ptr->note = k_info[i_ptr->k_idx].note;
+	}
+}
+
+
+/*
+ * Get item from a bag.
+ *
+ * See tables.c for a description of how bags function.
+ *
+ * XXX This whole routine plays nasty tricks with inventory in order
+ * to re-use the code from the get_item routine above.
+ *
+ * XXX We use an in-function version of inven_carry to ensure that
+ * we don't re-absorb the new item into the bag we took it from.
+ */
+bool get_item_from_bag(int *cp, cptr pmt, cptr str, object_type *o_ptr)
+{
+	bool cancel = FALSE;
+
+	int item;
+
+	int i, j, k;
+
+	object_type *i_ptr;
+
+	object_type *inventory_old;
+	object_type inventory_fake[INVEN_TOTAL];
+
+	char str_buf[160];
+
+	/* Paranoia */
+	if (o_ptr->sval >= SV_BAG_MAX_BAGS) return (FALSE);
+
+	/* Initialise fake inventory with objects */
+	for (i = 0; i < INVEN_TOTAL; i++)
+	{
+		i_ptr = &inventory_fake[i];
+
+		/* Empty slot */
+		if ((i >= INVEN_BAG_TOTAL) || !(bag_holds[o_ptr->sval][i][0]) || !(bag_contents[o_ptr->sval][i]))
+		{
+			i_ptr->k_idx = 0;
+			continue;
+		}
+
+		/* Fake the item */
+		fake_bag_item(i_ptr, o_ptr->sval, i);
+	}
+
+	/* Save inventory */
+	inventory_old = inventory;
+
+	/* Switch to fake inventory */
+	inventory = inventory_fake;
+
+	/* Hack -- modify failure string */
+	strcpy(str_buf, str);
+
+	/* Hack -- append */
+	strcpy(str_buf + strlen(str) - 1, " inside the bag.");
+
+	/* Get an item */
+	if (!get_item(&item, pmt, str_buf, (USE_INVEN))) cancel = TRUE;
+
+	/* Restore inventory */
+	inventory = inventory_old;
+
+	/* Cancelled? */
+	if (cancel) return (FALSE);
+
+	/* Get the item */
+	i_ptr = &inventory_fake[item];
+
+	/* Paranoia */
+	if (p_ptr->inven_cnt > INVEN_PACK) return (FALSE);
+
+	/* Reduce bag contents - wands hack */
+	if (i_ptr->tval == TV_WAND)
+	{
+		bag_contents[o_ptr->sval][item] -= i_ptr->number;
+		bag_contents[o_ptr->sval+1][item] -= i_ptr->charges * i_ptr->number + i_ptr->stackc;
+	}
+	/* Reduce bag contents - torches hack */
+	else if ((i_ptr->tval == TV_LITE) && (i_ptr->sval == SV_LITE_TORCH))
+	{
+		bag_contents[o_ptr->sval][item] -= i_ptr->charges * i_ptr->number + i_ptr->stackc;
+	}
+	/* Reduce bag contents */
+	else
+	{
+		bag_contents[o_ptr->sval][item] -= i_ptr->number;
+	}
+
+	/* Find an empty slot */
+	for (j = 0; j <= INVEN_PACK; j++) if (!inventory[j].k_idx) break;
+
+	/* Use that slot */
+	i = j;
+
+	/* Copy the item */
+	object_copy(&inventory[i], i_ptr);
+
+	/* Get the new object */
+	i_ptr = &inventory[i];
+
+	/* Find the next free show index */
+	for (j = 1; j < SHOWN_TOTAL; j++)
+	{
+		bool used = FALSE;
+
+		/* Check all items */
+		for (k = 0; k < INVEN_TOTAL; k++) if ((inventory[k].k_idx) && (inventory[k].show_idx == j)) used = TRUE;
+
+		/* Already an item using this slot? */
+		if (used) continue;
+
+		/* Use this slot */
+		break;
+	}
+
+	/* Set the show index for the item */
+	if (j < SHOWN_TOTAL) i_ptr->show_idx = j;
+	else i_ptr->show_idx = 0;
+
+	/* Increase the weight */
+	p_ptr->total_weight += (i_ptr->number * i_ptr->weight);
+
+	/* Count the items */
+	p_ptr->inven_cnt++;
+
+	/* Set the slot */
+	*cp = i;
+
+	/* Recalculate bonuses */
+	p_ptr->update |= (PU_BONUS | PU_RUNES);
+
+	/* Combine and Reorder pack */
+	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
+
+	/* Window stuff */
+	p_ptr->window |= (PW_INVEN);
+
+	/* Redraw stuff */
+	p_ptr->redraw |= (PR_ITEM_LIST);
+
+	/* Successful */
+	return (TRUE);
+}

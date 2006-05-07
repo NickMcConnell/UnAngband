@@ -588,6 +588,7 @@ static void do_cmd_travel(void)
 				cptr q, s;
 
 				int item;
+				object_type *o_ptr;
 
 				/* Return to Angband? */
 				if (p_ptr->dungeon != 0) selection = 0;
@@ -598,7 +599,31 @@ static void do_cmd_travel(void)
 				/* Get an item */
 				q = "Follow which map? ";
 				s = "You have no maps to guide you.";
-				if (get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) selection = inventory[item].sval;
+				if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_BAGS))) return;
+
+				/* Get the item (in the pack) */
+				if (item >= 0)
+			        {
+					o_ptr = &inventory[item];
+				}
+
+				/* Get the item (on the floor) */
+				else
+				{
+					o_ptr = &o_list[0 - item];
+				}
+
+				/* In a bag? */
+				if (o_ptr->tval == TV_BAG)
+				{
+					/* Get item from bag */
+					if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+					/* Refer to the item */
+					o_ptr = &inventory[item];
+				}
+
+				selection = o_ptr->sval;
 
 				/* Did not make selection */
 				if (!selection) return;
@@ -2127,12 +2152,11 @@ void do_cmd_set_trap_or_spike(void)
 	/* Get an item */
 	q = "Spike/Set trap with which item? ";
 	s = "You have nothing to set a trap or spike with.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
         {
-
 		o_ptr = &inventory[item];
 	}
 
@@ -2140,6 +2164,16 @@ void do_cmd_set_trap_or_spike(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	/* Spiking or setting trap? */
@@ -2193,7 +2227,6 @@ void do_cmd_set_trap_or_spike(void)
 		x = px + ddx[dir];
 
 	}
-
 
 	/* Monster */
 	if (cave_m_idx[y][x] > 0)

@@ -2,8 +2,8 @@ WARNING TO THOSE BUILDING FROM CVS
 
 In the lead up to version 0.6.1, I will endeavour to maintain save-file
 compatibility at any point, but cannot guarantee it. In addition, lots of
-stuff is likely to break. For instance, in this CVS update, torches will stop
-working after you save the game.
+stuff is likely to break. For instance, in this CVS update, the contents
+of magical bags is not saved, resulting in you losing any item put inside.
 
 ### Game Play ###
 
@@ -20,11 +20,23 @@ information, depending on the race and class of the character.
 mushrooms or flasks of oil in order to do additional damage from the effects
 of these items.
 
+- Magic items start being generated earlier in the game but are less powerful
+deeper in the dungeon.
+
+- You can now switch your torch or lantern on and off using the | key.
+
+- Added a variety of magical bags which can hold large numbers of objects at
+a constant weight. Each magical bag can only fit certain types of objects inside
+it.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
 the tiled graphics and fonts together on the screen without forcing the tiled
 graphics to scale.
+
+- Identifying an object now tells you whether you can apply runes to it or
+enchant it with brands or resists.
 
 ### Bug fixes ###
 
@@ -42,6 +54,9 @@ Mikolaj Konarski).
 Pval stacking is now replaced by charge stacking.
 
 - Separation of feelings from discounts.
+
+- You can now do html screendumps again any time the game is waiting for input
+using the ^] key.
 
 ### Build / Platform ###
 

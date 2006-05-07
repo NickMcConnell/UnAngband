@@ -1788,7 +1788,7 @@ u16b limit;
  */
 static errr rd_savefile_new_aux(void)
 {
-	int i;
+	int i, j;
 
 	byte tmp8u;
 	u16b tmp16u;
@@ -1992,7 +1992,7 @@ static errr rd_savefile_new_aux(void)
 	if (tmp16u > z_info->e_max)
 	{
 		note(format("Too many (%u) ego items!", tmp16u));
-		return (24);
+		return (-1);
 	}
 
 	/* Read the ego item flags */
@@ -2051,6 +2051,45 @@ static errr rd_savefile_new_aux(void)
 		return (-1);
 	}
 
+	/* Read the bags */
+	if (!older_than(0, 6, 1))
+	{
+		/* Load the Bags */
+		rd_u16b(&tmp16u);
+
+		/* Incompatible save files */
+		if (tmp16u > SV_BAG_MAX_BAGS)
+		{
+			note(format("Too many (%u) bag types!", tmp16u));
+			return (-1);
+		}
+
+		/* Load the bag contents */
+		for (i = 0; i < tmp16u; i++)
+		{
+			/* Load the Bags */
+			rd_byte(&tmp8u);
+
+			/* Incompatible save files */
+			if (tmp8u > INVEN_BAG_TOTAL)
+			{
+				note(format("Too many (%u) bag slots!", tmp8u));
+				return (-1);
+			}
+
+			for (j = 0; j < tmp8u; j++)
+			{
+				rd_s16b(&bag_contents[i][j]);
+			}
+		}
+	}
+	/* Empty the bags */
+	else
+	{
+		for (i = 0; i < SV_BAG_MAX_BAGS; i++)
+			for (j = 0; j < INVEN_BAG_TOTAL; j++)
+				bag_contents[i][j] = 0;
+	}
 
 	/* Read the stores */
 	rd_u16b(&tmp16u);

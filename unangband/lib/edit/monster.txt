@@ -17927,7 +17927,7 @@ I:115:1d2:30:1:10
 W:0:3:0:0
 B:PECK:HURT
 F:RAND_25
-F:ANIMAL | CAN_FLY
+F:ANIMAL | CAN_FLY | RAND_50
 D:A barnyard chicken.
 
 N:1246:Cow
@@ -17935,7 +17935,7 @@ G:Q:o
 I:105:2d6:30:1:10
 W:0:3:0:0
 B:BUTT:HURT
-F:ANIMAL | FRIEND
+F:ANIMAL | FRIEND | RAND_25
 D:A peacefully grazing bovine.
 
 N:1247:Sheep
@@ -17943,7 +17943,7 @@ G:Q:w
 I:110:2d3:30:1:10
 W:0:3:0:0
 B:BUTT:HURT
-F:ANIMAL | FRIENDS
+F:ANIMAL | FRIENDS | RAND_50
 D:A bleating but harmless animal.
 
 N:1248:Zombified dwarf

@@ -566,6 +566,12 @@ object_type *inventory;
 
 
 /*
+ * Array[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL] of numbers in magical bags
+ */
+s16b bag_contents[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL];
+
+
+/*
  * Array[INVEN_TOTAL] of items listed at the bottom of the screen
  * This is used to track player items in a pointer-based user interface
  */

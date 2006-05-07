@@ -83,7 +83,7 @@ void do_cmd_eat_food(void)
 	/* Get an item */
 	q = "Eat which item? ";
 	s = "You have nothing to eat.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -95,6 +95,16 @@ void do_cmd_eat_food(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	/* Use feat */
@@ -188,7 +198,7 @@ void do_cmd_quaff_potion(void)
 	/* Get an item */
 	q = "Quaff which potion? ";
 	s = "You have no potions to quaff.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -200,6 +210,16 @@ void do_cmd_quaff_potion(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	if (o_ptr->ident & (IDENT_STORE)) use_feat = TRUE;
@@ -311,7 +331,7 @@ void do_cmd_read_scroll(void)
 	/* Get an item */
 	q = "Read which scroll? ";
 	s = "You have no scrolls to read.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -323,6 +343,16 @@ void do_cmd_read_scroll(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	/* Use feat */
@@ -432,7 +462,6 @@ void do_cmd_use_staff(void)
 	{
 		o_ptr = &o_list[0 - item];
 	}
-
 
 	/* Mega-Hack -- refuse to use a pile from the ground */
 	if ((item < 0) && (o_ptr->number > 1))
@@ -676,7 +705,7 @@ void do_cmd_aim_wand(void)
 	/* Get an item */
 	q = "Aim which wand? ";
 	s = "You have no wand to aim.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -690,6 +719,15 @@ void do_cmd_aim_wand(void)
 		o_ptr = &o_list[0 - item];
 	}
 
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
 
 	/* Mega-Hack -- refuse to aim a pile from the ground */
 	if ((item < 0) && (o_ptr->number > 1))
@@ -952,7 +990,6 @@ void do_cmd_zap_rod(void)
 	{
 		o_ptr = &o_list[0 - item];
 	}
-
 
 	/* Mega-Hack -- refuse to zap a pile from the ground */
 	if ((item < 0) && (o_ptr->number > 1))
@@ -1796,7 +1833,7 @@ void do_cmd_apply_rune(void)
 	/* Get an item */
 	q = "Apply which runestone? ";
 	s = "You have no runestones.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -1810,6 +1847,16 @@ void do_cmd_apply_rune(void)
 		o_ptr = &o_list[0 - item];
 	}
 
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+
 	/* Use feat */
 	if (o_ptr->ident & (IDENT_STORE)) use_feat = TRUE;
 
@@ -1819,7 +1866,7 @@ void do_cmd_apply_rune(void)
 	q = "Apply rune to which item? ";
 	s = "You have nothing to apply it to.";
 
-	if (!get_item(&item2, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return;
+	if (!get_item(&item2, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */
 	if (item2 >= 0)
@@ -1831,6 +1878,16 @@ void do_cmd_apply_rune(void)
 	else
 	{
 		j_ptr = &o_list[0 - item2];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	if ((artifact_p(j_ptr)) || ((j_ptr->xtra1) && (j_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES)))

@@ -1032,7 +1032,7 @@ static void wr_dungeon(void)
  */
 static bool wr_savefile_new(void)
 {
-	int i;
+	int i, j;
 
 	u32b now;
 
@@ -1126,8 +1126,6 @@ static bool wr_savefile_new(void)
 	wr_u16b(tmp16u);
 	for (i = 0; i < tmp16u; i++)
 	{
-		int j;
-
 		wr_byte(MAX_QUEST_EVENTS);
 
 		for (j = 0; j < MAX_QUEST_EVENTS; j++)
@@ -1225,6 +1223,22 @@ static bool wr_savefile_new(void)
 
 	/* Add a sentinel */
 	wr_u16b(0xFFFF);
+
+#if 0
+	/* Write the number of bag types */
+	wr_u16b((u16b)SV_BAG_MAX_BAGS);
+
+	/* Write the bag contents */
+	for (i = 0; i < SV_BAG_MAX_BAGS; i++)
+	{
+		wr_byte(INVEN_BAG_TOTAL);
+
+		for (j = 0; j < INVEN_BAG_TOTAL; j++)
+		{
+			wr_u16b((u16b)bag_contents[i][j];
+		}
+	} 
+#endif
 
 	/* Note the stores */
 	tmp16u = MAX_STORES;
