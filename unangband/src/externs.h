@@ -393,6 +393,7 @@ extern void search(void);
 extern bool auto_pickup_ignore(const object_type *o_ptr);
 extern void py_pickup(int pickup);
 extern void hit_trap(int y, int x);
+extern bool auto_activate(const object_type *o_ptr);
 extern void py_attack(int y, int x);
 extern bool stuck_player(int *dir);
 extern void move_player(int dir, int jumping);
@@ -480,7 +481,7 @@ extern void do_cmd_aim_wand(void);
 extern void do_cmd_zap_rod(void);
 extern void do_cmd_assemble(void);
 extern void do_cmd_activate(void);
-extern void do_cmd_apply_rune(void);
+extern void do_cmd_apply_rune_or_coating(void);
 
 /* dungeon.c */
 extern bool dun_level_mon(int r_idx);

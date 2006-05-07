@@ -1865,6 +1865,52 @@ void hit_trap(int y, int x)
 
 
 /*
+ * Determine if the object has a "=A" in its inscription.
+ *
+ * This is used to automatically activate the object when attacking, throwing or firing it.
+ */
+bool auto_activate(const object_type *o_ptr)
+{
+	u32b f1, f2, f3, f4;
+
+	cptr s;
+
+	/* Check timeout */
+	if (o_ptr->timeout) return (FALSE);
+
+	/* Extract the flags */
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	
+	/* Check if can activate */
+	if ((f3 & (TR3_ACTIVATE)) == 0) return (FALSE);
+
+	/* No inscription */
+	if (!o_ptr->note) return (FALSE);
+
+	/* Find a '=' */
+	s = strchr(quark_str(o_ptr->note), '=');
+
+	/* Process inscription */
+	while (s)
+	{
+		/* Automatically activate on "=A" */
+		if (s[1] == 'A')
+		{
+			/* Can activate */
+			return (TRUE);
+		}
+
+		/* Find another '=' */
+		s = strchr(s + 1, '=');
+	}
+
+	/* Can activate */
+	return (FALSE);
+}
+
+
+
+/*
  * Attack the monster at the given location
  *
  * If no "weapon" is available, then "punch" the monster one time.
@@ -2266,6 +2312,102 @@ void py_attack(int y, int x)
 				was_asleep = FALSE;
 
 				break;
+			}
+			/* Apply additional effect from coating or sometimes activate */
+			else if ((coated_p(o_ptr)) || (auto_activate(o_ptr)))
+			{
+				int power;
+
+				/* Get artifact activation */
+				if (artifact_p(o_ptr)) power = a_info[o_ptr->name1].activation;
+
+				/* Get item effect */
+				else get_spell(&power, "use", o_ptr, FALSE);
+
+				/* Has a power */
+				if (power > 0)
+				{
+					spell_type *s_ptr = &s_info[power];
+
+					int ap_cnt;
+
+					/* Object is used */
+					if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
+
+					/* Scan through all four blows */
+					for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
+					{
+						int damage = 0;
+
+						/* Extract the attack infomation */
+						int effect = s_ptr->blow[ap_cnt].effect;
+						int method = s_ptr->blow[ap_cnt].method;
+						int d_dice = s_ptr->blow[ap_cnt].d_dice;
+						int d_side = s_ptr->blow[ap_cnt].d_side;
+						int d_plus = s_ptr->blow[ap_cnt].d_plus;
+
+						/* Hack -- no more attacks */
+						if (!method) break;
+
+						/* Mega hack -- dispel evil/undead objects */
+						if (!d_side)
+						{
+							d_plus += 25 * d_dice;
+						}
+
+						/* Roll out the damage */
+						if ((d_dice) && (d_side))
+						{
+							damage = damroll(d_dice, d_side) + d_plus;
+						}
+						else
+						{
+							damage = d_plus;
+						}
+
+						/* Hack -- apply damage as projection */
+						(void)project_m(-1,0,y,x,(coated_p(o_ptr) ? damage / 5 : damage), effect);
+
+						/* Hack -- affect ground if not a coating */
+						if (!coated_p(o_ptr)) (void)project_f(-1,0,y,x,damage, effect);
+
+						/* Reduce charges */
+						if (o_ptr->charges)
+						{
+							o_ptr->charges--;
+
+							/* Remove coating */
+							if (coated_p(o_ptr) && (!o_ptr->charges))
+							{
+								o_ptr->xtra1 = 0;
+								o_ptr->xtra2 = 0;
+							}
+						}
+						/* Start recharing item */
+						else if (auto_activate(o_ptr))
+						{
+							if (artifact_p(o_ptr))
+							{
+								artifact_type *a_ptr = &a_info[o_ptr->name1];
+
+								/* Set the recharge time */
+								if (a_ptr->randtime)
+								{
+									o_ptr->timeout = a_ptr->time + (byte)randint(a_ptr->randtime);
+								}
+								else
+								{
+									o_ptr->timeout = a_ptr->time;
+								}
+							}
+							else
+							{
+								/* Time object out */
+								o_ptr->timeout = rand_int(o_ptr->charges)+o_ptr->charges;
+							}
+						}
+					}
+				}
 			}
 		}
 	}

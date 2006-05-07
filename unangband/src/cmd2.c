@@ -3006,7 +3006,7 @@ void do_cmd_fire(void)
 	int dir, item;
 	int i, j, y, x, ty, tx;
 	int tdam, tdis, thits, tmul;
-	int bonus, chance, power;
+	int bonus, chance, power = 0;
 
 	int style_hit, style_dam, style_crit;
 	u32b shoot_style;
@@ -3444,11 +3444,17 @@ void do_cmd_fire(void)
 							       "%^s flees in terror!", m_name);
 					}
 
-					/* Get item effect */
-					get_spell(&power, "use", i_ptr, FALSE);
+					/* Use coating or sometimes activate item*/
+					if ((coated_p(i_ptr)) || (auto_activate(i_ptr)))
+					{
+						/* Get artifact activation */
+						if (artifact_p(i_ptr)) power = a_info[i_ptr->name1].activation;
+
+						/* Get item effect */
+						else get_spell(&power, "use", i_ptr, FALSE);
+					}
 
 					/* Has a power */
-					/* Always apply powers if ammunition */
 					if (power > 0)
 					{
 						spell_type *s_ptr = &s_info[power];
@@ -3489,8 +3495,47 @@ void do_cmd_fire(void)
 								damage = d_plus;
 							}
 
-							(void)project_m(-1,0,y,x,damage, effect);
-							(void)project_f(-1,0,y,x,damage, effect);
+							/* Hack -- apply damage as projection */
+							(void)project_m(-1,0,y,x,(coated_p(i_ptr) ? damage / 5 : damage), effect);
+
+							/* Hack -- affect ground if not a coating */
+							if (!coated_p(i_ptr)) (void)project_f(-1,0,y,x,damage, effect);
+
+							/* Reduce charges */
+							if (i_ptr->charges)
+							{
+								i_ptr->charges--;
+
+								/* Remove coating */
+								if (coated_p(i_ptr) && (!i_ptr->charges))
+								{
+									i_ptr->xtra1 = 0;
+									i_ptr->xtra2 = 0;
+								}
+							}
+							/* Start recharing item */
+							else if (auto_activate(i_ptr))
+							{
+								if (artifact_p(i_ptr))
+								{
+									artifact_type *a_ptr = &a_info[i_ptr->name1];
+
+									/* Set the recharge time */
+									if (a_ptr->randtime)
+									{
+										i_ptr->timeout = a_ptr->time + (byte)randint(a_ptr->randtime);
+									}
+									else
+									{
+										i_ptr->timeout = a_ptr->time;
+									}
+								}
+								else
+								{
+									/* Time object out */
+									i_ptr->timeout = rand_int(i_ptr->charges)+i_ptr->charges;
+								}
+							}
 						}
 					}
 				}
@@ -3879,11 +3924,17 @@ void do_cmd_throw(void)
 							       "%^s flees in terror!", m_name);
 					}
 
-					/* Get item effect */
-					get_spell(&power, "use", i_ptr, FALSE);
+					/* Use coating or sometimes activate item*/
+					if ((coated_p(i_ptr)) || (auto_activate(i_ptr)))
+					{
+						/* Get artifact activation */
+						if (artifact_p(i_ptr)) power = a_info[i_ptr->name1].activation;
+
+						/* Get item effect */
+						else get_spell(&power, "use", i_ptr, FALSE);
+					}
 
 					/* Has a power */
-					/* Always apply powers if ammunition */
 					if (power > 0)
 					{
 						spell_type *s_ptr = &s_info[power];
@@ -3924,8 +3975,48 @@ void do_cmd_throw(void)
 								damage = d_plus;
 							}
 
-							(void)project_m(-1,0,y,x,damage, effect);
-							(void)project_f(-1,0,y,x,damage, effect);
+
+							/* Hack -- apply damage as projection */
+							(void)project_m(-1,0,y,x,(coated_p(i_ptr) ? damage / 5 : damage), effect);
+
+							/* Hack -- affect ground if not a coating */
+							if (!coated_p(i_ptr)) (void)project_f(-1,0,y,x,damage, effect);
+
+							/* Reduce charges */
+							if (i_ptr->charges)
+							{
+								i_ptr->charges--;
+
+								/* Remove coating */
+								if (coated_p(i_ptr) && (!i_ptr->charges))
+								{
+									i_ptr->xtra1 = 0;
+									i_ptr->xtra2 = 0;
+								}
+							}
+							/* Start recharing item */
+							else if (auto_activate(i_ptr))
+							{
+								if (artifact_p(i_ptr))
+								{
+									artifact_type *a_ptr = &a_info[i_ptr->name1];
+
+									/* Set the recharge time */
+									if (a_ptr->randtime)
+									{
+										i_ptr->timeout = a_ptr->time + (byte)randint(a_ptr->randtime);
+									}
+									else
+									{
+										i_ptr->timeout = a_ptr->time;
+									}
+								}
+								else
+								{
+									/* Time object out */
+									i_ptr->timeout = rand_int(i_ptr->charges)+i_ptr->charges;
+								}
+							}
 						}
 					}
 				}

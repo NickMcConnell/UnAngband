@@ -18,7 +18,10 @@ information, depending on the race and class of the character.
 
 - You can now coat your sharp weapons, arrows and bolts with potions,
 mushrooms or flasks of oil in order to do additional damage from the effects
-of these items.
+of these items. This does 20% of the damager per blow or shot that throwing
+the equivalent potion, flask or mushroom does.
+
+- Added higher level dangerous potions to allow improved weapon coatings.
 
 - Magic items start being generated earlier in the game but are less powerful
 deeper in the dungeon.
@@ -28,6 +31,11 @@ deeper in the dungeon.
 - Added a variety of magical bags which can hold large numbers of objects at
 a constant weight. Each magical bag can only fit certain types of objects inside
 it.
+
+- You can inscribe an artifact weapon with '=A' to automatically activate it
+against the creature you are attacking or throwing the weapon against.  This
+causes the activation to affect the target creature only, and discharges the
+artifact as per normal.
 
 ### User Interface ###
 

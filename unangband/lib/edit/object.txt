@@ -19,7 +19,7 @@
 # N: serial number : & object name~
 # G: symbol : color
 # I: tval : sval : pval
-# W: depth : rarity (now always 0, see the "A:" line) : weight : coste
+# W: depth : charges : weight : cost
 # P: base armor class : base damage : plus to-hit : plus to-dam : plus to-ac
 # A: depth/rarity : depth/rarity : etc
 # F: flag | flag | etc
@@ -83,178 +83,178 @@ G:&:w
 
 N:1:Blindness
 G:,:w
-I:80:1:500
-W:5:0:1:0
+I:80:1:0
+W:5:500:1:0
 A:5/1
 
 N:2:Paranoia
 G:,:w
-I:80:2:500
-W:5:0:1:0
+I:80:2:0
+W:5:500:1:0
 A:5/1
 
 N:3:Confusion
 G:,:w
-I:80:3:500
-W:5:0:1:0
+I:80:3:0
+W:5:500:1:0
 A:5/1
 
 N:4:Hallucination
 G:,:w
-I:80:4:500
-W:10:0:1:0
+I:80:4:0
+W:10:500:1:0
 A:10/1
 
 N:5:Cure Poison
 G:,:w
-I:80:12:500
-W:10:0:1:60
+I:80:12:0
+W:10:500:1:60
 A:10/1
 
 N:6:Cure Blindness
 G:,:w
-I:80:13:500
-W:10:0:1:50
+I:80:13:0
+W:10:500:1:50
 A:10/1
 
 N:7:Cure Paranoia
 G:,:w
-I:80:14:500
-W:10:0:1:25
+I:80:14:0
+W:10:500:1:25
 A:10/1
 
 N:8:Cure Confusion
 G:,:w
-I:80:15:500
-W:10:0:1:50
+I:80:15:0
+W:10:500:1:50
 A:10/1
 
 N:9:Weakness
 G:,:w
-I:80:6:500
-W:10:0:1:0
+I:80:6:0
+W:10:500:1:0
 A:10/1
 
 N:10:Unhealth
 G:,:w
-I:80:10:500
-W:15:0:1:50
+I:80:10:0
+W:15:500:1:50
 A:15/1
 
 N:11:Restore Constitution
 G:,:w
-I:80:18:500
-W:20:0:1:350
+I:80:18:0
+W:20:500:1:350
 A:20/1
 
 N:12:Restoring
 G:,:w
-I:80:19:500
-W:20:0:1:1000
+I:80:19:0
+W:20:500:1:1000
 A:20/8:30/4:40/1
 
 N:13:Stupidity
 G:,:w
-I:80:8:500
-W:15:0:1:0
+I:80:8:0
+W:15:500:1:0
 A:15/1
 
 N:14:Naivety
 G:,:w
-I:80:9:500
-W:15:0:1:0
+I:80:9:0
+W:15:500:1:0
 A:15/1
 
 N:15:Poison
 G:,:w
-I:80:0:500
-W:5:0:1:0
+I:80:0:0
+W:5:500:1:0
 A:5/1:5/1
 
 N:16:Sickness
 G:,:w
-I:80:7:500
-W:10:0:1:0
+I:80:7:0
+W:10:500:1:0
 A:10/1
 
 N:17:Paralysis
 G:,:w
-I:80:5:500
-W:20:0:1:0
+I:80:5:0
+W:20:500:1:0
 A:20/1
 
 N:18:Restore Strength
 G:,:w
-I:80:17:500
-W:20:0:1:350
+I:80:17:0
+W:20:500:1:350
 A:20/1
 
 N:19:Disease
 G:,:w
-I:80:11:500
-W:20:0:1:50
+I:80:11:0
+W:20:500:1:50
 A:20/1
 
 N:20:Cure Serious Wounds
 G:,:w
-I:80:16:500
-W:15:0:1:75
+I:80:16:0
+W:15:500:1:75
 A:15/1
 
 ##### Normal Food #####
 
 N:21:& Ration~ of Food
 G:,:U
-I:80:35:5000
-W:0:0:10:3
+I:80:35:0
+W:0:5000:10:3
 A:0/1:5/1:10/1
 
 N:22:& Hard Biscuit~
 G:,:U
-I:80:32:500
-W:0:0:2:1
+I:80:32:0
+W:0:500:2:1
 A:0/1
 
 N:23:& Strip~ of Beef Jerky
 G:,:u
-I:80:33:1500
-W:0:0:2:2
+I:80:33:0
+W:0:1500:2:2
 A:0/2
 
 N:24:& Slime Mold~
 G:,:g
-I:80:36:3000
-W:1:0:5:2
+I:80:36:0
+W:1:3000:5:2
 A:1/1
 
 N:25:& Piece~ of Elvish Waybread
 G:,:B
-I:80:37:7500
-W:5:0:3:10
+I:80:37:0
+W:5:7500:3:10
 A:5/1:10/1:20/1
 
 N:26:& Pint~ of Fine Ale
 G:,:y
-I:80:38:500
-W:0:0:5:1
+I:80:38:0
+W:0:500:5:1
 A:0/2
 
 N:27:& Pint~ of Fine Wine
 G:,:r
-I:80:39:1000
-W:0:0:10:2
+I:80:39:0
+W:0:1000:10:2
 A:0/2
 
 N:28:Mana
 G:,:w
-I:80:20:500
-W:10:0:1:75
+I:80:20:0
+W:10:500:1:75
 A:15/1
 
 N:29:& Apple~
 G:,:g
-I:80:40:3000
-W:1:0:4:2
+I:80:40:0
+W:1:3000:4:2
 A:1/1
 P:0:1d1:0:0:0
 
@@ -1731,24 +1731,24 @@ Y:11:2
 
 N:222:Slime Mold Juice
 G:!:w
-I:75:2:400
-W:0:0:4:2
+I:75:2:0
+W:0:400:4:2
 A:0/1
 P:0:1d1:0:0:0
 F:THROWING
 
 N:223:Apple Juice
 G:!:w
-I:75:1:250
-W:0:0:4:1
+I:75:1:0
+W:0:250:4:1
 A:0/1
 P:0:1d1:0:0:0
 F:THROWING
 
 N:224:Water
 G:!:w
-I:75:0:200
-W:0:0:4:1
+I:75:0:0
+W:0:200:4:1
 A:0/1
 P:0:1d1:0:0:0
 F:THROWING
@@ -1756,8 +1756,8 @@ F:THROWING
 N:225:Strength
 G:!:w
 I:75:48:0
-W:20:0:4:400
-A:20/1
+W:40:0:4:400
+A:40/1
 P:0:1d1:0:0:0
 F:THROWING
 
@@ -1769,19 +1769,18 @@ A:3/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:227:Cure Minor Disease
-G:!:w
+N:227:Restore Strength
+G:!:d
 I:75:42:0
-W:10:0:4:100
-A:10/1
+W:25:0:4:300
+A:25/1
 P:0:1d1:0:0:0
-F:THROWING
 
 N:228:Intelligence
 G:!:w
 I:75:49:0
-W:20:0:4:400
-A:20/1
+W:40:0:4:400
+A:40/1
 P:0:1d1:0:0:0
 Y:17:2
 F:THROWING
@@ -1794,19 +1793,18 @@ A:20/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:230:Cure Plague
-G:!:w
+N:230:Restore Intelligence
+G:!:d
 I:75:43:0
-W:40:0:4:2000
-A:40/2
+W:25:0:4:300
+A:25/1
 P:0:1d1:0:0:0
-F:THROWING
 
 N:231:Wisdom
 G:!:w
 I:75:50:0
-W:20:0:4:400
-A:20/1
+W:40:0:4:400
+A:40/1
 P:0:1d1:0:0:0
 Y:5:2
 F:THROWING
@@ -1819,13 +1817,18 @@ A:20/1
 P:0:1d1:0:0:0
 F:THROWING
 
-# 233 - Was Restore Wisdom
+N:233:Restore Wisdom
+G:!:d
+I:75:44:0
+W:25:0:4:300
+A:25/1
+P:0:1d1:0:0:0
 
 N:234:Charisma
 G:!:w
 I:75:53:0
-W:20:0:4:350
-A:20/1
+W:30:0:4:350
+A:30/1
 P:0:1d1:0:0:0
 Y:19:2
 F:THROWING
@@ -1838,12 +1841,17 @@ A:20/1
 P:0:1d1:0:0:0
 F:THROWING
 
-# 236 - Was Restore Charisma
+N:236:Restore Charisma
+G:!:d
+I:75:47:0
+W:20:0:4:300
+A:20/1
+P:0:1d1:0:0:0
 
 N:237:Cure Light Wounds
 G:!:w
-I:75:34:50
-W:0:0:4:15
+I:75:34:0
+W:0:50:4:15
 A:0/1:1/1:3/1
 P:0:1d1:0:0:0
 Y:21:1
@@ -1895,8 +1903,8 @@ F:THROWING
 N:243:Constitution
 G:!:w
 I:75:52:0
-W:20:0:4:400
-A:20/1
+W:40:0:4:400
+A:40/1
 P:0:1d1:0:0:0
 Y:24:2
 F:THROWING
@@ -1964,15 +1972,25 @@ F:THROWING
 N:251:Dexterity
 G:!:w
 I:75:51:0
-W:20:0:4:400
-A:20/1
+W:40:0:4:400
+A:40/1
 P:0:1d1:0:0:0
 Y:26:2
 F:THROWING
 
-# 252 - Was Restore Dexterity
+N:252:Restore Dexterity
+G:!:d
+I:75:45:0
+W:25:0:4:300
+A:25/1
+P:0:1d1:0:0:0
 
-# 253 - Was Restore Constitution
+N:253:Restore Constitution
+G:!:d
+I:75:46:0
+W:25:0:4:300
+A:25/1
+P:0:1d1:0:0:0
 
 N:254:Lose Memories
 G:!:w
@@ -3498,10 +3516,10 @@ Y:22:3
 
 # Another potion
 
-N:432:Restoring
+N:432:Restore Body
 G:!:w
 I:75:54:0
-W:20:0:1:1000
+W:40:0:1:1000
 A:40/1:60/1
 P:0:1d1:0:0:0
 F:THROWING
@@ -5892,3 +5910,86 @@ G:&:o
 I:98:22:0
 W:85:5:100:2500
 A:85/5
+
+### Potions ###
+
+N:818:Cure Minor Disease
+G:!:w
+I:75:71:0
+W:10:0:4:100
+A:10/1
+P:0:1d1:0:0:0
+F:THROWING
+
+N:819:Cure Plague
+G:!:w
+I:75:72:0
+W:40:0:4:2000
+A:40/2
+P:0:1d1:0:0:0
+F:THROWING
+
+N:820:Bloating
+G:!:w
+I:75:73:0
+W:10:15000:4:2000
+A:10/1
+P:0:1d1:0:0:0
+F:THROWING
+
+N:820:Undeath
+G:!:w
+I:75:74:0
+W:40:0:4:2000
+A:40/2
+P:0:1d1:0:0:0
+F:THROWING
+
+N:821:Restore Mind
+G:!:w
+I:75:75:0
+W:40:0:1:1000
+A:40/1:60/1
+P:0:1d1:0:0:0
+F:THROWING
+
+N:822:Dragon's Flame
+G:!:w
+I:75:76:0
+W:50:0:1:1000
+A:50/1
+P:0:1d1:0:0:0
+F:THROWING
+
+N:823:Dragon's Frost
+G:!:w
+I:75:77:0
+W:40:0:1:800
+A:40/1
+P:0:1d1:0:0:0
+F:THROWING
+
+N:824:Dragon's Storm
+G:!:w
+I:75:78:0
+W:35:0:1:700
+A:35/1
+P:0:1d1:0:0:0
+F:THROWING
+
+N:825:Dragon's Bile
+G:!:w
+I:75:79:0
+W:45:0:1:900
+A:45/1
+P:0:1d1:0:0:0
+F:THROWING
+
+N:826:Dragon's Venom
+G:!:w
+I:75:80:0
+W:30:0:1:600
+A:30/1
+P:0:1d1:0:0:0
+F:THROWING
+

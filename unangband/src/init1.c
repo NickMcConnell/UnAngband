@@ -174,6 +174,8 @@ static cptr r_info_blow_method[] =
 	"SHOT",
 	"ARC_20",
 	"ARC_30",
+	"ARC_40",
+	"ARC_50",
 	"ARC_60",
 	"FLASK",
 	NULL

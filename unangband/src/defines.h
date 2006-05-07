@@ -2340,8 +2340,10 @@
 #define RBM_SHOT 	57
 #define RBM_ARC_20	58
 #define RBM_ARC_30	59
-#define RBM_ARC_60	60
-#define RBM_FLASK	61
+#define RBM_ARC_40	60
+#define RBM_ARC_50	61
+#define RBM_ARC_60	62
+#define RBM_FLASK	63
 
 #define RBM_MAX_NORMAL  23
 #define RBM_MIN_RANGED  15
@@ -2758,10 +2760,8 @@
 #define INSCRIP_RUNED		22 /* Does have runes */
 #define INSCRIP_AVERAGE		23 /* Has been detected to be average */
 #define INSCRIP_VALUABLE	24 /* Has been detected to be valuable */
-#define INSCRIP_COATED_POTION	25 /* Has been coated with a potion */
-#define INSCRIP_COATED_FOOD	26 /* Has been coated with a mushroom */
-#define INSCRIP_COATED_FLASK	27 /* Has been coated with a flask */
-#define INSCRIP_MIN_HIDDEN      28 /* Minimum inscription for hidden */
+#define INSCRIP_COATED		25 /* Has been coated with something */
+#define INSCRIP_MIN_HIDDEN      26 /* Minimum inscription for hidden */
 
 
 /*
@@ -2993,6 +2993,7 @@
 #define OBJECT_XTRA_MAX_HIDDEN 20
 
 #define OBJECT_XTRA_MIN_RUNES    36
+#define OBJECT_XTRA_MIN_COATS    75
 #define MAX_RUNE_FLAGS    4
 
 /* Total number of different slay types used */
@@ -4214,6 +4215,12 @@
  */
 #define cursed_p(T) \
 	((T)->ident & (IDENT_CURSED))
+
+/*
+ * Coated items.
+ */
+#define coated_p(T) \
+	((T)->xtra1 >= OBJECT_XTRA_MIN_COATS)
 
 
 /*

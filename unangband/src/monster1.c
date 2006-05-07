@@ -728,6 +728,8 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case RBM_SHOT:	p = "sling a shot at you"; break;
 			case RBM_ARC_20:	p = "create a 20 degree arc"; break;
 			case RBM_ARC_30:	p = "create a 30 degree arc"; break;
+			case RBM_ARC_40:	p = "create a 40 degree arc"; break;
+			case RBM_ARC_50:	p = "create a 50 degree arc"; break;
 			case RBM_ARC_60:	p = "create a 60 degree arc"; break;
 			case RBM_FLASK:	p = "throw a grenade at you"; break;
 		}

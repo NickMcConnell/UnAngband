@@ -1250,6 +1250,9 @@ int value_check_aux3(const object_type *o_ptr)
 		return (INSCRIP_NONMAGICAL);
 	}
 
+	/* Coated item */
+	if (coated_p(o_ptr)) return (INSCRIP_COATED);
+
 	/* Magic item */
 	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_EXCELLENT);
 
@@ -1383,6 +1386,9 @@ int value_check_aux5(const object_type *o_ptr)
 	/* Broken items */
 	/*if (broken_p(o_ptr)) return (INSCRIP_NONMAGICAL);*/
 
+	/* Coated item */
+	if (coated_p(o_ptr)) return (INSCRIP_COATED);
+
 	/* Magical item */
 	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_EGO_ITEM);
 
@@ -1445,7 +1451,7 @@ bool detect_objects_magic(void)
 
 		/* Artifacts, misc magic items, or enchanted wearables */
 		if (!(cursed_p(o_ptr)) && !(broken_p(o_ptr)) && (artifact_p(o_ptr) || ego_item_p(o_ptr) ||
-		    (o_ptr->xtra1) ||
+		    (o_ptr->xtra1 < OBJECT_XTRA_MIN_COATS) ||
 		    (tv == TV_AMULET) || (tv == TV_RING) ||
 		    (tv == TV_STAFF) || (tv == TV_WAND) || (tv == TV_ROD) ||
 		    (tv == TV_SCROLL) || (tv == TV_POTION) ||
@@ -1677,7 +1683,7 @@ bool detect_objects_power(void)
 
 		/* Artifacts, misc magic items, or enchanted wearables */
 		if (artifact_p(o_ptr) || ego_item_p(o_ptr) ||
-		    (o_ptr->xtra1) ||
+		    (o_ptr->xtra1 < OBJECT_XTRA_MIN_COATS) ||
 		    (tv == TV_AMULET) || (tv == TV_RING) ||
 		    (tv == TV_STAFF) || (tv == TV_WAND) || (tv == TV_ROD) ||
 		    (tv == TV_SCROLL) || (tv == TV_POTION) ||
@@ -5621,6 +5627,32 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				if ((level > 5) && (d_side)) damage += damroll((level-1)/5, d_side);
 
 				if (fire_arc(effect, dir, damage, 0, 30)) obvious = TRUE;
+
+				break;
+			}
+
+			case RBM_ARC_40:
+			{
+				/* Allow direction to be cancelled for free */
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
+
+				/* Hack - scale damage */
+				if ((level > 5) && (d_side)) damage += damroll((level-1)/5, d_side);
+
+				if (fire_arc(effect, dir, damage, 0, 40)) obvious = TRUE;
+
+				break;
+			}
+
+			case RBM_ARC_50:
+			{
+				/* Allow direction to be cancelled for free */
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
+
+				/* Hack - scale damage */
+				if ((level > 5) && (d_side)) damage += damroll((level-1)/5, d_side);
+
+				if (fire_arc(effect, dir, damage, 0, 50)) obvious = TRUE;
 
 				break;
 			}

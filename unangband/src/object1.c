@@ -1548,7 +1548,18 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	/* No more details wanted */
 	if (mode < 3) goto object_desc_done;
 
-	if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_RUNES)
+	if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_COATS)
+	{
+		int coating = lookup_kind(o_ptr->xtra1, o_ptr->xtra2);
+
+		if (k_info[coating].aware)
+		{
+			object_desc_str_macro(t, " <");
+			object_desc_str_macro(t, k_name+k_info[coating].name);
+			object_desc_str_macro(t, "-coated>");
+		}
+	}
+	else if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_RUNES)
 	{
 		object_desc_str_macro(t, " <");
 		if (o_ptr->xtra2 > 1)

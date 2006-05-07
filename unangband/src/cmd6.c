@@ -1608,7 +1608,8 @@ void do_cmd_activate(void)
 			break;
 		case TV_STAFF:
 			p_ptr->cur_style |= 1L << WS_STAFF;
-			break; */
+			break;
+*/
 		case TV_AMULET:
 			p_ptr->cur_style |= 1L << WS_AMULET;
 			break;
@@ -1630,7 +1631,8 @@ void do_cmd_activate(void)
 		switch (p_ptr->pstyle)
 		{
 /*			case WS_WAND:
-			case WS_STAFF: */
+			case WS_STAFF:
+*/
 			case WS_AMULET:
 			case WS_RING:
 				chance *= 2;
@@ -1806,11 +1808,58 @@ void do_cmd_activate(void)
 
 }
 
+
+
+/*
+ * Hook to determine if an object can be 'applied' to another object.
+ */
+static bool item_tester_hook_apply(const object_type *o_ptr)
+{
+	switch(o_ptr->tval)
+	{
+		case TV_FOOD:
+			if (o_ptr->sval < SV_FOOD_MIN_FOOD) return (TRUE);
+			break;
+		case TV_POTION:
+		case TV_FLASK:
+		case TV_RUNESTONE:
+			return (TRUE);
+	}
+
+	/* Assume not */
+	return (FALSE);
+}
+
+
+/*
+ * Hook to determine if an object can be coated with a potion, mushroom or flask.
+ */
+static bool item_tester_hook_coating(const object_type *o_ptr)
+{
+	switch(o_ptr->tval)
+	{
+		case TV_SWORD:
+		case TV_POLEARM:
+		case TV_ARROW:
+		case TV_BOLT:
+			if (o_ptr->weight < 1000) return (TRUE);
+	}
+
+	/* Assume not */
+	return (FALSE);
+}
+
+
+
 /*
  * Apply rune to an object. Destroys the selected runestone and (maybe)
  * give object powers or name2 or transform into another object of its kind.
+ *
+ * We now also allow potions, mushrooms and flasks to be applied to swords,
+ * polearms, bolts and arrows for various damaging effects. Note that for
+ * balance, these only do 1/5 of the damage that throwing them would apply.
  */
-void do_cmd_apply_rune(void)
+void do_cmd_apply_rune_or_coating(void)
 {
 	int item, item2;
 
@@ -1826,13 +1875,15 @@ void do_cmd_apply_rune(void)
 	int rune;
 
 	bool use_feat = FALSE;
+	bool brand_ammo = FALSE;
+	bool split = FALSE;
 
 	/* Restrict the choices */
-	item_tester_tval = TV_RUNESTONE;
+	item_tester_hook = item_tester_hook_apply;
 
 	/* Get an item */
-	q = "Apply which runestone? ";
-	s = "You have no runestones.";
+	q = "Apply which runestone, potion, mushroom or flask? ";
+	s = "You have no runestones, potions, mushrooms or flasks.";
 	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */
@@ -1860,12 +1911,22 @@ void do_cmd_apply_rune(void)
 	/* Use feat */
 	if (o_ptr->ident & (IDENT_STORE)) use_feat = TRUE;
 
-	rune = o_ptr->sval;
+	if (o_ptr->tval == TV_RUNESTONE)
+	{
+		/* Get an item to rune */
+		q = "Apply rune to which item? ";
+		s = "You have nothing to apply it to.";
+	}
+	else
+	{
+		/* Get an item to coat */
+		q = "Apply coating to which item? ";
+		s = "You have nothing to apply it to.";
 
-	/* Get an item to fill */
-	q = "Apply rune to which item? ";
-	s = "You have nothing to apply it to.";
+		item_tester_hook = item_tester_hook_coating;
+	}
 
+	/* Get item */
 	if (!get_item(&item2, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */
@@ -1881,27 +1942,51 @@ void do_cmd_apply_rune(void)
 	}
 
 	/* In a bag? */
-	if (o_ptr->tval == TV_BAG)
+	if (j_ptr->tval == TV_BAG)
 	{
 		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+		if (!get_item_from_bag(&item2, q, s, j_ptr)) return;
 
 		/* Refer to the item */
-		o_ptr = &inventory[item];
+		j_ptr = &inventory[item2];
 	}
 
+	/* Remove coating */
+	if ((coated_p(j_ptr)) && ((j_ptr->xtra1 != o_ptr->tval) || (j_ptr->xtra2 != o_ptr->sval)))
+	{
+		msg_format("It is %scoated with something.", o_ptr->tval == TV_RUNESTONE ? "" : "already ");
+
+		/* Verify */
+		if (!get_check("Remove the coating? "))
+		{
+			return;
+		}
+
+		/* Clear charges */
+		o_ptr->charges = 0;
+		o_ptr->stackc = 0;
+	}
+
+	/* Can't apply if artifact */
 	if ((artifact_p(j_ptr)) || ((j_ptr->xtra1) && (j_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES)))
 	{
 		msg_print("It has hidden powers that prevent this.");
 
-		/* Sense the item */
+		/* Sense the item? */
 		return;
 	}
 
-	if ((j_ptr->xtra1 > OBJECT_XTRA_MIN_RUNES) && (j_ptr->xtra1 != OBJECT_XTRA_MIN_RUNES + rune))
+	/* Get rune */
+	if (o_ptr->tval == TV_RUNESTONE) rune = o_ptr->sval;
+	else rune = -1;
+
+	/* Overwrite runes */
+	if ((j_ptr->xtra1 >= OBJECT_XTRA_MIN_RUNES)
+		&& (j_ptr->xtra1 < OBJECT_XTRA_MIN_COATS)
+		&& (j_ptr->xtra1 != OBJECT_XTRA_MIN_RUNES + rune))
 	{
 		/* Warning */
-		msg_print("It has other runes applied to it.");
+		msg_format("It has %srunes applied to it.", o_ptr->tval == TV_RUNESTONE ? "other " : "");
 
 		/* Verify */
 		if (!get_check("Overwrite them? "))
@@ -1910,20 +1995,15 @@ void do_cmd_apply_rune(void)
 		}
 	}
 
-	/* Take a turn */
-	p_ptr->energy_use = 100;
-
-	/* Get local object */
-	i_ptr = &object_type_body;
-
-	/* Obtain a local object */
-	object_copy(i_ptr, j_ptr);
-
-	/* Modify quantity */
-	i_ptr->number = 1;
-
-	/* Reset stack counter */
-	i_ptr->stackc = 0;
+	/* Hack -- check ammo */
+	switch (o_ptr->tval)
+	{
+		case TV_SHOT:
+		case TV_ARROW:
+		case TV_BOLT:
+			brand_ammo = TRUE;
+		break;
+	}
 
 	/* Decrease the item (in the pack) */
 	if (item >= 0)
@@ -1936,7 +2016,22 @@ void do_cmd_apply_rune(void)
 		/* Hack -- handle deletion of item slot */
 		if ((inventory[item].number == 0)
 		   && (item < item2)
-			&& (item2 < INVEN_WIELD)) item2--;
+			&& (item2 < INVEN_WIELD))
+		{
+			item2--;
+
+			/* Get the item (in the pack) */
+			if (item2 >= 0)
+			{
+				j_ptr = &inventory[item2];
+			}
+
+			/* Get the item (on the floor) */
+			else
+			{
+				j_ptr = &o_list[0 - item2];
+			}
+		}
 
 		inven_item_optimize(item);
 	}
@@ -1947,6 +2042,51 @@ void do_cmd_apply_rune(void)
 		floor_item_describe(0 - item);
 		floor_item_optimize(0 - item);
 		if (use_feat && (scan_feat(p_ptr->py,p_ptr->px) < 0)) cave_alter_feat(p_ptr->py,p_ptr->px,FS_USE_FEAT);
+	}
+
+	/* Take a turn */
+	p_ptr->energy_use = 100;
+
+	/* Hack -- split stack only if required. This is dangerous otherwise as we may
+	   be calling from a routine where we delete items later. XXX XXX */
+	/* Mega-hack -- we allow 20 arrows/bolts to be coated per application */
+	if ((o_ptr->number > 1) && ((!brand_ammo) || (o_ptr->number > 5)))
+	{
+		int qty = (brand_ammo) ? 20 : 1;
+		split = TRUE;
+
+		/* Get local object */
+		i_ptr = &object_type_body;
+
+		/* Obtain a local object */
+		object_copy(i_ptr, j_ptr);
+
+		/* Modify quantity */
+		i_ptr->number = qty;
+
+		/* Reset stack counter */
+		i_ptr->stackc = 0;
+
+		/* Decrease the item (in the pack) */
+		if (item2 >= 0)
+		{
+			/* Forget about item */
+			if (j_ptr->number == qty) inven_drop_flags(j_ptr);
+
+			inven_item_increase(item2, -qty);
+			inven_item_describe(item2);
+			inven_item_optimize(item2);
+		}
+		/* Decrease the item (from the floor) */
+		else
+		{
+			floor_item_increase(0 - item2, -qty);
+			floor_item_describe(0 - item2);
+			floor_item_optimize(0 - item2);
+		}
+
+		/* Hack -- use new temporary item */
+		j_ptr = i_ptr;
 	}
 
 	/* Decrease the item (in the pack) */
@@ -1973,175 +2113,198 @@ void do_cmd_apply_rune(void)
 	i_ptr->ident &= ~(IDENT_MENTAL);
         drop_all_flags(i_ptr);
 
-	if (i_ptr->xtra1 == OBJECT_XTRA_MIN_RUNES + rune)
+	/* Apply runestone */
+	if (o_ptr->tval == TV_RUNESTONE)
 	{
-		i_ptr->xtra2++;
-	}
-	else if ((i_ptr->name2) && (e_info[i_ptr->name2].runest == rune))
-	{
-		i_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
-		i_ptr->xtra2 = e_info[i_ptr->name2].runesc + 1;
-	}
-	else if (k_info[i_ptr->k_idx].runest == rune)
-	{
-		i_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
-		i_ptr->xtra2 = k_info[i_ptr->k_idx].runesc + 1;
-	}
-	else
-	{
-		i_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
-		i_ptr->xtra2 = 1;
-	}
-
-	/* Update bonuses */
-	p_ptr->update |= (PU_BONUS);
-
-	/* Combine / Reorder the pack (later) */
-	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
-
-	/* Window stuff */
-	p_ptr->window |= (PW_INVEN | PW_EQUIP);
-
-	for (i = 0; i<z_info->k_max; i++)
-	{
-		object_kind *k_ptr = &k_info[i];
-
-		if ((k_ptr->tval == i_ptr->tval) && (k_ptr->runest == rune) && (k_ptr->runesc == i_ptr->xtra2))
+		/* Apply runes */
+		if (i_ptr->xtra1 == OBJECT_XTRA_MIN_RUNES + rune)
 		{
-			msg_print("It glows brightly.");
-
-			/* Polymorph the item */
-			/* XXX We assume weight is the same ? */
-			object_prep(i_ptr, i);
-
-			/* Apply magic (allow artifacts) */
-			apply_magic(i_ptr, object_level, TRUE, FALSE, FALSE);
-
-			/* Add runes */
-			i_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
-			i_ptr->xtra2 = k_ptr->runesc;
-
-			/* Remove special inscription, if any */
-			i_ptr->feeling = 0;
-
-			/* Hack -- Clear the "felt" flag */
-			i_ptr->ident &= ~(IDENT_SENSE);
-
-			/* Hack -- Clear the "bonus" flag */
-			i_ptr->ident &= ~(IDENT_BONUS);
-
-			/* Hack -- Clear the "store" flag */
-			i_ptr->ident &= ~(IDENT_STORE);
-
-			/* Hack -- Clear the "known" flag */
-			i_ptr->ident &= ~(IDENT_KNOWN);
-
-			break;
+			i_ptr->xtra2++;
 		}
-	}
-
-	for (i= 0; i<z_info->e_max; i++)
-	{
-		ego_item_type *e_ptr = &e_info[i];
-
-		if ((e_ptr->runest == rune) && (e_ptr->runesc == i_ptr->xtra2))
+		else if ((i_ptr->name2) && (e_info[i_ptr->name2].runest == rune))
 		{
-			for (ii = 0;ii < 3; ii++)
+			i_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
+			i_ptr->xtra2 = e_info[i_ptr->name2].runesc + 1;
+		}
+		else if (k_info[i_ptr->k_idx].runest == rune)
+		{
+			i_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
+			i_ptr->xtra2 = k_info[i_ptr->k_idx].runesc + 1;
+		}
+		else
+		{
+			i_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
+			i_ptr->xtra2 = 1;
+		}
+
+		/* Update bonuses */
+		p_ptr->update |= (PU_BONUS);
+
+		/* Combine / Reorder the pack (later) */
+		p_ptr->notice |= (PN_COMBINE | PN_REORDER);
+
+		/* Window stuff */
+		p_ptr->window |= (PW_INVEN | PW_EQUIP);
+
+		for (i = 0; i<z_info->k_max; i++)
+		{
+			object_kind *k_ptr = &k_info[i];
+
+			if ((k_ptr->tval == i_ptr->tval) && (k_ptr->runest == rune) && (k_ptr->runesc == i_ptr->xtra2))
 			{
-				if ((e_ptr->tval[ii] == i_ptr->tval)
-				 && (e_ptr->min_sval[ii]<= i_ptr->sval)
-				  && (e_ptr->max_sval[ii] >= i_ptr->sval))
+				msg_print("It glows brightly.");
+
+				/* Polymorph the item */
+				/* XXX We assume weight is the same ? */
+				object_prep(i_ptr, i);
+
+				/* Apply magic (allow artifacts) */
+				apply_magic(i_ptr, object_level, TRUE, FALSE, FALSE);
+
+				/* Add runes */
+				i_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
+				i_ptr->xtra2 = k_ptr->runesc;
+
+				/* Remove special inscription, if any */
+				i_ptr->feeling = 0;
+
+				/* Hack -- Clear the "felt" flag */
+				i_ptr->ident &= ~(IDENT_SENSE);
+
+				/* Hack -- Clear the "bonus" flag */
+				i_ptr->ident &= ~(IDENT_BONUS);
+
+				/* Hack -- Clear the "store" flag */
+				i_ptr->ident &= ~(IDENT_STORE);
+
+				/* Hack -- Clear the "known" flag */
+				i_ptr->ident &= ~(IDENT_KNOWN);
+
+				break;
+			}
+		}
+
+		for (i= 0; i<z_info->e_max; i++)
+		{
+			ego_item_type *e_ptr = &e_info[i];
+
+			if ((e_ptr->runest == rune) && (e_ptr->runesc == i_ptr->xtra2))
+			{
+				for (ii = 0;ii < 3; ii++)
 				{
-					msg_print("It glows brightly.");
-
-					/* Ego-ize the item */
-					i_ptr->name2 = i;
-
-					/* Extra powers */
-					if (e_ptr->xtra)
+					if ((e_ptr->tval[ii] == i_ptr->tval)
+					 && (e_ptr->min_sval[ii]<= i_ptr->sval)
+					  && (e_ptr->max_sval[ii] >= i_ptr->sval))
 					{
-						i_ptr->xtra1 = e_ptr->xtra;
-						i_ptr->xtra2 = (byte)rand_int(object_xtra_size[e_ptr->xtra]);
+						msg_print("It glows brightly.");
+
+						/* Ego-ize the item */
+						i_ptr->name2 = i;
+
+						/* Extra powers */
+						if (e_ptr->xtra)
+						{
+							i_ptr->xtra1 = e_ptr->xtra;
+							i_ptr->xtra2 = (byte)rand_int(object_xtra_size[e_ptr->xtra]);
+						}
+
+						/* Forget about it */
+						drop_all_flags(o_ptr);
+
+						/* Hack -- acquire "broken" flag */
+						if (!e_ptr->cost) i_ptr->ident |= (IDENT_BROKEN);
+
+						/* Hack -- acquire "cursed" flag */
+						if (e_ptr->flags3 & (TR3_LIGHT_CURSE)) i_ptr->ident |= (IDENT_CURSED);
+
+						/* Hack -- apply extra penalties if needed */
+						if (cursed_p(i_ptr) || broken_p(i_ptr))
+						{
+							/* Hack -- obtain bonuses */
+							if (e_ptr->max_to_h > 0) i_ptr->to_h = MIN(i_ptr->to_h,-randint(e_ptr->max_to_h));
+							else i_ptr->to_h = MIN(i_ptr->to_h,0);
+
+							if (e_ptr->max_to_d > 0) i_ptr->to_d = MIN(i_ptr->to_d,-randint(e_ptr->max_to_d));
+							else i_ptr->to_d = MIN(i_ptr->to_d,0);
+
+							if (e_ptr->max_to_a > 0) i_ptr->to_a = MIN(i_ptr->to_a,-randint(e_ptr->max_to_a));
+							else i_ptr->to_a = MIN(i_ptr->to_a,0);
+
+							/* Hack -- obtain charges */
+							if (e_ptr->max_pval > 0) i_ptr->pval = MIN(i_ptr->pval,-randint(e_ptr->max_pval));
+						}
+
+						/* Hack -- apply extra bonuses if needed */
+						else
+						{
+							/* Hack -- obtain bonuses */
+							if (e_ptr->max_to_h > 0) i_ptr->to_h = MAX(i_ptr->to_h,randint(e_ptr->max_to_h));
+							else i_ptr->to_h = MIN(i_ptr->to_h,0);
+
+							if (e_ptr->max_to_d > 0) i_ptr->to_d = MAX(i_ptr->to_d,randint(e_ptr->max_to_d));
+							else i_ptr->to_d = MIN(i_ptr->to_d,0);
+
+							if (e_ptr->max_to_a > 0) i_ptr->to_a = MAX(i_ptr->to_a,randint(e_ptr->max_to_a));
+							else i_ptr->to_a = MIN(i_ptr->to_a,0);
+
+							/* Hack -- obtain pval */
+							if (e_ptr->max_pval > 0) i_ptr->pval = MAX(1,MIN(i_ptr->pval,randint(e_ptr->max_pval)));
+							else i_ptr->pval = MIN(i_ptr->pval,0);
+						}
+
+						/* Remove special inscription, if any */
+						i_ptr->feeling = 0;
+
+						/* Hack -- Clear the "felt" flag */
+						i_ptr->ident &= ~(IDENT_SENSE);
+
+						/* Hack -- Clear the "bonus" flag */
+						i_ptr->ident &= ~(IDENT_BONUS);
+
+						/* Hack -- Clear the "known" flag */
+						i_ptr->ident &= ~(IDENT_KNOWN);
+
+						/* Hack -- Clear the "store" flag */
+						i_ptr->ident &= ~(IDENT_STORE);
+
+						/* Hack -- Clear the "known" flag */
+						i_ptr->ident &= ~(IDENT_KNOWN);
+
+						break;
 					}
-
-					/* Forget about it */
-					drop_all_flags(o_ptr);
-
-					/* Hack -- acquire "broken" flag */
-					if (!e_ptr->cost) i_ptr->ident |= (IDENT_BROKEN);
-
-					/* Hack -- acquire "cursed" flag */
-					if (e_ptr->flags3 & (TR3_LIGHT_CURSE)) i_ptr->ident |= (IDENT_CURSED);
-
-					/* Hack -- apply extra penalties if needed */
-					if (cursed_p(i_ptr) || broken_p(i_ptr))
-					{
-						/* Hack -- obtain bonuses */
-						if (e_ptr->max_to_h > 0) i_ptr->to_h = MIN(i_ptr->to_h,-randint(e_ptr->max_to_h));
-						else i_ptr->to_h = MIN(i_ptr->to_h,0);
-
-						if (e_ptr->max_to_d > 0) i_ptr->to_d = MIN(i_ptr->to_d,-randint(e_ptr->max_to_d));
-						else i_ptr->to_d = MIN(i_ptr->to_d,0);
-
-						if (e_ptr->max_to_a > 0) i_ptr->to_a = MIN(i_ptr->to_a,-randint(e_ptr->max_to_a));
-						else i_ptr->to_a = MIN(i_ptr->to_a,0);
-
-						/* Hack -- obtain charges */
-						if (e_ptr->max_pval > 0) i_ptr->pval = MIN(i_ptr->pval,-randint(e_ptr->max_pval));
-					}
-
-					/* Hack -- apply extra bonuses if needed */
-					else
-					{
-						/* Hack -- obtain bonuses */
-						if (e_ptr->max_to_h > 0) i_ptr->to_h = MAX(i_ptr->to_h,randint(e_ptr->max_to_h));
-						else i_ptr->to_h = MIN(i_ptr->to_h,0);
-
-						if (e_ptr->max_to_d > 0) i_ptr->to_d = MAX(i_ptr->to_d,randint(e_ptr->max_to_d));
-						else i_ptr->to_d = MIN(i_ptr->to_d,0);
-
-						if (e_ptr->max_to_a > 0) i_ptr->to_a = MAX(i_ptr->to_a,randint(e_ptr->max_to_a));
-						else i_ptr->to_a = MIN(i_ptr->to_a,0);
-
-						/* Hack -- obtain pval */
-						if (e_ptr->max_pval > 0) i_ptr->pval = MAX(1,MIN(i_ptr->pval,randint(e_ptr->max_pval)));
-						else i_ptr->pval = MIN(i_ptr->pval,0);
-					}
-
-					/* Remove special inscription, if any */
-					i_ptr->feeling = 0;
-
-					/* Hack -- Clear the "felt" flag */
-					i_ptr->ident &= ~(IDENT_SENSE);
-
-					/* Hack -- Clear the "bonus" flag */
-					i_ptr->ident &= ~(IDENT_BONUS);
-
-					/* Hack -- Clear the "known" flag */
-					i_ptr->ident &= ~(IDENT_KNOWN);
-
-					/* Hack -- Clear the "store" flag */
-					i_ptr->ident &= ~(IDENT_STORE);
-
-					/* Hack -- Clear the "known" flag */
-					i_ptr->ident &= ~(IDENT_KNOWN);
-
-					break;
 				}
 			}
 		}
 	}
-
-	/* Carry the new item */
-	if (item2 >= 0)
-	{
-		item = inven_carry(i_ptr);
-		inven_item_describe(item);
-	}
+	/* Coat weapon */
 	else
 	{
-		item = floor_carry(p_ptr->py,p_ptr->px,i_ptr);
-		floor_item_describe(item);
+		int charges = i_ptr->charges * i_ptr->number + i_ptr->stackc;
+
+		/* This is a lot simpler */
+		i_ptr->xtra1 = o_ptr->tval;
+		i_ptr->xtra2 = o_ptr->sval;
+
+		/* Based on the weight, determine charges */
+		i_ptr->charges = (charges + 1000 / i_ptr->weight) / i_ptr->number;
+		i_ptr->stackc = (charges + 1000 / i_ptr->weight) % i_ptr->number;
+
+		if (i_ptr->stackc) i_ptr->charges++;
 	}
 
+	/* Need to carry the new object? */
+	if (split)
+	{
+		/* Carry the new item */
+		if (item2 >= 0)
+		{
+			item = inven_carry(i_ptr);
+			inven_item_describe(item);
+		}
+		else
+		{
+			item = floor_carry(p_ptr->py,p_ptr->px,i_ptr);
+			floor_item_describe(item);
+		}
+	}
 }

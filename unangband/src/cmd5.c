@@ -36,7 +36,7 @@
  */
 int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 {
-int i,ii;
+	int i,ii;
 
 	int num = 0;
 
@@ -88,7 +88,6 @@ int i,ii;
 		default:
 			p="power";
 			break;
-
 	}
 
 	/* Cannot cast spells if illiterate */
@@ -98,6 +97,18 @@ int i,ii;
 
 		return(-2);
 
+	}
+
+	/* Hack -- coated objects use coating instead */
+	if (coated_p(o_ptr))
+	{
+		object_type object_type_body;
+		object_type *j_ptr = &object_type_body;
+
+		j_ptr->tval = o_ptr->xtra1;
+		j_ptr->sval = o_ptr->xtra2;
+		j_ptr->k_idx = lookup_kind(o_ptr->xtra1, o_ptr->xtra2);
+		o_ptr = j_ptr;
 	}
 
 #ifdef ALLOW_REPEAT

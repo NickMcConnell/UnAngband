@@ -165,8 +165,13 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 		if (!(o_ptr->ident & IDENT_MENTAL)) return;
 	}
 
+	/* Coating */
+	if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_COATS)
+	{
+		/* No extra powers */
+	}
 	/* Rune powers */
-	if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_RUNES)
+	else if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_RUNES)
 	{
 		int rune = o_ptr->xtra1 - OBJECT_XTRA_MIN_RUNES;
 		int i;
@@ -353,7 +358,7 @@ void object_obvious_flags(object_type *o_ptr)
                 o_ptr->can_flags4 |= k_info[o_ptr->k_idx].flags4;
 
                 /* Non-runed average item have no more hidden ability */
-                if (!o_ptr->name2 && !o_ptr->xtra1 && wield_slot(o_ptr) >= INVEN_WIELD)
+                if (!o_ptr->name2 && !(o_ptr->xtra1) && wield_slot(o_ptr) >= INVEN_WIELD)
                         object_not_flags(o_ptr, ~(o_ptr->can_flags1), 
                                          ~(o_ptr->can_flags2), 
                                          ~(o_ptr->can_flags3), 
@@ -3517,7 +3522,13 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 
 	/* Hack -- Remove 'user' enchanted hidden flags */
 	/* This prevents runes and enchantment spells 'tainting' ego items */
-	if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_RUNES)
+
+	/* Ignore coatings */
+	if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_COATS)
+	{
+		/* No extra powers */
+	}
+	else if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_RUNES)
 	{
 		int rune = o_ptr->xtra1 - OBJECT_XTRA_MIN_RUNES;
 		int i;

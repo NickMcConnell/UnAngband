@@ -936,7 +936,16 @@ void object_bonus(object_type *o_ptr)
 
 					/* Superb */
 					if (o_ptr->xtra1) feel = INSCRIP_SUPERB;
+				}
 
+				/* Magic Items */
+				else if (o_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES)
+				{
+					/* Cursed/Broken */
+					if (cursed_p(o_ptr) || broken_p(o_ptr)) feel = INSCRIP_WORTHLESS;
+
+					/* Normal */
+					else feel = INSCRIP_EXCELLENT;
 				}
 
 				/* Still more to know? */
@@ -1596,9 +1605,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			/* Require identical "ego-item" names */
 			if (o_ptr->name2 != j_ptr->name2) return (FALSE);
 
-			/* Hack -- Never stack "powerful" items */
-			if (o_ptr->xtra1 || j_ptr->xtra1) return (FALSE);
-
 			/* Require 'similar' timeouts */
 			if ((o_ptr->timeout != j_ptr->timeout) && (!stack_force_times)
 				&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) )
@@ -1634,7 +1640,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 	}
 
 	/* Hack -- Require identical "xtra1" and "xtra2" status */
-	if ((o_ptr->xtra1 != j_ptr->xtra1) || (o_ptr->xtra2 !=j_ptr->xtra2)) return (0);
+	if ((o_ptr->xtra1 != j_ptr->xtra1) || (o_ptr->xtra2 != j_ptr->xtra2)) return (0);
 
 	/* Hack -- Require identical "name3" */
 	if (o_ptr->name3 != j_ptr->name3) return(0);
@@ -3784,7 +3790,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			if (power)
 			{
 
-				if (((power > 1) ? TRUE : FALSE) || (power < -1) || (o_ptr->xtra1))
+				if (((power > 1) || (o_ptr->xtra1) ? TRUE : FALSE) || (power < -1) || (o_ptr->xtra1))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),power);
 
 				if (lev > 3) (void)make_magic_item(o_ptr, lev / 4, power);
@@ -3866,12 +3872,13 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		ego_power = object_power(o_ptr);
 		if (ego_power < 0) ego_power = -ego_power;
 
-		/* Choose extra power appropriate to ego item - if under powered
-		 * XXX Always give cursed items xtra power */
-		if ((e_ptr->xtra) && (ego_power < lev))
+		/* Choose extra power appropriate to ego item */
+		if (e_ptr->xtra)
 		{
 			int choice = 0;
 			int x2 = -1;
+			int w1 = 10000;
+			int w2 = 0;
 
 			o_ptr->xtra1 = e_ptr->xtra;
 
@@ -3879,6 +3886,12 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			{
 				ego_power = object_power(o_ptr);
 				if (ego_power < 0) ego_power = -ego_power;
+
+				/* Is this weakest ability? */
+				if (ego_power < w1)
+				{
+					w1 = ego_power; w2 = o_ptr->xtra2;
+				}
 
 				if (ego_power < (lev * 3 / 2)) continue;
 
@@ -3888,8 +3901,8 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			/* Found a power */
 			if (x2 >= 0) o_ptr->xtra2 = x2;
 
-			/* Too powerful */
-			else o_ptr->xtra1 = 0;
+			/* Too powerful -- choose weakest xtra ability */
+			else o_ptr->xtra2 = w2;
 
 			/* Reset ego power */
 			ego_power = object_power(o_ptr);

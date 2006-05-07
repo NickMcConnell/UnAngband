@@ -51,6 +51,9 @@ int value_check_aux1(const object_type *o_ptr)
 	/* Broken items */
 	if (broken_p(o_ptr)) return (INSCRIP_BROKEN);
 
+	/* Coated items */
+	if (coated_p(o_ptr)) return (INSCRIP_COATED);
+
 	/* Magic item */
 	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_EXCELLENT);
 
@@ -93,6 +96,9 @@ int value_check_aux2(const object_type *o_ptr)
 
 	/* Broken items (all of them) */
 	if (broken_p(o_ptr)) return (INSCRIP_BROKEN);
+
+	/* Coated items */
+	if (coated_p(o_ptr)) return (INSCRIP_COATED);
 
 	/* Artifacts -- except cursed/broken ones */
 	if (artifact_p(o_ptr)) return (INSCRIP_UNCURSED);
@@ -1952,7 +1958,7 @@ static void process_command(void)
 		/* Apply a rune */
 		case 'y':
 		{
-			do_cmd_apply_rune();
+			do_cmd_apply_rune_or_coating();
 			break;
 		}
 

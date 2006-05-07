@@ -1665,7 +1665,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_DART: mon_shot(who, y, x, effect, dam, hit, result); break;
 				case RBM_SHOT: mon_shot(who, y, x, effect, dam, hit, result); break;
 				case RBM_ARC_20: mon_arc(who, y, x, effect, dam, 0, (powerful ? 40 : 20), result); break;
-				case RBM_ARC_30: mon_arc(who, y, x, effect, dam, 0, (powerful ? 60 : 40), result); break;
+				case RBM_ARC_30: mon_arc(who, y, x, effect, dam, 0, (powerful ? 50 : 30), result); break;
+				case RBM_ARC_40: mon_arc(who, y, x, effect, dam, 0, (powerful ? 60 : 40), result); break;
+				case RBM_ARC_50: mon_arc(who, y, x, effect, dam, 0, 50, result); break;
 				case RBM_ARC_60: mon_arc(who, y, x, effect, dam, 0, 60, result); break;
 				case RBM_FLASK:	mon_ball(who, y, x, effect, dam, 1, hit, result); break;
 				default: mon_beam(who, y, x, effect, dam, 2, result); /* For all hurt huge attacks */
