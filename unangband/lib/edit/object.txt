@@ -5937,7 +5937,7 @@ A:10/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:820:Undeath
+N:821:Undeath
 G:!:w
 I:75:74:0
 W:40:0:4:2000
@@ -5945,7 +5945,7 @@ A:40/2
 P:0:1d1:0:0:0
 F:THROWING
 
-N:821:Restore Mind
+N:822:Restore Mind
 G:!:w
 I:75:75:0
 W:40:0:1:1000
@@ -5953,7 +5953,7 @@ A:40/1:60/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:822:Dragon's Flame
+N:823:Dragon's Flame
 G:!:w
 I:75:76:0
 W:50:0:1:1000
@@ -5961,7 +5961,7 @@ A:50/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:823:Dragon's Frost
+N:824:Dragon's Frost
 G:!:w
 I:75:77:0
 W:40:0:1:800
@@ -5969,7 +5969,7 @@ A:40/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:824:Dragon's Storm
+N:825:Dragon's Storm
 G:!:w
 I:75:78:0
 W:35:0:1:700
@@ -5977,7 +5977,7 @@ A:35/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:825:Dragon's Bile
+N:826:Dragon's Bile
 G:!:w
 I:75:79:0
 W:45:0:1:900
@@ -5985,7 +5985,7 @@ A:45/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:826:Dragon's Venom
+N:827:Dragon's Venom
 G:!:w
 I:75:80:0
 W:30:0:1:600
@@ -5993,3 +5993,20 @@ A:30/1
 P:0:1d1:0:0:0
 F:THROWING
 
+N:828:Dark Rituals
+G:?:w
+I:70:74:0
+W:20:0:5:150
+A:20/1
+
+N:829:Black Arts
+G:?:w
+I:70:75:0
+W:40:0:5:250
+A:40/1:60/1
+
+N:830:Concentration
+G:?:w
+I:70:76:0
+W:20:0:5:150
+A:20/1

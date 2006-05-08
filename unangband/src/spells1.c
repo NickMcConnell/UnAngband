@@ -5995,6 +5995,32 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Melee attack - gain mana */
+		case GF_GAIN_MANA:
+		{
+			/* Monster may have mana */
+			if (r_ptr->mana)
+			{
+				/* Monster gains back all mana */
+				if (m_ptr->mana + dam / 5 >= r_ptr->mana)
+				{
+					note = " restores its mana.";
+					m_ptr->mana = r_ptr->mana;
+				}
+				/* Monster gains back partial mana */
+				else
+				{
+					note = " recovers mana.";
+					m_ptr->mana += dam / 5;
+				}
+
+				if (seen) obvious = TRUE;
+			}
+
+			dam = 0;
+			break;
+		}
+
 		/* Probe visible monsters */
 		case GF_PROBE:
 		{
@@ -8870,6 +8896,45 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Notice no mana */
 				update_smart_learn(who, SM_IMM_MANA);
 			}
+			break;
+		}
+
+		/* Melee attack - gain mana */
+		case GF_GAIN_MANA:
+		{
+			/* Monster may have mana */
+			if (p_ptr->msp)
+			{
+				/* Monster notices */
+				update_smart_forget(who, SM_IMM_MANA);
+
+				/* Player gains back all mana */
+				if (p_ptr->csp + dam >= p_ptr->msp)
+				{
+					p_ptr->csp = p_ptr->msp;
+					p_ptr->csp_frac = 0;
+
+					msg_print("You feel your head clear.");
+				}
+				/* Player gains back partial mana */
+				else
+				{
+					p_ptr->csp += dam;
+
+					msg_print("You feel your concentration improve.");
+				}
+
+				p_ptr->redraw |= (PR_MANA);
+				p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1 | PW_PLAYER_2 | PW_PLAYER_3);
+				obvious = TRUE;
+			}
+			else
+			{
+				/* Notice no mana */
+				update_smart_learn(who, SM_IMM_MANA);
+			}
+
+			dam = 0;
 			break;
 		}
 

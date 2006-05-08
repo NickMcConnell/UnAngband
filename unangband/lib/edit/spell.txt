@@ -2823,7 +2823,7 @@ S:CURE_DISEASE:4
 
 N:280:Mana
 A:80:20:1
-F:SLOW_MANA
+B:SELF:GAIN_MANA:2d5+0
 S:CURE_DISEASE:18
 
 N:281:Ration
@@ -2957,8 +2957,7 @@ D:You feel life flow through your body.
 
 N:303:Restore Mana
 A:75:40:1
-F:CURE_MANA
-D:You feel your head clear.
+B:SELF:GAIN_MANA:0d0+500
 
 N:304:Cure Minor Disease
 A:75:71:1
@@ -3220,7 +3219,8 @@ B:LOS:HASTE
 
 N:351:The Magi
 A:55:19:1
-F:CURE_MANA | CURE_INT
+B:SELF:GAIN_MANA:0d0+200
+F:CURE_INT
 D:You feel your head clear.
 
 N:352:Slow Monsters
@@ -3754,3 +3754,36 @@ N:420:Restore Mind
 A:75:75:1
 F:CURE_INT | CURE_WIS | CURE_DEX
 
+N:421:Dark Rituals
+A:70:74:1
+A:90:14:8
+A:92:8:8
+C:1:19:10:60:8
+C:3:28:10:70:6
+C:4:27:10:60:3
+C:8:19:10:60:8
+C:9:28:10:70:6
+B:SELF:DRAIN_LIFE:0d0+20
+B:SELF:GAIN_MANA:10d5+0
+
+N:422:Black Arts
+A:70:75:1
+A:90:14:9
+C:1:32:30:95:12
+C:3:37:30:80:12
+C:4:31:30:95:18
+C:8:32:30:95:12
+B:SELF:DRAIN_LIFE:0d0+100
+B:SELF:GAIN_MANA:15d5+50
+
+N:423:Concentration
+A:70:76:1
+A:90:2:9
+A:92:5:9
+C:1:19:0:60:8
+C:3:28:0:70:6
+C:4:27:0:60:3
+C:8:19:0:60:8
+C:9:28:10:70:6
+B:SELF:DRAIN_LIFE:0d0+100
+B:SELF:GAIN_MANA:5d5+0

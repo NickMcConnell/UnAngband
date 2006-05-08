@@ -2342,8 +2342,6 @@ static bool item_tester_unknown_bonus(const object_type *o_ptr)
 {
 	if (object_known_p(o_ptr))
 		return FALSE;
-	else if (o_ptr->ident & (IDENT_BONUS))
-		return FALSE;
 	else
 	{
 		switch (o_ptr->tval)
@@ -2367,10 +2365,19 @@ static bool item_tester_unknown_bonus(const object_type *o_ptr)
 			case TV_DRAG_ARMOR:
 			case TV_RING:
 			case TV_AMULET:
-			case TV_WAND:
+			{
+				if (!(o_ptr->ident & (IDENT_BONUS))) return TRUE;
+				if (!(o_ptr->ident & (IDENT_PVAL))) return TRUE;
+				break;
+			}
 			case TV_STAFF:
 			{
-				return TRUE;
+				if (!(o_ptr->ident & (IDENT_BONUS))) return TRUE;
+			}
+			case TV_WAND:
+			{
+				if (!(o_ptr->ident & (IDENT_CHARGES))) return TRUE;
+				break;
 			}
 		}
 	}
@@ -6168,36 +6175,6 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 		if (ee > 100000L) ee = 100000L;
 		gain_exp(ee);
 		obvious = TRUE;
-	}
-
-	if (s_ptr->flags3 & (SF3_SLOW_MANA))
-	{
-		if (p_ptr->csp < p_ptr->msp)
-		{
-			p_ptr->csp = p_ptr->csp + damroll(2,5);
-			if (p_ptr->csp >= p_ptr->msp)
-			{
-				p_ptr->csp = p_ptr->msp;
-				p_ptr->csp_frac = 0;
-			}
-			p_ptr->redraw |= (PR_MANA);
-			p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1 | PW_PLAYER_2 | PW_PLAYER_3);
-	
-			obvious = TRUE;
-		}
-	}
-
-	if (s_ptr->flags3 & (SF3_CURE_MANA))
-	{
-
-		if (p_ptr->csp < p_ptr->msp)
-		{
-			p_ptr->csp = p_ptr->msp;
-			p_ptr->csp_frac = 0;
-			p_ptr->redraw |= (PR_MANA);
-			p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1 | PW_PLAYER_2 | PW_PLAYER_3);
-			obvious = TRUE;
-		}
 	}
 
 	if (s_ptr->flags1 || s_ptr->flags2 || s_ptr->flags3) *cancel = FALSE;

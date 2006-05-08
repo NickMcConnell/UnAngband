@@ -1116,7 +1116,7 @@ struct player_class
 	bool spell_power;       /* Can cast 'powerful' spells */
 
 	bool sense_squared;	/* Pseudo-id squared */
-	bool sense_heavy;	/* Pseudo-id heavy */
+	byte sense_type;	/* Pseudo-id type */
 	u32b sense_base;	/* Base pseudo-id value */
 	u16b sense_div;		/* Pseudo-id divisor */
 

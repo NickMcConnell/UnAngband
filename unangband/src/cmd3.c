@@ -256,25 +256,16 @@ void do_cmd_wield(void)
 
 	/* Check for racial conflicts */
 	burn |= (f1 & (TR1_SLAY_NATURAL)) & (p_ptr->cur_flags4 & (TR4_ANIMAL));
-	burn |= (f1 & (TR1_SLAY_UNDEAD)) & (p_ptr->cur_flags4 & (TR4_UNDEAD));
-	burn |= (f1 & (TR1_SLAY_DEMON)) & (p_ptr->cur_flags4 & (TR4_DEMON));
 	burn |= (f1 & (TR1_SLAY_ORC)) & (p_ptr->cur_flags4 & (TR4_ORC));
 	burn |= (f1 & (TR1_SLAY_TROLL)) & (p_ptr->cur_flags4 & (TR4_TROLL));
 	burn |= (f1 & (TR1_SLAY_GIANT)) & (p_ptr->cur_flags4 & (TR4_GIANT));
-	burn |= (f1 & (TR1_SLAY_DRAGON)) & (p_ptr->cur_flags4 & (TR4_DRAGON));
-	burn |= (f1 & (TR1_KILL_DRAGON)) & (p_ptr->cur_flags4 & (TR4_DRAGON));
-	burn |= (f1 & (TR1_KILL_DEMON)) & (p_ptr->cur_flags4 & (TR4_DEMON));
-	burn |= (f1 & (TR1_KILL_UNDEAD)) & (p_ptr->cur_flags4 & (TR4_UNDEAD));
 	burn |= (f4 & (TR4_SLAY_MAN)) & (p_ptr->cur_flags4 & (TR4_MAN));
 	burn |= (f4 & (TR4_SLAY_ELF)) & (p_ptr->cur_flags4 & (TR4_ELF));
 	burn |= (f4 & (TR4_SLAY_DWARF)) & (p_ptr->cur_flags4 & (TR4_DWARF));
 	burn |= (f4 & (TR4_ANIMAL)) & (p_ptr->cur_flags1 & (TR1_SLAY_NATURAL));
-	burn |= (f4 & (TR4_UNDEAD)) & (p_ptr->cur_flags1 & (TR1_SLAY_UNDEAD));
-	burn |= (f4 & (TR4_DEMON)) & (p_ptr->cur_flags1 & (TR1_SLAY_DEMON));
 	burn |= (f4 & (TR4_ORC)) & (p_ptr->cur_flags1 & (TR1_SLAY_ORC));
 	burn |= (f4 & (TR4_TROLL)) & (p_ptr->cur_flags1 & (TR1_SLAY_TROLL));
 	burn |= (f4 & (TR4_GIANT)) & (p_ptr->cur_flags1 & (TR1_SLAY_GIANT));
-	burn |= (f4 & (TR4_DRAGON)) & (p_ptr->cur_flags1 & (TR1_SLAY_DRAGON));
 	burn |= (f4 & (TR4_MAN)) & (p_ptr->cur_flags4 & (TR4_SLAY_MAN));
 	burn |= (f4 & (TR4_DWARF)) & (p_ptr->cur_flags4 & (TR4_SLAY_DWARF));
 	burn |= (f4 & (TR4_ELF)) & (p_ptr->cur_flags4 & (TR4_SLAY_ELF));
@@ -286,7 +277,13 @@ void do_cmd_wield(void)
 		burn = FALSE;
 	}
 
-	/* Check for elemental conflicts */
+	/* Check for elemental conflicts and high slays */
+	burn |= (f1 & (TR1_SLAY_DRAGON)) & (p_ptr->cur_flags4 & (TR4_DRAGON));
+	burn |= (f1 & (TR1_SLAY_UNDEAD)) & (p_ptr->cur_flags4 & (TR4_UNDEAD));
+	burn |= (f1 & (TR1_SLAY_DEMON)) & (p_ptr->cur_flags4 & (TR4_DEMON));
+	burn |= (f1 & (TR1_KILL_DEMON)) & (p_ptr->cur_flags4 & (TR4_DEMON));
+	burn |= (f1 & (TR1_KILL_UNDEAD)) & (p_ptr->cur_flags4 & (TR4_UNDEAD));
+	burn |= (f1 & (TR1_KILL_DRAGON)) & (p_ptr->cur_flags4 & (TR4_DRAGON));
 	burn |= (f1 & (TR1_BRAND_HOLY)) & (p_ptr->cur_flags4 & (TR4_EVIL));
 	burn |= (f1 & (TR1_BRAND_POIS)) & (p_ptr->cur_flags4 & (TR4_HURT_POIS));
 	burn |= (f1 & (TR1_BRAND_ACID)) & (p_ptr->cur_flags4 & (TR4_HURT_ACID));
@@ -296,6 +293,12 @@ void do_cmd_wield(void)
 	burn |= (f4 & (TR4_BRAND_LITE)) & (p_ptr->cur_flags4 & (TR4_HURT_LITE));
 
 	burn |= (f4 & (TR4_EVIL)) & (p_ptr->cur_flags1 & (TR1_BRAND_HOLY));
+	burn |= (f4 & (TR4_DRAGON)) & (p_ptr->cur_flags1 & (TR1_SLAY_DRAGON));
+	burn |= (f4 & (TR4_UNDEAD)) & (p_ptr->cur_flags1 & (TR1_SLAY_UNDEAD));
+	burn |= (f4 & (TR4_DEMON)) & (p_ptr->cur_flags1 & (TR1_SLAY_DEMON));
+	burn |= (f4 & (TR4_DRAGON)) & (p_ptr->cur_flags1 & (TR1_KILL_DRAGON));
+	burn |= (f4 & (TR4_UNDEAD)) & (p_ptr->cur_flags1 & (TR1_KILL_UNDEAD));
+	burn |= (f4 & (TR4_DEMON)) & (p_ptr->cur_flags1 & (TR1_KILL_DEMON));
 	burn |= (f4 & (TR4_HURT_POIS)) & (p_ptr->cur_flags1 & (TR1_BRAND_POIS));
 	burn |= (f4 & (TR4_HURT_ACID)) & (p_ptr->cur_flags1 & (TR1_BRAND_ACID));
 	burn |= (f4 & (TR4_HURT_COLD)) & (p_ptr->cur_flags1 & (TR1_BRAND_COLD));
@@ -482,12 +485,29 @@ void do_cmd_wield(void)
 		/* Warn the player */
 		msg_print("Oops! It feels deathly cold!");
 
-		/* Sense the object if allowed */
-		o_ptr->feeling = INSCRIP_CURSED;
+		switch (o_ptr->feeling)
+		{
+			case INSCRIP_ARTIFACT: o_ptr->feeling = INSCRIP_TERRIBLE; break;
+			case INSCRIP_HIGH_EGO_ITEM: o_ptr->feeling = INSCRIP_WORTHLESS; break;
+			case INSCRIP_EGO_ITEM: o_ptr->feeling = INSCRIP_WORTHLESS; break;
+			default: o_ptr->feeling = INSCRIP_CURSED;
+		}
 
 		/* The object has been "sensed" */
 		o_ptr->ident |= (IDENT_SENSE);
 
+	}
+	/* Not cursed */
+	else
+	{
+		switch (o_ptr->feeling)
+		{
+			case INSCRIP_NONMAGICAL: o_ptr->feeling = INSCRIP_AVERAGE; break;
+			case INSCRIP_ARTIFACT: o_ptr->feeling = INSCRIP_SPECIAL; break;
+			case INSCRIP_HIGH_EGO_ITEM: o_ptr->feeling = INSCRIP_SUPERB; break;
+			case INSCRIP_EGO_ITEM: o_ptr->feeling = INSCRIP_EXCELLENT; break;
+			case INSCRIP_POWERFUL: o_ptr->feeling = INSCRIP_MAGICAL; break;
+		}
 	}
 
 	/* Get known flags */
@@ -498,6 +518,10 @@ void do_cmd_wield(void)
 
 	/* Some flags are instantly known */
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+
+	/* Hack -- identify pval */
+	if (f1 & (TR1_BLOWS | TR1_SHOTS | TR1_SPEED | TR1_STR |
+		TR1_INT | TR1_DEX | TR1_CON | TR1_CHR)) o_ptr->ident |= (IDENT_PVAL);
 
 	/* Hack -- the following are obvious from the displayed combat statistics */
 	if (f1 & (TR1_BLOWS)) object_can_flags(o_ptr,TR1_BLOWS,0x0L,0x0L,0x0L);

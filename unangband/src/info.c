@@ -915,7 +915,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 	if (s_ptr->flags3 & (SF3_CURE_CON)) vp[vn++]="constitution";
 	if (s_ptr->flags3 & (SF3_CURE_CHR)) vp[vn++]="charisma";
 	if (s_ptr->flags3 & (SF3_CURE_EXP)) vp[vn++]="experience";
-	if (s_ptr->flags3 & (SF3_CURE_MANA)) vp[vn++]="mana";
+	if (s_ptr->flags3 & (SF3_CURE_XXXX)) vp[vn++]="XXXX";
 
 	/* Describe stat effects */
 	if (vn)
@@ -949,7 +949,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 	/* Collect miscellaneous */
 	vn = 0;
 
-	if (s_ptr->flags3 & (SF3_SLOW_MANA)) vp[vn++] = "partially restores your mana";
+	if (s_ptr->flags3 & (SF3_SLOW_XXXX)) vp[vn++] = "partially restores your mana";
 	if (s_ptr->flags3 & (SF3_DEC_FOOD)) vp[vn++] = "makes you weak from hunger";
 	if (s_ptr->flags2 & (SF2_CURSE_WEAPON)) vp[vn++] = "curses your weapon";
 	if (s_ptr->flags2 & (SF2_CURSE_ARMOR)) vp[vn++] = "curses your armor";
@@ -1219,6 +1219,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 			case GF_BATTER:		q = "batter"; break;
 			case GF_BLIND_WEAK:		q = "blind"; break;
 			case GF_RAISE_DEAD: q = "raise dead"; break;
+			case GF_GAIN_MANA:	q = "add"; s= "mana to"; break;
 
 			/* Hack -- handle features */
 			case GF_FEATURE:

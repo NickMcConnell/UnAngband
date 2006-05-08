@@ -866,7 +866,7 @@ void object_bonus(object_type *o_ptr)
 	int feel = 0;
 
 	/* Identify the bonuses */
-	o_ptr->ident |= (IDENT_BONUS);
+	o_ptr->ident |= (IDENT_BONUS | IDENT_CHARGES | IDENT_PVAL);
 
 	/* Is this all we need to know */
 	if (!(o_ptr->name1) && ((o_ptr->tval == TV_AMULET) || (o_ptr->tval == TV_RING)))
@@ -3448,6 +3448,10 @@ int value_check_aux0(object_type *o_ptr)
  */
 int value_check_aux6(object_type *o_ptr)
 {
+	/* Hack -- mark object if it has no runes */
+	if (!(o_ptr->name1) && !(o_ptr->name2) && !(o_ptr->xtra1)
+		&& !(k_info[o_ptr->k_idx].runest)) return (INSCRIP_UNRUNED);
+
 	o_ptr->ident |= (IDENT_RUNES);
 
 	/* No feeling */
@@ -3460,6 +3464,19 @@ int value_check_aux6(object_type *o_ptr)
  */
 int value_check_aux7(object_type *o_ptr)
 {
+	/* Cursed/Broken */
+	if (cursed_p(o_ptr) || broken_p(o_ptr))
+	{
+		if (artifact_p(o_ptr)) return (INSCRIP_TERRIBLE);
+		if (o_ptr->name2) return (INSCRIP_WORTHLESS);
+		if (cursed_p(o_ptr)) return (INSCRIP_CURSED);
+		return (INSCRIP_BROKEN);
+	}
+
+	/* Hack -- mark object as average and don't value if it is average */
+	if (!(o_ptr->name1) && !(o_ptr->name2) && !(o_ptr->xtra1)
+		&& !(o_ptr->to_a > 0) && !(o_ptr->to_h + o_ptr->to_d > 0)) return (INSCRIP_AVERAGE);
+
 	o_ptr->ident |= (IDENT_VALUE);
 
 	/* No feeling */
@@ -3516,7 +3533,7 @@ int value_check_aux9(object_type *o_ptr)
  * Level 8 is equivalent to identify name only.
  * Level 9 is equivalent to full identify on restricted objects only.
  */
-int sense_magic(object_type *o_ptr, int sense_level)
+int sense_magic(object_type *o_ptr, int sense_type)
 {
 	int feel;
 
@@ -3562,7 +3579,7 @@ int sense_magic(object_type *o_ptr, int sense_level)
 	/* Always update racial information */
 	(void)value_check_aux0(o_ptr);
 
-	switch (sense_level)
+	switch (sense_type)
 	{
 		case 1:
 			feel = value_check_aux1(o_ptr);
@@ -4695,7 +4712,7 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 	}
 
 	/* Sense some magic on object at creation time */
-	sense_magic(j_ptr, 0);
+	sense_magic(j_ptr, cp_ptr->sense_type);
 
 	/* Success */
 	return (TRUE);

@@ -844,6 +844,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_BATTER:		q = "batter"; break;
 			case GF_BLIND_WEAK:		q = "blind"; break;
 			case GF_RAISE_DEAD:	q = "raise dead"; break;
+			case GF_GAIN_MANA:	q = "give mana"; break;
 		}
 
 

@@ -37,6 +37,8 @@ against the creature you are attacking or throwing the weapon against.  This
 causes the activation to affect the target creature only, and discharges the
 artifact as per normal.
 
+- Added spells and scrolls of various kinds of mana recovery.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

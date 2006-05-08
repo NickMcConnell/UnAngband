@@ -121,15 +121,14 @@ int value_check_aux2(const object_type *o_ptr)
 /*
  * Sense the inventory
  *
- * Class abilities defined in c_info.txt
+ * Now instead of class-based sensing, this notices various
+ * abilities on items that we don't notice any other way.
  */
 static void sense_inventory(void)
 {
 	int i;
 
 	int plev = p_ptr->lev;
-
-	int feel;
 
 	u32b f1=0x0L;
 	u32b f2=0x0L;
@@ -142,8 +141,6 @@ static void sense_inventory(void)
 	u32b af4=0x0L;
 
 	object_type *o_ptr;
-
-	char o_name[80];
 
 	/*** Check for "sensing" ***/
 
@@ -204,51 +201,6 @@ static void sense_inventory(void)
 			f3 |= (if3 & ~(o_ptr->may_flags3)) & ~(o_ptr->can_flags3);
 			f4 |= (if4 & ~(o_ptr->may_flags4)) & ~(o_ptr->can_flags4);
 		}
-
-		/* Check for a feeling */
-		feel = sense_magic(o_ptr, (cp_ptr->sense_heavy ? 1 : 2));
-
-		/* Skip non-feelings */
-		if (!feel) continue;
-
-		/* Occasional failure on inventory items */
-		if ((i < INVEN_WIELD) && (0 != rand_int(5))) continue;
-
-		/* Stop everything */
-		if (disturb_minor) disturb(0, 0);
-
-		/* Get an object description */
-		object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
-
-		/* Message (equipment) */
-		if (i >= INVEN_WIELD)
-		{
-			msg_format("You feel the %s (%c) you are %s %s %s...",
-				   o_name, index_to_label(i), describe_use(i),
-				   ((o_ptr->number == 1) ? "is" : "are"),
-				   inscrip_text[feel - INSCRIP_NULL]);
-		}
-
-		/* Message (inventory) */
-		else
-		{
-			msg_format("You feel the %s (%c) in your pack %s %s...",
-				   o_name, index_to_label(i),
-				   ((o_ptr->number == 1) ? "is" : "are"),
-				   inscrip_text[feel - INSCRIP_NULL]);
-		}
-
-		/* Sense the object */
-		o_ptr->feeling = feel;
-
-		/* The object has been "sensed" */
-		o_ptr->ident |= (IDENT_SENSE);
-
-		/* Combine / Reorder the pack (later) */
-		p_ptr->notice |= (PN_COMBINE | PN_REORDER);
-
-		/* Window stuff */
-		p_ptr->window |= (PW_INVEN | PW_EQUIP);
 	}
 
 	/* Hack --- silently notice stuff */

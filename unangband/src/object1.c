@@ -19,7 +19,7 @@
 /*
  * Max sizes of the following arrays.
  */
-#define MAX_TITLES     75       /* Used with scrolls (min 65) */
+#define MAX_TITLES     80       /* Used with scrolls (min 76) */
 #define MAX_SYLLABLES 158       /* Used with scrolls (see below) */
 
 
@@ -1257,6 +1257,18 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		}
 	}
 
+	/*
+         * Display object value
+         * Hack -- we use 50% of object value so player can feel like they
+         * are making a profit some of the time.
+         */
+	if (o_ptr->ident & (IDENT_VALUE))
+	{
+		object_desc_str_macro(t, " worth ");
+		object_desc_num_macro(t,object_value(o_ptr) / 2);
+		object_desc_str_macro(t, " gold pieces");
+	}
+
 	/* No more details wanted */
 	if (mode < 1) goto object_desc_done;
 
@@ -1392,7 +1404,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 
 	/* Hack -- Wands and Staffs have charges */
-	if (((known) || (o_ptr->ident & (IDENT_BONUS))) &&
+	if (((known) || (o_ptr->ident & (IDENT_CHARGES))) &&
 	    ((o_ptr->tval == TV_STAFF) ||
 	     (o_ptr->tval == TV_WAND)))
 	{
@@ -1428,7 +1440,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 
 	/* Dump "pval" flags for wearable items */
-	if ((known || (o_ptr->ident & (IDENT_BONUS))) && (f1 & (TR1_PVAL_MASK)))
+	if ((known || (o_ptr->ident & (IDENT_PVAL))) && (f1 & (TR1_PVAL_MASK)))
 	{
 		cptr tail = "";
 		cptr tail2 = "";
@@ -1548,6 +1560,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	/* No more details wanted */
 	if (mode < 3) goto object_desc_done;
 
+	/* Weapon coated */
 	if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_COATS)
 	{
 		int coating = lookup_kind(o_ptr->xtra1, o_ptr->xtra2);
@@ -1559,6 +1572,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			object_desc_str_macro(t, "-coated>");
 		}
 	}
+	/* Weapon has runes applied by player */
 	else if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_RUNES)
 	{
 		object_desc_str_macro(t, " <");
@@ -1571,6 +1585,43 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		if (o_ptr->xtra2 > 1) object_desc_chr_macro(t,'s');
 		object_desc_chr_macro(t, '>');
 	}
+	/* Weapon has 'runes' identified by player */
+	else if (o_ptr->ident & (IDENT_RUNES))
+	{
+		if (o_ptr->name1)
+		{
+			object_desc_str_macro(t, " <Unique>");
+		}
+		else if ((o_ptr->name2) && (e_info[o_ptr->name2].runest))
+		{
+			object_desc_str_macro(t, " <");
+			if (e_info[o_ptr->name2].runesc > 1)
+			{
+				object_desc_num_macro(t, e_info[o_ptr->name2].runesc);
+				object_desc_chr_macro(t,' ');
+			}
+			object_desc_str_macro(t, y_name+y_info[e_info[o_ptr->name2].runest].name);
+			if (e_info[o_ptr->name2].runesc > 1) object_desc_chr_macro(t,'s');
+			object_desc_chr_macro(t, '>');		
+		}
+		else if (k_info[o_ptr->k_idx].runest)
+		{
+			object_desc_str_macro(t, " <");
+			if (k_info[o_ptr->k_idx].runesc > 1)
+			{
+				object_desc_num_macro(t, k_info[o_ptr->k_idx].runesc);
+				object_desc_chr_macro(t,' ');
+			}
+			object_desc_str_macro(t, y_name+y_info[k_info[o_ptr->k_idx].runest].name);
+			if (k_info[o_ptr->k_idx].runesc > 1) object_desc_chr_macro(t,'s');
+			object_desc_chr_macro(t, '>');		
+		}
+		else if ((o_ptr->name2) || (o_ptr->xtra1))
+		{
+			object_desc_str_macro(t, " <Magic>");
+		}
+	}
+
 
 	/* Use standard inscription */
 	if (o_ptr->note)

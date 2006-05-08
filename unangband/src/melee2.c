@@ -623,6 +623,7 @@ static int find_resist(u32b smart, int effect)
 
 		/* Spells that attack player mana */
 		case GF_LOSE_MANA:
+		case GF_GAIN_MANA:
 		{
 			if (smart & (SM_IMM_MANA)) return (100);
 			else return (0);

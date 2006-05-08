@@ -819,6 +819,7 @@
 #define GF_BATTER	104
 #define GF_BLIND_WEAK	105
 #define GF_RAISE_DEAD	106
+#define GF_GAIN_MANA	107
 
 /*
  * Columns for the spell cost or damage flags
@@ -1327,8 +1328,8 @@
 #define SF3_CURE_CHR     0x00000800
 #define SF3_INC_EXP      0x00001000
 #define SF3_CURE_EXP     0x00002000
-#define SF3_SLOW_MANA    0x00004000
-#define SF3_CURE_MANA    0x00008000
+#define SF3_SLOW_XXXX    0x00004000
+#define SF3_CURE_XXXX    0x00008000
 #define SF3_SLOW_CURSE   0x00010000
 #define SF3_CURE_CURSE   0x00020000
 #define SF3_SLOW_POIS    0x00040000
@@ -2724,7 +2725,7 @@
 #define IDENT_CURSED	0x0040	/* Item is temporarily cursed */
 #define IDENT_BROKEN	0x0080	/* Item is permanently worthless */
 #define IDENT_DAMAGE	0x0100	/* Item damage is known */
-#define IDENT_CHARGE	0x0200	/* Item charges are known */
+#define IDENT_CHARGES	0x0200	/* Item charges are known */
 #define IDENT_VALUE	0x0400	/* Item value is known */
 #define IDENT_RUNES	0x0800	/* Item runes are known */
 #define IDENT_NAME	0x1000	/* Item name is known */

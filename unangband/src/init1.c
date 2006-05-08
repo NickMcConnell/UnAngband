@@ -294,6 +294,7 @@ static cptr r_info_blow_effect[] =
 	"BATTER",
 	"BLIND_WEAK",
 	"RAISE_DEAD",
+	"GAIN_MANA",
 	NULL
 };
 
@@ -4368,7 +4369,7 @@ errr parse_c_info(char *buf, header *head)
 	/* Process 'I' for "Info" (one line only) */
 	else if (buf[0] == 'I')
 	{
-		int mhp, exp, sense_div, sense_heavy, sense_squared;
+		int mhp, exp, sense_div, sense_type, sense_squared;
 		long sense_base;
 
 		/* There better be a current pc_ptr */
@@ -4376,7 +4377,7 @@ errr parse_c_info(char *buf, header *head)
 
 		/* Scan for the values */
 		if (6 != sscanf(buf+2, "%d:%d:%ld:%d:%d:%d",
-			    &mhp, &exp, &sense_base, &sense_div, &sense_heavy, &sense_squared))
+			    &mhp, &exp, &sense_base, &sense_div, &sense_type, &sense_squared))
 			return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
@@ -4384,7 +4385,7 @@ errr parse_c_info(char *buf, header *head)
 		pc_ptr->c_exp = exp;
 		pc_ptr->sense_base = sense_base;
 		pc_ptr->sense_div = sense_div;
-		pc_ptr->sense_heavy = sense_heavy;
+		pc_ptr->sense_type = sense_type;
 		pc_ptr->sense_squared = sense_squared;
 	}
 
