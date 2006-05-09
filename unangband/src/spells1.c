@@ -2492,7 +2492,7 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 
 	/* Hack -- prevent smoke/vapour etc on floors */
 	if ((typ != GF_FEATURE) && (who) &&
-		(f_ptr->flags1 & (FF1_FLOOR)))
+		((f_ptr->flags1 & (FF1_FLOOR)) != 0))
 	{
 		burnout = TRUE;
 	}
@@ -2504,7 +2504,6 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		case GF_ACID:
 		case GF_VAPOUR:
 		{
-
 			/* Hack -- halve acid damage in water */
 			if (f_ptr->flags2 & (FF2_WATER)) dam /= 2;
 		
@@ -3099,7 +3098,7 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 
 	/* Apply burnout */
 	if ((burnout) &&
-		(f_ptr->flags3 & (FF3_SPREAD)))
+		((f_info[cave_feat[y][x]].flags3 & (FF3_SPREAD)) != 0))
 	{
 		cave_alter_feat(y,x,FS_SPREAD);
 	}
