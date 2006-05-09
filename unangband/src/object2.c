@@ -3497,15 +3497,91 @@ int value_check_aux8(object_type *o_ptr)
 
 
 /*
- * Return a "feeling" (or NULL) about an item.  Method 6 (Rune magic).
+ * Return a "feeling" (or NULL) about an item.  Method 9 (Arrow magic).
  */
 int value_check_aux9(object_type *o_ptr)
 {
+	int feel = 0;
+
 	if ((o_ptr->tval == TV_BOW) || (o_ptr->tval == TV_ARROW) || (o_ptr->tval == TV_SHOT) ||
-		(o_ptr->tval == TV_BOLT)) object_known(o_ptr);
+		(o_ptr->tval == TV_BOLT))
+		object_known(o_ptr);
+	else
+		feel = value_check_aux2(o_ptr);
 
 	/* No feeling */
-	return (0);
+	return (feel);
+}
+
+/*
+ * Return a "feeling" (or NULL) about an item.  Methods 10 & 11 (Flag magic and flag weapon).
+ */
+int value_check_aux10(object_type *o_ptr, bool weapon)
+{
+	int feel = 0;
+
+	u32b f1, f2, f3, f4;
+
+	int i, count = 0;
+	u32b j, flag2;
+
+	int flag1 = 0;
+
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+
+	/* Remove base kind flags */
+	f1 &= ~(k_info[o_ptr->k_idx].flags1);
+	f2 &= ~(k_info[o_ptr->k_idx].flags2);
+	f3 &= ~(k_info[o_ptr->k_idx].flags3);
+	f4 &= ~(k_info[o_ptr->k_idx].flags4);
+
+	/* Check flags 1 */
+	for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
+	{
+		if ((!weapon) && (j > TR1_SPEED)) continue;
+		else if (j <= TR1_SPEED) continue;
+
+		if ( ((f1) & (j)) && !(rand_int(++count)) ) { flag1 = 1; flag2 = j;}
+	}
+
+	/* Check flags 2 if not weapon */
+	if (!weapon) for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
+	{
+		if (((f2) & (j)) && !(rand_int(++count))) { flag1 = 2; flag2 = j;}
+	}
+
+	/* Check flags 3 if not weapon */
+	if (!weapon) for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
+	{
+		if (((f3) & (j)) && !(rand_int(++count))) { flag1 = 3; flag2 = j;}
+	}
+
+	/* Check flags 4 if not weapon */
+	if (!weapon) for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
+	{
+		if (((f4) & (j)) && !(rand_int(++count))) { flag1 = 4; flag2 = j;}
+	}
+
+	switch(flag1)
+	{
+		case 1:
+			object_can_flags(o_ptr, flag2, 0x0L, 0x0L, 0x0L);
+			break;
+		case 2:
+			object_can_flags(o_ptr, 0x0L, flag2, 0x0L, 0x0L);
+			break;
+		case 3:
+			object_can_flags(o_ptr, 0x0L, 0x0L, flag2, 0x0L);
+			break;
+		case 4:
+			object_can_flags(o_ptr, 0x0L, 0x0L, 0x0L, flag2);
+			break;
+	}
+
+	if (!flag1) feel = value_check_aux2(o_ptr);
+
+	/* No feeling */
+	return (feel);
 }
 
 
@@ -3607,6 +3683,12 @@ int sense_magic(object_type *o_ptr, int sense_type)
 			break;
 		case 9:
 			feel = value_check_aux9(o_ptr);
+			break;
+		case 10:
+			feel = value_check_aux10(o_ptr, FALSE);
+			break;
+		case 11:
+			feel = value_check_aux10(o_ptr, TRUE);
 			break;
 	}
 

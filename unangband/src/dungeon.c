@@ -82,7 +82,7 @@ int value_check_aux1(const object_type *o_ptr)
 	if (o_ptr->to_h + o_ptr->to_d > 0) return (INSCRIP_GOOD);
 
 	/* Default to "average" */
-	return (0);
+	return (INSCRIP_AVERAGE);
 }
 
 
@@ -91,29 +91,74 @@ int value_check_aux1(const object_type *o_ptr)
  */
 int value_check_aux2(const object_type *o_ptr)
 {
+	/* If sensed magical, have no more value to add */
+	if ((o_ptr->feeling == INSCRIP_GOOD) || (o_ptr->feeling == INSCRIP_VERY_GOOD)
+		|| (o_ptr->feeling == INSCRIP_GREAT) || (o_ptr->feeling == INSCRIP_EXCELLENT)
+		|| (o_ptr->feeling == INSCRIP_SUPERB) || (o_ptr->feeling == INSCRIP_SPECIAL)
+		|| (o_ptr->feeling == INSCRIP_MAGICAL)) return (0);
+
 	/* Cursed items (all of them) */
-	if (cursed_p(o_ptr)) return (INSCRIP_CURSED);
+	if (cursed_p(o_ptr))
+	{
+		if (o_ptr->feeling == INSCRIP_ARTIFACT) return (INSCRIP_TERRIBLE);
+		else if (o_ptr->feeling == INSCRIP_HIGH_EGO_ITEM) return (INSCRIP_WORTHLESS);
+		else if (o_ptr->feeling == INSCRIP_EGO_ITEM) return (INSCRIP_WORTHLESS);
+		return (INSCRIP_CURSED);
+	}
 
 	/* Broken items (all of them) */
-	if (broken_p(o_ptr)) return (INSCRIP_BROKEN);
+	if (broken_p(o_ptr))
+	{
+		if (o_ptr->feeling == INSCRIP_ARTIFACT) return (INSCRIP_TERRIBLE);
+		else if (o_ptr->feeling == INSCRIP_HIGH_EGO_ITEM) return (INSCRIP_WORTHLESS);
+		else if (o_ptr->feeling == INSCRIP_EGO_ITEM) return (INSCRIP_WORTHLESS);
+		return (INSCRIP_BROKEN);
+	}
 
 	/* Coated items */
 	if (coated_p(o_ptr)) return (INSCRIP_COATED);
 
 	/* Artifacts -- except cursed/broken ones */
-	if (artifact_p(o_ptr)) return (INSCRIP_UNCURSED);
+	if (artifact_p(o_ptr))
+	{
+		/* Known to be artifact strength */
+		if ((o_ptr->feeling == INSCRIP_UNBREAKABLE)
+			|| (o_ptr->feeling == INSCRIP_ARTIFACT)) return (INSCRIP_SPECIAL);
+
+		return (INSCRIP_UNCURSED);
+	}
 
 	/* Ego-Items -- except cursed/broken ones */
-	if (ego_item_p(o_ptr)) return (INSCRIP_UNCURSED);
+	if (ego_item_p(o_ptr))
+	{
+		if (o_ptr->feeling == INSCRIP_HIGH_EGO_ITEM) return (INSCRIP_SUPERB);
+		else if (o_ptr->feeling == INSCRIP_EGO_ITEM) return (INSCRIP_EXCELLENT);
+		return (INSCRIP_UNCURSED);
+	}
+
+	/* Magic-Items */
+	if (o_ptr->xtra1)
+	{
+		if (o_ptr->feeling == INSCRIP_EGO_ITEM) return (INSCRIP_EXCELLENT);
+		return (INSCRIP_UNCURSED);
+	}
 
 	/* Good armor bonus */
-	if (o_ptr->to_a > 0) return (INSCRIP_UNCURSED);
+	if (o_ptr->to_a > 0)
+	{
+		if (o_ptr->feeling == INSCRIP_POWERFUL) return (INSCRIP_MAGICAL);
+		return (INSCRIP_UNCURSED);
+	}
 
 	/* Good weapon bonuses */
-	if (o_ptr->to_h + o_ptr->to_d > 0) return (INSCRIP_UNCURSED);
+	if (o_ptr->to_h + o_ptr->to_d > 0)
+	{
+		if (o_ptr->feeling == INSCRIP_POWERFUL) return (INSCRIP_MAGICAL);
+		return (INSCRIP_UNCURSED);
+	}
 
 	/* No feeling */
-	return (0);
+	return (INSCRIP_AVERAGE);
 }
 
 
