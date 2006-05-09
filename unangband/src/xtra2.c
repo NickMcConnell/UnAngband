@@ -2400,11 +2400,11 @@ int get_coin_type(const monster_race *r_ptr)
 	cptr name = (r_name + r_ptr->name);
 
 	/* Analyze "coin" monsters */
-	if (strchr("$gdDA", r_ptr->d_char))
+	if (strchr("$gdDAaI", r_ptr->d_char))
 	{
-		for (i = OBJ_GOLD_LIST; i < OBJ_GOLD_LIST + MAX_GOLD; i++)
+		for (i = 0; i < MAX_GOLD; i++)
 		{
-			object_kind *k_ptr = &k_info[i];
+			object_kind *k_ptr = &k_info[i + OBJ_GOLD_LIST];
 
 			/* Look for textual clues */
 			if (strstr(name, format(" %s ",k_name + k_ptr->name))) return (i);

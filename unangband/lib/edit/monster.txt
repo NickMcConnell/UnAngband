@@ -8642,7 +8642,7 @@ B:BITE:HURT:1d5
 F:FORCE_MAXHP | FORCE_SLEEP
 F:ONLY_GOLD | DROP_60 | DROP_1D2
 F:OPEN_DOOR | BASH_DOOR
-F:EVIL | DRAGON | NO_CONF | IM_FIRE | POWERFUL
+F:EVIL | DRAGON | NO_CONF | IM_FIRE | POWERFUL | DROP_MINERAL
 S:BRTH_CONFU | BRTH_FIRE
 D:This hatchling dragon is still soft, its eyes unaccustomed to light and
 D: its scales a dull bronze.
@@ -11266,7 +11266,7 @@ B:CLAW:HURT:1d4
 B:BITE:HURT:1d6
 F:FORCE_MAXHP | FORCE_SLEEP | 
 F:ONLY_GOLD | DROP_60 | DROP_1D2 | 
-F:OPEN_DOOR | BASH_DOOR | IM_POIS |
+F:OPEN_DOOR | BASH_DOOR | IM_POIS | DROP_MINERAL
 F:EVIL | DRAGON | POWERFUL
 S:BRTH_FORCE | BRTH_POIS
 D:This hatchling dragon is still soft, its eyes unaccustomed to light and 
@@ -11282,7 +11282,7 @@ B:CLAW:HURT:1d4
 B:BITE:HURT:1d6
 F:FORCE_MAXHP | FORCE_SLEEP | 
 F:ONLY_GOLD | DROP_60 | DROP_1D2 | 
-F:OPEN_DOOR | BASH_DOOR | IM_ELEC |
+F:OPEN_DOOR | BASH_DOOR | IM_ELEC | DROP_MINERAL
 F:EVIL | DRAGON | POWERFUL
 S:BRTH_GRAV | BRTH_ELEC
 D:This hatchling dragon is still soft, its eyes unaccustomed to light and 
@@ -11298,7 +11298,7 @@ B:CLAW:HURT:1d4
 B:BITE:HURT:1d6
 F:FORCE_MAXHP | FORCE_SLEEP | 
 F:ONLY_GOLD | DROP_60 | DROP_1D2 | 
-F:OPEN_DOOR | BASH_DOOR | IM_FIRE |
+F:OPEN_DOOR | BASH_DOOR | IM_FIRE | DROP_MINERAL
 F:EVIL | DRAGON | POWERFUL
 S:BRTH_INERT | BRTH_FIRE
 D:This hatchling dragon is still soft, its eyes unaccustomed to light and 

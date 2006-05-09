@@ -68,6 +68,8 @@ Pval stacking is now replaced by charge stacking.
 - You can now do html screendumps again any time the game is waiting for input
 using the ^] key.
 
+- Coin monsters were dropping the wrong types of coins (Reported by Adam Horowitz).
+
 ### Build / Platform ###
 
 

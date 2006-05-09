@@ -576,7 +576,7 @@ static void describe_monster_drop(int r_idx, const monster_lore *l_ptr)
 			{
 				int coin_type = get_coin_type(r_ptr);
 
-				switch (k_info[OBJ_GOLD_LIST + coin_type].tval)
+				switch (k_info[coin_type + OBJ_GOLD_LIST].tval)
 				{
 					case TV_GOLD:
 						vp[vn++] = "precious metal";
