@@ -3474,6 +3474,11 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 	u32b xf1 = 0, xf2 = 0, xf3 = 0, xf4 = 0;
 	int i;
 
+	u32b if1 = o_ptr->may_flags1 & (f1);
+	u32b if2 = o_ptr->may_flags2 & (f2);
+	u32b if3 = o_ptr->may_flags3 & (f3);
+	u32b if4 = o_ptr->may_flags4 & (f4);
+
 	/* Clear not flags */
 	o_ptr->not_flags1 &= ~(f1);
 	o_ptr->not_flags2 &= ~(f2);
@@ -3483,11 +3488,6 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 	/* Clear may flags on all kit - include inventory */
 	for (i = 0; i < INVEN_TOTAL+1; i++)
 	{
-		u32b if1 = o_ptr->may_flags1 & (f1);
-		u32b if2 = o_ptr->may_flags2 & (f2);
-		u32b if3 = o_ptr->may_flags3 & (f3);
-		u32b if4 = o_ptr->may_flags4 & (f4);
-
 		object_type *i_ptr = &inventory[i];
 
 		/* Skip non-objects */

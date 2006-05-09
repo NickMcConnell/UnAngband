@@ -75,6 +75,9 @@ not as intended. Fire now only generates smoke if wood or burnable objects are
 destroyed, acidic vapour if metal or objects vulnerable to acid are destroyed
 (Reported by Adam Horowitz).
 
+- Fixed bug that could result in another item incorrectly reporting item abilities
+after you identify these abilities on the first item (Reported by Adam Horowitz).
+
 ### Build / Platform ###
 
 
