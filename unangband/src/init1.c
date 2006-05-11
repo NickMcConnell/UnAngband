@@ -2703,24 +2703,13 @@ errr parse_k_info(char *buf, header *head)
 		/* Save the values */
 		k_ptr->tval = tval;
 		k_ptr->sval = sval;
-
-		/* Hack -- save having to change entire object.txt file */
-		if ((k_ptr->tval == TV_WAND) || (k_ptr->tval == TV_STAFF) || (k_ptr->tval == TV_POTION)
-			 || (k_ptr->tval == TV_FOOD) || (k_ptr->tval == TV_GOLD)  || (k_ptr->tval == TV_GEMS)
-			 || (k_ptr->tval == TV_LITE))
-		{
-			k_ptr->charges = pval;
-		}
-		else
-		{
-			k_ptr->pval = pval;
-		}
+		k_ptr->pval = pval;
 	}
 
 	/* Process 'W' for "More Info" (one line only) */
 	else if (buf[0] == 'W')
 	{
-		int level, extra, wgt;
+		int level, charges, wgt;
 		long cost;
 
 		/* There better be a current k_ptr */
@@ -2728,11 +2717,11 @@ errr parse_k_info(char *buf, header *head)
 
 		/* Scan for the values */
 		if (4 != sscanf(buf+2, "%d:%d:%d:%ld",
-			    &level, &extra, &wgt, &cost)) return (PARSE_ERROR_GENERIC);
+			    &level, &charges, &wgt, &cost)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		k_ptr->level = level;
-		k_ptr->extra = extra;
+		k_ptr->charges = charges;
 		k_ptr->weight = wgt;
 		k_ptr->cost = cost;
 	}

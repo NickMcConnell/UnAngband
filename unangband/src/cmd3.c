@@ -1282,6 +1282,7 @@ void do_cmd_refill(void)
 	bool unstack = FALSE;
 	bool use_feat = FALSE;
 	bool get_feat = FALSE;
+	bool relite = FALSE;
 
 	/* Restrict the choices */
 	item_tester_hook = item_tester_empty_flask_or_lite;
@@ -1375,6 +1376,14 @@ void do_cmd_refill(void)
 
 	/* Take a partial turn */
 	p_ptr->energy_use = 50;
+
+	/* Switch off light source */
+	if (o_ptr->timeout)
+	{
+		o_ptr->charges = o_ptr->timeout;
+		o_ptr->timeout = 0;
+		relite = TRUE;
+	}
 
 	if (o_ptr->number > 1)
 	{
@@ -1476,6 +1485,9 @@ void do_cmd_refill(void)
 	{
 		/* Carry */
 		item = inven_carry(o_ptr);
+
+		/* Don't relite */
+		relite = FALSE;
 	}
 
 	/* Use fuel from a lantern */
@@ -1520,7 +1532,7 @@ void do_cmd_refill(void)
 	/* Decrease the item (in the pack) */
 	else if (item2 >= 0)
 	{
-		if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+		if (j_ptr->number == 1) inven_drop_flags(j_ptr);
 
 		inven_item_increase(item2, -1);
 		inven_item_describe(item2);
@@ -1534,6 +1546,13 @@ void do_cmd_refill(void)
 		floor_item_optimize(0 - item2);
 		if (get_feat && (scan_feat(p_ptr->py,p_ptr->px) < 0)) cave_alter_feat(p_ptr->py,p_ptr->px,FS_GET_FEAT);
 		if (use_feat && (scan_feat(p_ptr->py,p_ptr->px) < 0)) cave_alter_feat(p_ptr->py,p_ptr->px,FS_USE_FEAT);
+	}
+
+	/* Relite if necessary */
+	if (relite)
+	{
+		o_ptr->timeout = o_ptr->charges;
+		o_ptr->charges = 0;
 	}
 
 	/* Combine / Reorder the pack (later) */

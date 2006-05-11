@@ -1,10 +1,3 @@
-WARNING TO THOSE BUILDING FROM CVS
-
-In the lead up to version 0.6.1, I will endeavour to maintain save-file
-compatibility at any point, but cannot guarantee it. In addition, lots of
-stuff is likely to break. For instance, in this CVS update, the contents
-of magical bags is not saved, resulting in you losing any item put inside.
-
 ### Game Play ###
 
 - Improved metric for when monsters should cast probe spell (Reported by

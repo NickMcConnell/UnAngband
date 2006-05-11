@@ -55,7 +55,7 @@
 
 #Version information
 
-V:0.6.0
+V:0.6.1
 
 # Default starting dungeon.
 
@@ -504,7 +504,7 @@ L:12:56:1:420:307:0
 S:514:776:0:0:0:0:0:0
 D:Goldberry's gifts can be found at her pool.
 
-N:56:the Midge Marshes
+N:56:the Midgewater Marshes
 X:11:12
 G:R
 R:INSECT
