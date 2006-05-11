@@ -788,6 +788,12 @@ static void process_world(void)
 		(void)set_blind(p_ptr->blind - 1);
 	}
 
+	/* Amnesia */
+	if (p_ptr->amnesia)
+	{
+		(void)set_amnesia(p_ptr->amnesia - 1);
+	}
+
 	/* Times see-invisible */
 	if (p_ptr->tim_invis)
 	{

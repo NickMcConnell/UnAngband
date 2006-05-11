@@ -1071,7 +1071,7 @@ static errr rd_extra(void)
 	strip_bytes(2);
 
 	/* Read the flags */
-	strip_bytes(2);	/* Old "rest" */
+	rd_s16b(&p_ptr->amnesia);
 	rd_s16b(&p_ptr->blind);
 	rd_s16b(&p_ptr->paralyzed);
 	rd_s16b(&p_ptr->confused);

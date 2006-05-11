@@ -647,7 +647,7 @@ static void wr_extra(void)
 	wr_s16b(p_ptr->sc);
 	wr_s16b(0);	/* oops */
 
-	wr_s16b(0);		/* old "rest" */
+	wr_s16b(p_ptr->amnesia);
 	wr_s16b(p_ptr->blind);
 	wr_s16b(p_ptr->paralyzed);
 	wr_s16b(p_ptr->confused);

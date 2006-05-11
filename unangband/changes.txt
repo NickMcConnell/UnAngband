@@ -78,8 +78,11 @@ destroyed, acidic vapour if metal or objects vulnerable to acid are destroyed
 - Fixed bug that could result in another item incorrectly reporting item abilities
 after you identify these abilities on the first item (Reported by Adam Horowitz).
 
-### Build / Platform ###
+- Fixed bug causing amnesia effect only to be removed by saving the game (Reported
+by Adam Horowitz).
 
+
+### Build / Platform ###
 
 
 
