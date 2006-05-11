@@ -39,6 +39,8 @@ artifact as per normal.
 
 - Added spells and scrolls of various kinds of mana recovery.
 
+- Added ego and magic lanterns.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

@@ -1118,6 +1118,9 @@ static s32b object_value_real(const object_type *o_ptr)
 
 	object_kind *k_ptr = &k_info[o_ptr->k_idx];
 
+	int power;
+
+
 	/* Hack -- "worthless" items */
 	if (!k_ptr->cost) return (0L);
 
@@ -1154,14 +1157,65 @@ static s32b object_value_real(const object_type *o_ptr)
 	}
 
 	/* Now evaluate object power */
+	power = object_power(o_ptr);
+
+	/* Hack -- No negative power on uncursed objects */
+	if ((power < 0) && !(cursed_p(o_ptr))) power = 0;
+
+	/* Apply power modifier to cost */
 	if ((o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_ARROW) || (o_ptr->tval == TV_BOLT))
 	{
-		value += object_power(o_ptr) * 5L;
+		value += power * 5L;
 	}
 	else
 	{
-		value += object_power(o_ptr) * 100;
+		value += power * 100;
 	}		
+
+	/* Hack -- object power assumes (+9,+9) on weapons and ammo so we need to include some smaller bonuses */
+	switch (o_ptr->tval)
+	{
+		/* Wands/Staffs */
+		case TV_WAND:
+		case TV_STAFF:
+		{
+			/* Pay extra for charges, depending on standard number of charges */
+			value += ((value / 20) * (o_ptr->charges / o_ptr->number));
+
+			if (o_ptr->tval == TV_WAND) break;
+
+			/* Fall through */
+		}
+
+		/* Bows/Weapons/Ammo */
+		case TV_BOW:
+		case TV_DIGGING:
+		case TV_HAFTED:
+		case TV_SWORD:
+		case TV_POLEARM:
+
+		{
+			/* Factor in the bonuses not considered by power equation */
+			value += o_ptr->to_h < 9 ? o_ptr->to_h * 100L : 0;
+			value += o_ptr->to_d < 9 ? o_ptr->to_d * 100L : 0;
+
+			/* Done */
+			break;
+		}
+
+		/* Ammo */
+		case TV_SHOT:
+		case TV_ARROW:
+		case TV_BOLT:
+		{
+			/* Factor in the bonuses not considered by power equation */
+			value += o_ptr->to_h < 9 ? o_ptr->to_h * 5L : 0;
+			value += o_ptr->to_d < 9 ? o_ptr->to_d * 5L : 0;
+
+			/* Done */
+			break;
+		}
+	}
 
 	/* No negative value */
 	if (value < 0) value = 0;
@@ -3922,6 +3976,20 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			break;
 		}
 
+		/* Ego Lanterns */
+		case TV_LITE:
+		{
+			if ((o_ptr->sval == SV_LITE_LANTERN) && (power))
+			{
+				if (((power > 1) || (o_ptr->xtra1) ? TRUE : FALSE) || (power < -1) || (o_ptr->xtra1))
+					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),power);
+
+				if (lev > 3) (void)make_magic_item(o_ptr, lev / 4, power);
+			}
+
+			/* Fall through */
+		}
+
 		default:
 		{
 			a_m_aux_4(o_ptr, lev, power);
@@ -4431,6 +4499,13 @@ static bool kind_is_good(int k_idx)
 		case TV_WAND:
 		{
 			if ((k_ptr->level >= 50) && !(k_ptr->flags3 & (TR3_LIGHT_CURSE))) return (TRUE);
+			return (FALSE);
+		}
+
+		/* Lites -- Must be lantern */
+		case TV_LITE:
+		{
+			if (k_ptr->sval == SV_LITE_LANTERN) return (TRUE);
 			return (FALSE);
 		}
 
