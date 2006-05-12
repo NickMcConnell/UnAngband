@@ -34,6 +34,9 @@ artifact as per normal.
 
 - Added ego and magic lanterns.
 
+- Monsters now eat bodies around the dungeon if they are hungry and not under
+attack.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

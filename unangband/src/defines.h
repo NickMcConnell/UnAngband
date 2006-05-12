@@ -2345,6 +2345,7 @@
 #define RBM_ARC_50	61
 #define RBM_ARC_60	62
 #define RBM_FLASK	63
+#define RBM_TRAIL	64
 
 #define RBM_MAX_NORMAL  23
 #define RBM_MIN_RANGED  15
@@ -3124,17 +3125,17 @@
 #define RF2_BASH_DOOR	0x00020000      /* Monster can bash doors */
 #define RF2_PASS_WALL	0x00040000      /* Monster can pass walls */
 #define RF2_KILL_WALL	0x00080000      /* Monster can destroy walls */
-#define RF2_ARCHER	0x00100000      /* Monster can move monsters */
-#define RF2_KILL_BODY	0x00200000      /* Monster can kill monsters */
+#define RF2_ARCHER	0x00100000      /* Monster has extra ammo */
+#define RF2_EAT_BODY	0x00200000      /* Monster can eat body parts */
 #define RF2_TAKE_ITEM	0x00400000      /* Monster can pick up items */
-#define RF2_KILL_ITEM	0x00800000      /* Monster can crush items */
-#define RF2_SNEAKY 	0x01000000 /* Monster hides a lot of actions */
-#define RF2_ARMOR	0x02000000 /* Monster is fully armoured (Reduces acid damage/stops some arrows) */
-#define RF2_PRIEST 	0x04000000 /* Monster has access to priest spells ? */
-#define RF2_MAGE   	0x08000000 /* Monster has access to mage spells ? */
-#define RF2_HAS_AURA  	0x10000000 /* Monster radiates an aura attack */
-#define RF2_HAS_WEB	0x20000000 /* Monster leaves a trail of webs */
-#define RF2_NEED_LITE	0x40000000 /* Monster cannot see the player if player is not visible */
+#define RF2_TRAIL	0x00800000      /* Monster leavs a trail behind it */
+#define RF2_SNEAKY 	0x01000000 	/* Monster hides a lot of actions */
+#define RF2_ARMOR	0x02000000 	/* Monster is fully armoured (Reduces acid damage/stops some arrows) */
+#define RF2_PRIEST 	0x04000000 	/* Monster has access to priest spells ? */
+#define RF2_MAGE   	0x08000000 	/* Monster has access to mage spells ? */
+#define RF2_HAS_AURA  	0x10000000 	/* Monster radiates an aura attack */
+#define RF2_HAS_WEB	0x20000000 	/* Monster leaves a trail of webs */
+#define RF2_NEED_LITE	0x40000000 	/* Monster cannot see the player if player is not visible */
 #define RF2_LOW_MANA_RUN	0x80000000	/* Monster will run if low on mana */
 
 /*

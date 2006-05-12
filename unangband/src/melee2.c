@@ -1605,16 +1605,8 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 		monster_type *n_ptr = &m_list[cave_m_idx[y][x]];
 		monster_race *nr_ptr = &r_info[n_ptr->r_idx];
 
-		/* Kill weaker monsters */
-		if ((r_ptr->flags2 & (RF2_KILL_BODY)) &&
-		    (!(nr_ptr->flags1 & (RF1_UNIQUE))) &&
-		    (r_ptr->mexp > nr_ptr->mexp))
-		{
-			move_chance = 100;
-		}
-
 		/* Pushed already */
-		else if ((m_ptr->mflag & (MFLAG_PUSH)) || (n_ptr->mflag & (MFLAG_PUSH)))
+		if ((m_ptr->mflag & (MFLAG_PUSH)) || (n_ptr->mflag & (MFLAG_PUSH)))
 		{
 
 			/* Cannot push away the other monster */
@@ -1657,7 +1649,7 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 	}
 
 	/* Hack -- avoid less interesting squares if collecting items */
-	else if ((cave_o_idx[y][x] == 0) && (r_ptr->flags2 & (RF2_TAKE_ITEM | RF2_KILL_ITEM)))
+	else if ((cave_o_idx[y][x] == 0) && (r_ptr->flags2 & (RF2_TAKE_ITEM | RF2_EAT_BODY)))
 	{
 		move_chance = 99;
 	}
@@ -4105,8 +4097,6 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 	bool did_open_door = FALSE;
 	bool did_bash_door = FALSE;
 	bool did_take_item = FALSE;
-	bool did_kill_item = FALSE;
-	bool did_kill_body = FALSE;
 	bool did_pass_wall = FALSE;
 	bool did_kill_wall = FALSE;
 	bool did_smart = FALSE;
@@ -4544,27 +4534,10 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		else if (cave_m_idx[ny][nx] > 0)
 		{
 			monster_type *n_ptr = &m_list[cave_m_idx[ny][nx]];
-			monster_race *nr_ptr = &r_info[n_ptr->r_idx];
-
-			/* XXX - Kill weaker monsters */
-			if ((r_ptr->flags2 & (RF2_KILL_BODY)) &&
-			    (!(nr_ptr->flags1 & (RF1_UNIQUE))) &&
-			    (r_ptr->mexp > nr_ptr->mexp))
-			{
-				/* Monster ate another monster */
-				did_kill_body = TRUE;
-
-				/* Generate treasure, etc */
-				monster_death(cave_m_idx[ny][nx]);
-
-				/* Delete the monster */
-				delete_monster_idx(cave_m_idx[ny][nx]);
-
-			}
 
 			/* Attack if confused and not fleeing */
 			/* XXX XXX Should use seperate routine */
-			else if (m_ptr->confused)
+			if (m_ptr->confused)
 			{
 				int ap_cnt;
 
@@ -4827,9 +4800,8 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					did_sneak = TRUE;
 				}
 	
-				/* Take or kill objects on the floor */
-				if ((r_ptr->flags2 & (RF2_TAKE_ITEM)) ||
-				    (r_ptr->flags2 & (RF2_KILL_ITEM)))
+				/* Take objects on the floor */
+				if (r_ptr->flags2 & (RF2_TAKE_ITEM))
 				{
 					u32b f1, f2, f3, f4;
 	
@@ -4856,7 +4828,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					if (f1 & (TR1_SLAY_UNDEAD)) flg3 |= (RF3_UNDEAD);
 					if (f1 & (TR1_SLAY_NATURAL)) flg3 |= (RF3_ANIMAL | RF3_PLANT | RF3_INSECT);
 					if (f1 & (TR1_BRAND_HOLY)) flg3 |= (RF3_EVIL);
-	
+
 					/* The object cannot be picked up by the monster */
 					if (artifact_p(o_ptr) || (r_ptr->flags3 & flg3))
 					{
@@ -4888,8 +4860,17 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 							}
 						}
 					}
+
+					/* Hack -- do not pick up bodies unless going to eat them */
+					else if ((o_ptr->tval == TV_BODY) && !(r_ptr->flags2 & (RF2_EAT_BODY)))
+					{
+						/* Do nothing */
+					}
+
 					/* Pick up the item */
-					else if (r_ptr->flags2 & (RF2_TAKE_ITEM))
+					/* Hack -- eat body monsters can carry one body */
+					else if ((r_ptr->flags2 & (RF2_TAKE_ITEM)) || ((r_ptr->flags2 & (RF2_EAT_BODY))
+						&& !(m_ptr->hold_o_idx) && (o_ptr->tval == TV_BODY)))
 					{
 						object_type *i_ptr;
 						object_type object_type_body;
@@ -4903,7 +4884,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 							/* Dump a message */
 							msg_format("%^s picks up %s.", m_name, o_name);
 						}
-	
+
 						/* Get local object */
 						i_ptr = &object_type_body;
 	
@@ -4915,23 +4896,6 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 	
 						/* Carry the object */
 						(void)monster_carry(cave_m_idx[m_ptr->fy][m_ptr->fx], i_ptr);
-					}
-	
-					/* Destroy the item */
-					else
-					{
-						/* Take note */
-						did_kill_item = TRUE;
-	
-						/* Describe observable situations */
-						if (player_has_los_bold(ny, nx))
-						{
-							/* Dump a message */
-							msg_format("%^s crushes %s.", m_name, o_name);
-						}
-	
-						/* Delete the object */
-						delete_object_idx(this_o_idx);
 					}
 				}
 			}
@@ -4956,12 +4920,6 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 
 		/* Monster tried to pick something up */
 		if (did_take_item) l_ptr->flags2 |= (RF2_TAKE_ITEM);
-
-		/* Monster tried to crush something */
-		if (did_kill_item) l_ptr->flags2 |= (RF2_KILL_ITEM);
-
-		/* Monster ate another monster */
-		if (did_kill_body) l_ptr->flags2 |= (RF2_KILL_BODY);
 
 		/* Monster passed through a wall */
 		/* XXX Temporary spell to pass wall so need to check */
@@ -5261,6 +5219,192 @@ static void process_monster(int m_idx)
 			return;
 		}
 	}
+
+	/*** Monster hungry? ***/
+	if ((((m_ptr->mflag & (MFLAG_WEAK | MFLAG_STUPID | MFLAG_NAIVE | MFLAG_CLUMSY | MFLAG_SICK)) != 0)
+		|| (((r_ptr->flags3 & (RF3_TROLL)) != 0) && (m_ptr->hp < m_ptr->maxhp)))
+		&& ((m_ptr->mflag & (MFLAG_AGGR)) == 0)
+		&& (!(r_ptr->flags3 & (RF3_NONLIVING)) || (r_ptr->flags2 & (RF2_EAT_BODY))))
+	{
+		int this_o_idx, next_o_idx, item = 0;
+
+		object_type *o_ptr;
+
+		/* Scan the pile of objects */
+		for (this_o_idx = cave_o_idx[m_ptr->fy][m_ptr->fx]; this_o_idx; this_o_idx = next_o_idx)
+		{
+			/* Get the object */
+			o_ptr = &o_list[this_o_idx];
+
+			/* Get the next object */
+			next_o_idx = o_ptr->next_o_idx;
+
+			/* Edible? */
+			switch (o_ptr->tval)
+			{
+				case TV_BODY:
+				case TV_BONE:
+					if (r_ptr->flags2 & (RF2_EAT_BODY)) item = this_o_idx;
+					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
+					break;
+				case TV_EGG:
+					if (!(r_ptr->flags2 & (RF2_EAT_BODY)) & (r_ptr->flags3 & (RF3_ANIMAL))) item = this_o_idx;
+					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
+					break;
+				case TV_FOOD:
+					if ((r_ptr->flags2 & (RF2_SMART)) && (o_ptr->sval >= SV_FOOD_MIN_FOOD)) item = this_o_idx;
+					if (!(r_ptr->flags2 & (RF2_EAT_BODY)) & (r_ptr->flags3 & (RF3_ANIMAL))) item = this_o_idx;
+					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
+					break;
+			}
+		}
+
+		/* Scan the carried objects */
+		for (this_o_idx = cave_o_idx[m_ptr->fy][m_ptr->fx]; this_o_idx; this_o_idx = next_o_idx)
+		{
+			/* Get the object */
+			o_ptr = &o_list[this_o_idx];
+
+			/* Get the next object */
+			next_o_idx = o_ptr->next_o_idx;
+
+			/* Edible? */
+			switch (o_ptr->tval)
+			{
+				case TV_BODY:
+				case TV_BONE:
+					if (r_ptr->flags2 & (RF2_EAT_BODY)) item = this_o_idx;
+					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
+					break;
+				case TV_EGG:
+					if (!(r_ptr->flags2 & (RF2_EAT_BODY)) & (r_ptr->flags3 & (RF3_ANIMAL))) item = this_o_idx;
+					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
+					break;
+				case TV_FOOD:
+					if ((r_ptr->flags2 & (RF2_SMART)) && (o_ptr->sval >= SV_FOOD_MIN_FOOD)) item = this_o_idx;
+					if (!(r_ptr->flags2 & (RF2_EAT_BODY)) & (r_ptr->flags3 & (RF3_ANIMAL))) item = this_o_idx;
+					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
+					break;
+			}
+		}
+
+		/* Something edible found? */
+		if (item)
+		{
+			int hp, part;
+
+			int amount = r_ptr->level + 5;
+
+			object_type object_type_body;
+
+			/* Get temporary object */
+			o_ptr = &object_type_body;
+
+			/* Get a copy of the object */
+			object_copy(o_ptr, &o_list[item]);
+
+			/* Reduce item */
+			floor_item_increase(item, -1);
+			floor_item_optimize(item);
+
+			/* Set object number */
+			o_ptr->number = 1;
+
+			/* Describe observable situations */
+			if (player_has_los_bold(m_ptr->fy, m_ptr->fx))
+			{
+				char m_name[80];
+				char o_name[80];
+
+				/* Describe monster */
+				monster_desc(m_name, m_ptr, 0);
+
+				/* Describe */
+				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
+
+				/* Dump a message */
+				if ((o_ptr->tval == TV_BONE) || ((o_ptr->tval == TV_BODY) && (o_ptr->weight > r_ptr->level))) msg_format("%^s chews on %s.", m_name, o_name);
+
+				/* Dump a message */
+				else msg_format("%^s swallows %s.", m_name, o_name);
+			}
+
+			/* Break up skeletons */
+			if ((o_ptr->tval == TV_BONE) && (o_ptr->sval == SV_BONE_SKELETON))
+			{
+				part = rand_int(5) + 3;
+				o_ptr->sval = SV_BONE_BONE;
+				o_ptr->weight /= part + 1;
+
+				for (i = 0; i < part; i++)
+				{
+					floor_carry(m_ptr->fy + rand_int(3) - 2, m_ptr->fx + rand_int(3) - 2, o_ptr);
+				}
+			}
+
+			/* Partially eat bodies */
+			else if ((o_ptr->tval == TV_BODY) && (o_ptr->weight > amount))
+			{
+				part = (o_ptr->weight - amount) * 100 / o_ptr->weight;
+				o_ptr->weight -= amount;
+
+				switch (o_ptr->sval)
+				{
+					case SV_BODY_CORPSE:
+					{
+						if (part < 90) o_ptr->sval = SV_BODY_HEADLESS;
+					}
+					case SV_BODY_HEADLESS:
+					{
+						if (part < 80) o_ptr->sval = SV_BODY_BUTCHERED;
+					}
+					case SV_BODY_BUTCHERED:
+					{
+						if ((part < 70) && ((rand_int(100) < 50) || !(make_part(o_ptr, o_ptr->name3)))) o_ptr->sval = SV_BODY_MEAT;
+					}
+				}
+
+				if ((part < 30) && (r_info[o_ptr->name3].flags8 & (RF8_HAS_SKELETON))) 
+				{
+					o_ptr->tval = TV_BONE;
+					if (part > 10) o_ptr->sval = SV_BONE_SKELETON;
+					else if (part > 5) o_ptr->sval = SV_BONE_BONE;
+					else if (r_info[o_ptr->name3].flags8 & (RF8_HAS_TEETH)) o_ptr->sval = SV_BONE_TEETH;
+					else (void)make_skin(o_ptr, o_ptr->name3);
+				}
+
+				floor_carry(m_ptr->fy, m_ptr->fx, o_ptr);
+			}
+
+			/* Recover stat */
+			/* Note that we use a hack to make hungry attacks make monsters weak. The ordering here
+			   makes monsters that are weak the least likely to recover this. Therefore hungry monsters
+			   will eat more than other monsters. */
+			switch(rand_int(5))
+			{
+				case 0: if ((m_ptr->mflag & (MFLAG_WEAK)) != 0) {  m_ptr->mflag &= ~(MFLAG_WEAK); break; }
+				case 1: if ((m_ptr->mflag & (MFLAG_SICK)) != 0)
+					{
+						m_ptr->mflag &= ~(MFLAG_SICK);
+						hp = calc_monster_hp(m_ptr);
+						if (m_ptr->maxhp < hp) { m_ptr->maxhp = hp; break; }
+					}
+				case 2: if ((m_ptr->mflag & (MFLAG_CLUMSY)) != 0) {  m_ptr->mflag &= ~(MFLAG_CLUMSY); break; }
+				case 3: if ((m_ptr->mflag & (MFLAG_STUPID)) != 0) {  m_ptr->mflag &= ~(MFLAG_STUPID); break; }
+				case 4: if ((m_ptr->mflag & (MFLAG_NAIVE)) != 0) {  m_ptr->mflag &= ~(MFLAG_NAIVE); break; }
+			}
+
+			/* Hack -- trolls recover hit points */
+			if (r_ptr->flags3 & (RF3_TROLL))
+			{
+				m_ptr->hp += m_ptr->maxhp / 30;
+				if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
+			}
+
+			return;
+		}
+	}
+
 
 	/*** Movement ***/
 

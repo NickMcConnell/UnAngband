@@ -7962,6 +7962,26 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				/* Obvious */
 				obvious = TRUE;
 
+				/* Recover stat */
+				/* Note that we use a hack to make hungry attacks make monsters weak. The ordering here
+				   makes monsters that are weak the least likely to recover this. Therefore hungry monsters
+				   will eat more than other monsters. */
+				switch(rand_int(5))
+				{
+					case 0: if ((m_ptr->mflag & (MFLAG_WEAK)) != 0) {  m_ptr->mflag &= ~(MFLAG_WEAK); break; }
+					case 1: if ((m_ptr->mflag & (MFLAG_SICK)) != 0)
+						{
+							int hp;
+
+							m_ptr->mflag &= ~(MFLAG_SICK);
+							hp = calc_monster_hp(m_ptr);
+							if (m_ptr->maxhp < hp) { m_ptr->maxhp = hp; break; }
+						}
+					case 2: if ((m_ptr->mflag & (MFLAG_CLUMSY)) != 0) {  m_ptr->mflag &= ~(MFLAG_CLUMSY); break; }
+					case 3: if ((m_ptr->mflag & (MFLAG_STUPID)) != 0) {  m_ptr->mflag &= ~(MFLAG_STUPID); break; }
+					case 4: if ((m_ptr->mflag & (MFLAG_NAIVE)) != 0) {  m_ptr->mflag &= ~(MFLAG_NAIVE); break; }
+				}
+
 				/* Done */
 				break;
 			}

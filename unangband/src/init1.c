@@ -178,6 +178,7 @@ static cptr r_info_blow_method[] =
 	"ARC_50",
 	"ARC_60",
 	"FLASK",
+	"TRAIL",
 	NULL
 };
 
@@ -479,9 +480,9 @@ static cptr r_info_flags2[] =
 	"PASS_WALL",
 	"KILL_WALL",
 	"ARCHER",
-	"KILL_BODY",
+	"EAT_BODY",
 	"TAKE_ITEM",
-	"KILL_ITEM",
+	"TRAIL",
 	"SNEAKY",
 	"WARRIOR",
 	"PRIEST",

@@ -732,6 +732,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case RBM_ARC_50:	p = "create a 50 degree arc"; break;
 			case RBM_ARC_60:	p = "create a 60 degree arc"; break;
 			case RBM_FLASK:	p = "throw a grenade at you"; break;
+			case RBM_TRAIL:	p = "trail"; break;
 		}
 
 
@@ -943,12 +944,13 @@ static void describe_monster_abilities(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags2 & RF2_BASH_DOOR) vp[vn++] = "bash down doors";
 	if (l_ptr->flags2 & RF2_PASS_WALL) vp[vn++] = "pass through walls";
 	if (l_ptr->flags2 & RF2_KILL_WALL) vp[vn++] = "bore through walls";
-	if (l_ptr->flags2 & RF2_KILL_BODY) vp[vn++] = "destroy weaker monsters";
+	if (l_ptr->flags2 & RF2_EAT_BODY) vp[vn++] = "can eat bodies to regain strength";
 	if (l_ptr->flags2 & RF2_TAKE_ITEM) vp[vn++] = "pick up objects";
-	if (l_ptr->flags2 & RF2_KILL_ITEM) vp[vn++] = "destroy objects";
 	if (l_ptr->flags3 & RF3_OOZE) vp[vn++] = "ooze through tiny cracks";
 	if (l_ptr->flags2 & RF2_CAN_CLIMB) vp[vn++] = "climb on walls and ceilings";
 	if (l_ptr->flags2 & RF2_CAN_DIG) vp[vn++] = "dig through earth and rubble";
+	if (l_ptr->flags2 & RF2_TRAIL) vp[vn++] = "leave a trail behind it";
+	if (l_ptr->flags2 & RF2_HAS_WEB) vp[vn++] = "trail a web behind it";
 	if (l_ptr->flags2 & RF2_SNEAKY) vp[vn++] = "hide in unusual places";
 	if ((l_ptr->flags2 & RF2_CAN_SWIM) && !(l_ptr->flags2 & RF2_MUST_SWIM)) vp[vn++] = "swim under water";
 	if ((l_ptr->flags2 & RF2_CAN_FLY) && !(l_ptr->flags2 & RF2_MUST_FLY)) vp[vn++] = "fly over obstacles";

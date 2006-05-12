@@ -9,27 +9,17 @@ This file describes my basic to do list for Unangband.
 Also see Lib\Todo, which is a dumping group for
 various files and ideas.
 
-Release v0.6.1
-==============
+Release v0.6.2 - v0.6.4
+=======================
+
 TODO: Re-balancing of objects and removal of 'useless' or less useful objects.
-
-TODO: Implement Ego lights.
-
-TODO: Allow potions to be applied to sharp weapons (swords / polearms) and arrows/bolts.
 
 TODO: Have light spells use line of sight, as opposed to line of fire, for their
 projections.
 
 TODO: Have loose rocks 'searched' to find the hidden object.
 
-TODO: Allow trolls and other monster to eat monster bodies to heal themselves, and vampires to
-suck the blood from monster bodies to improve their mana.
-
 TODO: Stores should preferentially stock items that the player actually buys.
-
-TODO: Good items should not include the high-level books.
-
-TODO: Have bags of various kinds.
 
 TODO: Have keys of various kinds.
 
@@ -45,9 +35,6 @@ TODO: Add monster ability 'reflect/beams' and 'reflect shots/thrown'.
 TODO: Add sleep effect.
 
 TODO: Add statis effect.
-
-TODO: Allow trolls and other monster to eat monster bodies to heal themselves, and vampires to
-suck the blood from monster bodies to improve their mana.
 
 TODO: Higher level birds, for bird summoners.
 
@@ -368,11 +355,6 @@ for half an hour.
 
 TODO: Add an eclipse, which lasts 5 minutes and occurs once... light
 like a full moon.
-
-TODO: Allow potions to be applied to sharp weapons (swords / polearms) and arrows/bolts.
-This causes the weapon to apply the potion effect when hitting. It has % chance equal
-to weight of weapon in tenths of pounds of losing the effect afterwards (doubled for
-bladed weapons, which require more potion).
 
 TODO: Add monster ability 'reflect/beams' and 'reflect shots/thrown'. These cause either
 any bolt/beam attack, or any shot/thrown weapon to reflect in a random compass direction,
@@ -895,10 +877,6 @@ TODO: Drop chunks of metals and large jewels for manufacturing purposes.
 
 TODO: Stores should preferentially stock items that the player actually buys.
 
-TODO: Good items should not include the high-level books. Good items should however include
-any object that the player has not seen or id'ed before. Perhaps give a power boost to unknown
-items, and evaluate overall object power to determine if the object is 'good' or not.
-
 TODO: Players pick their own stats when they advance a level.
 
 TODO: Mystics carry essences.
@@ -945,63 +923,6 @@ flying over the building). Furthermore, if the player throws a fireball at the b
 won't be affected. This requires setting some kind of PROJECT_OVER flag set when projecting
 at a target when you are climbing or MFLAG_OVER, and the first step is covered...
 
-
-TODO: Have bags of various kinds. A bag holds up to objects of up to 22 tval and sval combinations.
-It can only hold objects that have limited sets of properties; either number, or (for wands)
-number and charges. Up to u16b items and/or charges can be held.
-
-The bag array is an array of u16b p_ptr->bag[MAX_NUM_BAGS][22] (Each wand bag needs two rows).
-In addition, fake inscriptions can be specified for 0-9 to allow the number keys to select items
-as well. 
-
-Total cost is about 1 K to allow an inventory of 374 different types of objects to be carried
-by a single player.
-
-To provide some inventory management balance, spell books cannot be put in magical bags.
-
-Magical bags do not count the weight of their contents and just have a fixed weight approximately
-equal to 10 * the base item type they hold.
-
-Magical Bag of Enchantments – holds non-elemental wands
-
-Magical Bag of the Elements – holds elemental attack wands + trans rock to mud
-
-Magical Bag of the Four Winds – holds high powered elemental attack wands
-
-Magical Bag of Six Demons – holds high-powered non-elemental (e.g. gravity etc) attack wands
-
-Magical Bag of Antidotes – holds low powered curing potions (e.g. restore strength)
-
-Magical Bag of Poisons – holds non-helpful potions
-
-Magical Bag of Philtres – holds improvement potions
-
-Magical Bag of Elixirs – holds high powered potions
-
-Magical Bag of Provisions – holds food
-
-Magical Bag of Supplies – holds flasks, torches, spikes, lock picks, flints. Torches are handled
-specially.
-
-Magical Bag of Mushrooms – holds mushrooms
-
-Magical Bag of Scrying – holds identify / detect scrolls
-
-Magical Bag of Hedge Magics – holds less useful scrolls
-
-Magical Bag of Eldritch Magics – holds powerful scrolls
-
-Magical Bag of Lesser Runes – holds some runes
-
-Magical Bag of Greater Runes – holds more powerful runes
-
-Magical Bag of Maps – holds maps
-
-When selecting an item, if the command specifies USE_BAGS, a bag may be selected. If this is
-returned by the item picking routine, then a temporary inventory is created which the contents
-of the bag is copied to and an item is selected. The bag array is then edited directly to use
-up the item/charge, and apply the effect.
- 
 TODO: Elemental effects that cause more than 100 hp damage (before resistance) “The air around you
 is superheated/frozen.” “There is a static feeling in the air.” “Water swirls about you.” “Acid
 swirls about you.” These mean that when you attempt to use  an item vulnerable to the effect
