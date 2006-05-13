@@ -37,6 +37,9 @@ artifact as per normal.
 - Monsters now eat bodies around the dungeon if they are hungry and not under
 attack.
 
+- Improved utility of low powered detection spells. Added Sense Magic scrolls.
+(From Sangband).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

@@ -1244,38 +1244,38 @@
 
 /* SF1 - informational and prompted equipment */
 
-#define SF1_DETECT_DOORS 0x00000001
-#define SF1_DETECT_TRAPS 0x00000002
+#define SF1_DETECT_DOORS 	0x00000001
+#define SF1_DETECT_TRAPS 	0x00000002
 #define SF1_DETECT_STAIRS       0x00000004
-#define SF1_DETECT_WATER 0x00000008
-#define SF1_DETECT_GOLD  0x00000010
+#define SF1_DETECT_WATER 	0x00000008
+#define SF1_DETECT_GOLD  	0x00000010
 #define SF1_DETECT_OBJECT       0x00000020
-#define SF1_DETECT_MAGIC 0x00000040
-#define SF1_DETECT_CURSE 0x00000080
-#define SF1_DETECT_MONSTER      0x00000100
-#define SF1_DETECT_EVIL  0x00000200
-#define SF1_DETECT_INVIS 0x00000400
-#define SF1_DETECT_ANIMAL       0x00000800
-#define SF1_DETECT_UNDEAD       0x00001000
-#define SF1_DETECT_DEMON 0x00002000
-#define SF1_MAP_AREA     0x00004000
-#define SF1_WIZ_LITE     0x00008000
-#define SF1_LITE_ROOM    0x00010000
-#define SF1_DARK_ROOM    0x00020000
-#define SF1_FORGET       0x00040000
-#define SF1_SELF_KNOW    0x00080000
-#define SF1_IDENT 0x00100000
-#define SF1_IDENT_PACK   0x00200000
-#define SF1_IDENT_SENSE  0x00400000
-#define SF1_IDENT_BONUS  0x00800000
-#define SF1_IDENT_RUMOR  0x01000000
-#define SF1_IDENT_FULLY  0x02000000
-#define SF1_ACQUIREMENT   0x04000000
-#define SF1_STAR_ACQUIREMENT     0x08000000
-#define SF1_ENCHANT_TOH  0x10000000
-#define SF1_ENCHANT_TOD  0x20000000
-#define SF1_ENCHANT_TOA  0x40000000
-#define SF1_ENCHANT_HIGH 0x80000000
+#define SF1_DETECT_MAGIC 	0x00000040
+#define SF1_DETECT_CURSE 	0x00000080
+#define SF1_DETECT_POWER	0x00000100
+#define SF1_DETECT_MONSTER      0x00000200
+#define SF1_DETECT_EVIL  	0x00000400
+#define SF1_DETECT_LIFE 	0x00000800
+#define SF1_MAP_AREA     	0x00001000
+#define SF1_WIZ_LITE     	0x00002000
+#define SF1_LITE_ROOM    	0x00004000
+#define SF1_DARK_ROOM    	0x00008000
+#define SF1_FORGET       	0x00010000
+#define SF1_SELF_KNOW    	0x00020000
+#define SF1_IDENT 		0x00040000
+#define SF1_IDENT_PACK   	0x00080000
+#define SF1_IDENT_SENSE  	0x00100000
+#define SF1_IDENT_BONUS  	0x00200000
+#define SF1_IDENT_RUNES  	0x00400000
+#define SF1_IDENT_VALUE  	0x00800000
+#define SF1_IDENT_RUMOR  	0x01000000
+#define SF1_IDENT_FULLY  	0x02000000
+#define SF1_ACQUIREMENT   	0x04000000
+#define SF1_STAR_ACQUIREMENT    0x08000000
+#define SF1_ENCHANT_TOH  	0x10000000
+#define SF1_ENCHANT_TOD  	0x20000000
+#define SF1_ENCHANT_TOA  	0x40000000
+#define SF1_ENCHANT_HIGH 	0x80000000
 
 /* SF2 - timed abilities and modifying level */
 
@@ -2762,8 +2762,9 @@
 #define INSCRIP_RUNED		22 /* Does have runes */
 #define INSCRIP_AVERAGE		23 /* Has been detected to be average */
 #define INSCRIP_VALUABLE	24 /* Has been detected to be valuable */
-#define INSCRIP_COATED		25 /* Has been coated with something */
-#define INSCRIP_MIN_HIDDEN      26 /* Minimum inscription for hidden */
+#define INSCRIP_UNUSUAL		25 /* Has been detected to be not average */
+#define INSCRIP_COATED		26 /* Has been coated with something */
+#define INSCRIP_MIN_HIDDEN      27 /* Minimum inscription for hidden */
 
 
 /*

@@ -5223,7 +5223,7 @@ static void process_monster(int m_idx)
 	/*** Monster hungry? ***/
 	if ((((m_ptr->mflag & (MFLAG_WEAK | MFLAG_STUPID | MFLAG_NAIVE | MFLAG_CLUMSY | MFLAG_SICK)) != 0)
 		|| (((r_ptr->flags3 & (RF3_TROLL)) != 0) && (m_ptr->hp < m_ptr->maxhp)))
-		&& ((m_ptr->mflag & (MFLAG_AGGR)) == 0)
+		&& (((m_ptr->mflag & (MFLAG_AGGR)) == 0) || !(player_has_los_bold(m_ptr->fy, m_ptr->fx)))
 		&& (!(r_ptr->flags3 & (RF3_NONLIVING)) || (r_ptr->flags2 & (RF2_EAT_BODY))))
 	{
 		int this_o_idx, next_o_idx, item = 0;

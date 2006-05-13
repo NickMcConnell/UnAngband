@@ -863,115 +863,20 @@ void object_known(object_type *o_ptr)
  */
 void object_bonus(object_type *o_ptr)
 {
-	int feel = 0;
-
 	/* Identify the bonuses */
 	o_ptr->ident |= (IDENT_BONUS | IDENT_CHARGES | IDENT_PVAL);
 
 	/* Is this all we need to know */
-	if (!(o_ptr->name1) && ((o_ptr->tval == TV_AMULET) || (o_ptr->tval == TV_RING)))
-	{
-		/* Cursed/Broken */
-		if (!cursed_p(o_ptr) && !broken_p(o_ptr)) return;
-
-		/* Remove special inscription, if any */
-		o_ptr->feeling = 0;
-
-		/* Sense the object if allowed */
-		if (cursed_p(o_ptr) || broken_p(o_ptr)) o_ptr->feeling = INSCRIP_CURSED;
-
-		/* The object has been "sensed" */
-		o_ptr->ident |= (IDENT_SENSE);
-
-	}
-
-	/* Is this all we need to know */
-	else if ((o_ptr->tval == TV_WAND) || (o_ptr->tval == TV_STAFF))
+	if ((o_ptr->tval == TV_WAND) || (o_ptr->tval == TV_STAFF) || (o_ptr->tval == TV_AMULET) || (o_ptr->tval == TV_RING))
 	{
 		if (object_aware_p(o_ptr)) object_known(o_ptr);
 	}
 
 	/* Sense the item (if appropriate) */
-	else if (!object_known_p(o_ptr))
+	if (!object_known_p(o_ptr))
 	{
-		/* Valid "tval" codes */
-		switch (o_ptr->tval)
-		{
-			case TV_SHOT:
-			case TV_ARROW:
-			case TV_BOLT:
-			case TV_BOW:
-			case TV_DIGGING:
-			case TV_HAFTED:
-			case TV_POLEARM:
-			case TV_SWORD:
-			case TV_BOOTS:
-			case TV_GLOVES:
-			case TV_HELM:
-			case TV_CROWN:
-			case TV_SHIELD:
-			case TV_CLOAK:
-			case TV_SOFT_ARMOR:
-			case TV_HARD_ARMOR:
-			case TV_DRAG_ARMOR:
-			{
-				/* Artifacts */
-				if (artifact_p(o_ptr))
-				{
-					/* Cursed/Broken */
-					if (cursed_p(o_ptr) || broken_p(o_ptr)) feel = INSCRIP_TERRIBLE;
-
-					/* Normal */
-					else feel = INSCRIP_SPECIAL;
-				}
-
-				/* Ego-Items */
-				else if (ego_item_p(o_ptr))
-				{
-					/* Cursed/Broken */
-					if (cursed_p(o_ptr) || broken_p(o_ptr)) feel = INSCRIP_WORTHLESS;
-
-					/* Normal */
-					else feel = INSCRIP_EXCELLENT;
-
-					/* Superb */
-					if (o_ptr->xtra1) feel = INSCRIP_SUPERB;
-				}
-
-				/* Magic Items */
-				else if (o_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES)
-				{
-					/* Cursed/Broken */
-					if (cursed_p(o_ptr) || broken_p(o_ptr)) feel = INSCRIP_WORTHLESS;
-
-					/* Normal */
-					else feel = INSCRIP_EXCELLENT;
-				}
-
-				/* Still more to know? */
-				if (feel)
-				{
-
-					/* Sense the object */
-					o_ptr->feeling = feel;
-
-					/* The item has been sensed */
-					o_ptr->ident |= (IDENT_SENSE);
-
-				}
-
-				/* Object is completely known */
-				else
-				{
-					object_known(o_ptr);
-				}
-
-				break;
-			}
-		}
-
+		sense_magic(o_ptr, 1, TRUE);
 	}
-
 }
 
 
@@ -3568,7 +3473,7 @@ int value_check_aux9(object_type *o_ptr)
 }
 
 /*
- * Return a "feeling" (or NULL) about an item.  Methods 10 & 11 (Flag magic and flag weapon).
+ * Return a "feeling" (or NULL) about an item.  Methods 10 & 10a (Flag magic and flag weapon).
  */
 int value_check_aux10(object_type *o_ptr, bool weapon)
 {
@@ -3639,6 +3544,165 @@ int value_check_aux10(object_type *o_ptr, bool weapon)
 }
 
 
+/*
+ * Return a "feeling" (or NULL) about an item.  Method 11 (Average vs non-average).
+ */
+int value_check_aux11(object_type *o_ptr)
+{
+	/* If sensed, have no more value to add */
+	if (o_ptr->feeling) return(0);
+
+	/* Artifacts */
+	if (artifact_p(o_ptr))
+	{
+		/* Normal */
+		return (INSCRIP_UNUSUAL);
+	}
+
+	/* Ego-Items */
+	if (ego_item_p(o_ptr))
+	{
+		/* Normal */
+		return (INSCRIP_UNUSUAL);
+	}
+
+	/* Cursed items */
+	if (cursed_p(o_ptr)) return (INSCRIP_UNUSUAL);
+
+	/* Broken items */
+	/* if (broken_p(o_ptr)) return (INSCRIP_UNUSUAL); */
+
+	/* Magic item */
+	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_UNUSUAL);
+
+	/* Good "armor" bonus */
+	if (o_ptr->to_a > 0) return (INSCRIP_UNUSUAL);
+
+	/* Good "weapon" bonus */
+	if (o_ptr->to_h + o_ptr->to_d > 0) return (INSCRIP_UNUSUAL);
+
+	/* Kind */
+	if (k_info[o_ptr->k_idx].flavor) return (INSCRIP_UNUSUAL);
+
+	/* Default to average */
+	return (INSCRIP_AVERAGE);
+}
+
+
+
+
+/*
+ * Return a "feeling" (or NULL) about an item.  Method 12 (Magical vs non-magical).
+ */
+int value_check_aux12(object_type *o_ptr)
+{
+	/* If sensed magical, have no more value to add */
+	if ((o_ptr->feeling == INSCRIP_GOOD) || (o_ptr->feeling == INSCRIP_VERY_GOOD)
+		|| (o_ptr->feeling == INSCRIP_GREAT) || (o_ptr->feeling == INSCRIP_EXCELLENT)
+		|| (o_ptr->feeling == INSCRIP_SUPERB) || (o_ptr->feeling == INSCRIP_SPECIAL)
+		|| (o_ptr->feeling == INSCRIP_MAGICAL)) return (0);
+
+	/* Artifacts */
+	if ((artifact_p(o_ptr)) || (o_ptr->feeling == INSCRIP_ARTIFACT))
+	{
+		/* Known to be artifact strength */
+		if ((o_ptr->feeling == INSCRIP_UNBREAKABLE)
+			|| (o_ptr->feeling == INSCRIP_ARTIFACT))
+		{
+			/* Cursed/Broken */
+			if (cursed_p(o_ptr) || broken_p(o_ptr)) return (INSCRIP_TERRIBLE);
+
+			return (INSCRIP_SPECIAL);
+		}
+
+		/* Cursed/Broken */
+		if (cursed_p(o_ptr) || broken_p(o_ptr)) return (INSCRIP_NONMAGICAL);
+
+		/* Normal */
+		return (INSCRIP_MAGICAL);
+	}
+
+	/* Ego-Items */
+	if ((ego_item_p(o_ptr)) || (o_ptr->feeling == INSCRIP_HIGH_EGO_ITEM) || (o_ptr->feeling == INSCRIP_EGO_ITEM))
+	{
+		/* Known to be high ego-item strength */
+		if ((o_ptr->feeling == INSCRIP_HIGH_EGO_ITEM))
+		{
+			/* Cursed/Broken */
+			if (cursed_p(o_ptr) || broken_p(o_ptr)) return (INSCRIP_WORTHLESS);
+
+			return (INSCRIP_SUPERB);
+		}
+
+		/* Known to be high ego-item strength */
+		if ((o_ptr->feeling == INSCRIP_EGO_ITEM))
+		{
+			/* Cursed/Broken */
+			if (cursed_p(o_ptr) || broken_p(o_ptr)) return (INSCRIP_WORTHLESS);
+
+			return (INSCRIP_EXCELLENT);
+		}
+
+		/* Cursed/Broken */
+		if (cursed_p(o_ptr) || broken_p(o_ptr)) return (INSCRIP_NONMAGICAL);
+
+		/* Normal */
+		return (INSCRIP_MAGICAL);
+	}
+
+	/* Cursed items */
+	if (cursed_p(o_ptr)) return (INSCRIP_NONMAGICAL);
+
+	/* Broken items */
+	/* if (broken_p(o_ptr)) return (INSCRIP_BROKEN); */
+
+	/* Magic item */
+	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_MAGICAL);
+
+	/* Good "armor" bonus */
+	if (o_ptr->to_a > 0) return (INSCRIP_MAGICAL);
+
+	/* Good "weapon" bonus */
+	if (o_ptr->to_h + o_ptr->to_d > 0) return (INSCRIP_MAGICAL);
+
+	/* Kind */
+	if (k_info[o_ptr->k_idx].flavor) return (INSCRIP_MAGICAL);
+
+	/* Default to average */
+	return (INSCRIP_NONMAGICAL);
+}
+
+
+/*
+ * Return a "feeling" (or NULL) about an item.  Method 13 (Runed vs unruned).
+ */
+int value_check_aux13(object_type *o_ptr)
+{
+	/* If sensed, have no more value to add */
+	if (o_ptr->feeling) return(0);
+
+	/* Artifacts */
+	if (artifact_p(o_ptr))
+	{
+		/* Normal */
+		return (INSCRIP_RUNED);
+	}
+
+	/* Ego-Items */
+	if (ego_item_p(o_ptr))
+	{
+		/* Normal */
+		return (INSCRIP_RUNED);
+	}
+
+	/* Magic item */
+	if (o_ptr->xtra1) return (INSCRIP_RUNED);
+
+	/* Default to average */
+	return (INSCRIP_UNRUNED);
+}
+
+
 
 /*
  * The new item sensing routine.
@@ -3663,7 +3727,7 @@ int value_check_aux10(object_type *o_ptr, bool weapon)
  * Level 8 is equivalent to identify name only.
  * Level 9 is equivalent to full identify on restricted objects only.
  */
-int sense_magic(object_type *o_ptr, int sense_type)
+int sense_magic(object_type *o_ptr, int sense_type, bool heavy)
 {
 	int feel;
 
@@ -3675,6 +3739,11 @@ int sense_magic(object_type *o_ptr, int sense_type)
 	/* Valid "tval" codes */
 	switch (o_ptr->tval)
 	{
+		case TV_RING:
+		case TV_AMULET:
+		{
+			heavy = FALSE;
+		}
 		case TV_SHOT:
 		case TV_ARROW:
 		case TV_BOLT:
@@ -3712,39 +3781,42 @@ int sense_magic(object_type *o_ptr, int sense_type)
 	switch (sense_type)
 	{
 		case 1:
-			feel = value_check_aux1(o_ptr);
+			feel = heavy ? value_check_aux1(o_ptr) : value_check_aux2(o_ptr);
 			break;
 		case 2:
-			feel = value_check_aux2(o_ptr);
+			feel = heavy ? value_check_aux2(o_ptr) : value_check_aux11(o_ptr);
 			break;
 		case 3:
-			feel = value_check_aux3(o_ptr);
+			feel = heavy ? value_check_aux3(o_ptr) : value_check_aux12(o_ptr);
 			break;
 		case 4:
-			feel = value_check_aux4(o_ptr);
+			feel = heavy ? value_check_aux4(o_ptr) : value_check_aux4(o_ptr);
 			break;
 		case 5:
-			feel = value_check_aux5(o_ptr);
+			feel = heavy ? value_check_aux5(o_ptr) : value_check_aux11(o_ptr);
 			break;
 		case 6:
-			feel = value_check_aux6(o_ptr);
+			feel = heavy ? value_check_aux6(o_ptr) : value_check_aux13(o_ptr);
 			break;
 		case 7:
-			feel = value_check_aux7(o_ptr);
+			feel = heavy ? value_check_aux7(o_ptr) : value_check_aux11(o_ptr);
 			break;
 		case 8:
-			feel = value_check_aux8(o_ptr);
+			feel = heavy ? value_check_aux8(o_ptr) : value_check_aux11(o_ptr);
 			break;
 		case 9:
-			feel = value_check_aux9(o_ptr);
+			feel = heavy ? value_check_aux9(o_ptr) : value_check_aux11(o_ptr);
 			break;
 		case 10:
-			feel = value_check_aux10(o_ptr, FALSE);
+			feel = heavy ? value_check_aux10(o_ptr, FALSE) : value_check_aux11(o_ptr);
 			break;
 		case 11:
-			feel = value_check_aux10(o_ptr, TRUE);
+			feel = heavy ? value_check_aux10(o_ptr, TRUE) : value_check_aux11(o_ptr);
 			break;
 	}
+
+	/* Mark as sensed */
+	if ((sense_type) && ((heavy) || (o_ptr->tval == TV_RING) || (o_ptr->tval == TV_AMULET))) o_ptr->ident |= (IDENT_SENSE);
 
 	return (feel);
 }
@@ -4869,7 +4941,7 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 	}
 
 	/* Sense some magic on object at creation time */
-	sense_magic(j_ptr, cp_ptr->sense_type);
+	j_ptr->feeling = sense_magic(j_ptr, cp_ptr->sense_type, (p_ptr->lev >= 40) || rand_int(100) < 20 + p_ptr->lev * 2);
 
 	/* Success */
 	return (TRUE);

@@ -1068,7 +1068,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 
 	/* Hack -- Append "Artifact" or "Special" names */
-	if (known)
+	if ((known) || (o_ptr->ident & (IDENT_NAME)))
 	{
 		/* Grab any artifact name */
 		if (o_ptr->name1)

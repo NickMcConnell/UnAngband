@@ -1476,7 +1476,7 @@ bool detect_objects_magic(void)
 		}
 
 		/* Get the inscription */
-		feel = sense_magic(o_ptr, 3);
+		feel = sense_magic(o_ptr, 3, TRUE);
 
 		/* Sense something */
 		if (!feel) continue;
@@ -1496,7 +1496,7 @@ bool detect_objects_magic(void)
 		object_type *o_ptr = &inventory[i];
 
 		/* Get the inscription */
-		feel = sense_magic(o_ptr, 3);
+		feel = sense_magic(o_ptr, 3, TRUE);
 
 		/* Sense something */
 		if (!feel) continue;
@@ -1588,7 +1588,7 @@ bool detect_objects_cursed(void)
 		}
 
 		/* Get the inscription */
-		feel = sense_magic(o_ptr, 4);
+		feel = sense_magic(o_ptr, 4, TRUE);
 
 		/* Sense something */
 		if (!feel) continue;
@@ -1608,7 +1608,7 @@ bool detect_objects_cursed(void)
 		object_type *o_ptr = &inventory[i];
 
 		/* Get the inscription */
-		feel = sense_magic(o_ptr, 4);
+		feel = sense_magic(o_ptr, 4, TRUE);
 
 		/* Sense something? */
 		if (!feel) continue;
@@ -1708,7 +1708,7 @@ bool detect_objects_power(void)
 		}
 
 		/* Get the inscription */
-		feel = sense_magic(o_ptr, 5);
+		feel = sense_magic(o_ptr, 5, TRUE);
 
 		/* Sense something */
 		if (!feel) continue;
@@ -1728,7 +1728,7 @@ bool detect_objects_power(void)
 		object_type *o_ptr = &inventory[i];
 
 		/* Get the inscription */
-		feel = sense_magic(o_ptr, 5);
+		feel = sense_magic(o_ptr, 5, TRUE);
 
 		/* Sense something */
 		if (!feel) continue;
@@ -1823,81 +1823,6 @@ bool detect_monsters_normal(void)
 
 
 /*
- * Detect all "invisible" monsters on current panel
- */
-bool detect_monsters_invis(void)
-{
-	int i, y, x;
-
-	bool flag = FALSE;
-
-
-	/* Scan monsters */
-	for (i = 1; i < m_max; i++)
-	{
-		monster_type *m_ptr = &m_list[i];
-		monster_race *r_ptr = &r_info[m_ptr->r_idx];
-		monster_lore *l_ptr = &l_list[m_ptr->r_idx];
-
-		/* Skip dead monsters */
-		if (!m_ptr->r_idx) continue;
-
-		/* Location */
-		y = m_ptr->fy;
-		x = m_ptr->fx;
-
-		/* Only detect nearby monsters */
-		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
-
-		/* Note invisible monsters */
-		if (r_ptr->flags2 & (RF2_INVISIBLE))
-		{
-			/* Take note that they are invisible */
-			l_ptr->flags2 |= (RF2_INVISIBLE);
-
-			/* Update monster recall window */
-			if (p_ptr->monster_race_idx == m_ptr->r_idx)
-			{
-				/* Window stuff */
-				p_ptr->window |= (PW_MONSTER);
-			}
-
-		}
-
-		/* Detect invisible monsters */
-		if ((r_ptr->flags2 & (RF2_INVISIBLE)) || (m_ptr->tim_invis))
-		{
-			/* Optimize -- Repair flags */
-			repair_mflag_mark = repair_mflag_show = TRUE;
-
-			/* Hack -- Detect the monster */
-			m_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
-
-			/* Update the monster */
-			update_mon(i, FALSE);
-
-			/* Detect */
-			flag = TRUE;
-		}
-	}
-
-	/* Hack -- mark as safe */
-	if (view_detect_grids) detect_feat_flags(0L, 0L, 2 * MAX_SIGHT);
-
-	/* Describe */
-	if (flag)
-	{
-		/* Describe result */
-		msg_print("You sense the presence of invisible creatures!");
-	}
-
-	/* Result */
-	return (flag);
-}
-
-
-
-/*
  * Detect all "evil" monsters on current panel
  */
 bool detect_monsters_evil(void)
@@ -1965,10 +1890,11 @@ bool detect_monsters_evil(void)
 	return (flag);
 }
 
+
 /*
- * Detect all "undead" monsters on current panel
+ * Detect all "living" monsters on current panel
  */
-bool detect_monsters_undead(void)
+bool detect_monsters_living(void)
 {
 	int i, y, x;
 
@@ -1980,7 +1906,6 @@ bool detect_monsters_undead(void)
 	{
 		monster_type *m_ptr = &m_list[i];
 		monster_race *r_ptr = &r_info[m_ptr->r_idx];
-		monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
 		/* Skip dead monsters */
 		if (!m_ptr->r_idx) continue;
@@ -1993,11 +1918,8 @@ bool detect_monsters_undead(void)
 		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
 
 		/* Detect evil monsters */
-		if (r_ptr->flags3 & (RF3_UNDEAD))
+		if (!(r_ptr->flags3 & (RF3_NONLIVING)))
 		{
-			/* Take note that they are evil */
-			l_ptr->flags3 |= (RF3_UNDEAD);
-
 			/* Update monster recall window */
 			if (p_ptr->monster_race_idx == m_ptr->r_idx)
 			{
@@ -2026,143 +1948,7 @@ bool detect_monsters_undead(void)
 	if (flag)
 	{
 		/* Describe result */
-		msg_print("You sense the presence of undead creatures!");
-	}
-
-	/* Result */
-	return (flag);
-}
-
-/*
- * Detect all "animal" monsters on current panel
- */
-bool detect_monsters_animal(void)
-{
-	int i, y, x;
-
-	bool flag = FALSE;
-
-
-	/* Scan monsters */
-	for (i = 1; i < m_max; i++)
-	{
-		monster_type *m_ptr = &m_list[i];
-		monster_race *r_ptr = &r_info[m_ptr->r_idx];
-		monster_lore *l_ptr = &l_list[m_ptr->r_idx];
-
-		/* Skip dead monsters */
-		if (!m_ptr->r_idx) continue;
-
-		/* Location */
-		y = m_ptr->fy;
-		x = m_ptr->fx;
-
-		/* Only detect nearby monsters */
-		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
-
-		/* Detect evil monsters */
-		if (r_ptr->flags3 & (RF3_ANIMAL))
-		{
-			/* Take note that they are animals */
-			l_ptr->flags3 |= (RF3_ANIMAL);
-
-			/* Update monster recall window */
-			if (p_ptr->monster_race_idx == m_ptr->r_idx)
-			{
-				/* Window stuff */
-				p_ptr->window |= (PW_MONSTER);
-			}
-
-			/* Optimize -- Repair flags */
-			repair_mflag_mark = repair_mflag_show = TRUE;
-
-			/* Detect the monster */
-			m_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
-
-			/* Update the monster */
-			update_mon(i, FALSE);
-
-			/* Detect */
-			flag = TRUE;
-		}
-	}
-
-	/* Hack -- mark as safe */
-	if (view_detect_grids) detect_feat_flags(0L, 0L, 2 * MAX_SIGHT);
-
-	/* Describe */
-	if (flag)
-	{
-		/* Describe result */
-		msg_print("You sense the presence of natural creatures!");
-	}
-
-	/* Result */
-	return (flag);
-}
-
-/*
- * Detect all "demon" monsters on current panel
- */
-bool detect_monsters_demon(void)
-{
-	int i, y, x;
-
-	bool flag = FALSE;
-
-
-	/* Scan monsters */
-	for (i = 1; i < m_max; i++)
-	{
-		monster_type *m_ptr = &m_list[i];
-		monster_race *r_ptr = &r_info[m_ptr->r_idx];
-		monster_lore *l_ptr = &l_list[m_ptr->r_idx];
-
-		/* Skip dead monsters */
-		if (!m_ptr->r_idx) continue;
-
-		/* Location */
-		y = m_ptr->fy;
-		x = m_ptr->fx;
-
-		/* Only detect nearby monsters */
-		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
-
-		/* Detect evil monsters */
-		if (r_ptr->flags3 & (RF3_DEMON))
-		{
-			/* Take note that they are evil */
-			l_ptr->flags3 |= (RF3_DEMON);
-
-			/* Update monster recall window */
-			if (p_ptr->monster_race_idx == m_ptr->r_idx)
-			{
-				/* Window stuff */
-				p_ptr->window |= (PW_MONSTER);
-			}
-
-			/* Optimize -- Repair flags */
-			repair_mflag_mark = repair_mflag_show = TRUE;
-
-			/* Detect the monster */
-			m_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
-
-			/* Update the monster */
-			update_mon(i, FALSE);
-
-			/* Detect */
-			flag = TRUE;
-		}
-	}
-
-	/* Hack -- mark as safe */
-	if (view_detect_grids) detect_feat_flags(0L, 0L, 2 * MAX_SIGHT);
-
-	/* Describe */
-	if (flag)
-	{
-		/* Describe result */
-		msg_print("You sense the presence of demons!");
+		msg_print("You sense the presence of evil creatures!");
 	}
 
 	/* Result */
@@ -2185,7 +1971,8 @@ bool detect_all(void)
 	if (detect_objects_buried()) detect = TRUE;
 	if (detect_objects_gold()) detect = TRUE;
 	if (detect_objects_normal()) detect = TRUE;
-	if (detect_monsters_invis()) detect = TRUE;
+	if (detect_monsters_evil()) detect = TRUE;
+	if (detect_monsters_living()) detect = TRUE;
 	if (detect_monsters_normal()) detect = TRUE;
 
 	/* Result */
@@ -2394,6 +2181,38 @@ static bool item_tester_unknown_star(const object_type *o_ptr)
 	else
 		return TRUE;
 }
+
+
+static bool item_tester_unknown_sense(const object_type *o_ptr)
+{
+	if (object_known_p(o_ptr))
+		return FALSE;
+	else if (o_ptr->ident & IDENT_SENSE)
+		return FALSE;
+	else
+		return TRUE;
+}
+
+
+static bool item_tester_unknown_value(const object_type *o_ptr)
+{
+	if (o_ptr->ident & IDENT_VALUE)
+		return FALSE;
+	else
+		return TRUE;
+}
+
+
+static bool item_tester_unknown_runes(const object_type *o_ptr)
+{
+	if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_RUNES)
+		return FALSE;
+	else if (o_ptr->ident & IDENT_RUNES)
+		return FALSE;
+	else
+		return TRUE;
+}
+
 
 /*
  * Note for the following function, the player must know it is an artifact
@@ -2871,7 +2690,6 @@ bool ident_spell(void)
 		msg_format("On the ground: %s.",
 			   o_name);
 	}
-
 	/* Something happened */
 	return (TRUE);
 }
@@ -2896,8 +2714,8 @@ bool ident_spell_bonus(void)
 	item_tester_hook = item_tester_unknown_bonus;
 
 	/* Get an item */
-	q = "Identify which item? ";
-	s = "You have nothing to identify.";
+	q = "Gauge which item? ";
+	s = "You have nothing to gauge.";
 	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return (FALSE);
 
 	/* Get the item (in the pack) */
@@ -2923,6 +2741,200 @@ bool ident_spell_bonus(void)
 
 	/* Window stuff */
 	p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
+
+	/* Description */
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
+
+	/* Describe */
+	if (item >= INVEN_WIELD)
+	{
+		msg_format("%^s: %s (%c).",
+			   describe_use(item), o_name, index_to_label(item));
+	}
+	else if (item >= 0)
+	{
+		msg_format("In your pack: %s (%c).",
+			   o_name, index_to_label(item));
+	}
+	else
+	{
+		msg_format("On the ground: %s.",
+			   o_name);
+	}
+
+	/* Something happened */
+	return (TRUE);
+}
+
+
+/*
+ * Heavily senses an item in the inventory or on the floor.
+ * Returns TRUE if something was sensed, else FALSE.
+ */
+bool ident_spell_sense(void)
+{
+	int item;
+
+	object_type *o_ptr;
+
+	char o_name[80];
+
+	cptr q, s;
+
+
+	/* Only un-id'ed items */
+	item_tester_hook = item_tester_unknown_sense;
+
+	/* Get an item */
+	q = "Sense which item? ";
+	s = "You have nothing to sense.";
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return (FALSE);
+
+	/* Get the item (in the pack) */
+	if (item >= 0)
+	{
+		o_ptr = &inventory[item];
+	}
+
+	/* Get the item (on the floor) */
+	else
+	{
+		o_ptr = &o_list[0 - item];
+	}
+
+	/* Identify it's bonuses */
+	sense_magic(o_ptr, cp_ptr->sense_type, TRUE);
+
+	/* Description */
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
+
+	/* Describe */
+	if (item >= INVEN_WIELD)
+	{
+		msg_format("%^s: %s (%c).",
+			   describe_use(item), o_name, index_to_label(item));
+	}
+	else if (item >= 0)
+	{
+		msg_format("In your pack: %s (%c).",
+			   o_name, index_to_label(item));
+	}
+	else
+	{
+		msg_format("On the ground: %s.",
+			   o_name);
+	}
+
+	/* Something happened */
+	return (TRUE);
+}
+
+
+
+
+/*
+ * Identify the value of an object in the inventory (or on the floor)
+ * Returns TRUE if something was identified, else FALSE.
+ */
+bool ident_spell_value(void)
+{
+	int item;
+
+	object_type *o_ptr;
+
+	char o_name[80];
+
+	cptr q, s;
+
+
+	/* Only un-id'ed items */
+	item_tester_hook = item_tester_unknown_value;
+
+	/* Get an item */
+	q = "Value which item? ";
+	s = "You have nothing to value.";
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return (FALSE);
+
+	/* Get the item (in the pack) */
+	if (item >= 0)
+	{
+		o_ptr = &inventory[item];
+	}
+
+	/* Get the item (on the floor) */
+	else
+	{
+		o_ptr = &o_list[0 - item];
+	}
+
+	/* Value the item */
+	o_ptr->ident |= (IDENT_VALUE);
+
+	/* Recalculate bonuses */
+	p_ptr->update |= (PU_BONUS);
+
+	/* Description */
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
+
+	/* Describe */
+	if (item >= INVEN_WIELD)
+	{
+		msg_format("%^s: %s (%c).",
+			   describe_use(item), o_name, index_to_label(item));
+	}
+	else if (item >= 0)
+	{
+		msg_format("In your pack: %s (%c).",
+			   o_name, index_to_label(item));
+	}
+	else
+	{
+		msg_format("On the ground: %s.",
+			   o_name);
+	}
+
+	/* Something happened */
+	return (TRUE);
+}
+
+
+/*
+ * Determine the runes on an object in the inventory (or on the floor)
+ * Returns TRUE if something was identified, else FALSE.
+ */
+bool ident_spell_runes(void)
+{
+	int item;
+
+	object_type *o_ptr;
+
+	char o_name[80];
+
+	cptr q, s;
+
+
+	/* Only un-id'ed items */
+	item_tester_hook = item_tester_unknown_runes;
+
+	/* Get an item */
+	q = "Read runes on which item? ";
+	s = "You have nothing to read runes on.";
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return (FALSE);
+
+	/* Get the item (in the pack) */
+	if (item >= 0)
+	{
+		o_ptr = &inventory[item];
+	}
+
+	/* Get the item (on the floor) */
+	else
+	{
+		o_ptr = &o_list[0 - item];
+	}
+
+	/* Identify it's bonuses */
+	o_ptr->ident |= (IDENT_RUNES);
 
 	/* Description */
 	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
@@ -5574,7 +5586,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				int py = p_ptr->py;
 				int px = p_ptr->px;
 			
-				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_BOOM;
+				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_BOOM | PROJECT_PLAY;
 				if (project(-2, 1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
 				break;
 			}
@@ -5725,10 +5737,30 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 	}
 
 	/* Process the flags that apply to equipment */
-	if (s_ptr->flags1 & (SF1_IDENT_SENSE)) obvious = TRUE;
 	if (s_ptr->flags1 & (SF1_IDENT_BONUS))
 	{
 		if (!ident_spell_bonus() && (*cancel)) return (TRUE);
+		*cancel = FALSE;
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags1 & (SF1_IDENT_SENSE))
+	{
+		if (!ident_spell_sense() && (*cancel)) return (TRUE);
+		*cancel = FALSE;
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags1 & (SF1_IDENT_RUNES))
+	{
+		if (!ident_spell_runes() && (*cancel)) return (TRUE);
+		*cancel = FALSE;
+		obvious = TRUE;
+	}
+
+	if (s_ptr->flags1 & (SF1_IDENT_VALUE))
+	{
+		if (!ident_spell_value() && (*cancel)) return (TRUE);
 		*cancel = FALSE;
 		obvious = TRUE;
 	}
@@ -5802,10 +5834,7 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 	if ((s_ptr->flags1 & (SF1_DETECT_CURSE)) && (detect_objects_cursed())) obvious = TRUE;
 	if ((s_ptr->flags1 & (SF1_DETECT_MONSTER)) && (detect_monsters_normal())) obvious = TRUE;
 	if ((s_ptr->flags1 & (SF1_DETECT_EVIL)) && (detect_monsters_evil())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_INVIS)) && (detect_monsters_invis())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_ANIMAL)) && (detect_monsters_animal())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_UNDEAD)) && (detect_monsters_undead())) obvious = TRUE;
-	if ((s_ptr->flags1 & (SF1_DETECT_DEMON)) && (detect_monsters_demon())) obvious = TRUE;
+	if ((s_ptr->flags1 & (SF1_DETECT_LIFE)) && (detect_monsters_living())) obvious = TRUE;
 
 	if (s_ptr->flags1 & (SF1_MAP_AREA))
 	{

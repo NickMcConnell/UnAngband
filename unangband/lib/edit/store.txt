@@ -131,6 +131,7 @@ O:91:3:1
 N:5:Alchemist
 O:99:22:0
 O:99:27:0
+O:70:77:3
 O:70:17:1
 O:70:18:1
 O:70:16:1
@@ -591,6 +592,7 @@ O:77:0:3
 O:39:0:2
 O:39:1:1
 O:70:8:3
+O:70:77:2
 
 #Service of Satisfy Hunger
 N:35:Inn of the Green Dragon
