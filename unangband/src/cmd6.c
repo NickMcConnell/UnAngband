@@ -1873,6 +1873,7 @@ void do_cmd_apply_rune_or_coating(void)
 	int i,ii;
 
 	int rune;
+	int tval, sval;
 
 	bool use_feat = FALSE;
 	bool brand_ammo = FALSE;
@@ -1977,8 +1978,18 @@ void do_cmd_apply_rune_or_coating(void)
 	}
 
 	/* Get rune */
-	if (o_ptr->tval == TV_RUNESTONE) rune = o_ptr->sval;
-	else rune = -1;
+	if (o_ptr->tval == TV_RUNESTONE)
+	{
+		rune = o_ptr->sval;
+		tval = -1;
+		sval = -1;
+	}
+	else
+	{
+		rune = -1;
+		tval = o_ptr->tval;
+		sval = o_ptr->tval;
+	}
 
 	/* Overwrite runes */
 	if ((j_ptr->xtra1 >= OBJECT_XTRA_MIN_RUNES)
@@ -2016,7 +2027,7 @@ void do_cmd_apply_rune_or_coating(void)
 		/* Hack -- handle deletion of item slot */
 		if ((inventory[item].number == 0)
 		   && (item < item2)
-			&& (item2 < INVEN_WIELD))
+			&& (item2 < INVEN_WIELD) && (item2 >= 0))
 		{
 			item2--;
 
@@ -2050,9 +2061,9 @@ void do_cmd_apply_rune_or_coating(void)
 	/* Hack -- split stack only if required. This is dangerous otherwise as we may
 	   be calling from a routine where we delete items later. XXX XXX */
 	/* Mega-hack -- we allow 20 arrows/bolts to be coated per application */
-	if ((o_ptr->number > 1) && ((!brand_ammo) || (o_ptr->number > 5)))
+	if ((j_ptr->number > 1) && ((!brand_ammo) || (j_ptr->number > 5)))
 	{
-		int qty = (brand_ammo) ? 20 : 1;
+		int qty = (brand_ammo) ? 5 : 1;
 		split = TRUE;
 
 		/* Get local object */
@@ -2089,52 +2100,36 @@ void do_cmd_apply_rune_or_coating(void)
 		j_ptr = i_ptr;
 	}
 
-	/* Decrease the item (in the pack) */
-	if (item2 >= 0)
-	{
-                /* Forget guessed information */
-                if (j_ptr->number == 1) inven_drop_flags(j_ptr);
-
-		inven_item_increase(item2, -1);
-		inven_item_optimize(item2);
-	}
-	/* Decrease the item (from the floor) */
-	else
-	{
-		floor_item_increase(0 - item2, -1);
-		floor_item_optimize(item2);
-	}
-
         /*
          * Forget about it
          * Previously 'not' flags may be added.
          * Previously 'can'/'may' flags may have been removed.
          */
-	i_ptr->ident &= ~(IDENT_MENTAL);
-        drop_all_flags(i_ptr);
+	j_ptr->ident &= ~(IDENT_MENTAL);
+        drop_all_flags(j_ptr);
 
 	/* Apply runestone */
-	if (o_ptr->tval == TV_RUNESTONE)
+	if (rune >= 0)
 	{
 		/* Apply runes */
-		if (i_ptr->xtra1 == OBJECT_XTRA_MIN_RUNES + rune)
+		if (j_ptr->xtra1 == OBJECT_XTRA_MIN_RUNES + rune)
 		{
-			i_ptr->xtra2++;
+			j_ptr->xtra2++;
 		}
-		else if ((i_ptr->name2) && (e_info[i_ptr->name2].runest == rune))
+		else if ((j_ptr->name2) && (e_info[j_ptr->name2].runest == rune))
 		{
-			i_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
-			i_ptr->xtra2 = e_info[i_ptr->name2].runesc + 1;
+			j_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
+			j_ptr->xtra2 = e_info[j_ptr->name2].runesc + 1;
 		}
-		else if (k_info[i_ptr->k_idx].runest == rune)
+		else if (k_info[j_ptr->k_idx].runest == rune)
 		{
-			i_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
-			i_ptr->xtra2 = k_info[i_ptr->k_idx].runesc + 1;
+			j_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
+			j_ptr->xtra2 = k_info[j_ptr->k_idx].runesc + 1;
 		}
 		else
 		{
-			i_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
-			i_ptr->xtra2 = 1;
+			j_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
+			j_ptr->xtra2 = 1;
 		}
 
 		/* Update bonuses */
@@ -2150,35 +2145,35 @@ void do_cmd_apply_rune_or_coating(void)
 		{
 			object_kind *k_ptr = &k_info[i];
 
-			if ((k_ptr->tval == i_ptr->tval) && (k_ptr->runest == rune) && (k_ptr->runesc == i_ptr->xtra2))
+			if ((k_ptr->tval == j_ptr->tval) && (k_ptr->runest == rune) && (k_ptr->runesc == j_ptr->xtra2))
 			{
 				msg_print("It glows brightly.");
 
 				/* Polymorph the item */
 				/* XXX We assume weight is the same ? */
-				object_prep(i_ptr, i);
+				object_prep(j_ptr, i);
 
 				/* Apply magic (allow artifacts) */
-				apply_magic(i_ptr, object_level, TRUE, FALSE, FALSE);
+				apply_magic(j_ptr, object_level, TRUE, FALSE, FALSE);
 
 				/* Add runes */
-				i_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
-				i_ptr->xtra2 = k_ptr->runesc;
+				j_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
+				j_ptr->xtra2 = k_ptr->runesc;
 
 				/* Remove special inscription, if any */
-				i_ptr->feeling = 0;
+				j_ptr->feeling = 0;
 
 				/* Hack -- Clear the "felt" flag */
-				i_ptr->ident &= ~(IDENT_SENSE);
+				j_ptr->ident &= ~(IDENT_SENSE);
 
 				/* Hack -- Clear the "bonus" flag */
-				i_ptr->ident &= ~(IDENT_BONUS);
+				j_ptr->ident &= ~(IDENT_BONUS);
 
 				/* Hack -- Clear the "store" flag */
-				i_ptr->ident &= ~(IDENT_STORE);
+				j_ptr->ident &= ~(IDENT_STORE);
 
 				/* Hack -- Clear the "known" flag */
-				i_ptr->ident &= ~(IDENT_KNOWN);
+				j_ptr->ident &= ~(IDENT_KNOWN);
 
 				break;
 			}
@@ -2188,87 +2183,87 @@ void do_cmd_apply_rune_or_coating(void)
 		{
 			ego_item_type *e_ptr = &e_info[i];
 
-			if ((e_ptr->runest == rune) && (e_ptr->runesc == i_ptr->xtra2))
+			if ((e_ptr->runest == rune) && (e_ptr->runesc == j_ptr->xtra2))
 			{
 				for (ii = 0;ii < 3; ii++)
 				{
-					if ((e_ptr->tval[ii] == i_ptr->tval)
-					 && (e_ptr->min_sval[ii]<= i_ptr->sval)
-					  && (e_ptr->max_sval[ii] >= i_ptr->sval))
+					if ((e_ptr->tval[ii] == j_ptr->tval)
+					 && (e_ptr->min_sval[ii]<= j_ptr->sval)
+					  && (e_ptr->max_sval[ii] >= j_ptr->sval))
 					{
 						msg_print("It glows brightly.");
 
 						/* Ego-ize the item */
-						i_ptr->name2 = i;
+						j_ptr->name2 = i;
 
 						/* Extra powers */
 						if (e_ptr->xtra)
 						{
-							i_ptr->xtra1 = e_ptr->xtra;
-							i_ptr->xtra2 = (byte)rand_int(object_xtra_size[e_ptr->xtra]);
+							j_ptr->xtra1 = e_ptr->xtra;
+							j_ptr->xtra2 = (byte)rand_int(object_xtra_size[e_ptr->xtra]);
 						}
 
 						/* Forget about it */
-						drop_all_flags(o_ptr);
+						drop_all_flags(j_ptr);
 
 						/* Hack -- acquire "broken" flag */
-						if (!e_ptr->cost) i_ptr->ident |= (IDENT_BROKEN);
+						if (!e_ptr->cost) j_ptr->ident |= (IDENT_BROKEN);
 
 						/* Hack -- acquire "cursed" flag */
-						if (e_ptr->flags3 & (TR3_LIGHT_CURSE)) i_ptr->ident |= (IDENT_CURSED);
+						if (e_ptr->flags3 & (TR3_LIGHT_CURSE)) j_ptr->ident |= (IDENT_CURSED);
 
 						/* Hack -- apply extra penalties if needed */
-						if (cursed_p(i_ptr) || broken_p(i_ptr))
+						if (cursed_p(j_ptr) || broken_p(j_ptr))
 						{
 							/* Hack -- obtain bonuses */
-							if (e_ptr->max_to_h > 0) i_ptr->to_h = MIN(i_ptr->to_h,-randint(e_ptr->max_to_h));
-							else i_ptr->to_h = MIN(i_ptr->to_h,0);
+							if (e_ptr->max_to_h > 0) j_ptr->to_h = MIN(j_ptr->to_h,-randint(e_ptr->max_to_h));
+							else j_ptr->to_h = MIN(j_ptr->to_h,0);
 
-							if (e_ptr->max_to_d > 0) i_ptr->to_d = MIN(i_ptr->to_d,-randint(e_ptr->max_to_d));
-							else i_ptr->to_d = MIN(i_ptr->to_d,0);
+							if (e_ptr->max_to_d > 0) j_ptr->to_d = MIN(j_ptr->to_d,-randint(e_ptr->max_to_d));
+							else j_ptr->to_d = MIN(j_ptr->to_d,0);
 
-							if (e_ptr->max_to_a > 0) i_ptr->to_a = MIN(i_ptr->to_a,-randint(e_ptr->max_to_a));
-							else i_ptr->to_a = MIN(i_ptr->to_a,0);
+							if (e_ptr->max_to_a > 0) j_ptr->to_a = MIN(j_ptr->to_a,-randint(e_ptr->max_to_a));
+							else j_ptr->to_a = MIN(j_ptr->to_a,0);
 
 							/* Hack -- obtain charges */
-							if (e_ptr->max_pval > 0) i_ptr->pval = MIN(i_ptr->pval,-randint(e_ptr->max_pval));
+							if (e_ptr->max_pval > 0) j_ptr->pval = MIN(j_ptr->pval,-randint(e_ptr->max_pval));
 						}
 
 						/* Hack -- apply extra bonuses if needed */
 						else
 						{
 							/* Hack -- obtain bonuses */
-							if (e_ptr->max_to_h > 0) i_ptr->to_h = MAX(i_ptr->to_h,randint(e_ptr->max_to_h));
-							else i_ptr->to_h = MIN(i_ptr->to_h,0);
+							if (e_ptr->max_to_h > 0) j_ptr->to_h = MAX(j_ptr->to_h,randint(e_ptr->max_to_h));
+							else j_ptr->to_h = MIN(j_ptr->to_h,0);
 
-							if (e_ptr->max_to_d > 0) i_ptr->to_d = MAX(i_ptr->to_d,randint(e_ptr->max_to_d));
-							else i_ptr->to_d = MIN(i_ptr->to_d,0);
+							if (e_ptr->max_to_d > 0) j_ptr->to_d = MAX(j_ptr->to_d,randint(e_ptr->max_to_d));
+							else j_ptr->to_d = MIN(j_ptr->to_d,0);
 
-							if (e_ptr->max_to_a > 0) i_ptr->to_a = MAX(i_ptr->to_a,randint(e_ptr->max_to_a));
-							else i_ptr->to_a = MIN(i_ptr->to_a,0);
+							if (e_ptr->max_to_a > 0) j_ptr->to_a = MAX(j_ptr->to_a,randint(e_ptr->max_to_a));
+							else j_ptr->to_a = MIN(j_ptr->to_a,0);
 
 							/* Hack -- obtain pval */
-							if (e_ptr->max_pval > 0) i_ptr->pval = MAX(1,MIN(i_ptr->pval,randint(e_ptr->max_pval)));
-							else i_ptr->pval = MIN(i_ptr->pval,0);
+							if (e_ptr->max_pval > 0) j_ptr->pval = MAX(1,MIN(j_ptr->pval,randint(e_ptr->max_pval)));
+							else j_ptr->pval = MIN(j_ptr->pval,0);
 						}
 
 						/* Remove special inscription, if any */
-						i_ptr->feeling = 0;
+						j_ptr->feeling = 0;
 
 						/* Hack -- Clear the "felt" flag */
-						i_ptr->ident &= ~(IDENT_SENSE);
+						j_ptr->ident &= ~(IDENT_SENSE);
 
 						/* Hack -- Clear the "bonus" flag */
-						i_ptr->ident &= ~(IDENT_BONUS);
+						j_ptr->ident &= ~(IDENT_BONUS);
 
 						/* Hack -- Clear the "known" flag */
-						i_ptr->ident &= ~(IDENT_KNOWN);
+						j_ptr->ident &= ~(IDENT_KNOWN);
 
 						/* Hack -- Clear the "store" flag */
-						i_ptr->ident &= ~(IDENT_STORE);
+						j_ptr->ident &= ~(IDENT_STORE);
 
 						/* Hack -- Clear the "known" flag */
-						i_ptr->ident &= ~(IDENT_KNOWN);
+						j_ptr->ident &= ~(IDENT_KNOWN);
 
 						break;
 					}
@@ -2279,17 +2274,17 @@ void do_cmd_apply_rune_or_coating(void)
 	/* Coat weapon */
 	else
 	{
-		int charges = i_ptr->charges * i_ptr->number + i_ptr->stackc;
+		int charges = j_ptr->charges * j_ptr->number + j_ptr->stackc;
 
 		/* This is a lot simpler */
-		i_ptr->xtra1 = o_ptr->tval;
-		i_ptr->xtra2 = o_ptr->sval;
+		j_ptr->xtra1 = tval;
+		j_ptr->xtra2 = sval;
 
 		/* Based on the weight, determine charges */
-		i_ptr->charges = (charges + 1000 / i_ptr->weight) / i_ptr->number;
-		i_ptr->stackc = (charges + 1000 / i_ptr->weight) % i_ptr->number;
+		j_ptr->charges = (charges + 1000 / j_ptr->weight) / j_ptr->number;
+		j_ptr->stackc = (charges + 1000 / j_ptr->weight) % j_ptr->number;
 
-		if (i_ptr->stackc) i_ptr->charges++;
+		if (j_ptr->stackc) j_ptr->charges++;
 	}
 
 	/* Need to carry the new object? */
@@ -2298,12 +2293,12 @@ void do_cmd_apply_rune_or_coating(void)
 		/* Carry the new item */
 		if (item2 >= 0)
 		{
-			item = inven_carry(i_ptr);
+			item = inven_carry(j_ptr);
 			inven_item_describe(item);
 		}
 		else
 		{
-			item = floor_carry(p_ptr->py,p_ptr->px,i_ptr);
+			item = floor_carry(p_ptr->py,p_ptr->px,j_ptr);
 			floor_item_describe(item);
 		}
 	}

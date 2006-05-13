@@ -2770,7 +2770,7 @@
 /*
  * Number of special inscriptions, plus one.
  */
-#define MAX_INSCRIP			43
+#define MAX_INSCRIP			44
 
 
 /*
@@ -2996,7 +2996,7 @@
 #define OBJECT_XTRA_MAX_HIDDEN 20
 
 #define OBJECT_XTRA_MIN_RUNES    36
-#define OBJECT_XTRA_MIN_COATS    75
+#define OBJECT_XTRA_MIN_COATS    70
 #define MAX_RUNE_FLAGS    4
 
 /* Total number of different slay types used */

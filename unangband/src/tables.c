@@ -2426,6 +2426,7 @@ const cptr inscrip_text[MAX_INSCRIP] =
 	"runed",
 	"average",
 	"valuable",
+	"unusual",
 	"potion-coated",
 	"spore-coated",
 	"oil-coated",
