@@ -1066,20 +1066,19 @@ static errr rd_extra(void)
 	/* Ignore old redundant info */
 	p_ptr->held_song=tmp8u;
 
-	strip_bytes(6); /* Was strip bytes(8) */
+	/* Read the timers */
+	rd_s16b(&p_ptr->msleep);
+	rd_s16b(&p_ptr->petrify);
+	rd_s16b(&p_ptr->stastis);
 	rd_s16b(&p_ptr->sc);
-	strip_bytes(2);
-
-	/* Read the flags */
+	rd_s16b(&p_ptr->cursed);
 	rd_s16b(&p_ptr->amnesia);
 	rd_s16b(&p_ptr->blind);
 	rd_s16b(&p_ptr->paralyzed);
 	rd_s16b(&p_ptr->confused);
 	rd_s16b(&p_ptr->food);
 	rd_s16b(&p_ptr->rest);
-	strip_bytes(2); /* Old "protection" */
-
-	/* Read more flags */
+	rd_s16b(&p_ptr->psleep);
 	rd_s16b(&p_ptr->energy);
 	rd_s16b(&p_ptr->fast);
 	rd_s16b(&p_ptr->slow);

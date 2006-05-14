@@ -470,6 +470,15 @@
 #define PY_REST_RATE    30
 
 /*
+ * Player "sleep" crucial values
+ */
+#define PY_SLEEP_MAX    	8000    /* Rest value (Maximum) */
+#define PY_SLEEP_RECOVER    	4000    /* Rest value (Recover) */
+#define PY_SLEEP_ASLEEP    	10    /* Rest value (Asleep) */
+#define PY_SLEEP_DROWSY   	5     /* Rest value (Drowsy) */
+
+
+/*
  * Player regeneration constants
  */
 #define PY_REGEN_NORMAL		197		/* Regen factor*2^16 when full */
@@ -820,6 +829,12 @@
 #define GF_BLIND_WEAK	105
 #define GF_RAISE_DEAD	106
 #define GF_GAIN_MANA	107
+#define GF_FORGET	108
+#define GF_CURSE	109
+#define GF_DISPEL	110
+#define GF_STASTIS	111
+#define GF_PETRIFY	112
+
 
 /*
  * Columns for the spell cost or damage flags
@@ -1348,43 +1363,43 @@
 #define SF3_EVIL  0x80000000
 
 
-#define DISEASE_LOSE_STR    0x00000001
-#define DISEASE_LOSE_INT 0x00000002
-#define DISEASE_LOSE_WIS  0x00000004
-#define DISEASE_LOSE_DEX 0x00000008
-#define DISEASE_LOSE_CON   0x00000010
-#define DISEASE_LOSE_CHR  0x00000020
-#define DISEASE_HUNGER     0x00000040
-#define DISEASE_THIRST       0x00000080
-#define DISEASE_CUT   0x00000100
-#define DISEASE_STUN  0x00000200
-#define DISEASE_POISON       0x00000400
-#define DISEASE_HALLUC       0x00000800
-#define DISEASE_SLOW  0x00001000
-#define DISEASE_BLIND 0x00002000
-#define DISEASE_CONFUSE      0x00004000
-#define DISEASE_FEAR  0x00008000
-#define DISEASE_PARALYZE     0x00010000
-#define DISEASE_DRAIN_HP 0x00020000
-#define DISEASE_DRAIN_MANA 0x00040000
-#define DISEASE_DRAIN_EXP  0x00080000
-#define DISEASE_XXX2 0x00100000
-#define DISEASE_XXX3 0x00200000
-#define DISEASE_XXX4       0x00400000
-#define DISEASE_XXX5       0x00800000
-#define DISEASE_XXX6    0x01000000
-#define DISEASE_XXX7    0x02000000
-#define DISEASE_DISEASE       0x04000000
-#define DISEASE_QUICK     0x08000000
-#define DISEASE_POWER     0x10000000
-#define DISEASE_LIGHT     0x20000000
-#define DISEASE_HEAVY     0x40000000
-#define DISEASE_PERMANENT    0x80000000
+#define DISEASE_LOSE_STR    	0x00000001
+#define DISEASE_LOSE_INT 	0x00000002
+#define DISEASE_LOSE_WIS  	0x00000004
+#define DISEASE_LOSE_DEX 	0x00000008
+#define DISEASE_LOSE_CON   	0x00000010
+#define DISEASE_LOSE_CHR  	0x00000020
+#define DISEASE_HUNGER     	0x00000040
+#define DISEASE_THIRST       	0x00000080
+#define DISEASE_CUT   		0x00000100
+#define DISEASE_STUN  		0x00000200
+#define DISEASE_POISON       	0x00000400
+#define DISEASE_HALLUC       	0x00000800
+#define DISEASE_SLOW  		0x00001000
+#define DISEASE_BLIND 		0x00002000
+#define DISEASE_CONFUSE      	0x00004000
+#define DISEASE_FEAR  		0x00008000
+#define DISEASE_AMNESIA		0x00010000
+#define DISEASE_CURSE		0x00020000
+#define DISEASE_SLEEP		0x00040000
+#define DISEASE_PETRIFY		0x00080000
+#define DISEASE_PARALYZE     	0x00100000
+#define DISEASE_STASTIS		0x00200000
+#define DISEASE_DISPEL    	0x00400000
+#define DISEASE_DRAIN_HP 	0x00800000
+#define DISEASE_DRAIN_MANA	0x01000000
+#define DISEASE_DRAIN_EXP	0x02000000
+#define DISEASE_DISEASE       	0x04000000
+#define DISEASE_QUICK     	0x08000000
+#define DISEASE_POWER     	0x10000000
+#define DISEASE_LIGHT     	0x20000000
+#define DISEASE_HEAVY     	0x40000000
+#define DISEASE_PERMANENT    	0x80000000
 
 /* Maximum number of disease flags that can randomly affect the player */
-#define DISEASE_BLOWS 0x0001FFFF
-#define DISEASE_TYPES_HEAVY 20
-#define DISEASE_TYPES 16
+#define DISEASE_BLOWS 0x007FFFFF
+#define DISEASE_TYPES_HEAVY 24
+#define DISEASE_TYPES 18
 
 #define SPELL_RECHARGE   1
 #define SPELL_IDENT_TVAL 2
@@ -2346,6 +2361,7 @@
 #define RBM_ARC_60	62
 #define RBM_FLASK	63
 #define RBM_TRAIL	64
+#define RBM_SHRIEK	65
 
 #define RBM_MAX_NORMAL  23
 #define RBM_MIN_RANGED  15
@@ -3186,7 +3202,7 @@
 #define RF4_BLOW_2         0x00000002  /* 2nd blow is ranged attack */
 #define RF4_BLOW_3         0x00000004  /* 3rd blow is ranged attack */
 #define RF4_BLOW_4         0x00000008  /* 4th blow is ranged attack */
-#define RF4_SHRIEK         0x00000010  /* Shriek for help */
+#define RF4_ADD_AMMO       0x00000010  /* Add ammunition */
 #define RF4_QUAKE          0x00000020  /* Earthquake */
 #define RF4_EXPLODE        0x00000040  /* Explode with radius 3 */
 #define RF4_AURA           0x00000080  /* Radiate aura with radius 2 */
@@ -3273,7 +3289,7 @@
 #define RF6_FORGET         0x00004000  /* Cause amnesia */
 #define RF6_DRAIN_MANA     0x00008000  /* Drain Mana */
 #define RF6_CURSE          0x00010000  /* Curse player */
-#define RF6_ADD_AMMO       0x00020000  /* Dispel player */
+#define RF6_DISPEL         0x00020000  /* Dispel player */
 #define RF6_MIND_BLAST     0x00040000  /* Blast Mind  */
 #define RF6_ILLUSION       0x00080000  /* Hallucinate player */
 #define RF6_WOUND          0x00100000  /* Cause Wounds */

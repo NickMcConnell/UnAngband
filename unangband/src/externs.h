@@ -379,7 +379,7 @@ extern void monster_race_track(int r_idx);
 extern void artifact_track(int a_idx);
 extern void object_kind_track(int k_idx);
 extern void object_actual_track(const object_type *j_ptr);
-extern void disturb(int stop_search, int unused_flag);
+extern void disturb(int stop_search, int wake_up);
 extern bool is_quest(int level);
 
 /* cmd1.c */
@@ -935,6 +935,10 @@ extern bool set_paralyzed(int v);
 extern bool set_image(int v);
 extern bool set_amnesia(int v);
 extern bool set_cursed(int v);
+extern bool set_petrify(int v);
+extern bool set_stastis(int v);
+extern bool set_msleep(int v);
+extern bool set_psleep(int v);
 extern cptr desc_stat_imp[];
 extern bool set_stat_inc_tim(int v, int i);
 extern cptr desc_stat_dec[];

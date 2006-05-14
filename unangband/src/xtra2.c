@@ -255,7 +255,7 @@ bool set_paralyzed(int v)
 	/* Shut */
 	else
 	{
-		if (p_ptr->paralyzed)
+		if ((p_ptr->paralyzed) && !(p_ptr->stastis) && !(p_ptr->petrify))
 		{
 			msg_print("You can move again.");
 			notice = TRUE;
@@ -339,7 +339,7 @@ bool set_image(int v)
 
 
 /*
- * Set "p_ptr->confused", notice observable changes
+ * Set "p_ptr->amnesia", notice observable changes
  */
 bool set_amnesia(int v)
 {
@@ -361,7 +361,7 @@ bool set_amnesia(int v)
 	/* Shut */
 	else
 	{
-		if (p_ptr->confused)
+		if (p_ptr->amnesia)
 		{
 			msg_print("You feel less forgetful now.");
 			notice = TRUE;
@@ -397,7 +397,7 @@ bool set_cursed(int v)
 	{
 		if (!p_ptr->cursed)
 		{
-			msg_print("You feel cursed!");
+			msg_print("You feel unlucky!");
 			notice = TRUE;
 		}
 	}
@@ -423,6 +423,249 @@ bool set_cursed(int v)
 
 	/* Recalculate bonuses */
 	p_ptr->update |= (PU_BONUS);
+
+	/* Handle stuff */
+	handle_stuff();
+
+	/* Result */
+	return (TRUE);
+}
+
+
+/*
+ * Set "p_ptr->msleep", notice observable changes
+ */
+bool set_msleep(int v)
+{
+	bool notice = FALSE;
+
+	/* Hack -- Force good values */
+	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
+
+	/* Open */
+	if (v)
+	{
+		if (!p_ptr->msleep)
+		{
+			msg_print("Your eyelids feel heavy.");
+			notice = TRUE;
+		}
+	}
+
+	/* Shut */
+	else
+	{
+		if ((p_ptr->msleep) && !(p_ptr->psleep))
+		{
+			msg_print("You no longer feel sleepy.");
+			notice = TRUE;
+		}
+	}
+
+	/* Use the value */
+	p_ptr->msleep = v;
+
+	/* Nothing to notice */
+	if (!notice) return (FALSE);
+
+	/* Disturb */
+	if (disturb_state) disturb(0, 0);
+
+	/* Result */
+	return (TRUE);
+}
+
+
+/*
+ * Set "p_ptr->psleep", notice observable changes
+ */
+bool set_psleep(int v)
+{
+	bool notice = FALSE;
+
+	/* Hack -- Force good values */
+	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
+
+	/* Hack -- Wake player when finished sleeping */
+	if (v >= PY_SLEEP_MAX) v = 0;
+
+	/* Open */
+	if (v)
+	{
+		if ((p_ptr->psleep < PY_SLEEP_RECOVER) && (v >= PY_SLEEP_RECOVER))
+		{
+			int i, choice = -1, count = 0;
+
+			for (i = 0; i < A_MAX; i++)
+			{
+				if ((p_ptr->stat_cur[i]<p_ptr->stat_max[i]) && (rand_int(++count))) choice = i;
+			}
+
+			if (choice >= 0)
+			{
+				p_ptr->stat_cur[choice]++;
+			}
+
+			/* notice = TRUE; */
+		}
+		else if ((p_ptr->psleep < PY_SLEEP_ASLEEP) && (v >= PY_SLEEP_ASLEEP))
+		{
+			msg_print("You fall asleep.");
+			notice = TRUE;
+		}
+		else if ((p_ptr->psleep < PY_SLEEP_DROWSY) && (v >= PY_SLEEP_DROWSY))
+		{
+			msg_print("You feel drowsy.");
+			/* notice = TRUE; */
+		}
+	}
+
+	/* Shut */
+	else
+	{
+		if (p_ptr->psleep)
+		{
+			msg_print("You wake up.");
+			notice = TRUE;
+		}
+	}
+
+	/* Use the value */
+	p_ptr->psleep = v;
+
+	/* Nothing to notice */
+	if (!notice) return (FALSE);
+
+	/* Fully update the visuals */
+	p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS);
+
+	/* Redraw map */
+	p_ptr->redraw |= (PR_MAP);
+
+	/* Window stuff */
+	p_ptr->window |= (PW_OVERHEAD);
+
+	/* Redraw state */
+	p_ptr->redraw |= (PR_STATE);
+
+	/* Disturb */
+	if (disturb_state) disturb(0, 0);
+
+	/* Handle stuff */
+	handle_stuff();
+
+	/* Result */
+	return (TRUE);
+}
+
+
+/*
+ * Set "p_ptr->petrify", notice observable changes
+ */
+bool set_petrify(int v)
+{
+	bool notice = FALSE;
+
+	/* Hack -- Force good values */
+	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
+
+	/* Open */
+	if (v)
+	{
+		if (!p_ptr->petrify)
+		{
+			msg_print("You are petrified to the spot!");
+			notice = TRUE;
+		}
+	}
+
+	/* Shut */
+	else
+	{
+		if ((p_ptr->petrify) && !(p_ptr->stastis) && !(p_ptr->paralyzed))
+		{
+			msg_print("You can move again.");
+			notice = TRUE;
+		}
+	}
+
+	/* Hack -- paralyze the player if over 100 */
+	if (v > 100)
+	{
+		p_ptr->petrify = 100;
+		set_paralyzed(p_ptr->petrify - 100 / 10);
+	}
+
+	/* Use the value */
+	else p_ptr->petrify = v;
+
+	/* Nothing to notice */
+	if (!notice) return (FALSE);
+
+	/* Disturb */
+	if (disturb_state) disturb(0, 0);
+
+	/* Redraw the state */
+	p_ptr->redraw |= (PR_STATE);
+
+	/* Handle stuff */
+	handle_stuff();
+
+	/* Result */
+	return (TRUE);
+}
+
+
+/*
+ * Set "p_ptr->stastis", notice observable changes
+ */
+bool set_stastis(int v)
+{
+	bool notice = FALSE;
+
+	/* Hack -- Force good values */
+	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
+
+	/* MegaHack -- alter reality if too high */
+	if (v > 100)
+	{
+		msg_print("You are thrown into an alternate reality!");
+		p_ptr->leaving = TRUE;
+		notice = TRUE;
+		v = 0;
+	}
+
+	/* Open */
+	if (v)
+	{
+		if (!p_ptr->stastis)
+		{
+			msg_print("You are stuck in a time-loop!");
+			notice = TRUE;
+		}
+	}
+
+	/* Shut */
+	else
+	{
+		if ((p_ptr->stastis) && !(p_ptr->paralyzed) && !(p_ptr->petrify))
+		{
+			msg_print("You can move again.");
+			notice = TRUE;
+		}
+	}
+
+	/* Use the value */
+	p_ptr->stastis = v;
+
+	/* Nothing to notice */
+	if (!notice) return (FALSE);
+
+	/* Disturb */
+	if (disturb_state) disturb(0, 0);
+
+	/* Redraw the state */
+	p_ptr->redraw |= (PR_STATE);
 
 	/* Handle stuff */
 	handle_stuff();
@@ -1881,8 +2124,8 @@ bool set_food(int v)
 	/* Nothing to notice */
 	if (!notice) return (FALSE);
 
-	/* Disturb */
-	if (disturb_state) disturb(0, 0);
+	/* Disturb - wake player if hungry */
+	if (disturb_state) disturb(0, new_aux <= 2 ? TRUE : FALSE);
 
 	/* Recalculate bonuses */
 	p_ptr->update |= (PU_BONUS);

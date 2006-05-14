@@ -549,8 +549,8 @@ void modify_grid_boring_view(byte *a, char *c, int y, int x, byte cinfo, byte pi
 		}
 	}
 
-	/* Handle "blind" */
-	else if (p_ptr->blind)
+	/* Handle "blind" or "asleep" */
+	else if ((p_ptr->blind) || (p_ptr->psleep >= PY_SLEEP_ASLEEP))
 	{
 		/* Mega-hack */
 		if (*a & 0x80)
@@ -612,8 +612,8 @@ void modify_grid_boring_view(byte *a, char *c, int y, int x, byte cinfo, byte pi
  */
 void modify_grid_unseen_view(byte *a, char *c)
 {
-	/* Handle "blind" and night time*/
-	if (p_ptr->blind  || !(((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))))
+	/* Handle "blind", "asleep" and night time*/
+	if ((p_ptr->blind) || (p_ptr->psleep >= PY_SLEEP_ASLEEP)  || !(((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))))
 	{
 		/* Mega-hack */
 		if (*a & 0x80)
@@ -673,8 +673,8 @@ void modify_grid_interesting_view(byte *a, char *c, int y, int x, byte cinfo, by
 		}
 	}
 
-	/* Handle "blind" */
-	else if (p_ptr->blind)
+	/* Handle "blind" or "asleep" */
+	else if ((p_ptr->blind) || (p_ptr->psleep >= PY_SLEEP_ASLEEP))
 	{
 		/* Mega-hack */
 		if (*a & 0x80)
@@ -4010,7 +4010,7 @@ void update_view(void)
 	/*** Step 3 -- Complete the algorithm ***/
 
 	/* Handle blindness */
-	if (p_ptr->blind)
+	if ((p_ptr->blind) || (p_ptr->psleep >= PY_SLEEP_ASLEEP))
 	{
 		/* Process "new" grids */
 		for (i = 0; i < fast_view_n; i++)
@@ -6374,15 +6374,12 @@ void monster_race_track(int r_idx)
  *
  * The first arg indicates a major disturbance, which affects search.
  *
- * The second arg is currently unused, but could induce output flush.
+ * The second arg indicates a major disturbance, which wakes the player.
  *
  * All disturbance cancels repeated commands, resting, and running.
  */
-void disturb(int stop_search, int unused_flag)
+void disturb(int stop_search, int wake_up)
 {
-	/* Unused parameter */
-	(void)unused_flag;
-
 	/* Cancel auto-commands */
 	/* p_ptr->command_new = 0; */
 
@@ -6437,6 +6434,16 @@ void disturb(int stop_search, int unused_flag)
 
 		/* Recalculate bonuses */
 		p_ptr->update |= (PU_BONUS);
+
+		/* Redraw the state */
+		p_ptr->redraw |= (PR_STATE);
+	}
+
+	/* Wake the player if requested */
+	if (wake_up && p_ptr->psleep)
+	{
+		/* Cancel */
+		set_psleep(0);
 
 		/* Redraw the state */
 		p_ptr->redraw |= (PR_STATE);

@@ -1219,6 +1219,12 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 			case GF_BLIND_WEAK:		q = "blind"; break;
 			case GF_RAISE_DEAD: q = "raise dead"; break;
 			case GF_GAIN_MANA:	q = "add"; s= "mana to"; break;
+			case GF_FORGET:		q = "forget"; break;
+			case GF_CURSE:		q = "curse"; break;
+			case GF_DISPEL:		q = "remove"; s = "enchantments from"; break;
+			case GF_STASTIS:	q = "trap"; u= "in time loops"; break;
+			case GF_PETRIFY:	q = "petrify"; break;
+
 
 			/* Hack -- handle features */
 			case GF_FEATURE:

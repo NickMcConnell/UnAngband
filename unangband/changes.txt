@@ -40,6 +40,15 @@ attack.
 - Improved utility of low powered detection spells. Added Sense Magic scrolls.
 (From Sangband).
 
+- Added additional effects: Petrify which prevents you from moving and event-
+ually paralyzes you, which requires resist shards to resist; Stastis which
+prevents you from acting, but protects you from any attacks; Dispel which
+removes all enchantments from you and monsters; Sleep which causes you to
+become drowsy and then fall asleep, preventing you from acting and making you
+blind, but removed if you take any damage.
+
+- You can now sleep to recover damaged stats. This takes quite a while.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

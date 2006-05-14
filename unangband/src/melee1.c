@@ -394,6 +394,13 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 			break;
 		}
 
+		case RBM_SHRIEK:
+		{
+			prefix = "shrieks horribly";
+			strcpy(t_name, "");
+			break;
+		}
+
 		case RBM_SPORE:
 		{
 			prefix = "releases a cloud of spores";
@@ -536,11 +543,15 @@ bool make_attack_normal(int m_idx)
 
 	char ddesc[80];
 
-	bool blinked;
+	bool blinked = FALSE;
 
+	bool shrieked = FALSE;
 
 	/* Not allowed to attack */
 	if (r_ptr->flags1 & (RF1_NEVER_BLOW)) return (FALSE);
+
+	/* Player in stastis */
+	if (p_ptr->stastis) return (FALSE);
 
 
 	/* Total armor */
@@ -556,9 +567,6 @@ bool make_attack_normal(int m_idx)
 	/* Get the "died from" information (i.e. "a goblin") */
 	monster_desc(ddesc, m_ptr, 0x88);
 
-
-	/* Assume no blink */
-	blinked = FALSE;
 
 	/* Scan through all four blows */
 	for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
@@ -624,6 +632,9 @@ bool make_attack_normal(int m_idx)
 			case RBM_LASH:
 				touched = TRUE;
 				break;
+			case RBM_SHRIEK:
+				shrieked = TRUE;
+				break;
 		}
 
 		/* Monster hits player */
@@ -681,11 +692,15 @@ bool make_attack_normal(int m_idx)
 			/* Player armor reduces total damage */
 			damage -= (damage * ((p_ptr->ac + p_ptr->to_a < 150) ? p_ptr->ac + p_ptr->to_a: 150) / 250);
 
-
 			if (effect)
 			{
 				/* New result routine */
-				(void)project_p(m_idx, 0, p_ptr->py, p_ptr->px, damage, effect);
+				if (project_p(m_idx, 0, p_ptr->py, p_ptr->px, damage, effect))
+				{
+					obvious = TRUE;
+
+					if ((effect == GF_EAT_ITEM) || (effect == GF_EAT_GOLD)) blinked = TRUE;
+				}
 			}
 			else
 			{
@@ -796,6 +811,11 @@ bool make_attack_normal(int m_idx)
 		teleport_away(m_idx, MAX_SIGHT * 2 + 5);
 	}
 
+	/* Shriek */
+	if (shrieked)
+	{
+		aggravate_monsters(m_idx);
+	}
 
 	/* Always notice cause of death */
 	if (p_ptr->is_dead && (l_ptr->deaths < MAX_SHORT))
@@ -1624,16 +1644,17 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (dam) switch (method)
 			{
 				case RBM_SPIT:	mon_shot(who, y, x, effect, dam, hit, result); break;
-				case RBM_GAZE:	msg_print(result);(void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
-				case RBM_WAIL: msg_print(result);(void)project(0, 4, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
+				case RBM_GAZE:	msg_print(result);(void)project(who, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
+				case RBM_WAIL: msg_print(result);(void)project(who, 4, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
+				case RBM_SHRIEK: msg_print(result); (void)project(who, 6, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_ARC | PROJECT_HIDE, 20, 20); aggravate_monsters(who); break;
 				case RBM_SPORE:	mon_ball(who, y, x, effect, dam, 1, hit, result); break;
 				case RBM_LASH:  mon_beam(who, y, x, effect, dam, 2, result); break;
-				case RBM_BEG:	msg_print(result);(void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
-				case RBM_INSULT: msg_print(result);(void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
-				case RBM_SING:  msg_print(result);(void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
-				case RBM_TRAP:  msg_print(result);(void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
+				case RBM_BEG:	msg_print(result);(void)project(who, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
+				case RBM_INSULT: msg_print(result);(void)project(who, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
+				case RBM_SING:  msg_print(result);(void)project(who, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
+				case RBM_TRAP:  msg_print(result);(void)project(who, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_BOULDER: mon_shot(who, y, x, effect, dam, hit, result); break;
-				case RBM_AURA:	msg_print(result);(void)project(0, 2, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_CLOUD, 0, 0);  break;
+				case RBM_AURA:	msg_print(result);(void)project(who, 2, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_CLOUD, 0, 0);  break;
 				case RBM_SELF:	msg_print(result);(void)project(0, 0, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_DIRECT, 0, 0); break;
 				case RBM_ADJACENT: msg_print(result);(void)project(0, (rlev / 10) + 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
 				case RBM_HANDS: mon_beam(who, y, x, effect, dam, 3, result); break;
@@ -1647,15 +1668,15 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_CLOUD: mon_ball(who, y, x, effect, dam, 3, TRUE, result); break;
 				case RBM_STORM: mon_ball(who, y, x, effect, dam, 3, TRUE, result); break;
 				case RBM_BREATH: mon_arc(who, y, x, effect, MIN(dam, m_ptr->hp / d_side), 0, (powerful ? 40 : 20), result); break;
-				case RBM_AREA: (void)project(0, (rlev / 10) + 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
+				case RBM_AREA: (void)project(who, (rlev / 10) + 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
 				case RBM_LOS: (void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_LINE: mon_beam(who, y, x, effect, dam, 8, result); break;
-				case RBM_AIM: (void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
+				case RBM_AIM: (void)project(who, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_ORB: mon_ball(who, y, x, effect, dam, 2, TRUE, result); break;
 				case RBM_STAR: mon_beam(who, y, x, effect, dam, 10, result); break;
 				case RBM_SPHERE: mon_ball(who, y, x, effect, dam, 4, TRUE, result); break;
-				case RBM_PANEL: (void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT | PROJECT_WALL, 0, 0);  break;
-				case RBM_LEVEL: (void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT | PROJECT_WALL, 0, 0);  break;
+				case RBM_PANEL: (void)project(who, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT | PROJECT_WALL, 0, 0);  break;
+				case RBM_LEVEL: (void)project(who, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT | PROJECT_WALL, 0, 0);  break;
 				case RBM_CROSS: mon_beam(who, y, x, effect, dam, 10, result); break;
 				case RBM_STRIKE: mon_ball(who, y, x, effect, dam, 1, TRUE, result); break;
 				case RBM_EXPLODE: (void)project(0, 2, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, damroll(5,8), GF_EXPLODE, FLG_MON_BALL, 0, 0); break;
@@ -1711,7 +1732,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				}
 
 				/* Apply the cut */
-				if (k) (void)set_cut(p_ptr->cut + k);
+				if ((k) && !(p_ptr->stastis)) (void)set_cut(p_ptr->cut + k);
 			}
 
 			/* Handle stun */
@@ -1736,7 +1757,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				}
 
 				/* Apply the stun */
-				if (k) (void)set_stun(p_ptr->stun ? p_ptr->stun + randint(MIN(k,10)) : k);
+				if ((k) && !(p_ptr->stastis)) (void)set_stun(p_ptr->stun ? p_ptr->stun + randint(MIN(k,10)) : k);
 			}
 			break;
 		}
@@ -1754,7 +1775,33 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			aggravate_monsters(who);
 			break;
 		}
+#if 0
+		/* RF6_ADD_AMMO */
+		case 96+4:
+		{
+			int ammo = 0;
+			if (target <= 0) break;
+			if (who <= 0) break;
 
+			/* Grow ammunition */
+			ammo = find_monster_ammo(who, -1, TRUE);
+
+			if (ammo)
+			{
+				switch(o_list[ammo].tval)
+				{
+					case TV_EGG: msg_format("%^s grows more spores.", m_name); break;
+					case TV_JUNK: msg_format("%^s grows more rocks.", m_name); break;
+					case TV_ARROW: msg_format("%^s grows more arrows.", m_name); break;
+					case TV_BOLT: msg_format("%^s grows more bolts.", m_name); break;
+					case TV_SPIKE: msg_format("%^s grows more spikes.", m_name); break;
+					case TV_POLEARM: msg_format("%^s grows more darts.", m_name); break;
+					case TV_SHOT: msg_format("%^s grows more shots.", m_name); break;
+				}
+			}
+			break;
+		}
+#endif
 		/* RF4_QUAKE --- Earthquake */
 		case 96+5:
 		{
@@ -2878,8 +2925,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			}
 			else if (target < 0)
 			{
-				if (p_ptr->fast) set_fast(p_ptr->fast + rand_int(rlev/3));
-
+				if (p_ptr->stastis) /* No effect */ ; 
+				else if (p_ptr->fast) set_fast(p_ptr->fast + rand_int(rlev/3));
 				else set_fast(p_ptr->fast + rlev);
 			}
 
@@ -2918,7 +2965,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			else if (target < 0)
 			{
 				/* Player mana is worth more */
-				if (p_ptr->csp < p_ptr->msp)
+				if (p_ptr->stastis) /* No effect */ ; 
+				else if (p_ptr->csp < p_ptr->msp)
 				{
 					p_ptr->csp = p_ptr->csp + damroll((spower / 15) + 1,5);
 					if (p_ptr->csp >= p_ptr->msp)
@@ -3026,7 +3074,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			else if (target < 0)
 			{
 				/* We regain lost hitpoints */
-				hp_player(damroll(spower, 8));
+				if (!p_ptr->stastis) hp_player(damroll(spower, 8));
 
 				/* Lose some mana (high-level monsters are more efficient) */
 				cost = 1 + spower * 3 / (5 + 2 * rlev / 5);
@@ -3134,7 +3182,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				k = 0;
 
 				/* Hack -- always cure paralyzation first */
-				if (p_ptr->paralyzed)
+				if ((p_ptr->paralyzed) && !(p_ptr->stastis))
 				{
 					set_paralyzed(0);
 					break;
@@ -3162,8 +3210,11 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					if (p_ptr->exp < p_ptr->max_exp) k++;
 				}
 
+				/* Stastis */
+				if (p_ptr->stastis) /* No effect */ ; 
+
 				/* Pick a random ailment */
-				if (k)
+				else if (k)
 				{
 					/* Check what to restore - note paranoia checks */
 					if ((p_ptr->cut) && (k) && (rand_int(k--))) { set_cut(0); set_stun(0); }
@@ -3541,7 +3592,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			msg_format("%^s tries to blank your mind.", m_name);
 
-			if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
+			if (p_ptr->stastis) /* No effect */ ; 
+			else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
 			{
 				msg_print("You resist the effects!");
 			}
@@ -3564,7 +3616,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (!direct) break;
 			if (target == 0) break;
 
-			if ((target < 0) && (p_ptr->csp))
+			if ((target < 0) && (p_ptr->csp) && !(p_ptr->stastis))
 			{
 				/* Disturb if legal */
 				disturb(1, 0);
@@ -3651,47 +3703,27 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if ((blind) && (known)) msg_format("%^s curses %s.", m_name, t_name);
 			else msg_format("%^s points at %s and curses.", m_name, t_poss);
 
-			if (target < 0)
-			{
-				if (p_ptr->blessed)
-				{
-					msg_print("The gods protect you.");
-				}
-				else
-				{
-					(void)set_cursed(p_ptr->cursed + rlev / 8 + 4 + rand_int(4));
-				}
-			}
-			else if (target > 0)
-			{
-				/* No effect yet */
-			}
+			(void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, get_dam(spower, attack), GF_CURSE, FLG_MON_DIRECT, 0, 0);
+
 			break;
 		}
 
-		/* RF6_ADD_AMMO */
+		/* RF6_DISPEL */
 		case 160+17:
 		{
-			int ammo = 0;
-			if (target <= 0) break;
-			if (who <= 0) break;
-
-			/* Grow ammunition */
-			ammo = find_monster_ammo(who, -1, TRUE);
-
-			if (ammo)
+			if (!direct) break;
+			if (target < 0) disturb(1, 0);
+			if ((who > 0) && (!seen))
 			{
-				switch(o_list[ammo].tval)
-				{
-					case TV_EGG: msg_format("%^s grows more spores.", m_name); break;
-					case TV_JUNK: msg_format("%^s grows more rocks.", m_name); break;
-					case TV_ARROW: msg_format("%^s grows more arrows.", m_name); break;
-					case TV_BOLT: msg_format("%^s grows more bolts.", m_name); break;
-					case TV_SPIKE: msg_format("%^s grows more spikes.", m_name); break;
-					case TV_POLEARM: msg_format("%^s grows more darts.", m_name); break;
-					case TV_SHOT: msg_format("%^s grows more shots.", m_name); break;
-				}
+				if (target < 0) msg_print("There is a static feeling in the air.");
 			}
+			else if (who > 0)
+			{
+				msg_format("%^s dispels %s magic.", m_name, t_poss);
+			}
+
+			(void)project(0, 0, m_ptr->fy, m_ptr->fx, y, x, rlev, GF_DISPEL, FLG_MON_DIRECT, 0, 0);
+
 			break;
 		}
 
@@ -3710,7 +3742,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			}
 
 
-			if (target < 0)
+			if ((target < 0) && !(p_ptr->stastis))
 			{
 				if (rand_int(100) < p_ptr->skill_sav)
 				{
@@ -3763,7 +3795,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else if (known) msg_format("%^s casts a deceptive illusion at %s.",m_name,t_name);
 			}
 
-			if (target < 0)
+			if ((target < 0) && !(p_ptr->stastis))
 			{
 				if (p_ptr->cur_flags2 & (TR2_RES_CHAOS))
 				{
@@ -3850,7 +3882,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				k = 5;
 			}
 
-			if (target < 0)
+			if ((target < 0) && !(p_ptr->stastis))
 			{
 				if (rand_int(rlev / 2 + 70) < p_ptr->skill_sav)
 				{
@@ -3939,7 +3971,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Add to the monster bless counter */
 				n_ptr->bless += n_ptr->bless + rlev + rand_int(rlev);
 			}
-			else if (target < 0)
+			else if ((target < 0) && !(p_ptr->stastis))
 			{
 				/* Set blessing */
 				set_blessed(p_ptr->blessed + rlev);
@@ -3982,7 +4014,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Add to the monster haste counter */
 				n_ptr->beserk += n_ptr->beserk + rlev + rand_int(rlev);
 			}
-			else if (target < 0)
+			else if ((target < 0) && !(p_ptr->stastis))
 			{
 				/* Set blessing */
 				set_shero(p_ptr->shero + rlev);
@@ -4025,7 +4057,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Add to the monster shield counter */
 				n_ptr->shield += n_ptr->shield + rlev + rand_int(rlev);
 			}
-			else if (target < 0)
+			else if ((target < 0) && !(p_ptr->stastis))
 			{
 				/* Set blessing */
 				set_shield(p_ptr->shield + rlev);
@@ -4068,7 +4100,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Add to the monster haste counter */
 				n_ptr->oppose_elem += n_ptr->oppose_elem + rlev + rand_int(rlev);
 			}
-			else if (target < 0)
+			else if ((target < 0) && !(p_ptr->stastis))
 			{
 				/* Set opposition */
 				set_oppose_acid(p_ptr->oppose_acid + rlev);
@@ -4090,7 +4122,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (blind) msg_print("You are commanded to feel hungry.");
 			else msg_format("%^s gestures at you, and commands that you feel hungry.", m_name);
 
-			if (rand_int(rlev / 2 + 70) > p_ptr->skill_sav)
+			if (p_ptr->stastis) /* No effect */;
+			else if (rand_int(rlev / 2 + 70) > p_ptr->skill_sav)
 			{
 				/* Reduce food abruptly.  */
 				(void)set_food(p_ptr->food - (p_ptr->food/4));
@@ -4133,7 +4166,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else if (known) msg_format("%^s casts a fearful illusion at %s.",m_name,t_name);
 			}
 
-			if (target < 0)
+			if ((target < 0) && !(p_ptr->stastis))
 			{
 				if ((p_ptr->cur_flags2 & (TR2_RES_FEAR)) != 0)
 				{
@@ -4180,7 +4213,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else if (known) msg_format("%^s casts a spell, burning %s eyes.", m_name, t_poss);
 			}
 
-			if (target < 0)
+			if ((target < 0) && !(p_ptr->stastis))
 			{
 				if ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) != 0)
 				{
@@ -4229,7 +4262,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else if (known) msg_format("%^s creates a mesmerising illusion for %s.", m_name, t_poss);
 			}
 
-			if (target < 0)
+			if ((target < 0) && !(p_ptr->stastis))
 			{
 				if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) != 0)
 				{
@@ -4277,7 +4310,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else if (known) msg_format("%^s drains power from %s muscles.", m_name, t_poss);
 			}
 
-			if (target < 0)
+			if ((target < 0) && !(p_ptr->stastis))
 			{
 				if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0)
 				{
@@ -4324,7 +4357,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else if (known) msg_format("%^s stares deeply into %s muscles.", m_name, t_poss);
 			}
 
-			if (target < 0)
+			if ((target < 0) && !(p_ptr->stastis))
 			{
 				if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0)
 				{

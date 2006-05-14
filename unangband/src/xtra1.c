@@ -616,8 +616,18 @@ static void prt_state(void)
 	/* Hack -- handle some other stuff here. Don't change attr, so we inherit it from above. */
 	if (p_ptr->searching) strcpy(text, "Searching ");
 	if (p_ptr->held_song) strcpy(text, "Singing   ");
-	if (p_ptr->blocking) strcpy(text,  "Blocking  ");
-	if (p_ptr->dodging) strcpy(text,   "Dodging   ");
+	if (p_ptr->blocking)  strcpy(text, "Blocking  ");
+	if (p_ptr->dodging)   strcpy(text, "Dodging   ");
+	if (p_ptr->msleep)    strcpy(text, "Sleepy    ");
+	if (p_ptr->psleep)    strcpy(text, "Drowsy    ");
+
+	/* Asleep - attr and text always overrides */
+	if (p_ptr->psleep >= PY_SLEEP_ASLEEP)
+	{
+		attr = TERM_L_BLUE;
+
+		strcpy(text, "Asleep    ");
+	}
 
 	/* Paralysis - attr and text always overrides */
 	if (p_ptr->paralyzed)

@@ -1036,7 +1036,7 @@ void take_hit(int dam, cptr kb_str)
 
 
 	/* Disturb */
-	disturb(1, 0);
+	disturb(1, 1);
 
 	/* Mega-Hack -- Apply "invulnerability" */
 	if (p_ptr->invuln && (dam < 9000)) return;
@@ -6141,7 +6141,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 				if ((seen) && !(l_ptr->flags9 & (RF9_RES_BLIND)))
 				{
 					note = " cannot be blinded.";
-					l_ptr->flags9 |= (RF9_NO_SLOW);
+					l_ptr->flags9 |= (RF9_RES_BLIND);
 				}
 			}
 
@@ -6161,7 +6161,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 				}
 			}
 
-			/* Normal monsters slow down */
+			/* Normal monsters are blinded */
 			else
 			{
 				/* Blind */
@@ -6173,7 +6173,59 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
-		/* Default */
+		/* Monster forgets things */
+		case GF_FORGET:
+		{
+			/* Powerful monsters can resist */
+			if (monster_save(m_ptr, dam, &near))
+			{
+				if ((near) && (seen))
+				{
+					note = " appears absent-minded.";
+					m_ptr->ty = 0;
+					m_ptr->tx = 0;
+				}
+				else
+				{
+					if (seen) note = " is unaffected!";
+
+					obvious = FALSE;
+				}
+			}
+
+			/* Monster forgets stuff */
+			else
+			{
+				m_ptr->ty = 0;
+				m_ptr->tx = 0;
+				m_ptr->mflag &= ~(MFLAG_HIT_BLOW | MFLAG_HIT_RANGE | MFLAG_AGGR);
+				m_ptr->smart = 0L;
+			}
+
+			/* No "real" damage */
+			dam = 0;
+			break;
+		}
+
+		/* Monster stripped of enchantments */
+		case GF_DISPEL:
+		{
+			/* Monster abilities removed the next round*/
+			if (m_ptr->slowed) m_ptr->slowed = 1;
+			if (m_ptr->hasted) m_ptr->hasted = 1;
+			if (m_ptr->tim_invis) m_ptr->tim_invis = 1;
+			if (m_ptr->tim_passw) m_ptr->tim_passw = 1;
+			if (m_ptr->bless) m_ptr->bless = 1;
+			if (m_ptr->beserk) m_ptr->beserk = 1;
+			if (m_ptr->shield) m_ptr->shield = 1;
+			if (m_ptr->oppose_elem) m_ptr->oppose_elem = 1;
+
+			/* No "real" damage */
+			dam = 0;
+			break;
+		}
+
+ 		/* Default */
 		default:
 		{
 			/* Irrelevant */
@@ -6646,6 +6698,9 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 
 	/* Never affect projector */
 	if (cave_m_idx[y][x] == who) return (FALSE);
+
+	/* Never affect player in stastis */
+	if (p_ptr->stastis) return (FALSE);
 
 	/* Limit maximum damage XXX XXX XXX */
 	if (dam > 1600) dam = 1600;
@@ -8143,6 +8198,230 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Sleep (Use "dam" as "power") */
+		case GF_SLEEP:
+		{
+			/* Increase "paralyzed" */
+			if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0)
+			{
+				/* Always notice */
+				player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+
+				msg_print("You are unaffected!");
+				obvious = TRUE;
+			}
+			else if (rand_int(100) < p_ptr->skill_sav)
+			{
+				/* Always notice */
+				player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+
+				msg_print("You resist the effects!");
+				obvious = TRUE;
+			}
+			else if (p_ptr->msleep)
+			{
+				/* Inflict disease */
+				if (randint(400) < dam)
+				{
+					/* Serious affliction */
+					if (dam > 150)
+					{
+						if (p_ptr->disease == (DISEASE_SLEEP | DISEASE_LIGHT)) p_ptr->disease = 0;
+						p_ptr->disease |= (DISEASE_SLEEP);
+					}
+					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
+					{
+						p_ptr->disease |= (DISEASE_SLEEP | DISEASE_LIGHT);
+					}
+				}
+
+				/* Inflict sleepiness */
+				if (set_msleep(p_ptr->msleep + dam))
+				{
+					obvious = TRUE;
+				}
+			}
+			else
+			{
+				/* Always notice */
+				player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+
+				/* Inflict sleepiness */
+				if (set_msleep(dam))
+				{
+					obvious = TRUE;
+				}
+			}
+
+			break;
+		}
+
+		/* Curse */
+		case GF_CURSE:
+		{
+			int k = randint((dam / 3) + 2);
+
+			/* Take damage */
+			take_hit(dam, killer);
+
+			/* Blessing protects */
+			if (p_ptr->blessed)
+			{
+				msg_print("The gods protect you.");
+			}
+			else if (rand_int(100) < p_ptr->skill_sav)
+			{
+				msg_print("You resist the effects!");
+				obvious = TRUE;
+			}
+			else if (p_ptr->cursed)
+			{
+				/* Inflict disease */
+				if (randint(400) < dam)
+				{
+					/* Serious affliction */
+					if (dam > 150)
+					{
+						if (p_ptr->disease == (DISEASE_CURSE | DISEASE_LIGHT)) p_ptr->disease = 0;
+						p_ptr->disease |= (DISEASE_CURSE);
+					}
+					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
+					{
+						p_ptr->disease |= (DISEASE_CURSE | DISEASE_LIGHT);
+					}
+				}
+
+				/* Inflict curse */
+				if (set_cursed(p_ptr->cursed + k))
+				{
+					obvious = TRUE;
+				}
+			}
+			else
+			{
+				/* Inflict curse */
+				if (set_cursed(k))
+				{
+					obvious = TRUE;
+				}
+			}
+
+			break;
+		}
+
+		/* Make the player temporarily forgetful */
+		case GF_FORGET:
+		{
+			int k = randint((dam / 3) + 2);
+
+			/* Take damage */
+			take_hit(dam, killer);
+
+			/* Only save protects */
+			if (rand_int(100) < p_ptr->skill_sav)
+			{
+				msg_print("You resist the effects!");
+				obvious = TRUE;
+			}
+			else if (p_ptr->amnesia)
+			{
+				/* Inflict disease */
+				if (randint(400) < dam)
+				{
+					/* Serious affliction */
+					if (dam > 150)
+					{
+						if (p_ptr->disease == (DISEASE_AMNESIA | DISEASE_LIGHT)) p_ptr->disease = 0;
+						p_ptr->disease |= (DISEASE_AMNESIA);
+					}
+					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
+					{
+						p_ptr->disease |= (DISEASE_AMNESIA | DISEASE_LIGHT);
+					}
+				}
+
+				/* Inflict amnesia */
+				if (set_amnesia(k))
+				{
+					obvious = TRUE;
+				}
+			}
+			else
+			{
+				/* Inflict amnesia */
+				if (set_amnesia(k))
+				{
+					obvious = TRUE;
+				}
+			}
+
+			break;
+		}
+
+		/* Petrification */
+		case GF_PETRIFY:
+		{
+			int k = randint((dam / 3) + 2);
+
+			/* Take damage */
+			take_hit(dam, killer);
+
+			/* Increase "petrification" */
+			if ((p_ptr->cur_flags2 & (TR2_RES_SHARD)) != 0)
+			{
+				/* Always notice */
+				player_can_flags(who, 0x0L,TR2_RES_SHARD,0x0L,0x0L);
+
+				msg_print("You are unaffected!");
+				obvious = TRUE;
+			}
+			else if (rand_int(100) < p_ptr->skill_sav)
+			{
+				/* Always notice */
+				player_not_flags(who, 0x0L,TR2_RES_SHARD,0x0L,0x0L);
+
+				msg_print("You resist the effects!");
+				obvious = TRUE;
+			}
+			else if (p_ptr->petrify)
+			{
+				/* Inflict disease */
+				if (randint(200) < dam)
+				{
+					/* Serious affliction */
+					if (dam > 100)
+					{
+						if (p_ptr->disease == (DISEASE_PETRIFY | DISEASE_LIGHT)) p_ptr->disease = 0;
+						p_ptr->disease |= (DISEASE_PETRIFY);
+					}
+					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
+					{
+						p_ptr->disease |= (DISEASE_PETRIFY | DISEASE_LIGHT);
+					}
+				}
+
+				/* Inflict petrification */
+				if (set_petrify(p_ptr->petrify + k))
+				{
+					obvious = TRUE;
+				}
+			}
+			else
+			{
+				/* Always notice */
+				player_not_flags(who, 0x0L,TR2_RES_SHARD,0x0L,0x0L);
+
+				/* Inflict petrification */
+				if (set_petrify(k))
+				{
+					obvious = TRUE;
+				}
+			}
+
+			break;
+		}
+
+		/* Paralyze */
 		case GF_PARALYZE:
 		{
 			/* Hack -- Prevent perma-paralysis via damage */
@@ -8194,6 +8473,52 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 
 				/* Inflict paralyzation */
 				if (set_paralyzed(k))
+				{
+					obvious = TRUE;
+				}
+			}
+
+			break;
+		}
+
+		/* Stastis */
+		case GF_STASTIS:
+		{
+			/* Hack -- Prevent perma-paralysis via damage */
+			if (p_ptr->stastis && (dam < 1)) dam = 1;
+
+			/* Take damage */
+			take_hit(dam, killer);
+
+			/* Only save protects */
+			if (rand_int(100) < p_ptr->skill_sav)
+			{
+				msg_print("You resist the effects!");
+				obvious = TRUE;
+			}
+			else if (p_ptr->stastis)
+			{
+				/* Inflict disease */
+				if (randint(400) < dam)
+				{
+					/* Serious affliction */
+					if (dam > 250)
+					{
+						if (p_ptr->disease == (DISEASE_STASTIS | DISEASE_LIGHT)) p_ptr->disease = 0;
+						p_ptr->disease |= (DISEASE_STASTIS);
+					}
+					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
+					{
+						p_ptr->disease |= (DISEASE_STASTIS | DISEASE_LIGHT);
+					}
+				}
+			}
+			else
+			{
+				int k = randint((dam / 3) + 2);
+
+				/* Inflict stastis */
+				if (set_stastis(k))
 				{
 					obvious = TRUE;
 				}
@@ -8878,6 +9203,9 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		{
 			int drain;
 
+			/* Take damage */
+			take_hit(dam, killer);
+
 			/* Damage (mana) */
 			if (p_ptr->csp)
 			{
@@ -9016,6 +9344,104 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 
 				/* Probe worked */
 				obvious = TRUE;
+			}
+
+			break;
+		}
+
+		/* Remove enchantments from the player */
+		case GF_DISPEL:
+		{
+			dam = 0;
+
+			msg_print("You have been stripped of enchantments!");
+
+			/* Hack -- give player one round to react */
+			if (p_ptr->fast) set_fast(1);
+			if (p_ptr->slow) set_slow(1);
+			if (p_ptr->stastis) set_stastis(1);
+
+			if (p_ptr->protevil) set_protevil(1);
+			if (p_ptr->invuln) set_invuln(1);
+			if (p_ptr->hero) set_hero(1);
+			if (p_ptr->shero) set_shero(1);
+			if (p_ptr->shield) set_shield(1);
+			if (p_ptr->blessed) set_blessed(1);
+			if (p_ptr->tim_invis) set_tim_invis(1);
+			if (p_ptr->tim_infra) set_tim_infra(1);
+
+			if (p_ptr->oppose_acid) set_oppose_acid(1);
+			if (p_ptr->oppose_elec) set_oppose_elec(1);
+			if (p_ptr->oppose_fire) set_oppose_fire(1);
+			if (p_ptr->oppose_cold) set_oppose_cold(1);
+			if (p_ptr->oppose_pois) set_oppose_pois(1);
+
+			if (p_ptr->word_recall)
+			{
+				msg_print("A tension leaves the air around you.");
+				p_ptr->word_recall = 0;
+			}
+
+			/* Dispel worked */
+			obvious = TRUE;
+
+			break;
+		}
+
+		/* Dispel undead */
+		case GF_DISP_UNDEAD:
+		{
+			/* Only affect undead */
+			if (p_ptr->cur_flags4 & (TR4_UNDEAD))
+			{
+				/* Notice */
+				player_can_flags(who, 0x0L, 0x0L, 0x0L, TR4_UNDEAD);
+
+				/* Obvious */
+				obvious = TRUE;
+
+				/* Message */
+				msg_print("You are dispelled!");
+
+				/* Take damage */
+				take_hit(dam, killer);
+			}
+
+			/* Others ignore */
+			else
+			{
+				/* No damage */
+				dam = 0;
+			}
+
+			break;
+		}
+
+
+		/* Dispel evil */
+		case GF_DISP_EVIL:
+		{
+			/* Only affect undead */
+			if (p_ptr->cur_flags4 & (TR4_EVIL))
+			{
+				/* Notice */
+				player_can_flags(who, 0x0L, 0x0L, 0x0L, TR4_EVIL);
+
+				/* Obvious */
+				obvious = TRUE;
+
+				/* Message */
+				msg_print("You are dispelled!");
+
+				/* Take damage */
+				take_hit(dam, killer);
+			}
+
+			/* Others ignore */
+			else
+			{
+				/* No damage */
+				dam = 0;
 			}
 
 			break;

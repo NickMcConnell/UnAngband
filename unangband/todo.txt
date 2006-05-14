@@ -32,10 +32,6 @@ mimic.
 
 TODO: Add monster ability 'reflect/beams' and 'reflect shots/thrown'.
 
-TODO: Add sleep effect.
-
-TODO: Add statis effect.
-
 TODO: Higher level birds, for bird summoners.
 
 TODO: 'Good' monsters don't summon evil. 'Evil' monsters don't summon good.
@@ -52,22 +48,15 @@ TODO: Assemblies that can be build into objects of any type.
 
 TODO: Allow research of spells without a spellbook.
 
-TODO: DISPEL effect cast on you/by you removes temporary spell effects (except from potions / monster
-attacks?) whether positive or negative.
-
 TODO: SHIELD blocks magic missiles completely.
 
 TODO: Improve self-knowledge so that it tells you what the impact of an effect is: You are blind,
 which prevents you reading scrolls or casting spells from books or rune-stones. 
 
-TODO: DEAFEN effect? STENCH effect (vomit up your food randomly). BLOAT effect (causes you to be
-bloated). POLYMORPH player. SLEEP effect. STASTIS effect.  FURY effect (no spellcasting or
+TODO: DEAFEN effect? POLYMORPH player. FURY effect (no spellcasting or
 throwing/missile weapons). 
 
 TODO: Berserk should prevent you and monsters from spellcasting or throwing/missile weapons.
-
-TODO: PETRIFY effect prevents you moving (“You are petrified with fear?”) Maybe check out Eyangband 
-variable effects.
 
 TODO: Elemental effects that cause more than 100 hp damage should prevent you using certain types
 of objects the next round.

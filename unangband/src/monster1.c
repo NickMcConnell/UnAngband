@@ -191,7 +191,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 
 	/* Collect innate attacks */
 	vn = 0;
-	if (l_ptr->flags4 & (RF4_SHRIEK))      vp[vn++] = "shriek for help";
+	if (l_ptr->flags4 & (RF4_ADD_AMMO))      vp[vn++] = "grow ammunition";
 	if (l_ptr->flags4 & (RF4_QUAKE))      vp[vn++] = "create earthquakes";
 	/*if (l_ptr->flags4 & (RF4_EXPLODE))     vp[vn++] = "explode";*/
 	/*if (l_ptr->flags4 & (RF4_AURA)) vp[vn++] = "radiate a powerful aura";*/
@@ -346,7 +346,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags6 & RF6_TRAPS)       vp[vn++] = "create traps";
 	if (l_ptr->flags6 & RF6_DRAIN_MANA)  vp[vn++] = "drain mana";
 	if (l_ptr->flags6 & RF6_CURSE)       vp[vn++] = "curse you";
-	if (l_ptr->flags6 & RF6_ADD_AMMO)    vp[vn++] = "grow back ammunition";
+	if (l_ptr->flags6 & RF6_DISPEL)    vp[vn++] = "dispel enchantments on you";
 	if (l_ptr->flags6 & RF6_MIND_BLAST)  vp[vn++] = "cause mind blasting";
 	if (l_ptr->flags6 & RF6_WOUND)       vp[vn++] = "cause wounds";
 	if (l_ptr->flags6 & RF6_BLESS)       vp[vn++] = "become heroic";
@@ -846,6 +846,12 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_BLIND_WEAK:		q = "blind"; break;
 			case GF_RAISE_DEAD:	q = "raise dead"; break;
 			case GF_GAIN_MANA:	q = "give mana"; break;
+			case GF_FORGET:		q = "forget"; break;
+			case GF_CURSE:		q = "curse"; break;
+			case GF_DISPEL:		q = "dispel enchantments"; break;
+			case GF_STASTIS:		q = "trap in time-loops"; break;
+			case GF_PETRIFY:		q = "petrify"; break;
+
 		}
 
 

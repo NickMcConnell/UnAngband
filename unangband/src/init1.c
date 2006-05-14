@@ -541,7 +541,7 @@ static cptr r_info_flags4[] =
 	"BLOW_2",
 	"BLOW_3",
 	"BLOW_4",
-	"SHRIEK",
+	"ADD_AMMO",
 	"QUAKE",
 	"EXPLODE",
 	"AURA",
@@ -6323,7 +6323,6 @@ static long eval_max_dam(monster_race *r_ptr)
 					/*Misc flag4 flags*/
 					case 0:
 					{
-						if (flag_counter == RF4_SHRIEK) this_dam = rlev / 2;
 						break;
 					}
 
@@ -6343,9 +6342,11 @@ static long eval_max_dam(monster_race *r_ptr)
 						else if (flag_counter == RF6_DARKNESS) this_dam = rlev;
 						else if (flag_counter == RF6_TRAPS) this_dam = rlev;
 						else if (flag_counter == RF6_FORGET) this_dam = rlev / 3;
+						else if (flag_counter == RF6_DISPEL) this_dam = rlev;
 						else if (flag_counter == RF6_ILLUSION) this_dam = rlev;
 						else if (flag_counter == RF6_DRAIN_MANA) this_dam = rlev * 2;
 						else if (flag_counter == RF6_HUNGER) this_dam = rlev;
+						else if (flag_counter == RF6_PROBE) this_dam = rlev / 3;
 						else if (flag_counter == RF6_SCARE) this_dam = rlev;
 						else if (flag_counter == RF6_BLIND) this_dam = rlev;
 						else if (flag_counter == RF6_CONF) this_dam = rlev;

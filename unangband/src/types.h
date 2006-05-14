@@ -1328,6 +1328,11 @@ struct player_type
 	s16b stun;      /* Timed -- Stun */
 	s16b cursed;    /* Timed -- Curse */
 	s16b amnesia;	/* Timed -- Amnesia */
+	s16b petrify;	/* Timed -- Petrification */
+	s16b stastis;	/* Timed -- Stastis */
+
+	s16b msleep;	/* Timed -- monster induced sleep */
+	s16b psleep;	/* Timed -- player induced sleep */
 
 	s16b protevil;  /* Timed -- Protection */
 	s16b invuln;    /* Timed -- Invulnerable */

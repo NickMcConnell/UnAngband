@@ -195,6 +195,12 @@ static void sense_inventory(void)
 	/* No sensing when paralyzed */
 	if (p_ptr->paralyzed) return;
 
+	/* No sensing when in stastis */
+	if (p_ptr->stastis) return;
+
+	/* No sensing when asleep */
+	if (p_ptr->psleep > PY_SLEEP_ASLEEP) return;
+
 	/* No sensing when knocked out */
 	if (p_ptr->stun > 100) return;
 
@@ -558,6 +564,22 @@ static void process_world(void)
 		get_mon_num_prep();
 	}
 
+
+
+	/*** Stastis ***/
+	if (p_ptr->stastis)
+	{
+		(void)set_stastis(p_ptr->stastis - 1);
+
+		/* Update dynamic terrain */
+		update_dyna();
+
+		return;
+	}
+
+
+
+
 	/*** Damage over Time ***/
 
 	/* Get the feature */
@@ -583,7 +605,7 @@ static void process_world(void)
 	}
 
 	/* If paralyzed, we drown in shallow, deep or filled */
-	if ((p_ptr->paralyzed || (p_ptr->stun >=100)) &&
+	if ((p_ptr->paralyzed || (p_ptr->stun >=100) || (p_ptr->psleep >= PY_SLEEP_ASLEEP)) &&
 		(f_ptr->flags2 & (FF2_DEEP | FF2_SHALLOW | FF2_FILLED)))
 	{
 
@@ -636,7 +658,7 @@ static void process_world(void)
 
 	/* Tire normally */
 	/* XXX We exclude situations where we adjust this counter elsewhere */
-	if (!(p_ptr->resting || p_ptr->searching || p_ptr->running || p_ptr->paralyzed || (p_ptr->stun >= 100)) ||
+	if (!(p_ptr->resting || p_ptr->searching || p_ptr->running || p_ptr->paralyzed || p_ptr->stastis || (p_ptr->stun >= 100)) ||
 			(f_ptr->flags2 & (FF2_FILLED)))
 	{
 		(void)set_rest(p_ptr->rest - p_ptr->tiring);
@@ -792,6 +814,26 @@ static void process_world(void)
 	if (p_ptr->amnesia)
 	{
 		(void)set_amnesia(p_ptr->amnesia - 1);
+	}
+
+	/* Monster curses */
+	if (p_ptr->cursed)
+	{
+		(void)set_cursed(p_ptr->cursed - 1);
+	}
+
+	/* Petrification */
+	if (p_ptr->petrify)
+	{
+		(void)set_petrify(p_ptr->petrify - 1);
+	}
+
+	/* Monster induced sleep */
+	if (p_ptr->msleep)
+	{
+		(void)set_msleep(p_ptr->msleep - 1);
+
+		(void)set_psleep(p_ptr->psleep + 1);
 	}
 
 	/* Times see-invisible */
@@ -1336,7 +1378,7 @@ static void process_world(void)
 
 			case DISEASE_BLIND:
 			{
-				(void)set_blind(p_ptr->blind + randint(30) + 10);
+				(void)set_blind(p_ptr->blind + randint(10) + 2);
 				break;
 			}
 
@@ -1348,13 +1390,31 @@ static void process_world(void)
 
 			case DISEASE_CONFUSE:
 			{
-				(void)set_confused(p_ptr->confused + randint(30) + 10);
+				(void)set_confused(p_ptr->confused + randint(3) + 1);
 				break;
 			}
 
 			case DISEASE_HALLUC:
 			{
 				(void)set_image(p_ptr->image + randint(30) + 10);
+				break;
+			}
+
+			case DISEASE_AMNESIA:
+			{
+				(void)set_amnesia(p_ptr->amnesia + randint(30) + 10);
+				break;
+			}
+
+			case DISEASE_CURSE:
+			{
+				(void)set_cursed(p_ptr->cursed + randint(30) + 10);
+				break;
+			}
+
+			case DISEASE_SLEEP:
+			{
+				(void)set_msleep(p_ptr->msleep + randint(10) + 2);
 				break;
 			}
 
@@ -1367,6 +1427,24 @@ static void process_world(void)
 			case DISEASE_SLOW:
 			{
 				(void)set_slow(p_ptr->slow + randint(30) + 10);
+				break;
+			}
+
+			case DISEASE_PETRIFY:
+			{
+				(void)set_petrify(p_ptr->petrify + randint(3) + 1);
+				break;
+			}
+
+			case DISEASE_STASTIS:
+			{
+				(void)set_stastis(p_ptr->stastis + randint(3) + 1);
+				break;
+			}
+
+			case DISEASE_DISPEL:
+			{
+				(void)project_p(0, 0, p_ptr->py, p_ptr->px, 0, GF_DISPEL);
 				break;
 			}
 
@@ -2554,13 +2632,16 @@ static void process_player(void)
 		p_ptr->energy_use = 0;
 
 		/* Paralyzed or Knocked Out */
-		if ((p_ptr->paralyzed) || (p_ptr->stun >= 100))
+		if ((p_ptr->paralyzed) || (p_ptr->stun >= 100) || (p_ptr->psleep >= PY_SLEEP_ASLEEP))
 		{
 			/* Get the feature */
 			feature_type *f_ptr = &f_info[cave_feat[p_ptr->py][p_ptr->px]];
 
 			/* Take a turn */
 			p_ptr->energy_use = 100;
+
+			/* If asleep, slip deeper into slumber */
+			if (p_ptr->psleep) set_psleep(p_ptr->psleep + 1);
 
 			/* Catch breath */
 			if (!(f_ptr->flags2 & (FF2_FILLED)))
@@ -2595,6 +2676,9 @@ static void process_player(void)
 
 			/* Take a turn */
 			p_ptr->energy_use = 100;
+
+			/* If asleep, slip deeper into slumber */
+			if (p_ptr->psleep) set_psleep(p_ptr->psleep + 1);
 		}
 
 		/* Running */
@@ -3453,9 +3537,14 @@ void play_game(bool new_game)
 				(void)set_poisoned(0);
 				(void)set_afraid(0);
 				(void)set_paralyzed(0);
+				(void)set_amnesia(0);
+				(void)set_cursed(0);
 				(void)set_image(0);
 				(void)set_stun(0);
 				(void)set_cut(0);
+
+				(void)set_msleep(0);
+				(void)set_psleep(0);
 
 				/* Hack -- Prevent starvation */
 				(void)set_food(PY_FOOD_MAX - 1);

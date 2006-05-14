@@ -622,19 +622,19 @@ static void wr_extra(void)
 	/* Hack --- save held_song here. Was wr_16b(0)  Oops */
 	wr_byte(p_ptr->held_song);
 
-	wr_s16b(0);	/* oops */
-	wr_s16b(0);	/* oops */
-	wr_s16b(0);	/* oops */
+	/* Write the timers */
+	wr_s16b(p_ptr->msleep);
+	wr_s16b(p_ptr->petrify);
+	wr_s16b(p_ptr->stastis);
 	wr_s16b(p_ptr->sc);
-	wr_s16b(0);	/* oops */
-
+	wr_s16b(p_ptr->cursed);
 	wr_s16b(p_ptr->amnesia);
 	wr_s16b(p_ptr->blind);
 	wr_s16b(p_ptr->paralyzed);
 	wr_s16b(p_ptr->confused);
 	wr_s16b(p_ptr->food);
-	wr_s16b(p_ptr->rest);     /* old "food_digested" */
-	wr_s16b(0);	/* old "protection" */
+	wr_s16b(p_ptr->rest);
+	wr_s16b(p_ptr->psleep);
 	wr_s16b(p_ptr->energy);
 	wr_s16b(p_ptr->fast);
 	wr_s16b(p_ptr->slow);

@@ -309,6 +309,7 @@ F:IM_POIS
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_STUN | NO_CUTS | RES_BLIND
 F:PLANT | DROP_MUSHROOM
 F:DROP_60 | DROP_90 | ONLY_ITEM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:17:Giant yellow centipede
@@ -464,13 +465,13 @@ G:,:R
 I:110:2d2:4:1:0
 M:25:0:0:9
 W:2:2:0:1
-F:FORCE_SLEEP | NEVER_MOVE | NEVER_BLOW
+B:SHRIEK
+F:FORCE_SLEEP | NEVER_MOVE
 F:STUPID | EMPTY_MIND
 F:IM_POIS
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_CUTS | RES_BLIND
 F:PLANT | DROP_MUSHROOM
 F:DROP_60 | DROP_90 | ONLY_ITEM
-S:SHRIEK
 D:Yum!  It looks quite tasty.  It doesn't sound so nice, though...
 
 N:33:Blubbering icky thing
@@ -560,6 +561,7 @@ F:IM_POIS
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_CUTS | RES_BLIND
 F:PLANT | DROP_MUSHROOM
 F:DROP_60 | DROP_90 | ONLY_ITEM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:40:White jelly
@@ -769,6 +771,7 @@ F:IM_POIS | DROP_MUSHROOM
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_CUTS | RES_BLIND | NO_STUN
 F:PLANT
 F:DROP_60 | DROP_90 | ONLY_ITEM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:59:Silver jelly
@@ -1130,6 +1133,7 @@ F:STUPID | EMPTY_MIND
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_STUN | NO_CUTS | RES_BLIND
 F:PLANT | DROP_MUSHROOM
 F:DROP_60 | DROP_90 | ONLY_ITEM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:89:Novice priest
@@ -1791,6 +1795,7 @@ F:STUPID | EMPTY_MIND
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_CUTS | NO_STUN | RES_BLIND
 F:PLANT | DROP_MUSHROOM
 F:DROP_60 | DROP_90 | ONLY_ITEM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 #Was Grishnakh, the Hill Orc
@@ -2499,6 +2504,7 @@ F:NO_CONF | NO_SLEEP | NO_FEAR
 F:PLANT | DROP_MUSHROOM
 F:DROP_60 | DROP_90 | ONLY_ITEM
 S:BLINK | SLOW | SCARE | DARKNESS 
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.  It seems to glow with an unusual light.
 
 N:192:Guardian naga
@@ -3034,12 +3040,12 @@ M:25:0:0:0
 B:HIT:HURT:1d8
 B:HIT:HURT:1d8
 B:AURA:HUNGER
+B:SHRIEK
 F:ONLY_GOLD | DROP_90
 F:STUPID | EMPTY_MIND | OPEN_DOOR | BASH_DOOR
 F:EVIL
 F:NO_CONF | NO_SLEEP | NO_FEAR
 F:PLANT
-S:SHRIEK
 D:A pile of rotting vegetation that slides towards you with a disgusting
 D: stench, waking all it nears.
 
@@ -3456,6 +3462,7 @@ F:EMPTY_MIND | COLD_BLOOD | BASH_DOOR
 F:IM_FIRE | IM_COLD | IM_ELEC | IM_POIS | IM_EDGED
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_STUN | HUGE
 S:SLOW
+S:ADD_AMMO
 D:It is a massive metal statue that moves steadily towards you.
 
 N:259:Giant yellow scorpion
@@ -4041,7 +4048,7 @@ W:32:2:0:400
 M:15:0:0:0
 B:BUTT:BATTER:2d10
 B:BITE:FIRE:2d10
-B:GAZE:PARALYZE:2d6
+B:GAZE:PETRIFY:2d6
 F:FORCE_SLEEP
 F:BASH_DOOR
 F:ANIMAL | EAT_BODY | DRAGON | HAS_SCALE | HAS_FUR | HAS_WING
@@ -4194,7 +4201,7 @@ G:R:s
 I:120:20d30:15:90:30
 W:39:2:0:300
 M:15:15:0:0
-B:GAZE:PARALYZE
+B:GAZE:PETRIFY
 B:BITE:HURT:2d24
 F:ONLY_ITEM | DROP_1D2
 F:OPEN_DOOR | BASH_DOOR
@@ -4254,7 +4261,7 @@ G:Q:g
 I:110:30d10:15:55:40
 W:23:2:0:400
 M:11:0:0:0
-B:GAZE:TERRIFY:2d4
+B:GAZE:PETRIFY:2d4
 B:GAZE:BLIND:2d4
 B:BUTT:HURT:2d6
 B:BITE:HURT:2d12
@@ -4407,6 +4414,7 @@ F:FORCE_SLEEP | FORCE_MAXHP | MALE
 F:BASH_DOOR | ONLY_GOLD | DROP_90 | DROP_GREAT
 F:EVIL | CAN_FLY
 S:SLOW
+S:ADD_AMMO
 D:A great man-faced red lion with a lashing spiked tail.  The weak-minded he 
 D:lulls with song; the strong he slays with poisoned barbs.
 
@@ -5779,7 +5787,7 @@ F:RAND_50 | RAND_25
 F:EMPTY_MIND | BASH_DOOR | POWERFUL
 F:NO_CONF | NO_SLEEP | NO_FEAR
 F:HAS_LITE | HAS_AURA | RES_DARK | RES_LITE
-S:BRTH_LITE | BRTH_DARK | SHRIEK | AURA
+S:BRTH_LITE | BRTH_DARK | AURA
 D:A strange pillar of shining light that hurts your eyes.  Its shape changes
 D: constantly as it cuts through the air towards you.  It is like a beacon,
 D: waking monsters from their slumber.
@@ -6344,6 +6352,7 @@ F:EVIL | DRAGON | IM_COLD | NO_CONF | NO_SLEEP
 F:HAS_LITE  | ATTR_CLEAR | ATTR_METAL | NO_CUTS | RES_EDGED
 S:SLOW | CONF | SCARE
 S:BRTH_SHARD
+S:ADD_AMMO
 D:A huge crystalline dragon.  Its claws could cut you to shreds and its
 D: teeth are razor sharp.  Strange colours ripple through it as it moves in
 D: the light.
@@ -6456,6 +6465,7 @@ F:OPEN_DOOR | BASH_DOOR | NO_FEAR
 F:EVIL | DEMON | IM_ACID | IM_FIRE | NO_CONF | NO_SLEEP
 S:BRTH_ACID | BRTH_FIRE | 
 S:BOLT_ACID | BOLT_FIRE
+S:ADD_AMMO
 D:A sluggish demon of lizard form firing powerful missiles.  From the
 D: terribly oversized jaws to the stumpy lashing tail, pools of burning acid
 D: froth and sizzle.
@@ -6844,6 +6854,7 @@ F:IM_ELEC | IM_POIS | POWERFUL
 F:NO_CONF | NO_SLEEP | NO_FEAR
 S:BLIND | SLOW | CONF
 S:BRTH_POIS
+S:ADD_AMMO
 D:A constructed dragon, the drolem has massive strength.  Powerful spells
 D: weaved during its creation make it a fearsome adversary.  Its eyes show
 D: little intelligence, but it has been instructed to destroy all it meets.
@@ -6961,7 +6972,7 @@ M:18:18:8:78
 B:BITE:HURT:4d12
 B:BITE:HURT:4d12
 B:BITE:FIRE:7d14
-B:GAZE:PARALYZE
+B:GAZE:PETRIFY
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_4D2 | DROP_GOOD
 F:SMART | BASH_DOOR | POWERFUL
@@ -8414,9 +8425,9 @@ W:16:4:0:20
 M:15:0:0:15
 B:CLAW:HURT:1d4
 B:PECK:WOUND:1d4
+B:SHRIEK
 F:ANIMAL | FRIENDS
 F:CAN_FLY
-S:SHRIEK
 D:A type of crow, specially bred by the forces of evil as spies; their
 D: rudimentary intelligence guided by an evil mind has tracked you down,
 D: and now they seek to alert other evil creatures to your presence.
@@ -8506,6 +8517,7 @@ F:ONLY_ITEM | DROP_1D2
 F:OPEN_DOOR | BASH_DOOR | POWERFUL
 F:EVIL | DEMON | IM_POIS | NO_CONF | NO_SLEEP
 S:SCARE | S_DEMON
+S:ADD_AMMO
 D:A foul, humanoid creature with a long tail, clawed hands and feet,
 D: and a disgusting, wiry, snaky beard.  They are the elite shock troops
 D: of the hells, capable of a terrifying berserk fury.
@@ -8964,10 +8976,10 @@ I:120:3d2:8:18:10
 W:19:4:0:4
 M:15:0:0:15
 B:BITE:POISON:3d3
+B:SHRIEK
 F:RAND_50 | RAND_25
 F:MULTIPLY | WEIRD_MIND | EVIL | CAN_FLY
 F:INSECT
-S:SHRIEK
 D:Believed to be an evil relative of the cricket, this creature gets its name
 D: from its incessant squeaking, which can best be described as "neek-breek,
 D: neek-breek".  The noise can drive people frantic, and worse still, can be
@@ -9052,15 +9064,15 @@ G:g:r
 I:110:80d25:42:80:10
 W:28:3:0:800
 M:18:18:20:91
+B:GAZE:PETRIFY
 B:GAZE:TERRIFY
-B:GAZE:PARALYZE
-B:GAZE:LOSE_STR
 B:GAZE:HALLU
+B:SHRIEK:LOSE_STR
 F:EMPTY_MIND | NEVER_MOVE | EVIL
 F:IM_FIRE | IM_COLD | IM_ELEC | IM_POIS
 F:HURT_ROCK | COLD_BLOOD
 F:NO_CONF | NO_SLEEP | NO_FEAR
-S:SHRIEK | S_MONSTER | HOLD | CONF | MIND_BLAST | DRAIN_MANA | PROBE
+S:S_MONSTER | HOLD | CONF | MIND_BLAST | DRAIN_MANA | PROBE
 D:A figure carved from stone, with three vulture faces whose eyes glow
 D: with a malevolent light.
 
@@ -9108,8 +9120,8 @@ G:R:D
 I:120:20d100:25:100:15
 W:61:2:0:10000
 M:15:0:10:0
-B:GAZE:PARALYZE:3d12
-B:GAZE:PARALYZE:3d12
+B:GAZE:PETRIFY:3d12
+B:GAZE:PETRIFY:3d12
 B:BITE:POISON:2d12
 B:BITE:POISON:2d12
 F:ONLY_ITEM | DROP_1D2 | DROP_GOOD | POWERFUL
@@ -9735,14 +9747,14 @@ W:44:5:0:25000
 M:18:18:60:120
 B:GAZE:TERRIFY:5d8
 B:GAZE:PARALYZE:5d8
-B:GAZE:LOSE_STR:5d8
+B:SHRIEK:LOSE_STR:5d8
 B:GAZE:CONFUSE:5d8
 F:UNIQUE |
 F:EMPTY_MIND | COLD_BLOOD | BASH_DOOR | NEVER_MOVE |
 F:IM_FIRE | IM_COLD | IM_POIS | IM_ACID |
 F:HURT_ROCK | RES_WATER | RES_NEXUS
 F:NO_CONF | NO_SLEEP | NO_FEAR
-S:SHRIEK | S_HI_UNDEAD | S_MONSTERS | MIND_BLAST | DRAIN_MANA | WOUND
+S:S_HI_UNDEAD | S_MONSTERS | MIND_BLAST | DRAIN_MANA | WOUND
 S:PROBE
 D:It looks like a great figure seated upon a throne, with three joined bodies
 D: and three vulture-like heads.  It seems to be carved out of huge blocks of
@@ -9840,6 +9852,7 @@ F:NEVER_MOVE | MULTIPLY |
 F:STUPID | EMPTY_MIND | 
 F:IM_POIS | DROP_60 | DROP_90 | ONLY_ITEM |
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT | DROP_MUSHROOM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:647:Brown mushroom patch
@@ -9851,6 +9864,7 @@ B:SPORE:LOSE_CHR:2d2
 F:NEVER_MOVE | DROP_60 | DROP_90 | ONLY_ITEM |
 F:STUPID | EMPTY_MIND | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT | DROP_MUSHROOM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:648:Green mushroom patch
@@ -9862,6 +9876,7 @@ B:SPORE:LOSE_WIS:2d3
 F:NEVER_MOVE | DROP_60 | DROP_90 | ONLY_ITEM |
 F:STUPID | EMPTY_MIND | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT | DROP_MUSHROOM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:649:Black mushroom patch
@@ -9873,6 +9888,7 @@ B:SPORE:LOSE_INT:4d2
 F:NEVER_MOVE | DROP_60 | DROP_90 | ONLY_ITEM |
 F:STUPID | EMPTY_MIND | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT | DROP_MUSHROOM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:650:White mushroom patch
@@ -9884,6 +9900,7 @@ B:SPORE:COLD:2d4
 F:NEVER_MOVE | 
 F:STUPID | EMPTY_MIND | IM_COLD |
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT | DROP_MUSHROOM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:651:Blue mushroom patch
@@ -9895,6 +9912,7 @@ B:SPORE:ELEC:2d4
 F:NEVER_MOVE | IM_ELEC |
 F:STUPID | EMPTY_MIND | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT | DROP_MUSHROOM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:652:Red mushroom patch
@@ -9906,6 +9924,7 @@ B:SPORE:FIRE:3d4
 F:NEVER_MOVE | IM_FIRE |
 F:STUPID | EMPTY_MIND | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT | DROP_MUSHROOM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:653:Explodestool
@@ -9929,6 +9948,7 @@ B:SPORE:LOSE_DEX:3d2
 F:NEVER_MOVE | DROP_60 | DROP_90 | ONLY_ITEM | ATTR_METAL |
 F:STUPID | EMPTY_MIND | IM_ACID |
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT | DROP_MUSHROOM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:655:Silver mushroom patch
@@ -9940,6 +9960,7 @@ B:SPORE:EAT_LITE:3d1
 F:NEVER_MOVE | DROP_60 | DROP_90 | ONLY_ITEM | ATTR_METAL |
 F:STUPID | EMPTY_MIND | IM_COLD |
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT | DROP_MUSHROOM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:656:Wrinkled mushroom patch
@@ -9951,6 +9972,7 @@ B:SPORE:TIME:3d9
 F:NEVER_MOVE | 
 F:STUPID | EMPTY_MIND | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT | DROP_MUSHROOM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:657:Rotting mushroom patch
@@ -9962,6 +9984,7 @@ B:SPORE:EXP_20:2d3
 F:NEVER_MOVE | DROP_60 | DROP_90 | ONLY_ITEM |
 F:STUPID | EMPTY_MIND | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT | DROP_MUSHROOM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:658:Slimy mushroom patch
@@ -9973,6 +9996,7 @@ B:SPORE:ACID:3d3
 F:NEVER_MOVE | IM_ACID |
 F:STUPID | EMPTY_MIND | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | PLANT | DROP_MUSHROOM
+S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
 N:659:White slime
@@ -10174,6 +10198,7 @@ B:SPIKE:HURT:1d6
 F:NEVER_MOVE | DROP_60 | FORCE_MAXHP |
 F:STUPID | EMPTY_MIND | 
 F:PLANT | NO_CONF | NO_SLEEP | NO_FEAR | PLANT
+S:ADD_AMMO
 D:It has branches covered with cruel-looking thorns.
 
 N:675:Mandrake
@@ -10182,11 +10207,11 @@ I:110:20d10:6:20:10
 W:20:1:0:60
 M:0:25:6:30
 B:WAIL:TERRIFY
-B:WAIL:LOSE_INT
+B:SHRIEK:LOSE_INT
 F:NEVER_MOVE | DROP_60 | FORCE_MAXHP |
 F:STUPID | EMPTY_MIND | 
 F:EVIL | NO_CONF | NO_SLEEP | NO_FEAR | IM_POIS | PLANT
-S:SHRIEK | DRAIN_MANA | DARKNESS
+S:DRAIN_MANA | DARKNESS
 D:It is a tree twisted into the shape of a man.
 
 N:676:Wormwood
@@ -12252,12 +12277,12 @@ W:20:1:0:100
 M:14:0:0:0
 B:HIT:HURT:1d8
 B:HIT:ACID:2d4
+B:SHRIEK
 F:EMPTY_MIND | COLD_BLOOD | BASH_DOOR | ATTR_METAL | DROP_90 | ONLY_GOLD | DROP_MINERAL | ONLY_GOLD
 F:IM_FIRE | IM_COLD | IM_ELEC | IM_POIS | IM_ACID |
 F:FRIENDS | CAN_CLIMB |
 F:NO_CONF | NO_SLEEP | NO_FEAR
 F:RES_DISEN
-S:SHRIEK
 D:It is a large brass statue cast in the shape of a monkey.
 
 N:834:Ice golem
@@ -12623,7 +12648,7 @@ N:858:Crying spirit
 G:G:v
 I:120:5d8:14:20:10
 W:11:2:0:14
-M:8:0:2:20
+M:0:8:2:20
 B:TOUCH:TERRIFY
 F:FORCE_SLEEP | RAND_25 |
 F:DROP_60 | CAN_FLY |
@@ -12636,7 +12661,7 @@ N:859:Wailing spirit
 G:G:s
 I:120:5d8:14:20:10
 W:25:2:0:44
-M:8:0:2:25
+M:8:8:2:25
 B:WAIL:TERRIFY
 B:TOUCH:LOSE_DEX:1d8
 F:FORCE_SLEEP | RAND_25 | 
@@ -12650,7 +12675,7 @@ N:860:Cackling spirit
 G:G:D
 I:120:6d8:14:20:10
 W:23:2:0:52
-M:8:0:2:30
+M:0:8:2:30
 B:TOUCH:LOSE_DEX:1d8
 F:FORCE_SLEEP | RAND_25 | 
 F:DROP_60 | DROP_90 | CAN_FLY |
@@ -12663,7 +12688,7 @@ N:861:Cursing spirit
 G:G:U
 I:120:7d8:14:20:10
 W:24:2:0:60
-M:9:0:14:35
+M:0:9:14:35
 B:TOUCH:LOSE_WIS:1d9
 F:FORCE_SLEEP | RAND_25 | 
 F:DROP_60 | DROP_90 | CAN_FLY |
@@ -12676,20 +12701,21 @@ N:862:Shrieking spirit
 G:G:w
 I:120:8d8:14:20:10
 W:26:2:0:68
-M:9:0:15:40
+M:9:9:15:40
 B:TOUCH:LOSE_CON:1d9
+B:SHRIEK
 F:FORCE_SLEEP | RAND_25 | 
 F:DROP_60 | DROP_90 | CAN_FLY |
 F:INVISIBLE | COLD_BLOOD | PASS_WALL | IM_BLUNT | NO_CUTS | NO_STUN
 F:EVIL | UNDEAD | IM_COLD | NO_CONF | NO_SLEEP | CAN_FLY
-S:TPORT | SHRIEK
+S:TPORT
 D:A ghostly apparition that shrieks horribly.
 
 N:863:Mumbling spirit
 G:G:y
 I:120:9d8:14:20:10
 W:23:2:0:76
-M:9:0:21:45
+M:0:9:21:45
 B:TOUCH:LOSE_INT:1d10
 F:FORCE_SLEEP | RAND_25 | 
 F:DROP_60 | DROP_90 | CAN_FLY |
@@ -12702,7 +12728,7 @@ N:864:Commanding spirit
 G:G:W
 I:120:10d8:14:20:10
 W:29:2:0:84
-M:16:0:23:50
+M:0:16:23:50
 B:TOUCH:LOSE_STR:1d6
 B:TOUCH:LOSE_STR:1d6
 F:FORCE_SLEEP | RAND_25 | 
@@ -12716,7 +12742,7 @@ N:865:Chanting spirit
 G:G:R
 I:120:11d8:14:20:10
 W:29:2:0:92
-M:16:0:25:60
+M:0:16:25:60
 B:TOUCH:LOSE_INT:1d7
 B:TOUCH:LOSE_INT:1d7
 F:FORCE_SLEEP | RAND_25 | 
@@ -12730,7 +12756,7 @@ N:866:Incanting spirit
 G:G:b
 I:120:12d8:14:20:10
 W:29:2:0:100
-M:16:0:27:65
+M:0:16:27:65
 B:TOUCH:LOSE_WIS:1d7
 B:TOUCH:LOSE_WIS:1d7
 F:FORCE_SLEEP | RAND_25 | 
@@ -12744,7 +12770,7 @@ N:867:Screaming spirit
 G:G:r
 I:120:13d8:14:20:10
 W:31:2:0:110
-M:16:0:29:70
+M:0:16:29:70
 B:TOUCH:LOSE_DEX:1d8
 B:TOUCH:LOSE_DEX:1d8
 F:FORCE_SLEEP | RAND_25 | 
@@ -12758,7 +12784,7 @@ N:868:Howling spirit
 G:G:B
 I:120:14d8:14:20:10
 W:33:2:0:125
-M:16:0:31:75
+M:0:16:31:75
 B:TOUCH:LOSE_STR:1d10
 B:TOUCH:LOSE_STR:1d10
 B:BITE:HURT:2d6
@@ -12773,7 +12799,7 @@ N:869:Whispering spirit
 G:G:s
 I:120:15d8:14:20:10
 W:39:2:0:140
-M:16:0:33:80
+M:0:16:33:80
 B:TOUCH:EXP_20:1d12
 B:TOUCH:EXP_20:1d12
 B:TOUCH:EXP_20:1d12
@@ -13518,6 +13544,7 @@ F:RAND_25 |
 F:STUPID | EMPTY_MIND | ATTR_CLEAR | DROP_60 | INVISIBLE | COLD_BLOOD |
 F:IM_POIS | IM_COLD | EAT_BODY | TAKE_ITEM | MULTIPLY | OPEN_DOOR
 F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE
+S:ADD_AMMO
 D:It's cystalline and it's oozing.
 
 N:931:Clear ooze
@@ -13846,18 +13873,18 @@ N:960:Elven shade
 G:G:w
 I:130:48d12:20:25:10
 W:62:2:0:60000
-M:0:50:68:150
+M:25:50:68:150
 B:TOUCH:EXP_80:1d16
 B:TOUCH:UN_POWER
 B:TOUCH:LOSE_DEX:8d8
-B:TOUCH:LOSE_INT:8d8
+B:SHRIEK:LOSE_INT:8d8
 F:MALE | 
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_2D2 | NO_CUTS | NO_STUN | IM_BLUNT
 F:SMART | INVISIBLE | COLD_BLOOD | UNDEAD | ELF | RES_LITE
 F:EVIL | HAS_LITE  | NO_CONF | NO_SLEEP | RES_NETHR | ELF
 S:HEAL | BLINK | BLIND | CONF | WOUND | DARKNESS | 
-S:SHRIEK | TELE_AWAY | BALL_DARK | DRAIN_MANA |
+S:TELE_AWAY | BALL_DARK | DRAIN_MANA |
 S:S_MONSTER | S_UNDEAD | S_DEMON | S_RACE
 D:An elven figure that glows with an inner light.
 
@@ -15909,14 +15936,15 @@ N:1110:Screaming skull
 G:s:G
 I:115:10d8:15:30:30
 W:20:2:0:30
+M:33:33:7:50
 B:BITE:POISON:1d6
-B:WAIL:TERRIFY
+B:SHRIEK:TERRIFY
 F:FORCE_SLEEP | FORCE_MAXHP
 F:SMART | COLD_BLOOD
 F:EVIL | UNDEAD
 F:IM_COLD | IM_POIS | RES_EDGED
 F:NO_CONF | NO_SLEEP | NO_FEAR | LOW_MANA_RUN
-S:SHRIEK | BLINK | TELE_TO | ADD_MANA
+S:BLINK | TELE_TO | ADD_MANA
 D:A flying skull possessed by a terrible spirit.
 
 # From NPPAngband
@@ -16487,11 +16515,11 @@ M:30:30:6:43
 B:BITE:POISON:4d4
 B:BITE:POISON:4d4
 B:BUTT:CONFUSE:4d4
-B:SPIT:BLIND:4d4
+B:SHRIEK:BLIND:4d4
 F:CHAR_MULTI | FORCE_SLEEP | NEVER_MOVE | DROP_2D2 | COLD_BLOOD
 F:EMPTY_MIND | NO_FEAR | NO_STUN | NO_CONF | ATTR_INDEX
 F:NO_SLEEP
-S:SHRIEK | DARKNESS | TRAPS | FORGET | DRAIN_MANA
+S:DARKNESS | TRAPS | FORGET | DRAIN_MANA
 S:SCARE | BLIND | CONF | SLOW | S_MONSTER
 D:A strange creature that disguises itself as a staff to lure
 D: unsuspecting adventurers within reach of its venomous claws.
@@ -17380,6 +17408,7 @@ B:SPIKE:WOUND:29d5
 F:EMPTY_MIND | NEVER_MOVE | IM_FIRE | IM_COLD | IM_POIS | 
 F:NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP | PLANT | RES_BLIND | NO_STUN
 F:STUPID
+S:ADD_AMMO
 D:A lovely shimmering form, with razor sharp spikes thrusting out in all 
 D:directions. It patiently waits to destroy anyone who ventures nearby.
 
@@ -17412,15 +17441,15 @@ G:P:u
 I:115:95d10:20:30:50
 W:43:4:0:750
 M:10:10:25:40
-B:HIT:ELEC:4d9
-B:HIT:ELEC:4d9
+B:HIT:ELEC:8d9
 B:CRUSH:HURT:6d3
 B:BOLT:HURT:25d7
+B:SHRIEK:SOUND:4d9
 F:MALE | FORCE_SLEEP | ESCORT | 
 F:OPEN_DOOR | BASH_DOOR | TAKE_ITEM | 
 F:DROP_2D2 | GIANT | EVIL | IM_ELEC | 
 F:SMART | HUGE
-S:SHRIEK | BALL_ELEC | BEAM_ELEC | 
+S:BALL_ELEC | BEAM_ELEC | 
 S:TELE_TO | SCARE
 D:A great battle-lord of Horodwaith, twenty-five feet tall, who wields a
 D: massive two-handed sword that strikes like a bolt of lightning.
@@ -17646,14 +17675,14 @@ N:1226:Tyrant of Hell
 G:h:o
 I:130:18d100:25:40:50:15
 W:57:2:120:14000
-M:0:50:85:120
+M:50:50:85:120
 B:HIT:HURT:1d7
 B:HIT:UN_POWER:1d7
-B:HIT:LOSE_CON:1d7
+B:SHRIEK:LOSE_CON:1d7
 F:MALE | FORCE_SLEEP | 
 F:OPEN_DOOR | BASH_DOOR | 
 F:DROP_4D2 | EVIL | SMART |
-S:SHRIEK | BOLT_MANA | ARC_HFIRE | 
+S:BOLT_MANA | ARC_HFIRE | 
 S:ADD_MANA | CURSE | MIND_BLAST | WOUND | HOLD | 
 S:S_DEMON | S_HI_DEMON | OPPOSE_ELEM
 D:A haughty-faced humanoid the size of a child, surrounded by the dark fire 
@@ -18034,6 +18063,7 @@ F:DROP_1D2 | RES_EDGED | RES_WATER | RES_CHAOS | NO_CUTS
 F:DROP_2D2 | DROP_3D2 | DROP_4D2 | ONLY_GOLD
 F:NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP | HAS_AURA
 S:BRTH_SHARD | QUAKE
+S:ADD_AMMO
 D:An thundering, grinding, churning vortex of razor-sharp rubble that tears through
 D: the dungeon leaving a ruined jumble of rock in its wake.
 
