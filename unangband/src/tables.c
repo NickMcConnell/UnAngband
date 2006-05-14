@@ -2427,9 +2427,7 @@ const cptr inscrip_text[MAX_INSCRIP] =
 	"average",
 	"valuable",
 	"unusual",
-	"potion-coated",
-	"spore-coated",
-	"oil-coated",
+	"coated",
 	"sustain",
 	"high resist",
 	"enchanted",
@@ -2831,7 +2829,7 @@ byte spell_info_RF4[32][5]=
 	{0,     0,     0,     0,     0},        /* RF4_BLOW_2 */
 	{0,     0,     0,     0,     0},        /* RF4_BLOW_3 */
 	{0,     0,     0,     0,     0},        /* RF4_BLOW_4 */
-	{1,     0,     0,     0,     MAX_SIGHT},/* RF4_SHRIEK */
+	{0,     0,     0,     0,     MAX_SIGHT},/* RF4_ADD_AMMO */
 	{0,     0,     0,     0,     8},        /* RF4_QUAKE */
 	{0,     0,     0,     0,     1},        /* RF4_EXPLODE */
 	{0,     0,     0,     0,     1},        /* RF4_AURA */  /* Last spell with fixed maximum range */
@@ -2917,8 +2915,8 @@ const byte spell_info_RF6[32][5]=
 	{2,     0,     0,     0,     0},        /* RF6_TRAPS */
 	{6,     0,     0,     0,     0},        /* RF6_FORGET */
 	{2,     0,     0,     0,     0},        /* RF6_DRAIN_MANA */
-	{4,     0,     0,     0,     0},        /* RF6_CURSE */
-	{4,     0,     0,     0,     0},        /* RF6_ADD_AMMO */
+	{4,     3,     2,     6,     6},        /* RF6_CURSE */
+	{4,     0,     0,     0,     0},        /* RF6_DISPEL */
 	{3,     3,     2,     6,     6},        /* RF6_MIND_BLAST */
 	{4,     0,     0,     0,     0},        /* RF6_ILLUSION */
 	{4,     5,     2,     6,     6},        /* RF6_WOUND */
@@ -2998,7 +2996,7 @@ byte spell_desire_RF4[32][8] =
 	{ 40,  0,   0,   5,	0,   0,	   0	  ,  100}, /* RF4_BLOW_2    */
 	{ 40,  0,   0,   5,	0,   0,    0      ,  100}, /* RF4_BLOW_3    */
 	{ 40,  0,   0,   5,	0,   0,    0      ,  100}, /* RF4_BLOW_4    */
-	{ 30,  0,   0,   5,	0,   0,    0      ,  100}, /* RF4_SHRIEK    */
+	{ 60,  0,   0,   5,	0,   0,    0      ,  100}, /* RF4_SHRIEK    */
 	{ 40,  0,   0,   5,	0,   0,    0      ,  100}, /* RF4_QUAKE	    */
 	{ 20,  0,   0,   5,	0,   0, GF_EXPLODE  ,  100}, /* RF4_EXPLODE   */
 	{ 40,  0,   0,   0,	0,   0,    0      ,  100}, /* RF4_AURA      */
@@ -3088,7 +3086,7 @@ const byte spell_desire_RF6[32][8] =
 	{ 25,  0,   0,   0,	5,   0, 0  ,  100}, /* RF6_FORGET    */
 	{ 25,  0,   0,   15,	0,   0, GF_LOSE_MANA,  100}, /* RF6_DRAIN_MANA*/
 	{ 45,  0,   0,   0,	0,   0,	   0	  ,  100}, /* RF6_CURSE	    */
-	{ 40,  0,   0,   0,	0,   0,	   0	  ,  100}, /* RF6_ADD_AMMO    */
+	{ 45,  0,   0,   0,	0,   0,	   0	  ,  100}, /* RF6_DISPEL   */
 	{ 30,  0,   0,   0,	0,   0, 0  ,  100}, /* RF6_MIND_BLAST*/
 	{ 30,  0,   0,   0,	0,   0, GF_HALLU,  100}, /* RF6_ILLUSION*/
 	{ 40,  0,   0,   0,	0,   0, GF_HURT,  100}, /* RF6_WOUND	    */

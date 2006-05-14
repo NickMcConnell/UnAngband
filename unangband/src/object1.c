@@ -623,7 +623,6 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		/* Some objects are easy to describe */
 		case TV_JUNK:
 		case TV_SPIKE:
-		case TV_FLASK:
 		case TV_INSTRUMENT:
 		case TV_SPELL:
 		case TV_MAP:
@@ -753,6 +752,15 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 			if (aware) append_name = TRUE;
 			basenm = (flavor ? "& # Potion~" : "& Potion~");
+
+			break;
+		}
+
+		/* Flasks */
+		case TV_FLASK:
+		{
+			append_name = TRUE;
+			basenm = "& Flask~";
 
 			break;
 		}

@@ -1875,6 +1875,7 @@ void do_cmd_apply_rune_or_coating(void)
 	int rune;
 	int tval, sval;
 
+	bool aware = FALSE;
 	bool use_feat = FALSE;
 	bool brand_ammo = FALSE;
 	bool split = FALSE;
@@ -1963,6 +1964,9 @@ void do_cmd_apply_rune_or_coating(void)
 			return;
 		}
 
+		/* Clear feeling */
+		if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
+
 		/* Clear charges */
 		o_ptr->charges = 0;
 		o_ptr->stackc = 0;
@@ -1989,6 +1993,7 @@ void do_cmd_apply_rune_or_coating(void)
 		rune = -1;
 		tval = o_ptr->tval;
 		sval = o_ptr->tval;
+		aware = k_info[o_ptr->k_idx].aware;
 	}
 
 	/* Overwrite runes */
@@ -2279,6 +2284,8 @@ void do_cmd_apply_rune_or_coating(void)
 		/* This is a lot simpler */
 		j_ptr->xtra1 = tval;
 		j_ptr->xtra2 = sval;
+
+		if (!aware) o_ptr->feeling = INSCRIP_COATED;
 
 		/* Based on the weight, determine charges */
 		j_ptr->charges = (charges + 1000 / j_ptr->weight) / j_ptr->number;

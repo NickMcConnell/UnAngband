@@ -2786,7 +2786,7 @@
 /*
  * Number of special inscriptions, plus one.
  */
-#define MAX_INSCRIP			44
+#define MAX_INSCRIP			42
 
 
 /*

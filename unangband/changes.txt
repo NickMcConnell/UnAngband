@@ -14,7 +14,8 @@ mushrooms or flasks of oil in order to do additional damage from the effects
 of these items. This does 20% of the damager per blow or shot that throwing
 the equivalent potion, flask or mushroom does.
 
-- Added higher level dangerous potions to allow improved weapon coatings.
+- Added higher level dangerous potions and flasks to allow improved weapon
+coatings.
 
 - Magic items start being generated earlier in the game but are less powerful
 deeper in the dungeon.
