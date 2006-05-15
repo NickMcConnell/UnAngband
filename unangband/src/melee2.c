@@ -4688,13 +4688,6 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				cave_set_feat(oy, ox, FEAT_FLOOR_SLIME_T);
 			else if (r_ptr->flags8 & (RF8_HAS_SLIME))
 				cave_set_feat(oy, ox, FEAT_FLOOR_SLIME_T);
-			else if (r_ptr->flags2 & (RF2_HAS_WEB))
-				cave_set_feat(oy, ox, FEAT_FLOOR_WEB);
-		}
-                else if (f_info[cave_feat[oy][ox]].flags2 & (FF2_CHASM))
-		{
-			if (r_ptr->flags2 & (RF2_HAS_WEB))
-				cave_set_feat(oy, ox, FEAT_CHASM_WEB);
 		}
 
 		/* Reget the feature */

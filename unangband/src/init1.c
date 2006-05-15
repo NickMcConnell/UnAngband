@@ -179,6 +179,7 @@ static cptr r_info_blow_method[] =
 	"ARC_60",
 	"FLASK",
 	"TRAIL",
+	"SHRIEK",
 	NULL
 };
 
@@ -296,6 +297,14 @@ static cptr r_info_blow_effect[] =
 	"BLIND_WEAK",
 	"RAISE_DEAD",
 	"GAIN_MANA",
+	"FORGET",
+	"CURSE",
+	"DISPEL",
+	"STASTIS",
+	"PETRIFY",
+	"WEB",
+	"BLOOD",
+	"SLIME",
 	NULL
 };
 

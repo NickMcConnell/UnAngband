@@ -50,6 +50,10 @@ blind, but removed if you take any damage.
 
 - You can now sleep to recover damaged stats. This takes quite a while.
 
+- Instead of trailing webs around the dungeon, spiders now are generated in
+spider webs. Acidic monsters and other monster types now generate trails around
+the dungeon.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

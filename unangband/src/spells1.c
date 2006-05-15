@@ -2491,8 +2491,7 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 #endif
 
 	/* Hack -- prevent smoke/vapour etc on floors */
-	if ((typ != GF_FEATURE) && (who) &&
-		((f_ptr->flags1 & (FF1_FLOOR)) != 0))
+	if ((who) && ((f_ptr->flags1 & (FF1_FLOOR)) != 0))
 	{
 		burnout = TRUE;
 	}
@@ -2858,6 +2857,8 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		/* Make features */
 		case GF_FEATURE:
 		{
+			burnout = FALSE;
+
 			/* Require a "floor or ground" grid */
 			if (!(f_ptr->flags1 & (FF1_FLOOR))
 			 && !(f_ptr->flags3 & (FF3_GROUND))) break;
@@ -3090,7 +3091,34 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
-		case GF_NOTHING:
+		case GF_WEB:
+		{
+			/* Create webs on floor */
+			if (f_ptr->flags1 & (FF1_FLOOR)) cave_set_feat(y, x, FEAT_FLOOR_WEB);
+
+			/* Create webs on chasm */
+	                else if (f_ptr->flags2 & (FF2_CHASM)) cave_set_feat(y, x, FEAT_CHASM_WEB);
+
+			break;
+		}
+
+		case GF_BLOOD:
+		{
+			/* Create blood on floor */
+			if (f_ptr->flags1 & (FF1_FLOOR)) cave_set_feat(y, x, FEAT_FLOOR_BLOOD_T);
+
+			break;
+		}
+
+		case GF_SLIME:
+		{
+			/* Create slime on floor */
+			if (f_ptr->flags1 & (FF1_FLOOR)) cave_set_feat(y, x, FEAT_FLOOR_SLIME_T);
+
+			break;
+		}
+
+		default:
 
 			dam=0;
 			break;
@@ -7716,6 +7744,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Standard damage attacks */
 		case GF_BATTER:
 		case GF_WOUND:
 		case GF_HURT:

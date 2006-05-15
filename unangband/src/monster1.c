@@ -851,6 +851,9 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_DISPEL:		q = "dispel enchantments"; break;
 			case GF_STASTIS:		q = "trap in time-loops"; break;
 			case GF_PETRIFY:		q = "petrify"; break;
+			case GF_WEB:		q = "build webs"; break;
+			case GF_BLOOD:		q = "bloody"; break;
+			case GF_SLIME:		q = "slime"; break;
 
 		}
 
@@ -956,7 +959,6 @@ static void describe_monster_abilities(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags2 & RF2_CAN_CLIMB) vp[vn++] = "climb on walls and ceilings";
 	if (l_ptr->flags2 & RF2_CAN_DIG) vp[vn++] = "dig through earth and rubble";
 	if (l_ptr->flags2 & RF2_TRAIL) vp[vn++] = "leave a trail behind it";
-	if (l_ptr->flags2 & RF2_HAS_WEB) vp[vn++] = "trail a web behind it";
 	if (l_ptr->flags2 & RF2_SNEAKY) vp[vn++] = "hide in unusual places";
 	if ((l_ptr->flags2 & RF2_CAN_SWIM) && !(l_ptr->flags2 & RF2_MUST_SWIM)) vp[vn++] = "swim under water";
 	if ((l_ptr->flags2 & RF2_CAN_FLY) && !(l_ptr->flags2 & RF2_MUST_FLY)) vp[vn++] = "fly over obstacles";
@@ -1058,6 +1060,10 @@ static void describe_monster_abilities(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags2 & RF2_REGENERATE)
 	{
 		text_out(format("%^s regenerates quickly.  ", wd_he[msex]));
+	}
+	if (l_ptr->flags2 & RF2_HAS_WEB)
+	{
+		text_out(format("%^s appears in a giant web.  ", wd_he[msex]));
 	}
 
 

@@ -673,7 +673,7 @@ W:3:1:0:5
 B:BITE:HURT:1d4
 F:FRIENDS
 F:WEIRD_MIND | BASH_DOOR
-F:INSECT | CAN_CLIMB
+F:INSECT | CAN_CLIMB | HAS_WEB
 D:It is a black spider that moves in fits and starts.
 
 N:51:Wild cat
@@ -1266,7 +1266,7 @@ B:STING:POISON:1d4
 F:FRIENDS
 F:WEIRD_MIND | BASH_DOOR
 F:IM_POIS
-F:INSECT | CAN_CLIMB
+F:INSECT | CAN_CLIMB | HAS_WEB
 D:It scuttles towards you.
 
 N:100:Manes
@@ -3143,7 +3143,7 @@ B:BITE:POISON:1d6
 B:BITE:POISON:1d6
 F:FRIENDS
 F:WEIRD_MIND | BASH_DOOR
-F:IM_POIS
+F:IM_POIS | HAS_WEB
 F:INSECT | CAN_CLIMB
 S:BLINK | TELE_TO | TELE_SELF_TO
 D:A spider that never seems quite there.  Everywhere you look it is just
@@ -9158,7 +9158,7 @@ B:BITE:POISON:5d6
 F:FORCE_MAXHP | FORCE_SLEEP | ESCORT
 F:OPEN_DOOR | BASH_DOOR | HURT_LITE | SMART
 F:INSECT | EVIL | IM_FIRE | IM_POIS
-F:HAS_WEB | CAN_CLIMB | HAS_WEB
+F:HAS_WEB | CAN_CLIMB
 S:SLOW | HOLD | DRAIN_MANA | MIND_BLAST | HEAL
 S:BALL_FIRE | BOLT_FIRE | WOUND | S_SPIDER | S_KIN
 D:A vast, bloated arachnid, master of its brood: among the more terrible of
@@ -15160,7 +15160,7 @@ B:BITE:POISON:1d6
 B:BITE:POISON:1d6
 F:FRIENDS | 
 F:WEIRD_MIND | BASH_DOOR | RES_NEXUS
-F:INSECT | IM_POIS | CAN_CLIMB | PASS_WALL
+F:INSECT | IM_POIS | CAN_CLIMB | PASS_WALL | HAS_WEB
 D:A spider that never seems quite there.  Everywhere you look it is just
 D: half-seen in the corner of one eye.
 
@@ -17337,7 +17337,7 @@ B:CLAW:WOUND:1d9
 B:STING:POISON:3d9
 B:BITE:CONFUSE:1d9
 F:WEIRD_MIND | BASH_DOOR | EVIL | INSECT | 
-F:HURT_LITE | HAS_WEB | RES_DARK
+F:HURT_LITE | HAS_WEB | RES_DARK | HAS_WEB
 S:BRTH_POIS | BRTH_DARK | DARKNESS | TRAPS | BLIND | CONF | SLOW
 D:A massive spider, heaving the bloated bag of its body between great spined
 D: legs.
@@ -17617,7 +17617,7 @@ B:STING:BLIND:2d9
 B:STING:PARALYZE:2d9
 B:AURA:DARK:5d5
 F:MULTIPLY | FORCE_SLEEP | INVISIBLE | HAS_AURA | WEIRD_MIND | 
-F:RAND_25 | BASH_DOOR | FRIEND | INSECT | HURT_LITE | 
+F:RAND_25 | BASH_DOOR | FRIEND | INSECT | HURT_LITE | HAS_WEB
 F:NO_CONF | HAS_AURA | RES_DARK
 S:BRTH_DARK | AURA
 D:The darkness gathers, heaves, and out loom the taloned legs and hairy face 

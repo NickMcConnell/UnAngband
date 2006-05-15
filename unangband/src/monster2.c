@@ -1825,7 +1825,21 @@ void monster_swap(int y1, int x1, int y2, int x2)
 		/* Some monsters radiate damage when moving */
 		if (r_ptr->flags2 & (RF2_HAS_AURA))
 		{
-			(void)make_attack_ranged(m1,96+7,y2,x2);
+			int flg = (PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_PLAY |
+			PROJECT_HIDE | PROJECT_WALL);
+
+			/* The target is attacked by a ball attack */
+			(void)mon_blow_ranged(m1, y2, x2, RBM_AURA, 2, flg, NULL);
+		}
+
+		/* Some monsters trail damage when moving */
+		else if (r_ptr->flags2 & (RF2_TRAIL))
+		{
+			int flg = (PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_PLAY |
+			PROJECT_HIDE | PROJECT_WALL);
+
+			/* The target is attacked by a ball attack */
+			(void)mon_blow_ranged(m1, y2, x2, RBM_TRAIL, 0, flg, NULL);
 		}
 
 		/* Update monster */
@@ -1859,8 +1873,21 @@ void monster_swap(int y1, int x1, int y2, int x2)
 		/* Some monsters radiate damage when moving */
 		if (r_ptr->flags2 & (RF2_HAS_AURA))
 		{
-			(void)make_attack_ranged(m2,96+7,y1,x1);
+			int flg = (PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_PLAY |
+			PROJECT_HIDE | PROJECT_WALL);
 
+			/* The target is attacked by a ball attack */
+			(void)mon_blow_ranged(m2, y1, x1, RBM_AURA, 2, flg, NULL);
+		}
+
+		/* Some monsters trail damage when moving */
+		else if (r_ptr->flags2 & (RF2_TRAIL))
+		{
+			int flg = (PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_PLAY |
+			PROJECT_HIDE | PROJECT_WALL);
+
+			/* The target is attacked by a ball attack */
+			(void)mon_blow_ranged(m2, y1, x1, RBM_TRAIL, 0, flg, NULL);
 		}
 
 		/* Update monster */
@@ -3028,6 +3055,14 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp)
 	/* Give the monster some ammunition */
 	(void)find_monster_ammo(cave_m_idx[y][x], -1, TRUE);
 
+	/* Certain monsters created in giant spider webs */
+	if (r_ptr->flags2 & (RF2_HAS_WEB))
+	{
+		int flg = PROJECT_BOOM | PROJECT_GRID | PROJECT_HIDE;
+							
+		(void)project(0, 0, y, x, y, x, 0, GF_WEB, flg, 0, 0);
+	}
+
 	/* Success */
 	return (TRUE);
 }
@@ -3759,6 +3794,17 @@ bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp)
 	if ((r_ptr->flags1 & (RF1_ESCORT)) || (r_ptr->flags1 & (RF1_ESCORTS)))
 	{
 		place_monster_escort(y, x, r_idx, slp);
+	}
+
+	/* Certain monsters created in giant spider webs */
+	if (r_ptr->flags2 & (RF2_HAS_WEB))
+	{
+		int k;
+
+		int flg = PROJECT_BEAM | PROJECT_GRID | PROJECT_THRU | PROJECT_HIDE;
+							
+		/* Shoot web out in 8 directions when placed */
+		for (k = 0; k < 8; k++) (void)project(0, 10, y, x, y + 99 * ddy_ddd[k], x + 99 * ddx_ddd[k], 0, GF_WEB, flg, 0, 0);
 	}
 
 	/* Success */

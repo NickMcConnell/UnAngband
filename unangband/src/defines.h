@@ -834,6 +834,9 @@
 #define GF_DISPEL	110
 #define GF_STASTIS	111
 #define GF_PETRIFY	112
+#define GF_WEB		113
+#define GF_BLOOD	114
+#define GF_SLIME	115
 
 
 /*

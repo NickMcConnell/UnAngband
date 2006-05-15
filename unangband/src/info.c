@@ -1224,6 +1224,9 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 			case GF_DISPEL:		q = "remove"; s = "enchantments from"; break;
 			case GF_STASTIS:	q = "trap"; u= "in time loops"; break;
 			case GF_PETRIFY:	q = "petrify"; break;
+			case GF_WEB:		q = "build"; s = "webs around"; break;
+			case GF_BLOOD:		q = "cover"; u = "in blood"; break;
+			case GF_SLIME:		q = "cover"; u = "in slime"; break;
 
 
 			/* Hack -- handle features */

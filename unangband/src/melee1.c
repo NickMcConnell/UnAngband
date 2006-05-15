@@ -1279,7 +1279,7 @@ static void mon_arc(int who, int y, int x, int typ, int dam, int rad, int degree
 /*
  * Monster attempts to make a ranged melee attack.
  *
- * Only used by aura spells.
+ * Use by aura and trail effects.
  */
 void mon_blow_ranged(int who, int x, int y, int method, int range, int flg, cptr result)
 {
