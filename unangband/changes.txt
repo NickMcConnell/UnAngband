@@ -54,6 +54,9 @@ blind, but removed if you take any damage.
 spider webs. Acidic monsters and other monster types now generate trails around
 the dungeon.
 
+- Chasms can now be bridged by destructable bridges; you can now use rope and
+chain with spikes in order to build bridges across chasms.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
