@@ -30,6 +30,9 @@
 #define SPELL_TARGET_NORMAL   1 /* Target selected normally */
 #define SPELL_TARGET_SELF     2 /* Always targets self */
 #define SPELL_TARGET_AIMED    3 /* Always targets aimed target */
+#define SPELL_TARGET_COATED   4 /* Target applied from a weapon attack */
+#define SPELL_TARGET_EXPLODE   5 /* Always targets radius 1 ball attack */
+
 
 /*
  * Modes of list_object_flags()
@@ -397,20 +400,21 @@ void identify_random_gen(const object_type *o_ptr)
 
 
 /*
- * Hack -- Get spell description
+ * Hack -- Get spell description for effects on you.
  */
-bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detail, int target)
+static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int level, bool detail, int target, bool introduced)
 {
 	int vn;
 
-	int m,n,r;
+	int n,r;
 	cptr vp[64];
 
-	cptr p, q, s, t, u;
-
-	bool introduced = FALSE;
-
 	u32b id_flags = s_ptr->flags1;
+
+	(void)level;
+
+	/* Only apply effects to player */
+	if ((target != SPELL_TARGET_NORMAL) && (target != SPELL_TARGET_SELF)) return (FALSE);
 
 	/* Collect detects */
 	vn = 0;
@@ -1014,6 +1018,19 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 		}
 	}
 
+	return (introduced);
+}
+
+
+
+/*
+ * Hack -- Get spell description for effects on target based on blow.
+ */
+static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int level, bool detail, int target, bool introduced)
+{
+	int m,n,r;
+
+	cptr p, q, s, t, u;
 
 	/* Count the number of "known" attacks */
 	for (n = 0, m = 0; m < 4; m++)
@@ -1024,7 +1041,6 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 		/* Count known attacks */
 		n++;
 	}
-
 
 	/* Examine (and count) the actual attacks */
 	for (r = 0, m = 0; m < 4; m++)
@@ -1072,11 +1088,21 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 			case SPELL_TARGET_AIMED:
 				method = RBM_AIM;
 				break;
+
+			case SPELL_TARGET_COATED:
+				method = RBM_HIT;
+				break;
+
+			case SPELL_TARGET_EXPLODE:
+				method = RBM_FLASK;
+				break;
+
 		}
 
 		/* Get the method */
 		switch (method)
 		{
+			case RBM_HIT: p = "hits"; t = "one target"; break;
 			case RBM_AURA: p = "surrounds you with an aura";  t = "your enemies"; rad = 2; break;
 			case RBM_SELF: t = "you";break;
 			case RBM_EXPLODE: t = "you and all enemies adjacent to you"; break;
@@ -1103,6 +1129,8 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 			case RBM_SPHERE: p = "creates a sphere";  t = "your enemies";  rad = (level/10)+2;break;
 			case RBM_PANEL: t = "the current panel"; break;
 			case RBM_LEVEL: t = "the current level"; break;
+			case RBM_SPIT: p = "spits"; t = "one target"; break;
+			case RBM_FLASK: p = "creates a ball"; t = "your enemies"; rad = 1; break; 
 		}
 
 
@@ -1140,7 +1168,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 			case GF_LITE: q = "blast"; u = "with powerful light";break;
 			case GF_DARK: q = "blast"; u = "with powerful darkness";break;
 			case GF_WATER: q="blast"; u = "with water";break;
-		      case GF_CONFUSION:      q = "confuse"; break;
+		        case GF_CONFUSION:      q = "confuse"; break;
 			case GF_SOUND: q = "deafen";break;
 			case GF_SHARD: q = "blast"; u = "with shards";break;
 			case GF_NEXUS: q = "blast"; u = "with nexus";break;
@@ -1324,6 +1352,23 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 		{
 			/* Nothing */
 		}
+		else if (target == SPELL_TARGET_COATED)
+		{
+			int min = (d1 + d3) / 5;
+			int max = (d1 * d2 + d3) / 5;
+
+			if (max)
+			{
+				/* End */
+				if (max != min) text_out(format(" for %d-%d ", min, max));
+				else text_out(format(" for %d ", max));
+			}
+			else
+			{
+				/* Hack */
+				d1 = d2 = d3 = 0;
+			}
+		}
 		else if ((d1) && (d2) && (d3))
 		{
 			/* End */
@@ -1370,6 +1415,19 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
 
 }
 
+
+/*
+ * Hack -- Get spell description.
+ */
+bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detail, int target)
+{
+	bool anything = FALSE;
+
+	anything |= spell_desc_flags(s_ptr, intro, level, detail, target, anything);
+	anything |= spell_desc_blows(s_ptr, intro, level, detail, target, anything);
+
+	return (anything);
+}
 
 
 /*
@@ -2494,7 +2552,7 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
  */
 void list_object(const object_type *o_ptr, int mode)
 {
-	int i;
+	int i, n;
 
 	u32b f1, f2, f3, f4;
 
@@ -2502,8 +2560,6 @@ void list_object(const object_type *o_ptr, int mode)
 	bool charge = FALSE;
 	bool detail = FALSE;
 	bool powers = FALSE;
-
-	cptr p = NULL;
 
 	s16b book[26];
 
@@ -2594,56 +2650,218 @@ void list_object(const object_type *o_ptr, int mode)
 		}
 	}
 
-	/* Extra powers */
-	if (!random && ((object_aware_p(o_ptr)) || (spoil))
-		&& (o_ptr->tval !=TV_MAGIC_BOOK) && (o_ptr->tval != TV_PRAYER_BOOK)
-		&& (o_ptr->tval !=TV_SONG_BOOK) && (o_ptr->tval != TV_RUNESTONE))
+	/* Basic abilities -- damage/ damage multiplier */
+	if (!random && !spoil && o_ptr->dd && o_ptr->ds)
 	{
-		int target = SPELL_TARGET_NORMAL;
+		bool throw = TRUE;
 
+		/* Handle melee & throwing weapon damage. Ammunition handled later. */
 		switch (o_ptr->tval)
 		{
-			case TV_POTION:
-				p = "When quaffed, it ";
-				target = SPELL_TARGET_SELF;
-				break;
-			case TV_SCROLL:
-				p = "When read, it ";
-				break;
-			case TV_FOOD:
-				p = "When eaten, it ";
-				target = SPELL_TARGET_SELF;
-				break;
-			case TV_ROD:
-				p = "When zapped, it ";
-				charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
-				break;
+			case TV_SWORD:
 			case TV_STAFF:
-				p = "When used, it ";
+			case TV_HAFTED:
+			case TV_POLEARM:
+				text_out(format("When attacking or %sthrown, it ", (f3 & TR3_THROWING) ? "easily " : ""));
 				break;
-			case TV_WAND:
-				p = "When aimed, it ";
-				break;
-			case TV_FLASK:
 			case TV_LITE:
-				p = "When thrown, it ";
-				target = SPELL_TARGET_AIMED;
+			case TV_POTION:
+			case TV_FLASK:
+				/* Hack -- display throwing damage later */
+				throw = FALSE;
 				break;
-			case TV_ARROW:
-			case TV_BOLT:
-			case TV_SHOT:
-				p = "When fired, it ";
-				target = SPELL_TARGET_AIMED;
-				break;
-			case TV_SERVICE:
-				p = "When purchased, it ";
+			default:
+				text_out(format("When %sthrown, it ", (f3 & TR3_THROWING) ? "easily " : ""));
 				break;
 		}
 
-		if ((f3 & TR3_ACTIVATE) && !(p))
+		if (throw)
 		{
-			p = "When activated, it ";
-			charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
+			text_out(format("does %dd%d", o_ptr->dd, o_ptr->ds));
+			if (object_bonus_p(o_ptr))
+			{
+				if (o_ptr->to_d > 0) text_out(format(" + %d", o_ptr->to_d));
+				else if (o_ptr->to_d < 0) text_out(format(" - %d", o_ptr->to_d));
+			}
+			text_out(" ");
+			text_out((o_ptr->tval == TV_SWORD || o_ptr->tval == TV_POLEARM ||
+						o_ptr->tval == TV_ARROW || o_ptr->tval == TV_BOLT)
+						? "edged" : "blunt");
+			text_out(" damage.  ");
+			anything = TRUE;
+		}
+	}
+
+	/* Bows */
+	if (!random && !spoil && (o_ptr->tval == TV_BOW))
+	{
+		int mult = 2;
+
+		text_out("When shooting or set in a trap, it multiplies the base damage of ");
+
+		/* Affect Might */
+		if (f1 & (TR1_MIGHT)) mult += o_ptr->pval;
+
+		/* Analyze the launcher */
+		switch (o_ptr->sval)
+		{
+			/* Sling and ammo */
+			case SV_SLING:
+			{
+				/* Hack -- slings now act like 'throwers' */
+				text_out("shots or thrown items");
+				break;
+			}
+
+			/* Short Bow and Arrow */
+			case SV_LONG_BOW:
+			{
+				mult++;
+				/* Fall through */
+			}
+			case SV_SHORT_BOW:
+			{
+				text_out("arrows");
+				break;
+			}
+
+			/* Light Crossbow and Bolt */
+			case SV_HEAVY_XBOW:
+			{
+				mult++;
+				/* Fall through */
+			}
+			case SV_LIGHT_XBOW:
+			{
+				mult++;
+				text_out("bolts");
+				break;
+			}
+		}
+		text_out(format("by %d.  ", mult));
+	}
+
+	/* Extra powers */
+	if (!random && ((object_aware_p(o_ptr)) || (spoil))
+		&& (o_ptr->tval !=TV_MAGIC_BOOK) && (o_ptr->tval != TV_PRAYER_BOOK)
+		&& (o_ptr->tval !=TV_SONG_BOOK))
+	{
+		int vn = 0;
+		cptr vp[128];
+		int vt[128];
+		bool vd[128];
+
+		cptr vp_set_trap = "When set in a trap, it ";
+		cptr vp_throw = "When thrown, it ";
+		cptr vp_coating = "When applied to coat an arrow, bolt, sword or polearm, it ";
+		cptr vp_activate = "When activated, it ";
+		cptr vp_activate_attack = "When inscribed with {=A} and attacking an opponent, it ";
+		cptr vp_monster_eat = "When eaten by monsters, it ";
+
+		vn = 0;
+
+		switch(o_ptr->tval)
+		{
+			case TV_SCROLL:
+				vp[vn] = "When read, it "; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				break;
+
+			case TV_BODY:
+			case TV_BONE:
+				vp[vn] = vp_monster_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				break;
+
+			case TV_FOOD:
+				vp[vn] = "When eaten, it "; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_SELF;
+				vp[vn] = vp_monster_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				if (o_ptr->sval < SV_FOOD_MIN_FOOD)
+				{
+					vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+					vp[vn] = vp_coating; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_COATED;
+				}
+				break;
+
+			case TV_ROD:
+				vp[vn] = "When zapped, it "; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
+				break;
+
+			case TV_STAFF:
+				vp[vn] = "When used, it "; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				break;
+
+			case TV_WAND:
+				vp[vn] = "When aimed, it "; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				break;
+
+			case TV_BOLT:
+				vp[vn] = "When fired from a crossbow, it "; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				break;
+
+			case TV_ARROW:
+				vp[vn] = "When fired from a bow, it "; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				break;
+
+			case TV_SHOT:
+				vp[vn] = "When fired from a sling, it "; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				break;
+
+			case TV_SERVICE:
+				vp[vn] = "When purchased, it "; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
+				break;
+
+			case TV_POTION:
+				vp[vn] = "When quaffed, it "; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_SELF;
+				/* Fall through */
+			case TV_FLASK:
+				vp[vn] = vp_coating; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_COATED;
+				vp[vn] = vp_throw; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_EXPLODE;
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				break;
+
+			case TV_LITE:
+				vp[vn] = vp_throw; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				break;
+
+			case TV_SWORD:
+			case TV_POLEARM:
+			case TV_HAFTED:
+				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				if (f3 & TR3_ACTIVATE)
+				{
+					vp[vn] = vp_activate_attack; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+					charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
+				}
+				break;
+
+			case TV_DRAG_ARMOR:
+				if (f3 & TR3_ACTIVATE)
+				{
+					vp[vn] = vp_activate; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
+				}
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
+				break;
+
+			case TV_RUNESTONE:
+				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				break;
+
+			default:
+				if (f3 & TR3_ACTIVATE)
+				{
+					vp[vn] = vp_activate; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
+					charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
+				}
+				break;
 		}
 
 		/* Artifacts */
@@ -2656,7 +2874,7 @@ void list_object(const object_type *o_ptr, int mode)
 
 			if (a_ptr->activation)
 			{
-				if (spell_desc(&s_info[a_ptr->activation],"When activated, it ",0,art_detail, 1))
+				if (spell_desc(&s_info[a_ptr->activation],vp_activate_attack,0,art_detail, SPELL_TARGET_NORMAL))
 				{
 					anything = TRUE;
 
@@ -2664,27 +2882,180 @@ void list_object(const object_type *o_ptr, int mode)
 					else text_out(".  ");
 				}
 
-				p = NULL;
+				switch (o_ptr->tval)
+				{
+					case TV_SWORD:
+					case TV_POLEARM:
+					case TV_HAFTED:
+					case TV_STAFF:
+						if (spell_desc(&s_info[a_ptr->activation],vp_activate_attack,0,art_detail, SPELL_TARGET_AIMED))
+						{
+							anything = TRUE;
+
+							if (art_charge) text_out(format(", recharging in %d + d%d turns.  ",a_ptr->time,a_ptr->randtime));
+							else text_out(".  ");
+						}
+				}
+
+				vn = 0;
 			}
 		}
 
-		if (p)
+		if (vn)
 		{
-			/* Fill the book with spells */
-			fill_book(o_ptr,book,&num);
-
-			/* Detailled explaination */
-			detail = (k_info[o_ptr->k_idx].used > 4 * k_info[o_ptr->k_idx].level * num) || (spoil) || (o_ptr->ident & (IDENT_MENTAL));
-
-			for (i = 0; i < num; i++)
+			/* Scan */
+			for (n = 0; n < vn; n++)
 			{
-				powers |= spell_desc(&s_info[book[i]],(i==0)?p:", or ",0,detail, target);
+				/* Reset powers count */
+				powers = FALSE;
+
+				/* Display damage if required */
+				if (vd[n])
+				{
+					text_out(vp[n]);
+					text_out(format("does %dd%d", o_ptr->dd, o_ptr->ds));
+					if (object_bonus_p(o_ptr))
+					{
+						if (o_ptr->to_d > 0) text_out(format(" + %d", o_ptr->to_d));
+						else if (o_ptr->to_d < 0) text_out(format(" - %d", o_ptr->to_d));
+					}
+					text_out(" ");
+					text_out((o_ptr->tval == TV_SWORD || o_ptr->tval == TV_POLEARM ||
+								o_ptr->tval == TV_ARROW || o_ptr->tval == TV_BOLT)
+								? "edged" : "blunt");
+					text_out(" damage");
+					anything = TRUE;
+					powers = TRUE;
+				}
+
+				/* Hack -- food feeds player */
+				if (!(n) && (o_ptr->tval == TV_FOOD) && (o_ptr->charges))
+				{
+					text_out(vp[n]);
+					text_out("provides nourishment");
+					vd[n] = TRUE;
+					anything = TRUE;
+					powers = TRUE;
+				}
+
+				/* Hack -- monster food recovers monsters */
+				if (vp[n] == vp_monster_eat)
+				{
+					text_out(vp[n]);
+					text_out("helps them recover");
+					vd[n] = TRUE;
+					anything = TRUE;
+					powers = TRUE;
+				}
+
+				/* Fill the book with spells */
+				fill_book(o_ptr,book,&num);
+
+				/* Detailled explaination */
+				detail = (k_info[o_ptr->k_idx].used > 4 * k_info[o_ptr->k_idx].level * num) || (spoil) || (o_ptr->ident & (IDENT_MENTAL));
+
+				for (i = 0; i < num; i++)
+				{
+					powers |= spell_desc(&s_info[book[i]],(i==0) ? (vd[n] ? " and ": vp[n]) : ", or ",0,detail, vt[n]);
+				}
+
+				if ((charge) && (powers)) text_out(format(", recharging in d%d turns.  ",o_ptr->charges));
+				else if (powers) text_out(".  ");
+
+				anything |= powers;
 			}
+		}
+	}
 
-			if ((charge) && (powers)) text_out(format(", recharging in d%d turns.  ",o_ptr->charges));
-			else if (powers) text_out(".  ");
+	/* Basic abilities -- armor class */
+	if (!spoil && !random)
+	{
+		int armor = 0;
 
-			anything |= powers;
+		switch(o_ptr->tval)
+		{
+			/* Armour */
+			case TV_BOOTS:
+			case TV_GLOVES:
+			case TV_HELM:
+			case TV_CROWN:
+			case TV_SHIELD:
+			case TV_CLOAK:
+			case TV_SOFT_ARMOR:
+			case TV_HARD_ARMOR:
+			case TV_DRAG_ARMOR:
+				armor = o_ptr->ac;
+				break;
+		}
+
+		if (object_bonus_p(o_ptr)) armor += o_ptr->to_a;
+
+		if (armor)
+		{
+			text_out(format("It %s your armor class by %d.", armor > 0 ? "increases" : "decreases" , armor > 0 ? armor : -armor));
+
+			anything = TRUE;
+		}
+	}
+
+	/* Basic abilities -- tool use */
+	if (!spoil && !random)
+	{
+		cptr build_bridge = "You can build a bridge across a chasm with this ";
+
+		switch(o_ptr->tval)
+		{
+			case TV_DIGGING:
+				text_out("You can dig pits with this to trap monsters.  ");
+				anything = TRUE;
+				break;
+			case TV_SPIKE:
+				text_out("You can spike doors shut with this.  ");
+				text_out(format("%sand rope or chain.  ", build_bridge));
+				anything = TRUE;
+				break;
+			case TV_ROPE:
+				text_out(format("%sand spikes.  ", build_bridge));
+				anything = TRUE;
+				break;
+			case TV_SHOT:
+			case TV_ARROW:
+			case TV_BOLT:
+				if (o_ptr->sval == SV_AMMO_GRAPPLE)
+				{
+					text_out(format("%sand rope", build_bridge));
+					if (o_ptr->tval == TV_BOLT) text_out(" or chain");
+					text_out(".  ");
+					anything = TRUE;
+				}
+				break;
+			case TV_RUNESTONE:
+				text_out("You can apply it to different objects to change them or enchant them with additional powers.  ");
+				/* Fall through */
+			case TV_MAGIC_BOOK:
+			case TV_PRAYER_BOOK:
+			case TV_SONG_BOOK:
+				text_out("You can study this to learn new spells.  ");
+				text_out("You can cast spells from this that you have learnt.  ");
+				text_out("You can sell this to a shopkeeper for them to offer additional services.  ");
+				anything = TRUE;
+				break;
+			case TV_LITE:
+				text_out("You can wield this as a source of light.  ");
+				anything = TRUE;
+				break;
+			case TV_ASSEMBLY:
+				text_out("You can assemble this together to make something.  ");
+				anything = TRUE;
+				break;
+			case TV_MAP:
+				text_out("You can travel to additional locations with this.  ");
+				anything = TRUE;
+				break;
+			case TV_BAG:
+				text_out("You can carry numerous objects inside it.  ");
+				anything = TRUE;
+				break;
 		}
 	}
 
@@ -2724,7 +3095,6 @@ void list_object(const object_type *o_ptr, int mode)
 
         /* *Identified* object */
 	else if (spoil) text_out("You know everything about this item.  ");
-
 
 	/* Nothing was printed */
 	if (!random && !anything) text_out("You know nothing worth noting about this item.  ");

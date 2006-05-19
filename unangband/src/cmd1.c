@@ -1709,6 +1709,7 @@ void hit_trap(int y, int x)
 			case TV_POTION:
 			case TV_SCROLL:
 			case TV_FLASK:
+			case TV_LITE:
 			case TV_FOOD:
 			{
 				/* Hack -- boring food */

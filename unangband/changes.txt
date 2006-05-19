@@ -70,6 +70,8 @@ graphics to scale.
 - Identifying an object now tells you whether you can apply runes to it or
 enchant it with brands or resists.
 
+- Improvements to object display code to describe many more uses for objects.
+
 ### Bug fixes ###
 
 - Fix weapon branding.

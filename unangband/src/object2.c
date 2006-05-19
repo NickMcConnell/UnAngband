@@ -7914,7 +7914,7 @@ void fill_book(const object_type *o_ptr, s16b *book, int *num)
 							if ((slot >= 0) && (!book[slot])) book[slot] = i;
 						}
 
-						if ((*num) < slot) (*num) = slot;
+						if ((*num) < slot + 1) (*num) = slot + 1;
 					}
 				}
 				else

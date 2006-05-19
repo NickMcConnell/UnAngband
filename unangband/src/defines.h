@@ -1646,6 +1646,7 @@
 #define TV_SPELL 10      /* Magic spells (varies) */
 #define TV_STATUE       11      /* Statues ('~') */
 #define TV_ASSEMBLY	12	/* Assemblys ('~') */
+#define TV_ROPE		14	/* Ropes, vines or chains ('~') */
 #define TV_SHOT   16      /* Ammo for slings */
 #define TV_ARROW 17      /* Ammo for bows */
 #define TV_BOLT  18      /* Ammo for x-bows */
@@ -1783,6 +1784,7 @@
 #define SV_AMMO_HEAVY		2	/* seeker arrows and bolts */
 #define SV_AMMO_SPECIAL		3	/* special arrows and bolts */
 #define SV_AMMO_STEEL		5	/* steel arrows and bolts */
+#define SV_AMMO_GRAPPLE		6	/* grapple arrows and bolts */
 
 /* The "sval" codes for TV_BOW (note information in "sval") */
 #define SV_SLING			2	/* (x2) */
