@@ -2901,7 +2901,7 @@ void do_cmd_rest(void)
 	if (p_ptr->command_arg == -3)
 	{
 		p_ptr->command_arg = PY_SLEEP_ASLEEP;
-		set_psleep(100);
+		set_psleep(p_ptr->psleep++);
 	}
 
 	/* Save the rest code */

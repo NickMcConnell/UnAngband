@@ -57,6 +57,10 @@ the dungeon.
 - Chasms can now be bridged by destructable bridges; you can now use rope and
 chain with spikes in order to build bridges across chasms.
 
+- Water and other terrain and suffocation/drowning effects no longer confuse
+to allow player and monsters to have a better chance to find their way out of
+such terrain.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

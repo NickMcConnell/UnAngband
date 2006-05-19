@@ -2467,7 +2467,19 @@ static bool temp_lite(int y, int x)
  *
  * Hack -- We also "see" grids which are "memorized".
  *
- * Perhaps we should affect doors and/or walls.
+ * XXX Unlike Sangband, we do not have to be careful about ensuring that
+ * terrain doesn't get more dangerous and increases damage, because at
+ * the moment, the only terrain which affects maximum damage is water
+ * and no transitions that create watery terrain also increase damage.
+ * If we have transitions that are HURT_COLD or HURT_ELEC and end up
+ * with terrain with the WATER flag, then we may have to reconsider this.
+ *
+ * However, instead we have to check if a transition occurs under a
+ * monster, and then later check in project_t if that results in
+ * terrain that a monster cannot survive on, and either move or entomb them.
+ *
+ * Luckily this is very generic and doesn't require we duplicate transition
+ * code between here and project_t.
  */
 bool project_f(int who, int r, int y, int x, int dam, int typ)
 {
@@ -2477,6 +2489,8 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 	cptr f;
 
 	feature_type *f_ptr = &f_info[cave_feat[y][x]];
+
+	int feat;
 
 	/* Set feature name */
 	f = (f_name + f_ptr->name);
@@ -2490,12 +2504,14 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 	r = 0;
 #endif
 
+	/* Track changes */
+	feat = cave_feat[y][x];
+
 	/* Hack -- prevent smoke/vapour etc on floors */
 	if ((who) && ((f_ptr->flags1 & (FF1_FLOOR)) != 0))
 	{
 		burnout = TRUE;
 	}
-
 
 	/* Analyze the type */
 	switch (typ)
@@ -2615,7 +2631,6 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 
 				/* Destroy the feature */
 				cave_alter_feat(y, x, FS_HURT_ELEC);
-
 			}
 
 			if (temp_lite(y,x)) obvious = TRUE;
@@ -2737,7 +2752,7 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 			{
 				/* Unlock the door */
 				cave_alter_feat(y, x, FS_OPEN);
-
+	
 				/* Check line of sound */
 				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
@@ -2890,7 +2905,10 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 
 			strcpy(name,f_name+f_ptr->name);
 
-			if (!(strstr(name,"stone bridge"))) cave_set_feat(y,x,old_feat);
+			if (!(strstr(name,"stone bridge")))
+			{
+				cave_set_feat(y,x,old_feat);
+			}
 
 			break;
 		}
@@ -2938,10 +2956,8 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 				/* Observe */
 				obvious = TRUE;
 
-			/* Fully update the visuals */
-			p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS);
-
-
+				/* Fully update the visuals */
+				p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS);
 			}
 
 			if (!(cave_info[y][x] & (CAVE_XLOS)))
@@ -2966,7 +2982,6 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 					/* Fully update the visuals */
 					p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS);
 				}
-
 			}
 
 			break;
@@ -3023,7 +3038,10 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 				if (summon_specific(y, x, who > 0 ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_ELEMENT)) change = TRUE;
 			}
 
-			if (change) cave_set_feat(y,x,FEAT_FLOOR_EARTH);
+			if (change)
+			{
+				cave_set_feat(y,x,FEAT_FLOOR_EARTH);
+			}
 
 			break;
 		}
@@ -3094,10 +3112,16 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		case GF_WEB:
 		{
 			/* Create webs on floor */
-			if (f_ptr->flags1 & (FF1_FLOOR)) cave_set_feat(y, x, FEAT_FLOOR_WEB);
+			if (f_ptr->flags1 & (FF1_FLOOR))
+			{
+				cave_set_feat(y, x, FEAT_FLOOR_WEB);
+			}
 
 			/* Create webs on chasm */
-	                else if (f_ptr->flags2 & (FF2_CHASM)) cave_set_feat(y, x, FEAT_CHASM_WEB);
+	                else if (f_ptr->flags2 & (FF2_CHASM))
+			{
+				cave_set_feat(y, x, FEAT_CHASM_WEB);
+			}
 
 			break;
 		}
@@ -3125,10 +3149,17 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 	}
 
 	/* Apply burnout */
-	if ((burnout) &&
+	if ((burnout) && (feat != cave_feat[y][x]) &&
 		((f_info[cave_feat[y][x]].flags3 & (FF3_SPREAD)) != 0))
 	{
 		cave_alter_feat(y,x,FS_SPREAD);
+	}
+
+	/* Check for monster */
+	if (feat != cave_feat[y][x])
+	{
+		/* Monster was affected -- Mark grid for later processing. */
+		if (cave_m_idx[y][x] > 0) cave_temp_mark(y, x, FALSE);
 	}
 
 	/* Return "Anything seen?" */
@@ -4017,9 +4048,6 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 	/* Polymorph setting (true or false) */
 	int do_poly = 0;
 
-	/* Teleport setting (max distance) */
-	int do_dist = 0;
-
 	/* Confusion setting (amount to confuse) */
 	int do_conf = 0;
 
@@ -4457,8 +4485,10 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				do_conf = (10 + randint(15) + r) / (r + 1);
 				do_stun = (10 + randint(15) + r) / (r + 1);
+
+				/* Monster was affected -- Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
 			}
 			break;
 		}
@@ -4471,8 +4501,10 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			if (!(r_ptr->flags2 & (RF2_CAN_SWIM)) && ((m_ptr->stunned > 100) || (m_ptr->confused)))
 			{
 				if (seen) note = " is drowning";
-				do_conf = (10 + randint(15) + r) / (r + 1);
 				do_stun = (10 + randint(15) + r) / (r + 1);
+
+				/* Monster was affected -- Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
 			}
                         else if (!(r_ptr->flags2 & (RF2_CAN_SWIM)) && !(r_ptr->flags3 & (RF3_RES_WATER)))
 			{
@@ -4493,14 +4525,18 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 				dam *= 2;
 				if (seen) note = " cringes away from the salt water.";
 				note_dies = " shrivels away in the salt water.";
-				do_conf = (10 + randint(15) + r) / (r + 1);
 				do_stun = (10 + randint(15) + r) / (r + 1);
+
+				/* Monster was affected -- Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
 			}
 			else if (!(r_ptr->flags2 & (RF2_CAN_SWIM)) && ((m_ptr->stunned > 100) || (m_ptr->confused)))
 			{
 				if (seen) note = " is drowning";
-				do_conf = (10 + randint(15) + r) / (r + 1);
 				do_stun = (10 + randint(15) + r) / (r + 1);
+
+				/* Monster was affected -- Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
 			}
                         else if (!(r_ptr->flags2 & (RF2_CAN_SWIM)) && !(r_ptr->flags3 & (RF3_RES_WATER)))
 			{
@@ -4543,8 +4579,10 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			else if (!(r_ptr->flags2 & (RF2_CAN_SWIM)) && ((m_ptr->stunned > 100) || (m_ptr->confused)))
 			{
 				if (seen) note = " is drowning.";
-				do_conf = (10 + randint(15) + r) / (r + 1);
 				do_stun = (10 + randint(15) + r) / (r + 1);
+
+				/* Monster was affected -- Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
 			}
 			break;
 		}
@@ -4581,8 +4619,10 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				do_conf = (10 + randint(15) + r) / (r + 1);
 				do_stun = (10 + randint(15) + r) / (r + 1);
+
+				/* Monster was affected -- Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
 			}
 			break;
 		}
@@ -4618,8 +4658,10 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			else if (!(r_ptr->flags2 & (RF2_CAN_DIG)) && ((m_ptr->stunned > 100) || (m_ptr->confused)))
 			{
 				if (seen) note = " is drowning.";
-				do_conf = (10 + randint(15) + r) / (r + 1);
 				do_stun = (10 + randint(15) + r) / (r + 1);
+
+				/* Monster was affected -- Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
 			}
 			break;
 		}
@@ -4633,8 +4675,10 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
                         if (!(r_ptr->flags3 & (RF3_NONLIVING)) && ((m_ptr->stunned > 100) || (m_ptr->confused)))
 			{
 				if (seen) note = " is drowning.";
-				do_conf = (10 + randint(15) + r) / (r + 1);
 				do_stun = (10 + randint(15) + r) / (r + 1);
+
+				/* Monster was affected -- Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
 			}
                         else if (!(r_ptr->flags3 & (RF3_NONLIVING)))
 			{
@@ -4778,6 +4822,11 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 					l_ptr->flags3 |= (RF3_RES_NEXUS);
 				}
 			}
+			else
+			{
+				/* Monster was affected -- Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
+			}
 			break;
 		}
 
@@ -4800,10 +4849,16 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 				dam *= 3; dam /= (randint(6)+6);
 				if ((seen) && !(l_ptr->flags9 & (RF9_IM_BLUNT)))
 				{
-					note = " resists sound.";
+					note = " is unaffected.";
 					l_ptr->flags9 |= (RF9_IM_BLUNT);
 				}
 			}
+			else
+			{
+				/* Monster was affected -- Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
+			}
+
 			break;
 		}
 
@@ -4843,16 +4898,20 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		case GF_GRAVITY:
 		{
 			if (seen) obvious = TRUE;
-			do_dist = 10;
+
 			if (r_ptr->flags4 & (RF4_BRTH_GRAV))
 			{
 				dam *= 3; dam /= (randint(6)+6);
-				do_dist = 0;
 				if ((seen) && !(l_ptr->flags4 & (RF4_BRTH_GRAV)))
 				{
 					note = " resists gravity.";
 					l_ptr->flags4 |= (RF4_BRTH_GRAV);
 				}
+			}
+			else
+			{
+				/* Monster was affected -- Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
 			}
 			break;
 		}
@@ -4910,6 +4969,8 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		/* Wind -- Stuns + throws monster around */
 		case GF_WIND:
 		{
+			int do_dist;
+
 			if (seen) obvious = TRUE;
 			do_stun = (randint(15) + 1) / (r + 1);
 
@@ -4923,6 +4984,9 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 
 			/* Scale down damage based on distance */
 			dam = dam * do_dist / 8;
+
+			/* Monster was affected -- Mark grid for later processing. */
+			cave_temp_mark(y, x, FALSE);
 
 			break;
 		}
@@ -5348,7 +5412,9 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			{
 				if (seen) obvious = TRUE;
 				if (seen) l_ptr->flags3 |= (RF3_UNDEAD);
-				do_dist = dam;
+
+				/* Monster was affected -- Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
 			}
 
 			/* Others ignore */
@@ -5372,7 +5438,9 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			{
 				if (seen) obvious = TRUE;
 				if (seen) l_ptr->flags3 |= (RF3_EVIL);
-				do_dist = dam;
+
+				/* Monster was affected -- Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
 			}
 
 			/* Others ignore */
@@ -5394,8 +5462,8 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			/* Obvious */
 			if (seen) obvious = TRUE;
 
-			/* Prepare to teleport */
-			do_dist = dam;
+			/* Monster was affected -- Mark grid for later processing. */
+			cave_temp_mark(y, x, FALSE);
 
 			/* No "real" damage */
 			dam = 0;
@@ -6518,38 +6586,6 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			/* Quest monster */
 			if (r_ptr->flags1 & (RF1_QUESTOR)) check_fear_quest(cave_m_idx[y][x]);
 		}
-
-		/* Handle "teleport" */
-		if (do_dist)
-		{
-			/* Obvious */
-			if (seen) obvious = TRUE;
-
-			if (r_ptr->flags9 & (RF9_RES_TPORT))
-			{
-				if ((seen) && !(l_ptr->flags9 & (RF9_RES_TPORT)))
-				{
-					note = " resists teleport.";
-					l_ptr->flags9 |= (RF9_RES_TPORT);
-				}
-			}
-			else if (room_has_flag(y, x, ROOM_ANCHOR))
-			{
-				if (seen) note = " is anchored in place!";
-			}
-			else
-			{
-				/* Message */
-				if (seen) note = " disappears!";
-
-				/* Teleport */
-				teleport_away(cave_m_idx[y][x], do_dist);
-
-				/* Hack -- get new location */
-				y = m_ptr->fy;
-				x = m_ptr->fx;
-			}
-		}
 	}
 
 	/* If another monster or trap did the damage, hurt the monster by hand */
@@ -7111,7 +7147,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
-		/* Water -- stun/confuse/wet */
+		/* Water -- stun/wet/push around later */
 		case GF_WATER:
 		{
 			if (fuzzy) msg_print("You are hit by something!");
@@ -7126,18 +7162,6 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			{
 				/* Always notice */
 				player_can_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
-			}
-			if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) == 0)
-			{
-				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
-
-				(void)set_confused(p_ptr->confused ? p_ptr->confused + 1 : randint(5) + 5);
-			}
-			else
-			{
-				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
 			}
 
 			if ((p_ptr->cur_flags4 & (TR4_HURT_WATER)) != 0)
@@ -7154,6 +7178,10 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			water_dam(who, dam, killer, TRUE);
+
+			/* Mark grid for later processing. */
+			cave_temp_mark(y, x, FALSE);
+
 			break;
 		}
 
@@ -7178,6 +7206,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 
 			water_dam(who, dam, killer, TRUE);
+
 			break;
 		}
 
@@ -7465,7 +7494,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			break;
 		}
 
-		/* Force -- mostly stun */
+		/* Force -- mostly stun / big push */
 		case GF_FORCE:
 		{
 			if (fuzzy) msg_print("You are hit by something!");
@@ -7481,6 +7510,10 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				player_can_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
 			}
 			take_hit(dam, killer);
+
+			/* Mark grid for later processing. */
+			cave_temp_mark(y, x, FALSE);
+
 			break;
 		}
 
@@ -7633,7 +7666,6 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		{
 			if (fuzzy) msg_print("You are hit by something strange!");
 			msg_print("Gravity warps around you.");
-			teleport_player(5);
 			(void)set_slow(p_ptr->slow + rand_int(4) + 4);
 			if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) == 0)
 			{
@@ -7641,6 +7673,11 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 				(void)set_stun(p_ptr->stun + k);
 			}
 			take_hit(dam, killer);
+
+			/* Mark grid for later processing. */
+			cave_temp_mark(y, x, FALSE);
+
+
 			break;
 		}
 
@@ -7732,14 +7769,8 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			/* Take damage */
 			take_hit(dam, killer);
 
-			/* Messages */
-			if (dist >= 6)
-				msg_print("The wind grabs you, and whirls you around!");
-			else if (dist >= 1)
-				msg_print("The wind buffets you about.");
-
-			/* Throw the player around unsafely. */
-			teleport_player(dist);
+			/* Mark grid for later processing. */
+			cave_temp_mark(y, x, FALSE);
 
 			break;
 		}
@@ -8922,6 +8953,10 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			/* Hack -- no chasm/trap doors/down stairs on quest levels */
 			else if (is_quest(p_ptr->depth) || (p_ptr->depth == max_depth(p_ptr->dungeon)))
 			{
+
+				/* Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
+#if 0
 				int i = rand_int(8);
 
 				int k = 0;
@@ -8944,7 +8979,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 
 					break;
 				}
-
+#endif
 			}
 			else
 			{
@@ -9197,7 +9232,8 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			{
 				player_not_flags(who, 0x0L, 0x0L, 0x0L, TR4_ANCHOR);
 
-				(void)teleport_player(dam);
+				/* Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
 			}
 			dam = 0;
 			break;
@@ -9492,6 +9528,341 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 
 
 	/* Return "Anything seen?" */
+	return (obvious);
+}
+
+
+/*
+ * Helper function for "project()" below.
+ *
+ * Handle movement of monsters and the player.  Handle the alteration of
+ * grids that affect damage.  -LM-
+ *
+ * This function only checks grids marked with the PLAY_TEMP flag.  To
+ * help creatures get out of each other's way, this function processes
+ * from outside in.
+ *
+ * This accomplishes three things:  A creature now cannot be damaged/blinked
+ * more than once in a single projection, if all teleport functions also
+ * clear the PLAY_TEMP flag.  Also, terrain now affects damage taken, and
+ * only then gets altered.  Also, any summoned creatures don't get hurt
+ * by the magics that gave them birth.
+ *
+ * XXX XXX -- Hack -- because the PLAY_TEMP flag may be erased by certain
+ * updates, we must be careful not to allow any of the teleport functions
+ * called by this function to ask for one.  This work well in practice, but
+ * is a definite hack.
+ *
+ * This function assumes that most messages have already been shown.
+ */
+static bool project_t(int who, int y, int x, int dam, int typ, u32b flg)
+{
+	monster_type *m_ptr = NULL;
+	monster_race *r_ptr = NULL;
+
+	char m_name[80];
+
+	int k;
+
+	bool seen = FALSE;
+	bool obvious = FALSE;
+
+	bool affect_player = FALSE;
+	bool affect_monster = FALSE;
+
+	int do_dist = 0;
+	bool do_dist_los = FALSE;
+
+	/* Assume no note */
+	cptr note = NULL;
+
+	/* Only process marked grids. */
+	if (!(play_info[y][x] & (PLAY_TEMP))) return (FALSE);
+
+	/* Clear the cave_temp flag.  (this is paranoid) */
+	play_info[y][x] &= ~(PLAY_TEMP);
+
+	/* Projection will be affecting a player. */
+	if ((flg & (PROJECT_PLAY)) && (cave_m_idx[y][x] < 0))
+		affect_player = TRUE;
+
+	/* Projection will be affecting a monster. */
+	if ((flg & (PROJECT_KILL)) && (cave_m_idx[y][x] > 0))
+	{
+		affect_monster = TRUE;
+		m_ptr = &m_list[cave_m_idx[y][x]];
+		r_ptr = &r_info[m_ptr->r_idx];
+	}
+
+	if (affect_player)
+	{
+		obvious = TRUE;
+	}
+
+	if (affect_monster)
+	{
+		/* Sight check. */
+		if (m_ptr->ml) seen = TRUE;
+
+		/* Get the monster name (before teleporting) */
+		monster_desc(m_name, m_ptr, 0x40);
+	}
+
+	/* Hack -- storm can do several things */
+	if (typ == GF_STORM)
+	{
+		switch(rand_int(3))
+		{
+			case 0: typ = GF_WIND; break;
+			case 1: typ = GF_WATER; break;
+			case 2: typ = GF_ELEC; break;
+		}
+	}
+
+	/* Analyze the type */
+	switch (typ)
+	{
+		/* Gravity -- totally random blink */
+		case GF_GRAVITY:
+		{
+			if (affect_player)
+			{
+				if (((p_ptr->cur_flags2 & (TR2_RES_NEXUS)) || (p_ptr->cur_flags3 & (TR3_FEATHER))) &&
+				    (rand_int(3)))
+				{
+					msg_print("You barely hold your ground.");
+				}
+				else
+				{
+					msg_print("Gravity warps around you.");
+
+					do_dist = 10;
+				}
+			}
+
+			if (affect_monster)
+			{
+				/* Damage-variable throw distance */
+				do_dist = 4 + dam / 25;
+				do_dist_los = TRUE;
+
+				/* Resist even when affected */
+				if (r_ptr->flags4 & (RF4_BRTH_GRAV)) do_dist = 0;
+				else if (r_ptr->flags4 & (RF4_BRTH_NEXUS)) do_dist /= 4;
+				else if (r_ptr->flags3 & (RF3_RES_NEXUS)) do_dist /= 2;
+				else if (r_ptr->flags9 & (RF9_RES_TPORT))
+					do_dist = 2 * do_dist / 3;
+
+				/* Big, heavy monsters, metallic monsters and ghosts */
+				if ((r_ptr->flags3 & (RF3_HUGE)) || (r_ptr->flags9 & (RF9_IM_BLUNT | RF9_IM_EDGED))) do_dist /= 3;
+				else if ((r_ptr->flags3 & (RF3_GIANT)) || (r_ptr->flags9 & (RF9_RES_BLUNT | RF9_RES_EDGED))) do_dist /= 2;
+
+				if (seen) obvious = TRUE;
+			}
+
+			break;
+		}
+
+		/* Force -- thrust target away from caster */
+		case GF_FORCE:
+		{
+			if (affect_monster)
+			{
+				/* Force breathers are immune */
+				if (r_ptr->flags4 & (RF4_BRTH_FORCE)) break;
+
+				/* Big, heavy monsters, metallic monsters and ghosts */
+				if ((r_ptr->flags3 & (RF3_HUGE)) || (r_ptr->flags9 & (RF9_IM_BLUNT | RF9_IM_EDGED))) do_dist /= 3;
+				else if ((r_ptr->flags3 & (RF3_GIANT)) || (r_ptr->flags9 & (RF9_RES_BLUNT | RF9_RES_EDGED))) do_dist /= 2;
+			}
+
+			if ((affect_monster) || (affect_player))
+			{
+#if 0
+				/* Thrust monster or player away. */
+				thrust_away(who, y, x, 1 + dam / 15);
+#endif
+				/* Hack -- get new location */
+				if (affect_monster)
+				{
+					y = m_ptr->fy;
+					x = m_ptr->fx;
+				}
+			}
+
+			break;
+		}
+
+		/* Wind can move monsters and the player about */
+		case GF_WIND:
+		{
+			if (affect_player)
+			{
+				/* Throw distance depends on weight and strength */
+				int dist = 20 * dam / p_ptr->wt;
+				if (dist > 8) dist = 8;
+
+				/* Feather fall greatly reduces the effect of wind */
+				if (p_ptr->cur_flags3 & (TR3_FEATHER)) dist = (dist + 2) / 3;
+
+				/* Messages */
+				if (dist >= 6)
+					msg_print("The wind grabs you, and whirls you around!");
+				else if (dist >= 1)
+					msg_print("The wind buffets you about.");
+
+				/* Throw the player around unsafely. */
+				teleport_player(dist);
+			}
+
+			if (affect_monster)
+			{
+				/* Damage-variable throw distance */
+				do_dist = 1 + dam / 25;
+				if (do_dist > 8) do_dist = 8;
+				do_dist_los = TRUE;
+
+				/* Big, heavy monsters, metallic monsters and ghosts */
+				if ((r_ptr->flags3 & (RF3_HUGE)) || (r_ptr->flags9 & (RF9_IM_BLUNT | RF9_IM_EDGED))) do_dist /= 3;
+				else if ((r_ptr->flags3 & (RF3_GIANT)) || (r_ptr->flags9 & (RF9_RES_BLUNT | RF9_RES_EDGED))) do_dist /= 2;
+			}
+
+			break;
+		}
+
+		/* Many terrain types push the player or monster around. */
+		case GF_WATER:
+		case GF_WATER_WEAK:
+		case GF_SALT_WATER:
+		case GF_SUFFOCATE:
+		{
+
+			break;
+		}
+
+		/* Nexus - movement */
+		case GF_NEXUS:
+		{
+			if (affect_player)
+			{
+				if ((p_ptr->cur_flags2 & (TR2_RES_NEXUS)) == 0)
+				{
+					/* Get caster */
+					monster_type *n_ptr = &m_list[who];
+
+					/* Various effects. */
+					apply_nexus(n_ptr);
+				}
+			}
+
+			if (affect_monster)
+			{
+				/* Damage-variable throw distance */
+				do_dist = 4 + dam / 10;
+
+				/* Resist even when affected */
+				if      (r_ptr->flags4 & (RF4_BRTH_NEXUS)) do_dist = 0;
+				else if (r_ptr->flags3 & (RF3_RES_NEXUS)) do_dist /= 4;
+				else if (r_ptr->flags9 & (RF9_RES_TPORT))
+					do_dist = 2 * do_dist / 3;
+			}
+			break;
+		}
+
+		/* Teleport away - movement */
+		case GF_AWAY_UNDEAD:
+		case GF_AWAY_EVIL:
+		case GF_AWAY_ALL:
+		{
+			if (affect_player)
+			{
+				teleport_player(dam);
+			}
+
+			if (affect_monster)
+			{
+				/* Obvious */
+				if (seen) obvious = TRUE;
+
+				/* Prepare to teleport */
+				do_dist = dam;
+
+				/* Resist even when affected */
+				if (r_ptr->flags9 & (RF9_RES_TPORT)) do_dist /= 3;
+				else if (r_ptr->flags4 & (RF4_BRTH_NEXUS)) do_dist /= 2;
+				else if (r_ptr->flags3 & (RF3_RES_NEXUS)) do_dist /= 2;
+			}
+			break;
+		}
+	}
+
+	/* Handle teleportation of monster */
+	if (do_dist)
+	{
+		/* Obvious */
+		if (seen) obvious = TRUE;
+
+		/* Teleport */
+		teleport_away(cave_m_idx[y][x], do_dist);
+
+		/* No movement */
+		if ((y == m_ptr->fy) && (x == m_ptr->fx))
+		{
+			/* No message */
+		}
+		/* Visible (after teleport) */
+		else if (m_ptr->ml)
+		{
+			/* No message */
+		}
+		else
+		{
+			/* Message */
+			note = " disappears!";
+		}
+
+		/* Hack -- get new location */
+		if (affect_monster)
+		{
+			y = m_ptr->fy;
+			x = m_ptr->fx;
+		}
+	}
+
+	/* Check if monster cannot survive on terrain and possibly entomb */
+	if (affect_monster)
+	{
+		byte blocked;
+
+		/* Block grids marked with temp flags as not to hit monster twice */
+		for (k=0;k<8;k++)
+		{
+			if (play_info[ddy_ddd[k]][ddy_ddd[k]] & (PLAY_TEMP)) blocked |= 1 << k;
+		}
+
+		/* Check if monster can survive in terrain or move */
+		if (place_monster_here(y, x, m_ptr->r_idx) == MM_FAIL) entomb(y, x, blocked);
+	}
+
+	if (affect_monster)
+	{
+		/* Give detailed messages if visible */
+		if (note && seen)
+		{
+			msg_format("%^s%s", m_name, note);
+		}
+
+		/* Update the monster */
+		(void)update_mon(cave_m_idx[y][x], FALSE);
+
+		/* Update monster recall window */
+		if (p_ptr->monster_race_idx == m_ptr->r_idx)
+		{
+			/* Window stuff */
+			p_ptr->window |= (PW_MONSTER);
+		}
+	}
+
 	return (obvious);
 }
 
@@ -10423,6 +10794,20 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 
 			}
 		}
+	}
+
+	/* Teleport monsters and player around, alter certain features. */
+	for (i = 0; i < grids; i++)
+	{
+		/* Get the grid location */
+		y = gy[i];
+		x = gx[i];
+
+		/* Grid must be marked. */
+		if (!(play_info[y][x] & (PLAY_TEMP))) continue;
+
+		/* Affect marked grid */
+		if (project_t(who, y, x, dam_at_dist[gd[i]], typ, flg)) notice = TRUE;
 	}
 
 	/* Clear the "temp" array  (paranoia is good) */

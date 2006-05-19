@@ -5176,6 +5176,8 @@ s32b object_power(const object_type *o_ptr)
 				p -= 1; 
 			}
 
+		case TV_RING:
+		case TV_AMULET:
 			p += sign(o_ptr->to_a) * (ABS(o_ptr->to_a) / 2);
 
 			if (o_ptr->to_a > 9)

@@ -1077,9 +1077,27 @@ static s32b object_value_real(const object_type *o_ptr)
 		value += power * 100;
 	}		
 
-	/* Hack -- object power assumes (+9,+9) on weapons and ammo so we need to include some smaller bonuses */
+	/* Hack -- object power assumes (+9,+9) on weapons and ammo so we need to include some smaller bonuses,
+		and +9 ac on armour so we need to include some bonuses. */
 	switch (o_ptr->tval)
 	{
+		/* Armour */
+		case TV_BOOTS:
+		case TV_GLOVES:
+		case TV_HELM:
+		case TV_CROWN:
+		case TV_SHIELD:
+		case TV_CLOAK:
+		case TV_SOFT_ARMOR:
+		case TV_HARD_ARMOR:
+		case TV_DRAG_ARMOR:
+		{
+			/* Factor in the bonuses not considered by power equation */
+			value += o_ptr->to_a < 9 ? o_ptr->to_a * 100L : 0;
+
+			break;
+		}
+
 		/* Wands/Staffs */
 		case TV_WAND:
 		case TV_STAFF:

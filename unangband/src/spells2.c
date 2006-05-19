@@ -4045,7 +4045,7 @@ void entomb(int cy, int cx, byte invalid)
 			if (m_ptr->hp < 0)
 			{
 				/* Message */
-				msg_format("%^s is embedded in the rock!", m_name);
+				msg_format("%^s is trapped in the %s!", m_name, f_name + f_info[cave_feat[cy][cx]].name);
 
 				/* Delete the monster */
 				delete_monster(cy, cx);
