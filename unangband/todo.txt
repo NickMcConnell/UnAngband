@@ -17,8 +17,6 @@ TODO: Re-balancing of objects and removal of 'useless' or less useful objects.
 TODO: Have light spells use line of sight, as opposed to line of fire, for their
 projections.
 
-TODO: Have loose rocks 'searched' to find the hidden object.
-
 TODO: Stores should preferentially stock items that the player actually buys.
 
 TODO: Have keys of various kinds.
@@ -37,8 +35,6 @@ TODO: Higher level birds, for bird summoners.
 TODO: 'Good' monsters don't summon evil. 'Evil' monsters don't summon good.
 
 TODO: Commands from menus.
-
-TODO: Potions of free action.
 
 TODO: Free action, see invis, res blind etc. appear deeper in the dungeon then at present. 
 
@@ -70,8 +66,6 @@ TODO: Allow small monsters to stack on each other.
 TODO: Update to safe string handling routines from latest Angband builds.
 
 TODO: Update to latest X11 and GCU Angband files to fix compiler warnings.
-
-TODO: Add rope, rope bridges, grapples, elven rope, chains.
 
 TODO: Allow smart monsters to hide themselves in darkness, especially when fleeing,
 and alter terrain between them and the player to either permit los / lof / movement
@@ -209,10 +203,6 @@ TODO: Revised wilderness generation.
 Notes
 =====
 
-TODO: Implement Ego lights.
-I was also thinking about doing magical candles, and haven't decided
-whether lanterns will be done in e_info.txt or k_info.txt.
-
 TODO: Implement the player hiding in terrain, and items of
 invisibility.
 	This will require tweaking the monster AI so that
@@ -348,14 +338,6 @@ like a full moon.
 TODO: Add monster ability 'reflect/beams' and 'reflect shots/thrown'. These cause either
 any bolt/beam attack, or any shot/thrown weapon to reflect in a random compass direction,
 instead of affecting the target. This can also reflect back at the player...
-
-TODO: Add sleep effect: this is the same effect for monsters, but for player, causes 
-paralysis, which is removed temporarily if the player takes any damage, but reapplies
-3 turns later, until the sleep timer runs out. Damage for this purpose excludes
-poison/wounds and other cumulative effects.
-
-TODO: Add statis effect: this is the same as paralysis, but the player/monster is immune
-to all damage and magical effects for the duration of the paralysis.
 
 TODO: Create set items as per Sangband, but including sets of dragon armor.
 
@@ -827,10 +809,6 @@ o  b  ooo
 Hitting the blue crystal in this instance, causes a chain reaction...
 
 
-
-TODO: Have impassable trees and rubble which are hidden and found by either attempting to
-cross them or search them.
-
 TODO: Have light spells use line of sight, as opposed to line of fire, for their
 projections.
 
@@ -877,12 +855,6 @@ will never get allies.
 TODO: Have uniques corresponding to the players family. They are primarily quest 
 givers, however, if the player is evil, they will spit, insult, and wail at
 the player. (Considering vomit on, but it might be a bit much).
-
-TODO: Allow trolls and other monster to eat monster bodies to heal themselves, and vampires to
-suck the blood from monster bodies to improve their mana.
-
-TODO: Forget should cause spell casters to forget their spells, as opposed to forgetting what
-objects do.
 
 TODO: Higher level birds, for bird summoners.
 
@@ -993,22 +965,6 @@ usurous the money changer is.
 The player can donate to certain stores (the temple, the magic shop - for research), and tip others.
 Some shopkeepers are are too proud to accept. Potentially though e.g. the general store may have
 a Village Idiot fund etc.
-
-TODO: Add rope, rope bridges, grapples, elven rope, chains.
-
-Rope allows you to 'spike' various terrain to build a rope bridge over it. These are equivelent
-to stone bridges but can be destroyed by fire and acid. A grapple is similar, but you throw
-it and it trails rope behind it to form a rope bridge. Elven rope is like a grapple but is
-thrown and uses itself up. When you get elven rope, it picks up all connected elven rope sqaures.
-Chains are similar to rope but heavier and can only be destroyed by acid.
-
-N:Rope bridge over chasm
-G:':y (currently used by storm cloud graphic but will be changed).
-
-Note that rope is particularly useful on cloud levels.
-
-Note that 'open' levels cannot have rope bridges built on them, because they have no ceiling.
-This includes outside, towers and cloud levels (e.g. forces player to use the grappel).
 
 
 TODO: Add a materials system.

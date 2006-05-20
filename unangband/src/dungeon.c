@@ -1193,7 +1193,7 @@ static void process_world(void)
 
 				if (o_ptr->tval == TV_SPELL) msg_format("Your %s is running out.", o_name);
 				else if (o_ptr->sval == SV_LITE_LANTERN) msg_print("Your light is growing faint.");
-				else msg_print("Your %s flame dims.");
+				else msg_format("Your %s flame dims.", o_name);
 
 				/* Hack -- update torch radius */
 				if (i == INVEN_LITE) p_ptr->update |= (PU_TORCH);

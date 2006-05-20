@@ -2970,6 +2970,8 @@ void monster_death(int m_idx)
 			/* Make some gold */
 			if (!make_gold(i_ptr)) continue;
 
+			if (coin_type) l_ptr->flags9 |= (RF9_DROP_MINERAL);
+
 			/* Assume seen XXX XXX XXX */
 			dump_gold++;
 		}
@@ -2980,8 +2982,10 @@ void monster_death(int m_idx)
 			/* Make an object */
 			if (!make_object(i_ptr, good, great)) continue;
 
+			if (food_type) l_ptr->flags9 |= (RF9_DROP_MUSHROOM);
+
 			/* Hack -- ignore bodies */
-			switch (i_ptr->tval)
+			else switch (i_ptr->tval)
 			{
 				case TV_JUNK:
 				{

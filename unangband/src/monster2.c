@@ -2845,6 +2845,8 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 
 		/* Monster carries the object */
 		ammo = monster_carry(m_idx, o_ptr);
+
+		return (ammo);
 	}
 
 	/* Monster has no ammo and needs it */

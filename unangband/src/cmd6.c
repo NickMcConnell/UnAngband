@@ -1992,7 +1992,7 @@ void do_cmd_apply_rune_or_coating(void)
 	{
 		rune = -1;
 		tval = o_ptr->tval;
-		sval = o_ptr->tval;
+		sval = o_ptr->sval;
 		aware = k_info[o_ptr->k_idx].aware;
 	}
 
@@ -2012,7 +2012,7 @@ void do_cmd_apply_rune_or_coating(void)
 	}
 
 	/* Hack -- check ammo */
-	switch (o_ptr->tval)
+	switch (j_ptr->tval)
 	{
 		case TV_SHOT:
 		case TV_ARROW:
@@ -2285,7 +2285,7 @@ void do_cmd_apply_rune_or_coating(void)
 		j_ptr->xtra1 = tval;
 		j_ptr->xtra2 = sval;
 
-		if (!aware) o_ptr->feeling = INSCRIP_COATED;
+		if (!aware) j_ptr->feeling = INSCRIP_COATED;
 
 		/* Based on the weight, determine charges */
 		j_ptr->charges = (charges + 1000 / j_ptr->weight) / j_ptr->number;

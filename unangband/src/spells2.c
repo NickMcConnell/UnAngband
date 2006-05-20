@@ -1948,7 +1948,7 @@ bool detect_monsters_living(void)
 	if (flag)
 	{
 		/* Describe result */
-		msg_print("You sense the presence of evil creatures!");
+		msg_print("You sense the presence of life!");
 	}
 
 	/* Result */

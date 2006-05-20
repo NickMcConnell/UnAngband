@@ -1762,20 +1762,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			break;
 		}
 
-		/* RF4_SHRIEK */
-		case 96+4:
-		{
-			if (!direct) break;
-			disturb(1, 0);
-			sound(MSG_SHRIEK);
-			if (r_ptr->flags2 & (RF2_SMART))
-				msg_format("%^s shouts for help.", m_name);
-			else
-				msg_format("%^s makes a high pitched shriek.", m_name);
-			aggravate_monsters(who);
-			break;
-		}
-#if 0
 		/* RF6_ADD_AMMO */
 		case 96+4:
 		{
@@ -1801,7 +1787,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			}
 			break;
 		}
-#endif
+
 		/* RF4_QUAKE --- Earthquake */
 		case 96+5:
 		{

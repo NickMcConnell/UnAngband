@@ -3502,7 +3502,7 @@ void do_cmd_fire(void)
 			genuine_hit = test_hit_fire(chance2 + style_hit * BTH_PLUS_ADJ, calc_monster_ac(m_ptr, TRUE), m_ptr->ml);
 
 			/* Missiles bounce off resistant monsters */
-			if ((genuine_hit) && (mon_resist_object(m_ptr, o_ptr)))
+			if ((genuine_hit) && (mon_resist_object(m_ptr, i_ptr)))
 			{
 				/* XXX Rewrite remaining path of missile */
 
@@ -3686,7 +3686,13 @@ void do_cmd_fire(void)
 							}
 
 							/* Hack -- apply damage as projection */
-							(void)project_m(-1,0,y,x,(coated_p(i_ptr) ? damage / 5 : damage), effect);
+							if (project_m(-1,0,y,x,(coated_p(i_ptr) ? damage / 5 : damage), effect) && (coated_p(i_ptr)))
+							{
+								int k_idx = lookup_kind(i_ptr->xtra1, i_ptr->xtra2);
+								k_info[k_idx].aware = TRUE;
+								if (i_ptr->feeling == INSCRIP_COATED) i_ptr->feeling = 0;
+								if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
+							}
 
 							/* Hack -- affect ground if not a coating */
 							if (!coated_p(i_ptr)) (void)project_f(-1,0,y,x,damage, effect);
@@ -3701,6 +3707,8 @@ void do_cmd_fire(void)
 								{
 									i_ptr->xtra1 = 0;
 									i_ptr->xtra2 = 0;
+
+									if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
 								}
 							}
 							/* Start recharing item */
@@ -4185,9 +4193,14 @@ void do_cmd_throw(void)
 								damage = d_plus;
 							}
 
-
 							/* Hack -- apply damage as projection */
-							(void)project_m(-1,0,y,x,(coated_p(i_ptr) ? damage / 5 : damage), effect);
+							if (project_m(-1,0,y,x,(coated_p(i_ptr) ? damage / 5 : damage), effect) && (coated_p(i_ptr)))
+							{
+								int k_idx = lookup_kind(i_ptr->xtra1, i_ptr->xtra2);
+								k_info[k_idx].aware = TRUE;
+								if (i_ptr->feeling == INSCRIP_COATED) i_ptr->feeling = 0;
+								if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
+							}
 
 							/* Hack -- affect ground if not a coating */
 							if (!coated_p(i_ptr)) (void)project_f(-1,0,y,x,damage, effect);
@@ -4202,6 +4215,8 @@ void do_cmd_throw(void)
 								{
 									i_ptr->xtra1 = 0;
 									i_ptr->xtra2 = 0;
+
+									if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
 								}
 							}
 							/* Start recharing item */

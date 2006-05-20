@@ -2367,7 +2367,12 @@ void py_attack(int y, int x)
 						}
 
 						/* Hack -- apply damage as projection */
-						(void)project_m(-1,0,y,x,(coated_p(o_ptr) ? damage / 5 : damage), effect);
+						if (project_m(-1,0,y,x,(coated_p(o_ptr) ? damage / 5 : damage), effect) && (coated_p(o_ptr)))
+						{
+							int k_idx = lookup_kind(o_ptr->xtra1, o_ptr->xtra2);
+							k_info[k_idx].aware = TRUE;
+							if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
+						}
 
 						/* Hack -- affect ground if not a coating */
 						if (!coated_p(o_ptr)) (void)project_f(-1,0,y,x,damage, effect);
@@ -2382,6 +2387,8 @@ void py_attack(int y, int x)
 							{
 								o_ptr->xtra1 = 0;
 								o_ptr->xtra2 = 0;
+
+								if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
 							}
 						}
 						/* Start recharing item */

@@ -2476,7 +2476,7 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
  */
 static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 {
-	int i, j, level;
+	int i, j, k, level;
 
 	int e_idx;
 
@@ -2557,8 +2557,9 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 		/* Fake ego power */
 		o_ptr->name2 = e_idx;
 		j = object_power(o_ptr);
+#if 0
 		if (j < 0) j = -j;
-
+#endif
 		/* Force better for non-weapons as we can't modify power as easily */
 		if ((great) && (j < level / 2) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_HAFTED)
 			&& (o_ptr->tval != TV_SWORD) && (o_ptr->tval != TV_POLEARM) && (o_ptr->tval != TV_ARROW)
@@ -2572,16 +2573,16 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 
 		/* Test if this is a legal ego-item type for this object */
 		if (e_ptr->slot)
-			for (j = 0; j < 3; j++)
+			for (k = 0; k < 3; k++)
 		{
 			/* Require identical base type */
-			if (o_ptr->tval == e_ptr->tval[j])
+			if (o_ptr->tval == e_ptr->tval[k])
 			{
 				/* Require sval in bounds, lower */
-				if (o_ptr->sval >= e_ptr->min_sval[j])
+				if (o_ptr->sval >= e_ptr->min_sval[k])
 				{
 					/* Require sval in bounds, upper */
-					if (o_ptr->sval <= e_ptr->max_sval[j])
+					if (o_ptr->sval <= e_ptr->max_sval[k])
 					{
 
 						/* Accept */
@@ -4410,6 +4411,7 @@ static void name_drop(object_type *j_ptr)
 	if (j_ptr->name2) return;
 	if (j_ptr->xtra1) return;
 
+#if 0
 	/* Mark weapons and armour with racial flags */
 	switch (j_ptr->tval)
 	{
@@ -4456,7 +4458,7 @@ static void name_drop(object_type *j_ptr)
 			if ((r_info[r_idx].flags9 & (RF9_ELF)) && !(rand_int(count++))) { j_ptr->xtra1 = 19; j_ptr->xtra2 = 26;}
 		}
 	}
-
+#endif
 	/* Are we done? */
 	if ((j_ptr->tval != TV_BONE) && (j_ptr->tval != TV_EGG) && (j_ptr->tval != TV_STATUE)
 		&& (j_ptr->tval != TV_SKIN) && (j_ptr->tval != TV_BODY) &&
