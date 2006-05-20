@@ -1346,8 +1346,8 @@
 #define SF3_CURE_CHR     0x00000800
 #define SF3_INC_EXP      0x00001000
 #define SF3_CURE_EXP     0x00002000
-#define SF3_SLOW_XXXX    0x00004000
-#define SF3_CURE_XXXX    0x00008000
+#define SF3_FREE_ACT     0x00004000
+#define SF3_CURE_MEM     0x00008000
 #define SF3_SLOW_CURSE   0x00010000
 #define SF3_CURE_CURSE   0x00020000
 #define SF3_SLOW_POIS    0x00040000
@@ -1749,6 +1749,11 @@
 #define SV_ASSEMBLY_LEGS	 22
 #define SV_ASSEMBLY_PART_LEG_R	 23
 
+/* The "sval" codes for TV_ROPE */
+#define SV_ROPE_ROPE	1
+#define SV_ROPE_CHAIN	2
+#define SV_ROPE_ELVEN	4
+
 /* The "sval" codes for TV_SKIN */
 #define SV_SKIN_SKIN  1
 #define SV_SKIN_SCALE 2
@@ -1823,6 +1828,7 @@
 #define SV_JAVELIN				2	/* 1d6 */
 #define SV_AWL_PIKE				4	/* 1d8 */
 #define SV_SPEAR  				5	/* 1d8 */
+#define SV_HARPOON				6	/* 1d8 */
 #define SV_PIKE					8	/* 2d5 */
 #define SV_BEAKED_AXE			10	/* 2d6 */
 #define SV_BROAD_AXE			11	/* 2d6 */

@@ -212,8 +212,15 @@ bool set_afraid(int v)
 		}
 	}
 
+	/* Hack -- petrify the player if over 100 */
+	if (v > 100)
+	{
+		p_ptr->afraid = 100;
+		set_petrify(p_ptr->afraid - 100 / 10);
+	}
+
 	/* Use the value */
-	p_ptr->afraid = v;
+	else p_ptr->afraid = v;
 
 	/* Nothing to notice */
 	if (!notice) return (FALSE);
@@ -1210,6 +1217,56 @@ bool set_invuln(int v)
 
 	/* Use the value */
 	p_ptr->invuln = v;
+
+	/* Nothing to notice */
+	if (!notice) return (FALSE);
+
+	/* Disturb */
+	if (disturb_state) disturb(0, 0);
+
+	/* Recalculate bonuses */
+	p_ptr->update |= (PU_BONUS);
+
+	/* Handle stuff */
+	handle_stuff();
+
+	/* Result */
+	return (TRUE);
+}
+
+
+/*
+ * Set "p_ptr->free_act", notice observable changes
+ */
+bool set_free_act(int v)
+{
+	bool notice = FALSE;
+
+	/* Hack -- Force good values */
+	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
+
+	/* Open */
+	if (v)
+	{
+		if (!p_ptr->free_act)
+		{
+			msg_print("You feel you may act freely!");
+			notice = TRUE;
+		}
+	}
+
+	/* Shut */
+	else
+	{
+		if (p_ptr->invuln)
+		{
+			msg_print("You feel less free in your actions.");
+			notice = TRUE;
+		}
+	}
+
+	/* Use the value */
+	p_ptr->free_act = v;
 
 	/* Nothing to notice */
 	if (!notice) return (FALSE);

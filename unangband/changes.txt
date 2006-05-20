@@ -61,6 +61,9 @@ chain with spikes in order to build bridges across chasms.
 to allow player and monsters to have a better chance to find their way out of
 such terrain.
 
+- Added potions of free action, more high-level wands, ropes and grappling
+ammunition to shoot ropes across chasms.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

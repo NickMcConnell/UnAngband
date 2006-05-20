@@ -5908,6 +5908,9 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 	if ((s_ptr->flags2 & (SF2_OPP_ELEC)) && (set_oppose_elec(p_ptr->oppose_elec + lasts))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_OPP_POIS)) && (set_oppose_pois(p_ptr->oppose_pois + lasts))) obvious = TRUE;
 
+	/* SF3 - free action only */
+	if ((s_ptr->flags3 & (SF3_FREE_ACT)) && (set_free_act(p_ptr->free_act + lasts))) obvious = TRUE;
+
 	if (s_ptr->flags2 & (SF2_AGGRAVATE))
 	{
 		aggravate_monsters(0);
@@ -6083,7 +6086,7 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 
 	if (s_ptr->flags2 & (SF2_PARALYZE))
 	{
-		if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) == 0)
+		if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) == 0) && !(p_ptr->free_act))
 		{
 			if (set_paralyzed(p_ptr->paralyzed + lasts))
 			{
@@ -6096,13 +6099,13 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 		else /* if (obvious) */
 		{
 			/* Always notice */
-			equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
+			if (!p_ptr->free_act) equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 		}
 	}
 
 	if (s_ptr->flags2 & (SF2_SLOW))
 	{
-		if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) == 0)
+		if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) == 0) && !(p_ptr->free_act))
 		{
 			if (set_slow(p_ptr->slow + lasts))
 			{
@@ -6115,7 +6118,7 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 		else /* if (obvious) */
 		{
 			/* Always notice */
-			equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
+			if (!p_ptr->free_act) equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 		}
 	}
 
@@ -6160,6 +6163,8 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 	if ((s_ptr->flags3 & (SF3_CURE_CON))  && (do_res_stat(A_CON))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CHR))  && (do_res_stat(A_CHR))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_EXP)) && (restore_level())) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_FREE_ACT)) && (set_slow(0))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_MEM)) && (set_amnesia(0))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_SLOW_CURSE)) && (remove_curse())) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CURSE)) && (remove_all_curse())) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_SLOW_POIS)) && (set_poisoned(p_ptr->poisoned / 2))) obvious = TRUE;

@@ -119,6 +119,7 @@ static const grouper group_item[] =
 	  { TV_BAG,       "Bags" },
 	  { TV_SERVICE,       "Services" },
 	{ TV_SPIKE,		"Various" },
+	{ TV_ROPE,		  NULL },
 	{ TV_LITE,		  NULL },
 	{ TV_FLASK,		  NULL },
 	{ TV_JUNK,		  NULL },

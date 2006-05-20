@@ -1476,6 +1476,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		case TV_RUNESTONE:
 		case TV_MAP:
 		case TV_FLASK:
+		case TV_ROPE:
 		case TV_MAGIC_BOOK:
 		case TV_PRAYER_BOOK:
 		case TV_SONG_BOOK:

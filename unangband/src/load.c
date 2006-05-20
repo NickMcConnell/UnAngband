@@ -1102,9 +1102,8 @@ static errr rd_extra(void)
 	rd_s16b(&p_ptr->oppose_acid);
 	rd_s16b(&p_ptr->oppose_elec);
 	rd_s16b(&p_ptr->oppose_pois);
+	rd_s16b(&p_ptr->free_act);
 
-	rd_byte(&tmp8u);  /* Was p_ptr->confusing */
-	rd_byte(&tmp8u);	/* oops */
 	rd_byte(&tmp8u);	/* oops */
 	rd_byte(&p_ptr->climbing);
 	rd_byte(&p_ptr->searching);

@@ -2634,6 +2634,16 @@ void move_player(int dir, int jumping)
 		}
 	}
 
+	/* Petrified */
+	else if (p_ptr->petrify)
+	{
+		/* Disturb the player */
+		disturb(0, 0);
+
+		msg_print("You are too petrified to move.");
+		return;
+	}
+
 	/* Partial movement */
 	else if ((climb) && (dir != p_ptr->climbing))
 	{

@@ -222,6 +222,7 @@ void update_smart_cheat(int m_idx)
 	if (p_ptr->oppose_fire) m_ptr->smart |= (SM_OPP_FIRE);
 	if (p_ptr->oppose_cold) m_ptr->smart |= (SM_OPP_COLD);
 	if (p_ptr->oppose_pois) m_ptr->smart |= (SM_OPP_POIS);
+	if (p_ptr->free_act) m_ptr->smart |= (SM_FREE_ACT);
 	if (p_ptr->hero) m_ptr->smart |= (SM_OPP_FEAR);
 	if (p_ptr->shero) m_ptr->smart |= (SM_OPP_FEAR);
 
@@ -1125,6 +1126,7 @@ static bool hates_acid(object_type *o_ptr)
 		case TV_STAFF:
 		case TV_SCROLL:
 		case TV_MAP:
+		case TV_ROPE:
 		{
 			return (TRUE);
 		}
@@ -1201,6 +1203,7 @@ static bool hates_fire(object_type *o_ptr)
 		case TV_STAFF:
 		case TV_SCROLL:
 		case TV_MAP:
+		case TV_ROPE:
 		{
 			return (TRUE);
 		}
@@ -8262,10 +8265,11 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		case GF_SLEEP:
 		{
 			/* Increase "paralyzed" */
-			if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0)
+			if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->free_act))
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				if (!p_ptr->free_act) player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				else update_smart_learn(who, SM_FREE_ACT);
 
 				msg_print("You are unaffected!");
 				obvious = TRUE;
@@ -8491,10 +8495,11 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Increase "paralyzed" */
-			if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0)
+			if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->free_act))
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				if (!p_ptr->free_act) player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				else update_smart_learn(who, SM_FREE_ACT);
 
 				msg_print("You are unaffected!");
 				obvious = TRUE;
@@ -8593,10 +8598,11 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Increase "paralyzed" */
-			if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0)
+			if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->free_act))
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				if (!p_ptr->free_act) player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				else update_smart_learn(who, SM_FREE_ACT);
 
 				msg_print("You are unaffected!");
 				obvious = TRUE;

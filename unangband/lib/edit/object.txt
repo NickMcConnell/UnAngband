@@ -3357,11 +3357,11 @@ F:ACTIVATE | IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATE
 
 ##### Extra potions #####
 
-N:415:Death
+N:415:Free Action
 G:!:w
 I:75:23:0
-W:55:0:4:0
-A:55/4
+W:10:0:4:50
+A:10/1
 P:0:1d1:0:0:0
 F:THROWING
 
@@ -3709,16 +3709,16 @@ F:INSTA_ART
 # The Phial of Galadriel -- see artifact list
 
 N:500:& Phial~
-G:~:y
+G:~:B
 I:39:4:0
-W:1:0:10:10000
+W:25:0:10:10000
 P:0:1d1:0:0:0
 F:INSTA_ART
 
 # The Star of Elendil -- see artifact list
 
 N:501:& Star~
-G:~:y
+G:~:B
 I:39:5:0
 W:30:0:5:25000
 P:0:1d1:0:0:0
@@ -3727,7 +3727,7 @@ F:INSTA_ART
 # The Arkenstone of Thrain -- see artifact list
 
 N:502:& Arkenstone~
-G:~:y
+G:~:B
 I:39:6:0
 W:50:0:5:50000
 P:0:1d1:0:0:0
@@ -3808,7 +3808,7 @@ F:INSTA_ART
 # The Palantir of Westernesse -- see artifact list
 
 N:512:& Palantir~
-G:~:y
+G:~:B
 I:39:7:0
 W:75:0:200:100000
 P:0:10d10:0:0:0
@@ -5033,11 +5033,11 @@ W:50:0:10:2500
 A:50/2
 P:0:1d1:0:0:0
 
-N:681:Death
+N:681:Darkness Bolts
 G:-:w
-I:65:52:1
-W:111:0:10:60000
-A:111/11
+I:65:52:0
+W:35:0:10:1200
+A:35/1
 P:0:1d1:0:0:0
 
 N:682:Dragon's Storm
@@ -5077,31 +5077,31 @@ W:70:0:10:3000
 A:70/4
 P:0:1d1:0:0:0
 
-N:687:Conjuring Flame
+N:687:Nexus Bolts
 G:-:w
 I:65:58:1
-W:60:0:10:2000
-A:60/3
+W:55:0:10:2000
+A:55/2
 P:0:1d1:0:0:0
 F:IGNORE_FIRE
 
-N:688:Conjuring Acid
+N:688:Ice Bolts
 G:-:w
 I:65:59:1
-W:60:0:10:2000
-A:60/3
+W:55:0:10:2000
+A:55/2
 P:0:1d1:0:0:0
 F:IGNORE_ACID
 
-N:689:Conjuring Ice
+N:689:Wonder II
 G:-:w
 I:65:60:1
-W:60:0:10:2000
-A:60/3
+W:40:0:10:1000
+A:40/2
 P:0:1d1:0:0:0
 F:IGNORE_COLD
 
-N:690:Conjuring Lightning
+N:690:Shockwaves
 G:-:w
 I:65:61:1
 W:60:0:10:2000
@@ -6024,7 +6024,7 @@ A:1/1:3/1:5/1
 N:832:Blood
 G:!:r
 I:77:3:0
-W:1:0:1:0
+W:1:0:10:0
 A:1/1
 P:0:1d1:0:0:0
 F:THROWING
@@ -6032,7 +6032,7 @@ F:THROWING
 N:833:Slime
 G:!:W
 I:77:4:0
-W:1:0:1:0
+W:1:0:10:0
 A:1/1
 P:0:1d1:0:0:0
 F:THROWING
@@ -6040,7 +6040,7 @@ F:THROWING
 N:834:Bile
 G:!:o
 I:77:5:0
-W:1:0:1:0
+W:1:0:10:0
 A:1/1
 P:0:1d1:0:0:0
 F:THROWING
@@ -6048,7 +6048,7 @@ F:THROWING
 N:835:Web
 G:!:s
 I:77:6:0
-W:1:0:1:0
+W:1:0:10:0
 A:1/1
 P:0:1d1:0:0:0
 F:THROWING
@@ -6056,7 +6056,7 @@ F:THROWING
 N:836:Fire
 G:!:r
 I:77:7:0
-W:25:0:1:0
+W:25:0:10:250
 A:25/1
 P:0:1d1:0:0:0
 F:THROWING
@@ -6064,7 +6064,7 @@ F:THROWING
 N:837:Ice
 G:!:B
 I:77:8:0
-W:35:0:1:0
+W:35:0:10:350
 A:35/1
 P:0:1d1:0:0:0
 F:THROWING
@@ -6072,7 +6072,7 @@ F:THROWING
 N:838:Light
 G:!:y
 I:77:9:0
-W:15:0:1:0
+W:15:0:10:150
 A:15/1
 P:0:1d1:0:0:0
 F:THROWING
@@ -6080,7 +6080,7 @@ F:THROWING
 N:839:Darkness
 G:!:D
 I:77:10:0
-W:45:0:1:0
+W:45:0:10:450
 A:45/1
 P:0:1d1:0:0:0
 F:THROWING
@@ -6088,7 +6088,7 @@ F:THROWING
 N:840:Nexus
 G:!:R
 I:77:11:0
-W:55:0:1:0
+W:55:0:10:550
 A:55/1
 P:0:1d1:0:0:0
 F:THROWING
@@ -6096,7 +6096,7 @@ F:THROWING
 N:841:Chaos
 G:!:v
 I:77:12:0
-W:75:0:1:0
+W:75:0:10:750
 A:75/1
 P:0:1d1:0:0:0
 F:THROWING
@@ -6104,7 +6104,7 @@ F:THROWING
 N:842:Nether
 G:!:G
 I:77:13:0
-W:65:0:1:0
+W:65:0:10:650
 A:65/1
 P:0:1d1:0:0:0
 F:THROWING
@@ -6112,7 +6112,120 @@ F:THROWING
 N:843:Mana
 G:!:b
 I:77:14:0
-W:85:0:1:0
+W:85:0:10:850
 A:85/1
 P:0:1d1:0:0:0
 F:THROWING
+
+### Ropes ###
+
+N:844:Rope
+G:~:y
+I:14:1:0
+W:5:0:5:10
+A:5/1
+P:0:1d1:0:0:0
+F:THROWING
+
+N:845:Chain
+G:~:y
+I:14:2:0
+W:10:0:50:40
+A:10/1
+P:0:1d1:0:0:0
+F:THROWING | IGNORE_FIRE
+
+N:846:& Vine~
+G:~:u
+I:3:14:0
+W:1:0:15:0
+A:1/1
+P:0:1d1:0:0:0
+F:THROWING
+
+N:847:Elven Rope
+G:~:y
+I:14:4:0
+W:35:0:1:100
+A:35/1
+P:0:1d1:0:0:0
+F:THROWING | ELF | IGNORE_FIRE | IGNORE_ACID
+
+### Grapples ###
+
+N:848:& Grappling Arrow~
+G:{:y
+I:17:6:0
+W:20:0:10:10
+A:20/1:60/1
+P:0:1d6:0:0:0
+F:SHOW_MODS
+
+N:849:& Grappling Bolt~
+G:{:y
+I:18:6:0
+W:25:0:15:20
+A:25/1:65/1
+P:0:1d7:0:0:0
+F:SHOW_MODS
+
+N:850:& Grappling Hook~
+G:{:y
+I:16:6:0
+W:30:0:5:30
+A:30/1:70/1
+P:0:1d4:0:0:0
+F:SHOW_MODS | THROWING
+
+### Wands ###
+
+N:851:Explosions
+G:-:w
+I:65:63:1
+W:65:0:10:2000
+A:65/3
+P:0:1d1:0:0:0
+F:IGNORE_ELEC
+
+N:852:Bedlam
+G:-:w
+I:65:64:1
+W:70:0:10:2200
+A:70/3
+P:0:1d1:0:0:0
+F:IGNORE_ELEC
+
+N:853:Soulrending
+G:-:w
+I:65:65:1
+W:75:0:10:2500
+A:75/3
+P:0:1d1:0:0:0
+F:IGNORE_ELEC
+
+N:854:Chaos
+G:-:w
+I:65:66:1
+W:85:0:10:3000
+A:85/3
+P:0:1d1:0:0:0
+F:IGNORE_ELEC
+
+N:855:Chaos
+G:-:w
+I:65:67:1
+W:80:0:10:3750
+A:80/3
+P:0:1d1:0:0:0
+F:IGNORE_ELEC
+
+### Weapons ###
+
+N:856:& Harpoon~
+G:/:y
+I:22:6:0
+W:5:0:70:120
+A:5/1
+P:0:1d8:0:0:0
+F:SHOW_MODS | THROWING
+

@@ -2272,7 +2272,53 @@ void do_cmd_set_trap_or_spike(void)
 		/* Spike the door */
 		else if (action == FS_SPIKE)
 		{
+			object_type *k_ptr = NULL;
+
+			int feat = cave_feat[y][x];
+			int item2 = 0;
+
+			feat = feat_state(feat, FS_SPIKE);
+
+			if (strstr(f_name + f_info[feat].name, "rope"))
+			{
+				item_tester_tval = TV_ROPE;
+
+				/* Get an item */
+				q = "Attach which rope? ";
+				s = "You have no rope to attach.";
+				if (get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_BAGS)))
+				{
+					/* Get the object */
+					if (item2 >= 0)
+					{
+						k_ptr = &inventory[item2];
+					}
+					else
+					{
+						k_ptr = &o_list[0 - item2];
+					}
+
+					/* In a bag? */
+					if (k_ptr->tval == TV_BAG)
+					{
+						/* Get item from bag */
+						if (get_item_from_bag(&item2, q, s, k_ptr))
+						{
+							/* Refer to the item */
+							k_ptr = &inventory[item2];
+						}
+					}
+				}
+				else
+				{
+					return;
+				}
+			}
+
 			cave_alter_feat(y,x,FS_SPIKE);
+
+			/* MegaHack -- handle chain */
+			if ((k_ptr) && (k_ptr->sval == SV_ROPE_CHAIN)) cave_set_feat(y, x, cave_feat[y][x] + 1);
 
 			/* Update the visuals */
 			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
@@ -2280,6 +2326,8 @@ void do_cmd_set_trap_or_spike(void)
 			/* Destroy a spike in the pack */
 			if (item >= 0)
 			{
+				if ((o_ptr->number == 1) && (item2 > item)) item2--;
+
 				inven_item_increase(item, -1);
 				inven_item_describe(item);
 				inven_item_optimize(item);
@@ -2291,6 +2339,31 @@ void do_cmd_set_trap_or_spike(void)
 				floor_item_increase(0 - item, -1);
 				floor_item_describe(0 - item);
 				floor_item_optimize(0 - item);
+			}
+
+			if (k_ptr)
+			{
+				/* Reduce inventory -- suppress messages */
+				if (item2 >= 0)
+				{
+					if (k_ptr->number == 1)
+					{
+						inven_drop_flags(k_ptr);
+						k_ptr = NULL;
+					}
+
+					inven_item_increase(item2, -1);
+					inven_item_optimize(item2);
+				}
+
+				/* Reduce and describe floor item */
+				else
+				{
+					if (k_ptr->number == 1) k_ptr = NULL;
+
+					floor_item_increase(0 - item2, -1);
+					floor_item_optimize(0 - item2);
+				}
 			}
 		}
 
@@ -2983,6 +3056,19 @@ int breakage_chance(object_type *o_ptr)
 	return (10);
 }
 
+
+/*
+ * Hook to determine if an object is rope
+ */
+static bool item_tester_hook_rope(const object_type *o_ptr)
+{
+	if ((o_ptr->tval == TV_ROPE) && (o_ptr->sval != SV_ROPE_CHAIN)) return (TRUE);
+
+	/* Assume not */
+	return (FALSE);
+}
+
+
 /*
  * Fire an object from the pack or floor.
  *
@@ -3016,7 +3102,7 @@ void do_cmd_fire(void)
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
-	int dir, item;
+	int dir, item, item2 = 0;
 	int i, j, y, x, ty, tx;
 	int tdam, tdis, thits, tmul;
 	int bonus, chance, power = 0;
@@ -3027,6 +3113,7 @@ void do_cmd_fire(void)
 	object_type *o_ptr;
 	object_type *j_ptr;
 
+	object_type *k_ptr = NULL;
 	object_type *i_ptr;
 	object_type object_type_body;
 
@@ -3046,6 +3133,10 @@ void do_cmd_fire(void)
 
 	bool get_feat = FALSE;
 	bool was_asleep;
+
+	bool chasm = FALSE;
+
+	int feat;
 
 	/* Get the "bow" (if any) */
 	j_ptr = &inventory[INVEN_BOW];
@@ -3073,6 +3164,43 @@ void do_cmd_fire(void)
 
 	/* Get feat */
 	if (o_ptr->ident & (IDENT_STORE)) get_feat = TRUE;
+
+	/* Need a rope? */
+	if (o_ptr->sval == SV_AMMO_GRAPPLE)
+	{
+		/* Allow chain for some weapons */
+		if ((o_ptr->tval == TV_HAFTED) || (o_ptr->tval == TV_BOLT)) item_tester_tval = TV_ROPE;
+
+		/* Require rope */
+		else item_tester_hook = item_tester_hook_rope;
+
+		/* Get an item */
+		q = "Attach which rope? ";
+		s = "You have no rope to attach.";
+		if (get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_BAGS)))
+		{
+			/* Get the object */
+			if (item2 >= 0)
+			{
+				k_ptr = &inventory[item2];
+			}
+			else
+			{
+				k_ptr = &o_list[0 - item2];
+			}
+
+			/* In a bag? */
+			if (k_ptr->tval == TV_BAG)
+			{
+				/* Get item from bag */
+				if (get_item_from_bag(&item2, q, s, k_ptr))
+				{
+					/* Refer to the item */
+					k_ptr = &inventory[item2];
+				}
+			}
+		}
+	}
 
 	/* Hack -- if no bow, make object count for double */
 	if (j_ptr->tval != TV_BOW) j_ptr = o_ptr;
@@ -3114,7 +3242,11 @@ void do_cmd_fire(void)
 	/* Reduce and describe inventory */
 	if (item >= 0)
 	{
-		if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+		if (o_ptr->number == 1)
+		{
+			inven_drop_flags(o_ptr);
+			if (item2 > item) item2--;
+		}
 
 		inven_item_increase(item, -1);
 		inven_item_describe(item);
@@ -3196,6 +3328,51 @@ void do_cmd_fire(void)
 		/* Advance */
 		x = nx;
 		y = ny;
+
+		/* Handle rope over chasm */
+		if (k_ptr)
+		{
+			feat = cave_feat[y][x];
+
+			if (f_info[feat].flags2 & (FF2_CHASM)) chasm = TRUE;
+			else chasm = FALSE;
+
+			feat = feat_state(feat, FS_SPIKE);
+
+			if (strstr(f_name + f_info[feat].name, "rope"))
+			{
+				/* Hack -- remove spike */
+				feat = feat_state(feat, FS_GET_FEAT);
+
+				/* MegaHack -- handle chain */
+				if (k_ptr->sval == SV_ROPE_CHAIN) feat++;
+
+				/* Change the feature */
+				cave_set_feat(y, x, feat);
+
+				/* Reduce inventory -- suppress messages */
+				if (item2 >= 0)
+				{
+					if (k_ptr->number == 1)
+					{
+						inven_drop_flags(k_ptr);
+						k_ptr = NULL;
+					}
+
+					inven_item_increase(item2, -1);
+					inven_item_optimize(item2);
+				}
+
+				/* Reduce and describe floor item */
+				else
+				{
+					if (k_ptr->number == 1) k_ptr = NULL;
+
+					floor_item_increase(0 - item2, -1);
+					floor_item_optimize(0 - item2);
+				}
+			}
+		}
 
 		/* Only do visuals if the player can "see" the missile */
 		if (panel_contains(y, x) && player_can_see_bold(y, x))
@@ -3567,6 +3744,26 @@ void do_cmd_fire(void)
 
 	/* Drop (or break) near that location */
 	drop_near(i_ptr, j, y, x);
+
+	/* Rope doesn't reach other end of chasm */
+	if (chasm)
+	{
+		/* Project along the path */
+		for ( ; i >= 0; --i)
+		{
+			y = GRID_Y(path_g[i]);
+			x = GRID_X(path_g[i]);
+
+			feat = cave_feat[y][x];
+
+			/* Drop rope into chasm */
+			if ((strstr(f_name + f_info[feat].name, "rope")) || strstr(f_name + f_info[feat].name, "chain"))
+			{
+				/* Hack -- drop into chasm */
+				cave_alter_feat(y, x, FS_TIMED);
+			}
+		}
+	}	
 }
 
 

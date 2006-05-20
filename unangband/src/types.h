@@ -1336,6 +1336,7 @@ struct player_type
 
 	s16b protevil;  /* Timed -- Protection */
 	s16b invuln;    /* Timed -- Invulnerable */
+	s16b free_act;  /* Timed -- Free action */
 	s16b hero;      /* Timed -- Heroism */
 	s16b shero;     /* Timed -- Super Heroism */
 	s16b shield;    /* Timed -- Shield Spell */

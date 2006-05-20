@@ -4312,7 +4312,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if ((target < 0) && !(p_ptr->stastis))
 			{
-				if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0)
+				if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->free_act))
 				{
 					if (powerful && (rand_int(100) > p_ptr->skill_sav))
 					{
@@ -4323,7 +4323,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					else msg_print("You are unaffected!");
 
 					/* Always notice */
-					player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+					if (!p_ptr->free_act) player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+					else update_smart_learn(who, SM_FREE_ACT);
+
 				}
 				else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
 				{
@@ -4359,7 +4361,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if ((target < 0) && !(p_ptr->stastis))
 			{
-				if ((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0)
+				if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->free_act))
 				{
 					if (powerful && (rand_int(100) > p_ptr->skill_sav))
 					{
@@ -4373,7 +4375,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					else msg_print("You are unaffected!");
 
 					/* Always notice */
-					player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+					if (!p_ptr->free_act) player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+					else update_smart_learn(who, SM_FREE_ACT);
 				}
 				else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
 				{

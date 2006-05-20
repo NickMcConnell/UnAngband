@@ -529,6 +529,7 @@ F:RECALL
 
 N:39:Acid Bolt
 A:65:16:1
+A:65:24:16
 A:66:20:1
 A:90:2:6
 A:90:20:1
@@ -541,6 +542,7 @@ B:BOLT:ACID:8d8+0
 
 N:40:Cloud Kill
 A:65:29:1
+A:65:60:4
 A:90:8:3
 A:90:19:6
 A:93:4:13
@@ -564,6 +566,7 @@ B:BALL:ACID:1d0+40
 
 N:42:Ice Storm
 A:65:30:1
+A:65:60:5
 A:90:8:5
 A:93:14:22
 C:1:27:25:75:29
@@ -573,6 +576,7 @@ B:STORM:COLD:2d0+70
 
 N:43:Meteor Swarm
 A:65:31:1
+A:65:60:6
 A:90:8:6
 A:90:17:8
 A:93:21:22
@@ -1277,6 +1281,7 @@ S:DESTRUCTION:15
 
 N:105:Annihilation
 A:65:25:1
+A:65:24:25
 A:91:8:5
 A:91:14:9
 A:93:18:27
@@ -1612,6 +1617,7 @@ B:AIM:DRAIN_LIFE:2d10+0
 
 N:139:Blind Monster
 A:65:32:1
+A:65:60:7
 A:91:14:2
 A:93:18:12
 C:2:5:5:35:6
@@ -1725,6 +1731,7 @@ B:LINE:FEATURE:0d0+228
 
 N:151:Fire Bolt II
 A:65:33:1
+A:65:60:8
 A:90:9:7
 A:93:13:18
 C:1:20:15:60:12
@@ -1735,6 +1742,7 @@ B:BOLT:FIRE:6d12
 
 N:152:Fire Bolt III
 A:65:34:1
+A:65:60:9
 A:90:9:11
 A:93:13:24
 C:1:30:22:70:18
@@ -1746,6 +1754,7 @@ B:BOLT:FIRE:6d16
 
 N:153:Fire Storm
 A:65:35:1
+A:65:60:10
 A:90:9:12
 A:93:13:22
 C:1:37:37:80:18
@@ -1782,6 +1791,7 @@ L:1d48+48
 
 N:157:Acid Bolt II
 A:65:36:1
+A:65:60:11
 A:90:10:10
 A:93:1:18
 C:1:25:19:60:18
@@ -1809,6 +1819,7 @@ B:LINE:ACID:0d0+127
 
 N:160:Acid Storm
 A:65:37:1
+A:65:60:12
 A:90:10:11
 A:93:1:22
 C:1:28:31:85:26
@@ -1818,6 +1829,7 @@ B:STORM:ACID:2d0+65
 
 N:161:Acid Bolt III
 A:65:38:1
+A:65:60:13
 A:90:10:13
 A:93:1:24
 C:1:35:28:70:24
@@ -1868,6 +1880,7 @@ L:1d48+48
 
 N:166:Lightning Bolt II
 A:65:39:1
+A:65:60:14
 A:90:12:6
 A:93:22:18
 C:1:15:9:40:10
@@ -1894,6 +1907,7 @@ B:STORM:ELEC:0d0+45
 
 N:169:Lightning Bolt III
 A:65:40:1
+A:65:60:15
 A:90:12:9
 A:93:22:24
 C:1:25:13:50:16
@@ -1905,6 +1919,7 @@ B:BEAM:ELEC:3d12
 
 N:170:Lightning Storm
 A:65:41:1
+A:65:60:16
 A:90:12:10
 A:93:22:22
 C:1:32:31:75:16
@@ -1941,6 +1956,7 @@ L:1d48+48
 
 N:174:Frost Bolt II
 A:65:42:1
+A:65:60:17
 A:90:11:6
 A:93:14:18
 C:1:17:13:50:12
@@ -1960,6 +1976,7 @@ N:175:Summon Ice Elemental
 
 N:176:Frost Bolt III
 A:65:43:1
+A:65:60:18
 A:90:11:9
 A:93:14:24
 C:1:27:19:60:18
@@ -2348,6 +2365,7 @@ B:AREA:LITE:4d0+0
 
 N:215:Shooting Star
 A:65:44:1
+A:65:60:19
 A:90:17:7
 A:93:21:19
 C:1:22:17:50:11
@@ -2404,6 +2422,7 @@ B:LINE:LOWER:6d8
 
 N:221:Freezing Cloud
 A:65:45:1
+A:65:60:20
 A:90:19:3
 A:93:14:4
 C:1:14:9:45:5
@@ -2413,6 +2432,7 @@ B:CLOUD:COLD:0d0+20
 
 N:222:Acidic Cloud
 A:65:46:1
+A:65:60:21
 A:90:19:4
 A:93:1:4
 C:1:15:13:60:7
@@ -2422,6 +2442,7 @@ B:CLOUD:ACID:0d0+30
 
 N:223:Storm Cloud
 A:65:47:1
+A:65:60:22
 A:90:19:5
 A:92:7:5
 A:93:22:4
@@ -2444,6 +2465,7 @@ N:224:Summon Air Elemental
 
 N:225:Burning Cloud
 A:65:48:1
+A:65:60:23
 A:90:19:7
 A:93:13:4
 C:1:25:13:55:10
@@ -2494,6 +2516,7 @@ B:AREA:RAISE:2d0+0
 
 N:230:Water Bolt
 A:65:49:1
+A:65:60:24
 A:90:20:4
 A:93:26:19
 C:1:17:13:50:12
@@ -2520,6 +2543,7 @@ B:LINE:FEATURE:0d0+126
 
 N:233:Whirlpool
 A:65:50:1
+A:65:60:25
 A:90:20:7
 A:92:7:7
 A:93:26:22
@@ -2729,6 +2753,7 @@ B:BLAST:SOUND:4d10+0
 
 N:255:Sound Bolt
 A:65:51:1
+A:65:60:26
 A:92:11:5
 A:93:19:19
 C:9:25:20:60:3
@@ -2921,11 +2946,10 @@ L:1d100+0
 F:CUT | STUN
 D:Massive explosions rupture your body.
 
-N:297:Death
-A:65:52:1
+N:297:Free Action
 A:75:23:1
-B:AIM:DRAIN_LIFE:0d0+5000
-D:A feeling of Death flows through your body.
+L:1d24+24
+F:FREE_ACT
 
 N:298:Infravision
 A:75:24:1
@@ -3164,7 +3188,7 @@ B:BALL:ELEC:1d0+15
 
 N:342:Heal Monster
 A:65:0:1
-A:65:24:24
+A:65:24:26
 B:BOLT:HEAL:4d6+0
 
 N:343:Haste Monster
@@ -3282,11 +3306,13 @@ B:STAR:LITE_WEAK:6d8+0
 
 N:364:Mana bolt
 A:65:56:1
+A:65:60:1
 A:77:14:1
 B:BOLT:MANA:4d0+0
 
 N:365:Magical Arrow
 A:65:57:1
+A:65:60:2
 B:ARROW:HURT:6d0+0
 
 N:366:Remove Fear & Poison
@@ -3415,7 +3441,6 @@ D:You breathe the elements.
 
 N:382:Conjure Flames
 A:45:18:1
-A:65:58:1
 B:BALL:FIRE:2d0+30
 F:OPP_FIRE
 L:1d20+20
@@ -3423,7 +3448,6 @@ D:You conjure up flames.
 
 N:383:Conjure Acid
 A:45:17:1
-A:65:59:1
 B:BALL:ACID:2d0+20
 F:OPP_ACID
 L:1d20+20
@@ -3431,7 +3455,6 @@ D:You conjure up acid.
 
 N:384:Conjure Ice
 A:45:19:1
-A:65:60:1
 B:BALL:COLD:2d0+35
 F:OPP_COLD
 L:1d20+20
@@ -3439,7 +3462,6 @@ D:You conjure up ice.
 
 N:385:Conjure Lightning
 A:45:38:1
-A:65:61:1
 B:BALL:ELEC:2d0+25
 F:OPP_ELEC
 L:1d20+20
@@ -3583,6 +3605,7 @@ B:BEAM:LOCK_DOOR
 
 N:398:Striking
 A:65:62:1
+A:65:60:3
 A:91:1:9
 A:93:5:12
 C:2:5:4:30:4
@@ -3616,6 +3639,7 @@ A:45:37:10
 B:BOLT:MANA:0d0+250
 
 N:403:Shockwave
+A:65:61:1
 A:90:8:1
 A:93:19:13
 C:1:16:10:40:6
@@ -3624,6 +3648,7 @@ C:8:16:10:40:6
 B:BALL:SOUND:1d0+10
 
 N:404:Explosion
+A:65:63:1
 A:90:8:2
 A:93:11:11
 A:93:25:13
@@ -3632,6 +3657,7 @@ C:8:20:20:50:10
 B:BALL:SHARD:2d0+20
 
 N:405:Bedlam
+A:65:64:1
 A:90:6:3
 A:90:22:6
 A:93:15:13
@@ -3642,6 +3668,7 @@ C:8:25:15:60:24
 B:BALL:CONFUSE_WEAK:1d0+0
 
 N:406:Rend Soul
+A:65:65:1
 A:90:6:4
 A:93:18:19
 A:77:13:1
@@ -3650,6 +3677,7 @@ C:8:25:30:80:30
 B:BOLT_10:NETHER:5d0+0
 
 N:407:Chaos Strike
+A:65:66:1
 A:90:6:8
 A:93:28:19
 A:77:12:1
@@ -3658,6 +3686,7 @@ C:8:38:35:90:40
 B:BOLT:CHAOS:6d0+0
 
 N:408:Rift
+A:65:67:1
 A:90:8:7
 A:90:17:9
 A:93:21:25
@@ -3816,6 +3845,7 @@ F:IDENT_SENSE
 
 N:428:Darkness Bolt
 A:77:10:1
+A:65:52:1
 C:1:15:9:50:8
 C:4:25:20:60:3
 C:8:15:9:50:8
@@ -3823,6 +3853,7 @@ B:BOLT:DARK:7d8+0
 
 N:429:Nexus Bolt
 A:77:11:1
+A:65:58:1
 C:1:15:9:50:8
 C:4:25:20:60:3
 C:8:15:9:50:8
@@ -3830,6 +3861,7 @@ B:BOLT:NEXUS:6d8+0
 
 N:430:Ice Bolt
 A:77:8:1
+A:65:59:1
 C:1:15:9:50:8
 C:4:25:20:60:3
 C:8:15:9:50:8

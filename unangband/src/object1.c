@@ -813,6 +813,15 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			break;
 		}
 
+		/* Hack -- Rope */
+		case TV_ROPE:
+		{
+			modstr = basenm;
+			basenm = "& #";
+			break;
+			return;
+		}
+
 		/* Magical Bags */
 		case TV_BAG:
 		{
@@ -828,6 +837,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			basenm = "& Service~";
 			break;
 		}
+
 
 		/* Hack -- Gold */
 		case TV_GOLD:
@@ -940,6 +950,13 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		else if (o_ptr->number <= 0)
 		{
 			object_desc_str_macro(t, "no more ");
+		}
+
+		/* Hack -- rope */
+		else if (o_ptr->tval == TV_ROPE)
+		{
+			object_desc_num_macro(t, o_ptr->number);
+			object_desc_str_macro(t, "0 feet of ");
 		}
 
 		/* Extract the number */

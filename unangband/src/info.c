@@ -712,6 +712,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags2 & (SF2_BLESS)) vp[vn++]="blesses you";
 	if (s_ptr->flags2 & (SF2_SHIELD)) vp[vn++]="shields you";
 	if (s_ptr->flags2 & (SF2_INVULN)) vp[vn++]="makes you invulnerable to damage";
+	if (s_ptr->flags3 & (SF3_FREE_ACT)) vp[vn++] = "protects you from paralysis and magical slowness";
 	if (s_ptr->flags2 & (SF2_SEE_INVIS)) vp[vn++]="allows you to see invisible monsters";
 	if (s_ptr->flags2 & (SF2_PROT_EVIL)) vp[vn++]="protects your from evil monsters";
 	if (s_ptr->flags2 & (SF2_HASTE)) vp[vn++]="hastes you";
@@ -804,6 +805,8 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags3 & (SF3_CURE_IMAGE)) vp[vn++]="hallucinations";
 	if (s_ptr->flags3 & (SF3_CURE_CONF)) vp[vn++]="confusion";
 	if (s_ptr->flags3 & (SF3_CURE_FEAR)) vp[vn++]="fear";	
+	if (s_ptr->flags3 & (SF3_FREE_ACT)) vp[vn++]="slowness";
+	if (s_ptr->flags3 & (SF3_CURE_MEM)) vp[vn++]="amnesia";
 	if (s_ptr->type == SPELL_CURE_DISEASE) vp[vn++] = disease_name[s_ptr->param];
 
 	/* Describe cure effects */
@@ -918,7 +921,6 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags3 & (SF3_CURE_CON)) vp[vn++]="constitution";
 	if (s_ptr->flags3 & (SF3_CURE_CHR)) vp[vn++]="charisma";
 	if (s_ptr->flags3 & (SF3_CURE_EXP)) vp[vn++]="experience";
-	if (s_ptr->flags3 & (SF3_CURE_XXXX)) vp[vn++]="XXXX";
 
 	/* Describe stat effects */
 	if (vn)
@@ -952,7 +954,6 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	/* Collect miscellaneous */
 	vn = 0;
 
-	if (s_ptr->flags3 & (SF3_SLOW_XXXX)) vp[vn++] = "partially restores your mana";
 	if (s_ptr->flags3 & (SF3_DEC_FOOD)) vp[vn++] = "makes you weak from hunger";
 	if (s_ptr->flags2 & (SF2_CURSE_WEAPON)) vp[vn++] = "curses your weapon";
 	if (s_ptr->flags2 & (SF2_CURSE_ARMOR)) vp[vn++] = "curses your armor";
@@ -3015,7 +3016,7 @@ void list_object(const object_type *o_ptr, int mode)
 				anything = TRUE;
 				break;
 			case TV_ROPE:
-				text_out(format("%sand spikes.  ", build_bridge));
+				text_out(format("%sand spikes or grapples.  ", build_bridge));
 				anything = TRUE;
 				break;
 			case TV_SHOT:
