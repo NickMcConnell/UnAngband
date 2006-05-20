@@ -5215,8 +5215,8 @@ static void process_monster(int m_idx)
 
 	/*** Monster hungry? ***/
 	if ((((m_ptr->mflag & (MFLAG_WEAK | MFLAG_STUPID | MFLAG_NAIVE | MFLAG_CLUMSY | MFLAG_SICK)) != 0)
-		|| (((r_ptr->flags3 & (RF3_TROLL)) != 0) && (m_ptr->hp < m_ptr->maxhp)))
-		&& (((m_ptr->mflag & (MFLAG_AGGR)) == 0) || !(player_has_los_bold(m_ptr->fy, m_ptr->fx)))
+		|| (m_ptr->hp < m_ptr->maxhp))
+		&& (((m_ptr->mflag & (MFLAG_AGGR)) == 0) || !(player_has_los_bold(m_ptr->fy, m_ptr->fx)) || (m_ptr->hp < m_ptr->maxhp / 10))
 		&& (!(r_ptr->flags3 & (RF3_NONLIVING)) || (r_ptr->flags2 & (RF2_EAT_BODY))))
 	{
 		int this_o_idx, next_o_idx, item = 0;
@@ -5387,11 +5387,36 @@ static void process_monster(int m_idx)
 				case 4: if ((m_ptr->mflag & (MFLAG_NAIVE)) != 0) {  m_ptr->mflag &= ~(MFLAG_NAIVE); break; }
 			}
 
-			/* Hack -- trolls recover hit points */
+			/* All monsters recover hit points */
+			if (m_ptr->hp < m_ptr->maxhp)
+			{
+				/* Base regeneration */
+				int frac = m_ptr->maxhp / 100;
+
+				/* Minimal regeneration rate */
+				if (!frac) frac = 1;
+
+				/* Some monsters regenerate quickly */
+				if (r_ptr->flags2 & (RF2_REGENERATE)) frac *= 2;
+
+				/* Regenerate */
+				m_ptr->hp += frac;
+
+				/* Do not over-regenerate */
+				if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
+
+				/* Fully healed -> flag minimum range for recalculation */
+				if (m_ptr->hp == m_ptr->maxhp) m_ptr->min_range = 0;
+			}
+
+			/* Hack -- trolls recover more hit points */
 			if (r_ptr->flags3 & (RF3_TROLL))
 			{
 				m_ptr->hp += m_ptr->maxhp / 30;
 				if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
+
+				/* Fully healed -> flag minimum range for recalculation */
+				if (m_ptr->hp == m_ptr->maxhp) m_ptr->min_range = 0;
 			}
 
 			return;
@@ -5649,6 +5674,32 @@ static void recover_monster(int m_idx, bool regen)
 	/* Every 100 game turns, regenerate monsters */
 	else if ((regen) && !(m_ptr->cut) && !(m_ptr->poisoned))
 	{
+		/* Regenerate mana, if needed */
+		if (m_ptr->mana < r_ptr->mana)
+		{
+			/* Monster regeneration depends on maximum mana */
+			frac = r_ptr->mana / 30;
+
+			/* Minimal regeneration rate */
+			if (!frac) frac = 1;
+
+			/* Regenerate */
+			m_ptr->mana += frac;
+
+			/* Some monsters regenerate quickly */
+			if (r_ptr->flags2 & (RF2_REGENERATE)) frac *= 2;
+
+			/* Inactive monsters rest */
+			if (!(m_ptr->mflag & (MFLAG_ACTV))) frac *= 2;
+
+			/* Do not over-regenerate */
+			if (m_ptr->mana > r_ptr->mana) m_ptr->mana = r_ptr->mana;
+
+			/* Fully recovered mana -> flag minimum range for recalculation */
+			if (m_ptr->mana >= r_ptr->mana / 2) m_ptr->min_range = 0;
+		}
+
+		/* Regenerate hit points, if needed */
 		if (m_ptr->hp < m_ptr->maxhp)
 		{
 			/* Base regeneration */
@@ -5659,6 +5710,9 @@ static void recover_monster(int m_idx, bool regen)
 
 			/* Some monsters regenerate quickly */
 			if (r_ptr->flags2 & (RF2_REGENERATE)) frac *= 2;
+
+			/* Inactive monsters rest */
+			if (!(m_ptr->mflag & (MFLAG_ACTV))) frac *= 2;
 
 			/* Regenerate */
 			m_ptr->hp += frac;

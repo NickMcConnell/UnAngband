@@ -4744,12 +4744,6 @@ static bool kind_is_race(int k_idx)
 
 		/* Containers */
 		case TV_HOLD:
-		{
-			if (r_ptr->flags8 & (RF8_DROP_CHEST)) return (TRUE);
-			return (FALSE);
-		}
-
-		/* Magical Bags */
 		case TV_BAG:
 		{
 			if (r_ptr->flags8 & (RF8_DROP_CHEST)) return (TRUE);
@@ -4770,6 +4764,7 @@ static bool kind_is_race(int k_idx)
 		case TV_DIGGING:
 		case TV_SPIKE:
 		case TV_FLASK:
+		case TV_ROPE:
 		{
 			if (r_ptr->flags8 & (RF8_DROP_TOOL)) return (TRUE);
 			return (FALSE);
