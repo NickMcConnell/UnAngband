@@ -1046,7 +1046,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 	/* Examine (and count) the actual attacks */
 	for (r = 0, m = 0; m < 4; m++)
 	{
-		int method, effect, d1, d2, d3, rad;
+		int method, effect, d1, d2, d3, rad, arc;
 
 		/* Skip non-attacks */
 		if (!s_ptr->blow[m].method) continue;
@@ -1058,6 +1058,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		d2 = s_ptr->blow[m].d_side;
 		d3 = s_ptr->blow[m].d_plus;
 		rad = 0;
+		arc = 0;
 
 		/* Hack -- use level as modifier */
 		if ((!d2) && (!level))
@@ -1104,6 +1105,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		switch (method)
 		{
 			case RBM_HIT: p = "hits"; t = "one target"; break;
+			case RBM_SPIT: p = "spits"; t = "one target"; break;
 			case RBM_AURA: p = "surrounds you with an aura";  t = "your enemies"; rad = 2; break;
 			case RBM_SELF: t = "you";break;
 			case RBM_EXPLODE: t = "you and all enemies adjacent to you"; break;
@@ -1123,14 +1125,23 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_LOS: t = "all your enemies in line of sight"; break;
 			case RBM_LINE: t = "one direction"; break;
 			case RBM_AIM: t = "one target"; break;
+			case RBM_PANEL: t = "the current panel"; break;
+			case RBM_LEVEL: t = "the current level"; break;
 			case RBM_ORB: p = "creates an orb"; t = "your enemies"; rad = (level < 30 ? 2 : 3); d3 += level/2; break;
 			case RBM_CROSS: p = "surrounds you with a cross"; t = "your enemies"; break;
 			case RBM_STRIKE: p = "strikes"; t = "an enemy"; if ((level > 5) && (d2)) d1+= (level-1)/5; break;
 			case RBM_STAR: p = "surrounds you with a star"; t = "your enemies"; break;
 			case RBM_SPHERE: p = "creates a sphere";  t = "your enemies";  rad = (level/10)+2;break;
-			case RBM_PANEL: t = "the current panel"; break;
-			case RBM_LEVEL: t = "the current level"; break;
-			case RBM_SPIT: p = "spits"; t = "one target"; break;
+			case RBM_ARROW: p = "creates an arrow"; t="one target"; break;
+			case RBM_XBOLT: p = "creates a crossbow bolt"; t="one target"; break;
+			case RBM_SPIKE: p = "creates a spike"; t="one target"; break;
+			case RBM_DART: p = "creates a dart"; t="one target"; break;
+			case RBM_SHOT: p = "creates a shot"; t="one target"; break;
+			case RBM_ARC_20: p = "creates an arc"; arc = 20; break;
+			case RBM_ARC_30: p = "creates an arc"; arc = 30; break;
+			case RBM_ARC_40: p = "creates an arc"; arc = 40; break;
+			case RBM_ARC_50: p = "creates an arc"; arc = 50; break;
+			case RBM_ARC_60: p = "creates an arc"; arc = 60; break;
 			case RBM_FLASK: p = "creates a ball"; t = "your enemies"; rad = 1; break; 
 		}
 
@@ -1301,6 +1312,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		if (p)
 		{
 			text_out(p);
+			if (arc) text_out (format( " of %d degrees",arc));
 			if (rad) text_out (format( " of radius %d",rad));
 			text_out(" to");
 			if (q)
@@ -1389,6 +1401,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		/* Get the effect */
 		if ((d1 || d2 || d3) && (detail)) switch (effect)
 		{
+			case GF_WIND: text_out("damage against flying or climbing monsters, less against others"); break;
 			case GF_LITE_WEAK: text_out("damage to monsters vulnerable to light"); break;
 			case GF_KILL_WALL: text_out("damage to monsters made from rock"); break;
 			case GF_RAISE: case GF_LOWER: text_out("damage to monsters made from water"); break;

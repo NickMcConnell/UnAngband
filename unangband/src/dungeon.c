@@ -226,6 +226,13 @@ static void sense_inventory(void)
 		/* Skip empty slots */
 		if (!o_ptr->k_idx) continue;
 
+		/* Hack -- we seem to get a source of corrupt objects that crash this routine. Putting this warning in. */
+		if (o_ptr->k_idx >= z_info->k_max)
+		{
+			bell("BUG: Object corruption detected. See bugs.txt for reporting details.");
+			continue;
+		}
+
 		/* Sense flags to see if we have ability */
 		if (i >= INVEN_WIELD)
 		{
@@ -1997,7 +2004,12 @@ static void process_command(void)
 		/* Throw an item */
 		case 'v':
 		{
+
+			msg_format("To throw items,%s use the fire command.",
+				inventory[INVEN_BOW].tval == TV_BOW ? " take off your missile weapon and" : "");
+#if 0
 			do_cmd_throw();
+#endif
 			break;
 		}
 

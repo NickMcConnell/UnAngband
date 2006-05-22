@@ -629,6 +629,14 @@ static void prt_state(void)
 		strcpy(text, "Asleep    ");
 	}
 
+	/* Asleep - attr and text always overrides */
+	if (p_ptr->stastis)
+	{
+		attr = TERM_BLUE;
+
+		strcpy(text, "Timewarp! ");
+	}
+
 	/* Paralysis - attr and text always overrides */
 	if (p_ptr->paralyzed)
 	{

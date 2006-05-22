@@ -496,26 +496,35 @@ bool set_psleep(int v)
 	/* Hack -- Wake player when finished sleeping */
 	if (v >= PY_SLEEP_MAX) v = 0;
 
+	/* Recover stats */
+	if (p_ptr->psleep >= PY_SLEEP_RECOVER)
+	{
+		int i;
+
+		for (i = 0; i < A_MAX; i++)
+		{
+			if (p_ptr->stat_cur[i]<p_ptr->stat_max[i])
+			{
+				if (p_ptr->stat_cur[i] < 18) p_ptr->stat_cur[i]++;
+				else p_ptr->stat_cur[i] += 10;
+
+				if (p_ptr->stat_cur[i] > p_ptr->stat_max[i]) p_ptr->stat_cur[i] = p_ptr->stat_max[i];
+
+				p_ptr->redraw |= (PR_STATS);
+
+				v = 0;
+
+				notice = TRUE;
+			}
+		}
+
+		if (notice) msg_print("You recover somewhat.");
+	}
+
 	/* Open */
 	if (v)
 	{
-		if ((p_ptr->psleep < PY_SLEEP_RECOVER) && (v >= PY_SLEEP_RECOVER))
-		{
-			int i, choice = -1, count = 0;
-
-			for (i = 0; i < A_MAX; i++)
-			{
-				if ((p_ptr->stat_cur[i]<p_ptr->stat_max[i]) && (rand_int(++count))) choice = i;
-			}
-
-			if (choice >= 0)
-			{
-				p_ptr->stat_cur[choice]++;
-			}
-
-			/* notice = TRUE; */
-		}
-		else if ((p_ptr->psleep < PY_SLEEP_ASLEEP) && (v >= PY_SLEEP_ASLEEP))
+		if ((p_ptr->psleep < PY_SLEEP_ASLEEP) && (v >= PY_SLEEP_ASLEEP))
 		{
 			msg_print("You fall asleep.");
 			notice = TRUE;

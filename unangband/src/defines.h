@@ -472,8 +472,8 @@
 /*
  * Player "sleep" crucial values
  */
-#define PY_SLEEP_MAX    	8000    /* Rest value (Maximum) */
-#define PY_SLEEP_RECOVER    	4000    /* Rest value (Recover) */
+#define PY_SLEEP_MAX    	4800   /* Rest value (Maximum) */
+#define PY_SLEEP_RECOVER    	2400   /* Rest value (Recover) */
 #define PY_SLEEP_ASLEEP    	10    /* Rest value (Asleep) */
 #define PY_SLEEP_DROWSY   	5     /* Rest value (Drowsy) */
 
@@ -2230,6 +2230,11 @@
 #define SV_FLASK_OIL      0
 #define SV_FLASK_EMPTY    1
 #define SV_FLASK_ACID     2
+#define SV_FLASK_BLOOD	  3
+#define SV_FLASK_SLIME	  3
+#define SV_FLASK_BILE	  5
+#define SV_FLASK_WEB	  15
+
 
 /* The "sval" codes for TV_FOOD */
 #define SV_FOOD_POISON			0
@@ -3162,7 +3167,7 @@
 #define RF2_PRIEST 	0x04000000 	/* Monster has access to priest spells ? */
 #define RF2_MAGE   	0x08000000 	/* Monster has access to mage spells ? */
 #define RF2_HAS_AURA  	0x10000000 	/* Monster radiates an aura attack */
-#define RF2_HAS_WEB	0x20000000 	/* Monster leaves a trail of webs */
+#define RF2_HAS_WEB	0x20000000 	/* Monster created in a web */
 #define RF2_NEED_LITE	0x40000000 	/* Monster cannot see the player if player is not visible */
 #define RF2_LOW_MANA_RUN	0x80000000	/* Monster will run if low on mana */
 

@@ -2516,6 +2516,17 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		burnout = TRUE;
 	}
 
+	/* Hack -- storm can do several things */
+	if (typ == GF_STORM)
+	{
+		switch(rand_int(3))
+		{
+			case 0: typ = GF_WIND; break;
+			case 1: typ = GF_WATER; break;
+			case 2: typ = GF_ELEC; break;
+		}
+	}
+
 	/* Analyze the type */
 	switch (typ)
 	{
@@ -3141,6 +3152,37 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 		{
 			/* Create slime on floor */
 			if (f_ptr->flags1 & (FF1_FLOOR)) cave_set_feat(y, x, FEAT_FLOOR_SLIME_T);
+
+			break;
+		}
+
+		case GF_WIND:
+		{
+			/* Blow out flames and other timed effects */
+			if (f_ptr->flags3 & (FF3_TIMED))
+			{
+				/* Check line of sight */
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
+				{
+					msg_format("The %s blows out.",f);
+					obvious = TRUE;
+				}
+
+				cave_alter_feat(y,x,FS_TIMED);
+			}
+
+			/* Blow out smoke and other spreading effects */
+			else if (f_ptr->flags3 & (FF3_SPREAD))
+			{
+				/* Check line of sight */
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
+				{
+					msg_format("The %s blows away.",f);
+					obvious = TRUE;
+				}
+
+				cave_alter_feat(y,x,FS_SPREAD);
+			}
 
 			break;
 		}
@@ -4984,8 +5026,9 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			/* Big, heavy monsters, metallic monsters and ghosts */
 			if ((r_ptr->flags3 & (RF3_HUGE)) || (r_ptr->flags9 & (RF9_IM_BLUNT | RF9_IM_EDGED))) do_dist /= 3;
 			else if ((r_ptr->flags3 & (RF3_GIANT)) || (r_ptr->flags9 & (RF9_RES_BLUNT | RF9_RES_EDGED))) do_dist /= 2;
+			else if (m_ptr->mflag & (MFLAG_OVER)) do_dist = 8;
 
-			/* Scale down damage based on distance */
+			/* Scale down damage based on distance -- unless monster flying or climbing */
 			dam = dam * do_dist / 8;
 
 			/* Monster was affected -- Mark grid for later processing. */

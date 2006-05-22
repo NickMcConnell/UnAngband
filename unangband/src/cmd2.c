@@ -2937,7 +2937,7 @@ void do_cmd_rest(void)
 		}
 
 		/* Rest until done */
-		if (out_val[0] == '&')
+		else if (out_val[0] == '&')
 		{
 			p_ptr->command_arg = (-2);
 		}
@@ -2974,7 +2974,7 @@ void do_cmd_rest(void)
 	if (p_ptr->command_arg == -3)
 	{
 		p_ptr->command_arg = PY_SLEEP_ASLEEP;
-		set_psleep(p_ptr->psleep++);
+		set_psleep(1);
 	}
 
 	/* Save the rest code */
@@ -3148,8 +3148,18 @@ void do_cmd_fire(void)
 	if (!item_tester_tval) item_tester_hook = item_tester_hook_throwing;
 
 	/* Get an item */
-	q = "Fire which item? ";
-	s = "You have nothing to fire.";
+	if ((inventory[INVEN_BOW].k_idx) && (inventory[INVEN_BOW].tval == TV_BOW))
+	{
+		q = "Fire which item? ";
+		s = "You have nothing to fire. Take off your missile weapon to throw an item.";
+	}
+	/* Get an item */
+	else
+	{
+		q = "Throw which item? ";
+		s = "You have nothing to throw. Equip missile weapon to fire an item.";
+	}
+
 	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATG))) return;
 
 	/* Get the object */
@@ -3775,7 +3785,7 @@ void do_cmd_fire(void)
 }
 
 
-
+#if 0
 /*
  * Throw an object from the pack or floor.
  *
@@ -4263,3 +4273,4 @@ void do_cmd_throw(void)
 }
 
 
+#endif

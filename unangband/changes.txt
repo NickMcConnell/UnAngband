@@ -1,3 +1,5 @@
+Unangband 0.6.1 beta 1
+
 ### Game Play ###
 
 - Improved metric for when monsters should cast probe spell (Reported by
@@ -64,6 +66,9 @@ such terrain.
 - Added potions of free action, more high-level wands, ropes and grappling
 ammunition to shoot ropes across chasms.
 
+- Added a number of new attack spells using winds, blood, webs and other new
+effects, as well as nexus, ice and darkness.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -74,6 +79,8 @@ graphics to scale.
 enchant it with brands or resists.
 
 - Improvements to object display code to describe many more uses for objects.
+
+- Disabled the throw command. Thrown items are thrown using the fire command.
 
 ### Bug fixes ###
 

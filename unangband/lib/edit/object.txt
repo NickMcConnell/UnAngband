@@ -6025,7 +6025,7 @@ N:832:Blood
 G:!:r
 I:77:3:0
 W:1:0:10:0
-A:1/1
+A:1/2
 P:0:1d1:0:0:0
 F:THROWING
 
@@ -6033,23 +6033,23 @@ N:833:Slime
 G:!:W
 I:77:4:0
 W:1:0:10:0
-A:1/1
+A:1/2
 P:0:1d1:0:0:0
 F:THROWING
 
 N:834:Bile
 G:!:o
 I:77:5:0
-W:1:0:10:0
-A:1/1
+W:8:0:10:0
+A:8/2
 P:0:1d1:0:0:0
 F:THROWING
 
 N:835:Web
 G:!:s
 I:77:15:0
-W:1:0:10:0
-A:1/1
+W:2:0:10:0
+A:2/2
 P:0:1d1:0:0:0
 F:THROWING
 
@@ -6125,7 +6125,6 @@ I:14:1:0
 W:5:0:5:10
 A:5/1
 P:0:1d1:0:0:0
-F:THROWING
 
 N:845:Chain
 G:~:y
@@ -6133,7 +6132,7 @@ I:14:2:0
 W:10:0:50:40
 A:10/1
 P:0:1d1:0:0:0
-F:THROWING | IGNORE_FIRE
+F:IGNORE_FIRE
 
 N:846:& Vine~
 G:~:u
@@ -6141,7 +6140,6 @@ I:3:14:0
 W:1:0:15:0
 A:1/1
 P:0:1d1:0:0:0
-F:THROWING
 
 N:847:Elven Rope
 G:~:y
@@ -6149,7 +6147,7 @@ I:14:4:0
 W:35:0:1:100
 A:35/1
 P:0:1d1:0:0:0
-F:THROWING | ELF | IGNORE_FIRE | IGNORE_ACID
+F:ELF | IGNORE_FIRE | IGNORE_ACID
 
 ### Grapples ###
 
@@ -6211,17 +6209,47 @@ A:85/3
 P:0:1d1:0:0:0
 F:IGNORE_ELEC
 
-N:855:Chaos
+### 855 ###
+
+N:856:Blood
 G:-:w
-I:65:67:1
-W:80:0:10:3750
-A:80/3
+I:65:68:1
+W:70:0:10:3750
+A:70/2
 P:0:1d1:0:0:0
 F:IGNORE_ELEC
 
+N:857:Dispelling
+G:-:w
+I:65:69:1
+W:30:0:10:600
+A:30/3
+P:0:1d1:0:0:0
+F:IGNORE_ELEC
+
+N:858:Web building
+G:-:w
+I:65:70:1
+W:40:0:10:800
+A:40/3
+P:0:1d1:0:0:0
+F:IGNORE_ELEC
+
+N:859:Winds
+G:-:w
+I:65:71:1
+W:40:0:10:900
+A:40/3
+P:0:1d1:0:0:0
+F:IGNORE_ELEC
+
+### 860 - 863 ###
+
+
+
 ### Weapons ###
 
-N:856:& Harpoon~
+N:864:& Harpoon~
 G:/:y
 I:22:6:0
 W:5:0:70:120

@@ -325,10 +325,10 @@ static int wiz_create_itemtype(void)
 	cptr tval_desc;
 	char ch;
 
-	int choice[60];
-	static const char choice_name[] = "abcdefghijklmnopqrst"
-	                                  "ABCDEFGHIJKLMNOPQRST"
-	                                  "0123456789:;<=>?@%&*";
+	int choice[78];
+	static const char choice_name[] = "abcdefghijklmnopqrstuvwxyz"
+	                                  "ABCDEFGHIJKLMNOPQRSTuvwxyz"
+	                                  "0123456789:;<=>?@%&*(){}<>";
 	const char *cp;
 
 	char buf[160];
@@ -338,10 +338,10 @@ static int wiz_create_itemtype(void)
 	Term_clear();
 
 	/* Print all tval's and their descriptions */
-        for (num = 0; (num < 60) && object_group_tval[num]; num++)
+        for (num = 0; (num < 78) && object_group_tval[num]; num++)
 	{
-		row = 2 + (num % 20);
-		col = 30 * (num / 20);
+		row = 2 + (num % 26);
+		col = 30 * (num / 26);
 		ch  = choice_name[num];
                 prt(format("[%c] %s", ch, object_group_text[num]), row, col);
 	}
@@ -371,7 +371,7 @@ static int wiz_create_itemtype(void)
 	Term_clear();
 
 	/* We have to search the whole item list. */
-	for (num = 0, i = 1; (num < 60) && (i < z_info->k_max); i++)
+	for (num = 0, i = 1; (num < 78) && (i < z_info->k_max); i++)
 	{
 		object_kind *k_ptr = &k_info[i];
 
@@ -382,8 +382,8 @@ static int wiz_create_itemtype(void)
 			if (k_ptr->flags3 & (TR3_INSTA_ART)) continue;
 
 			/* Prepare it */
-			row = 2 + (num % 20);
-			col = 30 * (num / 20);
+			row = 2 + (num % 26);
+			col = 30 * (num / 26);
 			ch  = choice_name[num];
 
 			/* Get the "name" of object "i" */

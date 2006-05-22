@@ -4388,8 +4388,17 @@ static bool name_drop_okay(int r_idx)
 		if (r_ptr->flags2 & (RF2_STUPID)) return (FALSE);
 
 		/* Hack -- force unique or hybrid statues */
-		if ((j_ptr->tval == TV_STATUE) && !(r_ptr->flags1 & (RF1_UNIQUE)) && (r_ptr->d_char != 'H')) return (FALSE);
+		if (!(r_ptr->flags1 & (RF1_UNIQUE)) && (r_ptr->d_char != 'H')) return (FALSE);
 	}
+	else if (j_ptr->tval == TV_FLASK)
+	{
+		if ((j_ptr->sval == SV_FLASK_BLOOD) && !(r_ptr->flags8 & (RF8_HAS_BLOOD))) return (FALSE);
+		/* Hack -- breathers have bile */
+		if ((j_ptr->sval == SV_FLASK_BILE) && !(r_ptr->flags4 >= (RF4_BRTH_ACID))) return (FALSE);
+		if ((j_ptr->sval == SV_FLASK_SLIME) && !(r_ptr->flags8 & (RF8_HAS_SLIME))) return (FALSE);
+		if ((j_ptr->sval == SV_FLASK_WEB) && !(r_ptr->flags2 & (RF2_HAS_WEB))) return (FALSE);
+	}
+
 
 	/* Accept */
 	return (TRUE);
@@ -4462,9 +4471,14 @@ static void name_drop(object_type *j_ptr)
 	/* Are we done? */
 	if ((j_ptr->tval != TV_BONE) && (j_ptr->tval != TV_EGG) && (j_ptr->tval != TV_STATUE)
 		&& (j_ptr->tval != TV_SKIN) && (j_ptr->tval != TV_BODY) &&
-		(j_ptr->tval != TV_HOLD)) return;
+		(j_ptr->tval != TV_HOLD) && (j_ptr->tval != TV_FLASK)) return;
 
-	if ((rand_int(100) < (30+ (p_ptr->depth/2))) || (race_drop_idx))
+	/* Hack -- only some flasks are flavoured */
+	if ((j_ptr->tval == TV_FLASK) && (j_ptr->sval != SV_FLASK_BLOOD) && (j_ptr->sval != SV_FLASK_SLIME)
+		&& (j_ptr->sval != SV_FLASK_BILE) && (j_ptr->sval != SV_FLASK_WEB)) return;
+
+	/* Flavor the drop with a monster type */
+	if ((rand_int(100) < (30+ (p_ptr->depth * 2))) || (race_drop_idx))
 	{
 		/* Store the old hook */
 		get_mon_old_hook = get_mon_num_hook;
@@ -4492,7 +4506,6 @@ static void name_drop(object_type *j_ptr)
 
 		/* Flavor the skeleton */
 		j_ptr->name3 = r_idx;
-
 	}
 }
 

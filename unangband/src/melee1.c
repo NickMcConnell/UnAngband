@@ -641,7 +641,7 @@ bool make_attack_normal(int m_idx)
 		if (!effect || check_hit(attack_power(effect), rlev, m_idx, FALSE))
 		{
 			/* Always disturbing */
-			disturb(1, 0);
+			disturb(1, 1);
 
 			/* Hack -- Apply "protection from evil" */
 			if ((p_ptr->protevil > 0) &&
@@ -784,7 +784,7 @@ bool make_attack_normal(int m_idx)
 				disturb(1, 0);
 
 				/* Message */
-				msg_format("%^s misses you.", m_name);
+				if (!p_ptr->psleep) msg_format("%^s misses you.", m_name);
 			}
 		}
 
