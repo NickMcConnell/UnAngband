@@ -9884,7 +9884,7 @@ static bool project_t(int who, int y, int x, int dam, int typ, u32b flg)
 	/* Check if monster cannot survive on terrain and possibly entomb */
 	if (affect_monster)
 	{
-		byte blocked;
+		byte blocked = 0x00;
 
 		/* Block grids marked with temp flags as not to hit monster twice */
 		for (k=0;k<8;k++)

@@ -2116,6 +2116,10 @@ static void display_player_misc_info(void)
                 	case WS_SONG_BOOK:
                         	t = TV_SONG_BOOK;
                         	break;
+
+			default:
+				t = TV_RUNESTONE;
+				break;
 		}
 
 		u = lookup_kind(t, p_ptr->psval);

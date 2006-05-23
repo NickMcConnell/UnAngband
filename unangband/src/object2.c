@@ -3503,7 +3503,7 @@ int value_check_aux10(object_type *o_ptr, bool weapon)
 	u32b f1, f2, f3, f4;
 
 	int i, count = 0;
-	u32b j, flag2;
+	u32b j, flag2 = 0;
 
 	int flag1 = 0;
 
@@ -3750,7 +3750,7 @@ int value_check_aux13(object_type *o_ptr)
  */
 int sense_magic(object_type *o_ptr, int sense_type, bool heavy)
 {
-	int feel;
+	int feel = 0;
 
 	bool okay = FALSE;
 
