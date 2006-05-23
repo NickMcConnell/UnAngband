@@ -1,4 +1,5 @@
-Unangband 0.6.1 beta 1
+Unangband 0.6.1 "It's all in the reflexes." aka "Hell of the Upside-down
+Sinners"
 
 ### Game Play ###
 
