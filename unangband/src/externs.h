@@ -91,6 +91,7 @@ extern const cptr vocalize[MAX_LANGUAGES];
 extern const int month_day[9];
 extern const cptr month_name[9];
 extern const s16b bag_holds[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL][2];
+extern const cptr w_name_style[32];
 
 /* variable.c */
 extern cptr copyright;
@@ -763,6 +764,7 @@ extern void identify_pack(void);
 extern bool remove_curse(void);
 extern bool remove_all_curse(void);
 extern bool restore_level(void);
+extern void self_knowledge_aux(bool spoil, bool random);
 extern void self_knowledge(bool spoil);
 extern bool lose_all_info(void);
 extern void set_recall(void);

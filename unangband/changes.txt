@@ -86,6 +86,8 @@ enchant it with brands or resists.
 
 - Updated character dump code (From NPPAngband).
 
+- Display list of dungeons visited.
+
 ### Bug fixes ###
 
 - Fix weapon branding.

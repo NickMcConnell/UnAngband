@@ -1415,6 +1415,22 @@ static errr init_other(void)
 	/* Allocate it */
 	C_MAKE(inventory, INVEN_TOTAL, object_type);
 
+
+	/*** Prepare the bags ***/
+
+	/* Initialize empty bags */
+	for (i = 0; i < SV_BAG_MAX_BAGS; i++)
+		for (n = 0; n < INVEN_BAG_TOTAL; n++)
+			bag_contents[i][n] = 0;
+
+
+	/*** Prepare the dungeons ***/
+
+	/* Initialize maximum depth */
+	for (i = 0; i < z_info->t_max; i++)
+		t_info[i].max_depth = 0;
+
+
 	/*** Prepare the stores ***/
 
 	/* Allocate the stores */
@@ -1433,6 +1449,7 @@ static errr init_other(void)
 		C_MAKE(st_ptr->stock, st_ptr->stock_size, object_type);
 
 	}
+
 
 	/*** Prepare the options ***/
 

@@ -717,45 +717,6 @@ static void player_outfit(void)
 	}
 }
 
-/*
- * Names of various styles
- */
-
-static cptr w_name_style[] =
-{
-	"None",
-	"Unarmed",
-	"One-handed",
-	"Two-handed",
-	"Weapon & shield",
-	"Two-weapon",
-	"Hafted weapons",
-	"Swords",
-	"Polearms",
-	"Thrown weapons",
-	"Slings",
-	"Bows",
-	"Cross-bows",
-	"Backstab",
-	"Magic books",
-	"Prayer books",
-	"Song books",
-	"Instruments",
-	"Potions",
-	"Scrolls",
-	"Amulets",
-	"Rings",
-	"Wands/Rods",
-	"Staves",
-	"Slay Orcs",
-	"Slay Trolls",
-	"Slay Giants",
-	"Slay Dragons",
-	"Slay Evil",
-	"Slay Undead",
-	"Slay Animals",
-	"Slay Demons"
-};
 
 
 /* Locations of the tables on the screen */

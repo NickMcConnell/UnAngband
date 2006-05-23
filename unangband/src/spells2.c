@@ -443,13 +443,15 @@ bool restore_level(void)
 #define TR4_IGNORE_FLAGS (TR4_WEAPON_FLAGS)
 
 
-
 /*
  * Hack -- acquire self knowledge
  *
  * List various information about the player and/or his current equipment.
+ *
+ * Random set to true means we exclude information that appears elsewhere
+ * in the character dump.
  */
-void self_knowledge(bool spoil)
+void self_knowledge_aux(bool spoil, bool random)
 {
 	int i, n;
 
@@ -464,17 +466,6 @@ void self_knowledge(bool spoil)
 	int vn;
 
 	bool healthy = TRUE;
-
-	/* Save screen */
-	screen_save();
-
-	/* Clear the screen */
-	Term_clear();
-
-	/* Set text_out hook */
-	text_out_hook = text_out_to_screen;
-	
-	text_out_c(TERM_L_BLUE, "Self-knowledge\n");
 
 	if (p_ptr->blind)
 	{
@@ -509,6 +500,26 @@ void self_knowledge(bool spoil)
 	if (p_ptr->image)
 	{
 		text_out("You are hallucinating.  ");
+		healthy = FALSE;
+	}
+	if (p_ptr->amnesia)
+	{
+		text_out("You are suffering from amnesia.  ");
+		healthy = FALSE;
+	}
+	if (p_ptr->cursed)
+	{
+		text_out("You are cursed.  ");
+		healthy = FALSE;
+	}
+	if (p_ptr->msleep)
+	{
+		text_out("You are magically drowsy, and liable to fall asleep.  ");
+		healthy = FALSE;
+	}
+	if (p_ptr->petrify)
+	{
+		text_out("You are petrified.  ");
 		healthy = FALSE;
 	}
 
@@ -558,6 +569,32 @@ void self_knowledge(bool spoil)
 		/* Dump */
 		text_out(".  ");
 
+		/* Hint as to cure */
+		if (p_ptr->disease & (DISEASE_LIGHT))
+		{
+			text_out("Your disease will subside naturally, but can be treated.  ");
+		}
+		/* Hint as to cure */
+		else if (p_ptr->disease & (DISEASE_DISEASE))
+		{
+			text_out("Your disease will mutate, but can be treated.  ");
+		}
+		/* Hint as to cure */
+		else if (p_ptr->disease & (DISEASE_HEAVY))
+		{
+			text_out("Your disease can only be treated by removing the powerful curse.  ");
+		}
+		/* Hint as to cure */
+		else if (p_ptr->disease & (DISEASE_PERMANENT))
+		{
+			text_out("Your disease cannot be treated.  ");
+		}
+		/* Hint as to cure */
+		else
+		{
+			text_out("Your disease can only be treated by treating the symptoms.  ");
+			text_out("The treatment required varies for each affliction.  ");
+		}
 	}
 
 	if (healthy)
@@ -639,6 +676,8 @@ void self_knowledge(bool spoil)
 	vn = 0;
 
 	if (p_ptr->invuln) vp[vn++] = "invulnerable";
+	if (p_ptr->free_act) vp[vn++] = "protected from paralysis and magical slowing";
+
 	for (n = 0; n < A_CHR; n++)
 	{
 		if (p_ptr->stat_inc_tim[n]) vp[vn++] = desc_stat_imp[n];
@@ -698,7 +737,7 @@ void self_knowledge(bool spoil)
 	text_out("\n");
 
 	/* Hack -- racial effects */
-	if (rp_ptr->flags1 || rp_ptr->flags2 || rp_ptr->flags3 || rp_ptr->flags4)
+	if ((!random) && (rp_ptr->flags1 || rp_ptr->flags2 || rp_ptr->flags3 || rp_ptr->flags4))
 	{
 		text_out("Your race affects you.  ");
 
@@ -717,7 +756,7 @@ void self_knowledge(bool spoil)
 	t4 &= ~(rp_ptr->flags4);
 
 	/* Hack -- class effects */
-	if (t1 || t2 || t3 || t4)
+	if ((!random) && (t1 || t2 || t3 || t4))
 	{
 		text_out("Your training affects you.  ");
 
@@ -725,6 +764,8 @@ void self_knowledge(bool spoil)
 
 		text_out("\n");
 	}
+
+	if (random) goto remainder;
 
 	/* Get item flags from equipment */
 	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
@@ -800,6 +841,57 @@ void self_knowledge(bool spoil)
 		}
 
 	}
+
+remainder:
+	/* Clear the flags */
+	t1 = t2 = t3 = t4 = 0L;
+
+	/* Collect may flags */
+	for (n = 0; n < INVEN_TOTAL; n++)
+	{
+		o_ptr = &inventory[n];
+
+		t1 |= o_ptr->may_flags1;
+		t2 |= o_ptr->may_flags2;
+		t3 |= o_ptr->may_flags3;
+		t4 |= o_ptr->may_flags4;
+
+		/* Hack -- weapon effects */
+		if (t1 || t2 || t3 || t4)
+		{
+			text_out("You are carrying equipment that you have not fully identified.  ");
+	
+			list_object_flags(t1,t2,t3,t4,1);
+
+			text_out("\n");
+		}
+	}
+}
+
+
+/*
+ * Hack -- acquire self knowledge
+ *
+ * List various information about the player and/or his current equipment.
+ *
+ * Just prepares for the auxiliary routine above.
+ */
+void self_knowledge(bool spoil)
+{
+	/* Save screen */
+	screen_save();
+
+	/* Clear the screen */
+	Term_clear();
+
+	/* Set text_out hook */
+	text_out_hook = text_out_to_screen;
+	
+	/* Head the screen */
+	text_out_c(TERM_L_BLUE, "Self-knowledge\n");
+
+	/* Really do self-knowledge */
+	self_knowledge_aux(spoil, FALSE);
 
 	(void)anykey();
 

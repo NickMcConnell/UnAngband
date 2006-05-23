@@ -3514,3 +3514,44 @@ const s16b bag_holds[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL][2] =
 	  {0, 0}, {0, 0}, {0, 0}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0} }
 };
+
+
+
+/*
+ * Names of various styles
+ */
+const cptr w_name_style[32] =
+{
+	"None",
+	"Unarmed",
+	"One-handed",
+	"Two-handed",
+	"Shield & weapon",
+	"Two-weapon",
+	"Hafted weapons",
+	"Swords",
+	"Polearms",
+	"Thrown weapons",
+	"Slings",
+	"Bows",
+	"Cross-bows",
+	"Backstab",
+	"Magic books",
+	"Prayer books",
+	"Song books",
+	"Instruments",
+	"Potions",
+	"Scrolls",
+	"Amulets",
+	"Rings",
+	"Wands/Rods",
+	"Staves",
+	"Slay Orcs",
+	"Slay Trolls",
+	"Slay Giants",
+	"Slay Dragons",
+	"Slay Evil",
+	"Slay Undead",
+	"Slay Animals",
+	"Slay Demons"
+};

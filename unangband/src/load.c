@@ -2081,12 +2081,30 @@ static errr rd_savefile_new_aux(void)
 			}
 		}
 	}
-	/* Empty the bags */
-	else
+
+	/* Read the dungeons */
+	if (!older_than(0, 6, 1))
 	{
-		for (i = 0; i < SV_BAG_MAX_BAGS; i++)
-			for (j = 0; j < INVEN_BAG_TOTAL; j++)
-				bag_contents[i][j] = 0;
+		rd_u16b(&tmp16u);
+
+		/* Incompatible save files */
+		if (tmp16u > z_info->t_max)
+		{
+			note(format("Too many (%u) dungeon types!", tmp16u));
+			return (-1);
+		}
+
+		for (i = 0; i < tmp16u; i++)
+		{
+			/* Load the maximum depth */
+			rd_byte(&tmp8u);
+
+			/* Silently reduce depth */
+			if (tmp8u > max_depth(i) - min_depth(i)) tmp8u = max_depth(i) - min_depth(i);
+
+			/* Set the max_depth */
+			t_info[i].max_depth = tmp8u;
+		}
 	}
 
 	/* Read the stores */

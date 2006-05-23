@@ -5542,4 +5542,10 @@ void generate_cave(void)
 
 	/* Redraw state */
 	p_ptr->redraw |= (PR_STATE);
+
+	/* Set maximum depth for this dungeon */
+	if (t_info[p_ptr->dungeon].max_depth < p_ptr->depth - min_depth(p_ptr->dungeon))
+	{
+		t_info[p_ptr->dungeon].max_depth = p_ptr->depth - min_depth(p_ptr->dungeon);
+	}
 }

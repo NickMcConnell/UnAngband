@@ -1218,6 +1218,15 @@ static bool wr_savefile_new(void)
 		}
 	} 
 
+	/* Write the number of dungeon types */
+	wr_u16b((u16b)z_info->t_max);
+
+	/* Write the dungeon max depths */
+	for (i = 0; i < z_info->t_max; i++)
+	{
+		wr_byte(t_info[i].max_depth);
+	} 
+
 	/* Note the stores */
 	tmp16u = MAX_STORES;
 	wr_u16b(tmp16u);
