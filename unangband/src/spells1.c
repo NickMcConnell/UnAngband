@@ -1127,6 +1127,7 @@ static bool hates_acid(object_type *o_ptr)
 		case TV_SCROLL:
 		case TV_MAP:
 		case TV_ROPE:
+		case TV_STATUE:
 		{
 			return (TRUE);
 		}
@@ -1204,6 +1205,7 @@ static bool hates_fire(object_type *o_ptr)
 		case TV_SCROLL:
 		case TV_MAP:
 		case TV_ROPE:
+		case TV_STATUE:
 		{
 			return (TRUE);
 		}
@@ -1252,6 +1254,7 @@ static bool hates_water(object_type *o_ptr)
 		case TV_SONG_BOOK:
 		case TV_INSTRUMENT:
 		case TV_FOOD:
+		case TV_STATUE:
 		{
 			return (TRUE);
 		}

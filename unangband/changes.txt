@@ -69,6 +69,8 @@ ammunition to shoot ropes across chasms.
 - Added a number of new attack spells using winds, blood, webs and other new
 effects, as well as nexus, ice and darkness.
 
+- Added saleable paintings.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -81,6 +83,8 @@ enchant it with brands or resists.
 - Improvements to object display code to describe many more uses for objects.
 
 - Disabled the throw command. Thrown items are thrown using the fire command.
+
+- Updated character dump code (From NPPAngband).
 
 ### Bug fixes ###
 

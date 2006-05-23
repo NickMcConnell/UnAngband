@@ -1480,6 +1480,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		case TV_MAGIC_BOOK:
 		case TV_PRAYER_BOOK:
 		case TV_SONG_BOOK:
+		case TV_BAG:
 		{
 			/* Assume okay */
 			break;

@@ -1204,8 +1204,6 @@ static bool wr_savefile_new(void)
 	/* Add a sentinel */
 	wr_u16b(0xFFFF);
 
-	wr_u16b((u16b)0x0000);
-#if 0
 	/* Write the number of bag types */
 	wr_u16b((u16b)SV_BAG_MAX_BAGS);
 
@@ -1219,7 +1217,6 @@ static bool wr_savefile_new(void)
 			wr_u16b((u16b)bag_contents[i][j]);
 		}
 	} 
-#endif
 
 	/* Note the stores */
 	tmp16u = MAX_STORES;

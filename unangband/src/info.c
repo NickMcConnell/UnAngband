@@ -3058,6 +3058,10 @@ void list_object(const object_type *o_ptr, int mode)
 				text_out("You can wield this as a source of light.  ");
 				anything = TRUE;
 				break;
+			case TV_STATUE:
+				text_out("You're not art critic, but this might be worth something to sell.  ");
+				anything = TRUE;
+				break;
 			case TV_ASSEMBLY:
 				text_out("You can assemble this together to make something.  ");
 				anything = TRUE;
@@ -3107,8 +3111,45 @@ void list_object(const object_type *o_ptr, int mode)
 #endif
 	}
 
+	/* Display bag contents */
+	if (o_ptr->tval == TV_BAG)
+	{
+		object_type object_type_body;
+		object_type *i_ptr = &object_type_body;
+
+		bool intro = FALSE;
+
+		char o_name[120];
+
+		/* Display fake objects */
+		for (i = 0; i < INVEN_BAG_TOTAL; i++)
+		{
+			/* Empty slot */
+			if (!(bag_holds[o_ptr->sval][i][0])) continue;
+
+			/* Nothing in slot */
+			if (!(bag_contents[o_ptr->sval][i]) && !spoil) continue;
+
+			/* Fake the item */
+			fake_bag_item(i_ptr, o_ptr->sval, i);
+
+			/* Intro */
+			if (!intro && !random)
+			{
+				text_out("\nIt contains:\n");
+			}
+
+			/* Describe */
+			object_desc(o_name, sizeof(o_name), i_ptr, TRUE, 1);
+
+			text_out(format("%s %c) %s\n",random ? (!intro ? "with": "    ") : " ", 'a'+i, o_name));
+
+			intro = TRUE;
+		}
+	}
+
         /* *Identified* object */
-	else if (spoil) text_out("You know everything about this item.  ");
+	if (spoil && anything) text_out("You know everything about this item.  ");
 
 	/* Nothing was printed */
 	if (!random && !anything) text_out("You know nothing worth noting about this item.  ");

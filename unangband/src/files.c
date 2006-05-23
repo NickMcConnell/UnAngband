@@ -1866,6 +1866,40 @@ static void display_player_equippy(int y, int x)
 
 
 /*
+ * Equippy chars
+ */
+static void display_home_equippy(int y, int x)
+{
+	int i;
+
+	byte a;
+	char c;
+
+	object_type *o_ptr;
+
+	store_type *st_ptr = &store[STORE_HOME];
+
+	/* Dump equippy chars */
+	for (i = 0; i < MAX_INVENTORY_HOME	; ++i)
+	{
+		/* Object */
+		o_ptr = &st_ptr->stock[i];
+
+		/* Skip empty objects */
+		if (!o_ptr->k_idx) continue;
+
+		/* Get attr/char for display */
+		a = object_attr(o_ptr);
+		c = object_char(o_ptr);
+
+		/* Dump */
+		Term_putch(x+i, y, a, c);
+
+	}
+}
+
+
+/*
  * Hack -- see below
  */
 static const byte display_player_flag_set[4] =
@@ -2342,45 +2376,682 @@ static void display_player_sust_info(void)
 
 
 /*
+ * Special display, part 3
+ *
+ * Dump all info for the home equipment
+ * Positive mods with no sustain will be light green.
+ * Positive mods with a sustain will be dark green.
+ * Sustains (with no modification) will be a dark green 's'.
+ * Negative mods (from a curse) will be red.
+ * Huge mods (>9), like from MICoMorgoth, will be a '*'
+ * No mod, no sustain, will be a slate '.'
+ * This is followed by the home equipment
+ *
+ */
+static void display_home_equipment_info(int mode)
+{
+	int x, y, n, xmax, xmin;
+
+	int set;
+	u32b head;
+	u32b flag;
+	cptr name;
+
+	u32b f[5];
+
+	int i, row, col, stats;
+
+	object_type *o_ptr;
+	u32b f1, f2, f3, f4;
+	u32b ignore_f2, ignore_f3, ignore_f4;
+
+	byte a;
+	char c;
+
+	store_type *st_ptr = &store[STORE_HOME];
+
+	/* Row */
+	row = 3;
+
+	/* Column */
+	col = 7;
+
+	/* Equippy */
+	display_home_equippy(row-2, col);
+
+	/* Header */
+	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row-1, col);
+
+	/* Footer */
+	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row+6, col);
+
+	/* Process home stats */
+	for (i = 0; i < MAX_INVENTORY_HOME; ++i)
+	{
+		/* Object */
+		o_ptr = &st_ptr->stock[i];
+
+		/* Get the "known" flags */
+		object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
+
+		/* Hack -- assume stat modifiers are known */
+		object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
+
+		/* Initialize color based of sign of pval. */
+		for (stats = 0; stats < A_MAX; stats++)
+		{
+			/* Assume uppercase stat name */
+			c_put_str(TERM_WHITE, stat_names[stats], row+stats, 2);
+
+			/* Default */
+			a = TERM_SLATE;
+			c = '.';
+
+			/* Boost */
+			if (f1 & (1<<stats))
+			{
+				/* Default */
+				c = '*';
+
+				/* Good */
+				if (o_ptr->pval > 0)
+				{
+					/* Good */
+					a = TERM_L_GREEN;
+
+					/* Label boost */
+					if (o_ptr->pval < 10) c = I2D(o_ptr->pval);
+				}
+
+				/* Bad */
+				if (o_ptr->pval < 0)
+				{
+					/* Bad */
+					a = TERM_RED;
+
+					/* Label boost */
+					if (o_ptr->pval > -10) c = I2D(-(o_ptr->pval));
+				}
+			}
+
+			/* Sustain */
+			if (f2 & (1<<stats))
+			{
+				/* Dark green */
+				a = TERM_GREEN;
+
+				/* Convert '.' to 's' */
+				if (c == '.') c = 's';
+			}
+
+			/* Dump proper character */
+			Term_putch(col, row+stats, a, c);
+		}
+
+		/* Advance */
+		col++;
+	}
+
+	/*alternate between resists and abilities depending on the modes*/
+	if (mode == 2)
+	{
+		xmin = 0;
+		xmax = 2;
+	}
+
+	else if (mode == 3)
+	{
+		xmin = 2;
+		xmax = 4;
+	}
+
+	/*paranoia*/
+	else xmax = xmin = 0;
+
+	/* Row */
+	row = 10;
+
+	/* Re-Set Column */
+	col = 7;
+
+	/* 2nd Header */
+	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row-1, col + MAX_INVENTORY_HOME + 8);
+
+	/* Footer */
+	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row+8, col);
+
+	/* 2nd Footer */
+	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row+8, col + MAX_INVENTORY_HOME + 8);
+
+	/* 3rd Equippy */
+	display_home_equippy(row+9, col);
+
+	/* 4th Equippy */
+	display_home_equippy(row+9,col+ MAX_INVENTORY_HOME + 8);
+
+	/* Two Rows, alternating depending upon the mode */
+	for (x = 0; xmin < xmax; ++xmin, ++x)
+	{
+		/* Reset */
+		col = 32 * x;
+		row = 10;
+
+		/* Eight rows */
+		for (y = 0; y < 8; y++)
+		{
+			bool hack_aggravate = FALSE;
+			byte name_attr = TERM_WHITE;
+
+			/* Extract set */
+			set = display_player_flag_set[xmin];
+
+			/* Extract head */
+			head = display_player_flag_head[xmin];
+
+			/*hack - replace tunneling with aggravate*/
+			if ((xmin == 3) && (y ==3)) hack_aggravate = TRUE;
+
+			/* Extract flag */
+			flag = (head << y);
+
+			/* Extract name */
+			name = display_player_flag_names[xmin][y];
+
+			/*hack in aggravate flag for tunneling*/
+			if (hack_aggravate)
+			{
+				name = "Aggr.:";
+				flag = TR3_AGGRAVATE;
+				set  = 3;
+			}
+
+			/* Check equipment */
+			for (n = 7, i = 0; i < MAX_INVENTORY_HOME; ++i, ++n)
+			{
+				byte attr = TERM_SLATE;
+
+				object_type *o_ptr;
+
+				/* Object */
+				o_ptr = &st_ptr->stock[i];
+
+				/* Known flags */
+				object_flags_known(o_ptr, &f[1], &f[2], &f[3], &f[4]);
+
+				/* Color columns by parity */
+				if (i % 2) attr = TERM_L_WHITE;
+
+				/* Non-existant objects */
+				if (!o_ptr->k_idx) attr = TERM_L_DARK;
+
+				/* Hack -- Check immunities */
+				if ((xmin == 0) && (y < 5) &&
+				    (f[set] & ((TR2_IM_ACID) << y)))
+				{
+					c_put_str(TERM_L_GREEN, "*", row, col+n);
+					name_attr = TERM_L_GREEN;
+				}
+
+				/* Check flags */
+				else if (f[set] & flag)
+				{
+					c_put_str(TERM_L_BLUE, "+", row, col+n);
+					if (name_attr != TERM_L_GREEN) name_attr = TERM_L_BLUE;
+				}
+
+				/* Default */
+				else
+				{
+					c_put_str(attr, ".", row, col+n);
+				}
+			}
+
+			/* Header */
+			c_put_str(name_attr, name, row, col);
+
+			/* Advance */
+			row++;
+		}
+	}
+}
+
+
+/*
  * Display the character on the screen (two different modes)
  *
  * The top two lines, and the bottom line (or two) are left blank.
  *
  * Mode 0 = standard display with skills/history
  * Mode 1 = special display with equipment flags
+ * Mode 2 = Home equiment Stat Flags and 1st part of Resists
+ * Mode 3 = Home equiment Stat Flags and 2st part of Resists
  */
 void display_player(int mode)
 {
 	/* Erase screen */
 	clear_from(0);
 
-	/* Misc info */
-	display_player_misc_info();
-
 	/* Stat info */
 	display_player_stat_info();
 
-	/* Special */
-	if (mode)
+	if ((mode) < 2)
 	{
-		/* Hack -- Level */
-		put_str("Level", 9, 1);
-		c_put_str(TERM_L_BLUE, format("%d", p_ptr->lev), 9, 8);
+		/* Misc info */
+		display_player_misc_info();
 
-		/* Stat/Sustain flags */
-		display_player_sust_info();
+		/* Special */
+		if (mode)
+		{
+			/* Hack -- Level */
+			put_str("Level", 9, 1);
+			c_put_str(TERM_L_BLUE, format("%d", p_ptr->lev), 9, 8);
 
-		/* Other flags */
-		display_player_flag_info();
+			/* Stat/Sustain flags */
+			display_player_sust_info();
+
+			/* Other flags */
+			display_player_flag_info();
+		}
+
+		/* Standard */
+		else
+		{
+			/* Extra info */
+			display_player_xtra_info();
+		}
 	}
 
-	/* Standard */
-	else
+	else display_home_equipment_info(mode);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+static void dump_player_plus_minus(FILE *fff)
+{
+	int i, stats, modifier;
+
+	u32b f1, f2, f3, f4;
+
+	object_type *o_ptr;
+
+	/* Print it out */
+	for (i = INVEN_WIELD; i < END_EQUIPMENT; ++i)
 	{
-		/* Extra info */
-		display_player_xtra_info();
+
+		/* Object */
+		o_ptr = &inventory[i];
+
+		/* Get the "known" flags */
+		object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
+
+		modifier = FALSE;
+
+		/*check to see if there is an increase or decrease of a stat*/
+		for (stats = 0; stats < A_MAX; stats++)
+		{
+			/* Boost */
+			if (f1 & (1<<stats)) modifier = TRUE;
+		}
+
+		if (modifier)
+		{
+			/* positive pval */
+			if (o_ptr->pval > 0)
+			{
+				/*Make it a space*/
+				fprintf(fff,"+");
+
+			}
+
+			/* negative pval */
+			else if (o_ptr->pval < 0)
+			{
+				/*Make it a space*/
+				fprintf(fff,"-");
+
+			}
+		}
+
+		/* Just a space */
+		else fprintf(fff," ");
 	}
 }
+
+
+
+static void dump_player_stat_info(FILE *fff)
+{
+	int i, x, y, stats;
+
+	u32b f1, f2, f3, f4, fn;
+	u32b ignore_f2, ignore_f3, ignore_f4;
+
+	object_type *o_ptr;
+
+	char c;
+
+	char equippy[20];
+
+	/* Build the equippy */
+	for (x = 0,i = INVEN_WIELD; i < END_EQUIPMENT; ++i,++x)
+	{
+
+		/* Object */
+		o_ptr = &inventory[i];
+
+		/* empty objects */
+		if (!o_ptr->k_idx)
+		{
+			/*Make it a space*/
+			equippy[x] = ' ';
+
+		}
+
+		/* Get attr/char for display */
+		else equippy[x] = object_char(o_ptr);
+	}
+
+	/*finish off the string*/
+	equippy[x] = '\0';
+
+	/*Hack - record spaces for the character*/
+
+	fprintf(fff,"(+/-) ");
+
+	dump_player_plus_minus(fff);
+
+	fprintf(fff,"\n      %s               %s\n",equippy, equippy);
+
+	fprintf(fff,"      abcdefghijkl@              abcdefghijkl@\n");
+
+	for (stats = 0; stats < A_MAX; stats++)
+	{
+		fprintf(fff, "%6s", stat_names_reduced[stats]);
+
+		/* Process equipment, show stat modifiers */
+		for (x = 0, y = INVEN_WIELD; y < END_EQUIPMENT; ++y, ++x)
+		{
+			char c = '.';
+
+			object_type *o_ptr;
+
+			/* Get the object */
+			o_ptr = &inventory[y];
+
+			/* Get the "known" flags */
+			object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
+
+			/* Hack -- assume stat modifiers are known */
+			object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
+
+			/* Boost */
+			if (f1 & (1<<stats))
+			{
+				/* Default */
+				c = '*';
+
+				/* Good */
+				if (o_ptr->pval > 0)
+				{
+
+					/* Label boost */
+					if (o_ptr->pval < 10) c = I2D(o_ptr->pval);
+
+				}
+
+				/* Bad */
+				if (o_ptr->pval < 0)
+				{
+					/* Label boost */
+					if (o_ptr->pval > -10) c = I2D(-(o_ptr->pval));
+
+				}
+				if (o_ptr->pval == 0) c = '.';
+
+			}
+			/*dump the result*/
+			fprintf(fff,"%c",c);
+
+		}
+
+		/*a couple spaces, then do the sustains*/
+		fprintf(fff, ".      %7s ", stat_names_reduced[stats]);
+
+		/* Process equipment, show stat modifiers */
+		for (y = INVEN_WIELD; y < END_EQUIPMENT; ++y)
+		{
+
+			object_type *o_ptr;
+
+			/* Get the object */
+			o_ptr = &inventory[y];
+
+			/* Get the "known" flags */
+			object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
+
+			/* Hack -- assume stat modifiers are known */
+			object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
+
+			/* Sustain */
+			if (f2 & (1<<stats))  c = 's';
+			else c = '.';
+
+			/*dump the result*/
+			fprintf(fff,"%c",c);
+
+		}
+
+		/* Player flags */
+		player_flags(&f1, &f2, &f3, &fn);
+
+		/*default*/
+		c = '.';
+
+		/* Sustain */
+		if (f2 & (1<<stats)) c = 's';
+
+		/*dump the result*/
+		fprintf(fff,"%c",c);
+
+		fprintf(fff,"\n");
+
+	}
+
+}
+
+
+static void dump_home_plus_minus(FILE *fff)
+{
+	int i, stats, modifier;
+
+	u32b f1, f2, f3, f4;
+
+	object_type *o_ptr;
+	store_type *st_ptr = &store[STORE_HOME];
+
+	/* Print it out */
+	for (i = 0; i < MAX_INVENTORY_HOME; ++i)
+	{
+
+		/* Object */
+		o_ptr = &st_ptr->stock[i];
+
+		/* Get the "known" flags */
+		object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
+
+		modifier = FALSE;
+
+		/*check to see if there is an increase or decrease of a stat*/
+		for (stats = 0; stats < A_MAX; stats++)
+		{
+			/* Boost */
+			if (f1 & (1<<stats)) modifier = TRUE;
+		}
+
+		if (modifier)
+		{
+			/* positive pval */
+			if (o_ptr->pval > 0)
+			{
+				/*Make it a space*/
+				fprintf(fff,"+");
+
+			}
+
+			/* negative pval */
+			else if (o_ptr->pval < 0)
+			{
+				/*Make it a space*/
+				fprintf(fff,"-");
+
+			}
+		}
+
+		/* Just a space */
+		else fprintf(fff," ");
+	}
+}
+
+
+
+static void dump_home_stat_info(FILE *fff)
+{
+	int i, stats;
+
+	object_type *o_ptr;
+	store_type *st_ptr = &store[STORE_HOME];
+	u32b f1, f2, f3, f4;
+	u32b ignore_f2, ignore_f3, ignore_f4;
+
+	char c;
+	char equippy[30];
+
+	/* Print it out */
+	for (i = 0; i < MAX_INVENTORY_HOME; ++i)
+	{
+
+		/* Object */
+		o_ptr = &st_ptr->stock[i];
+
+		/* empty objects */
+		if (!o_ptr->k_idx)
+		{
+			/*Make it a space*/
+			equippy[i] = ' ';
+
+		}
+
+		/* Get attr/char for display */
+		else equippy[i] = object_char(o_ptr);
+	}
+
+	/*finish off the string*/
+	equippy[i] = '\0';
+
+	/*Hack - record spaces for the character*/
+
+	fprintf(fff,"(+/-)  ");
+
+	dump_home_plus_minus(fff);
+
+	fprintf(fff,"\n       %s        %s\n", equippy, equippy);
+
+	fprintf(fff,"       abcdefghijklmnopqrstuvwx        abcdefghijklmnopqrstuvwx\n");
+
+	for (stats = 0; stats < A_MAX; stats++)
+	{
+		fprintf(fff, "%6s ", stat_names_reduced[stats]);
+
+		/* Process home stats */
+		for (i = 0; i < MAX_INVENTORY_HOME; ++i)
+		{
+			/* Object */
+			o_ptr = &st_ptr->stock[i];
+
+			/* Get the "known" flags */
+			object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
+
+			/* Hack -- assume stat modifiers are known */
+			object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
+
+			c = '.';
+
+			/* Boost */
+			if (f1 & (1<<stats))
+			{
+				/* Default */
+				c = '*';
+
+				/* Good */
+				if (o_ptr->pval > 0)
+				{
+
+					/* Label boost */
+					if (o_ptr->pval < 10) c = I2D(o_ptr->pval);
+
+				}
+
+				/* Bad */
+				if (o_ptr->pval < 0)
+				{
+					/* Label boost */
+					if (o_ptr->pval > -10) c = I2D(-(o_ptr->pval));
+
+				}
+				if (o_ptr->pval == 0) c = '.';
+
+			}
+			/*dump the result*/
+			fprintf(fff,"%c",c);
+
+		}
+
+		/*a couple spaces, then do the sustains*/
+		fprintf(fff, "  %5s ", stat_names_reduced[stats]);
+
+		/* Process equipment, show stat modifiers */
+		for (i = 0; i < MAX_INVENTORY_HOME; ++i)
+		{
+
+			/* Object */
+			o_ptr = &st_ptr->stock[i];
+
+			/* Get the "known" flags */
+			object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
+
+			/* Hack -- assume stat modifiers are known */
+			object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
+
+			/* Sustain */
+			if (f2 & (1<<stats))  c = 's';
+			else c = '.';
+
+			/*dump the result*/
+			fprintf(fff,"%c",c);
+
+		}
+
+		fprintf(fff, "\n");
+
+	}
+
+}
+
 
 
 /*
@@ -2391,7 +3062,7 @@ void display_player(int mode)
  */
 errr file_character(cptr name, bool full)
 {
-	int i, x, y;
+	int i, w, x, y, z;
 
 	byte a;
 	char c;
@@ -2406,12 +3077,13 @@ errr file_character(cptr name, bool full)
 
 	char buf[1024];
 
+	bool no_quests = TRUE;
 
 	/* Unused parameter */
 	(void)full;
 
 	/* Build the filename */
-	path_build(buf, 1024, ANGBAND_DIR_USER, name);
+	path_build(buf, sizeof(buf), ANGBAND_DIR_USER, name);
 
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
@@ -2428,7 +3100,7 @@ errr file_character(cptr name, bool full)
 		fd_close(fd);
 
 		/* Build query */
-		sprintf(out_val, "Replace existing file %s? ", buf);
+		strnfmt(out_val, sizeof(out_val), "Replace existing file %s? ", buf);
 
 		/* Ask */
 		if (get_check(out_val)) fd = -1;
@@ -2437,16 +3109,15 @@ errr file_character(cptr name, bool full)
 	/* Open the non-existing file */
 	if (fd < 0) fff = my_fopen(buf, "w");
 
-
 	/* Invalid file */
 	if (!fff) return (-1);
-
 
 	text_out_hook = text_out_to_file;
 	text_out_file = fff;
 
 	/* Begin dump */
-	fprintf(fff, "  [Unangband %s Character Dump]\n\n", VERSION_STRING);
+	fprintf(fff, "  [%s %s Character Dump]\n\n",
+	        VERSION_NAME, VERSION_STRING);
 
 	/* Display player */
 	display_player(0);
@@ -2477,7 +3148,6 @@ errr file_character(cptr name, bool full)
 	/* Skip some lines */
 	fprintf(fff, "\n\n");
 
-
 	/* If dead, dump last messages -- Prfnoff */
 	if (p_ptr->is_dead)
 	{
@@ -2488,22 +3158,72 @@ errr file_character(cptr name, bool full)
 		{
 			fprintf(fff, "> %s\n", message_str((s16b)i));
 		}
-		fprintf(fff, "\n\n");
+		fprintf(fff, "\n");
+	}
+
+	fprintf(fff, "  [Character Equipment Stat Modifiers, Sustains and Flags]\n\n");
+
+	/*dump stat modifiers and sustains*/
+	dump_player_stat_info(fff);
+
+	/* Display player */
+	display_player(1);
+
+	/* Dump flags, but in two separate rows */
+	for (w = 0; w < 2; w ++)
+	{
+		for (y = (11 + w); y < (21 + w); y++)
+		{
+			/* Dump each row */
+			for (z = 0, x = 0; x < 79; x++, z++)
+			{
+				/* Get the attr/char */
+				(void)(Term_what(x, y, &a, &c));
+
+				/*Go through the whole thing twice, printing
+				 *two of the sets of resist flags each time.
+				 */
+				if ((!w) && (x < 40))
+				{
+					/*hack - space it out a bit*/
+					if (x == 20) fprintf(fff, "       ");
+
+					/* Dump it */
+					fprintf(fff, "%c", c);
+				}
+
+				else if ((w) && (x > 39))
+				{
+					/*hack - space it out a bit*/
+					if (x == 60) fprintf(fff, "       ");
+
+					/* Dump it */
+					fprintf(fff, "%c", c);
+				}
+
+			}
+
+			/* End the row */
+			fprintf(fff, "\n");
+		}
 	}
 
 	/* Dump the equipment */
 	if (p_ptr->equip_cnt)
 	{
-		fprintf(fff, "  [Character Equipment]\n\n");
-		for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+		fprintf(fff, "\n  [Character Equipment]\n\n");
+
+		for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
 		{
-			object_desc(o_name, sizeof(o_name), &inventory[i], TRUE, 3);
-			fprintf(fff, "%c) %s\n",
-			        index_to_label(i), o_name);
+			object_desc(o_name, sizeof(o_name), &inventory[i],
+				TRUE, 3);
+
+			fprintf(fff, "%c) %s\n", index_to_label(i), o_name);
 
 			/* Describe random object attributes */
 			identify_random_gen(&inventory[i]);
 		}
+
 		fprintf(fff, "\n\n");
 	}
 
@@ -2514,18 +3234,62 @@ errr file_character(cptr name, bool full)
 		if (!inventory[i].k_idx) break;
 
 		object_desc(o_name, sizeof(o_name), &inventory[i], TRUE, 3);
-		fprintf(fff, "%c) %s\n",
-		        index_to_label(i), o_name);
+		fprintf(fff, "%c) %s\n", index_to_label(i), o_name);
 
 		/* Describe random object attributes */
 		identify_random_gen(&inventory[i]);
 	}
-	fprintf(fff, "\n\n");
+	fprintf(fff, "\n");
 
 
-	/* Dump the Home -- if anything there */
+	/* Dump the Home Flags , then the inventory -- if anything there */
 	if (st_ptr->stock_num)
 	{
+
+		/* Header */
+		fprintf(fff, "  [Home Inventory Stat Modifiers, Sustains and Flags]\n\n");
+
+		/*dump stat modifiers and sustains*/
+		dump_home_stat_info(fff);
+
+		/*dump the home resists and abilities display*/
+		for (i =2; i <4; ++i)
+		{
+			/* Display player */
+			display_player(i);
+
+			/* Dump part of the screen */
+			for (y = (i + 7); y < (i + 17); y++)
+			{
+				/* Dump each row */
+				for (x = 0; x < 79; x++)
+				{
+					/* Get the attr/char */
+					(void)(Term_what(x, y, &a, &c));
+
+					/* Dump it */
+					buf[x] = c;
+				}
+
+				/* Back up over spaces */
+				while ((x > 0) && (buf[x-1] == ' ')) --x;
+
+				/* Terminate */
+				buf[x] = '\0';
+
+				/* End the row */
+				fprintf(fff, "%s\n", buf);
+			}
+		}
+
+		/* Display player */
+		display_player(0);
+
+		/* End the row */
+		fprintf(fff, "\n");
+
+		/*Now dump the inventory*/
+
 		/* Header */
 		fprintf(fff, "  [Home Inventory]\n\n");
 
@@ -2540,16 +3304,42 @@ errr file_character(cptr name, bool full)
 		}
 
 		/* Add an empty line */
-		fprintf(fff, "\n\n");
+		fprintf(fff, "\n");
 	}
 
+	else fprintf(fff, "[Your Home Is Empty]\n\n");
+
+	/* Dump quests */
+	fprintf(fff, "  [Quests]\n");
+
+	/* Warning */
+	text_out("Quests will not be enabled until version 0.7.0.  This output is for testing only.\n");
+
+	/* Either print live quests on level, or if nothing live, display current quests */
+	if (print_quests(QUEST_ACTIVE , QUEST_REWARD)) no_quests = FALSE;
+	else no_quests = !print_quests(QUEST_ASSIGN , QUEST_FINISH);
+
+	/* No quests? */
+	if (no_quests) text_out("You currently have no quests.\n");
+
+	text_out("\n");
 
 	/* Dump options */
-	fprintf(fff, "  [Options]\n\n");
+	fprintf(fff, "  [Options]\n");
 
 	/* Dump options */
-	for (i = OPT_ADULT; i < OPT_MAX; i++)
+	for (i = 0; i < OPT_MAX; i++)
 	{
+		/*hack - use game play options*/
+		if (i < OPT_GAME_PLAY) continue;
+		if ((i >= OPT_EFFICIENCY) && (i < OPT_ADULT)) continue;
+
+		/*print the labels*/
+		if (i == OPT_GAME_PLAY) fprintf(fff, "\nGAME PLAY OPTIONS:\n\n");
+		if (i == OPT_CHEAT) fprintf(fff, "\nCHEAT OPTIONS:\n\n");
+		if (i == OPT_ADULT) fprintf(fff, "\nBIRTH OPTIONS:\n\n");
+		if (i == OPT_SCORE) fprintf(fff, "\nCHEAT OPTIONS:\n\n");
+
 		if (option_desc[i])
 		{
 			fprintf(fff, "%-45s: %s (%s)\n",
@@ -2562,10 +3352,8 @@ errr file_character(cptr name, bool full)
 	/* Skip some lines */
 	fprintf(fff, "\n\n");
 
-
 	/* Close it */
 	my_fclose(fff);
-
 
 	/* Success */
 	return (0);

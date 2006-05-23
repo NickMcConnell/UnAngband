@@ -180,6 +180,11 @@
  */
 #define MAX_STORES	8
 
+/*
+ * Total number of items in home (see "store.c", etc)
+ */
+#define MAX_INVENTORY_HOME	24
+
 
 /*
  * Store index definitions (see "store.c", etc)
@@ -527,6 +532,12 @@
 #define INVEN_HEAD      33
 #define INVEN_HANDS     34
 #define INVEN_FEET      35
+
+/*
+ * Total number of equipment slots before quiver (old INVEN_TOTAL)
+ */
+#define END_EQUIPMENT	36
+
 
 /*
  * Total number of inventory slots (hard-coded).
@@ -3871,6 +3882,10 @@
  *
  * These values are hard-coded by savefiles (and various pieces of code).
  */
+#define OPT_USER_INTERFACE			0
+#define OPT_DISTURBANCE			    16
+#define OPT_GAME_PLAY			    32
+#define OPT_EFFICIENCY			    48
 #define OPT_VARIANT				     96
 #define OPT_BIRTH				       128
 #define OPT_CHEAT					160
