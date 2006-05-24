@@ -201,6 +201,9 @@ struct town_type
 	u16b store[MAX_STORES];
 	dungeon_zone zone[MAX_DUNGEON_ZONES];
 
+	byte max_depth;
+	byte unused;
+	s16b unused2;
 };
 
 
