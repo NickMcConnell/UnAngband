@@ -701,6 +701,15 @@ bool make_attack_normal(int m_idx)
 
 					if ((effect == GF_EAT_ITEM) || (effect == GF_EAT_GOLD)) blinked = TRUE;
 				}
+
+				/* Apply teleport & other effects */
+				if (project_t(m_idx, 0, p_ptr->py, p_ptr->px, damage, effect))
+				{
+					obvious = TRUE;
+
+					if ((effect == GF_EAT_ITEM) || (effect == GF_EAT_GOLD)) blinked = TRUE;
+				}
+
 			}
 			else
 			{
@@ -3757,6 +3766,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 					/* Hack --- Use GF_CONFUSION */
 					project_m(who, 0, y, x, get_dam(spower, attack), GF_CONFUSION);
+
+					/* Hack --- Use GF_CONFUSION */
+					project_t(who, 0, y, x, get_dam(spower, attack), GF_CONFUSION);
 				}
 				else if (n_ptr->ml)
 				{
@@ -3812,6 +3824,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				/* Hack --- Use GF_HALLU */
 				project_m(who, 0, y, x, rlev, GF_HALLU);
+
+				/* Hack --- Use GF_HALLU */
+				project_t(who, 0, y, x, rlev, GF_HALLU);
 			}
 			break;
 		}
@@ -3910,6 +3925,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					/* Hack --- Use GF_DRAIN_LIFE */
 					project_m(who, 0, y, x, damroll(8,8), GF_DRAIN_LIFE);
 
+					/* Hack --- Use GF_DRAIN_LIFE */
+					project_t(who, 0, y, x, damroll(8,8), GF_DRAIN_LIFE);
+
 					/* Hack -- player can cut monsters */
 					if ((s_ptr->flags3 & (RF3_NONLIVING)) == 0) n_ptr->cut = MIN(255, n_ptr->cut + cut);
 				}
@@ -3917,6 +3935,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				{
 					/* Hack -- monsters only do damage, not cuts, to each other */
 					project_m(who, 0, y, x, damroll(8,8) + cut, GF_DRAIN_LIFE);
+
+					/* Hack -- monsters only do damage, not cuts, to each other */
+					project_t(who, 0, y, x, damroll(8,8) + cut, GF_DRAIN_LIFE);
 				}
 			}
 
@@ -4183,6 +4204,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				/* Hack --- Use GF_TERRIFY */
 				project_m(who, 0, y, x, rlev, GF_TERRIFY);
+
+				/* Hack --- Use GF_TERRIFY */
+				project_t(who, 0, y, x, rlev, GF_TERRIFY);
 			}
 			break;
 		}
@@ -4230,6 +4254,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				/* Hack --- Use GF_CONF_WEAK */
 				project_m(who, 0, y, x, rlev, GF_CONF_WEAK);
+
+				/* Hack --- Use GF_CONF_WEAK */
+				project_t(who, 0, y, x, rlev, GF_CONF_WEAK);
 			}
 			break;
 		}
@@ -4279,6 +4306,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				/* Hack --- Use GF_CONF_WEAK */
 				project_m(who, 0, y, x, rlev, GF_CONF_WEAK);
+
+				/* Hack --- Use GF_CONF_WEAK */
+				project_t(who, 0, y, x, rlev, GF_CONF_WEAK);
 			}
 			break;
 		}
@@ -4329,6 +4359,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				/* Hack --- Use GF_SLOW_WEAK */
 				project_m(who, 0, y, x, rlev, GF_SLOW_WEAK);
+
+				/* Hack --- Use GF_SLOW_WEAK */
+				project_t(who, 0, y, x, rlev, GF_SLOW_WEAK);
 			}
 			break;
 		}
@@ -4380,6 +4413,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				/* Hack --- Use GF_SLEEP */
 				project_m(who, 0, y, x, rlev, GF_SLEEP);
+
+				/* Hack --- Use GF_SLEEP */
+				project_t(who, 0, y, x, rlev, GF_SLEEP);
 			}
 			break;
 		}
@@ -5905,6 +5941,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 				(void)project_m(0,0,y,x,damage, effect);
 				(void)project_f(0,0,y,x,damage, effect);
+				(void)project_t(0,0,y,x,damage, effect);
 			}
 		}
 	}
@@ -5922,6 +5959,9 @@ void mon_hit_trap(int m_idx, int y, int x)
    
 			/* Apply the blow */
 			project_m(0, 0, y, x, damage, f_ptr->blow.effect);
+
+			/* Apply the blow */
+			project_t(0, 0, y, x, damage, f_ptr->blow.effect);
 		}
 
 		/* Get feature */

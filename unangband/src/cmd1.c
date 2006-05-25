@@ -1822,6 +1822,7 @@ void hit_trap(int y, int x)
 
 				(void)project_p(0,0,y,x,damage, effect);
 				(void)project_f(0,0,y,x,damage, effect);
+				(void)project_t(0,0,y,x,damage, effect);
 			}
 		}
 	}
@@ -1845,6 +1846,7 @@ void hit_trap(int y, int x)
    
 			/* Apply the blow */
 			project_p(0, 0, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
+			project_t(0, 0, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
 		}
 
 		/* Get feature */
@@ -2376,6 +2378,9 @@ void py_attack(int y, int x)
 
 						/* Hack -- affect ground if not a coating */
 						if (!coated_p(o_ptr)) (void)project_f(-1,0,y,x,damage, effect);
+
+						/* Apply teleportation and other effects */
+						(void)project_t(-1,0,y,x,damage, effect);
 
 						/* Reduce charges */
 						if (o_ptr->charges)

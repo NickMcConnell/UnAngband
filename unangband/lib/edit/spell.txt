@@ -2770,7 +2770,7 @@ B:BOLT:SOUND:8d8+0
 # Additional Food effects.
 
 N:256:Poison
-A:75:6:1
+A:75:81:1
 A:80:0:1
 L:1d10+10
 B:SELF:POISON:0d0+0

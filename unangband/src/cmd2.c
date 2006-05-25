@@ -3707,6 +3707,9 @@ void do_cmd_fire(void)
 							/* Hack -- affect ground if not a coating */
 							if (!coated_p(i_ptr)) (void)project_f(-1,0,y,x,damage, effect);
 
+							/* Apply teleport & other effects */
+							(void)project_t(-1,0,y,x,damage, effect);
+
 							/* Reduce charges */
 							if (i_ptr->charges)
 							{
@@ -4214,6 +4217,9 @@ void do_cmd_throw(void)
 
 							/* Hack -- affect ground if not a coating */
 							if (!coated_p(i_ptr)) (void)project_f(-1,0,y,x,damage, effect);
+
+							/* Apply teleport & other effects */
+							(void)project_t(-1,0,y,x,damage, effect);
 
 							/* Reduce charges */
 							if (i_ptr->charges)

@@ -9607,7 +9607,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
  *
  * This function assumes that most messages have already been shown.
  */
-static bool project_t(int who, int y, int x, int dam, int typ, u32b flg)
+bool project_t(int who, int r, int y, int x, int dam, int typ)
 {
 	monster_type *m_ptr = NULL;
 	monster_race *r_ptr = NULL;
@@ -9634,25 +9634,22 @@ static bool project_t(int who, int y, int x, int dam, int typ, u32b flg)
 	/* Clear the cave_temp flag.  (this is paranoid) */
 	play_info[y][x] &= ~(PLAY_TEMP);
 
-	/* Projection will be affecting a player. */
-	if ((flg & (PROJECT_PLAY)) && (cave_m_idx[y][x] < 0))
+	/* Reduce damage by distance */
+	dam = (dam + r) / (r + 1);
+
+	if (cave_m_idx[y][x] < 0)
+	{
 		affect_player = TRUE;
-
-	/* Projection will be affecting a monster. */
-	if ((flg & (PROJECT_KILL)) && (cave_m_idx[y][x] > 0))
-	{
-		affect_monster = TRUE;
-		m_ptr = &m_list[cave_m_idx[y][x]];
-		r_ptr = &r_info[m_ptr->r_idx];
-	}
-
-	if (affect_player)
-	{
 		obvious = TRUE;
 	}
 
-	if (affect_monster)
+	if (cave_m_idx[y][x] > 0)
 	{
+		affect_monster = TRUE;
+
+		m_ptr = &m_list[cave_m_idx[y][x]];
+		r_ptr = &r_info[m_ptr->r_idx];
+
 		/* Sight check. */
 		if (m_ptr->ml) seen = TRUE;
 

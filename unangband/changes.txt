@@ -122,7 +122,16 @@ after you identify these abilities on the first item (Reported by Adam Horowitz)
 - Fixed bug causing amnesia effect only to be removed by saving the game (Reported
 by Adam Horowitz).
 
+- Fixed lockup bug when hit by wind spells (Reported by Adam Horowitz).
+
 - Monsters now regenerate mana.
+
+- Potions of poison now poison again (Reported by mikon).
+
+- Fixed bug preventing teleport and phase door from working (Reported by mikon and
+redelmansidi).
+
+- Fixed bug causing throwing artifacts to be generated in stacks.
 
 ### Build / Platform ###
 

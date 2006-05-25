@@ -8,8 +8,8 @@
 
 CC = gcc
 WRES = windres
-LIBS = -ggdb -mno-cygwin -mwindows -e _mainCRTStartup -lwinmm
-CFLAGS = -ggdb -O0 -Wall -W -pedantic -mno-cygwin -fno-strength-reduce -DWINDOWS
+LIBS = -mno-cygwin -mwindows -e _mainCRTStartup -lwinmm
+CFLAGS = -Wall -W -pedantic -mno-cygwin -O0 -fno-strength-reduce -DWINDOWS
 
 EXOBJS = \
 	angband.res \

@@ -5447,7 +5447,11 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				int py = p_ptr->py;
 				int px = p_ptr->px;
 
+				/* Apply damage */
 				if (project_p(-2, 0, py, px, damage, effect)) obvious = TRUE;
+
+				/* Apply teleport and other effects */
+				if (project_t(-2, 0, py, px, damage, effect)) obvious = TRUE;
 				break;
 			}
 
@@ -6567,7 +6571,11 @@ bool process_spell_eaten(int spell, int level, bool *cancel)
 		}
 		else
 		{
+			/* Apply damage */
 			if (project_p(-2,0,p_ptr->py,p_ptr->px,damage, effect)) obvious = TRUE;
+
+			/* Apply teleport and other effects */
+			if (project_t(-2,0,p_ptr->py,p_ptr->px,damage, effect)) obvious = TRUE;
 		}
 	}
 

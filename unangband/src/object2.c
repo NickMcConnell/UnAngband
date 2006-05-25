@@ -4604,6 +4604,7 @@ static bool kind_is_good(int k_idx)
 		case TV_SCROLL:
 		case TV_POTION:
 		case TV_WAND:
+		case TV_FLASK:
 		{
 			if ((k_ptr->level >= 50) && !(k_ptr->flags3 & (TR3_LIGHT_CURSE))) return (TRUE);
 			return (FALSE);
@@ -4933,7 +4934,7 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 	apply_magic(j_ptr, object_level, TRUE, good, great);
 
 	/* Generate multiple items */
-	switch (j_ptr->tval)
+	if (!artifact_p(j_ptr)) switch (j_ptr->tval)
 	{
 		case TV_SPIKE:
 		case TV_SHOT:
