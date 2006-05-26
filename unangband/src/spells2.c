@@ -5998,6 +5998,8 @@ bool process_spell_flags(int spell, int level, bool *cancel)
 	if ((s_ptr->flags2 & (SF2_INVULN)) && (set_invuln(p_ptr->invuln + lasts))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_SEE_INVIS)) && (set_tim_invis(p_ptr->tim_invis + lasts))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_PROT_EVIL)) && (set_protevil(p_ptr->protevil + lasts + (level== 0 ? 3 * p_ptr->lev : 0)))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_SLOW_CURSE)) && (set_cursed(0))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_CURSE)) && (set_cursed(0))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_OPP_FIRE)) && (set_oppose_fire(p_ptr->oppose_fire + lasts))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_OPP_COLD)) && (set_oppose_cold(p_ptr->oppose_cold + lasts))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_OPP_ACID)) && (set_oppose_acid(p_ptr->oppose_acid + lasts))) obvious = TRUE;

@@ -2872,7 +2872,7 @@ void do_cmd_timeofday()
 		else if (hour == MIDNIGHT - 1)
 			msg_print("It is almost midnight.");
 		else if (hour < MIDNIGHT)
-			msg_format("There are %d hours until midnight.", MIDDAY - hour);
+			msg_format("There are %d hours until midnight.", MIDNIGHT - hour);
 	}
 }
 

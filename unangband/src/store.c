@@ -3852,6 +3852,8 @@ void store_maint(int which)
 {
 	int j;
 
+	int tries = 0;
+
 	int old_rating = rating;
 
 	set_store(which);
@@ -3918,8 +3920,8 @@ void store_maint(int which)
 	/* Hack -- prevent "overflow" */
 	if (j >= st_ptr->stock_size) j = st_ptr->stock_size - 1;
 
-	/* Create some new items */
-	while (st_ptr->stock_num < j) store_create();
+	/* Create some new items -- fail if tried too many times */
+	while ((st_ptr->stock_num < j) && (tries++ < 1000)) store_create();
 
 	/* Hack -- Restore the rating */
 	rating = old_rating;

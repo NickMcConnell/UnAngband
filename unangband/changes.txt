@@ -72,6 +72,9 @@ effects, as well as nexus, ice and darkness.
 
 - Added saleable paintings.
 
+- Improve low level great drops in particular drops from the Dunlending agent
+(Reported by Mikon).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -133,8 +136,16 @@ redelmansidi).
 
 - Fixed bug causing throwing artifacts to be generated in stacks.
 
+- Fixed infinite loop during store item creation (Reported by Will Asher).
+
+- Fixed display of hours before midnight (Report by Mikon and others).
+
+- Fixed item boost code to ensure improving to-hit, to-dam, to-ac actually improves
+overall item power.
+
 ### Build / Platform ###
 
+- Fixed some missing files not updated on CVS (Reported by Mikon).
 
 
 Unangband 0.6.0 "Where's the Tequila? Did Tara Reid steal all the drinks?" (The Ari

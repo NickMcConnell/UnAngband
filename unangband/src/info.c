@@ -4995,9 +4995,13 @@ s32b object_power(const object_type *o_ptr)
 			{
 				p += o_ptr->to_d;
 			}
-			else
+			else if (o_ptr->to_d > -10)
 			{
 				p += 9;
+			}
+			else
+			{
+				p += o_ptr->to_d + 9;
 			}
 
 			if (f1 & TR1_SHOTS)
@@ -5030,9 +5034,13 @@ s32b object_power(const object_type *o_ptr)
 			{
 				p+= (o_ptr->to_h) * 2 / 3;
 			}
+			else if (o_ptr->to_h > -12)
+			{
+				p += 6;
+			}
 			else
 			{
-				p+= 6;
+				p += (o_ptr->to_h) * 2 / 3 + 6;
 			}
 
 			/* Normalise power back */
@@ -5147,9 +5155,13 @@ s32b object_power(const object_type *o_ptr)
 			{
 				p += o_ptr->to_d;
 			}
-			else
+			else if (o_ptr->to_d > -10)
 			{
 				p += 9;
+			}
+			else
+			{
+				p += o_ptr->to_d + 9;
 			}
 
 			if (f1 & TR1_BLOWS)
@@ -5171,11 +5183,14 @@ s32b object_power(const object_type *o_ptr)
 			{
 				p+= (o_ptr->to_h) * 2 / 3;
 			}
+			else if (o_ptr->to_h > -12)
+			{
+				p += 6;
+			}
 			else
 			{
-				p+= 6;
+				p += (o_ptr->to_d) * 2 / 3 + 6;
 			}
-
 
 			/* Normalise power back */
 			/* We remove the weapon base damage to get 'true' power */
@@ -5285,18 +5300,26 @@ s32b object_power(const object_type *o_ptr)
 			{
 				p += o_ptr->to_d;
 			}
-			else
+			else if (o_ptr->to_d > -10)
 			{
 				p += 9;
+			}
+			else
+			{
+				p += o_ptr->to_d + 9;
 			}
 
 			if (o_ptr->to_h > 9)
 			{
 				p+= (o_ptr->to_h) * 2 / 3;
 			}
+			else if (o_ptr->to_h > -12)
+			{
+				p += 6;
+			}
 			else
 			{
-				p+= 6;
+				p += (o_ptr->to_d) * 2 / 3 + 6;
 			}
 
 			/* Normalise power back */
@@ -5554,6 +5577,15 @@ s32b object_power(const object_type *o_ptr)
 			{
 				p+= (o_ptr->to_a - 9);
 			}
+			else if (o_ptr->to_a > -10)
+			{
+				/* No change */
+			}
+			else
+			{
+				p += o_ptr->to_d + 9;
+			}
+
 
 			if (o_ptr->to_a > 19)
 			{

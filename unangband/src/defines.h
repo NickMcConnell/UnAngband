@@ -47,7 +47,7 @@
 /*
  * Name of the version/variant
  */
-#define VERSION_NAME "UnAngband"
+#define VERSION_NAME "Unangband"
 
 
 /*

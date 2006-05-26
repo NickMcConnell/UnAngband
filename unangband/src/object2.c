@@ -2197,6 +2197,20 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 
 		if (power < 0) boost_power = -boost_power;
 
+		/* Hack -- boost to-hit, to-dam, to-ac to 10 if required to increase power */
+		if (boost_power <= old_boost_power)
+		{
+			switch(choice)
+			{
+				case 0: case 1: case 2: if (o_ptr->to_h * sign < 12) o_ptr->to_h = sign * 12; break;
+				case 3: case 4: case 5: if (o_ptr->to_d * sign < 10) o_ptr->to_d = sign * 10; break;
+				case 6: case 7: case 8: if (o_ptr->to_a * sign < 10) o_ptr->to_a = sign * 10; break;
+			}
+
+			boost_power = object_power(o_ptr);
+
+			if (power < 0) boost_power = -boost_power;
+		}
 	} while ((!(boost_power <= old_boost_power) && (boost_power < lev)) || (tryagain && (tries < 40)));
 
 	/* Hack -- undo the change that took us over the maximum power */
@@ -2249,6 +2263,9 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 	/* Hack -- clear ego extra flag */
 	if (o_ptr->name2) o_ptr->xtra1 = 0;
 
+	/* Boost level for great drops */
+	if ((power < -1) || (power > 1)) lev += 10;
+
 	/* Recompute power */
 	obj_pow1 = object_power(o_ptr);
 
@@ -2258,8 +2275,8 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 	/* Already too magical */
 	if (obj_pow1 >= lev) return (FALSE);
 
-	/* Boost item most of the time unless great */
-	if (!(great) && rand_int(3))
+	/* Boost item most of the time */
+	if (rand_int(3))
 	{
 		/* Boost the item */
 		boost_item(o_ptr, power, power);
@@ -2493,6 +2510,9 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 
 	level = p_ptr->depth;
 
+	/* Boost level if great */
+	if (great) level += 10;
+
 	/* Boost level (like with object base types) */
 	if (level > 0)
 	{
@@ -2558,9 +2578,8 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 		/* Fake ego power */
 		o_ptr->name2 = e_idx;
 		j = object_power(o_ptr);
-#if 0
 		if (j < 0) j = -j;
-#endif
+
 		/* Force better for non-weapons as we can't modify power as easily */
 		if ((great) && (j < level / 2) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_HAFTED)
 			&& (o_ptr->tval != TV_SWORD) && (o_ptr->tval != TV_POLEARM) && (o_ptr->tval != TV_ARROW)
@@ -2568,6 +2587,9 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 
 		/* Force better if we can't modify power */
 		else if ((great) && !(e_ptr->xtra) && (j < level * 3 / 4)) continue;
+
+		/* Force at least useful */
+		else if (j < level / 3) continue;
 
 		/* Test if permitted ego power */
 		if (j > level) continue;
