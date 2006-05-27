@@ -689,6 +689,19 @@
 #define COL_DEPTH		(show_sidebar ? 70 : 72)	/* "Lev NNN" / "NNNN ft" */
 
 
+#define ROW_CURSED	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
+					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
+#define COL_CURSED	(show_sidebar ? 78 : 78)	/* "Cursed" / "Cur" */
+
+#define ROW_AMNESIA	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
+					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
+#define COL_AMNESIA	(show_sidebar ? 85 : 81)	/* "Amnesia" / "Amn" */
+
+#define ROW_PETRIFY	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
+					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
+#define COL_PETRIFY	(show_sidebar ? 93 : 85)	/* "Amnesia" / "Amn" */
+
+
 /*** General index values ***/
 
 
@@ -2588,13 +2601,14 @@
 #define PR_STATE		0x00100000L	/* Display Extra (State) */
 #define PR_SPEED		0x00200000L	/* Display Extra (Speed) */
 #define PR_STUDY		0x00400000L	/* Display Extra (Study) */
-/* xxx */
 #define PR_EXTRA		0x01000000L	/* Display Extra Info */
 #define PR_BASIC		0x02000000L	/* Display Basic Info */
-/* xxx */
 #define PR_ITEM_LIST		0x04000000L     /* Display Item List */
 #define PR_MAP			0x08000000L	/* Display Map */
-/* xxx (many) */
+#define PR_AMNESIA		0x10000000L	/* Display Extra (Cursed) */
+#define PR_CURSED		0x20000000L	/* Display Extra (Amnesia) */
+#define PR_PETRIFY		0x40000000L	/* Display Extra (Petrify) */
+/* xxx */
 
 /*
  * Bit flags for the "p_ptr->window" variable (etc)

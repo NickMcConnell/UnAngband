@@ -9,7 +9,7 @@
 CC = gcc
 WRES = windres
 LIBS = -mno-cygwin -mwindows -e _mainCRTStartup -lwinmm
-CFLAGS = -Wall -W -pedantic -mno-cygwin -O0 -fno-strength-reduce -DWINDOWS
+CFLAGS = -Wall -W -pedantic -mno-cygwin -O0 -ggdb -fno-strength-reduce -DWINDOWS
 
 EXOBJS = \
 	angband.res \

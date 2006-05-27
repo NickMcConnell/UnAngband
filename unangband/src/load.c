@@ -368,6 +368,19 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&o_ptr->xtra1);
 	rd_byte(&o_ptr->xtra2);
 
+	/* Hack -- fix old burning arrows */
+	if (o_ptr->k_idx == 707)
+	{
+		o_ptr->k_idx = lookup_kind(TV_ARROW, SV_AMMO_NORMAL);
+		o_ptr->tval = TV_ARROW;
+		o_ptr->sval = SV_AMMO_NORMAL;
+		if (!o_ptr->xtra1)
+		{
+			o_ptr->xtra1 = TV_FLASK;
+			o_ptr->xtra2 = SV_FLASK_OIL;
+		}
+	}
+
 	/* Flags we have learnt about an item */
 	rd_u32b(&o_ptr->can_flags1);
 	rd_u32b(&o_ptr->can_flags2);

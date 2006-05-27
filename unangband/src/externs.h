@@ -669,6 +669,7 @@ extern void object_bonus(object_type *o_ptr);
 extern void object_mental(object_type *o_ptr);
 extern void object_aware(object_type *o_ptr);
 extern void object_tried(object_type *o_ptr);
+extern s32b object_value_real(const object_type *o_ptr);
 extern s32b object_value(const object_type *o_ptr);
 extern bool object_similar(const object_type *o_ptr, const object_type *j_ptr);
 extern void object_absorb(object_type *o_ptr, const object_type *j_ptr);

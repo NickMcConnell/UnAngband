@@ -760,7 +760,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		case TV_FLASK:
 		{
 			append_name = TRUE;
-			basenm = "& Flask~";
+			basenm = (o_ptr->name3 ? "& # Flask~" : "& Flask~");
 
 			break;
 		}
@@ -1289,8 +1289,10 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
          */
 	if (o_ptr->ident & (IDENT_VALUE))
 	{
+		
+
 		object_desc_str_macro(t, " worth ");
-		object_desc_num_macro(t,object_value(o_ptr) / 2);
+		object_desc_num_macro(t,object_value_real(o_ptr) / 2);
 		object_desc_str_macro(t, " gold pieces");
 	}
 
@@ -1661,8 +1663,19 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	}
 
 
+	/* Use magical bag as proxy inscription */
+	if (o_ptr->feeling >= MAX_INSCRIP)
+	{
+		int bag = lookup_kind(TV_BAG, o_ptr->feeling - MAX_INSCRIP);
+
+		if (bag)
+		{
+			v = k_name + k_info[bag].name;
+		}
+	}
+
 	/* Use special inscription, if any */
-	if (o_ptr->feeling)
+	else if (o_ptr->feeling)
 	{
 		v = inscrip_text[o_ptr->feeling];
 		if (strlen(v) == 0) v = NULL;

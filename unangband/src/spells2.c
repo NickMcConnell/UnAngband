@@ -2049,6 +2049,121 @@ bool detect_monsters_living(void)
 
 
 /*
+ * Detect all "mineral" monsters on the current panel
+ */
+bool detect_monsters_mineral(void)
+{
+	int i, y, x;
+
+	bool flag = FALSE;
+
+	/* Scan monsters */
+	for (i = 1; i < m_max; i++)
+	{
+		monster_type *m_ptr = &m_list[i];
+		monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+		/* Skip dead monsters */
+		if (!m_ptr->r_idx) continue;
+
+		/* Location */
+		y = m_ptr->fy;
+		x = m_ptr->fx;
+
+		/* Only detect nearby monsters */
+		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
+
+		/* Detect all mineral monsters */
+		if (r_ptr->flags9 & (RF9_DROP_MINERAL))
+		{
+			/* Optimize -- Repair flags */
+			repair_mflag_mark = repair_mflag_show = TRUE;
+
+			/* Hack -- Detect the monster */
+			m_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
+
+			/* Update the monster */
+			update_mon(i, FALSE);
+
+			/* Detect */
+			flag = TRUE;
+		}
+	}
+
+	/* Hack -- mark as safe */
+	if (view_detect_grids) detect_feat_flags(0L, 0L, 2 * MAX_SIGHT);
+
+	/* Describe */
+	if (flag)
+	{
+		/* Describe result */
+		msg_print("You sense the presence of mineral monsters!");
+	}
+
+	/* Result */
+	return (flag);
+}
+
+
+/*
+ * Detect all "mimic" monsters on the current panel
+ */
+bool detect_monsters_mimic(void)
+{
+	int i, y, x;
+
+	bool flag = FALSE;
+
+
+	/* Scan monsters */
+	for (i = 1; i < m_max; i++)
+	{
+		monster_type *m_ptr = &m_list[i];
+		monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+		/* Skip dead monsters */
+		if (!m_ptr->r_idx) continue;
+
+		/* Location */
+		y = m_ptr->fy;
+		x = m_ptr->fx;
+
+		/* Only detect nearby monsters */
+		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
+
+		/* Detect all object-like monsters */
+		if (strchr("!-_\\/{}[]&,~\"=()",r_ptr->d_char))
+		{
+			/* Optimize -- Repair flags */
+			repair_mflag_mark = repair_mflag_show = TRUE;
+
+			/* Hack -- Detect the monster */
+			m_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
+
+			/* Update the monster */
+			update_mon(i, FALSE);
+
+			/* Detect */
+			flag = TRUE;
+		}
+	}
+
+	/* Hack -- mark as safe */
+	if (view_detect_grids) detect_feat_flags(0L, 0L, 2 * MAX_SIGHT);
+
+	/* Describe */
+	if (flag)
+	{
+		/* Describe result */
+		msg_print("You sense the presence of mimics!");
+	}
+
+	/* Result */
+	return (flag);
+}
+
+
+/*
  * Detect everything
  */
 bool detect_all(void)
@@ -2066,6 +2181,8 @@ bool detect_all(void)
 	if (detect_monsters_evil()) detect = TRUE;
 	if (detect_monsters_living()) detect = TRUE;
 	if (detect_monsters_normal()) detect = TRUE;
+	if (detect_monsters_mineral()) detect = TRUE;
+	if (detect_monsters_mimic()) detect = TRUE;
 
 	/* Result */
 	return (detect);
@@ -2895,7 +3012,42 @@ bool ident_spell_sense(void)
 	}
 
 	/* Identify it's bonuses */
-	sense_magic(o_ptr, cp_ptr->sense_type, TRUE);
+	o_ptr->feeling = sense_magic(o_ptr, cp_ptr->sense_type, TRUE);
+
+	/* Sense non-wearable items */
+	if (!o_ptr->feeling)
+	{
+		int i, j;
+
+		/* Check bags */
+		for (i = 0; i < SV_BAG_MAX_BAGS; i++)
+
+		/* Find slot */
+		for (j = 0; j < INVEN_BAG_TOTAL; j++)
+		{
+			if ((bag_holds[i][j][0] == o_ptr->tval)
+				&& (bag_holds[i][j][1] == o_ptr->sval)) o_ptr->feeling = MAX_INSCRIP + i;
+		}
+
+		/* Still no feeling */
+		if (!o_ptr->feeling)
+		{
+			switch(o_ptr->feeling)
+			{
+				case TV_STAFF:
+				case TV_ROD:
+				case TV_BAG:
+					o_ptr->feeling = INSCRIP_MAGICAL;
+					break;
+				default:
+					o_ptr->feeling = INSCRIP_NONMAGICAL;
+					break;
+			}
+		}
+	}
+
+	/* Item is sensed */
+	o_ptr->ident |= (IDENT_SENSE);
 
 	/* Description */
 	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
@@ -5920,11 +6072,13 @@ bool process_spell_flags(int spell, int level, bool *cancel)
         {
                 if (detect_treasure()) obvious = TRUE;
                 if (detect_objects_gold()) obvious = TRUE;
+                if (detect_monsters_mineral()) obvious = TRUE;
         }
 	if (s_ptr->flags1 & (SF1_DETECT_OBJECT))
         {
                 if (detect_objects_buried()) obvious = TRUE;
                 if (detect_objects_normal()) obvious = TRUE;
+                if (detect_monsters_mimic()) obvious = TRUE;
         }
 	if ((s_ptr->flags1 & (SF1_DETECT_MAGIC)) && (detect_objects_magic())) obvious = TRUE;
 	if ((s_ptr->flags1 & (SF1_DETECT_CURSE)) && (detect_objects_cursed())) obvious = TRUE;

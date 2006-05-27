@@ -75,6 +75,13 @@ effects, as well as nexus, ice and darkness.
 - Improve low level great drops in particular drops from the Dunlending agent
 (Reported by Mikon).
 
+- Object detection now detects mimic monsters. Treasure detection now detects
+monsters made of coins or gems, or coin or gem-like monsters.
+
+- Burning arrows replaced by oil-coated regular arrows.
+
+- Some new weapons and armour re-balancing from Sangband.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -91,6 +98,8 @@ enchant it with brands or resists.
 - Updated character dump code (From NPPAngband).
 
 - Display list of dungeons visited.
+
+- Display amnesia, petrification, cursed status if there is room.
 
 ### Bug fixes ###
 
@@ -142,6 +151,16 @@ redelmansidi).
 
 - Fixed item boost code to ensure improving to-hit, to-dam, to-ac actually improves
 overall item power.
+
+- Fix bug with torches always stacking.
+
+- Fix sense magic to allow sensing on all objects (Reported by mikon).
+
+- Fix value magic to use real values (Reported by mikon).
+
+- Fix view_detect_grids option appearing twice (Reported by ekolis).
+
+- Ammunition carried by monsters is now sensed (Reported by mikon).
 
 ### Build / Platform ###
 

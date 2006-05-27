@@ -2377,7 +2377,7 @@ void py_attack(int y, int x)
 						}
 
 						/* Hack -- affect ground if not a coating */
-						if (!coated_p(o_ptr)) (void)project_f(-1,0,y,x,damage, effect);
+						(void)project_f(-1,0,y,x,damage, effect);
 
 						/* Apply teleportation and other effects */
 						(void)project_t(-1,0,y,x,damage, effect);

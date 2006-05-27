@@ -1017,7 +1017,7 @@ static s32b object_value_base(const object_type *o_ptr)
  *
  * Every wearable item with a "pval" bonus is worth extra (see below).
  */
-static s32b object_value_real(const object_type *o_ptr)
+s32b object_value_real(const object_type *o_ptr)
 {
 	s32b value;
 
@@ -1531,6 +1531,17 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			break;
 		}
 
+		case TV_LITE:
+		{
+			/* Require 'similar' charges */
+			if ((o_ptr->charges != j_ptr->charges) && (!stack_force_charges)
+				&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) )
+			{
+				if ((o_ptr->charges != 0) && (j_ptr->charges != 0)) return (0);
+			}
+			/* Fall through */
+		}
+
 		/* Weapons and Armor */
 		case TV_STAFF:
 		case TV_BOW:
@@ -1554,7 +1565,8 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		/* Rings, Amulets, Lites */
 		case TV_RING:
 		case TV_AMULET:
-		case TV_LITE:
+
+
 
 		/* Missiles */
 		case TV_BOLT:
@@ -4401,6 +4413,8 @@ static bool name_drop_okay(int r_idx)
 
 		/* Only fit animals in cages */
 		else if ((j_ptr->sval == SV_HOLD_CAGE) && !(r_ptr->flags3 & (RF3_ANIMAL))) return (FALSE);
+
+		else return (FALSE);
 	}
 	else if (j_ptr->tval == TV_STATUE)
 	{

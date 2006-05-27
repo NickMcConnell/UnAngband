@@ -2915,6 +2915,7 @@ A:75:13:1
 D:You feel your memories fade.
 F:DEC_EXP
 B:SELF:LOSE_INT:0d0+0
+B:SELF:FORGET:0d0+0
 S:CURE_DISEASE:15
 
 N:289:Ruination

@@ -384,6 +384,12 @@ bool set_amnesia(int v)
 	/* Disturb */
 	if (disturb_state) disturb(0, 0);
 
+	/* Redraw the "amnesia" */
+	p_ptr->redraw |= (PR_AMNESIA);
+
+	/* Handle stuff */
+	handle_stuff();
+
 	/* Result */
 	return (TRUE);
 }
@@ -427,6 +433,9 @@ bool set_cursed(int v)
 
 	/* Disturb */
 	if (disturb_state) disturb(0, 0);
+
+	/* Redraw the "cursed" */
+	p_ptr->redraw |= (PR_CURSED);
 
 	/* Recalculate bonuses */
 	p_ptr->update |= (PU_BONUS);
@@ -621,8 +630,8 @@ bool set_petrify(int v)
 	/* Disturb */
 	if (disturb_state) disturb(0, 0);
 
-	/* Redraw the state */
-	p_ptr->redraw |= (PR_STATE);
+	/* Redraw the "petrify" */
+	p_ptr->redraw |= (PR_PETRIFY);
 
 	/* Handle stuff */
 	handle_stuff();

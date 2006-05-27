@@ -496,6 +496,54 @@ static void prt_poisoned(void)
 
 
 /*
+ * Prints Cursed status
+ */
+static void prt_cursed(void)
+{
+	if (p_ptr->cursed)
+	{
+		c_put_str(TERM_ORANGE, (show_sidebar ? "Cursed" : "Curs"), ROW_CURSED, COL_CURSED);
+	}
+	else
+	{
+		put_str((show_sidebar ? "      " : "    "), ROW_CURSED, COL_CURSED);
+	}
+}
+
+
+/*
+ * Prints Amnesia status
+ */
+static void prt_amnesia(void)
+{
+	if (p_ptr->amnesia)
+	{
+		c_put_str(TERM_ORANGE, (show_sidebar ? "Amnesia" : "Forg"), ROW_AMNESIA, COL_AMNESIA);
+	}
+	else
+	{
+		put_str((show_sidebar ? "       " : "    "), ROW_AMNESIA, COL_AMNESIA);
+	}
+}
+
+
+/*
+ * Prints Petrified status
+ */
+static void prt_petrify(void)
+{
+	if (p_ptr->petrify)
+	{
+		c_put_str(TERM_ORANGE, (show_sidebar ? "Petrified" : "Petr"), ROW_PETRIFY, COL_PETRIFY);
+	}
+	else
+	{
+		put_str((show_sidebar ? "         " : "    "), ROW_PETRIFY, COL_PETRIFY);
+	}
+}
+
+
+/*
  * Prints Searching, Resting, Paralysis, or 'count' status
  * Display is always exactly 10 characters wide (see below)
  *
@@ -1241,6 +1289,9 @@ static void prt_frame_extra(void)
 	prt_confused();
 	prt_afraid();
 	prt_poisoned();
+	prt_cursed();
+	prt_amnesia();
+	prt_petrify();
 
 	/* State */
 	prt_state();
@@ -3793,7 +3844,7 @@ void redraw_stuff(void)
 	/* HACK - Redraw window "Display player (status)" if necessary */
 	if (p_ptr->redraw & (PR_HUNGER | PR_BLIND | PR_CONFUSED | PR_AFRAID |
 	                     PR_POISONED | PR_STATE | PR_SPEED | PR_STUDY |
-	                     PR_DEPTH))
+	                     PR_DEPTH | PR_CURSED | PR_AMNESIA | PR_PETRIFY))
 	{
 		p_ptr->window |= (PW_PLAYER_3);
 	}
@@ -3936,6 +3987,7 @@ void redraw_stuff(void)
 		p_ptr->redraw &= ~(PR_HUNGER);
 		p_ptr->redraw &= ~(PR_BLIND | PR_CONFUSED);
 		p_ptr->redraw &= ~(PR_AFRAID | PR_POISONED);
+		p_ptr->redraw &= ~(PR_CURSED | PR_AMNESIA | PR_PETRIFY);
 		p_ptr->redraw &= ~(PR_STATE | PR_SPEED | PR_STUDY);
 		prt_frame_extra();
 	}
@@ -3980,6 +4032,24 @@ void redraw_stuff(void)
 	{
 		p_ptr->redraw &= ~(PR_POISONED);
 		prt_poisoned();
+	}
+
+	if (p_ptr->redraw & (PR_CURSED))
+	{
+		p_ptr->redraw &= ~(PR_CURSED);
+		prt_cursed();
+	}
+
+	if (p_ptr->redraw & (PR_AMNESIA))
+	{
+		p_ptr->redraw &= ~(PR_AMNESIA);
+		prt_amnesia();
+	}
+
+	if (p_ptr->redraw & (PR_PETRIFY))
+	{
+		p_ptr->redraw &= ~(PR_PETRIFY);
+		prt_petrify();
 	}
 
 	if (p_ptr->redraw & (PR_STATE))

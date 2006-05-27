@@ -8369,7 +8369,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		/* Curse */
 		case GF_CURSE:
 		{
-			int k = randint((dam / 3) + 2);
+			int k =	(10 + randint(15) + r) / (r + 1);
 
 			/* Take damage */
 			take_hit(dam, killer);
@@ -8422,7 +8422,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		/* Make the player temporarily forgetful */
 		case GF_FORGET:
 		{
-			int k = randint((dam / 3) + 2);
+			int k =	(10 + randint(15) + r) / (r + 1);
 
 			/* Take damage */
 			take_hit(dam, killer);

@@ -843,7 +843,8 @@ static void process_world(void)
 	{
 		(void)set_msleep(p_ptr->msleep - 1);
 
-		(void)set_psleep(p_ptr->psleep + 1);
+		if (p_ptr->psleep < PY_SLEEP_DROWSY) (void)set_psleep(PY_SLEEP_DROWSY);
+		else ((void)set_psleep(p_ptr->psleep + 1));
 	}
 
 	/* Times see-invisible */

@@ -3704,8 +3704,8 @@ void do_cmd_fire(void)
 								if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
 							}
 
-							/* Hack -- affect ground if not a coating */
-							if (!coated_p(i_ptr)) (void)project_f(-1,0,y,x,damage, effect);
+							/* Hack -- affect ground */
+							(void)project_f(-1,0,y,x,damage, effect);
 
 							/* Apply teleport & other effects */
 							(void)project_t(-1,0,y,x,damage, effect);
@@ -4215,8 +4215,8 @@ void do_cmd_throw(void)
 								if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
 							}
 
-							/* Hack -- affect ground if not a coating */
-							if (!coated_p(i_ptr)) (void)project_f(-1,0,y,x,damage, effect);
+							/* Hack -- affect ground */
+							(void)project_f(-1,0,y,x,damage, effect);
 
 							/* Apply teleport & other effects */
 							(void)project_t(-1,0,y,x,damage, effect);
