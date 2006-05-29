@@ -312,13 +312,16 @@ static errr rd_item(object_type *o_ptr)
 	if (!(older_than(0, 6, 1)))
 	{
 		rd_s16b(&o_ptr->charges);
+
+		/* Hack -- fix missing charges from flasks of oil */
+		if (((o_ptr->tval == TV_FLASK) || (o_ptr->tval == TV_FOOD)) && !(o_ptr->charges)) o_ptr->charges = k_info[o_ptr->k_idx].charges;
 	}
 
 	/* Fix charges / timeout */
 	else
 	{
 		/* Hack -- fix rod/ring/dragon armor charge so that timeout set correctly in future */
-		if ((o_ptr->tval == TV_ROD) || (o_ptr->tval == TV_DRAG_ARMOR) || ((o_ptr->tval == TV_RING) &&
+		if ((o_ptr->tval == TV_ROD) || (o_ptr->tval == TV_DRAG_ARMOR) || (o_ptr->tval == TV_FLASK) || ((o_ptr->tval == TV_RING) &&
 			((o_ptr->sval == SV_RING_FLAMES) || (o_ptr->sval == SV_RING_ACID) || (o_ptr->sval == SV_RING_ICE) ||
 				(o_ptr->sval == SV_RING_LIGHTNING))))
 		{
@@ -551,6 +554,9 @@ static errr rd_item(object_type *o_ptr)
 			o_ptr->ds = 0;
 		}
 	}
+
+	/* Hack -- clear empty slots */
+	if (!o_ptr->k_idx) object_wipe(o_ptr);
 
 	/* Success */
 	return (0);

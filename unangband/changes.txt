@@ -171,6 +171,8 @@ overall item power.
 
 - Fixed bug causing infinite sleeping (Reported by mikon).
 
+- Improved loading of 0.6.0 save-files (Reported by darkDrone).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

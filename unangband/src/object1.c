@@ -1468,6 +1468,16 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		}
 	}
 
+	/* Hack -- Process food/fuel */
+	else if ((cheat_xtra) && ((o_ptr->tval == TV_FOOD) || (o_ptr->tval == TV_FLASK)))
+	{
+		/* Dump " (N charges)" */
+		object_desc_chr_macro(t, ' ');
+		object_desc_chr_macro(t, p1);
+		object_desc_num_macro(t, o_ptr->charges);
+		object_desc_str_macro(t, " fuel");
+		object_desc_chr_macro(t, p2);
+	}
 
 	/* Dump "pval" flags for wearable items */
 	if ((known || (o_ptr->ident & (IDENT_PVAL))) && (f1 & (TR1_PVAL_MASK)))
