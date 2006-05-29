@@ -844,7 +844,12 @@ static void process_world(void)
 		(void)set_msleep(p_ptr->msleep - 1);
 
 		if (p_ptr->psleep < PY_SLEEP_DROWSY) (void)set_psleep(PY_SLEEP_DROWSY);
-		else ((void)set_psleep(p_ptr->psleep + 1));
+	}
+
+	/* Player induced sleep -- hack: goes in other direction */
+	if (p_ptr->psleep)
+	{
+		(void)set_psleep(p_ptr->psleep + 1);
 	}
 
 	/* Times see-invisible */
@@ -2656,9 +2661,6 @@ static void process_player(void)
 			/* Take a turn */
 			p_ptr->energy_use = 100;
 
-			/* If asleep, slip deeper into slumber */
-			if (p_ptr->psleep) set_psleep(p_ptr->psleep + 1);
-
 			/* Catch breath */
 			if (!(f_ptr->flags2 & (FF2_FILLED)))
 			{
@@ -2692,9 +2694,6 @@ static void process_player(void)
 
 			/* Take a turn */
 			p_ptr->energy_use = 100;
-
-			/* If asleep, slip deeper into slumber */
-			if (p_ptr->psleep) set_psleep(p_ptr->psleep + 1);
 		}
 
 		/* Running */

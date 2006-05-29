@@ -2132,7 +2132,7 @@ void display_map(int *cy, int *cx)
 
 	town_type *t_ptr = &t_info[p_ptr->dungeon];
 
-	dungeon_zone *zone=&t_ptr->zone[0];;
+	dungeon_zone *zone=&t_ptr->zone[0];
 
 	/* Get the zone */
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);

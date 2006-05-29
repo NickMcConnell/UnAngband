@@ -160,7 +160,7 @@ void do_cmd_change_name(void)
 		/* Toggle mode */
 		else if ((ke.key == 'h') || (ke.key == '\xff'))
 		{
-			mode = !mode;
+			mode = (mode + 1) % 6;
 		}
 
 		/* Oops */
@@ -1996,8 +1996,8 @@ void do_cmd_visuals(void)
 				/* Skip non-entries */
 				if (!f_ptr->name) continue;
 
-				/* Skip mimic entries */
-				if (f_ptr->mimic != i) continue;
+				/* Skip mimic entries -- except invisible trap */
+				if ((f_ptr->mimic != i) && (i != FEAT_INVIS)) continue;
 
 				/* Dump a comment */
 				fprintf(fff, "# %s\n", (f_name + f_ptr->name));
@@ -2847,6 +2847,32 @@ void do_cmd_timeofday()
 	/* Display current date in the Elvish calendar */
 	msg_format("This is %s of the %s year of the third age.",
 	           get_month_name(day, cheat_xtra, FALSE), buf2);
+
+	/* Display location */
+	if (p_ptr->depth == min_depth(p_ptr->dungeon))
+	{
+		msg_format("You are in %s.", t_name + t_info[p_ptr->dungeon].name);
+	}
+	/* Display depth in feet */
+	else if (depth_in_feet)
+	{
+		dungeon_zone *zone=&t_info[0].zone[0];
+
+		/* Get the zone */
+		get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+
+		msg_format("You are %d ft %s %s.",
+			(p_ptr->depth - min_depth(p_ptr->dungeon)) * 50 ,
+				zone->tower ? "high above" : "deep in",
+					t_name + t_info[p_ptr->dungeon].name);
+	}
+	/* Display depth */
+	else
+	{
+		msg_format("You are on level %d of %s.",
+			p_ptr->depth - min_depth(p_ptr->dungeon),
+				t_name + t_info[p_ptr->dungeon].name);
+	}
 
 	/* Message */
 	if (cheat_xtra)
@@ -7003,6 +7029,7 @@ static void do_cmd_knowledge_features(void)
  * Display contents of the Home. Code taken from the player death interface 
  * and the show known objects function. -LM-
  */
+
 static void do_cmd_knowledge_home(void)
 {
 	int k;

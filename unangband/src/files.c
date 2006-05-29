@@ -1872,29 +1872,33 @@ static void display_home_equippy(int y, int x)
 /*
  * Hack -- see below
  */
-static const byte display_player_flag_set[4] =
+static const byte display_player_flag_set[6] =
 {
 	2,
 	2,
 	3,
-	1
+	1,
+	4,
+	3
 };
 
 /*
  * Hack -- see below
  */
-static const u32b display_player_flag_head[4] =
+static const u32b display_player_flag_head[6] =
 {
 	TR2_RES_ACID,
-	TR2_RES_BLIND,
+	TR2_RES_DARK,
 	TR3_SLOW_DIGEST,
-	TR1_STEALTH
+	TR1_SAVE,
+	TR4_UNDEAD,
+	TR3_DRAIN_HP
 };
 
 /*
  * Hack -- see below
  */
-static cptr display_player_flag_names[4][8] =
+static cptr display_player_flag_names[6][10] =
 {
 	{
 		" Acid:",	/* TR2_RES_ACID */
@@ -1904,10 +1908,13 @@ static cptr display_player_flag_names[4][8] =
 		" Pois:",	/* TR2_RES_POIS */
 		" Fear:",	/* TR2_RES_FEAR */
 		" Lite:",	/* TR2_RES_LITE */
-		" Dark:"	/* TR2_RES_DARK */
+		" Dark:",	/* TR2_RES_DARK */
+		"Water:",	/* TR4_HURT_WATER */
+		""
 	},
 
 	{
+		"Disea:",	/* TR4_RES_DISEASE */
 		"Blind:",	/* TR2_RES_BLIND */
 		"Confu:",	/* TR2_RES_CONFU */
 		"Sound:",	/* TR2_RES_SOUND */
@@ -1915,22 +1922,27 @@ static cptr display_player_flag_names[4][8] =
 		"Nexus:",	/* TR2_RES_NEXUS */
 		"Nethr:",	/* TR2_RES_NETHR */
 		"Chaos:",	/* TR2_RES_CHAOS */
-		"Disen:"	/* TR2_RES_DISEN */
+		"Disen:",	/* TR2_RES_DISEN */
+		""
 	},
 
 	{
-		"S.Dig:",	/* TR3_SLOW_DIGEST */
+		" Food:",	/* TR3_SLOW_DIGEST */
 		"Feath:",	/* TR3_FEATHER */
 		"PLite:",	/* TR3_LITE */
 		"Regen:",	/* TR3_REGEN */
 		"Telep:",	/* TR3_TELEPATHY */
 		"Invis:",	/* TR3_SEE_INVIS */
 		"FrAct:",	/* TR3_FREE_ACT */
-		"HLife:"	/* TR3_HOLD_LIFE */
+		"HLife:",	/* TR3_HOLD_LIFE */
+		"Activ:",	/* TR3_ACTIVATE */
+		"Throw:"	/* TR3_THROWING */
 	},
 
 	{
-		"Stea.:",	/* TR1_STEALTH */
+		" Save:",	/* TR1_SAVE */
+		"Devic:",	/* TR1_DEVICE */
+		"Steal:",	/* TR1_STEALTH */
 		"Sear.:",	/* TR1_SEARCH */
 		"Infra:",	/* TR1_INFRA */
 		"Tunn.:",	/* TR1_TUNNEL */
@@ -1938,14 +1950,376 @@ static cptr display_player_flag_names[4][8] =
 		"Blows:",	/* TR1_BLOWS */
 		"Shots:",	/* TR1_SHOTS */
 		"Might:"	/* TR1_MIGHT */
+	},
+
+	{
+		"Undea:",	/* TR4_UNDEAD */
+		"Demon:",	/* TR4_DEMON */
+		"  Orc:",	/* TR4_ORC */
+		"Troll:",	/* TR4_TROLL */
+		"Giant:",	/* TR4_GIANT */
+		"Dragn:",	/* TR4_DRAGON */
+		"  Man:",	/* TR4_MAN */
+		"Dwarf:",	/* TR4_DWARF */
+		"  Elf:",	/* TR4_ELF */
+		"Natur:"	/* TR4_NATURE */
+	},
+
+	{
+		"Healt:",	/* TR3_DRAIN_HP */
+		" Mana:",	/* TR3_DRAIN_MANA */
+		"Exper:",	/* TR3_DRAIN_EXP */
+		"",		/* xxx */
+		"Telep:",	/* TR3_TELEPORT / TR4_ANCHOR */
+		"Spell:",	/* TR4_SILENT */
+		"",		/* xxx */
+		"",		/* xxx */
+		" Evil:",	/* TR4_EVIL */
+		""		/* xxx */
 	}
 };
 
 
+
+/*
+ *
+ */
+static void put_flag_char(u32b f[4], int set, u32b flag, int y, int x, int row, int col, int pval)
+{
+	/* Low resists */
+	if (x == 0)
+	{
+		/* Hack -- Check immunities */
+		if ((y < 4) &&
+		    (f[2] & ((TR2_IM_ACID) << y)))
+		{
+			c_put_str(TERM_WHITE, "*", row, col);
+		}
+
+		/* MegaHack -- Check immunity to poison */
+		else if ((y == 4) &&
+			(f[4] & (TR4_IM_POIS)))
+		{
+			c_put_str(TERM_WHITE, "*", row, col);
+		}
+
+		/* Hack -- Check vulnerabilities */
+		else if ((y < 4) &&
+		    (f[4] & ((TR4_HURT_ACID) << y)))
+		{
+			c_put_str(TERM_RED, "-", row, col);
+		}
+
+		/* MegaHack -- Check vulnerability to poison */
+		else if ((y == 4) &&
+			(f[4] & (TR4_HURT_POIS)))
+		{
+			c_put_str(TERM_RED, "-", row, col);
+		}
+
+		/* MegaHack -- Check vulnerability to lite */
+		else if ((y == 6) &&
+			(f[4] & (TR4_HURT_LITE)))
+		{
+			c_put_str(TERM_RED, "-", row, col);
+		}
+
+		/* MegaHack -- Check vulnerability to water */
+		else if ((y == 8) &&
+			(f[4] & (TR4_HURT_WATER)))
+		{
+			c_put_str(TERM_RED, "-", row, col);
+		}
+
+		/* MegaHack -- Skip water */
+		else if (y == 8)
+		{
+			c_put_str(TERM_SLATE, ".", row, col);
+		}
+
+		/* Check flags */
+		else if (f[set] & flag)
+		{
+			c_put_str(TERM_WHITE, "+", row, col);
+		}
+
+		/* Default */
+		else
+		{
+			c_put_str(TERM_SLATE, ".", row, col);
+		}
+	}
+
+	/* High resists */
+	else if (x == 1)
+	{
+		/* MegaHack -- Check resistance to disease */
+		if ((y == 0) &&
+			(f[4] & (TR4_RES_DISEASE)))
+		{
+			c_put_str(TERM_WHITE, "+", row, col);
+		}
+
+		/* MegaHack -- Skip disease */
+		else if ((y == 0) &&
+			!(f[4] & (TR4_RES_DISEASE)))
+		{
+			c_put_str(TERM_SLATE, ".", row, col);
+		}
+
+		/* Check flags */
+		else if (f[set] & flag)
+		{
+			c_put_str(TERM_WHITE, "+", row, col);
+		}
+
+		/* Default */
+		else
+		{
+			c_put_str(TERM_SLATE, ".", row, col);
+		}
+	}
+
+	/* Abilities */
+	else if (x == 2)
+	{
+		/* MegaHack -- Check hunger */
+		if ((y == 4) &&
+			(f[4] & (TR4_HUNGER)))
+		{
+			c_put_str(TERM_RED, "-", row, col);
+		}
+
+		/* MegaHack -- Check activation */
+		else if ((y == 8) &&
+			(f[3] & (TR3_ACTIVATE)))
+		{
+			c_put_str(TERM_WHITE, "+", row, col);
+		}
+
+		/* MegaHack -- Skip activation */
+		else if ((y == 8) &&
+			!(f[3] & (TR3_ACTIVATE)))
+		{
+			c_put_str(TERM_SLATE, ".", row, col);
+		}
+
+		/* MegaHack -- Check throwing */
+		else if ((y == 9) &&
+			(f[3] & (TR3_THROWING)))
+		{
+			c_put_str(TERM_WHITE, "+", row, col);
+		}
+
+		/* MegaHack -- Skip throwing */
+		else if ((y == 9) &&
+			!(f[3] & (TR3_THROWING)))
+		{
+			c_put_str(TERM_SLATE, ".", row, col);
+		}
+
+		/* Check flags */
+		else if (f[set] & flag)
+		{
+			c_put_str(TERM_WHITE, "+", row, col);
+		}
+
+		/* Default */
+		else
+		{
+			c_put_str(TERM_SLATE, ".", row, col);
+		}
+	}
+
+	/* Pval dependent abilities */
+	else if (x == 3)
+	{
+		/* MegaHack -- Check static */
+		if ((y == 1) &&
+			(f[4] & (TR4_STATIC)))
+		{
+			c_put_str(TERM_RED, "x", row, col);
+		}
+
+		/* MegaHack -- Check aggravation */
+		else if ((y == 2) &&
+			(f[3] & (TR3_AGGRAVATE)))
+		{
+			c_put_str(TERM_RED, "x", row, col);
+		}
+
+		/* MegaHack -- Check windy */
+		else if ((y == 9) &&
+			(f[4] & (TR4_WINDY)))
+		{
+			c_put_str(TERM_RED, "x", row, col);
+		}
+
+		/* Check flags */
+		else if (f[set] & flag)
+		{
+			byte a;
+
+			/* Default */
+			char c = '*';
+
+			/* Good */
+			if (pval > 0)
+			{
+				/* Good */
+				a = TERM_L_GREEN;
+
+				/* Label boost */
+				if (pval < 10) c = I2D(pval);
+			}
+
+			/* Bad */
+			else if (pval < 0)
+			{
+				/* Bad */
+				a = TERM_RED;
+
+				/* Label boost */
+				if (pval > -10) c = I2D(-(pval));
+			}
+
+			/* Unknown */
+			else
+			{
+				/* Bad */
+				a = TERM_SLATE;
+				c = '?';
+			}
+
+			/* Display it */
+			c_put_str(a, format("%c", c), row, col);
+		}
+
+		/* Default */
+		else
+		{
+			c_put_str(TERM_SLATE, ".", row, col);
+		}
+
+	}
+
+	/* Racial sensing / marking */
+	else if (x == 4)
+	{
+		/* MegaHack -- Sense undead */
+		if ((y == 0) &&
+			(f[3] & (TR3_ESP_UNDEAD)))
+		{
+			if (f[set] & flag) c_put_str(TERM_WHITE, "*", row, col);
+			else c_put_str(TERM_WHITE, "s", row, col);
+		}
+
+		/* MegaHack -- Sense demon */
+		else if ((y == 1) &&
+			(f[3] & (TR3_ESP_DEMON)))
+		{
+			if (f[set] & flag) c_put_str(TERM_WHITE, "*", row, col);
+			else c_put_str(TERM_WHITE, "s", row, col);
+		}
+
+		/* MegaHack -- Sense orc */
+		else if ((y == 2) &&
+			(f[3] & (TR3_ESP_ORC)))
+		{
+			if (f[set] & flag) c_put_str(TERM_WHITE, "*", row, col);
+			else c_put_str(TERM_WHITE, "s", row, col);
+		}
+
+		/* MegaHack -- Sense troll */
+		else if ((y == 3) &&
+			(f[3] & (TR3_ESP_TROLL)))
+		{
+			if (f[set] & flag) c_put_str(TERM_WHITE, "*", row, col);
+			else c_put_str(TERM_WHITE, "s", row, col);
+		}
+
+		/* MegaHack -- Sense giant */
+		else if ((y == 4) &&
+			(f[3] & (TR3_ESP_GIANT)))
+		{
+			if (f[set] & flag) c_put_str(TERM_WHITE, "*", row, col);
+			else c_put_str(TERM_WHITE, "s", row, col);
+		}
+
+		/* MegaHack -- Sense dragon */
+		else if ((y == 0) &&
+			(f[3] & (TR3_ESP_DRAGON)))
+		{
+			if (f[set] & flag) c_put_str(TERM_WHITE, "*", row, col);
+			else c_put_str(TERM_WHITE, "s", row, col);
+		}
+
+		/* MegaHack -- Sense nature / mark animal */
+		else if (y == 9)
+		{
+			if ((f[4] & (TR4_ANIMAL)) && (f[3] & (TR3_ESP_NATURE))) c_put_str(TERM_WHITE, "*", row, col);
+			else if (f[3] & (TR3_ESP_NATURE)) c_put_str(TERM_WHITE, "s", row, col);
+			else if (f[4] & (TR4_ANIMAL)) c_put_str(TERM_WHITE, "+", row, col);
+			else c_put_str(TERM_SLATE, ".", row, col);
+		}
+
+		/* Check flags */
+		else if (f[set] & flag)
+		{
+			c_put_str(TERM_WHITE, "+", row, col);
+		}
+
+		/* Default */
+		else
+		{
+			c_put_str(TERM_SLATE, ".", row, col);
+		}
+
+	}
+
+	/* Negative abilities */
+	else if (x == 5)
+	{
+		/* MegaHack -- Check anchor/teleport */
+		if (y == 4)
+		{
+			if (f[4] & (TR4_ANCHOR)) c_put_str(TERM_RED, "x", row, col);
+			else if (f[3] & (TR3_TELEPORT)) c_put_str(TERM_WHITE, "+", row, col);
+			else c_put_str(TERM_SLATE, ".", row, col);
+		}
+
+		/* MegaHack -- Check spellcasting */
+		else if (y == 5)
+		{
+			if (f[4] & (TR4_SILENT)) c_put_str(TERM_RED, "x", row, col);
+			else c_put_str(TERM_SLATE, ".", row, col);
+		}
+
+		/* MegaHack -- Mark evil */
+		else if (y == 8)
+		{
+			if (f[4] & (TR4_EVIL)) c_put_str(TERM_WHITE, "+", row, col);
+			else c_put_str(TERM_SLATE, ".", row, col);
+		}
+
+		/* Check flags */
+		else if (f[set] & flag)
+		{
+			c_put_str(TERM_RED, "-", row, col);
+		}
+
+		/* Default */
+		else
+		{
+			c_put_str(TERM_SLATE, ".", row, col);
+		}
+	}
+}
+
 /*
  * Special display, part 1
  */
-static void display_player_flag_info(void)
+static void display_player_flag_info(int mode)
 {
 	int x, y, i, n;
 
@@ -1958,40 +2332,43 @@ static void display_player_flag_info(void)
 
 	u32b f[5];
 
+	int xmin = (mode == 1 ? 0 : 4);
+	int xmax = (mode == 1 ? 4 : 6);
 
-	/* Four columns */
-	for (x = 0; x < 4; x++)
+	/* Four or two columns */
+	for (x = xmin; x < xmax; x++)
 	{
 		/* Reset */
 		row = 11;
-		col = 20 * x;
+		col = 20 * (x - xmin);
 
 		/* Extract set */
 		set = display_player_flag_set[x];
 
 		/* Extract head */
 		head = display_player_flag_head[x];
-
+#if 0
 		/* Header */
 		c_put_str(TERM_WHITE, "abcdefghijkl@", row++, col+6);
-
-		/* Eight rows */
-		for (y = 0; y < 8; y++)
+#endif
+		/* Ten rows */
+		for (y = 0; y < 10; y++)
 		{
-			/* Extract flag */
-			flag = (head << y);
-
 			/* Extract name */
 			name = display_player_flag_names[x][y];
+
+			/* MegaHack -- skip empty rows */
+			if (strlen(name) == 0) continue;
 
 			/* Header */
 			c_put_str(TERM_WHITE, name, row, col);
 
+			/* Extract flag */
+			flag = (head << y);
+
 			/* Check equipment */
 			for (n = 6, i = INVEN_WIELD; i < INVEN_TOTAL; ++i, ++n)
 			{
-				byte attr = TERM_SLATE;
-
 				object_type *o_ptr;
 
 				/* Object */
@@ -2000,47 +2377,23 @@ static void display_player_flag_info(void)
 				/* Known flags */
 				object_flags_known(o_ptr, &f[1], &f[2], &f[3], &f[4]);
 
-				/* Color columns by parity */
-				if (i % 2) attr = TERM_L_WHITE;
-
 				/* Non-existant objects */
-				if (!o_ptr->k_idx) attr = TERM_L_DARK;
-
-				/* Hack -- Check immunities */
-				if ((x == 0) && (y < 4) &&
-				    (f[set] & ((TR2_IM_ACID) << y)))
+				if (!o_ptr->k_idx)
 				{
-					c_put_str(TERM_WHITE, "*", row, col+n);
+					c_put_str(TERM_L_DARK, ".", row, col + n);
 				}
-
-				/* Check flags */
-				else if (f[set] & flag)
-				{
-					c_put_str(TERM_WHITE, "+", row, col+n);
-				}
-
-				/* Default */
 				else
 				{
-					c_put_str(attr, ".", row, col+n);
+					/* Put flag in column */
+					put_flag_char(f, set, flag, y, x, row, col+n, o_ptr->pval);
 				}
 			}
 
 			/* Player flags */
 			player_flags(&f[1], &f[2], &f[3], &f[4]);
 
-			/* Default */
-			c_put_str(TERM_SLATE, ".", row, col+n);
-
-			/* Hack -- Check immunities */
-			if ((x == 0) && (y < 4) &&
-			    (f[set] & ((TR2_IM_ACID) << y)))
-			{
-				c_put_str(TERM_WHITE, "*", row, col+n);
-			}
-
-			/* Check flags */
-			else if (f[set] & flag) c_put_str(TERM_WHITE, "+", row, col+n);
+			/* Put flag in column */
+			put_flag_char(f, set, flag, y, x, row, col+n, 10);
 
 			/* Advance */
 			row++;
@@ -2186,6 +2539,7 @@ static void display_player_stat_info(void)
 	c_put_str(TERM_WHITE, " CB", row-1, col+16);
 	c_put_str(TERM_WHITE, " EB", row-1, col+20);
 	c_put_str(TERM_WHITE, "  Best", row-1, col+24);
+	c_put_str(TERM_WHITE, "  Curr", row-1, col+30);
 
 	/* Display the stats */
 	for (i = 0; i < A_MAX; i++)
@@ -2268,10 +2622,10 @@ static void display_player_sust_info(void)
 
 	/* Column */
 	col = 26;
-
+#if 0
 	/* Header */
 	c_put_str(TERM_WHITE, "abcdefghijkl@", row-1, col);
-
+#endif
 	/* Process equipment */
 	for (i = INVEN_WIELD; i < INVEN_TOTAL; ++i)
 	{
@@ -2487,16 +2841,22 @@ static void display_home_equipment_info(int mode)
 	}
 
 	/*alternate between resists and abilities depending on the modes*/
-	if (mode == 2)
+	if (mode == 3)
 	{
 		xmin = 0;
 		xmax = 2;
 	}
 
-	else if (mode == 3)
+	else if (mode == 4)
 	{
 		xmin = 2;
 		xmax = 4;
+	}
+
+	else if (mode == 5)
+	{
+		xmin = 4;
+		xmax = 6;
 	}
 
 	/*paranoia*/
@@ -2512,16 +2872,16 @@ static void display_home_equipment_info(int mode)
 	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row-1, col + MAX_INVENTORY_HOME + 8);
 
 	/* Footer */
-	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row+8, col);
+	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row+10, col);
 
 	/* 2nd Footer */
-	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row+8, col + MAX_INVENTORY_HOME + 8);
+	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row+10, col + MAX_INVENTORY_HOME + 8);
 
 	/* 3rd Equippy */
-	display_home_equippy(row+9, col);
+	display_home_equippy(row+11, col);
 
 	/* 4th Equippy */
-	display_home_equippy(row+9,col+ MAX_INVENTORY_HOME + 8);
+	display_home_equippy(row+11,col+ MAX_INVENTORY_HOME + 8);
 
 	/* Two Rows, alternating depending upon the mode */
 	for (x = 0; xmin < xmax; ++xmin, ++x)
@@ -2530,40 +2890,27 @@ static void display_home_equipment_info(int mode)
 		col = 32 * x;
 		row = 10;
 
-		/* Eight rows */
-		for (y = 0; y < 8; y++)
+		/* Ten rows */
+		for (y = 0; y < 10; y++)
 		{
-			bool hack_aggravate = FALSE;
-			byte name_attr = TERM_WHITE;
-
 			/* Extract set */
 			set = display_player_flag_set[xmin];
 
 			/* Extract head */
 			head = display_player_flag_head[xmin];
 
-			/*hack - replace tunneling with aggravate*/
-			if ((xmin == 3) && (y ==3)) hack_aggravate = TRUE;
+			/* Extract name */
+			name = display_player_flag_names[xmin][y];
+
+			/* MegaHack -- skip empty rows */
+			if (strlen(name) == 0) continue;
 
 			/* Extract flag */
 			flag = (head << y);
 
-			/* Extract name */
-			name = display_player_flag_names[xmin][y];
-
-			/*hack in aggravate flag for tunneling*/
-			if (hack_aggravate)
-			{
-				name = "Aggr.:";
-				flag = TR3_AGGRAVATE;
-				set  = 3;
-			}
-
 			/* Check equipment */
 			for (n = 7, i = 0; i < MAX_INVENTORY_HOME; ++i, ++n)
 			{
-				byte attr = TERM_SLATE;
-
 				object_type *o_ptr;
 
 				/* Object */
@@ -2572,36 +2919,20 @@ static void display_home_equipment_info(int mode)
 				/* Known flags */
 				object_flags_known(o_ptr, &f[1], &f[2], &f[3], &f[4]);
 
-				/* Color columns by parity */
-				if (i % 2) attr = TERM_L_WHITE;
-
 				/* Non-existant objects */
-				if (!o_ptr->k_idx) attr = TERM_L_DARK;
-
-				/* Hack -- Check immunities */
-				if ((xmin == 0) && (y < 5) &&
-				    (f[set] & ((TR2_IM_ACID) << y)))
+				if (!o_ptr->k_idx)
 				{
-					c_put_str(TERM_L_GREEN, "*", row, col+n);
-					name_attr = TERM_L_GREEN;
+					c_put_str(TERM_L_DARK, ".", row, col + n);
 				}
-
-				/* Check flags */
-				else if (f[set] & flag)
-				{
-					c_put_str(TERM_L_BLUE, "+", row, col+n);
-					if (name_attr != TERM_L_GREEN) name_attr = TERM_L_BLUE;
-				}
-
-				/* Default */
 				else
 				{
-					c_put_str(attr, ".", row, col+n);
+					/* Put flag in column */
+					put_flag_char(f, set, flag, y, x, row, col+n, o_ptr->pval);
 				}
 			}
 
 			/* Header */
-			c_put_str(name_attr, name, row, col);
+			c_put_str(TERM_WHITE, name, row, col);
 
 			/* Advance */
 			row++;
@@ -2617,8 +2948,10 @@ static void display_home_equipment_info(int mode)
  *
  * Mode 0 = standard display with skills/history
  * Mode 1 = special display with equipment flags
- * Mode 2 = Home equiment Stat Flags and 1st part of Resists
- * Mode 3 = Home equiment Stat Flags and 2st part of Resists
+ * Mode 2 = special display with equipment flags (columns 4 and 5)
+ * Mode 3 = Home equiment Stat Flags and 1st part of Resists
+ * Mode 4 = Home equiment Stat Flags and 2nd part of Resists
+ * Mode 5 = Home equiment Stat Flags and 3rd part of Resists
  */
 void display_player(int mode)
 {
@@ -2628,7 +2961,7 @@ void display_player(int mode)
 	/* Stat info */
 	display_player_stat_info();
 
-	if ((mode) < 2)
+	if ((mode) < 3)
 	{
 		/* Misc info */
 		display_player_misc_info();
@@ -2644,7 +2977,7 @@ void display_player(int mode)
 			display_player_sust_info();
 
 			/* Other flags */
-			display_player_flag_info();
+			display_player_flag_info(mode);
 		}
 
 		/* Standard */
@@ -3073,6 +3406,13 @@ errr file_character(cptr name, bool full)
 
 	bool no_quests = TRUE;
 
+	char buf2[20];
+
+	int day = bst(DAY, turn);
+
+	/* Format time of the day */
+	strnfmt(buf2, 20, get_day(bst(YEAR, turn) + START_YEAR));
+
 	/* Unused parameter */
 	(void)full;
 
@@ -3139,8 +3479,38 @@ errr file_character(cptr name, bool full)
 		fprintf(fff, "%s\n", buf);
 	}
 
+	/* Display current date in the Elvish calendar */
+	fprintf(fff," This is %s of the %s year of the third age.  ",
+	           get_month_name(day, cheat_xtra, FALSE), buf2);
+
+	/* Display location */
+	if (p_ptr->depth == min_depth(p_ptr->dungeon))
+	{
+		fprintf(fff, "You are in %s.", t_name + t_info[p_ptr->dungeon].name);
+	}
+	/* Display depth in feet */
+	else if (depth_in_feet)
+	{
+		dungeon_zone *zone=&t_info[0].zone[0];
+
+		/* Get the zone */
+		get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+
+		fprintf(fff, "You are %d ft %s %s.",
+			(p_ptr->depth - min_depth(p_ptr->dungeon)) * 50 ,
+				zone->tower ? "high above" : "deep in",
+					t_name + t_info[p_ptr->dungeon].name);
+	}
+	/* Display depth */
+	else
+	{
+		fprintf(fff, "You are on level %d of %s.",
+			p_ptr->depth - min_depth(p_ptr->dungeon),
+				t_name + t_info[p_ptr->dungeon].name);
+	}
+
 	/* Skip some lines */
-	fprintf(fff, "\n\n");
+	fprintf(fff, "\n\n\n");
 
 	/* If dead, dump last messages -- Prfnoff */
 	if (p_ptr->is_dead)
@@ -3166,7 +3536,7 @@ errr file_character(cptr name, bool full)
 	/* Dump flags, but in two separate rows */
 	for (w = 0; w < 2; w ++)
 	{
-		for (y = (11 + w); y < (21 + w); y++)
+		for (y = 11; y < 21; y++)
 		{
 			/* Dump each row */
 			for (z = 0, x = 0; x < 79; x++, z++)
@@ -3200,6 +3570,29 @@ errr file_character(cptr name, bool full)
 			/* End the row */
 			fprintf(fff, "\n");
 		}
+	}
+
+	/* Display player */
+	display_player(2);
+
+	/* Display remaining flags */
+	for (y = 11; y < 23; y++)
+	{
+		/* Dump each row */
+		for (x = 0; x < 40; x++)
+		{
+			/* Get the attr/char */
+			(void)(Term_what(x, y, &a, &c));
+
+			/*hack - space it out a bit*/
+			if (x == 20) fprintf(fff, "       ");
+
+			/* Dump it */
+			fprintf(fff, "%c", c);
+		}
+
+		/* End the row */
+		fprintf(fff, "\n");
 	}
 
 	/* Dump the equipment */
@@ -3247,13 +3640,13 @@ errr file_character(cptr name, bool full)
 		dump_home_stat_info(fff);
 
 		/*dump the home resists and abilities display*/
-		for (i =2; i <4; ++i)
+		for (i =3; i <6; ++i)
 		{
 			/* Display player */
 			display_player(i);
 
 			/* Dump part of the screen */
-			for (y = (i + 7); y < (i + 17); y++)
+			for (y = 10; y < 20; y++)
 			{
 				/* Dump each row */
 				for (x = 0; x < 79; x++)

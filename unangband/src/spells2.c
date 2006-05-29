@@ -855,17 +855,18 @@ remainder:
 		t2 |= o_ptr->may_flags2;
 		t3 |= o_ptr->may_flags3;
 		t4 |= o_ptr->may_flags4;
-
-		/* Hack -- weapon effects */
-		if (t1 || t2 || t3 || t4)
-		{
-			text_out("You are carrying equipment that you have not fully identified.  ");
-	
-			list_object_flags(t1,t2,t3,t4,1);
-
-			text_out("\n");
-		}
 	}
+
+	/* Hack -- weapon effects */
+	if (t1 || t2 || t3 || t4)
+	{
+		text_out("You are carrying equipment that you have not fully identified.  ");
+
+		list_object_flags(t1,t2,t3,t4,1);
+
+		text_out("\n");
+	}
+
 }
 
 

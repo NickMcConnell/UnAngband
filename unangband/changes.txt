@@ -101,6 +101,10 @@ enchant it with brands or resists.
 
 - Display amnesia, petrification, cursed status if there is room.
 
+- Time of day command also displays your current location.
+
+- Updated character display and dumps to include all object flags.
+
 ### Bug fixes ###
 
 - Fix weapon branding.
@@ -161,6 +165,11 @@ overall item power.
 - Fix view_detect_grids option appearing twice (Reported by ekolis).
 
 - Ammunition carried by monsters is now sensed (Reported by mikon).
+
+- Fixed bug causing repeated reporting of unknown flags on equipment in self-knowledge
+(In character dumpt by Bandobras).
+
+- Fixed bug causing infinite sleeping (Reported by mikon).
 
 ### Build / Platform ###
 

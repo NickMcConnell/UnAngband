@@ -317,6 +317,9 @@ void reset_visuals(bool unused)
 		/* Assume we will use the underlying values */
 		f_ptr->x_attr = f_ptr->d_attr;
 		f_ptr->x_char = f_ptr->d_char;
+
+		/* Reset attr lite */
+		f_ptr->flags3 |= FF3_ATTR_LITE;
 	}
 
 	/* Extract default attr/char code for objects */
@@ -556,7 +559,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	cptr s;
 
 	cptr u;
-	cptr v;
+ 	cptr v;
 
 	char p1 = '(', p2 = ')';
 	char b1 = '[', b2 = ']';
@@ -1672,6 +1675,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		{
 			v = k_name + k_info[bag].name;
 		}
+		else v = NULL;
 	}
 
 	/* Use special inscription, if any */
