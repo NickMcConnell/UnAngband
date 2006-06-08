@@ -3988,27 +3988,34 @@ static bool monster_save(monster_type *m_ptr, int power, bool *near)
 	*near = FALSE;
 
 	/* Get monster resistance */
-	save = r_ptr->level;
+	save = r_ptr->level + 10;
 
-	/* Uniques are tough */
+	/* Uniques are tougher */
 	if (r_ptr->flags1 & (RF1_UNIQUE)) save += 10;
 
 	/* Are we close? */
-	if ((power + 10 < save) && ((power * 10 / 8) + 10 > save)) *near = TRUE;
+	if ((power + 1 < save * 12 / 10) && (power + 40 > save * 8 / 10)) *near = TRUE;
 
 	/* Modify based on current wisdom */
 	if (m_ptr->mflag & (MFLAG_NAIVE)) save = save * 8 / 10;
 	else if (m_ptr->mflag & (MFLAG_WISE)) save = save * 12 / 10;
 
 	/* Check save */
-	if (power + 10 < save)
+	if (power + randint(40) < save)
 	{
-		/* Hack -- reduce wisdom */
-		if (m_ptr->mflag & (MFLAG_WISE)) m_ptr->mflag &= ~(MFLAG_WISE);
-		else m_ptr->mflag |= (MFLAG_NAIVE);
+		/* Has a chance */
+		if (*near)
+		{
+			/* Hack -- reduce wisdom */
+			if (m_ptr->mflag & (MFLAG_WISE)) m_ptr->mflag &= ~(MFLAG_WISE);
+			else m_ptr->mflag |= (MFLAG_NAIVE);
+		}
 
 		return (TRUE);
 	}
+
+	/* Clear near */
+	*near = FALSE;
 
 	/* Monster fails to save */
 	return (FALSE);
@@ -5846,7 +5853,6 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 				note = " is paralyzed!";
 				do_sleep = 500;
 			}
-
 			break;
 		}
 
@@ -5878,13 +5884,13 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 				{
 					if (seen) note = " is unaffected!";
 
-					do_blind = FALSE;
 					obvious = FALSE;
 				}
 			}
 			else
 			{
-				if (m_ptr->mspeed > 60) m_ptr->mspeed -= 10;
+				/* Speed up */
+				do_slow = 50 + rand_int(50);
 				note = " starts moving slower.";
 			}
 
@@ -6524,7 +6530,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			if (m_ptr->stunned)
 			{
 				note = " is more dazed.";
-				tmp = m_ptr->stunned + (do_stun / 2);
+				tmp = m_ptr->stunned + (do_stun / (r_ptr->level / 10 + 1));
 			}
 			else
 			{
@@ -6587,6 +6593,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			{
 				note = " is more poisoned.";
 			}
+
 			else
 			{
 				note = " is poisoned.";
@@ -6609,7 +6616,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			if (m_ptr->confused)
 			{
 				note = " looks more confused.";
-				tmp = m_ptr->confused + (do_conf / 2);
+				tmp = m_ptr->confused + (do_conf / (r_ptr->level / 10 + 1));
 			}
 
 			/* Was not confused */

@@ -466,6 +466,12 @@ static void player_wipe(void)
 		}
 	}
 
+	/* Clear the maximum depths */
+	for (i = 0; i < z_info->t_max; i++)
+	{
+		t_info[i].max_depth = 0;
+	}
+
 	/* Start with no artifacts made yet */
 	for (i = 0; i < z_info->a_max; i++)
 	{

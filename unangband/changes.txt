@@ -82,6 +82,11 @@ monsters made of coins or gems, or coin or gem-like monsters.
 
 - Some new weapons and armour re-balancing from Sangband.
 
+- Made cumulative effects of confusion and stun on monsters dependent on their
+level.
+
+- Made monster saving throws again slow, blindness, confusion etc more variable.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -167,13 +172,25 @@ overall item power.
 - Ammunition carried by monsters is now sensed (Reported by mikon).
 
 - Fixed bug causing repeated reporting of unknown flags on equipment in self-knowledge
-(In character dumpt by Bandobras).
+(In character dump by Bandobras).
 
 - Fixed bug causing infinite sleeping (Reported by mikon).
 
 - Improved loading of 0.6.0 save-files (Reported by darkDrone).
 
 - Fixed crash when initialising sounds (Reported by ekolis).
+
+- Wands of Wonder II are now random.
+
+- Clear dungeons explored with each new character (From various character dumps on
+angband.oook.cz).
+
+- Weak shaman rune sensing should notice the presence of runes on object kinds
+(Reported by Bandobras).
+
+- Blindness, paralysation, sleep effects from potins and mushrooms and coatings
+should now take effect against monsters (Reported by Bandobras).
+
 
 ### Build / Platform ###
 

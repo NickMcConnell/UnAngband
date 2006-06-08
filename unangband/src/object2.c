@@ -3753,6 +3753,9 @@ int value_check_aux13(object_type *o_ptr)
 	/* Magic item */
 	if (o_ptr->xtra1) return (INSCRIP_RUNED);
 
+	/* Kind has rune */
+	if (k_info[o_ptr->k_idx].runest) return (INSCRIP_RUNED);
+
 	/* Default to average */
 	return (INSCRIP_UNRUNED);
 }

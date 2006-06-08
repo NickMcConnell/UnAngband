@@ -3029,22 +3029,6 @@ bool ident_spell_sense(void)
 			if ((bag_holds[i][j][0] == o_ptr->tval)
 				&& (bag_holds[i][j][1] == o_ptr->sval)) o_ptr->feeling = MAX_INSCRIP + i;
 		}
-
-		/* Still no feeling */
-		if (!o_ptr->feeling)
-		{
-			switch(o_ptr->feeling)
-			{
-				case TV_STAFF:
-				case TV_ROD:
-				case TV_BAG:
-					o_ptr->feeling = INSCRIP_MAGICAL;
-					break;
-				default:
-					o_ptr->feeling = INSCRIP_NONMAGICAL;
-					break;
-			}
-		}
 	}
 
 	/* Item is sensed */
