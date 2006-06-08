@@ -3212,6 +3212,9 @@ void do_cmd_fire(void)
 		}
 	}
 
+	/* Hack -- flasks, potions, spores always break as if striking a monster */
+	if ((o_ptr->tval == TV_FLASK) || (o_ptr->tval == TV_POTION) || (o_ptr->tval == TV_EGG)) hit_body = TRUE;
+
 	/* Hack -- if no bow, make object count for double */
 	if (j_ptr->tval != TV_BOW) j_ptr = o_ptr;
 

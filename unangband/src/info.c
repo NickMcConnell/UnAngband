@@ -5739,7 +5739,7 @@ s32b object_power(const object_type *o_ptr)
 	ADD_POWER("sustain WIS",	 2, TR2_SUST_WIS, 2, sustains++);
 	ADD_POWER("sustain DEX",	 4, TR2_SUST_DEX, 2, sustains++);
 	ADD_POWER("sustain CON",	 3, TR2_SUST_CON, 2, sustains++);
-	ADD_POWER("sustain CHR",	 0, TR2_SUST_CHR, 2, sustains++);
+	ADD_POWER("sustain CHR",	 2, TR2_SUST_CHR, 2, sustains++);
 
 	/* Add bonus for sustains getting 'sustain-lock' */
 	if (sustains > 1) p += sustains * sustains / 2;
@@ -5765,7 +5765,7 @@ s32b object_power(const object_type *o_ptr)
 
 	ADD_POWER("free action",	 7, TR3_FREE_ACT, 3, high_resists++);
 	ADD_POWER("hold life",		 6, TR3_HOLD_LIFE, 3, high_resists++);
-	ADD_POWER("feather fall",	 1, TR3_FEATHER, 3,); /* was 2 */
+	ADD_POWER("feather fall",	 2, TR3_FEATHER, 3,); /* was 2 */
 	ADD_POWER("permanent light",     4, TR3_LITE, 3,); /* was 2 */
 
 	ADD_POWER("see invisible",	 4, TR3_SEE_INVIS, 3,);
@@ -5777,7 +5777,7 @@ s32b object_power(const object_type *o_ptr)
 	ADD_POWER("sense dragons",       5, TR3_ESP_DRAGON, 3,);
 	ADD_POWER("sense nature",	4, TR3_ESP_NATURE, 3,);
 	ADD_POWER("telepathy",	  18, TR3_TELEPATHY, 3,);
-	ADD_POWER("slow digestion",	 1, TR3_SLOW_DIGEST, 3,);
+	ADD_POWER("slow digestion",	 2, TR3_SLOW_DIGEST, 3,);
 
 	/* Digging moved to general section since it can be on anything now */
 	ADD_POWER("tunnelling",	 o_ptr->pval, TR1_TUNNEL, 1,);

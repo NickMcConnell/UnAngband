@@ -87,6 +87,10 @@ level.
 
 - Made monster saving throws again slow, blindness, confusion etc more variable.
 
+- Potions, flasks and spores will always explode when thrown as if hitting a 
+monster. They will also explode when on the floor and destroyed by an attack. 
+This allows much more tactical diversity when using them (Requested by mikon).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

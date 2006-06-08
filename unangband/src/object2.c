@@ -5642,16 +5642,15 @@ bool break_near(object_type *j_ptr, int y, int x)
 					flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
 					/* Hit with radius 1 attack */
-					obvious |= project(-1, 1, y, x, y, x, damroll(d_side, d_dice),
+					obvious |= project(-1, 1, y, x, y, x, damroll(d_side, d_dice) * j_ptr->number,
 						 effect, flg, 0, 0);
-
 				}
 
 				/* Object is used */
 				if ((obvious) && (k_info[j_ptr->k_idx].used < MAX_SHORT)) k_info[j_ptr->k_idx].used++;
 			}
 
-			if (obvious) return TRUE;
+			return TRUE;
 
 			break;
 
@@ -5687,7 +5686,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 					flg = PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
 					/* Hit with radiate attack */
-					obvious = project(-1, 1, y, x, y, x, damroll(d_side, d_dice),
+					obvious = project(-1, 1, y, x, y, x, damroll(d_side, d_dice) * j_ptr->number,
 						 effect, flg, 0, 0);
 
 					/* Count "obvious" attacks */

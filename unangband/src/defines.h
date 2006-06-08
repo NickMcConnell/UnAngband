@@ -2782,7 +2782,7 @@
 #define IDENT_MENTAL	0x0020	/* Item information is known */
 #define IDENT_CURSED	0x0040	/* Item is temporarily cursed */
 #define IDENT_BROKEN	0x0080	/* Item is permanently worthless */
-#define IDENT_DAMAGE	0x0100	/* Item damage is known */
+#define IDENT_BREAKS	0x0100	/* Item will break next round */
 #define IDENT_CHARGES	0x0200	/* Item charges are known */
 #define IDENT_VALUE	0x0400	/* Item value is known */
 #define IDENT_RUNES	0x0800	/* Item runes are known */

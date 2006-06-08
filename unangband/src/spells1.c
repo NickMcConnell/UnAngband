@@ -3678,18 +3678,6 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 		/* Attempt to destroy the object */
 		if (do_kill)
 		{
-			/* Containers release contents */
-			if ((o_ptr->tval == TV_HOLD)
-				&& (o_ptr->name3 > 0))
-			{
-				while (o_ptr->number)
-				{
-					(void)(race_near(o_ptr->name3, y, x));
-	
-					o_ptr->number--;
-				}
-			}
-
 			/* Effect "observed" */
 			if (o_ptr->ident & (IDENT_MARKED))
 			{
@@ -3760,11 +3748,25 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 					msg_format("The %s%s", o_name, note_kill);
 				}
 
+				/* Break open containers */
+				if ((o_ptr->tval == TV_HOLD) && (o_ptr->name3 > 0))
+				{
+					while (o_ptr->number)
+					{
+						race_near(o_ptr->name3, y, x);
+
+						o_ptr->number--;
+					}
+				}
+
 				/* Splash damage on terrain */
 				(void)project_f(0, r, y, x, damroll(1, o_ptr->weight), typ);
 
-				/* Delete the object */
-				delete_object_idx(this_o_idx);
+				/* And apply effects */
+				(void)project_t(0, r, y, x, damroll(1, o_ptr->weight), typ);
+
+				/* Delete the object later */
+				o_ptr->ident |= (IDENT_BREAKS);
 
 				/* Redraw */
 				lite_spot(y, x);
@@ -10868,6 +10870,30 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 
 	/* Clear the "temp" array  (paranoia is good) */
 	clear_temp_array();
+
+	/* Finally break items on floor.  This has to be done here and carefully to avoid infinite recursion. */
+	for (i = 0; i < z_info->o_max; i++)
+	{
+		object_type object_type_body;
+		object_type *i_ptr = &object_type_body;
+		object_type *o_ptr = &o_list[i];
+
+		/* Only break objects marked for breakage */
+		if (!(o_ptr->ident & (IDENT_BREAKS))) continue;
+
+		/* Get a copy of the object */
+		object_copy(i_ptr, o_ptr);
+
+		/* Delete the object */
+		delete_object_idx(i);
+
+		/* Break the copy of the object. Note that this recursively calls project routines which is why
+                   we have to be so careful. */
+		break_near(i_ptr, i_ptr->iy, i_ptr->ix);
+
+		/* Redraw */
+		lite_spot(i_ptr->iy, i_ptr->ix);
+	}
 
 	/* Update stuff if needed */
 	if (p_ptr->update) update_stuff();

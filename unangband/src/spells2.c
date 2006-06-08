@@ -1435,6 +1435,9 @@ int value_check_aux4(const object_type *o_ptr)
 	/* Known to be powerful */
 	if ((o_ptr->feeling == INSCRIP_POWERFUL)) return (INSCRIP_MAGICAL);
 
+	/* Known to be unusual */
+	if ((o_ptr->feeling == INSCRIP_UNUSUAL)) return (INSCRIP_MAGICAL);
+
 	/* Default to uncursed */
 	return (INSCRIP_UNCURSED);
 }
