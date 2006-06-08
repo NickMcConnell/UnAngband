@@ -3078,7 +3078,7 @@ void list_object(const object_type *o_ptr, int mode)
 	}
 
 	/* Can enchant this further? */
-	if (!spoil && !random && object_known_p(o_ptr) && !(o_ptr->xtra1) && !artifact_p(o_ptr) )
+	if (!spoil && !random && object_known_p(o_ptr) && !(o_ptr->xtra1) && !artifact_p(o_ptr) && (o_ptr->tval != TV_SERVICE) )
 	{
 		text_out_c(TERM_VIOLET,"\nYou can apply runes to it or enchant it with additional powers.  ");
 		anything = TRUE;

@@ -2135,8 +2135,8 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 	/* Too powerful already */
 	if (boost_power >= lev) return;
 
-	/* Occasionally supercharge up 1 ability */
-	if (!rand_int(10)) supercharge = TRUE;
+	/* Prefer to supercharge up 1 ability */
+	if (rand_int(5)) supercharge = TRUE;
 
 	do
 	{
@@ -2152,7 +2152,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 			case 0: case 1: case 2:
 
 				/* Increase to_h */
-				if (o_ptr->to_h) o_ptr->to_h+= sign;
+				if (o_ptr->to_h) o_ptr->to_h += sign;
 				else tryagain = TRUE;
 
 				break;
@@ -2160,7 +2160,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 			case 3: case 4: case 5:
 
 				/* Increase to_d */
-				if (o_ptr->to_d) o_ptr->to_d+= sign;
+				if (o_ptr->to_d) o_ptr->to_d += sign;
 				else tryagain = TRUE;
 
 				break;
@@ -2168,7 +2168,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 			case 6: case 7: case 8:
 
 				/* Increase to_a */
-				if (o_ptr->to_a) o_ptr->to_a+= sign;
+				if (o_ptr->to_a) o_ptr->to_a += sign;
 				else tryagain = TRUE;
 
 				break;
@@ -2176,7 +2176,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 			case 9:
 
 				/* Increase pval */
-				if (o_ptr->pval) o_ptr->pval+= sign;
+				if (o_ptr->pval) o_ptr->pval += sign;
 				else tryagain = TRUE;
 
 				break;
@@ -2210,13 +2210,28 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 		if (power < 0) boost_power = -boost_power;
 
 		/* Hack -- boost to-hit, to-dam, to-ac to 10 if required to increase power */
-		if (boost_power <= old_boost_power)
+		if ((boost_power <= old_boost_power) && !(tryagain))
 		{
 			switch(choice)
 			{
-				case 0: case 1: case 2: if (o_ptr->to_h * sign < 12) o_ptr->to_h = sign * 12; break;
-				case 3: case 4: case 5: if (o_ptr->to_d * sign < 10) o_ptr->to_d = sign * 10; break;
-				case 6: case 7: case 8: if (o_ptr->to_a * sign < 10) o_ptr->to_a = sign * 10; break;
+				case 0: case 1: case 2:
+				{
+					if ((sign > 0) && (o_ptr->to_h > 0) && (o_ptr->to_h < 12)) o_ptr->to_h = 12;
+					else if ((sign < 0) && (o_ptr->to_h < 0) && (o_ptr->to_h > -12)) o_ptr->to_h = -12;
+					break;
+				}
+				case 3: case 4: case 5:
+				{
+					if ((sign > 0) && (o_ptr->to_d > 0) && (o_ptr->to_d < 10)) o_ptr->to_d = 10;
+					else if ((sign < 0) && (o_ptr->to_d < 0) && (o_ptr->to_d > -10)) o_ptr->to_d = -10;
+					break;
+				}
+				case 6: case 7: case 8:
+				{
+					if ((sign > 0) && (o_ptr->to_a > 0) && (o_ptr->to_a < 10)) o_ptr->to_a = 10;
+					else if ((sign < 0) && (o_ptr->to_a < 0) && (o_ptr->to_a > -10)) o_ptr->to_a = -10;
+					break;
+				}
 			}
 
 			boost_power = object_power(o_ptr);

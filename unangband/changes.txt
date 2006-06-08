@@ -191,6 +191,10 @@ angband.oook.cz).
 - Blindness, paralysation, sleep effects from potins and mushrooms and coatings
 should now take effect against monsters (Reported by Bandobras).
 
+- Fix item boost code so that to-hit, to-dam, to-ac bonuses only appear on appropriate
+items (Reported by Bandobras and ekolis).
+
+- Services no longer say they can be enchanted when examined (Reported by Mikon).
 
 ### Build / Platform ###
 
