@@ -1475,7 +1475,7 @@ const cptr option_text[OPT_MAX] =
 	"dungeon_stair",			/* OPT_dungeon_stair */
 	"view_unsafe_grids",			/* OPT_view_unsafe_grids */
 	"view_detect_grids",			/* OPT_view_detect_grids */
-	NULL,					/* xxx track_follow */
+	"run_ignore_floors",			/* OPT_run_ignore_floors */
 	NULL,					/* xxx track_target */
 	NULL,					/* xxx smart_learn */
 	"smart_cheat",				/* OPT_smart_cheat */
@@ -1739,7 +1739,7 @@ const cptr option_desc[OPT_MAX] =
 	"Generate dungeons with connected stairs",	/* OPT_dungeon_stair */
 	"Mark where you have detected traps",		/* OPT_view_unsafe_grids */
 	"Mark where you have detected monsters",	/* OPT_view_unsafe_grids */
-	NULL,								/* xxx */
+	"When running, ignore interesting floors",				/* OPT_run_ignore_stairs */
 	NULL,								/* xxx */
 	NULL,								/* xxx */
 	NULL,								/* xxx*/
@@ -2003,7 +2003,7 @@ const bool option_norm[OPT_MAX] =
 	TRUE,		/* OPT_dungeon_stair */
 	TRUE,		/* OPT_view_unsafe_grids */
 	TRUE,		/* OPT_view_detect_grids */
-	FALSE,		/* xxx track_follow */
+	TRUE,		/* OPT_run_ignore_floors */
 	FALSE,		/* xxx track_target */
 	FALSE,		/* xxx smart_learn */
 	FALSE,		/* OPT_smart_cheat */

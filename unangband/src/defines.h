@@ -3960,7 +3960,7 @@
 #define OPT_dungeon_stair  41
 #define OPT_view_unsafe_grids 42
 #define OPT_view_detect_grids 43
-/* xxx track_follow */
+#define OPT_run_ignore_floors     44
 /* xxx track_target */
 /* xxx smart_learn */
 #define OPT_smart_cheat    47
@@ -4066,6 +4066,7 @@
 #define show_flavors      op_ptr->opt[OPT_show_flavors]
 #define run_ignore_stairs op_ptr->opt[OPT_run_ignore_stairs]
 #define run_ignore_doors  op_ptr->opt[OPT_run_ignore_doors]
+#define run_ignore_floors op_ptr->opt[OPT_run_ignore_floors]
 #define run_cut_corners   op_ptr->opt[OPT_run_cut_corners]
 #define run_use_corners   op_ptr->opt[OPT_run_use_corners]
 #define disturb_move      op_ptr->opt[OPT_disturb_move]

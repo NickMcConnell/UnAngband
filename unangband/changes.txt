@@ -114,6 +114,13 @@ enchant it with brands or resists.
 
 - Updated character display and dumps to include all object flags.
 
+- Corpses and other objects which are never picked up do not disturb the player
+when moving across them (Requested by will_asher).
+
+- Added new object run_ignore_floors which defaults to on, which means the
+player ignores unusual floor types such as slime, blood and dust whilst running
+(Requested by will_asher).
+
 ### Bug fixes ###
 
 - Fix weapon branding.

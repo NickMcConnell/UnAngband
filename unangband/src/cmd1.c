@@ -1137,7 +1137,7 @@ void py_pickup(int pickup)
 		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 		/* Hack -- disturb */
-		disturb(0, 0);
+		if (!auto_pickup_never(o_ptr)) disturb(0, 0);
 
 		/* Pick up gold */
 		if (o_ptr->tval >= TV_GOLD)
@@ -3236,7 +3236,7 @@ static bool run_test(void)
 			next_o_idx = o_ptr->next_o_idx;
 
 			/* Visible object */
-			if (o_ptr->ident & (IDENT_MARKED)) return (TRUE);
+			if ((o_ptr->ident & (IDENT_MARKED)) && !(auto_pickup_never(o_ptr))) return (TRUE);
 		}
 
 
@@ -3273,6 +3273,14 @@ static bool run_test(void)
 					/* Option -- ignore */
 					notice = FALSE;
 				}
+
+				/* Unusual floors */
+				if ((run_ignore_floors) && (f_info[feat].flags1 & (FF1_FLOOR)))
+				{
+					/* Option -- ignore */
+					notice = FALSE;
+				}
+
 			}
 
 			/* Interesting feature */
