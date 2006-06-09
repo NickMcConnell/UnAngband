@@ -1819,6 +1819,7 @@
 #define SV_SLING			2	/* (x2) */
 #define SV_SHORT_BOW		12	/* (x2) */
 #define SV_LONG_BOW			13	/* (x3) */
+#define SV_HAND_XBOW		22	/* (x3) */
 #define SV_LIGHT_XBOW		23	/* (x3) */
 #define SV_HEAVY_XBOW		24	/* (x4) */
 

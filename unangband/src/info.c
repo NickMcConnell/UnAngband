@@ -4690,6 +4690,7 @@ static int bow_multiplier(int sval)
 	{
 		case SV_SLING:
 		case SV_SHORT_BOW:
+		case SV_HAND_XBOW:
 			return (2);
 		case SV_LONG_BOW:
 		case SV_LIGHT_XBOW:
@@ -4697,7 +4698,7 @@ static int bow_multiplier(int sval)
 		case SV_HEAVY_XBOW:
 			return (4);
 		default:
-			msg_format("Illegal bow sval %s", sval);
+			msg_format("Illegal bow sval %d", sval);
 	}
 
 	return (0);

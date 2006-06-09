@@ -227,6 +227,8 @@ by will_asher and others).
 - Fixed bug causes quest location items to occasionally appear in resupply buildings
 (Reported by mikon and others).
 
+- Fixed string formatting bug that caused crash when computing power of hand crossbow.
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
