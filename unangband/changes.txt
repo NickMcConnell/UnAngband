@@ -219,6 +219,9 @@ items (Reported by Bandobras and ekolis).
 - Fixed bug where a fountain would contain amulets of ESP as opposed to a potion
 (Reported by Mikon).
 
+- Fix bugs in new lite charge code when wielding and taking off lite sources (Reported
+by will_asher).
+
 
 ### Build / Platform ###
 

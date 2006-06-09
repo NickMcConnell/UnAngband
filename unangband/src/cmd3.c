@@ -461,8 +461,8 @@ void do_cmd_wield(void)
 	{
 		act = "Your light source is";
 
-		/* Light torch */
-		if (!(artifact_p(o_ptr)))
+		/* Light torch if not lit already */
+		if (!(artifact_p(o_ptr)) && !(o_ptr->timeout))
 		{
 			o_ptr->timeout = o_ptr->charges;
 			o_ptr->charges = 0;

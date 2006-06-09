@@ -7592,13 +7592,10 @@ s16b inven_takeoff(int item, int amt)
 		act = "You were holding";
 
 		/* Snuff light */
-		if (!(artifact_p(o_ptr)))
+		if (!(artifact_p(i_ptr)) && (i_ptr->timeout))
 		{
-			if (!o_ptr->charges)
-			{
-				o_ptr->charges = o_ptr->timeout;
-				o_ptr->timeout = 0;
-			}
+			i_ptr->charges = i_ptr->timeout;
+			i_ptr->timeout = 0;
 		}
 	}
 
