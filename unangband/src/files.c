@@ -1483,9 +1483,6 @@ static void display_player_xtra_info(void)
 	Term_putstr(col+8, 8, -1, ((p_ptr->lev >= p_ptr->max_lev) ? TERM_L_BLUE : TERM_YELLOW),
 			format("%3d", p_ptr->lev));
 
-
-
-
 	/* Left */
 	col = 1;
 
@@ -1520,10 +1517,9 @@ static void display_player_xtra_info(void)
 		s32b advance = (player_exp[p_ptr->lev - 1] *
 		                p_ptr->expfact / 100L);
 
-#if 0
 		/*some players want to see experience needed to gain next level*/
 		if (toggle_xp) advance -= p_ptr->exp;
-#endif
+
 		Term_putstr(col+8, 13, -1, TERM_L_GREEN,
 		            format("%10ld", advance));
 	}
@@ -1611,18 +1607,15 @@ static void display_player_xtra_info(void)
 
 	/* Melee attacks */
 	strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
-	Term_putstr(col, 12, -1, TERM_WHITE, "Melee");
-	Term_putstr(col+5, 12, -1, TERM_L_BLUE, format("%11s", buf));
 
-	/* Describe melee styles */
-	if (p_ptr->cur_style & (1L << WS_HAFTED)) Term_putstr(col+6, 12, -1, TERM_YELLOW, "H");
-	if (p_ptr->cur_style & (1L << WS_SWORD)) Term_putstr(col+6, 12, -1, TERM_YELLOW, "S");
-	if (p_ptr->cur_style & (1L << WS_POLEARM)) Term_putstr(col+6, 12, -1, TERM_YELLOW, "P");
-	if (p_ptr->cur_style & (1L << WS_UNARMED)) Term_putstr(col+7, 12, -1, TERM_YELLOW, "UN");
-	if (p_ptr->cur_style & (1L << WS_ONE_HANDED)) Term_putstr(col+7, 12, -1, TERM_YELLOW, "1H");
-	if ((p_ptr->pstyle == WS_TWO_HANDED)&&(p_ptr->cur_style & (1L << WS_TWO_HANDED))) Term_putstr(col+7, 12, -1, TERM_YELLOW, "2H");
-	if (p_ptr->cur_style & (1L << WS_TWO_WEAPON)) Term_putstr(col+7, 12, -1, TERM_YELLOW, "2W");
-	if (p_ptr->cur_style & (1L << WS_WEAPON_SHIELD)) Term_putstr(col+7, 12, -1, TERM_YELLOW, "WS");
+	Term_putstr(col, 12, -1, TERM_WHITE, "Melee");
+	if (p_ptr->cur_style & (1L << WS_UNARMED)) Term_putstr(col, 12, -1, TERM_WHITE, "Unarm");
+	if (p_ptr->cur_style & (1L << WS_ONE_HANDED)) Term_putstr(col, 12, -1, TERM_WHITE, "1Hand");
+	if ((p_ptr->pstyle == WS_TWO_HANDED)&&(p_ptr->cur_style & (1L << WS_TWO_HANDED))) Term_putstr(col, 12, -1, TERM_WHITE, "2Hand");
+	if (p_ptr->cur_style & (1L << WS_TWO_WEAPON)) Term_putstr(col, 12, -1, TERM_WHITE, "2Weap");
+	if (p_ptr->cur_style & (1L << WS_WEAPON_SHIELD)) Term_putstr(col, 12, -1, TERM_WHITE, "WShld");
+
+	Term_putstr(col+5, 12, -1, TERM_L_BLUE, format("%11s", buf));
 
 	/* Range weapon */
 	o_ptr = &inventory[INVEN_BOW];
@@ -1638,14 +1631,17 @@ static void display_player_xtra_info(void)
 
 	/* Range attacks */
 	strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
+
 	Term_putstr(col, 13, -1, TERM_WHITE, "Shoot");
-	Term_putstr(col+5, 13, -1, TERM_L_BLUE, format("%11s", buf));
 
 	/* Describe shooting styles */
-	if (p_ptr->cur_style & (1L << WS_THROWN)) Term_putstr(col+6, 13, -1, TERM_YELLOW, "T");
-	if (p_ptr->cur_style & (1L << WS_SLING)) Term_putstr(col+6, 13, -1, TERM_YELLOW, "S");
-	if (p_ptr->cur_style & (1L << WS_BOW)) Term_putstr(col+6, 13, -1, TERM_YELLOW, "B");
-	if (p_ptr->cur_style & (1L << WS_XBOW)) Term_putstr(col+6, 13, -1, TERM_YELLOW, "X");
+	if (p_ptr->cur_style & (1L << WS_THROWN)) Term_putstr(col, 13, -1, TERM_WHITE, "Throw");
+	if (p_ptr->cur_style & (1L << WS_SLING)) Term_putstr(col, 13, -1, TERM_WHITE, "Sling");
+	if (p_ptr->cur_style & (1L << WS_BOW)) Term_putstr(col, 13, -1, TERM_WHITE, "Bows ");
+	if (p_ptr->cur_style & (1L << WS_XBOW)) Term_putstr(col, 13, -1, TERM_WHITE, "XBows");
+
+	Term_putstr(col+5, 13, -1, TERM_L_BLUE, format("%11s", buf));
+
 
 	/* Blows */
 	strnfmt(buf, sizeof(buf), "%d/turn", p_ptr->num_blow);
@@ -2535,8 +2531,8 @@ static void display_player_stat_info(void)
 
 	/* Print out the labels for the columns */
 	c_put_str(TERM_WHITE, "  Self", row-1, col+5);
-	c_put_str(TERM_WHITE, " RB", row-1, col+12);
-	c_put_str(TERM_WHITE, " CB", row-1, col+16);
+	if (adult_maximize_race) c_put_str(TERM_WHITE, " RB", row-1, col+12);
+	if (adult_maximize_class) c_put_str(TERM_WHITE, " CB", row-1, col+16);
 	c_put_str(TERM_WHITE, " EB", row-1, col+20);
 	c_put_str(TERM_WHITE, "  Best", row-1, col+24);
 	c_put_str(TERM_WHITE, "  Curr", row-1, col+30);
@@ -2569,12 +2565,18 @@ static void display_player_stat_info(void)
 		c_put_str(TERM_L_GREEN, buf, row+i, col+5);
 
 		/* Race Bonus */
-		sprintf(buf, "%+3d", rp_ptr->r_adj[i]);
-		c_put_str(TERM_L_BLUE, buf, row+i, col+12);
+		if (adult_maximize_race)
+		{
+			sprintf(buf, "%+3d", rp_ptr->r_adj[i]);
+			c_put_str(TERM_L_BLUE, buf, row+i, col+12);
+		}
 
 		/* Class Bonus */
-		sprintf(buf, "%+3d", cp_ptr->c_adj[i]);
-		c_put_str(TERM_L_BLUE, buf, row+i, col+16);
+		if (adult_maximize_class)
+		{
+			sprintf(buf, "%+3d", cp_ptr->c_adj[i]);
+			c_put_str(TERM_L_BLUE, buf, row+i, col+16);
+		}
 
 		/* Equipment Bonus */
 		sprintf(buf, "%+3d", p_ptr->stat_add[i]);

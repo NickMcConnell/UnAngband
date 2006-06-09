@@ -3950,8 +3950,7 @@
 #define OPT_verify_special 29
 #define OPT_allow_quantity 30
 #define OPT_easy_corpses 31
-#define OPT_auto_haggle    32
-#define OPT_auto_scum      33
+/* xxx */
 #define OPT_expand_look    36
 #define OPT_expand_list    37
 #define OPT_view_perma_grids     38
@@ -3988,8 +3987,8 @@
 #define OPT_run_avoid_center     69
 #define OPT_scroll_target  70
 #define OPT_auto_more      71
-#define OPT_smart_monsters 72
-#define OPT_smart_packs    73
+#define OPT_auto_display_lists	72
+#define OPT_toggle_xp	   73
 #define OPT_stack_force_charges			74
 #define OPT_stack_force_times		75
 /* xxx */
@@ -4008,7 +4007,7 @@
 /* xxx xxx */
 #define OPT_birth_point_based    (OPT_BIRTH+0)
 #define OPT_birth_auto_roller    (OPT_BIRTH+1)
-#define OPT_birth_maximize (OPT_BIRTH+2)
+#define OPT_birth_maximize_race (OPT_BIRTH+2)
 #define OPT_birth_preserve (OPT_BIRTH+3)
 #define OPT_birth_ironman  (OPT_BIRTH+4)
 #define OPT_birth_no_stores       (OPT_BIRTH+5)
@@ -4016,6 +4015,9 @@
 #define OPT_birth_rand_artifacts (OPT_BIRTH+7)
 #define OPT_birth_campaign  (OPT_BIRTH+8)
 #define OPT_birth_no_stacking       (OPT_BIRTH+9)
+#define OPT_birth_haggle (OPT_BIRTH+10)
+#define OPT_birth_scum (OPT_BIRTH+11)
+#define OPT_birth_maximize_class (OPT_BIRTH+12)
 /* xxx xxx */
 #define OPT_cheat_peek     (OPT_CHEAT+0)
 #define OPT_cheat_hear     (OPT_CHEAT+1)
@@ -4027,7 +4029,7 @@
 #define OPT_cheat_auto     (OPT_CHEAT+7)
 #define OPT_adult_point_based    (OPT_ADULT+0)
 #define OPT_adult_auto_roller    (OPT_ADULT+1)
-#define OPT_adult_maximize (OPT_ADULT+2)
+#define OPT_adult_maximize_race (OPT_ADULT+2)
 #define OPT_adult_preserve (OPT_ADULT+3)
 #define OPT_adult_ironman  (OPT_ADULT+4)
 #define OPT_adult_no_stores       (OPT_ADULT+5)
@@ -4035,6 +4037,9 @@
 #define OPT_adult_rand_artifacts (OPT_ADULT+7)
 #define OPT_adult_campaign  (OPT_ADULT+8)
 #define OPT_adult_no_stacking       (OPT_ADULT+9)
+#define OPT_adult_haggle (OPT_ADULT+10)
+#define OPT_adult_scum (OPT_ADULT+11)
+#define OPT_adult_maximize_class (OPT_ADULT+12)
 /* xxx xxx */
 #define OPT_score_peek     (OPT_SCORE+0)
 #define OPT_score_hear     (OPT_SCORE+1)
@@ -4081,8 +4086,6 @@
 #define verify_special    op_ptr->opt[OPT_verify_special]
 #define allow_quantity    op_ptr->opt[OPT_allow_quantity]
 #define easy_corpses      op_ptr->opt[OPT_easy_corpses]
-#define auto_haggle op_ptr->opt[OPT_auto_haggle]
-#define auto_scum   op_ptr->opt[OPT_auto_scum]
 /* xxx testing_stack */
 /* xxx testing_carry */
 #define expand_look op_ptr->opt[OPT_expand_look]
@@ -4121,8 +4124,8 @@
 #define run_avoid_center  op_ptr->opt[OPT_run_avoid_center]
 #define scroll_target     op_ptr->opt[OPT_scroll_target]
 #define auto_more   op_ptr->opt[OPT_auto_more]
-#define smart_monsters    op_ptr->opt[OPT_smart_monsters]
-#define smart_packs op_ptr->opt[OPT_smart_packs]
+#define auto_display_lists    op_ptr->opt[OPT_auto_display_lists]
+#define toggle_xp op_ptr->opt[OPT_toggle_xp]
 #define stack_force_charges  op_ptr->opt[OPT_stack_force_charges]
 #define stack_force_times  op_ptr->opt[OPT_stack_force_times]
 /* xxx */
@@ -4138,13 +4141,17 @@
 /* xxx xxx */
 #define birth_point_based op_ptr->opt[OPT_birth_point_based]
 #define birth_auto_roller op_ptr->opt[OPT_birth_auto_roller]
-#define birth_maximize    op_ptr->opt[OPT_birth_maximize]
+#define birth_maximize_race    op_ptr->opt[OPT_birth_maximize_race]
 #define birth_preserve    op_ptr->opt[OPT_birth_preserve]
 #define birth_ironman     op_ptr->opt[OPT_birth_ironman]
 #define birth_no_stores   op_ptr->opt[OPT_birth_no_stores]
 #define birth_no_artifacts       op_ptr->opt[OPT_birth_no_artifacts]
 #define birth_rand_artifacts    op_ptr->opt[OPT_birth_rand_artifacts]
 #define birth_campaign       op_ptr->opt[OPT_birth_campaign]
+#define birth_haggle       op_ptr->opt[OPT_birth_haggle]
+#define birth_scum       op_ptr->opt[OPT_birth_scum]
+#define birth_maximize_class    op_ptr->opt[OPT_birth_maximize_class]
+
 /* xxx xxx */
 #define cheat_peek  op_ptr->opt[OPT_cheat_peek]
 #define cheat_hear  op_ptr->opt[OPT_cheat_hear]
@@ -4157,7 +4164,7 @@
 /* xxx xxx */
 #define adult_point_based op_ptr->opt[OPT_adult_point_based]
 #define adult_auto_roller op_ptr->opt[OPT_adult_auto_roller]
-#define adult_maximize    op_ptr->opt[OPT_adult_maximize]
+#define adult_maximize_race    op_ptr->opt[OPT_adult_maximize_race]
 #define adult_preserve    op_ptr->opt[OPT_adult_preserve]
 #define adult_ironman     op_ptr->opt[OPT_adult_ironman]
 #define adult_no_stores   op_ptr->opt[OPT_adult_no_stores]
@@ -4165,6 +4172,9 @@
 #define adult_rand_artifacts    op_ptr->opt[OPT_adult_rand_artifacts]
 #define adult_campaign       op_ptr->opt[OPT_adult_campaign]
 #define adult_no_stacking   op_ptr->opt[OPT_adult_no_stacking]
+#define adult_haggle       op_ptr->opt[OPT_adult_haggle]
+#define adult_scum       op_ptr->opt[OPT_adult_scum]
+#define adult_maximize_class    op_ptr->opt[OPT_adult_maximize_class]
 /* xxx xxx */
 #define score_peek  op_ptr->opt[OPT_score_peek]
 #define score_hear  op_ptr->opt[OPT_score_hear]

@@ -467,7 +467,6 @@ static void do_cmd_travel(void)
 				/* Add maps */
 				for (i = 0; i < INVEN_WIELD; i++)
 				{
-
 					/* Skip non-objects */
 					if (!inventory[i].k_idx) continue;
 
@@ -493,6 +492,19 @@ static void do_cmd_travel(void)
 
 				/* No redraw yet */
 				redraw = FALSE;
+
+				/* Show the list */
+				if (auto_display_lists)
+				{
+					/* Show list */
+					redraw = TRUE;
+
+					/* Save screen */
+					screen_save();
+
+					/* Display a list of spells */
+					print_routes(routes, num, 1, 20);
+				}
 
 				/* Get a spell from the user */
 				while (!flag && get_com_ex(out_val, &ke))

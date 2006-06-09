@@ -5681,7 +5681,7 @@ F:ALLOC |
 F:USE_FEAT
 F:POWER_5
 
-# misty fountain - equivalent to potion of restoring
+# misty fountain - equivalent to potion of restore body
 
 N:388:misty fountain
 U:56
@@ -5690,7 +5690,7 @@ W:30:3:20:0
 K:DEFAULT:1
 K:BASH:383
 K:USE_FEAT:388
-O:423
+O:432
 F:CAN_CLIMB | LOS | MOVE | PROJECT | REMEMBER | NOTICE | HURT_ROCK | BASH | ALLOC |
 F:USE_FEAT
 F:POWER_5

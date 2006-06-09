@@ -1478,7 +1478,7 @@ static bool noneedtobargain(s32b minprice)
 static void updatebargain(s32b price, s32b minprice)
 {
 	/* Hack -- auto-haggle */
-	if (auto_haggle) return;
+	if (!adult_haggle) return;
 
 	/* Cheap items are "boring" */
 	if (minprice < 10L) return;
@@ -1620,8 +1620,19 @@ static void display_entry(int item)
 			put_str(out_val, y, 68);
 		}
 
+		/* Display a "haggle" cost */
+		else if (adult_haggle)
+		{
+			/* Extrect the "maximum" price */
+			x = price_item(o_ptr, ot_ptr->max_inflate, FALSE);
+
+			/* Actually draw the price (not fixed) */
+			sprintf(out_val, "%9ld  ", (long)x);
+			put_str(out_val, y, 68);
+		}
+
 		/* Display a "taxed" cost */
-		else if (auto_haggle)
+		else
 		{
 			/* Extract the "minimum" price */
 			x = price_item(o_ptr, ot_ptr->min_inflate, FALSE);
@@ -1630,17 +1641,6 @@ static void display_entry(int item)
 			if (!noneedtobargain(x)) x += x / 10;
 
 			/* Actually draw the price (with tax) */
-			sprintf(out_val, "%9ld  ", (long)x);
-			put_str(out_val, y, 68);
-		}
-
-		/* Display a "haggle" cost */
-		else
-		{
-			/* Extrect the "maximum" price */
-			x = price_item(o_ptr, ot_ptr->max_inflate, FALSE);
-
-			/* Actually draw the price (not fixed) */
 			sprintf(out_val, "%9ld  ", (long)x);
 			put_str(out_val, y, 68);
 		}
@@ -2145,10 +2145,10 @@ static bool purchase_haggle(object_type *o_ptr, s32b *price, cptr buying, char l
 	noneed = noneedtobargain(final_ask);
 
 	/* No need to haggle */
-	if (auto_haggle || noneed || (o_ptr->ident & (IDENT_FIXED)))
+	if (!adult_haggle || noneed || (o_ptr->ident & (IDENT_FIXED)))
 	{
 		/* Auto-haggle */
-		if (auto_haggle)
+		if (!adult_haggle)
 		{
 			/* Ignore haggling */
 			ignore = TRUE;
@@ -2335,16 +2335,16 @@ static bool sell_haggle(object_type *o_ptr, s32b *price, cptr selling, char labe
 	purse = (s32b)(ot_ptr->max_cost);
 
 	/* No need to haggle */
-	if (noneed || auto_haggle || (final_ask >= purse))
+	if (noneed || !adult_haggle || (final_ask >= purse))
 	{
 		/* Apply Sales Tax (if needed) */
-		if (auto_haggle && !noneed)
+		if (!adult_haggle && !noneed)
 		{
 			final_ask -= final_ask / 10;
 		}
 
 		/* No haggle option */
-		if (auto_haggle)
+		if (!adult_haggle)
 		{
 			/* Ignore haggling */
 			ignore = TRUE;

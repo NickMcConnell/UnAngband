@@ -1463,8 +1463,8 @@ const cptr option_text[OPT_MAX] =
 	"verify_special",			/* OPT_verify_special */
 	"allow_quantity",			/* OPT_allow_quantity */
 	"easy_corpses",			/* OPT_easy_corpses */
-	"auto_haggle",				/* OPT_auto_haggle */
-	"auto_scum",				/* OPT_auto_scum */
+	NULL,				/* xxx */
+	NULL,				/* xxx */
 	NULL,						/* xxx testing_stack */
 	NULL,						/* xxx testing_carry */
 	"expand_look",				/* OPT_expand_look */
@@ -1503,8 +1503,8 @@ const cptr option_text[OPT_MAX] =
 	"run_avoid_center",			/* OPT_run_avoid_center */
 	"scroll_target",			/* OPT_scroll_target */
 	"auto_more",				/* OPT_auto_more */
-	"smart_monsters",			/* OPT_smart_monsters */
-	"smart_packs",				/* OPT_smart_packs */
+	"auto_display_lists",			/* OPT_auto_display_lists */
+	"toggle_xp",				/* OPT_toggle_xp */
 	"stack_force_charges",						/* xxx */
 	"stack_force_times",						/* xxx */
 	NULL,						/* xxx */
@@ -1561,7 +1561,7 @@ const cptr option_text[OPT_MAX] =
 	NULL,					   /* xxx */
 	"birth_point_based",		/* OPT_birth_point_based */
 	"birth_auto_roller",		/* OPT_birth_auto_roller */
-	"birth_maximize",			/* OPT_birth_maximize */
+	"birth_maximize_race",			/* OPT_birth_maximize_race */
 	"birth_preserve",			/* OPT_birth_preserve */
 	"birth_ironman",			/* OPT_birth_ironman */
 	"birth_no_stores",			/* OPT_birth_no_stores */
@@ -1569,9 +1569,9 @@ const cptr option_text[OPT_MAX] =
 	"birth_rand_artifacts",		/* OPT_birth_rand_artifacts */
 	"birth_campaign",			       /* xxx */
 	"birth_no_stacking",			/* xxx */
-	NULL,						/* xxx */
-	NULL,						/* xxx */
-	NULL,						/* xxx */
+	"birth_haggle",						/* OPT_birth_haggle */
+	"birth_scum",						/* OPT_birth_scum */
+	"birth_maximize_class",			/* OPT_birth_maximize_class */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
@@ -1633,9 +1633,9 @@ const cptr option_text[OPT_MAX] =
 	"adult_rand_artifacts",		/* OPT_adult_rand_artifacts */
 	"adult_campaign",				/* xxx */
 	"adult_no_stacking",			/* xxx */
-	NULL,						/* xxx */
-	NULL,						/* xxx */
-	NULL,						/* xxx */
+	"adult_haggle",						/* OPT_adult_haggle */
+	"adult_scum",						/* OPT_adult_scum */
+	"adult_maximize_class",			/* OPT_adult_maximize_class */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
@@ -1727,8 +1727,8 @@ const cptr option_desc[OPT_MAX] =
 	"Verify use of special commands",			/* OPT_verify_special */
 	"Allow quantity specification",				/* OPT_allow_quantity */
 	"Ignore corpses by default",				/* OPT_easy_corpses */
-	"Auto-haggle in stores",				/* OPT_auto_haggle */
-	"Auto-scum for good levels",				/* OPT_auto_scum */
+	NULL,				/* xxx */
+	NULL,				/* xxx */
 	NULL,										/* xxx testing_stack */
 	NULL,										/* xxx testing_carry */
 	"Expand the power of the look command",		/* OPT_expand_look */
@@ -1767,8 +1767,8 @@ const cptr option_desc[OPT_MAX] =
 	"Avoid centering while running",			/* OPT_run_avoid_center */
 	"Scroll map while targetting",			/* OPT_scroll_target */
 	"Automatically clear '-more-' prompts",		/* OPT_auto_more */
-	"Monsters behave more intelligently",		/* OPT_smart_monsters */
-	NULL,								/* xxx */
+	"Automatically display drop-down lists",	/* OPT_auto_display_lists */
+	"Reverse experience display",				/* OPT_toggle_xp */
 	"Merge charges when stacking",				/* OPT_stack_force_charges */
 	"Merge timeouts when stacking",			/* OPT_stack_force_timeouts */
 	NULL,							/* xxx */
@@ -1825,7 +1825,7 @@ const cptr option_desc[OPT_MAX] =
 	NULL,									   /* xxx */
 	"Birth: Allow purchase of stats using points",	/* OPT_birth_point_based */
 	"Birth: Allow specification of minimal stats",	/* OPT_birth_auto_roller */
-	"Birth: Maximize effect of race/class bonuses",	/* OPT_birth_maximize */
+	"Birth: Maximize effect of race bonuses",	/* OPT_birth_maximize_race */
 	"Birth: Preserve artifacts when leaving level",	/* OPT_birth_preserve */
 	"Birth: Restrict the use of stairs/recall",	/* OPT_birth_ironman */
 	"Birth: Restrict the use of stores/home",	/* OPT_birth_no_stores */
@@ -1833,9 +1833,9 @@ const cptr option_desc[OPT_MAX] =
 	"Birth: Randomize all of the artifacts",       /* OPT_birth_rand_artifacts */
 	"Birth: Play in Lord of the Rings campaign",   /* OPT_birth_campaign */
 	"Birth: Don't stack objects on the floor",	/* OPT_birth_no_stacking */
-	NULL,										/* xxx */
-	NULL,										/* xxx */
-	NULL,										/* xxx */
+	"Birth: Haggle in stores",			/* OPT_birth_haggle */									/* xxx */
+	"Birth: Scum for good levels",			/* OPT_birth_scum */
+	"Birth: Maximize effect of class bonuses",	/* OPT_birth_maximize_class */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
@@ -1895,11 +1895,11 @@ const cptr option_desc[OPT_MAX] =
 	"Adult: Restrict the use of stores/home",	/* OPT_adult_no_stores */
 	"Adult: Restrict creation of artifacts",	/* OPT_adult_no_artifacts */
 	"Adult: Randomize all of the artifacts",       /* OPT_adult_rand_artifacts */
-	"Adult: Play in Lord of the Rings campaign",   /* OPT_birth_campaign */
-	"Adult: Don't stack objects on the floor",	/* OPT_birth_no_stacking */
-	NULL,										/* xxx */
-	NULL,										/* xxx */
-	NULL,										/* xxx */
+	"Adult: Play in Lord of the Rings campaign",   /* OPT_adult_campaign */
+	"Adult: Don't stack objects on the floor",	/* OPT_adult_no_stacking */
+	"Adult: Haggle in stores",			/* OPT_adult_haggle */									/* xxx */
+	"Adult: Scum for good levels",			/* OPT_adult_scum */
+	"Adult: Maximize effect of class bonuses",	/* OPT_adult_maximize_class */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
@@ -1991,8 +1991,8 @@ const bool option_norm[OPT_MAX] =
 	TRUE,		/* OPT_verify_special */
 	TRUE,		/* OPT_allow_quantity */
 	TRUE,		/* OPT_easy_corpses */
-	TRUE,		/* OPT_auto_haggle */
-	FALSE,		/* OPT_auto_scum */
+	FALSE,		/* xxx */
+	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	TRUE,		/* OPT_expand_look */
@@ -2031,8 +2031,8 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* OPT_run_avoid_center */
 	FALSE,		/* OPT_scroll_target */
 	FALSE,		/* OPT_auto_more */
-	FALSE,		/* OPT_smart_monsters */
-	FALSE,		/* OPT_smart_packs */
+	TRUE,		/* OPT_auto_display_lists */
+	TRUE,		/* OPT_toggle_xp */
 	FALSE,	  /* OPT_stack_force_charges */
 	FALSE,	  /* OPT_stack_force_times */
 	FALSE,	   /* xxx */
@@ -2046,7 +2046,7 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* OPT_view_glowing_lite */
 	FALSE,		/* OPT_view_surface_lite */
 	FALSE,	  /* xxx */
-	TRUE,		/* OPT_show_sidebar */
+	FALSE,		/* OPT_show_sidebar */
 	FALSE,		/* OPT_show_itemlist */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
@@ -2089,16 +2089,16 @@ const bool option_norm[OPT_MAX] =
 	FALSE,	  /* OPT_variant_drop_body */
 	FALSE,		/* OPT_birth_point_based */
 	FALSE,		/* OPT_birth_auto_roller */
-	TRUE,		/* OPT_birth_maximize */
+	TRUE,		/* OPT_birth_maximize_race */
 	TRUE,		/* OPT_birth_preserve */
 	FALSE,		/* OPT_birth_ironman */
 	FALSE,		/* OPT_birth_no_stores */
 	FALSE,		/* OPT_birth_no_artifacts */
 	FALSE,		/* OPT_birth_rand_artifacts */
 	TRUE,	  /* OPT_birth_campaign */
-	FALSE,		/* xxx */
-	FALSE,		/* xxx */
-	FALSE,		/* xxx */
+	FALSE,		/* OPT_birth_haggle */
+	FALSE,		/* OPT_birth_scum */
+	TRUE,		/* OPT_birth_maximise_class */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
@@ -2153,17 +2153,17 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* xxx */
 	FALSE,		/* OPT_adult_point_based */
 	FALSE,		/* OPT_adult_auto_roller */
-	TRUE,		/* OPT_adult_maximize */
+	TRUE,		/* OPT_adult_maximize_race */
 	TRUE,		/* OPT_adult_preserve */
 	FALSE,		/* OPT_adult_ironman */
 	FALSE,		/* OPT_adult_no_stores */
 	FALSE,		/* OPT_adult_no_artifacts */
 	FALSE,		/* OPT_adult_rand_artifacts */
-	FALSE,	  /* OPT_adult_campaign */
+	FALSE,	  	/* OPT_adult_campaign */
 	FALSE,		/* OPT_adult_no_stacking */
-	FALSE,		/* xxx */
-	FALSE,		/* xxx */
-	FALSE,		/* xxx */
+	FALSE,		/* OPT_adult_haggle */
+	FALSE,		/* OPT_adult_scum */
+	TRUE,		/* OPT_adult_maximize_class */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
@@ -2276,18 +2276,18 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 	/*** Game-Play ***/
 
 	{
-		OPT_auto_haggle,
-		OPT_auto_scum,
 		OPT_expand_look,
 		OPT_expand_list,
 		OPT_view_perma_grids,
 		OPT_view_torch_grids,
 		OPT_dungeon_align,
 		OPT_dungeon_stair,
-		OPT_smart_monsters,
 		OPT_view_unsafe_grids,
 		OPT_view_detect_grids,
 		OPT_reseed_artifacts,
+		255,
+		255,
+		255,
 		255,
 		255,
 		255,
@@ -2312,14 +2312,14 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_fresh_before,
 		OPT_fresh_after,
 		OPT_compress_savefile,
-		255,
-		255,
-		255,
-		255,
-		255,
-		255,
-		255,
-		255,
+		OPT_hilite_player,
+		OPT_view_player_lite,
+		OPT_view_yellow_lite,
+		OPT_view_bright_lite,
+		OPT_view_granite_lite,
+		OPT_view_special_lite,
+		OPT_view_glowing_lite,
+		OPT_view_surface_lite,
 		255
 	},
 
@@ -2335,17 +2335,17 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_show_details,
 		OPT_show_flavors,
 		OPT_view_flavors,
-		OPT_hilite_player,
-		OPT_view_player_lite,
-		OPT_view_yellow_lite,
-		OPT_view_bright_lite,
-		OPT_view_granite_lite,
-		OPT_view_special_lite,
-		OPT_view_glowing_lite,
-		OPT_view_surface_lite,
 		OPT_show_piles,
 		OPT_room_names,
 		OPT_room_descriptions,
+		OPT_auto_display_lists,
+		OPT_toggle_xp,
+		255,
+		255,
+		255,
+		255,
+		255,
+		255
 	},
 
 	/*** Birth ***/
@@ -2353,7 +2353,8 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 	{
 		OPT_birth_point_based,
 		OPT_birth_auto_roller,
-		OPT_birth_maximize,
+		OPT_birth_maximize_race,
+		OPT_birth_maximize_class,
 		OPT_birth_preserve,
 		OPT_birth_ironman,
 		OPT_birth_no_stores,
@@ -2361,9 +2362,8 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_birth_rand_artifacts,
 		OPT_birth_campaign,
 		OPT_birth_no_stacking,
-		255,
-		255,
-		255,
+		OPT_birth_haggle,
+		OPT_birth_scum,
 		255,
 		255,
 		255,

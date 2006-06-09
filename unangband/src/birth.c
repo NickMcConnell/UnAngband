@@ -162,7 +162,7 @@ static void load_prev_data(void)
 /*
  * Adjust a stat by an amount.
  *
- * This just uses "modify_stat_value()" unless "maximize" mode is false,
+ * This just uses "modify_stat_value()"
  * and a positive bonus is being applied, in which case, a special hack
  * is used, with the "auto_roll" flag affecting the result.
  *
@@ -173,8 +173,8 @@ static void load_prev_data(void)
  */
 static int adjust_stat(int value, int amount, int auto_roll)
 {
-	/* Negative amounts or maximize mode */
-	if ((amount < 0) || adult_maximize)
+	/* Negative amounts */
+	if (amount < 0)
 	{
 		return (modify_stat_value(value, amount));
 	}
@@ -222,7 +222,7 @@ static void get_stats(void)
 {
 	int i, j;
 
-	int bonus;
+	int bonus_max, bonus_add;
 
 	int dice[18];
 
@@ -254,26 +254,25 @@ static void get_stats(void)
 		p_ptr->stat_max[i] = j;
 
 		/* Obtain a "bonus" for "race" and "class" */
-		bonus = rp_ptr->r_adj[i] + cp_ptr->c_adj[i];
-
-		/* Variable stat maxes */
-		if (adult_maximize)
-		{
-			/* Start fully healed */
-			p_ptr->stat_cur[i] = p_ptr->stat_max[i];
-
-			/* Efficiency -- Apply the racial/class bonuses */
-			stat_use[i] = modify_stat_value(p_ptr->stat_max[i], bonus);
-		}
+		bonus_max = (adult_maximize_race ? rp_ptr->r_adj[i] : 0) + (adult_maximize_class ? cp_ptr->c_adj[i] : 0);
+		bonus_add = (adult_maximize_race ? 0 : rp_ptr->r_adj[i]) + (adult_maximize_class ? 0 : cp_ptr->c_adj[i]);
 
 		/* Fixed stat maxes */
-		else
+		if (bonus_add)
 		{
 			/* Apply the bonus to the stat (somewhat randomly) */
-			stat_use[i] = adjust_stat(p_ptr->stat_max[i], bonus, FALSE);
+			stat_use[i] = adjust_stat(p_ptr->stat_max[i], bonus_add, FALSE);
 
-			/* Save the resulting stat maximum */
-			p_ptr->stat_cur[i] = p_ptr->stat_max[i] = stat_use[i];
+		}
+
+		/* Save the resulting stat maximum */
+		p_ptr->stat_cur[i] = p_ptr->stat_max[i] = stat_use[i];
+
+		/* Variable stat maxes */
+		if (bonus_max)
+		{
+			/* Efficiency -- Apply the racial/class bonuses */
+			stat_use[i] = modify_stat_value(p_ptr->stat_max[i], bonus_max);
 		}
 	}
 }
@@ -1531,23 +1530,18 @@ static bool player_birth_aux_2(void)
 		/* Process stats */
 		for (i = 0; i < A_MAX; i++)
 		{
-			/* Variable stat maxes */
-			if (adult_maximize)
-			{
-				/* Reset stats */
-				p_ptr->stat_cur[i] = p_ptr->stat_max[i] = stats[i];
+			/* Obtain a "bonus" for "race" and "class" */
+			int bonus_add = (adult_maximize_race ? 0 : rp_ptr->r_adj[i]) + (adult_maximize_class ? 0 : cp_ptr->c_adj[i]);
 
-			}
+			/* Reset stats */
+			p_ptr->stat_cur[i] = p_ptr->stat_max[i] = stats[i];
 
 			/* Fixed stat maxes */
-			else
+			if (bonus_add)
 			{
-				/* Obtain a "bonus" for "race" and "class" */
-				int bonus = rp_ptr->r_adj[i] + cp_ptr->c_adj[i];
-
 				/* Apply the racial/class bonuses */
 				p_ptr->stat_cur[i] = p_ptr->stat_max[i] =
-					modify_stat_value(stats[i], bonus);
+					modify_stat_value(stats[i], bonus_add);
 			}
 
 			/* Total cost */
@@ -1712,7 +1706,7 @@ static bool player_birth_aux_3(void)
 			stat_match[i] = 0;
 
 			/* Race/Class bonus */
-			j = rp_ptr->r_adj[i] + cp_ptr->c_adj[i];
+			j = (adult_maximize_race ? 0 : rp_ptr->r_adj[i]) + (adult_maximize_class ? 0 : cp_ptr->c_adj[i]);
 
 			/* Obtain the "maximal" stat */
 			m = adjust_stat(17, j, TRUE);

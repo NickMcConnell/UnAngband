@@ -3389,6 +3389,12 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 		}
 	}
 
+	/* Option to always show a list */
+	if (auto_display_lists)
+	{
+		p_ptr->command_see = TRUE;
+	}
+
 	/* Start out in "display" mode */
 	if (p_ptr->command_see)
 	{

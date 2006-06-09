@@ -91,6 +91,11 @@ level.
 monster. They will also explode when on the floor and destroyed by an attack. 
 This allows much more tactical diversity when using them (Requested by mikon).
 
+- Haggling and auto-scum are now birth rather than game-play options.
+
+- Separated out maximise modes for race and class. Class now defaults to off
+(Half-maximise mode).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -120,6 +125,10 @@ when moving across them (Requested by will_asher).
 - Added new object run_ignore_floors which defaults to on, which means the
 player ignores unusual floor types such as slime, blood and dust whilst running
 (Requested by will_asher).
+
+- Added auto_display_lists and toggle_xp options from Hengband.
+
+- Display stats at bottom rather than side of screen by default.
 
 ### Bug fixes ###
 
@@ -206,6 +215,10 @@ should now take effect against monsters (Reported by Bandobras).
 items (Reported by Bandobras and ekolis).
 
 - Services no longer say they can be enchanted when examined (Reported by Mikon).
+
+- Fixed bug where a fountain would contain amulets of ESP as opposed to a potion
+(Reported by Mikon).
+
 
 ### Build / Platform ###
 

@@ -223,20 +223,42 @@ static void prt_level(void)
 static void prt_exp(void)
 {
 	char out_val[32];
+	s32b exp_display;
+	byte attr;
 
-	sprintf(out_val, "%8ld", (long)p_ptr->exp);
-
+	/*use different color if player's experience is drained*/
 	if (p_ptr->exp >= p_ptr->max_exp)
 	{
-		put_str("EXP ", ROW_EXP, COL_EXP);
-		c_put_str(TERM_L_GREEN, out_val, ROW_EXP, COL_EXP + 4);
+		attr = TERM_L_GREEN;
 	}
 	else
-
 	{
-		put_str("Exp ", ROW_EXP, COL_EXP);
-		c_put_str(TERM_YELLOW, out_val, ROW_EXP, COL_EXP + 4);
+		attr = TERM_YELLOW;
 	}
+
+	/*some players want to see how much they need to gain to get to the next level*/
+	if ((toggle_xp) && (p_ptr->lev < PY_MAX_LEVEL))
+	{
+		exp_display = ((player_exp[p_ptr->lev - 1] * p_ptr->expfact / 100L) -
+									p_ptr->exp);
+
+		/*Print experience label*/
+		put_str("NEXT ", ROW_EXP, COL_EXP);
+	}
+
+	else
+	{
+
+		exp_display = p_ptr->exp;
+
+		/*Print experience label*/
+		put_str("EXP ", ROW_EXP, COL_EXP);
+	}
+
+	sprintf(out_val, "%8ld", exp_display);
+
+	c_put_str(attr, out_val, ROW_EXP, COL_EXP + 4);
+
 }
 
 
@@ -2891,11 +2913,18 @@ static void calc_bonuses(void)
 		/* Extract modifier */
 		add = p_ptr->stat_add[i];
 
-		/* Maximize mode */
-		if (adult_maximize)
+		/* Maximize mode - race */
+		if (adult_maximize_race)
 		{
-			/* Modify the stats for race/class */
-			add += (rp_ptr->r_adj[i] + cp_ptr->c_adj[i]);
+			/* Modify the stats for race */
+			add += rp_ptr->r_adj[i];
+		}
+
+		/* Maximize mode - class */
+		if (adult_maximize_class)
+		{
+			/* Modify the stats for class */
+			add += cp_ptr->c_adj[i];
 		}
 
 		/* Extract timed increase */
