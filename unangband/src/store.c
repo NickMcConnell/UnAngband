@@ -1287,7 +1287,7 @@ static void store_create(void)
 	for (i = 0;i < STORE_CHOICES;i++)
 	{
 		/* Hack -- attempt to stock if item not available */
-		if ((su_ptr->tval[i]) && (rand_int(adj_chr_stock[p_ptr->stat_ind[A_CHR]]) < su_ptr->count[i]))
+		if ((su_ptr->count[i]) && (rand_int(adj_chr_stock[p_ptr->stat_ind[A_CHR]]) < su_ptr->count[i]))
 		{
 			int j;
 
@@ -1305,13 +1305,13 @@ static void store_create(void)
 
 				if (k_idx) break;
 			}
+		}
+	}
 
-			total += su_ptr->count[i];
-		}
-		else if (su_ptr->tval[i])
-		{
-			total += su_ptr->count[i];
-		}
+	/* Build item choices */
+	for (i = 0;i < STORE_CHOICES;i++)
+	{
+		total += su_ptr->count[i];
 	}
 
 	/* Hack -- consider up to four items */
@@ -3903,7 +3903,6 @@ void store_maint(int which)
 
 	/* Destroy objects until only "j" slots are left */
 	while (st_ptr->stock_num > j) store_delete();
-
 
 	/* Choose the number of slots to fill */
 	j = st_ptr->stock_num;

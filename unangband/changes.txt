@@ -224,6 +224,8 @@ by will_asher and others).
 
 - Fixed bug preventing Sauron from appearing in Orodruin (Reported by Ewan McNay).
 
+- Fixed bug causes quest location items to occasionally appear in resupply buildings
+(Reported by mikon and others).
 
 ### Build / Platform ###
 
