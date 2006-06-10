@@ -227,7 +227,7 @@ static void sense_inventory(void)
 		if (!o_ptr->k_idx) continue;
 
 		/* Hack -- we seem to get a source of corrupt objects that crash this routine. Putting this warning in. */
-		if (o_ptr->k_idx >= z_info->k_max)
+		if ((o_ptr->k_idx >= z_info->k_max) || (o_ptr->k_idx < 0))
 		{
 			bell("BUG: Object corruption detected. See bugs.txt for reporting details.");
 			continue;
@@ -1557,6 +1557,49 @@ static void process_world(void)
 	/* Update dynamic terrain */
 	update_dyna();
 
+#ifdef ALLOW_BORG
+	if (count_stop)
+	{
+		/* The borg is always in perfect health */
+
+		/* Restore stats */
+		(void)res_stat(A_STR);
+		(void)res_stat(A_INT);
+		(void)res_stat(A_WIS);
+		(void)res_stat(A_CON);
+		(void)res_stat(A_DEX);
+		(void)res_stat(A_CHR);
+
+		/* Restore experience. */
+		p_ptr->exp = p_ptr->max_exp;
+
+		/* No maladies */
+		p_ptr->blind = 0;
+		p_ptr->confused = 0;
+		p_ptr->poisoned = 0;
+		p_ptr->afraid = 0;
+		p_ptr->paralyzed = 0;
+		p_ptr->image = 0;
+		p_ptr->slow = 0;
+		p_ptr->stun = 0;
+		p_ptr->paralyzed = 0;
+		p_ptr->cut = 0;
+		p_ptr->psleep = 0;
+		p_ptr->msleep = 0;
+		p_ptr->petrify = 0;
+		p_ptr->stastis = 0;
+		p_ptr->cursed = 0;
+		p_ptr->amnesia = 0;
+		p_ptr->disease = 0;
+
+		/* Fully healed */
+		p_ptr->chp = p_ptr->mhp;
+		p_ptr->chp_frac = 0;
+
+		/* No longer hungry */
+		p_ptr->food = PY_FOOD_MAX - 1;
+	}
+#endif
 }
 
 
@@ -2652,7 +2695,13 @@ static void process_player(void)
 		/* Assume free turn */
 		p_ptr->energy_use = 0;
 
+#ifdef ALLOW_BORG
+		/* Using the borg. */
+		if (count_stop) do_cmd_borg();
+
 		/* Paralyzed or Knocked Out */
+		else 
+#endif
 		if ((p_ptr->paralyzed) || (p_ptr->stun >= 100) || (p_ptr->psleep >= PY_SLEEP_ASLEEP))
 		{
 			/* Get the feature */

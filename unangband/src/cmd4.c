@@ -4136,8 +4136,10 @@ void do_cmd_save_screen_html(void)
 
 
 #ifdef ALLOW_BORG_GRAPHICS
+#if 0
 	/* Initialize the translation table for the borg */
 	init_translate_visuals();
+#endif
 #endif /* ALLOW_BORG_GRAPHICS */
 
 	/* Message */

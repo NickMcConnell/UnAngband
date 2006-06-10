@@ -248,6 +248,9 @@ opposed to a ratio of range from the centre of effect.
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
 
+- Added Oangband's dumb borg for additional crash and performance testing.
+
+
 
 Unangband 0.6.0 "Where's the Tequila? Did Tara Reid steal all the drinks?" (The Ari
 Gold Release)

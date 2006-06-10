@@ -1031,6 +1031,10 @@ void take_hit(int dam, cptr kb_str)
 
 	int warning = (p_ptr->mhp * op_ptr->hitpoint_warn / 10);
 
+#ifdef ALLOW_BORG
+	/* Mega-Hack -- Borg can't be hurt. */
+	if (count_stop) return;
+#endif
 
 	/* Paranoia */
 	if (p_ptr->is_dead) return;

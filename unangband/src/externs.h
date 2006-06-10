@@ -1037,3 +1037,18 @@ extern void show_floor(const int *floor_list, int floor_num);
 /* randart.c */
 extern errr do_randart(u32b randart_seed, bool full);
 #endif /* GJW_RANDART */
+
+
+/*
+ * Some global variables for the "mindless" borg.
+ */
+#ifdef ALLOW_BORG
+/* borgdump.c */
+extern u32b count_stop;	         /* Turns to automatic stop */
+extern int count_change_level;   /* Turns to next level change */
+extern int count_teleport;       /* Turns to next teleport */
+extern byte allowed_depth[2];    /* Minimum and maximum depths */
+extern byte borg_dir;            /* Current direction */
+#endif
+
+

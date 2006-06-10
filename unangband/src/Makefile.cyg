@@ -48,6 +48,7 @@ EXOBJS = \
 	wizard2.o \
 	xtra1.o \
 	xtra2.o \
+	borgdumb.o \
 	z-form.o \
 	z-rand.o \
 	z-term.o \
@@ -231,6 +232,9 @@ xtra1.o: xtra1.c $(INCS)
 	$(CC) $(CFLAGS) $(INCDIRS) -c -o $@ $<
 
 xtra2.o: xtra2.c $(INCS)
+	$(CC) $(CFLAGS) $(INCDIRS) -c -o $@ $<
+
+borgdump.o: borgdumb.c $(INCS) borgdumb.h
 	$(CC) $(CFLAGS) $(INCDIRS) -c -o $@ $<
 
 z-form.o: z-form.c $(HDRS) z-form.h z-util.h z-virt.h

@@ -1579,7 +1579,7 @@ key_event inkey_ex(void)
 #ifdef ALLOW_BORG
 
 	/* Mega-Hack -- Use the special hook */
-	if (inkey_hack && ((ch = (*inkey_hack)(inkey_xtra)) != 0))
+	if (inkey_hack && ((ke.key = (*inkey_hack)(inkey_xtra)) != 0))
 	{
 		/* Cancel the various "global parameters" */
 		inkey_base = inkey_xtra = inkey_flag = inkey_scan = FALSE;
@@ -2555,6 +2555,10 @@ static void msg_print_aux(u16b type, cptr msg)
 	byte color;
 	int w, h;
 
+#ifdef ALLOW_BORG
+	/* Hack -- No messages for the borg */
+	if (count_stop) return;
+#endif
 
 	/* Obtain the size */
 	(void)Term_get_size(&w, &h);

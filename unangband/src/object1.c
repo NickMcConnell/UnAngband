@@ -284,7 +284,9 @@ void flavor_init(void)
 }
 
 #ifdef ALLOW_BORG_GRAPHICS
+#if 0
 extern void init_translate_visuals(void);
+#endif
 #endif /* ALLOW_BORG_GRAPHICS */
 
 
@@ -377,8 +379,10 @@ void reset_visuals(bool unused)
 	}
 
 #ifdef ALLOW_BORG_GRAPHICS
+#if 0
 	/* Initialize the translation table for the borg */
 	init_translate_visuals();
+#endif
 #endif /* ALLOW_BORG_GRAPHICS */
 }
 
