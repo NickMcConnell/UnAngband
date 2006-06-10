@@ -96,6 +96,8 @@ This allows much more tactical diversity when using them (Requested by mikon).
 - Separated out maximise modes for race and class. Class now defaults to off
 (Half-maximise mode).
 
+- Allow staffs to be used while wielding them (Requested by ekolis).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
