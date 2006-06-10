@@ -7719,7 +7719,6 @@ bool project_p(int who, int y, int x, int dam, int typ)
 			/* Mark grid for later processing. */
 			cave_temp_mark(y, x, FALSE);
 
-
 			break;
 		}
 
@@ -9675,7 +9674,8 @@ bool project_t(int who, int y, int x, int dam, int typ)
 				{
 					msg_print("Gravity warps around you.");
 
-					do_dist = 10;
+					/* Throw the player around unsafely. */
+					teleport_player(10);
 				}
 			}
 

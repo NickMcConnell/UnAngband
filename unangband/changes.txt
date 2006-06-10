@@ -244,6 +244,10 @@ by mikon).
 - Fixed bug causing area effect spell damage to taper off at the square of range as 
 opposed to a ratio of range from the centre of effect.
 
+- Fixed crash bug when monster has nothing to say.
+
+- Fixed crash bug when player hit by gravity.
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

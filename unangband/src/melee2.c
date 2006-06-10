@@ -3252,7 +3252,7 @@ void tell_allies_player_can(int y, int x, u32b flag)
 	int i,language;
 	bool vocal = FALSE;
 
-	cptr saying = NULL;
+	cptr saying = "& resists nothing.";
 
 	language = monster_language(m_list[cave_m_idx[y][x]].r_idx);
 
@@ -3329,7 +3329,7 @@ void tell_allies_player_not(int y, int x, u32b flag)
 	int i, language;
 	bool vocal = FALSE;
 
-	cptr saying = NULL;
+	cptr saying = "& no longer resists nothing.";
 
 	language = monster_language(m_list[cave_m_idx[y][x]].r_idx);
 

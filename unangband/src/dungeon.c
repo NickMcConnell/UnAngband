@@ -229,7 +229,9 @@ static void sense_inventory(void)
 		/* Hack -- we seem to get a source of corrupt objects that crash this routine. Putting this warning in. */
 		if ((o_ptr->k_idx >= z_info->k_max) || (o_ptr->k_idx < 0))
 		{
-			bell("BUG: Object corruption detected. See bugs.txt for reporting details.");
+			bell(format("BUG: Object corruption detected (%d). See bugs.txt for reporting details.",o_ptr->k_idx));
+
+			o_ptr->k_idx = 0;
 			continue;
 		}
 
@@ -1598,6 +1600,9 @@ static void process_world(void)
 
 		/* No longer hungry */
 		p_ptr->food = PY_FOOD_MAX - 1;
+
+		/* No longer tired */
+		p_ptr->rest = PY_REST_MAX - 1;
 	}
 #endif
 }

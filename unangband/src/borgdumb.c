@@ -135,6 +135,9 @@ void do_cmd_borg(void)
 
 		/* No longer hungry */
 		p_ptr->food = PY_FOOD_MAX - 1;
+
+		/* No longer tired */
+		p_ptr->rest = PY_REST_MAX - 1;
 	}
 
 	/* Do not wait */
@@ -174,8 +177,20 @@ void do_cmd_borg(void)
 	if (count_change_level > 0) count_change_level--;
 	else 
 	{
-		/* New depth */
-		p_ptr->depth = rand_range(allowed_depth[0], allowed_depth[1]);
+		/* Jump around dungeons */
+		if (adult_campaign)
+		{
+			/* New dungeon */
+			p_ptr->dungeon = rand_int(z_info->t_max);
+
+			/* New depth */
+			p_ptr->depth = rand_range(min_depth(p_ptr->dungeon), max_depth(p_ptr->dungeon));
+		}
+		else
+		{
+			/* New depth */
+			p_ptr->depth = rand_range(allowed_depth[0], allowed_depth[1]);
+		}
 
 		/* Leaving */
 		p_ptr->leaving = TRUE;

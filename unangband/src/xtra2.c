@@ -4034,6 +4034,12 @@ void describe_room(void)
 	char text_visible[240];
 	char text_always[240];
 
+
+#ifdef ALLOW_BORG
+	/* Hack -- No descriptions for the borg */
+	if (count_stop) return;
+#endif
+
 	/* Hack -- handle "xtra" mode */
 	if (!character_dungeon) return;
 
