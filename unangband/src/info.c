@@ -3259,7 +3259,6 @@ void print_spells(const s16b *book, int num, int y, int x)
 				sc_ptr=&(s_ptr->cast[ii]);
 			}
 		}
-			
 
 		/* Skip illegible spells */
 		if (!legible)

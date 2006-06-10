@@ -130,6 +130,10 @@ player ignores unusual floor types such as slime, blood and dust whilst running
 
 - Display stats at bottom rather than side of screen by default.
 
+- List spells learnt in character dump.
+
+- Change ordering in character dump slightly.
+
 ### Bug fixes ###
 
 - Fix weapon branding.

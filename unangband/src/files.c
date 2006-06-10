@@ -3452,8 +3452,8 @@ errr file_character(cptr name, bool full)
 	text_out_file = fff;
 
 	/* Begin dump */
-	fprintf(fff, "  [%s %s Character Dump]\n\n",
-	        VERSION_NAME, VERSION_STRING);
+	text_out(format("  [%s %s Character Dump]\n\n",
+	        VERSION_NAME, VERSION_STRING));
 
 	/* Display player */
 	display_player(0);
@@ -3477,18 +3477,18 @@ errr file_character(cptr name, bool full)
 		/* Terminate */
 		buf[x] = '\0';
 
-		/* End the row */
+		/* End the row -- hack: use fprintf to avoid line wrap*/
 		fprintf(fff, "%s\n", buf);
 	}
 
 	/* Display current date in the Elvish calendar */
-	fprintf(fff," This is %s of the %s year of the third age.  ",
-	           get_month_name(day, cheat_xtra, FALSE), buf2);
+	text_out(format(" This is %s of the %s year of the third age.  ",
+	           get_month_name(day, cheat_xtra, FALSE), buf2));
 
 	/* Display location */
 	if (p_ptr->depth == min_depth(p_ptr->dungeon))
 	{
-		fprintf(fff, "You are in %s.", t_name + t_info[p_ptr->dungeon].name);
+		text_out(format("You are in %s.", t_name + t_info[p_ptr->dungeon].name));
 	}
 	/* Display depth in feet */
 	else if (depth_in_feet)
@@ -3498,36 +3498,155 @@ errr file_character(cptr name, bool full)
 		/* Get the zone */
 		get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
-		fprintf(fff, "You are %d ft %s %s.",
+		text_out(format("You are %d ft %s %s.",
 			(p_ptr->depth - min_depth(p_ptr->dungeon)) * 50 ,
 				zone->tower ? "high above" : "deep in",
-					t_name + t_info[p_ptr->dungeon].name);
+					t_name + t_info[p_ptr->dungeon].name));
 	}
 	/* Display depth */
 	else
 	{
-		fprintf(fff, "You are on level %d of %s.",
+		text_out(format("You are on level %d of %s.",
 			p_ptr->depth - min_depth(p_ptr->dungeon),
-				t_name + t_info[p_ptr->dungeon].name);
+				t_name + t_info[p_ptr->dungeon].name));
 	}
 
 	/* Skip some lines */
-	fprintf(fff, "\n\n\n");
+	text_out("\n\n");
 
 	/* If dead, dump last messages -- Prfnoff */
 	if (p_ptr->is_dead)
 	{
 		i = message_num();
 		if (i > 15) i = 15;
-		fprintf(fff, "  [Last Messages]\n\n");
+		text_out("  [Last Messages]\n\n");
 		while (i-- > 0)
 		{
-			fprintf(fff, "> %s\n", message_str((s16b)i));
+			text_out(format("> %s\n", message_str((s16b)i)));
 		}
-		fprintf(fff, "\n");
+		text_out("\n");
 	}
 
-	fprintf(fff, "  [Character Equipment Stat Modifiers, Sustains and Flags]\n\n");
+	/* Dump the equipment */
+	if (p_ptr->equip_cnt)
+	{
+		text_out("  [Character Equipment]\n\n");
+
+		for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
+		{
+			object_desc(o_name, sizeof(o_name), &inventory[i],
+				TRUE, 3);
+
+			text_out(format("%c) %s\n", index_to_label(i), o_name));
+
+			/* Describe random object attributes */
+			identify_random_gen(&inventory[i]);
+		}
+
+		text_out("\n\n");
+	}
+
+	/* Dump the inventory */
+	text_out("  [Character Inventory]\n\n");
+	for (i = 0; i < INVEN_PACK; i++)
+	{
+		if (!inventory[i].k_idx) break;
+
+		object_desc(o_name, sizeof(o_name), &inventory[i], TRUE, 3);
+		text_out(format("%c) %s\n", index_to_label(i), o_name));
+
+		/* Describe random object attributes */
+		identify_random_gen(&inventory[i]);
+	}
+
+	text_out("\n");
+
+	/* Dump the Home Flags , then the inventory -- if anything there */
+	if (st_ptr->stock_num)
+	{
+		/* Header */
+		text_out("  [Home Inventory]\n\n");
+
+		/* Dump all available items */
+		for (i = 0; i < st_ptr->stock_num; i++)
+		{
+			object_desc(o_name, sizeof(o_name), &st_ptr->stock[i], TRUE, 3);
+			text_out(format("%c) %s\n", I2A(i), o_name));
+
+			/* Describe random object attributes */
+			identify_random_gen(&st_ptr->stock[i]);
+		}
+
+		/* Add an empty line */
+		text_out("\n");
+	}
+
+
+	/* Dump dungeons */
+	text_out("  [Dungeons Explored]\n\n");
+
+	for (i = 0; i < z_info->t_max; i++)
+	{
+		if (t_info[i].max_depth)
+		{
+			text_out("You have reached ");
+
+			/* Express in feet or level*/
+			if (depth_in_feet) text_out(format("%d foot depth in ", t_info[i].max_depth * 50));
+			else text_out(format("level %d of ",t_info[i].max_depth));
+
+			text_out(t_name + t_info[i].name);
+			text_out(".\n");
+		}
+	}
+
+	text_out("\n");
+
+	/* Dump self-knowledge */
+	text_out("  [Self-Knowledge]\n\n");
+
+	/* Do non-spoiler self-knowledge */
+	self_knowledge_aux(FALSE, TRUE);
+
+	text_out("\n");
+
+	/* Dump spells learnt */
+	if (c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL)
+	{
+		/* Dump quests */
+		text_out("  [Spells Learnt]\n\n");
+
+		/* Iterate through learnt spells */
+		for (i = 0; i < PY_MAX_SPELLS;i++)
+		{
+			int spell = p_ptr->spell_order[i];
+
+			if (spell)
+			{
+				if (i % 3 == 2) text_out(format("%s\n",s_name + s_info[spell].name));
+				else text_out(format("%-25s",s_name + s_info[spell].name));
+			}
+		}
+
+		text_out("\n\n");
+	}
+
+	/* Dump quests */
+	text_out("  [Quests]\n\n");
+
+	/* Warning */
+	text_out("Quests will not be enabled until version 0.7.0.  This output is for testing only.\n");
+
+	/* Either print live quests on level, or if nothing live, display current quests */
+	if (print_quests(QUEST_ACTIVE , QUEST_REWARD)) no_quests = FALSE;
+	else no_quests = !print_quests(QUEST_ASSIGN , QUEST_FINISH);
+
+	/* No quests? */
+	if (no_quests) text_out("You currently have no quests.\n");
+
+	text_out("\n");
+
+	text_out("  [Character Equipment Stat Modifiers, Sustains and Flags]\n\n");
 
 	/*dump stat modifiers and sustains*/
 	dump_player_stat_info(fff);
@@ -3552,25 +3671,25 @@ errr file_character(cptr name, bool full)
 				if ((!w) && (x < 40))
 				{
 					/*hack - space it out a bit*/
-					if (x == 20) fprintf(fff, "       ");
+					if (x == 20) text_out("       ");
 
 					/* Dump it */
-					fprintf(fff, "%c", c);
+					text_out(format("%c", c));
 				}
 
 				else if ((w) && (x > 39))
 				{
 					/*hack - space it out a bit*/
-					if (x == 60) fprintf(fff, "       ");
+					if (x == 60) text_out("       ");
 
 					/* Dump it */
-					fprintf(fff, "%c", c);
+					text_out(format("%c", c));
 				}
 
 			}
 
 			/* End the row */
-			fprintf(fff, "\n");
+			text_out("\n");
 		}
 	}
 
@@ -3587,56 +3706,24 @@ errr file_character(cptr name, bool full)
 			(void)(Term_what(x, y, &a, &c));
 
 			/*hack - space it out a bit*/
-			if (x == 20) fprintf(fff, "       ");
+			if (x == 20) text_out("       ");
 
 			/* Dump it */
-			fprintf(fff, "%c", c);
+			text_out(format("%c", c));
 		}
 
 		/* End the row */
-		fprintf(fff, "\n");
+		text_out("\n");
 	}
 
-	/* Dump the equipment */
-	if (p_ptr->equip_cnt)
-	{
-		fprintf(fff, "\n  [Character Equipment]\n\n");
-
-		for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
-		{
-			object_desc(o_name, sizeof(o_name), &inventory[i],
-				TRUE, 3);
-
-			fprintf(fff, "%c) %s\n", index_to_label(i), o_name);
-
-			/* Describe random object attributes */
-			identify_random_gen(&inventory[i]);
-		}
-
-		fprintf(fff, "\n\n");
-	}
-
-	/* Dump the inventory */
-	fprintf(fff, "  [Character Inventory]\n\n");
-	for (i = 0; i < INVEN_PACK; i++)
-	{
-		if (!inventory[i].k_idx) break;
-
-		object_desc(o_name, sizeof(o_name), &inventory[i], TRUE, 3);
-		fprintf(fff, "%c) %s\n", index_to_label(i), o_name);
-
-		/* Describe random object attributes */
-		identify_random_gen(&inventory[i]);
-	}
-	fprintf(fff, "\n");
-
+	/* Create some space */
+	text_out("\n\n");
 
 	/* Dump the Home Flags , then the inventory -- if anything there */
 	if (st_ptr->stock_num)
 	{
-
 		/* Header */
-		fprintf(fff, "  [Home Inventory Stat Modifiers, Sustains and Flags]\n\n");
+		text_out("  [Home Inventory Stat Modifiers, Sustains and Flags]\n\n");
 
 		/*dump stat modifiers and sustains*/
 		dump_home_stat_info(fff);
@@ -3667,7 +3754,7 @@ errr file_character(cptr name, bool full)
 				buf[x] = '\0';
 
 				/* End the row */
-				fprintf(fff, "%s\n", buf);
+				text_out(format("%s\n", buf));
 			}
 		}
 
@@ -3675,74 +3762,13 @@ errr file_character(cptr name, bool full)
 		display_player(0);
 
 		/* End the row */
-		fprintf(fff, "\n");
-
-		/*Now dump the inventory*/
-
-		/* Header */
-		fprintf(fff, "  [Home Inventory]\n\n");
-
-		/* Dump all available items */
-		for (i = 0; i < st_ptr->stock_num; i++)
-		{
-			object_desc(o_name, sizeof(o_name), &st_ptr->stock[i], TRUE, 3);
-			fprintf(fff, "%c) %s\n", I2A(i), o_name);
-
-			/* Describe random object attributes */
-			identify_random_gen(&st_ptr->stock[i]);
-		}
-
-		/* Add an empty line */
-		fprintf(fff, "\n");
+		text_out("\n");
 	}
 
-	else fprintf(fff, "  [Your Home Is Empty]\n\n");
-
-	/* Dump dungeons */
-	fprintf(fff, "  [Dungeons Explored]\n\n");
-
-	for (i = 0; i < z_info->t_max; i++)
-	{
-		if (t_info[i].max_depth)
-		{
-			text_out("You have reached ");
-
-			/* Express in feet or level*/
-			if (depth_in_feet) text_out(format("%d foot depth in ", t_info[i].max_depth * 50));
-			else text_out(format("level %d of ",t_info[i].max_depth));
-
-			text_out(t_name + t_info[i].name);
-			text_out(".\n");
-		}
-	}
-
-	text_out("\n");
-
-	/* Dump self-knowledge */
-	fprintf(fff, "  [Self-Knowledge]\n\n");
-
-	/* Do non-spoiler self-knowledge */
-	self_knowledge_aux(FALSE, TRUE);
-
-	text_out("\n");
-
-	/* Dump quests */
-	fprintf(fff, "  [Quests]\n\n");
-
-	/* Warning */
-	text_out("Quests will not be enabled until version 0.7.0.  This output is for testing only.\n");
-
-	/* Either print live quests on level, or if nothing live, display current quests */
-	if (print_quests(QUEST_ACTIVE , QUEST_REWARD)) no_quests = FALSE;
-	else no_quests = !print_quests(QUEST_ASSIGN , QUEST_FINISH);
-
-	/* No quests? */
-	if (no_quests) text_out("You currently have no quests.\n");
-
-	text_out("\n");
+	else text_out("  [Your Home Is Empty]\n\n");
 
 	/* Dump options */
-	fprintf(fff, "  [Options]\n");
+	text_out("  [Options]\n");
 
 	/* Dump options */
 	for (i = 0; i < OPT_MAX; i++)
@@ -3753,15 +3779,15 @@ errr file_character(cptr name, bool full)
 
 		if (option_desc[i])
 		{
-			fprintf(fff, "%-45s: %s (%s)\n",
+			text_out(format("%-45s: %s (%s)\n",
 			        format("%s%s", (i >= OPT_GAME_PLAY) && (i < OPT_EFFICIENCY) ? "Game: " : "", option_desc[i]),
 			        op_ptr->opt[i] ? "yes" : "no ",
-			        option_text[i]);
+			        option_text[i]));
 		}
 	}
 
 	/* Skip some lines */
-	fprintf(fff, "\n\n");
+	text_out("\n\n");
 
 	/* Close it */
 	my_fclose(fff);

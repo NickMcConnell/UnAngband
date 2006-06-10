@@ -1625,7 +1625,7 @@ const cptr option_text[OPT_MAX] =
 	NULL,						/* xxx */
 	"adult_point_based",		/* OPT_adult_point_based */
 	"adult_auto_roller",		/* OPT_adult_auto_roller */
-	"adult_maximize",			/* OPT_adult_maximize */
+	"adult_maximize_race",			/* OPT_adult_maximize */
 	"adult_preserve",			/* OPT_adult_preserve */
 	"adult_ironman",			/* OPT_adult_ironman */
 	"adult_no_stores",			/* OPT_adult_no_stores */
@@ -1889,7 +1889,7 @@ const cptr option_desc[OPT_MAX] =
 	NULL,										/* xxx */
 	"Adult: Allow purchase of stats using points",	/* OPT_adult_point_based */
 	"Adult: Allow specification of minimal stats",	/* OPT_adult_auto_roller */
-	"Adult: Maximize effect of race/class bonuses",	/* OPT_adult_maximize */
+	"Adult: Maximize effect of race bonuses",	/* OPT_adult_maximize */
 	"Adult: Preserve artifacts when leaving level",	/* OPT_adult_preserve */
 	"Adult: Restrict the use of stairs/recall",	/* OPT_adult_ironman */
 	"Adult: Restrict the use of stores/home",	/* OPT_adult_no_stores */
