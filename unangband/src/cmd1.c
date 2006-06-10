@@ -1820,9 +1820,9 @@ void hit_trap(int y, int x)
 					damage = d_plus;
 				}
 
-				(void)project_p(0,0,y,x,damage, effect);
-				(void)project_f(0,0,y,x,damage, effect);
-				(void)project_t(0,0,y,x,damage, effect);
+				(void)project_p(0,y,x,damage, effect);
+				(void)project_f(0,y,x,damage, effect);
+				(void)project_t(0,y,x,damage, effect);
 			}
 		}
 	}
@@ -1845,8 +1845,8 @@ void hit_trap(int y, int x)
 			dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
    
 			/* Apply the blow */
-			project_p(0, 0, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
-			project_t(0, 0, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
+			project_p(0, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
+			project_t(0, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
 		}
 
 		/* Get feature */
@@ -2369,7 +2369,7 @@ void py_attack(int y, int x)
 						}
 
 						/* Hack -- apply damage as projection */
-						if (project_m(-1,0,y,x,(coated_p(o_ptr) ? damage / 5 : damage), effect) && (coated_p(o_ptr)))
+						if (project_m(-1,y,x,(coated_p(o_ptr) ? damage / 5 : damage), effect) && (coated_p(o_ptr)))
 						{
 							int k_idx = lookup_kind(o_ptr->xtra1, o_ptr->xtra2);
 							k_info[k_idx].aware = TRUE;
@@ -2377,10 +2377,10 @@ void py_attack(int y, int x)
 						}
 
 						/* Hack -- affect ground if not a coating */
-						(void)project_f(-1,0,y,x,damage, effect);
+						(void)project_f(-1,y,x,damage, effect);
 
 						/* Apply teleportation and other effects */
-						(void)project_t(-1,0,y,x,damage, effect);
+						(void)project_t(-1,y,x,damage, effect);
 
 						/* Reduce charges */
 						if (o_ptr->charges)

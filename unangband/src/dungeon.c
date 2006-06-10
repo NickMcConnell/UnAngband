@@ -625,10 +625,10 @@ static void process_world(void)
 		msg_format("You are drowning %s%s!",(f_ptr->flags2 & (FF2_FILLED)?"":"in the "),name);
 
 		/* Apply the blow */
-		project_p(0, 0, p_ptr->py, p_ptr->px, damroll(4,6), GF_WATER);
+		project_p(0, p_ptr->py, p_ptr->px, damroll(4,6), GF_WATER);
 
 		/* Apply the blow */
-		project_t(0, 0, p_ptr->py, p_ptr->px, damroll(4,6), GF_WATER);
+		project_t(0, p_ptr->py, p_ptr->px, damroll(4,6), GF_WATER);
 	}
 
 	/* Take damage from poison */
@@ -1460,7 +1460,7 @@ static void process_world(void)
 
 			case DISEASE_DISPEL:
 			{
-				(void)project_p(0, 0, p_ptr->py, p_ptr->px, 0, GF_DISPEL);
+				(void)project_p(0, p_ptr->py, p_ptr->px, 0, GF_DISPEL);
 				break;
 			}
 

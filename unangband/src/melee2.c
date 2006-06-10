@@ -4566,10 +4566,10 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 						damage = damroll(d_dice, d_side);
 
 						/* New result routine */
-						project_p(m_idx,0,ny,nx,damage,effect);
+						project_p(m_idx,ny,nx,damage,effect);
 
 						/* Apply teleport and other effects */
-						project_t(m_idx,0,ny,nx,damage,effect);
+						project_t(m_idx,ny,nx,damage,effect);
 
 					}
 				}
@@ -5639,10 +5639,10 @@ static void recover_monster(int m_idx, bool regen)
 		if (surface && daytime && hurt_lite && outside)
 		{
 			/* Burn the monster */
-			project_m(0, 0, y, x, damroll(4,6), GF_LITE);
+			project_m(0, y, x, damroll(4,6), GF_LITE);
 
 			/* Burn the monster */
-			project_t(0, 0, y, x, damroll(4,6), GF_LITE);
+			project_t(0, y, x, damroll(4,6), GF_LITE);
 		}
 		else if ((f_info[cave_feat[y][x]].blow.method) && !(f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP)))
 		{
@@ -5653,10 +5653,10 @@ static void recover_monster(int m_idx, bool regen)
 		else
 		{
 			/* Burn the monster */
-			project_m(0, 0, y, x, damroll(4,6), GF_SUFFOCATE);
+			project_m(0, y, x, damroll(4,6), GF_SUFFOCATE);
 
 			/* Burn the monster */
-			project_t(0, 0, y, x, damroll(4,6), GF_SUFFOCATE);
+			project_t(0, y, x, damroll(4,6), GF_SUFFOCATE);
 		}
 
 		/* Is the monster hidden?*/

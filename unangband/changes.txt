@@ -232,8 +232,11 @@ by will_asher and others).
 - Fixed new project_t function that was causing teleport other not to work and teleport/
 phase door not to work on Macintosh platform (Reported by redelmansidi and pete mack).
 
-- Fix bugs with new separation of maximize race and maximize class options (Reported
+- Fixed bugs with new separation of maximize race and maximize class options (Reported
 by mikon).
+
+- Fixed bug causing area effect spell damage to taper off at the square of range as 
+opposed to a ratio of range from the centre of effect.
 
 ### Build / Platform ###
 

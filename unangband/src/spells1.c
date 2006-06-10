@@ -2487,7 +2487,7 @@ static bool temp_lite(int y, int x)
  * Luckily this is very generic and doesn't require we duplicate transition
  * code between here and project_t.
  */
-bool project_f(int who, int r, int y, int x, int dam, int typ)
+bool project_f(int who, int y, int x, int dam, int typ)
 {
 	bool obvious = FALSE;
 	bool burnout = FALSE;
@@ -2500,15 +2500,6 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
 
 	/* Set feature name */
 	f = (f_name + f_ptr->name);
-
-	/* This is dangerous when creating features at the moment */
-#if 0
-	/* Reduce damage by distance */
-	dam = (dam + r) / (r + 1);
-#else
-	/* Prevent warning */
-	r = 0;
-#endif
 
 	/* Track changes */
 	feat = cave_feat[y][x];
@@ -3232,7 +3223,7 @@ bool project_f(int who, int r, int y, int x, int dam, int typ)
  *
  * We return "TRUE" if the effect of the projection is "obvious".
  */
-static bool project_o(int who, int r, int y, int x, int dam, int typ)
+static bool project_o(int who, int y, int x, int dam, int typ)
 {
 	s16b this_o_idx, next_o_idx = 0;
 
@@ -3245,11 +3236,6 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 	u32b if4=0;
 
 	char o_name[80];
-
-#if 0 /* unused */
-	/* Reduce damage by distance */
-	dam = (dam + r) / (r + 1);
-#endif /* 0 */
 
 	/* Prevent warning */
 	who = 0;
@@ -3760,10 +3746,10 @@ static bool project_o(int who, int r, int y, int x, int dam, int typ)
 				}
 
 				/* Splash damage on terrain */
-				(void)project_f(0, r, y, x, damroll(1, o_ptr->weight), typ);
+				(void)project_f(0, y, x, damroll(1, o_ptr->weight), typ);
 
 				/* And apply effects */
-				(void)project_t(0, r, y, x, damroll(1, o_ptr->weight), typ);
+				(void)project_t(0, y, x, damroll(1, o_ptr->weight), typ);
 
 				/* Delete the object later */
 				o_ptr->ident |= (IDENT_BREAKS);
@@ -4077,7 +4063,7 @@ static bool monster_save(monster_type *m_ptr, int power, bool *near)
  *
  * We attempt to return "TRUE" if the player saw anything "useful" happen.
  */
-bool project_m(int who, int r, int y, int x, int dam, int typ)
+bool project_m(int who, int y, int x, int dam, int typ)
 {
 	int tmp;
 
@@ -4164,9 +4150,6 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 
 	/* Check if monster asleep */
 	was_asleep = (m_ptr->csleep == 0);
-
-	/* Reduce damage by distance */
-	dam = (dam + r) / (r + 1);
 
 	/* Walls protect monsters */
 	if (!cave_project_bold(y, x)) dam /= 2;
@@ -4315,7 +4298,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		case GF_POIS:
 		{
 			if (seen) obvious = TRUE;
-			do_pois = (10 + randint(15) + r) / (r + 1);
+			do_pois = (10 + randint(15));
 			if (r_ptr->flags3 & (RF3_IM_POIS))
 			{
 				dam /= 9;
@@ -4542,7 +4525,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				do_stun = (10 + randint(15) + r) / (r + 1);
+				do_stun = 10 + randint(15);
 
 				/* Monster was affected -- Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
@@ -4558,7 +4541,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			if (!(r_ptr->flags2 & (RF2_CAN_SWIM)) && ((m_ptr->stunned > 100) || (m_ptr->confused)))
 			{
 				if (seen) note = " is drowning";
-				do_stun = (10 + randint(15) + r) / (r + 1);
+				do_stun = 10 + randint(15);
 
 				/* Monster was affected -- Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
@@ -4566,7 +4549,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
                         else if (!(r_ptr->flags2 & (RF2_CAN_SWIM)) && !(r_ptr->flags3 & (RF3_RES_WATER)))
 			{
 				dam = 0;
-				do_stun = (10 + randint(15) + r) / (r + 1);
+				do_stun = 10 + randint(15);
 			}
 			break;
 		}
@@ -4582,7 +4565,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 				dam *= 2;
 				if (seen) note = " cringes away from the salt water.";
 				note_dies = " shrivels away in the salt water.";
-				do_stun = (10 + randint(15) + r) / (r + 1);
+				do_stun = 10 + randint(15);
 
 				/* Monster was affected -- Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
@@ -4590,7 +4573,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			else if (!(r_ptr->flags2 & (RF2_CAN_SWIM)) && ((m_ptr->stunned > 100) || (m_ptr->confused)))
 			{
 				if (seen) note = " is drowning";
-				do_stun = (10 + randint(15) + r) / (r + 1);
+				do_stun = 10 + randint(15);
 
 				/* Monster was affected -- Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
@@ -4598,7 +4581,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
                         else if (!(r_ptr->flags2 & (RF2_CAN_SWIM)) && !(r_ptr->flags3 & (RF3_RES_WATER)))
 			{
 				dam = 0;
-				do_stun = (10 + randint(15) + r) / (r + 1);
+				do_stun = 10 + randint(15);
 			}
 			break;
 		}
@@ -4636,7 +4619,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			else if (!(r_ptr->flags2 & (RF2_CAN_SWIM)) && ((m_ptr->stunned > 100) || (m_ptr->confused)))
 			{
 				if (seen) note = " is drowning.";
-				do_stun = (10 + randint(15) + r) / (r + 1);
+				do_stun = 10 + randint(15);
 
 				/* Monster was affected -- Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
@@ -4676,7 +4659,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				do_stun = (10 + randint(15) + r) / (r + 1);
+				do_stun = 10 + randint(15);
 
 				/* Monster was affected -- Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
@@ -4715,7 +4698,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			else if (!(r_ptr->flags2 & (RF2_CAN_DIG)) && ((m_ptr->stunned > 100) || (m_ptr->confused)))
 			{
 				if (seen) note = " is drowning.";
-				do_stun = (10 + randint(15) + r) / (r + 1);
+				do_stun = 10 + randint(15);
 
 				/* Monster was affected -- Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
@@ -4732,7 +4715,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
                         if (!(r_ptr->flags3 & (RF3_NONLIVING)) && ((m_ptr->stunned > 100) || (m_ptr->confused)))
 			{
 				if (seen) note = " is drowning.";
-				do_stun = (10 + randint(15) + r) / (r + 1);
+				do_stun = 10 + randint(15);
 
 				/* Monster was affected -- Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
@@ -4740,7 +4723,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
                         else if (!(r_ptr->flags3 & (RF3_NONLIVING)))
 			{
 				dam = 0;
-				do_stun = (10 + randint(15) + r) / (r + 1);
+				do_stun = 10 + randint(15);
 			}
 			break;
 		}
@@ -4750,7 +4733,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		{
 			if (seen) obvious = TRUE;
 			do_poly = TRUE;
-			do_conf = (5 + randint(11) + r) / (r + 1);
+			do_conf = 5 + randint(11);
 			if (r_ptr->flags9 & (RF9_RES_CHAOS))
 			{
 				dam *= 3; dam /= (randint(6)+6);
@@ -4768,7 +4751,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		case GF_HALLU:
 		{
 			if (seen) obvious = TRUE;
-			do_conf = (5 + randint(11) + r) / (r + 1);
+			do_conf = 5 + randint(11);
 			if (r_ptr->flags9 & (RF9_RES_CHAOS))
 			{
 				dam *= 3; dam /= (randint(6)+6);
@@ -4785,7 +4768,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		case GF_SHARD:
 		{
 			if (seen) obvious = TRUE;
-			do_cuts = (10 + randint(15) + r) / (r + 1);
+			do_cuts = 10 + randint(15);
 			if (r_ptr->flags4 & (RF4_BRTH_SHARD))
 			{
 				dam *= 3; dam /= (randint(6)+6);
@@ -4811,7 +4794,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		case GF_SOUND:
 		{
 			if (seen) obvious = TRUE;
-			do_stun = (10 + randint(15) + r) / (r + 1);
+			do_stun = 10 + randint(15);
 			if (r_ptr->flags4 & (RF4_BRTH_SOUND))
 			{
 				dam *= 2; dam /= (randint(6)+6);
@@ -4837,7 +4820,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		case GF_CONFUSION:
 		{
 			if (seen) obvious = TRUE;
-			do_conf = (10 + randint(15) + r) / (r + 1);
+			do_conf = 10 + randint(15);
 			if (r_ptr->flags4 & (RF4_BRTH_CONFU))
 			{
 				dam *= 2; dam /= (randint(6)+6);
@@ -4891,7 +4874,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		case GF_FORCE:
 		{
 			if (seen) obvious = TRUE;
-			do_stun = (randint(15) + r) / (r + 1);
+			do_stun = randint(15);
 			if (r_ptr->flags4 & (RF4_BRTH_FORCE))
 			{
 				dam *= 3; dam /= (randint(6)+6);
@@ -5003,8 +4986,8 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		case GF_ICE:
 		{
 			if (seen) obvious = TRUE;
-			do_stun = (randint(15) + 1) / (r + 1);
-			do_cuts = (randint(15) + r) / (r + 1);
+			do_stun = randint(15);
+			do_cuts = randint(15);
 			if (r_ptr->flags3 & (RF3_IM_COLD))
 			{
 				dam /= 3;
@@ -5029,7 +5012,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			int do_dist;
 
 			if (seen) obvious = TRUE;
-			do_stun = (randint(15) + 1) / (r + 1);
+			do_stun = randint(15);
 
 			/* Damage-variable throw distance */
 			do_dist = 1 + dam / 25;
@@ -5340,7 +5323,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			if (seen) obvious = TRUE;
 
 			/* Resist light never blinded */
-			if (!(r_ptr->flags9 & (RF9_RES_LITE))) do_blind = (randint(5) + r) / (r + 1);
+			if (!(r_ptr->flags9 & (RF9_RES_LITE))) do_blind = randint(5);
 
 			/* Hurt by light */
 			if (r_ptr->flags3 & (RF3_HURT_LITE))
@@ -5388,7 +5371,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				do_blind = (randint(5) + r) / (r + 1);
+				do_blind = randint(5);
 			}
 
 			if (r_ptr->flags3 & (RF3_HURT_LITE)) 
@@ -5425,7 +5408,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				do_blind = (randint(5) + r) / (r + 1);
+				do_blind = randint(5);
 			}
 			break;
 		}
@@ -5790,7 +5773,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		case GF_TERRIFY:
 		{
 			if (seen) obvious = TRUE;
-			do_fear = (10 + randint(15) + r) / (r + 1);
+			do_fear = 10 + randint(15);
 			if (r_ptr->flags3 & (RF3_NO_FEAR))
 			{
 				dam = 0;
@@ -6549,8 +6532,8 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
 		if (do_blind &&
 			 !(r_ptr->flags9 & (RF9_RES_BLIND)))
 		{
-			/* Don't blind already blinded monsters */
-			if (!m_ptr->blind)
+			/* Don't blind already blinded monsters -- but allow cross-eyed to be blinded */
+			if (m_ptr->blind <= 1)
 			{
 				if (seen) obvious = TRUE;
 				if (do_blind > 1) note = " is blinded.";
@@ -6780,7 +6763,7 @@ bool project_m(int who, int r, int y, int x, int dam, int typ)
  * Actually, for historical reasons, we just assume that the effects were
  * obvious.  XXX XXX XXX
  */
-bool project_p(int who, int r, int y, int x, int dam, int typ)
+bool project_p(int who, int y, int x, int dam, int typ)
 {
 	int k = 0;
 	int i,j;
@@ -6826,9 +6809,6 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 
 	/* Limit maximum damage XXX XXX XXX */
 	if (dam > 1600) dam = 1600;
-
-	/* Reduce damage by distance */
-	dam = (dam + r) / (r + 1);
 
 	/* If the player is blind, be more descriptive */
 	if (blind) fuzzy = TRUE;
@@ -8378,7 +8358,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		/* Curse */
 		case GF_CURSE:
 		{
-			int k =	(10 + randint(15) + r) / (r + 1);
+			int k =	10 + randint(15);
 
 			/* Take damage */
 			take_hit(dam, killer);
@@ -8431,7 +8411,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
 		/* Make the player temporarily forgetful */
 		case GF_FORGET:
 		{
-			int k =	(10 + randint(15) + r) / (r + 1);
+			int k =	10 + randint(15);
 
 			/* Take damage */
 			take_hit(dam, killer);
@@ -9616,7 +9596,7 @@ bool project_p(int who, int r, int y, int x, int dam, int typ)
  *
  * This function assumes that most messages have already been shown.
  */
-bool project_t(int who, int r, int y, int x, int dam, int typ)
+bool project_t(int who, int y, int x, int dam, int typ)
 {
 	monster_type *m_ptr = NULL;
 	monster_race *r_ptr = NULL;
@@ -9642,9 +9622,6 @@ bool project_t(int who, int r, int y, int x, int dam, int typ)
 
 	/* Clear the cave_temp flag.  (this is paranoid) */
 	play_info[y][x] &= ~(PLAY_TEMP);
-
-	/* Reduce damage by distance */
-	dam = (dam + r) / (r + 1);
 
 	if (cave_m_idx[y][x] < 0)
 	{
@@ -10592,8 +10569,11 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 	/* Calculate and store the actual damage at each distance. */
 	for (i = 0; i <= MAX_RANGE; i++)
 	{
+		/* Hack -- feature damage does not vary */
+		if (typ == GF_FEATURE) dam_temp = dam;
+
 		/* No damage outside the radius. */
-		if (i > rad) dam_temp = 0;
+		else if (i > rad) dam_temp = 0;
 
 		/* Standard damage calc. for 10' source diameters, or at origin. */
 		else if ((!source_diameter) || (i == 0))
@@ -10761,7 +10741,7 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 			x = gx[i];
 
 			/* Affect the feature in that grid */
-			if (project_f(who, gd[i], y, x, dam_at_dist[gd[i]], typ))
+			if (project_f(who, y, x, dam_at_dist[gd[i]], typ))
 				notice = TRUE;
 		}
 	}
@@ -10779,7 +10759,7 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 			x = gx[i];
 
 			/* Affect the object in the grid */
-			if (project_o(who, gd[i], y, x, dam_at_dist[gd[i]], typ)) notice = TRUE;
+			if (project_o(who, y, x, dam_at_dist[gd[i]], typ)) notice = TRUE;
 		}
 	}
 
@@ -10800,7 +10780,7 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 			x = gx[i];
 
 			/* Affect the monster in the grid */
-			if (project_m(who, gd[i], y, x, dam_at_dist[gd[i]], typ))
+			if (project_m(who, y, x, dam_at_dist[gd[i]], typ))
 				notice = TRUE;
 		}
 
@@ -10842,7 +10822,7 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 			{
 
 				/* Affect the player */
-				if (project_p(who, gd[i], y, x, dam_at_dist[gd[i]], typ))
+				if (project_p(who, y, x, dam_at_dist[gd[i]], typ))
 				{
 					notice = TRUE;
 
@@ -10865,7 +10845,7 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 		if (!(play_info[y][x] & (PLAY_TEMP))) continue;
 
 		/* Affect marked grid */
-		if (project_t(who, gd[i], y, x, dam_at_dist[gd[i]], typ)) notice = TRUE;
+		if (project_t(who, y, x, dam_at_dist[gd[i]], typ)) notice = TRUE;
 	}
 
 	/* Clear the "temp" array  (paranoia is good) */

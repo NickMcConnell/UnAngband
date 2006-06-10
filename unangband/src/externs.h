@@ -749,10 +749,10 @@ extern bool inc_stat(int stat);
 extern bool dec_stat(int stat, int amount, int permanent);
 extern bool res_stat(int stat);
 extern bool apply_disenchant(int mode);
-extern bool project_f(int who, int rad, int y, int x, int dam, int typ);
-extern bool project_m(int who, int rad, int y, int x, int dam, int typ);
-extern bool project_p(int who, int rad, int y, int x, int dam, int typ);
-extern bool project_t(int who, int rad, int y, int x, int dam, int typ);
+extern bool project_f(int who, int y, int x, int dam, int typ);
+extern bool project_m(int who, int y, int x, int dam, int typ);
+extern bool project_p(int who, int y, int x, int dam, int typ);
+extern bool project_t(int who, int y, int x, int dam, int typ);
 extern bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 			 u32b flg, int degrees, byte source_diameter);
 

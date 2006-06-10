@@ -3711,7 +3711,7 @@ void do_cmd_fire(void)
 							}
 
 							/* Hack -- apply damage as projection */
-							if (project_m(-1,0,y,x,(coated_p(i_ptr) ? damage / 5 : damage), effect) && (coated_p(i_ptr)))
+							if (project_m(-1,y,x,(coated_p(i_ptr) ? damage / 5 : damage), effect) && (coated_p(i_ptr)))
 							{
 								int k_idx = lookup_kind(i_ptr->xtra1, i_ptr->xtra2);
 								k_info[k_idx].aware = TRUE;
@@ -3720,10 +3720,10 @@ void do_cmd_fire(void)
 							}
 
 							/* Hack -- affect ground */
-							(void)project_f(-1,0,y,x,damage, effect);
+							(void)project_f(-1,y,x,damage, effect);
 
 							/* Apply teleport & other effects */
-							(void)project_t(-1,0,y,x,damage, effect);
+							(void)project_t(-1,y,x,damage, effect);
 
 							/* Reduce charges */
 							if (i_ptr->charges)
@@ -4222,7 +4222,7 @@ void do_cmd_throw(void)
 							}
 
 							/* Hack -- apply damage as projection */
-							if (project_m(-1,0,y,x,(coated_p(i_ptr) ? damage / 5 : damage), effect) && (coated_p(i_ptr)))
+							if (project_m(-1,y,x,(coated_p(i_ptr) ? damage / 5 : damage), effect) && (coated_p(i_ptr)))
 							{
 								int k_idx = lookup_kind(i_ptr->xtra1, i_ptr->xtra2);
 								k_info[k_idx].aware = TRUE;
@@ -4231,10 +4231,10 @@ void do_cmd_throw(void)
 							}
 
 							/* Hack -- affect ground */
-							(void)project_f(-1,0,y,x,damage, effect);
+							(void)project_f(-1,y,x,damage, effect);
 
 							/* Apply teleport & other effects */
-							(void)project_t(-1,0,y,x,damage, effect);
+							(void)project_t(-1,y,x,damage, effect);
 
 							/* Reduce charges */
 							if (i_ptr->charges)
