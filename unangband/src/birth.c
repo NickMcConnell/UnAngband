@@ -250,9 +250,6 @@ static void get_stats(void)
 		/* Extract 5 + 1d3 + 1d4 + 1d5 */
 		j = 5 + dice[3*i] + dice[3*i+1] + dice[3*i+2];
 
-		/* Save that value */
-		p_ptr->stat_max[i] = j;
-
 		/* Obtain a "bonus" for "race" and "class" */
 		bonus_max = (adult_maximize_race ? rp_ptr->r_adj[i] : 0) + (adult_maximize_class ? cp_ptr->c_adj[i] : 0);
 		bonus_add = (adult_maximize_race ? 0 : rp_ptr->r_adj[i]) + (adult_maximize_class ? 0 : cp_ptr->c_adj[i]);
@@ -261,8 +258,12 @@ static void get_stats(void)
 		if (bonus_add)
 		{
 			/* Apply the bonus to the stat (somewhat randomly) */
-			stat_use[i] = adjust_stat(p_ptr->stat_max[i], bonus_add, FALSE);
+			stat_use[i] = adjust_stat(j, bonus_add, FALSE);
 
+		}
+		else
+		{
+			stat_use[i] = j;
 		}
 
 		/* Save the resulting stat maximum */
@@ -1710,6 +1711,12 @@ static bool player_birth_aux_3(void)
 
 			/* Obtain the "maximal" stat */
 			m = adjust_stat(17, j, TRUE);
+
+			/* Modify for race if maximised */
+			if (adult_maximize_race) modify_stat_value(m, rp_ptr->r_adj[i]);
+
+			/* Modify for class if maximised */
+			if (adult_maximize_class) modify_stat_value(m, cp_ptr->c_adj[i]);
 
 			/* Save the maximum */
 			mval[i] = m;

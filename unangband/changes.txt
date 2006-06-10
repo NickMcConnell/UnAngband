@@ -232,6 +232,9 @@ by will_asher and others).
 - Fixed new project_t function that was causing teleport other not to work and teleport/
 phase door not to work on Macintosh platform (Reported by redelmansidi and pete mack).
 
+- Fix bugs with new separation of maximize race and maximize class options (Reported
+by mikon).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
