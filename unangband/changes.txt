@@ -229,6 +229,9 @@ by will_asher and others).
 
 - Fixed string formatting bug that caused crash when computing power of hand crossbow.
 
+- Fixed new project_t function that was causing teleport other not to work and teleport/
+phase door not to work on Macintosh platform (Reported by redelmansidi and pete mack).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

@@ -10865,7 +10865,7 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 		if (!(play_info[y][x] & (PLAY_TEMP))) continue;
 
 		/* Affect marked grid */
-		if (project_t(who, y, x, dam_at_dist[gd[i]], typ, flg)) notice = TRUE;
+		if (project_t(who, gd[i], y, x, dam_at_dist[gd[i]], typ)) notice = TRUE;
 	}
 
 	/* Clear the "temp" array  (paranoia is good) */
