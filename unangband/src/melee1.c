@@ -440,6 +440,18 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 			return;
 		}
 
+		case RBM_AURA:
+		{
+			prefix = "intensifies ";
+			suffix = " aura";
+
+			/* Get the monster possessive ("his"/"her"/"its") */
+			if (who > 0) monster_desc(t_name, &m_list[who], 0x22);
+			else strcpy (t_name,"its");
+
+			break;
+		}
+
 		default:
 		{
 			prefix = "casts a spell at ";

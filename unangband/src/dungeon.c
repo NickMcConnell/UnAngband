@@ -986,6 +986,12 @@ static void process_world(void)
 		(void)set_oppose_pois(p_ptr->oppose_pois - 1);
 	}
 
+	/* Free action */
+	if (p_ptr->free_act)
+	{
+		(void)set_free_act(p_ptr->free_act - 1);
+	}
+
 
 	/*** Poison and Stun and Cut ***/
 

@@ -695,11 +695,11 @@
 
 #define ROW_AMNESIA	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
 					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_AMNESIA	(show_sidebar ? 85 : 81)	/* "Amnesia" / "Amn" */
+#define COL_AMNESIA	(show_sidebar ? 85 : 82)	/* "Amnesia" / "Amn" */
 
 #define ROW_PETRIFY	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
 					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_PETRIFY	(show_sidebar ? 93 : 85)	/* "Amnesia" / "Amn" */
+#define COL_PETRIFY	(show_sidebar ? 93 : 86)	/* "Amnesia" / "Amn" */
 
 
 /*** General index values ***/

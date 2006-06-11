@@ -2557,7 +2557,7 @@ static void msg_print_aux(u16b type, cptr msg)
 
 #ifdef ALLOW_BORG
 	/* Hack -- No messages for the borg */
-	if (count_stop) return;
+	if ((count_stop) && !(auto_more)) return;
 #endif
 
 	/* Obtain the size */

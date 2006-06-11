@@ -136,6 +136,8 @@ player ignores unusual floor types such as slime, blood and dust whilst running
 
 - Change ordering in character dump slightly.
 
+- Separate message for when a monster intensifies its aura as an attack spell.
+
 ### Bug fixes ###
 
 - Fix weapon branding.
@@ -247,6 +249,8 @@ opposed to a ratio of range from the centre of effect.
 - Fixed crash bug when monster has nothing to say.
 
 - Fixed crash bug when player hit by gravity.
+
+- Temporary free action should now time out (Reported by Pete Mac).
 
 ### Build / Platform ###
 
