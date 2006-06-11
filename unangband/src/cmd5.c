@@ -1028,8 +1028,11 @@ void do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 		/* Must be true to let us abort */
 		bool abort = TRUE;
 
+		/* Always true */
+		bool known = TRUE;
+
 		/* Apply the spell effect */
-		process_spell(spell,plev,&abort);
+		process_spell(spell,plev,&abort,&known);
 
 		/* Did we cancel? */
 		if (abort) return;

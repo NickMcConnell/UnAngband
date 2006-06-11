@@ -300,6 +300,7 @@ void do_cmd_read_scroll(void)
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
+	bool known = FALSE;
 
 	object_type *o_ptr;
 
@@ -370,11 +371,14 @@ void do_cmd_read_scroll(void)
 	/* Set style */
 	p_ptr->cur_style |= (1L << WS_SCROLL);
 
+	/* Set if known */
+	if (object_aware_p(o_ptr)) known = TRUE;
+
 	/* Get scroll effect */
 	get_spell(&power, "use", o_ptr, FALSE);
 
 	/* Apply scroll effect */
-	if (power >= 0) ident = process_spell(power, 0, &cancel);
+	if (power >= 0) ident = process_spell(power, 0, &cancel, &known);
 	else return;
 
 	/* Clear styles */
@@ -436,6 +440,7 @@ void do_cmd_use_staff(void)
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
+	bool known = FALSE;
 
 	object_type *o_ptr;
 
@@ -544,8 +549,7 @@ void do_cmd_use_staff(void)
 	{
 		if (flush_failure) flush();
 		msg_print("The staff has no charges left.");
-		o_ptr->ident |= (IDENT_SENSE);
-		o_ptr->feeling = (INSCRIP_EMPTY);
+		o_ptr->ident |= (IDENT_CHARGES);
 		return;
 	}
 
@@ -555,11 +559,15 @@ void do_cmd_use_staff(void)
 	/* Set styles */
 	p_ptr->cur_style |= (1L << WS_STAFF);
 
+	/* Set if known */
+	if (object_aware_p(o_ptr)) known = TRUE;
+
 	/* Get rod effect */
 	get_spell(&power, "use", o_ptr, FALSE);
 
 	/* Apply staff effect */
-	if (power >= 0) ident = process_spell(power, 0, &cancel);
+	if (power >= 0) ident = process_spell(power, 0, &cancel, &known);
+	else return;
 
 	/* Clear styles */
 	p_ptr->cur_style &= ~(1L << WS_STAFF);
@@ -692,6 +700,7 @@ void do_cmd_aim_wand(void)
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
+	bool known = FALSE;
 
 	object_type *o_ptr;
 
@@ -811,8 +820,8 @@ void do_cmd_aim_wand(void)
 	{
 		if (flush_failure) flush();
 		msg_print("The wand has no charges left.");
-		o_ptr->ident |= (IDENT_SENSE);
-		o_ptr->feeling = (INSCRIP_EMPTY);
+		o_ptr->ident |= (IDENT_CHARGES);
+		if (object_aware_p(o_ptr)) object_known(o_ptr);
 		return;
 	}
 
@@ -825,8 +834,11 @@ void do_cmd_aim_wand(void)
 	/* Get wand effect */
 	get_spell(&power, "use", o_ptr, FALSE);
 
+	/* Set if known */
+	if (object_aware_p(o_ptr)) known = TRUE;
+
 	/* Apply wand effect */
-	if (power >= 0) ident = process_spell(power, 0, &cancel);
+	if (power >= 0) ident = process_spell(power, 0, &cancel, &known);
 	else return;
 
 	/* Clear styles */
@@ -961,6 +973,7 @@ void do_cmd_zap_rod(void)
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
+	bool known = FALSE;
 
 	object_type *o_ptr;
 
@@ -1069,14 +1082,15 @@ void do_cmd_zap_rod(void)
 	/* Hack -- get fake direction */
 	if (!object_aware_p(o_ptr) && (o_ptr->sval < SV_ROD_MIN_DIRECTION)) get_aim_dir(&dir);
 
+	/* Set if known */
+	if (object_aware_p(o_ptr)) known = TRUE;
+
 	/* Get rod effect */
 	get_spell(&power, "use", o_ptr, FALSE);
 
-	/* Paranoia */
-	if (power < 0) return;
-
 	/* Apply rod effect */
-	ident = process_spell(power, 0, &cancel);
+	if (power >= 0) ident = process_spell(power, 0, &cancel, &known);
+	else return;
 
 	/* Time rod out */
 	o_ptr->timeout = o_ptr->charges;
@@ -1546,6 +1560,7 @@ void do_cmd_activate(void)
 
 	/* Must be true to let us cancel */
 	bool cancel= TRUE;
+	bool known = TRUE;
 
 	object_type *o_ptr;
 
@@ -1682,7 +1697,7 @@ void do_cmd_activate(void)
 		if (a_ptr->activation)
 		{
 			/* Apply artifact effect */
-			(void)process_spell(a_ptr->activation, 0, &cancel);
+			(void)process_spell(a_ptr->activation, 0, &cancel, &known);
 		}
 		else
 		{
@@ -1693,7 +1708,7 @@ void do_cmd_activate(void)
 			if (power < 0) return;
 
 			/* Apply object effect */
-			(void)process_spell(power, 0, &cancel);
+			(void)process_spell(power, 0, &cancel, &known);
 		}
 
 		/* Set the recharge time */
@@ -1729,7 +1744,7 @@ void do_cmd_activate(void)
 		if (power < 0) return;
 
 		/* Apply object effect */
-		(void)process_spell(power, 0, &cancel);
+		(void)process_spell(power, 0, &cancel, &known);
 
 		if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
 

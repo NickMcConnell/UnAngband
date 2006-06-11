@@ -2587,7 +2587,8 @@ static void store_purchase(void)
 			{
 				int power;
 
-				bool cancel;
+				bool cancel = TRUE;
+				bool known = TRUE;
 
 				/* Say "okay" */
 				say_comment_1();
@@ -2599,7 +2600,7 @@ static void store_purchase(void)
 				if (power < 0) return;
 
 				/* Apply service effect */
-				(void)process_spell(power, 0, &cancel);
+				(void)process_spell(power, 0, &cancel, &known);
 
 				/* Hack -- allow certain services to be cancelled */
 				if (cancel) return;

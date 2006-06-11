@@ -98,6 +98,9 @@ This allows much more tactical diversity when using them (Requested by mikon).
 
 - Allow staffs to be used while wielding them (Requested by ekolis).
 
+- Detect magic now detects magical monsters. Detect water now detects watery monsters.
+Detect life now detects living terrain.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -137,6 +140,8 @@ player ignores unusual floor types such as slime, blood and dust whilst running
 - Change ordering in character dump slightly.
 
 - Separate message for when a monster intensifies its aura as an attack spell.
+
+- Decreased total text output for detection spells.
 
 ### Bug fixes ###
 
@@ -251,6 +256,11 @@ opposed to a ratio of range from the centre of effect.
 - Fixed crash bug when player hit by gravity.
 
 - Temporary free action should now time out (Reported by Pete Mac).
+
+- More monsters should be marked as not living (Reported by Pete Mac).
+
+- Detect traps scrolls now correctly mark the map and are identified if and only if
+they detect a trap (Reported by ekolis).
 
 ### Build / Platform ###
 

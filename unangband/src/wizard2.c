@@ -1490,7 +1490,10 @@ void do_cmd_debug(void)
 		/* Detect everything */
 		case 'd':
 		{
-			detect_all();
+			bool cancel = FALSE;
+			bool known = TRUE;
+
+			process_spell_flags(92, 100, &cancel, &known);
 			break;
 		}
 

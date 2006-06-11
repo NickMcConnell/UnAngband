@@ -3676,7 +3676,7 @@ errr parse_r_info(char *buf, header *head)
 
 		/* Hack -- nonliving monsters */
 		/* Death by Physical attack -- non-living monster */
-		if (strchr("Evg", r_ptr->d_char))
+		if (strchr("EvgWLzsN\\/~[]{}", r_ptr->d_char))
 		{
 			r_ptr->flags3 |= RF3_NONLIVING;
 		}
@@ -3868,6 +3868,13 @@ errr parse_r_info(char *buf, header *head)
 
 			/* Start the next entry */
 			s = t;
+		}
+
+		/* Hack -- nonliving monsters */
+		/* Death by Physical attack -- non-living monster */
+		if (r_ptr->flags3 & (RF3_UNDEAD | RF3_DEMON))
+		{
+			r_ptr->flags3 |= RF3_NONLIVING;
 		}
 	}
 
