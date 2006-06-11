@@ -1324,6 +1324,7 @@ void do_cmd_refill(void)
 		s = "You have no sources of oil.";
 
 		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
+
 	}
 	else if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_TORCH))
 	{
@@ -1334,7 +1335,7 @@ void do_cmd_refill(void)
 		q = "Refuel with which torch? ";
 		s = "You have no extra torches.";
 
-		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATG))) return;
+		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATG | USE_BAGS))) return;
 	}
 
 	else
@@ -1346,7 +1347,7 @@ void do_cmd_refill(void)
 		q = "Fill from where? ";
 		s = "You have nothing to fill it with.";
 
-		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
+		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
 	}
 
 	/* Get the item (in the pack) */

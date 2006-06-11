@@ -262,6 +262,8 @@ opposed to a ratio of range from the centre of effect.
 - Detect traps scrolls now correctly mark the map and are identified if and only if
 they detect a trap (Reported by ekolis).
 
+- Can now use flasks and torches from bags (Reported by darkDrone).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
