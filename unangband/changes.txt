@@ -101,6 +101,9 @@ This allows much more tactical diversity when using them (Requested by mikon).
 - Detect magic now detects magical monsters. Detect water now detects watery monsters.
 Detect life now detects living terrain.
 
+- Cure fear effects from potions of boldness, heroism and beserk strength now cure
+petrification as well (Requested by Pete Mac).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -263,6 +266,8 @@ opposed to a ratio of range from the centre of effect.
 they detect a trap (Reported by ekolis).
 
 - Can now use flasks and torches from bags (Reported by darkDrone).
+
+- Fix crash bug when stepping on a food-stealing trap (Reported by Pete Mac).
 
 ### Build / Platform ###
 

@@ -804,9 +804,11 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags3 & (SF3_CURE_BLIND)) vp[vn++]="blindness";
 	if (s_ptr->flags3 & (SF3_CURE_IMAGE)) vp[vn++]="hallucinations";
 	if (s_ptr->flags3 & (SF3_CURE_CONF)) vp[vn++]="confusion";
-	if (s_ptr->flags3 & (SF3_CURE_FEAR)) vp[vn++]="fear";	
+	if (s_ptr->flags3 & (SF3_CURE_FEAR)) vp[vn++]="fear";
+	if (s_ptr->flags3 & (SF3_CURE_FEAR)) vp[vn++]="petrification";
 	if (s_ptr->flags3 & (SF3_FREE_ACT)) vp[vn++]="slowness";
 	if (s_ptr->flags3 & (SF3_CURE_MEM)) vp[vn++]="amnesia";
+	if (s_ptr->flags3 & (SF3_SLOW_CURSE | SF3_CURE_CURSE)) vp[vn++]="curses";
 	if (s_ptr->type == SPELL_CURE_DISEASE) vp[vn++] = disease_name[s_ptr->param];
 
 	/* Describe cure effects */

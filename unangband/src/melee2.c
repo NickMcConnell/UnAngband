@@ -4963,6 +4963,68 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 
 
 /*
+ * Monster gets fed
+ */
+void feed_monster(int m_idx)
+{
+	monster_type *m_ptr = &m_list[m_idx];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	int hp;
+
+	/* Recover stat */
+	/* Note that we use a hack to make hungry attacks make monsters weak. The ordering here
+	   makes monsters that are weak the least likely to recover this. Therefore hungry monsters
+	   will eat more than other monsters. */
+	switch(rand_int(5))
+	{
+		case 0: if ((m_ptr->mflag & (MFLAG_WEAK)) != 0) {  m_ptr->mflag &= ~(MFLAG_WEAK); break; }
+		case 1: if ((m_ptr->mflag & (MFLAG_SICK)) != 0)
+			{
+				m_ptr->mflag &= ~(MFLAG_SICK);
+				hp = calc_monster_hp(m_ptr);
+				if (m_ptr->maxhp < hp) { m_ptr->maxhp = hp; break; }
+			}
+		case 2: if ((m_ptr->mflag & (MFLAG_CLUMSY)) != 0) {  m_ptr->mflag &= ~(MFLAG_CLUMSY); break; }
+		case 3: if ((m_ptr->mflag & (MFLAG_STUPID)) != 0) {  m_ptr->mflag &= ~(MFLAG_STUPID); break; }
+		case 4: if ((m_ptr->mflag & (MFLAG_NAIVE)) != 0) {  m_ptr->mflag &= ~(MFLAG_NAIVE); break; }
+	}
+
+	/* All monsters recover hit points */
+	if (m_ptr->hp < m_ptr->maxhp)
+	{
+		/* Base regeneration */
+		int frac = m_ptr->maxhp / 100;
+
+		/* Minimal regeneration rate */
+		if (!frac) frac = 1;
+
+		/* Some monsters regenerate quickly */
+		if (r_ptr->flags2 & (RF2_REGENERATE)) frac *= 2;
+
+		/* Regenerate */
+		m_ptr->hp += frac;
+
+		/* Do not over-regenerate */
+		if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
+
+		/* Fully healed -> flag minimum range for recalculation */
+		if (m_ptr->hp == m_ptr->maxhp) m_ptr->min_range = 0;
+	}
+
+	/* Hack -- trolls recover more hit points */
+	if (r_ptr->flags3 & (RF3_TROLL))
+	{
+		m_ptr->hp += m_ptr->maxhp / 30;
+		if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
+
+		/* Fully healed -> flag minimum range for recalculation */
+		if (m_ptr->hp == m_ptr->maxhp) m_ptr->min_range = 0;
+	}
+}
+
+
+/*
  * Monster takes its turn.
  */
 static void process_monster(int m_idx)
@@ -5288,7 +5350,7 @@ static void process_monster(int m_idx)
 		/* Something edible found? */
 		if (item)
 		{
-			int hp, part;
+			int part;
 
 			int amount = r_ptr->level + 5;
 
@@ -5373,55 +5435,8 @@ static void process_monster(int m_idx)
 				floor_carry(m_ptr->fy, m_ptr->fx, o_ptr);
 			}
 
-			/* Recover stat */
-			/* Note that we use a hack to make hungry attacks make monsters weak. The ordering here
-			   makes monsters that are weak the least likely to recover this. Therefore hungry monsters
-			   will eat more than other monsters. */
-			switch(rand_int(5))
-			{
-				case 0: if ((m_ptr->mflag & (MFLAG_WEAK)) != 0) {  m_ptr->mflag &= ~(MFLAG_WEAK); break; }
-				case 1: if ((m_ptr->mflag & (MFLAG_SICK)) != 0)
-					{
-						m_ptr->mflag &= ~(MFLAG_SICK);
-						hp = calc_monster_hp(m_ptr);
-						if (m_ptr->maxhp < hp) { m_ptr->maxhp = hp; break; }
-					}
-				case 2: if ((m_ptr->mflag & (MFLAG_CLUMSY)) != 0) {  m_ptr->mflag &= ~(MFLAG_CLUMSY); break; }
-				case 3: if ((m_ptr->mflag & (MFLAG_STUPID)) != 0) {  m_ptr->mflag &= ~(MFLAG_STUPID); break; }
-				case 4: if ((m_ptr->mflag & (MFLAG_NAIVE)) != 0) {  m_ptr->mflag &= ~(MFLAG_NAIVE); break; }
-			}
-
-			/* All monsters recover hit points */
-			if (m_ptr->hp < m_ptr->maxhp)
-			{
-				/* Base regeneration */
-				int frac = m_ptr->maxhp / 100;
-
-				/* Minimal regeneration rate */
-				if (!frac) frac = 1;
-
-				/* Some monsters regenerate quickly */
-				if (r_ptr->flags2 & (RF2_REGENERATE)) frac *= 2;
-
-				/* Regenerate */
-				m_ptr->hp += frac;
-
-				/* Do not over-regenerate */
-				if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
-
-				/* Fully healed -> flag minimum range for recalculation */
-				if (m_ptr->hp == m_ptr->maxhp) m_ptr->min_range = 0;
-			}
-
-			/* Hack -- trolls recover more hit points */
-			if (r_ptr->flags3 & (RF3_TROLL))
-			{
-				m_ptr->hp += m_ptr->maxhp / 30;
-				if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
-
-				/* Fully healed -> flag minimum range for recalculation */
-				if (m_ptr->hp == m_ptr->maxhp) m_ptr->min_range = 0;
-			}
+			/* Monster benefits */
+			feed_monster(m_idx);
 
 			return;
 		}

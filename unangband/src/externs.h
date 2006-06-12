@@ -579,6 +579,7 @@ extern void monster_speech(int m_idx, cptr saying, bool understand);
 extern void tell_allies_player_can(int y, int x, u32b flag);
 extern void tell_allies_player_not(int y, int x, u32b flag);
 extern void tell_allies_mflag(int y, int x, u32b flag, cptr saying);
+extern void feed_monster(int m_idx);
 extern void process_monsters(byte minimum_energy);
 extern int get_scent(int y, int x);
 extern bool cave_exist_mon(int r_idx, int y, int x, bool occupied_ok);
