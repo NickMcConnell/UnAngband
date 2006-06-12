@@ -104,6 +104,8 @@ Detect life now detects living terrain.
 - Cure fear effects from potions of boldness, heroism and beserk strength now cure
 petrification as well (Requested by Pete Mac).
 
+- Store services no longer count towards total store stock levels.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -268,6 +270,9 @@ they detect a trap (Reported by ekolis).
 - Can now use flasks and torches from bags (Reported by darkDrone).
 
 - Fix crash bug when stepping on a food-stealing trap (Reported by Pete Mac).
+
+- Fix infinite loop while maintaining a store when there are too many store services
+(Reported by Pete Mac).
 
 ### Build / Platform ###
 

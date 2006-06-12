@@ -584,7 +584,6 @@ static s16b label_to_store(int c)
 }
 
 
-
 /*
  * Determine if a store object can "absorb" another object.
  *
@@ -602,7 +601,10 @@ static bool store_object_similar(object_type *o_ptr, object_type *j_ptr)
 	/* Different objects cannot be stacked */
 	if (o_ptr->k_idx != j_ptr->k_idx) return (0);
 
-	/* Different pval cannot be stacked */
+	/* MegaHack -- services are simple */
+	if ((o_ptr->tval == TV_SERVICE) && (o_ptr->sval == j_ptr->sval)) return (1);
+
+	/* Different pval cannot be stacked *
 	if (o_ptr->pval != j_ptr->pval) return (0);
 
 	/* Different charges (etc) cannot be stacked */
@@ -3857,6 +3859,8 @@ void store_maint(int which)
 
 	int old_rating = rating;
 
+	int services = 0;
+
 	set_store(which);
 
 	if ((store_num_fake == STORE_HOME) || (store_num_fake == -1)) return;
@@ -3866,6 +3870,14 @@ void store_maint(int which)
 
 	/* Store keeper forgives the player */
 	st_ptr->insult_cur = 0;
+
+	/* Count services to exclude them later */
+	for (j = 0; j < st_ptr->stock_num; j++)
+	{
+		object_type *i_ptr = &(st_ptr->stock[j]);
+
+		if (i_ptr->tval == TV_SERVICE) services++;
+	}
 
 #if 0
 	/* Mega-Hack -- prune the black market */
@@ -3894,16 +3906,19 @@ void store_maint(int which)
 	j = j - randint(STORE_TURNOVER);
 
 	/* Never keep more than "STORE_MAX_KEEP" slots */
-	if (j > STORE_MAX_KEEP) j = STORE_MAX_KEEP;
+	if (j > STORE_MAX_KEEP + services) j = STORE_MAX_KEEP;
 
 	/* Always "keep" at least "STORE_MIN_KEEP" items */
-	if (j < STORE_MIN_KEEP) j = STORE_MIN_KEEP;
+	if (j < STORE_MIN_KEEP + services) j = STORE_MIN_KEEP;
 
 	/* Hack -- prevent "underflow" */
 	if (j < 0) j = 0;
 
-	/* Destroy objects until only "j" slots are left */
-	while (st_ptr->stock_num > j) store_delete();
+	/* Destroy objects until only "j" slots are left -- fail if tried too many times */
+	while ((st_ptr->stock_num > j) && (tries++ < 100)) store_delete();
+
+	/* Reset tries */
+	tries = 0;
 
 	/* Choose the number of slots to fill */
 	j = st_ptr->stock_num;
@@ -3921,7 +3936,7 @@ void store_maint(int which)
 	if (j >= st_ptr->stock_size) j = st_ptr->stock_size - 1;
 
 	/* Create some new items -- fail if tried too many times */
-	while ((st_ptr->stock_num < j) && (tries++ < 1000)) store_create();
+	while ((st_ptr->stock_num < j) && (tries++ < 100)) store_create();
 
 	/* Hack -- Restore the rating */
 	rating = old_rating;
