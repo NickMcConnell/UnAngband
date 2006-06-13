@@ -6311,12 +6311,13 @@ void scatter(int *yp, int *xp, int y, int x, int d, int m)
 {
 	int nx, ny;
 
+	int tries;
 
 	/* Unused parameter */
 	(void)m;
 
 	/* Pick a location */
-	while (TRUE)
+	for (tries = 0; tries < 100; tries++)
 	{
 		/* Pick a new location */
 		ny = rand_spread(y, d);
