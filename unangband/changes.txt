@@ -283,6 +283,11 @@ mikon).
 - Fixed bug where some high-bonus items were worth much less than they should have
 been (Reported by will_asher, ekolis).
 
+- Allow runes to be cast from the first turn after loading / starting the game.
+
+- Ensure that all objects that can fit into a bag do so the first time it is picked
+up.
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

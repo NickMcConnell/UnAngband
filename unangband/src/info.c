@@ -3248,6 +3248,14 @@ void print_spells(const s16b *book, int num, int y, int x)
 		/* Get the spell index */
 		spell = book[i];
 
+		/* Skip missing spells */
+		if (!spell)
+		{
+			sprintf(out_val, "  %c) %-30s", I2A(i), "(missing)");
+			c_prt(TERM_L_DARK, out_val, y + i + 1, x);
+			continue;
+		}
+
 		/* Get the spell info */
 		s_ptr = &s_info[spell];
 

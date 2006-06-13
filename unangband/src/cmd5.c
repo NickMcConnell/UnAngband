@@ -364,7 +364,6 @@ bool inven_book_okay(const object_type *o_ptr)
 			{
 				for (iii=0;iii<MAX_SPELL_CASTERS;iii++)
 				{
-
 					if (s_ptr->cast[iii].class == p_ptr->pclass) return(1);
 				}
 			}
@@ -441,8 +440,8 @@ void do_cmd_browse(void)
 	item_tester_hook = inven_book_okay;
 
 	/* Get an item */
-	q = "Browse which book? ";
-	s = "You have no books that you can read.";
+	q = "Browse which book or runestone? ";
+	s = "You have no books or runestones that you can read.";
 	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_BAGS))) return;
 
 	/* Get the item (in the pack) */

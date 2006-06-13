@@ -1729,9 +1729,6 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 		object_copy(i_ptr, o_ptr);
 		object_copy(o_ptr, j_ptr);
 		j_ptr = i_ptr;
-
-		/* Re-order again */
-		p_ptr->notice |= (PN_REORDER);
 	}
 
 	/* Hack -- magical bags -- object swallowed by bag */
@@ -1775,6 +1772,9 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 				bag_contents[o_ptr->sval][i] = total;
 			}
 		}
+
+		/* Combine and re-order again */
+		p_ptr->notice |= (PN_COMBINE | PN_REORDER);
 
 		/* Successful */
 		return;
@@ -7977,7 +7977,7 @@ void fill_book(const object_type *o_ptr, s16b *book, int *num)
 					if (p_ptr->cur_runes & (2 << (slot-1)))
 					{
 						/* Use book as hash table */
-                                                slot = slot % 20;
+                                                slot = (slot - 1) % (INVEN_PACK - 1);
 
 						/* Free entry in book */
 						if (book[slot] == 0)
@@ -7988,7 +7988,7 @@ void fill_book(const object_type *o_ptr, s16b *book, int *num)
 						/* Collision -- minimise impact by going from end of table */
 						else
 						{
-                                                        for (slot = 19; (slot >=0) && book[slot]; slot--) ;
+                                                        for (slot = INVEN_PACK - 2; (slot >=0) && book[slot]; slot--) ;
 
 							if ((slot >= 0) && (!book[slot])) book[slot] = i;
 						}

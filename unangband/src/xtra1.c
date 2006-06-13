@@ -2459,7 +2459,7 @@ static void calc_mana(void)
  */
 static void calc_runes(void)
 {
-        int i;
+        int i, ii;
         int this_o_idx,next_o_idx;
 
 	/* Clear runes */
@@ -2468,9 +2468,30 @@ static void calc_runes(void)
 	/* Check inventory */
 	for (i = 0;i<INVEN_WIELD;i++)
 	{
-		if (inventory[i].k_idx)
+		/* Skip empty slots */
+		if (!inventory[i].k_idx) continue;
+
+		/* Check for runes */
+		if (inventory[i].tval == TV_RUNESTONE)
 		{
-			if (inventory[i].tval == TV_RUNESTONE) p_ptr->cur_runes |= (2 << (inventory[i].sval-1));
+			/* Add to available runes */
+			p_ptr->cur_runes |= (2 << (inventory[i].sval-1));
+		}
+
+		/* Check for bags for runes */
+		else if (inventory[i].tval == TV_BAG)
+		{
+			/* Scan the bag */
+			for (ii = 0; ii < INVEN_BAG_TOTAL; ii++)
+			{
+				/* Slot holds a map */
+				if ((bag_holds[inventory[i].sval][ii][0] == TV_RUNESTONE) && (bag_contents[inventory[i].sval][ii]))
+				{
+					int sval = bag_holds[inventory[i].sval][ii][1];
+
+					p_ptr->cur_runes |= (2 << (sval - 1));
+				}
+			}
 		}
 	}
 

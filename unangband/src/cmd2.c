@@ -447,7 +447,7 @@ static void do_cmd_travel(void)
 				s16b routes[24];
 				char out_val[160];
 
-				int i, num = 0;
+				int i, ii, num = 0;
 
 				bool flag, redraw;
 				key_event ke;
@@ -470,6 +470,7 @@ static void do_cmd_travel(void)
 					/* Skip non-objects */
 					if (!inventory[i].k_idx) continue;
 
+					/* Check for maps */
 					if (inventory[i].tval == TV_MAP)
 					{
 						if (t_info[inventory[i].sval].nearby == p_ptr->dungeon)
@@ -479,6 +480,29 @@ static void do_cmd_travel(void)
 						else
 						{
 							routes[num++] = -inventory[i].sval - 1;
+						}
+					}
+
+					/* Check for bags for maps */
+					else if (inventory[i].tval == TV_BAG)
+					{
+						/* Scan the bag */
+						for (ii = 0; ii < INVEN_BAG_TOTAL; ii++)
+						{
+							/* Slot holds a map */
+							if ((bag_holds[inventory[i].sval][ii][0] == TV_MAP) && (bag_contents[inventory[i].sval][ii]))
+							{
+								int sval = bag_holds[inventory[i].sval][ii][1];
+
+								if (t_info[sval].nearby == p_ptr->dungeon)
+								{
+									routes[num++] = sval;
+								}
+								else
+								{
+									routes[num++] = -sval - 1;
+								}
+							}
 						}
 					}
 				}

@@ -3062,7 +3062,7 @@ static void dungeon(void)
 	Term_clear();
 
 	/* Update stuff */
-	p_ptr->update |= (PU_BONUS | PU_HP | PU_MANA | PU_SPELLS);
+	p_ptr->update |= (PU_BONUS | PU_HP | PU_MANA | PU_SPELLS | PU_RUNES);
 
 	/* Calculate torch radius */
 	p_ptr->update |= (PU_TORCH);
