@@ -6192,8 +6192,13 @@ s16b get_feat_num(int level)
 		/* Occasional "boost" */
 		if (rand_int(GREAT_OBJ) == 0)
 		{
+#if 0
 			/* What a bizarre calculation */
 			level = 1 + (level * MAX_DEPTH / randint(MAX_DEPTH));
+#endif
+
+			/* 10-20 levels boost */
+			level += (10 + rand_int(11));
 		}
 	}
 
@@ -6217,17 +6222,28 @@ s16b get_feat_num(int level)
 		/* Get the actual feature */
 		f_ptr = &f_info[f_idx];
 
-		/* Hack -- no upstairs on surface */
-		if ((f_ptr->flags1 & (FF1_LESS)) && (p_ptr->depth == min_depth(p_ptr->dungeon))) continue;
+		/* Hack -- restrict up stairs */
+		if (f_ptr->flags1 & (FF1_LESS))
+		{
+			/* On surface -- hack - towers place their upstairs separately */
+			if (p_ptr->depth == min_depth(p_ptr->dungeon)) continue;
 
-		/* Hack -- no chasm/trap doors/down stairs on quest levels */
-		if ((f_ptr->flags1 & (FF1_MORE)) && is_quest(p_ptr->depth)) continue;
+			/* On quest levels in towers */
+			if ((t_info[p_ptr->dungeon].zone[0].tower) && (is_quest(p_ptr->depth))) continue;
+		}
 
-		/* Hack -- no chasm/trap doors/down stairs at the bottom of a tower dungeon */
-		if ((t_info[p_ptr->dungeon].zone[0].tower) && (p_ptr->depth == 1)) continue;
+		/* Hack -- no chasm/trap doors/down stairs/wells on quest levels */
+		if (f_ptr->flags1 & (FF1_MORE))
+		{
+			/* At bottom of dungeon except in towers */
+			if (!(t_info[p_ptr->dungeon].zone[0].tower) && (p_ptr->depth == max_depth(p_ptr->dungeon))) continue;
 
-		/* Hack -- no chasm/trap doors/down stairs on the deepest level */
-		else if ((f_ptr->flags1 & (FF1_MORE)) && (p_ptr->depth == max_depth(p_ptr->dungeon))) continue;
+			/* On quest levels except in towers */
+			if (!(t_info[p_ptr->dungeon].zone[0].tower) && (is_quest(p_ptr->depth))) continue;
+
+			/* Hack -- no chasm/trap doors/down stairs at the bottom of a tower dungeon */
+			if ((t_info[p_ptr->dungeon].zone[0].tower) && (p_ptr->depth == 1)) continue;
+		}
 
 		/* Accept */
 		table[i].prob3 = table[i].prob2;

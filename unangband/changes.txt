@@ -274,6 +274,13 @@ they detect a trap (Reported by ekolis).
 - Fix infinite loop while maintaining a store when there are too many store services
 (Reported by Pete Mac).
 
+- Significantly out of depth terrain should no longer be generated (Reported by mikon,
+from NPPAngband).
+
+- Fake objects used in the terrain code should no longer be detected (Reported by
+mikon).
+
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

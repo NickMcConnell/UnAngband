@@ -1082,6 +1082,9 @@ bool detect_objects_tval(int tval)
 		/* Skip held objects */
 		if (o_ptr->held_m_idx) continue;
 
+		/* Skip stored objects */
+		if (o_ptr->ident & (IDENT_STORE)) continue;
+
 		/* Location */
 		y = o_ptr->iy;
 		x = o_ptr->ix;
@@ -1127,6 +1130,9 @@ bool detect_objects_normal(void)
 
 		/* Skip held objects */
 		if (o_ptr->held_m_idx) continue;
+
+		/* Skip stored objects */
+		if (o_ptr->ident & (IDENT_STORE)) continue;
 
 		/* Location */
 		y = o_ptr->iy;
@@ -1411,6 +1417,9 @@ bool detect_objects_magic(void)
 		/* Skip held objects */
 		if (o_ptr->held_m_idx) continue;
 
+		/* Skip stored objects */
+		if (o_ptr->ident & (IDENT_STORE)) continue;
+
 		/* Location */
 		y = o_ptr->iy;
 		x = o_ptr->ix;
@@ -1526,6 +1535,9 @@ bool detect_objects_cursed(void)
 		/* Skip held objects */
 		if (o_ptr->held_m_idx) continue;
 
+		/* Skip stored objects */
+		if (o_ptr->ident & (IDENT_STORE)) continue;
+
 		/* Location */
 		y = o_ptr->iy;
 		x = o_ptr->ix;
@@ -1630,6 +1642,9 @@ bool detect_objects_power(void)
 
 		/* Skip held objects */
 		if (o_ptr->held_m_idx) continue;
+
+		/* Skip stored objects */
+		if (o_ptr->ident & (IDENT_STORE)) continue;
 
 		/* Location */
 		y = o_ptr->iy;
