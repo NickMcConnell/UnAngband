@@ -1291,15 +1291,13 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 	/*
          * Display object value
-         * Hack -- we use 50% of object value so player can feel like they
-         * are making a profit some of the time.
          */
 	if (o_ptr->ident & (IDENT_VALUE))
 	{
 		
 
 		object_desc_str_macro(t, " worth ");
-		object_desc_num_macro(t,object_value_real(o_ptr) / 2);
+		object_desc_num_macro(t,object_value_real(o_ptr));
 		object_desc_str_macro(t, " gold pieces");
 	}
 

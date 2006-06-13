@@ -280,6 +280,8 @@ from NPPAngband).
 - Fake objects used in the terrain code should no longer be detected (Reported by
 mikon).
 
+- Fixed bug where some high-bonus items were worth much less than they should have
+been (Reported by will_asher, ekolis).
 
 ### Build / Platform ###
 

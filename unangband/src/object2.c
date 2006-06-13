@@ -1093,7 +1093,7 @@ s32b object_value_real(const object_type *o_ptr)
 		case TV_DRAG_ARMOR:
 		{
 			/* Factor in the bonuses not considered by power equation */
-			value += o_ptr->to_a < 9 ? o_ptr->to_a * 100L : 0;
+			value += o_ptr->to_a < 10 ? o_ptr->to_a * 100L : 0;
 
 			break;
 		}
@@ -1119,8 +1119,8 @@ s32b object_value_real(const object_type *o_ptr)
 
 		{
 			/* Factor in the bonuses not considered by power equation */
-			value += o_ptr->to_h < 9 ? o_ptr->to_h * 100L : 0;
-			value += o_ptr->to_d < 9 ? o_ptr->to_d * 100L : 0;
+			value += o_ptr->to_h < 12 ? o_ptr->to_h * 100L : 0;
+			value += o_ptr->to_d < 10 ? o_ptr->to_d * 100L : 0;
 
 			/* Done */
 			break;
@@ -1132,8 +1132,8 @@ s32b object_value_real(const object_type *o_ptr)
 		case TV_BOLT:
 		{
 			/* Factor in the bonuses not considered by power equation */
-			value += o_ptr->to_h < 9 ? o_ptr->to_h * 5L : 0;
-			value += o_ptr->to_d < 9 ? o_ptr->to_d * 5L : 0;
+			value += o_ptr->to_h < 12 ? o_ptr->to_h * 5L : 0;
+			value += o_ptr->to_d < 10 ? o_ptr->to_d * 5L : 0;
 
 			/* Done */
 			break;
@@ -1168,7 +1168,7 @@ s32b object_value(const object_type *o_ptr)
 
 
 	/* Known items -- acquire the actual value */
-	if (object_known_p(o_ptr))
+	if (object_known_p(o_ptr) || ((o_ptr->ident & (IDENT_VALUE | IDENT_STORE)) != 0))
 	{
 		/* Broken items -- worthless */
 		if (broken_p(o_ptr)) return (0L);

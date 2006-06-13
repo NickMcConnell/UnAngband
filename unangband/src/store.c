@@ -1427,14 +1427,9 @@ static void store_create(void)
 			/* if (object_value(i_ptr) <= 0) continue; */
 		}
 
-		/* Prune normal stores */
-		else
 #endif
-		{
-			/* No "worthless" items */
-			if (object_value(i_ptr) <= 0) continue;
-		}
-
+		/* No "worthless" items */
+		if (object_value(i_ptr) <= 0) continue;
 
 		/* Mass produce and/or Apply discount */
 		mass_produce(i_ptr);
