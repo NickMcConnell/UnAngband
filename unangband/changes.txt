@@ -112,6 +112,9 @@ petrification as well (Requested by Pete Mac).
 
 - Added ranged attack to Bert, Bill, Tom (Suggested by Pete Mack).
 
+- Store selling oil and lanterns is now available from Rivendell (Suggested by
+Pete Mack).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

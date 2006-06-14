@@ -550,10 +550,7 @@ O:93:26:1
 O:93:27:1
 O:93:28:1
 
-#Service of Analyze Magic and Read Magic
 N:33:Chemist
-O:99:22:0
-O:99:27:0
 O:70:8:4
 O:70:11:4
 O:70:12:3
@@ -578,6 +575,8 @@ O:70:54:1
 O:70:55:1
 O:70:56:1
 O:70:57:1
+O:39:1:4
+O:77:0:4
 
 N:34:Gandalf's Firework Shop
 O:65:7:1

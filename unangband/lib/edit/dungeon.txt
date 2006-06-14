@@ -81,7 +81,7 @@ D:Tip: Press '<' to travel elsewhere.
 N:2:Rivendell
 X:39:3
 L:0:0:420:155:0:0
-S:267:9:10:11:12:13:268:513
+S:267:9:10:11:519:13:268:513
 
 # Misty Mountains are quite wet (Underground rivers etc).
 
@@ -185,7 +185,7 @@ L:14:420:154:126:453:0
 N:14:Rivendell
 X:15:17
 L:0:0:420:155:0:0
-S:267:516:503:11:12:505:268:513
+S:267:516:503:11:519:505:268:513
 
 N:15:Caradhras
 X:16:19
