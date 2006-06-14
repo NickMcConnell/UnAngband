@@ -6333,6 +6333,13 @@ void scatter(int *yp, int *xp, int y, int x, int d, int m)
 		if (generic_los(y, x, ny, nx, CAVE_XLOF)) break;
 	}
 
+	/* Failed? */
+	if (tries >= 100)
+	{
+		ny = y;
+		nx = x;
+	}
+
 	/* Save the location */
 	(*yp) = ny;
 	(*xp) = nx;
