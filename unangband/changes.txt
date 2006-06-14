@@ -296,6 +296,9 @@ up.
 
 - Prevent infinite looping in scatter algorithm (Reported by Pete Mac).
 
+- Increased space available for room and dungeon descriptions to prevent
+crashing on some platforms (Reported by Pete Mac).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

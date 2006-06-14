@@ -3889,8 +3889,8 @@ static void room_info_top(int room)
 {
 	char first[2];
 	char name[40];
-	char text_visible[240];
-	char text_always[240];
+	char text_visible[1024];
+	char text_always[1024];
 
 	/* Hack -- handle "xtra" mode */
 	if (!character_dungeon) return;
@@ -3922,8 +3922,8 @@ static void room_info_top(int room)
 static void screen_room_info(int room)
 {
 	char name[32];
-	char text_visible[240];
-	char text_always[240];
+	char text_visible[1024];
+	char text_always[1024];
 
 	/* Hack -- handle "xtra" mode */
 	if (!character_dungeon) return;
@@ -3974,8 +3974,8 @@ void display_room_info(int room)
 {
 	int y;
 	char name[32];
-	char text_visible[240];
-	char text_always[240];
+	char text_visible[1024];
+	char text_always[1024];
 
 	/* Hack -- handle "xtra" mode */
 	if (!character_dungeon) return;
@@ -4031,8 +4031,8 @@ void describe_room(void)
 	int bx = p_ptr->px / BLOCK_WID;
 	int room = dun_room[by][bx];
 	char name[32];
-	char text_visible[240];
-	char text_always[240];
+	char text_visible[1024];
+	char text_always[1024];
 
 
 #ifdef ALLOW_BORG
