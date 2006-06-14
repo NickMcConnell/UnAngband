@@ -110,6 +110,8 @@ petrification as well (Requested by Pete Mac).
 
 - Added extra spells to Smaug (From Oangband).
 
+- Added ranged attack to Bert, Bill, Tom (Suggested by Pete Mack).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
