@@ -106,6 +106,10 @@ petrification as well (Requested by Pete Mac).
 
 - Store services no longer count towards total store stock levels.
 
+- Added HURT_LITE to Black Rider at Weathertop (Suggested by Pete Mack).
+
+- Added extra spells to Smaug (From Oangband).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
