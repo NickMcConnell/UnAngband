@@ -22,6 +22,9 @@ EXOBJS = $(COMMONOBJS) angband.res readdib.o
 readdib.o: readdib.c readdib.h
 	$(CC) $(CFLAGS) -DNEAR= $(INCDIRS) -c -o $@ $<
 
+main-win.o: main-win.c
+	$(CC) $(CFLAGS) -DNEAR= $(INCDIRS) -c -o $@ $<
+
 #
 # Targets
 #
