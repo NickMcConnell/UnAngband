@@ -364,6 +364,8 @@ void teleport_player(int dis)
 
 	bool look = TRUE;
 
+	/* Paranoia */
+	if (dis <= 0) return;
 
 	/* Initialize */
 	y = py;
@@ -9755,7 +9757,7 @@ bool project_t(int who, int y, int x, int dam, int typ)
 					msg_print("The wind buffets you about.");
 
 				/* Throw the player around unsafely. */
-				teleport_player(dist);
+				if (dist) teleport_player(dist);
 			}
 
 			if (affect_monster)
@@ -9819,7 +9821,7 @@ bool project_t(int who, int y, int x, int dam, int typ)
 		{
 			if (affect_player)
 			{
-				teleport_player(dam);
+				if (dam) teleport_player(dam);
 			}
 
 			if (affect_monster)

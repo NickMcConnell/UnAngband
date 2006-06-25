@@ -302,6 +302,8 @@ up.
 - Increased space available for room and dungeon descriptions to prevent
 crashing on some platforms (Reported by Pete Mac).
 
+- Prevent infinite looping when the player hit by wind attacks (Reported by Pete Mac).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
