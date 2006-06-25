@@ -316,7 +316,9 @@ crashing on some platforms (Reported by Pete Mac).
 
 - Fixed typo preventing main-xaw from building (Thanks to Nick McConnell for this).
 
-- Add Os/X support (Thanks to Pete Mac for this).
+- Added Os/X support (Thanks to Pete Mac for this).
+
+- Added support for automake on Linux / Unix systems (Thanks to Nick McConnell for this).
 
 
 Unangband 0.6.0 "Where's the Tequila? Did Tara Reid steal all the drinks?" (The Ari
