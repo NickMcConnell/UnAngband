@@ -49,7 +49,7 @@ copy src\*.h angband\src
 copy src\*.c angband\src
 copy src\Makefile.* angband\src
 
-zip -9 -r unangband-061-src.zip angband
+7z a -tzip -r unangband-061-src.zip angband
 
 rmdir /q /s angband
 

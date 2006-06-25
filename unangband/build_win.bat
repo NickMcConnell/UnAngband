@@ -51,7 +51,7 @@ copy lib\xtra\help\angband.cnt angband\lib\xtra\help
 
 upx -9 angband\angband.exe
 
-zip -9 -r unangband-061-win.zip angband
+7z a -tzip -r unangband-061-win.zip angband
 
-rmdir /s angband
+rmdir /q /s angband
 

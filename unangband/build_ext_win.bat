@@ -17,7 +17,7 @@ copy src\readdib.c ext-win\src\
 copy src\readdib.h ext-win\src\
 
 cd ext-win
-zip -9 -r ..\ext-win-306.zip *
+7z a -tzip ..\ext-win-306.zip *
 
 cd ..
 rmdir /q /s ext-win
