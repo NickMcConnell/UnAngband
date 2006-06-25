@@ -1,57 +1,57 @@
-mkdir angband
-mkdir angband\lib
-mkdir angband\lib\apex
-mkdir angband\lib\bone
-mkdir angband\lib\data
-mkdir angband\lib\edit
-mkdir angband\lib\file
-mkdir angband\lib\help
-mkdir angband\lib\info
-mkdir angband\lib\pref
-mkdir angband\lib\save
-mkdir angband\lib\script
-mkdir angband\lib\user
-mkdir angband\lib\xtra
-mkdir angband\lib\xtra\font
-mkdir angband\lib\xtra\graf
-mkdir angband\lib\xtra\music
-mkdir angband\lib\xtra\sound
-mkdir angband\lib\xtra\help
+mkdir unangband-061-win
+mkdir unangband-061-win\lib
+mkdir unangband-061-win\lib\apex
+mkdir unangband-061-win\lib\bone
+mkdir unangband-061-win\lib\data
+mkdir unangband-061-win\lib\edit
+mkdir unangband-061-win\lib\file
+mkdir unangband-061-win\lib\help
+mkdir unangband-061-win\lib\info
+mkdir unangband-061-win\lib\pref
+mkdir unangband-061-win\lib\save
+mkdir unangband-061-win\lib\script
+mkdir unangband-061-win\lib\user
+mkdir unangband-061-win\lib\xtra
+mkdir unangband-061-win\lib\xtra\font
+mkdir unangband-061-win\lib\xtra\graf
+mkdir unangband-061-win\lib\xtra\music
+mkdir unangband-061-win\lib\xtra\sound
+mkdir unangband-061-win\lib\xtra\help
 
-copy lib\apex\delete.me angband\lib\apex
-copy lib\bone\delete.me angband\lib\bone
-copy lib\data\delete.me angband\lib\data
-copy lib\info\delete.me angband\lib\info
-copy lib\save\delete.me angband\lib\save
-copy lib\user\delete.me angband\lib\user
-copy lib\xtra\music\delete.me angband\lib\xtra\music
+copy lib\apex\delete.me unangband-061-win\lib\apex
+copy lib\bone\delete.me unangband-061-win\lib\bone
+copy lib\data\delete.me unangband-061-win\lib\data
+copy lib\info\delete.me unangband-061-win\lib\info
+copy lib\save\delete.me unangband-061-win\lib\save
+copy lib\user\delete.me unangband-061-win\lib\user
+copy lib\xtra\music\delete.me unangband-061-win\lib\xtra\music
 
-copy angband.exe angband
-copy readme.txt angband
-copy changes.txt angband
+copy angband.exe unangband-061-win
+copy readme.txt unangband-061-win
+copy changes.txt unangband-061-win
 
-copy lib\edit\*.txt angband\lib\edit
+copy lib\edit\*.txt unangband-061-win\lib\edit
 
-copy lib\file\*.txt angband\lib\file
+copy lib\file\*.txt unangband-061-win\lib\file
 
-copy lib\help\*.txt angband\lib\help
-copy lib\help\*.hlp angband\lib\help
+copy lib\help\*.txt unangband-061-win\lib\help
+copy lib\help\*.hlp unangband-061-win\lib\help
 
-copy lib\pref\*.prf angband\lib\pref
+copy lib\pref\*.prf unangband-061-win\lib\pref
 
-copy lib\xtra\font\*.fon angband\lib\xtra\font
+copy lib\xtra\font\*.fon unangband-061-win\lib\xtra\font
 
-copy lib\xtra\graf\*.bmp angband\lib\xtra\graf
+copy lib\xtra\graf\*.bmp unangband-061-win\lib\xtra\graf
 
-copy lib\xtra\sound\sound.cfg angband\lib\xtra\sound
-copy lib\xtra\sound\*.wav angband\lib\xtra\sound
+copy lib\xtra\sound\sound.cfg unangband-061-win\lib\xtra\sound
+copy lib\xtra\sound\*.wav unangband-061-win\lib\xtra\sound
 
-copy lib\xtra\help\angband.hlp angband\lib\xtra\help
-copy lib\xtra\help\angband.cnt angband\lib\xtra\help
+copy lib\xtra\help\angband.hlp unangband-061-win\lib\xtra\help
+copy lib\xtra\help\angband.cnt unangband-061-win\lib\xtra\help
 
-upx -9 angband\angband.exe
+upx -9 unangband-061-win\angband.exe
 
-7z a -tzip -r unangband-061-win.zip angband
+7z a -tzip -r unangband-061-win.zip unangband-061-win
 
-rmdir /q /s angband
+rmdir /q /s unangband-061-win
 
