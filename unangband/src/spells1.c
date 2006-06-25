@@ -364,6 +364,8 @@ void teleport_player(int dis)
 
 	bool look = TRUE;
 
+	int tries = 0;
+
 	/* Paranoia */
 	if (dis <= 0) return;
 
@@ -408,22 +410,28 @@ void teleport_player(int dis)
 			/* Ignore illegal locations */
 			if (!in_bounds_fully(y, x)) continue;
 
-			/* Require "start" floor space */
-			if (!cave_start_bold(y, x)) continue;
+			/* Count tries */
+			tries++;
 
-			/* Check room */
-			if (cave_info[py][px] & (CAVE_ROOM))
+			/* Require "start" floor space if not looking hard */
+			if ((!cave_start_bold(y, x)) && (tries < 1000)) continue;
+
+			/* Permit unsafe empty locations if looking hard */
+			else if (!(cave_empty_bold(y,x))) continue;
+
+			/* Don't allow teleporting out of vaults once inside */
+			if ((cave_info[py][px] & (CAVE_ROOM)) && (room_has_flag(py, px, ROOM_ICKY)) && (tries < 2000))
 			{
-				/* Don't allow teleporting out of vaults once inside */
-				if (room_has_flag(py, px, ROOM_ICKY))
-				{
-					if (!(cave_info[y][x] & (CAVE_ROOM))) continue;
-					if (dun_room[py/BLOCK_HGT][px/BLOCK_WID] != dun_room[y/BLOCK_HGT][x/BLOCK_WID]) continue;
-				}
-
-				/* Don't allow teleporting into vaults */
-				else if (room_has_flag(y, x, ROOM_ICKY)) continue;
+				if (!(cave_info[y][x] & (CAVE_ROOM))) continue;
+				if (dun_room[py/BLOCK_HGT][px/BLOCK_WID] != dun_room[y/BLOCK_HGT][x/BLOCK_WID]) continue;
 			}
+
+			/* Don't allow teleporting into vaults if outside */
+			else if ((cave_info[y][x] & (CAVE_ROOM)) && (room_has_flag(y, x, ROOM_ICKY)) && (tries < 2000))
+			{
+				continue;
+			}
+
 
 			/* This grid looks good */
 			look = FALSE;
