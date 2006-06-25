@@ -18,7 +18,8 @@
 
 
 
-#ifdef SET_UID
+/* Hack for detecting unix stuff. */
+#ifdef PRIVATE_USER_PATH
 
 # ifndef HAVE_USLEEP
 
@@ -143,7 +144,7 @@ void user_name(char *buf, size_t len, int id)
 #else /* ACORN */
 
 
-#ifdef SET_UID
+#ifdef PRIVATE_USER_PATH
 
 /*
  * Extract a "parsed" path from an initial filename
@@ -214,7 +215,7 @@ errr path_parse(char *buf, int max, cptr file)
 }
 
 
-#else /* SET_UID */
+#else /* PRIVATE_USER_PATH */
 
 
 /*
@@ -317,12 +318,21 @@ errr path_build(char *buf, int max, cptr path, cptr file)
 FILE *my_fopen(cptr file, cptr mode)
 {
 	char buf[1024];
+	FILE *fff;
 
 	/* Hack -- Try to parse the path */
 	if (path_parse(buf, 1024, file)) return (NULL);
 
 	/* Attempt to fopen the file anyway */
-	return (fopen(buf, mode));
+	fff = (fopen(buf, mode));
+#if defined(MAC_MPW) || defined(MACH_O_CARBON)
+
+    /* Set file creator and type */
+    if (fff && strchr(mode, 'w')) fsetfileinfo(buf, _fcreator, _ftype);
+
+#endif
+
+	return fff;
 }
 
 
@@ -552,22 +562,28 @@ errr fd_copy(cptr file, cptr what)
 int fd_make(cptr file, int mode)
 {
 	char buf[1024];
+	int fd;
 
 	/* Hack -- Try to parse the path */
 	if (path_parse(buf, 1024, file)) return (-1);
 
-#if defined(MACINTOSH)
-
+#ifdef MACINTOSH
 	/* Create the file, fail if exists, write-only, binary */
-	return (open(buf, O_CREAT | O_EXCL | O_WRONLY | O_BINARY));
+	fd = (open(buf, O_CREAT | O_EXCL | O_WRONLY | O_BINARY));
 
 #else
-
 	/* Create the file, fail if exists, write-only, binary */
-	return (open(buf, O_CREAT | O_EXCL | O_WRONLY | O_BINARY, mode));
+	fd = (open(buf, O_CREAT | O_EXCL | O_WRONLY | O_BINARY, mode));
 
 #endif
 
+#ifdef MACH_O_CARBON
+    /* Set file creator and type */
+    if (fd >= 0) fsetfileinfo(buf, _fcreator, _ftype);
+
+#endif
+
+	return fd;
 }
 
 
