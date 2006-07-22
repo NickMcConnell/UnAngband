@@ -769,6 +769,9 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			append_name = TRUE;
 			basenm = (o_ptr->name3 ? "& # Flask~" : "& Flask~");
 
+			/* Racially mark the object */
+			if (o_ptr->name3) modstr = (r_name + r_info[o_ptr->name3].name);
+
 			break;
 		}
 
@@ -1025,6 +1028,16 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		{
 			/* Nothing */
 		}
+	}
+
+	/* Hack -- display debug tval/sval info in cheat_xtra mode */
+	if (cheat_xtra)
+	{
+		object_desc_str_macro(t, "(t");
+		object_desc_num_macro(t,o_ptr->tval);
+		object_desc_str_macro(t, ":s");
+		object_desc_num_macro(t,o_ptr->sval);
+		object_desc_str_macro(t, ") ");
 	}
 
 	/* Hack -- display debug stack info in cheat_xtra mode */

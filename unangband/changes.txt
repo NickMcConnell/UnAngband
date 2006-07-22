@@ -158,7 +158,7 @@ player ignores unusual floor types such as slime, blood and dust whilst running
 - Decreased total text output for detection spells.
 
 - When travelling, display the levels of your destination. Also display the
-levels and origin when examining any map (Suggested by darkDrone).
+levels and origin when examining any map (Suggested by Adam Horowitz).
 
 ### Bug fixes ###
 
@@ -316,6 +316,9 @@ charges (Reported by jevansau1).
 
 - Identifying or sensing an object clears more "sensed" inscriptions (Reported by
 ekolis).
+
+- Flasks of bile and blood now display the monster they are from (Reported by Pete
+mac).
 
 ### Build / Platform ###
 
