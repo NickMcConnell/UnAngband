@@ -1103,7 +1103,7 @@ s32b object_value_real(const object_type *o_ptr)
 		case TV_STAFF:
 		{
 			/* Pay extra for charges, depending on standard number of charges */
-			value += ((value / 20) * (o_ptr->charges / o_ptr->number));
+			value += ((value / 20) * o_ptr->charges);
 
 			if (o_ptr->tval == TV_WAND) break;
 

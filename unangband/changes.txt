@@ -306,6 +306,9 @@ crashing on some platforms (Reported by Pete Mac).
 
 - Fix infinite loop when teleporting in Edoras.
 
+- Fixed crash caused when selling or dropping an item that has been valued and has
+charges (Reported by jevansau1).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
@@ -322,6 +325,8 @@ crashing on some platforms (Reported by Pete Mac).
 
 - Add batch files to build windows executeable and source archives (Modelled on angband
 equivalent files).
+
+- Fix to makefile.cyg dependencies and unterminated comment (Reported by Pete mac).
 
 Unangband 0.6.0 "Where's the Tequila? Did Tara Reid steal all the drinks?" (The Ari
 Gold Release)
