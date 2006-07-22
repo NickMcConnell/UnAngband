@@ -5262,7 +5262,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (attack < 32*4)
 			{
 				l_ptr->flags4 |= (1L << (attack - 32*3));
-				if (l_ptr->cast_spell < MAX_UCHAR) l_ptr->cast_spell++;
+				if (l_ptr->cast_innate < MAX_UCHAR) l_ptr->cast_innate++;
 
 				/* Hack -- always notice if powerful */
 				if (r_ptr->flags2 & (RF2_POWERFUL)) l_ptr->flags2 |= (RF2_POWERFUL);

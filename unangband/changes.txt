@@ -320,6 +320,10 @@ ekolis).
 - Flasks of bile and blood now display the monster they are from (Reported by Pete
 mac).
 
+- You know learn about monster innate attacks as distinct from monster spells
+(Reported by ekolis).
+
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
