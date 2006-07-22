@@ -2959,6 +2959,9 @@ static void store_sell(void)
 			/* The object belongs to the store now */
 			i_ptr->ident |= IDENT_STORE;
 
+			/* The object is valued by the shopkeeper now */
+			i_ptr->ident &= ~(IDENT_VALUE);
+
 			/* Get the "actual" value */
 			value = object_value(i_ptr) * i_ptr->number;
 

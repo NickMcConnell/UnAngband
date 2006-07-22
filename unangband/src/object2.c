@@ -752,13 +752,23 @@ void object_mental(object_type *o_ptr)
 void object_known(object_type *o_ptr)
 {
 	/* Remove special inscription, except special inscriptions */
-	if ((o_ptr->feeling) && (o_ptr->feeling < INSCRIP_MIN_HIDDEN)) o_ptr->feeling = 0;
+	if (o_ptr->feeling < INSCRIP_MIN_HIDDEN) o_ptr->feeling = 0;
+	if (o_ptr->feeling >= MAX_INSCRIP) o_ptr->feeling = 0;
 
 	/* The object is not "sensed" */
 	o_ptr->ident &= ~(IDENT_SENSE);
 
 	/* The object is not "partially sensed" */
 	o_ptr->ident &= ~(IDENT_BONUS);
+
+	/* The object is not "charge sensed" */
+	o_ptr->ident &= ~(IDENT_CHARGES);
+
+	/* The object is not "name sensed" */
+	o_ptr->ident &= ~(IDENT_NAME);
+
+	/* The object is not "pval sensed" */
+	o_ptr->ident &= ~(IDENT_PVAL);
 
 	/* The object name is not guessed */
 	o_ptr->guess1 = 0;
@@ -898,6 +908,9 @@ void object_aware(object_type *o_ptr)
 
 	/* Auto-inscribe */
 	if (!o_ptr->note) o_ptr->note = k_info[o_ptr->k_idx].note;
+
+	/* Lose "magic bag" feeling */
+	if (o_ptr->feeling >= MAX_INSCRIP) o_ptr->feeling = 0;
 
 	/* Fully aware of the effects */
 	k_info[o_ptr->k_idx].aware = TRUE;

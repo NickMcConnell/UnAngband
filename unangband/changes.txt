@@ -157,6 +157,9 @@ player ignores unusual floor types such as slime, blood and dust whilst running
 
 - Decreased total text output for detection spells.
 
+- When travelling, display the levels of your destination. Also display the
+levels and origin when examining any map (Suggested by darkDrone).
+
 ### Bug fixes ###
 
 - Fix weapon branding.
@@ -308,6 +311,11 @@ crashing on some platforms (Reported by Pete Mac).
 
 - Fixed crash caused when selling or dropping an item that has been valued and has
 charges (Reported by jevansau1).
+
+- Objects sold to stores no longer display a separate value.
+
+- Identifying or sensing an object clears more "sensed" inscriptions (Reported by
+ekolis).
 
 ### Build / Platform ###
 

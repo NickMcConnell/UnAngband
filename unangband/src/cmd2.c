@@ -127,12 +127,13 @@ void print_routes(const s16b *route, int num, int y, int x)
 	byte line_attr;
 
 	town_type *t_ptr = &t_info[p_ptr->dungeon];
-	dungeon_zone *zone1 = &t_ptr->zone[0];
+	dungeon_zone *zone = &t_ptr->zone[0];
 
 	/* Title the list */
 	prt("", y, x);
 	put_str("Location", y, x + 5);
 	put_str(" Distance", y, x + 35);
+	put_str(" Level", y, x + 45);
 
 	/* Dump the routes */
 	for (i = 0; i < num; i++)
@@ -170,11 +171,11 @@ void print_routes(const s16b *route, int num, int y, int x)
 		t_ptr = &t_info[town];
 
 		/* Get the top of the dungeon */
-		get_zone(&zone1,p_ptr->dungeon,min_depth(p_ptr->dungeon));
+		zone = &(t_ptr->zone[0]);
 
 		/* Dump the spell --(-- */
-		sprintf(out_val, "  %c) %-30s %-16s",
-			I2A(i), t_name + t_ptr->name,distance);
+		sprintf(out_val, "  %c) %-30s %-10s%2d%3s ",
+			I2A(i), t_name + t_ptr->name,distance,zone->level,max_depth(town) > min_depth(town) ? format("-%-2d",max_depth(town)) : "");
 		c_prt(line_attr, out_val, y + i + 1, x);
 	}
 
@@ -421,6 +422,10 @@ static void do_cmd_travel(void)
 		else if (p_ptr->confused)
 		{
 			msg_print("You are too confused.");
+		}
+		else if (p_ptr->petrify)
+		{
+			msg_print("You are petrified.");
 		}
 		else if (p_ptr->afraid)
 		{
