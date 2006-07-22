@@ -15,7 +15,7 @@ OBJEXT=.o
 default: unangband
 
 include commondefs.inc
-EXOBJS = $(COMMONOBJS) angband.res readdib.o
+EXOBJS = $(COMMONOBJS) angband.res readdib$(OBJEXT) main-win$(OBJEXT)
 
 # Additional dependencies
 

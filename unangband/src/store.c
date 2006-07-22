@@ -604,7 +604,7 @@ static bool store_object_similar(object_type *o_ptr, object_type *j_ptr)
 	/* MegaHack -- services are simple */
 	if ((o_ptr->tval == TV_SERVICE) && (o_ptr->sval == j_ptr->sval)) return (1);
 
-	/* Different pval cannot be stacked *
+	/* Different pval cannot be stacked */
 	if (o_ptr->pval != j_ptr->pval) return (0);
 
 	/* Different charges (etc) cannot be stacked */
