@@ -5672,7 +5672,8 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				/* Hack - scale damage */
 				if ((level > 5) && (d_side)) damage += damroll((level-1)/5, d_side);
 
-				if (fire_ball(effect, dir, damage, 0)) obvious = TRUE;
+				/* Hack -- scale radius  */
+				if (fire_cloud(effect, dir, damage, (level / 20) + 2)) obvious = TRUE;
 
 				break;
 			}
