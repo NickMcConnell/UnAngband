@@ -120,6 +120,9 @@ studying them.
 
 - Rebalance and expand the mage spell list considerably.
 
+- Damage from cloud, storm and area spells do not decrease with distance from the
+centre of effect.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
