@@ -10587,8 +10587,11 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 	/* Calculate and store the actual damage at each distance. */
 	for (i = 0; i <= MAX_RANGE; i++)
 	{
-		/* Hack -- feature damage does not vary */
+		/* Paranoia -- feature damage does not vary */
 		if (typ == GF_FEATURE) dam_temp = dam;
+
+		/* Damage does not vary with range */
+		else if (flg & (PROJECT_AREA)) dam_temp = dam;
 
 		/* No damage outside the radius. */
 		else if (i > rad) dam_temp = 0;

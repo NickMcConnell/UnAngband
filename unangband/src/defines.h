@@ -904,11 +904,11 @@
 #define MAX_FEAT_STATES	 8
 
 /*
- * Maximum number of 
+ * Maximum number of spell constants
  */
 #define MAX_SPELL_APPEARS	10
 #define MAX_SPELL_CASTERS	5
-
+#define MAX_SPELL_PREREQUISITES	2
 
 
 /*** Feature Indexes (see "lib/edit/feature.txt") ***/
@@ -2403,6 +2403,11 @@
 #define RBM_FLASK	63
 #define RBM_TRAIL	64
 #define RBM_SHRIEK	65
+#define RBM_BOLT_MINOR	66
+#define RBM_BALL_MINOR	67
+#define RBM_BALL_II	68
+#define RBM_BALL_III	69
+#define RBM_AURA_MINOR	70
 
 #define RBM_MAX_NORMAL  23
 #define RBM_MIN_RANGED  15
@@ -2453,7 +2458,7 @@
 #define PROJECT_WALL         0x00000080
 #define PROJECT_PASS         0x00000100  /*Ignore walls*/
 #define PROJECT_MISS         0x00000200  /*Misses the first target*/
-#define PROJECT_XXX5         0x00000400
+#define PROJECT_AREA         0x00000400  /* Applies damage evenly at all ranges */
 
 /* What projections affect */
 #define PROJECT_GRID         0x00000800

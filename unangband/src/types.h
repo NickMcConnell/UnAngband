@@ -1204,6 +1204,8 @@ struct spell_type
 	spell_appears appears[MAX_SPELL_APPEARS];
 	spell_cast cast[MAX_SPELL_CASTERS];
 	spell_blow blow[4];
+
+	s16b preq[MAX_SPELL_PREREQUISITES];
 };
 
 /*

@@ -1048,7 +1048,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 	/* Examine (and count) the actual attacks */
 	for (r = 0, m = 0; m < 4; m++)
 	{
-		int method, effect, d1, d2, d3, rad, arc;
+		int method, effect, d1, d2, d3, rad, arc, rng;
 
 		/* Skip non-attacks */
 		if (!s_ptr->blow[m].method) continue;
@@ -1109,17 +1109,20 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_HIT: p = "hits"; t = "one target"; break;
 			case RBM_SPIT: p = "spits"; t = "one target"; break;
 			case RBM_AURA: p = "surrounds you with an aura";  t = "your enemies"; rad = 2; break;
+			case RBM_AURA_MINOR: p = "surrounds you with an aura";  t = "your enemies"; rad = 1; break;
 			case RBM_SELF: t = "you";break;
 			case RBM_EXPLODE: t = "you and all enemies adjacent to you"; break;
 			case RBM_ADJACENT: t = "all enemies adjacent to you"; break;
-			case RBM_HANDS: t = "a beam of 3 grids"; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
-			case RBM_MISSILE: t = "your enemies"; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
+			case RBM_HANDS: t = "a beam"; rng = 3; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
+			case RBM_MISSILE: p = "creates a missile"; t = "your enemies"; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
 			case RBM_BOLT_10: p = "creates a bolt"; t = "your enemies"; if ((level > 8) && (d2)) d1+= (level-5)/4;break;
 			case RBM_BOLT: p = "creates a powerful bolt";  t = "your enemies"; if ((level > 8) && (d2)) d1+= (level-5)/4;break;
 			case RBM_BEAM: p = "creates a beam"; t = "your enemies";if ((level > 8) && (d2)) d1+= (level-5)/4;break;
 			case RBM_BLAST: p = "creates an adjacent blast"; t = "your enemies"; d3 += level;break;
 			case RBM_WALL: p = "creates a wall"; t = "your enemies"; if ((level > 8) && (d2)) d1+= (level-5)/4;break;
 			case RBM_BALL: p = "creates a ball"; t = "your enemies"; rad = 2; break;
+			case RBM_BALL_II: p = "creates a ball"; t = "your enemies"; rad = 3; break;
+			case RBM_BALL_III: p = "creates a ball"; t = "your enemies"; rad = 4; break;
 			case RBM_CLOUD: p = "creates a cloud"; t = "your enemies"; rad = 2; d3 += level/2; break;
 			case RBM_STORM: p = "creates a storm"; t = "your enemies"; rad = 3; break;
 			case RBM_BREATH: p = "breathes";  t = "your enemies"; break;
@@ -1144,7 +1147,9 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_ARC_40: p = "creates an arc"; arc = 40; break;
 			case RBM_ARC_50: p = "creates an arc"; arc = 50; break;
 			case RBM_ARC_60: p = "creates an arc"; arc = 60; break;
-			case RBM_FLASK: p = "creates a ball"; t = "your enemies"; rad = 1; break; 
+			case RBM_FLASK: p = "creates a ball"; t = "your enemies"; rad = 1; break;
+			case RBM_BOLT_MINOR: p = "creates a bolt"; t = "your enemies"; rng = 4; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
+			case RBM_BALL_MINOR: p = "throws a ball"; t = "your enemies"; rad = 1; break;
 		}
 
 
@@ -1314,8 +1319,13 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		if (p)
 		{
 			text_out(p);
-			if (arc) text_out (format( " of %d degrees",arc));
-			if (rad) text_out (format( " of radius %d",rad));
+			if (rng || arc || rad) text_out(" of ");
+			if (rng) text_out (format( "range %d",rng));
+			if (rng && (arc || rad)) text_out(" and ");
+			if (arc) text_out (format( "%d degrees",arc));
+			if ((rng || arc) && rad) text_out(" and ");
+			if (rad) text_out (format( "radius %d",rad));
+
 			text_out(" to");
 			if (q)
 			{
@@ -1341,6 +1351,8 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 				text_out("s");
 			}		
 			else text_out("affects");
+
+			if (rng) text_out (format( " at up to range %d",rng));
 
 			if (s)
 			{
@@ -1538,10 +1550,14 @@ void spell_info(char *p, int spell, bool use_level)
 			case RBM_MISSILE: if ((level > 5) && (d2)) d1+= (level-1)/5;break;
 			case RBM_BOLT_10: if ((level > 8) && (d2)) d1+= (level-5)/4;break;
 			case RBM_BOLT: if ((level > 8) && (d2)) d1+= (level-5)/4;break;
+			case RBM_BOLT_MINOR: if ((level > 8) && (d2)) d1+= (level-5)/4;break;
 			case RBM_BEAM: if ((level > 8) && (d2)) d1+= (level-5)/4;break;
 			case RBM_BLAST: d3 += level;break;
 			case RBM_WALL: if ((level > 8) && (d2)) d1+= (level-5)/4;break;
+			case RBM_BALL_MINOR: rad = 2; break;
 			case RBM_BALL: rad = 2; break;
+			case RBM_BALL_II: rad = 3; break;
+			case RBM_BALL_III: rad = 4; break;
 			case RBM_CLOUD: rad = 2; d3 += level/2; break;
 			case RBM_STORM: rad = 3; break;
 			case RBM_AREA: rad = (level/10)+2; break;
@@ -3310,8 +3326,16 @@ void print_spells(const s16b *book, int num, int y, int x)
 		{
 			if (level <= p_ptr->lev)
 			{
-				comment = " unknown";
-				line_attr = TERM_L_BLUE;
+				if (spell_okay(spell, FALSE))
+				{
+					comment = " unknown";
+					line_attr = TERM_L_BLUE;
+				}
+				else
+				{
+					comment = " prerequsite";
+					line_attr = TERM_VIOLET;
+				}
 			}
 			else
 			{

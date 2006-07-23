@@ -4509,6 +4509,38 @@ void unlite_room(int y, int x)
 
 
 /*
+ * Cast a minor ball spell
+ * Stop if we hit a monster, act as a "ball"
+ * Note that this does not allow "target" mode to pass over monsters
+ * Affect grids, objects, and monsters
+ */
+bool fire_ball_minor(int typ, int dir, int dam, int rad)
+{
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int ty, tx;
+
+	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
+
+	/* Use the given direction */
+	ty = py + 99 * ddy[dir];
+	tx = px + 99 * ddx[dir];
+
+	/* Hack -- Use an actual "target" */
+	if ((dir == 5) && target_okay())
+	{
+		ty = p_ptr->target_row;
+		tx = p_ptr->target_col;
+	}
+
+	/* Analyze the "dir" and the "target".  Hurt items on floor. */
+	return (project(-1, rad, py, px, ty, tx, dam, typ, flg, 0, 0));
+}
+
+
+
+/*
  * Cast a ball spell
  * Stop if we hit a monster, act as a "ball"
  * Allow "target" mode to pass over monsters
@@ -4544,6 +4576,7 @@ bool fire_ball(int typ, int dir, int dam, int rad)
 /*
  * Cast a cloud spell
  * Stop if we hit a monster, act as a "ball"
+ * However damages all targets in area of effect equally
  * Allow "target" mode to pass over monsters
  * Affect monsters only
  */
@@ -4554,7 +4587,7 @@ bool fire_cloud(int typ, int dir, int dam, int rad)
 
 	int ty, tx;
 
-	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_BOOM | PROJECT_PLAY | PROJECT_BOOM;
+	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_BOOM | PROJECT_PLAY | PROJECT_BOOM | PROJECT_AREA;
 
 	/* Use the given direction */
 	ty = py + 99 * ddy[dir];
@@ -4662,8 +4695,6 @@ bool fire_bolt(int typ, int dir, int dam)
 	/* Hack -- Use an actual "target" */
 	if ((dir == 5) && target_okay())
 	{
-		flg &= ~(PROJECT_STOP);
-
 		ty = p_ptr->target_row;
 		tx = p_ptr->target_col;
 	}
@@ -4696,8 +4727,6 @@ bool fire_beam(int typ, int dir, int dam)
 	/* Hack -- Use an actual "target" */
 	if ((dir == 5) && target_okay())
 	{
-		flg &= ~(PROJECT_STOP);
-
 		ty = p_ptr->target_row;
 		tx = p_ptr->target_col;
 	}
@@ -4740,6 +4769,7 @@ bool fire_blast(int typ, int dir, int dam)
 
 }
 
+
 /*
  * Hands is now a range 3 beam, similar to lightening spark from Sangband.
  * It does not affect the grid however.
@@ -4762,8 +4792,6 @@ bool fire_hands(int typ, int dir, int dam)
 	/* Hack -- Use an actual "target" */
 	if ((dir == 5) && target_okay())
 	{
-		flg &= ~(PROJECT_STOP);
-
 		ty = p_ptr->target_row;
 		tx = p_ptr->target_col;
 	}
@@ -4771,6 +4799,34 @@ bool fire_hands(int typ, int dir, int dam)
 	/* Analyze the "dir" and the "target".  Hurt items on floor. */
 	return (project(-1, range, py, px, ty, tx, dam, typ, flg, 0, 0));
 }
+
+/*
+ * Minor bolts are a limited range bolt.
+ */
+bool fire_bolt_minor(int typ, int dir, int dam, int range)
+{
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int ty, tx;
+
+	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_GRID | PROJECT_PLAY;
+
+	/* Use the given direction */
+	ty = py + 99 * ddy[dir];
+	tx = px + 99 * ddx[dir];
+
+	/* Hack -- Use an actual "target" */
+	if ((dir == 5) && target_okay())
+	{
+		ty = p_ptr->target_row;
+		tx = p_ptr->target_col;
+	}
+
+	/* Analyze the "dir" and the "target".  Hurt items on floor. */
+	return (project(-1, range, py, px, ty, tx, dam, typ, flg, 0, 0));
+}
+
 
 /*
  * Create a (wielded) spell item
@@ -5335,6 +5391,19 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				if (fire_bolt(effect, dir, damage)) obvious = TRUE;
 				break;
 			}
+			case RBM_BOLT_MINOR:
+			{
+				int range = 4;
+
+				/* Allow direction to be cancelled for free */
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
+
+				/* Hack - scale damage */
+				if ((level > 8) && (d_side)) damage += damroll((level-5)/4, d_side);
+				
+				if (fire_bolt_minor(effect, dir, damage, range)) obvious = TRUE;
+				break;
+			}
 			case RBM_BOLT_10:
 			{
 				int beam;
@@ -5413,6 +5482,33 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 
 				break;
 			}
+			case RBM_BALL_II:
+			{
+				/* Allow direction to be cancelled for free */
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
+
+				if (fire_ball(effect, dir, damage, 3)) obvious = TRUE;
+
+				break;
+			}
+			case RBM_BALL_III:
+			{
+				/* Allow direction to be cancelled for free */
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
+
+				if (fire_ball(effect, dir, damage, 4)) obvious = TRUE;
+
+				break;
+			}
+			case RBM_BALL_MINOR:
+			{
+				/* Allow direction to be cancelled for free */
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
+
+				if (fire_ball_minor(effect, dir, damage, 1)) obvious = TRUE;
+
+				break;
+			}
 			case RBM_CLOUD:
 			{
 				int rad = 2;
@@ -5432,7 +5528,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				/* Allow direction to be cancelled for free */
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
 
-				if (fire_ball(effect, dir, damage, 3)) obvious = TRUE;
+				if (fire_cloud(effect, dir, damage, 3)) obvious = TRUE;
 
 				break;
 			}
@@ -5445,12 +5541,14 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 
 				break;
 			}
+
+			/* Applies same damage at all ranges */
 			case RBM_AREA:
 			{
 				int py = p_ptr->py;
 				int px = p_ptr->px;
 			
-				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL | PROJECT_BOOM;
+				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL | PROJECT_BOOM | PROJECT_AREA;
 				if (project(-1, (level / 10)+1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
 				break;
 			}
@@ -5522,6 +5620,16 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 			
 				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL | PROJECT_BOOM;
 				if (project(-1, 2, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
+				break;
+			}
+			case RBM_AURA_MINOR:
+			/* Radius 1, centred on self */
+			{
+				int py = p_ptr->py;
+				int px = p_ptr->px;
+			
+				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL | PROJECT_BOOM;
+				if (project(-1, 1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
 				break;
 			}
 			case RBM_EXPLODE:

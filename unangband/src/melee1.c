@@ -1213,7 +1213,6 @@ static void mon_ball(int who, int y, int x, int typ, int dam, int rad, bool hit,
 }
 
 
-
 /*
  * Release a cloud, which is a ball centered on the monster that does not
  * affect other monsters (mostly to avoid annoying messages).
@@ -1676,16 +1675,21 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_TRAP:  msg_print(result);(void)project(who, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_BOULDER: mon_shot(who, y, x, effect, dam, hit, result); break;
 				case RBM_AURA:	msg_print(result);(void)project(who, 2, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_CLOUD, 0, 0);  break;
+				case RBM_AURA_MINOR:	msg_print(result);(void)project(who, 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_CLOUD, 0, 0);  break;
 				case RBM_SELF:	msg_print(result);(void)project(0, 0, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_DIRECT, 0, 0); break;
 				case RBM_ADJACENT: msg_print(result);(void)project(0, (rlev / 10) + 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
 				case RBM_HANDS: mon_beam(who, y, x, effect, dam, 3, result); break;
 				case RBM_MISSILE: mon_bolt(who, y, x, effect, dam, result); break;
+				case RBM_BOLT_MINOR: mon_bolt(who, y, x, effect, dam, result); break;
 				case RBM_BOLT_10: (rand_int(100) < 10 ? mon_beam(who, y, x, effect, dam, 10, result) : mon_bolt(who, y, x, effect, dam, result)); break;
 				case RBM_BOLT: mon_bolt(who, y, x, effect, dam, result); break;
 				case RBM_BEAM: mon_beam(who, y, x, effect, dam, 10, result); break;
 				case RBM_BLAST: mon_arc(who, y, x, effect, dam, 0, 60, result); break;
 				case RBM_WALL: mon_beam(who, y, x, effect, dam, 12, result); break;
+				case RBM_BALL_MINOR: mon_ball(who, y, x, effect, dam, 2, TRUE, result); break;
 				case RBM_BALL: mon_ball(who, y, x, effect, dam, 2, TRUE, result); break;
+				case RBM_BALL_II: mon_ball(who, y, x, effect, dam, 3, TRUE, result); break;
+				case RBM_BALL_III: mon_ball(who, y, x, effect, dam, 4, TRUE, result); break;
 				case RBM_CLOUD: mon_ball(who, y, x, effect, dam, 3, TRUE, result); break;
 				case RBM_STORM: mon_ball(who, y, x, effect, dam, 3, TRUE, result); break;
 				case RBM_BREATH: mon_arc(who, y, x, effect, MIN(dam, m_ptr->hp / d_side), 0, (powerful ? 40 : 20), result); break;

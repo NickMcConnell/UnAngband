@@ -4116,6 +4116,9 @@ void fake_bag_item(object_type *i_ptr, int sval, int slot)
 		/* Fake bag number */
 		number = charges / FUEL_TORCH;
 
+		/* Round up */
+		if (charges % FUEL_TORCH) number++;
+
 		/* Get bag charges */
 		i_ptr->charges = charges / number;
 

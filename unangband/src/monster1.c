@@ -696,6 +696,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case RBM_TRAP: p = "trap"; break;
 			case RBM_BOULDER: p = "throw a boulder at you"; break;
 			case RBM_AURA: p = "radiate"; break;
+			case RBM_AURA_MINOR: p = "radiate"; break;
 			case RBM_SELF: p = "affect itself";break;
 			case RBM_ADJACENT: p = "affect all adjacent"; break;
 			case RBM_HANDS: p = "affect an adjacent target"; break;
@@ -706,6 +707,8 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case RBM_BLAST: p = "create an adjacent blast"; break;
 			case RBM_WALL: p = "create a wall"; break;
 			case RBM_BALL: p = "create a ball"; break;
+			case RBM_BALL_II: p = "create a large ball"; break;
+			case RBM_BALL_III: p = "create a huge ball"; break;
 			case RBM_CLOUD: p = "create a cloud"; break;
 			case RBM_STORM: p = "create a storm"; break;
 			case RBM_BREATH: p = "breathes"; break;

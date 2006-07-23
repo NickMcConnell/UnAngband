@@ -578,6 +578,7 @@ void do_cmd_browse(void)
 			}
 			else
 			{
+				bool intro = FALSE;
 
 				/* Set text_out hook */
 				text_out_hook = text_out_to_screen;
@@ -585,7 +586,26 @@ void do_cmd_browse(void)
 				/* Recall spell */
 				spell_desc(&s_info[spell],"When cast, it ",spell_power(spell), TRUE, 1);
 
-				text_out(".");
+				text_out(".\n");
+
+				/* Display pre-requisites */
+				for (i = 0; i < MAX_SPELL_PREREQUISITES; i++)
+				{
+					/* Check if pre-requisite spells */
+					if (s_info[spell].preq[i])
+					{
+						if (!intro) text_out_c(TERM_VIOLET,"You must learn ");
+						else text_out_c(TERM_VIOLET, " or ");
+
+						intro = TRUE;
+
+						text_out_c(TERM_VIOLET, s_name + s_info[s_info[spell].preq[i]].name);
+					}
+
+				}
+
+				/* Terminate if required */
+				if (intro) text_out_c(TERM_VIOLET, " before studying this spell.\n");
 
 				/* Build a prompt (accept all spells) */
 				strnfmt(out_val, 78, "The %s of %s. (%c-%c, ESC) Browse which %s:",

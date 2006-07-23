@@ -115,6 +115,11 @@ petrification as well (Requested by Pete Mac).
 - Store selling oil and lanterns is now available from Rivendell (Suggested by
 Pete Mack).
 
+- A number of spells now have prerequisite spells that you must learn first before
+studying them.
+
+- Rebalance and expand the mage spell list considerably.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

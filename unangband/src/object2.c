@@ -8355,7 +8355,34 @@ bool spell_okay(int spell, bool known)
 	}
 
 	/* Spell okay to study, not to cast */
-	if (i == PY_MAX_SPELLS) return (!known);
+	if (i == PY_MAX_SPELLS)
+	{
+		/* Spell may require pre-requisites */
+		if (!known)
+		{
+			int n;
+
+			bool preq = FALSE;
+
+			/* Check prerequisites */
+			for (n = 0; n < MAX_SPELL_PREREQUISITES; n++)
+			{
+				if (s_info[spell].preq[n])
+				{
+					preq = TRUE;
+
+					for (i=0;i<PY_MAX_SPELLS;i++)
+					{
+						if (p_ptr->spell_order[i] == s_info[spell].preq[n]) return (!known);
+					}
+				}
+			}
+
+			return (!preq);
+		}
+
+		return (!known);
+	}
 
 	/* Spell is forgotten */
 	if ((i < 32) ? (p_ptr->spell_forgotten1 & (1L << i)) :

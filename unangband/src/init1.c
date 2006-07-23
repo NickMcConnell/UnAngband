@@ -180,6 +180,11 @@ static cptr r_info_blow_method[] =
 	"FLASK",
 	"TRAIL",
 	"SHRIEK",
+	"BOLT_MINOR",
+	"BALL_MINOR",
+	"BALL_II",
+	"BALL_III",
+	"AURA_MINOR",
 	NULL
 };
 
@@ -4848,6 +4853,22 @@ errr parse_s_info(char *buf, header *head)
 
 	}
 
+	/* Process 'P' for "Pre-requisites" */
+	else if (buf[0] == 'P')
+	{
+		int p0, p1;
+
+		/* There better be a current s_ptr */
+		if (!s_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (2 != sscanf(buf+2, "%d:%d", &p0, &p1)) return (PARSE_ERROR_GENERIC);
+
+		/* Extract the prerequisites */
+		s_ptr->preq[0] = p0;
+		s_ptr->preq[1] = p1;
+	}
+
 	/* Hack -- Process 'F' for flags */
 	else if (buf[0] == 'F')
 	{
@@ -6660,6 +6681,8 @@ static long eval_max_dam(monster_race *r_ptr)
 					case RBM_BLAST: mana = 3; range = 5; break;
 					case RBM_WALL: mana = 6; range = MAX_SIGHT; break;
 					case RBM_BALL: mana = 4; range = MAX_SIGHT; break;
+					case RBM_BALL_II: mana = 5; range = MAX_SIGHT; break;
+					case RBM_BALL_III: mana = 6; range = MAX_SIGHT; break;
 					case RBM_CLOUD: mana = 5; range = MAX_SIGHT; break;
 					case RBM_STORM: mana = 6; range = MAX_SIGHT; break;
 					case RBM_BREATH: mana = 0; range = 6; break;
