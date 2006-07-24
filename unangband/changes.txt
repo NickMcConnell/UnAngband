@@ -123,6 +123,14 @@ studying them.
 - Damage from cloud, storm and area spells do not decrease with distance from the
 centre of effect.
 
+- Removed the ability of low level spell caster monsters to bash doors; particularly
+those short of stature (Suggested by Pete Mac).
+
+- Removed the ability of skeletons, zombies, dragons and hydras to open doors: they may
+still bash them however. Some other monsters may bash but not open doors now; or open
+but not bash doors.
+
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
