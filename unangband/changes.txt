@@ -130,6 +130,19 @@ those short of stature (Suggested by Pete Mac).
 still bash them however. Some other monsters may bash but not open doors now; or open
 but not bash doors.
 
+- Changed what attributes govern number of spells learnt, mana and fail rates: for
+mages, rangers, rogues and shamans, intelligence now controls number of spells learnt,
+wisdom now controls amount of mana and dexterity now controls spell failure rates.
+This is the same for priests and paladins, except they use charisma to determine
+spell failure rates. Bards use dexterity to determine number of spells learnt, charisma
+to determine mana and constitution to determine spell failure rates.
+This is configurable in p_class.txt for those who want to revert to the old system.
+
+- Changed stat progression so that 'about' one spell is learnt per level except for
+very high spell stats. Made individual stat increases have more impact on total spells
+known, especially at higher stat levels. Very low stats are better at remembering a few
+spells.
+
 
 ### User Interface ###
 

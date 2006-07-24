@@ -1917,8 +1917,6 @@ static void calc_spells(void)
 {
 	int i, ii, j, k, levels;
 	int num_allowed, num_known;
-	bool spells_done = FALSE;
-	bool spells_bad = FALSE;
 
 	spell_type *s_ptr;
 	spell_cast *sc_ptr = &(s_info[0].cast[0]);
@@ -1926,14 +1924,18 @@ static void calc_spells(void)
 	cptr p;
 
 	/* Hack --- We don't know which book it comes from */
-	switch (c_info[p_ptr->pclass].spell_stat)
+	switch (c_info[p_ptr->pclass].spell_book)
 	{
-		case A_WIS:
+		case TV_PRAYER_BOOK:
 			p="prayer";
 		break;
 
-		case A_CHR:
+		case TV_SONG_BOOK:
 			p = "song";
+		break;
+
+		case TV_RUNESTONE:
+			p = "ritual";
 		break;
 
 		default:
@@ -1957,8 +1959,8 @@ static void calc_spells(void)
 	if (levels < 0) levels = 0;
 
 	/* Extract total allowed spells */
-	num_allowed = (adj_mag_study[p_ptr->stat_ind[c_info[p_ptr->pclass].spell_stat]] *
-		       levels / 2);
+	num_allowed = (adj_mag_study[p_ptr->stat_ind[c_info[p_ptr->pclass].spell_stat_study]] *
+		       levels / 50) + 1;
 
 	/* Hack --- adjust num_allowed */
 	if (num_allowed >  PY_MAX_SPELLS) num_allowed = PY_MAX_SPELLS;
@@ -1998,34 +2000,7 @@ static void calc_spells(void)
 			num_known++;
 
 		}
-		else if (p_ptr->spell_order[j] == 99)
-		{
-
-			if (spells_done) spells_bad = TRUE;
-			spells_done = TRUE;
-		}
 	}
-	/* Fix spells, spell order and so forth for old characters. */
-	if (spells_bad)
-	{
-                /* Hack -- forget all spells */
-                p_ptr->spell_learned1 = 0;
-                p_ptr->spell_learned2 = 0;
-                p_ptr->spell_learned3 = 0;
-                p_ptr->spell_learned4 = 0;
-
-                /* Hack -- unlearn all spells */
-                p_ptr->spell_forgotten1 = 0;
-                p_ptr->spell_forgotten2 = 0;
-                p_ptr->spell_forgotten3 = 0;
-                p_ptr->spell_forgotten4 = 0;
-
-                /* Hack -- unlearn all spells */
-                for (j = 0; j < PY_MAX_SPELLS; j++) p_ptr->spell_order[j] = 0;
-
-                /* Hack -- unlearn all spells */
-                num_known = 0;
-        }
 
 	/* See how many spells we must forget or may learn */
 	p_ptr->new_spells = num_allowed - num_known;
@@ -2310,7 +2285,7 @@ static void calc_mana(void)
 	if (levels < 0) levels = 0;
 
 	/* Extract total mana */
-	msp = adj_mag_mana[p_ptr->stat_ind[pc_ptr->spell_stat]] * levels / 2;
+	msp = adj_mag_mana[p_ptr->stat_ind[pc_ptr->spell_stat_mana]] * levels / 2;
 
 	/* Hack -- usually add 1 mana */
 	if (msp) msp++;
@@ -3631,10 +3606,16 @@ static void calc_bonuses(void)
 				p_ptr->update |= (PU_HP);
 			}
 
-			/* Change in INT may affect Mana/Spells */
-			else if ((i == c_info[p_ptr->pclass].spell_stat) && (c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL))
+			/* Change in spell stat may affect Mana */
+			if ((i == c_info[p_ptr->pclass].spell_stat_mana) && (c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL))
 			{
-				p_ptr->update |= (PU_MANA | PU_SPELLS);
+				p_ptr->update |= (PU_MANA);
+			}
+
+			/* Change in spell stat may affect Mana */
+			if ((i == c_info[p_ptr->pclass].spell_stat_study) && (c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL))
+			{
+				p_ptr->update |= (PU_SPELLS);
 			}
 		}
 	}

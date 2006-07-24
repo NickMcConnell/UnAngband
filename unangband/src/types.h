@@ -1113,9 +1113,13 @@ struct player_class
 	u16b att_multiply;	/* Multiplier for attack calculations */
 
 	byte spell_book;	/* Tval of spell books (if any) */
-	u16b spell_stat;	/* Stat for spells (if any) */
+	byte spell_stat_study;	/* Stat for number of spells */
+	byte spell_stat_mana;	/* Stat for determining mana */
+	byte spell_stat_fail;	/* Stat for determine minimum and decrease in failure rate */
+
 	u16b spell_first;	/* Level of first spell */
 	u16b spell_weight;	/* Weight that hurts spells */
+
 	bool spell_power;       /* Can cast 'powerful' spells */
 
 	bool sense_squared;	/* Pseudo-id squared */

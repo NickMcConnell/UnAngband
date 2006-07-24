@@ -8276,7 +8276,7 @@ s16b spell_chance(int spell)
 	chance -= 3 * (p_ptr->lev - spell_level(spell));
 
 	/* Reduce failure rate by INT/WIS adjustment */
-	chance -= 3 * (adj_mag_stat[p_ptr->stat_ind[c_info[p_ptr->pclass].spell_stat]] - 1);
+	chance -= 3 * (adj_mag_fail_rate[p_ptr->stat_ind[c_info[p_ptr->pclass].spell_stat_fail]] - 1);
 
 	/* Not enough mana to cast */
 	if (sc_ptr->mana > p_ptr->csp)
@@ -8285,7 +8285,7 @@ s16b spell_chance(int spell)
 	}
 
 	/* Extract the minimum failure rate */
-	minfail = adj_mag_fail[p_ptr->stat_ind[c_info[p_ptr->pclass].spell_stat]];
+	minfail = adj_mag_fail_min[p_ptr->stat_ind[c_info[p_ptr->pclass].spell_stat_fail]];
 
 	/* Non mage/priest characters never get better than 5 percent */
 	if (!(c_info[p_ptr->pclass].spell_power))
