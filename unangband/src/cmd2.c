@@ -114,7 +114,7 @@ bool do_cmd_test(int y, int x, int action)
 }
 
 /*
- * Print a list of spells (for browsing or casting or viewing).
+ * Print a list of routes (for travelling).
  */
 void print_routes(const s16b *route, int num, int y, int x)
 {

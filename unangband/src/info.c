@@ -1107,6 +1107,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		switch (method)
 		{
 			case RBM_HIT: p = "hits"; t = "one target"; break;
+			case RBM_TOUCH: t = "one adjacent target"; if ((level > 8) && (d2)) d1+= (level-5)/4;break;
 			case RBM_SPIT: p = "spits"; t = "one target"; break;
 			case RBM_AURA: p = "surrounds you with an aura";  t = "your enemies"; rad = 2; break;
 			case RBM_AURA_MINOR: p = "surrounds you with an aura";  t = "your enemies"; rad = 1; break;
@@ -1546,6 +1547,7 @@ void spell_info(char *p, int spell, bool use_level)
 		/* Get the method */
 		switch (method)
 		{
+			case RBM_TOUCH: if ((level > 8) && (d2)) d1+= (level-5)/4;break;
 			case RBM_HANDS: if ((level > 5) && (d2)) d1+= (level-1)/5;break;
 			case RBM_MISSILE: if ((level > 5) && (d2)) d1+= (level-1)/5;break;
 			case RBM_BOLT_10: if ((level > 8) && (d2)) d1+= (level-5)/4;break;
@@ -3239,7 +3241,7 @@ void print_powers(const s16b *book, int num, int y, int x)
 /*
  * Print a list of spells (for browsing or casting or viewing).
  */
-void print_spells(const s16b *book, int num, int y, int x)
+void print_spells(const s16b *sn, int num, int y, int x)
 {
 	int i, ii, spell, level;
 
@@ -3269,7 +3271,7 @@ void print_spells(const s16b *book, int num, int y, int x)
 		sc_ptr = &(s_info[0].cast[0]);
 		
 		/* Get the spell index */
-		spell = book[i];
+		spell = sn[i];
 
 		/* Skip missing spells */
 		if (!spell)

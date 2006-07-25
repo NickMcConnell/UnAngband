@@ -143,6 +143,11 @@ very high spell stats. Made individual stat increases have more impact on total 
 known, especially at higher stat levels. Very low stats are better at remembering a few
 spells.
 
+- Whenever you learn a new spell, you now get a study item created in your inventory,
+depending on the type of spell book. This study item can be used to study spells not
+available in your current spell book; as well as allowing you to cast the spell you
+have just studied. This makes learning spells from features in the dungeon now useful.
+Be careful not to lose this study item however, as it is (currently) irreplaceable.
 
 ### User Interface ###
 

@@ -7971,6 +7971,14 @@ void fill_book(const object_type *o_ptr, s16b *book, int *num)
 	/* Fill book with nothing */
 	for (i=0;i<26;i++) book[i]=0;
 
+	/* Hack -- Study materials are easy */
+	if (o_ptr->tval == TV_STUDY)
+	{
+		book[0] = o_ptr->pval;
+		*num = 1;
+		return;
+	}
+
 	/* Fill book with spells */
 	for (i=0;i<z_info->s_max;i++)
 	{

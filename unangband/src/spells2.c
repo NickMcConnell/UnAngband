@@ -5364,11 +5364,31 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 			{
 				int py = p_ptr->py;
 				int px = p_ptr->px;
-			
+
 				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL;
 				if (project(-1, 1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
 				break;
 			}
+
+			/* One adjacent target */
+			case RBM_TOUCH:
+			{
+				int py = p_ptr->py;
+				int px = p_ptr->px;
+
+				int flg = PROJECT_KILL;
+
+				/* Allow direction to be cancelled for free */
+				if ((!get_rep_dir(&dir)) && (*cancel)) return (FALSE);
+
+				/* Hack - scale damage */
+				if ((level > 8) && (d_side)) damage += damroll((level-5)/4, d_side);
+				
+				if (project(-1, 1, py, px, py + ddy[dir], px + ddx[dir], damage, effect, flg, 0, 0)) obvious = TRUE;
+
+				break;
+			}
+
 			case RBM_HANDS:
 			{
 				/* Allow direction to be cancelled for free */
@@ -5380,6 +5400,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				if (fire_hands(effect, dir, damage)) obvious = TRUE;
 				break;
 			}
+
 			case RBM_MISSILE:
 			{
 				/* Allow direction to be cancelled for free */
@@ -5391,6 +5412,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				if (fire_bolt(effect, dir, damage)) obvious = TRUE;
 				break;
 			}
+
 			case RBM_BOLT_MINOR:
 			{
 				int range = 4;
@@ -5404,6 +5426,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				if (fire_bolt_minor(effect, dir, damage, range)) obvious = TRUE;
 				break;
 			}
+
 			case RBM_BOLT_10:
 			{
 				int beam;
@@ -5420,6 +5443,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				if (fire_bolt_or_beam(beam - 10, effect, dir, damage)) obvious = TRUE;
 				break;
 			}
+
 			case RBM_BOLT:
 			{
 				int beam;
@@ -5436,6 +5460,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 
 				break;
 			}
+
 			case RBM_BEAM:
 			{
 				/* Allow direction to be cancelled for free */

@@ -829,7 +829,14 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			modstr = basenm;
 			basenm = "& #";
 			break;
-			return;
+		}
+
+		/* Hack -- Research materials */
+		case TV_STUDY:
+		{
+			if (o_ptr->pval >= 0) modstr = s_name + s_info[o_ptr->pval].name;
+			else modstr = s_name + s_info[0].name;
+			break;
 		}
 
 		/* Magical Bags */

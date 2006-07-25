@@ -4693,3 +4693,119 @@ cptr get_month_name(int day, bool full, bool compact)
 
 	return (buf);
 }
+
+
+/*
+ * Generic display a list and pick a choice function. Returns TRUE selection or -1 if not selection made.
+ */
+bool get_list(print_list_func print_list, const s16b *sn, int num, cptr p, cptr q, int y, int x, int *selection)
+{
+	int i;
+
+	bool flag, redraw;
+	key_event ke;
+
+	char out_val[160];
+
+	/* Nothing chosen yet */
+	flag = FALSE;
+
+	/* No redraw yet */
+	redraw = FALSE;
+
+	/* Show the list */
+	if (auto_display_lists)
+	{
+		/* Show list */
+		redraw = TRUE;
+
+		/* Save screen */
+		screen_save();
+
+		/* Display the list */
+		print_list(sn, num, y, x);
+	}
+
+	/* Build a prompt (accept all spells) */
+	strnfmt(out_val, 78, "(%s %c-%c, *=List, ESC=exit) %s? ",
+	p, I2A(0), I2A(num - 1), q);
+
+	/* Get a spell from the user */
+	while (!flag && get_com_ex(out_val, &ke))
+	{
+		char choice;
+
+		if (ke.key == '\xff')
+		{
+			if (ke.mousebutton)
+			{
+				if (redraw) ke.key = 'a' + ke.mousey - 2;
+				else ke.key = ' ';
+			}
+			else continue;
+		}
+
+		/* Request redraw */
+		if ((ke.key == ' ') || (ke.key == '*') || (ke.key == '?'))
+		{
+			/* Hide the list */
+			if (redraw)
+			{
+				/* Load screen */
+				screen_load();
+
+				/* Hide list */
+				redraw = FALSE;
+			}
+
+			/* Show the list */
+			else
+			{
+				/* Show list */
+				redraw = TRUE;
+
+				/* Save screen */
+				screen_save();
+
+				/* Display a list of spells */
+				print_list(sn, num, y, x);
+			}
+
+			/* Ask again */
+			continue;
+
+		}
+
+		/* Lowercase 1+*/
+		choice = tolower(ke.key);
+
+		/* Extract request */
+		i = (islower(choice) ? A2I(choice) : -1);
+
+		/* Totally Illegal */
+		if ((i < 0) || (i >= num))
+		{
+			bell("Illegal choice!");
+			continue;
+		}
+
+		/* Get selection */
+		*selection = sn[i];
+
+		/* Stop the loop */
+		flag = TRUE;
+	}
+
+	/* Restore the screen */
+	if (redraw)
+	{
+		/* Load screen */
+		screen_load();
+
+		/* Hack -- forget redraw */
+		/* redraw = FALSE; */
+	}
+
+	/* Return success / failure */
+	return (flag);
+}

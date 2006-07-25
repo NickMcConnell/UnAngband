@@ -69,6 +69,11 @@ typedef byte byte_wid[DUNGEON_WID];
 typedef s16b s16b_wid[DUNGEON_WID];
 
 
+/**** Available Function Definitions ****/
+
+typedef void (*print_list_func)(const s16b *sn, int num, int y, int x);
+
+
 
 /**** Available Structs ****/
 

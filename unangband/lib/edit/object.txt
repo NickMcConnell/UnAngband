@@ -6369,5 +6369,23 @@ F:IGNORE_ACID | IGNORE_FIRE | IGNORE_ELEC | IGNORE_COLD
 D:A dragon-winged great helm, glowing in all the colors of the rainbow.  
 D:It grants resistance to the elements.
 
+N:878:& set~ of Research Notes on #
+G:?:R
+I:85:90:0
+W:5:0:5:0
 
+N:879:& set~ of Prayer Beads of #
+G:?:B
+I:85:91:0
+W:5:0:5:0
+
+N:880:& set~ of Sheet Music on #
+G:?:y
+I:85:92:0
+W:5:0:5:0
+
+N:881:& set~ of Runesticks of #
+G:?:G
+I:85:93:0
+W:5:0:5:0
 

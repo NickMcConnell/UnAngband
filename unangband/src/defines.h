@@ -1700,6 +1700,7 @@
 #define TV_POTION       75
 #define TV_FLASK 77
 #define TV_FOOD  80
+#define TV_STUDY	85
 #define TV_MAGIC_BOOK   90
 #define TV_PRAYER_BOOK  91
 #define TV_SONG_BOOK    92
