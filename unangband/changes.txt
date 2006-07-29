@@ -360,6 +360,7 @@ mac).
 - Range monster attacks should now be properly described (Reported by Adam Horowtiz
 and others).
 
+- Objects exist to cure all diseases (Reported by darkDrone).
 
 ### Build / Platform ###
 
