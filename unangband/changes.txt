@@ -357,6 +357,9 @@ mac).
 - You know learn about monster innate attacks as distinct from monster spells
 (Reported by ekolis).
 
+- Range monster attacks should now be properly described (Reported by Adam Horowtiz
+and others).
+
 
 ### Build / Platform ###
 

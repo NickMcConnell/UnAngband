@@ -185,6 +185,9 @@ static cptr r_info_blow_method[] =
 	"BALL_II",
 	"BALL_III",
 	"AURA_MINOR",
+	"8WAY",
+	"8WAY_II",
+	"8WAY_III",
 	NULL
 };
 

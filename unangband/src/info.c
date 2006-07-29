@@ -1151,6 +1151,9 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_FLASK: p = "creates a ball"; t = "your enemies"; rad = 1; break;
 			case RBM_BOLT_MINOR: p = "creates a bolt"; t = "your enemies"; rng = 4; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
 			case RBM_BALL_MINOR: p = "throws a ball"; t = "your enemies"; rad = 1; break;
+			case RBM_8WAY: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 2; break;
+			case RBM_8WAY_II: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 3; break;
+			case RBM_8WAY_III: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 4; break;
 		}
 
 
@@ -1560,6 +1563,9 @@ void spell_info(char *p, int spell, bool use_level)
 			case RBM_BALL: rad = 2; break;
 			case RBM_BALL_II: rad = 3; break;
 			case RBM_BALL_III: rad = 4; break;
+			case RBM_8WAY: rad = 2; break;
+			case RBM_8WAY_II: rad = 3; break;
+			case RBM_8WAY_III: rad = 4; break;
 			case RBM_CLOUD: rad = 2; d3 += level/2; break;
 			case RBM_STORM: rad = 3; break;
 			case RBM_AREA: rad = (level/10)+2; break;

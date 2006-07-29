@@ -156,6 +156,9 @@ TODO: Have various metal terrains.
 
 TODO: Have the concept of pushing and pulling when interacting with terrain.
 
+TODO: Have siege engines e.g. ballista, catapults etc which are a fixed location for a weapon
+that can be fired.
+
 TODO: Have machines which can be filled with oil and switched on.
 
 TODO: Have crystals of various colours and types, which cause interaction between sound,
@@ -467,17 +470,43 @@ conducted more effectively, so that radius does not decrease damage.
 TODO: Have various metal terrains, including metal floors, metal walls (which cannot be
 tunnelled or bashed, but are not permanent), and chains. Chains can cross caverns.
 
-TODO: Have the concept of pushing and pulling. Pushing or pulling on a chain pushes or pulls
-on all adjacent chains until there is no adjacent chain. Pushing or pulling on a chest moves
-it around on a floor. Pushing or pulling on a block (a new feature) pushes or pulls it around
-a shallow pit (which we can use to restrict the path of the block). Pushing or pulling a deck
-moves it around. All of the above objects move around on chain.
+TODO: Have the concept of pushing and pulling.
 
-This can be used to move objects around in various puzzle situations. This can be used
-to move a wooden deck along chain over a chasm to make it cross-able.
+Items which can be pushed:
+piles of ice / rubble / wood
+chests
+wooden platforms
+wooden / iron / spiked cages (new terrain)
+various traps (get activated when pushed)
+sliding walls (new terrain)
+weak wooden platforms (turn into pile of wood when pushed)
+boulders (new terrain)
 
-We can have wooden blocks and stone blocks. These block site and movement, but can
-be moved around to solve puzzles.
+You can push terrain to an adjacent terrain provided the adjacent terrain has a SLIDE
+flag.
+
+Terrain which has slide flag:
+ice / slimy floor
+oil-coated floor
+slopes (can slide down slope only, however get momentum similar to pulling as below)
+shallow / normal / deep pits / chasms (can push terrain into this location, but not out
+- it fills the pit up and destroys the terrain)
+chain (but not rope or vines)
+
+Items which can be pulled:
+rope / chain / vines
+
+If you pull a terrain, it pushes one adjacent terrain with a PUSH flag to its own location,
+and then your location the following turn. If that terrain has a PULL flag, it continues
+to pull in the direction you are pulling from instead.
+
+Add stone chests, which can be pushed around but not opened. It is only possible to open these
+by pushing them into a pit.
+
+You can push monsters into adjacent terrain.
+
+TODO: Have siege engines e.g. ballista, catapults etc which are a fixed location for a weapon
+that can be fired.
 
 TODO: Have machines, which are terrain types which when filled with oil and then hurt by
 electricity, can create various types of effects. A furnace creates fire. A generator creates

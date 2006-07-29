@@ -2409,6 +2409,9 @@
 #define RBM_BALL_II	68
 #define RBM_BALL_III	69
 #define RBM_AURA_MINOR	70
+#define RBM_8WAY	71
+#define RBM_8WAY_II	72
+#define RBM_8WAY_III	73
 
 #define RBM_MAX_NORMAL  23
 #define RBM_MIN_RANGED  15
@@ -2450,7 +2453,7 @@
 #define PROJECT_BEAM         0x00000001
 #define PROJECT_ARC          0x00000002
 #define PROJECT_STAR         0x00000004
-#define PROJECT_XXX1         0x00000008
+#define PROJECT_8WAY         0x00000008
 #define PROJECT_XXX2         0x00000010
 #define PROJECT_XXX3         0x00000020
 

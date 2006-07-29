@@ -4574,6 +4574,40 @@ bool fire_ball(int typ, int dir, int dam, int rad)
 
 
 /*
+ * Cast a 8-way beam spell
+ * Stop if we hit a monster, act as a beam in 8 directions
+ * Allow "target" mode to pass over monsters
+ * Affect grids, objects, and monsters
+ * Do not decrease damage with range
+ */
+bool fire_8way(int typ, int dir, int dam, int rad)
+{
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int ty, tx;
+
+	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_8WAY | PROJECT_AREA;
+
+	/* Use the given direction */
+	ty = py + 99 * ddy[dir];
+	tx = px + 99 * ddx[dir];
+
+	/* Hack -- Use an actual "target" */
+	if ((dir == 5) && target_okay())
+	{
+		flg &= ~(PROJECT_STOP);
+
+		ty = p_ptr->target_row;
+		tx = p_ptr->target_col;
+	}
+
+	/* Analyze the "dir" and the "target".  Hurt items on floor. */
+	return (project(-1, rad, py, px, ty, tx, dam, typ, flg, 0, 0));
+}
+
+
+/*
  * Cast a cloud spell
  * Stop if we hit a monster, act as a "ball"
  * However damages all targets in area of effect equally
@@ -5768,6 +5802,33 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				break;
 			}
 
+			case RBM_8WAY:
+			{
+				/* Allow direction to be cancelled for free */
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
+
+				if (fire_8way(effect, dir, damage, 2)) obvious = TRUE;
+
+				break;
+			}
+			case RBM_8WAY_II:
+			{
+				/* Allow direction to be cancelled for free */
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
+
+				if (fire_8way(effect, dir, damage, 3)) obvious = TRUE;
+
+				break;
+			}
+			case RBM_8WAY_III:
+			{
+				/* Allow direction to be cancelled for free */
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
+
+				if (fire_8way(effect, dir, damage, 4)) obvious = TRUE;
+
+				break;
+			}
 			default:
 			{
 				/* Allow direction to be cancelled for free */

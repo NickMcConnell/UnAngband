@@ -736,6 +736,9 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case RBM_ARC_60:	p = "create a 60 degree arc"; break;
 			case RBM_FLASK:	p = "throw a grenade at you"; break;
 			case RBM_TRAIL:	p = "trail"; break;
+			case RBM_8WAY: p = "create a 8-way beam"; break;
+			case RBM_8WAY_II: p = "create a large 8-way beam"; break;
+			case RBM_8WAY_III: p = "create a huge 8-way beam"; break;
 		}
 
 
