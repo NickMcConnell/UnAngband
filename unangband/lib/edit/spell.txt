@@ -3159,7 +3159,7 @@ S:SUMMON:0
 
 N:323:Summon Undead
 A:70:5:1
-S:SUMMON:17
+S:SUMMON:30
 
 N:324:Trap Creation
 A:70:7:1

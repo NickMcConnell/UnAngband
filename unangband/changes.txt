@@ -365,6 +365,8 @@ and others).
 - Its now possible to refuel using or wield torches, etc from magical bags (Reported 
 by darkDrone).
 
+- Fix scrolls of summon undead (Reported by darkDrones).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
