@@ -376,6 +376,7 @@ by darkDrone).
 
 - You can now study runes (Reported by Adam Horowitz).
 
+- Nonliving monsters should not pass through walls anymore (Reported by Adam Horowitz).
 
 ### Build / Platform ###
 

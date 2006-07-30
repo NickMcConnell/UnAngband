@@ -2222,9 +2222,10 @@ int place_monster_here(int y, int x, int r_idx)
 		return(MM_DIG);
 	}
 
-	/* Check if we don't need to breath */
+	/* Check if we don't need to breath -- note move check because we now mark walls as 'filled' */
 	if (resist &&
 		(r_ptr->flags3 & (RF3_NONLIVING)) &&
+		(f_ptr->flags1 & (FF1_MOVE)) &&
                 (f_ptr->flags2 & (FF2_DEEP | FF2_FILLED)))
 	{
 		return (MM_UNDER);
