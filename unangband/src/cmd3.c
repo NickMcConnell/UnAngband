@@ -516,7 +516,7 @@ void do_cmd_wield(void)
 			case INSCRIP_ARTIFACT: o_ptr->feeling = INSCRIP_SPECIAL; break;
 			case INSCRIP_HIGH_EGO_ITEM: o_ptr->feeling = INSCRIP_SUPERB; break;
 			case INSCRIP_EGO_ITEM: o_ptr->feeling = INSCRIP_EXCELLENT; break;
-			case INSCRIP_POWERFUL: o_ptr->feeling = INSCRIP_MAGICAL; break;
+			case INSCRIP_UNUSUAL: o_ptr->feeling = INSCRIP_MAGICAL; break;
 		}
 	}
 

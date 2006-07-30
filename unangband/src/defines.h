@@ -2820,7 +2820,7 @@
 #define INSCRIP_UNGETTABLE	14 /* Has flag preventing player / monster getting it */
 #define INSCRIP_NONMAGICAL	15 /* Has been detected to be average or cursed */
 #define INSCRIP_MAGICAL		16 /* Has been detected to be better than average */
-#define INSCRIP_POWERFUL	17 /* Has been detected to be powerful */
+#define INSCRIP_POWERFUL	17 /* XXX Not currently used. */
 #define INSCRIP_EGO_ITEM	18 /* Has been detected to be ego item */
 #define INSCRIP_HIGH_EGO_ITEM	19 /* Has been detected to be high ego item */
 #define INSCRIP_ARTIFACT	20 /* Has been detected to be artifact */

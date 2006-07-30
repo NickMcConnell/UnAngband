@@ -146,14 +146,14 @@ int value_check_aux2(const object_type *o_ptr)
 	/* Good armor bonus */
 	if (o_ptr->to_a > 0)
 	{
-		if (o_ptr->feeling == INSCRIP_POWERFUL) return (INSCRIP_MAGICAL);
+		if (o_ptr->feeling == INSCRIP_UNUSUAL) return (INSCRIP_MAGICAL);
 		return (INSCRIP_UNCURSED);
 	}
 
 	/* Good weapon bonuses */
 	if (o_ptr->to_h + o_ptr->to_d > 0)
 	{
-		if (o_ptr->feeling == INSCRIP_POWERFUL) return (INSCRIP_MAGICAL);
+		if (o_ptr->feeling == INSCRIP_UNUSUAL) return (INSCRIP_MAGICAL);
 		return (INSCRIP_UNCURSED);
 	}
 

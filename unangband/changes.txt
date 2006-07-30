@@ -203,6 +203,9 @@ player ignores unusual floor types such as slime, blood and dust whilst running
 - When travelling, display the levels of your destination. Also display the
 levels and origin when examining any map (Suggested by Adam Horowitz).
 
+- Merged the 'powerful' feeling with the 'unusual' feeling (Suggested by
+Adam Horowitz).
+
 ### Bug fixes ###
 
 - Fix weapon branding.

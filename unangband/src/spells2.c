@@ -1207,7 +1207,7 @@ int value_check_aux3(const object_type *o_ptr)
 	/* Cursed or broken items */
 	if ((cursed_p(o_ptr)) || (broken_p(o_ptr)))
 	{
-		if (o_ptr->feeling == INSCRIP_POWERFUL) return (INSCRIP_CURSED);
+		if (o_ptr->feeling == INSCRIP_UNUSUAL) return (INSCRIP_CURSED);
 
 		return (INSCRIP_NONMAGICAL);
 	}
@@ -1245,7 +1245,6 @@ int value_check_aux3(const object_type *o_ptr)
 	/* Have already got nonmagical sensed */
 	if (o_ptr->feeling == INSCRIP_UNCURSED) return(INSCRIP_AVERAGE);
 	if (o_ptr->feeling == INSCRIP_UNUSUAL) return(INSCRIP_MAGICAL);
-	if (o_ptr->feeling == INSCRIP_POWERFUL) return(INSCRIP_MAGICAL);
 
 	/* Default to nothing */
 	return (INSCRIP_NONMAGICAL);
@@ -1303,13 +1302,9 @@ int value_check_aux4(const object_type *o_ptr)
 	/* Broken items */
 	/* if (broken_p(o_ptr)) return (INSCRIP_BROKEN); */
 
-	/* Known to be powerful */
-	if ((o_ptr->feeling == INSCRIP_POWERFUL)) return (INSCRIP_MAGICAL);
-
 	/* Known to be unusual */
-	if ((o_ptr->feeling == INSCRIP_UNUSUAL)) return (INSCRIP_MAGICAL);
+	if (o_ptr->feeling == INSCRIP_UNUSUAL) return (INSCRIP_MAGICAL);
 	if (o_ptr->feeling == INSCRIP_UNCURSED) return(INSCRIP_AVERAGE);
-	if (o_ptr->feeling == INSCRIP_POWERFUL) return(INSCRIP_MAGICAL);
 
 	/* Default to uncursed */
 	return (INSCRIP_UNCURSED);
@@ -1325,7 +1320,7 @@ int value_check_aux5(const object_type *o_ptr)
 	if ((o_ptr->feeling == INSCRIP_GOOD) || (o_ptr->feeling == INSCRIP_VERY_GOOD)
 		|| (o_ptr->feeling == INSCRIP_GREAT) || (o_ptr->feeling == INSCRIP_EXCELLENT)
 		|| (o_ptr->feeling == INSCRIP_SUPERB) || (o_ptr->feeling == INSCRIP_SPECIAL)
-		|| (o_ptr->feeling == INSCRIP_MAGICAL) || (o_ptr->feeling == INSCRIP_POWERFUL)
+		|| (o_ptr->feeling == INSCRIP_MAGICAL) || (o_ptr->feeling == INSCRIP_UNUSUAL)
 		|| (o_ptr->feeling == INSCRIP_TERRIBLE) || (o_ptr->feeling == INSCRIP_WORTHLESS)
 		|| (o_ptr->feeling == INSCRIP_CURSED)) return (0);
 
@@ -1358,7 +1353,7 @@ int value_check_aux5(const object_type *o_ptr)
 	{
 		if (o_ptr->feeling == INSCRIP_NONMAGICAL) return (INSCRIP_CURSED);
 
-		return (INSCRIP_POWERFUL);
+		return (INSCRIP_UNUSUAL);
 	}
 
 	/* Broken items */
@@ -1373,13 +1368,13 @@ int value_check_aux5(const object_type *o_ptr)
 	/* Good "armor" bonus */
 	if (o_ptr->to_a > 0)
 	{
-		return (INSCRIP_POWERFUL);
+		return (INSCRIP_UNUSUAL);
 	}
 
 	/* Good "weapon" bonus */
 	if (o_ptr->to_h + o_ptr->to_d > 0)
 	{
-		return (INSCRIP_POWERFUL);
+		return (INSCRIP_UNUSUAL);
 	}
 
 	/* Default to nothing */
