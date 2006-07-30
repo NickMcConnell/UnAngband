@@ -248,7 +248,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	if (vn)
 	{
 		/* Already innate? */
-		if ((innate) || (l_ptr->flags4 & (RF4_BLOW_1 | RF4_BLOW_2 | RF4_BLOW_3 | RF4_BLOW_4))) text_out(" or");
+		if ((innate) || (ranged)) text_out(" and");
 
 		/* Intro */
 		else text_out(format("%^s", wd_he[msex]));
@@ -626,7 +626,6 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 	if (r_ptr->flags1 & RF1_FEMALE) msex = 2;
 	else if (r_ptr->flags1 & RF1_MALE) msex = 1;
 
-	
 	/* Count the number of "known" attacks */
 	for (n = 0, m = 0; m < 4; m++)
 	{
@@ -692,7 +691,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case RBM_BEG:	p = "beg"; break;
 			case RBM_INSULT:	p = "insult"; break;
 			case RBM_MOAN:	p = "moan"; break;
-			case RBM_SING:	p = "sing magical spells"; break;
+			case RBM_SING:	p = "sing"; break;
 			case RBM_TRAP: p = "trap"; break;
 			case RBM_BOULDER: p = "throw a boulder at you"; break;
 			case RBM_AURA: p = "radiate"; break;
@@ -821,6 +820,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_FALL_SPIKE: q = "drop into a spiked pit";break;
 			case GF_FALL_POIS: q = "drop into a poison spiked pit";break;
 			case GF_BLIND:  q = "blind"; break;
+			case GF_SLOW:  q = "slow"; break;
 			case GF_TERRIFY:	q = "terrify"; break;
 			case GF_PARALYZE:       q = "paralyze"; break;
 			case GF_LOSE_STR:       q = "reduce strength"; break;

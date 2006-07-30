@@ -384,6 +384,9 @@ by darkDrone).
 
 - Fix display of exp when gaining a level (Patch supplied by Pav Lucistnik).
 
+- Fixed effects of slow attack not being recalled in monster memory (Reported by Pete
+Mac).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
