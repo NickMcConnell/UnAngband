@@ -362,6 +362,9 @@ and others).
 
 - Objects exist to cure all diseases (Reported by darkDrone).
 
+- Its now possible to refuel using or wield torches, etc from magical bags (Reported 
+by darkDrone).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

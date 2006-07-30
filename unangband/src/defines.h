@@ -2547,7 +2547,6 @@
 #define USE_FLOOR		0x04	/* Allow floor items */
 #define USE_FEATU		0x08	/* Allow features (usable) */
 #define USE_FEATG		0x10	/* Allow features (gettable) */
-#define USE_BAGS		0x20	/* Allow contents of bags */
 
 
 
@@ -2788,7 +2787,7 @@
 #define IDENT_FIXED	0x0002	/* Item has been "haggled" */
 #define IDENT_BONUS	0x0004	/* Item bonuses are known */
 #define IDENT_KNOWN	0x0008	/* Item abilities are known */
-#define IDENT_STORE	0x0010	/* Item is in a store */
+#define IDENT_STORE	0x0010	/* Item is in a store / item is 'stored' in terrain */
 #define IDENT_MENTAL	0x0020	/* Item information is known */
 #define IDENT_CURSED	0x0040	/* Item is temporarily cursed */
 #define IDENT_BROKEN	0x0080	/* Item is permanently worthless */

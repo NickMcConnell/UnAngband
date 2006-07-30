@@ -3050,7 +3050,7 @@ static bool get_item_okay(int item)
 		for (i = 0; i < INVEN_BAG_TOTAL; i++)
 		{
 			/* Empty slot */
-			if ((bag_holds[o_ptr->sval][i][0]) || !(bag_contents[o_ptr->sval][i]))
+			if (!(bag_holds[o_ptr->sval][i][0]) || !(bag_contents[o_ptr->sval][i]))
 			{
 				i_ptr->k_idx = 0;
 				continue;

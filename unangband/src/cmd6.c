@@ -83,7 +83,7 @@ void do_cmd_eat_food(void)
 	/* Get an item */
 	q = "Eat which item? ";
 	s = "You have nothing to eat.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -198,7 +198,7 @@ void do_cmd_quaff_potion(void)
 	/* Get an item */
 	q = "Quaff which potion? ";
 	s = "You have no potions to quaff.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -332,7 +332,7 @@ void do_cmd_read_scroll(void)
 	/* Get an item */
 	q = "Read which scroll? ";
 	s = "You have no scrolls to read.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -468,6 +468,17 @@ void do_cmd_use_staff(void)
 		o_ptr = &o_list[0 - item];
 	}
 
+#if 0
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+#endif
 	/* Mega-Hack -- refuse to use a pile from the ground */
 	if ((item < 0) && (o_ptr->number > 1))
 	{
@@ -714,7 +725,7 @@ void do_cmd_aim_wand(void)
 	/* Get an item */
 	q = "Aim which wand? ";
 	s = "You have no wand to aim.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_BAGS))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -1003,7 +1014,17 @@ void do_cmd_zap_rod(void)
 	{
 		o_ptr = &o_list[0 - item];
 	}
+#if 0
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
 
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+#endif
 	/* Mega-Hack -- refuse to zap a pile from the ground */
 	if ((item < 0) && (o_ptr->number > 1))
 	{
@@ -1346,7 +1367,17 @@ void do_cmd_assemble(void)
 	{
 		o_ptr = &o_list[0 - item];
 	}
+#if 0
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
 
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+#endif
 	/* Take a turn */
 	p_ptr->energy_use = 100;
 
@@ -1402,6 +1433,17 @@ void do_cmd_assemble(void)
 	{
 		j_ptr = &o_list[0 - item2];
 	}
+#if 0
+	/* In a bag? */
+	if (j_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, j_ptr)) return;
+
+		/* Refer to the item */
+		j_ptr = &inventory[item2];
+	}
+#endif
 
 	/* Initialise svals */
 	src_sval = o_ptr->sval;
@@ -1596,7 +1638,17 @@ void do_cmd_activate(void)
 	{
 		o_ptr = &o_list[0 - item];
 	}
+#if 0
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
 
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+#endif
 	/* Take a turn */
 	p_ptr->energy_use = 100;
 
@@ -1901,7 +1953,7 @@ void do_cmd_apply_rune_or_coating(void)
 	/* Get an item */
 	q = "Apply which runestone, potion, mushroom or flask? ";
 	s = "You have no runestones, potions, mushrooms or flasks.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -1944,7 +1996,7 @@ void do_cmd_apply_rune_or_coating(void)
 	}
 
 	/* Get item */
-	if (!get_item(&item2, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_BAGS))) return;
+	if (!get_item(&item2, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return;
 
 	/* Get the item (in the pack) */
 	if (item2 >= 0)

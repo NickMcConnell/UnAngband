@@ -464,7 +464,7 @@ void do_cmd_browse(void)
 	/* Get an item */
 	q = "Browse which book or runestone? ";
 	s = "You have no books or runestones that you can read.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_BAGS))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -748,7 +748,7 @@ void do_cmd_study(void)
 	/* Get an item */
 	q = "Study which book or runestone? ";
 	s = "You have no books or runestones that you can read.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)

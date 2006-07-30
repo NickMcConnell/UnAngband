@@ -640,7 +640,7 @@ static void do_cmd_travel(void)
 				/* Get an item */
 				q = "Follow which map? ";
 				s = "You have no maps to guide you.";
-				if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_BAGS))) return;
+				if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) return;
 
 				/* Get the item (in the pack) */
 				if (item >= 0)
@@ -2193,7 +2193,7 @@ void do_cmd_set_trap_or_spike(void)
 	/* Get an item */
 	q = "Spike/Set trap with which item? ";
 	s = "You have nothing to set a trap or spike with.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_BAGS))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -2327,7 +2327,7 @@ void do_cmd_set_trap_or_spike(void)
 				/* Get an item */
 				q = "Attach which rope? ";
 				s = "You have no rope to attach.";
-				if (get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_BAGS)))
+				if (get_item(&item2, q, s, (USE_INVEN | USE_FLOOR)))
 				{
 					/* Get the object */
 					if (item2 >= 0)
@@ -3198,7 +3198,7 @@ void do_cmd_fire(void)
 	else
 	{
 		q = "Throw which item? ";
-		s = "You have nothing to throw. Equip missile weapon to fire an item.";
+		s = "You have nothing to throw. Equip a missile weapon to fire an item.";
 	}
 
 	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATG))) return;
@@ -3211,6 +3211,16 @@ void do_cmd_fire(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	/* Get feat */
@@ -3228,7 +3238,7 @@ void do_cmd_fire(void)
 		/* Get an item */
 		q = "Attach which rope? ";
 		s = "You have no rope to attach.";
-		if (get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_BAGS)))
+		if (get_item(&item2, q, s, (USE_INVEN | USE_FLOOR)))
 		{
 			/* Get the object */
 			if (item2 >= 0)
@@ -3887,6 +3897,16 @@ void do_cmd_throw(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	/* Get feat */

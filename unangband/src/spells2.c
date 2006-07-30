@@ -2351,6 +2351,16 @@ bool enchant_spell(int num_hit, int num_dam, int num_ac)
 		o_ptr = &o_list[0 - item];
 	}
 
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return (TRUE);
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+
 	/* Description */
 	object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
 
@@ -2419,7 +2429,17 @@ bool brand_item(int brand, cptr act)
 	{
 		o_ptr = &o_list[0 - item];
 	}
+#if 0
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return (TRUE);
 
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+#endif
 	/* Hack -- check ammo */
 	switch (o_ptr->tval)
 	{
@@ -2578,6 +2598,15 @@ bool ident_spell(void)
 		o_ptr = &o_list[0 - item];
 	}
 
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return (TRUE);
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
 
 	/* Identify it fully */
 	object_aware(o_ptr);
@@ -2651,6 +2680,16 @@ bool ident_spell_bonus(void)
 		o_ptr = &o_list[0 - item];
 	}
 
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return (TRUE);
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+
 	/* Identify it's bonuses */
 	object_bonus(o_ptr);
 
@@ -2721,6 +2760,16 @@ bool ident_spell_sense(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return (TRUE);
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	/* Identify it's bonuses */
@@ -2807,6 +2856,16 @@ bool ident_spell_value(void)
 		o_ptr = &o_list[0 - item];
 	}
 
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return (TRUE);
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+
 	/* Value the item */
 	o_ptr->ident |= (IDENT_VALUE);
 
@@ -2873,6 +2932,16 @@ bool ident_spell_runes(void)
 		o_ptr = &o_list[0 - item];
 	}
 
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return (TRUE);
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+
 	/* Identify it's bonuses */
 	o_ptr->ident |= (IDENT_RUNES);
 
@@ -2937,6 +3006,16 @@ bool ident_spell_rumor(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return (TRUE);
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	/* Pick an interesting phrase */
@@ -3125,6 +3204,16 @@ bool ident_spell_tval(int tval)
 		o_ptr = &o_list[0 - item];
 	}
 
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return (TRUE);
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+
 	/* Identify it fully */
 	object_aware(o_ptr);
 	object_known(o_ptr);
@@ -3198,6 +3287,16 @@ bool identify_fully(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return (TRUE);
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	/* Identify it fully */
@@ -3330,6 +3429,15 @@ bool recharge(int num)
 		o_ptr = &o_list[0 - item];
 	}
 
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return (TRUE);
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
 
 	/* Extract the object "level" */
 	lev = k_info[o_ptr->k_idx].level;
@@ -5012,6 +5120,16 @@ static void enchant_item(byte tval, int plev)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	/* Start with same kind */

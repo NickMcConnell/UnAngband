@@ -182,6 +182,16 @@ void do_cmd_wield(void)
 		o_ptr = &o_list[0 - item];
 	}
 
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+
 	/* Got from feature */
 	if (o_ptr->ident & (IDENT_STORE)) get_feat = TRUE;
 
@@ -683,7 +693,7 @@ void do_cmd_drop(void)
 	/* Get an item */
 	q = "Drop which item? ";
 	s = "You have nothing to drop.";
-	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_BAGS))) return;
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -762,6 +772,16 @@ void do_cmd_destroy(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	/* Get feat */
@@ -896,7 +916,7 @@ void do_cmd_observe(void)
 	/* Get an item */
 	q = "Examine which item? ";
 	s = "You have nothing to examine.";
-	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG | USE_BAGS))) return;
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -982,6 +1002,16 @@ void do_cmd_uninscribe(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	/* Nothing to remove */
@@ -1086,6 +1116,16 @@ void do_cmd_inscribe(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	/* Describe the activity */
@@ -1290,7 +1330,7 @@ void do_cmd_refill(void)
 	/* Get an item */
 	q = "Fill/fuel which item? ";
 	s = "You have nothing to fill or fuel.";
-	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_BAGS))) return;
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -1323,7 +1363,7 @@ void do_cmd_refill(void)
 		q = "Refill with which source of oil? ";
 		s = "You have no sources of oil.";
 
-		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
+		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 
 	}
 	else if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_TORCH))
@@ -1335,7 +1375,7 @@ void do_cmd_refill(void)
 		q = "Refuel with which torch? ";
 		s = "You have no extra torches.";
 
-		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATG | USE_BAGS))) return;
+		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATG))) return;
 	}
 
 	else
@@ -1347,7 +1387,7 @@ void do_cmd_refill(void)
 		q = "Fill from where? ";
 		s = "You have nothing to fill it with.";
 
-		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGS))) return;
+		if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 	}
 
 	/* Get the item (in the pack) */
@@ -1610,6 +1650,16 @@ void do_cmd_light_and_douse(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
 	}
 
 	/* Get an object description */

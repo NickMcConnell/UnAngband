@@ -4966,6 +4966,13 @@ static void death_examine(void)
 		/* Get the item */
 		o_ptr = &inventory[item];
 
+		/* In a bag? */
+		if (o_ptr->tval == TV_BAG)
+		{
+			/* Get item from bag -- hack: cancel to pick the bag itself */
+			if (get_item_from_bag(&item, q, s, o_ptr)) o_ptr = &inventory[item];
+		}
+
                 /* Known */
                 object_known(o_ptr);
 
