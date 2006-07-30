@@ -1556,7 +1556,6 @@ static errr init_other(void)
 	/* Hack -- Just call the "format()" function */
 	(void)format("%s (%s).", "Andrew Doull", MAINTAINER);
 
-
 	/* Success */
 	return (0);
 }

@@ -4690,6 +4690,20 @@ static bool kind_is_good(int k_idx)
 	return (FALSE);
 }
 
+
+/*
+ * Hack -- determine if a template is dropped by a race.
+ */
+static bool kind_is_tval(int k_idx)
+{
+	object_kind *k_ptr = &k_info[k_idx];
+
+	if (k_ptr->tval == tval_drop_idx) return (TRUE);
+
+	return (FALSE);
+}
+
+
 /*
  * Hack -- determine if a template is dropped by a race.
  */
@@ -4956,12 +4970,15 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		int k_idx;
 
 		/* Good objects */
-		if ((good) || (race_drop_idx))
+		if ((good) || (great) || (race_drop_idx) || (tval_drop_idx))
 		{
-			/* Activate restriction */
-			if (race_drop_idx) get_obj_num_hook = kind_is_race;
+			/* Activate tval restriction */
+			if (tval_drop_idx) get_obj_num_hook = kind_is_tval;
 
-			/* Activate restriction */
+			/* Activate racial restriction */
+			else if (race_drop_idx) get_obj_num_hook = kind_is_race;
+
+			/* Activate 'good' restriction */
 			else get_obj_num_hook = kind_is_good;
 
 			/* Prepare allocation table */
@@ -4972,7 +4989,7 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		k_idx = get_obj_num(base);
 
 		/* Good objects */
-		if ((good) || (race_drop_idx))
+		if ((good) || (great) || (race_drop_idx) || (tval_drop_idx))
 		{
 			/* Clear restriction */
 			get_obj_num_hook = NULL;
@@ -5041,6 +5058,9 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 	/* Sense some magic on object at creation time */
 	j_ptr->feeling = sense_magic(j_ptr, cp_ptr->sense_type, (p_ptr->lev >= 40) || rand_int(100) < 20 + p_ptr->lev * 2);
 
+	/* Hack -- theme chests */
+	if (opening_chest) tval_drop_idx = j_ptr->tval;
+
 	/* Success */
 	return (TRUE);
 }
@@ -5056,12 +5076,11 @@ bool make_object(object_type *j_ptr, bool good, bool great)
  *
  * The location must be a legal, clean, floor grid.
  */
-bool make_gold(object_type *j_ptr)
+bool make_gold(object_type *j_ptr, bool good, bool great)
 {
 	int i;
 
 	s32b base;
-
 
 	/* Hack -- Pick a Treasure variety */
 	i = ((randint(object_level + 2) + 2) / 2) - 1;
@@ -5086,6 +5105,10 @@ bool make_gold(object_type *j_ptr)
 
 	/* Determine how much the treasure is "worth" */
 	j_ptr->charges = (base + (8L * randint(base)) + randint(8));
+
+	/* Apply good or great flags */
+	if (great) j_ptr->charges *= (k_info[OBJ_GOLD_LIST + i].tval == TV_GEMS ? 100 : damroll(7, 4));
+	else if (good) j_ptr->charges *= (k_info[OBJ_GOLD_LIST + i].tval == TV_GEMS ? 10 : damroll(2, 3));
 
 	/* Success */
 	return (TRUE);
@@ -6128,7 +6151,7 @@ void place_gold(int y, int x)
 	object_wipe(i_ptr);
 
 	/* Make some gold */
-	if (make_gold(i_ptr))
+	if (make_gold(i_ptr, FALSE, FALSE))
 	{
 		/* Give it to the floor */
 		(void)floor_carry(y, x, i_ptr);

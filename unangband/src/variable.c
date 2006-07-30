@@ -127,9 +127,10 @@ s16b coin_type;		 /* Hack -- force coin type */
 
 s16b food_type;		 /* Hack -- force food type */
 
-s16b race_drop_idx;	     /* Hack -- force race drop */
+s16b race_drop_idx = 0;	     /* Hack -- force race drop */
+s16b tval_drop_idx = 0;	     /* Hack -- force race drop */
 
-bool opening_chest;	     /* Hack -- prevent chest generation */
+bool opening_chest = FALSE;	     /* Hack -- theme chest generation */
 
 bool shimmer_monsters;  /* Hack -- optimize multi-hued monsters */
 bool shimmer_objects;   /* Hack -- optimize multi-hued objects */

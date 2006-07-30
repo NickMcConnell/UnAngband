@@ -1322,6 +1322,9 @@ static void store_create(void)
 		/* Paranoia */
 		race_drop_idx = 0;
 
+		/* Paranoia */
+		tval_drop_idx = 0;
+
 		/* Quest rewards */
 		if ((total == 0) && (store_num_fake == -1))
 		{

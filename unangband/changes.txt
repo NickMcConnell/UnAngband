@@ -149,6 +149,13 @@ available in your current spell book; as well as allowing you to cast the spell 
 have just studied. This makes learning spells from features in the dungeon now useful.
 Be careful not to lose this study item however, as it is (currently) irreplaceable.
 
+- Chests are now themed and drop more useful and powerful items or valuable gold. Low
+level chests are less frequently trapped, high-level ones more so (Suggested by Adam
+Horowitz).
+
+- Monsters with good or great drops now drop more valuable gold or gems if they have
+a gold drop.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -365,7 +372,10 @@ and others).
 - Its now possible to refuel using or wield torches, etc from magical bags (Reported 
 by darkDrone).
 
-- Fix scrolls of summon undead (Reported by darkDrones).
+- Fix scrolls of summon undead (Reported by darkDrone).
+
+- You can now study runes (Reported by Adam Horowitz).
+
 
 ### Build / Platform ###
 

@@ -5589,6 +5589,9 @@ void cave_set_feat(int y, int x, int feat)
 		/* Always drop something */
 		if (!number) number = 1;
 
+		/* Opening a chest -- this forces tval_drop_idx to be set after first item selected */
+		opening_chest = TRUE;
+
 		/* Drop some objects */
 		for (j = 0; j < number; j++)
 		{
@@ -5602,7 +5605,7 @@ void cave_set_feat(int y, int x, int feat)
 			if (do_gold && (!do_item || (rand_int(100) < 50)))
 			{
 				/* Make some gold */
-				if (!make_gold(i_ptr)) continue;
+				if (!make_gold(i_ptr, good, great)) continue;
 			}
 
 			/* Make Object */
@@ -5612,9 +5615,15 @@ void cave_set_feat(int y, int x, int feat)
 				if (!make_object(i_ptr, good, great)) continue;
 			}
 
+			/* No longer opening a chest */
+			opening_chest = FALSE;
+
 			/* Drop it in the dungeon */
 			drop_near(i_ptr, -1, y, x);
 		}
+
+		/* Clear drop restriction */
+		tval_drop_idx = 0;
 
 	}
 }

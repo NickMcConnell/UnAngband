@@ -2986,7 +2986,7 @@ void monster_death(int m_idx)
 		if (do_gold && (!do_item || (rand_int(100) < 50)))
 		{
 			/* Make some gold */
-			if (!make_gold(i_ptr)) continue;
+			if (!make_gold(i_ptr, good, great)) continue;
 
 			if (coin_type) l_ptr->flags9 |= (RF9_DROP_MINERAL);
 
