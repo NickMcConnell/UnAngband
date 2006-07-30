@@ -3114,6 +3114,7 @@ static bool push_aside(monster_type *m_ptr, monster_type *n_ptr)
 	return (FALSE);
 }
 
+
 /*
  *  Determine the language a monster speaks.
  */
@@ -3127,7 +3128,7 @@ int monster_language(int r_idx)
 		/* Hack -- language depends on graphic */
 		int language = LANG_NATURAL;
 
-		if (r_ptr->d_char == ':') language = LANG_FOREST;
+		if ((r_ptr->d_char == ':') || (r_ptr->d_char == ';')) language = LANG_FOREST;
 		else if (r_ptr->d_char == ',') language = LANG_MUSHROOM;
 		else if ((r_ptr->d_char >= 'A') && (r_ptr->d_char <= 'Z')) language += r_ptr->d_char - 'A' + 1;
 		else if ((r_ptr->d_char >= 'a') && (r_ptr->d_char <= 'z')) language += r_ptr->d_char - 'a' + 26 + 1;
@@ -3146,6 +3147,7 @@ int monster_language(int r_idx)
 	return (LANG_COMMON);
 }
 
+
 /*
  *  Monsters speak to each other in various situations.
  */
@@ -3159,8 +3161,13 @@ void monster_speech(int m_idx, cptr saying, bool understand)
 
 	char m_name[80];
 
-	/* Monster never speaks */
-	if (r_ptr->flags3 & (RF3_NONVOCAL)) return;
+	/* Monster never speaks aloud */
+	if (r_ptr->flags3 & (RF3_NONVOCAL))
+	{
+		if (!(p_ptr->cur_flags3 & (TR3_TELEPATHY))) return;
+
+		speech = LANG_ESP;
+	}
 
 	/* Check if player understands language */
 	if (language == LANG_COMMON) understand = TRUE;
@@ -3259,6 +3266,7 @@ void tell_allies_player_can(int y, int x, u32b flag)
 {
 	int i,language;
 	bool vocal = FALSE;
+	bool esp = ((r_info[m_list[cave_m_idx[y][x]].r_idx].flags3 & (RF3_NONVOCAL)) != 0);
 
 	cptr saying = "& resists nothing.";
 
@@ -3279,8 +3287,8 @@ void tell_allies_player_can(int y, int x, u32b flag)
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
 
-		/* Ignore monsters not in LOF */
-		if (!generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
+		/* Ignore monsters not in LOF -- unless telepathic */
+		if (!esp && !(generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF))) continue;
 
 		/* Vocalise? */
 		if (!(n_ptr->csleep) && /* (n_ptr->mflag & (MFLAG_ACTV)) && */ ((n_ptr->smart & (flag)) != 0)) continue;
@@ -3336,6 +3344,7 @@ void tell_allies_player_not(int y, int x, u32b flag)
 {
 	int i, language;
 	bool vocal = FALSE;
+	bool esp = ((r_info[m_list[cave_m_idx[y][x]].r_idx].flags3 & (RF3_NONVOCAL)) != 0);
 
 	cptr saying = "& no longer resists nothing.";
 
@@ -3356,8 +3365,8 @@ void tell_allies_player_not(int y, int x, u32b flag)
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
 
-		/* Ignore monsters not in LOF */
-		if (!generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
+		/* Ignore monsters not in LOF -- unless telepathic */
+		if (!esp && !(generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF))) continue;
 
 		/* Vocalise? */
 		if (!(n_ptr->csleep) && /* (n_ptr->mflag & (MFLAG_ACTV)) && */ ((n_ptr->smart & (flag)) == 0)) continue;
@@ -3413,6 +3422,7 @@ void tell_allies_mflag(int y, int x, u32b flag, cptr saying)
 {
 	int i, language;
 	bool vocal = FALSE;
+	bool esp = ((r_info[m_list[cave_m_idx[y][x]].r_idx].flags3 & (RF3_NONVOCAL)) != 0);
 
 	language = monster_language(m_list[cave_m_idx[y][x]].r_idx);
 
@@ -3431,8 +3441,8 @@ void tell_allies_mflag(int y, int x, u32b flag, cptr saying)
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
 
-		/* Ignore monsters not in LOF */
-		if (!generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
+		/* Ignore monsters not in LOF -- unless telepathic */
+		if (!esp && !(generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF))) continue;
 
 		/* Vocalise? */
 		if (!(n_ptr->csleep) && /* (n_ptr->mflag & (MFLAG_ACTV)) && */ (n_ptr->mflag & (flag))) continue;

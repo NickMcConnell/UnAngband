@@ -3689,6 +3689,12 @@ errr parse_r_info(char *buf, header *head)
 			r_ptr->flags3 |= RF3_NONLIVING;
 		}
 
+		/* Hack -- nonvocal monsters */
+		if (strchr("ejmv\\/~[]{}", r_ptr->d_char))
+		{
+			r_ptr->flags3 |= RF3_NONVOCAL;
+		}
+
 		/* Canines and hounds and ring wraiths have super scent */
 		if ((strchr("CZ", r_ptr->d_char)) || ((r_ptr->d_char == 'W') && (r_ptr->flags1 & (RF1_UNIQUE))))
 		{

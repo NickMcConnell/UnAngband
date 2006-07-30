@@ -968,6 +968,7 @@ static void describe_monster_abilities(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags2 & RF2_SNEAKY) vp[vn++] = "hide in unusual places";
 	if ((l_ptr->flags2 & RF2_CAN_SWIM) && !(l_ptr->flags2 & RF2_MUST_SWIM)) vp[vn++] = "swim under water";
 	if ((l_ptr->flags2 & RF2_CAN_FLY) && !(l_ptr->flags2 & RF2_MUST_FLY)) vp[vn++] = "fly over obstacles";
+	if (l_ptr->flags3 & RF3_NONVOCAL) vp[vn++] = "communicate telepathically with its own kind";
 	if (l_ptr->flags9 & RF9_EVASIVE) vp[vn++] = "easily evade blows and missiles";
 
 	if (l_ptr->flags9 & (RF9_SUPER_SCENT))
@@ -1442,8 +1443,12 @@ static void describe_monster_exp(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->tkills)
 	{
 		/* Introduction */
-		if (l_ptr->flags1 & RF1_UNIQUE)
+		if ((l_ptr->flags3 & RF3_NONLIVING) && (l_ptr->flags1 & RF1_UNIQUE))
+			text_out("Destroying");
+		else if (l_ptr->flags1 & RF1_UNIQUE)
 			text_out("Killing");
+		else if (l_ptr->flags3 & RF3_NONLIVING)
+			text_out("Destruction of");
 		else
 			text_out("A kill of");
 

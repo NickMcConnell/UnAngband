@@ -3531,10 +3531,11 @@
 #define LANG_DRAGON	6
 #define LANG_DEMON	7
 #define LANG_UNDEAD	8
-#define LANG_FOREST	9
-#define LANG_MUSHROOM	10
-#define LANG_NATURAL	11
-#define MAX_LANGUAGES	65
+#define LANG_ESP	9
+#define LANG_FOREST	10
+#define LANG_MUSHROOM	11
+#define LANG_NATURAL	12
+#define MAX_LANGUAGES	66
 
 
 /*

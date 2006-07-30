@@ -1206,7 +1206,6 @@ void update_mon(int m_idx, bool full)
 			/* Weird mind, occasional telepathy */
 			else if (r_ptr->flags2 & (RF2_WEIRD_MIND))
 			{
-
 				/* One in ten individuals are detectable */
 				if ((m_idx % 10) == 5)
 				{
@@ -1220,19 +1219,21 @@ void update_mon(int m_idx, bool full)
 					/* Hack -- Memorize mental flags */
 					if (r_ptr->flags2 & (RF2_SMART)) l_ptr->flags2 |= (RF2_SMART);
 					if (r_ptr->flags2 & (RF2_STUPID)) l_ptr->flags2 |= (RF2_STUPID);
+					if (r_ptr->flags3 & (RF3_NONVOCAL)) l_ptr->flags2 |= (RF3_NONVOCAL);
 				}
 			}
 
 			/* Normal mind, allow telepathy */
 			else
 			{
-
 				/* Detectable */
 				flag = TRUE;
 
 				/* Hack -- Memorize mental flags */
 				if (r_ptr->flags2 & (RF2_SMART)) l_ptr->flags2 |= (RF2_SMART);
 				if (r_ptr->flags2 & (RF2_STUPID)) l_ptr->flags2 |= (RF2_STUPID);
+				if (r_ptr->flags3 & (RF3_NONVOCAL)) l_ptr->flags2 |= (RF3_NONVOCAL);
+
 			}
 
 #ifdef ALLOW_OBJECT_INFO_MORE
@@ -4397,8 +4398,8 @@ void message_pain(int m_idx, int dam)
 		return;
 	}
 #endif
-	/* Jelly's, Mold's, Vortex's, Quthl's */
-	if (strchr("jmvQ", r_ptr->d_char))
+	/* Nonvocal monsters */
+	if (r_ptr->flags3 & (RF3_NONVOCAL))
 	{
 		if (percentage > 95)
 			msg_format("%^s barely notices.", m_name);
@@ -4436,7 +4437,7 @@ void message_pain(int m_idx, int dam)
 	}
 
 	/* One type of monsters (ignore,squeal,shriek) */
-	else if (strchr("FIKMRSXabclqrst", r_ptr->d_char))
+	else if (strchr("FIKMRSXabclrs", r_ptr->d_char))
 	{
 		if (percentage > 95)
 			msg_format("%^s ignores the attack.", m_name);

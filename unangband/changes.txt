@@ -156,6 +156,8 @@ Horowitz).
 - Monsters with good or great drops now drop more valuable gold or gems if they have
 a gold drop.
 
+- Some monsters are now telepathic and will not say anything out loud about the player.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -377,6 +379,8 @@ by darkDrone).
 - You can now study runes (Reported by Adam Horowitz).
 
 - Nonliving monsters should not pass through walls anymore (Reported by Adam Horowitz).
+
+- Less monsters are understood by the player (Reported by Adam Horowitz).
 
 ### Build / Platform ###
 

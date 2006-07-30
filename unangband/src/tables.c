@@ -3210,6 +3210,7 @@ const cptr vocalize[MAX_LANGUAGES] =
 	"roars",	/* LANG_DRAGON */
 	"utters",	/* LANG_DEMON */
 	"whispers",	/* LANG_UNDEAD */
+	"thinks",	/* LANG_ESP */
 	"creaks",	/* LANG_FOREST */
 	"releases",	/* LANG_MUSHROOM */
 	"says",		/* LANG_NATURAL */
