@@ -382,6 +382,8 @@ by darkDrone).
 
 - Less monsters are understood by the player (Reported by Adam Horowitz).
 
+- Fix display of exp when gaining a level (Patch supplied by Pav Lucistnik).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
