@@ -3850,8 +3850,8 @@ F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 N:522:of Rune Magic
 G:?:r
 I:90:21:0
-W:40:0:30:2000
-A:40/1
+W:70:0:30:16000
+A:70/1
 P:0:1d1:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
@@ -3922,8 +3922,8 @@ F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 N:531:of Alchemy
 G:?:r
 I:90:13:0
-W:70:0:30:16000
-A:70/1
+W:40:0:30:2000
+A:40/1
 P:0:1d1:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
@@ -5655,30 +5655,30 @@ G:?:v
 I:99:22:0
 W:25:0:0:40
 
-N:772:Strength Serum
+N:772:Restore Strength
 G:?:v
 I:99:23:0
-W:25:0:0:500
+W:20:0:0:250
 
-N:773:Enchant Potion
+N:773:Restore Intelligence
 G:?:v
 I:99:24:0
-W:50:0:0:500
+W:20:0:0:250
 
-N:774:Create Gold
+N:774:Restore Wisdom
 G:?:v
 I:99:25:0
-W:100:0:0:500
+W:20:0:0:250
 
-N:775:Charisma
+N:775:Restore Charisma
 G:?:v
 I:99:26:0
-W:50:0:0:500
+W:20:0:0:250
 
 N:776:Read Magic
 G:?:v
 I:99:27:0
-W:50:0:0:40
+W:10:0:0:40
 
 N:777:*Identify*
 G:?:v
@@ -6402,3 +6402,16 @@ G:,:w
 I:80:22:0
 W:10:500:1:50
 A:10/1
+
+# Additional services
+
+N:884:Restore Dexterity
+G:?:v
+I:99:46:0
+W:20:0:0:250
+
+N:885:Restore Constitution
+G:?:v
+I:99:47:0
+W:20:0:0:250
+

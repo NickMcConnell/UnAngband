@@ -366,7 +366,7 @@ bool inven_book_okay(const object_type *o_ptr)
 	{
 		s_ptr = &s_info[o_ptr->pval];
 
-		for (i=0;iii<MAX_SPELL_CASTERS;i++)
+		for (i=0;i<MAX_SPELL_CASTERS;i++)
 		{
 			if (s_ptr->cast[i].class == p_ptr->pclass) return (1);
 		}
@@ -843,12 +843,10 @@ void do_cmd_study(void)
 			o_ptr = &object_type_body;
 
 			/* Set object details required */
-			o_ptr->k_idx = field[selection];
-			o_ptr->tval = k_info[field[selection]].tval;
-			o_ptr->sval = k_info[field[selection]].sval;
-
-			/* Ask for a spell, allow cancel */
-			if (!get_spell(&spell, "research", o_ptr, FALSE) && (spell == -1)) return;
+			o_ptr->k_idx = selection;
+			o_ptr->tval = k_info[selection].tval;
+			o_ptr->sval = k_info[selection].sval;
+			o_ptr->xtra1 = 0;
 		}
 		/* Did not choose something */
 		else
@@ -858,7 +856,7 @@ void do_cmd_study(void)
 	}
 
 	/* Prayer book -- Learn a random prayer */
-	else if (o_ptr->tval == TV_PRAYER_BOOK)
+	if (o_ptr->tval == TV_PRAYER_BOOK)
 	{
 		int ii;
 
