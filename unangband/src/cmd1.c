@@ -655,6 +655,11 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 		}
 	}
 
+	/* Hack -- if dice roll less than three, treat as three for adding multiplier only */
+	if (tdam < 3)
+	{
+		return (tdam + 3 * (mult - 1));
+	}
 
 	/* Return the total damage */
 	return (tdam * mult);

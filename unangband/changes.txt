@@ -162,6 +162,13 @@ a gold drop.
 
 - Smoother progression gaining spells and mana.
 
+- For computing slays and brands, if the value on the damage dice roll is less than
+3, treat it as 3 for determining the damage added by the slay or brand only. e.g. for
+x3 multiplier weapons, add at least 6 damage, x4 multiplier weapons, add at least 9
+damage, and x5 multiplier weapons, add at least 12 damage. We deliberately ignore
+this when computing weapon or artifact power for the moment to keep thing simplier (it
+will only add a point or two to power in most instances anyway).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
