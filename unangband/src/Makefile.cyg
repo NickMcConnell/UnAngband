@@ -48,7 +48,7 @@ clean:	cleanobjs cleanbin
 #
 
 unangband: $(EXOBJS)
-	$(CC) $(CFLAGS) -o unangband $(EXOBJS) $(INCDIRS) $(LIBDIRS) $(LIBS)
+	$(CC) -o unangband $(EXOBJS) $(INCDIRS) $(LIBDIRS) $(LIBS)
 
 
 #

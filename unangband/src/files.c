@@ -2516,18 +2516,11 @@ static void display_player_misc_info(void)
 /*
  * Special display, part 2b
  */
-static void display_player_stat_info(void)
+void display_player_stat_info(int row, int col)
 {
-	int i, row, col;
+	int i;
 
 	char buf[80];
-
-
-	/* Row */
-	row = 3;
-
-	/* Column */
-	col = 42;
 
 	/* Print out the labels for the columns */
 	c_put_str(TERM_WHITE, "  Self", row-1, col+5);
@@ -2961,7 +2954,7 @@ void display_player(int mode)
 	clear_from(0);
 
 	/* Stat info */
-	display_player_stat_info();
+	display_player_stat_info(3, 42);
 
 	if ((mode) < 3)
 	{

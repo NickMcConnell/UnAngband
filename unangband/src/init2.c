@@ -314,7 +314,7 @@ void create_user_dirs(void)
 
 	/* Create the directory */
 	mkdir(dirpath, 0700);
-#endif USE_PRIVATE_PATHS
+#endif /* USE_PRIVATE_PATHS */
 }
 
 #endif /* PRIVATE_USER_PATH */

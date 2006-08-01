@@ -675,9 +675,9 @@ void print_fields(const s16b *sn, int num, int y, int x)
 	/* Dump the fields */
 	for (i = 0; i < num; i++)
 	{
-		/* Dump the spell --(-- */
+		/* Dump the spell -- skip 'of ' if required */
 		sprintf(out_val, "  %c) %-75s ",
-			I2A(i), k_name + k_info[sn[i]].name);
+			I2A(i), k_name + k_info[sn[i]].name + (k_info[sn[i]].tval == TV_RUNESTONE ? 0 : 3));
 		c_prt(TERM_WHITE, out_val, y + i, x);
 	}
 
@@ -812,6 +812,7 @@ void do_cmd_study(void)
 
 		default:
 			p="power";
+			r = "";
 			break;
 	}
 

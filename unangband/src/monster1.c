@@ -738,6 +738,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case RBM_8WAY: p = "create a 8-way beam"; break;
 			case RBM_8WAY_II: p = "create a large 8-way beam"; break;
 			case RBM_8WAY_III: p = "create a huge 8-way beam"; break;
+			case RBM_SWARM: p = "create a swarm"; break;
 		}
 
 

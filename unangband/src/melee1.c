@@ -1312,6 +1312,33 @@ static void mon_area(int who, int y, int x, int typ, int dam, int rad, cptr resu
 
 /*
  * Cast a ball spell at the target
+ * Affect grids, objects, monsters, and (specifically) the player
+ * Stop at first target
+ */
+static void mon_ball_minor(int who, int y, int x, int typ, int dam, int rad, bool hit, cptr result)
+{
+	/* Message */
+	if (result) msg_print(result);
+
+	if (who > 0)
+	{
+		monster_type *m_ptr = &m_list[who];
+		int fy = m_ptr->fy;
+		int fx = m_ptr->fx;
+
+		/* Aim at target with a ball attack */
+		(void)project(who, rad, fy, fx, y, x, dam, typ, FLG_MON_BALL | PROJECT_STOP | (hit ? 0L : PROJECT_MISS), 0, 0);
+	}
+	else
+	{
+		/* Affect grids in radius with a ball attack */
+		(void)project(0, rad, y, x, y, x, dam, typ, FLG_MON_BALL, 0, 0);
+	}
+}
+
+
+/*
+ * Cast a ball spell at the target
  * Pass over any monsters that may be in the way
  * Affect grids, objects, monsters, and (specifically) the player
  * Can miss the first target
@@ -1811,7 +1838,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_BEAM: mon_beam(who, y, x, effect, dam, 10, result); break;
 				case RBM_BLAST: mon_ball(who, y, x, effect, dam, 0, TRUE, result); break;
 				case RBM_WALL: mon_beam(who, y, x, effect, dam, 12, result); break;
-				case RBM_BALL_MINOR: mon_ball(who, y, x, effect, dam, 2, TRUE, result); break;
+				case RBM_BALL_MINOR: mon_ball_minor(who, y, x, effect, dam, 2, FALSE, result); break;
 				case RBM_BALL: mon_ball(who, y, x, effect, dam, 2, TRUE, result); break;
 				case RBM_BALL_II: mon_ball(who, y, x, effect, dam, 3, TRUE, result); break;
 				case RBM_BALL_III: mon_ball(who, y, x, effect, dam, 4, TRUE, result); break;
@@ -1840,10 +1867,11 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_ARC_40: mon_arc(who, y, x, effect, dam, 0, (powerful ? 60 : 40), result); break;
 				case RBM_ARC_50: mon_arc(who, y, x, effect, dam, 0, 50, result); break;
 				case RBM_ARC_60: mon_arc(who, y, x, effect, dam, 0, 60, result); break;
-				case RBM_FLASK:	mon_ball(who, y, x, effect, dam, 1, hit, result); break;
+				case RBM_FLASK:	mon_ball_minor(who, y, x, effect, dam, 1, hit, result); break;
 				case RBM_8WAY: mon_8way(who, y, x, effect, dam, 2, result); break;
 				case RBM_8WAY_II: mon_8way(who, y, x, effect, dam, 3, result); break;
 				case RBM_8WAY_III: mon_8way(who, y, x, effect, dam, 4, result); break;
+				case RBM_SWARM: for (k = 0; k < (rlev / 20) + 2; k++) mon_ball_minor(who, y, x, effect, dam, 2, TRUE, result); break;
 				default: mon_beam(who, y, x, effect, dam, 2, result); /* For all hurt huge attacks */
 			}
 

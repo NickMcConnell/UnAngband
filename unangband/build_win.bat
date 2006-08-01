@@ -26,7 +26,7 @@ copy lib\save\delete.me unangband-061-win\lib\save
 copy lib\user\delete.me unangband-061-win\lib\user
 copy lib\xtra\music\delete.me unangband-061-win\lib\xtra\music
 
-copy angband.exe unangband-061-win
+copy unangband.exe unangband-061-win
 copy readme.txt unangband-061-win
 copy changes.txt unangband-061-win
 
@@ -49,7 +49,7 @@ copy lib\xtra\sound\*.wav unangband-061-win\lib\xtra\sound
 copy lib\xtra\help\angband.hlp unangband-061-win\lib\xtra\help
 copy lib\xtra\help\angband.cnt unangband-061-win\lib\xtra\help
 
-upx -9 unangband-061-win\angband.exe
+upx -9 unangband-061-win\unangband.exe
 
 7z a -tzip -r unangband-061-win.zip unangband-061-win
 

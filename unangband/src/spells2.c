@@ -4644,6 +4644,44 @@ bool fire_ball_minor(int typ, int dir, int dam, int rad)
 
 
 /*
+ * Cast multiple non-jumping ball spells at the same target.
+ *
+ * Targets absolute coordinates instead of a specific monster, so that
+ * the death of the monster doesn't change the target's location.
+ */
+bool fire_swarm(int num, int typ, int dir, int dam, int rad)
+{
+	bool noticed = FALSE;
+
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int ty, tx;
+
+	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
+
+	/* Use the given direction */
+	ty = py + 99 * ddy[dir];
+	tx = px + 99 * ddx[dir];
+
+	/* Hack -- Use an actual "target" (early detonation) */
+	if ((dir == 5) && target_okay())
+	{
+		ty = p_ptr->target_row;
+		tx = p_ptr->target_col;
+	}
+
+	while (num--)
+	{
+		/* Analyze the "dir" and the "target".  Hurt items on floor. */
+		if (project(-1, rad, py, px, ty, tx, dam, typ, flg, 0, 0)) noticed = TRUE;
+	}
+
+	return noticed;
+}
+
+
+/*
  * Cast a ball spell
  * Stop if we hit a monster, act as a "ball"
  * Allow "target" mode to pass over monsters
@@ -5941,6 +5979,14 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				if (fire_8way(effect, dir, damage, 4)) obvious = TRUE;
 
 				break;
+			}
+			case RBM_SWARM:
+			{
+				/* Allow direction to be cancelled for free */
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
+
+				if (fire_swarm(2 + level / 20, effect, dir,
+			           	damage + level / 2, 1)) obvious = TRUE;;
 			}
 			default:
 			{

@@ -1061,6 +1061,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		d3 = s_ptr->blow[m].d_plus;
 		rad = 0;
 		arc = 0;
+		rng = 0;
 
 		/* Hack -- use level as modifier */
 		if ((!d2) && (!level))
@@ -1154,6 +1155,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_8WAY: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 2; break;
 			case RBM_8WAY_II: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 3; break;
 			case RBM_8WAY_III: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 4; break;
+			case RBM_SWARM: p = "creates multiple balls"; t = "your enemies"; rad = 1; d3 += level / 2; break;
 		}
 
 
@@ -1570,6 +1572,7 @@ void spell_info(char *p, int spell, bool use_level)
 			case RBM_STORM: rad = 3; break;
 			case RBM_AREA: rad = (level/10)+2; break;
 			case RBM_ORB: rad = (level < 30 ? 2 : 3); d3 += level/2; break;
+			case RBM_SWARM: d3 += level / 2; rad = 1; break;
 		}
 
 		/* Default */
@@ -3967,7 +3970,7 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 	o_ptr->not_flags4 &= ~(f4);
 
 	/* Clear may flags on all kit - include inventory */
-	for (i = 0; i < INVEN_TOTAL+1; i++)
+	for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		object_type *i_ptr = &inventory[i];
 
@@ -4137,7 +4140,7 @@ static void inven_may_flags()
 	object_type *i_ptr;
 
 	/* Check inventory may flags*/
-	for (i = 0; i < INVEN_TOTAL+1; i++)
+	for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		i_ptr = &inventory[i];
 
@@ -4182,7 +4185,7 @@ static void inven_may_flags()
 	}
 
 	/* Check inventory may flags*/
-	for (i = 0; i < INVEN_TOTAL+1; i++)
+	for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		i_ptr = &inventory[i];
 
@@ -4703,7 +4706,7 @@ void inven_drop_flags(object_type *o_ptr)
 	if (!(f1) && !(f2) && !(f3) && !(f4)) return;
 
 	/* Clear equipment may flags*/
-	for (i = 0; i < INVEN_TOTAL+1; i++)
+	for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		i_ptr = &inventory[i];
 

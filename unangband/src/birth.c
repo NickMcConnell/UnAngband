@@ -1713,10 +1713,10 @@ static bool player_birth_aux_3(void)
 			m = adjust_stat(17, j, TRUE);
 
 			/* Modify for race if maximised */
-			if (adult_maximize_race) modify_stat_value(m, rp_ptr->r_adj[i]);
+			if (adult_maximize_race) m = modify_stat_value(m, rp_ptr->r_adj[i]);
 
 			/* Modify for class if maximised */
-			if (adult_maximize_class) modify_stat_value(m, cp_ptr->c_adj[i]);
+			if (adult_maximize_class) m = modify_stat_value(m, cp_ptr->c_adj[i]);
 
 			/* Save the maximum */
 			mval[i] = m;

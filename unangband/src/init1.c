@@ -188,6 +188,7 @@ static cptr r_info_blow_method[] =
 	"8WAY",
 	"8WAY_II",
 	"8WAY_III",
+	"SWARM",
 	NULL
 };
 

@@ -10271,7 +10271,7 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 	else if (!(flg & (PROJECT_ARC | PROJECT_STAR)))
 	{
 		/* Determine maximum length of projection path */
-		if (flg & (PROJECT_BOOM)) dist = MAX_RANGE;
+		if (flg & (PROJECT_BOOM | PROJECT_8WAY)) dist = MAX_RANGE;
 		else if (rad <= 0)        dist = MAX_RANGE;
 		else                      dist = rad;
 
@@ -10288,7 +10288,7 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 			int nx = GRID_X(path_g[i]);
 
 			/* Hack -- Balls explode before reaching walls. */
-			if ((flg & (PROJECT_BOOM)) && (!cave_project_bold(ny, nx)))
+			if ((flg & (PROJECT_BOOM | PROJECT_8WAY)) && (!cave_project_bold(ny, nx)))
 			{
 				break;
 			}
@@ -10389,6 +10389,54 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 	if (flg & (PROJECT_BEAM))
 	{
 		/* No special actions */
+	}
+
+	/* Handle 8-way projections */
+	else if (flg & (PROJECT_8WAY))
+	{
+		/* Unblocked directions */
+		byte dirs = 0xFF;
+
+		/*
+		 * If the center of the explosion hasn't been
+		 * saved already, save it now.
+		 */
+		if (grids == 0)
+		{
+			gy[grids] = y2;
+			gx[grids] = x2;
+			gd[grids++] = 0;
+		}
+
+		/* Scan outwards from centre */
+		for (k = 1; (k <= rad) && (dirs); k++)
+		{
+			/* In each direction */
+			for (i = 0; (i < 8) && (dirs & (1 << i)); i++)
+			{
+				int y = y2 + ddy_ddd[i] * k;
+				int x = x2 + ddx_ddd[i] * k;
+
+				/* This is a non-projectable grid */
+				if (!cave_project_bold(y, x))
+				{
+					/* Spell with PROJECT_PASS ignore these grids */
+					if (!(flg & (PROJECT_PASS)))
+					{
+						/* Remove from available directions */
+						dirs &= ~(1 << i);
+					}
+				}
+
+				/* PROJECT_WALL or PROJECT_PASS is active or terrain is passable */
+				if ((flg & (PROJECT_WALL | PROJECT_PASS)) || cave_project_bold(y, x))
+				{
+					gy[grids] = y;
+					gx[grids] = x;
+					gd[grids++] = k;
+				}
+			}
+		}
 	}
 
 	/* Handle explosions */

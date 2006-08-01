@@ -2473,65 +2473,105 @@ void improve_aware(void)
 	}
 }
 
+
+
+/*
+ * Print a list of stats (for improvement).
+ */
+void print_stats(const s16b *sn, int num, int y, int x)
+{
+	int i;
+
+	byte attr;
+
+	/* Display title */
+	prt("", y, x);
+
+	/* Add labels */
+	for (i = 0; i < num; i++)
+	{
+		attr = TERM_GREEN;
+
+		if (p_ptr->stat_cur[sn[i]] == 18 + 100) attr = TERM_L_DARK;
+		if (p_ptr->stat_cur[sn[i]]<p_ptr->stat_max[sn[i]]) attr = TERM_YELLOW;
+
+		/* Hack -- Dump the stat - hack from magic_name table */
+		c_prt(attr, format("  %c) ", I2A(i)), y + i + 1, x);
+	}
+
+	/* Display drop-shadow */
+	prt("", y + i + 1, x);
+
+	/* Display the stats */
+	display_player_stat_info(y, x + 5);
+}
+
+
 /*
  * Improve one stat, preferring lowest stats
  * Note hack to always improve the maximal value of a stat.
  */
 static void improve_stat(void)
 {
-	int k, stat, i;
-
 	int tmp = 0;
+	int i, selection;
 
-	int table[7];
+	s16b table[A_CHR+1];
 
-	cptr p="";
+	cptr p = "";
 
-	/* Start table */
-	table[0]=0;
+	bool okay = FALSE;
 
-	/* Build probability table */
-	for (i = 0;i <=A_CHR;i++)
+	/* Check which stats can still be improved */
+	for (i = 0; i <= A_CHR; i++)
 	{
-		k = (18 + 100) - p_ptr->stat_cur[i];
-
-		if (k> 0) table[i+1] = table[i]+k;
-		else table[i+1]=table[i];
+		table[i] = i;
+		if (p_ptr->stat_cur[i] < 18 + 100) okay = TRUE;
 	}
 
-	/* Choice */
-	if (table[6]) k = rand_int(table[6]);
+	/* No stats left to improve */
+	if (!okay) return;
 
-	/* Nothing to improve */
-	else return;
+retry:
 
-	/* Pick entry from table */
-	for (stat = 0;stat <=A_CHR;stat++)
+	/* Select stat to improve -- use above choice as default selection */
+	if (get_list(print_stats, table, 6, "Attribute", "Improve which attribute", 1, 37, &selection))
 	{
-		if (k< table[stat+1]) break;
+		/* Check if stat at maximum */
+		if (p_ptr->stat_cur[selection] >= 18 + 100)
+		{
+			msg_format("You cannot get any %s",desc_stat_imp[selection]);
+
+			goto retry;
+		}
 	}
+	else
+	{
+		goto retry;
+	}
+
 
 	/* Display */
-	if (p_ptr->stat_cur[stat]<p_ptr->stat_max[stat])
+	if (p_ptr->stat_cur[selection]<p_ptr->stat_max[selection])
 	{
 		/* Set description */
 		p = "you could be ";
 
 		/* Hack --- store stat */
-		tmp = p_ptr->stat_cur[stat];
-		p_ptr->stat_cur[stat] = p_ptr->stat_max[stat];
+		tmp = p_ptr->stat_cur[selection];
+		p_ptr->stat_cur[selection] = p_ptr->stat_max[selection];
 	}
 
 	/* Attempt to increase */
-	if (inc_stat(stat))
+	if (inc_stat(selection))
 	{
 		/* Message */
-		msg_format("You feel %s%s.",p,desc_stat_imp[stat]);
+		msg_format("You feel %s%s.",p,desc_stat_imp[selection]);
 
 	}
 
 	/* Hack --- restore stat */
-	if (tmp) p_ptr->stat_cur[stat] = tmp;
+	if (tmp) p_ptr->stat_cur[selection] = tmp;
 
 }
 
