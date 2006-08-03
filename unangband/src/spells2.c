@@ -572,17 +572,22 @@ void self_knowledge_aux(bool spoil, bool random)
 		/* Hint as to cure */
 		if (p_ptr->disease & (DISEASE_LIGHT))
 		{
-			text_out("Your disease will subside naturally, but can be treated.  ");
+			text_out("Your disease will subside naturally, but can be cured easily or the symptoms treated.  ");
 		}
 		/* Hint as to cure */
 		else if (p_ptr->disease & (DISEASE_DISEASE))
 		{
-			text_out("Your disease will mutate, but can be treated.  ");
+			text_out("Your disease will mutate, but can be cured or the symptoms treated.  ");
+		}
+		/* Hint as to cure */
+		else if (p_ptr->disease & (DISEASE_QUICK))
+		{
+			text_out("Your disease will hatch into a monster unless you can find some way of destroying it in the body.  ");
 		}
 		/* Hint as to cure */
 		else if (p_ptr->disease & (DISEASE_HEAVY))
 		{
-			text_out("Your disease can only be treated by removing the powerful curse.  ");
+			text_out("Your disease can only be treated by removing the powerful curse or treating the symptoms.  ");
 		}
 		/* Hint as to cure */
 		else if (p_ptr->disease & (DISEASE_PERMANENT))
@@ -6727,22 +6732,56 @@ bool process_spell_types(int spell, int level, bool *cancel)
 			}
 			case SPELL_CURE_DISEASE:
 			{
-				int v = (1 << s_ptr->param);
+				int v;
 
+				/* Mega Hack -- one disease is hard to cure. */
+				if ((p_ptr->disease & (1 << DISEASE_SPECIAL)) && (s_ptr->param != DISEASE_SPECIAL))
+				{
+					msg_print("This disease requires a special cure.");
+					return (TRUE);
+				}
+
+				/* Hack -- cure disease */
+				if (s_ptr->param >= 32)
+				{
+					/* Hack -- Cure 'normal disease' */
+					if (p_ptr->disease < (1 << DISEASE_TYPES_HEAVY))
+					{
+						obvious = TRUE;
+						*cancel = FALSE;
+
+						p_ptr->disease = 0;
+					}
+
+					/* Also cure minor disease */
+					v = DISEASE_LIGHT;
+				}
+				/* Cure symptom / specific disease */
+				else
+				{
+					v = (1 << s_ptr->param);
+				}
+
+				/* Cure diseases */
 				if ((p_ptr->disease & v) != 0)
 				{
 					obvious = TRUE;
 					*cancel = FALSE;
-					p_ptr->disease &= ~(v);
 
-					/* Hack -- cured all symptoms or cured all origins of disease */
+					/* Hack -- always cure light diseases by treating any symptom */
+					if (p_ptr->disease & (DISEASE_LIGHT))
+						p_ptr->disease = 0;
+					/* Remove a symptom/cause */
+					else
+						p_ptr->disease &= ~(v);
+
+					/* Cured all symptoms or cured all origins of disease? */
 					if ( ((s_ptr->param >= DISEASE_TYPES_HEAVY) && (p_ptr->disease < (1 << DISEASE_TYPES_HEAVY)))
 						|| ((p_ptr->disease & ((1 << DISEASE_TYPES_HEAVY) -1)) == 0) )
 					{
 						p_ptr->disease = 0;
 					}
 				}
-
 				break;
 			}
 			default:

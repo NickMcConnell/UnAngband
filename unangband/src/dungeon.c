@@ -1313,7 +1313,7 @@ static void process_world(void)
 	}
 
 	/*** Handle disease ***/
-	if ((p_ptr->disease & (DISEASE_BLOWS)) && (rand_int(300) < ((p_ptr->disease & (DISEASE_QUICK | DISEASE_LIGHT)) ? 3 : 1)))
+	if ((p_ptr->disease & ((1 << DISEASE_BLOWS) - 1)) && (rand_int(300) < ((p_ptr->disease & (DISEASE_QUICK | DISEASE_LIGHT)) ? 6 : 1)))
 	{
 		int i, n, effect = 0;
 
@@ -1324,7 +1324,7 @@ static void process_world(void)
 		n = 1;
 
 		/* Select one of the possible effects that the player can suffer */
-		for (i = 1; i < DISEASE_BLOWS; i <<=1)
+		for (i = 1; i < (1 << DISEASE_BLOWS); i <<=1)
 		{
 			if (!(p_ptr->disease & i)) continue;
 			
@@ -1436,33 +1436,9 @@ static void process_world(void)
 				break;
 			}
 
-			case DISEASE_SLEEP:
-			{
-				(void)set_msleep(p_ptr->msleep + randint(10) + 2);
-				break;
-			}
-
-			case DISEASE_PARALYZE:
-			{
-				(void)set_paralyzed(p_ptr->paralyzed + randint(3) + 1);
-				break;
-			}
-
 			case DISEASE_SLOW:
 			{
 				(void)set_slow(p_ptr->slow + randint(30) + 10);
-				break;
-			}
-
-			case DISEASE_PETRIFY:
-			{
-				(void)set_petrify(p_ptr->petrify + randint(3) + 1);
-				break;
-			}
-
-			case DISEASE_STASTIS:
-			{
-				(void)set_stastis(p_ptr->stastis + randint(3) + 1);
 				break;
 			}
 
@@ -1472,8 +1448,33 @@ static void process_world(void)
 				break;
 			}
 
+			case DISEASE_SLEEP:
+			{
+				(void)set_msleep(p_ptr->msleep + randint(10) + 2);
+				break;
+			}
+
+			case DISEASE_PETRIFY:
+			{
+				(void)set_petrify(p_ptr->petrify + randint(3) + 1);
+				break;
+			}
+
+			case DISEASE_PARALYZE:
+			{
+				(void)set_paralyzed(p_ptr->paralyzed + randint(3) + 1);
+				break;
+			}
+
+			case DISEASE_STASTIS:
+			{
+				(void)set_stastis(p_ptr->stastis + randint(3) + 1);
+				break;
+			}
+
 		}
 
+		/* Mutate plague */
 		if ((p_ptr->disease & (DISEASE_DISEASE)) && !(rand_int(3)))
 		{
 			if ((n < 3) && (p_ptr->disease & (DISEASE_HEAVY)))
@@ -1485,13 +1486,50 @@ static void process_world(void)
 			if (!rand_int(20)) p_ptr->disease |= (DISEASE_LIGHT);
 		}
 
+		/* Worsen black breath */
+		if ((p_ptr->disease & (1 << DISEASE_SPECIAL)) && !(rand_int(10)))
+		{
+			if (p_ptr->disease & (DISEASE_HEAVY))
+				p_ptr->disease |= (1 << rand_int(DISEASE_TYPES_HEAVY));
+			else
+				p_ptr->disease |= (1 << rand_int(DISEASE_TYPES));
+		}
+
 		/* The player is on the mend */
 		if ((p_ptr->disease & (DISEASE_LIGHT)) && !(rand_int(6)))
 		{
 			msg_print("The illness has subsided.");
 			p_ptr->disease = 0;
-		}		
+		}
 
+		/* The player is going to suffer further */
+		else if ((p_ptr->disease & (DISEASE_QUICK)) && !(rand_int(12)))
+		{
+			/* Breakfast time... */
+			msg_print("Something pushes through your skin.");
+			msg_print("Its... hatching...");
+
+			/* How many eggs? */
+			n = randint(p_ptr->depth / 5) + 1;
+
+			/* A nasty chest wound */
+			take_hit(damroll(n, 8),"the birth of a parasite");
+			
+			/* Set parasite race */
+			summon_race_type = parasite_hack[effect];
+
+			/* Drop lots of parasites */
+			for (i = 0; i < n; i++) (void)summon_specific(p_ptr->py, p_ptr->py, 99, SUMMON_FRIEND);
+
+			/* Aggravate if deep */
+			if (p_ptr->depth > 20) aggravate_monsters(-1);
+
+			/* Paralyze if heavy */
+			if (p_ptr->disease & (DISEASE_HEAVY)) (void)set_paralyzed(p_ptr->paralyzed + randint(3) + 1);
+
+			/* Not a pleasant cure but nonetheless */			
+			p_ptr->disease = 0;
+		}
 	}
 
 

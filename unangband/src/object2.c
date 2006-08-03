@@ -1090,7 +1090,7 @@ s32b object_value_real(const object_type *o_ptr)
 		value += power * 100;
 	}		
 
-	/* Hack -- object power assumes (+9,+9) on weapons and ammo so we need to include some smaller bonuses,
+	/* Hack -- object power assumes (+11,+9) on weapons and ammo so we need to include some smaller bonuses,
 		and +9 ac on armour so we need to include some bonuses. */
 	switch (o_ptr->tval)
 	{
@@ -1106,7 +1106,7 @@ s32b object_value_real(const object_type *o_ptr)
 		case TV_DRAG_ARMOR:
 		{
 			/* Factor in the bonuses not considered by power equation */
-			value += o_ptr->to_a < 10 ? o_ptr->to_a * 100L : 0;
+			value += o_ptr->to_a < 10 ? o_ptr->to_a * 100L : 1000L;
 
 			break;
 		}
@@ -1132,8 +1132,8 @@ s32b object_value_real(const object_type *o_ptr)
 
 		{
 			/* Factor in the bonuses not considered by power equation */
-			value += o_ptr->to_h < 12 ? o_ptr->to_h * 100L : 0;
-			value += o_ptr->to_d < 10 ? o_ptr->to_d * 100L : 0;
+			value += o_ptr->to_h < 12 ? o_ptr->to_h * 100L : 1200L;
+			value += o_ptr->to_d < 10 ? o_ptr->to_d * 100L : 1000L;
 
 			/* Done */
 			break;
@@ -1145,8 +1145,8 @@ s32b object_value_real(const object_type *o_ptr)
 		case TV_BOLT:
 		{
 			/* Factor in the bonuses not considered by power equation */
-			value += o_ptr->to_h < 12 ? o_ptr->to_h * 5L : 0;
-			value += o_ptr->to_d < 10 ? o_ptr->to_d * 5L : 0;
+			value += o_ptr->to_h < 12 ? o_ptr->to_h * 5L : 60L;
+			value += o_ptr->to_d < 10 ? o_ptr->to_d * 5L : 50L;
 
 			/* Done */
 			break;

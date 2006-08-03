@@ -169,6 +169,18 @@ damage, and x5 multiplier weapons, add at least 12 damage. We deliberately ignor
 this when computing weapon or artifact power for the moment to keep thing simplier (it
 will only add a point or two to power in most instances anyway).
 
+- Tweaked monster AI for situations involving pillar dancing, hack'n'back and splash
+damage exploits. Also ensure teleport to and teleport self to are used more sensibly.
+
+- Monsters now talk to allies who are out of sight but nearby. Also monsters now
+verbally as opposed to telepathically communicate when they find a scent.
+
+- Made parasites hatch.
+
+- Added some more cure disease items and magic.
+
+- Increased stone troll boulder damage. Modified lemures.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -216,6 +228,9 @@ levels and origin when examining any map (Suggested by Adam Horowitz).
 
 - Merged the 'powerful' feeling with the 'unusual' feeling (Suggested by
 Adam Horowitz).
+
+- Distinguished the two Rivendells as this was causing confusion when using
+maps.
 
 ### Bug fixes ###
 
@@ -410,6 +425,11 @@ or (nothing) slots (Thanks to Andrew Sidwell for assistance with Valgrind).
 
 - Spell casters will always have a minimal amount of mana even with low stats
 (Reported by Andrew Sidwell).
+
+- Fixed somewhat stupid pricing bug affecting +10 and higher AC armour and similar
+high bonus weapons (Reported by a number of people).
+
+- Fixed minor ailments not appearing to be cureable (Reported by Matthias Rudolf).
 
 ### Build / Platform ###
 

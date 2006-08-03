@@ -92,6 +92,8 @@ extern const int month_day[9];
 extern const cptr month_name[9];
 extern const s16b bag_holds[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL][2];
 extern const cptr w_name_style[32];
+extern const s16b parasite_hack[DISEASE_BLOWS];
+
 
 /* variable.c */
 extern cptr copyright;
@@ -578,9 +580,11 @@ extern void mon_hit_trap(int m_idx, int y, int x);
 
 /* melee2.c */
 extern void monster_speech(int m_idx, cptr saying, bool understand);
-extern void tell_allies_player_can(int y, int x, u32b flag);
-extern void tell_allies_player_not(int y, int x, u32b flag);
-extern void tell_allies_mflag(int y, int x, u32b flag, cptr saying);
+extern bool tell_allies_player_can(int y, int x, u32b flag);
+extern bool tell_allies_player_not(int y, int x, u32b flag);
+extern bool tell_allies_mflag(int y, int x, u32b flag, cptr saying);
+extern bool tell_allies_best_range(int y, int x, int range, cptr saying);
+extern bool tell_allies_target(int y, int x, int ty, int tx, bool scent, cptr saying);
 extern void feed_monster(int m_idx);
 extern void process_monsters(byte minimum_energy);
 extern int get_scent(int y, int x);

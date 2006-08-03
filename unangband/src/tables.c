@@ -2786,7 +2786,7 @@ const cptr disease_name[32] =
 	"shards",
 	"ringing in ears",
 	"green rot",
-	"magic eye",
+	"magic mushrooms",
 	"slow stumble",
 	"black eye",
 	"a hangover",
@@ -3555,4 +3555,37 @@ const cptr w_name_style[32] =
 	"Slay Undead",
 	"Slay Animals",
 	"Slay Demons"
+};
+
+
+/*
+ * Race of parasites
+ *
+ * This is a temporary hack.
+ */
+const s16b parasite_hack[DISEASE_BLOWS] =
+{
+	646,	/* Pink mushroom patch */
+	885,	/* Brain ooze */
+	107,	/* Lost soul */
+	65,	/* Yellow worm mass */
+	664,	/* Purple slime */
+	92,	/* Brown mold */
+	897,	/* Brown icky thing -- nothing like scatalogical in-jokes */
+	895,	/* Yellow icky thing */
+	219,	/* Earth spirit */
+	234,	/* Giant gold dragonfly */
+	648,	/* Green mushroom patch */
+	191,	/* Magic mushroom patch */
+	141,	/* Giant white tick */
+	588,	/* Black eye */
+	32,	/* Shrieker mushroom patch */
+	835,	/* Shiver */
+	119,	/* Lemure */
+	858,	/* Crying spirit */
+	1247,	/* Sheep -- narcolepsy */
+	219,	/* Earth spirit */
+	659,	/* White slime */
+	656,	/* Wrinkled mushroom */
+	85	/* Disenchanter eye */
 };

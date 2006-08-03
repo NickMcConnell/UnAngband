@@ -42,7 +42,7 @@
 # effect the item has, if applicable. 
 
 # 'W' is for extra information. Depth is the depth the object is
-# normally found at, rarity determines how common the object is,
+# normally found at, rarity determines how commoAn the object is,
 # weight is in tenth-pounds and cost is the items value.
 
 # 'P' is for power information. The items base armor class, its base
@@ -5635,10 +5635,10 @@ G:?:v
 I:99:18:0
 W:50:0:0:100
 
-N:768:Enchant Food
+N:768:Cure Black Breath
 G:?:v
 I:99:19:0
-W:50:0:0:500
+W:50:0:0:1500
 
 N:769:Bless Weapon
 G:?:v
@@ -6414,4 +6414,30 @@ N:885:Restore Constitution
 G:?:v
 I:99:47:0
 W:20:0:0:250
+
+N:886:Cure Plague
+G:?:v
+I:99:48:0
+W:50:0:0:1000
+
+N:887:Cure Disease
+G:?:v
+I:99:49:0
+W:50:0:0:500
+
+# Additional disease curing items
+
+N:888:Cure Disease
+G:!:w
+I:75:82:0
+W:20:0:4:400
+A:20/1
+P:0:1d1:0:0:0
+F:THROWING
+
+N:889:& sprig~ of Athelas
+G:,:G
+I:80:43:0
+W:45:75:3:1000
+A:45/1
 

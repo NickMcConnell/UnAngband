@@ -78,7 +78,7 @@ D:Tip: Press '<' to travel elsewhere.
 
 #The following quests are from the hobbit.
 
-N:2:Rivendell
+N:2:Rivendell, in late summer
 X:39:3
 L:0:0:420:155:0:0
 S:267:9:10:11:519:13:268:513
@@ -182,7 +182,7 @@ L:14:420:154:126:453:0
 
 #Duplicate to allow acces to Moria.
 
-N:14:Rivendell
+N:14:Rivendell, in autumn
 X:15:17
 L:0:0:420:155:0:0
 S:267:516:503:11:519:505:268:513
