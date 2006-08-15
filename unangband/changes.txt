@@ -240,6 +240,11 @@ maps.
 - Show monster health bar over gold when not showing the side bar (Many thanks
 to Pav Lucistnik for the patch).
 
+- It is now possible to improve an object with runes, and subsequently brand
+it, provided there are no 'left-over' runes. If there is, these runes are lost
+when the item is branded. However, an object cannot be branded, then subsequently
+improved with runes.
+
 ### Bug fixes ###
 
 - Fix weapon branding.

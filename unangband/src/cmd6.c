@@ -2228,24 +2228,8 @@ void do_cmd_apply_rune_or_coating(void)
 				/* Apply magic (allow artifacts) */
 				apply_magic(j_ptr, object_level, TRUE, FALSE, FALSE);
 
-				/* Add runes */
-				j_ptr->xtra1 = OBJECT_XTRA_MIN_RUNES + rune;
-				j_ptr->xtra2 = k_ptr->runesc;
-
-				/* Remove special inscription, if any */
-				j_ptr->feeling = 0;
-
-				/* Hack -- Clear the "felt" flag */
-				j_ptr->ident &= ~(IDENT_SENSE);
-
-				/* Hack -- Clear the "bonus" flag */
-				j_ptr->ident &= ~(IDENT_BONUS);
-
-				/* Hack -- Clear the "store" flag */
-				j_ptr->ident &= ~(IDENT_STORE);
-
-				/* Hack -- Clear the "known" flag */
-				j_ptr->ident &= ~(IDENT_KNOWN);
+				/* Hack -- Set the "runes" flag */
+				j_ptr->ident |= (IDENT_RUNES);
 
 				break;
 			}
@@ -2268,11 +2252,20 @@ void do_cmd_apply_rune_or_coating(void)
 						/* Ego-ize the item */
 						j_ptr->name2 = i;
 
+						/* Hack -- Set the "runes" flag */
+						j_ptr->ident |= (IDENT_RUNES);
+
 						/* Extra powers */
 						if (e_ptr->xtra)
 						{
 							j_ptr->xtra1 = e_ptr->xtra;
 							j_ptr->xtra2 = (byte)rand_int(object_xtra_size[e_ptr->xtra]);
+						}
+						else
+						{
+							/* Hack -- Clear the 'real' runes */
+							j_ptr->xtra1 = 0;
+							j_ptr->xtra2 = 0;
 						}
 
 						/* Forget about it */
@@ -2333,9 +2326,6 @@ void do_cmd_apply_rune_or_coating(void)
 
 						/* Hack -- Clear the "store" flag */
 						j_ptr->ident &= ~(IDENT_STORE);
-
-						/* Hack -- Clear the "known" flag */
-						j_ptr->ident &= ~(IDENT_KNOWN);
 
 						break;
 					}

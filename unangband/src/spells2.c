@@ -2453,12 +2453,25 @@ bool brand_item(int brand, cptr act)
 	/* Description */
 	object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
 
+	/* Overwrite runes and coatings */
+	if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_RUNES)
+	{
+		/* Warning */
+		msg_format("It has %s applied to it.", o_ptr->xtra1 < OBJECT_XTRA_MIN_COATS ? "runes" : "a coating");
+
+		/* Verify */
+		if (!get_check(o_ptr->xtra1 < OBJECT_XTRA_MIN_COATS ? "Overwrite them? " : "Remove it? "))
+		{
+			return (FALSE);
+		}
+	}
+
 	/* Describe */
 	msg_format("%s %s %s!",
 		   ((item >= 0) ? "Your" : "The"), o_name, act);
 
-	/* you can never modify artifacts / ego-items with hidden powers*/
-	if ((!artifact_p(o_ptr)) && !(o_ptr->xtra1))
+	/* you can never modify artifacts or items with an extra power. */
+	if (!(artifact_p(o_ptr)) && (!(o_ptr->xtra1) || !(o_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES)))
 	{
 		bool split = FALSE;
 
@@ -2507,6 +2520,11 @@ bool brand_item(int brand, cptr act)
 			o_ptr = i_ptr;
 		}
 
+		/* Hack -- still know runes if object was runed */
+		if ((o_ptr->xtra1 >= OBJECT_XTRA_MIN_RUNES)
+			&& (o_ptr->xtra1 < OBJECT_XTRA_MIN_COATS)) o_ptr->ident |= (IDENT_RUNES);
+
+		/* Apply the brand */
 		o_ptr->xtra1 = brand;
 		o_ptr->xtra2 = (byte)rand_int(object_xtra_size[brand]);
 
