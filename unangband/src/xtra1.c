@@ -844,8 +844,16 @@ static void health_redraw(void)
 	/* Not tracking */
 	if (!p_ptr->health_who)
 	{
-		/* Erase the health bar */
-		Term_erase(COL_INFO, ROW_INFO, 12);
+		if (show_sidebar)
+		{
+			/* Erase the health bar */
+			Term_erase(COL_INFO, ROW_INFO, 12);
+		}
+		else
+		{
+			/* Show gold instead */
+			prt_gold();
+		}
 	}
 
 	/* Tracking an unseen monster */
@@ -1290,7 +1298,7 @@ static void prt_frame_basic(void)
 	prt_depth();
 
 	/* Special */
-	if (show_sidebar) health_redraw();
+	health_redraw();
 }
 
 
@@ -2324,7 +2332,7 @@ static void calc_mana(void)
 		/* Normal gloves hurt mage-type spells */
 		if (o_ptr->k_idx &&
 		    !(f3 & (TR3_FREE_ACT)) &&
-		    !((f1 & (TR1_DEX)) && (o_ptr->pval > 0)))
+		    !((f1 & (TR1_INT | TR1_WIS | TR1_DEX)) && (o_ptr->pval > 0)))
 		{
 			/* Encumbered */
 			p_ptr->cumber_glove = TRUE;
@@ -4008,7 +4016,7 @@ void redraw_stuff(void)
 	if (p_ptr->redraw & (PR_HEALTH))
 	{
 		p_ptr->redraw &= ~(PR_HEALTH);
-		if (show_sidebar) health_redraw();
+		health_redraw();
 	}
 
 	if (p_ptr->redraw & (PR_EXTRA))

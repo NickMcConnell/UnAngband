@@ -1170,10 +1170,10 @@ void py_pickup(int pickup)
 			continue;
 		}
 
-		/* Test for auto-pickup */
+		/* Test for auto-destroy */
 		if (auto_destroy_okay(o_ptr))
 		{
-			/* Pick up the object */
+			/* Destroy the object */
 			py_destroy_aux(this_o_idx);
 
 			/* Check the next object */

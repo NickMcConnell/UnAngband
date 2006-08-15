@@ -1155,7 +1155,6 @@ static errr rd_extra(void)
 	rd_u16b(&p_ptr->total_winner);
 	rd_u16b(&p_ptr->noscore);
 
-
 	/* Read "death" */
 	rd_byte(&tmp8u);
 	p_ptr->is_dead = tmp8u;

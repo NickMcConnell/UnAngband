@@ -642,8 +642,9 @@
 					: (use_dbltile ? 3 : 2)): 1))
 #define COL_CURSP		(show_sidebar ? 0 : 55)	/* "Cur SP xxxxx" */
 
-#define ROW_INFO		20
-#define COL_INFO		0	/* "xxxxxxxxxxxx" */
+#define ROW_INFO		(show_sidebar ? 20 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
+					: (use_dbltile ? 3 : 2)): 1))
+#define COL_INFO		(show_sidebar ? 0 : 20)	/* "xxxxxxxxxxxx" */
 
 #define ROW_CUT		(show_sidebar ? 21 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
 					: (use_dbltile ? 4 : 3)): 2))

@@ -181,6 +181,9 @@ verbally as opposed to telepathically communicate when they find a scent.
 
 - Increased stone troll boulder damage. Modified lemures.
 
+- Gloves of intelligence and wisdom no longer affect mage type casters (Suggested by
+Adam Horowitz).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -231,6 +234,11 @@ Adam Horowitz).
 
 - Distinguished the two Rivendells as this was causing confusion when using
 maps.
+
+- Fixed bug when describing sense item effect (Reported by Pav Lucistnik).
+
+- Show monster health bar over gold when not showing the side bar (Many thanks
+to Pav Lucistnik for the patch).
 
 ### Bug fixes ###
 
@@ -431,6 +439,9 @@ high bonus weapons (Reported by a number of people).
 
 - Fixed minor ailments not appearing to be cureable (Reported by Matthias Rudolf).
 
+- Fixed potions of *Enlightenment* so they no longer increase intelligence and
+wisdom permanently (Reported by Matthias Rudolf).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
@@ -453,6 +464,8 @@ equivalent files).
 - Fix to makefile.cyg to allow it to generate executeable.
 
 - Change built executeable name in windows to unangband.exe.
+
+- Fix typo in comments (Reported by Pav Lucistnik). 	
 
 Unangband 0.6.0 "Where's the Tequila? Did Tara Reid steal all the drinks?" (The Ari
 Gold Release)

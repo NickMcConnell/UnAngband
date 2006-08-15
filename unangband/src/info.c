@@ -523,7 +523,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="wearable item";
 	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="wand";
 	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="staff";
-	if (id_flags & (SF1_IDENT)) vp[vn++]="unknown item";
+	if (id_flags & (SF1_IDENT | SF1_IDENT_SENSE)) vp[vn++]="unknown item";
 	if (id_flags & (SF1_IDENT_RUMOR | SF1_IDENT_FULLY | SF1_FORGET)) vp[vn++]="known item";
 	if (id_flags & (SF1_DETECT_CURSE)) vp[vn++]="cursed item";
 	if (id_flags & (SF1_DETECT_MAGIC)) vp[vn++]="magic item";

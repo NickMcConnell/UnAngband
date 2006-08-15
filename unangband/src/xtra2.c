@@ -2485,12 +2485,12 @@ void print_stats(const s16b *sn, int num, int y, int x)
 	byte attr;
 
 	/* Display title */
-	prt("", y, x);
+	/* prt("", y, x); */
 
 	/* Add labels */
 	for (i = 0; i < num; i++)
 	{
-		attr = TERM_GREEN;
+		attr = TERM_WHITE;
 
 		if (p_ptr->stat_cur[sn[i]] == 18 + 100) attr = TERM_L_DARK;
 		if (p_ptr->stat_cur[sn[i]]<p_ptr->stat_max[sn[i]]) attr = TERM_YELLOW;
@@ -2503,7 +2503,7 @@ void print_stats(const s16b *sn, int num, int y, int x)
 	prt("", y + i + 1, x);
 
 	/* Display the stats */
-	display_player_stat_info(y, x + 5);
+	display_player_stat_info(y + 1, x + 5);
 }
 
 
