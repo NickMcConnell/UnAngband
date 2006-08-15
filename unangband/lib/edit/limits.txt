@@ -32,7 +32,7 @@ M:E:128
 M:X:461
 
 # Maximum number of monster races (needs to be max + 2 for player ghost)
-M:R:1272
+M:R:1275
 
 # Maximum number of vaults
 M:V:51
@@ -56,7 +56,7 @@ M:C:10
 M:W:127
 
 # Maximum number of spells
-M:S:469
+M:S:470
 
 # Maximum number of runes
 M:Y:30
