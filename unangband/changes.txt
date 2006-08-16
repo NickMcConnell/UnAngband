@@ -188,6 +188,9 @@ Adam Horowitz).
 damaged, as opposed to destroyed, whilst in the backpack and affected by an inventory
 damaging elemental attack. Diggers are now vulnerible to damage whilst in the backpack.
 
+- Adjusted bag rarities and depths to try to make early bags more useful and interesting
+and deeper bags not necessarily encountered every game (Suggested by Matthias Rudolf).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
