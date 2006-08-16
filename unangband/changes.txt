@@ -459,6 +459,9 @@ wisdom permanently (Reported by Matthias Rudolf).
 - Fixed crash caused by monster suffering no damage whilst having no hit points
 (Thanks to Pav Lucistnik for locating this).
 
+- Fixed bug causing bags to weigh to much when picked up or when objects used from
+them (Reported by a number of people).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

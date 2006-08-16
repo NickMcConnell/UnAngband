@@ -1784,6 +1784,9 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 				number = ((total < ((2 << 15) - 1)) ? total : (((2 << 15) - 1) - 1));
 				bag_contents[o_ptr->sval][i] = total;
 			}
+
+			/* Hack -- Decrease the weight -- will be increased later */
+			p_ptr->total_weight -= (j_ptr->number * j_ptr->weight);
 		}
 
 		/* Combine and re-order again */
