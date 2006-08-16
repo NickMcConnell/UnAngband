@@ -979,6 +979,11 @@ bool auto_pickup_ignore(const object_type *o_ptr)
 }
 
 
+/*
+ * Helper routine for py_pickup() and py_pickup_floor().
+ *
+ * Destroy objects on the ground.
+ */
 static void py_destroy_aux(int o_idx)
 {
 	char o_name[80];
@@ -992,7 +997,7 @@ static void py_destroy_aux(int o_idx)
 	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 	/* Verify destruction */
-	if (verify_destroy)
+	if (verify_destroy && !auto_pickup_ignore(o_ptr))
 	{
 		sprintf(out_val, "Really destroy %s? ", o_name);
 		if (!get_check(out_val)) return;
@@ -1042,7 +1047,11 @@ static void py_destroy_aux(int o_idx)
 	}
 
 	/* Message */
-	msg_format("You destroy %s.", o_name);
+	if (!auto_pickup_ignore(o_ptr))
+	{
+		/* Message */
+		msg_format("You destroy %s.", o_name);
+	}
 
 	/* Delete the object directly */
 	delete_object_idx(o_idx);

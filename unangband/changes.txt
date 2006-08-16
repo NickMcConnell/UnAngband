@@ -245,6 +245,11 @@ it, provided there are no 'left-over' runes. If there is, these runes are lost
 when the item is branded. However, an object cannot be branded, then subsequently
 improved with runes.
 
+- If you ignore objects (including auto-ignoring of corpses), you are no longer
+prompted to verify destruction even if you have the verify_destroy option selected.
+In addition, you ignore objects under more circumstances (if they roll under you
+or disappear from view). (Thanks to Pav Lucistnik for the patch).
+
 ### Bug fixes ###
 
 - Fix weapon branding.
@@ -446,6 +451,9 @@ high bonus weapons (Reported by a number of people).
 
 - Fixed potions of *Enlightenment* so they no longer increase intelligence and
 wisdom permanently (Reported by Matthias Rudolf).
+
+- Fixed crash caused by monster suffering no damage whilst having no hit points
+(Thanks to Pav Lucistnik for locating this).
 
 ### Build / Platform ###
 

@@ -800,7 +800,7 @@ void do_cmd_destroy(void)
 	o_ptr->number = old_number;
 
 	/* Verify destruction */
-	if (verify_destroy)
+	if (verify_destroy && !auto_pickup_ignore(o_ptr))
 	{
 		sprintf(out_val, "Really destroy %s? ", o_name);
 		if (!get_check(out_val)) return;

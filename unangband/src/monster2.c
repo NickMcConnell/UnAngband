@@ -4337,8 +4337,6 @@ bool multiply_monster(int m_idx)
 
 /*
  * Dump a message describing a monster's reaction to damage
- *
- * Technically should attempt to treat "Beholder"'s as jelly's
  */
 void message_pain(int m_idx, int dam)
 {
@@ -4354,19 +4352,19 @@ void message_pain(int m_idx, int dam)
 	/* Get the monster name */
 	monster_desc(m_name, m_ptr, 0);
 
-#if 0
 	/* Notice non-damage */
 	if (dam == 0)
 	{
+#if 0
 		msg_format("%^s is unharmed.", m_name);
+#endif
 		return;
 	}
-#endif
 
 	/* Note -- subtle fix -CFT */
 	newhp = (long)(m_ptr->hp);
 	oldhp = newhp + (long)(dam);
-	tmp = (newhp * 100L) / oldhp;
+	tmp = (newhp * 100L) / (oldhp);
 	percentage = (int)(tmp);
 
 

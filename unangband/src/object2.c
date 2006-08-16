@@ -5961,13 +5961,16 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 		return;
 	}
 
-
 	/* Warn if we lose the item from view */
 	if (f_info[cave_feat[by][bx]].flags2 & (FF2_HIDE_ITEM))
 	{
-		/* Message */
-		msg_format("The %s disappear%s from view.",
-			   o_name, (plural ? "" : "s"));
+		/* Skip message on auto-ignored items */
+		if (!auto_pickup_ignore(j_ptr))
+		{
+			/* Message */
+			msg_format("The %s disappear%s from view.",
+				   o_name, (plural ? "" : "s"));
+		}
 	}
 
 	/* Sound */
@@ -5977,7 +5980,11 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 	/* Message when an object falls under the player */
 	if (chance && (cave_m_idx[by][bx] < 0))
 	{
-		msg_print("You feel something roll beneath your feet.");
+		/* Skip message on auto-ignored items */
+		if (!auto_pickup_ignore(j_ptr))
+		{
+			msg_print("You feel something roll beneath your feet.");
+		}
 
 		/* Recalculate runes */
 		p_ptr->update |= (PU_RUNES);
