@@ -184,6 +184,10 @@ verbally as opposed to telepathically communicate when they find a scent.
 - Gloves of intelligence and wisdom no longer affect mage type casters (Suggested by
 Adam Horowitz).
 
+- To encourage the use of swap weapons and armour, these types of items will just be
+damaged, as opposed to destroyed, whilst in the backpack and affected by an inventory
+damaging elemental attack. Diggers are now vulnerible to damage whilst in the backpack.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

@@ -1123,6 +1123,7 @@ static bool hates_acid(object_type *o_ptr)
 		case TV_SWORD:
 		case TV_HAFTED:
 		case TV_POLEARM:
+		case TV_DIGGING:
 		case TV_HELM:
 		case TV_CROWN:
 		case TV_SHIELD:
@@ -1172,6 +1173,7 @@ static bool hates_elec(object_type *o_ptr)
 	{
 		case TV_RING:
 		case TV_WAND:
+		case TV_BOOTS:
 		{
 			return (TRUE);
 		}
@@ -1197,6 +1199,7 @@ static bool hates_fire(object_type *o_ptr)
 		case TV_BOW:
 		case TV_HAFTED:
 		case TV_POLEARM:
+		case TV_DIGGING:
 		case TV_BOOTS:
 		case TV_GLOVES:
 		case TV_CLOAK:
@@ -1395,6 +1398,8 @@ static int inven_damage(inven_func typ, int perc)
 	/* Scan through the slots backwards */
 	for (i = 0; i < INVEN_PACK; i++)
 	{
+		bool damage;
+
 		o_ptr = &inventory[i];
 
 		/* Skip non-objects */
@@ -1406,8 +1411,71 @@ static int inven_damage(inven_func typ, int perc)
 		/* Give this item slot a shot at death */
 		if ((*typ)(o_ptr))
 		{
+			damage = FALSE;
+
+			/* Analyze the type to see if we just damage it */
+			switch (o_ptr->tval)
+			{
+				/* Weapons */
+				case TV_BOW:
+				case TV_SWORD:
+				case TV_HAFTED:
+				case TV_POLEARM:
+				case TV_DIGGING:
+				{
+					/* Damage the item */
+					o_ptr->to_h--;
+					o_ptr->to_d--;
+
+					/* Damaged! */
+					damage = TRUE;
+
+					break;
+				}
+
+				/* Wearable items */
+				case TV_HELM:
+				case TV_CROWN:
+				case TV_SHIELD:
+				case TV_BOOTS:
+				case TV_GLOVES:
+				case TV_CLOAK:
+				case TV_SOFT_ARMOR:
+				case TV_HARD_ARMOR:
+				case TV_DRAG_ARMOR:
+				{
+					/* Damage the item */
+					o_ptr->to_a--;
+
+					/* Damaged! */
+					damage = TRUE;
+
+					break;
+				}
+			}
+
+			/* Damage instead of destroy */
+			if (damage)
+			{
+				/* Hack --- unsense the item */
+				o_ptr->ident &= ~(IDENT_SENSE);	
+
+				/* Remove special inscription, if any */
+				o_ptr->feeling = 0;
+
+				/* Calculate bonuses */
+				p_ptr->update |= (PU_BONUS);
+
+				/* Window stuff */
+				p_ptr->window |= (PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
+
+				/* Casualty count */
+				amt = o_ptr->number;
+
+			}
+
 			/* Count the casualties */
-			for (amt = j = 0; j < o_ptr->number; ++j)
+			if (!damage) for (amt = j = 0; j < o_ptr->number; ++j)
 			{
 				if (rand_int(100) < perc) amt++;
 			}
@@ -1419,12 +1487,16 @@ static int inven_damage(inven_func typ, int perc)
 				object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 3);
 
 				/* Message */
-				msg_format("%sour %s (%c) %s destroyed!",
+				msg_format("%sour %s (%c) %s %s!",
 					   ((o_ptr->number > 1) ?
 					    ((amt == o_ptr->number) ? "All of y" :
 					     (amt > 1 ? "Some of y" : "One of y")) : "Y"),
 					   o_name, index_to_label(i),
-					   ((amt > 1) ? "were" : "was"));
+					   ((amt > 1) ? "were" : "was"),
+					   (damage ? "damaged" : "destroyed"));
+
+				/* Damage already done? */
+				if (damage) continue;
 
 				/* Forget object */
 				if (o_ptr->number == amt) inven_drop_flags(o_ptr);
