@@ -569,37 +569,76 @@ void self_knowledge_aux(bool spoil, bool random)
 		/* Dump */
 		text_out(".  ");
 
-		/* Hint as to cure */
-		if (p_ptr->disease & (DISEASE_LIGHT))
+		/* Collect changes */
+		vn = 0;
+
+		/* Describe changes */
+		if (p_ptr->disease & (DISEASE_DISEASE)) vp[vn++] = "mutate";
+		if (p_ptr->disease & (DISEASE_POWER)) vp[vn++] = "hatch into a monster";
+		if (p_ptr->disease & (1 << DISEASE_SPECIAL)) vp[vn++] = "progressively worsen";
+		if (p_ptr->disease & (DISEASE_LIGHT)) vp[vn++] = "subside naturally";
+
+		/* Scan */
+		for (n = 0; n < vn; n++)
 		{
-			text_out("Your disease will subside naturally, but can be cured easily or the symptoms treated.  ");
+			/* Intro */
+			if (n == 0) { text_out("It will "); }
+			else if (n < vn-1) text_out(", ");
+			else text_out(" and ");
+
+			/* Dump */
+			text_out(vp[n]);
 		}
-		/* Hint as to cure */
-		else if (p_ptr->disease & (DISEASE_DISEASE))
-		{
-			text_out("Your disease will mutate, but can be cured or the symptoms treated.  ");
-		}
-		/* Hint as to cure */
-		else if (p_ptr->disease & (DISEASE_QUICK))
-		{
-			text_out("Your disease will hatch into a monster unless you can find some way of destroying it in the body.  ");
-		}
-		/* Hint as to cure */
-		else if (p_ptr->disease & (DISEASE_HEAVY))
-		{
-			text_out("Your disease can only be treated by removing the powerful curse or treating the symptoms.  ");
-		}
-		/* Hint as to cure */
-		else if (p_ptr->disease & (DISEASE_PERMANENT))
-		{
-			text_out("Your disease cannot be treated.  ");
-		}
-		/* Hint as to cure */
+
+		/* Re-introduce? */
+		if (!n) text_out("It ");
+		else text_out(" and ");
+
+		/* Permanent disease */
+		if (p_ptr->disease & (DISEASE_PERMANENT)) text_out("cannot be cured");
 		else
 		{
-			text_out("Your disease can only be treated by treating the symptoms.  ");
-			text_out("The treatment required varies for each affliction.  ");
+			/* Light diseases are easily treated */
+			if (p_ptr->disease & (DISEASE_LIGHT)) text_out("can be easily treated");
+			else if (p_ptr->disease & (1 << DISEASE_SPECIAL)) text_out("can only be treated");
+			else text_out("must be treated");
+
+			/* Collect cures */
+			vn = 0;
+
+			/* Hints as to cure */
+			if ((p_ptr->disease & (DISEASE_DISEASE | DISEASE_LIGHT | (1 << DISEASE_SPECIAL)))
+				|| (p_ptr->disease < (DISEASE_DISEASE))) vp[vn++] = "the appropriate remedy";
+			if (p_ptr->disease & (DISEASE_QUICK)) vp[vn++] = "destroying the parasite in your body";
+			if (p_ptr->disease & (DISEASE_HEAVY)) vp[vn++] = "powerful healing magic";
+			if (p_ptr->disease & (DISEASE_POWER)) vp[vn++] = "removing the powerful curse";
+
+			/* Hack -- special disease */
+			if (p_ptr->disease & (1 << DISEASE_SPECIAL)) vn = 1;
+
+			/* Scan */
+			for (n = 0; n < vn; n++)
+			{
+				/* Intro */
+				if (!n) text_out(" by ");
+				else if (n < vn-1) text_out(", by ");
+				else if (p_ptr->disease & (DISEASE_LIGHT)) text_out(" or by ");
+				else text_out(" and by ");
+
+				/* Dump */
+				text_out(vp[n]);
+			}
 		}
+
+		/* Can cure by treating symptoms */
+		if (!(p_ptr->disease & (DISEASE_PERMANENT | (1 << DISEASE_SPECIAL))))
+		{
+			text_out(", or can have the symptoms treated");
+			if (p_ptr->disease & (DISEASE_HEAVY)) text_out(" for a temporary respite");
+		}
+
+		/* Dump */
+		text_out(".  ");
 	}
 
 	if (healthy)
@@ -6763,7 +6802,7 @@ bool process_spell_types(int spell, int level, bool *cancel)
 				if (s_ptr->param >= 32)
 				{
 					/* Hack -- Cure 'normal disease' */
-					if (p_ptr->disease < (1 << DISEASE_TYPES_HEAVY))
+					if (p_ptr->disease < (1L << DISEASE_TYPES_HEAVY))
 					{
 						obvious = TRUE;
 						*cancel = FALSE;
@@ -6777,7 +6816,7 @@ bool process_spell_types(int spell, int level, bool *cancel)
 				/* Cure symptom / specific disease */
 				else
 				{
-					v = (1 << s_ptr->param);
+					v = (1L << s_ptr->param);
 				}
 
 				/* Cure diseases */
@@ -6794,8 +6833,9 @@ bool process_spell_types(int spell, int level, bool *cancel)
 						p_ptr->disease &= ~(v);
 
 					/* Cured all symptoms or cured all origins of disease? */
-					if ( ((s_ptr->param >= DISEASE_TYPES_HEAVY) && (p_ptr->disease < (1 << DISEASE_TYPES_HEAVY)))
-						|| ((p_ptr->disease & ((1 << DISEASE_TYPES_HEAVY) -1)) == 0) )
+					/* Note for heavy diseases - curing the symptoms is temporary only */
+					if ( ((s_ptr->param >= DISEASE_TYPES_HEAVY) && (p_ptr->disease < (1L << DISEASE_TYPES_HEAVY)))
+						|| ( ((p_ptr->disease & ((1L << DISEASE_TYPES_HEAVY) -1)) == 0) && !(p_ptr->disease & (DISEASE_HEAVY)) ) )
 					{
 						p_ptr->disease = 0;
 					}
@@ -6905,6 +6945,9 @@ bool process_spell_eaten(int spell, int level, bool *cancel)
 			if (project_t(-2,p_ptr->py,p_ptr->px,damage, effect)) obvious = TRUE;
 		}
 	}
+
+	/* Apply flags */
+	if (process_spell_types(spell, level, cancel)) obvious = TRUE;
 
 	return (obvious);
 

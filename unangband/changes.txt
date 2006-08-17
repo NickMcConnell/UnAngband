@@ -191,6 +191,10 @@ damaging elemental attack. Diggers are now vulnerible to damage whilst in the ba
 - Adjusted bag rarities and depths to try to make early bags more useful and interesting
 and deeper bags not necessarily encountered every game (Suggested by Matthias Rudolf).
 
+- Adjusted diseases to make heavy and powerful diseases more distinct, and to improve
+'correctness' of disease life-cycle in instances where a disease was draining hitpoints
+mana or experience or preventing them from healing only.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -464,6 +468,11 @@ wisdom permanently (Reported by Matthias Rudolf).
 
 - Fixed bug causing bags to weigh to much when picked up or when objects used from
 them (Reported by a number of people).
+
+- Eating and quaffing items can now cure diseases (Thanks to Matthias Rudolf for
+providing some good test cases).
+
+- Fixed disease of stunning so that it actually stuns the player.
 
 ### Build / Platform ###
 

@@ -2802,10 +2802,10 @@ const cptr disease_name[32] =
 	"mana mites",
 	"black breath",
 	"the plague",
-	"fast-acting viruses",
 	"magical parasites",
-	"minor ailments",
 	"Morgoth's curse",
+	"minor ailments",
+	"hard to treat viruses",
 	"incurable illnesses"
 };
 
