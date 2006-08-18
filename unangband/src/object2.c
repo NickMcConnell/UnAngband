@@ -1593,14 +1593,24 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			if (o_ptr->to_h != j_ptr->to_h) return (FALSE);
 			if (o_ptr->to_d != j_ptr->to_d) return (FALSE);
 			if (o_ptr->to_a != j_ptr->to_a) return (FALSE);
+			if (o_ptr->pval != j_ptr->pval) return (FALSE);
 
-			/* Require similar "pval" code */
-			if (o_ptr->pval != j_ptr->pval)
+			/* Require similar "charges" code */
+			if (o_ptr->charges != j_ptr->charges)
 			{
 				/* Check for sign difference */
-				if ((o_ptr->pval > 0)&&(j_ptr->pval <= 0)) return (0);
-				if ((o_ptr->pval < 0)&&(j_ptr->pval >= 0)) return (0);
-				if ((o_ptr->pval == 0)&&(j_ptr->pval != 0)) return (0);
+				if ((o_ptr->charges > 0)&&(j_ptr->charges <= 0)) return (0);
+				if ((o_ptr->charges < 0)&&(j_ptr->charges >= 0)) return (0);
+				if ((o_ptr->charges == 0)&&(j_ptr->charges != 0)) return (0);
+
+				/* Line 1 -- no force charge stacking option */
+				/* Line 2 -- 1st charges is not 1 less than 2nd charges, or 1st charges is a charges stack */
+				/* Line 3 -- 1st charges is not 1 greater than 2nd charges, or 2nd charges is a charges stack */
+				/* Line 4 -- an item has auto_stack */
+				if ((!stack_force_charges)
+					&& ((o_ptr->charges != j_ptr->charges-1) || (o_ptr->stackc))
+					&& ((o_ptr->charges != j_ptr->charges+1) || (j_ptr->stackc))
+					&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr))) return (0);
 			}
 
 			/* Require identical "artifact" names */

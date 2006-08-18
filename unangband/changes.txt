@@ -494,6 +494,9 @@ choosing an item, even though the slot could, in fact, be chosen (Reported by je
 - Fixed bug preventing some items being created in wizard mode (Reported by Matthias
 Rudolf).
 
+- Fixed bug where object pvals would still attempt to stack in many circumstances
+(Reported by Matthias Rudolf).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
