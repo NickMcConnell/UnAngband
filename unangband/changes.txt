@@ -486,6 +486,8 @@ providing some good test cases).
 - Fixed freeze bug caused by unintialised variable in ego item knowledge screen
 (Reported by Matthias Rudolf).
 
+- Allow running over various floor types (Reported by Pav Lucistnik).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
