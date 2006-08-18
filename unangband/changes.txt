@@ -195,6 +195,8 @@ and deeper bags not necessarily encountered every game (Suggested by Matthias Ru
 'correctness' of disease life-cycle in instances where a disease was draining hitpoints
 mana or experience or preventing them from healing only.
 
+- Study items are now only created when you study at a feature.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -260,6 +262,13 @@ improved with runes.
 prompted to verify destruction even if you have the verify_destroy option selected.
 In addition, you ignore objects under more circumstances (if they roll under you
 or disappear from view). (Thanks to Pav Lucistnik for the patch).
+
+- Study items now tell you that they can be researched when you inspect them. You
+can also now browse the spells that you can research, if you are studying a magic
+book or runestone only (Requestd by Matthias Rudolf).
+
+- When Inspecting an object, the basic object functions are listed first, before
+flags or damage (Following discussion with Pav Lucistnik).
 
 ### Bug fixes ###
 

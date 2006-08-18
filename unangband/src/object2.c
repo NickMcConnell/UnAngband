@@ -1636,9 +1636,11 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		}
 	}
 
-	/* Hack -- Require identical "cursed" and "broken" status */
+	/* Hack -- Require identical "cursed" and "broken" status and "breaking" and "stored" staus */
 	if (((o_ptr->ident & (IDENT_CURSED)) != (j_ptr->ident & (IDENT_CURSED))) ||
-	    ((o_ptr->ident & (IDENT_BROKEN)) != (j_ptr->ident & (IDENT_BROKEN))))
+	    ((o_ptr->ident & (IDENT_BROKEN)) != (j_ptr->ident & (IDENT_BROKEN))) ||
+	    ((o_ptr->ident & (IDENT_BREAKS)) != (j_ptr->ident & (IDENT_BREAKS))) ||
+	    ((o_ptr->ident & (IDENT_STORE)) != (j_ptr->ident & (IDENT_STORE))))
 	{
 		return (0);
 	}
@@ -1864,17 +1866,11 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 	/* Add together the item counts */
 	o_ptr->number = number;
 
+	/* Hack -- Blend identify */
+	o_ptr->ident |= (j_ptr->ident);
+
 	/* Hack -- Blend "known" status */
 	if (object_known_p(j_ptr)) object_known(o_ptr);
-
-	/* Hack -- Blend "bonus" status */
-	if (j_ptr->ident & (IDENT_BONUS)) o_ptr->ident |= (IDENT_BONUS);
-
-	/* Hack -- Blend "store" status */
-	if (j_ptr->ident & (IDENT_STORE)) o_ptr->ident |= (IDENT_STORE);
-
-	/* Hack -- Blend "mental" status */
-	if (j_ptr->ident & (IDENT_MENTAL)) o_ptr->ident |= (IDENT_MENTAL);
 
 	/* Hack -- Blend "notes" */
 	if (j_ptr->note != 0) o_ptr->note = j_ptr->note;

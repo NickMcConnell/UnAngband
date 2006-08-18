@@ -2663,6 +2663,82 @@ void list_object(const object_type *o_ptr, int mode)
 
 	}
 
+	/* Basic abilities -- tool use */
+	if (!spoil && !random)
+	{
+		cptr build_bridge = "You can build a bridge across a chasm with this ";
+
+		switch(o_ptr->tval)
+		{
+			case TV_DIGGING:
+				text_out("You can dig pits with this to trap monsters.  ");
+				anything = TRUE;
+				break;
+			case TV_SPIKE:
+				text_out("You can spike doors shut with this.  ");
+				text_out(format("%sand rope or chain.  ", build_bridge));
+				anything = TRUE;
+				break;
+			case TV_ROPE:
+				text_out(format("%sand spikes or grapples.  ", build_bridge));
+				anything = TRUE;
+				break;
+			case TV_SHOT:
+			case TV_ARROW:
+			case TV_BOLT:
+				if (o_ptr->sval == SV_AMMO_GRAPPLE)
+				{
+					text_out(format("%sand rope", build_bridge));
+					if (o_ptr->tval == TV_BOLT) text_out(" or chain");
+					text_out(".  ");
+					anything = TRUE;
+				}
+				break;
+			case TV_RUNESTONE:
+				text_out("You can apply it to different objects to change them or enchant them with additional powers.  ");
+				/* Fall through */
+			case TV_MAGIC_BOOK:
+			case TV_PRAYER_BOOK:
+			case TV_SONG_BOOK:
+				text_out("You can study this to learn new spells.  ");
+				text_out("You can cast spells from this that you have learnt.  ");
+				text_out("You can sell this to a shopkeeper for them to offer additional services.  ");
+				anything = TRUE;
+				break;
+			case TV_STUDY:
+				text_out("You can study this to research a new field of magic.  ");
+				anything = TRUE;
+				break;
+			case TV_LITE:
+				text_out("You can wield this as a source of light.  ");
+				anything = TRUE;
+				break;
+			case TV_STATUE:
+				text_out("You're no art critic, but this might be worth something to sell.  ");
+				anything = TRUE;
+				break;
+			case TV_ASSEMBLY:
+				text_out("You can assemble this together to make something.  ");
+				anything = TRUE;
+				break;
+			case TV_MAP:
+				text_out("You can travel to ");
+				text_out(t_name + t_info[o_ptr->sval].name);
+				text_out(format(" (levels %d", min_depth(o_ptr->sval)));
+				if (max_depth(o_ptr->sval) > min_depth(o_ptr->sval)) text_out(format("-%d",max_depth(o_ptr->sval)));
+				text_out(") from ");
+				if (adult_campaign) text_out(t_name + t_info[t_info[o_ptr->sval].nearby].name);
+				else text_out(t_name + t_info[0].name);
+				text_out(" with this.  ");
+				anything = TRUE;
+				break;
+			case TV_BAG:
+				text_out("You can carry numerous objects inside it.  ");
+				anything = TRUE;
+				break;
+		}
+	}
+
 	/* Extract the flags */
 	object_flags_aux(mode, o_ptr, &f1, &f2, &f3, &f4);
 
@@ -2820,8 +2896,8 @@ void list_object(const object_type *o_ptr, int mode)
 				vp[vn] = vp_monster_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
 				if (o_ptr->sval < SV_FOOD_MIN_FOOD)
 				{
-					vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
 					vp[vn] = vp_coating; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_COATED;
+					vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
 				}
 				break;
 
@@ -3038,78 +3114,6 @@ void list_object(const object_type *o_ptr, int mode)
 			text_out(format("It %s your armor class by %d.", armor > 0 ? "increases" : "decreases" , armor > 0 ? armor : -armor));
 
 			anything = TRUE;
-		}
-	}
-
-	/* Basic abilities -- tool use */
-	if (!spoil && !random)
-	{
-		cptr build_bridge = "You can build a bridge across a chasm with this ";
-
-		switch(o_ptr->tval)
-		{
-			case TV_DIGGING:
-				text_out("You can dig pits with this to trap monsters.  ");
-				anything = TRUE;
-				break;
-			case TV_SPIKE:
-				text_out("You can spike doors shut with this.  ");
-				text_out(format("%sand rope or chain.  ", build_bridge));
-				anything = TRUE;
-				break;
-			case TV_ROPE:
-				text_out(format("%sand spikes or grapples.  ", build_bridge));
-				anything = TRUE;
-				break;
-			case TV_SHOT:
-			case TV_ARROW:
-			case TV_BOLT:
-				if (o_ptr->sval == SV_AMMO_GRAPPLE)
-				{
-					text_out(format("%sand rope", build_bridge));
-					if (o_ptr->tval == TV_BOLT) text_out(" or chain");
-					text_out(".  ");
-					anything = TRUE;
-				}
-				break;
-			case TV_RUNESTONE:
-				text_out("You can apply it to different objects to change them or enchant them with additional powers.  ");
-				/* Fall through */
-			case TV_MAGIC_BOOK:
-			case TV_PRAYER_BOOK:
-			case TV_SONG_BOOK:
-				text_out("You can study this to learn new spells.  ");
-				text_out("You can cast spells from this that you have learnt.  ");
-				text_out("You can sell this to a shopkeeper for them to offer additional services.  ");
-				anything = TRUE;
-				break;
-			case TV_LITE:
-				text_out("You can wield this as a source of light.  ");
-				anything = TRUE;
-				break;
-			case TV_STATUE:
-				text_out("You're not art critic, but this might be worth something to sell.  ");
-				anything = TRUE;
-				break;
-			case TV_ASSEMBLY:
-				text_out("You can assemble this together to make something.  ");
-				anything = TRUE;
-				break;
-			case TV_MAP:
-				text_out("You can travel to ");
-				text_out(t_name + t_info[o_ptr->sval].name);
-				text_out(format(" (levels %d", min_depth(o_ptr->sval)));
-				if (max_depth(o_ptr->sval) > min_depth(o_ptr->sval)) text_out(format("-%d",max_depth(o_ptr->sval)));
-				text_out(") from ");
-				if (adult_campaign) text_out(t_name + t_info[t_info[o_ptr->sval].nearby].name);
-				else text_out(t_name + t_info[0].name);
-				text_out(" with this.  ");
-				anything = TRUE;
-				break;
-			case TV_BAG:
-				text_out("You can carry numerous objects inside it.  ");
-				anything = TRUE;
-				break;
 		}
 	}
 

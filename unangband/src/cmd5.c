@@ -397,6 +397,32 @@ bool inven_book_okay(const object_type *o_ptr)
 
 
 /*
+ * Print a list of fields (for research).
+ */
+void print_fields(const s16b *sn, int num, int y, int x)
+{
+	int i;
+
+	char out_val[160];
+#if 0
+	/* Title the list */
+	prt("", y, x);
+#endif
+	/* Dump the fields */
+	for (i = 0; i < num; i++)
+	{
+		/* Dump the spell -- skip 'of ' if required */
+		sprintf(out_val, "  %c) %-75s ",
+			I2A(i), k_name + k_info[sn[i]].name + (k_info[sn[i]].tval == TV_RUNESTONE ? 0 : 3));
+		c_prt(TERM_WHITE, out_val, y + i, x);
+	}
+
+	/* Clear the bottom line */
+	prt("", y + i, x);
+}
+
+
+/*
  * Peruse the spells/prayers in a Book
  *
  * Note that *all* spells in the book are listed
@@ -414,7 +440,7 @@ void do_cmd_browse(void)
 
 	object_type *o_ptr;
 
-	cptr p, q, s;
+	cptr p, q, r, s;
 
 	int spell=-1;
 
@@ -426,6 +452,9 @@ void do_cmd_browse(void)
 
 	char out_val[160];
 
+	spell_type *s_ptr;
+
+	object_type object_type_body;
 
 	/* Cannot browse books if illiterate */
 	if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
@@ -506,23 +535,68 @@ void do_cmd_browse(void)
 	{
 		case TV_PRAYER_BOOK:
 			p="prayer";
+			r="Pray for which blessing";
 			break;
 
 		case TV_SONG_BOOK:
 			p="song";
+			r="Improvise which melody";
 			break;
 
 		case TV_MAGIC_BOOK:
 			p="spell";
+			r="Research which field";
 			break;
 
 		case TV_RUNESTONE:
 			p="pattern";
+			r="Engrave which pattern";
 			break;
 
 		default:
 			p="power";
+			r = "";
 			break;
+	}
+
+	/* Study materials -- Browse spells in a book related to the current spell for magic books and runestones only */
+	if ((o_ptr->tval == TV_STUDY) && ((o_ptr->sval == TV_MAGIC_BOOK) || (o_ptr->sval == TV_RUNESTONE)))
+	{
+		s16b field[MAX_SPELL_APPEARS];
+
+		int num = 0;
+
+		int selection = 0;
+
+		/* Get the spell */
+		s_ptr = &s_info[o_ptr->pval];
+
+		/* Pick a new spell item */
+		for (i = 0; i < MAX_SPELL_APPEARS; i++)
+		{
+			if (s_ptr->appears[i].tval == tval) field[num++] = lookup_kind(tval, s_ptr->appears[i].sval);
+		}
+
+		/* Paranoia */
+		if (!num) return;
+
+		/* Display the list and get a selection */
+		if (get_list(print_fields, field, num, format("%^ss",p), r, 1, 20, &selection))
+		{
+			/* Fake the o_ptr */
+			o_ptr = &object_type_body;
+
+			/* Set object details required */
+			o_ptr->k_idx = selection;
+			o_ptr->tval = k_info[selection].tval;
+			o_ptr->sval = k_info[selection].sval;
+			o_ptr->xtra1 = 0;
+		}
+		/* Did not choose something */
+		else
+		{
+			return;
+		}
 	}
 
 	/* Fill book with spells */
@@ -660,31 +734,6 @@ void do_cmd_browse(void)
 }
 
 
-/*
- * Print a list of fields (for research).
- */
-void print_fields(const s16b *sn, int num, int y, int x)
-{
-	int i;
-
-	char out_val[160];
-#if 0
-	/* Title the list */
-	prt("", y, x);
-#endif
-	/* Dump the fields */
-	for (i = 0; i < num; i++)
-	{
-		/* Dump the spell -- skip 'of ' if required */
-		sprintf(out_val, "  %c) %-75s ",
-			I2A(i), k_name + k_info[sn[i]].name + (k_info[sn[i]].tval == TV_RUNESTONE ? 0 : 3));
-		c_prt(TERM_WHITE, out_val, y + i, x);
-	}
-
-	/* Clear the bottom line */
-	prt("", y + i, x);
-}
-
 
 /*
  * Study a book to gain a new spell/prayer
@@ -708,6 +757,8 @@ void do_cmd_study(void)
 	int max_spells = PY_MAX_SPELLS;
 
 	object_type object_type_body;
+
+	bool study_item = FALSE;
 
 	/* Cannot cast spells if illiterate */
 	if (c_info[p_ptr->pclass].spell_first > 50)
@@ -771,6 +822,9 @@ void do_cmd_study(void)
 		/* Refer to the item */
 		o_ptr = &inventory[item];
 	}
+
+	/* Generate study item from features */
+	if (o_ptr->ident & (IDENT_STORE)) study_item = TRUE;
 
 	/* Track the object kind */
 	object_kind_track(o_ptr->k_idx);
@@ -995,17 +1049,21 @@ void do_cmd_study(void)
 	/* Save the new_spells value */
 	p_ptr->old_spells = p_ptr->new_spells;
 
-	/* Create a new study object */
-	o_ptr = &object_type_body;
+	/* Create study item if required */
+	if (study_item)
+	{
+		/* Create a new study object */
+		o_ptr = &object_type_body;
 
-	/* Prepare object */
-	object_prep(o_ptr,lookup_kind(TV_STUDY, tval));
+		/* Prepare object */
+		object_prep(o_ptr,lookup_kind(TV_STUDY, tval));
 
-	/* Set the spell */
-	o_ptr->pval = spell;
+		/* Set the spell */
+		o_ptr->pval = spell;
 
-	/* And carry it */
-	item = inven_carry(o_ptr);
+		/* And carry it */
+		item = inven_carry(o_ptr);
+	}
 
 	/* Redraw Study Status */
 	p_ptr->redraw |= (PR_STUDY);
