@@ -1112,6 +1112,25 @@ void lookup_prettyname(char name[60], int style, int sval, bool long_name, bool 
 			{
 				strcpy(temp,"Exorcist");
 			}
+			if (style == WS_INSTRUMENT) strcpy(temp,"Monk");
+			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
+			{
+
+				object_kind *k_ptr=&k_info[0];
+				int i;
+			
+				/* Analyse books */
+				for (i = 0;i<z_info->k_max;i++)
+				{
+					k_ptr = &k_info[i];
+
+					if ((k_ptr->tval == TV_PRAYER_BOOK) && (k_ptr->sval == sval)) break;
+				}
+
+				if (short_name) strcpy(temp,"Acolyte");
+				else sprintf(temp,"%s",k_name+k_ptr->name);
+				if (long_name) sprintf(temp,"Acolyte of the Order %s",k_name+k_ptr->name);
+			}
 			break;
 
 		case 3:
@@ -1141,6 +1160,11 @@ void lookup_prettyname(char name[60], int style, int sval, bool long_name, bool 
 				strcpy(temp,"Defender");
 			}
 			if (style == WS_SLAY_DRAGON) strcpy(temp,"Dragonslayer");
+			if (style == WS_INSTRUMENT)
+			{
+				 if (long_name) strcpy(temp,"Standard-bearer"); 
+				else strcpy(temp,"Standard");
+			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
 			{
 

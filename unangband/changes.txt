@@ -200,6 +200,8 @@ mana or experience or preventing them from healing only.
 - Scaled down the costs of high stats when using point based character generation due
 to stat gain at every level (Suggested by mikon).
 
+- Priests can now specialise in priest books or instruments (Suggested by mikon).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
