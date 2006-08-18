@@ -328,7 +328,7 @@ static int wiz_create_itemtype(void)
 	int choice[78];
 	static const char choice_name[] = "abcdefghijklmnopqrstuvwxyz"
 	                                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	                                  "0123456789:;<=>?@%&*(){}<>";
+	                                  "0123456789:;<=>?@%&*(){}[]";
 	const char *cp;
 
 	char buf[160];
