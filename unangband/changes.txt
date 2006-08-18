@@ -475,13 +475,16 @@ wisdom permanently (Reported by Matthias Rudolf).
 - Fixed crash caused by monster suffering no damage whilst having no hit points
 (Thanks to Pav Lucistnik for locating this).
 
-- Fixed bug causing bags to weigh to much when picked up or when objects used from
+- Fixed bug causing bags to weigh too much when picked up or when objects used from
 them (Reported by a number of people).
 
 - Eating and quaffing items can now cure diseases (Thanks to Matthias Rudolf for
 providing some good test cases).
 
 - Fixed disease of stunning so that it actually stuns the player.
+
+- Fixed freeze bug caused by unintialised variable in ego item knowledge screen
+(Reported by Matthias Rudolf).
 
 ### Build / Platform ###
 

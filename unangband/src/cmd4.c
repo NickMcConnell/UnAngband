@@ -5789,7 +5789,7 @@ static void do_cmd_knowledge_ego_items(void)
 	int grp_cnt, grp_idx[100];
 	int object_cnt;
 	int *object_idx;
-	int delay;
+	int delay = 0;
 
 	int column = 0;
 	bool flag;
