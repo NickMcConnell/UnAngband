@@ -483,7 +483,7 @@ static errr rd_item(object_type *o_ptr)
 		if (!e_ptr->name) o_ptr->name2 = 0;
 	}
 
-
+#if 0
 	/* Get the standard fields */
 	o_ptr->ac = k_ptr->ac;
 	o_ptr->dd = k_ptr->dd;
@@ -491,7 +491,7 @@ static errr rd_item(object_type *o_ptr)
 
 	/* Get the standard weight */
 	o_ptr->weight = k_ptr->weight;
-
+#endif
 	/* Hack -- extract the "broken" flag */
 	if (o_ptr->pval < 0) o_ptr->ident |= (IDENT_BROKEN);
 
