@@ -2870,11 +2870,8 @@ static void store_sell(void)
 	/* In a bag? */
 	if (o_ptr->tval == TV_BAG)
 	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
-
-		/* Refer to the item */
-		o_ptr = &inventory[item];
+		/* Get item from bag -- cancel for the bag */
+		if (get_item_from_bag(&item, q, s, o_ptr)) o_ptr = &inventory[item];
 	}
 
 	/* Hack -- Cannot remove cursed objects */

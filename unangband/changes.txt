@@ -509,6 +509,8 @@ selected target and fired to the top left corner (Reported by Matthias Rudolf).
 - Fixed bug where travelling downstairs from the top of a tower would take you to the
 next location to travel to (Reported by Matthias Rudolf).
 
+- Fixed bug preventing you from dropping or selling bags (Reported by jevansau1).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
