@@ -7358,7 +7358,7 @@ bool project_p(int who, int y, int x, int dam, int typ)
 				player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
 			}
 
-			if ((p_ptr->cur_flags2 & (TR2_RES_CHAOS)) != 0)
+			if ((p_ptr->cur_flags2 & (TR2_RES_CHAOS)) == 0)
 			{
 				/* Always notice */
 				player_not_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
