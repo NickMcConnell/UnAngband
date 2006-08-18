@@ -2608,6 +2608,9 @@ void list_object(const object_type *o_ptr, int mode)
 
 	int num;
 
+	int time = 0;
+	int randtime = 0;
+
 	bool random = (mode == OBJECT_FLAGS_RANDOM) ? TRUE : FALSE;
 	bool spoil = (mode == OBJECT_FLAGS_FULL) ? TRUE : FALSE;
 
@@ -2664,7 +2667,7 @@ void list_object(const object_type *o_ptr, int mode)
 	}
 
 	/* Basic abilities -- tool use */
-	if (!spoil && !random)
+	if (!random)
 	{
 		cptr build_bridge = "You can build a bridge across a chasm with this ";
 
@@ -2770,7 +2773,7 @@ void list_object(const object_type *o_ptr, int mode)
 	}
 
 	/* Basic abilities -- damage/ damage multiplier */
-	if (!random && !spoil && o_ptr->dd && o_ptr->ds)
+	if (!random && o_ptr->dd && o_ptr->ds)
 	{
 		bool throw = TRUE;
 
@@ -2797,7 +2800,7 @@ void list_object(const object_type *o_ptr, int mode)
 		if (throw)
 		{
 			text_out(format("does %dd%d", o_ptr->dd, o_ptr->ds));
-			if (object_bonus_p(o_ptr))
+			if (object_bonus_p(o_ptr) || spoil)
 			{
 				if (o_ptr->to_d > 0) text_out(format(" + %d", o_ptr->to_d));
 				else if (o_ptr->to_d < 0) text_out(format(" - %d", o_ptr->to_d));
@@ -2812,7 +2815,7 @@ void list_object(const object_type *o_ptr, int mode)
 	}
 
 	/* Bows */
-	if (!random && !spoil && (o_ptr->tval == TV_BOW))
+	if (!random && (o_ptr->tval == TV_BOW))
 	{
 		int mult = 2;
 
@@ -2863,7 +2866,7 @@ void list_object(const object_type *o_ptr, int mode)
 	/* Extra powers */
 	if (!random && ((object_aware_p(o_ptr)) || (spoil))
 		&& (o_ptr->tval !=TV_MAGIC_BOOK) && (o_ptr->tval != TV_PRAYER_BOOK)
-		&& (o_ptr->tval !=TV_SONG_BOOK))
+		&& (o_ptr->tval !=TV_SONG_BOOK) && (o_ptr->tval != TV_STUDY))
 	{
 		int vn = 0;
 		cptr vp[128];
@@ -2874,11 +2877,39 @@ void list_object(const object_type *o_ptr, int mode)
 		cptr vp_throw = "When thrown, it ";
 		cptr vp_coating = "When applied to coat an arrow, bolt, sword or polearm, it ";
 		cptr vp_activate = "When activated, it ";
+		cptr vp_activate_throw = "When inscribed with {=A} and attacking or thrown against an opponent, it ";
 		cptr vp_activate_attack = "When inscribed with {=A} and attacking an opponent, it ";
 		cptr vp_monster_eat = "When eaten by monsters, it ";
 
 		vn = 0;
 
+		/* Detailled explaination */
+		detail = (k_info[o_ptr->k_idx].used > 4 * k_info[o_ptr->k_idx].level * num) || (spoil) || (o_ptr->ident & (IDENT_MENTAL));
+
+		/* Activates */
+		if (f3 & TR3_ACTIVATE)
+		{
+			vp[vn] = vp_activate; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
+			charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
+			time = 0;
+			randtime = o_ptr->charges;
+
+			switch (o_ptr->tval)
+			{
+				case TV_STAFF:
+				case TV_SWORD:
+				case TV_POLEARM:
+				case TV_HAFTED:
+				case TV_DIGGING:
+				{
+					if (f3 & (TR3_THROWING)) vp[vn] = vp_activate_throw;
+					else vp[vn] = vp_activate_attack;
+					vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED; break;
+				}
+			}
+		}
+
+		/* Other attacks based on type */
 		switch(o_ptr->tval)
 		{
 			case TV_SCROLL:
@@ -2954,32 +2985,15 @@ void list_object(const object_type *o_ptr, int mode)
 			case TV_POLEARM:
 			case TV_HAFTED:
 				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
-				if (f3 & TR3_ACTIVATE)
-				{
-					vp[vn] = vp_activate_attack; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
-					charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
-				}
 				break;
 
 			case TV_DRAG_ARMOR:
-				if (f3 & TR3_ACTIVATE)
-				{
-					vp[vn] = vp_activate; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
-				}
 				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
 				charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
 				break;
 
 			case TV_RUNESTONE:
 				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
-				break;
-
-			default:
-				if (f3 & TR3_ACTIVATE)
-				{
-					vp[vn] = vp_activate; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
-					charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
-				}
 				break;
 		}
 
@@ -2988,36 +3002,10 @@ void list_object(const object_type *o_ptr, int mode)
 		{
 			artifact_type *a_ptr = &a_info[o_ptr->name1];
 
-			bool art_charge = (a_ptr->activated > a_ptr->randtime) || (spoil) || (o_ptr->ident & (IDENT_MENTAL));
-			bool art_detail = (a_ptr->activated > 8 * a_ptr->level) || (spoil) || (o_ptr->ident & (IDENT_MENTAL));
-
-			if (a_ptr->activation)
-			{
-				if (spell_desc(&s_info[a_ptr->activation],vp_activate_attack,0,art_detail, SPELL_TARGET_NORMAL))
-				{
-					anything = TRUE;
-
-					if (art_charge) text_out(format(", recharging in %d + d%d turns.  ",a_ptr->time,a_ptr->randtime));
-					else text_out(".  ");
-				}
-
-				switch (o_ptr->tval)
-				{
-					case TV_SWORD:
-					case TV_POLEARM:
-					case TV_HAFTED:
-					case TV_STAFF:
-						if (spell_desc(&s_info[a_ptr->activation],vp_activate_attack,0,art_detail, SPELL_TARGET_AIMED))
-						{
-							anything = TRUE;
-
-							if (art_charge) text_out(format(", recharging in %d + d%d turns.  ",a_ptr->time,a_ptr->randtime));
-							else text_out(".  ");
-						}
-				}
-
-				vn = 0;
-			}
+			charge = (a_ptr->activated > a_ptr->randtime) || (spoil) || (o_ptr->ident & (IDENT_MENTAL));
+			detail = (a_ptr->activated > 8 * a_ptr->level) || (spoil) || (o_ptr->ident & (IDENT_MENTAL));
+			time = a_ptr->time;
+			randtime = a_ptr->randtime;
 		}
 
 		if (vn)
@@ -3033,7 +3021,7 @@ void list_object(const object_type *o_ptr, int mode)
 				{
 					text_out(vp[n]);
 					text_out(format("does %dd%d", o_ptr->dd, o_ptr->ds));
-					if (object_bonus_p(o_ptr))
+					if (object_bonus_p(o_ptr) || spoil)
 					{
 						if (o_ptr->to_d > 0) text_out(format(" + %d", o_ptr->to_d));
 						else if (o_ptr->to_d < 0) text_out(format(" - %d", o_ptr->to_d));
@@ -3070,15 +3058,25 @@ void list_object(const object_type *o_ptr, int mode)
 				/* Fill the book with spells */
 				fill_book(o_ptr,book,&num);
 
-				/* Detailled explaination */
-				detail = (k_info[o_ptr->k_idx].used > 4 * k_info[o_ptr->k_idx].level * num) || (spoil) || (o_ptr->ident & (IDENT_MENTAL));
+				/* Hack -- fill book with artifact activation */
+				if ((o_ptr->name1) && ((object_known_p(o_ptr)) || (spoil)) && (f3 & TR3_ACTIVATE))
+				{
+					book[0] = a_info[o_ptr->name1].activation;
+					num = 1;
+				}
 
+				/* Display powers */
 				for (i = 0; i < num; i++)
 				{
 					powers |= spell_desc(&s_info[book[i]],(i==0) ? (vd[n] ? " and ": vp[n]) : ", or ",0,detail, vt[n]);
 				}
 
-				if ((charge) && (powers)) text_out(format(", recharging in d%d turns.  ",o_ptr->charges));
+				if ((charge) && (powers))
+				{
+					if ((time) && (randtime)) text_out(format(", recharging in d%d+%d turns.  ",randtime, time));
+					else if (randtime) text_out(format(", recharging in d%d turns.  ",randtime));
+					else if (time) text_out(format(", recharging in %d turns.  ",time));
+				}
 				else if (powers) text_out(".  ");
 
 				anything |= powers;
@@ -3087,7 +3085,7 @@ void list_object(const object_type *o_ptr, int mode)
 	}
 
 	/* Basic abilities -- armor class */
-	if (!spoil && !random)
+	if (!random)
 	{
 		int armor = 0;
 
@@ -3107,7 +3105,7 @@ void list_object(const object_type *o_ptr, int mode)
 				break;
 		}
 
-		if (object_bonus_p(o_ptr)) armor += o_ptr->to_a;
+		if (object_bonus_p(o_ptr) || spoil) armor += o_ptr->to_a;
 
 		if (armor)
 		{
