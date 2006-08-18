@@ -4931,9 +4931,12 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 							/* Describe observable situations */
 							if (m_ptr->ml && player_has_los_bold(ny, nx))
 							{
-								/* Dump a message */
-								msg_format("%^s tries to pick up %s, but fails.",
-									   m_name, o_name);
+								if (!auto_pickup_ignore(o_ptr))
+								{
+									/* Dump a message */
+									msg_format("%^s tries to pick up %s, but fails.",
+										   m_name, o_name);
+								}
 
 								/* Mark object as ungettable? */
 								if (!(o_ptr->feeling) &&
@@ -4969,8 +4972,8 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 						did_take_item = TRUE;
 	
 						/* Describe observable situations */
-						if (player_has_los_bold(ny, nx))
-						{
+						if (player_has_los_bold(ny, nx) && !auto_pickup_ignore(o_ptr))
+ 						{
 							/* Dump a message */
 							msg_format("%^s picks up %s.", m_name, o_name);
 						}
