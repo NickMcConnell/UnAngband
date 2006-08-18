@@ -739,7 +739,6 @@ void do_cmd_go_up(void)
 	/* Verify stairs */
 	if (!(f_ptr->flags1 & (FF1_STAIRS)) || !(f_ptr->flags1 & (FF1_LESS)))
 	{
-
 		/* Travel if possible */
 		if (p_ptr->depth == min_depth(p_ptr->dungeon))
 		{
@@ -758,35 +757,56 @@ void do_cmd_go_up(void)
 		return;
 	}
 
-	/* Check quests due to travelling - cancel if requested */
-	if (t_info[p_ptr->dungeon].zone[0].tower)
+	/* Hack -- travel through wilderness */
+	if ((adult_campaign) && (p_ptr->depth == max_depth(p_ptr->dungeon)) && (t_info[p_ptr->dungeon].zone[0].tower))
 	{
-		if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth + 1, TRUE)) return;
+		/* Check quests due to travelling - cancel if requested */
+		if (!check_travel_quest(t_info[p_ptr->dungeon].distant, min_depth(p_ptr->dungeon), TRUE)) return;
+
+		/* Success */
+		message(MSG_STAIRS_DOWN,0,format("You have found a way through %s.",t_name + t_info[p_ptr->dungeon].name));
+
+		/* Change the dungeon */
+		p_ptr->dungeon = t_info[p_ptr->dungeon].distant;
+
+		/* Set the new depth */
+		p_ptr->depth = min_depth(p_ptr->dungeon);
+
+		/* Leaving */
+		p_ptr->leaving = TRUE;
 	}
 	else
 	{
-		if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth - 1, TRUE)) return;
-	}
+		/* Check quests due to travelling - cancel if requested */
+		if (t_info[p_ptr->dungeon].zone[0].tower)
+		{
+			if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth + 1, TRUE)) return;
+		}
+		else
+		{
+			if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth - 1, TRUE)) return;
+		}
 
-	/* Hack -- take a turn */
-	p_ptr->energy_use = 100;
+		/* Hack -- take a turn */
+		p_ptr->energy_use = 100;
 
-	/* Success */
-	message(MSG_STAIRS_UP, 0, "You enter a maze of up staircases.");
+		/* Success */
+		message(MSG_STAIRS_UP, 0, "You enter a maze of up staircases.");
 
-	/* Create a way back */
-	p_ptr->create_down_stair = TRUE;
+		/* Create a way back */
+		p_ptr->create_down_stair = TRUE;
 
-	/* Hack -- tower level increases depth */
-	if (t_info[p_ptr->dungeon].zone[0].tower)
-	{
-		/* New depth */
-		p_ptr->depth++;
-	}
-	else
-	{
-		/* New depth */
-		p_ptr->depth--;
+		/* Hack -- tower level increases depth */
+		if (t_info[p_ptr->dungeon].zone[0].tower)
+		{
+			/* New depth */
+			p_ptr->depth++;
+		}
+		else
+		{
+			/* New depth */
+			p_ptr->depth--;
+		}
 	}
 
 	/* Leaving */
@@ -815,7 +835,7 @@ void do_cmd_go_down(void)
 	p_ptr->energy_use = 100;
 
 	/* Hack -- travel through wilderness */
-	if ((adult_campaign) && (p_ptr->depth == max_depth(p_ptr->dungeon)))
+	if ((adult_campaign) && (p_ptr->depth == max_depth(p_ptr->dungeon)) && !(t_info[p_ptr->dungeon].zone[0].tower))
 	{
 		/* Check quests due to travelling - cancel if requested */
 		if (!check_travel_quest(t_info[p_ptr->dungeon].distant, min_depth(p_ptr->dungeon), TRUE)) return;
@@ -829,8 +849,6 @@ void do_cmd_go_down(void)
 		/* Set the new depth */
 		p_ptr->depth = min_depth(p_ptr->dungeon);
 
-		/* Leaving */
-		p_ptr->leaving = TRUE;
 	}
 	else
 	{
@@ -861,10 +879,11 @@ void do_cmd_go_down(void)
 			/* New depth */
 			p_ptr->depth++;
 		}
-
-		/* Leaving */
-		p_ptr->leaving = TRUE;
 	}
+
+	/* Leaving */
+	p_ptr->leaving = TRUE;
+
 }
 
 
