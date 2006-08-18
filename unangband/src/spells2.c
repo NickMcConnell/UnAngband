@@ -4893,6 +4893,13 @@ static bool fire_arc(int typ, int dir, int dam, int rad, int degrees_of_arc)
 	ty = py + 99 * ddy[dir];
 	tx = px + 99 * ddx[dir];
 
+	/* Hack -- Use an actual "target" */
+	if ((dir == 5) && target_okay())
+	{
+		ty = p_ptr->target_row;
+		tx = p_ptr->target_col;
+	}
+
 	/* Narrow arcs lose relatively little energy over distance. */
 	if (degrees_of_arc < degree_factor)
 	{
