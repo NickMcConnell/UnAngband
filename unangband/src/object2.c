@@ -2324,8 +2324,8 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 	/* Already too magical */
 	if (obj_pow1 >= lev) return (FALSE);
 
-	/* Boost item most of the time */
-	if (rand_int(3))
+	/* Boost items most of the time -- except instruments and lites */
+	if ((o_ptr->tval != TV_LITE) && (o_ptr->tval != TV_INSTRUMENT) && rand_int(3))
 	{
 		/* Boost the item */
 		boost_item(o_ptr, power, power);
@@ -2338,10 +2338,13 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 
 		/* Already too magical */
 		if (obj_pow1 >= lev) return (FALSE);
+
+		/* Magical enough */
+		if (rand_int(2)) return (TRUE);
 	}
 
 	/* Hack -- Done boosting racial items */
-	if (!(o_ptr->name2) && (o_ptr->xtra1)) return (FALSE);
+	if (!(o_ptr->name2) && (o_ptr->xtra1)) return (TRUE);
 
 	/* Iterate through flags 1 */
 	for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)

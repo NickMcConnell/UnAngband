@@ -202,6 +202,9 @@ to stat gain at every level (Suggested by mikon).
 
 - Priests can now specialise in priest books or instruments (Suggested by mikon).
 
+- Magic items are half as common as before, but great non-magical items are now
+much more frequent.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
