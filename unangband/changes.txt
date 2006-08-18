@@ -500,6 +500,9 @@ Rudolf).
 - Fixed bug where you had to have resist chaos before chaos attacks would cause you to
 hallucinate, as opposed to protecting you from the effect (Reported by Matthias Rudolf).
 
+- Fixed bug where certain high-level amulets would have a pval of zero (Reported by
+Matthias Rudolf).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
