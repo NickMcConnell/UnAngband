@@ -518,6 +518,12 @@ next location to travel to (Reported by Matthias Rudolf).
 
 - Fixed bug preventing artifact daggers from being thrown.
 
+- Fixed bug permitting store keepers to buy items for more than their maximum purse
+(Reported by Matthias Rudolf).
+
+- Fixed bug preventing stores from buying items which they could sell (Reported by
+Matthias Rudolf).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

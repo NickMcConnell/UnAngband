@@ -732,8 +732,16 @@ static bool is_blessed(const object_type *o_ptr)
  */
 static bool store_will_buy(const object_type *o_ptr)
 {
+	int i;
+
 	/* Hack -- The Home is simple */
 	if ((store_num_fake == STORE_HOME) || (store_num_fake == -1)) return (TRUE);
+
+	/* Buy tvals that store will sell */
+	for (i = 0;i < STORE_CHOICES;i++)
+	{
+		if (su_ptr->tval[i] == o_ptr->tval) return (TRUE);
+	}
 
 	/* Switch on the store */
 	switch (store_num_fake)
@@ -2349,6 +2357,9 @@ static bool sell_haggle(object_type *o_ptr, s32b *price, cptr selling, char labe
 			/* Ignore haggling */
 			ignore = TRUE;
 		}
+
+		/* Limit purse */
+		if (final_ask > purse) final_ask = purse;
 
 		/* Final price */
 		cur_ask = final_ask;
