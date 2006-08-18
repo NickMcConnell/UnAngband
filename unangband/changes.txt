@@ -197,6 +197,9 @@ mana or experience or preventing them from healing only.
 
 - Study items are now only created when you study at a feature.
 
+- Scaled down the costs of high stats when using point based character generation due
+to stat gain at every level (Suggested by mikon).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
