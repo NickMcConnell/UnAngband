@@ -2202,6 +2202,35 @@ bool item_tester_okay(const object_type *o_ptr)
 	/* Hack -- ignore "gold" */
 	if (o_ptr->tval >= TV_GOLD) return (FALSE);
 
+	/* Hack -- check bag contents */
+	if (o_ptr->tval == TV_BAG)
+	{
+		object_type object_type_body;
+		object_type *i_ptr = &object_type_body;
+
+		int i;
+
+		/* Check bag contents */
+		for (i = 0; i < INVEN_BAG_TOTAL; i++)
+		{
+			/* Empty slot */
+			if (!(bag_holds[o_ptr->sval][i][0]) || !(bag_contents[o_ptr->sval][i]))
+			{
+				i_ptr->k_idx = 0;
+				continue;
+			}
+
+			/* Fake the item */
+			fake_bag_item(i_ptr, o_ptr->sval, i);
+
+			/* Check the tval */
+			if ((item_tester_tval) && (item_tester_tval == i_ptr->tval)) return (TRUE);
+
+			/* Check the hook */
+			if ((item_tester_hook) && ((*item_tester_hook)(i_ptr))) return (TRUE);
+		}
+	}
+
 	/* Check the tval */
 	if (item_tester_tval)
 	{
@@ -3036,32 +3065,6 @@ static bool get_item_okay(int item)
 	else
 	{
 		o_ptr = &o_list[0 - item];
-	}
-
-	/* Hack -- check bag contents */
-	if (o_ptr->tval == TV_BAG)
-	{
-		object_type object_type_body;
-		object_type *i_ptr = &object_type_body;
-
-		int i;
-
-		/* Check bag contents */
-		for (i = 0; i < INVEN_BAG_TOTAL; i++)
-		{
-			/* Empty slot */
-			if (!(bag_holds[o_ptr->sval][i][0]) || !(bag_contents[o_ptr->sval][i]))
-			{
-				i_ptr->k_idx = 0;
-				continue;
-			}
-
-			/* Fake the item */
-			fake_bag_item(i_ptr, o_ptr->sval, i);
-
-			/* Check the item */
-			if (item_tester_okay(i_ptr)) return (TRUE);
-		}
 	}
 
 	/* Verify the item */

@@ -488,6 +488,9 @@ providing some good test cases).
 
 - Allow running over various floor types (Reported by Pav Lucistnik).
 
+- Fixed bug preventing display of magic bags in inventory or equipment screens when
+choosing an item, even though the slot could, in fact, be chosen (Reported by jevansau1).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
