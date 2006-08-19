@@ -2522,6 +2522,10 @@ static void improve_stat(void)
 
 	bool okay = FALSE;
 
+#ifdef ALLOW_BORG
+	if (count_stop) return;
+#endif
+
 	/* Check which stats can still be improved */
 	for (i = 0; i <= A_CHR; i++)
 	{
@@ -6511,7 +6515,7 @@ bool confuse_dir(int *dp)
 	dir = (*dp);
 
 	/* Apply "confusion" */
-	if (p_ptr->confused)
+	if ((p_ptr->confused) && (p_ptr->confused > rand_int(33)))
 	{
 		/* Apply confusion XXX XXX XXX */
 		if ((dir == 5) || (rand_int(100) < 75))

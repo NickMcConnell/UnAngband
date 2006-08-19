@@ -854,7 +854,7 @@ struct monster_type
 	byte tim_invis;	/* Monster is temporarily invisible */
 	byte tim_passw;	/* Monster is temporarily passwall */
 	byte bless;	/* Monster is temporarily blessed */
-	byte beserk;	/* Monster is temporarily beserk */
+	byte berserk;	/* Monster is temporarily beserk */
 
 	byte shield;	/* Monster is temporarily shielded */
 	byte oppose_elem; /* Monster is temporarily resistant to elements */

@@ -265,7 +265,7 @@ static void wr_monster(const monster_type *m_ptr)
 	wr_byte(m_ptr->tim_invis);
 	wr_byte(m_ptr->tim_passw);
 	wr_byte(m_ptr->bless);
-	wr_byte(m_ptr->beserk);
+	wr_byte(m_ptr->berserk);
 	wr_byte(m_ptr->shield);
 	wr_byte(m_ptr->oppose_elem);
 	wr_byte(m_ptr->summoned);

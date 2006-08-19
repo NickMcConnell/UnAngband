@@ -248,9 +248,6 @@ static void strip_bytes(int n)
  */
 static errr rd_item(object_type *o_ptr)
 {
-	byte old_dd;
-	byte old_ds;
-
 	u32b f1, f2, f3, f4;
 
 	object_kind *k_ptr;
@@ -343,8 +340,8 @@ static errr rd_item(object_type *o_ptr)
 
 	rd_s16b(&o_ptr->ac);
 
-	rd_byte(&old_dd);
-	rd_byte(&old_ds);
+	rd_byte(&o_ptr->dd);
+	rd_byte(&o_ptr->ds);
 
 	rd_u16b(&o_ptr->ident);
 
@@ -483,12 +480,6 @@ static errr rd_item(object_type *o_ptr)
 		if (!e_ptr->name) o_ptr->name2 = 0;
 	}
 
-
-	/* Get the standard fields */
-	o_ptr->ac = k_ptr->ac;
-	o_ptr->dd = k_ptr->dd;
-	o_ptr->ds = k_ptr->ds;
-
 	/* Get the standard weight */
 	o_ptr->weight = k_ptr->weight;
 
@@ -526,13 +517,6 @@ static errr rd_item(object_type *o_ptr)
 
 		/* Obtain the ego-item info */
 		e_ptr = &e_info[o_ptr->name2];
-
-		/* Hack -- keep some old fields */
-		if ((o_ptr->dd < old_dd) && (o_ptr->ds == old_ds))
-		{
-			/* Keep old boosted damage dice */
-			o_ptr->dd = old_dd;
-		}
 
 		/* Hack -- extract the "broken" flag */
 		if (!e_ptr->cost) o_ptr->ident |= (IDENT_BROKEN);
@@ -592,7 +576,7 @@ static void rd_monster(monster_type *m_ptr)
 	rd_byte(&m_ptr->tim_invis);
 	rd_byte(&m_ptr->tim_passw);
 	rd_byte(&m_ptr->bless);
-	rd_byte(&m_ptr->beserk);
+	rd_byte(&m_ptr->berserk);
 	rd_byte(&m_ptr->shield);
 	rd_byte(&m_ptr->oppose_elem);
 	rd_byte(&m_ptr->summoned);

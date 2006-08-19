@@ -5340,14 +5340,14 @@ static void process_monster(int m_idx)
 	if ((chance_innate) && (m_ptr->cdis > MAX_RANGE)) chance_innate = 0;
 	if ((chance_spell) && (m_ptr->cdis > MAX_RANGE)) chance_spell = 0;
 
-	/* Cannot use spell attacks when blind, confused or not aware. */
-	if ((chance_spell) && ((m_ptr->blind) || (m_ptr->confused) || (!aware))) chance_spell = 0;
+	/* Cannot use spell attacks when blind, enraged or not aware. */
+	if ((chance_spell) && ((m_ptr->blind) || (m_ptr->berserk) || (!aware))) chance_spell = 0;
 
 	/* Cannot use innate attacks when not aware. */
 	if ((chance_innate) && (!aware)) chance_innate = 0;
 
-	/* Stunned monsters use spell attacks half as often. */
-	if ((chance_spell) && (m_ptr->stunned)) chance_spell /= 2;
+	/* Stunned and confused monsters use spell attacks half as often. */
+	if ((chance_spell) && (m_ptr->stunned) && (m_ptr->confused)) chance_spell /= 2;
 
 	/* Blind, confused or stunned monsters use innate attacks half as often. */
 	if ((chance_innate) && ((m_ptr->blind) || (m_ptr->confused) || (m_ptr->stunned))) chance_innate /= 2;
@@ -5396,6 +5396,14 @@ static void process_monster(int m_idx)
 					/* Disturb */
 					disturb(0, 0);
 				}
+
+				/* Set attack */
+				if (choice < 96 + 8) m_ptr->mflag |= (MFLAG_SHOT);
+				else if (choice < 128) m_ptr->mflag |= (MFLAG_BREATH);
+				else m_ptr->mflag |= (MFLAG_CAST);
+
+				/* Hack -- unhiding monsters end turn */
+				return;
 			}
 
 			/* Execute said attack */
@@ -5668,7 +5676,7 @@ static void process_monster(int m_idx)
 	/*** Find a target to move to ***/
 
 	/* Monster is genuinely confused */
-	if (m_ptr->confused)
+	if ((m_ptr->confused) && (m_ptr->confused > rand_int(100)))
 	{
 		/* Choose any direction except five and zero */
 		dir = rand_int(8);
@@ -5678,8 +5686,8 @@ static void process_monster(int m_idx)
 		tx = m_ptr->fx + ddx_ddd[dir];
 	}
 
-	/* Monster isn't confused, just moving semi-randomly */
-	else if (random)
+	/* Monster isn't confused, just moving semi-randomly, or monster is partially confused */
+	else if ((random) || ((m_ptr->confused) && (m_ptr->confused > rand_int(50))))
 	{
 		int start = rand_int(8);
 		bool dummy;
@@ -6359,24 +6367,24 @@ static void recover_monster(int m_idx, bool regen)
 
 
 	/*
-	 * Handle beserk counter
+	 * Handle berserk counter
 	 */
-	if (m_ptr->beserk)
+	if (m_ptr->berserk)
 	{
 		int d = 1;
 
 		/* Still invisible */
-		if (m_ptr->beserk > d)
+		if (m_ptr->berserk > d)
 		{
 			/* Reduce the confusion */
-			m_ptr->beserk -= d;
+			m_ptr->berserk -= d;
 		}
 
 		/* Expired */
 		else
 		{
 			/* No longer invisible */
-			m_ptr->beserk = 0;
+			m_ptr->berserk = 0;
 
 			/* Message if visible */
 			if (m_ptr->ml)
@@ -6385,7 +6393,7 @@ static void recover_monster(int m_idx, bool regen)
 				monster_desc(m_name, m_ptr, 0);
 
 				/* Dump a message */
-				msg_format("%^s is no longer beserk.", m_name);
+				msg_format("%^s is no longer berserk.", m_name);
 			}
 		}
 	}

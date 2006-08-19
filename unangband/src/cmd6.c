@@ -319,9 +319,9 @@ void do_cmd_read_scroll(void)
 		msg_print("You have no light to read by.");
 		return;
 	}
-	if (p_ptr->confused)
+	if (p_ptr->shero)
 	{
-		msg_print("You are too confused!");
+		msg_print("You are too enraged!");
 		return;
 	}
 
@@ -447,6 +447,13 @@ void do_cmd_use_staff(void)
 	cptr q, s;
 
 	int i;
+
+	/* Berserk */
+	if (p_ptr->shero)
+	{
+		msg_print("You are too enraged!");
+		return;
+	}
 
 	/* Restrict choices to wands */
 	item_tester_tval = TV_STAFF;
@@ -718,6 +725,13 @@ void do_cmd_aim_wand(void)
 	cptr q, s;
 
 	int i;
+
+	/* Berserk */
+	if (p_ptr->shero)
+	{
+		msg_print("You are too enraged!");
+		return;
+	}
 
 	/* Restrict choices to wands */
 	item_tester_tval = TV_WAND;
@@ -991,6 +1005,13 @@ void do_cmd_zap_rod(void)
 	cptr q, s;
 
 	int tmpval, dir;
+
+	/* Berserk */
+	if (p_ptr->shero)
+	{
+		msg_print("You are too enraged!");
+		return;
+	}
 
 	/* Restrict choices to rods */
 	item_tester_tval = TV_ROD;
@@ -1611,6 +1632,13 @@ void do_cmd_activate(void)
 	int tmpval;
 
 	int i;
+
+	/* Berserk */
+	if (p_ptr->shero)
+	{
+		msg_print("You are too enraged!");
+		return;
+	}
 
 	/* Amnesia */
 	if (p_ptr->amnesia)

@@ -86,7 +86,7 @@ static bool check_hit(int power, int level, int who, bool ranged)
 
 		/* Apply temporary conditions */
 		if (m_ptr->bless) power += 10;
-		if (m_ptr->beserk) power += 24;
+		if (m_ptr->berserk) power += 24;
 
 		/* Blind monsters almost always miss at ranged combat */
 		if ((ranged) && (m_ptr->blind)) power /= 10;
@@ -106,7 +106,7 @@ static bool check_hit(int power, int level, int who, bool ranged)
 	/* Total armor */
 	ac = p_ptr->ac + p_ptr->to_a;
 
-	if ((p_ptr->blind) || (p_ptr->confused) || (p_ptr->image))
+	if ((p_ptr->blind) || (p_ptr->confused) || (p_ptr->image) || (p_ptr->shero))
 		ac += p_ptr->blocking / 2;
 	else
 		ac += p_ptr->blocking;
@@ -1561,6 +1561,49 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	/* Hack -- don't summon on surface */
 	bool surface = p_ptr->depth == min_depth(p_ptr->dungeon);
 
+	/* Hack -- Confused monsters get a random target */
+	if ((who > 0) && (target) && (m_list[who].confused) && (m_list[who].confused > rand_int(33)))
+	{
+		int dir = randint(8);
+		int path_n;
+		u16b path_g[256];
+		int i, ty, tx;
+
+		/* Get the monster */
+		m_ptr = &m_list[who];
+
+		/* Predict the "target" location */
+		ty = m_ptr->fy + 99 * ddy[dir];
+		tx = m_ptr->fx + 99 * ddx[dir];
+
+		/* Calculate the path */
+		path_n = project_path(path_g, MAX_SIGHT, m_ptr->fy, m_ptr->fx, &ty, &tx, 0);
+
+		/* Hack -- Handle stuff */
+		handle_stuff();
+
+		/* Hack -- default is to start at monster and go in random dir */
+		y = m_ptr->fy + ddy[dir];
+		x = m_ptr->fx + ddx[dir];
+
+		/* Project along the path */
+		for (i = 0; i < path_n; ++i)
+		{
+			int ny = GRID_Y(path_g[i]);
+			int nx = GRID_X(path_g[i]);
+
+			/* Hack -- Stop before hitting walls */
+			if (!cave_project_bold(ny, nx)) break;
+
+			/* Advance */
+			x = nx;
+			y = ny;
+
+			/* Handle monster */
+			if (cave_m_idx[y][x]) break;
+		}
+	}
+
 	/* Describe target */
 	if (target > 0)
 	{
@@ -1798,7 +1841,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			/* Apply temporary conditions */
 			if (m_ptr->bless) power += 10;
-			if (m_ptr->beserk) power += 24;
+			if (m_ptr->berserk) power += 24;
 
 			/* Player has chance of being missed by various ranged attacks */
 			if (target < 0)
@@ -4159,7 +4202,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			break;
 		}
 
-		/* RF6_BESERK */
+		/* RF6_BERSERK */
 		case 160+22:
 		{
 			if (target == 0) break;
@@ -4185,13 +4228,13 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (target > 0)
 			{
 				/* Notify player */
-				if ((n_ptr->ml) && !(n_ptr->beserk))
+				if ((n_ptr->ml) && !(n_ptr->berserk))
 				{
-					msg_format("%^s goes beserk!", t_name);
+					msg_format("%^s goes berserk!", t_name);
 				}
 
 				/* Add to the monster haste counter */
-				n_ptr->beserk += n_ptr->beserk + rlev + rand_int(rlev);
+				n_ptr->berserk += n_ptr->berserk + rlev + rand_int(rlev);
 			}
 			else if ((target < 0) && !(p_ptr->stastis))
 			{
@@ -5688,7 +5731,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 	}
 
 	/* Hack -- evasive monsters may ignore trap */
-	if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!m_ptr->confused) && (!m_ptr->blind)
+	if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!m_ptr->berserk) && (!m_ptr->blind)
 		&& (!rand_int(m_ptr->stunned ? 2 : 3)))
 	{
 		if (m_ptr->ml)

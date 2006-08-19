@@ -2503,7 +2503,7 @@ int calc_monster_ac(const monster_type *m_ptr, bool ranged)
 	else if (m_ptr->shield) ac += 50;
 
 	/* Modify by temporary conditions */
-	if (m_ptr->beserk) ac -= 10;
+	if (m_ptr->berserk) ac -= 10;
 	if (m_ptr->bless) ac += 5;
 	if (m_ptr->stunned) ac -= 10;
 	if (m_ptr->blind) ac -= 10;

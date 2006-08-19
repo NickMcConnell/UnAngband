@@ -427,7 +427,7 @@ void print_fields(const s16b *sn, int num, int y, int x)
  *
  * Note that *all* spells in the book are listed
  *
- * Note that browsing is allowed while confused or blind,
+ * Note that browsing is allowed while berserk or blind,
  * and in the dark, primarily to allow browsing in stores.
  */
 void do_cmd_browse(void)
@@ -473,10 +473,10 @@ void do_cmd_browse(void)
 		return;
 	}
 
-	/* Confused */
-	if (p_ptr->confused)
+	/* Berserk */
+	if (p_ptr->shero)
 	{
-		msg_print("You are too confused!");
+		msg_print("You are too enraged!");
 		return;
 	}
 
@@ -774,9 +774,9 @@ void do_cmd_study(void)
 		return;
 	}
 
-	if (p_ptr->confused)
+	if (p_ptr->shero)
 	{
-		msg_print("You are too confused!");
+		msg_print("You are too enraged!");
 		return;
 	}
 
@@ -1377,10 +1377,10 @@ void do_cmd_cast(void)
 		return;
 	}
 
-	/* Not when confused */
-	if (p_ptr->confused)
+	/* Not when berserk */
+	if (p_ptr->shero)
 	{
-		msg_print("You are too confused!");
+		msg_print("You are too enraged!");
 		return;
 	}
 

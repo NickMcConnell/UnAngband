@@ -3198,6 +3198,20 @@ void do_cmd_fire(void)
 
 	int feat;
 
+	/* Berserk */
+	if (p_ptr->shero)
+	{
+		msg_print("You are too enraged!");
+		return;
+	}
+
+	/* Some items and some rooms blow missiles around */
+	if ((p_ptr->cur_flags4 & (TR4_WINDY)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_WINDY)))
+	{
+		msg_print("Its too windy around you!");
+		return;
+	}
+
 	/* Get the "bow" (if any) */
 	j_ptr = &inventory[INVEN_BOW];
 
@@ -3903,6 +3917,13 @@ void do_cmd_throw(void)
 	int msec = op_ptr->delay_factor * op_ptr->delay_factor;
 
 	bool was_asleep = FALSE;
+
+	/* Berserk */
+	if (p_ptr->shero)
+	{
+		msg_print("You are too enraged!");
+		return;
+	}
 
 	/* Get an item */
 	q = "Throw which item? ";

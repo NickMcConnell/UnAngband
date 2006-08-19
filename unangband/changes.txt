@@ -231,6 +231,20 @@ not appear as early, as Cure Mortal Wounds is available.
 - Reduced level at which many objects qualify as good drops so that e.g. *Identify*
 is now considered a good drop.
 
+- It is now possible to improve an object with runes, and subsequently brand
+it, provided there are no 'left-over' runes. If there is, these runes are lost
+when the item is branded. However, an object cannot be branded, then subsequently
+improved with runes.
+
+- Confusion no longer prevents you from casting spells. It also only takes effect
+sometimes at 'low' levels of confusion. Similar effects apply for monsters affected
+by confusion.
+
+- Being berserk prevents you from casting spells, using wands, staffs or rods, or
+archery or thrown weapons. Berserk monsters lose the ability to make ranged attacks.
+
+- You can now douse your lights to walk through water (Requested by darkDrone).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -286,11 +300,6 @@ maps.
 
 - Show monster health bar over gold when not showing the side bar (Many thanks
 to Pav Lucistnik for the patch).
-
-- It is now possible to improve an object with runes, and subsequently brand
-it, provided there are no 'left-over' runes. If there is, these runes are lost
-when the item is branded. However, an object cannot be branded, then subsequently
-improved with runes.
 
 - If you ignore objects (including auto-ignoring of corpses), you are no longer
 prompted to verify destruction even if you have the verify_destroy option selected.
@@ -562,6 +571,11 @@ the game (Reported by mikon and Matthias Rudolf).
 
 - Fixed highly annoying title display bug.
 
+- If you are wielding a torch and hit by water damage, the torch will be destroyed
+(Reported by Matthias Rudolf).
+
+- Windy rooms and items now correctly stop archery and throwing items.
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
@@ -586,6 +600,10 @@ equivalent files).
 - Change built executeable name in windows to unangband.exe.
 
 - Fix typo in comments (Reported by Pav Lucistnik). 	
+
+- Fix to allow borg to ignore stat increase on level gain.
+
+- Fixed spelling of berserk.
 
 Unangband 0.6.0 "Where's the Tequila? Did Tara Reid steal all the drinks?" (The Ari
 Gold Release)

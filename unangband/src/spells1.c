@@ -2114,16 +2114,23 @@ static void water_dam(int who, int dam, cptr kb_str, bool inven)
 		object_flags(o_ptr,&f1,&f2,&f3,&f4);
 
 		/* Hack -- Use up fuel (except on artifacts and lites unaffected by water) */
-		if (!artifact_p(o_ptr) && ((o_ptr->charges > 0) || (o_ptr->timeout > 0)) && !(f2 & TR2_IGNORE_WATER))
+		if (!artifact_p(o_ptr) && (o_ptr->timeout > 0) && !(f2 & TR2_IGNORE_WATER))
 		{
-			/* Douse light */
-			o_ptr->charges = 0;
-
 			/* Douse light */
 			o_ptr->timeout = 0;
 
 			disturb(0, 0);
 			msg_print("Your light has gone out!");
+
+			/* Destroy torch */
+			if (o_ptr->sval == SV_LITE_TORCH)
+			{
+				/* Adjust total weight */
+				p_ptr->total_weight -= o_ptr->weight * o_ptr->number;
+
+				/* Clear slot */
+				object_wipe(o_ptr);
+			}
 		}
 	}
 
@@ -6488,7 +6495,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 			if (m_ptr->tim_invis) m_ptr->tim_invis = 1;
 			if (m_ptr->tim_passw) m_ptr->tim_passw = 1;
 			if (m_ptr->bless) m_ptr->bless = 1;
-			if (m_ptr->beserk) m_ptr->beserk = 1;
+			if (m_ptr->berserk) m_ptr->berserk = 1;
 			if (m_ptr->shield) m_ptr->shield = 1;
 			if (m_ptr->oppose_elem) m_ptr->oppose_elem = 1;
 
