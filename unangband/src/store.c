@@ -321,9 +321,14 @@ static int store_num_fake = 7;
 static int store_num_real = 7;
 
 /*
- * We store the current "store page" here so everyone can access it
+ * We store the current "store page" top most item here so everyone can access it
  */
 static int store_top = 0;
+
+/*
+ * We store the current "store page" size here so everyone can access it
+ */
+static int store_size = 12;
 
 /*
  * We store the current fake "store pointer" here so everyone can access it
@@ -1529,14 +1534,14 @@ static void display_entry(int item)
 
 
 	/* Must be on current "page" to get displayed */
-	if (!((item >= store_top) && (item < store_top + 12))) return;
+	if (!((item >= store_top) && (item < store_top + store_size))) return;
 
 
 	/* Get the object */
 	o_ptr = &st_ptr->stock[item];
 
 	/* Get the row */
-	y = (item % 12) + 6;
+	y = (item % store_size) + 6;
 
 	/* Label it, clear the line --(-- */
 	sprintf(out_val, "%c) ", store_to_label(item));
@@ -1665,8 +1670,8 @@ static void display_inventory(void)
 {
 	int i, k;
 
-	/* Display the next 12 items */
-	for (k = 0; k < 12; k++)
+	/* Display the next store size items */
+	for (k = 0; k < store_size; k++)
 	{
 		/* Stop when we run out of items */
 		if (store_top + k >= st_ptr->stock_num) break;
@@ -1682,13 +1687,13 @@ static void display_inventory(void)
 	put_str("        ", 5, 20);
 
 	/* Visual reminder of "more items" */
-	if (st_ptr->stock_num > 12)
+	if (st_ptr->stock_num > store_size)
 	{
 		/* Show "more" reminder (after the last object ) */
 		prt("-more-", k + 6, 3);
 
 		/* Indicate the "current page" */
-		put_str(format("(Page %d)", store_top/12 + 1), 5, 20);
+		put_str(format("(Page %d)", store_top/store_size + 1), 5, 20);
 	}
 }
 
@@ -1700,7 +1705,7 @@ static void store_prt_gold(void)
 {
 	char out_val[64];
 
-	prt("Gold Remaining: ", 19, 53);
+	prt("Gold Remaining: ", 7 + store_size, 53);
 
 	sprintf(out_val, "%9ld", (long)p_ptr->au);
 	prt(out_val, 19, 68);
@@ -1717,6 +1722,9 @@ static void display_store(void)
 
 	/* Clear screen */
 	Term_clear();
+
+	/* Initialise store size */
+	store_size = Term->hgt - 12;
 
 	/* The "Home" is special */
 	if ((store_num_fake == STORE_HOME) || (store_num_fake == -1))
@@ -1829,7 +1837,7 @@ static bool get_stock(int *com_val, cptr pmt)
 			if (ke.mousebutton)
 			{
 				/* Hack -- fake a letter */
-				if ((ke.mousey >= 6) && (ke.mousey < 18))
+				if ((ke.mousey >= 6) && (ke.mousey < 6 + store_size))
 					ke.key = 'a' + ke.mousey - 6 + store_top;
 
 				/* Hack -- force error */
@@ -2742,7 +2750,7 @@ static void store_purchase(void)
 				else if (st_ptr->stock_num != n)
 				{
 					/* Only one screen left */
-					if (st_ptr->stock_num <= 12)
+					if (st_ptr->stock_num <= store_size)
 					{
 						store_top = 0;
 					}
@@ -2806,7 +2814,7 @@ static void store_purchase(void)
 		if (st_ptr->stock_num != n)
 		{
 			/* Only one screen left */
-			if (st_ptr->stock_num <= 12)
+			if (st_ptr->stock_num <= store_size)
 			{
 				store_top = 0;
 			}
@@ -3160,13 +3168,13 @@ static void store_process_command(char *choice)
 		int y = p_ptr->command_cmd_ex.mousey;
 		int x = p_ptr->command_cmd_ex.mousex;
 
-		if ((y >= 6) && (y < 18) && (*choice != 'g') && (*choice != 'l')) *choice = 'g';
-		else if ((y == 18) && (x > 2) && (x < 10) && (!store_top)) *choice = ' ';
-		else if ((y == 22) && (x < 31)) *choice = ESCAPE;
-		else if ((y == 22) && (x < 55)) *choice = 'g';
-		else if (y == 22) *choice = 'l';
-		else if ((y == 23) && (x < 31)) *choice = ' ';
-		else if ((y == 23) && (x < 55)) *choice = 'd';
+		if ((y >= 6) && (y < 6 + store_size) && (*choice != 'g') && (*choice != 'l')) *choice = 'g';
+		else if ((y == 6 + store_size) && (x > 2) && (x < 10) && (!store_top)) *choice = ' ';
+		else if ((y == 10 + store_size) && (x < 31)) *choice = ESCAPE;
+		else if ((y == 10 + store_size) && (x < 55)) *choice = 'g';
+		else if (y == 10 + store_size) *choice = 'l';
+		else if ((y == 11 + store_size) && (x < 31)) *choice = ' ';
+		else if ((y == 11 + store_size) && (x < 55)) *choice = 'd';
 
 		/* Hack -- execute command */
 		if (p_ptr->command_cmd_ex.mousebutton)
@@ -3190,7 +3198,7 @@ static void store_process_command(char *choice)
 		/* Browse */
 		case ' ':
 		{
-			if (st_ptr->stock_num <= 12)
+			if (st_ptr->stock_num <= store_size)
 			{
 				/* Nothing to see */
 				msg_print("Entire inventory is shown.");
@@ -3199,7 +3207,7 @@ static void store_process_command(char *choice)
 			else if (store_top == 0)
 			{
 				/* Page 2 */
-				store_top = 12;
+				store_top = store_size;
 
 				/* Redisplay wares */
 				display_inventory();
@@ -3657,29 +3665,29 @@ void do_cmd_store(void)
 		tmp_chr = p_ptr->stat_use[A_CHR];
 
 		/* Clear */
-		clear_from(21);
+		clear_from(9 + store_size);
 
 		/* Basic commands */
-		c_prt(choice == ESCAPE ? TERM_L_BLUE : TERM_WHITE, " ESC) Exit from Building.", 22, 0);
+		c_prt(choice == ESCAPE ? TERM_L_BLUE : TERM_WHITE, " ESC) Exit from Building.", 10 + store_size, 0);
 
 		/* Browse if necessary */
-		if (st_ptr->stock_num > 12)
+		if (st_ptr->stock_num > store_size)
 		{
-			c_prt(choice == ' ' ? TERM_L_BLUE : TERM_WHITE, " SPACE) Next page of stock", 23, 0);
+			c_prt(choice == ' ' ? TERM_L_BLUE : TERM_WHITE, " SPACE) Next page of stock", 11 + store_size, 0);
 		}
 
 		/* Commands */
-		c_prt(choice == 'g' ? TERM_L_BLUE : TERM_WHITE, " g) Get/Purchase an item.", 22, 31);
-		c_prt(choice == 'd' ? TERM_L_BLUE : TERM_WHITE, " d) Drop/Sell an item.", 23, 31);
+		c_prt(choice == 'g' ? TERM_L_BLUE : TERM_WHITE, " g) Get/Purchase an item.", 10 + store_size, 31);
+		c_prt(choice == 'd' ? TERM_L_BLUE : TERM_WHITE, " d) Drop/Sell an item.", 11 + store_size, 31);
 
 		/* Add in the eXamine option */
 		if (rogue_like_commands)
-			c_prt(choice == 'l' ? TERM_L_BLUE : TERM_WHITE, " x) eXamine an item.", 22, 56);
+			c_prt(choice == 'l' ? TERM_L_BLUE : TERM_WHITE, " x) eXamine an item.", 10 + store_size, 56);
 		else
-			c_prt(choice == 'l' ? TERM_L_BLUE : TERM_WHITE, " l) Look at an item.", 22, 56);
+			c_prt(choice == 'l' ? TERM_L_BLUE : TERM_WHITE, " l) Look at an item.", 10 + store_size, 56);
 
 		/* Prompt */
-		prt("You may: ", 21, 0);
+		prt("You may: ", 9 + store_size, 0);
 
 		/* Get a command */
 		request_command(TRUE);
@@ -3967,7 +3975,6 @@ void store_maint(int which)
 void store_init(int which)
 {
 	int k;
-
 
 	set_store(which);
 

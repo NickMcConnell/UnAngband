@@ -298,6 +298,8 @@ flags or damage (Following discussion with Pav Lucistnik).
 
 - Confirm selected stat increase at level gain (Requested by Matthias Rudolf).
 
+- Implented big screen in stores (Requested by Pav Lucistnik).
+
 ### Bug fixes ###
 
 - Fix weapon branding.
