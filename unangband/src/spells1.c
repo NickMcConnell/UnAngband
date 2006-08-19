@@ -1423,12 +1423,17 @@ static int inven_damage(inven_func typ, int perc)
 				case TV_POLEARM:
 				case TV_DIGGING:
 				{
-					/* Damage the item */
-					o_ptr->to_h--;
-					o_ptr->to_d--;
+					/* Chance to damage it */
+					if (rand_int(100) < perc)
+					{
+						/* Damage the item */
+						o_ptr->to_h--;
+						o_ptr->to_d--;
 
-					/* Damaged! */
-					damage = TRUE;
+						/* Damaged! */
+						damage = TRUE;
+					}
+					else continue;
 
 					break;
 				}
@@ -1444,11 +1449,16 @@ static int inven_damage(inven_func typ, int perc)
 				case TV_HARD_ARMOR:
 				case TV_DRAG_ARMOR:
 				{
-					/* Damage the item */
-					o_ptr->to_a--;
+					/* Chance to damage it */
+					if (rand_int(100) < perc)
+					{
+						/* Damage the item */
+						o_ptr->to_a--;
 
-					/* Damaged! */
-					damage = TRUE;
+						/* Damaged! */
+						damage = TRUE;
+					}
+					else continue;
 
 					break;
 				}
@@ -1471,11 +1481,10 @@ static int inven_damage(inven_func typ, int perc)
 
 				/* Casualty count */
 				amt = o_ptr->number;
-
 			}
 
 			/* Count the casualties */
-			if (!damage) for (amt = j = 0; j < o_ptr->number; ++j)
+			else for (amt = j = 0; j < o_ptr->number; ++j)
 			{
 				if (rand_int(100) < perc) amt++;
 			}

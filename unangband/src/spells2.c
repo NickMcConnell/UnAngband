@@ -2013,6 +2013,7 @@ static bool item_tester_hook_weapon_strict(const object_type *o_ptr)
 		case TV_SWORD:
 		case TV_HAFTED:
 		case TV_POLEARM:
+		case TV_DIGGING:
 		{
 			return (TRUE);
 		}

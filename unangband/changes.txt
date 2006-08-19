@@ -205,6 +205,8 @@ to stat gain at every level (Suggested by mikon).
 - Magic items are half as common as before, but great non-magical items are now
 much more frequent.
 
+- Allow diggers to be branded (Requested by ekolis).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
