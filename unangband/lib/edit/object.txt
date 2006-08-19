@@ -1756,8 +1756,8 @@ F:THROWING
 N:225:Strength
 G:!:w
 I:75:48:0
-W:40:0:4:400
-A:40/1
+W:35:0:4:400
+A:35/1
 P:0:1d1:0:0:0
 F:THROWING
 
@@ -1779,8 +1779,8 @@ P:0:1d1:0:0:0
 N:228:Intelligence
 G:!:w
 I:75:49:0
-W:40:0:4:400
-A:40/1
+W:35:0:4:400
+A:35/1
 P:0:1d1:0:0:0
 Y:17:2
 F:THROWING
@@ -1803,8 +1803,8 @@ P:0:1d1:0:0:0
 N:231:Wisdom
 G:!:w
 I:75:50:0
-W:40:0:4:400
-A:40/1
+W:35:0:4:400
+A:35/1
 P:0:1d1:0:0:0
 Y:5:2
 F:THROWING
@@ -1891,11 +1891,13 @@ P:0:1d1:0:0:0
 Y:3:2
 F:THROWING
 
+# Note level appears hack to force this to be a good drop.
+
 N:242:Healing
 G:!:w
 I:75:37:0
-W:15:200:4:300
-A:15/1:60/1
+W:40:200:4:300
+A:25/1:60/1
 P:0:1d1:0:0:0
 Y:3:3
 F:THROWING
@@ -1903,8 +1905,8 @@ F:THROWING
 N:243:Constitution
 G:!:w
 I:75:52:0
-W:40:0:4:400
-A:40/1
+W:35:0:4:400
+A:35/1
 P:0:1d1:0:0:0
 Y:24:2
 F:THROWING
@@ -1972,8 +1974,8 @@ F:THROWING
 N:251:Dexterity
 G:!:w
 I:75:51:0
-W:40:0:4:400
-A:40/1
+W:35:0:4:400
+A:35/1
 P:0:1d1:0:0:0
 Y:26:2
 F:THROWING
@@ -2526,8 +2528,8 @@ F:SHOW_MODS
 N:315:Slowness
 G:_:w
 I:55:1:0
-W:40:0:50:0
-A:40/1
+W:35:0:50:0
+A:35/1
 P:0:1d6:0:0:0
 F:SHOW_MODS
 
@@ -2543,8 +2545,8 @@ F:SHOW_MODS
 N:317:Remove Curse
 G:_:w
 I:55:6:0
-W:40:0:50:500
-A:40/1
+W:35:0:50:500
+A:35/1
 P:0:1d6:0:0:0
 Y:5:3
 F:SHOW_MODS
@@ -3369,8 +3371,8 @@ F:THROWING
 N:416:Ruination
 G:!:w
 I:75:15:0
-W:40:0:4:0
-A:40/8
+W:35:0:4:0
+A:35/8
 P:0:1d1:0:0:0
 F:THROWING
 
@@ -3394,16 +3396,16 @@ F:THROWING
 N:419:*Healing*
 G:!:w
 I:75:38:0
-W:40:200:4:1500
-A:40/4:80/2
+W:50:200:4:1500
+A:50/4:80/2
 P:0:1d1:0:0:0
 F:THROWING
 
 N:420:Life
 G:!:w
 I:75:39:0
-W:60:200:4:5000
-A:60/4:100/4
+W:75:200:4:5000
+A:75/4:100/4
 P:0:1d1:0:0:0
 F:THROWING
 
@@ -4788,8 +4790,8 @@ F:THROWING
 N:650:Cure Mortal Wounds
 G:!:w
 I:75:65:0
-W:10:200:4:200
-A:10/1
+W:15:200:4:200
+A:15/2
 P:0:1d1:0:0:0
 Y:3:2
 F:THROWING
@@ -4797,16 +4799,16 @@ F:THROWING
 N:651:Cure All Wounds
 G:!:w
 I:75:66:0
-W:25:200:4:300
-A:25/1:60/1
+W:40:200:4:300
+A:40/2:60/1
 P:0:1d1:0:0:0
 F:THROWING
 
 N:652:*Cure All Wounds*
 G:!:w
 I:75:67:0
-W:40:200:4:1200
-A:40/2:80/1
+W:60:200:4:1200
+A:60/2:80/1
 P:0:1d1:0:0:0
 F:THROWING
 
@@ -5933,8 +5935,8 @@ F:THROWING
 N:819:Cure Plague
 G:!:w
 I:75:72:0
-W:40:0:4:2000
-A:40/2
+W:35:0:4:2000
+A:35/2
 P:0:1d1:0:0:0
 F:THROWING
 
@@ -6239,16 +6241,16 @@ F:IGNORE_ELEC
 N:858:Web building
 G:-:w
 I:65:70:1
-W:40:0:10:800
-A:40/3
+W:30:0:10:800
+A:30/3
 P:0:1d1:0:0:0
 F:IGNORE_ELEC
 
 N:859:Winds
 G:-:w
 I:65:71:1
-W:40:0:10:900
-A:40/3
+W:30:0:10:900
+A:30/3
 P:0:1d1:0:0:0
 F:IGNORE_ELEC
 

@@ -4737,7 +4737,7 @@ static bool kind_is_good(int k_idx)
 		case TV_WAND:
 		case TV_FLASK:
 		{
-			if ((k_ptr->level >= 50) && !(k_ptr->flags3 & (TR3_LIGHT_CURSE))) return (TRUE);
+			if ((k_ptr->level >= 40) && !(k_ptr->flags3 & (TR3_LIGHT_CURSE))) return (TRUE);
 			return (FALSE);
 		}
 
@@ -5098,6 +5098,11 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		{
 			if (object_level > k_info[j_ptr->k_idx].level + 9) j_ptr->number = damroll(3, 4);
 			else if (object_level > k_info[j_ptr->k_idx].level + 4) j_ptr->number = damroll(2, 3);
+
+			/* Hack -- reduce stack sizes of deep items */
+			j_ptr->number /= (k_info[j_ptr->k_idx].level / 25) + 1;
+
+			if (j_ptr->number < 1) j_ptr->number = 1;
 			break;
 		}
 		default:
@@ -5903,7 +5908,7 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 			if (!generic_los(y, x, ty, tx, CAVE_XLOF)) continue;
 
 			/* Require drop space */
-			if (!(f_info[cave_feat[ty][tx]].flags1 & (FF1_DROP))) continue;
+			if ((f_info[cave_feat[ty][tx]].flags1 & (FF1_DROP)) == 0) continue;
 
 			/* Don't like hiding items space */
 			if ((f_info[cave_feat[ty][tx]].flags2 & (FF2_HIDE_ITEM)) && (rand_int(100)<80)) continue;
@@ -5927,7 +5932,6 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 
 				/* Check for possible combination */
 				if (object_similar(o_ptr, j_ptr)) comb = TRUE;
-
 			}
 
 			/* Add new object */

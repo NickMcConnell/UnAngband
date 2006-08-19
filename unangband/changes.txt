@@ -223,6 +223,14 @@ to cause high hit point damage attacks, but have reduced blows to compensate.
 - Acid can now reduce ac multiple levels in a single hit (equivalent to inventory
 damage) and destroy worn items that do not have additional magical properties.
 
+- Reduce size of deep object piles (Suggested by Matthias Rudolf).
+
+- Change progression of healing potions so that Healing and *Healing* and Life do
+not appear as early, as Cure Mortal Wounds is available.
+
+- Reduced level at which many objects qualify as good drops so that e.g. *Identify*
+is now considered a good drop.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
