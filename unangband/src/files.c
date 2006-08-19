@@ -1454,7 +1454,7 @@ static void display_player_xtra_info(void)
 	Term_putstr(col+7, 5, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->wt));
 
 	/* Title */
-	Term_putstr(col, 6, 1, TERM_WHITE, "Title");
+	Term_putstr(col, 6, -1, TERM_WHITE, "Title");
 
 	/* Wizard */
 	if (p_ptr->wizard)

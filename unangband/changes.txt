@@ -530,6 +530,8 @@ Matthias Rudolf).
 - Fixed bug causing high dice weapons to revert to normal damage dice after reloading
 the game (Reported by mikon and Matthias Rudolf).
 
+- Fixed highly annoying title display bug.
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
