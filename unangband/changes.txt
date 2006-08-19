@@ -280,6 +280,8 @@ book or runestone only (Requestd by Matthias Rudolf).
 - When Inspecting an object, the basic object functions are listed first, before
 flags or damage (Following discussion with Pav Lucistnik).
 
+- Confirm selected stat increase at level gain (Requested by Matthias Rudolf).
+
 ### Bug fixes ###
 
 - Fix weapon branding.

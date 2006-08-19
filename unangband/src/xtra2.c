@@ -2532,24 +2532,31 @@ static void improve_stat(void)
 	/* No stats left to improve */
 	if (!okay) return;
 
-retry:
-
-	/* Select stat to improve -- use above choice as default selection */
-	if (get_list(print_stats, table, 6, "Attribute", "Improve which attribute", 1, 37, &selection))
+	/* Should be paranoid here */
+	while (TRUE)
 	{
-		/* Check if stat at maximum */
-		if (p_ptr->stat_cur[selection] >= 18 + 100)
+		/* Select stat to improve */
+		if (get_list(print_stats, table, 6, "Attribute", "Improve which attribute", 1, 37, &selection))
 		{
-			msg_format("You cannot get any %s",desc_stat_imp[selection]);
+			/* Check if stat at maximum */
+			if (p_ptr->stat_cur[selection] >= 18 + 100)
+			{
+				msg_format("You cannot get any %s",desc_stat_imp[selection]);
+			}
 
-			goto retry;
+			/* Always verify */
+			else if (!(get_check(format("Are you sure you want to be %s? ", desc_stat_imp[selection]))))
+			{
+				/* Nothing */
+			}
+
+			/* Good selection */
+			else
+			{
+				break;
+			}
 		}
 	}
-	else
-	{
-		goto retry;
-	}
-
 
 	/* Display */
 	if (p_ptr->stat_cur[selection]<p_ptr->stat_max[selection])
