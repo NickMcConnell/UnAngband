@@ -207,6 +207,19 @@ much more frequent.
 
 - Allow diggers to be branded (Requested by ekolis).
 
+- Changed how inventory damage from elemental attacks works. Each vulnerible item in
+your inventory now has a 1% chance plus 1% per 15 hit points of elemental damage
+suffered of being destroyed when you are hit by an elemental attack. Resistance
+granted by an item (but not a spell) halves this chance, rounded down. This means
+you become immune to inventory damage from blows causing less than 15 hit points
+damage if you wear an item that grants elemental resistance. However the percentage
+increase from high damage attacks is not limited - any attack causing 30 or more
+damage (or 60 damage resisted) is now more likely to destroy items in your inventory
+than previously.
+
+-  Some nasty acidic monsters have had their blows modified so they are more likely
+to cause high hit point damage attacks, but have reduced blows to compensate. 
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

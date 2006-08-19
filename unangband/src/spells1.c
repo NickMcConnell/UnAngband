@@ -1608,7 +1608,7 @@ static int minus_ac(void)
  */
 static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 {
-	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
+	int inv = (dam / 15) + 1;
 
 	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_ACID)) != 0)
@@ -1663,6 +1663,8 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 		player_can_flags(who, 0x0L,TR2_RES_ACID,0x0L,0x0L);
 
 		dam = (dam + 2) / 3;
+
+		inv /= 2;
 	}
 	else
 	{
@@ -1691,7 +1693,7 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 	take_hit(dam, kb_str);
 
 	/* Inventory damage */
-	if (inven) inven_damage(set_acid_destroy, inv);
+	if ((inven) && (inv)) inven_damage(set_acid_destroy, inv);
 }
 
 
@@ -1700,7 +1702,7 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
  */
 static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 {
-	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
+	int inv = (dam / 15) + 1;
 
 	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_ELEC)) != 0)
@@ -1748,6 +1750,22 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 	if (dam <= 0) return;
 
 	/* Resist the damage */
+	if ((p_ptr->cur_flags2 & (TR2_RES_ELEC)) != 0)
+	{
+		/* Sometimes notice */
+		player_can_flags(who, 0x0L,TR2_RES_ELEC,0x0L,0x0L);
+
+		dam = (dam + 2) / 3;
+
+		inv /= 2;
+	}
+	else
+	{
+		/* Sometimes notice */
+		player_not_flags(who, 0x0L,TR2_RES_ELEC,0x0L,0x0L);
+	}
+
+	/* Resist the damage */
 	if (p_ptr->oppose_elec)
 	{
 		/* Monster notices */
@@ -1761,24 +1779,11 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 		update_smart_forget(who, SM_OPP_ELEC);
 	}
 
-	if ((p_ptr->cur_flags2 & (TR2_RES_ELEC)) != 0)
-	{
-		/* Sometimes notice */
-		player_can_flags(who, 0x0L,TR2_RES_ELEC,0x0L,0x0L);
-
-		dam = (dam + 2) / 3;
-	}
-	else
-	{
-		/* Sometimes notice */
-		player_not_flags(who, 0x0L,TR2_RES_ELEC,0x0L,0x0L);
-	}
-
 	/* Take damage */
 	take_hit(dam, kb_str);
 
 	/* Inventory damage */
-	if (inven) inven_damage(set_elec_destroy, inv);
+	if ((inven) && (inv)) inven_damage(set_elec_destroy, inv);
 }
 
 
@@ -1789,7 +1794,7 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
  */
 static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 {
-	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
+	int inv = (dam / 15) + 1;
 
 	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_FIRE)) != 0)
@@ -1843,6 +1848,8 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 		player_can_flags(who, 0x0L,TR2_RES_FIRE,0x0L,0x0L);
 
 		dam = (dam + 2) / 3;
+
+		inv /= 2;
 	}
 	else
 	{
@@ -1868,7 +1875,7 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 	take_hit(dam, kb_str);
 
 	/* Inventory damage */
-	if (inven) inven_damage(set_fire_destroy, inv);
+	if ((inven) && (inv)) inven_damage(set_fire_destroy, inv);
 }
 
 
@@ -1877,7 +1884,7 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
  */
 static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 {
-	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
+	int inv = (dam / 15) + 1;
 
 	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_COLD)) != 0)
@@ -1931,6 +1938,8 @@ static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 		player_can_flags(who, 0x0L,TR2_RES_COLD,0x0L,0x0L);
 
 		dam = (dam + 2) / 3;
+
+		inv /= 2;
 	}
 	else
 	{
@@ -1956,7 +1965,7 @@ static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 	take_hit(dam, kb_str);
 
 	/* Inventory damage */
-	if (inven) inven_damage(set_cold_destroy, inv);
+	if ((inven) && (inv)) inven_damage(set_cold_destroy, inv);
 }
 
 /*
@@ -2058,7 +2067,7 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
  */
 static void water_dam(int who, int dam, cptr kb_str, bool inven)
 {
-	int inv = (dam < 30) ? 1 : (dam < 60) ? 2 : 3;
+	int inv = (dam / 15) /* + 1 */;
 
 	/* Check for light being wielded */
 	object_type *o_ptr = &inventory[INVEN_LITE];
