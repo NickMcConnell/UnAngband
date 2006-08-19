@@ -1544,10 +1544,10 @@ static int minus_ac(int ac)
 
 	bool destroy = FALSE;
 
-	int slot;
+	int slot = INVEN_BODY;
 
 	/* Pick a (possibly empty) inventory slot */
-	switch (slot)
+	switch (randint(6))
 	{
 		case 1: slot = INVEN_BODY; break;
 		case 2: slot = INVEN_ARM; break;
