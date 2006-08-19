@@ -1534,7 +1534,7 @@ static int inven_damage(inven_func typ, int perc)
  *
  * If any armor is damaged (or resists), the player takes less damage.
  */
-static int minus_ac(void)
+static int minus_ac(int ac)
 {
 	object_type *o_ptr = NULL;
 
@@ -1542,23 +1542,42 @@ static int minus_ac(void)
 
 	char o_name[80];
 
+	bool destroy = FALSE;
+
+	int slot;
 
 	/* Pick a (possibly empty) inventory slot */
-	switch (randint(6))
+	switch (slot)
 	{
-		case 1: o_ptr = &inventory[INVEN_BODY]; break;
-		case 2: o_ptr = &inventory[INVEN_ARM]; break;
-		case 3: o_ptr = &inventory[INVEN_OUTER]; break;
-		case 4: o_ptr = &inventory[INVEN_HANDS]; break;
-		case 5: o_ptr = &inventory[INVEN_HEAD]; break;
-		case 6: o_ptr = &inventory[INVEN_FEET]; break;
+		case 1: slot = INVEN_BODY; break;
+		case 2: slot = INVEN_ARM; break;
+		case 3: slot = INVEN_OUTER; break;
+		case 4: slot = INVEN_HANDS; break;
+		case 5: slot = INVEN_HEAD; break;
+		case 6: slot = INVEN_FEET; break;
 	}
+
+	/* Get the object */
+	o_ptr = &inventory[slot];
 
 	/* Nothing to damage */
 	if (!o_ptr->k_idx) return (FALSE);
 
 	/* No damage left to be done */
-	if (o_ptr->ac + o_ptr->to_a <= 0) return (FALSE);
+	if (o_ptr->ac + o_ptr->to_a - ac <= 0) destroy = TRUE;
+
+	/* Mega Hack -- do not destroy ego items, magic items etc */
+	if ((destroy) && (o_ptr->name2 || o_ptr->xtra1 || o_ptr->xtra2 || (o_ptr->tval == TV_DRAG_ARMOR)))
+	{
+		/* Do not destroy */
+		destroy = FALSE;
+
+		/* Already completely damaged? */
+		if (o_ptr->ac + o_ptr->to_a <= 0) return (FALSE);
+
+		/* Damage completely */
+		ac = o_ptr->ac + o_ptr->to_a;
+	}
 
 	/* Describe */
 	object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
@@ -1581,16 +1600,29 @@ static int minus_ac(void)
 	object_not_flags(o_ptr,0x0L,TR2_IGNORE_ACID,0x0L,0x0L);
 
 	/* Message */
-	msg_format("Your %s is damaged!", o_name);
+	msg_format("Your %s is %s!", o_name, destroy ? "destroyed" : "damaged");
 
-	/* Damage the item */
-	o_ptr->to_a--;
+	/* Destroy item */
+	if (destroy)
+	{
+		/* Adjust total weight */
+		p_ptr->total_weight -= o_ptr->weight * o_ptr->number;
 
-	/* Hack --- unsense the item */
-	o_ptr->ident &= ~(IDENT_SENSE);	
+		/* Clear slot */
+		object_wipe(&inventory[slot]);
+	}
+	/* Damage item */
+	else
+	{
+		/* Damage the item */
+		o_ptr->to_a -= ac;
 
-	/* Remove special inscription, if any */
-	o_ptr->feeling = 0;
+		/* Hack --- unsense the item */
+		o_ptr->ident &= ~(IDENT_SENSE);	
+
+		/* Remove special inscription, if any */
+		o_ptr->feeling = 0;
+	}
 
 	/* Calculate bonuses */
 	p_ptr->update |= (PU_BONUS);
@@ -1687,7 +1719,7 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 	}
 
 	/* If any armor gets hit, defend the player */
-	if (minus_ac()) dam = (dam + 1) / 2;
+	if (minus_ac(inv)) dam = (dam + 1) / 2;
 
 	/* Take damage */
 	take_hit(dam, kb_str);

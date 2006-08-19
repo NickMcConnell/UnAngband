@@ -217,8 +217,11 @@ increase from high damage attacks is not limited - any attack causing 30 or more
 damage (or 60 damage resisted) is now more likely to destroy items in your inventory
 than previously.
 
--  Some nasty acidic monsters have had their blows modified so they are more likely
+- Some nasty acidic monsters have had their blows modified so they are more likely
 to cause high hit point damage attacks, but have reduced blows to compensate. 
+
+- Acid can now reduce ac multiple levels in a single hit (equivalent to inventory
+damage) and destroy worn items that do not have additional magical properties.
 
 ### User Interface ###
 
