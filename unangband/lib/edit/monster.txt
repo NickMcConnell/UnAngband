@@ -3275,8 +3275,8 @@ D:It is a huge wolf with eyes that glow with mannish intelligence.
 N:246:Wood elf lord
 G:l:o
 I:120:18d15:20:40:30
-W:29:1:0:500
-M:0:20:14:51
+W:31:1:0:500
+M:40:20:14:51
 B:HIT:HURT:3d10
 B:HIT:HURT:3d10
 B:ARROW:HURT:15d6
@@ -4655,7 +4655,7 @@ D: as its form shimmers and changes in front of your eyes.
 N:340:Law drake
 G:d:B
 I:110:55d10:20:70:70
-W:31:3:0:1400
+W:32:3:0:1400
 M:18:18:11:43
 B:CLAW:BATTER:2d6
 B:CLAW:BATTER:2d6
@@ -5043,7 +5043,7 @@ D:It is a massive intelligent troll with needle-sharp fangs.
 N:364:Dagashi
 G:t:o
 I:120:13d25:20:70:10
-W:29:3:0:500
+W:32:3:0:500
 M:20:0:22:0
 B:PUNCH:POISON:6d4
 B:PUNCH:LOSE_STR:6d4
@@ -13857,7 +13857,7 @@ D:An elven figure, with sword and bow quick to hand.
 N:959:Wood elf assassin
 G:l:D
 I:125:14d13:20:30:10
-W:31:2:0:15815
+W:32:2:0:15815
 M:20:0:0:0
 B:HIT:POISON:8d4
 B:HIT:POISON:8d4
@@ -15581,19 +15581,18 @@ D: unearthly.
 
 N:1082:The King of the Wood Elves
 G:l:o
-I:120:11d100:20:80:20
-W:36:4:0:1000
+I:120:18d25:20:80:20
+W:29:4:0:500
 M:40:20:22:63
-B:HIT:HURT:3d8
-B:HIT:HURT:3d8
-B:HIT:HURT:3d8
-B:ARROW:HURT:25d6
+B:HIT:HURT:3d12
+B:HIT:HURT:3d12
+B:ARROW:HURT:20d6
 F:UNIQUE | MALE
 F:ESCORT
 F:FORCE_MAXHP | FORCE_SLEEP
-F:ONLY_ITEM | DROP_2D2 | DROP_GOOD | DROP_GREAT
+F:ONLY_ITEM | DROP_2D2 | DROP_GOOD
 F:OPEN_DOOR | BASH_DOOR | ARCHER
-F:EVIL | IM_FIRE | IM_COLD | IM_POIS
+F:IM_FIRE | IM_COLD | IM_POIS | RES_LITE | ELF
 F:HAS_LITE
 F:NO_CONF | NO_SLEEP
 S:HASTE | BLIND | CONF | DARKNESS | BOLT_FIRE | BOLT_COLD

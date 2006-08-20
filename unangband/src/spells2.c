@@ -6601,11 +6601,11 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 	if ((s_ptr->flags3 & (SF3_CURE_MEM)) && (set_amnesia(0))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_SLOW_CURSE)) && (remove_curse())) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CURSE)) && (remove_all_curse())) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_SLOW_POIS)) && (set_poisoned(p_ptr->poisoned / 2))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_POIS)) && (set_poisoned(0))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_SLOW_CUTS)) && (set_cut(p_ptr->cut / 2))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CUTS)) && (set_cut(0))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_SLOW_STUN)) && (set_stun(p_ptr->stun / 2))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_STUN)) && (set_stun(0))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_POIS)) && (set_poisoned(0))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CONF)) && (set_confused(0))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_FOOD)) && (set_food(PY_FOOD_MAX -1))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_FEAR)) && (set_afraid(0))) obvious = TRUE;
@@ -6848,6 +6848,18 @@ bool process_spell_types(int spell, int level, bool *cancel)
 						p_ptr->disease = 0;
 					}
 				}
+				break;
+			}
+			case SPELL_SLOW_CONF:
+			{
+				*cancel = FALSE;
+				if (set_confused(p_ptr->confused / 2)) obvious = TRUE;
+				break;
+			}
+			case SPELL_SLOW_POIS:
+			{
+				*cancel = FALSE;
+				if (set_poisoned(p_ptr->poisoned / 2)) obvious = TRUE;
 				break;
 			}
 			default:

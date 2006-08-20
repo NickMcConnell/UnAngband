@@ -253,6 +253,18 @@ to unhide and will use the ability the following turn (Requested by Matthias Rud
 - You can now sell statues to temples. Stores will not stock statues once sold as they
 are only good for making money for the player through sale.
 
+- Reduced the power of the King of the Wood Elves to about 80% of his former strength
+(Requested by Pete Mac). Also modified the depth of some of his more powerful escorts
+so that they won't usually appear with him.
+
+- Upgraded and added more staffs of Cure x Wounds, and potions of Cure Moderate Wounds.
+Cure Serious Wounds effect from priest spell or potion or staff now only partially cures
+confusion and stun. Increased depth of Cure Serious Wounds and Cure Critical Wounds
+potions and made Cure Moderate Wounds potions appear at the old Cure Serious Wounds depth
+and frequency in stores. Since Cure Moderate Wounds in Unangband is equivalent to old
+Cure Serious Wounds from Angband, this shouldn't have too much of an impact, except for
+curing confusion (which is now less dangerous to the player initially).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

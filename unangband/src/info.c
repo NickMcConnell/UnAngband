@@ -842,8 +842,10 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 
 	/* Collect slow effects */
 	vn = 0;
-	if (s_ptr->flags3 & (SF3_SLOW_POIS)) vp[vn++]="poison";
+	if (s_ptr->type == SPELL_SLOW_POIS) vp[vn++]="poison";
+	if (s_ptr->type == SPELL_SLOW_CONF) vp[vn++]="confusion";
 	if (s_ptr->flags3 & (SF3_SLOW_CUTS)) vp[vn++]="cuts";
+	if (s_ptr->flags3 & (SF3_SLOW_STUN)) vp[vn++]="stun damage";
 
 	/* Describe cure effects */
 	if (vn)
