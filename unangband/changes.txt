@@ -265,6 +265,9 @@ and frequency in stores. Since Cure Moderate Wounds in Unangband is equivalent t
 Cure Serious Wounds from Angband, this shouldn't have too much of an impact, except for
 curing confusion (which is now less dangerous to the player initially).
 
+- Changed pricing formula for objects so that more powerful objects become progressively
+worth more.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

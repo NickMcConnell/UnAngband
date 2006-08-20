@@ -2804,8 +2804,8 @@ void list_object(const object_type *o_ptr, int mode)
 			text_out(format("does %dd%d", o_ptr->dd, o_ptr->ds));
 			if (object_bonus_p(o_ptr) || spoil)
 			{
-				if (o_ptr->to_d > 0) text_out(format(" + %d", o_ptr->to_d));
-				else if (o_ptr->to_d < 0) text_out(format(" - %d", o_ptr->to_d));
+				if (o_ptr->to_d > 0) text_out(format("+%d", o_ptr->to_d));
+				else if (o_ptr->to_d < 0) text_out(format("%d", o_ptr->to_d));
 			}
 			text_out(" ");
 			text_out((o_ptr->tval == TV_SWORD || o_ptr->tval == TV_POLEARM ||
@@ -2862,7 +2862,7 @@ void list_object(const object_type *o_ptr, int mode)
 				break;
 			}
 		}
-		text_out(format("by %d.  ", mult));
+		text_out(format(" by %d.  ", mult));
 	}
 
 	/* Extra powers */
@@ -3025,8 +3025,8 @@ void list_object(const object_type *o_ptr, int mode)
 					text_out(format("does %dd%d", o_ptr->dd, o_ptr->ds));
 					if (object_bonus_p(o_ptr) || spoil)
 					{
-						if (o_ptr->to_d > 0) text_out(format(" + %d", o_ptr->to_d));
-						else if (o_ptr->to_d < 0) text_out(format(" - %d", o_ptr->to_d));
+						if (o_ptr->to_d > 0) text_out(format("+%d", o_ptr->to_d));
+						else if (o_ptr->to_d < 0) text_out(format("%d", o_ptr->to_d));
 					}
 					text_out(" ");
 					text_out((o_ptr->tval == TV_SWORD || o_ptr->tval == TV_POLEARM ||
@@ -3111,7 +3111,7 @@ void list_object(const object_type *o_ptr, int mode)
 
 		if (armor)
 		{
-			text_out(format("It %s your armor class by %d.", armor > 0 ? "increases" : "decreases" , armor > 0 ? armor : -armor));
+			text_out(format("It %s your armor class by %d.  ", armor > 0 ? "increases" : "decreases" , armor > 0 ? armor : -armor));
 
 			anything = TRUE;
 		}
