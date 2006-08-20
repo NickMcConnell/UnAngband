@@ -250,6 +250,9 @@ archery or thrown weapons. Berserk monsters lose the ability to make ranged atta
 - Monsters that are hiding and wish to use a ranged attack or spell now take a turn
 to unhide and will use the ability the following turn (Requested by Matthias Rudolf).
 
+- You can now sell statues to temples. Stores will not stock statues once sold as they
+are only good for making money for the player through sale.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -586,6 +589,9 @@ the game (Reported by mikon and Matthias Rudolf).
 - Prevent player finding out some potion flavours through terrain knowledge window.
 
 - Fixed gold display bug introduced by big screen store code (Reported by darkDrone).
+
+- Fixed being able to sell worthless items to shops that would sell items of the same
+type (Reported by Adam Horowitz).
 
 ### Build / Platform ###
 

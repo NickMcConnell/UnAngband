@@ -742,6 +742,9 @@ static bool store_will_buy(const object_type *o_ptr)
 	/* Hack -- The Home is simple */
 	if ((store_num_fake == STORE_HOME) || (store_num_fake == -1)) return (TRUE);
 
+	/* Ignore "worthless" items XXX XXX XXX */
+	if (object_value(o_ptr) <= 0) return (FALSE);
+
 	/* Buy tvals that store will sell */
 	for (i = 0;i < STORE_CHOICES;i++)
 	{
@@ -768,6 +771,8 @@ static bool store_will_buy(const object_type *o_ptr)
 				case TV_CLOAK:
 				case TV_INSTRUMENT:
 				case TV_MAP:
+				case TV_BAG:
+				case TV_ROPE:
 				break;
 				default:
 				return (FALSE);
@@ -828,6 +833,7 @@ static bool store_will_buy(const object_type *o_ptr)
 				case TV_SCROLL:
 				case TV_POTION:
 				case TV_HAFTED:
+				case TV_STATUE:
 				break;
 				case TV_POLEARM:
 				case TV_SWORD:
@@ -882,9 +888,6 @@ static bool store_will_buy(const object_type *o_ptr)
 			break;
 		}
 	}
-
-	/* Ignore "worthless" items XXX XXX XXX */
-	if (object_value(o_ptr) <= 0) return (FALSE);
 
 	/* Assume okay */
 	return (TRUE);
@@ -1005,6 +1008,9 @@ static int store_carry(object_type *o_ptr)
 
 	/* Cursed/Worthless items "disappear" when sold */
 	if (value <= 0) return (-1);
+
+	/* Hack -- statues disappear when sold */
+	if (o_ptr->tval == TV_STATUE) return (-1);
 
 	/* Erase the inscription */
 	o_ptr->note = 0;
@@ -3015,7 +3021,6 @@ static void store_sell(void)
 			/* Take note if we add a new item */
 			n = st_ptr->stock_num;
 #endif
-
 			/* The store gets that (known) object */
 			item_pos = store_carry(i_ptr);
 
