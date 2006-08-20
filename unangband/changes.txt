@@ -585,6 +585,8 @@ the game (Reported by mikon and Matthias Rudolf).
 
 - Prevent player finding out some potion flavours through terrain knowledge window.
 
+- Fixed gold display bug introduced by big screen store code (Reported by darkDrone).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

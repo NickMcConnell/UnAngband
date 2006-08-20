@@ -1708,7 +1708,7 @@ static void store_prt_gold(void)
 	prt("Gold Remaining: ", 7 + store_size, 53);
 
 	sprintf(out_val, "%9ld", (long)p_ptr->au);
-	prt(out_val, 19, 68);
+	prt(out_val, 7 + store_size, 68);
 }
 
 
