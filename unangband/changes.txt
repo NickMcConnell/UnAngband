@@ -245,6 +245,8 @@ archery or thrown weapons. Berserk monsters lose the ability to make ranged atta
 
 - You can now douse your lights to walk through water (Requested by darkDrone).
 
+- Stop dungeons flooding with deep water.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -316,6 +318,8 @@ flags or damage (Following discussion with Pav Lucistnik).
 - Confirm selected stat increase at level gain (Requested by Matthias Rudolf).
 
 - Implented big screen in stores (Requested by Pav Lucistnik).
+
+- Fixed some issues with display of terrain knowledge.
 
 ### Bug fixes ###
 
@@ -575,6 +579,8 @@ the game (Reported by mikon and Matthias Rudolf).
 (Reported by Matthias Rudolf).
 
 - Windy rooms and items now correctly stop archery and throwing items.
+
+- Prevent player finding out some potion flavours through terrain knowledge window.
 
 ### Build / Platform ###
 

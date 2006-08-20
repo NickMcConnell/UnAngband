@@ -5994,11 +5994,7 @@ static void describe_feature_basic(int f_idx)
 			                            f_ptr->level));
 			}
 		}
-
-
 	}
-
-
 
 	/* Allocation */
 	vn = 0;
@@ -6121,10 +6117,10 @@ static void describe_feature_player_moves(int f_idx)
 	if ((intro) && (f_ptr->flags2 & (FF2_SHALLOW | FF2_DEEP | FF2_FILLED)))
 	{
 		if (effect) text_out(" and");
-		text_out(" making your equipment ");
+		text_out(" making your equipment");
 		
-		if (f_ptr->flags2 & (FF2_FILLED)) text_out("significantly");
-		else if (!(f_ptr->flags2 & (FF2_DEEP))) text_out("slightly");
+		if (f_ptr->flags2 & (FF2_FILLED)) text_out(" significantly");
+		else if (!(f_ptr->flags2 & (FF2_DEEP))) text_out(" slightly");
 		text_out(" heavier");
 		impede = TRUE;
 	}
@@ -6197,7 +6193,7 @@ static void describe_feature_player_moves(int f_idx)
 		if ((f_ptr->flags2 & (FF2_COVERED)) && !(f_ptr->flags1 & (FF1_BASH))) { vp[vn++] = "lie underneath from surfacing"; effect = TRUE; }
 		else if (f_ptr->flags2 & (FF2_COVERED)) { vp[vn++] = "lie underneath from surfacing without bashing through"; effect = TRUE; }
 		if (!(f_ptr->flags2 & (FF2_CAN_FLY))) { vp[vn++] = "must fly"; effect = TRUE; }
-		if (!(f_ptr->flags1 & (FF2_CAN_SWIM))) { vp[vn++] = "must swim"; effect = TRUE; }
+		if (!(f_ptr->flags2 & (FF2_CAN_SWIM))) { vp[vn++] = "must swim"; effect = TRUE; }
 	}
 	if (!(f_ptr->flags1 & (FF1_LOS))) vp[vn++] = "line of sight";
 	if (!(f_ptr->flags1 & (FF1_PROJECT))) vp[vn++] = "casting spells";
@@ -6266,7 +6262,7 @@ static void describe_feature_monster_moves(int f_idx)
 	if (!(f_ptr->flags1 & (FF1_MOVE)) || (f_ptr->blow.method) || (f_ptr->spell))
 	{
 		if ((f_ptr->flags2 & (FF2_CAN_FLY))) vp[vn++] = "fly"; 
-		if ((f_ptr->flags1 & (FF2_CAN_SWIM))) vp[vn++] = "swim";
+		if ((f_ptr->flags2 & (FF2_CAN_SWIM))) vp[vn++] = "swim";
 		if ((f_ptr->flags2 & (FF2_CAN_CLIMB))) vp[vn++] = "climb";
 		if ((f_ptr->flags2 & (FF2_CAN_DIG))) vp[vn++] = "dig";
 		if ((f_ptr->flags2 & (FF2_CAN_OOZE))) vp[vn++] = "ooze";
@@ -6628,42 +6624,42 @@ static void describe_feature_actions(int f_idx)
 
 					/* Side effects -- stop glow */
 					if (((f_ptr->flags2 & (FF2_GLOW)) != 0)
-						&& ((f_ptr[newfeat].flags2 & (FF2_GLOW)) == 0))
+						&& ((f_info[newfeat].flags2 & (FF2_GLOW)) == 0))
 					{
 						text_out(" and darken the surrounding grids");
 					}
 
 					/* Side effects -- start glow */
 					if (((f_ptr->flags2 & (FF2_GLOW)) == 0)
-						&& ((f_ptr[newfeat].flags2 & (FF2_GLOW)) != 0))
+						&& ((f_info[newfeat].flags2 & (FF2_GLOW)) != 0))
 					{
 						text_out(" and light up the surrounding grids");
 					}
 
 					/* Side effects -- remove branches */
 					if (((f_ptr->flags3 & (FF3_TREE)) == 0)
-						&& ((f_ptr[newfeat].flags3 & (FF3_TREE)) != 0))
+						&& ((f_info[newfeat].flags3 & (FF3_TREE)) != 0))
 					{
 						text_out(" and remove the surrounding branches");
 					}
 
 					/* Side effects -- remove branches */
 					if (((f_ptr->flags3 & (FF3_TREE)) != 0)
-						&& ((f_ptr[newfeat].flags3 & (FF3_TREE)) == 0))
+						&& ((f_info[newfeat].flags3 & (FF3_TREE)) == 0))
 					{
 						text_out(" and cover the surrounding grids with branches");
 					}
 
 					/* Side effects -- remove outside */
 					if (((f_ptr->flags3 & (FF3_OUTSIDE)) != 0)
-						&& ((f_ptr[newfeat].flags3 & (FF3_OUTSIDE)) == 0))
+						&& ((f_info[newfeat].flags3 & (FF3_OUTSIDE)) == 0))
 					{
 						text_out(" and hide the surrounding grids from the sun");
 					}
 
 					/* Side effects -- remove outside */
 					if (((f_ptr->flags3 & (FF3_OUTSIDE)) == 0)
-						&& ((f_ptr[newfeat].flags3 & (FF3_OUTSIDE)) != 0))
+						&& ((f_info[newfeat].flags3 & (FF3_OUTSIDE)) != 0))
 					{
 						text_out(" and expose the surrounding grids to daylight");
 					}
@@ -6671,7 +6667,7 @@ static void describe_feature_actions(int f_idx)
 
 				/* Side effects -- drop / use / get object */
 				if ((((f_ptr->flags1 & (FF1_HAS_GOLD | FF1_HAS_ITEM)) != 0)
-					&& ((f_ptr[newfeat].flags1 & (FF1_HAS_GOLD | FF1_HAS_ITEM)) == 0))
+					&& ((f_info[newfeat].flags1 & (FF1_HAS_GOLD | FF1_HAS_ITEM)) == 0))
 					|| (f_ptr->k_idx && ((i == FS_USE_FEAT) || (i == FS_GET_FEAT) || (i == FS_DISARM))))
 				{
 					int count = 0;
@@ -6717,6 +6713,9 @@ static void describe_feature_actions(int f_idx)
 						object_type *o_ptr = &object_type_body;
 
 						object_prep(o_ptr, f_ptr->k_idx);
+
+						/* Set it to stored to prevent revealing flavours */
+						o_ptr->ident |= (IDENT_STORE);
 
 						if (count)
 						{
@@ -6836,8 +6835,6 @@ static bool is_feature_action_valid(int f_idx, int action)
  */
 static void describe_feature_transitions(int f_idx)
 {
-	const feature_type *f_ptr = &f_info[f_idx];
-
 	int n, vn;
 	cptr vp[128];
 
@@ -6846,7 +6843,7 @@ static void describe_feature_transitions(int f_idx)
 	bool intro = FALSE;
 
 	/* Permanent stuff never gets changed */
-	if (f_ptr[f_idx].flags1 & FF1_PERMANENT) return;
+	if (f_info[f_idx].flags1 & FF1_PERMANENT) return;
 
 	/* Get the new feature */
 	for (i=0;i<MAX_FEAT_STATES;i++)
