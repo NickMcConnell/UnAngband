@@ -247,6 +247,9 @@ archery or thrown weapons. Berserk monsters lose the ability to make ranged atta
 
 - Stop dungeons flooding with deep water.
 
+- Monsters that are hiding and wish to use a ranged attack or spell now take a turn
+to unhide and will use the ability the following turn (Requested by Matthias Rudolf).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
