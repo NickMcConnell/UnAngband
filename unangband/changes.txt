@@ -340,8 +340,6 @@ flags or damage (Following discussion with Pav Lucistnik).
 
 - Implented big screen in stores (Requested by Pav Lucistnik).
 
-- Fixed some issues with display of terrain knowledge.
-
 ### Bug fixes ###
 
 - Fix weapon branding.
@@ -607,6 +605,11 @@ the game (Reported by mikon and Matthias Rudolf).
 
 - Fixed being able to sell worthless items to shops that would sell items of the same
 type (Reported by Adam Horowitz).
+
+- Fixed some issues with display of terrain knowledge.
+
+- Improve correctness of code displaying object bonuses in character screen (Reported
+by Matthias Rudolf).
 
 ### Build / Platform ###
 

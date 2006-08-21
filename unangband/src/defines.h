@@ -4247,14 +4247,13 @@
 
 /*
  * Determine if a given inventory item has known bonuses
- * Test One -- Check for special "known" tag
+ * Test One -- Check for special "known" or "bonus" tags
  * Test Two -- Check for "Easy Know" + "Aware"
- * Test Three -- Check for special "bonus" tag
  */
 #define object_bonus_p(T) \
-	(((T)->ident & (IDENT_KNOWN)) || \
-	 (k_info[(T)->k_idx].easy_know && k_info[(T)->k_idx].aware) || \
-	 ((T)->ident & (IDENT_BONUS)))
+	(((T)->ident & (IDENT_KNOWN | IDENT_BONUS)) || \
+	 ((k_info[(T)->k_idx].flags3 & (TR3_EASY_KNOW)) && \
+	  k_info[(T)->k_idx].aware))
 
 
 
