@@ -2988,6 +2988,19 @@ void monster_death(int m_idx)
 
 		/* Drop it in the dungeon */
 		drop_near(i_ptr, -1, y, x);
+
+		/* Hack -- this is temporary */
+		/* Total winner */
+		p_ptr->total_winner = TRUE;
+
+		/* Redraw the "title" */
+		p_ptr->redraw |= (PR_TITLE);
+
+		/* Congratulations */
+		msg_print("*** CONGRATULATIONS ***");
+		msg_print("You have won the game!");
+		msg_print("You may retire (commit suicide) when you are ready.");
+
 	}
 
 
