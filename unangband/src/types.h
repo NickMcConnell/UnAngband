@@ -1373,8 +1373,7 @@ struct player_type
 	byte climbing; /* Currently climbing */
 	byte searching; /* Currently searching */
 
-	byte dodging;   /* Currently dodging */
-	byte blocking;   /* Currently blocking */
+	u32b disease;	/* Disease types */
 
 	u32b spell_learned1;    /* Spell flags */
 	u32b spell_learned2;    /* Spell flags */
@@ -1488,6 +1487,11 @@ struct player_type
 	s16b stat_use[A_MAX];   /* Current modified stats */
 	s16b stat_top[A_MAX];   /* Maximal modified stats */
 
+	byte dodging;   	/* Currently dodging */
+	byte blocking;   	/* Currently blocking */
+	byte old_dodging; 	/* Was dodging */
+	byte old_blocking;   	/* Was blocking */
+
 	/*** Extracted fields ***/
 
 	s16b stat_add[A_MAX];   /* Equipment stat bonuses */
@@ -1497,8 +1501,6 @@ struct player_type
 	u32b cur_flags2;
 	u32b cur_flags3;
 	u32b cur_flags4;
-
-	u32b disease;	/* Disease types */
 
 	s16b dis_to_h;  /* Known bonus to hit */
 	s16b dis_to_d;  /* Known bonus to dam */

@@ -270,6 +270,9 @@ worth more.
 
 - Added double-brand ego weapons with drawbacks.
 
+- Wielding a weapon or digger less than 20 lbs, or a bow or sling, but not crossbow,
+only take half a turn.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -341,6 +344,9 @@ flags or damage (Following discussion with Pav Lucistnik).
 - Confirm selected stat increase at level gain (Requested by Matthias Rudolf).
 
 - Implented big screen in stores (Requested by Pav Lucistnik).
+
+- Made information about whether a character dodged or blocked last turn persist
+including the bonus to armour class from blocking.
 
 ### Bug fixes ###
 

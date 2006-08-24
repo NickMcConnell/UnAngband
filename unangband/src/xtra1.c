@@ -686,8 +686,8 @@ static void prt_state(void)
 	/* Hack -- handle some other stuff here. Don't change attr, so we inherit it from above. */
 	if (p_ptr->searching) strcpy(text, "Searching ");
 	if (p_ptr->held_song) strcpy(text, "Singing   ");
-	if (p_ptr->blocking)  strcpy(text, "Blocking  ");
-	if (p_ptr->dodging)   strcpy(text, "Dodging   ");
+	if ((p_ptr->blocking) || (p_ptr->old_blocking))  strcpy(text, "Blocking  ");
+	if ((p_ptr->dodging) || (p_ptr->old_dodging)) strcpy(text, "Dodging   ");
 	if (p_ptr->msleep)    strcpy(text, "Sleepy    ");
 	if (p_ptr->psleep)    strcpy(text, "Drowsy    ");
 
@@ -3082,6 +3082,14 @@ static void calc_bonuses(void)
 		p_ptr->skill_sav /= 2;
 	}
 
+	/* Temporarily "Blocking" */
+	if ((p_ptr->blocking) || (p_ptr->old_blocking))
+	{
+		if ((p_ptr->blind) || (p_ptr->confused) || (p_ptr->image) || (p_ptr->shero))
+			p_ptr->dis_to_a += (p_ptr->blocking ? p_ptr->blocking : p_ptr->old_blocking) / 2;
+		else
+			p_ptr->dis_to_a += (p_ptr->blocking ? p_ptr->blocking : p_ptr->old_blocking);
+	}
 
 	/*** Analyze weight ***/
 

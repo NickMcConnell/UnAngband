@@ -259,7 +259,29 @@ void do_cmd_wield(void)
 	}
 
 	/* Take a turn */
-	p_ptr->energy_use = 100;
+	switch (o_ptr->tval)
+	{
+		case TV_SWORD:
+		case TV_HAFTED:
+		case TV_POLEARM:
+		case TV_DIGGING:
+		{
+			if (o_ptr->weight >= 200) p_ptr->energy_use = 100;
+			else p_ptr->energy_use = 50;
+			break;
+		}
+		case TV_BOW:
+		{
+			if (o_ptr->sval >= SV_HAND_XBOW) p_ptr->energy_use = 100;
+			else p_ptr->energy_use = 50;
+			break;
+		}
+		default:
+		{
+			p_ptr->energy_use = 100;
+			break;
+		}
+	}
 
 	/* Get object flags */
 	object_flags(o_ptr,&f1,&f2,&f3,&f4);

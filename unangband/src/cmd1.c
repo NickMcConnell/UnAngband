@@ -2757,7 +2757,13 @@ void move_player(int dir, int jumping)
 			p_ptr->blocking = 0;
 
 			/* Redraw */
+			p_ptr->update |= (PU_BONUS);
+
+			/* Redraw */
 			p_ptr->redraw |= (PR_STATE);
+
+			/* Hack -- update straight away */
+			update_stuff();
 
 			/* Hack -- redraw straight away */
 			redraw_stuff();
@@ -3273,7 +3279,6 @@ static bool run_test(void)
 
 			if ((notice) && (f_info[feat].flags1 & (FF1_MOVE)))
 			{
-
 				if ((run_ignore_doors) && (f_info[feat].flags1 & (FF1_DOOR)) &&
 					(f_info[feat].flags1 & (FF1_CLOSE)))
 				{
