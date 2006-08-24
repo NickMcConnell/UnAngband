@@ -268,6 +268,8 @@ curing confusion (which is now less dangerous to the player initially).
 - Changed pricing formula for objects so that more powerful objects become progressively
 worth more.
 
+- Added double-brand ego weapons with drawbacks.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
