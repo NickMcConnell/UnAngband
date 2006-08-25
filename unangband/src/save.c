@@ -663,8 +663,8 @@ static void wr_extra(void)
 	wr_byte(0);	/* oops */
 	wr_byte(p_ptr->climbing);
 	wr_byte(p_ptr->searching);
-	wr_byte(p_ptr->dodging);
-	wr_byte(p_ptr->blocking);
+	wr_byte(0);
+	wr_byte(0);
 	wr_byte(0);
 
 	wr_u32b(p_ptr->disease);

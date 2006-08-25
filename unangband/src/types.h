@@ -1489,8 +1489,6 @@ struct player_type
 
 	byte dodging;   	/* Currently dodging */
 	byte blocking;   	/* Currently blocking */
-	byte old_dodging; 	/* Was dodging */
-	byte old_blocking;   	/* Was blocking */
 
 	/*** Extracted fields ***/
 

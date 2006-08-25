@@ -2939,18 +2939,6 @@ static void do_cmd_hold_or_stay(int pickup)
 				}
 			}
 		}
-
-		/* Update state */
-		p_ptr->update |= (PU_BONUS);
-
-		/* Redraw state */
-		p_ptr->redraw |= (PR_STATE);
-
-		/* Hack -- update straight away */
-		update_stuff();
-
-		/* Hack -- redraw straight away */
-		redraw_stuff();
 	}
 }
 

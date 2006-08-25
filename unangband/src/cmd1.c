@@ -2756,12 +2756,6 @@ void move_player(int dir, int jumping)
 			/* Hack -- not blocking */
 			p_ptr->blocking = 0;
 
-			/* Redraw */
-			p_ptr->update |= (PU_BONUS);
-
-			/* Redraw */
-			p_ptr->redraw |= (PR_STATE);
-
 			/* Hack -- update straight away */
 			update_stuff();
 

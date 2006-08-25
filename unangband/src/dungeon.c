@@ -2677,21 +2677,15 @@ static void process_player(void)
 	/*** Clear dodging ***/
 	if (p_ptr->dodging)
 	{
-		/* Save dodging */
-		p_ptr->old_dodging = p_ptr->dodging;
-
 		/* Clear dodging */
-		p_ptr->dodging = FALSE;
+		p_ptr->dodging = 0;
 	}
 
 	/*** Clear blocking ***/
 	if (p_ptr->blocking)
 	{
-		/* Save blocking */
-		p_ptr->old_blocking = p_ptr->blocking;
-
 		/* Clear blocking */
-		p_ptr->blocking = FALSE;
+		p_ptr->blocking = 0;
 	}
 
 	/*** Handle actual user input ***/
@@ -2991,46 +2985,6 @@ static void process_player(void)
 		}
 	}
 	while (!p_ptr->energy_use && !p_ptr->leaving);
-
-	/*** Clear dodging ***/
-	if (p_ptr->old_dodging)
-	{
-		/* Save dodging */
-		p_ptr->old_dodging = FALSE;
-
-		/* If not still dodging */
-		if (!p_ptr->dodging)
-		{
-			/* Redraw the state */
-			p_ptr->redraw |= (PR_STATE);
-
-			/* Hack -- update straight away */
-			redraw_stuff();
-		}
-	}
-
-	/*** Clear blocking ***/
-	if (p_ptr->old_blocking)
-	{
-		/* Save blocking */
-		p_ptr->old_blocking = FALSE;
-
-		/* If not still blocking */
-		if (!p_ptr->blocking)
-		{
-			/* Redraw the state */
-			p_ptr->update |= (PU_BONUS);
-
-			/* Redraw the state */
-			p_ptr->redraw |= (PR_STATE);
-
-			/* Hack -- update straight away */
-			update_stuff();
-
-			/* Hack -- update straight away */
-			redraw_stuff();
-		}
-	}
 
 	/* Update noise flow information */
 	update_noise();

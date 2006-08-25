@@ -345,8 +345,8 @@ flags or damage (Following discussion with Pav Lucistnik).
 
 - Implented big screen in stores (Requested by Pav Lucistnik).
 
-- Made information about whether a character dodged or blocked last turn persist
-including the bonus to armour class from blocking.
+- Hid information about whether a character dodged or blocked last turn (After 
+discussion with Pav Lucistnik).
 
 ### Bug fixes ###
 

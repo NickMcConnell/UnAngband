@@ -1110,8 +1110,8 @@ static errr rd_extra(void)
 	rd_byte(&tmp8u);	/* oops */
 	rd_byte(&p_ptr->climbing);
 	rd_byte(&p_ptr->searching);
-	rd_byte(&p_ptr->old_dodging);
-	rd_byte(&p_ptr->old_blocking);
+	rd_byte(&tmp8u);	/* oops */
+	rd_byte(&tmp8u);	/* oops */
 	rd_byte(&tmp8u);	/* oops */
 
 	rd_u32b(&p_ptr->disease);
