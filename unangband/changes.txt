@@ -273,6 +273,12 @@ worth more.
 - Wielding a weapon or digger less than 20 lbs, or a bow or sling, but not crossbow,
 only take half a turn.
 
+- Added scrolls of test magic. These identify magic items and detect one ability of
+ego items or artifacts (Suggested by Matthias Rudolf).
+
+- Improved semantics of becoming 'aware' of objects, particularly with reference to
+the bard's sense magic ability.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

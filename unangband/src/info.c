@@ -398,6 +398,8 @@ void identify_random_gen(const object_type *o_ptr)
 	text_out_wrap = 0;
 }
 
+/* Hack -- must not collide with existing ident flags */
+#define SF1_IDENT_PACK	0x00000001L
 
 /*
  * Hack -- Get spell description for effects on you.
@@ -456,7 +458,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 
 	/* Some identifies assume earlier IDs */
 	if (s_ptr->flags1 & (SF1_IDENT_FULLY)) id_flags |= SF1_IDENT;
-	if (s_ptr->flags1 & (SF1_IDENT_PACK)) id_flags |= SF1_IDENT;
+	if (s_ptr->type == SPELL_IDENT_PACK) id_flags |= (SF1_IDENT | SF1_IDENT_PACK);
 	if (s_ptr->flags1 & (SF1_DETECT_CURSE)) id_flags |= SF1_IDENT_PACK;
 	if (s_ptr->flags1 & (SF1_DETECT_MAGIC)) id_flags |= SF1_IDENT_PACK;
 	if (s_ptr->flags1 & (SF1_DETECT_CURSE)) id_flags |= SF1_IDENT_SENSE;
@@ -466,6 +468,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	/* Collect identifies */
 	vn = 0;
 	if (id_flags & (SF1_IDENT_SENSE)) vp[vn++]="the general power level";
+	if (id_flags & (SF1_IDENT_MAGIC)) vp[vn++]="a magical attribute";
 	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="the bonuses to hit, damage and armour class";
 	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="the number of charges";
 	if (id_flags & (SF1_IDENT_VALUE)) vp[vn++]="the value";
@@ -523,8 +526,8 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="wearable item";
 	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="wand";
 	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="staff";
-	if (id_flags & (SF1_IDENT | SF1_IDENT_SENSE)) vp[vn++]="unknown item";
-	if (id_flags & (SF1_IDENT_RUMOR | SF1_IDENT_FULLY | SF1_FORGET)) vp[vn++]="known item";
+	if (id_flags & (SF1_IDENT | SF1_IDENT_SENSE | SF1_IDENT_MAGIC)) vp[vn++]="unknown item";
+	if (id_flags & (SF1_IDENT_RUMOR | SF1_IDENT_FULLY | SF1_FORGET | SF1_IDENT_MAGIC)) vp[vn++]="known item";
 	if (id_flags & (SF1_DETECT_CURSE)) vp[vn++]="cursed item";
 	if (id_flags & (SF1_DETECT_MAGIC)) vp[vn++]="magic item";
 
@@ -3551,6 +3554,9 @@ void object_guess_name(object_type *o_ptr)
 	/* Do not guess aware items */
 	if (object_aware_p(o_ptr)) return;
 
+	/* Do not guess named items */
+	if (o_ptr->ident & (IDENT_NAME)) return;
+
 	/* Check the ego item list */
 	/* Hack -- exclude artifacts */
 	if (!(o_ptr->feeling == INSCRIP_SPECIAL) &&
@@ -3935,8 +3941,7 @@ void object_guess_name(object_type *o_ptr)
 		p_ptr->notice |= (PN_REORDER);
 
 		/* Window stuff */
-		p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
-		
+		p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);	
 	}
 }
 

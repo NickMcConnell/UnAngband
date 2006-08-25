@@ -1306,7 +1306,7 @@
 #define SF1_FORGET       	0x00010000
 #define SF1_SELF_KNOW    	0x00020000
 #define SF1_IDENT 		0x00040000
-#define SF1_IDENT_PACK   	0x00080000
+#define SF1_IDENT_MAGIC   	0x00080000
 #define SF1_IDENT_SENSE  	0x00100000
 #define SF1_IDENT_BONUS  	0x00200000
 #define SF1_IDENT_RUNES  	0x00400000
@@ -1448,6 +1448,7 @@
 #define SPELL_CURE_DISEASE	16
 #define SPELL_SLOW_CONF		17
 #define SPELL_SLOW_POIS		18
+#define SPELL_IDENT_PACK	19
 #define SPELL_INVEN_WIELD      24
 #define SPELL_INVEN_BOW       25
 #define SPELL_INVEN_LEFT      26
@@ -4226,7 +4227,8 @@
  * Determine if a given inventory item is "aware"
  */
 #define object_aware_p(T) \
-	(k_info[(T)->k_idx].aware)
+	(((T)->ident & (IDENT_NAME)) || \
+	 k_info[(T)->k_idx].aware)
 
 /*
  * Determine if a given inventory item is "tried"

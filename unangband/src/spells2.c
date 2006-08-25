@@ -2186,12 +2186,17 @@ static bool item_tester_known_rumor(const object_type *o_ptr)
 {
 	if (o_ptr->ident & IDENT_MENTAL)
 		return FALSE;
-	else if ((!object_known_p(o_ptr))
+	else if (!object_known_p(o_ptr) && !(o_ptr->ident & (IDENT_NAME))
 		&& !(o_ptr->feeling == INSCRIP_SPECIAL)
 		&& !(o_ptr->feeling == INSCRIP_EXCELLENT)
 		&& !(o_ptr->feeling == INSCRIP_SUPERB)
 		&& !(o_ptr->feeling == INSCRIP_WORTHLESS)
-		&& !(o_ptr->feeling == INSCRIP_TERRIBLE))
+		&& !(o_ptr->feeling == INSCRIP_TERRIBLE)
+		&& !(o_ptr->feeling == INSCRIP_ARTIFACT)
+		&& !(o_ptr->feeling == INSCRIP_HIGH_EGO_ITEM)
+		&& !(o_ptr->feeling == INSCRIP_EGO_ITEM)
+		&& !(o_ptr->feeling == INSCRIP_UNBREAKABLE)
+		&& !(o_ptr->feeling == INSCRIP_UNGETTABLE))
 		return FALSE;
 	else if (!(o_ptr->name1) && !(o_ptr->name2))
 		return FALSE;
@@ -2881,6 +2886,104 @@ bool ident_spell_sense(void)
 
 
 
+/*
+ * If an item is a magic item, provide its name. Else
+ * identify one flag that it has.
+ * Returns TRUE if something was sensed, else FALSE.
+ */
+bool ident_spell_magic(void)
+{
+	int item;
+
+	object_type *o_ptr;
+
+	char o_name[80];
+
+	cptr q, s;
+
+	bool examine = FALSE;
+
+	/* Only un-id'ed items */
+	item_tester_hook = item_tester_unknown;
+
+	/* Get an item */
+	q = "Test which item? ";
+	s = "You have nothing to test.";
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return (FALSE);
+
+	/* Get the item (in the pack) */
+	if (item >= 0)
+	{
+		o_ptr = &inventory[item];
+	}
+
+	/* Get the item (on the floor) */
+	else
+	{
+		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return (TRUE);
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+
+	/* Identify name if a magic item */
+	if (!o_ptr->name1 && !o_ptr->name2 && o_ptr->xtra1) object_aware(o_ptr);
+
+	/* Else identify one random flag -- if none left, get item name unless flavoured */
+	else if ((value_check_aux10(o_ptr, FALSE, FALSE)) && !(k_info[o_ptr->k_idx].flavor)) object_aware(o_ptr);
+
+	/* List object abilities */
+	else examine = TRUE;
+
+	/* Description */
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
+
+	/* Describe */
+	if (item >= INVEN_WIELD)
+	{
+		msg_format("%^s: %s (%c).",
+			   describe_use(item), o_name, index_to_label(item));
+	}
+	else if (item >= 0)
+	{
+		msg_format("In your pack: %s (%c).",
+			   o_name, index_to_label(item));
+	}
+	else
+	{
+		msg_format("On the ground: %s.",
+			   o_name);
+	}
+
+	/* Examine */
+	if (examine)
+	{
+		msg_print("");
+
+		/* Save the screen */
+		screen_save();
+
+		/* Describe */
+		screen_object(o_ptr);
+
+		(void)anykey();
+
+		/* Load the screen */
+		screen_load();
+	}
+
+	/* Something happened */
+	return (TRUE);
+}
+
+
 
 /*
  * Identify the value of an object in the inventory (or on the floor)
@@ -3157,8 +3260,8 @@ bool ident_spell_rumor(void)
 			if (object_known_p(o_ptr)) object_mental(o_ptr);
 			else
 			{
-				object_known(o_ptr);
 				object_aware(o_ptr);
+				object_known(o_ptr);
 			}
 
 		}
@@ -3190,6 +3293,9 @@ bool ident_spell_rumor(void)
 	{
 		/* Tell the player the bad news */
 		msg_format("%s%s.",p,r);
+
+		/* Unlucky */
+		msg_print("The legend lore has failed.");
 	}
 
 	if (done)
@@ -6151,6 +6257,13 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 		obvious = TRUE;
 	}
 
+	if (s_ptr->flags1 & (SF1_IDENT_MAGIC))
+	{
+		if (!ident_spell_magic() && (*cancel)) return (TRUE);
+		*cancel = FALSE;
+		obvious = TRUE;
+	}
+
 	if (s_ptr->flags1 & (SF1_IDENT_RUMOR))
 	{
 		if (!ident_spell_rumor() && (*cancel)) return (TRUE);
@@ -6304,12 +6417,6 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 	if (s_ptr->flags1 & (SF1_SELF_KNOW))
 	{
 		self_knowledge(TRUE);
-		obvious = TRUE;
-	}
-
-	if (s_ptr->flags1 & (SF1_IDENT_PACK))
-	{
-		identify_pack();
 		obvious = TRUE;
 	}
 
@@ -6864,6 +6971,12 @@ bool process_spell_types(int spell, int level, bool *cancel)
 				*cancel = FALSE;
 				if (set_poisoned(p_ptr->poisoned / 2)) obvious = TRUE;
 				break;
+			}
+			case SPELL_IDENT_PACK:
+			{
+				*cancel = FALSE;
+				identify_pack();
+				obvious = TRUE;
 			}
 			default:
 			{

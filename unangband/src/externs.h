@@ -781,6 +781,7 @@ extern void set_recall(void);
 extern int value_check_aux3(const object_type *o_ptr);
 extern int value_check_aux4(const object_type *o_ptr);
 extern int value_check_aux5(const object_type *o_ptr);
+extern int value_check_aux10(object_type *o_ptr, bool limit, bool weapon);
 extern void stair_creation(void);
 extern bool enchant(object_type *o_ptr, int n, int eflag);
 extern bool enchant_spell(int num_hit, int num_dam, int num_ac);

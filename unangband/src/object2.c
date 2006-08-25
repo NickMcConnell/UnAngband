@@ -731,8 +731,6 @@ void object_mental(object_type *o_ptr)
 }
 
 
-
-
 /*
  * Known is true when the "attributes" of an object are "known".
  *
@@ -770,12 +768,66 @@ void object_known(object_type *o_ptr)
 	/* The object is not "pval sensed" */
 	o_ptr->ident &= ~(IDENT_PVAL);
 
+	/* Now we know about the item */
+	o_ptr->ident |= (IDENT_KNOWN);
+}
+
+
+/*
+ * Sense the bonus/charges of an object
+ *
+ * Note under some circumstances, we fully know the object (When
+ * its bonuses/charges are all there is to know about it).
+ */
+void object_bonus(object_type *o_ptr)
+{
+	/* Identify the bonuses */
+	o_ptr->ident |= (IDENT_BONUS | IDENT_CHARGES | IDENT_PVAL);
+
+	/* Have we already learnt the name? */
+	if (o_ptr->ident & (IDENT_NAME))
+	{
+		object_known(o_ptr);
+	}
+
+	/* Is this all we need to know */
+	else if ((o_ptr->tval == TV_WAND) || (o_ptr->tval == TV_STAFF) || (o_ptr->tval == TV_AMULET) || (o_ptr->tval == TV_RING))
+	{
+		if (object_aware_p(o_ptr)) object_known(o_ptr);
+	}
+
+	/* Sense the item (if appropriate) */
+	if (!object_known_p(o_ptr))
+	{
+		sense_magic(o_ptr, 1, TRUE);
+	}
+}
+
+
+
+/*
+ * The player is now aware of the effects of the given object.
+ */
+void object_aware(object_type *o_ptr)
+{
+	object_kind *k_ptr = &k_info[o_ptr->k_idx];
+
+	int i;
+
+	u32b f1, f2, f3, f4;
+
+	/* Get the flags */
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+
+	/* No longer guessing */
+	k_ptr->guess = 0;
+
 	/* The object name is not guessed */
 	o_ptr->guess1 = 0;
 	o_ptr->guess2 = 0;
 
-	/* Remove name3 if artifact */
-	if (o_ptr->name1) o_ptr->name3 = 0;
+	/* No longer tried */
+	k_ptr->tried = FALSE;
 
 	/* Auto-inscribe */
 	if (o_ptr->name2)
@@ -787,8 +839,64 @@ void object_known(object_type *o_ptr)
 		if (!o_ptr->note) o_ptr->note = k_info[o_ptr->k_idx].note;
 	}
 
-	/* Now we know about the item */
-	o_ptr->ident |= (IDENT_KNOWN);
+	/* Remove name3 if artifact */
+	if (o_ptr->name1) o_ptr->name3 = 0;
+
+	/* Lose "magic bag" feeling */
+	if (o_ptr->feeling >= MAX_INSCRIP) o_ptr->feeling = 0;
+
+	/* Fully aware of the effects */
+	k_info[o_ptr->k_idx].aware = TRUE;
+
+	/* Identify the name */
+	o_ptr->ident |= (IDENT_NAME);
+
+	/* Check if easily known */
+	if (f3 & (TR3_EASY_KNOW)) object_known(o_ptr);
+
+	/* Is this all we need to know? - wands */
+	else if ((o_ptr->tval == TV_WAND) && (o_ptr->ident & (IDENT_CHARGES)))
+	{
+		object_known(o_ptr);
+	}
+
+	/* Is this all we need to know? - staffs */
+	else if ((o_ptr->tval == TV_STAFF) && (o_ptr->ident & (IDENT_CHARGES)) && (o_ptr->ident & (IDENT_BONUS)))
+	{
+		object_known(o_ptr);
+	}
+
+	/* Is this all we need to know? - other items */
+	else if ((o_ptr->ident & (IDENT_BONUS)) && (o_ptr->ident & (IDENT_PVAL)))
+	{
+		object_known(o_ptr);
+	}
+
+	/* Process objects */
+	for (i = 1; i < o_max; i++)
+	{
+		/* Get the object */
+		object_type *i_ptr = &o_list[i];
+
+		/* Skip dead objects */
+		if (!i_ptr->k_idx) continue;
+
+		/* Re-evaluate the object */
+		object_guess_name(i_ptr);	
+	}
+
+	/* Process objects */
+	for (i = 1; i < INVEN_TOTAL; i++)
+	{
+		/* Get the object */
+		object_type *i_ptr = &inventory[i];
+
+		/* Skip dead objects */
+		if (!i_ptr->k_idx) continue;
+
+		/* Re-evaluate the object */
+		object_guess_name(i_ptr);	
+	}
 
 	/* Now we know what it is, update what we know about it from our artifact memory */
 	if (o_ptr->name1)
@@ -866,88 +974,6 @@ void object_known(object_type *o_ptr)
 
 
 /*
- * Sense the bonus/charges of an object
- *
- * Note under some circumstances, we fully know the object (When
- * its bonuses/charges are all there is to know about it).
- */
-void object_bonus(object_type *o_ptr)
-{
-	/* Identify the bonuses */
-	o_ptr->ident |= (IDENT_BONUS | IDENT_CHARGES | IDENT_PVAL);
-
-	/* Is this all we need to know */
-	if ((o_ptr->tval == TV_WAND) || (o_ptr->tval == TV_STAFF) || (o_ptr->tval == TV_AMULET) || (o_ptr->tval == TV_RING))
-	{
-		if (object_aware_p(o_ptr)) object_known(o_ptr);
-	}
-
-	/* Sense the item (if appropriate) */
-	if (!object_known_p(o_ptr))
-	{
-		sense_magic(o_ptr, 1, TRUE);
-	}
-}
-
-
-
-/*
- * The player is now aware of the effects of the given object.
- */
-void object_aware(object_type *o_ptr)
-{
-	object_kind *k_ptr = &k_info[o_ptr->k_idx];
-
-	int i;
-
-	/* No longer guessing */
-	k_ptr->guess = 0;
-
-	/* No longer tried */
-	k_ptr->tried = FALSE;
-
-	/* Auto-inscribe */
-	if (!o_ptr->note) o_ptr->note = k_info[o_ptr->k_idx].note;
-
-	/* Lose "magic bag" feeling */
-	if (o_ptr->feeling >= MAX_INSCRIP) o_ptr->feeling = 0;
-
-	/* Fully aware of the effects */
-	k_info[o_ptr->k_idx].aware = TRUE;
-
-	/* Process objects */
-	for (i = 1; i < o_max; i++)
-	{
-		/* Get the object */
-		object_type *i_ptr = &o_list[i];
-
-		/* Skip dead objects */
-		if (!i_ptr->k_idx) continue;
-
-		/* Re-evaluate the object */
-		object_guess_name(i_ptr);
-	
-	}
-
-	/* Process objects */
-	for (i = 1; i < INVEN_TOTAL; i++)
-	{
-		/* Get the object */
-		object_type *i_ptr = &inventory[i];
-
-		/* Skip dead objects */
-		if (!i_ptr->k_idx) continue;
-
-		/* Re-evaluate the object */
-		object_guess_name(i_ptr);
-	
-	}
-
-}
-
-
-
-/*
  * Something has been "sampled"
  */
 void object_tried(object_type *o_ptr)
@@ -963,7 +989,6 @@ void object_tried(object_type *o_ptr)
 	/* Mark it as tried */
 	k_ptr->tried = TRUE;
 }
-
 
 
 /*
@@ -3595,7 +3620,8 @@ int value_check_aux7(object_type *o_ptr)
  */
 int value_check_aux8(object_type *o_ptr)
 {
-	o_ptr->ident |= (IDENT_NAME);
+	/* Become aware of object */
+	object_aware(o_ptr);
 
 	/* No feeling */
 	return (0);
@@ -3621,8 +3647,10 @@ int value_check_aux9(object_type *o_ptr)
 
 /*
  * Return a "feeling" (or NULL) about an item.  Methods 10 & 10a (Flag magic and flag weapon).
+ *
+ * If limit is set, only return either weapon or nonweapon flags.
  */
-int value_check_aux10(object_type *o_ptr, bool weapon)
+int value_check_aux10(object_type *o_ptr, bool limit, bool weapon)
 {
 	int feel = 0;
 
@@ -3644,26 +3672,26 @@ int value_check_aux10(object_type *o_ptr, bool weapon)
 	/* Check flags 1 */
 	for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
 	{
-		if ((!weapon) && (j > TR1_SPEED)) continue;
-		else if (j <= TR1_SPEED) continue;
+		if (limit && !weapon && (j > TR1_SPEED)) continue;
+		else if (limit && weapon && (j <= TR1_SPEED)) continue;
 
 		if ( ((f1) & (j)) && !(rand_int(++count)) ) { flag1 = 1; flag2 = j;}
 	}
 
 	/* Check flags 2 if not weapon */
-	if (!weapon) for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
+	if (!limit || !weapon) for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
 	{
 		if (((f2) & (j)) && !(rand_int(++count))) { flag1 = 2; flag2 = j;}
 	}
 
 	/* Check flags 3 if not weapon */
-	if (!weapon) for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
+	if (!limit || !weapon) for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
 	{
 		if (((f3) & (j)) && !(rand_int(++count))) { flag1 = 3; flag2 = j;}
 	}
 
 	/* Check flags 4 if not weapon */
-	if (!weapon) for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
+	if (!limit || !weapon) for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
 	{
 		if (((f4) & (j)) && !(rand_int(++count))) { flag1 = 4; flag2 = j;}
 	}
@@ -3958,10 +3986,10 @@ int sense_magic(object_type *o_ptr, int sense_type, bool heavy)
 			feel = heavy ? value_check_aux9(o_ptr) : value_check_aux11(o_ptr);
 			break;
 		case 10:
-			feel = heavy ? value_check_aux10(o_ptr, FALSE) : value_check_aux11(o_ptr);
+			feel = heavy ? value_check_aux10(o_ptr, TRUE, FALSE) : value_check_aux11(o_ptr);
 			break;
 		case 11:
-			feel = heavy ? value_check_aux10(o_ptr, TRUE) : value_check_aux11(o_ptr);
+			feel = heavy ? value_check_aux10(o_ptr, TRUE, TRUE) : value_check_aux11(o_ptr);
 			break;
 	}
 
