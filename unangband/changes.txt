@@ -622,6 +622,9 @@ by Matthias Rudolf).
 - Fixed bug with player not getting marked as a winner after killing Morgoth (Reported
 by Matthias Rudolf).
 
+- Fixed bug causing crash when examining a potion of cure disease (Reported by
+jevansau1).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

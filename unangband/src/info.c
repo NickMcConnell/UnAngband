@@ -811,6 +811,9 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags3 & (SF3_SLOW_CURSE | SF3_CURE_CURSE)) vp[vn++]="curses";
 	if (s_ptr->type == SPELL_CURE_DISEASE) vp[vn++] = disease_name[s_ptr->param];
 
+	/* Hack -- cure disease also cures minor diseases */
+	if ((s_ptr->type == SPELL_CURE_DISEASE) && (s_ptr->param == 32)) vp[vn++] = disease_name[29];
+
 	/* Describe cure effects */
 	if (vn)
 	{

@@ -554,6 +554,9 @@ void self_knowledge_aux(bool spoil, bool random)
 			if ((p_ptr->disease & i) != 0) vp[vn++] = disease_name[n];
 		}
 
+		/* Hack -- add a cause if none found */
+		if (p_ptr->disease < (1 << DISEASE_TYPES_HEAVY)) vp[vn++] = disease_name[32];
+
 		/* Scan */
 		for (n = 0; n < vn; n++)
 		{

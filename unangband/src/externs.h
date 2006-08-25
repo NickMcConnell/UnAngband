@@ -76,7 +76,7 @@ extern const int object_xtra_size[OBJECT_XTRA_MAX_HIDDEN];
 extern const cptr object_group_text[];
 extern const byte object_group_tval[];
 extern const cptr magic_name[4][32];
-extern const cptr disease_name[32];
+extern const cptr disease_name[33];
 extern byte spell_info_RF4[32][5];
 extern const byte spell_info_RF5[32][5];
 extern const byte spell_info_RF6[32][5];

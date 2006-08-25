@@ -2773,7 +2773,7 @@ const cptr magic_name[4][32] =
 	}
 };
 
-const cptr disease_name[32] =
+const cptr disease_name[33] =
 {
 	"pink rot",
 	"black brain",
@@ -2802,11 +2802,12 @@ const cptr disease_name[32] =
 	"mana mites",
 	"black breath",
 	"the plague",
-	"magical parasites",
+	"unnatural parasites",
 	"Morgoth's curse",
 	"minor ailments",
 	"hard to treat viruses",
-	"incurable illnesses"
+	"incurable illnesses",
+	"magical maladies"
 };
 
 /*
