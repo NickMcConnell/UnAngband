@@ -2593,11 +2593,15 @@ bool brand_item(int brand, cptr act)
     			object_can_flags(o_ptr,0x0L,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2);
 		}
 
-		/* Remove special inscription, if any */
-		o_ptr->feeling = INSCRIP_MIN_HIDDEN + brand - 1;
+		/* Hack -- some items become marked with a brand feeling */
+		if (o_ptr->name1 || o_ptr->name2)
+		{
+			/* Set brand feeling */
+			o_ptr->feeling = INSCRIP_MIN_HIDDEN + brand - 1;
 
-		/* The object has been "sensed" */
-		if (!object_known_p(o_ptr)) o_ptr->ident |= (IDENT_SENSE);
+			/* The object has been "sensed" */
+			if (!object_known_p(o_ptr)) o_ptr->ident |= (IDENT_SENSE);
+		}
 
 		/* Carry item again if split */
 		if (split)

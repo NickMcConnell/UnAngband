@@ -637,6 +637,8 @@ by Matthias Rudolf).
 - Fixed bug causing crash when examining a potion of cure disease (Reported by
 jevansau1).
 
+- Fixed bug causing blessed weapons to display status twice (Reported by ekolis).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
