@@ -2127,7 +2127,7 @@ W:14:3:11:40
 B:HIT:HURT:1d3
 F:RAND_50 | RAND_25
 F:EMPTY_MIND | INVISIBLE | COLD_BLOOD | BASH_DOOR
-F:IM_ELEC | IM_POIS | IM_BLUNT
+F:IM_ELEC | IM_POIS | IM_BLUNT | EVASIVE
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_SLOW
 F:CAN_FLY | NONLIVING
 D:A whirlwind of sentient air.
@@ -2888,7 +2888,7 @@ B:HIT:BATTER:2d7
 B:HIT:BATTER:2d7
 F:RAND_25
 F:EMPTY_MIND | COLD_BLOOD
-F:PASS_WALL | RES_EDGED
+F:PASS_WALL | IM_EDGED
 F:IM_FIRE | IM_COLD | IM_ELEC | IM_POIS | HURT_ROCK
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_SLOW
 F:CAN_DIG | NONLIVING
@@ -4007,7 +4007,7 @@ D:A hideous ogre wrapped in black sorcerous robes.
 N:297:Ulbandi, the Ogre Chieftain
 G:O:v
 I:120:15d100:20:100:20
-W:45:2:0:1500
+W:41:2:0:1500
 B:HIT:BATTER:6d6
 B:HIT:BATTER:6d6
 B:HIT:BATTER:6d6
@@ -4821,7 +4821,7 @@ F:EMPTY_MIND
 F:BASH_DOOR | POWERFUL
 F:IM_ELEC | IM_FIRE | IM_POIS | IM_ACID
 F:NO_CONF | NO_SLEEP | NO_FEAR | NONLIVING
-F:HAS_AURA | HAS_LITE  | RES_LAVA
+F:HAS_AURA | HAS_LITE  | RES_LAVA | RES_BLUNT
 S:BOLT_FIRE | ADD_MANA | ARC_HFIRE
 D:It is a towering inferno of flames.
 
@@ -4860,7 +4860,7 @@ F:EMPTY_MIND | COLD_BLOOD
 F:BASH_DOOR | POWERFUL
 F:IM_ACID | IM_POIS | IM_FIRE | IM_COLD
 F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_AURA
-F:RES_WATER | HURT_WATER | NONLIVING
+F:RES_WATER | HURT_WATER | NONLIVING | RES_BLUNT
 F:CAN_SWIM
 S:BOLT_COLD | BALL_STORM | ADD_MANA | BOLT_WATER | AURA
 D:It is a towering tempest of water.
@@ -4900,7 +4900,7 @@ D:Cool and confident, fast and lithe; protect your possessions quickly!
 N:355:Ulfang the Black
 G:t:D
 I:120:10d100:20:90:40
-W:37:5:0:1200
+W:34:5:0:1200
 M:0:10:1:43
 B:HIT:WOUND:5d5
 B:HIT:WOUND:5d5
@@ -5345,7 +5345,7 @@ D: tarnished gold hue, and light is reflected from its form.
 N:383:Rogrog the Black Troll
 G:T:D
 I:120:20d100:20:70:50
-W:48:3:0:5000
+W:45:3:0:5000
 M:15:0:0:0
 B:HIT:BATTER:12d7
 B:BITE:WOUND:4d10
@@ -5491,7 +5491,7 @@ D:A gaunt figure, clothed in black robes.
 N:392:Lorgan, Chief of the Easterlings
 G:q:o
 I:120:18d100:25:100:10
-W:46:2:0:1200
+W:43:2:0:1200
 M:0:25:15:78
 B:HIT:HURT:6d6
 B:HIT:HURT:6d6
@@ -5743,7 +5743,7 @@ D: fire.
 N:408:Castamir the Usurper
 G:q:R
 I:120:88d10:20:90:40
-W:38:5:0:1600
+W:36:5:0:1600
 M:0:50:46:78
 B:HIT:HURT:5d5
 B:HIT:HURT:5d5
@@ -5883,7 +5883,7 @@ D: around him.
 N:416:The Tyrant of Fire
 G:E:r
 I:120:24d100:12:50:50
-W:57:3:14:4000
+W:52:3:14:4000
 M:0:25:60:78
 B:HIT:FIRE:5d6
 B:HIT:FIRE:5d6
@@ -5893,7 +5893,7 @@ F:UNIQUE
 F:FORCE_SLEEP | FORCE_MAXHP | RAND_25
 F:EMPTY_MIND
 F:BASH_DOOR | POWERFUL
-F:IM_FIRE | IM_POIS | IM_ACID | IM_ELEC
+F:IM_FIRE | IM_POIS | IM_ACID | IM_ELEC | RES_BLUNT
 F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_AURA | RES_LAVA | NONLIVING
 S:BOLT_PLAS | BALL_FIRE | ADD_MANA | S_GROUP
 D:A towering fire elemental, it burns everything beyond recognition.
@@ -5996,15 +5996,15 @@ B:HIT:BATTER:6d5
 B:HIT:BATTER:6d5
 B:HIT:BATTER:6d5
 B:AURA:WATER:6d5
-F:UNIQUE
+F:UNIQUE | MALE
 F:FORCE_SLEEP | FORCE_MAXHP | RAND_25
 F:EMPTY_MIND | COLD_BLOOD
 F:BASH_DOOR | POWERFUL
 F:IM_POIS | IM_ACID | IM_FIRE | IM_COLD
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLUNT
 F:RES_WATER | HURT_WATER | HAS_AURA | CAN_SWIM | NONLIVING
-S:BOLT_ICE | BOLT_WATER | BALL_COLD | BALL_WATER | ADD_MANA
-D:A towering water elemental, it is master of all things liquid.
+S:BOLT_ICE | BOLT_WATER | BALL_COLD | BALL_WATER | ADD_MANA | S_GROUP
+D:A towering water elemental king, he is master of all things liquid.
 D: Wave after wave drowns your frail body.
 
 N:424:Ancient white dragon
@@ -6253,7 +6253,7 @@ D: surfaces and its screech echoes through the many winding dungeon corridors.
 N:440:The Black Rider at Bree
 G:W:D
 I:120:18d100:90:60:10
-W:49:3:0:10000
+W:47:3:0:10000
 M:15:15:60:63
 B:HIT:HURT:12d6
 B:HIT:EXP_80:8d6
@@ -6394,7 +6394,7 @@ D: lightning speed and its powers make it a tornado of death and destruction.
 N:449:The Black Rider at Weathertop
 G:W:D
 I:120:21d100:90:60:10
-W:53:3:0:13000
+W:50:3:0:13000
 M:33:33:65:84
 B:HIT:HURT:12d6
 B:TOUCH:EXP_80:5d6
@@ -6474,7 +6474,7 @@ D: froth and sizzle.
 N:453:The Black Rider at the Ford to Rivendell
 G:W:D
 I:120:24d100:90:70:10
-W:52:3:0:15000
+W:54:3:0:15000
 M:33:33:70:84
 B:HIT:HURT:7d6
 B:HIT:HURT:7d6
@@ -6493,7 +6493,7 @@ D:A tall black cloaked Ringwraith.
 N:454:Gorlim, Betrayer of Barahir
 G:q:g
 I:120:16d100:20:120:40
-W:49:3:0:7000
+W:48:3:0:7000
 M:0:50:37:78
 B:HIT:HURT:8d6
 B:HIT:HURT:8d6
@@ -6551,7 +6551,7 @@ D:It is demon with arms and pincers, its form a true mockery of life.
 N:457:One of the Nine
 G:W:D
 I:120:27d100:90:70:10
-W:54:3:0:18000
+W:57:3:0:18000
 M:40:40:70:91
 B:HIT:HURT:14d7
 B:TOUCH:EXP_80:6d7
@@ -6688,7 +6688,7 @@ D: itself in unearthly shadows.
 N:464:One of the Nine
 G:W:D
 I:120:32d100:90:70:10
-W:54:3:0:22000
+W:58:3:0:22000
 M:0:40:75:106
 B:HIT:HURT:8d7
 B:HIT:HURT:8d7
@@ -6726,7 +6726,7 @@ D:She is a demon of female form with many arms, each bearing deadly weapons.
 N:466:The Master of Earth
 G:E:u
 I:110:28d100:10:97:90
-W:59:3:13:4500
+W:80:3:13:4500
 B:HIT:BATTER:9d6
 B:HIT:BATTER:9d6
 B:BOULDER:HURT:35d10
@@ -6735,11 +6735,11 @@ F:UNIQUE
 F:FORCE_SLEEP | FORCE_MAXHP
 F:EMPTY_MIND | COLD_BLOOD
 F:PASS_WALL | POWERFUL
-F:IM_FIRE | IM_COLD | IM_ELEC | IM_POIS
+F:IM_FIRE | IM_COLD | IM_ELEC | IM_POIS | IM_EDGED
 F:HURT_ROCK | CAN_DIG
 F:NO_CONF | NO_SLEEP | NO_FEAR | CAN_DIG | NONLIVING
-S:BOLT_ACID | BALL_ACID | ADD_MANA | QUAKE
-D:A towering stone elemental stands before you.  The walls and ceiling are
+S:BOLT_ACID | BALL_ACID | ADD_MANA | QUAKE | S_GROUP
+D:A towering stone elemental master stands before you.  The walls and ceiling are
 D: reduced to rubble as it advances.
 
 N:467:Hell Knight
@@ -6765,23 +6765,23 @@ D:It is a massive humanoid demon wreathed in flames.
 N:468:The Queen of Air
 G:E:G
 I:130:27d100:12:50:50
-W:58:3:11:4750
+W:69:3:11:4750
 M:20:20:60:84
 B:HIT:BATTER:4d6
 B:HIT:BATTER:4d6
 B:HIT:CONFUSE:8d4
 B:AURA:WIND:4d4
-F:UNIQUE
+F:UNIQUE | FEMALE
 F:FORCE_SLEEP | FORCE_MAXHP
 F:RAND_25
 F:EMPTY_MIND | COLD_BLOOD
 F:BASH_DOOR | POWERFUL
-F:IM_ACID | IM_COLD | IM_ELEC | IM_POIS
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:IM_ACID | IM_COLD | IM_ELEC | IM_POIS | IM_BLUNT
+F:NO_CONF | NO_SLEEP | NO_FEAR | IM_BLUNT | EVASIVE
 F:CAN_FLY | HAS_AURA | NONLIVING
-S:BOLT_ELEC | BALL_COLD | BALL_ELEC | AURA | ADD_MANA | BALL_WIND
-D:A towering air elemental, it avoids your blows
-D: with its extreme speed.
+S:BOLT_ELEC | BALL_COLD | BALL_ELEC | AURA | ADD_MANA | BALL_WIND | S_GROUP
+D:A towering air elemental queen, she avoids your blows
+D: with her extreme speed.
 
 N:469:11-headed hydra
 G:y:B
@@ -6861,7 +6861,7 @@ D: little intelligence, but it has been instructed to destroy all it meets.
 N:473:Scatha the Worm
 G:A:W
 I:120:22d100:30:130:70
-W:51:2:0:17000
+W:49:2:0:17000
 M:25:25:38:78
 B:CLAW:HURT:4d10
 B:CLAW:HURT:4d10
@@ -6884,7 +6884,7 @@ D: into the air.
 N:474:The Messenger of Khamul
 G:W:D
 I:120:40d100:90:90:10
-W:56:3:0:25000
+W:61:3:0:25000
 M:0:40:90:106
 B:HIT:HURT:8d8
 B:HIT:HURT:8d8
@@ -6905,7 +6905,7 @@ D: in Dol Goldur as the messenger of Khamul the Shadow of the East.
 N:475:Smaug the Golden
 G:A:y
 I:120:24d100:30:130:70
-W:53:2:0:23000
+W:55:2:0:23000
 M:25:25:45:84
 B:CLAW:HURT:4d12
 B:CLAW:HURT:4d12
@@ -7001,7 +7001,7 @@ D: evil surrounds it.  Luckily for you, it can't move.
 N:480:Itangast, the Fire Drake
 G:A:R
 I:120:22d100:30:120:70
-W:50:2:0:20000
+W:51:2:0:20000
 M:25:25:30:84
 B:CLAW:HURT:4d10
 B:CLAW:HURT:4d10
@@ -7021,7 +7021,7 @@ D: smoke curl up from his nostrils as he regards you with disdain.
 N:481:Glaurung, Father of the Dragons
 G:A:R
 I:130:75d100:30:140:70
-W:73:3:0:50000
+W:86:3:0:50000
 M:40:40:55:169
 B:CLAW:HURT:5d12
 B:CLAW:HURT:5d12
@@ -7068,7 +7068,7 @@ D: wild if need be.
 N:483:Durin's Bane, the Balrog of Khazad-dum
 G:U:v
 I:130:30d100:20:100:80
-W:68:3:0:30000
+W:73:3:0:30000
 M:35:35:75:155
 B:HIT:FIRE:17d12
 B:LASH:FIRE:12d12
@@ -7194,7 +7194,7 @@ D: great muscles.  It regards you with contempt.
 N:491:Harowen the Black Hand
 G:t:v
 I:140:25d100:40:90:0
-W:55:3:0:20000
+W:59:3:0:20000
 M:18:18:35:73
 B:TOUCH:EAT_GOLD:5d5
 B:TOUCH:EAT_ITEM:5d5
@@ -7215,7 +7215,7 @@ D: moves with blinding speed.  Check your pockets!
 N:492:Gothmog, the Lieutenant of Morgul
 G:W:D
 I:120:45d100:90:100:10
-W:56:3:0:30000
+W:63:3:0:30000
 M:0:33:95:119
 B:HIT:HURT:18d9
 B:TOUCH:EXP_80:6d7
@@ -7260,7 +7260,7 @@ D: with disdainful ease.
 N:494:Khamul the Shadow of the East
 G:W:D
 I:120:50d100:90:100:10
-W:66:3:0:40000
+W:77:3:0:40000
 M:0:60:100:141
 B:HIT:HURT:9d10
 B:HIT:HURT:9d10
@@ -7427,7 +7427,7 @@ D:An awesome vortex of pure magic, power radiates from its frame.
 N:505:Thuringwethil, the Vampire Messenger
 G:V:v
 I:130:50d100:20:145:10
-W:63:4:0:23000
+W:72:4:0:23000
 M:0:40:70:176
 B:BITE:EXP_80:6d6
 B:BITE:EXP_80:6d6
@@ -7470,7 +7470,7 @@ D: you truly realize how insignificant you are.
 N:509:Palando the Blue
 G:M:b
 I:130:55d100:40:160:10
-W:89:3:0:25000
+W:95:3:0:25000
 M:0:70:90:155
 B:HIT:FIRE:9d12
 B:HIT:FIRE:4d6
@@ -7496,7 +7496,7 @@ D: of his servants, never returning to the West again.
 N:510:Alatar the Blue
 G:M:B
 I:130:60d100:40:170:10
-W:88:3:0:30000
+W:95:3:0:30000
 M:0:70:90:155
 B:TOUCH:EXP_80
 B:HIT:BLIND:10d5
@@ -7520,7 +7520,7 @@ D: of his servants, never returning to the West again.
 N:511:Ancalagon the Black
 G:A:D
 I:130:100d100:40:170:70
-W:97:3:0:45000
+W:96:3:0:45000
 M:45:45:80:190
 B:CLAW:HURT:6d12
 B:CLAW:HURT:6d12
@@ -7566,7 +7566,7 @@ D: strides towards you menacingly.
 N:513:Gandalf the White
 G:M:w
 I:130:75d100:40:180:10
-W:87:3:0:35000
+W:94:3:0:35000
 M:0:70:100:165
 B:HIT:UN_BONUS:6d8
 B:HIT:FIRE:4d6
@@ -7591,7 +7591,7 @@ D: wise and specializes in fire magic.
 N:514:Grimma Wormtongue, Agent of Saruman
 G:q:y
 I:125:50d100:100:100:0
-W:67:1:0:35000
+W:78:1:0:35000
 M:0:65:80:162
 B:HIT:UN_BONUS:6d8
 B:HIT:UN_BONUS:6d8
@@ -7636,7 +7636,7 @@ D: the stench of death.  Flee its hunger!
 N:516:Tevildo, Prince of Cats
 G:f:v
 I:130:48d100:100:200:0
-W:65:3:0:30000
+W:74:3:0:30000
 M:0:33:75:106
 B:CLAW:CONFUSE:12d12
 B:CLAW:LOSE_DEX:2d12
@@ -7761,15 +7761,15 @@ D: destroy you.
 
 #Was Tselakus, the Dreadlord
 
-N:522:Baldor the Hapless
+N:522:The Lord of the Paths of the Dead
 G:G:R
 I:130:65d100:20:150:10
-W:72:2:0:35000
+W:97:2:0:35000
 M:40:40:100:162
 B:HIT:HURT:10d10
 B:HIT:HURT:10d10
-B:HIT:LOSE_STR:4d6
-B:HIT:LOSE_STR:4d6
+B:TOUCH:LOSE_STR:8d6
+B:AURA:ANIM_DEAD
 F:UNIQUE | MALE
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_3D2 | DROP_4D2 | DROP_GOOD
@@ -7780,10 +7780,9 @@ F:CAN_FLY
 S:BLIND | HOLD | CONF
 S:BALL_DARK | BALL_NETHR
 S:S_WRAITH | S_HI_UNDEAD | S_KIN
-D:The eldest son of Brego, second King of Rohan.  At the feast held to
-D: celebrate the completion of Meduseld, he made a rash vow to tread the
-D: Paths of the Dead.  There he died and rose as one of the Dead, for the
-D: Paths are closed to all save the Dead and the heirs of Isildur.
+D:The mightiest of the oath breakers who lie in the Paths of the Dead.  His
+D: powerful blows and fell magic rain down on you, for you are not an heir
+D: of Isildur.
 
 N:523:Great Wyrm of Many Colours
 G:A:v
@@ -7871,15 +7870,14 @@ D:A skeletal form, around which the dead rise up in unlife...
 
 # Was Feagwath, the Undead Sorcerer
 
-N:528:The Lord of the Paths of the Dead
+N:528:Baldor the Hapless
 G:L:y
 I:130:50d100:20:85:50
-W:85:2:0:30000
+W:68:2:0:30000
 M:0:60:90:162
 B:TOUCH:EXP_80:8d12
 B:TOUCH:UN_POWER:8d12
 B:TOUCH:LOSE_DEX:8d12
-B:AURA:ANIM_DEAD
 F:UNIQUE | MALE
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ESCORT
@@ -7890,16 +7888,17 @@ F:IM_POIS | NO_CONF | NO_SLEEP | HAS_AURA
 S:BLINK | TELE_TO | BLIND | HOLD | SCARE | WOUND
 S:MIND_BLAST | TRAPS | BALL_MANA
 S:BOLT_MANA | BALL_NETHR | S_KIN | S_MONSTERS | S_UNDEAD
-D:The mightiest of the oath breakers who lie in the Paths of the Dead.  His
-D: powerful blows and fell magic rain down on you, for you are not an heir
-D: of Isildur.
+D:The eldest son of Brego, second King of Rohan.  At the feast held to
+D: celebrate the completion of Meduseld, he made a rash vow to tread the
+D: Paths of the Dead.  There he died and rose as one of the Dead, for the
+D: Paths are closed to all save the Dead and the heirs of Isildur.
 
 # Was Ungoliant, the Unlight
 
 N:530:Shelob, Spider of Darkness
 G:S:D
 I:130:130d100:40:160:80
-W:91:1:0:35000
+W:90:1:0:35000
 M:40:40:110:147
 B:CLAW:POISON:8d6
 B:CLAW:POISON:8d6
@@ -7947,7 +7946,7 @@ D: uncertain all of a sudden.
 N:532:Saruman of Many Colours
 G:M:v
 I:130:70d100:60:100:10
-W:85:3:0:38000
+W:87:3:0:38000
 M:0:60:105:147
 B:HIT:UN_BONUS:6d8
 B:HIT:UN_BONUS:6d8
@@ -7975,7 +7974,7 @@ D: world.
 N:535:The Witch-King of Angmar, Lord of the Nazgul
 G:W:D
 I:130:60d100:90:120:10
-W:89:3:0:60000
+W:82:3:0:60000
 M:0:60:125:162
 B:HIT:HURT:10d10
 B:HIT:HURT:10d10
@@ -8015,7 +8014,7 @@ D:It is a giant dog that glows with heat.  Flames pour from its nostrils.
 N:538:The Mouth of Sauron
 G:q:D
 I:140:75d100:20:120:80
-W:88:2:0:45000
+W:83:2:0:45000
 M:0:60:120:162
 B:GAZE:EXP_80:5d5
 B:GAZE:EXP_80:5d5
@@ -8038,7 +8037,7 @@ D: spells.
 N:540:Lungorthin, the Balrog of White Fire
 G:U:v
 I:130:70d100:20:125:80
-W:90:2:0:37000
+W:84:2:0:37000
 M:30:30:100:176
 B:HIT:FIRE:8d12
 B:AURA:FIRE:8d12
@@ -8063,7 +8062,7 @@ D: the heat of his body.
 N:541:Draugluin, Sire of All Werewolves
 G:C:u
 I:130:70d100:80:90:90
-W:80:2:0:40000
+W:62:2:0:40000
 M:33:33:30:119
 B:CLAW:HURT:6d8
 B:CLAW:HURT:6d8
@@ -8114,7 +8113,7 @@ D: have a foul and deadly breath.
 N:543:Huan, Wolfhound of the Valar
 G:C:W
 I:130:80d100:50:160:10
-W:95:1:0:40000
+W:92:1:0:40000
 M:20:0:0:0
 B:CLAW:COLD:9d12
 B:CLAW:COLD:9d12
@@ -8157,7 +8156,7 @@ D: deadly opponent in combat.
 N:545:Gothmog, the High Captain of Balrogs
 G:U:v
 I:130:80d100:100:140:0
-W:94:1:0:43000
+W:91:1:0:43000
 M:40:40:135:190
 B:HIT:FIRE:9d12
 B:AURA:FIRE:9d12
@@ -8489,7 +8488,7 @@ D: a dangerous enemy.
 N:566:Beorn, the Shape-Changer
 G:Q:D
 I:120:20d70:25:60:25
-W:40:3:0:1000
+W:38:3:0:1000
 B:CLAW:HURT:2d10
 B:CLAW:HURT:2d10
 B:BITE:HURT:4d8
@@ -8843,7 +8842,7 @@ B:HIT:BATTER:9d9
 B:BOULDER:HURT:13d10
 F:FORCE_SLEEP | FORCE_MAXHP
 F:DROP_1D2 | TAKE_ITEM
-F:BASH_DOOR | OPEN_DOOR
+F:BASH_DOOR | OPEN_DOOR | HUGE
 F:EVIL | IM_POIS | IM_ACID | IM_FIRE | IM_COLD | GIANT | NEED_LITE
 D:A gigantic ugly humanoid with but one eye and very thick skin.
 
@@ -8852,7 +8851,7 @@ D:A gigantic ugly humanoid with but one eye and very thick skin.
 N:585:Fluithuin the Ogress, Consort of Morgoth
 G:O:v
 I:130:53d100:40:140:40
-W:70:3:0:29000
+W:85:3:0:29000
 M:20:20:65:113
 B:HIT:BATTER:11d10
 B:HIT:BATTER:11d10
@@ -8869,19 +8868,21 @@ D:A powerful, fierce ogress, consort to Morgoth.
 N:586:Caradhras, the Mountain
 G:P:s
 I:120:60d100:30:160:15
-W:96:3:0:37000
-M:20:0:0:0
+W:94:3:0:37000
+M:20:20:110:113
 B:HIT:SHATTER:26d13
 B:HIT:CONFUSE:26d13
 B:BOULDER:HURT:40d10
-F:UNIQUE | MALE
+F:UNIQUE
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_GOOD | DROP_4D2 | KILL_WALL
 F:SMART | TAKE_ITEM | BASH_DOOR
-F:EVIL | GIANT | HURT_ROCK
+F:EVIL | GIANT | HURT_ROCK | HUGE
 F:IM_FIRE | IM_COLD | IM_ACID | IM_ELEC | IM_POIS
+S:BALL_WIND | BALL_STORM | BRTH_WIND | BOLT_ICE
 D:The greatest peak of the Misty Mountains, created by Morgoth to stop
-D: Orome's progress into the East.
+D: Orome's progress into the East.  Not even Gandalf was a match for
+D: its terrible strength. Turn back while you can!
 
 N:587:Kronos, Lord of the Titans
 G:P:v
@@ -8896,7 +8897,7 @@ F:UNIQUE | MALE
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_4D2 | DROP_3D2 | DROP_GOOD
 F:SMART | TAKE_ITEM | BASH_DOOR
-F:EVIL | GIANT | ESCORT
+F:EVIL | GIANT | ESCORT | HUGE
 F:IM_FIRE | IM_COLD | IM_ACID | IM_POIS | IM_ELEC | NO_STUN | NO_CUTS
 S:BRTH_FIRE | BRTH_COLD | BRTH_SHARD | BRTH_SOUND
 S:S_MONSTERS | S_KIN | TELE_TO | HEAL
@@ -8997,7 +8998,7 @@ D: barely see through them.
 N:594:Eol, the Dark Elf
 G:l:D
 I:130:80d30:20:100:60
-W:51:2:0:25000
+W:53:2:0:25000
 M:55:55:55:91
 B:HIT:HURT:3d8
 B:HIT:HURT:3d8
@@ -9018,7 +9019,7 @@ D: Aredhel of Gondolin.
 N:595:Maeglin, the Traitor of Gondolin
 G:l:D
 I:130:60d100:70:120:20
-W:87:2:0:35000
+W:67:2:0:35000
 M:0:18:80:190
 B:HIT:HURT:8d8
 B:HIT:HURT:8d8
@@ -9258,7 +9259,7 @@ D: wielding a huge club and pushing his own followers rudely aside.
 N:611:Ar-Pharazon the Golden
 G:t:y
 I:130:40d100:30:45:255
-W:57:1:0:32500
+W:64:1:0:32500
 M:0:18:25:134
 B:HIT:HURT:8d8
 B:HIT:HURT:8d8
@@ -9643,7 +9644,7 @@ D: enemies.
 N:636:Blodrin the Traitor
 G:l:o
 I:120:11d100:20:80:20
-W:39:4:0:1000
+W:40:4:0:1000
 M:0:18:20:78
 B:HIT:HURT:3d8
 B:HIT:HURT:3d8
@@ -9682,7 +9683,7 @@ D:The fattest and most bloated spider living in Mirkwood.
 N:638:Eilinel the Entrapped
 G:G:D
 I:120:90d10:10:40:1
-W:41:5:0:3500
+W:46:5:0:3500
 M:0:50:50:100
 B:HIT:HURT:3d5
 B:HIT:HURT:3d5
@@ -9702,7 +9703,7 @@ D: her magic to do his bidding.
 N:639:The Watcher in the Water
 G:F:D
 I:120:112d22:30:75:80
-W:64:2:0:60000
+W:65:2:0:60000
 M:18:18:40:80
 B:CRUSH:HURT:16d12
 B:CRUSH:HURT:16d12
@@ -9742,7 +9743,7 @@ D: looks down on your pathetic figure with hate and disdain.
 N:641:The Watcher of Cirith Ungol
 G:g:s
 I:120:60d200:42:40:10
-W:44:5:0:25000
+W:42:5:0:25000
 M:18:18:60:120
 B:GAZE:TERRIFY:5d8
 B:GAZE:PARALYZE:5d8
@@ -9766,7 +9767,7 @@ D: pass by this guardian.
 N:642:Oikeroi, Bodyguard of Tevildo
 G:f:v
 I:130:48d100:100:200:0
-W:62:3:0:30000
+W:70:3:0:30000
 M:0:33:75:106
 B:HIT:CONFUSE:12d12
 B:TOUCH:LOSE_DEX:2d12
@@ -9786,7 +9787,7 @@ D: cat looks down upon you with disdain.
 N:643:Umuiyan, Doorkeeper of Tevildo
 G:f:v
 I:130:48d100:100:200:0
-W:62:3:0:30000
+W:70:3:0:30000
 M:0:33:75:106
 B:HIT:CONFUSE:12d12
 B:TOUCH:LOSE_DEX:2d12
@@ -9821,7 +9822,7 @@ D:A strong and cunning orc warrior, a commander of Saruman's orcish horde.
 N:645:The Sorcerer of Dol Goldur
 G:q:s
 I:130:70d100:60:100:10
-W:67:3:0:38000
+W:79:3:0:38000
 M:0:60:105:147
 B:HIT:UN_BONUS:6d8
 B:HIT:UN_BONUS:6d8
@@ -15641,7 +15642,7 @@ D: Ithilien against the Enemy. You are an intruder here.
 N:1085:Denethor, Steward of Gondor
 G:t:o
 I:130:55d100:40:160:10
-W:86:3:0:25000
+W:90:3:0:25000
 M:0:70:90:155
 B:HIT:FIRE:9d12
 B:HIT:FIRE:4d6
@@ -16474,7 +16475,7 @@ D: with deadly menace.
 N:1144:Maglor, Son of Feanor
 G:l:o
 I:115:60d15:30:68:255
-W:40:2:0:2000
+W:37:2:0:2000
 M:40:40:20:78
 B:HIT:HURT:12d6
 B:HIT:HURT:12d5
@@ -16539,7 +16540,7 @@ D: can follow.
 N:1148:Maedhros, Son of Feanor
 G:l:o
 I:120:60d15:30:68:255
-W:46:2:91:2500
+W:44:2:91:2500
 M:35:35:25:91
 B:HIT:HURT:9d10
 B:HIT:HURT:9d10
@@ -16730,7 +16731,7 @@ D: curses all that defy him.
 N:1158:Evil Iggy
 G:p:v1
 I:130:65d100:40:180:10
-W:69:3:0:35000
+W:81:3:0:35000
 M:0:40:105:134
 B:TOUCH:LOSE_STR:6d8
 B:HIT:UN_BONUS:10d10
@@ -16865,7 +16866,7 @@ D:A gigantic animated diamond statue of demonic shape.
 N:1165:15-headed Hydra
 G:M:v1
 I:135:70d90:50:150:20
-W:92:2:0:22000
+W:89:2:0:22000
 M:40:40:85:126
 B:BITE:POISON:8d10
 B:BITE:COLD:8d10
@@ -18275,4 +18276,23 @@ F:IM_ACID | IM_POIS | NO_CONF | NO_SLEEP | CAN_SWIM | CAN_CLIMB
 S:BESERK | INVIS | TELE_SELF_TO
 D:A spined and ferocious insect: its proboscis tastes the air and its head unerringly turns to you;
 D: leaping off walls and ceilings, it runs at you to implant its children in your still warm flesh.
+
+N:1272:Shadow of Caradhras, the Mountain
+G:P:D
+I:115:30d100:30:120:15
+W:66:3:0:7000
+M:20:20:65:57
+B:HIT:SHATTER:13d7
+B:HIT:CONFUSE:13d7
+B:BOULDER:HURT:20d10
+F:UNIQUE
+F:FORCE_SLEEP | FORCE_MAXHP
+F:ONLY_ITEM | DROP_GOOD | DROP_2D2 | KILL_WALL
+F:SMART | TAKE_ITEM | BASH_DOOR
+F:EVIL | GIANT | HURT_ROCK | HUGE
+F:IM_FIRE | IM_COLD | IM_ACID | IM_ELEC | IM_POIS
+S:BALL_WIND | BALL_STORM | BRTH_WIND | BOLT_ICE
+D:A foreboding shadow of the greatest peak of the Misty Mountains.  Even at
+D: this distance, its terrible strength drives you back with wintry blasts
+D: and furious blows.
 

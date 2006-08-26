@@ -629,8 +629,19 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 	/* Count the number of "known" attacks */
 	for (n = 0, m = 0; m < 4; m++)
 	{
+		int method;
+
+		/* Extract the attack info */
+		method = r_ptr->blow[m].method;
+
 		/* Skip non-attacks */
-		if (!r_ptr->blow[m].method) continue;
+		if (!method) continue;
+
+		/* Ranged? */
+		if ((ranged) && (method < RBM_MIN_RANGED)) continue;
+
+		/* Melee? */
+		if (!(ranged) && (method > RBM_MAX_NORMAL)) continue;
 
 		/* Count known attacks */
 		if (l_ptr->blows[m]) n++;
@@ -641,9 +652,6 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 	{
 		int method, effect, d1, d2;
 
-		/* Skip non-attacks */
-		if (!r_ptr->blow[m].method) continue;
-
 		/* Skip unknown attacks */
 		if (!l_ptr->blows[m]) continue;
 
@@ -652,6 +660,9 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 		effect = r_ptr->blow[m].effect;
 		d1 = r_ptr->blow[m].d_dice;
 		d2 = r_ptr->blow[m].d_side;
+
+		/* Skip non-attacks */
+		if (!method) continue;
 
 		/* Ranged? */
 		if ((ranged) && (method < RBM_MIN_RANGED)) continue;

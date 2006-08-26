@@ -306,6 +306,9 @@ damage will also be increased by charging.
 and then switch to a lighter weapon (taking a half-move to do so), and take advantage
 of the additional attacks the lighter weapon affords.
 
+- Massively reduce the power of the guardian of Caradhras. Rebalance unique depths.
+Swap stats of Baldor the Hapless and Lord of the Paths of the Dead.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -675,6 +678,8 @@ jevansau1).
 - Fixed description of Detect Power spell.
 
 - Fixed description of unique statues.
+
+- Fixed blow listing bugs in monster recall.
 
 ### Build / Platform ###
 
