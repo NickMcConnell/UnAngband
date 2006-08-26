@@ -4145,7 +4145,7 @@ void fake_bag_item(object_type *i_ptr, int sval, int slot)
 		i_ptr->number = 99;
 
 		/* Set stack counter */
-		i_ptr->stackc = (charges % number >= 99 ? 0 : charges % number);
+		i_ptr->stackc = 98;
 	}
 	else
 	{
@@ -4153,13 +4153,17 @@ void fake_bag_item(object_type *i_ptr, int sval, int slot)
 		i_ptr->number = number;
 
 		/* Set stack counter */
-		i_ptr->stackc = charges % number;
+		i_ptr->stackc = i_ptr->charges % number;
 	}
 
 	/* Awareness always gives full knowledge */
 	if (object_aware_p(i_ptr))
 	{
+		object_aware(i_ptr);
 		object_known(i_ptr);
+
+		/* Add usage information */
+		i_ptr->usage = k_info[i_ptr->k_idx].used;
 
 		/* Auto-inscribe */
 		if (!i_ptr->note) i_ptr->note = k_info[i_ptr->k_idx].note;
@@ -4243,12 +4247,12 @@ bool get_item_from_bag(int *cp, cptr pmt, cptr str, object_type *o_ptr)
 	if (i_ptr->tval == TV_WAND)
 	{
 		bag_contents[o_ptr->sval][item] -= i_ptr->number;
-		bag_contents[o_ptr->sval+1][item] -= i_ptr->charges * i_ptr->number + i_ptr->stackc;
+		bag_contents[o_ptr->sval+1][item] -= i_ptr->charges * i_ptr->number - i_ptr->stackc;
 	}
 	/* Reduce bag contents - torches hack */
 	else if ((i_ptr->tval == TV_LITE) && (i_ptr->sval == SV_LITE_TORCH))
 	{
-		bag_contents[o_ptr->sval][item] -= i_ptr->charges * i_ptr->number + i_ptr->stackc;
+		bag_contents[o_ptr->sval][item] -= i_ptr->charges * i_ptr->number - i_ptr->stackc;
 	}
 	/* Reduce bag contents */
 	else

@@ -1798,20 +1798,20 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 				/* Set total number */
 				total = bag_contents[o_ptr->sval][i] + j_ptr->number;
 				number = ((total < ((2 << 15) - 1)) ? total : (((2 << 15) - 1) - 1));
-				bag_contents[o_ptr->sval][i] = total;
+				bag_contents[o_ptr->sval][i] = number;
 
 				/* Set total charges */
-				total = bag_contents[o_ptr->sval+1][i] + j_ptr->charges * j_ptr->number + j_ptr->stackc;
+				total = bag_contents[o_ptr->sval+1][i] + j_ptr->charges * j_ptr->number - j_ptr->stackc;
 				number = ((total < ((2 << 15) - 1)) ? total : (((2 << 15) - 1) - 1));
-				bag_contents[o_ptr->sval+1][i] = total;
+				bag_contents[o_ptr->sval+1][i] = number;
 			}
 			/* Hack -- absorb torches */
 			else if ((j_ptr->tval == TV_LITE) && (j_ptr->sval == SV_LITE_TORCH))
 			{
 				/* Set total charges */
-				total = bag_contents[o_ptr->sval][i] + j_ptr->charges * j_ptr->number + j_ptr->stackc;
+				total = bag_contents[o_ptr->sval][i] + j_ptr->charges * j_ptr->number - j_ptr->stackc;
 				number = ((total < ((2 << 15) - 1)) ? total : (((2 << 15) - 1) - 1));
-				bag_contents[o_ptr->sval][i] = total;
+				bag_contents[o_ptr->sval][i] = number;
 			}
 			/* Hack -- absorb other */
 			else
@@ -1819,7 +1819,7 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 				/* Set total number */
 				total = bag_contents[o_ptr->sval][i] + j_ptr->number;
 				number = ((total < ((2 << 15) - 1)) ? total : (((2 << 15) - 1) - 1));
-				bag_contents[o_ptr->sval][i] = total;
+				bag_contents[o_ptr->sval][i] = number;
 			}
 
 			/* Hack -- Decrease the weight -- will be increased later */

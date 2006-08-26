@@ -692,6 +692,12 @@ some items from the bag should be selectable.
 - Fixed bug where zapping a rod would cause the magical bag of supplies to be shown
 as a choice (Reported by darkDrone).
 
+- Fixed math in computing charges of objects in bags that resulted in an infinite loop
+(Reported by Matthias Rudolf).
+
+- Fixed objects in bags so that if they are known, you learn the 'deep knowledge'
+regarding their activation effects (Reported by Matthias Rudolf).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
