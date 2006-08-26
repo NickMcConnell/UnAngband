@@ -2389,6 +2389,7 @@ void do_cmd_set_trap_or_spike(void)
 
 			if (strstr(f_name + f_info[feat].name, "rope"))
 			{
+				/* Restrict an item */
 				item_tester_tval = TV_ROPE;
 
 				/* Get an item */

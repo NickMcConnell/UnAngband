@@ -2214,20 +2214,18 @@ bool item_tester_okay(const object_type *o_ptr)
 		for (i = 0; i < INVEN_BAG_TOTAL; i++)
 		{
 			/* Empty slot */
-			if (!(bag_holds[o_ptr->sval][i][0]) || !(bag_contents[o_ptr->sval][i]))
-			{
-				i_ptr->k_idx = 0;
-				continue;
-			}
+			if (!(bag_holds[o_ptr->sval][i][0]) || !(bag_contents[o_ptr->sval][i])) continue;
 
 			/* Fake the item */
 			fake_bag_item(i_ptr, o_ptr->sval, i);
 
 			/* Check the tval */
-			if ((item_tester_tval) && (item_tester_tval == i_ptr->tval)) return (TRUE);
+			if ((item_tester_tval) && !(item_tester_tval == i_ptr->tval)) continue;
 
 			/* Check the hook */
-			if ((item_tester_hook) && ((*item_tester_hook)(i_ptr))) return (TRUE);
+			if ((item_tester_hook) && (!(*item_tester_hook)(i_ptr))) continue;
+
+			return(TRUE);
 		}
 	}
 
@@ -4036,12 +4034,16 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 	}
 
 
-	/* Forget the item_tester_tval restriction */
-	item_tester_tval = 0;
+	/* Forget the item restrictions if not picking a bag */
+	if (!(item) || ((*cp > 0) && (inventory[*cp].tval != TV_BAG))
+		|| ((*cp < 0) && (o_list[0 - *cp].tval != TV_BAG)))
+	{
+		/* Forget the item_tester_tval restriction */
+		item_tester_tval = 0;
 
-	/* Forget the item_tester_hook restriction */
-	item_tester_hook = NULL;
-
+		/* Forget the item_tester_hook restriction */
+		item_tester_hook = NULL;
+	}
 
 	/* Clean up */
 	if (show_choices)

@@ -973,10 +973,13 @@ void do_cmd_aim_wand(void)
 /*
  * Hook to determine if an object is activatable and charged
  */
-static bool item_tester_hook_charged(const object_type *o_ptr)
+static bool item_tester_hook_rod_charged(const object_type *o_ptr)
 {
+	/* Confirm this is a rod */
+	if (o_ptr->tval != TV_ROD) return(FALSE);
+
 	/* Check the recharge */
-      if ((o_ptr->timeout) && ((!o_ptr->stackc) || (o_ptr->stackc >= o_ptr->number))) return (FALSE);
+      	if ((o_ptr->timeout) && ((!o_ptr->stackc) || (o_ptr->stackc >= o_ptr->number))) return (FALSE);
 
 	/* Assume charged */
 	return (TRUE);
@@ -1013,11 +1016,8 @@ void do_cmd_zap_rod(void)
 		return;
 	}
 
-	/* Restrict choices to rods */
-	item_tester_tval = TV_ROD;
-
 	/* Restrict choices to charged items */
-	item_tester_hook = item_tester_hook_charged;
+	item_tester_hook = item_tester_hook_rod_charged;
 
 	/* Get an item */
 	q = "Zap which rod? ";
