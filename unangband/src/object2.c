@@ -3919,6 +3919,7 @@ int sense_magic(object_type *o_ptr, int sense_type, bool heavy)
 	{
 		case TV_RING:
 		case TV_AMULET:
+		case TV_LITE:
 		{
 			heavy = FALSE;
 		}

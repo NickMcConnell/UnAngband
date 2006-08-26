@@ -672,6 +672,8 @@ jevansau1).
 
 - Fixed bug preventing Lance of Eorlingas being a lance.
 
+- Fixed description of Detect Power spell.
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

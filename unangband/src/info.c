@@ -427,6 +427,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags1 & (SF1_DETECT_GOLD))	vp[vn++] = "gold, including hidden treasures";
 	if (s_ptr->flags1 & (SF1_DETECT_OBJECT))	vp[vn++] = "objects, including hidden objects";
 	if (s_ptr->flags1 & (SF1_DETECT_MAGIC))	vp[vn++] = "magic objects, and senses their power";
+	if (s_ptr->flags1 & (SF1_DETECT_POWER))	vp[vn++] = "powerful objects, and senses their power";
 	if (s_ptr->flags1 & (SF1_DETECT_CURSE))	vp[vn++] = "cursed objects, and senses their power";
 	if (s_ptr->flags1 & (SF1_DETECT_MONSTER))	vp[vn++] = "visible monsters";
 	if (s_ptr->flags1 & (SF1_DETECT_EVIL))	vp[vn++] = "evil monsters";
@@ -461,12 +462,15 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->type == SPELL_IDENT_PACK) id_flags |= (SF1_IDENT | SF1_IDENT_PACK);
 	if (s_ptr->flags1 & (SF1_DETECT_CURSE)) id_flags |= SF1_IDENT_PACK;
 	if (s_ptr->flags1 & (SF1_DETECT_MAGIC)) id_flags |= SF1_IDENT_PACK;
-	if (s_ptr->flags1 & (SF1_DETECT_CURSE)) id_flags |= SF1_IDENT_SENSE;
+	if (s_ptr->flags1 & (SF1_DETECT_POWER)) id_flags |= SF1_IDENT_PACK;
+	if (s_ptr->flags1 & (SF1_DETECT_MAGIC)) id_flags |= SF1_DETECT_CURSE;
+	if (s_ptr->flags1 & (SF1_DETECT_MAGIC)) id_flags |= SF1_IDENT_SENSE;
 	if (s_ptr->flags1 & (SF1_DETECT_POWER)) id_flags |= SF1_IDENT_SENSE;
 	if (s_ptr->flags1 & (SF1_FORGET)) id_flags |= SF1_IDENT_PACK;
 
 	/* Collect identifies */
 	vn = 0;
+	if (id_flags & (SF1_DETECT_CURSE)) vp[vn++]="curses";
 	if (id_flags & (SF1_IDENT_SENSE)) vp[vn++]="the general power level";
 	if (id_flags & (SF1_IDENT_MAGIC)) vp[vn++]="a magical attribute";
 	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="the bonuses to hit, damage and armour class";
