@@ -698,6 +698,8 @@ as a choice (Reported by darkDrone).
 - Fixed objects in bags so that if they are known, you learn the 'deep knowledge'
 regarding their activation effects (Reported by Matthias Rudolf).
 
+- Fixed ranger and rogue sensing (Reported by Pav Lucistnik).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

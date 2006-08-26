@@ -3663,11 +3663,11 @@ int value_check_aux10(object_type *o_ptr, bool limit, bool weapon)
 
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
-	/* Remove base kind flags */
-	f1 &= ~(k_info[o_ptr->k_idx].flags1);
-	f2 &= ~(k_info[o_ptr->k_idx].flags2);
-	f3 &= ~(k_info[o_ptr->k_idx].flags3);
-	f4 &= ~(k_info[o_ptr->k_idx].flags4);
+	/* Remove known flags */
+	f1 &= ~(o_ptr->can_flags1);
+	f2 &= ~(o_ptr->can_flags2);
+	f3 &= ~(o_ptr->can_flags3);
+	f4 &= ~(o_ptr->can_flags4);
 
 	/* Check flags 1 */
 	for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
@@ -3687,6 +3687,10 @@ int value_check_aux10(object_type *o_ptr, bool limit, bool weapon)
 	/* Check flags 3 if not weapon */
 	if (!limit || !weapon) for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
 	{
+		/* Skip 'useless' flags */
+		if (j & (TR3_ACTIVATE | TR3_RANDOM | TR3_INSTA_ART |
+			  TR3_EASY_KNOW | TR3_HIDE_TYPE | TR3_SHOW_MODS)) continue;
+
 		if (((f3) & (j)) && !(rand_int(++count))) { flag1 = 3; flag2 = j;}
 	}
 
