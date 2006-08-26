@@ -674,6 +674,8 @@ jevansau1).
 
 - Fixed description of Detect Power spell.
 
+- Fixed description of unique statues.
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

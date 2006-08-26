@@ -920,7 +920,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 				char tmp_buf[160];
 
 				strcpy(tmp_buf, r_name + r_info[o_ptr->name3].name);
-				strcat(tmp_buf, "'s");
+				if (o_ptr->tval != TV_STATUE) strcat(tmp_buf, "'s");
 				modstr = tmp_buf;
 
 				/* Skip a/an */
