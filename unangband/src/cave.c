@@ -5241,6 +5241,7 @@ static void cave_set_feat_aux(int y, int x, int feat)
 		if (o_ptr->ident & (IDENT_STORE))
 		{
 			delete_object_idx(this_o_idx);
+			continue;
 		}
 	}
 
@@ -5287,6 +5288,19 @@ static void cave_set_feat_aux(int y, int x, int feat)
 		lite_spot(y, x);
 	}
 
+	/* Apply terrain damage to all objects and player in the grid */
+	/* XXX Don't call project as we may be getting called from there. */
+	/* XXX Don't apply damage to monsters as we may lose out on getting experience */
+	/* XXX XXX Be aware, that project_o can cause subsequent changes in terrain type,
+	   resulting in recursion back here. However, we shouldn't have any dangerous
+	   dangling pointers because project_o just marks objects for subsequent destruction,
+	   and careful terrain design should hopefully pick up any infinite loops. */
+	if (f_ptr->blow.effect)
+	{
+		project_o(0, y, x, damroll(f_ptr->blow.d_dice,f_ptr->blow.d_side), f_ptr->blow.effect);
+		project_p(0, y, x, damroll(f_ptr->blow.d_dice,f_ptr->blow.d_side), f_ptr->blow.effect);
+		project_t(0, y, x, damroll(f_ptr->blow.d_dice,f_ptr->blow.d_side), f_ptr->blow.effect);
+	}
 }
 
 

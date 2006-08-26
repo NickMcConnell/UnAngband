@@ -610,7 +610,6 @@ static void process_world(void)
 
 		/* Damage from terrain */
 		hit_trap(p_ptr->py,p_ptr->px);
-
 	}
 
 	/* If paralyzed, we drown in shallow, deep or filled */

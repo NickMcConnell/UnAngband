@@ -5938,6 +5938,9 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 			/* Require drop space */
 			if ((f_info[cave_feat[ty][tx]].flags1 & (FF1_DROP)) == 0) continue;
 
+			/* Requires terrain that won't destroy it */
+			if (hates_terrain(j_ptr, cave_feat[ty][tx])) continue;
+
 			/* Don't like hiding items space */
 			if ((f_info[cave_feat[ty][tx]].flags2 & (FF2_HIDE_ITEM)) && (rand_int(100)<80)) continue;
 

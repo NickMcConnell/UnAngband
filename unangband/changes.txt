@@ -273,11 +273,17 @@ worth more.
 - Wielding a weapon or digger less than 20 lbs, or a bow or sling, but not crossbow,
 only take half a turn.
 
-- Added scrolls of test magic. These identify magic items and detect one ability of
-ego items or artifacts (Suggested by Matthias Rudolf).
+- Added scrolls, spells and services of test magic. These identify magic items and
+detect one ability of ego items or artifacts (Suggested by Matthias Rudolf).
+
+- Added Legend Lore as a store service and spell.
 
 - Improved semantics of becoming 'aware' of objects, particularly with reference to
 the bard's sense magic ability.
+
+- Prevent objects dropping on terrain that would destroy them.
+
+- Destroy objects on terrain if it changes to a destructive type.
 
 ### User Interface ###
 
@@ -659,6 +665,8 @@ equivalent files).
 - Fix to allow borg to ignore stat increase on level gain.
 
 - Fixed spelling of berserk.
+
+- Fixed bug causing objects to drop in shop doors and walls.
 
 Unangband 0.6.0 "Where's the Tequila? Did Tara Reid steal all the drinks?" (The Ari
 Gold Release)

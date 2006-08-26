@@ -1281,6 +1281,62 @@ static bool hates_water(object_type *o_ptr)
 }
 
 
+/*
+ * Does a given object (usually) hate a terrain type?
+ */
+bool hates_terrain(object_type *o_ptr, int f_idx)
+{
+	/* Require non-destructive space */
+	switch(f_info[f_idx].blow.effect)
+	{
+		case GF_NOTHING:
+			break;
+
+		case GF_ACID:
+		case GF_VAPOUR:
+			if (hates_acid(o_ptr)) return(TRUE);
+			break;
+
+		case GF_METEOR:
+			if (hates_fire(o_ptr)) return(TRUE);
+			/* Fall through */
+		case GF_ICE:
+		case GF_COLD:
+			if (hates_cold(o_ptr)) return(TRUE);
+			break;
+
+		case GF_STORM:
+			if (hates_water(o_ptr)) return(TRUE);
+			/* Fall through */
+		case GF_ELEC:
+			if (hates_elec(o_ptr)) return(TRUE);
+			break;
+
+		case GF_PLASMA:
+			if (hates_elec(o_ptr)) return(TRUE);
+			/* Fall through */
+		case GF_FIRE:
+		case GF_SMOKE:
+		case GF_HELLFIRE:
+			if (hates_fire(o_ptr)) return(TRUE);
+			break;
+
+		case GF_WATER:
+		case GF_BWATER:
+		case GF_BMUD:
+		case GF_STEAM:
+		case GF_WATER_WEAK:
+			if (hates_water(o_ptr)) return(TRUE);
+			break;
+
+		default:
+			return(TRUE);
+	}
+
+	return (FALSE);
+}
+
+
 
 
 
@@ -3366,7 +3422,7 @@ bool project_f(int who, int y, int x, int dam, int typ)
  *
  * We return "TRUE" if the effect of the projection is "obvious".
  */
-static bool project_o(int who, int y, int x, int dam, int typ)
+bool project_o(int who, int y, int x, int dam, int typ)
 {
 	s16b this_o_idx, next_o_idx = 0;
 
@@ -3403,6 +3459,9 @@ static bool project_o(int who, int y, int x, int dam, int typ)
 
 		/* Get the next object */
 		next_o_idx = o_ptr->next_o_idx;
+
+		/* Paranoia - don't break again */
+		if (o_ptr->ident & (IDENT_BREAKS)) continue;
 
 		/* Extract the flags */
 		object_flags(o_ptr, &f1, &f2, &f3, &f4);
@@ -3888,14 +3947,14 @@ static bool project_o(int who, int y, int x, int dam, int typ)
 					}
 				}
 
+				/* Delete the object later -- needs to happen before project_f below */
+				o_ptr->ident |= (IDENT_BREAKS);
+
 				/* Splash damage on terrain */
 				(void)project_f(0, y, x, damroll(1, o_ptr->weight), typ);
 
 				/* And apply effects */
 				(void)project_t(0, y, x, damroll(1, o_ptr->weight), typ);
-
-				/* Delete the object later */
-				o_ptr->ident |= (IDENT_BREAKS);
 
 				/* Redraw */
 				lite_spot(y, x);
