@@ -1642,15 +1642,18 @@ static void display_player_xtra_info(void)
 
 	Term_putstr(col+5, 13, -1, TERM_L_BLUE, format("%11s", buf));
 
+	/* Compute charging bonus */
+	if (p_ptr->cur_style & (1L << WS_UNARMED)) tmp = MAX(1, p_ptr->wt / 33);
+	else tmp = MAX(1, inventory[INVEN_WIELD].weight / 33);
 
 	/* Blows */
-	strnfmt(buf, sizeof(buf), "%d/turn", p_ptr->num_blow);
+	strnfmt(buf, sizeof(buf), "%d/turn(x%d)", p_ptr->num_blow, tmp);
 	Term_putstr(col, 14, -1, TERM_WHITE, "Blows");
 	Term_putstr(col+5, 14, -1, TERM_L_BLUE, format("%11s", buf));
 
 
 	/* Shots */
-	strnfmt(buf, sizeof(buf), "%d/turn", p_ptr->num_fire);
+	strnfmt(buf, sizeof(buf), "%d/turn(x%d)", p_ptr->num_fire, p_ptr->ammo_mult);
 	Term_putstr(col, 15, -1, TERM_WHITE, "Shots");
 	Term_putstr(col+5, 15, -1, TERM_L_BLUE, format("%11s", buf));
 

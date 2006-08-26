@@ -385,6 +385,8 @@ discussion with Pav Lucistnik).
 
 - Display the damage multiplier from slays and brands when examining a weapon.
 
+- Display bow multiplier in character screen.
+
 ### Bug fixes ###
 
 - Fix weapon branding.
