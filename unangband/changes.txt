@@ -390,6 +390,8 @@ discussion with Pav Lucistnik).
 
 - Display bow multiplier in character screen.
 
+- Changed name of terrain containing something (Requested by darkDrone).
+
 ### Bug fixes ###
 
 - Fix weapon branding.

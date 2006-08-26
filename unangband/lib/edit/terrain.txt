@@ -1889,7 +1889,7 @@ D:You have found something!
 
 # 0xxx --> pile of rubble (known item)
 
-N:97:something under a pile of rubble
+N:97:a pile of rubble containing something
 W:1:9:13:0
 G:&:w
 K:DEFAULT:1
@@ -10281,7 +10281,7 @@ F:TUNNEL | WALL | OUTER | CAN_PASS | ATTR_LITE | FILLED
 F:REMEMBER | HURT_ROCK | CAN_CLIMB |
 F:POWER_40
 
-N:758:something hidden in a lit fireplace
+N:758:a lit fireplace containing something
 U:56
 W:1:1:10:0
 G:&:r
@@ -10402,7 +10402,7 @@ F:BRIDGE | HURT_FIRE | POWER_1 | REMEMBER | HAS_ITEM
 F:MUST_CLIMB
 D:You have found something!
 
-N:767:something under a pile of wood
+N:767:a pile of wood containing something
 W:0:1:17:0
 G:::U
 U:56
@@ -10414,7 +10414,7 @@ F:EASY_CLIMB | CAN_FLY | HIDE_SNEAK | LOS | CAN_DIG | TUNNEL | PROJECT
 F:BRIDGE | HURT_FIRE | POWER_1 | REMEMBER | HAS_ITEM
 F:MUST_CLIMB
 
-N:768:something hidden in a midden
+N:768:a midden containing something
 U:56
 W:1:1:10:0
 G:&:g
