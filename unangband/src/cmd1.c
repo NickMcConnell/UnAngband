@@ -1932,7 +1932,7 @@ bool auto_activate(const object_type *o_ptr)
  *
  * If no "weapon" is available, then "punch" the monster one time.
  */
-void py_attack(int y, int x)
+void py_attack(int y, int x, bool charging)
 {
 	int num = 0, k, bonus, chance;
 
@@ -1945,6 +1945,7 @@ void py_attack(int y, int x)
 	int blows = 0; /* Number of blows actually delivered */
 
 	int i;
+	int num_blows = 0;
 	int do_cuts = 0;
 	int do_stun = 0;
 	
@@ -1961,6 +1962,8 @@ void py_attack(int y, int x)
 	bool do_quake = FALSE;
 
 	bool was_asleep;
+
+	cptr p;
 
 	/* Get the monster */
 	m_ptr = &m_list[cave_m_idx[y][x]];
@@ -2074,8 +2077,18 @@ void py_attack(int y, int x)
 	/* Mark the monster as attacked by melee */
 	m_ptr->mflag |= (MFLAG_HIT_BLOW);
 
+	/* Get number of blows */
+	num_blows = p_ptr->num_blow;
+
+	/* Restrict blows if charging */
+	if (charging)
+	{
+		if (melee_style & (1L << WS_TWO_WEAPON)) num_blows = MAX(2, num_blows);
+		else num_blows = 1;
+	}
+
 	/* Attack once for each legal blow */
-	while (num++ < p_ptr->num_blow)
+	while (num++ < num_blows)
 	{
 		int slot = INVEN_WIELD;
 
@@ -2106,7 +2119,7 @@ void py_attack(int y, int x)
 		if (melee_style & (1L << WS_UNARMED))
 		{
 			/* Use feet because hands are full */
-			if (o_ptr->k_idx) o_ptr = &inventory[INVEN_FEET];
+			if ((o_ptr->k_idx) || (charging)) o_ptr = &inventory[INVEN_FEET];
 
 			/* Alternate hands and feet */
 			else if (!(blows %2)) o_ptr = &inventory[INVEN_FEET];
@@ -2154,12 +2167,15 @@ void py_attack(int y, int x)
 					{
 						int j = rand_int(100);
 
-						if (j < 33)
-							do_cuts = critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
-						else if (j < 66)
+						/* Hack -- spears do damaging criticals, axes stun or cut */ 
+						if (!(strstr(k_name + k_info[o_ptr->k_idx].name, "Axe"))
+							&& !(strstr(k_name + k_info[o_ptr->k_idx].name, "Halberd"))
+							&& !(strstr(k_name + k_info[o_ptr->k_idx].name, "Scythe")))
+							k += critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
+						else if ((j < 50) && !(strstr(k_name + k_info[o_ptr->k_idx].name, "Scythe")))
 							do_stun = critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
 						else
-							k += critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
+							do_cuts = critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
 						break;
 					}
 					case TV_SWORD:
@@ -2174,6 +2190,7 @@ void py_attack(int y, int x)
 					}
 				}
 
+				/* Add damage bonus */
 				k += o_ptr->to_d;
 
 				/* Check for new flags */
@@ -2212,6 +2229,13 @@ void py_attack(int y, int x)
 			/* Adjust for style */
 			k += p_ptr->to_d + style_dam;
 
+			/* Adjust for charging */
+			if (charging)
+			{
+				if ((melee_style & (1L << WS_UNARMED)) && (p_ptr->wt > 33)) k *= p_ptr->wt / 33;
+				else if (o_ptr->weight >= 66) k *= o_ptr->weight / 33;
+			}
+
 			/* Monster armor reduces total damage */
 			k -= (k * ((r_ptr->ac < 150) ? r_ptr->ac : 150) / 250);
 
@@ -2228,23 +2252,41 @@ void py_attack(int y, int x)
 			if (melee_style & (1L << WS_BACKSTAB))
 			{
 				/* Message */
-				message_format(MSG_HIT, m_ptr->r_idx, "You backstab %s.", m_name);
+				p = "You backstab %s!";
 			}
 			else if (do_stun)
 			{
 				/* Message */
-				message_format(MSG_HIT, m_ptr->r_idx, "You batter %s.", m_name);
+				p = "You batter %s!";
 			}
 			else if (do_cuts)
 			{
 				/* Message */
-				message_format(MSG_HIT, m_ptr->r_idx, "You wound %s.", m_name);
+				p = "You wound %s!";
+			}
+			else if (charging)
+			{
+				/* Unarmed */
+				if (melee_style & (1L << WS_UNARMED)) p = "You flying kick %s!";
+
+				/* Message */
+				else p = "You charge %s!";
 			}
 			else
 			{
+				/* Unarmed punch */
+				if (melee_style & (1L << WS_UNARMED))
+				{
+					if (blows % 2) p = "You punch %s.";
+					else p = "You kick %s.";
+				}
+
 				/* Message */
-				message_format(MSG_HIT, m_ptr->r_idx, "You hit %s.", m_name);
+				else p = "You hit %s.";
 			}
+
+			/* Message */
+			message_format(MSG_HIT, m_ptr->r_idx, p, m_name);
 
 			/* Complex message */
 			if (p_ptr->wizard)
@@ -2461,8 +2503,11 @@ void py_attack(int y, int x)
 	/* Mega-Hack -- apply earthquake brand */
 	if (do_quake) earthquake(p_ptr->py, p_ptr->px, 10);
 
+	/* Charging uses full turn */
+	if (charging) p_ptr->energy_use = 100;
+
 	/* Only use required energy to kill monster */
-	p_ptr->energy_use = 100 * blows / p_ptr->num_blow;
+	else p_ptr->energy_use = 100 * blows / p_ptr->num_blow;
 }
 
 /*
@@ -2557,8 +2602,14 @@ void move_player(int dir, int jumping)
 	/* Hack -- attack monsters --- except hidden ones */
 	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)))
 	{
+		bool charging = FALSE;
+
+		/* If moving, you can charge in the direction */
+		if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
+			|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
+
 		/* Attack */
-		py_attack(y, x);
+		py_attack(y, x, charging);
 	}
 
 	else if (stuck_player(&dir))
@@ -2750,8 +2801,8 @@ void move_player(int dir, int jumping)
 		/* Dodging */
 		else
 		{
-			/* Dodging */
-			p_ptr->dodging = ddd_180[dir];
+			/* Dodging -- reverse direction 180 degrees */
+			p_ptr->dodging = 10 - dir;
 
 			/* Hack -- not blocking */
 			p_ptr->blocking = 0;

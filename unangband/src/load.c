@@ -1107,7 +1107,7 @@ static errr rd_extra(void)
 	rd_s16b(&p_ptr->oppose_pois);
 	rd_s16b(&p_ptr->free_act);
 
-	rd_byte(&tmp8u);	/* oops */
+	rd_byte(&p_ptr->charging);
 	rd_byte(&p_ptr->climbing);
 	rd_byte(&p_ptr->searching);
 	rd_byte(&tmp8u);	/* oops */

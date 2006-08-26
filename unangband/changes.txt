@@ -283,6 +283,29 @@ the bard's sense magic ability.
 
 - Prevent objects dropping on terrain that would destroy them.
 
+- Spear-type polearms only every cause additional critical damage. Axe-type polearms
+including halberds will either stun or cut an opponent. Scythes only cut an opponent.
+
+- Added charging. If you move and then immediately attack in the same direction, or
+to a 45 degree adjacent direction, you will charge instead of conduct a normal attack.
+Charging results in you making a single attack (or two attacks, if you are wielding two
+weapons), instead of your usual number of blows. However, if the weapon weighs 6.6 or
+more pounds, all damage you would normally do is multiplied by the weight in lbs of
+the weapon divided by 3.3 lbs. e.g. 6.6 lbs does double damage, 9.9 does triple, etc.
+  Be aware that you always charge now, so that weapons with high blows and low weight
+are less effective when you close to attack an opponent, unless they end up more than
+45 degrees away from the direction of your move.  In general, if you get more blows
+than the weapon charge multiplier, it is probably worth waiting for the monsters to
+come to you.
+  If you are fighting unarmed, you use your weight divided by 33 lbs instead for the
+damage multiplier to deliver a flying kick.  Charging also doubles the 'power' of your
+bashes against terrain, so a door that you cannot force might be defeatable with a run
+up. Note that spear-type polearms are the most effective at charging as their critical
+damage will also be increased by charging.
+  A new combat tactic might be to select a heavy weapon, use it to charge an opponent,
+and then switch to a lighter weapon (taking a half-move to do so), and take advantage
+of the additional attacks the lighter weapon affords.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -357,6 +380,10 @@ flags or damage (Following discussion with Pav Lucistnik).
 
 - Hid information about whether a character dodged or blocked last turn (After 
 discussion with Pav Lucistnik).
+
+- Distinguish when using hands or feet when attacking with unarmed combat.
+
+- Display the damage multiplier from slays and brands when examining a weapon.
 
 ### Bug fixes ###
 
@@ -637,6 +664,12 @@ jevansau1).
 
 - Fixed bug causing blessed weapons to display status twice (Reported by ekolis).
 
+- Fixed bug causing objects to drop in shop doors and walls.
+
+- Fixed bug preventing dodging working in correct direction.
+
+- Fixed bug preventing Lance of Eorlingas being a lance.
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
@@ -666,7 +699,6 @@ equivalent files).
 
 - Fixed spelling of berserk.
 
-- Fixed bug causing objects to drop in shop doors and walls.
 
 Unangband 0.6.0 "Where's the Tequila? Did Tara Reid steal all the drinks?" (The Ari
 Gold Release)

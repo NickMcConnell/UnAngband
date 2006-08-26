@@ -1677,23 +1677,31 @@ static const o_flag_desc pval_flags1_desc[] =
 
 
 /*
- * Slays for weapons
+ * Slays(x3 damage) for weapons
  */
-static const o_flag_desc slay_flags1_desc[] =
+static const o_flag_desc slayx3_flags1_desc[] =
 {
-	{ TR1_SLAY_NATURAL,	"natural creatures" },
 	{ TR1_SLAY_UNDEAD,	"undead" },
 	{ TR1_SLAY_DEMON,	"demons" },
-	{ TR1_SLAY_ORC,		"orcs" },
-	{ TR1_SLAY_TROLL,	"trolls" },
-	{ TR1_SLAY_GIANT,	"giants" },
 	{ TR1_SLAY_DRAGON,	"dragons" }
 };
 
+
 /*
- * Slays for weapons
+ * Slays(x4 damage) for weapons
  */
-static const o_flag_desc slay_flags4_desc[] =
+static const o_flag_desc slayx4_flags1_desc[] =
+{
+	{ TR1_SLAY_NATURAL,	"natural creatures" },
+	{ TR1_SLAY_ORC,		"orcs" },
+	{ TR1_SLAY_TROLL,	"trolls" },
+	{ TR1_SLAY_GIANT,	"giants" }
+};
+
+/*
+ * Slays(x4 damage) for weapons
+ */
+static const o_flag_desc slayx4_flags4_desc[] =
 {
 	{ TR4_SLAY_MAN,	"men" },
 	{ TR4_SLAY_ELF,	"elves" },
@@ -1701,9 +1709,9 @@ static const o_flag_desc slay_flags4_desc[] =
 };
 
 /*
- * Executes for weapons
+ * Slays(x5 damage) for weapons
  */
-static const o_flag_desc kill_flags1_desc[] =
+static const o_flag_desc slayx5_flags1_desc[] =
 {
 	{ TR1_KILL_UNDEAD,	"undead" },
 	{ TR1_KILL_DEMON,	"demons" },
@@ -1712,9 +1720,9 @@ static const o_flag_desc kill_flags1_desc[] =
 
 
 /*
- * Brands for weapons
+ * Brands(x3 damage) for weapons
  */
-static const o_flag_desc brand_flags1_desc[] =
+static const o_flag_desc brandx3_flags1_desc[] =
 {
 	{ TR1_BRAND_POIS,       "poison" },
 	{ TR1_BRAND_ACID,       "acid" },
@@ -1725,20 +1733,21 @@ static const o_flag_desc brand_flags1_desc[] =
 };
 
 /*
- * Brands for weapons
+ * Brands(x3 damage) for weapons
+ */
+static const o_flag_desc brandx3_flags4_desc[] =
+{
+	{ TR4_BRAND_LITE,   "light" },
+	{ TR4_BRAND_DARK,   "darkness" }
+};
+
+
+/*
+ * Brands(extra damage unspecified) for weapons
  */
 static const o_flag_desc brand_flags3_desc[] =
 {
 	{ TR3_IMPACT,   "earthquakes" }
-};
-
-/*
- * Brands for weapons
- */
-static const o_flag_desc brand_flags4_desc[] =
-{
-	{ TR4_BRAND_LITE,   "light" },
-	{ TR4_BRAND_DARK,   "darkness" }
 };
 
 
@@ -2099,14 +2108,112 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 	cptr list[40];
 	cptr *list_ptr;
 
-	/* Brands */
-	if (f1 || f3 || f4)
+	/* Slays - x5 damage */
+	if (f1)
 	{
 		list_ptr = list;
 
-		list_ptr = spoiler_flag_aux(f1, brand_flags1_desc, list_ptr, N_ELEMENTS(brand_flags1_desc));
+		list_ptr = spoiler_flag_aux(f1, slayx5_flags1_desc, list_ptr, N_ELEMENTS(slayx5_flags1_desc));
+
+		/* Terminate the description list */
+		*list_ptr = NULL;
+		
+		switch (mode)
+		{
+			case LIST_FLAGS_CAN:
+				anything |= outlist("It does x5 damage against", list, TERM_WHITE);
+				break;
+			case LIST_FLAGS_MAY:
+				anything |= outlist("It may do x5 damage against", list, TERM_L_WHITE);
+				break;
+			case LIST_FLAGS_NOT:
+				anything |= outlist("It does not do x5 damage against", list, TERM_SLATE);
+				break;
+		} 
+	}
+
+
+	/* Slays - x4 damage */
+	if ((f1) || (f4))
+	{
+		list_ptr = list;
+
+		list_ptr = spoiler_flag_aux(f1, slayx4_flags1_desc, list_ptr, N_ELEMENTS(slayx4_flags1_desc));
+		list_ptr = spoiler_flag_aux(f4, slayx4_flags4_desc, list_ptr, N_ELEMENTS(slayx4_flags4_desc));
+
+		/* Terminate the description list */
+		*list_ptr = NULL;
+		
+		switch (mode)
+		{
+			case LIST_FLAGS_CAN:
+				anything |= outlist("It does x4 damage against", list, TERM_WHITE);
+				break;
+			case LIST_FLAGS_MAY:
+				anything |= outlist("It may do x4 damage against", list, TERM_L_WHITE);
+				break;
+			case LIST_FLAGS_NOT:
+				anything |= outlist("It does not do x4 damage against", list, TERM_SLATE);
+				break;
+		} 
+	}
+
+	/* Brands - x3 damage */
+	if (f1 || f4)
+	{
+		list_ptr = list;
+
+		list_ptr = spoiler_flag_aux(f1, brandx3_flags1_desc, list_ptr, N_ELEMENTS(brandx3_flags1_desc));
+		list_ptr = spoiler_flag_aux(f4, brandx3_flags4_desc, list_ptr, N_ELEMENTS(brandx3_flags4_desc));
+
+		/* Terminate the description list */
+		*list_ptr = NULL;
+
+		switch (mode)
+		{
+			case LIST_FLAGS_CAN:
+				anything |= outlist("It does x3 damage from", list, TERM_WHITE);
+				break;
+			case LIST_FLAGS_MAY:
+				anything |= outlist("It may do x3 damage from", list, TERM_L_WHITE);
+				break;
+			case LIST_FLAGS_NOT:
+				anything |= outlist("It does not do x3 damage from", list, TERM_SLATE);
+				break;
+		} 
+
+	}
+
+	/* Slays - x3 damage */
+	if (f1)
+	{
+		list_ptr = list;
+
+		list_ptr = spoiler_flag_aux(f1, slayx3_flags1_desc, list_ptr, N_ELEMENTS(slayx3_flags1_desc));
+
+		/* Terminate the description list */
+		*list_ptr = NULL;
+		
+		switch (mode)
+		{
+			case LIST_FLAGS_CAN:
+				anything |= outlist("It does x3 damage against", list, TERM_WHITE);
+				break;
+			case LIST_FLAGS_MAY:
+				anything |= outlist("It may do x3 damage against", list, TERM_L_WHITE);
+				break;
+			case LIST_FLAGS_NOT:
+				anything |= outlist("It does not do x3 damage against", list, TERM_SLATE);
+				break;
+		} 
+	}
+
+	/* Brands - extra damage */
+	if (f3)
+	{
+		list_ptr = list;
+
 		list_ptr = spoiler_flag_aux(f3, brand_flags3_desc, list_ptr, N_ELEMENTS(brand_flags3_desc));
-		list_ptr = spoiler_flag_aux(f4, brand_flags4_desc, list_ptr, N_ELEMENTS(brand_flags4_desc));
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -2120,60 +2227,12 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 				anything |= outlist("It may do extra damage from", list, TERM_L_WHITE);
 				break;
 			case LIST_FLAGS_NOT:
-				anything |= outlist("It does not do extra damage from", list, TERM_SLATE);
+				anything |= outlist("It does no extra damage from", list, TERM_SLATE);
 				break;
 		} 
 
 	}
 
-	/* Slays */
-	if ((f1) || (f4))
-	{
-		list_ptr = list;
-
-		list_ptr = spoiler_flag_aux(f1, slay_flags1_desc, list_ptr, N_ELEMENTS(slay_flags1_desc));
-		list_ptr = spoiler_flag_aux(f4, slay_flags4_desc, list_ptr, N_ELEMENTS(slay_flags4_desc));
-
-		/* Terminate the description list */
-		*list_ptr = NULL;
-		
-		switch (mode)
-		{
-			case LIST_FLAGS_CAN:
-				anything |= outlist("It is especially deadly against", list, TERM_WHITE);
-				break;
-			case LIST_FLAGS_MAY:
-				anything |= outlist("It may be deadly against", list, TERM_L_WHITE);
-				break;
-			case LIST_FLAGS_NOT:
-				anything |= outlist("It does no extra damage against", list, TERM_SLATE);
-				break;
-		} 
-	}
-
-	/* Execute */
-	if (f1)
-	{
-		list_ptr = list;
-
-		list_ptr = spoiler_flag_aux(f1, kill_flags1_desc, list_ptr, N_ELEMENTS(kill_flags1_desc));
-
-		/* Terminate the description list */
-		*list_ptr = NULL;
-		
-		switch (mode)
-		{
-			case LIST_FLAGS_CAN:
-				anything |= outlist("It is a great bane of", list, TERM_WHITE);
-				break;
-			case LIST_FLAGS_MAY:
-				anything |= outlist("It may be a great bane of", list, TERM_L_WHITE);
-				break;
-			case LIST_FLAGS_NOT:
-				anything |= outlist("It is not a great bane of", list, TERM_SLATE);
-				break;
-		} 
-	}
 
 	/* Vampirism */
 	if (f4)
@@ -2684,6 +2743,15 @@ void list_object(const object_type *o_ptr, int mode)
 			case TV_DIGGING:
 				text_out("You can dig pits with this to trap monsters.  ");
 				anything = TRUE;
+				/* Fall through */
+			case TV_SWORD:
+			case TV_HAFTED:
+			case TV_POLEARM:
+				if (o_ptr->weight >= 66)
+				{
+					text_out(format("It does x%d damage when charging.  ", o_ptr->weight / 33));
+					anything = TRUE;
+				}
 				break;
 			case TV_SPIKE:
 				text_out("You can spike doors shut with this.  ");
@@ -2792,6 +2860,7 @@ void list_object(const object_type *o_ptr, int mode)
 			case TV_STAFF:
 			case TV_HAFTED:
 			case TV_POLEARM:
+			case TV_DIGGING:
 				text_out(format("When attacking or %sthrown, it ", (f3 & TR3_THROWING) ? "easily " : ""));
 				break;
 			case TV_LITE:

@@ -1372,6 +1372,8 @@ struct player_type
 
 	byte climbing; /* Currently climbing */
 	byte searching; /* Currently searching */
+	byte charging;	/* Currently charging */
+	byte unused;
 
 	u32b disease;	/* Disease types */
 
@@ -1403,7 +1405,6 @@ struct player_type
 	bool is_dead;   /* Player is dead */
 
 	bool wizard;    /* Player is in wizard mode */
-
 
 	/*** Temporary fields ***/
 

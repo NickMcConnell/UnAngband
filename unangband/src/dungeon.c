@@ -2676,6 +2676,9 @@ static void process_player(void)
 	/*** Clear dodging ***/
 	if (p_ptr->dodging)
 	{
+		/* Set charging -- reverse direction 180 degrees */
+		p_ptr->charging = 10 - p_ptr->dodging;
+
 		/* Clear dodging */
 		p_ptr->dodging = 0;
 	}
@@ -2984,6 +2987,13 @@ static void process_player(void)
 		}
 	}
 	while (!p_ptr->energy_use && !p_ptr->leaving);
+
+	/*** Clear charging ***/
+	if (p_ptr->charging)
+	{
+		/* Set dodging */
+		p_ptr->charging = 0;
+	}
 
 	/* Update noise flow information */
 	update_noise();

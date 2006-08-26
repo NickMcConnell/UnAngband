@@ -43,12 +43,41 @@ const s16b ddx_ddd[9] =
 const s16b ddy_ddd[9] =
 { 1, -1, 0, 0, 1, 1, -1, -1, 0 };
 
-/*
- * Global array for reversing "keypad directions" 180 degrees
- */
-const s16b ddd_180[9] =
-{ 8, 2, 4, 6, 7, 9, 1, 3, 5 };
 
+/*
+ * Given a central direction at position [dir #][0], return a series 
+ * of directions radiating out on both sides from the central direction 
+ * all the way back to its rear.
+ * 
+ * Side directions come in pairs; for example, directions '1' and '3' 
+ * flank direction '2'.  The code should know which side to consider 
+ * first.  If the left, it must add 10 to the central direction to 
+ * access the second part of the table.
+ */ 
+const byte side_dirs[20][8] = 
+{
+	{ 0, 0, 0, 0, 0, 0, 0, 0 },	/* bias right */
+	{ 1, 4, 2, 7, 3, 8, 6, 9 },
+	{ 2, 1, 3, 4, 6, 7, 9, 8 },
+	{ 3, 2, 6, 1, 9, 4, 8, 7 },
+	{ 4, 7, 1, 8, 2, 9, 3, 6 },
+	{ 5, 5, 5, 5, 5, 5, 5, 5 },
+	{ 6, 3, 9, 2, 8, 1, 7, 4 },
+	{ 7, 8, 4, 9, 1, 6, 2, 3 },
+	{ 8, 9, 7, 6, 4, 3, 1, 2 },
+	{ 9, 6, 8, 3, 7, 2, 4, 1 },
+
+	{ 0, 0, 0, 0, 0, 0, 0, 0 },	/* bias left */
+	{ 1, 2, 4, 3, 7, 6, 8, 9 },
+	{ 2, 3, 1, 6, 4, 9, 7, 8 },
+	{ 3, 6, 2, 9, 1, 8, 4, 7 },
+	{ 4, 1, 7, 2, 8, 3, 9, 6 },
+	{ 5, 5, 5, 5, 5, 5, 5, 5 },
+	{ 6, 9, 3, 8, 2, 7, 1, 4 },
+	{ 7, 4, 8, 1, 9, 2, 6, 3 },
+	{ 8, 7, 9, 4, 6, 1, 3, 2 },
+	{ 9, 8, 6, 7, 3, 4, 2, 1 } 
+};
 
 
 /*

@@ -1234,11 +1234,17 @@ void do_cmd_open(void)
 	/* Monster */
 	if (cave_m_idx[y][x] > 0)
 	{
+		bool charging = FALSE;
+
 		/* Message */
 		msg_print("There is a monster in the way!");
 
+		/* If moving, you can charge in the direction */
+		if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
+			|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
+
 		/* Attack */
-		py_attack(y, x);
+		py_attack(y, x, charging);
 	}
 
 	/* Door */
@@ -1378,11 +1384,17 @@ void do_cmd_close(void)
 	/* Monster */
 	if (cave_m_idx[y][x] > 0)
 	{
+		bool charging = FALSE;
+
 		/* Message */
 		msg_print("There is a monster in the way!");
 
+		/* If moving, you can charge in the direction */
+		if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
+			|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
+
 		/* Attack */
-		py_attack(y, x);
+		py_attack(y, x, charging);
 	}
 
 	/* Door */
@@ -1615,11 +1627,17 @@ void do_cmd_tunnel(void)
 	/* Monster */
 	if (cave_m_idx[y][x] > 0)
 	{
+		bool charging = FALSE;
+
 		/* Message */
 		msg_print("There is a monster in the way!");
 
+		/* If moving, you can charge in the direction */
+		if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
+			|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
+
 		/* Attack */
-		py_attack(y, x);
+		py_attack(y, x, charging);
 	}
 
 	/* Walls */
@@ -1813,11 +1831,17 @@ void do_cmd_disarm(void)
 	/* Monster */
 	if (cave_m_idx[y][x] > 0)
 	{
+		bool charging = FALSE;
+
 		/* Message */
 		msg_print("There is a monster in the way!");
 
+		/* If moving, you can charge in the direction */
+		if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
+			|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
+
 		/* Attack */
-		py_attack(y, x);
+		py_attack(y, x, charging);
 	}
 
 	/* Disarm trap */
@@ -1840,7 +1864,7 @@ void do_cmd_disarm(void)
  *
  * Returns TRUE if repeated commands may continue
  */
-static bool do_cmd_bash_aux(int y, int x)
+static bool do_cmd_bash_aux(int y, int x, bool charging)
 {
 	int bash, temp;
 
@@ -1888,6 +1912,9 @@ static bool do_cmd_bash_aux(int y, int x)
 	/* Hack -- Bash power based on strength */
 	/* (Ranges from 3 to 20 to 100 to 200) */
 	bash = adj_str_blow[p_ptr->stat_ind[A_STR]];
+
+	/* Bonus for charging */
+	if (charging) bash *= 2;
 
 	/* Extract door power */
 	temp = f_info[cave_feat[y][x]].power;
@@ -1967,6 +1994,8 @@ void do_cmd_bash(void)
 
 	int y, x, dir;
 
+	bool charging = FALSE;
+
 #ifdef ALLOW_EASY_OPEN
 
 	/* Easy Bash */
@@ -2008,6 +2037,10 @@ void do_cmd_bash(void)
 
 	}
 
+	/* If moving, you can charge in the direction you move */
+	if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
+		|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
+
 	/* Allow repeated command */
 	if (p_ptr->command_arg)
 	{
@@ -2028,14 +2061,14 @@ void do_cmd_bash(void)
 		msg_print("There is a monster in the way!");
 
 		/* Attack */
-		py_attack(y, x);
+		py_attack(y, x, charging);
 	}
 
 	/* Door */
 	else
 	{
 		/* Bash the door */
-		if (!do_cmd_bash_aux(y, x))
+		if (!do_cmd_bash_aux(y, x, charging))
 		{
 			/* Cancel repeat */
 			disturb(0, 0);
@@ -2117,8 +2150,17 @@ void do_cmd_alter(void)
 	/* Attack monsters */
 	if (cave_m_idx[y][x] > 0)
 	{
+		bool charging = FALSE;
+
+		/* Message */
+		msg_print("There is a monster in the way!");
+
+		/* If moving, you can charge in the direction */
+		if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
+			|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
+
 		/* Attack */
-		py_attack(y, x);
+		py_attack(y, x, charging);
 	}
 
 	/* Disarm traps */
@@ -2291,11 +2333,17 @@ void do_cmd_set_trap_or_spike(void)
 	/* Monster */
 	if (cave_m_idx[y][x] > 0)
 	{
+		bool charging = FALSE;
+
 		/* Message */
 		msg_print("There is a monster in the way!");
 
+		/* If moving, you can charge in the direction */
+		if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
+			|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
+
 		/* Attack */
-		py_attack(y, x);
+		py_attack(y, x, charging);
 	}
 
 	/* Go for it */
