@@ -681,6 +681,9 @@ jevansau1).
 
 - Fixed blow listing bugs in monster recall.
 
+- Fixed bug allowing involuntary teleportation whilst you are anchored (Reported by
+jevansau1).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

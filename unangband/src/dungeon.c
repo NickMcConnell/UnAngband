@@ -1564,8 +1564,14 @@ static void process_world(void)
 
 	/*** Involuntary Movement ***/
 
+	/* Mega-Hack -- Ignore if anchored */
+	if ((p_ptr->cur_flags4 & (TR4_ANCHOR)) != 0)
+	{
+		/* No involuntary teleportation */
+	}
+
 	/* Mega-Hack -- Random teleportation XXX XXX XXX */
-	if (((p_ptr->cur_flags3 & (TR3_TELEPORT)) != 0) && (rand_int(100) < 1))
+	else if (((p_ptr->cur_flags3 & (TR3_TELEPORT)) != 0) && (rand_int(100) < 1))
 	{
 		/* Teleport player */
 		teleport_player(40);
