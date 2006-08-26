@@ -283,8 +283,6 @@ the bard's sense magic ability.
 
 - Prevent objects dropping on terrain that would destroy them.
 
-- Destroy objects on terrain if it changes to a destructive type.
-
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

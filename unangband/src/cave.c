@@ -5288,6 +5288,9 @@ static void cave_set_feat_aux(int y, int x, int feat)
 		lite_spot(y, x);
 	}
 
+	/* XXX XXX Disabled the following because it still causes infinite loops */
+#if 0
+
 	/* Apply terrain damage to all objects and player in the grid */
 	/* XXX Don't call project as we may be getting called from there. */
 	/* XXX Don't apply damage to monsters as we may lose out on getting experience */
@@ -5301,6 +5304,8 @@ static void cave_set_feat_aux(int y, int x, int feat)
 		project_p(0, y, x, damroll(f_ptr->blow.d_dice,f_ptr->blow.d_side), f_ptr->blow.effect);
 		project_t(0, y, x, damroll(f_ptr->blow.d_dice,f_ptr->blow.d_side), f_ptr->blow.effect);
 	}
+
+#endif
 }
 
 
