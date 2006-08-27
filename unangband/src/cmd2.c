@@ -3538,7 +3538,6 @@ void do_cmd_fire(void)
 		{
 			monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
 			monster_race *r_ptr = &r_info[m_ptr->r_idx];
-			monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
 			int chance2 = chance - distance(py, px, y, x);
 
@@ -3551,25 +3550,7 @@ void do_cmd_fire(void)
 			if (m_ptr->mflag & (MFLAG_HIDE)) continue;
 
 			/* Some monsters are great at dodging  -EZ- */
-			if (((r_ptr->flags9 & (RF9_EVASIVE))!= 0) && (!m_ptr->csleep) &&
-				(!m_ptr->blind) && (!m_ptr->berserk) && (!m_ptr->monfear)
-				&& (rand_int(5 + m_ptr->cdis) >= (m_ptr->stunned || m_ptr->stunned ? 4 : 2)))
-			{
-				if (visible)
-				{
-					char m_name[80];
-
-					/* Get "the monster" or "it" */
-					monster_desc(m_name, m_ptr, 0);
-
-					message_format(MSG_MISS, 0, "%^s dodges!", m_name);
-
-					/* Learn that monster can dodge */
-					l_ptr->flags9 |= (RF9_EVASIVE);
-				}
-
-				continue;
-			}
+			if (mon_evade(m_ptr, (m_ptr->confused || m_ptr->stunned ? 1 : 3) + m_ptr->cdis, 5 + m_ptr->cdis,"")) continue;
 
 			/* Reset style bonuses */
 			style_hit = 0;
@@ -4143,25 +4124,7 @@ void do_cmd_throw(void)
 			if (m_ptr->mflag & (MFLAG_HIDE)) continue;
 
 			/* Some monsters are great at dodging  -EZ- */
-			if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!m_ptr->csleep) &&
-				(!m_ptr->blind) && (!m_ptr->confused) && (!m_ptr->monfear)
-				&& (rand_int(5 + m_ptr->cdis) >= (m_ptr->stunned ? 4 : 3)))
-			{
-				if (visible)
-				{
-					char m_name[80];
-
-					/* Get "the monster" or "it" */
-					monster_desc(m_name, m_ptr, 0);
-
-					message_format(MSG_MISS, 0, "%^s dodges!", m_name);
-
-					/* Learn that monster can dodge */
-					l_ptr->flags9 |= (RF9_EVASIVE);
-				}
-
-				continue;
-			}
+			if (mon_evade(cave_m_idx[y][x], m_ptr->confused || m_ptr->stunned ? 4 : 2, 5 + m_ptr->cdis,"")) continue;
 
 			/* Test hit fire */
 			hit_or_near_miss = test_hit_fire(chance2, calc_monster_ac(m_ptr, FALSE), m_ptr->ml);

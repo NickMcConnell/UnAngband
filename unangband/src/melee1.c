@@ -5521,9 +5521,52 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 }
 
 
+/*
+ * Determine if monster resists a blow.  -LM-
+ *
+ * Return TRUE if evasion was successful.
+ */
+bool mon_evade(const monster_type* m_ptr, int chance, int out_of, cptr r)
+{
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+	monster_lore *l_ptr = &l_list[m_ptr->r_idx];
+
+	char m_name[80];
+
+	cptr p;
+
+	/* Get "the monster" or "it" */
+	monster_desc(m_name, m_ptr, 0x40);
+
+	switch(rand_int(4))
+	{
+		case 0: p = "dodges"; break;
+		case 1: p = "evades"; break;
+		case 2: p = "side steps"; break;
+		case 3: p = "ducks"; break;
+	}
+
+	/* Hack -- evasive monsters may ignore trap */
+	if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!m_ptr->berserk) && (!m_ptr->blind)
+		&& (rand_int(out_of) >= chance))
+	{
+		if (m_ptr->ml)
+		{
+			/* Message */
+			message_format(MSG_MISS, 0, "%^s %s%s!", m_name, p, r);
+
+			/* Note that monster is evasive */
+			l_ptr->flags9 |= (RF9_EVASIVE);
+		}
+		return (TRUE);
+	}
+
+	return (FALSE);
+}
+
 
 /*
- * Determine if monster evades or resists a blow.  -LM-
+ * Determine if monster resists a blow.  -LM-
  *
  * Return TRUE if blow was avoided.
  */
@@ -5691,8 +5734,6 @@ void mon_hit_trap(int m_idx, int y, int x)
 {
 	feature_type *f_ptr;
 	monster_type *m_ptr = &m_list[m_idx];
-	monster_race *r_ptr = &r_info[m_ptr->r_idx];
-	monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
 	int feat = cave_feat[y][x];
 
@@ -5739,23 +5780,14 @@ void mon_hit_trap(int m_idx, int y, int x)
 	}
 
 	/* Hack -- evasive monsters may ignore trap */
-	if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!m_ptr->berserk) && (!m_ptr->blind)
-		&& (!rand_int(m_ptr->stunned || m_ptr->confused ? 2 : 5)))
+	if (mon_evade(m_ptr, m_ptr->stunned || m_ptr->confused ? 50 : 80, 100, " a trap"))
 	{
-		if (m_ptr->ml)
+		if (f_ptr->flags1 & (FF1_SECRET))
 		{
-			/* Message */
-			msg_format("%^s dodges a trap.", m_name);
-
-			/* Note that monster is evasive */
-			l_ptr->flags9 |= (RF9_EVASIVE);
-
-			if (f_ptr->flags1 & (FF1_SECRET))
-			{
-				/* Discover */
-				cave_alter_feat(y,x,FS_SECRET);
-			}
+			/* Discover */
+			cave_alter_feat(y,x,FS_SECRET);
 		}
+
 		return;
 	}
 

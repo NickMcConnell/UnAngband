@@ -317,6 +317,8 @@ Swap stats of Baldor the Hapless and Lord of the Paths of the Dead.
 - Added additional wood elves to try to make Mirkwood more interesting.  Made Brass
 Monkeys less common.
 
+- Evasive monsters can now dodge bolt and beam spells (From Eyangband).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

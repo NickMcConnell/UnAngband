@@ -2005,7 +2005,6 @@ void py_attack(int y, int x, bool charging)
 		return;
 	}
 
-
 	/* Check melee styles only */
 	melee_style = p_ptr->cur_style & (WS_WIELD_FLAGS);
 
@@ -2049,7 +2048,6 @@ void py_attack(int y, int x, bool charging)
 		{
 			switch (w_info[i].benefit)
 			{
-
 				case WB_HIT:
 					style_hit += (p_ptr->lev - w_info[i].level) /2;
 					break;
@@ -2096,18 +2094,7 @@ void py_attack(int y, int x, bool charging)
 		blows++;
 
 		/* Some monsters are great at dodging  -EZ- */
-		if (((r_ptr->flags9 & (RF9_EVASIVE)) != 0) && (!was_asleep)
-			&& (!m_ptr->berserk) && (!m_ptr->blind) && (!m_ptr->monfear)
-			&& (rand_int(m_ptr->stunned || m_ptr->confused? 2 : 5)))
-		{
-			message_format(MSG_MISS, 0, "%^s evades your blow!",
-				m_name);
-
-			/* Learn that monster can dodge */
-			l_ptr->flags9 |= (RF9_EVASIVE);
-
-			continue;
-		}
+		if (mon_evade(m_ptr, m_ptr->stunned || m_ptr->confused? 50 : 80, 100, "your blow")) continue;
 
 		/* Get secondary weapon instead */
 		if (!(blows % 2) && (melee_style & (1L << WS_TWO_WEAPON))) slot = INVEN_ARM;

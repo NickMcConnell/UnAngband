@@ -4360,7 +4360,6 @@ bool project_m(int who, int y, int x, int dam, int typ)
 	/* Get the monster name (BEFORE polymorphing) */
 	monster_desc(m_name, m_ptr, 0);
 
-
 	/* Some monsters get "destroyed" */
 	if ((r_ptr->flags3 & (RF3_NONLIVING)) ||
 	    (r_ptr->flags2 & (RF2_STUPID)))
@@ -11035,6 +11034,17 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 			/* Get the grid location */
 			y = gy[i];
 			x = gx[i];
+
+			/* Check for evasion */
+			/* Area-effect and jumping spells cannot be dodged */
+			if (!(flg & (PROJECT_ARC | PROJECT_STAR | PROJECT_JUMP |
+			             PROJECT_BOOM)) && (cave_m_idx[y][x] > 0))
+			{
+			 	monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
+
+				/* Check if monster evades */
+				if (mon_evade(m_ptr,(m_ptr->confused || m_ptr->stunned ? 1 : 3) + gd[i], 5 + gd[i], "")) continue;
+			}
 
 			/* Affect the monster in the grid */
 			if (project_m(who, y, x, dam_at_dist[gd[i]], typ))
