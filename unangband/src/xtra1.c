@@ -402,7 +402,7 @@ static void prt_depth(void)
 	}
 	else
 	{
-		sprintf(depths, "Lev %d", (p_ptr->depth-min_depth(p_ptr->dungeon)));
+		sprintf(depths, "Lev %d", (p_ptr->depth));
 	}
 
 	/* Right-Adjust the "depth", and clear old values */
@@ -513,6 +513,31 @@ static void prt_poisoned(void)
 	else
 	{
                 put_str((show_sidebar ? "        " : "    "), ROW_POISONED, COL_POISONED);
+	}
+}
+
+
+/*
+ * Prints Cursed status
+ */
+static void prt_disease(void)
+{
+	byte attr = TERM_GREEN;
+
+	if (p_ptr->disease & (1 << DISEASE_SPECIAL)) attr = TERM_L_DARK;
+	else if (p_ptr->disease & (DISEASE_HEAVY)) attr = TERM_VIOLET;
+	else if (p_ptr->disease & (DISEASE_QUICK)) attr = TERM_L_RED;
+	else if (p_ptr->disease & (DISEASE_POWER)) attr = TERM_RED;
+	else if (p_ptr->disease & (DISEASE_DISEASE)) attr = TERM_ORANGE;
+	else if (p_ptr->disease & (DISEASE_LIGHT)) attr = TERM_YELLOW;
+
+	if (p_ptr->disease)
+	{
+		c_put_str(attr, (show_sidebar ? "Disease" : "Dise"), ROW_DISEASE, COL_DISEASE);
+	}
+	else
+	{
+		put_str((show_sidebar ? "       " : "    "), ROW_DISEASE, COL_DISEASE);
 	}
 }
 
@@ -735,18 +760,18 @@ static void prt_speed(void)
 	if (i > 110)
 	{
 		attr = TERM_L_GREEN;
-		sprintf(buf, "Fast (+%d)", (i - 110));
+		sprintf(buf, (show_sidebar ? "Fast (+%d)" : "Spd+%d"), (i - 110));
 	}
 
 	/* Slow */
 	else if (i < 110)
 	{
 		attr = TERM_L_UMBER;
-		sprintf(buf, "Slow (-%d)", (110 - i));
+		sprintf(buf, (show_sidebar ? "Slow (-%d)" : "Spd+%d"), (110 - i));
 	}
 
 	/* Display the speed */
-	c_put_str(attr, format("%-14s", buf), ROW_SPEED, COL_SPEED);
+	c_put_str(attr, format((show_sidebar ? "%-10s" : "%-6"), buf), ROW_SPEED, COL_SPEED);
 }
 
 
@@ -1341,6 +1366,7 @@ static void prt_frame_extra(void)
 	prt_confused();
 	prt_afraid();
 	prt_poisoned();
+	prt_disease();
 	prt_cursed();
 	prt_amnesia();
 	prt_petrify();
@@ -3904,7 +3930,7 @@ void redraw_stuff(void)
 	/* HACK - Redraw window "Display player (status)" if necessary */
 	if (p_ptr->redraw & (PR_HUNGER | PR_BLIND | PR_CONFUSED | PR_AFRAID |
 	                     PR_POISONED | PR_STATE | PR_SPEED | PR_STUDY |
-	                     PR_DEPTH | PR_CURSED | PR_AMNESIA | PR_PETRIFY))
+	                     PR_DEPTH | PR_DISEASE | PR_CURSED | PR_AMNESIA | PR_PETRIFY))
 	{
 		p_ptr->window |= (PW_PLAYER_3);
 	}
@@ -4047,7 +4073,7 @@ void redraw_stuff(void)
 		p_ptr->redraw &= ~(PR_HUNGER);
 		p_ptr->redraw &= ~(PR_BLIND | PR_CONFUSED);
 		p_ptr->redraw &= ~(PR_AFRAID | PR_POISONED);
-		p_ptr->redraw &= ~(PR_CURSED | PR_AMNESIA | PR_PETRIFY);
+		p_ptr->redraw &= ~(PR_DISEASE | PR_CURSED | PR_AMNESIA | PR_PETRIFY);
 		p_ptr->redraw &= ~(PR_STATE | PR_SPEED | PR_STUDY);
 		prt_frame_extra();
 	}
@@ -4092,6 +4118,12 @@ void redraw_stuff(void)
 	{
 		p_ptr->redraw &= ~(PR_POISONED);
 		prt_poisoned();
+	}
+
+	if (p_ptr->redraw & (PR_DISEASE))
+	{
+		p_ptr->redraw &= ~(PR_DISEASE);
+		prt_disease();
 	}
 
 	if (p_ptr->redraw & (PR_CURSED))

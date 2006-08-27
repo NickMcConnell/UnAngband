@@ -402,9 +402,9 @@
 
 
 /*
- * There is a 1/160 chance per round of creating a new monster
+ * There is a 1/200 chance per round base chance of creating a new monster
  */
-#define MAX_M_ALLOC_CHANCE	160
+#define MAX_M_ALLOC_CHANCE	200
 
 /*
  * Normal levels get at least 14 monsters
@@ -660,47 +660,51 @@
 
 #define ROW_BLIND		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
 					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)): 2))
-#define COL_BLIND		(show_sidebar ? 7 : 30)	/* "Blind" */
+#define COL_BLIND		(show_sidebar ? (Term->wid >= 100  ? 7 : 6)  : 30)	/* "Blind" */
 
 #define ROW_CONFUSED	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
 					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_CONFUSED	(show_sidebar ? 13 : 34)	/* "Confused" */
+#define COL_CONFUSED	(show_sidebar ? (Term->wid >= 100  ? 13 : 11) : 34)	/* "Confused" */
 
 #define ROW_AFRAID	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
 					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_AFRAID	(show_sidebar ? 22 : 38)	/* "Afraid" */
+#define COL_AFRAID	(show_sidebar ? (Term->wid >= 100  ? 22 : 19) : 38)	/* "Afraid" */
 
 #define ROW_POISONED	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
 					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_POISONED	(show_sidebar ? 29 : 42)	/* "Poisoned" */
+#define COL_POISONED	(show_sidebar ? (Term->wid >= 100  ? 29 : 25) : 42)	/* "Poisoned" */
 
-#define ROW_STATE		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
+#define ROW_DISEASE	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
 					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_STATE		(show_sidebar ? 38 : 67)	/* <state> */
-
-#define ROW_SPEED		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
-					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_SPEED		(show_sidebar ? 49 : 52)	/* "Slow (-NN)" or "Fast (+NN)" */
-
-#define ROW_STUDY		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
-					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_STUDY		(show_sidebar ? 64 : 46)	/* "Study" */
-
-#define ROW_DEPTH		Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1)
-#define COL_DEPTH		(show_sidebar ? 70 : 72)	/* "Lev NNN" / "NNNN ft" */
-
+#define COL_DISEASE	(show_sidebar ? (Term->wid >= 100  ? 38 : 33) : 46)	/* "Disease" / "Dise" */
 
 #define ROW_CURSED	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
 					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_CURSED	(show_sidebar ? 78 : 78)	/* "Cursed" / "Cur" */
+#define COL_CURSED	(show_sidebar ? (Term->wid >= 100  ? 46 : 40) : 50)	/* "Cursed" / "Curs" */
 
 #define ROW_AMNESIA	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
 					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_AMNESIA	(show_sidebar ? 85 : 82)	/* "Amnesia" / "Amn" */
+#define COL_AMNESIA	(show_sidebar ? (Term->wid >= 100  ? 53 : 46) : 54)	/* "Amnesia" / "Forg" */
 
 #define ROW_PETRIFY	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
 					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_PETRIFY	(show_sidebar ? 93 : 86)	/* "Amnesia" / "Amn" */
+#define COL_PETRIFY	(show_sidebar ? (Term->wid >= 100  ? 61 : 53) : 58)	/* "Petrify" / "Petr" */
+
+#define ROW_STATE		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
+					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
+#define COL_STATE		(show_sidebar ? (Term->wid >= 100  ? 69 : 60) : 62)	/* <state> */
+
+#define ROW_SPEED		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
+					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
+#define COL_SPEED		(show_sidebar ? (Term->wid >= 100  ? 80 : 70) : 72)	/* "Slow (-NN)" or "Fast (+NN)" */
+
+#define ROW_STUDY		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
+					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
+#define COL_STUDY		(show_sidebar ? (Term->wid >= 100  ? 91 : 80) : 79)	/* "Study" */
+
+#define ROW_DEPTH		Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1)
+#define COL_DEPTH		(show_sidebar ? (Term->wid >= 100  ? 96 : 85) : 84)	/* "Lev NNN" / "NNNN ft" */
+
 
 
 /*** General index values ***/
@@ -2620,10 +2624,10 @@
 #define PR_BASIC		0x02000000L	/* Display Basic Info */
 #define PR_ITEM_LIST		0x04000000L     /* Display Item List */
 #define PR_MAP			0x08000000L	/* Display Map */
-#define PR_AMNESIA		0x10000000L	/* Display Extra (Cursed) */
-#define PR_CURSED		0x20000000L	/* Display Extra (Amnesia) */
+#define PR_DISEASE		0x10000000L	/* Display Extra (Disease) */
+#define PR_AMNESIA		0x20000000L	/* Display Extra (Cursed) */
+#define PR_CURSED		0x40000000L	/* Display Extra (Amnesia) */
 #define PR_PETRIFY		0x40000000L	/* Display Extra (Petrify) */
-/* xxx */
 
 /*
  * Bit flags for the "p_ptr->window" variable (etc)

@@ -412,6 +412,79 @@ bool restore_level(void)
 	return (FALSE);
 }
 
+
+/*
+ *  Prints the diseases that the player is afflicted with or cured of.
+ */
+bool disease_desc(char *desc, u32b old_disease, u32b new_disease)
+{
+	cptr vp[64];
+
+	int i, n, vn;
+
+	u32b disease = 0x0L;
+
+	/* Getting worse */
+	if ((disease = (new_disease & ~(old_disease))))
+	{
+		strcpy(desc,"You are afflicted with ");
+	}
+	/* Getting better */
+	else if ((disease = (old_disease & ~(new_disease))))
+	{
+		strcpy(desc,"You are cured of ");
+	}
+	/* No change */
+	else
+	{
+		return(FALSE);
+	}
+
+	/* Collect symptoms */
+	vn = 0;
+	for (i = 1, n = 0; n < DISEASE_TYPES_HEAVY; i <<= 1, n++)
+	{
+		if ((disease & i) != 0) vp[vn++] = disease_name[n];
+	}
+
+	/* Scan */
+	for (n = 0; n < vn; n++)
+	{
+		/* Intro */
+		if (n == 0) { }
+		else if (n < vn-1) strcat(desc,", ");
+		else strcat(desc," and ");
+
+		/* Dump */
+		strcat(desc,vp[n]);
+	}
+
+	/* Collect causes */
+	vn = 0;
+	for (i = (1 << DISEASE_TYPES_HEAVY), n = DISEASE_TYPES_HEAVY; n < 32; i <<= 1, n++)
+	{
+		if ((disease & i) != 0) vp[vn++] = disease_name[n];
+	}
+
+	/* Scan */
+	for (n = 0; n < vn; n++)
+	{
+		/* Intro */
+		if (n == 0) { if ((disease & ((1 << DISEASE_TYPES_HEAVY) -1)) != 0) strcat(desc, " caused by "); }
+		else if (n < vn-1) strcat(desc,", ");
+		else strcat(desc," and ");
+
+		/* Dump */
+		strcat(desc,vp[n]);
+	}
+
+	/* Dump */
+	strcat(desc,".");
+
+	return(TRUE);
+}
+
+
 /*
  *  Hack -- exclude the following flags from equipment self-knowledge except weapons.
  */
@@ -525,52 +598,15 @@ void self_knowledge_aux(bool spoil, bool random)
 
 	if (p_ptr->disease)
 	{
-		text_out("You are afflicted with ");
+		char output[1024];
+
 		healthy = FALSE;
 
-		/* Collect symptoms */
-		vn = 0;
-		for (i = 1, n = 0; n < DISEASE_TYPES_HEAVY; i <<= 1, n++)
+		/* Describe diseases */
+		if (disease_desc(output, 0, p_ptr->disease))
 		{
-			if ((p_ptr->disease & i) != 0) vp[vn++] = disease_name[n];
+			text_out(format("%s  ", output));
 		}
-
-		/* Scan */
-		for (n = 0; n < vn; n++)
-		{
-			/* Intro */
-			if (n == 0) { }
-			else if (n < vn-1) text_out(", ");
-			else text_out(" and ");
-
-			/* Dump */
-			text_out(vp[n]);
-		}
-
-		/* Collect causes */
-		vn = 0;
-		for (i = (1 << DISEASE_TYPES_HEAVY), n = DISEASE_TYPES_HEAVY; n < 32; i <<= 1, n++)
-		{
-			if ((p_ptr->disease & i) != 0) vp[vn++] = disease_name[n];
-		}
-
-		/* Hack -- add a cause if none found */
-		if (p_ptr->disease < (1 << DISEASE_TYPES_HEAVY)) vp[vn++] = disease_name[32];
-
-		/* Scan */
-		for (n = 0; n < vn; n++)
-		{
-			/* Intro */
-			if (n == 0) { if ((p_ptr->disease & ((1 << DISEASE_TYPES_HEAVY) -1)) != 0) text_out (" caused by "); }
-			else if (n < vn-1) text_out(", ");
-			else text_out(" and ");
-
-			/* Dump */
-			text_out(vp[n]);
-		}
-
-		/* Dump */
-		text_out(".  ");
 
 		/* Collect changes */
 		vn = 0;
@@ -6211,7 +6247,7 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 
 	cptr vp[64];
 
-	char buf[240];
+	char buf[1024];
 
 	char *s = buf;
 
@@ -6912,6 +6948,9 @@ bool process_spell_types(int spell, int level, bool *cancel)
 			case SPELL_CURE_DISEASE:
 			{
 				int v;
+				u32b old_disease = p_ptr->disease;
+
+				*cancel = FALSE;
 
 				/* Mega Hack -- one disease is hard to cure. */
 				if ((p_ptr->disease & (1 << DISEASE_SPECIAL)) && (s_ptr->param != DISEASE_SPECIAL))
@@ -6927,7 +6966,6 @@ bool process_spell_types(int spell, int level, bool *cancel)
 					if (p_ptr->disease < (1L << DISEASE_TYPES_HEAVY))
 					{
 						obvious = TRUE;
-						*cancel = FALSE;
 
 						p_ptr->disease = 0;
 					}
@@ -6945,11 +6983,10 @@ bool process_spell_types(int spell, int level, bool *cancel)
 				if ((p_ptr->disease & v) != 0)
 				{
 					obvious = TRUE;
-					*cancel = FALSE;
 
 					/* Hack -- always cure light diseases by treating any symptom */
 					if (p_ptr->disease & (DISEASE_LIGHT))
-						p_ptr->disease = 0;
+						p_ptr->disease &= (DISEASE_HEAVY | DISEASE_PERMANENT);
 					/* Remove a symptom/cause */
 					else
 						p_ptr->disease &= ~(v);
@@ -6959,9 +6996,27 @@ bool process_spell_types(int spell, int level, bool *cancel)
 					if ( ((s_ptr->param >= DISEASE_TYPES_HEAVY) && (p_ptr->disease < (1L << DISEASE_TYPES_HEAVY)))
 						|| ( ((p_ptr->disease & ((1L << DISEASE_TYPES_HEAVY) -1)) == 0) && !(p_ptr->disease & (DISEASE_HEAVY)) ) )
 					{
-						p_ptr->disease = 0;
+						p_ptr->disease &= (DISEASE_PERMANENT);
 					}
 				}
+
+				/* Print diseases cured */
+				if (obvious)
+				{
+					char output[1024];
+
+					disease_desc(output, old_disease, p_ptr->disease);
+					msg_print(output);
+
+					p_ptr->redraw |= (PR_DISEASE);
+
+					if (p_ptr->disease)
+					{
+						disease_desc(output, p_ptr->disease, 0x0L);
+						msg_print(output);
+					}
+				}
+
 				break;
 			}
 			case SPELL_SLOW_CONF:

@@ -405,6 +405,12 @@ discussion with Pav Lucistnik).
 
 - Changed name of terrain containing something (Requested by darkDrone).
 
+- Print messages and display a status flag when you are cured or afflicted with
+a disease (Requested by Pav Lucistnik).
+
+- Reorganise main screen to group all status flags together, and ensure that
+important information is always fitted onto the screen.
+
 ### Bug fixes ###
 
 - Fix weapon branding.

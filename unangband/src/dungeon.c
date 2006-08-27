@@ -1334,6 +1334,8 @@ static void process_world(void)
 	/*** Handle disease ***/
 	if (rand_int(300) < ((p_ptr->disease & (DISEASE_QUICK | DISEASE_LIGHT)) ? 3 : 1))
 	{
+		u32b old_disease = p_ptr->disease;
+
 		/* Get hit by disease */
 		if (p_ptr->disease & ((1 << DISEASE_BLOWS) - 1))
 		{
@@ -1534,8 +1536,8 @@ static void process_world(void)
 				/* Paralyze if heavy */
 				if (p_ptr->disease & (DISEASE_HEAVY)) (void)set_paralyzed(p_ptr->paralyzed + randint(3) + 1);
 
-				/* Not a pleasant cure but nonetheless */			
-				p_ptr->disease = 0;
+				/* Not a pleasant cure but nonetheless */
+				p_ptr->disease &= (DISEASE_HEAVY | DISEASE_PERMANENT);
 			}
 
 			/* Mutate plague */
@@ -1577,7 +1579,21 @@ static void process_world(void)
 		if ((p_ptr->disease & (DISEASE_LIGHT)) && !(rand_int(6)))
 		{
 			msg_print("The illness has subsided.");
-			p_ptr->disease = 0;
+			p_ptr->disease &= (DISEASE_HEAVY | DISEASE_PERMANENT);
+
+			p_ptr->redraw |= (PR_DISEASE);
+		}
+
+		/* Diseases? */
+		else if (old_disease != p_ptr->disease)
+		{
+			char output[1024];
+
+			disease_desc(output, old_disease, p_ptr->disease);
+
+			msg_print(output);
+
+			p_ptr->redraw |= (PR_DISEASE);
 		}
 	}
 

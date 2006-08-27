@@ -6999,6 +6999,9 @@ bool project_p(int who, int y, int x, int dam, int typ)
 	/* Object name (for drain) */
 	char o_name[80];
 
+	/* Get diseases */
+	u32b old_disease = p_ptr->disease;
+
 	/* No player here */
 	if (!(cave_m_idx[y][x] < 0)) return (FALSE);
 
@@ -7140,21 +7143,25 @@ bool project_p(int who, int y, int x, int dam, int typ)
 					if (dam > 0)
 					{
 						p_ptr->disease |= (1 << rand_int(DISEASE_TYPES_HEAVY));
+						dam -= 15;
 
-						if ((dam > 15) && (rand_int(3)))
+						if ((dam > 15) && (rand_int(4)))
 						{
 							p_ptr->disease |= (DISEASE_HEAVY);
 							dam -= 30;
 						}
 
-						if ((dam > 15) && (rand_int(3)))
+						else if ((dam > 15) && (rand_int(3)))
 						{
 							p_ptr->disease |= (DISEASE_QUICK);
 							dam -= 30;
 						}
 
-						if (dam > 0) p_ptr->disease |= (DISEASE_POWER);
-						dam -= 15;
+						else if ((dam > 15) && (rand_int(2)))
+						{
+							p_ptr->disease |= (DISEASE_POWER);
+							dam -= 30;
+						}
 					}
 
 					p_ptr->disease &= ~(DISEASE_LIGHT);
@@ -9767,6 +9774,17 @@ bool project_p(int who, int y, int x, int dam, int typ)
 		}
 	}
 
+	/* Diseases? */
+	if (old_disease != p_ptr->disease)
+	{
+		char output[1024];
+
+		disease_desc(output, old_disease, p_ptr->disease);
+
+		msg_print(output);
+
+		p_ptr->redraw |= (PR_DISEASE);
+	}
 
 	/* Disturb */
 	disturb(1, 0);
