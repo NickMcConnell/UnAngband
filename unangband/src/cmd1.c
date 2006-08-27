@@ -2097,8 +2097,8 @@ void py_attack(int y, int x, bool charging)
 
 		/* Some monsters are great at dodging  -EZ- */
 		if (((r_ptr->flags9 & (RF9_EVASIVE)) != 0) && (!was_asleep)
-			&& (!m_ptr->confused) && (!m_ptr->blind) && (!m_ptr->monfear)
-			&& (rand_int(m_ptr->stunned ? 2 : 4)))
+			&& (!m_ptr->berserk) && (!m_ptr->blind) && (!m_ptr->monfear)
+			&& (rand_int(m_ptr->stunned || m_ptr->confused? 2 : 5)))
 		{
 			message_format(MSG_MISS, 0, "%^s evades your blow!",
 				m_name);
@@ -2140,10 +2140,18 @@ void py_attack(int y, int x, bool charging)
 			/* Message */
 			message_format(MSG_MISS, m_ptr->r_idx, "You miss %s.", m_name);
 		}
+		/* Test for resistance */
 		else if (mon_resist_object(m_ptr, o_ptr))
 		{
 			/* No need for message */
-			continue;
+		}
+		/* Test for huge monsters -- they resist non-charging attacks */
+		else if ((!charging) && (rand_int(100) < 60))
+		{
+			/* Message */
+			message_format(MSG_MISS, m_ptr->r_idx, "You cannot reach %s.", m_name);
+
+			/* Miss */
 		}
 		/* Player hits */
 		else

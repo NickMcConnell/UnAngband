@@ -309,6 +309,12 @@ of the additional attacks the lighter weapon affords.
 - Massively reduce the power of the guardian of Caradhras. Rebalance unique depths.
 Swap stats of Baldor the Hapless and Lord of the Paths of the Dead.
 
+- Huge monsters are hard to melee except from charging attacks.  Also light weapons
+(less than 13.3 lbs) are less effective at hitting them.  Made more monsters huge.
+
+- Complete rebalancing of monsters from level 5 to level 35.
+
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

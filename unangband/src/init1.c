@@ -6857,7 +6857,6 @@ static long eval_hp_adjust(monster_race *r_ptr)
 
 	/* Miscellaneous improvements */
 	if (r_ptr->flags2 & RF2_REGENERATE) {hp *= 10; hp /= 9;}
-	if (r_ptr->flags9 & RF9_EVASIVE) 	{hp *= 3; hp /= 2;}
 	if (r_ptr->flags2 & RF2_PASS_WALL) 	{hp *= 3; hp /= 2;}
 	else if (r_ptr->flags6 & RF6_WRAITHFORM) {hp *= 6; hp /= 5;}
 
@@ -6905,6 +6904,12 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	if (r_ptr->flags9 & RF9_IM_BLUNT) 	resists += 5;
 	else if (r_ptr->flags9 & RF9_RES_BLUNT) resists += 2;
 
+	/* Hack -- Huge = tough */
+	if (r_ptr->flags3 & RF3_HUGE) resists += 3;
+
+	/* Hack -- Evasive = tough */
+	if (r_ptr->flags9 & RF9_EVASIVE) resists += 2;
+ 
 	/* Bonus for multiple basic resists and weapon resists */
 	if (resists >= 10) resists *= 6;
 	else if (resists >= 10) resists *= 4;

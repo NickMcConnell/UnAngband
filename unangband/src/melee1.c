@@ -5560,7 +5560,7 @@ bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
 		case TV_DIGGING:
 		case TV_SPIKE:
 		{
-			/* Resist */
+			/* Immunity */
 			if ((r_ptr->flags9 & (RF9_IM_EDGED)) != 0)
 			{
 				/* Resist */
@@ -5573,10 +5573,8 @@ bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
 					l_ptr->flags9 |= (RF9_IM_EDGED);
 					learn = TRUE;
 				}
-
-				/* Take note */
-				note = "glances off of";
 			}
+			/* Resist */
 			else if ((r_ptr->flags9 & (RF9_RES_EDGED)) != 0)
 			{
 				resist = 60;
@@ -5587,15 +5585,22 @@ bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
 					l_ptr->flags9 |= (RF9_RES_EDGED);
 					learn = TRUE;
 				}
-
-				note = "glances off of";
 			}
 
+			/* Resist light weapons */
+			if ((r_ptr->flags3 & (RF3_HUGE)) != 0)
+			{
+				resist = MAX(resist, 133 - o_ptr->weight);
+			}
+
+			/* Take note */
+			note = "glances off of";
 			break;
 		}
 
 		default:
 		{
+			/* Immunity */
 			if ((r_ptr->flags9 & (RF9_IM_BLUNT)) != 0)
 			{
 				resist = 85;
@@ -5606,12 +5611,8 @@ bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
 					l_ptr->flags9 |= (RF9_IM_BLUNT);
 					learn = TRUE;
 				}
-
-				if (strchr("GvE", r_ptr->d_char))
-					note = "passes harmlessly through";
-				else
-					note = "bounces off of";
 			}
+			/* Resist */
 			else if ((r_ptr->flags9 & (RF9_RES_BLUNT)) != 0)
 			{
 				resist = 60;
@@ -5622,12 +5623,19 @@ bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
 					l_ptr->flags9 |= (RF9_RES_BLUNT);
 					learn = TRUE;
 				}
-
-				if (strchr("GvE", r_ptr->d_char))
-					note = "passes harmlessly through";
-				else
-					note = "bounces off of";
 			}
+
+			/* Resist light weapons */
+			if ((r_ptr->flags3 & (RF3_HUGE)) != 0)
+			{
+				resist = MAX(resist, 133 - o_ptr->weight);
+			}
+
+			/* Take note */
+			if (strchr("GvE", r_ptr->d_char))
+				note = "passes harmlessly through";
+			else
+				note = "bounces off of";
 
 			break;
 		}
@@ -5732,7 +5740,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 	/* Hack -- evasive monsters may ignore trap */
 	if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!m_ptr->berserk) && (!m_ptr->blind)
-		&& (!rand_int(m_ptr->stunned ? 2 : 3)))
+		&& (!rand_int(m_ptr->stunned || m_ptr->confused ? 2 : 5)))
 	{
 		if (m_ptr->ml)
 		{
