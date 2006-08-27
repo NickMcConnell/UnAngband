@@ -554,25 +554,45 @@ static void process_world(void)
 
 	/*** Process the monsters ***/
 
-	/* Check for creature generation */
-	if (rand_int(MAX_M_ALLOC_CHANCE) == 0)
+	/* Create new monsters */
+	if (p_ptr->depth)
 	{
-		/* Ensure wandering monsters suit the dungeon level */
-		get_mon_num_hook = dun_level_mon;
+		/* Base odds against a new monster (200 to 1) */
+		int odds = MAX_M_ALLOC_CHANCE;
 
-		/* Prepare allocation table */
-		get_mon_num_prep();
+		int max_m_cnt = (2 * p_ptr->depth / 3) + 20;
 
-		/* Make a new monster */
-		(void)alloc_monster(MAX_SIGHT + 5, FALSE);
+		/* Do not overpopulate the dungeon (important) */
+		if (m_cnt > max_m_cnt) odds += 4 * (m_cnt - max_m_cnt);
 
-		/* Ensure wandering monsters suit the dungeon level */
-		get_mon_num_hook = NULL;
+		/* Fewer monsters if stealthy, more if deep */
+		odds += p_ptr->skill_stl * 2;
+		odds -= p_ptr->depth / 2;
 
-		/* Prepare allocation table */
-		get_mon_num_prep();
+		/* Check for creature generation */
+		if (!rand_int(odds))
+		{
+			bool slp = FALSE;
+
+			/* Sneaky characters make monsters sleepy */
+			if (p_ptr->skill_stl > rand_int(100)) slp = TRUE;
+
+			/* Ensure wandering monsters suit the dungeon level */
+			get_mon_num_hook = dun_level_mon;
+
+			/* Prepare allocation table */
+			get_mon_num_prep();
+
+			/* Make a new monster */
+			(void)alloc_monster(MAX_SIGHT + 5, slp);
+
+			/* Ensure wandering monsters suit the dungeon level */
+			get_mon_num_hook = NULL;
+
+			/* Prepare allocation table */
+			get_mon_num_prep();
+		}
 	}
-
 
 
 	/*** Stastis ***/

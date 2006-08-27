@@ -319,6 +319,9 @@ Monkeys less common.
 
 - Evasive monsters can now dodge bolt and beam spells (From Eyangband).
 
+- Monsters spawn more frequently deeper in the dungeon. Stealth now affects spawning
+rate, and can result in monsters being spawned asleep (From SAngband).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
