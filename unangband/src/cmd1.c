@@ -2133,7 +2133,7 @@ void py_attack(int y, int x, bool charging)
 			/* No need for message */
 		}
 		/* Test for huge monsters -- they resist non-charging attacks */
-		else if ((!charging) && (rand_int(100) < 60))
+		else if ((r_ptr->flags3 & (RF3_HUGE)) && (!charging) && (rand_int(100) < 60))
 		{
 			/* Message */
 			message_format(MSG_MISS, m_ptr->r_idx, "You cannot reach %s.", m_name);
