@@ -314,6 +314,8 @@ Swap stats of Baldor the Hapless and Lord of the Paths of the Dead.
 
 - Complete rebalancing of monsters from level 5 to level 35.
 
+- Added additional wood elves to try to make Mirkwood more interesting.  Made Brass
+Monkeys less common.
 
 ### User Interface ###
 

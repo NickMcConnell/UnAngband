@@ -715,7 +715,7 @@ D:It's green and it's oozing.
 N:54:Poltergeist
 G:G:W
 I:130:2d5:8:15:10
-W:5:2:0:8
+W:7:2:0:8
 M:0:6:0:23
 B:TOUCH:TERRIFY
 F:RAND_50 | RAND_25
@@ -1007,7 +1007,7 @@ D:He is leaving behind a trail of dropped spell components.
 N:78:Green naga
 G:n:g
 I:110:9d8:18:40:120
-W:5:1:0:30
+W:10:1:0:30
 M:11:0:0:0
 B:CRUSH:HURT:1d8
 B:SPIT:ACID:2d6
@@ -1058,7 +1058,7 @@ D:It is a large pile of pulsing green flesh.
 N:82:Large goblin
 G:k:b
 I:110:13d9:20:32:30
-W:5:1:0:25
+W:7:1:0:25
 B:HIT:HURT:1d10
 F:DROP_90
 F:OPEN_DOOR | BASH_DOOR
@@ -1294,7 +1294,7 @@ D:A disembodied eye, bloodshot and nasty.
 N:102:Pink naga
 G:n:R
 I:110:11d8:20:40:120
-W:7:2:0:40
+W:11:2:0:40
 B:CRUSH:HURT:1d10
 B:BITE:LOSE_STR:1d4
 F:FEMALE
@@ -1351,7 +1351,7 @@ D: shambles forward.
 N:107:Lost soul
 G:G:B
 I:110:2d8:12:10:10
-W:7:4:0:18
+W:9:4:0:18
 M:0:6:0:26
 B:HIT:HURT:2d9
 B:TOUCH:LOSE_WIS
@@ -1546,7 +1546,7 @@ D:He is a hardy well-weathered survivor.
 N:121:Bandit
 G:t:r
 I:110:15d9:20:24:10
-W:7:2:0:26
+W:9:2:0:26
 M:18:0:2:0
 B:HIT:HURT:2d5
 B:TOUCH:EAT_GOLD
@@ -1561,7 +1561,7 @@ D:He is after your cash!
 N:122:Yeti
 G:Y:w
 I:110:11d9:20:24:10
-W:5:3:0:30
+W:8:3:0:30
 B:CLAW:HURT:1d3
 B:CLAW:HURT:1d3
 B:BITE:HURT:1d4
@@ -1739,7 +1739,7 @@ D:It is a vast black spider whose bulbous body is bloated with poison.
 N:136:Wood elf mage
 G:l:r
 I:120:7d10:20:16:20
-W:7:1:0:50
+W:10:1:0:50
 M:0:20:6:32
 B:HIT:HURT:1d6
 B:HIT:HURT:1d6
@@ -1821,7 +1821,7 @@ D:He is a cunning and devious orc.
 N:141:Giant white tick
 G:S:w
 I:100:12d8:12:40:20
-W:7:2:0:27
+W:8:2:0:27
 B:BITE:SLOW:2d6
 F:WEIRD_MIND | BASH_DOOR
 F:IM_POIS | NEVER_MISS
@@ -1889,7 +1889,7 @@ D: other demon matches its teleporting mastery.
 N:146:Creeping gold coins
 G:$:y
 I:100:18d8:5:36:10
-W:6:2:0:32
+W:7:2:0:32
 B:HIT:BATTER:3d6
 F:ONLY_GOLD | DROP_90 | DROP_1D2
 F:COLD_BLOOD | BASH_DOOR
@@ -2075,7 +2075,7 @@ D: of abducting Luthien from Doriath.
 N:160:Goblin wizard
 G:k:R
 I:110:12d9:18:24:10
-W:7:2:0:28
+W:11:2:0:28
 M:0:25:5:35
 B:HIT:HURT:1d8
 F:FORCE_SLEEP
@@ -2955,7 +2955,7 @@ D: your fingers as energy builds up in the air around you.
 N:224:Potion mimic
 G:!:w
 I:110:10d10:25:30:0
-W:5:3:0:60
+W:10:3:0:60
 M:0:18:9:51
 B:HIT:POISON:3d4
 B:HIT:HURT:2d3
@@ -8452,7 +8452,7 @@ D: steed for his Ringwraiths.
 N:563:Cave bear
 G:Q:u
 I:110:8d8:10:35:10
-W:5:1:0:25
+W:7:1:0:25
 B:CLAW:HURT:1d6
 B:CLAW:HURT:1d6
 B:BITE:HURT:1d8
@@ -8908,7 +8908,7 @@ D: the nether hells to seek revenge on the world.
 N:588:Black eye
 G:e:D
 I:120:15d8:2:6:10
-W:7:3:0:80
+W:10:3:0:80
 M:15:15:5:56
 B:GAZE:EXP_10
 B:GAZE:EXP_10
@@ -10285,7 +10285,7 @@ D:It is about three feet long and has poisonous pincers.
 N:682:Giant copper ant
 G:a:u
 I:110:8d8:12:34:60
-W:7:2:0:22
+W:12:2:0:22
 B:BITE:HURT:2d4
 B:STING:ELEC:2d4
 F:WEIRD_MIND | BASH_DOOR | IM_ACID | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
@@ -11032,7 +11032,7 @@ D:It is about four feet long and carnivorous.
 N:740:Giant pink centipede
 G:c:R
 I:110:5d8:7:10:40
-W:6:1:0:11
+W:11:1:0:11
 B:BITE:HURT:2d3
 B:STING:LOSE_STR:2d4
 F:RAND_25 | FRIENDS |
@@ -11883,7 +11883,7 @@ D:A shimmering ball of light which dances around town.
 N:801:Unseen servant
 G:E:y
 I:110:9d8:12:28:40
-W:5:4:15:58
+W:8:4:15:58
 B:HIT:HURT:1d6
 B:HIT:HURT:1d6
 F:RAND_50 | 
@@ -12020,7 +12020,7 @@ D:It looks poisonous.
 N:812:Giant red frog
 G:F:r
 I:110:6d8:12:20:50
-W:6:1:0:16
+W:9:1:0:16
 M:14:0:0:0
 B:BITE:POISON:3d4
 B:SPIT:LOSE_STR:1d4
@@ -12104,7 +12104,7 @@ D:It looks poisonous.
 N:820:Giant gold frog
 G:F:y
 I:110:7d8:12:24:50
-W:6:1:0:20
+W:8:1:0:20
 B:BITE:POISON:5d4
 F:RAND_25 | 
 F:BASH_DOOR | 
@@ -12148,7 +12148,7 @@ D:It is as big as a wolf.
 N:824:Giant green toad
 G:F:g
 I:110:6d8:12:24:50
-W:6:2:0:24
+W:8:2:0:24
 M:14:14:0:0
 B:BITE:POISON:3d4
 B:SPIT:SLOW:2d4
@@ -12274,7 +12274,7 @@ D:It is a massive coal-powered statue that moves steadily towards you.
 N:833:Brass monkey
 G:g:o
 I:110:14d8:12:30:10
-W:20:1:0:100
+W:20:4:0:100
 M:14:0:0:0
 B:HIT:HURT:1d8
 B:HIT:ACID:2d4
@@ -12305,7 +12305,7 @@ D:It is a massive ice statue that moves steadily towards you.
 N:835:Shiver
 G:G:w
 I:120:4d5:10:17:10
-W:7:2:0:16
+W:11:2:0:16
 M:0:8:8:20
 B:TOUCH:TERRIFY:1d5
 F:RAND_50 | RAND_25 | ATTR_CLEAR |
@@ -12504,7 +12504,7 @@ D:It is implacable, inescapable, and yet only a shadow of its true master.
 N:848:Forgotten soul
 G:G:o
 I:110:2d9:12:10:12
-W:6:4:0:18
+W:8:4:0:18
 M:0:6:0:30
 B:HIT:HURT:2d3
 B:TOUCH:LOSE_INT
@@ -12518,7 +12518,7 @@ D:It is almost insubstantial.
 N:849:Hungry soul
 G:G:R
 I:110:3d10:12:10:12
-W:6:4:0:24
+W:9:4:0:24
 M:0:8:0:34
 B:HIT:HUNGER:2d2
 B:TOUCH:EAT_FOOD
@@ -12888,7 +12888,7 @@ D: sophisticated.
 N:876:Gnome warrior
 G:h:u
 I:110:10d8:18:30:10
-W:5:2:0:30
+W:7:2:0:30
 B:HIT:HURT:1d8
 B:HIT:HURT:1d8
 F:MALE | 
@@ -12953,7 +12953,7 @@ D:A wizard of short stature.
 N:881:Dwarven warrior
 G:h:U
 I:110:10d10:18:30:10
-W:6:1:0:32
+W:8:1:0:32
 B:HIT:HURT:1d8
 B:HIT:HURT:1d8
 F:MALE | DWARF | RES_BLIND | SMART
@@ -13648,7 +13648,7 @@ D:It is about sixteen feet long.
 N:940:Sea snake
 G:J:b
 I:110:10d8:10:32:1
-W:5:1:0:25
+W:7:1:0:25
 B:BITE:POISON:3d4
 F:RAND_50 | 
 F:BASH_DOOR | CAN_SWIM |
@@ -13732,7 +13732,7 @@ D:He is an ugly, piratical looking humanoid armed with a hook.
 N:947:Killer dung beetle
 G:K:D
 I:110:16d8:10:45:30
-W:7:1:0:58
+W:10:1:0:58
 B:BITE:HURT:4d4
 F:RAND_25 |
 F:WEIRD_MIND | BASH_DOOR | 
@@ -13840,7 +13840,7 @@ F:WEIRD_MIND | BASH_DOOR | RAND_25
 F:INSECT | IM_POIS
 D:It is looking for prey.
 
-N:958:Wood elf ranger
+N:958:Wood elf hunter
 G:l:g
 I:115:10d10:20:16:20
 W:9:1:0:50
@@ -14153,7 +14153,7 @@ D:A strange white growth on the dungeon floor.
 N:976:Blue mold
 G:m:b
 I:110:15d8:2:12:99
-W:6:1:0:20
+W:8:1:0:20
 B:TOUCH:COLD:1d6
 B:AURA:COLD:1d3
 F:NEVER_MOVE | 
@@ -14188,7 +14188,7 @@ D:It is a strange slimy growth on the dungeon floor.
 N:979:Warty mold
 G:m:u
 I:110:21d8:2:14:75
-W:5:2:0:28
+W:6:2:0:28
 B:AURA:LOSE_CHR:1d4
 F:NEVER_MOVE | 
 F:STUPID | EMPTY_MIND | RES_BLIND | NO_STUN | NO_CUTS
@@ -15111,7 +15111,7 @@ D:nagas, but more talented in magic.
 N:1047:Black lizard
 G:R:D
 I:110:8d8:20:32:30
-W:7:2:0:45
+W:8:2:0:45
 B:BITE:POISON:1d6
 B:BITE:POISON:1d6
 F:ANIMAL | EAT_BODY
@@ -15733,7 +15733,7 @@ D:A cockroach the size of your head.
 N:1093:Rabid goblin
 G:k:o
 I:110:6d10:20:20:10
-W:5:3:0:34
+W:7:3:0:34
 B:BITE:DISEASE:2d3
 B:HIT:HURT:1d6
 F:BASH_DOOR | DROP_60 | EVIL | NO_FEAR | IM_POIS | ORC | DWARF
@@ -15907,7 +15907,7 @@ D:be growing.
 N:1108:Floating skull
 G:s:B
 I:110:6d8:15:30:30
-W:5:2:0:30
+W:8:2:0:30
 M:0:25:4:30
 B:BITE:HURT:1d5
 F:SMART | COLD_BLOOD
@@ -16378,7 +16378,7 @@ D:A huge draconic form.
 N:1138:Lightningjaw
 G:J:b
 I:115:10d9:12:20:0
-W:6:3:200:50
+W:10:3:200:50
 M:0:25:3:200
 B:BITE:ELEC:2d4
 F:WEIRD_MIND | RAND_50 | BASH_DOOR | FRIENDS | 
@@ -16931,7 +16931,7 @@ D: is unmatched!
 N:1168:Crypt creep
 G:s:D
 I:110:10d9:20:30:25
-W:7:3:0:50
+W:10:3:0:50
 M:0:14:4:20
 B:CLAW:HURT:1d5
 B:BITE:POISON:1d3
@@ -17672,7 +17672,7 @@ D:Short of stature though this ancient gnome may be, his reputation in the
 D:esoteric magics is unsurpassed, and his spells the stuff of wonder.
 
 N:1226:Tyrant of Hell
-G:h:o
+G:U:o
 I:130:18d100:25:40:50:15
 W:57:2:120:14000
 M:50:50:85:120
@@ -18008,7 +18008,7 @@ D:It is a bloated human form decomposing and leaking foul water.
 N:1250:Goblin grenadier
 G:k:r
 I:110:12d5:24:13:20:1
-W:6:3:20:12
+W:8:3:20:12
 M:20:0:0:0
 B:HIT:HURT:1d8
 B:FLASK:EXPLODE:6d5
@@ -18317,3 +18317,50 @@ D:A huge many-tentacled creature, long forgotten but rising from the endless dep
 D:  An inky stench comes from its foul bulk, and its massive arms reach out to crush
 D: you and drag you below.
 
+N:1274:Wood elf ranger
+G:l:G
+I:115:15d11:20:40:40
+W:19:1:0:55
+M:90:25:4:45
+B:HIT:HURT:5d4
+B:HIT:HURT:5d4
+B:ARROW:HURT:5d6
+F:MALE
+F:DROP_1D2
+F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
+F:WARRIOR | MAGE | NEED_LITE | ARCHER | ELF | RES_LITE
+S:S_INSECT
+S:BOLT_COLD | BOLT_ELEC | BLINK | CURE
+D:An elven master of both bow and sword, with minor spellcasting
+D: skills, and spiders come to do his bidding.
+
+N:1275:Wood elf enchanter
+G:l:b
+I:115:24d8:20:10:10
+W:21:2:0:125
+M:0:40:14:75
+B:HIT:HURT:5d4
+F:MALE
+F:FORCE_SLEEP | DROP_1D2
+F:SMART | OPEN_DOOR
+F:EVIL | NEED_LITE
+F:MAGE | LOW_MANA_RUN | ELF | RES_LITE
+S:HASTE | BLINK | TPORT | BLIND | HOLD | SLOW | CONF | DARKNESS
+S:ADD_MANA | INVIS | ILLUSION
+D:A elven spell caster of some power, weaving illusions and 
+D:  enchantments to beguile and frustrate you.
+
+N:1276:Wood elf tracker
+G:l:s
+I:115:20d11:20:40:40
+W:24:2:0:145
+M:20:0:8:0
+B:HIT:WOUND:8d5
+B:HIT:WOUND:8d5
+B:BOLT:HURT:12d7
+F:MALE
+F:DROP_1D2
+F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
+F:NEED_LITE | SMART | SUPER_SCENT
+F:WARRIOR | ELF | RES_LITE
+D:A grey-garbed elven warrior who moves with confidence.
