@@ -5596,8 +5596,8 @@ void cave_set_feat(int y, int x, int feat)
 		bool good = (f_ptr->flags3 & (FF3_DROP_GOOD)) ? TRUE : FALSE;
 		bool great = (f_ptr->flags3 & (FF3_DROP_GREAT)) ? TRUE : FALSE;
 
-		bool do_gold = (!(f_ptr->flags1 & (FF1_HAS_ITEM)));
-		bool do_item = (!(f_ptr->flags1 & (FF1_HAS_GOLD)));
+		bool do_item = ((f_ptr->flags1 & FF1_HAS_ITEM) && !(f_ptr->flags2 & (FF1_HAS_ITEM)));
+		bool do_gold = ((f_ptr->flags1 & FF1_HAS_GOLD) && !(f_ptr->flags2 & (FF1_HAS_GOLD)));
 
 		object_type *i_ptr;
 		object_type object_type_body;
