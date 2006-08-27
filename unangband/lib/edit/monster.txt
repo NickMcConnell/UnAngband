@@ -1307,7 +1307,7 @@ D:A large pink snake with a woman's torso.
 N:103:Pink jelly
 G:j:R
 I:110:26d8:2:1:99
-W:8:1:0:26
+W:4:1:0:26
 B:TOUCH:LOSE_STR:1d5
 F:NEVER_MOVE
 F:STUPID | EMPTY_MIND
@@ -1979,7 +1979,7 @@ D:A majestic hybrid of eagle and horse.
 N:153:Zombified orc
 G:z:s
 I:110:11d8:20:24:25
-W:4:1:0:30
+W:7:1:0:30
 B:HIT:HURT:1d4
 B:HIT:HURT:1d4
 B:HIT:HURT:1d4
@@ -13140,7 +13140,7 @@ D:It is a smallish, slimy, icky, poisonous creature.
 N:896:Pink icky thing
 G:i:R
 I:110:6d8:14:14:20
-W:4:1:0:18
+W:5:1:0:18
 B:TOUCH:LOSE_STR:2d5
 F:RAND_50 | 
 F:EMPTY_MIND
