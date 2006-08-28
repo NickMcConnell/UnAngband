@@ -322,6 +322,8 @@ Monkeys less common.
 - Monsters spawn more frequently deeper in the dungeon. Stealth now affects spawning
 rate, and can result in monsters being spawned asleep (From SAngband).
 
+- Made disease effects against monsters a lot more interesting.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -720,6 +722,11 @@ regarding their activation effects (Reported by Matthias Rudolf).
 - Fixed ranger and rogue sensing (Reported by Pav Lucistnik).
 
 - Fixed bugs with some chest drops (Reported by Matthias Rudolf).
+
+- Fixed bugs with unidentified rods not stacking (Reported by Pete Mac).
+
+- Fixed bug with various elemental wands not being recognisable unless they affect
+a monster (Reported by Pete Mac).
 
 ### Build / Platform ###
 

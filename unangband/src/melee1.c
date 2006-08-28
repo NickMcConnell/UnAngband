@@ -5929,8 +5929,8 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 					/* XXX Hack -- unstack if necessary */
 					if ((o_ptr->number > 1) &&
-					((!object_known_p(o_ptr) && (o_ptr->charges == 2) && (o_ptr->stackc > 1)) ||
-					  (!object_known_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
+					((!object_charges_p(o_ptr) && (o_ptr->charges == 2) && (o_ptr->stackc > 1)) ||
+					  (!object_charges_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
 					  (o_ptr->stackc != 1) && (o_ptr->charges > 2))))
 					{
 						object_type *i_ptr;

@@ -346,7 +346,7 @@ void do_cmd_wield(void)
 		/* Mark object as ungettable? */
 		if (!(o_ptr->feeling) &&
 			!(o_ptr->ident & (IDENT_SENSE))
-			&& !(object_known_p(o_ptr)))
+			&& !(object_named_p(o_ptr)))
 		{
 	
 			/* Sense the object */
@@ -401,7 +401,7 @@ void do_cmd_wield(void)
 	i_ptr->stackc = 0;
 
 	/* Sometimes use lower stack object */
-	if (!object_known_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
+	if (!object_charges_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
 	{
 		if (amt >= o_ptr->stackc)
 		{
@@ -852,7 +852,7 @@ void do_cmd_destroy(void)
 		/* Sense the object if allowed, don't sense ID'ed stuff */
 		if ((o_ptr->discount == 0)
 		&& !(o_ptr->ident & (IDENT_SENSE))
-		 && !(object_known_p(o_ptr)))
+		 && !(object_named_p(o_ptr)))
 		{
 			o_ptr->discount = INSCRIP_UNBREAKABLE;
 
@@ -887,7 +887,7 @@ void do_cmd_destroy(void)
 	msg_format("You destroy %s.", o_name);
 
 	/* Sometimes use lower stack object */
-	if (!object_known_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
+	if (!object_charges_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
 	{
 		if (amt >= o_ptr->stackc)
 		{
@@ -1059,7 +1059,7 @@ void do_cmd_uninscribe(void)
 	if (!easy_autos) return;
 
 	/* Do we inscribe all these ego items? */
-	if (object_known_p(o_ptr) && (o_ptr->name2) && (e_info[o_ptr->name2].note))
+	if (object_named_p(o_ptr) && (o_ptr->name2) && (e_info[o_ptr->name2].note))
 	{
 		e_info[o_ptr->name2].note = 0;
 
@@ -1076,7 +1076,7 @@ void do_cmd_uninscribe(void)
 			if (i_ptr->name2 != o_ptr->name2) continue;
 
 			/* Auto-inscribe */
-			if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = 0;
+			if (object_named_p(i_ptr) || cheat_auto) i_ptr->note = 0;
 
 		}
 
@@ -1099,7 +1099,7 @@ void do_cmd_uninscribe(void)
 			if (i_ptr->k_idx != o_ptr->k_idx) continue;
 
 			/* Auto-inscribe */
-			if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = 0;
+			if (object_named_p(i_ptr) || cheat_auto) i_ptr->note = 0;
 
 		}
 	}
@@ -1187,7 +1187,7 @@ void do_cmd_inscribe(void)
 	if (!easy_autos) return;
 
 	/* Do we inscribe all these ego items? */
-	if (object_known_p(o_ptr) && (o_ptr->name2))
+	if (object_named_p(o_ptr) && (o_ptr->name2))
 	{
 		e_info[o_ptr->name2].note = o_ptr->note;
 
@@ -1207,7 +1207,7 @@ void do_cmd_inscribe(void)
 			if (i_ptr->note) continue;
 
 			/* Auto-inscribe */
-			if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = e_info[o_ptr->name2].note;
+			if (object_named_p(i_ptr) || cheat_auto) i_ptr->note = e_info[o_ptr->name2].note;
 
 			/* Ignore */
 			if (auto_pickup_ignore(o_ptr)) o_ptr->ident &= ~(IDENT_MARKED);
@@ -1236,7 +1236,7 @@ void do_cmd_inscribe(void)
 			if (i_ptr->note) continue;
 
 			/* Auto-inscribe */
-			if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = o_ptr->note;
+			if (object_named_p(i_ptr) || cheat_auto) i_ptr->note = o_ptr->note;
 
 			/* Ignore */
 			if (auto_pickup_ignore(o_ptr)) o_ptr->ident &= ~(IDENT_MARKED);

@@ -2222,7 +2222,7 @@ static bool item_tester_known_rumor(const object_type *o_ptr)
 {
 	if (o_ptr->ident & IDENT_MENTAL)
 		return FALSE;
-	else if (!object_known_p(o_ptr) && !(o_ptr->ident & (IDENT_NAME))
+	else if (!object_named_p(o_ptr)
 		&& !(o_ptr->feeling == INSCRIP_SPECIAL)
 		&& !(o_ptr->feeling == INSCRIP_EXCELLENT)
 		&& !(o_ptr->feeling == INSCRIP_SUPERB)

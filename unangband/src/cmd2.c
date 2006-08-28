@@ -3367,7 +3367,7 @@ void do_cmd_fire(void)
 	i_ptr->ident &= ~(IDENT_STORE);
 
 	/* Sometimes use lower stack object */
-	if (!object_known_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
+	if (!object_charges_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
 	{
 		if (i_ptr->charges) i_ptr->charges--;
 
@@ -3995,7 +3995,7 @@ void do_cmd_throw(void)
 	i_ptr->ident &= ~(IDENT_STORE);
 
 	/* Sometimes use lower stack object */
-	if (!object_known_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
+	if (!object_charges_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
 	{
 		if (i_ptr->charges) i_ptr->charges--;
 

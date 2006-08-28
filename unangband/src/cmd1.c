@@ -1027,7 +1027,7 @@ static void py_destroy_aux(int o_idx)
 		/* Sense the object if allowed, don't sense ID'ed stuff */
 		if (!(o_ptr->feeling)
 			&& !(o_ptr->ident & (IDENT_SENSE))
-			 && !(object_known_p(o_ptr)))
+			 && !(object_named_p(o_ptr)))
 		{
 			o_ptr->discount = INSCRIP_UNBREAKABLE;
 
@@ -1609,8 +1609,8 @@ void hit_trap(int y, int x)
 
 					/* XXX Hack -- unstack if necessary */
 					if ((o_ptr->number > 1) &&					 
-					((!object_known_p(o_ptr) && (o_ptr->charges == 2) && (o_ptr->stackc > 1)) ||
-					  (!object_known_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
+					((!object_charges_p(o_ptr) && (o_ptr->charges == 2) && (o_ptr->stackc > 1)) ||
+					  (!object_charges_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
 					  (o_ptr->stackc != 1) && (o_ptr->charges > 2))))
 					{
 						object_type *i_ptr;

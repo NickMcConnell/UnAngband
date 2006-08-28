@@ -716,21 +716,6 @@ static bool store_check_num(object_type *o_ptr)
 
 
 /*
- * Determine if a weapon is 'blessed'
- */
-static bool is_blessed(const object_type *o_ptr)
-{
-	u32b f1, f2, f3, f4;
-
-	/* Get the flags */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
-
-	/* Is the object blessed? */
-	return ((f3 & TR3_BLESSED) ? TRUE : FALSE);
-}
-
-
-/*
  * Determine if the current store will purchase the given object
  *
  * Note that a shop-keeper must refuse to buy "worthless" objects
@@ -839,7 +824,7 @@ static bool store_will_buy(const object_type *o_ptr)
 				case TV_SWORD:
 				{
 					/* Known blessed blades are accepted too */
-					if (is_blessed(o_ptr) && object_known_p(o_ptr)) break;
+					if (o_ptr->can_flags3 & (TR3_BLESSED)) break;
 				}
 				default:
 				return (FALSE);

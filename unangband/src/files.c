@@ -1602,8 +1602,8 @@ static void display_player_xtra_info(void)
 	dam = p_ptr->dis_to_d;
 
 	/* Apply weapon bonuses */
-	if (object_known_p(o_ptr)) hit += o_ptr->to_h;
-	if (object_known_p(o_ptr)) dam += o_ptr->to_d;
+	if (object_bonus_p(o_ptr)) hit += o_ptr->to_h;
+	if (object_bonus_p(o_ptr)) dam += o_ptr->to_d;
 
 	/* Melee attacks */
 	strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
@@ -1625,8 +1625,8 @@ static void display_player_xtra_info(void)
 	dam = 0;
 
 	/* Apply weapon bonuses */
-	if (object_known_p(o_ptr)) hit += o_ptr->to_h;
-	if (object_known_p(o_ptr)) dam += o_ptr->to_d;
+	if (object_bonus_p(o_ptr)) hit += o_ptr->to_h;
+	if (object_bonus_p(o_ptr)) dam += o_ptr->to_d;
 
 
 	/* Range attacks */

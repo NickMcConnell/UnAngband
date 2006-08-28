@@ -65,7 +65,7 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 		}
 
 		/* Must be identified */
-		if (!object_known_p(o_ptr)) return;
+		if (!object_named_p(o_ptr)) return;
 	}
 
 	if (mode != OBJECT_FLAGS_RANDOM)
@@ -340,6 +340,7 @@ void object_flags(const object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3, u32b *
  */
 void object_obvious_flags(object_type *o_ptr)
 {
+	/* Fully identified */
         if (o_ptr->ident & (IDENT_MENTAL))
         {
                 u32b f1,f2,f3,f4;
@@ -352,21 +353,71 @@ void object_obvious_flags(object_type *o_ptr)
                 object_not_flags(o_ptr, ~(f1), ~(f2), ~(f3), ~(f4));
         }
 
-        else if (object_known_p(o_ptr) && !o_ptr->name1)
-        {
-                /* Abilities of base item are always known */
-                o_ptr->can_flags1 |= k_info[o_ptr->k_idx].flags1;
-                o_ptr->can_flags2 |= k_info[o_ptr->k_idx].flags2;
-                o_ptr->can_flags3 |= k_info[o_ptr->k_idx].flags3;
-                o_ptr->can_flags4 |= k_info[o_ptr->k_idx].flags4;
+	/* Identified name */
+	if (object_named_p(o_ptr))
+	{
+		/* Now we know what it is, update what we know about it from our artifact memory */
+		if (o_ptr->name1)
+		{
+			object_can_flags(o_ptr,a_list[o_ptr->name1].can_flags1,
+					a_list[o_ptr->name1].can_flags2,
+					a_list[o_ptr->name1].can_flags3,
+					a_list[o_ptr->name1].can_flags4);
 
-                /* Non-runed average item have no more hidden ability */
-                if (!o_ptr->name2 && !(o_ptr->xtra1) && wield_slot(o_ptr) >= INVEN_WIELD)
-                        object_not_flags(o_ptr, ~(o_ptr->can_flags1), 
-                                         ~(o_ptr->can_flags2), 
-                                         ~(o_ptr->can_flags3), 
-                                         ~(o_ptr->can_flags4));
-        }
+			object_not_flags(o_ptr,a_list[o_ptr->name1].not_flags1,
+					a_list[o_ptr->name1].not_flags2,
+					a_list[o_ptr->name1].not_flags3,
+					a_list[o_ptr->name1].not_flags4);
+		}
+		/* Now we know what it is, update what we know about it from our ego item memory */
+		else if (o_ptr->name2)
+		{
+			/* Obvious flags */
+			object_can_flags(o_ptr,e_info[o_ptr->name2].obv_flags1,
+					 e_info[o_ptr->name2].obv_flags2,
+					 e_info[o_ptr->name2].obv_flags3,
+					 e_info[o_ptr->name2].obv_flags4);
+
+			/* Known flags */
+			object_can_flags(o_ptr,e_list[o_ptr->name2].can_flags1,
+					 e_list[o_ptr->name2].can_flags2,
+					 e_list[o_ptr->name2].can_flags3,
+					 e_list[o_ptr->name2].can_flags4);
+			
+			object_not_flags(o_ptr,e_list[o_ptr->name2].not_flags1,
+					 e_list[o_ptr->name2].not_flags2,
+					 e_list[o_ptr->name2].not_flags3,
+					 e_list[o_ptr->name2].not_flags4);
+		}
+		/* Hack -- Magic items have an 'obvious' ability for which they are named */
+		else if ((o_ptr->xtra1) && (o_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES) && (o_ptr->feeling < INSCRIP_MIN_HIDDEN))
+		{
+			if (object_xtra_what[o_ptr->xtra1] == 1)
+				(o_ptr->can_flags1) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+			else if (object_xtra_what[o_ptr->xtra1] == 2)
+				(o_ptr->can_flags2) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+			else if (object_xtra_what[o_ptr->xtra1] == 3)
+				(o_ptr->can_flags3) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+			else if (object_xtra_what[o_ptr->xtra1] == 4)
+				(o_ptr->can_flags4) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
+		}
+
+		if (!o_ptr->name1)
+        	{
+               		/* Abilities of base item are always known */
+                	o_ptr->can_flags1 |= k_info[o_ptr->k_idx].flags1;
+                	o_ptr->can_flags2 |= k_info[o_ptr->k_idx].flags2;
+                	o_ptr->can_flags3 |= k_info[o_ptr->k_idx].flags3;
+                	o_ptr->can_flags4 |= k_info[o_ptr->k_idx].flags4;
+
+                	/* Non-ego, non-magical, non-runed average item have no more hidden ability */
+                	if (!o_ptr->name2 && !(o_ptr->xtra1) && wield_slot(o_ptr) >= INVEN_WIELD)
+                        	object_not_flags(o_ptr, ~(o_ptr->can_flags1), 
+                                	        ~(o_ptr->can_flags2), 
+                                        	~(o_ptr->can_flags3), 
+                                   	      	~(o_ptr->can_flags4));
+		}
+	}
 }
 
 
@@ -2046,7 +2097,7 @@ void screen_object(object_type *o_ptr)
         else list_object(o_ptr, OBJECT_FLAGS_KNOWN);
 
 	/* Display monster attributes */
-	if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_known_p(o_ptr)))) screen_roff(o_ptr->name3);
+	if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_named_p(o_ptr)))) screen_roff(o_ptr->name3);
 
 	/* Display item name */
 	obj_top(o_ptr);
@@ -3197,14 +3248,14 @@ void list_object(const object_type *o_ptr, int mode)
 	}
 
 	/* Can enchant this further? */
-	if (!spoil && !random && object_known_p(o_ptr) && !(o_ptr->xtra1) && !artifact_p(o_ptr) && (o_ptr->tval != TV_SERVICE) )
+	if (!spoil && !random && object_named_p(o_ptr) && !(o_ptr->xtra1) && !artifact_p(o_ptr) && (o_ptr->tval != TV_SERVICE) )
 	{
 		text_out_c(TERM_VIOLET,"\nYou can apply runes to it or enchant it with additional powers.  ");
 		anything = TRUE;
 	}
 
 	/* Unknown extra powers (ego-item with random extras or artifact) */
-	if (!spoil && !random && object_known_p(o_ptr) && (((o_ptr->xtra1) && (o_ptr->name2)) || artifact_p(o_ptr)) )
+	if (!spoil && !random && object_named_p(o_ptr) && (((o_ptr->xtra1) && (o_ptr->name2)) || artifact_p(o_ptr)) )
 	{
 		bool hidden = TRUE;
 	
@@ -3561,7 +3612,7 @@ void display_koff(const object_type *o_ptr)
 	list_object(o_ptr, OBJECT_FLAGS_KNOWN);
 
 	/* Display monster attributes */
-	if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_known_p(o_ptr)))) screen_roff(o_ptr->name3);
+	if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_named_p(o_ptr)))) screen_roff(o_ptr->name3);
 
 	/* Display item name */
 	obj_top(o_ptr);
@@ -3622,13 +3673,7 @@ void object_guess_name(object_type *o_ptr)
 	byte guess3=0;
 
 	/* Do not guess identified items */
-	if (object_known_p(o_ptr)) return;
-
-	/* Do not guess aware items */
-	if (object_aware_p(o_ptr)) return;
-
-	/* Do not guess named items */
-	if (o_ptr->ident & (IDENT_NAME)) return;
+	if (object_named_p(o_ptr)) return;
 
 	/* Check the ego item list */
 	/* Hack -- exclude artifacts */
@@ -4076,7 +4121,7 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 	o_ptr->can_flags4 |= (f4);
 
 	/* Must be identified to continue */
-	if (!object_known_p(o_ptr))
+	if (!object_named_p(o_ptr))
 	{
 		object_guess_name(o_ptr);
 
@@ -4400,7 +4445,7 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 	inven_may_flags();
 
 	/* Must be identified to continue */
-	if (!object_known_p(o_ptr))
+	if (!object_named_p(o_ptr))
 	{
 		object_guess_name(o_ptr);
 
@@ -4468,7 +4513,7 @@ void object_may_flags(object_type *o_ptr, u32b f1,u32b f2,u32b f3, u32b f4)
 	inven_may_flags();
 
 	/* Must be identified to continue */
-	if (!object_known_p(o_ptr))
+	if (!object_named_p(o_ptr))
 	{
 		object_guess_name(o_ptr);
 	}
@@ -4742,7 +4787,7 @@ void equip_can_flags(u32b f1,u32b f2,u32b f3, u32b f4)
 		i_ptr->may_flags4 |= (if4);
 
 		/* Must be identified to continue */
-		if ((guess) && (!object_known_p(i_ptr)))
+		if ((guess) && (!object_named_p(i_ptr)))
 		{
 			object_guess_name(i_ptr);
 		}

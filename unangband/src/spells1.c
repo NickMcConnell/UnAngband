@@ -2737,8 +2737,10 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s dissolves.",f);
-					obvious = TRUE;
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
 
 				/* Destroy the feature */
 				cave_alter_feat(y, x, FS_HURT_ACID);
@@ -2764,8 +2766,10 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s burns up.",f);
-					obvious = TRUE;
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
 
 				/* Destroy the feature */
 				cave_alter_feat(y, x, FS_HURT_FIRE);
@@ -2791,8 +2795,10 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s freezes.",f);
-					obvious = TRUE;
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
 
 				/* Destroy the feature */
 				cave_alter_feat(y, x, FS_HURT_COLD);
@@ -2812,8 +2818,10 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s shatters.",f);
-					obvious = TRUE;
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
 
 				/* Destroy the feature */
 				cave_alter_feat(y, x, FS_KILL_HUGE);
@@ -2833,8 +2841,10 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s is struck by lightening.",f);
-					obvious = TRUE;
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
 
 				/* Destroy the feature */
 				cave_alter_feat(y, x, FS_HURT_ELEC);
@@ -2856,8 +2866,10 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s floods.",f);
-					obvious = TRUE;
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
 
 				/* Destroy the feature */
 				cave_alter_feat(y, x, FS_HURT_WATER);
@@ -2877,8 +2889,10 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s evapourates.",f);
-					obvious = TRUE;
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
 
 				/* Destroy the feature */
 				cave_alter_feat(y, x, FS_HURT_BWATER);
@@ -2894,8 +2908,10 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s is poisoned.",f);
-					obvious = TRUE;
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
 
 				/* Destroy the feature */
 				cave_alter_feat(y, x, FS_HURT_POIS);
@@ -2933,8 +2949,13 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_print("There is a bright flash of light!");
-					obvious = TRUE;
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
+
+				/* Temporarily lite the square */
+				temp_lite(y,x);
 
 				/* Destroy the trap */
 				cave_alter_feat(y, x, FS_DISARM);
@@ -2944,11 +2965,13 @@ bool project_f(int who, int y, int x, int dam, int typ)
 			else if (f_ptr->flags1 & (FF1_DISARM))
 			{
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
+				if (/*(player_has_los_bold(y, x)) &&*/ (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_print("Click!");
-					obvious = TRUE;
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
 
 				/* Destroy the trap */
 				cave_alter_feat(y, x, FS_TUNNEL);
@@ -2961,11 +2984,13 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				cave_alter_feat(y, x, FS_OPEN);
 	
 				/* Check line of sound */
-				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
+				if (/*(player_has_los_bold(y, x)) &&*/ (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_print("Click!");
-					obvious = TRUE;
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
 			}
 
 			break;
@@ -2982,11 +3007,16 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_print("There is a bright flash of light!");
-					obvious = TRUE;
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
 
 				/* Destroy the door */
 				cave_alter_feat(y, x, FS_TUNNEL);
+
+				/* Temporarily lite */
+				temp_lite(y, x);
 			}
 
 			break;
@@ -2995,15 +3025,17 @@ bool project_f(int who, int y, int x, int dam, int typ)
 		/* Jam Doors */
 		case GF_LOCK_DOOR:
 		{
-
 			/* Close doors/traps/chests */
 			if (f_ptr->flags1 & (FF1_CLOSE))
 			{
 				/* Check line of sight */
 				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
-					obvious = TRUE;
+					msg_format("The %s slams shut.", f);
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
 
 				/* Destroy the door */
 				cave_alter_feat(y, x, FS_CLOSE);
@@ -3014,17 +3046,14 @@ bool project_f(int who, int y, int x, int dam, int typ)
 			{
 				int feat = cave_feat[y][x];
 
-				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
-				{
-					obvious = TRUE;
-				}
-
 				/* Jam the door */
 				cave_alter_feat(y, x, FS_SPIKE);
 
 				/* Paranoia */
 				if (feat == cave_feat[y][x]) break;
+
+				/* Notice any changes */
+				obvious = TRUE;
 			}
 
 			break;
@@ -3042,8 +3071,10 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s turns to mud.", f);
-					obvious = TRUE;
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
 
 				/* Destroy the trap */
 				cave_alter_feat(y, x, FS_HURT_ROCK);
@@ -3091,11 +3122,8 @@ bool project_f(int who, int y, int x, int dam, int typ)
 			/* Place a feature */
 			if (dam) cave_set_feat(y,x,dam);
 
-			/* Check line of sight */
-			if (player_has_los_bold(y, x))
-			{
-				obvious = TRUE;
-			}
+			/* Notice any changes */
+			obvious = TRUE;
 
 			break;
 		}		
@@ -3117,6 +3145,9 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				cave_set_feat(y,x,old_feat);
 			}
 
+			/* Notice any changes */
+			else obvious = TRUE;
+
 			break;
 		}
 
@@ -3129,6 +3160,9 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				(f_info[feat].flags1 & (FF1_LESS)) || (f_info[feat].flags2 & (FF2_FILLED))))
 			{
 				cave_set_feat(y,x,FEAT_WATER_K);
+
+				/* Notice any changes */
+				obvious = TRUE;
 			}
 			break;
 		}
@@ -3142,7 +3176,10 @@ bool project_f(int who, int y, int x, int dam, int typ)
 
 			if (f_info[feat].flags2 & (FF2_CAN_SWIM))
 			{
-				cave_set_feat(y,x,FEAT_FLOOR_EARTH);
+				cave_set_feat(y,x,FEAT_GROUND);
+
+				/* Notice any changes */
+				obvious = TRUE;
 			}
 			break;
 		}
@@ -3311,6 +3348,9 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				if (f_ptr->flags3 & (FF3_GET_FEAT)) cave_alter_feat(y, x, FS_GET_FEAT);
 				else if (f_ptr->flags3 & (FF3_OUTSIDE)) cave_set_feat(y,x, FEAT_GROUND);
 				else cave_set_feat(y,x,FEAT_FLOOR);
+
+				/* Notice any changes */
+				obvious = TRUE;
 			}
 
 			break;
@@ -3322,12 +3362,18 @@ bool project_f(int who, int y, int x, int dam, int typ)
 			if (f_ptr->flags1 & (FF1_FLOOR))
 			{
 				cave_set_feat(y, x, FEAT_FLOOR_WEB);
+
+				/* Notice any changes */
+				obvious = TRUE;
 			}
 
 			/* Create webs on chasm */
 	                else if (f_ptr->flags2 & (FF2_CHASM))
 			{
 				cave_set_feat(y, x, FEAT_CHASM_WEB);
+
+				/* Notice any changes */
+				obvious = TRUE;
 			}
 
 			break;
@@ -3336,15 +3382,26 @@ bool project_f(int who, int y, int x, int dam, int typ)
 		case GF_BLOOD:
 		{
 			/* Create blood on floor */
-			if (f_ptr->flags1 & (FF1_FLOOR)) cave_set_feat(y, x, FEAT_FLOOR_BLOOD_T);
+			if (f_ptr->flags1 & (FF1_FLOOR))
+			{
+				cave_set_feat(y, x, FEAT_FLOOR_BLOOD_T);
 
+				/* Notice any changes */
+				obvious = TRUE;
+			}
 			break;
 		}
 
 		case GF_SLIME:
 		{
 			/* Create slime on floor */
-			if (f_ptr->flags1 & (FF1_FLOOR)) cave_set_feat(y, x, FEAT_FLOOR_SLIME_T);
+			if (f_ptr->flags1 & (FF1_FLOOR))
+			{
+				cave_set_feat(y, x, FEAT_FLOOR_SLIME_T);
+
+				/* Notice any changes */
+				obvious = TRUE;
+			}
 
 			break;
 		}
@@ -3358,8 +3415,10 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s blows out.",f);
-					obvious = TRUE;
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
 
 				cave_alter_feat(y,x,FS_TIMED);
 			}
@@ -3371,8 +3430,10 @@ bool project_f(int who, int y, int x, int dam, int typ)
 				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_format("The %s blows away.",f);
-					obvious = TRUE;
 				}
+
+				/* Notice any changes */
+				obvious = TRUE;
 
 				cave_alter_feat(y,x,FS_SPREAD);
 			}
@@ -3899,7 +3960,8 @@ bool project_o(int who, int y, int x, int dam, int typ)
 					/* Item is unbreakable */
 					else
 					{
-						if (!object_known_p(o_ptr))
+						if (!o_ptr->feeling && !(o_ptr->ident & (IDENT_SENSE))
+							&& object_named_p(o_ptr))
 						{
 							/* Sense the object */
 							o_ptr->feeling = INSCRIP_UNBREAKABLE;
@@ -4379,6 +4441,51 @@ bool project_m(int who, int y, int x, int dam, int typ)
 		}
 	}
 
+	/* Hack -- disease can do several things */
+	if (typ == GF_DISEASE)
+	{
+		if (seen) obvious = TRUE;
+		if (r_ptr->flags3 & (RF3_NONLIVING))
+		{
+			dam = 0;
+			if ((seen) && (l_ptr->flags3 & (RF3_NONLIVING)))
+			{
+				note = " is unaffected.";
+				l_ptr->flags3 |= (RF3_NONLIVING);
+			}
+		}
+
+		else if (r_ptr->flags4 & (RF4_BRTH_DISEA))
+		{
+			dam /= 9;
+			if ((seen) && (l_ptr->flags4 & (RF4_BRTH_DISEA)))
+			{
+				note = " is immune to disease.";
+				l_ptr->flags4 |= (RF4_BRTH_DISEA);
+			}
+		}
+
+		else switch(rand_int(16))
+		{
+			case 0: typ = GF_HALLU; break;
+			case 1: typ = GF_BLIND; break;
+			case 2: typ = GF_TERRIFY; break;
+			case 3: typ = GF_CONFUSION; break;
+			case 4: typ = GF_SLOW; break;
+			case 5: typ = GF_LOSE_STR; break;
+			case 6: typ = GF_LOSE_INT; break;
+			case 7: typ = GF_LOSE_WIS; break;
+			case 8: typ = GF_LOSE_DEX; break;
+			case 9: typ = GF_LOSE_CON; break;
+			case 10: typ = GF_HUNGER; break;
+			case 11: typ = GF_FORGET; break;
+			case 12: typ = GF_CURSE; break;
+			case 13: typ = GF_PETRIFY; break;
+			case 14: typ = GF_PARALYZE; break;
+			case 15: typ = GF_LOSE_MANA; break;
+		}
+	}
+
 	/* Analyze the damage type */
 	switch (typ)
 	{
@@ -4499,7 +4606,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 		case GF_POIS:
 		{
 			if (seen) obvious = TRUE;
-			do_pois = (10 + randint(15));
+			do_pois = dam;
 			if (r_ptr->flags3 & (RF3_IM_POIS))
 			{
 				dam /= 9;
@@ -4507,22 +4614,6 @@ bool project_m(int who, int y, int x, int dam, int typ)
 				{
 					note = " is immune to poison.";
 					l_ptr->flags3 |= (RF3_IM_POIS);
-				}
-			}
-			break;
-		}
-
-		/* Disease */
-		case GF_DISEASE:
-		{
-			if (seen) obvious = TRUE;
-			if (r_ptr->flags3 & (RF3_NONLIVING))
-			{
-				dam /= 9;
-				if ((seen) && !(l_ptr->flags3 & (RF3_NONLIVING)))
-				{
-					note = " is immune to disease.";
-					l_ptr->flags3 |= (RF3_NONLIVING);
 				}
 			}
 			break;
@@ -6003,6 +6094,8 @@ bool project_m(int who, int y, int x, int dam, int typ)
 		}
 
 		/* Melee attack - paralyze */
+		case GF_STASTIS:
+		case GF_PETRIFY:
 		case GF_PARALYZE:
 		{
 			if (seen) obvious = TRUE;
@@ -6545,7 +6638,13 @@ bool project_m(int who, int y, int x, int dam, int typ)
 		}
 
 		/* Monster stripped of enchantments */
+		{
 		case GF_DISPEL:
+			/* No "real" damage */
+			dam = 0;
+		}
+		/* Hack -- curse effect - dispel plus damage */
+		case GF_CURSE:
 		{
 			/* Monster abilities removed the next round*/
 			if (m_ptr->slowed) m_ptr->slowed = 1;
@@ -6557,8 +6656,6 @@ bool project_m(int who, int y, int x, int dam, int typ)
 			if (m_ptr->shield) m_ptr->shield = 1;
 			if (m_ptr->oppose_elem) m_ptr->oppose_elem = 1;
 
-			/* No "real" damage */
-			dam = 0;
 			break;
 		}
 
@@ -8253,7 +8350,7 @@ bool project_p(int who, int y, int x, int dam, int typ)
 				i_ptr->stackc = 0;
 
 				/* Sometimes use lower stack object */
-				if (!object_known_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
+				if (!object_charges_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
 				{
 					if (i_ptr->charges) i_ptr->charges--;
 
@@ -10446,6 +10543,26 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 		(typ == GF_ELEC))
 	{
 		flg |= (PROJECT_LITE);
+	}
+
+	/* Some projection types always obvious */
+	/* Include anything that can be felt by raising / lowering temperature */
+	if ((typ == GF_STORM) || (typ == GF_WIND) || (typ == GF_COLD) ||
+		(typ == GF_ICE) || (typ == GF_FIRE) || (typ == GF_LAVA) ||
+		(typ == GF_BMUD) || (typ == GF_BWATER) || (typ == GF_STEAM) ||
+		(typ == GF_SMOKE) || (typ == GF_EXPLODE) || (typ == GF_ELEC) ||
+		(typ == GF_PLASMA))
+	{
+		notice = TRUE;
+	}
+
+	/* Some projection types always obvious unless the player is blind */
+	/* Include anything that emits something physical */
+	if ((typ == GF_ACID) || (typ == GF_VAPOUR) || (typ == GF_SHARD) ||
+		(typ == GF_WEB) || (typ == GF_BLOOD) || (typ == GF_SLIME) ||
+		(typ == GF_WATER) || (typ == GF_SALT_WATER))
+	{
+		if (!blind) notice = TRUE;
 	}
 
 	/* Hack -- Jump to target, but require a valid target */

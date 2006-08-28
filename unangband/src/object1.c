@@ -547,6 +547,10 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	int power;
 
 	bool aware;
+	bool named;
+	bool bonus;
+	bool charges;
+	bool pval;
 	bool known;
 
 	int flavor;
@@ -588,6 +592,18 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	/* See if the object is "aware" */
 	aware = (object_aware_p(o_ptr) ? TRUE : FALSE);
 
+	/* See if the object is "aware" */
+	named = (object_named_p(o_ptr) ? TRUE : FALSE);
+
+	/* See if the object is "aware" */
+	bonus = (object_bonus_p(o_ptr) ? TRUE : FALSE);
+
+	/* See if the object is "aware" */
+	charges = (object_charges_p(o_ptr) ? TRUE : FALSE);
+
+	/* See if the object is "aware" */
+	pval = (object_pval_p(o_ptr) ? TRUE : FALSE);
+
 	/* See if the object is "known" */
 	known = (object_known_p(o_ptr) ? TRUE : FALSE);
 
@@ -605,6 +621,9 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 		/* Pretend known and aware */
 		aware = TRUE;
+		named = TRUE;
+		bonus = TRUE;
+		charges = TRUE;
 		known = TRUE;
 	}
 
@@ -984,7 +1003,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		}
 
 		/* Hack -- The only one of its kind */
-		else if (known && artifact_p(o_ptr))
+		else if (named && artifact_p(o_ptr))
 		{
 			object_desc_str_macro(t, "The ");
 		}
@@ -1025,7 +1044,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		}
 
 		/* Hack -- The only one of its kind */
-		else if (known && artifact_p(o_ptr))
+		else if (named && artifact_p(o_ptr))
 		{
 			object_desc_str_macro(t, "The ");
 		}
@@ -1120,7 +1139,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 
 	/* Hack -- Append "Artifact" or "Special" names */
-	if ((known) || (o_ptr->ident & (IDENT_NAME)))
+	if (named)
 	{
 		/* Grab any artifact name */
 		if (o_ptr->name1)
@@ -1290,7 +1309,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	{
 		object_desc_str_macro(t, " containing ");
 
-		if (known)
+		if (named)
 		{
 	
 			if (!(r_info[o_ptr->name3].flags1 & (RF1_UNIQUE)))
@@ -1384,7 +1403,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 
 	/* Add the weapon bonuses */
-	if ((known) || (o_ptr->ident & (IDENT_BONUS)))
+	if (bonus)
 	{
 		/* Show the tohit/todam on request */
 		if (show_weapon)
@@ -1418,7 +1437,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 
 	/* Add the armor bonuses */
-	if ((known) || (o_ptr->ident & (IDENT_BONUS)))
+	if (bonus)
 	{
 		/* Show the armor class info */
 		if (show_armour)
@@ -1456,7 +1475,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 
 	/* Hack -- Wands and Staffs have charges */
-	if (((known) || (o_ptr->ident & (IDENT_CHARGES))) &&
+	if ((charges) &&
 	    ((o_ptr->tval == TV_STAFF) ||
 	     (o_ptr->tval == TV_WAND)))
 	{
@@ -1502,7 +1521,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	}
 
 	/* Dump "pval" flags for wearable items */
-	if ((known || (o_ptr->ident & (IDENT_PVAL))) && (f1 & (TR1_PVAL_MASK)))
+	if ((pval) && (f1 & (TR1_PVAL_MASK)))
 	{
 		cptr tail = "";
 		cptr tail2 = "";
@@ -1521,7 +1540,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		}
 
 		/* Do not display the "pval" flags */
-		else if (!known)
+		else if (!pval)
 		{
 			/* Nothing */
 		}

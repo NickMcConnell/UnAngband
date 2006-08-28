@@ -5979,7 +5979,7 @@ static void do_cmd_knowledge_ego_items(void)
 					if (i_ptr->note) continue;
 		
 					/* Auto-inscribe */
-					if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = e_ptr->note;
+					if (object_named_p(i_ptr) || cheat_auto) i_ptr->note = e_ptr->note;
 
 				}
 				break;
@@ -6003,7 +6003,7 @@ static void do_cmd_knowledge_ego_items(void)
 					if (i_ptr->name2 != object_idx[object_cur]) continue;
 		
 					/* Auto-inscribe */
-					if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = 0;
+					if (object_named_p(i_ptr) || cheat_auto) i_ptr->note = 0;
 
 				}
 				break;
@@ -6032,7 +6032,7 @@ static void do_cmd_knowledge_ego_items(void)
 						if (i_ptr->note) continue;
 			
 						/* Auto-inscribe */
-						if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = note_idx;
+						if (object_named_p(i_ptr) || cheat_auto) i_ptr->note = note_idx;
 	
 					}
 				}
@@ -6446,7 +6446,7 @@ static void do_cmd_knowledge_objects(void)
 						if (i_ptr->note) continue;
 		
 						/* Auto-inscribe */
-						if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = k_ptr->note;
+						if (object_named_p(i_ptr) || cheat_auto) i_ptr->note = k_ptr->note;
 					}
 				}
 				break;
@@ -6501,7 +6501,7 @@ static void do_cmd_knowledge_objects(void)
 						if (i_ptr->note) continue;
 			
 						/* Auto-inscribe */
-						if (object_known_p(i_ptr) || cheat_auto) i_ptr->note = note_idx;
+						if (object_named_p(i_ptr) || cheat_auto) i_ptr->note = note_idx;
 					}
 		
 				}

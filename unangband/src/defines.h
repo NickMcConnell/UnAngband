@@ -4231,8 +4231,7 @@
  * Determine if a given inventory item is "aware"
  */
 #define object_aware_p(T) \
-	(((T)->ident & (IDENT_NAME)) || \
-	 k_info[(T)->k_idx].aware)
+	(k_info[(T)->k_idx].aware)
 
 /*
  * Determine if a given inventory item is "tried"
@@ -4250,6 +4249,34 @@
 	(((T)->ident & (IDENT_KNOWN)) || \
 	 ((k_info[(T)->k_idx].flags3 & (TR3_EASY_KNOW)) && \
 	  k_info[(T)->k_idx].aware))
+
+/*
+ * Determine if a given inventory item is "named"
+ * Test One -- Check for special "known" or "named" tags
+ * Test Two -- Check for "Flavor" + "Aware"
+ */
+#define object_named_p(T) \
+	(((T)->ident & (IDENT_KNOWN | IDENT_NAME)) || \
+	 (k_info[(T)->k_idx].flavor && \
+	  k_info[(T)->k_idx].aware))
+
+
+/*
+ * Determine if a given inventory item charges are known
+ * Test One -- Check for special "known" or "named" tags
+ * Test Two -- Check for "Easy Know" + "Aware"
+ */
+#define object_charges_p(T) \
+	(((T)->ident & (IDENT_KNOWN | IDENT_CHARGES)))
+
+
+/*
+ * Determine if a given inventory item charges are known
+ * Test One -- Check for special "known" or "named" tags
+ */
+#define object_pval_p(T) \
+	(((T)->ident & (IDENT_KNOWN | IDENT_PVAL)))
+
 
 /*
  * Determine if a given inventory item has known bonuses

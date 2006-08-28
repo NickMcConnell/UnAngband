@@ -898,56 +898,8 @@ void object_aware(object_type *o_ptr)
 		object_guess_name(i_ptr);	
 	}
 
-	/* Now we know what it is, update what we know about it from our artifact memory */
-	if (o_ptr->name1)
-	{
-		object_can_flags(o_ptr,a_list[o_ptr->name1].can_flags1,
-				a_list[o_ptr->name1].can_flags2,
-				a_list[o_ptr->name1].can_flags3,
-				a_list[o_ptr->name1].can_flags4);
-
-		object_not_flags(o_ptr,a_list[o_ptr->name1].not_flags1,
-				a_list[o_ptr->name1].not_flags2,
-				a_list[o_ptr->name1].not_flags3,
-				a_list[o_ptr->name1].not_flags4);
-	}
-	/* Now we know what it is, update what we know about it from our ego item memory */
-	else if (o_ptr->name2)
-	{
-		/* Obvious flags */
-		object_can_flags(o_ptr,e_info[o_ptr->name2].obv_flags1,
-				 e_info[o_ptr->name2].obv_flags2,
-				 e_info[o_ptr->name2].obv_flags3,
-				 e_info[o_ptr->name2].obv_flags4);
-
-		/* Known flags */
-		object_can_flags(o_ptr,e_list[o_ptr->name2].can_flags1,
-				 e_list[o_ptr->name2].can_flags2,
-				 e_list[o_ptr->name2].can_flags3,
-				 e_list[o_ptr->name2].can_flags4);
-			
-		object_not_flags(o_ptr,e_list[o_ptr->name2].not_flags1,
-				 e_list[o_ptr->name2].not_flags2,
-				 e_list[o_ptr->name2].not_flags3,
-				 e_list[o_ptr->name2].not_flags4);
-	}
-	/* Hack -- Magic items have an 'obvious' ability for which they are named */
-	else if ((o_ptr->xtra1) && (o_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES) && (o_ptr->feeling < INSCRIP_MIN_HIDDEN))
-	{
-		if (object_xtra_what[o_ptr->xtra1] == 1)
-			(o_ptr->can_flags1) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
-		else if (object_xtra_what[o_ptr->xtra1] == 2)
-			(o_ptr->can_flags2) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
-		else if (object_xtra_what[o_ptr->xtra1] == 3)
-			(o_ptr->can_flags3) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
-		else if (object_xtra_what[o_ptr->xtra1] == 4)
-			(o_ptr->can_flags4) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
-	}
-	/* Everything else has obvious flags */
-	else
-	{
-		object_obvious_flags(o_ptr);
-	}
+	/* Set the obvious flags */
+	object_obvious_flags(o_ptr);
 
 	/* Now we know what it is, update what we know about it */
 	object_can_flags(o_ptr,o_ptr->can_flags1,
@@ -1204,7 +1156,6 @@ s32b object_value(const object_type *o_ptr)
 {
 	s32b value;
 
-
 	/* Known items -- acquire the actual value */
 	if (object_known_p(o_ptr) || ((o_ptr->ident & (IDENT_VALUE | IDENT_STORE)) != 0))
 	{
@@ -1227,13 +1178,43 @@ s32b object_value(const object_type *o_ptr)
 		/* Hack -- Felt cursed items */
 		if ((o_ptr->ident & (IDENT_SENSE)) && cursed_p(o_ptr)) return (0L);
 
+		/* Named value (use 'real' value and attempt to hack) */
+		if (object_named_p(o_ptr))
+		{
+			object_type object_type_body;
+			object_type *j_ptr = &object_type_body;
+
+			/* Copy object */
+			object_copy(j_ptr, o_ptr);
+
+			/* Remove unknown information */
+			if (!object_bonus_p(o_ptr)) { j_ptr->to_h = 0; j_ptr->to_d = 0; j_ptr->to_a = 0; }
+			if (!object_charges_p(o_ptr)) j_ptr->charges = 0;
+			if (!object_pval_p(o_ptr)) j_ptr->pval = 0;
+
+			/* Hack -- get 'real' value */
+			value = object_value_real(j_ptr);
+
+			/* Done */
+			return(value);
+		}
+
 		/* Base value (see above) */
-		value = object_value_base(o_ptr);
+		else value = object_value_base(o_ptr);
+
+		/* Hack -- assess known pval */
+		if (object_pval_p(o_ptr))
+		{
+			/* Hack -- negative bonuses are bad */
+			if (o_ptr->pval < 0) return (0L);
+
+			/* Guess value of pval */
+			value += o_ptr->pval * o_ptr->pval * 100L;
+		}
 
 		/* Hack -- Partially identified items */
-		if (o_ptr->ident & (IDENT_BONUS))
+		if (object_bonus_p(o_ptr))
 		{
-
 			switch(o_ptr->tval)
 			{
 				/* Rings/Amulets */
@@ -1377,7 +1358,6 @@ s32b object_value(const object_type *o_ptr)
 			}
 		}
 	}
-
 
 	/* Apply discount (if any) */
 	if (o_ptr->discount > 0)
@@ -1528,7 +1508,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		case TV_WAND:
 		{
 			/* Require identical knowledge of both items */
-			if (object_known_p(o_ptr) != object_known_p(j_ptr)) return (0);
+			if (object_charges_p(o_ptr) != object_charges_p(j_ptr)) return (0);
 
 			/* Require 'similar' charges */
 			if ((o_ptr->charges != j_ptr->charges))
@@ -1552,12 +1532,9 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			break;
 		}
 
-		/* Staffs and Wands and Rods */
+		/* Rods */
 		case TV_ROD:
 		{
-			/* Require identical knowledge of both items */
-			if (object_known_p(o_ptr) != object_known_p(j_ptr)) return (0);
-
 			/* Require 'similar' timeouts */
 			if ((o_ptr->timeout != j_ptr->timeout) && (!stack_force_times)
 				&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) )
@@ -1569,16 +1546,8 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			break;
 		}
 
+		/* Lites */
 		case TV_LITE:
-		{
-			/* Require 'similar' charges */
-			if ((o_ptr->charges != j_ptr->charges) && (!stack_force_charges)
-				&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) )
-			{
-				if ((o_ptr->charges != 0) && (j_ptr->charges != 0)) return (0);
-			}
-			/* Fall through */
-		}
 
 		/* Weapons and Armor */
 		case TV_STAFF:
@@ -1604,8 +1573,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		case TV_RING:
 		case TV_AMULET:
 
-
-
 		/* Missiles */
 		case TV_BOLT:
 		case TV_ARROW:
@@ -1613,6 +1580,9 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		{
 			/* Require identical knowledge of both items */
 			if (object_known_p(o_ptr) != object_known_p(j_ptr)) return (0);
+			if (object_named_p(o_ptr) != object_named_p(j_ptr)) return (0);
+			if (object_bonus_p(o_ptr) != object_bonus_p(j_ptr)) return (0);
+			if (object_pval_p(o_ptr) != object_pval_p(j_ptr)) return (0);
 
 			/* Require identical "bonuses" */
 			if (o_ptr->to_h != j_ptr->to_h) return (FALSE);
@@ -1664,7 +1634,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		default:
 		{
 			/* Require knowledge */
-			if (!object_known_p(o_ptr) || !object_known_p(j_ptr)) return (0);
+			if (!object_named_p(o_ptr) || !object_named_p(j_ptr)) return (0);
 
 			/* Probably okay */
 			break;
@@ -7131,7 +7101,7 @@ void inven_item_charges(int item)
 	if ((o_ptr->tval != TV_STAFF) && (o_ptr->tval != TV_WAND)) return;
 
 	/* Require known item */
-	if (!object_known_p(o_ptr)) return;
+	if (!object_charges_p(o_ptr)) return;
 
 	/* Multiple charges */
 	if (o_ptr->charges != 1)
@@ -7299,7 +7269,7 @@ void floor_item_charges(int item)
 	if ((o_ptr->tval != TV_STAFF) && (o_ptr->tval != TV_WAND)) return;
 
 	/* Require known item */
-	if (!object_known_p(o_ptr)) return;
+	if (!object_charges_p(o_ptr)) return;
 
 	/* Multiple charges */
 	if (o_ptr->charges != 1)
@@ -7695,7 +7665,7 @@ s16b inven_takeoff(int item, int amt)
 	i_ptr->stackc = 0;
 
 	/* Sometimes reverse the stack object */
-	if (!object_known_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
+	if (!object_charges_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
 	{
 		if (amt >= o_ptr->stackc)
 		{
@@ -7847,7 +7817,7 @@ void inven_drop(int item, int amt)
 	i_ptr->stackc = 0;
 
 	/* Sometimes reverse the stack object */
-	if (!object_known_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
+	if (!object_charges_p(o_ptr) && (rand_int(o_ptr->number)< o_ptr->stackc))
 	{
 		if (amt >= o_ptr->stackc)
 		{
