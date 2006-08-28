@@ -353,6 +353,15 @@ void object_obvious_flags(object_type *o_ptr)
                 object_not_flags(o_ptr, ~(f1), ~(f2), ~(f3), ~(f4));
         }
 
+	/* Abilities of base item are always known if aware */
+	if (object_aware_p(o_ptr))
+	{
+        	o_ptr->can_flags1 |= k_info[o_ptr->k_idx].flags1;
+                o_ptr->can_flags2 |= k_info[o_ptr->k_idx].flags2;
+                o_ptr->can_flags3 |= k_info[o_ptr->k_idx].flags3;
+                o_ptr->can_flags4 |= k_info[o_ptr->k_idx].flags4;
+	}
+
 	/* Identified name */
 	if (object_named_p(o_ptr))
 	{
@@ -401,21 +410,13 @@ void object_obvious_flags(object_type *o_ptr)
 			else if (object_xtra_what[o_ptr->xtra1] == 4)
 				(o_ptr->can_flags4) |= (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2);
 		}
-
-		if (!o_ptr->name1)
-        	{
-               		/* Abilities of base item are always known */
-                	o_ptr->can_flags1 |= k_info[o_ptr->k_idx].flags1;
-                	o_ptr->can_flags2 |= k_info[o_ptr->k_idx].flags2;
-                	o_ptr->can_flags3 |= k_info[o_ptr->k_idx].flags3;
-                	o_ptr->can_flags4 |= k_info[o_ptr->k_idx].flags4;
-
-                	/* Non-ego, non-magical, non-runed average item have no more hidden ability */
-                	if (!o_ptr->name2 && !(o_ptr->xtra1) && wield_slot(o_ptr) >= INVEN_WIELD)
-                        	object_not_flags(o_ptr, ~(o_ptr->can_flags1), 
-                                	        ~(o_ptr->can_flags2), 
-                                        	~(o_ptr->can_flags3), 
-                                   	      	~(o_ptr->can_flags4));
+               	/* Non-ego, non-magical, non-runed average item have no more hidden abilities */
+		else if (object_aware_p(o_ptr))
+		{
+			object_not_flags(o_ptr, ~(o_ptr->can_flags1), 
+				~(o_ptr->can_flags2),
+				~(o_ptr->can_flags3),
+				~(o_ptr->can_flags4));
 		}
 	}
 }

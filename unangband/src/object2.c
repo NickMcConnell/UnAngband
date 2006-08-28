@@ -5133,6 +5133,9 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 	/* Hack -- theme chests */
 	if (opening_chest) tval_drop_idx = j_ptr->tval;
 
+	/* Apply obvious flags */
+	object_obvious_flags(j_ptr);
+
 	/* Success */
 	return (TRUE);
 }
