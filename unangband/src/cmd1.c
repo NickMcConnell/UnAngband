@@ -1508,6 +1508,16 @@ void hit_trap(int y, int x)
 						/* Modify quantity */
 						i_ptr->number = 1;
 
+						/* Apply additional effect from coating or sometimes activate */
+						if ((coated_p(i_ptr)) || (auto_activate(i_ptr)))
+						{
+							/* Make item strike */
+							process_item_blow(i_ptr, y, x);
+
+							/* Hack -- Remove coating on original */
+							if ((!coated_p(i_ptr)) && (o_ptr->feeling == INSCRIP_COATED)) o_ptr->feeling = 0;
+						}
+
 						/* Drop nearby - some chance of breakage */
 						drop_near(i_ptr,y,x,breakage_chance(i_ptr));
 
@@ -1556,7 +1566,6 @@ void hit_trap(int y, int x)
 
 					/* Damage, check for fear and death */
 					take_hit(k, "a player trap");
-
 				}
 				else
 				{
@@ -1572,6 +1581,16 @@ void hit_trap(int y, int x)
 
 				/* Modify quantity */
 				i_ptr->number = 1;
+
+				/* Apply additional effect from coating or sometimes activate */
+				if ((coated_p(i_ptr)) || (auto_activate(i_ptr)))
+				{
+					/* Make item strike */
+					process_item_blow(i_ptr, y, x);
+
+					/* Hack -- Remove coating on original */
+					if ((!coated_p(i_ptr)) && (o_ptr->feeling == INSCRIP_COATED)) o_ptr->feeling = 0;
+				}
 
 				/* Drop nearby - some chance of breakage */
 				drop_near(i_ptr,y,x,breakage_chance(i_ptr));
@@ -1881,6 +1900,85 @@ void hit_trap(int y, int x)
 
 
 /*
+ *   Get style benefits against a monster, using permitted styles.
+ */
+void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hit, int *to_dam, int *to_crit)
+{
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+	int i;
+
+	/* Reset style benefits */
+	*to_hit = 0;
+	*to_dam = 0;
+	*to_crit = 0;
+
+	/* Check backstab if monster sleeping or fleeing */
+	if (((m_ptr->csleep) || (m_ptr->monfear)) && (p_ptr->cur_style & (1L<<WS_SWORD)) &&
+		  (p_ptr->pstyle == WS_BACKSTAB) && (inventory[INVEN_WIELD].weight < 100)) style |= (1L <<WS_BACKSTAB);
+
+	/* Check slay orc if monster is an orc */
+	if (r_ptr->flags3 & (RF3_ORC)) style |= (1L <<WS_SLAY_ORC);
+
+	/* Check slay troll if monster is a troll */
+	if (r_ptr->flags3 & (RF3_TROLL)) style |= (1L <<WS_SLAY_TROLL);
+
+	/* Check slay giant if monster is a giant */
+	if (r_ptr->flags3 & (RF3_GIANT)) style |= (1L <<WS_SLAY_GIANT);
+
+	/* Check slay dragon if monster is a dragon */
+	if (r_ptr->flags3 & (RF3_DRAGON)) style |= (1L <<WS_SLAY_DRAGON);
+
+	/* Check slay evil if monster is evil */
+	if (r_ptr->flags3 & (RF3_EVIL)) style |= (1L <<WS_SLAY_EVIL);
+
+	/* Check slay giant if monster is undead */
+	if (r_ptr->flags3 & (RF3_UNDEAD)) style |= (1L <<WS_SLAY_UNDEAD);
+
+	/* Check slay giant if monster is an animal */
+	if (r_ptr->flags3 & (RF3_ANIMAL)) style |= (1L <<WS_SLAY_ANIMAL);
+
+	/* Check slay giant if monster is a demon */
+	if (r_ptr->flags3 & (RF3_DEMON)) style |= (1L <<WS_SLAY_DEMON);
+
+	/*** Handle styles ***/
+	for (i = 0;i< z_info->w_max;i++)
+	{
+		if (w_info[i].class != p_ptr->pclass) continue;
+
+		if (w_info[i].level > p_ptr->lev) continue;
+
+		/* Check for styles */
+		if ((w_info[i].styles==0) || (w_info[i].styles & (style & (1L << p_ptr->pstyle))))
+		{
+			switch (w_info[i].benefit)
+			{
+				case WB_HIT:
+					*to_hit += (p_ptr->lev - w_info[i].level) /2;
+					break;
+
+				case WB_DAM:
+					*to_dam += (p_ptr->lev - w_info[i].level) /2;
+					break;
+
+				case WB_CRITICAL:
+					*to_crit++;
+					break;
+			}
+		}
+	}
+
+	/* Only allow criticals against living opponents */
+	if ((r_ptr->flags3 & (RF3_NONLIVING)) || (r_ptr->flags2 & (RF2_STUPID)))
+	{
+		*to_crit = 0;
+	}
+
+	/* Only allow criticals against visible opponents */
+	if (!(m_ptr->ml)) *to_crit = 0;
+}
+
+
+/*
  * Get the weapon slot based on the melee style and number of blows so far.
  */
 static int weapon_slot(u32b melee_style, int blows, bool charging)
@@ -2009,12 +2107,6 @@ void py_attack(int y, int x, bool charging)
 	/* Disturb the player */
 	disturb(0, 0);
 
-	/* Check if monster asleep */
-	was_asleep = (m_ptr->csleep == 0);
-
-	/* Disturb the monster */
-	m_ptr->csleep = 0;
-
 	/* Extract monster name (or "it") */
 	monster_desc(m_name, m_ptr, 0);
 
@@ -2043,69 +2135,14 @@ void py_attack(int y, int x, bool charging)
 	/* Check melee styles only */
 	melee_style = p_ptr->cur_style & (WS_WIELD_FLAGS);
 
-	/* Check backstab if monster sleeping or fleeing */
-	if (((was_asleep) || (m_ptr->monfear)) && (p_ptr->cur_style & (1L<<WS_SWORD)) &&
-		  (p_ptr->pstyle ==WS_BACKSTAB) && (inventory[INVEN_WIELD].weight < 100)) melee_style |= (1L <<WS_BACKSTAB);
+	/* Get style benefits */
+	mon_style_benefits(m_ptr, melee_style, &style_hit, &style_dam, &style_crit);
 
-	/* Check slay orc if monster is an orc */
-	if (r_ptr->flags3 & (RF3_ORC)) melee_style |= (1L <<WS_SLAY_ORC);
+	/* Check if monster asleep */
+	was_asleep = (m_ptr->csleep == 0);
 
-	/* Check slay troll if monster is a troll */
-	if (r_ptr->flags3 & (RF3_TROLL)) melee_style |= (1L <<WS_SLAY_TROLL);
-
-	/* Check slay giant if monster is a giant */
-	if (r_ptr->flags3 & (RF3_GIANT)) melee_style |= (1L <<WS_SLAY_GIANT);
-
-	/* Check slay dragon if monster is a dragon */
-	if (r_ptr->flags3 & (RF3_DRAGON)) melee_style |= (1L <<WS_SLAY_DRAGON);
-
-	/* Check slay evil if monster is evil */
-	if (r_ptr->flags3 & (RF3_EVIL)) melee_style |= (1L <<WS_SLAY_EVIL);
-
-	/* Check slay giant if monster is undead */
-	if (r_ptr->flags3 & (RF3_UNDEAD)) melee_style |= (1L <<WS_SLAY_UNDEAD);
-
-	/* Check slay giant if monster is an animal */
-	if (r_ptr->flags3 & (RF3_ANIMAL)) melee_style |= (1L <<WS_SLAY_ANIMAL);
-
-	/* Check slay giant if monster is a demon */
-	if (r_ptr->flags3 & (RF3_DEMON)) melee_style |= (1L <<WS_SLAY_DEMON);
-
-	/*** Handle styles ***/
-	if (!p_ptr->heavy_wield) for (i = 0;i< z_info->w_max;i++)
-	{
-		if (w_info[i].class != p_ptr->pclass) continue;
-
-		if (w_info[i].level > p_ptr->lev) continue;
-
-		/* Check for styles */
-		if ((w_info[i].styles==0) || (w_info[i].styles & (melee_style & (1L << p_ptr->pstyle))))
-		{
-			switch (w_info[i].benefit)
-			{
-				case WB_HIT:
-					style_hit += (p_ptr->lev - w_info[i].level) /2;
-					break;
-
-				case WB_DAM:
-					style_dam += (p_ptr->lev - w_info[i].level) /2;
-					break;
-
-				case WB_CRITICAL:
-					style_crit++;
-					break;
-			}
-		}
-	}
-
-	/* Only allow criticals against living opponents */
-	if ((r_ptr->flags3 & (RF3_NONLIVING)) || (r_ptr->flags2 & (RF2_STUPID)))
-	{
-		style_crit = 0;
-	}
-
-	/* Only allow criticals against visible opponents */
-	if (!(m_ptr->ml)) style_crit = 0;
+	/* Disturb the monster */
+	m_ptr->csleep = 0;
 
 	/* Mark the monster as attacked by melee */
 	m_ptr->mflag |= (MFLAG_HIT_BLOW);
@@ -2386,111 +2423,12 @@ void py_attack(int y, int x, bool charging)
 
 				break;
 			}
+
 			/* Apply additional effect from coating or sometimes activate */
 			else if ((coated_p(o_ptr)) || (auto_activate(o_ptr)))
 			{
-				int power;
-
-				/* Get artifact activation */
-				if (artifact_p(o_ptr)) power = a_info[o_ptr->name1].activation;
-
-				/* Get item effect */
-				else get_spell(&power, "use", o_ptr, FALSE);
-
-				/* Has a power */
-				if (power > 0)
-				{
-					spell_type *s_ptr = &s_info[power];
-
-					int ap_cnt;
-
-					/* Object is used */
-					if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
-
-					/* Scan through all four blows */
-					for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
-					{
-						int damage = 0;
-
-						/* Extract the attack infomation */
-						int effect = s_ptr->blow[ap_cnt].effect;
-						int method = s_ptr->blow[ap_cnt].method;
-						int d_dice = s_ptr->blow[ap_cnt].d_dice;
-						int d_side = s_ptr->blow[ap_cnt].d_side;
-						int d_plus = s_ptr->blow[ap_cnt].d_plus;
-
-						/* Hack -- no more attacks */
-						if (!method) break;
-
-						/* Mega hack -- dispel evil/undead objects */
-						if (!d_side)
-						{
-							d_plus += 25 * d_dice;
-						}
-
-						/* Roll out the damage */
-						if ((d_dice) && (d_side))
-						{
-							damage = damroll(d_dice, d_side) + d_plus;
-						}
-						else
-						{
-							damage = d_plus;
-						}
-
-						/* Hack -- apply damage as projection */
-						if (project_m(-1,y,x,(coated_p(o_ptr) ? damage / 5 : damage), effect) && (coated_p(o_ptr)))
-						{
-							int k_idx = lookup_kind(o_ptr->xtra1, o_ptr->xtra2);
-							k_info[k_idx].aware = TRUE;
-							if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
-						}
-
-						/* Hack -- affect ground if not a coating */
-						(void)project_f(-1,y,x,damage, effect);
-
-						/* Apply teleportation and other effects */
-						(void)project_t(-1,y,x,damage, effect);
-
-						/* Reduce charges */
-						if (o_ptr->charges)
-						{
-							o_ptr->charges--;
-
-							/* Remove coating */
-							if (coated_p(o_ptr) && (!o_ptr->charges))
-							{
-								o_ptr->xtra1 = 0;
-								o_ptr->xtra2 = 0;
-
-								if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
-							}
-						}
-						/* Start recharing item */
-						else if (auto_activate(o_ptr))
-						{
-							if (artifact_p(o_ptr))
-							{
-								artifact_type *a_ptr = &a_info[o_ptr->name1];
-
-								/* Set the recharge time */
-								if (a_ptr->randtime)
-								{
-									o_ptr->timeout = a_ptr->time + (byte)randint(a_ptr->randtime);
-								}
-								else
-								{
-									o_ptr->timeout = a_ptr->time;
-								}
-							}
-							else
-							{
-								/* Time object out */
-								o_ptr->timeout = rand_int(o_ptr->charges)+o_ptr->charges;
-							}
-						}
-					}
-				}
+				/* Make item strike */
+				process_item_blow(o_ptr, y, x);
 			}
 		}
 	}

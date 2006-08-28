@@ -7141,3 +7141,125 @@ bool process_spell(int spell, int level, bool *cancel, bool *known)
 	return (obvious);
 }
 
+
+/*
+ * Apply spell from an item as a blow to one grid and monsters/players, but not objects.
+ *
+ * XXX We assume that there is only 1 item in the stack at present.
+ */
+bool process_item_blow(object_type *o_ptr, int y, int x)
+{
+	int power = 0;
+	bool obvious = FALSE;
+
+	/* Get artifact activation */
+	if (artifact_p(o_ptr))
+	{
+		power = a_info[o_ptr->name1].activation;
+	}
+
+	/* Get item effect */
+	else
+	{
+		get_spell(&power, "use", o_ptr, FALSE);
+	}
+
+	/* Has a power */
+	if (power > 0)
+	{
+		spell_type *s_ptr = &s_info[power];
+
+		int ap_cnt;
+
+		int flg = (PROJECT_JUMP | PROJECT_HIDE | PROJECT_KILL | PROJECT_GRID | PROJECT_PLAY);
+
+		/* Object is used */
+		if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
+
+		/* Scan through all four blows */
+		for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
+		{
+			int damage = 0;
+
+			/* Extract the attack infomation */
+			int effect = s_ptr->blow[ap_cnt].effect;
+			int method = s_ptr->blow[ap_cnt].method;
+			int d_dice = s_ptr->blow[ap_cnt].d_dice;
+			int d_side = s_ptr->blow[ap_cnt].d_side;
+			int d_plus = s_ptr->blow[ap_cnt].d_plus;
+
+			/* Hack -- no more attacks */
+			if (!method) break;
+
+			/* Mega hack -- dispel evil/undead objects */
+			if (!d_side)
+			{
+				d_plus += 25 * d_dice;
+			}
+
+			/* Roll out the damage */
+			if ((d_dice) && (d_side))
+			{
+				damage = damroll(d_dice, d_side) + d_plus;
+			}
+			else
+			{
+				damage = d_plus;
+			}
+
+			/* Hack -- apply damage as projection */
+			obvious |= project(-1, 0, y, x, y, x,
+				(coated_p(o_ptr) ? damage / 5 : damage), effect, flg, 0, 0);
+		}
+
+		/* Evaluate coating */
+		if (obvious && (coated_p(o_ptr)))
+		{
+			int k_idx = lookup_kind(o_ptr->xtra1, o_ptr->xtra2);
+			k_info[k_idx].aware = TRUE;
+			if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
+		}
+
+		/* Reduce charges */
+		if (o_ptr->charges)
+		{
+			o_ptr->charges--;
+
+			/* Remove coating */
+			if (coated_p(o_ptr) && (!o_ptr->charges))
+			{
+				o_ptr->xtra1 = 0;
+				o_ptr->xtra2 = 0;
+
+				if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
+			}
+		}
+
+		/* Start recharing item */
+		else if (auto_activate(o_ptr))
+		{
+			if (artifact_p(o_ptr))
+			{
+				artifact_type *a_ptr = &a_info[o_ptr->name1];
+
+				/* Set the recharge time */
+				if (a_ptr->randtime)
+				{
+					o_ptr->timeout = a_ptr->time + (byte)randint(a_ptr->randtime);
+				}
+				else
+				{
+					o_ptr->timeout = a_ptr->time;
+				}
+			}
+			else
+			{
+				/* Time object out */
+				o_ptr->timeout = rand_int(o_ptr->charges)+o_ptr->charges;
+			}
+		}
+	}
+
+	/* Anything seen? */
+	return(obvious);
+}

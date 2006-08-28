@@ -2176,12 +2176,7 @@ static void process_command(void)
 		/* Throw an item */
 		case 'v':
 		{
-
-			msg_format("To throw items,%s use the fire command.",
-				inventory[INVEN_BOW].tval == TV_BOW ? " take off your missile weapon and" : "");
-#if 0
 			do_cmd_throw();
-#endif
 			break;
 		}
 

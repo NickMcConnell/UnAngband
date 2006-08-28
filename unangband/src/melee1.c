@@ -5889,6 +5889,16 @@ void mon_hit_trap(int m_idx, int y, int x)
 						/* Modify quantity */
 						i_ptr->number = 1;
 
+						/* Apply additional effect from coating or sometimes activate */
+						if ((coated_p(i_ptr)) || (auto_activate(i_ptr)))
+						{
+							/* Make item strike */
+							process_item_blow(i_ptr, y, x);
+
+							/* Hack -- Remove coating on original */
+							if ((!coated_p(i_ptr)) && (o_ptr->feeling == INSCRIP_COATED)) o_ptr->feeling = 0;
+						}
+
 						/* Drop nearby - some chance of breakage */
 						drop_near(i_ptr,y,x,breakage_chance(i_ptr));
 
@@ -6142,6 +6152,16 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 				/* Modify quantity */
 				i_ptr->number = 1;
+
+				/* Apply additional effect from coating or sometimes activate */
+				if ((coated_p(i_ptr)) || (auto_activate(i_ptr)))
+				{
+					/* Make item strike */
+					process_item_blow(i_ptr, y, x);
+
+					/* Hack -- Remove coating on original */
+					if ((!coated_p(i_ptr)) && (o_ptr->feeling == INSCRIP_COATED)) o_ptr->feeling = 0;
+				}
 
 				/* Drop nearby - some chance of breakage */
 				drop_near(i_ptr,y,x,breakage_chance(i_ptr));

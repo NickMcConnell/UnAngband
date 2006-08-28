@@ -3172,6 +3172,14 @@ static bool item_tester_hook_rope(const object_type *o_ptr)
 }
 
 
+
+
+
+
+
+
+
+
 /*
  * Fire an object from the pack or floor.
  *
@@ -3208,7 +3216,7 @@ void do_cmd_fire(void)
 	int dir, item, item2 = 0;
 	int i, j, y, x, ty, tx;
 	int tdam, tdis, thits, tmul;
-	int bonus, chance, power = 0;
+	int bonus, chance;
 
 	int style_hit, style_dam, style_crit;
 	u32b shoot_style;
@@ -3265,17 +3273,8 @@ void do_cmd_fire(void)
 	if (!item_tester_tval) item_tester_hook = item_tester_hook_throwing;
 
 	/* Get an item */
-	if ((inventory[INVEN_BOW].k_idx) && (inventory[INVEN_BOW].tval == TV_BOW))
-	{
-		q = "Fire which item? ";
-		s = "You have nothing to fire. Take off your missile weapon to throw an item.";
-	}
-	/* Get an item */
-	else
-	{
-		q = "Throw which item? ";
-		s = "You have nothing to throw. Equip a missile weapon to fire an item.";
-	}
+	q = "Fire which item? ";
+	s = "You have nothing to fire.";
 
 	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATG))) return;
 
@@ -3552,69 +3551,11 @@ void do_cmd_fire(void)
 			/* Some monsters are great at dodging  -EZ- */
 			if (mon_evade(m_ptr, (m_ptr->confused || m_ptr->stunned ? 1 : 3) + m_ptr->cdis, 5 + m_ptr->cdis,"")) continue;
 
-			/* Reset style bonuses */
-			style_hit = 0;
-			style_dam = 0;
-			style_crit = 0;
-
 			/* Check shooting styles only */
 			shoot_style = p_ptr->cur_style & (WS_SHOOT_FLAGS);
 
-			/* Check backstab if monster sleeping or fleeing */
-			if (((m_ptr->csleep) || (m_ptr->monfear)) && (p_ptr->cur_style & (1L<<WS_SWORD)) &&
-				  (p_ptr->pstyle == WS_BACKSTAB) && (inventory[INVEN_WIELD].weight < 100)) shoot_style |= (1L <<WS_BACKSTAB);
-
-			/* Check slay orc if monster is an orc */
-			if (r_ptr->flags3 & (RF3_ORC)) shoot_style |= (1L <<WS_SLAY_ORC);
-
-			/* Check slay troll if monster is a troll */
-			if (r_ptr->flags3 & (RF3_TROLL)) shoot_style |= (1L <<WS_SLAY_TROLL);
-
-			/* Check slay giant if monster is a giant */
-			if (r_ptr->flags3 & (RF3_GIANT)) shoot_style |= (1L <<WS_SLAY_GIANT);
-
-			/* Check slay dragon if monster is a dragon */
-			if (r_ptr->flags3 & (RF3_DRAGON)) shoot_style |= (1L <<WS_SLAY_DRAGON);
-
-			/* Check slay evil if monster is evil */
-			if (r_ptr->flags3 & (RF3_EVIL)) shoot_style |= (1L <<WS_SLAY_EVIL);
-
-			/* Check slay giant if monster is undead */
-			if (r_ptr->flags3 & (RF3_UNDEAD)) shoot_style |= (1L <<WS_SLAY_UNDEAD);
-
-			/* Check slay giant if monster is an animal */
-			if (r_ptr->flags3 & (RF3_ANIMAL)) shoot_style |= (1L <<WS_SLAY_ANIMAL);
-
-			/* Check slay giant if monster is a demon */
-			if (r_ptr->flags3 & (RF3_DEMON)) shoot_style |= (1L <<WS_SLAY_DEMON);
-
-			/*** Handle styles ***/
-			for (i = 0;i< z_info->w_max;i++)
-			{
-				if (w_info[i].class != p_ptr->pclass) continue;
-
-				if (w_info[i].level > p_ptr->lev) continue;
-
-				/* Check for styles */
-				if ((w_info[i].styles==0) || (w_info[i].styles & (shoot_style & (1L << p_ptr->pstyle))))
-				{
-					switch (w_info[i].benefit)
-					{
-						case WB_HIT:
-							style_hit += (p_ptr->lev - w_info[i].level) /2;
-							break;
-
-						case WB_DAM:
-							style_dam += (p_ptr->lev - w_info[i].level) /2;
-							break;
-
-						case WB_CRITICAL:
-							style_crit++;
-							break;
-					}
-				}
-
-			}
+			/* Get style benefits */
+			mon_style_benefits(m_ptr, shoot_style, &style_hit, &style_dam, &style_crit);
 
 			/* Test hit fire */
 			hit_or_near_miss = test_hit_fire(chance2 + style_hit * BTH_PLUS_ADJ, calc_monster_ac(m_ptr, FALSE), m_ptr->ml);
@@ -3758,107 +3699,11 @@ void do_cmd_fire(void)
 					/* Use coating or sometimes activate item*/
 					if ((coated_p(i_ptr)) || (auto_activate(i_ptr)))
 					{
-						/* Get artifact activation */
-						if (artifact_p(i_ptr)) power = a_info[i_ptr->name1].activation;
+						/* Make item strike */
+						process_item_blow(i_ptr, y, x);
 
-						/* Get item effect */
-						else get_spell(&power, "use", i_ptr, FALSE);
-					}
-
-					/* Has a power */
-					if (power > 0)
-					{
-						spell_type *s_ptr = &s_info[power];
-
-						int ap_cnt;
-
-						/* Object is used */
-						if (k_info[i_ptr->k_idx].used < MAX_SHORT) k_info[i_ptr->k_idx].used++;
-
-						/* Scan through all four blows */
-						for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
-						{
-							int damage = 0;
-
-							/* Extract the attack infomation */
-							int effect = s_ptr->blow[ap_cnt].effect;
-							int method = s_ptr->blow[ap_cnt].method;
-							int d_dice = s_ptr->blow[ap_cnt].d_dice;
-							int d_side = s_ptr->blow[ap_cnt].d_side;
-							int d_plus = s_ptr->blow[ap_cnt].d_plus;
-
-							/* Hack -- no more attacks */
-							if (!method) break;
-
-							/* Mega hack -- dispel evil/undead objects */
-							if (!d_side)
-							{
-								d_plus += 25 * d_dice;
-							}
-
-							/* Roll out the damage */
-							if ((d_dice) && (d_side))
-							{
-								damage = damroll(d_dice, d_side) + d_plus;
-							}
-							else
-							{
-								damage = d_plus;
-							}
-
-							/* Hack -- apply damage as projection */
-							if (project_m(-1,y,x,(coated_p(i_ptr) ? damage / 5 : damage), effect) && (coated_p(i_ptr)))
-							{
-								int k_idx = lookup_kind(i_ptr->xtra1, i_ptr->xtra2);
-								k_info[k_idx].aware = TRUE;
-								if (i_ptr->feeling == INSCRIP_COATED) i_ptr->feeling = 0;
-								if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
-							}
-
-							/* Hack -- affect ground */
-							(void)project_f(-1,y,x,damage, effect);
-
-							/* Apply teleport & other effects */
-							(void)project_t(-1,y,x,damage, effect);
-
-							/* Reduce charges */
-							if (i_ptr->charges)
-							{
-								i_ptr->charges--;
-
-								/* Remove coating */
-								if (coated_p(i_ptr) && (!i_ptr->charges))
-								{
-									i_ptr->xtra1 = 0;
-									i_ptr->xtra2 = 0;
-
-									if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
-								}
-							}
-							/* Start recharing item */
-							else if (auto_activate(i_ptr))
-							{
-								if (artifact_p(i_ptr))
-								{
-									artifact_type *a_ptr = &a_info[i_ptr->name1];
-
-									/* Set the recharge time */
-									if (a_ptr->randtime)
-									{
-										i_ptr->timeout = a_ptr->time + (byte)randint(a_ptr->randtime);
-									}
-									else
-									{
-										i_ptr->timeout = a_ptr->time;
-									}
-								}
-								else
-								{
-									/* Time object out */
-									i_ptr->timeout = rand_int(i_ptr->charges)+i_ptr->charges;
-								}
-							}
-						}
+						/* Hack -- Remove coating on original */
+						if ((!coated_p(i_ptr)) && (o_ptr->feeling == INSCRIP_COATED)) o_ptr->feeling = 0;
 					}
 				}
 
@@ -3899,7 +3744,6 @@ void do_cmd_fire(void)
 }
 
 
-#if 0
 /*
  * Throw an object from the pack or floor.
  *
@@ -3916,14 +3760,15 @@ void do_cmd_throw(void)
 
 	int dir, item;
 	int i, j, y, x, ty, tx;
-	int chance, tdam, tdis;
+	int chance, bonus, tdam, tdis;
 	int mul, div;
-	int power;
 
 	object_type *o_ptr;
 
 	object_type *i_ptr;
 	object_type object_type_body;
+
+	int style_hit, style_dam, style_crit;
 
 	bool hit_body = FALSE;
 	bool get_feat = FALSE;
@@ -3942,10 +3787,20 @@ void do_cmd_throw(void)
 
 	bool was_asleep = FALSE;
 
+	u32b f1, f2, f3, f4;
+	bool throwing;
+
 	/* Berserk */
 	if (p_ptr->shero)
 	{
 		msg_print("You are too enraged!");
+		return;
+	}
+
+	/* Some items and some rooms blow missiles around */
+	if ((p_ptr->cur_flags4 & (TR4_WINDY)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_WINDY)))
+	{
+		msg_print("Its too windy around you!");
 		return;
 	}
 
@@ -3975,6 +3830,12 @@ void do_cmd_throw(void)
 
 	/* Get feat */
 	if (o_ptr->ident & (IDENT_STORE)) get_feat = TRUE;
+
+	/* Get object flags */
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+
+	/* Set if throwing */
+	throwing = (f3 & (TR3_THROWING)) != 0;
 
 	/* Get a direction (or cancel) */
 	if (!get_aim_dir(&dir)) return;
@@ -4048,7 +3909,8 @@ void do_cmd_throw(void)
 	tdam = damroll(i_ptr->dd, i_ptr->ds);
 
 	/* Chance of hitting */
-	chance = (p_ptr->skill_tht + (p_ptr->to_h * BTH_PLUS_ADJ));
+	bonus = (p_ptr->to_h + i_ptr->to_h * (throwing ? 2 : 1));
+	chance = (p_ptr->skill_tht + (bonus * BTH_PLUS_ADJ));
 
 	/* Take a turn */
 	p_ptr->energy_use = 100;
@@ -4111,7 +3973,6 @@ void do_cmd_throw(void)
 		{
 			monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
 			monster_race *r_ptr = &r_info[m_ptr->r_idx];
-			monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
 			int chance2 = chance - distance(py, px, y, x);
 
@@ -4124,13 +3985,16 @@ void do_cmd_throw(void)
 			if (m_ptr->mflag & (MFLAG_HIDE)) continue;
 
 			/* Some monsters are great at dodging  -EZ- */
-			if (mon_evade(cave_m_idx[y][x], m_ptr->confused || m_ptr->stunned ? 4 : 2, 5 + m_ptr->cdis,"")) continue;
+			if (mon_evade(m_ptr, m_ptr->confused || m_ptr->stunned ? 4 : 2, 5 + m_ptr->cdis,"")) continue;
+
+			/* Get style benefits if a throwing weapon */
+			if (throwing) mon_style_benefits(m_ptr, WS_THROWN, &style_hit, &style_dam, &style_crit);
 
 			/* Test hit fire */
-			hit_or_near_miss = test_hit_fire(chance2, calc_monster_ac(m_ptr, FALSE), m_ptr->ml);
+			hit_or_near_miss = test_hit_fire(chance2 + style_hit * BTH_PLUS_ADJ, calc_monster_ac(m_ptr, FALSE), m_ptr->ml);
 
 			/* Genuine hit */
-			genuine_hit = test_hit_fire(chance2, calc_monster_ac(m_ptr, TRUE), m_ptr->ml);
+			genuine_hit = test_hit_fire(chance2 + style_hit * BTH_PLUS_ADJ, calc_monster_ac(m_ptr, TRUE), m_ptr->ml);
 
 			/* Missiles bounce off resistant monsters */
 			if ((genuine_hit) && (mon_resist_object(m_ptr, o_ptr)))
@@ -4169,13 +4033,13 @@ void do_cmd_throw(void)
 				}
 
 				/* Apply special damage XXX XXX XXX */
-				tdam = tot_dam_aux(i_ptr, tdam, m_ptr);
+				tdam = tot_dam_aux(i_ptr, tdam, m_ptr) + style_dam;
 
 				/* Apply critical damage */
-				tdam += critical_shot(i_ptr->weight, i_ptr->to_h, tdam);
+				tdam += critical_shot(i_ptr->weight, (i_ptr->to_h * (throwing ? 2 : 1) + style_crit *30), tdam);
 
 				/* Apply launcher and missile bonus */
-				tdam += i_ptr->to_d;
+				tdam += i_ptr->to_d * (throwing ? 2 : 1);
 
 				/* No negative damage */
 				if (tdam < 0) tdam = 0;
@@ -4268,107 +4132,11 @@ void do_cmd_throw(void)
 					/* Use coating or sometimes activate item*/
 					if ((coated_p(i_ptr)) || (auto_activate(i_ptr)))
 					{
-						/* Get artifact activation */
-						if (artifact_p(i_ptr)) power = a_info[i_ptr->name1].activation;
+						/* Make item strike */
+						process_item_blow(i_ptr, y, x);
 
-						/* Get item effect */
-						else get_spell(&power, "use", i_ptr, FALSE);
-					}
-
-					/* Has a power */
-					if (power > 0)
-					{
-						spell_type *s_ptr = &s_info[power];
-
-						int ap_cnt;
-
-						/* Object is used */
-						if (k_info[i_ptr->k_idx].used < MAX_SHORT) k_info[i_ptr->k_idx].used++;
-
-						/* Scan through all four blows */
-						for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
-						{
-							int damage = 0;
-
-							/* Extract the attack infomation */
-							int effect = s_ptr->blow[ap_cnt].effect;
-							int method = s_ptr->blow[ap_cnt].method;
-							int d_dice = s_ptr->blow[ap_cnt].d_dice;
-							int d_side = s_ptr->blow[ap_cnt].d_side;
-							int d_plus = s_ptr->blow[ap_cnt].d_plus;
-
-							/* Hack -- no more attacks */
-							if (!method) break;
-
-							/* Mega hack -- dispel evil/undead objects */
-							if (!d_side)
-							{
-								d_plus += 25 * d_dice;
-							}
-
-							/* Roll out the damage */
-							if ((d_dice) && (d_side))
-							{
-								damage = damroll(d_dice, d_side) + d_plus;
-							}
-							else
-							{
-								damage = d_plus;
-							}
-
-							/* Hack -- apply damage as projection */
-							if (project_m(-1,y,x,(coated_p(i_ptr) ? damage / 5 : damage), effect) && (coated_p(i_ptr)))
-							{
-								int k_idx = lookup_kind(i_ptr->xtra1, i_ptr->xtra2);
-								k_info[k_idx].aware = TRUE;
-								if (i_ptr->feeling == INSCRIP_COATED) i_ptr->feeling = 0;
-								if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
-							}
-
-							/* Hack -- affect ground */
-							(void)project_f(-1,y,x,damage, effect);
-
-							/* Apply teleport & other effects */
-							(void)project_t(-1,y,x,damage, effect);
-
-							/* Reduce charges */
-							if (i_ptr->charges)
-							{
-								i_ptr->charges--;
-
-								/* Remove coating */
-								if (coated_p(i_ptr) && (!i_ptr->charges))
-								{
-									i_ptr->xtra1 = 0;
-									i_ptr->xtra2 = 0;
-
-									if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
-								}
-							}
-							/* Start recharing item */
-							else if (auto_activate(i_ptr))
-							{
-								if (artifact_p(i_ptr))
-								{
-									artifact_type *a_ptr = &a_info[i_ptr->name1];
-
-									/* Set the recharge time */
-									if (a_ptr->randtime)
-									{
-										i_ptr->timeout = a_ptr->time + (byte)randint(a_ptr->randtime);
-									}
-									else
-									{
-										i_ptr->timeout = a_ptr->time;
-									}
-								}
-								else
-								{
-									/* Time object out */
-									i_ptr->timeout = rand_int(i_ptr->charges)+i_ptr->charges;
-								}
-							}
-						}
+						/* Hack -- Remove coating on original */
+						if ((!coated_p(i_ptr)) && (o_ptr->feeling == INSCRIP_COATED)) o_ptr->feeling = 0;
 					}
 				}
 
@@ -4387,6 +4155,3 @@ void do_cmd_throw(void)
 	/* Drop (or break) near that location */
 	drop_near(i_ptr, j, y, x);
 }
-
-
-#endif

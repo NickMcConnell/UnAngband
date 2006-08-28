@@ -324,6 +324,14 @@ rate, and can result in monsters being spawned asleep (From SAngband).
 
 - Made disease effects against monsters a lot more interesting.
 
+- Enabled throwing again. Throwing now includes damage from specialisation if the
+object you are throwing has the THROWING flag.  Such objects also get twice the
+benefit of their to-hit and damage bonuses when thrown.  If you have an instrument or
+no bow equipped, you are still capable of throwing using the fire command, and this
+command will only list items with the THROWING flag enabled.
+
+- Player traps now do additional damage from coated weapons and ammunition.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -413,7 +421,8 @@ a disease (Requested by Pav Lucistnik).
 - Reorganise main screen to group all status flags together, and ensure that
 important information is always fitted onto the screen.
 
-- Flags you learn on weapons are now reported after all your melee attacks.
+- Flags you learn on weapons are now reported after all your melee attacks have
+finished.
 
 ### Bug fixes ###
 

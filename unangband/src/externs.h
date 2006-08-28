@@ -397,6 +397,7 @@ extern void search(void);
 extern bool auto_pickup_ignore(const object_type *o_ptr);
 extern void py_pickup(int pickup);
 extern void hit_trap(int y, int x);
+extern void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hit, int *to_dam, int *to_crit);
 extern bool auto_activate(const object_type *o_ptr);
 extern void py_attack(int y, int x, bool charging);
 extern bool stuck_player(int *dir);
@@ -822,6 +823,7 @@ extern bool process_spell_blows(int spell, int level, bool *cancel);
 extern bool process_spell_types(int spell, int level, bool *cancel);
 extern bool process_spell_eaten(int spell, int level, bool *cancel);
 extern bool process_spell(int spell, int level, bool *cancel, bool *known);
+extern bool process_item_blow(object_type *o_ptr, int y, int x);
 
 /* store.c */
 extern void do_cmd_store(void);
