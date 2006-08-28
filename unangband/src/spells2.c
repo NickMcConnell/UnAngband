@@ -486,37 +486,6 @@ bool disease_desc(char *desc, u32b old_disease, u32b new_disease)
 
 
 /*
- *  Hack -- exclude the following flags from equipment self-knowledge except weapons.
- */
-#define TR1_WEAPON_FLAGS (TR1_SLAY_ORC | TR1_SLAY_TROLL | TR1_SLAY_GIANT |\
-			TR1_SLAY_DRAGON | TR1_SLAY_UNDEAD | TR1_SLAY_DEMON |\
-			TR1_SLAY_NATURAL | TR1_BRAND_HOLY | TR1_KILL_DRAGON |\
-			TR1_KILL_UNDEAD | TR1_KILL_DEMON | TR1_BRAND_ACID |\
-			TR1_BRAND_FIRE | TR1_BRAND_POIS | TR1_BRAND_ELEC |\
-			TR1_BRAND_COLD)
-
-#define TR2_WEAPON_FLAGS 0x0L
-
-#define TR3_WEAPON_FLAGS (TR3_IMPACT | TR3_BLESSED | TR3_THROWING)
-
-#define TR4_WEAPON_FLAGS (TR4_VAMP_HP | TR4_VAMP_MANA |\
-			  TR4_BRAND_LITE | TR4_BRAND_DARK | TR4_SLAY_MAN | TR4_SLAY_ELF |\
-			  TR4_SLAY_DWARF)
-/*
- *  Hack -- exclude the following flags from equipment self-knowledge as they never apply
- *  directly to the player.
- */
-#define TR1_IGNORE_FLAGS (TR1_WEAPON_FLAGS)
-
-#define TR2_IGNORE_FLAGS (TR2_WEAPON_FLAGS | TR2_IGNORE_MASK)
-
-#define TR3_IGNORE_FLAGS (TR3_WEAPON_FLAGS | TR3_ACTIVATE | TR3_RANDOM | TR3_INSTA_ART |\
-			  TR3_EASY_KNOW | TR3_HIDE_TYPE | TR3_SHOW_MODS)
-
-#define TR4_IGNORE_FLAGS (TR4_WEAPON_FLAGS)
-
-
-/*
  * Hack -- acquire self knowledge
  *
  * List various information about the player and/or his current equipment.

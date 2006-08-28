@@ -413,6 +413,8 @@ a disease (Requested by Pav Lucistnik).
 - Reorganise main screen to group all status flags together, and ensure that
 important information is always fitted onto the screen.
 
+- Flags you learn on weapons are now reported after all your melee attacks.
+
 ### Bug fixes ###
 
 - Fix weapon branding.
@@ -727,6 +729,9 @@ regarding their activation effects (Reported by Matthias Rudolf).
 
 - Fixed bug with various elemental wands not being recognisable unless they affect
 a monster (Reported by Pete Mac).
+
+- Fixed bug where weapons of slay man, elf and dwarf would lose knowledge about
+their abilities (Reported by Reported by Pav Lucistnik).
 
 ### Build / Platform ###
 

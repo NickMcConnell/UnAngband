@@ -611,7 +611,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 
 				if (mult < 4) mult = 4;
 			}
-			else if (m_ptr->ml)
+			else if ((l_ptr->flags9 & (RF9_MAN)) && (m_ptr->ml))
 			{
 				object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_SLAY_MAN);
 			}
@@ -628,7 +628,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 
 				if (mult < 4) mult = 4;
 			}
-			else if (m_ptr->ml)
+			else if ((l_ptr->flags9 & (RF9_ELF)) && (m_ptr->ml))
 			{
 				object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_SLAY_ELF);
 			}
@@ -645,7 +645,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 
 				if (mult < 4) mult = 4;
 			}
-			else if (m_ptr->ml)
+			else if ((l_ptr->flags9 & (RF9_ELF)) && (m_ptr->ml))
 			{
 				object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_SLAY_DWARF);
 			}
@@ -1880,6 +1880,35 @@ void hit_trap(int y, int x)
 }
 
 
+/*
+ * Get the weapon slot based on the melee style and number of blows so far.
+ */
+static int weapon_slot(u32b melee_style, int blows, bool charging)
+{
+	int slot = INVEN_WIELD;
+
+	/* Get secondary weapon instead */
+	if (!(blows % 2) && (melee_style & (1L << WS_TWO_WEAPON))) slot = INVEN_ARM;
+
+	/* Get the unarmed weapon */
+	if (melee_style & (1L << WS_UNARMED))
+	{
+		/* Use feet while charging */
+		if (charging) slot = INVEN_FEET;
+
+		/* Alternate hands and feet */
+		else if (!(blows %2)) slot = INVEN_FEET;
+
+		/* Use hands */
+		else slot = INVEN_HANDS;
+	}
+
+	return(slot);
+}
+
+
+
+
 
 /*
  * Determine if the object has a "=A" in its inscription.
@@ -1943,6 +1972,7 @@ void py_attack(int y, int x, bool charging)
 	u32b melee_style;
 
 	int blows = 0; /* Number of blows actually delivered */
+	int slot;
 
 	int i;
 	int num_blows = 0;
@@ -1964,6 +1994,11 @@ void py_attack(int y, int x, bool charging)
 	bool was_asleep;
 
 	cptr p;
+
+	u32b k1[3], k2[3], k3[3], k4[3];
+
+	u32b n1[3], n2[3], n3[3], n4[3];
+
 
 	/* Get the monster */
 	m_ptr = &m_list[cave_m_idx[y][x]];
@@ -2081,39 +2116,38 @@ void py_attack(int y, int x, bool charging)
 	/* Restrict blows if charging */
 	if (charging)
 	{
-		if (melee_style & (1L << WS_TWO_WEAPON)) num_blows = MAX(2, num_blows);
+		if (melee_style & (1L << WS_TWO_WEAPON)) num_blows = 2;
 		else num_blows = 1;
 	}
 
 	/* Attack once for each legal blow */
 	while (num++ < num_blows)
 	{
-		int slot = INVEN_WIELD;
-
 		/* Deliver a blow */
 		blows++;
 
-		/* Some monsters are great at dodging  -EZ- */
-		if (mon_evade(m_ptr, m_ptr->stunned || m_ptr->confused? 50 : 80, 100, "your blow")) continue;
+		/* Get weapon slot */
+		slot = weapon_slot(melee_style,blows,charging);
 
-		/* Get secondary weapon instead */
-		if (!(blows % 2) && (melee_style & (1L << WS_TWO_WEAPON))) slot = INVEN_ARM;
-
-		/* Get the weapon */
+		/* Weapon slot */
 		o_ptr = &inventory[slot];
 
-		/* Get the unarmed weapon */
-		if (melee_style & (1L << WS_UNARMED))
+		/* Record the item flags */
+		if (o_ptr->k_idx)
 		{
-			/* Use feet because hands are full */
-			if ((o_ptr->k_idx) || (charging)) o_ptr = &inventory[INVEN_FEET];
-
-			/* Alternate hands and feet */
-			else if (!(blows %2)) o_ptr = &inventory[INVEN_FEET];
-
-			/* Use hands */
-			else o_ptr = &inventory[INVEN_HANDS];
+			/* Get item first time it is used */
+			if ((blows <= 2) && ((blows <= 1)
+				|| (melee_style & ((1L << WS_UNARMED) | (1L << WS_TWO_WEAPON))) ))
+			{
+				k1[blows] = o_ptr->can_flags1;
+				k2[blows] = o_ptr->can_flags2;
+				k3[blows] = o_ptr->can_flags3;
+				k4[blows] = o_ptr->can_flags4;
+			}
 		}
+
+		/* Some monsters are great at dodging  -EZ- */
+		if (mon_evade(m_ptr, m_ptr->stunned || m_ptr->confused? 50 : 80, 100, "your blow")) continue;
 
 		/* Calculate the "attack quality" */
 		if (o_ptr->k_idx) bonus = p_ptr->to_h + o_ptr->to_h + style_hit;
@@ -2146,13 +2180,6 @@ void py_attack(int y, int x, bool charging)
 			/* Handle normal weapon/gauntlets/boots */
 			if (o_ptr->k_idx)
 			{
-				u32b k1 = o_ptr->can_flags1;
-				u32b k2 = o_ptr->can_flags2;
-				u32b k3 = o_ptr->can_flags3;
-				u32b k4 = o_ptr->can_flags4;
-
-				u32b n1, n2, n3, n4;
-
 				k = damroll(o_ptr->dd, o_ptr->ds);
 				k = tot_dam_aux(o_ptr, k, m_ptr);
 
@@ -2187,14 +2214,6 @@ void py_attack(int y, int x, bool charging)
 
 				/* Add damage bonus */
 				k += o_ptr->to_d;
-
-				/* Check for new flags */
-				n1 = o_ptr->can_flags1 & ~(k1);
-				n2 = o_ptr->can_flags2 & ~(k2);
-				n3 = o_ptr->can_flags3 & ~(k3);
-				n4 = o_ptr->can_flags4 & ~(k4);
-
-				if (n1 || n2 || n3 || n4) update_slot_flags(slot, n1, n2, n3, n4);
 
 				/* Check usage */
 				object_usage(slot);
@@ -2503,6 +2522,22 @@ void py_attack(int y, int x, bool charging)
 
 	/* Only use required energy to kill monster */
 	else p_ptr->energy_use = 100 * blows / p_ptr->num_blow;
+
+	/* Check and display any changed weapon flags */
+	for (i = 1; (i <= blows) && (i <= ((melee_style & ((1L << WS_UNARMED) | (1L << WS_TWO_WEAPON))) ? 2 : 1)); i++)
+	{
+		slot = weapon_slot(melee_style, i, charging);
+
+		o_ptr = &inventory[slot];
+
+		/* Check for new flags */
+		n1[i] = (o_ptr->can_flags1 & ~(k1[i])) & (TR1_WEAPON_FLAGS);
+		n2[i] = (o_ptr->can_flags2 & ~(k2[i])) & (TR2_WEAPON_FLAGS);
+		n3[i] = (o_ptr->can_flags3 & ~(k3[i])) & (TR3_WEAPON_FLAGS);
+		n4[i] = (o_ptr->can_flags4 & ~(k4[i])) & (TR4_WEAPON_FLAGS);
+
+		if (n1[i] || n2[i] || n3[i] || n4[i]) update_slot_flags(slot, n1[i], n2[i], n3[i], n4[i]);
+	}
 }
 
 /*
