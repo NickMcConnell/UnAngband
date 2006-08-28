@@ -5707,8 +5707,11 @@ bool break_near(object_type *j_ptr, int y, int x)
 		/* Potions and flasks explode with radius 1. */
 		case TV_POTION:
 		case TV_FLASK:
+		/* Non-artifact lites explode with radius 0 */
+		case TV_LITE:
 		{
 			int power;
+			int rad = j_ptr->tval == TV_LITE ? 0 : 1;
 
 			/* Get item effect */
 			get_spell(&power, "use", j_ptr, FALSE);
@@ -5732,7 +5735,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 					if (!method) break;
 
 					/* Message */
-					if (!i) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
+					if ((!i) && (rad)) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
 
 					/* Mega hack -- dispel evil/undead objects */
 					if (!d_side)
@@ -5753,7 +5756,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 					flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
 					/* Hit with radius 1 attack */
-					obvious |= project(-1, 1, y, x, y, x, damroll(d_side, d_dice) * j_ptr->number,
+					obvious |= project(-1, rad, y, x, y, x, damroll(d_side, d_dice) * j_ptr->number,
 						 effect, flg, 0, 0);
 				}
 
@@ -5827,8 +5830,8 @@ bool break_near(object_type *j_ptr, int y, int x)
 		}
 	}
 
-	/* Message */
-	msg_format("The %s disappear%s.",o_name, (plural ? "" : "s"));
+	/* Message if not breaking as a result of item destruction */
+	if (!(j_ptr->ident & (IDENT_BREAKS))) msg_format("The %s disappear%s.",o_name, (plural ? "" : "s"));
 
 	return TRUE;
 }
