@@ -703,7 +703,7 @@
 #define COL_STUDY		(show_sidebar ? (Term->wid >= 100  ? 91 : 80) : 79)	/* "Study" */
 
 #define ROW_DEPTH		Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1)
-#define COL_DEPTH		(show_sidebar ? (Term->wid >= 100  ? 96 : 85) : 84)	/* "Lev NNN" / "NNNN ft" */
+#define COL_DEPTH		(show_sidebar ? (Term->wid >= 100  ? 96 : 85) : 72)	/* "Lev NNN" / "NNNN ft" */
 
 
 
@@ -2627,7 +2627,7 @@
 #define PR_DISEASE		0x10000000L	/* Display Extra (Disease) */
 #define PR_AMNESIA		0x20000000L	/* Display Extra (Cursed) */
 #define PR_CURSED		0x40000000L	/* Display Extra (Amnesia) */
-#define PR_PETRIFY		0x40000000L	/* Display Extra (Petrify) */
+#define PR_PETRIFY		0x80000000L	/* Display Extra (Petrify) */
 
 /*
  * Bit flags for the "p_ptr->window" variable (etc)

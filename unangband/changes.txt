@@ -332,6 +332,10 @@ command will only list items with the THROWING flag enabled.
 
 - Player traps now do additional damage from coated weapons and ammunition.
 
+- You can now damage monster inventories. This is primarily intended for destroying
+monster ammunition with fire or acid based spells, but stolen objects will equally 
+be at risk of destruction.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

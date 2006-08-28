@@ -1581,6 +1581,80 @@ static int inven_damage(inven_func typ, int perc)
 }
 
 
+/*
+ * Destroys a type of item on a given percent chance carried by monsters.
+ * Note that missiles are no longer necessarily all destroyed
+ * Destruction taken from "melee.c" code for "stealing".
+ * Returns number of items destroyed.
+ */
+static int mon_inven_damage(const monster_type *m_ptr, inven_func typ, int perc)
+{
+	int j, k, amt;
+
+	object_type *o_ptr;
+
+	s16b this_o_idx, next_o_idx = 0;
+
+	char m_name[80];
+
+	char o_name[80];
+
+	/* Count the casualties */
+	k = 0;
+
+	/* Destroy objects being carried */
+	for (this_o_idx = m_ptr->hold_o_idx; this_o_idx; this_o_idx = next_o_idx)
+	{
+		/* Get the object */
+		o_ptr = &o_list[this_o_idx];
+
+		/* Get the next object */
+		next_o_idx = o_ptr->next_o_idx;
+
+		/* Hack -- for now, skip artifacts */
+		if (artifact_p(o_ptr)) continue;
+
+		/* Give this item slot a shot at death */
+		if ((*typ)(o_ptr))
+		{
+			/* Count the casualties */
+			for (amt = j = 0; j < o_ptr->number; ++j)
+			{
+				if (rand_int(100) < perc) amt++;
+			}
+
+			/* Some casualities */
+			if (amt)
+			{
+				/* Get a description */
+				object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 3);
+
+				/* Get "possessive" */
+				monster_desc(m_name, m_ptr, 0x22);
+
+				/* Message */
+				msg_format("%^s%s %s destroyed!",
+					   ((o_ptr->number > 1) ?
+					    ((amt == o_ptr->number) ? "All of " :
+					     (amt > 1 ? "Some of " : "One of ")) : m_name),
+					   (o_ptr->number > 1) ? m_name : "",  o_name, 
+					   ((amt > 1) ? "were" : "was"));
+
+				/* Destroy "amt" items */
+				if (k < o_ptr->number) o_ptr->number -= k;
+
+				/* Delete the object */
+				else delete_object_idx(this_o_idx);
+
+				/* Count the casualties */
+				k += amt;
+			}
+		}
+	}
+
+	/* Return the casualty count */
+	return (k);
+}
 
 
 /*
@@ -4385,6 +4459,9 @@ bool project_m(int who, int y, int x, int dam, int typ)
 	/* Heal amount (amount to blind) */
 	int do_blind = 0;
 
+	/* Destruction of inventory? */
+	inven_func do_inven_destroy = NULL;
+
 	/* Hold the monster name */
 	char m_name[80];
 
@@ -4527,6 +4604,10 @@ bool project_m(int who, int y, int x, int dam, int typ)
 					l_ptr->flags3 |= (RF2_ARMOR);
 				}
 			}
+
+			/* Do acid damage to inventory */
+			do_inven_destroy = set_acid_destroy;
+
 			break;
 		}
 
@@ -4551,6 +4632,10 @@ bool project_m(int who, int y, int x, int dam, int typ)
 				dam /= 3;
 				note = " is temporarily resistant to lightning.";
 			}
+
+			/* Do electricity damage to inventory */
+			do_inven_destroy = set_elec_destroy;
+
 			break;
 		}
 
@@ -4575,6 +4660,10 @@ bool project_m(int who, int y, int x, int dam, int typ)
 				dam /= 3;
 				note = " is temporarily resistant to fire.";
 			}
+
+			/* Do fire damage to inventory */
+			do_inven_destroy = set_fire_destroy;
+
 			break;
 		}
 
@@ -4599,6 +4688,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 				dam /= 3;
 				note = " is temporarily resistant to cold.";
 			}
+
 			break;
 		}
 
@@ -4719,6 +4809,9 @@ bool project_m(int who, int y, int x, int dam, int typ)
 				}
 			}
 
+			/* Do fire damage to inventory */
+			do_inven_destroy = set_fire_destroy;
+
 			break;
 		}
 
@@ -4735,6 +4828,10 @@ bool project_m(int who, int y, int x, int dam, int typ)
 					l_ptr->flags3 |= (RF3_RES_PLAS);
 				}
 			}
+
+			/* Do fire damage to inventory */
+			do_inven_destroy = set_fire_destroy;
+
 			break;
 		}
 
@@ -4822,6 +4919,10 @@ bool project_m(int who, int y, int x, int dam, int typ)
 				/* Monster was affected -- Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
 			}
+
+			/* Do water damage to inventory */
+			do_inven_destroy = set_water_destroy;
+
 			break;
 		}
 
@@ -4843,6 +4944,10 @@ bool project_m(int who, int y, int x, int dam, int typ)
 				dam = 0;
 				do_stun = 10 + randint(15);
 			}
+
+			/* Do water damage to inventory */
+			do_inven_destroy = set_water_destroy;
+
 			break;
 		}
 
@@ -4875,6 +4980,10 @@ bool project_m(int who, int y, int x, int dam, int typ)
 				dam = 0;
 				do_stun = 10 + randint(15);
 			}
+
+			/* Do water damage to inventory */
+			do_inven_destroy = set_water_destroy;
+
 			break;
 		}
 
@@ -4916,6 +5025,10 @@ bool project_m(int who, int y, int x, int dam, int typ)
 				/* Monster was affected -- Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
 			}
+
+			/* Do water damage to inventory */
+			do_inven_destroy = set_water_destroy;
+
 			break;
 		}
 
@@ -4956,6 +5069,10 @@ bool project_m(int who, int y, int x, int dam, int typ)
 				/* Monster was affected -- Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
 			}
+
+			/* Do fire damage to inventory */
+			do_inven_destroy = set_fire_destroy;
+
 			break;
 		}
 
@@ -4995,12 +5112,16 @@ bool project_m(int who, int y, int x, int dam, int typ)
 				/* Monster was affected -- Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
 			}
+
+			/* Do water damage to inventory */
+			do_inven_destroy = set_water_destroy;
+
 			break;
 		}
 
 		/* Suffocation damage for any monster in terrain they can't handle */
 		/* eg fish out of water */
-		/* Heavily stunned/confused take damage */
+		/* Heavily stunned */
 		case GF_SUFFOCATE:
 		{
 			if (seen) obvious = TRUE;
@@ -5294,6 +5415,9 @@ bool project_m(int who, int y, int x, int dam, int typ)
 				dam /= 2;
 				note = " is temporarily resistant to fire.";
 			}
+
+			/* Do cold damage to inventory */
+			do_inven_destroy = set_cold_destroy;
 
 			break;
 		}
@@ -6963,6 +7087,9 @@ bool project_m(int who, int y, int x, int dam, int typ)
 
 			/* Hack -- handle sleep */
 			if (do_sleep) m_ptr->csleep = do_sleep;
+
+			/* Hack -- handle inventory damage */
+			if (do_inven_destroy) mon_inven_damage(m_ptr, do_inven_destroy, (dam / 15) + 1);
 		}
 	}
 
@@ -6996,6 +7123,9 @@ bool project_m(int who, int y, int x, int dam, int typ)
 
 			/* Hack -- handle sleep */
 			if (do_sleep) m_ptr->csleep = do_sleep;
+
+			/* Hack -- handle inventory damage */
+			if (do_inven_destroy) mon_inven_damage(m_ptr, do_inven_destroy, (dam / 15) + 1);
 		}
 
 		/* Hack -- wake up nearby allies */
