@@ -4416,7 +4416,7 @@ static void cave_gen(void)
 	
 		/* Initialise room description */
 		room_info[dun->cent_n+1].type = ROOM_TOWER;
-		room_info[dun->cent_n+1].flags = 0;
+		room_info[dun->cent_n+1].flags = (ROOM_ICKY);
 		dun->cent[dun->cent_n].y = y;
 		dun->cent[dun->cent_n].x = x;
 		dun->cent_n++;
