@@ -3627,28 +3627,28 @@ static bool summon_specific_okay(int r_idx)
 
 		case SUMMON_ORC:
 		{
-			okay = ((r_ptr->flags3 & (RF3_ORC)) &&
+			okay = ((r_ptr->flags3 & (RF3_ORC)) && !(r_ptr->flags3 & ((RF3_RACE_MASK) & ~(RF3_ORC))) &&
 				!(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
 
 		case SUMMON_TROLL:
 		{
-			okay = ((r_ptr->flags3 & (RF3_TROLL)) &&
+			okay = ((r_ptr->flags3 & (RF3_TROLL)) && !(r_ptr->flags3 & ((RF3_RACE_MASK) & ~(RF3_TROLL))) &&
 				!(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
 
 		case SUMMON_GIANT:
 		{
-			okay = ((r_ptr->flags3 & (RF3_TROLL)) &&
+			okay = ((r_ptr->flags3 & (RF3_GIANT)) && !(r_ptr->flags3 & ((RF3_RACE_MASK) & ~(RF3_GIANT))) &&
 				!(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
 
 		case SUMMON_DEMON:
 		{
-			okay = ((r_ptr->flags3 & (RF3_DEMON)) &&
+			okay = ((r_ptr->flags3 & (RF3_DEMON)) && !(r_ptr->flags3 & ((RF3_RACE_MASK) & ~(RF3_DEMON))) &&
 				!(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
@@ -3663,7 +3663,7 @@ static bool summon_specific_okay(int r_idx)
 
 		case SUMMON_DRAGON:
 		{
-			okay = ((r_ptr->flags3 & (RF3_DRAGON)) &&
+			okay = ((r_ptr->flags3 & (RF3_DRAGON)) && !(r_ptr->flags3 & ((RF3_RACE_MASK) & ~(RF3_DRAGON))) &&
 				!(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
@@ -3685,7 +3685,8 @@ static bool summon_specific_okay(int r_idx)
 
 		case SUMMON_HI_DRAGON:
 		{
-			okay = (r_ptr->d_char == 'D');
+			okay = ((r_ptr->d_char == 'D') ||
+			        (r_ptr->d_char == 'A'));
 			break;
 		}
 

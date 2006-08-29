@@ -5575,6 +5575,9 @@ bool project_m(int who, int y, int x, int dam, int typ)
 
 				/* No "real" damage */
 				dam = 0;
+
+				/* Hack -- cure blindness */
+				m_ptr->blind = 0;				
 			}
 
 			break;

@@ -3610,7 +3610,7 @@ void do_cmd_store(void)
 	/* Hack -- Check the "locked doors" */
 	if ((which == MAX_STORES) || adult_no_stores ||
 		(store[which].store_open >= turn) ||
-		((zone->guard) && (r_info[zone->guard].cur_num>0)))
+		((zone->guard) && (r_info[zone->guard].cur_num > 0)))
 	{
 		msg_print("The doors are locked.");
 		return;

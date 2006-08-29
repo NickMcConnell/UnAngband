@@ -1168,9 +1168,27 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	}
 
 	/* Eliminate innate spells if not set */
-	if (!(choose & 0x01) && !(m_ptr->mflag & (MFLAG_SHOT | MFLAG_BREATH)))
+	if (!(choose & 0x01))
 	{
-		f4 &= ~(RF4_INNATE_MASK);
+		/* Remove ranged blows */
+		if (!(m_ptr->mflag & (MFLAG_SHOT)) && !(r_ptr->flags3 & (RF3_HUGE)))
+		{
+			f4 &= ~(0x0FL);
+		}
+
+		/* Remove other shot options */
+		if (!(m_ptr->mflag & (MFLAG_SHOT)))
+		{
+			f4 &= ~(0xF0L);
+		}
+
+		/* Remove breaths */
+		if (!(m_ptr->mflag & (MFLAG_BREATH)))
+		{
+			f4 &= ~(RF4_BREATH_MASK);
+		}
+
+		/* Remove other spells */
 		f5 &= ~(RF5_INNATE_MASK);
 		f6 &= ~(RF6_INNATE_MASK);
 		f7 &= ~(RF7_INNATE_MASK);
@@ -1180,11 +1198,12 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	}
 
 	/* Eliminate other spells if not set */
-	if (!(choose & 0x02) && !(m_ptr->mflag & (MFLAG_CAST)))
+	/* Hack -- if caster is blind, only spell they can cast is cure */
+	if ((m_ptr->blind) || (!(choose & 0x02) && !(m_ptr->mflag & (MFLAG_CAST))))
 	{
 		f4 &= (RF4_INNATE_MASK);
 		f5 &= (RF5_INNATE_MASK);
-		f6 &= (RF6_INNATE_MASK);
+		f6 &= (RF6_INNATE_MASK) | (m_ptr->blind ? (RF6_CURE) : 0x0L);
 		f7 &= (RF7_INNATE_MASK);
 
 		/* No spells left */
@@ -5302,8 +5321,10 @@ static void process_monster(int m_idx)
 	if ((chance_innate) && (m_ptr->cdis > MAX_RANGE)) chance_innate = 0;
 	if ((chance_spell) && (m_ptr->cdis > MAX_RANGE)) chance_spell = 0;
 
-	/* Cannot use spell attacks when blind, enraged or not aware. */
-	if ((chance_spell) && ((m_ptr->blind) || (m_ptr->berserk) || (!aware))) chance_spell = 0;
+	/* Cannot use spell attacks when enraged or not aware. */
+	/* Hack -- when blind, monster can only cast CURE spell. */
+	if ((chance_spell) && ((m_ptr->berserk) || (!aware)
+		|| ((m_ptr->blind) && !(r_ptr->flags6 & (RF6_CURE))) )) chance_spell = 0;
 
 	/* Cannot use innate attacks when not aware. */
 	if ((chance_innate) && (!aware)) chance_innate = 0;
@@ -5315,12 +5336,16 @@ static void process_monster(int m_idx)
 	if ((chance_innate) && ((m_ptr->blind) || (m_ptr->confused) || (m_ptr->stunned))) chance_innate /= 2;
 
 	/* Monster can use ranged attacks */
-	if ((chance_innate) || (chance_spell) || (r_ptr->flags3 & (RF3_HUGE)) || (m_ptr->mflag & (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH)))
+	if ((chance_innate) || (chance_spell)
+		|| ((r_ptr->flags3 & (RF3_HUGE)) && (m_ptr->cdis == 2))
+		|| (m_ptr->mflag & (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH)))
 	{
 		int roll = rand_int(100);
 
 		/* Pick a ranged attack */
-		if ((roll < chance_innate) || (roll < chance_spell) || (r_ptr->flags3 & (RF3_HUGE)) || (m_ptr->mflag & (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH)))
+		if ((roll < chance_innate) || (roll < chance_spell)
+			|| ((r_ptr->flags3 & (RF3_HUGE)) && (roll < 50) && (m_ptr->cdis == 2))
+			|| (m_ptr->mflag & (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH)))
 		{
 			/* Set up ranged melee attacks */
 			init_ranged_attack(r_ptr);
@@ -5377,12 +5402,17 @@ static void process_monster(int m_idx)
 	}
 
 	/*** Monster hungry? ***/
+	/*** This is a bit unnecessarily complicated */
 	if ((((m_ptr->mflag & (MFLAG_WEAK | MFLAG_STUPID | MFLAG_NAIVE | MFLAG_CLUMSY | MFLAG_SICK)) != 0)
-		|| (m_ptr->hp < m_ptr->maxhp))
-		&& (((m_ptr->mflag & (MFLAG_AGGR)) == 0) || !(player_has_los_bold(m_ptr->fy, m_ptr->fx)) || (m_ptr->hp < m_ptr->maxhp / 10))
+		|| (m_ptr->hp < m_ptr->maxhp) || (m_ptr->blind))
+		&& (((m_ptr->mflag & (MFLAG_AGGR)) == 0) || !(player_has_los_bold(m_ptr->fy, m_ptr->fx)) ||
+			(m_ptr->hp < m_ptr->maxhp / 10) || ((m_ptr->blind) && (r_ptr->freq_spell >= 25)))
 		&& (!(r_ptr->flags3 & (RF3_NONLIVING)) || (r_ptr->flags2 & (RF2_EAT_BODY))))
 	{
 		int this_o_idx, next_o_idx, item = 0;
+
+		/* MegaHack -- use cost as an indication of potion quality */
+		int min_cost = 1;
 
 		object_type *o_ptr;
 
@@ -5400,17 +5430,22 @@ static void process_monster(int m_idx)
 			{
 				case TV_BODY:
 				case TV_BONE:
+					if (min_cost > 1) continue;
 					if (r_ptr->flags2 & (RF2_EAT_BODY)) item = this_o_idx;
 					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
 					break;
 				case TV_EGG:
+					if (min_cost > 1) continue;
 					if (!(r_ptr->flags2 & (RF2_EAT_BODY)) & (r_ptr->flags3 & (RF3_ANIMAL))) item = this_o_idx;
 					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
 					break;
 				case TV_FOOD:
-					if ((r_ptr->flags2 & (RF2_SMART)) && (o_ptr->sval >= SV_FOOD_MIN_FOOD)) item = this_o_idx;
-					if (!(r_ptr->flags2 & (RF2_EAT_BODY)) & (r_ptr->flags3 & (RF3_ANIMAL))) item = this_o_idx;
-					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
+					if ((r_ptr->flags2 & (RF2_SMART)) && !(r_ptr->flags3 & (RF3_UNDEAD)) && (k_info[o_ptr->k_idx].cost > min_cost)) { item = this_o_idx; min_cost = k_info[o_ptr->k_idx].cost; }
+					else if (!(r_ptr->flags2 & (RF2_EAT_BODY)) & (r_ptr->flags3 & (RF3_ANIMAL))) item = this_o_idx;
+					else if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
+					break;
+				case TV_POTION:
+					if ((r_ptr->flags2 & (RF2_SMART)) && !(r_ptr->flags3 & (RF3_UNDEAD)) && (k_info[o_ptr->k_idx].cost > min_cost)) { item = this_o_idx; min_cost = k_info[o_ptr->k_idx].cost; }
 					break;
 			}
 		}
@@ -5429,17 +5464,22 @@ static void process_monster(int m_idx)
 			{
 				case TV_BODY:
 				case TV_BONE:
+					if (min_cost > 1) continue;
 					if (r_ptr->flags2 & (RF2_EAT_BODY)) item = this_o_idx;
 					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
 					break;
 				case TV_EGG:
+					if (min_cost > 1) continue;
 					if (!(r_ptr->flags2 & (RF2_EAT_BODY)) & (r_ptr->flags3 & (RF3_ANIMAL))) item = this_o_idx;
 					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
 					break;
 				case TV_FOOD:
-					if ((r_ptr->flags2 & (RF2_SMART)) && (o_ptr->sval >= SV_FOOD_MIN_FOOD)) item = this_o_idx;
-					if (!(r_ptr->flags2 & (RF2_EAT_BODY)) & (r_ptr->flags3 & (RF3_ANIMAL))) item = this_o_idx;
-					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
+					if ((r_ptr->flags2 & (RF2_SMART)) && !(r_ptr->flags3 & (RF3_UNDEAD)) && (k_info[o_ptr->k_idx].cost > min_cost)) { item = this_o_idx; min_cost = k_info[o_ptr->k_idx].cost; }
+					else if (!(r_ptr->flags2 & (RF2_EAT_BODY)) & (r_ptr->flags3 & (RF3_ANIMAL))) item = this_o_idx;
+					else if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
+					break;
+				case TV_POTION:
+					if ((r_ptr->flags2 & (RF2_SMART)) && !(r_ptr->flags3 & (RF3_UNDEAD)) && (k_info[o_ptr->k_idx].cost > min_cost)) { item = this_o_idx; min_cost = k_info[o_ptr->k_idx].cost; }
 					break;
 			}
 		}
@@ -5483,6 +5523,14 @@ static void process_monster(int m_idx)
 
 				/* Dump a message */
 				else msg_format("%^s swallows %s.", m_name, o_name);
+
+				/* Apply good potion / mushroom effect */
+				/* We assume anything that will eat bad mushrooms is immune to their effects */
+				if (((o_ptr->tval == TV_FOOD) || (o_ptr->tval == TV_POTION)) && (k_info[o_ptr->k_idx].cost))
+				{
+					/* Hack -- use item blow routine */
+					process_item_blow(o_ptr, m_ptr->fy, m_ptr->fx);
+				}
 			}
 
 			/* Break up skeletons */

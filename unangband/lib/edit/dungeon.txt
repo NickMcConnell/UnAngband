@@ -194,13 +194,15 @@ G:C
 L:20:451:56:148:473:0
 L:21:56:144:145:0:0
 L:50:56:144:145:1272:0
+D:The storms of the mountain echo around you.  Turn back, while you can!
 
-N:16:Moria
+N:16:the gates of Moria
 X:17:18
 L:21:49:397:56:639:0
-L:22:56:0:0:0:0
-L:45:56:1:0:0:0
-L:50:56:141:0:483:0
+L:22:56:393:0:0:0
+L:50:56:393:393:639:0
+D:The door to Moria is almost impossible to find.  You need a map to
+D: guide you.  While you search, something deadly stirs in the water.
 
 N:17:Isengard
 X:14:20
@@ -538,9 +540,36 @@ D: Brandywine to Buckland, it may be a while before you return to
 D: Hobbiton, and in some ways you can never come back.  The East
 D: Road from Hobbiton looks a fairer route, and safer too.
 
+# Break Moria up into several sections to be more like what I originally intended.
+
+N:59:the door to Moria
+X:16:60
+G:E
+L:0:0:1:56:0:0
+S:0:0:0:0:0:0:0:0
+D:Starlight leads the way.  'Speak friend, and enter'.
+
+N:60:the mines of Moria
+X:60:61
+L:22:56:0:0:0:0
+L:29:56:0:0:0:0
+L:30:0:1:0:1277:0
+S:805:0:0:0:0:0:0:0
+D:There is a thunderous roar and rocks tumble about you.  You are plunged into darkness.
+D:  Your heart shudders; the dust finally settles. Something has closed the door to
+D: Moria, from the outside.  Your only choice is to press onwards.  And downwards...
+
+N:61:Khazad-Dum
+X:60:18
+L:31:1:141:0:483:0
+L:32:56:141:0:0:0
+L:49:56:141:0:0:0
+L:50:5656:393:393:483:0
+D:Drums. Drums. Drums in the deep.
+
 # Must always be last position
 
-N:59:the West
+N:62:the West
 G:M
 L:0:0:420:0:0:0
 S:777:0:0:0:0:0:0:0

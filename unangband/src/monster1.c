@@ -374,8 +374,8 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags7 & RF7_S_FRIEND)    vp[vn++] = "summon a friend";
 	if (l_ptr->flags7 & RF7_S_FRIENDS)   vp[vn++] = "summon several friends";
 	if (l_ptr->flags7 & RF7_S_ORC)       vp[vn++] = "summon orcs";
-	if (l_ptr->flags7 & RF7_S_TROLL)     vp[vn++] = "summon orcs";
-	if (l_ptr->flags7 & RF7_S_GIANT)     vp[vn++] = "summon orcs";
+	if (l_ptr->flags7 & RF7_S_TROLL)     vp[vn++] = "summon trolls";
+	if (l_ptr->flags7 & RF7_S_GIANT)     vp[vn++] = "summon giants";
 	if (l_ptr->flags7 & RF7_S_DRAGON)    vp[vn++] = "summon a dragon";
 	if (l_ptr->flags7 & RF7_S_HI_DRAGON) vp[vn++] = "summon Ancient Dragons";
 	if (l_ptr->flags7 & RF7_A_ELEMENT)   vp[vn++] = "animate monsters from the elements";

@@ -319,7 +319,7 @@ W:1:1:0:2
 B:BITE:HURT:1d3
 B:STING:HURT:1d3
 F:WEIRD_MIND
-F:INSECT
+F:INSECT |
 D:It is about four feet long and carnivorous.
 
 N:18:Giant white centipede
@@ -330,7 +330,7 @@ B:BITE:HURT:1d2
 B:STING:HURT:1d2
 F:RAND_50
 F:WEIRD_MIND | BASH_DOOR
-F:INSECT
+F:INSECT |
 D:It is about four feet long and carnivorous.
 
 N:19:White icky thing
@@ -359,7 +359,7 @@ W:1:1:0:1
 B:BITE:HURT:1d2
 F:RAND_50
 F:MULTIPLY
-F:ANIMAL
+F:ANIMAL |
 D:It is about three feet long with large teeth.
 
 N:22:Large brown snake
@@ -582,7 +582,7 @@ W:2:1:0:6
 B:BITE:HURT:1d3
 F:RAND_25
 F:BASH_DOOR
-F:ANIMAL | EAT_BODY
+F:ANIMAL | EAT_BODY |
 F:CAN_SWIM
 D:It is as big as a wolf.
 
@@ -594,7 +594,7 @@ B:BITE:HURT:1d4
 F:RAND_25
 F:WEIRD_MIND
 F:BASH_DOOR | FRIEND
-F:INSECT
+F:INSECT |
 D:It is about three feet long.
 
 N:43:Salamander
@@ -708,7 +708,7 @@ B:CRAWL:ACID:1d3
 F:RAND_50 | RAND_25 | DROP_90
 F:STUPID | EMPTY_MIND
 F:IM_ACID | IM_POIS | EAT_BODY
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 F:OOZE
 D:It's green and it's oozing.
 
@@ -745,7 +745,7 @@ W:3:4:0:1
 B:BITE:HURT:1d1
 F:RAND_50 | RAND_25
 F:MULTIPLY | WEIRD_MIND
-F:INSECT
+F:INSECT |
 D:It is six inches long.
 
 N:57:Black naga
@@ -824,7 +824,7 @@ I:110:3d6:8:16:80
 W:2:3:0:7
 B:BITE:HURT:1d4
 F:WEIRD_MIND | BASH_DOOR | FRIENDS
-F:INSECT
+F:INSECT |
 D:It is about two feet long and has sharp pincers.
 
 N:63:Yellow mold
@@ -941,7 +941,7 @@ B:HIT:HURT:3d3
 F:ONLY_GOLD | DROP_1D2 | EMPTY_MIND
 F:COLD_BLOOD | BASH_DOOR | CHAR_MULTI
 F:IM_COLD | IM_POIS | IM_FIRE | NO_CONF | NO_SLEEP
-F:ATTR_METAL | DROP_MINERAL | ONLY_GOLD
+F:ATTR_METAL | DROP_MINERAL | ONLY_GOLD | RES_BLIND
 D:It appears to be a pile of copper coins.
 
 N:73:Giant white rat
@@ -951,7 +951,7 @@ W:4:3:0:1
 B:BITE:POISON:1d3
 F:RAND_25
 F:MULTIPLY
-F:ANIMAL | EAT_BODY | SMART
+F:ANIMAL | EAT_BODY | SMART |
 D:It is a very vicious rodent.
 
 N:74:Blue worm mass
@@ -1027,7 +1027,7 @@ B:CRAWL:COLD:1d4
 F:RAND_50 | RAND_25 | DROP_60
 F:STUPID | EMPTY_MIND
 F:IM_COLD | EAT_BODY
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 F:OOZE
 D:It's blue and it's oozing.
 
@@ -1073,7 +1073,7 @@ B:HIT:HURT:1d6
 F:COLD_BLOOD | EMPTY_MIND | BASH_DOOR
 F:EVIL | UNDEAD | IM_COLD | IM_POIS | ORC | DWARF
 F:NO_CONF | NO_SLEEP | NO_FEAR | RES_EDGED | IM_ELEC
-F:NO_STUN | NO_CUTS
+F:NO_STUN | NO_CUTS | RES_BLIND
 D:It is a small animated goblin skeleton.
 
 N:84:Grey icky thing
@@ -1195,7 +1195,7 @@ W:8:2:0:10
 B:BITE:HURT:1d3
 F:RAND_50
 F:ANIMAL | EAT_BODY
-F:FRIENDS | CAN_FLY | MUST_FLY
+F:FRIENDS | CAN_FLY | MUST_FLY |
 D:It screeches as it attacks.
 
 N:94:Goblin archer
@@ -1218,7 +1218,7 @@ B:HIT:BATTER:2d6
 F:ONLY_GOLD | DROP_60 | DROP_1D2 | CHAR_MULTI
 F:COLD_BLOOD | BASH_DOOR | EMPTY_MIND
 F:IM_FIRE | IM_POIS | IM_COLD | NO_CONF | NO_SLEEP
-F:ATTR_METAL | DROP_MINERAL | ONLY_GOLD
+F:ATTR_METAL | DROP_MINERAL | ONLY_GOLD | RES_BLIND
 D:It appears to be a pile of silver coins.
 
 N:96:Snaga
@@ -1322,7 +1322,7 @@ W:6:2:0:16
 B:BITE:LOSE_STR:2d4
 F:RAND_50
 F:BASH_DOOR
-F:ANIMAL | EAT_BODY
+F:ANIMAL | EAT_BODY |
 F:CAN_SWIM
 D:It looks poisonous.
 
@@ -1409,7 +1409,7 @@ D:Strong and powerful, for a goblin.
 #Was Wormtongue, Agent of Saruman
 #A somewhat controversial change.
 
-N:111:The Dunlending Agent of the Nazgul
+N:111:the Dunlending Agent of the Nazgul
 G:t:B
 I:110:25d10:20:30:20:56
 W:8:1:0:150
@@ -1478,7 +1478,7 @@ W:7:1:0:50
 B:BITE:FIRE:3d6
 F:FORCE_SLEEP
 F:RAND_25
-F:ANIMAL | EAT_BODY | IM_FIRE
+F:ANIMAL | EAT_BODY | IM_FIRE |
 F:CAN_SWIM
 D:A large black and yellow lizard.  You'd better run away!
 
@@ -1502,7 +1502,7 @@ B:HIT:HURT:2d5
 F:COLD_BLOOD | EMPTY_MIND | BASH_DOOR
 F:EVIL | ORC | UNDEAD
 F:IM_COLD | IM_POIS  | RES_EDGED | IM_ELEC
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 D:It is an animated orc skeleton.
 
 N:118:Novice paladin
@@ -1589,7 +1589,7 @@ W:5:3:0:2
 B:BITE:HURT:2d4
 F:RAND_25
 F:MULTIPLY
-F:ANIMAL | EAT_BODY | SMART
+F:ANIMAL | EAT_BODY | SMART |
 D:It is a rodent of unusual size.
 
 N:125:Goblin shaman
@@ -1694,7 +1694,7 @@ W:9:2:0:22
 B:BITE:HURT:1d4
 B:STING:LOSE_STR:1d4
 F:WEIRD_MIND | BASH_DOOR
-F:INSECT | FRIEND
+F:INSECT | FRIEND |
 D:It is large and has venomous mandibles.
 
 N:133:Brodda, the Easterling
@@ -1733,7 +1733,7 @@ B:BITE:POISON:1d6
 B:BITE:HURT:1d10
 F:WEIRD_MIND | BASH_DOOR
 F:IM_POIS
-F:INSECT | CAN_CLIMB | HAS_WEB
+F:INSECT | CAN_CLIMB | HAS_WEB |
 D:It is a vast black spider whose bulbous body is bloated with poison.
 
 N:136:Wood elf mage
@@ -1825,7 +1825,7 @@ W:8:2:0:27
 B:BITE:SLOW:2d6
 F:WEIRD_MIND | BASH_DOOR
 F:IM_POIS | NEVER_MISS
-F:INSECT
+F:INSECT |
 D:It is moving slowly towards you.
 
 N:142:Hairy mold
@@ -1894,7 +1894,7 @@ B:HIT:BATTER:3d6
 F:ONLY_GOLD | DROP_90 | DROP_1D2
 F:COLD_BLOOD | BASH_DOOR
 F:IM_POIS | IM_FIRE | IM_COLD | NO_CONF | NO_SLEEP
-F:ATTR_METAL | IM_ACID | NO_CUTS | DROP_MINERAL | ONLY_GOLD
+F:ATTR_METAL | IM_ACID | NO_CUTS | DROP_MINERAL | ONLY_GOLD | RES_BLIND
 D:It appears to be a pile of gold coins, until it starts crawling towards you
 D: on tiny legs.
 
@@ -1916,7 +1916,7 @@ W:9:4:0:4
 B:BITE:HURT:1d2
 F:RAND_50 | RAND_25
 F:MULTIPLY | WEIRD_MIND
-F:INSECT | CAN_FLY
+F:INSECT | CAN_FLY |
 D:A fast-breeding, annoying pest.
 
 N:149:Panther
@@ -2037,7 +2037,7 @@ B:TOUCH:EXP_10
 F:NEVER_MOVE
 F:STUPID | EMPTY_MIND
 F:IM_POIS | HURT_LITE
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 S:DRAIN_MANA
 D:Yum!  It looks quite tasty.  It is a pulsing mound of glowing flesh.
 
@@ -2129,7 +2129,7 @@ F:RAND_50 | RAND_25
 F:EMPTY_MIND | INVISIBLE | COLD_BLOOD | BASH_DOOR
 F:IM_ELEC | IM_POIS | IM_BLUNT | EVASIVE
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_SLOW
-F:CAN_FLY | NONLIVING
+F:CAN_FLY | NONLIVING | RES_BLIND
 D:A whirlwind of sentient air.
 
 N:164:Skeleton human
@@ -2141,7 +2141,7 @@ B:HIT:HURT:1d8
 F:EMPTY_MIND | COLD_BLOOD | BASH_DOOR
 F:EVIL | UNDEAD | IM_COLD | MAN
 F:IM_POIS | IM_ELEC | IM_COLD | RES_EDGED
-F:NO_CONF | NO_SLEEP | NO_FEAR | NO_STUN | NO_CUTS
+F:NO_CONF | NO_SLEEP | NO_FEAR | NO_STUN | NO_CUTS | RES_BLIND
 D:It is an animated human skeleton.
 
 N:165:Zombified human
@@ -2152,7 +2152,7 @@ B:HIT:POISON:2d6
 B:HIT:HURT:2d6
 F:EMPTY_MIND | COLD_BLOOD | BASH_DOOR
 F:EVIL | UNDEAD | IM_COLD | IM_POIS | MAN
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 D:It is a shambling human corpse dropping chunks of flesh behind it.
 
 N:166:Tiger
@@ -2212,7 +2212,7 @@ B:TOUCH:ACID:6d6
 F:NEVER_MOVE
 F:STUPID | EMPTY_MIND | COLD_BLOOD
 F:IM_ACID | IM_POIS | HURT_LITE
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 D:A strange jelly thing, covered in discoloured blotches.
 
 N:171:Drider
@@ -2241,7 +2241,7 @@ D:It is a vicious insect with a tough carapace.
 
 #Was Boldor, King of the Yeeks
 
-N:173:The Great Goblin of the Misty Mountains
+N:173:the Great Goblin of the Misty Mountains
 G:k:v
 I:120:18d10:18:24:10
 W:13:3:0:200
@@ -2279,7 +2279,7 @@ B:HIT:BATTER:4d5
 F:ONLY_GOLD | DROP_90 | DROP_2D2 | DROP_60
 F:COLD_BLOOD | BASH_DOOR
 F:IM_POIS | IM_FIRE | IM_COLD | IM_ACID | NO_CONF | NO_SLEEP
-F:ATTR_METAL | DROP_MINERAL | ONLY_GOLD
+F:ATTR_METAL | DROP_MINERAL | ONLY_GOLD | RES_BLIND
 D:It appears to be a pile of sentient mithril coins that doesn't like being
 D: picked up.
 
@@ -2338,7 +2338,7 @@ B:TRAIL:ACID
 F:STUPID | EMPTY_MIND | COLD_BLOOD | TRAIL
 F:TAKE_ITEM | BASH_DOOR
 F:IM_ACID | IM_POIS | EAT_BODY
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 D:A fast moving highly acidic jelly thing, that is eating away the floor it
 D: rests on.
 
@@ -2349,7 +2349,7 @@ W:11:3:0:4
 B:BITE:HURT:1d2
 F:RAND_50 | RAND_25
 F:MULTIPLY | WEIRD_MIND | BASH_DOOR
-F:INSECT
+F:INSECT |
 D:It makes you itch just to look at it.
 
 N:181:Ufthak of Cirith Ungol
@@ -2379,7 +2379,7 @@ F:FORCE_SLEEP
 F:RAND_50
 F:WEIRD_MIND | BASH_DOOR
 F:IM_COLD | COLD_BLOOD
-F:INSECT | CAN_FLY | DRAGON
+F:INSECT | CAN_FLY | DRAGON |
 S:BRTH_COLD
 D:It is a large dragonfly whose wings whip up a cloud of frost.
 
@@ -2445,7 +2445,7 @@ W:7:3:0:3
 B:BITE:HURT:1d2
 F:RAND_50
 F:WEIRD_MIND | MULTIPLY
-F:INSECT
+F:INSECT |
 D:It makes you itch just to look at it.
 
 N:188:Lurker
@@ -2572,7 +2572,7 @@ W:16:1:0:70
 B:BITE:POISON:1d13
 F:WEIRD_MIND | BASH_DOOR
 F:IM_POIS
-F:INSECT | CAN_CLIMB | HAS_WEB
+F:INSECT | CAN_CLIMB | HAS_WEB |
 D:A giant spider with hairy black and red legs.
 
 N:197:Giant clear centipede
@@ -2583,7 +2583,7 @@ B:BITE:HURT:2d4
 B:STING:HURT:2d4
 F:ATTR_CLEAR
 F:INVISIBLE | WEIRD_MIND | BASH_DOOR
-F:INSECT
+F:INSECT |
 D:It is about four feet long and carnivorous.
 
 N:198:Mirkwood spider
@@ -2716,7 +2716,7 @@ F:DROP_1D2 | DROP_4D2
 F:STUPID | EMPTY_MIND | COLD_BLOOD | TRAIL
 F:TAKE_ITEM | BASH_DOOR | EAT_BODY
 F:IM_ACID | IM_FIRE | IM_COLD | IM_ELEC | IM_POIS
-F:NO_CONF | NO_SLEEP | NO_FEAR | DROP_JUNK
+F:NO_CONF | NO_SLEEP | NO_FEAR | DROP_JUNK | RES_BLIND
 D:It is a strange, vast gelatinous structure that assumes cubic proportions
 D: as it lines all four walls of the corridors it patrols.  Through its
 D: semi-transparent jelly structure you can see treasures it has engulfed, and a
@@ -2731,7 +2731,7 @@ B:BITE:POISON:1d3
 F:FORCE_SLEEP | RAND_50 | RAND_25
 F:WEIRD_MIND | BASH_DOOR
 F:IM_POIS
-F:INSECT | DRAGON | CAN_FLY
+F:INSECT | DRAGON | CAN_FLY |
 S:BRTH_POIS
 D:A great, foul-smelling dragonfly.
 
@@ -2853,7 +2853,7 @@ B:BITE:HURT:2d6
 F:FORCE_SLEEP
 F:ONLY_GOLD | DROP_1D2
 F:BASH_DOOR
-F:ANIMAL | EAT_BODY
+F:ANIMAL | EAT_BODY | RES_BLIND | DRAGON
 S:SCARE
 D:A strange reptilian hybrid with two heads.
 
@@ -2867,7 +2867,7 @@ F:RAND_25
 F:EMPTY_MIND | COLD_BLOOD | BASH_DOOR
 F:IM_ACID | IM_POIS | RES_BLUNT
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_SLOW
-F:RES_WATER | HURT_WATER | CAN_SWIM | NONLIVING
+F:RES_WATER | HURT_WATER | CAN_SWIM | NONLIVING | RES_BLIND
 D:A whirlpool of sentient liquid.
 
 N:218:Giant pink scorpion
@@ -2877,7 +2877,7 @@ W:15:1:0:62
 B:BITE:HURT:2d8
 B:STING:LOSE_STR:2d8
 F:WEIRD_MIND | BASH_DOOR
-F:INSECT | CAN_CLIMB | SUPER_SCENT | SCENT | RES_BLIND
+F:INSECT | CAN_CLIMB | SUPER_SCENT | SCENT | RES_BLIND |
 D:It is fast and poisonous.
 
 N:219:Earth spirit
@@ -2891,7 +2891,7 @@ F:EMPTY_MIND | COLD_BLOOD
 F:PASS_WALL | IM_EDGED
 F:IM_FIRE | IM_COLD | IM_ELEC | IM_POIS | HURT_ROCK
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_SLOW
-F:CAN_DIG | NONLIVING
+F:CAN_DIG | NONLIVING | RES_BLIND
 D:A whirling mass of sentient rock.
 
 N:220:Fire spirit
@@ -2904,7 +2904,7 @@ F:RAND_25
 F:EMPTY_MIND | BASH_DOOR
 F:IM_FIRE | IM_POIS | RES_LAVA | RES_BLUNT
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_SLOW | RES_PLAS
-F:HAS_LITE | NONLIVING
+F:HAS_LITE | NONLIVING | RES_BLIND
 D:A whirlwind of sentient flame.
 
 N:221:Fire hound
@@ -3068,7 +3068,7 @@ B:BITE:ACID:1d3
 F:FORCE_SLEEP | RAND_50 | RAND_25
 F:WEIRD_MIND | BASH_DOOR
 F:IM_ACID
-F:INSECT | CAN_FLY | DRAGON
+F:INSECT | CAN_FLY | DRAGON |
 S:BRTH_ACID
 D:The size of a large bird, this fly drips caustic acid.
 
@@ -3107,7 +3107,7 @@ B:BITE:POISON:1d3
 F:FORCE_SLEEP
 F:RAND_50 | RAND_25 | DROP_60
 F:WEIRD_MIND | BASH_DOOR
-F:IM_POIS | NO_STUN
+F:IM_POIS | NO_STUN |
 F:INSECT | DRAGON | ATTR_METAL | DROP_MINERAL | ONLY_GOLD
 S:BRTH_SOUND
 D:Large beating wings support this dazzling insect.  A loud buzzing noise
@@ -3157,7 +3157,7 @@ B:BITE:HURT:2d6
 F:FORCE_SLEEP
 F:ONLY_GOLD | DROP_1D2 | DROP_2D2
 F:BASH_DOOR
-F:ANIMAL | EAT_BODY
+F:ANIMAL | EAT_BODY | RES_BLIND
 D:A strange reptilian hybrid with three heads.
 
 N:238:Earth hound
@@ -3377,7 +3377,7 @@ B:AURA:FIRE:3d3
 F:FORCE_SLEEP | RAND_50
 F:EMPTY_MIND | BASH_DOOR | POWERFUL | IM_BLUNT
 F:IM_FIRE | NO_FEAR | NO_CONF | NO_SLEEP
-F:HAS_AURA | HAS_LITE | RES_LAVA | RES_PLAS
+F:HAS_AURA | HAS_LITE | RES_LAVA | RES_PLAS | RES_BLIND
 S:BRTH_FIRE | AURA
 D:A whirling maelstrom of fire.
 
@@ -3392,7 +3392,7 @@ F:FORCE_SLEEP | RAND_50
 F:EMPTY_MIND | BASH_DOOR | POWERFUL | IM_BLUNT
 F:IM_ACID | NO_FEAR | NO_CONF | NO_SLEEP
 F:CAN_SWIM | HAS_AURA
-F:RES_WATER | HURT_WATER
+F:RES_WATER | HURT_WATER | RES_BLIND
 S:BALL_WATER | AURA
 D:A spinning whirlpool of water.
 
@@ -3405,7 +3405,7 @@ B:ENGULF:COLD:3d3
 B:AURA:COLD:3d3
 F:FORCE_SLEEP | RAND_50 | COLD_BLOOD | IM_BLUNT
 F:EMPTY_MIND | BASH_DOOR | POWERFUL | HAS_AURA
-F:IM_COLD | NO_FEAR | NO_CONF | NO_SLEEP
+F:IM_COLD | NO_FEAR | NO_CONF | NO_SLEEP | RES_BLIND
 S:BRTH_COLD | AURA
 D:A twisting whirlpool of frost.
 
@@ -3419,7 +3419,7 @@ B:AURA:ELEC:3d3
 F:FORCE_SLEEP | RAND_50
 F:EMPTY_MIND | BASH_DOOR | POWERFUL | RES_PLAS | IM_BLUNT
 F:IM_ELEC | NO_FEAR | NO_CONF | NO_SLEEP
-F:HAS_AURA | HAS_LITE  | CAN_FLY
+F:HAS_AURA | HAS_LITE  | CAN_FLY | RES_BLIND
 S:BRTH_ELEC | BEAM_ELEC | AURA
 D:A shimmering tornado of energy, sparks crackle along its length.
 
@@ -3468,7 +3468,7 @@ W:13:1:0:60
 B:BITE:HURT:1d8
 B:STING:POISON:2d5
 F:WEIRD_MIND | BASH_DOOR | SUPER_SCENT | SCENT | RES_BLIND
-F:INSECT
+F:INSECT |
 D:It is a giant scorpion with a sharp stinger.
 
 N:260:Black ooze
@@ -3481,7 +3481,7 @@ F:RAND_50 | DROP_60
 F:STUPID | EMPTY_MIND | MULTIPLY
 F:TAKE_ITEM | EAT_BODY | BASH_DOOR
 F:IM_POIS | NO_FEAR
-F:OOZE
+F:OOZE | RES_BLIND
 S:DRAIN_MANA
 D:A strange, inky puddle creeping around the dungeon floor.
 
@@ -3567,7 +3567,7 @@ F:FORCE_SLEEP
 F:RAND_50 | RAND_25 | DROP_60
 F:WEIRD_MIND | BASH_DOOR
 F:NO_CONF | NO_SLEEP
-F:INSECT | CAN_FLY | IM_FIRE | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | NO_CONF
+F:INSECT | CAN_FLY | IM_FIRE | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | NO_CONF |
 S:BRTH_CONFU
 D:This great gleaming bronze dragonfly has wings which beat mesmerically fast.
 
@@ -3634,7 +3634,7 @@ B:BITE:HURT:2d6
 F:FORCE_SLEEP
 F:ONLY_GOLD | DROP_4D2
 F:BASH_DOOR
-F:ANIMAL | EAT_BODY
+F:ANIMAL | EAT_BODY | RES_BLIND
 S:SCARE
 D:A strange reptilian hybrid with four heads.
 
@@ -3815,7 +3815,7 @@ W:11:1:0:90
 B:BITE:HURT:2d12
 F:RAND_25
 F:WEIRD_MIND | BASH_DOOR
-F:INSECT | FRIEND
+F:INSECT | FRIEND |
 D:It is an ant encased in shaggy grey fur.
 
 N:284:Ulwarth, Son of Ulfang
@@ -3850,7 +3850,7 @@ W:13:1:0:90
 B:BITE:FIRE:3d6
 F:RAND_25
 F:WEIRD_MIND | BASH_DOOR
-F:INSECT | IM_FIRE | NEVER_MISS
+F:INSECT | IM_FIRE | NEVER_MISS |
 D:It is smoking and burning with great heat.
 
 N:287:Cave ogre
@@ -3934,7 +3934,7 @@ W:27:3:0:60
 B:HIT:BATTER:3d10
 F:ONLY_GOLD | DROP_90 | DROP_3D2
 F:COLD_BLOOD | BASH_DOOR
-F:IM_ACID | IM_ELEC | IM_POIS | IM_FIRE | NO_CONF | NO_SLEEP | DROP_MINERAL | ONLY_GOLD
+F:IM_ACID | IM_ELEC | IM_POIS | IM_FIRE | NO_CONF | NO_SLEEP | DROP_MINERAL | ONLY_GOLD | RES_BLIND
 D:It appears to be a pile of coins made of precious adamant, slithering toward
 D: you on lots of tiny legs.
 
@@ -4101,7 +4101,7 @@ B:BITE:COLD:4d4
 F:FORCE_SLEEP
 F:ONLY_GOLD | DROP_1D2 | DROP_4D2
 F:BASH_DOOR | COLD_BLOOD
-F:ANIMAL | EAT_BODY | IM_COLD
+F:ANIMAL | EAT_BODY | IM_COLD | RES_BLIND
 S:SCARE | BRTH_COLD | BALL_COLD
 D:A strange reptilian hybrid with five heads.
 
@@ -4188,7 +4188,7 @@ F:FORCE_MAXHP | FORCE_SLEEP
 F:RAND_25
 F:ONLY_ITEM | DROP_4D2 | DROP_GOOD
 F:SMART | BASH_DOOR
-F:NO_CONF | NO_SLEEP | NO_STUN
+F:NO_CONF | NO_SLEEP | NO_STUN | RES_BLIND
 S:BLINK | TPORT | TELE_TO | TELE_AWAY | TELE_LEVEL | BLIND
 S:CONF | SCARE | TELE_SELF_TO | INVIS
 D:He wears a blue coat, his eyes are blue, and his face is as a ripe as
@@ -4231,7 +4231,7 @@ B:HIT:HURT:1d8
 B:BITE:ACID:2d8
 B:STING:POISON:1d8
 F:BASH_DOOR
-F:INSECT | IM_ACID | IM_POIS | CAN_DIG | HUGE
+F:INSECT | IM_ACID | IM_POIS | CAN_DIG | HUGE |
 D:It is a massive worm form, many feet in length.  Its vast maw drips acid
 D: and poison.
 
@@ -4397,7 +4397,7 @@ B:BITE:WOUND:1d14
 F:EMPTY_MIND | COLD_BLOOD | BASH_DOOR
 F:EVIL | UNDEAD | RES_EDGED | IM_ELEC
 F:IM_COLD | IM_POIS | GIANT | ORC
-F:NO_CONF | NO_SLEEP | NO_FEAR | NO_STUN | NO_CUTS
+F:NO_CONF | NO_SLEEP | NO_FEAR | NO_STUN | NO_CUTS | RES_BLIND
 D:It is an ogre skeleton animated by dark dweomers.
 
 N:321:Manticore
@@ -4423,7 +4423,7 @@ W:11:3:0:25
 B:BITE:ELEC:4d4
 F:RAND_25
 F:WEIRD_MIND | BASH_DOOR | FRIENDS
-F:INSECT | IM_ELEC
+F:INSECT | IM_ELEC |
 D:It is a giant ant that crackles with energy.
 
 N:323:Giant army ant
@@ -4433,7 +4433,7 @@ W:27:3:0:90
 B:BITE:HURT:2d12
 F:RAND_25 | FRIENDS
 F:WEIRD_MIND | BASH_DOOR | STUPID
-F:INSECT
+F:INSECT |
 D:An armoured form moving with purpose.  Powerful on its own, flee when
 D: hordes of them march.
 
@@ -4534,7 +4534,7 @@ B:HIT:CONFUSE:1d4
 F:FORCE_SLEEP | NEVER_MOVE
 F:STUPID | EMPTY_MIND | COLD_BLOOD |
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_STUN | NO_CUTS | RES_BLIND
-F:RES_BLUNT | PLANT
+F:RES_BLUNT | PLANT | RES_BLIND
 S:FORGET | INVIS
 D:A mass of green vegetation.  You don't remember seeing anything like it
 D: before.
@@ -4558,6 +4558,7 @@ N:334:Cave troll
 G:T:u
 I:110:24d12:20:50:50
 W:34:1:0:350
+M:15:0:0:0
 B:HIT:BATTER:2d8
 B:HIT:BATTER:2d8
 B:BITE:HURT:1d13
@@ -4628,7 +4629,7 @@ F:FORCE_MAXHP
 F:EMPTY_MIND | COLD_BLOOD | BASH_DOOR
 F:EVIL | TROLL | UNDEAD | HUGE
 F:NO_CONF | NO_SLEEP | NO_FEAR | RES_EDGED | IM_ELEC
-F:NO_STUN | NO_CUTS
+F:NO_STUN | NO_CUTS | RES_BLIND
 D:It is the animated form of a massive troll.
 
 N:339:Chaos drake
@@ -4821,7 +4822,7 @@ F:EMPTY_MIND
 F:BASH_DOOR | POWERFUL
 F:IM_ELEC | IM_FIRE | IM_POIS | IM_ACID
 F:NO_CONF | NO_SLEEP | NO_FEAR | NONLIVING
-F:HAS_AURA | HAS_LITE  | RES_LAVA | RES_BLUNT
+F:HAS_AURA | HAS_LITE  | RES_LAVA | RES_BLUNT | RES_BLIND
 S:BOLT_FIRE | ADD_MANA | ARC_HFIRE
 D:It is a towering inferno of flames.
 
@@ -4861,7 +4862,7 @@ F:BASH_DOOR | POWERFUL
 F:IM_ACID | IM_POIS | IM_FIRE | IM_COLD
 F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_AURA
 F:RES_WATER | HURT_WATER | NONLIVING | RES_BLUNT
-F:CAN_SWIM
+F:CAN_SWIM | RES_BLIND
 S:BOLT_COLD | BALL_STORM | ADD_MANA | BOLT_WATER | AURA
 D:It is a towering tempest of water.
 
@@ -4960,7 +4961,7 @@ W:19:4:0:275
 B:BITE:HURT:1d6
 B:STING:POISON:1d4
 F:WEIRD_MIND | BASH_DOOR | SUPER_SCENT | SCENT | RES_BLIND
-F:INSECT
+F:INSECT |
 D:It is a giant grey scorpion.  It looks poisonous.
 
 N:359:Earth elemental
@@ -4977,7 +4978,7 @@ F:EMPTY_MIND | COLD_BLOOD
 F:TRAIL | PASS_WALL | POWERFUL
 F:IM_FIRE | IM_COLD | IM_ELEC | IM_POIS | HURT_ROCK
 F:NO_CONF | NO_SLEEP | NO_FEAR | IM_EDGED | NO_CUTS
-F:CAN_DIG | NONLIVING
+F:CAN_DIG | NONLIVING | RES_BLIND
 S:BALL_SHARD | ADD_MANA
 D:It is a towering form composed of rock with fists of awesome power.
 
@@ -4993,7 +4994,7 @@ F:EMPTY_MIND | COLD_BLOOD
 F:BASH_DOOR | POWERFUL
 F:IM_ACID | IM_COLD | IM_ELEC | IM_POIS | IM_BLUNT
 F:NO_CONF | NO_SLEEP | NO_FEAR | EVASIVE
-F:CAN_FLY | HAS_AURA | NONLIVING
+F:CAN_FLY | HAS_AURA | NONLIVING | RES_BLIND
 S:BOLT_ELEC | BALL_ELEC | ADD_MANA | ARC_FORCE
 D:It is a towering tornado of winds.
 
@@ -5081,7 +5082,7 @@ F:FORCE_MAXHP | TAKE_ITEM | COLD_BLOOD
 F:DROP_1D2 | DROP_4D2 | DROP_JUNK
 F:STUPID | EMPTY_MIND | BASH_DOOR | EAT_BODY
 F:IM_ACID | IM_FIRE | IM_COLD | IM_ELEC | IM_POIS
-F:NO_FEAR | NO_CONF | NO_SLEEP
+F:NO_FEAR | NO_CONF | NO_SLEEP | RES_BLIND
 D:A disgusting animated blob of destruction.  Flee its gruesome hunger!
 
 N:367:Inertia hound
@@ -5146,7 +5147,7 @@ F:EMPTY_MIND | COLD_BLOOD
 F:BASH_DOOR | POWERFUL
 F:IM_ACID | IM_FIRE | IM_COLD | IM_POIS | HAS_AURA
 F:NO_CONF | NO_SLEEP | NO_FEAR
-F:CAN_DIG | OOZE | NONLIVING
+F:CAN_DIG | OOZE | NONLIVING | RES_BLIND
 S:BOLT_ACID | BALL_ACID | ADD_MANA | AURA
 D:It is a towering mass of filth, an eyesore of ooze.
 
@@ -5163,7 +5164,7 @@ F:EMPTY_MIND
 F:BASH_DOOR | POWERFUL
 F:IM_FIRE | IM_COLD | IM_ELEC | IM_POIS | RES_BLUNT
 F:NO_CONF | NO_SLEEP | NO_FEAR
-F:HAS_AURA | CAN_FLY | NONLIVING
+F:HAS_AURA | CAN_FLY | NONLIVING | RES_BLIND
 S:DARKNESS | BOLT_FIRE | ADD_MANA | AURA
 D:It is a towering blackened form, crackling with heat.
 
@@ -5205,7 +5206,7 @@ B:BITE:FIRE:3d12
 B:BITE:FIRE:3d12
 F:FORCE_MAXHP | FRIENDS
 F:WEIRD_MIND | BASH_DOOR
-F:INSECT | IM_FIRE
+F:INSECT | IM_FIRE |
 D:A giant ant covered in shaggy fur.  Its powerful jaws glow with heat.
 
 N:375:Mature white dragon
@@ -5467,7 +5468,7 @@ F:EMPTY_MIND | COLD_BLOOD
 F:BASH_DOOR | POWERFUL
 F:IM_COLD | IM_ELEC | IM_POIS | IM_ACID
 F:NO_CONF | NO_SLEEP | NO_FEAR
-F:HAS_AURA | NONLIVING
+F:HAS_AURA | NONLIVING | RES_BLIND
 S:BOLT_ICE | BALL_COLD | AURA | ADD_MANA
 D:It is a towering glacier of ice.
 
@@ -5552,7 +5553,7 @@ F:SMART | EMPTY_MIND | INVISIBLE | HAS_LITE
 F:PASS_WALL | POWERFUL | RES_EDGED | RES_BLIND | RES_BLUNT
 F:IM_ACID | IM_FIRE | IM_COLD | IM_ELEC | IM_POIS
 F:NO_CONF | NO_SLEEP | NO_FEAR
-F:CAN_FLY | NONLIVING
+F:CAN_FLY | NONLIVING | RES_BLIND
 S:BLINK | TPORT | CONF | WOUND | TELE_SELF_TO | HOLD
 D:A strange ball of glowing light.  It disappears and reappears and seems to
 D: draw you to it.  You seem somehow compelled to stand still and watch its
@@ -5572,7 +5573,7 @@ F:EMPTY_MIND
 F:PASS_WALL | POWERFUL
 F:IM_FIRE | IM_ELEC | IM_POIS | IM_ACID | RES_PLAS
 F:NO_CONF | NO_SLEEP | NO_FEAR
-F:HAS_AURA | RES_LAVA | NONLIVING
+F:HAS_AURA | RES_LAVA | NONLIVING | RES_BLIND
 S:BOLT_PLAS | BALL_FIRE | ADD_MANA | AURA
 D:It is a towering glowing form of molten hate.
 
@@ -5588,7 +5589,7 @@ F:DROP_60 | DROP_90 | DROP_1D2
 F:STUPID | EMPTY_MIND | COLD_BLOOD | TRAIL
 F:TAKE_ITEM | BASH_DOOR | EAT_BODY
 F:IM_ACID | IM_FIRE | IM_COLD | IM_ELEC | IM_POIS
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 D:A lump of rotting black flesh that slurrrrrrrps across the dungeon floor.
 
 N:399:Killer iridescent beetle
@@ -5614,7 +5615,7 @@ F:FORCE_SLEEP
 F:RAND_50 | RAND_25
 F:EMPTY_MIND | BASH_DOOR | POWERFUL
 F:NO_CONF | NO_SLEEP | NO_FEAR | IM_BLUNT
-F:HAS_AURA | RES_NEXUS
+F:HAS_AURA | RES_NEXUS | RES_BLIND
 S:BRTH_NEXUS | AURA
 D:A maelstrom of potent magical energy.
 
@@ -5630,7 +5631,7 @@ F:RAND_50 | RAND_25
 F:EMPTY_MIND | BASH_DOOR
 F:IM_FIRE | IM_ELEC | RES_PLAS
 F:NO_CONF | NO_SLEEP | NO_FEAR | IM_BLUNT
-F:HAS_AURA | HAS_LITE 
+F:HAS_AURA | HAS_LITE  | RES_BLIND
 S:BRTH_PLAS
 D:A whirlpool of intense flame, charring the stones at your feet.
 
@@ -5769,7 +5770,7 @@ F:FORCE_SLEEP
 F:RAND_50 | RAND_25
 F:EMPTY_MIND | BASH_DOOR | POWERFUL
 F:NO_CONF | NO_SLEEP | NO_FEAR
-F:HAS_AURA
+F:HAS_AURA | RES_BLIND
 S:BRTH_TIME
 D:You haven't seen it yet.
 
@@ -5785,7 +5786,7 @@ F:FORCE_SLEEP
 F:RAND_50 | RAND_25
 F:EMPTY_MIND | BASH_DOOR | POWERFUL
 F:NO_CONF | NO_SLEEP | NO_FEAR
-F:HAS_LITE | HAS_AURA | RES_DARK | RES_LITE
+F:HAS_LITE | HAS_AURA | RES_DARK | RES_LITE | RES_BLIND
 S:BRTH_LITE | BRTH_DARK | AURA
 D:A strange pillar of shining light that hurts your eyes.  Its shape changes
 D: constantly as it cuts through the air towards you.  It is like a beacon,
@@ -5880,7 +5881,7 @@ D: on itself and was consumed, this Maia sees nothing but bitterness
 D: and an ugly reality, and takes out his all consuming anger on everything
 D: around him.
 
-N:416:The Tyrant of Fire
+N:416:the Tyrant of Fire
 G:E:r
 I:120:24d100:12:50:50
 W:52:3:14:4000
@@ -5894,7 +5895,7 @@ F:FORCE_SLEEP | FORCE_MAXHP | RAND_25
 F:EMPTY_MIND
 F:BASH_DOOR | POWERFUL | HUGE
 F:IM_FIRE | IM_POIS | IM_ACID | IM_ELEC | RES_BLUNT
-F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_AURA | RES_LAVA | NONLIVING
+F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_AURA | RES_LAVA | NONLIVING | RES_BLIND
 S:BOLT_PLAS | BALL_FIRE | ADD_MANA | S_GROUP
 D:A towering fire elemental, it burns everything beyond recognition.
 
@@ -5983,11 +5984,11 @@ B:BOULDER:HURT:34d6
 F:FORCE_MAXHP
 F:ONLY_ITEM | DROP_1D2
 F:OPEN_DOOR | BASH_DOOR | HUGE
-F:EVIL | TROLL | EAT_BODY | IM_POIS | NO_CONF | NO_SLEEP | IM_ACID
+F:EVIL | TROLL | EAT_BODY | IM_POIS | NO_CONF | NO_SLEEP | IM_ACID | RES_BLIND
 D:A massive two-headed troll of huge strength, ettins are stupid but violent.
 D: They are also living proof that two heads are not more intelligent than one...
 
-N:422:The King of Water
+N:422:the King of Water
 G:E:b
 I:120:25d100:12:80:50
 W:56:3:12:4250
@@ -6002,7 +6003,7 @@ F:EMPTY_MIND | COLD_BLOOD
 F:BASH_DOOR | POWERFUL
 F:IM_POIS | IM_ACID | IM_FIRE | IM_COLD
 F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLUNT
-F:RES_WATER | HURT_WATER | HAS_AURA | CAN_SWIM | NONLIVING | HUGE
+F:RES_WATER | HURT_WATER | HAS_AURA | CAN_SWIM | NONLIVING | HUGE | RES_BLIND
 S:BOLT_ICE | BOLT_WATER | BALL_COLD | BALL_WATER | ADD_MANA | S_GROUP
 D:A towering water elemental king, he is master of all things liquid.
 D: Wave after wave drowns your frail body.
@@ -6053,7 +6054,7 @@ B:BITE:FIRE:3d9
 F:FORCE_SLEEP
 F:ONLY_GOLD | DROP_2D2 | DROP_4D2
 F:BASH_DOOR
-F:ANIMAL | EAT_BODY | IM_FIRE | HUGE
+F:ANIMAL | EAT_BODY | IM_FIRE | HUGE | RES_BLIND
 S:SCARE | BALL_FIRE | BOLT_FIRE | BRTH_FIRE
 D:A strange reptilian hybrid with seven heads.
 
@@ -6158,7 +6159,7 @@ B:BITE:ELEC:4d9
 B:BITE:ELEC:4d9
 B:SPIT:BLIND:4d9
 F:FORCE_SLEEP | ONLY_GOLD | DROP_2D2 | DROP_4D2 | HAS_LITE
-F:BASH_DOOR | ANIMAL | EAT_BODY | IM_ELEC | HUGE
+F:BASH_DOOR | ANIMAL | EAT_BODY | IM_ELEC | HUGE | RES_BLIND
 S:BRTH_ELEC | BALL_ELEC | BOLT_ELEC | BEAM_ELEC | SCARE
 S:BLIND
 D:A strange reptilian hybrid with nine heads.  It is lightning fast.
@@ -6244,13 +6245,13 @@ B:CLAW:HURT:8d12
 B:CRUSH:HURT:8d12
 B:PECK:ELEC:12d12
 F:BASH_DOOR
-F:ANIMAL | EAT_BODY | IM_ELEC | CAN_FLY | HUGE
+F:ANIMAL | EAT_BODY | IM_ELEC | CAN_FLY | HUGE |
 D:A vast legendary bird, its iron talons rake the most impenetrable of
 D: surfaces and its screech echoes through the many winding dungeon corridors.
 
 # Was Uvatha the Horseman
 
-N:440:The Black Rider at Bree
+N:440:the Black Rider at Bree
 G:W:D
 I:120:18d100:90:60:10
 W:47:3:0:10000
@@ -6391,7 +6392,7 @@ D: lightning speed and its powers make it a tornado of death and destruction.
 
 # Was Adunaphel the Quiet
 
-N:449:The Black Rider at Weathertop
+N:449:the Black Rider at Weathertop
 G:W:D
 I:120:21d100:90:60:10
 W:50:3:0:13000
@@ -6471,7 +6472,7 @@ D: froth and sizzle.
 
 # Was Akhorahil the Blind
 
-N:453:The Black Rider at the Ford to Rivendell
+N:453:the Black Rider at the Ford to Rivendell
 G:W:D
 I:120:24d100:90:70:10
 W:54:3:0:15000
@@ -6723,7 +6724,7 @@ S:BLIND | WOUND | BOLT_FIRE | BOLT_PLAS |
 S:S_DEMON
 D:She is a demon of female form with many arms, each bearing deadly weapons.
 
-N:466:The Master of Earth
+N:466:the Master of Earth
 G:E:u
 I:110:28d100:10:97:90
 W:80:3:13:4500
@@ -6737,7 +6738,7 @@ F:EMPTY_MIND | COLD_BLOOD
 F:PASS_WALL | POWERFUL | HUGE
 F:IM_FIRE | IM_COLD | IM_ELEC | IM_POIS | IM_EDGED
 F:HURT_ROCK | CAN_DIG
-F:NO_CONF | NO_SLEEP | NO_FEAR | CAN_DIG | NONLIVING
+F:NO_CONF | NO_SLEEP | NO_FEAR | CAN_DIG | NONLIVING | RES_BLIND
 S:BOLT_ACID | BALL_ACID | ADD_MANA | QUAKE | S_GROUP
 D:A towering stone elemental master stands before you.  The walls and ceiling are
 D: reduced to rubble as it advances.
@@ -6762,7 +6763,7 @@ S:BRTH_FIRE | BALL_CHAOS | ARC_HFIRE
 S:S_DEMON | BLESS
 D:It is a massive humanoid demon wreathed in flames.
 
-N:468:The Queen of Air
+N:468:the Queen of Air
 G:E:G
 I:130:27d100:12:50:50
 W:69:3:11:4750
@@ -6778,7 +6779,7 @@ F:EMPTY_MIND | COLD_BLOOD
 F:BASH_DOOR | POWERFUL
 F:IM_ACID | IM_COLD | IM_ELEC | IM_POIS | IM_BLUNT
 F:NO_CONF | NO_SLEEP | NO_FEAR | IM_BLUNT | EVASIVE
-F:CAN_FLY | HAS_AURA | NONLIVING | HUGE
+F:CAN_FLY | HAS_AURA | NONLIVING | HUGE | RES_BLIND
 S:BOLT_ELEC | BALL_COLD | BALL_ELEC | AURA | ADD_MANA | BALL_WIND | S_GROUP
 D:A towering air elemental queen, she avoids your blows
 D: with her extreme speed.
@@ -6793,7 +6794,7 @@ B:BITE:ELEC:5d9
 B:BITE:ACID:5d9
 B:SPIT:BLIND:5d9
 F:FORCE_SLEEP | ONLY_GOLD | DROP_3D2 | DROP_4D2
-F:BASH_DOOR | ANIMAL | EAT_BODY | IM_ACID | IM_ELEC | HUGE
+F:BASH_DOOR | ANIMAL | EAT_BODY | IM_ACID | IM_ELEC | HUGE | RES_BLIND
 S:BRTH_ACID | BRTH_ELEC | BALL_ACID | BALL_ELEC | BOLT_ACID
 S:BOLT_ELEC | BEAM_ELEC | SCARE | CONF
 D:A strange reptilian hybrid with eleven heads.
@@ -6881,7 +6882,7 @@ D: into the air.
 
 # Was Dwar, Dog Lord of War
 
-N:474:The Messenger of Khamul
+N:474:the Messenger of Khamul
 G:W:D
 I:120:40d100:90:90:10
 W:61:3:0:25000
@@ -7349,7 +7350,7 @@ M:0:100:45:78
 F:FORCE_SLEEP | FORCE_MAXHP | NEVER_MOVE | NEVER_BLOW
 F:SMART | COLD_BLOOD
 F:EVIL | UNDEAD | IM_COLD | IM_POIS
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 S:TELE_AWAY | BLIND | CONF | SCARE | WOUND | FORGET | DARKNESS
 S:BOLT_FIRE | BOLT_ACID | BOLT_COLD | BOLT_ELEC
 D:A skeletal hand floating in the air, motionless except for its flexing
@@ -7379,7 +7380,7 @@ F:FORCE_SLEEP | FORCE_MAXHP | NEVER_MOVE | NEVER_BLOW
 F:SMART | COLD_BLOOD
 F:EVIL | UNDEAD
 F:IM_FIRE | IM_COLD | IM_POIS
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 S:SLOW | WOUND | MIND_BLAST | MIND_BLAST | TRAPS | BOLT_PLAS
 S:BOLT_NETHR | BOLT_WATER | BOLT_MANA | CURSE
 S:S_UNDEAD
@@ -7399,7 +7400,7 @@ F:ATTR_MULTI | FORCE_SLEEP
 F:RAND_50 | RAND_25
 F:EMPTY_MIND | BASH_DOOR | POWERFUL
 F:NO_CONF | NO_SLEEP | NO_FEAR
-F:HAS_AURA | RES_CHAOS
+F:HAS_AURA | RES_CHAOS | RES_BLIND
 S:BRTH_CHAOS
 D:Void, nothingness, spinning destructively.
 
@@ -7417,7 +7418,7 @@ F:FORCE_SLEEP
 F:RAND_50 | RAND_25
 F:EMPTY_MIND | BASH_DOOR | POWERFUL
 F:IM_ACID | IM_FIRE | IM_COLD | IM_ELEC | IM_POIS
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 F:RES_PLAS | RES_NETHR | RES_NEXUS | RES_DARK | RES_LITE | RES_CHAOS | NO_CUTS | NO_STUN
 S:BRTH_ACID | BRTH_FIRE | BRTH_COLD | BRTH_ELEC | BRTH_POIS | BRTH_LITE
 S:BRTH_DARK | BRTH_SOUND | BRTH_CONFU | BRTH_CHAOS | BRTH_SHARD | BRTH_NETHR
@@ -7761,7 +7762,7 @@ D: destroy you.
 
 #Was Tselakus, the Dreadlord
 
-N:522:The Lord of the Paths of the Dead
+N:522:the Lord of the Paths of the Dead
 G:G:R
 I:130:65d100:20:150:10
 W:94:2:0:35000
@@ -7834,7 +7835,7 @@ B:HIT:HURT:4d5
 B:TOUCH:LOSE_MANA:1d5
 F:DROP_1D2 |
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | RES_EDGED | UNDEAD
-F:EVIL | SMART | HAS_AURA | IM_ELEC | IM_POIS | IM_COLD | NO_CUTS
+F:EVIL | SMART | HAS_AURA | IM_ELEC | IM_POIS | IM_COLD | NO_CUTS | RES_BLIND
 S:A_DEAD | WOUND | CURSE | ADD_MANA
 D:A skeletal form, which brings back the dead from beyond the grave...
 
@@ -7849,7 +7850,7 @@ B:AURA:ANIM_DEAD
 F:DROP_1D2 |
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | RES_EDGED | UNDEAD
 F:EVIL | SMART | HAS_AURA | IM_ELEC | IM_POIS | IM_COLD | NO_CUTS
-S:BLINK | BOLT_FIRE | WOUND | CURSE | ADD_MANA
+S:BLINK | BOLT_FIRE | WOUND | CURSE | ADD_MANA | RES_BLIND
 S:S_DEMON
 D:A skeletal form, which conjures forth demons from beyond...
 
@@ -7863,7 +7864,7 @@ B:TOUCH:LOSE_MANA:5d5
 B:AURA:ANIM_DEAD
 F:DROP_2D2 |
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | RES_EDGED | UNDEAD
-F:EVIL | SMART | HAS_AURA | IM_ELEC | IM_POIS | IM_COLD | NO_CUTS
+F:EVIL | SMART | HAS_AURA | IM_ELEC | IM_POIS | IM_COLD | NO_CUTS | RES_BLIND
 S:BLINK | TPORT | TELE_SELF_TO | TELE_TO | ADD_MANA
 S:CURSE | WOUND
 D:A skeletal form, around which the dead rise up in unlife...
@@ -7971,7 +7972,7 @@ D: seeks to emulate him and breeds orcs and trolls to fight for him.  He
 D: searches forever for the One Ring, to become a mighty Sorcerer-King of the
 D: world.
 
-N:535:The Witch-King of Angmar, Lord of the Nazgul
+N:535:the Witch-King of Angmar, Lord of the Nazgul
 G:W:D
 I:130:60d100:90:120:10
 W:82:3:0:60000
@@ -8011,7 +8012,7 @@ D:It is a giant dog that glows with heat.  Flames pour from its nostrils.
 
 # Was Cantoras, the Skeletal Lord
 
-N:538:The Mouth of Sauron
+N:538:the Mouth of Sauron
 G:q:D
 I:140:75d100:20:120:80
 W:83:2:0:45000
@@ -8025,7 +8026,7 @@ F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_2D2 | DROP_3D2 | DROP_4D2 | DROP_GOOD | DROP_GREAT
 F:SMART | COLD_BLOOD | OPEN_DOOR | BASH_DOOR
 F:EVIL | UNDEAD | IM_FIRE | IM_COLD | IM_POIS
-F:NO_CONF | NO_SLEEP | NO_FEAR | LOW_MANA_RUN
+F:NO_CONF | NO_SLEEP | NO_FEAR | LOW_MANA_RUN | RES_BLIND
 S:TELE_TO | SLOW | SCARE | WOUND | MIND_BLAST
 S:BOLT_ICE | BOLT_MANA | BALL_WATER | BALL_NETHR
 S:S_HI_UNDEAD | CURSE
@@ -8196,7 +8197,7 @@ F:FORCE_SLEEP | FORCE_MAXHP | FORCE_DEPTH
 F:ONLY_ITEM | DROP_2D2 | DROP_3D2 | DROP_4D2 | DROP_GOOD | DROP_GREAT
 F:SMART | OPEN_DOOR | BASH_DOOR | REGENERATE
 F:EVIL | IM_FIRE | IM_COLD | IM_ELEC | IM_POIS
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 S:TPORT | TELE_LEVEL | BLIND | SCARE | WOUND
 S:BOLT_ICE | BOLT_MANA | BOLT_PLAS | MIND_BLAST | FORGET
 S:BALL_MANA | BALL_FIRE | BALL_WATER | BALL_NETHR | BALL_DARK
@@ -8225,7 +8226,7 @@ F:DROP_GOOD | DROP_GREAT | DROP_CHOSEN
 F:SMART | KILL_WALL
 F:REGENERATE | HUGE
 F:EVIL | IM_ACID | IM_FIRE | IM_COLD | IM_ELEC | IM_POIS
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 S:BALL_MANA | BOLT_MANA | BALL_NETHR | MIND_BLAST | S_KIN
 S:S_MONSTERS | S_UNIQUE | S_WRAITH | S_HI_UNDEAD | S_HI_DRAGON | S_HI_DEMON
 S:QUAKE | WRAITHFORM | CURSE
@@ -8261,7 +8262,7 @@ B:TOUCH:LOSE_CHR:2d3
 F:NEVER_MOVE
 F:STUPID | EMPTY_MIND
 F:HURT_LITE | IM_POIS
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 D:It is a large pile of rotting flesh, whose touch spoils your food.  The terrible
 D: smell it exudes is also very hard to get rid of...
 
@@ -8273,7 +8274,7 @@ B:BITE:TERRIFY:1d3
 B:CLAW:HURT:1d2
 B:CLAW:HURT:1d2
 F:FORCE_SLEEP | RAND_50 | ANIMAL
-F:CAN_FLY | MUST_FLY | FRIENDS
+F:CAN_FLY | MUST_FLY | FRIENDS |
 D:It is a giant bat, the beating of whose wings produces a strangely unnerving noise.
 
 N:551:Giant silver ant
@@ -8286,7 +8287,7 @@ B:STING:POISON:3d4
 B:AURA:DARK_WEAK
 F:RAND_25
 F:WEIRD_MIND | BASH_DOOR
-F:INSECT | FRIENDS | HAS_AURA
+F:INSECT | FRIENDS | HAS_AURA |
 S:DARKNESS
 D:It is a small silvery ant, skittering about in unnatural darkness.  Its abdomen 
 D:bears a two-inch sting.
@@ -8298,7 +8299,7 @@ W:16:2:0:47
 B:BITE:POISON:2d6
 B:STING:BLIND:1d1
 F:WEIRD_MIND | BASH_DOOR
-F:INSECT | IM_POIS | NEVER_MISS
+F:INSECT | IM_POIS | NEVER_MISS |
 D:It is moving slowly towards you.
 
 N:553:Disenchanter bat
@@ -8992,7 +8993,7 @@ I:120:18d2:8:18:10
 W:31:4:0:4
 B:BITE:BLIND:1d2
 F:RAND_50 | RAND_25
-F:MULTIPLY | WEIRD_MIND | INSECT | CAN_FLY | HAS_LITE 
+F:MULTIPLY | WEIRD_MIND | INSECT | CAN_FLY | HAS_LITE |
 D:Clouds of these monsters light up the dungeon - so brightly that you can
 D: barely see through them.
 
@@ -9297,7 +9298,7 @@ M:25:0:0:0
 B:ENGULF:SHARD:6d6
 B:AURA:SHARD:6d6
 F:FORCE_SLEEP | RAND_50
-F:EMPTY_MIND | BASH_DOOR | POWERFUL
+F:EMPTY_MIND | BASH_DOOR | POWERFUL | RES_BLIND
 F:NO_FEAR | NO_CONF | NO_SLEEP | HAS_AURA | NO_CUTS | RES_EDGED | RES_BLUNT
 S:BRTH_SHARD
 D:A howling blast of razor-sharp mountain fragments, kept intact by perilous
@@ -9315,7 +9316,7 @@ F:ATTR_MULTI | FORCE_SLEEP
 F:RAND_50 | RAND_25
 F:EMPTY_MIND | BASH_DOOR | POWERFUL
 F:NO_CONF | NO_SLEEP | NO_FEAR
-F:RES_DISEN | HAS_AURA
+F:RES_DISEN | HAS_AURA | RES_BLIND
 S:BRTH_DISEN
 D:Howling through the disintegrating dungeon, this whirlpool of Unmagic
 D: rips the enchantments from everything it touches.
@@ -9448,7 +9449,7 @@ B:TOUCH:PARALYZE
 B:CRUSH:HURT:2d12
 S:TELE_TO | HOLD | BLIND | SCARE | DRAIN_MANA | DARKNESS 
 F:PLANT | NEVER_MOVE | COLD_BLOOD |
-F:EMPTY_MIND | UNIQUE | FORCE_MAXHP | FORCE_SLEEP |
+F:EMPTY_MIND | UNIQUE | FORCE_MAXHP | FORCE_SLEEP | RES_BLIND
 F:IM_POIS | IM_ACID
 F:DROP_90 | DROP_GOOD | ONLY_ITEM
 D:A huge willow-tree, old and hoary.  It looks enormous, its sprawling branches
@@ -9475,7 +9476,7 @@ F:OPEN_DOOR | BASH_DOOR |
 F:EVIL | ORC
 D:A captain of a regiment of weaker orcs.
 
-N:624:The First Black Cat of Queen Beruthiel
+N:624:the First Black Cat of Queen Beruthiel
 G:f:D
 I:120:25d10:35:100:20
 W:20:2:0:100
@@ -9487,7 +9488,7 @@ F:INVISIBLE | BASH_DOOR |
 F:ANIMAL | EAT_BODY | RES_DARK
 D:It is a huge cat, black as night.
 
-N:625:The Second Black Cat of Queen Beruthiel
+N:625:the Second Black Cat of Queen Beruthiel
 G:f:D
 I:120:26d10:35:100:20
 W:21:2:0:110
@@ -9499,7 +9500,7 @@ F:INVISIBLE | BASH_DOOR |
 F:ANIMAL | EAT_BODY | RES_DARK
 D:It is a huge cat, black as night.
 
-N:626:The Third Black Cat of Queen Beruthiel
+N:626:the Third Black Cat of Queen Beruthiel
 G:f:D
 I:120:27d10:35:100:20
 W:22:2:0:120
@@ -9511,7 +9512,7 @@ F:INVISIBLE | BASH_DOOR |
 F:ANIMAL | EAT_BODY | RES_DARK
 D:It is a huge cat, black as night.
 
-N:627:The Fourth Black Cat of Queen Beruthiel
+N:627:the Fourth Black Cat of Queen Beruthiel
 G:f:D
 I:120:28d10:35:100:20
 W:23:2:0:130
@@ -9523,7 +9524,7 @@ F:INVISIBLE | BASH_DOOR |
 F:ANIMAL | EAT_BODY | RES_DARK
 D:It is a huge cat, black as night.
 
-N:628:The Fifth Black Cat of Queen Beruthiel
+N:628:the Fifth Black Cat of Queen Beruthiel
 G:f:D
 I:120:29d10:35:100:20
 W:24:2:0:140
@@ -9535,7 +9536,7 @@ F:INVISIBLE | BASH_DOOR |
 F:ANIMAL | EAT_BODY | RES_DARK
 D:It is a huge cat, black as night.
 
-N:629:The Sixth Black Cat of Queen Beruthiel
+N:629:the Sixth Black Cat of Queen Beruthiel
 G:f:D
 I:120:30d10:35:100:20
 W:25:2:0:150
@@ -9547,7 +9548,7 @@ F:INVISIBLE | BASH_DOOR |
 F:ANIMAL | EAT_BODY | RES_DARK
 D:It is a huge cat, black as night.
 
-N:630:The Seventh Black Cat of Queen Beruthiel
+N:630:the Seventh Black Cat of Queen Beruthiel
 G:f:D
 I:120:31d10:35:100:20
 W:26:2:0:160
@@ -9559,7 +9560,7 @@ F:INVISIBLE | BASH_DOOR |
 F:ANIMAL | EAT_BODY | RES_DARK
 D:It is a huge cat, black as night.
 
-N:631:The Eighth Black Cat of Queen Beruthiel
+N:631:the Eighth Black Cat of Queen Beruthiel
 G:f:D
 I:120:32d10:35:100:20
 W:27:2:0:170
@@ -9571,7 +9572,7 @@ F:INVISIBLE | BASH_DOOR |
 F:ANIMAL | EAT_BODY | RES_DARK
 D:It is a huge cat, black as night.
 
-N:632:The Ninth Black Cat of Queen Beruthiel
+N:632:the Ninth Black Cat of Queen Beruthiel
 G:f:D
 I:120:33d10:35:100:20
 W:28:2:0:180
@@ -9661,7 +9662,7 @@ S:HEAL | SCARE | BOLT_ACID | BALL_ACID
 D:Son of Bor, and an Elf from Turin's Band of Outlaws.  He lusts only for
 D: blood and gold, caring nothing about those he robs of riches and life.
 
-N:637:The Great Spider of Mirkwood
+N:637:the Great Spider of Mirkwood
 G:S:D
 I:110:12d100:8:80:80
 W:27:3:0:1200
@@ -9701,7 +9702,7 @@ D: entrapped by Morgoth and used to trick her husband into betraying
 D: Barahir. Now she is totally entrapped by Morgoth's power, and uses
 D: her magic to do his bidding.
 
-N:639:The Watcher in the Water
+N:639:the Watcher in the Water
 G:F:D
 I:120:112d22:30:75:80
 W:65:2:0:60000
@@ -9741,7 +9742,7 @@ D: looks down on your pathetic figure with hate and disdain.
 
 #Toughened up Silent watcher from Zangband.
 
-N:641:The Watcher of Cirith Ungol
+N:641:the Watcher of Cirith Ungol
 G:g:s
 I:120:60d200:42:40:10
 W:42:5:0:25000
@@ -9820,7 +9821,7 @@ F:OPEN_DOOR | BASH_DOOR |
 F:EVIL | ORC | IM_FIRE | IM_COLD | IM_POIS | NO_CONF | NO_SLEEP
 D:A strong and cunning orc warrior, a commander of Saruman's orcish horde.
 
-N:645:The Sorcerer of Dol Goldur
+N:645:the Sorcerer of Dol Goldur
 G:q:s
 I:130:70d100:60:100:10
 W:79:3:0:38000
@@ -10113,7 +10114,7 @@ B:GAZE:BLIND:1d4
 F:FORCE_SLEEP | NEVER_MOVE | 
 F:STUPID | EMPTY_MIND | COLD_BLOOD
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_STUN | NO_CUTS |
-F:RES_BLUNT | PLANT
+F:RES_BLUNT | PLANT | RES_BLIND
 S:BLIND | INVIS
 D:A mass of orange vegetation. Its many eyes follow your every
 D: movement.
@@ -10128,7 +10129,7 @@ B:HIT:LOSE_DEX:1d4
 F:FORCE_SLEEP | NEVER_MOVE | 
 F:STUPID | EMPTY_MIND | COLD_BLOOD |
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_STUN | NO_CUTS | RES_BLIND
-F:RES_BLUNT | PLANT
+F:RES_BLUNT | PLANT | RES_BLIND
 S:SLOW | INVIS | TELE_SELF_TO
 D:A mass of yellow vegetation. You feel apathetic looking at
 D: its sluggish fronds.
@@ -10143,7 +10144,7 @@ B:HIT:CONFUSE:1d4
 F:FORCE_SLEEP | NEVER_MOVE | 
 F:STUPID | EMPTY_MIND | COLD_BLOOD | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_STUN | NO_CUTS | RES_BLIND
-F:RES_BLUNT | PLANT
+F:RES_BLUNT | PLANT | RES_BLIND
 S:BLINK | SLOW | SCARE | DARKNESS | INVIS
 D:A mass of bright blue vegetation. It wiggles its tiny fronds
 D: in mischevious anticipation.
@@ -10158,7 +10159,7 @@ B:HIT:LOSE_INT:1d4
 F:FORCE_SLEEP | NEVER_MOVE | 
 F:STUPID | EMPTY_MIND | COLD_BLOOD | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_STUN | NO_CUTS | RES_BLIND
-F:RES_BLUNT | PLANT
+F:RES_BLUNT | PLANT | RES_BLIND
 S:HEAL | TRAPS | TELE_SELF_TO | INVIS
 D:A mass of brown vegetation. Its fronds move cloyingly
 D:towards you, then dart away.
@@ -10173,7 +10174,7 @@ B:HIT:EXP_10:1d4
 F:FORCE_SLEEP | NEVER_MOVE | 
 F:STUPID | EMPTY_MIND | COLD_BLOOD | 
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_STUN | NO_CUTS | RES_BLIND
-F:RES_BLUNT | PLANT
+F:RES_BLUNT | PLANT | RES_BLIND
 S:S_UNDEAD | INVIS
 D:A mass of grey vegetation. Maggots writhe among its 
 D:long dead fronds.
@@ -10184,7 +10185,7 @@ I:100:20d10:6:20:10
 W:10:2:0:16
 M:0:25:5:20
 F:NEVER_MOVE| NEVER_BLOW | DROP_60 | FORCE_MAXHP |
-F:STUPID | EMPTY_MIND | PLANT
+F:STUPID | EMPTY_MIND | PLANT | RES_BLIND
 F:EVIL | NO_CONF | NO_SLEEP | NO_FEAR | UNDEAD
 S:HOLD | BLIND | SCARE | DRAIN_MANA | DARKNESS 
 D:It is a twisted black-barked tree.
@@ -10197,7 +10198,7 @@ M:80:0:0:0
 B:BITE:HURT:1d4
 B:SPIKE:HURT:1d6
 F:NEVER_MOVE | DROP_60 | FORCE_MAXHP |
-F:STUPID | EMPTY_MIND | 
+F:STUPID | EMPTY_MIND | RES_BLIND
 F:PLANT | NO_CONF | NO_SLEEP | NO_FEAR | PLANT
 S:ADD_AMMO
 D:It has branches covered with cruel-looking thorns.
@@ -10210,7 +10211,7 @@ M:0:25:6:30
 B:WAIL:TERRIFY
 B:SHRIEK:LOSE_INT
 F:NEVER_MOVE | DROP_60 | FORCE_MAXHP |
-F:STUPID | EMPTY_MIND | 
+F:STUPID | EMPTY_MIND | RES_BLIND
 F:EVIL | NO_CONF | NO_SLEEP | NO_FEAR | IM_POIS | PLANT
 S:DRAIN_MANA | DARKNESS
 D:It is a tree twisted into the shape of a man.
@@ -10223,7 +10224,7 @@ M:0:11:20:40
 B:CRAWL:POISON:2d3
 B:CRUSH:HURT:2d10
 F:RAND_25 | DROP_60 | FORCE_MAXHP |
-F:MULTIPLY |
+F:MULTIPLY | RES_BLIND
 F:STUPID | EMPTY_MIND | KILL_WALL | POWERFUL | 
 F:EVIL | NO_CONF | NO_SLEEP | NO_FEAR | IM_POIS | PLANT
 S:BALL_POIS 
@@ -10238,7 +10239,7 @@ B:TOUCH:PARALYZE
 B:TOUCH:PARALYZE
 B:CRUSH:HURT:2d12
 F:NEVER_MOVE| DROP_60 | FORCE_MAXHP |
-F:STUPID | EMPTY_MIND | 
+F:STUPID | EMPTY_MIND | RES_BLIND
 F:EVIL | NO_CONF | NO_SLEEP | NO_FEAR | PLANT | UNDEAD
 S:HOLD | BLIND | SCARE | DRAIN_MANA | DARKNESS
 S:S_UNDEAD | TELE_TO
@@ -10250,7 +10251,7 @@ I:120:30d10:6:20:0
 W:30:1:0:100
 B:CRUSH:HURT:2d8
 F:RAND_25 | FORCE_MAXHP |
-F:MULTIPLY | NEVER_MOVE |
+F:MULTIPLY | NEVER_MOVE | RES_BLIND
 F:STUPID | EMPTY_MIND | POWERFUL
 F:EVIL | NO_CONF | NO_SLEEP | NO_FEAR | PLANT
 D:It is a dangerous mass of razor sharp branches, growing furiously.
@@ -10279,7 +10280,7 @@ I:110:4d6:8:16:80
 W:7:1:0:7
 B:BITE:POISON:1d6
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT | FRIEND
+F:INSECT | FRIEND |
 D:It is about three feet long and has poisonous pincers.
 
 N:682:Giant copper ant
@@ -10289,7 +10290,7 @@ W:12:2:0:22
 B:BITE:HURT:2d4
 B:STING:ELEC:2d4
 F:WEIRD_MIND | BASH_DOOR | IM_ACID | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
-F:INSECT | FRIEND
+F:INSECT | FRIEND |
 D:It is large and has a dangerous sting.
 
 N:684:Giant gold ant
@@ -10299,7 +10300,7 @@ W:12:2:0:22
 B:BITE:HURT:1d5
 B:STING:HURT:6d2
 F:WEIRD_MIND | BASH_DOOR | IM_POIS | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
-F:INSECT | FRIEND
+F:INSECT | FRIEND |
 D:It is large and has a dangerous sting.
 
 N:685:Giant bronze ant
@@ -10309,7 +10310,7 @@ W:12:3:0:22
 B:BITE:HURT:1d8
 B:STING:CONFUSE:1d8
 F:WEIRD_MIND | BASH_DOOR | IM_FIRE | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
-F:INSECT | FRIEND
+F:INSECT | FRIEND |
 D:It is large and has a dangerous sting.
 
 N:686:Giant brass ant
@@ -10319,7 +10320,7 @@ W:12:2:0:22
 B:BITE:HURT:1d8
 B:STING:UN_BONUS:1d8
 F:WEIRD_MIND | BASH_DOOR | IM_ELEC | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
-F:INSECT | FRIEND
+F:INSECT | FRIEND |
 D:It is large and has a dangerous sting.
 
 N:687:Giant driver ant
@@ -10329,7 +10330,7 @@ W:33:2:0:90
 B:BITE:HURT:2d8
 F:RAND_25 | FRIENDS | MULTIPLY |
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT
+F:INSECT |
 D:An armoured form moving with purpose.  Powerful on its own, flee when 
 D:hordes of them march.
 
@@ -10339,7 +10340,7 @@ I:110:12d8:16:40:10
 W:11:2:0:0
 B:BITE:HURT:4d8
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT | FRIEND | SCENT | SUPER_SCENT
+F:INSECT | FRIEND | SCENT | SUPER_SCENT |
 D:A large ant with powerful mandibles.
 
 N:689:Giant shimmering ant
@@ -10348,7 +10349,7 @@ I:110:10d8:10:40:60
 W:11:2:0:0
 B:BITE:ELEC:5d5
 F:WEIRD_MIND | BASH_DOOR | RAND_25 | IM_ELEC |
-F:INSECT | FRIEND | RES_LITE | RES_DARK
+F:INSECT | FRIEND | RES_LITE | RES_DARK |
 D:It is large and has shocking mandibles.
 
 N:690:Giant ebony ant
@@ -10357,7 +10358,7 @@ I:110:15d8:12:24:60
 W:6:2:0:22
 B:BITE:HURT:2d3
 F:WEIRD_MIND | BASH_DOOR | RES_EDGED
-F:INSECT | FRIEND
+F:INSECT | FRIEND |
 D:It is large and has venomous mandibles.
 
 N:691:Giant clear ant
@@ -10366,7 +10367,7 @@ I:110:3d7:12:18:60
 W:8:2:0:22
 B:BITE:HURT:1d4
 F:WEIRD_MIND | BASH_DOOR | ATTR_CLEAR | INVISIBLE |
-F:INSECT | FRIEND | RAND_25
+F:INSECT | FRIEND | RAND_25 |
 D:It is large and has venomous mandibles.
 
 N:692:Giant mottled ant
@@ -10376,7 +10377,7 @@ W:19:1:0:90
 B:BITE:HURT:2d10
 F:RAND_25 | 
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT | FRIEND
+F:INSECT | FRIEND |
 D:It is an ant encased in shaggy mottled fur.
 
 N:693:Ancient copper dragon
@@ -10726,7 +10727,7 @@ B:BITE:ELEC:3d8
 B:CLAW:HURT:1d5
 B:CLAW:HURT:1d5
 F:RAND_50 | 
-F:ANIMAL | EAT_BODY | FRIENDS | CAN_FLY | MUST_FLY | IM_ELEC
+F:ANIMAL | EAT_BODY | FRIENDS | CAN_FLY | MUST_FLY | IM_ELEC |
 D:It screeches as it attacks.
 
 N:712:Giant fire bat
@@ -10737,7 +10738,7 @@ B:BITE:FIRE:3d8
 B:CLAW:HURT:1d4
 B:CLAW:HURT:1d4
 F:RAND_50 | 
-F:ANIMAL | EAT_BODY | FRIENDS | CAN_FLY | MUST_FLY | IM_FIRE
+F:ANIMAL | EAT_BODY | FRIENDS | CAN_FLY | MUST_FLY | IM_FIRE |
 D:It screeches as it attacks.
 
 N:713:Giant red bat
@@ -10748,7 +10749,7 @@ B:BITE:HURT:1d7
 B:CLAW:HURT:1d3
 B:CLAW:HURT:1d3
 F:RAND_50 | 
-F:ANIMAL | EAT_BODY | FRIENDS | CAN_FLY | MUST_FLY
+F:ANIMAL | EAT_BODY | FRIENDS | CAN_FLY | MUST_FLY |
 D:It screeches as it attacks.
 
 N:714:Green dragon bat
@@ -10759,7 +10760,7 @@ M:25:0:0:0
 B:BITE:POISON:1d3
 F:FORCE_SLEEP | RAND_50 | 
 F:BASH_DOOR | EAT_BODY
-F:ANIMAL | EAT_BODY | IM_POIS | FRIENDS | CAN_FLY | MUST_FLY | DRAGON
+F:ANIMAL | EAT_BODY | IM_POIS | FRIENDS | CAN_FLY | MUST_FLY | DRAGON |
 S:BRTH_POIS
 D:It is a sharp-tailed bat, rank with venom.
 
@@ -10769,7 +10770,7 @@ I:120:3d8:7:12:30
 W:16:2:0:10
 B:BITE:COLD:1d6
 F:RAND_50 | 
-F:ANIMAL | EAT_BODY | FRIENDS | CAN_FLY | MUST_FLY | IM_COLD
+F:ANIMAL | EAT_BODY | FRIENDS | CAN_FLY | MUST_FLY | IM_COLD |
 D:It screeches as it attacks.
 
 N:717:Giant grey bat
@@ -10780,7 +10781,7 @@ B:BITE:HURT:1d6
 B:CLAW:HURT:1d2
 B:CLAW:HURT:1d2
 F:RAND_50 | 
-F:ANIMAL | EAT_BODY | FRIENDS | CAN_FLY | MUST_FLY
+F:ANIMAL | EAT_BODY | FRIENDS | CAN_FLY | MUST_FLY |
 D:It screeches as it attacks.
 
 N:718:Giant long-eared bat
@@ -10791,7 +10792,7 @@ B:BITE:HURT:1d4
 B:CLAW:HURT:1d2
 B:CLAW:HURT:1d2
 F:RAND_50 | 
-F:ANIMAL | EAT_BODY | FRIENDS | CAN_FLY | MUST_FLY
+F:ANIMAL | EAT_BODY | FRIENDS | CAN_FLY | MUST_FLY |
 D:It screeches as it attacks.
 
 N:719:Huge black bat
@@ -10836,7 +10837,7 @@ I:130:7d8:10:15:30
 W:14:2:0:10
 B:BITE:HURT:1d6
 F:RAND_50 | FRIENDS | CAN_FLY | 
-F:ANIMAL | EAT_BODY
+F:ANIMAL | EAT_BODY |
 D:It screeches as it attacks.
 
 N:724:White dragon bat
@@ -10933,7 +10934,7 @@ B:BITE:EXP_80:3d4
 B:BITE:EXP_80:3d4
 F:RAND_50 | COLD_BLOOD | REGENERATE | FRIENDS | CAN_FLY | 
 F:EVIL | ANIMAL | UNDEAD | IM_COLD | IM_POIS | 
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR |
 D:An gargantuan undead bat that flies at you. It could bite your head off!
 
 N:732:Werebat
@@ -10956,7 +10957,7 @@ B:BITE:HURT:2d6
 B:BITE:HURT:2d10
 F:RAND_50 | FRIENDS | OPEN_DOOR | CAN_FLY | 
 F:ANIMAL | EAT_BODY | EVIL |
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR |
 D:It is a huge ugly bat that strikes terror into your heart.
 
 N:734:Hell bat
@@ -10982,7 +10983,7 @@ B:BITE:HURT:1d2
 B:STING:HURT:1d2
 F:RAND_50 | 
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT
+F:INSECT |
 D:It is about four feet long and carnivorous.
 
 N:736:Giant grey centipede
@@ -10993,7 +10994,7 @@ B:BITE:HURT:1d3
 B:STING:HURT:1d3
 F:RAND_50 | 
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT
+F:INSECT |
 D:It is about four feet long and carnivorous.
 
 N:737:Giant black centipede
@@ -11004,7 +11005,7 @@ B:BITE:HURT:1d3
 B:STING:POISON:1d4
 F:RAND_50 | 
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT
+F:INSECT |
 D:It is about four feet long and carnivorous.
 
 N:738:Giant brown centipede
@@ -11015,7 +11016,7 @@ B:BITE:HURT:2d3
 B:STING:HURT:1d4
 F:RAND_25 | FRIENDS |
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT
+F:INSECT |
 D:It is about four feet long and carnivorous.
 
 N:739:Metallic yellow centipede
@@ -11037,7 +11038,7 @@ B:BITE:HURT:2d3
 B:STING:LOSE_STR:2d4
 F:RAND_25 | FRIENDS |
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT
+F:INSECT |
 D:It is about four feet long and carnivorous.
 
 N:741:Giant red centipede
@@ -11047,7 +11048,7 @@ W:9:1:0:2
 B:BITE:HURT:1d2
 B:STING:POISON:1d2
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT
+F:INSECT |
 D:It is about six feet long and carnivorous.
 
 N:742:Giant blue centipede
@@ -11057,7 +11058,7 @@ W:4:1:0:2
 B:BITE:HURT:1d3
 B:STING:HURT:1d4
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT
+F:INSECT |
 D:It is about five feet long and carnivorous.
 
 N:743:Giant black centipede
@@ -11068,7 +11069,7 @@ B:BITE:HURT:1d2
 B:STING:HURT:1d2
 F:RAND_25 | 
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT
+F:INSECT |
 D:It is about five feet long and carnivorous.
 
 N:744:Cave crawler
@@ -11148,7 +11149,7 @@ I:120:8d6:32:18:15
 W:12:1:0:35
 B:BITE:HURT:1d7
 F:FRIENDS | 
-F:ANIMAL | EAT_BODY
+F:ANIMAL | EAT_BODY |
 D:It is a giant version of that yapping pest.
 
 N:751:Grey wolf
@@ -11933,7 +11934,7 @@ F:RAND_25 |
 F:EMPTY_MIND | BASH_DOOR
 F:EVIL | IM_FIRE | IM_POIS | IM_ELEC |
 F:NO_CONF | NO_SLEEP | NO_FEAR
-F:RES_LAVA | NONLIVING
+F:RES_LAVA | NONLIVING | RES_BLIND
 D:A whirlwind of sentient magma.
 
 N:805:Smoke spirit
@@ -11943,7 +11944,7 @@ W:14:2:17:40
 B:HIT:FIRE:2d5 
 F:EMPTY_MIND | BASH_DOOR | CAN_FLY |
 F:EVIL | IM_POIS | IM_FIRE | IM_COLD | IM_ELEC |
-F:NO_CONF | NO_SLEEP | NO_FEAR | NONLIVING
+F:NO_CONF | NO_SLEEP | NO_FEAR | NONLIVING | RES_BLIND
 D:A whirlwind of sentient smoke.
 
 N:806:Ooze spirit
@@ -11956,7 +11957,7 @@ F:RAND_25 |
 F:EMPTY_MIND | COLD_BLOOD | CAN_DIG |
 F:EVIL | IM_FIRE | IM_COLD | IM_ELEC | IM_POIS | 
 F:NO_CONF | NO_SLEEP | NO_FEAR
-F:OOZE | NONLIVING
+F:OOZE | NONLIVING | RES_BLIND
 D:A whirling form of sentient ooze.
 
 N:807:Ice spirit
@@ -11966,7 +11967,7 @@ W:14:2:18:100
 B:HIT:ICE:3d4
 F:EMPTY_MIND | COLD_BLOOD | BASH_DOOR | 
 F:EVIL | IM_POIS | IM_COLD | IM_ELEC |
-F:NO_CONF | NO_SLEEP | NO_FEAR | NONLIVING
+F:NO_CONF | NO_SLEEP | NO_FEAR | NONLIVING | RES_BLIND
 D:A whirlpool of sentient ice.
 
 N:808:Djinn
@@ -12004,7 +12005,7 @@ W:6:3:0:6
 B:BITE:HURT:1d3
 F:RAND_25 | CAN_SWIM |
 F:BASH_DOOR | 
-F:ANIMAL | EAT_BODY | MULTIPLY
+F:ANIMAL | EAT_BODY | MULTIPLY |
 D:It is as big as a wolf.
 
 N:811:Giant pink speckled frog
@@ -12014,7 +12015,7 @@ W:13:3:0:16
 B:BITE:LOSE_STR:2d4
 F:RAND_50 | 
 F:BASH_DOOR | 
-F:ANIMAL | EAT_BODY | CAN_SWIM | MULTIPLY
+F:ANIMAL | EAT_BODY | CAN_SWIM | MULTIPLY |
 D:It looks poisonous.
 
 N:812:Giant red frog
@@ -12026,7 +12027,7 @@ B:BITE:POISON:3d4
 B:SPIT:LOSE_STR:1d4
 F:RAND_25 | 
 F:BASH_DOOR
-F:ANIMAL | EAT_BODY | CAN_SWIM
+F:ANIMAL | EAT_BODY | CAN_SWIM |
 D:It looks poisonous.
 
 N:813:Giant black speckled frog
@@ -12036,7 +12037,7 @@ W:9:3:0:16
 B:BITE:HURT:1d6
 F:RAND_25 | 
 F:BASH_DOOR | 
-F:ANIMAL | EAT_BODY | CAN_SWIM | MULTIPLY
+F:ANIMAL | EAT_BODY | CAN_SWIM | MULTIPLY |
 D:It looks poisonous.
 
 N:814:Giant black frog
@@ -12046,7 +12047,7 @@ W:5:1:0:16
 B:BITE:HURT:1d6
 F:RAND_25 | 
 F:BASH_DOOR | 
-F:ANIMAL | EAT_BODY | CAN_SWIM
+F:ANIMAL | EAT_BODY | CAN_SWIM |
 D:It looks poisonous.
 
 N:815:Giant red speckled frog
@@ -12058,7 +12059,7 @@ B:BITE:POISON:3d4
 B:SPIT:LOSE_STR:1d4
 F:RAND_25 | 
 F:BASH_DOOR | 
-F:ANIMAL | EAT_BODY | CAN_SWIM | MULTIPLY
+F:ANIMAL | EAT_BODY | CAN_SWIM | MULTIPLY |
 D:It looks poisonous.
 
 N:816:Giant blue frog
@@ -12068,7 +12069,7 @@ W:6:1:0:11
 B:BITE:POISON:2d4
 F:RAND_25 | 
 F:BASH_DOOR | 
-F:ANIMAL | EAT_BODY | CAN_SWIM | IM_POIS
+F:ANIMAL | EAT_BODY | CAN_SWIM | IM_POIS |
 D:It looks poisonous.
 
 N:817:Giant blue speckled frog
@@ -12078,7 +12079,7 @@ W:12:3:0:11
 B:BITE:POISON:2d4
 F:RAND_25 | 
 F:BASH_DOOR | 
-F:ANIMAL | EAT_BODY | CAN_SWIM | MULTIPLY | IM_POIS
+F:ANIMAL | EAT_BODY | CAN_SWIM | MULTIPLY | IM_POIS |
 D:It looks poisonous.
 
 N:818:Giant yellow frog
@@ -12088,7 +12089,7 @@ W:5:2:0:16
 B:BITE:LOSE_DEX:2d4
 F:RAND_25 | 
 F:BASH_DOOR | 
-F:ANIMAL | EAT_BODY | CAN_SWIM | IM_POIS
+F:ANIMAL | EAT_BODY | CAN_SWIM | IM_POIS |
 D:It looks poisonous.
 
 N:819:Giant yellow speckled frog
@@ -12098,7 +12099,7 @@ W:15:2:0:16
 B:BITE:LOSE_DEX:2d4
 F:RAND_25 | 
 F:BASH_DOOR | 
-F:ANIMAL | EAT_BODY | CAN_SWIM | MULTIPLY | IM_POIS
+F:ANIMAL | EAT_BODY | CAN_SWIM | MULTIPLY | IM_POIS |
 D:It looks poisonous.
 
 N:820:Giant gold frog
@@ -12108,7 +12109,7 @@ W:8:1:0:20
 B:BITE:POISON:5d4
 F:RAND_25 | 
 F:BASH_DOOR | 
-F:ANIMAL | EAT_BODY | CAN_SWIM | IM_POIS | ATTR_METAL
+F:ANIMAL | EAT_BODY | CAN_SWIM | IM_POIS | ATTR_METAL |
 D:It looks poisonous.
 
 N:821:Giant gold speckled frog
@@ -12118,7 +12119,7 @@ W:22:1:0:20
 B:BITE:POISON:5d4
 F:RAND_25 | 
 F:BASH_DOOR | 
-F:ANIMAL | EAT_BODY | CAN_SWIM | MULTIPLY | IM_POIS | ATTR_METAL
+F:ANIMAL | EAT_BODY | CAN_SWIM | MULTIPLY | IM_POIS | ATTR_METAL |
 D:It looks poisonous.
 
 N:822:Giant tree frog
@@ -12130,7 +12131,7 @@ B:BITE:HURT:2d3
 B:SPIT:SLOW
 F:RAND_25 | CAN_SWIM | CAN_CLIMB
 F:BASH_DOOR | 
-F:ANIMAL | EAT_BODY
+F:ANIMAL | EAT_BODY |
 D:It is as big as a wolf.
 
 N:823:Giant speckled tree frog
@@ -12142,7 +12143,7 @@ B:BITE:HURT:2d3
 B:SPIT:SLOW
 F:RAND_25 | CAN_SWIM | CAN_CLIMB
 F:BASH_DOOR | 
-F:ANIMAL | EAT_BODY | MULTIPLY
+F:ANIMAL | EAT_BODY | MULTIPLY |
 D:It is as big as a wolf.
 
 N:824:Giant green toad
@@ -12154,7 +12155,7 @@ B:BITE:POISON:3d4
 B:SPIT:SLOW:2d4
 F:RAND_25 | CAN_SWIM |
 F:BASH_DOOR | 
-F:ANIMAL | IM_POIS
+F:ANIMAL | IM_POIS |
 S:BLINK | SLOW | SCARE | DARKNESS
 D:It is ugly and covered in warts.
 
@@ -12167,7 +12168,7 @@ B:BITE:LOSE_CHR:3d4
 B:SPIT:LOSE_CHR:2d4
 F:RAND_50 | 
 F:BASH_DOOR | 
-F:ANIMAL | CAN_SWIM | IM_POIS
+F:ANIMAL | CAN_SWIM | IM_POIS |
 S:HEAL | HASTE | BLIND | SCARE
 S:S_MONSTER
 D:It is ugly and covered in big brown warts.
@@ -12181,7 +12182,7 @@ B:BITE:HURT:4d4
 B:SPIT:PARALYZE:2d4
 F:RAND_25 | 
 F:BASH_DOOR | 
-F:ANIMAL | CAN_SWIM | IM_POIS
+F:ANIMAL | CAN_SWIM | IM_POIS |
 S:HEAL | HASTE | BLIND | SCARE | MIND_BLAST
 S:S_MONSTERS
 D:It is ugly and covered in horned warts.
@@ -13208,7 +13209,7 @@ B:BITE:HURT:1d2
 B:BITE:EAT_FOOD
 F:RAND_50 | 
 F:WEIRD_MIND | MULTIPLY | CAN_FLY |
-F:INSECT
+F:INSECT |
 D:It voraciously eats and breeds leaving nothing in its wake.
 
 N:903:Giant green locust
@@ -13219,7 +13220,7 @@ B:BITE:POISON:1d2
 B:BITE:EAT_FOOD
 F:RAND_50 | 
 F:WEIRD_MIND | MULTIPLY | CAN_FLY |
-F:INSECT | IM_POIS
+F:INSECT | IM_POIS |
 D:It voraciously eats and breeds leaving nothing in its wake.
 
 N:904:Giant yellow locust
@@ -13230,7 +13231,7 @@ B:BITE:POISON:1d3
 B:BITE:EAT_FOOD
 F:RAND_50 | 
 F:WEIRD_MIND | MULTIPLY | CAN_FLY |
-F:INSECT | IM_POIS | IM_FIRE
+F:INSECT | IM_POIS | IM_FIRE |
 D:It voraciously eats and breeds leaving nothing in its wake.
 
 N:905:Giant grub
@@ -13240,7 +13241,7 @@ W:3:2:0:2
 B:BITE:HURT:1d2
 F:RAND_50 | 
 F:MULTIPLY | 
-F:INSECT
+F:INSECT |
 D:It is about three feet long with large teeth and wriggles.
 
 N:906:Giant maggot
@@ -13250,7 +13251,7 @@ W:4:2:0:3
 B:BITE:HURT:1d3
 F:RAND_50 | 
 F:MULTIPLY | 
-F:INSECT
+F:INSECT |
 D:It is about four feet long with large teeth and wriggles.
 
 N:907:Giant red dragonfly
@@ -13272,7 +13273,7 @@ M:13:0:0:0
 B:BITE:HURT:1d6
 F:FORCE_SLEEP | RAND_50 | RAND_25
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY |
-F:INSECT | IM_FIRE | DRAGON
+F:INSECT | IM_FIRE | DRAGON |
 S:BRTH_ELEC
 D:A vast, lightning-struck dragonfly.
 
@@ -13285,7 +13286,7 @@ B:BITE:HURT:1d3
 F:FORCE_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_60
 F:RAND_50 | RAND_25 | 
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY | 
-F:INSECT | IM_ELEC | DRAGON
+F:INSECT | IM_ELEC | DRAGON |
 F:RES_NEXUS
 S:BRTH_NEXUS
 D:This gleaming copper dragonfly is never in the same place twice.
@@ -13299,7 +13300,7 @@ B:BITE:HURT:1d3
 F:FORCE_SLEEP | 
 F:RAND_50 | RAND_25 | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_60
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY | 
-F:INSECT | IM_COLD | NO_FEAR | DRAGON
+F:INSECT | IM_COLD | NO_FEAR | DRAGON |
 S:BRTH_FEAR
 D:This gleaming silver dragonfly has wings which hum a terrifying dirge.
 
@@ -13312,7 +13313,7 @@ B:BITE:HURT:1d3
 F:FORCE_SLEEP | 
 F:RAND_50 | RAND_25 | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_60
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY | 
-F:INSECT | IM_ACID | DRAGON
+F:INSECT | IM_ACID | DRAGON |
 F:RES_DISEN
 S:BRTH_DISEN
 D:This gleaming brass dragonfly has wings which leave a static feeling in the air.
@@ -13326,7 +13327,7 @@ B:BITE:HURT:1d3
 F:FORCE_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
 F:RAND_50 | RAND_25 | 
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY | 
-F:INSECT | IM_ACID | DRAGON
+F:INSECT | IM_ACID | DRAGON |
 S:BRTH_TIME
 D:This glistening amethyst dragonfly seems to dart back and forth in time.
 
@@ -13339,7 +13340,7 @@ B:BITE:HURT:1d3
 F:FORCE_SLEEP | 
 F:RAND_50 | RAND_25 | ATTR_CLEAR | CAN_FLY | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT | IM_COLD | DRAGON
+F:INSECT | IM_COLD | DRAGON |
 S:BRTH_MANA
 D:This clear diamond dragonfly has wings which glow with magical energy.
 
@@ -13352,7 +13353,7 @@ B:BITE:HURT:1d3
 F:FORCE_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
 F:RAND_50 | RAND_25 | 
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY | 
-F:INSECT | IM_POIS | DRAGON
+F:INSECT | IM_POIS | DRAGON |
 S:BRTH_FORCE
 D:This glistening emerald dragonfly has wings which beat with powerful force.
 
@@ -13365,7 +13366,7 @@ B:BITE:HURT:1d3
 F:FORCE_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
 F:RAND_50 | RAND_25 | 
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY | 
-F:INSECT | IM_COLD | NO_FEAR | DRAGON
+F:INSECT | IM_COLD | NO_FEAR | DRAGON |
 S:BRTH_GRAV
 D:This glistening sapphire dragonfly has wings that ride on gravity.
 
@@ -13378,7 +13379,7 @@ B:BITE:HURT:1d3
 F:FORCE_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
 F:RAND_50 | RAND_25 | 
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY | 
-F:INSECT | IM_COLD | NO_FEAR | DRAGON
+F:INSECT | IM_COLD | NO_FEAR | DRAGON |
 S:BRTH_INERT
 D:This glistening ruby dragonfly doesn't seem to move at all.
 
@@ -13389,7 +13390,7 @@ W:12:4:0:8
 B:BITE:HURT:1d4
 F:RAND_50 | RAND_25
 F:MULTIPLY | WEIRD_MIND
-F:INSECT | CAN_FLY
+F:INSECT | CAN_FLY |
 D:An annoying pest.
 
 N:918:Giant house fly
@@ -13399,7 +13400,7 @@ W:12:4:0:9
 B:BITE:DISEASE:1d2
 F:RAND_50 | RAND_25
 F:MULTIPLY | WEIRD_MIND
-F:INSECT | CAN_FLY
+F:INSECT | CAN_FLY |
 D:An sickening pest.
 
 N:919:Clear jelly
@@ -13411,7 +13412,7 @@ B:TOUCH:POISON:1d4
 F:NEVER_MOVE | ATTR_CLEAR | INVISIBLE
 F:STUPID | EMPTY_MIND
 F:HURT_LITE | 
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 S:DRAIN_MANA
 D:It is a large pulsating mound of clear flesh.
 
@@ -13424,7 +13425,7 @@ B:TOUCH:LOSE_CHR:1d4
 F:NEVER_MOVE | 
 F:STUPID | EMPTY_MIND | 
 F:HURT_LITE | 
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 D:It is a large pulsating mound of brown flesh.
 
 N:921:Red jelly
@@ -13435,7 +13436,7 @@ B:TOUCH:FIRE:1d8
 F:NEVER_MOVE | 
 F:STUPID | EMPTY_MIND | 
 F:HURT_LITE | 
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 D:It is a large pulsating mound of red flesh.
 
 N:922:Bright blue jelly
@@ -13447,7 +13448,7 @@ B:TOUCH:COLD:1d6
 F:NEVER_MOVE | 
 F:STUPID | EMPTY_MIND | 
 F:HURT_LITE | 
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 S:DRAIN_MANA | S_KIN | BLINK
 D:It is smarter than your average jelly.
 
@@ -13460,7 +13461,7 @@ B:TOUCH:ACID:1d2
 F:NEVER_MOVE | 
 F:STUPID | EMPTY_MIND | 
 F:HURT_LITE | 
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 S:DRAIN_MANA | S_MONSTER | TPORT
 D:It is smarter than your average jelly.
 
@@ -13473,7 +13474,7 @@ B:TOUCH:LOSE_ALL
 F:NEVER_MOVE | 
 F:STUPID | EMPTY_MIND | 
 F:IM_POIS | HURT_LITE | 
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 S:DRAIN_MANA
 D:It is a pulsing mound of black flesh.
 
@@ -13485,7 +13486,7 @@ B:CRAWL:FIRE:2d4
 F:RAND_50 | RAND_25 | DROP_90 | 
 F:STUPID | EMPTY_MIND | 
 F:IM_FIRE | IM_POIS | 
-F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE
+F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE | RES_BLIND
 D:It's red and it's oozing.
 
 N:926:Pink ooze
@@ -13496,7 +13497,7 @@ B:TOUCH:LOSE_STR:2d4
 F:RAND_50 | RAND_25 | DROP_90 | 
 F:STUPID | EMPTY_MIND | 
 F:IM_POIS | 
-F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE
+F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE | RES_BLIND
 D:It's pink and it's oozing.
 
 N:927:Purple ooze
@@ -13507,7 +13508,7 @@ B:TOUCH:LOSE_CON:2d4
 F:RAND_50 | RAND_25 | DROP_90 | 
 F:STUPID | EMPTY_MIND | 
 F:IM_POIS | 
-F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE
+F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE | RES_BLIND
 D:It's purple and it's oozing.
 
 N:928:Brown ooze
@@ -13518,7 +13519,7 @@ B:TOUCH:LOSE_CHR:1d3
 F:RAND_50 | RAND_25 | DROP_90 | 
 F:STUPID | EMPTY_MIND | 
 F:IM_POIS | 
-F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE
+F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE | RES_BLIND
 D:It's brown and it's oozing.
 
 N:929:Dull grey ooze
@@ -13530,7 +13531,7 @@ B:TOUCH:ACID:2d6
 F:RAND_50 | DROP_90 | 
 F:STUPID | EMPTY_MIND |
 F:BASH_DOOR | OOZE
-F:IM_POIS | NO_FEAR | NO_CONF | NO_SLEEP
+F:IM_POIS | NO_FEAR | NO_CONF | NO_SLEEP | RES_BLIND
 S:DRAIN_MANA | MIND_BLAST
 D:It's grey and it's oozing.
 
@@ -13544,7 +13545,7 @@ B:SPIKE:WOUND:4d4
 F:RAND_25 |
 F:STUPID | EMPTY_MIND | ATTR_CLEAR | DROP_60 | INVISIBLE | COLD_BLOOD |
 F:IM_POIS | IM_COLD | EAT_BODY | TAKE_ITEM | MULTIPLY | OPEN_DOOR
-F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE
+F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE | RES_BLIND
 S:ADD_AMMO
 D:It's cystalline and it's oozing.
 
@@ -13556,7 +13557,7 @@ B:TOUCH:CONFUSE:1d8
 F:RAND_50 |
 F:STUPID | EMPTY_MIND | ATTR_CLEAR | DROP_60 | INVISIBLE | COLD_BLOOD |
 F:IM_POIS | EAT_BODY | TAKE_ITEM | MULTIPLY
-F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE
+F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE | RES_BLIND
 D:It's clear and it's oozing.
 
 N:932:Disenchanter ooze
@@ -13568,7 +13569,7 @@ F:RAND_25 | RAND_50 | DROP_60 | ATTR_MULTI |
 F:STUPID | EMPTY_MIND | DROP_60 | COLD_BLOOD |
 F:IM_POIS | EAT_BODY | TAKE_ITEM
 F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE
-F:RES_DISEN
+F:RES_DISEN | RES_BLIND
 D:It's disenchanted and it's oozing.
 
 N:933:Grey ooze
@@ -13580,7 +13581,7 @@ B:AURA:COLD:1d6
 F:RAND_25 | RAND_50 | DROP_60 |
 F:STUPID | EMPTY_MIND | ATTR_CLEAR | DROP_60 |
 F:IM_POIS | EAT_BODY | TAKE_ITEM | COLD_BLOOD
-F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE | HAS_AURA
+F:NO_CONF | NO_SLEEP | NO_FEAR | OOZE | HAS_AURA | RES_BLIND
 D:It's cold and it's oozing.
 
 N:934:Small green snake
@@ -14894,7 +14895,7 @@ B:BITE:HURT:10d4
 B:BOULDER:HURT:4d10
 F:DROP_90 | RAND_25 |
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | HUGE
-F:EVIL | GIANT | NEED_LITE
+F:EVIL | GIANT | NEED_LITE | RES_BLIND
 D:It is a twenty-one foot tall giant with two bickering heads.
 
 N:1029:Night giant
@@ -14990,7 +14991,7 @@ I:110:2d3:8:4:20
 W:1:2:0:1
 B:BITE:HURT:1d3
 F:RAND_50 | 
-F:ANIMAL
+F:ANIMAL |
 D:It is about three feet long with large teeth.
 
 N:1036:Giant grey mouse
@@ -15000,7 +15001,7 @@ W:3:3:0:2
 B:BITE:HURT:2d2
 F:RAND_50 | 
 F:MULTIPLY | 
-F:ANIMAL
+F:ANIMAL |
 D:It is about three feet long with large teeth.
 
 N:1037:Giant black mouse
@@ -15010,7 +15011,7 @@ W:5:3:0:2
 B:BITE:WOUND:3d2
 F:RAND_50 | 
 F:MULTIPLY | 
-F:ANIMAL
+F:ANIMAL |
 D:It is about three feet long with large teeth.
 
 N:1038:Giant pink mouse
@@ -15020,7 +15021,7 @@ W:9:3:0:3
 B:BITE:LOSE_STR:1d2
 F:RAND_50 |
 F:MULTIPLY | 
-F:ANIMAL
+F:ANIMAL |
 D:It is about three feet long with large teeth.
 
 N:1039:Giant yellow mouse
@@ -15030,7 +15031,7 @@ W:15:3:0:4
 B:BITE:HURT:1d6
 B:BITE:POISON:1d6
 B:BITE:EAT_FOOD
-F:ANIMAL | MULTIPLY | 
+F:ANIMAL | MULTIPLY |
 D:It is about four feet long with large teeth.
 
 N:1040:Giant pack rat
@@ -15040,7 +15041,7 @@ W:5:2:0:2
 B:BITE:POISON:1d4
 F:RAND_25 | 
 F:FRIENDS
-F:ANIMAL | EAT_BODY | SMART
+F:ANIMAL | EAT_BODY | SMART |
 D:It is a rodent of unusual size.
 
 N:1041:Giant brown rat
@@ -15050,7 +15051,7 @@ W:7:3:0:2
 B:BITE:POISON:2d4
 F:RAND_25 | 
 F:MULTIPLY | 
-F:ANIMAL | EAT_BODY | SMART
+F:ANIMAL | EAT_BODY | SMART |
 D:It is a rodent of unusual size.
 
 N:1042:Giant ship rat
@@ -15060,7 +15061,7 @@ W:8:3:0:2
 B:BITE:POISON:2d5
 F:RAND_25 | 
 F:MULTIPLY | CAN_SWIM
-F:ANIMAL | EAT_BODY | SMART
+F:ANIMAL | EAT_BODY | SMART |
 D:It is a rodent of unusual size.
 
 N:1043:Giant glowing rat
@@ -15072,7 +15073,7 @@ B:BITE:ELEC:2d6
 B:SPIT:ELEC:2d6
 F:RAND_25 | 
 F:MULTIPLY | 
-F:ANIMAL | EAT_BODY | IM_ELEC | SMART
+F:ANIMAL | EAT_BODY | IM_ELEC | SMART |
 D:It is a rodent of unusual size.
 
 N:1044:Giant spotted rat
@@ -15082,7 +15083,7 @@ W:6:3:0:2
 B:BITE:POISON:1d5
 F:RAND_25 | 
 F:MULTIPLY | 
-F:ANIMAL | EAT_BODY | SMART
+F:ANIMAL | EAT_BODY | SMART |
 D:It is a rodent of unusual size.
 
 N:1045:Giant black rat
@@ -15092,7 +15093,7 @@ W:7:3:0:2
 B:BITE:POISON:1d5
 F:RAND_25 | 
 F:MULTIPLY | 
-F:ANIMAL | EAT_BODY | IM_POIS | SMART
+F:ANIMAL | EAT_BODY | IM_POIS | SMART |
 D:It is a rodent of unusual size.
 
 N:1046:Dark naga
@@ -15181,7 +15182,7 @@ W:19:1:0:95
 B:CLAW:HURT:1d11
 B:CLAW:HURT:1d11
 B:STING:POISON:3d4
-F:WEIRD_MIND | BASH_DOOR | INSECT | SCENT | SUPER_SCENT | RES_BLIND
+F:WEIRD_MIND | BASH_DOOR | INSECT | SCENT | SUPER_SCENT | RES_BLIND |
 D:A gleaming black scorpion as large as a lion, with a pulsating stinger and 
 D:two great deadly claws.
 
@@ -15399,7 +15400,7 @@ B:SPIT:BLIND:1d2
 F:FORCE_SLEEP | 
 F:ONLY_GOLD | DROP_4D2 | 
 F:BASH_DOOR | 
-F:ANIMAL | EAT_BODY | IM_POIS
+F:ANIMAL | EAT_BODY | IM_POIS | RES_BLIND
 S:SCARE | BALL_POIS | BRTH_POIS
 D:A strange reptilian hybrid with six heads.
 
@@ -15414,7 +15415,7 @@ B:BITE:COLD:3d12
 B:BITE:FIRE:3d12
 F:FORCE_SLEEP | ONLY_GOLD | DROP_2D2 | DROP_3D2 | HAS_LITE
 F:BASH_DOOR | ANIMAL | EAT_BODY | IM_FIRE | IM_COLD
-F:RES_PLAS | RES_LAVA | HUGE
+F:RES_PLAS | RES_LAVA | HUGE | RES_BLIND
 S:BRTH_FIRE | BRTH_COLD | BALL_FIRE | BALL_COLD | BOLT_FIRE
 S:BOLT_COLD | BOLT_PLAS | BOLT_ICE | SCARE
 D:A strange reptilian hybrid with eight heads.
@@ -15429,7 +15430,7 @@ B:BITE:ACID:5d9
 B:BITE:ACID:5d9
 B:SPIT:BLIND:4d9
 F:FORCE_SLEEP | ONLY_GOLD | DROP_3D2 | DROP_4D2
-F:BASH_DOOR | ANIMAL | EAT_BODY | IM_ACID | HUGE
+F:BASH_DOOR | ANIMAL | EAT_BODY | IM_ACID | HUGE | RES_BLIND
 S:BRTH_ACID | BALL_ACID | BOLT_ACID | SCARE | CONF
 D:A strange reptilian hybrid with ten heads.
 
@@ -15445,7 +15446,7 @@ B:SPIT:COLD:5d9
 F:FORCE_SLEEP | ONLY_GOLD | DROP_2D2 | DROP_3D2 | DROP_4D2
 F:HAS_LITE | BASH_DOOR | POWERFUL
 F:ANIMAL | EAT_BODY | IM_FIRE | IM_COLD | RES_PLAS | RES_NEXUS
-F:RES_LAVA | HUGE
+F:RES_LAVA | HUGE | RES_BLIND
 S:BRTH_FIRE | BRTH_COLD | BRTH_PLAS | BRTH_NEXUS | BALL_FIRE
 S:BALL_COLD | BOLT_FIRE | BOLT_COLD | BOLT_PLAS | BOLT_NETHR
 D:A strange reptilian hybrid with twelve heads.
@@ -15462,7 +15463,7 @@ B:SPIT:BLIND:6d9
 F:FORCE_SLEEP | ONLY_GOLD | DROP_1D2 | DROP_2D2 | DROP_3D2
 F:DROP_4D2 | BASH_DOOR | POWERFUL | HUGE
 F:ANIMAL | EAT_BODY | IM_ACID | IM_ELEC | IM_FIRE | IM_COLD
-F:IM_POIS | NO_CONF | RES_LAVA | RES_CHAOS | NO_CONF
+F:IM_POIS | NO_CONF | RES_LAVA | RES_CHAOS | NO_CONF | RES_BLIND
 S:BRTH_PLAS | BRTH_CONFU | BRTH_INERT | BRTH_GRAV | BRTH_CHAOS
 S:BALL_CONFU | BALL_CHAOS | BOLT_PLAS | BLIND | CONF
 D:A strange reptilian hybrid with thirteen heads.
@@ -15481,7 +15482,7 @@ F:DROP_4D2 | BASH_DOOR | POWERFUL | HUGE
 F:ANIMAL | EAT_BODY | IM_ACID | IM_ELEC | IM_FIRE | IM_COLD
 F:IM_POIS | RES_PLAS | RES_NEXUS | RES_DISEN
 F:NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP
-F:RES_LAVA | RES_DARK | RES_LITE | RES_CHAOS | NO_CUTS | NO_CONF | NO_STUN
+F:RES_LAVA | RES_DARK | RES_LITE | RES_CHAOS | NO_CUTS | NO_CONF | NO_STUN | RES_BLIND
 S:BRTH_PLAS | BRTH_LITE | BRTH_DARK | BRTH_CONFU | BRTH_SOUND
 S:BRTH_SHARD | BRTH_NEXUS | BRTH_CHAOS | BRTH_DISEN | BALL_LITE
 S:BALL_DARK | BALL_CONFU | BALL_SOUND | BALL_CHAOS | BOLT_WATER
@@ -15562,7 +15563,7 @@ F:ANIMAL | RES_WATER | HURT_WATER
 D:Liquid footprints follow this hound as it pads around the dungeon.  It
 D: has fins and a fish tail.
 
-N:1081:The Emperor Wight of Carn Dum
+N:1081:the Emperor Wight of Carn Dum
 G:W:r
 I:120:38d10:20:40:10
 W:30:2:0:1600
@@ -15581,7 +15582,7 @@ D:Your life force is torn from your body as this powerful unearthly being
 D: approaches. It whispers dreadful words of ancient songs, cold and
 D: unearthly.
 
-N:1082:The King of the Wood Elves
+N:1082:the King of the Wood Elves
 G:l:o
 I:120:18d25:20:80:20
 W:29:4:0:500
@@ -15745,7 +15746,7 @@ I:115:6d5:7:10:50
 W:13:4:0:4
 B:CRAWL:DISEASE:2d2
 F:INSECT | HURT_LITE | MULTIPLY | RAND_25 | RAND_50 | STUPID |
-F:WEIRD_MIND | 
+F:WEIRD_MIND |
 D:A cockroach the size of a small dog.
 
 N:1095:Giant tse-tse fly
@@ -15753,7 +15754,7 @@ G:I:o
 I:120:10d2:10:15:10
 W:10:4:0:8
 B:STING:DISEASE:1d2
-F:INSECT | MULTIPLY | NO_SLEEP | RAND_25 | RAND_50 | WEIRD_MIND
+F:INSECT | MULTIPLY | NO_SLEEP | RAND_25 | RAND_50 | WEIRD_MIND |
 D:It spreads malaria across the dungeon.
 
 N:1096:Rabid wolf
@@ -15781,7 +15782,7 @@ I:110:9d14:14:50:20
 W:13:1:0:75
 B:BITE:DISEASE:3d4
 B:STING:HURT:3d4
-F:INSECT | BASH_DOOR | RAND_25 | WEIRD_MIND | EAT_BODY | NEVER_MISS
+F:INSECT | BASH_DOOR | RAND_25 | WEIRD_MIND | EAT_BODY | NEVER_MISS |
 D:It is moving slowly and intently towards you.
 
 N:1099:Dzoo-noo-qua
@@ -15845,7 +15846,7 @@ B:ENGULF:DISEASE:4d6
 B:ENGULF:POISON:4d6
 B:ENGULF:NEXUS:4d6
 F:BASH_DOOR | EMPTY_MIND | NO_FEAR | NO_SLEEP |
-F:RAND_25 | RAND_50 | NO_CONF | IM_POIS | POWERFUL
+F:RAND_25 | RAND_50 | NO_CONF | IM_POIS | POWERFUL | RES_BLIND
 S:BRTH_NEXUS | BRTH_POIS | BRTH_DISEA
 D:A toxic whirlpool, it's foulness can be sensed from afar.
 
@@ -15913,7 +15914,7 @@ B:BITE:HURT:1d5
 F:SMART | COLD_BLOOD
 F:EVIL | UNDEAD
 F:IM_COLD | IM_POIS | RES_EDGED
-F:NO_CONF | NO_SLEEP | NO_FEAR | LOW_MANA_RUN
+F:NO_CONF | NO_SLEEP | NO_FEAR | LOW_MANA_RUN | RES_BLIND
 S:SLOW | SCARE | WOUND | BLINK | TELE_TO | ADD_MANA
 D:A floating skull possessed by a malignant spirit.
 
@@ -15928,7 +15929,7 @@ F:FORCE_SLEEP | FORCE_MAXHP | NEVER_MOVE | NEVER_BLOW
 F:SMART | COLD_BLOOD
 F:EVIL | UNDEAD
 F:IM_FIRE | IM_POIS | RES_EDGED
-F:NO_CONF | NO_SLEEP | NO_FEAR | LOW_MANA_RUN
+F:NO_CONF | NO_SLEEP | NO_FEAR | LOW_MANA_RUN | RES_BLIND
 S:BOLT_FIRE | SCARE | BLINK | TELE_TO | ADD_MANA
 D:A fiery-wreathed skull possessed by an infernal spirit.
 
@@ -15943,7 +15944,7 @@ F:FORCE_SLEEP | FORCE_MAXHP
 F:SMART | COLD_BLOOD
 F:EVIL | UNDEAD
 F:IM_COLD | IM_POIS | RES_EDGED
-F:NO_CONF | NO_SLEEP | NO_FEAR | LOW_MANA_RUN
+F:NO_CONF | NO_SLEEP | NO_FEAR | LOW_MANA_RUN | RES_BLIND
 S:BLINK | TELE_TO | ADD_MANA
 D:A flying skull possessed by a terrible spirit.
 
@@ -15957,7 +15958,7 @@ B:BITE:POISON:3d4
 B:TOUCH:POISON:3d5
 F:CHAR_MULTI | ONLY_GOLD | DROP_60 | DROP_1D2 | COLD_BLOOD
 F:EMPTY_MIND | BASH_DOOR | IM_ACID | IM_ELEC | IM_POIS
-F:NO_CONF | NO_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD
+F:NO_CONF | NO_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | RES_BLIND
 D:It appears to be a pile of opals, slithering toward you on lots of
 D: tiny legs.
 
@@ -15969,7 +15970,7 @@ B:BITE:POISON:3d4
 B:TOUCH:POISON:3d5
 F:CHAR_MULTI | ONLY_GOLD | DROP_60 | DROP_2D2 | COLD_BLOOD
 F:EMPTY_MIND | BASH_DOOR | IM_ACID | IM_ELEC | IM_POIS
-F:NO_CONF | NO_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD
+F:NO_CONF | NO_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | RES_BLIND
 D:It appears to be a pile of sapphires, slithering toward you on lots of
 D: tiny legs.
 
@@ -15982,7 +15983,7 @@ B:TOUCH:POISON:3d5
 B:HIT:BATTER:1d8
 F:CHAR_MULTI | ONLY_GOLD | DROP_60 | DROP_1D2 | DROP_2D2
 F:COLD_BLOOD | EMPTY_MIND | BASH_DOOR | IM_ACID | IM_ELEC
-F:IM_POIS | NO_CONF | NO_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD
+F:IM_POIS | NO_CONF | NO_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | RES_BLIND
 D:It appears to be a pile of rubies, slithering toward you on lots of
 D: tiny legs.
 
@@ -15996,7 +15997,7 @@ B:HIT:BATTER:1d10
 B:HIT:BATTER:1d11
 F:CHAR_MULTI | ONLY_GOLD | DROP_90 | DROP_2D2 | COLD_BLOOD
 F:EMPTY_MIND | BASH_DOOR | IM_ACID | IM_ELEC | IM_POIS
-F:NO_CONF | NO_SLEEP | ATTR_METAL | ATTR_CLEAR | DROP_MINERAL | ONLY_GOLD
+F:NO_CONF | NO_SLEEP | ATTR_METAL | ATTR_CLEAR | DROP_MINERAL | ONLY_GOLD | RES_BLIND
 D:It appears to be a pile of diamonds, slithering toward you on lots of
 D: tiny legs.
 
@@ -16398,7 +16399,7 @@ B:BITE:COLD:4d5
 B:SPIT:EXP_10:1d1
 F:EMPTY_MIND | COLD_BLOOD | BASH_DOOR | 
 F:UNDEAD | EVIL | ANIMAL | EAT_BODY | RES_EDGED | IM_ELEC | IM_COLD | IM_POIS | 
-F:NO_FEAR | NO_STUN | NO_SLEEP | HAS_SCALE
+F:NO_FEAR | NO_STUN | NO_SLEEP | HAS_SCALE | RES_BLIND
 D:The skeleton of a great snake, driven back to life by necromantic magics.  
 D:Its bite is cold and deadly.
 
@@ -16865,7 +16866,7 @@ S:TELE_TO | MIND_BLAST
 D:A gigantic animated diamond statue of demonic shape.
 
 N:1165:15-headed Hydra
-G:M:v1
+G:y:v
 I:135:70d90:50:150:20
 W:89:2:0:22000
 M:40:40:85:126
@@ -16877,7 +16878,7 @@ F:UNIQUE | FORCE_MAXHP | FORCE_SLEEP | ONLY_GOLD | DROP_1D2
 F:DROP_2D2 | DROP_3D2 | DROP_4D2 | DROP_GOOD | SMART
 F:HAS_LITE | BASH_DOOR | POWERFUL | HUGE
 F:ANIMAL | EAT_BODY | IM_ACID | IM_ELEC | IM_FIRE | IM_COLD
-F:IM_POIS | RES_PLAS | NO_CONF | NO_SLEEP | RES_LAVA
+F:IM_POIS | RES_PLAS | NO_CONF | NO_SLEEP | RES_LAVA | RES_BLIND
 S:BRTH_ACID | BRTH_ELEC | BRTH_FIRE | BRTH_COLD | BRTH_POIS
 S:BRTH_PLAS | BALL_ACID | BALL_ELEC | BALL_FIRE | BALL_COLD
 S:BALL_POIS | BALL_STORM | BOLT_ACID | BOLT_ELEC | BOLT_FIRE
@@ -16937,7 +16938,7 @@ B:CLAW:HURT:1d5
 B:BITE:POISON:1d3
 F:COLD_BLOOD | FRIEND | RAND_25 | OPEN_DOOR | 
 F:UNDEAD | EVIL | RES_EDGED | HURT_LITE | IM_ELEC | IM_COLD | IM_POIS | 
-F:NO_STUN | NO_CONF | NO_SLEEP
+F:NO_STUN | NO_CONF | NO_SLEEP | RES_BLIND
 S:A_DEAD | WOUND | S_UNDEAD
 D:It is a frightening skeletal figures in black robes. 
 
@@ -16949,7 +16950,7 @@ M:0:11:3:30
 B:HIT:WOUND:2d5
 F:FORCE_SLEEP | EMPTY_MIND | CAN_FLY | EVASIVE | 
 F:IM_ELEC | IM_COLD | IM_POIS | RES_WATER | RES_NEXUS | RES_NETHR | 
-F:RES_CHAOS | NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP
+F:RES_CHAOS | NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP | RES_BLIND
 S:BLINK | TELE_SELF_TO | WOUND
 D:A small war-axe filled with vitality and malevolence.  It whirs about your 
 D:head, gashing you faster than you can react.
@@ -16961,7 +16962,7 @@ W:8:2:0:50
 M:33:0:0:0
 B:SPIT:ACID:2d9
 F:RAND_25 | WEIRD_MIND | BASH_DOOR | 
-F:INSECT | FRIEND | STUPID
+F:INSECT | FRIEND | STUPID |
 D:A large, ebony-colored ant spitting acid.
 
 N:1171:Zombified lion
@@ -17068,7 +17069,7 @@ I:115:2d5:25:5:0
 W:1:3:11:3
 B:ENGULF:BATTER:1d1
 F:EMPTY_MIND | BASH_DOOR | RAND_25 | RAND_50 | CAN_FLY
-F:NO_FEAR | NO_CONF | NO_SLEEP | NO_CUTS | IM_POIS
+F:NO_FEAR | NO_CONF | NO_SLEEP | NO_CUTS | IM_POIS | RES_BLIND
 D:A small cyclone that stirs up the musty dungeon air.
 
 # From Sangband
@@ -17079,7 +17080,7 @@ I:100:3d2:4:1:10
 W:1:3:0:1
 B:CRAWL:POISON:1d1
 F:MULTIPLY | NEVER_MOVE | DROP_1D2
-F:EMPTY_MIND | STUPID | NO_FEAR | NO_SLEEP | NO_CONF | PLANT | DROP_MUSHROOM | ONLY_ITEM
+F:EMPTY_MIND | STUPID | NO_FEAR | NO_SLEEP | NO_CONF | PLANT | DROP_MUSHROOM | ONLY_ITEM | RES_BLIND
 D:Hideous green blobs:  crawling, oozing, and breeding.
 
 #From Sangband
@@ -17090,7 +17091,7 @@ I:110:3d6:8:4:10:1
 W:2:2:0:2
 B:HIT:FIRE:1d4
 F:EMPTY_MIND | FORCE_SLEEP | CHAR_MULTI | HAS_LITE | RAND_50 | 
-F:IM_POIS | NO_FEAR | NO_CONF | NO_SLEEP | NO_CUTS | STUPID
+F:IM_POIS | NO_FEAR | NO_CONF | NO_SLEEP | NO_CUTS | STUPID | RES_BLIND
 D:A torch that somehow seems to have come alive.
 
 #From Sangband
@@ -17104,7 +17105,7 @@ B:HIT:WOUND:1d4
 F:FORCE_SLEEP | EMPTY_MIND | FRIEND | 
 F:CAN_FLY | 
 F:IM_ELEC | IM_FIRE | IM_COLD | IM_POIS | RES_WATER | RES_NEXUS | 
-F:RES_NETHR | RES_CHAOS | NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP
+F:RES_NETHR | RES_CHAOS | NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP | RES_BLIND
 S:TELE_SELF_TO
 D:Nasty little animated daggers looking for warm meat.
 
@@ -17173,7 +17174,7 @@ B:HIT:BATTER:1d7
 F:NEVER_MISS | EMPTY_MIND | COLD_BLOOD | CHAR_MULTI | MUST_FLY
 F:CAN_FLY | EVASIVE | RES_EDGED | IM_ELEC | IM_COLD | IM_POIS | RES_WATER | 
 F:RES_NETHR | RES_TPORT | NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP | 
-F:SMART
+F:SMART | RES_BLIND
 S:BLINK | TELE_SELF_TO
 D:A animated human femur painted bright florescent pink.  It dances about 
 D:you and hits you every time you make a mistake.
@@ -17187,7 +17188,7 @@ W:11:3:0:4
 B:CRAWL:ACID:1d7
 F:MULTIPLY | WEIRD_MIND | RAND_25 | RAND_50 | BASH_DOOR | KILL_WALL | 
 F:INSECT | RES_EDGED | HURT_ROCK | IM_ACID | IM_POIS | RES_BLIND
-F:NO_FEAR | STUPID
+F:NO_FEAR | STUPID | RES_BLIND
 D:A disgusting mass of worms, indistinguishable from the stone around them 
 D:until they move.  Acid drips from the worms and eats through the floor.
 
@@ -17227,7 +17228,7 @@ M:0:33:12:70
 B:HIT:HURT:3d5
 B:HIT:HURT:3d5
 F:MALE | EVIL | FORCE_SLEEP | OPEN_DOOR | BASH_DOOR | TAKE_ITEM | 
-F:DROP_1D2 | FRIEND | PRIEST
+F:DROP_1D2 | FRIEND | PRIEST | RES_BLIND
 F:SMART
 S:BALL_LITE | HEAL | CURE | SCARE | BLIND | HOLD | BLESS
 D:A stocky, white-bearded dwarf with a pious but haughty expression.  Stauch is he 
@@ -17294,7 +17295,7 @@ B:TOUCH:CONFUSE:3d3
 F:FORCE_SLEEP | COLD_BLOOD | ATTR_INDEX
 F:NEVER_MOVE | UNDEAD | EVIL | IM_FIRE | IM_COLD | IM_POIS | 
 F:NO_FEAR | NO_CONF | NO_SLEEP | 
-F:SMART
+F:SMART | RES_BLIND
 S:BOLT_MANA | ADD_MANA | DARKNESS | CURSE | WOUND | SLOW | 
 S:S_UNDEAD
 D:A helmet filled with undead druj, glowing with magic and floating in thin 
@@ -17431,7 +17432,7 @@ B:HIT:WOUND:6d6
 B:HIT:WOUND:6d6
 F:FORCE_SLEEP | EMPTY_MIND | CAN_FLY | ATTR_INDEX 
 F:IM_ELEC | IM_FIRE | IM_COLD | IM_POIS | RES_WATER | RES_NEXUS | 
-F:RES_NETHR | RES_CHAOS | NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP
+F:RES_NETHR | RES_CHAOS | NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP | RES_BLIND
 S:TELE_SELF_TO
 D:A blade with no wielder you can see, slaughtering where it will.  It is 
 D:utterly untamable:  destroy it, flee, or die.
@@ -17528,7 +17529,7 @@ F:ATTR_MULTI | EMPTY_MIND | COLD_BLOOD |
 F:FRIEND | RAND_25 | RAND_50 | BASH_DOOR | TAKE_ITEM | CAN_FLY | 
 F:DROP_1D2 | RES_EDGED | RES_BLUNT | RES_WATER | RES_CHAOS | 
 F:NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP | DROP_JUNK | HAS_AURA | NO_CUTS
-F:DROP_2D2 | DROP_3D2 | DROP_4D2
+F:DROP_2D2 | DROP_3D2 | DROP_4D2 | RES_BLIND
 S:BRTH_SHARD | BRTH_WIND | BRTH_FORCE | AURA 
 S:ARC_FORCE | ADD_MANA
 D:An intense storm, churning and roiling, powerful enough to pick up trees
@@ -17543,7 +17544,7 @@ M:33:0:0:0
 B:TRAIL:MANA
 F:FORCE_SLEEP | EMPTY_MIND | TRAIL |
 F:NEVER_BLOW | RAND_25 | RAND_50 | BASH_DOOR
-F:NO_FEAR | NO_CONF | NO_SLEEP
+F:NO_FEAR | NO_CONF | NO_SLEEP | RES_BLIND | RES_BLIND
 S:BRTH_MANA
 D:Raw magic, driven by raw magic, a whirling devastation.
 
@@ -17632,7 +17633,7 @@ B:HIT:BATTER:25d25
 F:FORCE_SLEEP | EMPTY_MIND | 
 F:KILL_WALL | CAN_FLY | 
 F:IM_ELEC | IM_COLD | IM_POIS | RES_WATER | RES_NEXUS | RES_NETHR | 
-F:RES_CHAOS | NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP
+F:RES_CHAOS | NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP | RES_BLIND
 D:A maul thrice as large as a man and many times more massive, with a
 D: spectre-shimmer of dreadful magics surrounding it.  It smites and smashes
 D: down, pulverizes and mangles in heaps of rubble, blood, and bone.  Appalling
@@ -17828,7 +17829,7 @@ B:BITE:HURT:1d3
 F:FORCE_SLEEP | 
 F:RAND_50 | RAND_25 | ATTR_METAL | CAN_FLY | DROP_MINERAL | ONLY_GOLD | DROP_90
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT | RES_TPORT | DRAGON
+F:INSECT | RES_TPORT | DRAGON |
 S:BRTH_DISEA
 D:This pink garnet dragonfly has wings which glow with fecund energy.
 
@@ -17840,7 +17841,7 @@ B:BITE:POISON:2d4
 B:TOUCH:POISON:2d5
 F:CHAR_MULTI | ONLY_GOLD | DROP_60 | DROP_1D2 | COLD_BLOOD
 F:EMPTY_MIND | BASH_DOOR | IM_ACID | IM_ELEC | IM_POIS
-F:NO_CONF | NO_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD
+F:NO_CONF | NO_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | RES_BLIND
 D:It appears to be a pile of garnets, slithering toward you on lots of
 D: tiny legs.
 
@@ -18061,7 +18062,7 @@ F:EMPTY_MIND | COLD_BLOOD |
 F:RAND_25 | RAND_50 | BASH_DOOR | KILL_WALL 
 F:DROP_1D2 | RES_EDGED | RES_WATER | RES_CHAOS | NO_CUTS
 F:DROP_2D2 | DROP_3D2 | DROP_4D2 | ONLY_GOLD
-F:NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP | HAS_AURA
+F:NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP | HAS_AURA | RES_BLIND
 S:BRTH_SHARD | QUAKE
 S:ADD_AMMO
 D:An thundering, grinding, churning vortex of razor-sharp rubble that tears through
@@ -18090,7 +18091,7 @@ W:12:1:0:10
 B:TOUCH:POISON:1d3
 F:STUPID | EMPTY_MIND
 F:IM_POIS | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL | FRIENDS
-F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND | HAS_CORPSE | HAS_ARM
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND | HAS_CORPSE | HAS_ARM |
 D:It is a giant jellyfish glowing with pulsing white lights.
 
 N:1256:Giant silver jellyfish
@@ -18104,7 +18105,7 @@ B:AURA:DARK_WEAK
 F:STUPID | EMPTY_MIND
 F:IM_POIS | CAN_SWIM | MUST_SWIM
 F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND | FRIENDS
-F:ATTR_METAL | HAS_AURA | HAS_CORPSE | HAS_ARM
+F:ATTR_METAL | HAS_AURA | HAS_CORPSE | HAS_ARM |
 S:DRAIN_MANA | AURA
 D:It is a giant silver jellyfish that sucks all light from its
 D: surroundings.
@@ -18117,7 +18118,7 @@ M:0:6:0:0
 B:TOUCH:POISON:1d6
 F:STUPID | EMPTY_MIND
 F:IM_POIS | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL | FRIENDS
-F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND | HAS_CORPSE | HAS_ARM
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND | HAS_CORPSE | HAS_ARM |
 S:DRAIN_MANA
 D:It is a giant jellyfish glowing with pulsing yellow lights.
 
@@ -18129,7 +18130,7 @@ B:TOUCH:COLD:1d6
 F:COLD_BLOOD
 F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL
 F:IM_COLD | HAS_CORPSE | HAS_ARM | FRIENDS
-F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND |
 D:It is a giant jellyfish glowing with pulsing blue lights.
 
 N:1259:Giant green jellyfish
@@ -18139,7 +18140,7 @@ W:20:1:0:18
 B:TOUCH:ACID:1d5
 F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL
 F:IM_ACID | RES_BLIND | HAS_CORPSE | HAS_ARM | FRIENDS
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR |
 D:It is a giant jellyfish glowing with pulsing green lights.
 
 N:1260:Giant pink jellyfish
@@ -18148,7 +18149,7 @@ I:110:26d8:2:1:99
 W:17:1:0:26
 B:TOUCH:LOSE_STR:1d5
 F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL
-F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND | HAS_CORPSE | HAS_ARM | FRIENDS
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND | HAS_CORPSE | HAS_ARM | FRIENDS |
 D:It is a giant jellyfish glowing with pulsing pink lights.
 
 N:1261:Giant purple jellyfish
@@ -18159,7 +18160,7 @@ M:0:9:0:0
 B:TOUCH:EXP_10
 F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL
 F:IM_POIS | HAS_CORPSE | HAS_ARM | FRIENDS
-F:NO_CONF | NO_SLEEP | NO_FEAR
+F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLIND
 S:DRAIN_MANA
 D:It is a giant jellyfish glowing with pulsing purple lights.
 
@@ -18170,7 +18171,7 @@ W:28:2:0:33
 B:TOUCH:ACID:6d6
 F:STUPID | EMPTY_MIND | COLD_BLOOD
 F:IM_ACID | IM_POIS | CAN_SWIM | MUST_SWIM | HAS_CORPSE | HAS_ARM
-F:NO_CONF | NO_SLEEP | NO_FEAR | FRIENDS
+F:NO_CONF | NO_SLEEP | NO_FEAR | FRIENDS | RES_BLIND
 D:It is a giant jellyfish covered in discoloured blotches.
 
 N:1263:Giant ochre jellyfish
@@ -18183,7 +18184,7 @@ B:SPIT:ACID:2d10
 F:STUPID | EMPTY_MIND | COLD_BLOOD
 F:TAKE_ITEM | BASH_DOOR
 F:IM_ACID | IM_POIS | CAN_SWIM | MUST_SWIM | HAS_CORPSE | HAS_ARM
-F:NO_CONF | NO_SLEEP | NO_FEAR | FRIENDS
+F:NO_CONF | NO_SLEEP | NO_FEAR | FRIENDS | RES_BLIND
 D:It is a fast moving highly acidic giant jellyfish.
 
 N:1264:Giant rotting jellyfish
@@ -18194,7 +18195,7 @@ B:TOUCH:EAT_FOOD:2d3
 B:TOUCH:LOSE_CHR:2d3
 F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM
 F:IM_POIS | UNDEAD | IM_COLD | FRIENDS
-F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM
+F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | RES_BLIND
 D:It is a giant rotting jellyfish.
 
 N:1265:Giant clear jellyfish
@@ -18206,7 +18207,7 @@ B:TOUCH:POISON:1d4
 F:ATTR_CLEAR | INVISIBLE
 F:STUPID | EMPTY_MIND
 F:CAN_SWIM | MUST_SWIM | HAS_LITE | FRIENDS
-F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM
+F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | RES_BLIND
 S:DRAIN_MANA
 D:It is a giant almost transparent jellyfish glowing with pulsing lights.
 
@@ -18217,7 +18218,7 @@ W:23:1:0:32
 B:TOUCH:LOSE_CHR:1d4
 B:TOUCH:LOSE_CHR:1d4
 F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL 
-F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | FRIENDS
+F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | FRIENDS | RES_BLIND
 D:It is a giant jellyfish glowing with pulsing brown lights.
 
 N:1267:Giant red jellyfish
@@ -18226,7 +18227,7 @@ I:110:36d8:2:1:99
 W:24:1:0:38
 B:TOUCH:FIRE:1d8 
 F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL | 
-F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | FRIENDS
+F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | FRIENDS | RES_BLIND
 D:It is a giant jellyfish glowing with pulsing red lights.
 
 N:1268:Giant bright blue jellyfish
@@ -18236,7 +18237,7 @@ W:25:2:0:44
 M:0:11:3:40
 B:TOUCH:COLD:2d6 
 F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL
-F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | FRIENDS
+F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | FRIENDS | RES_BLIND
 S:DRAIN_MANA | S_KIN | BLINK
 D:It is smarter than your average giant jellyfish.
 
@@ -18247,7 +18248,7 @@ W:26:3:0:50
 M:0:11:4:50
 B:TOUCH:ACID:2d5 
 F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL
-F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | FRIENDS
+F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | FRIENDS | RES_BLIND
 S:DRAIN_MANA | S_MONSTER | TPORT
 D:It is smarter than your average giant jellyfish.
 
@@ -18259,7 +18260,7 @@ M:0:9:0:0
 B:TOUCH:LOSE_ALL:2d8
 F:STUPID | EMPTY_MIND | 
 F:IM_POIS | CAN_SWIM | MUST_SWIM | HAS_LITE | ATTR_METAL
-F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | FRIENDS
+F:NO_CONF | NO_SLEEP | NO_FEAR | HAS_CORPSE | HAS_ARM | FRIENDS | RES_BLIND
 S:DRAIN_MANA
 D:It is a giant jellyfish glowing with pulsing black lights.
 
@@ -18329,7 +18330,7 @@ F:MALE
 F:DROP_1D2
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:WARRIOR | MAGE | NEED_LITE | ARCHER | ELF | RES_LITE
-S:S_INSECT
+S:S_SPIDER
 S:BOLT_COLD | BOLT_ELEC | BLINK | CURE
 D:An elven master of both bow and sword, with minor spellcasting
 D: skills, and spiders come to do his bidding.
@@ -18364,3 +18365,21 @@ F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:NEED_LITE | SMART | SUPER_SCENT
 F:WARRIOR | ELF | RES_LITE
 D:A grey-garbed elven warrior who moves with confidence.
+
+N:1277:the Cave troll at Durin's Tomb
+G:T:u
+I:110:24d12:20:50:50
+W:30:1:0:350
+M:15:15:0:30
+B:HIT:BATTER:2d8
+B:HIT:BATTER:2d8
+B:BITE:HURT:1d13
+B:LASH:BATTER:2d8
+F:MALE
+F:DROP_60 | FORCE_MAXHP
+F:OPEN_DOOR | BASH_DOOR | HUGE
+F:EVIL | TROLL | EAT_BODY | HURT_LITE | UNIQUE
+S:S_ORC
+D:He is a vicious monster, feared for his ferocity. He can lash you with
+D: a chain hanging around his neck.
+

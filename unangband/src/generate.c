@@ -4203,7 +4203,8 @@ static void cave_gen(void)
 	/* Create ground */
 	else if (surface)
 	{
-		base = FEAT_GROUND;
+		if (f_info[zone->fill].flags1 & (FF1_FLOOR)) base = zone->fill;
+		else base = FEAT_GROUND;
 	}
 	/* Create granite wall */
 	else
@@ -4778,7 +4779,7 @@ static void cave_gen(void)
 				}
 
 				/* Place the questor */
-				place_monster_aux(y, x, i, TRUE, TRUE);
+				place_monster_aux(y, x, i, FALSE, TRUE);
 			}
 		}
 	}
@@ -4797,7 +4798,7 @@ static void cave_gen(void)
 		}
 
 		/* Place the questor */
-		place_monster_aux(y, x, zone->guard, TRUE, TRUE);
+		place_monster_aux(y, x, zone->guard, FALSE, TRUE);
 	}
 }
 
@@ -5140,7 +5141,7 @@ static void town_gen(void)
 		for (x = 1; x < TOWN_WID-1; x++)
 		{
 			/* Create empty ground */
-			cave_set_feat(y, x, FEAT_GROUND);
+			cave_set_feat(y, x, f_info[zone->big].flags1 & (FF1_FLOOR) ? zone->big : FEAT_GROUND);
 		}
 	}
 
@@ -5151,7 +5152,7 @@ static void town_gen(void)
 	town_illuminate(daytime);
 
 	/* Ensure guardian monsters */
-	if (!(daytime && surface) && (zone->guard) && (r_info[zone->guard].cur_num <= 0))
+	if ((!daytime || !surface) && (zone->guard) && (r_info[zone->guard].cur_num <= 0))
 	{
 		/* Pick a location */
 		while (1)
@@ -5164,27 +5165,28 @@ static void town_gen(void)
 		}
 
 		/* Place the questor */
-		place_monster_aux(y, x, zone->guard, TRUE, TRUE);
+		place_monster_aux(y, x, zone->guard, FALSE, TRUE);
 	}
-
-	/* Ensure wandering monsters suit the dungeon level */
-	get_mon_num_hook = dun_level_mon;
-	
-	/* Prepare allocation table */
-	get_mon_num_prep();
-
-	/* Make some residents */
-	for (i = 0; i < residents; i++)
+	else
 	{
-		/* Make a resident */
-		(void)alloc_monster(3, TRUE);
+		/* Ensure wandering monsters suit the dungeon level */
+		get_mon_num_hook = dun_level_mon;
+	
+		/* Prepare allocation table */
+		get_mon_num_prep();
+
+		/* Make some residents */
+		for (i = 0; i < residents; i++)
+		{
+			/* Make a resident */
+			(void)alloc_monster(3, TRUE);
+		}
+
+		get_mon_num_hook = NULL;
+
+		/* Prepare allocation table */
+		get_mon_num_prep();
 	}
-
-	get_mon_num_hook = NULL;
-
-	/* Prepare allocation table */
-	get_mon_num_prep();
-
 }
 
 
