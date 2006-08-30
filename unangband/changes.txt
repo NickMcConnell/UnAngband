@@ -336,6 +336,12 @@ command will only list items with the THROWING flag enabled.
 monster ammunition with fire or acid based spells, but stolen objects will equally 
 be at risk of destruction.
 
+- Moria has been broken into several parts with multiple paths and guardians.
+
+- Monsters will now use healing potions if they carry them, particularly to cure
+blindness. Monsters that are blinded are able to use cure spells (only) to heal
+themselves.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -750,6 +756,14 @@ their abilities (Reported by Reported by Pav Lucistnik).
 
 - Prevent players and monsters from teleporting in and out of towers (Reported by
 Matthias Rudolf).
+
+- Fixed summoning for various monster summon spells which were inadvertantly allowing
+too many different monster types to be summoned.
+
+- Fixed bug where huge monsters were only using their attacks at the frequency of their
+innate abilities. They now use their huge attacks 50% of the time.
+
+- Fixed bug where many monsters were firing magical bolts instead of crossbow bolts.
 
 ### Build / Platform ###
 
