@@ -4430,6 +4430,28 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 	o_ptr->may_flags3 &= ~(f3);
 	o_ptr->may_flags4 &= ~(f4);
 
+	/* Oops */
+	if ( (f1 & (o_ptr->can_flags1)) || (f2 & (o_ptr->can_flags2)) || (f3 & (o_ptr->can_flags3)) || (f4 & (o_ptr->can_flags4)))
+	{
+		msg_print("BUG: Forgetting something on an object we shouldn't forget. Please report.");
+
+		/* Load screen */
+		screen_save();
+
+		/* Begin recall */
+		Term_gotoxy(0, 1);
+
+		/* Actually display the item */
+		list_object_flags(f1 & (o_ptr->can_flags1), f2 & (o_ptr->can_flags2), f3 & (o_ptr->can_flags3), f4 & (o_ptr->can_flags4), 1);
+
+		(void)anykey();
+	
+		/* Load screen */
+		screen_load();
+
+		msg_format("%ld:%ld:%ld:%ld", f1 & (o_ptr->can_flags1), f2 & (o_ptr->can_flags2), f3 & (o_ptr->can_flags3), f4 & (o_ptr->can_flags4));
+	}
+
 	/* Clear can flags */
 	o_ptr->can_flags1 &= ~(f1);
 	o_ptr->can_flags2 &= ~(f2);

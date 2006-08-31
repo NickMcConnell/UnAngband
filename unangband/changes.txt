@@ -771,6 +771,13 @@ innate abilities. They now use their huge attacks 50% of the time.
 - Fixed bug where you guessed an object was magical e.g. (of Throwing?) when you learnt
 a flag that was a normal property of the object.
 
+- Fixed bug where an item that decreased your experience could make you think your
+equipment had hold life while you were blessed.
+
+- Fixed some incorrect dragon colours.
+
+- Fixed bug where you would have to open a chest twice.
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).
@@ -800,6 +807,7 @@ equivalent files).
 
 - Fixed spelling of berserk.
 
+- Added some bug reporting metrics to try and spot remaining known bugs.
 
 Unangband 0.6.0 "Where's the Tequila? Did Tara Reid steal all the drinks?" (The Ari
 Gold Release)

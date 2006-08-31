@@ -2205,7 +2205,7 @@ int place_monster_here(int y, int x, int r_idx)
 
 	/* Check for swimming */
 	if (resist &&
-		(r_ptr->flags2 & (RF2_CAN_SWIM)) &&
+		(r_ptr->flags2 & (RF2_CAN_SWIM | RF2_MUST_SWIM)) &&
 		(f_ptr->flags2 & (FF2_CAN_SWIM)))
 	{
 		return(MM_SWIM);
@@ -2243,7 +2243,7 @@ int place_monster_here(int y, int x, int r_idx)
 
 	/* Hack -- check for flying. */
 	if ((r_ptr->flags2 & (RF2_CAN_FLY)) &&
-		(f_ptr->flags2 & (FF2_CAN_FLY)))
+		(f_ptr->flags2 & (FF2_CAN_FLY | RF2_MUST_FLY)))
 	{
 		return(MM_FLY);
 	}
@@ -2539,7 +2539,7 @@ int calc_monster_hp(const monster_type *m_ptr)
 	if (m_ptr->mflag & (MFLAG_SICK)) hp = hp * 9 / 10;
 	else if (m_ptr->mflag & (MFLAG_HEALTHY)) hp = hp * 11 / 10;
 
-	if (hp <= 0) hp = 1;
+	if (hp < 1) hp = 1;
 
 	return(hp);
 }

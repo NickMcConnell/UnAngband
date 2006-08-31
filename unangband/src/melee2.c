@@ -5771,6 +5771,23 @@ static void recover_monster(int m_idx, bool regen)
 	char m_poss[80];
 
 
+	/* Hack -- Bug tracking */
+	if (m_ptr->hp > m_ptr->maxhp)
+	{
+		msg_print("BUG: Monster hit points too high! Please report.");
+
+		m_ptr->hp = m_ptr->maxhp;
+	}
+
+	/* Hack -- Bug tracking */
+	if (m_ptr->maxhp > r_ptr->hdice * r_ptr->hside)
+	{
+		msg_print("BUG: Monster hit points *way* too high! Please report.");
+
+		m_ptr->maxhp = calc_monster_hp(m_ptr);
+	}
+
+
 	/* Handle "summoned" */
 	if (m_ptr->summoned)
 	{

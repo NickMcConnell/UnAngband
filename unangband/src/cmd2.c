@@ -1074,29 +1074,27 @@ static bool do_cmd_open_aux(int y, int x)
 	if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
 	{
 		hit_trap(y,x);
-
-		/* Update the visuals */
-		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-
 	}
 
-
-	/* Secrets on door/permanent doors */
-	else if ((f_info[cave_feat[y][x]].flags1 & (FF1_SECRET)) ||
-		(f_info[cave_feat[y][x]].flags1 & (FF1_PERMANENT)))
+	/* Permanent doors */
+	else if (f_info[cave_feat[y][x]].flags1 & (FF1_PERMANENT))
 	{
-
 		/* Stuck */
 		find_secret(y,x);
-
-		/* Update the visuals */
-		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-
 	}
 
 	/* Locked door */
 	else if ((f_info[cave_feat[y][x]].flags1 & (FF1_OPEN)) && (f_info[cave_feat[y][x]].power >0))
 	{
+		/* Find secrets */
+		if (f_info[cave_feat[y][x]].flags1 & (FF1_SECRET))
+		{
+			find_secret(y,x);
+
+			/* Sanity check */
+			if (!(f_info[cave_feat[y][x]].flags1 & (FF1_OPEN))) return (FALSE);
+		}
+
 		/* Disarm factor */
 		i = p_ptr->skill_dis;
 
@@ -1146,6 +1144,15 @@ static bool do_cmd_open_aux(int y, int x)
 	/* Closed door */
 	else
 	{
+		/* Find secrets */
+		if (f_info[cave_feat[y][x]].flags1 & (FF1_SECRET))
+		{
+			find_secret(y,x);
+
+			/* Sanity check */
+			if (!(f_info[cave_feat[y][x]].flags1 & (FF1_OPEN))) return (FALSE);
+		}
+
 		/* Open the door */
 		cave_alter_feat(y, x, FS_OPEN);
 
@@ -1284,20 +1291,25 @@ static bool do_cmd_close_aux(int y, int x)
 
 	}
 
-	/* Secrets on door/permanent doors */
-	else if ((f_info[cave_feat[y][x]].flags1 & (FF1_SECRET)) ||
-		(f_info[cave_feat[y][x]].flags1 & (FF1_PERMANENT)))
+	/* Permanent doors */
+	else if	(f_info[cave_feat[y][x]].flags1 & (FF1_PERMANENT))
 	{
 		/* Stuck */
 		find_secret(y,x);
-
-		/* Update the visuals */
-		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 	}
 
 	/* Close door */
 	else
 	{
+		/* Find secrets */
+		if (f_info[cave_feat[y][x]].flags1 & (FF1_SECRET))
+		{
+			find_secret(y,x);
+
+			/* Sanity check */
+			if (!(f_info[cave_feat[y][x]].flags1 & (FF1_CLOSE))) return (FALSE);
+		}
+
 		/* Close the door */
 		cave_alter_feat(y, x, FS_CLOSE);
 
@@ -1454,22 +1466,16 @@ static bool do_cmd_tunnel_aux(int y, int x)
 
 	}
 
-	/* Permanent doors/rock */
+	/* Permanent rock */
 	else if (f_info[cave_feat[y][x]].flags1 & (FF1_PERMANENT))
-
 	{
 		/* Stuck */
 		find_secret(y,x);
-
-		/* Update the visuals */
-		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-
 	}
 
 	/* Dig or tunnel */
 	else if (f_info[cave_feat[y][x]].flags2 & (FF2_CAN_DIG))
 	{
-
 		/* Dig */
 		if (p_ptr->skill_dig > rand_int(20 * j))
 		{
@@ -1488,13 +1494,11 @@ static bool do_cmd_tunnel_aux(int y, int x)
 
 			/* Update the visuals */
 			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-
 		}
 
 		/* Keep trying */
 		else
 		{
-
 			/* Get mimiced feature */
 			feat = f_info[feat].mimic;
 
@@ -1505,12 +1509,10 @@ static bool do_cmd_tunnel_aux(int y, int x)
 			msg_format("You dig into the %s.",name);
 			more = TRUE;
 		}
-
 	}
 
 	else
 	{
-
 		/* Tunnel -- much harder */
 		if (p_ptr->skill_dig > (j + rand_int(40 * j)))
 		{
@@ -1529,7 +1531,6 @@ static bool do_cmd_tunnel_aux(int y, int x)
 
 			/* Update the visuals */
 			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-
 		}
 
 		/* Keep trying */
@@ -1897,16 +1898,11 @@ static bool do_cmd_bash_aux(int y, int x, bool charging)
 	}
 
 
-	/* Secrets on door/permanent doors */
-	else if ((f_info[cave_feat[y][x]].flags1 & (FF1_SECRET)) ||
-		(f_info[cave_feat[y][x]].flags1 & (FF1_PERMANENT)))
+	/* Permanent doors */
+	else if (f_info[cave_feat[y][x]].flags1 & (FF1_PERMANENT))
 	{
 		/* Stuck */
 		find_secret(y,x);
-
-		/* Update the visuals */
-		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-
 	}
 
 	/* Hack -- Bash power based on strength */
@@ -1930,6 +1926,15 @@ static bool do_cmd_bash_aux(int y, int x, bool charging)
 	{
 		/* Message */
 		msg_format("The %s crashes open!",name);
+
+		/* Find secrets */
+		if (f_info[cave_feat[y][x]].flags1 & (FF1_SECRET))
+		{
+			find_secret(y,x);
+
+			/* Sanity check */
+			if (!(f_info[cave_feat[y][x]].flags1 & (FF1_BASH))) return (FALSE);
+		}
 
 		/* Break down the door */
 		if (rand_int(100) < 50)
@@ -2357,24 +2362,14 @@ void do_cmd_set_trap_or_spike(void)
 		if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
 		{
 			hit_trap(y,x);
-
-			/* Update the visuals */
-			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-
 		}
 #endif
 
-
-		/* Secrets on door/permanent doors */
-		/* else */ if ((f_info[cave_feat[y][x]].flags1 & (FF1_SECRET)) ||
-			(f_info[cave_feat[y][x]].flags1 & (FF1_PERMANENT)))
+		/* Permanent doors */
+		/* else */ if (f_info[cave_feat[y][x]].flags1 & (FF1_PERMANENT))
 		{
 			/* Stuck */
 			find_secret(y,x);
-
-			/* Update the visuals */
-			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-
 		}
 
 		/* Spike the door */
@@ -2384,6 +2379,15 @@ void do_cmd_set_trap_or_spike(void)
 
 			int feat = cave_feat[y][x];
 			int item2 = 0;
+
+			/* Find secrets */
+			if (f_info[cave_feat[y][x]].flags1 & (FF1_SECRET))
+			{
+				find_secret(y,x);
+
+				/* Sanity check */
+				if (!(f_info[cave_feat[y][x]].flags1 & (FF1_SPIKE))) return;
+			}
 
 			feat = feat_state(feat, FS_SPIKE);
 
@@ -2491,6 +2495,15 @@ void do_cmd_set_trap_or_spike(void)
 			object_type object_type_body;
 
 			object_type *j_ptr;
+
+			/* Find secrets */
+			if (f_info[cave_feat[y][x]].flags1 & (FF1_SECRET))
+			{
+				find_secret(y,x);
+
+				/* Sanity check */
+				if (!(f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR))) return;
+			}
 
 			/* Get object body */
 			j_ptr = &object_type_body;

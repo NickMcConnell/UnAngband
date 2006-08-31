@@ -315,7 +315,6 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 					{
 						object_can_flags(o_ptr,TR1_KILL_DRAGON,0x0L,0x0L,0x0L);
 					}
-					else object_can_flags(o_ptr,TR1_SLAY_DRAGON,0x0L,0x0L,0x0L);
 					l_ptr->flags3 |= (RF3_DRAGON);
 				}
 
@@ -336,7 +335,6 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 					{
 						object_can_flags(o_ptr,TR1_KILL_DEMON,0x0L,0x0L,0x0L);
 					}
-					else object_can_flags(o_ptr,TR1_SLAY_DEMON,0x0L,0x0L,0x0L);
 					l_ptr->flags3 |= (RF3_DEMON);
 				}
 
@@ -357,7 +355,6 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 					{
 						object_can_flags(o_ptr,TR1_KILL_UNDEAD,0x0L,0x0L,0x0L);
 					}
-					else object_can_flags(o_ptr,TR1_SLAY_UNDEAD,0x0L,0x0L,0x0L);
 					l_ptr->flags3 |= (RF3_UNDEAD);
 				}
 

@@ -6477,7 +6477,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 				m_ptr->hp = m_ptr->hp * new_maxhp / m_ptr->maxhp;
 
 				/* To a minimum */
-				if (m_ptr->hp < 0) m_ptr->hp = 1;
+				if (m_ptr->hp < 0) m_ptr->hp = 0;
 
 				/* Permanently reduce maximum hp */
 				m_ptr->maxhp = new_maxhp;

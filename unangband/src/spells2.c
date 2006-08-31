@@ -6735,18 +6735,18 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 
 	if (s_ptr->flags3 & (SF3_DEC_EXP))
 	{
-		if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) == 0) && !p_ptr->blessed && (p_ptr->exp > 0))
+		if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0) || !p_ptr->blessed || (p_ptr->exp == 0))
+		{
+			/* Always notice */
+			if (!p_ptr->blessed && (p_ptr->exp > 0)) equip_can_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
+		}
+		else if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0)
 		{
 			lose_exp(p_ptr->exp / 4);
 			obvious = TRUE;
 
 			/* Always notice */
 			equip_not_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-		}
-		else if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0)
-		{
-			/* Always notice */
-			equip_can_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
 		}
 	}
 
