@@ -5087,6 +5087,7 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 	/* Generate multiple items */
 	if (!artifact_p(j_ptr)) switch (j_ptr->tval)
 	{
+		case TV_ROPE:
 		case TV_SPIKE:
 		case TV_SHOT:
 		case TV_ARROW:

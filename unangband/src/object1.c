@@ -1227,6 +1227,20 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			int x1, x2; /* Fake xtra flags */
 			u32b j;
 
+			u32b f1 = o_ptr->can_flags1;
+			u32b f2 = o_ptr->can_flags2;
+			u32b f3 = o_ptr->can_flags3;
+			u32b f4 = o_ptr->can_flags4;
+
+			/* Remove flags on aware objects */
+			if (k_info[o_ptr->k_idx].aware)
+			{
+				f1 &= ~(k_info[o_ptr->k_idx].flags1);
+				f2 &= ~(k_info[o_ptr->k_idx].flags2);
+				f3 &= ~(k_info[o_ptr->k_idx].flags3);
+				f4 &= ~(k_info[o_ptr->k_idx].flags4);
+			}
+
 			x1 = 0;
 			x2 = 0;
 
@@ -1234,7 +1248,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			for (i = 0, j = 0x00000001L; i < 32; i++, j<<=1)
 			{
 				/* Found a flag */
-				if ((j & o_ptr->can_flags1) != 0)
+				if ((j & f1) != 0)
 				{
 					/* First flag */
 					if (!x1) { x1 = 1; x2 = i; }
@@ -1248,7 +1262,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)
 			{
 				/* Found a flag */
-				if ((j & o_ptr->can_flags2) != 0)
+				if ((j & f2) != 0)
 				{
 					/* First flag */
 					if (!x1) { x1 = 2; x2 = i; }
@@ -1261,8 +1275,12 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			/* Loop through third flags */
 			for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)
 			{
+				/* Skip 'useless' flags */
+				if (j & (TR3_ACTIVATE | TR3_RANDOM | TR3_INSTA_ART |
+					  TR3_EASY_KNOW | TR3_HIDE_TYPE | TR3_SHOW_MODS)) continue;
+
 				/* Found a flag */
-				if ((j & o_ptr->can_flags3) != 0)
+				if ((j & f3) != 0)
 				{
 					/* First flag */
 					if (!x1) { x1 = 3; x2 = i; }
@@ -1276,7 +1294,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)
 			{
 				/* Found a flag */
-				if ((j & o_ptr->can_flags4) != 0)
+				if ((j & f4) != 0)
 				{
 					/* First flag */
 					if (!x1) { x1 = 4; x2 = i; }

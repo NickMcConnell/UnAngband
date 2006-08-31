@@ -765,6 +765,9 @@ innate abilities. They now use their huge attacks 50% of the time.
 
 - Fixed bug where many monsters were firing magical bolts instead of crossbow bolts.
 
+- Fixed bug where you guessed an object was magical e.g. (of Throwing?) when you learnt
+a flag that was a normal property of the object.
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

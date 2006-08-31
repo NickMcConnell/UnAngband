@@ -427,9 +427,6 @@ void object_obvious_flags(object_type *o_ptr)
  */
 void object_flags_known(object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3, u32b *f4)
 {
-        /* Set obvious flags for an average item */
-        object_obvious_flags(o_ptr);
-
 	object_flags_aux(OBJECT_FLAGS_KNOWN, o_ptr, f1, f2, f3, f4);
 }
 
@@ -2089,9 +2086,6 @@ void screen_object(object_type *o_ptr)
 
 	/* Begin recall */
 	Term_gotoxy(0, 1);
-
-        /* Set obvious flags for an average item */
-        object_obvious_flags(o_ptr);
 
 	/* Actually display the item */
         if (o_ptr->ident & (IDENT_MENTAL)) list_object(o_ptr, OBJECT_FLAGS_FULL);
