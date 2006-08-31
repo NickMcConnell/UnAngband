@@ -342,6 +342,9 @@ be at risk of destruction.
 blindness. Monsters that are blinded are able to use cure spells (only) to heal
 themselves.
 
+- You only trigger traps on chests when you attempt to open them now, as opposed
+to just stepping on them (Requested by Matthias Rudolf).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit

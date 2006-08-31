@@ -2506,7 +2506,7 @@ bool stuck_player(int *dir)
 		{
 
 			/* Get hit by terrain/traps */
-			if ((f_ptr->flags1 & (FF1_HIT_TRAP)) ||
+			if (((f_ptr->flags1 & (FF1_HIT_TRAP)) && !(f_ptr->flags3 & (FF3_CHEST))) ||
 				(f_ptr->spell) || (f_ptr->blow.method))
 			{
 
@@ -2636,10 +2636,9 @@ void move_player(int dir, int jumping)
 		/* Notice unknown obstacles */
 		if (!(play_info[y][x] & (PLAY_MARK)))
 		{
-
 			/* Get hit by terrain/traps */
-			if ((f_ptr->flags1 & (FF1_HIT_TRAP)) ||
-			(f_ptr->spell) || (f_ptr->blow.method))
+			if (((f_ptr->flags1 & (FF1_HIT_TRAP)) && !(f_ptr->flags3 & (FF3_CHEST))) ||
+				(f_ptr->spell) || (f_ptr->blow.method))
 			{
 				/* Hit the trap */
 				hit_trap(y, x);
@@ -2800,7 +2799,8 @@ void move_player(int dir, int jumping)
 
 
 		/* Get hit by terrain/traps */
-		if ((f_ptr->flags1 & (FF1_HIT_TRAP)) ||
+		/* Except for chests which must be opened to hit */
+		if (((f_ptr->flags1 & (FF1_HIT_TRAP)) && !(f_ptr->flags3 & (FF3_CHEST))) ||
 			(f_ptr->spell) || (f_ptr->blow.method))
 		{
 			/* Disturb */
@@ -2811,7 +2811,9 @@ void move_player(int dir, int jumping)
 		}
 
 		/* Discover secrets */
-		else if (f_ptr->flags1 & (FF1_SECRET))
+		/* Except for hidden objects/gold which must be found by searching */
+		else if ((f_ptr->flags1 & (FF1_SECRET))
+			&& !(f_ptr->flags1 & (FF1_HAS_ITEM | FF1_HAS_GOLD)))
 		{
 			/* Find the secret */
 			find_secret(y,x);
