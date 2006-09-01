@@ -778,6 +778,8 @@ equipment had hold life while you were blessed.
 
 - Fixed bug where you would have to open a chest twice.
 
+- Fixed bug where light or darkness could blind monsters that were already blind.
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

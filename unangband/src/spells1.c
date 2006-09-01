@@ -5741,8 +5741,8 @@ bool project_m(int who, int y, int x, int dam, int typ)
 		{
 			if (seen) obvious = TRUE;
 
-			/* Resist light never blinded */
-			if (!(r_ptr->flags9 & (RF9_RES_LITE))) do_blind = randint(5);
+			/* Resist light never blinded -- also don't blind if already afffected */
+			if (!(r_ptr->flags9 & (RF9_RES_LITE)) && !m_ptr->blind) do_blind = randint(5);
 
 			/* Hurt by light */
 			if (r_ptr->flags3 & (RF3_HURT_LITE))
@@ -5790,7 +5790,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				do_blind = randint(5);
+				 if (!m_ptr->blind) do_blind = randint(5);
 			}
 
 			if (r_ptr->flags3 & (RF3_HURT_LITE)) 
@@ -5808,6 +5808,18 @@ bool project_m(int who, int y, int x, int dam, int typ)
 			break;
 		}
 
+
+		/* Dark weak, but only blinds non-resistant creatures */
+		case GF_DARK_WEAK:
+		{
+			if (seen) obvious = TRUE;
+
+			/* Resist light never blinded -- also don't blind if already afffected */
+			if (!(r_ptr->flags9 & (RF9_RES_DARK)) && !m_ptr->blind) do_blind = randint(5);
+
+			dam = 0;
+			break;
+		}
 
 		/* Dark -- opposite of Lite */
 		case GF_DARK:
@@ -5827,7 +5839,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				do_blind = randint(5);
+				 if (!m_ptr->blind) do_blind = randint(5);
 			}
 			break;
 		}
