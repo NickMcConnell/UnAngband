@@ -2195,7 +2195,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			sound(MSG_BR_SOUND);
 			if (blind) result = format("%^s breathes.", m_name);
-			else result = format("%^s breathes frost at %s.", m_name, t_name);
+			else result = format("%^s breathes sound at %s.", m_name, t_name);
 
 			mon_arc(who, y, x, GF_SOUND, get_breath_dam(m_ptr->hp, GF_SOUND, powerful),
 			       0, (powerful ? 50 : 30), result);
@@ -5553,7 +5553,7 @@ bool mon_evade(const monster_type* m_ptr, int chance, int out_of, cptr r)
 		if (m_ptr->ml)
 		{
 			/* Message */
-			message_format(MSG_MISS, 0, "%^s %s%s!", m_name, p, r);
+			message_format(MSG_MISS, 0, "%^s %s %s!", m_name, p, r);
 
 			/* Note that monster is evasive */
 			l_ptr->flags9 |= (RF9_EVASIVE);

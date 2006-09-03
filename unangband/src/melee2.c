@@ -5922,7 +5922,9 @@ static void recover_monster(int m_idx, bool regen)
 		notice = rand_int(1024);
 
 		/* Aggravated by the player */
-		if ((p_ptr->cur_flags3 & (TR3_AGGRAVATE)) != 0)
+		/* Now only when in LOS or LOF */
+		if (((p_ptr->cur_flags3 & (TR3_AGGRAVATE)) != 0)
+			&& (play_info[m_ptr->fy][m_ptr->fx] & (PLAY_FIRE | PLAY_VIEW)))
 		{
 			/* Reset sleep counter */
 			m_ptr->csleep = 0;

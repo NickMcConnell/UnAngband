@@ -356,6 +356,9 @@ Dead (Requested by Matthias Rudolf).
 - Slimy floors and wet floors and walls as well as ice provide no purchase for
 climbing monsters.
 
+- Aggravation now only wakes monsters in line of sight or line of fire of the player
+(Requested by Matthias Rudolf).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
