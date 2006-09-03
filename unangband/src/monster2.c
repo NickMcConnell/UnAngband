@@ -2242,8 +2242,8 @@ int place_monster_here(int y, int x, int r_idx)
 
 
 	/* Hack -- check for flying. */
-	if ((r_ptr->flags2 & (RF2_CAN_FLY)) &&
-		(f_ptr->flags2 & (FF2_CAN_FLY | RF2_MUST_FLY)))
+	if ((r_ptr->flags2 & (RF2_CAN_FLY | RF2_MUST_FLY)) &&
+		(f_ptr->flags2 & (FF2_CAN_FLY)))
 	{
 		return(MM_FLY);
 	}
