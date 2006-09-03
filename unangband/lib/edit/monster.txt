@@ -9061,7 +9061,7 @@ D: unlife for many centuries by stealing the life of others.  It can
 D: summon the very shades of its victims from beyond the grave to
 D: come enslaved to its aid.
 
-N:597:Silent watcher
+N:597:the Silent watcher
 G:g:r
 I:110:80d25:42:80:10
 W:26:3:0:800

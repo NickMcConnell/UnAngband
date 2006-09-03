@@ -633,3 +633,5 @@ N:39:the White Tree
 N:40:Frodo's House
 
 N:41:tomb of Durin
+
+N:42:grey slab of stone

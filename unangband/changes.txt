@@ -350,6 +350,9 @@ to just stepping on them (Requested by Matthias Rudolf).
 
 - Temporary speed causes you to tire out quickly (Requested by mikon).
 
+- There is now a place to store valuables while you are exploring the Paths of the
+Dead (Requested by Matthias Rudolf).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
