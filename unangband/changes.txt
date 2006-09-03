@@ -791,6 +791,9 @@ equipment had hold life while you were blessed.
 
 - Fixed bug where time didn't pass while travelling (Reported by ekolis).
 
+- Fixed bug where surface 'dungeon' locations would count towards level feelings
+in dungeon (Reported by will_asher).
+
 ### Build / Platform ###
 
 - Fixed some missing files not updated on CVS (Reported by Mikon).

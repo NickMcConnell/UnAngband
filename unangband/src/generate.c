@@ -4783,8 +4783,9 @@ static void cave_gen(void)
 			}
 		}
 	}
+
 	/* Ensure guardian monsters */
-	else if ((zone->guard) && (r_info[zone->guard].cur_num <= 0))
+	if ((zone->guard) && (r_info[zone->guard].cur_num <= 0))
 	{
 		int y, x;
 
@@ -5152,7 +5153,7 @@ static void town_gen(void)
 	town_illuminate(daytime);
 
 	/* Ensure guardian monsters */
-	if ((!daytime || !surface) && (zone->guard) && (r_info[zone->guard].cur_num <= 0))
+	if (!(daytime && surface) && (zone->guard) && (r_info[zone->guard].cur_num <= 0))
 	{
 		/* Pick a location */
 		while (1)
@@ -5204,6 +5205,8 @@ void generate_cave(void)
 	int i, y, x, num;
 
 	dungeon_zone *zone=&t_info[0].zone[0];
+
+	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
 
 	/* Get the zone */
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
@@ -5533,8 +5536,8 @@ void generate_cave(void)
 	/* The dungeon is ready */
 	character_dungeon = TRUE;
 
-	/* Remember when this level was "created", except in town */
-	if (zone->fill) old_turn = turn;
+	/* Remember when this level was "created", except in town or surface locations */
+	if ((zone->fill) && !(surface)) old_turn = turn;
 
 	/* Hack -- always get a feeling leaving town */
 	else old_turn = 0;
