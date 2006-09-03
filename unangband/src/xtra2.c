@@ -3724,7 +3724,7 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 		dungeon_zone *zone=&t_ptr->zone[0];
 
 		/* Get the zone */ 
-		get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+		get_zone(&zone,p_ptr->dungeon,max_depth(p_ptr->dungeon));
 
 		if ((p_ptr->depth == min_depth(p_ptr->dungeon)) || (!zone->fill))
 		{
@@ -3739,7 +3739,7 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 						t_name + t_ptr->name));
 
 				/* Tell player where they can travel to */
-				if (t_ptr->distant != p_ptr->dungeon)
+				if ((t_ptr->distant != p_ptr->dungeon) && (adult_campaign))
 				{
 					strcat(text_always, format(", which allows you to travel to %s",
 						t_name + t_info[t_ptr->distant].name));
@@ -3752,12 +3752,53 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 				}
 
 				/* End sentence */
-				strcat(text_always, ".  ");
+				strcat(text_always, ".");
 			}
 			else
 			{
 				/* Describe location */
 				strcpy(text_always, t_text + t_info[p_ptr->dungeon].text);
+
+				/* Describe the guardian */
+				if (zone->guard)
+				{
+					if (strlen(text_always)) strcat(text_always,"  ");
+
+					/* Path to be opened */
+					if ((t_info[p_ptr->dungeon].distant != p_ptr->dungeon) && (adult_campaign))
+					{
+						strcat(text_always, format("The path to %s is guarded by %s, who you must defeat ",
+							t_name + t_info[t_info[p_ptr->dungeon].distant].name,
+							r_name + r_info[zone->guard].name));
+					}
+					/* Dungeon guardian */
+					else
+					{
+						strcat(text_always, format("%^s is guarded by %s, who you must defeat ",
+							t_name + t_info[p_ptr->dungeon].name,
+							r_name + r_info[zone->guard].name));
+					}
+
+					/* Guards surface */
+					if (t_ptr->zone[0].guard == zone->guard) strcat(text_always, "here");
+
+					/* Guards top of tower */					
+					if (t_info[p_ptr->dungeon].zone[0].tower)
+					{
+						if (t_ptr->zone[0].guard == zone->guard) strcat(text_always, " or ");
+						strcat(text_always, "at the top of the tower");
+					}
+
+					/* Guards bottom of dugeon */
+					else if (min_depth(p_ptr->dungeon) != max_depth(p_ptr->dungeon))
+					{
+						if (t_ptr->zone[0].guard == zone->guard) strcat(text_always, " or ");
+						strcat(text_always, "at the bottom of the dungeon");
+					}
+
+					/* End sentence */
+					strcat(text_always, ".");
+				}
 			}
 		}
 		else
@@ -3993,7 +4034,8 @@ static void room_info_top(int room)
 	Term_gotoxy(0, 0);
 
 	/* Hack - set first character to upper */
-	first[0] = name[0]-32;
+	if (first[0] >= 'a') first[0] = name[0]-32;
+	else first[0] = name[0];
 	first[1] = '\0';
 
 	/* Dump the name */
