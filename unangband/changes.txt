@@ -448,6 +448,10 @@ finished.
 - If you kill a dungeon guardian, you will be notified when you are on the surface
 of that dungeon that you have done so and where you can travel to.
 
+- You will always choose your wielded light source to refuel, light or douse if
+it can have the action applied to it (Requested by mikon). Unwield the light source
+to pick an arbitary light, or to use the fill command.
+
 ### Bug fixes ###
 
 - Fix weapon branding.

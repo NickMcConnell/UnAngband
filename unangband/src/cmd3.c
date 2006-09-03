@@ -1349,6 +1349,9 @@ void do_cmd_refill(void)
 	/* Restrict the choices */
 	item_tester_hook = item_tester_empty_flask_or_lite;
 
+	/* Hack -- prefer equipment */
+	p_ptr->command_wrk = (USE_EQUIP);
+
 	/* Get an item */
 	q = "Fill/fuel which item? ";
 	s = "You have nothing to fill or fuel.";
