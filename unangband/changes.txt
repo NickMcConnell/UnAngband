@@ -353,6 +353,9 @@ to just stepping on them (Requested by Matthias Rudolf).
 - There is now a place to store valuables while you are exploring the Paths of the
 Dead (Requested by Matthias Rudolf).
 
+- Slimy floors and wet floors and walls as well as ice provide no purchase for
+climbing monsters.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -797,6 +800,8 @@ equipment had hold life while you were blessed.
 
 - Fixed bug where surface 'dungeon' locations would count towards level feelings
 in dungeon (Reported by will_asher).
+
+- Fixed bugs where monsters could not fly through various terrain.
 
 ### Build / Platform ###
 
