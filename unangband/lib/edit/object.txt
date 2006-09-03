@@ -6510,3 +6510,16 @@ A:20/2
 F:SUST_STR | SUST_CON | SUST_CHR | EASY_KNOW
 Y:20:3
 
+# Additional scrolls
+
+N:896:Door Creation
+G:?:w
+I:70:79:0
+W:10:0:5:50
+A:10/1
+
+N:897:Stair Creation
+G:?:w
+I:70:80:0
+W:20:0:5:150
+A:20/1

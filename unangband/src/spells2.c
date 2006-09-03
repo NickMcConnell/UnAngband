@@ -1949,9 +1949,90 @@ bool detect_monsters(bool (*monster_test_hook)(const monster_type*), bool *known
 
 
 /*
+ * Convert existing terrain type to "up stairs"
+ */
+static void place_up_stairs(int y, int x)
+{
+	/* Create up stairs */
+	cave_set_feat(y, x, FEAT_LESS);
+}
+
+
+/*
+ * Convert existing terrain type to "down stairs"
+ */
+static void place_down_stairs(int y, int x)
+{
+	/* Create down stairs */
+	cave_set_feat(y, x, FEAT_MORE);
+}
+
+
+
+/*
+ * Place an up/down staircase at given location
+ */
+bool place_random_stairs(int y, int x, int feat)
+{
+	/* Paranoia */
+	if (!cave_clean_bold(y, x)) return (FALSE);
+
+	/* No dungeon, no stairs */
+	if (min_depth(p_ptr->dungeon) == max_depth(p_ptr->dungeon))
+	{
+		return (FALSE);
+	}
+
+	/* Top of tower -- must go down */
+	else if ((t_info[p_ptr->dungeon].zone[0].tower) && (p_ptr->depth >= max_depth(p_ptr->dungeon)))
+	{
+		place_down_stairs(y, x);
+	}
+
+	/* Bottom of tower dungeon -- must go up */
+	else if ((t_info[p_ptr->dungeon].zone[0].tower) && (p_ptr->depth <= min_depth(p_ptr->dungeon)))
+	{
+		place_up_stairs(y, x);
+	}
+
+	/* Surface -- must go down */
+	else if (p_ptr->depth == min_depth(p_ptr->dungeon))
+	{
+		cave_set_feat(y, x, FEAT_ENTRANCE);
+	}
+
+	/* Quest or bottom of dungeon -- must go up */
+	else if (is_quest(p_ptr->depth) || (p_ptr->depth >= max_depth(p_ptr->dungeon)))
+	{
+		place_up_stairs(y, x);
+	}
+
+	/* Fixed stairs */
+	else if (feat)
+	{
+		cave_set_feat(y, x, feat);
+	}
+
+	/* Random stairs -- bias towards direction player is heading */
+	else if (rand_int(100) < ((p_ptr->create_up_stair) ? 75 : ((p_ptr->create_down_stair) ? 25 : 50)) )
+	{
+		place_down_stairs(y, x);
+	}
+
+	/* Random stairs */
+	else
+	{
+		place_up_stairs(y, x);
+	}
+
+	return(TRUE);
+}
+
+
+/*
  * Create stairs at the player location
  */
-void stair_creation(void)
+bool stair_creation(void)
 {
 	int py = p_ptr->py;
 	int px = p_ptr->px;
@@ -1960,29 +2041,15 @@ void stair_creation(void)
 	if (!cave_valid_bold(py, px))
 	{
 		msg_print("The object resists the spell.");
-		return;
+		return (FALSE);
 	}
 
 	/* XXX XXX XXX */
 	delete_object(py, px);
 
-	/* Create a staircase */
-	if (p_ptr->depth == min_depth(p_ptr->dungeon))
-	{
-		cave_set_feat(py, px, FEAT_MORE);
-	}
-	else if (is_quest(p_ptr->depth) || (p_ptr->depth >= max_depth(p_ptr->dungeon)))
-	{
-		cave_set_feat(py, px, FEAT_LESS);
-	}
-	else if (rand_int(100) < 50)
-	{
-		cave_set_feat(py, px, FEAT_MORE);
-	}
-	else
-	{
-		cave_set_feat(py, px, FEAT_LESS);
-	}
+	if (place_random_stairs(py, px, 0)) return (TRUE);
+
+	return(FALSE);
 }
 
 
@@ -5738,7 +5805,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				int py = p_ptr->py;
 				int px = p_ptr->px;
 
-				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL;
+				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL | PROJECT_BOOM;
 				if (project(-1, 1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
 				break;
 			}
@@ -6472,8 +6539,7 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 
 	if (s_ptr->flags2 & (SF2_CREATE_STAIR))
 	{
-		stair_creation();
-		obvious = TRUE;
+		obvious = stair_creation();
 	}
 
 	if (s_ptr->flags2 & (SF2_TELE_LEVEL))

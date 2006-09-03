@@ -359,6 +359,10 @@ climbing monsters.
 - Aggravation now only wakes monsters in line of sight or line of fire of the player
 (Requested by Matthias Rudolf).
 
+- Added scrolls of Door Creation and Stair Creation and rings of Sustain Body and
+Sustain Mind. Stair Creation is biased to create stairs in the direction you last
+took.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -807,6 +811,9 @@ in dungeon (Reported by will_asher).
 - Fixed bugs where monsters could not fly through various terrain.
 
 - Fixed bugs with creation of some runic items (Reported by Matthias Rudolf).
+
+- Fixed bugs with stair creation, door creation and trap destruction (Reported by
+Matthias Rudolf).
 
 ### Build / Platform ###
 

@@ -493,6 +493,7 @@ C:9:25:27:60:17
 B:BEAM:DISPEL
 
 N:34:Door Creation
+A:70:79:1
 A:90:5:3
 A:93:7:20
 C:1:7:7:20:28
@@ -501,6 +502,7 @@ C:4:8:17:20:25
 B:ADJACENT:MAKE_DOOR
 
 N:35:Stair Creation
+A:70:80:1
 A:90:5:4
 A:93:7:24
 C:1:9:12:40:44

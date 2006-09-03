@@ -19,7 +19,7 @@
 /*
  * Max sizes of the following arrays.
  */
-#define MAX_TITLES     80       /* Used with scrolls (min 76) */
+#define MAX_TITLES     85       /* Used with scrolls (min 76) */
 #define MAX_SYLLABLES 158       /* Used with scrolls (see below) */
 
 

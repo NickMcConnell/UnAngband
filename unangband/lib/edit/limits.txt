@@ -20,7 +20,7 @@ M:F:807
 M:D:255
 
 # Maximum number of object kinds
-M:K:897
+M:K:899
 
 # Maximum number of artifacts
 M:A:137
@@ -29,7 +29,7 @@ M:A:137
 M:E:128
 
 # Maximum number of flavors
-M:X:461
+M:X:466
 
 # Maximum number of monster races (needs to be max + 2 for player ghost)
 M:R:1281
