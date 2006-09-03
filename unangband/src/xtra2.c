@@ -3726,15 +3726,39 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 		/* Get the zone */ 
 		get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
-		if (p_ptr->depth == min_depth(p_ptr->dungeon))
+		if ((p_ptr->depth == min_depth(p_ptr->dungeon)) || (!zone->fill))
 		{
-			strcpy(name, t_name + t_info[p_ptr->dungeon].name);
-			strcpy(text_always, t_text + t_info[p_ptr->dungeon].text);
-		}
-		else if (!zone->fill)
-		{
-			strcpy(name, t_name + t_info[p_ptr->dungeon].name);
-			strcpy(text_always, t_text + t_info[p_ptr->dungeon].text);
+			strcpy(name, t_name + t_ptr->name);
+
+			/* If defeated guardian, tell the player */
+			if ((zone->guard) && (!r_info[zone->guard].max_num))
+			{
+				/* Tell player guardian is defeated */
+				strcpy(text_always, format("You have defeated %s, guardian of %s",
+						r_name + r_info[zone->guard].name,
+						t_name + t_ptr->name));
+
+				/* Tell player where they can travel to */
+				if (t_ptr->distant != p_ptr->dungeon)
+				{
+					strcat(text_always, format(", which allows you to travel to %s",
+						t_name + t_info[t_ptr->distant].name));
+
+					/* Tell player if they may have difficulty getting back */
+					if (t_info[t_ptr->distant].nearby != p_ptr->dungeon)
+					{
+						strcat(text_always, ".  Collect anything you require from this location before you travel.  You may have difficulty returning here");
+					}
+				}
+
+				/* End sentence */
+				strcat(text_always, ".  ");
+			}
+			else
+			{
+				/* Describe location */
+				strcpy(text_always, t_text + t_info[p_ptr->dungeon].text);
+			}
 		}
 		else
 		{

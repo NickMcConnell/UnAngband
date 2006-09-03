@@ -114,78 +114,6 @@ bool do_cmd_test(int y, int x, int action)
 }
 
 /*
- * Print a list of routes (for travelling).
- */
-void print_routes(const s16b *route, int num, int y, int x)
-{
-	int i, town;
-
-	cptr distance;
-
-	char out_val[160];
-
-	byte line_attr;
-
-	town_type *t_ptr = &t_info[p_ptr->dungeon];
-	dungeon_zone *zone = &t_ptr->zone[0];
-
-	/* Title the list */
-	prt("", y, x);
-	put_str("Location", y, x + 5);
-	put_str(" Distance", y, x + 35);
-	put_str(" Level", y, x + 45);
-
-	/* Dump the routes */
-	for (i = 0; i < num; i++)
-	{
-		line_attr = TERM_WHITE;
-
-		/* Get the town index */
-		town = route[i];
-
-		/* Skip inaccessible towns */
-		if (town < 0)
-		{
-			t_ptr = &t_info[(-1) - town];
-
-			line_attr = TERM_SLATE;
-
-			sprintf(out_val, "  %c) %-30s near to %-16s",
-				I2A(i), t_name + t_ptr->name, t_name + t_info[t_ptr->nearby].name);
-			c_prt(line_attr, out_val, y + i + 1, x);
-
-			continue;
-		}
-
-		/* Get the distance */
-		if (t_ptr->nearby == town)
-		{
-			distance = "nearby";
-		}
-		else
-		{
-			distance = "distant";
-		}
-
-		/* Get the destination info */
-		t_ptr = &t_info[town];
-
-		/* Get the top of the dungeon */
-		zone = &(t_ptr->zone[0]);
-
-		/* Dump the spell --(-- */
-		sprintf(out_val, "  %c) %-30s %-10s%2d%3s ",
-			I2A(i), t_name + t_ptr->name,distance,zone->level,max_depth(town) > min_depth(town) ? format("-%-2d",max_depth(town)) : "");
-		c_prt(line_attr, out_val, y + i + 1, x);
-	}
-
-
-	/* Clear the bottom line */
-	prt("", y + i + 1, x);
-}
-
-
-/*
  * Check quests caused by travelling from the current level to another destination.
  *
  * XXX This includes travelling to the 'final' location and completely the first quest.
@@ -384,6 +312,187 @@ static bool check_travel_quest(int dungeon, int level, bool confirm)
 
 
 /*
+ * Print a list of routes (for travelling).
+ */
+void print_routes(const s16b *route, int num, int y, int x)
+{
+	int i, town;
+
+	cptr distance;
+
+	char out_val[160];
+
+	byte line_attr;
+
+	town_type *t_ptr = &t_info[p_ptr->dungeon];
+	dungeon_zone *zone = &t_ptr->zone[0];
+
+	/* Title the list */
+	prt("", y, x);
+	put_str("Location", y, x + 5);
+	put_str(" Distance", y, x + 35);
+	put_str(" Level", y, x + 45);
+
+	/* Dump the routes */
+	for (i = 0; i < num; i++)
+	{
+		line_attr = TERM_WHITE;
+
+		/* Get the town index */
+		town = route[i];
+
+		/* Skip inaccessible towns */
+		if (town < 0)
+		{
+			t_ptr = &t_info[(-1) - town];
+
+			line_attr = TERM_SLATE;
+
+			sprintf(out_val, "  %c) %-30s near to %-16s",
+				I2A(i), t_name + t_ptr->name, t_name + t_info[t_ptr->nearby].name);
+			c_prt(line_attr, out_val, y + i + 1, x);
+
+			continue;
+		}
+
+		/* Get the distance */
+		if (t_ptr->nearby == p_ptr->dungeon)
+		{
+			distance = "nearby";
+		}
+		else
+		{
+			distance = "distant";
+		}
+
+		/* Get the destination info */
+		t_ptr = &t_info[town];
+
+		/* Get the top of the dungeon */
+		zone = &(t_ptr->zone[0]);
+
+		/* Dump the spell --(-- */
+		sprintf(out_val, "  %c) %-30s %-10s%2d%3s ",
+			I2A(i), t_name + t_ptr->name,distance,zone->level,max_depth(town) > min_depth(town) ? format("-%-2d",max_depth(town)) : "");
+		c_prt(line_attr, out_val, y + i + 1, x);
+	}
+
+
+	/* Clear the bottom line */
+	prt("", y + i + 1, x);
+}
+
+
+/*
+ * Set routes
+ *
+ * Set up the possible routes from this location.
+ *
+ * Returns number of routes set up.
+ */
+int set_routes(s16b *routes, int max_num, int from)
+{
+	town_type *t_ptr = &t_info[p_ptr->dungeon];
+	dungeon_zone *zone1 = &t_ptr->zone[0];
+	dungeon_zone *zone2 = &t_ptr->zone[0];
+
+	int i, ii, num = 0;
+
+	/* Get the top of the dungeon */
+	get_zone(&zone1,from,min_depth(from));
+
+	/* Get the bottom of the dungeon */
+	get_zone(&zone2,from,max_depth(from));
+
+	/* Add nearby route */
+	if (t_ptr->nearby != from) routes[num++] = t_ptr->nearby;
+
+	/* Add far route if possible */
+	if (t_ptr->distant != from)
+	{
+		if (!(zone2->guard) || (!r_info[zone2->guard].max_num))
+		{
+			routes[num++] = t_ptr->distant;
+		}
+	}
+
+	/* Add maps */
+	for (i = 0; i < INVEN_WIELD; i++)
+	{
+		/* Skip non-objects */
+		if (!inventory[i].k_idx) continue;
+
+		/* Check for maps */
+		if (inventory[i].tval == TV_MAP)
+		{
+			if (t_info[inventory[i].sval].nearby == from)
+			{
+				routes[num++] = inventory[i].sval;
+			}
+			else
+			{
+				routes[num++] = -inventory[i].sval - 1;
+			}
+		}
+
+		/* Check for bags for maps */
+		else if (inventory[i].tval == TV_BAG)
+		{
+			/* Scan the bag */
+			for (ii = 0; ii < INVEN_BAG_TOTAL; ii++)
+			{
+				/* Slot holds a map */
+				if ((bag_holds[inventory[i].sval][ii][0] == TV_MAP) && (bag_contents[inventory[i].sval][ii]))
+				{
+					int sval = bag_holds[inventory[i].sval][ii][1];
+
+					if (t_info[sval].nearby == from)
+					{
+						routes[num++] = sval;
+					}
+					else
+					{
+						routes[num++] = -sval - 1;
+					}
+				}
+			}
+		}
+	}
+
+	/* Add additional locations from any of the above */
+	for (i = 0; (i < num) && (num < max_num); i++)
+	{
+		bool add_nearby =  (t_info[routes[i]].nearby != from);
+		bool add_distant =  (t_info[routes[i]].distant != from) && (t_info[routes[i]].distant != t_info[routes[i]].nearby);
+
+		/* Get the bottom of the dungeon */
+		get_zone(&zone2, routes[i], max_depth(routes[i]));
+
+		/* Can't travel to distant location */
+		if ((zone2->guard) && (r_info[zone2->guard].max_num)) add_distant = FALSE;
+
+		for (ii = 0; (ii < num) && (add_nearby || add_distant); ii++)
+		{
+			if (t_info[routes[i]].nearby == routes[ii]) add_nearby = FALSE;
+			if (t_info[routes[i]].distant == routes[ii]) add_distant = FALSE;
+		}
+
+		if (add_nearby)
+		{
+			routes[num++] = t_info[routes[i]].nearby;
+		}
+
+		if (add_distant)
+		{
+			routes[num++] = t_info[routes[i]].distant;
+		}
+	}
+
+	/* Return number of routes */
+	return(num);
+}
+
+/*
  * Travel to a different dungeon.
  *
  * This whole thing is a hack -- I haven't decided how elegant it is yet.
@@ -391,8 +500,9 @@ static bool check_travel_quest(int dungeon, int level, bool confirm)
 static void do_cmd_travel(void)
 {
 	town_type *t_ptr = &t_info[p_ptr->dungeon];
-	dungeon_zone *zone1 = &t_ptr->zone[0];
-	dungeon_zone *zone2 = &t_ptr->zone[0];
+	dungeon_zone *zone = &t_ptr->zone[0];
+
+	int i, num = 0;
 
 	int journey = 0;
 
@@ -403,10 +513,7 @@ static void do_cmd_travel(void)
 	bool edge_x = ((bx < 2) || (bx > ((DUNGEON_WID/BLOCK_WID)-3)));
 
 	/* Get the top of the dungeon */
-	get_zone(&zone1,p_ptr->dungeon,min_depth(p_ptr->dungeon));
-
-	/* Get the bottom of the dungeon */
-	get_zone(&zone2,p_ptr->dungeon,max_depth(p_ptr->dungeon));
+	get_zone(&zone,p_ptr->dungeon,min_depth(p_ptr->dungeon));
 
 	if (p_ptr->depth == min_depth(p_ptr->dungeon))
 	{
@@ -439,9 +546,9 @@ static void do_cmd_travel(void)
 		{
 			msg_print("You need to recover from any poison, cuts or stun damage.");
 		}
-		else if (!edge_y && !edge_x && zone1->fill)
+		else if (!edge_y && !edge_x && zone->fill)
 		{
-			msg_format("You need close to the edge of %s.",t_name + t_ptr->name);
+			msg_format("You need to be close to the edge of %s.",t_name + t_ptr->name);
 		}
 		else
 		{
@@ -452,65 +559,11 @@ static void do_cmd_travel(void)
 				s16b routes[24];
 				char out_val[160];
 
-				int i, ii, num = 0;
-
 				bool flag, redraw;
 				key_event ke;
 
-				/* Add nearby route */
-				routes[num++] = t_ptr->nearby;
-
-				/* Add far route if possible */
-				if (t_ptr->distant != p_ptr->dungeon)
-				{
-					if (!(zone2->guard) || (!r_info[zone2->guard].max_num))
-					{
-						routes[num++] = t_ptr->distant;
-					}
-				}
-
-				/* Add maps */
-				for (i = 0; i < INVEN_WIELD; i++)
-				{
-					/* Skip non-objects */
-					if (!inventory[i].k_idx) continue;
-
-					/* Check for maps */
-					if (inventory[i].tval == TV_MAP)
-					{
-						if (t_info[inventory[i].sval].nearby == p_ptr->dungeon)
-						{
-							routes[num++] = inventory[i].sval;
-						}
-						else
-						{
-							routes[num++] = -inventory[i].sval - 1;
-						}
-					}
-
-					/* Check for bags for maps */
-					else if (inventory[i].tval == TV_BAG)
-					{
-						/* Scan the bag */
-						for (ii = 0; ii < INVEN_BAG_TOTAL; ii++)
-						{
-							/* Slot holds a map */
-							if ((bag_holds[inventory[i].sval][ii][0] == TV_MAP) && (bag_contents[inventory[i].sval][ii]))
-							{
-								int sval = bag_holds[inventory[i].sval][ii][1];
-
-								if (t_info[sval].nearby == p_ptr->dungeon)
-								{
-									routes[num++] = sval;
-								}
-								else
-								{
-									routes[num++] = -sval - 1;
-								}
-							}
-						}
-					}
-				}
+				/* Routes */
+				num = set_routes(routes, 24, p_ptr->dungeon);
 
 				/* Build a prompt (accept all spells) */
 				strnfmt(out_val, 78, "(Travel %c-%c, *=List, ESC=exit) Travel where? ",
@@ -623,6 +676,21 @@ static void do_cmd_travel(void)
 				/* Abort if needed */
 				if (!flag) return;
 
+				/* Set journey time */
+				if (selection == t_ptr->nearby)
+				{
+					journey = damroll(2, 4);
+				}
+				/* Set journey time */
+				else if (selection == t_ptr->distant)
+				{
+					journey = damroll(3, 4);
+				}
+				/* Set journey time */
+				else
+				{
+					journey = damroll(4, 4);
+				}
 			}
 			else
 			{
@@ -674,7 +742,6 @@ static void do_cmd_travel(void)
 
 				/* Journey time */
 				journey = damroll(2,4);
-
 			}
 
 			if (journey < 4)

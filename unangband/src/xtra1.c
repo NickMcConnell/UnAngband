@@ -299,15 +299,15 @@ static void prt_hp(void)
 	byte color;
 
 
-	put_str((show_sidebar ? "Max HP " : "/ "), ROW_MAXHP, COL_MAXHP);
+	put_str((show_sidebar ? "Max HP " : "/"), ROW_MAXHP, COL_MAXHP);
 
 	sprintf(tmp, (show_sidebar ? "%5d" : "%4d"), p_ptr->mhp);
 	color = TERM_L_GREEN;
 
-	c_put_str(color, tmp, ROW_MAXHP, COL_MAXHP + (show_sidebar ? 7 : 2));
+	c_put_str(color, tmp, ROW_MAXHP, COL_MAXHP + (show_sidebar ? 7 : 1));
 
 
-	put_str((show_sidebar ? "Cur HP " : "HP: "), ROW_CURHP, COL_CURHP);
+	put_str((show_sidebar ? "Cur HP " : "HP:"), ROW_CURHP, COL_CURHP);
 
 	sprintf(tmp, (show_sidebar ? "%5d" : "%4d"), p_ptr->chp);
 
@@ -341,15 +341,15 @@ static void prt_sp(void)
 	if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL) return;
 
 
-	put_str((show_sidebar ? "Max SP " : "/ "), ROW_MAXSP, COL_MAXSP);
+	put_str((show_sidebar ? "Max SP " : "/"), ROW_MAXSP, COL_MAXSP);
 
 	sprintf(tmp, (show_sidebar ? "%5d" : "%4d"), p_ptr->msp);
 	color = TERM_L_GREEN;
 
-	c_put_str(color, tmp, ROW_MAXSP, COL_MAXSP + (show_sidebar ? 7 : 2));
+	c_put_str(color, tmp, ROW_MAXSP, COL_MAXSP + (show_sidebar ? 7 : 1));
 
 
-	put_str((show_sidebar ? "Cur SP " : "SP "), ROW_CURSP, COL_CURSP);
+	put_str((show_sidebar ? "Cur SP " : "SP:"), ROW_CURSP, COL_CURSP);
 
 	sprintf(tmp, (show_sidebar ? "%5d" : "%4d"), p_ptr->csp);
 
@@ -396,17 +396,25 @@ static void prt_depth(void)
 	{
 		strcpy(depths, "Wilds");
 	}
+	else if ((depth_in_feet) && !(COL_DEPTH))
+	{
+		sprintf(depths, "%d'", (p_ptr->depth-min_depth(p_ptr->dungeon)) * 50);
+	}
 	else if (depth_in_feet)
 	{
 		sprintf(depths, "%d ft", (p_ptr->depth-min_depth(p_ptr->dungeon)) * 50);
 	}
+	else if (COL_DEPTH)
+	{
+		sprintf(depths, "Lev %d", p_ptr->depth);
+	}
 	else
 	{
-		sprintf(depths, "Lev %d", (p_ptr->depth));
+		sprintf(depths, "%d", p_ptr->depth);
 	}
 
-	/* Right-Adjust the "depth", and clear old values */
-	prt(format("%7s", depths), ROW_DEPTH, COL_DEPTH);
+	if (COL_DEPTH == 0) put_str("DEPTH ", ROW_DEPTH, COL_DEPTH);
+	c_put_str(TERM_L_GREEN, format("%7s", depths), ROW_DEPTH, COL_DEPTH ? COL_DEPTH : COL_DEPTH + 5);
 }
 
 
@@ -771,7 +779,7 @@ static void prt_speed(void)
 	}
 
 	/* Display the speed */
-	c_put_str(attr, format((show_sidebar ? "%-10s" : "%-6"), buf), ROW_SPEED, COL_SPEED);
+	c_put_str(attr, format((show_sidebar ? "%-10s" : "%-6s"), buf), ROW_SPEED, COL_SPEED);
 }
 
 
@@ -3169,6 +3177,9 @@ static void calc_bonuses(void)
 			k = (k * 3)/2;
 		}
 	}
+
+	/* Hack -- temporary speed tires the player out quickly */
+	if (p_ptr->fast) p_ptr->tiring += 15;
 
 	/* Set the rate of tiring */
 	if (k > 10) p_ptr->tiring = k - 10;

@@ -345,6 +345,9 @@ themselves.
 - You only trigger traps on chests when you attempt to open them now, as opposed
 to just stepping on them (Requested by Matthias Rudolf).
 
+- You can now travel to any accessible location that you could travel to, not just
+'nearby' locations, however distant trips will take longer and leave you hungrier.
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -436,6 +439,9 @@ important information is always fitted onto the screen.
 
 - Flags you learn on weapons are now reported after all your melee attacks have
 finished.
+
+- If you kill a dungeon guardian, you will be notified when you are on the surface
+of that dungeon that you have done so and where you can travel to.
 
 ### Bug fixes ###
 
@@ -779,6 +785,8 @@ equipment had hold life while you were blessed.
 - Fixed bug where you would have to open a chest twice.
 
 - Fixed bug where light or darkness could blind monsters that were already blind.
+
+- Fixed bug where time didn't pass while travelling (Reported by ekolis).
 
 ### Build / Platform ###
 

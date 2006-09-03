@@ -591,6 +591,12 @@
 
 /*** Screen Locations ***/
 
+
+#define BOTTOM_LINE  Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1)
+#define SECOND_FROM_BOTTOM  Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2)
+
+
+
 /*
  * Some screen locations for various display routines
  * Currently, row 8 and 15 are the only "blank" rows.
@@ -606,104 +612,82 @@
 #define ROW_TITLE		3
 #define COL_TITLE		0	/* <title> or <mode> */
 
-#define ROW_LEVEL		(show_sidebar ? 4 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
-					: (use_dbltile ? 3 : 2)) : 1))
+#define ROW_LEVEL		(show_sidebar ? 4 : (BOTTOM_LINE))
 #define COL_LEVEL		0	/* "LEVEL xxxxxx" */
 
-#define ROW_EXP		(show_sidebar ? 5 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
-					: (use_dbltile ? 3 : 2)) : 1))
-#define COL_EXP		(show_sidebar ? 0 : 7)	/* "EXP xxxxxxxx" */
+#define ROW_EXP			(show_sidebar ? 5 : (BOTTOM_LINE))
+#define COL_EXP			(show_sidebar ? 0 : 7)	/* "EXP xxxxxxxx" */
 
-#define ROW_GOLD		(show_sidebar ? 6 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
-					: (use_dbltile ? 3 : 2)): 1))
+#define ROW_GOLD		(show_sidebar ? 6 : (BOTTOM_LINE))
 #define COL_GOLD		(show_sidebar ? 0 : 20)	/* "AU xxxxxxxxx" */
 
-#define ROW_STAT		(show_sidebar ? 8 : Term->hgt - (show_itemlist ? (use_trptile ? 5 \
-					: (use_dbltile ? 4 : 3)): 2))
+#define ROW_STAT		(show_sidebar ? 8 : (SECOND_FROM_BOTTOM))
 #define COL_STAT		0	/* "xxx   xxxxxx" */
 
-#define ROW_AC		(show_sidebar ? 15 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
-					: (use_dbltile ? 3 : 2)): 1))
-#define COL_AC		(show_sidebar ? 0 : 33)	/* "Cur AC xxxxx" */
+#define ROW_AC			(show_sidebar ? 15 : (BOTTOM_LINE))
+#define COL_AC			(show_sidebar ? 0 : 33)	/* "Cur AC xxxxx" */
 
-#define ROW_MAXHP		(show_sidebar ? 16 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
-					: (use_dbltile ? 3 : 2)): 1))
-#define COL_MAXHP		(show_sidebar ? 0 : 48)	/* "Max HP xxxxx" */
+#define ROW_MAXHP		(show_sidebar ? 16 : (BOTTOM_LINE))
+#define COL_MAXHP		(show_sidebar ? 0 : 47)	/* "Max HP xxxxx" */
 
-#define ROW_CURHP		(show_sidebar ? 17 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
-					: (use_dbltile ? 3 : 2)): 1))
+#define ROW_CURHP		(show_sidebar ? 17 : (BOTTOM_LINE))
 #define COL_CURHP		(show_sidebar ? 0 : 40)	/* "Cur HP xxxxx" */
 
-#define ROW_MAXSP		(show_sidebar ? 18 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
-					: (use_dbltile ? 3 : 2)): 1))
-#define COL_MAXSP		(show_sidebar ? 0 : 63)	/* "Max SP xxxxx" */
+#define ROW_MAXSP		(show_sidebar ? 18 : (BOTTOM_LINE))
+#define COL_MAXSP		(show_sidebar ? 0 : 60)	/* "Max SP xxxxx" */
 
-#define ROW_CURSP		(show_sidebar ? 19 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
-					: (use_dbltile ? 3 : 2)): 1))
-#define COL_CURSP		(show_sidebar ? 0 : 55)	/* "Cur SP xxxxx" */
+#define ROW_CURSP		(show_sidebar ? 19 : (BOTTOM_LINE))
+#define COL_CURSP		(show_sidebar ? 0 : 53)	/* "Cur SP xxxxx" */
 
-#define ROW_INFO		(show_sidebar ? 20 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
-					: (use_dbltile ? 3 : 2)): 1))
+#define ROW_INFO		(show_sidebar ? 20 : (BOTTOM_LINE))
 #define COL_INFO		(show_sidebar ? 0 : 20)	/* "xxxxxxxxxxxx" */
 
-#define ROW_CUT		(show_sidebar ? 21 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
-					: (use_dbltile ? 4 : 3)): 2))
-#define COL_CUT		(show_sidebar ? 0 : 18)	/* <cut> */
+#define ROW_CUT			(show_sidebar ? 21 : (SECOND_FROM_BOTTOM))
+#define COL_CUT			(show_sidebar ? 0 : 18)	/* <cut> */
 
-#define ROW_STUN	(show_sidebar ? 22 : Term->hgt - (show_itemlist ? (use_trptile ? 4 \
-					: (use_dbltile ? 4 : 3)): 2))
+#define ROW_STUN		(show_sidebar ? 22 : (SECOND_FROM_BOTTOM))
 #define COL_STUN		(show_sidebar ? 0 : 22)	/* <stun> */
 
-#define ROW_HUNGRY	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
-					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)): 2))
-#define COL_HUNGRY	(show_sidebar ? 0 : 26)	/* "Weak" / "Hungry" / "Full" / "Gorged" */
+#define ROW_HUNGRY		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_HUNGRY		(show_sidebar ? 0 : 26)	/* "Weak" / "Hungry" / "Full" / "Gorged" */
 
-#define ROW_BLIND		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
-					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)): 2))
-#define COL_BLIND		(show_sidebar ? (Term->wid >= 100  ? 7 : 6)  : 30)	/* "Blind" */
+#define ROW_BLIND		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_BLIND		(show_sidebar ? (Term->wid >= 90  ? 7 : 6)  : 30)	/* "Blind" */
 
-#define ROW_CONFUSED	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
-					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_CONFUSED	(show_sidebar ? (Term->wid >= 100  ? 13 : 11) : 34)	/* "Confused" */
+#define ROW_CONFUSED		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_CONFUSED		(show_sidebar ? (Term->wid >= 90  ? 13 : 11) : 34)	/* "Confused" */
 
-#define ROW_AFRAID	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
-					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_AFRAID	(show_sidebar ? (Term->wid >= 100  ? 22 : 19) : 38)	/* "Afraid" */
+#define ROW_AFRAID		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_AFRAID		(show_sidebar ? (Term->wid >= 90  ? 22 : 19) : 38)	/* "Afraid" */
 
-#define ROW_POISONED	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
-					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_POISONED	(show_sidebar ? (Term->wid >= 100  ? 29 : 25) : 42)	/* "Poisoned" */
+#define ROW_POISONED		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_POISONED		(show_sidebar ? (Term->wid >= 90  ? 29 : 25) : 42)	/* "Poisoned" */
 
-#define ROW_DISEASE	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
-					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_DISEASE	(show_sidebar ? (Term->wid >= 100  ? 38 : 33) : 46)	/* "Disease" / "Dise" */
+#define ROW_DISEASE		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_DISEASE	(show_sidebar ? (Term->wid >= 90  ? 38 : 33) : 46)	/* "Disease" / "Dise" */
 
-#define ROW_CURSED	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
-					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_CURSED	(show_sidebar ? (Term->wid >= 100  ? 46 : 40) : 50)	/* "Cursed" / "Curs" */
+#define ROW_CURSED	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_CURSED	(show_sidebar ? (Term->wid >= 90  ? 46 : 40) : 50)	/* "Cursed" / "Curs" */
 
-#define ROW_AMNESIA	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
-					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_AMNESIA	(show_sidebar ? (Term->wid >= 100  ? 53 : 46) : 54)	/* "Amnesia" / "Forg" */
+#define ROW_AMNESIA	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_AMNESIA	(show_sidebar ? (Term->wid >= 90  ? 53 : 46) : 54)	/* "Amnesia" / "Forg" */
 
-#define ROW_PETRIFY	(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
-					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_PETRIFY	(show_sidebar ? (Term->wid >= 100  ? 61 : 53) : 58)	/* "Petrify" / "Petr" */
+#define ROW_PETRIFY	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_PETRIFY	(show_sidebar ? (Term->wid >= 90  ? 61 : 53) : 58)	/* "Petrify" / "Petr" */
 
-#define ROW_STATE		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
-					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_STATE		(show_sidebar ? (Term->wid >= 100  ? 69 : 60) : 62)	/* <state> */
+#define ROW_STATE	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_STATE		(show_sidebar ? (Term->wid >= 90  ? 69 : 60) : 62)	/* <state> */
 
-#define ROW_SPEED		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
-					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_SPEED		(show_sidebar ? (Term->wid >= 100  ? 80 : 70) : 72)	/* "Slow (-NN)" or "Fast (+NN)" */
+#define ROW_SPEED	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_SPEED		(show_sidebar ? (Term->wid >= 90  ? 80 : 70) : 72)	/* "Slow (-NN)" or "Fast (+NN)" */
 
-#define ROW_STUDY		(show_sidebar ? Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1) \
-					: Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2))
-#define COL_STUDY		(show_sidebar ? (Term->wid >= 100  ? 91 : 80) : 79)	/* "Study" */
+#define ROW_STUDY		(show_sidebar ? (Term->wid >= 96 ? (BOTTOM_LINE) : 14) \
+					: (BOTTOM_LINE))
+#define COL_STUDY		(show_sidebar ? (Term->wid >= 96 ? 91 : 0) : 67)	/* "Study" */
 
-#define ROW_DEPTH		Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1)
-#define COL_DEPTH		(show_sidebar ? (Term->wid >= 100  ? 96 : 85) : 72)	/* "Lev NNN" / "NNNN ft" */
+#define ROW_DEPTH		(show_sidebar ? (Term->wid >= 105 ? (BOTTOM_LINE) : 7) \
+					: (BOTTOM_LINE))
+#define COL_DEPTH		(show_sidebar ? (Term->wid >= 105 ? 97 : 0) : 72)	/* "Lev NNN" / "NNNN ft" */
 
 
 
