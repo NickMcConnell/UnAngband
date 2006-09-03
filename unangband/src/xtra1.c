@@ -3144,9 +3144,8 @@ static void calc_bonuses(void)
 
 		if (f_ptr->flags2 & (FF2_FILLED))
 		{
-
 			/* ANDY - Need to check for swimming skill XXX */
-			if (f_ptr->flags2 & (FF2_CAN_SWIM))
+			if ((f_ptr->flags2 & (FF2_CAN_SWIM)) && (can_swim))
 			{
 				j = j * 3;
 				k = k * 3;
@@ -3160,7 +3159,7 @@ static void calc_bonuses(void)
 		else if (f_ptr->flags2 & (FF2_DEEP))
 		{
 			/* ANDY - Need to check for swimming skill XXX */
-			if (f_ptr->flags2 & (FF2_CAN_SWIM))
+			if ((f_ptr->flags2 & (FF2_CAN_SWIM)) && (can_swim))
 			{
 				j = j * 2;
 				k = k * 2;
@@ -3178,12 +3177,12 @@ static void calc_bonuses(void)
 		}
 	}
 
-	/* Hack -- temporary speed tires the player out quickly */
-	if (p_ptr->fast) p_ptr->tiring += 15;
-
 	/* Set the rate of tiring */
 	if (k > 10) p_ptr->tiring = k - 10;
 	else p_ptr->tiring = 0;
+
+	/* Hack -- temporary speed tires the player out quickly */
+	if (p_ptr->fast) p_ptr->tiring += PY_REST_RATE;
 
 	/* Apply "encumbrance" from weight */
 	if (j > i/2) p_ptr->pspeed -= ((j - (i/2)) / (i / 10));

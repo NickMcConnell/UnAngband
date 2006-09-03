@@ -2300,13 +2300,15 @@ bool set_rest(int v)
 			case 3:
 			{
 				msg_print("You are no longer tired.");
+
+				/* Change */
+				notice = TRUE;
+
 				break;
 			}
 
 		}
 
-		/* Change */
-		notice = TRUE;
 	}
 
 	/* Food decrease */

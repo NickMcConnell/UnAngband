@@ -348,6 +348,8 @@ to just stepping on them (Requested by Matthias Rudolf).
 - You can now travel to any accessible location that you could travel to, not just
 'nearby' locations, however distant trips will take longer and leave you hungrier.
 
+- Temporary speed causes you to tire out quickly (Requested by mikon).
+
 ### User Interface ###
 
 - Created a nice graphics mode on windows that attempts to automagically fit
@@ -783,8 +785,6 @@ equipment had hold life while you were blessed.
 - Fixed some incorrect dragon colours.
 
 - Fixed bug where you would have to open a chest twice.
-
-- Fixed bug where light or darkness could blind monsters that were already blind.
 
 - Fixed bug where time didn't pass while travelling (Reported by ekolis).
 

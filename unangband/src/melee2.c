@@ -5780,7 +5780,7 @@ static void recover_monster(int m_idx, bool regen)
 	}
 
 	/* Hack -- Bug tracking */
-	if (m_ptr->maxhp > r_ptr->hdice * r_ptr->hside)
+	if (m_ptr->maxhp > (r_ptr->hdice * r_ptr->hside) * 11 / 10)
 	{
 		msg_print("BUG: Monster hit points *way* too high! Please report.");
 
