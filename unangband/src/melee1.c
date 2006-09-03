@@ -5630,12 +5630,6 @@ bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
 				}
 			}
 
-			/* Resist light weapons */
-			if ((r_ptr->flags3 & (RF3_HUGE)) != 0)
-			{
-				resist = MAX(resist, 133 - o_ptr->weight);
-			}
-
 			/* Take note */
 			note = "glances off of";
 			break;
@@ -5666,12 +5660,6 @@ bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
 					l_ptr->flags9 |= (RF9_RES_BLUNT);
 					learn = TRUE;
 				}
-			}
-
-			/* Resist light weapons */
-			if ((r_ptr->flags3 & (RF3_HUGE)) != 0)
-			{
-				resist = MAX(resist, 133 - o_ptr->weight);
 			}
 
 			/* Take note */

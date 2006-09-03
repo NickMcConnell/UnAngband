@@ -1643,8 +1643,8 @@ static void display_player_xtra_info(void)
 	Term_putstr(col+5, 13, -1, TERM_L_BLUE, format("%11s", buf));
 
 	/* Compute charging bonus */
-	if (p_ptr->cur_style & (1L << WS_UNARMED)) tmp = MAX(1, p_ptr->wt / 33);
-	else tmp = MAX(1, inventory[INVEN_WIELD].weight / 33);
+	if (p_ptr->cur_style & (1L << WS_UNARMED)) tmp = MAX(1, p_ptr->wt / cp_ptr->chg_weight);
+	else tmp = MAX(1, inventory[INVEN_WIELD].weight / cp_ptr->chg_weight);
 
 	/* Blows */
 	strnfmt(buf, sizeof(buf), "%d/turn(x%d)", p_ptr->num_blow, tmp);

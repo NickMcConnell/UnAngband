@@ -4413,20 +4413,21 @@ errr parse_c_info(char *buf, header *head)
 	/* Process 'A' for "Attack Info" (one line only) */
 	else if (buf[0] == 'A')
 	{
-		int max_attacks, min_weight, att_multiply;
+		int max_attacks, min_weight, att_multiply, chg_weight;
 
 		/* There better be a current pc_ptr */
 		if (!pc_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (3 != sscanf(buf+2, "%d:%d:%d",
-			    &max_attacks, &min_weight, &att_multiply))
+		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
+			    &max_attacks, &min_weight, &att_multiply, &chg_weight))
 			return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		pc_ptr->max_attacks = max_attacks;
 		pc_ptr->min_weight = min_weight;
 		pc_ptr->att_multiply = att_multiply;
+		pc_ptr->chg_weight = chg_weight;
 	}
 
 	/* Process 'M' for "Magic Info" (one line only) */

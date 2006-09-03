@@ -2280,8 +2280,8 @@ void py_attack(int y, int x, bool charging)
 			/* Adjust for charging */
 			if (charging)
 			{
-				if ((melee_style & (1L << WS_UNARMED)) && (p_ptr->wt > 33)) k *= p_ptr->wt / 33;
-				else if (o_ptr->weight >= 66) k *= o_ptr->weight / 33;
+				if ((melee_style & (1L << WS_UNARMED)) && (p_ptr->wt > 33)) k *= p_ptr->wt / cp_ptr->chg_weight;
+				else if (o_ptr->weight >= 2 * cp_ptr->chg_weight) k *= o_ptr->weight / cp_ptr->chg_weight;
 			}
 
 			/* Monster armor reduces total damage */

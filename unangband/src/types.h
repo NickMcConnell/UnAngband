@@ -1113,6 +1113,7 @@ struct player_class
 	u16b max_attacks;	/* Maximum possible attacks */
 	u16b min_weight;	/* Minimum weapon weight for calculations */
 	u16b att_multiply;	/* Multiplier for attack calculations */
+	u16b chg_weight;	/* Divisor for charging damage calculations */
 
 	byte spell_book;	/* Tval of spell books (if any) */
 	byte spell_stat_study;	/* Stat for number of spells */

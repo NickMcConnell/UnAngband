@@ -305,12 +305,16 @@ damage will also be increased by charging.
   A new combat tactic might be to select a heavy weapon, use it to charge an opponent,
 and then switch to a lighter weapon (taking a half-move to do so), and take advantage
 of the additional attacks the lighter weapon affords.
+  Note the figure of 3.3 lbs is class dependent - it is this value for warriors and
+paladins, 4.4 lbs for priests, archers and thieves, 5.5 lbs for bards and rangers and
+6.6 lbs for mages and shamans.
 
 - Massively reduce the power of the guardian of Caradhras. Rebalance unique depths.
 Swap stats of Baldor the Hapless and Lord of the Paths of the Dead.
 
-- Huge monsters are hard to melee except from charging attacks.  Also light weapons
-(less than 13.3 lbs) are less effective at hitting them.  Made more monsters huge.
+- Huge monsters are hard to melee except from charging attacks, attacks against them
+missing approximately 60% of the time.  In order to effectively melee a huge monster,
+you need to step back after every attack and charge it again.  Made more monsters huge.
 
 - Complete rebalancing of monsters from level 5 to level 35.
 
