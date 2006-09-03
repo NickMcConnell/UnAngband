@@ -5543,7 +5543,7 @@ bool mon_evade(const monster_type* m_ptr, int chance, int out_of, cptr r)
 		case 0: p = "dodges"; break;
 		case 1: p = "evades"; break;
 		case 2: p = "side steps"; break;
-		case 3: p = "ducks"; break;
+		default: p = "ducks"; break;
 	}
 
 	/* Hack -- evasive monsters may ignore trap */
