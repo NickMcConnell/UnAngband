@@ -1,5 +1,7 @@
 ### Game Play ###
 
+- Wall of stone, earthquake and other effects that entomb monsters do not automatically
+destroy non-living monsters, making them slightly less abusable.
 
 ### User Interface ###
 

@@ -1346,15 +1346,22 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			/* Hack -- handle features */
 			case GF_FEATURE:
 			{
-
 				char buf[80];
 				cptr name = f_name + f_info[f_info[d3].mimic].name;
 
 				q = "create";
 				s = buf;
 				sprintf(buf,"%s%s around",is_a_vowel(name[0])?"a ":"an ",name);
-				d1 = 0;
-				d2 = 0;
+				if ((f_info[d3].flags1 & (FF1_MOVE)) == 0)
+				{
+					d1 = 4;
+					d2 = 8;
+				}
+				else
+				{
+					d1 = 0;
+					d2 = 0;
+				}
 				d3 = 0;
 
 			}
@@ -1482,6 +1489,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		/* Get the effect */
 		if ((d1 || d2 || d3) && (detail)) switch (effect)
 		{
+			case GF_FEATURE: text_out("damage, destroying living monsters that cannot escape to an adjacent grid"); break;
 			case GF_WIND: text_out("damage against flying or climbing monsters, less against others"); break;
 			case GF_LITE_WEAK: text_out("damage to monsters vulnerable to light"); break;
 			case GF_KILL_WALL: text_out("damage to monsters made from rock"); break;

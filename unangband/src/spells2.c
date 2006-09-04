@@ -4177,6 +4177,8 @@ void destroy_area(int y1, int x1, int r, bool full)
  * stuck in ice is different from granite wall is different from 
  * (impassable) rubble. Of course, we could just pull this from the
  * feature at this location.
+ *
+ * XXX This now does not kill nonliving monsters, for balance reasons.
  */
 void entomb(int cy, int cx, byte invalid)
 {
@@ -4324,7 +4326,7 @@ void entomb(int cy, int cx, byte invalid)
 			msg_format("%^s wails out in pain!", m_name);
 
 			/* Take damage from the quake */
-			damage = (sn ? (int)damroll(4, 8) : (m_ptr->hp + 1));
+			damage = (sn || (r_ptr->flags3 & (RF3_NONLIVING)) ? (int)damroll(4, 8) : (m_ptr->hp + 1));
 
 			/* Monster is certainly awake */
 			m_ptr->csleep = 0;
