@@ -2425,7 +2425,7 @@ static void display_player_misc_info(void)
 	put_str("Name", 2, 1);
 
 #ifdef USE_CLASS_PRETTY_NAMES
-	lookup_prettyname(name,p_ptr->pstyle,p_ptr->psval,TRUE,TRUE);
+	lookup_prettyname(name,p_ptr->pclass, p_ptr->pstyle,p_ptr->psval,TRUE,TRUE);
 	sprintf(buf,"%s, the %s",op_ptr->full_name,name);
 	c_put_str(TERM_L_BLUE, buf, 2, 8);
 #else
@@ -5000,7 +5000,7 @@ static void death_examine(void)
 static int highscore_seek(int i)
 {
 	/* Seek for the requested record */
-	return (fd_seek(highscore_fd, i * sizeof(high_score)));
+	return (fd_seek(highscore_fd, i * sizeof(high_score) + 8));
 }
 
 
@@ -5167,10 +5167,11 @@ void display_scores_aux(int from, int to, int note, high_score *score)
 		/* Dump 5 entries */
 		for (n = 0; j < count && n < 5; place++, j++, n++)
 		{
-			int pr, pc, clev, mlev, cdun, mdun;
+			int pr, pc, ps, pp, clev, mlev, cdep, mdep, cdun;
 
 			cptr user, gold, when, aged;
 
+			char name[60];
 
 			/* Hack -- indicate death in yellow */
 			attr = (j == note) ? TERM_YELLOW : TERM_WHITE;
@@ -5197,12 +5198,15 @@ void display_scores_aux(int from, int to, int note, high_score *score)
 			/* Extract the race/class */
 			pr = atoi(the_score.p_r);
 			pc = atoi(the_score.p_c);
+			ps = atoi(the_score.p_s);
+			pp = atoi(the_score.p_p);
 
 			/* Extract the level info */
 			clev = atoi(the_score.cur_lev);
 			mlev = atoi(the_score.max_lev);
+			cdep = atoi(the_score.cur_dep);
+			mdep = atoi(the_score.max_dep);
 			cdun = atoi(the_score.cur_dun);
-			mdun = atoi(the_score.max_dun);
 
 			/* Hack -- extract the gold and such */
 			for (user = the_score.uid; isspace(*user); user++) /* loop */;
@@ -5218,10 +5222,17 @@ void display_scores_aux(int from, int to, int note, high_score *score)
 				when = tmp_val;
 			}
 
+#ifdef USE_CLASS_PRETTY_NAMES
+			/* Get the class name */
+			lookup_prettyname(name, pc, ps, pp, FALSE, TRUE);
+#else
+			/* Get the class name */
+			strcpy(name, c_name + c_info[pc].name);
+#endif
 			/* Dump some info */
 			sprintf(out_val, "%3d.%9s  %s the %s %s, Level %d",
 			        place, the_score.pts, the_score.who,
-			        p_name + p_info[pr].name, c_name + c_info[pc].name,
+			        p_name + p_info[pr].name, name,
 			        clev);
 
 			/* Append a "maximum level" */
@@ -5231,18 +5242,13 @@ void display_scores_aux(int from, int to, int note, high_score *score)
 			c_put_str(attr, out_val, n*4 + 2, 0);
 
 			/* Another line of info */
-			sprintf(out_val, "               Killed by %s on %s %d",
-			        the_score.how, "Dungeon Level", cdun);
-
-			/* Hack -- some people die in the town */
-			if (!cdun)
-			{
-				sprintf(out_val, "               Killed by %s in the Town",
-				        the_score.how);
-			}
+			sprintf(out_val, "               Killed by %s %s %s",
+			        the_score.how, ( (cdep == min_depth(cdun)) && (cdep == max_depth(cdun)) ? "in" : 
+				( cdep == min_depth(cdun) ? "on the surface of":
+				format("on Dungeon Level %d in", cdep) ) ), t_name + t_info[cdun].name);
 
 			/* Append a "maximum level" */
-			if (mdun > cdun) strcat(out_val, format(" (Max %d)", mdun));
+			if (mdep > cdep) strcat(out_val, format(" (Max %d)", mdep));
 
 			/* Dump the info */
 			c_put_str(attr, out_val, n*4 + 3, 0);
@@ -5276,11 +5282,34 @@ void display_scores(int from, int to)
 {
 	char buf[1024];
 
+	char version[8];
+
 	/* Build the filename */
 	path_build(buf, 1024, ANGBAND_DIR_APEX, "scores.raw");
 
 	/* Open the binary high score file, for reading */
 	highscore_fd = fd_open(buf, O_RDONLY);
+
+	/* Clear version string */
+	version[0] = '\0';
+
+	/* Check highscore version */
+	if (!(highscore_fd < 0) && (!fd_read(highscore_fd, (char*)(version), 8)))
+	{
+		if (!fd_seek(highscore_fd, 0)) return;
+
+		sprintf(version, "%s", VERSION_STRING);
+
+		if (!fd_write(highscore_fd, version, 8)) return;
+	}
+
+	/* Compare string */
+	if (strcmp(version, "0.6.2"))
+	{
+		msg_print("Incompatible high score table.");
+		msg_print("Please rename lib\\apex\\scores.raw.");
+		return;
+	}
 
 	/* Clear screen */
 	Term_clear();
@@ -5421,12 +5450,15 @@ static errr enter_score(void)
 	sprintf(the_score.sex, "%c", (p_ptr->psex ? 'm' : 'f'));
 	sprintf(the_score.p_r, "%2d", p_ptr->prace);
 	sprintf(the_score.p_c, "%2d", p_ptr->pclass);
+	sprintf(the_score.p_s, "%2d", p_ptr->pstyle);
+	sprintf(the_score.p_p, "%2d", p_ptr->psval);
 
 	/* Save the level and such */
 	sprintf(the_score.cur_lev, "%3d", p_ptr->lev);
-	sprintf(the_score.cur_dun, "%3d", p_ptr->depth);
+	sprintf(the_score.cur_dep, "%3d", p_ptr->depth);
 	sprintf(the_score.max_lev, "%3d", p_ptr->max_lev);
-	sprintf(the_score.max_dun, "%3d", p_ptr->max_depth);
+	sprintf(the_score.max_dep, "%3d", p_ptr->max_depth);
+	sprintf(the_score.cur_dun, "%3d", p_ptr->dungeon);
 
 	/* Save the cause of death (31 chars) */
 	sprintf(the_score.how, "%-.31s", p_ptr->died_from);
@@ -5545,12 +5577,16 @@ errr predict_score(void)
 	sprintf(the_score.sex, "%c", (p_ptr->psex ? 'm' : 'f'));
 	sprintf(the_score.p_r, "%2d", p_ptr->prace);
 	sprintf(the_score.p_c, "%2d", p_ptr->pclass);
+	sprintf(the_score.p_s, "%2d", p_ptr->pstyle);
+	sprintf(the_score.p_p, "%2d", p_ptr->psval);
+
 
 	/* Save the level and such */
 	sprintf(the_score.cur_lev, "%3d", p_ptr->lev);
-	sprintf(the_score.cur_dun, "%3d", p_ptr->depth);
+	sprintf(the_score.cur_dep, "%3d", p_ptr->depth);
 	sprintf(the_score.max_lev, "%3d", p_ptr->max_lev);
-	sprintf(the_score.max_dun, "%3d", p_ptr->max_depth);
+	sprintf(the_score.max_dep, "%3d", p_ptr->max_depth);
+	sprintf(the_score.cur_dun, "%3d", p_ptr->dungeon);
 
 	/* Hack -- no cause of death */
 	strcpy(the_score.how, "nobody (yet!)");

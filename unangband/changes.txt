@@ -1,3 +1,20 @@
+### Game Play ###
+
+
+### User Interface ###
+
+- The high score table now records character styles and dungeon location killed in.  Old
+score files are (currently) incompatible and should be renamed from scores.raw.  If there is
+sufficient demand I (may) add in code to load these old score files.
+
+### Bug fixes ###
+
+- Fixed bug where many monster flags were not written to the save file (Reported by Matthias
+Rudolf).
+
+### Build / Platform ###
+
+
 Unangband 0.6.1 "It's all in the reflexes." aka "Hell of the Upside-down
 Sinners"
 
