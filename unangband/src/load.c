@@ -643,6 +643,13 @@ static void rd_lore(int r_idx)
 	rd_u32b(&l_ptr->flags6);
 	rd_u32b(&l_ptr->flags7);
 
+	/* Oops */
+	if (!older_than(0, 6, 2))
+	{
+		rd_u32b(&l_ptr->flags8);
+		rd_u32b(&l_ptr->flags9);
+	}
+
 	/* Read the "Racial" monster limit per level */
 	rd_byte(&r_ptr->max_num);
 
@@ -660,6 +667,9 @@ static void rd_lore(int r_idx)
 	l_ptr->flags5 &= r_ptr->flags5;
 	l_ptr->flags6 &= r_ptr->flags6;
 	l_ptr->flags7 &= r_ptr->flags7;
+	l_ptr->flags8 &= r_ptr->flags8;
+	l_ptr->flags9 &= r_ptr->flags9;
+
 }
 
 

@@ -45,7 +45,7 @@
 
 # Version stamp (required)
 
-V:0.6.1
+V:0.6.2
 
 W:0:1
 S:RING

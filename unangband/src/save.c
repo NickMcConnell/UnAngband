@@ -325,6 +325,8 @@ static void wr_lore(int r_idx)
 	wr_u32b(l_ptr->flags5);
 	wr_u32b(l_ptr->flags6);
 	wr_u32b(l_ptr->flags7);
+	wr_u32b(l_ptr->flags8);
+	wr_u32b(l_ptr->flags9);
 
 	/* Monster limit per level */
 	wr_byte(r_ptr->max_num);
