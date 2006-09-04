@@ -115,40 +115,11 @@ void do_cmd_equip(void)
 
 /*
  * The "wearable" tester
- *
- * XXX Was using wield_slot(o_ptr). Now inlined for performance.
  */
 static bool item_tester_hook_wear(const object_type *o_ptr)
 {
-	/* Slot for equipment */
-	switch (o_ptr->tval)
-	{
-		case TV_SWORD:
-		case TV_STAFF:
-		case TV_HAFTED:
-		case TV_POLEARM:
-		case TV_DIGGING:
-                case TV_INSTRUMENT:
-		case TV_BOW:
-		case TV_RING:
-		case TV_AMULET:
-		case TV_LITE:
-		case TV_DRAG_ARMOR:
-		case TV_HARD_ARMOR:
-		case TV_SOFT_ARMOR:
-		case TV_CLOAK:
-		case TV_SHIELD:
-		case TV_CROWN:
-		case TV_HELM:
-		case TV_GLOVES:
-		case TV_BOOTS:
-		case TV_BOLT:
-		case TV_ARROW:
-		case TV_SHOT:
-		{
-			return (TRUE);
-		}
-	}
+	/* Check if wearable/wieldable */
+	if (wield_slot(o_ptr) >= INVEN_WIELD) return (TRUE);
 
 	/* Assume not wearable */
 	return (FALSE);

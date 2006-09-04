@@ -7784,7 +7784,7 @@ s16b inven_takeoff(int item, int amt)
 
 	/* Message, sound if not the quiver */
 	if (!(IS_QUIVER_SLOT(item))) sound(MSG_WIELD);
-	msg_format("%s%s %s (%c).", act, act2, o_name, index_to_label(slot));
+	msg_format("%s %s (%c)%s.", act, o_name, index_to_label(slot), act2);
 
 	/* Return slot */
 	return (slot);

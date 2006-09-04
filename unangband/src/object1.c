@@ -2780,6 +2780,69 @@ void show_inven(void)
 		}
 	}
 
+	/*
+	 * Add notes about slots used by the quiver, if we have space, want
+	 * to show all slots, and have items in the quiver.
+	 */
+	if ((p_ptr->pack_size_reduce) && (item_tester_full) &&
+		(j <= (INVEN_PACK - p_ptr->pack_size_reduce)))
+	{
+		int ammo_num = 0, ammo_slot;
+
+		/* Count quiver ammo */
+		for (i = INVEN_QUIVER; i < END_QUIVER; i++)
+		{
+			/* Get the object */
+			o_ptr = &inventory[i];
+
+			/* Ignore empty objects */
+			if (!o_ptr->k_idx) continue;
+
+			/* Increment counter */
+			ammo_num += o_ptr->number * quiver_space_per_unit(o_ptr);
+		}
+
+		/* Insert a blank dividing line, if we have the space. */
+		if (j <= ((INVEN_PACK - 1) - p_ptr->pack_size_reduce))
+		{
+			j++;
+
+			prt("", j, col ? col - 2 : col);
+		}
+
+		for (i = 0; i < p_ptr->pack_size_reduce; i++)
+		{
+			/* Go to next line. */
+			j++;
+
+			prt("", j, col ? col - 2 : col);
+
+			/* Determine index, print it out. */
+			sprintf(tmp_val, "%c)", index_to_label(INVEN_PACK -
+				p_ptr->pack_size_reduce + i));
+
+			put_str(tmp_val, j, col);
+
+			/* Get the number of missiles gathered in this slot */
+			if (i == 0)
+			{
+				ammo_slot = ammo_num -
+					99 * (p_ptr->pack_size_reduce - 1);
+			}
+			else
+			{
+				ammo_slot = 99;
+			}
+
+			/* Hack -- use "(QUIVER)" as a description. */
+			strnfmt(o_name, sizeof(o_name),
+				"(QUIVER - %d missile%s)", ammo_slot,
+				(ammo_slot == 1) ? "": "s");
+
+			c_put_str(TERM_BLUE, o_name, j, col + 3);
+		}
+	}
+
 	/* Make a "shadow" below the list (only if needed) */
 	if (j && (j < Term->hgt)) prt("", j + 1, col ? col - 2 : col);
 }

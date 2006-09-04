@@ -2863,7 +2863,7 @@ static void store_sell(void)
 
 	/* Get an item */
 	s = "You have nothing that I want.";
-	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return;
+	if (!get_item(&item, q, s, (USE_QUIVER | USE_EQUIP | USE_INVEN | USE_FLOOR))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
