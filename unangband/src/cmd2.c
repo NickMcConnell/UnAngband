@@ -3356,12 +3356,19 @@ void do_cmd_fire(void)
 	q = "Fire which item? ";
 	s = "You have nothing to fire.";
 
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATG))) return;
+	if (!get_item(&item, q, s, (USE_QUIVER | USE_INVEN | USE_FLOOR | USE_FEATG))) return;
 
 	/* Get the object */
 	if (item >= 0)
 	{
 		o_ptr = &inventory[item];
+
+		/* A cursed quiver disables the use of non-cursed ammo */
+		if (IS_QUIVER_SLOT(item) && p_ptr->cursed_quiver && !cursed_p(o_ptr))
+		{
+			msg_print("Your quiver is cursed!");
+			return;
+		}
 	}
 	else
 	{
@@ -3509,7 +3516,7 @@ void do_cmd_fire(void)
 	tdam *= tmul;
 
 	/* Base range XXX XXX */
-	tdis = 10 + 5 * tmul;
+	tdis = 6 + 3 * tmul;
 
 	/* Take a turn */
 	p_ptr->energy_use = (100 / thits);
@@ -3887,11 +3894,18 @@ void do_cmd_throw(void)
 	/* Get an item */
 	q = "Throw which item? ";
 	s = "You have nothing to throw.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATG))) return;
+	if (!get_item(&item, q, s, (USE_QUIVER | USE_INVEN | USE_FLOOR | USE_FEATG))) return;
 
 	if (item >= 0)
 	{
 		o_ptr = &inventory[item];
+
+		/* A cursed quiver disables the use of non-cursed ammo */
+		if (IS_QUIVER_SLOT(item) && p_ptr->cursed_quiver && !cursed_p(o_ptr))
+		{
+			msg_print("Your quiver is cursed!");
+			return;
+		}
 	}
 	else
 	{
@@ -3974,7 +3988,7 @@ void do_cmd_throw(void)
 	missile_char = object_char(i_ptr);
 
 	/* Extract a "distance multiplier" */
-	mul = 10;
+	mul = (throwing ? 10 : 3);
 
 	/* Enforce a minimum "weight" of one pound */
 	div = ((i_ptr->weight > 10) ? i_ptr->weight : 10);

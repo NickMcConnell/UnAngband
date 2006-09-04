@@ -697,7 +697,7 @@ s16b bag_contents[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL];
  * Array[INVEN_TOTAL] of items listed at the bottom of the screen
  * This is used to track player items in a pointer-based user interface
  */
-int itemlist[INVEN_TOTAL+1];
+int itemlist[INVEN_TOTAL];
 
 
 /*
@@ -1164,3 +1164,24 @@ long tot_mon_power;
  */
 char pf_result[MAX_PF_LENGTH];
 int pf_result_index;
+
+
+/*
+ * Some static info used to manage quiver groups
+ */
+quiver_group_type quiver_group[MAX_QUIVER_GROUPS] =
+{
+	{'f', TERM_L_BLUE},
+	{'f', TERM_L_GREEN},
+	{'f', TERM_YELLOW},
+	{'v', TERM_ORANGE},
+};
+
+
+/*
+ * We cache the kinds of objects held in bags here
+ *
+ * Otherwise we get a significant performance penalty when checking bags for valid items due
+ * to the performance of lookup_kind when faking the objects in bags.
+ */
+s16b bag_kinds_cache[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL];

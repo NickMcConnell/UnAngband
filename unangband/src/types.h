@@ -120,6 +120,7 @@ typedef struct player_type player_type;
 typedef struct start_item start_item;
 typedef struct tval_desc tval_desc;
 typedef struct element_type element_type;
+typedef struct quiver_group_type quiver_group_type;
 
 
 
@@ -1416,6 +1417,9 @@ struct player_type
 
 	s16b inven_cnt; /* Number of items in inventory */
 	s16b equip_cnt; /* Number of items in equipment */
+	s16b pack_size_reduce;		/* Number of inventory slots used by
+					   the quiver */
+
 
 	s16b target_set;/* Target flag */
 	s16b target_who;/* Target identity */
@@ -1540,6 +1544,7 @@ struct player_type
 	s16b vulnerability;     /* How vulnerable? */
 
 	byte outside;	/* Player is outside? */
+	bool cursed_quiver;	/* The quiver is cursed */
 
 };
 
@@ -1610,4 +1615,14 @@ struct element_type
 	int effect;
 	u32b flags2;
 	int grp_idx;
+};
+
+
+/*
+ * Info used to manage quiver groups
+ */
+struct quiver_group_type
+{
+	char cmd;		/* The command used to perform an action with the objects in the group */
+	byte color;		/* The color of the pseudo-tag used for the group */
 };

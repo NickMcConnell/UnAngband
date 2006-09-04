@@ -744,6 +744,137 @@ void search(void)
 }
 
 
+
+/*
+ * Objects that combine with items already in the quiver get picked
+ * up, placed in the quiver, and combined automatically.
+ */
+static bool quiver_carry(object_type *o_ptr, int o_idx)
+{
+	int i;
+
+	object_type *i_ptr, *j_ptr = NULL;
+
+	char name[80];
+
+	/* Must be ammo. */
+	if (!ammo_p(o_ptr) && !is_throwing_weapon(o_ptr)) return (FALSE);
+
+	/* Known or sensed cursed ammo is avoided */
+	if (cursed_p(o_ptr) && ((o_ptr->ident & (IDENT_SENSE)) || object_known_p(o_ptr))) return (FALSE);
+
+	/* Check quiver space */
+	if (!quiver_carry_okay(o_ptr, o_ptr->number, -1)) return (FALSE);
+
+	/* Check quiver for similar objects. */
+	for (i = INVEN_QUIVER; i < END_QUIVER; i++)
+	{
+		/* Get object in that slot. */
+		i_ptr = &inventory[i];
+
+		/* Ignore empty objects */
+		if (!i_ptr->k_idx)
+		{
+			/* But save first empty slot, see later */
+			if (!j_ptr) j_ptr = i_ptr;
+
+			continue;
+		}
+
+		/* Look for similar. */
+		if (object_similar(i_ptr, o_ptr))
+		{
+
+			/* Absorb floor object. */
+			object_absorb(i_ptr, o_ptr);
+
+			/* Remember this slot */
+			j_ptr = i_ptr;
+
+			/* Done */
+			break;
+		}
+	}
+
+	/* Can't combine the ammo. Search for the "=g" inscription */
+	if (i >= END_QUIVER)
+	{
+		char *s;
+
+		/* Full quiver or no inscription at all */
+		if (!j_ptr || !(o_ptr->note)) return (FALSE);
+
+		/* Search the '=' character in the inscription */
+		s = strchr(quark_str(o_ptr->note), '=');
+
+		while (TRUE)
+		{
+			/* We reached the end of the inscription */
+			if (!s) return (FALSE);
+
+			/* We found the "=g" inscription */
+			if (s[1] == 'g')
+			{
+				/* Put the ammo in the empty slot */
+				object_copy(j_ptr, o_ptr);
+
+				/* Done */
+				break;
+			}
+
+			/* Keep looking */
+			s = strchr(s + 1, '=');
+		}
+	}
+
+	/*
+	 * Increase carried weight.
+	 * Note that o_ptr has the right number of missiles to add.
+	 */
+	p_ptr->total_weight += o_ptr->weight * o_ptr->number;
+
+	/* Reorder the quiver, track the index */
+	i = reorder_quiver(j_ptr - inventory);
+
+	/* Get the final slot */
+	j_ptr = &inventory[i];
+
+	/* Cursed! */
+	if (cursed_p(j_ptr))
+	{
+		/* Warn the player */
+		sound(MSG_CURSED);
+		msg_print("Oops! It feels deathly cold!");
+
+		/* Set the feeling */
+		j_ptr->feeling = INSCRIP_CURSED;
+
+		/* The object has been "sensed" */
+		j_ptr->ident |= (IDENT_SENSE);
+	}
+
+	/* Describe the object */
+	object_desc(name, sizeof(name), j_ptr, TRUE, 3);
+
+	/* Message */
+	msg_format("You have %s (%c).", name, index_to_label(i));
+
+	/* Delete the object */
+	delete_object_idx(o_idx);
+
+	/* Update "p_ptr->pack_size_reduce" */
+	find_quiver_size();
+
+	/* Recalculate bonuses */
+	p_ptr->update |= (PU_BONUS);
+
+	/* Window stuff */
+	p_ptr->window |= (PW_EQUIP);
+
+	return (TRUE);
+}
+
+
 /*
  * Determine if the object can be picked up, and has "=g" in its inscription.
  * If "=g" is followed by a number, pick up if the player has less than this number of similar objects in their inventory.
@@ -1185,6 +1316,9 @@ void py_pickup(int pickup)
 			/* Check the next object */
 			continue;
 		}
+
+		/* Test for quiver auto-pickup */
+		if (quiver_carry(o_ptr, this_o_idx)) continue;
 
 		/* Test for auto-pickup */
 		if (auto_pickup_okay(o_ptr))

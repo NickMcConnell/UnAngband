@@ -2878,7 +2878,7 @@ static void calc_bonuses(void)
 	/*** Analyze equipment ***/
 
 	/* Scan the equipment */
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+	for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
 	{
 		o_ptr = &inventory[i];
 
@@ -2960,6 +2960,30 @@ static void calc_bonuses(void)
 		/* Apply the mental bonuses tp hit/damage, if known */
 		if (object_bonus_p(o_ptr)) p_ptr->dis_to_h += o_ptr->to_h;
 		if (object_bonus_p(o_ptr)) p_ptr->dis_to_d += o_ptr->to_d;
+	}
+
+
+	/* Find cursed ammo in the quiver */
+	p_ptr->cursed_quiver = FALSE;
+
+	/* Scan the quiver */
+	for (i = INVEN_QUIVER; i < END_QUIVER; i++)
+	{
+		/* Get the object */
+		o_ptr = &inventory[i];
+
+		/* Ignore empty objects */
+		if (!o_ptr->k_idx) continue;
+
+		/* Found cursed ammo */
+		if (cursed_p(o_ptr))
+		{
+			/* Remember it */
+			p_ptr->cursed_quiver = TRUE;
+
+			/* Done */
+			break;
+		}
 	}
 
 

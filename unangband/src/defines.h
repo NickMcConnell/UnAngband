@@ -533,21 +533,46 @@
 #define INVEN_HANDS     34
 #define INVEN_FEET      35
 
-/*
- * Total number of equipment slots before quiver (old INVEN_TOTAL)
- */
+/* The end of the equipment (old INVEN_TOTAL, before quiver) */
 #define END_EQUIPMENT	36
 
+/*
+ * Blank line between equipment and quiver
+ */
+#define INVEN_BLANK	36
+
+/*
+ * First slot of the quiver
+ */
+#define INVEN_QUIVER	37
+
+/*
+ * The number of quiver slots
+ */
+#define MAX_QUIVER	10
+
+/*
+ * The end of the quiver
+ */
+#define END_QUIVER	(INVEN_QUIVER + MAX_QUIVER)
 
 /*
  * Total number of inventory slots (hard-coded).
  */
-#define INVEN_TOTAL	36
+#define INVEN_TOTAL	END_QUIVER
 
 /*
  * Total number of show item slots (hard-coded).
  */
-#define SHOWN_TOTAL	36
+#define SHOWN_TOTAL	END_QUIVER
+
+/*
+ * Used to determine if a slot is a quiver slot.
+ */
+#define IS_QUIVER_SLOT(slot) \
+(((slot) >= INVEN_QUIVER) && ((slot) < INVEN_QUIVER + MAX_QUIVER))
+
+
 
 
 /*
@@ -2541,7 +2566,7 @@
 #define USE_FLOOR		0x04	/* Allow floor items */
 #define USE_FEATU		0x08	/* Allow features (usable) */
 #define USE_FEATG		0x10	/* Allow features (gettable) */
-
+#define USE_QUIVER		0x20	/* Allow quiver items, forbid classic equipment */
 
 
 /*** Player flags ***/
@@ -4368,6 +4393,14 @@
 
 
 /*
+ * Ammo.
+ */
+#define ammo_p(T) \
+	(((T)->tval == TV_BOLT) || ((T)->tval == TV_ARROW) || \
+	((T)->tval == TV_SHOT))
+
+
+/*
  * Convert an "attr"/"char" pair into a "pict" (P)
  */
 #define PICT(A,C) \
@@ -4890,3 +4923,17 @@ extern int PlayerUID;
  * Maximum distance to consider in the pathfinder
  */
 #define MAX_PF_LENGTH 250
+
+
+/*
+ * Objects in the quiver are stored in groups. Each group has its own set of tags ranging from 0 to 9.
+ * The order of the groups is determined by the value of these constants
+ */
+enum
+{
+	QUIVER_GROUP_BOLTS = 0,
+	QUIVER_GROUP_ARROWS,
+	QUIVER_GROUP_SHOTS,
+	QUIVER_GROUP_THROWING_WEAPONS,
+	MAX_QUIVER_GROUPS
+};

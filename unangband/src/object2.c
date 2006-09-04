@@ -7182,6 +7182,9 @@ void inven_item_increase(int item, int num)
 		/* Add the weight */
 		p_ptr->total_weight += (num * o_ptr->weight);
 
+		/* Update "p_ptr->pack_size_reduce" */
+		if (IS_QUIVER_SLOT(item)) find_quiver_size();
+
 		/* Recalculate bonuses */
 		p_ptr->update |= (PU_BONUS);
 
@@ -7241,6 +7244,9 @@ void inven_item_optimize(int item)
 	/* The item is being wielded */
 	else
 	{
+		/* Reorder the quiver if necessary */
+		if (IS_QUIVER_SLOT(item)) p_ptr->notice |= (PN_REORDER);
+
 		/* One less item */
 		p_ptr->equip_cnt--;
 
@@ -7461,6 +7467,18 @@ s16b inven_carry(object_type *o_ptr)
 	/* Find an empty slot */
 	for (j = 0; j <= INVEN_PACK; j++)
 	{
+		/*
+		 * Hack -- Force pack overflow if we reached the slots of the
+		 * inventory reserved for the quiver. -DG-
+		 */
+		if (j >= INVEN_PACK - p_ptr->pack_size_reduce)
+		{
+			/* Jump to INVEN_PACK to not mess up pack reordering */
+			j = INVEN_PACK;
+
+			break;
+		}
+
 		j_ptr = &inventory[j];
 
 		/* Use it if found */
@@ -7647,6 +7665,7 @@ s16b inven_takeoff(int item, int amt)
 	object_type object_type_body;
 
 	cptr act;
+	cptr act2 = "";
 
 	char o_name[80];
 
@@ -7703,21 +7722,18 @@ s16b inven_takeoff(int item, int amt)
 	{
 		act = "You were enchanted with";
 	}
-	else if ((i_ptr->tval == TV_SWORD) || (i_ptr->tval == TV_POLEARM)
-			|| (i_ptr->tval == TV_HAFTED) || (i_ptr->tval== TV_STAFF))
-	{
-		act = "You were wielding";
-		if (item == INVEN_ARM) act = "You were wielding off-handed";
-	}
-	else if (item == INVEN_WIELD)
-	{
-		act = "You were using";
-	}
 
 	/* Took off weapon */
 	else if (item == INVEN_WIELD)
 	{
 		act = "You were wielding";
+	}
+
+	/* Took off shield / secondary weapon */
+	else if (item == INVEN_ARM)
+	{
+		if (i_ptr->tval == TV_SHIELD) act = "You were wearing";
+		else act = "You were off-hand wielding";
 	}
 
 	/* Took off bow */
@@ -7737,6 +7753,13 @@ s16b inven_takeoff(int item, int amt)
 			i_ptr->charges = i_ptr->timeout;
 			i_ptr->timeout = 0;
 		}
+	}
+
+	/* Removed ammunition */
+	else if (IS_QUIVER_SLOT(item))
+	{
+		act = "You removed";
+		act2 = " from your quiver";
 	}
 
 	/* Took off something */
@@ -7759,8 +7782,9 @@ s16b inven_takeoff(int item, int amt)
 		slot = -1;
 	}
 
-	/* Message */
-	msg_format("%s %s (%c).", act, o_name, index_to_label(slot));
+	/* Message, sound if not the quiver */
+	if (!(IS_QUIVER_SLOT(item))) sound(MSG_WIELD);
+	msg_format("%s%s %s (%c).", act, act2, o_name, index_to_label(slot));
 
 	/* Return slot */
 	return (slot);
@@ -8525,5 +8549,521 @@ bool spell_okay(int spell, bool known)
 
 	/* Okay to study, not to cast */
 	return (!known);
+}
+
+/*
+ * Returns in tag_num the numeric value of the inscription tag associated with
+ * an object in the inventory.
+ * Valid tags have the form "@n" or "@xn" where "n" is a number (0-9) and "x"
+ * is cmd. If cmd is 0 then "x" can be anything.
+ * Returns FALSE if the object doesn't have a valid tag.
+ */
+int get_tag_num(int o_idx, int cmd, byte *tag_num)
+{
+	object_type *o_ptr = &inventory[o_idx];
+	char *s;
+
+	/* Ignore empty objects */
+	if (!o_ptr->k_idx) return FALSE;
+
+	/* Ignore objects without notes */
+	if (!o_ptr->note) return FALSE;
+
+	/* Find the first '@' */
+	s = strchr(quark_str(o_ptr->note), '@');
+
+	while (s)
+	{
+		/* Found "@n"? */
+		if (isdigit((unsigned char)s[1]))
+		{
+			/* Convert to number */
+			*tag_num = D2I(s[1]);
+			return TRUE;
+		}
+
+		/* Found "@xn"? */
+		if ((!cmd || ((unsigned char)s[1] == cmd)) &&
+			isdigit((unsigned char)s[2]))
+		{
+			/* Convert to number */
+			*tag_num = D2I(s[2]);
+			return TRUE;
+		}
+
+		/* Find another '@' in any other case */
+		s = strchr(s + 1, '@');
+	}
+
+	return FALSE;
+}
+
+
+/*
+ * Calculate and apply the reduction in pack size due to use of the
+ * Quiver.
+ */
+void find_quiver_size(void)
+{
+	int ammo_num, i;
+	object_type *i_ptr;
+
+	/*
+	 * Items in the quiver take up space which needs to be subtracted
+	 * from space available elsewhere.
+	 */
+	ammo_num = 0;
+
+	for (i = INVEN_QUIVER; i < END_QUIVER; i++)
+	{
+		/* Get the item */
+		i_ptr = &inventory[i];
+
+		/* Ignore empty. */
+		if (!i_ptr->k_idx) continue;
+
+		/* Tally up missiles. */
+		ammo_num += i_ptr->number * quiver_space_per_unit(i_ptr);
+	}
+
+	/* Every 99 missiles in the quiver takes up one backpack slot. */
+	p_ptr->pack_size_reduce = (ammo_num + 98) / 99;
+}
+
+
+/*
+ * Combine ammo in the quiver.
+ */
+void combine_quiver(void)
+{
+	int i, j, k;
+
+	object_type *i_ptr;
+	object_type *j_ptr;
+
+	bool flag = FALSE;
+
+	/* Combine the quiver (backwards) */
+	for (i = END_QUIVER - 1; i > INVEN_QUIVER; i--)
+	{
+		/* Get the item */
+		i_ptr = &inventory[i];
+
+		/* Skip empty items */
+		if (!i_ptr->k_idx) continue;
+
+		/* Scan the items above that item */
+		for (j = INVEN_QUIVER; j < i; j++)
+		{
+			/* Get the item */
+			j_ptr = &inventory[j];
+
+			/* Skip empty items */
+			if (!j_ptr->k_idx) continue;
+
+			/* Can we drop "i_ptr" onto "j_ptr"? */
+			if (object_similar(j_ptr, i_ptr))
+			{
+				/* Take note */
+				flag = TRUE;
+
+				/* Add together the item counts */
+				object_absorb(j_ptr, i_ptr);
+
+				/* Slide everything down */
+				for (k = i; k < (END_QUIVER - 1); k++)
+				{
+					/* Hack -- slide object */
+					COPY(&inventory[k], &inventory[k+1], object_type);
+				}
+
+				/* Hack -- wipe hole */
+				object_wipe(&inventory[k]);
+
+				/* Done */
+				break;
+			}
+		}
+	}
+
+	if (flag)
+	{
+		/* Window stuff */
+		p_ptr->window |= (PW_EQUIP);
+
+		/* Message */
+		msg_print("You combine your quiver.");
+	}
+}
+
+/*
+ * Sort ammo in the quiver.  If requested, track the given slot and return
+ * its final position.
+ *
+ * Items marked with inscriptions of the form "@ [f] [any digit]"
+ * ("@f4", "@4", etc.) will be locked. It means that the ammo will be always
+ * fired using that digit. Different locked ammo can share the same tag.
+ * Unlocked ammo can be fired using its current pseudo-tag (shown in the
+ * equipment window). In that case the pseudo-tag can change depending on
+ * ammo consumption. -DG- (based on code from -LM- and -BR-)
+ */
+int reorder_quiver(int slot)
+{
+	int i, j, k;
+
+	s32b i_value;
+	byte i_group;
+
+	object_type *i_ptr;
+	object_type *j_ptr;
+
+	bool flag = FALSE;
+
+	byte tag;
+
+	/* This is used to sort locked and unlocked ammo */
+	struct ammo_info_type {
+		byte group;
+		s16b idx;
+		byte tag;
+		s32b value;
+	} ammo_info[MAX_QUIVER];
+	/* Position of the first locked slot */
+	byte first_locked;
+	/* Total size of the quiver (unlocked + locked ammo) */
+	byte quiver_size;
+
+	/*
+	 * This will hold the final ordering of ammo slots.
+	 * Note that only the indexes are stored
+	 */
+	s16b sorted_ammo_idxs[MAX_QUIVER];
+
+	/*
+	 * Reorder the quiver.
+	 *
+	 * First, we sort the ammo *indexes* in two sets, locked and unlocked
+	 * ammo. We use the same table for both sets (ammo_info).
+	 * Unlocked ammo goes in the beginning of the table and locked ammo
+	 * later.
+	 * The sets are merged later to produce the final ordering.
+	 * We use "first_locked" to determine the bound between sets. -DG-
+	 */
+	first_locked = quiver_size = 0;
+
+	/* Traverse the quiver */
+	for (i = INVEN_QUIVER; i < END_QUIVER; i++)
+	{
+		/* Get the object */
+		i_ptr = &inventory[i];
+
+		/* Ignore empty objects */
+		if (!i_ptr->k_idx) continue;
+
+		/* Get the value of the object */
+		i_value = object_value(i_ptr);
+
+		/* Note that we store all throwing weapons in the same group */
+		i_group = quiver_get_group(i_ptr);
+
+		/* Get the real tag of the object, if any */
+		if (get_tag_num(i, quiver_group[i_group].cmd, &tag))
+		{
+			/* Determine the portion of the table to be used */
+			j = first_locked;
+			k = quiver_size;
+		}
+		/*
+		 * If there isn't a tag we use a special value
+		 * to separate the sets.
+		 */
+		else
+		{
+			tag = 10;
+			/* Determine the portion of the table to be used */
+			j = 0;
+			k = first_locked;
+
+			/* We know that all locked ammo will be displaced */
+			++first_locked;
+		}
+
+		/* Search for the right place in the table */
+		for (; j < k; j++)
+		{
+			/* Get the other ammo */
+			j_ptr = &inventory[ammo_info[j].idx];
+
+			/* Objects sort by increasing group */
+			if (i_group < ammo_info[j].group) break;
+			if (i_group > ammo_info[j].group) continue;
+
+			/*
+			 * Objects sort by increasing tag.
+			 * Note that all unlocked ammo have the same tag (10)
+			 * so this step is meaningless for them -DG-
+			 */
+			if (tag < ammo_info[j].tag) break;
+			if (tag > ammo_info[j].tag) continue;
+
+			/* Objects sort by decreasing tval */
+			if (i_ptr->tval > j_ptr->tval) break;
+			if (i_ptr->tval < j_ptr->tval) continue;
+
+			/* Non-aware items always come last */
+			if (!object_aware_p(i_ptr)) continue;
+			if (!object_aware_p(j_ptr)) break;
+
+			/* Objects sort by increasing sval */
+			if (i_ptr->sval < j_ptr->sval) break;
+			if (i_ptr->sval > j_ptr->sval) continue;
+
+			/* Unidentified objects always come last */
+			if (!object_known_p(i_ptr)) continue;
+			if (!object_known_p(j_ptr)) break;
+
+			/* Objects sort by decreasing value */
+			if (i_value > ammo_info[j].value) break;
+			if (i_value < ammo_info[j].value) continue;
+		}
+
+		/*
+		 * We found the place. Displace the other slot
+		 * indexes if neccesary
+		 */
+		for (k = quiver_size; k > j; k--)
+		{
+			COPY(&ammo_info[k], &ammo_info[k - 1],
+				struct ammo_info_type);
+		}
+
+		/* Cache some data from the slot in the table */
+		ammo_info[j].group = i_group;
+		ammo_info[j].idx = i;
+		ammo_info[j].tag = tag;
+		/* We cache the value of the object too */
+		ammo_info[j].value = i_value;
+
+		/* Update the size of the quiver */
+		++quiver_size;
+	}
+
+	/*
+	 * Second, we merge the two sets to find the final ordering of the
+	 * ammo slots.
+	 * What this step really does is to place unlocked ammo in
+	 * the slots which aren't used by locked ammo. Again, we only work
+	 * with indexes in this step.
+	 */
+	i = 0;
+	j = first_locked;
+	tag = k = 0;
+
+	/* Compare ammo between the sets */
+	while ((i < first_locked) && (j < quiver_size))
+	{
+		/* Groups are different. Add the smallest first */
+		if (ammo_info[i].group > ammo_info[j].group)
+		{
+			sorted_ammo_idxs[k++] = ammo_info[j++].idx;
+			/* Reset the tag */
+			tag = 0;
+		}
+
+		/* Groups are different. Add the smallest first */
+		else if (ammo_info[i].group < ammo_info[j].group)
+		{
+			sorted_ammo_idxs[k++] = ammo_info[i++].idx;
+			/* Reset the tag */
+			tag = 0;
+		}
+
+		/*
+		 * Same group, and the tag is unlocked. Add some unlocked
+		 * ammo first
+		 */
+		else if (tag < ammo_info[j].tag)
+		{
+			sorted_ammo_idxs[k++] = ammo_info[i++].idx;
+			/* Increment the pseudo-tag */
+			++tag;
+		}
+		/*
+		 * The tag is locked. Perhaps there are several locked
+		 * slots with the same tag too. Add the locked ammo first
+		 */
+		else
+		{
+			/*
+			 * The tag is incremented only at the first ocurrence
+			 * of that value
+			 */
+			if (tag == ammo_info[j].tag)
+			{
+				++tag;
+			}
+			/* But the ammo is always added */
+			sorted_ammo_idxs[k++] = ammo_info[j++].idx;
+		}
+	}
+
+	/* Add remaining unlocked ammo, if neccesary */
+	while (i < first_locked)
+	{
+		sorted_ammo_idxs[k++] = ammo_info[i++].idx;
+	}
+
+	/* Add remaining locked ammo, if neccesary */
+	while (j < quiver_size)
+	{
+		sorted_ammo_idxs[k++] = ammo_info[j++].idx;
+	}
+
+	/* Determine if we have to reorder the real ammo */
+	for (k = 0; k < quiver_size; k++)
+	{
+		if (sorted_ammo_idxs[k] != (INVEN_QUIVER + k))
+		{
+			flag = TRUE;
+
+			break;
+		}
+	}
+
+	/* Reorder the real quiver, if necessary */
+	if (flag)
+	{
+		/* Temporary copy of the quiver */
+		object_type quiver[MAX_QUIVER];
+
+		/*
+		 * Copy the real ammo into the temporary quiver using
+		 * the new order
+		 */
+		for (i = 0; i < quiver_size; i++)
+		{
+			/* Get the original slot */
+			k = sorted_ammo_idxs[i];
+
+			/* Note the indexes */
+			object_copy(&quiver[i], &inventory[k]);
+
+			/*
+			 * Hack - Adjust the temporary slot if necessary.
+			 * Note that the slot becomes temporarily negative
+			 * to avoid multiple matches (indexes are positive).
+			 */
+			if (slot == k) slot = 0 - (INVEN_QUIVER + i);
+		}
+
+		/*
+		 * Hack - The loop has ended and slot was changed only once
+		 * like we wanted. Now we make slot positive again. -DG-
+		 */
+		if (slot < 0) slot = 0 - slot;
+
+		/*
+		 * Now dump the temporary quiver (sorted) into the real quiver
+		 */
+		for (i = 0; i < quiver_size; i++)
+		{
+			object_copy(&inventory[INVEN_QUIVER + i],
+					&quiver[i]);
+		}
+
+		/* Clear unused slots */
+		for (i = INVEN_QUIVER + quiver_size; i < END_QUIVER; i++)
+		{
+			object_wipe(&inventory[i]);
+		}
+
+		/* Window stuff */
+		p_ptr->window |= (PW_EQUIP);
+
+		/* Message */
+		if (!slot) msg_print("You reorganize your quiver.");
+	}
+
+	return (slot);
+}
+
+/*
+ * Returns TRUE if an object is a throwing weapon and can be put in the quiver
+ */
+bool is_throwing_weapon(const object_type *o_ptr)
+{
+	u32b f1, f2, f3, f4;
+
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+
+	return ((f3 & (TR3_THROWING)) ? TRUE: FALSE);
+}
+
+/*
+ * Returns the number of quiver units an object will consume when it's stored in the quiver.
+ * Every 99 quiver units we consume an inventory slot
+ */
+int quiver_space_per_unit(const object_type *o_ptr)
+{
+	return (ammo_p(o_ptr) ? 1: 5);
+}
+
+/*
+ * Returns TRUE if the specified number of objects of type o_ptr->k_idx can be hold in the quiver.
+ * Hack: if you are moving objects from the inventory to the quiver pass the inventory slot occupied by the object in
+ * "item". This will help us to determine if we have one free inventory slot more. You can pass -1 to ignore this feature.
+ */
+bool quiver_carry_okay(const object_type *o_ptr, int num, int item)
+{
+	int i;
+	int ammo_num = 0;
+	int have;
+	int need;
+
+	/* Paranoia */
+	if ((num <= 0) || (num > o_ptr->number)) num = o_ptr->number;
+
+	/* Count ammo in the quiver */
+	for (i = INVEN_QUIVER; i < END_QUIVER; i++)
+	{
+		/* Get the object */
+		object_type *i_ptr = &inventory[i];
+
+		/* Ignore empty objects */
+		if (!i_ptr->k_idx) continue;
+
+		/* Increment the ammo count */
+		ammo_num += (i_ptr->number * quiver_space_per_unit(i_ptr));
+	}
+
+	/* Add the requested amount of objects to be put in the quiver */
+	ammo_num += (num * quiver_space_per_unit(o_ptr));
+
+	/* We need as many free inventory as: */
+	need = (ammo_num + 98) / 99;
+
+	/* Calculate the number of available inventory slots */
+	have = INVEN_PACK - p_ptr->inven_cnt;
+
+	/* If we are emptying an inventory slot we have one free slot more */
+	if ((item >= 0) && (item < INVEN_PACK) && (num == o_ptr->number)) ++have;
+
+	/* Compute the result */
+	return (need <= have);
+}
+
+/*
+ * Returns the quiver group associated to an object. Defaults to throwing weapons
+ */
+byte quiver_get_group(const object_type *o_ptr)
+{
+	switch (o_ptr->tval)
+	{
+		case TV_BOLT: return (QUIVER_GROUP_BOLTS);
+		case TV_ARROW: return (QUIVER_GROUP_ARROWS);
+		case TV_SHOT: return (QUIVER_GROUP_SHOTS);
+	}
+
+	return (QUIVER_GROUP_THROWING_WEAPONS);
 }
 

@@ -4403,7 +4403,7 @@ static void equip_may_flags(u32b f1, u32b f2, u32b f3, u32b f4)
 	object_type *i_ptr;
 
 	/* Check inventory may flags*/
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+	for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
 	{
 		i_ptr = &inventory[i];
 
@@ -4456,7 +4456,7 @@ static void equip_may_flags(u32b f1, u32b f2, u32b f3, u32b f4)
 	if (!(if1) && !(if2) && !(if3) && !(if4)) return;
 
 	/* Check equipment may flags*/
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+	for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
 	{
 		i_ptr = &inventory[i];
 
@@ -4873,7 +4873,7 @@ void equip_can_flags(u32b f1,u32b f2,u32b f3, u32b f4)
 	if (p_ptr->blessed) f3 &= ~(TR3_HOLD_LIFE);
 
 	/* Exclude known flags */
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+	for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
 	{
 		i_ptr = &inventory[i];
 
@@ -4891,7 +4891,7 @@ void equip_can_flags(u32b f1,u32b f2,u32b f3, u32b f4)
 	if (!f1 && !f2 && !f3 && !f4) return;
 
 	/* Check for flags */
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+	for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
 	{
 		u32b if1 = f1;
 		u32b if2 = f2;
@@ -4941,7 +4941,7 @@ void equip_not_flags(u32b f1,u32b f2,u32b f3, u32b f4)
 	object_type *i_ptr;
 
 	/* Mark equipment with not flags*/
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+	for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
 	{
 		i_ptr = &inventory[i];
 

@@ -659,7 +659,7 @@ static void player_outfit(void)
 						{
 							k_idx = lookup_kind(TV_BOLT, SV_AMMO_NORMAL);
 							break;
-						}	break;
+						}
 					}
 					break;
 				}
@@ -681,9 +681,80 @@ static void player_outfit(void)
 			/* Check the slot */
 			slot = wield_slot(i_ptr);
 
+			/* Ammo gets special rules */
+			if (IS_QUIVER_SLOT(slot))
+			{
+				bool combined = FALSE;
+				int k;
+
+				/* Reset the slot. Check quiver space */
+				slot = -1;
+
+				if (quiver_carry_okay(i_ptr, i_ptr->number, -1))
+				{
+					/* Check quiver slots */
+					for (k = INVEN_QUIVER; k < END_QUIVER; k++)
+					{
+						/* Get the slot */
+						o_ptr = &inventory[k];
+
+						/* Empty slot */
+						if (!o_ptr->k_idx)
+						{
+							/* Remember the slot */
+							slot = k;
+						}
+						/* Occupied slot */
+						else if (object_similar(o_ptr, i_ptr))
+						{
+							/* Remember the slot */
+							slot = k;
+
+							/* Trigger object combination */
+							combined = TRUE;
+
+							/* Done */
+							break;
+						}
+					}
+				}
+
+	 			/* Found a slot */
+				if (slot != -1)
+ 				{
+					/* Get the slot again */
+					o_ptr = &inventory[slot];
+
+					/* Check insertion mode */
+					if (!combined)
+					{
+						/* Raw copy */
+						object_copy(o_ptr, i_ptr);
+
+						/* Hack -- Set a unique show_idx */
+						o_ptr->show_idx = show_idx++;
+					}
+					else
+					{
+						/* Combine */
+						object_absorb(o_ptr, i_ptr);
+					}
+
+					/* Increase the weight by hand */
+					p_ptr->total_weight += (i_ptr->weight * i_ptr->number);
+
+					/* Compute quiver size */
+					find_quiver_size();
+
+					/* Reorder quiver, refresh slot */
+					slot = reorder_quiver(slot);
+
+					/* We have used up all the object */					
+					i_ptr->number = 0;
+				}
+			}
 			/* If player can wield an item, and slot not already occupied, do so */
-			/* Hack -- Temporarily don't wield lites until lite on/off code working */
-			if ((slot >= INVEN_WIELD) && (slot != INVEN_LITE) && !(inventory[slot].k_idx))
+			else if ((slot >= INVEN_WIELD) && !(inventory[slot].k_idx))
 			{
 				/* Get the wield slot */
 				o_ptr = &inventory[slot];
@@ -701,7 +772,7 @@ static void player_outfit(void)
 				p_ptr->equip_cnt++;
 
 				/* Increase the weight */
-				p_ptr->total_weight += i_ptr->weight;
+				p_ptr->total_weight += o_ptr->weight;
 
 				/* Hack -- Set a unique show_idx */
 				o_ptr->show_idx = show_idx++;

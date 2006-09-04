@@ -1452,11 +1452,14 @@ static int inven_damage(inven_func typ, int perc)
 	k = 0;
 
 	/* Scan through the slots backwards */
-	for (i = 0; i < INVEN_PACK; i++)
+	for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		bool damage;
 
 		o_ptr = &inventory[i];
+
+		/* Damage only inventory and quiver */
+		if ((i >= INVEN_PACK) && !IS_QUIVER_SLOT(i)) continue;
 
 		/* Skip non-objects */
 		if (!o_ptr->k_idx) continue;

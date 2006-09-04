@@ -6,6 +6,8 @@ destroy non-living monsters, making them slightly less abusable.
 - If you learnt something about a flavored object, you will continue to remember it for
 all instances of that object type.
 
+- Implemented quivers from NPPAngband code.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
@@ -16,6 +18,10 @@ there is sufficient demand I (may) add in code to load these old score files.
 
 - Fixed bug where many monster flags were not written to the save file (Reported by
 Matthias Rudolf).
+
+- Fixed some more corruption bugs.
+
+- Improved performance of commands such as wielding when carrying several bags.
 
 ### Build / Platform ###
 

@@ -3775,7 +3775,7 @@ void request_command(bool shopping)
 
 
 	/* Hack -- Scan equipment */
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+	for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
 	{
 		cptr s;
 

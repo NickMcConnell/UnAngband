@@ -1,4 +1,4 @@
-/* File: files.c */
+
 
 /*
  * Copyright (c) 1997 Ben Harrison, James E. Wilson, Robert A. Koeneke
@@ -1816,7 +1816,7 @@ static void display_player_equippy(int y, int x)
 	object_type *o_ptr;
 
 	/* Dump equippy chars */
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; ++i)
+	for (i = INVEN_WIELD; i < END_EQUIPMENT; ++i)
 	{
 		/* Object */
 		o_ptr = &inventory[i];
@@ -2366,7 +2366,7 @@ static void display_player_flag_info(int mode)
 			flag = (head << y);
 
 			/* Check equipment */
-			for (n = 6, i = INVEN_WIELD; i < INVEN_TOTAL; ++i, ++n)
+			for (n = 6, i = INVEN_WIELD; i < END_EQUIPMENT; ++i, ++n)
 			{
 				object_type *o_ptr;
 
@@ -2625,7 +2625,7 @@ static void display_player_sust_info(void)
 	c_put_str(TERM_WHITE, "abcdefghijkl@", row-1, col);
 #endif
 	/* Process equipment */
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; ++i)
+	for (i = INVEN_WIELD; i < END_EQUIPMENT; ++i)
 	{
 		/* Get the object */
 		o_ptr = &inventory[i];
@@ -3530,6 +3530,28 @@ errr file_character(cptr name, bool full)
 
 		for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
 		{
+			object_desc(o_name, sizeof(o_name), &inventory[i],
+				TRUE, 3);
+
+			text_out(format("%c) %s\n", index_to_label(i), o_name));
+
+			/* Describe random object attributes */
+			identify_random_gen(&inventory[i]);
+		}
+
+		text_out("\n\n");
+	}
+
+	/* Dump the quiver */
+	if (p_ptr->pack_size_reduce)
+	{
+		text_out("  [Character Equipment -- Quiver]\n\n");
+
+		for (i = INVEN_QUIVER; i < END_QUIVER; i++)
+		{
+			/* Ignore empty slots */
+			if (!inventory[i].k_idx) continue;
+
 			object_desc(o_name, sizeof(o_name), &inventory[i],
 				TRUE, 3);
 

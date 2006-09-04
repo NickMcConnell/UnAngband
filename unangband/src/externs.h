@@ -330,6 +330,9 @@ extern long tot_mon_power;
 extern s32b *slays;
 extern char pf_result[MAX_PF_LENGTH];
 extern int pf_result_index;
+extern quiver_group_type quiver_group[MAX_QUIVER_GROUPS];
+extern s16b bag_kinds_cache[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL];
+
 
 /*
  * Automatically generated "function declarations"
@@ -736,6 +739,15 @@ extern s16b spell_level(int spell);
 extern s16b spell_power(int spell);
 extern s16b spell_chance(int spell);
 extern bool spell_okay(int spell, bool known);
+extern byte allow_altered_inventory;
+extern int get_tag_num(int o_idx, int cmd, byte *tag_num);
+extern void find_quiver_size(void);
+extern void combine_quiver(void);
+extern int reorder_quiver(int slot);
+extern bool is_throwing_weapon(const object_type *o_ptr);
+extern int quiver_space_per_unit(const object_type *o_ptr);
+extern bool quiver_carry_okay(const object_type *o_ptr, int num, int item);
+extern byte quiver_get_group(const object_type *o_ptr);
 
 /* save.c */
 extern bool save_player(void);

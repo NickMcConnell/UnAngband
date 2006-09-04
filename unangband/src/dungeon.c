@@ -219,7 +219,7 @@ static void sense_inventory(void)
 	/*** Sense everything ***/
 
 	/* Check everything */
-	for (i = 0; i < INVEN_TOTAL+1; i++)
+	for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		o_ptr = &inventory[i];
 
@@ -229,14 +229,14 @@ static void sense_inventory(void)
 		/* Hack -- we seem to get a source of corrupt objects that crash this routine. Putting this warning in. */
 		if ((o_ptr->k_idx >= z_info->k_max) || (o_ptr->k_idx < 0))
 		{
-			bell(format("BUG: Object corruption detected (%d). See bugs.txt for reporting details.",o_ptr->k_idx));
+			msg_format("BUG: Object corruption detected (%d). Please report.",o_ptr->k_idx);
 
 			o_ptr->k_idx = 0;
 			continue;
 		}
 
 		/* Sense flags to see if we have ability */
-		if (i >= INVEN_WIELD)
+		if ((i >= INVEN_WIELD) && !(IS_QUIVER_SLOT(i)))
 		{
 			u32b if1,if2,if3,if4;
 
@@ -1110,7 +1110,7 @@ static void process_world(void)
 	}
 
 	/* Process timeouts */
-	for (k = 0, j = 0, i = 0; i < INVEN_TOTAL+1; i++)
+	for (k = 0, j = 0, i = 0; i < INVEN_TOTAL; i++)
 	{
 		/* Get the object */
 		o_ptr = &inventory[i];

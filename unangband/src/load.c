@@ -1327,7 +1327,7 @@ static errr rd_inventory(void)
 			p_ptr->total_weight += (i_ptr->number * i_ptr->weight);
 
 			/* One more item */
-			p_ptr->equip_cnt++;
+			if (!IS_QUIVER_SLOT(n)) p_ptr->equip_cnt++;
 		}
 
 		/* Warning -- backpack is full */
@@ -1356,6 +1356,9 @@ static errr rd_inventory(void)
 			p_ptr->inven_cnt++;
 		}
 	}
+
+	/* Update "p_ptr->pack_size_reduce" */
+	find_quiver_size();
 
 	/* Success */
 	return (0);

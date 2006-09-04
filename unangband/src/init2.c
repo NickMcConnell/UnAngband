@@ -1506,6 +1506,10 @@ static errr init_other(void)
 		for (n = 0; n < INVEN_BAG_TOTAL; n++)
 			bag_contents[i][n] = 0;
 
+	/* Initialize bag kind cache */
+	for (i = 0; i < SV_BAG_MAX_BAGS; i++)
+		for (n = 0; n < INVEN_BAG_TOTAL; n++)
+			bag_kinds_cache[i][n] = lookup_kind(bag_holds[i][n][0], bag_holds[i][n][1]);
 
 	/*** Prepare the dungeons ***/
 

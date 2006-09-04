@@ -242,7 +242,7 @@ void identify_pack(void)
 	int i;
 
 	/* Simply identify and know every item */
-	for (i = 0; i < INVEN_TOTAL+1; i++)
+	for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		object_type *o_ptr = &inventory[i];
 
@@ -1516,7 +1516,7 @@ bool detect_objects_magic(void)
 	}
 
 	/* Sense inventory */
-	for (i = 0; i < INVEN_TOTAL+1; i++)
+	for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		int feel = 0;
 
@@ -1625,7 +1625,7 @@ bool detect_objects_cursed(void)
 	}
 
 	/* Sense inventory */
-	for (i = 0; i < INVEN_TOTAL+1; i++)
+	for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		int feel;
 
@@ -1742,7 +1742,7 @@ bool detect_objects_power(void)
 	}
 
 	/* Sense inventory */
-	for (i = 0; i < INVEN_TOTAL+1; i++)
+	for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		int feel = 0;
 
