@@ -657,7 +657,7 @@ monster_lore *l_list;
 /*
  * Array[z_info->a_max] of artifact lore
  */
-object_lore *a_list;
+object_info *a_list;
 
 /*
  * Array[z_info->e_max] of ego item lore
@@ -665,9 +665,9 @@ object_lore *a_list;
 object_lore *e_list;
 
 /*
- * Array[z_info->k_max] of kind lore
+ * Array[z_info->k_max] of flavor lore
  */
-object_lore *k_list;
+object_info *x_list;
 
 
 /*

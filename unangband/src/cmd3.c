@@ -1077,9 +1077,7 @@ void do_cmd_uninscribe(void)
 
 			/* Auto-inscribe */
 			if (object_named_p(i_ptr) || cheat_auto) i_ptr->note = 0;
-
 		}
-
 	}
 	/* Do we inscribe all these object kinds? */
 	else if (object_aware_p(o_ptr) && (k_info[o_ptr->k_idx].note))
@@ -1100,7 +1098,6 @@ void do_cmd_uninscribe(void)
 
 			/* Auto-inscribe */
 			if (object_named_p(i_ptr) || cheat_auto) i_ptr->note = 0;
-
 		}
 	}
 }

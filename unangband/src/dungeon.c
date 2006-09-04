@@ -3530,19 +3530,17 @@ void play_game(bool new_game)
 
 			for (i = 0;i<z_info->a_max;i++)
 			{
-				object_lore *n_ptr = &a_list[i];
+				object_info *n_ptr = &a_list[i];
 
 				n_ptr->can_flags1 = 0x0L;
 				n_ptr->can_flags2 = 0x0L;
 				n_ptr->can_flags3 = 0x0L;
-
-				n_ptr->may_flags1 = 0x0L;
-				n_ptr->may_flags2 = 0x0L;
-				n_ptr->may_flags3 = 0x0L;
+				n_ptr->can_flags4 = 0x0L;
 
 				n_ptr->not_flags1 = 0x0L;
 				n_ptr->not_flags2 = 0x0L;
 				n_ptr->not_flags3 = 0x0L;
+				n_ptr->not_flags4 = 0x0L;
 			}
 
 		}

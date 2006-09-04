@@ -87,6 +87,7 @@ typedef struct feature_state feature_state;
 typedef struct feature_blow feature_blow;
 typedef struct feature_type feature_type;
 typedef struct object_kind object_kind;
+typedef struct object_info object_info;
 typedef struct object_lore object_lore;
 typedef struct artifact_type artifact_type;
 typedef struct names_type names_type;
@@ -328,36 +329,6 @@ struct feature_type
 	char x_char;    /* Desired feature character */
 };
 
-/*
- * Information known about objects.
- *
- * Note we should retain kind/ego item information from
- * saved game to saved game, artifacts only if not random
- * artifacts, and never objects.
- *
- * Note that this is 2 bytes shorter than we want, but we
- * take advantage of that in the structures it is in.
- */
-struct object_info
-{
-	u32b can_flags1;
-	u32b can_flags2;
-	u32b can_flags3;
-	u32b can_flags4;
-
-	u32b may_flags1;
-	u32b may_flags2;
-	u32b may_flags3;
-	u32b may_flags4;
-
-	u32b not_flags1;
-	u32b not_flags2;
-	u32b not_flags3;
-	u32b not_flags4;
-
-	s16b usage;
-};
-
 
 /*
  * Information about object "kinds", including player knowledge.
@@ -420,6 +391,28 @@ struct object_kind
 	byte guess;
 	s16b used;	/* Number of times used */
 };
+
+
+/*
+ * Information known about objects.
+ *
+ * This is used for flavors/artifacts which only record whether
+ * or not an object has an ability. Ego items, which 'may' have
+ * abilities use the object_lore structure instead.
+ */
+struct object_info
+{
+	u32b can_flags1;
+	u32b can_flags2;
+	u32b can_flags3;
+	u32b can_flags4;
+
+	u32b not_flags1;
+	u32b not_flags2;
+	u32b not_flags3;
+	u32b not_flags4;
+};
+
 
 /*
  * Lore about "objects".

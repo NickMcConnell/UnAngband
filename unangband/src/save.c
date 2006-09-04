@@ -1125,7 +1125,7 @@ static bool wr_savefile_new(void)
 	for (i = 0; i < tmp16u; i++)
 	{
 		artifact_type *a_ptr = &a_info[i];
-		object_lore *n_ptr = &a_list[i];
+		object_info *n_ptr = &a_list[i];
 
 		wr_byte(a_ptr->cur_num);
 		wr_byte(0);
@@ -1180,7 +1180,29 @@ static bool wr_savefile_new(void)
                 /* Oops */
                	wr_byte(0);
                 wr_byte(0);
+        }
 
+	/* Don't bother saving the learnt flavor flags if dead */
+	if (!p_ptr->is_dead)
+	{
+		/* Hack -- Dump the flavors */
+		tmp16u =z_info->x_max;
+		wr_u16b(tmp16u);
+
+	        for (i = 0; i < tmp16u; i++)
+		{
+                	object_info *n_ptr = &x_list[i];
+
+                	wr_u32b(n_ptr->can_flags1);
+                	wr_u32b(n_ptr->can_flags2);
+                	wr_u32b(n_ptr->can_flags3);
+                	wr_u32b(n_ptr->can_flags4);
+
+                	wr_u32b(n_ptr->not_flags1);
+                	wr_u32b(n_ptr->not_flags2);
+                	wr_u32b(n_ptr->not_flags3);
+                	wr_u32b(n_ptr->not_flags4);
+		}
         }
 
 	/* Write the "extra" information */

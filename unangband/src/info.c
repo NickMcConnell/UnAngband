@@ -361,6 +361,19 @@ void object_obvious_flags(object_type *o_ptr)
                 o_ptr->can_flags3 |= k_info[o_ptr->k_idx].flags3;
                 o_ptr->can_flags4 |= k_info[o_ptr->k_idx].flags4;
 	}
+	/* Learnt abilities of flavored items are added if not aware */
+	else if (k_info[o_ptr->k_idx].flavor)
+	{
+		object_can_flags(o_ptr,x_list[k_info[o_ptr->k_idx].flavor].can_flags1,
+				x_list[k_info[o_ptr->k_idx].flavor].can_flags2,
+				x_list[k_info[o_ptr->k_idx].flavor].can_flags3,
+				x_list[k_info[o_ptr->k_idx].flavor].can_flags4);
+
+		object_not_flags(o_ptr,x_list[o_ptr->name1].not_flags1,
+				x_list[k_info[o_ptr->k_idx].flavor].not_flags2,
+				x_list[k_info[o_ptr->k_idx].flavor].not_flags3,
+				x_list[k_info[o_ptr->k_idx].flavor].not_flags4);	
+	}
 
 	/* Identified name */
 	if (object_named_p(o_ptr))
@@ -2880,7 +2893,7 @@ void list_object(const object_type *o_ptr, int mode)
 	object_flags_aux(mode, o_ptr, &f1, &f2, &f3, &f4);
 
 	/* Display the flags */
-	anything |= list_object_flags(f1, f2, f3, f4, 1); 
+	anything |= list_object_flags(f1, f2, f3, f4, LIST_FLAGS_CAN); 
 
 	/*
 	 * Handle cursed objects here to avoid redundancies such as noting
@@ -3274,13 +3287,13 @@ void list_object(const object_type *o_ptr, int mode)
 	if (!random && !spoil)
 	{
 		/* Display the flags */
-		anything |= list_object_flags(o_ptr->may_flags1, o_ptr->may_flags2, o_ptr->may_flags3, o_ptr->may_flags4, 2); 
+		anything |= list_object_flags(o_ptr->may_flags1, o_ptr->may_flags2, o_ptr->may_flags3, o_ptr->may_flags4, LIST_FLAGS_MAY); 
 
 #if 0
                 /* Equipment only */
                 if (wield_slot(o_ptr) >= INVEN_WIELD)
                         /* Display the flags */
-                        anything |= list_object_flags(o_ptr->not_flags1, o_ptr->not_flags2, o_ptr->not_flags3, o_ptr->not_flags4, 3);
+                        anything |= list_object_flags(o_ptr->not_flags1, o_ptr->not_flags2, o_ptr->not_flags3, o_ptr->not_flags4, LIST_FLAGS_NOT);
 #endif
 	}
 
@@ -3901,7 +3914,7 @@ void object_guess_name(object_type *o_ptr)
 		for (i = 1; i < z_info->a_max; i++)
 	{
 		artifact_type *a_ptr = &a_info[i];
-		object_lore *n_ptr = &a_list[i];
+		object_info *n_ptr = &a_list[i];
 
 		/* Skip "empty" items */
 		if (!a_ptr->name) continue;
@@ -4123,6 +4136,57 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 	o_ptr->can_flags3 |= (f3);
 	o_ptr->can_flags4 |= (f4);
 
+	/* If object flavored, learn flags about that flavor */
+	if (!object_aware_p(o_ptr) && (k_info[o_ptr->k_idx].flavor))
+	{
+		/* Learn for base flavor */
+		x_list[k_info[o_ptr->k_idx].flavor].can_flags1 |= (f1);
+		x_list[k_info[o_ptr->k_idx].flavor].can_flags2 |= (f2);
+		x_list[k_info[o_ptr->k_idx].flavor].can_flags3 |= (f3);
+		x_list[k_info[o_ptr->k_idx].flavor].can_flags4 |= (f4);
+
+		/* Process inventory */
+		for (i = 0; i < INVEN_TOTAL; i++)
+		{
+			object_type *i_ptr = &inventory[i];
+
+			/* Skip non-objects */
+			if (!i_ptr->k_idx) continue;
+
+			/* Not matching kind */
+			if (i_ptr->k_idx != o_ptr->k_idx) continue;
+
+			i_ptr->can_flags1 |= (f1);
+			i_ptr->can_flags2 |= (f2);
+			i_ptr->can_flags3 |= (f3);
+			i_ptr->can_flags4 |= (f4);
+
+			/* Guess name */
+			object_guess_name(o_ptr);
+		}
+
+		/* Process objects */
+		for (i = 1; i < o_max; i++)
+		{
+			/* Get the object */
+			object_type *i_ptr = &o_list[i];
+
+			/* Skip dead objects */
+			if (!i_ptr->k_idx) continue;
+
+			/* Not matching kind */
+			if (i_ptr->k_idx != o_ptr->k_idx) continue;
+
+			i_ptr->can_flags1 |= (f1);
+			i_ptr->can_flags2 |= (f2);
+			i_ptr->can_flags3 |= (f3);
+			i_ptr->can_flags4 |= (f4);
+
+			/* Guess name */
+			object_guess_name(o_ptr);
+		}
+	}
+
 	/* Must be identified to continue */
 	if (!object_named_p(o_ptr))
 	{
@@ -4196,7 +4260,7 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 	/* Artifact */
 	if (o_ptr->name1)
 	{
-		object_lore *n_ptr = &a_list[o_ptr->name1];
+		object_info *n_ptr = &a_list[o_ptr->name1];
 
 		n_ptr->not_flags1 &= ~(f1);
 		n_ptr->not_flags2 &= ~(f2);
@@ -4208,18 +4272,6 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 		n_ptr->can_flags2 |= (f2);
 		n_ptr->can_flags3 |= (f3);
 		n_ptr->can_flags4 |= (f4);
-
-		/* Extra flags */
-		n_ptr->may_flags1 |= xf1;
-		n_ptr->may_flags2 |= xf2;
-		n_ptr->may_flags3 |= xf3;
-		n_ptr->may_flags4 |= xf4;
-
-		/* Exclude fixed flags */
-		n_ptr->may_flags1 &= ~(n_ptr->can_flags1);
-		n_ptr->may_flags2 &= ~(n_ptr->can_flags2);
-		n_ptr->may_flags3 &= ~(n_ptr->can_flags3);
-		n_ptr->may_flags4 &= ~(n_ptr->can_flags4);
 	}
 
 	/* Ego item */
@@ -4423,6 +4475,8 @@ static void equip_may_flags(u32b f1, u32b f2, u32b f3, u32b f4)
  */
 void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 {
+	int i;
+
 	/* No change */
 	if (!(f1 & ~(o_ptr->not_flags1)) && !(f2 & ~(o_ptr->not_flags2)) && !(f3 & ~(o_ptr->not_flags3)) && !(f4 & ~(o_ptr->not_flags4))) return;
 	
@@ -4450,7 +4504,7 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 		Term_gotoxy(0, 1);
 
 		/* Actually display the item */
-		list_object_flags(f1 & (o_ptr->can_flags1), f2 & (o_ptr->can_flags2), f3 & (o_ptr->can_flags3), f4 & (o_ptr->can_flags4), 1);
+		list_object_flags(f1 & (o_ptr->can_flags1), f2 & (o_ptr->can_flags2), f3 & (o_ptr->can_flags3), f4 & (o_ptr->can_flags4), LIST_FLAGS_CAN);
 
 		(void)anykey();
 	
@@ -4466,6 +4520,62 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 	o_ptr->can_flags3 &= ~(f3);
 	o_ptr->can_flags4 &= ~(f4);
 
+	/* If object flavored, learn flags about that flavor */
+	if (!object_aware_p(o_ptr) && (k_info[o_ptr->k_idx].flavor))
+	{
+		x_list[k_info[o_ptr->k_idx].flavor].not_flags1 |= (f1);
+		x_list[k_info[o_ptr->k_idx].flavor].not_flags2 |= (f2);
+		x_list[k_info[o_ptr->k_idx].flavor].not_flags3 |= (f3);
+		x_list[k_info[o_ptr->k_idx].flavor].not_flags4 |= (f4);
+
+		/* Process inventory */
+		for (i = 0; i < INVEN_TOTAL; i++)
+		{
+			object_type *i_ptr = &inventory[i];
+
+			/* Skip non-objects */
+			if (!i_ptr->k_idx) continue;
+
+			/* Not matching kind */
+			if (i_ptr->k_idx != o_ptr->k_idx) continue;
+
+			i_ptr->not_flags1 |= (f1);
+			i_ptr->not_flags2 |= (f2);
+			i_ptr->not_flags3 |= (f3);
+			i_ptr->not_flags4 |= (f4);
+
+			/* Important -- have to clear may flags on inventory */
+			i_ptr->may_flags1 &= ~(f1);
+			i_ptr->may_flags2 &= ~(f2);
+			i_ptr->may_flags3 &= ~(f3);
+			i_ptr->may_flags4 &= ~(f4);
+
+			/* Guess name */
+			object_guess_name(o_ptr);
+		}
+
+		/* Process objects */
+		for (i = 1; i < o_max; i++)
+		{
+			/* Get the object */
+			object_type *i_ptr = &o_list[i];
+
+			/* Skip dead objects */
+			if (!i_ptr->k_idx) continue;
+
+			/* Not matching kind */
+			if (i_ptr->k_idx != o_ptr->k_idx) continue;
+
+			i_ptr->not_flags1 |= (f1);
+			i_ptr->not_flags2 |= (f2);
+			i_ptr->not_flags3 |= (f3);
+			i_ptr->not_flags4 |= (f4);
+
+			/* Guess name */
+			object_guess_name(o_ptr);
+		}
+	}
+
 	/* Check inventory */
 	inven_may_flags();
 
@@ -4480,7 +4590,7 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 	/* Artifact */
 	if (o_ptr->name1) 
 	{
-		object_lore *n_ptr = &a_list[o_ptr->name1];
+		object_info *n_ptr = &a_list[o_ptr->name1];
 
 		n_ptr->not_flags1 |= f1;
 		n_ptr->not_flags2 |= f2;
@@ -4563,7 +4673,6 @@ void drop_may_flags(object_type *o_ptr)
  */
 void drop_all_flags(object_type *o_ptr)
 {
-
 	/* Clear may flags */
 	o_ptr->can_flags1 = 0L;
 	o_ptr->can_flags2 = 0L;
@@ -4724,7 +4833,7 @@ void update_slot_flags(int slot, u32b f1, u32b f2, u32b f3, u32b f4)
 	Term_gotoxy(0, 1);
 
 	/* Actually display the item */
-	list_object_flags(f1, f2, f3, f4, 1);
+	list_object_flags(f1, f2, f3, f4, LIST_FLAGS_CAN);
 
 	(void)anykey();
 	

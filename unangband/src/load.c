@@ -1967,7 +1967,7 @@ static errr rd_savefile_new_aux(void)
 	/* Read the artifact flags */
 	for (i = 0; i < z_info->a_max; i++)
 	{
-		object_lore *n_ptr = &a_list[i];
+		object_info *n_ptr = &a_list[i];
 
 		rd_byte(&tmp8u);
 		a_info[i].cur_num = (tmp8u != 0);
@@ -2036,6 +2036,37 @@ static errr rd_savefile_new_aux(void)
 
 	if (arg_fiddle) note("Loaded Ego Items");
 
+	/* Don't bother saving flavor flags if dead */
+	if ((!older_than(0, 6, 2)) && !(p_ptr->is_dead))
+	{
+		/* Load the Flavors */
+		rd_u16b(&tmp16u);
+
+		/* Incompatible save files */
+		if (tmp16u > z_info->x_max)
+		{
+			note(format("Too many (%u) flavors!", tmp16u));
+			return (-1);
+		}
+
+		/* Read the flavor flags */
+		for (i = 0; i < tmp16u; i++)
+		{
+			object_info *n_ptr = &x_list[i];
+
+			rd_u32b(&n_ptr->can_flags1);
+			rd_u32b(&n_ptr->can_flags2);
+			rd_u32b(&n_ptr->can_flags3);
+			rd_u32b(&n_ptr->can_flags4);
+
+			rd_u32b(&n_ptr->not_flags1);
+			rd_u32b(&n_ptr->not_flags2);
+			rd_u32b(&n_ptr->not_flags3);
+			rd_u32b(&n_ptr->not_flags4);
+		}
+
+		if (arg_fiddle) note("Loaded Flavors");
+	}
 
 	/* Read the extra stuff */
 	if (rd_extra()) return (-1);

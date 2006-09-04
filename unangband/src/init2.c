@@ -1479,13 +1479,13 @@ static errr init_other(void)
 	C_MAKE(l_list, z_info->r_max, monster_lore);
 
 	/* Lore */
-	C_MAKE(a_list, z_info->a_max, object_lore);
+	C_MAKE(a_list, z_info->a_max, object_info);
 
 	/* Lore */
 	C_MAKE(e_list, z_info->e_max, object_lore);
 
 	/* Lore */
-	C_MAKE(k_list, z_info->k_max, object_lore);
+	C_MAKE(x_list, z_info->x_max, object_info);
 
 	/*** Prepare quest array ***/
 

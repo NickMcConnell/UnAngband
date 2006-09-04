@@ -4904,7 +4904,7 @@ errr do_randart(u32b randart_seed, bool full)
 
 		artifact_type *a_info_new;
 
-		object_lore *a_list_new;
+		object_info *a_list_new;
 
 		int art_high_slot = 255;
 
@@ -4912,7 +4912,7 @@ errr do_randart(u32b randart_seed, bool full)
 		C_MAKE(a_info_new, 256, artifact_type);
 
 		/* Allocate the new artifact lore range */
-		C_MAKE(a_list_new, 256, object_lore);
+		C_MAKE(a_list_new, 256, object_info);
 
 		/* Copy base artifacts to seed random powers */
 		for (i = ART_MIN_NORMAL; i < z_info->a_max;i++)
