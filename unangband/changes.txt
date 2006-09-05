@@ -23,6 +23,8 @@ Matthias Rudolf).
 
 - Improved performance of commands such as wielding when carrying several bags.
 
+- Fixed lockup when generating towers.
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.

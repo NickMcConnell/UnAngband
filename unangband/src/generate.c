@@ -4337,7 +4337,7 @@ static void cave_gen(void)
 	
 		/* Initialise room description */
 		room_info[dun->cent_n+1].type = ROOM_TOWER;
-		room_info[dun->cent_n+1].flags = (ROOM_ICKY);
+		room_info[dun->cent_n+1].flags = 0; /* Will be set to ROOM_ICKY at end of generation */
 		dun->cent[dun->cent_n].y = y;
 		dun->cent[dun->cent_n].x = x;
 		dun->cent_n++;
@@ -4720,6 +4720,13 @@ static void cave_gen(void)
 
 		/* Place the questor */
 		place_monster_aux(y, x, zone->guard, FALSE, TRUE);
+	}
+
+	/* Hack -- restrict teleporation in towers */
+	/* XXX Important that this occurs after placing the player */
+	if ((zone->tower) && (p_ptr->depth >= min_depth(p_ptr->dungeon)))
+	{
+		room_info[1].flags = (ROOM_ICKY);
 	}
 }
 
