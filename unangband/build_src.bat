@@ -47,6 +47,9 @@ copy lib\xtra\help\angband.cnt unangband-061-src\lib\xtra\help
 
 copy src\*.h unangband-061-src\src
 copy src\*.c unangband-061-src\src
+copy src\*.inc unangband-061-src\src
+copy src\*.rc unangband-061-src\src
+copy src\*.ico unangband-061-src\src
 copy src\Makefile.* unangband-061-src\src
 
 7z a -tzip -r unangband-061-src.zip unangband-061-src

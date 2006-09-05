@@ -29,6 +29,8 @@ Matthias Rudolf).
 
 - Reduce memory footprint of artifact lore.
 
+- Add additional files to src distribution to allow minimal compilation and running of
+Windows compile.
 
 Unangband 0.6.1 "It's all in the reflexes." aka "Hell of the Upside-down
 Sinners"
