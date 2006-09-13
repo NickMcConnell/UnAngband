@@ -2888,6 +2888,23 @@ static void calc_bonuses(void)
 	p_ptr->cur_flags3 = f3;
 	p_ptr->cur_flags4 = f4;
 
+	/* Affect hitpoint regeneration */
+	if (f3 & (TR3_REGEN_HP)) p_ptr->regen_hp += 1;
+
+	/* Affect mana regeneration */
+	if (f3 & (TR3_REGEN_MANA)) p_ptr->regen_hp += 1;
+
+	/* Affect light radius */
+	if (f3 & (TR3_LITE)) p_ptr->glowing += 1;
+
+	/* Affect incremental resists */
+	if (f2 & (TR2_RES_ACID)) p_ptr->incr_resist[INCR_RES_ACID]++;
+	if (f2 & (TR2_RES_COLD)) p_ptr->incr_resist[INCR_RES_COLD]++;
+	if (f2 & (TR2_RES_ELEC)) p_ptr->incr_resist[INCR_RES_ELEC]++;
+	if (f2 & (TR2_RES_FIRE)) p_ptr->incr_resist[INCR_RES_FIRE]++;
+	if (f2 & (TR2_RES_POIS)) p_ptr->incr_resist[INCR_RES_POIS]++;
+	if (f4 & (TR4_RES_WATER)) p_ptr->incr_resist[INCR_RES_WATER]++;
+
 	/*** Analyze equipment ***/
 
 	/* Scan the equipment */
