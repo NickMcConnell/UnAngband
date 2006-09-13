@@ -2663,7 +2663,7 @@ static void calc_torch(void)
 #ifdef ALLOW_OBJECT_INFO_MORE
 		equip_can_flags(0x0L,0x0L,TR3_LITE,0x0L);
 #endif
-		p_ptr->cur_lite++;
+		p_ptr->cur_lite += p_ptr->glowing;
 	}
 
 	/* Reduce lite when running if requested */
@@ -2830,6 +2830,12 @@ static void calc_bonuses(void)
 	p_ptr->cur_flags3 = 0L;
 	p_ptr->cur_flags4 = 0L;
 
+	/* Clear all incremental resist counters */
+	for (i = 0; i < MAX_INCR_RESISTS; i++)
+	{
+		p_ptr->incr_resist[i] = 1;
+	}
+
 	/*** Extract race/class info ***/
 
 	/* Base infravision (purely racial) */
@@ -2864,6 +2870,13 @@ static void calc_bonuses(void)
 
 	/* Base skill -- digging */
 	p_ptr->skill_dig = 0;
+
+	/* Base regeneration */
+	p_ptr->regen_hp = 0;
+	p_ptr->regen_mana = 0;
+
+	/* Base lite radius */
+	p_ptr->glowing = 0;
 
 	/*** Analyze player ***/
 
@@ -2928,6 +2941,23 @@ static void calc_bonuses(void)
 
 		/* Affect Might */
 		if (f1 & (TR1_MIGHT)) extra_might += o_ptr->pval;
+
+		/* Affect hitpoint regeneration */
+		if (f3 & (TR3_REGEN_HP)) p_ptr->regen_hp += o_ptr->pval;
+
+		/* Affect mana regeneration */
+		if (f3 & (TR3_REGEN_MANA)) p_ptr->regen_hp += o_ptr->pval;
+
+		/* Affect light radius */
+		if (f3 & (TR3_LITE)) p_ptr->glowing += o_ptr->pval;
+
+		/* Affect incremental resists */
+		if (f2 & (TR2_RES_ACID)) p_ptr->incr_resist[INCR_RES_ACID]++;
+		if (f2 & (TR2_RES_COLD)) p_ptr->incr_resist[INCR_RES_COLD]++;
+		if (f2 & (TR2_RES_ELEC)) p_ptr->incr_resist[INCR_RES_ELEC]++;
+		if (f2 & (TR2_RES_FIRE)) p_ptr->incr_resist[INCR_RES_FIRE]++;
+		if (f2 & (TR2_RES_POIS)) p_ptr->incr_resist[INCR_RES_POIS]++;
+		if (f4 & (TR4_RES_WATER)) p_ptr->incr_resist[INCR_RES_WATER]++;
 
 		/* Affect flags */
 		p_ptr->cur_flags1 |= f1;
@@ -3166,6 +3196,7 @@ static void calc_bonuses(void)
 		if ((inventory[INVEN_WIELD].k_idx) ||
 			(inventory[INVEN_ARM].k_idx)) can_swim = FALSE;
 
+		/* If filled */
 		if (f_ptr->flags2 & (FF2_FILLED))
 		{
 			/* ANDY - Need to check for swimming skill XXX */
@@ -3180,6 +3211,7 @@ static void calc_bonuses(void)
 				k = k * 4;
 			}
 		}
+		/* If deep */
 		else if (f_ptr->flags2 & (FF2_DEEP))
 		{
 			/* ANDY - Need to check for swimming skill XXX */
@@ -3194,6 +3226,7 @@ static void calc_bonuses(void)
 				k = k * 3;
 			}
 		}
+		/* If shallow */
 		else if (f_ptr->flags2 & (FF2_SHALLOW))
 		{
 			j = (j * 3)/2;
@@ -3833,6 +3866,7 @@ void notice_stuff(void)
 	{
 		p_ptr->notice &= ~(PN_COMBINE);
 		combine_pack();
+		combine_quiver();
 	}
 
 	/* Reorder the pack */
@@ -3840,6 +3874,7 @@ void notice_stuff(void)
 	{
 		p_ptr->notice &= ~(PN_REORDER);
 		reorder_pack();
+		(void)reorder_quiver(0);
 	}
 }
 

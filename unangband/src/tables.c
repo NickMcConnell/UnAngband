@@ -2528,7 +2528,7 @@ const int object_xtra_size[OBJECT_XTRA_MAX_HIDDEN] =
 	0,
 	6,
 	12,
-	15,
+	16,
 	4,
 	5,
 	1,
@@ -2540,7 +2540,7 @@ const int object_xtra_size[OBJECT_XTRA_MAX_HIDDEN] =
 	1,
 	1,
 	1,
-        10,
+        8,
 	32,	/* Magic item - flag 1 */
 	32,	/* Magic item - flag 2 */
 	32,	/* Magic item - flag 3 */
@@ -2734,7 +2734,7 @@ const cptr magic_name[4][32] =
 		"of Slow Digestion",
 		"of Feather Falling",
 		"(Glowing)",
-		"of Regeneration",
+		"of Health Regeneration",
 		"of Telepathy",
 		"of See Invisible",
 		"of Free Action",
@@ -2746,7 +2746,7 @@ const cptr magic_name[4][32] =
 		"of Sense Trolls",
 		"of Sense Undead",
 		"of Sense Nature",
-		"of Impact",
+		"of Mana Regeneration",
 		"(Drains Health)",
 		"(Drains Mana)",
 		"(Drains Experience)",
@@ -2756,9 +2756,9 @@ const cptr magic_name[4][32] =
 		"", /* Activates */
 		"(Blessed)",
 		"", /* Artifact */
-		"", /* Easily Known */
-		"", /* Hide Type */
-		"", /* Show Mods */
+		"of Hunger",
+		"of Impact",
+		"(Rope-attached)",
 		"of Throwing",
 		"",	/* Light curse */
 		"",	/* Heavy curse */
@@ -2775,7 +2775,7 @@ const cptr magic_name[4][32] =
 		"of Manathirst",
 		"of Poison Immunity",
 		"of Resist Disease",
-		"of Hunger",
+		"of Resist Water",
 		"of Slay Man",
 		"of Slay Elf",
 		"of Slay Dwarf",

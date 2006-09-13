@@ -1116,6 +1116,13 @@ static errr rd_extra(void)
 	rd_s16b(&p_ptr->oppose_acid);
 	rd_s16b(&p_ptr->oppose_elec);
 	rd_s16b(&p_ptr->oppose_pois);
+
+	if (!older_than(0, 6, 2))
+	{
+		rd_s16b(&p_ptr->oppose_water);
+		rd_s16b(&p_ptr->oppose_lava);
+	}
+
 	rd_s16b(&p_ptr->free_act);
 
 	rd_byte(&p_ptr->charging);

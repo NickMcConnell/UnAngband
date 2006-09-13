@@ -305,7 +305,9 @@ struct feature_type
 	u32b flags1;
 	u32b flags2;
 	u32b flags3;
-
+#if 0
+	u32b flows;    	/* Flow flags */
+#endif
 	u16b level;     /* Minimum level */
 	u16b rarity;    /* 1/Rarity */
 
@@ -626,7 +628,9 @@ struct monster_race
 	u32b flags7;    /* Flags 7 (summons) */
 	u32b flags8;	/* Flags 8 (drops) */
 	u32b flags9;	/* Flags 9 (extra) */
-
+#if 0
+	u32b flows;	/* Flow flags */
+#endif
 	monster_blow blow[4];   /* Up to four blows per round */
 
 	byte level;     /* Level of creature */
@@ -688,7 +692,6 @@ struct monster_lore
 	u32b flags7;  /* Observed racial flags */
 	u32b flags8;  /* Observed racial flags */
 	u32b flags9;	/* Flags 9 (extra) */
-
 };
 
 
@@ -1356,6 +1359,9 @@ struct player_type
 	s16b oppose_cold;       /* Timed -- oppose cold */
 	s16b oppose_pois;       /* Timed -- oppose poison */
 
+	s16b oppose_water;       /* Timed -- oppose water */
+	s16b oppose_lava;       /* Timed -- oppose lava */
+
 	s16b word_recall;       /* Word of recall counter */
 
 	s16b energy;    /* Current energy */
@@ -1499,6 +1505,8 @@ struct player_type
 	u32b cur_flags3;
 	u32b cur_flags4;
 
+	byte incr_resist[MAX_INCR_RESISTS];
+
 	s16b dis_to_h;  /* Known bonus to hit */
 	s16b dis_to_d;  /* Known bonus to dam */
 	s16b dis_to_a;  /* Known bonus to ac */
@@ -1523,6 +1531,10 @@ struct player_type
 	s16b skill_thb; /* Skill: To hit (shooting) */
 	s16b skill_tht; /* Skill: To hit (throwing) */
 	s16b skill_dig; /* Skill: Digging */
+
+	s16b regen_hp;	/* Hitpoint regeneration rate */
+	s16b regen_mana;/* Mana regeneration rate */
+	s16b glowing;	/* Light radius bonus from items */
 
 	u32b noise;     /* Derived from stealth */
 

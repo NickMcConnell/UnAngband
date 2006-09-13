@@ -660,6 +660,8 @@ static void wr_extra(void)
 	wr_s16b(p_ptr->oppose_acid);
 	wr_s16b(p_ptr->oppose_elec);
 	wr_s16b(p_ptr->oppose_pois);
+	wr_s16b(p_ptr->oppose_water);
+	wr_s16b(p_ptr->oppose_lava);
 	wr_s16b(p_ptr->free_act);
 
 	wr_byte(p_ptr->charging);

@@ -1928,7 +1928,7 @@ static cptr display_player_flag_names[6][10] =
 	{
 		" Food:",	/* TR3_SLOW_DIGEST */
 		"Feath:",	/* TR3_FEATHER */
-		"PLite:",	/* TR3_LITE */
+		" Glow:",	/* TR3_LITE */
 		"Regen:",	/* TR3_REGEN */
 		"Telep:",	/* TR3_TELEPATHY */
 		"Invis:",	/* TR3_SEE_INVIS */
@@ -2030,6 +2030,13 @@ static void put_flag_char(u32b f[4], int set, u32b flag, int y, int x, int row, 
 			c_put_str(TERM_RED, "-", row, col);
 		}
 
+		/* MegaHack -- Check resistance to water */
+		else if ((y == 8) &&
+			(f[4] & (TR4_RES_WATER)))
+		{
+			c_put_str(TERM_WHITE, "+", row, col);
+		}
+
 		/* MegaHack -- Skip water */
 		else if (y == 8)
 		{
@@ -2084,7 +2091,7 @@ static void put_flag_char(u32b f[4], int set, u32b flag, int y, int x, int row, 
 	{
 		/* MegaHack -- Check hunger */
 		if ((y == 4) &&
-			(f[4] & (TR4_HUNGER)))
+			(f[3] & (TR3_HUNGER)))
 		{
 			c_put_str(TERM_RED, "-", row, col);
 		}
@@ -2115,6 +2122,46 @@ static void put_flag_char(u32b f[4], int set, u32b flag, int y, int x, int row, 
 			!(f[3] & (TR3_THROWING)))
 		{
 			c_put_str(TERM_SLATE, ".", row, col);
+		}
+
+		/* MegaHack -- Display light pval */
+		else if ((y == 2) && (f[set] & flag))
+		{
+			byte a;
+
+			/* Default */
+			char c = '*';
+
+			/* Good */
+			if (pval > 0)
+			{
+				/* Good */
+				a = TERM_L_GREEN;
+
+				/* Label boost */
+				if (pval < 10) c = I2D(pval);
+			}
+
+			/* Bad */
+			else if (pval < 0)
+			{
+				/* Bad */
+				a = TERM_RED;
+
+				/* Label boost */
+				if (pval > -10) c = I2D(-(pval));
+			}
+
+			/* Unknown */
+			else
+			{
+				/* Bad */
+				a = TERM_SLATE;
+				c = '?';
+			}
+
+			/* Display it */
+			c_put_str(a, format("%c", c), row, col);
 		}
 
 		/* Check flags */
@@ -2305,6 +2352,47 @@ static void put_flag_char(u32b f[4], int set, u32b flag, int y, int x, int row, 
 		else if (f[set] & flag)
 		{
 			c_put_str(TERM_RED, "-", row, col);
+		}
+
+		/* MegaHack -- Display health/mana regen pval */
+		else if (((y == 0) && (f[3] & TR3_REGEN_HP))
+			|| ((y == 1) && (f[3] & TR3_REGEN_MANA)))
+		{
+			byte a;
+
+			/* Default */
+			char c = '*';
+
+			/* Good */
+			if (pval > 0)
+			{
+				/* Good */
+				a = TERM_L_GREEN;
+
+				/* Label boost */
+				if (pval < 10) c = I2D(pval);
+			}
+
+			/* Bad */
+			else if (pval < 0)
+			{
+				/* Bad */
+				a = TERM_RED;
+
+				/* Label boost */
+				if (pval > -10) c = I2D(-(pval));
+			}
+
+			/* Unknown */
+			else
+			{
+				/* Bad */
+				a = TERM_SLATE;
+				c = '?';
+			}
+
+			/* Display it */
+			c_put_str(a, format("%c", c), row, col);
 		}
 
 		/* Default */

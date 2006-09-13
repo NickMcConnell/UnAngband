@@ -514,9 +514,6 @@ void reset_visuals(bool unused)
  * Amulet or Necklace).  They will NEVER "append" the "k_info" name.  But,
  * they will append the artifact name, just like any artifact, if known.
  *
- * None of the Special Rings/Amulets are "EASY_KNOW", though they could be,
- * at least, those which have no "pluses", such as the three artifact lites.
- *
  * Hack -- Display "The One Ring" as "a Plain Gold Ring" until aware.
  *
  * The "pluralization" rules are extremely hackish, in fact, for efficiency,
@@ -1276,8 +1273,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)
 			{
 				/* Skip 'useless' flags */
-				if (j & (TR3_ACTIVATE | TR3_RANDOM | TR3_INSTA_ART |
-					  TR3_EASY_KNOW | TR3_HIDE_TYPE | TR3_SHOW_MODS)) continue;
+				if (j & (TR3_ACTIVATE | TR3_RANDOM | TR3_INSTA_ART)) continue;
 
 				/* Found a flag */
 				if ((j & f3) != 0)
@@ -1362,18 +1358,23 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	if (mode < 1) goto object_desc_done;
 
 	/* Display the item like a weapon */
-	if (f3 & (TR3_SHOW_MODS)) show_weapon = TRUE;
-
-	/* Display the item like a weapon */
 	if (o_ptr->to_h && o_ptr->to_d) show_weapon = TRUE;
 
 	/* Display the item like armour */
 	if (o_ptr->ac) show_armour = TRUE;
 
-
 	/* Dump base weapon info */
 	switch (o_ptr->tval)
 	{
+		/* Spells */
+		case TV_SPELL:
+		{
+			/* Hack -- check damage */
+			if ((o_ptr->dd < 2) && (o_ptr->ds < 2)) break;
+
+			/* Fall through */
+		}
+
 		/* Missiles */
 		case TV_SHOT:
 		case TV_BOLT:
@@ -1397,6 +1398,9 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			object_desc_num_macro(t, o_ptr->ds);
 			object_desc_chr_macro(t, p2);
 
+			/* Show mods like a weapon */
+			show_weapon = TRUE;
+
 			/* All done */
 			break;
 		}
@@ -1413,6 +1417,9 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			object_desc_chr_macro(t, 'x');
 			object_desc_num_macro(t, power);
 			object_desc_chr_macro(t, p2);
+
+			/* Show mods like a weapon */
+			show_weapon = TRUE;
 
 			/* All done */
 			break;
@@ -1541,96 +1548,12 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	/* Dump "pval" flags for wearable items */
 	if ((pval) && (f1 & (TR1_PVAL_MASK)))
 	{
-		cptr tail = "";
-		cptr tail2 = "";
-
 		/* Start the display */
 		object_desc_chr_macro(t, ' ');
 		object_desc_chr_macro(t, p1);
 
 		/* Dump the "pval" itself */
 		object_desc_int_macro(t, o_ptr->pval);
-
-		/* Do not display the "pval" flags */
-		if (f3 & (TR3_HIDE_TYPE))
-		{
-			/* Nothing */
-		}
-
-		/* Do not display the "pval" flags */
-		else if (!pval)
-		{
-			/* Nothing */
-		}
-
-		/* Stealth */
-		else if (f1 & (TR1_STEALTH))
-		{
-			/* Dump " to stealth" */
-			tail = " to stealth";
-		}
-
-		/* Searching */
-		else if (f1 & (TR1_SEARCH))
-		{
-			/* Dump " to searching" */
-			tail = " to searching";
-		}
-
-		/* Infravision */
-		else if (f1 & (TR1_INFRA))
-		{
-			/* Dump " to infravision" */
-			tail = " to infravision";
-		}
-
-#if 0
-
-		/* Tunneling */
-		else if (f1 & (TR1_TUNNEL))
-		{
-			/* Dump " to digging" */
-			tail = " to digging";
-		}
-
-#endif
-
-		/* Speed */
-		else if (f1 & (TR1_SPEED))
-		{
-			/* Dump " to speed" */
-			tail = " to speed";
-		}
-
-		/* Blows */
-		else if (f1 & (TR1_BLOWS))
-		{
-			/* Add " attack" */
-			tail = " attack";
-
-			/* Add "attacks" */
-			if (ABS(o_ptr->pval) != 1) tail2 = "s";
-		}
-
-#if 0
-
-		/* Shots */
-		else if (f1 & (TR1_SHOTS))
-		{
-			/* Nothing */
-		}
-
-		/* Might */
-		else if (f1 & (TR1_MIGHT))
-		{
-			/* Nothing */
-		}
-
-#endif
-
-		/* Add the descriptor */
-		object_desc_str_macro(t, tail);
-		object_desc_str_macro(t, tail2);
 
 		/* Finish the display */
 		object_desc_chr_macro(t, p2);

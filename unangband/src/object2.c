@@ -851,11 +851,8 @@ void object_aware(object_type *o_ptr)
 	/* Identify the name */
 	o_ptr->ident |= (IDENT_NAME);
 
-	/* Check if easily known */
-	if (f3 & (TR3_EASY_KNOW)) object_known(o_ptr);
-
 	/* Is this all we need to know? - wands */
-	else if ((o_ptr->tval == TV_WAND) && (o_ptr->ident & (IDENT_CHARGES)))
+	if ((o_ptr->tval == TV_WAND) && (o_ptr->ident & (IDENT_CHARGES)))
 	{
 		object_known(o_ptr);
 	}
@@ -866,8 +863,16 @@ void object_aware(object_type *o_ptr)
 		object_known(o_ptr);
 	}
 
-	/* Is this all we need to know? - other items */
-	else if ((o_ptr->ident & (IDENT_BONUS)) && (o_ptr->ident & (IDENT_PVAL)))
+	/* Is this all we need to know? - other wearable items */
+	else if (((o_ptr->tval == TV_RING) || (o_ptr->tval == TV_AMULET))
+		&& ((!(o_ptr->to_h) && !(o_ptr->to_d) && !(o_ptr->to_a)) || (o_ptr->ident & (IDENT_BONUS)))
+		&& (!(o_ptr->pval) || (o_ptr->ident & (IDENT_PVAL))))
+	{
+		object_known(o_ptr);
+	}
+
+	/* Is this all we need to know? - flavoured items */
+	else if (k_info[o_ptr->k_idx].flavor)
 	{
 		object_known(o_ptr);
 	}
@@ -3361,6 +3366,28 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					break;
 				}
 
+				/* Regeneration */
+				case SV_AMULET_REGEN:
+				{
+					/* Bonus to regeneration */
+					o_ptr->pval = 1 + m_bonus(5, level);
+
+					/* Cursed */
+					if (power < 0)
+					{
+						/* Broken */
+						o_ptr->ident |= (IDENT_BROKEN);
+
+						/* Cursed */
+						o_ptr->ident |= (IDENT_CURSED);
+
+						/* Reverse pval */
+						o_ptr->pval = 0 - (o_ptr->pval);
+					}
+
+					break;
+				}
+
 				/* Amulet of ESP -- never cursed */
 				case SV_AMULET_ESP:
 				{
@@ -3658,8 +3685,7 @@ int value_check_aux10(object_type *o_ptr, bool limit, bool weapon)
 	if (!limit || !weapon) for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
 	{
 		/* Skip 'useless' flags */
-		if (j & (TR3_ACTIVATE | TR3_RANDOM | TR3_INSTA_ART |
-			  TR3_EASY_KNOW | TR3_HIDE_TYPE | TR3_SHOW_MODS)) continue;
+		if (j & (TR3_ACTIVATE | TR3_RANDOM | TR3_INSTA_ART)) continue;
 
 		if (((f3) & (j)) && !(rand_int(++count))) { flag1 = 3; flag2 = j;}
 	}
@@ -4781,6 +4807,25 @@ static bool kind_is_race(int k_idx)
 
 	if ((r_ptr->flags1 & (RF1_DROP_GOOD)) && (!kind_is_good(k_idx))) return (FALSE);
 
+	/* Handle mimics differently */
+	if (r_ptr->flags1 & (RF1_CHAR_MULTI))
+	{
+		/* Hack -- act like chest */
+		if (r_ptr->d_char == '&') return (TRUE);
+
+		/* Force char */
+		if (r_ptr->d_char != k_ptr->d_char) return (FALSE);
+
+		/* Allow any attribute */
+		if (r_ptr->flags9 & (RF9_ATTR_INDEX)) return (TRUE);
+
+		/* Force attribute */
+		if (r_ptr->d_attr != k_ptr->d_attr) return (FALSE);
+
+		/* Done */
+		return (TRUE);
+	}
+
 	/* Analyze the item type */
 	switch (k_ptr->tval)
 	{
@@ -4861,10 +4906,6 @@ static bool kind_is_race(int k_idx)
 			return (FALSE);
 		}
 		case TV_SCROLL:
-		{
-			if (r_ptr->d_char == '?') return (TRUE);
-
-		}
 		case TV_RUNESTONE:
 		case TV_MAP:
 		{
@@ -4874,9 +4915,6 @@ static bool kind_is_race(int k_idx)
 
 		/* Rings/Amulets/Crowns */
 		case TV_RING:
-		{
-			if (r_ptr->d_char == '=') return (TRUE);
-		}
 		case TV_AMULET:
 		case TV_CROWN:
 		{
@@ -4887,7 +4925,6 @@ static bool kind_is_race(int k_idx)
 		/* Potions */
 		case TV_POTION:
 		{
-			if (r_ptr->d_char == '!') return (TRUE);
 			if (r_ptr->flags8 & (RF8_DROP_POTION)) return (TRUE);
 			return (FALSE);
 		}
@@ -4946,16 +4983,9 @@ static bool kind_is_race(int k_idx)
 
 		/* Rod/staff/wand */
 		case TV_STAFF:
-		{
-			if (r_ptr->d_char == '_') return (TRUE);
-			if (r_ptr->flags8 & (RF8_DROP_RSW)) return (TRUE);
-			return (FALSE);
-		}
-
 		case TV_ROD:
 		case TV_WAND:
 		{
-			if (r_ptr->d_char == '-') return (TRUE);
 			if (r_ptr->flags8 & (RF8_DROP_RSW)) return (TRUE);
 			return (FALSE);
 		}

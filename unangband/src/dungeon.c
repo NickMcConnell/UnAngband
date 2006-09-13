@@ -273,11 +273,14 @@ static void sense_inventory(void)
 	if (f3 & (TR3_SLOW_DIGEST)) equip_can_flags(0x0L,0x0L,TR3_SLOW_DIGEST,0x0L);
 	else if (!(af3 & (TR3_SLOW_DIGEST))) equip_not_flags(0x0L,0x0L,TR3_SLOW_DIGEST,0x0L);
 
-	if (f3 & (TR3_REGEN)) equip_can_flags(0x0L,0x0L,TR3_REGEN,0x0L);
-	else if (!(af3 & (TR3_REGEN))) equip_not_flags(0x0L,0x0L,TR3_REGEN,0x0L);
+	if (f3 & (TR3_REGEN_HP)) equip_can_flags(0x0L,0x0L,TR3_REGEN_HP,0x0L);
+	else if (!(af3 & (TR3_REGEN_HP))) equip_not_flags(0x0L,0x0L,TR3_REGEN_HP,0x0L);
 
-	if (f4 & (TR4_HUNGER)) equip_can_flags(0x0L,0x0L,0x0L,TR4_HUNGER);
-	else if (!(af4 & (TR4_HUNGER))) equip_not_flags(0x0L,0x0L,0x0L,TR4_HUNGER);
+	if (f3 & (TR3_REGEN_MANA)) equip_can_flags(0x0L,0x0L,TR3_REGEN_MANA,0x0L);
+	else if (!(af3 & (TR3_REGEN_MANA))) equip_not_flags(0x0L,0x0L,TR3_REGEN_MANA,0x0L);
+
+	if (f3 & (TR3_HUNGER)) equip_can_flags(0x0L,0x0L,0x0L,TR3_HUNGER);
+	else if (!(af3 & (TR3_HUNGER))) equip_not_flags(0x0L,0x0L,0x0L,TR3_HUNGER);
 }
 
 
@@ -627,7 +630,6 @@ static void process_world(void)
 	if (!(f_ptr->flags1 & (FF1_HIT_TRAP)) &&
 	    ((f_ptr->blow.method) || (f_ptr->spell)))
 	{
-
 		/* Damage from terrain */
 		hit_trap(p_ptr->py,p_ptr->px);
 	}
@@ -636,7 +638,6 @@ static void process_world(void)
 	if ((p_ptr->paralyzed || (p_ptr->stun >=100) || (p_ptr->psleep >= PY_SLEEP_ASLEEP)) &&
 		(f_ptr->flags2 & (FF2_DEEP | FF2_SHALLOW | FF2_FILLED)))
 	{
-
 		/* Get the mimiced feature */
 		mimic = f_ptr->mimic;
 
@@ -705,10 +706,13 @@ static void process_world(void)
 			i = extract_energy[p_ptr->pspeed] * 2;
 
 			/* Hunger takes more food */
-			if ((p_ptr->cur_flags4 & (TR4_HUNGER)) != 0) i += 100;
+			if ((p_ptr->cur_flags3 & (TR3_HUNGER)) != 0) i += 100;
 
 			/* Regeneration takes more food */
-			if ((p_ptr->cur_flags3 & (TR3_REGEN)) != 0) i += 30;
+			if (p_ptr->regen_hp > 0) i += 30 * p_ptr->regen_hp;
+
+			/* Regeneration takes more food */
+			if (p_ptr->regen_mana > 0) i += 30 * p_ptr->regen_mana;
 
 			/* Slow digestion takes less food */
 			if ((p_ptr->cur_flags3 & (TR3_SLOW_DIGEST)) != 0) i -= 10;
@@ -789,12 +793,6 @@ static void process_world(void)
 		}
 	}	
 
-	/* Regeneration ability */
-	if ((p_ptr->cur_flags3 & (TR3_REGEN)) != 0)
-	{
-		regen_amount = regen_amount * 2;
-	}
-
 	/* Searching or Resting */
 	if (p_ptr->searching || p_ptr->resting)
 	{
@@ -805,7 +803,8 @@ static void process_world(void)
 	if (p_ptr->csp < p_ptr->msp)
 	{
 		if (!(p_ptr->cur_flags3 & (TR3_DRAIN_MANA)) &&
-			!(p_ptr->disease & (DISEASE_DRAIN_MANA))) regenmana(regen_amount);
+			!(p_ptr->disease & (DISEASE_DRAIN_MANA))
+			&& (p_ptr->regen_mana >= 0)) regenmana(regen_amount * (p_ptr->regen_mana + 1));
 	}
 
 	/* Various things interfere with healing */
@@ -821,9 +820,9 @@ static void process_world(void)
 	if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) regen_amount = 0;
 
 	/* Regenerate Hit Points if needed */
-	if (p_ptr->chp < p_ptr->mhp)
+	if ((p_ptr->chp < p_ptr->mhp) && (p_ptr->regen_hp >= 0))
 	{
-		regenhp(regen_amount);
+		regenhp(regen_amount * (p_ptr->regen_hp + 1));
 	}
 
 

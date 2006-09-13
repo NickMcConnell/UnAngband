@@ -1344,7 +1344,7 @@ static void do_cmd_wiz_query(void)
 		{
 			case 'm': mask |= (PLAY_MARK); break;
 			case 'd': mask |= (PLAY_SAFE); break;
-      	      		case 'p': mask |= (PLAY_TMP2); break;
+      	      		case 'p': mask |= (PLAY_MAGI); break;
 			case 'l': mask |= (PLAY_LITE); break;
 			case 's': mask |= (PLAY_SEEN); break;
 			case 't': mask |= (PLAY_TEMP); break;
@@ -1357,9 +1357,9 @@ static void do_cmd_wiz_query(void)
 			case 'g': mask |= (CAVE_GLOW); break;
 			case 'r': mask |= (CAVE_ROOM); break;
 	      	        case 'd': mask |= (CAVE_DLIT); break;
-			case 'l': mask |= (CAVE_LITE); break;
+			case 'l': mask |= (CAVE_HALO); break;
 			case 'm': mask |= (CAVE_MLIT); break;
-			case 'x': mask |= (CAVE_XLIT); break;
+			case 'x': mask |= (CAVE_CLIM); break;
 			case 'f': mask |= (CAVE_XLOF); break;
 			case 's': mask |= (CAVE_XLOS); break;
 			case 'p': play_mask = TRUE; cmd = '\0'; break;

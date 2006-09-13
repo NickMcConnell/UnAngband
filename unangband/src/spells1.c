@@ -1775,6 +1775,8 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 {
 	int inv = (dam / 15) + 1;
 
+	int res = p_ptr->incr_resist[INCR_RES_ACID];
+
 	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_ACID)) != 0)
 	{
@@ -1827,9 +1829,7 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 		/* Sometimes notice */
 		player_can_flags(who, 0x0L,TR2_RES_ACID,0x0L,0x0L);
 
-		dam = (dam + 2) / 3;
-
-		inv /= 2;
+		inv /= res;
 	}
 	else
 	{
@@ -1843,7 +1843,8 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 		/* Monster notices */
 		update_smart_learn(who, SM_OPP_ACID);
 
-		dam = (dam + 2) / 3;
+		/* Increase resistance */
+		res += 3;
 	}
 	else
 	{
@@ -1853,6 +1854,9 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 
 	/* If any armor gets hit, defend the player */
 	if (minus_ac(inv)) dam = (dam + 1) / 2;
+
+	/* Reduce the damage */
+	dam = (dam - res - 1) / res;
 
 	/* Take damage */
 	take_hit(dam, kb_str);
@@ -1868,6 +1872,8 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 {
 	int inv = (dam / 15) + 1;
+
+	int res = p_ptr->incr_resist[INCR_RES_ELEC];
 
 	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_ELEC)) != 0)
@@ -1920,9 +1926,7 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 		/* Sometimes notice */
 		player_can_flags(who, 0x0L,TR2_RES_ELEC,0x0L,0x0L);
 
-		dam = (dam + 2) / 3;
-
-		inv /= 2;
+		inv /= res;
 	}
 	else
 	{
@@ -1936,13 +1940,17 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 		/* Monster notices */
 		update_smart_learn(who, SM_OPP_ELEC);
 
-		dam = (dam + 2) / 3;
+		/* Increase resistance */
+		res += 3;
 	}
 	else
 	{
 		/* Monster notices */
 		update_smart_forget(who, SM_OPP_ELEC);
 	}
+
+	/* Reduce the damage */
+	dam = (dam - res - 1) / res;
 
 	/* Take damage */
 	take_hit(dam, kb_str);
@@ -1960,6 +1968,8 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 {
 	int inv = (dam / 15) + 1;
+
+	int res = p_ptr->incr_resist[INCR_RES_FIRE];
 
 	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_FIRE)) != 0)
@@ -2012,9 +2022,7 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 		/* Sometimes notice */
 		player_can_flags(who, 0x0L,TR2_RES_FIRE,0x0L,0x0L);
 
-		dam = (dam + 2) / 3;
-
-		inv /= 2;
+		inv /= res;
 	}
 	else
 	{
@@ -2028,13 +2036,16 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 		/* Monster notices */
 		update_smart_learn(who, SM_OPP_FIRE);
 
-		dam = (dam + 2) / 3;
+		res += 3;
 	}
 	else
 	{
 		/* Monster notices */
 		update_smart_forget(who, SM_OPP_FIRE);
 	}
+
+	/* Reduce the damage */
+	dam = (dam - res - 1) / res;
 
 	/* Take damage */
 	take_hit(dam, kb_str);
@@ -2050,6 +2061,8 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 {
 	int inv = (dam / 15) + 1;
+
+	int res = p_ptr->incr_resist[INCR_RES_COLD];
 
 	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_COLD)) != 0)
@@ -2102,9 +2115,7 @@ static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 		/* Sometimes notice */
 		player_can_flags(who, 0x0L,TR2_RES_COLD,0x0L,0x0L);
 
-		dam = (dam + 2) / 3;
-
-		inv /= 2;
+		inv /= res;
 	}
 	else
 	{
@@ -2118,13 +2129,16 @@ static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 		/* Monster notices */
 		update_smart_learn(who, SM_OPP_COLD);
 
-		dam = (dam + 2) / 3;
+		res += 3;
 	}
 	else
 	{
 		/* Monster notices */
 		update_smart_forget(who, SM_OPP_COLD);
 	}
+
+	/* Reduce the damage */
+	dam = (dam - res - 1) / res;
 
 	/* Take damage */
 	take_hit(dam, kb_str);
@@ -2138,6 +2152,8 @@ static void cold_dam(int who, int dam, cptr kb_str, bool inven)
  */
 static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 {
+	int res = p_ptr->incr_resist[INCR_RES_POIS];
+
 	(void)inven;
 
 	/* Vulnerability */
@@ -2191,8 +2207,6 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 	{
 		/* Sometimes notice */
 		player_can_flags(who, 0x0L,TR2_RES_POIS,0x0L,0x0L);
-
-		dam = (dam + 2) / 3;
 	}
 	else
 	{
@@ -2206,13 +2220,16 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 		/* Monster notices */
 		update_smart_learn(who, SM_OPP_POIS);
 
-		dam = (dam + 2) / 3;
+		res += 3;
 	}
 	else
 	{
 		/* Monster notices */
 		update_smart_forget(who, SM_OPP_POIS);
 	}
+
+	/* Reduce the damage */
+	dam = (dam - res - 1) / res;
 
 	/* Take damage */
 	take_hit(dam, kb_str);
@@ -2233,6 +2250,8 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 static void water_dam(int who, int dam, cptr kb_str, bool inven)
 {
 	int inv = (dam / 15) /* + 1 */;
+
+	int res = p_ptr->incr_resist[INCR_RES_WATER];
 
 	/* Check for light being wielded */
 	object_type *o_ptr = &inventory[INVEN_LITE];
@@ -2267,6 +2286,29 @@ static void water_dam(int who, int dam, cptr kb_str, bool inven)
 		}
 	}
 
+	/* Resist the damage */
+	if ((p_ptr->cur_flags4 & (TR4_RES_WATER)) != 0)
+	{
+		/* Sometimes notice */
+		player_can_flags(who, 0x0L,0x0L,0x0L,TR4_RES_WATER);
+
+		inv /= res;
+	}
+	else
+	{
+		/* Sometimes notice */
+		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_RES_WATER);
+	}
+
+	/* Resist the damage */
+	if (p_ptr->oppose_water)
+	{
+		res += 3;
+	}
+
+	/* Reduce the damage */
+	dam = (dam - res - 1) / res;
+
 	/* Take damage */
 	take_hit(dam, kb_str);
 
@@ -2275,6 +2317,128 @@ static void water_dam(int who, int dam, cptr kb_str, bool inven)
 }
 
 
+/*
+ * Ignore the effects of terrain under a player.
+ */
+bool player_ignore_terrain(int f_idx)
+{
+	feature_type *f_ptr= &f_info[f_idx];
+
+	/* Hack -- boots provide protection from terrain */
+	object_type *i_ptr = &inventory[INVEN_FEET];
+
+	u32b f1 = 0x0L;
+	u32b f2 = 0x0L;
+	u32b f3 = 0x0L;
+	u32b f4 = 0x0L;
+
+	bool ignore = FALSE;
+
+	/* Get boot flags -- hack: only if terrain not filled */
+	if ((i_ptr->k_idx) && !(f_ptr->flags2 & (FF2_FILLED))) object_flags(i_ptr, &f1, &f2, &f3, &f4);
+
+	/* Check the blow type for terrain */
+	if ((f_ptr->blow.method) && !(f_ptr->flags1 & (FF1_HIT_TRAP)))
+		switch(f_ptr->blow.effect)
+	{
+		case GF_FIRE:
+		case GF_SMOKE:
+		{
+			if ((p_ptr->oppose_fire) || (p_ptr->oppose_lava)) ignore = TRUE;
+			else if (f2 & (TR2_RES_FIRE))
+			{
+				object_can_flags(i_ptr, 0x0L, TR2_RES_FIRE, 0x0L, 0x0L);
+				ignore = TRUE;
+			}
+			else if (p_ptr->cur_flags2 & (TR2_IM_FIRE))
+			{
+				equip_can_flags(0x0L, TR2_IM_FIRE, 0x0L, 0x0L);
+				ignore = TRUE;
+			}
+			break;
+		}
+		case GF_ACID:
+		case GF_VAPOUR:
+		{
+			if (p_ptr->oppose_acid) ignore = TRUE;
+			else if (f2 & (TR2_RES_ACID))
+			{
+				object_can_flags(i_ptr, 0x0L, TR2_RES_ACID, 0x0L, 0x0L);
+				ignore = TRUE;
+			}
+			else if (p_ptr->cur_flags2 & (TR2_IM_ACID))
+			{
+				equip_can_flags(0x0L, TR2_IM_ACID, 0x0L, 0x0L);
+				ignore = TRUE;
+			}
+			break;
+		}
+		case GF_COLD:
+		/* case GF_ICE: */
+		{
+			if (p_ptr->oppose_cold) ignore = TRUE;
+			else if (f2 & (TR2_RES_COLD))
+			{
+				object_can_flags(i_ptr, 0x0L, TR2_RES_COLD, 0x0L, 0x0L);
+				ignore = TRUE;
+			}
+			else if (p_ptr->cur_flags2 & (TR2_IM_COLD))
+			{
+				equip_can_flags(0x0L, TR2_IM_COLD, 0x0L, 0x0L);
+				ignore = TRUE;
+			}
+			break;
+		}
+		case GF_WATER:
+		case GF_WATER_WEAK:
+		case GF_SALT_WATER:
+		{
+			if (p_ptr->oppose_water) ignore = TRUE;
+			else if (f4 & (TR4_RES_WATER))
+			{
+				object_can_flags(i_ptr, 0x0L, 0x0L, 0x0L, TR4_RES_WATER);
+				ignore = TRUE;
+			}
+			break;
+		}
+		case GF_BMUD:
+		case GF_BWATER:
+		case GF_STEAM:
+		{
+			if ((p_ptr->oppose_water) && (p_ptr->oppose_fire)) ignore = TRUE;
+			else if ((f4 & (TR4_RES_WATER)) && (p_ptr->oppose_fire))
+			{
+				object_can_flags(i_ptr, 0x0L, 0x0L, 0x0L, TR4_RES_WATER);
+				ignore = TRUE;
+			}
+			else if ((f2 & (TR2_RES_FIRE)) && (p_ptr->oppose_water))
+			{
+				object_can_flags(i_ptr, 0x0L, TR2_RES_FIRE, 0x0L, 0x0L);
+				ignore = TRUE;
+			}
+			else if ((f4 & (TR4_RES_WATER)) && (f2 & (TR2_RES_FIRE)))
+			{
+				object_can_flags(i_ptr, 0x0L, TR2_RES_FIRE, 0x0L, TR4_RES_WATER);
+				ignore = TRUE;
+			}
+
+			/* Fall through */
+		}
+		case GF_LAVA:
+		{
+			if (p_ptr->oppose_lava) ignore = TRUE;
+			else if (p_ptr->cur_flags2 & (TR2_IM_FIRE))
+			{
+				equip_can_flags(0x0L, TR2_IM_FIRE, 0x0L, 0x0L);
+				ignore = TRUE;
+			}
+
+			break;
+		}
+	}
+
+	return (ignore);
+}
 
 
 

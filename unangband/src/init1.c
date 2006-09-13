@@ -786,7 +786,46 @@ static cptr r_info_flags9[] =
 	"UDUN_MAGIC"
 };
 
-
+#if 0
+/*
+ * Flow flags
+ */
+static cptr flow_flags[] =
+{
+	"FLOW_WALK_WALL",
+	"FLOW_WALK_OOZE",
+	"FLOW_WALK_BASH_OPEN",
+	"FLOW_WALK_BASH",
+	"FLOW_WALK_OPEN",
+	"FLOW_WALK",
+	"FLOW_WALK_FLY",
+	"FLOW_WALK_CLIMB",
+	"FLOW_FLY",
+	"FLOW_WALK_SWIM",
+	"FLOW_SWIM",
+	"FLOW_WALK_DIG",
+	"FLOW_WALK_ACID",
+	"FLOW_WALK_COLD",
+	"FLOW_WALK_ELEC",
+	"FLOW_WALK_FIRE",
+	"FLOW_WALK_FIRE_DIG",
+	"FLOW_WALK_FIRE_SWIM",
+	"FLOW_WALK_NONLIVING",
+	"FLOW_ACID",
+	"FLOW_COLD",
+	"FLOW_DIG",
+	"FLOW_FIRE",
+	"FLOW_FIRE_DIG",
+	"FLOW_FIRE_SWIM",
+	"FLOW_FLY_CHASM",
+	"FLOW_SWIM_DEEP",
+	"FLOW_HURT_FIRE",
+	"FLOW_HURT_WATER",
+	"",
+	"",
+	""
+};
+#endif
 
 /*
  * Monster race flags
@@ -1015,7 +1054,7 @@ static cptr k_info_flags3[] =
 	"SLOW_DIGEST",
 	"FEATHER",
 	"LITE",
-	"REGEN",
+	"REGEN_HP",
 	"TELEPATHY",
 	"SEE_INVIS",
 	"FREE_ACT",
@@ -1027,7 +1066,7 @@ static cptr k_info_flags3[] =
 	"ESP_TROLL",
 	"ESP_UNDEAD",
 	"ESP_NATURE",
-	"IMPACT",
+	"REGEN_MANA",
 	"DRAIN_HP",
 	"DRAIN_MANA",
 	"DRAIN_EXP",
@@ -1037,9 +1076,9 @@ static cptr k_info_flags3[] =
 	"ACTIVATE",
 	"BLESSED",
 	"INSTA_ART",
-	"EASY_KNOW",
-	"HIDE_TYPE",
-	"SHOW_MODS",
+	"HUNGER",
+	"IMPACT",
+	"HAS_ROPE",
 	"THROWING",
 	"LIGHT_CURSE",
 	"HEAVY_CURSE",
@@ -1059,7 +1098,7 @@ static cptr k_info_flags4[] =
 	"VAMP_MANA",
 	"IM_POIS",
 	"RES_DISEASE",
-	"HUNGER",
+	"RES_WATER",
 	"SLAY_MAN",
 	"SLAY_ELF",
 	"SLAY_DWARF",
@@ -2004,6 +2043,10 @@ static errr grab_one_room_race_flag(desc_type *d_ptr, cptr what)
 
 	if (grab_one_offset(&d_ptr->r_flag, r_info_flags9, what) == 0)
 		return (0);
+#if 0
+	if (grab_one_offset(&d_ptr->r_flag, flow_flags, what) == 0)
+		return (0);
+#endif
 
 	/* Oops */
 	msg_format("Unknown room race flag '%s'.", what);
@@ -2238,7 +2281,10 @@ static errr grab_one_feat_flag(feature_type *f_ptr, cptr what)
 
 	if (grab_one_flag(&f_ptr->flags3, f_info_flags3, what) == 0)
 		return (0);
-
+#if 0
+	if (grab_one_flag(&f_ptr->flows, flow_flags, what) == 0)
+		return (0);
+#endif
 	/* Oops */
 	msg_format("Unknown feature flag '%s'.", what);
 
@@ -3548,7 +3594,10 @@ static errr grab_one_basic_flag(monster_race *r_ptr, cptr what)
 
 	if (grab_one_flag(&r_ptr->flags9, r_info_flags9, what) == 0)
 		return (0);
-
+#if 0
+	if (grab_one_flag(&r_ptr->flows, flow_flags, what) == 0)
+		return (0);
+#endif
 	/* Oops */
 	msg_format("Unknown monster flag '%s'.", what);
 
@@ -7018,7 +7067,6 @@ errr eval_r_power(header *head)
 	C_MAKE(power, z_info->r_max, long);
 
 	/* Make sure all arrays start at zero */
-
 	for (i = 0; i < MAX_DEPTH; i++)
 	{
 		tot_hp[i] = 0;
@@ -7027,12 +7075,52 @@ errr eval_r_power(header *head)
 	}
 
 	/*
-	 * Go through r_info and evaluate power ratings.
+	 * Go through r_info and evaluate power ratings & flows.
 	 */
 	for (i = 0; i < z_info->r_max; i++)
 	{
 		/* Point at the "info" */
 		r_ptr = (monster_race*)head->info_ptr + i;
+#if 0
+		/*** Evaluate flows ***/
+
+		/* Evaluate 'unusual' flows */
+		if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL)) r_ptr->flows |= (1L << FLOW_WALK_WALL);
+		if (r_ptr->flags2 & (RF2_MUST_FLY)) r_ptr->flows |= (1L << FLOW_FLY);
+		if (r_ptr->flags2 & (RF2_MUST_SWIM)) r_ptr->flows |= (1L << FLOW_SWIM);
+
+		/* Evaluate walking flows */
+		if ((r_ptr->flags2 & (RF2_MUST_FLY | RF2_MUST_SWIM)) == 0)
+		{
+			/* Use walking */
+			r_ptr->flows |= (1L << FLOW_WALK);
+
+			/* Evaluate walk + other */
+			if (r_ptr->flags2 & (RF2_CAN_DIG)) r_ptr->flows |= (1L << FLOW_WALK_DIG) | (1L << FLOW_DIG);
+			if (r_ptr->flags2 & (RF2_CAN_FLY)) r_ptr->flows |= (1L << FLOW_WALK_FLY) | (1L << FLOW_FLY_CHASM);
+			if (r_ptr->flags2 & (RF2_CAN_SWIM)) r_ptr->flows |= (1L << FLOW_WALK_SWIM) | (1L << FLOW_SWIM);
+			if (r_ptr->flags2 & (RF2_CAN_CLIMB)) r_ptr->flows |= (1L << FLOW_WALK_CLIMB);
+			if (r_ptr->flags2 & (RF2_BASH_DOOR)) r_ptr->flows |= (1L << FLOW_WALK_BASH);
+			if (r_ptr->flags2 & (RF2_OPEN_DOOR)) r_ptr->flows |= (1L << FLOW_WALK_OPEN);
+			if ((r_ptr->flags2 & (RF2_BASH_DOOR)) && (r_ptr->flags2 & (RF2_OPEN_DOOR))) r_ptr->flows |= (1L << FLOW_WALK_BASH_OPEN);
+			if (r_ptr->flags3 & (RF3_OOZE)) r_ptr->flows |= (1L << FLOW_WALK_OOZE);
+			if (r_ptr->flags3 & (RF3_NONLIVING)) r_ptr->flows |= (1L << FLOW_WALK_NONLIVING);
+			if (r_ptr->flags3 & (RF3_IM_ACID)) r_ptr->flows |= (1L << FLOW_WALK_ACID) | (1L << FLOW_ACID);
+			if (r_ptr->flags3 & (RF3_IM_COLD)) r_ptr->flows |= (1L << FLOW_WALK_COLD);
+			if (r_ptr->flags3 & (RF3_IM_ELEC)) r_ptr->flows |= (1L << FLOW_WALK_ELEC);
+
+			/* Evaluate fire immunity flows */
+			if (r_ptr->flags3 & (RF3_IM_FIRE))
+			{
+				/* Use walking + fire immunity */
+				r_ptr->flows |= (1L << FLOW_WALK_FIRE) | (1L << FLOW_FIRE);
+
+				if (r_ptr->flags2 & (RF2_CAN_DIG)) r_ptr->flows |= (1L << FLOW_WALK_FIRE_DIG) | (1L << FLOW_FIRE_DIG);
+				if (r_ptr->flags2 & (RF2_CAN_SWIM)) r_ptr->flows |= (1L << FLOW_WALK_FIRE_SWIM) | (1L << FLOW_FIRE_SWIM);
+			}
+		}
+#endif
+		/*** Evaluate power ratings ***/
 
 		/* Set the current level */
 		lvl = r_ptr->level;
@@ -7227,6 +7315,51 @@ errr eval_e_power(header *head)
 		e_ptr = (ego_item_type*)head->info_ptr + i;
 
 		e_ptr->slay_power = slay_power(slay_index(e_ptr->flags1, e_ptr->flags2, e_ptr->flags3, e_ptr->flags4));
+	}
+
+	/* Success */
+	return(0);
+}
+
+
+/*
+ * Evaluate the feature flows to be stored in f_info.raw
+ */
+errr eval_f_power(header *head)
+{
+	int i;
+	feature_type *f_ptr = NULL;
+#if 0
+	feature_type *f2_ptr = NULL;
+#endif
+
+	/* Precompute values for feature flows */
+	for (i = 0; i < z_info->f_max; i++)
+	{
+		/* Point at the "info" */
+		f_ptr = (feature_type*)head->info_ptr + i;
+
+		/* Some obvious flags */
+		if (f_ptr->flags2 & (FF2_CAN_FLY)) 
+
+
+		/* Evaluate feature blows */
+		switch(f_ptr->blow.effect)
+		{
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
 	}
 
 	/* Success */

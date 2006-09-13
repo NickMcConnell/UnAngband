@@ -3066,7 +3066,14 @@ void monster_death(int m_idx)
 			/* Make an object */
 			if (!make_object(i_ptr, good, great)) continue;
 
-			if (food_type) l_ptr->flags9 |= (RF9_DROP_MUSHROOM);
+			/* Hack -- chest/bag mimics drop matching tvals */
+			if ((r_ptr->flags1 & (RF1_CHAR_MULTI)) && (r_ptr->d_char == '&')) tval_drop_idx = i_ptr->tval;
+
+			/* Hack -- mimics */
+			if (r_ptr->flags1 & (RF1_CHAR_MULTI)) l_ptr->flags1 |= (RF1_CHAR_MULTI);
+
+			/* Learn about drops */
+			else if (food_type) l_ptr->flags9 |= (RF9_DROP_MUSHROOM);
 
 			/* Hack -- ignore bodies */
 			else switch (i_ptr->tval)
@@ -3187,6 +3194,9 @@ void monster_death(int m_idx)
 
 	/* Reset "coin" type */
 	coin_type = 0;
+
+	/* Reset "tval drop" type */
+	tval_drop_idx = 0;
 
 	/* Reset "monster drop" type */
 	race_drop_idx = 0;

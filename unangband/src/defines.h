@@ -2669,9 +2669,9 @@
 #define CAVE_GLOW		0x01	/* self-illuminating */
 #define CAVE_ROOM		0x02	/* part of a room */
 #define CAVE_DLIT		0x04	/* lit by daylight during daytime */
-#define CAVE_LITE		0x08	/* lit by "something" */
+#define CAVE_HALO		0x08	/* lit by glowing feature */
 #define CAVE_MLIT		0x10	/* lit by a monster (or player in multi-player versions) */
-#define CAVE_XLIT		0x20	/* lit by a magical effect */
+#define CAVE_CLIM		0x20	/* location is 'climable' */
 #define CAVE_XLOF		0x40	/* blocks line of fire */
 #define CAVE_XLOS		0x80	/* blocks line of sight */
 
@@ -2680,7 +2680,7 @@
  */
 #define PLAY_MARK		0x01 	/* memorized feature */ 
 #define PLAY_SAFE		0x02 	/* detected as safe */
-#define PLAY_TMP2		0x04 	/* temp2 flag */
+#define PLAY_MAGI		0x04 	/* magical effect */
 #define PLAY_LITE		0x08 	/* lit by the player */
 #define PLAY_SEEN		0x10 	/* seen flag */
 #define PLAY_TEMP		0x20 	/* temp flag */
@@ -2688,13 +2688,40 @@
 #define PLAY_FIRE		0x80 	/* fire flag */
 
 
-/* We always set CAVE_LITE when a location is actually lit: CAVE_DLIT means a location is potentially liteable, and
- * CAVE_XLIT means that a spell effect graphic is displayed - despite the name this does not necessarily lit the
- * location. Any time anything unsets the CAVE_LITE location, all grids within radius 2 must be checked for either
- * a glowing feature, or a monster carrying a light, and all players must be checked to see if the play_lite flag is set.
- * Additionally it must be checked if it is daytime, if the dlit flag is set. This allows whole rooms to be lit during
- * daytime, or just parts of rooms... during night only actual outdoor locations are lit (or nothing during new moon). */
+/*
+ * Special flow values
+ */
+#define FLOW_WALK_WALL		0
+#define FLOW_WALK_OOZE		1
+#define FLOW_WALK_BASH_OPEN	2
+#define FLOW_WALK_BASH		3
+#define FLOW_WALK_OPEN		4
+#define FLOW_WALK		5
+#define FLOW_WALK_FLY		6
+#define FLOW_WALK_CLIMB		7
+#define FLOW_FLY		8	/* Must fly */
+#define FLOW_WALK_SWIM		9
+#define FLOW_SWIM		10	/* Must swim */
+#define FLOW_WALK_DIG		11
+#define FLOW_WALK_ACID		12
+#define FLOW_WALK_COLD		13
+#define FLOW_WALK_ELEC		14
+#define FLOW_WALK_FIRE		15
+#define FLOW_WALK_FIRE_DIG	16
+#define FLOW_WALK_FIRE_SWIM	17
+#define FLOW_WALK_NONLIVING	18
+#define FLOW_ACID		19	/* Fleeing/stays at range + immune acid */
+#define FLOW_COLD		20	/* Fleeing/stays at range + immune cold */
+#define FLOW_DIG		21	/* Fleeing/stays at range + can dig */
+#define FLOW_FIRE		22	/* Fleeing/stays at range + immune fire */
+#define FLOW_FIRE_DIG		23	/* Fleeing/stays at range + immune fire + can dig */
+#define FLOW_FIRE_SWIM		24	/* Fleeing/stays at range + immune fire + can swim */
+#define FLOW_FLY_CHASM		25	/* Fleeing/stays at range + can fly */
+#define FLOW_SWIM_DEEP		26	/* Fleeing/stays at range + can swim */
+#define FLOW_HURT_FIRE		27	/* Hurt_fire --> Blow:FIRE + Adjacent */
+#define FLOW_HURT_WATER		28	/* Hurt_water --> Blow:WATER + Adjacent */
 
+#define MAX_FLOWS		29
 
 
 /*** Room flags ***/
@@ -2981,10 +3008,10 @@
 #define TR2_RES_CHAOS    0x40000000L     /* Resist chaos */
 #define TR2_RES_DISEN    0x80000000L     /* Resist disenchant */
 
-#define TR3_SLOW_DIGEST  0x00000001L     /* Slow digest */
+#define TR3_SLOW_DIGEST	0x00000001L     /* Resist water */
 #define TR3_FEATHER      0x00000002L     /* Feather Falling */
 #define TR3_LITE	0x00000004L     /* Perma-Lite */
-#define TR3_REGEN 	0x00000008L     /* Regeneration */
+#define TR3_REGEN_HP 	0x00000008L     /* Hp Regeneration */
 #define TR3_TELEPATHY    0x00000010L     /* Telepathy */
 #define TR3_SEE_INVIS    0x00000020L     /* See Invis */
 #define TR3_FREE_ACT     0x00000040L     /* Free action */
@@ -2996,7 +3023,7 @@
 #define TR3_ESP_TROLL    0x00001000L     /* Sense trolls */
 #define TR3_ESP_UNDEAD   0x00002000L     /* Sense undead */
 #define TR3_ESP_NATURE   0x00004000L     /* Sense natural */
-#define TR3_IMPACT       0x00008000L     /* Earthquake blows */
+#define TR3_REGEN_MANA   0x00008000L	 /* Mana regeneration */
 #define TR3_DRAIN_HP     0x00010000L     /* Hit point drain */
 #define TR3_DRAIN_MANA   0x00020000L     /* Mana drain */
 #define TR3_DRAIN_EXP    0x00040000L     /* Experience drain */
@@ -3006,9 +3033,9 @@
 #define TR3_ACTIVATE     0x00400000L     /* Item can be activated */
 #define TR3_BLESSED      0x00800000L     /* Item has been blessed */
 #define TR3_INSTA_ART    0x01000000L     /* Item makes an artifact */
-#define TR3_EASY_KNOW    0x02000000L     /* Item is known if aware */
-#define TR3_HIDE_TYPE    0x04000000L     /* Item hides description */
-#define TR3_SHOW_MODS    0x08000000L     /* Item shows Tohit/Todam */
+#define TR3_HUNGER       0x02000000L     /* Item makes the user more hungry */
+#define TR3_IMPACT       0x04000000L     /* Earthquake blows */
+#define TR3_HAS_ROPE     0x08000000L     /* Item has rope attached */
 #define TR3_THROWING	 0x10000000L     /* Item gets shots/might bonus when thrown */
 #define TR3_LIGHT_CURSE  0x20000000L     /* Item has Light Curse */
 #define TR3_HEAVY_CURSE  0x40000000L     /* Item has Heavy Curse */
@@ -3022,7 +3049,7 @@
 #define TR4_VAMP_MANA  	0x00000020L     /* Weapon restores user sp when kills a creature with mana  */
 #define TR4_IM_POIS   	0x00000040L     /* Immune to poison  */
 #define TR4_RES_DISEASE 0x00000080L     /* Resistance to disease  */
-#define TR4_HUNGER      0x00000100L     /* Item makes user eat more food */
+#define TR4_RES_WATER   0x00000100L     /* Resistance to water */
 #define TR4_SLAY_MAN 	0x00000200L     /* Weapon slays humans */
 #define TR4_SLAY_ELF  	0x00000400L     /* Weapon slays elves */
 #define TR4_SLAY_DWARF 	0x00000800L     /* Weapon slays dwarves */
@@ -3047,6 +3074,17 @@
 #define TR4_HURT_FIRE   0x40000000L     /* Item makes wielder vulnerable to fire */
 #define TR4_HURT_COLD   0x80000000L     /* Item makes wielder vulnerable to cold */
 
+/*
+ * Indexes for incremental resists and other incremental abilities.
+ */
+#define INCR_RES_ACID     0     /* Resist acid */
+#define INCR_RES_ELEC     1     /* Resist elec */
+#define INCR_RES_FIRE     2     /* Resist fire */
+#define INCR_RES_COLD     3     /* Resist cold */
+#define INCR_RES_POIS     4     /* Resist poison */
+#define INCR_RES_WATER	  5     /* Resist water */
+
+#define MAX_INCR_RESISTS  6
 
 
 /*
@@ -3089,7 +3127,7 @@
 
 #define TR2_WEAPON_FLAGS 0x0L
 
-#define TR3_WEAPON_FLAGS (TR3_IMPACT | TR3_BLESSED | TR3_THROWING)
+#define TR3_WEAPON_FLAGS (TR3_IMPACT | TR3_BLESSED | TR3_THROWING | TR3_HAS_ROPE)
 
 #define TR4_WEAPON_FLAGS (TR4_VAMP_HP | TR4_VAMP_MANA |\
 			  TR4_BRAND_LITE | TR4_BRAND_DARK | TR4_SLAY_MAN | TR4_SLAY_ELF |\
@@ -3102,8 +3140,7 @@
 
 #define TR2_IGNORE_FLAGS (TR2_WEAPON_FLAGS | TR2_IGNORE_MASK)
 
-#define TR3_IGNORE_FLAGS (TR3_WEAPON_FLAGS | TR3_ACTIVATE | TR3_RANDOM | TR3_INSTA_ART |\
-			  TR3_EASY_KNOW | TR3_HIDE_TYPE | TR3_SHOW_MODS)
+#define TR3_IGNORE_FLAGS (TR3_WEAPON_FLAGS | TR3_ACTIVATE | TR3_RANDOM | TR3_INSTA_ART)
 
 #define TR4_IGNORE_FLAGS (TR4_WEAPON_FLAGS)
 
@@ -4289,13 +4326,9 @@
 
 /*
  * Determine if a given inventory item is "known"
- * Test One -- Check for special "known" tag
- * Test Two -- Check for "Easy Know" + "Aware"
  */
 #define object_known_p(T) \
-	(((T)->ident & (IDENT_KNOWN)) || \
-	 ((k_info[(T)->k_idx].flags3 & (TR3_EASY_KNOW)) && \
-	  k_info[(T)->k_idx].aware))
+	((T)->ident & (IDENT_KNOWN))
 
 /*
  * Determine if a given inventory item is "named"
@@ -4314,7 +4347,7 @@
  * Test Two -- Check for "Easy Know" + "Aware"
  */
 #define object_charges_p(T) \
-	(((T)->ident & (IDENT_KNOWN | IDENT_CHARGES)))
+	((T)->ident & (IDENT_KNOWN | IDENT_CHARGES))
 
 
 /*
@@ -4322,19 +4355,15 @@
  * Test One -- Check for special "known" or "named" tags
  */
 #define object_pval_p(T) \
-	(((T)->ident & (IDENT_KNOWN | IDENT_PVAL)))
+	((T)->ident & (IDENT_KNOWN | IDENT_PVAL))
 
 
 /*
  * Determine if a given inventory item has known bonuses
  * Test One -- Check for special "known" or "bonus" tags
- * Test Two -- Check for "Easy Know" + "Aware"
  */
 #define object_bonus_p(T) \
-	(((T)->ident & (IDENT_KNOWN | IDENT_BONUS)) || \
-	 ((k_info[(T)->k_idx].flags3 & (TR3_EASY_KNOW)) && \
-	  k_info[(T)->k_idx].aware))
-
+	((T)->ident & (IDENT_KNOWN | IDENT_BONUS))
 
 
 /*

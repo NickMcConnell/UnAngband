@@ -1991,9 +1991,12 @@ void hit_trap(int y, int x)
 		}
 	}
 
-	/* Regular traps */
+	/* Regular traps / terrain */
 	else
 	{
+		/* Player floats on terrain */
+		if (player_ignore_terrain(feat)) return;
+
 		if (strlen(text))
 		{
 			/* Message */
@@ -2747,11 +2750,20 @@ void move_player(int dir, int jumping)
 
 #endif /* ALLOW_EASY_ALTER */
 
+	/* Petrified */
+	else if (p_ptr->petrify)
+	{
+		/* Disturb the player */
+		disturb(0, 0);
+
+		msg_print("You are too petrified to move.");
+		return;
+	}
+
 	/* Player can not walk through "walls" */
 	/* Also cannot climb over unknown "trees/rubble" */
 	else if (!(f_ptr->flags1 & (FF1_MOVE))
-	&& (!(f_ptr->flags3 & (FF3_EASY_CLIMB))
-	|| !(play_info[y][x] & (PLAY_MARK))))
+	&& (!(f_ptr->flags3 & (FF3_EASY_CLIMB)) || !(play_info[y][x] & (PLAY_MARK))))
 	{
 		if ((verify_safe) && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
 		{
@@ -2807,16 +2819,6 @@ void move_player(int dir, int jumping)
 				((f_ptr->flags2 & (FF2_FILLED)) ? "" :
 				(is_a_vowel(name[0]) ? "an " : "a ")),name);
 		}
-	}
-
-	/* Petrified */
-	else if (p_ptr->petrify)
-	{
-		/* Disturb the player */
-		disturb(0, 0);
-
-		msg_print("You are too petrified to move.");
-		return;
 	}
 
 	/* Partial movement */

@@ -274,6 +274,7 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 				case TR3_PERMA_CURSE:
 					(*f3) |= TR3_HEAVY_CURSE;
 					/* Fall through */
+				case TR3_HUNGER:
 				case TR3_TELEPORT:
 				case TR3_DRAIN_MANA:
 				case TR3_DRAIN_HP:
@@ -292,7 +293,10 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 			switch (object_xtra_base[o_ptr->xtra1] << o_ptr->xtra2)
 			{
 				case TR4_BRAND_LITE:
-					(*f3) |= (TR3_LITE);
+					(*f3) |= TR3_LITE;
+					break;
+				case TR4_RES_WATER:
+					(*f2) |= TR2_IGNORE_WATER;
 					break;
 				case TR4_VAMP_HP:
 					(*f3) |= (TR3_DRAIN_HP | TR3_LIGHT_CURSE);
@@ -302,7 +306,6 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 					break;
 				case TR4_HURT_WATER:
 				case TR4_HURT_LITE:
-				case TR4_HUNGER:
 				case TR4_ANCHOR:
 				case TR4_SILENT:
 				case TR4_STATIC:
@@ -1751,6 +1754,18 @@ static const o_flag_desc pval_flags1_desc[] =
 
 
 /*
+ * Besides stats, these are the other player traits
+ * which may be affected by an object's pval
+ */
+static const o_flag_desc pval_flags3_desc[] =
+{
+	{ TR3_LITE,       "light radius" },
+	{ TR3_REGEN_HP,       "hitpoint regeneration" },
+	{ TR3_REGEN_MANA,     "mana regeneration" },
+};
+
+
+/*
  * Slays(x3 damage) for weapons
  */
 static const o_flag_desc slayx3_flags1_desc[] =
@@ -1964,8 +1979,6 @@ static const o_flag_desc misc_flags3_desc[] =
 {
 	{ TR3_SLOW_DIGEST,	"slow digestion" },
 	{ TR3_FEATHER,		"feather falling" },
-	{ TR3_LITE,	     "brighter light" },
-	{ TR3_REGEN,		"regeneration" },
 	{ TR3_TELEPATHY,	"telepathy" },
 	{ TR3_SEE_INVIS,	"see invisible" }
 };
@@ -2026,6 +2039,7 @@ static const o_flag_desc ignore_flags2_desc[] =
  */
 static const o_flag_desc bad_flags3_desc[] =
 {
+	{ TR3_HUNGER,		"hunger" },
 	{ TR3_TELEPORT,		"random teleportation" },
 	{ TR3_AGGRAVATE,	"aggravation" },
 	{ TR3_DRAIN_HP,		"health drain" },
@@ -2039,7 +2053,6 @@ static const o_flag_desc bad_flags3_desc[] =
  */
 static const o_flag_desc bad_flags4_desc[] =
 {
-	{ TR4_HUNGER,		"hunger" },
 	{ TR4_ANCHOR,		"inability to teleport" },
 	{ TR4_SILENT,		"inability to cast spells" },
 	{ TR4_STATIC,       	"inability to use magical devices" },
@@ -2358,6 +2371,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 
 		/* And now the "rest" */
 		list_ptr = spoiler_flag_aux(f1, pval_flags1_desc, list_ptr, N_ELEMENTS(pval_flags1_desc));
+
+		/* And now the "rest" */
+		list_ptr = spoiler_flag_aux(f3, pval_flags3_desc, list_ptr, N_ELEMENTS(pval_flags3_desc));
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -5724,6 +5740,19 @@ s32b object_power(const object_type *o_ptr)
 		}
 
 		case TV_BOOTS:
+		{
+			/* Bonus for resistance on boots due to terrain protection */
+			ADD_POWER("resist acid",	 3, TR2_RES_ACID, 2, );
+#if 0
+			ADD_POWER("resist elec",	 5, TR2_RES_ELEC, 2, );
+#endif
+			ADD_POWER("resist fire",	 3, TR2_RES_FIRE, 2, );
+			ADD_POWER("resist cold",	 1, TR2_RES_COLD, 2, );
+			ADD_POWER("resist water",	 3, TR2_RES_COLD, 4, );
+
+			/* Fall through */
+		}
+
 		case TV_CLOAK:
 		{
 			/* Bonus as we may choose to use a swap armour */
@@ -5999,7 +6028,7 @@ s32b object_power(const object_type *o_ptr)
 		}
 		if (f1 & TR1_CHR)
 		{
-			p += o_ptr->pval * o_ptr->pval / 8; /* Was o_ptr->pval */
+			p += o_ptr->pval * o_ptr->pval / 4; /* Was o_ptr->pval */
 		}
 		if (f1 & TR1_SAVE)
 		{
@@ -6020,12 +6049,19 @@ s32b object_power(const object_type *o_ptr)
 		/* For now add very small amount for searching */
 		if (f1 & TR1_SEARCH)
 		{
-			p += (o_ptr->pval * o_ptr->pval) / 12; /* Was o_ptr->pval / 6 */
+			p += o_ptr->pval * o_ptr->pval / 12;
 		}
-		/* For now add very small amount for infravision */
-		if (f1 & TR1_INFRA)
+		if (f3 & TR3_REGEN_HP)
 		{
-			p += (o_ptr->pval * o_ptr->pval) / 8; /* Was o_ptr->pval */
+			p += (o_ptr->pval * o_ptr->pval) * 3 / 2; /* Was constant 3 */
+		}
+		if (f3 & TR3_REGEN_MANA)
+		{
+			p += (o_ptr->pval * o_ptr->pval) * 3 / 2; /* Was constant 3 */
+		}
+		if (f3 & TR3_LITE)
+		{
+			p += (o_ptr->pval * o_ptr->pval) * 3; /* Was constant 3 */
 		}
 	}
 
@@ -6043,6 +6079,9 @@ s32b object_power(const object_type *o_ptr)
 		if (f1 & TR1_TUNNEL) p += o_ptr->pval;
 		if (f1 & TR1_SEARCH) p += o_ptr->pval;
 		if (f1 & TR1_INFRA) p += o_ptr->pval;
+		if (f3 & TR3_REGEN_HP) p -= 16;
+		if (f3 & TR3_REGEN_MANA) p -= 8;
+		if (f3 & TR3_LITE) p += 3 * o_ptr->pval;
 	}
 
 	if (f1 & TR1_SPEED)
@@ -6082,7 +6121,6 @@ s32b object_power(const object_type *o_ptr)
 	ADD_POWER("free action",	 7, TR3_FREE_ACT, 3, high_resists++);
 	ADD_POWER("hold life",		 6, TR3_HOLD_LIFE, 3, high_resists++);
 	ADD_POWER("feather fall",	 2, TR3_FEATHER, 3,); /* was 2 */
-	ADD_POWER("permanent light",     4, TR3_LITE, 3,); /* was 2 */
 
 	ADD_POWER("see invisible",	 4, TR3_SEE_INVIS, 3,);
 	ADD_POWER("sense orcs",	  	3, TR3_ESP_ORC, 3,);
@@ -6117,11 +6155,11 @@ s32b object_power(const object_type *o_ptr)
 	ADD_POWER("resist nether",	10, TR2_RES_NETHR, 2, high_resists++);
 	ADD_POWER("resist chaos",	10, TR2_RES_CHAOS, 2, high_resists++);
 	ADD_POWER("resist disenchantment", 10, TR2_RES_DISEN, 2, high_resists++);
+	ADD_POWER("resist disease", 10, TR4_RES_DISEASE, 4, high_resists++);
+	ADD_POWER("resist water",	5, TR4_RES_WATER, 4, high_resists++);
 
 	/* Add bonus for sustains getting 'high_resists-lock' */
 	if (high_resists > 1) p += high_resists * high_resists / 2;
-
-	ADD_POWER("regeneration",	 4, TR3_REGEN, 3,);
 
 	ADD_POWER("teleportation",	 -40, TR3_TELEPORT, 3,);
 	ADD_POWER("drain experience",	 -20, TR3_DRAIN_EXP, 3,);
@@ -6134,7 +6172,7 @@ s32b object_power(const object_type *o_ptr)
 /*	ADD_POWER("permanent curse",	 -40, TR3_PERMA_CURSE, 3,);*/
 	ADD_POWER("light vulnerability", -30, TR4_HURT_LITE, 4,);
 	ADD_POWER("water vulnerability", -30, TR4_HURT_WATER, 4,);
-	ADD_POWER("hunger",	 	 -15, TR4_HUNGER, 4,);
+	ADD_POWER("hunger",	 	 -15, TR3_HUNGER, 3,);
 	ADD_POWER("anchor",	 	 -4, TR4_ANCHOR, 4,);
 	ADD_POWER("silent",	 	 -20, TR4_SILENT, 4,);
 	ADD_POWER("static",	 	 -15, TR4_STATIC, 4,);
