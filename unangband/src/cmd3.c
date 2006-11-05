@@ -2173,6 +2173,19 @@ bool ang_sort_comp_hook(vptr u, vptr v, int a, int b)
 		if (z1 > z2) return (FALSE);
 	}
 
+	/* Sort by monster power and threat combined */
+	if (*why >= 2)
+	{
+		/* Extract power and highest threat */
+		z1 = r_info[w1].power + r_info[w1].highest_threat;
+		z2 = r_info[w2].power + r_info[w2].highest_threat;
+
+		/* Compare levels */
+		if (z1 < z2) return (TRUE);
+		if (z1 > z2) return (FALSE);
+	}
+
+
 
 	/* Compare indexes */
 	return (w1 <= w2);

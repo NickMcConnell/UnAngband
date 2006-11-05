@@ -83,6 +83,8 @@ Matthias Rudolf).
 
 - Fixed bug preventing resist disease magical items from being generated.
 
+- Fixed a number of monsters so they get to use their spells or innate ranged abilities.
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.

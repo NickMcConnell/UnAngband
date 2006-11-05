@@ -6141,6 +6141,123 @@ errr eval_info(eval_info_power_func eval_info_process, header *head)
 
 
 
+static long eval_blow_effect(int effect, int atk_dam, int rlev)
+{
+	switch (effect)
+	{
+		/*other bad effects - minor*/
+		case GF_EAT_GOLD:
+		case GF_EAT_ITEM:
+		case GF_EAT_FOOD:
+		case GF_EAT_LITE:
+		case GF_LOSE_CHR:
+		case GF_WIND:
+		{
+			atk_dam += 5;
+			break;
+		}
+		/*other bad effects - poison / disease */
+		case GF_DISEASE:
+		case GF_POIS:
+		case GF_ICE:
+		case GF_SHARD:
+		{
+			atk_dam *= 5;
+			atk_dam /= 4;
+			atk_dam += 5;
+			break;
+		}
+		/*other bad effects - elements / sustains*/
+		case GF_TERRIFY:
+		case GF_ACID:
+		case GF_ELEC:
+		case GF_FIRE:
+		case GF_COLD:
+		case GF_HUNGER:
+		case GF_LOSE_MANA:
+		case GF_LITE:
+		case GF_DARK:
+		case GF_SLOW:
+		{
+			atk_dam += 10;
+			break;
+		}
+		/*other bad effects - major*/
+		case GF_PLASMA:
+		case GF_WATER:
+		case GF_SOUND:
+		case GF_NEXUS:
+		case GF_BLIND:
+		case GF_LAVA:
+		case GF_CONFUSION:
+		case GF_LOSE_STR:
+		case GF_LOSE_INT:
+		case GF_LOSE_WIS:
+		case GF_LOSE_DEX:
+		case GF_HALLU:
+		{
+			atk_dam += 20;
+			break;
+		}
+		/*other bad effects - major*/
+		case GF_GRAVITY:
+		case GF_INERTIA:
+		case GF_FORCE:
+		case GF_NETHER:
+		case GF_DISENCHANT:
+		case GF_UN_BONUS:
+		case GF_UN_POWER:
+		case GF_LOSE_CON:
+		{
+			atk_dam += 30;
+			break;
+		}
+		/*other bad effects - major*/
+		case GF_PARALYZE:
+		case GF_LOSE_ALL:
+		{
+			atk_dam += 40;
+			break;
+		}
+		/* Experience draining attacks */
+		case GF_EXP_10:
+		case GF_EXP_20:
+		{
+			atk_dam += 1000 / (rlev + 1);
+			break;
+		}
+		case GF_CHAOS:
+		case GF_TIME:
+		case GF_EXP_40:
+		case GF_EXP_80:
+		{
+			atk_dam += 2000 / (rlev + 1);
+			break;
+		}
+		/*Earthquakes*/
+		case GF_SHATTER:
+		{
+			atk_dam += 300;
+			break;
+		}
+		/* No damage normally */
+		case GF_LITE_WEAK:
+		case GF_DARK_WEAK:
+		case GF_WATER_WEAK:
+		case GF_SALT_WATER:
+		case GF_BLIND_WEAK:
+		{
+			atk_dam = 5;
+		}
+		/*nothing special*/
+		default: break;
+	}
+
+	return (atk_dam);
+}
+
+
+
 /*
  * Go through the attack types for this monster.
  * We look for the maximum possible maximum damage that this
@@ -6219,7 +6336,9 @@ static long eval_max_dam(monster_race *r_ptr)
 		/* using 32 assumes a u32b flag size*/
 		for (i = 0; i < 32; i++)
 		{
-			u16b this_dam = 0;
+			int this_dam;
+
+			this_dam = 0;
 
 			/* We count ranged blows later */
 			if (!(x) && ((flag <= RF4_BLOW_4) || (flag == RF4_EXPLODE) || (flag == RF4_AURA))) continue;
@@ -6377,7 +6496,7 @@ static long eval_max_dam(monster_race *r_ptr)
 
 						}
 
-						this_dam = (this_dam * mult) / div_by;
+						this_dam = eval_blow_effect(which_gf, (this_dam * mult) / div_by, r_ptr->level);
 
 						/* Slight bonus for being powerful */
 						if (r_ptr->flags2 & (RF2_POWERFUL)) this_dam = this_dam * 8 / 7;
@@ -6391,25 +6510,25 @@ static long eval_max_dam(monster_race *r_ptr)
 					{
 						case 0:
 						{
-							this_dam = r_ptr->spell_power * spell_info_RF4[i][COL_SPELL_DAM_MULT];
+							this_dam = eval_blow_effect(spell_desire_RF4[i][6], r_ptr->spell_power * spell_info_RF4[i][COL_SPELL_DAM_MULT], r_ptr->level);
 							this_dam /=  MAX(1, spell_info_RF4[i][COL_SPELL_DAM_DIV]);
 							break;
 						}
 						case 1:
 						{
-							this_dam = r_ptr->spell_power * spell_info_RF5[i][COL_SPELL_DAM_MULT];
+							this_dam = eval_blow_effect(spell_desire_RF5[i][6], r_ptr->spell_power * spell_info_RF5[i][COL_SPELL_DAM_MULT], r_ptr->level);
 							this_dam /=  MAX(1, spell_info_RF5[i][COL_SPELL_DAM_DIV]);
 							break;
 						}
 						case 2:
 						{
-							this_dam = r_ptr->spell_power * spell_info_RF6[i][COL_SPELL_DAM_MULT];
+							this_dam = eval_blow_effect(spell_desire_RF6[i][6], r_ptr->spell_power * spell_info_RF6[i][COL_SPELL_DAM_MULT], r_ptr->level);
 							this_dam /=  MAX(1, spell_info_RF6[i][COL_SPELL_DAM_DIV]);
 							break;
 						}
 						case 3:
 						{
-							this_dam = r_ptr->spell_power * spell_info_RF7[i][COL_SPELL_DAM_MULT];
+							this_dam = eval_blow_effect(spell_desire_RF7[i][6], r_ptr->spell_power * spell_info_RF7[i][COL_SPELL_DAM_MULT], r_ptr->level);
 							this_dam /=  MAX(1, spell_info_RF7[i][COL_SPELL_DAM_DIV]);
 							break;
 						}
@@ -6516,8 +6635,8 @@ static long eval_max_dam(monster_race *r_ptr)
 			if (this_dam)
 			{
 				int freq;
-				int need_mana;
-				int has_ammo;
+				int need_mana = 0;
+				int has_ammo = 0;
 
 				/* Get frequency */
 				if ((x == 0) && (flag_counter & innate_mask)) freq = r_ptr->freq_innate;
@@ -6536,30 +6655,12 @@ static long eval_max_dam(monster_race *r_ptr)
 				else if (x == 2) need_mana = spell_info_RF6[i][0];
 				else if (x == 3) need_mana = spell_info_RF7[i][0];
 
-				/* Get ammo required */
-				if ((x == 0) & (i < 4))
+				/* Paranoia */
+				if ((need_mana) && !(r_ptr->mana))
 				{
-					switch (i)
-					{
-						case RBM_BOULDER:
-						case RBM_FLASK:
-						{
-							has_ammo = (r_ptr->level + 1) / 2;
-						}
-						case RBM_SPORE:
-						case RBM_ARROW:
-						case RBM_XBOLT:
-						case RBM_SPIKE:
-						case RBM_DART:
-						case RBM_SHOT:
-						{
-							has_ammo = r_ptr->level;
-						}
-					}
+					r_ptr->highest_threat = 30000;
+					r_ptr->best_threat = 96 + x * 32 + i;
 				}
-
-				/* Archers get more shots */
-				if (r_ptr->flags2 & (RF2_ARCHER)) has_ammo *= 2;
 
 				/* Adjust frequency for ammo */
 				if (has_ammo * 5 < freq) freq = has_ammo * 5;
@@ -6595,8 +6696,8 @@ static long eval_max_dam(monster_race *r_ptr)
 		}
 	}
 
-	/* Only do if it has attacks */
-	if (!(r_ptr->flags1 & (RF1_NEVER_BLOW)))
+	/* Check attacks */
+	if (TRUE)
 	{
 		for (i = 0; i < 4; i++)
 		{
@@ -6644,113 +6745,8 @@ static long eval_max_dam(monster_race *r_ptr)
 				}
 			}
 
-			switch (effect)
-			{
-				/*other bad effects - minor*/
-				case GF_EAT_GOLD:
-				case GF_EAT_ITEM:
-				case GF_EAT_FOOD:
-				case GF_EAT_LITE:
-				case GF_LOSE_CHR:
-				case GF_WIND:
-				{
-					atk_dam += 5;
-					break;
-				}
-				/*other bad effects - poison / disease */
-				case GF_DISEASE:
-				case GF_POIS:
-				case GF_ICE:
-				case GF_SHARD:
-				{
-					atk_dam *= 5;
-					atk_dam /= 4;
-					atk_dam += 5;
-					break;
-				}
-				/*other bad effects - elements / sustains*/
-				case GF_TERRIFY:
-				case GF_ACID:
-				case GF_ELEC:
-				case GF_FIRE:
-				case GF_COLD:
-				case GF_HUNGER:
-				case GF_LOSE_MANA:
-				case GF_LITE:
-				case GF_DARK:
-				case GF_SLOW:
-				{
-					atk_dam += 10;
-					break;
-				}
-				/*other bad effects - major*/
-				case GF_PLASMA:
-				case GF_WATER:
-				case GF_SOUND:
-				case GF_NEXUS:
-				case GF_BLIND:
-				case GF_LAVA:
-				case GF_CONFUSION:
-				case GF_LOSE_STR:
-				case GF_LOSE_INT:
-				case GF_LOSE_WIS:
-				case GF_LOSE_DEX:
-				case GF_EXP_10:
-				case GF_HALLU:
-				{
-					atk_dam += 20;
-					break;
-				}
-				/*other bad effects - major*/
-				case GF_GRAVITY:
-				case GF_INERTIA:
-				case GF_FORCE:
-				case GF_NETHER:
-				case GF_CHAOS:
-				case GF_DISENCHANT:
-				case GF_UN_BONUS:
-				case GF_UN_POWER:
-				case GF_LOSE_CON:
-				case GF_EXP_20:
-				{
-					atk_dam += 30;
-					break;
-				}
-				/*other bad effects - major*/
-				case GF_TIME:
-				case GF_PARALYZE:
-				case GF_LOSE_ALL:
-				case GF_EXP_40:
-				case GF_EXP_80:
-				{
-					atk_dam += 40;
-					break;
-				}
-
-
-				/*Earthquakes*/
-				case GF_SHATTER:
-				{
-					atk_dam += 300;
-					break;
-				}
-
-				/* No damage normally */
-				case GF_LITE_WEAK:
-				case GF_DARK_WEAK:
-				case GF_WATER_WEAK:
-				case GF_SALT_WATER:
-				case GF_BLIND_WEAK:
-				{
-					atk_dam = 5;
-				}
-
-				/*nothing special*/
-				default: break;
-			}
-
 			/* Normal melee attack */
-			if (method < RBM_MAX_NORMAL)
+			if ((method < RBM_MAX_NORMAL) && !(r_ptr->flags1 & (RF1_NEVER_BLOW)))
 			{
 				/* Keep a running total */
 				melee_dam += atk_dam;
@@ -6759,7 +6755,7 @@ static long eval_max_dam(monster_race *r_ptr)
 			/* Ranged attacks can also apply spell dam */
 			if (method > RBM_MIN_RANGED)
 			{
-				int range = MAX_SIGHT, mana = 0;
+				int range = MAX_SIGHT, mana = 0, has_ammo = 0, freq;
 				bool must_hit = FALSE;
 
 				/* Hack - record most damaging spell for diagnostics */
@@ -6778,13 +6774,13 @@ static long eval_max_dam(monster_race *r_ptr)
 					case RBM_SPIT:	mana = 0; must_hit = TRUE; break;
 					case RBM_GAZE:	mana = 3; range = MIN(MAX_SIGHT, r_ptr->aaf);break;
 					case RBM_WAIL:  mana = 5; range = 4; break;
-					case RBM_SPORE:	mana = 0; range = 3; must_hit = TRUE; break;
+					case RBM_SPORE:	mana = 0; range = 3; must_hit = TRUE; has_ammo = r_ptr->level; break;
 					case RBM_LASH:  mana = 0; range = 3; break;
 					case RBM_BEG:	mana = 0; range = 4; break;
 					case RBM_INSULT: mana = 0; range = 4; break;
 					case RBM_SING:  mana = 0; range = 4; break;
 					case RBM_TRAP:  mana = 0; range = 1; break;
-					case RBM_BOULDER: mana = 0; range = 8; must_hit = TRUE; break;
+					case RBM_BOULDER: mana = 0; range = 8; must_hit = TRUE; has_ammo = (r_ptr->level + 1) / 2; break;
 					case RBM_AURA:	mana = 4; range = 2; break;
 					case RBM_SELF:	mana = 3; range = 0; break;
 					case RBM_ADJACENT: mana = 3; range = 1; break;
@@ -6813,15 +6809,18 @@ static long eval_max_dam(monster_race *r_ptr)
 					case RBM_CROSS: mana = 4; range = MAX_SIGHT; break;
 					case RBM_STRIKE: mana = 5; range = MAX_SIGHT; break;
 					case RBM_EXPLODE: mana = 0; range = 1; break;
-					case RBM_ARROW: mana = 0; range = 10; must_hit = TRUE; break;
-					case RBM_XBOLT: mana = 0; range = 12; must_hit = TRUE; break;
-					case RBM_SPIKE: mana = 0; range = 4; must_hit = TRUE; break;
-					case RBM_DART: mana = 0; range = 8; must_hit = TRUE; break;
+					case RBM_ARROW: mana = 0; range = 10; must_hit = TRUE; has_ammo = r_ptr->level; break;
+					case RBM_XBOLT: mana = 0; range = 12; must_hit = TRUE; has_ammo = r_ptr->level; break;
+					case RBM_SPIKE: mana = 0; range = 4; must_hit = TRUE; has_ammo = r_ptr->level; break;
+					case RBM_DART: mana = 0; range = 8; must_hit = TRUE; has_ammo = r_ptr->level; break;
 					case RBM_SHOT: mana = 0; range = 8; must_hit = TRUE; break;
 					case RBM_ARC_20: mana = 6; range = 8; break;
 					case RBM_ARC_30: mana = 5; range = 6; break;
-					case RBM_FLASK:	mana = 0; range = 6; must_hit = TRUE; break;
+					case RBM_FLASK:	mana = 0; range = 6; must_hit = TRUE; has_ammo = (r_ptr->level + 1) / 2; break;
 				}
+
+				/* Archers get more shots */
+				if (r_ptr->flags2 & (RF2_ARCHER)) has_ammo *= 2;
 
 				/* Scale if needs to hit */
 				if (must_hit && !(r_ptr->flags9 & (RF9_NEVER_MISS)))
@@ -6836,8 +6835,46 @@ static long eval_max_dam(monster_race *r_ptr)
 				else
 					atk_dam = atk_dam * (3 + range) + atk_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / (7 - range);
 
-				/* Scale for mana requirement */
-				if (mana * 10 > r_ptr->mana) atk_dam = atk_dam * r_ptr->mana / (mana * 10);
+				/* Get frequency */
+				freq = r_ptr->freq_innate;
+
+				/* Paranoia */
+				if (!freq)
+				{
+					r_ptr->highest_threat = 30000;
+					r_ptr->best_threat = 96 + i;
+				}
+
+				/* Paranoia */
+				if ((mana) && !(r_ptr->mana))
+				{
+					r_ptr->highest_threat = 30000;
+					r_ptr->best_threat = 96 + i;
+				}
+
+				/* Adjust frequency for ammo */
+				if (has_ammo * 5 < freq) freq = has_ammo * 5;
+
+				/* Adjust frequency for mana -- casters that can add mana and need to do so */
+				if ((r_ptr->flags6 & (RF6_ADD_MANA)) && (mana) && (freq > r_ptr->mana * 10 / mana))
+				{
+					freq = MIN(freq, (freq + r_ptr->mana * 10 / mana) / 2);
+				}
+
+				/* Adjust frequency for mana */
+				else if (mana)
+				{
+					freq = MIN(freq, r_ptr->mana * 10 / mana);
+				}
+
+				/* Hack -- always get 1 shot */
+				if (freq < 10) freq = 10;
+
+				/* Hack -- aura frequency */
+				if (method == RBM_AURA) freq += 100;
+
+				/* Adjust for frequency */
+				atk_dam = atk_dam * freq / 100;
 
 				/* Best ranged attack? */
 				if (atk_dam > spell_dam)
@@ -6853,7 +6890,6 @@ static long eval_max_dam(monster_race *r_ptr)
 				/* Keep a running total */
 				melee_dam += 3 * atk_dam;
 			}
-
 		}
 
 		/* Hack - record most damaging spell for diagnostics */
@@ -7206,7 +7242,20 @@ errr eval_r_power(header *head)
 
 		/* Hack -- set exp */
 		if (lvl == 0) r_ptr->mexp = 0L;
-		else r_ptr->mexp = (hp * dam) / (lvl * 25);
+		else
+		{
+			r_ptr->mexp = (hp * dam) / (lvl * 25);
+
+			/* Round to 2 significant figures */
+			if (r_ptr->mexp > 100)
+			{
+				if (r_ptr->mexp < 1000) { r_ptr->mexp = (r_ptr->mexp + 5) / 10; r_ptr->mexp *= 10; }
+				else if (r_ptr->mexp < 10000) { r_ptr->mexp = (r_ptr->mexp + 50) / 100; r_ptr->mexp *= 100; }
+				else if (r_ptr->mexp < 100000) { r_ptr->mexp = (r_ptr->mexp + 500) / 1000; r_ptr->mexp *= 1000; }
+				else if (r_ptr->mexp < 1000000) { r_ptr->mexp = (r_ptr->mexp + 5000) / 10000; r_ptr->mexp *= 10000; }
+				else if (r_ptr->mexp < 10000000) { r_ptr->mexp = (r_ptr->mexp + 50000) / 100000; r_ptr->mexp *= 100000; }
+			}
+		}
 
 		if ((lvl) && (r_ptr->mexp < 1L)) r_ptr->mexp = 1L;
 
