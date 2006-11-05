@@ -42,8 +42,6 @@ TODO: Create set items as per Sangband, but including sets of dragon armor.
 
 TODO: Assemblies that can be build into objects of any type.
 
-TODO: Allow research of spells without a spellbook.
-
 TODO: SHIELD blocks magic missiles completely.
 
 TODO: Improve self-knowledge so that it tells you what the impact of an effect is: You are blind,
@@ -51,8 +49,6 @@ which prevents you reading scrolls or casting spells from books or rune-stones.
 
 TODO: DEAFEN effect? POLYMORPH player. FURY effect (no spellcasting or
 throwing/missile weapons). 
-
-TODO: Berserk should prevent you and monsters from spellcasting or throwing/missile weapons.
 
 TODO: Elemental effects that cause more than 100 hp damage should prevent you using certain types
 of objects the next round.
@@ -129,8 +125,6 @@ TODO:Implement mana regeneration, searching, detection etc. as a spell effect.
 
 TODO:Implement monster spellbooks, so that monsters can cast all ACID_MAGIC
 etc. spells.
-
-TODO: Players pick their own stats when they advance a level.
 
 TODO: Drop chunks of metals and large jewels for manufacturing purposes.
 
@@ -921,12 +915,6 @@ This occurs even if you are immune. This can also be associated with room types,
 when you activate an item / cast a spell that does more than this in damage. Wind causes windy
 effect preventing missiles/throwing.
 
-TODO: High level bird from Zangband.
-
-The Shantak (L.Dark 'B')
-=== Num:434 Lev:27 Rar:2 Spd:+10 Hp:25d20 Ac:55 Exp:280
-A scaly bird larger than an elephants, with a horse-like head. It is normally found on dungeon level 27, and moves quickly. A kill of this sanity-blasting natural evil creature is worth about 2520.00 points for a 1st level character. It is magical, casting spells which terrify or haste-self; 1 time in 6. It is suitable for riding. It resists acid. it won't evolve. It is fairly observant of intruders, which it may notice from 120 feet. It can bite to attack with damage 1d6, bite to attack with damage 1d6, and bite to attack with damage 1d6. (Hengband 1.6.0)
-
 TODO: Allow monsters to ride other monsters.
 
 We display this by 'shimmering' both the ATTR and CHAR of both the riding and ridden monster.
@@ -1009,10 +997,6 @@ SV_MATERIAL_STONE – a large #; rings
 Some items are generated with {empty socket}. This can have an SV_MATERIAL_STONE applied
 to it. The resulting item also gets the abilities of the ring applied to it that is
 associated with the stone.
-
-Mushrooms can be applied to 1 sword / polearm or up to 5 arrows/bolts. Potions can be
-applied to 1 sword/polearm or up to 20 arrows/bolts. These apply the mushroom or potion
-blow effects when swung / fired.
 
 Ego-items. Each ego item is associated with a wand sval. The ego item is ‘flavoured’ with
 the flavour of the wand. (e.g. Red Armour of Elvenkind).

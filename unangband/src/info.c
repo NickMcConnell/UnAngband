@@ -1724,7 +1724,7 @@ typedef struct o_flag_desc
  * affects all stats.  In this case, "All stats" is used instead of
  * listing each stat individually.
  */
-static const o_flag_desc stat_flags_desc[A_MAX] =
+static const o_flag_desc stat_flags_desc[A_MAX_OLD] =
 {
 	{ TR1_STR,	"strength" },
 	{ TR1_INT,	"intelligence" },
@@ -3251,23 +3251,7 @@ void list_object(const object_type *o_ptr, int mode)
 	/* Basic abilities -- armor class */
 	if (!random)
 	{
-		int armor = 0;
-
-		switch(o_ptr->tval)
-		{
-			/* Armour */
-			case TV_BOOTS:
-			case TV_GLOVES:
-			case TV_HELM:
-			case TV_CROWN:
-			case TV_SHIELD:
-			case TV_CLOAK:
-			case TV_SOFT_ARMOR:
-			case TV_HARD_ARMOR:
-			case TV_DRAG_ARMOR:
-				armor = o_ptr->ac;
-				break;
-		}
+		int armor = o_ptr->ac;
 
 		if (object_bonus_p(o_ptr) || spoil) armor += o_ptr->to_a;
 
@@ -5327,14 +5311,7 @@ s32b object_power(const object_type *o_ptr)
 			{
 				p += o_ptr->to_d;
 			}
-			else if (o_ptr->to_d > -10)
-			{
-				p += 9;
-			}
-			else
-			{
-				p += o_ptr->to_d + 9;
-			}
+			else p += 9;
 
 			if (f1 & TR1_SHOTS)
 			{
@@ -5366,18 +5343,11 @@ s32b object_power(const object_type *o_ptr)
 			{
 				p+= (o_ptr->to_h) * 2 / 3;
 			}
-			else if (o_ptr->to_h > -12)
-			{
-				p += 6;
-			}
-			else
-			{
-				p += (o_ptr->to_h) * 2 / 3 + 6;
-			}
+			else p += 6;
 
 			/* Normalise power back */
 			/* We now only count power as 'above' having the basic weapon at the same level */
-			if (o_ptr->sval == SV_SLING)
+			if (o_ptr->sval < 10)
 			{
 				int q = AVG_SLING_AMMO_DAMAGE * bow_multiplier(k_ptr->sval) + 15;
 
@@ -5386,8 +5356,7 @@ s32b object_power(const object_type *o_ptr)
 				else
 					p = 0;
 			}
-			else if (o_ptr->sval == SV_SHORT_BOW ||
-				o_ptr->sval == SV_LONG_BOW)
+			else if (o_ptr->sval < 20)
 			{
 				int q = AVG_BOW_AMMO_DAMAGE * bow_multiplier(k_ptr->sval) + 15;
 
@@ -5396,8 +5365,7 @@ s32b object_power(const object_type *o_ptr)
 				else
 					p = 0;
 			}
-			else if (o_ptr->sval == SV_LIGHT_XBOW ||
-				o_ptr->sval == SV_HEAVY_XBOW)
+			else if (o_ptr->sval < 30)
 			{
 				int q = AVG_XBOW_AMMO_DAMAGE * bow_multiplier(k_ptr->sval) + 15;
 
@@ -5483,18 +5451,11 @@ s32b object_power(const object_type *o_ptr)
 			/* Correction factor for damage */
 			p /= 2;
 
-			if (o_ptr->to_d > 9)
+			if (o_ptr->to_d > o_ptr->dd + o_ptr->ds)
 			{
 				p += o_ptr->to_d;
 			}
-			else if (o_ptr->to_d > -10)
-			{
-				p += 9;
-			}
-			else
-			{
-				p += o_ptr->to_d + 9;
-			}
+			else	p += o_ptr->dd + o_ptr->ds;
 
 			if (f1 & TR1_BLOWS)
 			{
@@ -5515,21 +5476,14 @@ s32b object_power(const object_type *o_ptr)
 			{
 				p+= (o_ptr->to_h) * 2 / 3;
 			}
-			else if (o_ptr->to_h > -12)
-			{
-				p += 6;
-			}
-			else
-			{
-				p += (o_ptr->to_d) * 2 / 3 + 6;
-			}
+			else p += 6;
 
 			/* Normalise power back */
 			/* We remove the weapon base damage to get 'true' power */
 			/* This makes e.g. a sword that provides fire immunity the same value as
 			   a ring that provides fire immunity */
-			if (ABS(p) > k_ptr->dd * (k_ptr->ds + 1) / 2 + 15)
-				p -= sign(p) * (k_ptr->dd * (k_ptr->ds + 1) / 2 + 15);
+			if (ABS(p) > k_ptr->dd * (k_ptr->ds + 1) / 2 + 6 + o_ptr->dd * o_ptr->ds)
+				p -= sign(p) * (k_ptr->dd * (k_ptr->ds + 1) / 2 + 6 + k_ptr->dd * k_ptr->ds);
 			else
 				p = 0;
 
@@ -5918,28 +5872,20 @@ s32b object_power(const object_type *o_ptr)
 				p -= o_ptr->weight / 50; 
 			}
 
-			if (o_ptr->to_a > 9)
+			if (o_ptr->to_a > o_ptr->ac)
 			{
-				p+= (o_ptr->to_a - 9);
+				p+= (o_ptr->to_a - o_ptr->ac);
 			}
-			else if (o_ptr->to_a > -10)
+			else p+= 9;
+
+			if (o_ptr->to_a > o_ptr->ac + 10)
 			{
-				/* No change */
-			}
-			else
-			{
-				p += o_ptr->to_d + 9;
+				p += (o_ptr->to_a - o_ptr->ac - 10);
 			}
 
-
-			if (o_ptr->to_a > 19)
+			if (o_ptr->to_a > o_ptr->ac + 20)
 			{
-				p += (o_ptr->to_a - 19);
-			}
-
-			if (o_ptr->to_a > 29)
-			{
-				p += (o_ptr->to_a - 29);
+				p += (o_ptr->to_a - o_ptr->ac - 20);
 			}
 
 			if (o_ptr->to_a > 39)
@@ -5953,9 +5899,6 @@ s32b object_power(const object_type *o_ptr)
 		case TV_STAFF:
 		case TV_HAFTED:
 		case TV_POLEARM:
-		case TV_BOW:
-		case TV_INSTRUMENT:
-		case TV_LITE:
 			/* These are breaks for 1-handed, 2-handed, max 4 blows for warriors,
 				and max 3 blows for others */
 			if (o_ptr->weight >= 150)
@@ -5978,6 +5921,9 @@ s32b object_power(const object_type *o_ptr)
 				p -= 1; 
 			}
 
+		case TV_BOW:
+		case TV_INSTRUMENT:
+		case TV_LITE:
 		case TV_RING:
 		case TV_AMULET:
 			p += sign(o_ptr->to_a) * (ABS(o_ptr->to_a) / 2);

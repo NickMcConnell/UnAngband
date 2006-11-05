@@ -646,6 +646,10 @@ struct monster_race
 	byte grp_idx;	/* Monster group index */
 	byte pad;
 	s16b pad2;
+
+	byte best_spell;	/* Best attack spell */
+	s16b highest_threat;	/* Computed highest threat */
+	byte best_threat;	/* Best threat (one off attack) */
 #if 0
 	s16b note;      /* Inscribe body parts with */
 #endif

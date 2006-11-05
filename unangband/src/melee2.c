@@ -977,7 +977,7 @@ static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 
 	/* Player dodges -- point the target at their old location */
 	if ((p_ptr->dodging) && (*tar_y == p_ptr->py) && (*tar_x == p_ptr->px)
-		&& (rand_int(100) < (extract_energy[p_ptr->pspeed] + adj_dex_ta[p_ptr->stat_ind[A_DEX]] - 128)))
+		&& (rand_int(100) < (extract_energy[p_ptr->pspeed] + adj_agi_ta[p_ptr->stat_ind[A_AGI]] - 128)))
 	{
 		/* msg_print("You dodge the attack."); */
 
@@ -3248,7 +3248,7 @@ void monster_speech(int m_idx, cptr saying, bool understand)
  */
 bool tell_allies_player_can(int y, int x, u32b flag)
 {
-	int i,language;
+	int i, language, d;
 	bool vocal = FALSE;
 
 	cptr saying = "& resists nothing.";
@@ -3270,8 +3270,14 @@ bool tell_allies_player_can(int y, int x, u32b flag)
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
 
+		/* Get distance */
+		d = distance(y, x, n_ptr->fy, n_ptr->fx);
+
 		/* Ignore monsters that are too far away */
-		if (distance(y, x, n_ptr->fy, n_ptr->fx) > MAX_SIGHT) continue;
+		if (d > MAX_SIGHT) continue;
+
+		/* Ignore monsters that are not nearby or projectable */
+		if ((d > 3) && !generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
 
 		/* Vocalise? */
 		if (!(n_ptr->csleep) && /* (n_ptr->mflag & (MFLAG_ACTV)) && */ ((n_ptr->smart & (flag)) != 0)) continue;
@@ -3328,7 +3334,7 @@ bool tell_allies_player_can(int y, int x, u32b flag)
  */
 bool tell_allies_player_not(int y, int x, u32b flag)
 {
-	int i, language;
+	int i, language, d;
 	bool vocal = FALSE;
 
 	cptr saying = "& no longer resists nothing.";
@@ -3350,8 +3356,14 @@ bool tell_allies_player_not(int y, int x, u32b flag)
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
 
+		/* Get distance */
+		d = distance(y, x, n_ptr->fy, n_ptr->fx);
+
 		/* Ignore monsters that are too far away */
-		if (distance(y, x, n_ptr->fy, n_ptr->fx) > MAX_SIGHT) continue;
+		if (d > MAX_SIGHT) continue;
+
+		/* Ignore monsters that are not nearby or projectable */
+		if ((d > 3) && !generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
 
 		/* Vocalise? */
 		if (!(n_ptr->csleep) && /* (n_ptr->mflag & (MFLAG_ACTV)) && */ ((n_ptr->smart & (flag)) == 0)) continue;
@@ -3408,7 +3420,7 @@ bool tell_allies_player_not(int y, int x, u32b flag)
  */
 bool tell_allies_mflag(int y, int x, u32b flag, cptr saying)
 {
-	int i, language;
+	int i, language, d;
 	bool vocal = FALSE;
 
 	language = monster_language(m_list[cave_m_idx[y][x]].r_idx);
@@ -3428,8 +3440,14 @@ bool tell_allies_mflag(int y, int x, u32b flag, cptr saying)
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
 
+		/* Get distance */
+		d = distance(y, x, n_ptr->fy, n_ptr->fx);
+
 		/* Ignore monsters that are too far away */
-		if (distance(y, x, n_ptr->fy, n_ptr->fx) > MAX_SIGHT) continue;
+		if (d > MAX_SIGHT) continue;
+
+		/* Ignore monsters that are not nearby or projectable */
+		if ((d > 3) && !generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
 
 		/* Vocalise? */
 		if (!(n_ptr->csleep) && /* (n_ptr->mflag & (MFLAG_ACTV)) && */ (n_ptr->mflag & (flag))) continue;
@@ -3452,11 +3470,11 @@ bool tell_allies_mflag(int y, int x, u32b flag, cptr saying)
 
 
 /*
- * Alert others around the monster about something, set their minimum range and wake them up
+ * Alert others around the monster that they have died, and wake them up, provided one is awake to observe it.
  */
-bool tell_allies_best_range(int y, int x, int range, cptr saying)
+bool tell_allies_death(int y, int x, cptr saying)
 {
-	int i, language;
+	int i, language, d;
 	bool vocal = FALSE;
 
 	language = monster_language(m_list[cave_m_idx[y][x]].r_idx);
@@ -3478,6 +3496,91 @@ bool tell_allies_best_range(int y, int x, int range, cptr saying)
 
 		/* Ignore monsters that are too far away */
 		if (distance(y, x, n_ptr->fy, n_ptr->fx) > MAX_SIGHT) continue;
+
+		/* Ignore monsters that are not within line of sight */
+		if (!generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOS)) continue;
+
+		/* Asleep? */
+		if (n_ptr->csleep) continue;
+
+		/* Activate all other monsters and communicate to them */
+		n_ptr->mflag |= (MFLAG_ACTV);
+		vocal = TRUE;
+	}
+
+	/* Nothing to say? */
+	if (!vocal) return (FALSE);
+
+	/* Rescan all other monsters */
+	for (i = 1; i < z_info->m_max; i++)
+	{
+		/* Access the monster */
+		monster_type *n_ptr = &m_list[i];
+
+		/* Ignore dead monsters */
+		if (!n_ptr->r_idx) continue;
+
+		/* Ignore itself */
+		if (i == cave_m_idx[y][x]) continue;
+
+		/* Ignore monsters who speak different language */
+		if (monster_language(n_ptr->r_idx) != language) continue;
+
+		/* Get distance */
+		d = distance(y, x, n_ptr->fy, n_ptr->fx);
+
+		/* Ignore monsters that are too far away */
+		if (d > MAX_SIGHT) continue;
+
+		/* Ignore monsters that are not nearby or projectable */
+		if ((d > 3) && !generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
+
+		/* Wake and activate all other monsters and communicate to them */
+		n_ptr->csleep = 0;
+		n_ptr->mflag |= (MFLAG_ACTV);
+	}
+
+	/* Speak */
+	monster_speech(cave_m_idx[y][x], saying, FALSE);
+
+	/* Something said */
+	return (TRUE);
+}
+
+
+/*
+ * Alert others around the monster about something, set their minimum range and wake them up
+ */
+bool tell_allies_best_range(int y, int x, int range, cptr saying)
+{
+	int i, language, d;
+	bool vocal = FALSE;
+
+	language = monster_language(m_list[cave_m_idx[y][x]].r_idx);
+
+	/* Scan all other monsters */
+	for (i = 1; i < z_info->m_max; i++)
+	{
+		/* Access the monster */
+		monster_type *n_ptr = &m_list[i];
+
+		/* Ignore dead monsters */
+		if (!n_ptr->r_idx) continue;
+
+		/* Ignore itself */
+		if (i == cave_m_idx[y][x]) continue;
+
+		/* Ignore monsters who speak different language */
+		if (monster_language(n_ptr->r_idx) != language) continue;
+
+		/* Get distance */
+		d = distance(y, x, n_ptr->fy, n_ptr->fx);
+
+		/* Ignore monsters that are too far away */
+		if (d > MAX_SIGHT) continue;
+
+		/* Ignore monsters that are not nearby or projectable */
+		if ((d > 3) && !generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
 
 		/* Activate all other monsters and communicate to them */
 		n_ptr->csleep = 0;
@@ -3502,7 +3605,7 @@ bool tell_allies_best_range(int y, int x, int range, cptr saying)
  */
 bool tell_allies_target(int y, int x, int ty, int tx, bool scent, cptr saying)
 {
-	int i, language;
+	int i, language, d;
 	bool vocal = FALSE;
 
 	language = monster_language(m_list[cave_m_idx[y][x]].r_idx);
@@ -3522,8 +3625,14 @@ bool tell_allies_target(int y, int x, int ty, int tx, bool scent, cptr saying)
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
 
+		/* Get distance */
+		d = distance(y, x, n_ptr->fy, n_ptr->fx);
+
 		/* Ignore monsters that are too far away */
-		if (distance(y, x, n_ptr->fy, n_ptr->fx) > MAX_SIGHT) continue;
+		if (d > MAX_SIGHT) continue;
+
+		/* Ignore monsters that are not nearby or projectable */
+		if ((d > 3) && !generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
 
 		/* Ignore monsters who have orders */
 		if ((n_ptr->ty) || (n_ptr->tx)) continue;
@@ -5336,11 +5445,12 @@ static void process_monster(int m_idx)
 	if ((chance_innate) && ((m_ptr->blind) || (m_ptr->confused) || (m_ptr->stunned))) chance_innate /= 2;
 
 	/* Monster can use ranged attacks */
+	/* Now use a 'save' against the players charisma to avoid this */
 	if ((chance_innate) || (chance_spell)
 		|| ((r_ptr->flags3 & (RF3_HUGE)) && (m_ptr->cdis == 2))
 		|| (m_ptr->mflag & (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH)))
 	{
-		int roll = rand_int(100);
+		int roll = rand_int(adj_chr_taunt[p_ptr->stat_ind[A_CHR]]);
 
 		/* Pick a ranged attack */
 		if ((roll < chance_innate) || (roll < chance_spell)

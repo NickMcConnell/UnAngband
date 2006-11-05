@@ -2024,7 +2024,7 @@ static bool do_cmd_bash_aux(int y, int x, bool charging)
 	}
 
 	/* Saving throw against stun */
-	else if (rand_int(100) < adj_dex_safe[p_ptr->stat_ind[A_DEX]] +
+	else if (rand_int(100) < adj_agi_safe[p_ptr->stat_ind[A_AGI]] +
 		 p_ptr->lev)
 	{
 		/* Message */
@@ -3018,7 +3018,7 @@ static void do_cmd_hold_or_stay(int pickup)
 		p_ptr->dodging = 0;
 
 		/* Base blocking */
-		p_ptr->blocking = adj_dex_ta[p_ptr->stat_ind[A_DEX]] - 128;
+		p_ptr->blocking = p_ptr->to_h;
 
 		/* No shield / secondary weapon */
 		if (!o_ptr->k_idx)
@@ -3043,9 +3043,6 @@ static void do_cmd_hold_or_stay(int pickup)
 
 			/* Adjust by to hit factor */
 			p_ptr->blocking += o_ptr->to_h;
-
-			/* Adjust by 'damage dice' -- secondary weapon / shield less effective */
-			p_ptr->blocking += damroll(o_ptr->dd, o_ptr->ds) / (slot == INVEN_ARM ? 2 : 1);
 		}
 
 		/* Modify by style */
@@ -3061,7 +3058,6 @@ static void do_cmd_hold_or_stay(int pickup)
 				switch (w_info[i].benefit)
 				{
 					case WB_HIT:
-					case WB_DAM:
 					case WB_AC:
 						p_ptr->blocking += (p_ptr->lev - w_info[i].level) /2;
 						break;

@@ -3267,23 +3267,28 @@ static void calc_bonuses(void)
 	/* Searching slows the player down */
 	if (p_ptr->searching) p_ptr->pspeed -= 10;
 
-	/* Sanity check on extreme speeds */
-	if (p_ptr->pspeed < 0) p_ptr->pspeed = 0;
-	if (p_ptr->pspeed > 199) p_ptr->pspeed = 199;
-
 	/*** Apply modifier bonuses ***/
 
 	/* Actual Modifier Bonuses (Un-inflate stat bonuses) */
-	p_ptr->to_a += ((int)(adj_dex_ta[p_ptr->stat_ind[A_DEX]]) - 128);
+	p_ptr->to_a += ((int)(adj_agi_ta[p_ptr->stat_ind[A_AGI]]) - 128);
+	p_ptr->to_a += ((int)(adj_wis_ta[p_ptr->stat_ind[A_WIS]]) - 128);
 	p_ptr->to_d += ((int)(adj_str_td[p_ptr->stat_ind[A_STR]]) - 128);
+	p_ptr->to_h += ((int)(adj_int_th[p_ptr->stat_ind[A_INT]]) - 128);
 	p_ptr->to_h += ((int)(adj_dex_th[p_ptr->stat_ind[A_DEX]]) - 128);
-	p_ptr->to_h += ((int)(adj_str_th[p_ptr->stat_ind[A_STR]]) - 128);
 
 	/* Displayed Modifier Bonuses (Un-inflate stat bonuses) */
-	p_ptr->dis_to_a += ((int)(adj_dex_ta[p_ptr->stat_ind[A_DEX]]) - 128);
+	p_ptr->dis_to_a += ((int)(adj_agi_ta[p_ptr->stat_ind[A_AGI]]) - 128);
+	p_ptr->dis_to_a += ((int)(adj_wis_ta[p_ptr->stat_ind[A_WIS]]) - 128);
 	p_ptr->dis_to_d += ((int)(adj_str_td[p_ptr->stat_ind[A_STR]]) - 128);
+	p_ptr->dis_to_h += ((int)(adj_int_th[p_ptr->stat_ind[A_INT]]) - 128);
 	p_ptr->dis_to_h += ((int)(adj_dex_th[p_ptr->stat_ind[A_DEX]]) - 128);
-	p_ptr->dis_to_h += ((int)(adj_str_th[p_ptr->stat_ind[A_STR]]) - 128);
+
+	/* Actual Modifier Bonuses */
+	p_ptr->pspeed += ((int)(adj_agi_speed[p_ptr->stat_ind[A_AGI]]) - 128);
+
+	/* Sanity check on extreme speeds */
+	if (p_ptr->pspeed < 0) p_ptr->pspeed = 0;
+	if (p_ptr->pspeed > 199) p_ptr->pspeed = 199;
 
 
 	/*** Modify skills ***/

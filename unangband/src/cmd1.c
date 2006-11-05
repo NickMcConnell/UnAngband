@@ -74,14 +74,14 @@ bool test_hit_norm(int chance, int ac, int vis)
 
 /*
  * Critical hits (from objects thrown by player)
- * Factor in item weight, total plusses, and player level.
+ * Factor in item weight, total plusses, and intelligence.
  */
 sint critical_shot(int weight, int plus, int dam)
 {
 	int i, k, crit = 0;
 
 	/* Extract "shot" power */
-	i = (weight + ((p_ptr->to_h + plus) * 4) + (p_ptr->lev * 2));
+	i = (weight + ((p_ptr->to_h + plus) * 4) + (adj_int_th[p_ptr->stat_ind[A_INT]] * 8));
 
 	/* Critical hit */
 	if (randint(5000) <= i)
@@ -110,14 +110,14 @@ sint critical_shot(int weight, int plus, int dam)
 /*
  * Critical hits (by player)
  *
- * Factor in weapon weight, total plusses, player level.
+ * Factor in weapon weight, total plusses, and intelligence.
  */
 sint critical_norm(int weight, int plus, int dam)
 {
 	int i, k, crit = 0;
 
 	/* Extract "blow" power */
-	i = (weight + ((p_ptr->to_h + plus) * 5) + (p_ptr->lev * 3));
+	i = (weight + ((p_ptr->to_h + plus) * 5) + (adj_int_th[p_ptr->stat_ind[A_INT]] * 10));
 
 	/* Chance */
 	if (randint(5000) <= i)
@@ -2573,10 +2573,6 @@ void py_attack(int y, int x, bool charging)
 		m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
 
 		tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
-	}
-	else if (fear)
-	{
-		tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has hurt me badly!");
 	}
 
 	/* Hack -- delay fear messages */

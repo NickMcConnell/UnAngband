@@ -968,6 +968,17 @@ static errr rd_extra(void)
 	byte tmp8u;
 	u16b tmp16u;
 
+	int a_max = A_MAX;
+
+	if (older_than(0,6,2))
+	{
+		a_max = A_MAX_OLD;
+		p_ptr->stat_max[A_AGI] = 11;
+		p_ptr->stat_cur[A_AGI] = 11;
+		p_ptr->stat_inc_tim[A_AGI] = 0;
+		p_ptr->stat_dec_tim[A_AGI] = 0;
+	}
+
 	rd_string(op_ptr->full_name, 32);
 
 	rd_string(p_ptr->died_from, 80);
@@ -1010,10 +1021,10 @@ static errr rd_extra(void)
 	rd_s16b(&p_ptr->wt);
 
 	/* Read the stat info */
-	for (i = 0; i < A_MAX; i++) rd_s16b(&p_ptr->stat_max[i]);
-	for (i = 0; i < A_MAX; i++) rd_s16b(&p_ptr->stat_cur[i]);
-	for (i = 0; i < A_MAX; i++) rd_s16b(&p_ptr->stat_inc_tim[i]);
-	for (i = 0; i < A_MAX; i++) rd_s16b(&p_ptr->stat_dec_tim[i]);
+	for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->stat_max[i]);
+	for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->stat_cur[i]);
+	for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->stat_inc_tim[i]);
+	for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->stat_dec_tim[i]);
 
 	strip_bytes(24);	/* oops */
 

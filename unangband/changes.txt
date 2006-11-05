@@ -37,6 +37,33 @@ old double-resist bonus, you have to wear 6 items + have temporary resistance.  
 should make dangerous elemental breathers suitable threatening again.  Of course, immunity
 provide complete protection as always.
 
+- Added a new stat: agility. Agility modifies base movement speed and increases armour class.
+Agility now also provides protection against theft instead of dexterity.  Currently no items
+modify agility directly.
+
+- Reorganised existing stat modifiers to make other stats more useful for warriors.
+Intelligence now modifies to hit bonus, instead of strength, and greatly increases chance of
+critical blows and shots.  Dexterity now has more of an impact on to-hit bonus, and no longer
+modifies armour class.  Wisdom now greatly modifies armour class.  Charisma decreases the
+chance of monsters using ranged attacks against you (taunting) and increases the chance of
+monsters fleeing after sustaining damage (intimidating).
+
+- Modified enchantment and item power evaluation.  It is now no longer possible to enchant
+weapon damage greater than damage dice * damage sides + 5, instead of the old value of 15.
+It is now now longer possible to enchant armour bonus greater than armour class + 5, instead
+of the old value of 15.
+
+- All to-hit bonuses are now only 2/3rds effective as before for hitting an enemy.  This makes
+base skill more important (similar to Oangband style combat) however it is easier in Unangband
+to get additional to-hit bonuses from styles and attributes.
+
+- Fleeing monsters no longer wake allies. Allies only wake each other if they are nearby or
+within line of fire (Suggested by Matthias Rudolf).
+
+- Attacking a fleeing monster will make them alert their allies if they recover their courage.
+
+- Killing a monster will alert their allies, if one of them is awake to see it.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.

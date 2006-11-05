@@ -6154,9 +6154,9 @@ errr eval_info(eval_info_power_func eval_info_process, header *head)
 static long eval_max_dam(monster_race *r_ptr)
 {
 	int i, x;
-	u32b dam = 1;
-	u32b hp;
-	u32b melee_dam, atk_dam, spell_dam;
+	int dam = 1;
+	int hp;
+	int melee_dam, atk_dam, spell_dam;
 	byte rlev;
 	u32b flag, breath_mask, attack_mask, innate_mask;
 	u32b flag_counter;
@@ -6173,7 +6173,6 @@ static long eval_max_dam(monster_race *r_ptr)
 
 	for (x = 0; x < 4; x++)
 	{
-
 		/*Get the flags 4 monster flags and masks*/
 		switch (x)
 		{
@@ -6434,7 +6433,7 @@ static long eval_max_dam(monster_race *r_ptr)
 					case 2:
 					{
 						/*Misc flag6 flags*/
-						if (flag_counter == RF6_ADD_MANA) this_dam = MAX(r_ptr->mana, 30);
+						if (flag_counter == RF6_ADD_MANA) this_dam = 0;
 						else if (flag_counter == RF6_BLINK) this_dam = rlev / 3;
 						else if (flag_counter == RF6_TELE_SELF_TO) this_dam = rlev * 2;
 						else if (flag_counter == RF6_TELE_TO) this_dam = rlev;
@@ -6500,38 +6499,96 @@ static long eval_max_dam(monster_race *r_ptr)
 
 			}
 
-			/* Hack - always allow one attack at maximum */
-			if (this_dam > spell_dam) spell_dam = this_dam;
+			/* Hack - record most damaging spell for diagnostics */
+			if (this_dam > r_ptr->highest_threat)
+			{
+				r_ptr->highest_threat = this_dam;
+				r_ptr->best_threat = 96 + x * 32 + i;
+			}
 
 			/* Hack - Apply over 10 rounds */
 			this_dam *= 10;
 
-			/* Scale for frequency */
-			if (flag_counter & innate_mask)	this_dam = this_dam * r_ptr->freq_innate / 100;
-			else this_dam = this_dam * r_ptr->freq_spell / 100;
-
 			/* Scale for spell failure chance */
 			if (!(r_ptr->flags2 & RF2_STUPID) && (x > 0)) this_dam = this_dam * MIN(75 + (rlev + 3) / 4, 100) / 100;
 
-			/* Scale for mana requirement */
-			if ((x == 0) && (spell_info_RF4[i][0] * 10 > r_ptr->mana))
+			/* Scale for frequency and availability of mana / ammo */
+			if (this_dam)
 			{
-				this_dam = this_dam * r_ptr->mana / (spell_info_RF4[i][0] * 10);
-			}
-			else if ((x == 1) && (spell_info_RF5[i][0] * 10 > r_ptr->mana))
-			{
-				this_dam = this_dam * r_ptr->mana / (spell_info_RF5[i][0] * 10);
-			}
-			else if ((x == 2) && (spell_info_RF6[i][0] * 10 > r_ptr->mana))
-			{
-				this_dam = this_dam * r_ptr->mana / (spell_info_RF6[i][0] * 10);
-			}
-			else if ((x == 3) && (spell_info_RF7[i][0] * 10 > r_ptr->mana))
-			{
-				this_dam = this_dam * r_ptr->mana / (spell_info_RF7[i][0] * 10);
+				int freq;
+				int need_mana;
+				int has_ammo;
+
+				/* Get frequency */
+				if ((x == 0) && (flag_counter & innate_mask)) freq = r_ptr->freq_innate;
+				else freq = r_ptr->freq_spell;
+
+				/* Paranoia */
+				if (!freq)
+				{
+					r_ptr->highest_threat = 30000;
+					r_ptr->best_threat = 96 + x * 32 + i;
+				}
+
+				/* Get mana required */
+				if (x == 0) need_mana = spell_info_RF4[i][0];
+				else if (x == 1) need_mana = spell_info_RF5[i][0];
+				else if (x == 2) need_mana = spell_info_RF6[i][0];
+				else if (x == 3) need_mana = spell_info_RF7[i][0];
+
+				/* Get ammo required */
+				if ((x == 0) & (i < 4))
+				{
+					switch (i)
+					{
+						case RBM_BOULDER:
+						case RBM_FLASK:
+						{
+							has_ammo = (r_ptr->level + 1) / 2;
+						}
+						case RBM_SPORE:
+						case RBM_ARROW:
+						case RBM_XBOLT:
+						case RBM_SPIKE:
+						case RBM_DART:
+						case RBM_SHOT:
+						{
+							has_ammo = r_ptr->level;
+						}
+					}
+				}
+
+				/* Archers get more shots */
+				if (r_ptr->flags2 & (RF2_ARCHER)) has_ammo *= 2;
+
+				/* Adjust frequency for ammo */
+				if (has_ammo * 5 < freq) freq = has_ammo * 5;
+
+				/* Adjust frequency for mana -- casters that can add mana and need to do so */
+				if ((r_ptr->flags6 & (RF6_ADD_MANA)) && (need_mana) && (freq > r_ptr->mana * 10 / need_mana))
+				{
+					freq = MIN(freq, (freq + r_ptr->mana * 10 / need_mana) / 2);
+				}
+
+				/* Adjust frequency for mana */
+				else if (need_mana)
+				{
+					freq = MIN(freq, r_ptr->mana * 10 / need_mana);
+				}
+
+				/* Hack -- always get 1 shot */
+				if (freq < 10) freq = 10;
+
+				/* Adjust for frequency */
+				this_dam = this_dam * freq / 100;
 			}
 
-			if (this_dam > spell_dam) spell_dam = this_dam;
+			/* Better spell? */
+			if (this_dam > spell_dam)
+			{
+				r_ptr->best_spell = 96 + x * 32 + i;
+				spell_dam = this_dam;
+			}
 
 			/*shift one bit*/
 			flag_counter = flag_counter << 1;
@@ -6692,19 +6749,11 @@ static long eval_max_dam(monster_race *r_ptr)
 				default: break;
 			}
 
-
 			/* Normal melee attack */
 			if (method < RBM_MAX_NORMAL)
 			{
 				/* Keep a running total */
 				melee_dam += atk_dam;
-			}
-
-			/* Hack -- aura is extra tough in melee */
-			if (method == RBM_AURA) 
-			{
-				/* Keep a running total */
-				melee_dam += 3 * atk_dam;
 			}
 
 			/* Ranged attacks can also apply spell dam */
@@ -6713,8 +6762,12 @@ static long eval_max_dam(monster_race *r_ptr)
 				int range = MAX_SIGHT, mana = 0;
 				bool must_hit = FALSE;
 
-				/* Hack -- always allow one attack at maximum */
-				if (spell_dam < atk_dam) spell_dam = atk_dam;
+				/* Hack - record most damaging spell for diagnostics */
+				if (atk_dam > r_ptr->highest_threat)
+				{
+					r_ptr->highest_threat = atk_dam;
+					r_ptr->best_threat = 96 + i;
+				}
 
 				/* Scale for frequency of innate attacks */
 				atk_dam = atk_dam * r_ptr->freq_innate / 100;
@@ -6786,9 +6839,28 @@ static long eval_max_dam(monster_race *r_ptr)
 				/* Scale for mana requirement */
 				if (mana * 10 > r_ptr->mana) atk_dam = atk_dam * r_ptr->mana / (mana * 10);
 
-				if (spell_dam < atk_dam) spell_dam = atk_dam;
+				/* Best ranged attack? */
+				if (atk_dam > spell_dam)
+				{
+					spell_dam = atk_dam;
+					r_ptr->best_spell = 96 + i;
+				}
 			}
 
+			/* Hack -- aura is extra tough in melee */
+			if (method == RBM_AURA) 
+			{
+				/* Keep a running total */
+				melee_dam += 3 * atk_dam;
+			}
+
+		}
+
+		/* Hack - record most damaging spell for diagnostics */
+		if (melee_dam > r_ptr->highest_threat)
+		{
+			r_ptr->highest_threat = melee_dam;
+			r_ptr->best_threat = 0;
 		}
 
 		/* 
@@ -6873,6 +6945,7 @@ static long eval_max_dam(monster_race *r_ptr)
 	 * monster at speed 100 will do half, etc.  Bonus for monsters who can haste self.
 	 */
 	dam = (dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) / 10;
+	r_ptr->highest_threat = (r_ptr->highest_threat * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 10 : 0)]) / 10;
 
 	/*but deep in a minimum*/
 	if (dam < 1) dam  = 1;

@@ -2355,8 +2355,14 @@ bool enchant(object_type *o_ptr, int n, int eflag)
 		if (eflag & (ENCH_TODAM))
 		{
 			if (o_ptr->to_d < 0) chance = 0;
-			else if (o_ptr->to_d > 15) chance = 1000;
-			else chance = enchant_table[o_ptr->to_d];
+			else if (o_ptr->tval == TV_BOW)
+			{
+				if (o_ptr->to_d > 15) chance = 1000;
+				else chance = enchant_table[o_ptr->to_d];
+			}
+			else if (o_ptr->to_d > o_ptr->dd * o_ptr->ds + 5) chance = 1000;
+			else if (o_ptr->to_d < o_ptr->dd * o_ptr->ds) chance = enchant_table[o_ptr->to_d * 10 / o_ptr->dd / o_ptr->ds];
+			else chance = enchant_table[o_ptr->to_d + 10 - o_ptr->dd - o_ptr->ds];
 
 			/* Attempt to enchant */
 			if ((randint(1000) > chance) && (!a || (rand_int(100) < 50)))
@@ -2383,8 +2389,9 @@ bool enchant(object_type *o_ptr, int n, int eflag)
 		if (eflag & (ENCH_TOAC))
 		{
 			if (o_ptr->to_a < 0) chance = 0;
-			else if (o_ptr->to_a > 15) chance = 1000;
-			else chance = enchant_table[o_ptr->to_a];
+			else if (o_ptr->to_a > o_ptr->ac + 5) chance = 1000;
+			else if (o_ptr->to_a < o_ptr->ac) chance = enchant_table[o_ptr->to_a * 10 / o_ptr->ac];
+			else chance = enchant_table[o_ptr->to_a + 10 - o_ptr->ac];
 
 			/* Attempt to enchant */
 			if ((randint(1000) > chance) && (!a || (rand_int(100) < 50)))

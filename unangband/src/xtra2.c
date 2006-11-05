@@ -703,28 +703,30 @@ bool set_stastis(int v)
 /*
  * Array of stat "descriptions"
  */
-cptr desc_stat_imp[] =
+cptr desc_stat_imp[A_MAX] =
 {
 	"stronger",
 	"smarter",
 	"wiser",
 	"more dextrous",
 	"healthier",
-	"cuter"
+	"cuter",
+	"more agile"
 };
 
 
 /*
  * Array of stat "descriptions"
  */
-static cptr desc_stat_imp_end[] =
+cptr desc_stat_imp_end[A_MAX] =
 {
 	"strong",
 	"smart",
 	"wise",
 	"dextrous",
 	"healthy",
-	"cute"
+	"cute",
+	"agile"
 };
 
 
@@ -2518,7 +2520,7 @@ static void improve_stat(void)
 	int tmp = 0;
 	int i, selection;
 
-	s16b table[A_CHR+1];
+	s16b table[A_MAX+1];
 
 	cptr p = "";
 
@@ -2529,7 +2531,7 @@ static void improve_stat(void)
 #endif
 
 	/* Check which stats can still be improved */
-	for (i = 0; i <= A_CHR; i++)
+	for (i = 0; i <= A_MAX; i++)
 	{
 		table[i] = i;
 		if (p_ptr->stat_cur[i] < 18 + 100) okay = TRUE;
@@ -3486,6 +3488,7 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 		if (note)
 		{
 			message_format(MSG_KILL, m_ptr->r_idx, "%^s%s", m_name, note);
+
 		}
 
 		/* Death by physical attack -- invisible monster */
@@ -3499,13 +3502,29 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 			 (r_ptr->flags2 & (RF2_STUPID)))
 		{
 			message_format(MSG_KILL, m_ptr->r_idx, "You have destroyed %s.", m_name);
+
 		}
 
 		/* Death by Physical attack -- living monster */
 		else
 		{
 			message_format(MSG_KILL, m_ptr->r_idx, "You have slain %s.", m_name);
+
 		}
+
+		/* Death by Physical attack -- non-living monster */
+		if ((r_ptr->flags3 & (RF3_NONLIVING)) ||
+			 (r_ptr->flags2 & (RF2_STUPID)))
+		{
+			/* Warn allies */
+			tell_allies_death(m_ptr->fy, m_ptr->fx, "& has destroyed one of us!");
+		}
+		else
+		{
+			/* Warn allies */
+			tell_allies_death(m_ptr->fy, m_ptr->fx, "& has killed one of us!");
+		}
+
 
 		/* Maximum player level */
 		div = p_ptr->max_lev;
@@ -3580,23 +3599,35 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 
 			/* No more fear */
 			(*fear) = FALSE;
+
+			/* Warn allies */
+			tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
 		}
 	}
 
 	/* Sometimes a monster gets scared by damage */
 	if (!m_ptr->monfear && !(r_ptr->flags3 & (RF3_NO_FEAR)) && (dam > 0))
 	{
-		int percentage;
+		long oldhp, newhp, tmp;
+		int percentage, fitness;
 
-		/* Percentage of fully healthy */
-		percentage = (100L * m_ptr->hp) / m_ptr->maxhp;
+		/* Note -- subtle fix -CFT */
+		newhp = (long)(m_ptr->hp);
+		oldhp = newhp + (long)(dam);
+		tmp = (newhp * 100L) / (oldhp);
+		percentage = (int)(tmp);
+
+		/* Percentage of fully healthy. Note maxhp can be zero. */
+		fitness = (100L * (m_ptr->hp + 1)) / (m_ptr->maxhp + 1);
 
 		/*
 		 * Run (sometimes) if at 10% or less of max hit points,
-		 * or (usually) when hit for half its current hit points
+		 * or (more often) when hit for 11% or more its current hit points
+		 * 
+		 * Percentages depend on player's charisma.
 		 */
-		if ((randint(10) >= percentage) ||
-		    ((dam >= m_ptr->hp) && (rand_int(5))))
+		if ((randint(adj_chr_fear[p_ptr->stat_ind[A_CHR]]) >= fitness) ||
+		    ((percentage > 10) && (rand_int(adj_chr_fear[p_ptr->stat_ind[A_CHR]] * percentage) > 100)) )
 		{
 			int fear_amt;
 

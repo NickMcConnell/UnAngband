@@ -7399,9 +7399,6 @@ bool project_p(int who, int y, int x, int dam, int typ)
 	/* Monster name (for damage) */
 	char killer[80];
 
-	/* Hack -- messages */
-	cptr act = NULL;
-
 	/* Target object*/
 	object_type *o_ptr;
 
@@ -8281,17 +8278,9 @@ bool project_p(int who, int y, int x, int dam, int typ)
 
 				case 6: case 7: case 8: case 9:
 				{
-					switch (randint(6))
-					{
-						case 1: k = A_STR; act = "strong"; break;
-						case 2: k = A_INT; act = "bright"; break;
-						case 3: k = A_WIS; act = "wise"; break;
-						case 4: k = A_DEX; act = "agile"; break;
-						case 5: k = A_CON; act = "hale"; break;
-						case 6: k = A_CHR; act = "beautiful"; break;
-					}
+					k = rand_int(A_MAX);
 
-					msg_format("You're not as %s as you used to be...", act);
+					msg_format("You're not as %s as you used to be...", desc_stat_imp_end[k]);
 
 					p_ptr->stat_cur[k] = (p_ptr->stat_cur[k] * 3) / 4;
 					if (p_ptr->stat_cur[k] < 3) p_ptr->stat_cur[k] = 3;
@@ -8543,7 +8532,7 @@ bool project_p(int who, int y, int x, int dam, int typ)
 
 			/* Saving throw (unless paralyzed) based on dex and level */
 			if (!p_ptr->paralyzed &&
-			    (rand_int(100) < (adj_dex_safe[p_ptr->stat_ind[A_DEX]] +
+			    (rand_int(100) < (adj_agi_safe[p_ptr->stat_ind[A_DEX]] +
 					      p_ptr->lev)))
 			{
 				/* Saving throw message */
@@ -8596,7 +8585,7 @@ bool project_p(int who, int y, int x, int dam, int typ)
 
 			/* Saving throw (unless paralyzed) based on dex and level */
 			if (!p_ptr->paralyzed &&
-			    (rand_int(100) < (adj_dex_safe[p_ptr->stat_ind[A_DEX]] +
+			    (rand_int(100) < (adj_agi_safe[p_ptr->stat_ind[A_DEX]] +
 					      p_ptr->lev)))
 			{
 				/* Saving throw message */

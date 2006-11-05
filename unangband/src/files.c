@@ -2725,7 +2725,7 @@ static void display_player_sust_info(void)
 		object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
 
 		/* Initialize color based of sign of pval. */
-		for (stat = 0; stat < A_MAX; stat++)
+		for (stat = 0; stat < A_MAX_OLD; stat++)
 		{
 			/* Default */
 			a = TERM_SLATE;
@@ -2780,7 +2780,7 @@ static void display_player_sust_info(void)
 	player_flags(&f1, &f2, &f3, &f4);
 
 	/* Check stats */
-	for (stat = 0; stat < A_MAX; ++stat)
+	for (stat = 0; stat < A_MAX_OLD; ++stat)
 	{
 		/* Default */
 		a = TERM_SLATE;
@@ -2872,7 +2872,7 @@ static void display_home_equipment_info(int mode)
 		object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
 
 		/* Initialize color based of sign of pval. */
-		for (stats = 0; stats < A_MAX; stats++)
+		for (stats = 0; stats < A_MAX_OLD; stats++)
 		{
 			/* Assume uppercase stat name */
 			c_put_str(TERM_WHITE, stat_names[stats], row+stats, 2);
@@ -3115,7 +3115,7 @@ static void dump_player_plus_minus(FILE *fff)
 		modifier = FALSE;
 
 		/*check to see if there is an increase or decrease of a stat*/
-		for (stats = 0; stats < A_MAX; stats++)
+		for (stats = 0; stats < A_MAX_OLD; stats++)
 		{
 			/* Boost */
 			if (f1 & (1<<stats)) modifier = TRUE;
@@ -3192,7 +3192,7 @@ static void dump_player_stat_info(FILE *fff)
 
 	fprintf(fff,"      abcdefghijkl@              abcdefghijkl@\n");
 
-	for (stats = 0; stats < A_MAX; stats++)
+	for (stats = 0; stats < A_MAX_OLD; stats++)
 	{
 		fprintf(fff, "%6s", stat_names_reduced[stats]);
 
@@ -3310,7 +3310,7 @@ static void dump_home_plus_minus(FILE *fff)
 		modifier = FALSE;
 
 		/*check to see if there is an increase or decrease of a stat*/
-		for (stats = 0; stats < A_MAX; stats++)
+		for (stats = 0; stats < A_MAX_OLD; stats++)
 		{
 			/* Boost */
 			if (f1 & (1<<stats)) modifier = TRUE;
@@ -3386,7 +3386,7 @@ static void dump_home_stat_info(FILE *fff)
 
 	fprintf(fff,"       abcdefghijklmnopqrstuvwx        abcdefghijklmnopqrstuvwx\n");
 
-	for (stats = 0; stats < A_MAX; stats++)
+	for (stats = 0; stats < A_MAX_OLD; stats++)
 	{
 		fprintf(fff, "%6s ", stat_names_reduced[stats]);
 

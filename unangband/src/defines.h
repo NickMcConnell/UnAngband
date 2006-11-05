@@ -322,7 +322,7 @@
 #define START_DAY               (DAY * (42 + 127))      /* Bilbo's birthday */
 
 #define BREAK_GLYPH		550		/* Rune of protection resistance */
-#define BTH_PLUS_ADJ    3       /* Adjust BTH per plus-to-hit */
+#define BTH_PLUS_ADJ    2       /* Adjust BTH per plus-to-hit */
 #define MON_MULT_ADJ	8		/* High value slows multiplication */
 #define MON_SUMMON_ADJ	2		/* Adjust level of summoned creatures */
 #define MON_DRAIN_LIFE	2		/* Percent of player exp drained per hit */
@@ -600,11 +600,18 @@
 #define A_DEX	3
 #define A_CON	4
 #define A_CHR	5
+#define A_AGI	6
 
 /*
  * Total number of stats.
  */
-#define A_MAX	6
+#define A_MAX	7
+
+
+/*
+ * Old total number of stats.
+ */
+#define A_MAX_OLD	6
 
 
 /*
@@ -3073,6 +3080,74 @@
 #define TR4_HURT_ELEC   0x20000000L     /* Item makes wielder vulnerable to elec */
 #define TR4_HURT_FIRE   0x40000000L     /* Item makes wielder vulnerable to fire */
 #define TR4_HURT_COLD   0x80000000L     /* Item makes wielder vulnerable to cold */
+
+#define TR5_SHOW_DD	0x00000001L	/* Show damage dice */
+#define TR5_SHOW_MODS   0x00000002L     /* Show "to-hit" and "to-dam" bonus */
+#define TR5_SHOW_CHARGE 0x00000004L	/* Show charges */
+#define TR5_SHOW_TURNS	0x00000008L	/* Show turns (of light) */
+#define TR5_HAS_PVAL	0x00000010L	/* Item has varying pval */
+#define TR5_HAS_BONUS	0x00000020L	/* Item has varying to-hit/to-dam/to-ac */
+#define TR5_HAS_CHARGES 0x00000040L	/* Item has varying charges */
+#define TR5_RANDOM      0x00000080L 	/* Item has random activation */
+#define TR5_INSTA_ART   0x00000100L     /* Item makes an artifact */
+#define TR5_EXTRA_DAM	0x00000200L	/* Item can do extra damage from brands/slays (cmd1.c) */
+#define TR5_EDGED	0x00000400L	/* Item does edged damage */
+#define TR5_BLUNT	0x00000800L	/* Item does blunt damage */
+#define TR5_DO_CUTS	0x00001000L	/* Item can do extra damage from cuts (cmd1.c) */
+#define TR5_DO_STUN	0x00002000L	/* Item can do extra damage from stun (cmd1.c) */
+#define TR5_IS_JUNK	0x00004000L	/* Item is junk (cmd1.c) */
+#define TR5_HAS_ROPE    0x00008000L	/* Item has rope attached (cmd2.c) */
+#define TR5_BREAK_100	0x00010000L	/* Breakage change 100% (cmd2.c) */
+#define TR5_BREAK_50	0x00020000L	/* Breakage change 50% (cmd2.c) */
+#define TR5_BREAK_25	0x00040000L	/* Breakage change 25% (cmd2.c) */
+#define TR5_BREAK_10	0x00080000L	/* Breakage change 10% (cmd2.c) */
+
+
+#define TR5_GLOW	0x00800000L	/* Item glows if timed */
+#define TR5_EXHAUST	0x01000000L	/* Item is destroyed at timeout */
+#define TR5_RECHARGE	0x02000000L	/* Item recharges at timeout */
+#define TR5_HURT_ACID	0x04000000L	/* Item can be destroyed by acid */
+#define TR5_HURT_COLD	0x08000000L	/* Item can be destroyed by cold */
+#define TR5_HURT_ELEC	0x10000000L	/* Item can be destroyed by electricity */
+#define TR5_HURT_FIRE	0x20000000L	/* Item can be destroyed by fire */
+#define TR5_HURT_WATER	0x40000000L	/* Item can be destroyed by water */
+#define TR5_HURT_XXXX	0x80000000L	/* Item can be destroyed by XXXX */
+
+#define TR6_WEAPON	0x00000000L	/* Item is a weapon */
+#define TR6_ARMOUR	0x00000000L	/* Item is an armour */
+#define TR6_FLAVOR			/* Item is "flavoured" */
+#define TR6_NAMED			/* Item is "named" after monster */
+#define TR5_1_HANDED	0x00040000L	/* Item can be wielded 1-handed. (cmd3.c) */
+#define TR5_2_HANDED	0x00080000L	/* Item can be wielded 2-handed. (cmd3.c) */
+#define TR5_OFF_HAND	0x00100000L	/* Item can be wielded in off-hand (cmd3.c) */
+#define TR5_W_SHIELD	0x00200000L	/* Item can be wielded with shield (cmd3.c) */
+#define TR6_ASSEMBLE
+#define TR6_BROWSE
+#define TR6_REFUEL
+#define TR6_APPLY
+#define TR6_QUAFF
+#define TR6_WIELD	0x00000000L	/* Item can be wielded */
+#define TR6_STUDY
+#define TR6_CAST
+#define TR6_FIRE
+#define TR6_FILL
+#define TR6_READ
+#define TR6_AIM
+#define TR6_EAT
+#define TR6_MIX
+#define TR6_USE
+#define TR6_ZAP
+#define TR6_AMMO			/* Item is branded in stacks */
+#define TR6_GOLD	0x00000000L	/* Item picked up for money only (cmd1.c) */
+#define TR6_EAT_BODY			/* Monster eats if has 'eat body' */
+#define TR6_EAT_INSECT			/* Monster eats if an insect */
+#define TR6_EAT_ANIMAL			/* Monster eats if an animal */
+#define TR6_EAT_CURE			/* Monster eats if looking for a cure */
+#define TR6_EAT_HEAL			/* Monster eats if looking for healing */
+#define TR6_EAT_MANA			/* Monster eats if looking for mana */
+
+
+
 
 /*
  * Indexes for incremental resists and other incremental abilities.

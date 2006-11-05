@@ -224,14 +224,14 @@ static void get_stats(void)
 
 	int bonus_max, bonus_add;
 
-	int dice[18];
+	int dice[A_MAX * 3];
 
 
 	/* Roll and verify some stats */
 	while (TRUE)
 	{
 		/* Roll some dice */
-		for (j = i = 0; i < 18; i++)
+		for (j = i = 0; i < A_MAX * 3; i++)
 		{
 			/* Roll the dice */
 			dice[i] = randint(3 + i % 3);
@@ -241,7 +241,7 @@ static void get_stats(void)
 		}
 
 		/* Verify totals */
-		if ((j > 42) && (j < 54)) break;
+		if ((j > A_MAX * 7) && (j < A_MAX * 9)) break;
 	}
 
 	/* Roll the stats */
