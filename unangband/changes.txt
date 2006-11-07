@@ -64,6 +64,8 @@ within line of fire (Suggested by Matthias Rudolf).
 
 - Killing a monster will alert their allies, if one of them is awake to see it.
 
+- Monster level and rarity now set by algorithm as opposed to manually.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
@@ -84,6 +86,8 @@ Matthias Rudolf).
 - Fixed bug preventing resist disease magical items from being generated.
 
 - Fixed a number of monsters so they get to use their spells or innate ranged abilities.
+
+- Replaced Durin's tomb with Balin's tomb.
 
 ### Build / Platform ###
 

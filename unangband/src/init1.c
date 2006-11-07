@@ -6488,14 +6488,16 @@ static long eval_max_dam(monster_race *r_ptr)
 							case GF_ELEC:
 							case GF_POIS:
 							{
-								/* Lets just pretend the player has the right base resist*/
-								div_by *= 3;
+								/* Scale for level */
+								mult *= 20;
+								div_by *= rlev + 20;
 
 								break;
 							}
 
 						}
 
+						/* Get damage */
 						this_dam = eval_blow_effect(which_gf, (this_dam * mult) / div_by, r_ptr->level);
 
 						/* Slight bonus for being powerful */
@@ -6612,6 +6614,9 @@ static long eval_max_dam(monster_race *r_ptr)
 						else if (flag_counter == RF7_S_WRAITH)	this_dam = rlev * 9 / 2;
 						else if (flag_counter == RF7_S_UNIQUE)	this_dam = rlev * 3;
 						else if (flag_counter == RF7_S_HI_UNIQUE)	this_dam = rlev * 5;
+
+						/* Fast summoners are more threatening */
+						this_dam = (this_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) / 10;
 						break;
 					}
 				}
@@ -6641,27 +6646,27 @@ static long eval_max_dam(monster_race *r_ptr)
 				/* Get frequency */
 				if ((x == 0) && (flag_counter & innate_mask)) freq = r_ptr->freq_innate;
 				else freq = r_ptr->freq_spell;
-
+#if 0
 				/* Paranoia */
 				if (!freq)
 				{
 					r_ptr->highest_threat = 30000;
 					r_ptr->best_threat = 96 + x * 32 + i;
 				}
-
+#endif
 				/* Get mana required */
 				if (x == 0) need_mana = spell_info_RF4[i][0];
 				else if (x == 1) need_mana = spell_info_RF5[i][0];
 				else if (x == 2) need_mana = spell_info_RF6[i][0];
 				else if (x == 3) need_mana = spell_info_RF7[i][0];
-
+#if 0
 				/* Paranoia */
 				if ((need_mana) && !(r_ptr->mana))
 				{
 					r_ptr->highest_threat = 30000;
 					r_ptr->best_threat = 96 + x * 32 + i;
 				}
-
+#endif
 				/* Adjust frequency for ammo */
 				if (has_ammo * 5 < freq) freq = has_ammo * 5;
 
@@ -6711,7 +6716,7 @@ static long eval_max_dam(monster_race *r_ptr)
 			if (!method) continue;
 
 			/* Assume maximum damage*/
-			atk_dam = d_dice * d_side;
+			atk_dam = eval_blow_effect(effect, d_dice * d_side, r_ptr->level);
 
 			switch (method)
 			{
@@ -6758,15 +6763,28 @@ static long eval_max_dam(monster_race *r_ptr)
 				int range = MAX_SIGHT, mana = 0, has_ammo = 0, freq;
 				bool must_hit = FALSE;
 
+				/* handle elemental breaths*/
+				switch (effect)
+				{
+					case GF_ACID:
+					case GF_FIRE:
+					case GF_COLD:
+					case GF_ELEC:
+					case GF_POIS:
+					{
+						/* Scale for level */
+						atk_dam *= 20;
+						atk_dam /= rlev + 20;
+						break;
+					}
+				}
+
 				/* Hack - record most damaging spell for diagnostics */
 				if (atk_dam > r_ptr->highest_threat)
 				{
 					r_ptr->highest_threat = atk_dam;
 					r_ptr->best_threat = 96 + i;
 				}
-
-				/* Scale for frequency of innate attacks */
-				atk_dam = atk_dam * r_ptr->freq_innate / 100;
 
 				/* Some ranged blows can miss */
 				switch(method)
@@ -6837,7 +6855,7 @@ static long eval_max_dam(monster_race *r_ptr)
 
 				/* Get frequency */
 				freq = r_ptr->freq_innate;
-
+#if 0
 				/* Paranoia */
 				if (!freq)
 				{
@@ -6851,7 +6869,7 @@ static long eval_max_dam(monster_race *r_ptr)
 					r_ptr->highest_threat = 30000;
 					r_ptr->best_threat = 96 + i;
 				}
-
+#endif
 				/* Adjust frequency for ammo */
 				if (has_ammo * 5 < freq) freq = has_ammo * 5;
 
@@ -6893,7 +6911,7 @@ static long eval_max_dam(monster_race *r_ptr)
 		}
 
 		/* Hack - record most damaging spell for diagnostics */
-		if (melee_dam > r_ptr->highest_threat)
+		if ((melee_dam > r_ptr->highest_threat) && (!(r_ptr->flags1 & (RF1_NEVER_MOVE)) || (r_ptr->flags2 & (RF2_MULTIPLY))))
 		{
 			r_ptr->highest_threat = melee_dam;
 			r_ptr->best_threat = 0;
@@ -6981,7 +6999,16 @@ static long eval_max_dam(monster_race *r_ptr)
 	 * monster at speed 100 will do half, etc.  Bonus for monsters who can haste self.
 	 */
 	dam = (dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) / 10;
-	r_ptr->highest_threat = (r_ptr->highest_threat * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 10 : 0)]) / 10;
+
+	/*
+	 * Adjust threat for speed -- multipliers are more threatening.
+	 */
+	if (r_ptr->flags2 & (RF2_MULTIPLY))
+		r_ptr->highest_threat = (r_ptr->highest_threat * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) / 10;
+	/*
+ 	 * Monsters that multiply / with friends can surround the player in a corridor.
+	 */
+	if ((r_ptr->flags1 & (RF1_FRIENDS)) || (r_ptr->flags2 & (RF2_MULTIPLY))) r_ptr->highest_threat *= 2;
 
 	/*but deep in a minimum*/
 	if (dam < 1) dam  = 1;
@@ -6995,7 +7022,7 @@ static long eval_max_dam(monster_race *r_ptr)
 static long eval_hp_adjust(monster_race *r_ptr)
 {
 	long hp;
-	int resists = 0;
+	int resists = 1;
 	int ac = 0;
 	int hide_bonus = 0;
 
@@ -7042,6 +7069,11 @@ static long eval_hp_adjust(monster_race *r_ptr)
 		 (r_ptr->flags6 & RF6_TELE_AWAY)||
 		 (r_ptr->flags6 & RF6_TELE_LEVEL)) hp = (hp * 6) / 5;
 
+	/*
+ 	 * Monsters that multiply are tougher to kill
+	 */
+	if (r_ptr->flags2 & (RF2_MULTIPLY)) hp *= 2;
+
 	/* Monsters with resistances are harder to kill.
 	   Therefore effective slays / brands against them are worth more. */
 	if (r_ptr->flags3 & RF3_IM_ACID)	resists += 2;
@@ -7070,21 +7102,21 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	if (r_ptr->flags9 & RF9_EVASIVE) resists += 2;
  
 	/* Bonus for multiple basic resists and weapon resists */
-	if (resists >= 10) resists *= 6;
+	if (resists >= 12) resists *= 6;
 	else if (resists >= 10) resists *= 4;
 	else if (resists >= 8) resists *= 3;
 	else if (resists >= 6) resists *= 2;
 
-	/* Reduce resists by vulnerabilities */
-	if (r_ptr->flags3 & RF3_HURT_LITE)	resists -= 3;
-	if (r_ptr->flags3 & RF3_HURT_ROCK)	resists -= 3;
-	if (r_ptr->flags3 & RF3_HURT_WATER)	resists -= 1;
-	if (r_ptr->flags2 & RF2_MUST_FLY)	resists -= 1;
-	if (r_ptr->flags2 & RF2_MUST_SWIM)	resists -= 1;
+	/* Terrain exploits reduce overall resists */
+	if (r_ptr->flags3 & RF3_HURT_LITE) 	resists /= 2;
+	if (r_ptr->flags2 & RF2_MUST_FLY)	resists /= 2;
+	if (r_ptr->flags2 & RF2_MUST_SWIM)	resists /= 3;
 
 	/* If quite resistant, reduce resists by defense holes */
-	if (resists >= 5)
+	if (resists >= 6)
 	{
+		if (r_ptr->flags3 & RF3_HURT_ROCK) 	resists -= 1;
+		if (r_ptr->flags3 & RF3_HURT_WATER) 	resists -= 1;
 		if (!(r_ptr->flags3 & RF3_NO_SLEEP))	resists -= 3;
 		if (!(r_ptr->flags3 & RF3_NO_FEAR))	resists -= 2;
 		if (!(r_ptr->flags3 & RF3_NO_CONF))	resists -= 2;
@@ -7094,11 +7126,11 @@ static long eval_hp_adjust(monster_race *r_ptr)
 		if (!(r_ptr->flags9 & RF9_NO_CUTS))	resists -= 1;
 		if (!(r_ptr->flags9 & RF9_RES_TPORT))	resists -= 2;
 
-		if (resists < 0) resists = 0;
+		if (resists < 5) resists = 5;
 	}
 
 	/* If quite resistant, bonus for high resists */
-	if (resists >= 5)
+	if (resists >= 3)
 	{
 		if (r_ptr->flags9 & RF9_RES_DARK)	resists += 1;
 		if (r_ptr->flags9 & RF9_RES_CHAOS)	resists += 1;
@@ -7138,12 +7170,12 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	if (resists < ac)
 	{
 		/* Modify hit points by ac */
-		hp += hp * resists / 250;
+		hp += hp * resists / (150 + r_ptr->level);
 	}
 	else
 	{
 		/* Modify hit points by ac */
-		hp += hp * ac / 250;
+		hp += hp * ac / (150 + r_ptr->level);
 	}
 
 	/*boundry control*/
@@ -7169,11 +7201,18 @@ errr eval_r_power(header *head)
 	long mon_count[MAX_DEPTH];
 	monster_race *r_ptr = NULL;
 
-	/* Reset the sum of all monster power values */
-	tot_mon_power = 0;
+	int iteration;
 
 	/* Allocate space for power */
 	C_MAKE(power, z_info->r_max, long);
+
+
+for (iteration = 0; iteration < 3; iteration ++)
+{
+
+	/* Reset the sum of all monster power values */
+	tot_mon_power = 0;
+
 
 	/* Make sure all arrays start at zero */
 	for (i = 0; i < MAX_DEPTH; i++)
@@ -7244,7 +7283,28 @@ errr eval_r_power(header *head)
 		if (lvl == 0) r_ptr->mexp = 0L;
 		else
 		{
-			r_ptr->mexp = (hp * dam) / (lvl * 25);
+			/* Compute depths of non-unique monsters */
+			if (!(r_ptr->flags1 & (RF1_UNIQUE)))
+			{
+				long mexp = (hp * dam) / 25;
+				long threat = r_ptr->highest_threat;
+
+				/* Compute level algorithmically */
+				for (j = 1; (mexp > j + 4) || (threat > j + 5); mexp -= j * j, threat -= (j + 4), j++);
+
+				/* Set level */
+				lvl = MIN(( j > 250 ? 90 + (j - 250) / 20 : 	/* Level 90 and above */
+						(j > 130 ? 70 + (j - 130) / 6 :	/* Level 70 and above */
+						(j > 40 ? 40 + (j - 40) / 3 :	/* Level 40 and above */
+						j))), 99);
+
+				/* Set level */
+				r_ptr->level = lvl;
+			}
+
+			/* Hack -- for Ungoliant */
+			if (hp > 10000) r_ptr->mexp = (hp / 25) * (dam / lvl);
+			else r_ptr->mexp = (hp * dam) / (lvl * 25);
 
 			/* Round to 2 significant figures */
 			if (r_ptr->mexp > 100)
@@ -7260,8 +7320,7 @@ errr eval_r_power(header *head)
 		if ((lvl) && (r_ptr->mexp < 1L)) r_ptr->mexp = 1L;
 
 		/*
-		 * Hack - at level 50 & above and 75 & above, we have to use an adjustment
-		 * factor to prevent overflow.
+		 * Hack - We have to use an adjustment factor to prevent overflow.
                  */
 		if (lvl >= 90)
 		{
@@ -7388,6 +7447,8 @@ errr eval_r_power(header *head)
 	/* Apply divisors now */
 	for (i = 0; i < z_info->r_max; i++)
 	{
+		int new_power;
+
 		/* Point at the "info" */
 		r_ptr = (monster_race*)head->info_ptr + i;
 
@@ -7411,8 +7472,19 @@ errr eval_r_power(header *head)
 
 			/* Never less than 1 */
 			if (r_ptr->power < 1) r_ptr->power = 1;
+
+			/* Get power */
+			new_power = r_ptr->power;
+
+			/* Compute rarity algorithmically */
+			for (j = 1; new_power > j; new_power -= j * j, j++);
+
+			/* Set rarity */
+			r_ptr->rarity = j;
 		}
 	}
+
+}
 
 	/* Free power array */
 	FREE(power);
