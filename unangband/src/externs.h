@@ -336,6 +336,7 @@ extern char pf_result[MAX_PF_LENGTH];
 extern int pf_result_index;
 extern quiver_group_type quiver_group[MAX_QUIVER_GROUPS];
 extern s16b bag_kinds_cache[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL];
+extern ecology_type cave_ecology;
 
 
 /*
@@ -643,6 +644,7 @@ extern bool animate_object(int item);
 extern void set_monster_fear(monster_type *m_ptr, int v, bool panic);
 extern bool multiply_monster(int m_idx);
 extern void message_pain(int m_idx, int dam);
+extern void get_monster_ecology(int r_idx);
 
 /* object1.c */
 extern void flavor_init(void);

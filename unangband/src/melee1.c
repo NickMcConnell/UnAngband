@@ -1558,6 +1558,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	bool normal;
 	bool direct;
 
+	/* Some summons override cave ecology */
+	bool old_cave_ecology = cave_ecology.ready;
+
 	/* Hack -- don't summon on surface */
 	bool surface = p_ptr->depth == min_depth(p_ptr->dungeon);
 
@@ -4670,6 +4673,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_R_KIN */
 		case 192 + 1:
 		{
+			/* Override cave ecology */
+			cave_ecology.ready = FALSE;
+
 			if (surface) break;
 			disturb(1, 0);
 			if (who > 0)
@@ -4698,6 +4704,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_A_DEAD */
 		case 192 + 2:
 		{
+			/* Override cave ecology */
+			cave_ecology.ready = FALSE;
+
 			if (surface) break;
 			disturb(1, 0);
 			if (who > 0)
@@ -4756,6 +4765,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_R_MONSTER */
 		case 192 + 5:
 		{
+			/* Override cave ecology */
+			cave_ecology.ready = FALSE;
+
 			if (surface) break;
 			disturb(1, 0);
 			if (who > 0)
@@ -4773,6 +4785,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_R_MONSTERS */
 		case 192 + 6:
 		{
+			/* Override cave ecology */
+			cave_ecology.ready = FALSE;
+
 			if (surface) break;
 			disturb(1, 0);
 			if (who > 0)
@@ -5155,7 +5170,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			for (k = 0; k < 1; k++)
 			{
 				count += summon_specific(m_ptr->fy, m_ptr->fx,
-					rlev - 1 - 1, SUMMON_DRAGON);
+					rlev - 1, SUMMON_DRAGON);
 			}
 
 			break;
@@ -5184,6 +5199,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_A_ELEMENT */
 		case 192 + 22:
 		{
+			/* Override cave ecology */
+			cave_ecology.ready = FALSE;
+
 			if (surface) break;
 			disturb(1, 0);
 
@@ -5202,6 +5220,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_A_OBJECT */
 		case 192 + 23:
 		{
+			/* Override cave ecology */
+			cave_ecology.ready = FALSE;
+
 			if (surface) break;
 			disturb(1, 0);
 
@@ -5413,6 +5434,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				msg_print("Something tried to cast a spell that has not yet been defined.");
 		}
 	}
+
+	/* Restore cave ecology */
+	cave_ecology.ready = old_cave_ecology;
 
 	/* Hack - Inform a blind player about monsters appearing nearby */
 	if (blind && count && (target < 0))

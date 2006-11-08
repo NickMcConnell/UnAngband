@@ -1631,50 +1631,6 @@ static void generate_hole(int y1, int x1, int y2, int x2, int feat)
 	}
 }
 
-/*
- * Hack -- flags type for "vault_aux_room_info()"
- */
-static int room_info_mon_flag;
-
-
-/*
- * Hack -- char type for "vault_aux_room_info()"
- */
-static byte room_info_mon_char;
-
-
-/*
- * Helper function for room info
- */
-static bool room_info_mon(int r_idx)
-{
-	monster_race *r_ptr = &r_info[r_idx];
-
-	/* Hack -- Require matching graphic if set  */
-	if ((room_info_mon_char) &&
-		(room_info_mon_char != r_ptr->d_char)) return (FALSE);
-
-	/* Require matching flag if set */
-	if (room_info_mon_flag < 0) return (TRUE);
-
-	if ((room_info_mon_flag < 32) && 
-		!(r_ptr->flags1 & (1L << room_info_mon_flag))) return (FALSE);
-
-	if ((room_info_mon_flag >= 32) && 
-		(room_info_mon_flag < 64) && 
-		!(r_ptr->flags2 & (1L << (room_info_mon_flag -32)))) return (FALSE);
-
-	if ((room_info_mon_flag >= 64) && 
-		(room_info_mon_flag < 96) && 
-		!(r_ptr->flags3 & (1L << (room_info_mon_flag -64)))) return (FALSE);
-
-	if ((room_info_mon_flag >= 96) && 
-		(room_info_mon_flag < 128) && 
-		!(r_ptr->flags4 & (1L << (room_info_mon_flag -96)))) return (FALSE);
-
-	/* Okay */
-	return (TRUE);
-}
 
 /*
  * Hack -- flags type for "vault_aux_room_info()"
@@ -1699,7 +1655,7 @@ static bool room_info_kind(int k_idx)
  */
 static void get_room_info(int y, int x)
 {
-	int i, j, chart, roll;
+	int i, j, k, chart, roll;
 
 	int room = dun->cent_n+1;
 
@@ -1729,6 +1685,70 @@ static void get_room_info(int y, int x)
 			while ((chart != d_info[i].chart) || (100 > d_info[i].roll)) i++;
 		}
 
+		/* If not allowed because of missing monsters, drop to maximum result */
+		if (cave_ecology.ready)
+		{
+			/* Currently valid */
+			bool invalid = FALSE, match_char = FALSE, match_flag = FALSE;
+
+			/* Has a monster match requirement */
+			for (k = 0; k < cave_ecology.num_races; k++)
+			{
+				monster_race *r_ptr = &r_info[k];
+
+				/* Check for char match */
+				if ((d_info[i].r_char) && (r_ptr->d_char)) match_char = TRUE;
+
+				/* Check for flag match */
+				if (d_info[i].r_flag)
+				{
+					if ((d_info[i].r_flag < 33) && 
+						!(r_ptr->flags1 & (1L << (d_info[i].r_flag - 1)))) match_flag = TRUE;
+
+					if ((d_info[i].r_flag >= 33) && 
+						(d_info[i].r_flag < 65) && 
+						!(r_ptr->flags2 & (1L << (d_info[i].r_flag -33)))) match_flag = TRUE;
+
+					if ((d_info[i].r_flag >= 65) && 
+						(d_info[i].r_flag < 97) && 
+						!(r_ptr->flags3 & (1L << (d_info[i].r_flag -65)))) match_flag = TRUE;
+
+					if ((d_info[i].r_flag >= 97) && 
+						(d_info[i].r_flag < 129) && 
+						!(r_ptr->flags4 & (1L << (d_info[i].r_flag -97)))) match_flag = TRUE;
+
+					if ((d_info[i].r_flag >= 129) && 
+						(d_info[i].r_flag < 161) && 
+						!(r_ptr->flags5 & (1L << (d_info[i].r_flag -129)))) match_flag = TRUE;
+
+					if ((d_info[i].r_flag >= 161) && 
+						(d_info[i].r_flag < 193) && 
+						!(r_ptr->flags6 & (1L << (d_info[i].r_flag -161)))) match_flag = TRUE;
+
+					if ((d_info[i].r_flag >= 193) && 
+						(d_info[i].r_flag < 225) && 
+						!(r_ptr->flags7 & (1L << (d_info[i].r_flag -193)))) match_flag = TRUE;
+
+					if ((d_info[i].r_flag >= 225) && 
+						(d_info[i].r_flag < 257) && 
+						!(r_ptr->flags8 & (1L << (d_info[i].r_flag -225)))) match_flag = TRUE;
+
+					if ((d_info[i].r_flag >= 257) && 
+						(d_info[i].r_flag < 289) && 
+						!(r_ptr->flags9 & (1L << (d_info[i].r_flag -257)))) match_flag = TRUE;
+				}
+			}
+
+			/* No char match found */
+			if ((d_info[i].r_char) && !(match_char)) invalid = TRUE;
+
+			/* No flag match found */
+			if ((d_info[i].r_flag) && !(match_flag)) invalid = TRUE;
+
+			/* Invalid -- don't pick */
+			if (invalid) while ((chart != d_info[i].chart) || (100 > d_info[i].roll)) i++;
+		}
+
 		/* Save index */
 		room_info[room].section[j++] = i;
 
@@ -1738,21 +1758,6 @@ static void get_room_info(int y, int x)
 		/* Place flags except SEEN */
 		room_info[room].flags |= (d_info[i].flags & ~(ROOM_SEEN));
 		
-		/* Place monster if needed */
-		if ((d_info[i].r_flag) || (d_info[i].r_char))
-		{
-			room_info_mon_flag = d_info[i].r_flag -1;
-			room_info_mon_char = d_info[i].r_char;
-
-			get_mon_num_hook = room_info_mon;
-
-			/* Prepare allocation table */
-			get_mon_num_prep();
-
-			/* Place several monsters */
-			vault_monsters(y,x,randint(2)+2);
-		}
-
 		/* Place objects if needed */
 		if (d_info[i].tval)
 		{
@@ -4150,6 +4155,44 @@ static void cave_gen(void)
 		}
 	}
 
+	/* Initialise the dungeon ecology */
+	cave_ecology.num_races = 0;
+	cave_ecology.ready = FALSE;
+
+	/* Place guardian if permitted */
+	if ((zone->guard) && (r_info[zone->guard].cur_num <= 0))
+	{
+		get_monster_ecology(zone->guard);
+	}
+
+	/* Get a seed monster for the ecology */
+	else
+	{
+		/* Set monster hook */
+		get_mon_num_hook = dun_level_mon;
+
+		/* Prepare allocation table */
+		get_mon_num_prep();
+
+		/* Get seed monster for ecology */
+		get_monster_ecology(0);
+	}
+
+	/* Clear monster hook */
+	get_mon_num_hook = NULL;
+
+	/* Prepare allocation table */
+	get_mon_num_prep();
+
+	/* Get additional monsters for the ecology */
+	while (cave_ecology.num_races < 4)
+	{
+		get_monster_ecology(0);
+	}
+
+	/* Start the ecology */
+	cave_ecology.ready = TRUE;
+
 	/* Possible "destroyed" level */
 	if ((p_ptr->depth > 10) && (rand_int(DUN_DEST) == 0)) destroyed = TRUE;
 
@@ -5037,6 +5080,10 @@ static void town_gen(void)
 
 	/* Initialise 'zeroeth' room description */
 	room_info[0].flags = 0;
+
+	/* Town does not have an ecology */
+	cave_ecology.num_races = 0;
+	cave_ecology.ready = FALSE;
 
 	/* Day time */
 	if (surface && daytime)

@@ -453,6 +453,9 @@ errr get_mon_num_prep(void)
 {
 	int i;
 
+	/* Using the ecology model */
+	if (cave_ecology.ready) return (0);
+
 	/* Scan the allocation table */
 	for (i = 0; i < alloc_race_size; i++)
 	{
@@ -520,6 +523,29 @@ s16b get_mon_num(int level)
 
 	bool daytime = ((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2));
 
+	/*
+	 * Use the ecology model
+	 *
+	 * This is a completely different model of monster distribution.
+	 *
+	 * We initialise a small table at the start of level generation and then
+	 * pick monsters from it. We ignore all rarity models and only accept
+	 * monsters from the table.
+	 */
+	if ((cave_ecology.ready) && (cave_ecology.num_races > 0))
+	{
+		int r_idx = cave_ecology.race[rand_int(cave_ecology.num_races)];
+
+		/* Hack -- Only 1 opportunity to encounter a unique */
+		if (r_info[r_idx].flags1 & (RF1_UNIQUE))
+		{
+			/* Replace entry in table */
+			cave_ecology.race[r_idx] = cave_ecology.race[--cave_ecology.num_races];
+		}
+
+		return (r_idx);
+	}
+
 	/* Boost the level */
 	if (level > 0)
 	{
@@ -556,6 +582,9 @@ s16b get_mon_num(int level)
 
 		/* Default */
 		table[i].prob3 = 0;
+
+		/* Ensure minimum depth */
+		if (table[i].level < MIN(p_ptr->depth - 3, level - 2)) continue;
 
 		/* No town monsters in dungeon */
 		if ((level > 0) && (table[i].level <= 0)) continue;
@@ -4472,4 +4501,298 @@ void message_pain(int m_idx, int dam)
 		else
 			msg_format("%^s cries out feebly.", m_name);
 	}
+}
+
+
+/*
+ * Auxiliary helper function for get_monster_ecology.
+ */
+bool get_monster_ecology_aux(bool (*tmp_mon_num_hook)(int r_idx), int number)
+{
+	int count;
+	int races = cave_ecology.num_races + number;
+
+	/* No more races */
+	if (cave_ecology.num_races >= MAX_ECOLOGY_RACES) return (FALSE);
+
+	/* Limit */
+	if (races > MAX_ECOLOGY_RACES) races = MAX_ECOLOGY_RACES;
+
+	/* Use supplied hook */
+	get_mon_num_hook = tmp_mon_num_hook;
+
+	/* Prepare allocation table */
+	get_mon_num_prep();
+
+	/* Limit loop */
+	count = 0;
+
+	/* Pick */
+	while ((count < 1000) && (cave_ecology.num_races < races))
+	{
+		/* Make a resident */
+		cave_ecology.race[cave_ecology.num_races] = get_mon_num(monster_level);
+
+		/* Have a good race */
+		if (cave_ecology.race[cave_ecology.num_races])
+		{
+			cave_ecology.num_races++;
+		}
+
+		/* Increase counter */
+		count++;
+	}
+
+	return(TRUE);
+}
+
+
+
+/*
+ * Get a monster, and add it and its allies to the ecology for the level.
+ */
+void get_monster_ecology(int r_idx)
+{
+	/* Store old hook */
+	bool (*get_mon_num_hook_temp)(int r_idx) = get_mon_num_hook;
+
+	/* Regenerate hook? */
+	bool used_new_hook = FALSE;
+
+	int old_monster_level = monster_level;
+
+	/* Paranoia */
+	if (cave_ecology.num_races >= MAX_ECOLOGY_RACES) return;
+
+	/* Pick a monster if one not specified */
+	if (!r_idx) r_idx = get_mon_num(monster_level);
+
+	/* Have a good race */
+	if (r_idx)
+	{
+		monster_race *r_ptr = &r_info[r_idx];
+
+		/* Hack -- hack the ecology */
+		int hack_ecology = 0;
+
+		monster_level = r_ptr->level - 1;
+
+		/* For first monster, we force some related monsters to appear */
+		if (!cave_ecology.num_races) hack_ecology = randint(6);
+
+		/* Add the monster */
+		cave_ecology.race[cave_ecology.num_races++] = r_idx;
+
+		/* Add flags */
+
+		/* Add escort races */
+		if (r_ptr->flags1 & (RF1_ESCORT | RF1_ESCORTS))
+		{
+			place_monster_idx = cave_ecology.race[cave_ecology.num_races];
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(place_monster_okay, 1 + rand_int(3) + (r_ptr->flags1 & (RF1_ESCORT) ? rand_int(3) : 0));
+		}
+
+		/* Add summon races -- summon kin */
+		if ((r_ptr->flags7 & (RF7_S_KIN)) || (hack_ecology == 1))
+		{
+			summon_specific_type = SUMMON_KIN;
+			summon_char_type = r_ptr->d_char;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, rand_int(2) + (r_ptr->flags1 & (RF1_UNIQUE) ? rand_int(3) : 0));
+		}
+
+		/* Add summon races -- summon plant */
+		if ((r_ptr->flags7 & (RF7_S_PLANT)) || (hack_ecology == 2))
+		{
+			summon_specific_type = SUMMON_PLANT;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon insect */
+		if (r_ptr->flags7 & (RF7_S_INSECT))
+		{
+			summon_specific_type = SUMMON_INSECT;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon animal */
+		if ((r_ptr->flags7 & (RF7_S_ANIMAL)) || (hack_ecology == 3))
+		{
+			summon_specific_type = SUMMON_ANIMAL;
+
+			/* Hack -- Set the class flags to summon */
+			summon_flag_type = (r_ptr->flags8 & (RF8_SKIN_MASK));
+
+			/* Mega Hack -- Other racial preferences for animals */
+			if (!summon_flag_type)
+			{
+				/* Everyone likes lions, tigers, wolves */
+				summon_flag_type |= RF8_HAS_FUR;
+
+				/* Surface dwellers like birds */
+				if ((r_ptr->flags9 & (RF9_RACE_MASK)) && ! (r_ptr->flags3 & (RF3_RACE_MASK))) 
+					summon_flag_type |= RF8_HAS_FEATHER;
+
+				/* Dungeon dwellers like reptiles, fish and worse */
+				else summon_flag_type |= RF8_HAS_SCALE;
+			}
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon hound */
+		if (r_ptr->flags7 & (RF7_S_HOUND))
+		{
+			summon_specific_type = SUMMON_HOUND;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon spider */
+		if (r_ptr->flags7 & (RF7_S_SPIDER))
+		{
+			summon_specific_type = SUMMON_SPIDER;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon class */
+		if ((r_ptr->flags7 & (RF7_S_CLASS)) || (hack_ecology == 4))
+		{
+			summon_specific_type = SUMMON_CLASS;
+
+			/* Hack -- Set the class flags to summon */
+			summon_flag_type = (r_ptr->flags2 & (RF2_CLASS_MASK));
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon race */
+		if ((r_ptr->flags7 & (RF7_S_RACE)) || (hack_ecology == 5))
+		{
+			summon_specific_type = SUMMON_RACE;
+
+			/* Hack -- Set the class flags to summon */
+			summon_flag_type = (r_ptr->flags3 & (RF3_RACE_MASK));
+
+			/* Mega Hack -- Combine two flags XXX */
+			summon_flag_type |= (r_ptr->flags9 & (RF9_RACE_MASK));
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon group */
+		if ((r_ptr->flags7 & (RF7_S_GROUP)) || (hack_ecology == 6))
+		{
+			summon_specific_type = SUMMON_GROUP;
+			summon_group_type = r_ptr->grp_idx;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon orc */
+		if (r_ptr->flags7 & (RF7_S_ORC))
+		{
+			summon_specific_type = SUMMON_ORC;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon troll */
+		if (r_ptr->flags7 & (RF7_S_TROLL))
+		{
+			summon_specific_type = SUMMON_TROLL;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon giant */
+		if (r_ptr->flags7 & (RF7_S_GIANT))
+		{
+			summon_specific_type = SUMMON_GIANT;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon dragon */
+		if (r_ptr->flags7 & (RF7_S_DRAGON))
+		{
+			summon_specific_type = SUMMON_DRAGON;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon high dragon */
+		if (r_ptr->flags7 & (RF7_S_HI_DRAGON))
+		{
+			summon_specific_type = SUMMON_HI_DRAGON;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon demon */
+		if (r_ptr->flags7 & (RF7_S_DEMON))
+		{
+			summon_specific_type = SUMMON_DEMON;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon high demon */
+		if (r_ptr->flags7 & (RF7_S_HI_DEMON))
+		{
+			summon_specific_type = SUMMON_HI_DEMON;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon undead */
+		if (r_ptr->flags7 & (RF7_S_UNDEAD))
+		{
+			summon_specific_type = SUMMON_UNDEAD;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+
+		/* Add summon races -- summon high undead */
+		if (r_ptr->flags7 & (RF7_S_HI_UNDEAD))
+		{
+			summon_specific_type = SUMMON_HI_UNDEAD;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+		}
+	}
+
+	/* Regenerate monster hook */
+	if (used_new_hook)
+	{
+		get_mon_num_hook = get_mon_num_hook_temp;
+
+		get_mon_num_prep();
+	}
+
+	/* Get old monster level */
+	monster_level = old_monster_level;
 }

@@ -121,6 +121,7 @@ typedef struct start_item start_item;
 typedef struct tval_desc tval_desc;
 typedef struct element_type element_type;
 typedef struct quiver_group_type quiver_group_type;
+typedef struct ecology_type ecology_type;
 
 
 
@@ -236,7 +237,7 @@ struct desc_type
 	s16b feat;      /* Extra features of this type */
 
 	u16b tval;      /* Add objects of this tval */
-	byte r_flag;    /* Add races with this flag */
+	u16b r_flag;    /* Add races with this flag */
 
 	byte r_char;    /* Add races of this char */
 	byte l_flag;    /* Restrict to these level types */
@@ -1642,3 +1643,15 @@ struct quiver_group_type
 	char cmd;		/* The command used to perform an action with the objects in the group */
 	byte color;		/* The color of the pseudo-tag used for the group */
 };
+
+
+/*
+ * Info about what monsters are placed in the dungeon.
+ */
+struct ecology_type
+{
+	s16b race[MAX_ECOLOGY_RACES];
+	byte num_races;
+	bool ready;		/* Are we forced to use this ecology? */
+};
+

@@ -3708,6 +3708,11 @@
 
 
 /*
+ *  Ecologies - used for monster placement
+ */
+#define MAX_ECOLOGY_RACES	64
+
+/*
  * Hack -- Bit masks to control what spells are considered
  */
 

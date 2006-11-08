@@ -1980,6 +1980,28 @@ static errr grab_one_offset(byte *offset, cptr names[], cptr what)
 
 
 /*
+ * Grab one flag from a textual string and convert to numeric
+ */
+static errr grab_one_offset_u16b(u16b *offset, cptr names[], cptr what)
+{
+	int i;
+
+	/* Check flags */
+	for (i = 0; i < 32; i++)
+	{
+		if (streq(what, names[i]))
+		{
+			*offset = *offset+i;
+			return (0);
+		}
+	}
+
+	*offset = *offset+32;
+	return (-1);
+}
+
+
+/*
  * Grab one special flag in an desc_type from a textual string
  */
 static errr grab_one_special_flag(desc_type *d_ptr, cptr what)
@@ -2017,31 +2039,31 @@ static errr grab_one_room_race_flag(desc_type *d_ptr, cptr what)
 {
 	d_ptr->r_flag = 1;
 
-	if (grab_one_offset(&d_ptr->r_flag, r_info_flags1, what) == 0)
+	if (grab_one_offset_u16b(&d_ptr->r_flag, r_info_flags1, what) == 0)
 		return (0);
 
-	if (grab_one_offset(&d_ptr->r_flag, r_info_flags2, what) == 0)
+	if (grab_one_offset_u16b(&d_ptr->r_flag, r_info_flags2, what) == 0)
 		return (0);
 
-	if (grab_one_offset(&d_ptr->r_flag, r_info_flags3, what) == 0)
+	if (grab_one_offset_u16b(&d_ptr->r_flag, r_info_flags3, what) == 0)
 		return (0);
 
-	if (grab_one_offset(&d_ptr->r_flag, r_info_flags4, what) == 0)
+	if (grab_one_offset_u16b(&d_ptr->r_flag, r_info_flags4, what) == 0)
 		return (0);
 
-	if (grab_one_offset(&d_ptr->r_flag, r_info_flags5, what) == 0)
+	if (grab_one_offset_u16b(&d_ptr->r_flag, r_info_flags5, what) == 0)
 		return (0);
 
-	if (grab_one_offset(&d_ptr->r_flag, r_info_flags6, what) == 0)
+	if (grab_one_offset_u16b(&d_ptr->r_flag, r_info_flags6, what) == 0)
 		return (0);
 
-	if (grab_one_offset(&d_ptr->r_flag, r_info_flags7, what) == 0)
+	if (grab_one_offset_u16b(&d_ptr->r_flag, r_info_flags7, what) == 0)
 		return (0);
 
-	if (grab_one_offset(&d_ptr->r_flag, r_info_flags8, what) == 0)
+	if (grab_one_offset_u16b(&d_ptr->r_flag, r_info_flags8, what) == 0)
 		return (0);
 
-	if (grab_one_offset(&d_ptr->r_flag, r_info_flags9, what) == 0)
+	if (grab_one_offset_u16b(&d_ptr->r_flag, r_info_flags9, what) == 0)
 		return (0);
 #if 0
 	if (grab_one_offset(&d_ptr->r_flag, flow_flags, what) == 0)
@@ -7004,11 +7026,7 @@ static long eval_max_dam(monster_race *r_ptr)
 	 * Adjust threat for speed -- multipliers are more threatening.
 	 */
 	if (r_ptr->flags2 & (RF2_MULTIPLY))
-		r_ptr->highest_threat = (r_ptr->highest_threat * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) / 10;
-	/*
- 	 * Monsters that multiply / with friends can surround the player in a corridor.
-	 */
-	if ((r_ptr->flags1 & (RF1_FRIENDS)) || (r_ptr->flags2 & (RF2_MULTIPLY))) r_ptr->highest_threat *= 2;
+		r_ptr->highest_threat = (r_ptr->highest_threat * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) / 5;
 
 	/*but deep in a minimum*/
 	if (dam < 1) dam  = 1;

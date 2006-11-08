@@ -66,6 +66,9 @@ within line of fire (Suggested by Matthias Rudolf).
 
 - Monster level and rarity now set by algorithm as opposed to manually.
 
+- Levels now will only spawn a limit different types of monsters. If you want to encounter a 
+different range of monsters, you need to travel to a new level.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
