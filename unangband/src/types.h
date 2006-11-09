@@ -227,10 +227,10 @@ struct desc_type
 
 	u32b flags;      /* Room flags */
 
-	byte roll;  /* Frequency of this entry */
-	byte chart; /* Chart index */
-	byte next;  /* Next chart index */
-	byte unused;
+	byte chance;  	/* Frequency of this entry */
+	byte not_chance;/* Frequency of this entry if conditions not met */
+	byte chart; 	/* Chart index */
+	byte next;  	/* Next chart index */
 	
 	u16b level; /* Minimum */
 

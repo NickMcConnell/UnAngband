@@ -1650,160 +1650,178 @@ static bool room_info_kind(int k_idx)
 
 }
 
+
+
 /*
  * Get the room description, and place stuff accordingly.
  */
 static void get_room_info(int y, int x)
 {
-	int i, j, k, chart, roll;
+	int i, j, k, chart, pick, chance, count, counter;
 
 	int room = dun->cent_n+1;
 
-	/* Initialise chart */
+	/* Start sections */
 	chart = 1;
 	j = 0;
+	counter = 0;
 
 	/* Room flags */
-	room_info[room].flags =0;
+	room_info[room].flags = 0;
 
 	/* Process the description */
 	while (chart && (j < ROOM_DESC_SECTIONS - 1))
 	{
 		/* Start over */
-		i = 0;
+		i = -1;
+		count = 0;
+		pick = 0;
 
-		/* Roll for line */
-		roll = randint(100);
+		/* Get the start of entries in the table for this index */
+		while ((chart != d_info[i].chart) && (counter < 5000)) { i++; counter++;}
 
-		/* Get the proper entry in the table */
-		while ((chart != d_info[i].chart) || (roll > d_info[i].roll)) i++;
-
-		/* If not allowed on this level, drop to maximum result */
-		if ((p_ptr->depth < d_info[i].level)
-			|| ((d_info[i].l_flag) && !(level_flag & d_info[i].l_flag)))
+		/* Cycle through valid entries */
+		while (chart == d_info[i].chart)
 		{
-			while ((chart != d_info[i].chart) || (100 > d_info[i].roll)) i++;
-		}
-
-		/* If not allowed because of missing monsters, drop to maximum result */
-		if (cave_ecology.ready)
-		{
-			/* Currently valid */
-			bool invalid = FALSE, match_char = FALSE, match_flag = FALSE;
-
-			/* Has a monster match requirement */
-			for (k = 0; k < cave_ecology.num_races; k++)
+			counter++;
+			if (counter > 10000)
 			{
-				monster_race *r_ptr = &r_info[k];
+				msg_format("Error: loop in chart position %d", chart);
+				break;
+			}
+
+			/* Get chance */
+			chance = d_info[i].chance;
+
+			/* If not allowed at this depth, skip completely */
+			while (p_ptr->depth < d_info[i].level) i++;
+
+			/* If requires this level type, reduce chance of occurring */
+			if (!(level_flag & d_info[i].l_flag)) chance = d_info[i].not_chance;
+
+			/* If not allowed because doesn't match level monster, reduce chance of occuring */
+			else if ((cave_ecology.ready) && (cave_ecology.num_races))
+			{
+				/* Match main monster */
+				monster_race *r_ptr = &r_info[cave_ecology.race[0]];
 
 				/* Check for char match */
-				if ((d_info[i].r_char) && (r_ptr->d_char)) match_char = TRUE;
+				if (d_info[i].r_char != r_ptr->d_char) chance = d_info[i].not_chance;
 
 				/* Check for flag match */
 				if (d_info[i].r_flag)
 				{
 					if ((d_info[i].r_flag < 33) && 
-						!(r_ptr->flags1 & (1L << (d_info[i].r_flag - 1)))) match_flag = TRUE;
+						!(r_ptr->flags1 & (1L << (d_info[i].r_flag - 1)))) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 33) && 
 						(d_info[i].r_flag < 65) && 
-						!(r_ptr->flags2 & (1L << (d_info[i].r_flag -33)))) match_flag = TRUE;
+						!(r_ptr->flags2 & (1L << (d_info[i].r_flag -33)))) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 65) && 
 						(d_info[i].r_flag < 97) && 
-						!(r_ptr->flags3 & (1L << (d_info[i].r_flag -65)))) match_flag = TRUE;
+						!(r_ptr->flags3 & (1L << (d_info[i].r_flag -65)))) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 97) && 
 						(d_info[i].r_flag < 129) && 
-						!(r_ptr->flags4 & (1L << (d_info[i].r_flag -97)))) match_flag = TRUE;
+						!(r_ptr->flags4 & (1L << (d_info[i].r_flag -97)))) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 129) && 
 						(d_info[i].r_flag < 161) && 
-						!(r_ptr->flags5 & (1L << (d_info[i].r_flag -129)))) match_flag = TRUE;
+						!(r_ptr->flags5 & (1L << (d_info[i].r_flag -129)))) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 161) && 
 						(d_info[i].r_flag < 193) && 
-						!(r_ptr->flags6 & (1L << (d_info[i].r_flag -161)))) match_flag = TRUE;
+						!(r_ptr->flags6 & (1L << (d_info[i].r_flag -161)))) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 193) && 
 						(d_info[i].r_flag < 225) && 
-						!(r_ptr->flags7 & (1L << (d_info[i].r_flag -193)))) match_flag = TRUE;
+						!(r_ptr->flags7 & (1L << (d_info[i].r_flag -193)))) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 225) && 
 						(d_info[i].r_flag < 257) && 
-						!(r_ptr->flags8 & (1L << (d_info[i].r_flag -225)))) match_flag = TRUE;
+						!(r_ptr->flags8 & (1L << (d_info[i].r_flag -225)))) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 257) && 
 						(d_info[i].r_flag < 289) && 
-						!(r_ptr->flags9 & (1L << (d_info[i].r_flag -257)))) match_flag = TRUE;
+						!(r_ptr->flags9 & (1L << (d_info[i].r_flag -257)))) chance = d_info[i].not_chance;
 				}
 			}
 
-			/* No char match found */
-			if ((d_info[i].r_char) && !(match_char)) invalid = TRUE;
-
-			/* No flag match found */
-			if ((d_info[i].r_flag) && !(match_flag)) invalid = TRUE;
-
-			/* Invalid -- don't pick */
-			if (invalid) while ((chart != d_info[i].chart) || (100 > d_info[i].roll)) i++;
-		}
-
-		/* Save index */
-		room_info[room].section[j++] = i;
-
-		/* Enter the next chart */
-		chart = d_info[i].next;
-
-		/* Place flags except SEEN */
-		room_info[room].flags |= (d_info[i].flags & ~(ROOM_SEEN));
-		
-		/* Place objects if needed */
-		if (d_info[i].tval)
-		{
-			room_info_kind_tval = d_info[i].tval;
-
-			get_obj_num_hook = room_info_kind;
-
-			/* Prepare allocation table */
-			get_obj_num_prep();
-
-			/* Place the items */
-			if (d_info[i].tval == TV_GOLD) vault_treasure(y,x,randint(4)+2);
-			else vault_items(y, x, randint(4)+2);
-
-			get_obj_num_hook = NULL;
-
-			/* Prepare allocation table */
-			get_obj_num_prep();
-
-		}
-			
-		/* Place features if needed */
-		if (d_info[i].feat)
-		{
-			int ii, y1, x1;
-			int num = 7 + rand_int(6);
-			int k = 0;
-
-			if (f_info[d_info[i].feat].flags3 & (FF3_ALLOC)) num /=2;
-
-			for (ii = 0; ii < 15; ii++)
+			/* Chance of room entry */
+			if (chance)
 			{
-				int d = 3;
+				/* Add to chances */
+				count += chance;
 
-				/* Pick a nearby location */
-				scatter(&y1, &x1, y, x, d, 0);
+				/* Check chance */
+				if (rand_int(count) < chance) pick = i;
+			}
 
-				/* Require "empty" grid */
-				if (!cave_start_bold(y1, x1)) continue;
+			/* Increase index */
+			i++;
+		}
 
-				cave_set_feat(y1,x1,d_info[i].feat);
+		/* Paranoia -- Have picked any entry? */
+		if (pick >= 0)
+		{
+			/* Set index to choice */
+			i = pick;
 
-				if (k++ >= num) break;
+			/* Save index */
+			room_info[room].section[j++] = i;
+
+			/* Enter the next chart */
+			chart = d_info[i].next;
+
+			/* Place flags except SEEN */
+			room_info[room].flags |= (d_info[i].flags & ~(ROOM_SEEN));
+		
+			/* Place objects if needed */
+			if (d_info[i].tval)
+			{
+				room_info_kind_tval = d_info[i].tval;
+
+				get_obj_num_hook = room_info_kind;
+
+				/* Prepare allocation table */
+				get_obj_num_prep();
+
+				/* Place the items */
+				if (d_info[i].tval == TV_GOLD) vault_treasure(y,x,randint(4)+2);
+				else vault_items(y, x, randint(4)+2);
+
+				get_obj_num_hook = NULL;
+
+				/* Prepare allocation table */
+				get_obj_num_prep();
+			}
+			
+			/* Place features if needed */
+			if (d_info[i].feat)
+			{
+				int ii, y1, x1;
+				int num = 7 + rand_int(6);
+				int k = 0;
+
+				if (f_info[d_info[i].feat].flags3 & (FF3_ALLOC)) num /=2;
+
+				for (ii = 0; ii < 15; ii++)
+				{
+					int d = 3;
+
+					/* Pick a nearby location */
+					scatter(&y1, &x1, y, x, d, 0);
+
+					/* Require "empty" grid */
+					if (!cave_start_bold(y1, x1)) continue;
+
+					cave_set_feat(y1,x1,d_info[i].feat);
+
+					if (k++ >= num) break;
+				}
 			}
 		}
-
 	}
 
 	/* Type */

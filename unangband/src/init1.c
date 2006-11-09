@@ -2092,7 +2092,7 @@ errr parse_d_info(char *buf, header *head)
 	/* Process 'N' for "New/Number" */
 	if (buf[0] == 'N')
 	{
-		int prv, nxt, prc, min;
+		int prv, nxt, cha, noc, min;
 
 		/* Hack - get the index */
 		i = error_idx + 1;
@@ -2110,13 +2110,14 @@ errr parse_d_info(char *buf, header *head)
 		d_ptr = (desc_type*)head->info_ptr + i;
 
 		/* Scan for the values */
-		if (4 != sscanf(buf, "N:%d:%d:%d:%d",
-			    &prv, &nxt, &prc, &min)) return (PARSE_ERROR_GENERIC);
+		if (5 != sscanf(buf, "N:%d:%d:%d:%d:%d",
+			    &prv, &nxt, &cha, &noc,  &min)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		d_ptr->chart = prv;
 		d_ptr->next = nxt;
-		d_ptr->roll = prc;
+		d_ptr->chance = cha;
+		d_ptr->not_chance = noc;
 		d_ptr->level = min;
 
 		/* Initialize other values */
