@@ -729,7 +729,6 @@ static cptr r_info_flags8[] =
 	"HAS_BLOOD",
 	"HAS_SLIME",
 	"HAS_SPORE",
-	"DROP_JUNK",
 	"DROP_CHEST",
 	"DROP_MISSILE",
 	"DROP_TOOL",
@@ -743,6 +742,7 @@ static cptr r_info_flags8[] =
 	"DROP_WRITING",
 	"DROP_POTION",
 	"DROP_FOOD",
+	"DROP_JUNK",
 	"ASSEMBLE"
 };
 
@@ -1991,12 +1991,12 @@ static errr grab_one_offset_u16b(u16b *offset, cptr names[], cptr what)
 	{
 		if (streq(what, names[i]))
 		{
-			*offset = *offset+i;
+			*offset = *offset + i;
 			return (0);
 		}
 	}
 
-	*offset = *offset+32;
+	*offset = *offset + 32;
 	return (-1);
 }
 

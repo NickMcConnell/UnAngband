@@ -679,13 +679,13 @@ B:
 D:littered with broken arrows.  
 K:17
 S:SEEN
-R:ARCHER
+R:DROP_MISSILE
 
 N:106:107:15:1:1
 A:machine
 B:
 D:covered with machine parts.  
-K:77
+K:12
 S:SEEN
 G:g
 
@@ -862,7 +862,7 @@ S:SEEN
 R:STUPID
 
 # Generally notice quality of the air on these levels
-N:107:108:80:40:0
+N:107:108:180:80:0
 A:
 B:
 D:The air here is 
@@ -958,11 +958,35 @@ B:
 D:smokey with incense.  
 R:PRIEST
 
-N:108:109:30:2:9
-A:
+N:108:109:15:0:4
+A:troll
+B:
+D:rank with the stench of troll.  
+R:TROLL
+
+N:108:109:15:0:4
+A:orc
+B:
+D:rank with the stench of orc.  
+R:ORC
+
+N:108:109:15:0:4
+A:dragon
+B:
+D:musky with the stench of dragon.  
+R:DRAGON
+
+N:108:109:30:1:9
+A:infernal
 B:
 D:rank with sulphur.  
 R:DEMON
+
+N:108:109:10:1:9
+A:
+B:
+D:rank with sulphur.  
+L:OIL
 
 N:108:109:30:4:9
 A:
@@ -1640,17 +1664,17 @@ S:SEEN
 
 N:117:102:10:2:4
 A:
-B:supply room
-D:Rope lines 
-K:14
+B:laboratory
+D:Laboratory equipment lines 
+K:77
 R:DROP_TOOL
 S:SEEN
 
 N:117:102:10:2:4
 A:
 B:supply room
-D:Flasks line 
-K:77
+D:Rope lines 
+K:14
 R:DROP_TOOL
 S:SEEN
 
@@ -1799,7 +1823,7 @@ S:SEEN
 R:WARRIOR
 
 N:117:102:10:1:6
-A:
+A:burnt
 B:
 D:Burn marks cover 
 R:IM_FIRE
@@ -1807,7 +1831,7 @@ F:308
 S:SEEN
 
 N:117:102:10:1:6
-A:
+A:corroded
 B:
 D:Acid marks cover 
 R:IM_ACID
@@ -1815,7 +1839,7 @@ F:309
 S:SEEN
 
 N:117:102:10:2:30
-A:
+A:frosty
 B:
 D:Frost covers 
 F:132

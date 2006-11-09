@@ -534,16 +534,25 @@ s16b get_mon_num(int level)
 	 */
 	if ((cave_ecology.ready) && (cave_ecology.num_races > 0))
 	{
-		int r_idx = cave_ecology.race[rand_int(cave_ecology.num_races)];
+		int choice = 0;
 
-		/* Hack -- Only 1 opportunity to encounter a unique */
-		if (r_info[r_idx].flags1 & (RF1_UNIQUE))
+		/* Count of choices */
+		j = 0;
+
+		/* Get monster */
+		for (i = 0; i < cave_ecology.num_races; i++)
 		{
-			/* Replace entry in table */
-			cave_ecology.race[r_idx] = cave_ecology.race[--cave_ecology.num_races];
+			if ((!(get_mon_num_hook) || (*get_mon_num_hook)(i)) && !(rand_int(++j))) choice = i;
 		}
 
-		return (r_idx);
+		/* Hack -- Only 1 opportunity to encounter a unique */
+		if (r_info[cave_ecology.race[choice]].flags1 & (RF1_UNIQUE))
+		{
+			/* Replace entry in table */
+			cave_ecology.race[choice] = cave_ecology.race[--cave_ecology.num_races];
+		}
+
+		return (cave_ecology.race[choice]);
 	}
 
 	/* Boost the level */

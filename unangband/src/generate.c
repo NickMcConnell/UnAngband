@@ -1690,14 +1690,14 @@ static void get_room_info(int y, int x)
 				break;
 			}
 
-			/* Get chance */
-			chance = d_info[i].chance;
-
 			/* If not allowed at this depth, skip completely */
 			while (p_ptr->depth < d_info[i].level) i++;
 
+			/* Get chance */
+			chance = d_info[i].chance;
+
 			/* If requires this level type, reduce chance of occurring */
-			if (!(level_flag & d_info[i].l_flag)) chance = d_info[i].not_chance;
+			if ((d_info[i].l_flag) && ((level_flag & d_info[i].l_flag) == 0)) chance = d_info[i].not_chance;
 
 			/* If not allowed because doesn't match level monster, reduce chance of occuring */
 			else if ((cave_ecology.ready) && (cave_ecology.num_races))
@@ -1706,45 +1706,45 @@ static void get_room_info(int y, int x)
 				monster_race *r_ptr = &r_info[cave_ecology.race[0]];
 
 				/* Check for char match */
-				if (d_info[i].r_char != r_ptr->d_char) chance = d_info[i].not_chance;
+				if ((d_info[i].r_char) && (d_info[i].r_char != r_ptr->d_char)) chance = d_info[i].not_chance;
 
 				/* Check for flag match */
 				if (d_info[i].r_flag)
 				{
 					if ((d_info[i].r_flag < 33) && 
-						!(r_ptr->flags1 & (1L << (d_info[i].r_flag - 1)))) chance = d_info[i].not_chance;
+						((r_ptr->flags1 & (1L << (d_info[i].r_flag - 1))) == 0)) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 33) && 
 						(d_info[i].r_flag < 65) && 
-						!(r_ptr->flags2 & (1L << (d_info[i].r_flag -33)))) chance = d_info[i].not_chance;
+						((r_ptr->flags2 & (1L << (d_info[i].r_flag - 33))) == 0)) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 65) && 
 						(d_info[i].r_flag < 97) && 
-						!(r_ptr->flags3 & (1L << (d_info[i].r_flag -65)))) chance = d_info[i].not_chance;
+						((r_ptr->flags3 & (1L << (d_info[i].r_flag - 65))) == 0)) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 97) && 
 						(d_info[i].r_flag < 129) && 
-						!(r_ptr->flags4 & (1L << (d_info[i].r_flag -97)))) chance = d_info[i].not_chance;
+						((r_ptr->flags4 & (1L << (d_info[i].r_flag - 97))) == 0)) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 129) && 
 						(d_info[i].r_flag < 161) && 
-						!(r_ptr->flags5 & (1L << (d_info[i].r_flag -129)))) chance = d_info[i].not_chance;
+						((r_ptr->flags5 & (1L << (d_info[i].r_flag - 129))) == 0)) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 161) && 
 						(d_info[i].r_flag < 193) && 
-						!(r_ptr->flags6 & (1L << (d_info[i].r_flag -161)))) chance = d_info[i].not_chance;
+						((r_ptr->flags6 & (1L << (d_info[i].r_flag - 161))) == 0)) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 193) && 
 						(d_info[i].r_flag < 225) && 
-						!(r_ptr->flags7 & (1L << (d_info[i].r_flag -193)))) chance = d_info[i].not_chance;
+						((r_ptr->flags7 & (1L << (d_info[i].r_flag - 193))) == 0)) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 225) && 
 						(d_info[i].r_flag < 257) && 
-						!(r_ptr->flags8 & (1L << (d_info[i].r_flag -225)))) chance = d_info[i].not_chance;
+						((r_ptr->flags8 & (1L << (d_info[i].r_flag - 225))) == 0)) chance = d_info[i].not_chance;
 
 					if ((d_info[i].r_flag >= 257) && 
 						(d_info[i].r_flag < 289) && 
-						!(r_ptr->flags9 & (1L << (d_info[i].r_flag -257)))) chance = d_info[i].not_chance;
+						((r_ptr->flags9 & (1L << (d_info[i].r_flag - 257))) == 0)) chance = d_info[i].not_chance;
 				}
 			}
 
@@ -1829,14 +1829,6 @@ static void get_room_info(int y, int x)
 
 	/* Terminate index list */
 	room_info[room].section[j] = -1;
-
-	/* Hack -- only clear room info hook here */
-	get_mon_num_hook = NULL;
-
-	/* Prepare allocation table */
-	get_mon_num_prep();
-
-
 }
 
 
