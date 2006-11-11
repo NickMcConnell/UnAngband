@@ -166,7 +166,7 @@ bool command_repeating = FALSE;
 byte feeling;		   /* Most recent feeling */
 s16b rating;		    /* Level's current rating */
 
-byte level_flag;		/* Level type */
+u32b level_flag;		/* Level type */
 
 
 bool good_item_flag;    /* True if "Artifact" on this level */

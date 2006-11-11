@@ -217,7 +217,6 @@ struct town_type
 
 /*
  * Information about room descriptions
- *
  */
 struct desc_type
 {
@@ -226,13 +225,14 @@ struct desc_type
 	u32b text;      /* Text (offset) */
 
 	u32b flags;      /* Room flags */
+	u32b l_flag;    /* Restrict to these level types */
 
 	byte chance;  	/* Frequency of this entry */
 	byte not_chance;/* Frequency of this entry if conditions not met */
 	byte chart; 	/* Chart index */
 	byte next;  	/* Next chart index */
 	
-	u16b level; /* Minimum */
+	u16b level; 	/* Minimum */
 
 	s16b feat;      /* Extra features of this type */
 
@@ -240,10 +240,12 @@ struct desc_type
 	u16b r_flag;    /* Add races with this flag */
 
 	byte r_char;    /* Add races of this char */
-	byte l_flag;    /* Restrict to these level types */
-
 };
 
+
+/*
+ * Description of a room
+ */
 struct room_info_type
 {
 	byte type;				/* Type of room (normal/pit) */

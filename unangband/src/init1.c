@@ -12,7 +12,7 @@
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
  * Angband variants FAQ. See rec.games.roguelike.angband for FAQ.
-*/
+ */
 
 #include "angband.h"
 
@@ -105,8 +105,32 @@ static cptr d_info_lflags[] =
 	"ACID",
 	"OIL",
 	"CHASM",
-	"DARK",  /* Hack -- dark rooms - was destroyed */
-	"CROWDED"
+	"DESTROYED",
+	"LIVING",
+	"CROWDED",
+	"SURFACE",
+	"DAYLIGHT",
+	"BATTLE",
+	"TOWER",
+	"VAULT",
+	"DUNGEON",
+	"STRONGHOLD",
+	"CRYPT",
+	"LAIR",
+	"MINE",
+	"CAVE",
+	"TOWN",
+	"WILD",
+	"RUIN",
+	"XXX2",
+	"XXX3",
+	"DARK",
+	"QUEST",
+	"GUARDIAN",
+	"ROOMS",
+	"TUNNELS",
+	"LESS",
+	"MORE"
 };
 
 /*
@@ -1937,27 +1961,6 @@ static errr grab_one_flag(u32b *flags, cptr names[], cptr what)
 
 
 /*
- * Grab one byte flag from a textual string
- */
-static errr grab_one_bflag(byte *flags, cptr names[], cptr what)
-{
-	int i;
-
-	/* Check flags */
-	for (i = 0; i < 8; i++)
-	{
-		if (streq(what, names[i]))
-		{
-			*flags |= (1L << i);
-			return (0);
-		}
-	}
-
-	return (-1);
-}
-
-
-/*
  * Grab one flag from a textual string and convert to numeric
  */
 static errr grab_one_offset(byte *offset, cptr names[], cptr what)
@@ -2022,7 +2025,7 @@ static errr grab_one_special_flag(desc_type *d_ptr, cptr what)
  */
 static errr grab_one_level_flag(desc_type *d_ptr, cptr what)
 {
-	if (grab_one_bflag(&d_ptr->l_flag, d_info_lflags, what) == 0)
+	if (grab_one_flag(&d_ptr->l_flag, d_info_lflags, what) == 0)
 		return (0);
 
 	/* Oops */

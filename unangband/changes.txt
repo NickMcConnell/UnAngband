@@ -94,6 +94,8 @@ Matthias Rudolf).
 
 - Replaced Durin's tomb with Balin's tomb.
 
+- Prevented stone wells from appearing at the bottom of dungeons (Reported by pepebe).
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.
@@ -102,6 +104,8 @@ Matthias Rudolf).
 Windows compile.
 
 - Removed HIDE_TYPE, SHOW_MODS and EASY_KNOW flags from items.
+
+- Added additional level flags to improve correctness of dungeon generation.
 
 Unangband 0.6.1 "It's all in the reflexes." aka "Hell of the Upside-down
 Sinners"

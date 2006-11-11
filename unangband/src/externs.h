@@ -174,7 +174,7 @@ extern object_type term_object;
 extern bool term_obj_real;
 extern byte feeling;
 extern s16b rating;
-extern byte level_flag;
+extern u32b level_flag;
 extern bool good_item_flag;
 extern bool closing_flag;
 extern int player_uid;

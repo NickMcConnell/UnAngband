@@ -435,10 +435,19 @@ R:PLANT
 N:104:105:5:0:0
 A:
 B:
+F:425
+D:A tree 
+S:SEEN
+L:LIVING
+
+N:104:105:5:0:0
+A:
+B:
 F:426
 D:An apple tree 
 S:SEEN
 R:ELF
+L:LIVING
 
 N:104:105:10:2:10
 A:
@@ -693,7 +702,6 @@ N:106:107:15:1:1
 A:sooty
 B:
 D:covered with soot.  
-K:77
 S:SEEN
 L:OIL
 
@@ -828,7 +836,7 @@ B:garden
 D:planted with thorny bushes.  
 F:440
 S:SEEN
-R:PLANT
+L:LIVING
 
 N:106:107:7:1:8
 A:
@@ -836,7 +844,7 @@ B:garden
 D:planted with thorny bushes.  
 F:441
 S:SEEN
-R:PLANT
+L:LIVING
 
 N:106:107:4:1:8
 A:
@@ -844,7 +852,7 @@ B:garden
 D:planted with thorny bushes.  
 F:448
 S:SEEN
-R:PLANT
+L:LIVING
 
 N:106:107:10:2:0
 A:dusty

@@ -1657,7 +1657,7 @@ static bool room_info_kind(int k_idx)
  */
 static void get_room_info(int y, int x)
 {
-	int i, j, k, chart, pick, chance, count, counter;
+	int i, j, chart, pick, chance, count, counter;
 
 	int room = dun->cent_n+1;
 
@@ -1910,8 +1910,8 @@ static void build_type1(int y0, int x0)
 
 
 	/* Hack -- mark light rooms */
-	if (light) level_flag &= ~(LF1_DEST);
-	else level_flag |= (LF1_DEST) ;
+	if (light) level_flag &= ~(LF1_DARK);
+	else level_flag |= (LF1_DARK) ;
 
 	/* Pretty description and maybe more monsters/objects/traps*/
 	get_room_info(y0,x0);
@@ -1969,8 +1969,8 @@ static void build_type2(int y0, int x0)
 
 
 	/* Hack -- mark light rooms */
-	if (light) level_flag &= ~(LF1_DEST);
-	else level_flag |= (LF1_DEST);
+	if (light) level_flag &= ~(LF1_DARK);
+	else level_flag |= (LF1_DARK);
 
 	/* Pretty description and maybe more monsters/objects/traps*/
 	get_room_info(y0,x0);
@@ -2132,8 +2132,8 @@ static void build_type3(int y0, int x0)
 
 
 	/* Hack -- mark light rooms */
-	if (light) level_flag &= ~(LF1_DEST);
-	else level_flag |= (LF1_DEST);
+	if (light) level_flag &= ~(LF1_DARK);
+	else level_flag |= (LF1_DARK);
 
 
 	/* Pretty description and maybe more monsters/objects/traps*/
@@ -3974,7 +3974,7 @@ static bool room_build(int by0, int bx0, int typ)
 	if (p_ptr->depth < room[typ].level) return (FALSE);
 
 	/* Restrict "crowded" rooms */
-	if (dun->crowded && ((typ == 5) || (typ == 6))) return (FALSE);
+	if ((level_flag & (LF1_CROWDED)) && ((typ == 5) || (typ == 6))) return (FALSE);
 
 	/* Extract blocks */
 	by1 = by0 + room[typ].dy1;
@@ -4045,7 +4045,7 @@ static bool room_build(int by0, int bx0, int typ)
 	}
 
 	/* Count "crowded" rooms */
-	if ((typ == 5) || (typ == 6)) dun->crowded = TRUE;
+	if ((typ == 5) || (typ == 6)) level_flag |= LF1_CROWDED;
 
 	/* Success */
 	return (TRUE);
@@ -4065,9 +4065,9 @@ bool cave_feat_lake(int f_idx)
 		}
 	}
 
-	if (level_flag)
+	/* Exclude terrain of various types */
+	if (level_flag & (LF1_WATER | LF1_LAVA | LF1_ICE | LF1_ACID | LF1_OIL | LF1_LIVING))
 	{
-
 		if (!(level_flag & (LF1_WATER)) && (f_ptr->flags2 & (FF2_WATER)))
 		{
 			return (FALSE);
@@ -4088,11 +4088,102 @@ bool cave_feat_lake(int f_idx)
 		{
 			return (FALSE);
 		}
-
+		if (!(level_flag & (LF1_LIVING)) && (f_ptr->flags3 & (FF3_LIVING)))
+		{
+			return (FALSE);
+		}
 	}
 
 	/* Okay */
 	return (TRUE);
+}
+
+
+/*
+ *  Sets various level flags at initialisation
+ */
+void init_level_flags(void)
+{
+	dungeon_zone *zone=&t_info[0].zone[0];
+
+	/* Get the zone */
+	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+
+	/* Set night and day level flag */
+	level_flag =  (p_ptr->depth == min_depth(p_ptr->dungeon)) ?
+			((((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))) ?
+				LF1_SURFACE | LF1_DAYLIGHT : LF1_SURFACE) : 0;
+
+	/* Add 'common' level flags */
+	if (zone->tower) level_flag |= (LF1_TOWER);
+	if ((zone->guard) && (r_info[zone->guard].cur_num <= 0)) level_flag |= (LF1_GUARDIAN);
+	if (is_quest(p_ptr->depth)) level_flag |= (LF1_QUEST);
+
+	/* Define town */
+	if (!zone->fill) level_flag |= LF1_TOWN;
+
+	/* Define wilderness */
+	if ((zone->fill) && !(f_info[zone->fill].flags1 & (FF1_WALL))) level_flag |= LF1_WILD;
+	if ((zone->big) && !(f_info[zone->big].flags1 & (FF1_WALL))) level_flag |= LF1_WILD;
+	if ((zone->small) && !(f_info[zone->small].flags1 & (FF1_WALL))) level_flag |= LF1_WILD;
+
+	/* No dungeon, no stairs */
+	if (min_depth(p_ptr->dungeon) == max_depth(p_ptr->dungeon))
+	{
+		/* Do nothing */;
+	}
+
+	/* Towers */
+	else if (level_flag & (LF1_TOWER))
+	{
+		/* Base of tower */
+		if (p_ptr->depth == min_depth(p_ptr->dungeon))
+		{
+			/* Do nothing -- We place upstairs as a hack */;
+		}
+
+		/* Top of tower */
+		else if (p_ptr->depth == max_depth(p_ptr->dungeon))
+		{
+			level_flag |= (LF1_LESS);
+		}
+
+		/* In tower */
+		else
+		{
+			level_flag |= (LF1_LESS | LF1_MORE);
+		}
+
+		/* Level is guarded? */
+		if (level_flag & (LF1_GUARDIAN)) level_flag &= ~(LF1_LESS);
+	}
+	/* Others */
+	else
+	{
+		/* Surface -- must go down */
+		if (p_ptr->depth == min_depth(p_ptr->dungeon))
+		{
+			level_flag |= (LF1_MORE);
+		}
+
+		/* Bottom of dungeon -- must go up */
+		else if (p_ptr->depth == max_depth(p_ptr->dungeon))
+		{
+			level_flag |= (LF1_LESS);
+		}
+
+		/* Middle of dungeon */
+		else
+		{
+			level_flag |= (LF1_LESS | LF1_MORE);
+		}
+
+		/* Level is guarded? */
+		if (level_flag & (LF1_GUARDIAN)) level_flag &= ~(LF1_MORE);
+	}
+
+	/* At the moment, all levels have rooms and corridors */
+	level_flag |= (LF1_ROOMS | LF1_TUNNELS);
 }
 
 
@@ -4109,34 +4200,25 @@ static void cave_gen(void)
 
 	int base;
 
-	bool destroyed = FALSE;
-
-	bool battlefield = FALSE;
-
 	char *name;
-
-	dun_data dun_body;
 
 	dungeon_zone *zone=&t_info[0].zone[0];
 
-	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
-	bool daytime = (((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2)));
+	dun_data dun_body;
 
 	/* Global data */
 	dun = &dun_body;
-
-	level_flag = 0x00;
 
 	/* Get the zone */
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
 	/* Create air */
-	if ((zone->tower) && (p_ptr->depth > min_depth(p_ptr->dungeon)))
+	if ((level_flag & (LF1_TOWER)) && !(level_flag & (LF1_SURFACE)))
 	{
 		base = FEAT_CHASM;
 	}
 	/* Create ground */
-	else if (surface)
+	else if (level_flag & (LF1_SURFACE))
 	{
 		if (f_info[zone->fill].flags1 & (FF1_FLOOR)) base = zone->fill;
 		else base = FEAT_GROUND;
@@ -4170,7 +4252,7 @@ static void cave_gen(void)
 	cave_ecology.ready = FALSE;
 
 	/* Place guardian if permitted */
-	if ((zone->guard) && (r_info[zone->guard].cur_num <= 0))
+	if (level_flag & (LF1_GUARDIAN))
 	{
 		get_monster_ecology(zone->guard);
 	}
@@ -4203,22 +4285,6 @@ static void cave_gen(void)
 	/* Start the ecology */
 	cave_ecology.ready = TRUE;
 
-	/* Possible "destroyed" level */
-	if ((p_ptr->depth > 10) && (rand_int(DUN_DEST) == 0)) destroyed = TRUE;
-
-	/* Hack -- No destroyed "quest" levels */
-	if (is_quest(p_ptr->depth)) destroyed = FALSE;
-
-	/* Hack -- No destroyed "bottom" levels */
-	if (p_ptr->depth == max_depth(p_ptr->dungeon)) destroyed = FALSE;
-
-	/* Hack -- No destroyed unusual levels */
-	if ((zone->fill) && !(f_info[zone->fill].flags1 & (FF1_WALL))) destroyed = FALSE;
-
-	/* Hack -- No destroyed slightly unusual levels */
-	if (!zone->big) destroyed = FALSE;
-	if (!zone->small) destroyed = FALSE;
-
 	/* Actual maximum number of rooms on this level */
 	dun->row_rooms = DUNGEON_HGT / BLOCK_HGT;
 	dun->col_rooms = DUNGEON_WID / BLOCK_WID;
@@ -4236,18 +4302,20 @@ static void cave_gen(void)
 		}
 	}
 
-
-	/* No "crowded" rooms yet */
-	dun->crowded = FALSE;
-
 	/* No "entrance" yet */
 	dun->entrance = FALSE;
 
 	/* No rooms yet */
 	dun->cent_n = 0;
 
-	/* No features on destroyed level */
-	if ((!destroyed) && (!(zone->tower) || (p_ptr->depth <=min_depth(p_ptr->dungeon))) )
+	/* Hack -- chance of destroyed level */
+	if ((p_ptr->depth > 10) && (rand_int(DUN_DEST) == 0)) level_flag |= LF1_DESTROYED;
+
+	/* Hack -- No destroyed "quest", "wild" or "guardian" levels */
+	if (level_flag & (LF1_QUEST | LF1_WILD | LF1_GUARDIAN)) level_flag &= ~(LF1_DESTROYED);
+
+	/* No features on destroyed level or in a tower above the surface */
+	if ((level_flag & (LF1_DESTROYED)) && (!(level_flag & (LF1_TOWER)) || (level_flag & (LF1_SURFACE)) ))
 	{
 		bool big = FALSE;
 		bool done_big = FALSE;
@@ -4336,7 +4404,6 @@ static void cave_gen(void)
 	/* Hack -- build a tower in the centre of the level */
 	if ((zone->tower) && (p_ptr->depth >= min_depth(p_ptr->dungeon)))
 	{
-
 		int typ = v_info[zone->tower].typ;
 
 		/* Hack - set to center of level */
@@ -4395,15 +4462,14 @@ static void cave_gen(void)
 		dun->cent[dun->cent_n].x = x;
 		dun->cent_n++;
 
-
 		/* Hack -- descending player always in tower */
-		if ((surface) && (p_ptr->create_up_stair))
+		if ((level_flag & LF1_SURFACE) && (p_ptr->create_up_stair))
 		{
 			player_place(y, x);
 		}
 
 		/* Hack -- always have upstairs */
-		else if (surface)
+		else if (level_flag & LF1_SURFACE)
 		{
 			feat_near(FEAT_LESS, y, x);
 		}
@@ -4411,14 +4477,24 @@ static void cave_gen(void)
 	}
 
 	/* Hack -- All levels deeper than 20 on surface are 'destroyed' */
-	if ((p_ptr->depth > 20) && (surface)) destroyed = TRUE;
+	if ((p_ptr->depth > 20) && (level_flag & (LF1_SURFACE))) level_flag |= (LF1_DESTROYED);
 
 	/* Hack -- All levels with escorts are 'battlefields' */
-	if (RF1_ESCORT & (1L << (t_info[p_ptr->dungeon].r_flag-1))) battlefield = TRUE;
-	if (RF1_ESCORTS & (1L << (t_info[p_ptr->dungeon].r_flag-1))) battlefield = TRUE;
+	if (RF1_ESCORT & (1L << (t_info[p_ptr->dungeon].r_flag-1))) level_flag |= (LF1_BATTLE);
+	if (RF1_ESCORTS & (1L << (t_info[p_ptr->dungeon].r_flag-1))) level_flag |= (LF1_BATTLE);
 
-	/* Build some rooms */
-	for (i = 0; i < DUN_ROOMS; i++)
+	/* Battlefields don't have rooms, but do have paths across the level */
+	if (level_flag & (LF1_BATTLE)) level_flag &= ~(LF1_ROOMS);
+
+	/* Non-destroyed surface locations don't have rooms, but do have paths across the level */
+	if ((level_flag & (LF1_SURFACE)) && !(level_flag & (LF1_DESTROYED))) level_flag &= ~(LF1_ROOMS);
+
+	/* Towers don't have rooms or tunnels */
+	if ((level_flag & (LF1_TOWER)) && !(level_flag & (LF1_SURFACE))) level_flag &= ~(LF1_ROOMS | LF1_TUNNELS);
+
+	/* Build some rooms or points to connect tunnels */
+	if (level_flag & (LF1_ROOMS | LF1_TUNNELS))
+		for (i = 0; i < DUN_ROOMS; i++)
 	{
 		/* Pick a block for the room */
 		by = rand_int(dun->row_rooms);
@@ -4434,15 +4510,8 @@ static void cave_gen(void)
 			if ((bx % 3) == 2) bx--;
 		}
 
-
-		/* Towers don't have other rooms above the surface */
-		if ((zone->tower) && !(p_ptr->depth <= min_depth(p_ptr->dungeon)))
-		{
-			/* Never mind */
-			continue;
-		}
-		/* Battle-fields don't have rooms */
-		else if (battlefield)
+		/* Don't have rooms or sometimes has rooms */
+		if (((level_flag & (LF1_ROOMS)) == 0) || ((level_flag & (LF1_MINE)) && (dun->cent_n % 2)))
 		{
 			/* Attempt a "non-existent" room */
 			if (room_build(by, bx, 0)) continue;
@@ -4450,27 +4519,6 @@ static void cave_gen(void)
 			/* Never mind */
 			continue;
 		}
-
-		/* Destroyed levels are boring */
-		else if (destroyed)
-		{
-			/* Attempt a "trivial" room */
-			if (room_build(by, bx, 1)) continue;
-
-			/* Never mind */
-			continue;
-		}
-		/* Otherwise don't build rooms */
-		else if (surface)
-		{
-
-			/* Attempt a "non-existent" room */
-			if (room_build(by, bx, 0)) continue;
-
-			/* Never mind */
-			continue;
-		}
-
 
 		/* Attempt an "unusual" room */
 		if (rand_int(DUN_UNUSUAL) < p_ptr->depth)
@@ -4552,7 +4600,6 @@ static void cave_gen(void)
 		cave_info[y][x] |= (CAVE_XLOF);
 	}
 
-
 	/* Hack -- Scramble the room order */
 	for (i = 0; i < dun->cent_n; i++)
 	{
@@ -4602,7 +4649,6 @@ static void cave_gen(void)
 		try_door(y + 1, x);
 	}
 
-
 	/* Hack -- Sandstone streamers are shallow */
 	if (rand_int(DUN_STR_SLV) > p_ptr->depth)
 	{
@@ -4626,7 +4672,7 @@ static void cave_gen(void)
 	}
 
 	/* Hack -- Add some quartz streamers */
-	for (i = 0; i < DUN_STR_QUA; i++)
+	for (i = 0; i < ((level_flag & LF1_MINE) != 0 ? DUN_STR_QUA * 2 : DUN_STR_QUA); i++)
 	{		
 		build_streamer(FEAT_QUARTZ, DUN_STR_QC);
 	}
@@ -4644,17 +4690,17 @@ static void cave_gen(void)
 	}
 
 	/* Destroy the level if necessary */
-	if (destroyed) destroy_level();
+	if (level_flag & (LF1_DESTROYED)) destroy_level();
 
-	/* Hack -- have more monsters at night */
-	if (surface && daytime) k = (p_ptr->depth / 6);
+	/* Hack -- have less monsters during day light */
+	if (level_flag & (LF1_DAYLIGHT)) k = (p_ptr->depth / 6);
 	else k = (p_ptr->depth / 3);
 
 	if (k > 10) k = 10;
 	if (k < 2) k = 2;
 
 	/* Hack -- make sure we have rooms/corridors to place stuff */
-	if ((((!surface) || (destroyed)) && !(battlefield)) || (zone->tower))
+	if (level_flag & (LF1_ROOMS | LF1_TOWER))
 	{	
 		/* Place 1 or 2 down stairs near some walls */
 		alloc_stairs(FEAT_MORE, rand_range(1, 2), 3);
@@ -4665,8 +4711,8 @@ static void cave_gen(void)
 		/* Place 2 random stairs near some walls */
 		alloc_stairs(0, 2, 3);
 
-		/* Put some rubble in corridors */
-		if (!zone->tower) alloc_object(ALLOC_SET_CORR, ALLOC_TYP_RUBBLE, randint(k));
+		/* Put some rubble in corridors -- we want to exclude towers unless other rooms on level */
+		if (level_flag & (LF1_ROOMS)) alloc_object(ALLOC_SET_CORR, ALLOC_TYP_RUBBLE, randint(k));
 	
 		/* Place some traps in the dungeon */
 		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_TRAP, randint(k));
@@ -4713,8 +4759,8 @@ static void cave_gen(void)
 	/* Prepare allocation table */
 	get_mon_num_prep();
 
-	/* Hack -- make sure we have rooms/corridors to place stuff */
-	if ((((!surface) || (destroyed)) && !(battlefield)) || (zone->tower))
+	/* Hack -- make sure we have rooms to place stuff */
+	if (level_flag & (LF1_ROOMS | LF1_TOWER))
 	{
 		/* Put some objects in rooms */
 		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ROOM, 3));
@@ -4725,7 +4771,7 @@ static void cave_gen(void)
 	}
 
 	/* Apply illumination */
-	if (surface) town_illuminate(daytime);
+	if (level_flag & (LF1_SURFACE)) town_illuminate((level_flag & (LF1_DAYLIGHT)) != 0);
 
 	/* Ensure quest monsters */
 	if (is_quest(p_ptr->depth))
@@ -4758,7 +4804,7 @@ static void cave_gen(void)
 	}
 
 	/* Ensure guardian monsters */
-	if ((zone->guard) && (r_info[zone->guard].cur_num <= 0))
+	if (level_flag & (LF1_GUARDIAN))
 	{
 		int y, x;
 
@@ -4777,7 +4823,7 @@ static void cave_gen(void)
 
 	/* Hack -- restrict teleporation in towers */
 	/* XXX Important that this occurs after placing the player */
-	if ((zone->tower) && (p_ptr->depth >= min_depth(p_ptr->dungeon)))
+	if (level_flag & (LF1_TOWER))
 	{
 		room_info[1].flags = (ROOM_ICKY);
 	}
@@ -5067,14 +5113,15 @@ static void town_gen(void)
 
 	int residents;
 
-	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
-
-	bool daytime = ((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2));
-
 	int by,bx;
 
 	town_type *t_ptr = &t_info[p_ptr->dungeon];
 	dungeon_zone *zone=&t_ptr->zone[0];;
+
+	/* Reset level flag */
+	level_flag =  (p_ptr->depth == min_depth(p_ptr->dungeon)) ?
+			((((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))) ?
+				LF1_SURFACE | LF1_DAYLIGHT : LF1_SURFACE) : 0;
 
 	/* Get the zone */
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
@@ -5096,7 +5143,7 @@ static void town_gen(void)
 	cave_ecology.ready = FALSE;
 
 	/* Day time */
-	if (surface && daytime)
+	if ((level_flag & (LF1_DAYLIGHT)) != 0)
 	{
 		/* Number of residents */
 		residents = MIN_M_ALLOC_TD;
@@ -5134,10 +5181,10 @@ static void town_gen(void)
 	town_gen_hack();
 
 	/* Apply illumination */
-	town_illuminate(daytime);
+	if (level_flag & (LF1_SURFACE)) town_illuminate((level_flag & (LF1_DAYLIGHT)) != 0);
 
 	/* Ensure guardian monsters */
-	if (!(daytime && surface) && (zone->guard) && (r_info[zone->guard].cur_num <= 0))
+	if ((level_flag & (LF1_GUARDIAN)) && !(level_flag & (LF1_DAYLIGHT)))
 	{
 		/* Pick a location */
 		while (1)
@@ -5187,13 +5234,6 @@ static void town_gen(void)
 void generate_cave(void)
 {
 	int i, y, x, num;
-
-	dungeon_zone *zone=&t_info[0].zone[0];
-
-	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
-
-	/* Get the zone */
-	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
 	/* The dungeon is not ready */
 	character_dungeon = FALSE;
@@ -5262,8 +5302,11 @@ void generate_cave(void)
 		/* Nothing good here yet */
 		rating = 0;
 
+		/* Initialise level flags */
+		init_level_flags();
+
 		/* Build the town */
-		if (!zone->fill)
+		if (level_flag & (LF1_TOWN))
 		{
 			/* Make a town */
 			town_gen();
@@ -5480,7 +5523,7 @@ void generate_cave(void)
 		if ((old_turn) && ((turn - old_turn) < 1000)) feeling = 0;
 
 		/* Hack -- no feeling in the town */
-		if (!zone->fill) feeling = 0;
+		if (level_flag & (LF1_TOWN)) feeling = 0;
 
 		/* Prevent object over-flow */
 		if (o_max >= z_info->o_max)
@@ -5521,9 +5564,9 @@ void generate_cave(void)
 	character_dungeon = TRUE;
 
 	/* Remember when this level was "created", except in town or surface locations */
-	if ((zone->fill) && !(surface)) old_turn = turn;
+	if (!(level_flag & (LF1_TOWN | LF1_SURFACE))) old_turn = turn;
 
-	/* Hack -- always get a feeling leaving town */
+	/* Hack -- always get a feeling leaving town or surface */
 	else old_turn = 0;
 
 	/* Set dodging - 'just appeared' */

@@ -1963,10 +1963,43 @@ static void place_up_stairs(int y, int x)
  */
 static void place_down_stairs(int y, int x)
 {
+	/* Surface -- place entrance if outside */
+	if ((level_flag & (LF1_SURFACE)) && (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
+	{
+		cave_set_feat(y, x, FEAT_ENTRANCE);
+	}
+
 	/* Create down stairs */
-	cave_set_feat(y, x, FEAT_MORE);
+	else
+	{
+		cave_set_feat(y, x, FEAT_MORE);
+	}
 }
 
+
+/*
+ * Convert existing terrain type to "quest stairs"
+ */
+void place_quest_stairs(int y, int x)
+{
+	/* Create up stairs in tower */
+	if (level_flag & (LF1_TOWER))
+	{
+		cave_set_feat(y, x, FEAT_LESS);
+	}		
+
+	/* Surface -- place entrance if outside */
+	else if ((level_flag & (LF1_SURFACE)) && (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
+	{
+		cave_set_feat(y, x, FEAT_ENTRANCE);
+	}
+
+	/* Create down stairs */
+	else
+	{
+		cave_set_feat(y, x, FEAT_MORE);
+	}
+}
 
 
 /*
@@ -1978,33 +2011,21 @@ bool place_random_stairs(int y, int x, int feat)
 	if (!cave_clean_bold(y, x)) return (FALSE);
 
 	/* No dungeon, no stairs */
-	if (min_depth(p_ptr->dungeon) == max_depth(p_ptr->dungeon))
+	if (!(level_flag & (LF1_LESS | LF1_MORE)))
 	{
 		return (FALSE);
 	}
 
-	/* Top of tower -- must go down */
-	else if ((t_info[p_ptr->dungeon].zone[0].tower) && (p_ptr->depth >= max_depth(p_ptr->dungeon)))
+	/* Cannot go down, must go up */
+	else if (!(level_flag & (LF1_MORE)))
+	{
+		place_up_stairs(y, x);
+	}
+
+	/* Cannot go up, must go down */
+	else if (!(level_flag & (LF1_LESS)))
 	{
 		place_down_stairs(y, x);
-	}
-
-	/* Bottom of tower dungeon -- must go up */
-	else if ((t_info[p_ptr->dungeon].zone[0].tower) && (p_ptr->depth <= min_depth(p_ptr->dungeon)))
-	{
-		place_up_stairs(y, x);
-	}
-
-	/* Surface -- must go down */
-	else if (p_ptr->depth == min_depth(p_ptr->dungeon))
-	{
-		cave_set_feat(y, x, FEAT_ENTRANCE);
-	}
-
-	/* Quest or bottom of dungeon -- must go up */
-	else if (is_quest(p_ptr->depth) || (p_ptr->depth >= max_depth(p_ptr->dungeon)))
-	{
-		place_up_stairs(y, x);
 	}
 
 	/* Fixed stairs */

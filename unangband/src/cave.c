@@ -5408,6 +5408,7 @@ void cave_set_feat(int y, int x, int feat)
 	if (f_ptr2->flags2 & (FF2_ACID)) level_flag |= (LF1_ACID);
 	if (f_ptr2->flags2 & (FF2_OIL)) level_flag |= (LF1_OIL);
 	if (f_ptr2->flags2 & (FF2_CHASM)) level_flag |= (LF1_CHASM);
+	if (f_ptr2->flags3 & (FF3_LIVING)) level_flag |= (LF1_LIVING);
 
 	/* Handle NEED_TREE locations */
 	if (tree && !tree2)

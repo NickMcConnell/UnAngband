@@ -1125,15 +1125,6 @@
 
 #define FEAT_ENTRANCE 471
 
-/* Level flags - extracted from feature flags */
-#define LF1_WATER 0x01
-#define LF1_LAVA  0x02
-#define LF1_ICE   0x04
-#define LF1_ACID  0x08
-#define LF1_OIL   0x10
-#define LF1_CHASM 0x20
-#define LF1_DEST  0x40
-#define LF1_CROWD 0x80
 
 
 /*Feature flags - should be used instead of feature indexes unless generating.*/
@@ -2730,6 +2721,39 @@
 
 #define MAX_FLOWS		29
 
+
+/* Level flags - extracted from feature flags */
+#define LF1_WATER 	0x00000001L
+#define LF1_LAVA  	0x00000002L
+#define LF1_ICE   	0x00000004L
+#define LF1_ACID  	0x00000008L
+#define LF1_OIL   	0x00000010L
+#define LF1_CHASM 	0x00000020L
+#define LF1_DESTROYED	0x00000040L
+#define LF1_LIVING  	0x00000080L
+#define LF1_CROWDED 	0x00000100L
+#define LF1_SURFACE	0x00000200L
+#define LF1_DAYLIGHT	0x00000400L
+#define LF1_BATTLE	0x00000800L
+#define LF1_TOWER	0x00001000L
+#define LF1_VAULT	0x00002000L	/* Vault level */
+#define LF1_DUNGEON	0x00004000L	/* Dungeon level */
+#define LF1_STRONGHOLD	0x00008000L	/* Stronghold (giant/dwarf) level */
+#define LF1_CRYPT	0x00010000L	/* Crypt level */
+#define LF1_LAIR	0x00020000L	/* Lair level */
+#define LF1_MINE	0x00040000L	/* Mine level */
+#define LF1_CAVE	0x00080000L	/* Cave level */
+#define LF1_TOWN	0x00100000L	/* Town level */
+#define LF1_WILD	0x00200000L	/* Wilderness level */
+#define LF1_RUIN	0x00400000L	/* Ruin level */
+
+#define LF1_DARK	0x02000000L	/* Dark room */
+#define LF1_QUEST	0x04000000L	/* Quest level */
+#define LF1_GUARDIAN	0x08000000L	/* Guarded level */
+#define LF1_ROOMS	0x10000000L	/* Level has rooms */
+#define LF1_TUNNELS	0x20000000L	/* Level has corridors */
+#define LF1_LESS	0x40000000L	/* Level goes up */
+#define LF1_MORE	0x80000000L	/* Level goes down */
 
 /*** Room flags ***/
 
