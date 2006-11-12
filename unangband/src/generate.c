@@ -239,6 +239,10 @@ struct dun_data
 	int tunn_n;
 	coord tunn[TUNN_MAX];
 
+	/* Array of partitions of rooms */
+	int part_n;
+	int part[CENT_MAX];
+
 	/* Number of blocks along each axis */
 	int row_rooms;
 	int col_rooms;
@@ -309,6 +313,20 @@ static void rand_dir(int *rdir, int *cdir)
 {
 	/* Pick a random direction */
 	int i = rand_int(4);
+
+	/* Extract the dy/dx components */
+	*rdir = ddy_ddd[i];
+	*cdir = ddx_ddd[i];
+}
+
+
+/*
+ * Pick a random direction
+ */
+static void rand_dir_cave(int *rdir, int *cdir)
+{
+	/* Pick a random direction */
+	int i = rand_int(8);
 
 	/* Extract the dy/dx components */
 	*rdir = ddy_ddd[i];
@@ -1020,7 +1038,7 @@ static void build_feature(int y, int x, int feat, bool do_big_lake)
 			{
 				/* Don't allow rooms here */
 				by = y/BLOCK_HGT;
-				bx = x/BLOCK_HGT;
+				bx = x/BLOCK_WID;
 	
 				dun->room_map[by][bx] = TRUE;
 			}
@@ -1073,8 +1091,8 @@ static void build_feature(int y, int x, int feat, bool do_big_lake)
 			{
 				/* Don't allow rooms here */
 				by = y/BLOCK_HGT;
-				bx = x/BLOCK_HGT;
-	
+				bx = x/BLOCK_WID;
+
 				dun->room_map[by][bx] = TRUE;
 			}
 	
@@ -3496,6 +3514,61 @@ static void build_type8(int y0, int x0)
 }
 
 /*
+ * Pick appropriate feature for lake.
+ */
+bool cave_feat_lake(int f_idx)
+{
+	feature_type *f_ptr = &f_info[f_idx];
+
+	/* Require lake or river */
+	if (!(f_ptr->flags2 & (FF2_RIVER)))
+	{
+		if (!(f_ptr->flags2 & (FF2_LAKE)))
+		{
+			return (FALSE);
+		}
+	}
+
+	/* Exclude terrain of various types */
+	if (level_flag & (LF1_WATER | LF1_LAVA | LF1_ICE | LF1_ACID | LF1_OIL | LF1_LIVING))
+	{
+		if (!(level_flag & (LF1_LIVING)) && (f_ptr->flags3 & (FF3_LIVING)))
+		{
+			return (FALSE);
+		}
+
+		if (!(level_flag & (LF1_WATER)) && (f_ptr->flags2 & (FF2_WATER)))
+		{
+			return (FALSE);
+		}
+
+		if (!(level_flag & (LF1_LAVA)) && (f_ptr->flags2 & (FF2_LAVA)))
+		{
+			return (FALSE);
+		}
+
+		if (!(level_flag & (LF1_ICE)) && (f_ptr->flags2 & (FF2_ICE)))
+		{
+			return (FALSE);
+		}
+
+		if (!(level_flag & (LF1_ACID)) && (f_ptr->flags2 & (FF2_ACID)))
+		{
+			return (FALSE);
+		}
+
+		if (!(level_flag & (LF1_OIL)) && (f_ptr->flags2 & (FF2_OIL)))
+		{
+			return (FALSE);
+		}
+	}
+
+	/* Okay */
+	return (TRUE);
+}
+
+
+/*
  * Hack -- fill in "tower" rooms
  *
  * Similar to vaults, but we never place monsters/traps/treasure.
@@ -3640,7 +3713,22 @@ static void build_roof(int y0, int x0, int ymax, int xmax, cptr data)
  *   FEAT_PERM_INNER -- inner room walls (perma)
  *   FEAT_PERM_OUTER -- outer room walls (perma)
  *   FEAT_PERM_SOLID -- dungeon border (perma)
+ *
+ *
+ * We now style the tunnels. The following tunnel styles are supported:
+ *
+ * -- standard Angband tunnel
+ * -- tunnel with pillared edges (on LF1_CRYPT levels)
+ * -- width 2 or width 3 tunnel (on LF1_STRONGHOLD levels)
+ * -- tunnels with lateral and diagonal interruptions (on LF1_CAVE levels)
  */
+
+#define TUNNEL_STANDARD	0
+#define TUNNEL_CRYPT	1
+#define TUNNEL_LARGE_SE	2
+#define TUNNEL_LARGE_NW	4
+#define TUNNEL_CAVE	8
+
 static void build_tunnel(int row1, int col1, int row2, int col2)
 {
 	int i, y, x;
@@ -3650,6 +3738,11 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	int main_loop_count = 0;
 
 	bool door_flag = FALSE;
+
+	int style = TUNNEL_STANDARD;
+
+	int by1 = row1/BLOCK_HGT;
+	int bx1 = col1/BLOCK_WID;
 
 	/* Reset the arrays */
 	dun->tunn_n = 0;
@@ -3662,6 +3755,14 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	/* Start out in the correct direction */
 	correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
 
+	/* Change tunnel type */
+	if (level_flag & (LF1_CAVE)) style |= (TUNNEL_CAVE);
+	if (level_flag & (LF1_STRONGHOLD)) style |= (TUNNEL_LARGE_SE | TUNNEL_LARGE_NW);
+	if (level_flag & (LF1_CRYPT)) style |= (TUNNEL_CRYPT);
+
+	/* Randomise style */
+	style = rand_int(16) & style;
+
 	/* Keep going until done (or bored) */
 	while ((row1 != row2) || (col1 != col2))
 	{
@@ -3669,15 +3770,18 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		if (main_loop_count++ > 2000) break;
 
 		/* Allow bends in the tunnel */
-		if (rand_int(100) < DUN_TUN_CHG)
+		if (rand_int(100) < ((style & TUNNEL_CAVE) != 0 ? DUN_TUN_RND * 2 : DUN_TUN_RND))
 		{
 			/* Get the correct direction */
 			correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
 
 			/* Random direction */
-			if (rand_int(100) < DUN_TUN_RND)
+			if (rand_int(100) < ((style & TUNNEL_CAVE) != 0 ? DUN_TUN_RND * 2 : DUN_TUN_RND))
 			{
-				rand_dir(&row_dir, &col_dir);
+				if ((style & TUNNEL_CAVE) != 0)
+					rand_dir_cave(&row_dir, &col_dir);
+				else
+					rand_dir(&row_dir, &col_dir);
 			}
 		}
 
@@ -3692,16 +3796,18 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
 
 			/* Random direction */
-			if (rand_int(100) < DUN_TUN_RND)
+			if (rand_int(100) < ((style & TUNNEL_CAVE) != 0 ? DUN_TUN_RND * 2 : DUN_TUN_RND))
 			{
-				rand_dir(&row_dir, &col_dir);
+				if ((style & TUNNEL_CAVE) != 0)
+					rand_dir_cave(&row_dir, &col_dir);
+				else
+					rand_dir(&row_dir, &col_dir);
 			}
 
 			/* Get the next location */
 			tmp_row = row1 + row_dir;
 			tmp_col = col1 + col_dir;
 		}
-
 
 		/* Avoid the edge of the dungeon */
 		if (cave_feat[tmp_row][tmp_col] == FEAT_PERM_SOLID) continue;
@@ -3757,9 +3863,43 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		/* Travel quickly through rooms */
 		else if (cave_info[tmp_row][tmp_col] & (CAVE_ROOM))
 		{
-			/* Accept the location */
-			row1 = tmp_row;
-			col1 = tmp_col;
+			/* Room */
+			int by2 = tmp_row/BLOCK_HGT;
+			int bx2 = tmp_col/BLOCK_WID;
+
+			/* Different room */
+			if (dun_room[by1][bx1] != dun_room[by2][bx2])
+			{
+				/* Different room in same partition */
+				if (dun->part[dun_room[by1][bx1]-1] == dun->part[dun_room[by2][bx2]-1])
+				{
+					/* Abort */
+					return;
+				}
+				else
+				{
+					int part1 = dun->part[dun_room[by1][bx1]-1];
+					int part2 = dun->part[dun_room[by2][bx2]-1];
+
+					/* Merge partitions */
+					for (i = 0; i < dun->cent_n; i++)
+					{
+						if (dun->part[i] == part2) dun->part[i] = part1;
+					}
+
+					/* Merge partitions */
+					dun->part_n--;
+
+					/* Accept tunnel */
+					break;
+				}
+			}
+			else
+			{
+				/* Accept the location */
+				row1 = tmp_row;
+				col1 = tmp_col;
+			}
 		}
 
 		/* Tunnel through all other walls and bridge features */
@@ -3803,7 +3943,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				/* No door in next grid */
 				door_flag = TRUE;
 			}
-
+#if 0
 			/* Hack -- allow pre-emptive tunnel termination */
 			if (rand_int(100) >= DUN_TUN_CON)
 			{
@@ -3817,6 +3957,21 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 
 				/* Terminate the tunnel */
 				if ((tmp_row > 10) || (tmp_col > 10)) break;
+			}
+#endif
+		}
+
+		/* Fix up diagonals from cave tunnels after 1 move */
+		/* Never move diagonally */
+		if (row_dir && col_dir)
+		{
+			if (rand_int(100) < 50)
+			{
+				row_dir = 0;
+			}
+			else
+			{
+				col_dir = 0;
 			}
 		}
 	}
@@ -4052,53 +4207,6 @@ static bool room_build(int by0, int bx0, int typ)
 }
 
 
-bool cave_feat_lake(int f_idx)
-{
-	feature_type *f_ptr = &f_info[f_idx];
-
-	/* Require lake or river */
-	if (!(f_ptr->flags2 & (FF2_RIVER)))
-	{
-		if (!(f_ptr->flags2 & (FF2_LAKE)))
-		{
-			return (FALSE);
-		}
-	}
-
-	/* Exclude terrain of various types */
-	if (level_flag & (LF1_WATER | LF1_LAVA | LF1_ICE | LF1_ACID | LF1_OIL | LF1_LIVING))
-	{
-		if (!(level_flag & (LF1_WATER)) && (f_ptr->flags2 & (FF2_WATER)))
-		{
-			return (FALSE);
-		}
-		if (!(level_flag & (LF1_LAVA)) && (f_ptr->flags2 & (FF2_LAVA)))
-		{
-			return (FALSE);
-		}
-		if (!(level_flag & (LF1_ICE)) && (f_ptr->flags2 & (FF2_ICE)))
-		{
-			return (FALSE);
-		}
-		if (!(level_flag & (LF1_ACID)) && (f_ptr->flags2 & (FF2_ACID)))
-		{
-			return (FALSE);
-		}
-		if (!(level_flag & (LF1_OIL)) && (f_ptr->flags2 & (FF2_OIL)))
-		{
-			return (FALSE);
-		}
-		if (!(level_flag & (LF1_LIVING)) && (f_ptr->flags3 & (FF3_LIVING)))
-		{
-			return (FALSE);
-		}
-	}
-
-	/* Okay */
-	return (TRUE);
-}
-
-
 /*
  *  Sets various level flags at initialisation
  */
@@ -4194,7 +4302,7 @@ void init_level_flags(void)
  */
 static void cave_gen(void)
 {
-	int i, k, y, x, y1, x1;
+	int i, j, k, y, x, y1, x1;
 
 	int by, bx;
 
@@ -4428,7 +4536,6 @@ static void cave_gen(void)
 		/* Hack -- are we directly above another tower? */
 		if ((p_ptr->depth == zone->level) && (p_ptr->depth > min_depth(p_ptr->dungeon)))
 		{
-
 			dungeon_zone *roof;
 	
 			get_zone(&roof,p_ptr->dungeon,p_ptr->depth-1);
@@ -4600,6 +4707,9 @@ static void cave_gen(void)
 		cave_info[y][x] |= (CAVE_XLOF);
 	}
 
+	/* Start with no tunnel doors */
+	dun->door_n = 0;
+
 	/* Hack -- Scramble the room order */
 	for (i = 0; i < dun->cent_n; i++)
 	{
@@ -4613,9 +4723,64 @@ static void cave_gen(void)
 		dun->cent[pick2].x = x1;
 	}
 
-	/* Start with no tunnel doors */
-	dun->door_n = 0;
+	/* Set number of partitions */
+	dun->part_n = dun->cent_n;
 
+	/* Partition rooms */
+	for (i = 0; i < dun->cent_n; i++)
+	{
+		dun->part[i] = i;		
+	}
+
+	/*
+	 * New tunnel generation routine.
+	 *
+	 * We partition the rooms into distinct partition numbers. We then find the room in
+	 * each partition with the closest neighbour in an adjacent partition and attempt
+	 * to connect the two rooms.
+	 *
+	 * When two rooms are connected by build_tunnel, the partitions are merged.
+	 *
+	 * We repeat, until there is only one partition.
+	 */
+
+	while (dun->part_n > 1)
+	{
+		for (i = 0; i < dun->cent_n; i++)
+		{
+			int dist = 30000;
+			int choice = -1;
+
+			for (j = 0; j < dun->cent_n; j++)
+			{
+				if (dun->part[j] != i) continue;
+
+				for (k = 0; k < dun->cent_n; k++)
+				{
+					int dist1 = distance(dun->cent[j].y, dun->cent[j].x, dun->cent[k].y, dun->cent[k].x);
+
+					if ((dun->part[j] != dun->part[k]) && (dist > dist1))
+					{
+						dist = dist1;
+						choice = k;
+					}
+				}
+
+				/* Connect the room to the nearest neighbour */
+				build_tunnel(dun->cent[j].y, dun->cent[j].x, dun->cent[choice].y, dun->cent[choice].x);
+
+				/* Finish partition */
+				if (dun->part_n == 1) break;
+			}
+
+			/* Finish partition */
+			if (dun->part_n == 1) break;
+		}
+	}
+
+
+/* Old connection routine below */
+#if 0
 	/* Paranoia */
 	if (dun->cent_n)
 	{
@@ -4634,6 +4799,7 @@ static void cave_gen(void)
 		y = dun->cent[i].y;
 		x = dun->cent[i].x;
 	}
+#endif
 
 	/* Place intersection doors */
 	for (i = 0; i < dun->door_n; i++)
@@ -4739,12 +4905,6 @@ static void cave_gen(void)
 	/* Determine the character location */
 	if ((p_ptr->py == 0) || (p_ptr->px == 0)) new_player_spot();
 
-	/* Ensure wandering monsters suit the dungeon level */
-	get_mon_num_hook = dun_level_mon;
-
-	/* Prepare allocation table */
-	get_mon_num_prep();
-
 	/* Pick a base number of monsters */
 	i = MIN_M_ALLOC_LEVEL + randint(8);
 
@@ -4753,11 +4913,6 @@ static void cave_gen(void)
 	{
 		(void)alloc_monster(0, TRUE);
 	}
-
-	get_mon_num_hook = NULL;
-
-	/* Prepare allocation table */
-	get_mon_num_prep();
 
 	/* Hack -- make sure we have rooms to place stuff */
 	if (level_flag & (LF1_ROOMS | LF1_TOWER))

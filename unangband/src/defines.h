@@ -143,7 +143,7 @@
  * Number of rooms to attempt to generate in dungeon.
  * 
  */
-#define DUN_ROOMS       50
+#define DUN_ROOMS       16
 
 /*
  * Number of grids in each dungeon (horizontally)

@@ -580,20 +580,8 @@ static void process_world(void)
 			/* Sneaky characters make monsters sleepy */
 			if (p_ptr->skill_stl > rand_int(100)) slp = TRUE;
 
-			/* Ensure wandering monsters suit the dungeon level */
-			get_mon_num_hook = dun_level_mon;
-
-			/* Prepare allocation table */
-			get_mon_num_prep();
-
 			/* Make a new monster */
 			(void)alloc_monster(MAX_SIGHT + 5, slp);
-
-			/* Ensure wandering monsters suit the dungeon level */
-			get_mon_num_hook = NULL;
-
-			/* Prepare allocation table */
-			get_mon_num_prep();
 		}
 	}
 

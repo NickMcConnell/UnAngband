@@ -71,6 +71,9 @@ different range of monsters, you need to travel to a new level.
 
 - Rooms descriptions will now be based on the most powerful monster on the level.
 
+- The dungeon generator will now create a lot less rooms on a level and will work much harder
+to ensure that all rooms are correctly connected.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
