@@ -74,6 +74,8 @@ different range of monsters, you need to travel to a new level.
 - The dungeon generator will now create a lot less rooms on a level and will work much harder
 to ensure that all rooms are correctly connected.
 
+- Corridors will now be generated according to the appropriate level 'theme'.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.

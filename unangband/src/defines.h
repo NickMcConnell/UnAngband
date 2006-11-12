@@ -4604,6 +4604,16 @@
 
 
 /*
+ * Determines if a map location is fully inside the outer walls
+ * with an additional 1 unit threshold.
+ *
+ * This is for tunnels which we may widen after generation.
+ */
+#define in_bounds_fully_tunnel(Y,X) \
+	(((Y) > 1) && ((Y) < DUNGEON_HGT-2) && \
+	 ((X) > 1) && ((X) < DUNGEON_WID-2))
+
+/*
  * Determines if a map location is currently "on screen"
  * Note that "panel_contains(Y,X)" always implies "in_bounds(Y,X)".
  * Pre-storing this into a cave_info flag would be nice.  XXX XXX

@@ -117,7 +117,9 @@
  * Dungeon tunnel generation values
  */
 #define DUN_TUN_RND     10      /* Chance of random direction */
-#define DUN_TUN_CHG     30      /* Chance of changing direction */
+#define DUN_TUN_CAV     50      /* Chance of random direction / changing direction in caves */
+#define DUN_TUN_CHG     10      /* Chance of changing direction */
+#define DUN_TUN_STY     5       /* Chance of changing style */
 #define DUN_TUN_CON     15      /* Chance of extra tunneling */
 #define DUN_TUN_PEN     25      /* Chance of doors at room entrances */
 #define DUN_TUN_JCT     90      /* Chance of doors at tunnel junctions */
@@ -471,7 +473,7 @@ static void alloc_object(int set, int typ, int num)
 			x = rand_int(DUNGEON_WID);
 
 			/* Require actual floor grid */
-			if (!(f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR))) continue;
+			if ((f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR)) == 0) continue;
 
 			/* Check for "room" */
 			room = (cave_info[y][x] & (CAVE_ROOM)) ? TRUE : FALSE;
@@ -3678,6 +3680,37 @@ static void build_roof(int y0, int x0, int ymax, int xmax, cptr data)
 	}
 }
 
+/*
+ * Leave 1 & 2 empty as these are used to vary the crenallations in crypt
+ * corridors
+ */
+
+#define TUNNEL_STYLE	4	/* First 'real' style */
+#define TUNNEL_CRYPT_L	4
+#define TUNNEL_CRYPT_R	8
+#define TUNNEL_LARGE_L	16
+#define TUNNEL_LARGE_R	32
+#define TUNNEL_CAVE	64
+#define TUNNEL_DUNGEON	128	/* This allows mixed styles */
+
+static int get_tunnel_style(void)
+{
+	int style = 0;
+
+	while ((style < TUNNEL_STYLE) && (level_flag & (LF1_CAVE | LF1_WILD | LF1_STRONGHOLD | LF1_CRYPT | LF1_DUNGEON)))
+	{
+		/* Change tunnel type */
+		if (level_flag & (LF1_CAVE | LF1_WILD)) style |= (TUNNEL_CAVE);
+		if (level_flag & (LF1_STRONGHOLD)) style |= (TUNNEL_LARGE_L | TUNNEL_LARGE_R);
+		if (level_flag & (LF1_CRYPT)) style |= (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R);
+		if (level_flag & (LF1_DUNGEON)) style |= (TUNNEL_DUNGEON);
+
+		/* Randomise style */
+		style = rand_int(256) & (style | (TUNNEL_STYLE -1));
+	}
+
+	return (style);
+}
 
 
 /*
@@ -3723,12 +3756,6 @@ static void build_roof(int y0, int x0, int ymax, int xmax, cptr data)
  * -- tunnels with lateral and diagonal interruptions (on LF1_CAVE levels)
  */
 
-#define TUNNEL_STANDARD	0
-#define TUNNEL_CRYPT	1
-#define TUNNEL_LARGE_SE	2
-#define TUNNEL_LARGE_NW	4
-#define TUNNEL_CAVE	8
-
 static void build_tunnel(int row1, int col1, int row2, int col2)
 {
 	int i, y, x;
@@ -3739,7 +3766,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 
 	bool door_flag = FALSE;
 
-	int style = TUNNEL_STANDARD;
+	/* Force style change */
+	int style = get_tunnel_style();
 
 	int by1 = row1/BLOCK_HGT;
 	int bx1 = col1/BLOCK_WID;
@@ -3755,28 +3783,30 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	/* Start out in the correct direction */
 	correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
 
-	/* Change tunnel type */
-	if (level_flag & (LF1_CAVE)) style |= (TUNNEL_CAVE);
-	if (level_flag & (LF1_STRONGHOLD)) style |= (TUNNEL_LARGE_SE | TUNNEL_LARGE_NW);
-	if (level_flag & (LF1_CRYPT)) style |= (TUNNEL_CRYPT);
-
-	/* Randomise style */
-	style = rand_int(16) & style;
-
 	/* Keep going until done (or bored) */
-	while ((row1 != row2) || (col1 != col2))
+	while ((row1 != row2) || (col1 != col2)) 
 	{
 		/* Mega-Hack -- Paranoia -- prevent infinite loops */
-		if (main_loop_count++ > 2000) break;
+		if (main_loop_count++ > 2000) return;
+
+		/* Hack -- Prevent tunnel weirdness */
+		if (dun->tunn_n >= TUNN_MAX) return;
+
+		/* Style tunnel after short distance */
+		if (rand_int(100) < (DUN_TUN_STY / (style & (TUNNEL_LARGE_L | TUNNEL_LARGE_R) ? 2 : 1)))
+		{
+			style = get_tunnel_style();
+		}
 
 		/* Allow bends in the tunnel */
-		if (rand_int(100) < ((style & TUNNEL_CAVE) != 0 ? DUN_TUN_RND * 2 : DUN_TUN_RND))
+		if (rand_int(100) < ((style & TUNNEL_CAVE ? DUN_TUN_CAV : DUN_TUN_CHG) /
+				(style & (TUNNEL_LARGE_L | TUNNEL_LARGE_R) ? 2 : 1)))
 		{
 			/* Get the correct direction */
 			correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
 
 			/* Random direction */
-			if (rand_int(100) < ((style & TUNNEL_CAVE) != 0 ? DUN_TUN_RND * 2 : DUN_TUN_RND))
+			if (rand_int(100) < (style & TUNNEL_CAVE ? DUN_TUN_CAV : DUN_TUN_RND))
 			{
 				if ((style & TUNNEL_CAVE) != 0)
 					rand_dir_cave(&row_dir, &col_dir);
@@ -3790,13 +3820,13 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		tmp_col = col1 + col_dir;
 
 		/* Do not leave the dungeon!!! XXX XXX */
-		while (!in_bounds_fully(tmp_row, tmp_col))
+		while (!in_bounds_fully_tunnel(tmp_row, tmp_col))
 		{
 			/* Get the correct direction */
 			correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
 
 			/* Random direction */
-			if (rand_int(100) < ((style & TUNNEL_CAVE) != 0 ? DUN_TUN_RND * 2 : DUN_TUN_RND))
+			if (rand_int(100) < (style & TUNNEL_CAVE ? DUN_TUN_CAV : DUN_TUN_RND))
 			{
 				if ((style & TUNNEL_CAVE) != 0)
 					rand_dir_cave(&row_dir, &col_dir);
@@ -3821,6 +3851,10 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		/* Pierce "outer" walls of rooms */
 		if (cave_feat[tmp_row][tmp_col] == FEAT_WALL_OUTER)
 		{
+			int wall1 = dun->wall_n;
+			bool door = TRUE;
+			bool pillar = FALSE;
+
 			/* Get the "next" location */
 			y = tmp_row + row_dir;
 			x = tmp_col + col_dir;
@@ -3845,16 +3879,72 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				dun->wall_n++;
 			}
 
-			/* Forbid re-entry near this piercing */
-			for (y = row1 - 1; y <= row1 + 1; y++)
+			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
+			if (style & (TUNNEL_LARGE_L))
 			{
-				for (x = col1 - 1; x <= col1 + 1; x++)
+				if (cave_feat[row1 + col_dir][col1 - row_dir] == FEAT_WALL_OUTER)
 				{
-					/* Convert adjacent "outer" walls as "solid" walls */
-					if (cave_feat[y][x] == FEAT_WALL_OUTER)
+					/* Save the wall location */
+					if (dun->wall_n < WALL_MAX)
 					{
-						/* Change the wall to a "solid" wall */
-						cave_set_feat(y, x, FEAT_WALL_SOLID);
+						dun->wall[dun->wall_n].y = row1 + col_dir;
+						dun->wall[dun->wall_n].x = col1 - row_dir;
+						dun->wall_n++;
+
+						/* Hack -- add regular pillars to some width 3 corridors */
+						if ((((row1 + col1) % ((style % 4) + 2)) == 0)
+							&& ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))== 0)) pillar = TRUE;
+					}
+				}
+				else
+				{
+					door = FALSE;
+				}
+			}
+
+			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
+			if (style & (TUNNEL_LARGE_R))
+			{
+				if (cave_feat[row1 - col_dir][col1 + row_dir] == FEAT_WALL_OUTER)
+				{
+					/* Save the wall location */
+					if (dun->wall_n < WALL_MAX)
+					{
+						if (pillar) dun->wall_n -= 2;
+
+						dun->wall[dun->wall_n].y = row1 - col_dir;
+						dun->wall[dun->wall_n].x = col1 + row_dir;
+						dun->wall_n++;
+
+						if (pillar) dun->wall_n++;
+					}
+				}
+				else
+				{
+					door = FALSE;
+				}
+			}
+
+			/* Cancel if can't make all the doors */
+			if (!door)
+			{
+				dun->wall_n = wall1;
+				continue;
+			}
+
+			/* Forbid re-entry near these piercings */
+			for (i = wall1; i < dun->wall_n; i++)
+			{
+				for (y = dun->wall[i].y - 1; y <= dun->wall[i].y + 1; y++)
+				{
+					for (x = dun->wall[i].x - 1; x <= dun->wall[i].x + 1; x++)
+					{
+						/* Convert adjacent "outer" walls as "solid" walls */
+						if (cave_feat[y][x] == FEAT_WALL_OUTER)
+						{
+							/* Change the wall to a "solid" wall */
+							cave_set_feat(y, x, FEAT_WALL_SOLID);
+						}
 					}
 				}
 			}
@@ -3902,9 +3992,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			}
 		}
 
-		/* Tunnel through all other walls and bridge features */
-		else if ((f_info[cave_feat[tmp_row][tmp_col]].flags1 & (FF1_TUNNEL)) ||
-		(f_info[cave_feat[tmp_row][tmp_col]].flags2 & (FF2_BRIDGE)))
+		/* Bridge features */
+		else if (f_info[cave_feat[tmp_row][tmp_col]].flags2 & (FF2_BRIDGE))
 		{
 			/* Accept this location */
 			row1 = tmp_row;
@@ -3916,6 +4005,97 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				dun->tunn[dun->tunn_n].y = row1;
 				dun->tunn[dun->tunn_n].x = col1;
 				dun->tunn_n++;
+			}
+
+			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
+			if ((style & (TUNNEL_LARGE_L)) && (!(style & (TUNNEL_LARGE_R)) || (style % 2)))
+			{
+				if (f_info[cave_feat[row1+col_dir][col1-row_dir]].flags2 & (FF2_BRIDGE))
+				{
+					/* Save the tunnel location */
+					if (dun->tunn_n < TUNN_MAX)
+					{
+						dun->tunn[dun->tunn_n].y = row1 + col_dir;
+						dun->tunn[dun->tunn_n].x = col1 - row_dir;
+						dun->tunn_n++;
+					}
+				}
+			}
+
+			/* Hack -- note use of else to ensure bridges are never more than 2 units wide */
+			else if (style & (TUNNEL_LARGE_L | TUNNEL_LARGE_R))
+			{
+				if (f_info[cave_feat[row1-col_dir][col1+row_dir]].flags2 & (FF2_BRIDGE))
+				{
+					/* Save the tunnel location */
+					if (dun->tunn_n < TUNN_MAX)
+					{
+						dun->tunn[dun->tunn_n].y = row1 - col_dir;
+						dun->tunn[dun->tunn_n].x = col1 + row_dir;
+						dun->tunn_n++;
+					}
+				}
+			}
+
+			/* Prevent door in next grid */
+			door_flag = TRUE;
+		}
+
+		/* Tunnel through all other walls and bridge features */
+		else if (f_info[cave_feat[tmp_row][tmp_col]].flags1 & (FF1_TUNNEL))
+		{
+			bool pillar = FALSE;
+
+			/* Accept this location */
+			row1 = tmp_row;
+			col1 = tmp_col;
+
+			/* Save the tunnel location */
+			if (dun->tunn_n < TUNN_MAX)
+			{
+				dun->tunn[dun->tunn_n].y = row1;
+				dun->tunn[dun->tunn_n].x = col1;
+				dun->tunn_n++;
+			}
+
+			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
+			if (style & (TUNNEL_CRYPT_L | TUNNEL_LARGE_L))
+			{
+				if ((f_info[cave_feat[row1+col_dir][col1-row_dir]].flags1 & (FF1_TUNNEL))
+					&& ((style & (TUNNEL_LARGE_L)) || !((row1 + col1 + style) % 2)))
+				{
+					/* Save the tunnel location */
+					if (dun->tunn_n < TUNN_MAX)
+					{
+						dun->tunn[dun->tunn_n].y = row1 + col_dir;
+						dun->tunn[dun->tunn_n].x = col1 - row_dir;
+						dun->tunn_n++;
+
+						/* Hack -- add regular pillars to some width 3 corridors */
+						if ((((row1 + col1) % ((style % 4) + 2)) == 0)
+							&& ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))== 0)) pillar = TRUE;
+					}
+				}
+			}
+
+			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
+			if (style & (TUNNEL_CRYPT_R | TUNNEL_LARGE_R))
+			{
+				if ((f_info[cave_feat[row1-col_dir][col1+row_dir]].flags1 & (FF1_TUNNEL))
+					&& ((style & (TUNNEL_LARGE_R)) || !((row1 + col1 + style / 2) % 2)))
+				{
+					/* Save the tunnel location */
+					if (dun->tunn_n < TUNN_MAX)
+					{
+						if (pillar) dun->tunn_n -= 2;
+
+						dun->tunn[dun->tunn_n].y = row1 - col_dir;
+						dun->tunn[dun->tunn_n].x = col1 + row_dir;
+						dun->tunn_n++;
+
+						if (pillar) dun->tunn_n++;
+					}
+				}
 			}
 
 			/* Allow door in next grid */
@@ -3993,7 +4173,6 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			/* Clear previous contents, bridge it */
 			cave_alter_feat(y, x, FS_TUNNEL);
 		}
-
 	}
 
 	/* Apply the piercings that we found */
@@ -4014,8 +4193,13 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			place_random_door(y, x);
 		}
 
+		/* Place identical doors if next set of doors is adjacent */
+		while ((i < dun->wall_n - 1) && (dun->wall[i+1].y - y < 1) && (dun->wall[i+1].x - x < 1))
+		{
+			cave_set_feat(dun->wall[i+1].y, dun->wall[i+1].x, cave_feat[y][x]);
+			i++;
+		}
 	}
-
 }
 
 
@@ -4231,9 +4415,9 @@ void init_level_flags(void)
 	if (!zone->fill) level_flag |= LF1_TOWN;
 
 	/* Define wilderness */
-	if ((zone->fill) && !(f_info[zone->fill].flags1 & (FF1_WALL))) level_flag |= LF1_WILD;
-	if ((zone->big) && !(f_info[zone->big].flags1 & (FF1_WALL))) level_flag |= LF1_WILD;
-	if ((zone->small) && !(f_info[zone->small].flags1 & (FF1_WALL))) level_flag |= LF1_WILD;
+	if ((zone->fill) && ((f_info[zone->fill].flags1 & (FF1_WALL)) != 0)) level_flag |= LF1_WILD;
+	if ((zone->big) && ((f_info[zone->big].flags1 & (FF1_WALL)) != 0)) level_flag |= LF1_WILD;
+	if ((zone->small) && ((f_info[zone->small].flags1 & (FF1_WALL)) != 0)) level_flag |= LF1_WILD;
 
 	/* No dungeon, no stairs */
 	if (min_depth(p_ptr->dungeon) == max_depth(p_ptr->dungeon))
