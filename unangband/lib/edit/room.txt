@@ -36,8 +36,8 @@
 # K: item
 # Generate extra items of this tval for this room.
 
-# L: ACID | OIL | CHASM | LAVA | ICE | WATER | DARK
-# Only generate on levels marked as this.
+# L: ACID | OIL | CHASM | LAVA | ICE | WATER | DESTROYED etc.
+# Only generate on levels with these flags.
 
 # DARK - only generate in dark rooms.
 
@@ -66,9 +66,6 @@ V:0.6.2
 # Hack -- until we distinguish room types
 
 N:1:101:1:1:0
-A:
-B:
-D:
 
 
 # 20% of rooms have at least one kind of visible feature
@@ -99,96 +96,112 @@ A:
 B:
 D:the north wall.  
 S:SEEN
+P:NORTH | PLACE | EDGE
 
 N:102:118:15:15:0
 A:
 B:
 D:the east wall.  
 S:SEEN
+P:EAST | PLACE | EDGE
 
 N:102:118:15:15:0
 A:
 B:
 D:the west wall.  
 S:SEEN
+P:WEST | PLACE | EDGE
 
 N:102:118:15:15:0
 A:
 B:
 D:the south wall.  
 S:SEEN
+P:SOUTH | PLACE | EDGE
 
 N:102:118:5:5:0
 A:
 B:
 D:the walls and ceiling.  
 S:SEEN
+P:EDGE | NORTH | SOUTH | EAST | WEST | PLACE
 
 N:102:118:1:1:0
 A:
 B:
 D:every available surface.  
 S:SEEN
+P:NORTH | SOUTH | EAST | WEST | CENTRE | PLACE
 
 N:102:103:2:2:0
 A:
 B:
 D:a nook in 
 S:SEEN
+P:ALLOC | WALL
 
 N:102:103:2:2:0
 A:
 B:
 D:a recess in 
 S:SEEN
+P:ALLOC | WALL
 
 N:102:103:2:2:0
 A:
 B:
 D:a cranny in 
 S:SEEN
+P:ALLOC | WALL
 
 N:102:103:2:2:0
 A:
 B:
 D:an alcove in 
 S:SEEN
+P:ALLOC | WALL
 
 N:102:103:2:2:0
 A:
 B:
 D:an cupboard in 
 S:SEEN
+P:ALLOC | WALL
 
 N:102:118:1:1:0
 A:
 B:
 D:the walls.  
 S:SEEN
+P:EDGE | NORTH | SOUTH | EAST | WEST | PLACE
 
 N:103:118:25:25:0
 A:
 B:
 D:the north wall.  
 S:SEEN
+P:NORTH | EDGE | PLACE
 
 N:103:118:25:25:0
 A:
 B:
 D:the east wall.  
 S:SEEN
+P:EAST | EDGE | PLACE
 
 N:103:118:25:25:0
 A:
 B:
 D:the west wall.  
 S:SEEN
+P:WEST | EDGE | PLACE
 
 N:103:118:25:25:0
 A:
 B:
 D:the south wall.  
 S:SEEN
+P:SOUTH | EDGE | PLACE
 
 N:104:105:1:1:0
 A:
@@ -472,30 +485,35 @@ A:
 B:
 D:against the north wall is 
 S:SEEN
+P:NORTH | PLACE
 
 N:105:106:15:15:0
 A:
 B:
 D:against the east wall is 
 S:SEEN
+P:EAST | PLACE
 
 N:105:106:15:15:0
 A:
 B:
 D:aginst the west wall is 
 S:SEEN
+P:WEST | PLACE
 
 N:105:106:15:15:0
 A:
 B:
 D:against the south wall is 
 S:SEEN
+P:SOUTH | PLACE
 
 N:105:106:40:40:0
 A:
 B:
 D:in the centre of the room is 
 S:SEEN
+P:CENTRE | PLACE
 
 N:106:107:15:3:0
 A:

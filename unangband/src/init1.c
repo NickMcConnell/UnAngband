@@ -97,6 +97,45 @@ static cptr d_info_sflags[] =
 /*
  * Room Level Flags
  */
+static cptr d_info_pflags[] =
+{
+	"NORTH",
+	"SOUTH",
+	"WEST",
+	"EAST",
+	"CENTRE",
+	"EDGE",
+	"PLACE",
+	"PILLAR",
+	"CHECKER",
+	"SCATTER",
+	"WALL",
+	"FLOOR",
+	"BATTLE",
+	"VAULT",
+	"DUNGEON",
+	"STRONGHOLD",
+	"CRYPT",
+	"LAIR",
+	"MINE",
+	"CAVE",
+	"TOWN",
+	"WILD",
+	"RUIN",
+	"ALLOC",
+	"DROP_ITEM",
+	"DROP_GOLD",
+	"XXX1",
+	"XXX1",
+	"XXX1",
+	"XXX1",
+	"XXX1",
+	"XXX1"
+};
+
+/*
+ * Room Level Flags
+ */
 static cptr d_info_lflags[] =
 {
 	"WATER",
@@ -110,8 +149,8 @@ static cptr d_info_lflags[] =
 	"CROWDED",
 	"SURFACE",
 	"DAYLIGHT",
-	"BATTLE",
 	"TOWER",
+	"BATTLE",
 	"VAULT",
 	"DUNGEON",
 	"STRONGHOLD",
@@ -2023,6 +2062,22 @@ static errr grab_one_special_flag(desc_type *d_ptr, cptr what)
 /*
  * Grab one level flag in an desc_type from a textual string
  */
+static errr grab_one_place_flag(desc_type *d_ptr, cptr what)
+{
+	if (grab_one_flag(&d_ptr->p_flag, d_info_pflags, what) == 0)
+		return (0);
+
+	/* Oops */
+	msg_format("Unknown room generate flag '%s'.", what);
+
+	/* Error */			
+	return (PARSE_ERROR_GENERIC);
+}
+
+
+/*
+ * Grab one level flag in an desc_type from a textual string
+ */
 static errr grab_one_level_flag(desc_type *d_ptr, cptr what)
 {
 	if (grab_one_flag(&d_ptr->l_flag, d_info_lflags, what) == 0)
@@ -2034,6 +2089,7 @@ static errr grab_one_level_flag(desc_type *d_ptr, cptr what)
 	/* Error */			
 	return (PARSE_ERROR_GENERIC);
 }
+
 
 /*
  * Grab an race flag in an desc_type from a textual string
@@ -2173,6 +2229,7 @@ errr parse_d_info(char *buf, header *head)
 		if (!add_text(&d_ptr->text, head, s))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
 	}
+
 	/* Hack -- Process 'S' for special flags */
 	else if (buf[0] == 'S')
 	{
@@ -2199,6 +2256,34 @@ errr parse_d_info(char *buf, header *head)
 			s = t;
 		}
 	}
+
+	/* Hack -- Process 'P' for placement flags */
+	else if (buf[0] == 'P')
+	{
+		/* There better be a current d_ptr */
+		if (!d_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Parse every entry textually */
+		for (s = buf + 2; *s; )
+		{
+			/* Find the end of this entry */
+			for (t = s; *t && (*t != ' ') && (*t != '|'); ++t) /* loop */;
+
+			/* Nuke and skip any dividers */
+			if (*t)
+			{
+				*t++ = '\0';
+				while (*t == ' ' || *t == '|') t++;
+			}
+
+			/* Parse this entry */
+			if (0 != grab_one_place_flag(d_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
+
+			/* Start the next entry */
+			s = t;
+		}
+	}
+
 	/* Hack -- Process 'L' for level flags */
 	else if (buf[0] == 'L')
 	{

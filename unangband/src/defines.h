@@ -2734,8 +2734,8 @@
 #define LF1_CROWDED 	0x00000100L
 #define LF1_SURFACE	0x00000200L
 #define LF1_DAYLIGHT	0x00000400L
-#define LF1_BATTLE	0x00000800L
-#define LF1_TOWER	0x00001000L
+#define LF1_TOWER	0x00000800L
+#define LF1_BATTLE	0x00001000L
 #define LF1_VAULT	0x00002000L	/* Vault level */
 #define LF1_DUNGEON	0x00004000L	/* Dungeon level */
 #define LF1_STRONGHOLD	0x00008000L	/* Stronghold (giant/dwarf) level */
@@ -2755,8 +2755,40 @@
 #define LF1_LESS	0x40000000L	/* Level goes up */
 #define LF1_MORE	0x80000000L	/* Level goes down */
 
-/*** Room flags ***/
 
+/* Room generation flags */
+#define RG1_NORTH	0x00000001L	/* Place in north */
+#define RG1_SOUTH	0x00000002L	/* Place in south */
+#define RG1_WEST	0x00000004L	/* Place in east */
+#define RG1_EAST	0x00000008L	/* Place in west */
+#define RG1_CENTRE	0x00000010L	/* Place in centre */
+#define RG1_EDGE	0x00000020L	/* Place on edge */
+#define RG1_PLACE	0x00000040L	/* Place now */
+#define RG1_PILLAR	0x00000080L	/* Place as pillars */
+#define RG1_CHECKER	0x00000100L	/* Place as checkered */
+#define RG1_SCATTER	0x00000200L	/* Place as scattered */
+#define RG1_WALL	0x00000400L	/* Place as wall */
+#define RG1_FLOOR	0x00000800L	/* Place as floor */
+#define RG1_BATTLE	0x00001000L	/* Place as battle */
+#define RG1_VAULT	0x00002000L	/* Vault level */
+#define RG1_DUNGEON	0x00004000L	/* Dungeon level */
+#define RG1_STRONGHOLD	0x00008000L	/* Stronghold (giant/dwarf) level */
+#define RG1_CRYPT	0x00010000L	/* Crypt level */
+#define RG1_LAIR	0x00020000L	/* Lair level */
+#define RG1_MINE	0x00040000L	/* Mine level */
+#define RG1_CAVE	0x00080000L	/* Cave level */
+#define RG1_TOWN	0x00100000L	/* Town level */
+#define RG1_WILD	0x00200000L	/* Wilderness level */
+#define RG1_RUIN	0x00400000L	/* Ruin level */
+#define RG1_ALLOC	0x00800000L	/* Place one only */
+#define RG1_DROP_ITEM	0x01000000L	/* Drop object */
+#define RG1_DROP_GOLD	0x02000000L	/* DRop gold */
+
+#define RG1_LEVEL_FLAGS (RG1_BATTLE | RG1_VAULT | RG1_DUNGEON | RG1_STRONGHOLD | RG1_CRYPT |\
+				RG1_LAIR | RG1_MINE | RG1_CAVE | RG1_TOWN | RG1_WILD | RG1_RUIN)
+
+
+/*** Room flags ***/
 
 /*
  * Special room flags

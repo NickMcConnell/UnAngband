@@ -119,7 +119,7 @@
 #define DUN_TUN_RND     10      /* Chance of random direction */
 #define DUN_TUN_CAV     50      /* Chance of random direction / changing direction in caves */
 #define DUN_TUN_CHG     10      /* Chance of changing direction */
-#define DUN_TUN_STY     5       /* Chance of changing style */
+#define DUN_TUN_STY     10       /* Chance of changing style */
 #define DUN_TUN_CON     15      /* Chance of extra tunneling */
 #define DUN_TUN_PEN     25      /* Chance of doors at room entrances */
 #define DUN_TUN_JCT     90      /* Chance of doors at tunnel junctions */
@@ -1553,7 +1553,7 @@ static void generate_fill(int y1, int x1, int y2, int x2, int feat)
 /*
  * Generate helper -- draw a rectangle with a feature
  */
-static void generate_draw(int y1, int x1, int y2, int x2, int feat)
+static void generate_rect(int y1, int x1, int y2, int x2, int feat)
 {
 	int y, x;
 
@@ -1567,6 +1567,100 @@ static void generate_draw(int y1, int x1, int y2, int x2, int feat)
 	{
 		cave_set_feat(y1, x, feat);
 		cave_set_feat(y2, x, feat);
+	}
+}
+
+
+
+
+/*
+ * Generate helper -- draw a rectangle with a feature using a 'pattern' flag.
+ */
+static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, int spacing)
+{
+	int y, x, k;
+
+	int y_alloc, x_alloc;
+	int choice = 0;
+
+	/* Scatter several about if requested */
+	for (k = 0; k < ((flag & (RG1_SCATTER)) != 0 ? 7 : 1); k++)
+	{
+		/* Scan the whole room */
+		for (y = y1; y <= y2; y++)
+		{
+			for (x = x1; x <= x2; x++)
+			{
+				/* Checkered room */
+				if (((flag & (RG1_CHECKER)) != 0) && ((x + y) % 2)) continue;
+
+				/* Only place on wall */
+				if (((flag & (RG1_WALL)) != 0) && ((f_info[cave_feat[y][x]].flags1 & (FF1_WALL)) == 0)) continue;
+
+				/* Don't place on wall otherwise */
+				if (((flag & (RG1_WALL)) == 0) && ((f_info[cave_feat[y][x]].flags1 & (FF1_WALL)) != 0)) continue;
+
+				/* Only place on floor */
+				if (((flag & (RG1_FLOOR)) != 0) && ((f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR)) == 0)) continue;
+
+				/* Only place on edge of room */
+				if (((flag & (RG1_EDGE)) != 0) && (cave_feat[y][x] != FEAT_WALL_OUTER))
+				{
+					int i;
+					bool accept = FALSE;
+
+					for (i = 0; i < 8; i++)
+					{
+						if (cave_feat[y + ddy_ddd[i]][x + ddx_ddd[i]] == FEAT_WALL_OUTER) accept = TRUE;
+					}
+
+					if (!accept) continue;
+				}
+
+				/* Maybe pick if placing one */
+				if (((flag & (RG1_ALLOC | RG1_SCATTER)) != 0) && (rand_int(++choice) == 0))
+				{
+					y_alloc = y;
+					x_alloc = x;
+				}
+
+				/* Set feature */
+				else
+				{
+					/* Assign feature */
+					if (feat) cave_set_feat(y, x, feat);
+
+					/* Require "clean" floor space */
+					if (((flag & (RG1_DROP_GOLD | RG1_DROP_ITEM)) != 0) && (cave_clean_bold(y, x)))
+					{
+						/* Drop gold 50% of the time if both defined */
+						if (((flag & (RG1_DROP_GOLD)) != 0) && (((flag & (RG1_DROP_ITEM)) == 0) || (rand_int(100) < 50))) place_gold(y, x);
+						else place_object(y, x, FALSE, FALSE);
+					}
+				}
+
+				/* Pillared room */
+				if ((flag & (RG1_PILLAR)) != 0) x += spacing;
+			}
+
+			/* Pillared room */
+			if ((flag & (RG1_PILLAR)) != 0) y += spacing;
+		}
+
+		/* Finally place if allocating a single feature */
+		if (((flag & (RG1_ALLOC | RG1_SCATTER)) != 0) && choice)
+		{
+			/* Assign feature */
+			if (feat) cave_set_feat(y, x, feat);
+
+			/* Require "clean" floor space */
+			if (((flag & (RG1_DROP_GOLD | RG1_DROP_ITEM)) != 0) && (cave_clean_bold(y, x)))
+			{
+				/* Drop gold 50% of the time if both defined */
+				if (((flag & (RG1_DROP_GOLD)) != 0) && (((flag & (RG1_DROP_ITEM)) == 0) || (rand_int(100) < 50))) place_gold(y, x);
+				else place_object(y, x, FALSE, FALSE);
+			}
+		}
 	}
 }
 
@@ -1675,11 +1769,54 @@ static bool room_info_kind(int k_idx)
 /*
  * Get the room description, and place stuff accordingly.
  */
-static void get_room_info(int y, int x)
+static void get_room_info(int y0, int x0)
 {
+	int y1a, x1a, y2a, x2a;
+	int y1b, x1b, y2b, x2b;
+
+	int light = FALSE;
+
 	int i, j, chart, pick, chance, count, counter;
 
-	int room = dun->cent_n+1;
+	int room = dun->cent_n + 1;
+
+	u32b place_flag = 0;
+
+	int place_tval = 0;
+	int place_feat = 0;
+
+	/* Occasional light */
+	if (p_ptr->depth <= randint(25)) light = TRUE;
+
+	/* Determine extents of room (a) */
+	y1a = y0 - randint(4);
+	x1a = x0 - randint(11);
+	y2a = y0 + randint(3);
+	x2a = x0 + randint(10);
+
+	/* Determine extents of room (b) */
+	y1b = y0 - randint(3);
+	x1b = x0 - randint(10);
+	y2b = y0 + randint(4);
+	x2b = x0 + randint(11);
+
+	/* Generate new room (a) */
+	generate_room(y1a-1, x1a-1, y2a+1, x2a+1, light);
+
+	/* Generate new room (b) */
+	generate_room(y1b-1, x1b-1, y2b+1, x2b+1, light);
+
+	/* Generate outer walls (a) */
+	generate_rect(y1a-1, x1a-1, y2a+1, x2a+1, FEAT_WALL_OUTER);
+
+	/* Generate outer walls (b) */
+	generate_rect(y1b-1, x1b-1, y2b+1, x2b+1, FEAT_WALL_OUTER);
+
+	/* Generate inner floors (a) */
+	generate_fill(y1a, x1a, y2a, x2a, FEAT_FLOOR);
+
+	/* Generate inner floors (b) */
+	generate_fill(y1b, x1b, y2b, x2b, FEAT_FLOOR);
 
 	/* Start sections */
 	chart = 1;
@@ -1797,50 +1934,113 @@ static void get_room_info(int y, int x)
 			/* Place flags except SEEN */
 			room_info[room].flags |= (d_info[i].flags & ~(ROOM_SEEN));
 		
+			/* Get tval */
+			if (d_info[i].tval) place_tval = d_info[i].tval;
+
+			/* Get feature */
+			if (d_info[i].feat) place_feat = d_info[i].tval;
+
+			/* Add flags */
+			place_flag |= d_info[i].p_flag;
+
+			/* Add level flags */
+			level_flag |= (d_info[i].p_flag & (RG1_LEVEL_FLAGS));
+
+			/* Don't place yet */
+			if ((place_flag & (RG1_PLACE)) == 0) continue;
+
 			/* Place objects if needed */
-			if (d_info[i].tval)
+			if (place_tval)
 			{
-				room_info_kind_tval = d_info[i].tval;
+				/* Set object hooks if required */
+				if (place_tval < TV_GOLD)
+				{
+					room_info_kind_tval = d_info[i].tval;
 
-				get_obj_num_hook = room_info_kind;
+					get_obj_num_hook = room_info_kind;
 
-				/* Prepare allocation table */
-				get_obj_num_prep();
+					/* Prepare allocation table */
+					get_obj_num_prep();
 
-				/* Place the items */
-				if (d_info[i].tval == TV_GOLD) vault_treasure(y,x,randint(4)+2);
-				else vault_items(y, x, randint(4)+2);
+					/* Drop gold */
+					place_flag |= (RG1_DROP_ITEM);
+				}
+				else
+				{
+					/* Drop gold */
+					place_flag |= (RG1_DROP_GOLD);
+				}
+			}
 
+			/* Place features or items if needed */
+			if ((place_feat) || (place_tval))
+			{
+				/* Place in centre of room */
+				if ((place_flag & (RG1_CENTRE)) != 0)
+				{
+					int y1c = MAX(y1a, y1b) + 1;
+					int y2c = MIN(y2a, y2b) - 1;
+					int x1c = MAX(x1a, x1b) + 1;
+					int x2c = MIN(x2a, x2b) - 1;
+
+					generate_patt(y1c, x1c, y2c, x2c, place_feat, place_flag, 1);
+				}
+
+				/* Place in west of room */
+				if ((place_flag & (RG1_WEST)) != 0)
+				{
+					int y1w = (x1a < x1b ? y1a : (x1a == x1b ? MIN(y1a, y1b) : y1b));
+					int y2w = (x1a < x1b ? y2a : (x1a == x1b ? MAX(y2a, y2b) : y2b));
+					int x1w = MIN(x1a, x1b);
+					int x2w = (x1a == x1b ? x1a + 1 : MAX(x1a, x1b) - 1);
+
+					generate_patt(y1w, x1w, y2w, x2w, place_feat, place_flag, 1);
+				}
+
+				/* Place in east of room */
+				if ((place_flag & (RG1_EAST)) != 0)
+				{
+					int y1e = (x2a > x2b ? y1a : (x1a == x1b ? MIN(y1a, y1b): y1b));
+					int y2e = (x2a > x2b ? y2a : (x1a == x1b ? MAX(y2a, y2b): y2b));
+					int x1e = (x2a == x2b ? x2a - 1 : MIN(x2a, x2b) + 1);
+					int x2e = MAX(x2a, x2b);
+
+					generate_patt(y1e, x1e, y2e, x2e, place_feat, place_flag, 1);
+				}
+
+				/* Place in north of room */
+				if ((place_flag & (RG1_NORTH)) != 0)
+				{
+					int y1n = MIN(y1a, y1b);
+					int y2n = (y1a == y1b ? y1a + 1 : MAX(y1a, y1b) - 1);
+					int x1n = (y1a < y1b ? x1a : (y1a == y1b ? MIN(x1a, x1b): y1b));
+					int x2n = (y1a < y1b ? x2a : (y1a == y1b ? MAX(x2a, x2b): x2b));
+
+					generate_patt(y1n, x1n, y2n, x2n, place_feat, place_flag, 1);
+				}
+
+				/* Place in south of room */
+				if ((place_flag & (RG1_SOUTH)) != 0)
+				{
+					int y1s = (y2a == y2b ? y2a - 1 : MIN(y2a, y2b) + 1);
+					int y2s = MAX(y2a, y2b);
+					int x1s = (y2a > y2b ? x1a : (y2a == y2b ? MIN(x1a, x1b): x1b));
+					int x2s = (y2a > y2b ? x2a : (y2a == y2b ? MAX(x2a, x2b): x2b));
+
+					generate_patt(y1s, x1s, y2s, x2s, place_feat, place_flag, 1);
+				}
+			}
+
+			/* Place objects if needed */
+			if (place_tval)
+			{
 				get_obj_num_hook = NULL;
 
 				/* Prepare allocation table */
 				get_obj_num_prep();
 			}
-			
-			/* Place features if needed */
-			if (d_info[i].feat)
-			{
-				int ii, y1, x1;
-				int num = 7 + rand_int(6);
-				int k = 0;
 
-				if (f_info[d_info[i].feat].flags3 & (FF3_ALLOC)) num /=2;
 
-				for (ii = 0; ii < 15; ii++)
-				{
-					int d = 3;
-
-					/* Pick a nearby location */
-					scatter(&y1, &x1, y, x, d, 0);
-
-					/* Require "empty" grid */
-					if (!cave_start_bold(y1, x1)) continue;
-
-					cave_set_feat(y1,x1,d_info[i].feat);
-
-					if (k++ >= num) break;
-				}
-			}
 		}
 	}
 
@@ -1849,6 +2049,7 @@ static void get_room_info(int y, int x)
 
 	/* Terminate index list */
 	room_info[room].section[j] = -1;
+
 }
 
 
@@ -1889,45 +2090,47 @@ static void build_type1(int y0, int x0)
 	y2 = y0 + randint(3);
 	x2 = x0 + randint(11);
 
-
 	/* Generate new room */
 	generate_room(y1-1, x1-1, y2+1, x2+1, light);
 
 	/* Generate outer walls */
-	generate_draw(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
+	generate_rect(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
 
 	/* Generate inner floors */
 	generate_fill(y1, x1, y2, x2, FEAT_FLOOR);
 
-
 	/* Hack -- Occasional pillar room */
-	if (rand_int(20) == 0)
+	if ((level_flag & (LF1_CRYPT)) != 0)
 	{
-		for (y = y1; y <= y2; y += 2)
+		switch (rand_int(2))
 		{
-			for (x = x1; x <= x2; x += 2)
-			{
-				cave_set_feat(y, x, FEAT_WALL_INNER);
-			}
+			case 0:
+				/* Pillared room */
+				for (y = y1; y <= y2; y += 2)
+				{
+					for (x = x1; x <= x2; x += 2)
+					{
+						cave_set_feat(y, x, FEAT_WALL_INNER);
+					}
+				}
+				break;
+
+			case 1:
+				/* Ragged edged room */
+				for (y = y1 + 2; y <= y2 - 2; y += 2)
+				{
+					cave_set_feat(y, x1, FEAT_WALL_INNER);
+					cave_set_feat(y, x2, FEAT_WALL_INNER);
+				}
+
+				for (x = x1 + 2; x <= x2 - 2; x += 2)
+				{
+					cave_set_feat(y1, x, FEAT_WALL_INNER);
+					cave_set_feat(y2, x, FEAT_WALL_INNER);
+				}
+				break;
 		}
 	}
-
-	/* Hack -- Occasional ragged-edge room */
-	else if (rand_int(50) == 0)
-	{
-		for (y = y1 + 2; y <= y2 - 2; y += 2)
-		{
-			cave_set_feat(y, x1, FEAT_WALL_INNER);
-			cave_set_feat(y, x2, FEAT_WALL_INNER);
-		}
-
-		for (x = x1 + 2; x <= x2 - 2; x += 2)
-		{
-			cave_set_feat(y1, x, FEAT_WALL_INNER);
-			cave_set_feat(y2, x, FEAT_WALL_INNER);
-		}
-	}
-
 
 	/* Hack -- mark light rooms */
 	if (light) level_flag &= ~(LF1_DARK);
@@ -1935,8 +2138,6 @@ static void build_type1(int y0, int x0)
 
 	/* Pretty description and maybe more monsters/objects/traps*/
 	get_room_info(y0,x0);
-
-
 }
 
 
@@ -1976,10 +2177,10 @@ static void build_type2(int y0, int x0)
 	generate_room(y1b-1, x1b-1, y2b+1, x2b+1, light);
 
 	/* Generate outer walls (a) */
-	generate_draw(y1a-1, x1a-1, y2a+1, x2a+1, FEAT_WALL_OUTER);
+	generate_rect(y1a-1, x1a-1, y2a+1, x2a+1, FEAT_WALL_OUTER);
 
 	/* Generate outer walls (b) */
-	generate_draw(y1b-1, x1b-1, y2b+1, x2b+1, FEAT_WALL_OUTER);
+	generate_rect(y1b-1, x1b-1, y2b+1, x2b+1, FEAT_WALL_OUTER);
 
 	/* Generate inner floors (a) */
 	generate_fill(y1a, x1a, y2a, x2a, FEAT_FLOOR);
@@ -1998,7 +2199,7 @@ static void build_type2(int y0, int x0)
 }
 
 
-
+#if 0
 /*
  * Type 3 -- Cross shaped rooms
  *
@@ -2054,10 +2255,10 @@ static void build_type3(int y0, int x0)
 	generate_room(y1b-1, x1b-1, y2b+1, x2b+1, light);
 
 	/* Generate outer walls (a) */
-	generate_draw(y1a-1, x1a-1, y2a+1, x2a+1, FEAT_WALL_OUTER);
+	generate_rect(y1a-1, x1a-1, y2a+1, x2a+1, FEAT_WALL_OUTER);
 
 	/* Generate outer walls (b) */
-	generate_draw(y1b-1, x1b-1, y2b+1, x2b+1, FEAT_WALL_OUTER);
+	generate_rect(y1b-1, x1b-1, y2b+1, x2b+1, FEAT_WALL_OUTER);
 
 	/* Generate inner floors (a) */
 	generate_fill(y1a, x1a, y2a, x2a, FEAT_FLOOR);
@@ -2088,7 +2289,7 @@ static void build_type3(int y0, int x0)
 		case 3:
 		{
 			/* Generate a small inner vault */
-			generate_draw(y1b, x1a, y2b, x2a, FEAT_WALL_INNER);
+			generate_rect(y1b, x1a, y2b, x2a, FEAT_WALL_INNER);
 
 			/* Open the inner vault with a secret door */
 			generate_hole(y1b, x1a, y2b, x2a, FEAT_SECRET);
@@ -2193,7 +2394,7 @@ static void build_type4(int y0, int x0)
 	generate_room(y1-1, x1-1, y2+1, x2+1, light);
 
 	/* Generate outer walls */
-	generate_draw(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
+	generate_rect(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
 
 	/* Generate inner floors */
 	generate_fill(y1, x1, y2, x2, FEAT_FLOOR);
@@ -2206,7 +2407,7 @@ static void build_type4(int y0, int x0)
 	x2 = x2 - 2;
 
 	/* Generate inner walls */
-	generate_draw(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_INNER);
+	generate_rect(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_INNER);
 
 
 	/* Inner room variations */
@@ -2232,7 +2433,7 @@ static void build_type4(int y0, int x0)
 			generate_hole(y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
 
 			/* Place another inner room */
-			generate_draw(y0-1, x0-1, y0+1, x0+1, FEAT_WALL_INNER);
+			generate_rect(y0-1, x0-1, y0+1, x0+1, FEAT_WALL_INNER);
 
 			/* Open the inner room with a locked door */
 			generate_hole(y0-1, x0-1, y0+1, x0+1, FEAT_DOOR_HEAD + randint(7));
@@ -2296,7 +2497,7 @@ static void build_type4(int y0, int x0)
 			if (rand_int(3) == 0)
 			{
 				/* Inner rectangle */
-				generate_draw(y0-1, x0-5, y0+1, x0+5, FEAT_WALL_INNER);
+				generate_rect(y0-1, x0-5, y0+1, x0+5, FEAT_WALL_INNER);
 
 				/* Secret doors (random top/bottom) */
 				place_secret_door(y0 - 3 + (randint(2) * 2), x0 - 3);
@@ -2673,7 +2874,7 @@ static void build_type5(int y0, int x0)
 	generate_room(y1-1, x1-1, y2+1, x2+1, light);
 
 	/* Generate outer walls */
-	generate_draw(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
+	generate_rect(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
 
 	/* Generate inner floors */
 	generate_fill(y1, x1, y2, x2, FEAT_FLOOR);
@@ -2686,7 +2887,7 @@ static void build_type5(int y0, int x0)
 	x2 = x2 - 2;
 
 	/* Generate inner walls */
-	generate_draw(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_INNER);
+	generate_rect(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_INNER);
 
 	/* Open the inner room with a secret door */
 	generate_hole(y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
@@ -2890,7 +3091,7 @@ static void build_type6(int y0, int x0)
 	generate_room(y1-1, x1-1, y2+1, x2+1, light);
 
 	/* Generate outer walls */
-	generate_draw(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
+	generate_rect(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
 
 	/* Generate inner floors */
 	generate_fill(y1, x1, y2, x2, FEAT_FLOOR);
@@ -2903,7 +3104,7 @@ static void build_type6(int y0, int x0)
 	x2 = x2 - 2;
 
 	/* Generate inner walls */
-	generate_draw(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_INNER);
+	generate_rect(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_INNER);
 
 	/* Open the inner room with a secret door */
 	generate_hole(y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
@@ -3273,7 +3474,7 @@ static void build_type6(int y0, int x0)
 }
 
 
-
+#endif
 /*
  * Hack -- fill in "vault" rooms
  */
@@ -3691,23 +3892,29 @@ static void build_roof(int y0, int x0, int ymax, int xmax, cptr data)
 #define TUNNEL_LARGE_L	16
 #define TUNNEL_LARGE_R	32
 #define TUNNEL_CAVE	64
-#define TUNNEL_DUNGEON	128	/* This allows mixed styles */
 
 static int get_tunnel_style(void)
 {
 	int style = 0;
 
-	while ((style < TUNNEL_STYLE) && (level_flag & (LF1_CAVE | LF1_WILD | LF1_STRONGHOLD | LF1_CRYPT | LF1_DUNGEON)))
+	/* Change tunnel type */
+	if (level_flag & (LF1_VAULT))
 	{
-		/* Change tunnel type */
-		if (level_flag & (LF1_CAVE | LF1_WILD)) style |= (TUNNEL_CAVE);
-		if (level_flag & (LF1_STRONGHOLD)) style |= (TUNNEL_LARGE_L | TUNNEL_LARGE_R);
-		if (level_flag & (LF1_CRYPT)) style |= (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R);
-		if (level_flag & (LF1_DUNGEON)) style |= (TUNNEL_DUNGEON);
-
-		/* Randomise style */
-		style = rand_int(256) & (style | (TUNNEL_STYLE -1));
+		style |= (TUNNEL_LARGE_L | TUNNEL_LARGE_R);
 	}
+	else if (level_flag & (LF1_STRONGHOLD))
+	{
+		if (p_ptr->depth % 2) style |= (TUNNEL_LARGE_L);
+		else style |= (TUNNEL_LARGE_R);
+	}
+	else if (level_flag & (LF1_CRYPT))
+	{
+		if (rand_int(100) < 50) style |= (TUNNEL_CRYPT_L);
+		if (rand_int(100) < 50) style |= (TUNNEL_CRYPT_R);
+	}
+	else if (level_flag & (LF1_CAVE)) style |= (TUNNEL_CAVE);
+
+	style |= rand_int(TUNNEL_STYLE);
 
 	return (style);
 }
@@ -3792,8 +3999,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		/* Hack -- Prevent tunnel weirdness */
 		if (dun->tunn_n >= TUNN_MAX) return;
 
-		/* Style tunnel after short distance */
-		if (rand_int(100) < (DUN_TUN_STY / (style & (TUNNEL_LARGE_L | TUNNEL_LARGE_R) ? 2 : 1)))
+		/* Allow changes in the tunnel style */
+		if (rand_int(100) < DUN_TUN_STY)
 		{
 			style = get_tunnel_style();
 		}
@@ -3980,6 +4187,9 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 					/* Merge partitions */
 					dun->part_n--;
 
+					msg_format("Merging %d with %d. %d left.", part1, part2, dun->part_n);
+
+
 					/* Accept tunnel */
 					break;
 				}
@@ -4152,6 +4362,40 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			else
 			{
 				col_dir = 0;
+			}
+		}
+
+		/* End found */
+		if ((row1 == row2) && (col1 == col2)) 
+		{
+			/* Room */
+			int by2 = row1/BLOCK_HGT;
+			int bx2 = col1/BLOCK_WID;
+
+			/* Different room in same partition */
+			if (dun->part[dun_room[by1][bx1]-1] == dun->part[dun_room[by2][bx2]-1])
+			{
+				/* Abort */
+				return;
+			}
+			else
+			{
+				int part1 = dun->part[dun_room[by1][bx1]-1];
+				int part2 = dun->part[dun_room[by2][bx2]-1];
+
+				/* Merge partitions */
+				for (i = 0; i < dun->cent_n; i++)
+				{
+					if (dun->part[i] == part2) dun->part[i] = part1;
+				}
+
+				/* Merge partitions */
+				dun->part_n--;
+
+					msg_format("Merging* %d with %d. %d left.", part1, part2, dun->part_n);
+
+				/* Accept tunnel */
+				break;
 			}
 		}
 	}
@@ -4347,10 +4591,12 @@ static bool room_build(int by0, int bx0, int typ)
 		/* Build an appropriate room */
 		case 8: build_type8(y, x); break;
 		case 7: build_type7(y, x); break;
+#if 0
 		case 6: build_type6(y, x); break;
 		case 5: build_type5(y, x); break;
 		case 4: build_type4(y, x); break;
 		case 3: build_type3(y, x); break;
+#endif
 		case 2: build_type2(y, x); break;
 		case 1: build_type1(y, x); break;
 
@@ -4767,6 +5013,8 @@ static void cave_gen(void)
 
 	}
 
+	level_flag |= LF1_MINE;
+
 	/* Hack -- All levels deeper than 20 on surface are 'destroyed' */
 	if ((p_ptr->depth > 20) && (level_flag & (LF1_SURFACE))) level_flag |= (LF1_DESTROYED);
 
@@ -4811,6 +5059,32 @@ static void cave_gen(void)
 			continue;
 		}
 
+		msg_format("Building room %d",i);
+
+		/* Attempt to build a vault */
+		if (level_flag & (LF1_VAULT))
+		{
+			room_build(by, bx, !i ? 8 : 1);
+
+			continue;
+		}
+
+		/* Mines always have irregular rooms */
+		else if (level_flag & (LF1_MINE))
+		{
+			room_build(by, bx, 2);
+
+			continue;
+		}
+
+		/* Other levels have regular shaped rooms */
+		else
+		{
+			room_build(by, bx, 1);
+
+			continue;
+		}
+#if 0
 		/* Attempt an "unusual" room */
 		if (rand_int(DUN_UNUSUAL) < p_ptr->depth)
 		{
@@ -4845,6 +5119,7 @@ static void cave_gen(void)
 
 		/* Attempt a trivial room */
 		if (room_build(by, bx, 1)) continue;
+#endif
 	}
 
 	/* Special boundary walls -- Top */
@@ -4943,6 +5218,7 @@ static void cave_gen(void)
 				{
 					int dist1 = distance(dun->cent[j].y, dun->cent[j].x, dun->cent[k].y, dun->cent[k].x);
 
+					/* Better choice? */
 					if ((dun->part[j] != dun->part[k]) && (dist > dist1))
 					{
 						dist = dist1;
@@ -4951,7 +5227,7 @@ static void cave_gen(void)
 				}
 
 				/* Connect the room to the nearest neighbour */
-				build_tunnel(dun->cent[j].y, dun->cent[j].x, dun->cent[choice].y, dun->cent[choice].x);
+				build_tunnel(dun->cent[j].y, dun->cent[j].x, dun->cent[k].y, dun->cent[k].x);
 
 				/* Finish partition */
 				if (dun->part_n == 1) break;

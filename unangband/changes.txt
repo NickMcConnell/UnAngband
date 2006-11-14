@@ -76,6 +76,8 @@ to ensure that all rooms are correctly connected.
 
 - Corridors will now be generated according to the appropriate level 'theme'.
 
+- Room descriptions now properly place items and features around the room as described.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
