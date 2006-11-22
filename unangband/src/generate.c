@@ -1574,18 +1574,20 @@ static void generate_rect(int y1, int x1, int y2, int x2, int feat)
 
 
 /*
- * Generate helper -- draw a rectangle with a feature using a 'pattern' flag.
+ * Generate helper -- draw a rectangle with a feature using a series of 'pattern' flags.
  */
 static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, int spacing)
 {
-	int y, x, k;
+	int y, x, i, k;
 
-	int y_alloc, x_alloc;
-	int choice = 0;
+	int y_alloc, x_alloc, choice;
 
 	/* Scatter several about if requested */
-	for (k = 0; k < ((flag & (RG1_SCATTER)) != 0 ? 7 : 1); k++)
+	for (k = 0; k < ((flag & (RG1_SCATTER | RG1_TRAIL)) != 0 ? 7 : 1); k++)
 	{
+		/* Pick location */
+		choice = 0;
+
 		/* Scan the whole room */
 		for (y = y1; y <= y2; y++)
 		{
@@ -1606,7 +1608,6 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 				/* Only place on edge of room */
 				if (((flag & (RG1_EDGE)) != 0) && (cave_feat[y][x] != FEAT_WALL_OUTER))
 				{
-					int i;
 					bool accept = FALSE;
 
 					for (i = 0; i < 8; i++)
@@ -1617,11 +1618,28 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 					if (!accept) continue;
 				}
 
-				/* Maybe pick if placing one */
-				if (((flag & (RG1_ALLOC | RG1_SCATTER)) != 0) && (rand_int(++choice) == 0))
+				/* Only place next to last choice */
+				if ((flag & (RG1_TRAIL)) != 0)
 				{
-					y_alloc = y;
-					x_alloc = x;
+					/* Place next to previous position */
+					if ((k == 0) || (distance(y, y_alloc, x, x_alloc) < 2 * spacing))
+					{
+						if (rand_int(++choice) == 0)
+						{
+							y_alloc = y;
+							x_alloc = x;
+						}
+					}
+				}
+
+				/* Maybe pick if placing one */
+				else if ((flag & (RG1_ALLOC | RG1_SCATTER | RG1_8WAY)) != 0)
+				{
+					if (rand_int(++choice) == 0)
+					{
+						y_alloc = y;
+						x_alloc = x;
+					}
 				}
 
 				/* Set feature */
@@ -1631,33 +1649,66 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 					if (feat) cave_set_feat(y, x, feat);
 
 					/* Require "clean" floor space */
-					if (((flag & (RG1_DROP_GOLD | RG1_DROP_ITEM)) != 0) && (cave_clean_bold(y, x)))
+					if (((flag & (RG1_HAS_GOLD | RG1_HAS_ITEM)) != 0) && (cave_clean_bold(y, x)))
 					{
 						/* Drop gold 50% of the time if both defined */
-						if (((flag & (RG1_DROP_GOLD)) != 0) && (((flag & (RG1_DROP_ITEM)) == 0) || (rand_int(100) < 50))) place_gold(y, x);
+						if (((flag & (RG1_HAS_GOLD)) != 0) && (((flag & (RG1_HAS_ITEM)) == 0) || (rand_int(100) < 50))) place_gold(y, x);
 						else place_object(y, x, FALSE, FALSE);
 					}
 				}
 
 				/* Pillared room */
-				if ((flag & (RG1_PILLAR)) != 0) x += spacing;
+				if ((flag & (RG1_PILLAR | RG1_COLS)) != 0) x += spacing;
 			}
 
 			/* Pillared room */
-			if ((flag & (RG1_PILLAR)) != 0) y += spacing;
+			if ((flag & (RG1_PILLAR | RG1_ROWS)) != 0) y += spacing;
+		}
+
+		/* Finally place in 8 directions */
+		if (((flag & (RG1_8WAY)) != 0) && choice)
+		{
+			/* Loop through features */
+			for (k = 0; k < MAX_SIGHT; k++)
+			{
+				for (i = 0; i < 8; i++)
+				{
+					/* Get position */
+					y = y_alloc + k * ddy_ddd[i];
+					x = x_alloc + k * ddx_ddd[i];
+
+					/* Limit spread */
+					if ((y < y1) || (y > y2) || (x < x1) || (x > x2)) continue;
+
+					/* Assign feature */
+					if (feat) cave_set_feat(y, x, feat);
+
+					/* Require "clean" floor space */
+					if (((flag & (RG1_HAS_GOLD | RG1_HAS_ITEM)) != 0) && (cave_clean_bold(y, x)))
+					{
+						/* Drop gold 50% of the time if both defined */
+						if (((flag & (RG1_HAS_GOLD)) != 0) && (((flag & (RG1_HAS_ITEM)) == 0) || (rand_int(100) < 50))) place_gold(y, x);
+						else place_object(y, x, FALSE, FALSE);
+					}
+				}
+			}
 		}
 
 		/* Finally place if allocating a single feature */
-		if (((flag & (RG1_ALLOC | RG1_SCATTER)) != 0) && choice)
+		else if (((flag & (RG1_ALLOC | RG1_SCATTER | RG1_TRAIL)) != 0) && choice)
 		{
+			/* Get location */
+			y = y_alloc;
+			x = x_alloc;
+
 			/* Assign feature */
 			if (feat) cave_set_feat(y, x, feat);
 
 			/* Require "clean" floor space */
-			if (((flag & (RG1_DROP_GOLD | RG1_DROP_ITEM)) != 0) && (cave_clean_bold(y, x)))
+			if (((flag & (RG1_HAS_GOLD | RG1_HAS_ITEM)) != 0) && (cave_clean_bold(y, x)))
 			{
 				/* Drop gold 50% of the time if both defined */
-				if (((flag & (RG1_DROP_GOLD)) != 0) && (((flag & (RG1_DROP_ITEM)) == 0) || (rand_int(100) < 50))) place_gold(y, x);
+				if (((flag & (RG1_HAS_GOLD)) != 0) && (((flag & (RG1_HAS_ITEM)) == 0) || (rand_int(100) < 50))) place_gold(y, x);
 				else place_object(y, x, FALSE, FALSE);
 			}
 		}
@@ -1938,7 +1989,10 @@ static void get_room_info(int y0, int x0)
 			if (d_info[i].tval) place_tval = d_info[i].tval;
 
 			/* Get feature */
-			if (d_info[i].feat) place_feat = d_info[i].tval;
+			if (d_info[i].feat) place_feat = d_info[i].feat;
+
+			/* Clear old position information */
+			if (d_info[i].p_flag & (RG1_PLACE_FLAGS)) place_flag &= ~(RG1_PLACE_FLAGS);
 
 			/* Add flags */
 			place_flag |= d_info[i].p_flag;
@@ -1955,7 +2009,7 @@ static void get_room_info(int y0, int x0)
 				/* Set object hooks if required */
 				if (place_tval < TV_GOLD)
 				{
-					room_info_kind_tval = d_info[i].tval;
+					room_info_kind_tval = place_tval;
 
 					get_obj_num_hook = room_info_kind;
 
@@ -1963,12 +2017,12 @@ static void get_room_info(int y0, int x0)
 					get_obj_num_prep();
 
 					/* Drop gold */
-					place_flag |= (RG1_DROP_ITEM);
+					place_flag |= (RG1_HAS_ITEM);
 				}
 				else
 				{
 					/* Drop gold */
-					place_flag |= (RG1_DROP_GOLD);
+					place_flag |= (RG1_HAS_GOLD);
 				}
 			}
 
@@ -1978,10 +2032,10 @@ static void get_room_info(int y0, int x0)
 				/* Place in centre of room */
 				if ((place_flag & (RG1_CENTRE)) != 0)
 				{
-					int y1c = MAX(y1a, y1b) + 1;
-					int y2c = MIN(y2a, y2b) - 1;
-					int x1c = MAX(x1a, x1b) + 1;
-					int x2c = MIN(x2a, x2b) - 1;
+					int y1c = MAX(y1a, y1b);
+					int y2c = MIN(y2a, y2b);
+					int x1c = MAX(x1a, x1b);
+					int x2c = MIN(x2a, x2b);
 
 					generate_patt(y1c, x1c, y2c, x2c, place_feat, place_flag, 1);
 				}
@@ -2038,9 +2092,13 @@ static void get_room_info(int y0, int x0)
 
 				/* Prepare allocation table */
 				get_obj_num_prep();
+
+				place_tval = 0;
 			}
 
-
+			/* Clear placement details */
+			place_flag &= (RG1_PLACE_FLAGS);
+			place_feat = 0;
 		}
 	}
 
@@ -2067,6 +2125,7 @@ static void get_room_info(int y0, int x0)
  *   8 -- greater vaults
  */
 
+#if 0
 
 /*
  * Type 1 -- normal rectangular rooms
@@ -2195,11 +2254,9 @@ static void build_type2(int y0, int x0)
 
 	/* Pretty description and maybe more monsters/objects/traps*/
 	get_room_info(y0,x0);
-
 }
 
 
-#if 0
 /*
  * Type 3 -- Cross shaped rooms
  *
@@ -4596,9 +4653,11 @@ static bool room_build(int by0, int bx0, int typ)
 		case 5: build_type5(y, x); break;
 		case 4: build_type4(y, x); break;
 		case 3: build_type3(y, x); break;
-#endif
 		case 2: build_type2(y, x); break;
 		case 1: build_type1(y, x); break;
+#endif
+
+		case 6: case 5: case 4: case 3: case 2: case 1: get_room_info(y, x);
 
 		default: if ((!dun->entrance) && (p_ptr->depth < max_depth(p_ptr->dungeon)))
 		{
@@ -5012,8 +5071,6 @@ static void cave_gen(void)
 		}
 
 	}
-
-	level_flag |= LF1_MINE;
 
 	/* Hack -- All levels deeper than 20 on surface are 'destroyed' */
 	if ((p_ptr->depth > 20) && (level_flag & (LF1_SURFACE))) level_flag |= (LF1_DESTROYED);

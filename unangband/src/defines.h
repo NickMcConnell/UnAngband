@@ -2781,12 +2781,19 @@
 #define RG1_WILD	0x00200000L	/* Wilderness level */
 #define RG1_RUIN	0x00400000L	/* Ruin level */
 #define RG1_ALLOC	0x00800000L	/* Place one only */
-#define RG1_DROP_ITEM	0x01000000L	/* Drop object */
-#define RG1_DROP_GOLD	0x02000000L	/* DRop gold */
+#define RG1_HAS_ITEM	0x01000000L	/* Drop object */
+#define RG1_HAS_GOLD	0x02000000L	/* Drop gold */
+#define RG1_8WAY	0x04000000L	/* Place 8 way */
+#define RG1_TRAIL	0x08000000L	/* Place trail */
+#define RG1_INNER	0x10000000L	/* Place inner room */
+#define RG1_MAZE	0x20000000L	/* Place maze */
+#define RG1_ROWS	0x40000000L	/* Place rows */
+#define RG1_COLS	0x80000000L	/* Place columns */
 
 #define RG1_LEVEL_FLAGS (RG1_BATTLE | RG1_VAULT | RG1_DUNGEON | RG1_STRONGHOLD | RG1_CRYPT |\
 				RG1_LAIR | RG1_MINE | RG1_CAVE | RG1_TOWN | RG1_WILD | RG1_RUIN)
 
+#define RG1_PLACE_FLAGS	(RG1_NORTH | RG1_SOUTH | RG1_WEST | RG1_EAST | RG1_CENTRE)
 
 /*** Room flags ***/
 

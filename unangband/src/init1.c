@@ -123,14 +123,14 @@ static cptr d_info_pflags[] =
 	"WILD",
 	"RUIN",
 	"ALLOC",
-	"DROP_ITEM",
-	"DROP_GOLD",
-	"XXX1",
-	"XXX1",
-	"XXX1",
-	"XXX1",
-	"XXX1",
-	"XXX1"
+	"HAS_ITEM",
+	"HAS_GOLD",
+	"8WAY",
+	"TRAIL",
+	"INNER",
+	"MAZE",
+	"ROWS",
+	"COLS"
 };
 
 /*
