@@ -3668,7 +3668,7 @@
  */
 #define RF9_PLAYER_GHOST   0x00000001      /* Ghost of a former player */
 #define RF9_NEVER_MISS     0x00000002      /* Never miss when attacking */
-#define RF9_SAME_SPEED     0x00000004      /* Move at same speed as player */
+#define RF9_LEVEL_SPEED    0x00000004      /* Levels up speed deeper in the dungeon */
 #define RF9_EVASIVE        0x00000008      /* Evade melee blows / missiles / bolts */
 #define RF9_SCENT          0x00000010      /* Track player by scent */
 #define RF9_SUPER_SCENT    0x00000020      /* Track player by scent - better range */
@@ -3696,8 +3696,8 @@
 #define RF9_DROP_MINERAL   0x08000000      /* Drop specific gold */
 #define RF9_ATTR_METAL     0x10000000      /* Changes color 'brighter' */
 #define RF9_ATTR_INDEX     0x20000000      /* Changes color by index */
-#define RF9_MORGUL_MAGIC   0x40000000      /* Morgul magic */
-#define RF9_UDUN_MAGIC     0x80000000	   /* Udun magic */
+#define RF9_LEVEL_SIZE     0x40000000      /* Levels up size deeper in the dungeon */
+#define RF9_LEVEL_POWER    0x80000000	   /* Levels up power deeper in the dungeon */
 
 /*
  * Some flags are obvious

@@ -2591,12 +2591,6 @@ byte calc_monster_speed(const monster_type *m_ptr)
 	/* Get the monster race */
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
-	/* Monster has same speed as player? */
-	if (r_ptr->flags9 & (RF9_SAME_SPEED))
-	{
-		return (p_ptr->pspeed);
-	}
-
 	/* Get the monster base speed */
 	speed = r_ptr->speed;
 

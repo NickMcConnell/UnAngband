@@ -1650,11 +1650,7 @@ static void describe_monster_movement(int r_idx, const monster_lore *l_ptr)
 	}
 
 	/* Speed */
-	if (l_ptr->flags9 & (RF9_SAME_SPEED))
-	{
-		text_out( " keeps apace with you");
-	}
-	else if (r_ptr->speed > 110)
+	if (r_ptr->speed > 110)
 	{
 		if (r_ptr->speed > 130) text_out( " incredibly");
 		else if (r_ptr->speed > 120) text_out(" very");

@@ -58,6 +58,200 @@ static int monster_critical(int dice, int sides, int dam, int effect)
 }
 
 
+/*
+ * Monster scale
+ *
+ * Scale a levelling monster based on monster depth vs actual depth.
+ */
+bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
+{
+	monster_race *r_ptr = &r_info[m_list[m_idx].r_idx];
+
+	int d1, d2, scale;
+	int i, boost;
+
+	/* Paranoia */
+	if ((r_ptr->flags9 & (RF9_LEVEL_SPEED | RF9_LEVEL_SIZE | RF9_LEVEL_POWER)) == 0) return (FALSE);
+
+	/* This is the reverse of the algorithmic level
+	   computation in eval_r_power in init1.c.
+	   We apply this because monster power increases
+	   much faster per level deeper in the dungeon.
+	 */
+
+	/* Compute effective power for monsters at this depth */
+	d1 = (depth <= 40 ? depth :
+			(depth <= 70 ? depth * 3 - 80 : 
+			(depth <= 90 ? depth * 6 - 290
+			: depth * 20 - 1550)));
+
+	/* Compute effective power for monster's old depth */
+	d2 = (r_ptr->level <= 40 ? r_ptr->level :
+			(r_ptr->level <= 70 ? r_ptr->level * 3 - 80 : 
+			(r_ptr->level <= 90 ? r_ptr->level * 6 - 290
+			: r_ptr->level * 20 - 1550)));
+
+	/* We only care about significant multipliers but scale up by multiple of 100 */
+	scale = ((d1 * 100) / d2);
+
+	/* Paranoia */
+	if (scale <= 100) return (FALSE);
+
+	/* Copy real monster to fake */
+	COPY(n_ptr, r_ptr, monster_race);
+
+	/* Set experience */
+	n_ptr->mexp = r_ptr->mexp * scale / 100;
+
+	/* Pick which flag if multiple flags */
+	if ((r_ptr->flags9 & (RF9_LEVEL_SPEED)) != 0)
+	{
+		if (((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0) && ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0))
+		{
+			if (m_idx % 3 == 2) n_ptr->flags9 &= ~(RF9_LEVEL_SPEED | RF9_LEVEL_SIZE);
+			else if (m_idx % 3 == 1) n_ptr->flags9 &= ~(RF9_LEVEL_SPEED | RF9_LEVEL_POWER);
+			else n_ptr->flags9 &= ~(RF9_LEVEL_SPEED | RF9_LEVEL_SIZE);
+		}
+		else if ((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0)
+		{
+			if (m_idx % 2) n_ptr->flags9 &= ~(RF9_LEVEL_SPEED);
+			else n_ptr->flags9 &= ~(RF9_LEVEL_SIZE);
+		}
+		else if ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0)
+		{
+			if (m_idx % 2) n_ptr->flags9 &= ~(RF9_LEVEL_POWER);
+			else n_ptr->flags9 &= ~(RF9_LEVEL_SIZE);
+		}
+	}
+	/* Pick another flag */
+	else if ((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0)
+	{
+		if ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0)
+		{
+			if (m_idx % 2) n_ptr->flags9 &= ~(RF9_LEVEL_POWER);
+			else n_ptr->flags9 &= ~(RF9_LEVEL_SIZE);
+		}
+	}
+
+	/* Scale up for speed */
+	if ((n_ptr->flags9 & (RF9_LEVEL_SPEED)) != 0)
+	{
+		/* We rely on speed giving us an overall scale improvement */
+		/* Note breeders are more dangerous on speed overall */
+
+		/* Boost speed first */
+		boost = scale / 100;
+
+		/* Limit to +25 faster */
+		if (boost > 25) boost = 25;
+
+		/* Increase fake speed */
+		n_ptr->speed += boost;
+
+		/* Reduce scale by actual improvement in energy */
+		scale = scale * extract_energy[r_ptr->speed] / extract_energy[n_ptr->speed];
+
+		/* Fast breeders more dangerous so reduce speed improvement */
+		if ((n_ptr->flags2 & (RF2_MULTIPLY)) != 0) n_ptr->speed -= boost / 2;
+
+		/* Hack -- faster casters run out of mana faster */
+		else if (n_ptr->mana && (boost > 10)) n_ptr->flags6 |= RF6_ADD_MANA;
+
+	}
+	/* Scale up for size */
+	else if ((n_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0)
+	{
+		/* Boost to huge first if required */
+		if (r_ptr->level >= depth + 20)
+		{
+			n_ptr->flags3 |= (RF3_HUGE);
+			scale = scale * 2 / 3;
+		}
+
+		/* Boost attack damage partially */
+		if (scale > 133)
+			for (i = 0; i < 4; i++)
+		{
+			if (!n_ptr->blow[i].d_side) continue;
+
+			boost = (scale * n_ptr->blow[i].d_dice / 25) / (n_ptr->blow[i].d_side * 3);
+
+			if (boost > 19 * n_ptr->blow[i].d_dice) boost = 19 * n_ptr->blow[i].d_dice;
+
+			if (boost > 1) n_ptr->blow[i].d_dice += boost - 1;
+		}
+
+		/* Boost power slightly */
+		if (scale > 133)
+		{
+			n_ptr->power = (r_ptr->power * scale * 3) / 4;
+		}
+	}
+
+	/* Scale up for power */
+	else if ((n_ptr->flags9 & (RF9_LEVEL_POWER)) != 0)
+	{
+		/* Boost speed first */
+		boost = scale / 400;
+
+		/* Limit to +15 faster */
+		if (boost > 15) boost = 15;
+
+		/* Increase fake speed */
+		n_ptr->speed += boost;
+
+		/* Reduce scale by actual improvement in energy */
+		scale = scale * extract_energy[r_ptr->speed] / extract_energy[n_ptr->speed];
+
+		/* Boost attack damage partially */
+		if (scale > 200)
+			for (i = 0; i < 4; i++)
+		{
+			if (!n_ptr->blow[i].d_side) continue;
+
+			boost = (scale * n_ptr->blow[i].d_dice / 50) / n_ptr->blow[i].d_side;
+
+			if (boost > 9 * n_ptr->blow[i].d_dice) boost = 9 * n_ptr->blow[i].d_dice;
+
+			if (boost > 1) n_ptr->blow[i].d_dice += boost - 1;
+		}
+
+		/* Boost power */
+		if (scale > 100)
+		{
+			n_ptr->power = (r_ptr->power * scale);
+		}
+	}
+
+	/* Not done? */
+	if (scale > 100)
+	{
+		/* Boost armour class next */
+		boost = r_ptr->ac * scale / 200;
+
+		/* Limit armour class improvement */
+		if (boost > 50 + n_ptr->ac / 3) boost = 50 + n_ptr->ac / 3;
+
+		/* Improve armour class */
+		n_ptr->ac += boost;
+
+		/* Reduce scale by actual scaled improvement in armour class */
+		scale = scale * r_ptr->ac / n_ptr->ac;
+
+		/* Not done? */
+		if (scale > 100)
+		{
+			/* Boost hit points -- unlimited */
+			n_ptr->hside = n_ptr->hside * scale / 100;
+		}
+	}
+
+	/* Set level to depth */
+	n_ptr->level = depth;
+
+	return (TRUE);
+}
+
 
 
 /*

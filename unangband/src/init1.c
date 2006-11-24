@@ -817,7 +817,7 @@ static cptr r_info_flags9[] =
 {
 	"PLAYER_GHOST",
 	"NEVER_MISS",
-	"SAME_SPEED",
+	"LEVEL_SPEED",
 	"EVASIVE",
 	"SCENT",
 	"SUPER_SCENT",
@@ -845,8 +845,8 @@ static cptr r_info_flags9[] =
 	"DROP_MINERAL",
 	"ATTR_METAL",
 	"ATTR_INDEX",
-	"MORGUL_MAGIC",
-	"UDUN_MAGIC"
+	"LEVEL_SIZE",
+	"LEVEL_POWER"
 };
 
 #if 0
@@ -6960,7 +6960,6 @@ static long eval_max_dam(monster_race *r_ptr)
 				/* Scale for maximum range */
 				if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL)) atk_dam *= 10;
 				else if (range >= 7) atk_dam *= 10;
-				else if (r_ptr->flags9 & (RF9_SAME_SPEED)) atk_dam *= MIN(4 + range, 10);
 				else
 					atk_dam = atk_dam * (3 + range) + atk_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / (7 - range);
 
@@ -7038,15 +7037,11 @@ static long eval_max_dam(monster_race *r_ptr)
 				melee_dam *= 10;
 		else if (r_ptr->flags3 & (RF3_HUGE))
 		{
-			if (r_ptr->flags9 & (RF9_SAME_SPEED)) melee_dam *= 6;
-			else
-				melee_dam = melee_dam * 4 + melee_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 6;
+			melee_dam = melee_dam * 4 + melee_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 6;
 		}
 		else
 		{
-			if (r_ptr->flags9 & (RF9_SAME_SPEED)) melee_dam *= 5;
-			else
-				melee_dam = melee_dam * 3 + melee_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 7;
+			melee_dam = melee_dam * 3 + melee_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 7;
 		}
 
 		/*
