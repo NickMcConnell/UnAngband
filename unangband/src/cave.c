@@ -5193,18 +5193,18 @@ static void cave_set_feat_aux(int y, int x, int feat)
 				/* And update */
 				update_mon(cave_m_idx[y][x],FALSE);
 
-		/* Hack --- tell the player if something unhides */
-		if (m_ptr->ml)
-		{
-		char m_name[80];
+				/* Hack --- tell the player if something unhides */
+				if (m_ptr->ml)
+				{
+					char m_name[80];
 
-		/* Get the monster name */
-		monster_desc(m_name, m_ptr, 0);
+					/* Get the monster name */
+					monster_desc(m_name, cave_m_idx[y][x], 0);
 
-		msg_format("%^s emerges from %s%s.",m_name,
-			((f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_FILLED))?"":"the "),
-			f_name+f_info[cave_feat[m_ptr->fy][m_ptr->fx]].name);
-		}
+					msg_format("%^s emerges from %s%s.",m_name,
+						((f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_FILLED))?"":"the "),
+						f_name+f_info[cave_feat[m_ptr->fy][m_ptr->fx]].name);
+				}
 
 				/* Disturb on "move" */
 				if (m_ptr->ml &&

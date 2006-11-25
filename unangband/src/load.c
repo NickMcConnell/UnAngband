@@ -2057,6 +2057,10 @@ static errr rd_savefile_new_aux(void)
 
 	if (arg_fiddle) note("Loaded Ego Items");
 
+	/* Read the extra stuff */
+	if (rd_extra()) return (-1);
+	if (arg_fiddle) note("Loaded extra information");
+
 	/* Don't bother saving flavor flags if dead */
 	if ((!older_than(0, 6, 2)) && !(p_ptr->is_dead))
 	{
@@ -2088,10 +2092,6 @@ static errr rd_savefile_new_aux(void)
 
 		if (arg_fiddle) note("Loaded Flavors");
 	}
-
-	/* Read the extra stuff */
-	if (rd_extra()) return (-1);
-	if (arg_fiddle) note("Loaded extra information");
 
 	/* Read random artifacts */
 	if (adult_rand_artifacts)

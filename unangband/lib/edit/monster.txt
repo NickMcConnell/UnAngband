@@ -819,7 +819,7 @@ F:MALE
 F:DROP_60
 F:TAKE_ITEM | OPEN_DOOR
 F:EVIL | HAS_LITE | NEED_LITE
-F:SNEAKY | LEVEL_POWER
+F:SNEAKY
 D:A short little guy, in bedraggled clothes.  He appears to be looking
 D: for a good tavern.
 
@@ -3280,7 +3280,7 @@ M:0:11:4:50
 B:CLAW:HURT:1d8
 B:BITE:WOUND:1d16
 F:RAND_25 | 
-F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | 
+F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | SMART
 F:ANIMAL | EAT_BODY | EVIL | FRIEND | LEVEL_SIZE | LEVEL_POWER
 S:BLINK | WOUND | HOLD | BOLT_FIRE
 D:It is a huge wolf with eyes that glow with mannish intelligence.
@@ -10967,7 +10967,7 @@ W:25:2:0:50
 B:BITE:HURT:1d6
 B:BITE:HURT:1d6
 B:BITE:HURT:1d10
-F:RAND_50 | FRIENDS | OPEN_DOOR | CAN_FLY | 
+F:RAND_50 | FRIENDS | OPEN_DOOR | CAN_FLY | SMART
 F:ANIMAL | EAT_BODY | EVIL | TAKE_ITEM | LEVEL_SIZE | LEVEL_POWER
 D:It is a huge black bat with eyes that glow with intelligence.
 
@@ -11223,7 +11223,7 @@ B:BITE:HURT:1d6
 B:BITE:HURT:1d6
 F:RAND_25 | 
 F:FRIENDS | CAN_CLIMB |
-F:BASH_DOOR | 
+F:BASH_DOOR | SMART
 F:ANIMAL | EAT_BODY | LEVEL_SIZE
 D:It is a huge wolf hailing from Mirkwood with eyes that glow with evil intelligence.
 
@@ -13286,7 +13286,7 @@ W:8:2:0:70
 M:13:0:0:0
 B:BITE:TERRIFY:1d6
 F:FORCE_SLEEP | RAND_50 | RAND_25
-F:WEIRD_MIND | BASH_DOOR | CAN_FLY |
+F:WEIRD_MIND | BASH_DOOR | CAN_FLY | LEVEL_SPEED
 S:BRTH_FIRE
 D:A vast, fiery-bright dragonfly.
 
@@ -13298,7 +13298,7 @@ M:13:0:0:0
 B:BITE:HURT:1d6
 F:FORCE_SLEEP | RAND_50 | RAND_25
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY |
-F:INSECT | IM_FIRE | DRAGON |
+F:INSECT | IM_FIRE | DRAGON | LEVEL_SPEED
 S:BRTH_ELEC
 D:A vast, lightning-struck dragonfly.
 
@@ -13312,7 +13312,7 @@ F:FORCE_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_60
 F:RAND_50 | RAND_25 | 
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY | 
 F:INSECT | IM_ELEC | DRAGON |
-F:RES_NEXUS
+F:RES_NEXUS | LEVEL_SPEED
 S:BRTH_NEXUS
 D:This gleaming copper dragonfly is never in the same place twice.
 
@@ -13325,7 +13325,7 @@ B:BITE:HURT:1d3
 F:FORCE_SLEEP | 
 F:RAND_50 | RAND_25 | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_60
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY | 
-F:INSECT | IM_COLD | NO_FEAR | DRAGON |
+F:INSECT | IM_COLD | NO_FEAR | DRAGON | LEVEL_SPEED
 S:BRTH_FEAR
 D:This gleaming silver dragonfly has wings which hum a terrifying dirge.
 
@@ -13339,7 +13339,7 @@ F:FORCE_SLEEP |
 F:RAND_50 | RAND_25 | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_60
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY | 
 F:INSECT | IM_ACID | DRAGON |
-F:RES_DISEN
+F:RES_DISEN | LEVEL_SPEED
 S:BRTH_DISEN
 D:This gleaming brass dragonfly has wings which leave a static feeling in the air.
 
@@ -13352,7 +13352,7 @@ B:BITE:HURT:1d3
 F:FORCE_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
 F:RAND_50 | RAND_25 | 
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY | 
-F:INSECT | IM_ACID | DRAGON |
+F:INSECT | IM_ACID | DRAGON | LEVEL_SPEED
 S:BRTH_TIME
 D:This glistening amethyst dragonfly seems to dart back and forth in time.
 
@@ -13365,7 +13365,7 @@ B:BITE:HURT:1d3
 F:FORCE_SLEEP | 
 F:RAND_50 | RAND_25 | ATTR_CLEAR | CAN_FLY | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT | IM_COLD | DRAGON |
+F:INSECT | IM_COLD | DRAGON | LEVEL_SPEED
 S:BRTH_MANA
 D:This clear diamond dragonfly has wings which glow with magical energy.
 
@@ -13378,7 +13378,7 @@ B:BITE:HURT:1d3
 F:FORCE_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
 F:RAND_50 | RAND_25 | 
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY | 
-F:INSECT | IM_POIS | DRAGON |
+F:INSECT | IM_POIS | DRAGON | LEVEL_SPEED
 S:BRTH_FORCE
 D:This glistening emerald dragonfly has wings which beat with powerful force.
 
@@ -13391,7 +13391,7 @@ B:BITE:HURT:1d3
 F:FORCE_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
 F:RAND_50 | RAND_25 | 
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY | 
-F:INSECT | IM_COLD | NO_FEAR | DRAGON |
+F:INSECT | IM_COLD | NO_FEAR | DRAGON | LEVEL_SPEED
 S:BRTH_GRAV
 D:This glistening sapphire dragonfly has wings that ride on gravity.
 
@@ -13404,7 +13404,7 @@ B:BITE:HURT:1d3
 F:FORCE_SLEEP | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
 F:RAND_50 | RAND_25 | 
 F:WEIRD_MIND | BASH_DOOR | CAN_FLY | 
-F:INSECT | IM_COLD | NO_FEAR | DRAGON |
+F:INSECT | IM_COLD | NO_FEAR | DRAGON | LEVEL_SPEED
 S:BRTH_INERT
 D:This glistening ruby dragonfly doesn't seem to move at all.
 
@@ -18425,7 +18425,7 @@ N:1278:Blade of Chaos
 G:|:v
 I:130:120d10:17:70:5
 W:44:4:0:670
-M:0:13:0:45
+M:0:23:0:90
 B:HIT:WOUND:15d6
 B:HIT:WOUND:15d6
 B:AURA:CHAOS:3d6

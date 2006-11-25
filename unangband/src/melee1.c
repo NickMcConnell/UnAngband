@@ -73,6 +73,12 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 	/* Paranoia */
 	if ((r_ptr->flags9 & (RF9_LEVEL_SPEED | RF9_LEVEL_SIZE | RF9_LEVEL_POWER)) == 0) return (FALSE);
 
+	/* Hack -- ensure distinct monster types */
+	depth = depth - ((depth - r_ptr->level) % 5);
+
+	/* Hack -- maximum power increase */
+	if (depth > r_ptr->level + 15) depth = r_ptr->level + 15;
+
 	/* This is the reverse of the algorithmic level
 	   computation in eval_r_power in init1.c.
 	   We apply this because monster power increases
@@ -399,7 +405,7 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 	if (who > 0)
 	{
 		/* Get the monster name (or "it") */
-		monster_desc(m_name, &m_list[who], 0x00);
+		monster_desc(m_name, who, 0x00);
 	}
 	else if (who < 0)
 	{
@@ -414,7 +420,7 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 	if (target > 0)
 	{
 		/* Get the monster name (or "it") */
-		monster_desc(t_name, &m_list[target], 0x00);
+		monster_desc(t_name, target, 0x00);
 	}
 	else if (target < 0)
 	{
@@ -641,7 +647,7 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 			suffix = " aura";
 
 			/* Get the monster possessive ("his"/"her"/"its") */
-			if (who > 0) monster_desc(t_name, &m_list[who], 0x22);
+			if (who > 0) monster_desc(t_name, who, 0x22);
 			else strcpy (t_name,"its");
 
 			break;
@@ -833,10 +839,10 @@ bool make_attack_normal(int m_idx)
 
 
 	/* Get the monster name (or "it") */
-	monster_desc(m_name, m_ptr, 0);
+	monster_desc(m_name, m_idx, 0);
 
 	/* Get the "died from" information (i.e. "a goblin") */
-	monster_desc(ddesc, m_ptr, 0x88);
+	monster_desc(ddesc, m_idx, 0x88);
 
 
 	/* Scan through all four blows */
@@ -1809,10 +1815,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		k_ptr = &l_list[cave_m_idx[y][x]];
 
 		/* Get the monster name (or "it") */
-		monster_desc(t_name, n_ptr, 0x00);
+		monster_desc(t_name, cave_m_idx[y][x], 0x00);
 
 		/* Get the monster possessive ("his"/"her"/"its") */
-		monster_desc(t_poss, n_ptr, 0x22);
+		monster_desc(t_poss, cave_m_idx[y][x], 0x22);
 	}
 	else if (target < 0)
 	{
@@ -1881,13 +1887,13 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		if (m_ptr->mflag & (MFLAG_HIDE)) return (FALSE);
 
 		/* Get the monster name (or "it") */
-		monster_desc(m_name, m_ptr, 0x00);
+		monster_desc(m_name, who, 0x00);
 
 		/* Get the monster possessive ("his"/"her"/"its") */
-		monster_desc(m_poss, m_ptr, 0x22);
+		monster_desc(m_poss, who, 0x22);
 
 		/* Hack -- Get the "died from" name */
-		monster_desc(ddesc, m_ptr, 0x88);
+		monster_desc(ddesc, who, 0x88);
 
 		/* Extract the "see-able-ness" */
 		seen = (!blind && m_ptr->ml);
@@ -3778,7 +3784,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if ((!seen) && (m_ptr->ml))
 				{
 					/* Get the name (using "A"/"An") again. */
-					monster_desc(ddesc, m_ptr, 0x08);
+					monster_desc(ddesc, who, 0x08);
 
 					/* Message */
 					msg_format("%^s suddenly appears.", ddesc);
@@ -5744,8 +5750,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
  *
  * Return TRUE if evasion was successful.
  */
-bool mon_evade(const monster_type* m_ptr, int chance, int out_of, cptr r)
+bool mon_evade(int m_idx, int chance, int out_of, cptr r)
 {
+	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 	monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
@@ -5753,10 +5760,12 @@ bool mon_evade(const monster_type* m_ptr, int chance, int out_of, cptr r)
 
 	cptr p;
 
-	/* Get "the monster" or "it" */
-	monster_desc(m_name, m_ptr, 0x40);
+	int roll = rand_int(out_of);
 
-	switch(rand_int(4))
+	/* Get "the monster" or "it" */
+	monster_desc(m_name, m_idx, 0x40);
+
+	switch(roll % 4)
 	{
 		case 0: p = "dodges"; break;
 		case 1: p = "evades"; break;
@@ -5766,7 +5775,7 @@ bool mon_evade(const monster_type* m_ptr, int chance, int out_of, cptr r)
 
 	/* Hack -- evasive monsters may ignore trap */
 	if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!m_ptr->berserk) && (!m_ptr->blind)
-		&& (rand_int(out_of) >= chance))
+		&& (roll < chance))
 	{
 		if (m_ptr->ml)
 		{
@@ -5788,8 +5797,9 @@ bool mon_evade(const monster_type* m_ptr, int chance, int out_of, cptr r)
  *
  * Return TRUE if blow was avoided.
  */
-bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
+bool mon_resist_object(int m_idx, const object_type *o_ptr)
 {
+	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 	monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
@@ -5802,7 +5812,7 @@ bool mon_resist_object(const monster_type* m_ptr, const object_type *o_ptr)
 	char o_name[80];
 
 	/* Get "the monster" or "it" */
-	monster_desc(m_name, m_ptr, 0x40);
+	monster_desc(m_name, m_idx, 0x40);
 
 	/* Describe object */
 	if (o_ptr->k_idx) object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
@@ -5954,7 +5964,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 	f_ptr = &f_info[cave_feat[y][x]];
 
 	/* Get "the monster" or "it" */
-	monster_desc(m_name, m_ptr, 0);
+	monster_desc(m_name, m_idx, 0);
 
 	/* Hack --- trapped doors */
 	/* XXX XXX Dangerous */
@@ -5986,7 +5996,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 	}
 
 	/* Hack -- evasive monsters may ignore trap */
-	if (mon_evade(m_ptr, m_ptr->stunned || m_ptr->confused ? 50 : 80, 100, " a trap"))
+	if (mon_evade(m_idx, (m_ptr->stunned || m_ptr->confused) ? 50 : 80, 100, " a trap"))
 	{
 		if (f_ptr->flags1 & (FF1_SECRET))
 		{
@@ -6077,7 +6087,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 							if (k < 0) k = 0;
 
 							/* Damage, check for fear and death */
-							if (!mon_resist_object(m_ptr, o_ptr)) (void)mon_take_hit(cave_m_idx[y][x], k, &fear, NULL);
+							if (!mon_resist_object(m_idx, o_ptr)) (void)mon_take_hit(cave_m_idx[y][x], k, &fear, NULL);
 
 						}
 						else
@@ -6341,7 +6351,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 					if (k < 0) k = 0;
 
 					/* Damage, check for fear and death */
-					if (!mon_resist_object(m_ptr, o_ptr)) (void)mon_take_hit(cave_m_idx[y][x], k, &fear, NULL);
+					if (!mon_resist_object(m_idx, o_ptr)) (void)mon_take_hit(cave_m_idx[y][x], k, &fear, NULL);
 
 				}
 				else

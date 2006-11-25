@@ -1184,6 +1184,9 @@ static bool wr_savefile_new(void)
                 wr_byte(0);
         }
 
+	/* Write the "extra" information */
+	wr_extra();
+
 	/* Don't bother saving the learnt flavor flags if dead */
 	if (!p_ptr->is_dead)
 	{
@@ -1206,9 +1209,6 @@ static bool wr_savefile_new(void)
                 	wr_u32b(n_ptr->not_flags4);
 		}
         }
-
-	/* Write the "extra" information */
-	wr_extra();
 
 	if (adult_rand_artifacts) wr_randarts();
 

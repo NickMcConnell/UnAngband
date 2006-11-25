@@ -2242,7 +2242,7 @@ void py_attack(int y, int x, bool charging)
 	disturb(0, 0);
 
 	/* Extract monster name (or "it") */
-	monster_desc(m_name, m_ptr, 0);
+	monster_desc(m_name, cave_m_idx[y][x], 0);
 
 	/* Auto-Recall if possible and visible */
 	if (m_ptr->ml) monster_race_track(m_ptr->r_idx);
@@ -2318,7 +2318,7 @@ void py_attack(int y, int x, bool charging)
 		}
 
 		/* Some monsters are great at dodging  -EZ- */
-		if (mon_evade(m_ptr, m_ptr->stunned || m_ptr->confused? 50 : 80, 100, "your blow")) continue;
+		if (mon_evade(cave_m_idx[y][x], (m_ptr->stunned || m_ptr->confused) ? 50 : 80, 100, "your blow")) continue;
 
 		/* Calculate the "attack quality" */
 		if (o_ptr->k_idx) bonus = p_ptr->to_h + o_ptr->to_h + style_hit;
@@ -2333,7 +2333,7 @@ void py_attack(int y, int x, bool charging)
 			message_format(MSG_MISS, m_ptr->r_idx, "You miss %s.", m_name);
 		}
 		/* Test for resistance */
-		else if (mon_resist_object(m_ptr, o_ptr))
+		else if (mon_resist_object(cave_m_idx[y][x], o_ptr))
 		{
 			/* No need for message */
 		}

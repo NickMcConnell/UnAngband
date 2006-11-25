@@ -1684,10 +1684,40 @@ static void describe_monster_movement(int r_idx, const monster_lore *l_ptr)
 		text_out(" on business");
 	}
 
+	/* Collect improvements */
+	vn = 0;
+
+	/* Describe the improvements */
+	if (l_ptr->flags9 & (RF9_LEVEL_SIZE)) vp[vn++] ="larger";
+	if (l_ptr->flags9 & (RF9_LEVEL_SPEED)) vp[vn++] ="faster";
+	if (l_ptr->flags9 & (RF9_LEVEL_POWER)) vp[vn++] ="more powerful";
+
+	/* Describe "improvements" */
+	if (vn)
+	{
+		if (old) text_out(", but");
+
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (n == 0) text_out(" is ");
+			else if (n < vn-1) text_out(", ");
+			else text_out(" or ");
+			/* Dump */
+			text_out(vp[n]);
+		}
+
+		text_out(" deeper in the dungeon");
+	}
+
 	/* The code above includes "attack speed" */
 	if (l_ptr->flags1 & RF1_NEVER_MOVE)
 	{
-		text_out(", but does not deign to chase intruders");
+		if (vn) text_out(", and");
+		else text_out(", but");
+
+		text_out(" does not deign to chase intruders");
 	}
 
 	/* End this sentence */

@@ -580,12 +580,13 @@ extern void cleanup_angband(void);
 extern bool load_player(void);
 
 /* melee1.c */
+extern bool monster_scale(monster_race *n_ptr, int m_idx, int depth);
 extern int get_breath_dam(s16b hit_points, int gf_type, bool powerful);
 extern bool make_attack_normal(int m_idx);
 extern void mon_blow_ranged(int who, int x, int y, int method, int range, int flg, cptr result);
 extern bool make_attack_ranged(int who, int attack, int py, int px);
-extern bool mon_evade(const monster_type* m_ptr, int chance, int out_of, cptr r);
-extern bool mon_resist_object(const monster_type *m_ptr, const object_type *o_ptr);
+extern bool mon_evade(int m_idx, int chance, int out_of, cptr r);
+extern bool mon_resist_object(int m_idx, const object_type *o_ptr);
 extern void mon_hit_trap(int m_idx, int y, int x);
 
 /* melee2.c */
@@ -617,7 +618,7 @@ extern s16b m_pop(void);
 extern errr get_mon_num_prep(void);
 extern s16b get_mon_num(int level);
 extern void display_monlist(void);
-extern void monster_desc(char *desc, const monster_type *m_ptr, int mode);
+extern void monster_desc(char *desc, int m_idx, int mode);
 extern void lore_do_probe(int m_idx);
 extern void lore_treasure(int m_idx, int num_item, int num_gold);
 extern void update_mon(int m_idx, bool full);

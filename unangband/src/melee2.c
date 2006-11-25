@@ -1906,7 +1906,7 @@ static void get_town_target(monster_type *m_ptr)
  * they can't handle.  Fixing this may require code to set monster 
  * paths.
  */
-static void get_move_advance(monster_type *m_ptr, int *ty, int *tx)
+static void get_move_advance(int m_idx, int *ty, int *tx)
 {
 	int py = p_ptr->py;
 	int px = p_ptr->px;
@@ -1918,6 +1918,7 @@ static void get_move_advance(monster_type *m_ptr, int *ty, int *tx)
 	bool use_sound = FALSE;
 	bool use_scent = FALSE;
 
+	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	/* Monster can go through rocks - head straight for character */
@@ -2279,8 +2280,9 @@ static bool find_safety(monster_type *m_ptr, int *ty, int *tx)
  *
  * Return TRUE if the monster did actually want to do anything.
  */
-static bool get_move_retreat(monster_type *m_ptr, int *ty, int *tx)
+static bool get_move_retreat(int m_idx, int *ty, int *tx)
 {
+	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	int i;
@@ -2305,6 +2307,7 @@ static bool get_move_retreat(monster_type *m_ptr, int *ty, int *tx)
 			/* Get axis distance from character to current target */
 			int dist_y = ABS(p_ptr->py - m_ptr->ty);
 			int dist_x = ABS(p_ptr->px - m_ptr->tx);
+
 
 			/* It's only out of LOS because of "knight's move" rules */
 			if (((dist_y == 2) && (dist_x == 1)) || 
@@ -2449,7 +2452,7 @@ static bool get_move_retreat(monster_type *m_ptr, int *ty, int *tx)
 				char m_name[80];
 
 				/* Get the monster name */
-				monster_desc(m_name, m_ptr, 0);
+				monster_desc(m_name, m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s turns to fight!", m_name);
@@ -2503,9 +2506,10 @@ static bool get_move_retreat(monster_type *m_ptr, int *ty, int *tx)
  *
  * Return FALSE if monster doesn't want to move or can't.
  */
-static bool get_move(monster_type *m_ptr, int *ty, int *tx, bool *fear, 
+static bool get_move(int m_idx, int *ty, int *tx, bool *fear, 
 		     bool must_use_target)
 {
+	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 	monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
@@ -2610,7 +2614,7 @@ static bool get_move(monster_type *m_ptr, int *ty, int *tx, bool *fear,
 		else if (m_ptr->cdis < FLEE_RANGE)
 		{
 			/* Find and move towards a hidey-hole */
-			get_move_retreat(m_ptr, ty, tx);
+			get_move_retreat(m_idx, ty, tx);
 			return (TRUE);
 		}
 
@@ -2696,7 +2700,7 @@ static bool get_move(monster_type *m_ptr, int *ty, int *tx, bool *fear,
 				if (play_info[m_ptr->fy][m_ptr->fx] & (PLAY_SEEN))
 				{
 					/* Find a safe spot to lurk in */
-					if (get_move_retreat(m_ptr, ty, tx))
+					if (get_move_retreat(m_idx, ty, tx))
 					{
 						*fear = TRUE;
 					}
@@ -2712,7 +2716,7 @@ static bool get_move(monster_type *m_ptr, int *ty, int *tx, bool *fear,
 				else
 				{
 					/* Advance, ... */
-					get_move_advance(m_ptr, ty, tx);
+					get_move_advance(m_idx, ty, tx);
 
 					/* ... but make sure we stay hidden. */
 					*fear = TRUE;
@@ -2760,7 +2764,7 @@ static bool get_move(monster_type *m_ptr, int *ty, int *tx, bool *fear,
 		if (play_info[m_ptr->fy][m_ptr->fx] & (PLAY_SEEN))
 		{
 			/* Find a safe spot to lurk in */
-			if (get_move_retreat(m_ptr, ty, tx))
+			if (get_move_retreat(m_idx, ty, tx))
 			{
 				*fear = TRUE;
 			}
@@ -2776,7 +2780,7 @@ static bool get_move(monster_type *m_ptr, int *ty, int *tx, bool *fear,
 		else
 		{
 			/* Advance, ... */
-			get_move_advance(m_ptr, ty, tx);
+			get_move_advance(m_idx, ty, tx);
 
 			/* ... but make sure we stay hidden. */
 			*fear = TRUE;
@@ -2806,7 +2810,7 @@ static bool get_move(monster_type *m_ptr, int *ty, int *tx, bool *fear,
 		if (!player_has_los_bold(m_ptr->fy, m_ptr->fx))
 		{
 			/* Advance */
-			get_move_advance(m_ptr, ty, tx);
+			get_move_advance(m_idx, ty, tx);
 		}
 
 		/* Monster can see the character */
@@ -2862,7 +2866,7 @@ static bool get_move(monster_type *m_ptr, int *ty, int *tx, bool *fear,
 	else
 	{
 		/* Back away -- try to be smart about it */
-		get_move_retreat(m_ptr, ty, tx);
+		get_move_retreat(m_idx, ty, tx);
 	}
 
 
@@ -3180,7 +3184,7 @@ void monster_speech(int m_idx, cptr saying, bool understand)
 	if (speech >= MAX_LANGUAGES) return;
 
 	/* Get the monster name */
-	monster_desc(m_name, m_ptr, 0);
+	monster_desc(m_name, m_idx, 0);
 
 	/* Dump a message */
 	if (!understand) msg_format("%^s %s something.", m_name, vocalize[speech]);
@@ -3686,8 +3690,10 @@ bool tell_allies_target(int y, int x, int ty, int tx, bool scent, cptr saying)
  * the number of such variables becomes greater, a structure to hold them
  * would look better than passing them around from function to function.
  */
-static bool make_move(monster_type *m_ptr, int *ty, int *tx, bool fear, bool *bash)
+static bool make_move(int m_idx, int *ty, int *tx, bool fear, bool *bash)
 {
+	monster_type *m_ptr = &m_list[m_idx];
+
 	int i, j;
 
 	/* Start direction, current direction */
@@ -3925,7 +3931,7 @@ static bool make_move(monster_type *m_ptr, int *ty, int *tx, bool fear, bool *ba
 							m_ptr->min_range = 1;  m_ptr->best_range = 1;
 
 							/* Get the monster name */
-							monster_desc(m_name, m_ptr, 0);
+							monster_desc(m_name, m_idx, 0);
 
 							/* Dump a message */
 							msg_format("%^s turns to fight!", m_name);
@@ -4130,7 +4136,7 @@ static bool make_move(monster_type *m_ptr, int *ty, int *tx, bool fear, bool *ba
 			char m_name[80];
 
 			/* Get the monster name */
-			monster_desc(m_name, m_ptr, 0);
+			monster_desc(m_name, m_idx, 0);
 
 			/* Dump a message */
 			msg_format("%^s turns on you!", m_name);
@@ -4213,7 +4219,7 @@ static bool bash_from_under(int m_idx, int y, int x, bool *bash)
 			char m_name[80];
 
 			/* Get the monster name */
-			monster_desc(m_name, m_ptr, 0);
+			monster_desc(m_name, m_idx, 0);
 
 			msg_format("%^s emerges from %s%s.",m_name,
 				((f_ptr->flags2 & (FF2_FILLED))?"":"the "),
@@ -4258,7 +4264,7 @@ static bool crash_from_above(int m_idx, int y, int x)
 			char m_name[80];
 
 			/* Get the monster name */
-			monster_desc(m_name, m_ptr, 0);
+			monster_desc(m_name, m_idx, 0);
 
 			msg_format("%^s crashes through the ceiling.",m_name);
 
@@ -4392,7 +4398,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				char m_name[80];
 
 				/* Get the monster name */
-				monster_desc(m_name, m_ptr, 0);
+				monster_desc(m_name, m_idx, 0);
 
 				msg_format("%^s emerges from %s%s.",m_name,
 					((f_info[cave_feat[oy][ox]].flags2 & (FF2_FILLED))?"":"the "),
@@ -4670,7 +4676,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 						char m_name[80];
 
 						/* Get the monster name */
-						monster_desc(m_name, m_ptr, 0);
+						monster_desc(m_name, m_idx, 0);
 
 						msg_format("%^s disarms the hidden %s.",m_name,f_name+f_info[feat].name);
 					}
@@ -4683,7 +4689,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					char m_name[80];
 
 					/* Get the monster name */
-					monster_desc(m_name, m_ptr, 0);
+					monster_desc(m_name, m_idx, 0);
 
 					msg_format("%^s disarms the %s.",m_name,f_name+f_info[feat].name);
 				}
@@ -4833,7 +4839,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			char m_name[80];
 
 			/* Get the monster name */
-			monster_desc(m_name, m_ptr, 0);
+			monster_desc(m_name, m_idx, 0);
 
 			msg_format("%^s hides in %s%s.",m_name,
 			((f_info[feat].flags2 & (FF2_FILLED))?"":"the "),
@@ -4856,7 +4862,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			char m_name[80];
 
 			/* Get the monster name */
-			monster_desc(m_name, m_ptr, 0);
+			monster_desc(m_name, m_idx, 0);
 
 			msg_format("%^s emerges from %s%s.",m_name,
 			((f_info[cave_feat[oy][ox]].flags2 & (FF2_FILLED))?"":"the "),
@@ -4968,7 +4974,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					char o_name[80];
 	
 					/* Get the monster name */
-					monster_desc(m_name, m_ptr, 0);
+					monster_desc(m_name, m_idx, 0);
 	
 					/* Get the object name */
 					object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
@@ -4997,7 +5003,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 	
 					/* Acquire the monster name */
-					monster_desc(m_name, m_ptr, 0x04);
+					monster_desc(m_name, m_idx, 0x04);
 	
 					/* React to objects that hurt the monster */
 					if (f1 & (TR1_SLAY_DRAGON)) flg3 |= (RF3_DRAGON);
@@ -5481,7 +5487,7 @@ static void process_monster(int m_idx)
 					char m_name[80];
 
 					/* Get the monster name */
-					monster_desc(m_name, m_ptr, 0);
+					monster_desc(m_name, m_idx, 0);
 
 					msg_format("%^s emerges from the %s.", m_name, f_name + f_info[cave_feat[m_ptr->fy][m_ptr->fx]].name);
 				}
@@ -5623,7 +5629,7 @@ static void process_monster(int m_idx)
 				char o_name[80];
 
 				/* Describe monster */
-				monster_desc(m_name, m_ptr, 0);
+				monster_desc(m_name, m_idx, 0);
 
 				/* Describe */
 				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
@@ -5843,12 +5849,12 @@ static void process_monster(int m_idx)
 	else
 	{
 		/* Choose a pair of target grids, or cancel the move. */
-		if (!get_move(m_ptr, &ty, &tx, &fear, must_use_target))
+		if (!get_move(m_idx, &ty, &tx, &fear, must_use_target))
 			return;
 	}
 
 	/* Calculate the actual move.  Cancel move on failure to enter grid. */
-	if (!make_move(m_ptr, &ty, &tx, fear, &bash)) return;
+	if (!make_move(m_idx, &ty, &tx, fear, &bash)) return;
 
 	/* Change terrain, move the monster, handle secondary effects. */
 	process_move(m_idx, ty, tx, bash);
@@ -5959,7 +5965,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Get the monster name */
-				monster_desc(m_name, m_ptr, 0);
+				monster_desc(m_name, m_idx, 0);
 
 				msg_format("%^s emerges from %s%s.",m_name,
 					((f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_FILLED))?"":"the "),
@@ -6043,7 +6049,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_ptr, 0);
+				monster_desc(m_name, m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s wakes up.", m_name);
@@ -6085,7 +6091,7 @@ static void recover_monster(int m_idx, bool regen)
 				if (m_ptr->ml)
 				{
 					/* Get the monster name */
-					monster_desc(m_name, m_ptr, 0);
+					monster_desc(m_name, m_idx, 0);
 
 					/* Dump a message */
 					msg_format("%^s wakes up.", m_name);
@@ -6139,7 +6145,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_ptr, 0);
+				monster_desc(m_name, m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s is no longer stunned.", m_name);
@@ -6170,7 +6176,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_ptr, 0);
+				monster_desc(m_name, m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s is no longer confused.", m_name);
@@ -6205,8 +6211,8 @@ static void recover_monster(int m_idx, bool regen)
 			if ((m_ptr->ml) && (m_ptr->min_range != FLEE_RANGE))
 			{
 				/* Acquire the monster name/poss */
-				monster_desc(m_name, m_ptr, 0);
-				monster_desc(m_poss, m_ptr, 0x22);
+				monster_desc(m_name, m_idx, 0);
+				monster_desc(m_poss, m_idx, 0x22);
 
 				/* Dump a message */
 				msg_format("%^s recovers %s courage.", m_name, m_poss);
@@ -6248,7 +6254,7 @@ static void recover_monster(int m_idx, bool regen)
 			if ((m_ptr->ml) && (m_ptr->hp < (m_ptr->cut > 200 ? 3 : (m_ptr->cut > 100 ? 2 : 1))))
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_ptr, 0);
+				monster_desc(m_name, m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s bleeds to death.", m_name);
@@ -6268,7 +6274,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_ptr, 0);
+				monster_desc(m_name, m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s is no longer bleeding.", m_name);
@@ -6294,7 +6300,7 @@ static void recover_monster(int m_idx, bool regen)
 			if ((m_ptr->ml) && (m_ptr->hp < 1))
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_ptr, 0);
+				monster_desc(m_name, m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s expires from poisoning.", m_name);
@@ -6314,7 +6320,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_ptr, 0);
+				monster_desc(m_name, m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s is no longer poisoned.", m_name);
@@ -6346,7 +6352,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_ptr, 0);
+				monster_desc(m_name, m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s is no longer blinded.", m_name);
@@ -6411,7 +6417,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Get the monster name */
-				monster_desc(m_name, m_ptr, 0);
+				monster_desc(m_name, m_idx, 0);
 
 				msg_format("%^s appears from nowhere.",m_name);
 
@@ -6464,7 +6470,7 @@ static void recover_monster(int m_idx, bool regen)
 				if (m_ptr->ml)
 				{
 					/* Get the monster name */
-					monster_desc(m_name, m_ptr, 0);
+					monster_desc(m_name, m_idx, 0);
 
 					msg_format("%^s emerges from %s%s.",m_name,
 						((f_ptr->flags2 & (FF2_FILLED))?"":"the "), f_name+f_ptr->name);
@@ -6529,7 +6535,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_ptr, 0);
+				monster_desc(m_name, m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s is no longer berserk.", m_name);

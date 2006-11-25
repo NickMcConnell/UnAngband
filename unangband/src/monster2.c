@@ -908,10 +908,11 @@ void display_monlist(void)
  *   0x22 --> Possessive, genderized if visable ("his") or "its"
  *   0x23 --> Reflexive, genderized if visable ("himself") or "itself"
  */
-void monster_desc(char *desc, const monster_type *m_ptr, int mode)
+void monster_desc(char *desc, int m_idx, int mode)
 {
 	cptr res;
 
+	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	cptr name = (r_name + r_ptr->name);
@@ -933,8 +934,8 @@ void monster_desc(char *desc, const monster_type *m_ptr, int mode)
 		int kind = 0x00;
 
 		/* Extract the gender (if applicable) */
-		if (r_ptr->flags1 & (RF1_FEMALE)) kind = 0x20;
-		else if (r_ptr->flags1 & (RF1_MALE)) kind = 0x10;
+		if ((r_ptr->flags1 & (RF1_FEMALE)) && (!(r_ptr->flags1 & (RF1_MALE)) || (m_idx % 2))) kind = 0x20;
+		else if ((r_ptr->flags1 & (RF1_MALE)) && (!(r_ptr->flags1 & (RF1_FEMALE)) || !(m_idx % 2)))  kind = 0x10;
 
 		/* Ignore the gender (if desired) */
 		if (!m_ptr || !pron) kind = 0x00;
@@ -986,8 +987,8 @@ void monster_desc(char *desc, const monster_type *m_ptr, int mode)
 	else if ((mode & 0x02) && (mode & 0x01))
 	{
 		/* The monster is visible, so use its gender */
-		if (r_ptr->flags1 & (RF1_FEMALE)) strcpy(desc, "herself");
-		else if (r_ptr->flags1 & (RF1_MALE)) strcpy(desc, "himself");
+		if ((r_ptr->flags1 & (RF1_FEMALE)) && (!(r_ptr->flags1 & (RF1_MALE)) || (m_idx % 2))) strcpy(desc, "herself");
+		else if ((r_ptr->flags1 & (RF1_MALE)) && (!(r_ptr->flags1 & (RF1_FEMALE)) || !(m_idx % 2))) strcpy(desc, "himself");
 		else strcpy(desc, "itself");
 	}
 
@@ -995,6 +996,92 @@ void monster_desc(char *desc, const monster_type *m_ptr, int mode)
 	/* Handle all other visible monster requests */
 	else
 	{
+		monster_race monster_race_scaled;
+		cptr prefix = NULL, suffix = NULL;
+		int level = r_ptr->level;
+		u32b class = r_ptr->flags2 & (RF2_CLASS_MASK);
+
+		/* Scale a monster */
+		if ((r_ptr->flags9 & (RF9_LEVEL_SIZE | RF9_LEVEL_SPEED | RF9_LEVEL_POWER)) != 0)
+		{
+			monster_scale(&monster_race_scaled, m_idx, p_ptr->depth);
+			r_ptr = &monster_race_scaled;
+		}
+
+		/* Add prefixes to levelled monsters */
+		if (r_ptr->flags9 & (RF9_LEVEL_SIZE))
+		{
+			if (p_ptr->depth >= level + 15) prefix = "Giant ";
+			else if (p_ptr->depth >= level + 10) prefix = "Huge ";
+			else if (p_ptr->depth >= level + 5) prefix = "Large ";
+		}
+		else if (r_ptr->flags9 & (RF9_LEVEL_SPEED))
+		{
+			if (p_ptr->depth >= level + 15) prefix = "Deadly ";
+			else if (p_ptr->depth >= level + 10) prefix = "Furious ";
+			else if (p_ptr->depth >= level + 5) prefix = "Fast ";
+		}
+		else if (r_ptr->flags9 & (RF9_LEVEL_POWER))
+		{
+			/* Lesser / greater / master */
+			if (((r_ptr->flags3 & (RF3_UNDEAD | RF3_DRAGON | RF3_DEMON | RF3_ANIMAL | RF3_PLANT | RF3_INSECT)) != 0) ||
+				(((r_ptr->flags3 & (RF3_ORC | RF3_TROLL | RF3_GIANT)) == 0) &&
+				((r_ptr->flags9 & (RF9_MAN | RF9_ELF | RF9_DWARF)) == 0)))
+			{
+				if (p_ptr->depth >= level + 15) prefix = "Master ";
+				else if (p_ptr->depth >= level + 10) prefix = "Greater ";
+				else prefix = "Lesser ";
+			}
+			else
+			{
+				/* Add a class suffix to some monsters */
+				if ((class == 0) && ((r_ptr->flags2 & (RF2_CLASS_MASK)) != 0))
+				{
+					if (((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_MAGE)) != 0)) suffix = "shaman";
+					else if (((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_ARCHER)) != 0)) suffix = "ranger";
+					else if (((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_ARMOR)) != 0)) suffix = "warrior mage";
+					else if ((r_ptr->flags2 & (RF2_MAGE)) != 0) suffix = "mage";
+					else if (((r_ptr->flags2 & (RF2_PRIEST)) != 0) && ((r_ptr->flags2 & (RF2_ARMOR)) != 0)) suffix = "knight";
+					else if ((r_ptr->flags2 & (RF2_PRIEST)) != 0) suffix = "priest";
+					else if ((r_ptr->flags2 & (RF2_ARCHER)) != 0) suffix = "archer";
+					else if ((r_ptr->flags2 & (RF2_SNEAKY)) != 0) suffix = "scout";
+					else if ((r_ptr->flags2 & (RF2_ARMOR)) != 0) suffix = "warrior";
+
+					/* Hack -- reduce rank */
+					if (suffix) level += 5;
+				}
+
+				/* Powerful monster ranks */
+				if (p_ptr->depth >= level + 15)
+				{
+					if (((r_ptr->flags2 & (RF2_ARMOR)) != 0) || 
+						((r_ptr->flags3 & (RF3_ORC | RF3_TROLL | RF3_GIANT)) != 0))
+							prefix = "Elite ";
+					else if (r_ptr->flags2 & (RF2_MAGE | RF2_PRIEST)) prefix = "Arch ";
+					else prefix = "Master ";
+				}
+				/* Moderately powerful monster ranks */
+				else if (p_ptr->depth >= level + 10)
+				{
+					if (((r_ptr->flags2 & (RF2_ARMOR)) != 0) || 
+						((r_ptr->flags3 & (RF3_ORC | RF3_TROLL | RF3_GIANT)) != 0))
+							prefix = "Veteran ";
+					else prefix = "Senior ";
+				}
+				/* Somewhat powerful monster ranks */
+				else if (p_ptr->depth >= level + 5)
+				{
+					if (((r_ptr->flags2 & (RF2_ARMOR)) != 0) || 
+						((r_ptr->flags3 & (RF3_ORC | RF3_TROLL | RF3_GIANT)) != 0))
+							prefix = "Hardened ";
+					else if (r_ptr->flags2 & (RF2_MAGE)) prefix = "Wily ";
+					else if (r_ptr->flags2 & (RF2_PRIEST)) prefix = "Superior ";
+					else prefix = "Experienced ";
+				}
+			}
+		}
+
+
 		/* It could be a Unique */
 		if (r_ptr->flags1 & (RF1_UNIQUE))
 		{
@@ -1009,7 +1096,9 @@ void monster_desc(char *desc, const monster_type *m_ptr, int mode)
 
 			/* Indefinite monsters need an indefinite article */
 			strcpy(desc, is_a_vowel(name[0]) ? "an " : "a ");
+			if (prefix) strcat(desc, prefix);
 			strcat(desc, name);
+			if (suffix) strcat(desc, suffix);
 		}
 
 		/* It could be a normal, definite, monster */
@@ -1017,7 +1106,9 @@ void monster_desc(char *desc, const monster_type *m_ptr, int mode)
 		{
 			/* Definite monsters need a definite article */
 			strcpy(desc, "the ");
+			if (prefix) strcat(desc, prefix);
 			strcat(desc, name);
+			if (suffix) strcat(desc, suffix);
 		}
 
 		/* Handle the Possessive as a special afterthought */
@@ -2625,7 +2716,7 @@ void set_monster_haste(s16b m_idx, s16b counter, bool message)
 	char m_name[80];
 
 	/* Get monster name*/
-	monster_desc(m_name, m_ptr, 0);
+	monster_desc(m_name, m_idx, 0);
 
 	/*see if we need to recalculate speed*/
 	if (m_ptr->hasted)
@@ -2670,7 +2761,7 @@ void set_monster_slow(s16b m_idx, s16b counter, bool message)
 	char m_name[80];
 
 	/* Get monster name*/
-	monster_desc(m_name, m_ptr, 0);
+	monster_desc(m_name, m_idx, 0);
 
 	/*see if we need to recalculate speed*/
 	if (m_ptr->slowed)
@@ -4383,7 +4474,7 @@ void message_pain(int m_idx, int dam)
 
 
 	/* Get the monster name */
-	monster_desc(m_name, m_ptr, 0);
+	monster_desc(m_name, m_idx, 0);
 
 	/* Notice non-damage */
 	if (dam == 0)

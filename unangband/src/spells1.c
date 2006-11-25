@@ -1590,8 +1590,10 @@ static int inven_damage(inven_func typ, int perc)
  * Destruction taken from "melee.c" code for "stealing".
  * Returns number of items destroyed.
  */
-static int mon_inven_damage(const monster_type *m_ptr, inven_func typ, int perc)
+static int mon_inven_damage(int m_idx, inven_func typ, int perc)
 {
+	monster_type *m_ptr = &m_list[m_idx];
+
 	int j, k, amt;
 
 	object_type *o_ptr;
@@ -1633,7 +1635,7 @@ static int mon_inven_damage(const monster_type *m_ptr, inven_func typ, int perc)
 				object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 3);
 
 				/* Get "possessive" */
-				monster_desc(m_name, m_ptr, 0x22);
+				monster_desc(m_name, m_idx, 0x22);
 
 				/* Message */
 				msg_format("%^s%s %s destroyed!",
@@ -4664,7 +4666,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 
 
 	/* Get the monster name (BEFORE polymorphing) */
-	monster_desc(m_name, m_ptr, 0);
+	monster_desc(m_name, who, 0);
 
 	/* Some monsters get "destroyed" */
 	if ((r_ptr->flags3 & (RF3_NONLIVING)) ||
@@ -6766,7 +6768,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 				char m_name[80];
 
 				/* Get "the monster" or "something" */
-				monster_desc(m_name, m_ptr, 0x04);
+				monster_desc(m_name, who, 0x04);
 
 				/* Describe the monster */
 				msg_format("%^s has %d hit points.", m_name, m_ptr->hp);
@@ -7271,7 +7273,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 			if (do_sleep) m_ptr->csleep = do_sleep;
 
 			/* Hack -- handle inventory damage */
-			if (do_inven_destroy) mon_inven_damage(m_ptr, do_inven_destroy, (dam / 15) + 1);
+			if (do_inven_destroy) mon_inven_damage(who, do_inven_destroy, (dam / 15) + 1);
 		}
 	}
 
@@ -7307,7 +7309,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 			if (do_sleep) m_ptr->csleep = do_sleep;
 
 			/* Hack -- handle inventory damage */
-			if (do_inven_destroy) mon_inven_damage(m_ptr, do_inven_destroy, (dam / 15) + 1);
+			if (do_inven_destroy) mon_inven_damage(who, do_inven_destroy, (dam / 15) + 1);
 		}
 
 		/* Hack -- wake up nearby allies */
@@ -7429,10 +7431,10 @@ bool project_p(int who, int y, int x, int dam, int typ)
 		m_ptr = &m_list[who];
 
 		/* Get the monster name */
-		monster_desc(m_name, m_ptr, 0);
+		monster_desc(m_name, who, 0);
 
 		/* Get the monster's real name */
-		monster_desc(killer, m_ptr, 0x88);
+		monster_desc(killer, who, 0x88);
 	}
 	else if (who == 0)
 	{
@@ -10260,7 +10262,7 @@ bool project_t(int who, int y, int x, int dam, int typ)
 		if (m_ptr->ml) seen = TRUE;
 
 		/* Get the monster name (before teleporting) */
-		monster_desc(m_name, m_ptr, 0x40);
+		monster_desc(m_name, cave_m_idx[y][x], 0x40);
 	}
 
 	/* Hack -- storm can do several things */
@@ -11479,7 +11481,7 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 			 	monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
 
 				/* Check if monster evades */
-				if (mon_evade(m_ptr,(m_ptr->confused || m_ptr->stunned ? 1 : 3) + gd[i], 5 + gd[i], "")) continue;
+				if (mon_evade(cave_m_idx[y][x],((m_ptr->confused || m_ptr->stunned) ? 1 : 3) + gd[i], 5 + gd[i], "")) continue;
 			}
 
 			/* Affect the monster in the grid */

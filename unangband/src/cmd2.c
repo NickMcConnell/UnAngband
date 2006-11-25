@@ -3632,7 +3632,7 @@ void do_cmd_fire(void)
 			if (m_ptr->mflag & (MFLAG_HIDE)) continue;
 
 			/* Some monsters are great at dodging  -EZ- */
-			if (mon_evade(m_ptr, (m_ptr->confused || m_ptr->stunned ? 1 : 3) + m_ptr->cdis, 5 + m_ptr->cdis,"")) continue;
+			if (mon_evade(cave_m_idx[y][x], ((m_ptr->confused || m_ptr->stunned) ? 1 : 3) + m_ptr->cdis, 5 + m_ptr->cdis,"")) continue;
 
 			/* Check shooting styles only */
 			shoot_style = p_ptr->cur_style & (WS_SHOOT_FLAGS);
@@ -3647,7 +3647,7 @@ void do_cmd_fire(void)
 			genuine_hit = test_hit_fire(chance2 + style_hit * BTH_PLUS_ADJ, calc_monster_ac(m_ptr, TRUE), m_ptr->ml);
 
 			/* Missiles bounce off resistant monsters */
-			if ((genuine_hit) && (mon_resist_object(m_ptr, i_ptr)))
+			if ((genuine_hit) && (mon_resist_object(cave_m_idx[y][x], i_ptr)))
 			{
 				/* XXX Rewrite remaining path of missile */
 
@@ -3710,7 +3710,7 @@ void do_cmd_fire(void)
 					char m_name[80];
 
 					/* Get "the monster" or "it" */
-					monster_desc(m_name, m_ptr, 0);
+					monster_desc(m_name, cave_m_idx[y][x], 0);
 
 					/* Near miss */
 					if (!genuine_hit)
@@ -3772,7 +3772,7 @@ void do_cmd_fire(void)
 						char m_name[80];
 
 						/* Get the monster name (or "it") */
-						monster_desc(m_name, m_ptr, 0);
+						monster_desc(m_name, cave_m_idx[y][x], 0);
 
 						/* Message */
 						message_format(MSG_FLEE, m_ptr->r_idx,
@@ -4075,7 +4075,7 @@ void do_cmd_throw(void)
 			if (m_ptr->mflag & (MFLAG_HIDE)) continue;
 
 			/* Some monsters are great at dodging  -EZ- */
-			if (mon_evade(m_ptr, m_ptr->confused || m_ptr->stunned ? 4 : 2, 5 + m_ptr->cdis,"")) continue;
+			if (mon_evade(cave_m_idx[y][x], (m_ptr->confused || m_ptr->stunned) ? 4 : 2, 5 + m_ptr->cdis,"")) continue;
 
 			/* Get style benefits if a throwing weapon */
 			if (throwing) mon_style_benefits(m_ptr, WS_THROWN, &style_hit, &style_dam, &style_crit);
@@ -4087,7 +4087,7 @@ void do_cmd_throw(void)
 			genuine_hit = test_hit_fire(chance2 + style_hit * BTH_PLUS_ADJ, calc_monster_ac(m_ptr, TRUE), m_ptr->ml);
 
 			/* Missiles bounce off resistant monsters */
-			if ((genuine_hit) && (mon_resist_object(m_ptr, o_ptr)))
+			if ((genuine_hit) && (mon_resist_object(cave_m_idx[y][x], o_ptr)))
 			{
 				/* XXX Rewrite remaining path of missile */
 
@@ -4150,7 +4150,7 @@ void do_cmd_throw(void)
 					char m_name[80];
 
 					/* Get "the monster" or "it" */
-					monster_desc(m_name, m_ptr, 0);
+					monster_desc(m_name, cave_m_idx[y][x], 0);
 
 					/* Near miss */
 					if (!genuine_hit)
@@ -4212,7 +4212,7 @@ void do_cmd_throw(void)
 						char m_name[80];
 
 						/* Get the monster name (or "it") */
-						monster_desc(m_name, m_ptr, 0);
+						monster_desc(m_name, cave_m_idx[y][x], 0);
 
 						/* Message */
 						message_format(MSG_FLEE, m_ptr->r_idx,

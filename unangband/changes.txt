@@ -103,6 +103,8 @@ Matthias Rudolf).
 
 - Prevented stone wells from appearing at the bottom of dungeons (Reported by pepebe).
 
+- Test for evasion was reversed.
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.
