@@ -2767,7 +2767,7 @@
 #define RG1_PILLAR	0x00000080L	/* Place as pillars */
 #define RG1_CHECKER	0x00000100L	/* Place as checkered */
 #define RG1_SCATTER	0x00000200L	/* Place as scattered */
-#define RG1_WALL	0x00000400L	/* Place as wall */
+#define RG1_OUTER	0x00000400L	/* Place as outer wall */
 #define RG1_FLOOR	0x00000800L	/* Place as floor */
 #define RG1_BATTLE	0x00001000L	/* Place as battle */
 #define RG1_VAULT	0x00002000L	/* Vault level */
@@ -2793,7 +2793,7 @@
 #define RG1_LEVEL_FLAGS (RG1_BATTLE | RG1_VAULT | RG1_DUNGEON | RG1_STRONGHOLD | RG1_CRYPT |\
 				RG1_LAIR | RG1_MINE | RG1_CAVE | RG1_TOWN | RG1_WILD | RG1_RUIN)
 
-#define RG1_PLACE_FLAGS	(RG1_NORTH | RG1_SOUTH | RG1_WEST | RG1_EAST | RG1_CENTRE)
+#define RG1_PLACE_FLAGS	(RG1_NORTH | RG1_SOUTH | RG1_WEST | RG1_EAST | RG1_CENTRE | RG1_EDGE | RG1_INNER)
 
 /*** Room flags ***/
 

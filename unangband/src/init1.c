@@ -109,7 +109,7 @@ static cptr d_info_pflags[] =
 	"PILLAR",
 	"CHECKER",
 	"SCATTER",
-	"WALL",
+	"OUTER",
 	"FLOOR",
 	"BATTLE",
 	"VAULT",
