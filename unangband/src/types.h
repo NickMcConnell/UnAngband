@@ -226,11 +226,15 @@ struct desc_type
 
 	u32b flags;      /* Room flags */
 	u32b l_flag;    /* Restrict to these level types */
+	u32b p_flag;	/* Generate */
 
 	byte chance;  	/* Frequency of this entry */
 	byte not_chance;/* Frequency of this entry if conditions not met */
 	byte chart; 	/* Chart index */
 	byte next;  	/* Next chart index */
+
+	byte branch;	/* Branch to chart index */
+	byte branch_on;	/* Branch on chart index */
 	
 	u16b level; 	/* Minimum */
 

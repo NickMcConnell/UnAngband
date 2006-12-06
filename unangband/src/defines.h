@@ -2764,11 +2764,11 @@
 #define RG1_CENTRE	0x00000010L	/* Place in centre */
 #define RG1_EDGE	0x00000020L	/* Place on edge */
 #define RG1_PLACE	0x00000040L	/* Place now */
-#define RG1_PILLAR	0x00000080L	/* Place as pillars */
+#define RG1_MIMIC	0x00000080L	/* Pick features that 'mimic' this feat */
 #define RG1_CHECKER	0x00000100L	/* Place as checkered */
 #define RG1_SCATTER	0x00000200L	/* Place as scattered */
 #define RG1_OUTER	0x00000400L	/* Place as outer wall */
-#define RG1_FLOOR	0x00000800L	/* Place as floor */
+#define RG1_TVAL	0x00000800L	/* Pick objects that match this 'tval' */
 #define RG1_BATTLE	0x00001000L	/* Place as battle */
 #define RG1_VAULT	0x00002000L	/* Vault level */
 #define RG1_DUNGEON	0x00004000L	/* Dungeon level */
@@ -2806,8 +2806,8 @@
 #define ROOM_QUEST	0x00000008L	   /* room is a quest */
 #define ROOM_LITE	0x00000010L	   /* room is lit */
 #define ROOM_DARK	0x00000020L	   /* room is dark */
-#define ROOM_SURFACE	0x00000040L	   /* room is on surface */
-#define ROOM_BOTTOM	0x00000080L	   /* room is bottom of dungeon */
+#define ROOM_LANGUAGE	0x00000040L	   /* room has language inscriptions */
+#define ROOM_XXXX	0x00000080L	   /* room has  */
 #define ROOM_DAYLITE	0x00000100L	   /* room is lit during daytime */ 
 #define ROOM_ICKY 	0x00000200L    /* room cannot be teleport target */
 #define ROOM_BLOODY	0x00000400L    /* room causes wounds/poison to become worse */

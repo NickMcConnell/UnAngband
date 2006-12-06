@@ -590,6 +590,8 @@ extern bool mon_resist_object(int m_idx, const object_type *o_ptr);
 extern void mon_hit_trap(int m_idx, int y, int x);
 
 /* melee2.c */
+extern int monster_language(int r_idx);
+extern bool player_understands(int language);
 extern void monster_speech(int m_idx, cptr saying, bool understand);
 extern bool tell_allies_player_can(int y, int x, u32b flag);
 extern bool tell_allies_player_not(int y, int x, u32b flag);

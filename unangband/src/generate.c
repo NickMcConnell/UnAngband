@@ -1869,6 +1869,9 @@ static void get_room_info(int y0, int x0)
 	int place_tval;
 	int place_feat;
 
+	int branch;
+	int branch_on;
+
 	/* Occasional light */
 	if (p_ptr->depth <= randint(25)) light = TRUE;
 
@@ -1919,6 +1922,9 @@ static void get_room_info(int y0, int x0)
 	place_tval = 0;
 	place_feat = 0;
 	place_flag = 0;
+
+	branch = 0;
+	branch_on = 0;
 
 	/* Room flags */
 	room_info[room].flags = 0;
@@ -2028,6 +2034,17 @@ static void get_room_info(int y0, int x0)
 			/* Enter the next chart */
 			chart = d_info[i].next;
 
+			/* Branch if required */
+			if (chart == branch_on)
+			{
+				/* Set alternate chart */
+				chart = branch;
+
+				/* Clear branch conditions */
+				branch = 0;
+				branch_on = 0;
+			}
+
 			/* Place flags except SEEN */
 			room_info[room].flags |= (d_info[i].flags & ~(ROOM_SEEN));
 		
@@ -2036,6 +2053,12 @@ static void get_room_info(int y0, int x0)
 
 			/* Get feature */
 			if (d_info[i].feat) place_feat = d_info[i].feat;
+
+			/* Get branch */
+			if (d_info[i].branch) branch = d_info[i].branch;
+
+			/* Get branch condition */
+			if (d_info[i].branch_on) branch_on = d_info[i].branch_on;
 
 			/* Clear old position information */
 			if (d_info[i].p_flag & (RG1_PLACE_FLAGS)) place_flag &= ~(RG1_PLACE_FLAGS);

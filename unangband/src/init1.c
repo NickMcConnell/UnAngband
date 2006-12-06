@@ -66,8 +66,8 @@ static cptr d_info_sflags[] =
 	"QUEST",
 	"LITE",
 	"DARK",
-	"SURFACE",
-	"BOTTOM",
+	"LANGUAGE",
+	"XXXX",
 	"DAYLITE",
 	"ICKY",
 	"BLOODY",
@@ -106,11 +106,11 @@ static cptr d_info_pflags[] =
 	"CENTRE",
 	"EDGE",
 	"PLACE",
-	"PILLAR",
+	"MIMIC",
 	"CHECKER",
 	"SCATTER",
 	"OUTER",
-	"FLOOR",
+	"TVAL",
 	"BATTLE",
 	"VAULT",
 	"DUNGEON",
@@ -2151,7 +2151,7 @@ errr parse_d_info(char *buf, header *head)
 	/* Process 'N' for "New/Number" */
 	if (buf[0] == 'N')
 	{
-		int prv, nxt, cha, noc, min;
+		int prv, nxt, bon, bra, cha, noc, min;
 
 		/* Hack - get the index */
 		i = error_idx + 1;
@@ -2169,12 +2169,14 @@ errr parse_d_info(char *buf, header *head)
 		d_ptr = (desc_type*)head->info_ptr + i;
 
 		/* Scan for the values */
-		if (5 != sscanf(buf, "N:%d:%d:%d:%d:%d",
-			    &prv, &nxt, &cha, &noc,  &min)) return (PARSE_ERROR_GENERIC);
+		if (7 != sscanf(buf, "N:%d:%d:%d:%d:%d:%d:%d",
+			    &prv, &nxt, &bon, &bra, &cha, &noc,  &min)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		d_ptr->chart = prv;
 		d_ptr->next = nxt;
+		d_ptr->branch_on = bon;
+		d_ptr->branch = bra;
 		d_ptr->chance = cha;
 		d_ptr->not_chance = noc;
 		d_ptr->level = min;

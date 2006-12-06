@@ -3976,16 +3976,45 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 
 			while ((j = room_info[room].section[i++]) != -1)
 			{
-				/* Visible description or always present? */
-				if (d_info[j].flags & (ROOM_SEEN))
+				char *last_buf = NULL;
+
+				/* Must understand language? */
+				if (d_info[j].flags & (ROOM_LANGUAGE))
+				{
+					/* Does the player understand the main language of the level? */
+					if ((last_buf) && (cave_ecology.ready) && (cave_ecology.num_races)
+						&& player_understands(monster_language(cave_ecology.race[0])))
+					{
+
+						/* Get the textual history */
+						strcat(last_buf, (d_text + d_info[j].text));
+					}
+					else if (last_buf)
+					{
+						/* Fake it */
+						strcat(last_buf, "nothing you can understand.  ");
+
+						/* Clear last buf to skip remaining language lines */
+						last_buf = NULL;
+					}
+				}
+				/* Visible description */
+				else if (d_info[j].flags & (ROOM_SEEN))
 				{
 					/* Get the textual history */
 					strcat(buf_text1, (d_text + d_info[j].text));
+
+					/* Record last buffer for language */
+					last_buf = buf_text1;
 				}
+				/* Description always present */
 				else
 				{
 					/* Get the textual history */
 					strcat(buf_text2, (d_text + d_info[j].text));
+
+					/* Record last buffer for language */
+					last_buf = buf_text1;
 				}
 
 				/* Get the name1 text if needed */
