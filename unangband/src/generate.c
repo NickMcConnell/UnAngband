@@ -1570,7 +1570,10 @@ static void generate_rect(int y1, int x1, int y2, int x2, int feat)
 	}
 }
 
-
+/*
+ * Number to place for scattering
+ */
+#define NUM_SCATTER   7
 
 
 /*
@@ -1586,7 +1589,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 	if (!dy || !dx) return;
 
 	/* Scatter several about if requested */
-	for (k = 0; k < ((flag & (RG1_SCATTER | RG1_TRAIL)) != 0 ? 7 : 1); k++)
+	for (k = 0; k < ((flag & (RG1_SCATTER | RG1_TRAIL)) != 0 ? NUM_SCATTER : 1); k++)
 	{
 		/* Pick location */
 		choice = 0;
@@ -1637,6 +1640,9 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 						((dx > 0) ? (x > x1) && (x < x2) : (x > x2) && (x < x1))) continue; 
 				}
 
+				/* Random */
+				if (((flag & (RG1_RAND_80)) != 0) && (rand_int(100) < 20)) continue;
+
 				/* Only place next to last choice */
 				if ((flag & (RG1_TRAIL)) != 0)
 				{
@@ -1663,6 +1669,16 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 				/* Set feature */
 				else
 				{
+					/* Hack -- in case we don't place enough */
+					if ((flag & (RG1_RAND_80)) != 0)
+					{
+						if (rand_int(++choice) == 0)
+						{
+							y_alloc = y;
+							x_alloc = x;
+						}
+					}
+
 					/* Assign feature */
 					if (feat) cave_set_feat(y, x, feat);
 
@@ -1682,6 +1698,16 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 					}
 				}
 			}
+		}
+
+		/* Hack -- if we don't have enough the first time, scatter instead */
+		if (((flag & (RG1_RAND_80)) != 0) && (choice < NUM_SCATTER))
+		{
+			flag &= ~(RG1_RAND_80);
+			flag |= (RG1_SCATTER);
+
+			/* Paranoia */
+			if (!choice) continue;
 		}
 
 		/* Finally place in 8 directions */
@@ -1831,9 +1857,11 @@ static void generate_hole(int y1, int x1, int y2, int x2, int feat)
 
 
 /*
- * Hack -- flags type for "vault_aux_room_info()"
+ * Hack -- tval and sval range for "room_info_kind()"
  */
-static int room_info_kind_tval;
+static byte room_info_kind_tval;
+static byte room_info_kind_min_sval;
+static byte room_info_kind_max_sval;
 
 /*
  *
@@ -1842,11 +1870,31 @@ static bool room_info_kind(int k_idx)
 {
 	object_kind *k_ptr = &k_info[k_idx];
 
-	if (k_ptr->tval == room_info_kind_tval) return (TRUE);
+	if (k_ptr->tval != room_info_kind_tval) return (FALSE);
+	if (k_ptr->sval < room_info_kind_min_sval) return (FALSE);
+	if (k_ptr->sval > room_info_kind_max_sval) return (FALSE);
+
+	return(TRUE);
+}
+
+
+/*
+ * Hack -- mimic'ed feature for "room_info_feat()"
+ */
+static byte room_info_feat_mimic;
+
+/*
+ *
+ */
+static bool room_info_feat(int f_idx)
+{
+	feature_type *f_ptr = &f_info[f_idx];
+
+	if (f_ptr->mimic == room_info_feat_mimic) return(TRUE);
 
 	return(FALSE);
-
 }
+
 
 
 
@@ -1866,7 +1914,7 @@ static void get_room_info(int y0, int x0)
 
 	u32b place_flag = 0;
 
-	int place_tval;
+	byte place_tval, place_min_sval, place_max_sval;
 	int place_feat;
 
 	int branch;
@@ -1920,6 +1968,8 @@ static void get_room_info(int y0, int x0)
 	j = 0;
 	counter = 0;
 	place_tval = 0;
+	place_min_sval = 0;
+	place_max_sval = 0;
 	place_feat = 0;
 	place_flag = 0;
 
@@ -2049,7 +2099,12 @@ static void get_room_info(int y0, int x0)
 			room_info[room].flags |= (d_info[i].flags & ~(ROOM_SEEN));
 		
 			/* Get tval */
-			if (d_info[i].tval) place_tval = d_info[i].tval;
+			if (d_info[i].tval)
+			{
+				place_tval = d_info[i].tval;
+				place_min_sval = d_info[i].min_sval;
+				place_max_sval = d_info[i].max_sval;
+			}
 
 			/* Get feature */
 			if (d_info[i].feat) place_feat = d_info[i].feat;
@@ -2072,13 +2127,27 @@ static void get_room_info(int y0, int x0)
 			/* Don't place yet */
 			if ((place_flag & (RG1_PLACE)) == 0) continue;
 
-			/* Place objects if needed */
+			/* Pick features if needed */
+			if (place_feat)
+			{
+				/* Set feature hook */
+				room_info_feat_mimic = place_feat;
+
+				get_feat_num_hook = room_info_feat;
+
+				/* Prepare allocation table */
+				get_feat_num_prep();
+			}
+
+			/* Pick objects if needed */
 			if (place_tval)
 			{
 				/* Set object hooks if required */
 				if (place_tval < TV_GOLD)
 				{
 					room_info_kind_tval = place_tval;
+					room_info_kind_min_sval = place_min_sval;
+					room_info_kind_max_sval = place_max_sval;
 
 					get_obj_num_hook = room_info_kind;
 
@@ -2168,8 +2237,19 @@ static void get_room_info(int y0, int x0)
 				}
 			}
 
-			/* Place objects if needed */
-			if (place_tval)
+			/* Clear feature hook */
+			if (place_feat)
+			{
+				get_feat_num_hook = NULL;
+
+				/* Prepare allocation table */
+				get_feat_num_prep();
+
+				place_feat = 0;
+			}
+
+			/* Clear object hook */
+			if (place_tval < 100)
 			{
 				get_obj_num_hook = NULL;
 
@@ -2181,7 +2261,6 @@ static void get_room_info(int y0, int x0)
 
 			/* Clear placement details */
 			place_flag &= (RG1_PLACE_FLAGS);
-			place_feat = 0;
 		}
 	}
 

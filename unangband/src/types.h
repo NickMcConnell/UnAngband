@@ -240,8 +240,11 @@ struct desc_type
 
 	s16b feat;      /* Extra features of this type */
 
-	u16b tval;      /* Add objects of this tval */
 	u16b r_flag;    /* Add races with this flag */
+
+	byte tval;      /* Add objects of this tval */
+	byte min_sval;  /* And from this sval */
+	byte max_sval;  /*   ... to this sval */
 
 	byte r_char;    /* Add races of this char */
 };

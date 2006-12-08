@@ -110,7 +110,7 @@ static cptr d_info_pflags[] =
 	"CHECKER",
 	"SCATTER",
 	"OUTER",
-	"TVAL",
+	"RAND_80",
 	"BATTLE",
 	"VAULT",
 	"DUNGEON",
@@ -2329,16 +2329,18 @@ errr parse_d_info(char *buf, header *head)
 	/* Process 'K' for "Kind" (one line only) */
 	else if (buf[0] == 'K')
 	{
-		int kind;
+		int tval, min_sval, max_sval;
 
 		/* There better be a current d_ptr */
 		if (!d_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (1 != sscanf(buf+2, "%d", &kind)) return (1);
+		if (3 != sscanf(buf+2, "%d:%d:%d", &tval, &min_sval, &max_sval)) return (1);
 
 		/* Save the values */
-		d_ptr->tval = kind;
+		d_ptr->tval = tval;
+		d_ptr->min_sval = min_sval;
+		d_ptr->max_sval = max_sval;
 	}
 
 	/* Process 'F' for "Feature" (one line only) */
