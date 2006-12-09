@@ -3961,6 +3961,7 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 			char buf_text2[240];
 			char buf_name1[16];
 			char buf_name2[16];
+			char *last_buf = NULL;
 
 			/* Clear the history text */
 			buf_text1[0] = '\0';
@@ -3976,8 +3977,6 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 
 			while ((j = room_info[room].section[i++]) != -1)
 			{
-				char *last_buf = NULL;
-
 				/* Must understand language? */
 				if (d_info[j].flags & (ROOM_LANGUAGE))
 				{
@@ -3985,7 +3984,6 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 					if ((last_buf) && (cave_ecology.ready) && (cave_ecology.num_races)
 						&& player_understands(monster_language(cave_ecology.race[0])))
 					{
-
 						/* Get the textual history */
 						strcat(last_buf, (d_text + d_info[j].text));
 					}

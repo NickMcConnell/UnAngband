@@ -1148,6 +1148,8 @@ static bool do_cmd_open_aux(int y, int x)
 	{
 		/* Stuck */
 		find_secret(y,x);
+
+		return (FALSE);
 	}
 
 	/* Locked door */
@@ -1363,6 +1365,8 @@ static bool do_cmd_close_aux(int y, int x)
 	{
 		/* Stuck */
 		find_secret(y,x);
+
+		return (FALSE);
 	}
 
 	/* Close door */
@@ -1538,6 +1542,8 @@ static bool do_cmd_tunnel_aux(int y, int x)
 	{
 		/* Stuck */
 		find_secret(y,x);
+
+		return (FALSE);
 	}
 
 	/* Dig or tunnel */
@@ -1961,15 +1967,15 @@ static bool do_cmd_bash_aux(int y, int x, bool charging)
 
 		/* Update the visuals */
 		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-
 	}
-
 
 	/* Permanent doors */
 	else if (f_info[cave_feat[y][x]].flags1 & (FF1_PERMANENT))
 	{
 		/* Stuck */
 		find_secret(y,x);
+
+		return (FALSE);
 	}
 
 	/* Hack -- Bash power based on strength */
@@ -2437,6 +2443,8 @@ void do_cmd_set_trap_or_spike(void)
 		{
 			/* Stuck */
 			find_secret(y,x);
+
+			return;
 		}
 
 		/* Spike the door */

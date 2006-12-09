@@ -3490,8 +3490,11 @@ bool tell_allies_mflag(int y, int x, u32b flag, cptr saying)
  */
 bool tell_allies_death(int y, int x, cptr saying)
 {
-	int i, language, d;
+	int i, j, language, d;
 	bool vocal = FALSE;
+
+	int count = 0;
+	int choice = 0;
 
 	language = monster_language(m_list[cave_m_idx[y][x]].r_idx);
 
@@ -3521,40 +3524,55 @@ bool tell_allies_death(int y, int x, cptr saying)
 
 		/* Activate all other monsters and communicate to them */
 		n_ptr->mflag |= (MFLAG_ACTV);
-		vocal = TRUE;
+
+		/* Rescan all other monsters */
+		for (j = 1; j < z_info->m_max; j++)
+		{
+			/* Access the monster */
+			monster_type *n2_ptr = &m_list[j];
+
+			/* Ignore dead monsters */
+			if (!n2_ptr->r_idx) continue;
+
+			/* Ignore itself */
+			if (j == cave_m_idx[n_ptr->fy][n_ptr->fx]) continue;
+
+			/* Ignore monsters who speak different language */
+			if (monster_language(n2_ptr->r_idx) != language) continue;
+
+			/* Get distance */
+			d = distance(n_ptr->fy, n_ptr->fx, n2_ptr->fy, n2_ptr->fx);
+
+			/* Ignore monsters that are too far away */
+			if (d > MAX_SIGHT) continue;
+
+			/* Ignore monsters that are not nearby or projectable */
+			if ((d > 3) && !generic_los(n_ptr->fy, n_ptr->fx, n2_ptr->fy, n2_ptr->fx, CAVE_XLOF)) continue;
+
+			/* Wake and activate all other monsters and communicate to them */
+			n2_ptr->csleep = 0;
+			n2_ptr->mflag |= (MFLAG_ACTV);
+
+			/* Spoken */
+			vocal = TRUE;
+		}
+
+		/* Nothing to say */
+		if (!vocal) continue;
+
+		/* Pick one */
+		if (!rand_int(++count)) choice = i;
+
+		/* Clear vocal */
+		vocal = FALSE;
 	}
 
 	/* Nothing to say? */
-	if (!vocal) return (FALSE);
+	if (!choice) return (FALSE);
 
-	/* Rescan all other monsters */
-	for (i = 1; i < z_info->m_max; i++)
-	{
-		/* Access the monster */
-		monster_type *n_ptr = &m_list[i];
-
-		/* Ignore dead monsters */
-		if (!n_ptr->r_idx) continue;
-
-		/* Ignore itself */
-		if (i == cave_m_idx[y][x]) continue;
-
-		/* Ignore monsters who speak different language */
-		if (monster_language(n_ptr->r_idx) != language) continue;
-
-		/* Get distance */
-		d = distance(y, x, n_ptr->fy, n_ptr->fx);
-
-		/* Ignore monsters that are too far away */
-		if (d > MAX_SIGHT) continue;
-
-		/* Ignore monsters that are not nearby or projectable */
-		if ((d > 3) && !generic_los(y, x, n_ptr->fy, n_ptr->fx, CAVE_XLOF)) continue;
-
-		/* Wake and activate all other monsters and communicate to them */
-		n_ptr->csleep = 0;
-		n_ptr->mflag |= (MFLAG_ACTV);
-	}
+	/* Get speaker details */
+	y = m_list[choice].fy;
+	x = m_list[choice].fx;
 
 	/* Speak */
 	monster_speech(cave_m_idx[y][x], saying, FALSE);

@@ -1526,8 +1526,8 @@ void hit_trap(int y, int x)
 		f_ptr = &f_info[f_ptr->mimic];
 	}
 
-	/* Hack -- fall onto trap */
-	if ((p_ptr->py != y) || (p_ptr->px !=x))
+	/* Hack -- fall onto trap if we can move */
+	if ((f_ptr->flags1 & (FF1_MOVE)) && ((p_ptr->py != y) || (p_ptr->px !=x)))
 	{
 		/* Move player */
 		monster_swap(p_ptr->py, p_ptr->px, y, x);

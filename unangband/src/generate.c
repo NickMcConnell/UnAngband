@@ -1647,8 +1647,8 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 				/* Leave inner area open */
 				if ((flag & (RG1_INNER)) != 0)
 				{
-					if (((dy > 0) ? (y > y1) && (y < y2) : (y > y2) && (y < y1)) &&
-						((dx > 0) ? (x > x1) && (x < x2) : (x > x2) && (x < x1))) continue; 
+					if (((dy > 0) ? (y > y1) && (y + dy <= y2) : (y + dy >= y2) && (y < y1)) &&
+						((dx > 0) ? (x > x1) && (x + dx <= x2) : (x + dx >= x2) && (x < x1))) continue; 
 				}
 
 				/* Random */
@@ -1892,7 +1892,7 @@ static bool room_info_kind(int k_idx)
 /*
  * Hack -- mimic'ed feature for "room_info_feat()"
  */
-static byte room_info_feat_mimic;
+static s16b room_info_feat_mimic;
 
 /*
  *

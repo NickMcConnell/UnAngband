@@ -3317,7 +3317,7 @@ B:
 D:A chess set 
 R:WARRIOR
 S:SEEN
-K:11:3:3
+K:11:4:4
 P:CHECKER
 F:439
 
@@ -4305,19 +4305,19 @@ B:
 D:glorious in battle against 
 S:SEEN
 
-N:131:133:0:0:5:1:0
+N:131:132:0:0:5:1:0
 A:
 B:
 D:in a pyrrhic victory against 
 S:SEEN
 
-N:131:133:0:0:5:1:0
+N:131:132:0:0:5:1:0
 A:
 B:
 D:fighting to the last against 
 S:SEEN
 
-N:131:133:0:0:5:1:0
+N:131:132:0:0:5:1:0
 A:
 B:
 D:under the grip of tyranny of 
@@ -4329,7 +4329,7 @@ B:
 D:being enslaved by 
 S:SEEN
 
-N:131:133:0:0:5:1:0
+N:131:132:0:0:5:1:0
 A:
 B:
 D:fleeing from  
@@ -4700,25 +4700,25 @@ P:OUTER | RANDOM | PLACE
 N:138:107:0:0:5:5:0
 A:
 B:
-F:748
+F:740
 P:OUTER | PLACE
 
 N:138:107:0:0:5:5:0
 A:
 B:
-F:748
+F:740
 P:OUTER | ROWS | COLS | PLACE
 
 N:138:107:0:0:5:5:0
 A:
 B:
-F:748
+F:740
 P:OUTER | CHECKER | PLACE
 
 N:138:107:0:0:5:5:0
 A:
 B:
-F:748
+F:740
 P:OUTER | RANDOM | PLACE
 
 # Place stores around.
