@@ -2139,7 +2139,7 @@ static void get_room_info(int y0, int x0)
 			if ((place_flag & (RG1_PLACE)) == 0) continue;
 
 			/* Pick features if needed */
-			if (place_feat)
+			if ((place_feat) && (f_info[place_feat].mimic == place_feat))
 			{
 				/* Set feature hook */
 				room_info_feat_mimic = place_feat;
@@ -2148,6 +2148,14 @@ static void get_room_info(int y0, int x0)
 
 				/* Prepare allocation table */
 				get_feat_num_prep();
+
+				/* Get a feature */
+				place_feat = get_feat_num(object_level);
+
+				/* Clear the hook */
+				get_feat_num_hook = NULL;
+
+				get_feat_num_prep();				
 			}
 
 			/* Pick objects if needed */
@@ -2264,17 +2272,6 @@ static void get_room_info(int y0, int x0)
 				}
 			}
 
-			/* Clear feature hook */
-			if (place_feat)
-			{
-				get_feat_num_hook = NULL;
-
-				/* Prepare allocation table */
-				get_feat_num_prep();
-
-				place_feat = 0;
-			}
-
 			/* Clear object hook */
 			if (place_tval < 100)
 			{
@@ -2288,6 +2285,7 @@ static void get_room_info(int y0, int x0)
 
 			/* Clear placement details */
 			place_flag &= (RG1_PLACE_FLAGS);
+			place_feat = 0;
 		}
 
 		/* Report errors */

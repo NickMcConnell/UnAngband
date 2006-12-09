@@ -787,10 +787,21 @@ void do_cmd_study(void)
 		return;
 	}
 
+	/* Cannot learn more spells */
 	if (!(p_ptr->new_spells))
 	{
-		msg_format("You cannot learn anything new!");
+		msg_format("You cannot learn anything more yet.");
 		return;
+	}
+
+	/* Message if needed */
+	else
+	{
+		/* Hack */
+		p_ptr->old_spells = 0;
+
+		/* Message */
+		calc_spells();
 	}
 
 	/* Restrict choices to "useful" books */
@@ -1036,15 +1047,6 @@ void do_cmd_study(void)
 
 	/* One less spell available */
 	p_ptr->new_spells--;
-
-	/* Message if needed */
-	if (p_ptr->new_spells)
-	{
-		/* Message */
-		msg_format("You can learn %d more %s%s.",
-		   p_ptr->new_spells, p,
-		   (p_ptr->new_spells != 1) ? "s" : "");
-	}
 
 	/* Save the new_spells value */
 	p_ptr->old_spells = p_ptr->new_spells;

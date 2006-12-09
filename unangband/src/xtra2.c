@@ -3344,7 +3344,7 @@ void monster_death(int m_idx)
 	if ((r_ptr->flags1 & (RF1_GUARDIAN)) && (p_ptr->depth != min_depth(p_ptr->dungeon)))
 	{
 		/* Stagger around */
-		while (!cave_valid_bold(y, x))
+		while (!cave_valid_bold(y, x) && !cave_clean_bold(y,x))
 		{
 			int d = 1;
 

@@ -4344,9 +4344,8 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 		p_ptr->command_see = FALSE;
 	}
 
-
 	/* Forget the item restrictions if not picking a bag */
-	if (!(item) || ((*cp > 0) && (inventory[*cp].tval != TV_BAG))
+	if (!(item) || ((*cp >= 0) && (inventory[*cp].tval != TV_BAG))
 		|| ((*cp < 0) && (o_list[0 - *cp].tval != TV_BAG)))
 	{
 		/* Forget the item_tester_tval restriction */

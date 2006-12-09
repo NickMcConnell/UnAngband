@@ -84,6 +84,9 @@ to ensure that all rooms are correctly connected.
 Old score files are (currently) incompatible and should be renamed from scores.raw.  If
 there is sufficient demand I (may) add in code to load these old score files.
 
+- Display the number of spells you can learn before picking which book to study (suggested by
+pepebe).
+
 ### Bug fixes ###
 
 - Fixed bug where many monster flags were not written to the save file (Reported by
@@ -104,6 +107,18 @@ Matthias Rudolf).
 - Prevented stone wells from appearing at the bottom of dungeons (Reported by pepebe).
 
 - Test for evasion was reversed.
+
+- Potion of free action appears in correct bag now (Reported by pepebe).
+
+- Potion of cure moderate wounds now heals instead of poisons the player (Reported by
+several people).
+
+- Prevent quest stairs destroying items (Reported by pepebe).
+
+- Fixed bug that was restricting item selection incorrectly (Reported by numerous people,
+fix by RDE).
+
+- Salt water now cures poison again (Reported by Harriet Bazley).
 
 ### Build / Platform ###
 

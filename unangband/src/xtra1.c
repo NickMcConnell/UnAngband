@@ -1977,7 +1977,7 @@ static void fix_help(void)
  * In the new structure, all learned bits must be set contiguous
  * from bit 0 up.
  */
-static void calc_spells(void)
+void calc_spells(void)
 {
 	int i, ii, j, k, levels;
 	int num_allowed, num_known;

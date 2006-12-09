@@ -948,6 +948,7 @@ extern void get_grid_using_angle(int angle, int y0, int x0,
 
 /* xtra1.c */
 extern void cnv_stat(int val, char *out_val);
+extern void calc_spells(void);
 extern s16b modify_stat_value(int value, int amount);
 #ifdef USE_CLASS_PRETTY_NAMES
 extern void lookup_prettyname(char name[60], int class, int style, int sval, bool long_name, bool short_name);
