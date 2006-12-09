@@ -9888,7 +9888,7 @@ F:POWER_5
 N:728:marked granite wall
 U:56
 W:1:1:10:0
-G:*:w
+G:*:v
 K:DEFAULT:1
 K:CHASM:141
 K:TREE:56
@@ -9901,7 +9901,7 @@ D:You find nothing interesting.
 N:729:marked granite wall
 U:56
 W:1:1:10:0
-G:*:w
+G:*:v
 M:728
 K:DEFAULT:1
 K:CHASM:141
@@ -10188,7 +10188,7 @@ D:You find something! Its not pleasant...
 N:748:stores
 U:56
 W:1:1:10:0
-G:*:v
+G:*:w
 K:DEFAULT:1
 K:CHASM:141
 K:TREE:56
@@ -10202,7 +10202,7 @@ D:You find nothing interesting.
 
 N:749:stores
 W:1:1:10:0
-G:*:v
+G:*:w
 M:748
 K:DEFAULT:1
 K:CHASM:141
@@ -10874,6 +10874,7 @@ D:You find nothing interesting.
 N:808:stone furnishings
 G:0:s
 W:30:1:20:0
+M:807
 K:DEFAULT:1
 K:CHASM:141
 F:TUNNEL | CAN_PASS | CAN_OOZE | EASY_CLIMB
@@ -10904,6 +10905,7 @@ D:You find nothing.
 N:811:wooden furniture
 G:0:U
 W:24:10:15:0
+M:810
 K:DEFAULT:771
 K:HURT_FIRE:502
 K:CHASM:445

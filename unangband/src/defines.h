@@ -352,7 +352,7 @@
 /*
  * Maximum amount of sections in room description.
  */
-#define ROOM_DESC_SECTIONS 15
+#define ROOM_DESC_SECTIONS 30
 
 /*
  * Dungeon room types 
@@ -2768,7 +2768,7 @@
 #define RG1_CHECKER	0x00000100L	/* Place as checkered */
 #define RG1_SCATTER	0x00000200L	/* Place as scattered */
 #define RG1_OUTER	0x00000400L	/* Place as outer wall */
-#define RG1_RAND_80	0x00000800L	/* Place 80% of the time */
+#define RG1_RANDOM	0x00000800L	/* Place 60% of the time */
 #define RG1_BATTLE	0x00001000L	/* Place as battle */
 #define RG1_VAULT	0x00002000L	/* Vault level */
 #define RG1_DUNGEON	0x00004000L	/* Dungeon level */

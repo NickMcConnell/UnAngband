@@ -1585,6 +1585,9 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 
 	int y_alloc = 0, x_alloc = 0, choice;
 
+	int offset = rand_int(100) < 50 ? 1 : 0;
+	int max_offset = offset + 1;
+
 	/* Paranoia */
 	if (!dy || !dx) return;
 
@@ -1600,13 +1603,21 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 			for (x = x1; (dx > 0) ? x <= x2 : x >= x2; x += dx)
 			{
 				/* Checkered room */
-				if (((flag & (RG1_CHECKER)) != 0) && ((x + y) % 2)) continue;
+				if (((flag & (RG1_CHECKER)) != 0) && ((x + y + offset) % 2)) continue;
 
 				/* Only place on outer wall */
 				if (((flag & (RG1_OUTER)) != 0) && (cave_feat[y][x] != FEAT_WALL_OUTER)) continue;
 
 				/* Only place on floor otherwise */
-				if (((flag & (RG1_OUTER)) == 0) && (cave_feat[y][x] != FEAT_FLOOR)) continue;
+				if (((flag & (RG1_OUTER)) == 0) && (cave_feat[y][x] != FEAT_FLOOR))
+				{
+					if (((flag & (RG1_CHECKER)) != 0) && (offset < max_offset)) offset++;
+
+					continue;
+				}
+
+				/* Clear max_offset */
+				max_offset = 0;
 
 				/* Only place on edge of room */
 				if (((flag & (RG1_EDGE)) != 0) && (cave_feat[y][x] != FEAT_WALL_OUTER))
@@ -1641,7 +1652,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 				}
 
 				/* Random */
-				if (((flag & (RG1_RAND_80)) != 0) && (rand_int(100) < 20)) continue;
+				if (((flag & (RG1_RANDOM)) != 0) && (rand_int(100) < 40)) continue;
 
 				/* Only place next to last choice */
 				if ((flag & (RG1_TRAIL)) != 0)
@@ -1670,7 +1681,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 				else
 				{
 					/* Hack -- in case we don't place enough */
-					if ((flag & (RG1_RAND_80)) != 0)
+					if ((flag & (RG1_RANDOM)) != 0)
 					{
 						if (rand_int(++choice) == 0)
 						{
@@ -1701,9 +1712,9 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 		}
 
 		/* Hack -- if we don't have enough the first time, scatter instead */
-		if (((flag & (RG1_RAND_80)) != 0) && (choice < NUM_SCATTER))
+		if (((flag & (RG1_RANDOM)) != 0) && (choice < NUM_SCATTER))
 		{
-			flag &= ~(RG1_RAND_80);
+			flag &= ~(RG1_RANDOM);
 			flag |= (RG1_SCATTER);
 
 			/* Paranoia */
@@ -1983,9 +1994,9 @@ static void get_room_info(int y0, int x0)
 	while (chart && (j < ROOM_DESC_SECTIONS - 1))
 	{
 		/* Start over */
-		i = -1;
+		i = 0;
 		count = 0;
-		pick = 0;
+		pick = -1;
 
 		/* Get the start of entries in the table for this index */
 		while ((chart != d_info[i].chart) && (counter < 5000)) { i++; counter++;}
@@ -2180,6 +2191,10 @@ static void get_room_info(int y0, int x0)
 					int x2c = MIN(x2a, x2b) - 1;
 					u32b place_flag_temp = place_flag;
 
+					/* Ensure some space */
+					if (y1c >= y2c) { y1c = y2c - 1; y2c = y1c + 3;}
+					if (x1c >= x2c) { x1c = x2c - 1; x2c = x1c + 3;}
+
 					/* Hack -- 'outer' and 'edge' walls do not exist in centre of room */
 					if ((place_flag_temp & (RG1_OUTER | RG1_EDGE)) != 0)
 					{
@@ -2198,6 +2213,9 @@ static void get_room_info(int y0, int x0)
 					int x1w = MIN(x1a, x1b) + outer;
 					int x2w = (x1a == x1b ? x1a + 1 : MAX(x1a, x1b) - 1);
 
+					/* Ensure some space */
+					if (x2w <= x2w) x2w = x1w + 1;
+
 					generate_patt(y1w, x1w, y2w, x2w, place_feat, place_flag, dy, dx);
 				}
 
@@ -2208,6 +2226,9 @@ static void get_room_info(int y0, int x0)
 					int y2e = (x2a > x2b ? y2a : (x1a == x1b ? MAX(y2a, y2b): y2b));
 					int x1e = (x2a == x2b ? x2a - 1 : MIN(x2a, x2b) + 1);
 					int x2e = MAX(x2a, x2b) - outer;
+
+					/* Ensure some space */
+					if (x1e >= x2e) x1e = x2e - 1;
 
 					/* Draw from east to west */
 					generate_patt(y1e, x2e, y2e, x1e, place_feat, place_flag, dy, -dx);
@@ -2221,6 +2242,9 @@ static void get_room_info(int y0, int x0)
 					int x1n = (y1a < y1b ? x1a : (y1a == y1b ? MIN(x1a, x1b): y1b));
 					int x2n = (y1a < y1b ? x2a : (y1a == y1b ? MAX(x2a, x2b): x2b));
 
+					/* Ensure some space */
+					if (y2n <= y1n) y2n = y1n + 1;
+
 					generate_patt(y1n, x1n, y2n, x2n, place_feat, place_flag, dy, dx);
 				}
 
@@ -2231,6 +2255,9 @@ static void get_room_info(int y0, int x0)
 					int y2s = MAX(y2a, y2b) - outer;
 					int x1s = (y2a > y2b ? x1a : (y2a == y2b ? MIN(x1a, x1b): x1b));
 					int x2s = (y2a > y2b ? x2a : (y2a == y2b ? MAX(x2a, x2b): x2b));
+
+					/* Ensure some space */
+					if (y1s >= y2s) y1s = y2s - 1;
 
 					/* Draw from south to north */
 					generate_patt(y2s, x1s, y1s, x2s, place_feat, place_flag, -dy, dx);
@@ -2261,6 +2288,13 @@ static void get_room_info(int y0, int x0)
 
 			/* Clear placement details */
 			place_flag &= (RG1_PLACE_FLAGS);
+		}
+
+		/* Report errors */
+		if (pick < 0)
+		{
+			msg_format("Error: unable to pick from chart entry %d with %d valid choices", chart, count);
+			chart = 0;
 		}
 	}
 

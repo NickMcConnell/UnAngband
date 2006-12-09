@@ -133,19 +133,68 @@ D:the south wall.
 S:SEEN
 P:SOUTH | PLACE | EDGE
 
+N:102:107:0:0:10:10:0
+A:
+B:
+D:the north and east walls.  
+S:SEEN
+P:EDGE | NORTH | EAST | PLACE
+
+N:102:107:0:0:10:10:0
+A:
+B:
+D:the south and east walls.  
+S:SEEN
+P:EDGE | SOUTH | EAST | PLACE
+
+N:102:107:0:0:10:10:0
+A:
+B:
+D:the south and west walls.  
+S:SEEN
+P:EDGE | SOUTH | WEST | PLACE
+
+N:102:107:0:0:10:10:0
+A:
+B:
+D:the north and west walls.  
+S:SEEN
+P:EDGE | NORTH | WEST | PLACE
+
+N:102:107:0:0:10:10:0
+A:
+B:
+D:the walls.  
+S:SEEN
+P:EDGE | NORTH | SOUTH | WEST | PLACE
+
+N:102:107:0:0:10:10:0
+A:
+B:
+D:the walls.  
+S:SEEN
+P:EDGE | NORTH | SOUTH | EAST | PLACE
+
+N:102:107:0:0:10:10:0
+A:
+B:
+D:the walls.  
+S:SEEN
+P:EDGE | SOUTH | WEST | EAST | PLACE
+
+N:102:107:0:0:10:10:0
+A:
+B:
+D:the walls.  
+S:SEEN
+P:EDGE | NORTH | EAST | WEST | PLACE
+
 N:102:107:0:0:5:5:0
 A:
 B:
-D:the walls and ceiling.  
+D:the walls.  
 S:SEEN
 P:EDGE | NORTH | SOUTH | EAST | WEST | PLACE
-
-N:102:107:0:0:1:1:0
-A:
-B:
-D:every available surface.  
-S:SEEN
-P:NORTH | SOUTH | EAST | WEST | CENTRE | PLACE
 
 N:102:103:0:0:2:2:0
 A:
@@ -1036,11 +1085,29 @@ D:in the centre of the room is
 S:SEEN
 P:CENTRE | PLACE
 
-N:106:107:0:0:15:3:0
+N:106:107:0:0:10:3:0
 A:
 B:
 D:covered with food and drink.  
 K:80:30:99
+S:SEEN
+R:DROP_FOOD
+P:PLACE | SCATTER
+
+N:106:107:0:0:5:1:0
+A:
+B:
+D:covered with food.  
+K:80:30:40
+S:SEEN
+R:DROP_FOOD
+P:PLACE | SCATTER
+
+N:106:107:0:0:5:1:0
+A:
+B:
+D:covered with drink.  
+K:80:40:99
 S:SEEN
 R:DROP_FOOD
 P:PLACE | SCATTER
@@ -1140,7 +1207,7 @@ B:
 D:covered with broken wood.  
 F:312
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:7:3:0
 A:
@@ -1157,7 +1224,7 @@ D:covered with vines.
 F:456
 L:LIVING
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:7:1:15
 A:checkered
@@ -1211,7 +1278,7 @@ D:slick with moisture.
 F:307
 L:WATER
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:14:2:0
 A:water-filled
@@ -1220,7 +1287,7 @@ D:flooded with stagnant water.
 F:310
 L:WATER
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:21:0:18
 A:water-filled
@@ -1229,7 +1296,7 @@ D:flooded with water.
 F:153
 L:WATER
 S:SEEN
-P:PLACE | RAND_80 | MIMIC
+P:PLACE | RANDOM | MIMIC
 
 N:106:107:0:0:14:0:27
 A:water-filled
@@ -1238,7 +1305,7 @@ D:flooded with deep water.
 F:155
 L:WATER
 S:SEEN
-P:PLACE | RAND_80 | MIMIC
+P:PLACE | RANDOM | MIMIC
 
 N:106:107:0:0:14:0:27
 A:water-filled
@@ -1247,7 +1314,7 @@ D:flooded with clear water.
 F:311
 L:WATER
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:7:0:60
 A:submerged
@@ -1256,7 +1323,7 @@ D:submerged under water.
 F:121
 L:WATER
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:7:1:10
 A:salty
@@ -1265,7 +1332,7 @@ D:covered in salt.
 F:559
 S:SEEN
 R:CAN_DIG
-P:PLACE | RAND_80 | MIMIC
+P:PLACE | RANDOM | MIMIC
 
 N:106:107:0:0:14:5:10
 A:rubble-strewn
@@ -1274,7 +1341,7 @@ D:surrounded by fallen rubble.
 F:49
 S:SEEN
 R:CAN_DIG
-P:PLACE | RAND_80 | MIMIC
+P:PLACE | RANDOM | MIMIC
 
 N:106:107:0:0:14:0:10
 A:ice-strewn
@@ -1283,7 +1350,7 @@ D:surrounded by fallen ice.
 F:464
 L:ICE
 S:SEEN
-P:PLACE | RAND_80 | MIMIC
+P:PLACE | RANDOM | MIMIC
 
 N:106:107:0:0:14:0:51
 A:acidic
@@ -1292,7 +1359,7 @@ D:surrounded by acid.
 F:157
 L:ACID
 S:SEEN
-P:PLACE | RAND_80 | MIMIC
+P:PLACE | RANDOM | MIMIC
 
 N:106:107:0:0:7:0:51
 A:acidic
@@ -1301,7 +1368,7 @@ D:surrounded by deep acid.
 F:155
 L:ACID
 S:SEEN
-P:PLACE | RAND_80 | MIMIC
+P:PLACE | RANDOM | MIMIC
 
 N:106:107:0:0:7:0:81
 A:boiling
@@ -1310,7 +1377,7 @@ D:surrounded by boiling water.
 F:208
 L:ACID
 S:SEEN
-P:PLACE | RAND_80 | MIMIC
+P:PLACE | RANDOM | MIMIC
 
 N:106:107:0:0:7:1:41
 A:
@@ -1328,7 +1395,7 @@ D:surrounded by falling water.
 F:126
 L:WATER
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:7:0:79
 A:acidic
@@ -1337,7 +1404,7 @@ D:surrounded by streams of deadly acid.
 F:127
 L:ACID
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:7:0:82
 A:boiling
@@ -1346,7 +1413,7 @@ D:surrounded by streams of boiling water.
 F:160
 L:WATER | LAVA
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:7:0:91
 A:lava
@@ -1355,7 +1422,7 @@ D:surrounded by flows of glowing hot lava.
 F:161
 L:LAVA
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:14:0:84
 A:lava
@@ -1364,7 +1431,7 @@ D:surrounded by glowing hot lava.
 F:216
 L:LAVA
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:7:0:87
 A:lava
@@ -1373,7 +1440,7 @@ D:surrounded by deep glowing hot lava.
 F:217
 L:LAVA
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:14:0:60
 A:burning
@@ -1391,7 +1458,7 @@ D:surrounded by burning coal dust.
 F:185
 L:OIL
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:7:0:65
 A:burning
@@ -1418,7 +1485,7 @@ D:surrounded by a storm cloud.
 F:228
 R:MAGE
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:14:0:51
 A:fuel
@@ -1436,7 +1503,7 @@ D:submerged in oil.
 F:225
 L:OIL
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:7:0:70
 A:
@@ -1579,7 +1646,7 @@ D:covered with coal dust.
 F:221
 L:OIL
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:15:1:5
 A:
@@ -1588,7 +1655,7 @@ D:slick with oil.
 F:219
 L:OIL
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:15:1:72
 A:
@@ -1597,14 +1664,14 @@ D:covered with volcanic ash.
 F:209
 L:LAVA
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:15:1:51
 A:
 B:
 D:covered with sulpher deposits.  
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:7:2:8
 A:sandy
@@ -1613,7 +1680,7 @@ D:covered with sand.
 F:192
 S:SEEN
 R:CAN_DIG
-P:PLACE | RAND_80 | MIMIC
+P:PLACE | RANDOM | MIMIC
 
 N:106:107:0:0:3:0:20
 A:sandy
@@ -1623,7 +1690,7 @@ F:197
 S:SEEN
 L:WATER
 R:CAN_DIG
-P:PLACE | RAND_80 | MIMIC
+P:PLACE | RANDOM | MIMIC
 
 N:106:107:0:0:15:2:75
 A:
@@ -1650,7 +1717,7 @@ D:covered in ice.
 F:145
 L:ICE
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:15:0:30
 A:
@@ -1685,7 +1752,7 @@ D:caked with dirt.
 F:135
 S:SEEN
 R:CAN_DIG
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:5:1:3
 A:muddy
@@ -1704,7 +1771,7 @@ F:199
 R:OOZE
 L:WATER
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:10:1:54
 A:muddy
@@ -1714,7 +1781,7 @@ F:201
 R:OOZE
 L:WATER
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:10:1:60
 A:boiling
@@ -1723,7 +1790,7 @@ D:surrounded by boiling mud.
 F:201
 L:WATER | LAVA
 S:SEEN
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:5:1:0
 A:rubble-filled
@@ -1732,7 +1799,7 @@ D:covered in rubble.
 F:96
 S:SEEN
 R:KILL_WALL
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:5:1:1
 A:dirt-filled
@@ -1741,7 +1808,7 @@ D:covered with piles of sand.
 F:525
 S:SEEN
 R:CAN_DIG
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:5:1:1
 A:dirt-filled
@@ -1750,7 +1817,7 @@ D:covered with piles of dirt.
 F:527
 S:SEEN
 R:CAN_DIG
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:15:1:3
 A:
@@ -1775,7 +1842,7 @@ D:planted with bushes.
 F:435
 S:SEEN
 L:LIVING
-P:PLACE | RAND_80 | MIMIC
+P:PLACE | RANDOM | MIMIC
 
 N:106:107:0:0:7:1:30
 A:
@@ -1784,7 +1851,7 @@ D:planted with thorns.
 F:448
 S:SEEN
 L:LIVING
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:107:0:0:7:1:40
 A:
@@ -1793,7 +1860,7 @@ D:planted with brambles.
 F:440
 S:SEEN
 L:LIVING
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:106:124:0:0:4:1:0
 A:
@@ -2006,14 +2073,6 @@ S:SEEN
 R:DWARF
 P:PLACE | SCATTER
 
-# Generally notice quality of the air on these levels
-N:107:108:0:0:180:80:0
-A:
-B:
-D:The air here is 
-P:NORTH | SOUTH | EAST | WEST | CENTRE
-L:LAVA | ACID | WATER | ICE
-
 N:107:109:0:0:20:1:25
 A:magic
 B:
@@ -2027,6 +2086,14 @@ A:
 B:
 D:
 L:LAVA | ICE
+
+# Generally notice quality of the air on these levels
+N:107:108:0:0:180:80:0
+A:
+B:
+D:The air here is 
+P:NORTH | SOUTH | EAST | WEST | CENTRE
+L:LAVA | ACID | WATER | ICE
 
 N:108:109:0:0:50:6:51
 A:humid
@@ -2091,7 +2158,7 @@ A:steamy
 B:
 D:filled with steam.  
 F:209
-P:PLACE | RAND_80
+P:PLACE | RANDOM
 
 N:108:109:0:0:15:0:60
 A:steamy
@@ -2306,13 +2373,13 @@ N:111:115:0:0:20:20:0
 A:
 B:
 
-N:112:133:0:0:15:1:15
+N:112:133:107:115:15:1:15
 A:
 B:
 D:a distant voice cry out 
 R:INVISIBLE
 
-N:112:133:0:0:150:1:15
+N:112:133:107:115:150:1:15
 A:
 B:
 D:a voice echoes nearby  
@@ -2881,15 +2948,15 @@ P:OUTER
 N:117:121:0:0:6:3:3
 A:cracked
 B:
-D:Cracks cover
+D:Cracks cover 
 F:113
 S:SEEN
-P:OUTER | RAND_80 | MIMIC
+P:OUTER | RANDOM | MIMIC
 
 N:117:121:0:0:6:3:1
 A:earth
 B:
-D:Earth covers
+D:Earth covers 
 F:114
 S:SEEN
 P:OUTER
@@ -2900,7 +2967,7 @@ B:
 D:Broken ice covers 
 F:115
 S:SEEN
-P:OUTER | RAND_80
+P:OUTER | RANDOM
 
 N:117:121:0:0:6:1:30
 A:oil-filled
@@ -2909,7 +2976,7 @@ D:Oil coats
 F:112
 L:OIL
 S:SEEN
-P:OUTER | RAND_80
+P:OUTER | RANDOM
 
 N:117:121:0:0:6:1:30
 A:coal
@@ -2918,9 +2985,9 @@ D:Seams of coal cover
 F:112
 L:OIL
 S:SEEN
-P:OUTER | RAND_80
+P:OUTER | RANDOM
 
-N:117:121:0:0:10:3:1
+N:117:121:107:137:10:3:1
 A:
 B:library
 D:Crowded bookshelves line 
@@ -2929,7 +2996,7 @@ S:SEEN
 R:DROP_WRITING
 P:SCATTER
 
-N:117:121:0:0:15:2:4
+N:117:121:107:137:15:2:4
 A:
 B:library
 D:Crowded bookshelves line 
@@ -2938,7 +3005,7 @@ R:MAGE
 S:SEEN
 P:SCATTER
 
-N:117:121:0:0:15:2:4
+N:117:121:107:137:15:2:4
 A:
 B:library
 D:Crowded bookshelves line 
@@ -2947,7 +3014,7 @@ R:PRIEST
 S:SEEN
 P:SCATTER
 
-N:117:121:0:0:10:2:4
+N:117:121:107:137:10:2:4
 A:
 B:laboratory
 D:Laboratory equipment lines 
@@ -2956,7 +3023,7 @@ R:DROP_POTION
 S:SEEN
 P:SCATTER
 
-N:117:121:0:0:10:2:4
+N:117:121:107:137:10:2:4
 A:
 B:laboratory
 D:Laboratory equipment lines 
@@ -2965,7 +3032,7 @@ R:DROP_TOOL
 S:SEEN
 P:SCATTER
 
-N:117:121:0:0:10:2:4
+N:117:121:107:137:10:2:4
 A:
 B:laboratory
 D:Laboratory equipment lines 
@@ -2974,7 +3041,7 @@ G:E
 S:SEEN
 P:SCATTER
 
-N:117:121:0:0:10:2:4
+N:117:121:107:139:10:2:4
 A:
 B:supply room
 D:Rope lines 
@@ -2983,7 +3050,7 @@ R:DROP_TOOL
 S:SEEN
 P:SCATTER
 
-N:117:121:0:0:6:2:5
+N:117:121:107:139:6:2:5
 A:
 B:supply room
 D:Bags of shot line 
@@ -2992,7 +3059,7 @@ R:DROP_MISSILE
 S:SEEN
 P:SCATTER
 
-N:117:121:0:0:6:2:5
+N:117:121:107:139:6:2:5
 A:
 B:supply room
 D:Bundles of arrows line 
@@ -3001,7 +3068,7 @@ R:DROP_MISSILE
 S:SEEN
 P:SCATTER
 
-N:117:121:0:0:6:2:5
+N:117:121:107:139:6:2:5
 A:
 B:supply room
 D:Bundles of bolts line 
@@ -3010,7 +3077,7 @@ R:DROP_MISSILE
 S:SEEN
 P:SCATTER
 
-N:117:121:0:0:6:2:5
+N:117:121:107:138:6:2:5
 A:
 B:guardroom
 D:Missile weapons line 
@@ -3019,7 +3086,7 @@ R:DROP_WEAPON
 S:SEEN
 P:SCATTER
 
-N:117:121:0:0:6:2:5
+N:117:121:107:138:6:2:5
 A:
 B:guardroom
 D:Weapon racks line 
@@ -3028,7 +3095,7 @@ R:DROP_WEAPON
 S:SEEN
 P:SCATTER
 
-N:117:121:0:0:6:2:7
+N:117:121:107:138:6:2:7
 A:
 B:guardroom
 D:Weapon racks line 
@@ -3037,7 +3104,7 @@ R:DROP_WEAPON
 S:SEEN
 P:SCATTER
 
-N:117:121:0:0:6:2:4
+N:117:121:107:138:6:2:4
 A:
 B:guardroom
 D:Weapon racks line 
@@ -3046,7 +3113,7 @@ R:DROP_WEAPON
 S:SEEN
 P:SCATTER
 
-N:117:121:0:0:15:2:4
+N:117:121:107:137:15:2:4
 A:
 B:music room
 D:Instruments line 
@@ -3055,7 +3122,7 @@ R:DROP_MUSIC
 S:SEEN
 P:SCATTER
 
-N:117:121:0:0:15:2:4
+N:117:121:107:137:15:2:4
 A:
 B:music room
 D:Music lines 
@@ -3127,7 +3194,7 @@ S:SEEN
 R:WARRIOR
 P:SCATTER
 
-N:117:121:0:0:10:3:5
+N:117:121:107:137:10:3:5
 A:
 B:closet
 D:Empty chests line 
@@ -3145,7 +3212,7 @@ S:SEEN
 R:WARRIOR
 P:SCATTER
 
-N:117:102:0:0:10:1:6
+N:117:102:107:140:10:1:6
 A:burnt
 B:
 D:Burn marks cover 
@@ -3154,7 +3221,7 @@ F:22
 S:SEEN
 P:SCATTER
 
-N:117:102:0:0:10:1:6
+N:117:102:107:140:10:1:6
 A:burnt
 B:
 D:Burn marks cover 
@@ -3163,7 +3230,7 @@ F:308
 S:SEEN
 P:SCATTER
 
-N:117:102:0:0:10:1:6
+N:117:102:107:140:10:1:6
 A:corroded
 B:
 D:Acid marks cover 
@@ -3172,7 +3239,7 @@ F:309
 S:SEEN
 P:SCATTER
 
-N:117:102:0:0:10:1:6
+N:117:102:107:140:10:1:6
 A:corroded
 B:
 D:Acid marks cover 
@@ -3190,7 +3257,7 @@ L:ICE
 S:SEEN
 P:SCATTER
 
-N:117:102:0:0:10:1:10
+N:117:102:107:140:10:1:10
 A:
 B:
 D:Burn marks cover 
@@ -3199,7 +3266,7 @@ F:308
 S:SEEN
 P:SCATTER
 
-N:117:102:0:0:10:1:11
+N:117:102:107:140:10:1:11
 A:
 B:
 D:Acid marks cover 
@@ -3235,7 +3302,7 @@ S:SEEN
 K:11:2:2
 P:ROWS | COLS
 
-N:117:102:107:126:6:3:5
+N:117:102:107:125:6:3:5
 A:
 B:
 D:Primitive wooden carvings line 
@@ -3295,21 +3362,30 @@ S:SEEN
 G:$
 P:SCATTER
 
-N:117:102:107:130:10:3:0
+N:117:102:107:125:10:3:0
 A:
 B:
 D:Wood panels cover 
 S:SEEN
 R:ELF
 
-N:117:121:0:0:15:3:0
+N:117:121:107:137:15:3:0
 A:
 B:kitchen
 D:Cupboards cover 
 K:80:30:99
 S:SEEN
 F:450
-R:SMART
+R:DROP_FOOD
+
+N:117:121:107:137:15:3:0
+A:
+B:bar
+D:Benches cover 
+K:80:40:99
+S:SEEN
+F:810
+R:DROP_FOOD
 
 N:117:113:0:0:3:1:0
 A:
@@ -3515,6 +3591,24 @@ R:NONLIVING
 N:117:121:0:0:10:3:0
 A:
 B:storeroom
+D:Stores line 
+S:SEEN
+P:OUTER
+R:SMART
+F:748
+
+N:117:121:0:0:10:3:0
+A:
+B:storeroom
+D:Ransacked stores line 
+S:SEEN
+P:OUTER
+R:STUPID
+F:750
+
+N:117:121:0:0:10:3:0
+A:
+B:storeroom
 D:Crowded shelves line 
 S:SEEN
 P:OUTER
@@ -3556,24 +3650,6 @@ S:SEEN
 P:OUTER
 R:NEED_LITE
 F:736
-
-N:117:121:0:0:10:3:0
-A:
-B:guardroom
-D:Weapon racks line 
-S:SEEN
-P:OUTER
-R:DROP_WEAPON
-F:740
-
-N:117:121:0:0:10:3:0
-A:
-B:guardroom
-D:Empty weapon racks line 
-S:SEEN
-P:OUTER
-R:NONLIVING
-F:763
 
 N:117:121:107:126:10:3:0
 A:vine-covered
@@ -3676,50 +3752,42 @@ P:OUTER
 R:HAS_SLIME
 F:756
 
-# Randomly place extra furniture around the room.
+# Randomly place extra stuff around the room.
 
-N:118:117:0:0:10:10:0
+N:118:136:0:0:15:5:0
+A:
+B:
+D:
+F:57
+R:UNDEAD
+
+N:118:136:0:0:15:5:0
+A:
+B:
+D:
+F:807
+R:NONLIVING
+
+N:118:136:0:0:15:5:0
+A:
+B:
+D:
+F:809
+R:NONLIVING
+
+N:118:136:0:0:15:5:0
 A:
 B:
 D:
 F:810
-P:CHECKER | CENTRE | PLACE
+R:SMART
 
-N:118:117:0:0:2:2:0
+N:118:136:0:0:15:5:0
 A:
 B:
 D:
-F:810
-P:ROWS | CENTRE | PLACE
-
-N:118:117:0:0:2:2:0
-A:
-B:
-D:
-F:810
-P:COLS | CENTRE | PLACE
-
-N:118:117:0:0:10:10:0
-A:
-B:
-D:
-F:810
-P:ROWS | COLS | CENTRE | PLACE
-
-N:118:117:0:0:5:5:0
-A:
-B:
-D:
-F:810
-P:INNER | CENTRE | PLACE
-
-N:118:117:0:0:5:5:0
-A:
-B:
-D:
-F:810
-P:SCATTER | CENTRE | PLACE
-
+F:812
+R:SMART
 
 # Randomly decide how to allocate feature. Then place extra furniture.
 
@@ -3868,16 +3936,8 @@ P:PLACE
 N:122:107:0:0:10:1:0
 A:landscaped
 B:
-D:landscaped into grassy tiers.  
+D:landscaped into grassy slopes.  
 F:530
-S:SEEN
-P:PLACE
-
-N:122:107:0:0:10:1:0
-A:landscaped
-B:
-D:landscaped into earth tiers.  
-F:533
 S:SEEN
 P:PLACE
 
@@ -4233,7 +4293,7 @@ B:
 D:toiling deep beneath the earth.  
 S:SEEN
 
-N:131:107:0:0:5:1:0
+N:131:132:0:0:5:1:0
 A:
 B:
 D:meeting 
@@ -4474,6 +4534,12 @@ S:LANGUAGE
 G:h
 R:INVISIBLE
 
+N:133:107:0:0:5:1:0
+A:
+B:
+D:'..f.. x... s.'  
+S:LANGUAGE
+
 N:134:135:0:0:5:1:0
 A:
 B:
@@ -4496,6 +4562,20 @@ N:134:135:0:0:5:1:0
 A:
 B:
 D:Someone has scratched 
+S:SEEN
+
+N:134:133:0:0:15:15:25
+A:
+B:
+D:Someone has scrawled in blood 
+F:305
+S:SEEN
+P:PLACE | SCATTER
+
+N:134:133:0:0:15:15:15
+A:
+B:
+D:Someone has obsessively repeated 
 S:SEEN
 
 N:135:107:0:0:5:1:0
@@ -4546,4 +4626,146 @@ A:
 B:
 D:'Made in NZ.'  
 S:SEEN
+
+N:136:117:0:0:10:10:0
+A:
+B:
+D:
+F:810
+P:CHECKER | CENTRE | PLACE
+
+N:136:117:0:0:2:2:0
+A:
+B:
+D:
+F:810
+P:ROWS | CENTRE | PLACE
+
+N:136:117:0:0:2:2:0
+A:
+B:
+D:
+F:810
+P:COLS | CENTRE | PLACE
+
+N:136:117:0:0:10:10:0
+A:
+B:
+D:
+F:810
+P:ROWS | COLS | CENTRE | PLACE
+
+N:136:117:0:0:5:5:0
+A:
+B:
+D:
+F:810
+P:INNER | CENTRE | PLACE
+
+N:136:117:0:0:5:5:0
+A:
+B:
+D:
+F:810
+P:SCATTER | CENTRE | PLACE
+
+# Place shelves around.
+
+N:137:107:0:0:5:5:0
+A:
+B:
+F:730
+P:OUTER | PLACE
+
+N:137:107:0:0:5:5:0
+A:
+B:
+F:730
+P:OUTER | ROWS | COLS | PLACE
+
+N:137:107:0:0:5:5:0
+A:
+B:
+F:730
+P:OUTER | CHECKER | PLACE
+
+N:137:107:0:0:5:5:0
+A:
+B:
+F:730
+P:OUTER | RANDOM | PLACE
+
+# Place weapon racks around.
+
+N:138:107:0:0:5:5:0
+A:
+B:
+F:748
+P:OUTER | PLACE
+
+N:138:107:0:0:5:5:0
+A:
+B:
+F:748
+P:OUTER | ROWS | COLS | PLACE
+
+N:138:107:0:0:5:5:0
+A:
+B:
+F:748
+P:OUTER | CHECKER | PLACE
+
+N:138:107:0:0:5:5:0
+A:
+B:
+F:748
+P:OUTER | RANDOM | PLACE
+
+# Place stores around.
+
+N:139:107:0:0:5:5:0
+A:
+B:
+F:748
+P:OUTER | PLACE
+
+N:139:107:0:0:5:5:0
+A:
+B:
+F:748
+P:OUTER | ROWS | COLS | PLACE
+
+N:139:107:0:0:5:5:0
+A:
+B:
+F:748
+P:OUTER | CHECKER | PLACE
+
+N:139:107:0:0:5:5:0
+A:
+B:
+F:748
+P:OUTER | RANDOM | PLACE
+
+# Place marked walls around.
+
+N:140:107:0:0:5:5:0
+A:
+B:
+F:729
+P:OUTER | PLACE | RANDOM
+
+N:140:107:0:0:5:5:0
+A:
+B:
+F:729
+P:OUTER | ROWS | COLS | PLACE | RANDOM
+
+N:140:107:0:0:5:5:0
+A:
+B:
+F:729
+P:OUTER | CHECKER | PLACE | RANDOM
+
+
 

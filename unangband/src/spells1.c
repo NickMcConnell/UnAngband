@@ -1821,10 +1821,6 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ACID);
 	}
 
-
-	/* No damage */
-	if (dam <= 0) return;
-
 	/* Resist the damage */
 	if ((p_ptr->cur_flags2 & (TR2_RES_ACID)) != 0)
 	{
@@ -1860,11 +1856,14 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 	/* Reduce the damage */
 	dam = (dam - res - 1) / res;
 
-	/* Take damage */
-	take_hit(dam, kb_str);
-
 	/* Inventory damage */
 	if ((inven) && (inv)) inven_damage(set_acid_destroy, inv);
+
+	/* No damage */
+	if (dam <= 0) return;
+
+	/* Take damage */
+	take_hit(dam, kb_str);
 }
 
 
@@ -1919,9 +1918,6 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ELEC);
 	}
 
-	/* No damage */
-	if (dam <= 0) return;
-
 	/* Resist the damage */
 	if ((p_ptr->cur_flags2 & (TR2_RES_ELEC)) != 0)
 	{
@@ -1954,11 +1950,14 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 	/* Reduce the damage */
 	dam = (dam - res - 1) / res;
 
-	/* Take damage */
-	take_hit(dam, kb_str);
-
 	/* Inventory damage */
 	if ((inven) && (inv)) inven_damage(set_elec_destroy, inv);
+
+	/* No damage */
+	if (dam <= 0) return;
+
+	/* Take damage */
+	take_hit(dam, kb_str);
 }
 
 
@@ -2015,9 +2014,6 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_FIRE);
 	}
 
-	/* No damage */
-	if (dam <= 0) return;
-
 	/* Resist the damage */
 	if ((p_ptr->cur_flags2 & (TR2_RES_FIRE)) != 0)
 	{
@@ -2049,11 +2045,14 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 	/* Reduce the damage */
 	dam = (dam - res - 1) / res;
 
-	/* Take damage */
-	take_hit(dam, kb_str);
-
 	/* Inventory damage */
 	if ((inven) && (inv)) inven_damage(set_fire_destroy, inv);
+
+	/* No damage */
+	if (dam <= 0) return;
+
+	/* Take damage */
+	take_hit(dam, kb_str);
 }
 
 
@@ -2108,9 +2107,6 @@ static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_COLD);
 	}
 
-	/* No damage */
-	if (dam <= 0) return;
-
 	/* Resist the damage */
 	if ((p_ptr->cur_flags2 & (TR2_RES_COLD)) != 0)
 	{
@@ -2142,11 +2138,14 @@ static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 	/* Reduce the damage */
 	dam = (dam - res - 1) / res;
 
-	/* Take damage */
-	take_hit(dam, kb_str);
-
 	/* Inventory damage */
 	if ((inven) && (inv)) inven_damage(set_cold_destroy, inv);
+
+	/* No damage */
+	if (dam <= 0) return;
+
+	/* Take damage */
+	take_hit(dam, kb_str);
 }
 
 /*
@@ -2200,10 +2199,6 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
 	}
 
-
-	/* No damage */
-	if (dam <= 0) return;
-
 	/* Resist the damage */
 	if ((p_ptr->cur_flags2 & (TR2_RES_POIS)) != 0)
 	{
@@ -2233,15 +2228,18 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 	/* Reduce the damage */
 	dam = (dam - res - 1) / res;
 
-	/* Take damage */
-	take_hit(dam, kb_str);
-
 	/* Increase poison counter */
 	if (!(p_ptr->oppose_pois) && !(p_ptr->cur_flags2 & (TR2_RES_POIS)))
 	{
 		/* Set poison counter */
-		(void)set_poisoned(p_ptr->poisoned + rand_int(dam) + 10);
+		(void)set_poisoned(p_ptr->poisoned + rand_int(dam + 1) + 10);
 	}
+
+	/* No damage */
+	if (dam <= 0) return;
+
+	/* Take damage */
+	take_hit(dam, kb_str);
 }
 
 
@@ -2308,14 +2306,17 @@ static void water_dam(int who, int dam, cptr kb_str, bool inven)
 		res += 3;
 	}
 
+	/* Inventory damage */
+	if (inven) inven_damage(set_water_destroy, inv);
+
+	/* No damage */
+	if (dam <= 0) return;
+
 	/* Reduce the damage */
 	dam = (dam - res - 1) / res;
 
 	/* Take damage */
 	take_hit(dam, kb_str);
-
-	/* Inventory damage */
-	if (inven) inven_damage(set_water_destroy, inv);
 }
 
 
@@ -11481,7 +11482,7 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 			 	monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
 
 				/* Check if monster evades */
-				if (mon_evade(cave_m_idx[y][x],((m_ptr->confused || m_ptr->stunned) ? 1 : 3) + gd[i], 5 + gd[i], "")) continue;
+				if (mon_evade(cave_m_idx[y][x],((m_ptr->confused || m_ptr->stunned) ? 1 : 3) + gd[i], 5 + gd[i], who < 0 ? " your magic" : "")) continue;
 			}
 
 			/* Affect the monster in the grid */

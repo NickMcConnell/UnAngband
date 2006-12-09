@@ -110,7 +110,7 @@ static cptr d_info_pflags[] =
 	"CHECKER",
 	"SCATTER",
 	"OUTER",
-	"RAND_80",
+	"RANDOM",
 	"BATTLE",
 	"VAULT",
 	"DUNGEON",
@@ -2170,7 +2170,7 @@ errr parse_d_info(char *buf, header *head)
 
 		/* Scan for the values */
 		if (7 != sscanf(buf, "N:%d:%d:%d:%d:%d:%d:%d",
-			    &prv, &nxt, &bon, &bra, &cha, &noc,  &min)) return (PARSE_ERROR_GENERIC);
+			    &prv, &nxt, &bon, &bra, &cha, &noc, &min)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		d_ptr->chart = prv;

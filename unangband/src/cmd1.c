@@ -2318,7 +2318,7 @@ void py_attack(int y, int x, bool charging)
 		}
 
 		/* Some monsters are great at dodging  -EZ- */
-		if (mon_evade(cave_m_idx[y][x], (m_ptr->stunned || m_ptr->confused) ? 50 : 80, 100, "your blow")) continue;
+		if (mon_evade(cave_m_idx[y][x], (m_ptr->stunned || m_ptr->confused) ? 50 : 80, 100, " your blow")) continue;
 
 		/* Calculate the "attack quality" */
 		if (o_ptr->k_idx) bonus = p_ptr->to_h + o_ptr->to_h + style_hit;

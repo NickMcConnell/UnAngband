@@ -5780,7 +5780,7 @@ bool mon_evade(int m_idx, int chance, int out_of, cptr r)
 		if (m_ptr->ml)
 		{
 			/* Message */
-			message_format(MSG_MISS, 0, "%^s %s %s!", m_name, p, r);
+			message_format(MSG_MISS, 0, "%^s %s%s!", m_name, p, r);
 
 			/* Note that monster is evasive */
 			l_ptr->flags9 |= (RF9_EVASIVE);

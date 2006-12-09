@@ -23,8 +23,6 @@ TODO: Have keys of various kinds.
 
 TODO: SILENCE monster spell prevents you casting.
 
-TODO: Implement monster spells the same way as player spells.
-
 TODO: Make mushrooms and other mimic monsters 'hide' in objects that they
 mimic.
 
@@ -37,10 +35,6 @@ TODO: 'Good' monsters don't summon evil. 'Evil' monsters don't summon good.
 TODO: Commands from menus.
 
 TODO: Free action, see invis, res blind etc. appear deeper in the dungeon then at present. 
-
-TODO: Create set items as per Sangband, but including sets of dragon armor.
-
-TODO: Assemblies that can be build into objects of any type.
 
 TODO: SHIELD blocks magic missiles completely.
 
@@ -55,10 +49,6 @@ of objects the next round.
 
 TODO: Electrical attacks should cause rings and rods to discharge as opposed to being destroyed.
 
-TODO: Allow monsters to ride other monsters.
-
-TODO: Allow small monsters to stack on each other.
-
 TODO: Update to safe string handling routines from latest Angband builds.
 
 TODO: Update to latest X11 and GCU Angband files to fix compiler warnings.
@@ -70,8 +60,9 @@ or prevent it, depending on whether they are fleeing or not.
 TODO: Work on isometric graphics. See http://www.gamedev.net/reference/articles/article742.asp
 and http://www.gamedev.net/reference/articles/article744.asp
 
-TODO: Add materials system.
+TODO: Level up flags which add an additional prefix to the monster type.
 
+TODO: Encumberance reduces energy as opposed to speed.
 
 Release v0.6.5
 ==============
@@ -90,6 +81,18 @@ TODO: Strike finds nearby terrain preferentially.
 
 Release v0.7.0
 ==============
+
+TODO: Implement monster spells the same way as player spells.
+
+TODO: Allow monsters to ride other monsters.
+
+TODO: Allow small monsters to stack on each other.
+
+TODO: Create set items as per Sangband, but including sets of dragon armor.
+
+TODO: Assemblies that can be build into objects of any type.
+
+TODO: Add materials system.
 
 TODO: Complete quest code.
 
@@ -110,8 +113,6 @@ TODO: Stores, in conjunction with the character's charisma, offer additional que
 on what the player state is.
 
 TODO: Have a primative economy.
-
-
 
 Release v0.8.0
 ==============
@@ -1072,3 +1073,63 @@ Gravity terrain only expands if hurt_huge…
 
 TODO: Strike finds nearby vulnerable terrain preferably…
 
+TODO: Level up flags which add an additional prefix
+to the monster type.
+
+Each prefix increases power by 5 levels?
+
+LEVEL_SIZE
+large
+very large
+giant   --> add giant flag
+huge	--> add huge flag
+gargantuan  --> add huge flag
+
+LEVEL_SPEED
+fast
+very fast
+dangerous
+furious
+deadly
+
+LEVEL_POWER
+skilled
+very skilled
+experienced
+veteran
+master
+grand master
+
+Size increases blow strength, hit points greatly, armour class moderately, power moderately.
+
+Speed increase speed, armour class greatly, hit points, mana moderately. No increase to
+power (hits faster, not harder).
+
+Power increases power, hit points, blows, speed, mana, frequency of attacks.
+
+LEVEL_SIZE for golems, elementals, animated undead.
+LEVEL_SPEED for animated objects, animated undead.
+LEVEL_POWER for classes.
+
+For creatures with multiple flags, choose one based on the monster index.
+
+This is primarily to keep animate type summons interesting.
+
+Suggested by Eddie Grove:
+
+> The way things are currently set up, if you carry too much weight
+> compared to your strength, you get a speed penalty.  I will call that
+> the encumbrance.
+>
+> The encumbrance currently matters a whole lot for starting characters,
+> and hardly at all for endgame characters.  Suppose the penalty is -2.
+> At the beginning, a drop from speed 0 to speed -2 drops energy from
+> 10/gameturn to 8/gameturn.  That is a big deal.  Late in the game,
+> when you haste and fight at +26 speed, the difference in dropping down
+> to +24 speed is a nearly inconsequential drop from 36/gameturn to
+> 34/gameturn.  If you can manage +36 speed, the drop is nothing at all
+> from 40/gameturn to 40/gameturn.
+>
+> I suggest a change so that an encumbrance of -2 means -20% to energy.
+> Then, at +36 speed, energy would drop from 40/gameturn to 32/gameturn.
+> That is noticeable, and would make weight relevant in the endgame.
