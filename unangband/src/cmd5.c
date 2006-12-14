@@ -55,7 +55,7 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 	key_event ke;
 
 	spell_type *s_ptr;
-	spell_cast *sc_ptr = &(s_info[0].cast[0]);
+	spell_cast *sc_ptr;
 
 	char out_val[160];
 
@@ -96,7 +96,8 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 	}
 
 	/* Cannot cast spells if illiterate */
-	if ((cast) &&(c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL))
+	if ((cast) &&(c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
+		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
 	{
 		msg_print("You cannot read books or runestones.");
 
@@ -286,6 +287,9 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 			/* Get the spell */
 			s_ptr = &s_info[spell];
 
+			/* Get the spell cast information */
+			sc_ptr=&(s_ptr->cast[0]);
+
 			if (cast)
 			{
 				/* Get the spell details */
@@ -370,6 +374,17 @@ bool inven_book_okay(const object_type *o_ptr)
 		{
 			if (s_ptr->cast[i].class == p_ptr->pclass) return (1);
 		}
+
+		for (i = 0; i < MAX_SPELL_APPEARS; i++)
+		{
+			if ((((s_info[o_ptr->pval].appears[i].tval == TV_SONG_BOOK) && (p_ptr->pstyle == WS_SONG_BOOK)) ||
+				((s_info[o_ptr->pval].appears[i].tval == TV_MAGIC_BOOK) && (p_ptr->pstyle == WS_MAGIC_BOOK)) ||
+				((s_info[o_ptr->pval].appears[i].tval == TV_PRAYER_BOOK) && (p_ptr->pstyle == WS_PRAYER_BOOK)))
+			 && (s_info[o_ptr->pval].appears[i].sval == p_ptr->psval))
+			{
+				return(1);
+			}
+		}
 	}
 
 	/* Book / runestone */
@@ -386,9 +401,19 @@ bool inven_book_okay(const object_type *o_ptr)
 				{
 					if (s_ptr->cast[iii].class == p_ptr->pclass) return(1);
 				}
+
+				for (iii = 0; iii < MAX_SPELL_APPEARS; iii++)
+				{
+					if ((((s_info[i].appears[iii].tval == TV_SONG_BOOK) && (p_ptr->pstyle == WS_SONG_BOOK)) ||
+						((s_info[i].appears[iii].tval == TV_MAGIC_BOOK) && (p_ptr->pstyle == WS_MAGIC_BOOK)) ||
+						((s_info[i].appears[iii].tval == TV_PRAYER_BOOK) && (p_ptr->pstyle == WS_PRAYER_BOOK)))
+					 && (s_info[i].appears[iii].sval == p_ptr->psval))
+					{
+						return(1);
+					}
+				}
 			}
 		}
-
 	}			
 
 	return (0);
@@ -457,7 +482,8 @@ void do_cmd_browse(void)
 	object_type object_type_body;
 
 	/* Cannot browse books if illiterate */
-	if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
+	if ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
+		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
 	{
 		msg_print("You cannot read books or runestones.");
 
@@ -635,7 +661,7 @@ void do_cmd_browse(void)
 
 			spell_type *s_ptr;
 
-			spell_cast *sc_ptr = &(s_info[0].cast[0]);
+			spell_cast *sc_ptr;
 
 			/* Save the spell index */
 			spell = book[i];
@@ -655,6 +681,9 @@ void do_cmd_browse(void)
 			/* Get the spell */
 			s_ptr = &s_info[spell];
 
+			/* Get the spell cost */
+			sc_ptr=&(s_ptr->cast[0]);
+
 			/* Get casting information */
 			for (ii=0;ii<MAX_SPELL_CASTERS;ii++)
 			{
@@ -662,6 +691,21 @@ void do_cmd_browse(void)
 				{
 					legible = TRUE;
 					sc_ptr=&(s_ptr->cast[ii]);
+				}
+			}
+
+			/* Hack -- get casting information for specialists */
+			if (!legible)
+			{
+				for (ii = 0; ii < MAX_SPELL_APPEARS; ii++)
+				{
+					if ((((s_info[spell].appears[ii].tval == TV_SONG_BOOK) && (p_ptr->pstyle == WS_SONG_BOOK)) ||
+						((s_info[spell].appears[ii].tval == TV_MAGIC_BOOK) && (p_ptr->pstyle == WS_MAGIC_BOOK)) ||
+						((s_info[spell].appears[ii].tval == TV_PRAYER_BOOK) && (p_ptr->pstyle == WS_PRAYER_BOOK)))
+					&& (s_info[spell].appears[ii].sval == p_ptr->psval))
+					{
+						legible = TRUE;
+					}
 				}
 			}
 
@@ -761,7 +805,8 @@ void do_cmd_study(void)
 	bool study_item = FALSE;
 
 	/* Cannot cast spells if illiterate */
-	if (c_info[p_ptr->pclass].spell_first > 50)
+	if ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
+		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
 	{
 		msg_print("You cannot read books or runestones.");
 
@@ -1132,11 +1177,14 @@ void do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 	int chance;
 
 	spell_type *s_ptr;
-	spell_cast *sc_ptr = &(s_info[0].cast[0]);
+	spell_cast *sc_ptr;
 
 
 	/* Get the spell */
 	s_ptr = &s_info[spell];
+
+	/* Get the cost */
+	sc_ptr=&(s_ptr->cast[0]);
 
 	/* Get the spell details */
 	for (i=0;i<MAX_SPELL_CASTERS;i++)
@@ -1145,8 +1193,6 @@ void do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 		{
 			sc_ptr=&(s_ptr->cast[i]);
 		}
-
-
 	}
 
 	/* Verify "dangerous" spells */
@@ -1365,7 +1411,8 @@ void do_cmd_cast(void)
 	}
 
 	/* Cannot cast spells if illiterate */
-	if (c_info[p_ptr->pclass].spell_first > 50)
+	if ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
+		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
 	{
 		msg_print("You cannot read books or runestones.");
 		return;

@@ -3426,9 +3426,6 @@ void print_spells(const s16b *sn, int num, int y, int x)
 	/* Dump the spells */
 	for (i = 0; i < num; i++)
 	{
-		/* Set casting details to null */
-		sc_ptr = &(s_info[0].cast[0]);
-		
 		/* Get the spell index */
 		spell = sn[i];
 
@@ -3443,6 +3440,9 @@ void print_spells(const s16b *sn, int num, int y, int x)
 		/* Get the spell info */
 		s_ptr = &s_info[spell];
 
+		/* Get the spell cost */
+		sc_ptr=&(s_ptr->cast[0]);
+
 		legible = FALSE;
 
 		for (ii=0;ii<MAX_SPELL_CASTERS;ii++)
@@ -3451,6 +3451,21 @@ void print_spells(const s16b *sn, int num, int y, int x)
 			{
 				legible = TRUE;
 				sc_ptr=&(s_ptr->cast[ii]);
+			}
+		}
+
+		/* Hack -- get casting information for specialists */
+		if (!legible)
+		{
+			for (ii = 0; ii < MAX_SPELL_APPEARS; ii++)
+			{
+				if ((((s_info[spell].appears[ii].tval == TV_SONG_BOOK) && (p_ptr->pstyle == WS_SONG_BOOK)) ||
+					((s_info[spell].appears[ii].tval == TV_MAGIC_BOOK) && (p_ptr->pstyle == WS_MAGIC_BOOK)) ||
+					((s_info[spell].appears[ii].tval == TV_PRAYER_BOOK) && (p_ptr->pstyle == WS_PRAYER_BOOK)))
+				&& (s_info[spell].appears[ii].sval == p_ptr->psval))
+				{
+					legible = TRUE;
+				}
 			}
 		}
 
@@ -3540,7 +3555,7 @@ void print_spells(const s16b *sn, int num, int y, int x)
 		/* Dump the spell --(-- */
 		sprintf(out_val, "  %c) %-30s%2d %4d %3d%%%s",
 			I2A(i), s_name + s_ptr->name,
-			spell_level(spell), sc_ptr->mana, spell_chance(spell), comment);
+			level, sc_ptr->mana, spell_chance(spell), comment);
 		c_prt(line_attr, out_val, y + i + 1, x);
 	}
 
@@ -3634,7 +3649,8 @@ void display_koff(const object_type *o_ptr)
 	obj_top(o_ptr);
 
 	/* Warriors are illiterate */
-	if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL) return;
+	if ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
+		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK)) return;
 
 	browse = FALSE;
 

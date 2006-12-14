@@ -1200,19 +1200,28 @@ static errr rd_extra(void)
 	}
 
 
-	/* Read spell info */
-	rd_u32b(&p_ptr->spell_learned1);
-	rd_u32b(&p_ptr->spell_learned2);
-	rd_u32b(&p_ptr->spell_learned3);
-	rd_u32b(&p_ptr->spell_learned4);
-	rd_u32b(&p_ptr->spell_worked1);
-	rd_u32b(&p_ptr->spell_worked2);
-	rd_u32b(&p_ptr->spell_worked3);
-	rd_u32b(&p_ptr->spell_worked4);
-	rd_u32b(&p_ptr->spell_forgotten1);
-	rd_u32b(&p_ptr->spell_forgotten2);
-	rd_u32b(&p_ptr->spell_forgotten3);
-	rd_u32b(&p_ptr->spell_forgotten4);
+	/* Hack -- unlearn ranger spells */
+	if (older_than(0, 6, 2) && (p_ptr->pclass == 4))
+	{
+		strip_bytes(48);
+
+	} 
+	else
+	{
+		/* Read spell info */
+		rd_u32b(&p_ptr->spell_learned1);
+		rd_u32b(&p_ptr->spell_learned2);
+		rd_u32b(&p_ptr->spell_learned3);
+		rd_u32b(&p_ptr->spell_learned4);
+		rd_u32b(&p_ptr->spell_worked1);
+		rd_u32b(&p_ptr->spell_worked2);
+		rd_u32b(&p_ptr->spell_worked3);
+		rd_u32b(&p_ptr->spell_worked4);
+		rd_u32b(&p_ptr->spell_forgotten1);
+		rd_u32b(&p_ptr->spell_forgotten2);
+		rd_u32b(&p_ptr->spell_forgotten3);
+		rd_u32b(&p_ptr->spell_forgotten4);
+	}
 
 	/* Read in the spells */
 	for (i = 0; i < PY_MAX_SPELLS; i++)

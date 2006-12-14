@@ -928,7 +928,7 @@
  * Maximum number of spell constants
  */
 #define MAX_SPELL_APPEARS	10
-#define MAX_SPELL_CASTERS	5
+#define MAX_SPELL_CASTERS	6
 #define MAX_SPELL_PREREQUISITES	2
 
 
@@ -1804,6 +1804,7 @@
 /* The "sval" codes for TV_EGG */
 #define SV_EGG_EGG    1
 #define SV_EGG_SPORE  2
+#define SV_EGG_SEED  3
 
 /* The "sval" codes for TV_SPELL */
 /* 

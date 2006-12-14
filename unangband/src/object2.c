@@ -4469,15 +4469,17 @@ static bool name_drop_okay(int r_idx)
 		/* Spore shooters have spores */
 		if ((j_ptr->sval == SV_EGG_SPORE) && !(r_ptr->flags8 & (RF8_HAS_SPORE))) return (FALSE);
 
-		/* Egg-layers shed their skin or have feathers or scales */
-		else if ((j_ptr->sval == SV_EGG_EGG) || (!(r_ptr->flags8 & (RF8_HAS_SKIN | RF8_HAS_FEATHER | RF8_HAS_SCALE)))) return (FALSE);
+		/* Egg-layers have feathers or scales or are insects*/
+		else if ((j_ptr->sval == SV_EGG_EGG) && !((r_ptr->flags8 & (RF8_HAS_FEATHER | RF8_HAS_SCALE)) || (r_ptr->flags3 & (RF3_INSECT)))) return (FALSE);
+
+		/* Seed layers are plants but not slimes or spores */
+		else if ((j_ptr->sval == SV_EGG_SEED) && ((r_ptr->flags8 & (RF8_HAS_SPORE | RF8_HAS_SLIME)) || !(r_ptr->flags3 & (RF3_PLANT)))) return (FALSE);
 
 		/* Undead/demons never have eggs */
 		if (r_ptr->flags3 & (RF3_UNDEAD | RF3_DEMON)) return (FALSE);
 
 		/* Hack -- dragons only hatch babies */
 		if ((r_ptr->flags3 & (RF3_DRAGON)) && (!strstr(r_name+r_ptr->name, "aby"))) return (FALSE);
-
 	}
 	else if (j_ptr->tval == TV_SKIN)
 	{
@@ -4560,10 +4562,8 @@ static bool name_drop_okay(int r_idx)
 		if ((j_ptr->sval == SV_FLASK_WEB) && !(r_ptr->flags2 & (RF2_HAS_WEB))) return (FALSE);
 	}
 
-
 	/* Accept */
 	return (TRUE);
-
 }
 
 
@@ -4581,7 +4581,6 @@ static void name_drop(object_type *j_ptr)
 	if (j_ptr->name2) return;
 	if (j_ptr->xtra1) return;
 
-#if 0
 	/* Mark weapons and armour with racial flags */
 	switch (j_ptr->tval)
 	{
@@ -4628,7 +4627,7 @@ static void name_drop(object_type *j_ptr)
 			if ((r_info[r_idx].flags9 & (RF9_ELF)) && !(rand_int(count++))) { j_ptr->xtra1 = 19; j_ptr->xtra2 = 26;}
 		}
 	}
-#endif
+
 	/* Are we done? */
 	if ((j_ptr->tval != TV_BONE) && (j_ptr->tval != TV_EGG) && (j_ptr->tval != TV_STATUE)
 		&& (j_ptr->tval != TV_SKIN) && (j_ptr->tval != TV_BODY) &&
@@ -8183,15 +8182,21 @@ s16b spell_level(int spell)
 
 	spell_type *s_ptr;
 
-	spell_cast *sc_ptr = &(s_info[0].cast[0]);
+	spell_cast *sc_ptr;
 
 	bool legible = FALSE;
+	bool fix_level = FALSE;
 
 	/* Paranoia -- must be literate */
-	if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL) return (100);
+	if ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
+		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
+			return (100);
 
 	/* Get the spell */
 	s_ptr = &s_info[spell];
+
+	/* Get the spell cost */
+	sc_ptr=&(s_ptr->cast[0]);
 
 	/* Get casting information */
 	for (i=0;i<MAX_SPELL_CASTERS;i++)
@@ -8203,9 +8208,24 @@ s16b spell_level(int spell)
 		}
 	}
 
+	/* Hack -- get casting information for specialists */
+	if (!legible)
+	{
+		for (i = 0; i < MAX_SPELL_APPEARS; i++)
+		{
+			if ((((s_info[spell].appears[i].tval == TV_SONG_BOOK) && (p_ptr->pstyle == WS_SONG_BOOK)) ||
+				((s_info[spell].appears[i].tval == TV_MAGIC_BOOK) && (p_ptr->pstyle == WS_MAGIC_BOOK)) ||
+				((s_info[spell].appears[i].tval == TV_PRAYER_BOOK) && (p_ptr->pstyle == WS_PRAYER_BOOK)))
+			&& (s_info[spell].appears[i].sval == p_ptr->psval))
+			{
+				legible = TRUE;
+				fix_level = TRUE;
+			}
+		}
+	}
+
 	/* Illegible */
 	if (!legible) return (100);
-
 
 	/* Get the level */
 	level = sc_ptr->level;
@@ -8214,6 +8234,17 @@ s16b spell_level(int spell)
 	for (i = 0;i< z_info->w_max;i++)
 	{
 		if (w_info[i].class != p_ptr->pclass) continue;
+
+		/* Hack -- Increase minimum level */
+		if (fix_level)
+		{
+			if ((w_info[i].styles & (1L << p_ptr->pstyle)) != 0)
+			{
+				level += w_info[i].level - 1;
+
+				fix_level = FALSE;
+			}
+		}
 
 		if (w_info[i].level > p_ptr->lev) continue;
 
@@ -8271,6 +8302,7 @@ s16b spell_level(int spell)
 			}
 		}
 	}
+
 	return(level);
 }
 
@@ -8397,17 +8429,22 @@ s16b spell_chance(int spell)
 
 	spell_type *s_ptr;
 
-	spell_cast *sc_ptr = &(s_info[0].cast[0]);
+	spell_cast *sc_ptr;
 
 	bool legible = FALSE;
 
 	int i;
 
 	/* Paranoia -- must be literate */
-	if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL) return (100);
+	if ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
+		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
+			return (100);
 
 	/* Get the spell */
 	s_ptr = &s_info[spell];
+
+	/* Get the spell cost */
+	sc_ptr=&(s_ptr->cast[0]);
 
 	/* Get casting information */
 	for (i=0;i<MAX_SPELL_CASTERS;i++)
@@ -8416,6 +8453,21 @@ s16b spell_chance(int spell)
 		{
 			legible = TRUE;
 			sc_ptr=&(s_ptr->cast[i]);
+		}
+	}
+
+	/* Hack -- get casting information for specialists */
+	if (!legible)
+	{
+		for (i = 0; i < MAX_SPELL_APPEARS; i++)
+		{
+			if ((((s_info[spell].appears[i].tval == TV_SONG_BOOK) && (p_ptr->pstyle == WS_SONG_BOOK)) ||
+				((s_info[spell].appears[i].tval == TV_MAGIC_BOOK) && (p_ptr->pstyle == WS_MAGIC_BOOK)) ||
+				((s_info[spell].appears[i].tval == TV_PRAYER_BOOK) && (p_ptr->pstyle == WS_PRAYER_BOOK)))
+			 &&  (s_info[spell].appears[i].sval == p_ptr->psval))
+			{
+				legible = TRUE;
+			}
 		}
 	}
 
@@ -8477,7 +8529,7 @@ bool spell_okay(int spell, bool known)
 {
 	spell_type *s_ptr;
 
-	spell_cast *sc_ptr = &(s_info[0].cast[0]);
+	spell_cast *sc_ptr;
 
 	int i;
 
@@ -8486,6 +8538,9 @@ bool spell_okay(int spell, bool known)
 	/* Get the spell */
 	s_ptr = &s_info[spell];
 
+	/* Get the spell cost */
+	sc_ptr=&(s_ptr->cast[0]);
+
 	/* Get casting information */
 	for (i=0;i<MAX_SPELL_CASTERS;i++)
 	{
@@ -8493,6 +8548,21 @@ bool spell_okay(int spell, bool known)
 		{
 			legible = TRUE;
 			sc_ptr=&(s_ptr->cast[i]);
+		}
+	}
+
+	/* Hack -- get casting information for specialists */
+	if (!legible)
+	{
+		for (i = 0; i < MAX_SPELL_APPEARS; i++)
+		{
+			if ((((s_info[spell].appears[i].tval == TV_SONG_BOOK) && (p_ptr->pstyle == WS_SONG_BOOK)) ||
+				((s_info[spell].appears[i].tval == TV_MAGIC_BOOK) && (p_ptr->pstyle == WS_MAGIC_BOOK)) ||
+				((s_info[spell].appears[i].tval == TV_PRAYER_BOOK) && (p_ptr->pstyle == WS_PRAYER_BOOK)))
+			  && (s_info[spell].appears[i].sval == p_ptr->psval))
+			{
+				legible = TRUE;
+			}
 		}
 	}
 

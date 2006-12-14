@@ -338,8 +338,9 @@ static void prt_sp(void)
 
 
 	/* Do not show mana unless it matters */
-	if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL) return;
-
+	if ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
+		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
+		 return;
 
 	put_str((show_sidebar ? "Max SP " : "/"), ROW_MAXSP, COL_MAXSP);
 
@@ -1036,9 +1037,44 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 {
 	char temp[60];
 
+	object_kind *k_ptr=&k_info[0];
+	int i;
+
 	temp[0] = '\0';
 
 	if (short_name) strcpy(temp,c_name+c_info[class].name);
+
+	if ((style == WS_MAGIC_BOOK) && (sval >= 0))
+	{
+		/* Analyse books */
+		for (i = 0;i<z_info->k_max;i++)
+		{
+			k_ptr = &k_info[i];
+			if ((k_ptr->tval == TV_MAGIC_BOOK) && (k_ptr->sval == sval)) break;
+		}
+	}
+
+	else if ((style == WS_PRAYER_BOOK) && (sval >= 0))
+	{
+
+		/* Analyse books */
+		for (i = 0;i<z_info->k_max;i++)
+		{
+			k_ptr = &k_info[i];
+			if ((k_ptr->tval == TV_PRAYER_BOOK) && (k_ptr->sval == sval)) break;
+		}
+	}
+
+	else if ((style == WS_SONG_BOOK) && (sval >= 0))
+	{
+
+		/* Analyse books */
+		for (i = 0;i<z_info->k_max;i++)
+		{
+			k_ptr = &k_info[i];
+			if ((k_ptr->tval == TV_SONG_BOOK) && (k_ptr->sval == sval)) break;
+		}
+	}
 
 	switch (class)
 	{
@@ -1074,6 +1110,18 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 			if (style == WS_SLAY_GIANT) strcpy(temp,"Giantkiller");
 			if (style == WS_SLAY_DRAGON) strcpy(temp,"Dragonkiller");
 			if (style == WS_RING) strcpy(temp,"Ringbearer");
+			if ((style == WS_MAGIC_BOOK) && (sval >= 0))
+			{
+				if (short_name) strcpy(temp,"Gifted Warrior");
+				else sprintf(temp,"%s",k_name+k_ptr->name);
+				if (long_name) sprintf(temp,"Warrior Gifted %s",k_name+k_ptr->name);
+			}
+			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
+			{
+				if (short_name) strcpy(temp,"Choosen Warrior");
+				else sprintf(temp,"%s",k_name+k_ptr->name);
+				if (long_name) sprintf(temp,"Warrior Choosen %s",k_name+k_ptr->name);
+			}
 			break;
 
 		case 1:
@@ -1085,18 +1133,6 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 			if (style == WS_RING) strcpy(temp,"Ringwielder");
 			if ((style == WS_MAGIC_BOOK) && (sval >= 0))
 			{
-
-				object_kind *k_ptr=&k_info[0];
-				int i;
-			
-				/* Analyse books */
-				for (i = 0;i<z_info->k_max;i++)
-				{
-					k_ptr = &k_info[i];
-
-					if ((k_ptr->tval == TV_MAGIC_BOOK) && (k_ptr->sval == sval)) break;
-				}
-
 				if (short_name) strcpy(temp,"Magi");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Magi %s",k_name+k_ptr->name);
@@ -1121,9 +1157,16 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 				if (sval == 16) strcpy(temp,"Illusionist");
 
 			}
+			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
+			{
+				if (short_name) strcpy(temp,"Cultist");
+				else sprintf(temp,"%s",k_name+k_ptr->name);
+				if (long_name) sprintf(temp,"Cultist %s",k_name+k_ptr->name);
+			}
 			break;
 
 		case 2:
+			if (!style) strcpy(temp,"Cleric");
 			if (style == WS_UNARMED) strcpy(temp,"Warrior Monk");
 			if (style == WS_HAFTED) strcpy(temp,"Templar");
 			if (style == WS_SLAY_EVIL) strcpy(temp,"Inquisitor");
@@ -1144,20 +1187,14 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 				strcpy(temp,"Exorcist");
 			}
 			if (style == WS_INSTRUMENT) strcpy(temp,"Monk");
+			if ((style == WS_MAGIC_BOOK) && (sval >= 0))
+			{
+				if (short_name) strcpy(temp,"Priest");
+				else sprintf(temp,"%s",k_name+k_ptr->name);
+				if (long_name) sprintf(temp,"Priest of the God %s",k_name+k_ptr->name);
+			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
 			{
-
-				object_kind *k_ptr=&k_info[0];
-				int i;
-			
-				/* Analyse books */
-				for (i = 0;i<z_info->k_max;i++)
-				{
-					k_ptr = &k_info[i];
-
-					if ((k_ptr->tval == TV_PRAYER_BOOK) && (k_ptr->sval == sval)) break;
-				}
-
 				if (short_name) strcpy(temp,"Acolyte");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Acolyte of the Order %s",k_name+k_ptr->name);
@@ -1165,6 +1202,18 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 			break;
 
 		case 3:
+			if ((style == WS_MAGIC_BOOK) && (sval >= 0))
+			{
+				if (short_name) strcpy(temp,"Scholar");
+				else sprintf(temp,"%s",k_name+k_ptr->name);
+				if (long_name) sprintf(temp,"Scholar %s",k_name+k_ptr->name);
+			}
+			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
+			{
+				if (short_name) strcpy(temp,"Researcher");
+				else sprintf(temp,"%s",k_name+k_ptr->name);
+				if (long_name) sprintf(temp,"Researcher %s",k_name+k_ptr->name);
+			}
 			if (style == WS_POTION) strcpy(temp,"Chemist");
 			if (style == WS_SCROLL) strcpy(temp,"Scholar");
 			if (style == WS_AMULET) strcpy(temp,"Gypsy");
@@ -1198,24 +1247,24 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
 			{
-
-				object_kind *k_ptr=&k_info[0];
-				int i;
-			
-				/* Analyse books */
-				for (i = 0;i<z_info->k_max;i++)
-				{
-					k_ptr = &k_info[i];
-
-					if ((k_ptr->tval == TV_PRAYER_BOOK) && (k_ptr->sval == sval)) break;
-				}
-
 				if (short_name) strcpy(temp,"Knight Errant");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Knight of the Order %s",k_name+k_ptr->name);
 			}
 			break;
 		case 6:
+			if ((style == WS_MAGIC_BOOK) && (sval >= 0))
+			{
+				if (short_name) strcpy(temp,"Gifted Thief");
+				else sprintf(temp,"%s",k_name+k_ptr->name);
+				if (long_name) sprintf(temp,"Thief Gifted %s",k_name+k_ptr->name);
+			}
+			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
+			{
+				if (short_name) strcpy(temp,"Choosen Thief");
+				else sprintf(temp,"%s",k_name+k_ptr->name);
+				if (long_name) sprintf(temp,"Thief Choosen %s",k_name+k_ptr->name);
+			}
 			if (style == WS_UNARMED) strcpy(temp,"Acrobat");
 			if (style == WS_ONE_HANDED) strcpy(temp,"Highwayman");
 			if (style == WS_TWO_HANDED) strcpy(temp,"Ninja");
@@ -1231,6 +1280,18 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 			break;
 
 		case 7:
+			if ((style == WS_MAGIC_BOOK) && (sval >= 0))
+			{
+				if (short_name) strcpy(temp,"Gifted Archer");
+				else sprintf(temp,"%s",k_name+k_ptr->name);
+				if (long_name) sprintf(temp,"Archer Gifted %s",k_name+k_ptr->name);
+			}
+			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
+			{
+				if (short_name) strcpy(temp,"Choosen Archer");
+				else sprintf(temp,"%s",k_name+k_ptr->name);
+				if (long_name) sprintf(temp,"Archer Choosen %s",k_name+k_ptr->name);
+			}
 			if (style == WS_SLING) strcpy(temp,"Slinger");
 			if (style == WS_BOW) strcpy(temp,"Longbowman");
 			if (style == WS_XBOW) strcpy(temp,"Crossbowman");
@@ -1240,33 +1301,9 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 
 			if (((style == WS_PRAYER_BOOK) || (style == WS_MAGIC_BOOK)) && (sval >= 0))
 			{
-
-				object_kind *k_ptr=&k_info[0];
-				int i;
-
-				int t = 0;
-
-				switch(style)
-				{
-					case WS_MAGIC_BOOK:
-						t = TV_MAGIC_BOOK;
-						break;
-					case WS_PRAYER_BOOK:
-						t = TV_PRAYER_BOOK;
-						break;
-				}
-			
-				/* Analyse books */
-				for (i = 0;i<z_info->k_max;i++)
-				{
-					k_ptr = &k_info[i];
-
-					if ((k_ptr->tval == t) && (k_ptr->sval == sval)) break;
-				}
-
-				if (short_name) strcpy(temp,"Cultist");
+				if (short_name) strcpy(temp,"Druid");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
-				if (long_name) sprintf(temp,"Cultist %s",
+				if (long_name) sprintf(temp,"Druid %s",
 					k_name+k_ptr->name);
 			}
 			break;
@@ -1277,22 +1314,25 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 
 			if ((style == WS_SONG_BOOK) && (sval >= 0))
 			{
-
-				object_kind *k_ptr=&k_info[0];
-				int i;
-			
-				/* Analyse books */
-				for (i = 0;i<z_info->k_max;i++)
-				{
-					k_ptr = &k_info[i];
-
-					if ((k_ptr->tval == TV_SONG_BOOK) && (k_ptr->sval == sval)) break;
-				}
-
 				if (short_name) strcpy(temp,"Spellsinger");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Spellsinger (%s)",k_name+k_ptr->name);
 			}
+			break;
+		case 10:
+			if (style == WS_UNARMED) strcpy(temp,"Spellfist");
+			if ((style == WS_THROWN) && (long_name))
+			{
+				strcpy(temp,"Prestidigitator");
+			}
+			else if ((style == WS_THROWN) && (short_name))
+			{
+				strcpy(temp,"Prestige");
+			}
+			if (style == WS_HAFTED) strcpy(temp,"Spellhammer");
+			if (style == WS_SWORD) strcpy(temp,"Spellsword");
+			if (style == WS_POLEARM) strcpy(temp,"Spellspear");
+
 			break;
 	}
 
@@ -1983,8 +2023,6 @@ void calc_spells(void)
 	int num_allowed, num_known;
 
 	spell_type *s_ptr;
-	spell_cast *sc_ptr = &(s_info[0].cast[0]);
-
 	cptr p;
 
 	/* Hack --- We don't know which book it comes from */
@@ -2008,7 +2046,10 @@ void calc_spells(void)
 
 	}
 
-	if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL) return;
+	/* Paranoia -- ensure class is literate */
+	if ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
+		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
+		 return;
 
 	/* Hack -- wait for creation */
 	if (!character_generated) return;
@@ -2016,15 +2057,37 @@ void calc_spells(void)
 	/* Hack -- handle "xtra" mode */
 	if (character_xtra) return;
 
-	/* Determine the number of spells allowed */
-	levels = p_ptr->lev - c_info[p_ptr->pclass].spell_first + 1;
+	/* Determine the number of spells allowed -- Standard method */
+	if (c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL)
+	{
+		levels = p_ptr->lev - c_info[p_ptr->pclass].spell_first + 1;
+	}
+
+	/* Determine the number of spells allowed -- Alternate method */
+	else
+	{
+		/* Modify the level */
+		for (i = 0;i< z_info->w_max;i++)
+		{
+			if (w_info[i].class != p_ptr->pclass) continue;
+
+			if (w_info[i].styles & (1L << p_ptr->pstyle))
+			{
+				levels = p_ptr->lev - w_info[i].level + 1;
+				break;
+			}
+		}
+	}
 
 	/* Hack -- no negative spells */
 	if (levels < 0) levels = 0;
 
 	/* Extract total allowed spells */
 	num_allowed = (adj_mag_study[p_ptr->stat_ind[c_info[p_ptr->pclass].spell_stat_study]] *
-		       levels / 50) + 1;
+		       levels / 50);
+
+	/* Hack -- ensure minimum of 1 if sufficient level to cast spells */
+	if (levels) num_allowed++;
 
 	/* Hack --- adjust num_allowed */
 	if (num_allowed >  PY_MAX_SPELLS) num_allowed = PY_MAX_SPELLS;
@@ -2062,7 +2125,6 @@ void calc_spells(void)
 		      (p_ptr->spell_learned4 & (1L << (j - 96))))))
 		{
 			num_known++;
-
 		}
 	}
 
@@ -2080,18 +2142,6 @@ void calc_spells(void)
 
 		/* Skip non-spells */
 		if (j == 0) continue;
-
-		/* Get the spell */
-		s_ptr = &s_info[j];
-
-		/* Get the spell details */
-		for (ii=0;ii<MAX_SPELL_CASTERS;ii++)
-		{
-			if (s_ptr->cast[ii].class == p_ptr->pclass)
-			{
-				sc_ptr=&(s_ptr->cast[ii]);
-			}
-		}
 
 		/* Skip spells we are allowed to know */
 		if (spell_level(j) <= p_ptr->lev) continue;
@@ -2138,6 +2188,9 @@ void calc_spells(void)
 				p_ptr->spell_learned4 &= ~(1L << (i - 96));
 			}
 
+			/* Get the spell */
+			s_ptr = &s_info[j];
+
 			/* Message */
 			msg_format("You have forgotten the %s of %s.", p,
 				   s_name + s_ptr->name);
@@ -2161,9 +2214,6 @@ void calc_spells(void)
 
 		/* Skip unknown spells */
 		if (j == 0) continue;
-
-		/* Get the spell */
-		s_ptr = &s_info[j];
 
 		/* Forget it (if learned) */
 		if ((i < 32) ? (p_ptr->spell_learned1 & (1L << i)) :
@@ -2207,6 +2257,9 @@ void calc_spells(void)
 				p_ptr->spell_learned4 &= ~(1L << (i - 96));
 			}
 
+			/* Get the spell */
+			s_ptr = &s_info[j];
+
 			/* Message */
 			msg_format("You have forgotten the %s of %s.", p,
 				   s_name + s_ptr->name);
@@ -2230,18 +2283,6 @@ void calc_spells(void)
 
 		/* Skip unknown spells */
 		if (j == 0) break;
-
-		/* Get the spell */
-		s_ptr = &s_info[j];
-
-		/* Get the spell details */
-		for (ii=0;ii<MAX_SPELL_CASTERS;ii++)
-		{
-			if (s_ptr->cast[ii].class == p_ptr->pclass)
-			{
-				sc_ptr=&(s_ptr->cast[ii]);
-			}
-		}
 
 		/* Skip spells we cannot remember */
 		if (spell_level(j) > p_ptr->lev) continue;
@@ -2287,6 +2328,9 @@ void calc_spells(void)
 			{
 				p_ptr->spell_learned4 |= (1L << (i - 96));
 			}
+
+			/* Get the spell */
+			s_ptr = &s_info[j];
 
 			/* Message */
 			msg_format("You have remembered the %s of %s.",
@@ -2340,10 +2384,31 @@ static void calc_mana(void)
 	bool icky_hands = FALSE;
 
 	/* Do not show mana unless it matters */
-	if (pc_ptr->spell_first > PY_MAX_LEVEL) return;
+	if ((pc_ptr->spell_first > PY_MAX_LEVEL)
+		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
+		 return;
 
-	/* Extract "effective" player level */
-	levels = (p_ptr->lev - pc_ptr->spell_first) + 1;
+	/* Extract "effective" player level -- Standard method */
+	if (pc_ptr->spell_first <= PY_MAX_LEVEL)
+	{
+		levels = p_ptr->lev - c_info[p_ptr->pclass].spell_first + 1;
+	}
+
+	/* Extract "effective" player level -- Alternate method */
+	else
+	{
+		/* Modify the level */
+		for (i = 0;i< z_info->w_max;i++)
+		{
+			if (w_info[i].class != p_ptr->pclass) continue;
+
+			if (w_info[i].styles & (1L << p_ptr->pstyle))
+			{
+				levels = p_ptr->lev - w_info[i].level + 1;
+				break;
+			}
+		}
+	}
 
 	/* Hack -- no negative mana */
 	if (levels < 0) levels = 0;
@@ -2371,7 +2436,6 @@ static void calc_mana(void)
 		{
 			icky_hands=TRUE;
 		}
-
 	}
 
 	/* Only mages are affected */
@@ -3751,13 +3815,17 @@ static void calc_bonuses(void)
 			}
 
 			/* Change in spell stat may affect Mana */
-			if ((i == c_info[p_ptr->pclass].spell_stat_mana) && (c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL))
+			if ((i == c_info[p_ptr->pclass].spell_stat_mana) &&
+				((c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL) || (p_ptr->pstyle == WS_MAGIC_BOOK)
+				|| (p_ptr->pstyle == WS_PRAYER_BOOK) || (p_ptr->pstyle == WS_SONG_BOOK)))
 			{
 				p_ptr->update |= (PU_MANA);
 			}
 
 			/* Change in spell stat may affect Mana */
-			if ((i == c_info[p_ptr->pclass].spell_stat_study) && (c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL))
+			if ((i == c_info[p_ptr->pclass].spell_stat_study) &&
+				((c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL) || (p_ptr->pstyle == WS_MAGIC_BOOK)
+				|| (p_ptr->pstyle == WS_PRAYER_BOOK) || (p_ptr->pstyle == WS_SONG_BOOK)))
 			{
 				p_ptr->update |= (PU_SPELLS);
 			}

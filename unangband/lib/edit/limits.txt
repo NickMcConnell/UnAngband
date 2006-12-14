@@ -50,10 +50,10 @@ M:P:11
 M:H:165
 
 # Maximum number of player classes
-M:C:10
+M:C:11
 
 # Maximum number of weapon style lines
-M:W:127
+M:W:160
 
 # Maximum number of spells
 M:S:471

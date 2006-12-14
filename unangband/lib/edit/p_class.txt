@@ -154,7 +154,7 @@ C:30:32:28:3:24:16:56:72
 X:8:10:10:0:0:0:30:45
 I:4:20:2000:40:11:0
 A:5:35:4:55
-M:90:1:2:3:3:400:0
+M:90:1:2:3:5:350:0
 E:90:0:1:1:0:0:0:100
 E:23:16:1:1:0:0:0:100
 E:19:13:1:1:0:0:0:100
@@ -275,3 +275,23 @@ T:Lauriet
 T:Lorekeeper
 T:Loremaster
 
+N:10:Warrior Mage
+S:2:1:1:0:1:-1:-1
+C:45:32:28:1:32:24:60:20
+X:15:13:10:0:0:0:40:15
+I:6:25:20000:40:10:1
+A:5:30:3:55
+M:90:1:2:3:3:400:0
+E:90:0:1:1:0:0:0:100
+E:23:8:1:1:0:0:0:100
+E:36:4:1:1:0:0:0:100
+T:Amateur
+T:Spell-for-hire
+T:Swordsman Trickster
+T:Swashbuckler Illusionist
+T:Veteran Spellbinder
+T:Myrmidon Evoker
+T:Commando Conjurer
+T:Champion Warlock
+T:Sorcerer-Hero
+T:Arch-Lord
