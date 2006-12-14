@@ -7392,7 +7392,7 @@ bool inven_carry_okay(const object_type *o_ptr)
 	int j;
 
 	/* Empty slot? */
-	if (p_ptr->inven_cnt < INVEN_PACK) return (TRUE);
+	if (p_ptr->inven_cnt < INVEN_PACK - p_ptr->pack_size_reduce) return (TRUE);
 
 	/* Similar slot? */
 	for (j = 0; j < INVEN_PACK; j++)

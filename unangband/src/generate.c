@@ -1570,6 +1570,26 @@ static void generate_rect(int y1, int x1, int y2, int x2, int feat)
 	}
 }
 
+
+
+/*
+ * Hack -- mimic'ed feature for "room_info_feat()"
+ */
+static s16b room_info_feat_mimic;
+
+/*
+ *
+ */
+static bool room_info_feat(int f_idx)
+{
+	feature_type *f_ptr = &f_info[f_idx];
+
+	if (f_ptr->mimic == room_info_feat_mimic) return(TRUE);
+
+	return(FALSE);
+}
+
+
 /*
  * Number to place for scattering
  */
@@ -1590,6 +1610,18 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 
 	/* Paranoia */
 	if (!dy || !dx) return;
+
+	/* Pick features if needed */
+	if ((feat) && (f_info[feat].mimic == feat))
+	{
+		/* Set feature hook */
+		room_info_feat_mimic = feat;
+
+		get_feat_num_hook = room_info_feat;
+
+		/* Prepare allocation table */
+		get_feat_num_prep();
+	}
 
 	/* Scatter several about if requested */
 	for (k = 0; k < ((flag & (RG1_SCATTER | RG1_TRAIL)) != 0 ? NUM_SCATTER : 1); k++)
@@ -1691,7 +1723,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 					}
 
 					/* Assign feature */
-					if (feat) cave_set_feat(y, x, feat);
+					if (feat) cave_set_feat(y, x, get_feat_num(object_level));
 
 					/* Require "clean" floor space */
 					if ((flag & (RG1_HAS_GOLD | RG1_HAS_ITEM)) != 0)
@@ -1737,7 +1769,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 					if ((y < y1) || (y > y2) || (x < x1) || (x > x2)) continue;
 
 					/* Assign feature */
-					if (feat) cave_set_feat(y, x, feat);
+					if (feat) cave_set_feat(y, x, get_feat_num(object_level));
 
 					/* Require "clean" floor space */
 					if ((flag & (RG1_HAS_GOLD | RG1_HAS_ITEM)) != 0)
@@ -1765,7 +1797,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 			x = x_alloc;
 
 			/* Assign feature */
-			if (feat) cave_set_feat(y, x, feat);
+			if (feat) cave_set_feat(y, x, get_feat_num(object_level));
 
 			/* Require "clean" floor space */
 			if ((flag & (RG1_HAS_GOLD | RG1_HAS_ITEM)) != 0)
@@ -1782,6 +1814,15 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 				}
 			}
 		}
+	}
+
+	/* Clear feature hook */
+	if ((feat) && (f_info[feat].mimic == feat))
+	{
+		/* Clear the hook */
+		get_feat_num_hook = NULL;
+
+		get_feat_num_prep();				
 	}
 }
 
@@ -1887,26 +1928,6 @@ static bool room_info_kind(int k_idx)
 
 	return(TRUE);
 }
-
-
-/*
- * Hack -- mimic'ed feature for "room_info_feat()"
- */
-static s16b room_info_feat_mimic;
-
-/*
- *
- */
-static bool room_info_feat(int f_idx)
-{
-	feature_type *f_ptr = &f_info[f_idx];
-
-	if (f_ptr->mimic == room_info_feat_mimic) return(TRUE);
-
-	return(FALSE);
-}
-
-
 
 
 /*
@@ -2137,26 +2158,6 @@ static void get_room_info(int y0, int x0)
 
 			/* Don't place yet */
 			if ((place_flag & (RG1_PLACE)) == 0) continue;
-
-			/* Pick features if needed */
-			if ((place_feat) && (f_info[place_feat].mimic == place_feat))
-			{
-				/* Set feature hook */
-				room_info_feat_mimic = place_feat;
-
-				get_feat_num_hook = room_info_feat;
-
-				/* Prepare allocation table */
-				get_feat_num_prep();
-
-				/* Get a feature */
-				place_feat = get_feat_num(object_level);
-
-				/* Clear the hook */
-				get_feat_num_hook = NULL;
-
-				get_feat_num_prep();				
-			}
 
 			/* Pick objects if needed */
 			if (place_tval)
