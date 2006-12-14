@@ -2579,7 +2579,7 @@ void py_attack(int y, int x, bool charging)
 	if (fear && m_ptr->ml)
 	{
 		/* Message */
-		message_format(MSG_FLEE, m_ptr->r_idx, "%^s flees in terror!", m_name);
+		message_format(MSG_FLEE, cave_m_idx[m_ptr->fy][m_ptr->fx], "%^s flees in terror!", m_name);
 	}
 
 	/* Mega-Hack -- apply earthquake brand */
