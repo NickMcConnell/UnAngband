@@ -553,6 +553,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	int flavor;
 
 	bool append_name;
+	bool append_modstr;
 
 	bool show_weapon;
 	bool show_armour;
@@ -626,6 +627,9 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 	/* Assume no name appending */
 	append_name = FALSE;
+
+	/* Assume no modstr appending */
+	append_modstr = FALSE;
 
 	/* Assume no need to show "weapon" bonuses */
 	show_weapon = FALSE;
@@ -783,10 +787,14 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		case TV_FLASK:
 		{
 			append_name = TRUE;
-			basenm = (o_ptr->name3 ? "& # Flask~" : "& Flask~");
+			basenm = "& Flask~";
 
 			/* Racially mark the object */
-			if (o_ptr->name3) modstr = (r_name + r_info[o_ptr->name3].name);
+			if (o_ptr->name3)
+			{
+				modstr = (r_name + r_info[o_ptr->name3].name);
+				append_modstr = TRUE;
+			}
 
 			break;
 		}
@@ -1127,11 +1135,13 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	}
 
 
-	/* Append the "kind name" to the "base name" */
-	if (append_name)
+	/* Append the "kind name" and/or "mod string" to the "base name" */
+	if ((append_name) || (append_modstr))
 	{
 		object_desc_str_macro(t, " of ");
-		object_desc_str_macro(t, (k_name + k_ptr->name));
+		if (append_modstr) object_desc_str_macro(t, modstr);
+		if ((append_modstr) && (append_name)) object_desc_str_macro(t, " ");
+		if (append_name) object_desc_str_macro(t, (k_name + k_ptr->name));
 	}
 
 

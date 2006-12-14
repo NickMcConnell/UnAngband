@@ -4936,7 +4936,7 @@ void init_level_flags(void)
 		/* Top of tower */
 		else if (p_ptr->depth == max_depth(p_ptr->dungeon))
 		{
-			level_flag |= (LF1_LESS);
+			level_flag |= (LF1_MORE);
 		}
 
 		/* In tower */
@@ -4944,9 +4944,6 @@ void init_level_flags(void)
 		{
 			level_flag |= (LF1_LESS | LF1_MORE);
 		}
-
-		/* Level is guarded? */
-		if (level_flag & (LF1_GUARDIAN)) level_flag &= ~(LF1_LESS);
 	}
 	/* Others */
 	else
@@ -4968,9 +4965,6 @@ void init_level_flags(void)
 		{
 			level_flag |= (LF1_LESS | LF1_MORE);
 		}
-
-		/* Level is guarded? */
-		if (level_flag & (LF1_GUARDIAN)) level_flag &= ~(LF1_MORE);
 	}
 
 	/* At the moment, all levels have rooms and corridors */
@@ -5004,12 +4998,12 @@ static void cave_gen(void)
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
 	/* Create air */
-	if ((level_flag & (LF1_TOWER)) && !(level_flag & (LF1_SURFACE)))
+	if (((level_flag & (LF1_TOWER)) != 0) && ((level_flag & (LF1_SURFACE)) == 0))
 	{
 		base = FEAT_CHASM;
 	}
 	/* Create ground */
-	else if (level_flag & (LF1_SURFACE))
+	else if ((level_flag & (LF1_SURFACE)) != 0)
 	{
 		if (f_info[zone->fill].flags1 & (FF1_FLOOR)) base = zone->fill;
 		else base = FEAT_GROUND;
@@ -5043,7 +5037,7 @@ static void cave_gen(void)
 	cave_ecology.ready = FALSE;
 
 	/* Place guardian if permitted */
-	if (level_flag & (LF1_GUARDIAN))
+	if ((level_flag & (LF1_GUARDIAN)) != 0)
 	{
 		get_monster_ecology(zone->guard);
 	}
@@ -5106,7 +5100,7 @@ static void cave_gen(void)
 	if (level_flag & (LF1_QUEST | LF1_WILD | LF1_GUARDIAN)) level_flag &= ~(LF1_DESTROYED);
 
 	/* No features on destroyed level or in a tower above the surface */
-	if ((level_flag & (LF1_DESTROYED)) && (!(level_flag & (LF1_TOWER)) || (level_flag & (LF1_SURFACE)) ))
+	if (((level_flag & (LF1_DESTROYED)) != 0) && (((level_flag & (LF1_TOWER)) == 0) || ((level_flag & (LF1_SURFACE)) != 0) ))
 	{
 		bool big = FALSE;
 		bool done_big = FALSE;
@@ -5277,13 +5271,13 @@ static void cave_gen(void)
 	if (level_flag & (LF1_BATTLE)) level_flag &= ~(LF1_ROOMS);
 
 	/* Non-destroyed surface locations don't have rooms, but do have paths across the level */
-	if ((level_flag & (LF1_SURFACE)) && !(level_flag & (LF1_DESTROYED))) level_flag &= ~(LF1_ROOMS);
+	if (((level_flag & (LF1_SURFACE)) != 0) && ((level_flag & (LF1_DESTROYED)) == 0)) level_flag &= ~(LF1_ROOMS);
 
 	/* Towers don't have rooms or tunnels */
-	if ((level_flag & (LF1_TOWER)) && !(level_flag & (LF1_SURFACE))) level_flag &= ~(LF1_ROOMS | LF1_TUNNELS);
+	if (((level_flag & (LF1_TOWER)) != 0) && ((level_flag & (LF1_SURFACE)) == 0)) level_flag &= ~(LF1_ROOMS | LF1_TUNNELS);
 
 	/* Build some rooms or points to connect tunnels */
-	if (level_flag & (LF1_ROOMS | LF1_TUNNELS))
+	if ((level_flag & (LF1_ROOMS | LF1_TUNNELS)) != 0)
 		for (i = 0; i < DUN_ROOMS; i++)
 	{
 		/* Pick a block for the room */
@@ -5301,7 +5295,7 @@ static void cave_gen(void)
 		}
 
 		/* Don't have rooms or sometimes has rooms */
-		if (((level_flag & (LF1_ROOMS)) == 0) || ((level_flag & (LF1_MINE)) && (dun->cent_n % 2)))
+		if (((level_flag & (LF1_ROOMS)) == 0) || (((level_flag & (LF1_MINE)) != 0) && (dun->cent_n % 2)))
 		{
 			/* Attempt a "non-existent" room */
 			if (room_build(by, bx, 0)) continue;
@@ -5567,17 +5561,17 @@ static void cave_gen(void)
 	}
 
 	/* Destroy the level if necessary */
-	if (level_flag & (LF1_DESTROYED)) destroy_level();
+	if ((level_flag & (LF1_DESTROYED)) != 0) destroy_level();
 
 	/* Hack -- have less monsters during day light */
-	if (level_flag & (LF1_DAYLIGHT)) k = (p_ptr->depth / 6);
+	if ((level_flag & (LF1_DAYLIGHT)) != 0) k = (p_ptr->depth / 6);
 	else k = (p_ptr->depth / 3);
 
 	if (k > 10) k = 10;
 	if (k < 2) k = 2;
 
 	/* Hack -- make sure we have rooms/corridors to place stuff */
-	if (level_flag & (LF1_ROOMS | LF1_TOWER))
+	if ((level_flag & (LF1_ROOMS | LF1_TOWER)) != 0)
 	{	
 		/* Place 1 or 2 down stairs near some walls */
 		alloc_stairs(FEAT_MORE, rand_range(1, 2), 3);
@@ -5589,7 +5583,7 @@ static void cave_gen(void)
 		alloc_stairs(0, 2, 3);
 
 		/* Put some rubble in corridors -- we want to exclude towers unless other rooms on level */
-		if (level_flag & (LF1_ROOMS)) alloc_object(ALLOC_SET_CORR, ALLOC_TYP_RUBBLE, randint(k));
+		if ((level_flag & (LF1_ROOMS)) != 0) alloc_object(ALLOC_SET_CORR, ALLOC_TYP_RUBBLE, randint(k));
 	
 		/* Place some traps in the dungeon */
 		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_TRAP, randint(k));
@@ -5626,7 +5620,7 @@ static void cave_gen(void)
 	}
 
 	/* Hack -- make sure we have rooms to place stuff */
-	if (level_flag & (LF1_ROOMS | LF1_TOWER))
+	if ((level_flag & (LF1_ROOMS | LF1_TOWER)) != 0)
 	{
 		/* Put some objects in rooms */
 		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ROOM, 3));
@@ -5637,7 +5631,7 @@ static void cave_gen(void)
 	}
 
 	/* Apply illumination */
-	if (level_flag & (LF1_SURFACE)) town_illuminate((level_flag & (LF1_DAYLIGHT)) != 0);
+	if ((level_flag & (LF1_SURFACE)) != 0) town_illuminate((level_flag & (LF1_DAYLIGHT)) != 0);
 
 	/* Ensure quest monsters */
 	if (is_quest(p_ptr->depth))
@@ -5670,7 +5664,7 @@ static void cave_gen(void)
 	}
 
 	/* Ensure guardian monsters */
-	if (level_flag & (LF1_GUARDIAN))
+	if ((level_flag & (LF1_GUARDIAN)) != 0)
 	{
 		int y, x;
 
@@ -5689,7 +5683,7 @@ static void cave_gen(void)
 
 	/* Hack -- restrict teleporation in towers */
 	/* XXX Important that this occurs after placing the player */
-	if (level_flag & (LF1_TOWER))
+	if ((level_flag & (LF1_TOWER)) != 0)
 	{
 		room_info[1].flags = (ROOM_ICKY);
 	}
@@ -5984,11 +5978,6 @@ static void town_gen(void)
 	town_type *t_ptr = &t_info[p_ptr->dungeon];
 	dungeon_zone *zone=&t_ptr->zone[0];;
 
-	/* Reset level flag */
-	level_flag =  (p_ptr->depth == min_depth(p_ptr->dungeon)) ?
-			((((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))) ?
-				LF1_SURFACE | LF1_DAYLIGHT : LF1_SURFACE) : 0;
-
 	/* Get the zone */
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
@@ -6047,10 +6036,10 @@ static void town_gen(void)
 	town_gen_hack();
 
 	/* Apply illumination */
-	if (level_flag & (LF1_SURFACE)) town_illuminate((level_flag & (LF1_DAYLIGHT)) != 0);
+	if ((level_flag & (LF1_SURFACE)) != 0) town_illuminate((level_flag & (LF1_DAYLIGHT)) != 0);
 
 	/* Ensure guardian monsters */
-	if ((level_flag & (LF1_GUARDIAN)) && !(level_flag & (LF1_DAYLIGHT)))
+	if (((level_flag & (LF1_GUARDIAN)) != 0) && ((level_flag & (LF1_DAYLIGHT)) == 0))
 	{
 		/* Pick a location */
 		while (1)

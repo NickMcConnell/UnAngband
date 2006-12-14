@@ -136,6 +136,8 @@ fix by RDE).
 
 - Fixed some bugs around trying to discount heavy item power levels.
 
+- Fixed names of flasks when containing monster parts.
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.
