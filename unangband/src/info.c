@@ -5862,15 +5862,9 @@ s32b object_power(const object_type *o_ptr)
 
 	}
 
-	/* Compute weight discount percentage */
-	/*
-	 * If an item weighs more than 5 pounds, we discount its power.
-	 *
-	 * This figure is from 30 lb weight limit for mages divided by 6 slots;
-	 * but we do it for all items as they may be used as swap items, but use a divisor of 10 lbs instead.
-	 */
+	/* Compute ac bonuses */
 
-	/* Evaluate ac bonus and weight differently for armour and non-armour. */
+	/* Evaluate ac bonus differently for armour and non-armour. */
 	switch (o_ptr->tval)
 	{
 		case TV_BOOTS:
@@ -5883,16 +5877,10 @@ s32b object_power(const object_type *o_ptr)
 		case TV_HARD_ARMOR:
 		case TV_DRAG_ARMOR:
 		{
-			if (o_ptr->weight >= 50)
-			{
-				p -= o_ptr->weight / 50; 
-			}
-
 			if (o_ptr->to_a > o_ptr->ac)
 			{
 				p+= (o_ptr->to_a - o_ptr->ac);
 			}
-			else p+= 9;
 
 			if (o_ptr->to_a > o_ptr->ac + 10)
 			{
@@ -5909,39 +5897,18 @@ s32b object_power(const object_type *o_ptr)
 				p += 20000;	/* inhibit */
 			}
 			break;
-
+		}
 		case TV_SWORD:
 		case TV_DIGGING:
 		case TV_STAFF:
 		case TV_HAFTED:
 		case TV_POLEARM:
-			/* These are breaks for 1-handed, 2-handed, max 4 blows for warriors,
-				and max 3 blows for others */
-			if (o_ptr->weight >= 150)
-			{
-				p -= 1; 
-			}
-
-			if (o_ptr->weight >= 200)
-			{
-				p -= 1; 
-			}
-
-			if (o_ptr->weight > 240)
-			{
-				p -= 1; 
-			}
-
-			if (o_ptr->weight > 960)
-			{
-				p -= 1; 
-			}
-
 		case TV_BOW:
 		case TV_INSTRUMENT:
 		case TV_LITE:
 		case TV_RING:
 		case TV_AMULET:
+		{
 			p += sign(o_ptr->to_a) * (ABS(o_ptr->to_a) / 2);
 
 			if (o_ptr->to_a > 9)
@@ -5959,10 +5926,9 @@ s32b object_power(const object_type *o_ptr)
 				p += 20000;	/* inhibit */
 			}
 			break;
-
+		}
 		default:
 			return(p);
-		}
 	}
 
 	/* Other abilities are evaluated independent of the object type. */
@@ -6155,6 +6121,92 @@ s32b object_power(const object_type *o_ptr)
 	ADD_POWER("lightning vulnerability", -40, TR4_HURT_ELEC, 4,);
 	ADD_POWER("fire vulnerability",	 -40, TR4_HURT_FIRE, 4,);
 	ADD_POWER("cold vulnerability",	 -40, TR4_HURT_COLD, 4,);
+
+
+	/* Evaluate weight discount. */
+	switch (o_ptr->tval)
+	{
+		case TV_BOOTS:
+		case TV_GLOVES:
+		case TV_HELM:
+		case TV_CROWN:
+		case TV_SHIELD:
+		case TV_CLOAK:
+		case TV_SOFT_ARMOR:
+		case TV_HARD_ARMOR:
+		case TV_DRAG_ARMOR:
+		{
+	/*
+	 * If a worn item weighs more than 5 pounds, we discount its power by up to 50%.
+	 *
+	 * This figure is from 30 lb weight limit for mages divided by 6 slots.
+	 */
+			if (o_ptr->weight >= 50)
+			{
+				if (p > o_ptr->weight / 25)
+					p -= o_ptr->weight / 50;
+				else if (p > 0)
+					p = (p + 1) / 2;
+			}
+
+			break;
+		}
+		case TV_SWORD:
+		case TV_DIGGING:
+		case TV_STAFF:
+		case TV_HAFTED:
+		case TV_POLEARM:
+		{
+			/* These are breaks for 1-handed, 2-handed, max 4 blows for warriors,
+				and max 3 blows for others */
+			if (p > 0)
+			{
+				if ((o_ptr->weight > 960) && (p > 7))
+				{
+					p -= 1; 
+				}
+
+				if ((o_ptr->weight > 240) && (p > 5))
+				{
+					p -= 1; 
+				}
+
+				if ((o_ptr->weight >= 200) && (p > 3))
+				{
+					p -= 1; 
+				}
+
+				if ((o_ptr->weight >= 150) && (p > 1))
+				{
+					p -= 1; 
+				}
+			}
+			break;
+		}
+		case TV_BOW:
+		case TV_INSTRUMENT:
+		case TV_LITE:
+		case TV_RING:
+		case TV_AMULET:
+		{
+	/*
+	 * If a worn item weighs more than 15 pounds, we discount its power by up to 50%.
+	 *
+	 * This if for acting as a swap item. Note that super heavy weapons get less of a
+	 * discount than other super heavy swap items, because of the increased criticals
+	 * and charge bonus.
+	 */
+			if (o_ptr->weight >= 150)
+			{
+				if (p > o_ptr->weight / 75)
+					p -= o_ptr->weight / 150;
+				else if (p > 0)
+					p = (p + 1) / 2;
+			}
+			break;
+		}
+	}
+
 
 	return (p);
 }

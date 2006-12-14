@@ -83,7 +83,7 @@ to ensure that all rooms are correctly connected.
 - Added new class Warrior Mage, which has good combat abilities and magic equivalent to the
 old Ranger.  Rangers now only cast spells (approximately) as well as rogues.
 
-- Renamed priest base class to cleric. Added priests as clerics who specialise in magic books,
+- Renamed priest base class to cleric. Added priests who specialise in magic books,
 which allows the priest to cast spells from one magic book as per a non-specialist mage. Added
 Gifted and Choosen Warriors, Archers and Thieves who can choose from a single magic book or
 prayer book spells. Added Cultists who are mages with access to one prayer book and renamed
@@ -133,6 +133,8 @@ fix by RDE).
 - Salt water now cures poison again (Reported by Harriet Bazley).
 
 - Minor Acid Ball now does fire damage.
+
+- Fixed some bugs around trying to discount heavy item power levels.
 
 ### Build / Platform ###
 

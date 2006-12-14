@@ -1020,7 +1020,6 @@ s32b object_value_real(const object_type *o_ptr)
 
 	int power;
 
-
 	/* Hack -- "worthless" items */
 	if (!k_ptr->cost) return (0L);
 
@@ -1058,6 +1057,7 @@ s32b object_value_real(const object_type *o_ptr)
 
 	/* Now evaluate object power */
 	power = object_power(o_ptr);
+
 #if 0
 	/* Hack -- No negative power on uncursed objects */
 	if ((power < 0) && !(cursed_p(o_ptr))) power = 0;
@@ -1073,7 +1073,7 @@ s32b object_value_real(const object_type *o_ptr)
 	}		
 
 	/* Hack -- object power assumes (+11,+9) on weapons and ammo so we need to include some smaller bonuses,
-		and +9 ac on armour so we need to include some bonuses. */
+		and ac bonus on armour equal to its base armour class so we need to include some bonuses. */
 	switch (o_ptr->tval)
 	{
 		/* Armour */
@@ -1088,7 +1088,7 @@ s32b object_value_real(const object_type *o_ptr)
 		case TV_DRAG_ARMOR:
 		{
 			/* Factor in the bonuses not considered by power equation */
-			value += o_ptr->to_a < 10 ? o_ptr->to_a * 100L : 1000L;
+			value += o_ptr->to_a <= o_ptr->ac ? o_ptr->to_a * 100L : o_ptr->ac * 100L;
 
 			break;
 		}
