@@ -1200,11 +1200,20 @@ static errr rd_extra(void)
 	}
 
 
-	/* Hack -- unlearn ranger spells */
+	/* Warn the player */
 	if (older_than(0, 6, 2) && (p_ptr->pclass == 4))
 	{
-		strip_bytes(48);
+		msg_print("Rangers have changed significantly since this save-file version.");
+		msg_print("You must choose now to either to retain the weapon style bonuses or offensive spells for this character.");
+		msg_print("");
 
+		if(!get_check("Continue? ")) return(-1);
+	}
+
+	/* Hack -- unlearn ranger spells */
+	if (older_than(0, 6, 2) && (p_ptr->pclass == 4) && (get_check("Retain weapon style bonuses and discard offensive spells? ")))
+	{
+		strip_bytes(48);
 	} 
 	else
 	{
@@ -1221,6 +1230,9 @@ static errr rd_extra(void)
 		rd_u32b(&p_ptr->spell_forgotten2);
 		rd_u32b(&p_ptr->spell_forgotten3);
 		rd_u32b(&p_ptr->spell_forgotten4);
+
+		/* Hack -- change class to warrior mage instead */
+		if (older_than(0, 6, 2) && (p_ptr->pclass == 4)){  p_ptr->pclass = 10; p_ptr->pstyle = 0; p_ptr->psval = 0; }
 	}
 
 	/* Read in the spells */

@@ -3943,18 +3943,32 @@ bool project_o(int who, int y, int x, int dam, int typ)
 				break;
 			}
 
-			/* Explosion -- very destructive to objects */
+			/* Explosion -- destroys fire + potions */
 			case GF_EXPLODE:
+			{
+				if (hates_fire(o_ptr))
+				{
+					do_kill = TRUE;
+					note_kill = (plural ? " burn up!" : " burns up!");
+					if (f2 & (TR2_IGNORE_FIRE)) ignore = TRUE;
+					if2 |= TR2_IGNORE_FIRE;
+				}
+				if (hates_cold(o_ptr))
+				{
+					ignore = FALSE;
+					do_kill = TRUE;
+					note_kill = (plural ? " shatters!" : " shatters!");
+					if (f2 & (TR2_IGNORE_COLD)) ignore = TRUE;
+					if2 |= TR2_IGNORE_COLD;
+				}
+				break;
+			}
+
+			/* Mana -- very destructive to objects */
 			case GF_MANA:
 			{
 				do_kill = TRUE;
-				note_kill = (plural ? " shatters!" : " shatters!");
-				if ((f2 & (TR2_IGNORE_ACID)) &&
-				    (f2 & (TR2_IGNORE_COLD)) &&
-				    (f2 & (TR2_IGNORE_ELEC)) &&
-				    (f2 & (TR2_IGNORE_FIRE)) &&
-				    (f2 & (TR2_IGNORE_WATER))) ignore = TRUE;
-
+				note_kill = (plural ? " are destroyed!" : " is destroyed!");
 				break;
 			}
 

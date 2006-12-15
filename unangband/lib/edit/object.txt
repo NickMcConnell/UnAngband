@@ -206,43 +206,43 @@ A:15/1
 N:21:& Ration~ of Food
 G:,:U
 I:80:35:0
-W:0:5000:10:3
+W:0:500:10:3
 A:0/1:5/1:10/1
 
 N:22:& Hard Biscuit~
 G:,:U
 I:80:32:0
-W:0:500:2:1
+W:0:250:2:1
 A:0/1
 
 N:23:& Strip~ of Beef Jerky
 G:,:u
 I:80:33:0
-W:0:1500:2:2
+W:0:750:2:2
 A:0/2
 
 N:24:& Slime Mold~
 G:,:g
 I:80:36:0
-W:1:3000:5:2
+W:1:600:5:2
 A:1/1
 
 N:25:& Piece~ of Elvish Waybread
 G:,:B
 I:80:37:0
-W:5:7500:3:10
+W:5:2500:3:10
 A:5/1:10/1:20/1
 
 N:26:& Pint~ of Fine Ale
 G:,:y
 I:80:40:0
-W:0:500:5:1
+W:0:100:5:1
 A:0/2
 
 N:27:& Pint~ of Fine Wine
 G:,:r
 I:80:41:0
-W:0:1000:10:2
+W:0:100:10:2
 A:0/2
 
 N:28:Mana
@@ -254,7 +254,7 @@ A:15/1
 N:29:& Apple~
 G:,:g
 I:80:38:0
-W:1:3000:4:2
+W:1:700:4:2
 A:1/1
 P:0:1d1:0:0:0
 
@@ -3163,7 +3163,7 @@ P:0:1d1:0:0:0
 N:392:& # Bone~
 G:~:R
 I:1:2:0
-W:0:0:3:0
+W:0:50:3:0
 A:0/1:1/1:10/1:20/1
 P:0:1d1:0:0:0
 
@@ -4200,7 +4200,7 @@ P:0:1d1:0:0:0
 
 N:567:& Wizard Light spell~
 G:~:B
-I:10:10:0
+I:10:10:3
 W:0:0:0:0
 P:0:1d1:0:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD |
@@ -4291,27 +4291,27 @@ F:RES_FIRE | RES_COLD | RES_ACID | RES_ELEC | RES_POIS | DRAGON
 N:578:& # Corpse~
 G:~:r
 I:6:1:0
-W:0:0:100:0
+W:0:200:100:0
 P:0:1d1:0:0:0
 
 N:579:& # Head~
 G:~:r
 I:6:2:0
-W:1:0:15:0
+W:1:250:15:0
 A:1/1
 P:0:1d1:0:0:0
 
 N:580:& # Hand~
 G:~:r
 I:6:3:0
-W:1:0:5:0
+W:1:150:5:0
 A:1/1
 P:0:1d1:0:0:0
 
 N:581:& # Arm~
 G:~:r
 I:6:4:0
-W:1:0:10:0
+W:1:200:10:0
 A:1/1
 P:0:1d1:0:0:0
 
@@ -4320,26 +4320,26 @@ P:0:1d1:0:0:0
 N:583:& # Leg~
 G:~:r
 I:6:6:0
-W:1:0:15:0
+W:1:250:15:0
 A:1/1
 P:0:1d1:0:0:0
 
 N:584:& # Wing~
 G:~:r
 I:6:7:0
-W:5:0:15:0
+W:5:150:15:0
 P:0:1d1:0:0:0
 
 N:585:& headless # Corpse~
 G:~:r
 I:6:13:0
-W:0:0:85:0
+W:0:150:85:0
 P:0:1d1:0:0:0
 
 N:586:& butchered # Corpse~
 G:~:r
 I:6:14:0
-W:0:0:25:0
+W:0:100:25:0
 P:0:1d1:0:0:0
 
 N:587:& broken Stump~
@@ -4359,13 +4359,13 @@ P:0:1d1:0:0:0
 N:589:& hunk~ of # Meat
 G:~:r
 I:6:15:0
-W:0:0:25:0
+W:0:600:25:0
 P:0:1d1:0:0:0
 
 N:590:& # Skin~
 G:~:G
 I:8:1:0
-W:20:0:20:0
+W:20:100:20:0
 A:20/1
 P:0:1d1:0:0:0
 
@@ -4393,13 +4393,13 @@ P:0:1d1:0:0:0
 N:595:& # Claw~
 G:~:r
 I:6:12:0
-W:2:0:2:0
+W:2:100:2:0
 P:0:1d1:0:0:0
 
 N:596:& large # Spore~
 G:~:W
 I:9:2:0
-W:3:0:1:0
+W:3:200:1:0
 A:7/2
 P:0:1d1:0:0:0
 F:THROWING
@@ -4407,7 +4407,7 @@ F:THROWING
 N:597:& # Egg~
 G:~:W
 I:9:1:0
-W:9:0:4:0
+W:9:600:4:0
 A:9/2:21/2:31/2
 P:0:1d1:0:0:0
 F:THROWING
@@ -4685,7 +4685,7 @@ I:70:57:0
 W:35:0:5:500
 A:35/1
 
-N:636:Enchant Bolts Brand
+N:636:Enchant Ammunition Brand
 G:?:w
 I:70:58:0
 W:25:0:5:750
@@ -6031,7 +6031,7 @@ A:1/1:3/1:5/1
 N:832:Blood
 G:!:r
 I:77:3:0
-W:1:0:10:0
+W:1:1000:10:0
 A:1/2
 P:0:1d1:0:0:0
 F:THROWING
@@ -6039,7 +6039,7 @@ F:THROWING
 N:833:Slime
 G:!:W
 I:77:4:0
-W:1:0:10:0
+W:1:100:10:0
 A:1/2
 P:0:1d1:0:0:0
 F:THROWING
@@ -6047,7 +6047,7 @@ F:THROWING
 N:834:Bile
 G:!:o
 I:77:5:0
-W:8:0:10:0
+W:8:50:10:0
 A:8/2
 P:0:1d1:0:0:0
 F:THROWING
@@ -6517,3 +6517,81 @@ G:?:w
 I:70:80:0
 W:20:0:5:150
 A:20/1
+
+# Artisan books
+
+N:898:of Craft
+G:?:r
+I:90:26:0
+W:30:0:30:900
+A:30/3
+P:0:1d1:0:0:0
+F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
+
+N:899:of Art
+G:?:r
+I:90:27:0
+W:45:0:30:900
+A:45/3
+P:0:1d1:0:0:0
+F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
+
+N:900:of Science
+G:?:r
+I:90:28:0
+W:60:0:30:2500
+A:60/3
+P:0:1d1:0:0:0
+F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
+
+# Ranger books
+
+N:901:of Trailcraft
+G:?:r
+I:90:29:0
+W:30:0:30:900
+A:30/3
+P:0:1d1:0:0:0
+F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
+
+N:902:of Warcraft
+G:?:r
+I:90:30:0
+W:45:0:30:900
+A:45/3
+P:0:1d1:0:0:0
+F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
+
+N:903:of Statecraft
+G:?:r
+I:90:31:0
+W:60:0:30:900
+A:60/3
+P:0:1d1:0:0:0
+F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
+
+# Paladin books
+
+#N:904:of xxx
+#G:?:b
+#I:91:15:0
+#W:30:0:30:800
+#A:30/3
+#P:0:1d1:0:0:0
+#F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
+
+#N:905:of xxx
+#G:?:b
+#I:91:16:0
+#W:50:0:30:5000
+#A:50/2
+#P:0:1d1:0:0:0
+#F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
+
+#N:906:of xxx
+#G:?:b
+#I:91:17:0
+#W:70:0:30:12500
+#A:70/2
+#P:0:1d1:0:0:0
+#F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER

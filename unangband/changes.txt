@@ -83,12 +83,15 @@ to ensure that all rooms are correctly connected.
 - Added new class Warrior Mage, which has good combat abilities and magic equivalent to the
 old Ranger.  Rangers now only cast spells (approximately) as well as rogues.
 
-- Renamed priest base class to cleric. Added priests who specialise in magic books,
-which allows the priest to cast spells from one magic book as per a non-specialist mage. Added
-Gifted and Choosen Warriors, Archers and Thieves who can choose from a single magic book or
-prayer book spells. Added Cultists who are mages with access to one prayer book and renamed
-old Shaman Cultists to Druids.
+- Added priests who specialise in magic books, which allows the priest to cast spells from
+one magic book as per a non-specialist mage. Added Gifted and Choosen Warriors, Archers and
+Thieves who can choose from a single magic book or prayer book spells. Added Cultists who
+are mages with access to one prayer book and renamed old Shaman Cultists to Druids.
 
+- Renamed Rogues to Artisans. Swapped Ranger and Artisan stealth.
+
+- Added 'Artisan' and 'Ranger' magic books, so that these two classes can get their entire
+spell selection in 6 books.
 
 ### User Interface ###
 
@@ -137,6 +140,8 @@ fix by RDE).
 - Fixed some bugs around trying to discount heavy item power levels.
 
 - Fixed names of flasks when containing monster parts.
+
+- Fixed cure serious wounds pre-requisite.
 
 ### Build / Platform ###
 
