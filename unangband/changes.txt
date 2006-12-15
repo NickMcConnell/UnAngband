@@ -84,7 +84,7 @@ to ensure that all rooms are correctly connected.
 old Ranger.  Rangers now only cast spells (approximately) as well as rogues.
 
 - Added priests who specialise in magic books, which allows the priest to cast spells from
-one magic book as per a non-specialist mage. Added Gifted and Choosen Warriors, Archers and
+one magic book as per a non-specialist mage. Added Gifted and Chosen Warriors, Archers and
 Thieves who can choose from a single magic book or prayer book spells. Added Cultists who
 are mages with access to one prayer book and renamed old Shaman Cultists to Druids.
 

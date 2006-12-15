@@ -1118,9 +1118,9 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Choosen Warrior");
+				if (short_name) strcpy(temp,"Chosen Warrior");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
-				if (long_name) sprintf(temp,"Warrior Choosen %s",k_name+k_ptr->name);
+				if (long_name) sprintf(temp,"Warrior Chosen %s",k_name+k_ptr->name);
 			}
 			break;
 
@@ -1261,9 +1261,9 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Choosen Thief");
+				if (short_name) strcpy(temp,"Chosen Thief");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
-				if (long_name) sprintf(temp,"Thief Choosen %s",k_name+k_ptr->name);
+				if (long_name) sprintf(temp,"Thief Chosen %s",k_name+k_ptr->name);
 			}
 			if (style == WS_UNARMED) strcpy(temp,"Acrobat");
 			if (style == WS_ONE_HANDED) strcpy(temp,"Highwayman");
@@ -1288,9 +1288,9 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Choosen Archer");
+				if (short_name) strcpy(temp,"Chosen Archer");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
-				if (long_name) sprintf(temp,"Archer Choosen %s",k_name+k_ptr->name);
+				if (long_name) sprintf(temp,"Archer Chosen %s",k_name+k_ptr->name);
 			}
 			if (style == WS_SLING) strcpy(temp,"Slinger");
 			if (style == WS_BOW) strcpy(temp,"Longbowman");
