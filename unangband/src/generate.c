@@ -119,8 +119,8 @@
 #define DUN_TUN_RND     10      /* Chance of random direction */
 #define DUN_TUN_CAV     50      /* Chance of random direction / changing direction in caves */
 #define DUN_TUN_CHG     10      /* Chance of changing direction */
-#define DUN_TUN_STY     10       /* Chance of changing style */
-#define DUN_TUN_CON     15      /* Chance of extra tunneling */
+#define DUN_TUN_STY     10      /* Chance of changing style */
+#define DUN_TUN_CON     15       /* Chance of extra tunneling */
 #define DUN_TUN_PEN     25      /* Chance of doors at room entrances */
 #define DUN_TUN_JCT     90      /* Chance of doors at tunnel junctions */
 
@@ -4252,7 +4252,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	int row_dir, col_dir;
 	int start_row, start_col;
 	int main_loop_count = 0;
-	int last_turn = 0;
+	int last_turn = 0, first_door, last_door;
 
 	bool door_flag = FALSE;
 	bool overrun_flag = FALSE;
@@ -4270,6 +4270,10 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	/* Save the starting location */
 	start_row = row1;
 	start_col = col1;
+
+	/* Record number of doorways */
+	first_door = dun->door_n;
+	last_door = dun->door_n;
 
 	/* Start out in the correct direction */
 	correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
@@ -4307,6 +4311,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 
 			/* Record this */
 			last_turn = dun->tunn_n;
+			last_door = dun->door_n;
 		}
 
 		/* Get the next location */
@@ -4330,9 +4335,11 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 
 			/* Fall back to last turn */
 			dun->tunn_n = last_turn;
+			dun->door_n = last_door;
 
 			/* Back up some more */
 			last_turn /= 2;
+			last_door = first_door;
 
 			/* Get the correct direction */
 			correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
@@ -4465,6 +4472,9 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				/* Different room in same partition */
 				if (dun->part[dun_room[by1][bx1]-1] == dun->part[dun_room[by2][bx2]-1])
 				{
+					/* Clear intersections */
+					dun->door_n = first_door;
+
 					/* Abort */
 					return;
 				}
@@ -4614,7 +4624,14 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			/* Prevent us following corridor length */
 			if (door_flag)
 			{
-				if (overrun_flag) return;
+				if ((overrun_flag) || (dun->door_n > first_door + 6))
+				{
+					/* Clear intersections */
+					dun->door_n = first_door;
+
+					/* Abort */
+					return;
+				}
 
 				overrun_flag = TRUE;
 			}
@@ -4635,9 +4652,9 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 
 				overrun_flag = FALSE;
 			}
-#if 0
+
 			/* Hack -- allow pre-emptive tunnel termination */
-			if (rand_int(100) >= DUN_TUN_CON)
+			if ((rand_int(100) >= DUN_TUN_CON) && (dun->door_n < 3))
 			{
 				/* Distance between row1 and start_row */
 				tmp_row = row1 - start_row;
@@ -4650,7 +4667,6 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				/* Terminate the tunnel */
 				if ((tmp_row > 10) || (tmp_col > 10)) break;
 			}
-#endif
 		}
 
 		/* Fix up diagonals from cave tunnels after 1 move */
@@ -4677,6 +4693,9 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			/* Different room in same partition */
 			if (dun->part[dun_room[by1][bx1]-1] == dun->part[dun_room[by2][bx2]-1])
 			{
+				/* Clear intersections */
+				dun->door_n = first_door;
+
 				/* Abort */
 				return;
 			}
@@ -4822,23 +4841,27 @@ static bool possible_doorway(int y, int x)
 /*
  * Places door at y, x position if at least 2 walls found
  */
-static void try_door(int y, int x)
+static bool try_door(int y, int x)
 {
 	/* Paranoia */
-	if (!in_bounds(y, x)) return;
+	if (!in_bounds(y, x)) return (FALSE);
 
 	/* Ignore walls */
-	if (cave_feat[y][x] >= FEAT_MAGMA) return;
+	if (!(f_info[cave_feat[y][x]].flags1 & (FF1_WALL))) return (FALSE);
 
 	/* Ignore room grids */
-	if (cave_info[y][x] & (CAVE_ROOM)) return;
+	if (cave_info[y][x] & (CAVE_ROOM)) return (FALSE);
 
 	/* Occasional door (if allowed) */
 	if ((rand_int(100) < DUN_TUN_JCT) && possible_doorway(y, x))
 	{
 		/* Place a door */
 		place_random_door(y, x);
+
+		return (TRUE);
 	}
+
+	return (FALSE);
 }
 
 /*
@@ -5556,15 +5579,23 @@ static void cave_gen(void)
 	/* Place intersection doors */
 	for (i = 0; i < dun->door_n; i++)
 	{
+		int dk = rand_int(100) < 50 ? 1 : -1;
+		int count = 0;
+
 		/* Extract junction location */
 		y = dun->door[i].y;
 		x = dun->door[i].x;
 
-		/* Try placing doors */
-		try_door(y, x - 1);
-		try_door(y, x + 1);
-		try_door(y - 1, x);
-		try_door(y + 1, x);
+		/* Try a door in one direction */
+		/* If the first created door is secret, stop */
+		for (j = 0, k = rand_int(4); j < 4; j++)
+		{
+			if (try_door(y + ddy_ddd[k], x + ddx_ddd[k])) count++;
+
+			if ((!count) && (f_info[cave_feat[y + ddy_ddd[k]][x + ddx_ddd[k]]].flags1 & (FF1_SECRET))) break;
+
+			k = (k + dk) % 4;
+		}
 	}
 
 	/* Hack -- Sandstone streamers are shallow */
