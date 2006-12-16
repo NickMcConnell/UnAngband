@@ -93,6 +93,15 @@ are mages with access to one prayer book and renamed old Shaman Cultists to Drui
 - Added 'Artisan' and 'Ranger' magic books, so that these two classes can get their entire
 spell selection in 6 books.
 
+- You now don't gain a stat increase every level, but gain multiple stat increases instead
+periodically. However, when increasing multiple stats, you can only increase each stat once
+per level gain. This prevents you maximising key stats too early and makes high starting
+stats more useful.
+
+- Improvements to costs when assigning attributes using the point assignment method at birth.
+This now mimics the distribution of stats using the auto-roller a lot more (Analysis by
+mikon).
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
@@ -135,7 +144,7 @@ fix by RDE).
 
 - Salt water now cures poison again (Reported by Harriet Bazley).
 
-- Minor Acid Ball now does fire damage.
+- Minor Acid Ball now does acid damage.
 
 - Fixed some bugs around trying to discount heavy item power levels.
 

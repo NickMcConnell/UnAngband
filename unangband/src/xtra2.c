@@ -2478,13 +2478,16 @@ void improve_aware(void)
 }
 
 
+static int stat_gain_selection[PY_MAX_STAT_GAIN];
+static int stat_gain_selected;
+
 
 /*
  * Print a list of stats (for improvement).
  */
 void print_stats(const s16b *sn, int num, int y, int x)
 {
-	int i;
+	int i, j;
 
 	byte attr;
 
@@ -2496,18 +2499,23 @@ void print_stats(const s16b *sn, int num, int y, int x)
 	{
 		attr = TERM_WHITE;
 
-		if (p_ptr->stat_cur[sn[i]] == 18 + 100) attr = TERM_L_DARK;
-		if (p_ptr->stat_cur[sn[i]]<p_ptr->stat_max[sn[i]]) attr = TERM_YELLOW;
+		if (p_ptr->stat_cur[sn[i]] < p_ptr->stat_max[sn[i]]) attr = TERM_YELLOW;
+		if (p_ptr->stat_max[sn[i]] == 18 + 100) attr = TERM_L_DARK;
+
+		for (j = 0; j < stat_gain_selected; j++)
+		{
+			if (stat_gain_selection[j] == i) attr = TERM_L_BLUE;
+		}
 
 		/* Hack -- Dump the stat - hack from magic_name table */
 		c_prt(attr, format("  %c) ", I2A(i)), y + i + 1, x);
+
+		/* Display the stats */
+		display_player_stat_info(y + 1, x + 5, i, i + 1, attr);	
 	}
 
 	/* Display drop-shadow */
 	prt("", y + i + 1, x);
-
-	/* Display the stats */
-	display_player_stat_info(y + 1, x + 5);
 }
 
 
@@ -2518,76 +2526,116 @@ void print_stats(const s16b *sn, int num, int y, int x)
 static void improve_stat(void)
 {
 	int tmp = 0;
-	int i, selection;
+	int i;
 
 	s16b table[A_MAX+1];
 
+	char buf[32];
+
 	cptr p = "";
 
-	bool okay = FALSE;
+	int count = 0;
 
 #ifdef ALLOW_BORG
 	if (count_stop) return;
 #endif
 
 	/* Check which stats can still be improved */
-	for (i = 0; i <= A_MAX; i++)
+	for (i = 0; i < A_MAX; i++)
 	{
 		table[i] = i;
-		if (p_ptr->stat_cur[i] < 18 + 100) okay = TRUE;
+		if (p_ptr->stat_max[i] < 18 + 100) count++;
 	}
 
 	/* No stats left to improve */
-	if (!okay) return;
+	if (!count) return;
 
-	/* Should be paranoid here */
-	while (TRUE)
+	/* Reduce count to number of abilities allowed improvements */
+	if (count > stat_gains[p_ptr->lev -1]) count = stat_gains[p_ptr->lev -1];
+
+	/* Confirm stat selection */
+	while (count)
 	{
-		/* Select stat to improve */
-		if (get_list(print_stats, table, A_MAX, "Attribute", "Improve which attribute", 1, 37, &selection))
+		/* Improve how many stats with level gain */
+		for (stat_gain_selected = 0; stat_gain_selected < count; stat_gain_selected++)
 		{
-			/* Check if stat at maximum */
-			if (p_ptr->stat_cur[selection] >= 18 + 100)
+			/* Should be paranoid here */
+			while (TRUE)
 			{
-				msg_format("You cannot get any %s",desc_stat_imp[selection]);
-			}
+				sprintf(buf,"Improve which attribute%s (%d)", count > 1 ? "s" : "", count - stat_gain_selected); 
 
-			/* Always verify */
-			else if (!(get_check(format("Are you sure you want to be %s? ", desc_stat_imp[selection]))))
-			{
-				/* Nothing */
-			}
+				/* Select stat to improve */
+				if (get_list(print_stats, table, A_MAX, "Attribute", buf, 1, 37, &(stat_gain_selection[stat_gain_selected])))
+				{
+					/* Check if stat at maximum */
+					if (p_ptr->stat_max[stat_gain_selection[stat_gain_selected]] >= 18 + 100)
+					{
+						msg_format("You cannot get any %s",desc_stat_imp[stat_gain_selection[stat_gain_selected]]);
+					}
 
-			/* Good selection */
-			else
-			{
-				break;
+					/* Good stat_gain_selection? */
+					else
+					{
+						bool okay = TRUE;
+
+						/* Check we are not improving another stat */
+						for (i = 0; i < stat_gain_selected; i++)
+						{
+							if (stat_gain_selection[i] == stat_gain_selection[stat_gain_selected]) okay = FALSE;
+						}
+
+						if (okay)
+							break;
+						else
+							msg_print("You must choose another attribute.");
+					}
+				}
 			}
 		}
-	}
 
-	/* Display */
-	if (p_ptr->stat_cur[selection]<p_ptr->stat_max[selection])
+		/* Save screen */
+		screen_save();
+
+		/* Redisplay stats */
+		print_stats(table, A_MAX, 1, 37);
+
+		/* Confirm? */
+		if (get_check("Increasing highlighted stats. Are you sure? "))
+		{
+			/* Load screen */
+			screen_load();
+
+			break;
+		}
+
+		/* Load screen */
+		screen_load();
+	}
+	
+	/* Improve how many stats with level gain */
+	for (stat_gain_selected = 0; stat_gain_selected < count; stat_gain_selected++)
 	{
-		/* Set description */
-		p = "you could be ";
+		/* Display */
+		if (p_ptr->stat_cur[stat_gain_selection[stat_gain_selected]] < p_ptr->stat_max[stat_gain_selection[stat_gain_selected]])
+		{
+			/* Set description */
+			p = "you could be ";
 
-		/* Hack --- store stat */
-		tmp = p_ptr->stat_cur[selection];
-		p_ptr->stat_cur[selection] = p_ptr->stat_max[selection];
+			/* Hack --- store stat */
+			tmp = p_ptr->stat_cur[stat_gain_selection[stat_gain_selected]];
+			p_ptr->stat_cur[stat_gain_selection[stat_gain_selected]] = p_ptr->stat_max[stat_gain_selection[stat_gain_selected]];
+		}
+
+		/* Attempt to increase */
+		if (inc_stat(stat_gain_selection[stat_gain_selected]))
+		{
+			/* Message */
+			msg_format("You feel %s%s.",p,desc_stat_imp[stat_gain_selection[stat_gain_selected]]);
+		}
+
+		/* Hack --- restore stat */
+		if (tmp) p_ptr->stat_cur[stat_gain_selection[stat_gain_selected]] = tmp;
 	}
-
-	/* Attempt to increase */
-	if (inc_stat(selection))
-	{
-		/* Message */
-		msg_format("You feel %s%s.",p,desc_stat_imp[selection]);
-
-	}
-
-	/* Hack --- restore stat */
-	if (tmp) p_ptr->stat_cur[selection] = tmp;
-
 }
 
 

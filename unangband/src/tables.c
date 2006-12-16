@@ -91,6 +91,30 @@ const char hexsym[16] =
 };
 
 
+
+/*
+ * Global array for number of stats to increase at each level.
+ * Ensure that no number here is greater than PY_MAX_STAT_GAIN.
+ */
+const byte stat_gains[PY_MAX_LEVEL] = 
+{
+/* This is the planned outline
+	0, 0, 0, 0, 2, 0, 0, 0, 0, 2,
+	0, 2, 0, 0, 0, 2, 0, 0, 0, 2,
+	2, 0, 0, 2, 0, 0, 2, 0, 0, 2,
+	0, 2, 0, 2, 0, 2, 0, 2, 0, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2 */
+
+/* And this spreads the stat gains better at lower levels and
+	gives bigger increases at higher levels. */
+	0, 2, 0, 0, 2, 0, 0, 2, 0, 5,
+	2, 0, 0, 2, 0, 0, 2, 0, 0, 5,
+	0, 2, 0, 2, 0, 2, 0, 2, 0, 5,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 5,
+	2, 2, 2, 2, 2, 3, 3, 3, 3, 5
+};
+
+
 /*
  * Stat Table -- One less than number of spells at level 50
  */

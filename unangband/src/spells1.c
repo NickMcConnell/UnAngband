@@ -9311,7 +9311,11 @@ bool project_p(int who, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Damage (stat) */
-			if (do_dec_stat(A_STR)) obvious = TRUE;
+			if (do_dec_stat(A_STR))
+			{
+				obvious = TRUE;
+				set_stat_dec_tim(p_ptr->stat_dec_tim[A_STR] + rand_int(20) + 20, A_STR);
+			}
 
 			break;
 		}
@@ -9322,7 +9326,11 @@ bool project_p(int who, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Damage (stat) */
-			if (do_dec_stat(A_INT)) obvious = TRUE;
+			if (do_dec_stat(A_INT))
+			{
+				obvious = TRUE;
+				set_stat_dec_tim(p_ptr->stat_dec_tim[A_INT] + rand_int(20) + 20, A_INT);
+			}
 
 			break;
 		}
@@ -9333,7 +9341,11 @@ bool project_p(int who, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Damage (stat) */
-			if (do_dec_stat(A_WIS)) obvious = TRUE;
+			if (do_dec_stat(A_WIS))
+			{
+				obvious = TRUE;
+				set_stat_dec_tim(p_ptr->stat_dec_tim[A_WIS] + rand_int(20) + 20, A_WIS);
+			}
 
 			break;
 		}
@@ -9344,7 +9356,11 @@ bool project_p(int who, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Damage (stat) */
-			if (do_dec_stat(A_DEX)) obvious = TRUE;
+			if (do_dec_stat(A_DEX))
+			{
+				obvious = TRUE;
+				set_stat_dec_tim(p_ptr->stat_dec_tim[A_DEX] + rand_int(20) + 20, A_DEX);
+			}
 
 			break;
 		}
@@ -9355,7 +9371,11 @@ bool project_p(int who, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Damage (stat) */
-			if (do_dec_stat(A_CON)) obvious = TRUE;
+			if (do_dec_stat(A_CON))
+			{
+				obvious = TRUE;
+				set_stat_dec_tim(p_ptr->stat_dec_tim[A_CON] + rand_int(20) + 20, A_CON);
+			}
 
 			break;
 		}
@@ -9366,7 +9386,11 @@ bool project_p(int who, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Damage (stat) */
-			if (do_dec_stat(A_CHR)) obvious = TRUE;
+			if (do_dec_stat(A_CHR))
+			{
+				obvious = TRUE;
+				set_stat_dec_tim(p_ptr->stat_dec_tim[A_CHR] + rand_int(20) + 20, A_CHR);
+			}
 
 			break;
 		}
@@ -9376,13 +9400,16 @@ bool project_p(int who, int y, int x, int dam, int typ)
 			/* Take damage */
 			take_hit(dam, killer);
 
-			/* Damage (stats) */
-			if (do_dec_stat(A_STR)) obvious = TRUE;
-			if (do_dec_stat(A_DEX)) obvious = TRUE;
-			if (do_dec_stat(A_CON)) obvious = TRUE;
-			if (do_dec_stat(A_INT)) obvious = TRUE;
-			if (do_dec_stat(A_WIS)) obvious = TRUE;
-			if (do_dec_stat(A_CHR)) obvious = TRUE;
+			/* Lose all stats */
+			for (k = 0; k < A_MAX; k++)
+			{
+				/* Damage (stats) */
+				if (do_dec_stat(i))
+				{
+					obvious = TRUE;
+					set_stat_dec_tim(p_ptr->stat_dec_tim[k] + rand_int(20) + 20, k);
+				}
+			}
 
 			break;
 		}

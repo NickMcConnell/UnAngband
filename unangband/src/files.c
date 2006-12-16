@@ -2607,35 +2607,39 @@ static void display_player_misc_info(void)
 /*
  * Special display, part 2b
  */
-void display_player_stat_info(int row, int col)
+void display_player_stat_info(int row, int col, int min, int max, int attr)
 {
 	int i;
 
 	char buf[80];
 
-	/* Print out the labels for the columns */
-	c_put_str(TERM_WHITE, "  Self", row-1, col+5);
-	if (adult_maximize_race) c_put_str(TERM_WHITE, " RB", row-1, col+12);
-	if (adult_maximize_class) c_put_str(TERM_WHITE, " CB", row-1, col+16);
-	c_put_str(TERM_WHITE, " EB", row-1, col+20);
-	c_put_str(TERM_WHITE, "  Best", row-1, col+24);
-	c_put_str(TERM_WHITE, "  Curr", row-1, col+30);
+	/* Hack -- display header if displaying first stat only */
+	if (min == 0)
+	{
+		/* Print out the labels for the columns */
+		c_put_str(TERM_WHITE, "  Self", row-1, col+5);
+		if (adult_maximize_race) c_put_str(TERM_WHITE, " RB", row-1, col+12);
+		if (adult_maximize_class) c_put_str(TERM_WHITE, " CB", row-1, col+16);
+		c_put_str(TERM_WHITE, " EB", row-1, col+20);
+		c_put_str(TERM_WHITE, "  Best", row-1, col+24);
+		c_put_str(TERM_WHITE, "  Curr", row-1, col+30);
+	}
 
 	/* Display the stats */
-	for (i = 0; i < A_MAX; i++)
+	for (i = min; i < max; i++)
 	{
 		/* Reduced */
 		if (p_ptr->stat_use[i] < p_ptr->stat_top[i])
 		{
 			/* Use lowercase stat name */
-			put_str(stat_names_reduced[i], row+i, col);
+			c_put_str(attr, stat_names_reduced[i], row+i, col);
 		}
 
 		/* Normal */
 		else
 		{
 			/* Assume uppercase stat name */
-			put_str(stat_names[i], row+i, col);
+			c_put_str(attr, stat_names[i], row+i, col);
 		}
 
 		/* Indicate natural maximum */
@@ -3045,7 +3049,7 @@ void display_player(int mode)
 	clear_from(0);
 
 	/* Stat info */
-	display_player_stat_info(3, 42);
+	display_player_stat_info(3, 42, 0, A_MAX, TERM_WHITE);
 
 	if ((mode) < 3)
 	{
