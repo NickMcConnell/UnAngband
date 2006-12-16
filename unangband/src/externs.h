@@ -404,7 +404,7 @@ extern sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr)
 extern void find_secret(int y, int x);
 extern void search(void);
 extern bool auto_pickup_ignore(const object_type *o_ptr);
-extern void py_pickup(int pickup);
+extern void py_pickup(int py, int px, int pickup);
 extern void hit_trap(int y, int x);
 extern void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hit, int *to_dam, int *to_crit);
 extern bool auto_activate(const object_type *o_ptr);

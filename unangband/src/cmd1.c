@@ -1227,11 +1227,8 @@ static void py_pickup_aux(int o_idx)
  *
  * If "pickup" is FALSE then only gold will be picked up.
  */
-void py_pickup(int pickup)
+void py_pickup(int py, int px, int pickup)
 {
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
 	s16b this_o_idx, next_o_idx = 0;
 
 	object_type *o_ptr;
@@ -1248,7 +1245,8 @@ void py_pickup(int pickup)
 #endif /* ALLOW_EASY_FLOOR */
 
 	/* Are we allowed to pick up anything here? */
-	if (!(f_info[cave_feat[py][px]].flags1 & (FF1_DROP))) return;
+	if (!(f_info[cave_feat[py][px]].flags1 & (FF1_DROP)) &&
+		(f_info[cave_feat[py][px]].flags1 & (FF1_MOVE))) return;
 
 	/* Scan the pile of objects */
 	for (this_o_idx = cave_o_idx[py][px]; this_o_idx; this_o_idx = next_o_idx)
@@ -2697,6 +2695,16 @@ void move_player(int dir, int jumping)
 		|| (!(f_ptr->flags3 & (FF3_MUST_CLIMB)) 
                 && (f_info[cave_feat[py][px]].flags3 & (FF3_MUST_CLIMB)))) != 0;
 
+	/* Hack -- pickup objects from locations you can't move to but can see */
+	if ((cave_o_idx[y][x]) && !(f_ptr->flags1 & (FF1_MOVE)) && (play_info[y][x] & (PLAY_MARK)))
+	{
+		/* Get item from the destination */
+		py_pickup(y, x, TRUE);
+
+		/* Disturb the player */
+		disturb(0, 0);
+	}
+
 	/* Hack -- attack monsters --- except hidden ones */
 	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)))
 	{
@@ -2911,7 +2919,7 @@ void move_player(int dir, int jumping)
 		}
 
 		/* Handle "objects" */
-		py_pickup(jumping != always_pickup);
+		py_pickup(y, x, jumping != always_pickup);
 
 		/* Handle "store doors" */
 		if (f_ptr->flags1 & (FF1_ENTER))

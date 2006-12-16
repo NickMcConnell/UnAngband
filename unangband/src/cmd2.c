@@ -2724,6 +2724,8 @@ static bool do_cmd_walk_test(int y, int x)
 	/* Hack -- walking allows attacking XXX XXX */
 	if (cave_m_idx[y][x] >0) return (TRUE);
 
+	/* Hack -- walking allows pickup XXX XXX */
+	if (cave_o_idx[y][x] >0) return (TRUE);
 
 	/* Player can not walk through "walls" */
 	/* Also cannot climb over unknown "trees/rubble" */
@@ -2733,7 +2735,8 @@ static bool do_cmd_walk_test(int y, int x)
 	{
 #ifdef ALLOW_EASY_ALTER
 
-		if (easy_alter) {
+		if (easy_alter)
+		{
 
 			if (f_info[feat].flags1 & (FF1_BASH)) return(TRUE);
 			if (f_info[feat].flags1 & (FF1_OPEN)) return(TRUE);
@@ -2993,7 +2996,7 @@ static void do_cmd_hold_or_stay(int pickup)
 	}
 
 	/* Handle "objects" */
-	py_pickup(pickup);
+	py_pickup(py, px, pickup);
 
 	/* Hack -- enter a store if we are on one */
 	if (f_info[cave_feat[py][px]].flags1 & (FF1_ENTER))

@@ -152,6 +152,8 @@ fix by RDE).
 
 - Fixed cure serious wounds pre-requisite.
 
+- Fixed bug where chests would drop the wrong number of items.
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.

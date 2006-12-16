@@ -1253,6 +1253,7 @@
 #define FS_MORE  23
 #define FS_RUN   24
 #define FS_FLOOR 25
+#define FS_SOLID 30
 #define FS_HIT_TRAP     31
 
 #define FS_FLAGS2       32

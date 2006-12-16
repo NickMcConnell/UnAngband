@@ -1712,6 +1712,8 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 				/* Set feature */
 				else
 				{
+					int place_feat = feat;
+
 					/* Hack -- in case we don't place enough */
 					if ((flag & (RG1_RANDOM)) != 0)
 					{
@@ -1722,8 +1724,16 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 						}
 					}
 
+					/* Pick a random feature? */
+					if ((feat) && (f_info[feat].mimic == feat))
+					{
+						place_feat = get_feat_num(object_level);
+
+						if (!place_feat) place_feat = feat;
+					}
+
 					/* Assign feature */
-					if (feat) cave_set_feat(y, x, get_feat_num(object_level));
+					if (place_feat) cave_set_feat(y, x, place_feat);
 
 					/* Require "clean" floor space */
 					if ((flag & (RG1_HAS_GOLD | RG1_HAS_ITEM)) != 0)
@@ -1756,6 +1766,16 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 		/* Finally place in 8 directions */
 		if (((flag & (RG1_8WAY)) != 0) && choice)
 		{
+			int place_feat = feat;
+
+			/* Pick a random feature? */
+			if ((feat) && (f_info[feat].mimic == feat))
+			{
+				place_feat = get_feat_num(object_level);
+
+				if (!place_feat) place_feat = feat;
+			}
+
 			/* Loop through features */
 			for (k = 0; k < MAX_SIGHT; k++)
 			{
@@ -1769,7 +1789,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 					if ((y < y1) || (y > y2) || (x < x1) || (x > x2)) continue;
 
 					/* Assign feature */
-					if (feat) cave_set_feat(y, x, get_feat_num(object_level));
+					if (place_feat) cave_set_feat(y, x, place_feat);
 
 					/* Require "clean" floor space */
 					if ((flag & (RG1_HAS_GOLD | RG1_HAS_ITEM)) != 0)
@@ -1792,12 +1812,22 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 		/* Finally place if allocating a single feature */
 		else if (((flag & (RG1_ALLOC | RG1_SCATTER | RG1_TRAIL)) != 0) && choice)
 		{
+			int place_feat = feat;
+
 			/* Get location */
 			y = y_alloc;
 			x = x_alloc;
 
+			/* Pick a random feature? */
+			if ((feat) && (f_info[feat].mimic == feat))
+			{
+				place_feat = get_feat_num(object_level);
+
+				if (!place_feat) place_feat = feat;
+			}
+
 			/* Assign feature */
-			if (feat) cave_set_feat(y, x, get_feat_num(object_level));
+			if (place_feat) cave_set_feat(y, x, place_feat);
 
 			/* Require "clean" floor space */
 			if ((flag & (RG1_HAS_GOLD | RG1_HAS_ITEM)) != 0)
@@ -4222,8 +4252,10 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	int row_dir, col_dir;
 	int start_row, start_col;
 	int main_loop_count = 0;
+	int last_turn = 0;
 
 	bool door_flag = FALSE;
+	bool overrun_flag = FALSE;
 
 	/* Force style change */
 	int style = get_tunnel_style();
@@ -4272,6 +4304,9 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				else
 					rand_dir(&row_dir, &col_dir);
 			}
+
+			/* Record this */
+			last_turn = dun->tunn_n;
 		}
 
 		/* Get the next location */
@@ -4281,6 +4316,24 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		/* Do not leave the dungeon!!! XXX XXX */
 		while (!in_bounds_fully_tunnel(tmp_row, tmp_col))
 		{
+			/* Fall back to last turn coords */
+			if (!last_turn)
+			{
+				row1 = start_row;
+				col1 = start_col;
+			}
+			else
+			{
+				row1 = dun->tunn[last_turn - 1].y;
+				col1 = dun->tunn[last_turn - 1].x;
+			}
+
+			/* Fall back to last turn */
+			dun->tunn_n = last_turn;
+
+			/* Back up some more */
+			last_turn /= 2;
+
 			/* Get the correct direction */
 			correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
 
@@ -4298,17 +4351,11 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			tmp_col = col1 + col_dir;
 		}
 
-		/* Avoid the edge of the dungeon */
-		if (cave_feat[tmp_row][tmp_col] == FEAT_PERM_SOLID) continue;
-
-		/* Avoid the edge of vaults */
-		if (cave_feat[tmp_row][tmp_col] == FEAT_PERM_OUTER) continue;
-
 		/* Avoid "solid" granite walls */
-		if (cave_feat[tmp_row][tmp_col] == FEAT_WALL_SOLID) continue;
+		if (f_info[cave_feat[tmp_row][tmp_col]].flags1 & (FF1_SOLID)) continue;
 
 		/* Pierce "outer" walls of rooms */
-		if (cave_feat[tmp_row][tmp_col] == FEAT_WALL_OUTER)
+		if (f_info[cave_feat[tmp_row][tmp_col]].flags1 & (FF1_OUTER))
 		{
 			int wall1 = dun->wall_n;
 			bool door = TRUE;
@@ -4318,13 +4365,9 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			y = tmp_row + row_dir;
 			x = tmp_col + col_dir;
 
-			/* Hack -- Avoid outer/solid permanent walls */
-			if (cave_feat[y][x] == FEAT_PERM_SOLID) continue;
-			if (cave_feat[y][x] == FEAT_PERM_OUTER) continue;
-
-			/* Hack -- Avoid outer/solid granite walls */
-			if (cave_feat[y][x] == FEAT_WALL_OUTER) continue;
-			if (cave_feat[y][x] == FEAT_WALL_SOLID) continue;
+			/* Hack -- Avoid outer/solid walls */
+			if (f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) continue;
+			if (f_info[cave_feat[y][x]].flags1 & (FF1_SOLID)) continue;
 
 			/* Accept this location */
 			row1 = tmp_row;
@@ -4341,7 +4384,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
 			if (style & (TUNNEL_LARGE_L))
 			{
-				if (cave_feat[row1 + col_dir][col1 - row_dir] == FEAT_WALL_OUTER)
+				if (f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_OUTER))
 				{
 					/* Save the wall location */
 					if (dun->wall_n < WALL_MAX)
@@ -4364,7 +4407,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
 			if (style & (TUNNEL_LARGE_R))
 			{
-				if (cave_feat[row1 - col_dir][col1 + row_dir] == FEAT_WALL_OUTER)
+				if (f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_OUTER))
 				{
 					/* Save the wall location */
 					if (dun->wall_n < WALL_MAX)
@@ -4399,10 +4442,10 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 					for (x = dun->wall[i].x - 1; x <= dun->wall[i].x + 1; x++)
 					{
 						/* Convert adjacent "outer" walls as "solid" walls */
-						if (cave_feat[y][x] == FEAT_WALL_OUTER)
+						if (f_info[cave_feat[y][x]].flags1 & (FF1_OUTER))
 						{
 							/* Change the wall to a "solid" wall */
-							cave_set_feat(y, x, FEAT_WALL_SOLID);
+							cave_alter_feat(y, x, FS_SOLID);
 						}
 					}
 				}
@@ -4438,9 +4481,6 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 
 					/* Merge partitions */
 					dun->part_n--;
-
-					msg_format("Merging %d with %d. %d left.", part1, part2, dun->part_n);
-
 
 					/* Accept tunnel */
 					break;
@@ -4571,6 +4611,14 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			row1 = tmp_row;
 			col1 = tmp_col;
 
+			/* Prevent us following corridor length */
+			if (door_flag)
+			{
+				if (overrun_flag) return;
+
+				overrun_flag = TRUE;
+			}
+
 			/* Collect legal door locations */
 			if (!door_flag)
 			{
@@ -4584,6 +4632,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 
 				/* No door in next grid */
 				door_flag = TRUE;
+
+				overrun_flag = FALSE;
 			}
 #if 0
 			/* Hack -- allow pre-emptive tunnel termination */
@@ -4643,8 +4693,6 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 
 				/* Merge partitions */
 				dun->part_n--;
-
-					msg_format("Merging* %d with %d. %d left.", part1, part2, dun->part_n);
 
 				/* Accept tunnel */
 				break;
@@ -5305,8 +5353,6 @@ static void cave_gen(void)
 			continue;
 		}
 
-		msg_format("Building room %d",i);
-
 		/* Attempt to build a vault */
 		if (level_flag & (LF1_VAULT))
 		{
@@ -5414,7 +5460,7 @@ static void cave_gen(void)
 
 	/* Start with no tunnel doors */
 	dun->door_n = 0;
-#if 0
+
 	/* Hack -- Scramble the room order */
 	for (i = 0; i < dun->cent_n; i++)
 	{
@@ -5427,7 +5473,7 @@ static void cave_gen(void)
 		dun->cent[pick2].y = y1;
 		dun->cent[pick2].x = x1;
 	}
-#endif
+
 	/* Set number of partitions */
 	dun->part_n = dun->cent_n;
 

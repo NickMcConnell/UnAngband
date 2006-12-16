@@ -913,6 +913,19 @@ static byte mana_color(void)
 }
 
 
+static byte disease_color(void)
+{
+	switch (rand_int(4))
+	{
+		case 0: case 1: return (TERM_GREEN);
+		case 2: return (TERM_VIOLET);
+		case 3: return (TERM_L_RED);
+	}
+
+	return (TERM_VIOLET);
+}
+
+
 /*
  * Return a color to use for the bolt/ball spells
  */
@@ -970,6 +983,8 @@ byte spell_color(int type)
 		case GF_STEAM:		return (TERM_L_WHITE);
 		case GF_VAPOUR:		return (TERM_L_GREEN);
 		case GF_SMOKE:		return (TERM_L_DARK);
+
+		case GF_DISEASE:	return (disease_color());
 	}
 
 	/* Standard "color" */

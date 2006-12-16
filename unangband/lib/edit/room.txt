@@ -68,16 +68,9 @@ V:0.6.2
 N:1:101:0:0:1:1:0
 
 
-# 16% of rooms have this
+# 33% of rooms have this
 
 N:101:117:0:0:33:33:0
-A:
-B:
-D:
-
-# 16% of rooms have furniture plus this
-
-N:101:118:0:0:33:33:0
 A:
 B:
 D:
@@ -917,7 +910,7 @@ A:
 B:midden
 D:A midden 
 R:SMART
-F:744
+F:746
 S:SEEN
 P:OUTER
 
@@ -3789,7 +3782,12 @@ D:
 F:812
 R:SMART
 
-# Randomly decide how to allocate feature. Then place extra furniture.
+N:118:107:0:0:50:50:0
+A:
+B:
+D:
+
+# Randomly decide how to allocate feature.
 
 N:119:105:0:0:10:10:0
 A:
@@ -4627,42 +4625,42 @@ B:
 D:'Made in NZ.'  
 S:SEEN
 
-N:136:117:0:0:10:10:0
+N:136:107:0:0:10:10:0
 A:
 B:
 D:
 F:810
 P:CHECKER | CENTRE | PLACE
 
-N:136:117:0:0:2:2:0
+N:136:107:0:0:2:2:0
 A:
 B:
 D:
 F:810
 P:ROWS | CENTRE | PLACE
 
-N:136:117:0:0:2:2:0
+N:136:107:0:0:2:2:0
 A:
 B:
 D:
 F:810
 P:COLS | CENTRE | PLACE
 
-N:136:117:0:0:10:10:0
+N:136:107:0:0:10:10:0
 A:
 B:
 D:
 F:810
 P:ROWS | COLS | CENTRE | PLACE
 
-N:136:117:0:0:5:5:0
+N:136:107:0:0:5:5:0
 A:
 B:
 D:
 F:810
 P:INNER | CENTRE | PLACE
 
-N:136:117:0:0:5:5:0
+N:136:107:0:0:5:5:0
 A:
 B:
 D:
@@ -4671,25 +4669,25 @@ P:SCATTER | CENTRE | PLACE
 
 # Place shelves around.
 
-N:137:107:0:0:5:5:0
+N:137:118:0:0:5:5:0
 A:
 B:
 F:730
 P:OUTER | PLACE
 
-N:137:107:0:0:5:5:0
+N:137:118:0:0:5:5:0
 A:
 B:
 F:730
 P:OUTER | ROWS | COLS | PLACE
 
-N:137:107:0:0:5:5:0
+N:137:118:0:0:5:5:0
 A:
 B:
 F:730
 P:OUTER | CHECKER | PLACE
 
-N:137:107:0:0:5:5:0
+N:137:118:0:0:5:5:0
 A:
 B:
 F:730
@@ -4697,25 +4695,25 @@ P:OUTER | RANDOM | PLACE
 
 # Place weapon racks around.
 
-N:138:107:0:0:5:5:0
+N:138:118:0:0:5:5:0
 A:
 B:
 F:740
 P:OUTER | PLACE
 
-N:138:107:0:0:5:5:0
+N:138:118:0:0:5:5:0
 A:
 B:
 F:740
 P:OUTER | ROWS | COLS | PLACE
 
-N:138:107:0:0:5:5:0
+N:138:118:0:0:5:5:0
 A:
 B:
 F:740
 P:OUTER | CHECKER | PLACE
 
-N:138:107:0:0:5:5:0
+N:138:118:0:0:5:5:0
 A:
 B:
 F:740
@@ -4723,25 +4721,25 @@ P:OUTER | RANDOM | PLACE
 
 # Place stores around.
 
-N:139:107:0:0:5:5:0
+N:139:118:0:0:5:5:0
 A:
 B:
 F:748
 P:OUTER | PLACE
 
-N:139:107:0:0:5:5:0
+N:139:118:0:0:5:5:0
 A:
 B:
 F:748
 P:OUTER | ROWS | COLS | PLACE
 
-N:139:107:0:0:5:5:0
+N:139:118:0:0:5:5:0
 A:
 B:
 F:748
 P:OUTER | CHECKER | PLACE
 
-N:139:107:0:0:5:5:0
+N:139:118:0:0:5:5:0
 A:
 B:
 F:748
@@ -4749,19 +4747,19 @@ P:OUTER | RANDOM | PLACE
 
 # Place marked walls around.
 
-N:140:107:0:0:5:5:0
+N:140:118:0:0:5:5:0
 A:
 B:
 F:729
 P:OUTER | PLACE | RANDOM
 
-N:140:107:0:0:5:5:0
+N:140:118:0:0:5:5:0
 A:
 B:
 F:729
 P:OUTER | ROWS | COLS | PLACE | RANDOM
 
-N:140:107:0:0:5:5:0
+N:140:118:0:0:5:5:0
 A:
 B:
 F:729
