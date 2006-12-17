@@ -2058,19 +2058,16 @@ static void get_room_info(int y0, int x0)
 		/* Get the start of entries in the table for this index */
 		while ((chart != d_info[i].chart) && (counter < 5000)) { i++; counter++;}
 
+		if (counter >= 5000) break;
+
 		/* Cycle through valid entries */
 		while (chart == d_info[i].chart)
 		{
 			counter++;
-			if (counter > 10000)
-			{
-				msg_format("Error: loop in chart position %d", chart);
-				break;
-			}
 
 			/* If not allowed at this depth, skip completely */
-			if (p_ptr->depth < d_info[i].level_min) continue;
-			if (p_ptr->depth > d_info[i].level_max) continue;
+			if (p_ptr->depth < d_info[i].level_min) { i++; continue; }
+			if (p_ptr->depth > d_info[i].level_max) { i++; continue; }
 
 			/* Get chance */
 			chance = d_info[i].chance;
@@ -4536,8 +4533,9 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				/* Different room in same partition */
 				if (dun->part[dun_room[by1][bx1]-1] == dun->part[dun_room[by2][bx2]-1])
 				{
-					/* Clear intersections */
+					/* Clear intersections and decorations */
 					dun->door_n = first_door;
+					dun->next_n = first_next;
 
 					/* Abort */
 					return;
@@ -4734,6 +4732,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				{
 					/* Clear intersections */
 					dun->door_n = first_door;
+					dun->next_n = first_next;
 
 					/* Abort */
 					return;
@@ -4801,6 +4800,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			{
 				/* Clear intersections */
 				dun->door_n = first_door;
+				dun->next_n = first_next;
 
 				/* Abort */
 				return;
@@ -5721,6 +5721,9 @@ static void cave_gen(void)
 		/* Extract doorway location */
 		y = dun->next[i].y;
 		x = dun->next[i].x;
+
+		/* Make sure we are placing solid wall */
+		if (!(f_info[cave_feat[y][x]].flags1 & (FF1_SOLID))) continue;
 
 		/* Place feature if required */
 		if (dun->next_feat[i]) cave_set_feat(y, x, dun->next_feat[i]);

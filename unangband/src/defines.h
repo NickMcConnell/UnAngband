@@ -352,7 +352,7 @@
 /*
  * Maximum amount of sections in room description.
  */
-#define ROOM_DESC_SECTIONS 30
+#define ROOM_DESC_SECTIONS 50
 
 /*
  * Dungeon room types 
