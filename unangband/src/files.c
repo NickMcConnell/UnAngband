@@ -2617,12 +2617,12 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 	if (min == 0)
 	{
 		/* Print out the labels for the columns */
-		c_put_str(TERM_WHITE, "  Self", row-1, col+5);
-		if (adult_maximize_race) c_put_str(TERM_WHITE, " RB", row-1, col+12);
-		if (adult_maximize_class) c_put_str(TERM_WHITE, " CB", row-1, col+16);
-		c_put_str(TERM_WHITE, " EB", row-1, col+20);
-		c_put_str(TERM_WHITE, "  Best", row-1, col+24);
-		c_put_str(TERM_WHITE, "  Curr", row-1, col+30);
+		c_put_str(TERM_WHITE, "  Self ", row-1, col+5);
+		if (adult_maximize_race) c_put_str(TERM_WHITE, " RB ", row-1, col+12);
+		if (adult_maximize_class) c_put_str(TERM_WHITE, " CB ", row-1, col+16);
+		c_put_str(TERM_WHITE, " EB ", row-1, col+20);
+		c_put_str(TERM_WHITE, "  Best ", row-1, col+24);
+		c_put_str(TERM_WHITE, "  Curr", row-1, col+31);
 	}
 
 	/* Display the stats */
@@ -2729,7 +2729,7 @@ static void display_player_sust_info(void)
 		object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
 
 		/* Initialize color based of sign of pval. */
-		for (stat = 0; stat < A_MAX_OLD; stat++)
+		for (stat = 0; stat < A_MAX; stat++)
 		{
 			/* Default */
 			a = TERM_SLATE;
@@ -2784,7 +2784,7 @@ static void display_player_sust_info(void)
 	player_flags(&f1, &f2, &f3, &f4);
 
 	/* Check stats */
-	for (stat = 0; stat < A_MAX_OLD; ++stat)
+	for (stat = 0; stat < A_MAX; ++stat)
 	{
 		/* Default */
 		a = TERM_SLATE;
@@ -2806,10 +2806,7 @@ static void display_player_sust_info(void)
 	col = 26;
 
 	/* Footer */
-	c_put_str(TERM_WHITE, "abcdefghijkl@", row+6, col);
-
-	/* Equippy */
-	display_player_equippy(row+7, col);
+	c_put_str(TERM_WHITE, "abcdefghijkl@", row+7, col);
 }
 
 
@@ -2861,7 +2858,7 @@ static void display_home_equipment_info(int mode)
 	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row-1, col);
 
 	/* Footer */
-	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row+6, col);
+	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row+7, col);
 
 	/* Process home stats */
 	for (i = 0; i < MAX_INVENTORY_HOME; ++i)
@@ -2876,7 +2873,7 @@ static void display_home_equipment_info(int mode)
 		object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
 
 		/* Initialize color based of sign of pval. */
-		for (stats = 0; stats < A_MAX_OLD; stats++)
+		for (stats = 0; stats < A_MAX; stats++)
 		{
 			/* Assume uppercase stat name */
 			c_put_str(TERM_WHITE, stat_names[stats], row+stats, 2);
@@ -2953,7 +2950,7 @@ static void display_home_equipment_info(int mode)
 	else xmax = xmin = 0;
 
 	/* Row */
-	row = 10;
+	row = 11;
 
 	/* Re-Set Column */
 	col = 7;
@@ -2978,7 +2975,7 @@ static void display_home_equipment_info(int mode)
 	{
 		/* Reset */
 		col = 32 * x;
-		row = 10;
+		row = 11;
 
 		/* Ten rows */
 		for (y = 0; y < 10; y++)
@@ -3032,7 +3029,7 @@ static void display_home_equipment_info(int mode)
 
 
 /*
- * Display the character on the screen (two different modes)
+ * Display the character on the screen (in different modes)
  *
  * The top two lines, and the bottom line (or two) are left blank.
  *
@@ -3119,7 +3116,7 @@ static void dump_player_plus_minus(FILE *fff)
 		modifier = FALSE;
 
 		/*check to see if there is an increase or decrease of a stat*/
-		for (stats = 0; stats < A_MAX_OLD; stats++)
+		for (stats = 0; stats < A_MAX; stats++)
 		{
 			/* Boost */
 			if (f1 & (1<<stats)) modifier = TRUE;
@@ -3196,7 +3193,7 @@ static void dump_player_stat_info(FILE *fff)
 
 	fprintf(fff,"      abcdefghijkl@              abcdefghijkl@\n");
 
-	for (stats = 0; stats < A_MAX_OLD; stats++)
+	for (stats = 0; stats < A_MAX; stats++)
 	{
 		fprintf(fff, "%6s", stat_names_reduced[stats]);
 
@@ -3314,7 +3311,7 @@ static void dump_home_plus_minus(FILE *fff)
 		modifier = FALSE;
 
 		/*check to see if there is an increase or decrease of a stat*/
-		for (stats = 0; stats < A_MAX_OLD; stats++)
+		for (stats = 0; stats < A_MAX; stats++)
 		{
 			/* Boost */
 			if (f1 & (1<<stats)) modifier = TRUE;
@@ -3390,7 +3387,7 @@ static void dump_home_stat_info(FILE *fff)
 
 	fprintf(fff,"       abcdefghijklmnopqrstuvwx        abcdefghijklmnopqrstuvwx\n");
 
-	for (stats = 0; stats < A_MAX_OLD; stats++)
+	for (stats = 0; stats < A_MAX; stats++)
 	{
 		fprintf(fff, "%6s ", stat_names_reduced[stats]);
 

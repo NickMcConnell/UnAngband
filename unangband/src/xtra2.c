@@ -2520,8 +2520,9 @@ void print_stats(const s16b *sn, int num, int y, int x)
 
 
 /*
- * Improve one stat, preferring lowest stats
- * Note hack to always improve the maximal value of a stat.
+ * Improve a player-chosen set of stats.
+ * TODO: upon pressing ESC restart the choice.
+ * Note the hack to always improve the maximal value of a stat.
  */
 static void improve_stat(void)
 {
@@ -2624,6 +2625,11 @@ static void improve_stat(void)
 			/* Hack --- store stat */
 			tmp = p_ptr->stat_cur[stat_gain_selection[stat_gain_selected]];
 			p_ptr->stat_cur[stat_gain_selection[stat_gain_selected]] = p_ptr->stat_max[stat_gain_selection[stat_gain_selected]];
+		}
+		else
+		{ 
+			p = "";
+			tmp = 0;
 		}
 
 		/* Attempt to increase */

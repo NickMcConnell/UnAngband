@@ -12,7 +12,7 @@
 
 # Format:
 # N:race number:race name
-# S:str:int:wis:dex:con:chr
+# S:str:int:wis:dex:con:chr:agi
 # R:dis:dev:sav:stl:srh:fos:thn:thb
 # X:hitdie:expbase:infra
 # I:history:agebase:agemod
@@ -25,7 +25,7 @@
 # increase for each new race.
 
 # 'S' is for the stat modifiers - strength, intelligence, wisdom,
-# dexterity, constitution, charisma.
+# dexterity, constitution, charisma, agility.
 
 # 'R' is for the base skills - disarming, magic devices, saving throws,
 # stealth, searching ability, searching frequency, to hit (melee),

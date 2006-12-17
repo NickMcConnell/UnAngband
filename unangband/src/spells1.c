@@ -2462,11 +2462,8 @@ bool player_ignore_terrain(int f_idx)
 
 
 /*
- * Increase a stat by one randomized level
- *
- * Most code will "restore" a stat before calling this function,
- * in particular, stat potions will always restore the stat and
- * then increase the fully restored value.
+ * Increase a stat by one randomized level.
+ * Some code will "restore" a stat before calling this function.
  */
 bool inc_stat(int stat)
 {
@@ -2485,7 +2482,7 @@ bool inc_stat(int stat)
 			value += gain;
 		}
 
-		/* Gain 1/6 to 1/3 of distance to 18/100 */
+		/* Gain 1/8 to 1/3 of distance to 18/100 */
 		else if (value < 18+98)
 		{
 			/* Approximate gain value */
