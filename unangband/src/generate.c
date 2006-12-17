@@ -2069,8 +2069,8 @@ static void get_room_info(int y0, int x0)
 			}
 
 			/* If not allowed at this depth, skip completely */
-			while (p_ptr->depth < d_info[i].level_min) i++;
-			while (p_ptr->depth > d_info[i].level_max) i++;
+			if (p_ptr->depth < d_info[i].level_min) continue;
+			if (p_ptr->depth > d_info[i].level_max) continue;
 
 			/* Get chance */
 			chance = d_info[i].chance;
@@ -2154,7 +2154,7 @@ static void get_room_info(int y0, int x0)
 			chart = d_info[i].next;
 
 			/* Branch if required */
-			if (chart == branch_on)
+			if ((branch_on) && (chart == branch_on))
 			{
 				/* Set alternate chart */
 				chart = branch;
@@ -2183,6 +2183,12 @@ static void get_room_info(int y0, int x0)
 
 			/* Get branch condition */
 			if (d_info[i].branch_on) branch_on = d_info[i].branch_on;
+
+			/* Set tunnel */
+			if (!(room_info[room].tunnel) && (d_info[i].tunnel)) room_info[room].tunnel = d_info[i].tunnel;
+
+			/* Set decoration */
+			if (!(room_info[room].solid) && (d_info[i].solid)) room_info[room].solid = d_info[i].solid;
 
 			/* Clear old position information */
 			if (d_info[i].p_flag & (RG1_PLACE_FLAGS)) place_flag &= ~(RG1_PLACE_FLAGS);
@@ -2331,6 +2337,15 @@ static void get_room_info(int y0, int x0)
 		{
 			msg_format("Error: unable to pick from chart entry %d with %d valid choices", chart, count);
 			chart = 0;
+
+	/* Type */
+	room_info[room].type = ROOM_NORMAL;
+
+	/* Terminate index list */
+	room_info[room].section[j] = -1;
+
+		return;
+
 		}
 	}
 

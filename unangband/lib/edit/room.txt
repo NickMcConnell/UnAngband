@@ -65,7 +65,7 @@ V:0.6.2
 
 # Hack -- until we distinguish room types
 
-N:1:101:0:0:1:1:0
+N:1:101:0:0:1:1:0:128
 
 
 # 33% of rooms have stuff on or near the walls
@@ -810,7 +810,7 @@ A:
 B:
 D:A broken window 
 R:NONLIVING
-F:725
+F:725:0:0
 S:SEEN
 P:OUTER
 
@@ -1034,7 +1034,7 @@ D:in the west of the room is
 S:SEEN
 P:WEST | PLACE
 
-3105:144:0:0:15:15:0:128
+N:105:144:0:0:15:15:0:128
 A:
 B:
 D:in the south of the room is 
@@ -1175,7 +1175,7 @@ S:SEEN
 R:DROP_JUNK
 P:PLACE | SCATTER
 
-3106:107:0:0:4:1:0:128
+N:106:107:0:0:4:1:0:128
 A:
 B:cellar
 D:littered with broken pottery.  
@@ -4586,7 +4586,7 @@ B:
 D:Someone has scratched 
 S:SEEN
 
-N:134:133:0:0:15:15:25:128
+N:134:135:0:0:15:15:25:128
 A:
 B:
 D:Someone has scrawled in blood 
@@ -4595,7 +4595,7 @@ R:EVIL
 S:SEEN
 P:PLACE | SCATTER
 
-N:134:133:0:0:15:15:15:128
+N:134:135:0:0:15:15:15:128
 A:
 B:
 D:Someone has obsessively repeated 
@@ -4833,7 +4833,6 @@ N:143:106:0:0:5:5:35:128
 A:
 B:
 P:SOUTH | CENTRE | EAST
-L:25
 
 N:143:106:0:0:5:5:35:128
 A:
@@ -4922,40 +4921,40 @@ P:WEST | EAST | CENTRE
 # Water-filled rooms
 
 N:146:107:0:0:15:15:0:128
-N:0:0:0
+F:0:0:0
 
 N:146:107:0:0:15:15:0:128
-N:0:0:837
+F:0:0:837
 
 N:146:107:0:0:15:15:0:128
-N:0:309:837
+F:0:309:837
 
 N:146:107:0:0:15:15:0:128
-N:0:309:0
+F:0:309:0
 
 N:146:107:0:0:15:15:0:128
-N:0:307:0
+F:0:307:0
 
 N:146:107:0:0:15:15:18:128
-N:0:310:0
+F:0:310:0
 
 N:146:107:0:0:15:15:27:128
-N:0:311:0
+F:0:311:0
 
 N:146:107:0:0:15:15:60:128
-N:0:120:837
+F:0:120:837
 
 N:146:107:0:0:15:15:60:128
-N:0:121:837
+F:0:121:837
 
 N:146:107:0:0:15:15:41:128
-N:0:126:837
+F:0:126:837
 
 N:146:107:0:0:15:15:18:128
-N:0:153:837
+F:0:153:837
 
 N:146:107:0:0:15:15:27:128
-N:0:155:837
+F:0:155:837
 
 # Boiling water-filled rooms
 

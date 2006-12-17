@@ -2180,7 +2180,7 @@ errr parse_d_info(char *buf, header *head)
 		d_ptr->chance = cha;
 		d_ptr->not_chance = noc;
 		d_ptr->level_min = min;
-		d_ptr->level_max = min;
+		d_ptr->level_max = max;
 
 		/* Initialize other values */
 		d_ptr->flags = 0;
