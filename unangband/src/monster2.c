@@ -1001,13 +1001,14 @@ void monster_desc(char *desc, int m_idx, int mode)
 		int level = r_ptr->level;
 		u32b class = r_ptr->flags2 & (RF2_CLASS_MASK);
 
+#if 0
 		/* Scale a monster */
 		if ((r_ptr->flags9 & (RF9_LEVEL_SIZE | RF9_LEVEL_SPEED | RF9_LEVEL_POWER)) != 0)
 		{
 			monster_scale(&monster_race_scaled, m_idx, p_ptr->depth);
 			r_ptr = &monster_race_scaled;
 		}
-
+#endif
 		/* Add prefixes to levelled monsters */
 		if (r_ptr->flags9 & (RF9_LEVEL_SIZE))
 		{
@@ -1095,7 +1096,7 @@ void monster_desc(char *desc, int m_idx, int mode)
 			/* XXX Check plurality for "some" */
 
 			/* Indefinite monsters need an indefinite article */
-			strcpy(desc, is_a_vowel(name[0]) ? "an " : "a ");
+			strcpy(desc, is_a_vowel(prefix ? prefix[0] : name[0]) ? "an " : "a ");
 			if (prefix) strcat(desc, prefix);
 			strcat(desc, name);
 			if (suffix) strcat(desc, suffix);
@@ -2956,14 +2957,17 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		/* Prepare the item */
 		object_prep(o_ptr, ammo_kind);
 
+		/* Give uniques maximum shots */
+		if (r_ptr->flags1 & (RF1_UNIQUE)) o_ptr->number = (byte)r_ptr->level;
+
+		/* Archers get more shots */
+		else if (r_ptr->flags2 & (RF2_ARCHER)) o_ptr->number += (byte)MIN(99,damroll(2, (r_ptr->level + 1) / 2));
+
 		/* Give the monster some shots */
-		o_ptr->number = (byte)rand_range(1, r_ptr->level);
+		else o_ptr->number = (byte)rand_range(1, (r_ptr->level + 1) / 2);
 
 		/* Flavour spores */
 		if (o_ptr->tval == TV_EGG) o_ptr->name3 = m_ptr->r_idx;
-
-		/* Archers get more shots */
-		if (r_ptr->flags2 & (RF2_ARCHER)) o_ptr->number += (byte)rand_range(1, r_ptr->level);
 
 		/* Boulder / flask throwers get less shots */
 		if ((ammo_tval == TV_JUNK) || (ammo_tval == TV_FLASK) || (ammo_tval == TV_POTION)) o_ptr->number = (o_ptr->number + 1) / 2;

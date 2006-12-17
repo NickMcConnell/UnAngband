@@ -224,9 +224,8 @@ struct desc_type
 	u32b name2;
 	u32b text;      /* Text (offset) */
 
-	u32b flags;      /* Room flags */
-	u32b l_flag;    /* Restrict to these level types */
-	u32b p_flag;	/* Generate */
+	u32b flags;     /* Room flags */
+	u32b p_flag;	/* Description placement flags */
 
 	byte chance;  	/* Frequency of this entry */
 	byte not_chance;/* Frequency of this entry if conditions not met */
@@ -236,16 +235,19 @@ struct desc_type
 	byte branch;	/* Branch to chart index */
 	byte branch_on;	/* Branch on chart index */
 	
-	u16b level; 	/* Minimum */
+	byte level_min; /* Minimum level */
+	byte level_max;	/* Maximum level */
+
+	u32b l_flag;    /* Restrict to these level types */
+	u16b r_flag;    /* Restrict to levels with these monster types */
 
 	s16b feat;      /* Extra features of this type */
-
-	u16b r_flag;    /* Add races with this flag */
+	s16b solid;	/* Place solid walls of this type */
+	s16b tunnel;	/* Fill tunnels with floors of this type */
 
 	byte tval;      /* Add objects of this tval */
 	byte min_sval;  /* And from this sval */
 	byte max_sval;  /*   ... to this sval */
-
 	byte r_char;    /* Add races of this char */
 };
 
@@ -261,12 +263,16 @@ struct room_info_type
 	u32b flags;		/* Room flags */
 
 	/* Decorations */
-
+	s16b	solid;		/* Feature to use as solid wall */
+	s16b	tunnel;		/* Feature to use as tunnel */
+	
+#if 0
 	byte d_attr[5];    	/* Desired feature attribute (basic / inner / outer / solid) */
 	char d_char[5];    	/* Desired feature character (basic / inner / outer / solid) */
 
 	byte x_attr[5];    	/* Desired feature attribute (basic / inner / outer / solid) */
 	char x_char[5];    	/* Desired feature character (basic / inner / outer / solid) */
+#endif
 };
 
 

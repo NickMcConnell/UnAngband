@@ -2151,7 +2151,7 @@ errr parse_d_info(char *buf, header *head)
 	/* Process 'N' for "New/Number" */
 	if (buf[0] == 'N')
 	{
-		int prv, nxt, bon, bra, cha, noc, min;
+		int prv, nxt, bon, bra, cha, noc, min, max;
 
 		/* Hack - get the index */
 		i = error_idx + 1;
@@ -2169,8 +2169,8 @@ errr parse_d_info(char *buf, header *head)
 		d_ptr = (desc_type*)head->info_ptr + i;
 
 		/* Scan for the values */
-		if (7 != sscanf(buf, "N:%d:%d:%d:%d:%d:%d:%d",
-			    &prv, &nxt, &bon, &bra, &cha, &noc, &min)) return (PARSE_ERROR_GENERIC);
+		if (8 != sscanf(buf, "N:%d:%d:%d:%d:%d:%d:%d:%d",
+			    &prv, &nxt, &bon, &bra, &cha, &noc, &min, &max)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		d_ptr->chart = prv;
@@ -2179,7 +2179,8 @@ errr parse_d_info(char *buf, header *head)
 		d_ptr->branch = bra;
 		d_ptr->chance = cha;
 		d_ptr->not_chance = noc;
-		d_ptr->level = min;
+		d_ptr->level_min = min;
+		d_ptr->level_max = min;
 
 		/* Initialize other values */
 		d_ptr->flags = 0;
@@ -2346,17 +2347,18 @@ errr parse_d_info(char *buf, header *head)
 	/* Process 'F' for "Feature" (one line only) */
 	else if (buf[0] == 'F')
 	{
-		int feat;
+		int feat, tunnel, solid;
 
 		/* There better be a current d_ptr */
 		if (!d_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (1 != sscanf(buf+2, "%d", &feat)) return (1);
+		if (3 != sscanf(buf+2, "%d:%d:%d", &feat, &tunnel, &solid)) return (1);
 
 		/* Save the values */
 		d_ptr->feat = feat;
-
+		d_ptr->tunnel = tunnel;
+		d_ptr->solid = solid;
 	}
 
 	/* Process 'R' for "Race flag" (once only) */

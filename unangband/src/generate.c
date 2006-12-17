@@ -233,13 +233,19 @@ struct dun_data
 	int door_n;
 	coord door[DOOR_MAX];
 
+	/* Array of solid wall locations and feature types */
+	int next_n;
+	coord next[DOOR_MAX];
+	s16b next_feat[DOOR_MAX];
+
 	/* Array of wall piercing locations */
 	int wall_n;
 	coord wall[WALL_MAX];
 
-	/* Array of tunnel grids */
+	/* Array of tunnel grids and feature types */
 	int tunn_n;
 	coord tunn[TUNN_MAX];
+	s16b tunn_feat[TUNN_MAX];
 
 	/* Array of partitions of rooms */
 	int part_n;
@@ -2063,7 +2069,8 @@ static void get_room_info(int y0, int x0)
 			}
 
 			/* If not allowed at this depth, skip completely */
-			while (p_ptr->depth < d_info[i].level) i++;
+			while (p_ptr->depth < d_info[i].level_min) i++;
+			while (p_ptr->depth > d_info[i].level_max) i++;
 
 			/* Get chance */
 			chance = d_info[i].chance;
@@ -4243,6 +4250,15 @@ static int get_tunnel_style(void)
  * -- tunnel with pillared edges (on LF1_CRYPT levels)
  * -- width 2 or width 3 tunnel (on LF1_STRONGHOLD levels)
  * -- tunnels with lateral and diagonal interruptions (on LF1_CAVE levels)
+ *
+ * We also can fill tunnels now. Filled tunnels occur iff the last floor
+ * space leaving the start room is not a FEAT_FLOOR or the first floor
+ * space entering the finishing room is not a FEAT_FLOOR.
+ *
+ * We also put 'decorations' next to tunnel entrances. These are various
+ * solid wall types relating to the room the tunnel goes from or to.
+ * However, we use the decorations of the room at the other end of the tunnel
+ * unless that room has no decorations, in which case we use our own.
  */
 
 static void build_tunnel(int row1, int col1, int row2, int col2)
@@ -4252,7 +4268,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	int row_dir, col_dir;
 	int start_row, start_col;
 	int main_loop_count = 0;
-	int last_turn = 0, first_door, last_door;
+	int last_turn = 0, first_door, last_door, first_tunn, first_next;
+	int start_tunnel = 0;
 
 	bool door_flag = FALSE;
 	bool overrun_flag = FALSE;
@@ -4274,6 +4291,12 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	/* Record number of doorways */
 	first_door = dun->door_n;
 	last_door = dun->door_n;
+
+	/* Record first tunnel location */
+	first_tunn = dun->tunn_n;
+
+	/* Record number of adjacent solid terrain to doorways */
+	first_next = dun->next_n;
 
 	/* Start out in the correct direction */
 	correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
@@ -4451,8 +4474,34 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 						/* Convert adjacent "outer" walls as "solid" walls */
 						if (f_info[cave_feat[y][x]].flags1 & (FF1_OUTER))
 						{
+							/* Room */
+							int by2 = tmp_row/BLOCK_HGT;
+							int bx2 = tmp_col/BLOCK_WID;
+
 							/* Change the wall to a "solid" wall */
 							cave_alter_feat(y, x, FS_SOLID);
+
+							/* Starting room overwrites ending room decorations unless has none */
+							if ((room_info[dun_room[by1][bx1]].solid) && (dun->next_n < WALL_MAX))
+							{
+								/* Overwrite with alternate terrain from starting room later */
+								dun->next[dun->next_n].y = y;
+								dun->next[dun->next_n].x = x;
+								dun->next_feat[dun->next_n] = room_info[dun_room[by1][bx1]].solid;
+								dun->next_n++;
+							}
+
+							/* Ending room overwrites starting room decorations unless has none */
+							if (room_info[dun_room[by2][bx2]].solid)
+							{
+								int j;
+
+								for (j = first_next; (j < dun->next_n) && (dun_room[by1][by2] == dun_room[dun->next[j].y][dun->next[j].x]); j++)
+								{
+									/* Overwrite with alternate terrain from ending room later */
+									dun->next_feat[j] = room_info[dun_room[by2][bx2]].solid;
+								}
+							}
 						}
 					}
 				}
@@ -4492,6 +4541,26 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 					/* Merge partitions */
 					dun->part_n--;
 
+					/* Rewrite tunnel to room if we end up on a non-floor space */
+					if ((cave_feat[tmp_row][tmp_col] != FEAT_FLOOR) && (room_info[dun_room[by2][bx2]].tunnel))
+					{
+						/* Hack -- overwrite half of tunnel */
+						if (start_tunnel)
+						{
+							/* Round up some times */
+							if (((dun->tunn_n - first_tunn) % 2) && (rand_int(100) < 50)) first_tunn++;
+
+							/* Adjust from half-way */
+							first_tunn = first_tunn + (dun->tunn_n - first_tunn) / 2;
+						}
+
+						/* Overwrite starting tunnel terrain with end tunnel terrain */
+						for (i = first_tunn; i < dun->tunn_n; i++)
+						{
+							if (dun->tunn_feat[i]) dun->tunn_feat[i] = room_info[dun_room[by2][bx2]].tunnel;
+						}
+					}
+
 					/* Accept tunnel */
 					break;
 				}
@@ -4501,6 +4570,17 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				/* Accept the location */
 				row1 = tmp_row;
 				col1 = tmp_col;
+
+				/* Clear start tunnel if feature is floor */
+				if (cave_feat[row1][col1] == FEAT_FLOOR)
+				{
+					start_tunnel = 0;
+				}
+				/* Set start tunnel if feature is not floor */
+				else
+				{
+					start_tunnel = room_info[dun_room[by1][bx1]].tunnel;
+				}
 			}
 		}
 
@@ -4567,6 +4647,17 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			{
 				dun->tunn[dun->tunn_n].y = row1;
 				dun->tunn[dun->tunn_n].x = col1;
+
+				/* Mark centre of tunnel with terrain type */
+				if (start_tunnel)
+				{
+					dun->tunn_feat[dun->tunn_n] = start_tunnel;
+				}
+				/* Hack -- mark centre in case we need to overwrite later */
+				{
+					dun->tunn_feat[dun->tunn_n] = 1;
+				}
+
 				dun->tunn_n++;
 			}
 
@@ -4726,14 +4817,22 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		y = dun->tunn[i].y;
 		x = dun->tunn[i].x;
 
-		if (f_info[cave_feat[y][x]].flags2 & (FF2_BRIDGE))
+		/* Apply feature - note hack */
+		if (dun->tunn_feat[i] > 1)
 		{
-			/* Clear previous contents, bridge it */
+			/* Clear previous contents, write terrain */
+			cave_set_feat(y, x, dun->tunn_feat[i]);
+		}
+		/* Apply bridge */
+		else if (f_info[cave_feat[y][x]].flags2 & (FF2_BRIDGE))
+		{
+			/* Bridge previous contents */
 			cave_alter_feat(y, x, FS_BRIDGE);
 		}
+		/* Apply tunnel */
 		else
 		{
-			/* Clear previous contents, bridge it */
+			/* Tunnel previous contents */
 			cave_alter_feat(y, x, FS_TUNNEL);
 		}
 	}
@@ -5484,6 +5583,9 @@ static void cave_gen(void)
 	/* Start with no tunnel doors */
 	dun->door_n = 0;
 
+	/* Start with no tunnel doorways */
+	dun->next_n = 0;
+
 	/* Hack -- Scramble the room order */
 	for (i = 0; i < dun->cent_n; i++)
 	{
@@ -5596,6 +5698,17 @@ static void cave_gen(void)
 
 			k = (k + dk) % 4;
 		}
+	}
+
+	/* Place room decorations */
+	for (i = 0; i < dun->next_n; i++)
+	{
+		/* Extract doorway location */
+		y = dun->next[i].y;
+		x = dun->next[i].x;
+
+		/* Place feature if required */
+		if (dun->next_feat[i]) cave_set_feat(y, x, dun->next_feat[i]);
 	}
 
 	/* Hack -- Sandstone streamers are shallow */
