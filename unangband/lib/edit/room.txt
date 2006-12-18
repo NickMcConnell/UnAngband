@@ -868,21 +868,21 @@ F:736:0:736
 S:SEEN
 P:OUTER
 
-N:104:105:0:0:5:2:0:128
+N:104:105:141:140:5:2:0:128
 A:
 B:
 D:A lever 
 R:SMART
-F:738:0:752
+F:753:0:753
 S:SEEN
 P:OUTER | ALLOC
 
-N:104:105:0:0:5:2:0:128
+N:104:105:141:140:5:2:30:128
 A:
 B:
 D:A lever 
 R:SMART
-F:739:0:753
+F:752:0:752
 S:SEEN
 P:OUTER | ALLOC
 
@@ -3486,8 +3486,7 @@ N:117:121:0:0:10:5:0:128
 A:
 B:cell
 D:Rusted chains hang from 
-K:14:2:2
-F:0:0:726
+F:853:0:739
 S:SEEN
 R:MAN
 P:SCATTER
@@ -4770,8 +4769,37 @@ B:
 F:748:0:748
 P:OUTER | RANDOM | PLACE
 
-### 140 ###
+# Stuff to manipulate with levers.
 
+N:140:141:0:0:5:5:30:128
+A:
+B:
+F:726:0:0
+P:OUTER | PLACE
+
+N:140:141:0:0:5:5:30:128
+A:
+B:
+F:850:0:0
+P:OUTER | PLACE
+
+N:140:141:0:0:5:5:0:128
+A:
+B:
+F:853:0:0
+P:OUTER | PLACE
+
+N:140:141:0:0:5:5:15:128
+A:
+B:
+F:858:0:0
+P:OUTER | PLACE
+
+N:140:141:0:0:5:5:15:128
+A:
+B:
+F:859:0:0
+P:OUTER | PLACE
 
 # Northern feature
 

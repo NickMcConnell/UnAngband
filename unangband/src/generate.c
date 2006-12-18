@@ -1630,7 +1630,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 	}
 
 	/* Scatter several about if requested */
-	for (k = 0; k < ((flag & (RG1_SCATTER | RG1_TRAIL)) != 0 ? NUM_SCATTER : 1); k++)
+	for (k = 0; k < ( ((flag & (RG1_SCATTER | RG1_TRAIL)) != 0) && ((flag & (RG1_ALLOC)) == 0) ? NUM_SCATTER : 1); k++)
 	{
 		/* Pick location */
 		choice = 0;
@@ -1985,6 +1985,9 @@ static void get_room_info(int y0, int x0)
 	byte place_tval, place_min_sval, place_max_sval;
 	int place_feat;
 
+	bool picked_name1 = FALSE;
+	bool picked_name2 = FALSE;
+
 	int branch;
 	int branch_on;
 
@@ -2144,8 +2147,14 @@ static void get_room_info(int y0, int x0)
 			/* Set index to choice */
 			i = pick;
 
-			/* Save index */
-			room_info[room].section[j++] = i;
+			/* Save index if we have anything to describe */
+			/* Note hack for efficiency */
+			if (((!picked_name1) && (picked_name1 = strlen(d_name + d_info[i].name1) > 0))
+				|| ((!picked_name2) && (picked_name2 = strlen(d_name + d_info[i].name2) > 0))
+				|| (strlen(d_text + d_info[i].text) > 0))
+			{
+				room_info[room].section[j++] = i;
+			}
 
 			/* Enter the next chart */
 			chart = d_info[i].next;
@@ -2161,8 +2170,8 @@ static void get_room_info(int y0, int x0)
 				branch_on = 0;
 			}
 
-			/* Place flags except SEEN */
-			room_info[room].flags |= (d_info[i].flags & ~(ROOM_SEEN));
+			/* Place flags except SEEN or HEARD */
+			room_info[room].flags |= (d_info[i].flags & ~(ROOM_SEEN | ROOM_HEARD));
 		
 			/* Get tval */
 			if (d_info[i].tval)
