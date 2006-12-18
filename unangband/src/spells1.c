@@ -2482,10 +2482,11 @@ bool inc_stat(int stat)
 			value += gain;
 		}
 
-		/* Gain one point; or else we get the mysterious 18/01 */
+		/* Gain one (sometimes eleven) points */
 		else if (value < 18)
 		{
-			value++;
+			gain = ((rand_int(100) < 75) ? 1 : 11);
+			value += gain;
 		}
 
 		/* Gain 1/8 to 1/4 of distance to 18/100; at last, 3--6 points */
