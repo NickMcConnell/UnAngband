@@ -2500,7 +2500,7 @@ void print_stats(const s16b *sn, int num, int y, int x)
 		attr = TERM_WHITE;
 
 		if (p_ptr->stat_cur[sn[i]] < p_ptr->stat_max[sn[i]]) attr = TERM_YELLOW;
-		if (p_ptr->stat_max[sn[i]] == 18 + 100) attr = TERM_L_DARK;
+		if (p_ptr->stat_max[sn[i]] == 18 + 999) attr = TERM_L_DARK;
 
 		for (j = 0; j < stat_gain_selected; j++)
 		{
@@ -2545,7 +2545,7 @@ static void improve_stat(void)
 	for (i = 0; i < A_MAX; i++)
 	{
 		table[i] = i;
-		if (p_ptr->stat_max[i] < 18 + 100) count++;
+		if (p_ptr->stat_max[i] < 18 + 999) count++;
 	}
 
 	/* No stats left to improve */
@@ -2569,7 +2569,7 @@ static void improve_stat(void)
 				if (get_list(print_stats, table, A_MAX, "Attribute", buf, 1, 37, &(stat_gain_selection[stat_gain_selected])))
 				{
 					/* Check if stat at maximum */
-					if (p_ptr->stat_max[stat_gain_selection[stat_gain_selected]] >= 18 + 100)
+					if (p_ptr->stat_max[stat_gain_selection[stat_gain_selected]] >= 18 + 999)
 					{
 						msg_format("You cannot get any %s",desc_stat_imp[stat_gain_selection[stat_gain_selected]]);
 					}

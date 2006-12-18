@@ -191,17 +191,13 @@ static int adjust_stat(int value, int amount, int auto_roll)
 			{
 				value++;
 			}
-			else if (value < 18+70)
+			else if (value < 18+90)
 			{
 				value += ((auto_roll ? 15 : randint(15)) + 5);
 			}
-			else if (value < 18+90)
+			else if (value < 18+999)
 			{
-				value += ((auto_roll ? 6 : randint(6)) + 2);
-			}
-			else if (value < 18+100)
-			{
-				value++;
+				value += ((auto_roll ? 3 : randint(3)) + 1);
 			}
 		}
 	}

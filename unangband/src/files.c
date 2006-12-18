@@ -2642,8 +2642,8 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 			c_put_str(attr, stat_names[i], row+i, col);
 		}
 
-		/* Indicate natural maximum */
-		if (p_ptr->stat_max[i] == 18+100)
+		/* Indicate the point where increases become very small */
+		if (p_ptr->stat_max[i] >= 18+90)
 		{
 			put_str("!", row+i, col+3);
 		}

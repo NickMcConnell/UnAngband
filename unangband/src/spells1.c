@@ -2472,36 +2472,58 @@ bool inc_stat(int stat)
 	/* Then augment the current/max stat */
 	value = p_ptr->stat_cur[stat];
 
-	/* Cannot go above 18/100 */
-	if (value < 18+100)
+	/* Cannot go above 18/999 */
+	if (value < 18+999)
 	{
 		/* Gain one (sometimes two) points */
-		if (value < 18)
+		if (value < 17)
 		{
 			gain = ((rand_int(100) < 75) ? 1 : 2);
 			value += gain;
 		}
 
-		/* Gain 1/8 to 1/3 of distance to 18/100 */
-		else if (value < 18+98)
-		{
-			/* Approximate gain value */
-			gain = (((18+100) - value) / 2 + 3) / 2;
-
-			/* Paranoia */
-			if (gain < 1) gain = 1;
-
-			/* Apply the bonus */
-			value += randint(gain) + gain / 2;
-
-			/* Maximal value */
-			if (value > 18+99) value = 18 + 99;
-		}
-
-		/* Gain one point at a time */
-		else
+		/* Gain one point; or else we get the mysterious 18/01 */
+		else if (value < 18)
 		{
 			value++;
+		}
+
+		/* Gain 1/8 to 1/4 of distance to 18/100; at last, 3--6 points */
+		else if (value < 18+90)
+		{
+			/* Approximate gain value */
+			gain = ((18+100) - value) / 5 + 4;
+
+			/* Roll the bonus */
+			value += (rand_int(gain) + gain) / 2;
+		}
+
+		/* Gain 2--4 points at a time */
+		else if (value < 18+100)
+		{
+			value += 1 + randint(3);
+
+		}
+
+		/* Gain 2--3 points at a time */
+		else if (value < 18+110)
+		{
+			value += 1 + randint(2);
+		}
+
+		/* Gain 1--3 points at a time */
+		else if (value < 18+120)
+		{
+			value += randint(3);
+		}
+
+		/* Gain 1--2 points at a time */
+		else
+		{
+			value += randint(2);
+
+			/* Maximal value */
+			if (value > 18+999) value = 18 + 999;
 		}
 
 		/* Save the new value */
