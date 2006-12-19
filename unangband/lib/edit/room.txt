@@ -1058,7 +1058,7 @@ P:EAST | PLACE | EDGE
 N:105:143:0:0:15:15:0:128
 A:
 B:
-D:aginst the west wall is 
+D:against the west wall is 
 S:SEEN
 P:WEST | PLACE | EDGE
 
