@@ -3658,6 +3658,13 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 			p_ptr->command_wrk = (USE_EQUIP);
 		}
 
+		/* Hack -- Start on equipment if for shooting */
+		if ((p_ptr->command_cmd == 'f')
+			&& allow_equip)
+		{
+			p_ptr->command_wrk = (USE_EQUIP);
+		}
+
 		/* Use inventory if allowed */
 		else if (use_inven)
 		{
