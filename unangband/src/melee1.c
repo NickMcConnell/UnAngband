@@ -5954,6 +5954,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 	int feat = cave_feat[y][x];
 
 	bool fear;
+	bool magic = TRUE;
 
 	char m_name[80];
 
@@ -6266,10 +6267,12 @@ void mon_hit_trap(int m_idx, int y, int x)
 			}
 
 			case TV_POTION:
-			case TV_SCROLL:
 			case TV_FLASK:
-			case TV_LITE:
 			case TV_FOOD:
+				magic = FALSE;
+				/* Drop through */
+			case TV_SCROLL:
+			case TV_LITE:
 			{
 				/* Hack -- boring food */
 				if ((o_ptr->tval == TV_FOOD) && (o_ptr->sval >= SV_FOOD_MIN_FOOD))
@@ -6423,6 +6426,19 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 				/* Hack -- no more attacks */
 				if (!method) break;
+
+				if  ((magic) && ((r_info[m_ptr->r_idx].flags9 & (RF9_RES_MAGIC)) != 0)
+					&& (rand_int(100) < 20 + p_ptr->depth / 2))
+				{
+					msg_format("%^s is unaffected.", m_name);
+
+					if ((m_ptr->ml) && !(l_list[m_ptr->r_idx].flags9 & (RF9_RES_MAGIC)))
+					{
+						l_list[m_ptr->r_idx].flags9 |= (RF9_RES_MAGIC);
+					}
+
+					continue;
+				}
 
 				/* Mega hack -- dispel evil/undead objects */
 				if (!d_side)

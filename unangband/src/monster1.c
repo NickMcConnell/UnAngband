@@ -1162,6 +1162,8 @@ static void describe_monster_abilities(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags9 & RF9_RES_DARK) vp[vn++] = "darkness";
 	if (l_ptr->flags9 & RF9_RES_CHAOS) vp[vn++] = "chaos";
 	if (l_ptr->flags9 & RF9_RES_TPORT) vp[vn++] = "teleportation";
+	if (l_ptr->flags9 & RF9_RES_MAGIC) vp[vn++] = "magical spells";
+	if (l_ptr->flags9 & RF9_RES_MAGIC) vp[vn++] = "the effects of rods, staffs and wands";
 	if ((l_ptr->flags9 & RF9_RES_EDGED) && (l_ptr->flags9 & RF9_RES_BLUNT)) vp[vn++] = "edged";
 	else if (l_ptr->flags9 & RF9_RES_EDGED) vp[vn++] = "edged weapons";
 	if (l_ptr->flags9 & RF9_RES_BLUNT) vp[vn++] = "blunt weapons";

@@ -102,6 +102,15 @@ stats more useful.
 This now mimics the distribution of stats using the auto-roller a lot more (Analysis by
 mikon).
 
+- Added magic resistance to a number of monsters, in particular demons and Maia. Magic
+resistance means that a monster has a percentage chance of completely ignoring an attack
+from a magical source (spell, scroll, rod, staff, wand or activated item). Activations that
+apply with the blow of an activated item ignore magic resistance, as weapon coatings and
+effects from thrown potions, flasks and food. Magic resistance also applies to the
+appropriate effects if an item is set in a trap.
+
+- Demons are also immune to damage from more elemental effects.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
@@ -153,6 +162,8 @@ fix by RDE).
 - Fixed cure serious wounds pre-requisite.
 
 - Fixed bug where chests would drop the wrong number of items.
+
+- Fixed bug where archery monsters could end up with negative ammo.
 
 ### Build / Platform ###
 

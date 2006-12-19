@@ -883,7 +883,7 @@
 #define GF_WEB		113
 #define GF_BLOOD	114
 #define GF_SLIME	115
-
+#define GF_RES_MAGIC	116
 
 /*
  * Columns for the spell cost or damage flags
@@ -2491,7 +2491,7 @@
 #define PROJECT_PLAY         0x00004000
 #define PROJECT_SAFE         0x00008000 /*(unused)*/
 #define PROJECT_LITE         0x00010000
-#define PROJECT_XXX7         0x00020000
+#define PROJECT_MAGIC        0x00020000 /* Resistable by monsters with resist magic */
 
 /* Graphics */
 #define PROJECT_HIDE         0x00040000
@@ -3687,7 +3687,7 @@
 #define RF9_IM_BLUNT       0x00008000      /* Immune to blunt weapons / resist sound/force */
 #define RF9_NO_CUTS        0x00010000      /* Cannot be cut */
 #define RF9_NO_SLOW        0x00020000      /* Cannot be slowed / paralyzed */
-#define RF9_FAMILY         0x00040000      /* Member of the player's family */
+#define RF9_RES_MAGIC      0x00040000      /* Resists magic */
 #define RF9_GOOD           0x00080000      /* Good - never summon evil / never summoned by evil */
 #define RF9_NEUTRAL        0x00100000      /* Neutral - don't interact with player unless attacked */
 #define RF9_DWARF          0x00200000      /* Hurt by slay dwarf */

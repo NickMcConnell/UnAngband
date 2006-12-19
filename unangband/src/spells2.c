@@ -4902,7 +4902,7 @@ bool fire_ball_minor(int typ, int dir, int dam, int rad)
 
 	int ty, tx;
 
-	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
+	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM | PROJECT_MAGIC;
 
 	/* Use the given direction */
 	ty = py + 99 * ddy[dir];
@@ -4936,7 +4936,7 @@ bool fire_swarm(int num, int typ, int dir, int dam, int rad)
 
 	int ty, tx;
 
-	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
+	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM | PROJECT_MAGIC;
 
 	/* Use the given direction */
 	ty = py + 99 * ddy[dir];
@@ -4972,7 +4972,7 @@ bool fire_ball(int typ, int dir, int dam, int rad)
 
 	int ty, tx;
 
-	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
+	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM | PROJECT_MAGIC;
 
 	/* Use the given direction */
 	ty = py + 99 * ddy[dir];
@@ -5006,7 +5006,7 @@ bool fire_8way(int typ, int dir, int dam, int rad)
 
 	int ty, tx;
 
-	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_8WAY | PROJECT_AREA;
+	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_8WAY | PROJECT_AREA | PROJECT_MAGIC;
 
 	/* Use the given direction */
 	ty = py + 99 * ddy[dir];
@@ -5040,7 +5040,7 @@ bool fire_cloud(int typ, int dir, int dam, int rad)
 
 	int ty, tx;
 
-	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_BOOM | PROJECT_PLAY | PROJECT_BOOM | PROJECT_AREA;
+	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_BOOM | PROJECT_PLAY | PROJECT_BOOM | PROJECT_AREA | PROJECT_MAGIC;
 
 	/* Use the given direction */
 	ty = py + 99 * ddy[dir];
@@ -5071,7 +5071,7 @@ static bool project_hook(int typ, int dir, int dam, int flg)
 	int ty, tx;
 
 	/* Pass through the target if needed */
-	flg |= (PROJECT_THRU);
+	flg |= (PROJECT_THRU | PROJECT_MAGIC);
 
 	/* Use the given direction */
 	ty = py + ddy[dir];
@@ -5098,7 +5098,7 @@ static bool fire_arc(int typ, int dir, int dam, int rad, int degrees_of_arc)
 
 	int ty, tx;
 
-	int flg = PROJECT_ARC | PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_WALL;
+	int flg = PROJECT_ARC | PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_WALL | PROJECT_MAGIC;
 
 	/* Diameter of source of energy is at least 20. */
 	int diameter_of_source = 20;
@@ -5146,7 +5146,7 @@ bool fire_bolt(int typ, int dir, int dam)
 
 	int ty, tx;
 
-	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_GRID | PROJECT_PLAY;
+	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_GRID | PROJECT_PLAY | PROJECT_MAGIC;
 
 	/* Use the given direction */
 	ty = py + 99 * ddy[dir];
@@ -5176,7 +5176,7 @@ bool fire_beam(int typ, int dir, int dam)
 
 	int ty, tx;
 
-	int flg = PROJECT_BEAM | PROJECT_KILL | PROJECT_GRID | PROJECT_THRU;
+	int flg = PROJECT_BEAM | PROJECT_KILL | PROJECT_GRID | PROJECT_THRU | PROJECT_MAGIC;
 
 	int range = 10;
 
@@ -5224,7 +5224,7 @@ bool fire_blast(int typ, int dir, int dam)
 	int ty = p_ptr->py+ddy[dir];
 	int tx = p_ptr->px+ddx[dir];
 
-	int flg = PROJECT_KILL | PROJECT_GRID | PROJECT_ITEM | PROJECT_BOOM | PROJECT_PLAY;
+	int flg = PROJECT_KILL | PROJECT_GRID | PROJECT_ITEM | PROJECT_BOOM | PROJECT_PLAY | PROJECT_MAGIC;
 	return (project(-1, 1, py, px, ty, tx, dam, typ, flg, 0, 0));
 
 }
@@ -5241,7 +5241,7 @@ bool fire_hands(int typ, int dir, int dam)
 
 	int ty, tx;
 
-	int flg = PROJECT_BEAM | PROJECT_KILL | PROJECT_THRU;
+	int flg = PROJECT_BEAM | PROJECT_KILL | PROJECT_THRU | PROJECT_MAGIC;
 
 	int range = 3;
 
@@ -5270,7 +5270,7 @@ bool fire_bolt_minor(int typ, int dir, int dam, int range)
 
 	int ty, tx;
 
-	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_GRID | PROJECT_PLAY;
+	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_GRID | PROJECT_PLAY | PROJECT_MAGIC;
 
 	/* Use the given direction */
 	ty = py + 99 * ddy[dir];
@@ -5835,7 +5835,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				int py = p_ptr->py;
 				int px = p_ptr->px;
 
-				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL | PROJECT_BOOM;
+				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL | PROJECT_BOOM | PROJECT_MAGIC;
 				if (project(-1, 1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
 				break;
 			}
@@ -5846,7 +5846,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				int py = p_ptr->py;
 				int px = p_ptr->px;
 
-				int flg = PROJECT_KILL;
+				int flg = PROJECT_KILL | PROJECT_MAGIC;
 
 				/* Allow direction to be cancelled for free */
 				if ((!get_rep_dir(&dir)) && (*cancel)) return (FALSE);

@@ -833,7 +833,7 @@ static cptr r_info_flags9[] =
 	"IM_BLUNT",
 	"NO_CUTS",
 	"NO_SLOW",
-	"FAMILY",
+	"RES_MAGIC",
 	"GOOD",
 	"NEUTRAL",
 	"DWARF",
@@ -7252,6 +7252,9 @@ static long eval_hp_adjust(monster_race *r_ptr)
 
 	/* Scale resists to ac */
 	resists = resists * 25;
+
+	/* Apply magic resistance */
+	if (r_ptr->flags9 & RF9_RES_MAGIC)	resists += 20 + r_ptr->level / 2;
 
 	/* Get the monster ac */
 	ac = r_ptr->ac;

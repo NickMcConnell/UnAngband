@@ -4785,6 +4785,19 @@ bool project_m(int who, int y, int x, int dam, int typ)
 	/* Analyze the damage type */
 	switch (typ)
 	{
+		/* Hack - for resist magic */
+		case GF_RES_MAGIC:
+		{
+			if (r_ptr->flags9 & (RF9_RES_MAGIC))
+			{
+				dam = 0;
+				if ((seen) && !(l_ptr->flags9 & (RF9_RES_MAGIC)))
+				{
+					note = " resists magic.";
+					l_ptr->flags9 |= (RF9_RES_MAGIC);
+				}
+			}
+		}
 
 		/* Explosion -- destructive -- pure damage */
 		case GF_EXPLODE:
@@ -11560,9 +11573,16 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 				/* Check if monster evades */
 				if (mon_evade(cave_m_idx[y][x],((m_ptr->confused || m_ptr->stunned) ? 1 : 3) + gd[i], 5 + gd[i], who < 0 ? " your magic" : "")) continue;
 			}
-
+			/* Hack -- handle resist magic. Deeper monsters are more resistant. */
+			else if ((flg & (PROJECT_MAGIC)) && (cave_m_idx[y][x] > 0)
+				&& ((r_info[m_list[cave_m_idx[y][x]].r_idx].flags9 & (RF9_RES_MAGIC)) != 0)
+				&& (rand_int(100) < 20 + p_ptr->depth / 2))
+			{
+				/* Hack -- resist magic */
+				if (project_m(who, y, x, 0, GF_RES_MAGIC)) notice = TRUE;
+			}
 			/* Affect the monster in the grid */
-			if (project_m(who, y, x, dam_at_dist[gd[i]], typ))
+			else if (project_m(who, y, x, dam_at_dist[gd[i]], typ))
 				notice = TRUE;
 		}
 
