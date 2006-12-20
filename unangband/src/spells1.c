@@ -2475,47 +2475,47 @@ bool inc_stat(int stat)
 	/* Cannot go above 18/999 */
 	if (value < 18+999)
 	{
-		/* Gain one (sometimes two) points */
-		if (value < 17)
+		/* Gain one point */
+		if (value < 18)
 		{
-			gain = ((rand_int(100) < 75) ? 1 : 2);
-			value += gain;
-		}
-
-		/* Gain one (sometimes eleven) points */
-		else if (value < 18)
-		{
-			gain = ((rand_int(100) < 75) ? 1 : 11);
-			value += gain;
+			value ++;
 		}
 
 		/* Gain 1/8 to 1/4 of distance to 18/100; at last, 3--6 points */
-		else if (value < 18+90)
+		else if (value < 18+100)
 		{
 			/* Approximate gain value */
-			gain = ((18+100) - value) / 5 + 4;
+			gain = ((18+100) - value) / 5 + 6;
 
 			/* Roll the bonus */
 			value += (rand_int(gain) + gain) / 2;
 		}
 
-		/* Gain 2--4 points at a time */
-		else if (value < 18+100)
+		/* Gain 3--6 points at a time */
+		else if (value < 18+110)
 		{
-			value += 1 + randint(3);
+			value += 2 + randint(4);
+
+		}
+
+		/* Gain 3--5 points at a time */
+		else if (value < 18+120)
+		{
+			value += 2 + randint(3);
+
+		}
+
+		/* Gain 3--4 points at a time */
+		else if (value < 18+130)
+		{
+			value += 2 + randint(2);
 
 		}
 
 		/* Gain 2--3 points at a time */
-		else if (value < 18+110)
+		else if (value < 18+150)
 		{
 			value += 1 + randint(2);
-		}
-
-		/* Gain 1--3 points at a time */
-		else if (value < 18+120)
-		{
-			value += randint(3);
 		}
 
 		/* Gain 1--2 points at a time */

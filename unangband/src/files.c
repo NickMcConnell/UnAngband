@@ -2640,8 +2640,8 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 			c_put_str(attr, stat_names[i], row+i, col);
 		}
 
-		/* Indicate the point where increases become very small */
-		if (p_ptr->stat_max[i] >= 18+90)
+		/* Indicate the threshold where increases cannot reach 10 points */
+		if (p_ptr->stat_max[i] >= 18+80)
 		{
 			put_str("!", row+i, col+3);
 		}
