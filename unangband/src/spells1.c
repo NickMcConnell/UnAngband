@@ -2477,26 +2477,22 @@ int calc_inc_stat(int value, int auto_roll)
 	if (value < 18)
 		value++;
 
-	/* Gain 1/8 to 1/4 of distance to 18/100; at last, 3--6 points */
-	else if (value < 18+100)
+	/* Gain 1/10 to 1/5 of distance to 18/100; at last, 3--5 points */
+	else if (value < 18+80)
 	{
 		/* Approximate gain value */
-		gain = ((18+100) - value) / 5 + 6;
+		gain = ((18+100) - value) / 5 + 1;
 
 		/* Roll the bonus */
 		value += (rand_roll(gain) + gain) / 2;
 	}
 
-	/* Gain 3--6 points at a time */
-	else if (value < 18+110)
-		value += 2 + rand_roll(4);
-
 	/* Gain 3--5 points at a time */
-	else if (value < 18+120)
+	else if (value < 18+100)
 		value += 2 + rand_roll(3);
 
 	/* Gain 3--4 points at a time */
-	else if (value < 18+130)
+	else if (value < 18+120)
 		value += 2 + rand_roll(2);
 
 	/* Gain 2--3 points at a time */

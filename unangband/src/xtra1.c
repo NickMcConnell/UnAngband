@@ -156,7 +156,7 @@ static void prt_stat(int stat)
 		}
 	}
 
-	/* Indicate the threshold where increases cannot reach 10 points */
+	/* Indicate the threshold where increases are never higher than 5 points */
 	if ((p_ptr->stat_max[stat] >= 18+80) && (show_sidebar))
 	{
 		put_str("!", ROW_STAT + stat, 3);
