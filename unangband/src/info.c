@@ -1748,7 +1748,7 @@ typedef struct o_flag_desc
  * affects all stats.  In this case, "All stats" is used instead of
  * listing each stat individually.
  */
-static const o_flag_desc stat_flags_desc[A_MAX_OLD] =
+static const o_flag_desc stat_flags_desc[6 /* FIXME: A_MAX */] =
 {
 	{ TR1_STR,	"strength" },
 	{ TR1_INT,	"intelligence" },
@@ -1756,6 +1756,7 @@ static const o_flag_desc stat_flags_desc[A_MAX_OLD] =
 	{ TR1_DEX,	"dexterity" },
 	{ TR1_CON,	"constitution" },
 	{ TR1_CHR,	"charisma" }
+	/* FIXME: { TR1_AGI ,	"agility" } */
 };
 
 /*

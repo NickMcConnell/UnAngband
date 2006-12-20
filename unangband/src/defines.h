@@ -608,13 +608,6 @@
  */
 #define A_MAX	7
 
-
-/*
- * Old total number of stats.
- */
-#define A_MAX_OLD	6
-
-
 /*
  * Player sex constants (hard-coded by save-files, arrays, etc)
  */
@@ -624,10 +617,8 @@
 
 /*** Screen Locations ***/
 
-
 #define BOTTOM_LINE  Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1)
 #define SECOND_FROM_BOTTOM  Term->hgt - (show_itemlist ? (use_trptile ? 5 : (use_dbltile ? 4 : 3)) : 2)
-
 
 
 /*

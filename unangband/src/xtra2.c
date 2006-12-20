@@ -2632,12 +2632,11 @@ static void improve_stat(void)
 			tmp = 0;
 		}
 
-		/* Attempt to increase */
-		if (inc_stat(stat_gain_selection[stat_gain_selected]))
-		{
-			/* Message */
-			msg_format("You feel %s%s.",p,desc_stat_imp[stat_gain_selection[stat_gain_selected]]);
-		}
+		/* Increase */
+		inc_stat(stat_gain_selection[stat_gain_selected]);
+
+		/* Message */
+		msg_format("You feel %s%s.",p,desc_stat_imp[stat_gain_selection[stat_gain_selected]]);
 
 		/* Hack --- restore stat */
 		if (tmp) p_ptr->stat_cur[stat_gain_selection[stat_gain_selected]] = tmp;

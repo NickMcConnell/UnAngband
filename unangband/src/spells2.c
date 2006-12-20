@@ -205,33 +205,17 @@ bool do_res_stat(int stat)
  */
 bool do_inc_stat(int stat)
 {
-	bool res;
+	/* Restore stat */
+	res_stat(stat);
 
-	/* Restore strength */
-	res = res_stat(stat);
+	/* Increase stat */
+	inc_stat(stat);
 
-	/* Attempt to increase */
-	if (inc_stat(stat))
-	{
-		/* Message */
-		msg_format("You feel very %s!", desc_stat_pos[stat]);
+	/* Message */
+	msg_format("You feel very %s!", desc_stat_pos[stat]);
 
-		/* Notice */
-		return (TRUE);
-	}
-
-	/* Restoration worked */
-	if (res)
-	{
-		/* Message */
-		msg_format("You feel less %s.", desc_stat_neg[stat]);
-
-		/* Notice */
-		return (TRUE);
-	}
-
-	/* Nothing obvious */
-	return (FALSE);
+	/* Notice */
+	return (TRUE);
 }
 
 /*

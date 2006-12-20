@@ -972,7 +972,7 @@ static errr rd_extra(void)
 
 	if (older_than(0,6,2))
 	{
-		a_max = A_MAX_OLD;
+		a_max = 6;
 		p_ptr->stat_max[A_AGI] = 11;
 		p_ptr->stat_cur[A_AGI] = 11;
 		p_ptr->stat_inc_tim[A_AGI] = 0;
