@@ -2618,9 +2618,9 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 	{
 		/* Print out the labels for the columns */
 		c_put_str(TERM_WHITE, "  Self ", row-1, col+5);
-		c_put_str(TERM_WHITE, " EB ", row-1, col+20);
-		c_put_str(TERM_WHITE, "  Best ", row-1, col+24);
-		c_put_str(TERM_WHITE, "  Curr", row-1, col+31);
+		c_put_str(TERM_WHITE, " EB ", row-1, col+12);
+		c_put_str(TERM_WHITE, "  Best ", row-1, col+16);
+		c_put_str(TERM_WHITE, "  Curr", row-1, col+23);
 	}
 
 	/* Display the stats */
@@ -2652,17 +2652,17 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 
 		/* Equipment Bonus */
 		sprintf(buf, "%+3d", p_ptr->stat_add[i]);
-		c_put_str(TERM_L_BLUE, buf, row+i, col+20);
+		c_put_str(TERM_L_BLUE, buf, row+i, col+12);
 
 		/* Resulting "modified" maximum value */
 		cnv_stat(p_ptr->stat_top[i], buf);
-		c_put_str(TERM_L_GREEN, buf, row+i, col+24);
+		c_put_str(TERM_L_GREEN, buf, row+i, col+16);
 
 		/* Only display stat_use if not maximal */
 		if (p_ptr->stat_use[i] < p_ptr->stat_top[i])
 		{
 			cnv_stat(p_ptr->stat_use[i], buf);
-			c_put_str(TERM_YELLOW, buf, row+i, col+31);
+			c_put_str(TERM_YELLOW, buf, row+i, col+23);
 		}
 	}
 }
@@ -3030,7 +3030,7 @@ void display_player(int mode)
 	clear_from(0);
 
 	/* Stat info */
-	display_player_stat_info(3, 42, 0, A_MAX, TERM_WHITE);
+	display_player_stat_info(3, 50, 0, A_MAX, TERM_WHITE);
 
 	if ((mode) < 3)
 	{

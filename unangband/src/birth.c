@@ -1631,7 +1631,7 @@ static bool player_birth_aux_2(void)
 		display_player(0);
 
 		/* Display the costs header */
-		put_str("Cost", row - 1, col + 32);
+		put_str("Cost ", row - 1, col + 32);
 
 		/* Display the costs */
 		for (i = 0; i < A_MAX; i++)
