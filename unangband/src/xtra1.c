@@ -3108,20 +3108,6 @@ static void calc_bonuses(void)
 		/* Extract modifier */
 		add = p_ptr->stat_add[i];
 
-		/* Maximize mode - race */
-		if (adult_maximize_race)
-		{
-			/* Modify the stats for race */
-			add += rp_ptr->r_adj[i];
-		}
-
-		/* Maximize mode - class */
-		if (adult_maximize_class)
-		{
-			/* Modify the stats for class */
-			add += cp_ptr->c_adj[i];
-		}
-
 		/* Extract timed increase */
 		if (p_ptr->stat_inc_tim[i]) add += 5;
 

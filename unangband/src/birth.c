@@ -167,9 +167,10 @@ static void load_prev_data(void)
  * is used, with the "auto_roll" flag affecting the result.
  *
  * The "auto_roll" flag selects "maximal" changes for use with the
- * auto-roller initialization code.  Otherwise, if "maximize" mode
- * is being used, the changes are fixed.  Otherwise, semi-random
+ * auto-roller initialization code.  Otherwise, semi-random
  * changes will occur, with larger changes at lower values.
+ *
+ * TODO: make this closer to the actual in-game stat increases; perhaps forgo randomness
  */
 static int adjust_stat(int value, int amount, int auto_roll)
 {
@@ -218,7 +219,7 @@ static void get_stats(void)
 {
 	int i, j;
 
-	int bonus_max, bonus_add;
+	int bonus_add;
 
 	int dice[A_MAX * 3];
 
@@ -247,30 +248,14 @@ static void get_stats(void)
 		j = 5 + dice[3*i] + dice[3*i+1] + dice[3*i+2];
 
 		/* Obtain a "bonus" for "race" and "class" */
-		bonus_max = (adult_maximize_race ? rp_ptr->r_adj[i] : 0) + (adult_maximize_class ? cp_ptr->c_adj[i] : 0);
-		bonus_add = (adult_maximize_race ? 0 : rp_ptr->r_adj[i]) + (adult_maximize_class ? 0 : cp_ptr->c_adj[i]);
+		bonus_add = rp_ptr->r_adj[i] + cp_ptr->c_adj[i];
 
-		/* Fixed stat maxes */
-		if (bonus_add)
-		{
-			/* Apply the bonus to the stat (somewhat randomly) */
-			stat_use[i] = adjust_stat(j, bonus_add, FALSE);
-
-		}
-		else
-		{
-			stat_use[i] = j;
-		}
+		/* Apply the bonus to the stat (somewhat randomly) */
+		stat_use[i] = adjust_stat(j, bonus_add, FALSE);
 
 		/* Save the resulting stat maximum */
 		p_ptr->stat_cur[i] = p_ptr->stat_max[i] = stat_use[i];
 
-		/* Variable stat maxes */
-		if (bonus_max)
-		{
-			/* Efficiency -- Apply the racial/class bonuses */
-			stat_use[i] = modify_stat_value(p_ptr->stat_max[i], bonus_max);
-		}
 	}
 }
 
@@ -1552,6 +1537,8 @@ static const int birth_stat_costs[(18-10)+1] = { 0, 1, 3, 5, 7, 10, 13, 16, 23};
  * available points, to which race/class modifiers are then applied.
  *
  * Each unused point is converted into 100 gold pieces.
+ *
+ * TODO: increase by more than 10 after 18; perhaps use the functon as for autorolling
  */
 static bool player_birth_aux_2(void)
 {
@@ -1599,18 +1586,14 @@ static bool player_birth_aux_2(void)
 		for (i = 0; i < A_MAX; i++)
 		{
 			/* Obtain a "bonus" for "race" and "class" */
-			int bonus_add = (adult_maximize_race ? 0 : rp_ptr->r_adj[i]) + (adult_maximize_class ? 0 : cp_ptr->c_adj[i]);
+			int bonus_add = rp_ptr->r_adj[i] + cp_ptr->c_adj[i];
 
 			/* Reset stats */
 			p_ptr->stat_cur[i] = p_ptr->stat_max[i] = stats[i];
 
-			/* Fixed stat maxes */
-			if (bonus_add)
-			{
-				/* Apply the racial/class bonuses */
-				p_ptr->stat_cur[i] = p_ptr->stat_max[i] =
-					modify_stat_value(stats[i], bonus_add);
-			}
+			/* Apply the racial/class bonuses */
+			p_ptr->stat_cur[i] = p_ptr->stat_max[i] =
+				modify_stat_value(stats[i], bonus_add);
 
 			/* Total cost */
 			cost += birth_stat_costs[stats[i] - 10];
@@ -1717,6 +1700,8 @@ static bool player_birth_aux_2(void)
  * The delay may be reduced, but is recommended to keep players
  * from continuously rolling up characters, which can be VERY
  * expensive CPU wise.  And it cuts down on player stupidity.
+ *
+ * TODO: merge stat increases with those from point-based?
  */
 static bool player_birth_aux_3(void)
 {
@@ -1774,16 +1759,10 @@ static bool player_birth_aux_3(void)
 			stat_match[i] = 0;
 
 			/* Race/Class bonus */
-			j = (adult_maximize_race ? 0 : rp_ptr->r_adj[i]) + (adult_maximize_class ? 0 : cp_ptr->c_adj[i]);
+			j = rp_ptr->r_adj[i] + cp_ptr->c_adj[i];
 
 			/* Obtain the "maximal" stat */
 			m = adjust_stat(17, j, TRUE);
-
-			/* Modify for race if maximised */
-			if (adult_maximize_race) m = modify_stat_value(m, rp_ptr->r_adj[i]);
-
-			/* Modify for class if maximised */
-			if (adult_maximize_class) m = modify_stat_value(m, cp_ptr->c_adj[i]);
 
 			/* Save the maximum */
 			mval[i] = m;

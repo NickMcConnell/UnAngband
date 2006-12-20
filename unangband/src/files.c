@@ -2618,8 +2618,6 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 	{
 		/* Print out the labels for the columns */
 		c_put_str(TERM_WHITE, "  Self ", row-1, col+5);
-		if (adult_maximize_race) c_put_str(TERM_WHITE, " RB ", row-1, col+12);
-		if (adult_maximize_class) c_put_str(TERM_WHITE, " CB ", row-1, col+16);
 		c_put_str(TERM_WHITE, " EB ", row-1, col+20);
 		c_put_str(TERM_WHITE, "  Best ", row-1, col+24);
 		c_put_str(TERM_WHITE, "  Curr", row-1, col+31);
@@ -2651,20 +2649,6 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 		/* Internal "natural" maximum value */
 		cnv_stat(p_ptr->stat_max[i], buf);
 		c_put_str(TERM_L_GREEN, buf, row+i, col+5);
-
-		/* Race Bonus */
-		if (adult_maximize_race)
-		{
-			sprintf(buf, "%+3d", rp_ptr->r_adj[i]);
-			c_put_str(TERM_L_BLUE, buf, row+i, col+12);
-		}
-
-		/* Class Bonus */
-		if (adult_maximize_class)
-		{
-			sprintf(buf, "%+3d", cp_ptr->c_adj[i]);
-			c_put_str(TERM_L_BLUE, buf, row+i, col+16);
-		}
 
 		/* Equipment Bonus */
 		sprintf(buf, "%+3d", p_ptr->stat_add[i]);

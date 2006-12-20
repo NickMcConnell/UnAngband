@@ -1792,17 +1792,17 @@ const cptr option_text[OPT_MAX] =
 	NULL,					   /* xxx */
 	"birth_point_based",		/* OPT_birth_point_based */
 	"birth_auto_roller",		/* OPT_birth_auto_roller */
-	"birth_maximize_race",			/* OPT_birth_maximize_race */
-	"birth_preserve",			/* OPT_birth_preserve */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
 	"birth_ironman",			/* OPT_birth_ironman */
 	"birth_no_stores",			/* OPT_birth_no_stores */
 	"birth_no_artifacts",		/* OPT_birth_no_artifacts */
 	"birth_rand_artifacts",		/* OPT_birth_rand_artifacts */
-	"birth_campaign",			       /* xxx */
-	"birth_no_stacking",			/* xxx */
-	"birth_haggle",						/* OPT_birth_haggle */
-	"birth_scum",						/* OPT_birth_scum */
-	"birth_maximize_class",			/* OPT_birth_maximize_class */
+	"birth_campaign",		    /* xxx */
+	"birth_no_stacking",		/* xxx */
+	"birth_haggle",				/* OPT_birth_haggle */
+	"birth_scum",				/* OPT_birth_scum */
+	NULL,						/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
@@ -1856,17 +1856,17 @@ const cptr option_text[OPT_MAX] =
 	NULL,						/* xxx */
 	"adult_point_based",		/* OPT_adult_point_based */
 	"adult_auto_roller",		/* OPT_adult_auto_roller */
-	"adult_maximize_race",			/* OPT_adult_maximize */
-	"adult_preserve",			/* OPT_adult_preserve */
+	NULL,						/* xxx */
+	NULL,						/* xxx */
 	"adult_ironman",			/* OPT_adult_ironman */
 	"adult_no_stores",			/* OPT_adult_no_stores */
 	"adult_no_artifacts",		/* OPT_adult_no_artifacts */
 	"adult_rand_artifacts",		/* OPT_adult_rand_artifacts */
-	"adult_campaign",				/* xxx */
-	"adult_no_stacking",			/* xxx */
-	"adult_haggle",						/* OPT_adult_haggle */
-	"adult_scum",						/* OPT_adult_scum */
-	"adult_maximize_class",			/* OPT_adult_maximize_class */
+	"adult_campaign",			/* xxx */
+	"adult_no_stacking",		/* xxx */
+	"adult_haggle",				/* OPT_adult_haggle */
+	"adult_scum",				/* OPT_adult_scum */
+	NULL,						/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
@@ -2056,8 +2056,8 @@ const cptr option_desc[OPT_MAX] =
 	NULL,									   /* xxx */
 	"Birth: Allow purchase of stats using points",	/* OPT_birth_point_based */
 	"Birth: Allow specification of minimal stats",	/* OPT_birth_auto_roller */
-	"Birth: Maximize effect of race bonuses",	/* OPT_birth_maximize_race */
-	"Birth: Preserve artifacts when leaving level",	/* OPT_birth_preserve */
+	NULL,										/* xxx */
+	NULL,										/* xxx */
 	"Birth: Restrict the use of stairs/recall",	/* OPT_birth_ironman */
 	"Birth: Restrict the use of stores/home",	/* OPT_birth_no_stores */
 	"Birth: Restrict creation of artifacts",	/* OPT_birth_no_artifacts */
@@ -2066,7 +2066,7 @@ const cptr option_desc[OPT_MAX] =
 	"Birth: Don't stack objects on the floor",	/* OPT_birth_no_stacking */
 	"Birth: Haggle in stores",			/* OPT_birth_haggle */									/* xxx */
 	"Birth: Scum for good levels",			/* OPT_birth_scum */
-	"Birth: Maximize effect of class bonuses",	/* OPT_birth_maximize_class */
+	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
@@ -2120,8 +2120,8 @@ const cptr option_desc[OPT_MAX] =
 	NULL,										/* xxx */
 	"Adult: Allow purchase of stats using points",	/* OPT_adult_point_based */
 	"Adult: Allow specification of minimal stats",	/* OPT_adult_auto_roller */
-	"Adult: Maximize effect of race bonuses",	/* OPT_adult_maximize */
-	"Adult: Preserve artifacts when leaving level",	/* OPT_adult_preserve */
+	NULL,										/* xxx */
+	NULL,										/* xxx */
 	"Adult: Restrict the use of stairs/recall",	/* OPT_adult_ironman */
 	"Adult: Restrict the use of stores/home",	/* OPT_adult_no_stores */
 	"Adult: Restrict creation of artifacts",	/* OPT_adult_no_artifacts */
@@ -2130,7 +2130,7 @@ const cptr option_desc[OPT_MAX] =
 	"Adult: Don't stack objects on the floor",	/* OPT_adult_no_stacking */
 	"Adult: Haggle in stores",			/* OPT_adult_haggle */									/* xxx */
 	"Adult: Scum for good levels",			/* OPT_adult_scum */
-	"Adult: Maximize effect of class bonuses",	/* OPT_adult_maximize_class */
+	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
@@ -2320,8 +2320,8 @@ const bool option_norm[OPT_MAX] =
 	FALSE,	  /* OPT_variant_drop_body */
 	FALSE,		/* OPT_birth_point_based */
 	FALSE,		/* OPT_birth_auto_roller */
-	TRUE,		/* OPT_birth_maximize_race */
-	TRUE,		/* OPT_birth_preserve */
+	FALSE,		/* xxx */
+	FALSE,		/* xxx */
 	FALSE,		/* OPT_birth_ironman */
 	FALSE,		/* OPT_birth_no_stores */
 	FALSE,		/* OPT_birth_no_artifacts */
@@ -2329,7 +2329,7 @@ const bool option_norm[OPT_MAX] =
 	TRUE,	  /* OPT_birth_campaign */
 	FALSE,		/* OPT_birth_haggle */
 	FALSE,		/* OPT_birth_scum */
-	TRUE,		/* OPT_birth_maximise_class */
+	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
@@ -2384,8 +2384,8 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* xxx */
 	FALSE,		/* OPT_adult_point_based */
 	FALSE,		/* OPT_adult_auto_roller */
-	TRUE,		/* OPT_adult_maximize_race */
-	TRUE,		/* OPT_adult_preserve */
+	FALSE,		/* xxx */
+	FALSE,		/* xxx */
 	FALSE,		/* OPT_adult_ironman */
 	FALSE,		/* OPT_adult_no_stores */
 	FALSE,		/* OPT_adult_no_artifacts */
@@ -2394,7 +2394,7 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* OPT_adult_no_stacking */
 	FALSE,		/* OPT_adult_haggle */
 	FALSE,		/* OPT_adult_scum */
-	TRUE,		/* OPT_adult_maximize_class */
+	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
@@ -2584,9 +2584,6 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 	{
 		OPT_birth_point_based,
 		OPT_birth_auto_roller,
-		OPT_birth_maximize_race,
-		OPT_birth_maximize_class,
-		OPT_birth_preserve,
 		OPT_birth_ironman,
 		OPT_birth_no_stores,
 		OPT_birth_no_artifacts,
@@ -2595,6 +2592,9 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_birth_no_stacking,
 		OPT_birth_haggle,
 		OPT_birth_scum,
+		255,
+		255,
+		255,
 		255,
 		255,
 		255,

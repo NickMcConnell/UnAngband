@@ -6589,9 +6589,6 @@ void generate_cave(void)
 		else if (rating > 0) feeling = 9;
 		else feeling = 10;
 
-		/* Hack -- Have a special feeling sometimes */
-		if (good_item_flag && !adult_preserve) feeling = 1;
-
 		/* It takes 1000 game turns for "feelings" to recharge */
 		if ((old_turn) && ((turn - old_turn) < 1000)) feeling = 0;
 
