@@ -1419,7 +1419,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		case TV_BOW:
 		{
 			/* Hack -- Extract the "base power" */
-			power = (o_ptr->sval % 10);
+			power = bow_multiplier(o_ptr->sval);
 
 			/* Append a "power" string */
 			object_desc_chr_macro(t, ' ');

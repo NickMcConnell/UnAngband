@@ -6354,8 +6354,7 @@ N:873:& Hand Crossbow~
 G:}:u
 I:19:22:0
 W:5:0:60:80
-A:1/2
-P:0:2d1:0:0:0
+A:5/1
 
 N:874:& Pair~ of Leather Sandals
 G:]:U

@@ -6055,23 +6055,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 						{
 							int k, mult;
 
-							switch (j_ptr->sval)
-							{
-								case SV_SLING:
-								case SV_SHORT_BOW:
-								mult = 2;
-								break;
-								case SV_LONG_BOW:
-								case SV_LIGHT_XBOW:
-									mult = 3;
-									break;
-								case SV_HEAVY_XBOW:
-									mult = 4;
-									break;
-								default:
-									mult = 1;
-									break;
-							}
+							mult = bow_multiplier(j_ptr->sval);
 
 							/* Apply extra might */
 							if (f1 & (TR1_MIGHT)) mult += j_ptr->pval;

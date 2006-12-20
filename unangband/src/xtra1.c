@@ -3444,6 +3444,8 @@ static void calc_bonuses(void)
 	/* Analyze launcher */
 	if (o_ptr->k_idx)
 	{
+		p_ptr->ammo_mult = bow_multiplier(o_ptr->sval);
+
 		/* Analyze the launcher */
 		switch (o_ptr->sval)
 		{
@@ -3451,39 +3453,23 @@ static void calc_bonuses(void)
 			case SV_SLING:
 			{
 				/* Hack -- slings now act like 'throwers' */
-				p_ptr->ammo_mult = 2;
 				break;
 			}
 
-			/* Short Bow and Arrow */
+			/* Bows */
 			case SV_SHORT_BOW:
-			{
-				p_ptr->ammo_tval = TV_ARROW;
-				p_ptr->ammo_mult = 2;
-				break;
-			}
-
-			/* Long Bow and Arrow */
 			case SV_LONG_BOW:
 			{
 				p_ptr->ammo_tval = TV_ARROW;
-				p_ptr->ammo_mult = 3;
 				break;
 			}
 
-			/* Light Crossbow and Bolt */
+			/* Crossbows */
+			case SV_HAND_XBOW:
 			case SV_LIGHT_XBOW:
-			{
-				p_ptr->ammo_tval = TV_BOLT;
-				p_ptr->ammo_mult = 3;
-				break;
-			}
-
-			/* Heavy Crossbow and Bolt */
 			case SV_HEAVY_XBOW:
 			{
 				p_ptr->ammo_tval = TV_BOLT;
-				p_ptr->ammo_mult = 4;
 				break;
 			}
 		}
@@ -3660,6 +3646,7 @@ static void calc_bonuses(void)
 				p_ptr->cur_style |= (1L << WS_BOW);
 				break;
 			}
+			case SV_HAND_XBOW:
 			case SV_LIGHT_XBOW:
 			case SV_HEAVY_XBOW:
 			{

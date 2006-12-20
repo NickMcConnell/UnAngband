@@ -1835,13 +1835,13 @@
 #define SV_AMMO_STEEL		5	/* steel arrows and bolts */
 #define SV_AMMO_GRAPPLE		6	/* grapple arrows and bolts */
 
-/* The "sval" codes for TV_BOW (note information in "sval") */
-#define SV_SLING			2	/* (x2) */
-#define SV_SHORT_BOW		12	/* (x2) */
-#define SV_LONG_BOW			13	/* (x3) */
-#define SV_HAND_XBOW		22	/* (x3) */
-#define SV_LIGHT_XBOW		23	/* (x3) */
-#define SV_HEAVY_XBOW		24	/* (x4) */
+/* The "sval" codes for TV_BOW */
+#define SV_SLING			2
+#define SV_SHORT_BOW		12
+#define SV_LONG_BOW			13
+#define SV_HAND_XBOW		22
+#define SV_LIGHT_XBOW		23
+#define SV_HEAVY_XBOW		24
 
 /* The "sval" codes for TV_DIGGING */
 #define SV_SHOVEL			1

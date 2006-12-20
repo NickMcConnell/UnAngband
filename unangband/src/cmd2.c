@@ -2611,6 +2611,7 @@ void do_cmd_set_trap_or_spike(void)
 							if (i_ptr->tval != TV_ARROW) trap_allowed = FALSE;
 							break;
 						}
+					    case SV_HAND_XBOW:
 						case SV_LIGHT_XBOW:
 						case SV_HEAVY_XBOW:
 						{

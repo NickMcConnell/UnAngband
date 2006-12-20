@@ -563,6 +563,7 @@ extern void update_slot_flags(int slot, u32b f1, u32b f2, u32b f3, u32b f4);
 extern void equip_can_flags(u32b f1,u32b f2,u32b f3, u32b f4);
 extern void equip_not_flags(u32b f1,u32b f2,u32b f3, u32b f4);
 extern void inven_drop_flags(object_type *o_ptr);
+extern int bow_multiplier(int sval);
 extern s32b slay_power(u32b s_index);
 extern u32b slay_index(const u32b f1, const u32b f2, const u32b f3, const u32b f4);
 extern s32b object_power(const object_type *o_ptr);

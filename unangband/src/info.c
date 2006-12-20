@@ -43,6 +43,30 @@
 
 
 /*
+ * Calculate the multiplier we'll get with a given bow type.
+ */
+int bow_multiplier(int sval)
+{
+	switch (sval)
+	{
+		case SV_SLING:
+		case SV_SHORT_BOW:
+		case SV_HAND_XBOW:
+			return (2);
+		case SV_LONG_BOW:
+		case SV_LIGHT_XBOW:
+			return (3);
+		case SV_HEAVY_XBOW:
+			return (4);
+		default:
+			msg_format("Illegal bow sval %d", sval);
+	}
+
+	return (0);
+}
+
+
+/*
  * Obtain the "flags" for an item
  */
 static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3, u32b *f4)
@@ -2981,7 +3005,7 @@ void list_object(const object_type *o_ptr, int mode)
 	/* Bows */
 	if (!random && (o_ptr->tval == TV_BOW))
 	{
-		int mult = 2;
+		int mult = bow_multiplier (o_ptr->sval);
 
 		text_out("When shooting or set in a trap, it multiplies the base damage of ");
 
@@ -3000,26 +3024,18 @@ void list_object(const object_type *o_ptr, int mode)
 			}
 
 			/* Short Bow and Arrow */
-			case SV_LONG_BOW:
-			{
-				mult++;
-				/* Fall through */
-			}
 			case SV_SHORT_BOW:
+			case SV_LONG_BOW:
 			{
 				text_out("arrows");
 				break;
 			}
 
 			/* Light Crossbow and Bolt */
+			case SV_HAND_XBOW:
+			case SV_LIGHT_XBOW:
 			case SV_HEAVY_XBOW:
 			{
-				mult++;
-				/* Fall through */
-			}
-			case SV_LIGHT_XBOW:
-			{
-				mult++;
 				text_out("bolts");
 				break;
 			}
@@ -5012,29 +5028,6 @@ void inven_drop_flags(object_type *o_ptr)
 #define AVG_BOW_AMMO_DAMAGE 12
 #define AVG_XBOW_AMMO_DAMAGE 12
 
-/*
- * Calculate the multiplier we'll get with a given bow type.
- */
-static int bow_multiplier(int sval)
-{
-	switch (sval)
-	{
-		case SV_SLING:
-		case SV_SHORT_BOW:
-		case SV_HAND_XBOW:
-			return (2);
-		case SV_LONG_BOW:
-		case SV_LIGHT_XBOW:
-			return (3);
-		case SV_HEAVY_XBOW:
-			return (4);
-		default:
-			msg_format("Illegal bow sval %d", sval);
-	}
-
-	return (0);
-}
-
 
 /*
  * Calculate the rating for a given slay combination.
@@ -5296,12 +5289,13 @@ s32b object_power(const object_type *o_ptr)
 				p += AVG_SLING_AMMO_DAMAGE;
 			}
 			else if (o_ptr->sval == SV_SHORT_BOW ||
-				o_ptr->sval == SV_LONG_BOW)
+					 o_ptr->sval == SV_LONG_BOW)
 			{
 				p += AVG_BOW_AMMO_DAMAGE;
 			}
-			else if (o_ptr->sval == SV_LIGHT_XBOW ||
-				o_ptr->sval == SV_HEAVY_XBOW)
+			else if (o_ptr->sval == SV_HAND_XBOW ||
+					 o_ptr->sval == SV_LIGHT_XBOW ||
+					 o_ptr->sval == SV_HEAVY_XBOW)
 			{
 				p += AVG_XBOW_AMMO_DAMAGE;
 			}

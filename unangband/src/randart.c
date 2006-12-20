@@ -404,31 +404,6 @@ static errr init_names(void)
 }
 
 
-
-
-/*
- * Calculate the multiplier we'll get with a given bow type.
- */
-static int bow_multiplier(int sval)
-{
-	switch (sval)
-	{
-		case SV_SLING:
-		case SV_SHORT_BOW:
-			return (2);
-		case SV_LONG_BOW:
-		case SV_LIGHT_XBOW:
-			return (3);
-		case SV_HEAVY_XBOW:
-			return (4);
-		default:
-			msg_format("Illegal bow sval %s", sval);
-	}
-
-	return (0);
-}
-
-
 static void remove_contradictory(artifact_type *a_ptr)
 {
 	if (a_ptr->flags3 & TR3_AGGRAVATE) a_ptr->flags1 &= ~(TR1_STEALTH);
@@ -514,7 +489,6 @@ static void remove_contradictory(artifact_type *a_ptr)
 	}
 
 
-
 /*
  * Evaluate the artifact's overall power level.
  */
@@ -578,8 +552,9 @@ static s32b artifact_power(int a_idx)
 			{
 				p += AVG_BOW_AMMO_DAMAGE;
 			}
-			else if (a_ptr->sval == SV_LIGHT_XBOW ||
-				a_ptr->sval == SV_HEAVY_XBOW)
+			else if (a_ptr->sval == SV_HAND_XBOW ||
+					 a_ptr->sval == SV_LIGHT_XBOW ||
+					 a_ptr->sval == SV_HEAVY_XBOW)
 			{
 				p += AVG_XBOW_AMMO_DAMAGE;
 			}
@@ -679,15 +654,16 @@ static s32b artifact_power(int a_idx)
 					p = 0;
 			}
 			else if (a_ptr->sval == SV_SHORT_BOW ||
-				a_ptr->sval == SV_LONG_BOW)
+					 a_ptr->sval == SV_LONG_BOW)
 			{
 				if (ABS(p) > AVG_BOW_AMMO_DAMAGE)
 					p -= sign(p) * AVG_BOW_AMMO_DAMAGE * bow_multiplier(k_ptr->sval);
 				else
 					p = 0;
 			}
-			else if (a_ptr->sval == SV_LIGHT_XBOW ||
-				a_ptr->sval == SV_HEAVY_XBOW)
+			else if (a_ptr->sval == SV_HAND_XBOW ||
+					 a_ptr->sval == SV_LIGHT_XBOW ||
+					 a_ptr->sval == SV_HEAVY_XBOW)
 			{
 				if (ABS(p) > AVG_XBOW_AMMO_DAMAGE)
 					p -= sign(p) * AVG_XBOW_AMMO_DAMAGE * bow_multiplier(k_ptr->sval);
@@ -1351,10 +1327,11 @@ static s16b choose_item(int a_idx)
 	switch (tval)
 	{
 	case TV_BOW:
-		if (r2 <10) sval = SV_SLING;
+		if (r2 < 15) sval = SV_SLING;
 		else if (r2 < 30) sval = SV_SHORT_BOW;
-		else if (r2 < 60) sval = SV_LONG_BOW;
-		else if (r2 < 90) sval = SV_LIGHT_XBOW;
+		else if (r2 < 60) sval = SV_HAND_XBOW;
+		else if (r2 < 90) sval = SV_LONG_BOW;
+		else if (r2 < 120) sval = SV_LIGHT_XBOW;
 		else sval = SV_HEAVY_XBOW;
 		break;
 
