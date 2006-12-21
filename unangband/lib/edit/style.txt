@@ -14,9 +14,9 @@
 #WEAPON&SHIELD: Wielding 1 weapon and shield.
 #TWO-WEAPON: Wielding 2 weapons, one in place of shield. 
 #Not all combinations work; try it for yourself.
-#In this configuration, if you get more than one attack,
-#2nd weapon gets every 2nd attack. Also, when charging
-#you always get two attacks (instead of the standard one attack others get).
+#With two weapons, if players get more than one attack,
+#2nd weapon gets every 2nd attack. Also, when charging,
+#players with two equipped weapons always get two attacks, instead of one.
 #THROWN: Not firing with an item (or whilst using a musical instrument in bow slow).
 #SLING: Firing with a sling.
 #BOW: Firing with a bow.

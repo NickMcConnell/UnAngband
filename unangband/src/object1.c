@@ -3700,13 +3700,13 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 		/*Hack -- Validate the item */
 		if ((k < INVEN_WIELD) ? !allow_inven : !allow_equip)
 		{
-			bell("Illegal object choice (1, tag)!");
+			bell(format("Illegal object choice%s!", cheat_xtra ? " (1, tag)" : ""));
 		}
 
 		/* Validate the item */
 		else if (!get_item_okay(k))
 		{
-			bell("Illegal object choice (2, tag)!");
+			bell(format("Illegal object choice%s!", cheat_xtra ? " (2, tag)" : ""));
 		}
 
 		/* Allow player to "refuse" certain actions */
@@ -4129,28 +4129,28 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 				/* Look up the tag */
 				if (!get_tag(&k, ke.key))
 				{
-					bell("Illegal object choice (3, tag)!");
+					bell(format("Illegal object choice%s!", cheat_xtra ? " (3, tag)" : ""));
 					break;
 				}
 
 				/* Hack -- Validate the item */
 				if ((k < INVEN_WIELD) ? !allow_inven : !allow_equip)
 				{
-					bell("Illegal object choice (4, tag)!");
+					bell(format("Illegal object choice%s!", cheat_xtra ? " (4, tag)" : ""));
 					break;
 				}
 
 				/* Forbid classic equipment if using the quiver */
 				if (use_quiver && (k >= INVEN_WIELD) && !IS_QUIVER_SLOT(k))
 				{
-					bell("Illegal object choice (5, tag)!");
+					bell(format("Illegal object choice%s!", cheat_xtra ? " (5, tag)" : ""));
 					break;
 				}
 
 				/* Validate the item */
 				if (!get_item_okay(k))
 				{
-					bell("Illegal object choice (6, tag)!");
+					bell(format("Illegal object choice%s!", cheat_xtra ? " (6, tag)" : ""));
 					break;
 				}
 
@@ -4176,7 +4176,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 				{
 					if (i1 != i2)
 					{
-						bell("Illegal object choice (7, default)!");
+						bell(format("Illegal object choice%s!", cheat_xtra ? " (7, default)" : ""));
 						break;
 					}
 
@@ -4188,7 +4188,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 				{
 					if (e1 != e2)
 					{
-						bell("Illegal object choice (8, default)!");
+						bell(format("Illegal object choice%s!", cheat_xtra ? " (8, default)" : ""));
 						break;
 					}
 
@@ -4202,7 +4202,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 				{
 					if (f1 != f2)
 					{
-						bell("Illegal object choice (9, default)!");
+						bell(format("Illegal object choice%s!", cheat_xtra ? " (9, default)" : ""));
 						break;
 					}
 
@@ -4214,7 +4214,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 				/* Validate the item */
 				if (!get_item_okay(k))
 				{
-					bell("Illegal object choice (10, default)!");
+					bell(format("Illegal object choice%s!", cheat_xtra ? " (10, default)" : ""));
 					break;
 				}
 
@@ -4276,7 +4276,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 
 					if (k < 0)
 					{
-						bell("Illegal object choice (11, inven)!");
+						bell(format("Illegal object choice%s!", cheat_xtra ? " (11, inven)" : ""));
 						break;
 					}
 				}
@@ -4288,14 +4288,14 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 
 					if (k < 0)
 					{
-						bell("Illegal object choice (12, equip)!");
+						bell(format("Illegal object choice%s!", cheat_xtra ? " (12, equip)" : ""));
 						break;
 					}
 
 					/* Forbid classic equipment if using the quiver */
 					if (use_quiver && !IS_QUIVER_SLOT(k))
 					{
-						bell("Illegal object choice (13, equip)!");
+						bell(format("Illegal object choice%s!", cheat_xtra ? " (13, equip)" : ""));
 						break;
 					}
 				}
@@ -4309,7 +4309,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 
 					if (k < 0 || k >= floor_num)
 					{
-						bell("Illegal object choice (14, floor)!");
+						bell(format("Illegal object choice%s!", cheat_xtra ? " (14, floor)" : ""));
 						break;
 					}
 
@@ -4322,7 +4322,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 				/* Validate the item */
 				if (!get_item_okay(k))
 				{
-					bell("Illegal object choice (15, normal)!");
+					bell(format("Illegal object choice%s!", cheat_xtra ? " (15, normal)" : ""));
 					break;
 				}
 

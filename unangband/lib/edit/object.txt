@@ -212,7 +212,7 @@ A:0/1:5/1:10/1
 N:22:& Hard Biscuit~
 G:,:U
 I:80:32:0
-W:0:250:2:1
+W:0:400:2:1
 A:0/1
 
 N:23:& Strip~ of Beef Jerky

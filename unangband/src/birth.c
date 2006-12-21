@@ -176,16 +176,12 @@ static int adjust_stat(int value, int amount, int auto_roll)
 	/* Increase, using the real stat increase function */
 	else
 	{
-		int i, v;
+		int i;
 
 		/* Apply reward */
 		for (i = 0; i < amount; i++)
 		{
-			/* FIXME: why is v needed here? Looks like a compiler bug! 
-			value += calc_inc_stat(value, auto_roll); 
-			*/
-			v = calc_inc_stat(value, auto_roll); 
-			value = v;
+			value = calc_inc_stat(value, auto_roll); 
 		}
 
 		return (value);
@@ -573,11 +569,11 @@ static void player_outfit(void)
 					switch (p_ptr->pstyle)
 					{
 						case WS_TWO_WEAPON:
-						case WS_THROWN:
 						{
 							k_idx = lookup_kind(TV_SWORD, SV_DAGGER);
 							break;
 						}
+						case WS_THROWN:
 						case WS_SLING:
 						{
 							k_idx = lookup_kind(TV_BOW, SV_SLING);
@@ -606,7 +602,7 @@ static void player_outfit(void)
 						case WS_TWO_WEAPON:
 						case WS_THROWN:
 						{
-							k_idx = lookup_kind(TV_SWORD, SV_DAGGER);
+							k_idx = lookup_kind(TV_SPIKE, 0);
 							break;
 						}
 						case WS_SLING:
