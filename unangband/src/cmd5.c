@@ -1169,9 +1169,9 @@ bool inven_cast_okay(const object_type *o_ptr)
 
 
 /*
- * Cast a spell (once chosen)
+ * Cast a spell (once chosen); return FALSE if aborted
  */
-void do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
+bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 {
 	int i;
 	int chance;
@@ -1212,7 +1212,7 @@ void do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 				p_ptr->held_song = 0;
 			}
 
-			return;
+			return FALSE;
 		}
 	}
 
@@ -1233,7 +1233,7 @@ void do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 
 				p_ptr->held_song = 0;
 			}
-			return;
+			return FALSE;
 		}
 	}
 
@@ -1290,7 +1290,7 @@ void do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 		process_spell(spell,plev,&abort,&known);
 
 		/* Did we cancel? */
-		if (abort) return;
+		if (abort) return FALSE;
 
 		for (i=0;i<PY_MAX_SPELLS;i++)
 		{
@@ -1379,6 +1379,7 @@ void do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 	/* Window stuff */
 	p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
 
+	return TRUE;
 }
 
 
@@ -1538,9 +1539,6 @@ void do_cmd_cast(void)
 		return;
 	}
 
-	/* Take a turn */
-	p_ptr->energy_use = 100;
-
 	/* Hold a song if possible */
 	if (s_info[spell].flags3 & (SF3_HOLD_SONG))
 	{
@@ -1582,6 +1580,9 @@ void do_cmd_cast(void)
 	}
 
 	/* Cast the spell - held songs get cast later*/
-	if (p_ptr->held_song != spell) do_cmd_cast_aux(spell,spell_power(spell),p,t);
+	if (p_ptr->held_song != spell)
+		if (do_cmd_cast_aux(spell,spell_power(spell),p,t))
+			/* If not aborted, take a turn */
+			p_ptr->energy_use = 100;
 }
 

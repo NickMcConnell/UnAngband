@@ -6908,7 +6908,7 @@ bool process_spell_types(int spell, int level, bool *cancel)
 				/* Only brand weapons */
 				item_tester_hook = item_tester_hook_weapon_strict;
 
-				if (!brand_item(s_ptr->param, "glows brightly.") && (*cancel)) return (TRUE);
+				if (!brand_item(s_ptr->param, "glows brightly") && (*cancel)) return (TRUE);
 				*cancel = FALSE;
 				obvious = TRUE;
 				break;
@@ -6918,14 +6918,14 @@ bool process_spell_types(int spell, int level, bool *cancel)
 				/* Only brand weapons */
 				item_tester_hook = item_tester_hook_armour;
 
-				if (!brand_item(s_ptr->param, "glows brightly.") && (*cancel)) return (TRUE);
+				if (!brand_item(s_ptr->param, "glows brightly") && (*cancel)) return (TRUE);
 				*cancel = FALSE;
 				obvious = TRUE;
 				break;
 			}
 			case SPELL_BRAND_ITEM:
 			{
-				if (!brand_item(s_ptr->param, "glows brightly.") && (*cancel)) return (TRUE);
+				if (!brand_item(s_ptr->param, "glows brightly") && (*cancel)) return (TRUE);
 				*cancel = FALSE;
 				obvious = TRUE;
 				break;
@@ -6935,7 +6935,7 @@ bool process_spell_types(int spell, int level, bool *cancel)
 				/* Only brand ammo */
 				item_tester_hook = item_tester_hook_ammo;
 
-				if (!brand_item(s_ptr->param, "glows brightly.") && (*cancel)) return (TRUE);
+				if (!brand_item(s_ptr->param, "glows brightly") && (*cancel)) return (TRUE);
 				*cancel = FALSE;
 				obvious = TRUE;
 				break;

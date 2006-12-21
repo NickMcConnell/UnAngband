@@ -2901,13 +2901,10 @@ static void process_player(void)
 			/* Hack -- sing song */
 			if (p_ptr->held_song)
 			{
-
 				/* Cast the spell */
-			    	do_cmd_cast_aux(p_ptr->held_song, spell_power(p_ptr->held_song), ((p_ptr->pstyle == WS_INSTRUMENT)?"play":"sing"), "song");
-
-				/* Hack -- Always use a full turn */
-				p_ptr->energy_use = 100;
-
+			    if (do_cmd_cast_aux(p_ptr->held_song, spell_power(p_ptr->held_song), ((p_ptr->pstyle == WS_INSTRUMENT)?"play":"sing"), "song"))
+					/* Hack -- if not aborted, always use a full turn */
+					p_ptr->energy_use = 100;
 			}
 
 			/* Use some energy */

@@ -59,10 +59,8 @@ int bow_multiplier(int sval)
 		case SV_HEAVY_XBOW:
 			return (4);
 		default:
-			msg_format("Illegal bow sval %d", sval);
+			return (0); /* instruments, etc. */
 	}
-
-	return (0);
 }
 
 

@@ -484,7 +484,7 @@ extern int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known);
 extern void do_cmd_browse_aux(const object_type *o_ptr);
 extern void do_cmd_browse(void);
 extern void do_cmd_study(void);
-extern void do_cmd_cast_aux(int spell, int plev, cptr p, cptr t);
+extern bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t);
 extern void do_cmd_cast(void);
 
 /* cmd6.c */
