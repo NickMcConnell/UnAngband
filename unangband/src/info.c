@@ -2859,10 +2859,21 @@ void list_object(const object_type *o_ptr, int mode)
 			case TV_SWORD:
 			case TV_HAFTED:
 			case TV_POLEARM:
-				if (o_ptr->weight >= 66)
+				if (cp_ptr)
+				{ 
+					if (o_ptr->weight >= 2 * cp_ptr->chg_weight)
+					{
+						text_out(format("It does x%d damage when charging.  ", o_ptr->weight / cp_ptr->chg_weight));
+						anything = TRUE;
+					}
+		        } 
+		        else  
 				{
-					text_out(format("It does x%d damage when charging.  ", o_ptr->weight / 33));
-					anything = TRUE;
+					if (o_ptr->weight >= 66)
+					{
+						text_out(format("It does x%d damage when charging.  ", o_ptr->weight / 33));
+						anything = TRUE;
+					}
 				}
 				break;
 			case TV_SPIKE:

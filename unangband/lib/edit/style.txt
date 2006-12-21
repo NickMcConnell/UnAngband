@@ -9,11 +9,14 @@
 #NONE: No style.
 #UNARMED: Not wielding a weapon or shield.
 #ONE-HANDED: Wielding 1 weapon and no shield. Prefers light weapons, and nothing over 20 lbs.
-#TWO-HANDED: Wielding 1 weapon and no shield. Prefers heavy weapons, and nothing less than 10 lbs.
+#TWO-HANDED: Wielding 1 weapon and no shield. 
+#Prefers heavy weapons, and nothing less than 10 lbs.
 #WEAPON&SHIELD: Wielding 1 weapon and shield.
-#TWO-WEAPON: Wielding 1 weapon and 2nd lighter weapon in place of shield. Requires
-#that 1st weapon light enough for multiple attacks. In this configuration, 2nd weapon
-#gets every 2nd attack.
+#TWO-WEAPON: Wielding 2 weapons, one in place of shield. 
+#Not all combinations work; try it for yourself.
+#In this configuration, if you get more than one attack,
+#2nd weapon gets every 2nd attack. Also, when charging
+#you always get two attacks (instead of the standard one attack others get).
 #THROWN: Not firing with an item (or whilst using a musical instrument in bow slow).
 #SLING: Firing with a sling.
 #BOW: Firing with a bow.
