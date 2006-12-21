@@ -5448,7 +5448,7 @@ s32b object_power(const object_type *o_ptr)
 
 				s_index = slay_index(f1, f2, f3, f4);
 
-				for (i = 0, j = 0x00000001L;(i < 32) && (j != s_index); i++, j<<=1);
+				for (i = 0, j = 0x00000001L; (i < 32) && (j != s_index); i++, j<<=1);
 
 				if (i < 32)
 				{
@@ -5462,11 +5462,11 @@ s32b object_power(const object_type *o_ptr)
 			/* Correction factor for damage */
 			p /= 2;
 
-			if (o_ptr->to_d > o_ptr->dd + o_ptr->ds)
+			if (o_ptr->to_d > o_ptr->dd * o_ptr->ds)
 			{
 				p += o_ptr->to_d;
 			}
-			else	p += o_ptr->dd + o_ptr->ds;
+			else p += o_ptr->dd * o_ptr->ds;
 
 			if (f1 & TR1_BLOWS)
 			{
@@ -5485,14 +5485,14 @@ s32b object_power(const object_type *o_ptr)
 
 			if (o_ptr->to_h > 9)
 			{
-				p+= (o_ptr->to_h) * 2 / 3;
+				p += (o_ptr->to_h) * 2 / 3;
 			}
 			else p += 6;
 
 			/* Normalise power back */
 			/* We remove the weapon base damage to get 'true' power */
-			/* This makes e.g. a sword that provides fire immunity the same value as
-			   a ring that provides fire immunity */
+			/* This makes e.g. a sword that provides fire immunity 
+			   the same value as a ring that provides fire immunity */
 			if (ABS(p) > k_ptr->dd * (k_ptr->ds + 1) / 2 + 6 + o_ptr->dd * o_ptr->ds)
 				p -= sign(p) * (k_ptr->dd * (k_ptr->ds + 1) / 2 + 6 + k_ptr->dd * k_ptr->ds);
 			else
@@ -5506,15 +5506,10 @@ s32b object_power(const object_type *o_ptr)
 				p += o_ptr->ac - k_ptr->ac;
 			}
 
-			if (o_ptr->weight < k_ptr->weight)
-			{
-				p++;
-			}
-
 			/* Remember, weight is in 0.1 lb. units. */
 			if (o_ptr->weight != k_ptr->weight)
 			{
-			/*	p += (k_ptr->weight - o_ptr->weight) / 20; */
+				p += (k_ptr->weight - o_ptr->weight) / 20;
 			}
 
 			/* Bonus as we may use a staff or hafted weapon as swap weapon */
@@ -5525,15 +5520,9 @@ s32b object_power(const object_type *o_ptr)
 			if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)) p++;
 			if (((f2 & (TR2_IGNORE_THEFT)) != 0) && ((kf2 & (TR2_IGNORE_THEFT)) == 0)) p++;
 
-			/* Bonus if throwing weapon */
+			/* Bonus for an extra throwing flag */
 			if (((f3 & (TR3_THROWING)) != 0) && ((kf3 & (TR3_THROWING)) == 0))
-			{
 				p += 2;
-
-				/* Bonus as we carry thrown weapons in inventory and throw them */
-				if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)) p++;
-				if (((f2 & (TR2_IGNORE_FIRE)) != 0) && ((kf2 & (TR2_IGNORE_FIRE)) == 0)) p++;
-			}
 
 			/* Add some specific powers here only */
 			ADD_POWER("blessed",		 1, TR3_BLESSED, 3,);

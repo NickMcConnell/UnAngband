@@ -617,7 +617,7 @@ P:0:8d4:0:0:0
 N:73:& Short Bow~
 G:}:U
 I:19:12:0
-W:3:0:30:50
+W:3:0:30:40
 A:3/1:50/1
 
 
@@ -6357,7 +6357,7 @@ F:THROWING
 N:873:& Hand Crossbow~
 G:}:u
 I:19:22:0
-W:5:0:60:80
+W:5:0:60:55
 A:5/1
 
 N:874:& Pair~ of Leather Sandals
