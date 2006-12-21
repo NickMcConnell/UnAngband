@@ -3101,6 +3101,9 @@ static void store_examine(void)
 		return;
 	}
 
+	/* Examining an object requires you to be more aware of it */
+	object_aware(o_ptr);
+
 	/* Description */
 	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 

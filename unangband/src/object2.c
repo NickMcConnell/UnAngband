@@ -860,9 +860,11 @@ void object_aware(object_type *o_ptr)
 	}
 
 	/* Is this all we need to know? - other wearable items */
-	else if (((o_ptr->tval == TV_RING) || (o_ptr->tval == TV_AMULET))
-		&& ((!(o_ptr->to_h) && !(o_ptr->to_d) && !(o_ptr->to_a)) || (o_ptr->ident & (IDENT_BONUS)))
-		&& (!(o_ptr->pval) || (o_ptr->ident & (IDENT_PVAL))))
+	else if (((o_ptr->tval == TV_RING || o_ptr->tval == TV_AMULET)
+			  || (o_ptr->tval >= TV_SHOT && o_ptr->tval <= TV_DRAG_ARMOR))
+			 && ((!(o_ptr->to_h) && !(o_ptr->to_d) && !(o_ptr->to_a)) 
+				 || (o_ptr->ident & (IDENT_BONUS)))
+			 && (!(o_ptr->pval) || (o_ptr->ident & (IDENT_PVAL))))
 	{
 		object_known(o_ptr);
 	}
