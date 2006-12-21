@@ -3364,7 +3364,7 @@ void do_cmd_fire(void)
 	q = "Fire which item? ";
 	s = "You have nothing to fire.";
 
-	if (!get_item(&item, q, s, (USE_QUIVER | USE_INVEN | USE_FLOOR | USE_FEATG))) return;
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG))) return;
 
 	/* Get the object */
 	if (item >= 0)
@@ -3902,7 +3902,7 @@ void do_cmd_throw(void)
 	/* Get an item */
 	q = "Throw which item? ";
 	s = "You have nothing to throw.";
-	if (!get_item(&item, q, s, (USE_QUIVER | USE_INVEN | USE_FLOOR | USE_FEATG))) return;
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG))) return;
 
 	if (item >= 0)
 	{
