@@ -1615,6 +1615,8 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 	int offset = rand_int(100) < 50 ? 1 : 0;
 	int max_offset = offset + 1;
 
+	bool outer;
+
 	/* Paranoia */
 	if (!dy || !dx) return;
 
@@ -1641,6 +1643,8 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 		{
 			for (x = x1; (dx > 0) ? x <= x2 : x >= x2; x += dx)
 			{
+				outer = ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) != 0);
+
 				/* Checkered room */
 				if (((flag & (RG1_CHECKER)) != 0) && ((x + y + offset) % 2)) continue;
 
@@ -1740,7 +1744,13 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 					}
 
 					/* Assign feature */
-					if (place_feat) cave_set_feat(y, x, place_feat);
+					if (place_feat)
+					{
+						cave_set_feat(y, x, place_feat);
+
+						/* Hack - fix outer walls */
+						if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) && !(outer)) cave_alter_feat(y, x, FS_SOLID);
+					}
 
 					/* Require "clean" floor space */
 					if ((flag & (RG1_HAS_GOLD | RG1_HAS_ITEM)) != 0)
@@ -1795,8 +1805,16 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 					/* Limit spread */
 					if ((y < y1) || (y > y2) || (x < x1) || (x > x2)) continue;
 
+					outer = ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) != 0);
+
 					/* Assign feature */
-					if (place_feat) cave_set_feat(y, x, place_feat);
+					if (place_feat)
+					{
+						cave_set_feat(y, x, place_feat);
+
+						/* Hack - fix outer walls */
+						if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) && !(outer)) cave_alter_feat(y, x, FS_SOLID);
+					}
 
 					/* Require "clean" floor space */
 					if ((flag & (RG1_HAS_GOLD | RG1_HAS_ITEM)) != 0)
@@ -1825,6 +1843,8 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 			y = y_alloc;
 			x = x_alloc;
 
+			outer = ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) != 0);
+
 			/* Pick a random feature? */
 			if ((feat) && (f_info[feat].mimic == feat))
 			{
@@ -1834,7 +1854,13 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 			}
 
 			/* Assign feature */
-			if (place_feat) cave_set_feat(y, x, place_feat);
+			if (place_feat)
+			{
+				cave_set_feat(y, x, place_feat);
+
+				/* Hack - fix outer walls */
+				if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) && !(outer)) cave_alter_feat(y, x, FS_SOLID);
+			}
 
 			/* Require "clean" floor space */
 			if ((flag & (RG1_HAS_GOLD | RG1_HAS_ITEM)) != 0)
