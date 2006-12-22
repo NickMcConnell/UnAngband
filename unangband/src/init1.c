@@ -7254,7 +7254,7 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	resists = resists * 25;
 
 	/* Apply magic resistance */
-	if (r_ptr->flags9 & RF9_RES_MAGIC)	resists += 20 + r_ptr->level / 2;
+	if (r_ptr->flags9 & RF9_RES_MAGIC)	resists += 40 + r_ptr->level;
 
 	/* Get the monster ac */
 	ac = r_ptr->ac;

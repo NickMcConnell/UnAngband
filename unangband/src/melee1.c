@@ -1356,19 +1356,22 @@ int get_breath_dam(s16b hit_points, int gf_type, bool powerful)
 
 
 #define FLG_MON_BEAM (PROJECT_BEAM | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | \
-			PROJECT_PLAY)
-#define FLG_MON_BOLT (PROJECT_STOP | PROJECT_KILL | PROJECT_PLAY | PROJECT_GRID)
-#define FLG_MON_BALL (PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | \
+			PROJECT_PLAY | PROJECT_MAGIC)
+#define FLG_MON_SHOT (PROJECT_STOP | PROJECT_KILL | PROJECT_PLAY | PROJECT_GRID)
+#define FLG_MON_BALL_SHOT (PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | \
 			PROJECT_PLAY | PROJECT_WALL)
+#define FLG_MON_BOLT (PROJECT_STOP | PROJECT_KILL | PROJECT_PLAY | PROJECT_GRID | PROJECT_MAGIC)
+#define FLG_MON_BALL (PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | \
+			PROJECT_PLAY | PROJECT_WALL | PROJECT_MAGIC)
 #define FLG_MON_AREA (PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | \
-			PROJECT_PLAY | PROJECT_WALL | PROJECT_AREA)
+			PROJECT_PLAY | PROJECT_WALL | PROJECT_AREA | PROJECT_MAGIC)
 #define FLG_MON_8WAY (PROJECT_8WAY | PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | \
-			PROJECT_PLAY | PROJECT_WALL | PROJECT_AREA)
+			PROJECT_PLAY | PROJECT_WALL | PROJECT_AREA | PROJECT_MAGIC)
 #define FLG_MON_CLOUD (PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_PLAY | \
-			PROJECT_HIDE | PROJECT_WALL)
+			PROJECT_HIDE | PROJECT_WALL | PROJECT_MAGIC)
 #define FLG_MON_ARC  (PROJECT_ARC | PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | \
-	           PROJECT_KILL | PROJECT_PLAY | PROJECT_WALL)
-#define FLG_MON_DIRECT (PROJECT_JUMP | PROJECT_KILL | PROJECT_PLAY)
+	           PROJECT_KILL | PROJECT_PLAY | PROJECT_WALL | PROJECT_MAGIC)
+#define FLG_MON_DIRECT (PROJECT_JUMP | PROJECT_KILL | PROJECT_PLAY | PROJECT_MAGIC)
 
 
 /*
@@ -1403,6 +1406,7 @@ static void mon_bolt(int who, int y, int x, int typ, int dam, cptr result)
  * Stop if we hit a monster
  * Affect monsters and the player
  * Can miss the first target
+ * Not treated as magic
  */
 static void mon_shot(int who, int y, int x, int typ, int dam, bool hit, cptr result)
 {
@@ -1416,7 +1420,7 @@ static void mon_shot(int who, int y, int x, int typ, int dam, bool hit, cptr res
 		int fx = m_ptr->fx;
 
 		/* Aim at target with a bolt attack */
-		(void)project(who, 0, fy, fx, y, x, dam, typ, FLG_MON_BOLT | (hit ? 0L : PROJECT_MISS), 0 , 0);
+		(void)project(who, 0, fy, fx, y, x, dam, typ, FLG_MON_SHOT | (hit ? 0L : PROJECT_MISS), 0 , 0);
 	}
 	else
 	{
@@ -1506,6 +1510,34 @@ static void mon_area(int who, int y, int x, int typ, int dam, int rad, cptr resu
 	{
 		/* Affect grids in radius with a ball attack */
 		(void)project(0, rad, y, x, y, x, dam, typ, FLG_MON_AREA, 0, 0);
+	}
+}
+
+
+/*
+ * Cast a ball shot at the target
+ * Affect grids, objects, monsters, and (specifically) the player
+ * Not treated as magic
+ * Stop at first target
+ */
+static void mon_ball_minor_shot(int who, int y, int x, int typ, int dam, int rad, bool hit, cptr result)
+{
+	/* Message */
+	if (result) msg_print(result);
+
+	if (who > 0)
+	{
+		monster_type *m_ptr = &m_list[who];
+		int fy = m_ptr->fy;
+		int fx = m_ptr->fx;
+
+		/* Aim at target with a ball attack */
+		(void)project(who, rad, fy, fx, y, x, dam, typ, FLG_MON_BALL_SHOT | PROJECT_STOP | (hit ? 0L : PROJECT_MISS), 0, 0);
+	}
+	else
+	{
+		/* Affect grids in radius with a ball attack */
+		(void)project(0, rad, y, x, y, x, dam, typ, FLG_MON_BALL_SHOT, 0, 0);
 	}
 }
 
@@ -2113,7 +2145,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_ARC_40: mon_arc(who, y, x, effect, dam, 0, (powerful ? 60 : 40), result); break;
 				case RBM_ARC_50: mon_arc(who, y, x, effect, dam, 0, 50, result); break;
 				case RBM_ARC_60: mon_arc(who, y, x, effect, dam, 0, 60, result); break;
-				case RBM_FLASK:	mon_ball_minor(who, y, x, effect, dam, 1, hit, result); break;
+				case RBM_FLASK:	mon_ball_minor_shot(who, y, x, effect, dam, 1, hit, result); break;
 				case RBM_8WAY: mon_8way(who, y, x, effect, dam, 2, result); break;
 				case RBM_8WAY_II: mon_8way(who, y, x, effect, dam, 3, result); break;
 				case RBM_8WAY_III: mon_8way(who, y, x, effect, dam, 4, result); break;
