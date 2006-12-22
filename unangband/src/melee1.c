@@ -673,7 +673,7 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 
 		case RBM_EXPLODE:
 		{
-			prefix = "explodes ";
+			prefix = "explodes";
 			strcpy(t_name, "");
 			break;
 		}
