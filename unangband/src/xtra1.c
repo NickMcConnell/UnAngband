@@ -2872,6 +2872,7 @@ static void calc_bonuses(void)
 
 	/* Reset "fire" info */
 	p_ptr->num_fire = 0;
+	p_ptr->num_throw = 0;
 	p_ptr->ammo_mult = 0;
 	p_ptr->ammo_tval = 0;
 	extra_shots = 0;
@@ -3423,6 +3424,7 @@ static void calc_bonuses(void)
 
 	/* Always get to shoot */
 	p_ptr->num_fire = 1;
+	p_ptr->num_throw = 1;
 
 	/* Always get to do some damage */
 	p_ptr->ammo_mult = 1;
@@ -3474,6 +3476,7 @@ static void calc_bonuses(void)
 
 		/* Require at least one shot */
 		if (p_ptr->num_fire < 1) p_ptr->num_fire = 1;
+		if (p_ptr->num_throw < 1) p_ptr->num_throw = 1;
 	}
 
 
@@ -3607,20 +3610,20 @@ static void calc_bonuses(void)
 	/* Check shooting preference styles */
 	o_ptr = &inventory[INVEN_BOW];
 
-	if (!o_ptr->k_idx)
+	/* Throwing is always possible */
+	p_ptr->cur_style |= (1L << WS_THROWN);
+
+	if (o_ptr->k_idx)
 	{
-		p_ptr->cur_style |= (1L << WS_THROWN);
-	}
-        else if (o_ptr->tval==TV_INSTRUMENT)
+		if (o_ptr->tval==TV_INSTRUMENT)
         {
-                p_ptr->cur_style |= (1L << WS_INSTRUMENT);
-		p_ptr->cur_style |= (1L << WS_THROWN);
+			p_ptr->cur_style |= (1L << WS_INSTRUMENT);
         }
-	else if (o_ptr->tval==TV_BOW)
-	{
-		/* Set shooting preference styles */
-		switch(o_ptr->sval)
+		else if (o_ptr->tval==TV_BOW)
 		{
+			/* Set shooting preference styles */
+			switch(o_ptr->sval)
+			{
 			case SV_SLING:
 			{
 				p_ptr->cur_style |= (1L << WS_SLING);
@@ -3639,9 +3642,9 @@ static void calc_bonuses(void)
 				p_ptr->cur_style |= (1L << WS_XBOW);
 				break;
 			}
+			}
 		}
 	}
-
 	
 	/* Check fighting styles */
 	o_ptr = &inventory[INVEN_ARM];
@@ -3660,7 +3663,8 @@ static void calc_bonuses(void)
 		{
 			case TV_SHIELD:
 			{
-				p_ptr->cur_style |= (1L << WS_WEAPON_SHIELD);
+				if (!(p_ptr->cur_style & (1L << WS_UNARMED)))
+					p_ptr->cur_style |= (1L << WS_WEAPON_SHIELD);
 				break;
 			}
 			case TV_HAFTED:
@@ -3668,7 +3672,8 @@ static void calc_bonuses(void)
 			case TV_SWORD:
 			case TV_STAFF:
 			{
-				p_ptr->cur_style |= (1L << WS_TWO_WEAPON);
+				if (!(p_ptr->cur_style & (1L << WS_UNARMED)))
+					p_ptr->cur_style |= (1L << WS_TWO_WEAPON);
 				break;
 			}
 		}
@@ -3715,7 +3720,16 @@ static void calc_bonuses(void)
 					break;
 
 				case WB_SHOT:
-					if (!p_ptr->heavy_shoot) p_ptr->num_fire++;
+					if (w_info[i].styles & (1L << WS_THROWN))
+						p_ptr->num_throw++;
+					if (!p_ptr->heavy_shoot
+						&& (p_ptr->cur_style & w_info[i].styles 
+							  & (1L << WS_SLING)
+							|| p_ptr->cur_style & w_info[i].styles 
+							  & (1L << WS_BOW)
+							|| p_ptr->cur_style & w_info[i].styles 
+							  & (1L << WS_XBOW)))
+						p_ptr->num_fire++;
 					break;
 
 				case WB_MIGHT:

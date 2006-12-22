@@ -1521,7 +1521,7 @@ static bool player_birth_aux_2(void)
 {
 	int i;
 
-	int row = 3;
+	int row = 2;
 	int col = 42;
 
 	int stat = 0;

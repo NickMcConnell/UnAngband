@@ -1560,6 +1560,7 @@ struct player_type
 
 	s16b num_blow;  /* Number of blows */
 	s16b num_fire;  /* Number of shots */
+	s16b num_throw; /* Number of throws */
 
 	byte ammo_mult; /* Ammo multiplier */
 

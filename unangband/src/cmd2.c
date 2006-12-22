@@ -3260,20 +3260,14 @@ static bool item_tester_hook_rope(const object_type *o_ptr)
 }
 
 
-
-
-
-
-
-
-
-
 /*
- * Fire an object from the pack or floor.
+ * Fire an already chosen object.
  *
- * You may only fire items that "match" your missile launcher.
+ * You may only fire items that "match" your missile launcher
+ * or a throwing weapon (see do_cmd_throw_selected).
  *
- * You must use slings + pebbles/shots, bows + arrows, xbows + bolts.
+ * You must use slings + pebbles/shots/thrown objects, 
+ * bows + arrows, xbows + bolts.
  *
  * See "calc_bonuses()" for more calculations and such.
  *
@@ -3296,12 +3290,12 @@ static bool item_tester_hook_rope(const object_type *o_ptr)
  *
  * Note that Bows of "Extra Shots" give an extra shot.
  */
-void do_cmd_fire(void)
+void do_cmd_fire_selected(object_type *o_ptr, int item)
 {
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
-	int dir, item, item2 = 0;
+	int dir, item2 = 0;
 	int i, j, y, x, ty, tx;
 	int tdam, tdis, thits, tmul;
 	int bonus, chance;
@@ -3309,9 +3303,7 @@ void do_cmd_fire(void)
 	int style_hit, style_dam, style_crit;
 	u32b shoot_style;
 
-	object_type *o_ptr;
 	object_type *j_ptr;
-
 	object_type *k_ptr = NULL;
 	object_type *i_ptr;
 	object_type object_type_body;
@@ -3326,8 +3318,6 @@ void do_cmd_fire(void)
 	int path_n;
 	u16b path_g[256];
 
-	cptr q, s;
-
 	int msec = op_ptr->delay_factor * op_ptr->delay_factor;
 
 	bool get_feat = FALSE;
@@ -3337,61 +3327,10 @@ void do_cmd_fire(void)
 
 	int feat;
 
-	/* Berserk */
-	if (p_ptr->shero)
-	{
-		msg_print("You are too enraged!");
-		return;
-	}
+	cptr q, s;
 
-	/* Some items and some rooms blow missiles around */
-	if ((p_ptr->cur_flags4 & (TR4_WINDY)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_WINDY)))
-	{
-		msg_print("Its too windy around you!");
-		return;
-	}
-
-	/* Get the "bow" (if any) */
+	/* Get the bow */
 	j_ptr = &inventory[INVEN_BOW];
-
-	/* Require proper missile */
-	item_tester_tval = p_ptr->ammo_tval;
-
-	/* Require throwing weapon */
-	if (!item_tester_tval) item_tester_hook = item_tester_hook_throwing;
-
-	/* Get an item */
-	q = "Fire which item? ";
-	s = "You have nothing to fire.";
-
-	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG))) return;
-
-	/* Get the object */
-	if (item >= 0)
-	{
-		o_ptr = &inventory[item];
-
-		/* A cursed quiver disables the use of non-cursed ammo */
-		if (IS_QUIVER_SLOT(item) && p_ptr->cursed_quiver && !cursed_p(o_ptr))
-		{
-			msg_print("Your quiver is cursed!");
-			return;
-		}
-	}
-	else
-	{
-		o_ptr = &o_list[0 - item];
-	}
-
-	/* In a bag? */
-	if (o_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
-
-		/* Refer to the item */
-		o_ptr = &inventory[item];
-	}
 
 	/* Get feat */
 	if (o_ptr->ident & (IDENT_STORE)) get_feat = TRUE;
@@ -3435,9 +3374,6 @@ void do_cmd_fire(void)
 
 	/* Hack -- flasks, potions, spores always break as if striking a monster */
 	if ((o_ptr->tval == TV_FLASK) || (o_ptr->tval == TV_POTION) || (o_ptr->tval == TV_EGG)) hit_body = TRUE;
-
-	/* Hack -- if no bow, make object count for double */
-	if (j_ptr->tval != TV_BOW) j_ptr = o_ptr;
 
 	/* Get a direction (or cancel) */
 	if (!get_aim_dir(&dir)) return;
@@ -3840,25 +3776,25 @@ void do_cmd_fire(void)
 
 
 /*
- * Throw an object from the pack or floor.
+ * Throw an already chosen object.
  *
  * Note: "unseen" monsters are very hard to hit.
  *
  * Should throwing a weapon do full damage?  Should it allow the magic
  * to hit bonus of the weapon to have an effect?  Should it ever cause
  * the item to be destroyed?  Should it do any damage at all?
+ *
+ * TODO: add multiple throws (from the style bonus)
  */
-void do_cmd_throw(void)
+void do_cmd_throw_selected(object_type *o_ptr, int item)
 {
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
-	int dir, item;
+	int dir;
 	int i, j, y, x, ty, tx;
 	int chance, bonus, tdam, tdis;
 	int mul, div;
-
-	object_type *o_ptr;
 
 	object_type *i_ptr;
 	object_type object_type_body;
@@ -3876,59 +3812,12 @@ void do_cmd_throw(void)
 	int path_n;
 	u16b path_g[256];
 
-	cptr q, s;
-
 	int msec = op_ptr->delay_factor * op_ptr->delay_factor;
 
 	bool was_asleep = FALSE;
 
 	u32b f1, f2, f3, f4;
 	bool throwing;
-
-	/* Berserk */
-	if (p_ptr->shero)
-	{
-		msg_print("You are too enraged!");
-		return;
-	}
-
-	/* Some items and some rooms blow missiles around */
-	if ((p_ptr->cur_flags4 & (TR4_WINDY)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_WINDY)))
-	{
-		msg_print("Its too windy around you!");
-		return;
-	}
-
-	/* Get an item */
-	q = "Throw which item? ";
-	s = "You have nothing to throw.";
-	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG))) return;
-
-	if (item >= 0)
-	{
-		o_ptr = &inventory[item];
-
-		/* A cursed quiver disables the use of non-cursed ammo */
-		if (IS_QUIVER_SLOT(item) && p_ptr->cursed_quiver && !cursed_p(o_ptr))
-		{
-			msg_print("Your quiver is cursed!");
-			return;
-		}
-	}
-	else
-	{
-		o_ptr = &o_list[0 - item];
-	}
-
-	/* In a bag? */
-	if (o_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
-
-		/* Refer to the item */
-		o_ptr = &inventory[item];
-	}
 
 	/* Get feat */
 	if (o_ptr->ident & (IDENT_STORE)) get_feat = TRUE;
@@ -3938,6 +3827,9 @@ void do_cmd_throw(void)
 
 	/* Set if throwing */
 	throwing = (f3 & (TR3_THROWING)) != 0;
+
+	/* Hack -- flasks, potions, spores always break as if striking a monster */
+	if ((o_ptr->tval == TV_FLASK) || (o_ptr->tval == TV_POTION) || (o_ptr->tval == TV_EGG)) hit_body = TRUE;
 
 	/* Get a direction (or cancel) */
 	if (!get_aim_dir(&dir)) return;
@@ -3951,7 +3843,7 @@ void do_cmd_throw(void)
 	/* Single object */
 	i_ptr->number = 1;
 
-	/* Reset stack count*/
+	/* Reset stack counter */
 	i_ptr->stackc = 0;
 
 	/* No longer 'stored' */
@@ -4140,7 +4032,7 @@ void do_cmd_throw(void)
 				/* Apply critical damage */
 				tdam += critical_shot(i_ptr->weight, (i_ptr->to_h * (throwing ? 2 : 1) + style_crit *30), tdam);
 
-				/* Apply launcher and missile bonus */
+				/* Apply weapon and special throwing bonus */
 				tdam += i_ptr->to_d * (throwing ? 2 : 1);
 
 				/* No negative damage */
@@ -4256,4 +4148,145 @@ void do_cmd_throw(void)
 
 	/* Drop (or break) near that location */
 	drop_near(i_ptr, j, y, x);
+}
+
+
+/*
+ * Fire an object from the pack or floor.
+ * See do_cmd_fire_selected.
+ */
+void do_cmd_fire(void)
+{
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int item;
+
+	object_type *o_ptr;
+
+	cptr q, s;
+
+	/* Berserk */
+	if (p_ptr->shero)
+	{
+		msg_print("You are too enraged!");
+		return;
+	}
+
+	/* Some items and some rooms blow missiles around */
+	if ((p_ptr->cur_flags4 & (TR4_WINDY)) || (room_has_flag(py, px, ROOM_WINDY)))
+	{
+		msg_print("Its too windy around you!");
+		return;
+	}
+
+	/* Require proper missile */
+	item_tester_tval = p_ptr->ammo_tval;
+
+	/* Require throwing weapon */
+	if (!item_tester_tval) item_tester_hook = item_tester_hook_throwing;
+
+	/* Get an item */
+	q = "Fire which item? ";
+	s = "You have nothing to fire.";
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG))) return;
+
+	/* Get the object */
+	if (item >= 0)
+	{
+		o_ptr = &inventory[item];
+
+		/* A cursed quiver disables the use of non-cursed ammo */
+		if (IS_QUIVER_SLOT(item) && p_ptr->cursed_quiver && !cursed_p(o_ptr))
+		{
+			msg_print("Your quiver is cursed!");
+			return;
+		}
+	}
+	else
+	{
+		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+
+	/* If no bow, call the function for throwing */
+    /* TODO: repair do_cmd_throw_selected so that ropes from bags work, etc. */
+	if (!item_tester_tval) 
+		do_cmd_throw_selected(o_ptr, item);
+	else 
+		do_cmd_fire_selected(o_ptr, item);
+}
+
+
+/*
+ * Throw an object from the pack or floor.
+ * See do_cmd_throw_selected.
+ */
+void do_cmd_throw(void)
+{
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int item;
+
+	object_type *o_ptr;
+
+	cptr q, s;
+
+	/* Berserk */
+	if (p_ptr->shero)
+	{
+		msg_print("You are too enraged!");
+		return;
+	}
+
+	/* Some items and some rooms blow missiles around */
+	if ((p_ptr->cur_flags4 & (TR4_WINDY)) || (room_has_flag(py, px, ROOM_WINDY)))
+	{
+		msg_print("Its too windy around you!");
+		return;
+	}
+
+	/* Get an item */
+	q = "Throw which item? ";
+	s = "You have nothing to throw.";
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG))) return;
+
+	/* Get the object */
+	if (item >= 0)
+	{
+		o_ptr = &inventory[item];
+
+		/* A cursed quiver disables the use of non-cursed ammo */
+		if (IS_QUIVER_SLOT(item) && p_ptr->cursed_quiver && !cursed_p(o_ptr))
+		{
+			msg_print("Your quiver is cursed!");
+			return;
+		}
+	}
+	else
+	{
+		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+
+	do_cmd_throw_selected(o_ptr, item);
 }
