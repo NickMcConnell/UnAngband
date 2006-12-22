@@ -177,6 +177,7 @@
  */
 #define CENT_MAX	100
 #define DOOR_MAX	200
+#define NEXT_MAX	200
 #define WALL_MAX	500
 #define TUNN_MAX	900
 
@@ -235,8 +236,8 @@ struct dun_data
 
 	/* Array of solid wall locations and feature types */
 	int next_n;
-	coord next[DOOR_MAX];
-	s16b next_feat[DOOR_MAX];
+	coord next[NEXT_MAX];
+	s16b next_feat[NEXT_MAX];
 
 	/* Array of wall piercing locations */
 	int wall_n;
@@ -2196,9 +2197,6 @@ static void get_room_info(int y0, int x0)
 			/* Set decoration */
 			if (!(room_info[room].solid) && (d_info[i].solid)) room_info[room].solid = d_info[i].solid;
 
-			/* Clear old position information */
-			if (d_info[i].p_flag & (RG1_PLACE_FLAGS)) place_flag &= ~(RG1_PLACE_FLAGS);
-
 			/* Add flags */
 			place_flag |= d_info[i].p_flag;
 
@@ -2334,7 +2332,7 @@ static void get_room_info(int y0, int x0)
 			}
 
 			/* Clear placement details */
-			place_flag &= (RG1_PLACE_FLAGS);
+			place_flag = 0;
 			place_feat = 0;
 		}
 
@@ -4502,8 +4500,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 							/* Change the wall to a "solid" wall */
 							cave_alter_feat(y, x, FS_SOLID);
 
-							/* Starting room overwrites ending room decorations unless has none */
-							if ((room_info[dun_room[by1][bx1]].solid) && (dun->next_n < WALL_MAX))
+							/* Decorate next to the start and/or end of the tunnel with the starting room decorations */
+							if ((room_info[dun_room[by1][bx1]].solid) && (dun->next_n < NEXT_MAX))
 							{
 								/* Overwrite with alternate terrain from starting room later */
 								dun->next[dun->next_n].y = y;
@@ -4512,8 +4510,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 								dun->next_n++;
 							}
 
-							/* Ending room overwrites starting room decorations unless has none */
-							if (room_info[dun_room[by2][bx2]].solid)
+							/* If the ending room has decorations, overwrite the start */
+							if ((room_info[dun_room[by2][bx2]].solid) && (dun->next_n < NEXT_MAX))
 							{
 								int j;
 
@@ -4563,8 +4561,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 					/* Merge partitions */
 					dun->part_n--;
 
-					/* Rewrite tunnel to room if we end up on a non-floor space */
-					if ((cave_feat[tmp_row][tmp_col] != FEAT_FLOOR) && (room_info[dun_room[by2][bx2]].tunnel))
+					/* Rewrite tunnel to room if we end up on a non-floor */
+					if (cave_feat[tmp_row][tmp_col] != FEAT_FLOOR)
 					{
 						/* Hack -- overwrite half of tunnel */
 						if (start_tunnel)
@@ -4593,12 +4591,11 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				row1 = tmp_row;
 				col1 = tmp_col;
 
-				/* Clear start tunnel if feature is floor */
-				if (cave_feat[row1][col1] == FEAT_FLOOR)
+				/* Clear tunnel feature if feature is a floor */
+				if (cave_feat[tmp_row][tmp_col] == FEAT_FLOOR)
 				{
 					start_tunnel = 0;
 				}
-				/* Set start tunnel if feature is not floor */
 				else
 				{
 					start_tunnel = room_info[dun_room[by1][bx1]].tunnel;

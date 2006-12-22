@@ -3244,13 +3244,13 @@ bool project_f(int who, int y, int x, int dam, int typ)
 			}
 
 			/* Locked doors are unlocked */
-			else if (f_ptr->flags1 & (FF1_OPEN))
+			else if (f_ptr->flags1 & (FF1_OPEN | FF1_BASH))
 			{
 				/* Unlock the door */
 				cave_alter_feat(y, x, FS_OPEN);
 	
 				/* Check line of sound */
-				if (/*(player_has_los_bold(y, x)) &&*/ (f_ptr->flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
 				{
 					msg_print("Click!");
 				}
@@ -3308,7 +3308,7 @@ bool project_f(int who, int y, int x, int dam, int typ)
 			}
 
 			/* Jam doors */
-			while (f_ptr->flags1 & (FF1_SPIKE))
+			while (f_info[cave_feat[y][x]].flags1 & (FF1_SPIKE))
 			{
 				int feat = cave_feat[y][x];
 

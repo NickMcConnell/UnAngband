@@ -165,6 +165,8 @@ fix by RDE).
 
 - Fixed bug where archery monsters could end up with negative ammo.
 
+- Fixed bug preventing wizard lock correctly jamming doors.
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.

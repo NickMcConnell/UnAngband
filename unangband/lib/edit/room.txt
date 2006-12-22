@@ -70,7 +70,7 @@ N:1:101:0:0:1:1:0:128
 
 # 33% of rooms have stuff on or near the walls
 
-N:101:117:0:0:33:33:0:128
+N:101:117:0:0:33:33:0:20
 A:
 B:
 D:
@@ -870,7 +870,7 @@ F:736:0:736
 S:SEEN
 P:OUTER
 
-N:104:105:141:140:25:2:0:128
+N:104:105:106:140:25:2:0:128
 A:
 B:
 D:A lever 
@@ -879,7 +879,7 @@ F:753:0:753
 S:SEEN
 P:OUTER | ALLOC
 
-N:104:105:141:140:25:2:30:128
+N:104:105:106:140:25:2:30:128
 A:
 B:
 D:A lever 
@@ -888,7 +888,7 @@ F:752:0:752
 S:SEEN
 P:OUTER | ALLOC
 
-N:104:105:141:140:50:2:0:128
+N:104:105:106:140:50:2:0:128
 A:
 B:
 D:A lever 
@@ -897,7 +897,7 @@ F:753:0:753
 S:SEEN
 P:OUTER | ALLOC
 
-N:104:105:141:140:50:2:30:128
+N:104:105:106:140:50:2:30:128
 A:
 B:
 D:A lever 
@@ -945,7 +945,7 @@ P:OUTER
 N:104:146:107:105:50:2:20:128
 A:waterfall
 B:
-D:A water fall
+D:A water fall 
 L:WATER
 F:126:0:0
 S:SEEN
@@ -954,7 +954,7 @@ P:ALLOC
 N:104:147:107:105:50:0:41:128
 A:boiling
 B:
-D:A boiling water fall
+D:A boiling water fall 
 L:WATER | LAVA
 F:160:0:0
 S:SEEN
@@ -1043,56 +1043,56 @@ D:The floor is
 S:SEEN
 R:SMART
 
-N:105:141:0:0:15:15:0:128
+N:105:141:0:0:15:15:15:128
 A:
 B:
 D:in the north of the room is 
 S:SEEN
 P:NORTH | PLACE
 
-N:105:142:0:0:15:15:0:128
+N:105:142:0:0:15:15:15:128
 A:
 B:
 D:in the east of the room is 
 S:SEEN
 P:EAST | PLACE
 
-N:105:143:0:0:15:15:0:128
+N:105:143:0:0:15:15:15:128
 A:
 B:
 D:in the west of the room is 
 S:SEEN
 P:WEST | PLACE
 
-N:105:144:0:0:15:15:0:128
+N:105:144:0:0:15:15:15:128
 A:
 B:
 D:in the south of the room is 
 S:SEEN
 P:SOUTH | PLACE
 
-N:105:141:0:0:15:15:0:128
+N:105:141:0:0:15:15:0:45
 A:
 B:
 D:against the north wall is 
 S:SEEN
 P:NORTH | PLACE | EDGE
 
-N:105:142:0:0:15:15:0:128
+N:105:142:0:0:15:15:0:45
 A:
 B:
 D:against the east wall is 
 S:SEEN
 P:EAST | PLACE | EDGE
 
-N:105:143:0:0:15:15:0:128
+N:105:143:0:0:15:15:0:45
 A:
 B:
 D:against the west wall is 
 S:SEEN
 P:WEST | PLACE | EDGE
 
-N:105:144:0:0:15:15:0:128
+N:105:144:0:0:15:15:0:60
 A:
 B:
 D:against the south wall is 
@@ -1303,7 +1303,7 @@ D:slick with moisture.
 F:307:0:0
 L:WATER
 S:SEEN
-P:PLACE | RANDOM
+P:PLACE
 
 N:106:146:0:0:140:2:0:128
 A:water-filled
@@ -1312,7 +1312,7 @@ D:flooded with stagnant water.
 F:310:0:0
 L:WATER
 S:SEEN
-P:PLACE | RANDOM
+P:PLACE
 
 N:106:146:0:0:210:0:18:128
 A:water-filled
@@ -1321,7 +1321,7 @@ D:flooded with water.
 F:153:0:0
 L:WATER
 S:SEEN
-P:PLACE | RANDOM | MIMIC
+P:PLACE
 
 N:106:146:0:0:140:0:27:128
 A:water-filled
@@ -1330,7 +1330,7 @@ D:flooded with deep water.
 F:155:0:0
 L:WATER
 S:SEEN
-P:PLACE | RANDOM | MIMIC
+P:PLACE
 
 N:106:146:0:0:140:0:27:128
 A:water-filled
@@ -1339,7 +1339,7 @@ D:flooded with clear water.
 F:311:0:0
 L:WATER
 S:SEEN
-P:PLACE | RANDOM
+P:PLACE
 
 N:106:146:0:0:70:0:60:128
 A:submerged
@@ -1348,7 +1348,7 @@ D:submerged under water.
 F:121:0:0
 L:WATER
 S:SEEN
-P:PLACE | RANDOM
+P:PLACE
 
 N:106:107:0:0:35:1:10:128
 A:salty
@@ -1357,7 +1357,7 @@ D:covered in salt.
 F:559:0:0
 S:SEEN
 R:CAN_DIG
-P:PLACE | RANDOM | MIMIC
+P:PLACE | RANDOM
 
 N:106:107:0:0:35:1:10:128
 A:salty
@@ -1366,7 +1366,7 @@ D:covered in salt.
 F:559:0:0
 S:SEEN
 L:ACID
-P:PLACE | RANDOM | MIMIC
+P:PLACE | RANDOM
 
 N:106:107:0:0:70:5:10:128
 A:rubble-strewn
@@ -1393,7 +1393,7 @@ D:surrounded by acid.
 F:157:0:0
 L:ACID
 S:SEEN
-P:PLACE | RANDOM | MIMIC
+P:PLACE
 
 N:106:148:0:0:70:0:68:128
 A:acidic
@@ -1402,7 +1402,7 @@ D:surrounded by deep acid.
 F:159:0:0
 L:ACID
 S:SEEN
-P:PLACE | RANDOM | MIMIC
+P:PLACE
 
 N:106:148:0:0:140:0:75:128
 A:acidic
@@ -1411,7 +1411,7 @@ D:surrounded by boiling acid.
 F:157:0:0
 L:ACID
 S:SEEN
-P:PLACE | RANDOM | MIMIC
+P:PLACE
 
 N:106:148:0:0:70:0:78:128
 A:acidic
@@ -1420,7 +1420,7 @@ D:surrounded by deep boiling acid.
 F:159:0:0
 L:ACID
 S:SEEN
-P:PLACE | RANDOM | MIMIC
+P:PLACE
 
 N:106:147:0:0:70:0:81:128
 A:boiling
@@ -1429,7 +1429,7 @@ D:surrounded by boiling water.
 F:208:0:0
 L:ACID
 S:SEEN
-P:PLACE | RANDOM | MIMIC
+P:PLACE
 
 N:106:149:0:0:70:1:41:128
 A:
@@ -1447,7 +1447,7 @@ D:surrounded by falling water.
 F:126:0:0
 L:WATER
 S:SEEN
-P:PLACE | RANDOM
+P:PLACE | SCATTER
 
 N:106:148:0:0:70:0:79:128
 A:acidic
@@ -1456,7 +1456,7 @@ D:surrounded by streams of deadly acid.
 F:127:0:0
 L:ACID
 S:SEEN
-P:PLACE | RANDOM
+P:PLACE | SCATTER
 
 N:106:147:0:0:70:0:82:128
 A:boiling
@@ -1465,7 +1465,7 @@ D:surrounded by streams of boiling water.
 F:160:0:0
 L:WATER | LAVA
 S:SEEN
-P:PLACE | RANDOM
+P:PLACE | SCATTER
 
 N:106:150:0:0:70:0:91:128
 A:lava
@@ -1555,7 +1555,7 @@ D:submerged in oil.
 F:225:0:0
 L:OIL
 S:SEEN
-P:PLACE | RANDOM
+P:PLACE
 
 N:106:151:0:0:70:0:70:128
 A:
@@ -1806,7 +1806,7 @@ D:covered in mud.
 F:390:0:0
 L:WATER
 S:SEEN
-P:PLACE | SCATTER
+P:PLACE | RANDOM
 
 N:106:146:0:0:100:1:21:128
 A:muddy
@@ -2212,7 +2212,7 @@ B:
 D:filled with steam.  
 F:206:173:837
 L:LAVA | WATER
-P:PLACE | SCATTER
+P:PLACE | ALLOC
 
 N:108:109:0:0:15:1:51:128
 A:
@@ -2220,7 +2220,7 @@ B:
 D:filled with gas.  
 F:706:181:0
 L:LAVA
-P:PLACE | SCATTER
+P:PLACE | ALLOC
 
 N:108:109:0:0:15:1:72:128
 A:
@@ -2228,7 +2228,7 @@ B:
 D:filled with fire.  
 F:707:162:729
 L:LAVA
-P:PLACE | SCATTER
+P:PLACE | ALLOC
 
 N:108:109:0:0:15:1:51:128
 A:
@@ -2236,7 +2236,7 @@ B:
 D:filled with acidic vapours.  
 F:708:165:728
 L:LAVA
-P:PLACE | SCATTER
+P:PLACE | ALLOC
 
 N:108:109:0:0:15:1:51:128
 A:
@@ -2244,7 +2244,7 @@ B:
 D:misty with droplets.  
 F:709:307:837
 L:WATER
-P:PLACE | SCATTER
+P:PLACE | ALLOC
 
 N:108:109:0:0:15:1:4:128
 A:smokey
@@ -4830,31 +4830,31 @@ P:OUTER | RANDOM | PLACE
 
 # Stuff to manipulate with levers.
 
-N:140:141:0:0:5:5:30:128
+N:140:106:0:0:5:5:30:128
 A:
 B:
 F:726:0:0
 P:OUTER | PLACE
 
-N:140:141:0:0:5:5:30:128
+N:140:106:0:0:5:5:30:128
 A:
 B:
 F:850:0:0
 P:OUTER | PLACE
 
-N:140:141:0:0:5:5:0:128
+N:140:106:0:0:5:5:0:128
 A:
 B:
 F:853:0:0
 P:OUTER | PLACE
 
-N:140:141:0:0:5:5:15:128
+N:140:106:0:0:5:5:15:128
 A:
 B:
 F:858:0:0
 P:OUTER | PLACE
 
-N:140:141:0:0:5:5:15:128
+N:140:106:0:0:5:5:15:128
 A:
 B:
 F:859:0:0
@@ -4904,44 +4904,44 @@ A:
 B:
 P:SOUTH | CENTRE | EAST
 
-# South
+# West
 
 N:143:106:0:0:5:5:0:128
 A:
 B:
-P:SOUTH
+P:WEST
 
 N:143:106:0:0:15:15:15:128
 A:
 B:
-P:SOUTH | CENTRE
+P:WEST | CENTRE
 
 N:143:106:0:0:5:5:35:128
 A:
 B:
-P:SOUTH | CENTRE | EAST
+P:NORTH | CENTRE | WEST
 
 N:143:106:0:0:5:5:35:128
 A:
 B:
 P:SOUTH | CENTRE | WEST
 
-# West
+# South
 
 N:144:106:0:0:5:5:0:128
 A:
 B:
-P:WEST
+P:SOUTH
 
 N:144:106:0:0:15:15:15:128
 A:
 B:
-P:WEST | CENTRE
+P:SOUTH | CENTRE
 
 N:144:106:0:0:5:5:35:128
 A:
 B:
-P:NORTH | CENTRE | WEST
+P:SOUTH | CENTRE | EAST
 
 N:144:106:0:0:5:5:35:128
 A:
