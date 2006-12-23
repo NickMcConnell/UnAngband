@@ -1648,8 +1648,8 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 				/* Checkered room */
 				if (((flag & (RG1_CHECKER)) != 0) && ((x + y + offset) % 2)) continue;
 
-				/* Only place on outer wall */
-				if (((flag & (RG1_OUTER)) != 0) && (cave_feat[y][x] != FEAT_WALL_OUTER)) continue;
+				/* Only place on outer/solid walls */
+				if (((flag & (RG1_OUTER)) != 0) && (cave_feat[y][x] != FEAT_WALL_OUTER) && (cave_feat[y][x] != FEAT_WALL_SOLID)) continue;
 
 				/* Only place on floor otherwise */
 				if (((flag & (RG1_OUTER)) == 0) && (cave_feat[y][x] != FEAT_FLOOR))
@@ -1746,10 +1746,30 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 					/* Assign feature */
 					if (place_feat)
 					{
-						cave_set_feat(y, x, place_feat);
+						/* Preserve the 'solid' status of a wall */
+						if (cave_feat[y][x] == FEAT_WALL_SOLID)
+						{
+							/* Place solid wall now */
+							if ((f_info[place_feat].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)
+							{
+								cave_set_feat(y, x, (f_info[place_feat].flags1 & (FF1_OUTER)) != 0 ? feat_state(place_feat, FS_SOLID) : place_feat);
+							}
+							else
+							{
+								/* Overwrite solid wall later */
+								dun->next[dun->next_n].y = y;
+								dun->next[dun->next_n].x = x;
+								dun->next_feat[dun->next_n] = place_feat;
+								dun->next_n++;
+							}
+						}
+						else
+						{
+							cave_set_feat(y, x, place_feat);
 
-						/* Hack - fix outer walls */
-						if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) && !(outer)) cave_alter_feat(y, x, FS_SOLID);
+							/* Hack - fix outer walls if placing inside a room */
+							if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) && !(outer)) cave_alter_feat(y, x, FS_INNER);
+						}
 					}
 
 					/* Require "clean" floor space */
@@ -1810,10 +1830,30 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 					/* Assign feature */
 					if (place_feat)
 					{
-						cave_set_feat(y, x, place_feat);
+						/* Preserve the 'solid' status of a wall */
+						if (cave_feat[y][x] == FEAT_WALL_SOLID)
+						{
+							/* Place solid wall now */
+							if ((f_info[place_feat].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)
+							{
+								cave_set_feat(y, x, (f_info[place_feat].flags1 & (FF1_OUTER)) != 0 ? feat_state(place_feat, FS_SOLID) : place_feat);
+							}
+							else
+							{
+								/* Overwrite solid wall later */
+								dun->next[dun->next_n].y = y;
+								dun->next[dun->next_n].x = x;
+								dun->next_feat[dun->next_n] = place_feat;
+								dun->next_n++;
+							}
+						}
+						else
+						{
+							cave_set_feat(y, x, place_feat);
 
-						/* Hack - fix outer walls */
-						if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) && !(outer)) cave_alter_feat(y, x, FS_SOLID);
+							/* Hack - fix outer walls if placing inside a room */
+							if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) && !(outer)) cave_alter_feat(y, x, FS_INNER);
+						}
 					}
 
 					/* Require "clean" floor space */
@@ -1856,10 +1896,30 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 			/* Assign feature */
 			if (place_feat)
 			{
-				cave_set_feat(y, x, place_feat);
+				/* Preserve the 'solid' status of a wall */
+				if (cave_feat[y][x] == FEAT_WALL_SOLID)
+				{
+					/* Place solid wall now */
+					if ((f_info[place_feat].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)
+					{
+						cave_set_feat(y, x, (f_info[place_feat].flags1 & (FF1_OUTER)) != 0 ? feat_state(place_feat, FS_SOLID) : place_feat);
+					}
+					else
+					{
+						/* Overwrite solid wall later */
+						dun->next[dun->next_n].y = y;
+						dun->next[dun->next_n].x = x;
+						dun->next_feat[dun->next_n] = place_feat;
+						dun->next_n++;
+					}
+				}
+				else
+				{
+					cave_set_feat(y, x, place_feat);
 
-				/* Hack - fix outer walls */
-				if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) && !(outer)) cave_alter_feat(y, x, FS_SOLID);
+					/* Hack - fix outer walls if placing inside a room */
+					if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) && !(outer)) cave_alter_feat(y, x, FS_INNER);
+				}
 			}
 
 			/* Require "clean" floor space */
@@ -5494,6 +5554,9 @@ static void cave_gen(void)
 	/* Towers don't have rooms or tunnels */
 	if (((level_flag & (LF1_TOWER)) != 0) && ((level_flag & (LF1_SURFACE)) == 0)) level_flag &= ~(LF1_ROOMS | LF1_TUNNELS);
 
+	/* Start with no tunnel doorways -- note needs to happen before placement of rooms now */
+	dun->next_n = 0;
+
 	/* Build some rooms or points to connect tunnels */
 	if ((level_flag & (LF1_ROOMS | LF1_TUNNELS)) != 0)
 		for (i = 0; i < DUN_ROOMS; i++)
@@ -5629,9 +5692,6 @@ static void cave_gen(void)
 
 	/* Start with no tunnel doors */
 	dun->door_n = 0;
-
-	/* Start with no tunnel doorways */
-	dun->next_n = 0;
 
 	/* Hack -- Scramble the room order */
 	for (i = 0; i < dun->cent_n; i++)
