@@ -1489,12 +1489,12 @@ static void display_player_xtra_info(void)
 	/* Player Game Turn */
 	Term_putstr(col, 13, -1, TERM_WHITE, "Plr Turn");
 	Term_putstr(col+9, 13, -1, TERM_L_GREEN,
-		            format("%9ld", turn));
+		            format("%9ld", player_turn));
 
 	/* Non-Resting Player Game Turn */
 	Term_putstr(col, 14, -1, TERM_WHITE, "Act Turn");
 	Term_putstr(col+9, 14, -1, TERM_L_GREEN,
-		            format("%9ld", turn));
+		            format("%9ld", player_turn - resting_turn));
 
 	/* Current Experience */
 	Term_putstr(col, 15, -1, TERM_WHITE, "Curr Exp");
@@ -1668,9 +1668,9 @@ static void display_player_xtra_info(void)
 	if (p_ptr->cur_style & (1L << WS_SLING)) 
 		Term_putstr(col, 14, -1, TERM_WHITE, "Sling");
 	else if (p_ptr->cur_style & (1L << WS_BOW)) 
-		Term_putstr(col, 14, -1, TERM_WHITE, "Bows ");
+		Term_putstr(col, 14, -1, TERM_WHITE, "Bow  ");
 	else if (p_ptr->cur_style & (1L << WS_XBOW)) 
-		Term_putstr(col, 14, -1, TERM_WHITE, "XBows");
+		Term_putstr(col, 14, -1, TERM_WHITE, "XBow ");
 	else
 		Term_putstr(col, 14, -1, TERM_WHITE, "Shoot");
 
@@ -2632,7 +2632,7 @@ static void display_player_misc_info(void)
 
 	c_put_str(TERM_L_BLUE, c_name + cp_ptr->name, 4, 8);
 
-	/* Style --- FIXME: Style None is disaplyed as "d" after reload! */
+	/* Style */
 	put_str("Style", 5, 1);
 
 	if (p_ptr->psval)
