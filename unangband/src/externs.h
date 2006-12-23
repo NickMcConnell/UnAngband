@@ -142,6 +142,8 @@ extern u32b summon_flag_type;
 extern s16b summon_race_type;
 extern s32b turn;
 extern s32b old_turn;
+extern s32b player_turn;
+extern s32b resting_turn;
 extern bool use_sound;
 extern bool use_mouse;
 extern bool use_trackmouse;

@@ -2139,12 +2139,18 @@ void player_birth(void)
 	/* Hack -- outfit the player */
 	player_outfit();
 
-	/* Hack -- set the dungeon */
+	/* Hack -- set the dungeon. */
 	if (adult_campaign) p_ptr->dungeon = 1;
 	else p_ptr->dungeon = 0;
 
-	/* Hack -- set the town */
-	p_ptr->town = p_ptr->dungeon;
+	/* Hack -- set the town
+	   TODO: assign home towns for each choice in each starting 
+	   points (1, 4, 5, 7, etc.) of player history in p_hist.txt.
+	   Assume the player had an errand in Hobbiton, so town = 1,
+	   but perhaps allow recalls to the home towns (and back)...
+	   Make some rules for the change of player's home town, see FA. */
+	if (adult_campaign) p_ptr->town = 11;
+	else p_ptr->town = 0;
 
 	/* Set last disturb */
 	p_ptr->last_disturb = turn;

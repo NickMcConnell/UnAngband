@@ -1080,7 +1080,7 @@ static errr rd_extra(void)
 				p_ptr->pstyle = WS_BOW;
 				break;
 			default:
-				p_ptr->psval = 1;
+				p_ptr->psval = 0;
 			break;
 		}
 	}
@@ -1145,8 +1145,22 @@ static errr rd_extra(void)
 
 	rd_u32b(&p_ptr->disease);
 
+	if (!older_than(0, 6, 2))
+	{
+		/* # of player turns */
+		rd_s32b(&player_turn);
+
+		/* # of turns spent resting */
+		rd_s32b(&resting_turn);
+	}
+	else
+	{
+		player_turn = 0;
+		resting_turn = 0;
+	}
+
 	/* Future use */
-	strip_bytes(36);
+	strip_bytes(28);
 
 	/* Read the randart version */
 	rd_u32b(&randart_version);
@@ -2320,6 +2334,8 @@ bool load_player(void)
 
 	/* Paranoia */
 	turn = 0;
+	player_turn  = 0;
+	resting_turn = 0;
 
 	/* Paranoia */
 	p_ptr->is_dead = FALSE;
@@ -2548,6 +2564,7 @@ bool load_player(void)
 
 			/* Forget turns */
 			turn = old_turn = 0;
+			player_turn = resting_turn = 0;
 
 			/* Done */
 			return (TRUE);

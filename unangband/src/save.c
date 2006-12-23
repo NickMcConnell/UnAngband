@@ -673,8 +673,14 @@ static void wr_extra(void)
 
 	wr_u32b(p_ptr->disease);
 
+	/* # of player turns */
+	wr_s32b(player_turn);
+
+	/* # of turns spent resting */
+	wr_s32b(resting_turn);
+
 	/* Future use */
-	for (i = 0; i < 9; i++) wr_u32b(0L);
+	for (i = 0; i < 7; i++) wr_u32b(0L);
 
 	/* Random artifact version */
 	wr_u32b(RANDART_VERSION);

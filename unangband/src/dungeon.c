@@ -2895,6 +2895,13 @@ static void process_player(void)
 
 		/*** Clean up ***/
 
+		/* Action is or was resting */
+		if (p_ptr->resting)
+		{
+			/* Increment the resting counter */
+			resting_turn++;
+		}
+
 		/* Significant */
 		if (p_ptr->energy_use)
 		{
@@ -2909,6 +2916,9 @@ static void process_player(void)
 
 			/* Use some energy */
 			p_ptr->energy -= p_ptr->energy_use;
+
+			/* Increment the player turn counter */
+			player_turn++;
 
 			/* Hack -- constant hallucination */
 			if (p_ptr->image) p_ptr->redraw |= (PR_MAP);
@@ -3537,7 +3547,8 @@ void play_game(bool new_game)
 
 		/* Hack -- enter the world */
 		turn = 1;
-
+		player_turn = 0;
+		resting_turn = 0;
 	}
 
 	/* Normal machine (process player name) */
