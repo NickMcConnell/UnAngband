@@ -3537,6 +3537,9 @@ bool tell_allies_death(int y, int x, cptr saying)
 			/* Ignore itself */
 			if (j == cave_m_idx[n_ptr->fy][n_ptr->fx]) continue;
 
+			/* Ignore the monster that died */
+			if ((n2_ptr->fy == y) && (n2_ptr->fx == x)) continue;
+
 			/* Ignore monsters who speak different language */
 			if (monster_language(n2_ptr->r_idx) != language) continue;
 

@@ -1924,7 +1924,11 @@
 
 /* The "sval" codes for TV_CLOAK */
 #define SV_CLOAK					1
+#define SV_TABARD				3
+#define SV_LEATHER_COAT				5
 #define SV_SHADOW_CLOAK				6
+#define SV_RIVETED_LEATHER_COAT			8
+#define SV_CHAIN_MAIL_COAT			13
 
 /* The "sval" codes for TV_GLOVES */
 #define SV_SET_OF_LEATHER_GLOVES	1

@@ -111,6 +111,9 @@ appropriate effects if an item is set in a trap.
 
 - Demons are also immune to damage from more elemental effects.
 
+- Added heavy armoured coats that wield into the Cloak slot. This allows players to easily
+increase their armour early on, at the cost of additional encumberance.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
@@ -166,6 +169,9 @@ fix by RDE).
 - Fixed bug where archery monsters could end up with negative ammo.
 
 - Fixed bug preventing wizard lock correctly jamming doors.
+
+- The experience from killing a monster that increases you by several levels is scaled down
+correctly.
 
 ### Build / Platform ###
 

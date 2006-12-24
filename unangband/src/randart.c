@@ -1229,7 +1229,8 @@ static void store_base_power (void)
 			case TV_SHIELD:
 				art_shield_total++; break;
 			case TV_CLOAK:
-				art_cloak_total++; break;
+				if (a_info[i].sval <= SV_SHADOW_CLOAK) art_cloak_total++;
+				else art_armor_total++; break;
 			case TV_HELM:
 			case TV_CROWN:
 				art_headgear_total++; break;
@@ -1407,6 +1408,7 @@ static s16b choose_item(int a_idx)
 
 		/* Adjust tval, as all armour is done together */
 		if (r2 < 30) tval = TV_SOFT_ARMOR;
+		else if (r2 < 37) tval = TV_CLOAK;
 		else if (r2 < 106) tval = TV_HARD_ARMOR;
 		else tval = TV_DRAG_ARMOR;
 
@@ -1419,10 +1421,14 @@ static s16b choose_item(int a_idx)
 		else if (r2 < 25) sval = SV_HARD_STUDDED_LEATHER;
 		else if (r2 < 30) sval = SV_LEATHER_SCALE_MAIL;
 
+		/* Cloak-like armour */
+		else if (r2 < 33) sval = SV_RIVETED_LEATHER_COAT;
+		else if (r2 < 37) sval = SV_CHAIN_MAIL_COAT;
+
 		/* Hard stuff. */
-		else if (r2 < 33) sval = SV_RUSTY_CHAIN_MAIL;
-		else if (r2 < 38) sval = SV_METAL_SCALE_MAIL;
-		else if (r2 < 44) sval = SV_CHAIN_MAIL;
+		else if (r2 < 39) sval = SV_RUSTY_CHAIN_MAIL;
+		else if (r2 < 43) sval = SV_METAL_SCALE_MAIL;
+		else if (r2 < 46) sval = SV_CHAIN_MAIL;
 		else if (r2 < 49) sval = SV_AUGMENTED_CHAIN_MAIL;
 		else if (r2 < 54) sval = SV_DOUBLE_CHAIN_MAIL;
 		else if (r2 < 59) sval = SV_BAR_CHAIN_MAIL;
@@ -1486,7 +1492,9 @@ static s16b choose_item(int a_idx)
 		break;
 
 	case TV_CLOAK:
-		if (r2 < 100) sval = SV_CLOAK;
+		if (r2 < 30) sval = SV_CLOAK;
+		else if (r2 < 50) sval = SV_TABARD;
+		else if (r2 < 100) sval = SV_LEATHER_COAT;
 		else sval = SV_SHADOW_CLOAK;
 		break;
 	}

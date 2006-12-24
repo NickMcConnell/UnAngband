@@ -2662,9 +2662,47 @@ void check_experience(void)
 	/* Hack -- upper limit */
 	if (p_ptr->max_exp > PY_MAX_EXP) p_ptr->max_exp = PY_MAX_EXP;
 
-
 	/* Hack -- maintain "max" experience */
-	if (p_ptr->exp > p_ptr->max_exp) p_ptr->max_exp = p_ptr->exp;
+	if (p_ptr->exp > p_ptr->max_exp)
+	{
+		int adjust = -1;
+		s32b new_exp = p_ptr->exp;
+		s32b new_exp_frac = p_ptr->exp_frac;
+
+		/* Gain levels while possible */
+		while ((p_ptr->max_lev < PY_MAX_LEVEL) &&
+		       (p_ptr->exp >= (player_exp[p_ptr->max_lev+adjust] *
+				       p_ptr->expfact / 100L)))
+		{
+
+			/* Reduce outstanding experience after level gain */
+			p_ptr->exp = (player_exp[p_ptr->max_lev+adjust] * p_ptr->expfact / 100L) +
+				(p_ptr->exp - (player_exp[p_ptr->max_lev+adjust] * p_ptr->expfact / 100L)) * (p_ptr->max_lev + adjust + 1) / (p_ptr->max_lev + adjust + 2);
+
+			/* Modify adjustment */
+			adjust++;
+		}
+
+		/* Add fractional experience */
+		/* Handle fractional experience */
+		if (adjust > -1) new_exp_frac = (((new_exp * (p_ptr->max_lev + adjust + 1)) % (p_ptr->max_lev + adjust + 2))
+				* 0x10000L / (p_ptr->max_lev + adjust + 2)) + p_ptr->exp_frac;
+
+		/* Keep track of experience */
+		if (new_exp_frac >= 0x10000L)
+		{
+			p_ptr->exp++;
+			p_ptr->exp_frac = (u16b)(new_exp_frac - 0x10000L);
+		}
+		else
+		{
+			p_ptr->exp_frac = (u16b)new_exp_frac;
+		}
+
+		/* Set new maximum experience */
+		p_ptr->max_exp = p_ptr->exp;
+
+	}
 
 	/* Redraw experience */
 	p_ptr->redraw |= (PR_EXP);
@@ -3471,6 +3509,7 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 	monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
 	s32b div, new_exp, new_exp_frac;
+	byte new_level;
 
 	/* Redraw (later) if needed */
 	if (p_ptr->health_who == m_idx) p_ptr->redraw |= (PR_HEALTH);
@@ -3585,9 +3624,14 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 		/* Give some experience for the kill */
 		new_exp = ((long)r_ptr->mexp * r_ptr->level) / div;
 
+		/* Base adjustment */
+		new_level = -1;
+
 		/* Handle fractional experience */
 		new_exp_frac = ((((long)r_ptr->mexp * r_ptr->level) % div)
 				* 0x10000L / div) + p_ptr->exp_frac;
+
+		
 
 		/* Keep track of experience */
 		if (new_exp_frac >= 0x10000L)
