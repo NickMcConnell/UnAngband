@@ -4992,7 +4992,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			cave_alter_feat(y, x, FS_BRIDGE);
 		}
 		/* Apply tunnel */
-		else
+		else if (f_info[cave_feat[y][x]].flags1 & (FF1_TUNNEL))
 		{
 			/* Tunnel previous contents */
 			cave_alter_feat(y, x, FS_TUNNEL);
@@ -5006,19 +5006,21 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		y = dun->wall[i].y;
 		x = dun->wall[i].x;
 
+		/* Convert to doorway if an outer wall */
+		if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) != 0) cave_alter_feat(y, x, FS_DOOR);
+
 		/* Convert to floor grid */
-		cave_set_feat(y, x, FEAT_FLOOR);
+		else cave_set_feat(y, x, FEAT_FLOOR);
 
 		/* Occasional doorway */
 		if (rand_int(100) < DUN_TUN_PEN)
 		{
-
 			/* Place a random door */
 			place_random_door(y, x);
 		}
 
 		/* Place identical doors if next set of doors is adjacent */
-		while ((i < dun->wall_n - 1) && (dun->wall[i+1].y - y < 1) && (dun->wall[i+1].x - x < 1))
+		while ((i < dun->wall_n - 1) && (ABS(dun->wall[i+1].y - y) <= 1) && (ABS(dun->wall[i+1].x - x) <= 1))
 		{
 			cave_set_feat(dun->wall[i+1].y, dun->wall[i+1].x, cave_feat[y][x]);
 			i++;

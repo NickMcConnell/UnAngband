@@ -5115,6 +5115,13 @@ static void cave_set_feat_aux(int y, int x, int feat)
 
 	s16b this_o_idx, next_o_idx = 0;
 
+	/* Paranoia */
+	if (feat > z_info->f_max)
+	{
+		msg_format("Error: Setting invalid feat %d at (%d, %d).", feat, y, x);
+		return;
+	}
+
 	/* Really set the feature */
 	cave_feat[y][x] = feat;
 
@@ -5674,7 +5681,14 @@ int feat_state(int feat, int action)
 		}
 	}
 
-	/* No change in state */
+	/* Paranoia */
+	if (newfeat > z_info->f_max)
+	{
+		msg_format("Error: %d transitioning to %d by action %d out of bounds.", feat, newfeat, action);
+		return (feat);
+	}
+
+	/* Change in state */
 	return (newfeat);
 }
 
