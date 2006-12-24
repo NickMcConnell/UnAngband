@@ -2154,6 +2154,7 @@ static void get_room_info(int y0, int x0)
 	room_info[room].flags = 0;
 
 	/* Process the description */
+	/* Note we need 1 space at end of room_desc_sections to terminate description */
 	while (chart && (j < ROOM_DESC_SECTIONS - 1))
 	{
 		/* Start over */
@@ -2189,7 +2190,7 @@ static void get_room_info(int y0, int x0)
 				monster_race *r_ptr = &r_info[cave_ecology.race[0]];
 
 				/* Check for char match */
-				if ((d_info[i].r_char) && (d_info[i].r_char != r_ptr->d_char)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
+				if ((d_info[i].r_char) && (d_info[i].r_char == r_ptr->d_char)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
 
 				/* Check for flag match */
 				if (d_info[i].r_flag)
@@ -2272,11 +2273,14 @@ static void get_room_info(int y0, int x0)
 
 			/* Save index if we have anything to describe */
 			/* Note hack for efficiency */
-			if (((!picked_name1) && (picked_name1 = strlen(d_name + d_info[i].name1) > 0))
-				|| ((!picked_name2) && (picked_name2 = strlen(d_name + d_info[i].name2) > 0))
+			if (((!picked_name1) && (strlen(d_name + d_info[i].name1) > 0))
+				|| ((!picked_name2) && (strlen(d_name + d_info[i].name2) > 0))
 				|| (strlen(d_text + d_info[i].text) > 0))
 			{
 				room_info[room].section[j++] = i;
+
+				if (strlen(d_name + d_info[i].name1) > 0) picked_name1 = TRUE;
+				if (strlen(d_name + d_info[i].name2) > 0) picked_name2 = TRUE;
 			}
 
 			/* Enter the next chart */
@@ -2481,14 +2485,13 @@ static void get_room_info(int y0, int x0)
 			msg_format("Error: unable to pick from chart entry %d with %d valid choices", chart, count);
 			chart = 0;
 
-	/* Type */
-	room_info[room].type = ROOM_NORMAL;
+			/* Type */
+			room_info[room].type = ROOM_NORMAL;
 
-	/* Terminate index list */
-	room_info[room].section[j] = -1;
+			/* Terminate index list */
+			room_info[room].section[j] = -1;
 
-		return;
-
+			return;
 		}
 	}
 
@@ -2497,7 +2500,6 @@ static void get_room_info(int y0, int x0)
 
 	/* Terminate index list */
 	room_info[room].section[j] = -1;
-
 }
 
 

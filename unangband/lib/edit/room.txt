@@ -327,7 +327,7 @@ N:104:119:0:0:25:1:0:128
 A:
 B:festhall
 D:A stone table 
-F:807:807:807
+F:807:0:807
 S:SEEN
 R:SMART
 
@@ -335,7 +335,7 @@ N:104:119:0:0:25:1:0:128
 A:
 B:dining room
 D:A wooden table 
-F:810:810:810
+F:810:0:810
 S:SEEN
 R:SMART
 
@@ -1275,7 +1275,7 @@ D:inlaid with precious metal.
 K:100:0:99
 F:0:0:55
 S:SEEN
-G:$
+R:DROP_MINERAL
 P:PLACE | SCATTER
 
 N:106:107:0:0:35:3:0:128
@@ -2093,7 +2093,7 @@ P:SCATTER
 N:106:107:0:0:80:8:0:128
 A:candle-lit
 B:
-D:lit by candles.   
+D:lit by candles.  
 F:405:0:405
 L:DARK
 S:SEEN
@@ -2168,7 +2168,7 @@ P:PLACE | SCATTER
 N:107:109:0:0:100:1:25:128
 A:magic
 B:
-D:There is a static feeling in the air. 
+D:There is a static feeling in the air.  
 S:STATIC
 R:RES_DISEN
 
@@ -2443,7 +2443,7 @@ D:from the east.
 N:110:111:0:0:15:15:0:128
 A:
 B:
-D:from the west.   
+D:from the west.  
 
 N:110:111:0:0:15:15:0:128
 A:
@@ -2477,131 +2477,131 @@ B:
 D:distant voices wailing 
 R:TPORT
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:a low voice saying 
 R:INVISIBLE
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:a voice cackling evilly 
 R:TRAPS
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:a voice cursing 
 R:CURSE
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:a voice muttering to itself 
 G:h
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:a quiet voice mumbling to itself 
 G:CONF
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:a quiet voice mumbling to itself 
 G:BLIND
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:a voice commanding you 
 G:h
 R:TELE_TO
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:a voice chanting 
 R:S_MONSTER
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:many voices chanting 
 R:S_MONSTERS
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:a voice whisper next to you 
 R:S_UNDEAD
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:many voices whisper next to you 
 R:S_HI_UNDEAD
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:thunderous whispers echoing 
 R:S_WRAITH
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
-D:twisted incantations 
+D:twisted incantations repeating 
 R:WOUND
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:strange voices shrieking 
 G:G
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:something howling 
 G:C
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:something strange howling 
 G:Z
 
-N:112:133:0:0:150:1:15:128
+N:112:133:0:0:15:1:15:128
 A:
 B:
-D:something rustling...
+D:something rustling... 
 R:S_PLANT
 
-N:112:115:0:0:150:1:15:128
+N:112:115:0:0:15:1:15:128
 A:
 B:
-D:something chittering...
+D:something chittering... 
 R:S_INSECT
 
-N:112:115:0:0:150:1:15:128
+N:112:115:0:0:15:1:15:128
 A:
 B:
-D:something chittering...
+D:something chittering... 
 R:S_SPIDER
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:distant drums beating 
 R:S_ORC
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
-D:distant drums beating...
+D:distant drums beating... 
 R:S_TROLL
 
 N:112:133:107:115:15:1:15:128
@@ -2616,7 +2616,7 @@ B:
 D:defeaning drums 
 R:TROLL
 
-N:112:115:0:0:150:1:15:128
+N:112:115:0:0:15:1:15:128
 A:
 B:
 D:distant thunder... 
@@ -2628,13 +2628,13 @@ B:
 D:thunderous voices... 
 R:GIANT
 
-N:112:115:0:0:150:1:15:128
+N:112:115:0:0:15:1:15:128
 A:
 B:
 D:distant roaring... 
 R:S_DRAGON
 
-N:112:115:0:0:150:1:15:128
+N:112:115:0:0:15:1:15:128
 A:
 B:
 D:distant roaring of ancient timbre... 
@@ -2646,13 +2646,13 @@ B:
 D:cacophonous roaring... 
 R:DRAGON
 
-N:112:115:0:0:150:1:15:128
+N:112:115:0:0:15:1:15:128
 A:
 B:
 D:distant chanting of infernal voices... 
 R:S_DEMON
 
-N:112:115:0:0:150:1:15:128
+N:112:115:0:0:15:1:15:128
 A:
 B:
 D:distant chorus of infernal voices... 
@@ -2664,34 +2664,34 @@ B:
 D:infernal voices... 
 R:DEMON
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:distant echoes of an authorative voice saying 
 R:S_UNIQUE
 
-N:112:133:107:115:150:1:15:128
+N:112:133:107:115:15:1:15:128
 A:
 B:
 D:a masterful voice saying 
 R:S_HI_UNIQUE
 
-N:112:115:0:0:150:1:15:128
+N:112:115:0:0:15:1:15:128
 A:
 B:
 D:distant rumbling... 
 R:A_ELEMENT
 
-N:112:115:0:0:150:1:15:128
+N:112:115:0:0:15:1:15:128
 A:
 B:
-D:the clank of machinery...
+D:the clank of machinery... 
 R:A_OBJECT
 
 N:112:115:0:0:15:1:15:128
 A:
 B:
-D:the clank of machinery...
+D:the clank of machinery... 
 F:2:0:0
 G:g
 P:PLACE | SCATTER
@@ -2705,61 +2705,61 @@ R:KILL_WALL
 N:112:115:0:0:15:0:3:128
 A:
 B:kennels
-D:howling...
+D:howling... 
 G:C
 
 N:112:115:0:0:15:1:5:128
 A:haunted
 B:
-D:quiet footsteps...
+D:quiet footsteps... 
 G:G
 
 N:112:115:0:0:15:2:3:128
 A:rat-infested
 B:
-D:a sudden scampering...
+D:a sudden scampering... 
 G:r
 
 N:112:115:0:0:15:0:3:128
 A:
 B:
-D:slithering noises...
+D:slithering noises... 
 G:J
 
 N:112:115:0:0:15:0:3:128
 A:
 B:
-D:a sudden hissing...
+D:a sudden hissing... 
 G:J
 
 N:112:115:0:0:15:1:5:128
 A:haunted
 B:
-D:something whispering...
+D:something whispering... 
 R:UNDEAD
 
 N:112:115:0:0:15:0:3:128
 A:
 B:antfarm
-D:a faint chittering...
+D:a faint chittering... 
 G:a
 
 N:112:115:0:0:15:0:4:128
 A:
 B:
-D:a faint chittering...
+D:a faint chittering... 
 R:INSECT
 
 N:112:115:0:0:15:1:14:128
 A:
 B:
-D:distant chanting...
+D:distant chanting... 
 R:MAGE
 
 N:112:115:0:0:15:1:40:128
 A:
 B:
-D:distant echoes...
+D:distant echoes... 
 L:CHASM
 
 N:112:115:0:0:10:1:3:128
@@ -2771,31 +2771,31 @@ R:INVISIBLE
 N:112:115:0:0:15:1:10:128
 A:
 B:
-D:the wind whistling through a distant chasm...
+D:the wind whistling through a distant chasm...  
 L:CHASM
 
 N:112:115:0:0:15:0:40:128
 A:
 B:
-D:the wind whistling through a nearby chasm...
+D:the wind whistling through a nearby chasm...  
 L:CHASM
 
 N:112:115:0:0:15:3:1:128
 A:
 B:
-D:the drip of water...
+D:the drip of water...  
 L:WATER
 
 N:112:115:0:0:15:1:18:128
 A:
 B:
-D:running water.
+D:running water.  
 L:WATER
 
 N:112:115:0:0:10:0:27:128
 A:
 B:
-D:rushing water.
+D:rushing water.  
 L:WATER
 
 N:112:115:0:0:10:0:27:128
@@ -2805,42 +2805,42 @@ D:waves lapping against the rocks.
 L:WATER
 
 N:112:115:0:0:30:1:40:128
-D:the thunder of a distant waterfall...
+D:the thunder of a distant waterfall... 
 L:WATER | CHASM
 
 N:112:115:0:0:60:0:40:128
-D:the thunder of a nearby waterfall...
+D:the thunder of a nearby waterfall... 
 L:WATER | CHASM
 
 N:112:115:0:0:100:0:60:128
 A:
 B:
-D:bubbling mud.
+D:bubbling mud.  
 L:LAVA
 
 N:112:115:0:0:250:0:81:128
 A:
 B:
-D:the earth trembling all around you.
+D:the earth trembling all around you.  
 L:LAVA
 
 N:112:115:0:0:100:0:71:128
 A:
 B:
-D:the roar of a nearby volcano...
+D:the roar of a nearby volcano...  
 L:LAVA
 
 N:112:115:0:0:10:1:30:128
 A:silent
 B:
-D:nothing, not even your footsteps.
+D:nothing, not even your footsteps.  
 S:SILENT
 R:NONLIVING
 
 N:112:115:0:0:0:15:0:128
 A:quiet
 B:
-D:nothing.
+D:nothing.  
 L:LAVA
 
 N:113:114:0:0:250:15:0:128
@@ -3688,10 +3688,10 @@ F:833:0:833
 N:117:102:107:127:75:3:14:128
 A:
 B:
-D:Gold inlay covers 
+D:Precious inlay covers 
 K:100:0:99
 S:SEEN
-G:$
+R:DROP_MINERAL
 P:SCATTER
 F:0:0:55
 
@@ -4368,7 +4368,7 @@ N:122:153:0:0:5:0:0:128
 A:
 B:
 F:421:0:0
-D:shaded by trees.   
+D:shaded by trees.  
 S:SEEN
 L:LIVING
 P:PLACE
@@ -4377,7 +4377,7 @@ N:122:153:0:0:5:0:0:128
 A:
 B:
 F:422:0:0
-D:planted with herbs.   
+D:planted with herbs.  
 S:SEEN
 L:LIVING
 P:PLACE
