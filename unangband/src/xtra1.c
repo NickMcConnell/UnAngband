@@ -338,9 +338,11 @@ static void prt_sp(void)
 
 
 	/* Do not show mana unless it matters */
-	if ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
-		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
-		 return;
+	if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL
+		&& p_ptr->pstyle != WS_MAGIC_BOOK
+		&& p_ptr->pstyle != WS_PRAYER_BOOK
+		&& p_ptr->pstyle != WS_SONG_BOOK)
+		return;
 
 	put_str((show_sidebar ? "Max SP " : "/"), ROW_MAXSP, COL_MAXSP);
 
@@ -2019,7 +2021,7 @@ static void fix_help(void)
  */
 void calc_spells(void)
 {
-	int i, ii, j, k, levels;
+	int i, ii, j, k, levels = 0;
 	int num_allowed, num_known;
 
 	spell_type *s_ptr;
@@ -2047,9 +2049,11 @@ void calc_spells(void)
 	}
 
 	/* Paranoia -- ensure class is literate */
-	if ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
-		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
-		 return;
+	if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL
+		&& p_ptr->pstyle != WS_MAGIC_BOOK 
+		&& p_ptr->pstyle != WS_PRAYER_BOOK 
+		&& p_ptr->pstyle != WS_SONG_BOOK)
+		return;
 
 	/* Hack -- wait for creation */
 	if (!character_generated) return;
@@ -2064,6 +2068,7 @@ void calc_spells(void)
 	}
 
 	/* Determine the number of spells allowed -- Alternate method */
+	/* This is used only for 'Chosen' spellcasters (Warriors, etc.) */
 	else
 	{
 		/* Modify the level */
@@ -2373,7 +2378,7 @@ void calc_spells(void)
  */
 static void calc_mana(void)
 {
-	int msp, levels, cur_wgt, max_wgt;
+	int msp, cur_wgt, max_wgt, levels = 0;
 
 	int i;
 
@@ -2384,9 +2389,11 @@ static void calc_mana(void)
 	bool icky_hands = FALSE;
 
 	/* Do not show mana unless it matters */
-	if ((pc_ptr->spell_first > PY_MAX_LEVEL)
-		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
-		 return;
+	if (pc_ptr->spell_first > PY_MAX_LEVEL
+		&& p_ptr->pstyle != WS_MAGIC_BOOK 
+		&& p_ptr->pstyle != WS_PRAYER_BOOK 
+		&& p_ptr->pstyle != WS_SONG_BOOK)
+		return;
 
 	/* Extract "effective" player level -- Standard method */
 	if (pc_ptr->spell_first <= PY_MAX_LEVEL)
@@ -2394,7 +2401,7 @@ static void calc_mana(void)
 		levels = p_ptr->lev - c_info[p_ptr->pclass].spell_first + 1;
 	}
 
-	/* Extract "effective" player level -- Alternate method */
+	/* Extract "effective" player level -- Alternate method, see above */
 	else
 	{
 		/* Modify the level */
@@ -2432,10 +2439,11 @@ static void calc_mana(void)
 		if (w_info[i].benefit != WB_ICKY_HANDS) continue;
 
 		/* Check for styles */
-		if ((w_info[i].styles==0) || (w_info[i].styles & (p_ptr->cur_style & (1L << p_ptr->pstyle))))
-		{
+		/* Beware, a Priest specializing in a single Magic Book
+		   will be penalized with ICKY_HANDS! */
+		if ( w_info[i].styles==0
+			 || w_info[i].styles & p_ptr->cur_style & (1L << p_ptr->pstyle) )
 			icky_hands=TRUE;
-		}
 	}
 
 	/* Only mages are affected */
@@ -2803,15 +2811,25 @@ static int weight_limit(void)
  * Also calculates what weapon styles the character is currently
  * using.
  *
- * Note that multiple weapon styles are possible in
- * conjunction, and the character is always using the WS_NONE
- * style. Also note that it is not possible to calculate some
+ * Note that multiple weapon styles are possible in conjunction
+ * and the character is always using the WS_NONE style.
+ * Also note that it is not possible to calculate some
  * styles here (WS_MAGIC_BOOK etc., WS_BACKSTAB) so that
  * these styles are limited in what flags they provide.
- *
  * In particular, "book" styles are only checked for the "power"
  * benefit and backstab styles are only checked for the weapon
  * hit and damage and critical benefit.
+ * However, we also don't check cur_style in the code where 
+ * these style's benefits are given, so they work, 
+ * although in limited contexts.
+ *
+ * For example
+ *   W:0:10 S:MAGIC_BOOK B:XTRA_BLOW
+ * won't work. For other, but similar reasons,
+ *   W:0:10 S:WS_NONE B:ID
+ * or
+ *   W:0:10 B:ID
+ * may have problems, too.
  */
 static void calc_bonuses(void)
 {
@@ -2872,7 +2890,7 @@ static void calc_bonuses(void)
 
 	/* Reset "fire" info */
 	p_ptr->num_fire = 0;
-	p_ptr->num_throw = 0;
+	p_ptr->num_throw = 1;
 	p_ptr->ammo_mult = 0;
 	p_ptr->ammo_tval = 0;
 	extra_shots = 0;
@@ -3061,6 +3079,7 @@ static void calc_bonuses(void)
 
 		/* Hack -- do not apply "weapon" bonuses */
 		if (i == INVEN_WIELD) continue;
+		if (i == INVEN_ARM) continue;
 
 		/* Hack -- do not apply "bow" bonuses */
 		if (i == INVEN_BOW) continue;
@@ -3069,7 +3088,7 @@ static void calc_bonuses(void)
 		p_ptr->to_h += o_ptr->to_h;
 		p_ptr->to_d += o_ptr->to_d;
 
-		/* Apply the mental bonuses tp hit/damage, if known */
+		/* Apply the mental bonuses to hit/damage, if known */
 		if (object_bonus_p(o_ptr)) p_ptr->dis_to_h += o_ptr->to_h;
 		if (object_bonus_p(o_ptr)) p_ptr->dis_to_d += o_ptr->to_d;
 	}
@@ -3420,15 +3439,6 @@ static void calc_bonuses(void)
 		p_ptr->heavy_shoot = TRUE;
 	}
 
-	/* Hack -- we use 'firing' for throwing weapons */
-
-	/* Always get to shoot */
-	p_ptr->num_fire = 1;
-	p_ptr->num_throw = 1;
-
-	/* Always get to do some damage */
-	p_ptr->ammo_mult = 1;
-
 	/* Analyze launcher */
 	if (o_ptr->k_idx)
 	{
@@ -3472,11 +3482,6 @@ static void calc_bonuses(void)
 			p_ptr->ammo_mult += extra_might;
 	      
 		}
-
-
-		/* Require at least one shot */
-		if (p_ptr->num_fire < 1) p_ptr->num_fire = 1;
-		if (p_ptr->num_throw < 1) p_ptr->num_throw = 1;
 	}
 
 
@@ -3555,12 +3560,12 @@ static void calc_bonuses(void)
 
 
 
-	/*** Compute styles ***/
+	/*** Compute exercised styles ***/
 
 	/* Assume okay */
 	p_ptr->icky_wield = FALSE;
 
-	/* Hack --- always uses no style */
+	/* The character always uses the "generalist" style */
 	p_ptr->cur_style |= (1L << WS_NONE);
 
 	/* Check weapon preference styles */
@@ -3687,19 +3692,23 @@ static void calc_bonuses(void)
 		if (w_info[i].level > p_ptr->lev) continue;
 
 		/* Check for styles */
-		if ((w_info[i].styles==0) || (w_info[i].styles & (p_ptr->cur_style & (1L << p_ptr->pstyle))))
+		if (w_info[i].styles==0 
+			|| w_info[i].styles & p_ptr->cur_style & (1L << p_ptr->pstyle))
 		{
 			switch (w_info[i].benefit)
 			{
+#if 0 
+/* FIXME! */
 				case WB_HIT:
-					/* MegaHack -- we update the display, regardless of if melee or missile, but handle elsewhere */
+					/* MegaHack -- we update the display, regardless of if melee or missile or thrown, but handle real benefits elsewhere */
 					p_ptr->dis_to_h += (p_ptr->lev-w_info[i].level) /2;
 					break;
 
 				case WB_DAM:
-					/* MegaHack -- we update the display, regardless of if melee or missile, but handle elsewhere */
+					/* MegaHack -- we update the display, regardless of if melee or missile or thrown, but handle real benefits elsewhere */
 					p_ptr->dis_to_d += (p_ptr->lev-w_info[i].level) /2;
 					break;
+#endif
 
 				case WB_CRITICAL:
 				case WB_POWER:
@@ -3720,15 +3729,12 @@ static void calc_bonuses(void)
 					break;
 
 				case WB_SHOT:
-					if (w_info[i].styles & (1L << WS_THROWN))
+					if ( w_info[i].styles & p_ptr->cur_style 
+						 & (1L << p_ptr->pstyle) & (WS_THROWN_FLAGS) )
 						p_ptr->num_throw++;
 					if (!p_ptr->heavy_shoot
-						&& (p_ptr->cur_style & w_info[i].styles 
-							  & (1L << WS_SLING)
-							|| p_ptr->cur_style & w_info[i].styles 
-							  & (1L << WS_BOW)
-							|| p_ptr->cur_style & w_info[i].styles 
-							  & (1L << WS_XBOW)))
+						&& (w_info[i].styles & p_ptr->cur_style 
+							& (1L << p_ptr->pstyle)	& WS_LAUNCHER_FLAGS))
 						p_ptr->num_fire++;
 					break;
 

@@ -1228,18 +1228,17 @@ static void style_aux_hook(birth_menu w_str)
  */
 static bool get_player_style(void)
 {
-        int     i,choice;
-        birth_menu    styles[32];
-
+	int i,choice;
+	birth_menu styles[MAX_WEAP_STYLES];
 	u32b style;
-
-        int style_list[MAX_WEAP_STYLES];
+	int style_list[MAX_WEAP_STYLES];
+	int num = 0;
 
 	/*** Player weapon speciality ***/
 
-	int num = 0;
 
-        style = (1L<<WS_NONE);
+	style = (1L<<WS_NONE);	/* Every class can choose this style */
+
 
 	/* Collect styles */
 	for (i = 0;i< z_info->w_max;i++)
@@ -1247,7 +1246,6 @@ static bool get_player_style(void)
 		if (w_info[i].class != p_ptr->pclass) continue;
 
 		style |= w_info[i].styles;
-
 	}
 
 	/* Analyse styles */
@@ -1256,43 +1254,42 @@ static bool get_player_style(void)
 		if (style & (1L<<i)) style_list[num++]=i;
 
 	}
-
-        if (num == 1)
-        {
-                p_ptr->pstyle = style_list[0];
-
-                return (TRUE);
+	if (num == 1)
+	{
+		p_ptr->pstyle = style_list[0];
+		
+		return (TRUE);
 	}
 
 	/* Extra info */
         Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
-	            "Your 'style' determines under what circumstances you get extra bonuses.");
+					"Your 'style' determines under what circumstances you get extra bonuses.");
 
 	/* Tabulate styles */
 	for (i = 0; i < num; i++)
 	{
 		/* Save the string */
-                styles[i].name = w_name_style[style_list[i]];
-                styles[i].ghost = FALSE;
+		styles[i].name = w_name_style[style_list[i]];
+		styles[i].ghost = FALSE;
 	}
 
-        /* Hack */
-        styles[0].ghost = TRUE;
+	/* Hack */
+	styles[0].ghost = TRUE;
 
-        choice = get_player_choice(styles, num, STYLE_COL, 20,
-                                     "styles.txt", style_aux_hook);
+	choice = get_player_choice(styles, num, STYLE_COL, 20,
+							   "styles.txt", style_aux_hook);
 
 	/* No selection? */
-        if (choice == INVALID_CHOICE)
+	if (choice == INVALID_CHOICE)
 	{
 		p_ptr->pstyle = 0;
 
 		return (FALSE);
 	}
-        else
-        {
-                p_ptr->pstyle = style_list[choice];
-        }
+	else
+	{
+		p_ptr->pstyle = style_list[choice];
+	}
 
 	return (TRUE);
 }

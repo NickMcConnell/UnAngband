@@ -4067,7 +4067,7 @@
 #define D_RANGE    7
 
 
-/* Weapon style constants */
+/* Weapon style constants, see edit/style.txt */
 
 #define WS_NONE		0
 #define WS_UNARMED	1
@@ -4102,12 +4102,12 @@
 #define WS_SLAY_ANIMAL	30
 #define WS_SLAY_DEMON	31
 
-
 #define MAX_WEAP_STYLES  32
 
-#define WS_WIELD_FLAGS  0x000001FF
-#define WS_SHOOT_FLAGS  0x00001E00
-#define WS_AWARE_FLAGS  0x00FC0000
+#define WS_WIELD_FLAGS  0x000001FF /* WS_UNARMED--WS_POLEARM + WS_NONE*/
+#define WS_LAUNCHER_FLAGS  0x00001C01 /* WS_SLING--WS_XBOW + WS_NONE*/
+#define WS_THROWN_FLAGS  0x00000201 /* WS_THROWN + WS_NONE*/
+#define WS_AWARE_FLAGS  0x00FC0001 /* ? */
 
 /* Weapon style improvements */
 #define WB_NONE   0

@@ -3058,27 +3058,31 @@ static void do_cmd_hold_or_stay(int pickup)
 		}
 
 		/* Modify by style */
-		if (!p_ptr->heavy_wield) for (i = 0;i< z_info->w_max;i++)
-		{
-			if (w_info[i].class != p_ptr->pclass) continue;
+		if (!p_ptr->heavy_wield) 
+			for (i = 0; i < z_info->w_max; i++)
+			{
+				if (w_info[i].class != p_ptr->pclass) continue;
 
-			if (w_info[i].level > p_ptr->lev) continue;
+				if (w_info[i].level > p_ptr->lev) continue;
 
 			/* Check for styles */
-			if ((w_info[i].styles==0) || (w_info[i].styles & (melee_style & (1L << p_ptr->pstyle))))
+			if (w_info[i].styles==0 
+				|| w_info[i].styles & melee_style & (1L << p_ptr->pstyle))
 			{
 				switch (w_info[i].benefit)
 				{
+					switch (w_info[i].benefit)
+					{
 					case WB_HIT:
 					case WB_AC:
 						p_ptr->blocking += (p_ptr->lev - w_info[i].level) /2;
 						break;
+					}
 				}
 			}
-		}
+			}
 	}
 }
-
 
 /*
  * Hold still (usually pickup)
@@ -3583,7 +3587,7 @@ void do_cmd_fire_selected(object_type *o_ptr, int item)
 			if (mon_evade(cave_m_idx[y][x], ((m_ptr->confused || m_ptr->stunned) ? 1 : 3) + m_ptr->cdis, 5 + m_ptr->cdis," your shot")) continue;
 
 			/* Check shooting styles only */
-			shoot_style = p_ptr->cur_style & (WS_SHOOT_FLAGS);
+			shoot_style = p_ptr->cur_style & WS_LAUNCHER_FLAGS;
 
 			/* Get style benefits */
 			mon_style_benefits(m_ptr, shoot_style, &style_hit, &style_dam, &style_crit);
@@ -3982,7 +3986,7 @@ void do_cmd_throw_selected(object_type *o_ptr, int item)
 			if (mon_evade(cave_m_idx[y][x], (m_ptr->confused || m_ptr->stunned) ? 4 : 2, 5 + m_ptr->cdis," your throw")) continue;
 
 			/* Get style benefits if a throwing weapon */
-			if (throwing) mon_style_benefits(m_ptr, WS_THROWN, &style_hit, &style_dam, &style_crit);
+			if (throwing) mon_style_benefits(m_ptr, WS_THROWN_FLAGS, &style_hit, &style_dam, &style_crit);
 
 			/* Test hit fire */
 			hit_or_near_miss = test_hit_fire(chance2 + style_hit * BTH_PLUS_ADJ, calc_monster_ac(m_ptr, FALSE), m_ptr->ml);

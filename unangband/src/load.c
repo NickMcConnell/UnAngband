@@ -1067,6 +1067,10 @@ static errr rd_extra(void)
 	/* Ignore old redundant info */
 	p_ptr->psval=tmp8u;
 
+#if 0
+	/* Unfortunately, we can't say if it's vanilla character
+	 * and this psval hack breaks NONE characters */
+
 	/* Hack -- set styles for vanilla characters */
 	/* Mega Hack -- use psval == 1 to indicate we have applied this hack  */
 	if ((!p_ptr->pstyle) && (!p_ptr->psval))
@@ -1080,10 +1084,11 @@ static errr rd_extra(void)
 				p_ptr->pstyle = WS_BOW;
 				break;
 			default:
-				p_ptr->psval = 0;
-			break;
+				p_ptr->psval = 1;
+				break;
 		}
 	}
+#endif
 
 	/* Hack --- Get held_song information. */
 	rd_byte(&tmp8u); /* Oops */
@@ -1246,7 +1251,7 @@ static errr rd_extra(void)
 		rd_u32b(&p_ptr->spell_forgotten4);
 
 		/* Hack -- change class to warrior mage instead */
-		if (older_than(0, 6, 2) && (p_ptr->pclass == 4)){  p_ptr->pclass = 10; p_ptr->pstyle = 0; p_ptr->psval = 0; }
+		if (older_than(0, 6, 2) && (p_ptr->pclass == 4)){  p_ptr->pclass = 10; p_ptr->pstyle = WS_NONE; p_ptr->psval = 0; }
 	}
 
 	/* Read in the spells */

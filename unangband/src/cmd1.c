@@ -1655,7 +1655,7 @@ void hit_trap(int y, int x)
 				object_type *i_ptr;
 				object_type object_type_body;
 
-				/* Describe ammo */
+				/* Describe */
 				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
 
 				/* Test for hit */
@@ -2028,11 +2028,16 @@ void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hit, int 
 	*to_dam = 0;
 	*to_crit = 0;
 
-	/* Check backstab if monster sleeping or fleeing */
-	if (((m_ptr->csleep) || (m_ptr->monfear)) && (p_ptr->cur_style & (1L<<WS_SWORD)) &&
-		  (p_ptr->pstyle == WS_BACKSTAB) && (inventory[INVEN_WIELD].weight < 100)) style |= (1L <<WS_BACKSTAB);
+	/* Now record in style what styles we can potentially exercise here.
+	   Leter we will check if we actually have picked one of those at birth. */
 
-	/* Check slay orc if monster is an orc */
+	/* Check backstab if monster sleeping or fleeing */
+	if ( (m_ptr->csleep || m_ptr->monfear) 
+		 && style & (1L<<WS_SWORD) /* works only for melee */
+		 && inventory[INVEN_WIELD].weight < 100 ) 
+		style |= (1L <<WS_BACKSTAB);
+
+	/* Check slay orc if monster is an orc; works also for ranged attacks */
 	if (r_ptr->flags3 & (RF3_ORC)) style |= (1L <<WS_SLAY_ORC);
 
 	/* Check slay troll if monster is a troll */
@@ -2077,7 +2082,7 @@ void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hit, int 
 					break;
 
 				case WB_CRITICAL:
-					*to_crit++;
+					*to_crit += 1;
 					break;
 			}
 		}

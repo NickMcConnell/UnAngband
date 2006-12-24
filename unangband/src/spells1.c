@@ -9439,7 +9439,7 @@ bool project_p(int who, int y, int x, int dam, int typ)
 			for (k = 0; k < A_MAX; k++)
 			{
 				/* Damage (stats) */
-				if (do_dec_stat(i))
+				if (do_dec_stat(k))
 				{
 					obvious = TRUE;
 					set_stat_dec_tim(p_ptr->stat_dec_tim[k] + rand_int(20) + 20, k);

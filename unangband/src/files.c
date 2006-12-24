@@ -1582,6 +1582,7 @@ static void display_player_xtra_info(void)
 		hit = p_ptr->dis_to_h;
 		dam = p_ptr->dis_to_d;
 
+		/* TODO: add in style benefits? in other places, too... */
 		/* Apply weapon bonuses */
 		if (object_bonus_p(o_ptr)) hit += o_ptr->to_h;
 		if (object_bonus_p(o_ptr)) dam += o_ptr->to_d;
@@ -2663,10 +2664,8 @@ static void display_player_misc_info(void)
 		p = k_name + k_info[u].name + 3;
 
         }
-	else if (p_ptr->pstyle)
-		p = w_name_style[p_ptr->pstyle];
 	else
-		p = "None";
+		p = w_name_style[p_ptr->pstyle];
 
 	/* Hack -- force string to fit */
 	if (strlen(p) >= 13)

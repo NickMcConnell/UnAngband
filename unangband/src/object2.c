@@ -8250,7 +8250,8 @@ s16b spell_level(int spell)
 
 		/* Check for styles */
 		/* Hack -- we don't check 'current' styles */
-		if ((w_info[i].styles==0) || (w_info[i].styles & (1L << p_ptr->pstyle)))
+		if (w_info[i].styles==0
+			|| w_info[i].styles & (1L << p_ptr->pstyle))
 		switch (p_ptr->pstyle)
 		{
 			case WS_MAGIC_BOOK:
@@ -8337,8 +8338,10 @@ s16b spell_power(int spell)
 		if (w_info[i].benefit != WB_POWER) continue;
 
 		/* Check styles */
-		/* Hack -- we don't check 'current' styles except for rings, amulets, instruments, etc */
-		if ((w_info[i].styles==0) || (w_info[i].styles & (1L << p_ptr->pstyle)))
+		/* Hack -- we don't check 'current' styles
+		   except for rings, amulets, instruments, etc */
+		if (w_info[i].styles==0 
+			|| w_info[i].styles & (1L << p_ptr->pstyle))
 		switch (p_ptr->pstyle)
 		{
 			case WS_MAGIC_BOOK:
@@ -8404,10 +8407,15 @@ s16b spell_power(int spell)
 						plev += 10;
 					}
 				}
+				break;
 			}
 			default:
 			{
-				if (w_info[i].styles & p_ptr->cur_style) plev += 10;
+				/* FIXME: WS_RING, etc. are not always properly set 
+				 * in cur_style when calling this function, e.g. for info. */ 
+				if ( w_info[i].styles & p_ptr->cur_style 
+					 & (1L << p_ptr->pstyle) ) 
+					plev += 10;
 				break;
 			}
 		}
