@@ -264,6 +264,10 @@ struct dun_data
 
 	/* Hack -- number of entrances to dungeon */
 	bool entrance;
+
+	/* Hack -- theme rooms */
+	s16b theme_feat;
+	byte theme_tval;
 };
 
 
@@ -2052,6 +2056,18 @@ static bool room_info_kind(int k_idx)
 	return(TRUE);
 }
 
+/*
+ * How we match on flags
+ *
+ * Match any = no descriptions encountered matching monster or level flags
+ * Match chance = descriptions matching monster or level flags only
+ * Match theme = descriptions matching feature or tval theme
+ *
+ */
+
+#define MATCH_ANY 0
+#define MATCH_CHANCE 1
+#define MATCH_THEME 2
 
 /*
  * Get the room description, and place stuff accordingly.
@@ -2063,7 +2079,7 @@ static void get_room_info(int y0, int x0)
 
 	int light = FALSE;
 
-	int i, j, chart, pick, chance, count, counter;
+	int i, j, chart, pick, chance, count, counter, match;
 
 	int room = dun->cent_n + 1;
 
@@ -2144,6 +2160,7 @@ static void get_room_info(int y0, int x0)
 		i = 0;
 		count = 0;
 		pick = -1;
+		match = MATCH_ANY;
 
 		/* Get the start of entries in the table for this index */
 		while ((chart != d_info[i].chart) && (counter < 5000)) { i++; counter++;}
@@ -2159,11 +2176,11 @@ static void get_room_info(int y0, int x0)
 			if (p_ptr->depth < d_info[i].level_min) { i++; continue; }
 			if (p_ptr->depth > d_info[i].level_max) { i++; continue; }
 
-			/* Get chance */
-			chance = d_info[i].chance;
+			/* Reset chance */
+			chance = 0;			
 
 			/* If requires this level type, reduce chance of occurring */
-			if ((d_info[i].l_flag) && ((level_flag & d_info[i].l_flag) == 0)) chance = d_info[i].not_chance;
+			if ((d_info[i].l_flag) && ((level_flag & d_info[i].l_flag) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
 
 			/* If not allowed because doesn't match level monster, reduce chance of occuring */
 			else if ((cave_ecology.ready) && (cave_ecology.num_races))
@@ -2172,47 +2189,66 @@ static void get_room_info(int y0, int x0)
 				monster_race *r_ptr = &r_info[cave_ecology.race[0]];
 
 				/* Check for char match */
-				if ((d_info[i].r_char) && (d_info[i].r_char != r_ptr->d_char)) chance = d_info[i].not_chance;
+				if ((d_info[i].r_char) && (d_info[i].r_char != r_ptr->d_char)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
 
 				/* Check for flag match */
 				if (d_info[i].r_flag)
 				{
 					if ((d_info[i].r_flag < 33) && 
-						((r_ptr->flags1 & (1L << (d_info[i].r_flag - 1))) == 0)) chance = d_info[i].not_chance;
+						((r_ptr->flags1 & (1L << (d_info[i].r_flag - 1))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
 
-					if ((d_info[i].r_flag >= 33) && 
+					else if ((d_info[i].r_flag >= 33) && 
 						(d_info[i].r_flag < 65) && 
-						((r_ptr->flags2 & (1L << (d_info[i].r_flag - 33))) == 0)) chance = d_info[i].not_chance;
+						((r_ptr->flags2 & (1L << (d_info[i].r_flag - 33))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
 
-					if ((d_info[i].r_flag >= 65) && 
+					else if ((d_info[i].r_flag >= 65) && 
 						(d_info[i].r_flag < 97) && 
-						((r_ptr->flags3 & (1L << (d_info[i].r_flag - 65))) == 0)) chance = d_info[i].not_chance;
+						((r_ptr->flags3 & (1L << (d_info[i].r_flag - 65))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
 
-					if ((d_info[i].r_flag >= 97) && 
+					else if ((d_info[i].r_flag >= 97) && 
 						(d_info[i].r_flag < 129) && 
-						((r_ptr->flags4 & (1L << (d_info[i].r_flag - 97))) == 0)) chance = d_info[i].not_chance;
+						((r_ptr->flags4 & (1L << (d_info[i].r_flag - 97))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
 
-					if ((d_info[i].r_flag >= 129) && 
+					else if ((d_info[i].r_flag >= 129) && 
 						(d_info[i].r_flag < 161) && 
-						((r_ptr->flags5 & (1L << (d_info[i].r_flag - 129))) == 0)) chance = d_info[i].not_chance;
+						((r_ptr->flags5 & (1L << (d_info[i].r_flag - 129))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
 
-					if ((d_info[i].r_flag >= 161) && 
+					else if ((d_info[i].r_flag >= 161) && 
 						(d_info[i].r_flag < 193) && 
-						((r_ptr->flags6 & (1L << (d_info[i].r_flag - 161))) == 0)) chance = d_info[i].not_chance;
+						((r_ptr->flags6 & (1L << (d_info[i].r_flag - 161))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
 
-					if ((d_info[i].r_flag >= 193) && 
+					else if ((d_info[i].r_flag >= 193) && 
 						(d_info[i].r_flag < 225) && 
-						((r_ptr->flags7 & (1L << (d_info[i].r_flag - 193))) == 0)) chance = d_info[i].not_chance;
+						((r_ptr->flags7 & (1L << (d_info[i].r_flag - 193))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
 
-					if ((d_info[i].r_flag >= 225) && 
+					else if ((d_info[i].r_flag >= 225) && 
 						(d_info[i].r_flag < 257) && 
-						((r_ptr->flags8 & (1L << (d_info[i].r_flag - 225))) == 0)) chance = d_info[i].not_chance;
+						((r_ptr->flags8 & (1L << (d_info[i].r_flag - 225))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
 
-					if ((d_info[i].r_flag >= 257) && 
+					else if ((d_info[i].r_flag >= 257) && 
 						(d_info[i].r_flag < 289) && 
-						((r_ptr->flags9 & (1L << (d_info[i].r_flag - 257))) == 0)) chance = d_info[i].not_chance;
+						((r_ptr->flags9 & (1L << (d_info[i].r_flag - 257))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
 				}
 			}
+
+			/* Themes */
+			if ( ((dun->theme_feat) && ((d_info[i].feat == dun->theme_feat) || (d_info[i].solid == dun->theme_feat) || (d_info[i].tunnel == dun->theme_feat)))
+				 || ((dun->theme_tval) && (d_info[i].tval == dun->theme_tval)) )
+			{
+				if (match < MATCH_THEME)
+				{
+					count = 0;
+					match = MATCH_THEME;
+				}
+			}
+			else if (match == MATCH_THEME)
+			{
+				/* No chance if matching theme */
+				chance = 0;
+			}
+
+			/* Default chance */
+			if ((!chance) && (match == MATCH_ANY)) chance = d_info[i].not_chance;
 
 			/* Chance of room entry */
 			if (chance)
@@ -2282,6 +2318,23 @@ static void get_room_info(int y0, int x0)
 
 			/* Set decoration */
 			if (!(room_info[room].solid) && (d_info[i].solid)) room_info[room].solid = d_info[i].solid;
+
+			/* Set tval match */
+			if (!(dun->theme_feat) && !(dun->theme_tval) && (place_tval) && ((!(place_feat) && !(d_info[i].tunnel) && !(d_info[i].solid)) || (rand_int(100) < 50)))
+			{
+				dun->theme_tval = place_tval;
+			}
+			/* Set feature match -- the math for the 3rd choice is wrong here. It makes solid too common, which may be better anyway. */
+			else if (!(dun->theme_feat) && !(dun->theme_tval) && ((place_feat) || (d_info[i].tunnel) || (d_info[i].solid)))
+			{
+				dun->theme_feat = place_feat;
+				if ((d_info[i].tunnel) && ((!place_feat) || (rand_int(100) < 50)))
+				{
+					dun->theme_feat = d_info[i].tunnel;
+					if ((d_info[i].solid) && (rand_int(100) < 50)) dun->theme_feat = d_info[i].solid;
+				}
+				else if ((d_info[i].solid) && ((!place_feat) || (rand_int(100) < 50))) dun->theme_feat = d_info[i].solid;
+			}
 
 			/* Add flags */
 			place_flag |= d_info[i].p_flag;
@@ -5556,6 +5609,10 @@ static void cave_gen(void)
 
 	/* Start with no tunnel doorways -- note needs to happen before placement of rooms now */
 	dun->next_n = 0;
+
+	/* Start with no themes */
+	dun->theme_feat = 0;
+	dun->theme_tval = 0;
 
 	/* Build some rooms or points to connect tunnels */
 	if ((level_flag & (LF1_ROOMS | LF1_TUNNELS)) != 0)

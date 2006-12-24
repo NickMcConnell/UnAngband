@@ -5045,7 +5045,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons plants.", m_name);
-				else msg_print("You hear distant chanting.");
+				else msg_print("You hear distant rustling.");
 			}
 
 			/* Count them for later */
@@ -5336,7 +5336,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons orcs.", m_name);
-				else msg_print("You hear distant chanting.");
+				else msg_print("You hear distant drums.");
 			}
 
 			/* Count them for later */
@@ -5356,7 +5356,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons trolls.", m_name);
-				else msg_print("You hear distant chanting.");
+				else msg_print("You hear distant drums.");
 			}
 
 			/* Count them for later */
@@ -5376,7 +5376,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons giants.", m_name);
-				else msg_print("You hear distant chanting.");
+				else msg_print("You hear distant thunder.");
 			}
 
 			/* Count them for later */
@@ -5396,7 +5396,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons a dragon.", m_name);
-				else msg_print("You hear distant chanting.");
+				else msg_print("You hear distant roars.");
 			}
 
 			for (k = 0; k < 1; k++)
@@ -5418,7 +5418,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons ancient dragons!", m_name);
-				else msg_print("You hear cacophonous chanting.");
+				else msg_print("You hear cacophonous roars.");
 			}
 
 			for (k = 0; k < 4; k++)
@@ -5441,7 +5441,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((blind) && (known)) result = format("%^s mumbles.", m_name);
 				else if (known) result = format("%^s magically animates the elements around %s.", m_name, t_name);
-				else result = "You hear distant chanting.";
+				else result = "You hear distant rumbles.";
 			}
 
 			/* Animate elements */
@@ -5462,7 +5462,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((blind) && (known)) result = format("%^s mumbles.", m_name);
 				else if (known) result = format("%^s magically animates the objects around %s.", m_name, t_name);
-				else result = "You hear distant chanting.";
+				else result = "You hear distant clanking.";
 			}
 
 			/* Animate objects */
@@ -5613,7 +5613,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((blind) && (known)) msg_format("%^s whispers.", m_name);
 				else if (known) msg_format("%^s magically summons greater undead!", m_name);
-				else msg_print("You hear loud whispering.");
+				else msg_print("You hear loud and imperious whispering.");
 
 				/* Hack -- prevent summoning for a short while */
 				m_ptr->summoned = 20;

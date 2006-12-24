@@ -2137,7 +2137,7 @@ S:SEEN
 R:SMART
 P:PLACE | SCATTER
 
-N:106:121:0:0:50:2:0:128
+N:106:128:0:0:50:2:0:128
 A:
 B:
 D:covered with hieroglyphics.  
@@ -2469,14 +2469,224 @@ N:112:133:107:115:15:1:15:128
 A:
 B:
 D:a distant voice cry out 
+R:SCARE
+
+N:112:133:107:115:15:1:15:128
+A:
+B:
+D:distant voices wailing 
+R:TPORT
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:a low voice saying 
 R:INVISIBLE
 
 N:112:133:107:115:150:1:15:128
 A:
 B:
-D:a voice echoes nearby  
+D:a voice cackling evilly 
+R:TRAPS
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:a voice cursing 
+R:CURSE
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:a voice muttering to itself 
 G:h
-R:INVISIBLE
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:a quiet voice mumbling to itself 
+G:CONF
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:a quiet voice mumbling to itself 
+G:BLIND
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:a voice commanding you 
+G:h
+R:TELE_TO
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:a voice chanting 
+R:S_MONSTER
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:many voices chanting 
+R:S_MONSTERS
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:a voice whisper next to you 
+R:S_UNDEAD
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:many voices whisper next to you 
+R:S_HI_UNDEAD
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:thunderous whispers echoing 
+R:S_WRAITH
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:twisted incantations 
+R:WOUND
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:strange voices shrieking 
+G:G
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:something howling 
+G:C
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:something strange howling 
+G:Z
+
+N:112:133:0:0:150:1:15:128
+A:
+B:
+D:something rustling...
+R:S_PLANT
+
+N:112:115:0:0:150:1:15:128
+A:
+B:
+D:something chittering...
+R:S_INSECT
+
+N:112:115:0:0:150:1:15:128
+A:
+B:
+D:something chittering...
+R:S_SPIDER
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:distant drums beating 
+R:S_ORC
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:distant drums beating...
+R:S_TROLL
+
+N:112:133:107:115:15:1:15:128
+A:
+B:
+D:loud drums beating 
+R:ORC
+
+N:112:133:107:115:15:1:15:128
+A:
+B:
+D:defeaning drums 
+R:TROLL
+
+N:112:115:0:0:150:1:15:128
+A:
+B:
+D:distant thunder... 
+R:S_GIANT
+
+N:112:115:0:0:15:1:15:128
+A:
+B:
+D:thunderous voices... 
+R:GIANT
+
+N:112:115:0:0:150:1:15:128
+A:
+B:
+D:distant roaring... 
+R:S_DRAGON
+
+N:112:115:0:0:150:1:15:128
+A:
+B:
+D:distant roaring of ancient timbre... 
+R:S_HI_DRAGON
+
+N:112:115:0:0:15:1:15:128
+A:
+B:
+D:cacophonous roaring... 
+R:DRAGON
+
+N:112:115:0:0:150:1:15:128
+A:
+B:
+D:distant chanting of infernal voices... 
+R:S_DEMON
+
+N:112:115:0:0:150:1:15:128
+A:
+B:
+D:distant chorus of infernal voices... 
+R:S_HI_DEMON
+
+N:112:115:0:0:15:1:15:128
+A:
+B:
+D:infernal voices... 
+R:DEMON
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:distant echoes of an authorative voice saying 
+R:S_UNIQUE
+
+N:112:133:107:115:150:1:15:128
+A:
+B:
+D:a masterful voice saying 
+R:S_HI_UNIQUE
+
+N:112:115:0:0:150:1:15:128
+A:
+B:
+D:distant rumbling... 
+R:A_ELEMENT
+
+N:112:115:0:0:150:1:15:128
+A:
+B:
+D:the clank of machinery...
+R:A_OBJECT
 
 N:112:115:0:0:15:1:15:128
 A:
@@ -2538,7 +2748,7 @@ N:112:115:0:0:15:0:4:128
 A:
 B:
 D:a faint chittering...
-G:S
+R:INSECT
 
 N:112:115:0:0:15:1:14:128
 A:
