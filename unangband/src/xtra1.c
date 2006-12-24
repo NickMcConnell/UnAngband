@@ -3697,19 +3697,8 @@ static void calc_bonuses(void)
 		{
 			switch (w_info[i].benefit)
 			{
-#if 0 
-/* FIXME! */
 				case WB_HIT:
-					/* MegaHack -- we update the display, regardless of if melee or missile or thrown, but handle real benefits elsewhere */
-					p_ptr->dis_to_h += (p_ptr->lev-w_info[i].level) /2;
-					break;
-
 				case WB_DAM:
-					/* MegaHack -- we update the display, regardless of if melee or missile or thrown, but handle real benefits elsewhere */
-					p_ptr->dis_to_d += (p_ptr->lev-w_info[i].level) /2;
-					break;
-#endif
-
 				case WB_CRITICAL:
 				case WB_POWER:
 				case WB_ICKY_HANDS:

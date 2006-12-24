@@ -2020,13 +2020,17 @@ void hit_trap(int y, int x)
  */
 void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hit, int *to_dam, int *to_crit)
 {
-	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+	monster_race *r_ptr = NULL;
 	int i;
 
 	/* Reset style benefits */
 	*to_hit = 0;
 	*to_dam = 0;
 	*to_crit = 0;
+
+  if (m_ptr) /* A hack for display of bonuses */
+  {
+	r_ptr = &r_info[m_ptr->r_idx];
 
 	/* Now record in style what styles we can potentially exercise here.
 	   Leter we will check if we actually have picked one of those at birth. */
@@ -2060,6 +2064,7 @@ void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hit, int 
 
 	/* Check slay giant if monster is a demon */
 	if (r_ptr->flags3 & (RF3_DEMON)) style |= (1L <<WS_SLAY_DEMON);
+  }
 
 	/*** Handle styles ***/
 	for (i = 0;i< z_info->w_max;i++)
@@ -2089,13 +2094,17 @@ void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hit, int 
 	}
 
 	/* Only allow criticals against living opponents */
-	if ((r_ptr->flags3 & (RF3_NONLIVING)) || (r_ptr->flags2 & (RF2_STUPID)))
+	if (r_ptr && (r_ptr->flags3 & (RF3_NONLIVING) 
+				  || r_ptr->flags2 & (RF2_STUPID)))
 	{
 		*to_crit = 0;
 	}
 
 	/* Only allow criticals against visible opponents */
-	if (!(m_ptr->ml)) *to_crit = 0;
+	if (m_ptr && !(m_ptr->ml))
+	{
+		*to_crit = 0;
+	}
 }
 
 

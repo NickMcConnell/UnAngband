@@ -1424,6 +1424,8 @@ static void display_player_xtra_info(void)
 	s32b tmpl;
 	int col;
 	int hit, dam;
+	int style_hit, style_dam, style_crit;
+	u32b style;
 	int base, plus;
 	int tmp;
 	int xthn, xthb, xfos, xsrh;
@@ -1552,6 +1554,14 @@ static void display_player_xtra_info(void)
 	hit = p_ptr->dis_to_h;
 	dam = p_ptr->dis_to_d;
 
+	/* Check melee styles only */
+	style = p_ptr->cur_style & (WS_WIELD_FLAGS);
+
+	/* Get style benefits */
+	mon_style_benefits(NULL, style, &style_hit, &style_dam, &style_crit);
+	hit += style_hit;
+	dam += style_dam;
+
 	/* Apply weapon bonuses */
 	if (object_bonus_p(o_ptr)) hit += o_ptr->to_h;
 	if (object_bonus_p(o_ptr)) dam += o_ptr->to_d;
@@ -1582,7 +1592,14 @@ static void display_player_xtra_info(void)
 		hit = p_ptr->dis_to_h;
 		dam = p_ptr->dis_to_d;
 
-		/* TODO: add in style benefits? in other places, too... */
+		/* Check melee styles only */
+		style = p_ptr->cur_style & (WS_WIELD_FLAGS);
+
+		/* Get style benefits */
+		mon_style_benefits(NULL, style, &style_hit, &style_dam, &style_crit);
+		hit += style_hit;
+		dam += style_dam;
+
 		/* Apply weapon bonuses */
 		if (object_bonus_p(o_ptr)) hit += o_ptr->to_h;
 		if (object_bonus_p(o_ptr)) dam += o_ptr->to_d;
@@ -1658,6 +1675,14 @@ static void display_player_xtra_info(void)
 	hit = p_ptr->dis_to_h;
 	dam = 0;
 
+	/* Check shooting styles only */
+	style = p_ptr->cur_style & WS_LAUNCHER_FLAGS;
+	
+	/* Get style benefits */
+	mon_style_benefits(NULL, style, &style_hit, &style_dam, &style_crit);
+	hit += style_hit;
+	dam += style_dam;
+
 	/* Apply weapon bonuses */
 	if (object_bonus_p(o_ptr)) hit += o_ptr->to_h;
 	if (object_bonus_p(o_ptr)) dam += o_ptr->to_d;
@@ -1681,16 +1706,19 @@ static void display_player_xtra_info(void)
 	Term_putstr(col+5, 15, -1, TERM_L_BLUE, format("%12s", buf));
 
 	/* Throwing attacks */
-	/* TODO: add in style benefits? in other places, too... */
 	hit = p_ptr->dis_to_h;
 	dam = 0;
+
+	/* Get style benefits */
+	mon_style_benefits(NULL, WS_THROWN_FLAGS, &style_hit, &style_dam, &style_crit);
+	hit += style_hit;
+	dam += style_dam;
 
 	Term_putstr(col, 16, -1, TERM_WHITE, "Throw");
 	strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
 	Term_putstr(col+5, 16, -1, TERM_L_BLUE, format("%12s", buf));
 
 	/* Throws */
-	/* TODO: add in style benefits? in other places, too... */
 	strnfmt(buf, sizeof(buf), "%d/turn(x%d)", p_ptr->num_throw, 2);
 	Term_putstr(col, 17, -1, TERM_WHITE, "Hurls");
 	Term_putstr(col+5, 17, -1, TERM_L_BLUE, format("%12s", buf));
