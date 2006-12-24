@@ -4286,7 +4286,7 @@ void update_dyna(void)
 
 				adjfeat = cave_feat[yy][xx];
 
-				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_HIDE | PROJECT_PLAY;
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE;
 
 				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
    
@@ -4323,7 +4323,7 @@ void update_dyna(void)
 
 				int adjfeat = cave_feat[yy][xx];
 
-				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_HIDE | PROJECT_PLAY;
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE;
 
 				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
    

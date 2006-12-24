@@ -989,7 +989,7 @@ static void build_feature(int y, int x, int feat, bool do_big_lake)
 
 	/* Hack -- minimise holes in terrain */
 	if (surface && !feat2) feat2 = feat1;
-
+#if 0
 	/* Hack -- Save the room location */
 	if (!(f_info[feat1].flags2 & (FF2_RIVER))
 	       && (dun->cent_n < CENT_MAX))
@@ -998,7 +998,7 @@ static void build_feature(int y, int x, int feat, bool do_big_lake)
 		dun->cent[dun->cent_n].x = x;
 		dun->cent_n++;
 	}
-
+#endif
 	if ((f_info[feat1].flags2 & (FF2_LAKE)) || !(f_info[feat1].flags2 & (FF2_RIVER)))
 	{
 		lake_width = DUN_FEAT_RNG;
@@ -4758,6 +4758,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			{
 				dun->tunn[dun->tunn_n].y = row1;
 				dun->tunn[dun->tunn_n].x = col1;
+				dun->tunn_feat[dun->tunn_n] = 0;
 				dun->tunn_n++;
 			}
 
@@ -4771,6 +4772,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 					{
 						dun->tunn[dun->tunn_n].y = row1 + col_dir;
 						dun->tunn[dun->tunn_n].x = col1 - row_dir;
+						dun->tunn_feat[dun->tunn_n] = 0;
 						dun->tunn_n++;
 					}
 				}
@@ -4786,6 +4788,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 					{
 						dun->tunn[dun->tunn_n].y = row1 - col_dir;
 						dun->tunn[dun->tunn_n].x = col1 + row_dir;
+						dun->tunn_feat[dun->tunn_n] = 0;
 						dun->tunn_n++;
 					}
 				}
@@ -4834,6 +4837,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 					{
 						dun->tunn[dun->tunn_n].y = row1 + col_dir;
 						dun->tunn[dun->tunn_n].x = col1 - row_dir;
+						dun->tunn_feat[dun->tunn_n] = 0;
 						dun->tunn_n++;
 
 						/* Hack -- add regular pillars to some width 3 corridors */
@@ -4856,6 +4860,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 
 						dun->tunn[dun->tunn_n].y = row1 - col_dir;
 						dun->tunn[dun->tunn_n].x = col1 + row_dir;
+						dun->tunn_feat[dun->tunn_n] = 0;
 						dun->tunn_n++;
 
 						if (pillar) dun->tunn_n++;
@@ -4984,10 +4989,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		/* Apply feature - note hack */
 		if (dun->tunn_feat[i] > 1)
 		{
-#if 0
 			/* Clear previous contents, write terrain */
 			cave_set_feat(y, x, dun->tunn_feat[i]);
-#endif
 		}
 		/* Apply bridge */
 		else if (f_info[cave_feat[y][x]].flags2 & (FF2_BRIDGE))
@@ -5442,8 +5445,8 @@ static void cave_gen(void)
 	/* Hack -- No destroyed "quest", "wild" or "guardian" levels */
 	if (level_flag & (LF1_QUEST | LF1_WILD | LF1_GUARDIAN)) level_flag &= ~(LF1_DESTROYED);
 
-	/* No features on destroyed level or in a tower above the surface */
-	if (((level_flag & (LF1_DESTROYED)) != 0) && (((level_flag & (LF1_TOWER)) == 0) || ((level_flag & (LF1_SURFACE)) != 0) ))
+	/* No features in a tower above the surface */
+	if (((level_flag & (LF1_TOWER)) == 0) || ((level_flag & (LF1_SURFACE)) != 0))
 	{
 		bool big = FALSE;
 		bool done_big = FALSE;
@@ -5491,7 +5494,6 @@ static void cave_gen(void)
 				/* Room type */
 				if (cheat_room)
 				{
-
 					name = (f_name + f_info[feat].name);
 
 					if (f_info[feat].edge)
@@ -5504,7 +5506,7 @@ static void cave_gen(void)
 					}
 					else
 					{
-					msg_format ("Building %s%s.", (big?"big ":""),name);
+						msg_format ("Building %s%s.", (big?"big ":""),name);
 					}
 				}
 
@@ -5524,9 +5526,7 @@ static void cave_gen(void)
 			}
 
 			get_feat_num_hook = NULL;
-
 		}
-
 	}
 
 	/* Hack -- build a tower in the centre of the level */
