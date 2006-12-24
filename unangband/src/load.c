@@ -1844,6 +1844,29 @@ u16b limit;
 	}
 
 
+	/*** Read the ecology ***/
+	if (!older_than(0, 6, 2))
+	{
+		/* Read the ecology count */
+		rd_u16b(&limit);
+
+		/* Hack -- verify */
+		if (limit > MAX_ECOLOGY_RACES)
+		{
+			note(format("Too many (%d) ecology entries!", limit));
+			return (-1);
+		}
+
+		/* Read the ecology */
+		for (i = 1; i < limit; i++)
+		{
+			rd_s16b(&(cave_ecology.race[i]));
+		}
+
+		/* Ecology ready? */
+		cave_ecology.ready = (limit > 0);
+	}
+
 	/*** Success ***/
 
 	/* The dungeon is ready */

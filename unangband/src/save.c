@@ -1013,6 +1013,25 @@ static void wr_dungeon(void)
 		/* Dump it */
 		wr_monster(m_ptr);
 	}
+
+	/*** Dump the monster ecology ***/
+	if (cave_ecology.ready)
+	{
+		/* Total races in ecology */
+		wr_u16b(cave_ecology.num_races);
+
+		/* Dump the monsters */
+		for (i = 1; i < cave_ecology.num_races; i++)
+		{
+			/* Dump it */
+			wr_u16b(cave_ecology.race[i]);
+		}
+	}
+	else
+	{
+		/* Hack -- no ecology */
+		wr_u16b(0);
+	}
 }
 
 
