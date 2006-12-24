@@ -2152,6 +2152,8 @@ static void get_room_info(int y0, int x0)
 
 	/* Room flags */
 	room_info[room].flags = 0;
+	room_info[room].tunnel = 0;
+	room_info[room].solid = 0;
 
 	/* Process the description */
 	/* Note we need 1 space at end of room_desc_sections to terminate description */
@@ -4982,8 +4984,10 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		/* Apply feature - note hack */
 		if (dun->tunn_feat[i] > 1)
 		{
+#if 0
 			/* Clear previous contents, write terrain */
 			cave_set_feat(y, x, dun->tunn_feat[i]);
+#endif
 		}
 		/* Apply bridge */
 		else if (f_info[cave_feat[y][x]].flags2 & (FF2_BRIDGE))
@@ -5171,6 +5175,11 @@ static bool room_build(int by0, int bx0, int typ)
 	y = ((by1 + by2 + 1) * BLOCK_HGT) / 2;
 	x = ((bx1 + bx2 + 1) * BLOCK_WID) / 2;
 
+	/* Initialise room info */
+	room_info[dun->cent_n+1].flags = 0;
+	room_info[dun->cent_n+1].tunnel = 0;
+	room_info[dun->cent_n+1].solid = 0;
+
 	/* Build a room */
 	switch (typ)
 	{
@@ -5205,7 +5214,6 @@ static bool room_build(int by0, int bx0, int typ)
 			dun->room_map[by][bx] = TRUE;
 
 			dun_room[by][bx] = dun->cent_n+1;
-
 		}
 	}
 
@@ -5639,9 +5647,10 @@ static void cave_gen(void)
 		/* Don't have rooms or sometimes has rooms */
 		if (((level_flag & (LF1_ROOMS)) == 0) || (((level_flag & (LF1_MINE)) != 0) && (dun->cent_n % 2)))
 		{
+#if 0
 			/* Attempt a "non-existent" room */
 			if (room_build(by, bx, 0)) continue;
-
+#endif
 			/* Never mind */
 			continue;
 		}
