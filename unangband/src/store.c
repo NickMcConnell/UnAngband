@@ -887,7 +887,7 @@ static bool store_will_buy(const object_type *o_ptr)
  *
  * Note that this is a hacked up version of "inven_carry()".
  *
- * Also note that it may not correctly "adapt" to "knowledge" bacoming
+ * Also note that it may not correctly "adapt" to "knowledge" becoming
  * known, the player may have to pick stuff up and drop it again.
  */
 static int home_carry(object_type *o_ptr)
@@ -2781,6 +2781,11 @@ static void store_purchase(void)
 			   o_name, store_to_label(item));
 
 #endif
+		/* Combine / Reorder the pack (later) */
+		p_ptr->notice |= (PN_COMBINE | PN_REORDER);
+
+		/* The object no longer belongs to the store */
+		i_ptr->ident &= ~(IDENT_STORE);
 
 		/* Give it to the player */
 		item_new = inven_carry(i_ptr);
@@ -3101,8 +3106,13 @@ static void store_examine(void)
 		return;
 	}
 
-	/* Examining an object requires you to be more aware of it */
-	object_aware(o_ptr);
+	/* TODO: improve this to always reveal all obvious properties */
+	if (store_num_fake != STORE_HOME || store_num_fake != -1)
+	{
+		/* Examining an object requires you to be more aware of it
+		   but don't auto-*ID* things at home */
+		object_aware(o_ptr);
+	}
 
 	/* Description */
 	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
