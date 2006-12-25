@@ -320,9 +320,13 @@ void do_cmd_wield(void)
 		if (amt <= 0) return;
 	}
 
-	/* Hack - Throwing weapons can we wielded in the quiver too. Ask the player */
-	if (is_throwing_weapon(o_ptr) && !IS_QUIVER_SLOT(slot) &&
-		get_check("Do you want to put it in the quiver? ")) slot = INVEN_QUIVER;
+	/* Hack - Throwing weapons can we wielded in the quiver too. 
+	   Ask the player, unless he has already chosen the off-hand. */
+	if ( is_throwing_weapon(o_ptr) 
+		 && !IS_QUIVER_SLOT(slot) 
+		 && slot != INVEN_ARM
+		 && get_check("Do you want to put it in the quiver? ") ) 
+		slot = INVEN_QUIVER;
 
 	/* Source and destination identical */
 	if (item == slot) return;
