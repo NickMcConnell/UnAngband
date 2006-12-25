@@ -1423,12 +1423,12 @@ static void display_player_xtra_info(void)
 	int i;
 	s32b tmpl;
 	int col;
-	int hit, dam;
+	int hit, dam, hit_real;
 	int style_hit, style_dam, style_crit;
 	u32b style;
 	int base, plus;
 	int tmp;
-	int xthn, xthb, xfos, xsrh;
+	int xthn, xthb, xtht, xfos, xsrh;
 	int xdis, xdev, xsav, xstl;
 	byte likert_attr;
 
@@ -1535,6 +1535,111 @@ static void display_player_xtra_info(void)
 		            format("%9s", "********"));
 	}
 
+	/* Middle left */
+	col = 21;
+
+	/* Hit Points */
+	if (p_ptr->mhp > 99)
+	{
+		sprintf(buf, "%d/%d", p_ptr->chp, p_ptr->mhp);
+		Term_putstr(col, 10, -1, TERM_WHITE, "HP");
+		Term_putstr(col+8, 10, -1, TERM_L_BLUE, format("%9s", buf));
+	}
+	else 
+	{
+		sprintf(buf, "%d/%d", p_ptr->chp, p_ptr->mhp);
+		Term_putstr(col, 10, -1, TERM_WHITE, "Hit-Points");
+		Term_putstr(col+12, 10, -1, TERM_L_BLUE, format("%5s", buf));
+	}
+
+	/* Spell Points */
+	if (p_ptr->msp > 99)
+	{
+		sprintf(buf, "%d/%d", p_ptr->csp, p_ptr->msp);
+		Term_putstr(col, 11, -1, TERM_WHITE, "SP");
+		Term_putstr(col+8, 11, -1, TERM_L_BLUE, format("%9s", buf));
+	}
+	else 
+	{
+		sprintf(buf, "%d/%d", p_ptr->csp, p_ptr->msp);
+		Term_putstr(col, 11, -1, TERM_WHITE, "Spell-Pts");
+		Term_putstr(col+12, 11, -1, TERM_L_BLUE, format("%5s", buf));
+	}
+
+	/* Armor */
+	base = p_ptr->dis_ac;
+	plus = p_ptr->dis_to_a;
+
+	/* Total Armor */
+	strnfmt(buf, sizeof(buf), "[%d,%+d]", base, plus);
+	Term_putstr(col, 12, -1, TERM_WHITE, "Armor");
+	Term_putstr(col+8, 12, -1, TERM_L_BLUE, format("%9s", buf));
+
+	/* Infra */
+	strnfmt(buf, sizeof(buf), "%d ft", p_ptr->see_infra * 10);
+	Term_putstr(col, 13, -1, TERM_WHITE, "Infravis");
+	Term_putstr(col+8, 13, -1, TERM_L_BLUE, format("%9s", buf));
+
+	/* Gold */
+	Term_putstr(col, 14, -1, TERM_WHITE, "Gold");
+	Term_putstr(col+4, 14, -1, TERM_L_BLUE,
+	            format("%13ld", p_ptr->au));
+
+	/* Burden (in pounds) */
+	strnfmt(buf, sizeof(buf), "%ld.%ld lbs",
+	        p_ptr->total_weight / 10L,
+	        p_ptr->total_weight % 10L);
+	Term_putstr(col, 15, -1, TERM_WHITE, "Burden");
+
+	/* calculate burden as a % of character's max burden */
+	strnfmt(buf, sizeof(buf), format("%6ld lbs", p_ptr->total_weight / 10L, p_ptr->total_weight % 10L));
+	Term_putstr(col+7, 15, -1, TERM_L_BLUE, buf);
+
+	/* Now print burden as a percentage of carrying capacity */
+	tmpl = ((p_ptr->total_weight * 10L) / adj_str_wgt[p_ptr->stat_ind[A_STR]]) / 10L;
+	Term_putstr(col, 16, -1, TERM_WHITE, "% Burden");
+
+	/* output, but leave a space for the % */
+	strnfmt(buf, sizeof(buf), format("%8ld", tmpl));
+	Term_putstr(col+8, 16, -1, (tmpl < 100L) ? TERM_L_BLUE : TERM_YELLOW, buf);
+
+	/* Hack - add the % at the end */
+	sprintf(buf, "%%");
+	Term_putstr(col+16, 16, -1, (tmpl < 100L) ? TERM_L_BLUE : TERM_YELLOW, buf);
+
+	/*get the player's speed*/
+	i = p_ptr->pspeed;
+
+	/* Hack -- Visually "undo" the Search Mode Slowdown */
+	if (p_ptr->searching) i += 10;
+
+	/* Hack -- Visually "undo" temp speed */
+	if (p_ptr->fast) i -= 10;
+
+	/* Hack -- Visually "undo" temp slowing */
+	if (p_ptr->slow) i += 10;
+
+	/* Fast */
+	if (i > 110)
+	{
+		sprintf(buf, "+%d", (i - 110));
+	}
+
+	/* Slow */
+	else if (i < 110)
+	{
+		sprintf(buf, "-%d", (110 - i));
+	}
+
+	else
+	{
+		 sprintf(buf, "Normal");
+	}
+
+	/* Speed */
+	Term_putstr(col, 17, -1, TERM_WHITE, "Speed");
+	Term_putstr(col+8, 17, -1, TERM_L_BLUE, format("%9s", buf));
+
 	/* Middle */
 	col = 40;
 
@@ -1553,6 +1658,7 @@ static void display_player_xtra_info(void)
 	/* Base skill */
 	hit = p_ptr->dis_to_h;
 	dam = p_ptr->dis_to_d;
+	hit_real = p_ptr->to_h;
 
 	/* Check melee styles only */
 	style = p_ptr->cur_style & (WS_WIELD_FLAGS);
@@ -1561,10 +1667,15 @@ static void display_player_xtra_info(void)
 	mon_style_benefits(NULL, style, &style_hit, &style_dam, &style_crit);
 	hit += style_hit;
 	dam += style_dam;
+	hit_real += style_hit;
 
 	/* Apply weapon bonuses */
 	if (object_bonus_p(o_ptr)) hit += o_ptr->to_h;
 	if (object_bonus_p(o_ptr)) dam += o_ptr->to_d;
+	hit_real += o_ptr->to_h;
+
+	/* Fighting Skill (with current weapon) */
+	xthn = p_ptr->skill_thn + (hit_real * BTH_PLUS_ADJ);
 
 	/* Melee attacks */
 	strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
@@ -1674,6 +1785,7 @@ static void display_player_xtra_info(void)
 	/* Base skill */
 	hit = p_ptr->dis_to_h;
 	dam = 0;
+	hit_real = p_ptr->to_h;
 
 	/* Check shooting styles only */
 	style = p_ptr->cur_style & WS_LAUNCHER_FLAGS;
@@ -1682,10 +1794,15 @@ static void display_player_xtra_info(void)
 	mon_style_benefits(NULL, style, &style_hit, &style_dam, &style_crit);
 	hit += style_hit;
 	dam += style_dam;
+	hit_real += style_hit;
 
 	/* Apply weapon bonuses */
 	if (object_bonus_p(o_ptr)) hit += o_ptr->to_h;
 	if (object_bonus_p(o_ptr)) dam += o_ptr->to_d;
+	hit_real += o_ptr->to_h;
+
+	/* Shooting Skill (with current bow) */
+	xthb = p_ptr->skill_thb + (hit_real * BTH_PLUS_ADJ);
 
 	strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
 	Term_putstr(col+5, 14, -1, TERM_L_BLUE, format("%12s", buf));
@@ -1708,11 +1825,16 @@ static void display_player_xtra_info(void)
 	/* Throwing attacks */
 	hit = p_ptr->dis_to_h;
 	dam = 0;
+	hit_real = p_ptr->to_h;
 
 	/* Get style benefits */
 	mon_style_benefits(NULL, WS_THROWN_FLAGS, &style_hit, &style_dam, &style_crit);
 	hit += style_hit;
 	dam += style_dam;
+	hit_real += style_hit;
+
+	/* Throwing Skill */
+	xtht = p_ptr->skill_tht + (hit_real * BTH_PLUS_ADJ);
 
 	Term_putstr(col, 16, -1, TERM_WHITE, "Throw");
 	strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
@@ -1723,123 +1845,8 @@ static void display_player_xtra_info(void)
 	Term_putstr(col, 17, -1, TERM_WHITE, "Hurls");
 	Term_putstr(col+5, 17, -1, TERM_L_BLUE, format("%12s", buf));
 
-	/* Middle left */
-	col = 21;
-
-	/* Hit Points */
-	if (p_ptr->mhp > 99)
-	{
-		sprintf(buf, "%d/%d", p_ptr->chp, p_ptr->mhp);
-		Term_putstr(col, 10, -1, TERM_WHITE, "HP");
-		Term_putstr(col+8, 10, -1, TERM_L_BLUE, format("%9s", buf));
-	}
-	else 
-	{
-		sprintf(buf, "%d/%d", p_ptr->chp, p_ptr->mhp);
-		Term_putstr(col, 10, -1, TERM_WHITE, "Hit-Points");
-		Term_putstr(col+12, 10, -1, TERM_L_BLUE, format("%5s", buf));
-	}
-
-	/* Spell Points */
-	if (p_ptr->msp > 99)
-	{
-		sprintf(buf, "%d/%d", p_ptr->csp, p_ptr->msp);
-		Term_putstr(col, 11, -1, TERM_WHITE, "SP");
-		Term_putstr(col+8, 11, -1, TERM_L_BLUE, format("%9s", buf));
-	}
-	else 
-	{
-		sprintf(buf, "%d/%d", p_ptr->csp, p_ptr->msp);
-		Term_putstr(col, 11, -1, TERM_WHITE, "Spell-Pts");
-		Term_putstr(col+12, 11, -1, TERM_L_BLUE, format("%5s", buf));
-	}
-
-	/* Armor */
-	base = p_ptr->dis_ac;
-	plus = p_ptr->dis_to_a;
-
-	/* Total Armor */
-	strnfmt(buf, sizeof(buf), "[%d,%+d]", base, plus);
-	Term_putstr(col, 12, -1, TERM_WHITE, "Armor");
-	Term_putstr(col+8, 12, -1, TERM_L_BLUE, format("%9s", buf));
-
-	/* Infra */
-	strnfmt(buf, sizeof(buf), "%d ft", p_ptr->see_infra * 10);
-	Term_putstr(col, 13, -1, TERM_WHITE, "Infravis");
-	Term_putstr(col+8, 13, -1, TERM_L_BLUE, format("%9s", buf));
-
-	/* Gold */
-	Term_putstr(col, 14, -1, TERM_WHITE, "Gold");
-	Term_putstr(col+4, 14, -1, TERM_L_BLUE,
-	            format("%13ld", p_ptr->au));
-
-	/* Burden (in pounds) */
-	strnfmt(buf, sizeof(buf), "%ld.%ld lbs",
-	        p_ptr->total_weight / 10L,
-	        p_ptr->total_weight % 10L);
-	Term_putstr(col, 15, -1, TERM_WHITE, "Burden");
-
-	/* calculate burden as a % of character's max burden */
-	strnfmt(buf, sizeof(buf), format("%6ld lbs", p_ptr->total_weight / 10L, p_ptr->total_weight % 10L));
-	Term_putstr(col+7, 15, -1, TERM_L_BLUE, buf);
-
-	/* Now print burden as a percentage of carrying capacity */
-	tmpl = ((p_ptr->total_weight * 10L) / adj_str_wgt[p_ptr->stat_ind[A_STR]]) / 10L;
-	Term_putstr(col, 16, -1, TERM_WHITE, "% Burden");
-
-	/* output, but leave a space for the % */
-	strnfmt(buf, sizeof(buf), format("%8ld", tmpl));
-	Term_putstr(col+8, 16, -1, (tmpl < 100L) ? TERM_L_BLUE : TERM_YELLOW, buf);
-
-	/* Hack - add the % at the end */
-	sprintf(buf, "%%");
-	Term_putstr(col+16, 16, -1, (tmpl < 100L) ? TERM_L_BLUE : TERM_YELLOW, buf);
-
-	/*get the player's speed*/
-	i = p_ptr->pspeed;
-
-	/* Hack -- Visually "undo" the Search Mode Slowdown */
-	if (p_ptr->searching) i += 10;
-
-	/* Hack -- Visually "undo" temp speed */
-	if (p_ptr->fast) i -= 10;
-
-	/* Hack -- Visually "undo" temp slowing */
-	if (p_ptr->slow) i += 10;
-
-	/* Fast */
-	if (i > 110)
-	{
-		sprintf(buf, "+%d", (i - 110));
-	}
-
-	/* Slow */
-	else if (i < 110)
-	{
-		sprintf(buf, "-%d", (110 - i));
-	}
-
-	else
-	{
-		 sprintf(buf, "Normal");
-	}
-
-	/* Speed */
-	Term_putstr(col, 17, -1, TERM_WHITE, "Speed");
-	Term_putstr(col+8, 17, -1, TERM_L_BLUE, format("%9s", buf));
-
 	/* Right */
 	col = 59;
-
-	/* Fighting Skill (with current weapon) */
-	o_ptr = &inventory[INVEN_WIELD];
-	tmp = p_ptr->to_h + o_ptr->to_h;
-	xthn = p_ptr->skill_thn + (tmp * BTH_PLUS_ADJ);
-
-	/* Shooting Skill (with current bow) */
-	o_ptr = &inventory[INVEN_BOW];
-	tmp = p_ptr->to_h + o_ptr->to_h;
-	xthb = p_ptr->skill_thb + (tmp * BTH_PLUS_ADJ);
 
 	/* Basic abilities */
 	xdis = p_ptr->skill_dis;
@@ -1849,36 +1856,36 @@ static void display_player_xtra_info(void)
 	xsrh = p_ptr->skill_srh;
 	xfos = p_ptr->skill_fos;
 
-	put_str("Save Throw", 10, col);
-	desc = likert(xsav, 6, &likert_attr);
+	put_str("Fighting", 10, col);
+	desc = likert(xthn, 12, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 10, col+11);
 
-	put_str("Stealth", 11, col);
-	desc = likert(xstl, 1, &likert_attr);
+	put_str("Shooting", 11, col);
+	desc = likert(xthb, 12, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 11, col+11);
 
-	put_str("Fighting", 12, col);
-	desc = likert(xthn, 12, &likert_attr);
+	put_str("Throwing", 12, col);
+	desc = likert(xtht, 12, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 12, col+11);
 
-	put_str("Shooting", 13, col);
-	desc = likert(xthb, 12, &likert_attr);
+	put_str("Stealth", 13, col);
+	desc = likert(xstl, 1, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 13, col+11);
 
-	put_str("Disarming", 14, col);
-	desc = likert(xdis, 8, &likert_attr);
+	put_str("Save Throw", 14, col);
+	desc = likert(xsav, 6, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 14, col+11);
 
 	put_str("Devices", 15, col);
 	desc = likert(xdev, 6, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 15, col+11);
 
-	put_str("Perception", 16, col);
-	desc = likert(xfos, 6, &likert_attr);
+	put_str("Disarming", 16, col);
+	desc = likert(xdis, 8, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 16, col+11);
 
-	put_str("Searching", 17, col);
-	desc = likert(xsrh, 6, &likert_attr);
+	put_str("Perception", 17, col);
+	desc = likert(xfos, 6, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 17, col+11);
 
 	/* Indent output by 1 character, and wrap at column 72 */
