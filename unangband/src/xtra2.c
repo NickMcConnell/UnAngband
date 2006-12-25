@@ -2511,7 +2511,7 @@ void print_stats(const s16b *sn, int num, int y, int x)
 		c_prt(attr, format("  %c) ", I2A(i)), y + i + 1, x);
 
 		/* Display the stats */
-		display_player_stat_info(y + 1, x + 5, i, i + 1, attr);	
+		display_player_stat_info(y + 1, x + 1, i, i + 1, attr);	
 	}
 
 	/* Display drop-shadow */

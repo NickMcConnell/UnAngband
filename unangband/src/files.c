@@ -1413,16 +1413,12 @@ static cptr likert(int x, int y, byte *attr)
 
 /*
  * Prints some "extra" information on the screen.
- *
- * Space includes rows 3-9 cols 24-79
- * Space includes rows 10-17 cols 1-79
- * Space includes rows 19-22 cols 1-79
  */
 static void display_player_xtra_info(void)
 {
 	int i;
 	s32b tmpl;
-	int col;
+	int col, row;
 	int hit, dam, hit_real;
 	int style_hit, style_dam, style_crit;
 	u32b style;
@@ -1449,6 +1445,38 @@ static void display_player_xtra_info(void)
 #else
 	c_put_str(TERM_L_BLUE, op_ptr->full_name, 1, 8);
 #endif
+
+	/* Current Home Town */
+	put_str("Home", 7, 1);
+	c_put_str(TERM_L_BLUE, t_name + t_info[p_ptr->town].name, 7, 8);
+
+	/* Current Dungeon */
+	put_str("Target", 8, 1);
+	c_put_str(TERM_L_BLUE, t_name + t_info[p_ptr->dungeon].name, 8, 8);
+
+	/* Upper middle */
+	col = 32;
+	row = 2;
+
+	/* Age */
+	Term_putstr(col, row, -1, TERM_WHITE, "Age");
+	Term_putstr(col+8, row, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->age));
+
+	/* Height */
+	Term_putstr(col, row + 1, -1, TERM_WHITE, "Height");
+	Term_putstr(col+8, row + 1, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->ht));
+
+	/* Weight */
+	Term_putstr(col, row + 2, -1, TERM_WHITE, "Weight");
+	Term_putstr(col+8, row + 2, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->wt));
+
+	/* Status */
+	Term_putstr(col, row + 3, -1, TERM_WHITE, "Status");
+	Term_putstr(col+8, row + 3, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->sc));
+	/* Char level */
+	Term_putstr(col, row + 4, -1, TERM_WHITE, "Level");
+	Term_putstr(col+8, row + 4, -1, ((p_ptr->lev >= p_ptr->max_lev) ? TERM_L_BLUE : TERM_YELLOW),
+				format("%4d", p_ptr->lev));
 
 	/* Left */
 	col = 1;
@@ -2642,7 +2670,7 @@ static void display_player_misc_info(void)
 {
 	cptr p;
 
-	int n, col, row;
+	int n;
 
 	char buf[80];
 
@@ -2703,10 +2731,10 @@ static void display_player_misc_info(void)
 		p = w_name_style[p_ptr->pstyle];
 
 	/* Hack -- force string to fit */
-	if (strlen(p) >= 13)
+	if (strlen(p) >= 24)
 	{
 		/* Copy first word of name into temporary buffer */
-		for (n = 0; (*p) && (*p != ' ') && (n < 13); n++, p++)
+		for (n = 0; (*p) && (*p != ' ') && (n < 24); n++, p++)
 		{
 			buf[n] = *p;
 		}
@@ -2742,38 +2770,6 @@ static void display_player_misc_info(void)
 	}
 
 	c_put_str(TERM_L_BLUE, buf, 6, 8);
-
-	/* Current Home Town */
-	put_str("Home", 7, 1);
-	c_put_str(TERM_L_BLUE, t_name + t_info[p_ptr->town].name, 7, 8);
-
-	/* Current Dungeon */
-	put_str("Target", 8, 1);
-	c_put_str(TERM_L_BLUE, t_name + t_info[p_ptr->dungeon].name, 8, 8);
-
-	/* Upper middle */
-	col = 23;
-	row = 2;
-
-	/* Age */
-	Term_putstr(col, row, -1, TERM_WHITE, "Age");
-	Term_putstr(col+8, row, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->age));
-
-	/* Height */
-	Term_putstr(col, row + 1, -1, TERM_WHITE, "Height");
-	Term_putstr(col+8, row + 1, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->ht));
-
-	/* Weight */
-	Term_putstr(col, row + 2, -1, TERM_WHITE, "Weight");
-	Term_putstr(col+8, row + 2, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->wt));
-
-	/* Status */
-	Term_putstr(col, row + 3, -1, TERM_WHITE, "Status");
-	Term_putstr(col+8, row + 3, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->sc));
-	/* Char level */
-	Term_putstr(col, row + 4, -1, TERM_WHITE, "Level");
-	Term_putstr(col+8, row + 4, -1, ((p_ptr->lev >= p_ptr->max_lev) ? TERM_L_BLUE : TERM_YELLOW),
-				format("%4d", p_ptr->lev));
 }
 
 
@@ -2792,8 +2788,9 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 		/* Print out the labels for the columns */
 		c_put_str(TERM_WHITE, "  Self ", row-1, col+5);
 		c_put_str(TERM_WHITE, " EB ", row-1, col+12);
-		c_put_str(TERM_WHITE, "  Best ", row-1, col+16);
-		c_put_str(TERM_WHITE, "  Curr", row-1, col+23);
+		c_put_str(TERM_WHITE, " TB ", row-1, col+16);
+		c_put_str(TERM_WHITE, "  Best ", row-1, col+20);
+		c_put_str(TERM_WHITE, "  Curr", row-1, col+27);
 	}
 
 	/* Display the stats */
@@ -2827,15 +2824,21 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 		sprintf(buf, "%+3d", p_ptr->stat_add[i]);
 		c_put_str(TERM_L_BLUE, buf, row+i, col+12);
 
+		/* Temporary Bonus */
+		sprintf(buf, "%+3d", 
+				(p_ptr->stat_inc_tim[i] ? 5 : 0) 
+				- (p_ptr->stat_dec_tim[i] ? 5 : 0));
+		c_put_str(TERM_L_BLUE, buf, row+i, col+16);
+
 		/* Resulting "modified" maximum value */
 		cnv_stat(p_ptr->stat_top[i], buf);
-		c_put_str(TERM_L_GREEN, buf, row+i, col+16);
+		c_put_str(TERM_L_GREEN, buf, row+i, col+20);
 
 		/* Only display stat_use if not maximal */
 		if (p_ptr->stat_use[i] < p_ptr->stat_top[i])
 		{
 			cnv_stat(p_ptr->stat_use[i], buf);
-			c_put_str(TERM_YELLOW, buf, row+i, col+23);
+			c_put_str(TERM_YELLOW, buf, row+i, col+27);
 		}
 	}
 }
@@ -2867,7 +2870,7 @@ static void display_player_sust_info(void)
 	row = 2;
 
 	/* Column */
-	col = 36;
+	col = 32;
 
 	/* Header */
 	c_put_str(TERM_WHITE, "abcdefghijkl@", row-1, col);
@@ -3196,7 +3199,7 @@ void display_player(int mode)
 	clear_from(0);
 
 	/* Stat info */
-	display_player_stat_info(2, 50, 0, A_MAX, TERM_WHITE);
+	display_player_stat_info(2, 46, 0, A_MAX, TERM_WHITE);
 
 	/* Stat/Sustain flags */
 	if (mode)
