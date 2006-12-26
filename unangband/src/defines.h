@@ -358,17 +358,10 @@
  * Dungeon room types 
  */
 #define ROOM_NORMAL			0 
-#define ROOM_LARGE			1
-#define ROOM_NEST_THEME   2
-#define ROOM_NEST_JELLY		3
-#define ROOM_NEST_ANIMAL	5
-#define ROOM_NEST_UNDEAD	7
-#define ROOM_PIT_ORC		8
-#define ROOM_PIT_TROLL		9
-#define ROOM_PIT_THEME   10
-#define ROOM_PIT_GIANT		11
-#define ROOM_PIT_DRAGON		12
-#define ROOM_PIT_DEMON		13
+#define ROOM_CHAMBERS	10
+#define ROOM_STARBURST	11
+#define ROOM_FRACTAL	12
+#define ROOM_INTERESTING   13
 #define ROOM_LESSER_VAULT	14
 #define ROOM_GREATER_VAULT	15
 #define ROOM_TOWER       16
@@ -5097,6 +5090,23 @@ extern int PlayerUID;
  */
 #define N_ELEMENTS(a) (sizeof(a) / sizeof((a)[0]))
 
+
+
+/* Utilitary macros for the grid queue type */
+
+/* These two return the coordinates of the grid at the front of the queue */
+/* THE QUEUE MUST CONTAIN AT LEAST ONE ELEMENT */
+#define GRID_QUEUE_Y(Q) ((Q)->data[(Q)->head].y)
+#define GRID_QUEUE_X(Q) ((Q)->data[(Q)->head].x)
+
+/* Returns TRUE if the given queue is empty */
+#define GRID_QUEUE_EMPTY(Q) ((Q)->head == (Q)->tail)
+
+/* Returns TRUE if the given queue is full */
+#define GRID_QUEUE_FULL(Q) ((((Q)->tail + 1) % (Q)->max_size) == (Q)->head)
+
+/*Square a number*/
+#define GET_SQUARE(X) 	((X) * (X))
 
 
 /*

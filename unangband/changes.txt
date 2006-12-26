@@ -114,6 +114,9 @@ appropriate effects if an item is set in a trap.
 - Added heavy armoured coats that wield into the Cloak slot. This allows players to easily
 increase their armour early on, at the cost of additional encumberance.
 
+- Added starburst rooms, fractal rooms from NPPAngband, streamer code and room distribution
+code from Sangband (modified somewhat).
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.

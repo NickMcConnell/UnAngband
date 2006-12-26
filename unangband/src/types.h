@@ -1629,6 +1629,36 @@ struct high_score
 
 
 /*
+ * Simple structure to hold a map location
+ */
+
+typedef struct coord coord;
+
+struct coord
+{
+	byte y;
+	byte x;
+};
+
+
+/*
+ * A circular queue of map locations.
+ * Check out defines.h and util.c for usage
+ */
+typedef struct
+{
+	/* Maximum number of grids in the queue */
+	size_t max_size;
+	/* Grid data */
+	coord *data;
+	/* Head and tail of the queue */
+	size_t head, tail;
+} grid_queue_type;
+
+
+
+
+/*
  * A structure to hold a tval and its description
  */
 struct tval_desc

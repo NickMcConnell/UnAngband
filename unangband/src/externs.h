@@ -943,6 +943,10 @@ extern byte get_angle_to_grid[41][41];
 extern int get_angle_to_target(int y0, int x0, int y1, int x1, int dir);
 extern void get_grid_using_angle(int angle, int y0, int x0,
 	int *ty, int *tx);
+extern void grid_queue_create(grid_queue_type *q, size_t max_size);
+extern void grid_queue_destroy(grid_queue_type *q);
+extern bool grid_queue_push(grid_queue_type *q, byte y, byte x);
+extern void grid_queue_pop(grid_queue_type *q);
 
 
 /* xtra1.c */
