@@ -88,6 +88,8 @@ N:5:104:0:0:1:1:0:128
 # Central feature large room.
 
 N:6:104:0:0:1:1:0:128
+A:
+B:chamber
 
 # Chambers.
 

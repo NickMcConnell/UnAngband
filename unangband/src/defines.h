@@ -2752,7 +2752,7 @@
 #define LF1_CAVE	0x00080000L	/* Cave level */
 #define LF1_TOWN	0x00100000L	/* Town level */
 #define LF1_WILD	0x00200000L	/* Wilderness level */
-#define LF1_RUIN	0x00400000L	/* Ruin level */
+#define LF1_CHAMBERS	0x00400000L	/* Chambers level */
 
 #define LF1_DARK	0x02000000L	/* Dark room */
 #define LF1_QUEST	0x04000000L	/* Quest level */
@@ -2762,6 +2762,10 @@
 #define LF1_LESS	0x40000000L	/* Level goes up */
 #define LF1_MORE	0x80000000L	/* Level goes down */
 
+
+#define LF1_THEME \
+	(LF1_DESTROYED | LF1_VAULT | LF1_DUNGEON | LF1_STRONGHOLD | \
+	LF1_CRYPT | LF1_LAIR | LF1_MINE | LF1_CAVE | LF1_WILD)
 
 /* Room generation flags */
 #define RG1_NORTH	0x00000001L	/* Place in north */

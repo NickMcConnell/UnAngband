@@ -217,6 +217,10 @@ struct room_data
 	byte min_level;
 	byte max_number;
 	byte count_as;
+	byte unused;
+
+	/* Level that this appears on */
+	u32b theme;
 };
 
 
@@ -297,25 +301,25 @@ static dun_data *dun;
  */
 static room_data room[ROOM_MAX] =
 {
-   /* Depth:         0   10   20   30   40   50   60   70   80   90  100  min max_num count*/
+   /* Depth:         0   10   20   30   40   50   60   70   80   90  100  min max_num count, theme*/
 
-   /* Nothing */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS,	1},
-   /* 'Empty' */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS,	1},
-   /* Walls   */  {{180,240, 300, 300, 300, 300, 300, 300, 300, 300, 300},  1,DUN_ROOMS/2,	1},
-   /* Centre */   {{60, 100, 120, 140, 160, 180, 200, 200, 200, 200, 200},  1,DUN_ROOMS/2,	1},
-   /* Lrg wall */ {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	2},
-   /* Lrg cent */ {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	2},
-   /* Xlg cent */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,DUN_ROOMS/4,	3},
-   /* Chambers */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	1,		3},
-   /* I. Room */  {{30,  60,  70,  80,  80,  75,  70,  67,  65,  62,  60},  0,  2,		1},
-   /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	2,		2},
-   /* G. Vault */ {{ 0,   0,   1,   2,   3,   4,   6,   7,   8,  10,  12}, 20,	1,		3},
-   /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	1,		3},
-   /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		3},
-   /* Fractal */  {{60, 100, 120, 140, 160, 180, 200, 200, 200, 200, 200},  1,DUN_ROOMS,	2},
-   /* Lrg fra */  {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	3},
-   /* Huge fra */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,	1,		4},
-   /* Lair */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		1}
+   /* Nothing */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS,	1, 0, LF1_THEME},
+   /* 'Empty' */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE)},
+   /* Walls   */  {{180,240, 300, 300, 300, 300, 300, 300, 300, 300, 300},  1,DUN_ROOMS/2,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_DESTROYED)},
+   /* Centre */   {{60, 100, 120, 140, 160, 180, 200, 200, 200, 200, 200},  1,DUN_ROOMS/2,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_DESTROYED | LF1_CRYPT)},
+   /* Lrg wall */ {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	2, 0, LF1_STRONGHOLD | LF1_DUNGEON | LF1_CRYPT},
+   /* Lrg cent */ {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	2, 0, LF1_STRONGHOLD | LF1_DUNGEON},
+   /* Xlg cent */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,DUN_ROOMS/4,	3, 0, LF1_STRONGHOLD},
+   /* Chambers */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	1,		3, 0, LF1_CHAMBERS},
+   /* I. Room */  {{30,  60,  70,  80,  80,  75,  70,  67,  65,  62,  60},  0,  2,		1, 0, 0L},
+   /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	2,		2, 0, LF1_DUNGEON | LF1_VAULT},
+   /* G. Vault */ {{ 0,   0,   1,   2,   3,   4,   6,   7,   8,  10,  12}, 20,	1,		3, 0, LF1_VAULT},
+   /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	1,		3, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE},
+   /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		3, 0, LF1_CAVE},
+   /* Fractal */  {{60, 100, 120, 140, 160, 180, 200, 200, 200, 200, 200},  1,DUN_ROOMS,	2, 0, LF1_MINE | LF1_CAVE | LF1_LAIR},
+   /* Lrg fra */  {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	3, 0, LF1_MINE | LF1_CAVE | LF1_LAIR},
+   /* Huge fra */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE | LF1_LAIR},
+   /* Lair */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		1, 0, LF1_LAIR}
 };
 
 
@@ -6916,12 +6920,35 @@ static void cave_gen(void)
 			/* Skip at this depth */
 			if (room[room_type].min_level > p_ptr->depth) continue;
 
+			/* Skip if level themed and we don't match the theme */
+			if (((level_flag & (LF1_THEME)) != 0) && ((room[room_type].theme & (level_flag)) != 0)) continue;
+
 			/* Build the room. */
 			while ((rand_int(100) < room[room_type].chance[p_ptr->depth < 100 ? p_ptr->depth / 10 : 10])
 				&& (rooms_built < room[room_type].max_number) && (room_build(dun->cent_n + 1, room_type)))
 			{
 				/* Increase the room built count. */
 				rooms_built += room[room_type].count_as;
+
+				/* No theme chosen */
+				if ((level_flag & (LF1_THEME)) == 0)
+				{
+					/* Hack -- no choice */
+					int choice = -1;
+
+					/* Reset count */
+					k = 0;
+
+					/* Pick a theme */
+					for (j = 0; j < 32; j++)
+					{
+						/* Pick a theme */
+						if ( ((room[room_type].theme & (1L << j)) != 0) && (rand_int(++k))) choice = j;
+					}
+
+					/* Set a theme if picked */
+					if (choice >= 0) level_flag |= (1L << choice);
+				}
 			}
 		}
 	}
