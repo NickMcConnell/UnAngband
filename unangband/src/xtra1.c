@@ -2460,7 +2460,8 @@ static void calc_mana(void)
 		/* Normal gloves hurt mage-type spells */
 		if (o_ptr->k_idx &&
 		    !(f3 & (TR3_FREE_ACT)) &&
-		    !((f1 & (TR1_INT | TR1_WIS | TR1_DEX)) && (o_ptr->pval > 0)))
+		    !((f1 & (TR1_INT | TR1_WIS | TR1_DEX | TR1_AGI)) 
+			  && (o_ptr->pval > 0)))
 		{
 			/* Encumbered */
 			p_ptr->cumber_glove = TRUE;
@@ -3008,6 +3009,7 @@ static void calc_bonuses(void)
 		if (f1 & (TR1_DEX)) p_ptr->stat_add[A_DEX] += o_ptr->pval;
 		if (f1 & (TR1_CON)) p_ptr->stat_add[A_CON] += o_ptr->pval;
 		if (f1 & (TR1_CHR)) p_ptr->stat_add[A_CHR] += o_ptr->pval;
+		if (f1 & (TR1_AGI)) p_ptr->stat_add[A_AGI] += o_ptr->pval;
 
 		/* Affect saves */
 		if (f1 & (TR1_SAVE)) p_ptr->skill_sav += o_ptr->pval;
@@ -3029,9 +3031,6 @@ static void calc_bonuses(void)
 
 		/* Affect digging (factor of 20) */
 		if (f1 & (TR1_TUNNEL)) p_ptr->skill_dig += (o_ptr->pval * 20);
-
-		/* Affect speed */
-		if (f1 & (TR1_SPEED)) p_ptr->pspeed += o_ptr->pval;
 
 		/* Affect blows */
 		if (f1 & (TR1_BLOWS)) extra_blows += o_ptr->pval;
@@ -3147,13 +3146,20 @@ static void calc_bonuses(void)
 		p_ptr->stat_use[i] = use;
 
 		/* Values: 3, 4, ..., 17 */
-		if (use <= 18) ind = (use - 3);
+		if (use <= 18) 
+		  ind = use - 3;
 
 		/* Ranges: 18/00-18/09, ..., 18/210-18/219 */
-		else if (use <= 18+219) ind = (15 + (use - 18) / 10);
+		else if (use <= 18+219) 
+		  ind = 15 + (use - 18) / 10;
+
+		/* Range: 18/220 + 27 more levels (governs speed) */
+		else if (i == A_AGI && use <= 18+219 + 27*10)
+		  ind = 15 + (use - 18) / 10;
 
 		/* Range: 18/220+ */
-		else ind = (37);
+		else 
+		  ind = 37;
 
 		/* Save the new index */
 		p_ptr->stat_ind[i] = ind;

@@ -4748,7 +4748,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 			}
 		}
 
-		else switch(rand_int(16))
+		else switch(rand_int(17))
 		{
 			case 0: typ = GF_HALLU; break;
 			case 1: typ = GF_BLIND; break;
@@ -4766,6 +4766,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 			case 13: typ = GF_PETRIFY; break;
 			case 14: typ = GF_PARALYZE; break;
 			case 15: typ = GF_LOSE_MANA; break;
+			case 16: typ = GF_LOSE_AGI; break;
 		}
 	}
 
@@ -5862,7 +5863,6 @@ bool project_m(int who, int y, int x, int dam, int typ)
 			/* Normal monsters slow down */
 			else
 			{
-				/* Speed up */
 				do_slow = 50 + rand_int(50);
 			}
 
@@ -6494,7 +6494,8 @@ bool project_m(int who, int y, int x, int dam, int typ)
 		}
 
 
-		/* Melee attack - slow */
+		/* Melee attack - slow; agility draining works the same */
+		case GF_LOSE_AGI:
 		case GF_SLOW:
 		{
 			if (seen) obvious = TRUE;
@@ -6526,7 +6527,6 @@ bool project_m(int who, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				/* Speed up */
 				do_slow = 50 + rand_int(50);
 				note = " starts moving slower.";
 			}
@@ -8582,9 +8582,9 @@ bool project_p(int who, int y, int x, int dam, int typ)
 			/* Obvious */
 			obvious = TRUE;
 
-			/* Saving throw (unless paralyzed) based on dex and level */
+			/* Saving throw (unless paralyzed) based on agi and level */
 			if (!p_ptr->paralyzed &&
-			    (rand_int(100) < (adj_agi_safe[p_ptr->stat_ind[A_DEX]] +
+			    (rand_int(100) < (adj_agi_safe[p_ptr->stat_ind[A_AGI]] +
 					      p_ptr->lev)))
 			{
 				/* Saving throw message */
@@ -8635,9 +8635,9 @@ bool project_p(int who, int y, int x, int dam, int typ)
 			/* Take damage */
 			take_hit(dam, killer);
 
-			/* Saving throw (unless paralyzed) based on dex and level */
+			/* Saving throw (unless paralyzed) based on agi and level */
 			if (!p_ptr->paralyzed &&
-			    (rand_int(100) < (adj_agi_safe[p_ptr->stat_ind[A_DEX]] +
+			    (rand_int(100) < (adj_agi_safe[p_ptr->stat_ind[A_AGI]] +
 					      p_ptr->lev)))
 			{
 				/* Saving throw message */
@@ -9395,6 +9395,21 @@ bool project_p(int who, int y, int x, int dam, int typ)
 			{
 				obvious = TRUE;
 				set_stat_dec_tim(p_ptr->stat_dec_tim[A_DEX] + rand_int(20) + 20, A_DEX);
+			}
+
+			break;
+		}
+
+		case GF_LOSE_AGI:
+		{
+			/* Take damage */
+			take_hit(dam, killer);
+
+			/* Damage (stat) */
+			if (do_dec_stat(A_AGI))
+			{
+				obvious = TRUE;
+				set_stat_dec_tim(p_ptr->stat_dec_tim[A_AGI] + rand_int(20) + 20, A_AGI);
 			}
 
 			break;
@@ -11670,4 +11685,3 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 	/* Return "something was noticed" */
 	return (notice);
 }
-

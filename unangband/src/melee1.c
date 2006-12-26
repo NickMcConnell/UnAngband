@@ -789,6 +789,7 @@ static int attack_power(int effect)
 		case GF_LOSE_INT:	power =  0; break;
 		case GF_LOSE_WIS:	power =  0; break;
 		case GF_LOSE_CHR:	power =  0; break;
+		case GF_LOSE_AGI:	power =  0; break;
 		case GF_LOSE_ALL:	power =  2; break;
 
 		case GF_EXP_10:	power =  5; break;
@@ -3652,6 +3653,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					if (p_ptr->stat_cur[A_DEX] != p_ptr->stat_max[A_DEX]) k++;
 					if (p_ptr->stat_cur[A_CON] != p_ptr->stat_max[A_CON]) k++;
 					if (p_ptr->stat_cur[A_CHR] != p_ptr->stat_max[A_CHR]) k++;
+					if (p_ptr->stat_cur[A_AGI] != p_ptr->stat_max[A_AGI]) k++;
 					if (p_ptr->exp < p_ptr->max_exp) k++;
 				}
 
@@ -3672,11 +3674,12 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					else if ((p_ptr->food < PY_FOOD_WEAK) && (k) && (rand_int(k--))) set_food(PY_FOOD_MAX -1);
 					else if ((rlev < 30) || (k <= 0)) /* Nothing */ ;
 					else if ((p_ptr->stat_cur[A_STR] != p_ptr->stat_max[A_STR]) && (k) && (rand_int(k--))) do_res_stat(A_STR);
-					else if ((p_ptr->stat_cur[A_INT] != p_ptr->stat_max[A_STR]) && (k) && (rand_int(k--))) do_res_stat(A_INT);
-					else if ((p_ptr->stat_cur[A_WIS] != p_ptr->stat_max[A_STR]) && (k) && (rand_int(k--))) do_res_stat(A_WIS);
-					else if ((p_ptr->stat_cur[A_DEX] != p_ptr->stat_max[A_STR]) && (k) && (rand_int(k--))) do_res_stat(A_DEX);
-					else if ((p_ptr->stat_cur[A_CON] != p_ptr->stat_max[A_STR]) && (k) && (rand_int(k--))) do_res_stat(A_CON);
-					else if ((p_ptr->stat_cur[A_CHR] != p_ptr->stat_max[A_STR]) && (k) && (rand_int(k--))) do_res_stat(A_CHR);
+					else if ((p_ptr->stat_cur[A_INT] != p_ptr->stat_max[A_INT]) && (k) && (rand_int(k--))) do_res_stat(A_INT);
+					else if ((p_ptr->stat_cur[A_WIS] != p_ptr->stat_max[A_WIS]) && (k) && (rand_int(k--))) do_res_stat(A_WIS);
+					else if ((p_ptr->stat_cur[A_DEX] != p_ptr->stat_max[A_DEX]) && (k) && (rand_int(k--))) do_res_stat(A_DEX);
+					else if ((p_ptr->stat_cur[A_CON] != p_ptr->stat_max[A_CON]) && (k) && (rand_int(k--))) do_res_stat(A_CON);
+					else if ((p_ptr->stat_cur[A_CHR] != p_ptr->stat_max[A_CHR]) && (k) && (rand_int(k--))) do_res_stat(A_CHR);
+					else if ((p_ptr->stat_cur[A_AGI] != p_ptr->stat_max[A_AGI]) && (k) && (rand_int(k--))) do_res_stat(A_AGI);
 					else if ((p_ptr->exp < p_ptr->max_exp) && (k) && (rand_int(k--))) restore_level();
 				}
 

@@ -377,6 +377,8 @@ static cptr r_info_blow_effect[] =
 	"WEB",
 	"BLOOD",
 	"SLIME",
+	"RES_MAGIC",
+	"LOSE_AGI",
 	NULL
 };
 
@@ -1048,7 +1050,7 @@ static cptr k_info_flags1[] =
 	"SEARCH",
 	"INFRA",
 	"TUNNEL",
-	"SPEED",
+	"AGI",
 	"BLOWS",
 	"SHOTS",
 	"MIGHT",
@@ -1081,6 +1083,7 @@ static cptr k_info_flags2[] =
 	"SUST_DEX",
 	"SUST_CON",
 	"SUST_CHR",
+	/* FIXME: a hack; we don't have enough bits at the moment: "SUST_AGI", */
 	"IGNORE_ACID",
 	"IGNORE_ELEC",
 	"IGNORE_FIRE",
@@ -1352,9 +1355,11 @@ static cptr s_info_flags3[] =
 	"CURE_MEM",
 	"SLOW_CURSE",
 	"CURE_CURSE",
-	"SLOW_CUTS",
+	/* FIXME: a hack; we don't have enough bits at the moment:	"SLOW_CUTS", */
+	"INC_AGI",
 	"CURE_CUTS",
-	"SLOW_STUN",
+	/* FIXME: a hack; we don't have enough bits at the moment:	"SLOW_STUN", */
+	"CURE_AGI",
 	"CURE_STUN",
 	"CURE_POIS",
 	"CURE_CONF",
@@ -1988,6 +1993,25 @@ static errr grab_one_flag(u32b *flags, cptr names[], cptr what)
 	/* Check flags */
 	for (i = 0; i < 32; i++)
 	{
+	    /* FIXME: An utterly terrible hack ---
+		   we don't have enough bits at the moment */
+	    if (streq(what, "SUST_AGI"))
+		  {
+			*flags |= TR2_SUST_DEX;
+			return (0);
+		  }
+	    if (streq(what, "SLOW_CUTS"))
+		  {
+			*flags |= SF3_CURE_CUTS;
+			return (0);
+		  }
+	    if (streq(what, "SLOW_STUN"))
+		  {
+			*flags |= SF3_CURE_STUN;
+			return (0);
+		  }
+		/* End of the hack */
+
 		if (streq(what, names[i]))
 		{
 			*flags |= (1L << i);
@@ -2009,6 +2033,15 @@ static errr grab_one_offset(byte *offset, cptr names[], cptr what)
 	/* Check flags */
 	for (i = 0; i < 32; i++)
 	{
+	    /* FIXME: An utterly terrible hack ---
+		   we don't have enough bits at the moment */
+	    if (streq(what, "SUST_AGI"))
+		  {
+			*offset = *offset+3; /* SUST_DEX */
+			return (0);
+		  }
+		/* End of the hack */
+
 		if (streq(what, names[i]))
 		{
 			*offset = *offset+i;
@@ -6324,6 +6357,7 @@ static long eval_blow_effect(int effect, int atk_dam, int rlev)
 		case GF_DISENCHANT:
 		case GF_UN_BONUS:
 		case GF_UN_POWER:
+		case GF_LOSE_AGI:
 		case GF_LOSE_CON:
 		{
 			atk_dam += 30;

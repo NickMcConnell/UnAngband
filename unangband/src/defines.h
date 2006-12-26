@@ -521,7 +521,7 @@
 /*
  * Indexes used for various "equipment" slots (hard-coded by savefiles, etc).
  */
-#define INVEN_WIELD	24
+#define INVEN_WIELD	    24
 #define INVEN_BOW       25
 #define INVEN_LEFT      26
 #define INVEN_RIGHT     27
@@ -875,6 +875,7 @@
 #define GF_BLOOD	114
 #define GF_SLIME	115
 #define GF_RES_MAGIC	116
+#define GF_LOSE_AGI     117
 
 /*
  * Columns for the spell cost or damage flags
@@ -1360,7 +1361,7 @@
 #define SF2_OPP_ELEC     0x40000000
 #define SF2_OPP_POIS     0x80000000
 
-/* SF3 - healing self, and untimed improvements */
+/* SF3 - healing self and timed and untimed improvements */
 
 #define SF3_INC_STR      0x00000001
 #define SF3_INC_INT      0x00000002
@@ -1380,20 +1381,30 @@
 #define SF3_CURE_MEM     0x00008000
 #define SF3_SLOW_CURSE   0x00010000
 #define SF3_CURE_CURSE   0x00020000
-#define SF3_SLOW_CUTS    0x00040000
 #define SF3_CURE_CUTS    0x00080000
-#define SF3_SLOW_STUN    0x00100000
 #define SF3_CURE_STUN    0x00200000
+
+
+/* FIXME: this is a hack, needed because we've run out of bits! */
+/* revert to this when we gather some new bits: */
+/* #define SF3_SLOW_CUTS    0x00040000 */
+/* #define SF3_SLOW_STUN    0x00100000 */
+#define SF3_SLOW_CUTS    SF3_CURE_CUTS
+#define SF3_SLOW_STUN    SF3_CURE_STUN
+#define SF3_INC_AGI      0x00040000
+#define SF3_CURE_AGI     0x00100000
+
+
 #define SF3_CURE_POIS    0x00400000
 #define SF3_CURE_CONF    0x00800000
 #define SF3_CURE_FOOD    0x01000000
 #define SF3_CURE_FEAR    0x02000000
 #define SF3_CURE_BLIND   0x04000000
-#define SF3_CURE_IMAGE		0x08000000
-#define SF3_DEC_FOOD   	0x10000000
+#define SF3_CURE_IMAGE   0x08000000
+#define SF3_DEC_FOOD   	 0x10000000
 #define SF3_DEC_EXP      0x20000000
 #define SF3_HOLD_SONG    0x40000000
-#define SF3_EVIL  0x80000000
+#define SF3_EVIL         0x80000000
 
 
 #define DISEASE_LOSE_STR    	0x00000001
@@ -1428,6 +1439,7 @@
 #define DISEASE_LIGHT     	0x20000000
 #define DISEASE_HEAVY     	0x40000000
 #define DISEASE_PERMANENT    	0x80000000
+
 
 /* Maximum number of disease flags that can randomly affect the player */
 #define DISEASE_TYPES 18
@@ -2044,7 +2056,7 @@
 #define SV_RING_ACCURACY		28
 #define SV_RING_DAMAGE			29
 #define SV_RING_SLAYING			30
-#define SV_RING_SPEED			31
+#define SV_RING_AGI 			31
 #define SV_RING_BARAHIR			32
 #define SV_RING_TULKAS			33
 #define SV_RING_NARYA			34
@@ -2266,6 +2278,9 @@
 #define SV_POTION_STAR_ENLIGHTENMENT	57
 #define SV_POTION_SELF_KNOWLEDGE		58
 #define SV_POTION_EXPERIENCE			59
+/* xxx */
+#define SV_POTION_AGI   			84
+#define SV_POTION_RES_AGI			85
 
 /* The "sval" codes for TV_FLASK */
 #define SV_FLASK_OIL      0
@@ -3021,7 +3036,7 @@
 #define TR1_SEARCH 0x00000200L     /* Search += "pval" */
 #define TR1_INFRA  0x00000400L     /* Infra += "pval" */
 #define TR1_TUNNEL 0x00000800L     /* Tunnel += "pval" */
-#define TR1_SPEED  0x00001000L     /* Speed += "pval" */
+#define TR1_AGI    0x00001000L     /* AGI += "pval" */
 #define TR1_BLOWS  0x00002000L     /* Blows += "pval" */
 #define TR1_SHOTS  0x00004000L     /* Shots += "pval" */
 #define TR1_MIGHT  0x00008000L     /* Might += "pval" */
@@ -3074,6 +3089,9 @@
 #define TR2_RES_NETHR    0x20000000L     /* Resist nether */
 #define TR2_RES_CHAOS    0x40000000L     /* Resist chaos */
 #define TR2_RES_DISEN    0x80000000L     /* Resist disenchant */
+
+/* FIXME: a hack; we don't have enough bits at the moment: */
+#define TR2_SUST_AGI     TR2_SUST_DEX  /* Sustain AGI */
 
 #define TR3_SLOW_DIGEST	0x00000001L     /* Resist water */
 #define TR3_FEATHER      0x00000002L     /* Feather Falling */
@@ -3228,9 +3246,9 @@
  */
 #define TR1_PVAL_MASK \
 	(TR1_STR | TR1_INT | TR1_WIS | TR1_DEX | \
-	 TR1_CON | TR1_CHR | TR1_SAVE | TR1_DEVICE | \
+	 TR1_CON | TR1_CHR | TR1_AGI | TR1_SAVE | TR1_DEVICE | \
 	 TR1_STEALTH | TR1_SEARCH | TR1_INFRA | TR1_TUNNEL | \
-	 TR1_SPEED | TR1_BLOWS | TR1_SHOTS | TR1_MIGHT)
+	 TR1_BLOWS | TR1_SHOTS | TR1_MIGHT)
 
 /*
  * Flag set 2 -- mask for "ignore element" flags.

@@ -434,6 +434,7 @@ static void remove_contradictory(artifact_type *a_ptr)
 		if (a_ptr->flags1 & TR1_DEX) a_ptr->flags2 &= ~(TR2_SUST_DEX);
 		if (a_ptr->flags1 & TR1_CON) a_ptr->flags2 &= ~(TR2_SUST_CON);
 		if (a_ptr->flags1 & TR1_CHR) a_ptr->flags2 &= ~(TR2_SUST_CHR);
+		if (a_ptr->flags1 & TR1_AGI) a_ptr->flags2 &= ~(TR2_SUST_AGI);
 		a_ptr->flags1 &= ~(TR1_BLOWS);
 	}
 
@@ -972,6 +973,11 @@ static s32b artifact_power(int a_idx)
 			p += 3 * a_ptr->pval * a_ptr->pval / 4;
 			LOG_PRINT2("Adding power for DEX bonus %d, total is %d\n", a_ptr->pval, p);
 		}
+		if (a_ptr->flags1 & TR1_AGI)
+		{
+			p += 3 * a_ptr->pval * a_ptr->pval / 4;
+			LOG_PRINT2("Adding power for AGI bonus %d, total is %d\n", a_ptr->pval, p);
+		}
 		if (a_ptr->flags1 & TR1_CON)
 		{
 			p += a_ptr->pval * a_ptr->pval;
@@ -1026,6 +1032,7 @@ static s32b artifact_power(int a_idx)
 		if (a_ptr->flags1 & TR1_INT) p += 2 * a_ptr->pval;
 		if (a_ptr->flags1 & TR1_WIS) p += 2 * a_ptr->pval;
 		if (a_ptr->flags1 & TR1_DEX) p += 3 * a_ptr->pval;
+		if (a_ptr->flags1 & TR1_AGI) p += 4 * a_ptr->pval;
 		if (a_ptr->flags1 & TR1_CON) p += 4 * a_ptr->pval;
 		if (a_ptr->flags1 & TR1_STEALTH) p += a_ptr->pval;
 		if (a_ptr->flags1 & TR1_STEALTH) p += a_ptr->pval;
@@ -1047,11 +1054,6 @@ static s32b artifact_power(int a_idx)
 		p += a_ptr->pval;
 		LOG_PRINT2("Adding power for infra bonus/penalty %d, total is %d\n", a_ptr->pval, p);
 	}
-	if (a_ptr->flags1 & TR1_SPEED)
-	{
-		p += 5 * a_ptr->pval;
-		LOG_PRINT2("Adding power for speed bonus/penalty %d, total is %d\n", a_ptr->pval, p);
-	}
 
 	ADD_POWER("sustain STR",	 5, TR2_SUST_STR, 2,sustains++);
 	ADD_POWER("sustain INT",	 2, TR2_SUST_INT, 2,sustains++);
@@ -1059,6 +1061,7 @@ static s32b artifact_power(int a_idx)
 	ADD_POWER("sustain DEX",	 4, TR2_SUST_DEX, 2,sustains++);
 	ADD_POWER("sustain CON",	 3, TR2_SUST_CON, 2,sustains++);
 	ADD_POWER("sustain CHR",	 0, TR2_SUST_CHR, 2,sustains++);
+	ADD_POWER("sustain AGI",	 4, TR2_SUST_AGI, 2,sustains++);
 
 	/* Add bonus for sustains getting 'sustain-lock' */
 	if (sustains > 1)
@@ -2176,8 +2179,9 @@ static void parse_frequencies ()
 		 */
 
 		if ( (a_ptr->flags1 & TR1_STR) || (a_ptr->flags1 & TR1_INT) ||
-			(a_ptr->flags1 & TR1_WIS) || (a_ptr->flags1 & TR1_DEX) ||
-			(a_ptr->flags1 & TR1_CON) || (a_ptr->flags1 & TR1_CHR) )
+			 (a_ptr->flags1 & TR1_WIS) || (a_ptr->flags1 & TR1_DEX) ||
+			 (a_ptr->flags1 & TR1_CON) || (a_ptr->flags1 & TR1_CHR) ||
+			 (a_ptr->flags1 & TR1_AGI) )
 		{
 			/* Stat bonus case.  Add up the number of individual bonuses */
 
@@ -2223,10 +2227,11 @@ static void parse_frequencies ()
 				/* Counted this one separately so subtract it here */
 				temp--;
 			}
-			else if ((a_ptr->tval == TV_GLOVES) && (a_ptr->flags1 & TR1_DEX))
+			else if ((a_ptr->tval == TV_GLOVES) 
+					 && (a_ptr->flags1 & TR1_DEX || a_ptr->flags1 & TR1_AGI))
 			{
-				/* Handle DEX bonus on gloves */
-				LOG_PRINT("Adding 1 for DEX bonus on gloves.\n");
+				/* Handle DEX/AGI bonus on gloves */
+				LOG_PRINT("Adding 1 for DEX/AGI bonus on gloves.\n");
 
 				(artprobs[ART_IDX_GLOVE_DEX])++;
 				/* Counted this one separately so subtract it here */
@@ -2247,8 +2252,9 @@ static void parse_frequencies ()
 		}
 
 		if ( (a_ptr->flags2 & TR2_SUST_STR) || (a_ptr->flags2 & TR2_SUST_INT) ||
-			(a_ptr->flags2 & TR2_SUST_WIS) || (a_ptr->flags2 & TR2_SUST_DEX) ||
-			(a_ptr->flags2 & TR2_SUST_CON) || (a_ptr->flags2 & TR2_SUST_CHR) )
+			 (a_ptr->flags2 & TR2_SUST_WIS) || (a_ptr->flags2 & TR2_SUST_DEX) ||
+			 (a_ptr->flags2 & TR2_SUST_CON) || (a_ptr->flags2 & TR2_SUST_CHR) ||
+			 (a_ptr->flags2 & TR2_SUST_AGI))
 		{
 			/* Now do sustains, in a similar manner */
 			temp = 0;
@@ -2258,6 +2264,7 @@ static void parse_frequencies ()
 			if (a_ptr->flags2 & TR2_SUST_DEX) temp++;
 			if (a_ptr->flags2 & TR2_SUST_CON) temp++;
 			if (a_ptr->flags2 & TR2_SUST_CHR) temp++;
+			if (a_ptr->flags2 & TR2_SUST_AGI) temp++;
 
 			LOG_PRINT1("Adding %d for stat sustains.\n", temp);
 
@@ -2333,10 +2340,11 @@ static void parse_frequencies ()
 			(artprobs[ART_IDX_GEN_INFRA])++;
 		}
 
-		if (a_ptr->flags1 & TR1_SPEED)
+		if (a_ptr->flags1 & TR1_AGI)
 		{
 			/*
-			 * Speed - boots handled separately.
+			 * TODO: this was not yet balanced for SPEED to AGI change!
+			 * Speed (agility) - boots handled separately.
 			 * This is something of a special case in that we use the same
 			 * frequency for the supercharged value and the normal value.
 			 * We get away with this by using a somewhat lower average value
@@ -2353,7 +2361,7 @@ static void parse_frequencies ()
 
 				(artprobs[ART_IDX_GEN_SPEED_SUPER])++;
 			}
-			else if(a_ptr->tval == TV_BOOTS)
+			else if (a_ptr->tval == TV_BOOTS)
 			{
 				/* Handle boots separately */
 				LOG_PRINT("Adding 1 for normal speed bonus on boots.\n");
@@ -2897,7 +2905,8 @@ static void add_stat(artifact_type *a_ptr)
 	/* Hack: break out if all stats are raised to avoid an infinite loop */
 	if ((a_ptr->flags1 & TR1_STR) && (a_ptr->flags1 & TR1_INT) &&
 		(a_ptr->flags1 & TR1_WIS) && (a_ptr->flags1 & TR1_DEX) &&
-		(a_ptr->flags1 & TR1_CON) && (a_ptr->flags1 & TR1_CHR))
+		(a_ptr->flags1 & TR1_CON) && (a_ptr->flags1 & TR1_CHR) &&
+		(a_ptr->flags1 & TR1_AGI))
 			return;
 
 	/* Make sure we add one that hasn't been added yet */
@@ -2910,6 +2919,7 @@ static void add_stat(artifact_type *a_ptr)
 		else if (r == 3) success = add_dex(a_ptr);
 		else if (r == 4) success = add_con(a_ptr);
 		else if (r == 5) success = add_chr(a_ptr);
+		/* AGI handled separately */
 	}
 }
 
@@ -2961,6 +2971,14 @@ static bool add_sus_chr(artifact_type *a_ptr)
 	return TRUE;
 }
 
+static bool add_sus_agi(artifact_type *a_ptr)
+{
+	if (a_ptr->flags2 & TR2_SUST_AGI) return FALSE;
+	a_ptr->flags2 |= TR2_SUST_AGI;
+	LOG_PRINT("Adding ability: sustain AGI\n");
+	return TRUE;
+}
+
 static void add_sustain(artifact_type *a_ptr)
 {
 	int r;
@@ -2969,18 +2987,20 @@ static void add_sustain(artifact_type *a_ptr)
 	/* Hack: break out if all stats are sustained to avoid an infinite loop */
 	if ((a_ptr->flags2 & TR2_SUST_STR) && (a_ptr->flags2 & TR2_SUST_INT) &&
 		(a_ptr->flags2 & TR2_SUST_WIS) && (a_ptr->flags2 & TR2_SUST_DEX) &&
-		(a_ptr->flags2 & TR2_SUST_CON) && (a_ptr->flags2 & TR2_SUST_CHR))
+		(a_ptr->flags2 & TR2_SUST_CON) && (a_ptr->flags2 & TR2_SUST_CHR) &&
+		(a_ptr->flags2 & TR2_SUST_AGI))
 			return;
 
 	while (!success)
 	{
-		r = rand_int(6);
+		r = rand_int(7);
 		if (r == 0) success = add_sus_str(a_ptr);
 		else if (r == 1) success = add_sus_int(a_ptr);
 		else if (r == 2) success = add_sus_wis(a_ptr);
 		else if (r == 3) success = add_sus_dex(a_ptr);
 		else if (r == 4) success = add_sus_con(a_ptr);
 		else if (r == 5) success = add_sus_chr(a_ptr);
+		else if (r == 6) success = add_sus_agi(a_ptr);
 	}
 }
 
@@ -3026,12 +3046,12 @@ static void add_tunnelling(artifact_type *a_ptr)
 	LOG_PRINT1("Adding ability: tunnelling (new bonus is %+d)\n", a_ptr->pval);
 }
 
-static void add_speed(artifact_type *a_ptr)
+static void add_agi(artifact_type *a_ptr)
 {
-	a_ptr->flags1 |= TR1_SPEED;
+	a_ptr->flags1 |= TR1_AGI;
 	if (a_ptr->pval == 0)
 	{
-		a_ptr->pval = (s16b)(1 + rand_int(4));
+	    a_ptr->pval = (s16b)(1 + rand_int(3)); /* was 4 with TR1_SPEED */
 		LOG_PRINT1("Adding ability: speed (first time) (now %+d)\n", a_ptr->pval);
 	}
 	else
@@ -4217,7 +4237,7 @@ static void add_ability_aux(artifact_type *a_ptr, int r)
 
 		case ART_IDX_BOOT_SPEED:
 		case ART_IDX_GEN_SPEED:
-			add_speed(a_ptr);
+			add_agi(a_ptr);
 			break;
 
 		case ART_IDX_GLOVE_FA:
@@ -4226,7 +4246,10 @@ static void add_ability_aux(artifact_type *a_ptr, int r)
 			break;
 
 		case ART_IDX_GLOVE_DEX:
-			add_dex(a_ptr);
+			if (rand_int (1))
+			  add_dex(a_ptr);
+			else
+			  add_agi(a_ptr);
 			break;
 
 		case ART_IDX_HELM_RBLIND:
@@ -4430,8 +4453,8 @@ static void try_supercharge(artifact_type *a_ptr)
 	/* Big speed bonus - any item (potentially) */
 	if (rand_int (z_info->a_max) < artprobs[ART_IDX_GEN_SPEED_SUPER])
 	{
-		a_ptr->flags1 |= TR1_SPEED;
-		a_ptr->pval = 6 + rand_int(4);
+		a_ptr->flags1 |= TR1_AGI;
+		a_ptr->pval = 4 + rand_int(3); /* was 6 + rand_int(4) with TR1_SPEED */
 		LOG_PRINT1("Supercharging speed for this item!  (New speed bonus is %d)\n", a_ptr->pval);
 	}
 	/* Aggravation */

@@ -790,7 +790,8 @@ cptr desc_stat_dec[] =
 	"more naive",
 	"clumsier",
 	"sicklier",
-	"uglier"
+	"uglier",
+	"more slugish"
 };
 
 
@@ -804,7 +805,8 @@ static cptr desc_stat_dec_end[] =
 	"naive",
 	"clumsy",
 	"sickly",
-	"ugly"
+	"ugly",
+	"slugish"
 };
 
 /*

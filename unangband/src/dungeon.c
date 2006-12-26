@@ -1450,6 +1450,8 @@ static void process_world(void)
 				case DISEASE_SLOW:
 				{
 					(void)set_slow(p_ptr->slow + randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10);
+					/* Also slightly reduce agility. */
+					dec_stat(A_AGI, p_ptr->disease & (DISEASE_POWER) ? randint(3) : 1, 0);
 					break;
 				}
 
@@ -1670,9 +1672,10 @@ static void process_world(void)
 		(void)res_stat(A_STR);
 		(void)res_stat(A_INT);
 		(void)res_stat(A_WIS);
-		(void)res_stat(A_CON);
 		(void)res_stat(A_DEX);
+		(void)res_stat(A_CON);
 		(void)res_stat(A_CHR);
+		(void)res_stat(A_AGI);
 
 		/* Restore experience. */
 		p_ptr->exp = p_ptr->max_exp;

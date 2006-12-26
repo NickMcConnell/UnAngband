@@ -690,8 +690,9 @@ void do_cmd_wield(void)
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 	/* Hack -- identify pval */
-	if (f1 & (TR1_BLOWS | TR1_SHOTS | TR1_SPEED | TR1_STR |
-		TR1_INT | TR1_DEX | TR1_CON | TR1_CHR)) o_ptr->ident |= (IDENT_PVAL);
+	if (f1 & (TR1_BLOWS | TR1_SHOTS | TR1_STR |
+			  TR1_INT | TR1_DEX | TR1_CON | TR1_CHR | TR1_AGI))
+	  o_ptr->ident |= (IDENT_PVAL);
 
 	/* Hack -- the following are obvious from the displayed combat statistics */
 	if (f1 & (TR1_BLOWS)) object_can_flags(o_ptr,TR1_BLOWS,0x0L,0x0L,0x0L);
@@ -699,10 +700,6 @@ void do_cmd_wield(void)
 
 	if (f1 & (TR1_SHOTS)) object_can_flags(o_ptr,TR1_SHOTS,0x0L,0x0L,0x0L);
 	else object_not_flags(o_ptr,TR1_SHOTS,0x0L,0x0L,0x0L);
-
-	/* Hack -- the following are obvious from the displayed combat statistics */
-	if (f1 & (TR1_SPEED)) object_can_flags(o_ptr,TR1_SPEED,0x0L,0x0L,0x0L);
-	else object_not_flags(o_ptr,TR1_SPEED,0x0L,0x0L,0x0L);
 
 	/* Hack -- the following are obvious from the displayed stats */
 	if (f1 & (TR1_STR)) object_can_flags(o_ptr,TR1_STR,0x0L,0x0L,0x0L);
@@ -722,6 +719,9 @@ void do_cmd_wield(void)
 
 	if (f1 & (TR1_CHR)) object_can_flags(o_ptr,TR1_CHR,0x0L,0x0L,0x0L);
 	else object_not_flags(o_ptr,TR1_CHR,0x0L,0x0L,0x0L);
+
+	if (f1 & (TR1_AGI)) object_can_flags(o_ptr,TR1_AGI,0x0L,0x0L,0x0L);
+	else object_not_flags(o_ptr,TR1_AGI,0x0L,0x0L,0x0L);
 
 #ifndef ALLOW_OBJECT_INFO_MORE
 	/* Hack --- we do these here, because they are too computationally expensive in the 'right' place */

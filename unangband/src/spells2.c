@@ -125,7 +125,8 @@ static cptr desc_stat_pos[] =
 	"wise",
 	"dextrous",
 	"healthy",
-	"cute"
+	"cute",
+	"agile"
 };
 
 
@@ -139,7 +140,8 @@ static cptr desc_stat_neg[] =
 	"naive",
 	"clumsy",
 	"sickly",
-	"ugly"
+	"ugly",
+	"slugish"
 };
 
 
@@ -6776,6 +6778,7 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 		if ((s_ptr->flags3 & (SF3_INC_DEX)) && (set_stat_inc_tim(lasts, A_DEX))) obvious = TRUE;
 		if ((s_ptr->flags3 & (SF3_INC_CON)) && (set_stat_inc_tim(lasts, A_CON))) obvious = TRUE;
 		if ((s_ptr->flags3 & (SF3_INC_CHR)) && (set_stat_inc_tim(lasts, A_CHR))) obvious = TRUE;
+		if ((s_ptr->flags3 & (SF3_INC_AGI)) && (set_stat_inc_tim(lasts, A_AGI))) obvious = TRUE;
 	}
 	/* SF3 - no duration specified, so permanent stat increase */
 	else
@@ -6786,6 +6789,7 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 		if ((s_ptr->flags3 & (SF3_INC_DEX)) && (do_inc_stat(A_DEX))) obvious = TRUE;
 		if ((s_ptr->flags3 & (SF3_INC_CON)) && (do_inc_stat(A_CON))) obvious = TRUE;
 		if ((s_ptr->flags3 & (SF3_INC_CHR)) && (do_inc_stat(A_CHR))) obvious = TRUE;
+		if ((s_ptr->flags3 & (SF3_INC_AGI)) && (do_inc_stat(A_AGI))) obvious = TRUE;
 	}
 
 	/* SF3 - healing self, and untimed improvements */
@@ -6795,6 +6799,7 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 	if ((s_ptr->flags3 & (SF3_CURE_DEX))  && (do_res_stat(A_DEX))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CON))  && (do_res_stat(A_CON))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CHR))  && (do_res_stat(A_CHR))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_AGI))  && (do_res_stat(A_AGI))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_EXP)) && (restore_level())) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_FREE_ACT)) && (set_slow(0))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_MEM)) && (set_amnesia(0))) obvious = TRUE;
