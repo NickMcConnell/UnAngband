@@ -3301,7 +3301,7 @@ void do_cmd_fire_selected(object_type *o_ptr, int item)
 
 	int dir, item2 = 0;
 	int i, j, y, x, ty, tx;
-	int tdam, tdis, thits, tmul;
+	int tdam, tdis, tmul;
 	int bonus, chance;
 
 	int style_hit, style_dam, style_crit;
@@ -3447,9 +3447,6 @@ void do_cmd_fire_selected(object_type *o_ptr, int item)
 	missile_attr = object_attr(i_ptr);
 	missile_char = object_char(i_ptr);
 
-	/* Use the proper number of shots */
-	thits = p_ptr->num_fire;
-
 	/* Base damage from thrown object */
 	tdam = damroll(i_ptr->dd, i_ptr->ds);
 
@@ -3467,7 +3464,7 @@ void do_cmd_fire_selected(object_type *o_ptr, int item)
 	tdis = 6 + 3 * tmul;
 
 	/* Take a turn */
-	p_ptr->energy_use = (100 / thits);
+	p_ptr->energy_use = (100 / p_ptr->num_fire);
 
 	/* Start at the player */
 	y = py;
@@ -3911,7 +3908,7 @@ void do_cmd_throw_selected(object_type *o_ptr, int item)
 	chance = (p_ptr->skill_tht + (bonus * BTH_PLUS_ADJ));
 
 	/* Take a turn */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = (100 / p_ptr->num_throw);
 
 	/* Start at the player */
 	y = py;
