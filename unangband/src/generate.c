@@ -2417,11 +2417,11 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 {
 	int i, count, pick, match, chance;
 
-	int counter;
+	int counter = 0;
 
 	/* Process the description */
 	/* Note we need 1 space at end of room_desc_sections to terminate description */
-	while (*chart && (*j < ROOM_DESC_SECTIONS - 1))
+	while ((*chart != 0) && (*j < ROOM_DESC_SECTIONS - 1))
 	{
 		/* Start over */
 		i = 0;
@@ -2432,7 +2432,11 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 		/* Get the start of entries in the table for this index */
 		while ((*chart != d_info[i].chart) && (counter < 5000)) { i++; counter++;}
 
-		if (counter >= 5000) break;
+		if (counter >= 5000)
+		{
+			msg_print("Error: aborting loop in room descriptions.");
+			break;
+		}
 
 		/* Cycle through valid entries */
 		while (*chart == d_info[i].chart)
@@ -2546,7 +2550,7 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 				|| ( ((*name & (PICKED_NAME2)) == 0) && (strlen(d_name + d_info[i].name2) > 0))
 				|| (strlen(d_text + d_info[i].text) > 0))
 			{
-				room_info[room].section[*j++] = i;
+				room_info[room].section[(*j)++] = i;
 
 				if (strlen(d_name + d_info[i].name1) > 0) *name |= PICKED_NAME1;
 				if (strlen(d_name + d_info[i].name2) > 0) *name |= PICKED_NAME2;
@@ -2650,8 +2654,6 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 		/* Report errors */
 		if (pick < 0)
 		{
-			msg_format("Error: unable to pick from chart entry %d with %d valid choices", chart, count);
-
 			return (FALSE);
 		}
 	}
@@ -2685,10 +2687,24 @@ static void set_room_flags(int room, int type)
 	byte branch_on = 0;
 
 	/* Get room info */
-	while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name, 
-			RG1_NORTH | RG1_SOUTH | RG1_WEST | RG1_EAST | RG1_INNER))
+	while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name, 0L))
 	{
-		/* Do nothing */
+		/* Clear object hook */
+		if (place_tval)
+		{
+			get_obj_num_hook = NULL;
+
+			/* Prepare allocation table */
+			get_obj_num_prep();
+
+			place_tval = 0;
+			place_min_sval = 0;
+			place_max_sval = 0;
+		}
+
+		/* Clear placement details */
+		place_flag = 0;
+		place_feat = 0;
 	}
 
 	/* Type */
@@ -6365,7 +6381,7 @@ static bool build_type7(int room, int type)
 	build_chambers(y1, x1, y2, x2, 30, light);
 
 	/* Initialize room description */
-	room_info[dun->cent_n+1].type = ROOM_CHAMBERS;
+	room_info[dun->cent_n].type = ROOM_CHAMBERS;
 
 	/* Set the chamber flags */
 	set_room_flags(room, type);
@@ -6399,7 +6415,7 @@ static bool build_type8910(int room, int type)
 	if (!find_space(&y0, &x0, v_ptr->hgt, v_ptr->wid)) return (FALSE);
 
 	/* Initialize room description */
-	room_info[dun->cent_n+1].type = ROOM_INTERESTING + type - 8;
+	room_info[dun->cent_n].type = ROOM_INTERESTING + type - 8;
 
 	/* Boost the rating */
 	rating += v_ptr->rat;
@@ -6433,7 +6449,7 @@ static bool build_type1112(int room, int type)
 	if (!find_space(&y0, &x0, dy * 2 + 1, dx * 2 + 1)) return (FALSE);
 
 	/* Initialize room description */
-	room_info[dun->cent_n+1].type = ROOM_STARBURST;
+	room_info[dun->cent_n].type = ROOM_STARBURST;
 
 	/* Try building starburst */
 	build_type_starburst(y0, x0, dy, dx, light);
@@ -6441,7 +6457,7 @@ static bool build_type1112(int room, int type)
 	/* Set the vault / interesting room flags */
 	set_room_flags(room, type);
 
-	return (FALSE);
+	return (TRUE);
 }
 
 
@@ -6465,15 +6481,15 @@ static bool build_type131415(int room, int type)
 	if (!find_space(&y0, &x0, height, width)) return (FALSE);
 
 	/* Initialize room description */
-	room_info[dun->cent_n+1].type = ROOM_FRACTAL;
+	room_info[dun->cent_n].type = ROOM_FRACTAL;
 
 	/* Build fractal */
-	if (build_type_fractal(y0, x0, fractal_type)) return (TRUE);
+	if (!build_type_fractal(y0, x0, fractal_type)) return (FALSE);
 
 	/* Set the vault / interesting room flags */
 	set_room_flags(room, type);
 
-	return (FALSE);
+	return (TRUE);
 }
 
 
@@ -6482,8 +6498,6 @@ static bool build_type131415(int room, int type)
  */
 static bool room_build(int room, int type)
 {
-	msg_format("Attempting room %d.",type);
-
 	/* Build a room */
 	switch (type)
 	{
