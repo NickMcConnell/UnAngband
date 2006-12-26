@@ -2690,6 +2690,12 @@ static void set_room_flags(int room, int type)
 	{
 		/* Do nothing */
 	}
+
+	/* Type */
+	room_info[room].type = ROOM_NORMAL;
+
+	/* Terminate index list */
+	room_info[room].section[j] = -1;
 }
 
 
