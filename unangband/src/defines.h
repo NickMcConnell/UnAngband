@@ -3007,7 +3007,7 @@
 #define TR1_STR    0x00000001L     /* STR += "pval" */
 #define TR1_INT    0x00000002L     /* INT += "pval" */
 #define TR1_WIS    0x00000004L     /* WIS += "pval" */
-#define TR1_DEX    0x00000008L     /* DEX += "pval" */
+#define TR1_DEX    0x00000008L     /* DEX += "pval"; AGI += "pval" */
 #define TR1_CON    0x00000010L     /* CON += "pval" */
 #define TR1_CHR    0x00000020L     /* CHR += "pval" */
 #define TR1_SAVE   0x00000040L     /* Saves += "pval" */
@@ -3040,7 +3040,7 @@
 #define TR2_SUST_STR     0x00000001L     /* Sustain STR */
 #define TR2_SUST_INT     0x00000002L     /* Sustain INT */
 #define TR2_SUST_WIS     0x00000004L     /* Sustain WIS */
-#define TR2_SUST_DEX     0x00000008L     /* Sustain DEX */
+#define TR2_SUST_DEX     0x00000008L     /* Sustain DEX and AGI */
 #define TR2_SUST_CON     0x00000010L     /* Sustain CON */
 #define TR2_SUST_CHR     0x00000020L     /* Sustain CHR */
 #define TR2_IGNORE_ACID   0x00000040L     /* Item ignores Acid damage */

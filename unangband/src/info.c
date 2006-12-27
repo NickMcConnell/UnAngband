@@ -5940,7 +5940,7 @@ s32b object_power(const object_type *o_ptr)
 		}
 		if (f1 & TR1_DEX)
 		{
-			p += 3 * o_ptr->pval * o_ptr->pval / 4;  /* Was 3 * o_ptr->pval */
+			p += o_ptr->pval * o_ptr->pval;  /* Was 3 * o_ptr->pval */
 		}
 		if (f1 & TR1_CON)
 		{
@@ -5990,7 +5990,7 @@ s32b object_power(const object_type *o_ptr)
 		if (f1 & TR1_STR) p += 4 * o_ptr->pval;
 		if (f1 & TR1_INT) p += 2 * o_ptr->pval;
 		if (f1 & TR1_WIS) p += 2 * o_ptr->pval;
-		if (f1 & TR1_DEX) p += 3 * o_ptr->pval;
+		if (f1 & TR1_DEX) p += 4 * o_ptr->pval;
 		if (f1 & TR1_CON) p += 4 * o_ptr->pval;
 		if (f1 & TR1_CHR) p += o_ptr->pval;
 		if (f1 & TR1_SAVE) p += o_ptr->pval;

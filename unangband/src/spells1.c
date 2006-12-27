@@ -8328,7 +8328,7 @@ bool project_p(int who, int y, int x, int dam, int typ)
 
 				case 6: case 7: case 8: case 9:
 				{
-					k = rand_int(A_MAX);
+  				    k = rand_int(A_MAX); /* AGI not coupled with DEX */
 
 					msg_format("You're not as %s as you used to be...", desc_stat_imp_end[k]);
 
