@@ -1912,7 +1912,7 @@ static void display_player_xtra_info(void)
 	desc = likert(xdis, 8, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 16, col+11);
 
-	put_str("Perception", 17, col);
+	put_str("Searching", 17, col);
 	desc = likert(xfos, 6, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 17, col+11);
 
