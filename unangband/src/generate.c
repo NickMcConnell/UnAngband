@@ -311,12 +311,12 @@ static room_data room[ROOM_MAX] =
    /* Lrg cent */ {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	2, 0, LF1_STRONGHOLD | LF1_DUNGEON},
    /* Xlg cent */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,DUN_ROOMS/4,	3, 0, LF1_STRONGHOLD},
    /* Chambers */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	1,		3, 0, LF1_CHAMBERS},
-   /* I. Room */  {{30,  60,  70,  80,  80,  75,  70,  67,  65,  62,  60},  0,  2,		1, 0, 0L},
+   /* I. Room */  {{30,  60,  70,  80,  80,  75,  70,  67,  65,  62,  60},  0,  2,		1, 0, LF1_DUNGEON},
    /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	2,		2, 0, LF1_DUNGEON | LF1_VAULT},
    /* G. Vault */ {{ 0,   0,   1,   2,   3,   4,   6,   7,   8,  10,  12}, 20,	1,		3, 0, LF1_VAULT},
    /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	1,		3, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE},
    /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		3, 0, LF1_CAVE},
-   /* Fractal */  {{60, 100, 120, 140, 160, 180, 200, 200, 200, 200, 200},  1,DUN_ROOMS,	2, 0, LF1_MINE | LF1_CAVE | LF1_LAIR},
+   /* Fractal */  {{100, 100, 120, 140, 160, 180, 200, 200, 200, 200, 200},  1,DUN_ROOMS,	2, 0, LF1_MINE | LF1_CAVE | LF1_LAIR},
    /* Lrg fra */  {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	3, 0, LF1_MINE | LF1_CAVE | LF1_LAIR},
    /* Huge fra */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE | LF1_LAIR},
    /* Lair */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		1, 0, LF1_LAIR}
@@ -3780,7 +3780,7 @@ static void fractal_map_to_room(fractal_map map, byte fractal_type, int y0, int 
 				/* Place usual walls on other levels */
 				else
 				{
-					cave_set_feat(yy, xx, FEAT_WALL_EXTRA);
+					cave_set_feat(yy, xx, FEAT_WALL_OUTER);
 				}
 			}
 			else
@@ -5388,23 +5388,19 @@ static void build_roof(int y0, int x0, int ymax, int xmax, cptr data)
  * corridors
  */
 
-#define TUNNEL_STYLE	4	/* First 'real' style */
-#define TUNNEL_CRYPT_L	4
-#define TUNNEL_CRYPT_R	8
-#define TUNNEL_LARGE_L	16
-#define TUNNEL_LARGE_R	32
-#define TUNNEL_CAVE	64
+#define TUNNEL_STYLE	4L	/* First 'real' style */
+#define TUNNEL_CRYPT_L	4L
+#define TUNNEL_CRYPT_R	8L
+#define TUNNEL_LARGE_L	16L
+#define TUNNEL_LARGE_R	32L
+#define TUNNEL_CAVE	64L
 
-static int get_tunnel_style(void)
+static u32b get_tunnel_style(void)
 {
 	int style = 0;
 
 	/* Change tunnel type */
-	if (level_flag & (LF1_VAULT))
-	{
-		style |= (TUNNEL_LARGE_L | TUNNEL_LARGE_R);
-	}
-	else if (level_flag & (LF1_STRONGHOLD))
+	if (level_flag & (LF1_STRONGHOLD))
 	{
 		if (p_ptr->depth % 2) style |= (TUNNEL_LARGE_L);
 		else style |= (TUNNEL_LARGE_R);
@@ -5414,7 +5410,10 @@ static int get_tunnel_style(void)
 		if (rand_int(100) < 50) style |= (TUNNEL_CRYPT_L);
 		if (rand_int(100) < 50) style |= (TUNNEL_CRYPT_R);
 	}
-	else if (level_flag & (LF1_CAVE)) style |= (TUNNEL_CAVE);
+	else if (level_flag & (LF1_CAVE))
+	{
+		style |= (TUNNEL_CAVE);
+	}
 
 	style |= rand_int(TUNNEL_STYLE);
 
@@ -5487,7 +5486,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	bool overrun_flag = FALSE;
 
 	/* Force style change */
-	int style = get_tunnel_style();
+	u32b style = get_tunnel_style();
 
 	int by1 = row1/BLOCK_HGT;
 	int bx1 = col1/BLOCK_WID;
@@ -6523,6 +6522,8 @@ static bool room_build(int room, int type)
 		case 1: if (build_type123(room, type)) return(TRUE); break;
 	}
 
+	msg_print("Failed");
+
 	/* Failure */
 	return (FALSE);
 }
@@ -6552,9 +6553,9 @@ void init_level_flags(void)
 	if (!zone->fill) level_flag |= LF1_TOWN;
 
 	/* Define wilderness */
-	if ((zone->fill) && ((f_info[zone->fill].flags1 & (FF1_WALL)) != 0)) level_flag |= LF1_WILD;
-	if ((zone->big) && ((f_info[zone->big].flags1 & (FF1_WALL)) != 0)) level_flag |= LF1_WILD;
-	if ((zone->small) && ((f_info[zone->small].flags1 & (FF1_WALL)) != 0)) level_flag |= LF1_WILD;
+	if ((zone->fill) && ((f_info[zone->fill].flags1 & (FF1_WALL)) != 0)) level_flag |= LF1_FEATURE;
+	if ((zone->big) && ((f_info[zone->big].flags1 & (FF1_WALL)) != 0)) level_flag |= LF1_FEATURE;
+	if ((zone->small) && ((f_info[zone->small].flags1 & (FF1_WALL)) != 0)) level_flag |= LF1_FEATURE;
 
 	/* No dungeon, no stairs */
 	if (min_depth(p_ptr->dungeon) == max_depth(p_ptr->dungeon))
@@ -6630,6 +6631,8 @@ static void cave_gen(void)
 	dungeon_zone *zone=&t_info[0].zone[0];
 
 	dun_data dun_body;
+
+	int counter = 0;
 
 	/* Global data */
 	dun = &dun_body;
@@ -6737,7 +6740,7 @@ static void cave_gen(void)
 	if ((p_ptr->depth > 10) && (rand_int(DUN_DEST) == 0)) level_flag |= LF1_DESTROYED;
 
 	/* Hack -- No destroyed "quest", "wild" or "guardian" levels */
-	if (level_flag & (LF1_QUEST | LF1_WILD | LF1_GUARDIAN)) level_flag &= ~(LF1_DESTROYED);
+	if (level_flag & (LF1_QUEST | LF1_FEATURE | LF1_GUARDIAN)) level_flag &= ~(LF1_DESTROYED);
 
 	/* No features in a tower above the surface */
 	if (((level_flag & (LF1_TOWER)) == 0) || ((level_flag & (LF1_SURFACE)) != 0))
@@ -6921,7 +6924,7 @@ static void cave_gen(void)
 			if (room[room_type].min_level > p_ptr->depth) continue;
 
 			/* Skip if level themed and we don't match the theme */
-			if (((level_flag & (LF1_THEME)) != 0) && ((room[room_type].theme & (level_flag)) != 0)) continue;
+			if (((level_flag & (LF1_THEME)) != 0) && ((room[room_type].theme & (level_flag)) == 0)) continue;
 
 			/* Build the room. */
 			while ((rand_int(100) < room[room_type].chance[p_ptr->depth < 100 ? p_ptr->depth / 10 : 10])
@@ -6943,15 +6946,19 @@ static void cave_gen(void)
 					for (j = 0; j < 32; j++)
 					{
 						/* Pick a theme */
-						if ( ((room[room_type].theme & (1L << j)) != 0) && (rand_int(++k))) choice = j;
+						if ( ((room[room_type].theme & (1L << j)) != 0) && (rand_int(++k) == 0)) choice = j;
 					}
 
 					/* Set a theme if picked */
-					if (choice >= 0) level_flag |= (1L << choice);
+					if (choice >= 0)
+					{
+						level_flag |= (1L << choice);
+					}
 				}
 			}
 		}
 	}
+
 
 	/* Special boundary walls -- Top */
 	for (x = 0; x < DUNGEON_WID; x++)
@@ -7036,6 +7043,13 @@ static void cave_gen(void)
 
 	while (dun->part_n > 1)
 	{
+		if (++counter > 500)
+		{
+			msg_format("Cannot connect rooms.");
+
+			break;
+		}
+
 		for (i = 0; i < dun->cent_n; i++)
 		{
 			int dist = 30000;

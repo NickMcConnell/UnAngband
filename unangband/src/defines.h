@@ -2735,8 +2735,9 @@
 #define LF1_CAVE	0x00080000L	/* Cave level */
 #define LF1_TOWN	0x00100000L	/* Town level */
 #define LF1_WILD	0x00200000L	/* Wilderness level */
-#define LF1_CHAMBERS	0x00400000L	/* Chambers level */
-
+#define LF1_RUIN	0x00400000L	/* Chambers level */
+#define LF1_FEATURE	0x00800000L	/* Chambers level */
+#define LF1_CHAMBERS	0x01000000L	/* Chambers level */
 #define LF1_DARK	0x02000000L	/* Dark room */
 #define LF1_QUEST	0x04000000L	/* Quest level */
 #define LF1_GUARDIAN	0x08000000L	/* Guarded level */
