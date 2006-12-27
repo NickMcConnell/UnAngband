@@ -2015,6 +2015,7 @@
 #define SV_AMULET_TRICKERY		20
 #define SV_AMULET_INFRAVISION		21
 #define SV_AMULET_RESIST_LIGHTNING  22
+#define SV_AMULET_SERPENTS      23
 
 
 /* The sval codes for TV_RING */

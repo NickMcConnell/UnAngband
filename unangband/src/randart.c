@@ -2905,8 +2905,7 @@ static void add_stat(artifact_type *a_ptr)
 	/* Hack: break out if all stats are raised to avoid an infinite loop */
 	if ((a_ptr->flags1 & TR1_STR) && (a_ptr->flags1 & TR1_INT) &&
 		(a_ptr->flags1 & TR1_WIS) && (a_ptr->flags1 & TR1_DEX) &&
-		(a_ptr->flags1 & TR1_CON) && (a_ptr->flags1 & TR1_CHR) &&
-		(a_ptr->flags1 & TR1_AGI))
+		(a_ptr->flags1 & TR1_CON) && (a_ptr->flags1 & TR1_CHR))
 			return;
 
 	/* Make sure we add one that hasn't been added yet */
@@ -2919,7 +2918,6 @@ static void add_stat(artifact_type *a_ptr)
 		else if (r == 3) success = add_dex(a_ptr);
 		else if (r == 4) success = add_con(a_ptr);
 		else if (r == 5) success = add_chr(a_ptr);
-		/* AGI handled separately */
 	}
 }
 

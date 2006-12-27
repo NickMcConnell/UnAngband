@@ -92,6 +92,7 @@
 #
 # Changes related to AGI/DEX rebalance:
 # moved Seven League deeper and Thievery shallower
+# added Cloaks of the Bat
 #
 # TODO: I have no clue how to restrict SPEED items to below DL 40
 # (or assure their pvals are DL/10 + 1 below DL 40)
@@ -156,7 +157,7 @@ N:9:of the Quendi
 X:30:25:2
 W:0:4:0:15000
 C:0:0:10:3
-T:35:0:7
+T:35:0:6
 T:36:0:99
 T:37:0:99
 F:STEALTH | 
@@ -206,7 +207,7 @@ X:32:25:2
 W:60:4:0:20000
 C:0:0:20:0
 T:34:0:99
-T:35:0:7
+T:35:0:99
 T:36:2:2
 F:RES_DISEN | SUST_STR | SUST_CON | SUST_DEX | HOLD_LIFE | 
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD
@@ -364,24 +365,34 @@ N:40:(Spiderthread)
 X:31:15:0
 W:0:2:0:1500
 C:0:0:10:0
-T:35:0:7
+T:35:0:3
+T:35:6:6
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | RES_SHARD | ANIMAL
 Y:25:2
+
+# Cloak, but only the two light svals, DEX instead of SPEED, but higher pval
+N:41:of the Bat
+X:31:15:0
+W:0:3:0:3000
+C:-10:-10:15:5
+T:35:1:1
+T:35:6:6
+F:DEX | RES_DARK | SEE_INVIS | INFRA | STEALTH | ANIMAL
 
 N:42:of Aman
 X:31:20:2
 W:0:6:0:4000
 C:0:0:20:3
-T:35:0:7
+T:35:0:8
 F:STEALTH | 
-F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | MAN
+F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD
 Y:23:3
 
 N:43:of Shadows
 X:31:15:0
 W:0:4:0:1500
 C:0:0:0:5
-T:35:0:7
+T:35:0:8
 F:STEALTH | RES_DARK
 Y:18:3
 
@@ -392,7 +403,7 @@ X:31:15:0
 W:20:4:0:3000
 C:0:0:0:5
 T:30:2:3
-T:35:0:7
+T:35:0:6
 F:STEALTH | RES_SOUND | SILENT
 Y:19:3
 
@@ -401,7 +412,7 @@ X:31:15:0
 W:32:4:0:2000
 C:0:0:5:0
 T:30:2:3
-T:35:0:7
+T:35:0:8
 O:ELF
 F:STEALTH | FEATHER | IGNORE_ACID | IGNORE_FIRE
 Y:10:3
@@ -472,7 +483,7 @@ N:60:of Stability
 X:35:20:0
 W:0:10:0:5000
 T:30:0:99
-T:35:0:7
+T:35:0:99
 F:RES_NEXUS | FEATHER | ANCHOR
 Y:25:3
 

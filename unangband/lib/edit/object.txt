@@ -1,4 +1,4 @@
-# File: k_info.txt
+# File: object.txt
 
 
 # This file is used to initialize the "lib/raw/k_info.raw" file, which is
@@ -997,7 +997,7 @@ P:10:1d1:0:0:10
 F:IGNORE_ACID
 
 
-### The Cloaks ###
+### Cloaks ###
 
 N:123:& Cloak~
 G:(:g
@@ -1079,7 +1079,7 @@ A:30/1
 F:STR | SUST_STR
 Y:25:2
 
-N:133:Dexterity
+N:133:Dexterity and Agility
 G:=:w
 I:45:26:0
 W:30:0:2:500
@@ -1103,12 +1103,12 @@ A:30/1
 F:INT | SUST_INT
 Y:17:2
 
-N:136:Agility
+N:136:Speed
 G:=:w
 I:45:31:0
 W:75:0:2:100000
 A:75/1
-F:AGI | SUST_AGI
+F:SPEED
 Y:27:2
 
 N:137:Searching
@@ -1131,7 +1131,7 @@ G:=:w
 I:45:6:0
 W:50:0:2:20000
 A:50/4
-F:SUST_STR | SUST_INT | SUST_WIS | SUST_DEX | SUST_CON | SUST_CHR | SUST_AGI
+F:SUST_STR | SUST_INT | SUST_WIS | SUST_DEX | SUST_CON | SUST_CHR
 Y:20:5
 
 N:140:Resist Fire
@@ -1291,7 +1291,7 @@ A:10/1
 F:SUST_CON
 Y:24:1
 
-N:160:Sustain Dexterity
+N:160:Sustain Dexterity and Agility
 G:=:w
 I:45:14:0
 W:10:0:2:250
@@ -1394,7 +1394,7 @@ G:":w
 I:40:0:-5
 W:50:0:3:0
 A:50/1
-F:LIGHT_CURSE | STR | INT | WIS | DEX | CON | CHR | AGI
+F:LIGHT_CURSE | STR | INT | WIS | DEX | CON | CHR
 
 ##### Scrolls #####
 
@@ -1975,7 +1975,7 @@ A:1/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:251:Dexterity
+N:251:Dexterity and Agility
 G:!:w
 I:75:51:0
 W:35:0:4:400
@@ -1984,7 +1984,7 @@ P:0:1d1:0:0:0
 Y:26:2
 F:THROWING
 
-N:252:Restore Dexterity
+N:252:Restore Dexterity and Agility
 G:!:d
 I:75:45:0
 W:25:0:4:300
@@ -3487,7 +3487,7 @@ G:":w
 I:40:20:1
 W:70:0:3:30000
 A:70/8
-F:DEX | SUST_DEX | AGI | SUST_AGI | STEALTH | SEARCH | INFRA | 
+F:STEALTH | SPEED | SEARCH | INFRA | 
 F:RES_NEXUS | RES_POIS
 Y:16:4
 
@@ -6430,7 +6430,7 @@ A:10/1
 
 # Additional services
 
-N:884:Restore Dexterity
+N:884:Restore Dexterity and Agility
 G:?:v
 I:99:46:0
 W:20:0:0:250
@@ -6497,7 +6497,7 @@ G:=:w
 I:45:39:0
 W:20:0:2:1000
 A:20/2
-F:SUST_INT | SUST_WIS | SUST_AGI
+F:SUST_INT | SUST_WIS | SUST_DEX
 Y:20:4
 
 N:895:Sustain Body
@@ -6505,7 +6505,7 @@ G:=:w
 I:45:40:0
 W:20:0:2:1000
 A:20/2
-F:SUST_STR | SUST_CON | SUST_CHR | SUST_DEX
+F:SUST_STR | SUST_CON | SUST_CHR
 Y:20:3
 
 # Additional scrolls
@@ -6614,7 +6614,7 @@ P:3:1d1:0:0:0
 
 N:908:Leather Coat~
 G:(:U
-I:35:6:0
+I:35:5:0
 W:10:0:100:150
 A:10/1
 P:5:1d1:-1:0:0
@@ -6633,27 +6633,11 @@ W:25:0:220:750
 A:25/1
 P:13:1d4:-3:0:0
 
-# Additional service
-
-N:911:Restore Agility
-G:?:v
-I:99:52:0
-W:20:0:0:250
-
-# Additional potions
-
-N:912:Agility
-G:!:w
-I:75:84:0
-W:35:0:4:400
-A:35/1
-P:0:1d1:0:0:0
-Y:26:2
-F:THROWING
-
-N:913:Restore Agility
-G:!:d
-I:75:85:0
-W:25:0:4:300
-A:25/1
-P:0:1d1:0:0:0
+# Amulet with DEX, as opposed to SPEED (Trickery)
+N:911:the Serpents
+G:":G
+I:40:23:1
+W:35:0:3:20000
+A:35/2
+F:RES_POIS | DEX | ACTIVATE
+Y:16:4

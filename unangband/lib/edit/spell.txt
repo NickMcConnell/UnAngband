@@ -14,8 +14,8 @@
 # === Understanding spell.txt ===
 
 # N: number : name
-# A: tval : sval:slot
-# C: class: level:mana:failure:min failure
+# A: tval : sval : slot
+# C: class : level : mana : failure : min failure
 # F: flags
 # B: attack method : attack effect : damage
 # L: duration
@@ -631,6 +631,7 @@ A:65:60:4
 A:90:8:3
 A:90:19:6
 A:93:4:13
+A:40:23:1
 P:9:0
 C:1:20:9:50:8
 C:10:22:19:60:6
@@ -1345,7 +1346,7 @@ A:99:10:1
 C:2:35:70:90:230
 C:5:40:80:90:200
 C:8:37:75:90:215
-F:CURE_STR | CURE_INT | CURE_WIS | CURE_DEX | CURE_CON | CURE_CHR | CURE_AGI | CURE_MEM
+F:CURE_STR | CURE_INT | CURE_WIS | CURE_DEX | CURE_CON | CURE_CHR | CURE_MEM
 
 N:100:Remembrance
 A:75:41:1
@@ -3255,7 +3256,7 @@ N:302:Life
 A:75:39:1
 B:SELF:HEAL:0d0+5000
 F:CURE_CUTS | CURE_STUN | CURE_POIS | CURE_BLIND | CURE_CONF | CURE_IMAGE
-F:CURE_STR | CURE_INT | CURE_WIS | CURE_DEX | CURE_CON | CURE_CHR | CURE_AGI
+F:CURE_STR | CURE_INT | CURE_WIS | CURE_DEX | CURE_CON | CURE_CHR
 F:CURE_MEM
 S:CURE_DISEASE:30
 D:You feel life flow through your body.
@@ -3325,8 +3326,8 @@ F:CURE_CHR | INC_CHR
 N:314:Augmentation
 A:75:55:1
 L:1d50+50
-F:CURE_STR | CURE_INT | CURE_WIS | CURE_DEX | CURE_CON | CURE_CHR | CURE_AGI
-F:INC_STR | INC_INT | INC_WIS | INC_DEX | INC_CON | INC_CHR | INC_AGI
+F:CURE_STR | CURE_INT | CURE_WIS | CURE_DEX | CURE_CON | CURE_CHR
+F:INC_STR | INC_INT | INC_WIS | INC_DEX | INC_CON | INC_CHR
 
 N:315:*Enlightenment*
 A:75:57:1
@@ -4141,11 +4142,11 @@ F:CURE_WIS
 
 N:419:Restore Body
 A:75:54:1
-F:CURE_STR | CURE_CON | CURE_CHR | CURE_DEX
+F:CURE_STR | CURE_CON | CURE_CHR
 
 N:420:Restore Mind
 A:75:75:1
-F:CURE_INT | CURE_WIS | CURE_AGI | CURE_MEM
+F:CURE_INT | CURE_WIS | CURE_DEX | CURE_MEM
 
 N:421:Dark Rituals
 A:70:74:1
@@ -4626,12 +4627,3 @@ C:10:32:60:70:100
 C:4:35:20:70:100
 C:8:25:60:70:100
 F:IDENT_MAGIC
-
-N:471:Restore Agility
-A:75:45:1
-F:CURE_AGI
-
-N:472:Agility
-A:75:51:1
-L:1d30+30
-F:CURE_AGI | INC_AGI
