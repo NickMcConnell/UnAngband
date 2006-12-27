@@ -94,9 +94,6 @@
 # moved Seven League deeper and Thievery shallower
 # added Cloaks of the Bat
 #
-# TODO: I have no clue how to restrict SPEED items to below DL 40
-# (or assure their pvals are DL/10 + 1 below DL 40)
-#
 # Version stamp (required)
 
 V:0.6.2

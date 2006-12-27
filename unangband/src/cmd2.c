@@ -3784,8 +3784,6 @@ void do_cmd_fire_selected(object_type *o_ptr, int item)
  * Should throwing a weapon do full damage?  Should it allow the magic
  * to hit bonus of the weapon to have an effect?  Should it ever cause
  * the item to be destroyed?  Should it do any damage at all?
- *
- * TODO: add multiple throws (from the style bonus)
  */
 void do_cmd_throw_selected(object_type *o_ptr, int item)
 {

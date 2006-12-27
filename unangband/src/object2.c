@@ -2195,10 +2195,25 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 
 			case 9:
 
-				/* Increase pval */
-				if (o_ptr->pval) o_ptr->pval += sign;
-				else tryagain = TRUE;
+			  /* Is this an ego item? */
+			  if (o_ptr->name2)
+				{
+				ego_item_type *e_ptr = &e_info[o_ptr->name2];
 
+				/* Increase pval; only rarely if SPEED */
+				if (o_ptr->pval 
+					&& (!(e_ptr->flags1 & (TR1_SPEED))
+						|| rand_int(100) < 33))
+				  o_ptr->pval += sign;
+				else tryagain = TRUE;
+				}
+			  else
+				{
+				/* Increase pval */
+				if (o_ptr->pval)
+				  o_ptr->pval += sign;
+				else tryagain = TRUE;
+				}
 				break;
 
 			case 10:
@@ -3127,14 +3142,14 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				/* Ring of Speed! */
 				case SV_RING_SPEED:
 				{
-					/* Base speed (1 to 10) */
-					o_ptr->pval = randint(5) + m_bonus(5, level);
+					/* Base speed (1 to 8) */
+					o_ptr->pval = randint(3) + m_bonus(5, level);
 
 					/* Super-charge the ring */
-					while (rand_int(100) < 50) o_ptr->pval++;
+					while (rand_int(100) < 33) o_ptr->pval++;
 
-					/* Cursed Ring */
-					if (power < 0)
+					/* Cursed Ring; Hack: above DL30 sure */
+					if (power < 0 || p_ptr->depth < 30 + rand_int (20))
 					{
 						/* Broken */
 						o_ptr->ident |= (IDENT_BROKEN);
@@ -3439,10 +3454,25 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					break;
 				}
 
-				/* Amulet of Trickery -- never cursed */
+				/* Amulet of Trickery -- never cursed below DL50 */
 				case SV_AMULET_TRICKERY:
 				{
 					o_ptr->pval = randint(1) + m_bonus(3, level);
+
+					/* Cursed */
+					if (p_ptr->depth < 20 + rand_int (30))
+					{
+						/* Broken */
+						o_ptr->ident |= (IDENT_BROKEN);
+
+						/* Cursed */
+						o_ptr->ident |= (IDENT_CURSED);
+
+						/* Reverse pval */
+						o_ptr->pval = 0 - (o_ptr->pval);
+
+						break;
+					}
 
 					/* Boost the rating */
 					rating += 25;
@@ -3465,6 +3495,35 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					/* Penalize */
 					o_ptr->pval = 0 - (randint(5) + m_bonus(5, level));
 					o_ptr->to_a = 0 - (randint(5) + m_bonus(5, level));
+
+					break;
+				}
+
+				/* Amulet of the Serpents --- no speed, so bigger pval */
+				case SV_AMULET_SERPENTS:
+				{
+					o_ptr->pval = 1 + m_bonus(7, level);
+
+					/* Cursed */
+					if (power < 0)
+					{
+						/* Broken */
+						o_ptr->ident |= (IDENT_BROKEN);
+
+						/* Cursed */
+						o_ptr->ident |= (IDENT_CURSED);
+
+						/* Reverse pval */
+						o_ptr->pval = 0 - (o_ptr->pval);
+
+						break;
+					}
+
+					/* Boost the rating */
+					rating += 25;
+
+					/* Mention the item */
+					if (cheat_peek) object_mention(o_ptr);
 
 					break;
 				}
@@ -4259,6 +4318,14 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 
 		/* Hack -- acquire "cursed" flag */
 		if (e_ptr->flags3 & (TR3_LIGHT_CURSE)) o_ptr->ident |= (IDENT_CURSED);
+
+		/* Hack --- too shallow SPEED item */
+		if (e_ptr->flags1 & (TR1_SPEED)
+			&& p_ptr->depth < 35 + rand_int (20))
+		  { 
+			o_ptr->ident |= (IDENT_BROKEN);
+			o_ptr->ident |= (IDENT_CURSED);
+		  }
 
 		/* Hack -- apply extra penalties if needed */
 		if (cursed_p(o_ptr) || broken_p(o_ptr))

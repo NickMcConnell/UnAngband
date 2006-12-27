@@ -969,8 +969,8 @@ static s32b artifact_power(int a_idx)
 		}
 		if (a_ptr->flags1 & TR1_DEX)
 		{
-			p += 3 * a_ptr->pval * a_ptr->pval / 4;
-			LOG_PRINT2("Adding power for DEX bonus %d, total is %d\n", a_ptr->pval, p);
+			p += a_ptr->pval * a_ptr->pval;
+			LOG_PRINT2("Adding power for DEX+AGI bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		if (a_ptr->flags1 & TR1_CON)
 		{
@@ -1025,7 +1025,7 @@ static s32b artifact_power(int a_idx)
 		if (a_ptr->flags1 & TR1_STR) p += 4 * a_ptr->pval;
 		if (a_ptr->flags1 & TR1_INT) p += 2 * a_ptr->pval;
 		if (a_ptr->flags1 & TR1_WIS) p += 2 * a_ptr->pval;
-		if (a_ptr->flags1 & TR1_DEX) p += 3 * a_ptr->pval;
+		if (a_ptr->flags1 & TR1_DEX) p += 4 * a_ptr->pval;
 		if (a_ptr->flags1 & TR1_CON) p += 4 * a_ptr->pval;
 		if (a_ptr->flags1 & TR1_STEALTH) p += a_ptr->pval;
 		if (a_ptr->flags1 & TR1_STEALTH) p += a_ptr->pval;
@@ -2341,7 +2341,7 @@ static void parse_frequencies ()
 			 * frequency for the supercharged value and the normal value.
 			 * We get away with this by using a somewhat lower average value
 			 * for the supercharged ability than in the basic set (around
-			 * +7 or +8 - c.f. Ringil and the others at +10 and upwards).
+			 * +4 or +5 - c.f. Ringil and the others at +7 and upwards).
 			 * This then allows us to add an equal number of
 			 * small bonuses around +3 or so without unbalancing things.
 			 */
@@ -4431,7 +4431,7 @@ static void try_supercharge(artifact_type *a_ptr)
 	if (rand_int (z_info->a_max) < artprobs[ART_IDX_GEN_SPEED_SUPER])
 	{
 		a_ptr->flags1 |= TR1_SPEED;
-		a_ptr->pval = 6 + rand_int(4);
+		a_ptr->pval = 3 + rand_int(3);
 		LOG_PRINT1("Supercharging speed for this item!  (New speed bonus is %d)\n", a_ptr->pval);
 	}
 	/* Aggravation */
