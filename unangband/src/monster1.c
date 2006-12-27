@@ -841,7 +841,6 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_LOSE_DEX:       q = "reduce dexterity"; break;
 			case GF_LOSE_CON:       q = "reduce constitution"; break;
 			case GF_LOSE_CHR:       q = "reduce charisma"; break;
-			case GF_LOSE_AGI:       q = "reduce agility"; break;
 			case GF_LOSE_ALL:       q = "reduce all stats"; break;
 			case GF_SHATTER:	q = "shatter"; break;
 			case GF_EXP_10: q = "lower experience (by 10d6+)"; break;

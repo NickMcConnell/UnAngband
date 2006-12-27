@@ -2257,7 +2257,6 @@ bool mon_resist_feat(int feat, int r_idx)
 			case GF_LOSE_DEX:
 			case GF_LOSE_CON:
 			case GF_LOSE_CHR:
-			case GF_LOSE_AGI:
 			case GF_LOSE_ALL:
 			case GF_EXP_10:
 			case GF_EXP_20:

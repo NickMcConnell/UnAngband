@@ -3084,9 +3084,9 @@ static void a_m_aux_2(object_type *o_ptr, int level, int power)
 /*
  * Apply magic to an item known to be a "ring" or "amulet"
  *
- * Hack -- note special rating boost for ring of agility
+ * Hack -- note special rating boost for ring of speed
  * Hack -- note special rating boost for amulet of the magi
- * Hack -- note special "pval boost" code for ring of agility
+ * Hack -- note special "pval boost" code for ring of speed
  * Hack -- note that some items must be cursed (or blessed)
  */
 static void a_m_aux_3(object_type *o_ptr, int level, int power)
@@ -3124,11 +3124,11 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					break;
 				}
 
-				/* Ring of Agility! */
-				case SV_RING_AGI:
+				/* Ring of Speed! */
+				case SV_RING_SPEED:
 				{
-					/* Base agility (1 to 7) */
-					o_ptr->pval = randint(3) + m_bonus(4, level);
+					/* Base speed (1 to 10) */
+					o_ptr->pval = randint(5) + m_bonus(5, level);
 
 					/* Super-charge the ring */
 					while (rand_int(100) < 50) o_ptr->pval++;
@@ -3149,7 +3149,7 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					}
 
 					/* Rating boost */
-					rating += 20;
+					rating += 25;
 
 					/* Mention the item */
 					if (cheat_peek) object_mention(o_ptr);
@@ -3667,8 +3667,8 @@ int value_check_aux10(object_type *o_ptr, bool limit, bool weapon)
 	/* Check flags 1 */
 	for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
 	{
-		if (limit && !weapon && (j > TR1_AGI)) continue;
-		else if (limit && weapon && (j <= TR1_AGI)) continue;
+		if (limit && !weapon && (j > TR1_SPEED)) continue;
+		else if (limit && weapon && (j <= TR1_SPEED)) continue;
 
 		if ( ((f1) & (j)) && !(rand_int(++count)) ) { flag1 = 1; flag2 = j;}
 	}

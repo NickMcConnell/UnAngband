@@ -789,7 +789,6 @@ static int attack_power(int effect)
 		case GF_LOSE_INT:	power =  0; break;
 		case GF_LOSE_WIS:	power =  0; break;
 		case GF_LOSE_CHR:	power =  0; break;
-		case GF_LOSE_AGI:	power =  0; break;
 		case GF_LOSE_ALL:	power =  2; break;
 
 		case GF_EXP_10:	power =  5; break;

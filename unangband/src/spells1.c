@@ -4748,7 +4748,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 			}
 		}
 
-		else switch(rand_int(17))
+		else switch(rand_int(16))
 		{
 			case 0: typ = GF_HALLU; break;
 			case 1: typ = GF_BLIND; break;
@@ -4766,7 +4766,6 @@ bool project_m(int who, int y, int x, int dam, int typ)
 			case 13: typ = GF_PETRIFY; break;
 			case 14: typ = GF_PARALYZE; break;
 			case 15: typ = GF_LOSE_MANA; break;
-			case 16: typ = GF_LOSE_AGI; break;
 		}
 	}
 
@@ -6494,8 +6493,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 		}
 
 
-		/* Melee attack - slow; agility draining works the same */
-		case GF_LOSE_AGI:
+		/* Melee attack - slow */
 		case GF_SLOW:
 		{
 			if (seen) obvious = TRUE;
@@ -9396,15 +9394,6 @@ bool project_p(int who, int y, int x, int dam, int typ)
 				obvious = TRUE;
 				set_stat_dec_tim(p_ptr->stat_dec_tim[A_DEX] + rand_int(20) + 20, A_DEX);
 			}
-
-			break;
-		}
-
-		case GF_LOSE_AGI:
-		{
-			/* Take damage */
-			take_hit(dam, killer);
-
 			/* Damage (stat) */
 			if (do_dec_stat(A_AGI))
 			{

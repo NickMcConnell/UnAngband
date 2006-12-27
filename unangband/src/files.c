@@ -2113,7 +2113,7 @@ static cptr display_player_flag_names[6][10] =
 		"Sear.:",	/* TR1_SEARCH */
 		"Infra:",	/* TR1_INFRA */
 		"Tunn.:",	/* TR1_TUNNEL */
-		"     :",	/* was TR1_SPEED */
+		"Speed:",	/* TR1_SPEED */
 		"Blows:",	/* TR1_BLOWS */
 		"Shots:",	/* TR1_SHOTS */
 		"Might:"	/* TR1_MIGHT */

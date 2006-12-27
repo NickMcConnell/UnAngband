@@ -239,8 +239,6 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 					break;
 				case TR1_DEX:
 					if (o_ptr->pval > 0) (*f2) |= TR2_SUST_DEX;
-					/* A hack: see several lines below: */
-					if (o_ptr->pval > 0) (*f2) |= TR2_SUST_AGI;
 					break;
 				case TR1_CON:
 					if (o_ptr->pval > 0) (*f2) |= TR2_SUST_CON;
@@ -248,11 +246,6 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 				case TR1_CHR:
 					if (o_ptr->pval > 0) (*f2) |= TR2_SUST_CHR;
 					break;
-/* FIXME: a hack; we don't have enough bits at the moment:
-				case TR1_AGI:
-					if (o_ptr->pval > 0) (*f2) |= TR2_SUST_AGI;
-					break;
-*/
 				case TR1_BRAND_ACID:
 					(*f2) |= TR2_IGNORE_ACID;
 					break;
@@ -989,7 +982,6 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags3 & (SF3_INC_DEX)) vp[vn++]="dexterity";
 	if (s_ptr->flags3 & (SF3_INC_CON)) vp[vn++]="constitution";
 	if (s_ptr->flags3 & (SF3_INC_CHR)) vp[vn++]="charisma";
-	if (s_ptr->flags3 & (SF3_INC_AGI)) vp[vn++]="agility";
 	if (s_ptr->flags3 & (SF3_INC_EXP)) vp[vn++]="experience";
 
 	/* Describe stat effects */
@@ -1029,7 +1021,6 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags3 & (SF3_CURE_DEX)) vp[vn++]="dexterity";
 	if (s_ptr->flags3 & (SF3_CURE_CON)) vp[vn++]="constitution";
 	if (s_ptr->flags3 & (SF3_CURE_CHR)) vp[vn++]="charisma";
-	if (s_ptr->flags3 & (SF3_CURE_AGI)) vp[vn++]="agility";
 	if (s_ptr->flags3 & (SF3_CURE_EXP)) vp[vn++]="experience";
 
 	/* Describe stat effects */
@@ -1357,7 +1348,6 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_LOSE_DEX:       q = "reduce"; s="dexterity from"; break;
 			case GF_LOSE_CON:       q = "reduce"; s="constitution from"; break;
 			case GF_LOSE_CHR:       q = "reduce"; s="charisma from"; break;
-			case GF_LOSE_AGI:       q = "reduce"; s="agility from"; break;
 			case GF_LOSE_ALL:       q = "reduce"; s="all stats from"; break;
 			case GF_SHATTER:	q = "shatter"; break;
 			case GF_EXP_10: q = "drain"; s="experience (by 10d6+) from"; break;
@@ -1756,15 +1746,14 @@ typedef struct o_flag_desc
  * affects all stats.  In this case, "All stats" is used instead of
  * listing each stat individually.
  */
-static const o_flag_desc stat_flags_desc[A_MAX] =
+static const o_flag_desc stat_flags_desc[A_MAX - 1 /* disregarding AGI */] =
 {
 	{ TR1_STR,	"strength" },
 	{ TR1_INT,	"intelligence" },
 	{ TR1_WIS,	"wisdom" },
 	{ TR1_DEX,	"dexterity" },
 	{ TR1_CON,	"constitution" },
-	{ TR1_CHR,	"charisma" },
-	{ TR1_AGI,	"agility" }
+	{ TR1_CHR,	"charisma" }
 };
 
 /*
@@ -1779,6 +1768,7 @@ static const o_flag_desc pval_flags1_desc[] =
 	{ TR1_SEARCH,     "searching" },
 	{ TR1_INFRA,      "infravision" },
 	{ TR1_TUNNEL,     "tunneling" },
+	{ TR1_SPEED,      "speed" },
 	{ TR1_BLOWS,      "attacks" },
 	{ TR1_SHOTS,      "shots" },
 	{ TR1_MIGHT,      "might" }
@@ -1893,8 +1883,7 @@ static const o_flag_desc sustain_flags_desc[] =
 	{ TR2_SUST_WIS,   "wisdom" },
 	{ TR2_SUST_DEX,   "dexterity" },
 	{ TR2_SUST_CON,   "constitution" },
-	{ TR2_SUST_CHR,   "charisma" },
-	{ TR2_SUST_AGI,   "agility" }
+	{ TR2_SUST_CHR,   "charisma" }
 };
 
 /*
@@ -2216,11 +2205,9 @@ static bool outlist(cptr header, const cptr *list, byte attr)
 bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 {
 	const u32b all_stats = (TR1_STR | TR1_INT | TR1_WIS |
-							TR1_DEX | TR1_CON | TR1_CHR | 
-							TR1_AGI);
+							TR1_DEX | TR1_CON | TR1_CHR);
 	const u32b all_sustains = (TR2_SUST_STR | TR2_SUST_INT | TR2_SUST_WIS |
-							   TR2_SUST_DEX | TR2_SUST_CON | TR2_SUST_CHR |
-							   TR2_SUST_AGI);
+							   TR2_SUST_DEX | TR2_SUST_CON | TR2_SUST_CHR);
 
 	bool anything = FALSE; /* Printed anything at all */
 
@@ -5963,10 +5950,6 @@ s32b object_power(const object_type *o_ptr)
 		{
 			p += o_ptr->pval * o_ptr->pval / 4; /* Was o_ptr->pval */
 		}
-		if (f1 & TR1_AGI)
-		{
-			p += 3 * o_ptr->pval * o_ptr->pval / 4;
-		}
 		if (f1 & TR1_SAVE)
 		{
 			p += o_ptr->pval * o_ptr->pval / 4; /* Was o_ptr->pval */
@@ -6010,7 +5993,6 @@ s32b object_power(const object_type *o_ptr)
 		if (f1 & TR1_DEX) p += 3 * o_ptr->pval;
 		if (f1 & TR1_CON) p += 4 * o_ptr->pval;
 		if (f1 & TR1_CHR) p += o_ptr->pval;
-		if (f1 & TR1_AGI) p += 5 * o_ptr->pval;
 		if (f1 & TR1_SAVE) p += o_ptr->pval;
 		if (f1 & TR1_DEVICE) p += o_ptr->pval;
 		if (f1 & TR1_STEALTH) p += o_ptr->pval;
@@ -6022,13 +6004,17 @@ s32b object_power(const object_type *o_ptr)
 		if (f3 & TR3_LITE) p += 3 * o_ptr->pval;
 	}
 
+	if (f1 & TR1_SPEED)
+	{
+		p += 5 * o_ptr->pval;
+	}
+
 	ADD_POWER("sustain STR",	 5, TR2_SUST_STR, 2, sustains++);
 	ADD_POWER("sustain INT",	 2, TR2_SUST_INT, 2, sustains++);
 	ADD_POWER("sustain WIS",	 2, TR2_SUST_WIS, 2, sustains++);
 	ADD_POWER("sustain DEX",	 4, TR2_SUST_DEX, 2, sustains++);
 	ADD_POWER("sustain CON",	 3, TR2_SUST_CON, 2, sustains++);
 	ADD_POWER("sustain CHR",	 2, TR2_SUST_CHR, 2, sustains++);
-	ADD_POWER("sustain AGI",	 4, TR2_SUST_AGI, 2, sustains++);
 
 	/* Add bonus for sustains getting 'sustain-lock' */
 	if (sustains > 1) p += sustains * sustains / 2;
