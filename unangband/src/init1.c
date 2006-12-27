@@ -1050,7 +1050,7 @@ static cptr k_info_flags1[] =
 	"SEARCH",
 	"INFRA",
 	"TUNNEL",
-	"AGI",
+	"SPEED",
 	"BLOWS",
 	"SHOTS",
 	"MIGHT",
