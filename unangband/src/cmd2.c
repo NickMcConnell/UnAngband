@@ -2040,7 +2040,7 @@ static bool do_cmd_bash_aux(int y, int x, bool charging)
 		more = TRUE;
 	}
 
-	/* High dexterity yields coolness */
+	/* High agility yields coolness */
 	else
 	{
 		/* Message */

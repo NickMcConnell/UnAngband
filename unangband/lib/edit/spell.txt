@@ -3283,7 +3283,7 @@ C:5:40:80:90:200
 C:8:37:75:90:215
 S:CURE_DISEASE:26
 
-N:306:Restore Dexterity
+N:306:Restore Dexterity and Agility
 A:75:45:1
 F:CURE_DEX
 S:CURE_DISEASE:3
@@ -3308,7 +3308,7 @@ A:75:50:1
 L:1d30+30
 F:CURE_WIS | INC_WIS
 
-N:311:Dexterity
+N:311:Dexterity and Agility
 A:75:51:1
 L:1d30+30
 F:CURE_DEX | INC_DEX

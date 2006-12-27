@@ -979,7 +979,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags3 & (SF3_INC_STR)) vp[vn++]="strength";
 	if (s_ptr->flags3 & (SF3_INC_INT)) vp[vn++]="intelligence";
 	if (s_ptr->flags3 & (SF3_INC_WIS)) vp[vn++]="wisdom";
-	if (s_ptr->flags3 & (SF3_INC_DEX)) vp[vn++]="dexterity";
+	if (s_ptr->flags3 & (SF3_INC_DEX)) vp[vn++]="dexterity and agility";
 	if (s_ptr->flags3 & (SF3_INC_CON)) vp[vn++]="constitution";
 	if (s_ptr->flags3 & (SF3_INC_CHR)) vp[vn++]="charisma";
 	if (s_ptr->flags3 & (SF3_INC_EXP)) vp[vn++]="experience";
@@ -1018,7 +1018,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags3 & (SF3_CURE_STR)) vp[vn++]="strength";
 	if (s_ptr->flags3 & (SF3_CURE_INT)) vp[vn++]="intelligence";
 	if (s_ptr->flags3 & (SF3_CURE_WIS)) vp[vn++]="wisdom";
-	if (s_ptr->flags3 & (SF3_CURE_DEX)) vp[vn++]="dexterity";
+	if (s_ptr->flags3 & (SF3_CURE_DEX)) vp[vn++]="dexterity and agility";
 	if (s_ptr->flags3 & (SF3_CURE_CON)) vp[vn++]="constitution";
 	if (s_ptr->flags3 & (SF3_CURE_CHR)) vp[vn++]="charisma";
 	if (s_ptr->flags3 & (SF3_CURE_EXP)) vp[vn++]="experience";
@@ -1345,7 +1345,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_LOSE_STR:       q = "reduce"; s="strength from"; break;
 			case GF_LOSE_INT:       q = "reduce"; s="intelligence from"; break;
 			case GF_LOSE_WIS:       q = "reduce"; s="wisdom from"; break;
-			case GF_LOSE_DEX:       q = "reduce"; s="dexterity from"; break;
+			case GF_LOSE_DEX:       q = "reduce"; s="dexterity and agility from"; break;
 			case GF_LOSE_CON:       q = "reduce"; s="constitution from"; break;
 			case GF_LOSE_CHR:       q = "reduce"; s="charisma from"; break;
 			case GF_LOSE_ALL:       q = "reduce"; s="all stats from"; break;
@@ -1751,7 +1751,7 @@ static const o_flag_desc stat_flags_desc[A_MAX - 1 /* disregarding AGI */] =
 	{ TR1_STR,	"strength" },
 	{ TR1_INT,	"intelligence" },
 	{ TR1_WIS,	"wisdom" },
-	{ TR1_DEX,	"dexterity" },
+	{ TR1_DEX,	"dexterity and agility" },
 	{ TR1_CON,	"constitution" },
 	{ TR1_CHR,	"charisma" }
 };
@@ -1881,7 +1881,7 @@ static const o_flag_desc sustain_flags_desc[] =
 	{ TR2_SUST_STR,   "strength" },
 	{ TR2_SUST_INT,   "intelligence" },
 	{ TR2_SUST_WIS,   "wisdom" },
-	{ TR2_SUST_DEX,   "dexterity" },
+	{ TR2_SUST_DEX,   "dexterity and agility" },
 	{ TR2_SUST_CON,   "constitution" },
 	{ TR2_SUST_CHR,   "charisma" }
 };

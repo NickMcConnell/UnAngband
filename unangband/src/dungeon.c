@@ -1365,6 +1365,8 @@ static void process_world(void)
 				case DISEASE_LOSE_DEX:
 				{
 					dec_stat(A_DEX, p_ptr->disease & (DISEASE_POWER) ? randint(6) : 1, 0);
+					/* An exception --- disease does not glue DEX and AGI.
+					   See DISEASE_SLOW below, however. */
 					break;
 				}
 
