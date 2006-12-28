@@ -3140,7 +3140,7 @@ int monster_language(int r_idx)
  */
 bool player_understands(int language)
 {
-	bool understand;
+	bool understand = FALSE;
 
 	if (language == LANG_COMMON) understand = TRUE;
 	else if ((language == LANG_ELF) && (p_ptr->cur_flags4 & (TR4_ELF))) understand = TRUE;

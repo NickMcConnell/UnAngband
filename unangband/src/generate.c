@@ -314,11 +314,11 @@ static room_data room[ROOM_MAX] =
    /* I. Room */  {{30,  60,  70,  80,  80,  75,  70,  67,  65,  62,  60},  0,  2,		1, 0, LF1_DUNGEON},
    /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	2,		2, 0, LF1_DUNGEON | LF1_VAULT},
    /* G. Vault */ {{ 0,   0,   1,   2,   3,   4,   6,   7,   8,  10,  12}, 20,	1,		3, 0, LF1_VAULT},
-   /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	1,		3, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE},
-   /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		3, 0, LF1_CAVE},
-   /* Fractal */  {{100, 100, 120, 140, 160, 180, 200, 200, 200, 200, 200},  1,DUN_ROOMS,	2, 0, LF1_MINE | LF1_CAVE | LF1_LAIR},
-   /* Lrg fra */  {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	3, 0, LF1_MINE | LF1_CAVE | LF1_LAIR},
-   /* Huge fra */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE | LF1_LAIR},
+   /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS,	3, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE | LF1_LAIR},
+   /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		3, 0, LF1_MINE | LF1_CAVE | LF1_LAIR},
+   /* Fractal */  {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	3, 0, LF1_MINE | LF1_CAVE},
+   /* Lrg fra */  {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	3,		3, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE},
+   /* Huge fra */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE},
    /* Lair */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		1, 0, LF1_LAIR}
 };
 
@@ -1497,7 +1497,6 @@ static bool find_space(int *y, int *x, int height, int width)
 		/* Pick a top left block at random */
 		block_y = rand_int(dun->row_rooms - blocks_high);
 		block_x = rand_int(dun->col_rooms - blocks_wide);
-
 
 		/* Itty-bitty rooms can shift about within their rectangle */
 		if (blocks_wide < 3)
@@ -4786,6 +4785,13 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			last_door = dun->door_n;
 		}
 
+		/* Hack -- if we are not starting in a room, include starting grid */
+		if ((dun->tunn_n == 0) && ((cave_info[row1][col1] & (CAVE_ROOM)) == 0))
+		{
+			row1 = row1 - row_dir;
+			col1 = col1 - col_dir;
+		}
+
 		/* Get the next location */
 		tmp_row = row1 + row_dir;
 		tmp_col = col1 + col_dir;
@@ -5717,7 +5723,8 @@ static bool build_type1112(int room, int type)
 {
 	int y0, x0, dy, dx;
 
-	bool light;
+	/* Deeper in the dungeon, starbursts are less likely to be lit. */
+	bool light = (rand_range(25, 60) > p_ptr->depth) ? TRUE : FALSE;
 
 	switch (type)
 	{
@@ -6150,6 +6157,8 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 	/* Store extra information for passable lakes */
 	if (!solid_lake)
 	{
+		int by, bx;
+
 		/* Forests are always lit. Others not so much */
 		if (((f_info[feat].flags3 & (FF3_LIVING)) != 0) || 
 			(p_ptr->depth <= randint(25)))
@@ -6158,25 +6167,27 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 		}
 
 		/* Connect the lake with the dungeon */
+		/* Note in order to connect the dungeon correctly, we have to set up the lake as a room,
+		   even if we do not mark it as one. We however allow big lakes to have rooms inside them. */
 		if (dun->cent_n < CENT_MAX)
 		{
 			dun->cent[dun->cent_n].y = *y0;
 			dun->cent[dun->cent_n].x = *x0;
 			dun->cent_n++;
-		}
 
-		/* We won't build rooms over small lakes */
-		if (!do_big_lake)
+			/* Initialise room */
+			room_info[dun->cent_n].flags = 0;
+			room_info[dun->cent_n].tunnel = 0;
+			room_info[dun->cent_n].solid = 0;
+		}		
+
+		for (by = by1; by <= by2; by++)
 		{
-			int bx, by;
-
-			for (by = by1; by <= by2; by++)
+			for (bx = bx1; bx <= bx2; bx++)
 			{
-				for (bx = bx1; bx <= bx2; bx++)
-				{
-					/* Mark the blocks as used */
-					dun->room_map[by][bx] = TRUE;
-				}
+				/* Mark the blocks as used -- unless a big lake*/
+				if (!do_big_lake) dun->room_map[by][bx] = TRUE;
+				dun_room[by][bx] = dun->cent_n;
 			}
 		}
 	}
@@ -6373,6 +6384,7 @@ static void build_nature(void)
 		if ((count == 0) && (zone->big))
 		{
 			feat = zone->big;
+			big = TRUE;
 		}
 		else if (zone->small)
 		{
@@ -7067,14 +7079,28 @@ static void cave_gen(void)
 			/* What type of room are we building now? */
 			int room_type = room_build_order[i];
 
+			/* Check if this is the last room type we can place for this theme. If so, continue to place it. */
+			bool last = TRUE;
+
 			/* Skip at this depth */
 			if (room[room_type].min_level > p_ptr->depth) continue;
 
 			/* Skip if level themed and we don't match the theme */
 			if (((level_flag & (LF1_THEME)) != 0) && ((room[room_type].theme & (level_flag)) == 0)) continue;
 
+			/* Level is themed */
+			if ((level_flag & (LF1_THEME)) != 0)
+			{
+				/* Check remaining room types */
+				for (k = i + 1; k < ROOM_MAX; k++)
+				{
+					/* Valid room type left */
+					if ((room[room_build_order[k]].theme & (level_flag)) != 0) last = FALSE;
+				}
+			}
+
 			/* Build the room. */
-			while ((rand_int(100) < room[room_type].chance[p_ptr->depth < 100 ? p_ptr->depth / 10 : 10])
+			while (((last) || (rand_int(100) < room[room_type].chance[p_ptr->depth < 100 ? p_ptr->depth / 10 : 10]))
 				&& (rooms_built < room[room_type].max_number) && (room_build(dun->cent_n + 1, room_type)))
 			{
 				/* Increase the room built count. */
@@ -7275,7 +7301,7 @@ static void cave_gen(void)
 
 			if ((!count) && (f_info[cave_feat[y + ddy_ddd[k]][x + ddx_ddd[k]]].flags1 & (FF1_SECRET))) break;
 
-			k = (k + dk) % 4;
+			k = (4 + k + dk) % 4;
 		}
 	}
 
