@@ -206,9 +206,9 @@
  * Room type information
  */
 
-typedef struct room_data room_data;
+typedef struct room_data_type room_data_type;
 
-struct room_data
+struct room_data_type
 {
 	/* Allocation information. */
 	s16b chance[11];
@@ -299,7 +299,7 @@ static dun_data *dun;
  * all other rooms are finished -- until the level fills up, or the room
  * count reaches the limit (DUN_ROOMS).
  */
-static room_data room[ROOM_MAX] =
+static room_data_type room_data[ROOM_MAX] =
 {
    /* Depth:         0   10   20   30   40   50   60   70   80   90  100  min max_num count, theme*/
 
@@ -1629,13 +1629,13 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 		if (f_info[feat].flags2 & (FF2_BRIDGE))
 		{
 			/* Bridge previous contents */
-			feat_state(feat, FS_BRIDGE);
+			edge = feat_state(feat, FS_BRIDGE);
 		}
 		/* Apply tunnel */
 		else if (f_info[feat].flags1 & (FF1_TUNNEL))
 		{
 			/* Tunnel previous contents */
-			feat_state(feat, FS_TUNNEL);
+			edge = feat_state(feat, FS_TUNNEL);
 		}
 	}
 
@@ -3839,33 +3839,136 @@ static bool build_pool(int y0, int x0, int feat, bool do_big_pool)
 
 
 
-static void build_type_starburst(int y0, int x0, int dy, int dx, bool light)
+static void build_type_starburst(int room, int type, int y0, int x0, int dy, int dx, bool light)
 {
 	bool want_pools = (rand_int(150) < p_ptr->depth);
 
 	bool giant_room = (dy >= 19) && (dx >= 33);
 
 	/* Default floor and edge */
-	u16b feat = FEAT_FLOOR;
-	u16b edge = FEAT_WALL_OUTER;
+	s16b feat = FEAT_FLOOR;
+	s16b edge = FEAT_WALL_OUTER;
+	s16b inner = FEAT_NONE;
+	s16b alloc = FEAT_NONE;
+	s16b pool[3];
+
+	int n_pools = 0;
+
 	/* Default flags, classic rooms */
 	u32b flag = (STAR_BURST_ROOM | STAR_BURST_RAW_FLOOR |
 		STAR_BURST_RAW_EDGE);
 
+	u32b exclude = (RG1_NORTH | RG1_SOUTH | RG1_EAST | RG1_WEST | RG1_HAS_ITEM | RG1_HAS_GOLD |
+			RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR | RG1_CHECKER | RG1_ROWS | RG1_COLS |
+			RG1_8WAY | RG1_DOORWAY | RG1_3X3HIDDEN);
+
+	int j = 0;
+
+	u32b place_flag = 0L;
+
+	byte place_tval = 0;
+	byte place_min_sval = 0;
+	byte place_max_sval = 0;
+	s16b place_feat = 0;
+
+	byte name = 0L;
+
+	byte branch = 0;
+	byte branch_on = 0;
+
+	/* Exclude light or dark */
+	if (light) exclude |= RG1_DARK;
+	else exclude |= RG1_LITE;
+
+	/* Get room info */
+	while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name,
+		exclude))
+	{
+		/* Place features or items if needed */
+		if (place_feat)
+		{
+			if ((place_flag & (RG1_CENTRE)) != 0)
+			{
+				exclude |= RG1_CENTRE;
+				feat = place_feat;
+
+				if ((place_flag & (RG1_IGNORE_EDGE | RG1_BRIDGE_EDGE)) != 0)
+				{
+					exclude |= RG1_EDGE | RG1_OUTER;
+					edge = place_feat;
+
+					if ((place_flag & (RG1_BRIDGE_EDGE)) != 0)
+					{
+						if (f_info[feat].flags2 & (FF2_BRIDGE))
+						{
+							/* Bridge previous contents */
+							edge = feat_state(feat, FS_BRIDGE);
+						}
+						/* Apply tunnel */
+						else if (f_info[feat].flags1 & (FF1_TUNNEL))
+						{
+							/* Tunnel previous contents */
+							edge = feat_state(feat, FS_TUNNEL);
+						}
+					}
+				}
+			}
+
+			if ((place_flag & (RG1_ALLOC)) != 0)
+			{
+				exclude |= RG1_ALLOC;
+				alloc = place_feat;
+			}
+
+			if ((place_flag & (RG1_EDGE | RG1_OUTER)) != 0)
+			{
+				exclude |= RG1_EDGE | RG1_OUTER;
+				edge = place_feat;
+			}
+
+			if ((place_flag & (RG1_INNER | RG1_STARBURST)) != 0)
+			{
+				exclude |= RG1_INNER | RG1_STARBURST;
+				inner = place_feat;
+			}
+
+			if ((place_flag & (RG1_SCATTER | RG1_RANDOM)) != 0)
+			{
+				if ((!(giant_room) && (n_pools > 1)) || (n_pools > 2)) exclude |= RG1_SCATTER | RG1_RANDOM;
+				want_pools = TRUE;
+				pool[n_pools++] = place_feat;
+			}
+		}
+
+		/* Clear object hook */
+		if (place_tval)
+		{
+			get_obj_num_hook = NULL;
+
+			/* Prepare allocation table */
+			get_obj_num_prep();
+
+			place_tval = 0;
+			place_min_sval = 0;
+			place_max_sval = 0;
+		}
+
+		/* Clear placement details */
+		place_flag = 0;
+		place_feat = 0;
+	}
+
+	/* Type */
+	room_info[room].type = ROOM_NORMAL;
+
+	/* Terminate index list */
+	room_info[room].section[j] = -1;
+
 	/* Occasional light */
 	if (light) flag |= (STAR_BURST_LIGHT);
 
-	/* Frozen edge on ice levels */
-	if (level_flag & (LF1_ICE))
-	{
-		edge = FEAT_ICE;
-
-		/* Make ice walls interesting */
-		flag &= ~(STAR_BURST_RAW_EDGE);
-	}
-
 	/* Case 1. Plain starburst room */
-	if (rand_int(100) < 75)
+	if ((rand_int(100) < 75) && !(inner))
 	{
 		/* Allow cloverleaf rooms if pools are disabled */
 		if (!want_pools) flag |= (STAR_BURST_CLOVER);
@@ -3881,21 +3984,18 @@ static void build_type_starburst(int y0, int x0, int dy, int dx, bool light)
 			feat, edge, flag);
 
 		/* Special case. Create a solid wall formation */
-		if (!rand_int(2))
+		if ((inner) || (!rand_int(2)))
 		{
-			/* Classic rooms */
-			if (edge == FEAT_WALL_OUTER)
-			{
-				feat = FEAT_WALL_INNER;
-			}
+			if (!inner) inner = edge;
 
-			/* Ice wall formation */
+			/* Classic rooms */
+			if ((f_info[inner].flags1 & (FF1_OUTER)) != 0)
+			{
+				feat = feat_state(inner, FS_INNER);
+			}
 			else
 			{
-				feat = edge;
-
-				/* Make ice walls interesting */
-				flag &= ~(STAR_BURST_RAW_FLOOR);
+				feat = inner;
 			}
 
 			/* No edge */
@@ -3921,13 +4021,32 @@ static void build_type_starburst(int y0, int x0, int dy, int dx, bool light)
 	/* Build pools */
 	if (want_pools)
 	{
-		int i, n_pools, range;
+		int i, range;
 
-		/* Randomize the number of pools */
-		n_pools = randint(2);
+		/* Haven't allocated pools */
+		if (!n_pools)
+		{
+			/* Randomize the number of pools */
+			n_pools = randint(2);
 
-		/* Adjust for giant rooms */
-		if (giant_room) n_pools += 1;
+			/* Adjust for giant rooms */
+			if (giant_room) n_pools += 1;
+
+			/* Place the pools */
+			for (i = 0; i < n_pools; i++)
+			{
+				/* Choose a feature for the pool */
+				pool[i] = pick_proper_feature(cave_feat_pool);
+
+				/* Got none */
+				if (!pool[i])
+				{
+					i--;
+					n_pools--;
+					continue;
+				}
+			}
+		}
 
 		/* How far of room center? */
 		range = giant_room ? 12: 5;
@@ -3940,16 +4059,6 @@ static void build_type_starburst(int y0, int x0, int dy, int dx, bool light)
 		{
 			int tries;
 
-			/* Pick a new feature */
-			if (!feat || !rand_int(4))
-			{
-				/* Choose a feature for the pool */
-				feat = pick_proper_feature(cave_feat_pool);
-
-				/* Got none */
-				if (!feat) continue;
-			}
-
 			for (tries = 0; tries < 2500; tries++)
 			{
 				/* Get the center of the pool */
@@ -3959,7 +4068,7 @@ static void build_type_starburst(int y0, int x0, int dy, int dx, bool light)
 				/* Verify center */
 				if (cave_feat[y][x] == FEAT_FLOOR)
 				{
-					build_pool(y, x, feat, giant_room);
+					build_pool(y, x, pool[i], giant_room);
 
 					/* Done */
 					break;
@@ -3967,6 +4076,9 @@ static void build_type_starburst(int y0, int x0, int dy, int dx, bool light)
 			}
 		}
 	}
+
+	/* Hack -- place feature at centre */
+	if (alloc) cave_set_feat(y0, x0, alloc);
 }
 
 
@@ -5832,7 +5944,7 @@ static bool build_type1112(int room, int type)
 	room_info[dun->cent_n].type = ROOM_STARBURST;
 
 	/* Try building starburst */
-	build_type_starburst(y0, x0, dy, dx, light);
+	build_type_starburst(room, type, y0, x0, dy, dx, light);
 
 	/* Set the vault / interesting room flags */
 	set_room_flags(room, type);
@@ -7178,10 +7290,10 @@ static void cave_gen(void)
 			bool last = TRUE;
 
 			/* Skip at this depth */
-			if (room[room_type].min_level > p_ptr->depth) continue;
+			if (room_data[room_type].min_level > p_ptr->depth) continue;
 
 			/* Skip if level themed and we don't match the theme */
-			if (((level_flag & (LF1_THEME)) != 0) && ((room[room_type].theme & (level_flag)) == 0)) continue;
+			if (((level_flag & (LF1_THEME)) != 0) && ((room_data[room_type].theme & (level_flag)) == 0)) continue;
 
 			/* Level is themed */
 			if ((level_flag & (LF1_THEME)) != 0)
@@ -7190,16 +7302,16 @@ static void cave_gen(void)
 				for (k = i + 1; k < ROOM_MAX; k++)
 				{
 					/* Valid room type left */
-					if ((room[room_build_order[k]].theme & (level_flag)) != 0) last = FALSE;
+					if ((room_data[room_build_order[k]].theme & (level_flag)) != 0) last = FALSE;
 				}
 			}
 
 			/* Build the room. */
-			while (((last) || (rand_int(100) < room[room_type].chance[p_ptr->depth < 100 ? p_ptr->depth / 10 : 10]))
-				&& (rooms_built < room[room_type].max_number) && (room_build(dun->cent_n + 1, room_type)))
+			while (((last) || (rand_int(100) < room_data[room_type].chance[p_ptr->depth < 100 ? p_ptr->depth / 10 : 10]))
+				&& (rooms_built < room_data[room_type].max_number) && (room_build(dun->cent_n + 1, room_type)))
 			{
 				/* Increase the room built count. */
-				rooms_built += room[room_type].count_as;
+				rooms_built += room_data[room_type].count_as;
 
 				/* No theme chosen */
 				if ((level_flag & (LF1_THEME)) == 0)
@@ -7214,7 +7326,7 @@ static void cave_gen(void)
 					for (j = 0; j < 32; j++)
 					{
 						/* Pick a theme */
-						if ( ((room[room_type].theme & (1L << j)) != 0) && (rand_int(++k) == 0)) choice = j;
+						if ( ((room_data[room_type].theme & (1L << j)) != 0) && (rand_int(++k) == 0)) choice = j;
 					}
 
 					/* Set a theme if picked */

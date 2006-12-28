@@ -117,9 +117,21 @@ B:vault
 
 N:11:107:0:0:1:1:0:128
 
-# Large starburst room.
+# Small starburst room - central feature.
 
-N:12:107:0:0:1:1:0:128
+N:11:104:0:0:1:1:0:128
+
+# Small starburst room - wall decorations.
+
+N:11:117:0:0:1:1:0:128
+
+# Large starburst room - central feature.
+
+N:12:104:0:0:1:1:0:128
+
+# Large starburst room - wall decorations.
+
+N:12:117:0:0:1:1:0:128
 
 # Small fractal room.
 
@@ -2272,7 +2284,7 @@ N:107:108:0:0:180:80:0:128
 A:
 B:
 D:The air here is 
-P:NORTH | SOUTH | EAST | WEST | CENTRE
+P:CENTRE
 L:LAVA | ACID | WATER | ICE
 
 N:108:109:0:0:50:6:51:128

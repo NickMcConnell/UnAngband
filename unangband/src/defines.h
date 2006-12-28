@@ -2777,7 +2777,7 @@
 #define RG1_3X3		0x00400000L	/* Place in 3x3 grids */
 #define RG1_8WAY	0x00800000L	/* Place 8 ways */
 #define RG1_DOORWAY	0x01000000L	/* Place doorway in 1 edge */
-#define RG1_3x3HIDDEN	0x02000000L	/* Place 3x3 with hollow inside and doorway */
+#define RG1_3X3HIDDEN	0x02000000L	/* Place 3x3 with hollow inside and doorway */
 #define RG1_STARBURST	0x04000000L	/* Place starburst in centre */
 #define RG1_BRIDGE_EDGE	0x08000000L	/* Replace edges of room with bridges */
 #define RG1_IGNORE_EDGE	0x10000000L	/* Ignore edges, run terrain to edge of room */
