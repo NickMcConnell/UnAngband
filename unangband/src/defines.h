@@ -2759,34 +2759,32 @@
 #define RG1_CENTRE	0x00000010L	/* Place in centre */
 #define RG1_EDGE	0x00000020L	/* Place on edge */
 #define RG1_PLACE	0x00000040L	/* Place now */
-#define RG1_MIMIC	0x00000080L	/* Pick features that 'mimic' this feat */
+#define RG1_ALLOC	0x00000080L	/* Pick one only */
 #define RG1_CHECKER	0x00000100L	/* Place as checkered */
 #define RG1_SCATTER	0x00000200L	/* Place as scattered */
 #define RG1_OUTER	0x00000400L	/* Place as outer wall */
 #define RG1_RANDOM	0x00000800L	/* Place 60% of the time */
-#define RG1_BATTLE	0x00001000L	/* Place as battle */
-#define RG1_VAULT	0x00002000L	/* Vault level */
-#define RG1_DUNGEON	0x00004000L	/* Dungeon level */
-#define RG1_STRONGHOLD	0x00008000L	/* Stronghold (giant/dwarf) level */
-#define RG1_CRYPT	0x00010000L	/* Crypt level */
-#define RG1_LAIR	0x00020000L	/* Lair level */
-#define RG1_MINE	0x00040000L	/* Mine level */
-#define RG1_CAVE	0x00080000L	/* Cave level */
-#define RG1_TOWN	0x00100000L	/* Town level */
-#define RG1_WILD	0x00200000L	/* Wilderness level */
-#define RG1_RUIN	0x00400000L	/* Ruin level */
-#define RG1_ALLOC	0x00800000L	/* Place one only */
-#define RG1_HAS_ITEM	0x01000000L	/* Drop object */
-#define RG1_HAS_GOLD	0x02000000L	/* Drop gold */
-#define RG1_8WAY	0x04000000L	/* Place 8 way */
-#define RG1_TRAIL	0x08000000L	/* Place trail */
-#define RG1_INNER	0x10000000L	/* Place inner room */
-#define RG1_MAZE	0x20000000L	/* Place maze */
-#define RG1_ROWS	0x40000000L	/* Place rows */
-#define RG1_COLS	0x80000000L	/* Place columns */
+#define RG1_HAS_ITEM	0x00001000L	/* Drop object */
+#define RG1_HAS_GOLD	0x00002000L	/* Drop gold */
+#define RG1_TRAIL	0x00004000L	/* Place trail */
+#define RG1_INNER	0x00008000L	/* Place as edge of inner room */
+#define RG1_ROWS	0x00010000L	/* Place rows */
+#define RG1_COLS	0x00020000L	/* Place columns */
+#define RG1_MAZE_PATH	0x00040000L	/* Place as a path in a maze, use inner walls for walls */
+#define RG1_MAZE_WALL	0x00080000L	/* Place as a wall in a maze, use edge or floors for path */
+#define RG1_MAZE_DECOR	0x00100000L	/* Place as a path in a maze, use floors for walls */
+#define RG1_2X2		0x00200000L	/* Place in 2x2 grids */
+#define RG1_3X3		0x00400000L	/* Place in 3x3 grids */
+#define RG1_8WAY	0x00800000L	/* Place 8 ways */
+#define RG1_DOORWAY	0x01000000L	/* Place doorway in 1 edge */
+#define RG1_3x3HIDDEN	0x02000000L	/* Place 3x3 with hollow inside and doorway */
+#define RG1_STARBURST	0x04000000L	/* Place starburst in centre */
+#define RG1_BRIDGE_EDGE	0x08000000L	/* Replace edges of room with bridges */
+#define RG1_IGNORE_EDGE	0x10000000L	/* Ignore edges, run terrain to edge of room */
+#define RG1_BRIDGE_IN	0x20000000L	/* Run bridges into the centre of the room */
+#define RG1_LITE	0x40000000L	/* Generate room with light */
+#define RG1_DARK	0x80000000L	/* Generate room with darkness */
 
-#define RG1_LEVEL_FLAGS (RG1_BATTLE | RG1_VAULT | RG1_DUNGEON | RG1_STRONGHOLD | RG1_CRYPT |\
-				RG1_LAIR | RG1_MINE | RG1_CAVE | RG1_TOWN | RG1_WILD | RG1_RUIN)
 
 /*** Room flags ***/
 

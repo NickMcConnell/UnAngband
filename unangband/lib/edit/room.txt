@@ -373,6 +373,30 @@ S:SEEN
 L:LIVING
 P:ROWS | COLS
 
+N:104:120:0:0:60:2:0:128
+A:
+B:garden
+D:A garden 
+S:SEEN
+L:LIVING
+P:MAZE_WALL
+
+N:104:120:0:0:60:2:0:128
+A:
+B:garden
+D:A garden 
+S:SEEN
+L:LIVING
+P:MAZE_PATH
+
+N:104:120:0:0:60:2:0:128
+A:
+B:garden
+D:A garden 
+S:SEEN
+L:LIVING
+P:STARBURST
+
 N:104:119:0:0:25:1:0:128
 A:
 B:festhall
@@ -437,6 +461,7 @@ B:
 D:A trench 
 R:WARRIOR
 S:SEEN
+P:MAZE_DECOR
 F:457:457:457
 
 N:104:119:0:0:25:2:0:128
@@ -1273,6 +1298,15 @@ S:SEEN
 R:MAN
 P:PLACE | CHECKER
 
+N:106:107:0:0:35:3:0:128
+A:tiled
+B:
+D:decorated with a tile mosaic.  
+F:439:0:732
+S:SEEN
+R:MAN
+P:PLACE | MAZE_DECOR
+
 N:106:107:0:0:3:3:0:128
 A:
 B:
@@ -1403,6 +1437,7 @@ A:steamy
 B:
 D:surrounded by steam.  
 F:209:173:837
+S:SEEN
 P:PLACE | RANDOM
 
 N:106:147:0:0:15:0:60:128
@@ -1411,6 +1446,7 @@ B:
 D:surrounded by steam.  
 F:206:173:837
 L:LAVA | WATER
+S:SEEN
 P:PLACE | ALLOC
 
 N:106:150:0:0:15:1:51:128
@@ -1419,6 +1455,7 @@ B:
 D:surrounded by gas.  
 F:706:181:0
 L:LAVA
+S:SEEN
 P:PLACE | ALLOC
 
 N:106:150:0:0:15:1:72:128
@@ -1427,6 +1464,7 @@ B:
 D:surrounded by fire.  
 F:707:162:729
 L:LAVA
+S:SEEN
 P:PLACE | ALLOC
 
 N:106:148:0:0:15:1:51:128
@@ -1435,6 +1473,7 @@ B:
 D:surrounded by acidic vapours.  
 F:708:165:728
 L:ACID
+S:SEEN
 P:PLACE | ALLOC
 
 N:106:146:0:0:15:1:51:128
@@ -1443,6 +1482,7 @@ B:
 D:misty with droplets.  
 F:709:307:837
 L:WATER
+S:SEEN
 P:PLACE | ALLOC
 
 N:106:107:0:0:35:1:10:128
@@ -2017,7 +2057,7 @@ D:surrounded by pits.
 F:17:0:0
 R:CAN_DIG
 S:SEEN
-P:INNER
+P:PLACE | MAZE_WALL
 
 N:106:107:0:0:25:1:60:128
 A:runed
@@ -2026,7 +2066,7 @@ D:covered by strange runes.
 F:20:0:750
 R:MAGE
 S:SEEN
-P:INNER
+P:PLACE | MAZE_WALL
 
 N:106:107:0:0:25:1:60:128
 A:trapped
@@ -2035,7 +2075,7 @@ D:surrounded by explosive traps.
 F:326:0:0
 R:SNEAKY
 S:SEEN
-P:INNER
+P:PLACE | MAZE_WALL
 
 N:106:107:0:0:25:1:60:128
 A:trapped
@@ -2044,7 +2084,7 @@ D:surrounded by spring-loaded traps.
 F:24:0:0
 R:SNEAKY
 S:SEEN
-P:INNER
+P:PLACE | MAZE_WALL
 
 N:106:107:0:0:25:1:60:128
 A:trapped
@@ -2053,7 +2093,7 @@ D:surrounded by gas traps.
 R:SNEAKY
 F:24:0:0
 S:SEEN
-P:INNER
+P:PLACE | MAZE_WALL
 
 N:106:107:0:0:25:1:60:128
 A:visage
@@ -2062,7 +2102,7 @@ D:surrounded by stoney visages.
 R:MAGE
 F:70:0:0
 S:SEEN
-P:INNER
+P:PLACE | MAZE_WALL
 
 N:106:107:0:0:25:1:60:128
 A:trapped
@@ -2071,7 +2111,7 @@ D:surrounded by trip wires.
 R:SNEAKY
 F:77:0:0
 S:SEEN
-P:INNER
+P:PLACE | MAZE_WALL
 
 N:106:107:0:0:25:1:60:128
 A:symbol
@@ -2080,7 +2120,7 @@ D:covered by magic symbols.
 R:MAGE
 F:81:0:750
 S:SEEN
-P:INNER
+P:PLACE | MAZE_WALL
 
 N:106:107:0:0:25:1:60:128
 A:hexen
@@ -2089,7 +2129,7 @@ D:covered by ancient hexes.
 R:MAGE
 F:87:0:750
 S:SEEN
-P:INNER
+P:PLACE | MAZE_WALL
 
 N:106:107:0:0:25:1:60:128
 A:trapped
@@ -2098,7 +2138,7 @@ D:surrounded by murder holes.
 R:SNEAKY
 F:91:0:0
 S:SEEN
-P:INNER
+P:PLACE | MAZE_WALL
 
 N:106:124:0:0:20:1:0:128
 A:
@@ -4210,6 +4250,18 @@ B:
 D:
 P:INNER
 
+N:119:105:0:0:5:5:0:128
+A:
+B:
+D:
+P:MAZE_WALL
+
+N:119:105:0:0:5:5:0:128
+A:
+B:
+D:
+P:STARBURST
+
 # Garden layout
 
 N:120:122:0:0:15:15:0:128
@@ -4292,6 +4344,12 @@ A:
 B:
 D:
 P:INNER
+
+N:121:102:0:0:5:5:0:128
+A:
+B:
+D:
+P:MAZE_WALL
 
 N:122:107:0:0:10:1:0:128
 A:rocky
@@ -5358,6 +5416,21 @@ N:145:106:0:0:15:15:0:128
 A:
 B:
 P:CENTRE
+
+N:145:106:0:0:15:15:0:128
+A:
+B:
+P:CENTRE | STARBURST
+
+N:145:106:0:0:15:15:0:128
+A:
+B:
+P:CENTRE | MAZE_WALL
+
+N:145:106:0:0:15:15:0:128
+A:
+B:
+P:CENTRE | INNER
 
 N:145:106:0:0:15:15:15:128
 A:

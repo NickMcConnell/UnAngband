@@ -17,7 +17,7 @@ V:0.6.2
 M:F:872
 
 # Maximum number of room description lines
-M:D:770
+M:D:800
 
 # Maximum number of object kinds
 M:K:914

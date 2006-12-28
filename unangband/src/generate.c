@@ -1078,6 +1078,504 @@ static void generate_rect(int y1, int x1, int y2, int x2, int feat)
 
 
 
+/* Convert a maze coordinate into a dungeon coordinate */
+#define YPOS(y, y1)		((y1) + (y) * 2 + 1)
+#define XPOS(x, x1)		((x1) + (x) * 2 + 1)
+
+
+/*
+ * Build an acyclic maze inside a given rectangle.  - Eric Bock -
+ * Construct the maze from a given pair of features.
+ *
+ * Note that the edge lengths should be odd.
+ */
+static void draw_maze(int y1, int x1, int y2, int x2, byte feat_wall,
+    byte feat_path)
+{
+	int i, j;
+	int ydim, xdim;
+	int grids;
+
+	int y, x;
+	int ty, tx;
+	int dy, dx;
+
+	byte dir[4];
+	byte dirs;
+
+	/* Start with a solid rectangle of the "wall" feat */
+	generate_fill(y1, x1, y2, x2, feat_wall);
+
+	/* Calculate dimensions */
+	ydim = (y2 - y1) / 2;
+	xdim = (x2 - x1) / 2;
+
+	/* Number of unexamined grids */
+	grids = ydim * xdim - 1;
+
+	/* Set the initial position */
+	y = rand_int(ydim);
+	x = rand_int(xdim);
+
+	/* Place a floor here */
+	cave_set_feat(YPOS(y, y1), XPOS(x, x1), feat_path);
+
+	/* Now build the maze */
+	while (grids)
+	{
+		/* Only use maze grids */
+		if (cave_feat[YPOS(y, y1)][XPOS(x, x1)] == feat_path)
+		{
+			/* Pick a target */
+			ty = rand_int(ydim);
+			tx = rand_int(xdim);
+
+			while (TRUE)
+			{
+				dirs = 0;
+				dy = 0;
+				dx = 0;
+
+				/* Calculate the dungeon position */
+				j = YPOS(y, y1);
+				i = XPOS(x, x1);
+
+				/** Enumerate possible directions **/
+
+				/* Up */
+				if (y && (cave_feat[j - 2][i] == feat_wall)) dir[dirs++] = 1;
+
+				/* Down */
+				if ((y < ydim - 1) && (cave_feat[j + 2][i] == feat_wall)) dir[dirs++] = 2;
+
+				/* Left */
+				if (x && (cave_feat[j][i - 2] == feat_wall)) dir[dirs++] = 3;
+
+				/* Right */
+				if ((x < xdim - 1) && (cave_feat[j][i + 2] == feat_wall)) dir[dirs++] = 4;
+
+				/* Dead end; go to the next valid grid */
+				if (!dirs) break;
+
+				/* Pick a random direction */
+				switch (dir[rand_int(dirs)])
+				{
+					/* Move up */
+					case 1:  dy = -1;  break;
+
+					/* Move down */
+					case 2:  dy =  1;  break;
+
+					/* Move left */
+					case 3:  dx = -1;  break;
+
+					/* Move right */
+					case 4:  dx =  1;  break;
+				}
+
+				/* Place floors */
+				cave_set_feat(j + dy, i + dx, feat_path);
+				cave_set_feat(j + dy * 2, i + dx * 2, feat_path);
+
+				/* Advance */
+				y += dy;
+				x += dx;
+
+				/* One less grid to examine */
+				grids--;
+
+				/* Check for completion */
+				if ((y == ty) && (x == tx)) break;
+			}
+		}
+
+		/* Find a new position */
+		y = rand_int(ydim);
+		x = rand_int(xdim);
+	}
+}
+
+
+#undef YPOS
+#undef XPOS
+
+
+/*
+ * Mark a starburst shape in the dungeon with the CAVE_TEMP flag, given the
+ * coordinates of a section of the dungeon in "box" format. -LM-, -DG-
+ *
+ * Starburst are made in three steps:
+ * 1: Choose a box size-dependant number of arcs.  Large starburts need to
+ *    look less granular and alter their shape more often, so they need
+ *    more arcs.
+ * 2: For each of the arcs, calculate the portion of the full circle it
+ *    includes, and its maximum effect range (how far in that direction
+ *    we can change features in).  This depends on starburst size, shape, and
+ *    the maximum effect range of the previous arc.
+ * 3: Use the table "get_angle_to_grid" to supply angles to each grid in
+ *    the room.  If the distance to that grid is not greater than the
+ *    maximum effect range that applies at that angle, change the feature
+ *    if appropriate (this depends on feature type).
+ *
+ * Usage notes:
+ * - This function uses a table that cannot handle distances larger than
+ *   20, so it calculates a distance conversion factor for larger starbursts.
+ * - This function is not good at handling starbursts much longer along one axis
+ *   than the other.
+ * This function doesn't mark any grid in the perimeter of the given box.
+ *
+ */
+static bool mark_starburst_shape(int y1, int x1, int y2, int x2, u32b flag)
+{
+	int y0, x0, y, x, ny, nx;
+	int i;
+	int size;
+	int dist, max_dist, dist_conv, dist_check;
+	int height, width, arc_dist;
+	int degree_first, center_of_arc, degree;
+
+	/* Special variant starburst.  Discovered by accident. */
+	bool make_cloverleaf = FALSE;
+
+	/* Holds first degree of arc, maximum effect distance in arc. */
+	int arc[45][2];
+
+	/* Number (max 45) of arcs. */
+	int arc_num;
+
+	/* Make certain the starburst does not cross the dungeon edge. */
+	if ((!in_bounds_fully(y1, x1)) || (!in_bounds_fully(y2, x2))) return (FALSE);
+
+	/* Robustness -- test sanity of input coordinates. */
+	if ((y1 + 2 >= y2) || (x1 + 2 >= x2)) return (FALSE);
+
+	/* Get room height and width. */
+	height = 1 + y2 - y1;
+	width  = 1 + x2 - x1;
+
+	/* Note the "size" */
+	size = 2 + (width + height) / 22;
+
+	/* Get a shrinkage ratio for large starbursts, as table is limited. */
+	if ((width > 40) || (height > 40))
+	{
+		if (width > height) dist_conv = 1 + (10 * width  / 40);
+		else                dist_conv = 1 + (10 * height / 40);
+	}
+	else dist_conv = 10;
+
+	/* Make a cloverleaf starburst sometimes.  (discovered by accident) */
+	if ((flag & (STAR_BURST_CLOVER)) && (height > 10) && (!rand_int(20)))
+	{
+		arc_num = 12;
+		make_cloverleaf = TRUE;
+	}
+
+	/* Usually, we make a normal starburst. */
+	else
+	{
+		/* Ask for a reasonable number of arcs. */
+		arc_num = 8 + (height * width / 80);
+		arc_num = rand_spread(arc_num, 3);
+		if (arc_num < 8) arc_num = 8;
+		if (arc_num > 45) arc_num = 45;
+	}
+
+
+	/* Get the center of the starburst. */
+	y0 = y1 + height / 2;
+	x0 = x1 + width  / 2;
+
+	/* Start out at zero degrees. */
+	degree_first = 0;
+
+
+	/* Determine the start degrees and expansion distance for each arc. */
+	for (i = 0; i < arc_num; i++)
+	{
+		/* Get the first degree for this arc (using 180-degree circles). */
+		arc[i][0] = degree_first;
+
+		/* Get a slightly randomized start degree for the next arc. */
+		degree_first += 180 / arc_num;
+
+		/* Do not entirely leave the usual range */
+		if (degree_first < 180 * (i+1) / arc_num)
+		{
+			degree_first = 180 * (i+1) / arc_num;
+		}
+		if (degree_first > (180 + arc_num) * (i+1) / arc_num)
+		{
+			degree_first = (180 + arc_num) * (i+1) / arc_num;
+		}
+
+		/* Get the center of the arc (convert from 180 to 360 circle). */
+		center_of_arc = degree_first + arc[i][0];
+
+		/* Get arc distance from the horizontal (0 and 180 degrees) */
+		if      (center_of_arc <=  90) arc_dist = center_of_arc;
+		else if (center_of_arc >= 270) arc_dist = ABS(center_of_arc - 360);
+		else                           arc_dist = ABS(center_of_arc - 180);
+
+		/* Special case -- Handle cloverleafs */
+		if ((arc_dist == 45) && (make_cloverleaf)) dist = 0;
+
+		/*
+		 * Usual case -- Calculate distance to expand outwards.  Pay more
+		 * attention to width near the horizontal, more attention to height
+		 * near the vertical.
+		 */
+		else dist = ((height * arc_dist) + (width * (90 - arc_dist))) / 90;
+
+		/* Randomize distance (should never be greater than radius) */
+		arc[i][1] = rand_range(dist / 4, dist / 2);
+
+		/* Keep variability under control (except in special cases). */
+		if ((dist != 0) && (i != 0))
+		{
+			int diff = arc[i][1] - arc[i-1][1];
+
+			if (ABS(diff) > size)
+			{
+				if (diff > 0)	arc[i][1] = arc[i-1][1] + size;
+				else arc[i][1] = arc[i-1][1] - size;
+			}
+		}
+	}
+
+	/* Neaten up final arc of circle by comparing it to the first. */
+	if (TRUE)
+	{
+		int diff = arc[arc_num - 1][1] - arc[0][1];
+
+		if (ABS(diff) > size)
+		{
+			if (diff > 0)	arc[arc_num - 1][1] = arc[0][1] + size;
+			else arc[arc_num - 1][1] = arc[0][1] - size;
+		}
+	}
+
+
+	/* Precalculate check distance. */
+	dist_check = 21 * dist_conv / 10;
+
+	/* Change grids between (and not including) the edges. */
+	for (y = y1 + 1; y < y2; y++)
+	{
+		for (x = x1 + 1; x < x2; x++)
+		{
+
+			/* Get distance to grid. */
+			dist = distance(y0, x0, y, x);
+
+			/* Look at the grid if within check distance. */
+			if (dist < dist_check)
+			{
+				/* Convert and reorient grid for table access. */
+				ny = 20 + 10 * (y - y0) / dist_conv;
+				nx = 20 + 10 * (x - x0) / dist_conv;
+
+				/* Illegal table access is bad. */
+				if ((ny < 0) || (ny > 40) || (nx < 0) || (nx > 40))  continue;
+
+				/* Get angle to current grid. */
+				degree = get_angle_to_grid[ny][nx];
+
+				/* Scan arcs to find the one that applies here. */
+				for (i = arc_num - 1; i >= 0; i--)
+				{
+					if (arc[i][0] <= degree)
+					{
+						max_dist = arc[i][1];
+
+						/* Must be within effect range. */
+						if (max_dist >= dist)
+						{
+							/* Mark the grid */
+							play_info[y][x] |= (PLAY_TEMP);
+						}
+
+						/* Arc found.  End search */
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	return (TRUE);
+}
+
+
+/*
+ * Make a starburst room. -LM-, -DG-
+ *
+ * Usage notes:
+ * - This function is not good at handling rooms much longer along one axis
+ *   than the other.
+ * - It is safe to call this function on areas that might contain vaults or
+ *   pits, because "icky" and occupied grids are left untouched.
+ */
+static bool generate_starburst_room(int y1, int x1, int y2, int x2,
+	s16b feat, s16b edge, u32b flag)
+{
+	int y, x, d;
+
+	/* Mark the affected grids */
+	if (!mark_starburst_shape(y1, x1, y2, x2, flag)) return (FALSE);
+
+	/* Paranoia */
+	if (edge == feat) edge = FEAT_NONE;
+
+	/* Process marked grids */
+	for (y = y1 + 1; y < y2; y++)
+	{
+		for (x = x1 + 1; x < x2; x++)
+		{
+			/* Marked grids only */
+			if (!(play_info[y][x] & (PLAY_TEMP))) continue;
+
+			/* Do not touch "icky" grids. */
+			if (room_has_flag(y, x, ROOM_ICKY)) continue;
+
+			/* Do not touch occupied grids. */
+			if (cave_m_idx[y][x] != 0) continue;
+			if (cave_o_idx[y][x] != 0) continue;
+
+			/* Illuminate if requested */
+			if (flag & (STAR_BURST_LIGHT))
+			{
+				cave_info[y][x] |= (CAVE_GLOW);
+			}
+			/* Or turn off the lights */
+			else
+			{
+				cave_info[y][x] &= ~(CAVE_GLOW);
+			}
+
+			/* Floor overwrites the dungeon */
+			if (flag & (STAR_BURST_RAW_FLOOR))
+			{
+				cave_set_feat(y, x, feat);
+			}
+			/* Floor is merged with the dungeon */
+			else
+			{
+				build_terrain(y, x, feat);
+			}
+
+			/* Make part of a room if requested */
+			if (flag & (STAR_BURST_ROOM))
+			{
+				cave_info[y][x] |= (CAVE_ROOM);
+			}
+
+			/* Special case. No edge feature */
+			if (edge == FEAT_NONE)
+			{
+				/*
+				 * We lite the outside grids anyway, to
+				 * avoid lakes surrounded with blackness.
+				 * We only do this if the lake is lit.
+				 */
+				if (!(flag & (STAR_BURST_LIGHT |
+					STAR_BURST_ROOM))) continue;
+
+				/* Look in all directions. */
+				for (d = 0; d < 8; d++)
+				{
+					/* Extract adjacent location */
+					int yy = y + ddy_ddd[d];
+					int xx = x + ddx_ddd[d];
+
+					/* Ignore annoying locations */
+					if (!in_bounds_fully(yy, xx)) continue;
+
+					/* Already processed */
+					if (play_info[yy][xx] & (PLAY_TEMP)) continue;
+
+					/* Lite the feature */
+					if (flag & (STAR_BURST_LIGHT))
+					{
+						cave_info[yy][xx] |= (CAVE_GLOW);
+					}
+
+					/* Make part of the room */
+					if (flag & (STAR_BURST_ROOM))
+					{
+						cave_info[yy][xx] |= (CAVE_ROOM);
+					}
+				}
+
+				/* Done */
+				continue;
+			}
+
+			/* Common case. We have an edge feature */
+
+			/* Look in all directions. */
+			for (d = 0; d < 8; d++)
+			{
+				/* Extract adjacent location */
+				int yy = y + ddy_ddd[d];
+				int xx = x + ddx_ddd[d];
+
+				/* Ignore annoying locations */
+				if (!in_bounds_fully(yy, xx)) continue;
+
+				/* Already processed */
+				if (play_info[yy][xx] & (PLAY_TEMP)) continue;
+
+				/* Do not touch "icky" grids. */
+				if (room_has_flag(yy, xx, ROOM_ICKY)) continue;
+
+				/* Do not touch occupied grids. */
+				if (cave_m_idx[yy][xx] != 0) continue;
+				if (cave_o_idx[yy][xx] != 0) continue;
+
+				/* Illuminate if requested. */
+				if (flag & (STAR_BURST_LIGHT))
+				{
+					cave_info[yy][xx] |= (CAVE_GLOW);
+				}
+
+				/* Edge overwrites the dungeon */
+				if (flag & (STAR_BURST_RAW_EDGE))
+				{
+					cave_set_feat(yy, xx, edge);
+
+				}
+				/* Edge is merged with the dungeon */
+				else
+				{
+					build_terrain(yy, xx, edge);
+				}
+
+				/* Make part of a room if requested */
+				if (flag & (STAR_BURST_ROOM))
+				{
+					cave_info[yy][xx] |= (CAVE_ROOM);
+				}
+
+			}
+		}
+	}
+
+	/* Clear the mark */
+	for (y = y1 + 1; y < y2; y++)
+	{
+		for (x = x1 + 1; x < x2; x++)
+		{
+			play_info[y][x] &= ~(PLAY_TEMP);
+		}
+	}
+
+	/* Success */
+	return (TRUE);
+}
+
+
+
 /*
  * Hack -- mimic'ed feature for "room_info_feat()"
  */
@@ -1105,7 +1603,7 @@ static bool room_info_feat(int f_idx)
 /*
  * Generate helper -- draw a rectangle with a feature using a series of 'pattern' flags.
  */
-static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, int dy, int dx)
+static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, int dy, int dx)
 {
 	int y, x, i, k;
 
@@ -1115,6 +1613,31 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 	int max_offset = offset + 1;
 
 	bool outer;
+	bool use_edge;
+
+	s16b edge = f_info[feat].edge;
+
+	/* Ignore edge terrain - use central terrain */
+	if ((flag & (RG1_IGNORE_EDGE)) != 0)
+	{
+		edge = feat;
+	}
+
+	/* Bridge or tunnel edges instead */
+	else if ((flag & (RG1_BRIDGE_EDGE)) != 0)
+	{
+		if (f_info[feat].flags2 & (FF2_BRIDGE))
+		{
+			/* Bridge previous contents */
+			feat_state(feat, FS_BRIDGE);
+		}
+		/* Apply tunnel */
+		else if (f_info[feat].flags1 & (FF1_TUNNEL))
+		{
+			/* Tunnel previous contents */
+			feat_state(feat, FS_TUNNEL);
+		}
+	}
 
 	/* Paranoia */
 	if (!dy || !dx) return;
@@ -1129,6 +1652,59 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 
 		/* Prepare allocation table */
 		get_feat_num_prep();
+	}
+
+	/* Draw maze if required -- ensure minimum size */
+	if (((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR)) != 0) && (y2 - y1 > 4) && (x2 - x1 > 4) && ((flag & (RG1_ALLOC)) == 0))
+	{
+		bool n = FALSE, s = FALSE, e = FALSE, w = FALSE;
+
+		int wall = ((flag & (RG1_MAZE_WALL)) != 0) ? feat : (((flag & (RG1_MAZE_DECOR)) != 0) ? FEAT_FLOOR : FEAT_WALL_INNER);
+		int path = ((flag & (RG1_MAZE_PATH)) != 0) ? feat : (edge && (edge != feat) ? edge : FEAT_FLOOR);
+
+		/* Check for outer edges */
+		if ((f_info[cave_feat[y1][x1 + x2 / 2]].flags1 & (FF1_OUTER)) != 0) n = TRUE;
+		if ((f_info[cave_feat[y1 + y2 / 2][x1]].flags1 & (FF1_OUTER)) != 0) w = TRUE;
+		if ((f_info[cave_feat[y1 + y2 / 2][x2]].flags1 & (FF1_OUTER)) != 0) e = TRUE;
+		if ((f_info[cave_feat[y2][x1 + x2 / 2]].flags1 & (FF1_OUTER)) != 0) s = TRUE;
+
+		/* Ensure the correct ordering and that size is odd in both directions */
+		if ((dy > 0) && (dx > 0)) draw_maze(y1, x1, y1 + y2 % 2 ? y2 : y2 - 1, x1 + x2 % 2 ? x2 : x2 - 1, wall, path);
+		else if ((dy < 0) && (dx > 0)) draw_maze(y2, x1, y1 + y2 % 2 ? y1 : y1 - 1, x1 + x2 % 2 ? x2 : x2 - 1, wall, path);
+		else if ((dy > 0) && (dx < 0)) draw_maze(y1, x2, y1 + y2 % 2 ? y2 : y2 - 1, x1 + x2 % 2 ? x1 : x1 - 1, wall, path);
+		else if ((dy < 0) && (dx < 0)) draw_maze(y2, x2, y1 + y2 % 2 ? y1 : y1 - 1, x1 + x2 % 2 ? x1 : x1 - 1, wall, path);
+
+		/* Ensure outer edges */
+		if (n) for (x = x1; (dx > 0) ? x <= x2 : x >= x2; x += dx > 0 ? 1 : -1) cave_set_feat(y1, x, FEAT_WALL_OUTER);
+		if (w) for (y = y1; (dy > 0) ? y <= y2 : y >= y2; y += dy > 0 ? 1 : -1) cave_set_feat(y, x1, FEAT_WALL_OUTER);
+		if (e) for (y = y1; (dy > 0) ? y <= y2 : y >= y2; y += dy > 0 ? 1 : -1) cave_set_feat(y, x2, FEAT_WALL_OUTER);
+		if (s) for (x = x1; (dx > 0) ? x <= x2 : x >= x2; x += dx > 0 ? 1 : -1) cave_set_feat(y2, x, FEAT_WALL_OUTER);
+		
+		/* Hack -- scatter items inside maze */
+		flag |= (RG1_SCATTER);
+		feat = 0;
+		edge = 0;
+	}
+
+	/* Use checkered for invalid mazes */
+	else if ((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR)) != 0)
+	{
+		flag |= (RG1_CHECKER);
+	}
+
+	/* Place starburst if required */
+	else if (((flag & (RG1_STARBURST)) != 0) && ((flag & (RG1_ALLOC)) == 0))
+	{
+		/* Ensure the correct ordering of directions */
+		if ((dy > 0) && (dx > 0)) generate_starburst_room(y1, x1, y2, x2, feat, edge, STAR_BURST_ROOM | (((flag & (RG1_LITE)) != 0) ? STAR_BURST_LIGHT : 0L));
+		else if ((dy < 0) && (dx > 0)) generate_starburst_room(y2, x1, y1, x2, feat, edge, STAR_BURST_ROOM | (((flag & (RG1_LITE)) != 0) ? STAR_BURST_LIGHT : 0L));
+		else if ((dy > 0) && (dx < 0)) generate_starburst_room(y1, x2, y2, x1, feat, edge, STAR_BURST_ROOM | (((flag & (RG1_LITE)) != 0) ? STAR_BURST_LIGHT : 0L));
+		else if ((dy < 0) && (dx < 0)) generate_starburst_room(y2, x2, y1, x1, feat, edge, STAR_BURST_ROOM | (((flag & (RG1_LITE)) != 0) ? STAR_BURST_LIGHT : 0L));
+
+		/* Hack -- scatter items around the starburst */
+		flag |= (RG1_SCATTER);
+		feat = 0;
+		edge = 0;
 	}
 
 	/* Scatter several about if requested */
@@ -1164,14 +1740,14 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 				/* Only place on edge of room if edge flag and not centre flag set */
 				if (((flag & (RG1_EDGE)) != 0) && ((flag & (RG1_CENTRE)) == 0) && (cave_feat[y][x] != FEAT_WALL_OUTER))
 				{
-					bool accept = FALSE;
+					use_edge = FALSE;
 
 					for (i = 0; i < 8; i++)
 					{
-						if (cave_feat[y + ddy_ddd[i]][x + ddx_ddd[i]] == FEAT_WALL_OUTER) accept = TRUE;
+						if ((f_info[cave_feat[y + ddy_ddd[i]][x + ddx_ddd[i]]].flags1 & (FF1_OUTER)) != 0) use_edge = TRUE;
 					}
 
-					if (!accept) continue;
+					if (!use_edge) continue;
 				}
 				/* Don't place on edge of room if centre and not edge flag are set */
 				else if (((flag & (RG1_CENTRE)) != 0) && ((flag & (RG1_EDGE)) == 0) && (cave_feat[y][x] != FEAT_WALL_OUTER))
@@ -1180,10 +1756,12 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 
 					for (i = 0; i < 4; i++)
 					{
-						if (cave_feat[y + ddy_ddd[i]][x + ddx_ddd[i]] == FEAT_WALL_OUTER) accept = FALSE;
+						if ((f_info[cave_feat[y + ddy_ddd[i]][x + ddx_ddd[i]]].flags1 & (FF1_OUTER)) != 0) accept = FALSE;
 					}
 
 					if (!accept) continue;
+
+					use_edge = TRUE;
 				}
 
 				/* Leave inner area open */
@@ -1223,6 +1801,9 @@ static void generate_patt(int y1, int x1, int y2, int x2, int feat, u32b flag, i
 				else
 				{
 					int place_feat = feat;
+
+					/* Use edge instead */
+					if ((use_edge) && (edge)) place_feat = edge;
 
 					/* Hack -- in case we don't place enough */
 					if ((flag & (RG1_RANDOM)) != 0)
@@ -1606,6 +2187,10 @@ static bool find_space(int *y, int *x, int height, int width)
 }
 
 
+
+
+
+
 /*
  * Hack -- tval and sval range for "room_info_kind()"
  */
@@ -1857,9 +2442,6 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 
 			/* Add flags */
 			*place_flag |= d_info[i].p_flag;
-
-			/* Add level flags */
-			level_flag |= (d_info[i].p_flag & (RG1_LEVEL_FLAGS));
 
 			/* Don't place yet */
 			if ((*place_flag & (RG1_PLACE)) == 0) continue;
@@ -3255,379 +3837,6 @@ static bool build_pool(int y0, int x0, int feat, bool do_big_pool)
 }
 
 
-/*
- * Mark a starburst shape in the dungeon with the CAVE_TEMP flag, given the
- * coordinates of a section of the dungeon in "box" format. -LM-, -DG-
- *
- * Starburst are made in three steps:
- * 1: Choose a box size-dependant number of arcs.  Large starburts need to
- *    look less granular and alter their shape more often, so they need
- *    more arcs.
- * 2: For each of the arcs, calculate the portion of the full circle it
- *    includes, and its maximum effect range (how far in that direction
- *    we can change features in).  This depends on starburst size, shape, and
- *    the maximum effect range of the previous arc.
- * 3: Use the table "get_angle_to_grid" to supply angles to each grid in
- *    the room.  If the distance to that grid is not greater than the
- *    maximum effect range that applies at that angle, change the feature
- *    if appropriate (this depends on feature type).
- *
- * Usage notes:
- * - This function uses a table that cannot handle distances larger than
- *   20, so it calculates a distance conversion factor for larger starbursts.
- * - This function is not good at handling starbursts much longer along one axis
- *   than the other.
- * This function doesn't mark any grid in the perimeter of the given box.
- *
- */
-static bool mark_starburst_shape(int y1, int x1, int y2, int x2, u32b flag)
-{
-	int y0, x0, y, x, ny, nx;
-	int i;
-	int size;
-	int dist, max_dist, dist_conv, dist_check;
-	int height, width, arc_dist;
-	int degree_first, center_of_arc, degree;
-
-	/* Special variant starburst.  Discovered by accident. */
-	bool make_cloverleaf = FALSE;
-
-	/* Holds first degree of arc, maximum effect distance in arc. */
-	int arc[45][2];
-
-	/* Number (max 45) of arcs. */
-	int arc_num;
-
-	/* Make certain the starburst does not cross the dungeon edge. */
-	if ((!in_bounds_fully(y1, x1)) || (!in_bounds_fully(y2, x2))) return (FALSE);
-
-	/* Robustness -- test sanity of input coordinates. */
-	if ((y1 + 2 >= y2) || (x1 + 2 >= x2)) return (FALSE);
-
-	/* Get room height and width. */
-	height = 1 + y2 - y1;
-	width  = 1 + x2 - x1;
-
-	/* Note the "size" */
-	size = 2 + (width + height) / 22;
-
-	/* Get a shrinkage ratio for large starbursts, as table is limited. */
-	if ((width > 40) || (height > 40))
-	{
-		if (width > height) dist_conv = 1 + (10 * width  / 40);
-		else                dist_conv = 1 + (10 * height / 40);
-	}
-	else dist_conv = 10;
-
-	/* Make a cloverleaf starburst sometimes.  (discovered by accident) */
-	if ((flag & (STAR_BURST_CLOVER)) && (height > 10) && (!rand_int(20)))
-	{
-		arc_num = 12;
-		make_cloverleaf = TRUE;
-	}
-
-	/* Usually, we make a normal starburst. */
-	else
-	{
-		/* Ask for a reasonable number of arcs. */
-		arc_num = 8 + (height * width / 80);
-		arc_num = rand_spread(arc_num, 3);
-		if (arc_num < 8) arc_num = 8;
-		if (arc_num > 45) arc_num = 45;
-	}
-
-
-	/* Get the center of the starburst. */
-	y0 = y1 + height / 2;
-	x0 = x1 + width  / 2;
-
-	/* Start out at zero degrees. */
-	degree_first = 0;
-
-
-	/* Determine the start degrees and expansion distance for each arc. */
-	for (i = 0; i < arc_num; i++)
-	{
-		/* Get the first degree for this arc (using 180-degree circles). */
-		arc[i][0] = degree_first;
-
-		/* Get a slightly randomized start degree for the next arc. */
-		degree_first += 180 / arc_num;
-
-		/* Do not entirely leave the usual range */
-		if (degree_first < 180 * (i+1) / arc_num)
-		{
-			degree_first = 180 * (i+1) / arc_num;
-		}
-		if (degree_first > (180 + arc_num) * (i+1) / arc_num)
-		{
-			degree_first = (180 + arc_num) * (i+1) / arc_num;
-		}
-
-		/* Get the center of the arc (convert from 180 to 360 circle). */
-		center_of_arc = degree_first + arc[i][0];
-
-		/* Get arc distance from the horizontal (0 and 180 degrees) */
-		if      (center_of_arc <=  90) arc_dist = center_of_arc;
-		else if (center_of_arc >= 270) arc_dist = ABS(center_of_arc - 360);
-		else                           arc_dist = ABS(center_of_arc - 180);
-
-		/* Special case -- Handle cloverleafs */
-		if ((arc_dist == 45) && (make_cloverleaf)) dist = 0;
-
-		/*
-		 * Usual case -- Calculate distance to expand outwards.  Pay more
-		 * attention to width near the horizontal, more attention to height
-		 * near the vertical.
-		 */
-		else dist = ((height * arc_dist) + (width * (90 - arc_dist))) / 90;
-
-		/* Randomize distance (should never be greater than radius) */
-		arc[i][1] = rand_range(dist / 4, dist / 2);
-
-		/* Keep variability under control (except in special cases). */
-		if ((dist != 0) && (i != 0))
-		{
-			int diff = arc[i][1] - arc[i-1][1];
-
-			if (ABS(diff) > size)
-			{
-				if (diff > 0)	arc[i][1] = arc[i-1][1] + size;
-				else arc[i][1] = arc[i-1][1] - size;
-			}
-		}
-	}
-
-	/* Neaten up final arc of circle by comparing it to the first. */
-	if (TRUE)
-	{
-		int diff = arc[arc_num - 1][1] - arc[0][1];
-
-		if (ABS(diff) > size)
-		{
-			if (diff > 0)	arc[arc_num - 1][1] = arc[0][1] + size;
-			else arc[arc_num - 1][1] = arc[0][1] - size;
-		}
-	}
-
-
-	/* Precalculate check distance. */
-	dist_check = 21 * dist_conv / 10;
-
-	/* Change grids between (and not including) the edges. */
-	for (y = y1 + 1; y < y2; y++)
-	{
-		for (x = x1 + 1; x < x2; x++)
-		{
-
-			/* Get distance to grid. */
-			dist = distance(y0, x0, y, x);
-
-			/* Look at the grid if within check distance. */
-			if (dist < dist_check)
-			{
-				/* Convert and reorient grid for table access. */
-				ny = 20 + 10 * (y - y0) / dist_conv;
-				nx = 20 + 10 * (x - x0) / dist_conv;
-
-				/* Illegal table access is bad. */
-				if ((ny < 0) || (ny > 40) || (nx < 0) || (nx > 40))  continue;
-
-				/* Get angle to current grid. */
-				degree = get_angle_to_grid[ny][nx];
-
-				/* Scan arcs to find the one that applies here. */
-				for (i = arc_num - 1; i >= 0; i--)
-				{
-					if (arc[i][0] <= degree)
-					{
-						max_dist = arc[i][1];
-
-						/* Must be within effect range. */
-						if (max_dist >= dist)
-						{
-							/* Mark the grid */
-							play_info[y][x] |= (PLAY_TEMP);
-						}
-
-						/* Arc found.  End search */
-						break;
-					}
-				}
-			}
-		}
-	}
-
-	return (TRUE);
-}
-
-
-/*
- * Make a starburst room. -LM-, -DG-
- *
- * Usage notes:
- * - This function is not good at handling rooms much longer along one axis
- *   than the other.
- * - It is safe to call this function on areas that might contain vaults or
- *   pits, because "icky" and occupied grids are left untouched.
- */
-static bool generate_starburst_room(int y1, int x1, int y2, int x2,
-	u16b feat, u16b edge, u32b flag)
-{
-	int y, x, d;
-
-	/* Mark the affected grids */
-	if (!mark_starburst_shape(y1, x1, y2, x2, flag)) return (FALSE);
-
-	/* Paranoia */
-	if (edge == feat) edge = FEAT_NONE;
-
-	/* Process marked grids */
-	for (y = y1 + 1; y < y2; y++)
-	{
-		for (x = x1 + 1; x < x2; x++)
-		{
-			/* Marked grids only */
-			if (!(play_info[y][x] & (PLAY_TEMP))) continue;
-
-			/* Do not touch "icky" grids. */
-			if (room_has_flag(y, x, ROOM_ICKY)) continue;
-
-			/* Do not touch occupied grids. */
-			if (cave_m_idx[y][x] != 0) continue;
-			if (cave_o_idx[y][x] != 0) continue;
-
-			/* Illuminate if requested */
-			if (flag & (STAR_BURST_LIGHT))
-			{
-				cave_info[y][x] |= (CAVE_GLOW);
-			}
-			/* Or turn off the lights */
-			else
-			{
-				cave_info[y][x] &= ~(CAVE_GLOW);
-			}
-
-			/* Floor overwrites the dungeon */
-			if (flag & (STAR_BURST_RAW_FLOOR))
-			{
-				cave_set_feat(y, x, feat);
-			}
-			/* Floor is merged with the dungeon */
-			else
-			{
-				build_terrain(y, x, feat);
-			}
-
-			/* Make part of a room if requested */
-			if (flag & (STAR_BURST_ROOM))
-			{
-				cave_info[y][x] |= (CAVE_ROOM);
-			}
-
-			/* Special case. No edge feature */
-			if (edge == FEAT_NONE)
-			{
-				/*
-				 * We lite the outside grids anyway, to
-				 * avoid lakes surrounded with blackness.
-				 * We only do this if the lake is lit.
-				 */
-				if (!(flag & (STAR_BURST_LIGHT |
-					STAR_BURST_ROOM))) continue;
-
-				/* Look in all directions. */
-				for (d = 0; d < 8; d++)
-				{
-					/* Extract adjacent location */
-					int yy = y + ddy_ddd[d];
-					int xx = x + ddx_ddd[d];
-
-					/* Ignore annoying locations */
-					if (!in_bounds_fully(yy, xx)) continue;
-
-					/* Already processed */
-					if (play_info[yy][xx] & (PLAY_TEMP)) continue;
-
-					/* Lite the feature */
-					if (flag & (STAR_BURST_LIGHT))
-					{
-						cave_info[yy][xx] |= (CAVE_GLOW);
-					}
-
-					/* Make part of the room */
-					if (flag & (STAR_BURST_ROOM))
-					{
-						cave_info[yy][xx] |= (CAVE_ROOM);
-					}
-				}
-
-				/* Done */
-				continue;
-			}
-
-			/* Common case. We have an edge feature */
-
-			/* Look in all directions. */
-			for (d = 0; d < 8; d++)
-			{
-				/* Extract adjacent location */
-				int yy = y + ddy_ddd[d];
-				int xx = x + ddx_ddd[d];
-
-				/* Ignore annoying locations */
-				if (!in_bounds_fully(yy, xx)) continue;
-
-				/* Already processed */
-				if (play_info[yy][xx] & (PLAY_TEMP)) continue;
-
-				/* Do not touch "icky" grids. */
-				if (room_has_flag(yy, xx, ROOM_ICKY)) continue;
-
-				/* Do not touch occupied grids. */
-				if (cave_m_idx[yy][xx] != 0) continue;
-				if (cave_o_idx[yy][xx] != 0) continue;
-
-				/* Illuminate if requested. */
-				if (flag & (STAR_BURST_LIGHT))
-				{
-					cave_info[yy][xx] |= (CAVE_GLOW);
-				}
-
-				/* Edge overwrites the dungeon */
-				if (flag & (STAR_BURST_RAW_EDGE))
-				{
-					cave_set_feat(yy, xx, edge);
-
-				}
-				/* Edge is merged with the dungeon */
-				else
-				{
-					build_terrain(yy, xx, edge);
-				}
-
-				/* Make part of a room if requested */
-				if (flag & (STAR_BURST_ROOM))
-				{
-					cave_info[yy][xx] |= (CAVE_ROOM);
-				}
-
-			}
-		}
-	}
-
-	/* Clear the mark */
-	for (y = y1 + 1; y < y2; y++)
-	{
-		for (x = x1 + 1; x < x2; x++)
-		{
-			play_info[y][x] &= ~(PLAY_TEMP);
-		}
-	}
-
-	/* Success */
-	return (TRUE);
-}
 
 
 static void build_type_starburst(int y0, int x0, int dy, int dx, bool light)
@@ -3759,132 +3968,6 @@ static void build_type_starburst(int y0, int x0, int dy, int dx, bool light)
 		}
 	}
 }
-
-
-
-/* Convert a maze coordinate into a dungeon coordinate */
-#define YPOS(y, y1)		((y1) + (y) * 2 + 1)
-#define XPOS(x, x1)		((x1) + (x) * 2 + 1)
-
-
-/*
- * Build an acyclic maze inside a given rectangle.  - Eric Bock -
- * Construct the maze from a given pair of features.
- *
- * Note that the edge lengths should be odd.
- */
-static void draw_maze(int y1, int x1, int y2, int x2, byte feat_wall,
-    byte feat_path)
-{
-	int i, j;
-	int ydim, xdim;
-	int grids;
-
-	int y, x;
-	int ty, tx;
-	int dy, dx;
-
-	byte dir[4];
-	byte dirs;
-
-	/* Start with a solid rectangle of the "wall" feat */
-	generate_fill(y1, x1, y2, x2, feat_wall);
-
-	/* Calculate dimensions */
-	ydim = (y2 - y1) / 2;
-	xdim = (x2 - x1) / 2;
-
-	/* Number of unexamined grids */
-	grids = ydim * xdim - 1;
-
-	/* Set the initial position */
-	y = rand_int(ydim);
-	x = rand_int(xdim);
-
-	/* Place a floor here */
-	cave_set_feat(YPOS(y, y1), XPOS(x, x1), feat_path);
-
-	/* Now build the maze */
-	while (grids)
-	{
-		/* Only use maze grids */
-		if (cave_feat[YPOS(y, y1)][XPOS(x, x1)] == feat_path)
-		{
-			/* Pick a target */
-			ty = rand_int(ydim);
-			tx = rand_int(xdim);
-
-			while (TRUE)
-			{
-				dirs = 0;
-				dy = 0;
-				dx = 0;
-
-				/* Calculate the dungeon position */
-				j = YPOS(y, y1);
-				i = XPOS(x, x1);
-
-				/** Enumerate possible directions **/
-
-				/* Up */
-				if (y && (cave_feat[j - 2][i] == feat_wall)) dir[dirs++] = 1;
-
-				/* Down */
-				if ((y < ydim - 1) && (cave_feat[j + 2][i] == feat_wall)) dir[dirs++] = 2;
-
-				/* Left */
-				if (x && (cave_feat[j][i - 2] == feat_wall)) dir[dirs++] = 3;
-
-				/* Right */
-				if ((x < xdim - 1) && (cave_feat[j][i + 2] == feat_wall)) dir[dirs++] = 4;
-
-				/* Dead end; go to the next valid grid */
-				if (!dirs) break;
-
-				/* Pick a random direction */
-				switch (dir[rand_int(dirs)])
-				{
-					/* Move up */
-					case 1:  dy = -1;  break;
-
-					/* Move down */
-					case 2:  dy =  1;  break;
-
-					/* Move left */
-					case 3:  dx = -1;  break;
-
-					/* Move right */
-					case 4:  dx =  1;  break;
-				}
-
-				/* Place floors */
-				cave_set_feat(j + dy, i + dx, feat_path);
-				cave_set_feat(j + dy * 2, i + dx * 2, feat_path);
-
-				/* Advance */
-				y += dy;
-				x += dx;
-
-				/* One less grid to examine */
-				grids--;
-
-				/* Check for completion */
-				if ((y == ty) && (x == tx)) break;
-			}
-		}
-
-		/* Find a new position */
-		y = rand_int(ydim);
-		x = rand_int(xdim);
-	}
-}
-
-
-#undef YPOS
-#undef XPOS
-
-
-
 
 
 
@@ -5479,8 +5562,8 @@ static bool build_type123(int room, int type)
 	}
 
 	/* Calculate dimensions */
-	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 2;
-	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 2;
+	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 3;
+	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 3;
 
 	/* Find and reserve some space in the dungeon.  Get center of room. */
 	if (!find_space(&y0, &x0, height, width)) return (FALSE);
@@ -5547,8 +5630,8 @@ static bool build_type45(int room, int type)
 	}
 
 	/* Calculate dimensions */
-	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 2;
-	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 2;
+	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 3;
+	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 3;
 
 	/* Find and reserve some space in the dungeon.  Get center of room. */
 	if (!find_space(&y0, &x0, height, width)) return (FALSE);
@@ -5616,8 +5699,8 @@ static bool build_type6(int room, int type)
 	}
 
 	/* Calculate dimensions */
-	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 2;
-	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 2;
+	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 3;
+	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 3;
 
 	/* Find and reserve some space in the dungeon.  Get center of room. */
 	if (!find_space(&y0, &x0, height, width)) return (FALSE);
