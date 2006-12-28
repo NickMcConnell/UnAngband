@@ -528,7 +528,7 @@ B:
 D:A pile of rubble 
 F:49:49:113
 S:SEEN
-P:SCATTER | MIMIC
+P:SCATTER
 
 N:104:119:0:0:30:3:1:128
 A:
@@ -537,7 +537,7 @@ D:A pile of rubble
 F:49:49:113
 S:SEEN
 R:CAN_DIG
-P:SCATTER | MIMIC
+P:SCATTER
 
 N:104:119:0:0:30:3:1:128
 A:
@@ -546,7 +546,7 @@ D:A pile of rubble
 F:49:49:113
 S:SEEN
 R:GIANT
-P:SCATTER | MIMIC
+P:SCATTER
 
 N:104:119:0:0:25:1:1:128
 A:
@@ -606,7 +606,6 @@ F:637:0:406
 D:A magic circle 
 S:SEEN
 R:MAGE
-P:MIMIC
 
 N:104:119:0:0:30:2:40:128
 A:magic
@@ -615,7 +614,6 @@ F:638:0:406
 D:A magic triangle 
 S:SEEN
 R:MAGE
-P:MIMIC
 
 N:104:119:0:0:40:2:50:128
 A:magic
@@ -624,7 +622,7 @@ F:639:0:406
 D:A magic square 
 S:SEEN
 R:MAGE
-P:MIMIC
+
 
 N:104:119:0:0:50:2:60:128
 A:magic
@@ -633,7 +631,7 @@ F:640:0:406
 D:A magic pentagram 
 S:SEEN
 R:MAGE
-P:MIMIC
+
 
 N:104:119:0:0:60:2:70:128
 A:magic
@@ -642,7 +640,7 @@ F:640:0:406
 D:A magic hexagram 
 S:SEEN
 R:MAGE
-P:MIMIC
+
 
 N:104:119:0:0:35:2:5:128
 A:
@@ -651,7 +649,7 @@ F:668:0:405
 D:A shrine 
 S:SEEN
 R:PRIEST
-P:MIMIC | ALLOC
+P:ALLOC
 
 N:104:119:0:0:25:3:0:128
 A:
@@ -687,7 +685,7 @@ F:420:0:831
 D:A tree 
 S:SEEN
 L:LIVING
-P:SCATTER | MIMIC
+P:SCATTER
 
 N:104:119:0:0:50:0:40:128
 A:tree
@@ -705,7 +703,7 @@ F:421:0:831
 D:A tree 
 S:SEEN
 L:LIVING
-P:SCATTER | MIMIC
+P:SCATTER
 
 N:104:119:0:0:50:0:0:128
 A:
@@ -1026,7 +1024,7 @@ D:A small wooden chest
 R:SNEAKY
 F:316:0:0
 S:SEEN
-P:ALLOC | MIMIC
+P:ALLOC
 
 N:104:105:0:0:25:2:15:128
 A:
@@ -1035,7 +1033,7 @@ D:A large wooden chest
 R:SNEAKY
 F:327:0:0
 S:SEEN
-P:ALLOC | MIMIC
+P:ALLOC
 
 N:104:105:0:0:25:2:25:128
 A:
@@ -1044,7 +1042,7 @@ D:A small iron chest
 R:SNEAKY
 F:336:0:0
 S:SEEN
-P:ALLOC | MIMIC
+P:ALLOC
 
 N:104:105:0:0:25:2:35:128
 A:
@@ -1053,7 +1051,7 @@ D:A large iron chest
 R:SNEAKY
 F:345:0:0
 S:SEEN
-P:ALLOC | MIMIC
+P:ALLOC
 
 N:104:105:0:0:25:2:45:128
 A:
@@ -1062,7 +1060,7 @@ D:A small steel chest
 R:SNEAKY
 F:355:0:0
 S:SEEN
-P:ALLOC | MIMIC
+P:ALLOC
 
 N:104:105:0:0:25:2:55:128
 A:
@@ -1071,7 +1069,7 @@ D:A large steel chest
 R:SNEAKY
 F:345:0:0
 S:SEEN
-P:ALLOC | MIMIC
+P:ALLOC
 
 N:104:105:0:0:30:3:5:128
 A:
@@ -1226,7 +1224,7 @@ D:littered with loose rocks.
 F:95:0:835
 S:SEEN
 R:CAN_DIG
-P:PLACE | SCATTER | MIMIC
+P:PLACE | SCATTER
 
 N:106:107:0:0:50:2:3:128
 A:rocky
@@ -1472,7 +1470,7 @@ D:surrounded by fallen rubble.
 F:49:49:113
 S:SEEN
 R:CAN_DIG
-P:PLACE | RANDOM | MIMIC
+P:PLACE | RANDOM
 
 N:106:149:0:0:140:0:10:128
 A:ice-strewn
@@ -1481,7 +1479,7 @@ D:surrounded by fallen ice.
 F:464:0:0
 L:ICE
 S:SEEN
-P:PLACE | RANDOM | MIMIC
+P:PLACE | RANDOM
 
 N:106:148:0:0:140:0:65:128
 A:acidic
@@ -1598,7 +1596,7 @@ D:surrounded by trench filled with burning oil.
 F:184:0:0
 L:OIL
 S:SEEN
-P:PLACE | INNER | MIMIC
+P:PLACE | INNER
 
 N:106:151:0:0:70:0:60:128
 A:
@@ -1820,7 +1818,7 @@ D:covered with sand.
 F:192:192:112
 S:SEEN
 R:CAN_DIG
-P:PLACE | RANDOM | MIMIC
+P:PLACE | RANDOM
 
 N:106:146:0:0:30:0:20:128
 A:quicksand
@@ -1830,7 +1828,7 @@ F:197:0:0
 S:SEEN
 L:WATER
 R:CAN_DIG
-P:PLACE | RANDOM | MIMIC
+P:PLACE | RANDOM
 
 N:106:151:0:0:150:2:75:128
 A:burning
@@ -1983,7 +1981,7 @@ D:planted with bushes.
 F:435:0:0
 S:SEEN
 L:LIVING
-P:PLACE | RANDOM | MIMIC
+P:PLACE | RANDOM
 
 N:106:153:0:0:70:1:30:128
 A:
@@ -2019,7 +2017,7 @@ D:surrounded by pits.
 F:17:0:0
 R:CAN_DIG
 S:SEEN
-P:INNER | MIMIC
+P:INNER
 
 N:106:107:0:0:25:1:60:128
 A:runed
@@ -2028,7 +2026,7 @@ D:covered by strange runes.
 F:20:0:750
 R:MAGE
 S:SEEN
-P:INNER | MIMIC
+P:INNER
 
 N:106:107:0:0:25:1:60:128
 A:trapped
@@ -2037,7 +2035,7 @@ D:surrounded by explosive traps.
 F:326:0:0
 R:SNEAKY
 S:SEEN
-P:INNER | MIMIC
+P:INNER
 
 N:106:107:0:0:25:1:60:128
 A:trapped
@@ -2046,7 +2044,7 @@ D:surrounded by spring-loaded traps.
 F:24:0:0
 R:SNEAKY
 S:SEEN
-P:INNER | MIMIC
+P:INNER
 
 N:106:107:0:0:25:1:60:128
 A:trapped
@@ -2055,7 +2053,7 @@ D:surrounded by gas traps.
 R:SNEAKY
 F:24:0:0
 S:SEEN
-P:INNER | MIMIC
+P:INNER
 
 N:106:107:0:0:25:1:60:128
 A:visage
@@ -2064,7 +2062,7 @@ D:surrounded by stoney visages.
 R:MAGE
 F:70:0:0
 S:SEEN
-P:INNER | MIMIC
+P:INNER
 
 N:106:107:0:0:25:1:60:128
 A:trapped
@@ -2073,7 +2071,7 @@ D:surrounded by trip wires.
 R:SNEAKY
 F:77:0:0
 S:SEEN
-P:INNER | MIMIC
+P:INNER
 
 N:106:107:0:0:25:1:60:128
 A:symbol
@@ -2082,7 +2080,7 @@ D:covered by magic symbols.
 R:MAGE
 F:81:0:750
 S:SEEN
-P:INNER | MIMIC
+P:INNER
 
 N:106:107:0:0:25:1:60:128
 A:hexen
@@ -2091,7 +2089,7 @@ D:covered by ancient hexes.
 R:MAGE
 F:87:0:750
 S:SEEN
-P:INNER | MIMIC
+P:INNER
 
 N:106:107:0:0:25:1:60:128
 A:trapped
@@ -2100,7 +2098,7 @@ D:surrounded by murder holes.
 R:SNEAKY
 F:91:0:0
 S:SEEN
-P:INNER | MIMIC
+P:INNER
 
 N:106:124:0:0:20:1:0:128
 A:
@@ -3220,7 +3218,7 @@ D:Strange runes cover
 F:20:817:750
 S:SEEN | CURSED
 R:EVIL
-P:SCATTER | MIMIC
+P:SCATTER
 
 N:117:102:0:0:25:1:0:128
 A:candle-lit
@@ -3328,7 +3326,7 @@ D:Cracks cover
 F:113:0:113
 R:OOZE
 S:SEEN
-P:OUTER | RANDOM | MIMIC
+P:OUTER | RANDOM
 
 N:117:121:0:0:30:3:1:128
 A:earth
@@ -4450,7 +4448,7 @@ D:covered in snow.
 S:SEEN
 R:ELF
 L:LIVING | ICE
-P:PLACE | MIMIC
+P:PLACE
 
 N:122:149:0:0:25:0:45:128
 A:
@@ -4469,7 +4467,7 @@ D:planted with bushes.
 F:435:0:0
 S:SEEN
 L:LIVING
-P:PLACE | MIMIC
+P:PLACE
 
 N:122:153:0:0:7:1:30:128
 A:
@@ -4478,7 +4476,7 @@ D:planted with thorns.
 F:448:0:0
 S:SEEN
 L:LIVING
-P:PLACE | MIMIC
+P:PLACE
 
 N:122:153:0:0:7:1:30:128
 A:
@@ -4496,7 +4494,7 @@ D:planted with poisonous thorns.
 F:436:0:0
 S:SEEN
 L:LIVING
-P:PLACE | MIMIC
+P:PLACE
 
 N:122:146:0:0:14:2:0:128
 A:
@@ -5208,6 +5206,26 @@ A:
 B:
 P:NORTH | CENTRE | EAST
 
+N:141:106:0:0:15:15:45:128
+A:
+B:
+P:NORTH | CENTRE | EDGE
+
+N:141:106:0:0:5:5:55:128
+A:
+B:
+P:NORTH | CENTRE | WEST | EDGE
+
+N:141:106:0:0:5:5:55:128
+A:
+B:
+P:NORTH | CENTRE | EAST | EDGE
+
+N:141:106:0:0:5:5:65:128
+A:
+B:
+P:NORTH | CENTRE | EAST | WEST | EDGE
+
 # East
 
 N:142:106:0:0:5:5:0:128
@@ -5229,6 +5247,26 @@ N:142:106:0:0:5:5:35:128
 A:
 B:
 P:SOUTH | CENTRE | EAST
+
+N:142:106:0:0:15:15:45:128
+A:
+B:
+P:EAST | CENTRE | EDGE
+
+N:142:106:0:0:5:5:55:128
+A:
+B:
+P:NORTH | CENTRE | EAST | EDGE
+
+N:142:106:0:0:5:5:55:128
+A:
+B:
+P:SOUTH | CENTRE | EAST | EDGE
+
+N:142:106:0:0:5:5:65:128
+A:
+B:
+P:SOUTH | CENTRE | EAST | NORTH | EDGE
 
 # West
 
@@ -5252,6 +5290,26 @@ A:
 B:
 P:SOUTH | CENTRE | WEST
 
+N:143:106:0:0:15:15:45:128
+A:
+B:
+P:WEST | CENTRE | EDGE
+
+N:143:106:0:0:5:5:55:128
+A:
+B:
+P:NORTH | CENTRE | WEST | EDGE
+
+N:143:106:0:0:5:5:55:128
+A:
+B:
+P:SOUTH | CENTRE | WEST | EDGE
+
+N:143:106:0:0:5:5:65:128
+A:
+B:
+P:SOUTH | CENTRE | WEST | NORTH | EDGE
+
 # South
 
 N:144:106:0:0:5:5:0:128
@@ -5273,6 +5331,26 @@ N:144:106:0:0:5:5:35:128
 A:
 B:
 P:SOUTH | CENTRE | WEST
+
+N:144:106:0:0:15:15:45:128
+A:
+B:
+P:SOUTH | CENTRE | EDGE
+
+N:144:106:0:0:5:5:55:128
+A:
+B:
+P:SOUTH | CENTRE | EAST | EDGE
+
+N:144:106:0:0:5:5:55:128
+A:
+B:
+P:SOUTH | CENTRE | WEST | EDGE
+
+N:144:106:0:0:5:5:65:128
+A:
+B:
+P:SOUTH | CENTRE | WEST | EAST | EDGE
 
 # Centre
 

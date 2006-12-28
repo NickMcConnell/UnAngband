@@ -117,6 +117,8 @@ increase their armour early on, at the cost of additional encumberance.
 - Added starburst rooms, fractal rooms from NPPAngband, streamer code and room distribution
 code from Sangband (modified somewhat).
 
+- Changed to NPP-style lakes and rivers.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
