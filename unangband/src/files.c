@@ -1903,12 +1903,12 @@ static void display_player_xtra_info(void)
 	desc = likert(xsav, 6, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 14, col+11);
 
-	put_str("Devices", 15, col);
-	desc = likert(xdev, 6, &likert_attr);
+	put_str("Disarming", 15, col);
+	desc = likert(xdis, 8, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 15, col+11);
 
-	put_str("Disarming", 16, col);
-	desc = likert(xdis, 8, &likert_attr);
+	put_str("Devices", 16, col);
+	desc = likert(xdev, 6, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 16, col+11);
 
 	put_str("Searching", 17, col);
@@ -3117,10 +3117,10 @@ static void display_home_equipment_info(int mode)
 	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row-1, col + MAX_INVENTORY_HOME + 8);
 
 	/* Footer */
-	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row+10, col);
+	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", (mode == 3 ? row+9 : row+10), col);
 
 	/* 2nd Footer */
-	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", row+10, col + MAX_INVENTORY_HOME + 8);
+	c_put_str(TERM_WHITE, "abcdefghijklmnopqrstuvwx", (mode == 3 ? row+9 : (mode == 5 ? row+6 : row+10)), col + MAX_INVENTORY_HOME + 8);
 
 	/* 3rd Equippy */
 	display_home_equippy(row+11, col);
