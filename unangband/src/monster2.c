@@ -4607,14 +4607,23 @@ void message_pain(int m_idx, int dam)
  */
 bool get_monster_ecology_aux(bool (*tmp_mon_num_hook)(int r_idx), int number)
 {
-	int count;
+	int i, count;
 	int races = cave_ecology.num_races + number;
 
 	/* No more races */
 	if (cave_ecology.num_races >= MAX_ECOLOGY_RACES) return (FALSE);
 
-	/* Limit */
-	if (races > MAX_ECOLOGY_RACES) races = MAX_ECOLOGY_RACES;
+	/* Reduce races required by existing races in ecology */
+	for (i = 0, count = 0; i < cave_ecology.num_races; i++)
+	{
+		if (tmp_mon_num_hook(cave_ecology.race[i])) races--;
+	}
+
+	/* Limit races */
+	if (races >= MAX_ECOLOGY_RACES) races = MAX_ECOLOGY_RACES;
+
+	/* Minimum 1 additional race */
+	else if (races <= cave_ecology.num_races) races = cave_ecology.num_races + 1;
 
 	/* Use supplied hook */
 	get_mon_num_hook = tmp_mon_num_hook;
@@ -4673,7 +4682,7 @@ void get_monster_ecology(int r_idx)
 		/* Hack -- hack the ecology */
 		int hack_ecology = 0;
 
-		monster_level = r_ptr->level - 1;
+		monster_level = r_ptr->level > 1 ? r_ptr->level - 1 : r_ptr->level;
 
 		/* For first monster, we force some related monsters to appear */
 		if (!cave_ecology.num_races) hack_ecology = randint(6);
@@ -4689,7 +4698,7 @@ void get_monster_ecology(int r_idx)
 			place_monster_idx = cave_ecology.race[cave_ecology.num_races];
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(place_monster_okay, 1 + rand_int(3) + (r_ptr->flags1 & (RF1_ESCORT) ? rand_int(3) : 0));
+			used_new_hook |= get_monster_ecology_aux(place_monster_okay, 2 + rand_int(3) + (r_ptr->flags1 & (RF1_ESCORT) ? rand_int(3) : 0));
 		}
 
 		/* Add summon races -- summon kin */
@@ -4699,7 +4708,7 @@ void get_monster_ecology(int r_idx)
 			summon_char_type = r_ptr->d_char;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, rand_int(2) + (r_ptr->flags1 & (RF1_UNIQUE) ? rand_int(3) : 0));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(2) + (r_ptr->flags1 & (RF1_UNIQUE) ? rand_int(3) : 0));
 		}
 
 		/* Add summon races -- summon plant */
@@ -4708,7 +4717,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_PLANT;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon insect */
@@ -4717,7 +4726,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_INSECT;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon animal */
@@ -4743,7 +4752,7 @@ void get_monster_ecology(int r_idx)
 			}
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon hound */
@@ -4752,7 +4761,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_HOUND;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon spider */
@@ -4761,7 +4770,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_SPIDER;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon class */
@@ -4773,7 +4782,7 @@ void get_monster_ecology(int r_idx)
 			summon_flag_type = (r_ptr->flags2 & (RF2_CLASS_MASK));
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon race */
@@ -4788,7 +4797,7 @@ void get_monster_ecology(int r_idx)
 			summon_flag_type |= (r_ptr->flags9 & (RF9_RACE_MASK));
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon group */
@@ -4798,7 +4807,7 @@ void get_monster_ecology(int r_idx)
 			summon_group_type = r_ptr->grp_idx;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon orc */
@@ -4807,7 +4816,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_ORC;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon troll */
@@ -4816,7 +4825,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_TROLL;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon giant */
@@ -4825,7 +4834,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_GIANT;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon dragon */
@@ -4834,7 +4843,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_DRAGON;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon high dragon */
@@ -4843,7 +4852,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_HI_DRAGON;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon demon */
@@ -4852,7 +4861,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_DEMON;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon high demon */
@@ -4861,7 +4870,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_HI_DEMON;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon undead */
@@ -4870,7 +4879,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_UNDEAD;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 
 		/* Add summon races -- summon high undead */
@@ -4879,7 +4888,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_HI_UNDEAD;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
 		}
 	}
 

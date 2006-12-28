@@ -306,13 +306,13 @@ static room_data room[ROOM_MAX] =
    /* Nothing */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS,	1, 0, LF1_THEME},
    /* 'Empty' */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_WILD)},
    /* Walls   */  {{180,240, 300, 300, 300, 300, 300, 300, 300, 300, 300},  1,DUN_ROOMS/2,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_DESTROYED | LF1_TOWER | LF1_WILD)},
-   /* Centre */   {{60, 100, 120, 140, 160, 180, 200, 200, 200, 200, 200},  1,DUN_ROOMS/2,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_DESTROYED | LF1_CRYPT | LF1_TOWER | LF1_WILD)},
+   /* Centre */   {{60, 100, 120, 140, 160, 180, 200, 200, 200, 200, 200},  1,DUN_ROOMS/2,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_DESTROYED | LF1_TOWER | LF1_WILD)},
    /* Lrg wall */ {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	2, 0, LF1_STRONGHOLD | LF1_DUNGEON | LF1_CRYPT},
    /* Lrg cent */ {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	2, 0, LF1_STRONGHOLD | LF1_DUNGEON},
    /* Xlg cent */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,DUN_ROOMS/4,	3, 0, LF1_STRONGHOLD},
    /* Chambers */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	1,		3, 0, LF1_CHAMBERS},
    /* I. Room */  {{30,  60,  70,  80,  80,  75,  70,  67,  65,  62,  60},  0,  2,		1, 0, LF1_DUNGEON},
-   /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	2,		2, 0, LF1_DUNGEON | LF1_VAULT},
+   /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	2,		2, 0, LF1_VAULT | LF1_CRYPT},
    /* G. Vault */ {{ 0,   0,   1,   2,   3,   4,   6,   7,   8,  10,  12}, 20,	1,		3, 0, LF1_VAULT},
    /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS,	3, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE | LF1_LAIR},
    /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		3, 0, LF1_MINE | LF1_CAVE | LF1_LAIR},
@@ -1960,7 +1960,7 @@ static void set_room_flags(int room, int type)
  * Build a room consisting of two overlapping rooms.
  * Get the room description, and place stuff accordingly.
  */
-static void build_overlapping(int room, int type, int y1a, int x1a, int y2a, int x2a,
+static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int x2a,
 	int y1b, int x1b, int y2b, int x2b, bool light, int spacing, bool pillars)
 {
 	int j = 0;
@@ -1976,6 +1976,11 @@ static void build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 
 	byte branch = 0;
 	byte branch_on = 0;
+
+	/* Make certain the overlapping room does not cross the dungeon edge. */
+	if ((!in_bounds_fully(y1a, x1a)) || (!in_bounds_fully(y1b, x1b))
+		 || (!in_bounds_fully(y2a, x2a)) || (!in_bounds_fully(y2b, x2b))) return (FALSE);
+
 
 	/* Generate new room (a) */
 	generate_room(y1a, x1a, y2a, x2a, light);
@@ -2119,6 +2124,8 @@ static void build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 
 	/* Terminate index list */
 	room_info[room].section[j] = -1;
+
+	return(TRUE);
 }
 
 
@@ -3292,7 +3299,7 @@ static bool mark_starburst_shape(int y1, int x1, int y2, int x2, u32b flag)
 	int arc_num;
 
 	/* Make certain the starburst does not cross the dungeon edge. */
-	if ((!in_bounds(y1, x1)) || (!in_bounds(y2, x2))) return (FALSE);
+	if ((!in_bounds_fully(y1, x1)) || (!in_bounds_fully(y2, x2))) return (FALSE);
 
 	/* Robustness -- test sanity of input coordinates. */
 	if ((y1 + 2 >= y2) || (x1 + 2 >= x2)) return (FALSE);
@@ -5438,6 +5445,7 @@ static bool build_type123(int room, int type)
 	int y1a, x1a, y2a, x2a;
 	int y1b, x1b, y2b, x2b;
 	int height, width;
+	int symetry = rand_int(100);
 
 	bool light = FALSE;
 	int spacing = 1;
@@ -5459,13 +5467,13 @@ static bool build_type123(int room, int type)
 	x2b = randint(13);
 
 	/* Sometimes express symetry */
-	if (rand_int(100) < 16)
+	if (symetry < 20)
 	{
 		x1a = x2a; x2b = x1b;
 	}
 
 	/* Sometimes express symetry */
-	if (rand_int(100) < 16)
+	if ((symetry < 10) || (symetry > 90))
 	{
 		y1a = y2a; y2b = y1b;
 	}
@@ -5490,7 +5498,7 @@ static bool build_type123(int room, int type)
 	x2b = x0 + x2b + 1;
 
 	/* Build an overlapping room with the above shape */
-	build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, pillars);
+	if (!build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, pillars)) return (FALSE);
 
 	return (TRUE);
 }
@@ -5505,6 +5513,7 @@ static bool build_type45(int room, int type)
 	int y1a, x1a, y2a, x2a;
 	int y1b, x1b, y2b, x2b;
 	int height, width;
+	int symetry = rand_int(100);
 
 	bool light = FALSE;
 	int spacing = 2 + rand_int(2);
@@ -5526,13 +5535,13 @@ static bool build_type45(int room, int type)
 	x2b = randint(13) + 6;
 
 	/* Sometimes express symetry */
-	if (rand_int(100) < 16)
+	if (symetry < 30)
 	{
 		x1a = x2a; x2b = x1b;
 	}
 
 	/* Sometimes express symetry */
-	if (rand_int(100) < 16)
+	if ((symetry < 20) || (symetry > 90))
 	{
 		y1a = y2a; y2b = y1b;
 	}
@@ -5557,7 +5566,7 @@ static bool build_type45(int room, int type)
 	x2b = x0 + x2b + 1;
 
 	/* Build an overlapping room with the above shape */
-	build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, pillars);
+	if (!build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, pillars)) return (FALSE);
 
 	return (TRUE);
 }
@@ -5573,6 +5582,7 @@ static bool build_type6(int room, int type)
 	int y1a, x1a, y2a, x2a;
 	int y1b, x1b, y2b, x2b;
 	int height, width;
+	int symetry = rand_int(100);
 
 	bool light = FALSE;
 	int spacing = 4 + rand_int(4);
@@ -5594,13 +5604,13 @@ static bool build_type6(int room, int type)
 	x2b = randint(26) + 13;
 
 	/* Sometimes express symetry */
-	if (rand_int(100) < 16)
+	if (symetry < 40)
 	{
 		x1a = x2a; x2b = x1b;
 	}
 
 	/* Sometimes express symetry */
-	if (rand_int(100) < 16)
+	if ((symetry < 30) || (symetry > 90))
 	{
 		y1a = y2a; y2b = y1b;
 	}
@@ -5625,7 +5635,7 @@ static bool build_type6(int room, int type)
 	x2b = x0 + x2b + 1;
 
 	/* Build an overlapping room with the above shape */
-	build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, pillars);
+	if (!build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, pillars)) return (FALSE);
 
 	return (TRUE);
 }
