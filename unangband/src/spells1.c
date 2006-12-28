@@ -7321,7 +7321,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 			if (do_sleep) m_ptr->csleep = do_sleep;
 
 			/* Hack -- handle inventory damage */
-			if (do_inven_destroy) mon_inven_damage(who, do_inven_destroy, (dam / 15) + 1);
+			if (do_inven_destroy) mon_inven_damage(cave_m_idx[y][x], do_inven_destroy, (dam / 15) + 1);
 		}
 	}
 
@@ -7357,7 +7357,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 			if (do_sleep) m_ptr->csleep = do_sleep;
 
 			/* Hack -- handle inventory damage */
-			if (do_inven_destroy) mon_inven_damage(who, do_inven_destroy, (dam / 15) + 1);
+			if (do_inven_destroy) mon_inven_damage(cave_m_idx[y][x], do_inven_destroy, (dam / 15) + 1);
 		}
 
 		/* Hack -- wake up nearby allies */
