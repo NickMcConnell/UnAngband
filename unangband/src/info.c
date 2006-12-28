@@ -6006,7 +6006,7 @@ s32b object_power(const object_type *o_ptr)
 
 	if (f1 & TR1_SPEED)
 	{
-		p += 5 * o_ptr->pval;
+		p += 7 * o_ptr->pval;
 	}
 
 	ADD_POWER("sustain STR",	 5, TR2_SUST_STR, 2, sustains++);

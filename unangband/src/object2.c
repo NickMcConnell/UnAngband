@@ -2365,6 +2365,9 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		o_ptr->xtra1 = 16;
 		o_ptr->xtra2 = i;
 
+		/* Too shallow SPEED */
+		if (j == TR1_SPEED && p_ptr->depth < 40 + rand_int (20)) continue;
+
 		/* Skip non-weapons -- we have to do this because brands grant ignore flags XXX */
 		if ((j >= TR1_BRAND_ACID) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_HAFTED)
 			&& (o_ptr->tval != TV_SWORD) && (o_ptr->tval != TV_POLEARM) && (o_ptr->tval != TV_ARROW)

@@ -1049,7 +1049,7 @@ static s32b artifact_power(int a_idx)
 	}
 	if (a_ptr->flags1 & TR1_SPEED)
 	{
-		p += 5 * a_ptr->pval;
+		p += 7 * a_ptr->pval;
 		LOG_PRINT2("Adding power for speed bonus/penalty %d, total is %d\n", a_ptr->pval, p);
 	}
 
