@@ -3981,7 +3981,10 @@ void do_cmd_throw_selected(object_type *o_ptr, int item)
 			if (mon_evade(cave_m_idx[y][x], (m_ptr->confused || m_ptr->stunned) ? 4 : 2, 5 + m_ptr->cdis," your throw")) continue;
 
 			/* Get style benefits if a throwing weapon */
-			if (throwing) mon_style_benefits(m_ptr, WS_THROWN_FLAGS, &style_hit, &style_dam, &style_crit);
+			if (throwing) 
+			  mon_style_benefits(m_ptr, WS_THROWN_FLAGS, &style_hit, &style_dam, &style_crit);
+			else
+			  style_hit = style_dam = style_crit = 0;
 
 			/* Test hit fire */
 			hit_or_near_miss = test_hit_fire(chance2 + style_hit * BTH_PLUS_ADJ, calc_monster_ac(m_ptr, FALSE), m_ptr->ml);
@@ -4219,7 +4222,7 @@ void do_cmd_fire(void)
 
 	/* If no bow, call the function for throwing */
     /* TODO: repair do_cmd_throw_selected so that ropes from bags work, etc. */
-	if (!item_tester_tval) 
+	if (!(p_ptr->ammo_tval))
 		do_cmd_throw_selected(o_ptr, item);
 	else 
 		do_cmd_fire_selected(o_ptr, item);
