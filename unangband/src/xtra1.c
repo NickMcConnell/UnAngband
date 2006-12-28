@@ -3438,6 +3438,7 @@ static void calc_bonuses(void)
 	if (o_ptr->k_idx)
 	{
 		p_ptr->ammo_mult = bow_multiplier(o_ptr->sval);
+		p_ptr->num_fire = 1;
 
 		/* Analyze the launcher */
 		switch (o_ptr->sval)
