@@ -3998,8 +3998,14 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 			
 			i = 0;
 
-			while ((i < ROOM_DESC_SECTIONS) && ((j = room_info[room].section[i++]) != -1))
+			while ((room >= 0) && (i < ROOM_DESC_SECTIONS))
 			{
+				/* Get description */
+				j = room_info[room].section[i++];
+
+				/* End of description */
+				if (j < 0) break;
+
 				/* Must understand language? */
 				if (d_info[j].flags & (ROOM_LANGUAGE))
 				{

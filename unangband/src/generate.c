@@ -7040,7 +7040,7 @@ static void cave_gen(void)
 		}
 
 		/* Hack -- always have upstairs */
-		else if (level_flag & LF1_SURFACE)
+		else if ((level_flag & LF1_SURFACE) && (level_flag & LF1_LESS))
 		{
 			feat_near(FEAT_LESS, y, x);
 		}

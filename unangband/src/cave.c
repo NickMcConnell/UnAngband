@@ -5116,7 +5116,7 @@ static void cave_set_feat_aux(int y, int x, int feat)
 	s16b this_o_idx, next_o_idx = 0;
 
 	/* Paranoia */
-	if (feat > z_info->f_max)
+	if ((feat > z_info->f_max) || (y < 0) || (y > DUNGEON_HGT) || (x < 0) || (x > DUNGEON_WID))
 	{
 		msg_format("Error: Setting invalid feat %d at (%d, %d).", feat, y, x);
 		return;
