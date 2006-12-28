@@ -1049,7 +1049,7 @@ struct player_race
 	s16b r_sav;     /* saving throw */
 	s16b r_stl;     /* stealth */
 	s16b r_srh;     /* search ability */
-	s16b r_fos;     /* search frequency */
+	s16b r_tht;     /* combat (throwing) */
 	s16b r_thn;     /* combat (normal) */
 	s16b r_thb;     /* combat (shooting) */
 
@@ -1111,7 +1111,7 @@ struct player_class
 	s16b c_sav;     /* class saving throws */
 	s16b c_stl;     /* class stealth */
 	s16b c_srh;     /* class searching ability */
-	s16b c_fos;     /* class searching frequency */
+	s16b c_tht;     /* class to hit (throwing) */
 	s16b c_thn;     /* class to hit (normal) */
 	s16b c_thb;     /* class to hit (bows) */
 
@@ -1120,7 +1120,7 @@ struct player_class
 	s16b x_sav;     /* extra saving throws */
 	s16b x_stl;     /* extra stealth */
 	s16b x_srh;     /* extra searching ability */
-	s16b x_fos;     /* extra searching frequency */
+	s16b x_tht;     /* extra to hit (throwing) */
 	s16b x_thn;     /* extra to hit (normal) */
 	s16b x_thb;     /* extra to hit (bows) */
 
@@ -1546,7 +1546,6 @@ struct player_type
 	s16b skill_sav; /* Skill: Saving throw */
 	s16b skill_stl; /* Skill: Stealth factor */
 	s16b skill_srh; /* Skill: Searching ability */
-	s16b skill_fos; /* Skill: Searching frequency */
 	s16b skill_thn; /* Skill: To hit (normal) */
 	s16b skill_thb; /* Skill: To hit (shooting) */
 	s16b skill_tht; /* Skill: To hit (throwing) */

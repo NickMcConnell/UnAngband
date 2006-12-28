@@ -2991,7 +2991,7 @@ static void do_cmd_hold_or_stay(int pickup)
 	}
 
 	/* Spontaneous Searching - doubly effective */
-	if ((p_ptr->skill_fos >= 25) || (0 == rand_int(25 - p_ptr->skill_fos)))
+	if ((p_ptr->skill_srh >= 25) || (0 == rand_int(25 - p_ptr->skill_srh)))
 	{
 		search();
 	}

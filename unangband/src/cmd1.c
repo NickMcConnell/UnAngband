@@ -2881,8 +2881,8 @@ void move_player(int dir, int jumping)
 		p_ptr->climbing = 0;
 
 		/* Spontaneous Searching */
-		if ((p_ptr->skill_fos >= 50) ||
-		    (0 == rand_int(50 - p_ptr->skill_fos)))
+		if ((p_ptr->skill_srh >= 50) ||
+		    (0 == rand_int(50 - p_ptr->skill_srh)))
 		{
 			search();
 		}

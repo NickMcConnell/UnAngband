@@ -1424,7 +1424,7 @@ static void display_player_xtra_info(void)
 	u32b style;
 	int base, plus;
 	int tmp;
-	int xthn, xthb, xtht, xfos, xsrh;
+	int xthn, xthb, xtht, xsrh;
 	int xdis, xdev, xsav, xstl;
 	byte likert_attr;
 
@@ -1882,7 +1882,6 @@ static void display_player_xtra_info(void)
 	xsav = p_ptr->skill_sav;
 	xstl = p_ptr->skill_stl;
 	xsrh = p_ptr->skill_srh;
-	xfos = p_ptr->skill_fos;
 
 	put_str("Fighting", 10, col);
 	desc = likert(xthn, 12, &likert_attr);
@@ -1913,7 +1912,7 @@ static void display_player_xtra_info(void)
 	c_put_str(likert_attr, format("%9s", desc), 16, col+11);
 
 	put_str("Searching", 17, col);
-	desc = likert(xfos, 6, &likert_attr);
+	desc = likert(xsrh, 6, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 17, col+11);
 
 	/* Indent output by 1 character, and wrap at column 72 */

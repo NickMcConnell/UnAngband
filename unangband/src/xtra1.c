@@ -2939,9 +2939,6 @@ static void calc_bonuses(void)
 	/* Base skill -- searching ability */
 	p_ptr->skill_srh = rp_ptr->r_srh + cp_ptr->c_srh;
 
-	/* Base skill -- searching frequency */
-	p_ptr->skill_fos = rp_ptr->r_fos + cp_ptr->c_fos;
-
 	/* Base skill -- combat (normal) */
 	p_ptr->skill_thn = rp_ptr->r_thn + cp_ptr->c_thn;
 
@@ -2949,7 +2946,7 @@ static void calc_bonuses(void)
 	p_ptr->skill_thb = rp_ptr->r_thb + cp_ptr->c_thb;
 
 	/* Base skill -- combat (throwing) */
-	p_ptr->skill_tht = rp_ptr->r_thb + cp_ptr->c_thb;
+	p_ptr->skill_tht = rp_ptr->r_tht + cp_ptr->c_tht;
 
 	/* Base skill -- digging */
 	p_ptr->skill_dig = 0;
@@ -3024,9 +3021,6 @@ static void calc_bonuses(void)
 
 		/* Affect searching ability (factor of five) */
 		if (f1 & (TR1_SEARCH)) p_ptr->skill_srh += (o_ptr->pval * 5);
-
-		/* Affect searching frequency (factor of five) */
-		if (f1 & (TR1_SEARCH)) p_ptr->skill_fos += (o_ptr->pval * 5);
 
 		/* Affect infravision */
 		if (f1 & (TR1_INFRA)) p_ptr->see_infra += o_ptr->pval;
@@ -3398,9 +3392,6 @@ static void calc_bonuses(void)
 	/* Affect Skill -- search ability (Level, by Class) */
 	p_ptr->skill_srh += (cp_ptr->x_srh * p_ptr->lev / 10);
 
-	/* Affect Skill -- search frequency (Level, by Class) */
-	p_ptr->skill_fos += (cp_ptr->x_fos * p_ptr->lev / 10);
-
 	/* Affect Skill -- combat (normal) (Level, by Class) */
 	p_ptr->skill_thn += (cp_ptr->x_thn * p_ptr->lev / 10);
 
@@ -3408,7 +3399,7 @@ static void calc_bonuses(void)
 	p_ptr->skill_thb += (cp_ptr->x_thb * p_ptr->lev / 10);
 
 	/* Affect Skill -- combat (throwing) (Level, by Class) */
-	p_ptr->skill_tht += (cp_ptr->x_thb * p_ptr->lev / 10);
+	p_ptr->skill_tht += (cp_ptr->x_tht * p_ptr->lev / 10);
 
 	/* Limit Skill -- digging from 1 up */
 	if (p_ptr->skill_dig < 1) p_ptr->skill_dig = 1;

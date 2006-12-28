@@ -13,7 +13,7 @@
 # Format:
 # N:race number:race name
 # S:str:int:wis:dex:con:chr:agi
-# R:dis:dev:sav:stl:srh:fos:thn:thb
+# R:dis:dev:sav:stl:srh:tht:thn:thb
 # X:hitdie:expbase:infra
 # I:history:agebase:agemod
 # H:hgtmale:modhgtmale:hgtfemale:modhgtfemale
@@ -28,7 +28,7 @@
 # dexterity, constitution, charisma, agility.
 
 # 'R' is for the base skills - disarming, magic devices, saving throws,
-# stealth, searching ability, searching frequency, to hit (melee),
+# stealth, searching ability, to hit (throws), to hit (melee),
 # to hit (bows).
 
 # 'X' is for extra info - max. hitpoints gained per level, experience
