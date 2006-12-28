@@ -4,3 +4,4 @@ unangband
 *.o
 *.res
 *.icns
+makefile

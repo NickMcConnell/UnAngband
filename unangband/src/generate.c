@@ -304,9 +304,9 @@ static room_data room[ROOM_MAX] =
    /* Depth:         0   10   20   30   40   50   60   70   80   90  100  min max_num count, theme*/
 
    /* Nothing */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS,	1, 0, LF1_THEME},
-   /* 'Empty' */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE)},
-   /* Walls   */  {{180,240, 300, 300, 300, 300, 300, 300, 300, 300, 300},  1,DUN_ROOMS/2,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_DESTROYED)},
-   /* Centre */   {{60, 100, 120, 140, 160, 180, 200, 200, 200, 200, 200},  1,DUN_ROOMS/2,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_DESTROYED | LF1_CRYPT)},
+   /* 'Empty' */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_WILD)},
+   /* Walls   */  {{180,240, 300, 300, 300, 300, 300, 300, 300, 300, 300},  1,DUN_ROOMS/2,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_DESTROYED | LF1_TOWER | LF1_WILD)},
+   /* Centre */   {{60, 100, 120, 140, 160, 180, 200, 200, 200, 200, 200},  1,DUN_ROOMS/2,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_DESTROYED | LF1_CRYPT | LF1_TOWER | LF1_WILD)},
    /* Lrg wall */ {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	2, 0, LF1_STRONGHOLD | LF1_DUNGEON | LF1_CRYPT},
    /* Lrg cent */ {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	2, 0, LF1_STRONGHOLD | LF1_DUNGEON},
    /* Xlg cent */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,DUN_ROOMS/4,	3, 0, LF1_STRONGHOLD},
@@ -7012,6 +7012,7 @@ static void cave_gen(void)
 		build_tower(y, x, v_ptr->hgt, v_ptr->wid, v_text + v_ptr->text);
 
 		/* Reserve some blocks */
+#if 0
 		for (by = (y - v_ptr->hgt) / BLOCK_HGT; by <= (y + v_ptr->hgt) / BLOCK_HGT; by++)
 		{
 			for (bx = (x - v_ptr->wid) / BLOCK_WID; by <= (x + v_ptr->wid) / BLOCK_WID; bx++)
@@ -7021,6 +7022,7 @@ static void cave_gen(void)
 				dun_room[by][bx] = dun->cent_n+1;	
 			}
 		}
+#endif
 	
 		/* Set corridor here */
 		dun->cent[dun->cent_n].y = y;

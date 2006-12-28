@@ -9,7 +9,7 @@
 CC = gcc
 WRES = windres
 LIBS = -mno-cygwin -mwindows -e _mainCRTStartup -lwinmm
-CFLAGS = -Wall -W -pedantic -mno-cygwin -ggdb -O2 -fno-strength-reduce -DWINDOWS
+CFLAGS = -Wall -W -pedantic -mno-cygwin -ggdb -fno-strength-reduce -DWINDOWS -DALLOW_BORG
 OBJEXT=.o
 
 default: unangband
