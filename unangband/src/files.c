@@ -1869,7 +1869,7 @@ static void display_player_xtra_info(void)
 	Term_putstr(col+5, 16, -1, TERM_L_BLUE, format("%12s", buf));
 
 	/* Throws */
-	strnfmt(buf, sizeof(buf), "%d/turn(x%d)", p_ptr->num_throw, 2);
+	strnfmt(buf, sizeof(buf), "%d/turn(x%d)", p_ptr->num_throw, 1);
 	Term_putstr(col, 17, -1, TERM_WHITE, "Hurls");
 	Term_putstr(col+5, 17, -1, TERM_L_BLUE, format("%12s", buf));
 

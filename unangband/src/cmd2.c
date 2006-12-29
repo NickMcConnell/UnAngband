@@ -3312,6 +3312,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   int bonus, chance;
 
   int style_hit, style_dam, style_crit;
+  bool throwing;
 
   object_type *j_ptr;
   object_type *k_ptr = NULL;
@@ -3319,6 +3320,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   object_type object_type_body;
 
   bool hit_body = FALSE;
+  bool chasm = FALSE;
 
   byte missile_attr;
   char missile_char;
@@ -3329,9 +3331,6 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   u16b path_g[256];
 
   int msec = op_ptr->delay_factor * op_ptr->delay_factor;
-
-  bool chasm = FALSE;
-
   int feat;
 
   /* Need a rope? */
@@ -3478,7 +3477,6 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   else
     {
       u32b f1, f2, f3, f4;
-      bool throwing;
       int mul, div;
 
       /* Get object flags */
@@ -3492,10 +3490,6 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 	j_ptr = o_ptr;
       else
 	j_ptr = NULL;
-
-      /* Boost the damage so that throwing with a sling is not always better */
-      if (throwing)
-	tdam *= 2;
 
       /* Extract a "distance multiplier" */
       mul = throwing ? 10 : 3;
@@ -3513,10 +3507,6 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
       /* Number of hits per round */
       thits = p_ptr->num_throw;
     }
-
-  /* Actually "fire" the object */
-  bonus = i_ptr->to_h + (j_ptr ? j_ptr->to_h : 0);
-  chance = p_ptr->skill_thb + (p_ptr->to_h + bonus) * BTH_PLUS_ADJ;
 
   /* Take a turn */
   p_ptr->energy_use = 100 / thits;
@@ -3631,8 +3621,8 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 	  monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
 	  monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
-	  int chance2 = chance - distance(py, px, y, x);
 	  int visible = m_ptr->ml;
+	  int chance2;
 
 	  bool hit_or_near_miss;
 	  bool genuine_hit;
@@ -3671,21 +3661,28 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 			    " your throw"))
 		continue;
 
-	      /* Hack: j_ptr shows if this is a throwing object */
-	      if (j_ptr)
+	      if (throwing)
 		  mon_style_benefits(m_ptr, WS_THROWN_FLAGS, 
 				     &style_hit, &style_dam, &style_crit);
 	      else
 		style_hit = style_dam = style_crit = 0;
 	    }
 
+	  /* Actually "fire" the object */
+	  bonus = (p_ptr->to_h 
+		   + i_ptr->to_h 
+		   + (j_ptr ? j_ptr->to_h : 0) 
+		   + style_hit);
+	  chance = p_ptr->skill_thb + bonus * BTH_PLUS_ADJ;
+	  chance2 = chance - distance(py, px, y, x);
+
 	  /* Test hit fire */
-	  hit_or_near_miss = test_hit_fire(chance2 + style_hit * BTH_PLUS_ADJ, 
+	  hit_or_near_miss = test_hit_fire(chance2, 
 					   calc_monster_ac(m_ptr, FALSE), 
 					   m_ptr->ml);
 
 	  /* Genuine hit */
-	  genuine_hit = test_hit_fire(chance2 + style_hit * BTH_PLUS_ADJ, 
+	  genuine_hit = test_hit_fire(chance2, 
 				      calc_monster_ac(m_ptr, TRUE), 
 				      m_ptr->ml);
 
@@ -3725,10 +3722,17 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 	      /* Apply special damage XXX XXX XXX */
 	      tdam = tot_dam_aux(i_ptr, tdam, m_ptr);
 
-	      /* Apply critical damage; TODO: boost throws */
-	      tdam += critical_shot(i_ptr->weight, 
-				    bonus + style_crit * 30, 
-				    tdam);
+	      /* Apply critical damage */
+	      if (fire)
+		tdam += critical_shot(i_ptr->weight, 
+				      bonus + style_crit * 30, 
+				      tdam);
+	      else if (throwing)
+		/* Throws (with specialized throwing weapons) hit harder */
+		tdam += critical_norm(i_ptr->weight, 
+				      bonus + style_crit * 30, 
+				      tdam);
+
 
 	      /* Apply launcher, missile and style bonus */
 	      tdam += i_ptr->to_d + (j_ptr ? j_ptr->to_d : 0) + style_dam;

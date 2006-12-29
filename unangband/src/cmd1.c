@@ -81,7 +81,7 @@ sint critical_shot(int weight, int plus, int dam)
 	int i, k, crit = 0;
 
 	/* Extract "shot" power */
-	i = (weight + ((p_ptr->to_h + plus) * 4) + (adj_int_th[p_ptr->stat_ind[A_INT]] * 8));
+	i = weight + plus * 4 + adj_int_th[p_ptr->stat_ind[A_INT]] * 8;
 
 	/* Critical hit */
 	if (randint(5000) <= i)
@@ -117,7 +117,7 @@ sint critical_norm(int weight, int plus, int dam)
 	int i, k, crit = 0;
 
 	/* Extract "blow" power */
-	i = (weight + ((p_ptr->to_h + plus) * 5) + (adj_int_th[p_ptr->stat_ind[A_INT]] * 10));
+	i = weight + plus * 5 + adj_int_th[p_ptr->stat_ind[A_INT]] * 10;
 
 	/* Chance */
 	if (randint(5000) <= i)
@@ -1665,7 +1665,7 @@ void hit_trap(int y, int x)
 
 					k = damroll(o_ptr->dd, o_ptr->ds);
 
-					k += critical_norm(o_ptr->weight, o_ptr->to_h, k);
+					k += critical_norm(o_ptr->weight, 2 * o_ptr->to_h, k);
 					k += o_ptr->to_d;
 
 					/* Armour reduces total damage */
@@ -2360,21 +2360,21 @@ void py_attack(int y, int x, bool charging)
 						if (!(strstr(k_name + k_info[o_ptr->k_idx].name, "Axe"))
 							&& !(strstr(k_name + k_info[o_ptr->k_idx].name, "Halberd"))
 							&& !(strstr(k_name + k_info[o_ptr->k_idx].name, "Scythe")))
-							k += critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
+							k += critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
 						else if ((j < 50) && !(strstr(k_name + k_info[o_ptr->k_idx].name, "Scythe")))
-							do_stun = critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
+							do_stun = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
 						else
-							do_cuts = critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
+							do_cuts = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
 						break;
 					}
 					case TV_SWORD:
 					{
-						do_cuts = critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
+						do_cuts = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
 						break;
 					}
 					default:
 					{
-						do_stun = critical_norm(o_ptr->weight, o_ptr->to_h + (style_crit * 30), k);
+						do_stun = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
 						break;
 					}
 				}
@@ -2404,7 +2404,7 @@ void py_attack(int y, int x, bool charging)
 			else
 			{
 				k = 1;
-				do_stun = critical_norm(c_info[p_ptr->pclass].min_weight, (style_crit * 30),k);
+				do_stun = critical_norm(c_info[p_ptr->pclass].min_weight, (style_crit * 30), k);
 			}
 
 			/* Adjust for style */
