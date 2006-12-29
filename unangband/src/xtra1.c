@@ -3147,11 +3147,11 @@ static void calc_bonuses(void)
 		/* Values: 3, 4, ..., 17 */
 		if (use <= 18) ind = (use - 3);
 
-		/* Ranges: 18/00-18/09, ..., 18/210-18/219 */
-		else if (use <= 18+219) ind = (15 + (use - 18) / 10);
+		/* Ranges: 18/00-18/09, ..., 18/240-18/249 */
+		else if (use <= 18+249) ind = (15 + (use - 18) / 10);
 
-		/* Range: 18/220+ */
-		else ind = (37);
+		/* Range: 18/250+ */
+		else ind = 40;
 
 		/* Save the new index */
 		p_ptr->stat_ind[i] = ind;
