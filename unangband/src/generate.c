@@ -324,9 +324,8 @@ static room_data_type room_data[ROOM_MAX] =
 
 
 
-/* Build rooms in descending order of difficulty of placing e.g. size. We do lairs and vaults ahead of
-   others because they place out of depth monsters. */
-static byte room_build_order[ROOM_MAX] = {16, 8, 7, 12, 10, 6, 15, 14, 13, 11, 6, 5, 4, 3, 2, 1};
+/* Build rooms in descending order of difficulty of placing e.g. size, frequency. */
+static byte room_build_order[ROOM_MAX] = {16, 10, 7, 15, 12, 6, 14, 9, 8, 13, 11, 5, 4, 3, 2, 1};
 
 
 /*
@@ -2162,10 +2161,14 @@ static bool find_space(int *y, int *x, int height, int width)
 			dun->cent[dun->cent_n].x = *x;
 			dun->cent_n++;
 
-			/* Initialise room */
-			room_info[dun->cent_n].flags = 0;
-			room_info[dun->cent_n].tunnel = 0;
-			room_info[dun->cent_n].solid = 0;
+			/* Paranoia */
+			if (dun->cent_n < DUN_ROOMS)
+			{
+				/* Initialise room */
+				room_info[dun->cent_n].flags = 0;
+				room_info[dun->cent_n].tunnel = 0;
+				room_info[dun->cent_n].solid = 0;
+			}
 		}
 
 		/* Reserve some blocks.  Mark each with the room index. */
@@ -2267,6 +2270,8 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 		/* Cycle through valid entries */
 		while (*chart == d_info[i].chart)
 		{
+			bool good_chance = FALSE;
+
 			counter++;
 
 			/* If not allowed at this depth, skip completely */
@@ -2280,7 +2285,7 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 			chance = 0;			
 
 			/* If requires this level type, reduce chance of occurring */
-			if ((d_info[i].l_flag) && ((level_flag & d_info[i].l_flag) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
+			if ((d_info[i].l_flag) && ((level_flag & d_info[i].l_flag) != 0)) good_chance = TRUE;
 
 			/* If not allowed because doesn't match level monster, reduce chance of occuring */
 			else if ((cave_ecology.ready) && (cave_ecology.num_races))
@@ -2289,45 +2294,59 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 				monster_race *r_ptr = &r_info[cave_ecology.race[0]];
 
 				/* Check for char match */
-				if ((d_info[i].r_char) && (d_info[i].r_char == r_ptr->d_char)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
+				if ((d_info[i].r_char) && (d_info[i].r_char == r_ptr->d_char)) good_chance = TRUE;
 
 				/* Check for flag match */
 				if (d_info[i].r_flag)
 				{
 					if ((d_info[i].r_flag < 33) && 
-						((r_ptr->flags1 & (1L << (d_info[i].r_flag - 1))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
+						((r_ptr->flags1 & (1L << (d_info[i].r_flag - 1))) != 0)) good_chance = TRUE;
 
 					else if ((d_info[i].r_flag >= 33) && 
 						(d_info[i].r_flag < 65) && 
-						((r_ptr->flags2 & (1L << (d_info[i].r_flag - 33))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
+						((r_ptr->flags2 & (1L << (d_info[i].r_flag - 33))) != 0)) good_chance = TRUE;
 
 					else if ((d_info[i].r_flag >= 65) && 
 						(d_info[i].r_flag < 97) && 
-						((r_ptr->flags3 & (1L << (d_info[i].r_flag - 65))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
+						((r_ptr->flags3 & (1L << (d_info[i].r_flag - 65))) != 0)) good_chance = TRUE;
 
 					else if ((d_info[i].r_flag >= 97) && 
 						(d_info[i].r_flag < 129) && 
-						((r_ptr->flags4 & (1L << (d_info[i].r_flag - 97))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
+						((r_ptr->flags4 & (1L << (d_info[i].r_flag - 97))) != 0)) good_chance = TRUE;
 
 					else if ((d_info[i].r_flag >= 129) && 
 						(d_info[i].r_flag < 161) && 
-						((r_ptr->flags5 & (1L << (d_info[i].r_flag - 129))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
+						((r_ptr->flags5 & (1L << (d_info[i].r_flag - 129))) != 0)) good_chance = TRUE;
 
 					else if ((d_info[i].r_flag >= 161) && 
 						(d_info[i].r_flag < 193) && 
-						((r_ptr->flags6 & (1L << (d_info[i].r_flag - 161))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
+						((r_ptr->flags6 & (1L << (d_info[i].r_flag - 161))) != 0)) good_chance = TRUE;
 
 					else if ((d_info[i].r_flag >= 193) && 
 						(d_info[i].r_flag < 225) && 
-						((r_ptr->flags7 & (1L << (d_info[i].r_flag - 193))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
+						((r_ptr->flags7 & (1L << (d_info[i].r_flag - 193))) != 0)) good_chance = TRUE;
 
 					else if ((d_info[i].r_flag >= 225) && 
 						(d_info[i].r_flag < 257) && 
-						((r_ptr->flags8 & (1L << (d_info[i].r_flag - 225))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
+						((r_ptr->flags8 & (1L << (d_info[i].r_flag - 225))) != 0)) good_chance = TRUE;
 
 					else if ((d_info[i].r_flag >= 257) && 
 						(d_info[i].r_flag < 289) && 
-						((r_ptr->flags9 & (1L << (d_info[i].r_flag - 257))) != 0)) { chance = d_info[i].chance; if (match < MATCH_CHANCE) { count = 0; match = MATCH_CHANCE; } }
+						((r_ptr->flags9 & (1L << (d_info[i].r_flag - 257))) != 0)) good_chance = TRUE;
+				}
+			}
+
+			/* Good chance */
+			if (good_chance)
+			{
+				/* Set chance */
+				chance = d_info[i].chance;
+
+				/* Improve match if placing objects or features */
+				if ((match < MATCH_CHANCE) && ((d_info[i].feat) || (d_info[i].tval)))
+				{
+					count = 0;
+					match = MATCH_CHANCE;
 				}
 			}
 
@@ -2376,7 +2395,11 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 				|| ( ((*name & (PICKED_NAME2)) == 0) && (strlen(d_name + d_info[i].name2) > 0))
 				|| (strlen(d_text + d_info[i].text) > 0))
 			{
-				room_info[room].section[(*j)++] = i;
+				/* Paranoia */
+				if ((room < DUN_ROOMS) && (*j < ROOM_DESC_SECTIONS))
+				{
+					room_info[room].section[(*j)++] = i;
+				}
 
 				if (strlen(d_name + d_info[i].name1) > 0) *name |= PICKED_NAME1;
 				if (strlen(d_name + d_info[i].name2) > 0) *name |= PICKED_NAME2;
@@ -2396,8 +2419,18 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 				*branch_on = 0;
 			}
 
-			/* Place flags except SEEN or HEARD */
-			room_info[room].flags |= (d_info[i].flags & ~(ROOM_SEEN | ROOM_HEARD));
+			/* Paranoia */
+			if (room < DUN_ROOMS)
+			{
+				/* Place flags except SEEN or HEARD */
+				room_info[room].flags |= (d_info[i].flags & ~(ROOM_SEEN | ROOM_HEARD));
+
+				/* Set tunnel */
+				if (!(room_info[room].tunnel) && (d_info[i].tunnel)) room_info[room].tunnel = d_info[i].tunnel;
+
+				/* Set decoration */
+				if (!(room_info[room].solid) && (d_info[i].solid)) room_info[room].solid = d_info[i].solid;
+			}
 		
 			/* Get tval */
 			if (d_info[i].tval)
@@ -2415,12 +2448,6 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 
 			/* Get branch condition */
 			if (d_info[i].branch_on) *branch_on = d_info[i].branch_on;
-
-			/* Set tunnel */
-			if (!(room_info[room].tunnel) && (d_info[i].tunnel)) room_info[room].tunnel = d_info[i].tunnel;
-
-			/* Set decoration */
-			if (!(room_info[room].solid) && (d_info[i].solid)) room_info[room].solid = d_info[i].solid;
 
 			/* Set tval match */
 			if (!(dun->theme_feat) && !(dun->theme_tval) && (*place_tval) && ((!(*place_feat) && !(d_info[i].tunnel) && !(d_info[i].solid)) || (rand_int(100) < 50)))
@@ -2530,11 +2557,19 @@ static void set_room_flags(int room, int type)
 		place_feat = 0;
 	}
 
-	/* Type */
-	room_info[room].type = ROOM_NORMAL;
+	/* Paranoia */
+	if (room < DUN_ROOMS)
+	{
+		/* Type */
+		room_info[room].type = ROOM_NORMAL;
 
-	/* Terminate index list */
-	room_info[room].section[j] = -1;
+		/* Further paranoia */
+		if (j < ROOM_DESC_SECTIONS)
+		{
+			/* Terminate index list */
+			room_info[room].section[j] = -1;
+		}
+	}
 }
 
 
@@ -2645,11 +2680,19 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 		place_feat = 0;
 	}
 
-	/* Type */
-	room_info[room].type = ROOM_NORMAL;
+	/* Paranoia */
+	if (room < DUN_ROOMS)
+	{
+		/* Type */
+		room_info[room].type = ROOM_NORMAL;
 
-	/* Terminate index list */
-	room_info[room].section[j] = -1;
+		/* Further paranoia */
+		if (j < ROOM_DESC_SECTIONS)
+		{
+			/* Terminate index list */
+			room_info[room].section[j] = -1;
+		}
+	}
 }
 
 
@@ -2816,11 +2859,19 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 		place_feat = 0;
 	}
 
-	/* Type */
-	room_info[room].type = ROOM_NORMAL;
+	/* Paranoia */
+	if (room < DUN_ROOMS)
+	{
+		/* Type */
+		room_info[room].type = ROOM_NORMAL;
 
-	/* Terminate index list */
-	room_info[room].section[j] = -1;
+		/* Further paranoia */
+		if (j < ROOM_DESC_SECTIONS)
+		{
+			/* Terminate index list */
+			room_info[room].section[j] = -1;
+		}
+	}
 
 	return(TRUE);
 }
@@ -5140,7 +5191,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 							cave_alter_feat(y, x, FS_SOLID);
 
 							/* Decorate next to the start and/or end of the tunnel with the starting room decorations */
-							if ((room_info[dun_room[by1][bx1]].solid) && (dun->next_n < NEXT_MAX))
+							if ((dun_room[by1][bx1] < DUN_ROOMS) && (room_info[dun_room[by1][bx1]].solid) && (dun->next_n < NEXT_MAX))
 							{
 								/* Overwrite with alternate terrain from starting room later */
 								dun->next[dun->next_n].y = y;
@@ -5150,7 +5201,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 							}
 
 							/* If the ending room has decorations, overwrite the start */
-							if ((room_info[dun_room[by2][bx2]].solid) && (dun->next_n < NEXT_MAX))
+							if ((dun_room[by2][bx2] < DUN_ROOMS) && (room_info[dun_room[by2][bx2]].solid) && (dun->next_n < NEXT_MAX))
 							{
 								int j;
 
@@ -5216,7 +5267,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 						/* Overwrite starting tunnel terrain with end tunnel terrain */
 						for (i = first_tunn; i < dun->tunn_n; i++)
 						{
-							if (dun->tunn_feat[i]) dun->tunn_feat[i] = room_info[dun_room[by2][bx2]].tunnel;
+							if ((dun_room[by2][bx2] < DUN_ROOMS) && (dun->tunn_feat[i])) dun->tunn_feat[i] = room_info[dun_room[by2][bx2]].tunnel;
 						}
 					}
 
@@ -5230,15 +5281,17 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				row1 = tmp_row;
 				col1 = tmp_col;
 
-				/* Clear tunnel feature if feature is a floor */
-				if (cave_feat[tmp_row][tmp_col] == FEAT_FLOOR)
-				{
-					start_tunnel = 0;
-				}
-				else
+				/* Set tunnel feature if feature is not a floor */
+				if ((cave_feat[tmp_row][tmp_col] != FEAT_FLOOR) && (dun_room[by1][bx1] < DUN_ROOMS))
 				{
 					start_tunnel = room_info[dun_room[by1][bx1]].tunnel;
 				}
+				/* Clear tunnel feature if feature is a floor */
+				else
+				{
+					start_tunnel = 0;
+				}
+
 			}
 		}
 
@@ -5872,11 +5925,15 @@ static bool build_type7(int room, int type)
 	/* Build the chambers */
 	build_chambers(y1, x1, y2, x2, 30, light);
 
-	/* Initialize room description */
-	room_info[dun->cent_n].type = ROOM_CHAMBERS;
-
 	/* Set the chamber flags */
 	set_room_flags(room, type);
+
+	/* Paranoia */
+	if (dun->cent_n < DUN_ROOMS)
+	{
+		/* Initialize room description */
+		room_info[dun->cent_n].type = ROOM_CHAMBERS;
+	}
 
 	return (TRUE);
 }
@@ -5918,6 +5975,31 @@ static bool build_type8910(int room, int type)
 	/* Set the vault / interesting room flags */
 	set_room_flags(room, type);
 
+	/* Paranoia */
+	if (dun->cent_n < DUN_ROOMS)
+	{
+		switch (type)
+		{
+			case 8:
+				/* Initialize room description */
+				room_info[dun->cent_n].type = ROOM_INTERESTING;
+
+				break;
+
+			case 9:
+				/* Initialize room description */
+				room_info[dun->cent_n].type = ROOM_LESSER_VAULT;
+
+				break;
+
+			case 10:
+				/* Initialize room description */
+				room_info[dun->cent_n].type = ROOM_GREATER_VAULT;
+
+				break;
+		}
+	}
+
 	return (TRUE);
 }
 
@@ -5941,14 +6023,8 @@ static bool build_type1112(int room, int type)
 	/* Find and reserve some space in the dungeon.  Get center of room. */
 	if (!find_space(&y0, &x0, dy * 2 + 1, dx * 2 + 1)) return (FALSE);
 
-	/* Initialize room description */
-	room_info[dun->cent_n].type = ROOM_STARBURST;
-
 	/* Try building starburst */
 	build_type_starburst(room, type, y0, x0, dy, dx, light);
-
-	/* Set the vault / interesting room flags */
-	set_room_flags(room, type);
 
 	return (TRUE);
 }
@@ -5973,14 +6049,8 @@ static bool build_type131415(int room, int type)
 	/* Find and reserve some space in the dungeon.  Get center of room. */
 	if (!find_space(&y0, &x0, height, width)) return (FALSE);
 
-	/* Initialize room description */
-	room_info[dun->cent_n].type = ROOM_FRACTAL;
-
 	/* Build fractal */
 	if (!build_type_fractal(room, type, y0, x0, fractal_type)) return (FALSE);
-
-	/* Set the vault / interesting room flags */
-	set_room_flags(room, type);
 
 	return (TRUE);
 }
@@ -6381,10 +6451,14 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 			dun->cent[dun->cent_n].x = *x0;
 			dun->cent_n++;
 
-			/* Initialise room */
-			room_info[dun->cent_n].flags = 0;
-			room_info[dun->cent_n].tunnel = 0;
-			room_info[dun->cent_n].solid = 0;
+			/* Paranoia */
+			if (dun->cent_n < DUN_ROOMS)
+			{
+				/* Initialise room */
+				room_info[dun->cent_n].flags = 0;
+				room_info[dun->cent_n].tunnel = 0;
+				room_info[dun->cent_n].solid = 0;
+			}
 		}		
 
 		for (by = by1; by <= by2; by++)
@@ -7185,12 +7259,6 @@ static void cave_gen(void)
 	/* Hack -- No destroyed "quest", "wild" or "guardian" levels */
 	if (level_flag & (LF1_QUEST | LF1_FEATURE | LF1_GUARDIAN)) level_flag &= ~(LF1_DESTROYED);
 
-	/* No features in a tower above the surface */
-	if (((level_flag & (LF1_TOWER)) == 0) || ((level_flag & (LF1_SURFACE)) != 0))
-	{
-		build_nature();
-	}
-
 	/* Hack -- build a tower in the centre of the level */
 	if ((zone->tower) && (p_ptr->depth >= min_depth(p_ptr->dungeon)))
 	{
@@ -7217,27 +7285,35 @@ static void cave_gen(void)
 		/* Hack -- Build the tower */
 		build_tower(y, x, v_ptr->hgt, v_ptr->wid, v_text + v_ptr->text);
 
-		/* Reserve some blocks */
-#if 0
-		for (by = (y - v_ptr->hgt) / BLOCK_HGT; by <= (y + v_ptr->hgt) / BLOCK_HGT; by++)
+		/* Paranoia */
+		if (dun->cent_n < CENT_MAX)
 		{
-			for (bx = (x - v_ptr->wid) / BLOCK_WID; by <= (x + v_ptr->wid) / BLOCK_WID; bx++)
+			/* Set corridor here */
+			dun->cent[dun->cent_n].y = y;
+			dun->cent[dun->cent_n].x = x;
+			dun->cent_n++;
+
+			/* Reserve some blocks */
+			for (by = (y - v_ptr->hgt / 2) / BLOCK_HGT; by <= (y + v_ptr->hgt / 2 + 1) / BLOCK_HGT; by++)
 			{
-				dun->room_map[by][bx] = TRUE;
+				for (bx = (x - v_ptr->wid / 2) / BLOCK_WID; by <= (x + v_ptr->wid / 2 + 1) / BLOCK_WID; bx++)
+				{
+					dun->room_map[by][bx] = TRUE;
 	
-				dun_room[by][bx] = dun->cent_n+1;	
+					dun_room[by][bx] = dun->cent_n;
+				}
+			}
+
+			/* Paranoia */
+			if (dun->cent_n < DUN_ROOMS)
+			{
+				/* Initialise room description */
+				room_info[dun->cent_n].type = ROOM_TOWER;
+				room_info[dun->cent_n].flags = 0; /* Will be set to ROOM_ICKY at end of generation */
+				room_info[dun->cent_n].tunnel = 0;
+				room_info[dun->cent_n].solid = 0;
 			}
 		}
-#endif
-	
-		/* Set corridor here */
-		dun->cent[dun->cent_n].y = y;
-		dun->cent[dun->cent_n].x = x;
-		dun->cent_n++;
-
-		/* Initialise room description */
-		room_info[dun->cent_n].type = ROOM_TOWER;
-		room_info[dun->cent_n].flags = 0; /* Will be set to ROOM_ICKY at end of generation */
 
 		/* Hack -- descending player always in tower */
 		if ((level_flag & LF1_SURFACE) && (p_ptr->create_up_stair))
@@ -7251,6 +7327,12 @@ static void cave_gen(void)
 			feat_near(FEAT_LESS, y, x);
 		}
 
+	}
+
+	/* No features in a tower above the surface */
+	if (((level_flag & (LF1_TOWER)) == 0) || ((level_flag & (LF1_SURFACE)) != 0))
+	{
+		build_nature();
 	}
 
 	/* Hack -- All levels deeper than 20 on surface are 'destroyed' */
@@ -7282,7 +7364,7 @@ static void cave_gen(void)
 		/*
 		 * Build each type of room in turn until we cannot build any more.
 		 */
-		for (i = 0; (i < ROOM_MAX) && (dun->cent_n + 1 < DUN_ROOMS); i++)
+		for (i = 0; (i < ROOM_MAX) && (dun->cent_n < DUN_ROOMS - 1); i++)
 		{
 			/* What type of room are we building now? */
 			int room_type = room_build_order[i];
@@ -7309,7 +7391,8 @@ static void cave_gen(void)
 
 			/* Build the room. */
 			while (((last) || (rand_int(100) < room_data[room_type].chance[p_ptr->depth < 100 ? p_ptr->depth / 10 : 10]))
-				&& (rooms_built < room_data[room_type].max_number) && (room_build(dun->cent_n + 1, room_type)))
+				&& (rooms_built < room_data[room_type].max_number) && (dun->cent_n < DUN_ROOMS - 1) &&
+					(room_build(dun->cent_n + 1, room_type)))
 			{
 				/* Increase the room built count. */
 				rooms_built += room_data[room_type].count_as;
@@ -7443,7 +7526,13 @@ static void cave_gen(void)
 				for (k = 0; k < dun->cent_n; k++)
 				{
 					int dist1 = distance(dun->cent[j].y, dun->cent[j].x, dun->cent[k].y, dun->cent[k].x);
-					int type = room_info[dun_room[dun->cent[i].y/BLOCK_HGT][dun->cent[i].x/BLOCK_WID]].type;
+					int type = ROOM_NORMAL;
+
+					/* Paranoia */
+					if (dun_room[dun->cent[i].y/BLOCK_HGT][dun->cent[i].x/BLOCK_WID] < DUN_ROOMS)
+					{
+						type = room_info[dun_room[dun->cent[i].y/BLOCK_HGT][dun->cent[i].x/BLOCK_WID]].type;
+					}
 
 					/* Hack -- skip vaults */
 					if ((type == ROOM_LESSER_VAULT) || (type == ROOM_GREATER_VAULT)) continue;

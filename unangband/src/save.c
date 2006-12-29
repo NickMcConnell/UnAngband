@@ -961,20 +961,17 @@ static void wr_dungeon(void)
 	{
 		int j;
 
-		wr_byte(room_info[i].type);
+		wr_s16b(room_info[i].type);
+		wr_s16b(room_info[i].vault);
 		wr_u32b(room_info[i].flags);
 
-		if (room_info[i].type == ROOM_NORMAL)
+		for (j = 0; j < ROOM_DESC_SECTIONS; j++)
 		{
-			for (j = 0; j < ROOM_DESC_SECTIONS; j++)
-			{
-				wr_s16b(room_info[i].section[j]);
+			wr_s16b(room_info[i].section[j]);
 
-				if (room_info[i].section[j] == -1) break;
-			}
+			if (room_info[i].section[j] == -1) break;
 		}
 	}
-
 
 	/*** Compact ***/
 

@@ -1473,7 +1473,7 @@ static void rd_messages(void)
 static errr rd_dungeon(void)
 {
 	int i, y, x;
-int by, bx;
+	int by, bx;
 
 	s16b town;
 	s16b dungeon;
@@ -1484,6 +1484,8 @@ int by, bx;
 	byte count;
 	byte tmp8u;
 	u16b tmp16u;
+	u32b tmp32u;
+	s16b tmp16s;
 
 u16b limit;
 
@@ -1678,7 +1680,7 @@ u16b limit;
 	}
 
 
-	/*** Room descriptions ***/
+	/*** Room indexes ***/
 	for (bx = 0; bx < MAX_ROOMS_ROW; bx++)
 	{
 		for (by = 0; by < MAX_ROOMS_COL; by++)
@@ -1687,21 +1689,49 @@ u16b limit;
 		}
 	}
 
-	for (i = 1; i < DUN_ROOMS; i++)
+
+	/*** Read and discard old room descriptions ***/
+	if (older_than(0, 6, 2))
+	{
+		for (i = 1; i < 50; i++)
+		{
+			int j;
+
+			rd_byte(&tmp8u);
+			rd_u32b(&tmp32u);
+
+			if (!room_info[i].type)
+			{
+				for (j = 0; j < 15; j++)
+				{
+					rd_s16b(&tmp16s);
+
+					if (tmp16s == -1) break;
+				}
+			}
+		}
+
+		for (i = 1; i < DUN_ROOMS; i++)
+		{
+			room_info[i].type = ROOM_NONE;
+			room_info[i].section[0] = -1;
+		}
+	}
+
+	/*** Room descriptions ***/
+	else for (i = 1; i < DUN_ROOMS; i++)
 	{
 		int j;
 
-		rd_byte(&room_info[i].type);
+		rd_s16b(&room_info[i].type);
+		rd_s16b(&room_info[i].vault);
 		rd_u32b(&room_info[i].flags);
 
-		if (room_info[i].type == ROOM_NORMAL)
+		for (j = 0; j < ROOM_DESC_SECTIONS; j++)
 		{
-			for (j = 0; j < ROOM_DESC_SECTIONS; j++)
-			{
-				rd_s16b(&room_info[i].section[j]);
+			rd_s16b(&room_info[i].section[j]);
 
-				if (room_info[i].section[j] == -1) break;
-			}
+			if (room_info[i].section[j] == -1) break;
 		}
 	}
 

@@ -2516,10 +2516,10 @@ L:CHASM
 
 # Skip noises.
 
-N:109:115:0:0:5:1:40:128
+N:109:110:111:115:5:1:40:128
 A:windy
 B:
-D:A howling gale blows around the room.  
+D:A howling gale blows 
 L:CHASM
 S:WINDY
 

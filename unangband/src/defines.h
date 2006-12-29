@@ -357,14 +357,24 @@
 /*
  * Dungeon room types 
  */
-#define ROOM_NORMAL			0 
-#define ROOM_CHAMBERS	10
-#define ROOM_STARBURST	11
-#define ROOM_FRACTAL	12
-#define ROOM_INTERESTING   13
-#define ROOM_LESSER_VAULT	14
-#define ROOM_GREATER_VAULT	15
-#define ROOM_TOWER       16
+#define ROOM_NONE			0
+#define ROOM_NORMAL			1
+#define ROOM_NORMAL_WALLS		2
+#define ROOM_NORMAL_CENTRE		3
+#define ROOM_LARGE_WALLS		4
+#define ROOM_LARGE_CENTRE		5
+#define ROOM_HUGE_CENTRE		6
+#define ROOM_CHAMBERS			7
+#define ROOM_INTERESTING   		8
+#define ROOM_LESSER_VAULT		9
+#define ROOM_GREATER_VAULT		10
+#define ROOM_STAR_BURST			11
+#define ROOM_HUGE_STAR_BURST		11
+#define ROOM_FRACTAL			13
+#define ROOM_LARGE_FRACTAL		14
+#define ROOM_HUGE_FRACTAL		15
+#define ROOM_LAIR			16
+#define ROOM_TOWER       		17
 
 
 
@@ -2820,7 +2830,7 @@
 #define ROOM_DISPEL	0x04000000L	   /* room dispels enchantments */
 #define ROOM_RANDOM	0x08000000L	   /* room activates randomly for effect */
 #define ROOM_PUZZLE	0x10000000L	   /* room requires features contained destroyed */
-#define ROOM_LAIR	0x20000000L	   /* room requires monsters contained destroyed */
+#define ROOM_GUARD	0x20000000L	   /* room requires monsters contained destroyed */
 #define ROOM_OBJECT	0x40000000L	   /* room requires objects contained destroyed */
 #define ROOM_TRAP	0x80000000L	   /* whole room is a trap */
 

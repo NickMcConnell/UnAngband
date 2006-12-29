@@ -257,7 +257,8 @@ struct desc_type
  */
 struct room_info_type
 {
-	byte type;				/* Type of room (normal/pit) */
+	s16b type;				/* Type of room (normal/pit) */
+	s16b vault;				/* Vault chosen */
 	s16b section[ROOM_DESC_SECTIONS];	/* Array of room descriptions */
 
 	u32b flags;		/* Room flags */

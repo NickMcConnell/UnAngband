@@ -3854,6 +3854,15 @@ bool change_panel(int dir)
  */
 static void get_room_desc(int room, char *name, char *text_visible, char *text_always)
 {
+	bool scan_name = FALSE;
+	bool scan_desc = FALSE;
+
+	town_type *t_ptr = &t_info[p_ptr->dungeon];
+	dungeon_zone *zone=&t_ptr->zone[0];
+
+	/* Get the zone */ 
+	get_zone(&zone,p_ptr->dungeon,max_depth(p_ptr->dungeon));
+
 	/* Initialize text */
 	strcpy(name, "");
 	if (text_always) strcpy(text_always, "");
@@ -3862,12 +3871,6 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 	/* Town or not in room */
 	if (!room)
 	{
-		town_type *t_ptr = &t_info[p_ptr->dungeon];
-		dungeon_zone *zone=&t_ptr->zone[0];
-
-		/* Get the zone */ 
-		get_zone(&zone,p_ptr->dungeon,max_depth(p_ptr->dungeon));
-
 		if ((p_ptr->depth == min_depth(p_ptr->dungeon)) || (!zone->fill))
 		{
 			strcpy(name, t_name + t_ptr->name);
@@ -3901,7 +3904,7 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 			else
 			{
 				/* Describe location */
-				strcpy(text_always, t_text + t_info[p_ptr->dungeon].text);
+				strcpy(text_always, t_text + t_ptr->text);
 
 				/* Describe the guardian */
 				if (zone->guard)
@@ -3909,17 +3912,17 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 					if (strlen(text_always)) strcat(text_always,"  ");
 
 					/* Path to be opened */
-					if ((t_info[p_ptr->dungeon].distant != p_ptr->dungeon) && (adult_campaign))
+					if ((t_ptr->distant != p_ptr->dungeon) && (adult_campaign))
 					{
 						strcat(text_always, format("The path to %s is guarded by %s, who you must defeat ",
-							t_name + t_info[t_info[p_ptr->dungeon].distant].name,
+							t_name + t_info[t_ptr->distant].name,
 							r_name + r_info[zone->guard].name));
 					}
 					/* Dungeon guardian */
 					else
 					{
 						strcat(text_always, format("%^s is guarded by %s, who you must defeat ",
-							t_name + t_info[p_ptr->dungeon].name,
+							t_name + t_ptr->name,
 							r_name + r_info[zone->guard].name));
 					}
 
@@ -3927,7 +3930,7 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 					if (t_ptr->zone[0].guard == zone->guard) strcat(text_always, "here");
 
 					/* Guards top of tower */					
-					if (t_info[p_ptr->dungeon].zone[0].tower)
+					if (t_ptr->zone[0].tower)
 					{
 						if (t_ptr->zone[0].guard == zone->guard) strcat(text_always, " or ");
 						strcat(text_always, "at the top of the tower");
@@ -3955,138 +3958,190 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 	/* In room */
 	switch (room_info[room].type)
 	{
-		case (ROOM_GREATER_VAULT):
-		{
-			strcpy(name, "greater vault");
-			if (text_visible) strcpy(text_visible, "This vast sealed chamber is amongst the largest of its kind and is filled with ");
-			if (text_visible) strcat(text_visible, "deadly monsters and rich treasure.");
-			if (text_always) strcpy(text_always, "Beware!");
-			return;
-		}
-		case (ROOM_LESSER_VAULT):
-		{
-			strcpy(name, "lesser vault");
-			if (text_visible) strcpy(text_visible, "This vault is larger than most you have seen and contains more than ");
-			if (text_visible) strcat(text_visible, "its share of monsters and treasure.");
-			return;
-		}
 		case (ROOM_TOWER):
 		{
-			strcpy(name, "tower");
-			if (text_visible) strcpy(text_visible, "This tower is filled with monsters and traps.");
-			return;
+			strcpy(name, "the tower of ");
+			strcat(name, t_name + t_ptr->name);
+
+			/* Brief description */
+			if (text_visible) strcpy(text_visible, "This tower is filled with monsters and traps.  ");
+
+			/* Describe height of tower */
+			if (text_visible)
+			{
+				strcpy(text_visible, format("It looks about %d feet tall.  ", (max_depth(p_ptr->dungeon) - min_depth(p_ptr->dungeon) + 1) * 50));
+			}
+			break;
 		}
-		case (ROOM_NORMAL):
+
+		case (ROOM_LAIR):
 		{
-			int i, j;
+			monster_race *r_ptr = &r_info[room_info[room].vault];
 
-			char buf_text1[1024];
-			char buf_text2[1024];
-			char buf_name1[16];
-			char buf_name2[16];
-			char *last_buf = NULL;
+			strcpy(name, "the lair of ");
+			strcat(name, r_name + r_ptr->name);
+			if ((r_ptr->flags1 & (RF1_UNIQUE)) == 0) strcat(name, "s");
 
-			/* Clear the history text */
-			buf_text1[0] = '\0';
-			buf_text2[0] = '\0';
+			if (text_visible) strcpy(text_visible, "This is the lair of ");
+			if (text_visible) strcat(text_visible, r_name + r_ptr->name);
+			if ((text_visible) && ((r_ptr->flags1 & (RF1_UNIQUE)) == 0)) strcat(name, "s");
+			if (text_visible) strcat(text_visible, ".  ");
+			if (text_visible) strcat(text_visible, r_text + r_ptr->name);
+			if (text_always) strcpy(text_always, "Beware!  ");
 
-			/* Clear the name1 text */
-			buf_name1[0] = '\0';
+			break;
+		}
 
-			/* Clear the name2 text */
-			buf_name2[0] = '\0';
-			
-			i = 0;
+		case (ROOM_GREATER_VAULT):
+		{
+			strcpy(name, "greater ");
 
-			while ((room >= 0) && (i < ROOM_DESC_SECTIONS))
+			if (text_visible) strcpy(text_visible, "This vast sealed chamber is amongst the largest of its kind and is filled with ");
+			if (text_visible) strcat(text_visible, "deadly monsters and rich treasure.  ");
+			if (text_always) strcpy(text_always, "Beware!  ");
+
+			/* Fall through */	
+		}
+
+		case (ROOM_LESSER_VAULT):
+		{
+			/* Display vault name */
+			if ((v_name + v_info[room_info[room].vault].name)[0] == '\'')
 			{
-				/* Get description */
-				j = room_info[room].section[i++];
-
-				/* End of description */
-				if (j < 0) break;
-
-				/* Must understand language? */
-				if (d_info[j].flags & (ROOM_LANGUAGE))
-				{
-					/* Does the player understand the main language of the level? */
-					if ((last_buf) && (cave_ecology.ready) && (cave_ecology.num_races)
-						&& player_understands(monster_language(cave_ecology.race[0])))
-					{
-						/* Get the textual history */
-						strcat(last_buf, (d_text + d_info[j].text));
-					}
-					else if (last_buf)
-					{
-						/* Fake it */
-						strcat(last_buf, "nothing you can understand.  ");
-
-						/* Clear last buf to skip remaining language lines */
-						last_buf = NULL;
-					}
-
-					/* Diagnostics */
-					if ((cheat_xtra) && (last_buf)) strcat(last_buf, format("%d", i));
-
-				}
-				/* Visible description */
-				else if (d_info[j].flags & (ROOM_SEEN))
-				{
-					/* Get the textual history */
-					strcat(buf_text1, (d_text + d_info[j].text));
-
-					/* Record last buffer for language */
-					last_buf = buf_text1;
-
-					/* Diagnostics */
-					if (cheat_xtra) strcat(buf_text1, format("%d", i));
-
-				}
-				/* Description always present */
-				else
-				{
-					/* Get the textual history */
-					strcat(buf_text2, (d_text + d_info[j].text));
-
-					/* Record last buffer for language */
-					last_buf = buf_text2;
-
-					/* Diagnostics */
-					if (cheat_xtra) strcat(buf_text2, format("%d", i));
-				}
-
-				/* Get the name1 text if needed */
-				if (!strlen(buf_name1)) strcpy(buf_name1, (d_name + d_info[j].name1));
-
-				/* Get the name2 text if needed */
-				if (!strlen(buf_name2)) strcpy(buf_name2, (d_name + d_info[j].name2));
+				strcat(name, "vault ");
+				strcat(name, v_name + v_info[room_info[room].vault].name);
+			}
+			else
+			{
+				strcat(name, "vault");
 			}
 
-			/* Set the visible description */
-			if (text_visible) strcpy(text_visible, buf_text1);
+			scan_desc = TRUE;
+			break;
+		}
 
-			/* Set the visible description */
-			if (text_always) strcpy(text_always, buf_text2);
+		case (ROOM_INTERESTING):
+		{
+			strcat(name, v_name + v_info[room_info[room].vault].name);
+			if (text_visible) strcpy(text_visible, "There is something remarkable here.  ");
+			break;
+		}
 
-			/* Set room name */
-			if (strlen(buf_name1)) strcpy(name, buf_name1);
+		case (ROOM_CHAMBERS):
+		{
+			if (text_visible) strcpy(text_visible, "This is one of many rooms crowded with monsters.  ");
+			scan_name = TRUE;
+			scan_desc = TRUE;
+			break;
+		}
 
-			/* And add second room name if necessary */
-			if (strlen(buf_name2))
+		default:
+		{
+			scan_name = TRUE;
+			scan_desc = TRUE;
+			break;
+		}
+	}
+
+	/* Read through and display the description if required */
+	if ((scan_name) || (scan_desc))
+	{
+		int i, j;
+
+		char buf_name1[16];
+		char buf_name2[16];
+		char *last_buf = NULL;
+
+		/* Clear the name1 text */
+		buf_name1[0] = '\0';
+
+		/* Clear the name2 text */
+		buf_name2[0] = '\0';
+			
+		i = 0;
+
+		while ((room >= 0) && (i < ROOM_DESC_SECTIONS))
+		{
+			/* Get description */
+			j = room_info[room].section[i++];
+
+			/* End of description */
+			if (j < 0) break;
+
+			/* Must understand language? */
+			if (d_info[j].flags & (ROOM_LANGUAGE))
 			{
-				if (strlen(buf_name1))
+				/* Does the player understand the main language of the level? */
+				if ((last_buf) && (cave_ecology.ready) && (cave_ecology.num_races)
+					&& player_understands(monster_language(cave_ecology.race[0])))
 				{
-					strcat(name, " ");
-					strcat(name, buf_name2);
+					/* Get the textual history */
+					strcat(last_buf, (d_text + d_info[j].text));
 				}
-				else
+				else if (last_buf)
 				{
-					strcpy(name, buf_name2);
+					/* Fake it */
+					strcat(last_buf, "nothing you can understand.  ");
+
+					/* Clear last buf to skip remaining language lines */
+					last_buf = NULL;
 				}
 
+				/* Diagnostics */
+				if ((cheat_xtra) && (last_buf)) strcat(last_buf, format("%d", i));
+			}
+
+			/* Visible description */
+			else if (d_info[j].flags & (ROOM_SEEN))
+			{
+				/* Get the textual history */
+				if (text_visible) strcat(text_visible, (d_text + d_info[j].text));
+
+				/* Record last buffer for language */
+				last_buf = text_visible;
+
+				/* Diagnostics */
+				if ((cheat_xtra) && (text_visible)) strcat(text_visible, format("%d", i));
+			}
+
+			/* Description always present */
+			else
+			{
+				/* Get the textual history */
+				if (text_always) strcat(text_always, (d_text + d_info[j].text));
+
+				/* Record last buffer for language */
+				last_buf = text_always;
+
+				/* Diagnostics */
+				if ((cheat_xtra) && (text_always)) strcat(text_always, format("%d", i));
+			}
+
+			/* Get the name1 text if needed */
+			if (!strlen(buf_name1)) strcpy(buf_name1, (d_name + d_info[j].name1));
+
+			/* Get the name2 text if needed */
+			if (!strlen(buf_name2)) strcpy(buf_name2, (d_name + d_info[j].name2));
+		}
+
+		/* Set room name */
+		if (strlen(buf_name1)) strcpy(name, buf_name1);
+
+		/* And add second room name if necessary */
+		if (strlen(buf_name2))
+		{
+			if (strlen(buf_name1))
+			{
+				strcat(name, " ");
+				strcat(name, buf_name2);
+			}
+			else
+			{
+				strcpy(name, buf_name2);
 			}
 
 		}
+
 	}
 
 	if ((cheat_room) && (text_always))
