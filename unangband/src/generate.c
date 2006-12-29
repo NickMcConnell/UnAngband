@@ -394,7 +394,6 @@ static void new_player_spot(void)
 	/* Place the player */
 	while (1)
 	{
-
 		/* Pick a legal spot */
 		y = rand_range(1, DUNGEON_HGT - 2);
 		x = rand_range(1, DUNGEON_WID - 2);
@@ -5968,19 +5967,20 @@ static bool build_type8910(int room, int type)
 {
 	vault_type *v_ptr = NULL;
 	int y0, x0;
+	int limit = 0;
 
 	/* Pick a lesser vault */
 	while (TRUE)
 	{
+		/* Limit */
+		if (limit++ > 500) return (FALSE);
+
 		/* Get a random vault record */
 		v_ptr = &v_info[rand_int(z_info->v_max)];
 
 		/* Accept the first room of this type */
 		if (v_ptr->typ == type) break;
 	}
-
-	/* Couldn't find vault */
-	if (!v_ptr) return (FALSE);
 
 	/* Find and reserve some space in the dungeon.  Get center of room. */
 	if (!find_space(&y0, &x0, v_ptr->hgt, v_ptr->wid)) return (FALSE);
@@ -6087,21 +6087,21 @@ static bool room_build(int room, int type)
 	switch (type)
 	{
 		/* Build an appropriate room */
-		case 15: if (build_type131415(room, type)) return(TRUE); break;
-		case 14: if (build_type131415(room, type)) return(TRUE); break;
-		case 13: if (build_type131415(room, type)) return(TRUE); break;
-		case 12: if (build_type1112(room, type)) return(TRUE); break;
-		case 11: if (build_type1112(room, type)) return(TRUE); break;
-		case 10: if (build_type8910(room, type)) return(TRUE); break;
-		case 9: if (build_type8910(room, type)) return(TRUE); break;
-		case 8: if (build_type8910(room, type)) return(TRUE); break;
-		case 7: if (build_type7(room, type)) return(TRUE); break;
-		case 6: if (build_type6(room, type)) return(TRUE); break;
-		case 5: if (build_type45(room, type)) return(TRUE); break;
-		case 4: if (build_type45(room, type)) return(TRUE); break;
-		case 3: if (build_type123(room, type)) return(TRUE); break;
-		case 2: if (build_type123(room, type)) return(TRUE); break;
-		case 1: if (build_type123(room, type)) return(TRUE); break;
+		case ROOM_HUGE_FRACTAL: if (build_type131415(room, type)) return(TRUE); break;
+		case ROOM_LARGE_FRACTAL: if (build_type131415(room, type)) return(TRUE); break;
+		case ROOM_FRACTAL: if (build_type131415(room, type)) return(TRUE); break;
+		case ROOM_HUGE_STAR_BURST: if (build_type1112(room, type)) return(TRUE); break;
+		case ROOM_STAR_BURST: if (build_type1112(room, type)) return(TRUE); break;
+		case ROOM_GREATER_VAULT: if (build_type8910(room, type)) return(TRUE); break;
+		case ROOM_LESSER_VAULT: if (build_type8910(room, type)) return(TRUE); break;
+		case ROOM_INTERESTING: if (build_type8910(room, type)) return(TRUE); break;
+		case ROOM_CHAMBERS: if (build_type7(room, type)) return(TRUE); break;
+		case ROOM_HUGE_CENTRE: if (build_type6(room, type)) return(TRUE); break;
+		case ROOM_LARGE_CENTRE: if (build_type45(room, type)) return(TRUE); break;
+		case ROOM_LARGE_WALLS: if (build_type45(room, type)) return(TRUE); break;
+		case ROOM_NORMAL_CENTRE: if (build_type123(room, type)) return(TRUE); break;
+		case ROOM_NORMAL_WALLS: if (build_type123(room, type)) return(TRUE); break;
+		case ROOM_NORMAL: if (build_type123(room, type)) return(TRUE); break;
 	}
 
 	/* Failure */

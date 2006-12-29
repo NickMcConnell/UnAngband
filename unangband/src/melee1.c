@@ -872,9 +872,9 @@ bool make_attack_normal(int m_idx)
 		if (method > RBM_MAX_NORMAL) continue;
 
 		/* Assume no cut or stun or touched */
-		do_cut = TRUE;
-		do_stun = TRUE;
-		touched = TRUE;
+		do_cut = FALSE;
+		do_stun = FALSE;
+		touched = FALSE;
 
 		/* Apply monster stats */
 		if (d_side > 1)
