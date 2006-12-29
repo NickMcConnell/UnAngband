@@ -1719,6 +1719,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 			for (x = x1; (dx > 0) ? x <= x2 : x >= x2; x += dx)
 			{
 				outer = ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) != 0);
+				use_edge = FALSE;
 
 				/* Checkered room */
 				if (((flag & (RG1_CHECKER)) != 0) && ((x + y + offset) % 2)) continue;
@@ -1740,8 +1741,6 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 				/* Only place on edge of room if edge flag and not centre flag set */
 				if (((flag & (RG1_EDGE)) != 0) && ((flag & (RG1_CENTRE)) == 0) && (cave_feat[y][x] != FEAT_WALL_OUTER))
 				{
-					use_edge = FALSE;
-
 					for (i = 0; i < 8; i++)
 					{
 						if ((f_info[cave_feat[y + ddy_ddd[i]][x + ddx_ddd[i]]].flags1 & (FF1_OUTER)) != 0) use_edge = TRUE;
@@ -3798,7 +3797,7 @@ static void fractal_map_merge_another(fractal_map map, fractal_template *t_ptr)
 /*
  * Build a fractal room given its center. Returns TRUE on success.
  */
-static bool build_type_fractal(int room, int chart, int y0, int x0, byte type)
+static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, bool light)
 {
 	fractal_map map;
 	fractal_template *t_ptr;
@@ -3815,8 +3814,6 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type)
 	int n_pools = 0;
 
 	int i;
-
-	bool light;
 
 	/* Paranoia */
 	if (type >= MAX_FRACTAL_TYPES) return (FALSE);
@@ -6061,6 +6058,9 @@ static bool build_type131415(int room, int type)
 
 	byte fractal_type;
 
+	/* Deeper in the dungeon, starbursts are less likely to be lit. */
+	bool light = (rand_range(25, 60) > p_ptr->depth) ? TRUE : FALSE;
+
 	switch (type)
 	{
 		case 15: fractal_type = FRACTAL_TYPE_33x65; height = 33; width = 65; break;
@@ -6072,7 +6072,7 @@ static bool build_type131415(int room, int type)
 	if (!find_space(&y0, &x0, height, width)) return (FALSE);
 
 	/* Build fractal */
-	if (!build_type_fractal(room, type, y0, x0, fractal_type)) return (FALSE);
+	if (!build_type_fractal(room, type, y0, x0, fractal_type, light)) return (FALSE);
 
 	return (TRUE);
 }
