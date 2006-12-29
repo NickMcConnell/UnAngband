@@ -2538,6 +2538,121 @@ static void set_room_flags(int room, int type)
 }
 
 
+typedef s16b pool_type[3];
+
+
+/*
+ *  Get room info for rooms where we do not have any north / south / east / west or clear place to drop items.
+ */
+static void set_irregular_room_info(int room, int type, bool light, s16b *feat, s16b *edge, s16b *inner, s16b *alloc, pool_type *pool, int *n_pools)
+{
+	u32b exclude = (RG1_NORTH | RG1_SOUTH | RG1_EAST | RG1_WEST | RG1_HAS_ITEM | RG1_HAS_GOLD |
+			RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR | RG1_CHECKER | RG1_ROWS | RG1_COLS |
+			RG1_8WAY | RG1_DOORWAY | RG1_3X3HIDDEN);
+
+	int j = 0;
+
+	u32b place_flag = 0L;
+
+	byte place_tval = 0;
+	byte place_min_sval = 0;
+	byte place_max_sval = 0;
+	s16b place_feat = 0;
+
+	byte name = 0L;
+
+	byte branch = 0;
+	byte branch_on = 0;
+
+	/* Exclude light or dark */
+	if (light) exclude |= RG1_DARK;
+	else exclude |= RG1_LITE;
+
+	/* Get room info */
+	while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name,
+		exclude))
+	{
+		/* Place features or items if needed */
+		if (place_feat)
+		{
+			if ((place_flag & (RG1_CENTRE)) != 0)
+			{
+				exclude |= RG1_CENTRE;
+				*feat = place_feat;
+
+				if ((place_flag & (RG1_IGNORE_EDGE | RG1_BRIDGE_EDGE)) != 0)
+				{
+					exclude |= RG1_EDGE | RG1_OUTER;
+					*edge = place_feat;
+
+					if ((place_flag & (RG1_BRIDGE_EDGE)) != 0)
+					{
+						if (f_info[*feat].flags2 & (FF2_BRIDGE))
+						{
+							/* Bridge previous contents */
+							*edge = feat_state(*feat, FS_BRIDGE);
+						}
+						/* Apply tunnel */
+						else if (f_info[*feat].flags1 & (FF1_TUNNEL))
+						{
+							/* Tunnel previous contents */
+							*edge = feat_state(*feat, FS_TUNNEL);
+						}
+					}
+				}
+			}
+
+			if ((place_flag & (RG1_ALLOC)) != 0)
+			{
+				exclude |= RG1_ALLOC;
+				*alloc = place_feat;
+			}
+
+			if ((place_flag & (RG1_EDGE | RG1_OUTER)) != 0)
+			{
+				exclude |= RG1_EDGE | RG1_OUTER;
+				*edge = place_feat;
+			}
+
+			if ((place_flag & (RG1_INNER | RG1_STARBURST)) != 0)
+			{
+				exclude |= RG1_INNER | RG1_STARBURST;
+				*inner = place_feat;
+			}
+
+			if ((place_flag & (RG1_SCATTER | RG1_RANDOM)) != 0)
+			{
+				if (*n_pools > 2) exclude |= RG1_SCATTER | RG1_RANDOM;
+				*pool[(*n_pools)++] = place_feat;
+			}
+		}
+
+		/* Clear object hook */
+		if (place_tval)
+		{
+			get_obj_num_hook = NULL;
+
+			/* Prepare allocation table */
+			get_obj_num_prep();
+
+			place_tval = 0;
+			place_min_sval = 0;
+			place_max_sval = 0;
+		}
+
+		/* Clear placement details */
+		place_flag = 0;
+		place_feat = 0;
+	}
+
+	/* Type */
+	room_info[room].type = ROOM_NORMAL;
+
+	/* Terminate index list */
+	room_info[room].section[j] = -1;
+}
+
+
 /*
  * Build a room consisting of two overlapping rooms.
  * Get the room description, and place stuff accordingly.
@@ -3482,22 +3597,16 @@ static void fractal_map_mark_edge(fractal_map map, fractal_template *t_ptr)
 	}
 }
 
+
+
+
+
 /*
  * Construct a fractal room given a fractal map and the room center's coordinates.
  */
-static void fractal_map_to_room(fractal_map map, byte fractal_type, int y0, int x0)
+static void fractal_map_to_room(fractal_map map, byte fractal_type, int y0, int x0, bool light, s16b floor, s16b wall, pool_type pool)
 {
 	int x, y, y1, x1, wid, hgt;
-	bool light = FALSE;
-	int floor_type;
-	/*
-	 * No pools for now. Note that we choose the features for the pool when
-	 * we need them. If we pick three random features right now we might
-	 * generate inconsistent levels.
-	 */
-	u16b pool1 = FEAT_NONE;
-	u16b pool2 = FEAT_NONE;
-	u16b pool3 = FEAT_NONE;
 
 	/* Get the dimensions of the fractal map */
 	hgt = fractal_dim[fractal_type].hgt;
@@ -3509,9 +3618,6 @@ static void fractal_map_to_room(fractal_map map, byte fractal_type, int y0, int 
 
 	/* Occasional light */
 	if (p_ptr->depth <= randint(25)) light = TRUE;
-
-	/* Use earth floor sometimes. EXPERIMENTAL */
-	floor_type = rand_int(100);
 
 	/* Apply the map to the dungeon */
 	for (y = 0; y < hgt; y++)
@@ -3529,43 +3635,43 @@ static void fractal_map_to_room(fractal_map map, byte fractal_type, int y0, int 
 			/* Translate each grid type to dungeon features */
 			if (grid_type >= FRACTAL_FLOOR)
 			{
-				u16b feat = FEAT_NONE;
+				s16b feat = FEAT_NONE;
 
 				/* Pool grid */
 				if (grid_type == FRACTAL_POOL_1)
 				{
 					/* Pick a feature if necessary */
-					if (pool1 == FEAT_NONE)
+					if (pool[0] == FEAT_NONE)
 					{
-						pool1 = pick_proper_feature(cave_feat_pool);
+						pool[0] = pick_proper_feature(cave_feat_pool);
 					}
 
 					/* Use the pool feature */
-					feat = pool1;
+					feat = pool[0];
 				}
 				/* Pool grid */
 				else if (grid_type == FRACTAL_POOL_2)
 				{
 					/* Pick a feature if necessary */
-					if (pool2 == FEAT_NONE)
+					if (pool[1] == FEAT_NONE)
 					{
-						pool2 = pick_proper_feature(cave_feat_pool);
+						pool[1] = pick_proper_feature(cave_feat_pool);
 					}
 
 					/* Use the pool feature */
-					feat = pool2;
+					feat = pool[1];
 				}
 				/* Pool grid */
 				else if (grid_type == FRACTAL_POOL_3)
 				{
 					/* Pick a feature if necessary */
-					if (pool3 == FEAT_NONE)
+					if (pool[2] == FEAT_NONE)
 					{
-						pool3 = pick_proper_feature(cave_feat_pool);
+						pool[2] = pick_proper_feature(cave_feat_pool);
 					}
 
 					/* Use the pool feature */
-					feat = pool3;
+					feat = pool[2];
 				}
 
 				/* Place the selected pool feature */
@@ -3576,38 +3682,13 @@ static void fractal_map_to_room(fractal_map map, byte fractal_type, int y0, int 
 				/* Or place a floor */
 				else
 				{
-					/* Use earth floor (15%) */
-					if (floor_type < 15)
-					{
-						feat = FEAT_FLOOR_EARTH;
-					}
-					/* Use scattered earth floor (5%) */
-					else if ((floor_type < 20) && !rand_int(7))
-					{
-						feat = FEAT_FLOOR_EARTH;
-					}
-					/* Plain old floor (80%) */
-					else
-					{
-						feat = FEAT_FLOOR;
-					}
-
 					/* Place floors */
-					cave_set_feat(yy, xx, feat);
+					cave_set_feat(yy, xx, floor);
 				}
 			}
 			else if (grid_type == FRACTAL_EDGE)
 			{
-				/* Place ice walls on ice levels */
-				if (level_flag & LF1_ICE)
-				{
-					build_terrain(yy, xx, FEAT_ICE);
-				}
-				/* Place usual walls on other levels */
-				else
-				{
-					cave_set_feat(yy, xx, FEAT_WALL_OUTER);
-				}
+				cave_set_feat(yy, xx, wall);
 			}
 			else
 			{
@@ -3665,15 +3746,37 @@ static void fractal_map_merge_another(fractal_map map, fractal_template *t_ptr)
 /*
  * Build a fractal room given its center. Returns TRUE on success.
  */
-static bool build_type_fractal(int y0, int x0, byte type)
+static bool build_type_fractal(int room, int chart, int y0, int x0, byte type)
 {
 	fractal_map map;
 	fractal_template *t_ptr;
 	int tries;
 	bool do_merge = FALSE;
 
+	/* Default floor and edge */
+	s16b feat = FEAT_FLOOR;
+	s16b edge = FEAT_WALL_OUTER;
+	s16b inner = FEAT_NONE;
+	s16b alloc = FEAT_NONE;
+	pool_type pool;
+
+	int n_pools = 0;
+
+	int i;
+
+	bool light;
+
 	/* Paranoia */
 	if (type >= MAX_FRACTAL_TYPES) return (FALSE);
+
+	/* Set irregular room info */
+	set_irregular_room_info(room, chart, light, &feat, &edge, &inner, &alloc, &pool, &n_pools);
+
+	/* Clear remaining pools */
+	for (i = n_pools; i < 3; i++)
+	{
+		pool[i] = FEAT_NONE;
+	}
 
 	/* Reset the loop counter */
 	tries = 0;
@@ -3737,7 +3840,7 @@ static bool build_type_fractal(int y0, int x0, byte type)
 	fractal_map_mark_edge(map, t_ptr);
 
 	/* Place the room */
-	fractal_map_to_room(map, type, y0, x0);
+	fractal_map_to_room(map, type, y0, x0, light, feat, edge, pool);
 
 	/* Free resources */
 	FREE(map);
@@ -3837,8 +3940,6 @@ static bool build_pool(int y0, int x0, int feat, bool do_big_pool)
 }
 
 
-
-
 static void build_type_starburst(int room, int type, int y0, int x0, int dy, int dx, bool light)
 {
 	bool want_pools = (rand_int(150) < p_ptr->depth);
@@ -3858,111 +3959,11 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 	u32b flag = (STAR_BURST_ROOM | STAR_BURST_RAW_FLOOR |
 		STAR_BURST_RAW_EDGE);
 
-	u32b exclude = (RG1_NORTH | RG1_SOUTH | RG1_EAST | RG1_WEST | RG1_HAS_ITEM | RG1_HAS_GOLD |
-			RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR | RG1_CHECKER | RG1_ROWS | RG1_COLS |
-			RG1_8WAY | RG1_DOORWAY | RG1_3X3HIDDEN);
+	/* Set irregular room info */
+	set_irregular_room_info(room, type, light, &feat, &edge, &inner, &alloc, &pool, &n_pools);
 
-	int j = 0;
-
-	u32b place_flag = 0L;
-
-	byte place_tval = 0;
-	byte place_min_sval = 0;
-	byte place_max_sval = 0;
-	s16b place_feat = 0;
-
-	byte name = 0L;
-
-	byte branch = 0;
-	byte branch_on = 0;
-
-	/* Exclude light or dark */
-	if (light) exclude |= RG1_DARK;
-	else exclude |= RG1_LITE;
-
-	/* Get room info */
-	while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name,
-		exclude))
-	{
-		/* Place features or items if needed */
-		if (place_feat)
-		{
-			if ((place_flag & (RG1_CENTRE)) != 0)
-			{
-				exclude |= RG1_CENTRE;
-				feat = place_feat;
-
-				if ((place_flag & (RG1_IGNORE_EDGE | RG1_BRIDGE_EDGE)) != 0)
-				{
-					exclude |= RG1_EDGE | RG1_OUTER;
-					edge = place_feat;
-
-					if ((place_flag & (RG1_BRIDGE_EDGE)) != 0)
-					{
-						if (f_info[feat].flags2 & (FF2_BRIDGE))
-						{
-							/* Bridge previous contents */
-							edge = feat_state(feat, FS_BRIDGE);
-						}
-						/* Apply tunnel */
-						else if (f_info[feat].flags1 & (FF1_TUNNEL))
-						{
-							/* Tunnel previous contents */
-							edge = feat_state(feat, FS_TUNNEL);
-						}
-					}
-				}
-			}
-
-			if ((place_flag & (RG1_ALLOC)) != 0)
-			{
-				exclude |= RG1_ALLOC;
-				alloc = place_feat;
-			}
-
-			if ((place_flag & (RG1_EDGE | RG1_OUTER)) != 0)
-			{
-				exclude |= RG1_EDGE | RG1_OUTER;
-				edge = place_feat;
-			}
-
-			if ((place_flag & (RG1_INNER | RG1_STARBURST)) != 0)
-			{
-				exclude |= RG1_INNER | RG1_STARBURST;
-				inner = place_feat;
-			}
-
-			if ((place_flag & (RG1_SCATTER | RG1_RANDOM)) != 0)
-			{
-				if ((!(giant_room) && (n_pools > 1)) || (n_pools > 2)) exclude |= RG1_SCATTER | RG1_RANDOM;
-				want_pools = TRUE;
-				pool[n_pools++] = place_feat;
-			}
-		}
-
-		/* Clear object hook */
-		if (place_tval)
-		{
-			get_obj_num_hook = NULL;
-
-			/* Prepare allocation table */
-			get_obj_num_prep();
-
-			place_tval = 0;
-			place_min_sval = 0;
-			place_max_sval = 0;
-		}
-
-		/* Clear placement details */
-		place_flag = 0;
-		place_feat = 0;
-	}
-
-	/* Type */
-	room_info[room].type = ROOM_NORMAL;
-
-	/* Terminate index list */
-	room_info[room].section[j] = -1;
+	/* Have pool contents */
+	if (n_pools) want_pools = TRUE;
 
 	/* Occasional light */
 	if (light) flag |= (STAR_BURST_LIGHT);
@@ -4066,7 +4067,7 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 				int x = rand_spread(x0, range);
 
 				/* Verify center */
-				if (cave_feat[y][x] == FEAT_FLOOR)
+				if (cave_feat[y][x] == feat)
 				{
 					build_pool(y, x, pool[i], giant_room);
 
@@ -5976,7 +5977,7 @@ static bool build_type131415(int room, int type)
 	room_info[dun->cent_n].type = ROOM_FRACTAL;
 
 	/* Build fractal */
-	if (!build_type_fractal(y0, x0, fractal_type)) return (FALSE);
+	if (!build_type_fractal(room, type, y0, x0, fractal_type)) return (FALSE);
 
 	/* Set the vault / interesting room flags */
 	set_room_flags(room, type);

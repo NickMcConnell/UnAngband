@@ -2519,7 +2519,7 @@ L:CHASM
 N:109:115:0:0:5:1:40:128
 A:windy
 B:
-D:A howling gale blows 
+D:A howling gale blows around the room.  
 L:CHASM
 S:WINDY
 
