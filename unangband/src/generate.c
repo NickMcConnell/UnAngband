@@ -325,8 +325,10 @@ static room_data_type room_data[ROOM_MAX] =
 
 
 /* Build rooms in descending order of difficulty of placing e.g. size, frequency. */
-static byte room_build_order[ROOM_MAX] = {16, 10, 7, 15, 12, 6, 14, 9, 8, 13, 11, 5, 4, 3, 2, 1};
-
+static byte room_build_order[ROOM_MAX] = {ROOM_LAIR, ROOM_GREATER_VAULT, ROOM_HUGE_FRACTAL, ROOM_HUGE_STAR_BURST,
+						ROOM_CHAMBERS, ROOM_HUGE_CENTRE, ROOM_LARGE_FRACTAL, ROOM_LESSER_VAULT,
+						ROOM_INTERESTING, ROOM_STAR_BURST, ROOM_FRACTAL, ROOM_LARGE_CENTRE,
+						ROOM_LARGE_WALLS, ROOM_NORMAL_CENTRE, ROOM_NORMAL_WALLS, ROOM_NORMAL};
 
 /*
  * Always picks a correct direction
@@ -2291,7 +2293,7 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 			else if ((cave_ecology.ready) && (cave_ecology.num_races))
 			{
 				/* Match main monster */
-				monster_race *r_ptr = &r_info[cave_ecology.race[0]];
+				monster_race *r_ptr = &r_info[cave_ecology.deepest_race];
 
 				/* Check for char match */
 				if ((d_info[i].r_char) && (d_info[i].r_char == r_ptr->d_char)) good_chance = TRUE;
@@ -2561,7 +2563,7 @@ static void set_room_flags(int room, int type)
 	if (room < DUN_ROOMS)
 	{
 		/* Type */
-		room_info[room].type = ROOM_NORMAL;
+		room_info[room].type = type;
 
 		/* Further paranoia */
 		if (j < ROOM_DESC_SECTIONS)
@@ -2684,7 +2686,7 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 	if (room < DUN_ROOMS)
 	{
 		/* Type */
-		room_info[room].type = ROOM_NORMAL;
+		room_info[room].type = type;
 
 		/* Further paranoia */
 		if (j < ROOM_DESC_SECTIONS)
@@ -2863,7 +2865,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	if (room < DUN_ROOMS)
 	{
 		/* Type */
-		room_info[room].type = ROOM_NORMAL;
+		room_info[room].type = type;
 
 		/* Further paranoia */
 		if (j < ROOM_DESC_SECTIONS)
@@ -4595,7 +4597,20 @@ static bool build_chambers(int y1, int x1, int y2, int x2, int monsters_left, bo
 	return (TRUE);
 }
 
+/*
+ * Place a monster in a vault and get the details. Add these to the ecology.
+ */
+static void vault_monster(int y, int x)
+{
+	place_monster(y, x, TRUE, TRUE);
 
+	if (cave_m_idx[y][x])
+	{
+		s16b r_idx = m_list[cave_m_idx[y][x]].r_idx;
+
+		get_monster_ecology(r_idx);
+	}
+}
 
 
 /*
@@ -4607,6 +4622,10 @@ static void build_vault(int y0, int x0, int ymax, int xmax, cptr data)
 
 	cptr t;
 
+	bool old_ecology = cave_ecology.ready;
+
+	/* Allow any monster */
+	cave_ecology.ready = FALSE;
 
 	/* Place dungeon features and objects */
 	for (t = data, dy = 0; dy < ymax; dy++)
@@ -4701,7 +4720,7 @@ static void build_vault(int y0, int x0, int ymax, int xmax, cptr data)
 				case '&':
 				{
 					monster_level = p_ptr->depth + 5;
-					place_monster(y, x, TRUE, TRUE);
+					vault_monster(y, x);
 					monster_level = p_ptr->depth;
 					break;
 				}
@@ -4710,7 +4729,7 @@ static void build_vault(int y0, int x0, int ymax, int xmax, cptr data)
 				case '@':
 				{
 					monster_level = p_ptr->depth + 11;
-					place_monster(y, x, TRUE, TRUE);
+					vault_monster(y, x);
 					monster_level = p_ptr->depth;
 					break;
 				}
@@ -4719,7 +4738,7 @@ static void build_vault(int y0, int x0, int ymax, int xmax, cptr data)
 				case '9':
 				{
 					monster_level = p_ptr->depth + 9;
-					place_monster(y, x, TRUE, TRUE);
+					vault_monster(y, x);
 					monster_level = p_ptr->depth;
 					object_level = p_ptr->depth + 7;
 					place_object(y, x, TRUE, FALSE);
@@ -4731,7 +4750,7 @@ static void build_vault(int y0, int x0, int ymax, int xmax, cptr data)
 				case '8':
 				{
 					monster_level = p_ptr->depth + 40;
-					place_monster(y, x, TRUE, TRUE);
+					vault_monster(y, x);
 					monster_level = p_ptr->depth;
 					object_level = p_ptr->depth + 20;
 					place_object(y, x, TRUE, TRUE);
@@ -4745,7 +4764,7 @@ static void build_vault(int y0, int x0, int ymax, int xmax, cptr data)
 					if (rand_int(100) < 50)
 					{
 						monster_level = p_ptr->depth + 3;
-						place_monster(y, x, TRUE, TRUE);
+						vault_monster(y, x);
 						monster_level = p_ptr->depth;
 					}
 					if (rand_int(100) < 50)
@@ -4759,6 +4778,9 @@ static void build_vault(int y0, int x0, int ymax, int xmax, cptr data)
 			}
 		}
 	}
+
+	/* Ecology */
+	cave_ecology.ready = old_ecology;
 }
 
 

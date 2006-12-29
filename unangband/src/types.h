@@ -1696,6 +1696,7 @@ struct quiver_group_type
  */
 struct ecology_type
 {
+	s16b deepest_race;	/* Race that defines what the dungeon looks like */
 	s16b race[MAX_ECOLOGY_RACES];
 	byte num_races;
 	bool ready;		/* Are we forced to use this ecology? */

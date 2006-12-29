@@ -112,6 +112,7 @@ B:vault
 N:10:113:0:0:1:1:0:128
 A:
 B:vault
+D:A 
 
 # Small starburst room.
 
@@ -2179,16 +2180,6 @@ L:DARK
 S:SEEN
 R:NEED_LITE
 P:PLACE | SCATTER | ROWS | COLS
-
-N:106:123:0:0:30:1:0:128
-A:portrait
-B:
-D:surrounded by paintings.  
-R:SMART
-K:11:25:99
-F:0:0:732
-S:SEEN
-P:SCATTER
 
 N:106:107:0:0:80:8:0:128
 A:candle-lit

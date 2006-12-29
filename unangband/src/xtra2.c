@@ -3856,6 +3856,7 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 {
 	bool scan_name = FALSE;
 	bool scan_desc = FALSE;
+	bool beware = FALSE;
 
 	town_type *t_ptr = &t_info[p_ptr->dungeon];
 	dungeon_zone *zone=&t_ptr->zone[0];
@@ -3987,7 +3988,7 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 			if ((text_visible) && ((r_ptr->flags1 & (RF1_UNIQUE)) == 0)) strcat(name, "s");
 			if (text_visible) strcat(text_visible, ".  ");
 			if (text_visible) strcat(text_visible, r_text + r_ptr->name);
-			if (text_always) strcpy(text_always, "Beware!  ");
+			beware = TRUE;
 
 			break;
 		}
@@ -3998,7 +3999,7 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 
 			if (text_visible) strcpy(text_visible, "This vast sealed chamber is amongst the largest of its kind and is filled with ");
 			if (text_visible) strcat(text_visible, "deadly monsters and rich treasure.  ");
-			if (text_always) strcpy(text_always, "Beware!  ");
+			beware = TRUE;
 
 			/* Fall through */	
 		}
@@ -4068,6 +4069,15 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 			/* End of description */
 			if (j < 0) break;
 
+			/* Get the name1 text if needed */
+			if (!strlen(buf_name1)) strcpy(buf_name1, (d_name + d_info[j].name1));
+
+			/* Get the name2 text if needed */
+			if (!strlen(buf_name2)) strcpy(buf_name2, (d_name + d_info[j].name2));
+
+			/* Need description? */
+			if (!scan_desc) continue;
+
 			/* Must understand language? */
 			if (d_info[j].flags & (ROOM_LANGUAGE))
 			{
@@ -4116,33 +4126,33 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 				/* Diagnostics */
 				if ((cheat_xtra) && (text_always)) strcat(text_always, format("%d", i));
 			}
-
-			/* Get the name1 text if needed */
-			if (!strlen(buf_name1)) strcpy(buf_name1, (d_name + d_info[j].name1));
-
-			/* Get the name2 text if needed */
-			if (!strlen(buf_name2)) strcpy(buf_name2, (d_name + d_info[j].name2));
 		}
 
-		/* Set room name */
-		if (strlen(buf_name1)) strcpy(name, buf_name1);
-
-		/* And add second room name if necessary */
-		if (strlen(buf_name2))
+		/* Set the name if required */
+		if (scan_name)
 		{
-			if (strlen(buf_name1))
-			{
-				strcat(name, " ");
-				strcat(name, buf_name2);
-			}
-			else
-			{
-				strcpy(name, buf_name2);
-			}
 
+			/* Set room name */
+			if (strlen(buf_name1)) strcpy(name, buf_name1);
+
+			/* And add second room name if necessary */
+			if (strlen(buf_name2))
+			{
+				if (strlen(buf_name1))
+				{
+					strcat(name, " ");
+					strcat(name, buf_name2);
+				}
+				else
+				{
+					strcpy(name, buf_name2);
+				}
+			}
 		}
-
 	}
+
+	/* Beware */
+	if ((beware) && (text_always)) strcpy(text_always, "Beware!  ");
 
 	if ((cheat_room) && (text_always))
 	{
