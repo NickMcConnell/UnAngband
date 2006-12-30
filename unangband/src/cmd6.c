@@ -1791,10 +1791,8 @@ void do_cmd_activate(void)
 			break;
 */
 		case TV_AMULET:
-			p_ptr->cur_style |= 1L << WS_AMULET;
-			break;
 		case TV_RING:
-			p_ptr->cur_style |= 1L << WS_RING;
+		  /* Already assigned, because wielded */
 			break;
 	}
 
@@ -1833,7 +1831,7 @@ void do_cmd_activate(void)
 		msg_print("You failed to activate it properly.");
 		
 		/* Clear styles */
-		p_ptr->cur_style &= ~((1L << WS_WAND) | (1L << WS_STAFF) | (1L << WS_RING) | (1L << WS_AMULET));
+		p_ptr->cur_style &= ~((1L << WS_WAND) | (1L << WS_STAFF));
 		return;
 	}
 
@@ -1984,7 +1982,7 @@ void do_cmd_activate(void)
 	}
 
 	/* Clear styles */
-	p_ptr->cur_style &= ~((1L << WS_WAND) | (1L << WS_STAFF) | (1L << WS_RING) | (1L << WS_AMULET));
+	p_ptr->cur_style &= ~((1L << WS_WAND) | (1L << WS_STAFF));
 
 }
 

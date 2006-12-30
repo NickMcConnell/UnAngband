@@ -1907,6 +1907,7 @@
 #define SV_LARGE_METAL_SHIELD		5
 #define SV_SHIELD_OF_DEFLECTION		10
 
+/* These are correct */
 /* The "sval" codes for TV_HELM */
 #define SV_HARD_LEATHER_CAP		2
 #define SV_METAL_CAP			3
@@ -1978,6 +1979,7 @@
 #define SV_DRAGON_BALANCE	20
 #define SV_DRAGON_POWER		30
 
+/* These are correct */
 /* The sval codes for TV_LITE */
 #define SV_LITE_TORCH		0
 #define SV_LITE_LANTERN		1
@@ -2012,7 +2014,7 @@
 #define SV_AMULET_RESIST_LIGHTNING  22
 #define SV_AMULET_SERPENTS      23
 
-
+/* These may be incorrect */
 /* The sval codes for TV_RING */
 #define SV_RING_WOE				0
 #define SV_RING_AGGRAVATION		1
@@ -2268,16 +2270,18 @@
 #define SV_POTION_SELF_KNOWLEDGE		58
 #define SV_POTION_EXPERIENCE			59
 
+/* These are correct */
 /* The "sval" codes for TV_FLASK */
 #define SV_FLASK_OIL      0
-#define SV_FLASK_EMPTY    1
 #define SV_FLASK_ACID     2
 #define SV_FLASK_BLOOD	  3
-#define SV_FLASK_SLIME	  3
+#define SV_FLASK_SLIME	  4
 #define SV_FLASK_BILE	  5
 #define SV_FLASK_WEB	  15
+#define SV_FLASK_EMPTY    2
 
 
+/* These may be incorrect */
 /* The "sval" codes for TV_FOOD */
 #define SV_FOOD_POISON			0
 #define SV_FOOD_BLINDNESS		1
@@ -2299,16 +2303,19 @@
 #define SV_FOOD_RESTORE_STR		17
 #define SV_FOOD_RESTORE_CON		18
 #define SV_FOOD_RESTORING		19
-#define SV_FOOD_MANA      		20
+#define SV_FOOD_MANA                    20
 /* many missing mushrooms */
+
+/* These are correct */
 #define SV_FOOD_BISCUIT			32
 #define SV_FOOD_JERKY			33
 #define SV_FOOD_RATION			35
 #define SV_FOOD_SLIME_MOLD		36
 #define SV_FOOD_WAYBREAD		37
-#define SV_FOOD_PINT_OF_ALE		38
-#define SV_FOOD_PINT_OF_WINE	39
-#define SV_FOOD_PINT_OF_SPIRITS	42
+#define SV_FOOD_APPLE 		        39
+#define SV_FOOD_PINT_OF_ALE		40
+#define SV_FOOD_PINT_OF_WINE	        41
+#define SV_FOOD_PINT_OF_SPIRITS	        42
 
 
 /*

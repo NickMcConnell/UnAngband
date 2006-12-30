@@ -3492,12 +3492,13 @@ const element_type element[MAX_ELEMENTS] =
  */
 const start_item common_items[MAX_COMMON_ITEMS]=
 {
-	{	TV_FOOD, SV_FOOD_SLIME_MOLD, 6, 7, 0, 0, 0, 20},
 	{	TV_FOOD, SV_FOOD_PINT_OF_SPIRITS, 1, 1, 0, 0, 0, 15},
 	{	TV_FOOD, SV_FOOD_PINT_OF_ALE, 1, 1, 0, 0, 16, 60},
+	{	TV_FOOD, SV_FOOD_PINT_OF_WINE, 1, 1, 0, 0, 61, 95},
+	{	TV_FOOD, SV_FOOD_APPLE, 1, 1, 0, 0, 96, 100},
+	{	TV_FOOD, SV_FOOD_SLIME_MOLD, 6, 7, 0, 0, 0, 20},
 	{	TV_FOOD, SV_FOOD_BISCUIT, 13, 19, 0, 0, 21, 40},
 	{	TV_FOOD, SV_FOOD_RATION, 3, 7, 0, 0, 41, 100},
-	{	TV_FOOD, SV_FOOD_PINT_OF_WINE, 1, 1, 0, 0, 61, 95},
 	{	TV_LITE, SV_LITE_TORCH, 3, 7, 500, 3500, 0, 75},
 	{	TV_LITE, SV_LITE_LANTERN, 1, 1, 500, 3500, 76, 100},
 	{	TV_FLASK, SV_FLASK_OIL, 2, 5, 0, 0, 76, 100},

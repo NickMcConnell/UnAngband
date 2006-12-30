@@ -3608,11 +3608,19 @@ static void calc_bonuses(void)
 		}
 	}
 
-	/* Check shooting preference styles */
-	o_ptr = &inventory[INVEN_BOW];
+	/* Check if we wear an amulet or a ring */
+	if (inventory[INVEN_NECK].k_idx)
+	  p_ptr->cur_style |= (1L << WS_AMULET);
+	if (inventory[INVEN_LEFT].k_idx)
+	  p_ptr->cur_style |= (1L << WS_RING);
+	if (inventory[INVEN_RIGHT].k_idx)
+	  p_ptr->cur_style |= (1L << WS_RING);
 
 	/* Throwing is always possible */
 	p_ptr->cur_style |= (1L << WS_THROWN);
+
+	/* Check shooting preference styles */
+	o_ptr = &inventory[INVEN_BOW];
 
 	if (o_ptr->k_idx)
 	{
@@ -3689,7 +3697,7 @@ static void calc_bonuses(void)
 
 		/* Check for styles */
 		if (w_info[i].styles==0 
-			|| w_info[i].styles & p_ptr->cur_style & (1L << p_ptr->pstyle))
+		    || w_info[i].styles & p_ptr->cur_style & (1L << p_ptr->pstyle))
 		{
 			switch (w_info[i].benefit)
 			{

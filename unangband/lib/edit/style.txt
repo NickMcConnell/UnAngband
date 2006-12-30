@@ -31,6 +31,9 @@
 #PRAYER_BOOK: Casting a spell from a prayer book.
 #SONG_BOOK: Casting a spell from a song book.
 #INSTRUMENT: Wielding an instrument.
+#RING, AMULET: Wearing a ring or amulet, respectively. Note that they can
+#  be worn also in off-hand with these styles, but this does not count
+#  as an excercise of the style.
 
 #The benefits are granted only when fighting in the particular style preferred.
 
@@ -68,8 +71,8 @@ S:RING
 B:POWER
 
 W:0:1
-S:UNARMED | TWO-HANDED | ONE-HANDED | WEAPON&SHIELD | SWORD | HAFTED | 
-S:POLEARM | TWO-WEAPON | NONE
+S:NONE | UNARMED | ONE-HANDED | TWO-HANDED | WEAPON&SHIELD | TWO-WEAPON
+S:HAFTED | SWORD | POLEARM | RING
 B:XTRA_BLOW
 
 W:0:1
@@ -214,7 +217,7 @@ S:MAGIC_BOOK
 B:ICKY_HANDS
 
 W:2:10
-S:SLAY_DEMON | SLAY_UNDEAD
+S:SLAY_DEMON | SLAY_UNDEAD | SLAY_EVIL
 B:HIT
 
 W:2:10
@@ -234,7 +237,7 @@ S:SLAY_EVIL
 B:CRITICAL
 
 W:2:20
-S:UNARMED
+S:UNARMED | NONE
 B:XTRA_BLOW
 
 W:2:30
@@ -242,7 +245,7 @@ S:UNARMED
 B:XTRA_BLOW
 
 W:2:30
-S:UNARMED
+S:UNARMED | SLAY_DEMON | SLAY_UNDEAD
 B:CRITICAL
 
 W:2:40
@@ -270,6 +273,10 @@ B:POWER
 
 W:4:1
 B:ICKY_HANDS
+
+W:4:10
+S:NONE
+B:AC
 
 W:4:20
 S:BOW
@@ -311,7 +318,7 @@ S:SLAY_DRAGON
 B:DAM
 
 W:5:5
-S:WEAPON&SHIELD | ONE-HANDED
+S:WEAPON&SHIELD | ONE-HANDED | NONE
 B:AC
 
 W:5:15
@@ -342,6 +349,10 @@ S:BACKSTAB | ONE-HANDED | UNARMED | TWO-HANDED | TWO-WEAPON | SLAY_DEMON | SLAY_
 B:CRITICAL
 
 W:6:1
+S:RING
+B:XTRA_BLOW
+
+W:6:1
 S:THROWN
 B:XTRA_SHOT
 
@@ -354,7 +365,7 @@ S:UNARMED | TWO-HANDED | SLAY_DEMON | SLAY_UNDEAD
 B:DAM
 
 W:6:5
-S:UNARMED | ONE-HANDED | TWO-WEAPON
+S:UNARMED | ONE-HANDED | TWO-WEAPON | AMULET
 B:AC
 
 W:6:7

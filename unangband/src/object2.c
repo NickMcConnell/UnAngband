@@ -8479,13 +8479,18 @@ s16b spell_power(int spell)
 				}
 				break;
 			}
-			default:
+			case WS_RING:
+			case WS_AMULET:
 			{
-				/* FIXME: WS_RING, etc. are not always properly set 
-				 * in cur_style when calling this function, e.g. for info. */ 
 				if ( w_info[i].styles & p_ptr->cur_style 
 					 & (1L << p_ptr->pstyle) ) 
 					plev += 10;
+				break;
+			}
+
+			default:
+			{
+				plev += 10;
 				break;
 			}
 		}

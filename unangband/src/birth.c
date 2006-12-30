@@ -573,6 +573,11 @@ static void player_outfit(void)
 							k_idx = lookup_kind(TV_SWORD, SV_DAGGER);
 							break;
 						}
+					        case WS_RING:
+						  {
+						    k_idx = lookup_kind(TV_RING, rand_int(SV_RING_TELEPORTATION + 1));
+						    break;
+						  }
 						case WS_THROWN:
 						case WS_SLING:
 						{
@@ -605,6 +610,11 @@ static void player_outfit(void)
 							k_idx = lookup_kind(TV_SPIKE, 0);
 							break;
 						}
+						case WS_RING:
+						  {
+						    k_idx = lookup_kind(TV_ROPE, SV_ROPE_ELVEN);
+						    break;
+						  }
 						case WS_SLING:
 						{
 							k_idx = lookup_kind(TV_SHOT, SV_AMMO_NORMAL);
@@ -635,8 +645,12 @@ static void player_outfit(void)
 			/* Modify the charges */
 			if ((e_ptr->charge_min) && (e_ptr->charge_max)) i_ptr->charges = rand_range(e_ptr->charge_min, e_ptr->charge_max);
 
-			object_aware(i_ptr);
-			object_known(i_ptr);
+			/* Rings are misterious */
+			if (i_ptr->tval != TV_RING)
+			  {
+			    object_aware(i_ptr);
+			    object_known(i_ptr);
+			  }
 
 			/* Check the slot */
 			slot = wield_slot(i_ptr);
