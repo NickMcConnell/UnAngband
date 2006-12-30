@@ -1257,7 +1257,7 @@ int value_check_aux3(const object_type *o_ptr)
 	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_EXCELLENT);
 
 	/* Great "armor" bonus */
-	if (o_ptr->to_a > 8) return (INSCRIP_GREAT);
+	if (o_ptr->to_a > 9) return (INSCRIP_GREAT);
 
 	/* Great "weapon" bonus */
 	if (o_ptr->to_h + o_ptr->to_d > 14) return (INSCRIP_GREAT);
@@ -1269,7 +1269,7 @@ int value_check_aux3(const object_type *o_ptr)
 	if (o_ptr->ds > k_info[o_ptr->k_idx].ds) return (INSCRIP_GREAT);
 
 	/* Very good "armor" bonus */
-	if (o_ptr->to_a > 4) return (INSCRIP_VERY_GOOD);
+	if (o_ptr->to_a > 5) return (INSCRIP_VERY_GOOD);
 
 	/* Good "weapon" bonus */
 	if (o_ptr->to_h + o_ptr->to_d > 7) return (INSCRIP_VERY_GOOD);
