@@ -2890,7 +2890,7 @@ static void calc_bonuses(void)
 
 	/* Reset "fire" info */
 	p_ptr->num_fire = 0;
-	p_ptr->num_throw = 1;
+	p_ptr->num_throw = 2;
 	p_ptr->ammo_mult = 0;
 	p_ptr->ammo_tval = 0;
 	extra_shots = 0;

@@ -3231,7 +3231,7 @@ int breakage_chance(object_type *o_ptr)
 
 	/* Rarely break */
 	{
-	  if (is_throwing_item(o_ptr))
+	  if (is_throwing_item(o_ptr)) /* TODO: instead of 1 implement slight disenchant instead of breaking */
 	    return 1;
 	  else
 	    return 10;
@@ -3282,12 +3282,13 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   int dir, item2 = 0;
   int i, j, y, x, ty, tx;
   int tdam, tdis, thits;
+  int bow_to_h = 0;
+  int bow_to_d = 0;
   int bonus, chance;
 
   int style_hit, style_dam, style_crit;
   bool throwing = FALSE;
 
-  object_type *j_ptr;
   object_type *k_ptr = NULL;
   object_type *i_ptr;
   object_type object_type_body;
@@ -3428,14 +3429,15 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   /* Base damage from thrown object */
   tdam = damroll(i_ptr->dd, i_ptr->ds);
 
-  /* A piece of code dependent on fire/throw */
+  /* The first piece of code dependent on fire/throw */
   if (fire)
     {
       /* Check usage of the bow */
       object_usage(INVEN_BOW);
 
       /* Get the bow */
-      j_ptr = &inventory[INVEN_BOW];
+      bow_to_h = inventory[INVEN_BOW].to_h;
+      bow_to_d = inventory[INVEN_BOW].to_d;
 
       /* Boost the damage */
       tdam *= p_ptr->ammo_mult;
@@ -3451,13 +3453,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
       int mul, div;
 
       /* Set if a throwing object */
-      throwing = is_known_throwing_item(o_ptr);
-
-      /* Hack -- if a throwing object, make object count for double */
-      if (throwing)
-	j_ptr = o_ptr;
-      else
-	j_ptr = NULL;
+      throwing = is_throwing_item(o_ptr);
 
       /* Extract a "distance multiplier" */
       mul = throwing ? 10 : 3;
@@ -3472,8 +3468,12 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
       if (tdis > 10) 
 	tdis = 10;
 
-      /* Number of hits per round */
-      thits = p_ptr->num_throw;
+      if (item == INVEN_WIELD && throwing)
+	/* Trick throw */
+	thits = 1;
+      else
+	/* Number of hits per round; does not depend on (throwing) */
+	thits = p_ptr->num_throw;
     }
 
   /* Take a turn */
@@ -3635,19 +3635,27 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 		continue;
 
 	      if (throwing)
-		  mon_style_benefits(m_ptr, WS_THROWN_FLAGS, 
-				     &style_hit, &style_dam, &style_crit);
+		mon_style_benefits(m_ptr, WS_THROWN_FLAGS, 
+				   &style_hit, &style_dam, &style_crit);
 	      else
 		style_hit = style_dam = style_crit = 0;
 
 	      ranged_skill = p_ptr->skill_tht;
+
+	      /* Badly balanced big weapons waste the throwing skill.
+		 Various junk (non-weapons) does not have to_hit, 
+		 so don't penalize second time. */
+	      if (!throwing 
+		  && (i_ptr->tval == TV_BOW 
+		      || i_ptr->tval == TV_DIGGING 
+		      || i_ptr->tval == TV_HAFTED 
+		      || i_ptr->tval == TV_POLEARM 
+		      || i_ptr->tval == TV_SWORD))
+		ranged_skill /= 2;
 	    }
 
 	  /* Actually "fire" the object */
-	  bonus = (p_ptr->to_h 
-		   + i_ptr->to_h 
-		   + (j_ptr ? j_ptr->to_h : 0) 
-		   + style_hit);
+	  bonus = (p_ptr->to_h + i_ptr->to_h + bow_to_h + style_hit);
 	  chance = ranged_skill + bonus * BTH_PLUS_ADJ;
 	  chance2 = chance - distance(py, px, y, x);
 
@@ -3697,8 +3705,9 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 	      /* Apply special damage XXX XXX XXX */
 	      tdam = tot_dam_aux(i_ptr, tdam, m_ptr);
 
-	      /* Apply critical damage */
+	      /* The third and last piece of fire/throw dependent code */
 	      if (fire)
+		/* Apply missile critical damage */
 		tdam += critical_shot(i_ptr->weight, 
 				      bonus + style_crit * 30, 
 				      tdam);
@@ -3707,10 +3716,17 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 		tdam += critical_norm(i_ptr->weight, 
 				      bonus + style_crit * 30, 
 				      tdam);
-
+	      else
+		/* Throwing non-throwing items gives no criticals */
+		tdam += 0;
 
 	      /* Apply launcher, missile and style bonus */
-	      tdam += i_ptr->to_d + (j_ptr ? j_ptr->to_d : 0) + style_dam;
+	      tdam += i_ptr->to_d + bow_to_d + style_dam;
+
+	      /* TODO: implement multiple targetting instead */
+	      if (!fire && item == INVEN_WIELD && throwing)
+		/* Trick throw, boost the damage */
+		tdam *= p_ptr->num_blow;
 
 	      /* No negative damage */
 	      if (tdam < 0) 
