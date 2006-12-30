@@ -3312,7 +3312,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   int bonus, chance;
 
   int style_hit, style_dam, style_crit;
-  bool throwing;
+  bool throwing = FALSE;
 
   object_type *j_ptr;
   object_type *k_ptr = NULL;
@@ -3321,6 +3321,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 
   bool hit_body = FALSE;
   bool chasm = FALSE;
+  int feat;
 
   byte missile_attr;
   char missile_char;
@@ -3330,8 +3331,6 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   int path_n;
   u16b path_g[256];
 
-  int msec = op_ptr->delay_factor * op_ptr->delay_factor;
-  int feat;
 
   /* Need a rope? */
   if (o_ptr->sval == SV_AMMO_GRAPPLE)
@@ -3482,7 +3481,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
       /* Get object flags */
       object_flags(o_ptr, &f1, &f2, &f3, &f4);
       
-      /* Set if throwing */
+      /* Set if a throwing object */
       throwing = (f3 & (TR3_THROWING)) != 0;
 
       /* Hack -- if a throwing object, make object count for double */
@@ -3535,6 +3534,8 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   /* Project along the path */
   for (i = 0; i < path_n; ++i)
     {
+      int msec = op_ptr->delay_factor * op_ptr->delay_factor;
+
       int ny = GRID_Y(path_g[i]);
       int nx = GRID_X(path_g[i]);
 
@@ -3622,6 +3623,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 	  monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	  int visible = m_ptr->ml;
+	  int ranged_skill;
 	  int chance2;
 
 	  bool hit_or_near_miss;
@@ -3631,7 +3633,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 	  if (m_ptr->mflag & (MFLAG_HIDE)) 
 	    continue;
 
-	  /* The second and last fire/throw dependent code piece */
+	  /* The second fire/throw dependent code piece */
 	  if (fire)
 	    {
 	      u32b shoot_style;
@@ -3650,13 +3652,15 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 	      /* Get style benefits */
 	      mon_style_benefits(m_ptr, shoot_style, 
 				 &style_hit, &style_dam, &style_crit);
+
+	      ranged_skill = p_ptr->skill_thb;
 	    }
 	  else
 	    {
 	      /* Long throws are easier to dodge than long shots */
 	      if (mon_evade(cave_m_idx[y][x], 
 			    2 * m_ptr->cdis + (m_ptr->confused 
-					       || m_ptr->stunned ? 2 : 4),
+					       || m_ptr->stunned ? 1 : 4),
 			    5 + 2 * m_ptr->cdis,
 			    " your throw"))
 		continue;
@@ -3666,6 +3670,8 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 				     &style_hit, &style_dam, &style_crit);
 	      else
 		style_hit = style_dam = style_crit = 0;
+
+	      ranged_skill = p_ptr->skill_tht;
 	    }
 
 	  /* Actually "fire" the object */
@@ -3673,7 +3679,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 		   + i_ptr->to_h 
 		   + (j_ptr ? j_ptr->to_h : 0) 
 		   + style_hit);
-	  chance = p_ptr->skill_thb + bonus * BTH_PLUS_ADJ;
+	  chance = ranged_skill + bonus * BTH_PLUS_ADJ;
 	  chance2 = chance - distance(py, px, y, x);
 
 	  /* Test hit fire */

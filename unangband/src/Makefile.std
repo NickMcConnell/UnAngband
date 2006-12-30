@@ -230,6 +230,8 @@ install: unangband
 # Build the "Unangband" program
 #
 
+.PHONY : unangband debug
+
 unangband:
 	@$(MAKE) $(OBJS) CFLAGS="$(NORMAL_CFLAGS)"
 	$(CC) $(NORMAL_CFLAGS) $(LDFLAGS) -o unangband $(OBJS) $(LIBS)
