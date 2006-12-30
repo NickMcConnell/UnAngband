@@ -9143,17 +9143,32 @@ int reorder_quiver(int slot)
 	return (slot);
 }
 
+
 /*
- * Returns TRUE if an object is a throwing weapon and can be put in the quiver
+ * Returns TRUE if an object is a throwing item
  */
-bool is_throwing_weapon(const object_type *o_ptr)
+bool is_throwing_item(const object_type *o_ptr)
 {
-	u32b f1, f2, f3, f4;
+  u32b f1, f2, f3, f4;
 
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+  object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
-	return ((f3 & (TR3_THROWING)) ? TRUE: FALSE);
+  return (f3 & TR3_THROWING ? TRUE : FALSE);
 }
+
+
+/*
+ * Returns TRUE if an object is a known throwing item
+ */
+bool is_known_throwing_item(const object_type *o_ptr)
+{
+  u32b f1, f2, f3, f4;
+
+  object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
+
+  return (f3 & TR3_THROWING ? TRUE : FALSE);
+}
+
 
 /*
  * Returns the number of quiver units an object will consume when it's stored in the quiver.

@@ -322,7 +322,7 @@ void do_cmd_wield(void)
 
 	/* Hack - Throwing weapons can we wielded in the quiver too. 
 	   Ask the player, unless he has already chosen the off-hand. */
-	if ( is_throwing_weapon(o_ptr) 
+	if ( is_known_throwing_item(o_ptr) 
 		 && !IS_QUIVER_SLOT(slot) 
 		 && slot != INVEN_ARM
 		 && get_check("Do you want to put it in the quiver? ") ) 

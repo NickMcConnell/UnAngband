@@ -2293,24 +2293,6 @@ void do_cmd_alter(void)
 
 
 /*
- * Hook to determine if an object is good to throw
- */
-static bool item_tester_hook_throwing(const object_type *o_ptr)
-{
-	u32b f1, f2, f3, f4;
-
-	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
-
-	/* Check activation flag */
-	if (f3 & (TR3_THROWING)) return (TRUE);
-
-	/* Assume not */
-	return (FALSE);
-}
-
-
-/*
  * Hack -- Set a trap or jam a door closed with a spike.
  *
  * This command may not be repeated.
@@ -2620,7 +2602,7 @@ void do_cmd_set_trap_or_spike(void)
 						}
 						default:
 						{
-							if (!item_tester_hook_throwing(i_ptr)) trap_allowed = FALSE;
+							if (!is_known_throwing_item(i_ptr)) trap_allowed = FALSE;
 							break;
 						}
 					}
@@ -3249,16 +3231,7 @@ int breakage_chance(object_type *o_ptr)
 
 	/* Rarely break */
 	{
-	  u32b f1, f2, f3, f4;
-	  bool throwing;
-
-	  /* Get object flags */
-	  object_flags(o_ptr, &f1, &f2, &f3, &f4);
-      
-	  /* Set if throwing */
-	  throwing = (f3 & (TR3_THROWING)) != 0;
-
-	  if (throwing)
+	  if (is_throwing_item(o_ptr))
 	    return 1;
 	  else
 	    return 10;
@@ -3475,14 +3448,10 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
     }
   else
     {
-      u32b f1, f2, f3, f4;
       int mul, div;
 
-      /* Get object flags */
-      object_flags(o_ptr, &f1, &f2, &f3, &f4);
-      
       /* Set if a throwing object */
-      throwing = (f3 & (TR3_THROWING)) != 0;
+      throwing = is_known_throwing_item(o_ptr);
 
       /* Hack -- if a throwing object, make object count for double */
       if (throwing)
@@ -3927,7 +3896,7 @@ void do_cmd_fire(void)
 
   /* Require throwing weapon */
   if (!item_tester_tval) 
-    item_tester_hook = item_tester_hook_throwing;
+    item_tester_hook = is_known_throwing_item;
 
   /* Get an item */
   q = "Fire which item? ";

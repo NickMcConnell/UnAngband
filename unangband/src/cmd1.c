@@ -758,7 +758,7 @@ static bool quiver_carry(object_type *o_ptr, int o_idx)
 	char name[80];
 
 	/* Must be ammo. */
-	if (!ammo_p(o_ptr) && !is_throwing_weapon(o_ptr)) return (FALSE);
+	if (!ammo_p(o_ptr) && !is_known_throwing_item(o_ptr)) return (FALSE);
 
 	/* Known or sensed cursed ammo is avoided */
 	if (cursed_p(o_ptr) && ((o_ptr->ident & (IDENT_SENSE)) || object_known_p(o_ptr))) return (FALSE);
