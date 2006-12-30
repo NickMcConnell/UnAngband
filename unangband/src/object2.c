@@ -5854,7 +5854,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 					flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
 					/* Hit with radius 1 attack */
-					obvious |= project(-1, rad, y, x, y, x, damroll(d_side, d_dice) * j_ptr->number,
+					obvious |= project(-1, rad, y, x, y, x, damage * j_ptr->number,
 						 effect, flg, 0, 0);
 				}
 

@@ -4792,6 +4792,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 
 			/* Attack if confused and not fleeing */
 			/* XXX XXX Should use seperate routine */
+			/* TODO: join with other (monster?) attack routines */
 			if (m_ptr->confused)
 			{
 				int ap_cnt;

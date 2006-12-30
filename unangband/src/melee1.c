@@ -804,6 +804,7 @@ static int attack_power(int effect)
 
 /*
  * Attack the player via physical attacks.
+ * TODO: join with other (monster?) attack routines
  */
 bool make_attack_normal(int m_idx)
 {
@@ -1682,6 +1683,7 @@ static void mon_arc(int who, int y, int x, int typ, int dam, int rad, int degree
 
 /*
  * Monster attempts to make a ranged melee attack.
+ * TODO: join with other (monster?) attack routines
  *
  * Use by aura and trail effects.
  */
@@ -1746,6 +1748,7 @@ void mon_blow_ranged(int who, int x, int y, int method, int range, int flg, cptr
 
 /*
  * Monster attempts to make a ranged (non-melee) attack.
+ * TODO: join with other (monster?) attack routines
  *
  * Determine if monster can attack at range, then see if it will.  Use
  * the helper function "choose_attack_spell()" to pick a physical ranged
@@ -5979,6 +5982,8 @@ bool mon_resist_object(int m_idx, const object_type *o_ptr)
 
 /*
  * Handle monster hitting a real trap.
+ * TODO: join with other (monster?) attack routines
+ * TODO: this is probably the easiest place for the refactoring
  */
 void mon_hit_trap(int m_idx, int y, int x)
 {

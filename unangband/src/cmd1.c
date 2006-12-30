@@ -1541,6 +1541,7 @@ void hit_trap(int y, int x)
 	disturb(0, 0);
 
 	/* Apply the object */
+	/* TODO: join with other (monster?) attack routines */
 	if ((cave_o_idx[y][x]) && (f_ptr->flags1 & (FF1_HIT_TRAP)))
 	{
 		object_type *o_ptr = &o_list[cave_o_idx[y][x]];
@@ -1926,6 +1927,7 @@ void hit_trap(int y, int x)
 
 
 		/* Has a power */
+		/* TODO: join with other spell attack routines */
 		if (power > 0)
 		{
 			spell_type *s_ptr = &s_info[power];
@@ -1951,6 +1953,8 @@ void hit_trap(int y, int x)
 				if (!method) break;
 
 				/* Mega hack -- dispel evil/undead objects */
+				/* FIXME: how is player supposed to be unded?
+				   Also in many other places */
 				if (!d_side)
 				{
 					d_plus += 25 * d_dice;
