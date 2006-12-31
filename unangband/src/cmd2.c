@@ -3222,7 +3222,6 @@ int breakage_chance(object_type *o_ptr)
 		case TV_WAND:
 		case TV_SHOT:
 		case TV_BOLT:
-		case TV_SPIKE:
 		case TV_BODY:
 		{
 			return (25);
@@ -3230,12 +3229,7 @@ int breakage_chance(object_type *o_ptr)
 	}
 
 	/* Rarely break */
-	{
-	  if (is_throwing_item(o_ptr)) /* TODO: instead of 1 implement slight disenchant instead of breaking */
-	    return 1;
-	  else
-	    return 10;
-	}
+	return (31 - adj_chr_fear[p_ptr->stat_ind[A_INT]]);
 }
 
 
@@ -3644,9 +3638,10 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 
 	      /* Badly balanced big weapons waste the throwing skill.
 		 Various junk (non-weapons) does not have to_hit, 
-		 so don't penalize second time. */
+		 so don't penalize a second time. */
 	      if (!throwing 
-		  && (i_ptr->tval == TV_BOW 
+		  && (i_ptr->tval == TV_STAFF
+		      || i_ptr->tval == TV_BOW 
 		      || i_ptr->tval == TV_DIGGING 
 		      || i_ptr->tval == TV_HAFTED 
 		      || i_ptr->tval == TV_POLEARM 
@@ -3723,7 +3718,13 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 	      /* Apply launcher, missile and style bonus */
 	      tdam += i_ptr->to_d + bow_to_d + style_dam;
 
-	      /* TODO: implement multiple targetting instead */
+	      /* TODO: implement multiple targetting instead;
+		 every time the weapon hits get next target;
+		 after the last target the weapon returns
+		 and based on AGI you catch it, it drops midway,
+		 closer or father from you depending on AGI,
+		 or even, with really bad AGI roll, 
+		 you get hit and catch it this way */
 	      if (!fire && item == INVEN_WIELD && throwing)
 		/* Trick throw, boost the damage */
 		tdam *= p_ptr->num_blow;

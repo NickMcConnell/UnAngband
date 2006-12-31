@@ -5774,6 +5774,37 @@ bool break_near(object_type *j_ptr, int y, int x)
 
 	bool obvious = FALSE;
 
+	/* These loose bonuses before breaking */
+	switch (j_ptr->tval)
+	  {
+	  case TV_HAFTED: 
+	  case TV_POLEARM:
+	  case TV_SWORD:
+	  case TV_STAFF:  
+	  case TV_DIGGING:
+	    {
+	      /* Artifacts have 60% chance to resist disenchantment */
+	      if (artifact_p(j_ptr) && (rand_int(100) < 60))
+		{
+		  return (FALSE);
+		}
+	      else if (j_ptr->to_h > 0 && j_ptr->to_h >= j_ptr->to_d)
+		{
+		  j_ptr->to_h--;
+		  return (FALSE);
+		}
+	      else if (j_ptr->to_d > 0)
+		{
+		  j_ptr->to_d--;
+		  return (FALSE);
+		}
+	    }
+	  }
+
+	/* Artifacts do not break */
+	if (artifact_p(j_ptr))
+	  return (FALSE);
+
 	/* Extract plural */
 	if (j_ptr->number != 1) plural = TRUE;
 
@@ -5974,10 +6005,11 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 	object_desc(o_name, sizeof(o_name), j_ptr, FALSE, 0);   
 
 	/* Handle normal "breakage" */
-	if (!artifact_p(j_ptr) && (rand_int(100) < chance))
-	{
-		if (break_near(j_ptr, y, x)) return;
-	}
+	if (rand_int(100) < chance)
+	  {
+	    if (break_near(j_ptr, y, x)) 
+	      return;
+	  }
 
 
 	/* Score */

@@ -1842,157 +1842,186 @@ s16b label_to_equip(int c)
 }
 
 
+/*
+ * Can the two weapons be wielded together?
+ * If one does not exist, assume they can.
+ */
+bool two_weapons_balanced(const object_type *o_ptr, const object_type *i_ptr)
+{
+  /* If one of the weapons is a digger, the pair is not balanced
+     (but they still can be dual-wielded if the digger goes
+     into the main wield slot, see below) */
+  if (o_ptr->tval == TV_DIGGING || i_ptr->tval == TV_DIGGING)
+    return FALSE;
+
+  /* Weapons do not unbalance each other if one does not exist... */
+  if (!o_ptr->k_idx || !i_ptr->k_idx)
+    return TRUE;
+  /* ...or if one is actually a shield... */
+  else if (o_ptr->tval == TV_SHIELD || i_ptr->tval == TV_SHIELD)
+    return TRUE;
+  /* ...or i_ptr is throwing... */
+  else if (is_known_throwing_item(i_ptr)
+      && o_ptr->weight < 200)
+    return TRUE;
+  /* ...or o_ptr is throwing... */
+  else if (is_known_throwing_item(o_ptr)
+	   && i_ptr->weight < 200)
+    return TRUE;
+  /* ...or both are identical. */
+  else if (i_ptr->tval == o_ptr->tval 
+	   && ((i_ptr->sval == o_ptr->sval 
+		&& (i_ptr->weight < 150)
+		&& (o_ptr->weight < 150))
+	       /* (All staffs are "identical".) */
+	       || i_ptr->tval == TV_STAFF))
+    return TRUE;
+  /* No other possibility */
+  else
+    return FALSE;
+}
+
 
 /*
- * Determine which equipment slot (if any) an item likes
+ * Determine which equipment slot (if any) an item likes.
+ * Prefer empty slots, then prefer INVEN_WIELD.
+ * For compatibility with do_cmd_wield assure 
+ * that if we propose INVEN_ARM then also INVEN_WIELD is legal.
+ * It's possible to off-hand wield Ringil and fight unarmed,
+ * but let people discover how to do that instead of making it
+ * a separate explicit UI choice, annoying for everybody else.
  */
 s16b wield_slot(const object_type *o_ptr)
 {
-	/* Slot for equipment */
-	switch (o_ptr->tval)
-	{
-		case TV_SWORD:
-			/* Two-weapon combat -- Wielding a light stabbing weapon */
-			if ((inventory[INVEN_WIELD].k_idx)
-				&& ((inventory[INVEN_WIELD].tval == TV_SWORD)
-					|| (inventory[INVEN_WIELD].tval == TV_STAFF)
-					|| (inventory[INVEN_WIELD].tval == TV_POLEARM)
-						|| (inventory[INVEN_WIELD].tval == TV_HAFTED)))
-			{
-				if ((inventory[INVEN_WIELD].weight < 200) && (o_ptr->weight < 100)) return (INVEN_ARM);
-			}
+  /* Slot for equipment */
+  switch (o_ptr->tval)
+    {
+    case TV_HAFTED: 
+    case TV_POLEARM:
+    case TV_SWORD:
+    case TV_STAFF:  
+      {
+	object_type *w_ptr = &inventory[INVEN_WIELD];
+	object_type *a_ptr = &inventory[INVEN_ARM];
 
-			/* Fall through */
-		case TV_STAFF:
-  			/* Two-weapon combat -- all staffs are "identical" */
-			if ((inventory[INVEN_WIELD].k_idx)
-				&& (inventory[INVEN_WIELD].tval == TV_STAFF))
-			{
-				return (INVEN_ARM);
-			}
-			/* Fall through */
-		case TV_HAFTED:
-		case TV_POLEARM:
-  			/* Two-weapon combat -- identical weapons are "balanced" if less than 15 lbs*/
-			if ((inventory[INVEN_WIELD].k_idx)
-				&& ((inventory[INVEN_WIELD].tval == TV_SWORD)
-					|| (inventory[INVEN_WIELD].tval == TV_STAFF)
-					|| (inventory[INVEN_WIELD].tval == TV_POLEARM)
-						|| (inventory[INVEN_WIELD].tval == TV_HAFTED)))
-			{
-				object_type *i_ptr = &inventory[INVEN_WIELD];
+	if (!w_ptr->k_idx)
+	/* If main wield slot free, try to take it */
+	  if (two_weapons_balanced(o_ptr, a_ptr))
+	    /* Arm slot does not cause problems */
+	    return (INVEN_WIELD);
+	  else
+	    /* Arm slot precludes dual-wield; for do_cmd_wield
+	       compatiblity we do not offer to replace arm slot */ 
+	    return (-1);
+	else if (!a_ptr->k_idx)
+	  /* else if arm slot free, try to take it */
+	  if (two_weapons_balanced(o_ptr, w_ptr))
+	    /* Main wield slot does not cause problems;
+	       this single choice can be overriden in do_cmd_wield;
+	       freeing the off-hand slot is also only the only way 
+	       to get a weapon to the off-hand slot */
+	    return (INVEN_ARM);
+	  else
+	    /* Main wield slot precludes dual-wield; replace it */ 
+	    return (INVEN_WIELD);
+	else
+	  /* else both slots are taken; try to replace 
+	     only the main wield slot to reduce the UI annoyance factor
+	     --- now the off-hand weapon behaves much as a shield */
+	  if (two_weapons_balanced(o_ptr, a_ptr))
+	    /* Arm slot does not cause problems */
+	    return (INVEN_WIELD);
+	  else
+	    /* Arm slot precludes dual-wield, fail */
+	    return (-1);
+      }
 
-				if ((i_ptr->tval == o_ptr->tval) && (i_ptr->sval == o_ptr->sval) 
-						&& (o_ptr->weight < 150)) return (INVEN_ARM);
-			}
+    case TV_DIGGING:
+      {
+	/* Diggers only go into the main wield slot,
+	   but they coexist peacefully with everything, so that two-weapon 
+	   specialists do not have to unwield off-hand weapons all the time;
+	   if there is systematic abuse, tone down digger attack power */
+	return (INVEN_WIELD);
+      }
 
-			/* Two-weapon combat -- primary weapon */
-			if ((inventory[INVEN_ARM].k_idx)
-				&& ((inventory[INVEN_ARM].tval == TV_SWORD)
-					|| (inventory[INVEN_ARM].tval == TV_STAFF)
-					|| (inventory[INVEN_ARM].tval == TV_POLEARM)
-						|| (inventory[INVEN_ARM].tval == TV_HAFTED)))
-			{
-				object_type *i_ptr = &inventory[INVEN_ARM];
+    case TV_INSTRUMENT:
+    case TV_BOW:
+      {
+	return (INVEN_BOW);
+      }
 
-				/* Wielding a light stabbing weapon */
-				if ((i_ptr->tval == TV_SWORD) && (o_ptr->weight < 200) && (i_ptr->weight < 100)) return (INVEN_WIELD);
+    case TV_RING:
+      {
+	if (!inventory[INVEN_RIGHT].k_idx) 
+	  /* Use the right hand first */
+	  return (INVEN_RIGHT);
+	else
+	  /* Use the left hand for swapping (by default) */
+	  return (INVEN_LEFT);
+      }
 
-				/* Identical weapons are "balanced" if less than 20 lbs */
-				if ((i_ptr->tval == o_ptr->tval) && (i_ptr->sval == o_ptr->sval) && (o_ptr->weight < 150)) return (INVEN_WIELD);
+    case TV_AMULET:
+      {
+	/* TODO: allow in off-hand with WS_AMULET; the same with rings; see also cmd3.c do_cmd_wield */
+	return (INVEN_NECK);
+      }
 
-				/* Hack -- too unbalanced to wield */
-				return (-1);
-			}
+    case TV_LITE:
+      {
+	return (INVEN_LITE);
+      }
 
-			/* Wield in primary hand */
-			return (INVEN_WIELD);
-			break;
+    case TV_DRAG_ARMOR:
+    case TV_HARD_ARMOR:
+    case TV_SOFT_ARMOR:
+      {
+	return (INVEN_BODY);
+      }
 
-		case TV_DIGGING:
-		{
-			/* Two-weapon combat not allowed */
-			if ((inventory[INVEN_ARM].k_idx) && (inventory[INVEN_ARM].tval != TV_SHIELD)) return (-1);
+    case TV_CLOAK:
+      {
+	return (INVEN_OUTER);
+      }
 
-			/* Wield in primary hand */
-			return (INVEN_WIELD);
-			break;
-		}
-                case TV_INSTRUMENT:
-		case TV_BOW:
-		{
-			return (INVEN_BOW);
-		}
+    case TV_SHIELD:
+      {
+	return (INVEN_ARM);
+      }
 
-		case TV_RING:
-		{
-			/* Use the right hand first */
-			if (!inventory[INVEN_RIGHT].k_idx) return (INVEN_RIGHT);
+    case TV_CROWN:
+    case TV_HELM:
+      {
+	return (INVEN_HEAD);
+      }
 
-			/* Use the left hand for swapping (by default) */
-			return (INVEN_LEFT);
-		}
+    case TV_GLOVES:
+      {
+	return (INVEN_HANDS);
+      }
 
-		case TV_AMULET:
-		{
-			return (INVEN_NECK);
-		}
+    case TV_BOOTS:
+      {
+	return (INVEN_FEET);
+      }
 
-		case TV_LITE:
-		{
-			return (INVEN_LITE);
-		}
+      /* Ammo asks for first quiver slot */
+    case TV_BOLT:
+    case TV_ARROW:
+    case TV_SHOT:
+      {
+	return (INVEN_QUIVER);
+      }
 
-		case TV_DRAG_ARMOR:
-		case TV_HARD_ARMOR:
-		case TV_SOFT_ARMOR:
-		{
-			return (INVEN_BODY);
-		}
+    default:
+      {
+	break;
+      }
 
-		case TV_CLOAK:
-		{
-			return (INVEN_OUTER);
-		}
+    }
 
-		case TV_SHIELD:
-		{
-			return (INVEN_ARM);
-		}
-
-		case TV_CROWN:
-		case TV_HELM:
-		{
-			return (INVEN_HEAD);
-		}
-
-		case TV_GLOVES:
-		{
-			return (INVEN_HANDS);
-		}
-
-		case TV_BOOTS:
-		{
-			return (INVEN_FEET);
-		}
-
-		/* Ammo asks for first quiver slot */
-		case TV_BOLT:
-		case TV_ARROW:
-		case TV_SHOT:
-		{
-			return (INVEN_QUIVER);
-		}
-
-		default:
-		{
-			break;
-		}
-
-	}
-
-	/* No slot available */
-	return (-1);
+  /* No slot available */
+  return (-1);
 }
 
 
