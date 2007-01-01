@@ -617,6 +617,24 @@
 #define SEX_FEMALE		0
 #define SEX_MALE		1
 
+/*
+ * Player race constants (hard-coded by save-files, arrays, etc)
+ */
+#define RACE_HUMAN        0
+#define RACE_HALF_ELF     1
+#define RACE_WOOD_ELF     2
+#define RACE_HOBBIT       3
+#define RACE_GNOME        4
+#define RACE_DWARF        5
+#define RACE_HALF_ORC     6
+#define RACE_HALF_TROLL   7
+#define RACE_DUNADAN      8
+#define RACE_HIGH_ELF     9
+#define RACE_GOBLIN       10
+
+#define MAX_RACES        10
+
+
 
 /*** Screen Locations ***/
 
@@ -1845,6 +1863,7 @@
 #define SV_MATTOCK			7
 
 /* The "sval" values for TV_HAFTED */
+#define SV_THROWING_HAMMER    	        1	/* 2d4 */
 #define SV_WHIP					2	/* 1d4 */
 #define SV_QUARTERSTAFF			3	/* 1d9 */
 #define SV_BATON				4	/* 1d5 */
@@ -1881,7 +1900,7 @@
 #define SV_SCYTHE_OF_SLICING	30	/* 8d4 */
 
 /* The "sval" codes for TV_SWORD */
-#define SV_BROKEN_DAGGER		1	/* 1d1 */
+#define SV_BROKEN_DAGGER		3	/* 1d1 */
 #define SV_BROKEN_SWORD			2	/* 1d2 */
 #define SV_DAGGER				4	/* 1d4 */
 #define SV_MAIN_GAUCHE			5	/* 1d5 */

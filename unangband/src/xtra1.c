@@ -778,7 +778,7 @@ static void prt_speed(void)
 	else if (i < 110)
 	{
 		attr = TERM_L_UMBER;
-		sprintf(buf, (show_sidebar ? "Slow (-%d)" : "Spd+%d"), (110 - i));
+		sprintf(buf, (show_sidebar ? "Slow (-%d)" : "Spd-%d"), (110 - i));
 	}
 
 	/* Display the speed */

@@ -2655,9 +2655,6 @@ static void store_purchase(void)
 				/* Buying an object makes you aware of it */
 				object_aware(i_ptr);
 
-				/* The object kind is not guessed */
-				k_info[i_ptr->k_idx].guess = 0;
-
 				/* Combine / Reorder the pack (later) */
 				p_ptr->notice |= (PN_COMBINE | PN_REORDER);
 

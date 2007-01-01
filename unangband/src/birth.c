@@ -453,6 +453,9 @@ static void player_wipe(void)
 	{
 		object_kind *k_ptr = &k_info[i];
 
+		/* Reset "guess" */
+		k_ptr->guess = 0;
+
 		/* Reset "tried" */
 		k_ptr->tried = FALSE;
 
@@ -568,17 +571,33 @@ static void player_outfit(void)
 				{
 					switch (p_ptr->pstyle)
 					{
-						case WS_TWO_WEAPON:
-						{
-							k_idx = lookup_kind(TV_SWORD, SV_DAGGER);
-							break;
-						}
 					        case WS_RING:
 						  {
 						    k_idx = lookup_kind(TV_RING, rand_int(SV_RING_TELEPORTATION + 1));
 						    break;
 						  }
+						case WS_TWO_WEAPON:
+						  {
+						    k_idx = lookup_kind(TV_SWORD, SV_DAGGER);
+						    break;
+						  }
 						case WS_THROWN:
+						  {
+						    switch (p_ptr->prace)
+						      {
+						      case RACE_HALF_TROLL:
+							{
+							  k_idx = lookup_kind(TV_SHOT, SV_AMMO_LIGHT);
+							  break;
+							}
+						      default:
+							{
+							  k_idx = lookup_kind(TV_BOW, SV_SLING);
+							  break;
+							}
+						      }
+						    break;
+						  }
 						case WS_SLING:
 						{
 							k_idx = lookup_kind(TV_BOW, SV_SLING);
@@ -605,11 +624,43 @@ static void player_outfit(void)
 					switch (p_ptr->pstyle)
 					{
 						case WS_TWO_WEAPON:
+						  {
+						    /* Used to polish weapons */
+						    k_idx = lookup_kind(TV_FLASK, SV_FLASK_OIL);
+						    break;
+						  }
 						case WS_THROWN:
-						{
-							k_idx = lookup_kind(TV_SPIKE, 0);
-							break;
-						}
+						  {
+						    switch (p_ptr->prace)
+						      {
+						      case RACE_HOBBIT:
+						      case RACE_HALF_TROLL:
+							{
+							  k_idx = lookup_kind(TV_SHOT, SV_AMMO_LIGHT);
+							  break;
+							}
+						      default:
+							switch (randint(3))
+							  {
+							  case 1:
+							    {
+							      k_idx = lookup_kind(TV_SWORD, SV_DAGGER);
+							      break;
+							    }
+							  case 2:
+							    {
+							      k_idx = lookup_kind(TV_POLEARM, SV_DART);
+							      break;
+							    }
+							  case 3:
+							    {
+							      k_idx = lookup_kind(TV_SPIKE, 0);
+							      break;
+							    }
+							  }
+						      }
+						    break;
+						  }
 						case WS_RING:
 						  {
 						    k_idx = lookup_kind(TV_ROPE, SV_ROPE_ELVEN);
