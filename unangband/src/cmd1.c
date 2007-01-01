@@ -846,11 +846,7 @@ static bool quiver_carry(object_type *o_ptr, int o_idx)
 		sound(MSG_CURSED);
 		msg_print("Oops! It feels deathly cold!");
 
-		/* Set the feeling */
-		j_ptr->feeling = INSCRIP_CURSED;
-
-		/* The object has been "sensed" */
-		j_ptr->ident |= (IDENT_SENSE);
+		mark_cursed_feeling(o_ptr);
 	}
 
 	/* Describe the object */

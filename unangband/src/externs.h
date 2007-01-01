@@ -439,6 +439,7 @@ extern void do_cmd_fire(void);
 extern void do_cmd_throw(void);
 
 /* cmd3.c */
+extern void mark_cursed_feeling(object_type *o_ptr);
 extern void do_cmd_inven(void);
 extern void do_cmd_equip(void);
 extern void do_cmd_wield(void);

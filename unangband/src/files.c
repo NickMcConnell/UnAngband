@@ -1717,10 +1717,10 @@ static void display_player_xtra_info(void)
 		Term_putstr(col, 11, -1, TERM_WHITE, "1Hand");
 	else if (p_ptr->pstyle == WS_TWO_HANDED
 			 && p_ptr->cur_style & (1L << WS_TWO_HANDED))
-		Term_putstr(col, 11, -1, TERM_WHITE, "BothH");
+		Term_putstr(col, 11, -1, TERM_WHITE, "2Hand");
 	else if (p_ptr->cur_style & (1L << WS_TWO_WEAPON)) 
 	{
-		Term_putstr(col, 11, -1, TERM_WHITE, "2Weap");
+		Term_putstr(col, 11, -1, TERM_WHITE, "Dual");
 
 		/* Off-hand melee weapon */
 		assert (inventory[INVEN_ARM].k_idx);
@@ -1764,8 +1764,8 @@ static void display_player_xtra_info(void)
 		strnfmt(buf, sizeof(buf), "[%d,%+d]", base, plus);
 		Term_putstr(col+5, 12, -1, TERM_L_BLUE, format("%12s", buf));
 	}
-	else plog_fmt("Illegal melee style in display_player_xtra_info: %d",
-				  p_ptr->cur_style);
+	else Term_putstr(col, 11, -1, TERM_WHITE, "Wield");
+
 
 	/* Off-hand */
 	if (inventory[INVEN_ARM].k_idx)

@@ -696,8 +696,12 @@ static void player_outfit(void)
 			/* Modify the charges */
 			if ((e_ptr->charge_min) && (e_ptr->charge_max)) i_ptr->charges = rand_range(e_ptr->charge_min, e_ptr->charge_max);
 
-			/* Rings are misterious */
-			if (i_ptr->tval != TV_RING)
+			/* Rings are mysterious and powerful */
+			if (i_ptr->tval == TV_RING)
+			  {
+			    apply_magic(i_ptr, 50, FALSE, TRUE, TRUE);
+			  }
+			else
 			  {
 			    object_aware(i_ptr);
 			    object_known(i_ptr);

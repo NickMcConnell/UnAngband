@@ -216,6 +216,22 @@ static int quiver_wield(int item, object_type *o_ptr)
 	return reorder_quiver(slot);
 }
 
+/*
+ * Mark the item as known cursed.
+ */
+void mark_cursed_feeling(object_type *o_ptr)
+{
+  switch (o_ptr->feeling)
+    {
+    case INSCRIP_ARTIFACT: o_ptr->feeling = INSCRIP_TERRIBLE; break;
+    case INSCRIP_HIGH_EGO_ITEM: o_ptr->feeling = INSCRIP_WORTHLESS; break;
+    case INSCRIP_EGO_ITEM: o_ptr->feeling = INSCRIP_WORTHLESS; break;
+    default: o_ptr->feeling = INSCRIP_CURSED;
+    }
+
+  /* The object has been "sensed" */
+  o_ptr->ident |= (IDENT_SENSE);
+}
 
 
 /*
@@ -294,13 +310,16 @@ void do_cmd_wield(void)
 	if (slot < 0) return;
 
 	/* Hack -- don't dual wield */
-	if ((slot == INVEN_ARM) && (o_ptr->tval != TV_SHIELD))
-	{
-		if (!get_check("Wield it in your off-hand? "))
-		{
-			slot = INVEN_WIELD;
-		}
-	}
+	if (slot == INVEN_ARM 
+	    && o_ptr->tval != TV_SHIELD
+	    && o_ptr->tval != TV_RING
+	    && o_ptr->tval != TV_AMULET)
+	  {
+	    if (!get_check("Wield it in your off-hand? "))
+	      {
+		slot = INVEN_WIELD;
+	      }
+	  }
 
 	/* Hack -- multiple rings */
 	else if (o_ptr->tval == TV_RING)
@@ -344,6 +363,8 @@ void do_cmd_wield(void)
 		msg_format("The %s you are %s appears to be cursed.",
 		   o_name, describe_use(slot));
 
+		mark_cursed_feeling(&inventory[slot]);
+
 		/* Cancel the command */
 		return;
 	}
@@ -356,6 +377,8 @@ void do_cmd_wield(void)
 		/* Message */
 		msg_format("The %s you are %s appears to be cursed.",
 		   o_name, describe_use(item));
+
+		mark_cursed_feeling(&inventory[item]);
 
 		/* Cancel the command */
 		return;
@@ -637,17 +660,7 @@ void do_cmd_wield(void)
 		/* Warn the player */
 		msg_print("Oops! It feels deathly cold!");
 
-		switch (o_ptr->feeling)
-		{
-			case INSCRIP_ARTIFACT: o_ptr->feeling = INSCRIP_TERRIBLE; break;
-			case INSCRIP_HIGH_EGO_ITEM: o_ptr->feeling = INSCRIP_WORTHLESS; break;
-			case INSCRIP_EGO_ITEM: o_ptr->feeling = INSCRIP_WORTHLESS; break;
-			default: o_ptr->feeling = INSCRIP_CURSED;
-		}
-
-		/* The object has been "sensed" */
-		o_ptr->ident |= (IDENT_SENSE);
-
+		mark_cursed_feeling(o_ptr);
 	}
 	/* Not cursed */
 	else
@@ -810,6 +823,8 @@ void do_cmd_takeoff(void)
 		/* Oops */
 		msg_print("Hmmm, it seems to be cursed.");
 
+		mark_cursed_feeling(o_ptr);
+
 		/* Nope */
 		return;
 	}
@@ -878,6 +893,8 @@ void do_cmd_drop(void)
 	{
 		/* Oops */
 		msg_print("Hmmm, it seems to be cursed.");
+
+		mark_cursed_feeling(o_ptr);
 
 		/* Nope */
 		return;
@@ -1018,6 +1035,8 @@ void do_cmd_destroy(void)
 		/* Message */
 		msg_format("The %s you are %s appears to be cursed.",
 		           o_name, describe_use(item));
+
+		mark_cursed_feeling(o_ptr);
 
 		/* Done */
 		return;

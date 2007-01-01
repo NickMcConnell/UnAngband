@@ -1860,6 +1860,12 @@ bool two_weapons_balanced(const object_type *o_ptr, const object_type *i_ptr)
   /* ...or if one is actually a shield... */
   else if (o_ptr->tval == TV_SHIELD || i_ptr->tval == TV_SHIELD)
     return TRUE;
+  /* ...or if one is actually a ring... */
+  else if (o_ptr->tval == TV_RING || i_ptr->tval == TV_RING)
+    return TRUE;
+  /* ...or if one is actually an amulet... */
+  else if (o_ptr->tval == TV_AMULET || i_ptr->tval == TV_AMULET)
+    return TRUE;
   /* ...or i_ptr is throwing... */
   else if (is_known_throwing_item(i_ptr)
       && o_ptr->weight < 200)
@@ -1908,11 +1914,11 @@ s16b wield_slot(const object_type *o_ptr)
 	/* If main wield slot free, try to take it */
 	  if (two_weapons_balanced(o_ptr, a_ptr))
 	    /* Arm slot does not cause problems */
-	    return (INVEN_WIELD);
+	    return INVEN_WIELD;
 	  else
 	    /* Arm slot precludes dual-wield; for do_cmd_wield
 	       compatiblity we do not offer to replace arm slot */ 
-	    return (-1);
+	    return -1;
 	else if (!a_ptr->k_idx)
 	  /* else if arm slot free, try to take it */
 	  if (two_weapons_balanced(o_ptr, w_ptr))
@@ -1920,20 +1926,20 @@ s16b wield_slot(const object_type *o_ptr)
 	       this single choice can be overriden in do_cmd_wield;
 	       freeing the off-hand slot is also only the only way 
 	       to get a weapon to the off-hand slot */
-	    return (INVEN_ARM);
+	    return INVEN_ARM;
 	  else
 	    /* Main wield slot precludes dual-wield; replace it */ 
-	    return (INVEN_WIELD);
+	    return INVEN_WIELD;
 	else
 	  /* else both slots are taken; try to replace 
 	     only the main wield slot to reduce the UI annoyance factor
 	     --- now the off-hand weapon behaves much as a shield */
 	  if (two_weapons_balanced(o_ptr, a_ptr))
 	    /* Arm slot does not cause problems */
-	    return (INVEN_WIELD);
+	    return INVEN_WIELD;
 	  else
 	    /* Arm slot precludes dual-wield, fail */
-	    return (-1);
+	    return -1;
       }
 
     case TV_DIGGING:
@@ -1942,67 +1948,79 @@ s16b wield_slot(const object_type *o_ptr)
 	   but they coexist peacefully with everything, so that two-weapon 
 	   specialists do not have to unwield off-hand weapons all the time;
 	   if there is systematic abuse, tone down digger attack power */
-	return (INVEN_WIELD);
+	return INVEN_WIELD;
       }
 
     case TV_INSTRUMENT:
     case TV_BOW:
       {
-	return (INVEN_BOW);
+	return INVEN_BOW;
       }
 
     case TV_RING:
       {
 	if (!inventory[INVEN_RIGHT].k_idx) 
 	  /* Use the right hand first */
-	  return (INVEN_RIGHT);
+	  return INVEN_RIGHT;
+	else if (!inventory[INVEN_LEFT].k_idx) 
+	  /* Use the right hand second */
+	  return INVEN_LEFT;
+	else if (!inventory[INVEN_ARM].k_idx
+		 && p_ptr->pstyle == WS_RING)
+	  /* Use the off-hand last */
+	  return INVEN_ARM;
 	else
-	  /* Use the left hand for swapping (by default) */
-	  return (INVEN_LEFT);
+	  /* Use the left hand for swapping, by default */
+	  return INVEN_LEFT;
       }
 
     case TV_AMULET:
       {
-	/* TODO: allow in off-hand with WS_AMULET; the same with rings; see also cmd3.c do_cmd_wield */
-	return (INVEN_NECK);
+	if (!inventory[INVEN_NECK].k_idx) 
+	  return INVEN_NECK;
+	else if (!inventory[INVEN_ARM].k_idx
+		 && p_ptr->pstyle == WS_AMULET)
+	  return INVEN_ARM;
+	else
+	  return INVEN_NECK;
       }
 
     case TV_LITE:
       {
-	return (INVEN_LITE);
+	return INVEN_LITE;
       }
 
     case TV_DRAG_ARMOR:
     case TV_HARD_ARMOR:
     case TV_SOFT_ARMOR:
       {
-	return (INVEN_BODY);
+	return INVEN_BODY;
       }
 
     case TV_CLOAK:
       {
-	return (INVEN_OUTER);
+	return INVEN_OUTER;
       }
 
     case TV_SHIELD:
       {
-	return (INVEN_ARM);
+	return INVEN_ARM;
       }
 
     case TV_CROWN:
     case TV_HELM:
       {
-	return (INVEN_HEAD);
+	return INVEN_HEAD;
       }
 
     case TV_GLOVES:
       {
-	return (INVEN_HANDS);
+	return INVEN_HANDS;
       }
 
     case TV_BOOTS:
       {
-	return (INVEN_FEET);
+	return INVEN_FEET;
       }
 
       /* Ammo asks for first quiver slot */
@@ -2010,7 +2028,7 @@ s16b wield_slot(const object_type *o_ptr)
     case TV_ARROW:
     case TV_SHOT:
       {
-	return (INVEN_QUIVER);
+	return INVEN_QUIVER;
       }
 
     default:
@@ -2021,7 +2039,7 @@ s16b wield_slot(const object_type *o_ptr)
     }
 
   /* No slot available */
-  return (-1);
+  return -1;
 }
 
 
