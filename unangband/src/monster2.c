@@ -3172,8 +3172,18 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp)
 	/* Calculate the monster_speed*/
 	n_ptr->mspeed = calc_monster_speed(n_ptr);
 
-	/* And start with random energy */
-	n_ptr->energy = (byte)rand_int(100);
+	/* Force monster to wait for player */
+	if (r_ptr->flags1 & (RF1_FORCE_SLEEP))
+	{
+		/* Give almost no starting energy (avoids clumped movement) */
+		n_ptr->energy = (byte)rand_int(10);
+	}
+
+	else
+	{
+		/* Give a random starting energy */
+		n_ptr->energy = (byte)rand_int(50);
+	}
 
 	/* Some monsters radiate lite when born */
 	if ((r_ptr->flags2 & (RF2_HAS_LITE))
