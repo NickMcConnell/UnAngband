@@ -3364,7 +3364,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   /* No longer 'stored' */
   i_ptr->ident &= ~(IDENT_STORE);
 
-  /* Sometimes use lower stack object */
+  /* Sometimes use lower stack object --- FIXME: clarify comment, search and replace similar comments */
   if (!object_charges_p(o_ptr) && rand_int(o_ptr->number) < o_ptr->stackc)
     {
       if (i_ptr->charges) 
@@ -3375,9 +3375,6 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 
       o_ptr->stackc--;
     }
-
-  /* Forget information on dropped object */
-  drop_may_flags(i_ptr);
 
   /* Reduce and describe inventory */
   if (item >= 0)
@@ -3447,7 +3444,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
       int mul, div;
 
       /* Set if a throwing object */
-      throwing = is_throwing_item(o_ptr);
+      throwing = is_throwing_item(i_ptr);
 
       /* Extract a "distance multiplier" */
       mul = throwing ? 10 : 3;
@@ -3719,12 +3716,8 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 	      tdam += i_ptr->to_d + bow_to_d + style_dam;
 
 	      /* TODO: implement multiple targetting instead;
-		 every time the weapon hits get next target;
-		 after the last target the weapon returns
-		 and based on AGI you catch it, it drops midway,
-		 closer or father from you depending on AGI,
-		 or even, with really bad AGI roll, 
-		 you get hit and catch it this way */
+		 every time the weapon hits get next target;		 
+		 TODO: balance num_throw vs. num_blow */
 	      if (!fire && item == INVEN_WIELD && throwing)
 		/* Trick throw, boost the damage */
 		tdam *= p_ptr->num_blow;
@@ -3834,7 +3827,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 		      /* Make item strike */
 		      process_item_blow(i_ptr, y, x);
 
-		      /* Hack -- Remove coating on original */
+		      /* Hack -- Remove coating on original --- FIXME: explain why this is needed */
 		      if (!coated_p(i_ptr) 
 			  && o_ptr->feeling == INSCRIP_COATED) 
 			o_ptr->feeling = 0;
@@ -3850,32 +3843,77 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 	}
     }
 
+  /* TODO: based on AGI you catch it, it drops midway,
+     closer or father from you depending on AGI,
+     or even, with really bad AGI roll, 
+     you get hit and catch it the hard way.
+     Or just treat the player as a monster and the way back to the player
+     as the additional hitting round, but instead of a succesful hit, catch,
+     insted of near_miss, drop, instead of big miss, hit the player. */
+
   /* Chance of breakage (during attacks) */
   j = (hit_body ? breakage_chance(i_ptr) : 0);
 
-  /* Drop (or break) near that location */
-  drop_near(i_ptr, j, y, x);
-
-  /* Rope doesn't reach other end of chasm */
-  if (chasm)
+  /* Is it a successful trick shot? */
+  if (!fire && item == INVEN_WIELD && throwing
+      && hit_body) /* the last of the hit_body values represents catching */
+    /* Try to return the weapon to the player */
     {
-      /* Project along the path */
-      for ( ; i >= 0; --i)
+      /* Perhaps harm the weapon */
+      if (rand_int(100) < j && break_near(i_ptr, y, x))
+	/* The returned weapon turned out to be totally broken */
 	{
-	  y = GRID_Y(path_g[i]);
-	  x = GRID_X(path_g[i]);
-
-	  feat = cave_feat[y][x];
-
-	  /* Drop rope into chasm */
-	  if (strstr(f_name + f_info[feat].name, "rope") 
-	      || strstr(f_name + f_info[feat].name, "chain"))
-	    {
-	      /* Hack -- drop into chasm */
-	      cave_alter_feat(y, x, FS_TIMED);
-	    }
+	  /* Nothing more to do */
 	}
-    }	
+      else
+	/* Either intact or only mildly harmed */
+	{
+	  /* TODO: animate here the return path;
+	     if the path is obstructed, do not hit, drop instead */
+    
+	  /* Wear again the (possibly slighly harmed) weapon */
+	  object_copy(o_ptr, i_ptr);
+
+	  /* Recalculate bonuses */
+	  p_ptr->update |= (PU_BONUS);
+
+	  /* Window stuff --- TODO: are all these needed? */
+	  p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
+
+	  /* Update item list --- TODO: are all these needed? */
+	  p_ptr->redraw |= (PR_ITEM_LIST);
+	}
+    }
+  else
+    /* Not a successful trick shot; just drop near the last monster */
+    {
+      /* Forget information on dropped object --- FIXME: say why it is needed */
+      drop_may_flags(i_ptr);
+      
+      /* Drop (or break) near that location */
+      drop_near(i_ptr, j, y, x);
+  
+      /* Rope doesn't reach other end of chasm */
+      if (chasm)
+	{
+	  /* Project along the path */
+	  for ( ; i >= 0; --i)
+	    {
+	      y = GRID_Y(path_g[i]);
+	      x = GRID_X(path_g[i]);
+	      
+	      feat = cave_feat[y][x];
+	      
+	      /* Drop rope into chasm */
+	      if (strstr(f_name + f_info[feat].name, "rope") 
+		  || strstr(f_name + f_info[feat].name, "chain"))
+		{
+		  /* Hack -- drop into chasm */
+		  cave_alter_feat(y, x, FS_TIMED);
+		}
+	    }
+	}	
+    }
 }
 
 

@@ -32,8 +32,11 @@
 #SONG_BOOK: Casting a spell from a song book.
 #INSTRUMENT: Wielding an instrument.
 #RING, AMULET: Wearing a ring or amulet, respectively. Note that they can
-#  be worn also in off-hand with these styles, but this does not count
-#  as an excercise of the style.
+#  be worn also in off-hand with these styles, but having them only 
+#  in the off-hand does not count as an excercise of the style.
+#POTION: Abilities related to potion-use, whether quaffing, picking up, 
+#  throwing, etc. 
+#SCROLL: Abilities related to scroll-use, such as reading and identifying them.
 
 #The benefits are granted only when fighting in the particular style preferred.
 
