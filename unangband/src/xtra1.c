@@ -2103,14 +2103,15 @@ void calc_spells(void)
 	/* Number of spells can be learnt */
 	for (j = 0; j < z_info->s_max;j++)
 	{
-		/* Get the spell details */
-		for (ii=0;ii<MAX_SPELL_CASTERS;ii++)
-		{
-			if (s_info[j].cast[ii].class == p_ptr->pclass)
-			{
-				k++;
-			}
-		}
+	  /* Get the spell details; warriors (class 0) have no spells */
+	  if (p_ptr->pclass)
+	    for (ii = 0; ii < MAX_SPELL_CASTERS; ii++)
+	      {
+		if (s_info[j].cast[ii].class == p_ptr->pclass)
+		  {
+		    k++;
+		  }
+	      }
 	}
 
 	/* Hack --- Assume cannot learn more than spells in spell books */

@@ -8282,7 +8282,7 @@ s16b spell_level(int spell)
 
 	spell_type *s_ptr;
 
-	spell_cast *sc_ptr;
+	spell_cast *sc_ptr = NULL;
 
 	bool legible = FALSE;
 	bool fix_level = FALSE;
@@ -8295,18 +8295,16 @@ s16b spell_level(int spell)
 	/* Get the spell */
 	s_ptr = &s_info[spell];
 
-	/* Get the spell cost */
-	sc_ptr=&(s_ptr->cast[0]);
-
-	/* Get casting information */
-	for (i=0;i<MAX_SPELL_CASTERS;i++)
-	{
-		if (s_ptr->cast[i].class == p_ptr->pclass)
+	/* Get our casting information; warriors (class 0) have no spells */
+	if (p_ptr->pclass)
+	  for (i = 0;i < MAX_SPELL_CASTERS; i++)
+	    {
+	      if (s_ptr->cast[i].class == p_ptr->pclass)
 		{
-			legible = TRUE;
-			sc_ptr=&(s_ptr->cast[i]);
+		  legible = TRUE;
+		  sc_ptr=&(s_ptr->cast[i]);
 		}
-	}
+	    }
 
 	/* Hack -- get casting information for specialists */
 	if (!legible)
@@ -8319,6 +8317,9 @@ s16b spell_level(int spell)
 			&& (s_info[spell].appears[i].sval == p_ptr->psval))
 			{
 				legible = TRUE;
+				/* Get the first spell caster's casting info */
+				sc_ptr=&(s_ptr->cast[0]);
+				/* And remember to fix it later */
 				fix_level = TRUE;
 			}
 		}
@@ -8514,6 +8515,7 @@ s16b spell_power(int spell)
 			case WS_RING:
 			case WS_AMULET:
 			{
+			  /* TODO: check if the spell appear in the ring */
 				if ( w_info[i].styles & p_ptr->cur_style 
 					 & (1L << p_ptr->pstyle) ) 
 					plev += 10;
@@ -8522,6 +8524,7 @@ s16b spell_power(int spell)
 
 			default:
 			{
+			  /* TODO: check if the spell appear in the scroll */
 				plev += 10;
 				break;
 			}
@@ -8542,7 +8545,7 @@ s16b spell_chance(int spell)
 
 	spell_type *s_ptr;
 
-	spell_cast *sc_ptr;
+	spell_cast *sc_ptr = NULL;
 
 	bool legible = FALSE;
 
@@ -8556,18 +8559,16 @@ s16b spell_chance(int spell)
 	/* Get the spell */
 	s_ptr = &s_info[spell];
 
-	/* Get the spell cost */
-	sc_ptr=&(s_ptr->cast[0]);
-
-	/* Get casting information */
-	for (i=0;i<MAX_SPELL_CASTERS;i++)
-	{
-		if (s_ptr->cast[i].class == p_ptr->pclass)
+	/* Get our casting information; warriors (class 0) have no spells */
+	if (p_ptr->pclass)
+	  for (i = 0; i < MAX_SPELL_CASTERS; i++)
+	    {
+	      if (s_ptr->cast[i].class == p_ptr->pclass)
 		{
-			legible = TRUE;
-			sc_ptr=&(s_ptr->cast[i]);
+		  legible = TRUE;
+		  sc_ptr=&(s_ptr->cast[i]);
 		}
-	}
+	    }
 
 	/* Hack -- get casting information for specialists */
 	if (!legible)
@@ -8580,6 +8581,9 @@ s16b spell_chance(int spell)
 			 &&  (s_info[spell].appears[i].sval == p_ptr->psval))
 			{
 				legible = TRUE;
+				/* Get the first spell caster's casting info */
+				sc_ptr=&(s_ptr->cast[0]);
+				/* And remember to fix it later */
 			}
 		}
 	}
@@ -8593,7 +8597,7 @@ s16b spell_chance(int spell)
 	/* Reduce failure rate by "effective" level adjustment */
 	chance -= 3 * (p_ptr->lev - spell_level(spell));
 
-	/* Reduce failure rate by INT/WIS adjustment */
+	/* Reduce failure rate by the fail-stat adjustment */
 	chance -= 3 * (adj_mag_fail_rate[p_ptr->stat_ind[c_info[p_ptr->pclass].spell_stat_fail]] - 1);
 
 	/* Not enough mana to cast */
@@ -8642,8 +8646,6 @@ bool spell_okay(int spell, bool known)
 {
 	spell_type *s_ptr;
 
-	spell_cast *sc_ptr;
-
 	int i;
 
 	bool legible =FALSE;
@@ -8651,18 +8653,15 @@ bool spell_okay(int spell, bool known)
 	/* Get the spell */
 	s_ptr = &s_info[spell];
 
-	/* Get the spell cost */
-	sc_ptr=&(s_ptr->cast[0]);
-
-	/* Get casting information */
-	for (i=0;i<MAX_SPELL_CASTERS;i++)
-	{
-		if (s_ptr->cast[i].class == p_ptr->pclass)
+	/* Get our casting information; warriors (class 0) have no spells */
+	if (p_ptr->pclass)
+	  for (i = 0; i < MAX_SPELL_CASTERS; i++)
+	    {
+	      if (s_ptr->cast[i].class == p_ptr->pclass)
 		{
-			legible = TRUE;
-			sc_ptr=&(s_ptr->cast[i]);
+		  legible = TRUE;
 		}
-	}
+	    }
 
 	/* Hack -- get casting information for specialists */
 	if (!legible)

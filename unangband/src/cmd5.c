@@ -287,19 +287,20 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 			/* Get the spell */
 			s_ptr = &s_info[spell];
 
-			/* Get the spell cast information */
+			/* Get the default spell cast information */
 			sc_ptr=&(s_ptr->cast[0]);
 
 			if (cast)
 			{
-				/* Get the spell details */
-				for (ii=0;ii<MAX_SPELL_CASTERS;ii++)
-				{
-					if (s_ptr->cast[ii].class == p_ptr->pclass)
-					{
-						sc_ptr=&(s_ptr->cast[ii]);
-					}
-				}
+			  /* Get the spell details; warriors (class 0) have no spells */
+			  if (p_ptr->pclass)
+			    for (ii=0;ii<MAX_SPELL_CASTERS;ii++)
+			      {
+				if (s_ptr->cast[ii].class == p_ptr->pclass)
+				  {
+				    sc_ptr=&(s_ptr->cast[ii]);
+				  }
+			      }
 
 				/* Prompt */
 				strnfmt(tmp_val, 78, "%^s %s (%d mana, %d%% fail)? ",
@@ -370,10 +371,13 @@ bool inven_book_okay(const object_type *o_ptr)
 	{
 		s_ptr = &s_info[o_ptr->pval];
 
-		for (i=0;i<MAX_SPELL_CASTERS;i++)
-		{
-			if (s_ptr->cast[i].class == p_ptr->pclass) return (1);
-		}
+		/* Warriors (class 0) have no spells */
+		if (p_ptr->pclass)
+		  for (i = 0; i < MAX_SPELL_CASTERS; i++)
+		    {
+		      if (s_ptr->cast[i].class == p_ptr->pclass) 
+			return (1);
+		    }
 
 		for (i = 0; i < MAX_SPELL_APPEARS; i++)
 		{
@@ -397,10 +401,13 @@ bool inven_book_okay(const object_type *o_ptr)
 			if ((s_ptr->appears[ii].tval == o_ptr->tval) &&
 			    (s_ptr->appears[ii].sval == o_ptr->sval))
 			{
-				for (iii=0;iii<MAX_SPELL_CASTERS;iii++)
-				{
-					if (s_ptr->cast[iii].class == p_ptr->pclass) return(1);
-				}
+			  /* Warriors (class 0) have no spells */
+			  if (p_ptr->pclass)
+			    for (iii = 0; iii<MAX_SPELL_CASTERS; iii++)
+			      {
+				if (s_ptr->cast[iii].class == p_ptr->pclass) 
+				  return(1);
+			      }
 
 				for (iii = 0; iii < MAX_SPELL_APPEARS; iii++)
 				{
@@ -684,15 +691,16 @@ void do_cmd_browse(void)
 			/* Get the spell cost */
 			sc_ptr=&(s_ptr->cast[0]);
 
-			/* Get casting information */
-			for (ii=0;ii<MAX_SPELL_CASTERS;ii++)
-			{
-				if (s_ptr->cast[ii].class == p_ptr->pclass)
+			/* Get our casting information; warriors (class 0) have no spells */
+			if (p_ptr->pclass)
+			  for (ii = 0; ii < MAX_SPELL_CASTERS; ii++)
+			    {
+			      if (s_ptr->cast[ii].class == p_ptr->pclass)
 				{
-					legible = TRUE;
-					sc_ptr=&(s_ptr->cast[ii]);
+				  legible = TRUE;
+				  sc_ptr=&(s_ptr->cast[ii]);
 				}
-			}
+			    }
 
 			/* Hack -- get casting information for specialists */
 			if (!legible)
@@ -1186,14 +1194,15 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 	/* Get the cost */
 	sc_ptr=&(s_ptr->cast[0]);
 
-	/* Get the spell details */
-	for (i=0;i<MAX_SPELL_CASTERS;i++)
-	{
-		if (s_ptr->cast[i].class == p_ptr->pclass)
+	/* Get the spell details; warriors (class 0) have no spells */
+	if (p_ptr->pclass)
+	  for (i = 0; i < MAX_SPELL_CASTERS; i++)
+	    {
+	      if (s_ptr->cast[i].class == p_ptr->pclass)
 		{
-			sc_ptr=&(s_ptr->cast[i]);
+		  sc_ptr=&(s_ptr->cast[i]);
 		}
-	}
+	    }
 
 	/* Verify "dangerous" spells */
 	if (sc_ptr->mana > p_ptr->csp)

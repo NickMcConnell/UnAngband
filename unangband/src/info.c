@@ -463,7 +463,7 @@ void object_obvious_flags(object_type *o_ptr)
 /*
  * Obtain the "flags" for an item which are known to the player
  */
-void object_flags_known(object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3, u32b *f4)
+void object_flags_known(const object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3, u32b *f4)
 {
 	object_flags_aux(OBJECT_FLAGS_KNOWN, o_ptr, f1, f2, f3, f4);
 }
@@ -3441,7 +3441,7 @@ void print_spells(const s16b *sn, int num, int y, int x)
 
 	spell_type *s_ptr;
 
-	spell_cast *sc_ptr;
+	spell_cast *sc_ptr = NULL;
 
 	/* Title the list */
 	prt("", y, x);
@@ -3465,19 +3465,18 @@ void print_spells(const s16b *sn, int num, int y, int x)
 		/* Get the spell info */
 		s_ptr = &s_info[spell];
 
-		/* Get the spell cost */
-		sc_ptr=&(s_ptr->cast[0]);
-
 		legible = FALSE;
 
-		for (ii=0;ii<MAX_SPELL_CASTERS;ii++)
-		{
-			if (s_ptr->cast[ii].class == p_ptr->pclass)
+		/* Get the spell details; warriors (class 0) have no spells */
+		if (p_ptr->pclass)
+		  for (ii = 0; ii < MAX_SPELL_CASTERS; ii++)
+		    {
+		      if (s_ptr->cast[ii].class == p_ptr->pclass)
 			{
-				legible = TRUE;
-				sc_ptr=&(s_ptr->cast[ii]);
+			  legible = TRUE;
+			  sc_ptr=&(s_ptr->cast[ii]);
 			}
-		}
+		    }
 
 		/* Hack -- get casting information for specialists */
 		if (!legible)
@@ -3489,7 +3488,9 @@ void print_spells(const s16b *sn, int num, int y, int x)
 					((s_info[spell].appears[ii].tval == TV_PRAYER_BOOK) && (p_ptr->pstyle == WS_PRAYER_BOOK)))
 				&& (s_info[spell].appears[ii].sval == p_ptr->psval))
 				{
-					legible = TRUE;
+				  legible = TRUE;
+				  /* Get the first spell caster's casting info */
+				  sc_ptr=&(s_ptr->cast[0]);
 				}
 			}
 		}
@@ -3688,11 +3689,12 @@ void display_koff(const object_type *o_ptr)
 			if ((s_ptr->appears[ii].tval == o_ptr->tval) &&
 			    (s_ptr->appears[ii].sval == o_ptr->sval))
 			{
-				for (iii=0;iii<MAX_SPELL_CASTERS;iii++)
-				{
-
-					if (s_ptr->cast[iii].class == p_ptr->pclass) browse=TRUE;
-				}
+			  /* Warriors (class 0) have no spells */
+			  if (p_ptr->pclass)
+			    for (iii = 0; iii < MAX_SPELL_CASTERS; iii++)
+			      {
+				if (s_ptr->cast[iii].class == p_ptr->pclass) browse=TRUE;
+			      }
 			}
 		}
 
