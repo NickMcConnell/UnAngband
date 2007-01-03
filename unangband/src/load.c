@@ -1153,15 +1153,15 @@ static errr rd_extra(void)
 	if (!older_than(0, 6, 2))
 	{
 		/* # of player turns */
-		rd_s32b(&player_turn);
+		rd_s32b(&p_ptr->player_turn);
 
 		/* # of turns spent resting */
-		rd_s32b(&resting_turn);
+		rd_s32b(&p_ptr->resting_turn);
 	}
 	else
 	{
-		player_turn = 0;
-		resting_turn = 0;
+		p_ptr->player_turn = 0;
+		p_ptr->resting_turn = 0;
 	}
 
 	/* Future use */
@@ -2392,8 +2392,8 @@ bool load_player(void)
 
 	/* Paranoia */
 	turn = 0;
-	player_turn  = 0;
-	resting_turn = 0;
+	p_ptr->player_turn  = 0;
+	p_ptr->resting_turn = 0;
 
 	/* Paranoia */
 	p_ptr->is_dead = FALSE;
@@ -2622,7 +2622,7 @@ bool load_player(void)
 
 			/* Forget turns */
 			turn = old_turn = 0;
-			player_turn = resting_turn = 0;
+			p_ptr->player_turn = p_ptr->resting_turn = 0;
 
 			/* Done */
 			return (TRUE);

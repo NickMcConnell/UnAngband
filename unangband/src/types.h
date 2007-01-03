@@ -1576,6 +1576,9 @@ struct player_type
 
 	s16b vulnerability;     /* How vulnerable? */
 
+        s32b player_turn;         /* Number of player turns (including resting) */
+        s32b resting_turn;        /* Number of player turns spent resting */
+
 	byte outside;	/* Player is outside? */
 	bool cursed_quiver;	/* The quiver is cursed */
 

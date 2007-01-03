@@ -100,8 +100,6 @@ s16b summon_race_type;	   /* Hack -- See summon_specific() */
 
 s32b turn;			      /* Current game turn */
 s32b old_turn;		      /* Hack -- Level feeling counter */
-s32b player_turn;         /* Number of player turns (including resting) */
-s32b resting_turn;        /* Number of player turns spent resting */
 
 bool surface;
 bool daytime;

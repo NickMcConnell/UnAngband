@@ -674,10 +674,10 @@ static void wr_extra(void)
 	wr_u32b(p_ptr->disease);
 
 	/* # of player turns */
-	wr_s32b(player_turn);
+	wr_s32b(p_ptr->player_turn);
 
 	/* # of turns spent resting */
-	wr_s32b(resting_turn);
+	wr_s32b(p_ptr->resting_turn);
 
 	/* Future use */
 	for (i = 0; i < 7; i++) wr_u32b(0L);
