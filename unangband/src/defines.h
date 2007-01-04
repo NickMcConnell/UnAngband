@@ -964,17 +964,11 @@
 #define FEAT_LESS		0x06
 #define FEAT_MORE		0x07
 
-/* Shops */
-#define FEAT_SHOP_HEAD	0x08
-#define FEAT_SHOP_TAIL	0x0F
-
-/* Traps */
-#define FEAT_TRAP_HEAD	0x10
-#define FEAT_TRAP_TAIL	0x1F
+* Shops */
+#define FEAT_HOME               0x0F
 
 /* Doors */
-#define FEAT_DOOR_HEAD	0x20
-#define FEAT_DOOR_TAIL	0x2F
+#define FEAT_DOOR_CLOSED        0x20
 
 /* Extra */
 #define FEAT_SECRET		0x30
