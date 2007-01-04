@@ -3270,24 +3270,22 @@ static bool item_tester_hook_rope(const object_type *o_ptr)
  */
 void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 {
-  int py = p_ptr->py;
-  int px = p_ptr->px;
-
-  int dir, item2 = 0;
-  int i, j, y, x, ty, tx;
+  int item2 = 0;
+  int i = 0;
+  int j, y, x, old_y, old_x, tricks;
+  int ty, tx; /* Current target coordinates */
   int tdam, tdis, thits;
   int bow_to_h = 0;
   int bow_to_d = 0;
   int bonus, chance;
 
   int style_hit, style_dam, style_crit;
-  bool throwing = FALSE;
 
-  object_type *k_ptr = NULL;
+  object_type *k_ptr;
   object_type *i_ptr;
   object_type object_type_body;
 
-  bool hit_body = FALSE;
+  bool hit_body;
   bool chasm = FALSE;
   int feat;
 
@@ -3299,9 +3297,14 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   int path_n;
   u16b path_g[256];
 
+  int use_old_target_backup = use_old_target;
 
-  /* Need a rope? */
-  if (o_ptr->sval == SV_AMMO_GRAPPLE)
+  bool throwing = is_throwing_item(o_ptr);
+  bool trick_throw = !fire && item == INVEN_WIELD && throwing;
+  int num_tricks = trick_throw ? p_ptr->num_blow + 1 : 1;
+
+  /* Need a rope? (No rope for trick throws) */
+  if (o_ptr->sval == SV_AMMO_GRAPPLE && !trick_throw)
     {
       cptr q, s;
 
@@ -3338,16 +3341,15 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 		}
 	    }
 	}
+      else
+	{
+	  k_ptr = &o_list[0 - item2];
+	}
     }
-
-  /* Get a direction (or cancel) */
-  if (!get_aim_dir(&dir)) return;
-
-  /* Hack -- flasks, potions, spores always break as if striking a monster */
-  if (o_ptr->tval == TV_FLASK 
-      || o_ptr->tval == TV_POTION 
-      || o_ptr->tval == TV_EGG) 
-    hit_body = TRUE;
+  else
+    {
+      k_ptr = NULL;
+    }
 
   /* Get local object */
   i_ptr = &object_type_body;
@@ -3364,61 +3366,12 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   /* No longer 'stored' */
   i_ptr->ident &= ~(IDENT_STORE);
 
-  /* Sometimes use lower stack object --- FIXME: clarify comment, search and replace similar comments */
-  if (!object_charges_p(o_ptr) && rand_int(o_ptr->number) < o_ptr->stackc)
-    {
-      if (i_ptr->charges) 
-	i_ptr->charges--;
-
-      if (i_ptr->timeout) 
-	i_ptr->timeout = 0;
-
-      o_ptr->stackc--;
-    }
-
-  /* Reduce and describe inventory */
-  if (item >= 0)
-    {
-      if (o_ptr->number == 1)
-	{
-	  inven_drop_flags(o_ptr);
-	  if (item2 > item) 
-	    item2--;
-	}
-
-      inven_item_increase(item, -1);
-      inven_item_describe(item);
-      inven_item_optimize(item);
-    }
-
-  /* Reduce and describe floor item */
-  else
-    {
-      bool get_feat = FALSE;
-
-      floor_item_increase(0 - item, -1);
-      floor_item_optimize(0 - item);
-
-      /* Get feat */
-      if (o_ptr->ident & (IDENT_STORE)) 
-	get_feat = TRUE;
-
-      if (get_feat && scan_feat(py, px) < 0) 
-	cave_alter_feat(py, px, FS_GET_FEAT);
-    }
-
-  /* Sound */
-  sound(MSG_SHOOT);
-
   /* Describe the object */
   object_desc(o_name, sizeof(o_name), i_ptr, FALSE, 3);
 
   /* Find the color and symbol for the object */
   missile_attr = object_attr(i_ptr);
   missile_char = object_char(i_ptr);
-
-  /* Base damage from thrown object */
-  tdam = damroll(i_ptr->dd, i_ptr->ds);
 
   /* The first piece of code dependent on fire/throw */
   if (fire)
@@ -3430,9 +3383,6 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
       bow_to_h = inventory[INVEN_BOW].to_h;
       bow_to_d = inventory[INVEN_BOW].to_d;
 
-      /* Boost the damage */
-      tdam *= p_ptr->ammo_mult;
-
       /* Base range XXX XXX */
       tdis = 6 + 3 * p_ptr->ammo_mult;
 
@@ -3442,9 +3392,6 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   else
     {
       int mul, div;
-
-      /* Set if a throwing object */
-      throwing = is_throwing_item(i_ptr);
 
       /* Extract a "distance multiplier" */
       mul = throwing ? 10 : 3;
@@ -3459,404 +3406,479 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
       if (tdis > 10) 
 	tdis = 10;
 
-      if (item == INVEN_WIELD && throwing)
-	/* Trick throw */
+      if (trick_throw)
 	thits = 1;
       else
 	/* Number of hits per round; does not depend on (throwing) */
 	thits = p_ptr->num_throw;
     }
 
-  /* Take a turn */
-  p_ptr->energy_use = 100 / thits;
+  /* Coordinates of the fired/thrown object; start at the player */
+  y = p_ptr->py;
+  x = p_ptr->px;
 
-  /* Start at the player */
-  y = py;
-  x = px;
+  /* No misses yet */
+  hit_body = TRUE;
 
-  /* Predict the "target" location */
-  ty = py + 99 * ddy[dir];
-  tx = px + 99 * ddx[dir];
-
-  /* Check for "target request" */
-  if (dir == 5 && target_okay())
+  /* Iterate through trick throw targets;
+     the last pass if for returning to player;
+     if no tricks, just one iteration */
+  for (tricks = 0; tricks < num_tricks; tricks++)
     {
-      tx = p_ptr->target_col;
-      ty = p_ptr->target_row;
-    }
+      int dir = 0;
 
-  /* Calculate the path */
-  path_n = project_path(path_g, tdis, py, px, &ty, &tx, 0);
+      /* If a complete miss, stop trick shot */
+      if (!hit_body)
+	break;
 
-  /* Hack -- Handle stuff */
-  handle_stuff();
+      /* Reset hit_body */
+      if (o_ptr->tval == TV_FLASK 
+	  || o_ptr->tval == TV_POTION 
+	  || o_ptr->tval == TV_EGG) 
+	/* Hack -- flasks, potions, spores break as if striking a monster */
+	hit_body = TRUE;
+      else
+	/* Otherwise hitting is not that easy */
+	hit_body = FALSE;
 
-  /* Project along the path */
-  for (i = 0; i < path_n; ++i)
-    {
-      int msec = op_ptr->delay_factor * op_ptr->delay_factor;
-
-      int ny = GRID_Y(path_g[i]);
-      int nx = GRID_X(path_g[i]);
-
-      /* Hack -- Stop before hitting walls */
-      if (!cave_project_bold(ny, nx)) break;
-
-      /* Advance */
-      x = nx;
-      y = ny;
-
-      /* Handle rope over chasm */
-      if (k_ptr)
+      /* If all trick shots used, return to player, do not query target */
+      if (trick_throw && tricks == num_tricks - 1)
 	{
-	  feat = cave_feat[y][x];
-
-	  if (f_info[feat].flags2 & FF2_CHASM) 
-	    chasm = TRUE;
-	  else 
-	    chasm = FALSE;
-
-	  feat = feat_state(feat, FS_SPIKE);
-
-	  if (strstr(f_name + f_info[feat].name, "rope"))
-	    {
-	      /* Hack -- remove spike */
-	      feat = feat_state(feat, FS_GET_FEAT);
-
-	      /* MegaHack -- handle chain */
-	      if (k_ptr->sval == SV_ROPE_CHAIN) 
-		feat++;
-
-	      /* Change the feature */
-	      cave_set_feat(y, x, feat);
-
-	      /* Reduce inventory -- suppress messages */
-	      if (item2 >= 0)
-		{
-		  if (k_ptr->number == 1)
-		    {
-		      inven_drop_flags(k_ptr);
-		      k_ptr = NULL;
-		    }
-
-		  inven_item_increase(item2, -1);
-		  inven_item_optimize(item2);
-		}
-
-	      /* Reduce and describe floor item */
-	      else
-		{
-		  if (k_ptr->number == 1) 
-		    k_ptr = NULL;
-
-		  floor_item_increase(0 - item2, -1);
-		  floor_item_optimize(0 - item2);
-		}
-	    }
+	  tx = p_ptr->px;
+	  ty = p_ptr->py;
 	}
-
-      /* Only do visuals if the player can "see" the missile */
-      if (panel_contains(y, x) && player_can_see_bold(y, x))
-	{
-	  /* Visual effects */
-	  print_rel(missile_char, missile_attr, y, x);
-	  move_cursor_relative(y, x);
-	  if (fresh_before) 
-	    Term_fresh();
-	  Term_xtra(TERM_XTRA_DELAY, msec);
-	  lite_spot(y, x);
-	  if (fresh_before) 
-	    Term_fresh();
-	}
-
-      /* Delay anyway for consistency */
       else
 	{
-	  /* Pause anyway, for consistancy */
-	  Term_xtra(TERM_XTRA_DELAY, msec);
+	  /* Reset the chosen direction */
+	  p_ptr->command_dir = 0;
+
+	  /* Get a direction (or cancel) */
+	  if (!get_aim_dir(&dir))
+	    /* Canceled */
+	    if (tricks > 0)
+	      /* If canceled mid-trick-throw, try to return weapon */
+	      {
+		tx = p_ptr->px;
+		ty = p_ptr->py;
+	      }
+	    else
+	      /* If canceled before first throw, cancel whole player move */
+	      {
+		return;
+	      }
+	  else
+	    /* No cancel */
+	    {
+	      /* Check for "target request" */
+	      if (dir == 5 && target_okay())
+		{
+		  tx = p_ptr->target_col;
+		  ty = p_ptr->target_row;
+		}
+	      else
+		{
+		  /* Predict the "target" location */
+		  ty = y + 99 * ddy[dir];
+		  tx = x + 99 * ddx[dir];
+		}
+
+	      /* If target repeated, drop weapon */
+	      if (tx == x && ty == y)
+		break;
+
+	      /* Disable auto-target for the rest of trick shots */
+	      use_old_target = FALSE;
+
+	      /* Sound */
+	      sound(MSG_SHOOT);
+	    }
 	}
 
-      /* Handle monster */
-      if (cave_m_idx[y][x] > 0)
+      /* Calculate the path */
+      path_n = project_path(path_g, tdis, y, x, &ty, &tx, 0);
+
+      /* Hack -- Handle stuff */
+      handle_stuff();
+
+      /* Save the source of the shot/throw */
+      old_y = y;
+      old_x = x;
+
+      /* Project along the path */
+      for (i = 0; i < path_n; ++i)
 	{
-	  monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
-	  monster_race *r_ptr = &r_info[m_ptr->r_idx];
+	  int msec = op_ptr->delay_factor * op_ptr->delay_factor;
 
-	  int visible = m_ptr->ml;
-	  int ranged_skill;
-	  int chance2;
+	  int ny = GRID_Y(path_g[i]);
+	  int nx = GRID_X(path_g[i]);
 
-	  bool hit_or_near_miss;
-	  bool genuine_hit;
+	  /* Hack -- Stop before hitting walls */
+	  if (!cave_project_bold(ny, nx)) 
+	    break;
 
-	  /* Ignore hidden monsters */
-	  if (m_ptr->mflag & (MFLAG_HIDE)) 
-	    continue;
+	  /* Advance */
+	  x = nx;
+	  y = ny;
 
-	  /* The second fire/throw dependent code piece */
-	  if (fire)
+	  /* Handle rope over chasm */
+	  if (k_ptr)
 	    {
-	      u32b shoot_style;
+	      /* No worry that rope removed from inventory many times */
+	      assert (!trick_throw);
 
-	      /* Some monsters are great at dodging  -EZ- */
-	      if (mon_evade(cave_m_idx[y][x], 
-			    m_ptr->cdis + (m_ptr->confused 
-					   || m_ptr->stunned ? 1 : 3),
-			    5 + m_ptr->cdis,
-			    " your shot"))
-		continue;
+	      feat = cave_feat[y][x];
 
-	      /* Check shooting styles only */
-	      shoot_style = p_ptr->cur_style & WS_LAUNCHER_FLAGS;
+	      if (f_info[feat].flags2 & FF2_CHASM) 
+		chasm = TRUE;
+	      else 
+		chasm = FALSE;
 
-	      /* Get style benefits */
-	      mon_style_benefits(m_ptr, shoot_style, 
-				 &style_hit, &style_dam, &style_crit);
-
-	      ranged_skill = p_ptr->skill_thb;
-	    }
-	  else
-	    {
-	      /* Long throws are easier to dodge than long shots */
-	      if (mon_evade(cave_m_idx[y][x], 
-			    2 * m_ptr->cdis + (m_ptr->confused 
-					       || m_ptr->stunned ? 1 : 4),
-			    5 + 2 * m_ptr->cdis,
-			    " your throw"))
-		continue;
-
-	      if (throwing)
-		mon_style_benefits(m_ptr, WS_THROWN_FLAGS, 
-				   &style_hit, &style_dam, &style_crit);
-	      else
-		style_hit = style_dam = style_crit = 0;
-
-	      ranged_skill = p_ptr->skill_tht;
-
-	      /* Badly balanced big weapons waste the throwing skill.
-		 Various junk (non-weapons) does not have to_hit, 
-		 so don't penalize a second time. */
-	      if (!throwing 
-		  && (i_ptr->tval == TV_STAFF
-		      || i_ptr->tval == TV_BOW 
-		      || i_ptr->tval == TV_DIGGING 
-		      || i_ptr->tval == TV_HAFTED 
-		      || i_ptr->tval == TV_POLEARM 
-		      || i_ptr->tval == TV_SWORD))
-		ranged_skill /= 2;
-	    }
-
-	  /* Actually "fire" the object */
-	  bonus = (p_ptr->to_h + i_ptr->to_h + bow_to_h + style_hit);
-	  chance = ranged_skill + bonus * BTH_PLUS_ADJ;
-	  chance2 = chance - distance(py, px, y, x);
-
-	  /* Test hit fire */
-	  hit_or_near_miss = test_hit_fire(chance2, 
-					   calc_monster_ac(m_ptr, FALSE), 
-					   m_ptr->ml);
-
-	  /* Genuine hit */
-	  genuine_hit = test_hit_fire(chance2, 
-				      calc_monster_ac(m_ptr, TRUE), 
-				      m_ptr->ml);
-
-	  /* Missiles bounce off resistant monsters */
-	  if (genuine_hit && mon_resist_object(cave_m_idx[y][x], i_ptr))
-	    {
-	      /* XXX Rewrite remaining path of missile */
-
-	      continue;
-	    }
-
-	  /* Did we hit it or get close? */
-	  if (hit_or_near_miss || genuine_hit)
-	    {
-	      bool fear = FALSE;
-	      bool was_asleep = (m_ptr->csleep == 0);
-
-	      /* Assume a default death */
-	      cptr note_dies = " dies.";
-
-	      /* Note the collision */
-	      hit_body = TRUE;
-
-	      /* Disturb the monster */
-	      m_ptr->csleep = 0;
-
-	      /* Mark the monster as attacked by the player */
-	      m_ptr->mflag |= MFLAG_HIT_RANGE;
-
-	      /* Some monsters get "destroyed" */
-	      if (r_ptr->flags3 & RF3_NONLIVING || r_ptr->flags2 & RF2_STUPID)
+	      feat = feat_state(feat, FS_SPIKE);
+	      
+	      if (strstr(f_name + f_info[feat].name, "rope"))
 		{
-		  /* Special note at death */
-		  note_dies = " is destroyed.";
-		}
+		  /* Hack -- remove spike */
+		  feat = feat_state(feat, FS_GET_FEAT);
 
-	      /* Apply special damage XXX XXX XXX */
-	      tdam = tot_dam_aux(i_ptr, tdam, m_ptr);
+		  /* MegaHack -- handle chain */
+		  if (k_ptr->sval == SV_ROPE_CHAIN) 
+		    feat++;
 
-	      /* The third and last piece of fire/throw dependent code */
-	      if (fire)
-		/* Apply missile critical damage */
-		tdam += critical_shot(i_ptr->weight, 
-				      bonus + style_crit * 30, 
-				      tdam);
-	      else if (throwing)
-		/* Throws (with specialized throwing weapons) hit harder */
-		tdam += critical_norm(i_ptr->weight, 
-				      bonus + style_crit * 30, 
-				      tdam);
-	      else
-		/* Throwing non-throwing items gives no criticals */
-		tdam += 0;
+		  /* Change the feature */
+		  cave_set_feat(y, x, feat);
 
-	      /* Apply launcher, missile and style bonus */
-	      tdam += i_ptr->to_d + bow_to_d + style_dam;
-
-	      /* TODO: implement multiple targetting instead;
-		 every time the weapon hits get next target;		 
-		 TODO: balance num_throw vs. num_blow */
-	      if (!fire && item == INVEN_WIELD && throwing)
-		/* Trick throw, boost the damage */
-		tdam *= p_ptr->num_blow;
-
-	      /* No negative damage */
-	      if (tdam < 0) 
-		tdam = 0;
-
-	      /* Handle unseen monster */
-	      if (!visible)
-		{
-		  /* Invisible monster */
-		  msg_format("The %s finds a mark.", o_name);
-
-		  /* Near miss? */
-		  if (!genuine_hit) 
-		    tdam = 0;
-		}
-
-	      /* Handle visible monster */
-	      else
-		{
-		  char m_name[80];
-
-		  /* Get "the monster" or "it" */
-		  monster_desc(m_name, cave_m_idx[y][x], 0);
-
-		  /* Near miss */
-		  if (!genuine_hit)
+		  /* Reduce inventory -- suppress messages */
+		  if (item2 >= 0)
 		    {
-		      /* Missile was stopped */
-		      if (r_ptr->flags2 & (RF2_ARMOR) 
-			  || m_ptr->shield) 
-			msg_format("%^s blocks the %s with a %sshield.", 
-				   m_name, 
-				   o_name, 
-				   m_ptr->shield ? "mystic " : "");
+		      if (k_ptr->number == 1)
+			{
+			  inven_drop_flags(k_ptr);
+			  k_ptr = NULL;
+			}
 
-		      /* No normal damage */
-		      tdam = 0;
+		      inven_item_increase(item2, -1);
+		      inven_item_optimize(item2);
 		    }
-		  /* Successful hit */
+
+		  /* Reduce and describe floor item */
 		  else
 		    {
-		      msg_format("The %s hits %s.", o_name, m_name);
+		      if (k_ptr->number == 1) 
+			k_ptr = NULL;
+
+		      floor_item_increase(0 - item2, -1);
+		      floor_item_optimize(0 - item2);
 		    }
-
-		  /* Hack -- Track this monster race */
-		  if (m_ptr->ml) 
-		    monster_race_track(m_ptr->r_idx);
-
-		  /* Hack -- Track this monster */
-		  if (m_ptr->ml) 
-		    health_track(cave_m_idx[y][x]);
 		}
+	    }
+	  
+	  /* Only do visuals if the player can "see" the missile */
+	  if (panel_contains(y, x) && player_can_see_bold(y, x))
+	    {
+	      /* Visual effects */
+	      print_rel(missile_char, missile_attr, y, x);
+	      move_cursor_relative(y, x);
+	      if (fresh_before) 
+		Term_fresh();
+	      Term_xtra(TERM_XTRA_DELAY, msec);
+	      lite_spot(y, x);
+	      if (fresh_before) 
+		Term_fresh();
+	    }
 
-	      /* Complex message */
-	      if (p_ptr->wizard)
+	  /* Delay anyway for consistency */
+	  else
+	    {
+	      /* Pause anyway, for consistancy */
+	      Term_xtra(TERM_XTRA_DELAY, msec);
+	    }
+
+	  /* Handle monster */
+	  if (cave_m_idx[y][x] > 0)
+	    {
+	      monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
+	      monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	      int visible = m_ptr->ml;
+	      int ranged_skill;
+	      int chance2;
+
+	      bool hit_or_near_miss;
+	      bool genuine_hit;
+	      
+	      /* Ignore hidden monsters */
+	      if (m_ptr->mflag & (MFLAG_HIDE)) 
+		continue;
+
+	      /* If the weapon returns, monster blocks it; drop near monster */
+	      if (tx == p_ptr->px && ty == p_ptr->py)
+		break;
+
+	      /* Base damage from the object */
+	      tdam = damroll(i_ptr->dd, i_ptr->ds);
+
+	      /* The second fire/throw dependent code piece */
+	      if (fire)
 		{
-		  msg_format("You do %d (out of %d) damage.",
-			     tdam, m_ptr->hp);
-		}
+		  u32b shoot_style;
 
-	      /* Hit the monster, check for death */
-	      if (mon_take_hit(cave_m_idx[y][x], tdam, &fear, note_dies))
-		{
-		  /* Dead monster */
-		}
+		  /* Boost the damage */
+		  tdam *= p_ptr->ammo_mult;
 
-	      /* No death */
+		  /* Some monsters are great at dodging  -EZ- */
+		  if (mon_evade(cave_m_idx[y][x], 
+				m_ptr->cdis + (m_ptr->confused 
+					       || m_ptr->stunned ? 1 : 3),
+				5 + m_ptr->cdis,
+				" your shot"))
+		    continue;
+
+		  /* Check shooting styles only */
+		  shoot_style = p_ptr->cur_style & WS_LAUNCHER_FLAGS;
+
+		  /* Get style benefits */
+		  mon_style_benefits(m_ptr, shoot_style, 
+				     &style_hit, &style_dam, &style_crit);
+
+		  ranged_skill = p_ptr->skill_thb;
+		}
 	      else
 		{
-		  /* Message */
-		  message_pain(cave_m_idx[y][x], tdam);
+		  /* Long throws are easier to dodge than long shots */
+		  if (mon_evade(cave_m_idx[y][x], 
+				2 * m_ptr->cdis + (m_ptr->confused 
+						   || m_ptr->stunned ? 1 : 4),
+				5 + 2 * m_ptr->cdis,
+				" your throw"))
+		    continue;
 
-		  /* Alert fellows */
-		  if (was_asleep)
+		  if (throwing)
+		    mon_style_benefits(m_ptr, WS_THROWN_FLAGS, 
+				       &style_hit, &style_dam, &style_crit);
+		  else
+		    style_hit = style_dam = style_crit = 0;
+
+		  ranged_skill = p_ptr->skill_tht;
+
+		  /* Badly balanced big weapons waste the throwing skill.
+		     Various junk (non-weapons) does not have to_hit, 
+		     so don't penalize a second time. */
+		  if (!throwing 
+		      && (i_ptr->tval == TV_STAFF
+			  || i_ptr->tval == TV_BOW 
+			  || i_ptr->tval == TV_DIGGING 
+			  || i_ptr->tval == TV_HAFTED 
+			  || i_ptr->tval == TV_POLEARM 
+			  || i_ptr->tval == TV_SWORD))
+		    ranged_skill /= 2;
+		}
+
+	      /* Actually "fire" the object */
+	      bonus = (p_ptr->to_h + i_ptr->to_h + bow_to_h + style_hit);
+	      chance = ranged_skill + bonus * BTH_PLUS_ADJ;
+	      chance2 = chance - distance(old_y, old_x, y, x);
+
+	      /* Test hit fire */
+	      hit_or_near_miss = test_hit_fire(chance2, 
+					       calc_monster_ac(m_ptr, FALSE), 
+					       m_ptr->ml);
+
+	      /* Genuine hit */
+	      genuine_hit = test_hit_fire(chance2, 
+					  calc_monster_ac(m_ptr, TRUE), 
+					  m_ptr->ml);
+
+	      /* Missiles bounce off resistant monsters */
+	      if (genuine_hit && mon_resist_object(cave_m_idx[y][x], i_ptr))
+		{
+		  /* XXX Rewrite remaining path of missile */
+
+		  continue;
+		}
+
+	      /* Did we hit it or get close? */
+	      if (hit_or_near_miss || genuine_hit)
+		{
+		  bool fear = FALSE;
+		  bool was_asleep = (m_ptr->csleep == 0);
+
+		  /* Assume a default death */
+		  cptr note_dies = " dies.";
+
+		  /* Note the collision */
+		  hit_body = TRUE;
+
+		  /* Disturb the monster */
+		  m_ptr->csleep = 0;
+
+		  /* Mark the monster as attacked by the player */
+		  m_ptr->mflag |= MFLAG_HIT_RANGE;
+
+		  /* Some monsters get "destroyed" */
+		  if (r_ptr->flags3 & RF3_NONLIVING || r_ptr->flags2 & RF2_STUPID)
 		    {
-		      m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
-
-		      /* Let allies know */
-		      tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, 
-					"& has attacked me!");
+		      /* Special note at death */
+		      note_dies = " is destroyed.";
 		    }
-		  else if (fear)
+
+		  /* Apply special damage XXX XXX XXX */
+		  tdam = tot_dam_aux(i_ptr, tdam, m_ptr);
+
+		  /* The third and last piece of fire/throw dependent code */
+		  if (fire)
+		    /* Apply missile critical damage */
+		    tdam += critical_shot(i_ptr->weight, 
+					  bonus + style_crit * 30, 
+					  tdam);
+		  else if (throwing)
+		    /* Throws (with specialized throwing weapons) hit harder */
+		    tdam += critical_norm(i_ptr->weight, 
+					  bonus + style_crit * 30, 
+					  tdam);
+		  else
+		    /* Throwing non-throwing items gives no criticals */
+		    tdam += 0;
+
+		  /* Apply launcher, missile and style bonus */
+		  tdam += i_ptr->to_d + bow_to_d + style_dam;
+		  
+		  /* No negative damage */
+		  if (tdam < 0) 
+		    tdam = 0;
+
+		  /* Handle unseen monster */
+		  if (!visible)
 		    {
-		      tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, 
-					"& has hurt me badly!");
+		      /* Invisible monster */
+		      msg_format("The %s finds a mark.", o_name);
+
+		      /* Near miss? */
+		      if (!genuine_hit) 
+			tdam = 0;
 		    }
 
-		  /* Take note */
-		  if (fear && m_ptr->ml)
+		  /* Handle visible monster */
+		  else
 		    {
 		      char m_name[80];
 
-		      /* Get the monster name (or "it") */
+		      /* Get "the monster" or "it" */
 		      monster_desc(m_name, cave_m_idx[y][x], 0);
 
-		      /* Message */
-		      message_format(MSG_FLEE, m_ptr->r_idx,
-				     "%^s flees in terror!", m_name);
+		      /* Near miss */
+		      if (!genuine_hit)
+			{
+			  /* Missile was stopped */
+			  if (r_ptr->flags2 & (RF2_ARMOR) 
+			      || m_ptr->shield) 
+			    msg_format("%^s blocks the %s with a %sshield.", 
+				       m_name, 
+				       o_name, 
+				       m_ptr->shield ? "mystic " : "");
+
+			  /* No normal damage */
+			  tdam = 0;
+			}
+		      /* Successful hit */
+		      else
+			{
+			  msg_format("The %s hits %s.", o_name, m_name);
+			}
+
+		      /* Hack -- Track this monster race */
+		      if (m_ptr->ml) 
+			monster_race_track(m_ptr->r_idx);
+
+		      /* Hack -- Track this monster */
+		      if (m_ptr->ml) 
+			health_track(cave_m_idx[y][x]);
 		    }
+
+		  /* Complex message */
+		  if (p_ptr->wizard)
+		    {
+		      msg_format("You do %d (out of %d) damage.",
+				 tdam, m_ptr->hp);
+		    }
+
+		  /* Hit the monster, check for death */
+		  if (mon_take_hit(cave_m_idx[y][x], tdam, &fear, note_dies))
+		    {
+		      /* Dead monster */
+		    }
+
+		  /* No death */
+		  else
+		    {
+		      /* Message */
+		      message_pain(cave_m_idx[y][x], tdam);
+
+		      /* Alert fellows */
+		      if (was_asleep)
+			{
+			  m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
+
+			  /* Let allies know */
+			  tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, 
+					    "& has attacked me!");
+			}
+		      else if (fear)
+			{
+			  tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, 
+					    "& has hurt me badly!");
+			}
+
+		      /* Take note */
+		      if (fear && m_ptr->ml)
+			{
+			  char m_name[80];
+
+			  /* Get the monster name (or "it") */
+			  monster_desc(m_name, cave_m_idx[y][x], 0);
+
+			  /* Message */
+			  message_format(MSG_FLEE, m_ptr->r_idx,
+					 "%^s flees in terror!", m_name);
+			}
 
 		  /* Use coating or sometimes activate item */
-		  if (coated_p(i_ptr) || auto_activate(i_ptr))
-		    {
-		      /* Make item strike */
-		      process_item_blow(i_ptr, y, x);
+		      if (coated_p(i_ptr) || auto_activate(i_ptr))
+			{
+			  /* Make item strike */
+			  process_item_blow(i_ptr, y, x);
 
-		      /* Hack -- Remove coating on original --- FIXME: explain why this is needed */
-		      if (!coated_p(i_ptr) 
-			  && o_ptr->feeling == INSCRIP_COATED) 
-			o_ptr->feeling = 0;
+			  /* Hack -- Remove coating on original --- FIXME: explain why this is needed */
+			  if (!coated_p(i_ptr) 
+			      && o_ptr->feeling == INSCRIP_COATED) 
+			    o_ptr->feeling = 0;
+			}
 		    }
+
+		  /* Check usage */
+		  object_usage(item);
+
+		  /* Stop looking */
+		  break;
 		}
-
-	      /* Check usage */
-	      object_usage(item);
-
-	      /* Stop looking */
-	      break;
 	    }
 	}
     }
 
-  /* TODO: based on AGI you catch it, it drops midway,
-     closer or father from you depending on AGI,
+  /* Reenable auto-target */
+  use_old_target = use_old_target_backup;
+
+  /* Take a turn */
+  p_ptr->energy_use = 100 / thits;
+
+  /* TODO: based on AGI you catch it or not
      or even, with really bad AGI roll, 
-     you get hit and catch it the hard way.
-     Or just treat the player as a monster and the way back to the player
-     as the additional hitting round, but instead of a succesful hit, catch,
-     insted of near_miss, drop, instead of big miss, hit the player. */
+     you get hit and catch it the hard way. */
 
   /* Chance of breakage (during attacks) */
   j = (hit_body ? breakage_chance(i_ptr) : 0);
 
-  /* Is it a successful trick shot? */
-  if (!fire && item == INVEN_WIELD && throwing
-      && hit_body) /* the last of the hit_body values represents catching */
+  /* Is a trick throw and have the weapon returned? */
+  if (trick_throw && x == p_ptr->px && y == p_ptr->py)
     /* Try to return the weapon to the player */
     {
       /* Perhaps harm the weapon */
@@ -3868,9 +3890,6 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
       else
 	/* Either intact or only mildly harmed */
 	{
-	  /* TODO: animate here the return path;
-	     if the path is obstructed, do not hit, drop instead */
-    
 	  /* Wear again the (possibly slighly harmed) weapon */
 	  object_copy(o_ptr, i_ptr);
 
@@ -3887,6 +3906,49 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   else
     /* Not a successful trick shot; just drop near the last monster */
     {
+      /* Sometimes use lower stack object --- FIXME: clarify comment, search and replace similar comments */
+      if (!object_charges_p(o_ptr) && rand_int(o_ptr->number) < o_ptr->stackc)
+	{
+	  if (i_ptr->charges) 
+	    i_ptr->charges--;
+
+	  if (i_ptr->timeout) 
+	    i_ptr->timeout = 0;
+      
+	  o_ptr->stackc--;
+	}
+
+      /* Reduce and describe inventory */
+      if (item >= 0)
+	{
+	  if (o_ptr->number == 1)
+	    {
+	      inven_drop_flags(o_ptr);
+	      if (item2 > item) 
+		item2--;
+	    }
+
+	  inven_item_increase(item, -1);
+	  inven_item_describe(item);
+	  inven_item_optimize(item);
+	}
+
+      /* Reduce and describe floor item */
+      else
+	{
+	  bool get_feat = FALSE;
+	  
+	  floor_item_increase(0 - item, -1);
+	  floor_item_optimize(0 - item);
+	  
+	  /* Get feat */
+	  if (o_ptr->ident & (IDENT_STORE)) 
+	    get_feat = TRUE;
+	  
+	  if (get_feat && scan_feat(p_ptr->py, p_ptr->px) < 0) 
+	    cave_alter_feat(p_ptr->py, p_ptr->px, FS_GET_FEAT);
+	}
+
       /* Forget information on dropped object --- FIXME: say why it is needed */
       drop_may_flags(i_ptr);
       
@@ -3923,9 +3985,6 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
  */
 void do_cmd_fire(void)
 {
-  int py = p_ptr->py;
-  int px = p_ptr->px;
-
   int item;
 
   object_type *o_ptr;
@@ -3940,7 +3999,8 @@ void do_cmd_fire(void)
     }
 
   /* Some items and some rooms blow missiles around */
-  if (p_ptr->cur_flags4 & (TR4_WINDY) || room_has_flag(py, px, ROOM_WINDY))
+  if (p_ptr->cur_flags4 & (TR4_WINDY) 
+      || room_has_flag(p_ptr->py, p_ptr->px, ROOM_WINDY))
     {
       msg_print("Its too windy around you!");
       return;
@@ -3988,7 +4048,7 @@ void do_cmd_fire(void)
     }
 
   /* Check for launcher */
-  if (p_ptr->ammo_tval)
+  if (p_ptr->num_fire)
     /* Launcher wielded, so fire */
     do_cmd_fire_or_throw_selected(o_ptr, item, TRUE);
   else 
@@ -4003,9 +4063,6 @@ void do_cmd_fire(void)
  */
 void do_cmd_throw(void)
 {
-  int py = p_ptr->py;
-  int px = p_ptr->px;
-
   int item;
 
   object_type *o_ptr;
@@ -4020,7 +4077,8 @@ void do_cmd_throw(void)
     }
 
   /* Some items and some rooms blow missiles around */
-  if (p_ptr->cur_flags4 & (TR4_WINDY) || room_has_flag(py, px, ROOM_WINDY))
+  if (p_ptr->cur_flags4 & (TR4_WINDY) 
+      || room_has_flag(p_ptr->py, p_ptr->px, ROOM_WINDY))
     {
       msg_print("Its too windy around you!");
       return;

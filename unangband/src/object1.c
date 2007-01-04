@@ -3705,8 +3705,10 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 			p_ptr->command_wrk = (USE_EQUIP);
 		}
 
-		/* Hack -- Start on equipment if shooting or fueling */
-		if ((p_ptr->command_cmd == 'f' || p_ptr->command_cmd == 'F')
+		/* Hack -- Start on equipment if shooting, throwing or fueling */
+		if ((p_ptr->command_cmd == 'f' 
+		     || p_ptr->command_cmd == 'v' 
+		     || p_ptr->command_cmd == 'F')
 			&& allow_equip)
 		{
 			p_ptr->command_wrk = (USE_EQUIP);
