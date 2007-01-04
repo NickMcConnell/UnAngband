@@ -964,7 +964,7 @@
 #define FEAT_LESS		0x06
 #define FEAT_MORE		0x07
 
-* Shops */
+/* Shops */
 #define FEAT_HOME               0x0F
 
 /* Doors */

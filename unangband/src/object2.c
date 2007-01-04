@@ -5774,6 +5774,37 @@ bool break_near(object_type *j_ptr, int y, int x)
 
 	bool obvious = FALSE;
 
+	/* These loose bonuses before breaking */
+	switch (j_ptr->tval)
+	  {
+	  case TV_HAFTED: 
+	  case TV_POLEARM:
+	  case TV_SWORD:
+	  case TV_STAFF:  
+	  case TV_DIGGING:
+	    {
+	      /* Artifacts have 60% chance to resist disenchantment */
+	      if (artifact_p(j_ptr) && (rand_int(100) < 60))
+		{
+		  return (FALSE);
+		}
+	      else if (j_ptr->to_h > 0 && j_ptr->to_h >= j_ptr->to_d)
+		{
+		  j_ptr->to_h--;
+		  return (FALSE);
+		}
+	      else if (j_ptr->to_d > 0)
+		{
+		  j_ptr->to_d--;
+		  return (FALSE);
+		}
+	    }
+	  }
+
+	/* Artifacts do not break */
+	if (artifact_p(j_ptr))
+	  return (FALSE);
+
 	/* Extract plural */
 	if (j_ptr->number != 1) plural = TRUE;
 
@@ -5854,7 +5885,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 					flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
 					/* Hit with radius 1 attack */
-					obvious |= project(-1, rad, y, x, y, x, damroll(d_side, d_dice) * j_ptr->number,
+					obvious |= project(-1, rad, y, x, y, x, damage * j_ptr->number,
 						 effect, flg, 0, 0);
 				}
 
@@ -5974,10 +6005,11 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 	object_desc(o_name, sizeof(o_name), j_ptr, FALSE, 0);   
 
 	/* Handle normal "breakage" */
-	if (!artifact_p(j_ptr) && (rand_int(100) < chance))
-	{
-		if (break_near(j_ptr, y, x)) return;
-	}
+	if (rand_int(100) < chance)
+	  {
+	    if (break_near(j_ptr, y, x)) 
+	      return;
+	  }
 
 
 	/* Score */
@@ -8250,7 +8282,7 @@ s16b spell_level(int spell)
 
 	spell_type *s_ptr;
 
-	spell_cast *sc_ptr;
+	spell_cast *sc_ptr = NULL;
 
 	bool legible = FALSE;
 	bool fix_level = FALSE;
@@ -8263,18 +8295,16 @@ s16b spell_level(int spell)
 	/* Get the spell */
 	s_ptr = &s_info[spell];
 
-	/* Get the spell cost */
-	sc_ptr=&(s_ptr->cast[0]);
-
-	/* Get casting information */
-	for (i=0;i<MAX_SPELL_CASTERS;i++)
-	{
-		if (s_ptr->cast[i].class == p_ptr->pclass)
+	/* Get our casting information; warriors (class 0) have no spells */
+	if (p_ptr->pclass)
+	  for (i = 0;i < MAX_SPELL_CASTERS; i++)
+	    {
+	      if (s_ptr->cast[i].class == p_ptr->pclass)
 		{
-			legible = TRUE;
-			sc_ptr=&(s_ptr->cast[i]);
+		  legible = TRUE;
+		  sc_ptr=&(s_ptr->cast[i]);
 		}
-	}
+	    }
 
 	/* Hack -- get casting information for specialists */
 	if (!legible)
@@ -8287,6 +8317,9 @@ s16b spell_level(int spell)
 			&& (s_info[spell].appears[i].sval == p_ptr->psval))
 			{
 				legible = TRUE;
+				/* Get the first spell caster's casting info */
+				sc_ptr=&(s_ptr->cast[0]);
+				/* And remember to fix it later */
 				fix_level = TRUE;
 			}
 		}
@@ -8479,13 +8512,20 @@ s16b spell_power(int spell)
 				}
 				break;
 			}
-			default:
+			case WS_RING:
+			case WS_AMULET:
 			{
-				/* FIXME: WS_RING, etc. are not always properly set 
-				 * in cur_style when calling this function, e.g. for info. */ 
+			  /* TODO: check if the spell appear in the ring */
 				if ( w_info[i].styles & p_ptr->cur_style 
 					 & (1L << p_ptr->pstyle) ) 
 					plev += 10;
+				break;
+			}
+
+			default:
+			{
+			  /* TODO: check if the spell appear in the scroll */
+				plev += 10;
 				break;
 			}
 		}
@@ -8505,7 +8545,7 @@ s16b spell_chance(int spell)
 
 	spell_type *s_ptr;
 
-	spell_cast *sc_ptr;
+	spell_cast *sc_ptr = NULL;
 
 	bool legible = FALSE;
 
@@ -8519,18 +8559,16 @@ s16b spell_chance(int spell)
 	/* Get the spell */
 	s_ptr = &s_info[spell];
 
-	/* Get the spell cost */
-	sc_ptr=&(s_ptr->cast[0]);
-
-	/* Get casting information */
-	for (i=0;i<MAX_SPELL_CASTERS;i++)
-	{
-		if (s_ptr->cast[i].class == p_ptr->pclass)
+	/* Get our casting information; warriors (class 0) have no spells */
+	if (p_ptr->pclass)
+	  for (i = 0; i < MAX_SPELL_CASTERS; i++)
+	    {
+	      if (s_ptr->cast[i].class == p_ptr->pclass)
 		{
-			legible = TRUE;
-			sc_ptr=&(s_ptr->cast[i]);
+		  legible = TRUE;
+		  sc_ptr=&(s_ptr->cast[i]);
 		}
-	}
+	    }
 
 	/* Hack -- get casting information for specialists */
 	if (!legible)
@@ -8543,6 +8581,9 @@ s16b spell_chance(int spell)
 			 &&  (s_info[spell].appears[i].sval == p_ptr->psval))
 			{
 				legible = TRUE;
+				/* Get the first spell caster's casting info */
+				sc_ptr=&(s_ptr->cast[0]);
+				/* And remember to fix it later */
 			}
 		}
 	}
@@ -8556,7 +8597,7 @@ s16b spell_chance(int spell)
 	/* Reduce failure rate by "effective" level adjustment */
 	chance -= 3 * (p_ptr->lev - spell_level(spell));
 
-	/* Reduce failure rate by INT/WIS adjustment */
+	/* Reduce failure rate by the fail-stat adjustment */
 	chance -= 3 * (adj_mag_fail_rate[p_ptr->stat_ind[c_info[p_ptr->pclass].spell_stat_fail]] - 1);
 
 	/* Not enough mana to cast */
@@ -8605,8 +8646,6 @@ bool spell_okay(int spell, bool known)
 {
 	spell_type *s_ptr;
 
-	spell_cast *sc_ptr;
-
 	int i;
 
 	bool legible =FALSE;
@@ -8614,18 +8653,15 @@ bool spell_okay(int spell, bool known)
 	/* Get the spell */
 	s_ptr = &s_info[spell];
 
-	/* Get the spell cost */
-	sc_ptr=&(s_ptr->cast[0]);
-
-	/* Get casting information */
-	for (i=0;i<MAX_SPELL_CASTERS;i++)
-	{
-		if (s_ptr->cast[i].class == p_ptr->pclass)
+	/* Get our casting information; warriors (class 0) have no spells */
+	if (p_ptr->pclass)
+	  for (i = 0; i < MAX_SPELL_CASTERS; i++)
+	    {
+	      if (s_ptr->cast[i].class == p_ptr->pclass)
 		{
-			legible = TRUE;
-			sc_ptr=&(s_ptr->cast[i]);
+		  legible = TRUE;
 		}
-	}
+	    }
 
 	/* Hack -- get casting information for specialists */
 	if (!legible)
@@ -9143,17 +9179,32 @@ int reorder_quiver(int slot)
 	return (slot);
 }
 
+
 /*
- * Returns TRUE if an object is a throwing weapon and can be put in the quiver
+ * Returns TRUE if an object is a throwing item
  */
-bool is_throwing_weapon(const object_type *o_ptr)
+bool is_throwing_item(const object_type *o_ptr)
 {
-	u32b f1, f2, f3, f4;
+  u32b f1, f2, f3, f4;
 
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+  object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
-	return ((f3 & (TR3_THROWING)) ? TRUE: FALSE);
+  return (f3 & TR3_THROWING ? TRUE : FALSE);
 }
+
+
+/*
+ * Returns TRUE if an object is a known throwing item
+ */
+bool is_known_throwing_item(const object_type *o_ptr)
+{
+  u32b f1, f2, f3, f4;
+
+  object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
+
+  return (f3 & TR3_THROWING ? TRUE : FALSE);
+}
+
 
 /*
  * Returns the number of quiver units an object will consume when it's stored in the quiver.
