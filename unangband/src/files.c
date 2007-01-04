@@ -3035,6 +3035,8 @@ static void display_home_equipment_info(int mode)
 		{
 			/* Assume uppercase stat name */
 			c_put_str(TERM_WHITE, stat_names[stats], row+stats, 2);
+			if (stats == A_DEX) 
+			  c_put_str(TERM_WHITE, stat_names[A_AGI], row+A_AGI, 2);
 
 			/* Default */
 			a = TERM_SLATE;
