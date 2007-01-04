@@ -180,7 +180,6 @@
  */
 #define MAX_STORES	8
 
-
 /*
  * Total number of items in home (see "store.c", etc)
  */
@@ -189,16 +188,11 @@
 
 /*
  * Store index definitions (see "store.c", etc)
- *
- * Note that STORE_HOME has a completely different meaning
- * and index now.
  */
+
 #define STORE_HOME		0
-#define STORE_STORAGE		1
-#define STORE_QUEST_REWARD	2
-
-#define STORE_MIN_BUY_SELL	3
-
+#define STORE_STORAGE           1
+#define STORE_QUEST_REWARD      2
 #define STORE_GENERAL		3
 #define STORE_ARMOR		4
 #define STORE_WEAPON		5
@@ -207,6 +201,7 @@
 #define STORE_MAGIC		8
 #define STORE_B_MARKET		9
 
+#define STORE_MIN_BUY_SELL      3
 
 /*
  * Maximum number of player "sex" types (see "table.c", etc)
@@ -627,6 +622,24 @@
 #define SEX_FEMALE		0
 #define SEX_MALE		1
 
+/*
+ * Player race constants (hard-coded by save-files, arrays, etc)
+ */
+#define RACE_HUMAN        0
+#define RACE_HALF_ELF     1
+#define RACE_WOOD_ELF     2
+#define RACE_HOBBIT       3
+#define RACE_GNOME        4
+#define RACE_DWARF        5
+#define RACE_HALF_ORC     6
+#define RACE_HALF_TROLL   7
+#define RACE_DUNADAN      8
+#define RACE_HIGH_ELF     9
+#define RACE_GOBLIN       10
+
+#define MAX_RACES        10
+
+
 
 /*** Screen Locations ***/
 
@@ -952,10 +965,16 @@
 #define FEAT_MORE		0x07
 
 /* Shops */
-#define FEAT_HOME		0x0F
+#define FEAT_SHOP_HEAD	0x08
+#define FEAT_SHOP_TAIL	0x0F
+
+/* Traps */
+#define FEAT_TRAP_HEAD	0x10
+#define FEAT_TRAP_TAIL	0x1F
 
 /* Doors */
-#define	FEAT_DOOR_CLOSED	0x20
+#define FEAT_DOOR_HEAD	0x20
+#define FEAT_DOOR_TAIL	0x2F
 
 /* Extra */
 #define FEAT_SECRET		0x30
@@ -1849,6 +1868,7 @@
 #define SV_MATTOCK			7
 
 /* The "sval" values for TV_HAFTED */
+#define SV_THROWING_HAMMER    	        1	/* 2d4 */
 #define SV_WHIP					2	/* 1d4 */
 #define SV_QUARTERSTAFF			3	/* 1d9 */
 #define SV_BATON				4	/* 1d5 */
@@ -1885,7 +1905,7 @@
 #define SV_SCYTHE_OF_SLICING	30	/* 8d4 */
 
 /* The "sval" codes for TV_SWORD */
-#define SV_BROKEN_DAGGER		1	/* 1d1 */
+#define SV_BROKEN_DAGGER		3	/* 1d1 */
 #define SV_BROKEN_SWORD			2	/* 1d2 */
 #define SV_DAGGER				4	/* 1d4 */
 #define SV_MAIN_GAUCHE			5	/* 1d5 */
@@ -1911,6 +1931,7 @@
 #define SV_LARGE_METAL_SHIELD		5
 #define SV_SHIELD_OF_DEFLECTION		10
 
+/* These are correct */
 /* The "sval" codes for TV_HELM */
 #define SV_HARD_LEATHER_CAP		2
 #define SV_METAL_CAP			3
@@ -1982,6 +2003,7 @@
 #define SV_DRAGON_BALANCE	20
 #define SV_DRAGON_POWER		30
 
+/* These are correct */
 /* The sval codes for TV_LITE */
 #define SV_LITE_TORCH		0
 #define SV_LITE_LANTERN		1
@@ -2016,7 +2038,7 @@
 #define SV_AMULET_RESIST_LIGHTNING  22
 #define SV_AMULET_SERPENTS      23
 
-
+/* These may be incorrect */
 /* The sval codes for TV_RING */
 #define SV_RING_WOE				0
 #define SV_RING_AGGRAVATION		1
@@ -2272,16 +2294,18 @@
 #define SV_POTION_SELF_KNOWLEDGE		58
 #define SV_POTION_EXPERIENCE			59
 
+/* These are correct */
 /* The "sval" codes for TV_FLASK */
 #define SV_FLASK_OIL      0
-#define SV_FLASK_EMPTY    1
 #define SV_FLASK_ACID     2
 #define SV_FLASK_BLOOD	  3
-#define SV_FLASK_SLIME	  3
+#define SV_FLASK_SLIME	  4
 #define SV_FLASK_BILE	  5
 #define SV_FLASK_WEB	  15
+#define SV_FLASK_EMPTY    2
 
 
+/* These may be incorrect */
 /* The "sval" codes for TV_FOOD */
 #define SV_FOOD_POISON			0
 #define SV_FOOD_BLINDNESS		1
@@ -2303,16 +2327,19 @@
 #define SV_FOOD_RESTORE_STR		17
 #define SV_FOOD_RESTORE_CON		18
 #define SV_FOOD_RESTORING		19
-#define SV_FOOD_MANA      		20
+#define SV_FOOD_MANA                    20
 /* many missing mushrooms */
+
+/* These are correct */
 #define SV_FOOD_BISCUIT			32
 #define SV_FOOD_JERKY			33
 #define SV_FOOD_RATION			35
 #define SV_FOOD_SLIME_MOLD		36
 #define SV_FOOD_WAYBREAD		37
-#define SV_FOOD_PINT_OF_ALE		38
-#define SV_FOOD_PINT_OF_WINE	39
-#define SV_FOOD_PINT_OF_SPIRITS	42
+#define SV_FOOD_APPLE 		        39
+#define SV_FOOD_PINT_OF_ALE		40
+#define SV_FOOD_PINT_OF_WINE	        41
+#define SV_FOOD_PINT_OF_SPIRITS	        42
 
 
 /*
