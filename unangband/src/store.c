@@ -3935,8 +3935,6 @@ int store_init(int feat)
 	/* Stock items */
 	if (st_ptr->base > STORE_HOME)
 	{
-
-
 		/* Create some new items */
 		while (st_ptr->stock_num < (st_ptr->base == STORE_QUEST_REWARD ? 4 : 8)) store_create(store_index);
 	}
