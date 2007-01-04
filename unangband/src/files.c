@@ -1717,10 +1717,10 @@ static void display_player_xtra_info(void)
 		Term_putstr(col, 11, -1, TERM_WHITE, "1Hand");
 	else if (p_ptr->pstyle == WS_TWO_HANDED
 			 && p_ptr->cur_style & (1L << WS_TWO_HANDED))
-		Term_putstr(col, 11, -1, TERM_WHITE, "2Hand");
+		Term_putstr(col, 11, -1, TERM_WHITE, "BothH");
 	else if (p_ptr->cur_style & (1L << WS_TWO_WEAPON)) 
 	{
-		Term_putstr(col, 11, -1, TERM_WHITE, "Dual");
+		Term_putstr(col, 11, -1, TERM_WHITE, "2Weap");
 
 		/* Off-hand melee weapon */
 		assert (inventory[INVEN_ARM].k_idx);
@@ -1764,8 +1764,8 @@ static void display_player_xtra_info(void)
 		strnfmt(buf, sizeof(buf), "[%d,%+d]", base, plus);
 		Term_putstr(col+5, 12, -1, TERM_L_BLUE, format("%12s", buf));
 	}
-	else Term_putstr(col, 11, -1, TERM_WHITE, "Wield");
-
+	else plog_fmt("Illegal melee style in display_player_xtra_info: %d",
+				  p_ptr->cur_style);
 
 	/* Off-hand */
 	if (inventory[INVEN_ARM].k_idx)
@@ -1869,9 +1869,7 @@ static void display_player_xtra_info(void)
 	Term_putstr(col+5, 16, -1, TERM_L_BLUE, format("%12s", buf));
 
 	/* Throws */
-	strnfmt(buf, sizeof(buf), "%d/turn(x%d)", p_ptr->num_throw, 
-		is_known_throwing_item(&inventory[INVEN_WIELD]) 
-		? p_ptr->num_blow : 1);
+	strnfmt(buf, sizeof(buf), "%d/turn(x%d)", p_ptr->num_throw, 2);
 	Term_putstr(col, 17, -1, TERM_WHITE, "Hurls");
 	Term_putstr(col+5, 17, -1, TERM_L_BLUE, format("%12s", buf));
 
@@ -2015,7 +2013,7 @@ static void display_home_equippy(int y, int x)
 
 	object_type *o_ptr;
 
-	store_type *st_ptr = &store[STORE_HOME];
+	store_type *st_ptr = store[STORE_HOME];
 
 	/* Dump equippy chars */
 	for (i = 0; i < MAX_INVENTORY_HOME	; ++i)
@@ -3001,7 +2999,7 @@ static void display_home_equipment_info(int mode)
 	byte a;
 	char c;
 
-	store_type *st_ptr = &store[STORE_HOME];
+	store_type *st_ptr = store[STORE_HOME];
 
 	/* Row */
 	row = 2;
@@ -3035,8 +3033,9 @@ static void display_home_equipment_info(int mode)
 		{
 			/* Assume uppercase stat name */
 			c_put_str(TERM_WHITE, stat_names[stats], row+stats, 2);
-			if (stats == A_DEX) 
-			  c_put_str(TERM_WHITE, stat_names[A_AGI], row+A_AGI, 2);
+
+			if (stats == A_DEX)
+			c_put_str(TERM_WHITE, stat_names[A_AGI], row+A_AGI, 2);
 
 			/* Default */
 			a = TERM_SLATE;
@@ -3453,7 +3452,7 @@ static void dump_home_plus_minus(FILE *fff)
 	u32b f1, f2, f3, f4;
 
 	object_type *o_ptr;
-	store_type *st_ptr = &store[STORE_HOME];
+	store_type *st_ptr = store[STORE_HOME];
 
 	/* Print it out */
 	for (i = 0; i < MAX_INVENTORY_HOME; ++i)
@@ -3505,7 +3504,7 @@ static void dump_home_stat_info(FILE *fff)
 	int i, stats;
 
 	object_type *o_ptr;
-	store_type *st_ptr = &store[STORE_HOME];
+	store_type *st_ptr = store[STORE_HOME];
 	u32b f1, f2, f3, f4;
 	u32b ignore_f2, ignore_f3, ignore_f4;
 
@@ -3642,7 +3641,7 @@ errr file_character(cptr name, bool full)
 
 	FILE *fff = NULL;
 
-	store_type *st_ptr = &store[STORE_HOME];
+	store_type *st_ptr = store[STORE_HOME];
 
 	char o_name[80];
 
@@ -5071,7 +5070,7 @@ static void death_knowledge(void)
 
 	object_type *o_ptr;
 
-	store_type *st_ptr = &store[STORE_HOME];
+	store_type *st_ptr = store[STORE_HOME];
 
 	/* Hack -- Know everything in the inven/equip */
 	for (i = 0; i < INVEN_TOTAL; i++)
@@ -5122,7 +5121,7 @@ static void show_info(void)
 
 	object_type *o_ptr;
 
-	store_type *st_ptr = &store[STORE_HOME];
+	store_type *st_ptr = store[STORE_HOME];
 
 
 	/* Display player */

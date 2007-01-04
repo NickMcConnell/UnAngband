@@ -680,12 +680,29 @@ static void rd_lore(int r_idx)
  */
 static errr rd_store(int n)
 {
-	store_type *st_ptr = &store[n];
-
+	store_type *st_ptr;
 	int j;
 
 	byte own, num;
 
+	/* Make a new store */
+	C_MAKE(st_ptr, 1, store_type);
+
+	/* Copy basic information for older versions */
+	if (older_than(0, 6, 2))
+	{
+		/* Copy basic store information to it */
+		COPY(st_ptr, &u_info[f_info[t_info[p_ptr->town].store[n]].power], store_type);
+	}
+
+	/* Assume full stock */
+	st_ptr->stock_size = STORE_INVEN_MAX;
+
+	/* Allocate the stock */
+	C_MAKE(st_ptr->stock, st_ptr->stock_size, object_type);
+
+	/* Add it to the list of stores */
+	store[total_store_count++] = st_ptr;
 
 	/* Read the basic info */
 	rd_s32b(&st_ptr->store_open);
@@ -2262,16 +2279,48 @@ static errr rd_savefile_new_aux(void)
 
 			/* Set the max_depth */
 			t_info[i].max_depth = tmp8u;
+
+			/* Read the store indexes */
+			if (!older_than(0, 6, 2) && !p_ptr->is_dead)
+			{
+				/* Load the number of stores */
+				rd_byte(&tmp8u);
+#if 0
+				for (j = 0; j < tmp8u; j++)
+				{
+					/* Load the store index */
+					rd_u16b(&tmp16u);
+
+					t_info[i].store_index[j] = tmp16u;
+				}
+#endif
+			}
 		}
 	}
 
-	/* Read the stores */
-	rd_u16b(&tmp16u);
-	for (i = 0; i < tmp16u; i++)
+	/* Don't read stores anymore if dead */
+	if (!p_ptr->is_dead || older_than(0, 6, 2))
 	{
-		if (rd_store(i)) return (-1);
-	}
+		/* Read the stores */
+		rd_u16b(&tmp16u);
 
+		/* Hack -- for older versions */
+		if (older_than(0, 6, 2)) total_store_count++;
+
+		for (i = 0; i < tmp16u; i++)
+		{
+			if (rd_store(i)) return (-1);
+		}
+
+		/* Hack -- for older versions */
+		if (older_than(0, 6, 2))
+		{
+			store[STORE_HOME] = store[7];
+
+			/* Paranoia */
+			if (tmp16u == 8) total_store_count--;
+		}
+	}
 
 	/* I'm not dead yet... */
 	if (!p_ptr->is_dead)
@@ -2286,6 +2335,12 @@ static errr rd_savefile_new_aux(void)
 
 		/* Read the ghost info */
 		rd_ghost();
+	}
+
+	/* Get the stores */
+	if (older_than(0, 6, 2))
+	{
+
 	}
 
 

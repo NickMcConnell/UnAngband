@@ -104,6 +104,7 @@ typedef struct quest_event quest_event;
 typedef struct quest_type quest_type;
 typedef struct owner_type owner_type;
 typedef struct store_type store_type;
+typedef store_type *store_type_ptr;
 typedef struct player_magic player_magic;
 typedef struct player_sex player_sex;
 typedef struct player_race player_race;
@@ -207,6 +208,8 @@ struct town_type
 	byte r_flag;    /* Add races with this flag */
 
 	u16b store[MAX_STORES];
+	u16b store_index[MAX_STORES];
+
 	dungeon_zone zone[MAX_DUNGEON_ZONES];
 
 	byte max_depth;
@@ -1001,18 +1004,20 @@ struct owner_type
  */
 struct store_type
 {
-	u32b name;     /* Name (offset) */
+	u32b name;    	/* Name (offset) */
 
-	byte owner;     /* Owner index */
-	byte extra;     /* Unused for now */
+	byte owner;    	/* Owner index */
+	byte base;     	/* Store basic type */
+	byte level;	/* Store generation level */
+	byte unused;	/* Unused at moment */
 
-	s16b insult_cur;/* Insult counter */
+	s16b insult_cur; /* Insult counter */
 
 	s16b good_buy;  /* Number of "good" buys */
 	s16b bad_buy;   /* Number of "bad" buys */
 
 	s32b store_open;/* Closed until this turn */
-	s32b store_wary;/* Unused */
+	s16b store_wary;/* Unused */
 
 	byte tval[STORE_CHOICES];
 	byte sval[STORE_CHOICES];
@@ -1576,8 +1581,8 @@ struct player_type
 
 	s16b vulnerability;     /* How vulnerable? */
 
-        s32b player_turn;         /* Number of player turns (including resting) */
-        s32b resting_turn;        /* Number of player turns spent resting */
+	s32b player_turn;         /* Number of player turns (including resting) */
+	s32b resting_turn;        /* Number of player turns spent resting */
 
 	byte outside;	/* Player is outside? */
 	bool cursed_quiver;	/* The quiver is cursed */

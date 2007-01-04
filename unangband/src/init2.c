@@ -1400,6 +1400,7 @@ static errr init_other(void)
 {
 	int i, n;
 
+	int total_store_size = 0;
 
 	/*** Prepare the various "bizarre" arrays ***/
 
@@ -1513,30 +1514,25 @@ static errr init_other(void)
 
 	/*** Prepare the dungeons ***/
 
-	/* Initialize maximum depth */
+	/* Initialize maximum depth and count stores */
 	for (i = 0; i < z_info->t_max; i++)
+	{
 		t_info[i].max_depth = 0;
+
+		for (n = 0; n < MAX_STORES; n++)
+		{
+			if (t_info[i].store[n]) total_store_size++;
+		}
+	}
 
 
 	/*** Prepare the stores ***/
 
-	/* Allocate the stores */
-	C_MAKE(store, MAX_STORES, store_type);
+	/* Set zero stores initially. Stores get initialized at load time or when first entering a store. */
+	total_store_count = 0;
 
-	/* Fill in each store */
-	for (i = 0; i < MAX_STORES; i++)
-	{
-		/* Get the store */
-		store_type *st_ptr = &store[i];
-
-		/* Assume full stock */
-		st_ptr->stock_size = STORE_INVEN_MAX;
-
-		/* Allocate the stock */
-		C_MAKE(st_ptr->stock, st_ptr->stock_size, object_type);
-
-	}
-
+	/*** Allocate space for the maximum number of stores */
+	C_MAKE(store, total_store_size, store_type_ptr);
 
 	/*** Prepare the options ***/
 
@@ -2244,18 +2240,18 @@ void cleanup_angband(void)
 	if (store)
 	{
 		/* Free the store inventories */
-		for (i = 0; i < MAX_STORES; i++)
+		for (i = 0; i < total_store_count; i++)
 		{
 			/* Get the store */
-			store_type *st_ptr = &store[i];
+			store_type *st_ptr = store[i];
 
 			/* Free the store inventory */
 			FREE(st_ptr->stock);
+
+			/* Free the store */
+			FREE(st_ptr);
 		}
 	}
-
-	/* Free the stores */
-	FREE(store);
 
 	/* Free the player inventory */
 	FREE(inventory);

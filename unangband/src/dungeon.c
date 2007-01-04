@@ -19,7 +19,6 @@
 
 /*
  * Return a "feeling" (or NULL) about an item.  Method 1 (Heavy).
- * TODO: a lot of code is here duplicated with value_check_aux3 in spells2.c
  */
 int value_check_aux1(const object_type *o_ptr)
 {
@@ -59,7 +58,7 @@ int value_check_aux1(const object_type *o_ptr)
 	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_EXCELLENT);
 
 	/* Great "armor" bonus */
-	if (o_ptr->to_a > 9) return (INSCRIP_GREAT);
+	if (o_ptr->to_a > 8) return (INSCRIP_GREAT);
 
 	/* Great "weapon" bonus */
 	if (o_ptr->to_h + o_ptr->to_d > 14) return (INSCRIP_GREAT);
@@ -71,7 +70,7 @@ int value_check_aux1(const object_type *o_ptr)
 	if (o_ptr->ds > k_info[o_ptr->k_idx].ds) return (INSCRIP_GREAT);
 
 	/* Very good "armor" bonus */
-	if (o_ptr->to_a > 5) return (INSCRIP_VERY_GOOD);
+	if (o_ptr->to_a > 4) return (INSCRIP_VERY_GOOD);
 
 	/* Good "weapon" bonus */
 	if (o_ptr->to_h + o_ptr->to_d > 7) return (INSCRIP_VERY_GOOD);
@@ -526,8 +525,8 @@ static void process_world(void)
 			/* Message */
 			if (cheat_xtra) msg_print("Updating Shops...");
 
-			/* Maintain each shop (except home) */
-			for (n = 0; n < MAX_STORES; n++)
+			/* Maintain each shop (except home, special locations) */
+			for (n = 0; n < total_store_count; n++)
 			{
 				/* Maintain */
 				store_maint(n);
@@ -542,7 +541,7 @@ static void process_world(void)
 				/* Pick a random shop (except home) */
 				while (1)
 				{
-					n = rand_int(MAX_STORES);
+					n = rand_int(total_store_count);
 					if (n != STORE_HOME) break;
 				}
 

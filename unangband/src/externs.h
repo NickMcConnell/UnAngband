@@ -227,7 +227,8 @@ extern object_info *a_list;
 extern object_lore *e_list;
 extern object_info *x_list;
 extern quest_type *q_list;
-extern store_type *store;
+extern s16b total_store_count;
+extern store_type_ptr *store;
 extern object_type *inventory;
 extern s16b bag_contents[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL];
 extern s16b alloc_kind_size;
@@ -852,9 +853,9 @@ extern bool process_item_blow(object_type *o_ptr, int y, int x);
 
 /* store.c */
 extern void do_cmd_store(void);
-extern void store_shuffle(int which);
-extern void store_maint(int which);
-extern void store_init(int which);
+extern void store_shuffle(int store_index);
+extern void store_maint(int store_index);
+extern int store_init(int feat);
 
 /* util.c */
 extern errr path_parse(char *buf, int max, cptr file);

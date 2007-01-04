@@ -119,6 +119,10 @@ code from Sangband (modified somewhat).
 
 - Changed to NPP-style lakes and rivers.
 
+- Removed hack that prevented more than 1 town worth of stores being kept in memory. All the
+stores you have visited will now keep their inventory between visits, being maintained and
+shuffled normally.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.

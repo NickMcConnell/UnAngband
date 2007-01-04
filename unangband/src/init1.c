@@ -5671,6 +5671,17 @@ errr parse_u_info(char *buf, header *head)
 		cur_t = 0;
 	}
 
+	/* Process 'X' for "Extra" */
+	else if (buf[0] == 'X')
+	{
+		int base;
+
+		/* Scan for the values */
+		if (1 != sscanf(buf+2, "%d", &base)) return (PARSE_ERROR_GENERIC);
+
+		u_ptr->base = base;
+	}
+
 	/* Process 'O' for "Offered" (up to thirty two lines) */
 	else if (buf[0] == 'O')
 	{

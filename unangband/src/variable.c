@@ -675,10 +675,17 @@ object_info *x_list;
 quest_type *q_list;
 
 
+
 /*
- * Array[MAX_STORES] of stores
+ * The size of "store" (at most z_info->t_max * MAX_STORES)
  */
-store_type *store;
+s16b total_store_count;
+
+
+/*
+ * Array[total_store_count] of pointers to stores
+ */
+store_type_ptr *store;
 
 /*
  * Array[INVEN_TOTAL] of objects in the player's inventory

@@ -1273,18 +1273,31 @@ static bool wr_savefile_new(void)
 	for (i = 0; i < z_info->t_max; i++)
 	{
 		wr_byte(t_info[i].max_depth);
-	} 
 
-	/* Note the stores */
-	tmp16u = MAX_STORES;
-	wr_u16b(tmp16u);
+		/* Write the store indexes if alive */
+		if (!p_ptr->is_dead)
+		{
+			wr_byte(MAX_STORES);
+#if 0
+			/* Write the actual store indexes */
+			for (j = 0; j < MAX_STORES; j++)
+			{
+				wr_u16b((u16b)t_info[i].store_index[j]);
+			}
+#endif
+		}
+	}
 
-	/* Dump the stores */
-	for (i = 0; i < tmp16u; i++) wr_store(&store[i]);
-
-	/* Player is not dead, write the dungeon */
+	/* Player is not dead, write the stores and the dungeon */
 	if (!p_ptr->is_dead)
 	{
+		/* Note the stores */
+		tmp16u = total_store_count;
+		wr_u16b(tmp16u);
+
+		/* Dump the stores */
+		for (i = 0; i < tmp16u; i++) wr_store(store[i]);
+
 		/* Dump the dungeon */
 		wr_dungeon();
 

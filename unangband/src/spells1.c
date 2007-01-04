@@ -3199,7 +3199,7 @@ bool project_f(int who, int y, int x, int dam, int typ)
 			if (cave_feat[y][x] == FEAT_SECRET)
 			{
 				/* Create closed door */
-				cave_set_feat(y, x, FEAT_DOOR_HEAD + 0x00);
+				cave_set_feat(y, x, FEAT_DOOR_CLOSED);
 
 				/* Check line of sight */
 				if (player_has_los_bold(y, x))
@@ -3356,7 +3356,7 @@ bool project_f(int who, int y, int x, int dam, int typ)
 			if (!cave_naked_bold(y, x)) break;
 
 			/* Create closed door */
-			cave_set_feat(y, x, FEAT_DOOR_HEAD + 0x00);
+			cave_set_feat(y, x, FEAT_DOOR_CLOSED);
 
 			/* Observe */
 			if (play_info[y][x] & (PLAY_MARK)) obvious = TRUE;
