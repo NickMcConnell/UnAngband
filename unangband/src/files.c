@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright (c) 1997 Ben Harrison, James E. Wilson, Robert A. Koeneke
  *
@@ -1717,10 +1715,10 @@ static void display_player_xtra_info(void)
 		Term_putstr(col, 11, -1, TERM_WHITE, "1Hand");
 	else if (p_ptr->pstyle == WS_TWO_HANDED
 			 && p_ptr->cur_style & (1L << WS_TWO_HANDED))
-		Term_putstr(col, 11, -1, TERM_WHITE, "BothH");
+		Term_putstr(col, 11, -1, TERM_WHITE, "2Hand");
 	else if (p_ptr->cur_style & (1L << WS_TWO_WEAPON)) 
 	{
-		Term_putstr(col, 11, -1, TERM_WHITE, "2Weap");
+		Term_putstr(col, 11, -1, TERM_WHITE, "Dual");
 
 		/* Off-hand melee weapon */
 		assert (inventory[INVEN_ARM].k_idx);
@@ -1764,8 +1762,8 @@ static void display_player_xtra_info(void)
 		strnfmt(buf, sizeof(buf), "[%d,%+d]", base, plus);
 		Term_putstr(col+5, 12, -1, TERM_L_BLUE, format("%12s", buf));
 	}
-	else plog_fmt("Illegal melee style in display_player_xtra_info: %d",
-				  p_ptr->cur_style);
+	else Term_putstr(col, 11, -1, TERM_WHITE, "Wield");
+
 
 	/* Off-hand */
 	if (inventory[INVEN_ARM].k_idx)
@@ -1869,7 +1867,9 @@ static void display_player_xtra_info(void)
 	Term_putstr(col+5, 16, -1, TERM_L_BLUE, format("%12s", buf));
 
 	/* Throws */
-	strnfmt(buf, sizeof(buf), "%d/turn(x%d)", p_ptr->num_throw, 2);
+	strnfmt(buf, sizeof(buf), "%d/turn(x%d)", p_ptr->num_throw, 
+		is_known_throwing_item(&inventory[INVEN_WIELD]) 
+		? p_ptr->num_blow : 1);
 	Term_putstr(col, 17, -1, TERM_WHITE, "Hurls");
 	Term_putstr(col+5, 17, -1, TERM_L_BLUE, format("%12s", buf));
 
@@ -3033,9 +3033,8 @@ static void display_home_equipment_info(int mode)
 		{
 			/* Assume uppercase stat name */
 			c_put_str(TERM_WHITE, stat_names[stats], row+stats, 2);
-
-			if (stats == A_DEX)
-			c_put_str(TERM_WHITE, stat_names[A_AGI], row+A_AGI, 2);
+			if (stats == A_DEX) 
+			  c_put_str(TERM_WHITE, stat_names[A_AGI], row+A_AGI, 2);
 
 			/* Default */
 			a = TERM_SLATE;
