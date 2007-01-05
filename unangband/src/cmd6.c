@@ -2391,7 +2391,7 @@ void do_cmd_apply_rune_or_coating(void)
 						/* Hack -- apply extra penalties if needed */
 						if (cursed_p(j_ptr) || broken_p(j_ptr))
 						{
-							/* Hack -- obtain bonuses */
+							/* Hack -- obtain penalties */
 							if (e_ptr->max_to_h > 0) j_ptr->to_h = MIN(j_ptr->to_h,-randint(e_ptr->max_to_h));
 							else j_ptr->to_h = MIN(j_ptr->to_h,0);
 
@@ -2412,7 +2412,8 @@ void do_cmd_apply_rune_or_coating(void)
 							if (e_ptr->max_to_h > 0) j_ptr->to_h = MAX(j_ptr->to_h,randint(e_ptr->max_to_h));
 							else j_ptr->to_h = MIN(j_ptr->to_h,0);
 
-							if (e_ptr->max_to_d > 0) j_ptr->to_d = MAX(j_ptr->to_d,randint(e_ptr->max_to_d));
+							if (e_ptr->max_to_d > 0) j_ptr->to_d = MIN(MAX(j_ptr->to_d,randint(e_ptr->max_to_d)),
+												   j_ptr->dd * j_ptr->ds + 5);
 							else j_ptr->to_d = MIN(j_ptr->to_d,0);
 
 							if (e_ptr->max_to_a > 0) j_ptr->to_a = MAX(j_ptr->to_a,randint(e_ptr->max_to_a));

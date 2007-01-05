@@ -1112,6 +1112,7 @@ s32b object_value_real(const object_type *o_ptr)
 
 		{
 			/* Factor in the bonuses not considered by power equation */
+		  /* TODO: change now that to_d is bound by weapon dice? */
 			value += o_ptr->to_h < 12 ? o_ptr->to_h * 100L : 1200L;
 			value += o_ptr->to_d < 10 ? o_ptr->to_d * 100L : 1000L;
 
@@ -2179,8 +2180,10 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 
 			case 3: case 4: case 5:
 
-				/* Increase to_d */
-				if (o_ptr->to_d) o_ptr->to_d += sign;
+				/* Increase to_d; not above weapon dice */
+				if (o_ptr->to_d
+				    && o_ptr->to_d < o_ptr->dd * o_ptr->ds + 5)
+				  o_ptr->to_d += sign;
 				else tryagain = TRUE;
 
 				break;
@@ -2203,7 +2206,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 				/* Increase pval; only rarely if SPEED */
 				if (o_ptr->pval 
 					&& (!(e_ptr->flags1 & (TR1_SPEED))
-						|| rand_int(100) < 33))
+					    || rand_int(100) < 33))
 				  o_ptr->pval += sign;
 				else tryagain = TRUE;
 				}
@@ -2924,14 +2927,16 @@ static void a_m_aux_1(object_type *o_ptr, int level, int power)
 	{
 		/* Enchant */
 		o_ptr->to_h += tohit1;
-		o_ptr->to_d += todam1;
+		o_ptr->to_d = MIN(o_ptr->to_d + todam1, 
+				  o_ptr->dd * o_ptr->ds + 5);
 
 		/* Very good */
 		if (power > 1)
 		{
 			/* Enchant again */
 			o_ptr->to_h += tohit2;
-			o_ptr->to_d += todam2;
+			o_ptr->to_d = MIN(o_ptr->to_d + todam2, 
+					  o_ptr->dd * o_ptr->ds + 5);
 		}
 	}
 
@@ -3240,6 +3245,7 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				}
 
 				/* Ring of damage */
+				/* TODO: reduce bonus here and elsewhere now that to_d is bound by weapon dice */
 				case SV_RING_DAMAGE:
 				{
 					/* Bonus to damage */
@@ -4175,7 +4181,8 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		o_ptr->ds = a_ptr->ds;
 		o_ptr->to_a = a_ptr->to_a;
 		o_ptr->to_h = a_ptr->to_h;
-		o_ptr->to_d = a_ptr->to_d;
+		o_ptr->to_d = MIN(a_ptr->to_d, 
+				  a_ptr->dd * a_ptr->ds + 5);
 		o_ptr->weight = a_ptr->weight;
 
 		/* Hack -- extract the "broken" flag */
@@ -4347,7 +4354,8 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		{
 			/* Hack -- obtain bonuses */
 			if (e_ptr->max_to_h > 0) o_ptr->to_h += randint(e_ptr->max_to_h);
-			if (e_ptr->max_to_d > 0) o_ptr->to_d += randint(e_ptr->max_to_d);
+			if (e_ptr->max_to_d > 0) o_ptr->to_d = MIN(o_ptr->to_d + randint(e_ptr->max_to_d), 
+								   o_ptr->dd * o_ptr->ds + 5);
 			if (e_ptr->max_to_a > 0) o_ptr->to_a += randint(e_ptr->max_to_a);
 
 			/* Hack -- obtain pval */
@@ -5774,7 +5782,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 
 	bool obvious = FALSE;
 
-	/* These loose bonuses before breaking */
+	/* These lose bonuses before breaking */
 	switch (j_ptr->tval)
 	  {
 	  case TV_HAFTED: 
