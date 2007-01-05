@@ -1681,9 +1681,10 @@ static void display_player_xtra_info(void)
 	/* Melee weapon */
 	o_ptr = &inventory[INVEN_WIELD];
 
-	/* Base skill */
+	/* Base skill; damage from equipment bound by weapon dice */
 	hit = p_ptr->dis_to_h;
-	dam = p_ptr->dis_to_d;
+	dam = MIN(p_ptr->dis_to_d, 
+		  o_ptr->dd * o_ptr->ds + 5);
 	hit_real = p_ptr->to_h;
 
 	/* Check melee styles only */
@@ -1725,9 +1726,10 @@ static void display_player_xtra_info(void)
 
 		o_ptr = &inventory[INVEN_ARM];
 
-		/* Base skill */
+		/* Base skill; damage from equipment bound by weapon dice */
 		hit = p_ptr->dis_to_h;
-		dam = p_ptr->dis_to_d;
+		dam = MIN(p_ptr->dis_to_d, 
+			  o_ptr->dd * o_ptr->ds + 5);
 
 		/* Check melee styles only */
 		style = p_ptr->cur_style & (WS_WIELD_FLAGS);
@@ -1771,7 +1773,7 @@ static void display_player_xtra_info(void)
 		o_ptr = &inventory[INVEN_ARM];
 	
 		if (o_ptr->tval == TV_SHIELD 
-			&& !(p_ptr->cur_style & (1L << WS_WEAPON_SHIELD)))
+		    && !(p_ptr->cur_style & (1L << WS_WEAPON_SHIELD)))
 		{
 			/* Shield stats (if shield bashes are in, display bash value) */
 			base = o_ptr->ac;
@@ -1783,7 +1785,7 @@ static void display_player_xtra_info(void)
 			Term_putstr(col+6, 12, -1, TERM_L_BLUE, format("%11s", buf));
 		}
 		else if (!(o_ptr->tval == TV_SHIELD)
-				 && !(p_ptr->cur_style & (1L << WS_TWO_WEAPON)))
+			 && !(p_ptr->cur_style & (1L << WS_TWO_WEAPON)))
 		{
 			/* Unused weapon, e.g. in off-hand when fighting unarmed */
 			Term_putstr(col, 12, -1, TERM_WHITE, "Unused");

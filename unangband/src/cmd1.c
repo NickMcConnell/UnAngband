@@ -2407,9 +2407,12 @@ void py_attack(int y, int x, bool charging)
 				do_stun = critical_norm(c_info[p_ptr->pclass].min_weight, (style_crit * 30), k);
 			}
 
-			/* Adjust for style and equipment/stats to_d */
-			/* TODO: limit p_ptr->to_d to damroll(o_ptr->dd, o_ptr->ds) based on spells2.c */
-			k += p_ptr->to_d + style_dam;
+			/* Adjust for equipment/stats to_d bounded by dice */
+			k += MIN(p_ptr->to_d, 
+				 o_ptr->dd * o_ptr->ds + 5);
+
+			/* Adjust for style */
+			k += style_dam;
 
 			/* Adjust for charging */
 			if (charging)
