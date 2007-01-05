@@ -9,17 +9,115 @@ This file describes my basic to do list for Unangband.
 Also see Lib\Todo, which is a dumping group for
 various files and ideas.
 
-Release v0.6.2 - v0.6.4
+Release v0.6.2 - v0.6.5
 =======================
 
-TODO: Re-balancing of objects and removal of 'useless' or less useful objects.
+MAIN FOCUS: Improve the user interface and game balance.
+
+TODO: Dwarves get intelligence bonus rather than penalty.
+
+TODO: Various UI improvements.
+
+TODO: Hold spells and gambits.
+
+TODO: Implement revised bard spell list.
 
 TODO: Have light spells use line of sight, as opposed to line of fire, for their
 projections.
 
 TODO: Stores should preferentially stock items that the player actually buys.
 
+TODO: Commands from menus.
+
+TODO: SHIELD blocks magic missiles completely.
+
+TODO: Free action, see invis, res blind etc. appear deeper in the dungeon then at present. 
+
+TODO: Make stat gain potions shallower than present.
+
+TODO: Improve self-knowledge so that it tells you what the impact of an effect is: You are blind,
+which prevents you reading scrolls or casting spells from books or rune-stones. 
+
+TODO: DEAFEN effect? POLYMORPH player. FURY effect (no spellcasting or
+throwing/missile weapons). 
+
+TODO: Electrical attacks should cause rings and rods to discharge as opposed to being destroyed.
+
+TODO: Update to safe string handling routines from latest Angband builds.
+
+TODO: Update to latest X11 and GCU Angband files to fix compiler warnings.
+
+TODO: Work on isometric graphics. See http://www.gamedev.net/reference/articles/article742.asp
+and http://www.gamedev.net/reference/articles/article744.asp
+
+TODO: Level up flags which add an additional prefix to the monster type.
+
+TODO: Encumberance reduces energy as opposed to speed.
+
+TODO: Additional store functions. If a store is sold an empty wand / staff, it charges it.
+If a store is sold the constituents for an object it attempts to make it.
+
+TODO: Stores, in conjunction with the character's charisma, offer additional quests based
+on what the player state is.
+
+TODO: Have groups of spells, that if the player learns one, the
+remainder in the group become harder to learn. 
+
+TODO: Split the mage spellbooks up more.
+
+
+Release v0.7.0
+==============
+
+MAIN FOCUS: Complete the quest code. Allow the player to modify and manufacture items.
+
+TODO: Complete quest code.
+
+TODO: Create set items as per Sangband, but including sets of dragon armor.
+
+TODO: Assemblies that can be build into objects of any type.
+
+TODO: Add materials system.
+
+TODO: Player buffs defined in a text file as opposed to code.
+
+TODO: Have an option birth_evil that automatically flags the player as evil.
+
+TODO: Add weird terrain types.
+
+TODO: Strike finds nearby terrain preferentially.
+
+TODO:Implement alchemy/manufacturing items.
+
+TODO:Implement all magic spells so that they are level dependent.
+
+TODO:Implement mana regeneration, searching, detection etc. as a spell effect.
+
+TODO: Drop chunks of metals and large jewels for manufacturing purposes.
+
+TODO: Mystics carry essences.
+
 TODO: Have keys of various kinds.
+
+
+
+Release v0.8.0
+==============
+
+MAIN FOCUS: Revise monster AI to fix known AI bugs and allow friendly monsters.
+
+TODO: Implement friendly monsters and uniques.
+
+TODO: Allow monsters to ride other monsters.
+
+TODO: Allow small monsters to stack on each other.
+
+TODO: Give monsters some AI patterns.
+
+TODO: Fix monster AI to allow correct navigation through all types of terrain.
+
+TODO:Implement monster spellbooks, so that monsters can cast all ACID_MAGIC
+etc. spells.
 
 TODO: SILENCE monster spell prevents you casting.
 
@@ -32,109 +130,22 @@ TODO: Higher level birds, for bird summoners.
 
 TODO: 'Good' monsters don't summon evil. 'Evil' monsters don't summon good.
 
-TODO: Commands from menus.
-
-TODO: Free action, see invis, res blind etc. appear deeper in the dungeon then at present. 
-
-TODO: SHIELD blocks magic missiles completely.
-
-TODO: Improve self-knowledge so that it tells you what the impact of an effect is: You are blind,
-which prevents you reading scrolls or casting spells from books or rune-stones. 
-
-TODO: DEAFEN effect? POLYMORPH player. FURY effect (no spellcasting or
-throwing/missile weapons). 
-
-TODO: Elemental effects that cause more than 100 hp damage should prevent you using certain types
-of objects the next round.
-
-TODO: Electrical attacks should cause rings and rods to discharge as opposed to being destroyed.
-
-TODO: Update to safe string handling routines from latest Angband builds.
-
-TODO: Update to latest X11 and GCU Angband files to fix compiler warnings.
-
 TODO: Allow smart monsters to hide themselves in darkness, especially when fleeing,
 and alter terrain between them and the player to either permit los / lof / movement
 or prevent it, depending on whether they are fleeing or not.
 
-TODO: Work on isometric graphics. See http://www.gamedev.net/reference/articles/article742.asp
-and http://www.gamedev.net/reference/articles/article744.asp
 
-TODO: Level up flags which add an additional prefix to the monster type.
-
-TODO: Encumberance reduces energy as opposed to speed.
-
-Release v0.6.5
-==============
-
-TODO: Improve dungeon generation algorithms.
-
-TODO: Implement room descriptions version 2.
-
-TODO: Add different corridor types.
-
-TODO: Add level theming.
-
-TODO: Add weird terrain types.
-
-TODO: Strike finds nearby terrain preferentially.
-
-Release v0.7.0
-==============
-
-TODO: Implement monster spells the same way as player spells.
-
-TODO: Allow monsters to ride other monsters.
-
-TODO: Allow small monsters to stack on each other.
-
-TODO: Create set items as per Sangband, but including sets of dragon armor.
-
-TODO: Assemblies that can be build into objects of any type.
-
-TODO: Add materials system.
-
-TODO: Complete quest code.
-
-TODO: Implement friendly monsters and uniques.
-
-TODO: Give monsters some AI patterns.
-
-TODO: Player buffs defined in a text file as opposed to code.
-
-TODO: Have an option birth_evil that automatically flags the player as evil.
-
-TODO: Have uniques corresponding to the players family.
-
-TODO: Additional store functions. If a store is sold an empty wand / staff, it charges it.
-If a store is sold the constituents for an object it attempts to make it.
-
-TODO: Stores, in conjunction with the character's charisma, offer additional quests based
-on what the player state is.
-
-TODO: Have a primative economy.
-
-Release v0.8.0
-==============
-TODO:Implement alchemy/manufacturing items.
-
-TODO:Implement revised bard spell list.
-
-TODO:Implement all magic spells so that they are level dependent.
-
-TODO:Implement mana regeneration, searching, detection etc. as a spell effect.
-
-TODO:Implement monster spellbooks, so that monsters can cast all ACID_MAGIC
-etc. spells.
-
-TODO: Drop chunks of metals and large jewels for manufacturing purposes.
-
-TODO: Mystics carry essences.
 
 
 Release v0.9.0
 ==============
-TODO: Have two layers of terrain - wall/feature and 'underlying terrain'.
+
+MAIN FOCUS: Tidy up in preparation for version 1.0 release.
+
+Lower priority activities are listed here to see if they are feasible or not.
+
+TODO: Elemental effects that cause more than 100 hp damage should prevent you using certain types
+of objects the next round.
 
 TODO: Implement the player hiding in terrain, and items of
 invisibility.
@@ -188,12 +199,24 @@ like a full moon.
 
 TODO: I like the idea of being able to get onto the roof of a building. 
 
+TODO: Implement Sangband-like weather system for magic.
 
-Release v0.10.0
+
+Release v2.0.0
 ===============
+
+MAIN FOCUS: To implement things that are a significant departure from
+Angband or Unangband.
+
+TODO: Skill system.
+
+TODO: Have two layers of terrain - wall/feature and 'underlying terrain'.
 
 TODO: Revised wilderness generation.
 
+TODO: Have uniques corresponding to the players family.
+
+TODO: Have a primative economy.
 
 
 
@@ -241,22 +264,9 @@ Should be less of a job now, as all spells can be cast by monsters
 on each other and there are cooperative spells that monsters can
 use to assist the player now (such as haste, heal and cure).
 
-TODO:Implement monster spells the same way as player spells.
-Don't know if this is necessary, but is a logical conclusion to
-much of the 4GAI work already done.
-
 TODO:Implement alchemy/manufacturing items.
 	This is low priority at this stage. Perhaps do essences
 as per Sangband, or ingredients based system?
-
-TODO:Implement room descriptions version 2.
-        This will mean that features and objects will be placed
-more aesthetically around the room, and match the textual
-descriptions.
-
-TODO:Implement revised bard spell list.
-Revise bard spells, so that none are directional spells.
-(Eg fiery aura etc.)
 
 TODO:Implement line of sight damage intensification spells.
 eg Fire Dance, Wild Waters, Sea's Rage and so on.
@@ -290,20 +300,10 @@ Cantrips book.
 Other skills: Literacy (Use of scrolls), Wizardy (Use of staffs), Chemistry
 (Use of potions) etc.
 
-TODO:Allow research of spells without a spellbook. You can continue to research
-a spell once you have learnt it. This gives you a chance of producing
-Research Notes (for spells), Runesticks (For runes), Lyric Sheets (For songs)
-or Prayer Beads (for prayers). The item contains a spell from another spell
-book that the spell you are researching is contained in. eg researching
-Detect Monsters in a magic book of Cantrips may help you produce research
-notes for Identify.
-
 TODO: Make mushrooms and other mimic monsters 'hide' in objects that they
 mimic.
 
 TODO: Add tents (G:<:R), sails (G:>:R).
-
-TODO: Replace wooden floors with wooden decks.
 
 TODO: Allow player to dig shallow pits, which fill with water etc to become
 shallow water.
@@ -463,7 +463,7 @@ maximum range is achieved (use MAX_SIGHT as an upper limit). Ball attacks should
 conducted more effectively, so that radius does not decrease damage.
 
 TODO: Have various metal terrains, including metal floors, metal walls (which cannot be
-tunnelled or bashed, but are not permanent), and chains. Chains can cross caverns.
+tunnelled or bashed, but are not permanent).
 
 TODO: Have the concept of pushing and pulling.
 
@@ -1039,31 +1039,6 @@ TV_ESSENCE, SV_ESSENCE_attack effect (e.g. GF_ ).
 Essences can be used to add flags to item.
 
 
-TODO: Add different corridor types.
-
-Normal – as per existing
-
-Giant – width 2 corridor, occurs with giant/dwarf levels
-
-Crypt – width 2 corridor, with pillar filled corridors
-
-Pillared – width 3 corridor with pillars down the centre
-
-Natural – corridor changes direction 90 degrees every step…
-
-River – join with river instead of corridor
-
-Vent – join with vent instead of corridor
-
-Filled – corridor filled with terrain
-
-TODO: Add level theming.
-
-Lair – level based around a unique (unique hides in big pool
-
-Vault – level based around a vault
-
-
 TODO: Add weird terrain types.
  
 Chaos/ Nexus / Nether/Gravity terrain – hits to feature: Chaos/Nexus
@@ -1134,7 +1109,169 @@ Suggested by Eddie Grove:
 > Then, at +36 speed, energy would drop from 40/gameturn to 32/gameturn.
 > That is noticeable, and would make weight relevant in the endgame.
 
-Throwing-related TODOs:
-* There are unconventional throwers e.g. people who throw potions. I hope these are already catered for by the selection of high-level potions such as dragon's blood, which can do significant damage. They might want a boost to the throw radius of these potions at some point from radius 2 to radius 3. Give potion specialists a damage boost here. [...] Boost throwing potion/spore/etc damage radius with potion specialisation at some point, or on deeper potions. Maybe a scaling up damage multiplier on these as well for potion specialisation. [...] or specialties that boost in ball effects radii by 1 (including potions and spores, perhaps excluding books), perhaps also increasing power in the centre so that the power on the border is the same as the with the original, lower radius.
-* I'd like to see archers / throwers get abilities where they can beam the attack through multiple targets, powerful attacks that push enemies away, spin type attacks that affect all adjacent enemies etc. Not sure how to do this easily: I don't like the idea of a pick an attack menu. I do like the idea of player movement and position determining what they do e.g. shots at close range push away or fire through, shots at long range can fire over intermediate targets, etc. [...] Throwing trick-shot based on number of blows is OK for warriors, perhaps also make a spell/scroll that temporarily, or only for one throw, boosts throwing (e.g. the magical throw will be a trick-shot as with spell-level/10 blows, or +1 blow if natural blows are already higher). 
-* ...O-style spells boosting shooting/throwing [...] For instance, at the moment you could make a one round 'Cloak of Steel' spell, that boosts total blows by a large amount, and fits into the cloak slot as a spell. That'd be an interesting trade off to make: e.g. +10 blows for one round of inactivity. Have a look at the existing spell objects for ideas. FYI I'll be removing the elemental blades, as I have yet to see anyone learn one. [...] I'd like to add some martial 'spellbooks', such as Adrenaline Moves, that provide these types of abilities. With warrior spell specialists allowed to pick a spell book, we know have a lot more flexibility around this. I've done a little with the ranger / rogue books I added, but its a temporary thing. [...] I'd particularly like to increase / change ranger spell options and shaman spells.
+
+TODO: Various UI improvements.
+
+* Squelch / automizer.  I think these are overkill, especially with
+magical bags. Of course, I generate lots of junk in the dungeon, so
+they may not be. However, I'd hope that auto-inscriptions allow you to
+do most of this anyway, with a lot simpler an implementation.
+
+* Adopting platform independent macro key code from variants such as
+NPPAngband where you can specify e.g. \[tab] to mean the tab key on
+any platform. Credit Mogami correctly.
+
+* When you press a number e.g. 1 while selecting an item, and you
+don't have a valid '1' binding (either by an inscription or
+automatically from the quiver), you get prompted for a 'Pick an item
+to select with the '1' key for this action?' The item then gets
+inscribed with @f1 etc as appropriate.
+
+* Allow numbers to be used in books to mean '1st spell learnt in that
+book, 2nd spell learnt' in the order the player has learnt spells.
+
+* Define tab to mean either m11. or f1. depending on whether you are a
+mage/shaman or not. Then the first time you press tab, you will be
+prompted to pick an item, and every subsequent tab key will either
+cast or fire the item at the target. (I assume here 1st mage spell
+learnt is attack spell).
+
+* Styles and substyles need to have .prf files defined.
+
+* Investigate use of 'n' in ToME.
+
+* Investigate an easy_macro's option that automatically clears -more-
+prompts, and lets you verify stuff (and other sensible options) whilst
+still specifying a string of keys/commands. e.g. don't require that
+the player have to define every macro starting with \e\e\e and other
+'weird' options. Also use this to 'detect' if the macro has been
+entered wrong somehow e.g. assume the player only wants to define a
+single command combination.
+
+* Make all commands accessible from drop-down menus in the GUI.
+
+TODO: Hold spells and gabmits.
+
+* Expand the hold_spells option to allow bards to specify under what
+circumstances to cast spells. They get a maximum of 1 casting per
+round and can specify 1 held spell, plus 1 every 5 levels.
+e.g.
+a)  Cure mortal wounds - cast immediately when reach hit point warning
+b)  Prayer - cast immediately when spell expires
+c)  Detect traps - cast immediately when leaving area detected traps
+d)  Light - cast immediately when entering a dark room
+e)  Remembrance - cast at end of turn when experience has been drained
+
+* Expand on this system for 'gambits' for all players. However, note
+for other classes, the actions specified override the player's turn,
+so it may only be safe to allow these whilst the player is searching.
+
+e.g.
+
+b)  Prayer - cast instead of searching when spell expires
+c)  Detect traps - cast instead of searching when leaving area detected traps
+d)  Light - cast instead of searching when entering a dark room
+
+or
+
+a)  Rod of Detect Traps - zap instead of searching when when leaving
+area detected traps
+b)  Palantir - activate instead of searching when entering a dark room.
+
+etc.
+
+We want to future proof these gambits so that the player can specify
+gambits for monsters / allies under their control at a later date. Its
+probably worth while allowing the player to directly invoke commands /
+use items as opposed to indirectly doing this via a macro, as then the
+gambit system can intelligently determine if they have the item in
+question before attempting the gambit.
+
+
+TODO: Improve balance of mage spells.
+
+I may have gone overboard on the availability of mage spells in
+Unangband. Mages now don't have any real problems with creatures with
+elemental resistances; because they are able to learn spells 'across
+the board' that allow them to pick the resistance whole and exploit
+it.
+
+My intention was to make some kind of trade off between knowing lots
+of spells, but weaker elemental spells, and knowing the best spell in
+a particular element at a particular level. I'm aware mages can
+specialise in a particular spell book; but this still doesn't give the
+desired effect.
+
+My initial attempt was to implement spell pre-requisites, which forces
+the mage to learn 'basic' spells of a particular type, before learning
+more powerful ones. I like this enough to keep it; however its not
+sufficiently tough to force a mage to learn a particular spell set.
+
+My thoughts are leaning towards one of the following:
+
+
+
+TODO: Have groups of spells, that if the player learns one, the
+remainder in the group become harder to learn. I'm thinking 4-6 levels
+harder. Its hard to 'justify' within the game environment however, and
+is quite transparently a balancing issue.
+
+TODO: Implement Sangband-like weather system for magic. Hot / cold
+temperature, still / windy conditions and wet / dry humidity help and
+penalise various elemental types [1]. Rather than base this strictly
+on the weather, I'd probably sample the surroundings of the player,
+count e.g. the number of fire vs ice squares, and then adjust upwards
+and downwards based on the amount of fire or ice magic cast by the
+player and monsters. This means in fiery locations and around fiery
+monsters, fire spells do more damage. Of course, said monsters tend to
+be immune to fire... however the cold magic they tend to be vulnerable
+to does less damage in hot conditions.
+
+TODO: Split the mage spellbooks up more, forcing the player to specialise.
+At the moment, all types of elemental magic is available in the basic
+spell books. I'd do something along the lines of Sangband, without
+forcing separate classes. I've outlined below tentatively how I'd
+break up the attack spells into separate basic books (plus a couple of
+the higher level books where I've also gone overboard). Of course,
+this doesn't prevent the player from just carrying four books with the
+4 elements in. Again, maybe I should change this to be e.g. 'Fire
+Magic I, Fire Magic II, Fire Magic III'.
+
+1st mage books (Was just cantrips)
+Cantrips - detect monsters, magic missile, torch, stinking cloud, wizard spells
+Hedges  - detect life, lightning spark, acid splash, druid spells
+Tricks  - detect evil, magic missile, chill, stinking cloud, darkness,
+necromancer spells
+Gambits - detect minds, sting, fire blast, illusionist spells
+
+2nd mage books (Was just conjuration)
+Conjuration - lightning bolt, frost bolt,
+Prestidigitation - minor fire ball, minor acid ball
+Summoning - poison missile, darkness bolt
+
+3rd mage book: (Was just incantations)
+Incantations - fire bolt, acid bolt
+Invectures - freeze, minor frost ball
+Illusions - spider's web, gust of wind
+Invocations - lightning bolt ii, frost bolt ii
+
+4th mage book: (Was just sorcery)
+Sorcery - frost ball, fire ball
+Magery - chain lightning, cone of cold
+Wizardry - fire beam, melting ray
+
+7th mage book: (Was just Power)
+Power - bedlam, rend soul, chaos strike, mana storm, nexus burst
+Balance - fire storm, fire ball ii, arc of fire, acid ball ii
+Space - cold snap, chain lightning, ball lightning, ball lightning ii, artic ray
+
+9th mage book: (Was just Destruction)
+Destruction - shockwave, cloud kill, acid ball, ice storm, meteor swarm, rift
+Immoliation - immoliation, fire ball iii, arc of hellfire, acid ball iii
+Annihilation - death fog, dragon's bane, fimbulwinter, chain lightning
+iii, ball lightning iii
+
+[1]  From memory still benefits poison, windy benefits lightning, wet
+benefits water, and dry benefits acid. I could be wrong though.
+--
+
