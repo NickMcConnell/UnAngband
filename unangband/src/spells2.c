@@ -1259,8 +1259,12 @@ int value_check_aux3(const object_type *o_ptr)
 	/* Great "armor" bonus */
 	if (o_ptr->to_a > 9) return (INSCRIP_GREAT);
 
-	/* Great "weapon" bonus */
-	if (o_ptr->to_h + o_ptr->to_d > 14) return (INSCRIP_GREAT);
+	/* Great to_h bonus */
+	if (o_ptr->to_h > 9) return (INSCRIP_GREAT);
+
+	/* Great to_d bonus */
+	if (o_ptr->to_d >= k_info[o_ptr->k_idx].dd * k_info[o_ptr->k_idx].ds) 
+	  return (INSCRIP_GREAT);
 
 	/* Great "weapon" dice */
 	if (o_ptr->dd > k_info[o_ptr->k_idx].dd) return (INSCRIP_GREAT);
