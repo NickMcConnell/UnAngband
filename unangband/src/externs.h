@@ -42,6 +42,7 @@ extern const byte adj_chr_gold[];
 extern const byte adj_chr_stock[];
 extern const byte adj_chr_taunt[];
 extern const byte adj_chr_fear[];
+extern const byte adj_int_break[];
 extern const byte adj_int_dev[];
 extern const byte adj_wis_sav[];
 extern const byte adj_dex_dis[];

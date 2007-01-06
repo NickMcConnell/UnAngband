@@ -3229,7 +3229,7 @@ int breakage_chance(object_type *o_ptr)
 	}
 
 	/* Rarely break */
-	return (31 - adj_chr_fear[p_ptr->stat_ind[A_INT]]);
+	return (31 - adj_int_break[p_ptr->stat_ind[A_INT]]);
 }
 
 
