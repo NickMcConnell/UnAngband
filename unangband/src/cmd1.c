@@ -2283,8 +2283,10 @@ void py_attack(int y, int x, bool charging)
 	/* Restrict blows if charging */
 	if (charging)
 	{
-		if (melee_style & (1L << WS_TWO_WEAPON)) num_blows = 2;
-		else num_blows = 1;
+		if (melee_style & (1L << WS_TWO_WEAPON)) 
+		  num_blows = MIN(2, num_blows);
+		else 
+		  num_blows = 1;
 	}
 
 	/* Attack once for each legal blow */
