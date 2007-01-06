@@ -3272,12 +3272,11 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 {
   int item2 = 0;
   int i = 0;
-  int j, y, x, old_y, old_x, tricks;
-  int ty, tx; /* Current target coordinates */
-  int tdam, tdis, thits;
+  int j, y, x, tricks, tdis;
   int bow_to_h = 0;
   int bow_to_d = 0;
-  int bonus, chance;
+  int ranged_skill;
+  int catch_chance = 0;
 
   int style_hit, style_dam, style_crit;
 
@@ -3376,23 +3375,33 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   /* The first piece of code dependent on fire/throw */
   if (fire)
     {
-      /* Check usage of the bow */
-      object_usage(INVEN_BOW);
-
       /* Get the bow */
       bow_to_h = inventory[INVEN_BOW].to_h;
       bow_to_d = inventory[INVEN_BOW].to_d;
 
+      ranged_skill = p_ptr->skill_thb;
+
       /* Base range XXX XXX */
       tdis = 6 + 3 * p_ptr->ammo_mult;
-
-      /* Number of hits per round */
-      thits = p_ptr->num_fire;
     }
   else
     {
       int mul, div;
 
+      ranged_skill = p_ptr->skill_tht;
+
+      /* Badly balanced big weapons waste the throwing skill.
+	 Various junk (non-weapons) does not have to_hit, 
+	 so don't penalize a second time. */
+      if (!throwing 
+	  && (i_ptr->tval == TV_STAFF
+	      || i_ptr->tval == TV_BOW 
+	      || i_ptr->tval == TV_DIGGING 
+	      || i_ptr->tval == TV_HAFTED 
+	      || i_ptr->tval == TV_POLEARM 
+	      || i_ptr->tval == TV_SWORD))
+	ranged_skill /= 2;
+      
       /* Extract a "distance multiplier" */
       mul = throwing ? 10 : 3;
 
@@ -3405,12 +3414,6 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
       /* Max distance of 10 */
       if (tdis > 10) 
 	tdis = 10;
-
-      if (trick_throw)
-	thits = 1;
-      else
-	/* Number of hits per round; does not depend on (throwing) */
-	thits = p_ptr->num_throw;
     }
 
   /* Coordinates of the fired/thrown object; start at the player */
@@ -3426,6 +3429,8 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   for (tricks = 0; tricks < num_tricks; tricks++)
     {
       int dir = 0;
+      int old_y, old_x; /* Previous weapon location */
+      int ty, tx; /* Current target coordinates */
 
       /* If a complete miss, stop trick shot */
       if (!hit_body)
@@ -3600,8 +3605,10 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 	      monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	      int visible = m_ptr->ml;
-	      int ranged_skill;
+	      int bonus;
+	      int chance;
 	      int chance2;
+	      int tdam;
 
 	      bool hit_or_near_miss;
 	      bool genuine_hit;
@@ -3639,8 +3646,6 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 		  /* Get style benefits */
 		  mon_style_benefits(m_ptr, shoot_style, 
 				     &style_hit, &style_dam, &style_crit);
-
-		  ranged_skill = p_ptr->skill_thb;
 		}
 	      else
 		{
@@ -3657,26 +3662,15 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 				       &style_hit, &style_dam, &style_crit);
 		  else
 		    style_hit = style_dam = style_crit = 0;
-
-		  ranged_skill = p_ptr->skill_tht;
-
-		  /* Badly balanced big weapons waste the throwing skill.
-		     Various junk (non-weapons) does not have to_hit, 
-		     so don't penalize a second time. */
-		  if (!throwing 
-		      && (i_ptr->tval == TV_STAFF
-			  || i_ptr->tval == TV_BOW 
-			  || i_ptr->tval == TV_DIGGING 
-			  || i_ptr->tval == TV_HAFTED 
-			  || i_ptr->tval == TV_POLEARM 
-			  || i_ptr->tval == TV_SWORD))
-		    ranged_skill /= 2;
 		}
 
 	      /* Actually "fire" the object */
 	      bonus = (p_ptr->to_h + i_ptr->to_h + bow_to_h + style_hit);
 	      chance = ranged_skill + bonus * BTH_PLUS_ADJ;
 	      chance2 = chance - distance(old_y, old_x, y, x);
+
+	      /* Record for later */
+	      catch_chance = chance;
 
 	      /* Test hit fire */
 	      hit_or_near_miss = test_hit_fire(chance2, 
@@ -3724,7 +3718,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 		  /* Apply special damage XXX XXX XXX */
 		  tdam = tot_dam_aux(i_ptr, tdam, m_ptr);
 
-		  /* The third and last piece of fire/throw dependent code */
+		  /* The third piece of fire/throw dependent code */
 		  if (fire)
 		    /* Apply missile critical damage */
 		    tdam += critical_shot(i_ptr->weight, 
@@ -3867,17 +3861,99 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   /* Reenable auto-target */
   use_old_target = use_old_target_backup;
 
-  /* Take a turn */
-  p_ptr->energy_use = 100 / thits;
-
-  /* TODO: based on AGI you catch it or not
-     or even, with really bad AGI roll, 
-     you get hit and catch it the hard way. */
-
   /* Chance of breakage (during attacks) */
   j = (hit_body ? breakage_chance(i_ptr) : 0);
 
-  /* Is a trick throw and have the weapon returned? */
+  /* The fourth and last piece of code dependent on fire/throw */
+  if (fire)
+    {
+      /* Check usage of the bow */
+      object_usage(INVEN_BOW);
+
+      /* Take a turn */
+      p_ptr->energy_use = 100 / p_ptr->num_fire;
+    }
+  else
+    {
+      int throws_per_round;
+      
+      if (trick_throw)
+	throws_per_round = 1;
+      else
+	/* This does not depend on whether the weapon is a throwing weapon */
+	throws_per_round = p_ptr->num_throw;
+
+      /* Take a turn */
+      p_ptr->energy_use = 100 / throws_per_round;
+    }
+
+  /* Is this a trick throw and has the weapon returned? */
+  if (trick_throw && x == p_ptr->px && y == p_ptr->py)
+    {
+      /* Keep it sane */
+      catch_chance = MAX(0, MAX(catch_chance, ranged_skill/5));
+
+      /* Randomize */
+      catch_chance = randint(catch_chance);
+
+      if (catch_chance <= 3 + catch_chance / 30)
+	/* You don't catch the returning weapon; it hits you */
+	{
+	  /* TODO: this code is taken from hit_trap in cmd1.c --- factor it out */
+	  int k;
+
+	  /* Describe */
+	  object_desc(o_name, sizeof(o_name), i_ptr, FALSE, 0);
+
+	  k = damroll(i_ptr->dd, i_ptr->ds);
+	  k += critical_norm(i_ptr->weight, 2 * i_ptr->to_h, k);
+	  k += i_ptr->to_d;
+
+	  /* Armour reduces total damage */
+	  k -= (k * ((p_ptr->ac < 150) ? p_ptr->ac : 150) / 250);
+
+	  /* No negative damage */
+	  if (k < 0) k = 0;
+
+	  /* Trap description */
+	  msg_format("You catch the returning %^s in your belly!", o_name);
+
+	  /* Damage, check for fear and death */
+	  take_hit(k, "a returning weapon");
+
+	  /* Apply additional effect from coating or sometimes activate */
+	  if (coated_p(i_ptr) || auto_activate(i_ptr))
+	    {
+	      /* Make item strike */
+	      process_item_blow(i_ptr, y, x);
+	    }
+
+	  /* Weapon caught */
+	}
+      else if (catch_chance <= 6 + catch_chance / 20)
+	/* You don't catch the returning weapon; it almost hits you */
+	{
+	  /* Describe */
+	  object_desc(o_name, sizeof(o_name), i_ptr, FALSE, 0);
+
+	  msg_format("The returning %^s narrowly misses you.", o_name);
+
+	  /* Weapon not caught */
+	  trick_throw = FALSE;
+	}
+      else if (catch_chance <= 9 + catch_chance / 10)
+	/* You don't catch the returning weapon; it drops nearby */
+	{
+	  /* Weapon not caught */
+	  trick_throw = FALSE;
+	}
+      else
+	{
+	  /* Weapon caught */
+	}
+    }
+
+  /* Is this a trick throw and have the weapon returned? */
   if (trick_throw && x == p_ptr->px && y == p_ptr->py)
     /* Try to return the weapon to the player */
     {
