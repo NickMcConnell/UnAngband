@@ -259,7 +259,7 @@ struct dun_data
 
 	/* Hack -- theme rooms */
 	s16b theme_feat;
-	byte theme_tval;
+/*	byte theme_tval;*/
 
 	/* Array of which blocks are used */
 	bool room_map[MAX_ROOMS_ROW][MAX_ROOMS_COL];
@@ -2350,7 +2350,7 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 
 			/* Themes */
 			if ( ((dun->theme_feat) && ((d_info[i].feat == dun->theme_feat) || (d_info[i].solid == dun->theme_feat) || (d_info[i].tunnel == dun->theme_feat)))
-				 || ((dun->theme_tval) && (d_info[i].tval == dun->theme_tval)) )
+				 /*|| ((dun->theme_tval) && (d_info[i].tval == dun->theme_tval)) */)
 			{
 				if (match < MATCH_THEME)
 				{
@@ -2448,13 +2448,16 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 			if (d_info[i].branch_on) *branch_on = d_info[i].branch_on;
 
 			/* Set tval match */
+#if 0
 			if (!(dun->theme_feat) && !(dun->theme_tval) && (*place_tval) && ((!(*place_feat) && !(d_info[i].tunnel) && !(d_info[i].solid)) || (rand_int(100) < 50)))
 			{
 				dun->theme_tval = *place_tval;
 			}
 
 			/* Set feature match -- the math for the 3rd choice is wrong here. It makes solid too common, which may be better anyway. */
-			else if (!(dun->theme_feat) && !(dun->theme_tval) && ((*place_feat) || (d_info[i].tunnel) || (d_info[i].solid)))
+			else
+#endif
+			if (!(dun->theme_feat) /* && !(dun->theme_tval) */ && ((*place_feat) || (d_info[i].tunnel) || (d_info[i].solid)))
 			{
 				dun->theme_feat = *place_feat;
 				if ((d_info[i].tunnel) && ((!*place_feat) || (rand_int(100) < 50)))
@@ -5798,8 +5801,8 @@ static bool build_type123(int room, int type)
 	}
 
 	/* Calculate dimensions */
-	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 3;
-	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 3;
+	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 5;
+	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 5;
 
 	/* Find and reserve some space in the dungeon.  Get center of room. */
 	if (!find_space(&y0, &x0, height, width)) return (FALSE);
@@ -5866,8 +5869,8 @@ static bool build_type45(int room, int type)
 	}
 
 	/* Calculate dimensions */
-	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 3;
-	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 3;
+	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 5;
+	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 5;
 
 	/* Find and reserve some space in the dungeon.  Get center of room. */
 	if (!find_space(&y0, &x0, height, width)) return (FALSE);
@@ -5935,8 +5938,8 @@ static bool build_type6(int room, int type)
 	}
 
 	/* Calculate dimensions */
-	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 3;
-	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 3;
+	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 5;
+	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 5;
 
 	/* Find and reserve some space in the dungeon.  Get center of room. */
 	if (!find_space(&y0, &x0, height, width)) return (FALSE);
@@ -7432,7 +7435,7 @@ static void cave_gen(void)
 
 	/* Start with no themes */
 	dun->theme_feat = 0;
-	dun->theme_tval = 0;
+/*	dun->theme_tval = 0;*/
 
 	/* Build some rooms or points to connect tunnels */
 	if ((level_flag & (LF1_ROOMS | LF1_TUNNELS)) != 0)
