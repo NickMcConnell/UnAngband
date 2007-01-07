@@ -1675,11 +1675,14 @@ static bool item_tester_hook_activate(const object_type *o_ptr)
 	/* Not known */
 	if (!object_known_p(o_ptr)) return (FALSE);
 
-	/* Check the recharge */
-	if ((o_ptr->timeout) && ((!o_ptr->stackc) || (o_ptr->stackc >= o_ptr->number))) return (FALSE);
-
 	/* Extract the flags */
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+
+	/* Hack -- for spells that can activate */
+	if ((o_ptr->tval == TV_SPELL) && (f3 & (TR3_ACTIVATE))) return (TRUE);
+
+	/* Check the recharge */
+	if ((o_ptr->timeout) && ((!o_ptr->stackc) || (o_ptr->stackc >= o_ptr->number))) return (FALSE);
 
 	/* Check activation flag */
 	if (f3 & (TR3_ACTIVATE)) return (TRUE);

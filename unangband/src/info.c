@@ -1207,7 +1207,6 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		switch (method)
 		{
 			case RBM_HIT: p = "hits"; t = "one target"; break;
-			case RBM_TOUCH: t = "one adjacent target"; if ((level > 8) && (d2)) d1+= (level-5)/4;break;
 			case RBM_SPIT: p = "spits"; t = "one target"; break;
 			case RBM_AURA: p = "surrounds you with an aura";  t = "your enemies"; rad = 2; break;
 			case RBM_AURA_MINOR: p = "surrounds you with an aura";  t = "your enemies"; rad = 1; break;
@@ -1255,6 +1254,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_8WAY_II: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 3; break;
 			case RBM_8WAY_III: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 4; break;
 			case RBM_SWARM: p = "creates multiple balls"; t = "your enemies"; rad = 1; d3 += level / 2; break;
+			default: t = "one adjacent target"; if ((level > 8) && (d2)) d1+= (level-5)/4;break;
 		}
 
 

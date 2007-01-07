@@ -60,10 +60,11 @@ If a store is sold the constituents for an object it attempts to make it.
 TODO: Stores, in conjunction with the character's charisma, offer additional quests based
 on what the player state is.
 
-TODO: Have groups of spells, that if the player learns one, the
-remainder in the group become harder to learn. 
+TODO: Allow the player to fly.
 
-TODO: Split the mage spellbooks up more.
+TODO: Allow the player to jump. This may be needed to navigate various
+'puzzle' locations.
+
 
 
 Release v0.7.0
@@ -142,7 +143,8 @@ Release v0.9.0
 
 MAIN FOCUS: Tidy up in preparation for version 1.0 release.
 
-Lower priority activities are listed here to see if they are feasible or not.
+Lower priority activities are listed here to see if they are feasible or not. They are ideas and
+may not necessarily be added.
 
 TODO: Elemental effects that cause more than 100 hp damage should prevent you using certain types
 of objects the next round.
@@ -200,6 +202,13 @@ like a full moon.
 TODO: I like the idea of being able to get onto the roof of a building. 
 
 TODO: Implement Sangband-like weather system for magic.
+
+TODO: Have groups of spells, that if the player learns one, the
+remainder in the group become harder to learn. 
+
+TODO: Split the mage spellbooks up more.
+
+
 
 
 Release v2.0.0
@@ -395,6 +404,7 @@ Res_acid	Acid walk	Not harmed by acid or acidic clouds
 Res_cold	Ice walk	Not harmed by ice, cannot slip on ice, cannot sink in snow
 Res_pois	Swamp walk	Cannot slip on mud, does not sink into mud
 Res_elec	Cloud walk	Cannot fall into chasms that are filled with clouds
+Res_water	Water walk	Cannot sink into water
 
 This is of course, a horrible hack. Note that boots of cloud walking break many of the
 puzzles we would otherwise force solutions for by using chasms.
@@ -1275,3 +1285,43 @@ iii, ball lightning iii
 benefits water, and dry benefits acid. I could be wrong though.
 --
 
+
+
+TODO: Allow the player to jump. This may be needed to navigate various
+'puzzle' locations.
+
+Jumping can either be done to the squares a player is charging into (e.g.
+with a run up) or from an EASY_CLIMB location that the player has climbed
+onto. Jumping allows the player to ignore hit_trap effects or terrain damage
+(except for filled terrain) for a single location. They must then move to
+an adjacent location. Use charging directions for the locations that they
+can move into.
+
+Jumping is only possible through locations that have the CAN_FLY flag.
+
+Jumping is only possible if the player is below 50% encumberance or has
+the feather fall flag.
+
+
+TODO: Allow the player to fly.
+
+There are two types of flying: flying because the player is so light due
+to accumulated feather fall flags, where they can run on water and clouds
+ala Crouching Tiger, Hidden Dragon, and flying where the player has
+unpowered (Gliding) or powered (Flying or Hovering) flight.
+
+Gliding allows the player to fly only when they are charging. As a result,
+gliding fails as soon as a player attacks or does any other action other
+than moving in a restricted set of directions.
+
+Flying acts as per gliding, but allows the player a number of turns 'sinking'
+or 'landing', before the flight actually fails. This gives the player the
+opportunity to attack or act for a limited period while flying.
+
+Hovering just treats the player as flying all the time, except in locations
+that are not CAN_FLY.
+
+Accumulated levels of feather fall allow the player to (2 flags) walk on mud
+and snow, (3 flags) walk on water, or (4 flags) walk on clouds, as per the
+various walking flags above. Note that walking on air except clouds is not
+possible using accumulated feather fall levels.

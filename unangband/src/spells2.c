@@ -5283,7 +5283,7 @@ bool fire_bolt_minor(int typ, int dir, int dam, int range)
 /*
  * Create a (wielded) spell item
  */
-static void wield_spell(int item, int k_idx, int time)
+static void wield_spell(int item, int k_idx, int time, int level)
 {
 	object_type *i_ptr;
 	object_type object_type_body;
@@ -5303,6 +5303,23 @@ static void wield_spell(int item, int k_idx, int time)
 	i_ptr->timeout = time;
 	object_aware(i_ptr);
 	object_known(i_ptr);
+
+	/* Scale the item based on the player's level */
+
+	/* Hack - scale damage */
+	if ((level > 8) && (i_ptr->ds)) i_ptr->dd += (level-5)/4;
+
+	/* Hack - scale pvals */
+	if (i_ptr->pval) i_ptr->pval += (level / 10);
+
+	/* Hack - scale to hit */
+	if (i_ptr->to_h) i_ptr->to_h += (level / 2);
+
+	/* Hack - scale to dam */
+	if (i_ptr->to_d) i_ptr->to_d += (level / 2);
+
+	/* Hack - scale to ac */
+	if (i_ptr->ac) i_ptr->to_a += (i_ptr->ac * level / 25);
 
 	/* Take off existing item */
 	if (o_ptr->k_idx)
@@ -6259,7 +6276,7 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 
 				/* Hack - scale damage */
 				if ((level > 8) && (d_side)) damage += damroll((level-5)/4, d_side);
-				
+
 				if (project(-1, 1, py, px, py + ddy[dir], px + ddx[dir], damage, effect, flg, 0, 0)) obvious = TRUE;
 
 				break;
@@ -7098,7 +7115,7 @@ bool process_spell_types(int spell, int level, bool *cancel)
 			}
 			default:
 			{
-				wield_spell(s_ptr->type,s_ptr->param,lasts);
+				wield_spell(s_ptr->type,s_ptr->param,lasts, level);
 				*cancel = FALSE;
 				obvious = TRUE;
 				break;

@@ -1573,7 +1573,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	/* Indicate "charging" artifacts/rods */
 	if (o_ptr->timeout)
 	{
-		if ((o_ptr->tval == TV_ROD) || (f3 & (TR3_ACTIVATE)))
+		if (((o_ptr->tval == TV_ROD) || (f3 & (TR3_ACTIVATE))) && (o_ptr->tval != TV_SPELL))
 		{
 			/* Hack -- variant timeout stack */
 			if (o_ptr->stackc)

@@ -11554,27 +11554,29 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 			y = gy[i];
 			x = gx[i];
 
-			/* Check for evasion */
-			/* Area-effect and jumping spells cannot be dodged */
-			if (!(flg & (PROJECT_ARC | PROJECT_STAR | PROJECT_JUMP |
-			             PROJECT_BOOM)) && (cave_m_idx[y][x] > 0))
+			/* Check for monster */
+			if (cave_m_idx[y][x] > 0)
+
 			{
 			 	monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
 
+				/* Hack -- handle resist magic. Deeper monsters are more resistant. */
+				if ((flg & (PROJECT_MAGIC)) && (cave_m_idx[y][x] > 0)
+					&& ((r_info[m_list[cave_m_idx[y][x]].r_idx].flags9 & (RF9_RES_MAGIC)) != 0)
+					&& (rand_int(100) < 20 + p_ptr->depth / 2))
+				{
+					/* Hack -- resist magic */
+					if (project_m(who, y, x, 0, GF_RES_MAGIC)) notice = TRUE;
+				}
 				/* Check if monster evades */
-				if (mon_evade(cave_m_idx[y][x],((m_ptr->confused || m_ptr->stunned) ? 1 : 3) + gd[i], 5 + gd[i], who < 0 ? " your magic" : "")) continue;
+				/* Area-effect and jumping spells cannot be dodged */
+				else if (!(flg & (PROJECT_ARC | PROJECT_STAR | PROJECT_JUMP |
+			             PROJECT_BOOM)) && (cave_m_idx[y][x] > 0) && 
+					(mon_evade(cave_m_idx[y][x],((m_ptr->confused || m_ptr->stunned) ? 1 : 3) + gd[i], 5 + gd[i], who < 0 ? " your magic" : ""))) continue;
+
+				/* Affect the monster in the grid */
+				else if (project_m(who, y, x, dam_at_dist[gd[i]], typ))	notice = TRUE;
 			}
-			/* Hack -- handle resist magic. Deeper monsters are more resistant. */
-			else if ((flg & (PROJECT_MAGIC)) && (cave_m_idx[y][x] > 0)
-				&& ((r_info[m_list[cave_m_idx[y][x]].r_idx].flags9 & (RF9_RES_MAGIC)) != 0)
-				&& (rand_int(100) < 20 + p_ptr->depth / 2))
-			{
-				/* Hack -- resist magic */
-				if (project_m(who, y, x, 0, GF_RES_MAGIC)) notice = TRUE;
-			}
-			/* Affect the monster in the grid */
-			else if (project_m(who, y, x, dam_at_dist[gd[i]], typ))
-				notice = TRUE;
 		}
 
 		/* Player affected one monster (without "jumping") */
