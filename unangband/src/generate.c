@@ -310,14 +310,14 @@ static room_data_type room_data[ROOM_MAX] =
    /* Walls   */  {{180,240, 300, 300, 300, 300, 300, 300, 300, 300, 300},  1,DUN_ROOMS/2,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_DESTROYED | LF1_TOWER | LF1_WILD)},
    /* Centre */   {{60, 100, 120, 140, 160, 180, 200, 200, 200, 200, 200},  1,DUN_ROOMS/2,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_DESTROYED | LF1_TOWER | LF1_WILD)},
    /* Lrg wall */ {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	2, 0, LF1_STRONGHOLD | LF1_DUNGEON | LF1_CRYPT},
-   /* Lrg cent */ {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	2, 0, LF1_STRONGHOLD | LF1_DUNGEON},
-   /* Xlg cent */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,DUN_ROOMS/4,	3, 0, LF1_STRONGHOLD},
+   /* Lrg cent */ {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	2, 0, LF1_STRONGHOLD | LF1_DUNGEON | LF1_SEWER},
+   /* Xlg cent */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,DUN_ROOMS/4,	3, 0, LF1_STRONGHOLD | LF1_SEWER},
    /* Chambers */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	1,		3, 0, LF1_CHAMBERS},
    /* I. Room */  {{30,  60,  70,  80,  80,  75,  70,  67,  65,  62,  60},  0,  2,		1, 0, LF1_DUNGEON},
    /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	2,		2, 0, LF1_VAULT | LF1_CRYPT},
    /* G. Vault */ {{ 0,   0,   1,   2,   3,   4,   6,   7,   8,  10,  12}, 20,	1,		3, 0, LF1_VAULT},
-   /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS,	3, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE | LF1_LAIR},
-   /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		3, 0, LF1_MINE | LF1_CAVE | LF1_LAIR},
+   /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS,	3, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE | LF1_LAIR | LF1_SEWER},
+   /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		3, 0, LF1_MINE | LF1_CAVE | LF1_LAIR | LF1_SEWER},
    /* Fractal */  {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	3, 0, LF1_MINE | LF1_CAVE},
    /* Lrg fra */  {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	3,		3, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE},
    /* Huge fra */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE},
@@ -5044,8 +5044,15 @@ static u32b get_tunnel_style(void)
 	/* Change tunnel type */
 	if (level_flag & (LF1_STRONGHOLD))
 	{
-		if (p_ptr->depth % 2) style |= (TUNNEL_LARGE_L);
-		else style |= (TUNNEL_LARGE_R);
+		int i = rand_int(100);
+
+		if (i < 66) style |= (TUNNEL_LARGE_L);
+		if (i > 33) style |= (TUNNEL_LARGE_R);
+	}
+	else if (level_flag & (LF1_SEWER))
+	{
+		if (rand_int(100) < 50) style |= (TUNNEL_LARGE_L);
+		if (rand_int(100) < 50) style |= (TUNNEL_LARGE_R);
 	}
 	else if (level_flag & (LF1_CRYPT))
 	{
@@ -5826,6 +5833,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	/* Turn the tunnel into corridor */
 	for (i = 0; i < dun->tunn_n; i++)
 	{
+		int feat = 0;
+
 		/* Get the grid */
 		y = dun->tunn[i].y;
 		x = dun->tunn[i].x;
@@ -5835,6 +5844,15 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		{
 			/* Clear previous contents, write terrain */
 			cave_set_feat(y, x, dun->tunn_feat[i]);
+		}
+		/* Put a feature in sewer tunnels */
+		else if ((dun->tunn_feat[i] == 1) && (level_flag & (LF1_SEWER)))
+		{
+			/* Pick a feature if none selected */
+			if (!feat) feat = pick_proper_feature(cave_feat_pool);
+			
+			/* Clear previous contents, write terrain */
+			if (feat) cave_set_feat(y, x, dun->tunn_feat[i]);
 		}
 		/* Apply bridge */
 		else if (f_info[cave_feat[y][x]].flags2 & (FF2_BRIDGE))

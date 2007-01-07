@@ -146,7 +146,7 @@ static cptr d_info_lflags[] =
 	"CHASM",
 	"DESTROYED",
 	"LIVING",
-	"CROWDED",
+	"SEWER",
 	"SURFACE",
 	"DAYLIGHT",
 	"TOWER",
