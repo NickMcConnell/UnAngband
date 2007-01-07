@@ -1446,7 +1446,16 @@ static void display_player_xtra_info(void)
 
 	/* Current Home Town */
 	put_str("Home", 7, 1);
-	c_put_str(TERM_L_BLUE, t_name + t_info[p_ptr->town].name, 7, 8);
+
+	/* Has a home defined*/
+	if (total_store_count)
+	{
+		c_put_str(TERM_L_BLUE, format("%^s in %s", u_name + u_info[store[STORE_HOME]->index].name, t_name + t_info[p_ptr->town].name), 7, 8);
+	}
+	else
+	{
+		c_put_str(TERM_L_BLUE, t_name + t_info[p_ptr->town].name, 7, 8);
+	}
 
 	/* Current Dungeon */
 	put_str("Target", 8, 1);

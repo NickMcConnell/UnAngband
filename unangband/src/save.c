@@ -399,6 +399,9 @@ static void wr_store(const store_type *st_ptr)
 {
 	int j;
 
+	/* Save the store index */
+	wr_byte(st_ptr->index);
+
 	/* Save the "open" counter */
 	wr_u32b(st_ptr->store_open);
 
@@ -1278,13 +1281,12 @@ static bool wr_savefile_new(void)
 		if (!p_ptr->is_dead)
 		{
 			wr_byte(MAX_STORES);
-#if 0
+
 			/* Write the actual store indexes */
 			for (j = 0; j < MAX_STORES; j++)
 			{
 				wr_u16b((u16b)t_info[i].store_index[j]);
 			}
-#endif
 		}
 	}
 

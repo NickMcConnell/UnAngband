@@ -1659,7 +1659,7 @@ static void display_store(int store_index)
 	if (st_ptr->base < STORE_MIN_BUY_SELL)
 	{
 		/* Put the owner name */
-		put_str(u_name + st_ptr->name, 3, 30);
+		put_str(u_name + u_info[st_ptr->index].name, 3, 30);
 
 		/* Label the object descriptions */
 		put_str("Item Description", 5, 3);
@@ -1674,7 +1674,7 @@ static void display_store(int store_index)
 	/* Normal stores */
 	else
 	{
-		cptr store_name = (u_name + st_ptr->name);
+		cptr store_name = (u_name + u_info[st_ptr->index].name);
 		cptr owner_name = &(b_name[ot_ptr->owner_name]);
 		cptr race_name = p_name + p_info[ot_ptr->owner_race].name;
 
@@ -3478,15 +3478,6 @@ void do_cmd_store(void)
 		return;
 	}
 
-	/*
-	 * Set the home town. Not really used now, except for informational purposes.
-	 */
-	if (p_ptr->town != p_ptr->dungeon)
-	{
-		/* Change the home */
-		p_ptr->town = p_ptr->dungeon;		
-	}
-
 	/* Hack -- Extract the store code */
 	for (i = 0; i < MAX_STORES; i++)
 	{
@@ -3497,8 +3488,18 @@ void do_cmd_store(void)
 		}
 	}
 
+	/* Hack -- homes are special */
+	if (f_info[feat].d_char == '8')
+	{
+		/* Change the home */
+		p_ptr->town = p_ptr->dungeon;
+
+		/* Set the new home */
+		store[STORE_HOME]->index = f_info[feat].power;
+	}
+
 	/* Store has not been entered before -- skip home */
-	if ((store_index == 0) && (f_info[feat].d_char != '8'))
+	else if (store_index == 0)
 	{
 		/* Initialise store */
 		store_index = store_init(feat);

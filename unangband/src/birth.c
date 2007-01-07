@@ -2227,6 +2227,9 @@ void player_birth(void)
 	/* Maintain the shop (ten times) */
 	for (n = 0; n < 10; n++) store_maint(STORE_HOME);
 
+	/* Hack -- name home */
+	store[STORE_HOME]->index = 8;
+
 	/* Quests */
 	for (n = 0; n < z_info->q_max; n++)
 	{

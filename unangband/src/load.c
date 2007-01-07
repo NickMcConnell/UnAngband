@@ -695,6 +695,15 @@ static errr rd_store(int n)
 		COPY(st_ptr, &u_info[f_info[t_info[p_ptr->town].store[n]].power], store_type);
 	}
 
+	else
+	{
+		/* Read the store index */
+		rd_byte(&st_ptr->index);
+
+		/* Copy basic store information to it */
+		COPY(st_ptr, &u_info[st_ptr->index], store_type);
+	}
+
 	/* Assume full stock */
 	st_ptr->stock_size = STORE_INVEN_MAX;
 
@@ -2285,15 +2294,12 @@ static errr rd_savefile_new_aux(void)
 			{
 				/* Load the number of stores */
 				rd_byte(&tmp8u);
-#if 0
+
 				for (j = 0; j < tmp8u; j++)
 				{
 					/* Load the store index */
-					rd_u16b(&tmp16u);
-
-					t_info[i].store_index[j] = tmp16u;
+					rd_u16b(&t_info[i].store_index[j]);
 				}
-#endif
 			}
 		}
 	}

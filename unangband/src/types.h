@@ -1006,10 +1006,10 @@ struct store_type
 {
 	u32b name;    	/* Name (offset) */
 
-	byte owner;    	/* Owner index */
 	byte base;     	/* Store basic type */
+	byte index;	/* Index into u_info */
+	byte owner;    	/* Owner index */
 	byte level;	/* Store generation level */
-	byte unused;	/* Unused at moment */
 
 	s16b insult_cur; /* Insult counter */
 

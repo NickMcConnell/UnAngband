@@ -5667,6 +5667,9 @@ errr parse_u_info(char *buf, header *head)
 		/* Store the name */
 		if (!(u_ptr->name = add_name(head, s))) return (PARSE_ERROR_OUT_OF_MEMORY);
 
+		/* Save the index into the store structure */
+		u_ptr->index = i;
+		
 		/* Reset the store */
 		cur_t = 0;
 	}
