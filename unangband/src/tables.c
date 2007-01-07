@@ -3851,7 +3851,7 @@ const cptr w_name_style[32] =
 	"One-handed",
 	"Two-handed",
 	"Shield & weapon",
-	"Two-weapon",
+	"Dual-wield",
 	"Hafted weapons",
 	"Swords",
 	"Polearms",

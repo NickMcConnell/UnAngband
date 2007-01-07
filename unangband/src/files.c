@@ -1752,7 +1752,7 @@ static void display_player_xtra_info(void)
 		if (object_bonus_p(o_ptr)) hit += o_ptr->to_h;
 		if (object_bonus_p(o_ptr)) dam += o_ptr->to_d;
 
-		Term_putstr(col, 12, -1, TERM_WHITE, "Off-H");
+		Term_putstr(col, 12, -1, TERM_WHITE, "Off");
 		strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
 		Term_putstr(col+5, 12, -1, TERM_L_BLUE, format("%12s", buf));
 	}
