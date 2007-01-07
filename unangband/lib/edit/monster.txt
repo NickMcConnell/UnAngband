@@ -17237,7 +17237,7 @@ M:0:90:3:200
 B:PECK:WOUND:1d4
 F:WEIRD_MIND | FRIENDS | BASH_DOOR | CAN_FLY | 
 F:ANIMAL | RES_WATER | RES_NEXUS | RES_TPORT | 
-F:NO_CONF | LEVEL_SIZE | MUST_FLY
+F:NO_CONF | NO_STUN | LEVEL_SIZE | MUST_FLY
 S:BALL_WIND | ARC_FORCE
 D:From the vast Plains of Air come these shimmering avian beings; as they 
 D:beat their wings, terrible winds rise up and buffet you.

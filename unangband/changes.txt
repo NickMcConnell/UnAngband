@@ -132,6 +132,8 @@ there is sufficient demand I (may) add in code to load these old score files.
 - Display the number of spells you can learn before picking which book to study (suggested by
 pepebe).
 
+- Fixed bug in big term display of shop inventories (Reported by Pav Lucistnik).
+
 ### Bug fixes ###
 
 - Fixed bug where many monster flags were not written to the save file (Reported by

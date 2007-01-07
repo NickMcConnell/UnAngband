@@ -2509,11 +2509,11 @@ void print_stats(const s16b *sn, int num, int y, int x)
 			if (stat_gain_selection[j] == i) attr = TERM_L_BLUE;
 		}
 
-		/* Hack -- Dump the stat - hack from magic_name table */
+		/* Display the label */
 		c_prt(attr, format("  %c) ", I2A(i)), y + i + 1, x);
 
 		/* Display the stats */
-		display_player_stat_info(y + 1, x + 1, i, i + 1, attr);	
+		display_player_stat_info(y + 1, x + 5, i, i + 1, attr);	
 	}
 
 	/* Display drop-shadow */
@@ -2568,7 +2568,7 @@ static void improve_stat(void)
 				sprintf(buf,"Improve which attribute%s (%d)", count > 1 ? "s" : "", count - stat_gain_selected); 
 
 				/* Select stat to improve */
-				if (get_list(print_stats, table, A_MAX, "Attribute", buf, 1, 45, &(stat_gain_selection[stat_gain_selected])))
+				if (get_list(print_stats, table, A_MAX, "Attribute", buf, 1, 41, &(stat_gain_selection[stat_gain_selected])))
 				{
 					/* Check if stat at maximum */
 					if (p_ptr->stat_max[stat_gain_selection[stat_gain_selected]] >= 18 + 999)
@@ -2600,7 +2600,7 @@ static void improve_stat(void)
 		screen_save();
 
 		/* Redisplay stats */
-		print_stats(table, A_MAX, 1, 45);
+		print_stats(table, A_MAX, 1, 41);
 
 		/* Confirm? */
 		if (get_check("Increasing highlighted stats. Are you sure? "))

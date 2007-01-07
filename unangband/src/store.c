@@ -1608,7 +1608,7 @@ static void display_inventory(int store_index)
 	}
 
 	/* Erase the extra lines and the "more" prompt */
-	for (i = k; i < 13; i++) prt("", i + 6, 0);
+	for (i = k; i < Term->hgt - 9; i++) prt("", i + 6, 0);
 
 	/* Assume "no current page" */
 	put_str("        ", 5, 20);
