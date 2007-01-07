@@ -5832,25 +5832,6 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				break;
 			}
 
-			/* One adjacent target */
-			case RBM_TOUCH:
-			{
-				int py = p_ptr->py;
-				int px = p_ptr->px;
-
-				int flg = PROJECT_KILL | PROJECT_MAGIC;
-
-				/* Allow direction to be cancelled for free */
-				if ((!get_rep_dir(&dir)) && (*cancel)) return (FALSE);
-
-				/* Hack - scale damage */
-				if ((level > 8) && (d_side)) damage += damroll((level-5)/4, d_side);
-				
-				if (project(-1, 1, py, px, py + ddy[dir], px + ddx[dir], damage, effect, flg, 0, 0)) obvious = TRUE;
-
-				break;
-			}
-
 			case RBM_HANDS:
 			{
 				/* Allow direction to be cancelled for free */
@@ -6265,12 +6246,21 @@ bool process_spell_blows(int spell, int level, bool *cancel)
 				if (fire_swarm(2 + level / 20, effect, dir,
 			           	damage + level / 2, 1)) obvious = TRUE;;
 			}
+			/* One adjacent target */
 			default:
 			{
+				int py = p_ptr->py;
+				int px = p_ptr->px;
+
+				int flg = PROJECT_KILL | PROJECT_MAGIC;
+
 				/* Allow direction to be cancelled for free */
 				if ((!get_rep_dir(&dir)) && (*cancel)) return (FALSE);
 
-				if (fire_hands(effect, dir, damage)) obvious = TRUE;
+				/* Hack - scale damage */
+				if ((level > 8) && (d_side)) damage += damroll((level-5)/4, d_side);
+				
+				if (project(-1, 1, py, px, py + ddy[dir], px + ddx[dir], damage, effect, flg, 0, 0)) obvious = TRUE;
 
 				break;
 			}

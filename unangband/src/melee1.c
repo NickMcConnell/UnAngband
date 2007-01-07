@@ -5858,9 +5858,31 @@ bool mon_resist_object(int m_idx, const object_type *o_ptr)
 	/*
 	 * Handle monsters that resist blunt and/or edged weapons. We include
 	 * martial arts as a blunt attack, as well as any unusual thrown objects.
+	 * We include resist magic for instances where we try to attack monsters
+	 * with spell based weapons.
 	 */
 	switch (o_ptr->tval)
 	{
+		case TV_SPELL:
+		{
+			/* Resist */
+			if ((r_ptr->flags9 & (RF9_RES_MAGIC)) != 0)
+			{
+				resist = 60;
+
+				if (((l_ptr->flags9 & (RF9_RES_MAGIC)) == 0) &&
+					(m_ptr->ml))
+				{
+					l_ptr->flags9 |= (RF9_RES_MAGIC);
+					learn = TRUE;
+				}
+			}
+
+			/* Take note */
+			note = "glances off of";
+			break;
+		}
+
 		case TV_ARROW:
 		case TV_BOLT:
 		case TV_POLEARM:
