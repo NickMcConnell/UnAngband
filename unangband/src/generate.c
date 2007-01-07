@@ -132,21 +132,13 @@
 #define DUN_TUN_PEN     25      /* Chance of doors at room entrances */
 #define DUN_TUN_JCT     90      /* Chance of doors at tunnel junctions */
 
+
 /*
  * Dungeon streamer generation values
  */
-#define DUN_STR_WID           2  /* Width of streamers (can be higher) */
-#define DUN_STR_CHG          16  /* 1/(4 + chance) of altering direction */
-#define DUN_STR_MAG     3       /* Number of magma streamers */
-#define DUN_STR_MC      90      /* 1/chance of treasure per magma */
-#define DUN_STR_QUA     2       /* Number of quartz streamers */
-#define DUN_STR_QC      40      /* 1/chance of treasure per quartz */
-#define DUN_STR_SAN     2       /* Number of sandstone streamers */
-#define DUN_STR_SLV     40      /* Deepest level sandstone occurs instead of magma */
-#define DUN_STR_GOL     20      /* 1/chance of rich mineral vein */
-#define DUN_STR_GC      2       /* 1/chance of treasure per rich mineral vein */
-#define DUN_STR_CRA     8       /* 1/chance of cracks through dungeon */
-#define DUN_STR_CC      0       /* 1/chance of treasure per crack */
+#define DUN_STR_WID          2  /* Width of streamers (can be higher) */
+#define DUN_STR_CHG          16 /* 1/(4 + chance) of altering direction */
+#define DUN_MAX_STREAMER     5  /* Number of streamers */
 
 
 /*
@@ -1102,6 +1094,9 @@ static void draw_maze(int y1, int x1, int y2, int x2, byte feat_wall,
 
 	byte dir[4];
 	byte dirs;
+
+	/* Paranoia */
+	if ((!feat_wall) || (!feat_path) || (feat_wall == feat_path)) return;
 
 	/* Start with a solid rectangle of the "wall" feat */
 	generate_fill(y1, x1, y2, x2, feat_wall);
@@ -2878,20 +2873,11 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 
 
 /*
- * Pick appropriate feature for lake.
+ *  Ensure that the terrain matches the required level flags.
  */
-bool cave_feat_lake(int f_idx)
+static bool check_level_flags(int f_idx)
 {
 	feature_type *f_ptr = &f_info[f_idx];
-
-	/* Require lake or river */
-	if (!(f_ptr->flags2 & (FF2_RIVER)))
-	{
-		if (!(f_ptr->flags2 & (FF2_LAKE)))
-		{
-			return (FALSE);
-		}
-	}
 
 	/* Exclude terrain of various types */
 	if (level_flag & (LF1_WATER | LF1_LAVA | LF1_ICE | LF1_ACID | LF1_OIL | LF1_LIVING))
@@ -2927,8 +2913,30 @@ bool cave_feat_lake(int f_idx)
 		}
 	}
 
-	/* Okay */
 	return (TRUE);
+
+}
+
+
+
+/*
+ * Pick appropriate feature for lake.
+ */
+bool cave_feat_lake(int f_idx)
+{
+	feature_type *f_ptr = &f_info[f_idx];
+
+	/* Require lake or river */
+	if (!(f_ptr->flags2 & (FF2_RIVER)))
+	{
+		if (!(f_ptr->flags2 & (FF2_LAKE)))
+		{
+			return (FALSE);
+		}
+	}
+
+	/* Okay */
+	return (check_level_flags(f_idx));
 }
 
 
@@ -2939,12 +2947,6 @@ static bool cave_feat_pool(int f_idx)
 {
 	feature_type *f_ptr = &f_info[f_idx];
 
-	/* Hack -- Ignore ice pools on non-ice levels */
-	if (!(level_flag & LF1_ICE) && ((f_ptr->flags2 & (FF2_ICE)) != 0))
-	{
-		return (FALSE);
-	}
-
 	/* Hack -- Ignore solid features */
 	if ((f_ptr->flags1 & (FF1_MOVE)) != 0)
 	{
@@ -2953,6 +2955,53 @@ static bool cave_feat_pool(int f_idx)
 
 	/* All remaining lake features will be fine */
 	return (cave_feat_lake(f_idx));
+}
+
+
+/*
+ * Returns TRUE if f_idx is a valid island feature
+ */
+static bool cave_feat_island(int f_idx)
+{
+	feature_type *f_ptr = &f_info[f_idx];
+
+	/* Ignore non-lake features */
+	if (!(f_ptr->flags2 & (FF2_LAKE)))
+	{
+		return (FALSE);
+	}
+
+	/* Hack -- Ignore solid features, unless climbable */
+	if (((f_ptr->flags1 & (FF1_MOVE)) != 0) && ((f_ptr->flags3 & (FF3_EASY_CLIMB)) == 0))
+	{
+		return (FALSE);
+	}
+
+	/* Ignore shallow, deep or filled features */
+	if ((f_ptr->flags2 & (FF2_SHALLOW | FF2_DEEP | FF2_FILLED)) != 0)
+	{
+		return (FALSE);
+	}
+
+	return (TRUE);
+}
+
+
+/*
+ * Returns TRUE if f_idx is a valid pool feature
+ */
+static bool cave_feat_streamer(int f_idx)
+{
+	feature_type *f_ptr = &f_info[f_idx];
+
+	/* Require lake or river */
+	if (!(f_ptr->flags1 & (FF1_STREAMER)))
+	{
+		return (FALSE);
+	}
+
+	/* All remaining features depend on level flags */
+	return (check_level_flags(f_idx));
 }
 
 
@@ -6758,7 +6807,7 @@ static bool streamer_change_grid[47] =
  * basic vein, one with hidden gold, and one with known gold.  The
  * hidden gold types are currently unused.
  */
-static void build_streamer(int feat, int chance)
+static void build_streamer(int feat)
 {
 	int table_start;
 	int i;
@@ -6767,10 +6816,12 @@ static void build_streamer(int feat, int chance)
 	int out1, out2;
 	bool change;
 
+	/* Get chance */
+	int chance = f_info[feat_state(feat, FS_STREAMER)].rarity;
+
 	/* Initialize time until next turn, and time until next treasure */
 	int time_to_treas = randint(chance * 2);
 	int time_to_turn = randint(DUN_STR_CHG * 2);
-
 
 	/* Set standard width.  Vary width sometimes. */
 	int width = 2 * DUN_STR_WID + 1;
@@ -6835,7 +6886,7 @@ static void build_streamer(int feat, int chance)
 				if (time_to_treas == 0)
 				{
 					time_to_treas = randint(chance * 2);
-					cave_feat[y][dx] += 0x04;
+					cave_feat[y][dx] = feat_state(feat, FS_STREAMER);
 				}
 			}
 		}
@@ -6869,7 +6920,7 @@ static void build_streamer(int feat, int chance)
 				if (time_to_treas == 0)
 				{
 					time_to_treas = randint(chance * 2);
-					cave_feat[dy][x] += 0x04;
+					cave_feat[y][dx] = feat_state(feat, FS_STREAMER);
 				}
 			}
 		}
@@ -7638,44 +7689,18 @@ static void cave_gen(void)
 		if (dun->next_feat[i]) cave_set_feat(y, x, dun->next_feat[i]);
 	}
 
-	/* Hack -- Sandstone streamers are shallow */
-	if (rand_int(DUN_STR_SLV) > p_ptr->depth)
+	/* Allocate some streamers */
+	for (i = 0; i < DUN_MAX_STREAMER; i++)
 	{
+		/* Pick a feature */
+		int feat = pick_proper_feature(cave_feat_streamer);
 
-		/* Hack -- Add some sandstone streamers */
-		for (i = 0; i < DUN_STR_SAN; i++)
+		/* Got a valid feature? */
+		if (feat)
 		{
-			build_streamer(FEAT_SANDSTONE, 0);
+			/* Build one lake/river. */
+			build_streamer(feat);
 		}
-	}
-
-	else
-	{
-
-		/* Hack -- Add some magma streamers */
-		for (i = 0; i < DUN_STR_MAG; i++)
-		{
-			build_streamer(FEAT_MAGMA, DUN_STR_MC);
-		}
-
-	}
-
-	/* Hack -- Add some quartz streamers */
-	for (i = 0; i < ((level_flag & LF1_MINE) != 0 ? DUN_STR_QUA * 2 : DUN_STR_QUA); i++)
-	{		
-		build_streamer(FEAT_QUARTZ, DUN_STR_QC);
-	}
-
-	/* Hack -- Add a rich mineral vein very rarely */
-	if (!rand_int(DUN_STR_GOL))
-	{
-		build_streamer(FEAT_QUARTZ, DUN_STR_GC);
-	}
-
-	/* Hack -- Add cracks through the dungeon occasionally */
-	if (!(rand_int(DUN_STR_CRA)))
-	{
-		build_streamer(FEAT_WALL_C, DUN_STR_CC);
 	}
 
 	/* Destroy the level if necessary */

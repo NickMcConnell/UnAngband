@@ -1256,6 +1256,7 @@
 #define FS_DISARM       12
 #define FS_ENTER 13
 #define FS_TUNNEL       14
+#define FS_STREAMER	15
 #define FS_DOOR  18
 #define FS_TRAP  19
 #define FS_STAIRS       20
