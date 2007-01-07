@@ -124,10 +124,10 @@
 /*
  * Dungeon tunnel generation values
  */
-#define DUN_TUN_RND     10      /* Chance of random direction */
-#define DUN_TUN_CAV     50      /* Chance of random direction / changing direction in caves */
-#define DUN_TUN_CHG     10      /* Chance of changing direction */
-#define DUN_TUN_STY     10      /* Chance of changing style */
+#define DUN_TUN_RND     30      /* 1 in # chance of random direction */
+#define DUN_TUN_ADJ     10      /* 1 in # chance of adjusting direction */
+#define DUN_TUN_CAV     2      	/* 1 in # chance of random direction in caves */
+#define DUN_TUN_STYLE   10      /* 1 in # chance of changing style */
 #define DUN_TUN_CON     15       /* Chance of extra tunneling */
 #define DUN_TUN_PEN     25      /* Chance of doors at room entrances */
 #define DUN_TUN_JCT     90      /* Chance of doors at tunnel junctions */
@@ -174,6 +174,7 @@
 #define NEXT_MAX	200
 #define WALL_MAX	40
 #define TUNN_MAX	300
+#define SOLID_MAX	30
 #define STAIR_MAX	30
 
 
@@ -232,7 +233,12 @@ struct dun_data
 	int door_n;
 	coord door[DOOR_MAX];
 
-	/* Array of solid wall locations and feature types */
+	/* Array of solid walls */
+	int solid_n;
+	coord solid[SOLID_MAX];
+	s16b solid_feat[SOLID_MAX];
+
+	/* Array of decorations next to room entrances and feature types */
 	int next_n;
 	coord next[NEXT_MAX];
 	s16b next_feat[NEXT_MAX];
@@ -245,6 +251,10 @@ struct dun_data
 	int tunn_n;
 	coord tunn[TUNN_MAX];
 	s16b tunn_feat[TUNN_MAX];
+
+	/* Array of good potential stair grids */
+	s16b stair_n;
+	coord stair[STAIR_MAX];
 
 	/* Array of partitions of rooms */
 	int part_n;
@@ -321,58 +331,6 @@ static byte room_build_order[ROOM_MAX] = {ROOM_LAIR, ROOM_GREATER_VAULT, ROOM_HU
 						ROOM_CHAMBERS, ROOM_HUGE_CENTRE, ROOM_LARGE_FRACTAL, ROOM_LESSER_VAULT,
 						ROOM_INTERESTING, ROOM_STAR_BURST, ROOM_FRACTAL, ROOM_LARGE_CENTRE,
 						ROOM_LARGE_WALLS, ROOM_NORMAL_CENTRE, ROOM_NORMAL_WALLS, ROOM_NORMAL};
-
-/*
- * Always picks a correct direction
- */
-static void correct_dir(int *rdir, int *cdir, int y1, int x1, int y2, int x2)
-{
-	/* Extract vertical and horizontal directions */
-	*rdir = (y1 == y2) ? 0 : (y1 < y2) ? 1 : -1;
-	*cdir = (x1 == x2) ? 0 : (x1 < x2) ? 1 : -1;
-
-	/* Never move diagonally */
-	if (*rdir && *cdir)
-	{
-		if (rand_int(100) < 50)
-		{
-			*rdir = 0;
-		}
-		else
-		{
-			*cdir = 0;
-		}
-	}
-}
-
-
-/*
- * Pick a random direction
- */
-static void rand_dir(int *rdir, int *cdir)
-{
-	/* Pick a random direction */
-	int i = rand_int(4);
-
-	/* Extract the dy/dx components */
-	*rdir = ddy_ddd[i];
-	*cdir = ddx_ddd[i];
-}
-
-
-/*
- * Pick a random direction
- */
-static void rand_dir_cave(int *rdir, int *cdir)
-{
-	/* Pick a random direction */
-	int i = rand_int(8);
-
-	/* Extract the dy/dx components */
-	*rdir = ddy_ddd[i];
-	*cdir = ddx_ddd[i];
-}
-
 
 /*
  * Returns random co-ordinates for player/monster/object
@@ -4948,6 +4906,126 @@ static void build_roof(int y0, int x0, int ymax, int xmax, cptr data)
 
 
 /*
+ * Always picks a correct direction
+ */
+static void correct_dir(int *rdir, int *cdir, int y1, int x1, int y2, int x2)
+{
+	/* Extract vertical and horizontal directions */
+	*rdir = (y1 == y2) ? 0 : (y1 < y2) ? 1 : -1;
+	*cdir = (x1 == x2) ? 0 : (x1 < x2) ? 1 : -1;
+
+	/* Never move diagonally */
+	if (*rdir && *cdir)
+	{
+		if (rand_int(100) < 50)
+		{
+			*rdir = 0;
+		}
+		else
+		{
+			*cdir = 0;
+		}
+	}
+}
+
+
+/*
+ * Go in a semi-random direction from current location to target location.
+ * Do not actually head away from the target grid.  Always make a turn.
+ */
+static void adjust_dir(int *row_dir, int *col_dir, int y1, int x1, int y2, int x2)
+{
+	/* Always turn 90 degrees. */
+	if ((*row_dir == 0) || ((*row_dir != 0) && (*col_dir != 0) && (rand_int(100) < 50)))
+	{
+		*col_dir = 0;
+
+		/* On the y-axis of target - freely choose a side to turn to. */
+		if (y1 == y2) *row_dir = ((rand_int(2)) ? - 1 : 1);
+
+		/* Never turn away from target. */
+		else *row_dir = ((y1 < y2) ? 1 : -1);
+	}
+	else
+	{
+		*row_dir = 0;
+
+		/* On the x-axis of target - freely choose a side to turn to. */
+		if (x1 == x2) *col_dir = ((rand_int(2)) ? - 1 : 1);
+
+		/* Never turn away from target. */
+		else *col_dir = ((x1 < x2) ? 1 : -1);
+	}
+}
+
+
+/*
+ * Go in a completely random orthogonal direction.  If we turn around
+ * 180 degrees, save the grid; it may be a good place to place stairs
+ * and/or the player.
+ */
+static void rand_dir(int *row_dir, int *col_dir, int y, int x)
+{
+	/* Pick a random direction */
+	int i = rand_int(4);
+
+	/* Extract the dy/dx components */
+	int row_dir_tmp = ddy_ddd[i];
+	int col_dir_tmp = ddx_ddd[i];
+
+	/* Save useful grids. */
+	if ((-(*row_dir) == row_dir_tmp) && (-(*col_dir) == col_dir_tmp))
+	{
+		/* Save the current tunnel location if surrounded by walls. */
+		if ((in_bounds_fully(y, x)) && (dun->stair_n < STAIR_MAX) &&
+			(next_to_walls(y, x) == 4))
+		{
+			dun->stair[dun->stair_n].y = y;
+			dun->stair[dun->stair_n].x = x;
+			dun->stair_n++;
+		}
+	}
+
+	/* Save the new direction. */
+	*row_dir = row_dir_tmp;
+	*col_dir = col_dir_tmp;
+}
+
+
+/*
+ * Go in a completely random direction.  If we turn around
+ * 180 degrees, save the grid; it may be a good place to place stairs
+ * and/or the player.
+ */
+static void rand_dir_cave(int *row_dir, int *col_dir, int y, int x)
+{
+	/* Pick a random direction */
+	int i = rand_int(8);
+
+	/* Extract the dy/dx components */
+	int row_dir_tmp = ddy_ddd[i];
+	int col_dir_tmp = ddx_ddd[i];
+
+	/* Save useful grids. */
+	if ((-(*row_dir) == row_dir_tmp) && (-(*col_dir) == col_dir_tmp))
+	{
+		/* Save the current tunnel location if surrounded by walls. */
+		if ((in_bounds_fully(y, x)) && (dun->stair_n < STAIR_MAX) &&
+			(next_to_walls(y, x) == 4))
+		{
+			dun->stair[dun->stair_n].y = y;
+			dun->stair[dun->stair_n].x = x;
+			dun->stair_n++;
+		}
+	}
+
+	/* Save the new direction. */
+	*row_dir = row_dir_tmp;
+	*col_dir = col_dir_tmp;
+}
+
+
+/*
  * Leave 1 & 2 empty as these are used to vary the crenallations in crypt
  * corridors
  */
@@ -5055,9 +5133,22 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	int by1 = row1/BLOCK_HGT;
 	int bx1 = col1/BLOCK_WID;
 
+	/* Initialize some movement counters */
+	int adjust_dir_timer = randint(DUN_TUN_ADJ * 2);
+	int rand_dir_timer   = randint(DUN_TUN_RND * 2);
+	int correct_dir_timer = 0;
+	int tunnel_style_timer = randint(DUN_TUN_STYLE * 2);
+
+	/* Not yet worried about our progress */
+	int desperation = 0;
+
+	/* Readjust movement counter for caves */
+	if ((style & TUNNEL_CAVE) != 0) rand_dir_timer = randint(DUN_TUN_CAV * 2);
+	
 	/* Reset the arrays */
 	dun->tunn_n = 0;
 	dun->wall_n = 0;
+	dun->solid_n = 0;
 
 	/* Save the starting location */
 	start_row = row1;
@@ -5080,36 +5171,43 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	while ((row1 != row2) || (col1 != col2)) 
 	{
 		/* Mega-Hack -- Paranoia -- prevent infinite loops */
-		if (main_loop_count++ > 2000) return;
-
-		/* Hack -- Prevent tunnel weirdness */
-		if (dun->tunn_n >= TUNN_MAX) return;
-
-		/* Allow changes in the tunnel style */
-		if (rand_int(100) < DUN_TUN_STY)
+		if (main_loop_count++ > 2000)
 		{
-			style = get_tunnel_style();
-		}
+			/* Clear intersections and decorations */
+			dun->door_n = first_door;
+			dun->next_n = first_next;
 
-		/* Allow bends in the tunnel */
-		if (rand_int(100) < ((style & TUNNEL_CAVE ? DUN_TUN_CAV : DUN_TUN_CHG) /
-				(style & (TUNNEL_LARGE_L | TUNNEL_LARGE_R) ? 2 : 1)))
-		{
-			/* Get the correct direction */
-			correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
-
-			/* Random direction */
-			if (rand_int(100) < (style & TUNNEL_CAVE ? DUN_TUN_CAV : DUN_TUN_RND))
+			/* Remove the solid walls we applied */
+			for (i = 0; i < dun->solid_n; i++)
 			{
-				if ((style & TUNNEL_CAVE) != 0)
-					rand_dir_cave(&row_dir, &col_dir);
-				else
-					rand_dir(&row_dir, &col_dir);
+				/* Get the grid */
+				y = dun->solid[i].y;
+				x = dun->solid[i].x;
+
+				cave_set_feat(y, x, dun->solid_feat[i]);
 			}
 
-			/* Record this */
-			last_turn = dun->tunn_n;
-			last_door = dun->door_n;
+			return;
+		}
+
+		/* Hack -- Prevent tunnel weirdness */
+		if (dun->tunn_n >= TUNN_MAX)
+		{
+			/* Clear intersections and decorations */
+			dun->door_n = first_door;
+			dun->next_n = first_next;
+
+			/* Remove the solid walls we applied */
+			for (i = 0; i < dun->solid_n; i++)
+			{
+				/* Get the grid */
+				y = dun->solid[i].y;
+				x = dun->solid[i].x;
+
+				cave_set_feat(y, x, dun->solid_feat[i]);
+			}
+
+			return;
 		}
 
 		/* Hack -- if we are not starting in a room, include starting grid */
@@ -5119,12 +5217,107 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			col1 = col1 - col_dir;
 		}
 
+		/* Try moving randomly if we seem stuck. */
+		else if ((row1 != tmp_row) && (col1 != tmp_col))
+		{
+			desperation++;
+
+			/* Try a 90 degree turn. */
+			if (desperation == 1)
+			{
+				adjust_dir(&row_dir, &col_dir, row1, col1, row2, col2);
+				adjust_dir_timer = 3;
+			}
+
+			/* Try turning randomly. */
+			else if (desperation < 4)
+			{
+				rand_dir(&row_dir, &col_dir, row1, col1);
+				correct_dir_timer = 2;
+			}
+			else
+			{
+				/* We've run out of ideas.  Stop wasting time. */
+				/* Clear intersections and decorations */
+				dun->door_n = first_door;
+				dun->next_n = first_next;
+
+				/* Remove the solid walls we applied */
+				for (i = 0; i < dun->solid_n; i++)
+				{
+					/* Get the grid */
+					y = dun->solid[i].y;
+					x = dun->solid[i].x;
+
+					cave_set_feat(y, x, dun->solid_feat[i]);
+				}
+
+				/* Abort */
+				return;
+			}
+		}
+
+		/* We're making progress. */
+		else
+		{
+			/* No worries. */
+			desperation = 0;
+
+			/* Count down times until next movement changes. */
+			if (adjust_dir_timer > 0) adjust_dir_timer--;
+			if (rand_dir_timer > 0) rand_dir_timer--;
+			if (correct_dir_timer > 0) correct_dir_timer--;
+			if (tunnel_style_timer > 0) tunnel_style_timer--;
+
+			/* Adjust the tunnel style if required */
+			if (tunnel_style_timer == 0)
+			{
+				style = get_tunnel_style();
+				tunnel_style_timer = randint(DUN_TUN_STYLE * 2);
+			}
+
+			/* Make a random turn, set timer. */
+			if (rand_dir_timer == 0)
+			{
+				if ((style & TUNNEL_CAVE) != 0)
+				{
+					rand_dir_cave(&row_dir, &col_dir, row1, col1);
+					rand_dir_timer = randint(DUN_TUN_CAV * 2);
+				}
+				else
+				{
+					rand_dir(&row_dir, &col_dir, row1, col1);
+					rand_dir_timer = randint(DUN_TUN_RND * 2);
+				}
+
+				correct_dir_timer = randint(4);
+			}
+
+			/* Adjust direction, set timer. */
+			else if (adjust_dir_timer == 0)
+			{
+				adjust_dir(&row_dir, &col_dir, row1, col1, row2, col2);
+
+				adjust_dir_timer = randint(DUN_TUN_ADJ * 2);
+			}
+
+			/* Go in correct direction. */
+			else if (correct_dir_timer == 0)
+			{
+				correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
+
+				/* Don't use again unless needed. */
+				correct_dir_timer = -1;
+			}
+		}
+
+
 		/* Get the next location */
 		tmp_row = row1 + row_dir;
 		tmp_col = col1 + col_dir;
 
-		/* Do not leave the dungeon!!! XXX XXX */
-		while (!in_bounds_fully_tunnel(tmp_row, tmp_col))
+		/* Do not leave the dungeon */
+		while (!in_bounds_fully(tmp_row, tmp_col))
 		{
 			/* Fall back to last turn coords */
 			if (!last_turn)
@@ -5146,17 +5339,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			last_turn /= 2;
 			last_door = first_door;
 
-			/* Get the correct direction */
-			correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
-
-			/* Random direction */
-			if (rand_int(100) < (style & TUNNEL_CAVE ? DUN_TUN_CAV : DUN_TUN_RND))
-			{
-				if ((style & TUNNEL_CAVE) != 0)
-					rand_dir_cave(&row_dir, &col_dir);
-				else
-					rand_dir(&row_dir, &col_dir);
-			}
+			/* Adjust direction */
+			adjust_dir(&row_dir, &col_dir, row1, col1, row2, col2);
 
 			/* Get the next location */
 			tmp_row = row1 + row_dir;
@@ -5260,6 +5444,12 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 							int by2 = tmp_row/BLOCK_HGT;
 							int bx2 = tmp_col/BLOCK_WID;
 
+							/* Record details of walls made solid in the event we abort this tunnel */
+							dun->solid[dun->solid_n].y = y;
+							dun->solid[dun->solid_n].x = x;
+							dun->solid_feat[dun->solid_n] = cave_feat[y][x];
+							dun->solid_n++;
+							
 							/* Change the wall to a "solid" wall */
 							cave_alter_feat(y, x, FS_SOLID);
 
@@ -5306,6 +5496,16 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 					/* Clear intersections and decorations */
 					dun->door_n = first_door;
 					dun->next_n = first_next;
+
+					/* Remove the solid walls we applied */
+					for (i = 0; i < dun->solid_n; i++)
+					{
+						/* Get the grid */
+						y = dun->solid[i].y;
+						x = dun->solid[i].x;
+
+						cave_set_feat(y, x, dun->solid_feat[i]);
+					}
 
 					/* Abort */
 					return;
@@ -5510,6 +5710,16 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 					dun->door_n = first_door;
 					dun->next_n = first_next;
 
+					/* Remove the solid walls we applied */
+					for (i = 0; i < dun->solid_n; i++)
+					{
+						/* Get the grid */
+						y = dun->solid[i].y;
+						x = dun->solid[i].x;
+
+						cave_set_feat(y, x, dun->solid_feat[i]);
+					}
+
 					/* Abort */
 					return;
 				}
@@ -5577,6 +5787,16 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				/* Clear intersections */
 				dun->door_n = first_door;
 				dun->next_n = first_next;
+
+				/* Remove the solid walls we applied */
+				for (i = 0; i < dun->solid_n; i++)
+				{
+					/* Get the grid */
+					y = dun->solid[i].y;
+					x = dun->solid[i].x;
+
+					cave_set_feat(y, x, dun->solid_feat[i]);
+				}
 
 				/* Abort */
 				return;
@@ -5771,7 +5991,7 @@ static bool build_type123(int room, int type)
 
 	bool light = FALSE;
 	int spacing = 1;
-	bool pillars = (level_flag == LF1_CRYPT) || (rand_int(20) == 0);
+	bool pillars = ((level_flag & (LF1_CRYPT)) != 0) || (rand_int(20) == 0);
 
 	/* Occasional light */
 	if (p_ptr->depth <= randint(25)) light = TRUE;
