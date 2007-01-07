@@ -5124,7 +5124,7 @@ static u32b get_tunnel_style(void)
 static void build_tunnel(int row1, int col1, int row2, int col2)
 {
 	int i, y, x;
-	int tmp_row, tmp_col;
+	int tmp_row = row1, tmp_col = col1;
 	int row_dir, col_dir;
 	int start_row, start_col;
 	int main_loop_count = 0;
@@ -7166,7 +7166,7 @@ static void build_streamer(int feat)
 				if (time_to_treas == 0)
 				{
 					time_to_treas = randint(chance * 2);
-					cave_feat[y][dx] = feat_state(feat, FS_STREAMER);
+					cave_feat[dy][x] = feat_state(feat, FS_STREAMER);
 				}
 			}
 		}
