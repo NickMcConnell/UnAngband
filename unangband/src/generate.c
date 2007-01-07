@@ -5186,7 +5186,6 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 
 				cave_set_feat(y, x, dun->solid_feat[i]);
 			}
-
 			return;
 		}
 
@@ -5205,6 +5204,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				x = dun->solid[i].x;
 
 				cave_set_feat(y, x, dun->solid_feat[i]);
+
 			}
 
 			return;
@@ -5250,6 +5250,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 					x = dun->solid[i].x;
 
 					cave_set_feat(y, x, dun->solid_feat[i]);
+
 				}
 
 				/* Abort */
@@ -5488,7 +5489,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			int bx2 = tmp_col/BLOCK_WID;
 
 			/* Different room */
-			if (dun_room[by1][bx1] != dun_room[by2][bx2])
+			if ((dun_room[by1][bx1]) && (dun_room[by2][bx2]) && (dun_room[by1][bx1] != dun_room[by2][bx2]))
 			{
 				/* Different room in same partition */
 				if (dun->part[dun_room[by1][bx1]-1] == dun->part[dun_room[by2][bx2]-1])
@@ -5505,6 +5506,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 						x = dun->solid[i].x;
 
 						cave_set_feat(y, x, dun->solid_feat[i]);
+
 					}
 
 					/* Abort */
@@ -5520,9 +5522,6 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 					{
 						if (dun->part[i] == part2) dun->part[i] = part1;
 					}
-
-					/* Merge partitions */
-					dun->part_n--;
 
 					/* Rewrite tunnel to room if we end up on a non-floor */
 					if (cave_feat[tmp_row][tmp_col] != FEAT_FLOOR)
@@ -5718,6 +5717,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 						x = dun->solid[i].x;
 
 						cave_set_feat(y, x, dun->solid_feat[i]);
+
 					}
 
 					/* Abort */
@@ -5781,6 +5781,9 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			int by2 = row1/BLOCK_HGT;
 			int bx2 = col1/BLOCK_WID;
 
+			/* Both ends are rooms */
+			if ((dun_room[by1][bx1]) && (dun_room[by2][bx2]))
+			{
 			/* Different room in same partition */
 			if (dun->part[dun_room[by1][bx1]-1] == dun->part[dun_room[by2][bx2]-1])
 			{
@@ -5796,12 +5799,13 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 					x = dun->solid[i].x;
 
 					cave_set_feat(y, x, dun->solid_feat[i]);
+
 				}
 
 				/* Abort */
 				return;
 			}
-			else
+			else if ((dun_room[by1][bx1]) && (dun_room[by2][bx2]))
 			{
 				int part1 = dun->part[dun_room[by1][bx1]-1];
 				int part2 = dun->part[dun_room[by2][bx2]-1];
@@ -5812,11 +5816,9 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 					if (dun->part[i] == part2) dun->part[i] = part1;
 				}
 
-				/* Merge partitions */
-				dun->part_n--;
-
 				/* Accept tunnel */
 				break;
+				}
 			}
 		}
 	}
@@ -7441,14 +7443,13 @@ static void cave_gen(void)
 	int by, bx;
 
 	int rooms_built = 0;
+	int counter = 0;
 
 	int base;
 
 	dungeon_zone *zone=&t_info[0].zone[0];
 
 	dun_data dun_body;
-
-	int counter = 0;
 
 	/* Global data */
 	dun = &dun_body;
@@ -7783,9 +7784,6 @@ static void cave_gen(void)
 		dun->cent[pick2].x = x1;
 	}
 
-	/* Set number of partitions */
-	dun->part_n = dun->cent_n;
-
 	/* Partition rooms */
 	for (i = 0; i < dun->cent_n; i++)
 	{
@@ -7804,80 +7802,89 @@ static void cave_gen(void)
 	 * We repeat, until there is only one partition.
 	 */
 
-	while (dun->part_n > 1)
+	while (TRUE)
 	{
-		if (++counter > 500)
+		bool finished = TRUE;
+
+		/* Abort */
+		if (counter++ > DUN_ROOMS * DUN_ROOMS)
 		{
-			msg_format("Cannot connect rooms.");
+			msg_print("Aborting. Cannot connect rooms.");
 
 			break;
 		}
 
+		/* Check each partition */
 		for (i = 0; i < dun->cent_n; i++)
 		{
 			int dist = 30000;
-			int choice = -1;
+			int c1 = -1;
+			int c2 = -1;
+			int r1 = -1;
+			int r2 = -1;
+			int n1 = 0;
+			int n2 = 0;
 
+			/* Check members of each partition */
 			for (j = 0; j < dun->cent_n; j++)
 			{
 				if (dun->part[j] != i) continue;
 
+				/* Pick a random choice */
+				if (!rand_int(++n1)) r1 = j;
+
+				/* Check all rooms */
 				for (k = 0; k < dun->cent_n; k++)
 				{
-					int dist1 = distance(dun->cent[j].y, dun->cent[j].x, dun->cent[k].y, dun->cent[k].x);
-					int type = ROOM_NORMAL;
+					int dist1;
 
-					/* Paranoia */
-					if (dun_room[dun->cent[i].y/BLOCK_HGT][dun->cent[i].x/BLOCK_WID] < DUN_ROOMS)
+					/* Skip members of the same partition */
+					if (dun->part[k] == i) continue;										
+
+					/* Trying a random choice */
+					if (counter > 2 * DUN_ROOMS)
 					{
-						type = room_info[dun_room[dun->cent[i].y/BLOCK_HGT][dun->cent[i].x/BLOCK_WID]].type;
+						dist1 = distance(dun->cent[r1].y, dun->cent[r1].x, dun->cent[k].y, dun->cent[k].x);
+					}
+					else
+					{
+						dist1 = distance(dun->cent[j].y, dun->cent[j].x, dun->cent[k].y, dun->cent[k].x);
 					}
 
-					/* Hack -- skip vaults */
-					if ((type == ROOM_LESSER_VAULT) || (type == ROOM_GREATER_VAULT)) continue;
-
-					/* Better choice? */
-					if ((dun->part[j] != dun->part[k]) && (dist > dist1))
+					/* Pick this room sometimes */
+					if (dist1 < dist)
 					{
 						dist = dist1;
-						choice = k;
+						if (counter > 2 * DUN_ROOMS) c1 = r1; else c1 = j;
+						c2 = k;
 					}
+
+					/* Pick a random choice */
+					if (!rand_int(++n2)) r2 = k;
 				}
-
-				/* Connect the room to the nearest neighbour */
-				build_tunnel(dun->cent[j].y, dun->cent[j].x, dun->cent[k].y, dun->cent[k].x);
-
-				/* Finish partition */
-				if (dun->part_n == 1) break;
+			}
+			/* Use the choice */
+			if ((c1 >= 0) && (c2 >= 0) && ((counter < 4 * DUN_ROOMS) || (rand_int(counter) < 50)))
+			{
+				build_tunnel(dun->cent[c1].y, dun->cent[c1].x, dun->cent[c2].y, dun->cent[c2].x);
+			}
+			/* Try a random choice */
+			else if ((r1 >= 0) && (r2 >= 0))
+			{
+				build_tunnel(dun->cent[r1].y, dun->cent[r1].x, dun->cent[r2].y, dun->cent[r2].x);
 			}
 
-			/* Finish partition */
-			if (dun->part_n == 1) break;
+
 		}
+		/* Check if we have finished. All partition numbers will be the same. */
+		for (i = 1; i < dun->cent_n; i++)
+		{
+			if (dun->part[i] != dun->part[i-1]) finished = FALSE;
+		}
+
+		/* Finished? */
+		if (finished) break;
 	}
-
-
-/* Old connection routine below */
-#if 0
-	/* Paranoia */
-	if (dun->cent_n)
-	{
-		/* Hack -- connect the first room to the last room */
-		y = dun->cent[dun->cent_n-1].y;
-		x = dun->cent[dun->cent_n-1].x;
-	}
-
-	/* Connect all the rooms together */
-	for (i = 0; i < dun->cent_n; i++)
-	{
-		/* Connect the room to the previous room */
-		build_tunnel(dun->cent[i].y, dun->cent[i].x, y, x);
-
-		/* Remember the "previous" room */
-		y = dun->cent[i].y;
-		x = dun->cent[i].x;
-	}
-#endif
 
 	/* Place intersection doors */
 	for (i = 0; i < dun->door_n; i++)
