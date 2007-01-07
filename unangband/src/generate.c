@@ -1416,6 +1416,9 @@ static bool generate_starburst_room(int y1, int x1, int y2, int x2,
 {
 	int y, x, d;
 
+	/* Paranoia */
+	if (!feat) return (FALSE);
+
 	/* Mark the affected grids */
 	if (!mark_starburst_shape(y1, x1, y2, x2, flag)) return (FALSE);
 
