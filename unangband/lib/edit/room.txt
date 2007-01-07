@@ -389,7 +389,7 @@ P:ROWS | COLS
 N:104:120:0:0:60:2:0:128
 A:
 B:garden
-D:A garden maze 
+D:A garden  
 S:SEEN
 L:LIVING
 P:MAZE_WALL
@@ -397,7 +397,7 @@ P:MAZE_WALL
 N:104:120:0:0:60:2:0:128
 A:
 B:garden
-D:A garden maze 
+D:A garden  
 S:SEEN
 L:LIVING
 P:MAZE_PATH
@@ -4256,7 +4256,7 @@ P:INNER
 N:119:105:0:0:5:5:0:128
 A:
 B:
-D:maze 
+D: 
 P:MAZE_WALL
 
 N:119:105:0:0:5:5:0:128
@@ -4351,7 +4351,7 @@ P:INNER
 N:121:102:0:0:5:5:0:128
 A:
 B:
-D:maze 
+D: 
 P:MAZE_WALL
 
 N:122:107:0:0:10:1:0:128
@@ -5427,7 +5427,7 @@ P:CENTRE | STARBURST
 
 N:145:106:0:0:15:15:0:128
 A:
-B:maze
+B:
 P:CENTRE | MAZE_WALL
 
 N:145:106:0:0:15:15:0:128
