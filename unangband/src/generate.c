@@ -5135,6 +5135,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	bool overrun_flag = FALSE;
 	bool abort_and_cleanup = FALSE;
 
+	dun_data *dun_test = dun;
+
 	/* Force style change */
 	u32b style = get_tunnel_style();
 
@@ -5284,7 +5286,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		tmp_col = col1 + col_dir;
 
 		/* Do not leave the dungeon */
-		while (!in_bounds_fully(tmp_row, tmp_col))
+		while (!in_bounds_fully_tunnel(tmp_row, tmp_col))
 		{
 			/* Fall back to last turn coords */
 			if (!last_turn)
@@ -6317,6 +6319,9 @@ static bool build_type131415(int room, int type)
  */
 static bool room_build(int room, int type)
 {
+	/* Generating */
+	if (cheat_room) msg_format("Building room type %d.", type);
+
 	/* Build a room */
 	switch (type)
 	{
@@ -7449,6 +7454,9 @@ static void cave_gen(void)
 		}
 	}
 
+	/* Generating */
+	if (cheat_room) msg_print("Generating ecology.");
+
 	/* Initialise the dungeon ecology */
 	cave_ecology.num_races = 0;
 	cave_ecology.ready = FALSE;
@@ -7510,6 +7518,9 @@ static void cave_gen(void)
 	/* No rooms yet */
 	dun->cent_n = 0;
 
+	/* No stairs yet */
+	dun->stair_n = 0;
+
 	/* Hack -- chance of destroyed level */
 	if ((p_ptr->depth > 10) && (rand_int(DUN_DEST) == 0)) level_flag |= LF1_DESTROYED;
 
@@ -7520,6 +7531,9 @@ static void cave_gen(void)
 	if ((zone->tower) && (p_ptr->depth >= min_depth(p_ptr->dungeon)))
 	{
 		vault_type *v_ptr;
+
+		/* Generating */
+		if (cheat_room) msg_print("Building tower.");
 
 		/* Get the location of the tower */
 		y = (DUNGEON_HGT) / 2;
@@ -7589,6 +7603,10 @@ static void cave_gen(void)
 	/* No features in a tower above the surface */
 	if (((level_flag & (LF1_TOWER)) == 0) || ((level_flag & (LF1_SURFACE)) != 0))
 	{
+
+		/* Generating */
+		if (cheat_room) msg_print("Building nature.");
+
 		build_nature();
 	}
 
@@ -7618,6 +7636,9 @@ static void cave_gen(void)
 	/* Build some rooms or points to connect tunnels */
 	if ((level_flag & (LF1_ROOMS | LF1_TUNNELS)) != 0)
 	{
+		/* Generating */
+		if (cheat_room) msg_print("Building rooms.");
+
 		/*
 		 * Build each type of room in turn until we cannot build any more.
 		 */
@@ -7763,6 +7784,9 @@ static void cave_gen(void)
 	{
 		bool finished = TRUE;
 
+		/* Generating */
+		if (cheat_room) msg_print("Connecting rooms.");
+
 		/* Abort */
 		if (counter++ > DUN_ROOMS * DUN_ROOMS)
 		{
@@ -7885,6 +7909,9 @@ static void cave_gen(void)
 		/* Pick a feature */
 		int feat = pick_proper_feature(cave_feat_streamer);
 
+		/* Generating */
+		if (cheat_room) msg_print("Building streamers.");
+
 		/* Got a valid feature? */
 		if (feat)
 		{
@@ -7906,6 +7933,9 @@ static void cave_gen(void)
 	/* Hack -- make sure we have rooms/corridors to place stuff */
 	if ((level_flag & (LF1_ROOMS | LF1_TOWER)) != 0)
 	{	
+		/* Generating */
+		if (cheat_room) msg_print("Placing stairs, rubble, traps.");
+
 		/* Place 1 or 2 down stairs near some walls */
 		alloc_stairs(FEAT_MORE, rand_range(1, 2), 3);
 
@@ -7926,6 +7956,10 @@ static void cave_gen(void)
 	}
 	else if (!dun->entrance)
 	{
+
+		/* Generating */
+		if (cheat_room) msg_print("Placing dungeon entrance.");
+
 		/* Place the dungeon entrance */
 		while (TRUE)
 		{
@@ -7946,6 +7980,9 @@ static void cave_gen(void)
 	/* Pick a base number of monsters */
 	i = MIN_M_ALLOC_LEVEL + randint(8);
 
+	/* Generating */
+	if (cheat_room) msg_print("Placing monsters.");
+
 	/* Put some monsters in the dungeon */
 	for (i = i + k; i > 0; i--)
 	{
@@ -7955,6 +7992,9 @@ static void cave_gen(void)
 	/* Hack -- make sure we have rooms to place stuff */
 	if ((level_flag & (LF1_ROOMS | LF1_TOWER)) != 0)
 	{
+		/* Generating */
+		if (cheat_room) msg_print("Placing objects, treasure.");
+
 		/* Put some objects in rooms */
 		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ROOM, 3));
 	
@@ -8001,6 +8041,9 @@ static void cave_gen(void)
 	{
 		int y, x;
 
+		/* Generating */
+		if (cheat_room) msg_print("Placing guardian.");
+
 		/* Pick a location */
 		while (1)
 		{
@@ -8013,6 +8056,9 @@ static void cave_gen(void)
 		/* Place the questor */
 		place_monster_aux(y, x, zone->guard, FALSE, TRUE);
 	}
+
+	/* Generating */
+	if (cheat_room) msg_print("Finished generating dungeon.");
 
 	/* Hack -- restrict teleporation in towers */
 	/* XXX Important that this occurs after placing the player */
@@ -8429,6 +8475,9 @@ void generate_cave(void)
         /* There is no dynamic terrain */
         dyna_full = FALSE;
 	dyna_n = 0;
+
+	/* Generating */
+	if (cheat_room) msg_print("Generating new level.");
 
 	/* Generate */
 	for (num = 0; TRUE; num++)
