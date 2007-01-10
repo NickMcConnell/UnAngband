@@ -174,7 +174,7 @@
 #define NEXT_MAX	200
 #define WALL_MAX	40
 #define TUNN_MAX	300
-#define SOLID_MAX	30
+#define SOLID_MAX	120
 #define STAIR_MAX	30
 
 
@@ -5133,6 +5133,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 
 	bool door_flag = FALSE;
 	bool overrun_flag = FALSE;
+	bool abort_and_cleanup = FALSE;
 
 	/* Force style change */
 	u32b style = get_tunnel_style();
@@ -5180,41 +5181,15 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		/* Mega-Hack -- Paranoia -- prevent infinite loops */
 		if (main_loop_count++ > 2000)
 		{
-			/* Clear intersections and decorations */
-			dun->door_n = first_door;
-			dun->next_n = first_next;
-
-			/* Remove the solid walls we applied */
-			for (i = 0; i < dun->solid_n; i++)
-			{
-				/* Get the grid */
-				y = dun->solid[i].y;
-				x = dun->solid[i].x;
-
-				cave_set_feat(y, x, dun->solid_feat[i]);
-			}
-			return;
+			abort_and_cleanup = TRUE;
+			break;
 		}
 
 		/* Hack -- Prevent tunnel weirdness */
 		if (dun->tunn_n >= TUNN_MAX)
 		{
-			/* Clear intersections and decorations */
-			dun->door_n = first_door;
-			dun->next_n = first_next;
-
-			/* Remove the solid walls we applied */
-			for (i = 0; i < dun->solid_n; i++)
-			{
-				/* Get the grid */
-				y = dun->solid[i].y;
-				x = dun->solid[i].x;
-
-				cave_set_feat(y, x, dun->solid_feat[i]);
-
-			}
-
-			return;
+			abort_and_cleanup = TRUE;
+			break;
 		}
 
 		/* Hack -- if we are not starting in a room, include starting grid */
@@ -5244,24 +5219,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			}
 			else
 			{
-				/* We've run out of ideas.  Stop wasting time. */
-				/* Clear intersections and decorations */
-				dun->door_n = first_door;
-				dun->next_n = first_next;
-
-				/* Remove the solid walls we applied */
-				for (i = 0; i < dun->solid_n; i++)
-				{
-					/* Get the grid */
-					y = dun->solid[i].y;
-					x = dun->solid[i].x;
-
-					cave_set_feat(y, x, dun->solid_feat[i]);
-
-				}
-
-				/* Abort */
-				return;
+				abort_and_cleanup = TRUE;
+				break;
 			}
 		}
 
@@ -5451,12 +5410,15 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 							/* Room */
 							int by2 = tmp_row/BLOCK_HGT;
 							int bx2 = tmp_col/BLOCK_WID;
-
+		
 							/* Record details of walls made solid in the event we abort this tunnel */
-							dun->solid[dun->solid_n].y = y;
-							dun->solid[dun->solid_n].x = x;
-							dun->solid_feat[dun->solid_n] = cave_feat[y][x];
-							dun->solid_n++;
+							if (dun->solid_n < SOLID_MAX)
+							{
+								dun->solid[dun->solid_n].y = y;
+								dun->solid[dun->solid_n].x = x;
+								dun->solid_feat[dun->solid_n] = cave_feat[y][x];
+								dun->solid_n++;
+							}
 							
 							/* Change the wall to a "solid" wall */
 							cave_alter_feat(y, x, FS_SOLID);
@@ -5501,23 +5463,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				/* Different room in same partition */
 				if (dun->part[dun_room[by1][bx1]-1] == dun->part[dun_room[by2][bx2]-1])
 				{
-					/* Clear intersections and decorations */
-					dun->door_n = first_door;
-					dun->next_n = first_next;
-
-					/* Remove the solid walls we applied */
-					for (i = 0; i < dun->solid_n; i++)
-					{
-						/* Get the grid */
-						y = dun->solid[i].y;
-						x = dun->solid[i].x;
-
-						cave_set_feat(y, x, dun->solid_feat[i]);
-
-					}
-
-					/* Abort */
-					return;
+					abort_and_cleanup = TRUE;
+					break;
 				}
 				else
 				{
@@ -5712,23 +5659,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			{
 				if ((overrun_flag) || (dun->door_n > first_door + 6))
 				{
-					/* Clear intersections */
-					dun->door_n = first_door;
-					dun->next_n = first_next;
-
-					/* Remove the solid walls we applied */
-					for (i = 0; i < dun->solid_n; i++)
-					{
-						/* Get the grid */
-						y = dun->solid[i].y;
-						x = dun->solid[i].x;
-
-						cave_set_feat(y, x, dun->solid_feat[i]);
-
-					}
-
-					/* Abort */
-					return;
+					abort_and_cleanup = TRUE;
+					break;
 				}
 
 				overrun_flag = TRUE;
@@ -5791,44 +5723,51 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			/* Both ends are rooms */
 			if ((dun_room[by1][bx1]) && (dun_room[by2][bx2]))
 			{
-			/* Different room in same partition */
-			if (dun->part[dun_room[by1][bx1]-1] == dun->part[dun_room[by2][bx2]-1])
-			{
-				/* Clear intersections */
-				dun->door_n = first_door;
-				dun->next_n = first_next;
-
-				/* Remove the solid walls we applied */
-				for (i = 0; i < dun->solid_n; i++)
+				/* Different room in same partition */
+				if (dun->part[dun_room[by1][bx1]-1] == dun->part[dun_room[by2][bx2]-1])
 				{
-					/* Get the grid */
-					y = dun->solid[i].y;
-					x = dun->solid[i].x;
-
-					cave_set_feat(y, x, dun->solid_feat[i]);
-
+					abort_and_cleanup = TRUE;
+					break;
 				}
-
-				/* Abort */
-				return;
-			}
-			else if ((dun_room[by1][bx1]) && (dun_room[by2][bx2]))
-			{
-				int part1 = dun->part[dun_room[by1][bx1]-1];
-				int part2 = dun->part[dun_room[by2][bx2]-1];
-
-				/* Merge partitions */
-				for (i = 0; i < dun->cent_n; i++)
+				else if ((dun_room[by1][bx1]) && (dun_room[by2][bx2]))
 				{
-					if (dun->part[i] == part2) dun->part[i] = part1;
-				}
+					int part1 = dun->part[dun_room[by1][bx1]-1];
+					int part2 = dun->part[dun_room[by2][bx2]-1];
 
-				/* Accept tunnel */
-				break;
+					/* Merge partitions */
+					for (i = 0; i < dun->cent_n; i++)
+					{
+						if (dun->part[i] == part2) dun->part[i] = part1;
+					}
+
+					/* Accept tunnel */
+					break;
 				}
 			}
 		}
 	}
+
+
+	/* We have to cleanup some stuff before returning if we abort */	
+	if (abort_and_cleanup)
+	{
+		/* Clear intersections and decorations */
+		dun->door_n = first_door;
+		dun->next_n = first_next;
+
+		/* Remove the solid walls we applied */
+		for (i = 0; i < dun->solid_n; i++)
+		{
+			/* Get the grid */
+			y = dun->solid[i].y;
+			x = dun->solid[i].x;
+
+			cave_set_feat(y, x, dun->solid_feat[i]);
+		}
+
+		return;
+	}
+
 
 	/* Turn the tunnel into corridor */
 	for (i = 0; i < dun->tunn_n; i++)
