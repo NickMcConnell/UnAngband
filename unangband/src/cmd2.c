@@ -634,7 +634,7 @@ static void do_cmd_travel(void)
 
 					}
 
-					/* Lowercase 1+*/
+					/* Lowercase 1+ */
 					choice = tolower(ke.key);
 
 					/* Extract request */
@@ -676,20 +676,18 @@ static void do_cmd_travel(void)
 				/* Abort if needed */
 				if (!flag) return;
 
-				/* Set journey time */
+				/* Set journey time; takes longer at night */
 				if (selection == t_ptr->nearby)
 				{
-					journey = damroll(2, 4);
+					journey = damroll(2 + (level_flag & (LF1_DAYLIGHT)), 4);
 				}
-				/* Set journey time */
 				else if (selection == t_ptr->distant)
 				{
-					journey = damroll(3, 4);
+					journey = damroll(3 + (level_flag & (LF1_DAYLIGHT)), 4);
 				}
-				/* Set journey time */
 				else
 				{
-					journey = damroll(4, 4);
+					journey = damroll(4 + (level_flag & (LF1_DAYLIGHT)), 4);
 				}
 			}
 			else
