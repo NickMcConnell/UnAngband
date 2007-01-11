@@ -195,20 +195,6 @@ static int quiver_wield(int item, object_type *o_ptr)
 	/* Increase the weight */
 	p_ptr->total_weight += i_ptr->weight * num;
 
-	/* Decrease the item (from the pack) */
-	if (item >= 0)
-	{
-		inven_item_increase(item, -num);
-		inven_item_optimize(item);
-	}
-
-	/* Decrease the item (from the floor) */
-	else
-	{
-		floor_item_increase(0 - item, -num);
-		floor_item_optimize(0 - item);
-	}
-
 	/* Update "p_ptr->pack_size_reduce" */
 	find_quiver_size();
 
