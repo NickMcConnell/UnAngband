@@ -1448,7 +1448,7 @@ struct player_type
 	s16b total_weight;      /* Total weight being carried */
 
 	s16b inven_cnt; /* Number of items in inventory */
-	s16b equip_cnt; /* Number of items in equipment */
+	s16b equip_cnt; /* Number of items in equipment (except quiver) */
 	s16b pack_size_reduce;		/* Number of inventory slots used by
 					   the quiver */
 

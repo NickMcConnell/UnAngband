@@ -3928,7 +3928,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 
 	  /* Weapon caught */
 	}
-      else if (catch_chance <= 6 + catch_chance / 20)
+      else if (catch_chance <= 9 + catch_chance / 10)
 	/* You don't catch the returning weapon; it almost hits you */
 	{
 	  /* Describe */
@@ -3936,12 +3936,6 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 
 	  msg_format("The returning %^s narrowly misses you.", o_name);
 
-	  /* Weapon not caught */
-	  trick_throw = FALSE;
-	}
-      else if (catch_chance <= 9 + catch_chance / 10)
-	/* You don't catch the returning weapon; it drops nearby */
-	{
 	  /* Weapon not caught */
 	  trick_throw = FALSE;
 	}

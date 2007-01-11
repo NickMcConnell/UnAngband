@@ -7362,10 +7362,11 @@ void inven_item_optimize(int item)
 	else
 	{
 		/* Reorder the quiver if necessary */
-		if (IS_QUIVER_SLOT(item)) p_ptr->notice |= (PN_REORDER);
-
-		/* One less item */
-		p_ptr->equip_cnt--;
+		if (IS_QUIVER_SLOT(item)) 
+		  p_ptr->notice |= (PN_REORDER);
+		else
+		  /* One less item */
+		  p_ptr->equip_cnt--;
 
 		/* Erase the empty slot */
 		object_wipe(&inventory[item]);
