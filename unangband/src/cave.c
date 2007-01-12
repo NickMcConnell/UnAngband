@@ -5853,6 +5853,10 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 	{
 		/* Require strict LOF */
 		require_strict_lof = TRUE;
+
+		/* Hack in a hack for trick throws */
+		if (range == 256)
+		require_strict_lof = FALSE;
 	}
 
 	/* Get position change (signed) */
