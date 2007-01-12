@@ -2891,7 +2891,7 @@ static void calc_bonuses(void)
 
 	/* Reset "fire" info */
 	p_ptr->num_fire = 0;
-	p_ptr->num_throw = 2;
+	p_ptr->num_throw = 1;
 	p_ptr->ammo_mult = 0;
 	p_ptr->ammo_tval = 0;
 	extra_shots = 0;
@@ -3514,10 +3514,9 @@ static void calc_bonuses(void)
 		p_ptr->heavy_wield = TRUE;
 	}
 
-	/* Normal weapons */
-	if (weight && !p_ptr->heavy_wield)
+	/* Normal weapons and throwing weapons */
 	{
-		int str_index, dex_index;
+		int str_index, dex_index, half_str;
 
 		int num = c_info[p_ptr->pclass].max_attacks;
 		int wgt = c_info[p_ptr->pclass].min_weight;
@@ -3551,10 +3550,41 @@ static void calc_bonuses(void)
 		/* Require at least one blow */
 		if (p_ptr->num_blow < 1) p_ptr->num_blow = 1;
 
-		/* Boost digging skill by weapon weight */
-		p_ptr->skill_dig += (weight / 10);
+		/* Throwing weapons */
+
+		/* Enforce a fixed divisor and multiplier for throwing
+		   (the same as for warrior's blows) */
+		div = 30;
+		mul = 5;
+
+		/* Make strength less significant */
+		half_str = 10 + p_ptr->stat_ind[A_STR] / 4;
+
+		/* Get the strength vs weight; strength translated */
+		str_index = adj_str_blow[half_str] * mul / div;
+
+		/* Maximal value */
+		if (str_index > 11) str_index = 11;
+
+		/* Index by dexterity the same as for blows */
+
+		/* Use the blows table */
+		p_ptr->num_throw = blows_table[str_index][dex_index];
+
+		/* Maximal value */
+		if (p_ptr->num_throw > num) p_ptr->num_throw = num;
+
+		/* Require at least one throw */
+		if (p_ptr->num_throw < 1) p_ptr->num_throw = 1;
 	}
 
+	/* Check if heavy weapon or no weapon at all */
+	if (!weight || p_ptr->heavy_wield)
+	  /* Limit blows */
+	    p_ptr->num_blow = 1;
+	else
+	  /* Boost digging skill by weapon weight */
+	  p_ptr->skill_dig += (weight / 10);
 
 
 	/*** Compute exercised styles ***/

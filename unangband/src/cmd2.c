@@ -3282,7 +3282,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   object_type *i_ptr;
   object_type object_type_body;
 
-  bool hit_body = TRUE;
+  bool ammo_can_break = TRUE;
   bool trick_failure = FALSE;
   bool chasm = FALSE;
   int feat;
@@ -3434,7 +3434,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 
       /* If too far or all tricks used, return to player; no target query */
       if (trick_throw
-	  && (!hit_body 
+	  && (!ammo_can_break 
 	      || tricks == num_tricks - 1))
 	{
 	  tx = p_ptr->px;
@@ -3507,15 +3507,15 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
       old_y = y;
       old_x = x;
 
-      /* Reset hit_body */
+      /* Reset ammo_can_break */
       if (o_ptr->tval == TV_FLASK 
 	  || o_ptr->tval == TV_POTION 
 	  || o_ptr->tval == TV_EGG) 
 	/* Hack -- flasks, potions, spores break as if striking a monster */
-	hit_body = TRUE;
+	ammo_can_break = TRUE;
       else
-	/* Otherwise hitting is not that easy */
-	hit_body = FALSE;
+	/* Otherwise not breaking by default */
+	ammo_can_break = FALSE;
 
       /* Project along the path */
       for (i = 0; i < path_n; ++i)
@@ -3713,7 +3713,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 		  cptr note_dies = " dies.";
 
 		  /* Note the collision */
-		  hit_body = TRUE;
+		  ammo_can_break = TRUE;
 
 		  /* 2nd and last cause of failure: bounce off monster */
 		  trick_failure = !genuine_hit;
@@ -3877,8 +3877,8 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
   /* Reenable auto-target */
   use_old_target = use_old_target_backup;
 
-  /* Chance of breakage (during attacks) */
-  j = ((hit_body || trick_failure) ? breakage_chance(i_ptr) : 0);
+  /* Chance of breakage; trick throws always risky */
+  j = ((ammo_can_break || trick_throw) ? breakage_chance(i_ptr) : 0);
 
   /* The fourth and last piece of code dependent on fire/throw */
   if (fire)
@@ -3990,7 +3990,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 	}
     }
   else
-    /* Not a successful trick shot; just drop near the last monster */
+    /* Not a successful trick shot; just drop near the last monster/wall */
     {
       /* Sometimes use lower stack object --- FIXME: clarify comment, search and replace similar comments */
       if (!object_charges_p(o_ptr) && rand_int(o_ptr->number) < o_ptr->stackc)
