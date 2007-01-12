@@ -491,7 +491,6 @@ void do_cmd_wield(void)
 
 		/* Redraw stuff */
 		p_ptr->redraw |= (PR_ITEM_LIST);
-
 	}
 
 	/* Ammo goes in quiver slots, which have special rules. */
@@ -502,54 +501,28 @@ void do_cmd_wield(void)
 
 	    /* Can't do it; note the turn already wasted for racial sensing */
 	    if (!slot) return;
-
-	    /* Get the wield slot */
-	    j_ptr = &inventory[slot];
 	  }
-	else
+
+	/* Reset stackc; assume no wands in quiver */
+	i_ptr->stackc = 0;
+
+	/* Sometimes use lower stack object */
+	if (!object_charges_p(o_ptr) 
+	    && (rand_int(o_ptr->number) < o_ptr->stackc))
 	  {
-	    /* Reset stackc; assume no wands in quiver */
-	    i_ptr->stackc = 0;
-
-	    /* Sometimes use lower stack object */
-	    if (!object_charges_p(o_ptr) 
-		&& (rand_int(o_ptr->number) < o_ptr->stackc))
+	    if (amt >= o_ptr->stackc)
 	      {
-		if (amt >= o_ptr->stackc)
-		{
-			i_ptr->stackc = o_ptr->stackc;
+		i_ptr->stackc = o_ptr->stackc;
 
-			o_ptr->stackc = 0;
-		}
-		else
-		{
-			if (i_ptr->charges) i_ptr->charges--;
-			if (i_ptr->timeout) i_ptr->timeout = 0;
-
-			o_ptr->stackc -= amt;
-		}
-	      }
-
-	    /* Get the wield slot */
-	    j_ptr = &inventory[slot];
-
-	    if (rings) 
-	      {
-		/* Wear the new rings */
-		object_absorb(j_ptr, i_ptr);
+		o_ptr->stackc = 0;
 	      }
 	    else
 	      {
-		/* Take off existing item */
-		if (j_ptr->k_idx)
-		  (void)inven_takeoff(slot, 255);
+		if (i_ptr->charges) i_ptr->charges--;
+		if (i_ptr->timeout) i_ptr->timeout = 0;
 
-		/* Wear the new stuff */
-		object_copy(j_ptr, i_ptr);
+		o_ptr->stackc -= amt;
 	      }
-
-	    /* Increment the equip counter by hand */
-	    p_ptr->equip_cnt++;
 	  }
 
 	/* Decrease the item (from the pack); cancelling no longer possible */
@@ -570,6 +543,30 @@ void do_cmd_wield(void)
 		floor_item_optimize(0 - item);
 		if (get_feat && (scan_feat(p_ptr->py,p_ptr->px) < 0)) cave_alter_feat(p_ptr->py,p_ptr->px,FS_GET_FEAT);
 	}
+
+	/* Get the wield slot */
+	j_ptr = &inventory[slot];
+
+
+	/* Special rules for similar rings */
+	if (rings) 
+	  {
+	    /* Wear the new rings */
+	    object_absorb(j_ptr, i_ptr);
+	  }
+	else if (!IS_QUIVER_SLOT(slot))
+	/* Normal rules for non-ammo */
+	  {
+	    /* Take off existing item */
+	    if (j_ptr->k_idx)
+	      (void)inven_takeoff(slot, 255);
+
+	    /* Wear the new stuff */
+	    object_copy(j_ptr, i_ptr);
+
+	    /* Increment the equip counter by hand */
+	    p_ptr->equip_cnt++;
+	  }
 
 	/* Increase the weight */
 	p_ptr->total_weight += i_ptr->weight * amt;

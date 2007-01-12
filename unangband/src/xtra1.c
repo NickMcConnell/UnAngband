@@ -3501,7 +3501,7 @@ static void calc_bonuses(void)
 	o_ptr = &inventory[INVEN_ARM];
 
 	/* Add weight of secondary weapon */
-	if (o_ptr->k_idx && (o_ptr->tval != TV_SHIELD)) weight += 2* o_ptr->weight;
+	if (o_ptr->k_idx && (o_ptr->tval != TV_SHIELD)) weight += o_ptr->weight;
 
 	/* It is hard to hold a heavy weapon */
 	if (hold < weight / 10)
@@ -3579,7 +3579,7 @@ static void calc_bonuses(void)
 	}
 
 	/* Check if heavy weapon or no weapon at all */
-	if (!weight || p_ptr->heavy_wield)
+	if (!inventory[INVEN_WIELD].k_idx || p_ptr->heavy_wield)
 	  /* Limit blows */
 	    p_ptr->num_blow = 1;
 	else
