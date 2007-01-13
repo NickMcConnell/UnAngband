@@ -462,8 +462,13 @@ int set_routes(s16b *routes, int max_num, int from)
 	/* Add additional locations from any of the above */
 	for (i = 0; (i < num) && (num < max_num); i++)
 	{
-		bool add_nearby =  (t_info[routes[i]].nearby != from);
-		bool add_distant =  (t_info[routes[i]].distant != from) && (t_info[routes[i]].distant != t_info[routes[i]].nearby);
+		bool add_nearby, add_distant;
+
+		/* Cannot choose inaccessible map locations */
+		if (routes[i] < 0) continue;
+
+		add_nearby =  (t_info[routes[i]].nearby != from);
+		add_distant =  (t_info[routes[i]].distant != from) && (t_info[routes[i]].distant != t_info[routes[i]].nearby);
 
 		/* Get the bottom of the dungeon */
 		get_zone(&zone2, routes[i], max_depth(routes[i]));
