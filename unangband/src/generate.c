@@ -413,9 +413,6 @@ static void new_player_spot(void)
 
 	/* Place the player */
 	player_place(y, x);
-
-	/* Place the player */
-	player_place(y, x);
 }
 
 
@@ -6356,7 +6353,7 @@ static bool build_type131415(int room, int type)
 static bool room_build(int room, int type)
 {
 	/* Generating */
-	if (cheat_room) msg_format("Building room type %d.", type);
+	if (cheat_xtra) msg_format("Building room type %d.", type);
 
 	/* Build a room */
 	switch (type)
@@ -7495,7 +7492,7 @@ static void cave_gen(void)
 	{
 
 		/* Generating */
-		if (cheat_room) msg_print("Generating ecology.");
+		if (cheat_xtra) msg_print("Generating ecology.");
 
 		/* Initialise the dungeon ecology */
 		cave_ecology.num_races = 0;
@@ -7574,7 +7571,7 @@ static void cave_gen(void)
 		vault_type *v_ptr;
 
 		/* Generating */
-		if (cheat_room) msg_print("Building tower.");
+		if (cheat_xtra) msg_print("Building tower.");
 
 		/* Get the location of the tower */
 		y = (DUNGEON_HGT) / 2;
@@ -7608,7 +7605,7 @@ static void cave_gen(void)
 			/* Reserve some blocks */
 			for (by = (y - v_ptr->hgt / 2) / BLOCK_HGT; by <= (y + v_ptr->hgt / 2 + 1) / BLOCK_HGT; by++)
 			{
-				for (bx = (x - v_ptr->wid / 2) / BLOCK_WID; by <= (x + v_ptr->wid / 2 + 1) / BLOCK_WID; bx++)
+				for (bx = (x - v_ptr->wid / 2) / BLOCK_WID; bx <= (x + v_ptr->wid / 2 + 1) / BLOCK_WID; bx++)
 				{
 					dun->room_map[by][bx] = TRUE;
 	
@@ -7630,6 +7627,9 @@ static void cave_gen(void)
 		/* Hack -- descending player always in tower */
 		if ((level_flag & LF1_SURFACE) && ((f_info[p_ptr->create_stair].flags1 & (FF1_LESS)) != 0))
 		{
+			/* Clear previous contents, add dungeon entrance */
+			place_random_stairs(y, x, FEAT_MORE);
+
 			player_place(y, x);
 		}
 
@@ -7638,7 +7638,6 @@ static void cave_gen(void)
 		{
 			feat_near(FEAT_LESS, y, x);
 		}
-
 	}
 
 	/* No features in a tower above the surface */
