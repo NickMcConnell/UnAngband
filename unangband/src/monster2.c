@@ -534,7 +534,7 @@ s16b get_mon_num(int level)
 	 */
 	if ((cave_ecology.ready) && (cave_ecology.num_races > 0))
 	{
-		int choice = 0;
+		int choice = -1;
 
 		/* Count of choices */
 		j = 0;
@@ -542,17 +542,25 @@ s16b get_mon_num(int level)
 		/* Get monster */
 		for (i = 0; i < cave_ecology.num_races; i++)
 		{
+			/* Get the actual race */
+			r_ptr = &r_info[cave_ecology.race[choice]];
+
+			/* Hack -- "unique" monsters must be "unique" */
+			if ((r_ptr->flags1 & (RF1_UNIQUE)) &&
+			    (r_ptr->cur_num >= r_ptr->max_num))
+			{
+				continue;
+			}
+
+			/* Can choose this monster? */
 			if ((!(get_mon_num_hook) || (*get_mon_num_hook)(i)) && !(rand_int(++j))) choice = i;
 		}
 
-		/* Hack -- Only 1 opportunity to encounter a unique */
-		if (r_info[cave_ecology.race[choice]].flags1 & (RF1_UNIQUE))
-		{
-			/* Replace entry in table */
-			cave_ecology.race[choice] = cave_ecology.race[--cave_ecology.num_races];
-		}
-
-		return (cave_ecology.race[choice]);
+		/* Made a choice */
+		if (choice > 0)
+			return (cave_ecology.race[choice]);
+		else
+			return (0);
 	}
 
 	/* Boost the level */

@@ -4716,6 +4716,8 @@ static void name_drop(object_type *j_ptr)
 	/* Flavor the drop with a monster type */
 	if ((rand_int(100) < (30+ (p_ptr->depth * 2))) || (race_drop_idx))
 	{
+		bool old_ecology = cave_ecology.ready;
+
 		/* Store the old hook */
 		get_mon_old_hook = get_mon_num_hook;
 
@@ -4724,6 +4726,9 @@ static void name_drop(object_type *j_ptr)
 
 		/* Store the item kind */
 		name_drop_k_idx = j_ptr->k_idx;
+
+		/* Sometimes ignore the ecology */
+		if (rand_int(100) < 50) cave_ecology.ready = FALSE;
 
 		/* Prep the list */
 		get_mon_num_prep();
@@ -4736,6 +4741,9 @@ static void name_drop(object_type *j_ptr)
 
 		/* Prep the list */
 		get_mon_num_prep();
+
+		/* Reset the ecology */
+		cave_ecology.ready = old_ecology;
 
 		/* Failure? */
 		if (!r_idx) return;

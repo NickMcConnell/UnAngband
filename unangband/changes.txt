@@ -159,6 +159,8 @@ mostly available in Animal Magic and Transformation magic books.
 
 - Disabled ecologies on very early levels as this made them too boring.
 
+- Fixed bug resulting in weird combinations of body parts being generated. 
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
