@@ -315,7 +315,7 @@ static room_data_type room_data[ROOM_MAX] =
    /* Chambers */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	1,		3, 0, LF1_CHAMBERS},
    /* I. Room */  {{30,  60,  70,  80,  80,  75,  70,  67,  65,  62,  60},  0,  2,		1, 0, LF1_DUNGEON},
    /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	2,		2, 0, LF1_VAULT | LF1_CRYPT},
-   /* G. Vault */ {{ 0,   0,   1,   2,   3,   4,   6,   7,   8,  10,  12}, 20,	1,		3, 0, LF1_VAULT},
+   /* G. Vault */ {{ 0,   0,   1,   2,   3,   4,   6,   7,   8,  10,  12}, 20,	1,		3, 0, LF1_VAULT | LF1_STRONGHOLD},
    /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS,	3, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE | LF1_LAIR | LF1_SEWER},
    /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		3, 0, LF1_MINE | LF1_CAVE | LF1_LAIR | LF1_SEWER},
    /* Fractal */  {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS/3,	3, 0, LF1_MINE | LF1_CAVE},
@@ -331,40 +331,6 @@ static byte room_build_order[ROOM_MAX] = {ROOM_LAIR, ROOM_GREATER_VAULT, ROOM_HU
 						ROOM_CHAMBERS, ROOM_HUGE_CENTRE, ROOM_LARGE_FRACTAL, ROOM_LESSER_VAULT,
 						ROOM_INTERESTING, ROOM_STAR_BURST, ROOM_FRACTAL, ROOM_LARGE_CENTRE,
 						ROOM_LARGE_WALLS, ROOM_NORMAL_CENTRE, ROOM_NORMAL_WALLS, ROOM_NORMAL};
-
-/*
- * Returns random co-ordinates for player/monster/object
- */
-static void new_player_spot(void)
-{
-	int y, x;
-
-	int count=0;
-
-	/* Place the player */
-	while (1)
-	{
-		/* Pick a legal spot */
-		y = rand_range(1, DUNGEON_HGT - 2);
-		x = rand_range(1, DUNGEON_WID - 2);
-
-		if (cave_naked_bold(y,x) && (count > 2000)) break;
-
-		/* Must be a "start" floor grid */
-		if (!cave_start_bold(y, x)) continue;
-
-		/* Refuse to start in anti-teleport rooms */
-		if (room_has_flag(y, x, ROOM_ICKY)) continue;
-
-		/* Done */
-		break;
-	}
-
-	/* Place the player */
-	player_place(y, x);
-}
-
-
 
 /*
  * Count the number of walls adjacent to the given grid.
@@ -383,6 +349,73 @@ static int next_to_walls(int y, int x)
 	if (f_info[cave_feat[y+1][x]].flags1 & (FF1_WALL)) k++;
 
 	return (k);
+}
+
+
+
+/*
+ * Returns random co-ordinates for player/monster/object
+ */
+static void new_player_spot(void)
+{
+	int i = 0;
+	int y = 0;
+	int x = 0;
+
+	while (TRUE)
+	{
+		i++;
+
+		/* Scan stored locations first. */
+		if ((i < dun->stair_n) && (p_ptr->create_stair > 0))
+		{
+			/* Get location */
+			y = dun->stair[i].y;
+			x = dun->stair[i].x;
+
+			/* Require exactly three adjacent walls */
+			if (next_to_walls(y, x) != 3) continue;
+
+			/* Require a "naked" floor grid */
+			if (!cave_naked_bold(y, x)) continue;
+
+			/* Success */
+			break;
+		}
+
+		/* Then, search at random */
+		else
+		{
+			/* Pick a random grid */
+			y = rand_int(DUNGEON_HGT);
+			x = rand_int(DUNGEON_WID);
+
+			/* Refuse to start on anti-teleport (vault) grids */
+			if ((cave_info[y][x] & (CAVE_ROOM)) && (room_has_flag(y, x, ROOM_ICKY))) continue;
+
+			/* Must be a floor grid clear of monsters and objects  XXX */
+			if (!cave_naked_bold(y, x)) continue;
+
+			/* Try not to start in rooms */
+			if ((i < 450) && (cave_info[y][x] & (CAVE_ROOM))) continue;
+
+			/* Player prefers to be near walls. */
+			if      ((i < 300) && (next_to_walls(y, x) < 2)) continue;
+			else if ((i < 600) && (next_to_walls(y, x) < 1)) continue;
+
+			/* Success */
+			break;
+		}
+	}
+
+	/* Place the stairs (if any) */
+	if (p_ptr->create_stair) cave_set_feat(y, x, p_ptr->create_stair);
+
+	/* Place the player */
+	player_place(y, x);
+
+	/* Place the player */
+	player_place(y, x);
 }
 
 
@@ -5128,7 +5161,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	int row_dir, col_dir;
 	int start_row, start_col;
 	int main_loop_count = 0;
-	int last_turn = 0, first_door, last_door, first_tunn, first_next;
+	int last_turn = 0, first_door, last_door, first_tunn, first_next, first_stair;
 	int start_tunnel = 0;
 
 	bool door_flag = FALSE;
@@ -5152,9 +5185,12 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	/* Not yet worried about our progress */
 	int desperation = 0;
 
+	/* Keep stronghold corridors tidy */
+	if ((level_flag & LF1_STRONGHOLD) != 0) tunnel_style_timer = -1;
+
 	/* Readjust movement counter for caves */
 	if ((style & TUNNEL_CAVE) != 0) rand_dir_timer = randint(DUN_TUN_CAV * 2);
-	
+
 	/* Reset the arrays */
 	dun->tunn_n = 0;
 	dun->wall_n = 0;
@@ -5168,11 +5204,10 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	first_door = dun->door_n;
 	last_door = dun->door_n;
 
-	/* Record first tunnel location */
+	/* Record start locations in the event of aborting */
 	first_tunn = dun->tunn_n;
-
-	/* Record number of adjacent solid terrain to doorways */
 	first_next = dun->next_n;
+	first_stair = dun->stair_n;
 
 	/* Start out in the correct direction */
 	correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
@@ -5756,6 +5791,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		/* Clear intersections and decorations */
 		dun->door_n = first_door;
 		dun->next_n = first_next;
+		dun->stair_n = first_stair;
 
 		/* Remove the solid walls we applied */
 		for (i = 0; i < dun->solid_n; i++)
@@ -7454,46 +7490,51 @@ static void cave_gen(void)
 		}
 	}
 
-	/* Generating */
-	if (cheat_room) msg_print("Generating ecology.");
-
-	/* Initialise the dungeon ecology */
-	cave_ecology.num_races = 0;
-	cave_ecology.ready = FALSE;
-
-	/* Place guardian if permitted */
-	if ((level_flag & (LF1_GUARDIAN)) != 0)
+	/* Very early levels boring with ecologies enabled */
+	if (p_ptr->depth > 3)
 	{
-		get_monster_ecology(zone->guard);
-	}
 
-	/* Get a seed monster for the ecology */
-	else
-	{
-		/* Set monster hook */
-		get_mon_num_hook = dun_level_mon;
+		/* Generating */
+		if (cheat_room) msg_print("Generating ecology.");
+
+		/* Initialise the dungeon ecology */
+		cave_ecology.num_races = 0;
+		cave_ecology.ready = FALSE;
+
+		/* Place guardian if permitted */
+		if ((level_flag & (LF1_GUARDIAN)) != 0)
+		{
+			get_monster_ecology(zone->guard);
+		}
+
+		/* Get a seed monster for the ecology */
+		else
+		{
+			/* Set monster hook */
+			get_mon_num_hook = dun_level_mon;
+
+			/* Prepare allocation table */
+			get_mon_num_prep();
+
+			/* Get seed monster for ecology */
+			get_monster_ecology(0);
+		}
+
+		/* Clear monster hook */
+		get_mon_num_hook = NULL;
 
 		/* Prepare allocation table */
 		get_mon_num_prep();
 
-		/* Get seed monster for ecology */
-		get_monster_ecology(0);
+		/* Get additional monsters for the ecology */
+		while (cave_ecology.num_races < 4)
+		{
+			get_monster_ecology(0);
+		}
+
+		/* Start the ecology */
+		cave_ecology.ready = TRUE;
 	}
-
-	/* Clear monster hook */
-	get_mon_num_hook = NULL;
-
-	/* Prepare allocation table */
-	get_mon_num_prep();
-
-	/* Get additional monsters for the ecology */
-	while (cave_ecology.num_races < 4)
-	{
-		get_monster_ecology(0);
-	}
-
-	/* Start the ecology */
-	cave_ecology.ready = TRUE;
 
 	/* Actual maximum number of rooms on this level */
 	dun->row_rooms = DUNGEON_HGT / BLOCK_HGT;
@@ -7587,7 +7628,7 @@ static void cave_gen(void)
 		}
 
 		/* Hack -- descending player always in tower */
-		if ((level_flag & LF1_SURFACE) && (p_ptr->create_up_stair))
+		if ((level_flag & LF1_SURFACE) && ((f_info[p_ptr->create_stair].flags1 & (FF1_LESS)) != 0))
 		{
 			player_place(y, x);
 		}

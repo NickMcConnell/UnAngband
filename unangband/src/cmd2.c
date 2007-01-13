@@ -859,7 +859,7 @@ void do_cmd_go_up(void)
 		message(MSG_STAIRS_UP, 0, "You enter a maze of up staircases.");
 
 		/* Create a way back */
-		p_ptr->create_down_stair = TRUE;
+		p_ptr->create_stair = feat_state(cave_feat[py][px], FS_LESS);
 
 		/* Hack -- tower level increases depth */
 		if (t_info[p_ptr->dungeon].zone[0].tower)
@@ -931,7 +931,7 @@ void do_cmd_go_down(void)
 		message(MSG_STAIRS_DOWN, 0, "You enter a maze of down staircases.");
 
 		/* Create a way back */
-		p_ptr->create_up_stair = TRUE;
+		p_ptr->create_stair = feat_state(cave_feat[py][px], FS_MORE);
 
 		/* Hack -- tower level decreases depth */
 		if (t_info[p_ptr->dungeon].zone[0].tower)

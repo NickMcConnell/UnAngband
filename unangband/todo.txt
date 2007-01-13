@@ -60,11 +60,12 @@ If a store is sold the constituents for an object it attempts to make it.
 TODO: Stores, in conjunction with the character's charisma, offer additional quests based
 on what the player state is.
 
+TODO: Significant improvements to the store system.
+
 TODO: Allow the player to fly.
 
 TODO: Allow the player to jump. This may be needed to navigate various
 'puzzle' locations.
-
 
 
 Release v0.7.0
@@ -1325,3 +1326,17 @@ Accumulated levels of feather fall allow the player to (2 flags) walk on mud
 and snow, (3 flags) walk on water, or (4 flags) walk on clouds, as per the
 various walking flags above. Note that walking on air except clouds is not
 possible using accumulated feather fall levels.
+
+TODO: Significant improvements to the store system.
+
+We now record the stock a store will sell in each store, so we should make
+significant improvements here.
+
+In particular, it should be possible for a player to order in certain items,
+if its not currently stocked, as per FAngband.
+
+We should also improve the selling of magic books to stores. We should tie
+a magic book to certain flags. When the magic book is sold, the store then
+becomes capable of selling equipment with these flags, in addition to offering
+extra store services.
+

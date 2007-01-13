@@ -5666,7 +5666,8 @@ int feat_state(int feat, int action)
 	int i;
 
 	/* Permanent stuff never gets changed */
-	if (f_info[feat].flags1 & FF1_PERMANENT) return (feat);
+	/* Hack -- ignore for less and more. This is required to reverse stair directions. */
+	if ((f_info[feat].flags1 & FF1_PERMANENT) && (action != FS_LESS) && (action != FS_MORE)) return (feat);
 
 	/* Set default feat */
 	newfeat = f_info[feat].defaults;

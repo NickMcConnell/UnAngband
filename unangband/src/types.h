@@ -1439,8 +1439,7 @@ struct player_type
 
 	bool leaving;   /* True if player is leaving */
 
-	bool create_up_stair;   /* Create up stair on next level */
-	bool create_down_stair; /* Create down stair on next level */
+	s16b create_stair;   /* Create what type of stair on next level */
 
 	s16b wy;/* Dungeon panel */
 	s16b wx;/* Dungeon panel */

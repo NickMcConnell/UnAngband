@@ -9686,33 +9686,8 @@ bool project_p(int who, int y, int x, int dam, int typ)
 			/* Hack -- no chasm/trap doors/down stairs on quest levels */
 			else if (is_quest(p_ptr->depth) || (p_ptr->depth == max_depth(p_ptr->dungeon)))
 			{
-
 				/* Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
-#if 0
-				int i = rand_int(8);
-
-				int k = 0;
-
-				/* Scan all neighbors */
-				while (cave_feat[y][x] != FEAT_CHASM)
-				{
-					int yy = y + ddy_ddd[i];
-					int xx = x + ddx_ddd[i];
-
-					/* Hack -- bounds check */
-					if (++k>30) break;
-
-					i = rand_int(8);
-
-					if (cave_feat[yy][xx] != FEAT_CHASM) continue;
-
-					/* Hack -- fall back into the chasm */
-					monster_swap(p_ptr->py,p_ptr->px,yy,xx);
-
-					break;
-				}
-#endif
 			}
 			else
 			{
@@ -9722,6 +9697,9 @@ bool project_p(int who, int y, int x, int dam, int typ)
 				/* Leaving */
 				p_ptr->leaving = TRUE;
 			}
+
+			/* Clear stairs */
+			p_ptr->create_stair = 0;
 
 			break;
 		}

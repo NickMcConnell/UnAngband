@@ -155,6 +155,10 @@ shuffled normally.
 - Added a number of additional spells wielded as weapons, armour and amulets.  These are
 mostly available in Animal Magic and Transformation magic books.
 
+- Use Sangband stair placement algorithm.
+
+- Disabled ecologies on very early levels as this made them too boring.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
