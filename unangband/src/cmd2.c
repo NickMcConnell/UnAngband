@@ -679,15 +679,15 @@ static void do_cmd_travel(void)
 				/* Set journey time; takes longer at night */
 				if (selection == t_ptr->nearby)
 				{
-					journey = damroll(2 + (level_flag & (LF1_DAYLIGHT)), 4);
+					journey = damroll(2 + (level_flag & LF1_DAYLIGHT ? 1 : 0), 4);
 				}
 				else if (selection == t_ptr->distant)
 				{
-					journey = damroll(3 + (level_flag & (LF1_DAYLIGHT)), 4);
+					journey = damroll(3 + (level_flag & LF1_DAYLIGHT ? 1 : 0), 4);
 				}
 				else
 				{
-					journey = damroll(4 + (level_flag & (LF1_DAYLIGHT)), 4);
+					journey = damroll(4 + (level_flag & LF1_DAYLIGHT ? 1 : 0), 4);
 				}
 			}
 			else
