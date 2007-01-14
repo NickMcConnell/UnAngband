@@ -3692,12 +3692,12 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 
 	      /* Test hit fire */
 	      hit_or_near_miss = test_hit_fire(chance2, 
-					       calc_monster_ac(m_ptr, FALSE), 
+					       calc_monster_ac(cave_m_idx[y][x], FALSE), 
 					       m_ptr->ml);
 
 	      /* Genuine hit */
 	      genuine_hit = test_hit_fire(chance2, 
-					  calc_monster_ac(m_ptr, TRUE), 
+					  calc_monster_ac(cave_m_idx[y][x], TRUE), 
 					  m_ptr->ml);
 
 	      /* Missiles bounce off resistant monsters */

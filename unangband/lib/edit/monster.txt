@@ -18320,7 +18320,7 @@ S:BESERK | INVIS | TELE_SELF_TO
 D:A spined and ferocious insect: its proboscis tastes the air and its head unerringly turns to you;
 D: leaping off walls and ceilings, it runs at you to implant its children in your still warm flesh.
 
-N:1272:Shadow of Caradhras, the Mountain
+N:1272:the Shadow of Caradhras, the Mountain
 G:P:D
 I:115:30d100:30:120:15
 W:66:3:0:7000

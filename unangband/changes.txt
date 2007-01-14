@@ -157,7 +157,11 @@ mostly available in Animal Magic and Transformation magic books.
 
 - Use Sangband stair placement algorithm.
 
-- Disabled ecologies on very early levels as this made them too boring.
+- Disabled ecologies on very early levels as this made them too boring. Increased the 
+minimum size of an ecology.
+
+- In order to provide a greater range of monsters, scale up the power of some low level
+monsters as they appear deeper in the dungeon.
 
 ### User Interface ###
 
@@ -173,6 +177,9 @@ pepebe).
 - Major overhaul of the Character Screen (Mikolaj Konarski).
 
 - Marked granite walls now don't disappear when searched (Suggested by Mikolaj Konarski).
+
+- If you see a monster passing a wall that can (merely) cast temporary passwall, you will
+learn about the spell, even if you didn't see them cast it.
 
 ### Bug fixes ###
 

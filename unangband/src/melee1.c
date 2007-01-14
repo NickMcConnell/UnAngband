@@ -6112,7 +6112,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 						object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
 
 						/* Did we hit? */
-						if (test_hit_fire((j_ptr->to_h + o_ptr->to_h)* BTH_PLUS_ADJ + f_ptr->power,  calc_monster_ac(m_ptr, TRUE), TRUE))
+						if (test_hit_fire((j_ptr->to_h + o_ptr->to_h)* BTH_PLUS_ADJ + f_ptr->power,  calc_monster_ac(m_idx, TRUE), TRUE))
 						{
 							int k, mult;
 
@@ -6381,7 +6381,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
 
 				/* Test for hit */
-				if (test_hit_norm(o_ptr->to_h * BTH_PLUS_ADJ + f_ptr->power, calc_monster_ac(m_ptr, FALSE), TRUE))
+				if (test_hit_norm(o_ptr->to_h * BTH_PLUS_ADJ + f_ptr->power, calc_monster_ac(m_idx, FALSE), TRUE))
 				{
 					int k;
 

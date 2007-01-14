@@ -6696,7 +6696,7 @@ bool project_m(int who, int y, int x, int dam, int typ)
 
 			if (obvious) note = " appears sicklier.";
 
-			new_maxhp = calc_monster_hp(m_ptr);
+			new_maxhp = calc_monster_hp(cave_m_idx[y][x]);
 
 			if (new_maxhp < m_ptr->maxhp)
 			{

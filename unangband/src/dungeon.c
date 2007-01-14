@@ -3063,9 +3063,6 @@ static void process_player(void)
  */
 static void dungeon(void)
 {
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
 	/* Hack -- enforce illegal panel */
 	p_ptr->wy = DUNGEON_HGT;
 	p_ptr->wx = DUNGEON_WID;
