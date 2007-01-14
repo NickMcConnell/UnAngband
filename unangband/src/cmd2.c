@@ -356,13 +356,17 @@ void print_routes(const s16b *route, int num, int y, int x)
 		}
 
 		/* Get the distance */
-		if (t_ptr->nearby == p_ptr->dungeon)
+		if (t_info[p_ptr->dungeon].nearby == town)
 		{
 			distance = "nearby";
 		}
+		else if (t_info[p_ptr->dungeon].distant == town)
+		{
+			distance = "yonder";
+		}
 		else
 		{
-			distance = "distant";
+			distance = "remote";
 		}
 
 		/* Get the destination info */
