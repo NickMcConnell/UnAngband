@@ -2941,13 +2941,13 @@ static void calc_bonuses(void)
 	p_ptr->skill_srh = rp_ptr->r_srh + cp_ptr->c_srh;
 
 	/* Base skill -- combat (normal) */
-	p_ptr->skill_thn = rp_ptr->r_thn + cp_ptr->c_thn;
+	p_ptr->skill_thn = rp_ptr->r_thn + cp_ptr->c_thn - 40;
 
 	/* Base skill -- combat (shooting) */
-	p_ptr->skill_thb = rp_ptr->r_thb + cp_ptr->c_thb;
+	p_ptr->skill_thb = rp_ptr->r_thb + cp_ptr->c_thb - 25;
 
 	/* Base skill -- combat (throwing) */
-	p_ptr->skill_tht = rp_ptr->r_tht + cp_ptr->c_tht;
+	p_ptr->skill_tht = rp_ptr->r_tht + cp_ptr->c_tht - 25;
 
 	/* Base skill -- digging */
 	p_ptr->skill_dig = 0;
