@@ -7688,7 +7688,7 @@ static void cave_gen(void)
 			int room_type = room_build_order[i];
 
 			/* Check if this is the last room type we can place for this theme. If so, continue to place it. */
-			bool last = TRUE;
+			bool last = FALSE;
 
 			/* Skip at this depth */
 			if (room_data[room_type].min_level > p_ptr->depth) continue;
@@ -7699,8 +7699,10 @@ static void cave_gen(void)
 			/* Level is themed */
 			if ((level_flag & (LF1_THEME)) != 0)
 			{
+				last = TRUE;
+
 				/* Check remaining room types */
-				for (k = i + 1; k < ROOM_MAX; k++)
+				for (k = 0; k < i; k++)
 				{
 					/* Valid room type left */
 					if ((room_data[room_build_order[k]].theme & (level_flag)) != 0) last = FALSE;
