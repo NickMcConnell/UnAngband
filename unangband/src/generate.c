@@ -7529,9 +7529,39 @@ static void cave_gen(void)
 		get_mon_num_prep();
 
 		/* Get additional monsters for the ecology */
-		while (cave_ecology.num_races < 8)
+		while (TRUE)
 		{
-			get_monster_ecology(0);
+			/* Count of different non-unique monsters in ecology */
+			k = 0;
+
+			/* Check ecology */
+			for (i = 0; i < cave_ecology.num_races; i++)
+			{
+				bool differs = TRUE;
+
+				/* Don't count uniques */
+				if ((r_info[cave_ecology.race[i]].flags1 & (RF1_UNIQUE)) != 0) continue;				
+
+				/* Check if appears already */
+				for (j = 0; j < i; j++)
+				{
+					if (cave_ecology.race[i] == cave_ecology.race[j]) differs = FALSE;
+				}
+
+				/* Race not already counted */
+				if (differs) k++;
+			}
+
+			/* Not enough different monsters */
+			if ((k < MIN_ECOLOGY_RACES) && (cave_ecology.num_races < MAX_ECOLOGY_RACES))
+			{
+				get_monster_ecology(0);
+			}
+			/* We are done */
+			else
+			{
+				break;
+			}
 		}
 
 		/* Start the ecology */
