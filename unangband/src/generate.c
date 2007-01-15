@@ -7702,7 +7702,7 @@ static void cave_gen(void)
 				last = TRUE;
 
 				/* Check remaining room types */
-				for (k = 0; k < i; k++)
+				for (k = i + 1; k < ROOM_MAX; k++)
 				{
 					/* Valid room type left */
 					if ((room_data[room_build_order[k]].theme & (level_flag)) != 0) last = FALSE;
