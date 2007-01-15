@@ -409,7 +409,12 @@ static void new_player_spot(void)
 	}
 
 	/* Place the stairs (if any) */
-	if (p_ptr->create_stair) cave_set_feat(y, x, p_ptr->create_stair);
+	/* Don't allow stairs if connected stair option is off */
+	if ((p_ptr->create_stair) &&
+		(((f_info[p_ptr->create_stair].flags1 & (FF1_STAIRS)) == 0) || (dungeon_stair)))
+	{
+		cave_set_feat(y, x, p_ptr->create_stair);
+	}
 
 	/* Place the player */
 	player_place(y, x);
