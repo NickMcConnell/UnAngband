@@ -318,7 +318,7 @@ static room_data_type room_data[ROOM_MAX] =
    /* G. Vault */ {{ 0,   0,   1,   2,   3,   4,   6,   7,   8,  10,  12}, 20,	1,		3, 0, LF1_VAULT | LF1_STRONGHOLD},
    /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS,	2, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE | LF1_LAIR | LF1_SEWER},
    /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		3, 0, LF1_MINE | LF1_CAVE | LF1_LAIR | LF1_SEWER},
-   /* Fractal */  {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS,	2, 0, LF1_MINE | LF1_CAVE},
+   /* Fractal */  {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS * 2/3,	2, 0, LF1_MINE | LF1_CAVE},
    /* Lrg fra */  {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS / 2,	3, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE},
    /* Huge fra */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE},
    /* Lair */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		1, 0, LF1_LAIR}
@@ -5075,26 +5075,39 @@ static void rand_dir_cave(int *row_dir, int *col_dir, int y, int x)
 static u32b get_tunnel_style(void)
 {
 	int style = 0;
+	int i = rand_int(100);
 
-	/* Change tunnel type */
+	/* Stronghold levels have width 2 corridors, or width 3 corridors, often with pillars */
+	/* The style of the tunnel does not change after initial selection */
 	if (level_flag & (LF1_STRONGHOLD))
 	{
-		int i = rand_int(100);
-
 		if (i < 66) style |= (TUNNEL_LARGE_L);
 		if (i > 33) style |= (TUNNEL_LARGE_R);
 	}
+	/* Dungeon levels have width 1 corridors, or width 2 corridors deeper in the dungeon */
+	/* The style of the tunnel does not change after initial selection */
+	else if (level_flag & (LF1_DUNGEON))
+	{
+		if (i < p_ptr->depth) style |= (i % 2) ? (TUNNEL_LARGE_L) : (TUNNEL_LARGE_R);
+	}
+	/* Sewer levels have width 2 corridors, or width 3 corridors, often with pillars */
+	/* The centre of the corridor is filled with pool type terrain, and the corridor style
+	   changes regularly. */
 	else if (level_flag & (LF1_SEWER))
 	{
-		if (rand_int(100) < 50) style |= (TUNNEL_LARGE_L);
-		if (rand_int(100) < 50) style |= (TUNNEL_LARGE_R);
+		if (i < 50) style |= (TUNNEL_LARGE_L);
+		if ((i < 25) || (i >= 75)) style |= (TUNNEL_LARGE_R);
 	}
+	/* Crypt levels have width 2 corridors, or width 3 corridors, with pillars on the edge of the corridor */
+	/* The corridor style changes regularly. */
 	else if (level_flag & (LF1_CRYPT))
 	{
-		if (rand_int(100) < 50) style |= (TUNNEL_CRYPT_L);
-		if (rand_int(100) < 50) style |= (TUNNEL_CRYPT_R);
+		if (i < 50) style |= (TUNNEL_CRYPT_L);
+		if ((i < 25) || (i >= 75)) style |= (TUNNEL_CRYPT_R);
 	}
-	else if (level_flag & (LF1_CAVE))
+	/* Cave levels have narrow, frequently random corridors. Mines occasionally do. */
+	/* The corridor style changes regularly for caves. Mines have longer straights than other levels. */
+	else if (((level_flag & (LF1_CAVE)) != 0) || (((level_flag & (LF1_MINE)) != 0) && (i < 33)))
 	{
 		style |= (TUNNEL_CAVE);
 	}
@@ -5179,7 +5192,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	int bx1 = col1/BLOCK_WID;
 
 	/* Initialize some movement counters */
-	int adjust_dir_timer = randint(DUN_TUN_ADJ * 2);
+	int adjust_dir_timer = randint(DUN_TUN_ADJ * 2) * (((level_flag & (LF1_MINE)) != 0) ? 2 : 1);
 	int rand_dir_timer   = randint(DUN_TUN_RND * 2);
 	int correct_dir_timer = 0;
 	int tunnel_style_timer = randint(DUN_TUN_STYLE * 2);
@@ -5188,7 +5201,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	int desperation = 0;
 
 	/* Keep stronghold corridors tidy */
-	if ((level_flag & LF1_STRONGHOLD) != 0) tunnel_style_timer = -1;
+	if ((level_flag & (LF1_STRONGHOLD | LF1_DUNGEON)) != 0) tunnel_style_timer = -1;
 
 	/* Readjust movement counter for caves */
 	if ((style & TUNNEL_CAVE) != 0) rand_dir_timer = randint(DUN_TUN_CAV * 2);
@@ -5304,7 +5317,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			{
 				adjust_dir(&row_dir, &col_dir, row1, col1, row2, col2);
 
-				adjust_dir_timer = randint(DUN_TUN_ADJ * 2);
+				adjust_dir_timer = randint(DUN_TUN_ADJ * 2) * (((level_flag & (LF1_MINE)) != 0) ? 2 : 1);
 			}
 
 			/* Go in correct direction. */
