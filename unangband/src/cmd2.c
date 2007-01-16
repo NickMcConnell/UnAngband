@@ -3980,7 +3980,10 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
       if (rand_int(100) < j && break_near(i_ptr, y, x))
 	/* The returned weapon turned out to be totally broken */
 	{
-	  /* Nothing more to do */
+	  /* Reduce and describe inventory */
+	  inven_item_increase(item, -1);
+	  inven_item_describe(item);
+	  inven_item_optimize(item);
 	}
       else
 	/* Either intact or only mildly harmed */
