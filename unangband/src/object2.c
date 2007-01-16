@@ -5790,6 +5790,9 @@ bool break_near(object_type *j_ptr, int y, int x)
 
 	bool obvious = FALSE;
 
+	/* Describe object */
+	object_desc(o_name, sizeof(o_name), j_ptr, FALSE, 0);   
+
 	/* These lose bonuses before breaking */
 	switch (j_ptr->tval)
 	  {
@@ -5807,11 +5810,21 @@ bool break_near(object_type *j_ptr, int y, int x)
 	      else if (j_ptr->to_h > 0 && j_ptr->to_h >= j_ptr->to_d)
 		{
 		  j_ptr->to_h--;
+
+		  /* Message */
+		  msg_format("Your %s bends!",
+			     o_name);
+
 		  return (FALSE);
 		}
 	      else if (j_ptr->to_d > 0)
 		{
 		  j_ptr->to_d--;
+
+		  /* Message */
+		  msg_format("Your %s chips at the end!",
+			     o_name);
+
 		  return (FALSE);
 		}
 	    }
@@ -5823,9 +5836,6 @@ bool break_near(object_type *j_ptr, int y, int x)
 
 	/* Extract plural */
 	if (j_ptr->number != 1) plural = TRUE;
-
-	/* Describe object */
-	object_desc(o_name, sizeof(o_name), j_ptr, FALSE, 0);   
 
 	/* Special case breakages */
 	switch (j_ptr->tval)
