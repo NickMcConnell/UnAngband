@@ -3207,12 +3207,12 @@ int breakage_chance(object_type *o_ptr)
 		case TV_JUNK:
 		case TV_SKIN:
 		case TV_EGG:
+		case TV_LITE:
 		{
 			return (100);
 		}
 
 		/* Often break */
-		case TV_LITE:
 		case TV_SCROLL:
 		case TV_BONE:
 		{

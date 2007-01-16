@@ -5890,9 +5890,10 @@ bool break_near(object_type *j_ptr, int y, int x)
 					if (!method) break;
 
 					/* Message */
-					if ((!i) && (rad)) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
+					if (!i && rad) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
+					if (!i && !rad) msg_format("The %s burst%s into flames.",o_name, (plural ? "" : "s"));
 
-					/* Mega hack -- dispel evil/undead objects */
+					/* Mega hack --- spells in objects */
 					if (!d_side)
 					{
 						d_plus += 25 * d_dice;
