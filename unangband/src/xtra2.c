@@ -3713,7 +3713,7 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 		/* Note -- subtle fix -CFT */
 		newhp = (long)(m_ptr->hp);
 		oldhp = newhp + (long)(dam);
-		tmp = (newhp * 100L) / (oldhp);
+		tmp = (100L * dam) / (oldhp);
 		percentage = (int)(tmp);
 
 		/* Percentage of fully healthy. Note maxhp can be zero. */
