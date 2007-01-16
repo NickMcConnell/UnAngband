@@ -110,12 +110,6 @@
 /* DUN_ROOMS now defined in defines.h */
 #define DUN_UNUSUAL     200     /* Level/chance of unusual room */
 #define DUN_DEST	30      /* 1/chance of having a destroyed level */
-#define DUN_FRACTAL	25	/* 1/chance of having a fractal level */
-#define SMALL_LEVEL 10	/* 1/chance of smaller size */
-#define THEMED_LEVEL_CHANCE	50	/* 1/chance of being a themed level */
-#define WILDERNESS_LEVEL_CHANCE	35	/* 1/chance of being a pseudo-wilderness level */
-
-#define DUN_FEAT_OILC   10      /* 1/chance of oil/coal feature level */
 #define DUN_FEAT	60	/* Chance in 100 of having features */
 #define DUN_MAX_LAKES   3       /* Maximum number of lakes/rivers */
 #define DUN_FEAT_RNG    2       /* Width of lake */
@@ -128,7 +122,8 @@
 #define DUN_TUN_ADJ     10      /* 1 in # chance of adjusting direction */
 #define DUN_TUN_CAV     2      	/* 1 in # chance of random direction in caves */
 #define DUN_TUN_STYLE   10      /* 1 in # chance of changing style */
-#define DUN_TUN_CON     15       /* Chance of extra tunneling */
+#define DUN_TUN_CRYPT   6       /* 1 in # chance of crypt niche having stairs or a monster */
+#define DUN_TUN_CON     15      /* Chance of extra tunneling */
 #define DUN_TUN_PEN     25      /* Chance of doors at room entrances */
 #define DUN_TUN_JCT     90      /* Chance of doors at tunnel junctions */
 
@@ -440,37 +435,62 @@ static void place_rubble(int y, int x)
  */
 static void alloc_stairs(int feat, int num, int walls)
 {
-	int y, x, i, j, flag;
+	int y, x, i = 0, j;
 
 	/* Place "num" stairs */
-	for (i = 0; i < num; i++)
+	for (j = 0; j < num; j++)
 	{
-		/* Place some stairs */
-		for (flag = FALSE; !flag; )
+		while (TRUE)
 		{
-			/* Try several times, then decrease "walls" */
-			for (j = 0; !flag && j <= 3000; j++)
+			i++;
+
+			/* Scan stored locations first. */
+			if (i < dun->stair_n)
+			{
+				/* Get location */
+				y = dun->stair[i].y;
+				x = dun->stair[i].x;
+
+				/* Require exactly three adjacent walls */
+				if (next_to_walls(y, x) != 3) continue;
+
+				/* Require a "naked" floor grid */
+				if (!cave_naked_bold(y, x)) continue;
+
+				/* Hack -- only half the time */
+				if (rand_int(100) < 50) continue;
+
+				/* Success */
+				break;
+			}
+
+			/* Then, search at random */
+			else
 			{
 				/* Pick a random grid */
 				y = rand_int(DUNGEON_HGT);
 				x = rand_int(DUNGEON_WID);
 
-				/* Require actual floor grid */
-				if (!(f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR))) continue;
+				/* Require actual floor or ground grid */
+				if (((f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR)) == 0)
+					&& ((f_info[cave_feat[y][x]].flags3 & (FF3_GROUND)) == 0)) continue;
+
+				/* Must be a floor grid clear of monsters and objects  XXX */
+				if (!cave_naked_bold(y, x)) continue;
+
+				/* Player prefers to be near walls. */
+				if      ((i % 300) == 0) walls--;
 
 				/* Require a certain number of adjacent walls */
 				if (next_to_walls(y, x) < walls) continue;
 
-				/* Place fixed stairs */
-				place_random_stairs(y, x, feat);
-
-				/* All done */
-				flag = TRUE;
+				/* Success */
+				break;
 			}
-
-			/* Require fewer walls */
-			if (walls) walls--;
 		}
+
+		/* Place fixed stairs */
+		place_random_stairs(y, x, feat);
 	}
 }
 
@@ -481,13 +501,11 @@ static void alloc_stairs(int feat, int num, int walls)
  */
 static void alloc_object(int set, int typ, int num)
 {
-	int y, x, k, c;
+	int y, x, k, i = 0;
 
 	/* Place some objects */
 	for (k = 0; k < num; k++)
 	{
-		c = 0;
-
 		/* Pick a "legal" spot */
 		while (TRUE)
 		{
@@ -496,26 +514,48 @@ static void alloc_object(int set, int typ, int num)
 			bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
 
 			/* Paranoia */
-			if (c++ > 2000) return;
+			if (i++ > 2000) return;
 
-			/* Location */
-			y = rand_int(DUNGEON_HGT);
-			x = rand_int(DUNGEON_WID);
+			/* Scan stored locations first if allowed to place in corridors. */
+			if ((i < dun->stair_n) && ((set == ALLOC_SET_CORR) || (set == ALLOC_SET_BOTH)))
+			{
+				/* Get location */
+				y = dun->stair[i].y;
+				x = dun->stair[i].x;
 
-			/* Require actual floor grid */
-			if ((f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR)) == 0) continue;
+				/* Require a "clean" floor grid */
+				if (!cave_clean_bold(y, x)) continue;
 
-			/* Check for "room" */
-			room = (cave_info[y][x] & (CAVE_ROOM)) ? TRUE : FALSE;
+				/* Require a "naked" floor grid */
+				if (!cave_naked_bold(y, x)) continue;
 
-			/* Require corridor? */
-			if ((set == ALLOC_SET_CORR) && room && !surface) continue;
+				/* Success */
+				break;
+			}
 
-			/* Require room? */
-			if ((set == ALLOC_SET_ROOM) && !room) continue;
+			/* Then search at random */
+			else
+			{
+				/* Location */
+				y = rand_int(DUNGEON_HGT);
+				x = rand_int(DUNGEON_WID);
 
-			/* Accept it */
-			break;
+				/* Require actual floor or ground grid */
+				if (((f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR)) == 0)
+					&& ((f_info[cave_feat[y][x]].flags3 & (FF3_GROUND)) == 0)) continue;
+
+				/* Check for "room" */
+				room = (cave_info[y][x] & (CAVE_ROOM)) ? TRUE : FALSE;
+
+				/* Require corridor? */
+				if ((set == ALLOC_SET_CORR) && room && !surface) continue;
+
+				/* Require room? */
+				if ((set == ALLOC_SET_ROOM) && !room) continue;
+
+				/* Success */
+				break;
+			}
 		}
 
 		/* Place something */
@@ -5196,6 +5236,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	int rand_dir_timer   = randint(DUN_TUN_RND * 2);
 	int correct_dir_timer = 0;
 	int tunnel_style_timer = randint(DUN_TUN_STYLE * 2);
+	int crypt_timer = randint(DUN_TUN_CRYPT * 2);
 
 	/* Not yet worried about our progress */
 	int desperation = 0;
@@ -5654,9 +5695,12 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			}
 
 			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
-			if (style & (TUNNEL_CRYPT_L | TUNNEL_LARGE_L))
+			if ((style & (TUNNEL_CRYPT_L | TUNNEL_LARGE_L))
+				|| ((style & (TUNNEL_CRYPT_R | TUNNEL_LARGE_R))
+					&& ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)))
 			{
 				if ((f_info[cave_feat[row1+col_dir][col1-row_dir]].flags1 & (FF1_TUNNEL))
+					&& ((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) == 0)
 					&& ((style & (TUNNEL_LARGE_L)) || !((row1 + col1 + style) % 2)))
 				{
 					/* Save the tunnel location */
@@ -5671,13 +5715,27 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 						if ((((row1 + col1) % ((style % 4) + 2)) == 0)
 							&& ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))== 0)) pillar = TRUE;
 					}
+
+					/* Save the location for later stair allocation */
+					if ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))
+						&& (crypt_timer-- == 0) && (dun->stair_n < STAIR_MAX))
+					{
+						dun->stair[dun->stair_n].y = row1 + col_dir;
+						dun->stair[dun->stair_n].x = col1 - row_dir;
+						dun->stair_n++;
+
+						crypt_timer = randint(DUN_TUN_CRYPT * 2);
+					}
 				}
 			}
 
 			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
-			if (style & (TUNNEL_CRYPT_R | TUNNEL_LARGE_R))
+			if ((style & (TUNNEL_CRYPT_R | TUNNEL_LARGE_R))
+				|| ((style & (TUNNEL_CRYPT_L | TUNNEL_LARGE_L))
+					&& ((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)))
 			{
 				if ((f_info[cave_feat[row1-col_dir][col1+row_dir]].flags1 & (FF1_TUNNEL))
+					&& ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) == 0)
 					&& ((style & (TUNNEL_LARGE_R)) || !((row1 + col1 + style / 2) % 2)))
 				{
 					/* Save the tunnel location */
@@ -5691,6 +5749,17 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 						dun->tunn_n++;
 
 						if (pillar) dun->tunn_n++;
+					}
+
+					/* Save the location for later stair allocation */
+					if ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))
+						&& (crypt_timer-- == 0) && (dun->stair_n < STAIR_MAX))
+					{
+						dun->stair[dun->stair_n].y = row1 - col_dir;
+						dun->stair[dun->stair_n].x = col1 + row_dir;
+						dun->stair_n++;
+
+						crypt_timer = randint(DUN_TUN_CRYPT * 2);
 					}
 				}
 			}
@@ -8036,17 +8105,16 @@ static void cave_gen(void)
 		alloc_stairs(0, 2, 3);
 
 		/* Put some rubble in corridors -- we want to exclude towers unless other rooms on level */
-		if ((level_flag & (LF1_ROOMS)) != 0) alloc_object(ALLOC_SET_CORR, ALLOC_TYP_RUBBLE, randint(k));
+		if ((level_flag & (LF1_ROOMS)) != 0) alloc_object(ALLOC_SET_CORR, ALLOC_TYP_RUBBLE, randint(k * ((level_flag & (LF1_CRYPT | LF1_MINE | LF1_CAVE)) != 0) ? 3 : 1));
 	
 		/* Place some traps in the dungeon */
-		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_TRAP, randint(k));
+		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_TRAP, randint(k * ((level_flag & (LF1_STRONGHOLD | LF1_CRYPT)) != 0) ? 3 : 1));
 	
 		/* Place some features in rooms */
 		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_FEATURE, 1);
 	}
 	else if (!dun->entrance)
 	{
-
 		/* Generating */
 		if (cheat_room) msg_print("Placing dungeon entrance.");
 
@@ -8068,7 +8136,8 @@ static void cave_gen(void)
 	if ((p_ptr->py == 0) || (p_ptr->px == 0)) new_player_spot();
 
 	/* Pick a base number of monsters */
-	i = MIN_M_ALLOC_LEVEL + randint(8);
+	/* Strongholds and sewers have more monsters */
+	i = MIN_M_ALLOC_LEVEL + randint(8 * ((level_flag & (LF1_STRONGHOLD | LF1_SEWER)) != 0) ? 3 : 1);
 
 	/* Generating */
 	if (cheat_room) msg_print("Placing monsters.");
@@ -8086,11 +8155,11 @@ static void cave_gen(void)
 		if (cheat_room) msg_print("Placing objects, treasure.");
 
 		/* Put some objects in rooms */
-		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ROOM, 3));
+		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ROOM * ((level_flag & (LF1_STRONGHOLD)) != 0) ? 3 : 1, 3));
 	
 		/* Put some objects/gold in the dungeon */
-		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ITEM, 3));
-		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_GOLD, Rand_normal(DUN_AMT_GOLD, 3));
+		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ITEM * ((level_flag & (LF1_CRYPT)) != 0) ? 3 : 1, 3));
+		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_GOLD, Rand_normal(DUN_AMT_GOLD* ((level_flag & (LF1_MINE)) != 0) ? 3 : 1, 3));
 	}
 
 	/* Apply illumination */

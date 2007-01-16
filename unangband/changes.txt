@@ -163,6 +163,13 @@ minimum size of an ecology.
 - In order to provide a greater range of monsters, scale up the power of some low level
 monsters as they appear deeper in the dungeon.
 
+- In order to make different level types more interesting, boosted various types of
+things placed, depending on the level: strongholds and sewers have more monsters, crypts
+and strongholds have more traps, mines have more treasures, caves, crypts and mines have
+more rubble, crypts have more objects appearing in corridors and strongholds have more
+objects appearing in rooms. Also made the tunnel types more interesting for each level
+type.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
