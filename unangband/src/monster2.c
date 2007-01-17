@@ -3284,8 +3284,8 @@ static bool place_monster_group(int y, int x, int r_idx, bool slp,
 	byte hack_y[GROUP_MAX];
 	byte hack_x[GROUP_MAX];
 
-	/* Hack -- don't adjust if one monster */
-	if (group_size > 1)
+	/* Hack -- don't adjust if two monsters in group */
+	if (group_size > 2)
 	{
 		/* Hard monsters, smaller groups */
 		if (r_ptr->level > p_ptr->depth)
@@ -3933,7 +3933,20 @@ bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp)
 	/* Friends for uniques - we have to reallocate separately to avoid recursion */
 	if ((r_ptr->flags1 & (RF1_UNIQUE)) && (r_ptr->flags1 & (RF1_FRIEND | RF1_FRIENDS)))
 	{
-		int i, s_idx;
+		int i, n;
+
+		int group_size = (r_ptr->flags1 & (RF1_FRIENDS) ? rand_range(3, 5) : 2);
+		int hack_n;
+
+		byte hack_x[6];
+		byte hack_y[6];
+		s16b hack_r_idx[6];
+
+		/* Start on the monster */
+		hack_n = 1;
+		hack_x[0] = x;
+		hack_y[0] = y;
+		hack_r_idx[0] = r_idx;
 
 		/* Save the unique attr and char */
 		summon_attr_type = r_ptr->d_attr;
@@ -3942,34 +3955,58 @@ bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp)
 		/* Save the "summon" type */
 		summon_specific_type = SUMMON_UNIQUE_FRIEND;
 
-		/* Place friend or friends */
-		for (i = 0; i < (r_ptr->flags1 & (RF1_FRIENDS) ? 4 : 1); i++)
+		/* Puddle monsters, breadth first, up to group_size */
+		for (n = 0; (n < hack_n) && (hack_n < group_size); n++)
 		{
+			/* Grab the location */
+			int hx = hack_x[n];
+			int hy = hack_y[n];
+
+			/* Random direction */
+			int start = rand_int(8);
+
 			/* Require "okay" monsters */
 			get_mon_num_hook = summon_specific_okay;
 
 			/* Prepare allocation table */
 			get_mon_num_prep();
 
-			/* Pick a monster, using the monster race level */
-			s_idx = get_mon_num(r_ptr->level);
-
-			/* Remove restriction */
-			get_mon_num_hook = NULL;
-
-			/* Prepare allocation table */
-			get_mon_num_prep();
-
-			/* Handle failure */
-			if (!s_idx) continue;
-
-			/* Place one monster, or fail */
-			if (!place_monster_one(y, x, s_idx, slp)) return (FALSE);
-
-			/* Escorts for certain monsters */
-			if ((r_info[s_idx].flags1 & (RF1_ESCORT)) || (r_info[s_idx].flags1 & (RF1_ESCORTS)))
+			/* Check each direction, up to group_size */
+			for (i = start; (i < 8 + start) && (hack_n < group_size); i++)
 			{
-				place_monster_escort(y, x, s_idx, slp);
+				int mx = hx + ddx_ddd[i % 8];
+				int my = hy + ddy_ddd[i % 8];
+
+				/* Pick a monster, using the monster race level */
+				hack_r_idx[hack_n] = get_mon_num(r_ptr->level);
+
+				/* Nothing picked */
+				if (!hack_r_idx[hack_n]) break;
+
+				/* Attempt to place another monster */
+				if (place_monster_one(my, mx, hack_r_idx[hack_n], slp))
+				{
+					/* Add it to the "hack" set */
+					hack_y[hack_n] = my;
+					hack_x[hack_n] = mx;
+					hack_n++;
+				}
+			}
+		}
+
+		/* Remove restriction */
+		get_mon_num_hook = NULL;
+
+		/* Prepare allocation table */
+		get_mon_num_prep();
+
+		/* Place escorts after placing unique friends */
+		for (n = 0; (n < hack_n) && (hack_n < group_size); n++)
+		{
+			/* Escorts for certain monsters */
+			if ((r_info[hack_r_idx[n]].flags1 & (RF1_ESCORT)) || (r_info[hack_r_idx[n]].flags1 & (RF1_ESCORTS)))
+			{
+				place_monster_escort(hack_y[n], hack_x[n], hack_r_idx[n], slp);
 			}
 		}
 	}
@@ -3977,7 +4014,7 @@ bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp)
 	else if (r_ptr->flags1 & (RF1_FRIEND))
 	{
 		/* Attempt to place a second monster */
-		(void)place_monster_group(y, x, r_idx, slp, 1);
+		(void)place_monster_group(y, x, r_idx, slp, 2);
 	}
 	/* Friends for certain monsters */
 	else if (r_ptr->flags1 & (RF1_FRIENDS))

@@ -92,10 +92,10 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 			: depth * 20 - 1550)));
 
 	/* Compute effective power for monster's old depth */
-	d2 = (r_ptr->level <= 40 ? r_ptr->level :
+	d2 = (r_ptr->level == 0 ? 1 : (r_ptr->level <= 40 ? r_ptr->level :
 			(r_ptr->level <= 70 ? r_ptr->level * 3 - 80 : 
 			(r_ptr->level <= 90 ? r_ptr->level * 6 - 290
-			: r_ptr->level * 20 - 1550)));
+			: r_ptr->level * 20 - 1550))));
 
 	/* We only care about significant multipliers but scale up by multiple of 100 */
 	scale = ((d1 * 100) / d2);

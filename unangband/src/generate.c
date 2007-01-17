@@ -7635,7 +7635,7 @@ static void cave_gen(void)
 			}
 
 			/* Not enough different monsters */
-			if ((k > 0) && (cave_ecology.num_races < MAX_ECOLOGY_RACES))
+			if ((k >= 0) && (cave_ecology.num_races < MAX_ECOLOGY_RACES))
 			{
 				get_monster_ecology(0);
 			}
