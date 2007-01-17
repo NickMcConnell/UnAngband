@@ -5812,8 +5812,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 		  j_ptr->to_h--;
 
 		  /* Message */
-		  msg_format("Your %s bends!",
-			     o_name);
+		  msg_format("Your %s bends!", o_name);
 
 		  return (FALSE);
 		}
@@ -5822,8 +5821,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 		  j_ptr->to_d--;
 
 		  /* Message */
-		  msg_format("Your %s chips at the end!",
-			     o_name);
+		  msg_format("Your %s chips!", o_name);
 
 		  return (FALSE);
 		}
