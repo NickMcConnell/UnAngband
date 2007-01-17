@@ -1087,7 +1087,6 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 			if (style == WS_TWO_HANDED) strcpy(temp,"Samurai");
 			if (style == WS_TWO_WEAPON) strcpy(temp,"Gladiator");
 			if (style == WS_WEAPON_SHIELD) strcpy(temp,"Knight");
-			if (style == WS_RING) strcpy(temp,"Ringbearer");
 			if ((style == WS_HAFTED) && (long_name))
 			{
 				strcpy(temp,"Weaponmaster (Hafted)");
