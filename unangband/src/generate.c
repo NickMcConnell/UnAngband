@@ -7614,7 +7614,7 @@ static void cave_gen(void)
 		while (TRUE)
 		{
 			/* Count of different non-unique monsters in ecology */
-			k = 0;
+			k = MIN_ECOLOGY_RACES + rand_int(MIN_ECOLOGY_RACES);
 
 			/* Check ecology */
 			for (i = 0; i < cave_ecology.num_races; i++)
@@ -7631,11 +7631,11 @@ static void cave_gen(void)
 				}
 
 				/* Race not already counted */
-				if (differs) k++;
+				if (differs) k--;
 			}
 
 			/* Not enough different monsters */
-			if ((k < MIN_ECOLOGY_RACES) && (cave_ecology.num_races < MAX_ECOLOGY_RACES))
+			if ((k > 0) && (cave_ecology.num_races < MAX_ECOLOGY_RACES))
 			{
 				get_monster_ecology(0);
 			}
