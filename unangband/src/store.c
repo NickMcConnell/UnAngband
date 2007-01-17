@@ -2837,6 +2837,8 @@ static void store_sell(int store_index)
 		/* Oops */
 		msg_print("Hmmm, it seems to be cursed.");
 
+		mark_cursed_feeling(o_ptr);
+
 		/* Nope */
 		return;
 	}
