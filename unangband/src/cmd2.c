@@ -1607,6 +1607,7 @@ static bool do_cmd_tunnel_aux(int y, int x)
 			/* Give the message */  
 			msg_print("You have finished the tunnel.");
 			
+			/* FIXME: how to mark the grid is altered by the player so that he cannot scum for XP by disarming pits? Perhaps add some rounded pebbles to that location? */
 			cave_alter_feat(y,x,FS_TUNNEL);
 
 			/* Update the visuals */
@@ -1616,7 +1617,6 @@ static bool do_cmd_tunnel_aux(int y, int x)
 		/* Keep trying */
 		else
 		{
-
 			/* Get mimiced feature */
 			feat = f_info[feat].mimic;
 
