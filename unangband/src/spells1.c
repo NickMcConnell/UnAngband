@@ -1653,7 +1653,7 @@ static int mon_inven_damage(int m_idx, inven_func typ, int perc)
 				monster_desc(m_name, m_idx, 0x22);
 
 				/* Message */
-				msg_format("%^s%s %s destroyed!",
+				msg_format("%^s%s %s %s destroyed!",
 					   ((o_ptr->number > 1) ?
 					    ((amt == o_ptr->number) ? "All of " :
 					     (amt > 1 ? "Some of " : "One of ")) : m_name),
