@@ -1130,6 +1130,8 @@ static void draw_maze(int y1, int x1, int y2, int x2, byte feat_wall,
 	/* Paranoia */
 	if ((!feat_wall) || (!feat_path) || (feat_wall == feat_path)) return;
 
+	if (cheat_xtra) msg_print("Drawing maze.");
+
 	/* Start with a solid rectangle of the "wall" feat */
 	generate_fill(y1, x1, y2, x2, feat_wall);
 
@@ -1454,6 +1456,9 @@ static bool generate_starburst_room(int y1, int x1, int y2, int x2,
 	/* Mark the affected grids */
 	if (!mark_starburst_shape(y1, x1, y2, x2, flag)) return (FALSE);
 
+
+	if (cheat_xtra) msg_print("Generating starburst.");
+
 	/* Paranoia */
 	if (edge == feat) edge = FEAT_NONE;
 
@@ -1684,6 +1689,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 		get_feat_num_prep();
 	}
 
+#if 0
 	/* Draw maze if required -- ensure minimum size */
 	if (((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR)) != 0) && (y2 - y1 > 4) && (x2 - x1 > 4) && ((flag & (RG1_ALLOC)) == 0))
 	{
@@ -1717,7 +1723,9 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 	}
 
 	/* Use checkered for invalid mazes */
-	else if ((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR)) != 0)
+	else
+#endif
+		if ((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR)) != 0)
 	{
 		flag |= (RG1_CHECKER);
 	}
@@ -2278,6 +2286,8 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 
 	int counter = 0;
 
+	if (cheat_xtra) msg_format("Getting room info %d.",*chart);
+
 	/* Process the description */
 	/* Note we need 1 space at end of room_desc_sections to terminate description */
 	while ((*chart != 0) && (*j < ROOM_DESC_SECTIONS - 1))
@@ -2746,6 +2756,8 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	byte branch = 0;
 	byte branch_on = 0;
 
+	int limit = 0;
+
 	/* Make certain the overlapping room does not cross the dungeon edge. */
 	if ((!in_bounds_fully(y1a, x1a)) || (!in_bounds_fully(y1b, x1b))
 		 || (!in_bounds_fully(y2a, x2a)) || (!in_bounds_fully(y2b, x2b))) return (FALSE);
@@ -2782,6 +2794,12 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	/* Get room info */
 	while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name, 0L))
 	{
+		if (limit++ > 1000)
+		{
+			msg_format("Error: Keep trying to place stuff with chart item %d. Please report.", j);
+			return (FALSE);
+		}
+
 		/* Place features or items if needed */
 		if ((place_feat) || (place_tval))
 		{
