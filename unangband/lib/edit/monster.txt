@@ -502,10 +502,10 @@ D:It is about four feet long and carnivorous.
 
 N:35:Apprentice warrior
 G:t:u
-I:110:9d4:20:16:5
+I:110:7d4:20:14:5
 W:3:1:1:6
-B:HIT:HURT:1d6
-B:HIT:HURT:1d6
+B:HIT:HURT:1d5
+B:HIT:HURT:1d5
 F:MALE
 F:DROP_60
 F:OPEN_DOOR | BASH_DOOR | FRIEND
@@ -514,9 +514,9 @@ D:He looks inexperienced but tough.
 
 N:36:Apprentice rogue
 G:t:b
-I:110:8d4:20:12:5
+I:110:6d4:20:12:5
 W:3:1:1:6
-B:HIT:HURT:1d6
+B:HIT:HURT:1d4
 B:TOUCH:EAT_GOLD
 F:MALE
 F:DROP_60
@@ -527,7 +527,7 @@ D:A rather shifty individual.
 
 N:37:Apprentice priest
 G:p:b
-I:110:7d4:20:10:10
+I:110:5d4:20:10:10
 W:3:1:1:6
 M:0:8:2:23
 B:HIT:HURT:1d5
@@ -541,7 +541,7 @@ D:He is tripping over his priestly robes.
 
 N:38:Apprentice mage
 G:q:r
-I:110:6d4:20:6:5
+I:110:4d4:20:6:5
 M:0:8:2:23
 W:3:1:1:6
 B:HIT:HURT:1d4
@@ -900,9 +900,9 @@ D:It is an armoured lizard with a powerful bite.
 
 N:69:Apprentice ranger
 G:q:W
-I:110:6d8:20:8:5
+I:110:6d6:20:8:5
 W:4:1:1:18
-M:12:12:2:23
+M:8:8:2:23
 B:HIT:HURT:1d5
 B:HIT:HURT:1d5
 B:ARROW:HURT:1d6
@@ -916,11 +916,11 @@ D:An agile hunter, ready and relaxed.
 
 N:70:Apprentice paladin
 G:p:w
-I:110:6d8:20:16:5
+I:110:6d6:20:13:5
 W:5:1:1:18
-M:0:12:1:23
-B:HIT:HURT:1d7
-B:HIT:HURT:1d7
+M:0:10:1:23
+B:HIT:HURT:1d5
+B:HIT:HURT:1d5
 F:MALE | FORCE_SLEEP | DROP_60
 F:OPEN_DOOR | BASH_DOOR | FRIEND
 F:WARRIOR | PRIEST | HAS_LITE | NEED_LITE
@@ -997,10 +997,10 @@ D: vigour.  He can prove a troublesome opponent.
 
 N:77:Novice mage
 G:q:r
-I:110:6d4:20:6:10
+I:110:6d6:20:12:10
 W:6:3:2:6
-M:0:8:2:23
-B:HIT:HURT:1d4
+M:0:12:2:23
+B:HIT:HURT:1d6
 F:MALE
 F:FORCE_SLEEP
 F:FRIENDS | DROP_60
@@ -1143,10 +1143,10 @@ D:Yum!  It looks quite tasty.
 
 N:89:Novice priest
 G:p:b
-I:110:7d4:20:10:5
+I:110:7d6:20:15:5
 W:7:3:2:6
-M:0:8:2:23
-B:HIT:HURT:1d5
+M:0:12:2:23
+B:HIT:HURT:1d7
 F:MALE
 F:FORCE_SLEEP
 F:FRIENDS | DROP_60
@@ -1157,7 +1157,7 @@ D:He is tripping over his priestly robes.
 
 N:90:Novice warrior
 G:t:u
-I:110:9d4:20:16:5
+I:110:9d6:20:16:5
 W:6:3:2:6
 B:HIT:HURT:1d6
 B:HIT:HURT:1d6
@@ -1169,10 +1169,12 @@ D:He looks inexperienced but tough.
 
 N:91:Novice rogue
 G:t:b
-I:110:8d4:20:12:5
+I:110:8d6:20:12:5
 W:6:3:2:6
+M:8:0:0:0
 B:HIT:HURT:1d6
 B:TOUCH:EAT_GOLD
+B:SHOT:HURT:2d4
 F:MALE
 F:FRIENDS | DROP_60
 F:TAKE_ITEM | OPEN_DOOR
@@ -1468,8 +1470,8 @@ G:q:W
 I:110:6d8:20:8:5
 W:8:3:2:18
 M:12:12:2:17
-B:HIT:HURT:1d5
-B:HIT:HURT:1d5
+B:HIT:HURT:1d7
+B:HIT:HURT:1d7
 B:ARROW:HURT:1d6
 F:MALE
 F:FORCE_SLEEP | FRIENDS | DROP_60
@@ -1517,8 +1519,8 @@ G:p:w
 I:110:6d8:20:16:5
 W:9:3:2:18
 M:0:12:1:17
-B:HIT:HURT:1d7
-B:HIT:HURT:1d7
+B:HIT:HURT:1d9
+B:HIT:HURT:1d9
 F:MALE
 F:FORCE_SLEEP
 F:FRIENDS | DROP_60
@@ -11527,7 +11529,7 @@ B:CLAW:HURT:2d4
 B:BITE:DARK:3d6
 B:AURA:DARK_WEAK
 F:FORCE_SLEEP | FORCE_MAXHP | CAN_FLY |
-F:ONLY_ITEM | DROP_2D2 | PASS_WALL | 
+F:ONLY_ITEM | DROP_2D2 |
 F:BASH_DOOR | HAS_LITE | HAS_AURA
 F:EVIL | DRAGON | NO_CONF | NO_SLEEP | RES_DARK | LEVEL_SIZE | LEVEL_POWER
 F:IM_COLD | IM_ELEC | RES_DARK | POWERFUL | SMART
@@ -11545,7 +11547,7 @@ B:CLAW:HURT:2d4
 B:BITE:PLASMA:3d6
 B:AURA:FIRE:2d4
 F:FORCE_SLEEP | FORCE_MAXHP | CAN_FLY | HAS_AURA | HAS_LITE  |
-F:ONLY_ITEM | DROP_2D2 | PASS_WALL | 
+F:ONLY_ITEM | DROP_2D2 |
 F:BASH_DOOR | LEVEL_SIZE | LEVEL_POWER
 F:EVIL | DRAGON | NO_CONF | NO_SLEEP |
 F:IM_FIRE | IM_ELEC | POWERFUL | SMART
@@ -11580,7 +11582,7 @@ B:CLAW:HURT:2d4
 B:CLAW:HURT:2d4
 B:BITE:POISON:3d6
 F:FORCE_SLEEP | FORCE_MAXHP | 
-F:ONLY_ITEM | DROP_2D2 | PASS_WALL | 
+F:ONLY_ITEM | DROP_2D2 |
 F:BASH_DOOR | RES_WATER | LEVEL_SIZE | LEVEL_POWER
 F:EVIL | DRAGON | NO_CONF | NO_SLEEP |
 F:IM_ACID | IM_POIS | CAN_SWIM | POWERFUL | SMART
@@ -11597,7 +11599,7 @@ B:CLAW:HURT:2d4
 B:CLAW:HURT:2d4
 B:BITE:ELEC:3d6
 F:FORCE_SLEEP | FORCE_MAXHP | CAN_FLY |
-F:ONLY_ITEM | DROP_2D2 | PASS_WALL | 
+F:ONLY_ITEM | DROP_2D2 |
 F:BASH_DOOR | LEVEL_SIZE | LEVEL_POWER
 F:EVIL | DRAGON | NO_CONF | NO_SLEEP |
 F:IM_ACID | IM_ELEC | POWERFUL | SMART
@@ -14797,7 +14799,7 @@ D:He is bumbling and ineffectual at the best of times.
 
 N:1019:Apprentice shaman
 G:p:W
-I:110:6d4:20:6:5
+I:110:4d4:20:6:5
 W:3:1:1:8
 M:0:8:2:23
 B:HIT:HURT:1d4
@@ -14810,10 +14812,10 @@ D:He waves a magical talisman at you.
 
 N:1020:Novice shaman
 G:p:W
-I:110:6d4:20:6:10
+I:110:6d6:20:6:10
 W:6:2:2:8
-M:0:8:2:23
-B:HIT:HURT:1d4
+M:0:15:2:23
+B:HIT:BATTER:1d6
 F:MALE | 
 F:FORCE_SLEEP | 
 F:FRIENDS | DROP_60 | HAS_LITE | NEED_LITE | PRIEST | MAGE
@@ -17176,12 +17178,11 @@ D:found in small groups.
 
 N:1188:Apprentice archer
 G:t:w
-I:110:9d5:20:8:20
+I:110:5d5:20:8:20
 W:6:2:30:25
 M:40:0:0:0
 B:HIT:HURT:1d5
-B:HIT:HURT:1d5
-B:ARROW:HURT:3d6
+B:ARROW:HURT:2d6
 F:MALE | FORCE_SLEEP | OPEN_DOOR | FRIEND
 F:ONLY_GOLD | DROP_90 | SMART | ARCHER
 D:A nasty little fellow with a bow and arrow.
