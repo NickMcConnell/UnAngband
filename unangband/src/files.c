@@ -3887,7 +3887,7 @@ errr file_character(cptr name, bool full)
 	if ((c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL)
 		|| (p_ptr->pstyle == WS_MAGIC_BOOK) || (p_ptr->pstyle == WS_PRAYER_BOOK) || (p_ptr->pstyle == WS_SONG_BOOK))
 	{
-		/* Dump quests */
+		/* Dump spells */
 		text_out("  [Spells Learnt]\n\n");
 
 		/* Iterate through learnt spells */
@@ -3905,6 +3905,7 @@ errr file_character(cptr name, bool full)
 		text_out("\n\n");
 	}
 
+#if 0
 	/* Dump quests */
 	text_out("  [Quests]\n\n");
 
@@ -3919,6 +3920,7 @@ errr file_character(cptr name, bool full)
 	if (no_quests) text_out("You currently have no quests.\n");
 
 	text_out("\n");
+#endif
 
 	text_out("  [Character Equipment Stat Modifiers, Sustains and Flags]\n\n");
 
