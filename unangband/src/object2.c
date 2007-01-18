@@ -4657,6 +4657,7 @@ static void name_drop(object_type *j_ptr)
 	if (j_ptr->name2) return;
 	if (j_ptr->xtra1) return;
 
+#if 0
 	/* Mark weapons and armour with racial flags */
 	switch (j_ptr->tval)
 	{
@@ -4703,7 +4704,7 @@ static void name_drop(object_type *j_ptr)
 			if ((r_info[r_idx].flags9 & (RF9_ELF)) && !(rand_int(count++))) { j_ptr->xtra1 = 19; j_ptr->xtra2 = 26;}
 		}
 	}
-
+#endif
 	/* Are we done? */
 	if ((j_ptr->tval != TV_BONE) && (j_ptr->tval != TV_EGG) && (j_ptr->tval != TV_STATUE)
 		&& (j_ptr->tval != TV_SKIN) && (j_ptr->tval != TV_BODY) &&
