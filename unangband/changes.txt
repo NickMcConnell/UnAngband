@@ -170,6 +170,10 @@ more rubble, crypts have more objects appearing in corridors and strongholds hav
 objects appearing in rooms. Also made the tunnel types more interesting for each level
 type.
 
+- Electricity no longer destroys items. Instead it will affect rods, staffs and wands with
+the same percentage chances, however draining them instead of destroying them. Rods will
+be set to a high timeout value instead.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
