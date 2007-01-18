@@ -2289,12 +2289,13 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 		match = MATCH_ANY;
 
 		/* Get the start of entries in the table for this index */
-		while ((*chart != d_info[i].chart) && (counter < 5000)) { i++; counter++;}
+		while ((*chart != d_info[i].chart) && (i < z_info->d_max)) { i++; }
 
-		if (counter >= 5000)
+		/* Reached end of chart */
+		if (i >= z_info->d_max)
 		{
-			if (cheat_xtra) msg_print("Error: aborting loop in room descriptions.");
-			break;
+			msg_format("Error: Reached end of chart looking for %d. Please report.", *chart);
+			return (FALSE);
 		}
 
 		/* Cycle through valid entries */
@@ -2302,7 +2303,11 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 		{
 			bool good_chance = FALSE;
 
-			counter++;
+			if (counter++ > 5000)
+			{
+				msg_print("Error: aborting loop in room descriptions. Please report.");
+				return (FALSE);
+			}
 
 			/* If not allowed at this depth, skip completely */
 			if (p_ptr->depth < d_info[i].level_min) { i++; continue; }
