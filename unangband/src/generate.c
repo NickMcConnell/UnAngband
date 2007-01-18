@@ -2293,7 +2293,7 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 
 		if (counter >= 5000)
 		{
-			msg_print("Error: aborting loop in room descriptions.");
+			if (cheat_xtra) msg_print("Error: aborting loop in room descriptions.");
 			break;
 		}
 
