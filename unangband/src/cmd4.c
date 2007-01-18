@@ -165,9 +165,9 @@ void do_cmd_change_name(void)
 
 		/* Oops */
 		else
-		{
-			bell("Illegal command for change name!");
-		}
+		  {
+		    bell(NULL);
+		  }
 
 		/* Flush messages */
 		message_flush();
