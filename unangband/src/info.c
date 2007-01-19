@@ -361,18 +361,18 @@ void object_flags(const object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3, u32b *
 
 
 /*
- * Set obvious flags for average items 
+ * Set obvious flags for items 
  */
 void object_obvious_flags(object_type *o_ptr)
 {
+        u32b f1, f2, f3, f4;
+
+	/* Spoil the object */
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+
 	/* Fully identified */
         if (o_ptr->ident & (IDENT_MENTAL))
         {
-                u32b f1,f2,f3,f4;
-
-                /* Spoil the object */
-                object_flags(o_ptr, &f1, &f2, &f3, &f4);
-
                 object_can_flags(o_ptr, f1, f2, f3, f4);
 
                 object_not_flags(o_ptr, ~(f1), ~(f2), ~(f3), ~(f4));
@@ -457,6 +457,14 @@ void object_obvious_flags(object_type *o_ptr)
 				~(o_ptr->can_flags4));
 		}
 	}
+
+	/* Hack: if it stays that way, please remove the code from do_cmd_wield */
+	/* Throwing is always obvious */
+	if (f3 & TR3_THROWING)
+	{
+		object_can_flags(o_ptr,0x0L,0x0L,TR3_THROWING,0x0L);
+	}
+	else object_not_flags(o_ptr,0x0L,0x0L,TR3_THROWING,0x0L);
 }
 
 

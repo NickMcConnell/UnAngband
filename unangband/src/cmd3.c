@@ -727,12 +727,13 @@ void do_cmd_wield(void)
 	}
 	else object_not_flags(j_ptr,0x0L,0x0L,TR3_BLESSED,0x0L);
 
-	/* Hack --- the following are either obvious or (relatively) unimportant */
+	/* Remove if TR3_THROWING is to be obvious forever
 	if (f3 & (TR3_THROWING))
 	{
 		object_can_flags(j_ptr,0x0L,0x0L,TR3_THROWING,0x0L);
 	}
 	else object_not_flags(j_ptr,0x0L,0x0L,TR3_THROWING,0x0L);
+	*/
 
 	if (f3 & (TR3_LIGHT_CURSE)) object_can_flags(j_ptr,0x0L,0x0L,TR3_LIGHT_CURSE,0x0L);
 	else object_not_flags(j_ptr,0x0L,0x0L,TR3_LIGHT_CURSE,0x0L);
