@@ -3559,7 +3559,7 @@ static void calc_bonuses(void)
 		/* Make strength less significant */
 		half_str = 10 + p_ptr->stat_ind[A_STR] / 4;
 
-		/* Get the strength vs weight; strength translated */
+		/* Get the strength vs weight */
 		str_index = adj_str_blow[half_str] * mul / div;
 
 		/* Maximal value */
@@ -3570,7 +3570,7 @@ static void calc_bonuses(void)
 		/* Use the blows table */
 		p_ptr->num_throw = blows_table[str_index][dex_index];
 
-		/* Maximal value */
+		/* Maximal value; limited by class, as for blows */
 		if (p_ptr->num_throw > num) p_ptr->num_throw = num;
 
 		/* Require at least one throw */
