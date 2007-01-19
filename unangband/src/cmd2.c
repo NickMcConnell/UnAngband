@@ -3277,7 +3277,7 @@ static bool item_tester_hook_rope(const object_type *o_ptr)
  *
  * Note that Bows of "Extra Shots" give an extra shot.
  */
-void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
+void do_cmd_fire_or_throw_selected(int item, bool fire)
 {
   int item2 = 0;
   int i = 0;
@@ -3289,6 +3289,7 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 
   int style_hit, style_dam, style_crit;
 
+  object_type *o_ptr = &inventory[item];
   object_type *k_ptr;
   object_type *i_ptr;
   object_type object_type_body;
@@ -4080,10 +4081,10 @@ void do_cmd_fire_or_throw_selected(object_type *o_ptr, int item, bool fire)
 
 
 /*
- * Fire an object from the pack or floor.
+ * Throw or fire an object from the pack or floor.
  * See do_cmd_fire_selected.
  */
-void do_cmd_fire(void)
+void do_cmd_throw_fire(bool fire)
 {
   int item;
 
@@ -4106,16 +4107,19 @@ void do_cmd_fire(void)
       return;
     }
 
-  /* Require proper missile */
-  item_tester_tval = p_ptr->ammo_tval;
+  if (fire)
+    {
+      /* Require proper missile */
+      item_tester_tval = p_ptr->ammo_tval;
 
-  /* Require throwing weapon */
-  if (!item_tester_tval) 
-    item_tester_hook = is_known_throwing_item;
+      /* Require throwing weapon */
+      if (!item_tester_tval) 
+	item_tester_hook = is_known_throwing_item;
+    }
 
   /* Get an item */
-  q = "Fire which item? ";
-  s = "You have nothing to fire.";
+  q = fire ? "Fire which item? " : "Throw which item? ";
+  s = fire ? "You have nothing to fire." : "You have nothing to throw.";
   if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG)))
     return;
 
@@ -4142,81 +4146,28 @@ void do_cmd_fire(void)
       /* Get item from bag */
       if (!get_item_from_bag(&item, q, s, o_ptr)) 
 	return;
-
-      /* Refer to the item */
-      o_ptr = &inventory[item];
     }
 
-  /* Check for launcher */
-  if (p_ptr->num_fire)
-    /* Launcher wielded, so fire */
-    do_cmd_fire_or_throw_selected(o_ptr, item, TRUE);
+  if (fire && p_ptr->num_fire)
+    do_cmd_fire_or_throw_selected(item, TRUE);
   else 
-    /* No launcher, so throw */
-    do_cmd_fire_or_throw_selected(o_ptr, item, FALSE);
+    do_cmd_fire_or_throw_selected(item, FALSE);
+}
+
+
+/*
+ * Fire an object from the pack or floor.
+ */
+void do_cmd_fire(void)
+{
+  do_cmd_throw_fire(TRUE);
 }
 
 
 /*
  * Throw an object from the pack or floor.
- * See do_cmd_throw_selected.
  */
 void do_cmd_throw(void)
 {
-  int item;
-
-  object_type *o_ptr;
-
-  cptr q, s;
-
-  /* Berserk */
-  if (p_ptr->shero)
-    {
-      msg_print("You are too enraged!");
-      return;
-    }
-
-  /* Some items and some rooms blow missiles around */
-  if (p_ptr->cur_flags4 & (TR4_WINDY) 
-      || room_has_flag(p_ptr->py, p_ptr->px, ROOM_WINDY))
-    {
-      msg_print("Its too windy around you!");
-      return;
-    }
-
-  /* Get an item */
-  q = "Throw which item? ";
-  s = "You have nothing to throw.";
-  if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG))) 
-    return;
-
-  /* Get the object */
-  if (item >= 0)
-    {
-      o_ptr = &inventory[item];
-
-      /* A cursed quiver disables the use of non-cursed ammo */
-      if (IS_QUIVER_SLOT(item) && p_ptr->cursed_quiver && !cursed_p(o_ptr))
-	{
-	  msg_print("Your quiver is cursed!");
-	  return;
-	}
-    }
-  else
-    {
-      o_ptr = &o_list[0 - item];
-    }
-
-  /* In a bag? */
-  if (o_ptr->tval == TV_BAG)
-    {
-      /* Get item from bag */
-      if (!get_item_from_bag(&item, q, s, o_ptr)) 
-	return;
-
-      /* Refer to the item */
-      o_ptr = &inventory[item];
-    }
-
-  do_cmd_fire_or_throw_selected(o_ptr, item, FALSE);
+  do_cmd_throw_fire(FALSE);
 }
