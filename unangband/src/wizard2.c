@@ -927,6 +927,9 @@ static void wiz_create_item(void)
 	/* Apply magic (no messages, no artifacts) */
 	apply_magic(i_ptr, p_ptr->depth, FALSE, FALSE, FALSE);
 
+	/* Apply obvious flags */
+	object_obvious_flags(i_ptr);
+
 	/* Hack -- use repeat count to specify quantity */
 	if (p_ptr->command_arg) i_ptr->number = p_ptr->command_arg;
 
