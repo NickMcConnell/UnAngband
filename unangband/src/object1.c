@@ -2294,14 +2294,28 @@ bool item_tester_okay(const object_type *o_ptr)
 			if (!(bag_holds[o_ptr->sval][i][0]) || !(bag_contents[o_ptr->sval][i])) continue;
 
 			/* Check the tval */
-			if ((item_tester_tval) && !(item_tester_tval == bag_holds[o_ptr->sval][i][0])) continue;
+			if (item_tester_tval)
+			  {
+			    if (!(item_tester_tval == bag_holds[o_ptr->sval][i][0]))
+			      continue;
+			    else 
+			      break;
+			  }
 
 			/* Fake the item */
 			fake_bag_item(i_ptr, o_ptr->sval, i);
 
 			/* Check the hook */
-			if ((item_tester_hook) && !(*item_tester_hook)(i_ptr)) continue;
+			if (item_tester_hook)
+			  {
+			    if (!(*item_tester_hook)(i_ptr))
+			      continue;
+			    else 
+			      break;
+			  }
 		}
+		
+		if (i < INVEN_BAG_TOTAL) return (TRUE);
 	}
 
 	/* Check the tval */
@@ -4455,6 +4469,9 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 
 /*
  * Create a fake item from the bag arrays
+ *
+ * FIXME: It's sooo ugly and so fragile; why not just copy the objects?
+ * Or if they aren't stored, why not store them somewhere?
  */
 void fake_bag_item(object_type *i_ptr, int sval, int slot)
 {
@@ -4464,8 +4481,7 @@ void fake_bag_item(object_type *i_ptr, int sval, int slot)
 	/* Initially no item */
 	i_ptr->k_idx = 0;
 
-	/* Paranoia */
-	if ((sval >= SV_BAG_MAX_BAGS) || (slot >= INVEN_BAG_TOTAL)) return;
+	assert (sval <= SV_BAG_MAX_BAGS && slot <= INVEN_BAG_TOTAL);
 
 	/* Get bag kind from lookup kind cache */
 	i_ptr->k_idx = bag_kinds_cache[sval][slot];
@@ -4537,6 +4553,9 @@ void fake_bag_item(object_type *i_ptr, int sval, int slot)
 
 		/* Auto-inscribe */
 		if (!i_ptr->note) i_ptr->note = k_info[i_ptr->k_idx].note;
+
+		/* Apply obvious flags, e.g. for throwing items */
+		object_obvious_flags(i_ptr);
 	}
 }
 
