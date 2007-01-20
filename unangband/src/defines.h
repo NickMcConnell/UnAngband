@@ -625,19 +625,46 @@
 /*
  * Player race constants (hard-coded by save-files, arrays, etc)
  */
-#define RACE_HUMAN        0
-#define RACE_HALF_ELF     1
-#define RACE_WOOD_ELF     2
-#define RACE_HOBBIT       3
-#define RACE_GNOME        4
-#define RACE_DWARF        5
-#define RACE_HALF_ORC     6
-#define RACE_HALF_TROLL   7
-#define RACE_DUNADAN      8
-#define RACE_HIGH_ELF     9
-#define RACE_GOBLIN       10
+#define RACE_MAN_OF_BREE	0
+#define RACE_HALF_ELF		1
+#define RACE_WOOD_ELF		2
+#define RACE_HOBBIT		3
+#define RACE_GNOME		4
+#define RACE_DWARF		5
+#define RACE_HALF_ORC		6
+#define RACE_HALF_TROLL		7
+#define RACE_DUNADAN		8
+#define RACE_HIGH_ELF		9
+#define RACE_GOBLIN		10
+#define RACE_ORC		11
+#define RACE_MAN_OF_ROHAN	12
+#define RACE_MAN_OF_GONDOR	13
+#define RACE_MAN_OF_HARAD	14
+#define RACE_MAN_OF_THE_DALE	15
+#define RACE_BEORNING		16
+#define RACE_STONE_GIANT	17
+#define RACE_STONE_TROLL	18
+#define RACE_ENT           	19
+#define RACE_MAIA		20
+#define RACE_SHADOW_FAIRY	21
+#define RACE_MAN_OF_ERECH	22
+#define RACE_WEREWOLF		23
+#define RACE_VAMPIRE		24
+#define RACE_GOAT		25
+#define RACE_BEAR		26
+#define RACE_MOUSE		27
+#define RACE_HOUND         	28
+#define RACE_CHEETAH       	29
+#define RACE_LION          	30
+#define RACE_DRAGON        	31
+#define RACE_WOLF         	32
+#define RACE_BAT          	33
 
-#define MAX_RACES        10
+
+/*
+ * Max 'real' races for defining stores etc.
+ */
+#define MAX_RACES		25
 
 
 

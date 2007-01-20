@@ -5236,8 +5236,6 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	bool overrun_flag = FALSE;
 	bool abort_and_cleanup = FALSE;
 
-	dun_data *dun_test = dun;
-
 	/* Force style change */
 	u32b style = get_tunnel_style();
 
@@ -5304,8 +5302,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			row1 = row1 - row_dir;
 			col1 = col1 - col_dir;
 
-			dun->stair[dun->stair_n].y = y;
-			dun->stair[dun->stair_n].x = x;
+			dun->stair[dun->stair_n].y = row1;
+			dun->stair[dun->stair_n].x = col1;
 			dun->stair_n++;
 		}
 
@@ -9148,6 +9146,19 @@ void generate_cave(void)
 
 	/* Hack -- always get a feeling leaving town or surface */
 	else old_turn = 0;
+
+	/* XXX Hurt light players sleep until it gets dark before entering surface levels */
+	/* FIXME - Should really check that the player knows they are vulnerable to light */
+	if (((p_ptr->cur_flags4 & (TR4_HURT_LITE)) != 0) && ((level_flag & (LF1_DAYLIGHT)) != 0))
+	{
+		/* Hack -- Set time to one turn before sun down */
+		turn += ((10L * TOWN_DAWN) / 2) - (turn % (10L * TOWN_DAWN)) - 1;
+
+		/* XXX Set food, etc */
+
+		/* Inform the player */
+		msg_print("You sleep during the day.");
+	}
 
 	/* Set dodging - 'just appeared' */
 	p_ptr->dodging = 9;

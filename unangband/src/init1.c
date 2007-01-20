@@ -5837,7 +5837,8 @@ errr parse_g_info(char *buf, header *head)
 		s = buf+1;
 
 		/* Initialize the counter to max races */
-		j = z_info->p_max;
+		/* j = z_info->p_max;*/
+		j = MAX_RACES;
 
 		/* Repeat */
 		while (j-- > 0)

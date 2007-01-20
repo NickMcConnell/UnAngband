@@ -2735,38 +2735,36 @@ W:30:0:30:900
 A:30/1
 P:0:1d1:0:0:0
 
+##### Some magical spells #####
 
-##### Various Stuff #####
+N:338:& Hunter's Stride~
+G:":y
+I:10:16:6
+W:0:0:0:0
+P:0:0d0:0:0:0
+F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
+F:SPEED
 
-N:338:& handful~ of Sand
-G:~:u
-I:3:9:0
-W:0:0:5:0
-P:0:1d1:0:0:0
+N:339:& Bark Skin~
+G:[:U
+I:10:37:0
+W:0:0:0:0
+P:25:0d0:0:0:0
+F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
+F:HURT_FIRE
 
-N:339:& handful~ of Earth
-G:~:u
-I:3:10:0
-W:0:0:5:0
-P:0:1d1:0:0:0
+N:340:& Ent Roots~
+G:[:U
+I:10:38:8
+W:0:0:0:0
+P:0:5d5:0:0:0
+F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
+F:TUNNEL
 
-N:340:& handful~ of Mud
-G:~:u
-I:3:11:0
-W:0:0:5:0
-P:0:1d1:0:0:0
+### 341 ###
 
-N:341:& handful~ of Dust
-G:~:u
-I:3:12:0
-W:0:0:5:0
-P:0:1d1:0:0:0
+### 342 ###
 
-N:342:& handful~ of Ice
-G:~:u
-I:3:13:0
-W:0:0:5:0
-P:0:1d2:0:0:0
 
 N:343:& # Flask~
 G:!:w
@@ -4206,7 +4204,7 @@ P:0:1d1:0:0:0
 # and destroyed if they are 'taken off'.
 # So most of the following flags are not useful anyway.
 
-N:567:& Wizard Light spell~
+N:567:& Wizard Light~
 G:~:B
 I:10:10:3
 W:0:0:0:0
@@ -4214,7 +4212,7 @@ P:0:1d1:0:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:LITE
 
-N:568:& Psychic Crown spell~
+N:568:& Psychic Crown~
 G:]:v
 I:10:13:0
 W:0:0:0:0
@@ -4222,7 +4220,7 @@ P:0:1d1:0:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:TELEPATHY | ACTIVATE
 
-N:569:& Spiritual Hammer spell~
+N:569:& Spiritual Hammer~
 G:\:G
 I:10:25:0
 W:0:0:0:0
@@ -4230,7 +4228,7 @@ P:0:3d5:10:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:SLAY_UNDEAD | SEE_INVIS | BLESSED
 
-N:570:& Hexen Hammer spell~
+N:570:& Hexen Hammer~
 G:\:g
 I:10:26:0
 W:0:0:0:0
@@ -4238,7 +4236,7 @@ P:0:5d8:10:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:SLAY_DEMON | RES_FIRE | BLESSED
 
-N:571:& Runestaff spell~
+N:571:& Runestaff~
 G:\:y
 I:10:30:0
 W:0:0:0:0
@@ -4246,7 +4244,7 @@ P:0:6d4:10:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:BRAND_FIRE | BRAND_ELEC | RES_FIRE | RES_ELEC | LITE | BLESSED | ACTIVATE
 
-N:572:& Bat Wings spell~
+N:572:& Bat Wings~
 G:):v
 I:10:31:5
 W:0:0:0:0
@@ -4254,7 +4252,7 @@ P:5:0d0:0:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:SPEED | FEATHER | ANIMAL | WINDY
 
-N:573:& Wolf's Maw spell~
+N:573:& Wolf's Maw~
 G:]:v
 I:10:32:5
 W:0:1:0:0
@@ -4262,7 +4260,7 @@ P:5:0d0:0:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:INFRA | SEARCH | VAMP_HP | ANIMAL | SILENT | HUNGER | ACTIVATE
 
-N:574:& Talons spell~
+N:574:& Talons~
 G:):r
 I:10:33:-10
 W:0:0:0:0
@@ -4270,7 +4268,7 @@ P:5:5d20:10:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:BLOWS | SHOTS | DEVICE
 
-N:575:& Wolf's Hide spell~
+N:575:& Wolf's Hide~
 G:[:u
 I:10:34:5
 W:0:0:0:0
@@ -4278,7 +4276,7 @@ P:20:0d0:0:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:RES_COLD | STEALTH | ANIMAL | REGEN_HP | ACTIVATE
 
-N:576:& Stone Skin spell~
+N:576:& Stone Skin~
 G:[:D
 I:10:35:0
 W:0:0:0:0
@@ -4286,7 +4284,7 @@ P:50:0d0:-25:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:RES_SHARD
 
-N:577:& Dragonscales spell~
+N:577:& Dragonscales~
 G:[:D
 I:10:36:0
 W:0:0:0:0
@@ -4357,12 +4355,12 @@ W:0:0:300:0
 A:0/1
 P:0:1d1:0:0:0
 
-N:588:& broken Branch~
+N:588:& Branch~
 G:~:u
 I:3:8:0
 W:0:0:30:0
 A:0/1
-P:0:1d1:0:0:0
+P:0:1d5:0:0:0
 
 N:589:& hunk~ of # Meat
 G:~:r
@@ -6646,7 +6644,7 @@ A:35/2
 F:RES_POIS | DEX | ACTIVATE
 Y:16:4
 
-N:912:& Cobra's Cowl spell~
+N:912:& Cobra's Cowl~
 G:":G
 I:10:11:5
 W:0:4:0:0
@@ -6654,7 +6652,7 @@ P:5:0d0:0:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:RES_POIS | RES_WATER | INFRA | ACTIVATE
 
-N:913:& Goat's Hooves spell~
+N:913:& Goat's Hooves~
 G:]:W
 I:10:12:5
 W:0:3:0:0
@@ -6662,7 +6660,7 @@ P:5:0d0:0:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:DEX | ACTIVATE
 
-N:914:& Dragon's Maw spell~
+N:914:& Dragon's Maw~
 G:]:v
 I:10:29:0
 W:0:9:0:0
@@ -6671,7 +6669,7 @@ F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_
 F:SEE_INVIS | RES_FIRE | RES_COLD | RES_ACID | RES_ELEC | RES_POIS | DRAGON
 F:HUNGER | ACTIVATE
 
-N:915:& Lion's Mane spell~
+N:915:& Lion's Mane~
 G:":y
 I:10:14:5
 W:0:4:0:0

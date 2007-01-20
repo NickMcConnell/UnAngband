@@ -776,6 +776,7 @@ static void do_cmd_travel(void)
 			turn += PY_FOOD_FULL/10*journey*4;
 
 			/* XXX Recharges, stop temporary speed etc. */
+			/* We don't do this to e.g. allow the player to buff themselves before fighting Beorn. */
 
 			/* Check quests due to travelling - cancel if requested */
 			if (!check_travel_quest(selection, min_depth(p_ptr->dungeon), TRUE)) return;

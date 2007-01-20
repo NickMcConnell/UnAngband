@@ -1076,6 +1076,7 @@ struct player_race
 	byte f_m_wt;    /* mod weight (females) */
 
 	byte infra;     /* Infra-vision range */
+	byte home;	/* Home town */
 
 	u32b choice;    /* Legal class choices */
 
@@ -1085,6 +1086,8 @@ struct player_race
 	u32b flags2;    /* Racial Flags, set 2 */
 	u32b flags3;    /* Racial Flags, set 3 */
 	u32b flags4;    /* Racial Flags, set 4 */
+
+	s16b slots[END_EQUIPMENT - INVEN_WIELD];	/* Slot occupied by a shape 'object' */
 };
 
 
@@ -1308,7 +1311,6 @@ struct player_type
 	byte psex;      /* Sex index */
 	byte prace;     /* Race index */
 	byte pclass;    /* Class index */
-
 	byte pstyle;      /* Style specialization */
 
 	byte hitdie;    /* Hit dice (sides) */
@@ -1400,7 +1402,7 @@ struct player_type
 	byte climbing; /* Currently climbing */
 	byte searching; /* Currently searching */
 	byte charging;	/* Currently charging */
-	byte unused;
+	byte pshape;    /* Shape index */
 
 	u32b disease;	/* Disease types */
 

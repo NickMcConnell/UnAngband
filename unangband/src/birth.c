@@ -1149,7 +1149,14 @@ static bool get_player_race()
 	for (i = 0; i < z_info->p_max; i++)
 	{
 		races[i].name = p_name + p_info[i].name;
-		races[i].ghost = FALSE;
+		if (p_info[i].flags3 & (TR3_RANDOM))
+		{
+			races[i].ghost = FALSE;
+		}
+		else
+		{
+			races[i].ghost = TRUE;
+		}
 	}
 
 	p_ptr->prace = get_player_choice(races, z_info->p_max, RACE_COL, 15,
