@@ -1781,6 +1781,7 @@ I:75:42:0
 W:25:0:4:300
 A:25/1
 P:0:1d1:0:0:0
+F:THROWING
 
 N:228:Intelligence
 G:!:w
@@ -1805,6 +1806,7 @@ I:75:43:0
 W:25:0:4:300
 A:25/1
 P:0:1d1:0:0:0
+F:THROWING
 
 N:231:Wisdom
 G:!:w
@@ -1829,6 +1831,7 @@ I:75:44:0
 W:25:0:4:300
 A:25/1
 P:0:1d1:0:0:0
+F:THROWING
 
 N:234:Charisma
 G:!:w
@@ -1853,6 +1856,7 @@ I:75:47:0
 W:20:0:4:300
 A:20/1
 P:0:1d1:0:0:0
+F:THROWING
 
 N:237:Cure Light Wounds
 G:!:w
@@ -1992,6 +1996,7 @@ I:75:45:0
 W:25:0:4:300
 A:25/1
 P:0:1d1:0:0:0
+F:THROWING
 
 N:253:Restore Constitution
 G:!:d
@@ -1999,6 +2004,7 @@ I:75:46:0
 W:25:0:4:300
 A:25/1
 P:0:1d1:0:0:0
+F:THROWING
 
 N:254:Lose Memories
 G:!:w
