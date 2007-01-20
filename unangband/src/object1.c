@@ -1228,7 +1228,8 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		}
 
 		/* Grab any magic name */
-		else if (o_ptr->feeling < INSCRIP_MIN_HIDDEN)
+		else if (o_ptr->tval != TV_POTION
+			 && o_ptr->feeling < INSCRIP_MIN_HIDDEN)
 		{
 			int i;
 			int x1, x2; /* Fake xtra flags */

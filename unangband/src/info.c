@@ -3744,8 +3744,9 @@ void object_guess_name(object_type *o_ptr)
 	if (object_named_p(o_ptr)) return;
 
 	/* Check the ego item list */
-	/* Hack -- exclude artifacts */
-	if (!(o_ptr->feeling == INSCRIP_SPECIAL) &&
+	/* Hack -- exclude artifacts and potions */
+	if (o_ptr->tval != TV_POTION
+	    && !(o_ptr->feeling == INSCRIP_SPECIAL) &&
 	       !(o_ptr->feeling == INSCRIP_ARTIFACT) &&
 	       !(o_ptr->feeling == INSCRIP_TERRIBLE) &&
 	       !(o_ptr->feeling == INSCRIP_UNBREAKABLE))
@@ -3872,11 +3873,12 @@ void object_guess_name(object_type *o_ptr)
 	/* This should be here to guess for rings/amulets etc. */
 
 	/* Check the normal item list */
-	/* Hack -- exclude artifacts */
-	if (!(o_ptr->feeling == INSCRIP_SPECIAL) &&
-	       !(o_ptr->feeling == INSCRIP_ARTIFACT) &&
-	       !(o_ptr->feeling == INSCRIP_TERRIBLE) &&
-	       !(o_ptr->feeling == INSCRIP_UNBREAKABLE))
+	/* Hack -- exclude artifacts and potions */
+	if (o_ptr->tval != TV_POTION
+	    && o_ptr->feeling != INSCRIP_SPECIAL
+	    && o_ptr->feeling != INSCRIP_ARTIFACT
+	    && o_ptr->feeling != INSCRIP_TERRIBLE
+	    && o_ptr->feeling != INSCRIP_UNBREAKABLE)
 	for (i = 1; i < z_info->k_max; i++)
 	{
 		object_kind *k_ptr = &k_info[i];
