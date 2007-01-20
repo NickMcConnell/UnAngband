@@ -766,6 +766,7 @@ extern bool is_known_throwing_item(const object_type *o_ptr);
 extern int quiver_space_per_unit(const object_type *o_ptr);
 extern bool quiver_carry_okay(const object_type *o_ptr, int num, int item);
 extern byte quiver_get_group(const object_type *o_ptr);
+extern bool quiver_carry(object_type *o_ptr, int o_idx);
 
 /* save.c */
 extern bool save_player(void);

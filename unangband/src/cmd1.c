@@ -748,8 +748,11 @@ void search(void)
 /*
  * Objects that combine with items already in the quiver get picked
  * up, placed in the quiver, and combined automatically.
+ *
+ * FIXME: make a function with this name that will behave 
+ * similarly as inven_carry; then use it in do_cmd_apply_rune_or_coating
  */
-static bool quiver_carry(object_type *o_ptr, int o_idx)
+bool quiver_carry(object_type *o_ptr, int o_idx)
 {
 	int i;
 
@@ -856,7 +859,8 @@ static bool quiver_carry(object_type *o_ptr, int o_idx)
 	msg_format("You have %s (%c).", name, index_to_label(i));
 
 	/* Delete the object */
-	delete_object_idx(o_idx);
+	if (o_idx >= 0)
+	  delete_object_idx(o_idx);
 
 	/* Update "p_ptr->pack_size_reduce" */
 	find_quiver_size();

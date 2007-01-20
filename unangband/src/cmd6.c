@@ -2153,7 +2153,7 @@ void do_cmd_apply_rune_or_coating(void)
 		o_ptr->stackc = 0;
 	}
 
-	/* Can't apply if artifact */
+	/* Can't apply if artifact or other magical item */
 	if ((artifact_p(j_ptr)) || ((j_ptr->xtra1) && (j_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES)))
 	{
 		msg_print("It has hidden powers that prevent this.");
@@ -2469,16 +2469,28 @@ void do_cmd_apply_rune_or_coating(void)
 	/* Need to carry the new object? */
 	if (split)
 	{
-		/* Carry the new item */
-		if (item2 >= 0)
-		{
-			item = inven_carry(j_ptr);
-			inven_item_describe(item);
-		}
-		else
-		{
-			item = floor_carry(p_ptr->py,p_ptr->px,j_ptr);
-			floor_item_describe(item);
-		}
+	  /* If taken from the quiver, try to combine or put in the quiver */
+	  if (item2 >= INVEN_QUIVER)
+	    if (quiver_carry(j_ptr, -1))
+	      {
+		/* FIXME: use a proper quiver_carry and do not wipe below */
+
+		/* Wipe the object */
+		object_wipe(j_ptr);
+
+		return;
+	      }
+
+	  /* Carry the new item */
+	  if (item2 >= 0)
+	    {
+	      item = inven_carry(j_ptr);
+	      inven_item_describe(item);
+	    }
+	  else
+	    {
+	      item = floor_carry(p_ptr->py,p_ptr->px,j_ptr);
+	      floor_item_describe(item);
+	    }
 	}
 }
