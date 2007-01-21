@@ -3575,11 +3575,13 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 	bool use_featg = ((mode & (USE_FEATG)) ? TRUE : FALSE);
 	bool use_featu = ((mode & (USE_FEATU)) ? TRUE : FALSE);
 	bool use_quiver = ((mode & (USE_QUIVER)) ? TRUE: FALSE);
+	bool use_self = ((mode & (USE_SELF)) ? TRUE: FALSE);
 
 	bool allow_inven = FALSE;
 	bool allow_equip = FALSE;
 	bool allow_floor = FALSE;
 	bool allow_feats = FALSE;
+	bool allow_self = FALSE;
 
 	bool toggle = FALSE;
 
@@ -3696,8 +3698,11 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 		if ((make_feat(i_ptr,p_ptr->py,p_ptr->px)) && item_tester_okay(i_ptr)) allow_feats = TRUE;
 	}
 
+	/* Scan oneself */
+	if ((use_self) && (item_tester_okay(&inventory[INVEN_BLANK]))) allow_self = TRUE;
+
 	/* Require at least one legal choice */
-	if (!allow_inven && !allow_equip && !allow_floor && !allow_feats)
+	if (!allow_inven && !allow_equip && !allow_floor && !allow_feats && !allow_self)
 	{
 		/* Cancel p_ptr->command_see */
 		p_ptr->command_see = FALSE;
@@ -3862,22 +3867,11 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 				strcat(out_val, tmp_val);
 			}
 
-			/* Indicate ability to "view" */
-			if (!p_ptr->command_see) strcat(out_val, " * to see,");
-
 			/* Indicate legality of "toggle" */
 			if (use_equip) strcat(out_val, " / for Equip,");
 
 			/* Indicate legality of the "floor" */
 			if (allow_floor) strcat(out_val, " - for floor,");
-
-			/* Indicate legality of the "feature" */
-			if (allow_feats)
-			{
-				strcat(out_val, " . for ");
-				strcat(out_val,f_name + f_info[cave_feat[p_ptr->py][p_ptr->px]].name);
-				strcat(out_val,",");
-			}
 
 		}
 
@@ -3901,22 +3895,11 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 				strcat(out_val, tmp_val);
 			}
 
-			/* Indicate ability to "view" */
-			if (!p_ptr->command_see) strcat(out_val, " * to see,");
-
 			/* Indicate legality of "toggle" */
 			if (use_inven) strcat(out_val, " / for Inven,");
 
 			/* Indicate legality of the "floor" */
 			if (allow_floor) strcat(out_val, " - for floor,");
-
-			/* Indicate legality of the "feature" */
-			if (allow_feats)
-			{
-				strcat(out_val, " . for ");
-				strcat(out_val,f_name + f_info[cave_feat[p_ptr->py][p_ptr->px]].name);
-				strcat(out_val,",");
-			}
 		}
 
 #ifdef ALLOW_EASY_FLOOR
@@ -3940,25 +3923,28 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 				strcat(out_val, tmp_val);
 			}
 
-			/* Indicate ability to "view" */
-			if (!p_ptr->command_see) strcat(out_val, " * to see,");
-
 			/* Append */
 			if (use_inven) strcat(out_val, " / for Inven,");
 
 			/* Append */
 			else if (use_equip) strcat(out_val, " / for Equip,");
-
-			/* Indicate legality of the "feature" */
-			if (allow_feats)
-			{
-				strcat(out_val, " . for ");
-				strcat(out_val,f_name + f_info[cave_feat[p_ptr->py][p_ptr->px]].name);
-				strcat(out_val,",");
-			}
 		}
 
 #endif /* ALLOW_EASY_FLOOR */
+
+		/* Indicate ability to "view" */
+		if (!p_ptr->command_see) strcat(out_val, " * to see,");
+
+		/* Indicate legality of the "self" */
+		if (allow_self) strcat(out_val, " @ for self,");
+
+		/* Indicate legality of the "feature" */
+		if (allow_feats)
+		{
+			strcat(out_val, " . for ");
+			strcat(out_val,f_name + f_info[cave_feat[p_ptr->py][p_ptr->px]].name);
+			strcat(out_val,",");
+		}
 
 		/* Finish the prompt */
 		strcat(out_val, " ESC");
@@ -4317,6 +4303,22 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 
 				/* Accept that choice */
 				(*cp) = 0 - k;
+				item = TRUE;
+				done = TRUE;
+
+				break;
+
+			case '@':
+
+				/* Paranoia */
+				if (!allow_self)
+				{
+					bell("Cannot select self!");
+					break;
+				}
+
+				/* Accept that choice */
+				(*cp) = INVEN_BLANK;
 				item = TRUE;
 				done = TRUE;
 

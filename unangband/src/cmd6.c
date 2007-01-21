@@ -1678,7 +1678,7 @@ static bool item_tester_hook_activate(const object_type *o_ptr)
 	/* Extract the flags */
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
-	/* Hack -- for spells that can activate */
+	/* Hack -- for spells that can activate. They are always 'charging', so would never activate otherwise. */
 	if ((o_ptr->tval == TV_SPELL) && (f3 & (TR3_ACTIVATE))) return (TRUE);
 
 	/* Check the recharge */
@@ -1735,13 +1735,22 @@ void do_cmd_activate(void)
 		return;
 	}
 
+	/* Hack -- prepare a fake item for innate racial abilities of the current shape */
+	if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE))
+	{
+		inventory[INVEN_BLANK].k_idx = 578;	/* Note this is kind index for Corpse */
+		inventory[INVEN_BLANK].tval = TV_RACE;
+		inventory[INVEN_BLANK].sval = p_ptr->pshape;
+		inventory[INVEN_BLANK].number = 1;
+	}
+
 	/* Prepare the hook */
 	item_tester_hook = item_tester_hook_activate;
 
 	/* Get an item */
 	q = "Activate which item? ";
 	s = "You have nothing to activate.";
-	if (!get_item(&item, q, s, (USE_EQUIP))) return;
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_SELF))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -1835,6 +1844,10 @@ void do_cmd_activate(void)
 		
 		/* Clear styles */
 		p_ptr->cur_style &= ~((1L << WS_WAND) | (1L << WS_STAFF));
+
+		/* Clear racial activation */
+		if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE)) object_wipe(&inventory[INVEN_BLANK]);
+
 		return;
 	}
 
@@ -1906,16 +1919,20 @@ void do_cmd_activate(void)
 		/* Get object effect --- choose if required */
 		get_spell(&power, "use", o_ptr, TRUE);
 
+		/* Clear racial activation */
+		if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE)) object_wipe(&inventory[INVEN_BLANK]);
+
 		/* Paranoia */
 		if (power < 0) return;
 
 		/* Apply object effect */
 		(void)process_spell(power, 0, &cancel, &known);
 
+		/* Used the object */
 		if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
 
 		/* Time object out */
-		o_ptr->timeout = rand_int(o_ptr->charges)+o_ptr->charges;
+		if (o_ptr->charges) o_ptr->timeout = rand_int(o_ptr->charges)+o_ptr->charges;
 
 		/* Window stuff */
 		p_ptr->window |= (PW_INVEN | PW_EQUIP);

@@ -583,20 +583,14 @@ static void player_outfit(void)
 						  }
 						case WS_THROWN:
 						  {
-						    switch (p_ptr->prace)
-						      {
-						      case RACE_HOBBIT:
-						      case RACE_HALF_TROLL:
+						    if (p_info[p_ptr->prace].r_tht > p_info[p_ptr->prace].r_thb)
 							{
 							  k_idx = lookup_kind(TV_SHOT, SV_AMMO_LIGHT);
-							  break;
 							}
-						      default:
+							else
 							{
 							  k_idx = lookup_kind(TV_BOW, SV_SLING);
-							  break;
 							}
-						      }
 						    break;
 						  }
 						case WS_SLING:
@@ -1108,12 +1102,12 @@ static void race_aux_hook(birth_menu r_str)
 	char s[50];
 
 	/* Extract the proper race index from the string. */
-	for (race = 0; race < z_info->p_max; race++)
+	for (race = 0; race < z_info->g_max; race++)
 	{
 		if (!strcmp(r_str.name, p_name + p_info[race].name)) break;
 	}
 
-	if (race == z_info->p_max) return;
+	if (race == z_info->g_max) return;
 
 	/* Display relevant details. */
 	for (i = 0; i < A_MAX; i++)
@@ -1139,27 +1133,20 @@ static bool get_player_race()
 	int i;
 	birth_menu *races;
 
-	C_MAKE(races, z_info->p_max, birth_menu);
+	C_MAKE(races, z_info->g_max, birth_menu);
 
 	/* Extra info */
 	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
 		"Your 'race' determines various intrinsic factors and bonuses.");
 
 	/* Tabulate races */
-	for (i = 0; i < z_info->p_max; i++)
+	for (i = 0; i < z_info->g_max; i++)
 	{
 		races[i].name = p_name + p_info[i].name;
-		if (p_info[i].flags3 & (TR3_RANDOM))
-		{
-			races[i].ghost = FALSE;
-		}
-		else
-		{
-			races[i].ghost = TRUE;
-		}
+		races[i].ghost = ((p_info[i].flags3 & (TR3_RANDOM)) != 0);
 	}
 
-	p_ptr->prace = get_player_choice(races, z_info->p_max, RACE_COL, 15,
+	p_ptr->prace = get_player_choice(races, z_info->g_max, RACE_COL, 15,
                 "races.txt", race_aux_hook);
 
 	/* No selection? */
@@ -1174,6 +1161,9 @@ static bool get_player_race()
 
 	/* Save the race pointer */
 	rp_ptr = &p_info[p_ptr->prace];
+
+	/* Save the starting town */
+	p_ptr->town = rp_ptr->home;
 
         FREE(races);
 
@@ -2216,15 +2206,6 @@ void player_birth(void)
 	/* Hack -- set the dungeon. */
 	if (adult_campaign) p_ptr->dungeon = 1;
 	else p_ptr->dungeon = 0;
-
-	/* Hack -- set the town
-	   TODO: assign home towns for each choice in each starting 
-	   points (1, 4, 5, 7, etc.) of player history in p_hist.txt.
-	   Assume the player had an errand in Hobbiton, so town = 1,
-	   but perhaps allow recalls to the home towns (and back)...
-	   Make some rules for the change of player's home town, see FA. */
-	if (adult_campaign) p_ptr->town = 11;
-	else p_ptr->town = 0;
 
 	/* Set last disturb */
 	p_ptr->last_disturb = turn;

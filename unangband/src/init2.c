@@ -1302,8 +1302,7 @@ static errr init_g_info(void)
 	errr err;
 
 	/* Init the header */
-	/*init_header(&g_head, (u16b)(z_info->p_max * z_info->p_max), sizeof(byte));*/
-	init_header(&g_head, (u16b)(MAX_RACES * MAX_RACES), sizeof(byte));
+	init_header(&g_head, (u16b)(z_info->g_max * z_info->g_max), sizeof(byte));
 
 
 #ifdef ALLOW_TEMPLATES

@@ -2767,7 +2767,15 @@ P:0:5d5:0:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:TUNNEL
 
-### 341 ###
+# If we implement confusion brand, replace the following with confusion.
+
+N:341:& Cat's Paw~
+G:[:U
+I:10:39:5
+W:0:0:0:0
+P:0:1d5:0:0:0
+F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
+F:STEALTH | BRAND_POIS
 
 ### 342 ###
 

@@ -621,11 +621,11 @@ static void wr_extra(void)
 
 	/* More info */
 
-	/* Hack --- save psval here. Was wr_16b(0)  Oops */
+	/* Hack --- save psval here.*/
 	wr_byte(p_ptr->psval);
 
-	/* Hack --- save held_song here. Was wr_16b(0)  Oops */
-	wr_byte(p_ptr->held_song);
+	/* Hack --- save shape here.*/
+	wr_byte(p_ptr->pshape);
 
 	/* Write the timers */
 	wr_s16b(p_ptr->msleep);
@@ -682,8 +682,14 @@ static void wr_extra(void)
 	/* # of turns spent resting */
 	wr_s32b(p_ptr->resting_turn);
 
+	/* Held song */
+	wr_s16b(p_ptr->held_song);
+
 	/* Future use */
-	for (i = 0; i < 7; i++) wr_u32b(0L);
+	wr_s16b(0);
+
+	/* Future use */
+	for (i = 0; i < 6; i++) wr_u32b(0L);
 
 	/* Random artifact version */
 	wr_u32b(RANDART_VERSION);

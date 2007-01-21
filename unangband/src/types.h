@@ -143,18 +143,19 @@ struct maxima
 	u16b d_max;     /* Max size for "d_info[]" */
 	u16b f_max;     /* Max size for "f_info[]" */
 
-	u16b k_max;     /* Max size for "k_info[]" */
-
 	u16b a_max;     /* Max size for "a_info[]" */
 	u16b e_max;     /* Max size for "e_info[]" */
 
+	u16b k_max;     /* Max size for "k_info[]" */
 	u16b x_max;     /* Max size for "x_info[]" */
-	u16b q_max;	/* Max size for "q_info[]" */
 
-	u16b r_max;     /* Max size for "r_info[]" */
+	u16b q_max;	/* Max size for "q_info[]" */
 	u16b v_max;     /* Max size for "v_info[]" */
 
+	u16b r_max;     /* Max size for "r_info[]" */
 	u16b p_max;     /* Max size for "p_info[]" */
+
+	u16b g_max;     /* Max size for "g_info[]" */
 	u16b h_max;     /* Max size for "h_info[]" */
 
 	u16b t_max;	/* Max size for "t_info[]" */
@@ -1316,8 +1317,8 @@ struct player_type
 	byte hitdie;    /* Hit dice (sides) */
 	byte expfact;   /* Experience factor */
 
-	byte psval;		 /* Style sub-specialization*/
-	byte held_song;  /* Hack --- Song being sung */
+	byte psval;	/* Style sub-specialization*/
+	byte pshape;	/* Current shape */
 
 	u16b dungeon;		/* Current dungeon number */
 	u16b town;      /* Current town number */
@@ -1399,10 +1400,11 @@ struct player_type
 	s16b rest;      /* Current rest */
 	s16b water;     /* Current water */
 
+	s16b held_song;     /* Currently held song */
+
 	byte climbing; /* Currently climbing */
 	byte searching; /* Currently searching */
 	byte charging;	/* Currently charging */
-	byte pshape;    /* Shape index */
 
 	u32b disease;	/* Disease types */
 

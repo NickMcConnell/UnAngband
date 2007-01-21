@@ -1015,7 +1015,7 @@ static errr rd_extra(void)
 	rd_byte(&p_ptr->prace);
 
 	/* Verify player race */
-	if (p_ptr->prace >= z_info->p_max)
+	if (p_ptr->prace >= z_info->g_max)
 	{
 		note(format("Invalid player race (%d).", p_ptr->prace));
 		return (-1);
@@ -1086,41 +1086,24 @@ static errr rd_extra(void)
 	/* Hack -- Repair maximum dungeon level */
 	if (p_ptr->max_depth < 0) p_ptr->max_depth = 1;
 
-	/* More info */
 	/* Hack --- Get psval information. */
-	rd_byte(&tmp8u); /* Oops */
+	rd_byte(&p_ptr->psval);
 
-	/* Ignore old redundant info */
-	p_ptr->psval=tmp8u;
+	/* Hack --- Get shape information. */
+	rd_byte(&p_ptr->pshape);
 
-#if 0
-	/* Unfortunately, we can't say if it's vanilla character
-	 * and this psval hack breaks NONE characters */
-
-	/* Hack -- set styles for vanilla characters */
-	/* Mega Hack -- use psval == 1 to indicate we have applied this hack  */
-	if ((!p_ptr->pstyle) && (!p_ptr->psval))
+	/* Hack - this is needed for wip 0.6.2 versions */
+	if ((older_than(0, 6, 2)) || (!p_ptr->pshape))
 	{
-		switch(p_ptr->pclass)
-		{
-			case 2: /* CLASS_PRIEST */
-				p_ptr->pstyle = WS_HAFTED;
-				break;
-			case 4: /* CLASS_RANGER */
-				p_ptr->pstyle = WS_BOW;
-				break;
-			default:
-				p_ptr->psval = 1;
-				break;
-		}
+		p_ptr->pshape = p_ptr->prace;
 	}
-#endif
 
-	/* Hack --- Get held_song information. */
-	rd_byte(&tmp8u); /* Oops */
-
-	/* Ignore old redundant info */
-	p_ptr->held_song=tmp8u;
+	/* Verify player shape */
+	if (p_ptr->pshape >= z_info->p_max)
+	{
+		note(format("Invalid player shape (%d).", p_ptr->pshape));
+		return (-1);
+	}
 
 	/* Read the timers */
 	rd_s16b(&p_ptr->msleep);
@@ -1190,8 +1173,11 @@ static errr rd_extra(void)
 		p_ptr->resting_turn = 0;
 	}
 
+	/* Get held song */
+	rd_s16b(&p_ptr->held_song);
+
 	/* Future use */
-	strip_bytes(28);
+	strip_bytes(26);
 
 	/* Read the randart version */
 	rd_u32b(&randart_version);

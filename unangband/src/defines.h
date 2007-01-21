@@ -661,13 +661,6 @@
 #define RACE_BAT          	33
 
 
-/*
- * Max 'real' races for defining stores etc.
- */
-#define MAX_RACES		25
-
-
-
 /*** Screen Locations ***/
 
 #define BOTTOM_LINE  Term->hgt - (show_itemlist ? (use_trptile ? 4 : (use_dbltile ? 3 : 2)) : 1)
@@ -1503,6 +1496,8 @@
 #define SPELL_SLOW_CONF		17
 #define SPELL_SLOW_POIS		18
 #define SPELL_IDENT_PACK	19
+#define SPELL_CHANGE_SHAPE	20
+#define SPELL_REVERT_SHAPE	21
 #define SPELL_INVEN_WIELD      24
 #define SPELL_INVEN_BOW       25
 #define SPELL_INVEN_LEFT      26
@@ -1764,6 +1759,7 @@
 #define TV_SERVICE	99	/* Services have special meanings in stores */
 #define TV_GOLD  100     /* Gold or higher tvals can only be picked up by players */
 #define TV_GEMS  101
+#define TV_RACE	 102	/* Used for racial activations */
 
 /* The "sval" codes for TV_SKELETON */
 #define SV_BONE_SKULL 1
@@ -2618,6 +2614,7 @@
 #define USE_FEATU		0x08	/* Allow features (usable) */
 #define USE_FEATG		0x10	/* Allow features (gettable) */
 #define USE_QUIVER		0x20	/* Allow quiver items, forbid classic equipment */
+#define USE_SELF		0x40	/* Allow selection of player */
 
 
 /*** Player flags ***/

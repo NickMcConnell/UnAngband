@@ -1716,6 +1716,18 @@ errr parse_z_info(char *buf, header *head)
 		z_info->p_max = max;
 	}
 
+	/* Process 'G' for "Maximum g_info[] index" */
+	else if (buf[2] == 'G')
+	{
+		int max;
+
+		/* Scan for the value */
+		if (1 != sscanf(buf+4, "%d", &max)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the value */
+		z_info->g_max = max;
+	}
+
 	/* Process 'C' for "Maximum c_info[] index" */
 	else if (buf[2] == 'C')
 	{
@@ -4302,18 +4314,19 @@ errr parse_p_info(char *buf, header *head)
 	/* Hack -- Process 'I' for "info" and such */
 	else if (buf[0] == 'I')
 	{
-		int hist, b_age, m_age;
+		int hist, b_age, m_age, home;
 
 		/* There better be a current pr_ptr */
 		if (!pr_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (3 != sscanf(buf+2, "%d:%d:%d",
-			    &hist, &b_age, &m_age)) return (PARSE_ERROR_GENERIC);
+		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
+			    &hist, &b_age, &m_age, &home)) return (PARSE_ERROR_GENERIC);
 
 		pr_ptr->hist = hist;
 		pr_ptr->b_age = b_age;
 		pr_ptr->m_age = m_age;
+		pr_ptr->home = home;
 	}
 
 	/* Hack -- Process 'H' for "Height" */
@@ -5837,8 +5850,7 @@ errr parse_g_info(char *buf, header *head)
 		s = buf+1;
 
 		/* Initialize the counter to max races */
-		/* j = z_info->p_max;*/
-		j = MAX_RACES;
+		j = z_info->g_max;
 
 		/* Repeat */
 		while (j-- > 0)
