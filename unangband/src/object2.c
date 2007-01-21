@@ -1954,8 +1954,6 @@ void object_copy(object_type *o_ptr, const object_type *j_ptr)
  */
 void object_prep(object_type *o_ptr, int k_idx)
 {
-  assert (k_idx);
-
 	object_kind *k_ptr = &k_info[k_idx];
 
 	/* Clear the record */

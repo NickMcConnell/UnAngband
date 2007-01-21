@@ -527,6 +527,9 @@ bool set_psleep(int v)
 			}
 		}
 
+		/* Hack -- allow 'built-in' equipment to recover from disenchantment */
+		change_shape(p_ptr->prace, p_ptr->lev);
+
 		if (notice) msg_print("You recover somewhat.");
 	}
 

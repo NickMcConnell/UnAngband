@@ -1947,8 +1947,9 @@ static void display_player_xtra_info(void)
  */
 void player_flags(u32b *f1, u32b *f2, u32b *f3, u32b *f4)
 {
-
 	int i;
+
+	player_race *shape_ptr = &p_info[p_ptr->pshape];
 
 	/* Clear */
 	(*f1) = (*f2) = (*f3) = (*f4) = 0L;
@@ -1958,6 +1959,12 @@ void player_flags(u32b *f1, u32b *f2, u32b *f3, u32b *f4)
 	(*f2) |= rp_ptr->flags2;
 	(*f3) |= rp_ptr->flags3;
 	(*f4) |= rp_ptr->flags4;
+
+	/* Add shape flags */
+	(*f1) |= shape_ptr->flags1;
+	(*f2) |= shape_ptr->flags2;
+	(*f3) |= shape_ptr->flags3;
+	(*f4) |= shape_ptr->flags4;
 
 	/*** Handle styles ***/
 	for (i = 0;i< z_info->w_max;i++)
@@ -2698,7 +2705,14 @@ static void display_player_misc_info(void)
 
 	/* Race */
 	put_str("Race", 3, 1);
-	c_put_str(TERM_L_BLUE, p_name + rp_ptr->name, 3, 8);
+	if (p_ptr->prace != p_ptr->pshape)
+	{
+		c_put_str(TERM_L_BLUE, format("%s (%s)", p_name + rp_ptr->name, p_name + p_info[p_ptr->pshape].name), 3, 8);
+	}
+	else
+	{
+		c_put_str(TERM_L_BLUE, p_name + rp_ptr->name, 3, 8);
+	}
 
 
 	/* Class */
@@ -4964,6 +4978,7 @@ static void make_bones(void)
 			fprintf(fp, "%s\n", op_ptr->full_name);
 			fprintf(fp, "%d\n", p_ptr->mhp);
 			fprintf(fp, "%d\n", p_ptr->prace);
+
 			fprintf(fp, "%d\n", p_ptr->pclass);
 
 			/* Close and save the Bones file */

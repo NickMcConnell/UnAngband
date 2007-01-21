@@ -571,6 +571,11 @@
 #define INVEN_TOTAL	END_QUIVER
 
 /*
+ * Total number of inventory slots (hard-coded).
+ */
+#define INVEN_SELF	END_QUIVER
+
+/*
  * Total number of show item slots (hard-coded).
  */
 #define SHOWN_TOTAL	END_QUIVER
@@ -1755,11 +1760,11 @@
 #define TV_PRAYER_BOOK  91
 #define TV_SONG_BOOK    92
 #define TV_RUNESTONE    93
+#define TV_RACE	 97	/* Used for racial activations */
 #define TV_BAG		98	/* Containers for other items */
 #define TV_SERVICE	99	/* Services have special meanings in stores */
 #define TV_GOLD  100     /* Gold or higher tvals can only be picked up by players */
 #define TV_GEMS  101
-#define TV_RACE	 102	/* Used for racial activations */
 
 /* The "sval" codes for TV_SKELETON */
 #define SV_BONE_SKULL 1

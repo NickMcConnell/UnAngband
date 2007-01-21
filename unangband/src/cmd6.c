@@ -1738,10 +1738,14 @@ void do_cmd_activate(void)
 	/* Hack -- prepare a fake item for innate racial abilities of the current shape */
 	if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE))
 	{
-		inventory[INVEN_BLANK].k_idx = 578;	/* Note this is kind index for Corpse */
-		inventory[INVEN_BLANK].tval = TV_RACE;
-		inventory[INVEN_BLANK].sval = p_ptr->pshape;
-		inventory[INVEN_BLANK].number = 1;
+		/* Prepare a 'fake' object */
+		object_prep(&inventory[INVEN_SELF], lookup_kind(TV_RACE, 0));
+
+		/* Object is known */
+		object_known(&inventory[INVEN_SELF]);
+
+		/* Hack -- set sval */
+		inventory[INVEN_SELF].sval = p_ptr->pshape;
 	}
 
 	/* Prepare the hook */
@@ -1846,7 +1850,7 @@ void do_cmd_activate(void)
 		p_ptr->cur_style &= ~((1L << WS_WAND) | (1L << WS_STAFF));
 
 		/* Clear racial activation */
-		if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE)) object_wipe(&inventory[INVEN_BLANK]);
+		if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE)) object_wipe(&inventory[INVEN_SELF]);
 
 		return;
 	}
@@ -1920,7 +1924,7 @@ void do_cmd_activate(void)
 		get_spell(&power, "use", o_ptr, TRUE);
 
 		/* Clear racial activation */
-		if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE)) object_wipe(&inventory[INVEN_BLANK]);
+		if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE)) object_wipe(&inventory[INVEN_SELF]);
 
 		/* Paranoia */
 		if (power < 0) return;

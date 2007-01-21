@@ -4793,3 +4793,65 @@ C:8:25:17:85:120
 C:9:30:25:85:80
 S:INVEN_NECK:915
 L:1d48+48
+
+N:477:End Shapechange
+A:97:29:1:1
+A:97:30:1:1
+A:97:31:1:1
+A:97:32:1:1
+A:97:33:1:1
+A:97:34:1:1
+A:97:35:1:1
+A:97:36:1:1
+A:97:37:1:1
+A:97:38:1:1
+S:REVERT_SHAPE:0
+
+N:478:Change into Goat
+A:97:24:1
+S:CHANGE_SHAPE:29
+
+N:479:Change into Bear
+A:97:18:1
+S:CHANGE_SHAPE:30
+
+N:480:Change into Mouse
+A:97:24:2
+S:CHANGE_SHAPE:31
+
+N:481:Change into Hound
+A:97:24:3
+S:CHANGE_SHAPE:32
+
+N:482:Change into Cheetah
+A:97:24:4
+S:CHANGE_SHAPE:33
+
+N:483:Change into Lion
+A:97:24:5
+S:CHANGE_SHAPE:34
+
+N:484:Change into Dragon
+S:CHANGE_SHAPE:35
+
+N:485:Change into Wolf
+A:97:27:1
+A:97:28:1
+S:CHANGE_SHAPE:36
+
+N:486:Change into Bat
+A:97:24:6
+A:97:28:2
+S:CHANGE_SHAPE:37
+
+N:487:Change into Serpent
+A:97:24:7
+S:CHANGE_SHAPE:38
+
+N:488:Change into Cat
+A:97:24:8
+S:CHANGE_SHAPE:39
+
+N:489:End Shapechange
+A:97:39:1:1
+S:REVERT_SHAPE:0

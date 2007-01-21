@@ -4117,7 +4117,7 @@ void do_cmd_throw_fire(bool fire)
   /* Get an item */
   q = fire ? "Fire which item? " : "Throw which item? ";
   s = fire ? "You have nothing to fire." : "You have nothing to throw.";
-  if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG)))
+  if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | (fire ? USE_FEATG : 0L))))
     return;
 
   /* Get the object */

@@ -2854,7 +2854,6 @@ static void calc_bonuses(void)
 
 	u32b f1, f2, f3, f4;
 
-
 	/*** Memorize ***/
 
 	/* Save the old speed */
@@ -2874,7 +2873,6 @@ static void calc_bonuses(void)
 		old_stat_use[i] = p_ptr->stat_use[i];
 		old_stat_ind[i] = p_ptr->stat_ind[i];
 	}
-
 
 	/*** Reset ***/
 
@@ -2958,6 +2956,44 @@ static void calc_bonuses(void)
 	/* Base lite radius */
 	p_ptr->glowing = 0;
 
+	/*** Extract shape info ***/
+
+	/* Apply bonuses if shape differs from race */
+	if (p_ptr->prace != p_ptr->pshape)
+	{
+		player_race *shape_ptr = &p_info[p_ptr->pshape];
+
+		/* Base infravision (purely racial) */
+		p_ptr->see_infra += shape_ptr->infra;
+
+		/* Base skill -- disarming */
+		p_ptr->skill_dis += shape_ptr->r_dis;
+
+		/* Base skill -- magic devices */
+		p_ptr->skill_dev += shape_ptr->r_dev;
+
+		/* Base skill -- saving throw */
+		p_ptr->skill_sav += shape_ptr->r_sav;
+
+		/* Base skill -- stealth */
+		p_ptr->skill_stl += shape_ptr->r_stl;
+
+		/* Base skill -- searching ability */
+		p_ptr->skill_srh += shape_ptr->r_srh;
+
+		/* Base skill -- combat (normal) */
+		p_ptr->skill_thn += shape_ptr->r_thn;
+
+		/* Base skill -- combat (shooting) */
+		p_ptr->skill_thb += shape_ptr->r_thb;
+
+		/* Base skill -- combat (throwing) */
+		p_ptr->skill_tht += shape_ptr->r_tht;
+
+		/* Add the stat modifiers */
+		for (i = 0; i < A_MAX; i++) p_ptr->stat_add[i] += shape_ptr->r_adj[i];
+	}
+
 	/*** Analyze player ***/
 
 	/* Extract the player flags */
@@ -2972,7 +3008,7 @@ static void calc_bonuses(void)
 	if (f3 & (TR3_REGEN_HP)) p_ptr->regen_hp += 1;
 
 	/* Affect mana regeneration */
-	if (f3 & (TR3_REGEN_MANA)) p_ptr->regen_hp += 1;
+	if (f3 & (TR3_REGEN_MANA)) p_ptr->regen_mana += 1;
 
 	/* Affect light radius */
 	if (f3 & (TR3_LITE)) p_ptr->glowing += 1;

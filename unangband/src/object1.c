@@ -3699,7 +3699,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 	}
 
 	/* Scan oneself */
-	if ((use_self) && (item_tester_okay(&inventory[INVEN_BLANK]))) allow_self = TRUE;
+	if ((use_self) && (item_tester_okay(&inventory[INVEN_SELF]))) allow_self = TRUE;
 
 	/* Require at least one legal choice */
 	if (!allow_inven && !allow_equip && !allow_floor && !allow_feats && !allow_self)
@@ -4318,7 +4318,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 				}
 
 				/* Accept that choice */
-				(*cp) = INVEN_BLANK;
+				(*cp) = INVEN_SELF;
 				item = TRUE;
 				done = TRUE;
 

@@ -1162,6 +1162,9 @@ static bool get_player_race()
 	/* Save the race pointer */
 	rp_ptr = &p_info[p_ptr->prace];
 
+	/* Save the player shape */
+	p_ptr->pshape = p_ptr->prace;
+
 	/* Save the starting town */
 	p_ptr->town = rp_ptr->home;
 
@@ -2199,6 +2202,8 @@ void player_birth(void)
 	message_add("  ", MSG_GENERIC);
 	message_add(" ", MSG_GENERIC);
 
+	/* Hack -- assume the new shape */
+	change_shape(p_ptr->prace, p_ptr->lev);
 
 	/* Hack -- outfit the player */
 	player_outfit();

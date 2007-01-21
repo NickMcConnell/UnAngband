@@ -1393,8 +1393,8 @@ static cptr s_info_types[] =
 	"SLOW_CONF",
 	"SLOW_POIS",
 	"IDENT_PACK",
-	"XXX5",
-	"XXX6",
+	"CHANGE_SHAPE",
+	"REVERT_SHAPE",
 	"XXX7",
 	"XXX8",
 	"INVEN_WIELD",
@@ -4389,6 +4389,35 @@ errr parse_p_info(char *buf, header *head)
 
 			/* Start the next entry */
 			s = t;
+		}
+	}
+
+	/* Process 'O' for "Built-in Objects" (one line only) */
+	else if (buf[0] == 'O')
+	{
+		i = 0;
+
+		/* There better be a current pr_ptr */
+		if (!pr_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Parse every entry textually */
+		for (s = buf + 2; *s && (i < END_EQUIPMENT - INVEN_WIELD); )
+		{
+			/* Find the end of this entry */
+			for (t = s; *t && (*t != ':'); ++t) /* loop */;
+
+			/* Nuke and skip any dividers */
+			if (*t)
+			{
+				*t++ = '\0';
+			}
+
+			/* Hack - Parse this entry */
+			pr_ptr->slots[i] = atoi(s);
+
+			/* Start the next entry */
+			s = t;
+			i++;
 		}
 	}
 

@@ -324,8 +324,20 @@ void do_cmd_wield(void)
 	/* Adjust amount */
 	if (IS_QUIVER_SLOT(slot)) amt = o_ptr->number;
 
+	/* Prevent wielding over 'built-in' item */
+	if (!IS_QUIVER_SLOT(slot) && (o_ptr->k_idx == p_info[p_ptr->pshape].slots[slot - INVEN_WIELD]))
+	{
+		/* Describe it */
+		object_desc(o_name, sizeof(o_name), &inventory[slot], FALSE, 0);
+
+		/* Oops */
+		msg_format("You cannot remove the %s.", o_name);
+
+		/* Nope */
+		return;
+	}
 	/* Prevent wielding into a cursed slot */
-	if (!IS_QUIVER_SLOT(slot) && cursed_p(&inventory[slot]))
+	else if (!IS_QUIVER_SLOT(slot) && cursed_p(&inventory[slot]))
 	{
 		/* Describe it */
 		object_desc(o_name, sizeof(o_name), &inventory[slot], FALSE, 0);
@@ -778,9 +790,17 @@ void do_cmd_takeoff(void)
 		o_ptr = &o_list[0 - item];
 	}
 
+	/* Item is 'built-in' to shape*/
+	if (!IS_QUIVER_SLOT(item) && (o_ptr->k_idx == p_info[p_ptr->pshape].slots[item - INVEN_WIELD]))
+	{
+		/* Oops */
+		msg_print("You cannot remove this.");
 
+		/* Nope */
+		return;
+	}
 	/* Item is cursed */
-	if (cursed_p(o_ptr))
+	else if (cursed_p(o_ptr))
 	{
 		/* Oops */
 		msg_print("Hmmm, it seems to be cursed.");
@@ -850,8 +870,17 @@ void do_cmd_drop(void)
 	/* Allow user abort */
 	if (amt <= 0) return;
 
+	/* Prevent wielding over 'built-in' item */
+	if (!IS_QUIVER_SLOT(item) && (o_ptr->k_idx == p_info[p_ptr->pshape].slots[item - INVEN_WIELD]))
+	{
+		/* Oops */
+		msg_print("You cannot remove this.");
+
+		/* Nope */
+		return;
+	}
 	/* Hack -- Cannot remove cursed items */
-	if ((item >= INVEN_WIELD) && cursed_p(o_ptr))
+	else if ((item >= INVEN_WIELD) && cursed_p(o_ptr))
 	{
 		/* Oops */
 		msg_print("Hmmm, it seems to be cursed.");
