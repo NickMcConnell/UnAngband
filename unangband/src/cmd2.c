@@ -3511,7 +3511,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 	tdis = 256;
 
       /* Calculate the path */
-      path_n = project_path(path_g, tdis, y, x, &ty, &tx, 0);
+      path_n = project_path(path_g, tdis, y, x, &ty, &tx, PROJECT_THRU);
 
       /* Hack -- Handle stuff */
       handle_stuff();
@@ -4129,14 +4129,11 @@ void do_cmd_throw_fire(bool fire)
       if (!item_tester_tval) 
 	item_tester_hook = is_known_throwing_item;
     }
-	else
-	{
-	     	/* Require throwing weapon */
-      		if (!item_tester_tval) 
-		{
-			item_tester_hook = item_tester_hook_throwable;
-		}
-	}
+  else
+    {
+      /* Require an item that can be thrown at all */
+      item_tester_hook = item_tester_hook_throwable;
+    }
 
   /* Get an item */
   q = fire ? "Fire which item? " : "Throw which item? ";
