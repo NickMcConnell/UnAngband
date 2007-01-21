@@ -4081,7 +4081,7 @@ R:SMART
 F:742:456:742
 L:LIVING
 
-N:117:121:107:153:50:3:0:128
+N:117:121:107:151:50:3:0:128
 A:vine-covered
 B:
 D:Vines grow on 
