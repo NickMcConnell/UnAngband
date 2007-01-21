@@ -11088,13 +11088,13 @@ F:WEIRD_MIND | BASH_DOOR |
 F:INSECT | FRIEND
 D:It is about five feet long and carnivorous.
 
-N:743:Giant black centipede
+N:743:Metallic black centipede
 G:c:D
 I:110:5d8:8:10:40
 W:4:1:0:2
-B:BITE:HURT:1d2
-B:STING:HURT:1d2
-F:RAND_25 | 
+B:BITE:HURT:2d3
+B:STING:LOSE_INT:2d4
+F:RAND_25 | ATTR_METAL
 F:WEIRD_MIND | BASH_DOOR | 
 F:INSECT | FRIEND
 D:It is about five feet long and carnivorous.
