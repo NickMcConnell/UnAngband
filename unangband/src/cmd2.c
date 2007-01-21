@@ -3290,7 +3290,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 
   int style_hit, style_dam, style_crit;
 
-  object_type *o_ptr = &inventory[item];
+  object_type *o_ptr = item >= 0 ? &inventory[item] : &o_list[0 - item];
   object_type *k_ptr;
   object_type *i_ptr;
   object_type object_type_body;
@@ -4038,16 +4038,12 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
       /* Reduce and describe floor item */
       else
 	{
-	  bool get_feat = FALSE;
-	  
 	  floor_item_increase(0 - item, -1);
 	  floor_item_optimize(0 - item);
 	  
 	  /* Get feat */
-	  if (o_ptr->ident & (IDENT_STORE)) 
-	    get_feat = TRUE;
-	  
-	  if (get_feat && scan_feat(p_ptr->py, p_ptr->px) < 0) 
+	  if (o_ptr->ident & (IDENT_STORE) 
+	      && scan_feat(p_ptr->py, p_ptr->px) < 0)
 	    cave_alter_feat(p_ptr->py, p_ptr->px, FS_GET_FEAT);
 	}
 
