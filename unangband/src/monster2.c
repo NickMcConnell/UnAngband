@@ -3023,6 +3023,12 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		/* Sense magic */
 		o_ptr->feeling = sense_magic(o_ptr,cp_ptr->sense_type,TRUE);
 
+		/* Auto-inscribe if necessary */
+		if ((cheat_auto) || (object_aware_p(o_ptr))) o_ptr->note = k_info[ammo_kind].note;
+
+		/* Apply obvious flags */
+		object_obvious_flags(o_ptr);
+
 		/* Monster carries the object */
 		ammo = monster_carry(m_idx, o_ptr);
 

@@ -2715,6 +2715,9 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 	/* Auto-inscribe if necessary */
 	if (cheat_auto) o_ptr->note = e_info[o_ptr->name2].note;
 
+	/* Apply obvious flags */
+	object_obvious_flags(o_ptr);
+
 	return (TRUE);
 }
 
@@ -5636,6 +5639,8 @@ bool make_feat(object_type *j_ptr, int y, int x)
 
 	/* Auto-inscribe if necessary */
 	if ((cheat_auto) || (object_aware_p(j_ptr))) j_ptr->note = k_info[k_idx].note;
+	/* Apply obvious flags */
+	object_obvious_flags(j_ptr);
 
 	/* Add to the floor */
 	if (floor_carry(y,x,j_ptr)) return (TRUE);
