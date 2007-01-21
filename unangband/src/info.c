@@ -1555,6 +1555,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_CONF_WEAK: text_out("power"); break;
 			case GF_SLEEP: text_out("power"); break;
 			case GF_BLIND_WEAK: text_out("power"); break;
+			case GF_GAIN_MANA: text_out("spell points"); break;
 			default: text_out("damage"); break;
 
 		}
@@ -1709,6 +1710,7 @@ void spell_info(char *p, int spell, bool use_level)
 			case GF_CONF_WEAK: q="pow"; break;
 			case GF_SLEEP: q="pow"; break;
 			case GF_BLIND_WEAK: q="pow"; break;
+			case GF_GAIN_MANA: q="mana"; break;
 			default: q="dam"; break;
 		}
 
