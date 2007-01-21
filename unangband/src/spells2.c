@@ -5447,8 +5447,7 @@ void change_shape(int shape, int level)
 		for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
 		{
 			/* Currently has a 'built-in' item */
-			if ((p_info[p_ptr->pshape].slots[i - INVEN_WIELD]) &&
-				(inventory[i].k_idx == p_info[p_ptr->pshape].slots[i - INVEN_WIELD]))
+			if (inventory[i].ident & (IDENT_STORE))
 			{
 				/* Wipe the slot */
 				object_wipe(&inventory[i]);
