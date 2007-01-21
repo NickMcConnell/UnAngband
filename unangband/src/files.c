@@ -1344,13 +1344,17 @@ static cptr likert(int x, int y, byte *attr)
 	if (x < 0)
 	{
 		*attr = TERM_RED;
-		return ("Very Bad");
+		return ("Awful");
 	}
 
 	/* Analyze the value */
 	switch ((x / y))
 	{
 		case 0:
+		{
+			*attr = TERM_RED;
+			return ("Very Bad");
+		}
 		case 1:
 		{
 			*attr = TERM_RED;
@@ -1362,6 +1366,10 @@ static cptr likert(int x, int y, byte *attr)
 			return ("Poor");
 		}
 		case 3:
+		{
+			*attr = TERM_YELLOW;
+			return ("Iffy");
+		}
 		case 4:
 		{
 			*attr = TERM_YELLOW;
@@ -1379,11 +1387,11 @@ static cptr likert(int x, int y, byte *attr)
 		}
 		case 7:
 		case 8:
+		case 9:
 		{
 			*attr = TERM_L_GREEN;
 			return ("Excellent");
 		}
-		case 9:
 		case 10:
 		case 11:
 		case 12:
