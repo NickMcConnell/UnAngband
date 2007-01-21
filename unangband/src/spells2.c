@@ -5469,7 +5469,14 @@ void change_shape(int shape, int level)
 	for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
 	{
 		/* Wield 'built-in' equipment */
-		if (p_info[shape].slots[i - INVEN_WIELD]) wield_spell(i, p_info[shape].slots[i - INVEN_WIELD], 0, level);
+		if (p_info[shape].slots[i - INVEN_WIELD])
+		{
+			/* Wield the spell */
+			wield_spell(i, p_info[shape].slots[i - INVEN_WIELD], 0, level);
+
+			/* Mark as 'built-in' item */
+			inventory[i].ident |= (IDENT_STORE);
+		}
 	}
 
 	/* Update stuff */

@@ -325,7 +325,7 @@ void do_cmd_wield(void)
 	if (IS_QUIVER_SLOT(slot)) amt = o_ptr->number;
 
 	/* Prevent wielding over 'built-in' item */
-	if (!IS_QUIVER_SLOT(slot) && (o_ptr->k_idx == p_info[p_ptr->pshape].slots[slot - INVEN_WIELD]))
+	if (!IS_QUIVER_SLOT(slot) && ((inventory[slot].ident & (IDENT_STORE)) != 0))
 	{
 		/* Describe it */
 		object_desc(o_name, sizeof(o_name), &inventory[slot], FALSE, 0);
@@ -760,6 +760,21 @@ void do_cmd_wield(void)
 }
 
 
+/*
+ * The "takeoff" and "drop" tester
+ */
+static bool item_tester_hook_removable(const object_type *o_ptr)
+{
+	/* Forbid known cursed */
+	if (o_ptr->ident & (IDENT_CURSED)) return (FALSE);
+
+	/* Forbid 'built-in' */
+	if (o_ptr->ident & (IDENT_STORE)) return (FALSE);
+
+	/* Assume removable */
+	return (TRUE);
+}
+
 
 /*
  * Take off an item
@@ -772,6 +787,7 @@ void do_cmd_takeoff(void)
 
 	cptr q, s;
 
+	item_tester_hook = item_tester_hook_removable;
 
 	/* Get an item */
 	q = "Take off which item? ";
@@ -791,7 +807,7 @@ void do_cmd_takeoff(void)
 	}
 
 	/* Item is 'built-in' to shape*/
-	if (!IS_QUIVER_SLOT(item) && (o_ptr->k_idx == p_info[p_ptr->pshape].slots[item - INVEN_WIELD]))
+	if (!IS_QUIVER_SLOT(item) && ((inventory[item].ident & (IDENT_STORE)) != 0))
 	{
 		/* Oops */
 		msg_print("You cannot remove this.");
@@ -839,6 +855,7 @@ void do_cmd_drop(void)
 
 	cptr q, s;
 
+	item_tester_hook = item_tester_hook_removable;
 
 	/* Get an item */
 	q = "Drop which item? ";
@@ -871,7 +888,7 @@ void do_cmd_drop(void)
 	if (amt <= 0) return;
 
 	/* Prevent wielding over 'built-in' item */
-	if (!IS_QUIVER_SLOT(item) && (o_ptr->k_idx == p_info[p_ptr->pshape].slots[item - INVEN_WIELD]))
+	if (!IS_QUIVER_SLOT(item) && ((inventory[item].ident & (IDENT_STORE)) != 0))
 	{
 		/* Oops */
 		msg_print("You cannot remove this.");

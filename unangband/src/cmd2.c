@@ -4078,6 +4078,22 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 
 
 /*
+ * Returns TRUE if an object is permitted to be thrown
+ */
+bool item_tester_hook_throwable(const object_type *o_ptr)
+{
+	/* Spell cannot be thrown */
+	if (o_ptr->tval == TV_SPELL) return (FALSE);
+
+	/* Cannot thrown any 'built-in' item type */
+	if (o_ptr->ident & (IDENT_STORE)) return (FALSE);
+
+	/* Allowed */
+	return (TRUE);
+}
+
+
+/*
  * Throw or fire an object from the pack or floor.
  * See do_cmd_fire_selected.
  */
@@ -4113,11 +4129,19 @@ void do_cmd_throw_fire(bool fire)
       if (!item_tester_tval) 
 	item_tester_hook = is_known_throwing_item;
     }
+	else
+	{
+	     	/* Require throwing weapon */
+      		if (!item_tester_tval) 
+		{
+			item_tester_hook = item_tester_hook_throwable;
+		}
+	}
 
   /* Get an item */
   q = fire ? "Fire which item? " : "Throw which item? ";
   s = fire ? "You have nothing to fire." : "You have nothing to throw.";
-  if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | (fire ? USE_FEATG : 0L))))
+  if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG)))
     return;
 
   /* Get the object */

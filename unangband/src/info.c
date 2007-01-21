@@ -3000,6 +3000,9 @@ void list_object(const object_type *o_ptr, int mode)
 				/* Hack -- display throwing damage later */
 				throw = FALSE;
 				break;
+			case TV_SPELL:
+				/* Never thrown */
+				throw = FALSE;
 			default:
 				text_out(format("When %sthrown, it ", (f3 & TR3_THROWING) ? "easily " : ""));
 				break;
