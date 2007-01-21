@@ -134,21 +134,21 @@ N:12:104:0:0:1:1:0:128
 
 N:12:117:0:0:1:1:0:128
 
-# Small fractal room.
+# Medium fractal room.
 
 N:13:107:0:0:1:1:0:128
 A:
 B:cave
 
-# Medium fractal room.
+# Large fractal room.
 
 N:14:107:0:0:1:1:0:128
 A:
 B:cavern
 
-# Large fractal room.
+# Huge fractal room.
 
-N:14:107:0:0:1:1:0:128
+N:15:107:0:0:1:1:0:128
 A:
 B:cavern
 

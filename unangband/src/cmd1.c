@@ -2707,7 +2707,7 @@ void move_player(int dir, int jumping)
                 && (f_info[cave_feat[py][px]].flags3 & (FF3_MUST_CLIMB)))) != 0;
 
 	/* Hack -- pickup objects from locations you can't move to but can see */
-	if ((cave_o_idx[y][x]) && !(f_ptr->flags1 & (FF1_MOVE)) && (play_info[y][x] & (PLAY_MARK)))
+	if (((cave_o_idx[y][x]) || (f_ptr->flags3 & (FF3_GET_FEAT))) && !(f_ptr->flags1 & (FF1_MOVE)) && (play_info[y][x] & (PLAY_MARK)))
 	{
 		/* Get item from the destination */
 		py_pickup(y, x, TRUE);
