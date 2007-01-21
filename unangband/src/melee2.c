@@ -3151,6 +3151,7 @@ bool player_understands(int language)
 	else if ((language == LANG_DRAGON) && ((p_ptr->cur_flags4 & (TR4_DRAGON)) || (p_ptr->cur_flags3 & (TR3_ESP_DRAGON)))) understand = TRUE;
 	else if ((language == LANG_DEMON) && ((p_ptr->cur_flags4 & (TR4_DEMON)) || (p_ptr->cur_flags3 & (TR3_ESP_DEMON)))) understand = TRUE;
 	else if ((language == LANG_UNDEAD) && ((p_ptr->cur_flags4 & (TR4_UNDEAD)) || (p_ptr->cur_flags3 & (TR3_ESP_UNDEAD)))) understand = TRUE;
+	else if (((language == LANG_FOREST) || (language == LANG_MUSHROOM)) && (p_ptr->pshape == RACE_ENT)) understand = TRUE;
 	else if ((language >= LANG_NATURAL) && ((p_ptr->cur_flags4 & (TR4_ANIMAL)) || (p_ptr->cur_flags3 & (TR3_ESP_NATURE)))) understand = TRUE;
 
 	return (understand);

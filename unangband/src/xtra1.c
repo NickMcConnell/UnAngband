@@ -3014,12 +3014,12 @@ static void calc_bonuses(void)
 	if (f3 & (TR3_LITE)) p_ptr->glowing += 1;
 
 	/* Affect incremental resists */
-	if (f2 & (TR2_RES_ACID)) p_ptr->incr_resist[INCR_RES_ACID]++;
-	if (f2 & (TR2_RES_COLD)) p_ptr->incr_resist[INCR_RES_COLD]++;
-	if (f2 & (TR2_RES_ELEC)) p_ptr->incr_resist[INCR_RES_ELEC]++;
-	if (f2 & (TR2_RES_FIRE)) p_ptr->incr_resist[INCR_RES_FIRE]++;
-	if (f2 & (TR2_RES_POIS)) p_ptr->incr_resist[INCR_RES_POIS]++;
-	if (f4 & (TR4_RES_WATER)) p_ptr->incr_resist[INCR_RES_WATER]++;
+	if (f2 & (TR2_RES_ACID)) p_ptr->incr_resist[INCR_RES_ACID]+=3;
+	if (f2 & (TR2_RES_COLD)) p_ptr->incr_resist[INCR_RES_COLD]+=3;
+	if (f2 & (TR2_RES_ELEC)) p_ptr->incr_resist[INCR_RES_ELEC]+=3;
+	if (f2 & (TR2_RES_FIRE)) p_ptr->incr_resist[INCR_RES_FIRE]+=3;
+	if (f2 & (TR2_RES_POIS)) p_ptr->incr_resist[INCR_RES_POIS]+=3;
+	if (f4 & (TR4_RES_WATER)) p_ptr->incr_resist[INCR_RES_WATER]+=3;
 
 	/*** Analyze equipment ***/
 

@@ -171,7 +171,7 @@ X:8:115:5
 I:23:15:10:3
 H:38:4:36:3
 W:70:5:60:4
-F:RES_POIS | ORC | DWARF 
+F:RES_POIS | ORC | DWARF | HURT_LITE
 C:0|2|3|4|5|6
 
 N:11:Orc
@@ -367,7 +367,7 @@ X:10:4:3
 I:48:14:9:26
 H:72:6:66:4
 W:180:25:150:20
-F:ACTIVATE  | UNDEAD | HURT_LITE
+F:ACTIVATE  | UNDEAD | HURT_LITE | REGEN_HP
 C:0|2|3|4|6
 
 # The following shapes are not startable races.
