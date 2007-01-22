@@ -14,8 +14,6 @@ Release v0.6.2 - v0.6.5
 
 MAIN FOCUS: Improve the user interface and game balance.
 
-TODO: Dwarves get intelligence bonus rather than penalty.
-
 TODO: Various UI improvements.
 
 TODO: Hold spells and gambits.
@@ -41,8 +39,6 @@ which prevents you reading scrolls or casting spells from books or rune-stones.
 TODO: DEAFEN effect? POLYMORPH player. FURY effect (no spellcasting or
 throwing/missile weapons). 
 
-TODO: Electrical attacks should cause rings and rods to discharge as opposed to being destroyed.
-
 TODO: Update to safe string handling routines from latest Angband builds.
 
 TODO: Update to latest X11 and GCU Angband files to fix compiler warnings.
@@ -61,11 +57,6 @@ TODO: Stores, in conjunction with the character's charisma, offer additional que
 on what the player state is.
 
 TODO: Significant improvements to the store system.
-
-TODO: Allow the player to fly.
-
-TODO: Allow the player to jump. This may be needed to navigate various
-'puzzle' locations.
 
 
 Release v0.7.0
@@ -101,6 +92,10 @@ TODO: Mystics carry essences.
 
 TODO: Have keys of various kinds.
 
+TODO: Allow the player to fly.
+
+TODO: Allow the player to jump. This may be needed to navigate various
+'puzzle' locations.
 
 
 Release v0.8.0
@@ -109,6 +104,8 @@ Release v0.8.0
 MAIN FOCUS: Revise monster AI to fix known AI bugs and allow friendly monsters.
 
 TODO: Implement friendly monsters and uniques.
+
+TODO: Allow spells to summon monsters.
 
 TODO: Allow monsters to ride other monsters.
 
@@ -135,8 +132,6 @@ TODO: 'Good' monsters don't summon evil. 'Evil' monsters don't summon good.
 TODO: Allow smart monsters to hide themselves in darkness, especially when fleeing,
 and alter terrain between them and the player to either permit los / lof / movement
 or prevent it, depending on whether they are fleeing or not.
-
-
 
 
 Release v0.9.0
@@ -273,6 +268,55 @@ TODO: Implement friendly monsters and uniques.
 Should be less of a job now, as all spells can be cast by monsters
 on each other and there are cooperative spells that monsters can
 use to assist the player now (such as haste, heal and cure).
+
+TODO: Allow spells to summon monsters.
+
+A lot of this is already in spell.txt. Spells should summon monsters
+from a group (e.g. fire elementals etc). To balance summons,
+summoning spells should incur a mana debt, and a blood debt. The
+mana debt occurs when the spell is cast and equal to the cost of
+the summoning spell. The mana debt reduces the maximum mana of the
+player until the monster is dismissed or killed, at which point the
+mana debt is paid back, and the player maximum (but not current) mana
+is increased again. The blood debt is equal to 5 hp per player
+level of the summoned monster. The blood debt is incurred when the
+player dismisses a summons, or the summons is killed. The blood debt
+is taken as damage at this point. A player cannot dismiss a monster
+if they cannot pay the blood debt (e.g. would be killed by the
+blood debt damage).
+
+In addition, summons have loyalty, which is increased by the player
+taking damage from enemies and damaging the enemies, and by healing
+the summons, if the summons is good, or by damaging the summons, if
+the summons is evil. If the summons loyalty drops to zero, the summons
+will turn on the caster. Note that it is still possible to still
+dismiss the summons, if the caster can incur the blood debt, even if
+the summons has turned. Note that also evil summons will always turn
+on the caster if the caster hit points drop below the blood debt
+incurred by the monster.
+
+Summons also have a summons channel, which allows the caster to
+target the summons with any spell, regardless of line of sight or not.
+Casting teleport through the summons channel will instead recall the
+monster out to the range of the teleport to adjacent to the caster's
+position.
+
+Summoned monsters have a telepathic link with the caster. This allows
+the caster to see through the summons to remote areas.
+
+The 'O'rder menu for summons is as follows:
+
+(1) Set target
+(2) Set target to self (rally)
+(3) Clear target
+(4) Set minimum distance
+(5) Set maximum distance
+(6) Target with spell  -- this acts as a modified cast spell command.
+(7) See through summons
+
+(D) Dismiss summons
+
+Need to look at other commands that variants allow.
 
 TODO:Implement alchemy/manufacturing items.
 	This is low priority at this stage. Perhaps do essences
