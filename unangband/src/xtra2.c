@@ -714,7 +714,8 @@ cptr desc_stat_imp[A_MAX] =
 	"more dextrous",
 	"healthier",
 	"cuter",
-	"more agile"
+	"more agile",
+	"bigger"
 };
 
 
@@ -729,7 +730,8 @@ cptr desc_stat_imp_end[A_MAX] =
 	"dextrous",
 	"healthy",
 	"cute",
-	"agile"
+	"agile",
+	"big"
 };
 
 
@@ -794,7 +796,8 @@ cptr desc_stat_dec[] =
 	"clumsier",
 	"sicklier",
 	"uglier",
-	"more slugish"
+	"more slugish",
+	"smaller"
 };
 
 
@@ -809,7 +812,8 @@ static cptr desc_stat_dec_end[] =
 	"clumsy",
 	"sickly",
 	"ugly",
-	"slugish"
+	"slugish",
+	"small"
 };
 
 /*

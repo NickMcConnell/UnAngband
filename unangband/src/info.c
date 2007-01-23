@@ -985,7 +985,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	/* Collect stat gain effects */
 	vn = 0;
 
-	if (s_ptr->flags3 & (SF3_INC_STR)) vp[vn++]="strength";
+	if (s_ptr->flags3 & (SF3_INC_STR)) vp[vn++]="strength and size";
 	if (s_ptr->flags3 & (SF3_INC_INT)) vp[vn++]="intelligence";
 	if (s_ptr->flags3 & (SF3_INC_WIS)) vp[vn++]="wisdom";
 	if (s_ptr->flags3 & (SF3_INC_DEX)) vp[vn++]="dexterity and agility";
@@ -1024,7 +1024,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 
 	/* Collect restore effects */
 	vn = 0;
-	if (s_ptr->flags3 & (SF3_CURE_STR)) vp[vn++]="strength";
+	if (s_ptr->flags3 & (SF3_CURE_STR)) vp[vn++]="strength and size";
 	if (s_ptr->flags3 & (SF3_CURE_INT)) vp[vn++]="intelligence";
 	if (s_ptr->flags3 & (SF3_CURE_WIS)) vp[vn++]="wisdom";
 	if (s_ptr->flags3 & (SF3_CURE_DEX)) vp[vn++]="dexterity and agility";
@@ -1351,7 +1351,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_BLIND:  q = "blind"; break;
 			case GF_TERRIFY:	q = "terrify"; break;
 			case GF_PARALYZE:       q = "paralyze"; break;
-			case GF_LOSE_STR:       q = "reduce"; s="strength from"; break;
+			case GF_LOSE_STR:       q = "reduce"; s="strength and size from"; break;
 			case GF_LOSE_INT:       q = "reduce"; s="intelligence from"; break;
 			case GF_LOSE_WIS:       q = "reduce"; s="wisdom from"; break;
 			case GF_LOSE_DEX:       q = "reduce"; s="dexterity and agility from"; break;
@@ -1757,9 +1757,9 @@ typedef struct o_flag_desc
  * affects all stats.  In this case, "All stats" is used instead of
  * listing each stat individually.
  */
-static const o_flag_desc stat_flags_desc[A_MAX - 1 /* disregarding AGI */] =
+static const o_flag_desc stat_flags_desc[A_MAX - 2 /* disregarding AGI and SIZ */] =
 {
-	{ TR1_STR,	"strength" },
+	{ TR1_STR,	"strength and size" },
 	{ TR1_INT,	"intelligence" },
 	{ TR1_WIS,	"wisdom" },
 	{ TR1_DEX,	"dexterity and agility" },
@@ -1889,7 +1889,7 @@ static const o_flag_desc vamp_flags4_desc[] =
  */
 static const o_flag_desc sustain_flags_desc[] =
 {
-	{ TR2_SUST_STR,   "strength" },
+	{ TR2_SUST_STR,   "strength and size" },
 	{ TR2_SUST_INT,   "intelligence" },
 	{ TR2_SUST_WIS,   "wisdom" },
 	{ TR2_SUST_DEX,   "dexterity and agility" },

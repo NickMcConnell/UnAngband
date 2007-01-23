@@ -126,7 +126,8 @@ static cptr desc_stat_pos[] =
 	"dextrous",
 	"healthy",
 	"cute",
-	"agile"
+	"agile",
+	"big"
 };
 
 
@@ -141,7 +142,8 @@ static cptr desc_stat_neg[] =
 	"clumsy",
 	"sickly",
 	"ugly",
-	"slugish"
+	"slugish",
+	"small"
 };
 
 
@@ -151,14 +153,14 @@ static cptr desc_stat_neg[] =
 bool do_dec_stat(int stat)
 {
 	/* Sustain */
-	if (p_ptr->cur_flags2 & (TR2_SUST_STR << (stat == A_AGI ? A_DEX : stat)))
+        if (p_ptr->cur_flags2 & (TR2_SUST_STR << (stat == A_AGI ? A_DEX : (stat == A_SIZ ? A_STR : stat))))
 	{
 		/* Message */
 		msg_format("You feel very %s for a moment, but the feeling passes.",
 			   desc_stat_neg[stat]);
 
 		/* Always notice */
-		equip_can_flags(0x0L, TR2_SUST_STR << (stat == A_AGI ? A_DEX : stat), 0x0L, 0x0L);
+		equip_can_flags(0x0L, TR2_SUST_STR << (stat == A_AGI ? A_DEX : (stat == A_SIZ ? A_STR : stat)), 0x0L, 0x0L);
 
 		/* Notice effect */
 		return (TRUE);
@@ -171,7 +173,7 @@ bool do_dec_stat(int stat)
 		msg_format("You feel very %s.", desc_stat_neg[stat]);
 
 		/* Always notice */
-		equip_not_flags(0x0L, TR2_SUST_STR << (stat == A_AGI ? A_DEX : stat), 0x0L, 0x0L);
+		equip_not_flags(0x0L, TR2_SUST_STR << (stat == A_AGI ? A_DEX : (stat == A_SIZ ? A_STR : stat)), 0x0L, 0x0L);
 
 		/* Notice effect */
 		return (TRUE);
@@ -6871,13 +6873,17 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 	/* SF3 - duration specified, so temporary stat increase */
 	if (lasts)
 	{
-		if ((s_ptr->flags3 & (SF3_INC_STR)) && (set_stat_inc_tim(lasts, A_STR))) obvious = TRUE;
+  	        if (s_ptr->flags3 & (SF3_INC_STR))
+		  { 
+		    if (set_stat_inc_tim(lasts, A_STR)) obvious = TRUE;
+		    if (set_stat_inc_tim(lasts, A_SIZ)) obvious = TRUE;
+		  }
 		if ((s_ptr->flags3 & (SF3_INC_INT)) && (set_stat_inc_tim(lasts, A_INT))) obvious = TRUE;
 		if ((s_ptr->flags3 & (SF3_INC_WIS)) && (set_stat_inc_tim(lasts, A_WIS))) obvious = TRUE;
 		if (s_ptr->flags3 & (SF3_INC_DEX))
 		  { 
-			if (set_stat_inc_tim(lasts, A_DEX)) obvious = TRUE;
-			if (set_stat_inc_tim(lasts, A_AGI)) obvious = TRUE;
+		    if (set_stat_inc_tim(lasts, A_DEX)) obvious = TRUE;
+		    if (set_stat_inc_tim(lasts, A_AGI)) obvious = TRUE;
 		  }
 		if ((s_ptr->flags3 & (SF3_INC_CON)) && (set_stat_inc_tim(lasts, A_CON))) obvious = TRUE;
 		if ((s_ptr->flags3 & (SF3_INC_CHR)) && (set_stat_inc_tim(lasts, A_CHR))) obvious = TRUE;
@@ -6885,26 +6891,34 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 	/* SF3 - no duration specified, so permanent stat increase */
 	else
 	{
-		if ((s_ptr->flags3 & (SF3_INC_STR)) && (do_inc_stat(A_STR))) obvious = TRUE;
+		if (s_ptr->flags3 & (SF3_INC_STR))
+		  {
+		    if (do_inc_stat(A_STR)) obvious = TRUE;
+		    if (do_inc_stat(A_SIZ)) obvious = TRUE;
+		  }
 		if ((s_ptr->flags3 & (SF3_INC_INT)) && (do_inc_stat(A_INT))) obvious = TRUE;
 		if ((s_ptr->flags3 & (SF3_INC_WIS)) && (do_inc_stat(A_WIS))) obvious = TRUE;
 		if (s_ptr->flags3 & (SF3_INC_DEX))
 		  {
-			if (do_inc_stat(A_DEX)) obvious = TRUE;
-			if (do_inc_stat(A_AGI)) obvious = TRUE;
+		    if (do_inc_stat(A_DEX)) obvious = TRUE;
+		    if (do_inc_stat(A_AGI)) obvious = TRUE;
 		  }
 		if ((s_ptr->flags3 & (SF3_INC_CON)) && (do_inc_stat(A_CON))) obvious = TRUE;
 		if ((s_ptr->flags3 & (SF3_INC_CHR)) && (do_inc_stat(A_CHR))) obvious = TRUE;
 	}
 
 	/* SF3 - healing self, and untimed improvements */
-	if ((s_ptr->flags3 & (SF3_CURE_STR)) && (do_res_stat(A_STR))) obvious = TRUE;
+	if (s_ptr->flags3 & (SF3_CURE_STR))
+	  {
+	    if (do_res_stat(A_STR)) obvious = TRUE;
+	    if (do_res_stat(A_SIZ)) obvious = TRUE;
+	  }
 	if ((s_ptr->flags3 & (SF3_CURE_INT)) && (do_res_stat(A_INT))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_WIS)) && (do_res_stat(A_WIS))) obvious = TRUE;
 	if (s_ptr->flags3 & (SF3_CURE_DEX))
 	  {
-		if (do_res_stat(A_DEX)) obvious = TRUE;
-		if (do_res_stat(A_AGI)) obvious = TRUE;
+	    if (do_res_stat(A_DEX)) obvious = TRUE;
+	    if (do_res_stat(A_AGI)) obvious = TRUE;
 	  }
 	if ((s_ptr->flags3 & (SF3_CURE_CON))  && (do_res_stat(A_CON))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CHR))  && (do_res_stat(A_CHR))) obvious = TRUE;

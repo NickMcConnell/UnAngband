@@ -835,7 +835,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_SLOW:  q = "slow"; break;
 			case GF_TERRIFY:	q = "terrify"; break;
 			case GF_PARALYZE:       q = "paralyze"; break;
-			case GF_LOSE_STR:       q = "reduce strength"; break;
+			case GF_LOSE_STR:       q = "reduce strength and size"; break;
 			case GF_LOSE_INT:       q = "reduce intelligence"; break;
 			case GF_LOSE_WIS:       q = "reduce wisdom"; break;
 			case GF_LOSE_DEX:       q = "reduce dexterity and agility"; break;

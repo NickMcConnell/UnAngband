@@ -3035,13 +3035,17 @@ static void calc_bonuses(void)
 		object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 		/* Affect stats */
-		if (f1 & (TR1_STR)) p_ptr->stat_add[A_STR] += o_ptr->pval;
+		if (f1 & (TR1_STR))
+		  {
+		    p_ptr->stat_add[A_STR] += o_ptr->pval;
+		    p_ptr->stat_add[A_SIZ] += o_ptr->pval;
+		  }
 		if (f1 & (TR1_INT)) p_ptr->stat_add[A_INT] += o_ptr->pval;
 		if (f1 & (TR1_WIS)) p_ptr->stat_add[A_WIS] += o_ptr->pval;
 		if (f1 & (TR1_DEX)) 
 		  {
-			p_ptr->stat_add[A_DEX] += o_ptr->pval;
-			p_ptr->stat_add[A_AGI] += o_ptr->pval;
+		    p_ptr->stat_add[A_DEX] += o_ptr->pval;
+		    p_ptr->stat_add[A_AGI] += o_ptr->pval;
 		  }
 		if (f1 & (TR1_CON)) p_ptr->stat_add[A_CON] += o_ptr->pval;
 		if (f1 & (TR1_CHR)) p_ptr->stat_add[A_CHR] += o_ptr->pval;
@@ -4212,6 +4216,7 @@ void redraw_stuff(void)
 		prt_stat(A_CON);
 		prt_stat(A_CHR);
 		prt_stat(A_AGI);
+		prt_stat(A_SIZ);
 	}
 
 	if (p_ptr->redraw & (PR_ARMOR))

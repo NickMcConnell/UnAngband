@@ -1683,7 +1683,7 @@ const cptr color_names[16] =
  */
 const cptr stat_names[A_MAX] =
 {
-	"STR: ", "INT: ", "WIS: ", "DEX: ", "CON: ", "CHR: ", "AGI: "
+	"STR: ", "INT: ", "WIS: ", "DEX: ", "CON: ", "CHR: ", "AGI: ", "SIZ: "
 };
 
 /*
@@ -1691,7 +1691,7 @@ const cptr stat_names[A_MAX] =
  */
 const cptr stat_names_reduced[A_MAX] =
 {
-	"Str: ", "Int: ", "Wis: ", "Dex: ", "Con: ", "Chr: ", "Agi: "
+	"Str: ", "Int: ", "Wis: ", "Dex: ", "Con: ", "Chr: ", "Agi: ", "Siz: "
 };
 
 /*
@@ -1699,7 +1699,7 @@ const cptr stat_names_reduced[A_MAX] =
  */
 const cptr stat_names_reduced_short[A_MAX] =
 {
-	"Str", "Int", "Wis", "Dex", "Con", "Chr", "Agi"
+	"Str", "Int", "Wis", "Dex", "Con", "Chr", "Agi", "Siz"
 };
 
 /*
@@ -2951,7 +2951,7 @@ const cptr magic_name[4][32] =
 {
 	/* TR1_ */
 	{
-		"of Strength",
+		"of Strength and Size",
 		"of Intelligence",
 		"of Wisdom",
 		"of Dexterity and Agility",
@@ -2987,7 +2987,7 @@ const cptr magic_name[4][32] =
 
 	/* TR2_ */
 	{
-		"of Sustain Strength",
+		"of Sustain Strength and Size",
 		"of Sustain Intelligence",
 		"of Sustain Wisdom",
 		"of Sustain Dexterity and Agility",

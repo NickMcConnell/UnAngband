@@ -67,7 +67,7 @@
 #define VERSION_MAJOR	0
 #define VERSION_MINOR	6
 #define VERSION_PATCH	2
-#define VERSION_EXTRA	0
+#define VERSION_EXTRA	1
 
 
 /*
@@ -615,11 +615,12 @@
 #define A_CON	4
 #define A_CHR	5
 #define A_AGI	6
+#define A_SIZ	7
 
 /*
  * Total number of stats.
  */
-#define A_MAX	7
+#define A_MAX	8
 
 /*
  * Player sex constants (hard-coded by save-files, arrays, etc)

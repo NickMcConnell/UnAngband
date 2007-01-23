@@ -1007,6 +1007,7 @@ static void do_cmd_wiz_cure_all(void)
 	(void)res_stat(A_CON);
 	(void)res_stat(A_CHR);
 	(void)res_stat(A_AGI);
+	(void)res_stat(A_SIZ);
 
 	/* Restore the level */
 	(void)restore_level();

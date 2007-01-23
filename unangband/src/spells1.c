@@ -9352,6 +9352,13 @@ bool project_p(int who, int y, int x, int dam, int typ)
 				set_stat_dec_tim(p_ptr->stat_dec_tim[A_STR] + rand_int(20) + 20, A_STR);
 			}
 
+			/* Damage (stat) */
+			if (do_dec_stat(A_SIZ))
+			{
+				obvious = TRUE;
+				set_stat_dec_tim(p_ptr->stat_dec_tim[A_SIZ] + rand_int(20) + 20, A_SIZ);
+			}
+
 			break;
 		}
 

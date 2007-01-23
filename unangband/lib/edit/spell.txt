@@ -3126,7 +3126,7 @@ A:80:15:1
 F:CURE_CONF
 S:CURE_DISEASE:14
 
-N:270:Restore Strength
+N:270:Restore Strength and Size
 A:75:42:1
 A:80:17:1
 A:90:4:8
@@ -3222,7 +3222,7 @@ B:SELF:LOSE_ALL:10d10+0
 S:CURE_DISEASE:27
 D:Your nerves and muscles feel weak and lifeless.
 
-N:290:Weakness
+N:290:Weakness and Smallness
 A:75:16:1
 B:SELF:LOSE_STR
 
@@ -3350,7 +3350,7 @@ C:10:12:20:95:115
 F:CURE_CHR
 S:CURE_DISEASE:5
 
-N:308:Strength
+N:308:Strength and Size
 A:75:48:1
 L:1d30+30
 F:CURE_STR | INC_STR

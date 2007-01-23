@@ -90,7 +90,7 @@ static void note(cptr msg)
  * This function determines if the version of the savefile
  * currently being read is older than version "x.y.z".
  */
-bool older_than(int x, int y, int z)
+bool older_than(int x, int y, int z, int w)
 {
 	/* Much older, or much more recent */
 	if (sf_major < x) return (TRUE);
@@ -103,6 +103,8 @@ bool older_than(int x, int y, int z)
 	/* Barely older, or barely more recent */
 	if (sf_patch < z) return (TRUE);
 	if (sf_patch > z) return (FALSE);
+	if (sf_extra < w) return (TRUE);
+	if (sf_extra > w) return (FALSE);
 
 	/* Identical versions */
 	return (FALSE);
@@ -278,7 +280,7 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&o_ptr->show_idx);
 	rd_byte(&o_ptr->discount);
 
-	if (!(older_than(0, 6, 1)))
+	if (!(older_than(0, 6, 1, 0)))
 	{
 		rd_byte(&o_ptr->feeling);
 		rd_byte(&o_ptr->spare);
@@ -306,7 +308,7 @@ static errr rd_item(object_type *o_ptr)
 	rd_s16b(&o_ptr->timeout);
 
 	/* Get charges */
-	if (!(older_than(0, 6, 1)))
+	if (!(older_than(0, 6, 1, 0)))
 	{
 		rd_s16b(&o_ptr->charges);
 
@@ -346,7 +348,7 @@ static errr rd_item(object_type *o_ptr)
 	rd_u16b(&o_ptr->ident);
 
 	/* Fix marked byte */
-	if (older_than(0, 6, 1))
+	if (older_than(0, 6, 1, 0))
 	{
 		if (o_ptr->ident & (0xFF00))
 		{
@@ -644,7 +646,7 @@ static void rd_lore(int r_idx)
 	rd_u32b(&l_ptr->flags7);
 
 	/* Oops */
-	if (!older_than(0, 6, 2))
+	if (!older_than(0, 6, 2, 0))
 	{
 		rd_u32b(&l_ptr->flags8);
 		rd_u32b(&l_ptr->flags9);
@@ -689,7 +691,7 @@ static errr rd_store(int n)
 	C_MAKE(st_ptr, 1, store_type);
 
 	/* Copy basic information for older versions */
-	if (older_than(0, 6, 2))
+	if (older_than(0, 6, 2, 0))
 	{
 		/* Copy basic store information to it */
 		COPY(st_ptr, &u_info[f_info[t_info[p_ptr->town].store[n]].power], store_type);
@@ -996,7 +998,17 @@ static errr rd_extra(void)
 
 	int a_max = A_MAX;
 
-	if (older_than(0,6,2))
+	/* Hack - this is needed for wip 0.6.2 versions */
+	if (older_than(0, 6, 2, 1))
+	{
+		a_max = 7;
+		p_ptr->stat_max[A_SIZ] = 11;
+		p_ptr->stat_cur[A_SIZ] = 11;
+		p_ptr->stat_inc_tim[A_SIZ] = 0;
+		p_ptr->stat_dec_tim[A_SIZ] = 0;
+	}
+
+	if (older_than(0, 6, 2, 0))
 	{
 		a_max = 6;
 		p_ptr->stat_max[A_AGI] = 11;
@@ -1093,7 +1105,7 @@ static errr rd_extra(void)
 	rd_byte(&p_ptr->pshape);
 
 	/* Hack - this is needed for wip 0.6.2 versions */
-	if ((older_than(0, 6, 2)) || (!p_ptr->pshape))
+	if ((older_than(0, 6, 2, 0)) || (!p_ptr->pshape))
 	{
 		p_ptr->pshape = p_ptr->prace;
 	}
@@ -1142,7 +1154,7 @@ static errr rd_extra(void)
 	rd_s16b(&p_ptr->oppose_elec);
 	rd_s16b(&p_ptr->oppose_pois);
 
-	if (!older_than(0, 6, 2))
+	if (!older_than(0, 6, 2, 0))
 	{
 		rd_s16b(&p_ptr->oppose_water);
 		rd_s16b(&p_ptr->oppose_lava);
@@ -1159,7 +1171,7 @@ static errr rd_extra(void)
 
 	rd_u32b(&p_ptr->disease);
 
-	if (!older_than(0, 6, 2))
+	if (!older_than(0, 6, 2, 0))
 	{
 		/* # of player turns */
 		rd_s32b(&p_ptr->player_turn);
@@ -1232,7 +1244,7 @@ static errr rd_extra(void)
 
 
 	/* Warn the player */
-	if (older_than(0, 6, 2) && (p_ptr->pclass == 4))
+	if (older_than(0, 6, 2, 0) && (p_ptr->pclass == 4))
 	{
 		msg_print("Rangers have changed significantly since this save-file version.");
 		msg_print("You must choose now to either to retain the weapon style bonuses or offensive spells for this character.");
@@ -1242,7 +1254,7 @@ static errr rd_extra(void)
 	}
 
 	/* Hack -- unlearn ranger spells */
-	if (older_than(0, 6, 2) && (p_ptr->pclass == 4) && (get_check("Retain weapon style bonuses and discard offensive spells? ")))
+	if (older_than(0, 6, 2, 0) && (p_ptr->pclass == 4) && (get_check("Retain weapon style bonuses and discard offensive spells? ")))
 	{
 		strip_bytes(48);
 	} 
@@ -1263,7 +1275,7 @@ static errr rd_extra(void)
 		rd_u32b(&p_ptr->spell_forgotten4);
 
 		/* Hack -- change class to warrior mage instead */
-		if (older_than(0, 6, 2) && (p_ptr->pclass == 4)){  p_ptr->pclass = 10; p_ptr->pstyle = WS_NONE; p_ptr->psval = 0; }
+		if (older_than(0, 6, 2, 0) && (p_ptr->pclass == 4)){  p_ptr->pclass = 10; p_ptr->pstyle = WS_NONE; p_ptr->psval = 0; }
 	}
 
 	/* Read in the spells */
@@ -1703,7 +1715,7 @@ u16b limit;
 
 
 	/*** Read and discard old room descriptions ***/
-	if (older_than(0, 6, 2))
+	if (older_than(0, 6, 2, 0))
 	{
 		for (i = 1; i < 50; i++)
 		{
@@ -1887,7 +1899,7 @@ u16b limit;
 
 
 	/*** Read the ecology ***/
-	if (!older_than(0, 6, 2))
+	if (!older_than(0, 6, 2, 0))
 	{
 		/* Read the ecology count */
 		rd_u16b(&limit);
@@ -2167,7 +2179,7 @@ static errr rd_savefile_new_aux(void)
 	if (arg_fiddle) note("Loaded extra information");
 
 	/* Don't bother saving flavor flags if dead */
-	if ((!older_than(0, 6, 2)) && !(p_ptr->is_dead))
+	if ((!older_than(0, 6, 2, 0)) && !(p_ptr->is_dead))
 	{
 		/* Load the Flavors */
 		rd_u16b(&tmp16u);
@@ -2220,7 +2232,7 @@ static errr rd_savefile_new_aux(void)
 	}
 
 	/* Read the bags */
-	if (!older_than(0, 6, 1))
+	if (!older_than(0, 6, 1, 0))
 	{
 		/* Load the Bags */
 		rd_u16b(&tmp16u);
@@ -2253,7 +2265,7 @@ static errr rd_savefile_new_aux(void)
 	}
 
 	/* Read the dungeons */
-	if (!older_than(0, 6, 1))
+	if (!older_than(0, 6, 1, 0))
 	{
 		rd_u16b(&tmp16u);
 
@@ -2276,7 +2288,7 @@ static errr rd_savefile_new_aux(void)
 			t_info[i].max_depth = tmp8u;
 
 			/* Read the store indexes */
-			if (!older_than(0, 6, 2) && !p_ptr->is_dead)
+			if (!older_than(0, 6, 2, 0) && !p_ptr->is_dead)
 			{
 				/* Load the number of stores */
 				rd_byte(&tmp8u);
@@ -2291,13 +2303,13 @@ static errr rd_savefile_new_aux(void)
 	}
 
 	/* Don't read stores anymore if dead */
-	if (!p_ptr->is_dead || older_than(0, 6, 2))
+	if (!p_ptr->is_dead || older_than(0, 6, 2, 0))
 	{
 		/* Read the stores */
 		rd_u16b(&tmp16u);
 
 		/* Hack -- for older versions */
-		if (older_than(0, 6, 2)) total_store_count++;
+		if (older_than(0, 6, 2, 0)) total_store_count++;
 
 		for (i = 0; i < tmp16u; i++)
 		{
@@ -2305,7 +2317,7 @@ static errr rd_savefile_new_aux(void)
 		}
 
 		/* Hack -- for older versions */
-		if (older_than(0, 6, 2))
+		if (older_than(0, 6, 2, 0))
 		{
 			store[STORE_HOME] = store[7];
 
@@ -2330,7 +2342,7 @@ static errr rd_savefile_new_aux(void)
 	}
 
 	/* Get the stores */
-	if (older_than(0, 6, 2))
+	if (older_than(0, 6, 2, 0))
 	{
 
 	}
@@ -2586,12 +2598,12 @@ bool load_player(void)
 		/* Clear screen */
 		Term_clear();
 
-		if (older_than(OLD_VERSION_MAJOR, OLD_VERSION_MINOR, OLD_VERSION_PATCH))
+		if (older_than(OLD_VERSION_MAJOR, OLD_VERSION_MINOR, OLD_VERSION_PATCH, 0))
 		{
 			err = -1;
 			what = "Savefile is too old";
 		}
-		else if (!older_than(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH + 1))
+		else if (!older_than(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_EXTRA + 1))
 		{
 			err = -1;
 			what = "Savefile is from the future";

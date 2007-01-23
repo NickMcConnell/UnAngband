@@ -130,7 +130,7 @@ I:80:15:0
 W:10:500:1:50
 A:10/1
 
-N:9:Weakness
+N:9:Weakness and Smallness
 G:,:w
 I:80:6:0
 W:10:500:1:0
@@ -184,7 +184,7 @@ I:80:5:0
 W:20:500:1:0
 A:20/1
 
-N:18:Restore Strength
+N:18:Restore Strength and Size
 G:,:w
 I:80:17:0
 W:20:500:1:350
@@ -1070,7 +1070,7 @@ P:5:1d3:0:0:0
 
 ##### Rings #####
 
-N:132:Strength
+N:132:Strength and Size
 G:=:w
 I:45:24:0
 W:30:0:2:500
@@ -1173,7 +1173,7 @@ A:15/1
 F:FREE_ACT
 Y:7:1
 
-N:145:Weakness
+N:145:Weakness and Smallness
 G:=:w
 I:45:2:-5
 W:5:0:2:0
@@ -1260,7 +1260,7 @@ A:20/1
 F:SEE_INVIS
 Y:12:2
 
-N:156:Sustain Strength
+N:156:Sustain Strength and Size
 G:=:w
 I:45:10:0
 W:10:0:2:250
@@ -1759,7 +1759,7 @@ A:0/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:225:Strength
+N:225:Strength and Size
 G:!:w
 I:75:48:0
 W:35:0:4:400
@@ -1767,7 +1767,7 @@ A:35/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:226:Weakness
+N:226:Weakness and Smallness
 G:!:w
 I:75:16:0
 W:3:0:4:0
@@ -1775,7 +1775,7 @@ A:3/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:227:Restore Strength
+N:227:Restore Strength and Size
 G:!:d
 I:75:42:0
 W:25:0:4:300
@@ -5679,7 +5679,7 @@ G:?:v
 I:99:22:0
 W:25:0:0:40
 
-N:772:Restore Strength
+N:772:Restore Strength and Size
 G:?:v
 I:99:23:0
 W:20:0:0:250

@@ -2920,7 +2920,7 @@ static void display_player_sust_info(void)
 		object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
 
 		/* Initialize color based of sign of pval. */
-		for (stat = 0; stat < A_MAX - 1 /* AGI coupled with DEX */; stat++)
+		for (stat = 0; stat < A_MAX - 2 /* AGI coupled with DEX and SIZ with STR */; stat++)
 		{
 			/* Default */
 			a = TERM_SLATE;
@@ -2967,6 +2967,8 @@ static void display_player_sust_info(void)
 			Term_putch(col, row+stat, a, c);
 			if (stat == A_DEX) 
 			  Term_putch(col, row+A_AGI, a, c);
+			if (stat == A_STR) 
+			  Term_putch(col, row+A_SIZ, a, c);
 		}
 
 		/* Advance */
@@ -2977,7 +2979,7 @@ static void display_player_sust_info(void)
 	player_flags(&f1, &f2, &f3, &f4);
 
 	/* Check stats */
-	for (stat = 0; stat < A_MAX - 1 /* AGI coupled with DEX */; ++stat)
+	for (stat = 0; stat < A_MAX - 2 /* AGI coupled with DEX and SIZ with STR */; ++stat)
 	{
 		/* Default */
 		a = TERM_SLATE;
@@ -2995,6 +2997,8 @@ static void display_player_sust_info(void)
 		Term_putch(col, row+stat, a, c);
 		if (stat == A_DEX) 
 		  Term_putch(col, row+A_AGI, a, c);
+		if (stat == A_STR) 
+		  Term_putch(col, row+A_SIZ, a, c);
 	}
 }
 
@@ -3062,12 +3066,14 @@ static void display_home_equipment_info(int mode)
 		object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
 
 		/* Initialize color based of sign of pval. */
-		for (stats = 0; stats < A_MAX - 1 /* AGI coupled with DEX */; stats++)
+		for (stats = 0; stats < A_MAX - 2 /* AGI coupled with DEX and SIZ with STR */; stats++)
 		{
 			/* Assume uppercase stat name */
 			c_put_str(TERM_WHITE, stat_names[stats], row+stats, 2);
 			if (stats == A_DEX) 
 			  c_put_str(TERM_WHITE, stat_names[A_AGI], row+A_AGI, 2);
+			if (stats == A_STR) 
+			  c_put_str(TERM_WHITE, stat_names[A_SIZ], row+A_SIZ, 2);
 
 			/* Default */
 			a = TERM_SLATE;
@@ -3114,6 +3120,8 @@ static void display_home_equipment_info(int mode)
 			Term_putch(col, row+stats, a, c);
 			if (stats == A_DEX) 
 			  Term_putch(col, row+A_AGI, a, c);
+			if (stats == A_STR) 
+			  Term_putch(col, row+A_SIZ, a, c);
 		}
 
 		/* Advance */
@@ -3304,7 +3312,7 @@ static void dump_player_plus_minus(FILE *fff)
 		modifier = FALSE;
 
 		/*check to see if there is an increase or decrease of a stat*/
-		for (stats = 0; stats < A_MAX - 1 /* AGI coupled with DEX */; stats++)
+		for (stats = 0; stats < A_MAX - 2 /* AGI coupled with DEX and SIZ with STR */; stats++)
 		{
 			/* Boost */
 			if (f1 & (1<<stats)) modifier = TRUE;
@@ -3402,7 +3410,7 @@ static void dump_player_stat_info(FILE *fff)
 			object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
 
 			/* Boost */
-			if (f1 & (1<<(stats == A_AGI ? A_DEX : stats)))
+			if (f1 & (1<<(stats == A_AGI ? A_DEX : (stats == A_SIZ ? A_STR : stats))))
 			{
 				/* Default */
 				c = '*';
@@ -3450,7 +3458,7 @@ static void dump_player_stat_info(FILE *fff)
 			object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
 
 			/* Sustain */
-			if (f2 & (1<<(stats == A_AGI ? A_DEX : stats)))  c = 's';
+			if (f2 & (1<<(stats == A_AGI ? A_DEX : (stats == A_SIZ ? A_STR : stats))))  c = 's';
 			else c = '.';
 
 			/*dump the result*/
@@ -3465,7 +3473,7 @@ static void dump_player_stat_info(FILE *fff)
 		c = '.';
 
 		/* Sustain */
-		if (f2 & (1<<(stats == A_AGI ? A_DEX : stats))) c = 's';
+		if (f2 & (1<<(stats == A_AGI ? A_DEX : (stats == A_SIZ ? A_STR : stats)))) c = 's';
 
 		/*dump the result*/
 		fprintf(fff,"%c",c);
@@ -3499,7 +3507,7 @@ static void dump_home_plus_minus(FILE *fff)
 		modifier = FALSE;
 
 		/*check to see if there is an increase or decrease of a stat*/
-		for (stats = 0; stats < A_MAX - 1 /* AGI coupled with DEX */; stats++)
+		for (stats = 0; stats < A_MAX - 2 /* AGI coupled with DEX and SIZ with STR */; stats++)
 		{
 			/* Boost */
 			if (f1 & (1<<stats)) modifier = TRUE;
@@ -3594,7 +3602,7 @@ static void dump_home_stat_info(FILE *fff)
 			c = '.';
 
 			/* Boost */
-			if (f1 & (1<<(stats == A_AGI ? A_DEX : stats)))
+			if (f1 & (1<<(stats == A_AGI ? A_DEX : (stats == A_SIZ ? A_STR : stats))))
 			{
 				/* Default */
 				c = '*';
@@ -3640,7 +3648,7 @@ static void dump_home_stat_info(FILE *fff)
 			object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
 
 			/* Sustain */
-			if (f2 & (1<<(stats == A_AGI ? A_DEX : stats)))  c = 's';
+			if (f2 & (1<<(stats == A_AGI ? A_DEX : (stats == A_SIZ ? A_STR : stats))))  c = 's';
 			else c = '.';
 
 			/*dump the result*/
