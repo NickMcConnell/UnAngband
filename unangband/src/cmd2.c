@@ -1796,13 +1796,21 @@ static bool do_cmd_disarm_aux(int y, int x, bool disarm)
 
 		/* Remove the trap */
 		if (disarm)
-		{
-			/* Remove the trap */
-			cave_alter_feat(y, x, FS_DISARM);
+		  {
+		    /* A hack to e.g. get Flasks of Oil, etc. from traps */
+		    object_type *i_ptr;
+		    object_type object_type_body;
 
-			/* Update the visuals */
-			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-		}
+		    i_ptr = &object_type_body;
+
+		    make_feat(i_ptr, y, x);
+
+		    /* Remove the trap */
+		    cave_alter_feat(y, x, FS_DISARM);
+
+		    /* Update the visuals */
+		    p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
+		  }
 	}
 
 	/* Failure -- Keep trying */
@@ -1819,13 +1827,21 @@ static bool do_cmd_disarm_aux(int y, int x, bool disarm)
 
 		/* Remove the trap */
 		if (!disarm)
-		{
-			/* Remove the trap */
-			cave_alter_feat(y, x, FS_DISARM);
+		  {
+		    /* A hack to e.g. get Flasks of Oil, etc. from traps */
+		    object_type *i_ptr;
+		    object_type object_type_body;
 
-			/* Update the visuals */
-			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-		}
+		    i_ptr = &object_type_body;
+
+		    make_feat(i_ptr, y, x);
+
+		    /* Remove the trap */
+		    cave_alter_feat(y, x, FS_DISARM);
+
+		    /* Update the visuals */
+		    p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
+		  }
 	}
 
 	/* Failure -- Set off the trap */

@@ -5244,10 +5244,11 @@ static void cave_set_feat_aux(int y, int x, int feat)
 			o_ptr->ident &= ~(IDENT_MARKED);
 		}
 
-		/* Destroy stored items */
+		/* Destroy stored items --- Hack: changed to get Flasks of Oil, etc. from traps; I have no clue what more it does change */
 		if (o_ptr->ident & (IDENT_STORE))
 		{
-			delete_object_idx(this_o_idx);
+		  o_ptr->ident &= ~IDENT_STORE;
+		  /*			delete_object_idx(this_o_idx); */
 			continue;
 		}
 	}
