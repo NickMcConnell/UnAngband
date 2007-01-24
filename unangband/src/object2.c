@@ -1550,9 +1550,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			break;
 		}
 
-		/* Lites */
-		case TV_LITE:
-
 		/* Weapons and Armor */
 		case TV_STAFF:
 		case TV_BOW:
@@ -1573,9 +1570,11 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			/* Fall through */
 		}
 
-		/* Rings, Amulets, Lites */
+		/* Rings, Amulets, Lites, Instruments */
 		case TV_RING:
 		case TV_AMULET:
+		case TV_LITE:
+	        case TV_INSTRUMENT:
 
 		/* Missiles */
 		case TV_BOLT:
