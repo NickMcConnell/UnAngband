@@ -761,17 +761,28 @@ void do_cmd_wield(void)
 
 
 /*
- * The "takeoff" and "drop" tester
+ * The "drop" tester
  */
-static bool item_tester_hook_removable(const object_type *o_ptr)
+static bool item_tester_hook_droppable(const object_type *o_ptr)
 {
-	/* Forbid known cursed */
-	if (o_ptr->ident & (IDENT_CURSED)) return (FALSE);
-
 	/* Forbid 'built-in' */
 	if (o_ptr->ident & (IDENT_STORE)) return (FALSE);
 
-	/* Assume removable */
+	return (TRUE);
+}
+
+
+/*
+ * The "takeoff" tester
+ */
+static bool item_tester_hook_removable(const object_type *o_ptr)
+{
+	/* Forbid not droppable */
+	if (!item_tester_hook_droppable(o_ptr)) return (FALSE);
+
+	/* Forbid cursed */
+	if (o_ptr->ident & (IDENT_CURSED)) return (FALSE);
+
 	return (TRUE);
 }
 
@@ -855,7 +866,7 @@ void do_cmd_drop(void)
 
 	cptr q, s;
 
-	item_tester_hook = item_tester_hook_removable;
+	item_tester_hook = item_tester_hook_droppable;
 
 	/* Get an item */
 	q = "Drop which item? ";
