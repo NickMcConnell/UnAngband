@@ -3197,7 +3197,29 @@ static void calc_bonuses(void)
 		p_ptr->stat_ind[i] = ind;
 	}
 
+	/* Penalty for SIZ over STR */
+	if (p_ptr->stat_ind[A_SIZ] > p_ptr->stat_ind[A_STR])
+	  {
+	    int use, ind;
+	    int penalty = (p_ptr->stat_ind[A_SIZ] - p_ptr->stat_ind[A_STR]) / 2;
+	    /* Extract the new "stat_use" from the old "stat_use" */
+	    use = modify_stat_value(p_ptr->stat_use[A_AGI], -penalty);
 
+	    /* Save the new value */
+	    p_ptr->stat_use[A_AGI] = use;
+
+	    /* Values: 3, 4, ..., 17 */
+	    if (use <= 18) ind = (use - 3);
+
+	    /* Ranges: 18/00-18/09, ..., 18/240-18/249 */
+	    else if (use <= 18+249) ind = (15 + (use - 18) / 10);
+
+	    /* Range: 18/250+ */
+	    else ind = 40;
+
+	    /* Save the new index */
+	    p_ptr->stat_ind[A_AGI] = ind;
+	  }
 
 
 	/*** Temporary flags ***/
