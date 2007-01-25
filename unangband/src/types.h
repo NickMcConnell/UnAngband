@@ -1566,9 +1566,10 @@ struct player_type
 
 	u32b noise;     /* Derived from stealth */
 
-	s16b num_blow;  /* Number of blows */
-	s16b num_fire;  /* Number of shots */
-	s16b num_throw; /* Number of throws */
+	s16b num_blow;   /* Number of blows */
+	s16b num_charge; /* Number of shots */
+	s16b num_fire;   /* Number of shots */
+	s16b num_throw;  /* Number of throws */
 
 	byte ammo_mult; /* Ammo multiplier */
 

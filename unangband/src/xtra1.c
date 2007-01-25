@@ -2884,6 +2884,7 @@ static void calc_bonuses(void)
 
 	/* Reset "blow" info */
 	p_ptr->num_blow = 1;
+	p_ptr->num_charge = 1;
 	extra_blows = 0;
 
 	/* Reset "fire" info */
@@ -3699,6 +3700,19 @@ static void calc_bonuses(void)
 			}
 		}
 	}
+
+	/* Charging multiplier */
+	if (p_ptr->cur_style & (1L << WS_UNARMED) 
+	    && p_ptr->wt >= 2 * cp_ptr->chg_weight) 
+	  p_ptr->num_charge = p_ptr->wt / cp_ptr->chg_weight;
+	else if (o_ptr->weight >= 2 * cp_ptr->chg_weight) 
+	  p_ptr->num_charge = o_ptr->weight / cp_ptr->chg_weight;
+	else
+	  p_ptr->num_charge = 1;
+
+	/* Can get as low as 0 */
+	p_ptr->num_charge = MIN(p_ptr->num_charge, 
+				adj_int_dev[p_ptr->stat_ind[A_SIZ]]);
 
 	/* Check if we wear an amulet or a ring */
 	if (inventory[INVEN_NECK].k_idx)
