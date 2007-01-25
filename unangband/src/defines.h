@@ -67,7 +67,7 @@
 #define VERSION_MAJOR	0
 #define VERSION_MINOR	6
 #define VERSION_PATCH	2
-#define VERSION_EXTRA	1
+#define VERSION_EXTRA	2
 
 
 /*
@@ -632,34 +632,32 @@
  * Player race constants (hard-coded by save-files, arrays, etc)
  */
 #define RACE_MAN_OF_BREE	0
-#define RACE_HALF_ELF		1
-#define RACE_WOOD_ELF		2
-#define RACE_HOBBIT		3
-#define RACE_GNOME		4
-#define RACE_DWARF		5
-#define RACE_HALF_ORC		6
-#define RACE_HALF_TROLL		7
-#define RACE_DUNADAN		8
-#define RACE_HIGH_ELF		9
-#define RACE_GOBLIN		10
-#define RACE_ORC		11
-#define RACE_GOBLIN_MAN		12
-#define RACE_DRUADAN		13
-#define RACE_MAN_OF_ROHAN	14
-#define RACE_MAN_OF_GONDOR	15
-#define RACE_MAN_OF_HARAD	16
-#define RACE_MAN_OF_DALE	17
+#define RACE_WOOD_ELF		1
+#define RACE_HOBBIT		2
+#define RACE_SHADOW_FAIRY	3
+#define RACE_DWARF		4
+#define RACE_DUNADAN		5
+#define RACE_HIGH_ELF		6
+#define RACE_MAIA		7
+#define RACE_ENT           	8
+#define RACE_DRUADAN		9
+#define RACE_MAN_OF_ERECH	10
+#define RACE_MAN_OF_DALE	11
+#define RACE_MAN_OF_ROHAN	12
+#define RACE_MAN_OF_GONDOR	13
+#define RACE_MAN_OF_HARAD	14
+#define RACE_FORGE_GIANT	15
+#define RACE_FIRE_GIANT		16
+#define RACE_FROST_GIANT	17
 #define RACE_BEORNING		18
-#define RACE_FIRE_GIANT		19
-#define RACE_FROST_GIANT	20
-#define RACE_FORGE_GIANT	21
-#define RACE_STONE_TROLL	22
-#define RACE_ENT           	23
-#define RACE_MAIA		24
-#define RACE_SHADOW_FAIRY	25
-#define RACE_MAN_OF_ERECH	26
-#define RACE_WEREWOLF		27
-#define RACE_VAMPIRE		28
+#define RACE_WEREWOLF		19
+#define RACE_VAMPIRE		20
+#define RACE_GOBLIN		21
+#define RACE_GOBLIN_MAN		22
+#define RACE_ORC		23
+#define RACE_HALF_ORC		24
+#define RACE_STONE_TROLL	25
+/* 26--28 free */
 #define RACE_GOAT		29
 #define RACE_BEAR		30
 #define RACE_MOUSE		31

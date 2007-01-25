@@ -1026,6 +1026,103 @@ static errr rd_extra(void)
 	/* Player race */
 	rd_byte(&p_ptr->prace);
 
+	if (older_than(0, 6, 2, 2))
+	  {
+	    switch (p_ptr->prace)
+	      {
+	      case /* old RACE_MAN_OF_BREE        */ 0:
+		p_ptr->prace = RACE_MAN_OF_BREE;
+		break;
+	      case /* old RACE_HALF_ELF           */ 1:
+		p_ptr->prace = RACE_WOOD_ELF; /* Removed! */
+		break;
+	      case /* old RACE_WOOD_ELF           */ 2:
+		p_ptr->prace = RACE_WOOD_ELF;
+		break;
+	      case /* old RACE_HOBBIT             */ 3:
+		p_ptr->prace = RACE_HOBBIT;
+		break;
+	      case /* old RACE_GNOME              */ 4:
+		p_ptr->prace = RACE_GOBLIN; /* Removed! */
+		break;
+	      case /* old RACE_DWARF              */ 5:
+		p_ptr->prace = RACE_DWARF;
+		break;
+	      case /* old RACE_HALF_ORC           */ 6:
+		p_ptr->prace = RACE_HALF_ORC;
+		break;
+	      case /* old RACE_HALF_TROLL         */ 7:
+		p_ptr->prace = RACE_STONE_TROLL; /* Removed! */
+		break;
+	      case /* old RACE_DUNADAN            */ 8:
+		p_ptr->prace = RACE_DUNADAN;
+		break;
+	      case /* old RACE_HIGH_ELF           */ 9:
+		p_ptr->prace = RACE_HIGH_ELF;
+		break;
+	      case /* old RACE_GOBLIN             */ 10:
+		p_ptr->prace = RACE_GOBLIN;
+		break;
+	      case /* old RACE_ORC                */ 11:
+		p_ptr->prace = RACE_ORC;
+		break;
+	      case /* old RACE_GOBLIN_MAN         */ 12:
+		p_ptr->prace = RACE_GOBLIN_MAN;
+		break;
+	      case /* old RACE_DRUADAN            */ 13:
+		p_ptr->prace = RACE_DRUADAN;
+		break;
+	      case /* old RACE_MAN_OF_ROHAN       */ 14:
+		p_ptr->prace = RACE_MAN_OF_ROHAN;
+		break;
+	      case /* old RACE_MAN_OF_GONDOR      */ 15:
+		p_ptr->prace = RACE_MAN_OF_GONDOR;
+		break;
+	      case /* old RACE_MAN_OF_HARAD       */ 16:
+		p_ptr->prace = RACE_MAN_OF_HARAD;
+		break;
+	      case /* old RACE_MAN_OF_DALE        */ 17:
+		p_ptr->prace = RACE_MAN_OF_DALE;
+		break;
+	      case /* old RACE_BEORNING           */ 18:
+		p_ptr->prace = RACE_BEORNING;
+		break;
+	      case /* old RACE_FIRE_GIANT         */ 19:
+		p_ptr->prace = RACE_FIRE_GIANT;
+		break;
+	      case /* old RACE_FROST_GIANT        */ 20:
+		p_ptr->prace = RACE_FROST_GIANT;
+		break;
+	      case /* old RACE_FORGE_GIANT        */ 21:
+		p_ptr->prace = RACE_FORGE_GIANT;
+		break;
+	      case /* old RACE_STONE_TROLL        */ 22:
+		p_ptr->prace = RACE_STONE_TROLL;
+		break;
+	      case /* old RACE_ENT                */ 23:
+		p_ptr->prace = RACE_ENT;
+		break;
+	      case /* old RACE_MAIA               */ 24:
+		p_ptr->prace = RACE_MAIA;
+		break;
+	      case /* old RACE_SHADOW_FAIRY       */ 25:
+		p_ptr->prace = RACE_SHADOW_FAIRY;
+		break;
+	      case /* old RACE_MAN_OF_ERECH       */ 26:
+		p_ptr->prace = RACE_MAN_OF_ERECH;
+		break;
+	      case /* old RACE_WEREWOLF           */ 27:
+		p_ptr->prace = RACE_WEREWOLF;
+		break;
+	      case /* old RACE_VAMPIRE            */ 28:
+		p_ptr->prace = RACE_VAMPIRE;
+		break;
+	      default:
+		note(format("Invalid player race (%d).", p_ptr->prace));
+		return (-1);
+	      }
+	  }
+
 	/* Verify player race */
 	if (p_ptr->prace >= z_info->g_max)
 	{
@@ -1105,7 +1202,7 @@ static errr rd_extra(void)
 	rd_byte(&p_ptr->pshape);
 
 	/* Hack - this is needed for wip 0.6.2 versions */
-	if ((older_than(0, 6, 2, 0)) || (!p_ptr->pshape))
+	if ((older_than(0, 6, 2, 2)) || (!p_ptr->pshape))
 	{
 		p_ptr->pshape = p_ptr->prace;
 	}

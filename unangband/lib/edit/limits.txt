@@ -47,7 +47,7 @@ M:U:43
 M:P:40
 
 # Maximum number of playable races
-M:G:29
+M:G:26
 
 # Maximum number of player history lines
 M:H:350

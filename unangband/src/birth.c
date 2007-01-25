@@ -626,15 +626,12 @@ static void player_outfit(void)
 						  }
 						case WS_THROWN:
 						  {
-						    switch (p_ptr->prace)
+						    if (p_info[p_ptr->prace].r_tht > p_info[p_ptr->prace].r_thb)
 						      {
-						      case RACE_HOBBIT:
-						      case RACE_HALF_TROLL:
-							{
-							  k_idx = lookup_kind(TV_SHOT, SV_AMMO_LIGHT);
-							  break;
-							}
-						      default:
+							k_idx = lookup_kind(TV_SHOT, SV_AMMO_LIGHT);
+						      }
+						    else
+						      {
 							switch (randint(3))
 							  {
 							  case 1:

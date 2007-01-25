@@ -55,9 +55,6 @@
 # change into as an effect, in addition to their starting race. To define that
 # a race is selectable as a starting race, it must have an index less than
 # the number of 'playable' races defined in the limits.txt file.
-#
-# Use the RANDOM flag to 'ghost out' races that are not appropriate for the
-# Third Age but are required for backwards compatibility.
 
 # Version stamp (required)
 
@@ -74,17 +71,7 @@ W:180:25:150:20
 F:MAN 
 C:0|1|2|3|4|5|6|7|8|9
 
-N:1:Half-Elf
-S:0:1:-1:1:-1:1:1:10
-R:2:3:3:1:8:10:-10:10
-X:10:110:2
-I:4:24:16:2
-H:66:6:62:6
-W:130:15:100:10
-F:SUST_DEX | MAN | ELF | RANDOM
-C:0|1|2|3|4|5|6|7|8|9
-
-N:2:Wood-Elf
+N:1:Wood-Elf
 S:-1:2:-1:1:-2:1:3:9
 R:5:6:6:1:10:10:-10:40
 X:9:120:3
@@ -94,7 +81,7 @@ W:100:6:80:6
 F:SUST_DEX | RES_LITE | ELF 
 C:0|1|3|4|6|7|8|9
 
-N:3:Hobbit
+N:2:Hobbit
 S:-2:2:1:3:2:1:-2:7
 R:15:18:18:4:13:40:-40:10
 X:7:110:4
@@ -104,17 +91,18 @@ W:60:3:50:3
 F:HOLD_LIFE 
 C:0|3|4|6|7
 
-N:4:Gnome
-S:-1:2:0:2:1:-2:-1:8
-R:10:12:12:3:9:20:-20:20
-X:8:125:4
-I:13:50:40:1
-H:42:3:39:3
-W:90:6:75:3
-F:FREE_ACT | RANDOM
-C:0|1|2|3|6|7|9
+N:3:Shadow Fairy
+S:-2:2:2:1:-1:0:2:7
+R:7:5:0:6:10:15:-30:-5
+X:6:140:4
+I:29:200:100:62
+H:80:8:73:8
+W:90:20:80:15
+F:ELF | DEMON 
+#U:SHADOW
+C:0|1|2|3|4|6|7|8
 
-N:5:Dwarf
+N:4:Dwarf
 S:2:3:2:-2:2:-3:-3:11
 R:2:9:9:-1:8:10:20:20
 X:11:120:5
@@ -124,27 +112,7 @@ W:150:10:120:10
 F:RES_BLIND | DWARF 
 C:0|2|5|7|9
 
-N:6:Half-Orc
-S:2:-1:0:0:1:-4:2:10
-R:-3:-3:-3:-1:3:0:20:0
-X:10:110:3
-I:19:11:4:17
-H:66:1:62:1
-W:150:5:120:5
-F:RES_DARK | MAN | ORC 
-C:0|2|3|6|7
-
-N:7:Half-Troll
-S:4:-4:-2:-4:3:-6:1:12
-R:-5:-8:-8:-2:0:30:30:-50
-X:12:120:3
-I:21:20:10:17
-H:96:10:84:8
-W:250:50:225:40
-F:SUST_STR | REGEN_HP | MAN | TROLL | RANDOM
-C:0|2|7
-
-N:8:Dunadan
+N:5:Dunadan
 S:1:2:2:2:3:1:2:10
 R:4:5:5:2:7:10:20:10
 X:10:180:0
@@ -154,7 +122,7 @@ W:190:20:180:15
 F:SUST_CON | MAN 
 C:0|1|2|3|4|5|6|7|8|9
 
-N:9:High-Elf
+N:6:High-Elf
 S:1:3:-1:3:1:3:2:10
 R:4:20:20:3:9:0:10:20
 X:10:200:4
@@ -164,37 +132,33 @@ W:190:20:180:15
 F:RES_LITE | SEE_INVIS | ELF 
 C:0|1|2|4|6|7|8|9
 
-N:10:Goblin
-S:-1:-1:0:2:2:-2:0:8
-R:10:5:0:4:15:10:0:10
-X:8:115:5
-I:23:15:10:3
-H:38:4:36:3
-W:70:5:60:4
-F:RES_POIS | ORC | DWARF | HURT_LITE
-C:0|2|3|4|5|6
+N:7:Maia
+S:2:3:3:2:4:4:2:12
+R:10:15:16:1:5:15:48:24
+X:12:100:0
+I:27:10000:5000:62
+H:130:40:130:50
+W:300:40:280:40
+F:ELF | DEMON | ACTIVATE
+#U:DIVINE
+C:0|1|2|3|4|5|6|7|8
 
-N:11:Orc
-S:4:-2:0:0:2:-8:4:10
-R:-6:-6:-6:-2:6:0:30:0
-X:10:110:3
-I:37:11:4:34
-H:66:1:62:1
-W:150:5:120:5
-F:RES_DARK | ORC  | HURT_LITE
-C:0|2|3|6|7
+# Had tunnel + 8. Has Branches, Barkskin, Ent Roots.
+# We hack the understand plants ability as we do not have a plant flag.
 
-N:12:Goblin-Man
-S:-1:-1:0:2:2:-2:0:10
-R:10:5:0:4:15:10:0:10:0:0
-X:8:115:5
-I:41:15:10:34
-H:45:4:40:3
-W:70:5:60:4
-F:ORC | DWARF | MAN
-C:0|2|3|4|5|6
+N:8:Ent
+S:2:0:2:-5:2:0:-5:12
+R:-5:-2:5:1:-5:10:20:-10
+X:12:130:0
+I:31:120:60:20
+H:80:27:75:25
+W:240:50:220:40
+#F:PLANT
+#U:WOODEN | POLEARM_UNSKILL
+O:588:588:0:0:0:0:339:0:0:0:588:340
+C:0|2|4|6
 
-N:13:Druadan
+N:9:Druadan
 S:2:-2:2:-1:2:-4:2:11
 R:-3:-5:7:2:2:15:14:-8
 X:11:190:0
@@ -205,7 +169,27 @@ F:TELEPATHY | MAN
 #U:EDAIN 
 C:0|2|4|5|8
 
-N:14:Man of Rohan
+N:10:Man of Erech
+S:0:0:0:0:0:0:0:10
+R:0:0:0:0:5:0:0:0
+X:10:130:0
+I:45:3000:50:29
+H:72:6:66:4
+W:180:25:150:20
+F:MAN | UNDEAD | IM_POIS | RES_COLD 
+C:0|1|2|3|4|5|6|7|8|9
+
+N:11:Man of Dale
+S:0:0:0:0:0:0:0:10
+R:0:0:0:0:5:0:0:0
+X:10:100:0
+I:1:14:6:52
+H:72:6:66:4
+W:180:25:150:20
+F:MAN 
+C:0|1|2|3|4|5|6|7|8|9
+
+N:12:Man of Rohan
 S:0:0:0:0:0:0:0:10
 R:0:0:0:0:5:0:0:0
 X:10:100:0
@@ -215,7 +199,7 @@ W:180:25:150:20
 F:MAN 
 C:0|1|2|3|4|5|6|7|8|9
 
-N:15:Man of Gondor
+N:13:Man of Gondor
 S:0:0:0:0:0:0:0:10
 R:0:0:0:0:5:0:0:0
 X:10:100:0
@@ -225,7 +209,7 @@ W:180:25:150:20
 F:MAN 
 C:0|1|2|3|4|5|6|7|8|9
 
-N:16:Man of Harad
+N:14:Man of Harad
 S:0:0:0:0:0:0:0:10
 R:0:0:0:0:5:0:0:0
 X:10:100:0
@@ -235,15 +219,35 @@ W:180:25:150:20
 F:MAN 
 C:0|1|2|3|4|5|6|7|8|9
 
-N:17:Man of Dale
-S:0:0:0:0:0:0:0:10
-R:0:0:0:0:5:0:0:0
-X:10:100:0
-I:1:14:6:52
-H:72:6:66:4
-W:180:25:150:20
-F:MAN 
-C:0|1|2|3|4|5|6|7|8|9
+N:15:Forge Giant
+S:8:0:-4:-3:3:-8:2:16
+R:-10:16:-16:-16:0:45:45:-75
+X:16:120:3
+I:42:20:10:15
+H:144:20:126:12
+W:500:100:450:80
+F:GIANT | RES_ELEC
+C:0|2|7
+
+N:16:Fire Giant
+S:8:0:-4:-3:3:-8:2:16
+R:-10:16:-16:-16:0:45:45:-75
+X:16:120:3
+I:42:20:10:15
+H:144:20:126:12
+W:500:100:450:80
+F:GIANT | RES_FIRE
+C:0|2|7
+
+N:17:Frost Giant
+S:8:0:-4:-3:3:-8:2:16
+R:-10:16:-16:-16:0:45:45:-75
+X:16:120:3
+I:42:20:10:15
+H:144:20:126:12
+W:500:100:450:80
+F:GIANT | RES_COLD
+C:0|2|7
 
 N:18:Beorning
 S:0:-1:1:0:1:-1:-1:10
@@ -256,99 +260,9 @@ F:ACTIVATE  | MAN | ANIMAL
 #U:BEARSKIN
 C:0|2|3|4|6
 
-N:19:Fire Giant
-S:8:0:-4:-3:3:-8:2:16
-R:-10:-16:-16:-16:0:45:45:-75
-X:16:120:3
-I:42:20:10:15
-H:144:20:126:12
-W:500:100:450:80
-F:GIANT | RES_FIRE
-C:0|2|7
-
-N:20:Frost Giant
-S:8:0:-4:-3:3:-8:2:16
-R:-10:-16:-16:-16:0:45:45:-75
-X:16:120:3
-I:42:20:10:15
-H:144:20:126:12
-W:500:100:450:80
-F:GIANT | RES_COLD
-C:0|2|7
-
-N:21:Forge Giant
-S:8:0:-4:-3:3:-8:2:16
-R:-10:-16:-16:-16:0:45:45:-75
-X:16:120:3
-I:42:20:10:15
-H:144:20:126:12
-W:500:100:450:80
-F:GIANT | RES_ELEC
-C:0|2|7
-
-# Has Stoneskin.
-
-N:22:Stone Troll
-S:8:-8:-4:-8:6:-12:2:24
-R:-10:-16:-16:-4:0:45:45:-75
-X:24:120:2
-I:44:20:10:39
-H:144:20:126:12
-W:1000:200:900:160
-F:SUST_STR | REGEN_HP | TROLL | HURT_LITE 
-O:0:0:0:0:0:0:576:0:0:0:0:0
-C:0|2|7
-
-# Had tunnel + 8. Has Branches, Barkskin, Ent Roots.
-# We hack the understand plants ability as we do not have a plant flag.
-
-N:23:Ent
-S:2:0:2:-5:2:0:-5:12
-R:-5:-2:5:1:-5:10:20:-10
-X:12:130:0
-I:31:120:60:20
-H:80:27:75:25
-W:240:50:220:40
-#F:PLANT
-#U:WOODEN | POLEARM_UNSKILL
-O:588:588:0:0:0:0:339:0:0:0:588:340
-C:0|2|4|6
-
-N:24:Maia
-S:2:3:3:2:4:4:2:12
-R:10:15:16:1:5:15:48:24
-X:12:100:0
-I:27:10000:5000:62
-H:130:40:130:50
-W:300:40:280:40
-F:ELF | DEMON | ACTIVATE
-#U:DIVINE
-C:0|1|2|3|4|5|6|7|8
-
-N:25:Shadow Fairy
-S:-2:2:2:1:-1:0:2:7
-R:7:5:0:6:10:15:-30:-5
-X:7:140:4
-I:29:200:100:62
-H:80:8:73:8
-W:90:20:80:15
-F:ELF | DEMON 
-#U:SHADOW
-C:0|1|2|3|4|6|7|8
-
-N:26:Man of Erech
-S:0:0:0:0:0:0:0:10
-R:0:0:0:0:5:0:0:0
-X:10:130:0
-I:45:3000:50:29
-H:72:6:66:4
-W:180:25:150:20
-F:MAN | UNDEAD | IM_POIS | RES_COLD 
-C:0|1|2|3|4|5|6|7|8|9
-
 # Currently using Beorning stats. Need to change this.
 
-N:27:Werewolf
+N:19:Werewolf
 S:0:-1:1:0:1:-1:2:10
 R:2:-2:0:1:3:13:16:0
 X:10:4:0
@@ -360,7 +274,7 @@ C:0|2|3|4|6
 
 # Currently using Beorning stats. Need to change this.
 
-N:28:Vampire
+N:20:Vampire
 S:0:-1:1:0:1:-1:0:10
 R:2:-2:0:1:3:13:16:0
 X:10:4:3
@@ -369,6 +283,70 @@ H:72:6:66:4
 W:180:25:150:20
 F:ACTIVATE  | UNDEAD | HURT_LITE | REGEN_HP
 C:0|2|3|4|6
+
+N:21:Goblin
+S:-1:-1:0:2:2:-2:0:8
+R:10:5:0:4:15:10:0:10
+X:8:115:5
+I:23:15:10:3
+H:38:4:36:3
+W:70:5:60:4
+F:RES_POIS | ORC | DWARF | HURT_LITE
+C:0|2|3|4|5|6
+
+N:22:Goblin-Man
+S:-1:-1:0:2:2:-2:0:10
+R:10:5:0:4:15:10:0:10:0:0
+X:8:115:5
+I:41:15:10:34
+H:45:4:40:3
+W:70:5:60:4
+F:RES_POIS | ORC | DWARF | MAN
+C:0|2|3|4|5|6
+
+N:23:Orc
+S:4:-2:0:0:2:-8:4:10
+R:-6:-6:-6:-2:6:0:30:0
+X:10:110:3
+I:37:11:4:34
+H:66:1:62:1
+W:150:5:120:5
+F:RES_DARK | ORC  | HURT_LITE
+C:0|2|3|6|7
+
+N:24:Half-Orc
+S:2:-1:0:0:1:-4:2:10
+R:-3:-3:-3:-1:3:0:20:0
+X:10:110:3
+I:19:11:4:17
+H:66:1:62:1
+W:150:5:120:5
+F:RES_DARK | ORC | MAN
+C:0|2|3|6|7
+
+# Has Stoneskin.
+
+N:25:Stone Troll
+S:8:-8:-4:-8:6:-12:2:24
+R:-10:-16:-16:-4:0:45:45:-75
+X:24:120:2
+I:44:20:10:39
+H:144:20:126:12
+W:1000:200:900:160
+F:SUST_STR | REGEN_HP | TROLL | HURT_LITE 
+O:0:0:0:0:0:0:576:0:0:0:0:0
+C:0|2|7
+
+# Old trolls
+#N:7:Half-Troll
+#S:4:-4:-2:-4:3:-6:1:12
+#R:-5:-8:-8:-2:0:30:30:-50
+#X:12:120:3
+#I:21:20:10:17
+#H:96:10:84:8
+#W:250:50:225:40
+#F:SUST_STR | REGEN_HP | MAN | TROLL | RANDOM
+#C:0|2|7
 
 # The following shapes are not startable races.
 # The stats are from Sangband, but could be made a lot more interesting here. e.g. hounds / wolves bigger
