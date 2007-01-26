@@ -216,8 +216,8 @@ static void get_stats(void)
 			j += dice[i];
 		}
 
-		/* Verify totals */
-		if ((j > A_MAX * 7) && (j < A_MAX * 9)) break;
+		/* Verify totals; (A_MAX - 1) to fit spell-point generation */
+		if ((j > (A_MAX - 1) * 7) && (j < (A_MAX - 1) * 9)) break;
 	}
 
 	/* Roll the stats */
@@ -253,42 +253,44 @@ static void get_extra(void)
 	/* Experience factor */
 	p_ptr->expfact = rp_ptr->r_exp + cp_ptr->c_exp;
 
-	/* Hitdice */
-	p_ptr->hitdie = rp_ptr->r_mhp + cp_ptr->c_mhp;
-
-	/* Initial hitpoints */
-	p_ptr->mhp = p_ptr->hitdie;
-
-	/* Minimum hitpoints at highest level */
-	min_value = (PY_MAX_LEVEL * (p_ptr->hitdie - 1) * 3) / 8;
+	/* Minimum hitpoints at highest level - 1 */
+	min_value = (PY_MAX_LEVEL * 9 * 3) / 8;
 	min_value += PY_MAX_LEVEL;
 
-	/* Maximum hitpoints at highest level */
-	max_value = (PY_MAX_LEVEL * (p_ptr->hitdie - 1) * 5) / 8;
+	/* Maximum hitpoints at highest level - 1 */
+	max_value = (PY_MAX_LEVEL * 9 * 5) / 8;
 	max_value += PY_MAX_LEVEL;
 
-	/* Pre-calculate level 1 hitdice */
-	p_ptr->player_hp[0] = p_ptr->hitdie;
+	/* Set level 1 hitdice */
+	p_ptr->player_hp[0] = 10;
 
 	/* Roll out the hitpoints */
 	while (TRUE)
 	{
 		/* Roll the hitpoint values */
-		for (i = 1; i < PY_MAX_LEVEL; i++)
+		for (i = 1; i < PY_MAX_LEVEL -1 ; i++)
 		{
-			j = randint(p_ptr->hitdie);
+			j = randint(10);
 			p_ptr->player_hp[i] = p_ptr->player_hp[i-1] + j;
 		}
 
-		/* XXX Could also require acceptable "mid-level" hitpoints */
+		/* Require "valid" hitpoints at various levels */
+		if (p_ptr->player_hp[(PY_MAX_LEVEL-2)/5] <= min_value/5) continue;
+		if (p_ptr->player_hp[(PY_MAX_LEVEL-2)/5] >= max_value/5) continue;
 
-		/* Require "valid" hitpoints at highest level */
-		if (p_ptr->player_hp[PY_MAX_LEVEL-1] < min_value) continue;
-		if (p_ptr->player_hp[PY_MAX_LEVEL-1] > max_value) continue;
+		if (p_ptr->player_hp[(PY_MAX_LEVEL-2)/2] <= min_value/2) continue;
+		if (p_ptr->player_hp[(PY_MAX_LEVEL-2)/2] >= max_value/2) continue;
+
+		if (p_ptr->player_hp[PY_MAX_LEVEL-2] <= min_value) continue;
+		if (p_ptr->player_hp[PY_MAX_LEVEL-2] >= max_value) continue;
 
 		/* Acceptable */
 		break;
 	}
+
+	/* Set level 50 hitdice */
+	p_ptr->player_hp[PY_MAX_LEVEL-1] = 
+	  p_ptr->player_hp[PY_MAX_LEVEL-2] + 10;
 }
 
 
@@ -1114,7 +1116,32 @@ static void race_aux_hook(birth_menu r_str)
 		Term_putstr(RACE_AUX_COL, TABLE_ROW + i, -1, TERM_WHITE, s);
 	}
 
-	sprintf(s, "Hit die: %d ", p_info[race].r_mhp);
+	/* Process stats */
+	for (i = 0; i < A_MAX; i++)
+	  {
+	    /* Obtain a "bonus" for "race" and "class" */
+	    int bonus_add = p_info[race].r_adj[i];
+
+	    /* Get the minimally increased stat for the bonuses */
+	    int value_min = adjust_stat(10, bonus_add, 1);
+
+	    /* Get the maximally increased stat for the bonuses */
+	    int value_max = adjust_stat(10, bonus_add, 99);
+
+	    /* Get the stat increased by the average for the bonuses */
+	    int value = value_min + (value_max - value_min) / 2;
+
+	    /* Apply the racial/class bonuses */
+	    p_ptr->stat_cur[i] = p_ptr->stat_max[i] = value;
+	  }
+
+	/* Calculate the hitdie */
+	p_ptr->update |= (PU_BONUS | PU_HP);
+
+	/* Update stuff */
+	update_stuff();
+
+	sprintf(s, "Hit die: %d ", p_ptr->hitdie);
 	Term_putstr(RACE_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
 	sprintf(s, "Experience: %d%% ", p_info[race].r_exp);
 	Term_putstr(RACE_AUX_COL, TABLE_ROW + A_MAX + 1, -1, TERM_WHITE, s);
@@ -1196,7 +1223,33 @@ static void class_aux_hook(birth_menu c_str)
 		Term_putstr(CLASS_AUX_COL, TABLE_ROW + i, -1, TERM_WHITE, s);
 	}
 
-        sprintf(s, "Hit die: %d ", c_info[class_idx].c_mhp+p_info[p_ptr->prace].r_mhp);
+	/* Process stats */
+	for (i = 0; i < A_MAX; i++)
+	  {
+	    /* Obtain a "bonus" for "race" and "class" */
+	    int bonus_add = p_info[p_ptr->prace].r_adj[i] 
+	      + c_info[class_idx].c_adj[i];
+
+	    /* Get the minimally increased stat for the bonuses */
+	    int value_min = adjust_stat(10, bonus_add, 1);
+
+	    /* Get the maximally increased stat for the bonuses */
+	    int value_max = adjust_stat(10, bonus_add, 99);
+
+	    /* Get the stat increased by the average for the bonuses */
+	    int value = value_min + (value_max - value_min) / 2;
+
+	    /* Apply the racial/class bonuses */
+	    p_ptr->stat_cur[i] = p_ptr->stat_max[i] = value;
+	  }
+
+	/* Calculate the hitdie */
+	p_ptr->update |= (PU_BONUS | PU_HP);
+
+	/* Update stuff */
+	update_stuff();
+
+	sprintf(s, "Hit die: %d ", p_ptr->hitdie);
 	Term_putstr(CLASS_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
         sprintf(s, "Experience: %d%% ", c_info[class_idx].c_exp+p_info[p_ptr->prace].r_exp);
 	Term_putstr(CLASS_AUX_COL, TABLE_ROW + A_MAX + 1, -1, TERM_WHITE, s);
@@ -1282,7 +1335,7 @@ static void style_aux_hook(birth_menu w_str)
                 Term_putstr(STYLE_AUX_COL, TABLE_ROW + i, -1, TERM_WHITE, s);
 	}
 
-        sprintf(s, "Hit die: %d ", c_info[p_ptr->pclass].c_mhp+p_info[p_ptr->prace].r_mhp);
+	sprintf(s, "Hit die: %d ", p_ptr->hitdie);
         Term_putstr(STYLE_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
         sprintf(s, "Experience: %d%%",c_info[p_ptr->pclass].c_exp+p_info[p_ptr->prace].r_exp +
                                                 (style_idx ? 10 : 0) );
@@ -1677,14 +1730,14 @@ static bool player_birth_aux_2(void)
 		display_player(0);
 
 		/* Display the costs header */
-		put_str("Cost ", row - 1, col + 32);
+		put_str("Cost ", row - 1, col + 33);
 
 		/* Display the costs */
 		for (i = 0; i < A_MAX; i++)
 		{
 			/* Display cost */
 			sprintf(buf, "%4d", birth_stat_costs[stats[i] - 10]);
-			put_str(buf, row + i, col + 32);
+			put_str(buf, row + i, col + 33);
 		}
 
 

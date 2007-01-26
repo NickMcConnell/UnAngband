@@ -1146,8 +1146,10 @@ static errr rd_extra(void)
 	/* Player style */
 	rd_byte(&p_ptr->pstyle);
 
-	/* Special Race/Class info */
+	/* XXX Can be removed, most probably */
 	rd_byte(&p_ptr->hitdie);
+
+	/* Special Race/Class info */
 	rd_byte(&p_ptr->expfact);
 
 	/* Age/Height/Weight */

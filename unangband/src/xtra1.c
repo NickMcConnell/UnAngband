@@ -2634,13 +2634,18 @@ static void calc_hitpoints(void)
 {
 	int bonus, mhp;
 
-	/* Un-inflate "half-hitpoint bonus per level" value */
-	bonus = ((int)(adj_con_mhp[p_ptr->stat_ind[A_CON]]) - 128);
+	/* Un-inflate "extra hit die points above SIZ" value */
+	bonus = ((int)(adj_con_die[p_ptr->stat_ind[A_CON]]) - 128);
+
+	/* Un-inflate "extra hit die points on top of standard 1d10" value */
+	bonus += ((int)(adj_siz_die[p_ptr->stat_ind[A_SIZ]]) - 128);
+
+	/* Calculate hitdice */
+	p_ptr->hitdie = 10 + bonus;
 
 	/* Calculate hitpoints */
 	mhp = p_ptr->player_hp[p_ptr->lev-1] + (bonus * p_ptr->lev / 2);
 
-	/* Always have at least one hitpoint per level */
 	if (mhp < p_ptr->lev + 1) mhp = p_ptr->lev + 1;
 
 	/* New maximum hitpoints */

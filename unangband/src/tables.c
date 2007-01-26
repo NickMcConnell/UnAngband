@@ -1346,23 +1346,23 @@ const byte adj_con_fix[] =
 
 
 /*
- * Stat Table (CON) -- extra hit dice points above SIZ (plus 128)
+ * Stat Table (CON) -- extra hit die points above SIZ (plus 128)
  */
-const byte adj_con_mhp[] =
+const byte adj_con_die[] =
 {
 	128 + -3	/* 3 */,
 	128 + -2	/* 4 */,
 	128 + -2	/* 5 */,
 	128 + -1	/* 6 */,
 	128 + -1	/* 7 */,
-	128 + -1	/* 8 */,
-	128 + -1	/* 9 */,
+	128 + 0	/* 8 */,
+	128 + 0	/* 9 */,
 	128 + 0	/* 10 */,
 	128 + 0	/* 11 */,
-	128 + 0	/* 12 */,
+	128 + 1	/* 12 */,
 	128 + 1	/* 13 */,
 	128 + 1	/* 14 */,
-	128 + 1	/* 15 */,
+	128 + 2	/* 15 */,
 	128 + 2	/* 16 */,
 	128 + 2	/* 17 */,
 	128 + 3	/* 18/00-18/09 */,
@@ -1395,23 +1395,23 @@ const byte adj_con_mhp[] =
 
 
 /*
- * Stat Table (SIZ) -- extra hit dice points on top of standard 1d10 (plus 128)
+ * Stat Table (SIZ) -- extra hit die points on top of standard 1d10 (plus 128)
  */
-const byte adj_siz_dice[] =
+const byte adj_siz_die[] =
 {
 	128 + -3	/* 3 */,
 	128 + -2	/* 4 */,
 	128 + -2	/* 5 */,
 	128 + -1	/* 6 */,
 	128 + -1	/* 7 */,
-	128 + -1	/* 8 */,
-	128 + -1	/* 9 */,
+	128 + 0	/* 8 */,
+	128 + 0	/* 9 */,
 	128 + 0	/* 10 */,
 	128 + 0	/* 11 */,
-	128 + 0	/* 12 */,
+	128 + 1	/* 12 */,
 	128 + 1	/* 13 */,
 	128 + 1	/* 14 */,
-	128 + 1	/* 15 */,
+	128 + 2	/* 15 */,
 	128 + 2	/* 16 */,
 	128 + 2	/* 17 */,
 	128 + 3	/* 18/00-18/09 */,
