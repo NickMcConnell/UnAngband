@@ -2670,13 +2670,13 @@ static void calc_hitpoints(void)
 	/* Calculate the weight for males */
 	if (p_ptr->psex == SEX_MALE)
 	{
-		p_ptr->wt = randint(2) + rp_ptr->m_b_wt + rp_ptr->m_b_wt * p_ptr->stat_use[A_SIZ] / 200;
+		p_ptr->wt = rp_ptr->m_b_wt + rp_ptr->m_b_wt * p_ptr->stat_use[A_SIZ] / 200;
 	}
 
 	/* Calculate the weight for females */
 	else if (p_ptr->psex == SEX_FEMALE)
 	{
-		p_ptr->wt = randint(5) + rp_ptr->f_b_wt + rp_ptr->f_b_wt * p_ptr->stat_use[A_SIZ] / 200;;
+		p_ptr->wt = rp_ptr->f_b_wt + rp_ptr->f_b_wt * p_ptr->stat_use[A_SIZ] / 200;;
 	}
 }
 

@@ -1430,7 +1430,7 @@ static void display_player_xtra_info(void)
 	u32b style;
 	int base, plus;
 	int tmp;
-	int xthn, xthb, xtht, xsrh;
+	int xthn, xthb, xtht, xsrh, xdig;
 	int xdis, xdev, xsav, xstl;
 	byte likert_attr;
 
@@ -1481,23 +1481,58 @@ static void display_player_xtra_info(void)
 	Term_putstr(col, row + 1, -1, TERM_WHITE, "Height");
 	Term_putstr(col+8, row + 1, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->ht + p_ptr->stat_use[A_SIZ]/20));
 
-	/* Weight */
-	Term_putstr(col, row + 2, -1, TERM_WHITE, "Weight");
-	Term_putstr(col+8, row + 2, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->wt));
-
 	/* Status */
-	Term_putstr(col, row + 3, -1, TERM_WHITE, "Status");
-	Term_putstr(col+8, row + 3, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->sc));
-	/* Char level */
-	Term_putstr(col, row + 4, -1, TERM_WHITE, "Level");
-	Term_putstr(col+8, row + 4, -1, ((p_ptr->lev >= p_ptr->max_lev) ? TERM_L_BLUE : TERM_YELLOW),
-				format("%4d", p_ptr->lev));
+	Term_putstr(col, row + 2, -1, TERM_WHITE, "Status");
+	Term_putstr(col+8, row + 2, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->sc));
 
 	/* Left */
 	col = 1;
 
+	/* Char level */
+	Term_putstr(col, 10, -1, TERM_WHITE, "Level");
+	Term_putstr(col+10, 10, -1, 
+		    ((p_ptr->lev >= p_ptr->max_lev) ? TERM_L_GREEN : TERM_YELLOW),
+		    format("%8d", p_ptr->lev));
+
+	/* Current Experience */
+	Term_putstr(col, 11, -1, TERM_WHITE, "Curr Exp");
+	if (p_ptr->exp >= p_ptr->max_exp)
+	{
+		Term_putstr(col+9, 11, -1, TERM_L_GREEN,
+		            format("%9ld", p_ptr->exp));
+	}
+	else
+	{
+		Term_putstr(col+9, 11, -1, TERM_YELLOW,
+		            format("%9ld", p_ptr->exp));
+	}
+
+	/* Maximum Experience */
+	Term_putstr(col, 12, -1, TERM_WHITE, "Max Exp");
+	Term_putstr(col+9, 12, -1, TERM_L_GREEN,
+	            format("%9ld", p_ptr->max_exp));
+
+	/* Advance Experience */
+	Term_putstr(col, 13, -1, TERM_WHITE, "Adv Exp");
+	if (p_ptr->lev < PY_MAX_LEVEL)
+	{
+		s32b advance = (player_exp[p_ptr->lev - 1] *
+		                p_ptr->expfact / 100L);
+
+		/*some players want to see experience needed to gain next level*/
+		if (toggle_xp) advance -= p_ptr->exp;
+
+		Term_putstr(col+9, 13, -1, TERM_L_GREEN,
+		            format("%9ld", advance));
+	}
+	else
+	{
+		Term_putstr(col+9, 13, -1, TERM_L_GREEN,
+		            format("%9s", "********"));
+	}
+
 	/* Current dungeon level */
-	Term_putstr(col, 10, -1, TERM_WHITE, "Depth"); 	 
+	Term_putstr(col, 14, -1, TERM_WHITE, "Depth"); 	 
   	 
 	/* Has he actually left the town? */ 	 
 	if (p_ptr->max_depth) 	 
@@ -1509,10 +1544,10 @@ static void display_player_xtra_info(void)
 	/*hasn't left town*/ 	 
 	else strnfmt(buf, sizeof(buf), "    Town"); 	 
 	
-	Term_putstr(col+10, 10, -1, TERM_L_GREEN, buf);
+	Term_putstr(col+10, 14, -1, TERM_L_GREEN, buf);
 
 	/* Max dungeon level */ 	 
-	Term_putstr(col, 11, -1, TERM_WHITE, "MaxDepth"); 	 
+	Term_putstr(col, 15, -1, TERM_WHITE, "MaxDepth"); 	 
   	 
 	/* Has he actually left the town? */ 	 
 	if (p_ptr->max_depth) 	 
@@ -1524,59 +1559,22 @@ static void display_player_xtra_info(void)
 	/*hasn't left town*/ 	 
 	else strnfmt(buf, sizeof(buf), "    Town"); 	 
 	
-	Term_putstr(col+10, 11, -1, TERM_L_GREEN, buf);
+	Term_putstr(col+10, 15, -1, TERM_L_GREEN, buf);
 
 	/* Game Turn */
-	Term_putstr(col, 12, -1, TERM_WHITE, "Game Turn");
-	Term_putstr(col+9, 12, -1, TERM_L_GREEN,
+	Term_putstr(col, 16, -1, TERM_WHITE, "Game Turn");
+	Term_putstr(col+9, 16, -1, TERM_L_GREEN,
 		            format("%9ld", turn));
 
 	/* Player Game Turn */
-	Term_putstr(col, 13, -1, TERM_WHITE, "Plr Turn");
-	Term_putstr(col+9, 13, -1, TERM_L_GREEN,
+	Term_putstr(col, 17, -1, TERM_WHITE, "Plr Turn");
+	Term_putstr(col+9, 17, -1, TERM_L_GREEN,
 		            format("%9ld", p_ptr->player_turn));
 
 	/* Non-Resting Player Game Turn */
-	Term_putstr(col, 14, -1, TERM_WHITE, "Act Turn");
-	Term_putstr(col+9, 14, -1, TERM_L_GREEN,
+	Term_putstr(col, 18, -1, TERM_WHITE, "Act Turn");
+	Term_putstr(col+9, 18, -1, TERM_L_GREEN,
 		            format("%9ld", p_ptr->player_turn - p_ptr->resting_turn));
-
-	/* Current Experience */
-	Term_putstr(col, 15, -1, TERM_WHITE, "Curr Exp");
-	if (p_ptr->exp >= p_ptr->max_exp)
-	{
-		Term_putstr(col+9, 15, -1, TERM_L_GREEN,
-		            format("%9ld", p_ptr->exp));
-	}
-	else
-	{
-		Term_putstr(col+9, 15, -1, TERM_YELLOW,
-		            format("%9ld", p_ptr->exp));
-	}
-
-	/* Maximum Experience */
-	Term_putstr(col, 16, -1, TERM_WHITE, "Max Exp");
-	Term_putstr(col+9, 16, -1, TERM_L_GREEN,
-	            format("%9ld", p_ptr->max_exp));
-
-	/* Advance Experience */
-	Term_putstr(col, 17, -1, TERM_WHITE, "Adv Exp");
-	if (p_ptr->lev < PY_MAX_LEVEL)
-	{
-		s32b advance = (player_exp[p_ptr->lev - 1] *
-		                p_ptr->expfact / 100L);
-
-		/*some players want to see experience needed to gain next level*/
-		if (toggle_xp) advance -= p_ptr->exp;
-
-		Term_putstr(col+9, 17, -1, TERM_L_GREEN,
-		            format("%9ld", advance));
-	}
-	else
-	{
-		Term_putstr(col+9, 17, -1, TERM_L_GREEN,
-		            format("%9s", "********"));
-	}
 
 	/* Middle left */
 	col = 21;
@@ -1609,46 +1607,50 @@ static void display_player_xtra_info(void)
 		Term_putstr(col+12, 11, -1, TERM_L_BLUE, format("%5s", buf));
 	}
 
+	/* Hit die (changes with SIZ and CON) */
+	Term_putstr(col, 12, -1, TERM_WHITE, "Hit die");
+	Term_putstr(col+8, 12, -1, TERM_L_BLUE, format("%9d", p_ptr->hitdie));
+
 	/* Armor */
 	base = p_ptr->dis_ac;
 	plus = p_ptr->dis_to_a;
 
 	/* Total Armor */
 	strnfmt(buf, sizeof(buf), "[%d,%+d]", base, plus);
-	Term_putstr(col, 12, -1, TERM_WHITE, "Armor");
-	Term_putstr(col+8, 12, -1, TERM_L_BLUE, format("%9s", buf));
+	Term_putstr(col, 13, -1, TERM_WHITE, "Armor");
+	Term_putstr(col+8, 13, -1, TERM_L_BLUE, format("%9s", buf));
 
 	/* Infra */
 	strnfmt(buf, sizeof(buf), "%d ft", p_ptr->see_infra * 10);
-	Term_putstr(col, 13, -1, TERM_WHITE, "Infravis");
-	Term_putstr(col+8, 13, -1, TERM_L_BLUE, format("%9s", buf));
+	Term_putstr(col, 14, -1, TERM_WHITE, "Infravis");
+	Term_putstr(col+8, 14, -1, TERM_L_BLUE, format("%9s", buf));
 
 	/* Gold */
-	Term_putstr(col, 14, -1, TERM_WHITE, "Gold");
-	Term_putstr(col+4, 14, -1, TERM_L_BLUE,
+	Term_putstr(col, 15, -1, TERM_WHITE, "Gold");
+	Term_putstr(col+4, 15, -1, TERM_L_BLUE,
 	            format("%13ld", p_ptr->au));
 
 	/* Burden (in pounds) */
 	strnfmt(buf, sizeof(buf), "%ld.%ld lbs",
 	        p_ptr->total_weight / 10L,
 	        p_ptr->total_weight % 10L);
-	Term_putstr(col, 15, -1, TERM_WHITE, "Burden");
+	Term_putstr(col, 16, -1, TERM_WHITE, "Burden");
 
 	/* calculate burden as a % of character's max burden */
 	strnfmt(buf, sizeof(buf), format("%6ld lbs", p_ptr->total_weight / 10L, p_ptr->total_weight % 10L));
-	Term_putstr(col+7, 15, -1, TERM_L_BLUE, buf);
+	Term_putstr(col+7, 16, -1, TERM_L_BLUE, buf);
 
 	/* Now print burden as a percentage of carrying capacity */
 	tmpl = ((p_ptr->total_weight * 10L) / adj_str_wgt[p_ptr->stat_ind[A_STR]]) / 10L;
-	Term_putstr(col, 16, -1, TERM_WHITE, "% Burden");
+	Term_putstr(col, 17, -1, TERM_WHITE, "% Burden");
 
 	/* output, but leave a space for the % */
 	strnfmt(buf, sizeof(buf), format("%8ld", tmpl));
-	Term_putstr(col+8, 16, -1, (tmpl < 100L) ? TERM_L_BLUE : TERM_YELLOW, buf);
+	Term_putstr(col+8, 17, -1, (tmpl < 100L) ? TERM_L_BLUE : TERM_YELLOW, buf);
 
 	/* Hack - add the % at the end */
 	sprintf(buf, "%%");
-	Term_putstr(col+16, 16, -1, (tmpl < 100L) ? TERM_L_BLUE : TERM_YELLOW, buf);
+	Term_putstr(col+16, 17, -1, (tmpl < 100L) ? TERM_L_BLUE : TERM_YELLOW, buf);
 
 	/*get the player's speed*/
 	i = p_ptr->pspeed;
@@ -1680,8 +1682,8 @@ static void display_player_xtra_info(void)
 	}
 
 	/* Speed */
-	Term_putstr(col, 17, -1, TERM_WHITE, "Speed");
-	Term_putstr(col+8, 17, -1, TERM_L_BLUE, format("%9s", buf));
+	Term_putstr(col, 18, -1, TERM_WHITE, "Speed");
+	Term_putstr(col+8, 18, -1, TERM_L_BLUE, format("%9s", buf));
 
 	/* Middle */
 	col = 40;
@@ -1887,6 +1889,10 @@ static void display_player_xtra_info(void)
 	Term_putstr(col, 17, -1, TERM_WHITE, "Hurls");
 	Term_putstr(col+5, 17, -1, TERM_L_BLUE, format("%12s", buf));
 
+	/* Weight */
+	Term_putstr(col, 18, -1, TERM_WHITE, "Weight");
+	Term_putstr(col+6, 18, -1, TERM_L_BLUE, format("%7d lbs", (int)p_ptr->wt));
+
 	/* Right */
 	col = 59;
 
@@ -1896,6 +1902,7 @@ static void display_player_xtra_info(void)
 	xsav = p_ptr->skill_sav;
 	xstl = p_ptr->skill_stl;
 	xsrh = p_ptr->skill_srh;
+	xdig = p_ptr->skill_dig;
 
 	put_str("Fighting", 10, col);
 	desc = likert(xthn, 12, &likert_attr);
@@ -1929,12 +1936,16 @@ static void display_player_xtra_info(void)
 	desc = likert(xsrh, 6, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 17, col+11);
 
-	/* Indent output by 1 character, and wrap at column 72 */
-	text_out_wrap = 65;
+	put_str("Digging", 18, col);
+	desc = likert(xdig, 6, &likert_attr);
+	c_put_str(likert_attr, format("%9s", desc), 18, col+11);
+
+	/* Indent output by 1 character, and wrap at column 76 */
+	text_out_wrap = 76;
 	text_out_indent = 1;
 
 	/* History */
-	Term_gotoxy(text_out_indent, 19);
+	Term_gotoxy(text_out_indent, 20);
 	text_out_to_screen(TERM_WHITE, p_ptr->history);
 
 	/* Reset text_out() vars */
