@@ -244,8 +244,8 @@ static void get_stats(void)
  */
 static void get_extra(void)
 {
-	int i, j, min_value, max_value;
-
+	int i, j, min_value, max_value; 
+	int random_levels = PY_MAX_LEVEL - 2;
 
 	/* Level one */
 	p_ptr->max_lev = p_ptr->lev = 1;
@@ -254,12 +254,12 @@ static void get_extra(void)
 	p_ptr->expfact = rp_ptr->r_exp + cp_ptr->c_exp;
 
 	/* Minimum hitpoints at highest level - 1 */
-	min_value = (PY_MAX_LEVEL * 9 * 3) / 8;
-	min_value += PY_MAX_LEVEL;
+	min_value = random_levels * 9 * 3 / 8;
+	min_value += random_levels;
 
 	/* Maximum hitpoints at highest level - 1 */
-	max_value = (PY_MAX_LEVEL * 9 * 5) / 8;
-	max_value += PY_MAX_LEVEL;
+	max_value = random_levels * 9 * 5 / 8;
+	max_value += random_levels;
 
 	/* Set level 1 hitdice */
 	p_ptr->player_hp[0] = 10;
@@ -268,29 +268,35 @@ static void get_extra(void)
 	while (TRUE)
 	{
 		/* Roll the hitpoint values */
-		for (i = 1; i < PY_MAX_LEVEL -1 ; i++)
+		for (i = 1; i <= random_levels ; i++)
 		{
 			j = randint(10);
 			p_ptr->player_hp[i] = p_ptr->player_hp[i-1] + j;
 		}
 
 		/* Require "valid" hitpoints at various levels */
-		if (p_ptr->player_hp[(PY_MAX_LEVEL-2)/5] <= min_value/5) continue;
-		if (p_ptr->player_hp[(PY_MAX_LEVEL-2)/5] >= max_value/5) continue;
+		if (p_ptr->player_hp[random_levels/5] - 10 <= min_value/5) 
+		  continue;
+		if (p_ptr->player_hp[random_levels/5] - 10 >= max_value/5) 
+		  continue;
 
-		if (p_ptr->player_hp[(PY_MAX_LEVEL-2)/2] <= min_value/2) continue;
-		if (p_ptr->player_hp[(PY_MAX_LEVEL-2)/2] >= max_value/2) continue;
+		if (p_ptr->player_hp[random_levels/2] - 10 <= min_value/2) 
+		  continue;
+		if (p_ptr->player_hp[random_levels/2] - 10 >= max_value/2) 
+		  continue;
 
-		if (p_ptr->player_hp[PY_MAX_LEVEL-2] <= min_value) continue;
-		if (p_ptr->player_hp[PY_MAX_LEVEL-2] >= max_value) continue;
+		if (p_ptr->player_hp[random_levels] - 10 <= min_value) 
+		  continue;
+		if (p_ptr->player_hp[random_levels] - 10 >= max_value) 
+		  continue;
 
 		/* Acceptable */
 		break;
 	}
 
 	/* Set level 50 hitdice */
-	p_ptr->player_hp[PY_MAX_LEVEL-1] = 
-	  p_ptr->player_hp[PY_MAX_LEVEL-2] + 10;
+	p_ptr->player_hp[PY_MAX_LEVEL - 1] = 
+	  p_ptr->player_hp[random_levels] + 10;
 }
 
 

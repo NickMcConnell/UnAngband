@@ -2644,9 +2644,8 @@ static void calc_hitpoints(void)
 	p_ptr->hitdie = 10 + bonus;
 
 	/* Calculate hitpoints */
-	mhp = p_ptr->player_hp[p_ptr->lev-1] + (bonus * p_ptr->lev / 2);
-
-	if (mhp < p_ptr->lev + 1) mhp = p_ptr->lev + 1;
+	mhp = p_ptr->player_hp[p_ptr->lev - 1]
+	  + p_ptr->player_hp[p_ptr->lev - 1] * bonus / 10;
 
 	/* New maximum hitpoints */
 	if (p_ptr->mhp != mhp)
