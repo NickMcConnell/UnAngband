@@ -1060,7 +1060,6 @@ struct player_race
 	s16b r_thn;     /* combat (normal) */
 	s16b r_thb;     /* combat (shooting) */
 
-	byte r_mhp;     /* Race hit-dice modifier */
 	byte r_exp;     /* Race experience factor */
 
 	byte b_age;     /* base age */
@@ -1069,12 +1068,10 @@ struct player_race
 	byte m_b_ht;    /* base height (males) */
 	byte m_m_ht;    /* mod height (males) */
 	byte m_b_wt;    /* base weight (males) */
-	byte m_m_wt;    /* mod weight (males) */
 
 	byte f_b_ht;    /* base height (females) */
 	byte f_m_ht;    /* mod height (females)   */
 	byte f_b_wt;    /* base weight (females) */
-	byte f_m_wt;    /* mod weight (females) */
 
 	byte infra;     /* Infra-vision range */
 	byte home;	/* Home town */
@@ -1134,7 +1131,6 @@ struct player_class
 	s16b x_thn;     /* extra to hit (normal) */
 	s16b x_thb;     /* extra to hit (bows) */
 
-	s16b c_mhp;     /* Class hit-dice adjustment */
 	s16b c_exp;     /* Class experience factor */
 
 	u16b max_attacks;	/* Maximum possible attacks */

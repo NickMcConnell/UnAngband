@@ -4306,7 +4306,6 @@ errr parse_p_info(char *buf, header *head)
 			    &mhp, &exp, &infra)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		pr_ptr->r_mhp = mhp;
 		pr_ptr->r_exp = exp;
 		pr_ptr->infra = infra;
 	}
@@ -4350,19 +4349,17 @@ errr parse_p_info(char *buf, header *head)
 	/* Hack -- Process 'W' for "Weight" */
 	else if (buf[0] == 'W')
 	{
-		int m_b_wt, m_m_wt, f_b_wt, f_m_wt;
+		int m_b_wt, f_b_wt;
 
 		/* There better be a current pr_ptr */
 		if (!pr_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
-			    &m_b_wt, &m_m_wt, &f_b_wt, &f_m_wt)) return (PARSE_ERROR_GENERIC);
+		if (2 != sscanf(buf+2, "%d:%d",
+			    &m_b_wt, &f_b_wt)) return (PARSE_ERROR_GENERIC);
 
 		pr_ptr->m_b_wt = m_b_wt;
-		pr_ptr->m_m_wt = m_m_wt;
 		pr_ptr->f_b_wt = f_b_wt;
-		pr_ptr->f_m_wt = f_m_wt;
 	}
 
 	/* Hack -- Process 'F' for flags */
@@ -4610,7 +4607,6 @@ errr parse_c_info(char *buf, header *head)
 			return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		pc_ptr->c_mhp = mhp;
 		pc_ptr->c_exp = exp;
 		pc_ptr->sense_base = sense_base;
 		pc_ptr->sense_div = sense_div;
