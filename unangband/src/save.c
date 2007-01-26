@@ -591,6 +591,8 @@ static void wr_extra(void)
 
 	wr_s16b(p_ptr->age);
 	wr_s16b(p_ptr->ht);
+
+	/* Unneeded */
 	wr_s16b(p_ptr->wt);
 
 	/* Dump the stats (maximum and current) */

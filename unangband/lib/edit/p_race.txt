@@ -14,10 +14,10 @@
 # N:race number:race name
 # S:str:int:wis:dex:con:chr:agi:siz
 # R:dis:dev:sav:stl:srh:tht:thn:thb
-# X:hitdie:expbase:infra
+# X:unused:expbase:infra
 # I:history:agebase:agemod:hometown
 # H:hgtmale:modhgtmale:hgtfemale:modhgtfemale
-# W:wgtmale:modwgtmale:wgtfemale:modwgtfemale
+# W:wgtmale:unused:wgtfemale:unused
 # F:racial flags
 # C:classes (numeric)
 # O:wield:bow:left_ring:right_ring:neck:lite:body:outer:arm:head:hands:feet

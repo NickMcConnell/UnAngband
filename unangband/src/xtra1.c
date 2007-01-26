@@ -2666,6 +2666,18 @@ static void calc_hitpoints(void)
 		/* Window stuff */
 		p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
 	}
+
+	/* Calculate the weight for males */
+	if (p_ptr->psex == SEX_MALE)
+	{
+		p_ptr->wt = randint(2) + rp_ptr->m_b_wt + rp_ptr->m_b_wt * p_ptr->stat_use[A_SIZ] / 200;
+	}
+
+	/* Calculate the weight for females */
+	else if (p_ptr->psex == SEX_FEMALE)
+	{
+		p_ptr->wt = randint(5) + rp_ptr->f_b_wt + rp_ptr->f_b_wt * p_ptr->stat_use[A_SIZ] / 200;;
+	}
 }
 
 
@@ -3904,13 +3916,13 @@ static void calc_bonuses(void)
 		/* Notice changes */
 		if (p_ptr->stat_ind[i] != old_stat_ind[i])
 		{
-			/* Change in CON affects Hitpoints */
-			if (i == A_CON)
+			/* Change in CON or SIZ affects hitpoints */
+			if (i == A_CON || i == A_SIZ)
 			{
 				p_ptr->update |= (PU_HP);
 			}
 
-			/* Change in spell stat may affect Mana */
+			/* Change in spell stat may affect mana */
 			if ((i == c_info[p_ptr->pclass].spell_stat_mana) &&
 				((c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL) || (p_ptr->pstyle == WS_MAGIC_BOOK)
 				|| (p_ptr->pstyle == WS_PRAYER_BOOK) || (p_ptr->pstyle == WS_SONG_BOOK)))
@@ -3918,7 +3930,7 @@ static void calc_bonuses(void)
 				p_ptr->update |= (PU_MANA);
 			}
 
-			/* Change in spell stat may affect Mana */
+			/* Change in spell stat may affect spells */
 			if ((i == c_info[p_ptr->pclass].spell_stat_study) &&
 				((c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL) || (p_ptr->pstyle == WS_MAGIC_BOOK)
 				|| (p_ptr->pstyle == WS_PRAYER_BOOK) || (p_ptr->pstyle == WS_SONG_BOOK)))

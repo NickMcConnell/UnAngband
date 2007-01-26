@@ -1475,11 +1475,11 @@ static void display_player_xtra_info(void)
 
 	/* Age */
 	Term_putstr(col, row, -1, TERM_WHITE, "Age");
-	Term_putstr(col+8, row, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->age));
+	Term_putstr(col+8, row, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->age + p_ptr->max_lev / 10));
 
 	/* Height */
 	Term_putstr(col, row + 1, -1, TERM_WHITE, "Height");
-	Term_putstr(col+8, row + 1, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->ht));
+	Term_putstr(col+8, row + 1, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->ht + p_ptr->stat_use[A_SIZ]/20));
 
 	/* Weight */
 	Term_putstr(col, row + 2, -1, TERM_WHITE, "Weight");

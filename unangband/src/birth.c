@@ -353,25 +353,23 @@ static void get_history(void)
 
 
 /*
- * Computes character's age, height, and weight
+ * Computes character's age and height
  */
 static void get_ahw(void)
 {
 	/* Calculate the age */
 	p_ptr->age = rp_ptr->b_age + randint(rp_ptr->m_age);
 
-	/* Calculate the height/weight for males */
+	/* Calculate the height for males */
 	if (p_ptr->psex == SEX_MALE)
 	{
 		p_ptr->ht = Rand_normal(rp_ptr->m_b_ht, rp_ptr->m_m_ht);
-		p_ptr->wt = Rand_normal(rp_ptr->m_b_wt, rp_ptr->m_m_wt);
 	}
 
-	/* Calculate the height/weight for females */
+	/* Calculate the height/ for females */
 	else if (p_ptr->psex == SEX_FEMALE)
 	{
 		p_ptr->ht = Rand_normal(rp_ptr->f_b_ht, rp_ptr->f_m_ht);
-		p_ptr->wt = Rand_normal(rp_ptr->f_b_wt, rp_ptr->f_m_wt);
 	}
 }
 

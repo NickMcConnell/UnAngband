@@ -1155,6 +1155,8 @@ static errr rd_extra(void)
 	/* Age/Height/Weight */
 	rd_s16b(&p_ptr->age);
 	rd_s16b(&p_ptr->ht);
+
+	/* Unneeded */
 	rd_s16b(&p_ptr->wt);
 
 	/* Read the stat info */
