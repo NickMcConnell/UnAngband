@@ -31,8 +31,6 @@ TODO: SHIELD blocks magic missiles completely.
 
 TODO: Free action, see invis, res blind etc. appear deeper in the dungeon then at present. 
 
-TODO: Make stat gain potions shallower than present.
-
 TODO: Improve self-knowledge so that it tells you what the impact of an effect is: You are blind,
 which prevents you reading scrolls or casting spells from books or rune-stones. 
 
@@ -221,7 +219,7 @@ TODO: Revised wilderness generation.
 
 TODO: Have uniques corresponding to the players family.
 
-TODO: Have a primative economy.
+TODO: Have a primitive economy.
 
 
 
@@ -923,8 +921,6 @@ TODO: Drop chunks of metals and large jewels for manufacturing purposes.
 
 TODO: Stores should preferentially stock items that the player actually buys.
 
-TODO: Players pick their own stats when they advance a level.
-
 TODO: Mystics carry essences.
 
 TODO: Have an option birth_evil that automatically flags the player as evil. This means
@@ -989,7 +985,7 @@ control by the player, and not correspond to the player speed.
 TODO: Allow small monsters to stack on each other.
 
 
-TODO: Have a primative economy.
+TODO: Have a primitive economy.
 
 Store purse size increases by the profit they make from sales, and reduces by the cost they make
 from purchases. Cycling stock out earns the store 50% of the stock value; new stock in costs the
