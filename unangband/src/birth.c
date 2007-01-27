@@ -579,7 +579,7 @@ static void player_outfit(void)
 					{
 					        case WS_RING:
 						  {
-						    k_idx = lookup_kind(TV_RING, rand_int(SV_RING_TELEPORTATION + 1));
+						    k_idx = lookup_kind(TV_RING, rand_int(1) ? SV_RING_AGGRAVATION : rand_int(5) ? SV_RING_TELEPORTATION : SV_RING_WOE);
 						    break;
 						  }
 						case WS_TWO_WEAPON:
