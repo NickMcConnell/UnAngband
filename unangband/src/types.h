@@ -1056,6 +1056,7 @@ struct player_race
 	s16b r_sav;     /* saving throw */
 	s16b r_stl;     /* stealth */
 	s16b r_srh;     /* search ability */
+	s16b r_dig;     /* digging ability */
 	s16b r_tht;     /* combat (throwing) */
 	s16b r_thn;     /* combat (normal) */
 	s16b r_thb;     /* combat (shooting) */
@@ -1118,6 +1119,7 @@ struct player_class
 	s16b c_sav;     /* class saving throws */
 	s16b c_stl;     /* class stealth */
 	s16b c_srh;     /* class searching ability */
+	s16b c_dig;     /* class digging ability */
 	s16b c_tht;     /* class to hit (throwing) */
 	s16b c_thn;     /* class to hit (normal) */
 	s16b c_thb;     /* class to hit (bows) */
@@ -1127,6 +1129,7 @@ struct player_class
 	s16b x_sav;     /* extra saving throws */
 	s16b x_stl;     /* extra stealth */
 	s16b x_srh;     /* extra searching ability */
+	s16b x_dig;     /* extra digging ability */
 	s16b x_tht;     /* extra to hit (throwing) */
 	s16b x_thn;     /* extra to hit (normal) */
 	s16b x_thb;     /* extra to hit (bows) */
@@ -1550,11 +1553,11 @@ struct player_type
 	s16b skill_dev; /* Skill: Magic Devices */
 	s16b skill_sav; /* Skill: Saving throw */
 	s16b skill_stl; /* Skill: Stealth factor */
+	s16b skill_dig; /* Skill: Digging */
 	s16b skill_srh; /* Skill: Searching ability */
 	s16b skill_thn; /* Skill: To hit (normal) */
 	s16b skill_thb; /* Skill: To hit (shooting) */
 	s16b skill_tht; /* Skill: To hit (throwing) */
-	s16b skill_dig; /* Skill: Digging */
 
 	s16b regen_hp;	/* Hitpoint regeneration rate */
 	s16b regen_mana;/* Mana regeneration rate */

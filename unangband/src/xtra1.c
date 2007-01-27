@@ -2954,6 +2954,9 @@ static void calc_bonuses(void)
 	/* Base skill -- searching ability */
 	p_ptr->skill_srh = rp_ptr->r_srh + cp_ptr->c_srh;
 
+	/* Base skill -- digging */
+	p_ptr->skill_dig = rp_ptr->r_dig + cp_ptr->c_dig;;
+
 	/* Base skill -- combat (normal) */
 	p_ptr->skill_thn = rp_ptr->r_thn + cp_ptr->c_thn;
 
@@ -2962,9 +2965,6 @@ static void calc_bonuses(void)
 
 	/* Base skill -- combat (throwing) */
 	p_ptr->skill_tht = rp_ptr->r_tht + cp_ptr->c_tht;
-
-	/* Base skill -- digging */
-	p_ptr->skill_dig = 0;
 
 	/* Base regeneration */
 	p_ptr->regen_hp = 0;
@@ -2997,6 +2997,9 @@ static void calc_bonuses(void)
 
 		/* Base skill -- searching ability */
 		p_ptr->skill_srh += shape_ptr->r_srh;
+
+		/* Base skill -- digging ability */
+		p_ptr->skill_dig += shape_ptr->r_dig;
 
 		/* Base skill -- combat (normal) */
 		p_ptr->skill_thn += shape_ptr->r_thn;
@@ -3470,6 +3473,9 @@ static void calc_bonuses(void)
 
 	/* Affect Skill -- search ability (Level, by Class) */
 	p_ptr->skill_srh += (cp_ptr->x_srh * p_ptr->lev / 10);
+
+	/* Affect Skill -- digging ability (Level, by Class) */
+	p_ptr->skill_dig += (cp_ptr->x_dig * p_ptr->lev / 10);
 
 	/* Affect Skill -- combat (normal) (Level, by Class) */
 	p_ptr->skill_thn += (cp_ptr->x_thn * p_ptr->lev / 10);
