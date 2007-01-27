@@ -231,10 +231,10 @@ W:180:150
 F:MAN | RES_FEAR
 C:0|1|2|3|4|5|6|7|8|9
 
-#Sum = -2; much higher without CHR; huge weight
+#Sum = -2; much higher without CHR; huge weight; throwing
 N:15:Forge Giant
 S:8:-3:-8:-4:3:-6:-5:13
-R:-10:17:-12:-10:0:5:40:20:-70
+R:-10:13:-12:-10:0:5:40:20:-70
 X:120:3
 I:42:20:10:15
 H:144:20:126:12
@@ -242,10 +242,10 @@ W:500:450
 F:GIANT | RES_ELEC
 C:0|2|7
 
-#Sum = -2; much higher without CHR; huge weight
+#Sum = -2; much higher without CHR; huge weight; devices
 N:16:Fire Giant
 S:8:-3:-8:-4:3:-6:-5:13
-R:-10:17:-12:-10:0:5:40:20:-70
+R:-10:18:-12:-10:0:5:30:20:-70
 X:120:3
 I:42:20:10:15
 H:144:20:126:12
@@ -253,10 +253,10 @@ W:500:450
 F:GIANT | RES_FIRE
 C:0|2|7
 
-#Sum = -2; much higher without CHR; huge weight
+#Sum = -1; much higher without CHR; huge weight; cold thinking
 N:17:Frost Giant
-S:8:-3:-8:-4:3:-6:-5:13
-R:-10:17:-12:-10:0:5:40:20:-70
+S:8:-1:-6:-4:3:-6:-8:13
+R:-10:13:-12:-10:0:5:30:20:-70
 X:120:3
 I:42:20:10:15
 H:144:20:126:12
