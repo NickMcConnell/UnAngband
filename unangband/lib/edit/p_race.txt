@@ -92,9 +92,9 @@ W:60:50
 F:HOLD_LIFE
 C:0|3|4|6|7
 
-#Sum = -1; very low HP
+#Sum = -3; very low HP; high stealth and cool flag
 N:3:Shadow Fairy
-S:-6:6:4:2:-5:0:3:-5
+S:-6:6:4:2:-6:0:3:-6
 R:7:20:0:6:5:-3:20:-30:-10
 X:140:6
 I:29:200:100:62
