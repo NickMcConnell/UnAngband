@@ -830,13 +830,13 @@ static void player_outfit(void)
 
 #define QUESTION_COL	3	
 #define SEX_COL			0
-#define RACE_COL		12
-#define RACE_AUX_COL    27
-#define CLASS_COL		27
-#define CLASS_AUX_COL   40
-#define STYLE_COL               40
-#define STYLE_AUX_COL   58
-#define BOOK_COL                58
+#define RACE_COL		10
+#define RACE_AUX_COL    26
+#define CLASS_COL		26
+#define CLASS_AUX_COL   42
+#define STYLE_COL               42
+#define STYLE_AUX_COL   61
+#define BOOK_COL                61
 
 #define INVALID_CHOICE 255
 
@@ -1115,7 +1115,7 @@ static void race_aux_hook(birth_menu r_str)
 	/* Display relevant details. */
 	for (i = 0; i < A_MAX; i++)
 	{
-		sprintf(s, "%s%+d", stat_names_reduced[i],
+		sprintf(s, "%s%+d ", stat_names_reduced[i],
 		p_info[race].r_adj[i]);
 		Term_putstr(RACE_AUX_COL, TABLE_ROW + i, -1, TERM_WHITE, s);
 	}
@@ -1147,9 +1147,9 @@ static void race_aux_hook(birth_menu r_str)
 
 	sprintf(s, "Hit die: %d ", p_ptr->hitdie);
 	Term_putstr(RACE_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
-	sprintf(s, "Experience: %d%% ", p_info[race].r_exp);
+	sprintf(s, "Experience: %d%%  ", p_info[race].r_exp);
 	Term_putstr(RACE_AUX_COL, TABLE_ROW + A_MAX + 1, -1, TERM_WHITE, s);
-	sprintf(s, "Infravision: %d ft ", p_info[race].infra * 10);
+	sprintf(s, "Infravision: %d ft  ", p_info[race].infra * 10);
 	Term_putstr(RACE_AUX_COL, TABLE_ROW + A_MAX + 2, -1, TERM_WHITE, s);
 }
 
@@ -1174,7 +1174,7 @@ static bool get_player_race()
 		races[i].ghost = ((p_info[i].flags3 & (TR3_RANDOM)) != 0);
 	}
 
-	p_ptr->prace = get_player_choice(races, z_info->g_max, RACE_COL, 15,
+	p_ptr->prace = get_player_choice(races, z_info->g_max, RACE_COL, 17,
                 "races.txt", race_aux_hook);
 
 	/* No selection? */
@@ -1222,7 +1222,7 @@ static void class_aux_hook(birth_menu c_str)
 	/* Display relevant details. */
 	for (i = 0; i < A_MAX; i++)
 	{
-		sprintf(s, "%s%+d", stat_names_reduced[i],
+		sprintf(s, "%s%+d ", stat_names_reduced[i],
                 c_info[class_idx].c_adj[i] + p_info[p_ptr->prace].r_adj[i]);
 		Term_putstr(CLASS_AUX_COL, TABLE_ROW + i, -1, TERM_WHITE, s);
 	}
@@ -1255,7 +1255,7 @@ static void class_aux_hook(birth_menu c_str)
 
 	sprintf(s, "Hit die: %d ", p_ptr->hitdie);
 	Term_putstr(CLASS_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
-        sprintf(s, "Experience: %d%% ", c_info[class_idx].c_exp+p_info[p_ptr->prace].r_exp);
+        sprintf(s, "Experience: %d%%  ", c_info[class_idx].c_exp+p_info[p_ptr->prace].r_exp);
 	Term_putstr(CLASS_AUX_COL, TABLE_ROW + A_MAX + 1, -1, TERM_WHITE, s);
 }
 
@@ -1293,7 +1293,7 @@ static bool get_player_class(void)
 		classes[i].name = c_name + c_info[i].name;
 	}
 
-	p_ptr->pclass = get_player_choice(classes, z_info->c_max, CLASS_COL, 20,
+	p_ptr->pclass = get_player_choice(classes, z_info->c_max, CLASS_COL, 16,
                                       "classes.txt", class_aux_hook);
 
 	/* No selection? */
@@ -1334,14 +1334,14 @@ static void style_aux_hook(birth_menu w_str)
 	/* Display relevant details. */
 	for (i = 0; i < A_MAX; i++)
 	{
-		sprintf(s, "%s%+d", stat_names_reduced[i],
+		sprintf(s, "%s%+d ", stat_names_reduced[i],
                 c_info[p_ptr->pclass].c_adj[i] + p_info[p_ptr->prace].r_adj[i]);
                 Term_putstr(STYLE_AUX_COL, TABLE_ROW + i, -1, TERM_WHITE, s);
 	}
 
 	sprintf(s, "Hit die: %d ", p_ptr->hitdie);
         Term_putstr(STYLE_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
-        sprintf(s, "Experience: %d%%",c_info[p_ptr->pclass].c_exp+p_info[p_ptr->prace].r_exp +
+        sprintf(s, "Experience: %d%%  ",c_info[p_ptr->pclass].c_exp+p_info[p_ptr->prace].r_exp +
                                                 (style_idx ? 10 : 0) );
         Term_putstr(STYLE_AUX_COL, TABLE_ROW + A_MAX + 1, -1, TERM_WHITE, s);
 }
@@ -1400,7 +1400,7 @@ static bool get_player_style(void)
 	/* Hack */
 	styles[0].ghost = TRUE;
 
-	choice = get_player_choice(styles, num, STYLE_COL, 20,
+	choice = get_player_choice(styles, num, STYLE_COL, 19,
 							   "styles.txt", style_aux_hook);
 
 	/* No selection? */
@@ -1497,7 +1497,7 @@ static bool get_player_book(void)
                 books[i].ghost = FALSE;
 	}
 
-        choice = get_player_choice(books, num, BOOK_COL, 20,
+        choice = get_player_choice(books, num, BOOK_COL, 19,
                                      "styles.txt", NULL);
 
 	/* No selection? */
@@ -1540,7 +1540,7 @@ static bool get_player_sex(void)
 		genders[i].ghost = FALSE;
 	}
 
-        p_ptr->psex = get_player_choice(genders, 2, SEX_COL, 15,
+        p_ptr->psex = get_player_choice(genders, 2, SEX_COL, 10,
                                  "birth.txt",   NULL);
 
 	/* No selection? */

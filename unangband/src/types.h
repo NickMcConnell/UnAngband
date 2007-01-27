@@ -1062,16 +1062,16 @@ struct player_race
 
 	byte r_exp;     /* Race experience factor */
 
-	byte b_age;     /* base age */
-	byte m_age;     /* mod age */
+	u16b b_age;     /* base age */
+	u16b m_age;     /* mod age */
 
-	byte m_b_ht;    /* base height (males) */
-	byte m_m_ht;    /* mod height (males) */
-	byte m_b_wt;    /* base weight (males) */
+	u16b m_b_ht;    /* base height (males) */
+	u16b m_m_ht;    /* mod height (males) */
+	u16b m_b_wt;    /* base weight (males) */
 
-	byte f_b_ht;    /* base height (females) */
-	byte f_m_ht;    /* mod height (females)   */
-	byte f_b_wt;    /* base weight (females) */
+	u16b f_b_ht;    /* base height (females) */
+	u16b f_m_ht;    /* mod height (females)   */
+	u16b f_b_wt;    /* base weight (females) */
 
 	byte infra;     /* Infra-vision range */
 	byte home;	/* Home town */

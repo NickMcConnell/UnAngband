@@ -3719,8 +3719,8 @@ static void calc_bonuses(void)
 
 	/* Charging multiplier */
 	if (p_ptr->cur_style & (1L << WS_UNARMED) 
-	    && p_ptr->wt >= 2 * cp_ptr->chg_weight) 
-	  p_ptr->num_charge = p_ptr->wt / cp_ptr->chg_weight;
+	    && p_ptr->wt >= 4 * cp_ptr->chg_weight) 
+	  p_ptr->num_charge = p_ptr->wt / (2 * cp_ptr->chg_weight);
 	else if (o_ptr->weight >= 2 * cp_ptr->chg_weight) 
 	  p_ptr->num_charge = o_ptr->weight / cp_ptr->chg_weight;
 	else
