@@ -4296,14 +4296,14 @@ errr parse_p_info(char *buf, header *head)
 	/* Process 'X' for "Extra Info" (one line only) */
 	else if (buf[0] == 'X')
 	{
-		int mhp, exp, infra;
+		int exp, infra;
 
 		/* There better be a current pr_ptr */
 		if (!pr_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (3 != sscanf(buf+2, "%d:%d:%d",
-			    &mhp, &exp, &infra)) return (PARSE_ERROR_GENERIC);
+		if (2 != sscanf(buf+2, "%d:%d",
+			    &exp, &infra)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		pr_ptr->r_exp = exp;
@@ -4595,15 +4595,15 @@ errr parse_c_info(char *buf, header *head)
 	/* Process 'I' for "Info" (one line only) */
 	else if (buf[0] == 'I')
 	{
-		int mhp, exp, sense_div, sense_type, sense_squared;
+		int exp, sense_div, sense_type, sense_squared;
 		long sense_base;
 
 		/* There better be a current pc_ptr */
 		if (!pc_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (6 != sscanf(buf+2, "%d:%d:%ld:%d:%d:%d",
-			    &mhp, &exp, &sense_base, &sense_div, &sense_type, &sense_squared))
+		if (5 != sscanf(buf+2, "%d:%ld:%d:%d:%d",
+			    &exp, &sense_base, &sense_div, &sense_type, &sense_squared))
 			return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
