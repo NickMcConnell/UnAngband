@@ -142,10 +142,10 @@ I:80:10:0
 W:15:500:1:50
 A:15/1
 
-N:11:Restore Constitution
+N:11:Restore Constitution and Charisma
 G:,:w
 I:80:18:0
-W:20:500:1:350
+W:10:500:1:150
 A:20/1
 
 N:12:Restoring
@@ -187,7 +187,7 @@ A:20/1
 N:18:Restore Strength and Size
 G:,:w
 I:80:17:0
-W:20:500:1:350
+W:10:500:1:150
 A:20/1
 
 N:19:Disease
@@ -1268,28 +1268,29 @@ A:10/1
 F:SUST_STR
 Y:25:1
 
-N:157:Sustain Intelligence
+N:157:Sustain Intelligence and Wisdom
 G:=:w
 I:45:11:0
 W:10:0:2:250
 A:10/1
-F:SUST_INT
+F:SUST_INT | SUST_WIS
 Y:17:1
 
-N:158:Sustain Wisdom
-G:=:w
-I:45:12:0
-W:10:0:2:250
-A:10/1
-F:SUST_WIS
-Y:5:1
+#Unused
+#N:158:Sustain Wisdom
+#G:=:w
+#I:45:12:0
+#W:10:0:2:250
+#A:10/1
+#F:SUST_WIS
+#Y:5:1
 
-N:159:Sustain Constitution
+N:159:Sustain Constitution and Charisma
 G:=:w
 I:45:13:0
 W:10:0:2:250
 A:10/1
-F:SUST_CON
+F:SUST_CON | SUST_CHR
 Y:24:1
 
 N:160:Sustain Dexterity and Agility
@@ -1300,13 +1301,14 @@ A:10/1
 F:SUST_DEX
 Y:26:1
 
-N:161:Sustain Charisma
-G:=:w
-I:45:15:0
-W:10:0:2:250
-A:10/1
-F:SUST_CHR
-Y:19:1
+#Unused
+#N:161:Sustain Charisma
+#G:=:w
+#I:45:15:0
+#W:10:0:2:250
+#A:10/1
+#F:SUST_CHR
+#Y:19:1
 
 N:162:Slaying
 G:=:w
@@ -1762,8 +1764,8 @@ F:THROWING
 N:225:Strength and Size
 G:!:w
 I:75:48:0
-W:35:0:4:400
-A:35/1
+W:20:0:4:400
+A:20/1:50/1
 P:0:1d1:0:0:0
 F:THROWING
 
@@ -1778,16 +1780,16 @@ F:THROWING
 N:227:Restore Strength and Size
 G:!:d
 I:75:42:0
-W:25:0:4:300
-A:25/1
+W:15:0:4:200
+A:15/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:228:Intelligence
+N:228:Intelligence and Wisdom
 G:!:w
 I:75:49:0
-W:35:0:4:400
-A:35/1
+W:25:0:4:400
+A:25/1:55/1
 P:0:1d1:0:0:0
 Y:17:2
 F:THROWING
@@ -1800,22 +1802,23 @@ A:20/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:230:Restore Intelligence
+N:230:Restore Intelligence and Wisdom
 G:!:d
 I:75:43:0
-W:25:0:4:300
-A:25/1
+W:15:0:4:200
+A:15/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:231:Wisdom
-G:!:w
-I:75:50:0
-W:35:0:4:400
-A:35/1
-P:0:1d1:0:0:0
-Y:5:2
-F:THROWING
+#Unused
+#N:231:Wisdom
+#G:!:w
+#I:75:50:0
+#W:35:0:4:400
+#A:35/1
+#P:0:1d1:0:0:0
+#Y:5:2
+#F:THROWING
 
 N:232:Naivety
 G:!:w
@@ -1825,22 +1828,24 @@ A:20/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:233:Restore Wisdom
-G:!:d
-I:75:44:0
-W:25:0:4:300
-A:25/1
-P:0:1d1:0:0:0
-F:THROWING
+#Unused
+#N:233:Restore Wisdom
+#G:!:d
+#I:75:44:0
+#W:25:0:4:300
+#A:25/1
+#P:0:1d1:0:0:0
+#F:THROWING
 
-N:234:Charisma
-G:!:w
-I:75:53:0
-W:30:0:4:350
-A:30/1
-P:0:1d1:0:0:0
-Y:19:2
-F:THROWING
+#Unused
+#N:234:Charisma
+#G:!:w
+#I:75:53:0
+#W:30:0:4:350
+#A:30/1
+#P:0:1d1:0:0:0
+#Y:19:2
+#F:THROWING
 
 N:235:Ugliness
 G:!:w
@@ -1850,13 +1855,14 @@ A:20/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:236:Restore Charisma
-G:!:d
-I:75:47:0
-W:20:0:4:300
-A:20/1
-P:0:1d1:0:0:0
-F:THROWING
+#Unused
+#N:236:Restore Charisma
+#G:!:d
+#I:75:47:0
+#W:20:0:4:300
+#A:20/1
+#P:0:1d1:0:0:0
+#F:THROWING
 
 N:237:Cure Light Wounds
 G:!:w
@@ -1912,11 +1918,11 @@ P:0:1d1:0:0:0
 Y:3:3
 F:THROWING
 
-N:243:Constitution
+N:243:Constitution and Charisma
 G:!:w
 I:75:52:0
-W:35:0:4:400
-A:35/1
+W:20:0:4:400
+A:20/1:50/1
 P:0:1d1:0:0:0
 Y:24:2
 F:THROWING
@@ -1984,8 +1990,8 @@ F:THROWING
 N:251:Dexterity and Agility
 G:!:w
 I:75:51:0
-W:35:0:4:400
-A:35/1
+W:20:0:4:400
+A:20/1:50/1
 P:0:1d1:0:0:0
 Y:26:2
 F:THROWING
@@ -1993,16 +1999,16 @@ F:THROWING
 N:252:Restore Dexterity and Agility
 G:!:d
 I:75:45:0
-W:25:0:4:300
-A:25/1
+W:15:0:4:200
+A:15/1
 P:0:1d1:0:0:0
 F:THROWING
 
-N:253:Restore Constitution
+N:253:Restore Constitution and Charisma
 G:!:d
 I:75:46:0
-W:25:0:4:300
-A:25/1
+W:15:0:4:200
+A:15/1
 P:0:1d1:0:0:0
 F:THROWING
 
@@ -5684,20 +5690,22 @@ G:?:v
 I:99:23:0
 W:20:0:0:250
 
-N:773:Restore Intelligence
+N:773:Restore Intelligence and Wisdom
 G:?:v
 I:99:24:0
 W:20:0:0:250
 
-N:774:Restore Wisdom
-G:?:v
-I:99:25:0
-W:20:0:0:250
+#Unused
+#N:774:Restore Wisdom
+#G:?:v
+#I:99:25:0
+#W:20:0:0:250
 
-N:775:Restore Charisma
-G:?:v
-I:99:26:0
-W:20:0:0:250
+#Unused
+#N:775:Restore Charisma
+#G:?:v
+#I:99:26:0
+#W:20:0:0:250
 
 N:776:Read Magic
 G:?:v
@@ -6457,7 +6465,7 @@ G:?:v
 I:99:46:0
 W:20:0:0:250
 
-N:885:Restore Constitution
+N:885:Restore Constitution and Charisma
 G:?:v
 I:99:47:0
 W:20:0:0:250
