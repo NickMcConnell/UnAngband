@@ -2670,13 +2670,13 @@ static void calc_hitpoints(void)
 	/* Calculate the weight for males */
 	if (p_ptr->psex == SEX_MALE)
 	{
-		p_ptr->wt = rp_ptr->m_b_wt + rp_ptr->m_b_wt * p_ptr->stat_use[A_SIZ] / 200;
+		p_ptr->wt = 2 * rp_ptr->m_b_wt / 3 + rp_ptr->m_b_wt * p_ptr->stat_use[A_SIZ] / 268;
 	}
 
 	/* Calculate the weight for females */
 	else if (p_ptr->psex == SEX_FEMALE)
 	{
-		p_ptr->wt = rp_ptr->f_b_wt + rp_ptr->f_b_wt * p_ptr->stat_use[A_SIZ] / 200;;
+		p_ptr->wt = 2 * rp_ptr->f_b_wt / 3 + rp_ptr->f_b_wt * p_ptr->stat_use[A_SIZ] / 268;;
 	}
 }
 
@@ -3719,8 +3719,8 @@ static void calc_bonuses(void)
 
 	/* Charging multiplier */
 	if (p_ptr->cur_style & (1L << WS_UNARMED) 
-	    && p_ptr->wt >= 4 * cp_ptr->chg_weight) 
-	  p_ptr->num_charge = p_ptr->wt / (2 * cp_ptr->chg_weight);
+	    && p_ptr->wt >= 2 * cp_ptr->chg_weight) 
+	  p_ptr->num_charge = p_ptr->wt / cp_ptr->chg_weight;
 	else if (o_ptr->weight >= 2 * cp_ptr->chg_weight) 
 	  p_ptr->num_charge = o_ptr->weight / cp_ptr->chg_weight;
 	else

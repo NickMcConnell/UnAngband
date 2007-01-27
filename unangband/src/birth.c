@@ -366,7 +366,7 @@ static void get_ahw(void)
 		p_ptr->ht = Rand_normal(rp_ptr->m_b_ht, rp_ptr->m_m_ht);
 	}
 
-	/* Calculate the height/ for females */
+	/* Calculate the height for females */
 	else if (p_ptr->psex == SEX_FEMALE)
 	{
 		p_ptr->ht = Rand_normal(rp_ptr->f_b_ht, rp_ptr->f_m_ht);
