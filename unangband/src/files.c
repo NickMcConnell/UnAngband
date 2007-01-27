@@ -1580,7 +1580,7 @@ static void display_player_xtra_info(void)
 	col = 21;
 
 	/* Hit Points */
-	if (p_ptr->mhp > 99)
+	if (p_ptr->mhp > 99 || p_ptr->chp < 0)
 	{
 		sprintf(buf, "%d/%d", p_ptr->chp, p_ptr->mhp);
 		Term_putstr(col, 10, -1, TERM_WHITE, "HP");
@@ -2870,7 +2870,12 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 
 		/* Resulting "modified" maximum value */
 		cnv_stat(p_ptr->stat_top[i], buf);
-		c_put_str(TERM_L_GREEN, buf, row+i, col+20);
+		if (p_ptr->stat_inc_tim[i])
+		  c_put_str(TERM_L_BLUE, buf, row+i, col+20);
+		else if (p_ptr->stat_dec_tim[i])
+		  c_put_str(TERM_ORANGE, buf, row+i, col+20);
+		else
+		  c_put_str(TERM_L_GREEN, buf, row+i, col+20);
 
 		/* Only display stat_use if not maximal */
 		if (p_ptr->stat_use[i] < p_ptr->stat_top[i])

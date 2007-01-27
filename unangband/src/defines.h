@@ -704,62 +704,62 @@
 #define ROW_STAT		(show_sidebar ? 8 : (SECOND_FROM_BOTTOM))
 #define COL_STAT		0	/* "xxx   xxxxxx" */
 
-#define ROW_AC			(show_sidebar ? 15 : (BOTTOM_LINE))
+#define ROW_AC			(show_sidebar ? 17 : (BOTTOM_LINE))
 #define COL_AC			(show_sidebar ? 0 : 33)	/* "Cur AC xxxxx" */
 
-#define ROW_MAXHP		(show_sidebar ? 16 : (BOTTOM_LINE))
+#define ROW_MAXHP		(show_sidebar ? 18 : (BOTTOM_LINE))
 #define COL_MAXHP		(show_sidebar ? 0 : 47)	/* "Max HP xxxxx" */
 
-#define ROW_CURHP		(show_sidebar ? 17 : (BOTTOM_LINE))
+#define ROW_CURHP		(show_sidebar ? 19 : (BOTTOM_LINE))
 #define COL_CURHP		(show_sidebar ? 0 : 40)	/* "Cur HP xxxxx" */
 
-#define ROW_MAXSP		(show_sidebar ? 18 : (BOTTOM_LINE))
+#define ROW_MAXSP		(show_sidebar ? 20 : (BOTTOM_LINE))
 #define COL_MAXSP		(show_sidebar ? 0 : 60)	/* "Max SP xxxxx" */
 
-#define ROW_CURSP		(show_sidebar ? 19 : (BOTTOM_LINE))
+#define ROW_CURSP		(show_sidebar ? 21 : (BOTTOM_LINE))
 #define COL_CURSP		(show_sidebar ? 0 : 53)	/* "Cur SP xxxxx" */
 
-#define ROW_INFO		(show_sidebar ? 20 : (BOTTOM_LINE))
+#define ROW_INFO		(show_sidebar ? 22 : (BOTTOM_LINE))
 #define COL_INFO		(show_sidebar ? 0 : 20)	/* "xxxxxxxxxxxx" */
 
-#define ROW_CUT			(show_sidebar ? 21 : (SECOND_FROM_BOTTOM))
-#define COL_CUT			(show_sidebar ? 0 : 18)	/* <cut> */
+#define ROW_CUT			(show_sidebar ? 23 : (SECOND_FROM_BOTTOM))
+#define COL_CUT			(show_sidebar ? 0 : 24)	/* <cut> */
 
-#define ROW_STUN		(show_sidebar ? 22 : (SECOND_FROM_BOTTOM))
-#define COL_STUN		(show_sidebar ? 0 : 22)	/* <stun> */
+#define ROW_STUN		(show_sidebar ? 24 : (SECOND_FROM_BOTTOM))
+#define COL_STUN		(show_sidebar ? 0 : 28)	/* <stun> */
 
 #define ROW_HUNGRY		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_HUNGRY		(show_sidebar ? 0 : 26)	/* "Weak" / "Hungry" / "Full" / "Gorged" */
+#define COL_HUNGRY		(show_sidebar ? 0 : 32)	/* "Weak" / "Hungry" / "Full" / "Gorged" */
 
 #define ROW_BLIND		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_BLIND		(show_sidebar ? (Term->wid >= 90  ? 7 : 6)  : 30)	/* "Blind" */
+#define COL_BLIND		(show_sidebar ? (Term->wid >= 90  ? 7 : 6)  : 36)	/* "Blind" */
 
 #define ROW_CONFUSED		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_CONFUSED		(show_sidebar ? (Term->wid >= 90  ? 13 : 11) : 34)	/* "Confused" */
+#define COL_CONFUSED		(show_sidebar ? (Term->wid >= 90  ? 13 : 11) : 40)	/* "Confused" */
 
 #define ROW_AFRAID		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_AFRAID		(show_sidebar ? (Term->wid >= 90  ? 22 : 19) : 38)	/* "Afraid" */
+#define COL_AFRAID		(show_sidebar ? (Term->wid >= 90  ? 22 : 19) : 44)	/* "Afraid" */
 
 #define ROW_POISONED		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_POISONED		(show_sidebar ? (Term->wid >= 90  ? 29 : 25) : 42)	/* "Poisoned" */
+#define COL_POISONED		(show_sidebar ? (Term->wid >= 90  ? 29 : 25) : 48)	/* "Poisoned" */
 
 #define ROW_DISEASE		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_DISEASE	(show_sidebar ? (Term->wid >= 90  ? 38 : 33) : 46)	/* "Disease" / "Dise" */
+#define COL_DISEASE	(show_sidebar ? (Term->wid >= 90  ? 38 : 33) : 52)	/* "Disease" / "Dise" */
 
 #define ROW_CURSED	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_CURSED	(show_sidebar ? (Term->wid >= 90  ? 46 : 40) : 50)	/* "Cursed" / "Curs" */
+#define COL_CURSED	(show_sidebar ? (Term->wid >= 90  ? 46 : 40) : 56)	/* "Cursed" / "Curs" */
 
 #define ROW_AMNESIA	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_AMNESIA	(show_sidebar ? (Term->wid >= 90  ? 53 : 46) : 54)	/* "Amnesia" / "Forg" */
+#define COL_AMNESIA	(show_sidebar ? (Term->wid >= 90  ? 53 : 46) : 60)	/* "Amnesia" / "Forg" */
 
 #define ROW_PETRIFY	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_PETRIFY	(show_sidebar ? (Term->wid >= 90  ? 61 : 53) : 58)	/* "Petrify" / "Petr" */
+#define COL_PETRIFY	(show_sidebar ? (Term->wid >= 90  ? 61 : 53) : 64)	/* "Petrify" / "Petr" */
 
 #define ROW_STATE	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_STATE		(show_sidebar ? (Term->wid >= 90  ? 69 : 60) : 62)	/* <state> */
+#define COL_STATE		(show_sidebar ? (Term->wid >= 90  ? 69 : 60) : 69)	/* <state> */
 
 #define ROW_SPEED	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_SPEED		(show_sidebar ? (Term->wid >= 90  ? 80 : 70) : 72)	/* "Slow (-NN)" or "Fast (+NN)" */
+#define COL_SPEED		(show_sidebar ? (Term->wid >= 90  ? 80 : 70) : 69)	/* "Slow (-NN)" or "Fast (+NN)" */
 
 #define ROW_STUDY		(show_sidebar ? (Term->wid >= 96 ? (BOTTOM_LINE) : 14) \
 					: (BOTTOM_LINE))

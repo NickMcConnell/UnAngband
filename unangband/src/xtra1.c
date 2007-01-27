@@ -127,33 +127,50 @@ static void prt_stat(int stat)
 	char tmp[32];
 
 	/* Display "injured" stat */
-	if (p_ptr->stat_cur[stat] < p_ptr->stat_max[stat])
+	if (p_ptr->stat_use[stat] < p_ptr->stat_top[stat])
 	{
-		if (show_sidebar)
-		{
-			put_str(stat_names_reduced[stat], ROW_STAT + stat, 0);
-			cnv_stat(p_ptr->stat_use[stat], tmp);
-			c_put_str(TERM_YELLOW, tmp, ROW_STAT + stat, COL_STAT + 6);
-		}
-		else
-		{
-			c_put_str(TERM_YELLOW, stat_names_reduced_short[stat], ROW_STAT, COL_STAT + 3 * stat);
-		}
+	  if (show_sidebar)
+	    {
+	      put_str(stat_names_reduced[stat], ROW_STAT + stat, 0);
+	      cnv_stat(p_ptr->stat_use[stat], tmp);
+	      if (p_ptr->stat_dec_tim[stat])
+		c_put_str(TERM_ORANGE, tmp, ROW_STAT + stat, COL_STAT + 6);
+	      else
+		c_put_str(TERM_YELLOW, tmp, ROW_STAT + stat, COL_STAT + 6);
+	    }
+	  else
+	    {
+	      if (p_ptr->stat_dec_tim[stat])
+		c_put_str(TERM_ORANGE, stat_names_reduced_short[stat], 
+			  ROW_STAT, COL_STAT + 3 * stat);
+	      else
+		c_put_str(TERM_YELLOW, stat_names_reduced_short[stat], 
+			  ROW_STAT, COL_STAT + 3 * stat);
+	    }
 	}
 
 	/* Display "healthy" stat */
 	else
 	{
-		if (show_sidebar)
-		{
-			put_str(stat_names[stat], ROW_STAT + stat, 0);
-			cnv_stat(p_ptr->stat_use[stat], tmp);
-			c_put_str(TERM_L_GREEN, tmp, ROW_STAT + stat, COL_STAT + 6);
-		}
-		else
-		{
-			put_str("   ", ROW_STAT, COL_STAT + 3 * stat);
-		}
+	  if (show_sidebar)
+	    {
+	      put_str(stat_names[stat], ROW_STAT + stat, 0);
+	      cnv_stat(p_ptr->stat_use[stat], tmp);
+	      if (p_ptr->stat_inc_tim[stat])
+		c_put_str(TERM_L_BLUE, tmp, ROW_STAT + stat, COL_STAT + 6);
+	      else
+		c_put_str(TERM_L_GREEN, tmp, ROW_STAT + stat, COL_STAT + 6);
+	    }
+	  else
+	    if (p_ptr->stat_inc_tim[stat])
+	      {
+		c_put_str(TERM_L_BLUE, stat_names[stat], 
+			  ROW_STAT, COL_STAT + 3 * stat);
+	      }
+	    else
+	      {
+		put_str("   ", ROW_STAT, COL_STAT + 3 * stat);
+	      }
 	}
 
 	/* Indicate the threshold where increases are never higher than 5 points */
@@ -715,9 +732,10 @@ static void prt_state(void)
 
 	/* Nothing interesting */
 	else
-	{
-                strcpy(text, "          ");
-	}
+	  {
+	    /*strcpy(text, "          "); */
+	    *text = 0;
+	  }
 
 	/* Hack -- handle some other stuff here. Don't change attr, so we inherit it from above. */
 	if (p_ptr->searching) strcpy(text, "Searching ");
@@ -750,7 +768,8 @@ static void prt_state(void)
 	}
 
 	/* Display the info (or blanks) */
-	c_put_str(attr, text, ROW_STATE, COL_STATE);
+	if (text)
+	  c_put_str(attr, text, ROW_STATE, COL_STATE);
 }
 
 
@@ -771,18 +790,18 @@ static void prt_speed(void)
 	if (i > 110)
 	{
 		attr = TERM_L_GREEN;
-		sprintf(buf, (show_sidebar ? "Fast (+%d)" : "Spd+%d"), (i - 110));
+		sprintf(buf, (1/*show_sidebar*/ ? "Fast (+%d)" : "Spd+%d"), (i - 110));
 	}
 
 	/* Slow */
 	else if (i < 110)
 	{
 		attr = TERM_L_UMBER;
-		sprintf(buf, (show_sidebar ? "Slow (-%d)" : "Spd-%d"), (110 - i));
+		sprintf(buf, (1/*show_sidebar*/ ? "Slow (-%d)" : "Spd-%d"), (110 - i));
 	}
 
 	/* Display the speed */
-	c_put_str(attr, format((show_sidebar ? "%-10s" : "%-6s"), buf), ROW_SPEED, COL_SPEED);
+	c_put_str(attr, format((1/*show_sidebar*/ ? "%-10s" : "%-6s"), buf), ROW_SPEED, COL_SPEED);
 }
 
 
@@ -1420,11 +1439,11 @@ static void prt_frame_extra(void)
 	prt_amnesia();
 	prt_petrify();
 
-	/* State */
-	prt_state();
-
 	/* Speed */
 	prt_speed();
+
+	/* State */
+	prt_state();
 
 	/* Study spells */
 	prt_study();
@@ -2670,13 +2689,15 @@ static void calc_hitpoints(void)
 	/* Calculate the weight for males */
 	if (p_ptr->psex == SEX_MALE)
 	{
-		p_ptr->wt = 2 * rp_ptr->m_b_wt / 3 + rp_ptr->m_b_wt * p_ptr->stat_use[A_SIZ] / 268;
+		p_ptr->wt = 2 * rp_ptr->m_b_wt / 3 
+		  + rp_ptr->m_b_wt * p_ptr->stat_use[A_SIZ] / 268;
 	}
 
 	/* Calculate the weight for females */
 	else if (p_ptr->psex == SEX_FEMALE)
 	{
-		p_ptr->wt = 2 * rp_ptr->f_b_wt / 3 + rp_ptr->f_b_wt * p_ptr->stat_use[A_SIZ] / 268;;
+		p_ptr->wt = 2 * rp_ptr->f_b_wt / 3 
+		  + rp_ptr->f_b_wt * p_ptr->stat_use[A_SIZ] / 268;;
 	}
 }
 
@@ -4405,6 +4426,7 @@ void redraw_stuff(void)
 	if (p_ptr->redraw & (PR_STATE))
 	{
 		p_ptr->redraw &= ~(PR_STATE);
+		prt_speed();
 		prt_state();
 	}
 
@@ -4412,6 +4434,7 @@ void redraw_stuff(void)
 	{
 		p_ptr->redraw &= ~(PR_SPEED);
 		prt_speed();
+		prt_state();
 	}
 
 	if (p_ptr->redraw & (PR_STUDY))
