@@ -62,6 +62,7 @@ extern const byte adj_agi_speed[];
 extern const byte adj_con_fix[];
 extern const byte adj_con_die[];
 extern const byte adj_siz_die[];
+extern const byte adj_charge_siz[];
 extern const byte blows_table[12][12];
 extern const byte extract_energy[200];
 extern const s32b player_exp[PY_MAX_LEVEL];

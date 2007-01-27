@@ -3728,7 +3728,7 @@ static void calc_bonuses(void)
 
 	/* Can get as low as 0 */
 	p_ptr->num_charge = MIN(p_ptr->num_charge, 
-				adj_int_dev[p_ptr->stat_ind[A_SIZ]]);
+				adj_charge_siz[p_ptr->stat_ind[A_SIZ]]);
 
 	/* Check if we wear an amulet or a ring */
 	if (inventory[INVEN_NECK].k_idx)
