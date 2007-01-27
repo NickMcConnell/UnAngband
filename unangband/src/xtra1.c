@@ -2952,7 +2952,7 @@ static void calc_bonuses(void)
 	p_ptr->skill_stl = rp_ptr->r_stl + cp_ptr->c_stl;
 
 	/* Base skill -- searching ability */
-	p_ptr->skill_srh = rp_ptr->r_srh + cp_ptr->c_srh;
+	p_ptr->skill_srh = 5 + rp_ptr->r_srh + cp_ptr->c_srh;
 
 	/* Base skill -- digging */
 	p_ptr->skill_dig = rp_ptr->r_dig + cp_ptr->c_dig;;
