@@ -8370,7 +8370,7 @@ static bool cave_gen(void)
 			y = rand_int(DUNGEON_HGT);
 			x = rand_int(DUNGEON_WID);
 
-			if (place_monster_here(y, x, zone->guard) > 0) break;
+			if (place_monster_here(y, x, zone->guard) > MM_FAIL) break;
 		}
 
 		/* Place the questor */
@@ -8882,8 +8882,8 @@ void ensure_quest()
 							/* Require empty grid */
 							if (!cave_empty_bold(y, x)) continue;
 
-							/* Require monster can survive on terrain */
-							if (!place_monster_here(y, x, qe_ptr->race)) continue;
+							/* Require monster can pass and survive on terrain */
+							if (place_monster_here(y, x, qe_ptr->race) > MM_FAIL) continue;
 
 							/* Accept it */
 							break;

@@ -1539,8 +1539,8 @@ bool cave_exist_mon(int r_idx, int y, int x, bool occupied_ok)
 		if (!occupied_ok) return (FALSE);
 	}
 
-	/*** Check passability of various features. ***/
-	if (place_monster_here(y,x,r_idx) > 0) return (TRUE);
+	/* Check passability and survivability of features */
+	if (place_monster_here(y,x,r_idx) > MM_FAIL) return (TRUE);
 
 	/* Catch weirdness */
 	return (FALSE);
@@ -1672,21 +1672,20 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 
 	}
 
-	/* Feature is passable */
+	/* Feature is passable or damaging */
 	else if (mmove != MM_FAIL)
 	{
-		/* Do not kill ourselves in terrain ourself unless confused */
-		if ((mmove == MM_DROWN) && (!m_ptr->confused))
+		/* Do not kill ourselves in terrain unless confused */
+		if (mmove == MM_DROWN && !m_ptr->confused)
 		{
 			/* Try to get out of existing trouble */
-                        if (place_monster_here(m_ptr->fy,m_ptr->fx, m_ptr->r_idx) <= 0) move_chance /= 4;
-
+                        if (place_monster_here(m_ptr->fy, m_ptr->fx, m_ptr->r_idx) <= MM_FAIL) move_chance /= 4;
 			/* Don't walk into trouble */
 			else move_chance = 0;
 		}
 
 		/* We cannot natively climb, but are negotiating a tree or rubble */
-		else if ((mmove == MM_CLIMB) && !(r_ptr->flags2 & (RF2_CAN_CLIMB)))
+		else if (mmove != MM_DROWN && mmove == MM_CLIMB && !(r_ptr->flags2 & RF2_CAN_CLIMB))
 		{
 			move_chance /= 2;
 		}
@@ -4475,7 +4474,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 
 	/* The monster is stuck in terrain e.g. cages */
 	if (!(m_ptr->mflag & (MFLAG_OVER)) && !(f_info[cave_feat[oy][ox]].flags1 & (FF1_MOVE)) &&
-		(place_monster_here(oy,ox,m_ptr->r_idx) <= 0) && (mmove != MM_PASS))
+		(place_monster_here(oy, ox, m_ptr->r_idx) <= MM_FAIL) && (mmove != MM_PASS))
 	{
 		/* Hack -- check old location */
 		feat = cave_feat[oy][ox];
@@ -5946,7 +5945,7 @@ static void recover_monster(int m_idx, bool regen)
 	}
 
 	/* Get hit by terrain continuously */
-	if (place_monster_here(y,x,m_ptr->r_idx) < 0)
+	if (place_monster_here(y, x, m_ptr->r_idx) < MM_FAIL)
 	{
 		bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
 

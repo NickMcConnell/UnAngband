@@ -307,8 +307,8 @@ void teleport_away(int m_idx, int dis)
 			/* Ignore illegal locations */
 			if (!in_bounds_fully(ny, nx)) continue;
 
-			/* Require safe location for monster */
-			if (!place_monster_here(ny, nx, m_ptr->r_idx)) continue;
+			/* Require safe passable space for monster */
+			if (place_monster_here(ny, nx, m_ptr->r_idx) <= MM_FAIL) continue;
 
 			/* Don't allow teleporting into other monster or player */
 			if (cave_m_idx[ny][nx]) continue;
@@ -1578,7 +1578,7 @@ static int inven_damage(inven_func typ, int perc)
 					    ((amt == o_ptr->number) ? "All of y" :
 					     (amt > 1 ? "Some of y" : "One of y")) : "Y"),
 					   o_name, index_to_label(i),
-					   ((amt > 1) ? "were" : "was"),
+					   (damage ? (amt > 1 ? "are" : "is") : (amt > 1 ? "were" : "was")),
 					   (damage ? "damaged" : "destroyed"));
 
 				/* Damage already done? */
@@ -6849,7 +6849,8 @@ bool project_m(int who, int y, int x, int dam, int typ)
 		{
 			if (seen) obvious = TRUE;
 
-			if (!place_monster_here(y,x,m_ptr->r_idx)) entomb(y, x, 0x0L);
+			if (place_monster_here(y, x, m_ptr->r_idx) <= MM_FAIL) 
+			  entomb(y, x, 0x0L);
 			break;
 		}
 
@@ -10578,8 +10579,9 @@ bool project_t(int who, int y, int x, int dam, int typ)
 			if (play_info[ddy_ddd[k]][ddy_ddd[k]] & (PLAY_TEMP)) blocked |= 1 << k;
 		}
 
-		/* Check if monster can survive in terrain or move */
-		if (place_monster_here(y, x, m_ptr->r_idx) == MM_FAIL) entomb(y, x, blocked);
+		/* Check if monster can move and survive in terrain */
+		if (place_monster_here(y, x, m_ptr->r_idx) <= MM_FAIL) 
+		  entomb(y, x, blocked);
 	}
 
 	if (affect_monster)

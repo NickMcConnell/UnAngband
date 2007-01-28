@@ -5748,8 +5748,8 @@ void race_near(int r_idx, int y1, int x1)
 		/* Require an "empty" floor grid */
 		if (!cave_empty_bold(y, x)) continue;
 
-		/* Require monster can survive on terrain */
-		if (!place_monster_here(y, x, r_idx)) continue;
+		/* Require monster can move unharmed on terrain */
+		if (place_monster_here(y, x, r_idx) <= MM_FAIL) continue;
 
 		/* Create a new monster (awake, no groups) */
 		(void)place_monster_aux(y, x, r_idx, FALSE, FALSE);

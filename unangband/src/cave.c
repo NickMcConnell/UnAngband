@@ -5193,7 +5193,7 @@ static void cave_set_feat_aux(int y, int x, int feat)
 
 		if (hidden)
 		{
-			monster_hide(y,x,place_monster_here(y,x,m_ptr->r_idx) > 0, m_ptr);
+			monster_hide(y, x, place_monster_here(y, x, m_ptr->r_idx), m_ptr);
 
 			if (!(m_ptr->mflag & (MFLAG_HIDE)))
 			{
