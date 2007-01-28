@@ -1823,7 +1823,7 @@ errr parse_z_info(char *buf, header *head)
 		z_info->b_max = max;
 	}
 
-	/* Process 'B' for "Maximum q_info[] subindex" */
+	/* Process 'Q' for "Maximum q_info[] subindex" */
 	else if (buf[2] == 'Q')
 	{
 		int max;
@@ -3820,6 +3820,21 @@ errr parse_r_info(char *buf, header *head)
 		/* Store the text */
 		if (!add_text(&(r_ptr->text), head, s))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
+
+		/* Hack: assume 'D' is always after 'B' and 'F' and catch
+		   monsters than have no attacks but no NEVER_BLOW flag */
+		if (!(r_ptr->flags1 & RF1_NEVER_BLOW))
+		  {
+		    int blows = 0;
+
+		    for (i = 0; i < 4; i++) 
+		      if (r_ptr->blow[i].method > 0
+			  && r_ptr->blow[i].method <= RBM_MAX_NORMAL)
+			blows++;
+
+		    if (!blows)
+		      return (PARSE_ERROR_GENERIC);
+		  }
 	}
 
 	/* Process 'G' for "Graphics" (one line only) */
@@ -4036,6 +4051,10 @@ errr parse_r_info(char *buf, header *head)
 		/* Extract the damage dice and sides */
 		r_ptr->blow[i].d_dice = atoi(s);
 		r_ptr->blow[i].d_side = atoi(t);
+
+		/* Catch fraudulent NEVER_BLOW monsters */
+		if (n1 <= RBM_MAX_NORMAL && r_ptr->flags1 & RF1_NEVER_BLOW)
+		  return (PARSE_ERROR_GENERIC);
 	}
 	/* Process 'F' for "Basic Flags" (multiple lines) */
 	else if (buf[0] == 'F')
@@ -4069,6 +4088,13 @@ errr parse_r_info(char *buf, header *head)
 		{
 			r_ptr->flags3 |= RF3_NONLIVING;
 		}
+
+		/* Catch fraudulent NEVER_BLOW monsters */
+		if (r_ptr->flags1 & RF1_NEVER_BLOW)
+		  for (i = 0; i < 4; i++) 
+		    if (r_ptr->blow[i].method > 0
+			&& r_ptr->blow[i].method <= RBM_MAX_NORMAL)
+		      return (PARSE_ERROR_GENERIC);		  
 	}
 
 	/* Process 'S' for "Spell Flags" (multiple lines) */
