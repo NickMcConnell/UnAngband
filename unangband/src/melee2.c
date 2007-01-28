@@ -2489,7 +2489,7 @@ static bool get_move_retreat(int m_idx, int *ty, int *tx)
  * Monsters not in LOS always advance (this avoids player frustration).  
  * Monsters in LOS will advance to the character, up to their standard
  * combat range, to a grid that allows them to target the character, or
- * just stay still if they are happy where they are, depending on the
+ * just move at random if they are happy where they are, depending on the
  * tactical situation and the monster's preferred and minimum combat
  * ranges.
  * NOTE:  Here is an area that would benefit from more development work.
@@ -2840,24 +2840,16 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 				*tx = px;
 			}
 
-			/* Otherwise they will stay still or move randomly. */
+			/* Otherwise they will move randomly. */
+			/* TODO: Monsters could look for better terrain... */
 			else
-			{
-				/*
-				 * It would be odd if monsters that move randomly 
-				 * were to stay still.
-				 */
-				if (r_ptr->flags1 & (RF1_RAND_50 | RF1_RAND_25))
-				{
-					/* pick a random grid next to the monster */
-					int i = rand_int(8);
+			  {
+			    /* pick a random grid next to the monster */
+			    int i = rand_int(8);
 
-					*ty = m_ptr->fy + ddy_ddd[i];
-					*tx = m_ptr->fx + ddx_ddd[i];
-				}
-
-				/* Monsters could look for better terrain... */
-			}
+			    *ty = m_ptr->fy + ddy_ddd[i];
+			    *tx = m_ptr->fx + ddx_ddd[i];
+			  }
 		}
 	}
 
