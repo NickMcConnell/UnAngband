@@ -1383,36 +1383,17 @@ static int set_cold_destroy(object_type *o_ptr)
 static int set_elec_destroy(object_type *o_ptr)
 {
 	u32b f1, f2, f3, f4;
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 	/* Only affect rods, staffs and wands */
 	if ((o_ptr->tval != TV_ROD) && (o_ptr->tval != TV_STAFF) && (o_ptr->tval != TV_WAND)) return (FALSE);
 
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 	if (f2 & (TR2_IGNORE_ELEC))
 	{
 		object_can_flags(o_ptr,0x0L,TR2_IGNORE_ELEC,0x0L,0x0L);
 		return (FALSE);
 	}
-
-	/* Only drain charges, don't destroy */
-	if ((o_ptr->tval == TV_STAFF) ||
-	     (o_ptr->tval == TV_WAND))
-	{
-		/* Uncharge */
-		o_ptr->charges = 0;
-		o_ptr->stackc = 0;
-	}
-
-	/* Quietly drain charged wands/staffs */
-	else if (o_ptr->tval == TV_ROD)
-	{
-		int t = randint(999);
-
-		/* Discharge */
-		if (o_ptr->timeout < t) o_ptr->timeout = t;
-	}
-
-	return (FALSE);
+	return (TRUE);
 }
 
 
@@ -1527,6 +1508,37 @@ static int inven_damage(inven_func typ, int perc)
 
 					break;
 				}
+				/* Rods, staffs and wands */
+			        case TV_STAFF:
+			        case TV_WAND:
+				  {
+				    if (rand_int(100) < perc)
+				      {
+					/* Only drain charges, don't destroy */
+					o_ptr->charges = 0;
+					o_ptr->stackc = 0;
+
+					/* Damaged! */
+					damage = TRUE;
+				      }
+				    else continue;
+				    
+				    break;
+				  }
+			        case TV_ROD:
+				  {
+				    if (rand_int(100) < perc)
+				      {
+					/* Discharge */
+					int t = randint(999);
+					if (o_ptr->timeout < t) o_ptr->timeout = t;
+					/* Damaged! */
+					damage = TRUE;
+				      }
+				    else continue;
+				    
+				    break;
+				  }
 			}
 
 			/* Damage instead of destroy */
