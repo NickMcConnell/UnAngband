@@ -1139,6 +1139,7 @@ static void race_aux_hook(birth_menu r_str)
 	    p_ptr->stat_cur[i] = p_ptr->stat_max[i] = value;
 	  }
 
+#if 0
 	/* Calculate the hitdie */
 	p_ptr->update |= (PU_BONUS | PU_HP);
 
@@ -1147,6 +1148,8 @@ static void race_aux_hook(birth_menu r_str)
 
 	sprintf(s, "Hit die: %d ", p_ptr->hitdie);
 	Term_putstr(RACE_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
+#endif
+
 	sprintf(s, "Experience: %d%%  ", p_info[race].r_exp);
 	Term_putstr(RACE_AUX_COL, TABLE_ROW + A_MAX + 1, -1, TERM_WHITE, s);
 	sprintf(s, "Infravision: %d ft  ", p_info[race].infra * 10);
@@ -1247,6 +1250,7 @@ static void class_aux_hook(birth_menu c_str)
 	    p_ptr->stat_cur[i] = p_ptr->stat_max[i] = value;
 	  }
 
+#if 0
 	/* Calculate the hitdie */
 	p_ptr->update |= (PU_BONUS | PU_HP);
 
@@ -1255,6 +1259,7 @@ static void class_aux_hook(birth_menu c_str)
 
 	sprintf(s, "Hit die: %d ", p_ptr->hitdie);
 	Term_putstr(CLASS_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
+#endif
         sprintf(s, "Experience: %d%%  ", c_info[class_idx].c_exp+p_info[p_ptr->prace].r_exp);
 	Term_putstr(CLASS_AUX_COL, TABLE_ROW + A_MAX + 1, -1, TERM_WHITE, s);
 }
@@ -1338,9 +1343,10 @@ static void style_aux_hook(birth_menu w_str)
                 c_info[p_ptr->pclass].c_adj[i] + p_info[p_ptr->prace].r_adj[i]);
                 Term_putstr(STYLE_AUX_COL, TABLE_ROW + i, -1, TERM_WHITE, s);
 	}
-
+#if 0
 	sprintf(s, "Hit die: %d ", p_ptr->hitdie);
         Term_putstr(STYLE_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
+#endif
         sprintf(s, "Experience: %d%%  ",c_info[p_ptr->pclass].c_exp+p_info[p_ptr->prace].r_exp +
                                                 (style_idx ? 10 : 0) );
         Term_putstr(STYLE_AUX_COL, TABLE_ROW + A_MAX + 1, -1, TERM_WHITE, s);
