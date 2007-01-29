@@ -91,7 +91,7 @@ static bool item_tester_hook_food_edible(const object_type *o_ptr)
 		/* Some flasks count as bodies */
 		case TV_FLASK:
 
-			if (o_ptr->name3) return (FALSE);
+			if (o_ptr->sval != SV_FLASK_BLOOD) return (FALSE);
 
 			/* Fall through */
 

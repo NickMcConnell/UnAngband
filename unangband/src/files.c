@@ -1429,7 +1429,6 @@ static void display_player_xtra_info(void)
 	int style_hit, style_dam, style_crit;
 	u32b style;
 	int base, plus;
-	int tmp;
 	int xthn, xthb, xtht, xsrh, xdig;
 	int xdis, xdev, xsav, xstl;
 	byte likert_attr;
@@ -3697,8 +3696,6 @@ errr file_character(cptr name, bool full)
 	char o_name[80];
 
 	char buf[1024];
-
-	bool no_quests = TRUE;
 
 	char buf2[20];
 

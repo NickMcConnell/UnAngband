@@ -540,6 +540,29 @@ static void player_outfit(void)
 			/* Get the object_kind */
 			s16b k_idx = lookup_kind(e_ptr->tval, e_ptr->sval);
 
+			/* MegaHack -- undead start with 'foods' */
+			if (p_info[p_ptr->prace].flags4 & (TR4_UNDEAD)) switch (e_ptr->tval)
+			{
+				case TV_FOOD:
+				{
+					switch(rand_int(4))
+					{
+						case 0:
+							k_idx = lookup_kind(TV_FLASK, SV_FLASK_BLOOD);
+							break;
+						case 1:
+							k_idx = lookup_kind(TV_BONE, SV_BONE_BONE);
+							break;
+						case 2:
+							k_idx = lookup_kind(TV_BODY, SV_BODY_ARM);
+							break;
+						case 3:
+							k_idx = lookup_kind(TV_BODY, SV_BODY_LEG);
+							break;
+					}
+				}
+			}
+
 			/* Hack -- style lookups to change basic equipment */
 			if (p_ptr->pstyle) switch (e_ptr->tval)
 			{
