@@ -525,7 +525,6 @@ void teleport_player_to(int ny, int nx)
 }
 
 
-
 /*
  * Teleport monster to a grid near the given location.  This function is
  * used in the monster spell "TELE_SELF_TO", to allow monsters both to
@@ -591,6 +590,88 @@ void teleport_towards(int oy, int ox, int ny, int nx)
 }
 
 
+void scatter_objects_under_feat(int y, int x)
+{
+  s16b this_o_idx, next_o_idx = 0;
+
+  assert (in_bounds(y, x));
+
+  /* Scan all objects in the grid */
+  for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
+    {
+      object_type *o_ptr;
+		
+      /* Get the object */
+      o_ptr = &o_list[this_o_idx];
+
+      /* Get the next object */
+      next_o_idx = o_ptr->next_o_idx;
+
+      /* Drop the object */
+      drop_near(o_ptr, -1, y, x);
+    }
+
+  /* Objects are gone */
+  cave_o_idx[y][x] = 0;
+
+  /* Visual update */
+  lite_spot(y, x);
+}
+
+
+void create_down_teleport_level(void)
+{
+		message(MSG_TPLEVEL, 0, "The floor beneath you collapses.");
+
+		/* Hack -- tower level increases depth */
+		if (t_info[p_ptr->dungeon].zone[0].tower)
+		{
+			/* New depth */
+			p_ptr->depth--;
+		}
+		else
+		{
+			/* New depth */
+			p_ptr->depth++;
+		}
+
+		/* Leaving */
+		p_ptr->leaving = TRUE;
+
+	  /* Create stairs down 
+	     cave_set_feat(y, x, FEAT_CHASM); */
+
+	  /* Save any objects in that place
+	     scatter_objects_under_feat(int y, int x) */
+}
+
+
+void create_up_teleport_level(void)
+{
+		message(MSG_TPLEVEL, 0, "The eruption at your feet pushes you upward.");
+
+		/* Hack -- tower level increases depth */
+		if (t_info[p_ptr->dungeon].zone[0].tower)
+		{
+			/* New depth */
+			p_ptr->depth++;
+		}
+		else
+		{
+			/* New depth */
+			p_ptr->depth--;
+		}
+
+		/* Leaving */
+		p_ptr->leaving = TRUE;
+
+	  /* Create stairs down 
+	     cave_set_feat(y, x, FEAT_GEYSER); */
+
+	  /* Save any objects in that place
+	     scatter_objects_under_feat(int y, int x) */
+}
+
 
 /*
  * Creates terrain that will move the player one level up or down 
@@ -600,95 +681,42 @@ void teleport_towards(int oy, int ox, int ny, int nx)
  */
 void teleport_player_level(void)
 {
-	if (adult_ironman)
+  if (adult_ironman)
+    {
+      msg_print("Nothing happens.");
+      return;
+    }
+
+  if (!max_depth(p_ptr->dungeon))
+    {
+      msg_print("Nothing happens.");
+      return;
+    }
+  else if (p_ptr->depth == min_depth(p_ptr->dungeon))
+    {
+      create_down_teleport_level();
+    }
+  else if (is_quest(p_ptr->depth) 
+	   || (p_ptr->depth >= max_depth(p_ptr->dungeon)))
+    {
+      /* Hack -- tower level increases depth */
+      if (t_info[p_ptr->dungeon].zone[0].tower)
 	{
-		msg_print("Nothing happens.");
-		return;
+	  create_down_teleport_level();
 	}
-
-	if (!max_depth(p_ptr->dungeon))
+      else
 	{
-		msg_print("Nothing happens.");
-		return;
+	  create_up_teleport_level();
 	}
-	else if (p_ptr->depth == min_depth(p_ptr->dungeon))
-	{
-		message(MSG_TPLEVEL, 0, "The floor beneath you collapses.");
-
-		/* Hack -- tower level decreases depth */
-		if (t_info[p_ptr->dungeon].zone[0].tower)
-		{
-			/* New depth */
-			p_ptr->depth--;
-		}
-		else
-		{
-			/* New depth */
-			p_ptr->depth++;
-		}
-
-		/* Leaving */
-		p_ptr->leaving = TRUE;
-	}
-
-	else if (is_quest(p_ptr->depth) || (p_ptr->depth >= max_depth(p_ptr->dungeon)))
-	{
-		/* Hack -- tower level increases depth */
-		if (t_info[p_ptr->dungeon].zone[0].tower)
-		{
-			message(MSG_TPLEVEL, 0, "The floor beneath you collapses.");
-		}
-		else
-		{
-			message(MSG_TPLEVEL, 0, "An unseen force pulls you through the ceiling.");
-		}
-
-		/* New depth */
-		p_ptr->depth--;
-
-		/* Leaving */
-		p_ptr->leaving = TRUE;
-	}
-
-	else if (rand_int(100) < 50)
-	{
-		message(MSG_TPLEVEL, 0, "An unseen force pulls you through the ceiling.");
-
-		/* Hack -- tower level increases depth */
-		if (t_info[p_ptr->dungeon].zone[0].tower)
-		{
-			/* New depth */
-			p_ptr->depth++;
-		}
-		else
-		{
-			/* New depth */
-			p_ptr->depth--;
-		}
-
-		/* Leaving */
-		p_ptr->leaving = TRUE;
-	}
-
-	else
-	{
-		message(MSG_TPLEVEL, 0, "The floor beneath you collapses.");
-
-		/* Hack -- tower level increases depth */
-		if (t_info[p_ptr->dungeon].zone[0].tower)
-		{
-			/* New depth */
-			p_ptr->depth--;
-		}
-		else
-		{
-			/* New depth */
-			p_ptr->depth++;
-		}
-
-		/* Leaving */
-		p_ptr->leaving = TRUE;
-	}
+    }
+  else if (rand_int(100) < 50)
+    {
+      create_up_teleport_level();
+    }
+  else
+    {
+      create_down_teleport_level();
+    }
 }
 
 

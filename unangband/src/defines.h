@@ -1167,7 +1167,9 @@
 
 #define FEAT_ENTRANCE 471
 
-
+#define FEAT_GEYSER 711
+#define FEAT_WATER_SPOUT 714
+#define FEAT_ERUPTING_LAVA 722
 
 /*Feature flags - should be used instead of feature indexes unless generating.*/
 

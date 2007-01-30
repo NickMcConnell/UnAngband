@@ -3461,33 +3461,8 @@ void monster_death(int m_idx)
 	  /* Create stairs down */
 	  cave_set_feat(y, x, FEAT_MORE);
 
-	  /* Scatter any objects */
-	  {
-	    s16b this_o_idx, next_o_idx = 0;
-
-	    assert (in_bounds(y, x));
-
-	    /* Scan all objects in the grid */
-	    for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
-	      {
-		object_type *o_ptr;
-		
-		/* Get the object */
-		o_ptr = &o_list[this_o_idx];
-
-		/* Get the next object */
-		next_o_idx = o_ptr->next_o_idx;
-
-		/* Drop the object */
-		drop_near(o_ptr, -1, y, x);
-	      }
-
-	    /* Objects are gone */
-	    cave_o_idx[y][x] = 0;
-
-	    /* Visual update */
-	    lite_spot(y, x);
-	  }
+	  /* Save any objects in that place */
+	  scatter_objects_under_feat(y, x);
 	}
 
 

@@ -786,6 +786,7 @@ extern void teleport_player(int dis);
 extern void teleport_player_to(int ny, int nx);
 extern void teleport_towards(int oy, int ox, int ny, int nx);
 extern void teleport_player_level(void);
+extern void scatter_objects_under_feat(int y, int x);
 extern void take_hit(int dam, cptr kb_str);
 extern bool hates_terrain(object_type *o_ptr, int f_idx);
 extern bool player_ignore_terrain(int f_idx);
