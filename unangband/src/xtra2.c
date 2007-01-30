@@ -5534,7 +5534,7 @@ static key_event target_set_interactive_aux(int y, int x, int *room, int mode, c
 			if (prefix(name, "the ")) s3 = "";
 
 			/* Hack -- special introduction for filled areas */
-			if (*s2 && (f_info[feat].flags2 & (FF2_FILLED))) s2 = "";
+			if (*s2 && (f_info[feat].flags2 & (FF2_FILLED))) s2 = "surrounded by ";
 
 			/* Hack -- special introduction for store doors */
 			if (f_info[feat].flags1 & (FF1_ENTER))
