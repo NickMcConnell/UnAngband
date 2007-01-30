@@ -340,7 +340,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags6 & RF6_TELE_SELF_TO)vp[vn++] = "teleport-self to";
 	if (l_ptr->flags6 & RF6_TELE_TO)     vp[vn++] = "teleport to";
 	if (l_ptr->flags6 & RF6_TELE_AWAY)   vp[vn++] = "teleport away";
-	if (l_ptr->flags6 & RF6_TELE_LEVEL)  vp[vn++] = "teleport level";
+	if (l_ptr->flags6 & RF6_TELE_LEVEL)  vp[vn++] = "push through floor or ceiling";
 	if (l_ptr->flags6 & RF6_WRAITHFORM)  vp[vn++] = "assume wraithform";
 	if (l_ptr->flags6 & RF6_DARKNESS)    vp[vn++] = "create darkness";
 	if (l_ptr->flags6 & RF6_TRAPS)       vp[vn++] = "create traps";

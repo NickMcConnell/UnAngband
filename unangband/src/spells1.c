@@ -593,7 +593,8 @@ void teleport_towards(int oy, int ox, int ny, int nx)
 
 
 /*
- * Teleport the player one level up or down (random when legal)
+ * Creates terrain that will move the player one level up or down 
+ * (random when legal)
  *
  * Note hacks because we now support towers as well as dungeons.
  */
@@ -612,7 +613,7 @@ void teleport_player_level(void)
 	}
 	else if (p_ptr->depth == min_depth(p_ptr->dungeon))
 	{
-		message(MSG_TPLEVEL, 0, "You sink through the floor.");
+		message(MSG_TPLEVEL, 0, "The floor beneath you collapses.");
 
 		/* Hack -- tower level decreases depth */
 		if (t_info[p_ptr->dungeon].zone[0].tower)
@@ -635,11 +636,11 @@ void teleport_player_level(void)
 		/* Hack -- tower level increases depth */
 		if (t_info[p_ptr->dungeon].zone[0].tower)
 		{
-			message(MSG_TPLEVEL, 0, "You sink through the floor.");
+			message(MSG_TPLEVEL, 0, "The floor beneath you collapses.");
 		}
 		else
 		{
-			message(MSG_TPLEVEL, 0, "You rise up through the ceiling.");
+			message(MSG_TPLEVEL, 0, "An unseen force pulls you through the ceiling.");
 		}
 
 		/* New depth */
@@ -651,7 +652,7 @@ void teleport_player_level(void)
 
 	else if (rand_int(100) < 50)
 	{
-		message(MSG_TPLEVEL, 0, "You rise up through the ceiling.");
+		message(MSG_TPLEVEL, 0, "An unseen force pulls you through the ceiling.");
 
 		/* Hack -- tower level increases depth */
 		if (t_info[p_ptr->dungeon].zone[0].tower)
@@ -671,7 +672,7 @@ void teleport_player_level(void)
 
 	else
 	{
-		message(MSG_TPLEVEL, 0, "You sink through the floor.");
+		message(MSG_TPLEVEL, 0, "The floor beneath you collapses.");
 
 		/* Hack -- tower level increases depth */
 		if (t_info[p_ptr->dungeon].zone[0].tower)

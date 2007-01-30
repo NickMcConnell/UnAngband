@@ -48,7 +48,7 @@
 
 # 'M' is the index of a feature to mimic.
 
-# 'T' is for trap effects. These may be any effect and damge from attack that
+# 'T' is for trap effects. These may be any effect and damage from attack that
 # a monster may use, but a feature only has one possible trap effect per feature.
 
 # 'S' is for trap spells, which are selected from monster spells. Each feature
@@ -4131,7 +4131,6 @@ U:56
 G:^:o
 W:10:1:20:0
 S:TELE_LEVEL
-D:You hit a teleport trap!
 K:DEFAULT:1
 K:HIT_TRAP:284
 F:TRAP | HIDE_ITEM | HIT_TRAP | DISARM | CAN_CLIMB | CAN_FLY | PLACE |

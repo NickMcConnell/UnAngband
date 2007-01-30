@@ -572,7 +572,7 @@ C:10:19:22:40:21
 C:8:19:22:40:21
 F:CREATE_STAIR
 
-N:36:Teleport Level
+N:36:Escape
 A:70:10:1
 A:90:5:5
 A:92:3:5
@@ -1504,7 +1504,7 @@ C:5:25:25:80:12
 C:8:25:25:80:12
 B:AIM:AWAY_ALL:1d0+0
 
-N:115:Teleport Level
+N:115:Escape
 A:91:4:5
 A:93:7:27
 C:2:30:40:75:133

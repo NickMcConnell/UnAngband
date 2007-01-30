@@ -1083,7 +1083,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		f_name+f_info[s_ptr->param].name);
 	if (s_ptr->flags1 & (SF1_STAR_ACQUIREMENT)) vp[vn++] = "creates several excellent, superb or special items";
 	else if (s_ptr->flags1 & (SF1_ACQUIREMENT)) vp[vn++] = "creates an excellent, superb or special item";
-	if (s_ptr->flags2 & (SF2_TELE_LEVEL)) vp[vn++] = "teleports you to an adjacent level";
+	if (s_ptr->flags2 & (SF2_TELE_LEVEL)) vp[vn++] = "pushes you through floor or ceiling";
 	if (s_ptr->flags2 & (SF2_RECALL)) vp[vn++]="returns you to the surface, or teleports you into the depths";
 	if (s_ptr->flags2 & (SF2_ALTER_LEVEL)) vp[vn++] = "alters the level you are on";
 	if (s_ptr->type == SPELL_EARTHQUAKE) vp[vn++] = format("creates a radius %d earthquake",s_ptr->param);
