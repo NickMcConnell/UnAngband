@@ -829,6 +829,7 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_EAT_LITE:       q = "absorb light"; break;
 			case GF_FALL: q = "drop into a pit";break;
 			case GF_FALL_MORE: q = "drop through the floor";break;
+			case GF_FALL_LESS: q = "rise through the ceiling";break;
 			case GF_FALL_SPIKE: q = "drop into a spiked pit";break;
 			case GF_FALL_POIS: q = "drop into a poison spiked pit";break;
 			case GF_BLIND:  q = "blind"; break;

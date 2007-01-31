@@ -1346,6 +1346,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_EAT_LITE:       q = "absorb light from"; break;
 			case GF_FALL: q = "drop"; u="into a pit";break;
 			case GF_FALL_MORE: q = "drop"; u="through the floor";break;
+			case GF_FALL_LESS: q = "rise"; u="through the ceiling";break;
 			case GF_FALL_SPIKE: q = "drop"; u="into a spiked pit";break;
 			case GF_FALL_POIS: q = "drop"; u="into a poison spiked pit";break;
 			case GF_BLIND:  q = "blind"; break;

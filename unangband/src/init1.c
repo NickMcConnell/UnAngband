@@ -377,7 +377,9 @@ static cptr r_info_blow_effect[] =
 	"WEB",
 	"BLOOD",
 	"SLIME",
-	NULL
+	"RESIST_MAGIC",
+	"FALL_LESS",
+	NULL,
 };
 
 /*

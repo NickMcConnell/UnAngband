@@ -590,86 +590,21 @@ void teleport_towards(int oy, int ox, int ny, int nx)
 }
 
 
-void scatter_objects_under_feat(int y, int x)
-{
-  s16b this_o_idx, next_o_idx = 0;
-
-  assert (in_bounds(y, x));
-
-  /* Scan all objects in the grid */
-  for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
-    {
-      object_type *o_ptr;
-		
-      /* Get the object */
-      o_ptr = &o_list[this_o_idx];
-
-      /* Get the next object */
-      next_o_idx = o_ptr->next_o_idx;
-
-      /* Drop the object */
-      drop_near(o_ptr, -1, y, x);
-    }
-
-  /* Objects are gone */
-  cave_o_idx[y][x] = 0;
-
-  /* Visual update */
-  lite_spot(y, x);
-}
-
-
 void create_down_teleport_level(void)
 {
-		message(MSG_TPLEVEL, 0, "The floor beneath you collapses.");
+  message(MSG_TPLEVEL, 0, "The floor beneath you collapses.");
 
-		/* Hack -- tower level increases depth */
-		if (t_info[p_ptr->dungeon].zone[0].tower)
-		{
-			/* New depth */
-			p_ptr->depth--;
-		}
-		else
-		{
-			/* New depth */
-			p_ptr->depth++;
-		}
-
-		/* Leaving */
-		p_ptr->leaving = TRUE;
-
-	  /* Create stairs down 
-	     cave_set_feat(y, x, FEAT_CHASM); */
-
-	  /* Save any objects in that place
-	     scatter_objects_under_feat(int y, int x) */
+  /* Create feature leading down */
+  cave_set_feat(p_ptr->py, p_ptr->px, CRUMBLING_FLOOR);
 }
 
 
 void create_up_teleport_level(void)
 {
-		message(MSG_TPLEVEL, 0, "The eruption at your feet pushes you upward.");
+  message(MSG_TPLEVEL, 0, "Rubble falls down from the ceiling.");
 
-		/* Hack -- tower level increases depth */
-		if (t_info[p_ptr->dungeon].zone[0].tower)
-		{
-			/* New depth */
-			p_ptr->depth++;
-		}
-		else
-		{
-			/* New depth */
-			p_ptr->depth--;
-		}
-
-		/* Leaving */
-		p_ptr->leaving = TRUE;
-
-	  /* Create stairs down 
-	     cave_set_feat(y, x, FEAT_GEYSER); */
-
-	  /* Save any objects in that place
-	     scatter_objects_under_feat(int y, int x) */
+  /* Create feature leading up */
+  cave_set_feat(p_ptr->py, p_ptr->px, TREMBLING_RUBBLE);
 }
 
 
@@ -9707,53 +9642,65 @@ bool project_p(int who, int y, int x, int dam, int typ)
 		}
 
 		case GF_FALL_MORE:
-		{
-			if ((p_ptr->cur_flags3 & (TR3_FEATHER)) != 0)
-			{
-				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+		case GF_FALL_LESS:
+		  {
+		    if (typ == GF_FALL_MORE && 
+			p_ptr->cur_flags3 & (TR3_FEATHER) != 0)
+		      {
+			/* Always notice */
+			player_can_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
 
-				msg_print("You gently float down to the next level.");
-				dam = 0;
-			}
-			else
-			{
-				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+			if (typ == GF_FALL_MORE)
+			  msg_print("You gently float down to the next level.");
+				
+			dam = 0;
+		      }
+		    else
+		      {
+			if (typ == GF_FALL_MORE)
+			  /* Always notice */
+			  player_not_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+			  
+			take_hit(dam, killer);
+		      }
 
-				take_hit(dam, killer);
-			}
+		    /* Hack -- no chasm/trap doors on quest levels */
+		    if (!max_depth(p_ptr->dungeon)
+			|| (typ == GF_FALL_MORE 
+			    && (is_quest(p_ptr->depth) 
+				|| p_ptr->depth == max_depth(p_ptr->dungeon)))
+			|| (typ == GF_FALL_LESS
+			    && p_ptr->depth == min_depth(p_ptr->dungeon)))
+		      {
+			/* Mark grid for later processing. */
+			cave_temp_mark(y, x, FALSE);
+		      }
+		    /* Hack -- tower level decreases depth */
+		    else if ((typ == GF_FALL_MORE 
+			      && !t_info[p_ptr->dungeon].zone[0].tower)
+			     || (typ == GF_FALL_LESS 
+				 && t_info[p_ptr->dungeon].zone[0].tower))
+		      {
+			/* New depth */
+			p_ptr->depth++;
 
-			/* Hack -- tower level decreases depth */
-			if (t_info[p_ptr->dungeon].zone[0].tower)
-			{
-				/* New depth */
-				p_ptr->depth--;
+			/* Leaving */
+			p_ptr->leaving = TRUE;
+		      }
+		    else
+		      {
+			/* New depth */
+			p_ptr->depth--;
 
-				/* Leaving */
-				p_ptr->leaving = TRUE;
+			/* Leaving */
+			p_ptr->leaving = TRUE;
+		      }
 
-			}
-			/* Hack -- no chasm/trap doors/down stairs on quest levels */
-			else if (is_quest(p_ptr->depth) || (p_ptr->depth == max_depth(p_ptr->dungeon)))
-			{
-				/* Mark grid for later processing. */
-				cave_temp_mark(y, x, FALSE);
-			}
-			else
-			{
-				/* New depth */
-				p_ptr->depth++;
+		    /* Clear stairs */
+		    p_ptr->create_stair = 0;
 
-				/* Leaving */
-				p_ptr->leaving = TRUE;
-			}
-
-			/* Clear stairs */
-			p_ptr->create_stair = 0;
-
-			break;
-		}
+		    break;
+		  }
 
 		case GF_FALL_SPIKE:
 		{

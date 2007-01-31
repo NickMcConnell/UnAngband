@@ -931,6 +931,7 @@
 #define GF_BLOOD	114
 #define GF_SLIME	115
 #define GF_RES_MAGIC	116
+#define GF_FALL_LESS    117
 
 /*
  * Columns for the spell cost or damage flags
@@ -1170,6 +1171,9 @@
 #define FEAT_GEYSER 711
 #define FEAT_WATER_SPOUT 714
 #define FEAT_ERUPTING_LAVA 722
+#define CRUMBLING_FLOOR 873
+#define TREMBLING_RUBBLE 874
+#define PULSING_RUBBLE 875
 
 /*Feature flags - should be used instead of feature indexes unless generating.*/
 
