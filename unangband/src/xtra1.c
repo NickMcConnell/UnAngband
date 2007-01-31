@@ -3623,9 +3623,9 @@ static void calc_bonuses(void)
 	{
 		int str_index, dex_index, half_str;
 
-		int num = c_info[p_ptr->pclass].max_attacks;
-		int wgt = c_info[p_ptr->pclass].min_weight;
-		int mul = c_info[p_ptr->pclass].att_multiply;
+		int num = cp_ptr->max_attacks;
+		int wgt = cp_ptr->min_weight;
+		int mul = cp_ptr->att_multiply;
 		int div;
 
 		/* Enforce a minimum "weight" (tenth pounds) */
@@ -3950,16 +3950,16 @@ static void calc_bonuses(void)
 			}
 
 			/* Change in spell stat may affect mana */
-			if ((i == c_info[p_ptr->pclass].spell_stat_mana) &&
-				((c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL) || (p_ptr->pstyle == WS_MAGIC_BOOK)
+			if ((i == cp_ptr->spell_stat_mana) &&
+				((cp_ptr->spell_first <= PY_MAX_LEVEL) || (p_ptr->pstyle == WS_MAGIC_BOOK)
 				|| (p_ptr->pstyle == WS_PRAYER_BOOK) || (p_ptr->pstyle == WS_SONG_BOOK)))
 			{
 				p_ptr->update |= (PU_MANA);
 			}
 
 			/* Change in spell stat may affect spells */
-			if ((i == c_info[p_ptr->pclass].spell_stat_study) &&
-				((c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL) || (p_ptr->pstyle == WS_MAGIC_BOOK)
+			if ((i == cp_ptr->spell_stat_study) &&
+				((cp_ptr->spell_first <= PY_MAX_LEVEL) || (p_ptr->pstyle == WS_MAGIC_BOOK)
 				|| (p_ptr->pstyle == WS_PRAYER_BOOK) || (p_ptr->pstyle == WS_SONG_BOOK)))
 			{
 				p_ptr->update |= (PU_SPELLS);
