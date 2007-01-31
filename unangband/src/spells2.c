@@ -1035,6 +1035,12 @@ void set_recall(void)
 	/* Activate recall */
 	if (!p_ptr->word_recall)
 	{
+		if (!get_check("The air starts crackling. Are you sure you want to continue? "))
+		  {
+		    msg_print("A sudden discharge fills the air with a strange smell...");
+		    return;
+		  }
+
 		/* Reset recall depth */
 		if ((p_ptr->depth > min_depth(p_ptr->dungeon)) && (p_ptr->depth != p_ptr->max_depth))
 		{
