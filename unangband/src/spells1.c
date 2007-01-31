@@ -9645,7 +9645,7 @@ bool project_p(int who, int y, int x, int dam, int typ)
 		case GF_FALL_LESS:
 		  {
 		    if (typ == GF_FALL_MORE && 
-			p_ptr->cur_flags3 & (TR3_FEATHER) != 0)
+			(p_ptr->cur_flags3 & TR3_FEATHER) != 0)
 		      {
 			/* Always notice */
 			player_can_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
