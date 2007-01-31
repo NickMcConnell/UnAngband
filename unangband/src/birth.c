@@ -1224,7 +1224,7 @@ static void class_aux_hook(birth_menu c_str)
 	Term_putstr(CLASS_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
 
 	/* Experience factor */
-	p_ptr->expfact += cp_ptr->c_exp;
+	p_ptr->expfact = rp_ptr->r_exp + cp_ptr->c_exp;
 
         sprintf(s, "Experience: %d%%  ", p_ptr->expfact);
 	Term_putstr(CLASS_AUX_COL, TABLE_ROW + A_MAX + 1, -1, TERM_WHITE, s);
@@ -1310,7 +1310,7 @@ static void style_aux_hook(birth_menu w_str)
         Term_putstr(STYLE_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
 
 	/* Experience factor */
-	p_ptr->expfact += style_idx ? 10 : 0;
+	p_ptr->expfact = rp_ptr->r_exp + cp_ptr->c_exp + (style_idx ? 10 : 0);
 
         sprintf(s, "Experience: %d%%  ", p_ptr->expfact);
         Term_putstr(STYLE_AUX_COL, TABLE_ROW + A_MAX + 1, -1, TERM_WHITE, s);
