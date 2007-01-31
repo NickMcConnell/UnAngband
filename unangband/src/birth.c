@@ -240,67 +240,6 @@ static void get_stats(void)
 
 
 /*
- * Roll for some info that the auto-roller ignores
- */
-static void get_extra(void)
-{
-	int i, j, min_value, max_value; 
-	int random_levels = PY_MAX_LEVEL - 2;
-
-	/* Level one */
-	p_ptr->max_lev = p_ptr->lev = 1;
-
-	/* Experience factor */
-	p_ptr->expfact = rp_ptr->r_exp + cp_ptr->c_exp;
-
-	/* Minimum hitpoints at highest level - 1 */
-	min_value = random_levels * 9 * 3 / 8;
-	min_value += random_levels;
-
-	/* Maximum hitpoints at highest level - 1 */
-	max_value = random_levels * 9 * 5 / 8;
-	max_value += random_levels;
-
-	/* Set level 1 hitdice */
-	p_ptr->player_hp[0] = 10;
-
-	/* Roll out the hitpoints */
-	while (TRUE)
-	{
-		/* Roll the hitpoint values */
-		for (i = 1; i <= random_levels ; i++)
-		{
-			j = randint(10);
-			p_ptr->player_hp[i] = p_ptr->player_hp[i-1] + j;
-		}
-
-		/* Require "valid" hitpoints at various levels */
-		if (p_ptr->player_hp[random_levels/5] - 10 <= min_value/5) 
-		  continue;
-		if (p_ptr->player_hp[random_levels/5] - 10 >= max_value/5) 
-		  continue;
-
-		if (p_ptr->player_hp[random_levels/2] - 10 <= min_value/2) 
-		  continue;
-		if (p_ptr->player_hp[random_levels/2] - 10 >= max_value/2) 
-		  continue;
-
-		if (p_ptr->player_hp[random_levels] - 10 <= min_value) 
-		  continue;
-		if (p_ptr->player_hp[random_levels] - 10 >= max_value) 
-		  continue;
-
-		/* Acceptable */
-		break;
-	}
-
-	/* Set level 50 hitdice */
-	p_ptr->player_hp[PY_MAX_LEVEL - 1] = 
-	  p_ptr->player_hp[random_levels] + 10;
-}
-
-
-/*
  * Get the racial history, and social class, using the "history charts".
  */
 static void get_history(void)
@@ -412,7 +351,6 @@ static void get_money(void)
 static void player_wipe(void)
 {
 	int i, j;
-
 
 	/* Wipe the player */
 	(void)WIPE(p_ptr, player_type);
@@ -541,7 +479,7 @@ static void player_outfit(void)
 			s16b k_idx = lookup_kind(e_ptr->tval, e_ptr->sval);
 
 			/* MegaHack -- undead start with 'foods' */
-			if (p_info[p_ptr->prace].flags4 & (TR4_UNDEAD)) switch (e_ptr->tval)
+			if (rp_ptr->flags4 & (TR4_UNDEAD)) switch (e_ptr->tval)
 			{
 				case TV_FOOD:
 				{
@@ -612,7 +550,7 @@ static void player_outfit(void)
 						  }
 						case WS_THROWN:
 						  {
-						    if (p_info[p_ptr->prace].r_tht > p_info[p_ptr->prace].r_thb)
+						    if (rp_ptr->r_tht > rp_ptr->r_thb)
 							{
 							  k_idx = lookup_kind(TV_SHOT, SV_AMMO_LIGHT);
 							}
@@ -655,7 +593,7 @@ static void player_outfit(void)
 						  }
 						case WS_THROWN:
 						  {
-						    if (p_info[p_ptr->prace].r_tht > p_info[p_ptr->prace].r_thb)
+						    if (rp_ptr->r_tht > rp_ptr->r_thb)
 						      {
 							k_idx = lookup_kind(TV_SHOT, SV_AMMO_LIGHT);
 						      }
@@ -1135,11 +1073,14 @@ static void race_aux_hook(birth_menu r_str)
 
 	if (race == z_info->g_max) return;
 
+	/* Save the race pointer */
+	rp_ptr = &p_info[race];
+
 	/* Display relevant details. */
 	for (i = 0; i < A_MAX; i++)
 	{
 		sprintf(s, "%s%+d ", stat_names_reduced[i],
-		p_info[race].r_adj[i]);
+		rp_ptr->r_adj[i]);
 		Term_putstr(RACE_AUX_COL, TABLE_ROW + i, -1, TERM_WHITE, s);
 	}
 
@@ -1147,7 +1088,7 @@ static void race_aux_hook(birth_menu r_str)
 	for (i = 0; i < A_MAX; i++)
 	  {
 	    /* Obtain a "bonus" for "race" and "class" */
-	    int bonus_add = p_info[race].r_adj[i];
+	    int bonus_add = rp_ptr->r_adj[i];
 
 	    /* Get the minimally increased stat for the bonuses */
 	    int value_min = adjust_stat(10, bonus_add, 1);
@@ -1158,11 +1099,10 @@ static void race_aux_hook(birth_menu r_str)
 	    /* Get the stat increased by the average for the bonuses */
 	    int value = value_min + (value_max - value_min) / 2;
 
-	    /* Apply the racial/class bonuses */
+	    /* Apply the racial bonuses */
 	    p_ptr->stat_cur[i] = p_ptr->stat_max[i] = value;
 	  }
 
-#if 0
 	/* Calculate the hitdie */
 	p_ptr->update |= (PU_BONUS | PU_HP);
 
@@ -1171,11 +1111,13 @@ static void race_aux_hook(birth_menu r_str)
 
 	sprintf(s, "Hit die: %d ", p_ptr->hitdie);
 	Term_putstr(RACE_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
-#endif
 
-	sprintf(s, "Experience: %d%%  ", p_info[race].r_exp);
+	/* Experience factor */
+	p_ptr->expfact = rp_ptr->r_exp;
+
+	sprintf(s, "Experience: %d%%  ", p_ptr->expfact);
 	Term_putstr(RACE_AUX_COL, TABLE_ROW + A_MAX + 1, -1, TERM_WHITE, s);
-	sprintf(s, "Infravision: %d ft  ", p_info[race].infra * 10);
+	sprintf(s, "Infravision: %d ft  ", rp_ptr->infra * 10);
 	Term_putstr(RACE_AUX_COL, TABLE_ROW + A_MAX + 2, -1, TERM_WHITE, s);
 }
 
@@ -1213,9 +1155,6 @@ static bool get_player_race()
         	return (FALSE);
 	}
 
-	/* Save the race pointer */
-	rp_ptr = &p_info[p_ptr->prace];
-
 	/* Save the player shape */
 	p_ptr->pshape = p_ptr->prace;
 
@@ -1245,11 +1184,14 @@ static void class_aux_hook(birth_menu c_str)
 
 	if (class_idx == z_info->c_max) return;
 
+	/* Set class */
+	cp_ptr = &c_info[class_idx];
+
 	/* Display relevant details. */
 	for (i = 0; i < A_MAX; i++)
 	{
 		sprintf(s, "%s%+d ", stat_names_reduced[i],
-                c_info[class_idx].c_adj[i] + p_info[p_ptr->prace].r_adj[i]);
+                cp_ptr->c_adj[i] + rp_ptr->r_adj[i]);
 		Term_putstr(CLASS_AUX_COL, TABLE_ROW + i, -1, TERM_WHITE, s);
 	}
 
@@ -1257,8 +1199,7 @@ static void class_aux_hook(birth_menu c_str)
 	for (i = 0; i < A_MAX; i++)
 	  {
 	    /* Obtain a "bonus" for "race" and "class" */
-	    int bonus_add = p_info[p_ptr->prace].r_adj[i] 
-	      + c_info[class_idx].c_adj[i];
+	    int bonus_add = rp_ptr->r_adj[i] + cp_ptr->c_adj[i];
 
 	    /* Get the minimally increased stat for the bonuses */
 	    int value_min = adjust_stat(10, bonus_add, 1);
@@ -1273,7 +1214,6 @@ static void class_aux_hook(birth_menu c_str)
 	    p_ptr->stat_cur[i] = p_ptr->stat_max[i] = value;
 	  }
 
-#if 0
 	/* Calculate the hitdie */
 	p_ptr->update |= (PU_BONUS | PU_HP);
 
@@ -1282,8 +1222,11 @@ static void class_aux_hook(birth_menu c_str)
 
 	sprintf(s, "Hit die: %d ", p_ptr->hitdie);
 	Term_putstr(CLASS_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
-#endif
-        sprintf(s, "Experience: %d%%  ", c_info[class_idx].c_exp+p_info[p_ptr->prace].r_exp);
+
+	/* Experience factor */
+	p_ptr->expfact += cp_ptr->c_exp;
+
+        sprintf(s, "Experience: %d%%  ", p_ptr->expfact);
 	Term_putstr(CLASS_AUX_COL, TABLE_ROW + A_MAX + 1, -1, TERM_WHITE, s);
 }
 
@@ -1334,9 +1277,6 @@ static bool get_player_class(void)
 		return (FALSE);
 	}
 
-	/* Set class */
-	cp_ptr = &c_info[p_ptr->pclass];
-
         FREE(classes);
 
 	return (TRUE);
@@ -1363,15 +1303,16 @@ static void style_aux_hook(birth_menu w_str)
 	for (i = 0; i < A_MAX; i++)
 	{
 		sprintf(s, "%s%+d ", stat_names_reduced[i],
-                c_info[p_ptr->pclass].c_adj[i] + p_info[p_ptr->prace].r_adj[i]);
+                cp_ptr->c_adj[i] + rp_ptr->r_adj[i]);
                 Term_putstr(STYLE_AUX_COL, TABLE_ROW + i, -1, TERM_WHITE, s);
 	}
-#if 0
 	sprintf(s, "Hit die: %d ", p_ptr->hitdie);
         Term_putstr(STYLE_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
-#endif
-        sprintf(s, "Experience: %d%%  ",c_info[p_ptr->pclass].c_exp+p_info[p_ptr->prace].r_exp +
-                                                (style_idx ? 10 : 0) );
+
+	/* Experience factor */
+	p_ptr->expfact += style_idx ? 10 : 0;
+
+        sprintf(s, "Experience: %d%%  ", p_ptr->expfact);
         Term_putstr(STYLE_AUX_COL, TABLE_ROW + A_MAX + 1, -1, TERM_WHITE, s);
 }
 
@@ -1430,7 +1371,7 @@ static bool get_player_style(void)
 	styles[0].ghost = TRUE;
 
 	choice = get_player_choice(styles, num, STYLE_COL, 19,
-							   "styles.txt", style_aux_hook);
+				   "styles.txt", style_aux_hook);
 
 	/* No selection? */
 	if (choice == INVALID_CHOICE)
@@ -1611,6 +1552,9 @@ static bool player_birth_aux_1(void)
 	Term_putstr(QUESTION_COL, HEADER_ROW + 4, -1, TERM_WHITE,
 	            "selection, '=' for the birth options, '?' for help, or 'Ctrl-X' to quit.");
 
+	/* Level one */
+	p_ptr->max_lev = p_ptr->lev = 1;
+
 	if (!get_player_sex()) return (FALSE);
 
 	/* Clean up */
@@ -1692,16 +1636,11 @@ static bool player_birth_aux_2(void)
 		stats[i] = 10;
 	}
 
-
-	/* Roll for base hitpoints */
-	get_extra();
-
 	/* Roll for age/height/weight */
 	get_ahw();
 
 	/* Roll for social class */
 	get_history();
-
 
 	/* Interact */
 	while (1)
@@ -2097,9 +2036,6 @@ static bool player_birth_aux_3(void)
 
 		/*** Display ***/
 
-		/* Roll for base hitpoints */
-		get_extra();
-
 		/* Roll for age/height/weight */
 		get_ahw();
 
@@ -2256,6 +2192,58 @@ static bool player_birth_aux(void)
 }
 
 
+void roll_hp_table(void)
+{
+  int i, j, min_value, max_value; 
+  int random_levels = PY_MAX_LEVEL - 2;
+
+  /* Minimum hitpoints at highest level - 1 */
+  min_value = random_levels * 9 * 3 / 8;
+  min_value += random_levels;
+
+  /* Maximum hitpoints at highest level - 1 */
+  max_value = random_levels * 9 * 5 / 8;
+  max_value += random_levels;
+
+  /* Set level 1 hitdice */
+  p_ptr->player_hp[0] = 10;
+
+  /* Roll out the hitpoints */
+  while (TRUE)
+    {
+      /* Roll the hitpoint values */
+      for (i = 1; i <= random_levels ; i++)
+	{
+	  j = randint(10);
+	  p_ptr->player_hp[i] = p_ptr->player_hp[i-1] + j;
+	}
+
+      /* Require "valid" hitpoints at various levels */
+      if (p_ptr->player_hp[random_levels/5] - 10 <= min_value/5) 
+	continue;
+      if (p_ptr->player_hp[random_levels/5] - 10 >= max_value/5) 
+	continue;
+
+      if (p_ptr->player_hp[random_levels/2] - 10 <= min_value/2) 
+	continue;
+      if (p_ptr->player_hp[random_levels/2] - 10 >= max_value/2) 
+	continue;
+
+      if (p_ptr->player_hp[random_levels] - 10 <= min_value) 
+	continue;
+      if (p_ptr->player_hp[random_levels] - 10 >= max_value) 
+	continue;
+
+      /* Acceptable */
+      break;
+    }
+
+  /* Set level 50 hitdice */
+  p_ptr->player_hp[PY_MAX_LEVEL - 1] = 
+    p_ptr->player_hp[random_levels] + 10;
+}
+
+
 /*
  * Create a new character.
  *
@@ -2266,13 +2254,15 @@ void player_birth(void)
 {
 	int n;
 
+	/* Wipe the player */
+	player_wipe();
+
+	/* Roll the hitpoints table */
+	roll_hp_table();
 
 	/* Create a new character */
 	while (1)
 	{
-		/* Wipe the player */
-		player_wipe();
-
 		/* Roll up a new character */
 		if (player_birth_aux()) break;
 	}
