@@ -3222,7 +3222,7 @@ B:SELF:LOSE_ALL:10d10+0
 S:CURE_DISEASE:27
 D:Your nerves and muscles feel weak and lifeless.
 
-N:290:Weakness and Smallness
+N:290:Weakness
 A:75:16:1
 B:SELF:LOSE_STR
 
