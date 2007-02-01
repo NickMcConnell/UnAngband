@@ -1102,7 +1102,7 @@ static void race_aux_hook(birth_menu r_str)
 	    /* Apply the racial bonuses */
 	    p_ptr->stat_cur[i] = p_ptr->stat_max[i] = value;
 	  }
-#if 0
+
 	/* Calculate the hitdie */
 	p_ptr->update |= (PU_BONUS | PU_HP);
 
@@ -1111,7 +1111,7 @@ static void race_aux_hook(birth_menu r_str)
 
 	sprintf(s, "Hit die: %d ", p_ptr->hitdie);
 	Term_putstr(RACE_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
-#endif
+
 	/* Experience factor */
 	p_ptr->expfact = rp_ptr->r_exp;
 
@@ -1213,7 +1213,7 @@ static void class_aux_hook(birth_menu c_str)
 	    /* Apply the racial/class bonuses */
 	    p_ptr->stat_cur[i] = p_ptr->stat_max[i] = value;
 	  }
-#if 0
+
 	/* Calculate the hitdie */
 	p_ptr->update |= (PU_BONUS | PU_HP);
 
@@ -1222,7 +1222,6 @@ static void class_aux_hook(birth_menu c_str)
 
 	sprintf(s, "Hit die: %d ", p_ptr->hitdie);
 	Term_putstr(CLASS_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
-#endif
 
 	/* Experience factor */
 	p_ptr->expfact = rp_ptr->r_exp + cp_ptr->c_exp;
@@ -1307,10 +1306,10 @@ static void style_aux_hook(birth_menu w_str)
                 cp_ptr->c_adj[i] + rp_ptr->r_adj[i]);
                 Term_putstr(STYLE_AUX_COL, TABLE_ROW + i, -1, TERM_WHITE, s);
 	}
-#if 0
+
 	sprintf(s, "Hit die: %d ", p_ptr->hitdie);
         Term_putstr(STYLE_AUX_COL, TABLE_ROW + A_MAX, -1, TERM_WHITE, s);
-#endif
+
 	/* Experience factor */
 	p_ptr->expfact = rp_ptr->r_exp + cp_ptr->c_exp + (style_idx ? 10 : 0);
 
