@@ -255,7 +255,9 @@ correctly.
 - Fixed bug causing crashes when attempting to travel with maps in the inventory.
 
 - Fixed bug where gain mana effects would report as causing damage instead (Reported by 
-Martin Dann).
+manchu).
+
+- Fix the return of the shrine exploit (Reported by Matthias Rudolf).
 
 ### Build / Platform ###
 
