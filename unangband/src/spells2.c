@@ -1298,8 +1298,7 @@ int value_check_aux3(const object_type *o_ptr)
 
 	/* Great to_d bonus */
 	if (o_ptr->to_d >
-	    (k_info[o_ptr->k_idx].dd * k_info[o_ptr->k_idx].ds < 4 ?
-	     9 : k_info[o_ptr->k_idx].dd * k_info[o_ptr->k_idx].ds))
+	    MAX(7, k_info[o_ptr->k_idx].dd * k_info[o_ptr->k_idx].ds))
 	  return (INSCRIP_GREAT);
 
 	/* Great "weapon" dice */
@@ -1382,7 +1381,11 @@ int value_check_aux4(const object_type *o_ptr)
 
 	/* Known to be unusual */
 	if (o_ptr->feeling == INSCRIP_UNUSUAL) return (INSCRIP_MAGICAL);
-	if (o_ptr->feeling == INSCRIP_UNCURSED) return(INSCRIP_AVERAGE);
+
+	/* FIXME: I've added the to_* check because it was wrong without it */
+	if (o_ptr->to_h + o_ptr->to_d <= 0 
+	    && o_ptr->feeling == INSCRIP_UNCURSED)
+	  return(INSCRIP_AVERAGE);
 
 	/* Default to uncursed */
 	return (INSCRIP_UNCURSED);
