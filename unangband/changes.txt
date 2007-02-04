@@ -178,6 +178,9 @@ be set to a high timeout value instead.
 races have the ability to shape change into other shapes (e.g. Beorning, Vampire, Werewolf,
 Maia). Added support for innate racial activations.
 
+- Teleport level attacks now affect the terrain under you, which either drops you a level
+or launches you up a level. This gives you a chance to evade the attack by moving.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
