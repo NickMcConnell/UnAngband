@@ -7738,7 +7738,7 @@ bool project_p(int who, int y, int x, int dam, int typ)
 		{
 			if (fuzzy) msg_print("You are hit by something!");
 			take_hit(dam, killer);
-			if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) != 0)
+			if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) == 0)
 			{
 				int k = (randint((dam > 40) ? 35 : (dam * 3 / 4 + 5)));
 

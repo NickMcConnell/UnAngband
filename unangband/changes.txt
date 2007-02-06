@@ -270,6 +270,9 @@ manchu).
 
 - Fix game crash reported by Matthias Rudolf.
 
+- Fixed bug where plasma incorrectly interacted with sound resistance (Reported
+by Matthias Rudolf).
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.
