@@ -2181,7 +2181,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 
 				/* Increase to_d; not above weapon dice */
 				if (o_ptr->to_d
-				    && o_ptr->to_d < o_ptr->dd * o_ptr->ds + 5)
+				    && o_ptr->to_d < (o_ptr->tval == TV_BOW ? 15 : o_ptr->dd * o_ptr->ds + 5))
 				  o_ptr->to_d += sign;
 				else tryagain = TRUE;
 
@@ -2930,7 +2930,7 @@ static void a_m_aux_1(object_type *o_ptr, int level, int power)
 		/* Enchant */
 		o_ptr->to_h += tohit1;
 		o_ptr->to_d = MIN(o_ptr->to_d + todam1, 
-				  o_ptr->dd * o_ptr->ds + 5);
+				  (o_ptr->tval == TV_BOW ? 15 : o_ptr->dd * o_ptr->ds + 5));
 
 		/* Very good */
 		if (power > 1)
@@ -2938,7 +2938,7 @@ static void a_m_aux_1(object_type *o_ptr, int level, int power)
 			/* Enchant again */
 			o_ptr->to_h += tohit2;
 			o_ptr->to_d = MIN(o_ptr->to_d + todam2, 
-					  o_ptr->dd * o_ptr->ds + 5);
+					  (o_ptr->tval == TV_BOW ? 15 : o_ptr->dd * o_ptr->ds + 5));
 		}
 	}
 
@@ -4184,7 +4184,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		o_ptr->to_a = a_ptr->to_a;
 		o_ptr->to_h = a_ptr->to_h;
 		o_ptr->to_d = MIN(a_ptr->to_d, 
-				  a_ptr->dd * a_ptr->ds + 5);
+				  (a_ptr->tval == TV_BOW ? 15 : a_ptr->dd * a_ptr->ds + 5));
 		o_ptr->weight = a_ptr->weight;
 
 		/* Hack -- extract the "broken" flag */
@@ -4357,7 +4357,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			/* Hack -- obtain bonuses */
 			if (e_ptr->max_to_h > 0) o_ptr->to_h += randint(e_ptr->max_to_h);
 			if (e_ptr->max_to_d > 0) o_ptr->to_d = MIN(o_ptr->to_d + randint(e_ptr->max_to_d), 
-								   o_ptr->dd * o_ptr->ds + 5);
+								   (o_ptr->tval == TV_BOW ? 15 : o_ptr->dd * o_ptr->ds + 5));
 			if (e_ptr->max_to_a > 0) o_ptr->to_a += randint(e_ptr->max_to_a);
 
 			/* Hack -- obtain pval */
