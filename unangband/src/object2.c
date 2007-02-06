@@ -2181,7 +2181,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 
 				/* Increase to_d; not above weapon dice */
 				if (o_ptr->to_d
-				    && o_ptr->to_d < (o_ptr->tval == TV_BOW ? 15 : o_ptr->dd * o_ptr->ds + 5))
+				    && o_ptr->to_d + sign < (o_ptr->tval == TV_BOW ? 15 : o_ptr->dd * o_ptr->ds + 5))
 				  o_ptr->to_d += sign;
 				else tryagain = TRUE;
 
@@ -2190,7 +2190,9 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 			case 6: case 7: case 8:
 
 				/* Increase to_a */
-				if (o_ptr->to_a) o_ptr->to_a += sign;
+				if (o_ptr->to_a
+				    && o_ptr->to_a + sign < o_ptr->ac + 5)
+				  o_ptr->to_a += sign;
 				else tryagain = TRUE;
 
 				break;
@@ -2259,13 +2261,13 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 				}
 				case 3: case 4: case 5:
 				{
-					if ((sign > 0) && (o_ptr->to_d > 0) && (o_ptr->to_d < 10)) o_ptr->to_d = 10;
+					if ((sign > 0) && (o_ptr->to_d > 0) && (o_ptr->to_d < 10)) o_ptr->to_d = MIN(o_ptr->dd * o_ptr->ds + 5, 10);
 					else if ((sign < 0) && (o_ptr->to_d < 0) && (o_ptr->to_d > -10)) o_ptr->to_d = -10;
 					break;
 				}
 				case 6: case 7: case 8:
 				{
-					if ((sign > 0) && (o_ptr->to_a > 0) && (o_ptr->to_a < 10)) o_ptr->to_a = 10;
+					if ((sign > 0) && (o_ptr->to_a > 0) && (o_ptr->to_a < 10)) o_ptr->to_a = MIN(o_ptr->ac + 5, 10);
 					else if ((sign < 0) && (o_ptr->to_a < 0) && (o_ptr->to_a > -10)) o_ptr->to_a = -10;
 					break;
 				}
@@ -3060,13 +3062,13 @@ static void a_m_aux_2(object_type *o_ptr, int level, int power)
 	if (power > 0)
 	{
 		/* Enchant */
-		o_ptr->to_a += toac1;
+		o_ptr->to_a = MIN(o_ptr->ac, o_ptr->to_a + 5 + toac1);
 
 		/* Very good */
 		if (power > 1)
 		{
 			/* Enchant again */
-			o_ptr->to_a += toac2;
+			o_ptr->to_a = MIN(o_ptr->ac, o_ptr->to_a + 5 + toac2);
 		}
 	}
 
@@ -4181,7 +4183,8 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		o_ptr->ac = a_ptr->ac;
 		o_ptr->dd = a_ptr->dd;
 		o_ptr->ds = a_ptr->ds;
-		o_ptr->to_a = a_ptr->to_a;
+		o_ptr->to_a = MIN(a_ptr->to_a,
+				  a_ptr->ac + 5);
 		o_ptr->to_h = a_ptr->to_h;
 		o_ptr->to_d = MIN(a_ptr->to_d, 
 				  (a_ptr->tval == TV_BOW ? 15 : a_ptr->dd * a_ptr->ds + 5));
@@ -4358,7 +4361,8 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			if (e_ptr->max_to_h > 0) o_ptr->to_h += randint(e_ptr->max_to_h);
 			if (e_ptr->max_to_d > 0) o_ptr->to_d = MIN(o_ptr->to_d + randint(e_ptr->max_to_d), 
 								   (o_ptr->tval == TV_BOW ? 15 : o_ptr->dd * o_ptr->ds + 5));
-			if (e_ptr->max_to_a > 0) o_ptr->to_a += randint(e_ptr->max_to_a);
+			if (e_ptr->max_to_a > 0) o_ptr->to_a = MIN(o_ptr->to_a + randint(e_ptr->max_to_a),
+								   o_ptr->ac + 5);
 
 			/* Hack -- obtain pval */
 			if (e_ptr->max_pval > 0) o_ptr->pval += randint(e_ptr->max_pval);

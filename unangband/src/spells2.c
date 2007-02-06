@@ -1291,7 +1291,8 @@ int value_check_aux3(const object_type *o_ptr)
 	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_EXCELLENT);
 
 	/* Great "armor" bonus */
-	if (o_ptr->to_a > 9) return (INSCRIP_GREAT);
+	if (o_ptr->to_a > MAX(7, o_ptr->ac)) 
+	  return (INSCRIP_GREAT);
 
 	/* Great to_h bonus */
 	if (o_ptr->to_h > 9) return (INSCRIP_GREAT);
