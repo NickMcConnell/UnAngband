@@ -266,6 +266,8 @@ manchu).
 
 - Fix the return of the shrine exploit (Reported by Matthias Rudolf).
 
+- Fix map "door to Moria" cannot be stored in bag of maps (Reported by Matthias Rudolf).
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.
