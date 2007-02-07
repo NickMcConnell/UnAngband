@@ -183,6 +183,9 @@ or launches you up a level. This gives you a chance to evade the attack by movin
 
 - Activating spell objects or innate abilities now tires you out.
 
+- Monsters when blinded now have a better selection of spells to cast.
+
+
 
 ### User Interface ###
 
@@ -272,6 +275,8 @@ manchu).
 
 - Fixed bug where plasma incorrectly interacted with sound resistance (Reported
 by Matthias Rudolf).
+
+- Fixed bug where spell weapons would cause you to fight unarmed instead (Reported by pepebe).
 
 ### Build / Platform ###
 
