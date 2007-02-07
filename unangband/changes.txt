@@ -285,6 +285,9 @@ by Matthias Rudolf).
 - Fixed bug where monsters would blind themselves with darkness spells (Reported by
 redelmansidi).
 
+- Fixed bug where detecting curses twice on an item would mark it average (Reported by
+Matthias Rudolf).
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.
