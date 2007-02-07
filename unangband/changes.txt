@@ -282,6 +282,9 @@ by Matthias Rudolf).
 
 - Fixed bug where spell weapons would cause you to fight unarmed instead (Reported by pepebe).
 
+- Fixed bug where monsters would blind themselves with darkness spells (Reported by
+redelmansidi).
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.
