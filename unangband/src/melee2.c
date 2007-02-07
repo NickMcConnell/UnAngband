@@ -1221,6 +1221,18 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		if (!f4 && !f5 && !f6 && !f7) return (0);
 	}
 
+	/* Eliminate all direct spells when player entering a level */
+	if (p_ptr->dodging == 9)
+	{
+		f4 &= (rf4_no_player_mask | RF4_SUMMON_MASK);
+		f5 &= (RF5_NO_PLAYER_MASK | RF4_SUMMON_MASK);
+		f6 &= (RF6_NO_PLAYER_MASK | RF6_SUMMON_MASK);
+		f7 &= (RF7_NO_PLAYER_MASK | RF7_SUMMON_MASK);
+
+		/* No spells left */
+		if (!f4 && !f5 && !f6 && !f7) return (0);
+	}
+
 	/*default: target the player*/
 	*tar_y = p_ptr->py;
 	*tar_x = p_ptr->px;
