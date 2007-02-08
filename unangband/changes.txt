@@ -291,6 +291,9 @@ Matthias Rudolf).
 - Fixed bug where artifacts would be lost if generated on a level and automatically id'ed
 due to class based sensing (Reported by Matthias Rudolf).
 
+- Fixed bugs with Khazad-Dum (Reported by Matthias Rudolf).
+
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.
