@@ -3675,6 +3675,7 @@ int value_check_aux7(object_type *o_ptr)
 	if (!(o_ptr->name1) && !(o_ptr->name2) && !(o_ptr->xtra1)
 		&& !(o_ptr->to_a > 0) && !(o_ptr->to_h + o_ptr->to_d > 0)) return (INSCRIP_AVERAGE);
 
+	/* Value the item */
 	o_ptr->ident |= (IDENT_VALUE);
 
 	/* No feeling */
@@ -3687,8 +3688,21 @@ int value_check_aux7(object_type *o_ptr)
  */
 int value_check_aux8(object_type *o_ptr)
 {
-	/* Become aware of object */
-	object_aware(o_ptr);
+	/* Important!!! Note different treatment for artifacts. Otherwise the player can
+	   potentially lose artifacts by leaving a level after they are 'automatically'
+	   identified. Note that for some artifacts - at the moment rings and amulets,
+	   even calling object_aware is dangerous at this stage. So we manually make
+	   any artifact 'aware' manually. */
+	if (artifact_p(o_ptr))
+	{
+		/* Identify the name */
+		o_ptr->ident |= (IDENT_NAME);
+	}
+	else
+	{
+		/* Become aware of object */
+		object_aware(o_ptr);
+	}
 
 	/* No feeling */
 	return (0);
@@ -3702,11 +3716,31 @@ int value_check_aux9(object_type *o_ptr)
 {
 	int feel = 0;
 
+	/* Heavy sensing of missile weapons and ammo */
 	if ((o_ptr->tval == TV_BOW) || (o_ptr->tval == TV_ARROW) || (o_ptr->tval == TV_SHOT) ||
 		(o_ptr->tval == TV_BOLT))
-		object_known(o_ptr);
+	{
+		/* Important!!! Note different treatment for artifacts. Otherwise the player can
+		   potentially lose artifacts by leaving a level after they are 'automatically'
+		   identified. Note that for some artifacts - at the moment rings and amulets,
+		   even calling object_aware is dangerous at this stage. */
+		if (artifact_p(o_ptr))
+		{
+			/* Identify the name */
+			o_ptr->ident |= (IDENT_NAME);
+
+			/* Mark as an artifact */
+			feel = value_check_aux5(o_ptr);
+		}
+		else
+		{
+			object_known(o_ptr);
+		}
+	}
 	else
+	{
 		feel = value_check_aux2(o_ptr);
+	}
 
 	/* No feeling */
 	return (feel);
