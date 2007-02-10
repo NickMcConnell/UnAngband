@@ -193,6 +193,8 @@ enters the level (Requested by Matthias Rudolf).
 
 - Tree-filled caverns are placed better in the dungeon.
 
+- Mice and bats now have better named built-in objects.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.

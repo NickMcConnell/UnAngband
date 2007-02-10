@@ -4600,9 +4600,12 @@ static bool name_drop_okay(int r_idx)
 	else if (j_ptr->tval == TV_SKIN)
 	{
 		/* Skip if monster does not have body part */
-		if ((j_ptr->sval == SV_SKIN_FEATHER) && !(r_ptr->flags8 & (RF8_HAS_FEATHER))) return (FALSE);
-		else if ((j_ptr->sval == SV_SKIN_SCALE) && !(r_ptr->flags8 & (RF8_HAS_SCALE))) return (FALSE);
-		else if ((j_ptr->sval == SV_SKIN_FUR) && !(r_ptr->flags8 & (RF8_HAS_FUR))) return (FALSE);
+		if ((j_ptr->sval == SV_SKIN_FEATHERS) && !(r_ptr->flags8 & (RF8_HAS_FEATHER))) return (FALSE);
+		else if ((j_ptr->sval == SV_SKIN_FEATHER_COAT) && !(r_ptr->flags8 & (RF8_HAS_FEATHER))) return (FALSE);
+		else if ((j_ptr->sval == SV_SKIN_SCALES) && !(r_ptr->flags8 & (RF8_HAS_SCALE))) return (FALSE);
+		else if ((j_ptr->sval == SV_SKIN_SCALE_COAT) && !(r_ptr->flags8 & (RF8_HAS_SCALE))) return (FALSE);
+		else if ((j_ptr->sval == SV_SKIN_FURS) && !(r_ptr->flags8 & (RF8_HAS_FUR))) return (FALSE);
+		else if ((j_ptr->sval == SV_SKIN_FUR_COAT) && !(r_ptr->flags8 & (RF8_HAS_FUR))) return (FALSE);
 
 		/* Hack -- we allow lots of skins, Mr Lecter */
 		else if ((j_ptr->sval == SV_SKIN_SKIN) && !(r_ptr->flags8 & (RF8_HAS_SLIME | RF8_HAS_FEATHER | RF8_HAS_SCALE | RF8_HAS_FUR))
@@ -5566,9 +5569,9 @@ bool make_skin(object_type *j_ptr, int m_idx)
 
 	/* Usually produce a skin */
 	if (r_ptr->flags8 & (RF8_HAS_SKIN)) k_idx = lookup_kind(TV_SKIN,SV_SKIN_SKIN);
-	else if (r_ptr->flags8 & (RF8_HAS_FUR)) k_idx = lookup_kind(TV_SKIN,SV_SKIN_FUR);
-	else if (r_ptr->flags8 & (RF8_HAS_FEATHER)) k_idx = lookup_kind(TV_SKIN,SV_SKIN_FEATHER);
-	else if (r_ptr->flags8 & (RF8_HAS_SCALE)) k_idx = lookup_kind(TV_SKIN,SV_SKIN_SCALE);
+	else if (r_ptr->flags8 & (RF8_HAS_FUR)) k_idx = lookup_kind(TV_SKIN,SV_SKIN_FURS);
+	else if (r_ptr->flags8 & (RF8_HAS_FEATHER)) k_idx = lookup_kind(TV_SKIN,SV_SKIN_FEATHERS);
+	else if (r_ptr->flags8 & (RF8_HAS_SCALE)) k_idx = lookup_kind(TV_SKIN,SV_SKIN_SCALES);
 
 	/* No object? */
 	if (!k_idx) return (FALSE);
