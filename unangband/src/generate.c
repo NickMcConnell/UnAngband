@@ -606,6 +606,8 @@ static bool variable_terrain(int *feat, int oldfeat)
 	/* Hack -- place trees infrequently */
 	if (f_info[*feat].flags3 & (FF3_TREE))
 	{
+		k = randint(100);
+
 		if (k<=85) *feat = oldfeat;
 		return (TRUE);
 	}
@@ -678,6 +680,7 @@ static bool variable_terrain(int *feat, int oldfeat)
 
 		case FEAT_WATER_FALLS:
 		{
+			k = randint(100);
 			if (k <= 60) *feat = FEAT_WATER_H;
 			if ((k > 60) && (k<80)) *feat = FEAT_WATER;
 			break;
@@ -685,6 +688,7 @@ static bool variable_terrain(int *feat, int oldfeat)
 
 		case FEAT_ACID_FALLS:
 		{
+			k = randint(100);
 			if (k <= 60) *feat = FEAT_ACID_H;
 			if ((k > 60) && (k<80)) *feat = FEAT_ACID;
 			break;
