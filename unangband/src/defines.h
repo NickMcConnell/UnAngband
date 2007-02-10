@@ -1488,7 +1488,7 @@
 
 
 /* Maximum number of disease flags that can randomly affect the player */
-#define DISEASE_TYPES 18
+#define DISEASE_TYPES 17
 #define DISEASE_BLOWS 23
 #define DISEASE_SPECIAL 25
 #define DISEASE_TYPES_HEAVY 26

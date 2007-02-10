@@ -185,8 +185,8 @@ or launches you up a level. This gives you a chance to evade the attack by movin
 
 - Monsters when blinded now have a better selection of spells to cast.
 
-- Resist disease now completely protects against diseases from disease attacks (Requested by
-Matthias Rudolf).
+- Resist disease now completely protects against diseases from disease attacks. Constitution
+provides significant reduction in disease effects (Requested by Matthias Rudolf).
 
 - Monsters cannot target the player with ranged attacks or spells the first turn the player
 enters the level (Requested by Matthias Rudolf).
