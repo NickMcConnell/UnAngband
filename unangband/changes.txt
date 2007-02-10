@@ -299,6 +299,8 @@ due to class based sensing (Reported by Matthias Rudolf).
 - Fixed lockup when generating dungeon under clearing in the forest (Reported by Mikolaj
 Konarski).
 
+- Fixed crash when taking poison damage.
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.

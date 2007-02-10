@@ -1808,11 +1808,11 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 	/* If any armor gets hit, defend the player */
 	if (minus_ac(inv)) dam = (dam + 1) / 2;
 
-	/* Reduce the damage */
-	dam = (dam - res - 1) / res;
-
 	/* Inventory damage */
 	if ((inven) && (inv)) inven_damage(set_acid_destroy, inv);
+
+	/* Reduce the damage */
+	dam = (dam - res - 1) / res;
 
 	/* No damage */
 	if (dam <= 0) return;
@@ -1902,11 +1902,11 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 		update_smart_forget(who, SM_OPP_ELEC);
 	}
 
-	/* Reduce the damage */
-	dam = (dam - res - 1) / res;
-
 	/* Inventory damage */
 	if ((inven) && (inv)) inven_damage(set_elec_destroy, inv);
+
+	/* Reduce the damage */
+	dam = (dam - res - 1) / res;
 
 	/* No damage */
 	if (dam <= 0) return;
@@ -1997,11 +1997,11 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 		update_smart_forget(who, SM_OPP_FIRE);
 	}
 
-	/* Reduce the damage */
-	dam = (dam - res - 1) / res;
-
 	/* Inventory damage */
 	if ((inven) && (inv)) inven_damage(set_fire_destroy, inv);
+
+	/* Reduce the damage */
+	dam = (dam - res - 1) / res;
 
 	/* No damage */
 	if (dam <= 0) return;
@@ -2090,11 +2090,11 @@ static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 		update_smart_forget(who, SM_OPP_COLD);
 	}
 
-	/* Reduce the damage */
-	dam = (dam - res - 1) / res;
-
 	/* Inventory damage */
 	if ((inven) && (inv)) inven_damage(set_cold_destroy, inv);
+
+	/* Reduce the damage */
+	dam = (dam - res - 1) / res;
 
 	/* No damage */
 	if (dam <= 0) return;
@@ -2183,15 +2183,15 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 	/* Reduce the damage */
 	dam = (dam - res - 1) / res;
 
+	/* No damage */
+	if (dam <= 0) return;
+
 	/* Increase poison counter */
 	if (!(p_ptr->oppose_pois) && !(p_ptr->cur_flags2 & (TR2_RES_POIS)))
 	{
 		/* Set poison counter */
 		(void)set_poisoned(p_ptr->poisoned + rand_int(dam + 1) + 10);
 	}
-
-	/* No damage */
-	if (dam <= 0) return;
 
 	/* Take damage */
 	take_hit(dam, kb_str);
@@ -2264,11 +2264,11 @@ static void water_dam(int who, int dam, cptr kb_str, bool inven)
 	/* Inventory damage */
 	if (inven) inven_damage(set_water_destroy, inv);
 
-	/* No damage */
-	if (dam <= 0) return;
-
 	/* Reduce the damage */
 	dam = (dam - res - 1) / res;
+
+	/* No damage */
+	if (dam <= 0) return;
 
 	/* Take damage */
 	take_hit(dam, kb_str);
