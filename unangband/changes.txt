@@ -217,6 +217,9 @@ learn about the spell, even if you didn't see them cast it.
 
 - You can now gather items from wall terrain by walking into them (Requested by ekolis).
 
+- Improved recall of objects that are part of a character's shape (Requested by Mikolaj Konarski
+and pete mac).
+
 ### Bug fixes ###
 
 - Fixed bug where many monster flags were not written to the save file (Reported by
