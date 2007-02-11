@@ -301,6 +301,8 @@ Konarski).
 
 - Fixed crash when taking poison damage.
 
+- Fix infinite loop when generating lakes of terrain (Reported by pete mac).
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.
