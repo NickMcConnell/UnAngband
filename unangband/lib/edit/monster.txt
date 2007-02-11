@@ -9843,7 +9843,7 @@ B:ARROW:HURT:10d5
 F:UNIQUE | MALE | 
 F:FORCE_MAXHP | 
 F:ESCORT | 
-F:ONLY_ITEM | DROP_1D2 | DROP_GOOD | 
+F:ONLY_ITEM | DROP_1D2 | DROP_GOOD
 F:OPEN_DOOR | BASH_DOOR | SMART
 F:EVIL | ORC | IM_FIRE | IM_COLD | IM_POIS | NO_CONF | NO_SLEEP
 D:A strong and cunning orc warrior, a commander of Saruman's orcish horde.

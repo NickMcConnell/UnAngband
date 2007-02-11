@@ -314,6 +314,9 @@ Konarski).
 
 - Fix memory corruption bug when generating surface locations.
 
+- Fix bug causing guardian uniques to be accompanied by out of depth monsters (Reported
+by Matthias Rudolf).
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.

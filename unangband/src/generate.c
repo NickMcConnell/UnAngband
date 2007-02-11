@@ -7720,7 +7720,7 @@ static void init_ecology(int r_idx)
 	/* Count of different non-unique monsters in ecology */
 	k = MIN_ECOLOGY_RACES + rand_int(MIN_ECOLOGY_RACES);
 
-	/* Initialise ecolgy based on seed race */
+	/* Initialise ecology based on seed race */
 	if (r_idx)
 	{
 		/* Get seed monster for ecology */
@@ -8928,7 +8928,7 @@ static bool town_gen(void)
 	{
 		/* Ensure wandering monsters suit the dungeon level */
 		get_mon_num_hook = dun_level_mon;
-	
+
 		/* Prepare allocation table */
 		get_mon_num_prep();
 

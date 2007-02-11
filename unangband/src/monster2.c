@@ -4777,11 +4777,11 @@ bool get_monster_ecology_aux(bool (*tmp_mon_num_hook)(int r_idx), int number)
 
 /*
  * Get a monster, and add it and its allies to the ecology for the level.
- *
- * If a race is passed to this routine, we assume it has been added already and only add its allies.
  */
 void get_monster_ecology(int r_idx)
 {
+	int i = cave_ecology.num_races;
+
 	/* Store old hook */
 	bool (*get_mon_num_hook_temp)(int r_idx) = get_mon_num_hook;
 
@@ -4797,18 +4797,26 @@ void get_monster_ecology(int r_idx)
 	if (!r_idx)
 	{
 		r_idx = get_mon_num(monster_level);
-
-		/* Add the monster */
-		if (r_idx) cave_ecology.race[cave_ecology.num_races++] = r_idx;
 	}
 
-	/* Have a good race */
-	if (r_idx)
-	{
-		monster_race *r_ptr = &r_info[r_idx];
+	/* Add the monster */
+	if (r_idx) cave_ecology.race[cave_ecology.num_races++] = r_idx;
 
+	/* Have a good race */
+	for ( ; i < cave_ecology.num_races; i++)
+	{
 		/* Hack -- hack the ecology */
 		int hack_ecology = 0;
+
+		/* Monster race pointer */
+		monster_race *r_ptr;
+
+		/* Get the monster */
+		r_idx = cave_ecology.race[i];
+		r_ptr = &r_info[r_idx];
+
+		/* For first monster on a level, we force some related monsters to appear */
+		if (cave_ecology.num_races <= 1) hack_ecology = randint(6);
 
 		/* Is the current monster deeper */
 		if (r_info[cave_ecology.deepest_race].level < r_info[r_idx].level)
@@ -4825,10 +4833,7 @@ void get_monster_ecology(int r_idx)
 		}
 
 		/* Try slightly lower monster level */
-		monster_level = r_ptr->level > 1 ? r_ptr->level - 1 : r_ptr->level;
-
-		/* For first monster, we force some related monsters to appear */
-		if (!cave_ecology.num_races) hack_ecology = randint(6);
+		monster_level = MIN(p_ptr->depth, r_ptr->level > 1 ? r_ptr->level - 1 : r_ptr->level);
 
 		/* Add escort races */
 		if (r_ptr->flags1 & (RF1_ESCORT | RF1_ESCORTS))
