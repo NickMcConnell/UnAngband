@@ -305,6 +305,10 @@ Konarski).
 
 - Fix infinite loop when generating lakes of terrain (Reported by pete mac).
 
+- Fix another infinite loop when generating lakes of terrain (Reported by pete mac).
+
+- Fix infinite loop when shuffling shops when haven't entered a store.
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.

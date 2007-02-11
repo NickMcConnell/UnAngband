@@ -545,11 +545,7 @@ static void process_world(void)
 				if (cheat_xtra) msg_print("Shuffling a Shopkeeper...");
 
 				/* Pick a random shop (except home) */
-				while (1)
-				{
-					n = rand_int(total_store_count);
-					if (n != STORE_HOME) break;
-				}
+				n = randint(total_store_count - 1);
 
 				/* Shuffle it */
 				store_shuffle(n);
