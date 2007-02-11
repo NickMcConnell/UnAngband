@@ -195,6 +195,8 @@ enters the level (Requested by Matthias Rudolf).
 
 - Mice and bats now have better named built-in objects.
 
+- Prevent flooding of open ground.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
