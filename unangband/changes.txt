@@ -309,6 +309,8 @@ Konarski).
 
 - Fix infinite loop when shuffling shops when haven't entered a store.
 
+- Fix memory corruption bug when generating surface locations.
+
 ### Build / Platform ###
 
 - Reduce memory footprint of artifact lore.

@@ -223,6 +223,10 @@ struct dun_data
 	int cent_n;
 	coord cent[CENT_MAX];
 
+	/* Array of partitions of rooms */
+	int part_n;
+	int part[CENT_MAX];
+
 	/* Array of possible door locations */
 	int door_n;
 	coord door[DOOR_MAX];
@@ -249,10 +253,6 @@ struct dun_data
 	/* Array of good potential stair grids */
 	s16b stair_n;
 	coord stair[STAIR_MAX];
-
-	/* Array of partitions of rooms */
-	int part_n;
-	int part[CENT_MAX];
 
 	/* Number of blocks along each axis */
 	int row_rooms;
@@ -5399,7 +5399,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		}
 
 		/* Hack -- if we are not starting in a room, include starting grid. Also add as a possible stair location. */
-		if ((dun->tunn_n == 0) && ((cave_info[row1][col1] & (CAVE_ROOM)) == 0))
+		if ((dun->tunn_n == 0) && ((cave_info[row1][col1] & (CAVE_ROOM)) == 0) && (dun->stair_n < STAIR_MAX))
 		{
 			row1 = row1 - row_dir;
 			col1 = col1 - col_dir;
@@ -6988,10 +6988,6 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 	{
 		int by, bx;
 
-		/* Clear big lake flags if there is no edge. This also sets the ROOM_BRIDGE flag below. 
-		   Otherwise, we never tunnel into the room correctly. */
-		if (!f_info[feat].edge) do_big_lake = FALSE;
-
 		/* Forests are always lit. Others not so much */
 		if (((f_info[feat].flags3 & (FF3_LIVING)) != 0) || 
 			(p_ptr->depth <= randint(25)))
@@ -6999,9 +6995,8 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 			flag |= (STAR_BURST_LIGHT);
 		}
 
-		/* Assign lake as room. XXX Do not do this for big lakes otherwise we never reach
-		   rooms inside the big lake. */
-		if (!do_big_lake) flag |= (STAR_BURST_ROOM);
+		/* Assign lake as room. */
+		flag |= (STAR_BURST_ROOM);
 
 		/* Connect the lake with the dungeon */
 		/* Note in order to connect the dungeon correctly, we have to set up the lake as a room,
@@ -7016,7 +7011,7 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 			if (dun->cent_n < DUN_ROOMS)
 			{
 				/* Initialise room */
-				room_info[dun->cent_n].flags = do_big_lake ? 0L : (ROOM_BRIDGE);
+				room_info[dun->cent_n].flags = (ROOM_BRIDGE);
 				room_info[dun->cent_n].tunnel = 0;
 				room_info[dun->cent_n].solid = 0;
 			}
@@ -7027,7 +7022,7 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 			for (bx = bx1; bx <= bx2; bx++)
 			{
 				/* Mark the blocks as used -- unless a big lake. */
-				if (!do_big_lake) dun->room_map[by][bx] = TRUE;
+				dun->room_map[by][bx] = TRUE;
 				dun_room[by][bx] = dun->cent_n;
 			}
 		}
@@ -7852,7 +7847,10 @@ static void place_tower()
 		{
 			/* Initialise room description */
 			room_info[dun->cent_n].type = ROOM_TOWER;
-			room_info[dun->cent_n].flags = 0; /* Will be set to ROOM_ICKY at end of generation */
+
+			/* Will be set to ROOM_ICKY at end of generation */
+			room_info[dun->cent_n].flags = (level_flag & (LF1_SURFACE)) != 0 ? ROOM_ICKY : 0;
+
 			room_info[dun->cent_n].tunnel = 0;
 			room_info[dun->cent_n].solid = 0;
 		}

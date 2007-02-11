@@ -2160,7 +2160,8 @@ void screen_object(object_type *o_ptr)
         else list_object(o_ptr, OBJECT_FLAGS_KNOWN);
 
 	/* Display monster attributes */
-	if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_named_p(o_ptr)))) screen_roff(o_ptr->name3);
+	if ((o_ptr->name3) && ((o_ptr->ident & (IDENT_STORE)) != 0)
+		&& ((o_ptr->tval != TV_HOLD) || (object_named_p(o_ptr)))) screen_roff(o_ptr->name3);
 
 	/* Display item name */
 	obj_top(o_ptr);
