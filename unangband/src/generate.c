@@ -5660,8 +5660,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			}
 		}
 
-		/* Travel quickly through rooms */
-		else if (cave_info[tmp_row][tmp_col] & (CAVE_ROOM))
+		/* Travel quickly through rooms -- unless we bridge this room */
+		else if ((cave_info[tmp_row][tmp_col] & (CAVE_ROOM)) && ((room_has_flag(tmp_row, tmp_col, ROOM_BRIDGE) == 0)))
 		{
 			/* Room */
 			int by2 = tmp_row/BLOCK_HGT;
@@ -6945,6 +6945,10 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 			flag |= (STAR_BURST_LIGHT);
 		}
 
+		/* Assign lake as room */
+		flag |= (STAR_BURST_ROOM);
+
+
 		/* Connect the lake with the dungeon */
 		/* Note in order to connect the dungeon correctly, we have to set up the lake as a room,
 		   even if we do not mark it as one. We however allow big lakes to have rooms inside them. */
@@ -6958,7 +6962,7 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 			if (dun->cent_n < DUN_ROOMS)
 			{
 				/* Initialise room */
-				room_info[dun->cent_n].flags = 0;
+				room_info[dun->cent_n].flags = (ROOM_BRIDGE);
 				room_info[dun->cent_n].tunnel = 0;
 				room_info[dun->cent_n].solid = 0;
 			}
@@ -6969,7 +6973,7 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 			for (bx = bx1; bx <= bx2; bx++)
 			{
 				/* Mark the blocks as used -- unless a big lake*/
-				if (!do_big_lake) dun->room_map[by][bx] = TRUE;
+				dun->room_map[by][bx] = TRUE;
 				dun_room[by][bx] = dun->cent_n;
 			}
 		}
