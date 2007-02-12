@@ -26,12 +26,11 @@ Step 7: Play...    Try "./angband".
 Of course, if you have a compiler, you can compile a (possibly customized)
 executable on almost any system.  You will need the "source archive" (as
 above), which contains the standard "src" and "lib" directories, and for
-some platforms (including Macintosh and Windows), you will also need an
+some platforms (including Windows), you will also need an
 appropriate "extra archive", which contains some extra platform specific
 files, and instructions about how to use them.  Some "extra archives" may
-be found at the ftp site (including "/angband/Macintosh/ext-mac.sit.bin"
-and "/angband/Windows/ext-win.zip"), but be sure that you get a version
-of the "extra archive" designed for your Angband version.
+be found at the ftp site and "/angband/Windows/ext-win.zip"), but be sure
+that you get a version of the "extra archive" designed for your Angband version.
 
 About configure:
     ./configure --help
@@ -200,3 +199,15 @@ GNU/Linux or Unix + GCC
 	directory.
 - Run Angband:
 	Start Angband with "angband".
+
+----------------------------------------------------------------------
+OS X (versions 10.3.x and later)
+----------------------------------------------------------------------
+- Install the Angband source:
+	Extract the source code with "tar -xvzf unangband-xxx.tar.gz"
+- Compile angband
+    run "make -f Makefile.osx" in the angband directory.
+- Run angband
+    Start UnAngband from the finder.
+
+
