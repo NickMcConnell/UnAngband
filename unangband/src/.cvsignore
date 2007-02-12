@@ -5,3 +5,5 @@ unangband
 *.res
 *.icns
 makefile
+.gdb*
+.*.swp

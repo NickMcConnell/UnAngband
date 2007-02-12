@@ -4,3 +4,8 @@ unangband
 *.o
 *.zip
 *.ini
+*.dmg
+*.tgz
+.DS_Store
+.gdb*
+.*.swp
