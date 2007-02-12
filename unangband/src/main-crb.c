@@ -15,10 +15,9 @@
  * versions 10.3 and later.  The still-usable old version uses QuickDraw
  * Graphics, "deprecated" as of 10.4
  *
- * Support for legacy Macs and pre-10.3 OSX macs has been removed.
+ * Support for legacy Macs and pre-10.3 OSX has been removed.
  * The old carbon code is still available in main-crb.c, 
- * Angband version 3.0.6. Precarboniferous code is available in
- * main-mac.c
+ * Angband version 3.0.6; pre-carboniferous code in angband main-mac.c
  */
 
 /*
