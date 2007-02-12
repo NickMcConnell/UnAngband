@@ -2545,7 +2545,7 @@ static void init_menubar(void)
 			strnfmt((char*)buf, 15, "%d", i);
 			CFStringRef cfstr = CFStringCreateWithBytes ( NULL, buf,
 									strlen(buf), kCFStringEncodingASCII, false);
-			AppendMenuItemTextWithCFString(m, cfstr, 0, 0, NULL);
+			AppendMenuItemTextWithCFString(m, cfstr, 0, j, NULL);
 			SetMenuItemRefCon(m, i-MIN_FONT+1, i);
 		}
 	}
@@ -2647,12 +2647,14 @@ static void validate_menus(void)
 	}
 }
 
-OSStatus ValidateMenuCommand(EventHandlerCallRef inCallRef,
-							EventRef inEvent, void *inUserData )
+static OSStatus ValidateMenuCommand(EventHandlerCallRef inCallRef,
+									EventRef inEvent, void *inUserData )
 {
 	validate_menus();
 	return noErr;
 }
+
+
 
 static OSStatus AngbandGame(EventHandlerCallRef inCallRef,
 							EventRef inEvent, void *inUserData )
@@ -2719,6 +2721,20 @@ static OSStatus openGame(int op)
 
 	return noErr;
 }
+
+/* Open Document is only remaining apple event that needs to be handled
+   explicitly */
+static OSStatus AppleCommand(EventHandlerCallRef inCallRef,
+							EventRef inEvent, void *inUserData )
+{
+	EventRecord aevent;
+	(void) AEProcessAppleEvent(&aevent);
+	if(open_when_ready) {
+		game_in_progress = TRUE;
+		new_game = false;
+	}
+}
+
 
 static OSStatus QuitCommand(EventHandlerCallRef inCallRef,
 							EventRef inEvent, void *inUserData )
@@ -2858,8 +2874,9 @@ static OSStatus GraphicsCommand(EventHandlerCallRef inCallRef,
 							NULL, sizeof(HICommand), NULL, &command);
 
 	// Check for valid input
-	assert(kStyleMenu == GetMenuID(command.menu.menuRef));
-	if (command.commandID != 'graf')
+	// assert(kStyleMenu == GetMenuID(command.menu.menuRef));
+	if (command.commandID != 'graf' ||
+			kStyleMenu != GetMenuID(command.menu.menuRef))
 		return eventNotHandledErr;
 
 	// Index in graphics_modes[]
@@ -3748,6 +3765,17 @@ int main(void)
 	/* Prepare the windows */
 	init_windows();
 
+#if 0
+	/* Handle 'apple' events */
+    /* Install the open event hook (ignore error codes) */
+    (void)AEInstallEventHandler(
+        kCoreEventClass,
+        kAEOpenDocuments,
+        NewAEEventHandlerUPP(AEH_Open),
+        0L,
+        FALSE);
+#endif
+
 	/* Install menu and application handlers */
 	install_handlers(0);
 
@@ -3768,16 +3796,6 @@ int main(void)
 
 	/* Note the "system" */
 	ANGBAND_SYS = "mac";
-
-#if 0
-	/* Install the open event hook (ignore error codes) */
-	(void)AEInstallEventHandler(
-		kCoreEventClass,
-		kAEOpenDocuments,
-		NewAEEventHandlerUPP(AEH_Open),
-		0L,
-		FALSE);
-#endif
 
 
 	/* Validate the contents of the main window */

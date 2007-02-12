@@ -96,6 +96,7 @@
                 <ostype name="command">copy</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="148">
+                <boolean name="disabled">TRUE</boolean>
                 <boolean name="updateSingleItem">TRUE</boolean>
                 <string name="title">Select All</string>
                 <string name="keyEquivalent">a</string>
@@ -183,7 +184,6 @@
                   <string name="title">Tile Width</string>
                   <int name="menuID">107</int>
                 </object>
-                <ostype name="command">graf</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="308">
                 <boolean name="updateSingleItem">TRUE</boolean>
@@ -192,7 +192,6 @@
                   <string name="title">Tile Height</string>
                   <int name="menuID">108</int>
                 </object>
-                <ostype name="command">graf</ostype>
               </object>
             </array>
             <boolean name="autoDisable">TRUE</boolean>

@@ -35,10 +35,10 @@ OBJS = $(COMMONOBJS) \
 
 all: install
 
-install: unangband $(RESSRCS) $(ICONFILES) $(PLIST) $(LIBFILES)
+install: $(EXE) $(ICONFILES) $(PLIST) $(LIBFILES)
 
 clean:
-	rm *.o unangband
+	rm *.o $(EXE)
 
 
 #
@@ -49,7 +49,7 @@ clean:
 # Executable
 #
 
-unangband: $(OBJS)
+$(EXE): $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@  $(OBJS) $(LIBS)
 
 #
@@ -64,11 +64,17 @@ unangband: $(OBJS)
 #
 # Installation.
 # Application bundle -- a directory looking like an ordinary application
+#
 
 # Name of the game
 APPNAME = UnAngband.app
 # Bundle of the game (it must be a directory whose name ends in ".app")
 APPBNDL = ../$(APPNAME)
+
+#Name of the executable file
+EXE=unangband
+# Version number (displayed)
+VERSION=0.6.2
 
 # A bundle must have these subdirectories
 APPCONT = $(APPBNDL)/Contents
@@ -89,7 +95,6 @@ APPRES = $(APPCONT)/Resources
 # directory and "make install-tiles".
 ICONFILES = osx/Angband.icns osx/Save.icns osx/Edit.icns osx/Data.icns
 PLIST = osx/Angband.xml
-RESSRCS = osx/Angband.r
 
 RFLAGS = -i /Developer/Headers/FlatCarbon -d MACH_O_CARBON
 GRAPHSRC=../lib/xtra/graf/
@@ -102,40 +107,37 @@ LIBFILES = \
   ../lib/help/*.hlp \
   ../lib/pref/*.prf \
 
-install: unangband $(RESSRCS) $(ICONFILES) $(PLIST) $(LIBFILES)
-	mkdir -p $(APPBNDL)
-	mkdir -p $(APPCONT)
-	mkdir -p $(APPBIN)
-	mkdir -p $(APPRES)
-	mkdir -p $(APPRES)/English.lproj/main.nib 
-	mkdir -p $(APPRES)/lib/edit
-	mkdir -p $(APPRES)/lib/file
-	mkdir -p $(APPRES)/lib/help
-	mkdir -p $(APPRES)/lib/pref
-	mkdir -p $(APPRES)/lib/script
-	mkdir -p $(APPRES)/lib/xtra/graf
-	mkdir -p $(APPRES)/lib/xtra/sound
+install: $(EXE) $(ICONFILES) $(PLIST) $(LIBFILES)
+	@echo making directories...
+	@mkdir -p $(APPBNDL)
+	@mkdir -p $(APPCONT)
+	@mkdir -p $(APPBIN)
+	@mkdir -p $(APPRES)
+	@mkdir -p $(APPRES)/English.lproj/main.nib 
+	@mkdir -p $(APPRES)/lib/edit
+	@mkdir -p $(APPRES)/lib/file
+	@mkdir -p $(APPRES)/lib/help
+	@mkdir -p $(APPRES)/lib/pref
+	@mkdir -p $(APPRES)/lib/script
+	@mkdir -p $(APPRES)/lib/xtra/graf
+	@mkdir -p $(APPRES)/lib/xtra/sound
 
-	cp ../lib/edit/*.txt $(APPRES)/lib/edit
-	cp ../lib/file/*.txt $(APPRES)/lib/file
-	cp ../lib/help/*.txt $(APPRES)/lib/help
-	cp ../lib/help/*.hlp $(APPRES)/lib/help
-	cp ../lib/pref/*.prf $(APPRES)/lib/pref
+	@echo copying files...
+	@cp ../lib/edit/*.txt $(APPRES)/lib/edit
+	@cp ../lib/file/*.txt $(APPRES)/lib/file
+	@cp ../lib/help/*.txt $(APPRES)/lib/help
+	@cp ../lib/help/*.hlp $(APPRES)/lib/help
+	@cp ../lib/pref/*.prf $(APPRES)/lib/pref
+
+	# 'optionally' install sound and graphics tiles, if present
 	-cp ../lib/xtra/graf/*.png $(APPRES)/lib/xtra/graf
 	-cp ../lib/xtra/sound/*.wav $(APPRES)/lib/xtra/sound
 
-	install -m 755 unangband $(APPBIN)
+	install -m 755 $(EXE) $(APPBIN)
 	install -m 644 $(ICONFILES) $(APPRES)
 	cp osx/English.lproj/main.nib/*ib $(APPRES)/English.lproj/main.nib
-	# $(REZ) $(RFLAGS) -o $(APPRES)/angband.rsrc $(RESSRCS)
-	install -m 644 $(PLIST) $(APPCONT)/Info.plist
+	sed 's/\$$VERSION\$$/0.6.2/' $(PLIST) > $(APPCONT)/Info.plist
 	$(SETFILE) -a B $(APPBNDL)
-
-install-tiles: $(TILES)
-	install -m 644 $(TILES) $(APPRES)/lib/xtra/graf
-
-install-sound: $(SOUNDSRCS)
-	install -m 644 ../lib/xtra/sound/*.wav $(APPRES)/lib/xtra/sound
 
 
 #
@@ -143,24 +145,19 @@ install-sound: $(SOUNDSRCS)
 #
 
 
-PACKAGE_NAME = Unangband-0.5-alpha
+PACKAGE_NAME = Unangband-$(VERSION)
 
 # In the unlikely event that tar+zip isn't enough...
 
-dist: install install-tiles $(SOUNDSRCS)
-	mkdir disttemp
-	mkdir disttemp/Docs
-
-	cp ../readme.txt disttemp/Docs
-	cp ../changes.txt disttemp/Docs
-	cp ../Authors disttemp/Docs/Authors.txt
-	cp ../Copying disttemp/Docs/Copying.txt
-	cp ../Thanks disttemp/Docs/Thanks.txt
-
+dist: install
+	@rm -rf disttemp
+	mkdir -p disttemp/Docs
+	cp ../readme.txt ../changes.txt disttemp/Docs
 	cp -R -p "$(APPBNDL)" disttemp
-	$(REZ) $(RFLAGS) -o disttemp/$(APPNAME)/Contents/Resources/angband.rsrc $(RESSRCS) $(SOUNDSRCS)
 	$(SETFILE) -a B disttemp/$(APPNAME)
 
-	hdiutil create -fs HFS+ -volname $(PACKAGE_NAME) -srcfolder disttemp "$(PACKAGE_NAME)-osx.dmg"
+	-rm ../"$(PACKAGE_NAME)-osx.dmg"
+
+	hdiutil create -fs HFS+ -volname $(PACKAGE_NAME) -srcfolder disttemp ../"$(PACKAGE_NAME)-osx.dmg"
 
 	rm -rf disttemp

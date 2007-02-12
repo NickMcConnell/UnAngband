@@ -6,11 +6,19 @@
     <key>CFBundleExecutable</key><string>unangband</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleSignature</key><string>A271</string>
-    <key>CFBundleVersion</key><string>0.61</string>
-    <key>CFBundleShortVersionString</key><string>0.61</string>
+    <key>CFBundleVersion</key><string>$VERSION$</string>
+    <key>CFBundleShortVersionString</key><string>$VERSION$</string>
     <key>CFBundleIconFile</key><string>Angband</string>
     <key>CFBundleIdentifier</key><string>net.thangorodrim.Unangband</string>
     <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
+    <key>CFBundleLongVersionString</key>
+    <string>$VERSION$, Copyright 2001-2006 Andrew Doull et al</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2001-2006 Andrew Doull et al</string>
+    <key>CFBundleGetInfoString</key>
+    <string>$VERSION$,  © 2001-2006 Andrew Doull et al</string>
+
+
     <key>CFBundleDocumentTypes</key>
       <array>
         <dict>
