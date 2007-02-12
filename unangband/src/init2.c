@@ -82,6 +82,7 @@ void init_file_paths(char *path)
 	char *tail;
 
 #ifdef PRIVATE_USER_PATH
+	char dirpath[1024];
 	char buf[1024];
 #endif 
 
@@ -158,8 +159,11 @@ void init_file_paths(char *path)
 	ANGBAND_DIR_PREF = string_make(path);
 
 #ifdef PRIVATE_USER_PATH
+	/* Use absolute path -- ~/ doesn't work reliably on OS X */
+	path_parse(dirpath, sizeof(dirpath), PRIVATE_USER_PATH);
+
     /* Build the path to the user specific sub-directory */
-	path_build(buf, sizeof(buf), PRIVATE_USER_PATH, VERSION_NAME);
+	path_build(buf, sizeof(buf), dirpath, VERSION_NAME);
 
     /* Build a relative path name */
     ANGBAND_DIR_USER = string_make(buf);

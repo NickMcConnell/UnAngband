@@ -583,6 +583,7 @@ extern void display_feature_roff(int f_idx);
 
 /* init2.c */
 extern void init_file_paths(char *path);
+extern void create_user_dirs(void);
 extern void init_angband(void);
 extern void cleanup_angband(void);
 

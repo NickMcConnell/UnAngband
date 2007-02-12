@@ -30,8 +30,8 @@
  */
 #include "config.h"
 #include "defines.h"
-/* OS X defines and externs. */
-#include "osx.h"
+/* OS-specific defines and externs. */
+#include "osx/osx.h"
 
 #include "types.h"
 

@@ -6522,11 +6522,11 @@ void disturb(int stop_search, int wake_up)
  */
 bool is_quest(int level)
 {
-	int i;
 
+#if 0
+	int i;
 	/* Town is never a quest */
 	if (!level) return (FALSE);
-#if 0
 	/* Check quests */
 	for (i = 0; i < MAX_Q_IDX; i++)
 	{
