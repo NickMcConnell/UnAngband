@@ -7721,7 +7721,7 @@ static void init_ecology(int r_idx)
 	k = MIN_ECOLOGY_RACES + rand_int(MIN_ECOLOGY_RACES);
 
 	/* Initialise ecology based on seed race */
-	if (r_idx)
+	if ((r_idx) && ((level_flag & (LF1_BATTLE)) == 0))
 	{
 		/* Get seed monster for ecology */
 		get_monster_ecology(r_idx);
@@ -7773,7 +7773,28 @@ static void init_ecology(int r_idx)
 		/* Not enough different monsters */
 		if ((k >= 0) && (cave_ecology.num_races < MAX_ECOLOGY_RACES))
 		{
+			/* Hack -- battlefield monsters continue to honour the same hook */
+			if ((level_flag & (LF1_BATTLE)) != 0)
+			{
+				/* Set monster hook */
+				get_mon_num_hook = dun_level_mon;
+
+				/* Prepare allocation table */
+				get_mon_num_prep();
+			}
+
+			/* Get seed monster for ecology */
 			get_monster_ecology(0);
+
+			/* Hack -- battlefield monsters continue to honour the same hook */
+			if ((level_flag & (LF1_BATTLE)) != 0)
+			{
+				/* Clear monster hook */
+				get_mon_num_hook = NULL;
+
+				/* Prepare allocation table */
+				get_mon_num_prep();
+			}
 		}
 		/* We are done */
 		else
@@ -7784,6 +7805,7 @@ static void init_ecology(int r_idx)
 
 	/* Start the ecology */
 	cave_ecology.ready = TRUE;
+	cave_ecology.valid_hook = TRUE;
 }
 
 /*
