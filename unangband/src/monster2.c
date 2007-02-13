@@ -453,38 +453,35 @@ errr get_mon_num_prep(void)
 {
 	int i;
 
-	/* Nothing valid get -- we paranoically do this outside the cave_ecology.ready check */
+	/* No ecology creatures valid yet */
 	cave_ecology.valid_hook = FALSE;
 		
 	/* Using the ecology model */
-	if (cave_ecology.ready)
+	for (i = 0; i < cave_ecology.num_races; i++)
 	{
-		for (i = 0; i < cave_ecology.num_races; i++)
+		/* Accept monsters which pass the restriction, if any */
+		if (!get_mon_num_hook || (*get_mon_num_hook)(cave_ecology.race[i]))
 		{
-			/* Accept monsters which pass the restriction, if any */
-			if (!get_mon_num_hook || (*get_mon_num_hook)(cave_ecology.race[i]))
-			{
-				/* Accept this monster */
-				cave_ecology.get_mon[i] = TRUE;
+			/* Accept this monster */
+			cave_ecology.get_mon[i] = TRUE;
 				
-				/* Have a valid monster */
-				cave_ecology.valid_hook = TRUE;
-			}
-
-			/* Do not use this monster */
-			else
-			{
-				/* Decline this monster */
-				cave_ecology.get_mon[i] = FALSE;
-			}
+			/* Have a valid monster */
+			cave_ecology.valid_hook = TRUE;
 		}
+
+		/* Do not use this monster */
+		else
+		{
+			/* Decline this monster */
+			cave_ecology.get_mon[i] = FALSE;
+		}
+	}
 		
 		/*
 		 * Have a valid choice -- we should uncomment this for efficiency if we are sure we don't change value of
 		 * cave_ecology.ready between calling get_mon_num_prep() and get_mon_num()
 		 */
-		/* if (cave_ecology.valid_hook) return (0); */	
-	}
+		/* if ((cave_ecology.ready) && (cave_ecology.valid_hook)) return (0); */	
 
 	/* Scan the allocation table */
 	for (i = 0; i < alloc_race_size; i++)
