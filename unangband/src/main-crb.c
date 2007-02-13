@@ -3204,7 +3204,7 @@ static OSStatus MouseCommand ( EventHandlerCallRef inCallRef,
 	if(&data[0] != td)
 		return eventNotHandledErr;
 
-	int button = 0;
+	short button = 0;
 	GetEventParameter(inEvent, kEventParamMouseButton, typeMouseButton,
 						NULL, sizeof(button), NULL, &button);
 	UInt32 modifiers = 0;
@@ -3213,13 +3213,21 @@ static OSStatus MouseCommand ( EventHandlerCallRef inCallRef,
 	HIPoint p = {0, 0};
 	GetEventParameter(inEvent, kEventParamMouseLocation, typeHIPoint, NULL,
 						sizeof(p),  NULL, &p);
+	if(button == -1)
+		button = 1;
 
 	if(button == 1 && modifiers & cmdKey) 
 		button = 2;
 	else if(button == 1 && modifiers & shiftKey)
 		button = 3;
 
-	// Term_mouse((p.x-1)/td->tile_wid, p.y/td_tile_hgt, button);
+	// X coordinate relative to left side of window exclusive of border.
+	p.x -= (BORDER_WID+td->r.left);
+	// Y coordinate relative to top of window content region.
+	// HACK: assumes title width of 21 pixels.
+	p.y -= td->r.top + 21;
+
+	Term_mousepress((p.x-1)/td->tile_wid, p.y/td->tile_hgt, button);
 	return noErr;
 }
 

@@ -121,7 +121,7 @@ typedef struct CommandDef CommandDef;
 #define HICOM kEventProcessCommand
 #define KYDWN kEventRawKeyDown
 #define KYRPT kEventRawKeyRepeat
-#define CLICK kEventWindowClickContentRgn
+#define CLICK kEventWindowHandleContentClick
 #define WNUPD kEventWindowUpdate
 #define WNRSZ kEventWindowResizeCompleted
 
