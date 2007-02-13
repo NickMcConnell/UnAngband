@@ -7,3 +7,5 @@ unangband
 makefile
 .gdb*
 .*.swp
+foo*
+junk*

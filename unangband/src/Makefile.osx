@@ -6,6 +6,9 @@
 # Standard defines
 #
 
+#Name of the executable file
+EXE=unangband
+
 TOOLDIR = /Developer/Tools
 SETFILE = $(TOOLDIR)/SetFile
 REZ = $(TOOLDIR)/Rez
@@ -28,6 +31,7 @@ OBJS = $(COMMONOBJS) \
 # 
 # Additional dependencies
 #
+main-crb.c: osx/osx_tables.h
 
 #
 # Targets
@@ -71,8 +75,6 @@ APPNAME = UnAngband.app
 # Bundle of the game (it must be a directory whose name ends in ".app")
 APPBNDL = ../$(APPNAME)
 
-#Name of the executable file
-EXE=unangband
 # Version number (displayed)
 VERSION=0.6.2
 
