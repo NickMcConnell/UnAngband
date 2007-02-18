@@ -2222,7 +2222,7 @@ void ang_atexit(void (*arg)(void) ){
 	static exitlist *list; 
 	exitlist *next;
 
-	if(arg == 0) {
+	if(arg != 0) {
 		C_MAKE(next, 1, exitlist);
 		next->func = arg;
 		next->next = list;

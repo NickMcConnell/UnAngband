@@ -373,13 +373,16 @@ static void display_group_list(int col, int row, int wid, int per_page,
 	/* Display lines until done */
 	for (i = 0, pos = start; i < per_page && pos < max; i++, pos++)
 	{
+		char buffer[21];
 		byte attr = curs_attrs[CURS_KNOWN][cursor == pos];
 
 		/* Erase the line */
 		Term_erase(col, row + i, wid);
 
-		/* Display it */
-		c_put_str(attr, group_text[pos], row + i, col);
+		/* Display it (width should not exceed 20) */
+		strncpy(buffer, group_text[pos], 20);
+		buffer[20] = 0;
+		c_put_str(attr, buffer, row + i, col);
 	}
 	/* Wipe the rest? */
 }
@@ -498,6 +501,7 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 		int len = strlen(g_names[i]);
 		if(len > g_name_len) g_name_len = len;
 	}
+	if(g_name_len >= 20) g_name_len = 20;
 
 	while ((!flag) && (grp_cnt))
 	{
@@ -1534,7 +1538,10 @@ static int o_cmp_tval(const void *a, const void *b)
 	/* order by */
 	c = k_a->aware - k_b->aware;
 	if(c) return -c; /* aware has low sort weight */
-	if(!k_a->aware) return strcmp(x_name + k_a->flavor, x_name +k_b->flavor);
+	if(!k_a->aware) {
+		return strcmp(x_text + x_info[k_a->flavor].text,
+									x_text +x_info[k_b->flavor].text);
+	}
 	c = k_a->cost - k_b->cost;
 	if(c) return c;
 	return strcmp(k_name + k_a->name, k_name + k_b->name);
@@ -1759,14 +1766,16 @@ static void do_cmd_knowledge_home(void)
 /* =================== TOWNS AND DUNGEONS ================================ */
 
 static void dungeon_lore(int oid) {
-	int dun = oid/4;
-	int zone = oid%4;
+	int dun = oid / MAX_DUNGEON_ZONES;
+	int zone = oid % MAX_DUNGEON_ZONES;
 	int guard = t_info[dun].zone[zone].guard;
 
 	screen_save();
 	c_prt(TERM_L_BLUE, format("Level %d of %s", t_info[dun].zone[zone].level, t_info[dun].name+t_name), 0, 0);
 	Term_gotoxy(0, 1);
+
 	text_out_c(TERM_WHITE, t_info[dun].text + t_text);
+
 	if(t_info[dun].zone[zone].guard) {
 		text_out_c(TERM_WHITE, format(" It %s guarded by %s.",
 			r_info[guard].max_num ? "is" : "was", r_info[guard].name + r_name));
@@ -1779,18 +1788,20 @@ static void dungeon_lore(int oid) {
 
 static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 {
-	int zone = oid %4;
-	int dun = oid/ 4;
-	int level = t_info[dun].zone[zone].level;
+	int zone = oid % MAX_DUNGEON_ZONES;
+	int dun = oid / MAX_DUNGEON_ZONES;
 
 	byte attr = curs_attrs[CURS_KNOWN][(int)cursor];
 	
-	if(!level) {
-		/* Hack: towns have at least 3 stores; wildernesses at most 2 */
-		if(t_info[dun].store[3] != 0) 
+	if(zone == 0) {
+		if(t_info[dun].zone[0].level == 0) {
 			c_prt(attr, format("Town of %s", t_info[dun].name + t_name), row, col);
-		else 
+		}
+		else {
 			c_prt(attr, t_info[dun].name + t_name, row, col);
+		}
+		c_prt(attr, format("Lev %3d",
+					t_info[dun].max_depth + t_info[dun].zone[0].level), row, 65);
 	}
 	else {
 		c_prt(attr, format("Level %d of %s", t_info[dun].zone[zone].level,
@@ -1798,7 +1809,7 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 	}
 }
 
-static int oiddiv4 (int oid) { return oid/4; }
+static int oiddiv4 (int oid) { return oid/MAX_DUNGEON_ZONES; }
 static const char* town_name(int gid) { return t_info[gid].name+t_name; }
 
 
@@ -1810,16 +1821,20 @@ static void do_cmd_knowledge_dungeons(void)
 	member_funcs zone_f = {display_dungeon_zone, dungeon_lore, 0, 0, 0};
 	group_funcs dun_f = {z_info->t_max, FALSE, town_name, 0, oiddiv4, 0};
 
-	C_MAKE(zones, MAX_DUNGEON_ZONES*4, int);
+	C_MAKE(zones, z_info->t_max*MAX_DUNGEON_ZONES + 1, int);
 
 	for(i = 0; i < z_info->t_max; i++) {
 		if(t_info[i].max_depth == 0 && i != p_ptr->dungeon) continue;
-		for(j = 0; j < 1 || t_info[i].zone[j].level != 0; j++) {
+		for(j = 0; (j < 1 || t_info[i].zone[j].level != 0 )
+											 && j < MAX_DUNGEON_ZONES; j++)
+		{
 			if(t_info[i].zone[j].level == 0 || t_info[i].zone[j].guard)
-				zones[z_count++] = 4*i + j;
+				zones[z_count++] = MAX_DUNGEON_ZONES*i + j;
 		}
 	}
-	display_knowledge("locations", zones, z_count, dun_f, zone_f, 0);
+	zones[z_count] = -1;
+
+	display_knowledge("locations", zones, z_count, dun_f, zone_f, "Reached");
 	FREE(zones);
 }
 
@@ -5982,7 +5997,7 @@ typedef struct {
 	int page;
 } command_menu;
 
-command_menu option_actions [] = {
+static command_menu option_actions [] = {
 	{'1', "User Interface Options", do_cmd_options_aux, 0},
 	{'2', "Disturbance Options", do_cmd_options_aux, 1},
 	{'3', "Game-Play Options", do_cmd_options_aux, 2},
@@ -5999,7 +6014,7 @@ command_menu option_actions [] = {
 	{'H', "Hitpoint Warning", (action_f) do_cmd_hp_warn, 0}
 };
 
-command_menu knowledge_actions[] = {
+static command_menu knowledge_actions[] = {
 	{'1', "Display artifact knowledge", (action_f)do_cmd_knowledge_artifacts, 0},
 	{'2', "Display monster knowledge", (action_f)do_cmd_knowledge_monsters, 0},
 	{'3', "Display ego item knowledge", (action_f)do_cmd_knowledge_ego_items, 0},
