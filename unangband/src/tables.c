@@ -2951,7 +2951,7 @@ const cptr object_group_text[] =
 	"Shot"	,
 	"Shield"	 ,
 	"Crown"	,
-        "Helm",
+	"Helm",
 	"Gloves"	 ,
 	"Boots"	,
 	"Cloak"	,

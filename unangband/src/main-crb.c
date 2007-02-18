@@ -2898,6 +2898,7 @@ static void graphics_aux(int op)
 	use_graphics = (op != 0);
 	graf_mode = op;
 	ANGBAND_GRAF = graphics_modes[op].name;
+	arg_graphics = op;
 
 	graphics_nuke();
 
@@ -3225,9 +3226,9 @@ static OSStatus MouseCommand ( EventHandlerCallRef inCallRef,
 	p.x -= (BORDER_WID+td->r.left);
 	// Y coordinate relative to top of window content region.
 	// HACK: assumes title width of 21 pixels.
-	p.y -= td->r.top + 21;
+	p.y -= (td->r.top + 21);
 
-	Term_mousepress((p.x-1)/td->tile_wid, p.y/td->tile_hgt, button);
+	Term_mousepress(p.x/td->tile_wid, p.y/td->tile_hgt, button);
 	return noErr;
 }
 

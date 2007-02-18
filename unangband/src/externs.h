@@ -467,7 +467,7 @@ extern void do_cmd_redraw(void);
 extern void do_cmd_change_name(void);
 extern void do_cmd_message_one(void);
 extern void do_cmd_messages(void);
-extern void do_cmd_options(void);
+extern void do_cmd_menu(int menuID, const char *title);
 extern void do_cmd_pref(void);
 extern void do_cmd_macros(void);
 extern void do_cmd_visuals(void);
@@ -484,7 +484,6 @@ extern void do_cmd_save_screen(void);
 extern void do_cmd_save_screen_html(void);
 extern const cptr feature_group_text[];
 extern int feat_order(int feat);
-extern void do_cmd_knowledge(void);
 
 /* cmd5.c */
 extern int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known);

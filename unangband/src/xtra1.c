@@ -3720,7 +3720,7 @@ static void calc_bonuses(void)
 		/* Set weapon preference styles */
 		switch(o_ptr->tval)
 		{
-                        case TV_STAFF:
+			case TV_STAFF:
 			case TV_HAFTED:
 			{
 				p_ptr->cur_style |= (1L << WS_HAFTED);

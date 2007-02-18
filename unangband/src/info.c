@@ -2840,10 +2840,10 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 		switch (mode)
 		{
 			case LIST_FLAGS_CAN:
-				anything |= outlist("It burdens you with", list, TERM_WHITE);
+				anything |= outlist("It burdens you with", list, TERM_ORANGE);
 				break;
 			case LIST_FLAGS_MAY:
-				anything |= outlist("It may burden you with", list, TERM_L_WHITE);
+				anything |= outlist("It may burden you with", list, TERM_YELLOW);
 				break;
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not burden you with", list, TERM_SLATE);
@@ -3716,6 +3716,8 @@ bool make_fake_artifact(object_type *o_ptr, byte name1)
 	o_ptr->to_h = a_ptr->to_h;
 	o_ptr->to_d = a_ptr->to_d;
 	o_ptr->weight = a_ptr->weight;
+
+	if (a_ptr->flags3 & (TR3_LIGHT_CURSE)) o_ptr->ident |= (IDENT_CURSED);
 
 	/* Success */
 	return (TRUE);
