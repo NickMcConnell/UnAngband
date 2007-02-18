@@ -2212,11 +2212,37 @@ void init_angband(void)
 	note("[Initialization complete]");
 }
 
+void ang_atexit(void (*arg)(void) ){
+	
+	typedef struct exitlist exitlist;
+	struct exitlist {
+		void (*func)(void) ;
+		exitlist *next;
+	};
+	static exitlist *list; 
+	exitlist *next;
+
+	if(arg == 0) {
+		C_MAKE(next, 1, exitlist);
+		next->func = arg;
+		next->next = list;
+		list = next;
+		return;
+	}
+	
+	while (list) {
+		next = list->next;
+		list->func();
+		FREE(list);
+		list = next;
+	}
+}
 
 void cleanup_angband(void)
 {
 	int i, j;
 
+	ang_atexit(0);
 
 	/* Free the macros */
 	for (i = 0; i < macro__num; ++i)

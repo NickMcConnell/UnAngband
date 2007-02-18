@@ -585,6 +585,8 @@ extern void init_file_paths(char *path);
 extern void create_user_dirs(void);
 extern void init_angband(void);
 extern void cleanup_angband(void);
+void ang_atexit(void (*arg)(void));
+
 
 /* load.c */
 extern bool load_player(void);

@@ -1776,6 +1776,7 @@ static void dungeon_lore(int oid) {
 	screen_load();
 	anykey();
 }
+
 static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 {
 	int zone = oid %4;
@@ -1811,22 +1812,15 @@ static void do_cmd_knowledge_dungeons(void)
 
 	C_MAKE(zones, MAX_DUNGEON_ZONES*4, int);
 
-	/* HACK: guess visitation by killed guardians and present town */
 	for(i = 0; i < z_info->t_max; i++) {
-		int visited = FALSE;
-		if(i == p_ptr->dungeon) visited = TRUE;
-		for(j = 0; !visited && (j < 1 || t_info[i].zone[j].level != 0); j++) {
-			int race = t_info[i].zone[j].guard;
-			monster_race *r_ptr = &r_info[race];
-			if(race && r_ptr->max_num == 0)
-				visited = TRUE;
-		}
-		if(visited) for(j = 0; j < 1 || t_info[i].zone[j].level != 0; j++) {
+		if(t_info[i].max_depth == 0 && i != p_ptr->dungeon) continue;
+		for(j = 0; j < 1 || t_info[i].zone[j].level != 0; j++) {
 			if(t_info[i].zone[j].level == 0 || t_info[i].zone[j].guard)
 				zones[z_count++] = 4*i + j;
 		}
 	}
 	display_knowledge("locations", zones, z_count, dun_f, zone_f, 0);
+	FREE(zones);
 }
 
 /* =================== END JOIN DEFINITIONS ================================ */
@@ -6020,6 +6014,10 @@ command_menu knowledge_actions[] = {
 	{'V', "Interact with visuals", (action_f) do_cmd_visuals, 0},
 };
 
+/* Keep macro counts happy. */
+static void cleanup_cmds () {
+	FREE(obj_group_order);
+}
 /*
  * Set or unset various options.
  *
@@ -6053,6 +6051,7 @@ void do_cmd_menu(int menuID, const char *title)
 		int i, n = 0;
 		for(n = 0; object_group_tval[n]; n++)
 		C_MAKE(obj_group_order, TV_GEMS+1, int);
+		ang_atexit(cleanup_cmds);
 		for(i = 0; i <= TV_GEMS; i++) /* allow for missing values */
 			obj_group_order[i] = -1;
 		for(i = 0; i < n; i++) {
@@ -6133,6 +6132,4 @@ void do_cmd_menu(int menuID, const char *title)
 	/* Load screen */
 	screen_load();
 }
-
-
 
