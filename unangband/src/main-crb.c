@@ -497,19 +497,13 @@ static void activate(WindowRef w)
 {
 	/* Activate */
 
-	if(focus.active == w) {
-		if(focus.ctx)
-			CGContextSynchronize(focus.ctx);
-	}
-	else if(focus.active) {
-		// Paranoia. This should never be necessary.
-		// (Term_flush() should have just been called)
+	if(focus.active && focus.ctx) {
 		CGContextSynchronize(focus.ctx);
-
-		if(focus.ctx)
+		if(focus.active != w) {
+			/* Change window context */
 			QDEndCGContext(GetWindowPort(focus.active), &focus.ctx);
-
-		focus.ctx = 0;
+			focus.ctx = 0;
+		}
 	}
 	/* Activate */
 	if (w && focus.ctx == 0) {
@@ -1049,8 +1043,6 @@ static CGImageRef GetTileImage(int row, int col, bool has_alpha)
 	size_t tile_wid = td->tile_wid *(1+use_bigtile);
 	size_t nbytes = (td->tile_hgt * tile_wid) * 4;
 	void *data = calloc(1, nbytes);
-
-	CGImageAlphaInfo info = CGImageGetAlphaInfo(frame.image);
 
 	CGContextRef map;
 	map = CGBitmapContextCreate(data, tile_wid, td->tile_hgt,
@@ -1841,7 +1833,7 @@ static errr Term_curs_mac(int x, int y)
 	int tile_wid = td->tile_wid;
 	if(use_bigtile) {
 		byte a, c;
-		Term_what(x+1,y, &a, &c);
+		Term_what(x+1,y, &a, &(char)c);
 		if(c == 0xff) tile_wid *= 2;
 	}
 
@@ -2733,6 +2725,7 @@ static OSStatus AppleCommand(EventHandlerCallRef inCallRef,
 		game_in_progress = TRUE;
 		new_game = false;
 	}
+	return noErr;
 }
 
 
@@ -3589,7 +3582,7 @@ static bool CheckEvents(int wait)
 			EventClass evc = GetEventClass(event);
 			EventType evt = GetEventKind(event);
 			if(evc != 'mous' || evt != kEventMouseDragged )
-				printf("%d (%4s) %d\n", evc, &evc, evt);
+				printf("%d (%4s) %d\n", (int)evc, (char*)&evc, (int)evt);
 		}
 		if(err == noErr) {
 			err = SendEventToEventTarget (event, target);

@@ -148,11 +148,11 @@ HANDLERDEF(CommandCommand);				HANDLERDEF(AngbandGame);
 const CommandDef event_defs [] =
 {
 	{ 'font', kEventFontSelection,
-						FontCommand,	 NULL, NULL }, // Change Font
+						FontCommand,	 0, NULL }, // Change Font
 	{ 'font', kEventFontPanelClosed,
-						FontCommand,	 NULL, NULL }, // Menu state change
+						FontCommand,	 0, NULL }, // Menu state change
 	{ 'appl',  kEventAppActiveWindowChanged,
-						FontCommand,	 NULL, NULL }, // Store "true" focus
+						FontCommand,	 0, NULL }, // Store "true" focus
 
 	{ 'cmds', HICOM,	AboutCommand,	 kAngbandMenu, NULL},
 	{ 'cmds', HICOM,	PrintCommand,	 kEditMenu, "Cheaters never win!"},
