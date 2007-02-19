@@ -5683,7 +5683,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 					int part2 = dun->part[dun_room[by2][bx2]-1];
 
 					/* Merging successfully */
-					if (cheat_xtra) msg_format("Merging partition %d (room %d) with endpoint %d (room %d).", part1, dun_room[by1][bx1], part2, dun_room[by2][bx2]);
+					if (cheat_xtra) msg_format("Merging partition %d (room %d) with %d (room %d).", part1, dun_room[by1][bx1], part2, dun_room[by2][bx2]);
 
 					/* Merge partitions */
 					for (i = 0; i < dun->cent_n; i++)
