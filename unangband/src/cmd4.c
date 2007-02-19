@@ -77,9 +77,9 @@ static join_t *default_join;
 static int default_join_cmp(const void *a, const void *b)
 {
 	join_t *ja = &default_join[*(int*)a];
-	join_t *jb = &default_join[*(int*)a];
+	join_t *jb = &default_join[*(int*)b];
 	int c = ja->gid - jb->gid;
-	if(c) return c;
+	if (c) return c;
 	return ja->oid - jb->oid;
 }
 static int default_group(int oid) { return default_join[oid].gid; }
@@ -397,6 +397,7 @@ static void display_member_list(int col, int row, int wid, int per_page,
 		member_funcs o_funcs)
 {
 	int i, pos;
+
 	for(i = 0, pos = start; i < per_page && pos < o_count; i++, pos++) {
 		int oid = object_idx[pos];
 		byte attr = curs_attrs[CURS_KNOWN][cursor == oid];
@@ -469,6 +470,7 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 	int browser_rows;
 	int wid, hgt;
 	int i;
+	int prev_g = -1;
 
 	/* Get size */
 	Term_get_size(&wid, &hgt);
@@ -482,7 +484,6 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 	C_MAKE(g_list, max_group+1, int);
 	C_MAKE(g_offset, max_group+1, int);
 
-	int prev_g = -1;
 	for(i = 0; i < o_count; i++) {
 		if(prev_g != g_funcs.group(obj_list[i])) {
 			prev_g = g_funcs.group(obj_list[i]);
@@ -496,9 +497,10 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 
 	/* The compact set of group names, in display order */
 	C_MAKE(g_names, grp_cnt, const char **);
-	for(i = 0; i < grp_cnt; i++) {
+	for (i = 0; i < grp_cnt; i++) {
+		int len;
 		g_names[i] = g_funcs.name(g_list[i]);
-		int len = strlen(g_names[i]);
+		len = strlen(g_names[i]);
 		if(len > g_name_len) g_name_len = len;
 	}
 	if(g_name_len >= 20) g_name_len = 20;
@@ -1130,7 +1132,8 @@ static void do_cmd_knowledge_monsters(void)
 	
 	int *monsters;
 	int m_count = 0;
-	int i, j;
+	int i;
+	size_t j;
 
 	for(i = 0; i < z_info->r_max; i++) {
 		monster_race *r_ptr = &r_info[i];
@@ -1570,8 +1573,10 @@ static void do_cmd_knowledge_objects(void)
 
 	int *objects;
 	int o_count = 0;
-	C_MAKE(objects, z_info->k_max, int);
 	int i;
+
+	C_MAKE(objects, z_info->k_max, int);
+
 	for(i = 0; i < z_info->k_max; i++) {
 		if(k_info[i].aware || k_info[i].flavor || cheat_lore) {
 			int c = obj_group_order[k_info[i].tval];
@@ -1696,10 +1701,11 @@ static void display_store_object(int col, int row, bool cursor, int oid)
 	object_type *o_ptr = &s_ptr->stock[default_join[oid].oid];
 	char buffer[60];
 
-	object_desc(buffer, 50, o_ptr, TRUE, 3);
-
 	/* Should be UNKNOWN for unreachable locations like Bombadil's */
 	byte attr = curs_attrs[CURS_KNOWN][(int)cursor];
+
+	object_desc(buffer, 50, o_ptr, TRUE, 3);
+
 	c_prt(attr, buffer, row, col);
 }
 
@@ -1720,12 +1726,14 @@ static const char *store_name(int gid)
 static void do_cmd_knowledge_home(void)
 {
 	member_funcs contents_f = {display_store_object, screen_store_object, 0, 0, 0};
-	group_funcs home_f =
-		{total_store_count, FALSE, store_name, 0, default_group, 0};
+	group_funcs home_f = {0, FALSE, store_name, 0, default_group, 0};
 
 	int *objects, store_count = 0;
 	int i, j;
 	int o_count = 0;
+
+	/* Save the store count */
+	home_f.maxnum = total_store_count;
 
 	for(i = 0; i < total_store_count; i++) {
 		if(!cheat_xtra && store[i]->index != 0 &&
@@ -1811,7 +1819,10 @@ static void do_cmd_knowledge_dungeons(void)
 	int z_count = 0;
 	int *zones;
 	member_funcs zone_f = {display_dungeon_zone, dungeon_lore, 0, 0, 0};
-	group_funcs dun_f = {z_info->t_max, FALSE, town_name, 0, oiddiv4, 0};
+	group_funcs dun_f = {0, FALSE, town_name, 0, oiddiv4, 0};
+
+	/* Save the maximum number of terrain types */
+	dun_f.maxnum = z_info->t_max;
 
 	C_MAKE(zones, z_info->t_max*MAX_DUNGEON_ZONES, int);
 
@@ -2710,10 +2721,12 @@ void do_cmd_options_append(int dummy, const char *dummy2)
 {
 	char ftmp[80];
 
-	/* Prompt */
-	prt("Command: Append options to a file", 20, 0);
+	/* Unused paramaters */
+	(void)dummy;
+	(void)dummy2;
 
 	/* Prompt */
+	prt("Command: Append options to a file", 20, 0);
 	prt("File: ", 21, 0);
 
 	/* Default filename */
