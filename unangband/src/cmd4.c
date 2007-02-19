@@ -604,7 +604,7 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 
 		handle_stuff();
 
-		if(visual_list)
+		if (visual_list)
 		{
 			place_visual_list_cursor(g_name_len + 3, 7, *o_funcs.xattr(oid), 
 									*o_funcs.xchar(oid), attr_top, char_left);
@@ -615,7 +615,7 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 		}
 		else
 		{
-			Term_gotoxy(g_name_len + 3, 6 + (oid - object_top));
+			Term_gotoxy(g_name_len + 3, 6 + (o_cur - object_top));
 		}
 	
 		if (delay)
@@ -676,32 +676,44 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 			case '{':
 			case '}':
 			case '\\':
-				if(o_funcs.note == 0 || o_funcs.note(oid) == 0)
-					break;
 			{
 				char note_text[80] = "";
-				u16b *note = o_funcs.note(oid);
-				u16b old_note = *note;
-				if(ke.key == '{') {
+				u16b *note;
+				u16b old_note;
+
+				/* Make sure we have an object */
+				if (o_funcs.note == NULL || o_funcs.note(oid) == 0)
+					break;
+
+				/* Get a copy of the note */
+				note = o_funcs.note(oid);
+				old_note = *note;
+
+				if (ke.key == '{')
+				{
 					/* Prompt */
 					prt("Inscribe with: ", hgt, 0);
 
 					/* Default note */
 					if (old_note)
-					{
 						sprintf(note_text, "%s", quark_str(old_note));
-					}
+
 					/* Get a filename */
-					if (!askfor_aux(note_text, 80)) continue;
+					if (!askfor_aux(note_text, sizeof note_text)) continue;
+
 					/* Set the inscription */
 					*note = quark_add(note_text);
+
 					/* Set the current default note */
 					note_idx = *note;
 				}
-				else if(ke.key == '}') {
+				else if (ke.key == '}')
+				{
 					*note = 0;
 				}
-				else { /* '\\' */
+				else
+				{
+					/* '\\' */
 					*note = note_idx;
 				}
 
@@ -715,13 +727,13 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 					if (!i_ptr->k_idx || i_ptr->note != old_note) continue;
 
 					/* Not matching item */
-					if(!g_funcs.group(oid) != i_ptr->tval) continue;
+					if (!g_funcs.group(oid) != i_ptr->tval) continue;
 
 					/* Auto-inscribe */
-						if(g_funcs.aware(i_ptr) || cheat_auto)
-					 			i_ptr->note = note_idx;
-
+					if (g_funcs.aware(i_ptr) || cheat_auto)
+						i_ptr->note = note_idx;
 				}
+
 				break;
 			}
 			
@@ -1704,7 +1716,7 @@ static void display_store_object(int col, int row, bool cursor, int oid)
 	/* Should be UNKNOWN for unreachable locations like Bombadil's */
 	byte attr = curs_attrs[CURS_KNOWN][(int)cursor];
 
-	object_desc(buffer, 50, o_ptr, TRUE, 3);
+	object_desc(buffer, sizeof buffer, o_ptr, TRUE, 3);
 
 	c_prt(attr, buffer, row, col);
 }
