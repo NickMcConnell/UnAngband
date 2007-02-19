@@ -1144,8 +1144,8 @@ static void do_cmd_knowledge_monsters(void)
 		}
 	}
 
-	C_MAKE(default_join, m_count+1, join_t);
-	C_MAKE(monsters, m_count+1, int);
+	C_MAKE(default_join, m_count, join_t);
+	C_MAKE(monsters, m_count, int);
 
 	m_count = 0;
 	for(i = 0; i < z_info->r_max; i++) {
@@ -1165,7 +1165,6 @@ static void do_cmd_knowledge_monsters(void)
 			default_join[m_count++].gid = j;
 		}
 	}
-	monsters[m_count] = -1;
 
 	display_knowledge("monsters", monsters, m_count, r_funcs, m_funcs,
 						"Sym  Kills");
@@ -1274,7 +1273,7 @@ static void do_cmd_knowledge_artifacts(void)
 	int a_count = 0;
 	int i, j;
 
-	C_MAKE(artifacts, z_info->a_max+1, int);
+	C_MAKE(artifacts, z_info->a_max, int);
 	
 	/* Collect valid artifacts */
 	for(i = 0; i < z_info->a_max; i++) {
@@ -1290,9 +1289,6 @@ static void do_cmd_knowledge_artifacts(void)
 				artifacts[j] = artifacts[j+1];
 		}
 	}
-	/* TODO: do same for stores, inventory */
-
-	artifacts[a_count] = -1;
 
 	display_knowledge("artifacts", artifacts, a_count, obj_f, art_f, 0);
 	FREE(artifacts);
@@ -1391,8 +1387,8 @@ static void do_cmd_knowledge_ego_items(void)
 	int i, j;
 
 	/* HACK: currently no more than 3 tvals for one ego type */
-	C_MAKE(egoitems, z_info->e_max*3+1, int);
-	C_MAKE(default_join, z_info->e_max*3+1, join_t);
+	C_MAKE(egoitems, z_info->e_max*3, int);
+	C_MAKE(default_join, z_info->e_max*3, join_t);
 	for(i = 0; i < z_info->e_max; i++) {
 		if(e_info[i].aware || cheat_lore) {
 			for(j = 0; j < 3 && e_info[i].tval[j]; j++) {
@@ -1407,7 +1403,6 @@ static void do_cmd_knowledge_ego_items(void)
 		}
 	}
 
-	egoitems[e_count] = -1;
 	display_knowledge("ego items", egoitems, e_count, obj_f, ego_f, "Sym");
 	FREE(default_join);
 	default_join = 0;
@@ -1575,7 +1570,7 @@ static void do_cmd_knowledge_objects(void)
 
 	int *objects;
 	int o_count = 0;
-	C_MAKE(objects, z_info->k_max+1, int);
+	C_MAKE(objects, z_info->k_max, int);
 	int i;
 	for(i = 0; i < z_info->k_max; i++) {
 		if(k_info[i].aware || k_info[i].flavor || cheat_lore) {
@@ -1585,7 +1580,6 @@ static void do_cmd_knowledge_objects(void)
 			}
 		}
 	}
-	objects[o_count] = -1;
 	display_knowledge("known objects", objects, o_count, kind_f, obj_f, "Sym");
 	FREE(objects);
 }
@@ -1676,8 +1670,7 @@ static void do_cmd_knowledge_features(void)
 	group_funcs fkind_f = {N_ELEMENTS(feature_group_text), FALSE,
 							fkind_name, f_cmp_fkind, feat_order, 0};
 
-	member_funcs feat_f = {display_feature, feat_lore,
-								f_xchar, f_xattr, 0};
+	member_funcs feat_f = {display_feature, feat_lore, f_xchar, f_xattr, 0};
 
 	int *features;
 	int f_count = 0;
@@ -1687,7 +1680,6 @@ static void do_cmd_knowledge_features(void)
 	for(i = 0; i < z_info->f_max; i++) {
 		features[f_count++] = i; /* Currently no filter for features */
 	}
-	features[f_count] = -1;
 
 	display_knowledge("features", features, f_count, fkind_f, feat_f, " Sym (Lt/Dk)");
 	FREE(features);
@@ -1821,7 +1813,7 @@ static void do_cmd_knowledge_dungeons(void)
 	member_funcs zone_f = {display_dungeon_zone, dungeon_lore, 0, 0, 0};
 	group_funcs dun_f = {z_info->t_max, FALSE, town_name, 0, oiddiv4, 0};
 
-	C_MAKE(zones, z_info->t_max*MAX_DUNGEON_ZONES + 1, int);
+	C_MAKE(zones, z_info->t_max*MAX_DUNGEON_ZONES, int);
 
 	for(i = 0; i < z_info->t_max; i++) {
 		if(t_info[i].max_depth == 0 && i != p_ptr->dungeon) continue;
@@ -1832,7 +1824,6 @@ static void do_cmd_knowledge_dungeons(void)
 				zones[z_count++] = MAX_DUNGEON_ZONES*i + j;
 		}
 	}
-	zones[z_count] = -1;
 
 	display_knowledge("locations", zones, z_count, dun_f, zone_f, "Reached");
 	FREE(zones);
