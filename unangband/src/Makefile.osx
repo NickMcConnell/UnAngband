@@ -138,7 +138,7 @@ install: $(EXE) $(ICONFILES) $(PLIST) $(LIBFILES)
 	install -m 755 $(EXE) $(APPBIN)
 	install -m 644 $(ICONFILES) $(APPRES)
 	cp osx/English.lproj/main.nib/*ib $(APPRES)/English.lproj/main.nib
-	sed 's/\$$VERSION\$$/0.6.2/' $(PLIST) > $(APPCONT)/Info.plist
+	sed 's/\$$VERSION\$$/$(VERSION)/' $(PLIST) > $(APPCONT)/Info.plist
 	$(SETFILE) -a B $(APPBNDL)
 
 
