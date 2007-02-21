@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plist version="1.0">
   <dict>
-    <key>CFBundleName</key><string>Unangband</string>
-    <key>CFBundleDisplayName</key><string>Unangband (OS X)</string>
-    <key>CFBundleExecutable</key><string>unangband</string>
+    <key>CFBundleName</key><string>$NAME$</string>
+    <key>CFBundleDisplayName</key><string>$NAME$ (OS X)</string>
+    <key>CFBundleExecutable</key><string>$EXECUTABLE$</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleSignature</key><string>A271</string>
     <key>CFBundleVersion</key><string>$VERSION$</string>
     <key>CFBundleShortVersionString</key><string>$VERSION$</string>
-    <key>CFBundleIconFile</key><string>Angband</string>
-    <key>CFBundleIdentifier</key><string>net.thangorodrim.Unangband</string>
+    <key>CFBundleIconFile</key><string>$NAME$</string>
+    <key>CFBundleIdentifier</key><string>net.thangorodrim.$NAME$</string>
     <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
     <key>CFBundleLongVersionString</key>
-    <string>$VERSION$, Copyright 2001-2006 Andrew Doull et al</string>
+    <string>$VERSION$, Copyright $COPYRIGHT$</string>
     <key>NSHumanReadableCopyright</key>
-    <string>Copyright © 2001-2006 Andrew Doull et al</string>
+    <string>Copyright © $COPYRIGHT$</string
     <key>CFBundleGetInfoString</key>
-    <string>$VERSION$,  © 2001-2006 Andrew Doull et al</string>
+    <string>$VERSION$, © $COPYRIGHT$</string>
 
 
     <key>CFBundleDocumentTypes</key>

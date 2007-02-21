@@ -8,6 +8,8 @@
 
 #Name of the executable file
 EXE=unangband
+NAME=Unangband
+COPYRIGHT=2001-2006 Andrew Doull et al
 
 TOOLDIR = /Developer/Tools
 SETFILE = $(TOOLDIR)/SetFile
@@ -138,7 +140,9 @@ install: $(EXE) $(ICONFILES) $(PLIST) $(LIBFILES)
 	install -m 755 $(EXE) $(APPBIN)
 	install -m 644 $(ICONFILES) $(APPRES)
 	cp osx/English.lproj/main.nib/*ib $(APPRES)/English.lproj/main.nib
-	sed 's/\$$VERSION\$$/$(VERSION)/' $(PLIST) > $(APPCONT)/Info.plist
+	sed -e 's/\$$VERSION\$$/$(VERSION)/' -e 's/\$$COPYRIGHT\$$/$(COPYRIGHT)/' \
+		-e 's/\$$NAME\$$/$(NAME)/' -e 's/\$$EXECUTABLE\$$/$(EXE)/' \
+		$(PLIST) > $(APPCONT)/Info.plist
 	$(SETFILE) -a B $(APPBNDL)
 
 
@@ -147,7 +151,7 @@ install: $(EXE) $(ICONFILES) $(PLIST) $(LIBFILES)
 #
 
 
-PACKAGE_NAME = Unangband-$(VERSION)
+PACKAGE_NAME = $(NAME)-$(VERSION)
 
 # In the unlikely event that tar+zip isn't enough...
 
