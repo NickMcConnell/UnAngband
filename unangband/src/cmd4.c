@@ -676,18 +676,13 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 			case '{':
 			case '}':
 			case '\\':
-			{
-				char note_text[80] = "";
-				u16b *note;
-				u16b old_note;
-
-				/* Make sure we have an object */
+				/* precondition -- valid object */
 				if (o_funcs.note == NULL || o_funcs.note(oid) == 0)
 					break;
-
-				/* Get a copy of the note */
-				note = o_funcs.note(oid);
-				old_note = *note;
+			{
+				char note_text[80] = "";
+				u16b *note = o_funcs.note(oid);
+				u16b old_note = *note;
 
 				if (ke.key == '{')
 				{
@@ -1738,14 +1733,12 @@ static const char *store_name(int gid)
 static void do_cmd_knowledge_home(void)
 {
 	member_funcs contents_f = {display_store_object, screen_store_object, 0, 0, 0};
-	group_funcs home_f = {0, FALSE, store_name, 0, default_group, 0};
+	group_funcs home_f =
+		{total_store_count, FALSE, store_name, 0, default_group, 0};
 
 	int *objects, store_count = 0;
 	int i, j;
 	int o_count = 0;
-
-	/* Save the store count */
-	home_f.maxnum = total_store_count;
 
 	for(i = 0; i < total_store_count; i++) {
 		if(!cheat_xtra && store[i]->index != 0 &&
@@ -1831,10 +1824,7 @@ static void do_cmd_knowledge_dungeons(void)
 	int z_count = 0;
 	int *zones;
 	member_funcs zone_f = {display_dungeon_zone, dungeon_lore, 0, 0, 0};
-	group_funcs dun_f = {0, FALSE, town_name, 0, oiddiv4, 0};
-
-	/* Save the maximum number of terrain types */
-	dun_f.maxnum = z_info->t_max;
+	group_funcs dun_f = {z_info->t_max, FALSE, town_name, 0, oiddiv4, 0};
 
 	C_MAKE(zones, z_info->t_max*MAX_DUNGEON_ZONES, int);
 
