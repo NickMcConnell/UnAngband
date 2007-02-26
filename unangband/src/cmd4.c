@@ -1833,7 +1833,7 @@ static void do_cmd_knowledge_dungeons(void)
 		for(j = 0; (j < 1 || t_info[i].zone[j].level != 0 )
 											 && j < MAX_DUNGEON_ZONES; j++)
 		{
-			if(t_info[i].zone[j].level == 0 || t_info[i].zone[j].guard)
+			if(j == 0 || t_info[i].zone[j].guard)
 				zones[z_count++] = MAX_DUNGEON_ZONES*i + j;
 		}
 	}
