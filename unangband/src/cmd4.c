@@ -1718,17 +1718,28 @@ static void display_store_object(int col, int row, bool cursor, int oid)
 
 static void screen_store_object(int oid)
 {
+	screen_save();
+
 	store_type *s_ptr = store[default_join[oid].gid];
 	object_type *o_ptr = &s_ptr->stock[default_join[oid].oid];
 	/* Describe */
 	screen_object(o_ptr);
+	/* Load the screen */
+
+	(void)anykey();
+
+	screen_load();
 }
 
 
 /* this isn't necessary; data is already sorted.*/
 /* static int s_cmp_obj(void *a, void *b); */
 static const char *store_name(int gid)
-{ return u_name + store[gid]->name; }
+{
+	/* HACK: Home works differently from storage */
+	if(gid != STORE_HOME) return u_name + store[gid]->name;
+	else return u_name + u_info[store[STORE_HOME]->index].name;
+}
 
 static void do_cmd_knowledge_home(void)
 {
@@ -1741,8 +1752,7 @@ static void do_cmd_knowledge_home(void)
 	int o_count = 0;
 
 	for(i = 0; i < total_store_count; i++) {
-		if(!cheat_xtra && store[i]->index != 0 &&
-								store[i]->base != 1 && store[i]->base != 2) 
+		if(!cheat_xtra && i != STORE_HOME && store[i]->base != 1 && store[i]->base != 2) 
 			continue;
 		store_count++;
 	}
@@ -1751,8 +1761,8 @@ static void do_cmd_knowledge_home(void)
 	C_MAKE(default_join, (MAX_INVENTORY_HOME+1)*store_count, join_t);
 
 	for(i = 0; i < total_store_count; i++) {
-		if(!cheat_xtra && store[i]->index != 0 &&
-								store[i]->base != 1 && store[i]->base != 2) 
+		/* Check for current home */
+		if(!cheat_xtra && i != STORE_HOME && store[i]->base != 1 && store[i]->base != 2) 
 			continue;
 		for(j = 0; store[i]->stock[j].k_idx; j++) {
 			objects[o_count] = o_count;
@@ -1829,7 +1839,11 @@ static void do_cmd_knowledge_dungeons(void)
 	C_MAKE(zones, z_info->t_max*MAX_DUNGEON_ZONES, int);
 
 	for(i = 0; i < z_info->t_max; i++) {
-		if(t_info[i].max_depth == 0 && i != p_ptr->dungeon) continue;
+		/* HACK: there should be a better way to determine visitation */
+		int guard0 = t_info[i].zone[0].guard;
+		if(t_info[i].max_depth == 0 && i != p_ptr->dungeon &&
+			(!guard0 || r_info[guard0].max_num)) continue;
+
 		for(j = 0; (j < 1 || t_info[i].zone[j].level != 0 )
 											 && j < MAX_DUNGEON_ZONES; j++)
 		{
