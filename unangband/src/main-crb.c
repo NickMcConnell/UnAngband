@@ -289,6 +289,7 @@ struct GlyphInfo
 
 static GlyphInfo glyph_data[MAX_TERM_DATA+1];
 
+static WindowRef aboutDialog;
 
 
 static bool CheckEvents(int wait);
@@ -2523,6 +2524,8 @@ static void init_menubar(void)
 	if((err = SetMenuBarFromNib(nib, CFSTR("MenuBar"))))
 		quit("Cannot prepare menu bar!");
 
+	(void) CreateWindowFromNib(nib, CFSTR("DLOG:about"), &aboutDialog);
+
 	DisposeNibReference(nib);
 
 	MenuRef m = MyGetMenuHandle(kStyleMenu);
@@ -2663,6 +2666,8 @@ static OSStatus AngbandGame(EventHandlerCallRef inCallRef,
 	DisableAllMenuItems(MyGetMenuHandle(kTileHgtMenu));
 	/* Prompt the user - You may have to change this for some variants */
 	prt("[Choose 'New', 'Open' or 'Import' from the 'File' menu]", 23, 11);
+
+	SetFontInfoForSelection(kFontSelectionATSUIType, 0, 0, 0);
 
 	for(int i = kNew; i <= kImport; i++)
 		EnableMenuItem(MyGetMenuHandle(kFileMenu), i);
@@ -3035,9 +3040,7 @@ static OSStatus RevalidateGraphics(term_data *td, EventRef inEvent)
 	}
 
 	// Only rescale graphics when absolutely necessary.
-	if(command.commandID == 'graf')
-		menuID = GetMenuID(command.menu.menuRef);
-	if((menuID != kTileWidMenu ||  menuID != kTileHgtMenu))
+	if(command.commandID != kTileWidMenu && command.commandID != kTileHgtMenu)
 	{
 		// Reset tilesize to default when graphics change.
 		td->tile_wid = td->tile_hgt = 0;
@@ -3315,6 +3318,7 @@ static OSStatus PrintCommand(EventHandlerCallRef inCallRef, EventRef inEvent,
 	return noErr;
 }
 
+/* About angband... */
 static OSStatus AboutCommand(EventHandlerCallRef inCallRef, EventRef inEvent,
     void *inUserData )
 {
@@ -3326,27 +3330,33 @@ static OSStatus AboutCommand(EventHandlerCallRef inCallRef, EventRef inEvent,
 	if(command.commandID != 'abou')
 		return eventNotHandledErr;
 
-	/* About angband... */
-	DialogPtr dialog;
 	short item_hit;
 
-	/* Get the about dialogue */
-	dialog = GetNewDialog(128, 0, (WindowRef)-1);
-
 	/* Move it to the middle of the screen */
-	RepositionWindow( GetDialogWindow(dialog), NULL, kWindowCenterOnMainScreen);
+	RepositionWindow(aboutDialog,  NULL, kWindowCenterOnMainScreen);
 
 	/* Show the dialog */
-	TransitionWindow(GetDialogWindow(dialog),
+	TransitionWindow(aboutDialog,
 		kWindowZoomTransitionEffect,
 		kWindowShowTransitionAction,
 		NULL);
 
 	/* wait for user to click on it */
-	ModalDialog(0, &item_hit);
+	for(;;) {
+		EventRef event;
+		(void) ReceiveNextEvent(0, 0, kEventDurationForever, true, &event);
+		EventClass evc = GetEventClass(event);
+		EventType evt = GetEventKind(event);
+		if(evc == 'keyb' || (evc == 'mous' && kEventMouseDown))
+			break;
+	}
 
-	/* Free the dialogue */
-	DisposeDialog(dialog);
+	/* Hide the dialogue */
+	TransitionWindow(aboutDialog,
+		kWindowZoomTransitionEffect,
+		kWindowHideTransitionAction,
+		NULL);
+
 	return noErr;
 }
 

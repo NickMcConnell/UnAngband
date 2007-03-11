@@ -597,7 +597,7 @@
     <reference idRef="215"/>
   </array>
   <dictionary count="4" name="nameTable">
-    <string>DLOG:128</string>
+    <string>DLOG:about</string>
     <reference idRef="288"/>
     <string>Files Owner</string>
     <reference idRef="1"/>
