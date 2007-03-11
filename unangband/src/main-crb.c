@@ -3168,6 +3168,7 @@ static OSStatus FontCommand(EventHandlerCallRef inHandlerCallRef, EventRef inEve
 		(void) GetEventParameter (inEvent, kEventParamATSUFontID,
 							typeATSUFontID, NULL, sizeof(fid), NULL, &fid);
 
+		if(size > 32*(1<<16)) size = 32*(1<<16);
 		float fsize = 1.0*size/(1<<16);
 		FontChanged(fid, fsize);
 		return noErr;
