@@ -428,7 +428,7 @@ static OSErr path_to_spec(const char *path, FSSpec *spec)
 	FSRef ref;
 
 	/* Convert pathname to FSRef ... */
-	err = FSPathMakeRef(path, &ref, NULL);
+	err = FSPathMakeRef((byte*) path, &ref, NULL);
 	if (err != noErr) return (err);
 
 	/* ... then FSRef to FSSpec */
@@ -453,7 +453,7 @@ static OSErr spec_to_path(const FSSpec *spec, char *buf, size_t size)
 	if (err != noErr) return (err);
 
 	/* ... then FSRef to pathname */
-	err = FSRefMakePath(&ref, buf, size);
+	err = FSRefMakePath(&ref, (byte*)buf, size);
 
 	/* Inform caller of success or failure */
 	return (err);
@@ -705,11 +705,16 @@ static GlyphInfo *get_glyph_info(ATSUFontID fid, float size)
 	ATSUSetTextPointerLocation(info->layout, text, 0, 1, 1);
 	ATSUSetRunStyle(info->layout, info->style, 0, 1);
 
-	ByteCount oCount;
+	ByteCount oCount = 0;
 	FontNameCode oCode;
-	ATSUGetIndFontName(fid, 6, sizeof(info->psname), info->psname,
+	err = ATSUGetIndFontName(fid, 6, sizeof(info->psname), info->psname,
 													&oCount, &oCode, 0, 0, 0);
 
+	require_noerr(err, CantInitialize);
+	if(oCount == 0 || strlen(info->psname) == 0)
+		goto CantInitialize;
+
+	info->psname[oCount] = 0;
 	// Is font mono-space?
 	err = ATSUCreateTextLayout(&info->layout);
 	require_noerr(err, CantInitialize);
@@ -752,7 +757,6 @@ static GlyphInfo *get_glyph_info(ATSUFontID fid, float size)
 	info->font_wid = (info->font_wid)/(1<<16);
 
 	info->refcount++;
-
 	return info;
 
 CantInitialize:
@@ -792,10 +796,10 @@ static void release_glyph_info(GlyphInfo *info)
 static void term_data_check_font(term_data *td)
 {
 	GlyphInfo *info = get_glyph_info(td->font_id, td->font_size);
-	if(info) {
-		release_glyph_info(td->ginfo);
-		td->ginfo = info;
-	}
+	if(!info) return;
+
+	release_glyph_info(td->ginfo);
+	td->ginfo = info;
 
 	td->font_wid = (info->font_wid +.999);
 	td->font_hgt = info->ascent + info->descent;
@@ -884,20 +888,20 @@ static void term_data_check_size(term_data *td)
 	td->bounds = (CGRect) {{0, 0},
 		{td->cols * td->tile_wid, td->rows * td->tile_hgt}};
 
-	/* Assume no graphics */
+	/* Assume no graphics, monospace */
 	td->t->higher_pict = FALSE;
 	td->t->always_pict = FALSE;
 
 	
 	/* Handle graphics */
-	if (td->ginfo->monospace) td->t->higher_pict = TRUE;
+	if (!td->ginfo->monospace) {
+		/* Draw every character */
+		td->t->always_pict = TRUE;
+	}
 	else if (use_graphics && (td == &data[0]))
 	{
 		/* Use higher pict whenever possible */
-		if (td->ginfo->monospace) td->t->higher_pict = TRUE;
-
-		/* Use always_pict only when necessary */
-		else td->t->always_pict = TRUE;
+		td->t->higher_pict = TRUE;
 	}
 
 }
@@ -1832,9 +1836,10 @@ static errr Term_curs_mac(int x, int y)
 	/* Frame the grid, staying within the boundary. */
 	int tile_wid = td->tile_wid;
 	if(use_bigtile) {
-		byte a, c;
-		Term_what(x+1,y, &a, &(char)c);
-		if(c == 0xff) tile_wid *= 2;
+		byte a;
+		char c;
+		Term_what(x+1,y, &a, &c);
+		if(c == (char) 0xff) tile_wid *= 2;
 	}
 
 	CGRect r = {{x * td->tile_wid + .5, y * td->tile_hgt + .5 },
@@ -2032,7 +2037,7 @@ static char *locate_lib(char *buf, size_t size)
 	if (!main_url) return (NULL);
 
 	/* Get the URL in the file system's native string representation */
-	success = CFURLGetFileSystemRepresentation(main_url, TRUE, buf, size);
+	success = CFURLGetFileSystemRepresentation(main_url, TRUE, (byte*)buf, size);
 
 	/* Free the url */
 	CFRelease(main_url);
@@ -2535,7 +2540,7 @@ static void init_menubar(void)
 			char buf[15];
 			/* Tile size */
 			strnfmt((char*)buf, 15, "%d", i);
-			CFStringRef cfstr = CFStringCreateWithBytes ( NULL, buf,
+			CFStringRef cfstr = CFStringCreateWithBytes ( NULL, (byte*) buf,
 									strlen(buf), kCFStringEncodingASCII, false);
 			AppendMenuItemTextWithCFString(m, cfstr, 0, j, NULL);
 			SetMenuItemRefCon(m, i-MIN_FONT+1, i);
@@ -2667,7 +2672,7 @@ static OSStatus AngbandGame(EventHandlerCallRef inCallRef,
 		if(data[i].mapped)
 			RevalidateGraphics(&data[i], 0);
 	}
-	
+
 	/* Flush the prompt */
 	Term_fresh();
 	Term_flush();
@@ -3178,8 +3183,8 @@ static OSStatus FontCommand(EventHandlerCallRef inHandlerCallRef, EventRef inEve
 		if(w) fontInfo.focus = w; 
 		return noErr;
 	}
-	else if(type == 'font' && type == kEventFontPanelClosed) {
-		SetMenuItemTextWithCFString(GetMenuHandle(102), 3, CFSTR("Show Fonts"));
+	else if(class == 'font' && type == kEventFontPanelClosed) {
+		SetMenuItemTextWithCFString(GetMenuHandle(kStyleMenu), kFonts, CFSTR("Show Fonts"));
 		return noErr;
 	}
 
@@ -3222,6 +3227,7 @@ static OSStatus MouseCommand ( EventHandlerCallRef inCallRef,
 	p.y -= (td->r.top + 21);
 
 	Term_mousepress(p.x/td->tile_wid, p.y/td->tile_hgt, button);
+
 	return noErr;
 }
 
