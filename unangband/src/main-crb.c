@@ -3033,7 +3033,6 @@ static OSStatus RevalidateGraphics(term_data *td, EventRef inEvent)
 	HICommand command;
 	command.commandID = 0;
 	command.menu.menuRef = 0;
-	int menuID = 0;
 	if(inEvent) {
 		GetEventParameter( inEvent, kEventParamDirectObject, typeHICommand,
 							NULL, sizeof(command), NULL, &command);
@@ -3330,8 +3329,6 @@ static OSStatus AboutCommand(EventHandlerCallRef inCallRef, EventRef inEvent,
 	if(command.commandID != 'abou')
 		return eventNotHandledErr;
 
-	short item_hit;
-
 	/* Move it to the middle of the screen */
 	RepositionWindow(aboutDialog,  NULL, kWindowCenterOnMainScreen);
 
@@ -3341,13 +3338,18 @@ static OSStatus AboutCommand(EventHandlerCallRef inCallRef, EventRef inEvent,
 		kWindowShowTransitionAction,
 		NULL);
 
-	/* wait for user to click on it */
+	/* wait for user input */
 	for(;;) {
+		EventTargetRef target = GetEventDispatcherTarget();
 		EventRef event;
-		(void) ReceiveNextEvent(0, 0, kEventDurationForever, true, &event);
+		OSStatus err = ReceiveNextEvent(0, 0, kEventDurationForever, true, &event);
 		EventClass evc = GetEventClass(event);
 		EventType evt = GetEventKind(event);
-		if(evc == 'keyb' || (evc == 'mous' && kEventMouseDown))
+		if(err == noErr) {
+			SendEventToEventTarget (event, target);
+			ReleaseEvent(event);
+		}
+		if(evc == 'keyb' || (evc == 'mous' && evt == kEventMouseDown))
 			break;
 	}
 

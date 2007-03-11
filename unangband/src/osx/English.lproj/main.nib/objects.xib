@@ -4,7 +4,7 @@
   <object name="rootObject" class="NSCustomObject" id="1">
     <string name="customClass">NSApplication</string>
   </object>
-  <array count="76" name="allObjects">
+  <array count="74" name="allObjects">
     <object class="IBCarbonMenu" id="29">
       <string name="title">main</string>
       <array count="6" name="items">
@@ -410,7 +410,7 @@
       <string name="title">Andrew Doull</string>
     </object>
     <object class="IBCarbonWindow" id="288">
-      <string name="windowRect">126 334 369 642 </string>
+      <string name="windowRect">111 93 354 401 </string>
       <string name="title"></string>
       <object name="rootControl" class="IBCarbonRootControl" id="290">
         <string name="bounds">0 0 243 308 </string>
@@ -498,27 +498,10 @@
     <reference idRef="314"/>
     <reference idRef="316"/>
     <reference idRef="317"/>
-    <object class="IBCarbonRootControl" id="318">
-      <string name="bounds">0 0 123 448 </string>
-      <string name="viewFrame">0 0 448 123 </string>
-    </object>
-    <object class="IBCarbonWindow" id="319">
-      <string name="windowRect">165 344 288 792 </string>
-      <string name="title">Window</string>
-      <reference name="rootControl" idRef="318"/>
-      <boolean name="receiveUpdates">FALSE</boolean>
-      <boolean name="isResizable">FALSE</boolean>
-      <boolean name="liveResize">TRUE</boolean>
-      <boolean name="compositing">TRUE</boolean>
-      <int name="carbonWindowClass">1</int>
-      <int name="themeBrush">3</int>
-      <int name="windowPosition">7</int>
-      <boolean name="isConstrained">FALSE</boolean>
-    </object>
     <reference idRef="322"/>
     <reference idRef="323"/>
   </array>
-  <array count="76" name="allParents">
+  <array count="74" name="allParents">
     <reference idRef="1"/>
     <reference idRef="29"/>
     <reference idRef="131"/>
@@ -591,20 +574,16 @@
     <reference idRef="215"/>
     <reference idRef="147"/>
     <reference idRef="215"/>
-    <reference idRef="319"/>
-    <reference idRef="1"/>
     <reference idRef="290"/>
     <reference idRef="215"/>
   </array>
-  <dictionary count="4" name="nameTable">
+  <dictionary count="3" name="nameTable">
     <string>DLOG:about</string>
     <reference idRef="288"/>
     <string>Files Owner</string>
     <reference idRef="1"/>
     <string>MenuBar</string>
     <reference idRef="29"/>
-    <string>Window</string>
-    <reference idRef="319"/>
   </dictionary>
   <unsigned_int name="nextObjectID">324</unsigned_int>
 </object>
