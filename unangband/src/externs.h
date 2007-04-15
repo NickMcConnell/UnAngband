@@ -35,6 +35,7 @@ extern const byte side_dirs[20][8];
 extern const char hexsym[16];
 extern const byte stat_gains[PY_MAX_LEVEL];
 extern const byte adj_mag_study[];
+extern const byte adj_mag_study_max[];
 extern const s16b adj_mag_mana[];
 extern const byte adj_mag_fail_min[];
 extern const byte adj_mag_fail_rate[];
