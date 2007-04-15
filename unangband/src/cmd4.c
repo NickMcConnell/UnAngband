@@ -1687,7 +1687,7 @@ static void do_cmd_knowledge_features(void)
 	int *features;
 	int f_count = 0;
 	int i;
-	C_MAKE(features, z_info->f_max, int);
+	C_MAKE(features, z_info->f_max + 1, int);
 
 	for(i = 0; i < z_info->f_max; i++) {
 		features[f_count++] = i; /* Currently no filter for features */
