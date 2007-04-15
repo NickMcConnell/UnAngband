@@ -1194,7 +1194,6 @@ static bool hates_water(object_type *o_ptr)
 		case TV_SONG_BOOK:
 		case TV_INSTRUMENT:
 		case TV_FOOD:
-		case TV_STATUE:
 		{
 			return (TRUE);
 		}
@@ -2220,24 +2219,25 @@ static void water_dam(int who, int dam, cptr kb_str, bool inven)
 
 		object_flags(o_ptr,&f1,&f2,&f3,&f4);
 
-		/* Hack -- Use up fuel (except on artifacts and lites unaffected by water) */
+		/* Hack -- Douse light (except on artifacts and lites unaffected by water)
+		 * We no longer reduce the fuel as players found this annoying.
+		 */
 		if (!artifact_p(o_ptr) && (o_ptr->timeout > 0) && !(f2 & TR2_IGNORE_WATER))
 		{
+			/* Copy charges */
+			o_ptr->charges = o_ptr->timeout;
+			
 			/* Douse light */
 			o_ptr->timeout = 0;
 
 			disturb(0, 0);
 			msg_print("Your light has gone out!");
+			
+			/* Update torch */
+			p_ptr->update |= (PU_TORCH);
 
-			/* Destroy torch */
-			if (o_ptr->sval == SV_LITE_TORCH)
-			{
-				/* Adjust total weight */
-				p_ptr->total_weight -= o_ptr->weight * o_ptr->number;
-
-				/* Clear slot */
-				object_wipe(o_ptr);
-			}
+			/* Fully update the visuals */
+			p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS);
 		}
 	}
 
