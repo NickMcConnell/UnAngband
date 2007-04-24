@@ -2503,6 +2503,7 @@
 #define RBM_8WAY_II	72
 #define RBM_8WAY_III	73
 #define RBM_SWARM	74
+#define RBM_DAGGER	75
 
 #define RBM_MAX_NORMAL  23
 #define RBM_MIN_RANGED  15

@@ -5636,6 +5636,9 @@ bool make_feat(object_type *j_ptr, int y, int x)
 	/* Get the item */
 	k_idx = f_ptr->k_idx;
 
+	/* Paranoia */
+	if (!k_idx) return (FALSE);
+
 	/* Get existing item */
 	item = scan_feat(y,x);
 

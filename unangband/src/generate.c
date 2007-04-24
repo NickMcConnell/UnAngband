@@ -1907,7 +1907,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 					}
 				}
 				/* Maybe pick if placing one */
-				else if ((flag & (RG1_ALLOC | RG1_SCATTER | RG1_8WAY)) != 0)
+				else if ((flag & (RG1_ALLOC | RG1_SCATTER | RG1_TRAIL | RG1_8WAY)) != 0)
 				{
 					if (rand_int(++choice) == 0)
 					{
@@ -1945,7 +1945,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 					/* Assign feature */
 					if (place_feat)
 					{
-						/* Preserve the 'solid' status of a wall */
+						/* Preserve the 'solid' status of a wall & ensure that at least 1 feature is placed */
 						if (cave_feat[y][x] == FEAT_WALL_SOLID)
 						{
 							/* Place solid wall now */
@@ -2049,6 +2049,11 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 					/* Assign feature */
 					if (place_feat)
 					{
+						/* Hack -- if we are placing one feature, we replace it with a solid wall to ensure that it
+						 * is not overwritten later on. We take advantage of the dun->next array to do this.
+						 */
+						if (k == 0) cave_feat[y][x] = FEAT_WALL_SOLID;
+
 						/* Preserve the 'solid' status of a wall */
 						if (cave_feat[y][x] == FEAT_WALL_SOLID)
 						{
@@ -2115,6 +2120,11 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 			/* Assign feature */
 			if (place_feat)
 			{
+				/* Hack -- if we are placing one feature, we replace it with a solid wall to ensure that it
+				 * is not overwritten later on. We take advantage of the dun->next array to do this.
+				 */
+				if (k == 0) cave_feat[y][x] = FEAT_WALL_SOLID;
+
 				/* Preserve the 'solid' status of a wall */
 				if (cave_feat[y][x] == FEAT_WALL_SOLID)
 				{
@@ -5326,7 +5336,7 @@ static u32b get_tunnel_style(void)
  */
 static void build_tunnel(int row1, int col1, int row2, int col2)
 {
-	int i, y, x;
+	int i, j, y, x;
 	int tmp_row = row1, tmp_col = col1;
 	int row_dir, col_dir;
 	int start_row, start_col;
@@ -5614,6 +5624,18 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				{
 					for (x = dun->wall[i].x - 1; x <= dun->wall[i].x + 1; x++)
 					{
+						bool doorway;
+						
+						doorway = FALSE;
+
+						/* Avoid solidifying areas where we'll end up placing doors */
+						for (j = wall1; j < dun->wall_n; j++)
+						{
+							if ((y == dun->wall[j].y) && (x == dun->wall[j].x)) doorway = TRUE; 
+						}
+
+						if (doorway) continue;
+
 						/* Convert adjacent "outer" walls as "solid" walls */
 						if (f_info[cave_feat[y][x]].flags1 & (FF1_OUTER))
 						{
@@ -5634,7 +5656,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 							cave_alter_feat(y, x, FS_SOLID);
 
 							/* Decorate next to the start and/or end of the tunnel with the starting room decorations */
-							if ((dun_room[by1][bx1]) && (dun_room[by1][bx1] < DUN_ROOMS) && (room_info[dun_room[by1][bx1]].solid) && (dun->next_n < NEXT_MAX))
+							if ((dun_room[by1][bx1]) && (dun_room[by1][bx1] < DUN_ROOMS) && ((room_info[dun_room[by1][bx1]].solid) || (dun_room[by1][bx1] == dun_room[by2][bx2]))
+									&& (dun->next_n < NEXT_MAX))
 							{
 								/* Overwrite with alternate terrain from starting room later */
 								dun->next[dun->next_n].y = y;
@@ -5648,11 +5671,16 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 							{
 								int j;
 
-								for (j = first_next; (j < dun->next_n) && (dun_room[by1][by2] == dun_room[dun->next[j].y][dun->next[j].x]); j++)
+								for (j = first_next; j < dun->next_n; j++)
 								{
 									/* Overwrite with alternate terrain from ending room later */
 									dun->next_feat[j] = room_info[dun_room[by2][bx2]].solid;
 								}
+							}
+							/* If ending room does not have decorations and neither does start, clear the above 'fake' decorations */
+							else if ((dun_room[by1][bx1]) && (dun_room[by1][bx1] < DUN_ROOMS) && !(room_info[dun_room[by1][bx1]].solid) && (dun_room[by1][bx1] != dun_room[by2][bx2]))
+							{
+								dun->next_n = first_next;
 							}
 						}
 					}
@@ -6080,8 +6108,6 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		/* Convert to doorway if an outer wall */
 		if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) != 0)
 		{
-
-			msg_print("!");
 			cave_alter_feat(y, x, FS_DOOR);
 		}
 

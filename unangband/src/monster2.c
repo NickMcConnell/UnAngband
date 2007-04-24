@@ -3021,7 +3021,15 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 					ammo_sval = SV_POTION_DETONATIONS;
 				}
 				break;
+			}			
+			case RBM_DAGGER:
+			{
+				ammo_kind = 43;
+				ammo_tval = TV_SWORD;
+				ammo_sval = SV_DAGGER;
+				break;
 			}
+
 		}
 
 		/* Blow doesn't need ammo */
@@ -4876,7 +4884,7 @@ void get_monster_ecology(int r_idx)
 		r_ptr = &r_info[r_idx];
 
 		/* For first monster on a level, we force some related monsters to appear */
-		if (cave_ecology.num_races <= 1) hack_ecology = randint(6);
+		if (cave_ecology.num_races <= 1) hack_ecology = randint(5);
 
 		/* Is the current monster deeper */
 		if (r_info[cave_ecology.deepest_race].level < r_info[r_idx].level)
@@ -4905,7 +4913,7 @@ void get_monster_ecology(int r_idx)
 		}
 
 		/* Add summon races -- summon kin */
-		if ((r_ptr->flags7 & (RF7_S_KIN)) || (hack_ecology == 1))
+		if ((r_ptr->flags7 & (RF7_S_KIN)) || (hack_ecology == 1) || ((level_flag & (LF1_STRONGHOLD)) != 0))
 		{
 			summon_specific_type = SUMMON_KIN;
 			summon_char_type = r_ptr->d_char;
@@ -4915,7 +4923,7 @@ void get_monster_ecology(int r_idx)
 		}
 
 		/* Add summon races -- summon plant */
-		if ((r_ptr->flags7 & (RF7_S_PLANT)) || (hack_ecology == 2))
+		if (r_ptr->flags7 & (RF7_S_PLANT))
 		{
 			summon_specific_type = SUMMON_PLANT;
 
@@ -4933,7 +4941,7 @@ void get_monster_ecology(int r_idx)
 		}
 
 		/* Add summon races -- summon animal */
-		if ((r_ptr->flags7 & (RF7_S_ANIMAL)) || (hack_ecology == 3))
+		if ((r_ptr->flags7 & (RF7_S_ANIMAL)) || (hack_ecology == 2) || ((level_flag & (LF1_SEWER)) != 0))
 		{
 			summon_specific_type = SUMMON_ANIMAL;
 
@@ -4977,7 +4985,7 @@ void get_monster_ecology(int r_idx)
 		}
 
 		/* Add summon races -- summon class */
-		if ((r_ptr->flags7 & (RF7_S_CLASS)) || ((hack_ecology == 4) && ((r_ptr->flags2 & (RF2_CLASS_MASK)) != 0) ))
+		if ((r_ptr->flags7 & (RF7_S_CLASS)) || (((hack_ecology == 3) || ((level_flag & (LF1_DUNGEON)) != 0)) && ((r_ptr->flags2 & (RF2_CLASS_MASK)) != 0) ))
 		{
 			summon_specific_type = SUMMON_CLASS;
 
@@ -4989,7 +4997,7 @@ void get_monster_ecology(int r_idx)
 		}
 
 		/* Add summon races -- summon race */
-		if ((r_ptr->flags7 & (RF7_S_RACE)) || ((hack_ecology == 5) && (((r_ptr->flags3 & (RF3_RACE_MASK)) != 0) ||
+		if ((r_ptr->flags7 & (RF7_S_RACE)) || (((hack_ecology == 4) || ((level_flag & (LF1_CRYPT)) != 0)) && (((r_ptr->flags3 & (RF3_RACE_MASK)) != 0) ||
 															((r_ptr->flags3 & (RF3_RACE_MASK)) != 0))))
 		{
 			summon_specific_type = SUMMON_RACE;
@@ -5005,7 +5013,7 @@ void get_monster_ecology(int r_idx)
 		}
 
 		/* Add summon races -- summon group */
-		if ((r_ptr->flags7 & (RF7_S_GROUP)) || ((hack_ecology == 6) && r_ptr->grp_idx))
+		if ((r_ptr->flags7 & (RF7_S_GROUP)) || (((hack_ecology == 5) || ((level_flag & (LF1_CHAMBERS)) != 0)) && r_ptr->grp_idx))
 		{
 			summon_specific_type = SUMMON_GROUP;
 			summon_group_type = r_ptr->grp_idx;

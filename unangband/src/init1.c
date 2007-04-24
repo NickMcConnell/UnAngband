@@ -252,6 +252,7 @@ static cptr r_info_blow_method[] =
 	"8WAY_II",
 	"8WAY_III",
 	"SWARM",
+	"DAGGER",
 	NULL
 };
 
@@ -2373,6 +2374,38 @@ errr parse_d_info(char *buf, header *head)
 		d_ptr->feat = feat;
 		d_ptr->tunnel = tunnel;
 		d_ptr->solid = solid;
+		
+		/* Hack -- ensure we have correct level flags */
+		if (f_info[d_ptr->feat].flags2 & (FF2_ICE)) d_ptr->l_flag |= LF1_ICE;
+		if (f_info[d_ptr->tunnel].flags2 & (FF2_ICE)) d_ptr->l_flag |= LF1_ICE;
+		if (f_info[d_ptr->solid].flags2 & (FF2_ICE)) d_ptr->l_flag |= LF1_ICE;
+		if (f_info[d_ptr->feat].flags2 & (FF2_WATER)) d_ptr->l_flag |= LF1_WATER;
+		if (f_info[d_ptr->tunnel].flags2 & (FF2_WATER)) d_ptr->l_flag |= LF1_WATER;
+		if (f_info[d_ptr->solid].flags2 & (FF2_WATER)) d_ptr->l_flag |= LF1_WATER;
+		if (f_info[d_ptr->feat].flags2 & (FF2_LAVA)) d_ptr->l_flag |= LF1_LAVA;
+		if (f_info[d_ptr->tunnel].flags2 & (FF2_LAVA)) d_ptr->l_flag |= LF1_LAVA;
+		if (f_info[d_ptr->solid].flags2 & (FF2_LAVA)) d_ptr->l_flag |= LF1_LAVA;
+		if (f_info[d_ptr->feat].flags2 & (FF2_ACID)) d_ptr->l_flag |= LF1_ACID;
+		if (f_info[d_ptr->tunnel].flags2 & (FF2_ACID)) d_ptr->l_flag |= LF1_ACID;
+		if (f_info[d_ptr->solid].flags2 & (FF2_ACID)) d_ptr->l_flag |= LF1_ACID;
+		if (f_info[d_ptr->feat].flags2 & (FF2_OIL)) d_ptr->l_flag |= LF1_OIL;
+		if (f_info[d_ptr->tunnel].flags2 & (FF2_OIL)) d_ptr->l_flag |= LF1_OIL;
+		if (f_info[d_ptr->solid].flags2 & (FF2_OIL)) d_ptr->l_flag |= LF1_OIL;
+		if (f_info[d_ptr->feat].flags2 & (FF2_CHASM)) d_ptr->l_flag |= LF1_CHASM;
+		if (f_info[d_ptr->tunnel].flags2 & (FF2_CHASM)) d_ptr->l_flag |= LF1_CHASM;
+		if (f_info[d_ptr->solid].flags2 & (FF2_CHASM)) d_ptr->l_flag |= LF1_CHASM;
+		if (f_info[d_ptr->feat].flags3 & (FF3_LIVING)) d_ptr->l_flag |= LF1_LIVING;
+		if (f_info[d_ptr->tunnel].flags3 & (FF3_LIVING)) d_ptr->l_flag |= LF1_LIVING;
+		if (f_info[d_ptr->solid].flags3 & (FF3_LIVING)) d_ptr->l_flag |= LF1_LIVING;
+	
+		/* Ensure that level flags must occur */
+		if (f_info[d_ptr->feat].flags2 & (FF2_ICE | FF2_WATER | FF2_LAVA | FF2_ACID | FF2_OIL | FF2_CHASM)) d_ptr->not_chance = 0;
+		if (f_info[d_ptr->tunnel].flags2 & (FF2_ICE | FF2_WATER | FF2_LAVA | FF2_ACID | FF2_OIL | FF2_CHASM)) d_ptr->not_chance = 0;
+		if (f_info[d_ptr->solid].flags2 & (FF2_ICE | FF2_WATER | FF2_LAVA | FF2_ACID | FF2_OIL | FF2_CHASM)) d_ptr->not_chance = 0;
+		if (f_info[d_ptr->feat].flags3 & (FF3_LIVING)) d_ptr->not_chance = 0;
+		if (f_info[d_ptr->tunnel].flags3 & (FF3_LIVING)) d_ptr->not_chance = 0;
+		if (f_info[d_ptr->solid].flags3 & (FF3_LIVING)) d_ptr->not_chance = 0;
+		
 	}
 
 	/* Process 'R' for "Race flag" (once only) */
@@ -7406,6 +7439,22 @@ errr eval_r_power(header *head)
 
 	int iteration;
 
+	/* Hack -- Clear item drop flags when monster doesn't drop anything */
+	for (i = 0; i < z_info->r_max; i++)
+	{
+		/* Point at the "info" */
+		r_ptr = (monster_race*)head->info_ptr + i;
+		
+		if ((r_ptr->flags1 & (RF1_DROP_60 | RF1_DROP_90 | RF1_DROP_1D2 | RF1_DROP_2D2 | RF1_DROP_3D2 | RF1_DROP_4D2)) == 0)
+		{
+			r_ptr->flags1 &= ~(RF1_ONLY_GOLD | RF1_ONLY_ITEM | RF1_DROP_GOOD | RF1_DROP_GREAT | RF1_DROP_USEFUL);
+			r_ptr->flags8 &= ~(RF8_DROP_CHEST | RF8_DROP_MISSILE | RF8_DROP_TOOL | RF8_DROP_WEAPON | RF8_DROP_MUSIC |
+								RF8_DROP_CLOTHES | RF8_DROP_LITE | RF8_DROP_JEWELRY | RF8_DROP_RSW | RF8_DROP_WRITING |
+								RF8_DROP_POTION | RF8_DROP_FOOD | RF8_DROP_JUNK);			
+		}
+	}
+
+
 	/* Allocate space for power */
 	C_MAKE(power, z_info->r_max, long);
 
@@ -7745,23 +7794,379 @@ errr eval_f_power(header *head)
 		{
 		}
 
-
-
-
-
-
-
-
-
-
-
-
-
 	}
 
 	/* Success */
 	return(0);
 }
+
+
+#ifdef ALLOW_TEMPLATES_OUTPUT
+
+/*
+ * Emit a "template" file.
+ * 
+ * This allows us to modify an existing template file by parsing it
+ * in and then modifying the data structures.
+ * 
+ * We parse the previous "template" file to allow us to include comments.
+ */
+errr emit_info_txt(FILE *fp, FILE *template, char *buf, header *head,
+   emit_info_txt_index_func emit_info_txt_index, emit_info_txt_always_func emit_info_txt_always)
+{
+	errr err;
+
+	/* Not ready yet */
+	bool okay = FALSE;
+	bool comment = FALSE;
+	int blanklines = 0;
+
+	/* Just before the first record */
+	error_idx = -1;
+
+	/* Just before the first line */
+	error_line = 0;
+
+	/* Parse */
+	while (0 == my_fgets(template, buf, 1024))
+	{
+		/* Advance the line number */
+		error_line++;
+
+		/* Skip blank lines */
+		if (!buf[0])
+		{
+			if (comment) blanklines++;
+			continue;
+		}
+
+		/* Emit a comment line */
+		if (buf[0] == '#')
+		{
+			/* Skip comments created by emission process */
+			if ((buf[1] == '$') && (buf[2] == '#')) continue;
+
+			while (blanklines--) fprintf(fp,"\n");
+			fprintf(fp,"%s\n",buf);
+			comment = TRUE;
+			blanklines = 0;
+			continue;
+		}
+
+		/* Verify correct "colon" format */
+		if (buf[1] != ':') return (PARSE_ERROR_GENERIC);
+
+		/* Hack -- Process 'V' for "Version" */
+		if (buf[0] == 'V')
+		{
+			if (comment) fprintf(fp,"\n");
+			comment = FALSE;
+
+			/* Output the version number */
+			fprintf(fp, "\nV:%d.%d.%d\n\n", head->v_major, head->v_minor, head->v_patch);
+			
+			/* Okay to proceed */
+			okay = TRUE;
+
+			/* Continue */
+			continue;
+		}
+
+		/* No version yet */
+		if (!okay) return (PARSE_ERROR_OBSOLETE_FILE);
+
+		/* Hack -- Process 'N' for "Name" */
+		if ((emit_info_txt_index) && (buf[0] == 'N'))
+		{
+			int idx;
+			
+			idx = atoi(buf + 2);
+
+			/* Verify index order */
+			if (idx < ++error_idx) return (PARSE_ERROR_NON_SEQUENTIAL_RECORDS);
+			
+			/* Verify information */
+			if (idx >= head->info_num) return (PARSE_ERROR_TOO_MANY_ENTRIES);
+			
+			if (comment) fprintf(fp,"\n");
+			comment = FALSE;
+
+			while (error_idx < idx)
+			{
+				fprintf(fp,"### %d - Unused ###\n\n",error_idx++);	
+			}
+
+			if ((err = (emit_info_txt_index(fp, head, idx))) != 0)
+				return (err);
+		}
+
+		/* Ignore anything else and continue */
+		continue;
+	}
+
+	/* No version yet */
+	if (!okay) return (PARSE_ERROR_OBSOLETE_FILE);
+#if 0
+	if ((emit_info_txt_always) && ((err = (emit_info_txt_always(fp, head))) != 0))
+				return (err);
+#endif
+	/* Success */
+	return (0);
+}
+
+
+/*
+ * Emit one textual string based on a flag.
+ */
+static errr emit_flags_32(FILE *fp, cptr intro_text, u32b flags, cptr names[])
+{
+	int i;
+	bool intro = TRUE;
+	int len = 0;
+
+	/* Check flags */
+	for (i = 0; i < 32; i++)
+	{
+		if ((flags & (1L << i)) != 0)
+		{
+			/* Newline needed */
+			if (len + strlen(names[i]) > 60)
+			{
+					fprintf(fp,"\n");
+					len = 0;
+					intro = TRUE;
+			}
+			
+			/* Introduction needed */
+			if (intro)
+			{
+				fprintf(fp, intro_text);
+				len += strlen(intro_text);
+				intro = FALSE;
+			}
+			else fprintf(fp," ");
+			
+			/* Output flag */
+			fprintf(fp, "%s |", names[i]);
+			len += strlen(names[i]);
+		}
+	}
+
+	/* Something output */
+	if (!intro) fprintf(fp, "\n");
+
+	return (0);
+}
+
+static char color_attr_to_char[] =
+{
+		'd',
+		'w',
+		's',
+		'o',
+		'r',
+		'g',
+		'b',
+		'u',
+		'D',
+		'W',
+		'v',
+		'y',
+		'R',
+		'G',
+		'B',
+		'U'
+};
+		
+/*
+ * Emit the "r_info" array into an ascii "template" file
+ */
+errr emit_r_info_index(FILE *fp, header *head, int i)
+{
+	int n;
+
+	/* Current entry */
+	monster_race *r_ptr = (monster_race*)head->info_ptr + i;
+	
+	
+	/* Output 'N' for "New/Number/Name" */
+	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + r_ptr->name);
+
+	/* Output 'G' for "Graphics" (one line only) */
+	fprintf(fp, "G:%c:%c\n",r_ptr->d_char,color_attr_to_char[r_ptr->d_attr]);
+
+	/* Output 'I' for "Info" (one line only) */
+	fprintf(fp, "I:%d:%dd%d:%d:%d:%d\n",r_ptr->speed,r_ptr->hdice,r_ptr->hside,r_ptr->aaf,r_ptr->ac,r_ptr->sleep);
+
+	/* Output 'W' for "More Info" (one line only) */
+	fprintf(fp,"W:%d:%d:%d:%ld\n",r_ptr->level, r_ptr->rarity, r_ptr->grp_idx, r_ptr->mexp);
+
+	/* Output 'M' for "Magic Info" (one line only) */
+	fprintf(fp, "M:%d:%d:%d:%d\n",r_ptr->freq_innate, r_ptr->freq_spell, r_ptr->spell_power, r_ptr->mana);
+
+	/* Output 'B' for "Blows" (up to four lines) */
+	for (n = 0; n < 4; n++)
+	{
+		/* End of blows */
+		if (!r_ptr->blow[n].method) break;
+
+		/* Output blow method */		
+		fprintf(fp, "B:%s", r_info_blow_method[r_ptr->blow[n].method]);
+		
+		/* Output blow effect */
+		if (r_ptr->blow[n].effect)
+		{
+			fprintf(fp, ":%s", r_info_blow_effect[r_ptr->blow[n].effect]);
+			
+			/* Output blow damage if required */
+			if ((r_ptr->blow[n].d_dice) && (r_ptr->blow[n].d_side))
+			{
+				fprintf(fp, ":%dd%d", r_ptr->blow[n].d_dice, r_ptr->blow[n].d_side);
+			}
+		}
+		
+		/* End line */
+		fprintf(fp, "\n");
+	}
+
+	/* Output 'F' for "Flags" */
+	emit_flags_32(fp, "F:", r_ptr->flags1, r_info_flags1);
+	emit_flags_32(fp, "F:", r_ptr->flags2, r_info_flags2);
+	emit_flags_32(fp, "F:", r_ptr->flags3, r_info_flags3);
+	emit_flags_32(fp, "F:", r_ptr->flags8, r_info_flags8);
+	emit_flags_32(fp, "F:", r_ptr->flags9, r_info_flags9);
+
+	/* Output 'S' for "Spell Flags" (multiple lines) */
+	emit_flags_32(fp, "S:", r_ptr->flags4, r_info_flags4);
+	emit_flags_32(fp, "S:", r_ptr->flags5, r_info_flags5);
+	emit_flags_32(fp, "S:", r_ptr->flags6, r_info_flags6);
+	emit_flags_32(fp, "S:", r_ptr->flags7, r_info_flags7);
+
+#if 0
+	/* Output 'D' for "Description" */
+	fprintf(fp, "D:%s\n", i, head->text_ptr + r_ptr->text);
+#endif
+
+	fprintf(fp,"\n");
+
+	/* Success */
+	return (0);	
+}
+
+
+/*
+ * Emit the "f_info" array into an ascii "template" file
+ */
+errr emit_f_info_index(FILE *fp, header *head, int i)
+{
+	int n;
+
+	/* Current entry */
+	feature_type *f_ptr = (feature_type*)head->info_ptr + i;
+	feature_type *f2_ptr;
+	
+	/* Output 'N' for "New/Number/Name" */
+	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + f_ptr->name);
+
+	/* Output 'G' for "Graphics" (one line only) */
+	fprintf(fp, "G:%c:%c\n",f_ptr->d_char,color_attr_to_char[f_ptr->d_attr]);
+
+	/* Output 'M' for "Mimic" (one line only) */
+	if (f_ptr->mimic != i)
+	{
+		fprintf(fp, "M:%d\n", f_ptr->mimic);
+		f2_ptr = (feature_type*)head->info_ptr + f_ptr->mimic;
+		fprintf(fp, "#$# %s\n",head->name_ptr + f2_ptr->name);
+	}
+
+	/* Output 'U' for "Unseen" (one line only) */
+	if (f_ptr->unseen != i)
+	{
+		fprintf(fp, "U:%d\n",f_ptr->unseen);
+		f2_ptr = (feature_type*)head->info_ptr + f_ptr->unseen;
+		fprintf(fp, "#$# %s\n",head->name_ptr + f2_ptr->name);
+	}
+
+	/* Output 'O' for "Object" (one line only) */
+	fprintf(fp, "O:%d\n",f_ptr->k_idx);
+
+	/* Output 'W' for "More Info" (one line only) */
+	fprintf(fp,"W:%d:%d:%d:%d\n",f_ptr->level, f_ptr->rarity, f_ptr->priority, f_ptr->edge);
+		f2_ptr = (feature_type*)head->info_ptr + f_ptr->edge;
+		if (f_ptr->edge) fprintf(fp, "#$# %s\n",head->name_ptr + f2_ptr->name);
+
+	/* Output 'T' for "Trap" (one line only) */
+	if (f_ptr->blow.method)
+	{
+		/* Output blow method */		
+		fprintf(fp, "T:%s", r_info_blow_method[f_ptr->blow.method]);
+		
+		/* Output blow effect */
+		if (f_ptr->blow.effect)
+		{
+			fprintf(fp, ":%s", r_info_blow_effect[f_ptr->blow.effect]);
+			
+			/* Output blow damage if required */
+			if ((f_ptr->blow.d_dice) && (f_ptr->blow.d_side))
+			{
+				fprintf(fp, ":%dd%d", f_ptr->blow.d_dice, f_ptr->blow.d_side);
+			}
+		}
+		
+		/* End line */
+		fprintf(fp, "\n");
+	}
+
+	/* Output 'S' for "Spell" (one line only) */
+	if (f_ptr->spell)
+	{
+		fprintf(fp,"S:%s\n", f_ptr->spell < 33 ? r_info_flags4[f_ptr->spell - 1] :
+							 (f_ptr->spell < 65 ? r_info_flags5[f_ptr->spell - 33] :
+							 (f_ptr->spell < 129 ? r_info_flags6[f_ptr->spell - 65] :
+							 (f_ptr->spell < 161 ? r_info_flags7[f_ptr->spell - 129] : "Error"))));		
+	}
+
+	/* Output 'K' for "Transitions" (up to 8 lines, plus default) */
+	if (f_ptr->defaults)
+	{
+		fprintf(fp,"K:DEFAULT:%d\n",f_ptr->defaults);
+		f2_ptr = (feature_type*)head->info_ptr + f_ptr->mimic;
+		if (f_ptr->defaults != i) fprintf(fp, "#$# %s\n",head->name_ptr + f2_ptr->name);
+	}
+
+	for (n = 0; n < MAX_FEAT_STATES; n++)
+	{
+ 		if (f_ptr->state[n].action == FS_FLAGS_END) break;
+ 		if (f_ptr->state[n].result == i) continue;
+
+		fprintf(fp,"K:%s:%d\n", f_ptr->state[n].action < 32 ? f_info_flags1[f_ptr->state[n].action] :
+							 (f_ptr->state[n].action < 64 ? f_info_flags2[f_ptr->state[n].action - 32] :
+							 (f_ptr->state[n].action < 128 ? f_info_flags3[f_ptr->state[n].action - 64] : "Error"))
+							 ,f_ptr->state[n].result);
+		f2_ptr = (feature_type*)head->info_ptr + f_ptr->state[n].result;
+		fprintf(fp, "#$# %s\n",head->name_ptr + f2_ptr->name);
+	}
+
+	/* Output 'F' for "Flags" */
+	emit_flags_32(fp, "F:", f_ptr->flags1, f_info_flags1);
+	emit_flags_32(fp, "F:", f_ptr->flags2, f_info_flags2);
+	emit_flags_32(fp, "F:", f_ptr->flags3, f_info_flags3);
+
+#if 0
+	/* Output 'D' for "Description" */
+	fprintf(fp, "D:%s\n", i, head->text_ptr + f_ptr->text);
+#endif
+
+	fprintf(fp,"\n");
+
+	/* Success */
+	return (0);	
+}
+
+
+
+#endif
+
 
 
 #else	/* ALLOW_TEMPLATES */
