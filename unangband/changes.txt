@@ -197,6 +197,9 @@ enters the level (Requested by Matthias Rudolf).
 
 - Prevent flooding of open ground.
 
+- Added some low level priest spells and defined some pre-requisites for basic priest
+spells.
+
 ### User Interface ###
 
 - The high score table now records character styles and dungeon location killed in.
