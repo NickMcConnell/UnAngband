@@ -2855,6 +2855,39 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 
 }
 
+const cptr inscrip_info[] =
+{
+		NULL,
+		"It is a cursed artifact of some kind, that you may be able to enchant back to full strength.  ",
+		"It is a cursed ego item of some kind.  ",
+		"It is cursed, with negative effects if you attempt to use it.  ",
+		"It has been blasted by powerful magic.  ",
+		"It needs recharging.  ",
+		"It is of good quality, but with no additional powers.  ",
+		"It is a useful ego item.  ",
+		"It is a useful artifact.  ",
+		"It is an artifact that has resisted your destruction.  ",
+		"It is an ego item or artifact that resisted being picked up or used.  ",
+		"It is of average quality or better, and not cursed.  It may be an ego item or artifact.  ",
+		"It is of very good quality, but with no additional powers.  ",
+		"It is of great quality, but with no additonal powers.  ",
+		"It is a useful ego item, with a random hidden ability.  ",
+		"It is of average quality or worse, and may be cursed.  It may be an ego item or artifact.  ",
+		"It is better than average quality, and not cursed.  It may be an ego item or artifact.  ",
+		"It is an ego item or artifact.  ",
+		"It is an ego item, but may or may not be cursed.  ",
+		"It is an ego item, with a random hidden ability, but may or may not be cursed.  ",
+		"It is an artifact, but may or may not be cursed.  ",
+		"There are no runes on it.  ",
+		"There are runes on it.  It may be an ego item or artifact.  ",
+		"It is of average quality, but may be damaged by wear and tear.  ",
+		"It is valuable, but may or may not be cursed.  ",
+		"It is better than average quality, but may or may not be cursed.  It may be an ego item or artifact.  ",
+		"It is coated with a substance.  ",
+		"It has a magically applied enchantment.  "
+};
+
+
 /* 
  * Create a spoiler file entry for an artifact 
  */
@@ -3161,6 +3194,7 @@ void list_object(const object_type *o_ptr, int mode)
 		cptr vp_activate = "When activated, it ";
 		cptr vp_activate_throw = "When inscribed with {=A} and attacking or thrown against an opponent, it ";
 		cptr vp_activate_attack = "When inscribed with {=A} and attacking an opponent, it ";
+		cptr vp_player_eat = "When eaten, it ";
 		cptr vp_monster_eat = "When eaten by monsters, it ";
 
 		vn = 0;
@@ -3201,11 +3235,12 @@ void list_object(const object_type *o_ptr, int mode)
 
 			case TV_BODY:
 			case TV_BONE:
+				vp[vn] = vp_player_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_SELF;
 				vp[vn] = vp_monster_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
 				break;
 
 			case TV_FOOD:
-				vp[vn] = "When eaten, it "; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_SELF;
+				vp[vn] = vp_player_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_SELF;
 				vp[vn] = vp_monster_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
 				if (o_ptr->sval < SV_FOOD_MIN_FOOD)
 				{
@@ -3253,6 +3288,10 @@ void list_object(const object_type *o_ptr, int mode)
 				vp[vn] = "When quaffed, it "; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_SELF;
 				/* Fall through */
 			case TV_FLASK:
+				if ((o_ptr->tval == TV_FLASK) && (o_ptr->sval == SV_FLASK_BLOOD))
+				{
+					vp[vn] = vp_player_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_SELF;					
+				}
 				vp[vn] = vp_coating; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_COATED;
 				vp[vn] = vp_throw; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_EXPLODE;
 				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
@@ -3318,10 +3357,21 @@ void list_object(const object_type *o_ptr, int mode)
 				}
 
 				/* Hack -- food feeds player */
-				if (!(n) && (o_ptr->tval == TV_FOOD) && (o_ptr->charges))
+				if ((vp[n] == vp_player_eat) && (o_ptr->charges))
 				{
 					text_out(vp[n]);
-					text_out("provides nourishment");
+					text_out(k_info[o_ptr->k_idx].used >= 10 ? format("provides %d units of nourishment", o_ptr->charges * o_ptr->weight) : "provides nourishment");
+					switch (o_ptr->tval)
+					{
+						case TV_FOOD:
+							break;
+						case TV_EGG:
+							text_out(" to hungry players");
+							break;
+						default:
+							text_out(" to starving players");
+							break;
+					}
 					vd[n] = TRUE;
 					anything = TRUE;
 					powers = TRUE;
@@ -3378,6 +3428,36 @@ void list_object(const object_type *o_ptr, int mode)
 			text_out(format("It %s your armor class by %d.  ", armor > 0 ? "increases" : "decreases" , armor > 0 ? armor : -armor));
 
 			anything = TRUE;
+		}
+	}
+
+	/* Have sensed something about this item */
+	if ((o_ptr->feeling) || (object_known_p(o_ptr)))
+	{
+		int feeling = o_ptr->feeling;
+		if (!feeling) feeling = value_check_aux1(o_ptr);
+		
+		if (feeling)
+		{
+			if (feeling <= INSCRIP_COATED)
+			{
+				text_out(inscrip_info[feeling]);
+				anything = TRUE;
+			}
+			else if (feeling >= MAX_INSCRIP)
+			{
+				int bag = lookup_kind(TV_BAG, o_ptr->feeling - MAX_INSCRIP);
+
+				if (bag)
+				{
+					text_out(format("You sense it belongs with %s.  ",k_name + k_info[bag].name));
+					anything = TRUE;
+				}
+			}
+			else
+			{
+				text_out(inscrip_info[INSCRIP_COATED + 1]);
+			}
 		}
 	}
 
