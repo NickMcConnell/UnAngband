@@ -5552,32 +5552,28 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			if (f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) continue;
 			if (f_info[cave_feat[y][x]].flags1 & (FF1_SOLID)) continue;
 
-			/* Accept this location */
-			row1 = tmp_row;
-			col1 = tmp_col;
-
 			/* Save the wall location */
 			if (dun->wall_n < WALL_MAX)
 			{
-				dun->wall[dun->wall_n].y = row1;
-				dun->wall[dun->wall_n].x = col1;
+				dun->wall[dun->wall_n].y = tmp_row;
+				dun->wall[dun->wall_n].x = tmp_col;
 				dun->wall_n++;
 			}
 
 			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
 			if (style & (TUNNEL_LARGE_L))
 			{
-				if (f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_OUTER))
+				if (f_info[cave_feat[tmp_row + col_dir][tmp_col - row_dir]].flags1 & (FF1_OUTER))
 				{
 					/* Save the wall location */
 					if (dun->wall_n < WALL_MAX)
 					{
-						dun->wall[dun->wall_n].y = row1 + col_dir;
-						dun->wall[dun->wall_n].x = col1 - row_dir;
+						dun->wall[dun->wall_n].y = tmp_row + col_dir;
+						dun->wall[dun->wall_n].x = tmp_col - row_dir;
 						dun->wall_n++;
 
 						/* Hack -- add regular pillars to some width 3 corridors */
-						if ((((row1 + col1) % ((style % 4) + 2)) == 0)
+						if ((((tmp_row + tmp_col) % ((style % 4) + 2)) == 0)
 							&& ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))== 0)) pillar = TRUE;
 					}
 				}
@@ -5590,15 +5586,15 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
 			if (style & (TUNNEL_LARGE_R))
 			{
-				if (f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_OUTER))
+				if (f_info[cave_feat[tmp_row - col_dir][tmp_col + row_dir]].flags1 & (FF1_OUTER))
 				{
 					/* Save the wall location */
 					if (dun->wall_n < WALL_MAX)
 					{
 						if (pillar) dun->wall_n -= 2;
 
-						dun->wall[dun->wall_n].y = row1 - col_dir;
-						dun->wall[dun->wall_n].x = col1 + row_dir;
+						dun->wall[dun->wall_n].y = tmp_row - col_dir;
+						dun->wall[dun->wall_n].x = tmp_col + row_dir;
 						dun->wall_n++;
 
 						if (pillar) dun->wall_n++;
@@ -5616,6 +5612,10 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				dun->wall_n = wall1;
 				continue;
 			}
+
+			/* Accept this location */
+			row1 = tmp_row;
+			col1 = tmp_col;
 
 			/* Forbid re-entry near these piercings */
 			for (i = wall1; i < dun->wall_n; i++)
