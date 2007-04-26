@@ -7890,6 +7890,7 @@ errr emit_info_txt(FILE *fp, FILE *template, char *buf, header *head,
 			
 			if (comment) fprintf(fp,"\n");
 			comment = FALSE;
+			blanklines = 0;
 
 			while (error_idx < idx)
 			{
@@ -7906,10 +7907,10 @@ errr emit_info_txt(FILE *fp, FILE *template, char *buf, header *head,
 
 	/* No version yet */
 	if (!okay) return (PARSE_ERROR_OBSOLETE_FILE);
-#if 0
+
 	if ((emit_info_txt_always) && ((err = (emit_info_txt_always(fp, head))) != 0))
 				return (err);
-#endif
+
 	/* Success */
 	return (0);
 }
@@ -7930,7 +7931,7 @@ static errr emit_flags_32(FILE *fp, cptr intro_text, u32b flags, cptr names[])
 		if ((flags & (1L << i)) != 0)
 		{
 			/* Newline needed */
-			if (len + strlen(names[i]) > 60)
+			if (len + strlen(names[i]) > 75)
 			{
 					fprintf(fp,"\n");
 					len = 0;
@@ -7944,11 +7945,15 @@ static errr emit_flags_32(FILE *fp, cptr intro_text, u32b flags, cptr names[])
 				len += strlen(intro_text);
 				intro = FALSE;
 			}
-			else fprintf(fp," ");
+			else
+			{
+				fprintf(fp," ");
+				len++;
+			}
 			
 			/* Output flag */
 			fprintf(fp, "%s |", names[i]);
-			len += strlen(names[i]);
+			len += strlen(names[i]) + 2;
 		}
 	}
 
@@ -7957,6 +7962,109 @@ static errr emit_flags_32(FILE *fp, cptr intro_text, u32b flags, cptr names[])
 
 	return (0);
 }
+
+/*
+ * Emit description to file.
+ * 
+ * TODO: Consider merging with text_out_to_file in util.c,
+ * where most of this came from.
+ */
+static errr emit_desc(FILE *fp, cptr intro_text, cptr text)
+{	
+	/* Current position on the line */
+	int pos = 0;
+
+	/* Wrap width */
+	int wrap = 75 - strlen(intro_text);
+
+	/* Current location within "str" */
+	cptr s = text;
+	
+	/* Process the string */
+	while (*s)
+	{
+		char ch;
+		int n = 0;
+		int len = wrap - pos;
+		int l_space = 0;
+
+		/* If we are at the start of the line... */
+		if (pos == 0)
+		{
+			fprintf(fp, intro_text);
+		}
+
+		/* Find length of line up to next newline or end-of-string */
+		while ((n < len) && !((s[n] == '\n') || (s[n] == '\0')))
+		{
+			/* Mark the most recent space in the string */
+			if (s[n] == ' ') l_space = n;
+
+			/* Increment */
+			n++;
+		}
+
+		/* If we have encountered no spaces */
+		if ((l_space == 0) && (n == len))
+		{
+			/* If we are at the start of a new line */
+			if (pos == 0)
+			{
+				len = n;
+			}
+			else
+			{
+				/* Begin a new line */
+				fputc('\n', fp);
+
+				/* Reset */
+				pos = 0;
+
+				continue;
+			}
+		}
+		else
+		{
+			/* Wrap at the newline */
+			if ((s[n] == '\n') || (s[n] == '\0')) len = n;
+
+			/* Wrap at the last space */
+			else len = l_space;
+		}
+
+		/* Write that line to file */
+		for (n = 0; n < len; n++)
+		{
+			/* Ensure the character is printable */
+			ch = (isprint(s[n]) ? s[n] : ' ');
+
+			/* Write out the character */
+			fputc(ch, fp);
+
+			/* Increment */
+			pos++;
+		}
+
+		/* Move 's' past the stuff we've written */
+		s += len;
+
+		/* Skip newlines */
+		if (*s == '\n') s++;
+
+		/* Begin a new line */
+		fputc('\n', fp);
+
+		/* If we are at the end of the string, end */
+		if (*s == '\0') return (0);
+
+		/* Reset */
+		pos = 0;
+	}
+
+	/* We are done */
+	return (0);
+}
+
 
 static char color_attr_to_char[] =
 {
@@ -8042,10 +8150,8 @@ errr emit_r_info_index(FILE *fp, header *head, int i)
 	emit_flags_32(fp, "S:", r_ptr->flags6, r_info_flags6);
 	emit_flags_32(fp, "S:", r_ptr->flags7, r_info_flags7);
 
-#if 0
 	/* Output 'D' for "Description" */
-	fprintf(fp, "D:%s\n", i, head->text_ptr + r_ptr->text);
-#endif
+	emit_desc(fp, "D:", head->text_ptr + r_ptr->text);
 
 	fprintf(fp,"\n");
 
@@ -8152,10 +8258,8 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	emit_flags_32(fp, "F:", f_ptr->flags2, f_info_flags2);
 	emit_flags_32(fp, "F:", f_ptr->flags3, f_info_flags3);
 
-#if 0
 	/* Output 'D' for "Description" */
-	fprintf(fp, "D:%s\n", i, head->text_ptr + f_ptr->text);
-#endif
+	emit_desc(fp, "D:", head->text_ptr + f_ptr->text);
 
 	fprintf(fp,"\n");
 
@@ -8165,7 +8269,7 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 
 
 
-#endif
+#endif /* ALLOW_TEMPLATES_OUTPUT */
 
 
 

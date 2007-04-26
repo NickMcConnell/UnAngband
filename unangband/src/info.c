@@ -3446,7 +3446,7 @@ void list_object(const object_type *o_ptr, int mode)
 			}
 			else if (feeling >= MAX_INSCRIP)
 			{
-				int bag = lookup_kind(TV_BAG, o_ptr->feeling - MAX_INSCRIP);
+				int bag = lookup_kind(TV_BAG, feeling - MAX_INSCRIP);
 
 				if (bag)
 				{
