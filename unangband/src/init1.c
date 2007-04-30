@@ -6440,7 +6440,6 @@ static long eval_blow_effect(int effect, int atk_dam, int rlev)
 		case GF_GRAVITY:
 		case GF_INERTIA:
 		case GF_FORCE:
-		case GF_NETHER:
 		case GF_UN_BONUS:
 		case GF_UN_POWER:
 		case GF_LOSE_CON:
@@ -6468,6 +6467,7 @@ static long eval_blow_effect(int effect, int atk_dam, int rlev)
 			atk_dam += 1000 / (rlev + 1);
 			break;
 		}
+		case GF_NETHER:
 		case GF_CHAOS:
 		case GF_TIME:
 		case GF_EXP_40:
@@ -7243,6 +7243,14 @@ static long eval_max_dam(monster_race *r_ptr)
 	if (r_ptr->flags2 & (RF2_MULTIPLY))
 		r_ptr->highest_threat = (r_ptr->highest_threat * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) / 5;
 
+	/*
+	 * Adjust threat for friends.
+	 */
+	if (r_ptr->flags1 & (RF1_FRIENDS))
+		r_ptr->highest_threat *= 2;
+	else if (r_ptr->flags1 & (RF1_FRIEND))
+		r_ptr->highest_threat = r_ptr->highest_threat * 3 / 2;
+		
 	/*but deep in a minimum*/
 	if (dam < 1) dam  = 1;
 

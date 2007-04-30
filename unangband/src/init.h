@@ -110,7 +110,6 @@ extern errr eval_info(eval_info_power_func eval_info_process, header *head);
 extern errr emit_info_txt(FILE *fp, FILE *template, char *buf, header *head,
    emit_info_txt_index_func emit_info_txt_index, emit_info_txt_always_func emit_info_txt_always);
 
-
 #ifdef ALLOW_TEMPLATES
 extern errr parse_z_info(char *buf, header *head);
 extern errr parse_v_info(char *buf, header *head);
