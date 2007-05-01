@@ -465,6 +465,74 @@ byte dark_attr[16] =
 
 
 /*
+ * These tables are built by having a 'or'ing the value below when
+ * there is a wall in the same direction. Note these numbers are in
+ * an isometric layout (e.g. rotated 45 degrees from overhead)
+	8		2
+      *
+1		4
+
+*/
+
+
+/*
+ * Offset to door char based on adjacent wall grids.
+ */
+byte door_char[16] =
+{
+	0,	0,	0,	0,	
+	1,	0,	0,	0,
+	1,	1,	0,	0,	
+	1,	1,	1,	0
+};
+
+
+
+/*
+ * Offset to wall char based on adjacent wall grids.
+ */
+byte wall_char[16] =
+{
+	14,	0,	14,	3,	
+	4,	13,	1,	2,	
+	12,	11,	5,	8,	
+	9,	10,	6,	7,	
+};
+
+
+/*
+ * Modify a grid appearance based on the adjacent walls
+ * 
+ * 
+ */
+void modify_grid_adjacent_view(byte *a, char *c, int y, int x, byte adj_char[16])
+{
+	byte walls = 0;
+	int i;
+
+	(void)a;
+
+	for (i = 0; i < 4; i++)
+	{
+		int yy = y + ddy_ddd[i];
+		int xx = x + ddx_ddd[i];
+
+		/* Ignore annoying locations */
+		if (!in_bounds_fully(yy, xx)) continue;
+
+		/* Note we use the mimic'ed value, but always assume this is known */
+		if (f_info[f_info[cave_feat[yy][xx]].mimic].flags2 & (FF1_WALL))
+		{
+			walls |= 1 << i;
+		}
+	}
+	
+	/* Modify char by adj_char offset */
+	c += adj_char[walls];
+}
+
+
+/*
  * Modify a 'boring' grid appearance based on the ambient light
  */
 void modify_grid_boring_view(byte *a, char *c, int y, int x, byte cinfo, byte pinfo)
@@ -984,8 +1052,22 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			/* Normal char */
 			c = f_ptr->x_char;
 
+			/* Special wall effects */
+			if (f_ptr->flags3 & (FF3_ATTR_WALL))
+			{
+				/* Modify based on adjacent grids */
+				(*modify_grid_adjacent_hook)(&a, &c, y, x, wall_char);
+			}
+
+			/* Special wall effects */
+			else if (f_ptr->flags3 & (FF3_ATTR_DOOR))
+			{
+				/* Modify based on adjacent grids */
+				(*modify_grid_adjacent_hook)(&a, &c, y, x, door_char);
+			}
+
 			/* Special lighting effects */
-			if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL | FF3_NEED_TREE)))
+			else if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE)))
 			{
 				/* Modify the lighting */
 				(*modify_grid_boring_hook)(&a, &c, y, x, cinfo, pinfo);
@@ -1007,8 +1089,22 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			/* Normal char */
 			c = f_ptr->x_char;
 
+			/* Special wall effects */
+			if (f_ptr->flags3 & (FF3_ATTR_WALL))
+			{
+				/* Modify based on adjacent grids */
+				(*modify_grid_adjacent_hook)(&a, &c, y, x, wall_char);
+			}
+
+			/* Special wall effects */
+			else if (f_ptr->flags3 & (FF3_ATTR_DOOR))
+			{
+				/* Modify based on adjacent grids */
+				(*modify_grid_adjacent_hook)(&a, &c, y, x, door_char);
+			}
+
 			/* Special lighting effects */
-			if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL | FF3_NEED_TREE)))
+			else if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE)))
 			{
 				/* Modify lighting */
 				(*modify_grid_unseen_hook)(&a, &c);
@@ -1076,9 +1172,22 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			/* Normal char */
 			c = f_ptr->x_char;
 
-			/* Special lighting effects */
-			if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL | FF3_NEED_TREE)))
+			/* Special wall effects */
+			if (f_ptr->flags3 & (FF3_ATTR_WALL))
 			{
+				/* Modify based on adjacent grids */
+				(*modify_grid_adjacent_hook)(&a, &c, y, x, wall_char);
+			}
+
+			/* Special wall effects */
+			else if (f_ptr->flags3 & (FF3_ATTR_DOOR))
+			{
+				/* Modify based on adjacent grids */
+				(*modify_grid_adjacent_hook)(&a, &c, y, x, door_char);
+			}
+
+			/* Special lighting effects */
+			else if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE)))			{
 				/* Modify lighting */
 				(*modify_grid_boring_hook)(&a, &c, y, x, cinfo, pinfo);
 			}
@@ -1106,8 +1215,22 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			/* Normal char */
 			c = f_ptr->x_char;
 
+			/* Special wall effects */
+			if (f_ptr->flags3 & (FF3_ATTR_WALL))
+			{
+				/* Modify based on adjacent grids */
+				(*modify_grid_adjacent_hook)(&a, &c, y, x, wall_char);
+			}
+
+			/* Special wall effects */
+			else if (f_ptr->flags3 & (FF3_ATTR_DOOR))
+			{
+				/* Modify based on adjacent grids */
+				(*modify_grid_adjacent_hook)(&a, &c, y, x, door_char);
+			}
+
 			/* Special lighting effects */
-			if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
+			else if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE)))
 			{
 				/* Modify lighting */
 				(*modify_grid_unseen_hook)(&a, &c);
@@ -1161,15 +1284,29 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		/* Normal char */
 		c = f_ptr->x_char;
 
+		/* Special wall effects */
+		if (f_ptr->flags3 & (FF3_ATTR_WALL))
+		{
+			/* Modify based on adjacent grids */
+			(*modify_grid_adjacent_hook)(&a, &c, y, x, wall_char);
+		}
+
+		/* Special wall effects */
+		else if (f_ptr->flags3 & (FF3_ATTR_DOOR))
+		{
+			/* Modify based on adjacent grids */
+			(*modify_grid_adjacent_hook)(&a, &c, y, x, door_char);
+		}
+
 		/* Special lighting effects */
-		if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
+		else if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE)))
 		{
 			/* Modify lighting */
 			(*modify_grid_boring_hook)(&a, &c, y, x, cinfo, pinfo);
 		}
 
 		/* Special lighting effects */
-		else if ((view_granite_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL)))
+		else if ((view_granite_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE)))
 		{
 			/* Modify lighting */
 			(*modify_grid_interesting_hook)(&a, &c, y, x, cinfo, pinfo);
