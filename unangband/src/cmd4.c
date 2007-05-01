@@ -1718,10 +1718,13 @@ static void display_store_object(int col, int row, bool cursor, int oid)
 
 static void screen_store_object(int oid)
 {
-	screen_save();
-
 	store_type *s_ptr = store[default_join[oid].gid];
 	object_type *o_ptr = &s_ptr->stock[default_join[oid].oid];
+
+	/* Save the screen */
+	screen_save();
+
+
 	/* Describe */
 	screen_object(o_ptr);
 	/* Load the screen */
@@ -2655,8 +2658,10 @@ static errr option_dump(cptr fname)
 	/* Build the filename */
 	path_build(buf, 1024, ANGBAND_DIR_USER, fname);
 
+#if MACH_O_CARBON
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
+#endif
 
 	/* Append to the file */
 	fff = my_fopen(buf, "a");
@@ -2825,8 +2830,10 @@ static errr macro_dump(cptr fname)
 	/* Build the filename */
 	path_build(buf, 1024, ANGBAND_DIR_USER, fname);
 
+#if MACH_O_CARBON
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
+#endif
 
 	/* Append to the file */
 	fff = my_fopen(buf, "a");
@@ -2995,9 +3002,10 @@ static errr keymap_dump(cptr fname)
 
 	/* Build the filename */
 	path_build(buf, 1024, ANGBAND_DIR_USER, fname);
-
+#if MACH_O_CARBON
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
+#endif
 
 	/* Append to the file */
 	fff = my_fopen(buf, "a");
@@ -3089,9 +3097,10 @@ void do_cmd_macros(void)
 		mode = KEYMAP_MODE_ORIG;
 	}
 
-
+#if MACH_O_CARBON
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
+#endif
 
 
 	/* Save screen */
@@ -3487,9 +3496,10 @@ void do_cmd_visuals(void)
 	}
 	else if (use_bigtile) empty_symbol = "<< ?? >>";
 
+#if MACH_O_CARBON
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
-
+#endif
 
 	/* Save screen */
 	screen_save();
@@ -4120,10 +4130,10 @@ void do_cmd_colors(void)
 	char buf[1024];
 
 	int line = 0;
-
+#if MACH_O_CARBON
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
-
+#endif
 
 	/* Save screen */
 	screen_save();
@@ -4368,9 +4378,10 @@ static errr cmd_autos_dump(cptr fname)
 
 	/* Build the filename */
 	path_build(buf, 1024, ANGBAND_DIR_USER, fname);
-
+#if MACH_O_CARBON
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
+#endif
 
 	/* Append to the file */
 	fff = my_fopen(buf, "a");
@@ -5628,9 +5639,10 @@ void do_cmd_save_screen(void)
 
 	/* Build the filename */
 	path_build(buf, 1024, ANGBAND_DIR_USER, "dump.txt");
-
+#if MACH_O_CARBON
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
+#endif
 
 	/* Append to the file */
 	fff = my_fopen(buf, "w");
@@ -5718,9 +5730,10 @@ void do_cmd_save_screen_html(void)
 
 	/* Build the filename */
 	path_build(file_name, 1024, ANGBAND_DIR_USER, "dump.prf");
-
+#if MACH_O_CARBON
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
+#endif
 
 	/* Append to the file */
 	fff = my_fopen(file_name, "w");
@@ -6093,9 +6106,10 @@ void do_cmd_menu(int menuID, const char *title)
 			obj_group_order[object_group_tval[i]] = i;
 		}
 	}
-
+#if MACH_O_CARBON
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
+#endif
 
 	/* Save screen */
 	screen_save();
