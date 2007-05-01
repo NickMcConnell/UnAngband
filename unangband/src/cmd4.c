@@ -737,10 +737,10 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 			}
 			
 			/* HACK: make this a function.  Replace g_funcs.aware() */
-			case 'w':
-			case 'a':
-			case 'f':
-			case 'd':
+			case 'w': case 'W':
+			case 'a': case 'A':
+			case 'f': case 'F':
+			case 'd': case 'D':
 				/* precondition -- valid feature */
 				if (o_funcs.note != NULL && o_funcs.flags3(oid) != 0)
 			{
@@ -796,6 +796,7 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 				}
 			}
 			}
+			break;
 			}
 			default:
 			{
@@ -1692,7 +1693,7 @@ static void display_feature(int col, int row, bool cursor, int oid )
 
 
 	/* Tile supports special lighting? */
-	if (!(f_ptr->flags3 & (FF3_ATTR_LITE)) ||
+	if (!(f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_DOOR | FF3_ATTR_WALL)) ||
 		((f_ptr->x_attr) && (arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO)))
 	{
 			prt("       ", row, col2);
@@ -1738,7 +1739,7 @@ static const char *fkind_name(int gid) { return feature_group_text[gid]; }
 static byte *f_xattr(int oid) { return &f_info[oid].x_attr; }
 static char *f_xchar(int oid) { return &f_info[oid].x_char; }
 static void feat_lore(int oid) { screen_feature_roff(oid); anykey(); }
-static u16b *f_flags3(int oid) { return &f_info[default_join[oid].oid].flags3; }
+static u32b *f_flags3(int oid) { return &f_info[oid].flags3; }
 
 /*
  * Interact with feature visuals.
@@ -1756,6 +1757,7 @@ static void do_cmd_knowledge_features(void)
 	C_MAKE(features, z_info->f_max + 1, int);
 
 	for(i = 0; i < z_info->f_max; i++) {
+		if ((f_info[i].mimic != i) && (i != FEAT_INVIS)) continue;
 		features[f_count++] = i; /* Currently no filter for features */
 	}
 
