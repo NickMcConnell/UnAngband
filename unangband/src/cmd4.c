@@ -1400,9 +1400,6 @@ static void desc_ego_fake(int oid)
 	/* Save screen */
 	screen_save();
 
-	/* Set text_out hook */
-	text_out_hook = text_out_to_screen;
-
 	/* Dump the name */
 	c_prt(TERM_L_BLUE, format("Ego Item %s",e_name+e_ptr->name), 0, 0);
 
@@ -6133,6 +6130,10 @@ void do_cmd_menu(int menuID, const char *title)
 	int line = 0;
 	command_menu *actions;
 	int n_actions;
+
+	/* Set text_out hook */
+	text_out_hook = text_out_to_screen;
+
 
 	switch (menuID) {
 		case MENU_OPTIONS:
