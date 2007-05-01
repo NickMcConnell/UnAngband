@@ -520,15 +520,18 @@ void modify_grid_adjacent_view(byte *a, char *c, int y, int x, byte adj_char[16]
 		/* Ignore annoying locations */
 		if (!in_bounds_fully(yy, xx)) continue;
 
+		/* Ignore unknown grids */
+		if ((play_info[yy][xx] & (PLAY_MARK | PLAY_SEEN)) == 0) continue;
+
 		/* Note we use the mimic'ed value, but always assume this is known */
-		if (f_info[f_info[cave_feat[yy][xx]].mimic].flags2 & (FF1_WALL))
+		if (f_info[f_info[cave_feat[yy][xx]].mimic].flags1 & (FF1_WALL))
 		{
 			walls |= 1 << i;
 		}
 	}
 	
 	/* Modify char by adj_char offset */
-	c += adj_char[walls];
+	*c += adj_char[walls];
 }
 
 
@@ -1187,13 +1190,14 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			}
 
 			/* Special lighting effects */
-			else if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE)))			{
+			else if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE)))
+			{
 				/* Modify lighting */
 				(*modify_grid_boring_hook)(&a, &c, y, x, cinfo, pinfo);
 			}
 
 			/* Special lighting effects */
-			else if ((view_granite_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL | FF3_NEED_TREE)))
+			else if ((view_granite_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE)))
 			{
 				/* Modify lighting */
 				(*modify_grid_interesting_hook)(&a, &c, y, x, cinfo, pinfo);

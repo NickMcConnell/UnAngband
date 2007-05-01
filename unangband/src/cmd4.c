@@ -742,7 +742,7 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 			case 'f': case 'F':
 			case 'd': case 'D':
 				/* precondition -- valid feature */
-				if (o_funcs.note != NULL && o_funcs.flags3(oid) != 0)
+				if (o_funcs.flags3 != NULL && o_funcs.flags3(oid) != 0)
 			{
 				u32b *flags3 = o_funcs.flags3(oid);
 
