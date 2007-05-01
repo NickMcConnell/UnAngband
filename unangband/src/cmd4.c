@@ -63,6 +63,10 @@ typedef struct {
 	/* Address of inscription.  Unknown 'flavors' return null  */
 	u16b *(*note)(int oid);
 
+	/* Required only for features */
+	/* Address of flags3 for manipulation (adding and removing lite/wall/door/item) */
+	u32b *(*flags3)(int oid);
+
 } member_funcs;
 
 
@@ -732,6 +736,67 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 				break;
 			}
 			
+			/* HACK: make this a function.  Replace g_funcs.aware() */
+			case 'w':
+			case 'a':
+			case 'f':
+			case 'd':
+				/* precondition -- valid feature */
+				if (o_funcs.note != NULL && o_funcs.flags3(oid) != 0)
+			{
+				u32b *flags3 = o_funcs.flags3(oid);
+
+			switch(ke.key)
+			{
+			case 'a': case 'A':
+			{
+				if (*flags3 & (FF3_ATTR_LITE))
+				{
+					*flags3 &= ~(FF3_ATTR_LITE);
+				}
+				else
+				{
+					*flags3 |= (FF3_ATTR_LITE);
+				}
+			}
+
+			case 'f': case 'F':
+			{
+				if (*flags3 & (FF3_ATTR_ITEM))
+				{
+					*flags3 &= ~(FF3_ATTR_ITEM);
+				}
+				else
+				{
+					*flags3 |= (FF3_ATTR_ITEM);
+				}
+			}
+
+			case 'd': case 'D':
+			{
+				if (*flags3 & (FF3_ATTR_DOOR))
+				{
+					*flags3 &= ~(FF3_ATTR_DOOR);
+				}
+				else
+				{
+					*flags3 |= (FF3_ATTR_DOOR);
+				}
+			}
+
+			case 'w': case 'W':
+			{
+				if (*flags3 & (FF3_ATTR_WALL))
+				{
+					*flags3 &= ~(FF3_ATTR_WALL);
+				}
+				else
+				{
+					*flags3 |= (FF3_ATTR_WALL);
+				}
+			}
+			}
+			}
 			default:
 			{
 				/* Move the cursor; disable roguelike keyset. */
@@ -1135,7 +1200,7 @@ static void do_cmd_knowledge_monsters(void)
 	group_funcs r_funcs = {N_ELEMENTS(monster_group_text), FALSE, race_name,
 							m_cmp_race, default_group, 0};
 
-	member_funcs m_funcs = {display_monster, mon_lore, m_xchar, m_xattr, 0};
+	member_funcs m_funcs = {display_monster, mon_lore, m_xchar, m_xattr, 0, 0};
 	
 	int *monsters;
 	int m_count = 0;
@@ -1277,7 +1342,7 @@ static void do_cmd_knowledge_artifacts(void)
 {
 	/* HACK -- should be TV_MAX */
 	group_funcs obj_f = {TV_GEMS, FALSE, kind_name, a_cmp_tval, art2tval, 0};
-	member_funcs art_f = {display_artifact, desc_art_fake, 0, 0, 0};
+	member_funcs art_f = {display_artifact, desc_art_fake, 0, 0, 0, 0};
 
 	int *artifacts;
 	int a_count = 0;
@@ -1390,7 +1455,7 @@ static void do_cmd_knowledge_ego_items(void)
 	group_funcs obj_f =
 		{TV_GEMS, FALSE, ego_grp_name, e_cmp_tval, default_group, 0};
 
-	member_funcs ego_f = {display_ego_item, desc_ego_fake, 0, 0, e_note};
+	member_funcs ego_f = {display_ego_item, desc_ego_fake, 0, 0, e_note, 0};
 
 	int *egoitems;
 	int e_count = 0;
@@ -1576,7 +1641,7 @@ static void do_cmd_knowledge_objects(void)
 	group_funcs kind_f =
 		{TV_GEMS, FALSE, kind_name, o_cmp_tval, obj2tval, 0};
 	member_funcs obj_f =
-		{display_object, desc_obj_fake, o_xchar, o_xattr, o_note};
+		{display_object, desc_obj_fake, o_xchar, o_xattr, o_note, 0};
 
 	int *objects;
 	int o_count = 0;
@@ -1673,6 +1738,7 @@ static const char *fkind_name(int gid) { return feature_group_text[gid]; }
 static byte *f_xattr(int oid) { return &f_info[oid].x_attr; }
 static char *f_xchar(int oid) { return &f_info[oid].x_char; }
 static void feat_lore(int oid) { screen_feature_roff(oid); anykey(); }
+static u16b *f_flags3(int oid) { return &f_info[default_join[oid].oid].flags3; }
 
 /*
  * Interact with feature visuals.
@@ -1682,7 +1748,7 @@ static void do_cmd_knowledge_features(void)
 	group_funcs fkind_f = {N_ELEMENTS(feature_group_text), FALSE,
 							fkind_name, f_cmp_fkind, feat_order, 0};
 
-	member_funcs feat_f = {display_feature, feat_lore, f_xchar, f_xattr, 0};
+	member_funcs feat_f = {display_feature, feat_lore, f_xchar, f_xattr, 0, f_flags3};
 
 	int *features;
 	int f_count = 0;
@@ -1746,7 +1812,7 @@ static const char *store_name(int gid)
 
 static void do_cmd_knowledge_home(void)
 {
-	member_funcs contents_f = {display_store_object, screen_store_object, 0, 0, 0};
+	member_funcs contents_f = {display_store_object, screen_store_object, 0, 0, 0, 0};
 	group_funcs home_f =
 		{total_store_count, FALSE, store_name, 0, default_group, 0};
 
@@ -1836,7 +1902,7 @@ static void do_cmd_knowledge_dungeons(void)
 	int i, j;
 	int z_count = 0;
 	int *zones;
-	member_funcs zone_f = {display_dungeon_zone, dungeon_lore, 0, 0, 0};
+	member_funcs zone_f = {display_dungeon_zone, dungeon_lore, 0, 0, 0, 0};
 	group_funcs dun_f = {z_info->t_max, FALSE, town_name, 0, oiddiv4, 0};
 
 	C_MAKE(zones, z_info->t_max*MAX_DUNGEON_ZONES, int);
@@ -2658,10 +2724,8 @@ static errr option_dump(cptr fname)
 	/* Build the filename */
 	path_build(buf, 1024, ANGBAND_DIR_USER, fname);
 
-#if MACH_O_CARBON
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
-#endif
 
 	/* Append to the file */
 	fff = my_fopen(buf, "a");
@@ -2830,10 +2894,8 @@ static errr macro_dump(cptr fname)
 	/* Build the filename */
 	path_build(buf, 1024, ANGBAND_DIR_USER, fname);
 
-#if MACH_O_CARBON
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
-#endif
 
 	/* Append to the file */
 	fff = my_fopen(buf, "a");
@@ -3002,10 +3064,9 @@ static errr keymap_dump(cptr fname)
 
 	/* Build the filename */
 	path_build(buf, 1024, ANGBAND_DIR_USER, fname);
-#if MACH_O_CARBON
+
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
-#endif
 
 	/* Append to the file */
 	fff = my_fopen(buf, "a");
@@ -3097,11 +3158,8 @@ void do_cmd_macros(void)
 		mode = KEYMAP_MODE_ORIG;
 	}
 
-#if MACH_O_CARBON
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
-#endif
-
 
 	/* Save screen */
 	screen_save();
@@ -3496,10 +3554,8 @@ void do_cmd_visuals(void)
 	}
 	else if (use_bigtile) empty_symbol = "<< ?? >>";
 
-#if MACH_O_CARBON
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
-#endif
 
 	/* Save screen */
 	screen_save();
@@ -4130,10 +4186,9 @@ void do_cmd_colors(void)
 	char buf[1024];
 
 	int line = 0;
-#if MACH_O_CARBON
+
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
-#endif
 
 	/* Save screen */
 	screen_save();
@@ -4378,10 +4433,9 @@ static errr cmd_autos_dump(cptr fname)
 
 	/* Build the filename */
 	path_build(buf, 1024, ANGBAND_DIR_USER, fname);
-#if MACH_O_CARBON
+
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
-#endif
 
 	/* Append to the file */
 	fff = my_fopen(buf, "a");
@@ -5639,10 +5693,9 @@ void do_cmd_save_screen(void)
 
 	/* Build the filename */
 	path_build(buf, 1024, ANGBAND_DIR_USER, "dump.txt");
-#if MACH_O_CARBON
+
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
-#endif
 
 	/* Append to the file */
 	fff = my_fopen(buf, "w");
@@ -5730,10 +5783,9 @@ void do_cmd_save_screen_html(void)
 
 	/* Build the filename */
 	path_build(file_name, 1024, ANGBAND_DIR_USER, "dump.prf");
-#if MACH_O_CARBON
+
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
-#endif
 
 	/* Append to the file */
 	fff = my_fopen(file_name, "w");
@@ -6106,10 +6158,9 @@ void do_cmd_menu(int menuID, const char *title)
 			obj_group_order[object_group_tval[i]] = i;
 		}
 	}
-#if MACH_O_CARBON
+
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
-#endif
 
 	/* Save screen */
 	screen_save();

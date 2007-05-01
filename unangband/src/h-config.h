@@ -235,6 +235,14 @@
 
 
 /*
+ *  Systems other than Macs don't use file types
+ */
+#ifndef MACH_O_CARBON
+# define FILE_TYPE(X) ((void) 0)
+#endif
+
+
+/*
  * OPTION: Define "HAVE_USLEEP" only if "usleep()" exists.
  *
  * Note that this is only relevant for "SET_UID" machines.
