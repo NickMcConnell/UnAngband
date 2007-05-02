@@ -466,13 +466,16 @@ byte dark_attr[16] =
 
 /*
  * These tables are built by having a 'or'ing the value below when
- * there is a wall in the same direction. Note these numbers are in
- * an isometric layout (e.g. rotated 45 degrees from overhead)
-	8		2
-      *
-1		4
-
-*/
+ * there is a wall in the same direction.
+ *
+ * This allows certain items to be defined in their relationship
+ * to walls, for instance, having doors be either - or | depending
+ * on how the adjacent walls are created.
+ *
+ * Similarly, for tile sets where walls are drawn as connected to
+ * adjacent walls, it allows up to 15 types of walls to be defined
+ * depending on the adjacent walls.
+ */
 
 
 /*
@@ -487,7 +490,6 @@ byte door_char[16] =
 };
 
 
-
 /*
  * Offset to wall char based on adjacent wall grids.
  */
@@ -499,6 +501,15 @@ byte wall_char[16] =
 	9,	10,	6,	7,	
 };
 
+#define WALL_S	1
+#define WALL_N	2
+#define WALL_E	4
+#define WALL_W	8
+#define WALL_SE	16
+#define WALL_SW	32
+#define WALL_NE	64
+#define WALL_NW	128
+
 
 /*
  * Modify a grid appearance based on the adjacent walls
@@ -508,7 +519,7 @@ byte wall_char[16] =
  */
 void modify_grid_adjacent_view(byte *a, char *c, int y, int x, byte adj_char[16])
 {
-	byte walls = 0;
+	byte walls = 0, cancel = 0;
 	int i, n = 4;
 
 	(void)a;
@@ -521,11 +532,14 @@ void modify_grid_adjacent_view(byte *a, char *c, int y, int x, byte adj_char[16]
 		int yy = y + ddy_ddd[i];
 		int xx = x + ddx_ddd[i];
 
-		/* Ignore annoying locations */
-		if (!in_bounds_fully(yy, xx)) continue;
+		/* Treat annoying locations as if a wall */
+		if (!in_bounds_fully(yy, xx))
+		{
+			walls |= 1 << i;
+		}
 
 		/* Note we use the mimic'ed value, but always assume this is known */
-		if (f_info[f_info[cave_feat[yy][xx]].mimic].flags3 & (FF3_ATTR_WALL))
+		else if ((f_info[f_info[cave_feat[yy][xx]].mimic].flags3 & (FF3_ATTR_WALL)) != 0)
 		{
 			walls |= 1 << i;
 		}
@@ -534,11 +548,19 @@ void modify_grid_adjacent_view(byte *a, char *c, int y, int x, byte adj_char[16]
 	/* Hack -- if both diagonals set, clear wall in between.
 	 * This saves having to have a 256 character array for walls and makes
 	 * edges of continguous walls look a lot better.
+	 *
+	 * This relies on the fact that usually we will not see walls beyond the
+	 * edge of a room. So we can approximate by 'cancelling' the effect of walls
+	 * in certain directions for determining whether we have to display an
+	 * adjacent wall.
 	 */
-	if (((walls & 16) != 0) && ((walls & 32) != 0) && ((walls & 4) != 0) && ((walls & 8) != 0)) walls &= ~(1);
-	if (((walls & 16) != 0) && ((walls & 64) != 0) && ((walls & 1) != 0) && ((walls & 2) != 0)) walls &= ~(4);
-	if (((walls & 32) != 0) && ((walls & 128) != 0) && ((walls & 1) != 0) && ((walls & 2) != 0)) walls &= ~(8);
-	if (((walls & 64) != 0) && ((walls & 128) != 0) && ((walls & 4) != 0) && ((walls & 8) != 0)) walls &= ~(2);
+	if ((walls & (WALL_SE | WALL_SW | WALL_E | WALL_W)) == (WALL_SE | WALL_SW | WALL_E | WALL_W)) cancel |= (WALL_S);
+	if ((walls & (WALL_SE | WALL_NE | WALL_S | WALL_N)) == (WALL_SE | WALL_NE | WALL_S | WALL_N)) cancel |= (WALL_E);
+	if ((walls & (WALL_SW | WALL_NW | WALL_S | WALL_N)) == (WALL_SW | WALL_NW | WALL_S | WALL_N)) cancel |= (WALL_W);
+	if ((walls & (WALL_NE | WALL_NW | WALL_E | WALL_W)) == (WALL_NE | WALL_NW | WALL_E | WALL_W)) cancel |= (WALL_N);
+
+	/* Cancel only after checking all combinations */
+	if (cancel) walls &= ~(cancel);
 
 	/* Modify char by adj_char offset */
 	*c += adj_char[walls & 15];
