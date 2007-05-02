@@ -503,16 +503,20 @@ byte wall_char[16] =
 /*
  * Modify a grid appearance based on the adjacent walls
  * 
- * 
+ * Note in order to avoid weirdness with grids on the edge of known areas, we
+ * ignore whether or not the player knows about adjacent walls.
  */
 void modify_grid_adjacent_view(byte *a, char *c, int y, int x, byte adj_char[16])
 {
 	byte walls = 0;
-	int i;
+	int i, n = 4;
 
 	(void)a;
 
-	for (i = 0; i < 4; i++)
+	/* Hack -- check diagonals if proper wall */
+	if (adj_char == wall_char) n = 8;
+
+	for (i = 0; i < n; i++)
 	{
 		int yy = y + ddy_ddd[i];
 		int xx = x + ddx_ddd[i];
@@ -520,18 +524,24 @@ void modify_grid_adjacent_view(byte *a, char *c, int y, int x, byte adj_char[16]
 		/* Ignore annoying locations */
 		if (!in_bounds_fully(yy, xx)) continue;
 
-		/* Ignore unknown grids */
-		if ((play_info[yy][xx] & (PLAY_MARK | PLAY_SEEN)) == 0) continue;
-
 		/* Note we use the mimic'ed value, but always assume this is known */
-		if (f_info[f_info[cave_feat[yy][xx]].mimic].flags1 & (FF1_WALL))
+		if (f_info[f_info[cave_feat[yy][xx]].mimic].flags3 & (FF3_ATTR_WALL))
 		{
 			walls |= 1 << i;
 		}
 	}
-	
+
+	/* Hack -- if both diagonals set, clear wall in between.
+	 * This saves having to have a 256 character array for walls and makes
+	 * edges of continguous walls look a lot better.
+	 */
+	if (((walls & 16) != 0) && ((walls & 32) != 0) && ((walls & 4) != 0) && ((walls & 8) != 0)) walls &= ~(1);
+	if (((walls & 16) != 0) && ((walls & 64) != 0) && ((walls & 1) != 0) && ((walls & 2) != 0)) walls &= ~(4);
+	if (((walls & 32) != 0) && ((walls & 128) != 0) && ((walls & 1) != 0) && ((walls & 2) != 0)) walls &= ~(8);
+	if (((walls & 64) != 0) && ((walls & 128) != 0) && ((walls & 4) != 0) && ((walls & 8) != 0)) walls &= ~(2);
+
 	/* Modify char by adj_char offset */
-	*c += adj_char[walls];
+	*c += adj_char[walls & 15];
 }
 
 
