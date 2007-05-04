@@ -7793,16 +7793,8 @@ errr eval_f_power(header *head)
 		/* Point at the "info" */
 		f_ptr = (feature_type*)head->info_ptr + i;
 
-		/* Some obvious flags */
-		if (f_ptr->flags2 & (FF2_CAN_FLY)) 
-
-
-		/* Evaluate feature blows */
-		switch(f_ptr->blow.effect)
-		{
-		}
-
 	}
+
 
 	/* Success */
 	return(0);

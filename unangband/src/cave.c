@@ -539,10 +539,17 @@ void modify_grid_adjacent_view(byte *a, char *c, int y, int x, byte adj_char[16]
 		}
 
 		/* Note we use the mimic'ed value, but always assume this is known */
-		else if ((f_info[f_info[cave_feat[yy][xx]].mimic].flags3 & (FF3_ATTR_WALL)) != 0)
+		else if ((f_info[f_info[cave_feat[yy][xx]].mimic].flags3 & (FF3_ATTR_WALL | FF3_ATTR_DOOR)) != 0)
 		{
 			walls |= 1 << i;
 		}
+
+		/* Note we check the underneath value as well, but always assume this is known */
+		else if ((f_info[f_info[f_info[cave_feat[yy][xx]].mimic].under].flags3 & (FF3_ATTR_WALL | FF3_ATTR_DOOR)) != 0)
+		{
+			walls |= 1 << i;
+		}
+
 	}
 
 	/* Hack -- if both diagonals set, clear wall in between.
@@ -562,8 +569,19 @@ void modify_grid_adjacent_view(byte *a, char *c, int y, int x, byte adj_char[16]
 	/* Cancel only after checking all combinations */
 	if (cancel) walls &= ~(cancel);
 
-	/* Modify char by adj_char offset */
-	*c += adj_char[walls & 15];
+	/* Clear if completely cancelled */
+	if (cancel == (WALL_N | WALL_S | WALL_E | WALL_W))
+	{
+		*a = f_info[FEAT_NONE].x_attr;
+		*c = f_info[FEAT_NONE].x_char;
+	}
+
+	/* Otherwise apply an offset */
+	else
+	{
+		/* Modify char by adj_char offset */
+		*c += adj_char[walls & (WALL_N | WALL_S | WALL_E | WALL_W)];
+	}
 }
 
 

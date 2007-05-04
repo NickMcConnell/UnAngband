@@ -3774,8 +3774,9 @@ void do_cmd_visuals(void)
 				fprintf(fff, "# %s\n", (f_name + f_ptr->name));
 
 				/* Dump the feature attr/char info */
-				fprintf(fff, "F:%d:0x%02X:0x%02X:%s%s%s%s\n\n", i,
-					(byte)(f_ptr->x_attr), (byte)(f_ptr->x_char),(f_ptr->flags3 & (FF3_ATTR_LITE)) ? "A" : "",
+				fprintf(fff, "F:%d:0x%02X:0x%02X:%d:%s%s%s%s\n\n", i,
+					(byte)(f_ptr->x_attr), (byte)(f_ptr->x_char),f_ptr->under,
+						(f_ptr->flags3 & (FF3_ATTR_LITE)) ? "A" : "",
 						(f_ptr->flags3 & (FF3_ATTR_ITEM)) ? "F" : "",
 						(f_ptr->flags3 & (FF3_ATTR_DOOR)) ? "D" : "",
 						(f_ptr->flags3 & (FF3_ATTR_WALL)) ? "W" : "");
@@ -4431,7 +4432,7 @@ static errr cmd_autos_dump(cptr fname)
 	/* Dump the macros */
 
 	/* Build the filename */
-	path_build(buf, 1024, ANGBAND_DIR_USER, fname);
+	path_build(buf, 1024, ANGBAND_DIR_USER, ftmp);
 
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
