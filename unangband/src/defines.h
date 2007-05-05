@@ -3403,11 +3403,11 @@
 #define MFLAG_MARK      0x00000080    /* Monster is currently memorized */
 
 #define MFLAG_ACTV      0x00000100    /* Monster is currently active */
-#define MFLAG_RUNS      0x00000200    /* Monster is currently running */
+#define MFLAG_LITE      0x00000200    /* Monster is using a lite */
 #define MFLAG_PUSH      0x00000400    /* Monster has pushed/been pushed aside */
-#define MFLAG_CAST	0x00000800    /* Monster will cast spell at first opportunity */
+#define MFLAG_CAST	0x00000800    	/* Monster will cast spell at first opportunity */
 #define MFLAG_SNEAKED	0x00001000    /* Monster has been sneak attacked */
-#define MFLAG_AGGR	0x00002000    /* Monster will act in aggressive manner */
+#define MFLAG_AGGR	0x00002000    	/* Monster will act in aggressive manner */
 #define MFLAG_HIT_RANGE	0x00004000    /* Monster has just been hit by ranged attack */
 #define MFLAG_HIT_BLOW	0x00008000    /* Monster has just been hit by melee attack */
 

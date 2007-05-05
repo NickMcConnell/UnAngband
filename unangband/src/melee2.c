@@ -2787,10 +2787,11 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 		if (play_info[m_ptr->fy][m_ptr->fx] & (PLAY_SEEN))
 		{
 			/* Find a safe spot to lurk in */
-			if (get_move_retreat(m_idx, ty, tx))
+			if ((get_move_retreat(m_idx, ty, tx)) && !(play_info[*ty][*tx] & (PLAY_SEEN)))
 			{
 				*fear = TRUE;
 			}
+			/* The game is up */
 			else
 			{
 				/* No safe spot -- charge */
@@ -2805,7 +2806,7 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 			/* Advance, ... */
 			get_move_advance(m_idx, ty, tx);
 
-			/* ... but make sure we stay hidden. */
+			/* But avoid visibility */
 			*fear = TRUE;
 		}
 	}
@@ -5300,6 +5301,7 @@ static void process_monster(int m_idx)
 	/* Assume the monster is able to perceive the player. */
 	bool aware = TRUE;
 	bool must_use_target = FALSE;
+	bool nearby = FALSE;
 
 	/* Will the monster move randomly? */
 	bool random = FALSE;
@@ -5344,7 +5346,46 @@ static void process_monster(int m_idx)
 		/* The monster is catching too much of a whiff to ignore */
 		else if (cave_when[m_ptr->fy][m_ptr->fx])
 		{
-			if (monster_can_smell(m_ptr)) m_ptr->mflag |= (MFLAG_ACTV);
+			if (monster_can_smell(m_ptr))
+			{
+				m_ptr->mflag |= (MFLAG_ACTV);
+			}
+		}
+	}
+
+	/*
+	 * Special behaviour for monsters that need lite when character is not
+	 * carrying a lite.
+	 */
+	if ((r_ptr->flags2 & (RF2_NEED_LITE)) && !(p_ptr->cur_lite))
+	{
+		/* Character is not directly visible */
+		if (!player_can_fire_bold(m_ptr->fy, m_ptr->fx))
+		{
+			/* Monster loses awareness */
+			aware = FALSE;
+		}
+
+		/* Character is in darkness and monster is active */
+		else if ((m_ptr->mflag & (MFLAG_ACTV)) && (!(cave_info[p_ptr->py][p_ptr->px] & (CAVE_LITE))))
+		{
+			/* Lite up */
+			if (!(m_ptr->mflag & (MFLAG_LITE)))
+			{
+				m_ptr->mflag |= (MFLAG_LITE);
+
+				gain_attribute(y, x, 2, CAVE_XLOS, apply_halo, redraw_halo_gain);
+			}
+			
+			/* Player hasn't attacked the monster */
+			if (!(m_ptr->mflag & (MFLAG_HIT_RANGE | MFLAG_HIT_BLOW))) aware = FALSE;
+		}
+
+		/* Player has attacked the monster */
+		if ((m_ptr->mflag & (MFLAG_HIT_RANGE | MFLAG_HIT_BLOW)))
+		{
+			m_ptr->ty = p_ptr->py;
+			m_ptr->tx = p_ptr->px;
 		}
 	}
 
@@ -5361,7 +5402,7 @@ static void process_monster(int m_idx)
 			m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
 
 			/* Tell allies to close */
-			if (tell_allies_best_range(m_ptr->fy, m_ptr->fx, 1, "& has attacked me!"))
+			if (tell_allies_best_range(m_ptr->fy, m_ptr->fx, 1, (aware) ? "& has attacked me!" : "Something has attacked me!"))
 			{
 				/* Close oneself */
 				if (m_ptr->min_range > 1) m_ptr->min_range--;
@@ -5405,7 +5446,7 @@ static void process_monster(int m_idx)
 			m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
 
 			/* Tell allies to close */
-			if (tell_allies_best_range(m_ptr->fy, m_ptr->fx, 1, "& has attacked me!"))
+			if (tell_allies_best_range(m_ptr->fy, m_ptr->fx, 1, (aware) ? "& has attacked me!" : "Something has attacked me!"))
 			{
 				/* Close oneself if only option is melee */
 				if (!r_ptr->freq_spell && !r_ptr->freq_innate) m_ptr->min_range = m_ptr->best_range = 1;
@@ -5808,7 +5849,7 @@ static void process_monster(int m_idx)
 	}
 
 	/* Monster is using the special "townsman" AI */
-	else if (m_ptr->mflag & (MFLAG_TOWN))
+	if (m_ptr->mflag & (MFLAG_TOWN))
 	{
 		/* Town monster been attacked */
 		if (m_ptr->mflag & (MFLAG_AGGR))

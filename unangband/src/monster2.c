@@ -128,28 +128,9 @@ bool check_monster_lite(int m_idx)
 {
 	/* Get monster */
 	monster_type *m_ptr = &m_list[m_idx];
-	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
-	/* Monster asleep or hiding, no lite */
-	if ((m_ptr->csleep) && !(m_ptr->mflag & (MFLAG_HIDE))) return FALSE;
-	
-	/* Monster always has lite */
-	if (r_ptr->flags2 & (RF2_HAS_LITE)) return TRUE;
-
-	/* Monster needs lite */
-	if (r_ptr->flags2 & (RF2_NEED_LITE))
-	{
-		/* Doesn't need lite in daylight, perma-light or glowing light */
-		if (cave_info[m_ptr->fy][m_ptr->fx] & (CAVE_DLIT | CAVE_GLOW | CAVE_HALO)) return FALSE;
-
-		/* Does need lite if player out of line of sight */
-		if (!(play_info[m_ptr->fy][m_ptr->fx] & (PLAY_VIEW))) return TRUE;
-
-		/* Does need lite if player doesn't have light */
-		if (p_ptr->cur_lite) return FALSE;
-	}
-	
-	return FALSE;
+	/* Monster has a lite */
+	return ((m_ptr->mflag & (MFLAG_LITE)) != 0);
 }
 
 
@@ -2623,6 +2604,7 @@ void monster_hide(int y, int x, int mmove, monster_type *m_ptr)
 {
 	/* Hack -- don't summon on surface */
 	bool surface = p_ptr->depth == min_depth(p_ptr->dungeon);
+	bool lite = (m_ptr->mflag & (MFLAG_LITE)) != 0;
 
 	/* Get the feature */
 	feature_type *f_ptr = &f_info[cave_feat[y][x]];
@@ -2633,7 +2615,7 @@ void monster_hide(int y, int x, int mmove, monster_type *m_ptr)
 	/* Over the ceiling of a building */
 	if ((m_ptr->mflag & (MFLAG_OVER)) &&
 		(m_ptr->mflag & (MFLAG_HIDE)))
-	{
+	{	
 		/* Don't change state or update further */
 		return;
 	}
@@ -2722,8 +2704,30 @@ void monster_hide(int y, int x, int mmove, monster_type *m_ptr)
 	{
 		m_ptr->mflag &= ~(MFLAG_HIDE);
 	}
-
+	
+	/* Hiding monsters gets rid of light */
+	if (m_ptr->mflag & (MFLAG_HIDE))
+	{
+		m_ptr->mflag &= ~(MFLAG_LITE);
+		
+		if (lite)
+		{
+			check_attribute_lost(y, x, 2, CAVE_XLOS, require_torch_lit, has_torch_lit, redraw_torch_lit_loss, remove_torch_lit, reapply_torch_lit);	
+		}
+	}
+	
+	/* Unhiding monsters which have light always show lite */
+	else if (r_ptr->flags2 & (RF2_HAS_LITE))
+	{
+		m_ptr->mflag |= (MFLAG_LITE);
+		
+		if (!lite)
+		{
+			gain_attribute(y, x, 2, CAVE_XLOS, apply_torch_lit, redraw_torch_lit_gain);	
+		}
+	}
 }
+
 
 /*
  * Place a copy of a monster in the dungeon XXX XXX
@@ -2765,12 +2769,6 @@ s16b monster_place(int y, int x, monster_type *n_ptr)
 
 		/* Update the monster */
 		update_mon(m_idx, TRUE);
-
-		/* Handle creating monster with lite */
-		if (check_monster_lite(m_idx))
-		{
-			gain_attribute(y, x, 2, CAVE_XLOS, apply_torch_lit, redraw_torch_lit_gain);
-		}
 
 		/* Get the new race */
 		r_ptr = &r_info[m_ptr->r_idx];
