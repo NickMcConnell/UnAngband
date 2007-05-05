@@ -2749,6 +2749,9 @@
 #define CAVE_XLOF		0x40	/* blocks line of fire */
 #define CAVE_XLOS		0x80	/* blocks line of sight */
 
+/* Cave lit by any form of light - except player torch */
+#define CAVE_LITE		(CAVE_GLOW | CAVE_DLIT | CAVE_TLIT | CAVE_HALO)
+
 /*
  * Special player grid flags
  */

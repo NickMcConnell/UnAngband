@@ -192,17 +192,20 @@ void remove_torch_lit(int y, int x)
 {
 	cave_info[y][x] &= ~(CAVE_TLIT);
 
+#if 0
 	/* Note we ensure that locations lit by player are also torch lit */
 	if ((play_info[y][x] & (PLAY_VIEW)) && (distance(p_ptr->py, p_ptr->px, y, x) <= p_ptr->cur_lite))
 	{
 		cave_info[y][x] |= (CAVE_TLIT);
 	}
+	else
+#endif	
 	/* Plunge into darkness if required */
-	else if (!(cave_info[y][x] & (CAVE_TLIT | CAVE_DLIT | CAVE_GLOW | CAVE_HALO)))
+	if (!(cave_info[y][x] & (CAVE_TLIT | CAVE_DLIT | CAVE_GLOW | CAVE_HALO)))
 	{
 		play_info[y][x] &= ~(PLAY_SEEN);
 	}
-	
+
 }
 
 void reapply_torch_lit(int y, int x)
@@ -2225,7 +2228,7 @@ void monster_swap(int y1, int x1, int y2, int x2)
 	/* Handle creating "glowing" terrain */
 	if (!lite3 && lite2)
 	{
-		gain_attribute(y1, x1, 2, CAVE_XLOS, apply_torch_lit, redraw_torch_lit_gain);
+		gain_attribute(y2, x2, 2, CAVE_XLOS, apply_torch_lit, redraw_torch_lit_gain);
 	}
 
 	/* Redraw */

@@ -594,26 +594,7 @@ void modify_grid_boring_view(byte *a, char *c, int y, int x, byte cinfo, byte pi
 	if (pinfo & (PLAY_SEEN))
 	{
 		/* Lit by "torch" lite */
-		if (view_yellow_lite && (cinfo & (CAVE_TLIT)))
-		{
-			/* Mega-hack */
-			if (*a & 0x80)
-			{
-				/* Use a brightly lit tile */
-				if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
-					*c -= 1;
-				else if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
-					*c += 2;
-			}
-			else
-			{
-				/* Use "yellow" */
-				*a = lite_attr[*a];
-			}
-		}
-
-		/* Lit by "halo" lite at nighttime */
-		else if (view_glowing_lite && (cinfo & (CAVE_HALO)) && !(cinfo & (CAVE_DLIT)))
+		if (view_yellow_lite && !(cinfo & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT)))
 		{
 			/* Mega-hack */
 			if (*a & 0x80)
@@ -1200,13 +1181,6 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			{
 				/* Modify based on adjacent grids */
 				(*modify_grid_adjacent_hook)(&a, &c, y, x, door_char);
-			}
-
-			/* Special lighting effects */
-			else if ((view_granite_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE)))
-			{
-				/* Modify lighting */
-				(*modify_grid_boring_hook)(&a, &c, y, x, cinfo, pinfo);
 			}
 
 			/* Special lighting effects */
@@ -3637,20 +3611,13 @@ void update_view(void)
 	{
 		/* Mark as "PLAY_SEEN" */
 		pinfo |= (PLAY_SEEN);
-		
-		/* Mark as "torch lit */
-		cinfo |= (CAVE_TLIT);
 
 		/* Mark as "PLAY_LITE" */
-		/* pinfo |= (PLAY_LITE); */
-
-		/* Mark as "CAVE_LITE" */
-		/* cinfo |= (CAVE_LITE); */
-
+		/*pinfo |= (PLAY_LITE);*/
 	}
 
 	/* Lit grid */
-	else if (cinfo & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT))
+	else if (cinfo & (CAVE_LITE))
 	{
 		/* Mark as "PLAY_SEEN" */
 		pinfo |= (PLAY_SEEN);
@@ -3734,18 +3701,13 @@ void update_view(void)
 							/* Mark as "PLAY_SEEN" */
 							pinfo |= (PLAY_SEEN);
 
-							/* Mark as "torch lit */
-							cinfo |= (CAVE_TLIT);
-
 							/* Mark as "PLAY_LITE" */
 							/* pinfo |= (PLAY_LITE); */
 
-							/* Mark as "CAVE_LITE" */
-							/* cinfo |= (CAVE_LITE); */
 						}
 
 						/* Lit grids */
-						else if (cinfo & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT))
+						else if (cinfo & (CAVE_LITE))
 						{
 							int y = GRID_Y(g);
 							int x = GRID_X(g);
@@ -3758,11 +3720,11 @@ void update_view(void)
 
 							/* Check for "complex" illumination */
 							if ((!(cave_info[yy][xx] & (CAVE_XLOS)) &&
-							      (cave_info[yy][xx] & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT))) ||
+							      (cave_info[yy][xx] & (CAVE_LITE))) ||
 							    (!(cave_info[y][xx] & (CAVE_XLOS)) &&
-							      (cave_info[y][xx] & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT))) ||
+							      (cave_info[y][xx] & (CAVE_LITE))) ||
 							    (!(cave_info[yy][x] & (CAVE_XLOS)) &&
-							      (cave_info[yy][x] & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT))))
+							      (cave_info[yy][x] & (CAVE_LITE))))
 							{
 								/* Mark as seen */
 								pinfo |= (PLAY_SEEN);
@@ -3771,7 +3733,7 @@ void update_view(void)
 #else /* UPDATE_VIEW_COMPLEX_WALL_ILLUMINATION */
 
 							/* Check for "simple" illumination */
-							if (cave_info[yy][xx] & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT))
+							if (cave_info[yy][xx] & (CAVE_LITE))
 							{
 								/* Mark as seen */
 								pinfo |= (PLAY_SEEN);
@@ -3819,18 +3781,12 @@ void update_view(void)
 							/* Mark as "PLAY_SEEN" */
 							pinfo |= (PLAY_SEEN);
 
-							/* Mark as "torch lit */
-							cinfo |= (CAVE_TLIT);
-
 							/* Mark as "PLAY_LITE" */
 							/* pinfo |= (PLAY_LITE); */
-
-							/* Mark as "CAVE_LITE" */
-							/* cinfo |= (CAVE_LITE); */
 						}
 
 						/* Lit grids */
-						else if (cinfo & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT))
+						else if (cinfo & (CAVE_LITE))
 						{
 							/* Mark as "CAVE_SEEN" */
 							pinfo |= (PLAY_SEEN);
@@ -5393,7 +5349,7 @@ bool has_halo(int y, int x)
 bool redraw_halo_loss(int y, int x)
 {
 	return (((play_info[y][x] & (PLAY_VIEW)) && (play_info[y][x] & (PLAY_SEEN))
-	&& !(cave_info[y][x] & (CAVE_TLIT | CAVE_DLIT | CAVE_GLOW | CAVE_HALO)))	
+	&& !(cave_info[y][x] & (CAVE_LITE)))	
 	 || ((view_glowing_lite) && ((cave_info[y][x] & (CAVE_HALO)) == 0)));
 }
 
@@ -5412,7 +5368,7 @@ void apply_halo(int y, int x)
 void remove_halo(int y, int x)
 {
 	cave_info[y][x] &= ~(CAVE_HALO);
-	if (!(cave_info[y][x] & (CAVE_TLIT | CAVE_DLIT | CAVE_GLOW | CAVE_HALO))) play_info[y][x] &= ~(PLAY_SEEN);
+	if (!(cave_info[y][x] & (CAVE_LITE))) play_info[y][x] &= ~(PLAY_SEEN);
 }
 
 void reapply_halo(int y, int x)
@@ -5441,7 +5397,7 @@ bool has_daylight(int y, int x)
 bool redraw_daylight_loss(int y, int x)
 {
 	return (((play_info[y][x] & (PLAY_VIEW)) && (play_info[y][x] & (PLAY_SEEN))
-	&& !(cave_info[y][x] & (CAVE_TLIT | CAVE_HALO | CAVE_GLOW | CAVE_DLIT)))	
+	&& !(cave_info[y][x] & (CAVE_LITE)))	
 	 || ((view_glowing_lite) && ((cave_info[y][x] & (CAVE_DLIT)) == 0)));
 }
 
@@ -5460,7 +5416,7 @@ void apply_daylight(int y, int x)
 void remove_daylight(int y, int x)
 {
 	cave_info[y][x] &= ~(CAVE_DLIT);
-	if (!(cave_info[y][x] & (CAVE_TLIT | CAVE_DLIT | CAVE_GLOW | CAVE_HALO))) play_info[y][x] &= ~(PLAY_SEEN);
+	if (!(cave_info[y][x] & (CAVE_LITE))) play_info[y][x] &= ~(PLAY_SEEN);
 }
 
 void reapply_daylight(int y, int x)
