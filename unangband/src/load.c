@@ -1811,7 +1811,7 @@ u16b limit;
 	{
 		for (x = 0; x < DUNGEON_WID; x++)
 		{
-			if (f_info[cave_feat[y][x]].flags3 & (FF2_GLOW))
+			if (f_info[cave_feat[y][x]].flags2 & (FF2_GLOW))
 			{
 				gain_attribute(y, x, 2, CAVE_XLOS, apply_halo, redraw_halo_gain);
 			}
@@ -1949,7 +1949,7 @@ u16b limit;
 			/* Check if object lites the dungeon */
 			if (check_object_lite(i_ptr))
 			{
-				gain_attribute(by, bx, 1, 0, apply_halo, redraw_halo_gain);
+				gain_attribute(y, x, 2, CAVE_XLOS, apply_halo, redraw_halo_gain);
 			}
 		}
 	}

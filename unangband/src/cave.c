@@ -633,7 +633,7 @@ void modify_grid_boring_view(byte *a, char *c, int y, int x, byte cinfo, byte pi
 	}
 
 	/* Handle "dark" grids */
-	else if (!(cinfo & (CAVE_GLOW | CAVE_DLIT | CAVE_HALO)))
+	else if (!(cinfo & (CAVE_LITE)))
 	{
 		/* Mega-hack */
 		if (*a & 0x80)
@@ -758,7 +758,7 @@ void modify_grid_interesting_view(byte *a, char *c, int y, int x, byte cinfo, by
 	}
 
 	/* Handle "dark" grids */
-	else if (!(cinfo & (CAVE_GLOW | CAVE_HALO | CAVE_TLIT | CAVE_DLIT)))
+	else if (!(cinfo & (CAVE_LITE)))
 	{
 		/* Mega-hack */
 		if (*a & 0x80)
@@ -1960,7 +1960,7 @@ void note_spot(int y, int x)
 		if (!(f_info[feat].flags1 & (FF1_REMEMBER)))
 		{
 			/* Option -- memorize certain floors */
-			if (((cinfo & (CAVE_GLOW | CAVE_HALO)) && view_perma_grids) ||
+			if (((cinfo & (CAVE_GLOW)) && view_perma_grids) ||
 			    view_torch_grids)
 			{
 				/* Memorize */
@@ -3564,7 +3564,7 @@ void update_view(void)
 		}
 
 		/* Clear "CAVE_VIEW" and "CAVE_SEEN" flags */
-		pinfo &= ~(PLAY_VIEW | PLAY_SEEN);
+		pinfo &= ~(PLAY_VIEW | PLAY_SEEN | PLAY_LITE);
 
 		/* Save cave info */
 		fast_play_info[g] = pinfo;
@@ -3613,7 +3613,7 @@ void update_view(void)
 		pinfo |= (PLAY_SEEN);
 
 		/* Mark as "PLAY_LITE" */
-		/*pinfo |= (PLAY_LITE);*/
+		pinfo |= (PLAY_LITE);
 	}
 
 	/* Lit grid */
@@ -3702,7 +3702,7 @@ void update_view(void)
 							pinfo |= (PLAY_SEEN);
 
 							/* Mark as "PLAY_LITE" */
-							/* pinfo |= (PLAY_LITE); */
+							pinfo |= (PLAY_LITE);
 
 						}
 
@@ -3782,7 +3782,7 @@ void update_view(void)
 							pinfo |= (PLAY_SEEN);
 
 							/* Mark as "PLAY_LITE" */
-							/* pinfo |= (PLAY_LITE); */
+							pinfo |= (PLAY_LITE);
 						}
 
 						/* Lit grids */
@@ -3951,7 +3951,7 @@ void update_view(void)
 			g = fast_view_g[i];
 
 			/* Grid cannot be "PLAY_SEEN" */
-			fast_play_info[g] &= ~(PLAY_SEEN);
+			fast_play_info[g] &= ~(PLAY_SEEN | PLAY_LITE);
 		}
 	}
 
@@ -5362,19 +5362,19 @@ bool redraw_halo_gain(int y, int x)
 void apply_halo(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_HALO);
-	if (play_info[y][x] & (PLAY_VIEW)) play_info[y][x] |= (PLAY_SEEN);
+	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->blind)) play_info[y][x] |= (PLAY_SEEN);
 }
 
 void remove_halo(int y, int x)
 {
 	cave_info[y][x] &= ~(CAVE_HALO);
-	if (!(cave_info[y][x] & (CAVE_LITE))) play_info[y][x] &= ~(PLAY_SEEN);
+	if (!(play_info[y][x] & (PLAY_LITE)) && !(cave_info[y][x] & (CAVE_LITE))) play_info[y][x] &= ~(PLAY_SEEN);
 }
 
 void reapply_halo(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_HALO);
-	if (play_info[y][x] & (PLAY_VIEW)) play_info[y][x] |= (PLAY_SEEN);
+	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->blind)) play_info[y][x] |= (PLAY_SEEN);
 }
 
 
@@ -5410,19 +5410,19 @@ bool redraw_daylight_gain(int y, int x)
 void apply_daylight(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_HALO);
-	if (play_info[y][x] & (PLAY_VIEW)) play_info[y][x] |= (PLAY_SEEN);
+	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->blind)) play_info[y][x] |= (PLAY_SEEN);
 }
 
 void remove_daylight(int y, int x)
 {
 	cave_info[y][x] &= ~(CAVE_DLIT);
-	if (!(cave_info[y][x] & (CAVE_LITE))) play_info[y][x] &= ~(PLAY_SEEN);
+	if (!(play_info[y][x] & (PLAY_LITE)) && !(cave_info[y][x] & (CAVE_LITE))) play_info[y][x] &= ~(PLAY_SEEN);
 }
 
 void reapply_daylight(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_DLIT);
-	if (play_info[y][x] & (PLAY_VIEW)) play_info[y][x] |= (PLAY_SEEN);
+	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->blind)) play_info[y][x] |= (PLAY_SEEN);
 }
 
 
@@ -6582,4 +6582,103 @@ bool is_quest(int level)
 #endif
 	/* Nope */
 	return (FALSE);
+}
+
+
+/*
+ *  Sets various level flags at initialisation
+ */
+void init_level_flags(void)
+{
+	dungeon_zone *zone=&t_info[0].zone[0];
+
+	/* Get the zone */
+	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+
+	/* Set night and day level flag */
+	level_flag =  (p_ptr->depth == min_depth(p_ptr->dungeon)) ?
+			((((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))) ?
+				LF1_SURFACE | LF1_DAYLIGHT : LF1_SURFACE) : 0;
+
+	/* Add 'common' level flags */
+	if (zone->tower) level_flag |= (LF1_TOWER);
+	if ((zone->guard) && (r_info[zone->guard].cur_num <= 0)) level_flag |= (LF1_GUARDIAN);
+	if (is_quest(p_ptr->depth)) level_flag |= (LF1_QUEST);
+
+	/* Define town */
+	if (!zone->fill) level_flag |= LF1_TOWN;
+
+	/* Define wilderness */
+	if ((zone->fill) && ((f_info[zone->fill].flags1 & (FF1_WALL)) != 0)) level_flag |= LF1_FEATURE;
+	if ((zone->big) && ((f_info[zone->big].flags1 & (FF1_WALL)) != 0)) level_flag |= LF1_FEATURE;
+	if ((zone->small) && ((f_info[zone->small].flags1 & (FF1_WALL)) != 0)) level_flag |= LF1_FEATURE;
+
+	/* No dungeon, no stairs */
+	if (min_depth(p_ptr->dungeon) == max_depth(p_ptr->dungeon))
+	{
+		/* Do nothing */;
+	}
+
+	/* Towers */
+	else if (level_flag & (LF1_TOWER))
+	{
+		/* Base of tower */
+		if (p_ptr->depth == min_depth(p_ptr->dungeon))
+		{
+			/* Do nothing -- We place upstairs as a hack */;
+		}
+
+		/* Top of tower */
+		else if (p_ptr->depth == max_depth(p_ptr->dungeon))
+		{
+			level_flag |= (LF1_MORE);
+		}
+
+		/* In tower */
+		else
+		{
+			level_flag |= (LF1_LESS | LF1_MORE);
+		}
+	}
+	/* Others */
+	else
+	{
+		/* Surface -- must go down */
+		if (p_ptr->depth == min_depth(p_ptr->dungeon))
+		{
+			level_flag |= (LF1_MORE);
+		}
+
+		/* Bottom of dungeon -- must go up */
+		else if (p_ptr->depth == max_depth(p_ptr->dungeon))
+		{
+			level_flag |= (LF1_LESS);
+		}
+
+		/* Middle of dungeon */
+		else
+		{
+			level_flag |= (LF1_LESS | LF1_MORE);
+		}
+	}
+
+	/* At the moment, all levels have rooms and corridors */
+	level_flag |= (LF1_ROOMS | LF1_TUNNELS);
+
+	/* Hack -- All levels deeper than 20 on surface are 'destroyed' */
+	if ((p_ptr->depth > 20) && (level_flag & (LF1_SURFACE))) level_flag |= (LF1_DESTROYED);
+
+	/* Hack -- All levels with escorts are 'battlefields' */
+	if (RF1_ESCORT & (1L << (t_info[p_ptr->dungeon].r_flag-1))) level_flag |= (LF1_BATTLE);
+	if (RF1_ESCORTS & (1L << (t_info[p_ptr->dungeon].r_flag-1))) level_flag |= (LF1_BATTLE);
+
+	/* Surface battlefields don't have rooms, but do have paths across the level */
+	if (((level_flag & (LF1_SURFACE)) != 0) && ((level_flag & (LF1_BATTLE)) != 0)) level_flag &= ~(LF1_ROOMS);
+
+	/* Non-destroyed surface locations don't have rooms, but do have paths across the level */
+	if (((level_flag & (LF1_SURFACE)) != 0) && ((level_flag & (LF1_DESTROYED)) == 0)) level_flag &= ~(LF1_ROOMS);
+
+	/* Towers don't have rooms or tunnels */
+	if (((level_flag & (LF1_TOWER)) != 0) && ((level_flag & (LF1_SURFACE)) == 0)) level_flag &= ~(LF1_ROOMS | LF1_TUNNELS);
+
 }

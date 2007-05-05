@@ -185,33 +185,20 @@ bool redraw_torch_lit_gain(int y, int x)
 void apply_torch_lit(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_TLIT);
-	if (play_info[y][x] & (PLAY_VIEW)) play_info[y][x] |= (PLAY_SEEN);
+	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->blind)) play_info[y][x] |= (PLAY_SEEN);
 }
 
 void remove_torch_lit(int y, int x)
 {
 	cave_info[y][x] &= ~(CAVE_TLIT);
 
-#if 0
-	/* Note we ensure that locations lit by player are also torch lit */
-	if ((play_info[y][x] & (PLAY_VIEW)) && (distance(p_ptr->py, p_ptr->px, y, x) <= p_ptr->cur_lite))
-	{
-		cave_info[y][x] |= (CAVE_TLIT);
-	}
-	else
-#endif	
-	/* Plunge into darkness if required */
-	if (!(cave_info[y][x] & (CAVE_TLIT | CAVE_DLIT | CAVE_GLOW | CAVE_HALO)))
-	{
-		play_info[y][x] &= ~(PLAY_SEEN);
-	}
-
+	if (!(play_info[y][x] & (PLAY_LITE)) && !(cave_info[y][x] & (CAVE_LITE))) play_info[y][x] &= ~(PLAY_SEEN);
 }
 
 void reapply_torch_lit(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_TLIT);
-	if (play_info[y][x] & (PLAY_VIEW)) play_info[y][x] |= (PLAY_SEEN);
+	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->blind)) play_info[y][x] |= (PLAY_SEEN);
 }
 
 
