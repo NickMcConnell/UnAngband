@@ -162,6 +162,13 @@ void delete_object_idx(int o_idx)
 		y = j_ptr->iy;
 		x = j_ptr->ix;
 
+		/* Check if was projecting lite */
+		if (check_object_lite(j_ptr))
+		{
+			/* Recheck surrounding lite */
+			check_attribute_lost(y, x, 2, CAVE_XLOS, require_halo, has_halo, redraw_halo_loss, remove_halo, reapply_halo);		
+		}
+
 		/* Visual update */
 		lite_spot(y, x);
 	}
@@ -6044,6 +6051,32 @@ bool break_near(object_type *j_ptr, int y, int x)
 }
 
 /*
+ * Is item a lite source on the floor?
+ */
+bool check_object_lite(object_type *j_ptr)
+{
+#if 0
+	/* Is item visible? */
+	if (!(j_ptr->ident & (IDENT_MARKED))) return FALSE;
+#endif
+	/* Is timing out, and a lite? */
+	if ((j_ptr->timeout) && (j_ptr->tval == TV_LITE)) return TRUE;
+
+	/* Is timing out, and a lite source */
+	else if (j_ptr->timeout)
+	{
+		u32b f1, f2, f3, f4;
+			
+		object_flags(j_ptr, &f1, &f2, &f3, &f4);
+			
+		if (f3 & (TR3_LITE)) return (TRUE);
+	}
+	
+	return FALSE;
+}
+
+
+/*
  * Let an object fall to the ground at or near a location.
  *
  * The initial location is assumed to be "in_bounds_fully()".
@@ -6252,6 +6285,9 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 	/* Warn if we lose the item from view */
 	if (f_info[cave_feat[by][bx]].flags2 & (FF2_HIDE_ITEM))
 	{
+		/* Clear visibility */
+		j_ptr->ident &= ~(IDENT_MARKED);
+
 		/* Skip message on auto-ignored items */
 		if (!auto_pickup_ignore(j_ptr))
 		{
@@ -6259,6 +6295,15 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 			msg_format("The %s disappear%s from view.",
 				   o_name, (plural ? "" : "s"));
 		}
+	}
+
+	/* Gain lite? */
+	if (check_object_lite(j_ptr))
+	{
+		/* Message */
+		msg_format("The %s light%s up the surroundings.", o_name, (plural ? "" : "s"));
+		
+		gain_attribute(by, bx, 2, CAVE_XLOS, apply_halo, redraw_halo_gain);
 	}
 
 	/* Sound */
@@ -7557,9 +7602,10 @@ void floor_item_optimize(int item)
 
 	/* Only optimize empty items */
 	if (o_ptr->number) return;
-
+	
 	/* Delete the object */
 	delete_object_idx(item);
+
 }
 
 

@@ -2744,7 +2744,7 @@
 #define CAVE_ROOM		0x02	/* part of a room */
 #define CAVE_DLIT		0x04	/* lit by daylight during daytime */
 #define CAVE_HALO		0x08	/* lit by glowing feature */
-#define CAVE_MLIT		0x10	/* lit by a monster (or player in multi-player versions) */
+#define CAVE_TLIT		0x10	/* lit by a monster or player */
 #define CAVE_CLIM		0x20	/* location is 'climable' */
 #define CAVE_XLOF		0x40	/* blocks line of fire */
 #define CAVE_XLOS		0x80	/* blocks line of sight */

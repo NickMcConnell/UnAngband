@@ -121,6 +121,97 @@ s16b poly_r_idx(int base_idx)
 }
 
 
+/*
+ * Check whether monster has a lite
+ */
+bool check_monster_lite(int m_idx)
+{
+	/* Get monster */
+	monster_type *m_ptr = &m_list[m_idx];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	/* Monster asleep or hiding, no lite */
+	if ((m_ptr->csleep) && !(m_ptr->mflag & (MFLAG_HIDE))) return FALSE;
+	
+	/* Monster always has lite */
+	if (r_ptr->flags2 & (RF2_HAS_LITE)) return TRUE;
+
+	/* Monster needs lite */
+	if (r_ptr->flags2 & (RF2_NEED_LITE))
+	{
+		/* Doesn't need lite in daylight, perma-light or glowing light */
+		if (cave_info[m_ptr->fy][m_ptr->fx] & (CAVE_DLIT | CAVE_GLOW | CAVE_HALO)) return FALSE;
+
+		/* Does need lite if player out of line of sight */
+		if (!(play_info[m_ptr->fy][m_ptr->fx] & (PLAY_VIEW))) return TRUE;
+
+		/* Does need lite if player doesn't have light */
+		if (p_ptr->cur_lite) return FALSE;
+	}
+	
+	return FALSE;
+}
+
+
+/*
+ * Monster light functions
+ */
+bool require_torch_lit(int y, int x)
+{
+	return ((cave_info[y][x] & (CAVE_TLIT)) != 0);
+}
+
+bool has_torch_lit(int y, int x)
+{
+	/* No monster, no torch lite */
+	if (!cave_m_idx[y][x]) return FALSE;
+	
+	/* Check monster lite */
+	if (check_monster_lite(cave_m_idx[y][x])) return TRUE;
+
+	return FALSE;
+}
+
+bool redraw_torch_lit_loss(int y, int x)
+{
+	return ((play_info[y][x] & (PLAY_VIEW)) && ((cave_info[y][x] & (CAVE_TLIT)) == 0));	
+}
+
+bool redraw_torch_lit_gain(int y, int x)
+{
+	return ((play_info[y][x] & (PLAY_VIEW)) && ((cave_info[y][x] & (CAVE_TLIT)) != 0));	
+}
+
+void apply_torch_lit(int y, int x)
+{
+	cave_info[y][x] |= (CAVE_TLIT);
+	if (play_info[y][x] & (PLAY_VIEW)) play_info[y][x] |= (PLAY_SEEN);
+}
+
+void remove_torch_lit(int y, int x)
+{
+	cave_info[y][x] &= ~(CAVE_TLIT);
+
+	/* Note we ensure that locations lit by player are also torch lit */
+	if ((play_info[y][x] & (PLAY_VIEW)) && (distance(p_ptr->py, p_ptr->px, y, x) <= p_ptr->cur_lite))
+	{
+		cave_info[y][x] |= (CAVE_TLIT);
+	}
+	/* Plunge into darkness if required */
+	else if (!(cave_info[y][x] & (CAVE_TLIT | CAVE_DLIT | CAVE_GLOW | CAVE_HALO)))
+	{
+		play_info[y][x] &= ~(PLAY_SEEN);
+	}
+	
+}
+
+void reapply_torch_lit(int y, int x)
+{
+	cave_info[y][x] |= (CAVE_TLIT);
+	if (play_info[y][x] & (PLAY_VIEW)) play_info[y][x] |= (PLAY_SEEN);
+}
+
+
 /* 
  * Delete a monster by index.
  *
@@ -175,7 +266,13 @@ void delete_monster_idx(int i)
 		/* Delete the object */
 		delete_object_idx(this_o_idx);
 	}
-
+	
+	/* Extinguish lite */
+	if (check_monster_lite(i))
+	{
+		/* Recheck surrounding lite */
+		check_attribute_lost(y, x, 2, CAVE_XLOS, require_torch_lit, has_torch_lit, redraw_torch_lit_loss, remove_torch_lit, reapply_torch_lit);
+	}
 
 	/* Wipe the Monster */
 	(void)WIPE(m_ptr, monster_type);
@@ -1986,6 +2083,8 @@ static void player_swap(const int y1, const int x1, const int y2, const int x2)
 }
 
 
+
+
 /*
  * Swap the players/monsters (if any) at two locations XXX XXX XXX
  */
@@ -1995,11 +2094,12 @@ void monster_swap(int y1, int x1, int y2, int x2)
 
 	monster_type *m_ptr;
 	monster_race *r_ptr;
+	
+	bool lite1 = FALSE, lite2 = FALSE, lite3 = FALSE, lite4 = FALSE;
 
 	/* Monsters */
 	m1 = cave_m_idx[y1][x1];
 	m2 = cave_m_idx[y2][x2];
-
 
 	/* Update grids */
 	cave_m_idx[y1][x1] = m2;
@@ -2011,16 +2111,12 @@ void monster_swap(int y1, int x1, int y2, int x2)
 		m_ptr = &m_list[m1];
 		r_ptr = &r_info[m_ptr->r_idx];
 
+		/* Check monster lite at origin */
+		lite1 = check_monster_lite(m1);
+
 		/* Move monster */
 		m_ptr->fy = y2;
 		m_ptr->fx = x2;
-
-		/* Some monsters radiate lite when moving */
-		if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE))
-		{
-			/* Update the visuals */
-			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-		}
 
 		/* Some monsters radiate damage when moving */
 		if (r_ptr->flags2 & (RF2_HAS_AURA))
@@ -2044,6 +2140,9 @@ void monster_swap(int y1, int x1, int y2, int x2)
 
 		/* Update monster */
 		update_mon(m1, TRUE);
+		
+		/* Check for lite again */
+		lite2 = check_monster_lite(m1);
 	}
 
 	/* Player 1 */
@@ -2058,10 +2157,12 @@ void monster_swap(int y1, int x1, int y2, int x2)
 		m_ptr = &m_list[m2];
 		r_ptr = &r_info[m_ptr->r_idx];
 
+		/* Check monster lite at origin */
+		lite3 = check_monster_lite(m1);
+
 		/* Move monster */
 		m_ptr->fy = y1;
 		m_ptr->fx = x1;
-
 
 		/* Some monsters radiate lite when moving */
 		if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE))
@@ -2092,6 +2193,9 @@ void monster_swap(int y1, int x1, int y2, int x2)
 
 		/* Update monster */
 		update_mon(m2, TRUE);
+		
+		/* Check monster lite at origin */
+		lite4 = check_monster_lite(m2);
 	}
 
 	/* Player 2 */
@@ -2100,6 +2204,29 @@ void monster_swap(int y1, int x1, int y2, int x2)
 		player_swap(y2, x2, y1, x1);
 	}
 
+	/* Check monster lites */
+	if (lite1 && !lite4)
+	{
+		check_attribute_lost(y1, x1, 2, CAVE_XLOS, require_torch_lit, has_torch_lit, redraw_torch_lit_loss, remove_torch_lit, reapply_torch_lit);
+	}
+
+	/* Check monster lites */
+	if (lite3 && !lite2)
+	{
+		check_attribute_lost(y2, x2, 2, CAVE_XLOS, require_torch_lit, has_torch_lit, redraw_torch_lit_loss, remove_torch_lit, reapply_torch_lit);
+	}
+
+	/* Handle creating "glowing" terrain */
+	if (!lite1 && lite4)
+	{
+		gain_attribute(y1, x1, 2, CAVE_XLOS, apply_torch_lit, redraw_torch_lit_gain);
+	}
+	
+	/* Handle creating "glowing" terrain */
+	if (!lite3 && lite2)
+	{
+		gain_attribute(y1, x1, 2, CAVE_XLOS, apply_torch_lit, redraw_torch_lit_gain);
+	}
 
 	/* Redraw */
 	lite_spot(y1, x1);
@@ -2648,6 +2775,12 @@ s16b monster_place(int y, int x, monster_type *n_ptr)
 
 		/* Update the monster */
 		update_mon(m_idx, TRUE);
+
+		/* Handle creating monster with lite */
+		if (check_monster_lite(m_idx))
+		{
+			gain_attribute(y, x, 2, CAVE_XLOS, apply_torch_lit, redraw_torch_lit_gain);
+		}
 
 		/* Get the new race */
 		r_ptr = &r_info[m_ptr->r_idx];

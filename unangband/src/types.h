@@ -74,6 +74,9 @@ typedef s16b s16b_wid[DUNGEON_WID];
 typedef void (*print_list_func)(const s16b *sn, int num, int y, int x);
 
 
+typedef bool (*tester_attribute_func)(int y, int x);
+typedef void (*modify_attribute_func)(int y, int x);
+
 
 /**** Available Structs ****/
 

@@ -1363,7 +1363,7 @@ static void do_cmd_wiz_query(void)
 			case 'r': mask |= (CAVE_ROOM); break;
 	      	        case 'd': mask |= (CAVE_DLIT); break;
 			case 'l': mask |= (CAVE_HALO); break;
-			case 'm': mask |= (CAVE_MLIT); break;
+			case 't': mask |= (CAVE_TLIT); break;
 			case 'x': mask |= (CAVE_CLIM); break;
 			case 'f': mask |= (CAVE_XLOF); break;
 			case 's': mask |= (CAVE_XLOS); break;

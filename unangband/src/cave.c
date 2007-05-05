@@ -593,28 +593,8 @@ void modify_grid_boring_view(byte *a, char *c, int y, int x, byte cinfo, byte pi
 	/* Handle "seen" grids */
 	if (pinfo & (PLAY_SEEN))
 	{
-		/* Lit by "indirect sun" light */
-		if (view_surface_lite && p_ptr->outside &&
-					!(f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
-		{
-			/* Mega-hack */
-			if (*a & 0x80)
-			{
-				if ((arg_graphics != GRAPHICS_ORIGINAL) && (arg_graphics != GRAPHICS_DAVID_GERVAIS_ISO))
-				{
-					/* Use a dark tile */
-					*c += 1;
-				}
-			}
-			else
-			{
-				/* Use "gray" */
-				*a = dark_attr[*a];
-			}
-		}
-
-		/* Only lit by "torch" lite */
-		else if (view_yellow_lite && !(cinfo & (CAVE_GLOW | CAVE_DLIT | CAVE_MLIT | CAVE_HALO)))
+		/* Lit by "torch" lite */
+		if (view_yellow_lite && (cinfo & (CAVE_TLIT)))
 		{
 			/* Mega-hack */
 			if (*a & 0x80)
@@ -632,8 +612,8 @@ void modify_grid_boring_view(byte *a, char *c, int y, int x, byte cinfo, byte pi
 			}
 		}
 
-		/* Lit by "halo" lite */
-		else if (view_glowing_lite && (cinfo & (CAVE_HALO)))
+		/* Lit by "halo" lite at nighttime */
+		else if (view_glowing_lite && (cinfo & (CAVE_HALO)) && !(cinfo & (CAVE_DLIT)))
 		{
 			/* Mega-hack */
 			if (*a & 0x80)
@@ -672,7 +652,7 @@ void modify_grid_boring_view(byte *a, char *c, int y, int x, byte cinfo, byte pi
 	}
 
 	/* Handle "dark" grids */
-	else if (!(cinfo & (CAVE_GLOW | CAVE_DLIT | CAVE_HALO | CAVE_MLIT)))
+	else if (!(cinfo & (CAVE_GLOW | CAVE_DLIT | CAVE_HALO)))
 	{
 		/* Mega-hack */
 		if (*a & 0x80)
@@ -797,7 +777,7 @@ void modify_grid_interesting_view(byte *a, char *c, int y, int x, byte cinfo, by
 	}
 
 	/* Handle "dark" grids */
-	else if (!(cinfo & (CAVE_GLOW | CAVE_HALO | CAVE_MLIT | CAVE_DLIT)))
+	else if (!(cinfo & (CAVE_GLOW | CAVE_HALO | CAVE_TLIT | CAVE_DLIT)))
 	{
 		/* Mega-hack */
 		if (*a & 0x80)
@@ -1220,6 +1200,13 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			{
 				/* Modify based on adjacent grids */
 				(*modify_grid_adjacent_hook)(&a, &c, y, x, door_char);
+			}
+
+			/* Special lighting effects */
+			else if ((view_granite_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE)))
+			{
+				/* Modify lighting */
+				(*modify_grid_boring_hook)(&a, &c, y, x, cinfo, pinfo);
 			}
 
 			/* Special lighting effects */
@@ -3444,9 +3431,6 @@ void forget_view(void)
 		/* Clear "CAVE_VIEW" and "CAVE_SEEN" flags */
 		fast_play_info[g] &= ~(PLAY_VIEW | PLAY_SEEN);
 
-		/* Clear "CAVE_LITE" flag */
-		/* fast_play_info[g] &= ~(PLAY_LITE); */
-
 		/* Redraw */
 		lite_spot(y, x);
 	}
@@ -3583,9 +3567,6 @@ void update_view(void)
 	byte pinfo;
 	byte cinfo;
 
-	/* Used for monster lite patch */
-	int fy,fx;
-
 	/*** Step 0 -- Begin ***/
 
 	/* Save the old "view" grids for later */
@@ -3596,6 +3577,7 @@ void update_view(void)
 
 		/* Get grid info */
 		pinfo = fast_play_info[g];
+		cinfo = fast_cave_info[g];
 
 		/* Save "PLAY_SEEN" grids */
 		if (pinfo & (PLAY_SEEN))
@@ -3609,9 +3591,6 @@ void update_view(void)
 
 		/* Clear "CAVE_VIEW" and "CAVE_SEEN" flags */
 		pinfo &= ~(PLAY_VIEW | PLAY_SEEN);
-
-		/* Clear "CAVE_LITE" flag */
-		/* info &= ~(PLAY_LITE); */
 
 		/* Save cave info */
 		fast_play_info[g] = pinfo;
@@ -3639,178 +3618,7 @@ void update_view(void)
 	/* Handle real light */
 	if (radius > 0) ++radius;
 
-	/*** Step 1A -- monster lites ***/
-	/* Scan monster list and add monster lites */
-	for ( i = 1; i < z_info->m_max; i++)
-	{
-
-		/* Check the i'th monster */
-		monster_type *m_ptr = &m_list[i];
-		monster_race *r_ptr = &r_info[m_ptr->r_idx];
-
-		/* Skip dead monsters */
-	      	if (!m_ptr->r_idx) continue;
-
-		/* Skip sleeping monsters */
-		if (m_ptr->csleep) continue;
-
-		/* Skip hiding monsters */
-		if (m_ptr->mflag & (MFLAG_HIDE)) continue;
-
-		/* Access the location */
-		fx = m_ptr->fx;
-		fy = m_ptr->fy;
-
-		/* Carrying lite */
-		if ((r_ptr->flags2 & (RF2_HAS_LITE))
-			|| ((r_ptr->flags2 & (RF2_NEED_LITE)) && !(radius)
-                  && !(fast_cave_info[pg] & (CAVE_GLOW | CAVE_HALO))))
-		{
-			/* monster grid */
-			if (generic_los(py,px,fy,fx, CAVE_XLOS))
-			{
-				g = GRID(fy,fx);
-				pinfo = fast_play_info[g];
-
-				pinfo |= (PLAY_VIEW);
-				pinfo |= (PLAY_SEEN);
-
-				/* Save cave info */
-				fast_play_info[g] = pinfo;
-
-				/* Save in array */
-				fast_view_g[fast_view_n++] = g;
-			}
-
-			/* Radius 1 -- torch radius */
-
-			/* Adjacent grid */
-			if (generic_los(py,px,fy+1,fx, CAVE_XLOS))
-			{
-				g = GRID(fy+1,fx);
-				pinfo = fast_play_info[g];
-
-				pinfo |= (PLAY_VIEW);
-				pinfo |= (PLAY_SEEN);
-
-				/* Save cave info */
-				fast_play_info[g] = pinfo;
-
-				/* Save in array */
-				fast_view_g[fast_view_n++] = g;
-			}
-
-			if (generic_los(py,px,fy-1,fx, CAVE_XLOS))
-			{
-				g = GRID(fy-1,fx);
-				pinfo = fast_play_info[g];
-
-				pinfo |= (PLAY_VIEW);
-				pinfo |= (PLAY_SEEN);
-
-				/* Save cave info */
-				fast_play_info[g] = pinfo;
-
-				/* Save in array */
-				fast_view_g[fast_view_n++] = g;
-			}
-
-			if (generic_los(py,px,fy,fx+1, CAVE_XLOS))
-			{
-				g = GRID(fy,fx+1);
-				pinfo = fast_play_info[g];
-
-				pinfo |= (PLAY_VIEW);
-				pinfo |= (PLAY_SEEN);
-
-				/* Save cave info */
-				fast_play_info[g] = pinfo;
-
-				/* Save in array */
-				fast_view_g[fast_view_n++] = g;
-			}
-
-			if (generic_los(py,px,fy,fx-1, CAVE_XLOS))
-			{
-				g = GRID(fy,fx-1);
-				pinfo = fast_play_info[g];
-
-				pinfo |= (PLAY_VIEW);
-				pinfo |= (PLAY_SEEN);
-
-				/* Save cave info */
-				fast_play_info[g] = pinfo;
-
-				/* Save in array */
-				fast_view_g[fast_view_n++] = g;
-			}
-
-			/* Diagonal grids */
-			if (generic_los(py,px,fy+1,fx+1, CAVE_XLOS))
-			{
-				g = GRID(fy+1,fx+1);
-				pinfo = fast_play_info[g];
-
-				pinfo |= (PLAY_VIEW);
-				pinfo |= (PLAY_SEEN);
-
-				/* Save cave info */
-				fast_play_info[g] = pinfo;
-
-				/* Save in array */
-				fast_view_g[fast_view_n++] = g;
-			}
-
-			if (generic_los(py,px,fy+1,fx-1, CAVE_XLOS))
-			{
-				g = GRID(fy+1,fx-1);
-				pinfo = fast_play_info[g];
-
-				pinfo |= (PLAY_VIEW);
-				pinfo |= (PLAY_SEEN);
-
-				/* Save cave info */
-				fast_play_info[g] = pinfo;
-
-				/* Save in array */
-				fast_view_g[fast_view_n++] = g;
-			}
-
-			if (generic_los(py,px,fy-1,fx+1, CAVE_XLOS))
-			{
-				g = GRID(fy-1,fx+1);
-				pinfo = fast_play_info[g];
-
-				pinfo |= (PLAY_VIEW);
-				pinfo |= (PLAY_SEEN);
-
-				/* Save cave info */
-				fast_play_info[g] = pinfo;
-
-				/* Save in array */
-				fast_view_g[fast_view_n++] = g;
-			}
-
-			if (generic_los(py,px,fy-1,fx-1, CAVE_XLOS))
-			{
-				g = GRID(fy-1,fx-1);
-				pinfo = fast_play_info[g];
-
-				pinfo |= (PLAY_VIEW);
-				pinfo |= (PLAY_SEEN);
-
-				/* Save cave info */
-				fast_play_info[g] = pinfo;
-
-				/* Save in array */
-				fast_view_g[fast_view_n++] = g;
-			}
-
-		}
-
-	}
-
-	/*** Step 1B -- player grid ***/
+	/*** Step 1 -- player grid ***/
 
 	/* Player grid */
 	g = pg;
@@ -3829,6 +3637,9 @@ void update_view(void)
 	{
 		/* Mark as "PLAY_SEEN" */
 		pinfo |= (PLAY_SEEN);
+		
+		/* Mark as "torch lit */
+		cinfo |= (CAVE_TLIT);
 
 		/* Mark as "PLAY_LITE" */
 		/* pinfo |= (PLAY_LITE); */
@@ -3836,12 +3647,10 @@ void update_view(void)
 		/* Mark as "CAVE_LITE" */
 		/* cinfo |= (CAVE_LITE); */
 
-		/* Mark as "CAVE_MLIT" */
-		/* cinfo |= (CAVE_MLIT); */
 	}
 
 	/* Lit grid */
-	else if (cinfo & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT | CAVE_MLIT))
+	else if (cinfo & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT))
 	{
 		/* Mark as "PLAY_SEEN" */
 		pinfo |= (PLAY_SEEN);
@@ -3925,18 +3734,18 @@ void update_view(void)
 							/* Mark as "PLAY_SEEN" */
 							pinfo |= (PLAY_SEEN);
 
+							/* Mark as "torch lit */
+							cinfo |= (CAVE_TLIT);
+
 							/* Mark as "PLAY_LITE" */
 							/* pinfo |= (PLAY_LITE); */
 
 							/* Mark as "CAVE_LITE" */
 							/* cinfo |= (CAVE_LITE); */
-
-							/* Mark as "CAVE_MLIT" */
-							/* cinfo |= (CAVE_MLIT); */
 						}
 
 						/* Lit grids */
-						else if (cinfo & (CAVE_GLOW))
+						else if (cinfo & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT))
 						{
 							int y = GRID_Y(g);
 							int x = GRID_X(g);
@@ -3949,11 +3758,11 @@ void update_view(void)
 
 							/* Check for "complex" illumination */
 							if ((!(cave_info[yy][xx] & (CAVE_XLOS)) &&
-							      (cave_info[yy][xx] & (CAVE_GLOW | CAVE_HALO))) ||
+							      (cave_info[yy][xx] & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT))) ||
 							    (!(cave_info[y][xx] & (CAVE_XLOS)) &&
-							      (cave_info[y][xx] & (CAVE_GLOW | CAVE_HALO))) ||
+							      (cave_info[y][xx] & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT))) ||
 							    (!(cave_info[yy][x] & (CAVE_XLOS)) &&
-							      (cave_info[yy][x] & (CAVE_GLOW | CAVE_HALO))))
+							      (cave_info[yy][x] & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT))))
 							{
 								/* Mark as seen */
 								pinfo |= (PLAY_SEEN);
@@ -3962,7 +3771,7 @@ void update_view(void)
 #else /* UPDATE_VIEW_COMPLEX_WALL_ILLUMINATION */
 
 							/* Check for "simple" illumination */
-							if (cave_info[yy][xx] & (CAVE_GLOW | CAVE_HALO))
+							if (cave_info[yy][xx] & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT))
 							{
 								/* Mark as seen */
 								pinfo |= (PLAY_SEEN);
@@ -4010,18 +3819,18 @@ void update_view(void)
 							/* Mark as "PLAY_SEEN" */
 							pinfo |= (PLAY_SEEN);
 
+							/* Mark as "torch lit */
+							cinfo |= (CAVE_TLIT);
+
 							/* Mark as "PLAY_LITE" */
 							/* pinfo |= (PLAY_LITE); */
 
 							/* Mark as "CAVE_LITE" */
 							/* cinfo |= (CAVE_LITE); */
-
-							/* Mark as "CAVE_MLIT" */
-							/* cinfo |= (CAVE_MLIT); */
 						}
 
 						/* Lit grids */
-						else if (cinfo & (CAVE_GLOW | CAVE_HALO))
+						else if (cinfo & (CAVE_GLOW | CAVE_HALO | CAVE_DLIT))
 						{
 							/* Mark as "CAVE_SEEN" */
 							pinfo |= (PLAY_SEEN);
@@ -5448,10 +5257,6 @@ static void cave_set_feat_aux(int y, int x, int feat)
 #endif
 }
 
-
-typedef bool (*tester_attribute_func)(int y, int x);
-typedef void (*modify_attribute_func)(int y, int x);
-
 /*
  * Check adjacent locations to see if an attribute that a feature applies
  * to these locations still applies.
@@ -5459,101 +5264,98 @@ typedef void (*modify_attribute_func)(int y, int x);
  * This occurs for cave edges, trees, locations lit by daylight, locations lit by
  * glowing features.
  */
-void check_attribute_lost(int y, int x, tester_attribute_func require_attribute, tester_attribute_func has_attribute,
+void check_attribute_lost(int y, int x, int r, byte los, tester_attribute_func require_attribute, tester_attribute_func has_attribute,
 	tester_attribute_func redraw_attribute, modify_attribute_func remove_attribute,	modify_attribute_func reapply_attribute)
 {
-	int i, ii;
+	int yy, xx;
+	int yyy, xxx;
 	
-	int feat;
-	
-	for (i = 0; i < 8; i++)
+	for (yy = y - r; yy <= y + r; yy++)
 	{
-		int yy = y + ddy_ddd[i];
-		int xx = x + ddx_ddd[i];
-
-		/* Ignore annoying locations */
-		if (!in_bounds_fully(yy, xx)) continue;
-
-		/* Get the feature */
-		feat = cave_feat[yy][xx];
-
-		/* Was destroyed grid only one 'holding this one up' */
-		if (require_attribute(yy, xx))
+		for (xx = x - r; xx <= x + r; xx++)
 		{
-			/* Temporarily remove the attribute from the grid */
-			remove_attribute(yy, xx);
+			/* Ignore annoying locations */
+			if (!in_bounds_fully(yy, xx)) continue;
 
-			/* Check adjacent grids to reapply it */
-			for (ii = 0; ii < 8; ii++)
+			/* Ignore distance locations */
+			if ((r > 1) && (distance(y, x, yy, xx) > r)) continue;
+
+			/* Was destroyed grid only one 'holding this one up' */
+			if (require_attribute(yy, xx))
 			{
-				int yyy = yy + ddy_ddd[ii];
-				int xxx = xx + ddx_ddd[ii];
+				/* Temporarily remove the attribute from the grid */
+				remove_attribute(yy, xx);
 
-				/* Ignore annoying locations */
-				if (!in_bounds_fully(yyy, xxx)) continue;
-
-				/* Is supports the 'affected' grid */
-				if (has_attribute(yyy,xxx))
+				/* Check nearby grids to reapply it */
+				for (yyy = yy - r; yyy <= yy + r; yyy++)
 				{
-					reapply_attribute(yy, xx);
+					for (xxx = x - r; xxx <= x + r; xxx++)
+					{
+						/* Ignore annoying locations */
+						if (!in_bounds_fully(yyy, xxx)) continue;
+						
+						/* Ignore distance locations */
+						if ((r > 1) && (distance(yy, xx, yyy, xxx) > r)) continue;
 
-					break;
+						/* Ensure grid has line of sight if required */
+						if ((r > 1) && (los) && !(generic_los(yy, xx, yyy, xxx, los))) continue;
+
+						/* Is supports the 'affected' grid */
+						if (has_attribute(yyy,xxx))
+						{
+							reapply_attribute(yy, xx);
+
+							break;
+						}
+					}
+			
+					/* Require redraw */
+					if (redraw_attribute(yy,xx))
+					{
+						note_spot(yy, xx);
+						lite_spot(yy, xx);	
+					}
 				}
 			}
-			
+		}
+	}
+}
+
+
+/*
+ * Apply an attribute to nearby locations
+ */
+void gain_attribute(int y, int x, int r, byte los, modify_attribute_func apply_attribute, tester_attribute_func redraw_attribute)
+{
+	int yy, xx;
+
+	for (yy = y - r; yy <= y + r; yy++)
+	{
+		for (xx = x - r; xx <= x + r; xx++)
+		{
+			/* Ignore annoying locations */
+			if (!in_bounds_fully(yy, xx)) continue;
+
+			/* Ignore distance locations */
+			if ((r > 1) && (distance(y, x, yy, xx) > r)) continue;
+
+			/* Ensure grid has line of sight if required */
+			if ((r > 1) && (los) && !(generic_los(y, x, yy, xx, los))) continue;
+
+			/* Apply attribute */
+			apply_attribute(yy, xx);
+
 			/* Require redraw */
-			if (redraw_attribute(yy,xx))
+			if (redraw_attribute(yy, xx))
 			{
 				note_spot(yy, xx);
 				lite_spot(yy, xx);	
 			}
 		}
 	}
-
-	/* Require redraw */
-	if (redraw_attribute(y,x))
-	{
-		note_spot(y, x);
-		lite_spot(y, x);	
-	}
 }
 
-/*
- * Apply an attribute to adjacent locations
- */
-void gain_attribute(int y, int x, modify_attribute_func apply_attribute, tester_attribute_func redraw_attribute)
-{
-	int i;
-	
-	/* Apply attribute */
-	apply_attribute(y, x);
 
-	/* Require redraw */
-	if (redraw_attribute(y,x))
-	{
-		note_spot(y, x);
-		lite_spot(y, x);	
-	}
-		
-	for (i = 0; i < 8; i++)
-	{
-		int yy = y + ddy_ddd[i];
-		int xx = x + ddx_ddd[i];
-
-		/* Ignore annoying locations */
-		if (!in_bounds_fully(yy, xx)) continue;
-
-		/* Apply attribute */
-		apply_attribute(y, x);
-
-		/* Require redraw */
-		if (redraw_attribute(y,x))
-		{
-			note_spot(y, x);
-			lite_spot(y, x);	
-		}	
-	}
-}
 
 /*
  * Halo functions
@@ -5565,27 +5367,58 @@ bool require_halo(int y, int x)
 
 bool has_halo(int y, int x)
 {
-	return ((f_info[cave_feat[y][x]].flags2 & (FF2_GLOW)) != 0);
+	int this_o_idx, next_o_idx;
+	
+	/* Glowing feature */
+	if ((f_info[cave_feat[y][x]].flags2 & (FF2_GLOW)) != 0) return TRUE;
+	
+	/* Scan all objects in the grid */
+	for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
+	{
+		object_type *o_ptr;
+
+		/* Get the object */
+		o_ptr = &o_list[this_o_idx];
+
+		/* Get the next object */
+		next_o_idx = o_ptr->next_o_idx;
+
+		/* Check object lite */
+		if (check_object_lite(o_ptr)) return TRUE;
+	}
+
+	return FALSE;
 }
 
-bool redraw_halo(int y, int x)
+bool redraw_halo_loss(int y, int x)
 {
-	return ((view_glowing_lite) && ((cave_info[y][x] & (CAVE_HALO)) == 0));
+	return (((play_info[y][x] & (PLAY_VIEW)) && (play_info[y][x] & (PLAY_SEEN))
+	&& !(cave_info[y][x] & (CAVE_TLIT | CAVE_DLIT | CAVE_GLOW | CAVE_HALO)))	
+	 || ((view_glowing_lite) && ((cave_info[y][x] & (CAVE_HALO)) == 0)));
+}
+
+bool redraw_halo_gain(int y, int x)
+{
+	return (((play_info[y][x] & (PLAY_VIEW)) && !(play_info[y][x] & (PLAY_SEEN)))	
+	 || ((view_glowing_lite) && ((cave_info[y][x] & (CAVE_HALO)) != 0)));
 }
 
 void apply_halo(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_HALO);
+	if (play_info[y][x] & (PLAY_VIEW)) play_info[y][x] |= (PLAY_SEEN);
 }
 
 void remove_halo(int y, int x)
 {
 	cave_info[y][x] &= ~(CAVE_HALO);
+	if (!(cave_info[y][x] & (CAVE_TLIT | CAVE_DLIT | CAVE_GLOW | CAVE_HALO))) play_info[y][x] &= ~(PLAY_SEEN);
 }
 
 void reapply_halo(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_HALO);
+	if (play_info[y][x] & (PLAY_VIEW)) play_info[y][x] |= (PLAY_SEEN);
 }
 
 
@@ -5605,24 +5438,35 @@ bool has_daylight(int y, int x)
 	return ( daytime && surface && ((f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)) !=0));
 }
 
-bool redraw_daylight(int y, int x)
+bool redraw_daylight_loss(int y, int x)
 {
-	return ((view_glowing_lite) && ((cave_info[y][x] & (CAVE_DLIT)) == 0));
+	return (((play_info[y][x] & (PLAY_VIEW)) && (play_info[y][x] & (PLAY_SEEN))
+	&& !(cave_info[y][x] & (CAVE_TLIT | CAVE_HALO | CAVE_GLOW | CAVE_DLIT)))	
+	 || ((view_glowing_lite) && ((cave_info[y][x] & (CAVE_DLIT)) == 0)));
+}
+
+bool redraw_daylight_gain(int y, int x)
+{
+	return (((play_info[y][x] & (PLAY_VIEW)) && !(play_info[y][x] & (PLAY_SEEN)))	
+	 || ((view_glowing_lite) && ((cave_info[y][x] & (CAVE_DLIT)) != 0)));
 }
 
 void apply_daylight(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_HALO);
+	if (play_info[y][x] & (PLAY_VIEW)) play_info[y][x] |= (PLAY_SEEN);
 }
 
 void remove_daylight(int y, int x)
 {
 	cave_info[y][x] &= ~(CAVE_DLIT);
+	if (!(cave_info[y][x] & (CAVE_TLIT | CAVE_DLIT | CAVE_GLOW | CAVE_HALO))) play_info[y][x] &= ~(PLAY_SEEN);
 }
 
 void reapply_daylight(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_DLIT);
+	if (play_info[y][x] & (PLAY_VIEW)) play_info[y][x] |= (PLAY_SEEN);
 }
 
 
@@ -5641,7 +5485,12 @@ bool has_tree(int y, int x)
 	return (((f_info[cave_feat[y][x]].flags3 & (FF3_TREE)) !=0) && (rand_int(100) < 50));
 }
 
-bool redraw_tree(int y, int x)
+bool redraw_tree_loss(int y, int x)
+{
+	return (FALSE);
+}
+
+bool redraw_tree_gain(int y, int x)
 {
 	return (FALSE);
 }
@@ -5673,7 +5522,12 @@ bool has_chasm_edge(int y, int x)
 		 ((f_info[cave_feat[y][x]].flags2 & (FF2_BRIDGED)) != 0));
 }
 
-bool redraw_chasm_edge(int y, int x)
+bool redraw_chasm_edge_loss(int y, int x)
+{
+	return (FALSE);	
+}
+
+bool redraw_chasm_edge_gain(int y, int x)
 {
 	return (FALSE);	
 }
@@ -5727,13 +5581,13 @@ void cave_set_feat(int y, int x, int feat)
 	/* Handle destroying "glowing" terrain */
 	if (halo && !halo2)
 	{
-		check_attribute_lost(y, x, require_halo, has_halo, redraw_halo, remove_halo, reapply_halo);
+		check_attribute_lost(y, x, 2, CAVE_XLOS, require_halo, has_halo, redraw_halo_loss, remove_halo, reapply_halo);
 	}
 
-	/* Handle destroying "glowing" terrain */
+	/* Handle destroying "outside" terrain */
 	if (dlit && !dlit2)
 	{
-		check_attribute_lost(y, x, require_daylight, has_daylight, redraw_daylight, remove_daylight, reapply_daylight);
+		check_attribute_lost(y, x, 2, CAVE_XLOS, require_daylight, has_daylight, redraw_daylight_loss, remove_daylight, reapply_daylight);
 	}
 
 	/* Handle destroying "need_tree" terrain */
@@ -5757,7 +5611,7 @@ void cave_set_feat(int y, int x, int feat)
 		}
 
 		/* Cause branches to fall */		
-		check_attribute_lost(y, x, require_tree, has_tree, redraw_tree, remove_tree, reapply_tree);
+		check_attribute_lost(y, x, 1, 0, require_tree, has_tree, redraw_tree_loss, remove_tree, reapply_tree);
 		
 		/* Check if daylight added */
 		if (daytime && surface) for (i = 0; i < 8; i++)
@@ -5772,7 +5626,7 @@ void cave_set_feat(int y, int x, int feat)
 			if (((dlit_adj & (1 << i)) != 0) && ((f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)) != 0))
 			{
 				/* Add more light */
-				gain_attribute(yy, xx, apply_daylight, redraw_daylight);
+				gain_attribute(yy, xx, 2, CAVE_XLOS, apply_daylight, redraw_daylight_gain);
 			}
 		}
 	}
@@ -5794,7 +5648,7 @@ void cave_set_feat(int y, int x, int feat)
 	 */
 	if (f_ptr2->flags2 & (FF2_CHASM))
 	{
-		check_attribute_lost(y, x, require_chasm_edge, has_chasm_edge, redraw_chasm_edge, remove_chasm_edge, reapply_chasm_edge);
+		check_attribute_lost(y, x, 1, 0, require_chasm_edge, has_chasm_edge, redraw_chasm_edge_loss, remove_chasm_edge, reapply_chasm_edge);
 	}
 	
 	/*
@@ -5823,13 +5677,13 @@ void cave_set_feat(int y, int x, int feat)
 	/* Handle creating "glowing" terrain */
 	if (!halo && halo2)
 	{
-		gain_attribute(y, x, apply_halo, redraw_halo);
+		gain_attribute(y, x, 2, CAVE_XLOS, apply_halo, redraw_halo_gain);
 	}
 
 	/* Handle creating terrain lit by "daylight" */
 	if (!dlit && dlit2)
 	{
-		gain_attribute(y, x, apply_daylight, redraw_daylight);
+		gain_attribute(y, x, 2, CAVE_XLOS, apply_daylight, redraw_daylight_gain);
 	}
 
 	/* Handle gold/items */

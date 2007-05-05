@@ -1274,8 +1274,18 @@ static void process_world(void)
 		/* Timing out? */
 		if (o_ptr->timeout > 0)
 		{
+			/* Check for light extinguishing */
+			bool extinguish = ((o_ptr->timeout == 1) && check_object_lite(o_ptr));
+			
 			/* Recharge */
 			o_ptr->timeout--;
+			
+			/* Extinguish lite */
+			if ((extinguish) && (o_ptr->iy) && (o_ptr->ix))
+			{
+				/* Check for loss of light */
+				check_attribute_lost(o_ptr->iy, o_ptr->ix, 2, CAVE_XLOS, require_halo, has_halo, redraw_halo_loss, remove_halo, reapply_halo);
+			}
 
 			/* Notice changes */
 			if (!(o_ptr->timeout) || ((o_ptr->stackc) ? (o_ptr->timeout < o_ptr->stackc) :
@@ -1312,8 +1322,6 @@ static void process_world(void)
 				{
 					/* Notice count */
 					j++;
-		
-		
 				}
 			}
 		}
