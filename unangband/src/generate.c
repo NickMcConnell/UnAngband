@@ -183,6 +183,7 @@
 #define STAR_BURST_CLOVER	0x00000004	/* Allow cloverleaf rooms */
 #define STAR_BURST_RAW_FLOOR	0x00000008	/* Floor overwrites dungeon */
 #define STAR_BURST_RAW_EDGE	0x00000010	/* Edge overwrites dungeon */
+#define STAR_BURST_MOAT		0x00000020	/* Skip areas defined as a room */
 
 
 /*
@@ -317,17 +318,13 @@ static room_data_type room_data[ROOM_MAX] =
    /* Fractal */  {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS * 2/3,	2, 0, LF1_MINE | LF1_CAVE},
    /* Lrg fra */  {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS / 2,	3, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE},
    /* Huge fra */ {{ 0,   0,   0,   0,   0,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE},
-   /* Lair */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		1, 0, LF1_LAIR},
-   /* Xlg fill */ {{ 0,   0,   0,   0,   0,   12, 12,  12,  12,  12,  12}, 11,  2,	3, 0, 		LF1_SEWER},
-   /* Fill fra */ {{ 0,   0,   0,   4,   4,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE},   
-   /* Fill star */{{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		3, 0, LF1_CAVE | LF1_SEWER}
+   /* Lair */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		1, 0, LF1_LAIR}
 };
 
 
 
 /* Build rooms in descending order of difficulty of placing e.g. size, frequency. */
-static byte room_build_order[ROOM_MAX] = {ROOM_LAIR, ROOM_GREATER_VAULT, ROOM_FILL_FRACTAL,
-						ROOM_FILL_STAR_BURST, ROOM_CHAMBERS, ROOM_HUGE_FILL, ROOM_HUGE_FRACTAL,
+static byte room_build_order[ROOM_MAX] = {ROOM_LAIR, ROOM_GREATER_VAULT, ROOM_CHAMBERS, ROOM_HUGE_FRACTAL,
 						ROOM_HUGE_STAR_BURST, ROOM_HUGE_CENTRE, ROOM_LARGE_FRACTAL, ROOM_LESSER_VAULT,
 						ROOM_INTERESTING, ROOM_STAR_BURST, ROOM_FRACTAL, ROOM_LARGE_CENTRE,
 						ROOM_LARGE_WALLS, ROOM_NORMAL_CENTRE, ROOM_NORMAL_WALLS, ROOM_NORMAL, 0};
@@ -1550,6 +1547,38 @@ static bool generate_starburst_room(int y1, int x1, int y2, int x2,
 	{
 		for (x = x1 + 1; x < x2; x++)
 		{
+			/* Floor overwrites the dungeon */
+			if (flag & (STAR_BURST_MOAT))
+			{			
+				/* Non-room grids only for moats */
+				if (cave_info[y][x] & (CAVE_ROOM)) continue;
+
+				/* Mark grids next to rooms with terrain if required */
+				else if (!(play_info[y][x] & (PLAY_TEMP)))
+				{
+					int i;
+					
+					/* Check adjacent grids for 'rooms' */
+					for (i = 0; i < 8; i++)
+					{
+						int yy,xx;
+
+						yy = y + ddy_ddd[i];
+						xx = x + ddx_ddd[i];
+	
+						/* Ignore annoying locations */
+						if (!in_bounds_fully(yy, xx)) continue;
+
+						/* Mark with temp flag if next to room */
+						if (cave_info[yy][xx] & (CAVE_ROOM))
+						{
+							/* Include in starburst */
+							play_info[y][x] |= (PLAY_TEMP);
+						}
+					}
+				}
+			}
+
 			/* Marked grids only */
 			if (!(play_info[y][x] & (PLAY_TEMP))) continue;
 
@@ -1656,6 +1685,13 @@ static bool generate_starburst_room(int y1, int x1, int y2, int x2,
 				/* Do not touch occupied grids. */
 				if (cave_m_idx[yy][xx] != 0) continue;
 				if (cave_o_idx[yy][xx] != 0) continue;
+
+				/* Floor overwrites the dungeon */
+				if (flag & (STAR_BURST_MOAT))
+				{			
+					/* Non-room grids only for moats */
+					if (cave_info[y][x] & (CAVE_ROOM)) continue;
+				}
 
 				/* Illuminate if requested. */
 				if (flag & (STAR_BURST_LIGHT))
@@ -2230,7 +2266,7 @@ static bool find_space(int *y, int *x, int height, int width)
 	for (i = 0; i < 25; i++)
 	{
 		filled = FALSE;
-
+		
 		/* Pick a top left block at random */
 		block_y = rand_int(dun->row_rooms - blocks_high);
 		block_x = rand_int(dun->col_rooms - blocks_wide);
@@ -3105,16 +3141,6 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	/* Exclude light or dark */
 	if (light) exclude |= RG1_DARK;
 	else exclude |= RG1_LITE;
-	
-	/*
-	 * Get filling if required.
-	 * This has to happen before getting the room info to set the level flags correctly.
-	 */
-	if (type == ROOM_HUGE_FILL)
-	{
-			/* Pick a feature */
-			floor = pick_proper_feature(cave_feat_pool);
-	}
 
 	/* Generate new room (a) */
 	generate_room(y1a, x1a, y2a, x2a, light);
@@ -4109,20 +4135,6 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, b
 
 	/* Paranoia */
 	if (type >= MAX_FRACTAL_TYPES) return (FALSE);
-
-	/*
-	 * Get filling if required.
-	 * This has to happen before set_irregular_room_info to set the level flags correctly.
-	 */
-	if (chart == ROOM_FILL_FRACTAL)
-	{
-			/* Pick a feature */
-			feat = pick_proper_feature(cave_feat_pool);
-			edge = f_info[feat].edge;
-
-			/* Get an island */
-			inner = pick_proper_feature(cave_feat_island);
-	}
 	
 	/* Set irregular room info */
 	set_irregular_room_info(room, chart, light, &feat, &edge, &inner, &alloc, &pool, &n_pools);
@@ -4139,7 +4151,7 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, b
 	/* Clear remaining pools */
 	for (i = n_pools; i < 3; i++)
 	{
-		pool[i] = FEAT_NONE;
+		pool[i] = feat;
 	}
 
 	/* Reset the loop counter */
@@ -4323,22 +4335,7 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 	int n_pools = 0;
 
 	/* Default flags, classic rooms */
-	u32b flag = (STAR_BURST_ROOM | STAR_BURST_RAW_FLOOR |
-		STAR_BURST_RAW_EDGE);
-
-	/*
-	 * Get filling if required.
-	 * This has to happen before set_irregular_room_info to set the level flags correctly.
-	 */
-	if (type == ROOM_FILL_STAR_BURST)
-	{
-			/* Pick a feature */
-			feat = pick_proper_feature(cave_feat_pool);
-			edge = f_info[feat].edge;
-			
-			/* Get an island */
-			inner = pick_proper_feature(cave_feat_island);
-	}
+	u32b flag = (STAR_BURST_RAW_FLOOR |	STAR_BURST_RAW_EDGE);
 
 	/* Set irregular room info */
 	set_irregular_room_info(room, type, light, &feat, &edge, &inner, &alloc, &pool, &n_pools);
@@ -4348,6 +4345,9 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 
 	/* Occasional light */
 	if (light) flag |= (STAR_BURST_LIGHT);
+	
+	/* Mark as room */
+	if (room) flag |= (STAR_BURST_ROOM);
 
 	/* Case 1. Plain starburst room */
 	if ((rand_int(100) < 75) && !(inner))
@@ -4462,6 +4462,7 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 	/* Hack -- place feature at centre */
 	if (alloc) cave_set_feat(y0, x0, alloc);
 }
+
 
 
 
@@ -5223,6 +5224,487 @@ static void build_roof(int y0, int x0, int ymax, int xmax, cptr data)
 }
 
 
+/*#define ENABLE_WAVES 1 */
+
+#ifdef ENABLE_WAVES
+
+/*
+ * Pick a point from the border of a rectangle given its top left corner (p1)
+ * and its bottom right corner (p2).
+ * Assumes (p1.x < p2.x) and (p1.y < p2.y)
+ * Returns the selected point in "result".
+ */
+static void pick_point_from_border(coord p1, coord p2, coord *result)
+{
+	/* Pick a side of the rectangle */
+	switch (rand_int(4))
+	{
+		/* Top border */
+		case 0:
+		{
+			/* Fixed coordinate */
+			result->y = p1.y;
+			result->x = rand_range(p1.x, p2.x);
+			break;
+		}
+		/* Bottom border */
+		case 1:
+		{
+			/* Fixed coordinate */
+			result->y = p2.y;
+			result->x = rand_range(p1.x, p2.x);
+			break;
+		}
+		/* Left border */
+		case 2:
+		{
+			/* Fixed coordinate */
+			result->x = p1.x;
+			result->y = rand_range(p1.y, p2.y);
+			break;
+		}
+		/* Right border */
+		case 3:
+		{
+			/* Fixed coordinate */
+			result->x = p2.x;
+			result->y = rand_range(p1.y, p2.y);
+			break;
+		}
+	}
+}
+
+
+
+/*
+ * Construct a chain of waves for a water lake, given the coordinates of the
+ * rectangle who contains the lake.
+ */
+static void build_waves(int y1, int x1, int y2, int x2)
+{
+	coord p1, p2;
+	coord start, end;
+	int dx, dy;
+	int wid, hgt;
+
+	int tries = 0;
+
+	/* Fill in the point structures */
+	p1.x = x1;
+	p1.y = y1;
+
+	p2.x = x2;
+	p2.y = y2;
+
+	/* Paranoia */
+	if (!in_bounds_fully(y1, x1) || !in_bounds_fully(y2, x2)) return;
+
+	/* Get the size of the lake */
+	hgt = y2 - y1 + 1;
+	wid = x2 - x1 + 1;
+
+	/* We don't like small lakes */
+	if ((hgt < 15) || (wid < 15)) return;
+
+	/* Pick a pair of points from the border of the rectangle */
+	while (TRUE)
+	{
+		int chain_wid, chain_hgt;
+
+		/* Paranoia */
+		if (++tries > 2500) return;
+
+		/* Pick the points */
+		pick_point_from_border(p1, p2, &start);
+		pick_point_from_border(p1, p2, &end);
+
+		/* These points define a rectangle. Get its size */
+		chain_hgt = (int)start.y - (int)end.y;
+		chain_hgt = ABS(chain_hgt) + 1;
+
+		chain_wid = (int)start.x - (int)end.x;
+		chain_wid = ABS(chain_wid) + 1;
+
+		/* This new rectangle must be noticeable */
+		if ((chain_hgt >= (2 * hgt / 3)) &&
+			(chain_wid >= (2 * wid / 3))) break;
+	}
+
+	/* Reset the loop count */
+	tries = 0;
+
+	/* Join the points using waves (similar to build_tunnel) */
+	while ((start.x != end.x) || (start.y != end.y))
+	{
+		int x, y, i, wave;
+
+		/* Paranoia */
+		if (++tries > 2500) return;
+
+		/* Get the current coordinate of the chain */
+		y = start.y;
+		x = start.x;
+
+		/* Get the next coordinate */
+		correct_dir(&dy, &dx, start.y, start.x, end.y, end.x);
+
+		/* Get the next coordinate of the chain (for later) */
+		start.y += dy;
+		start.x += dx;
+
+		/* Paranoia */
+		if (!in_bounds_fully(y, x)) break;
+
+		/* Ignore non-water */
+		if ((f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) == 0) continue;
+
+		/* Pick the proper "crest" feature */
+		if ((f_info[cave_feat[y][x]].flags2 & (FF2_DEEP)) == 0)
+		{
+			wave = FEAT_CREST_H;
+		}
+		else
+		{
+			wave = FEAT_CREST;
+		}
+
+		/* A chain of waves is built using "crest of waves" */
+		cave_set_feat(y, x, wave);
+
+		/* Sometimes, surround the crest with "plain" waves */
+		if (rand_int(100) < 50)	continue;
+
+		/* Place the surrounding waves (similar to build_streamer) */
+		for (i = 0; i < 2; i++)
+		{
+			/* Pick a nearby location (very close) */
+			int yy = rand_spread(y, 1);
+			int xx = rand_spread(x, 1);
+
+			/* Ignore annoying locations */
+			if (!in_bounds_fully(yy, xx)) continue;
+
+			/* Ignore non-water */
+			if(!cave_ff3_match(yy, xx, FF3_WATER)) continue;
+
+			/* Pick the proper "wave" feature */
+			if (cave_ff2_match(yy, xx, FF2_DEEP))
+			{
+				wave = FEAT_WAVE_H;
+			}
+			else
+			{
+				wave = FEAT_WAVE;
+			}
+
+			/* Place the wave */
+			cave_set_feat(yy, xx, wave);
+		}
+	}
+}
+
+#endif /* ENABLE_WAVES */
+
+
+/*
+ * Room type information
+ */
+
+typedef struct lake_size lake_size;
+
+struct lake_size
+{
+	/* Required size in blocks */
+	s16b dy1, dy2, dx1, dx2;
+
+	/* Hack -- minimum level */
+	s16b level;
+};
+
+
+/* Available size for lakes (in blocks) */
+enum
+{
+	LAKE_DATA_2x2,
+	LAKE_DATA_2x3,
+	LAKE_DATA_3x3,
+	LAKE_DATA_3x4,
+	LAKE_DATA_4x4,
+	LAKE_DATA_4x5,
+	MAX_LAKE_DATA
+};
+
+/* Block information for lakes (sorted by size, smaller first) */
+static const lake_size lake_data[MAX_LAKE_DATA] =
+{
+	{0, 1, 0, 1, 1},		/* LAKE_DATA_2x2 */
+	{0, 1, -1, 1, 1},		/* LAKE_DATA_2x3 */
+	{-1, 1, -1, 1, 1},		/* LAKE_DATA_3x3 */
+	{-1, 1, -1, 2, 1},		/* LAKE_DATA_3x4 */
+	{-1, 2, -1, 2, 1},		/* LAKE_DATA_4x4 */
+	{-1, 2, -2, 2, 1},		/* LAKE_DATA_4x5 */
+};
+
+/*
+ * Build a lake using the given feature.
+ * Returns TRUE on success.
+ * The coordinates of its center are stored in y0 and x0.
+ */
+static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
+	int *y0, int *x0)
+{
+	int bx0, by0;
+	int bx1, by1, bx2, by2;
+	int wid, hgt;
+	int tries = 0;
+	int lake_idx;
+	const lake_size *ld;
+	/* Starburst flags */
+	u32b flag = 0;
+	/*
+	 * Notice special cases: these are replaced with passable features
+	 * sometimes (build_terrain)
+	 */
+	bool solid_lake = ((f_info[feat].flags1 & (FF1_WALL)) != 0);
+
+	/* Solid lakes are made very large sometimes */
+	if (solid_lake && !rand_int(3)) do_big_lake = TRUE;
+
+	/* Choose an initial size for the lake */
+	if (do_big_lake)
+	{
+		if (!rand_int(10)) lake_idx = LAKE_DATA_4x5;
+		else if (!rand_int(5)) lake_idx = LAKE_DATA_4x4;
+		else lake_idx = LAKE_DATA_3x4;
+	}
+	else
+	{
+		/*
+		 * Lakes at shallow levels are smaller, and some at deeper
+		 * levels too
+		 */
+		if ((p_ptr->depth >= 25) && !rand_int(7))
+		{
+			lake_idx = LAKE_DATA_3x4;
+		}
+		else
+		{
+			lake_idx = LAKE_DATA_2x3;
+		}
+	}
+
+	/* Adjust the size of the lake, if needed */
+	while (TRUE)
+	{
+		/* Get block information for this kind of lake */
+		ld = &lake_data[lake_idx];
+
+		/* Get the size of the lake in blocks */
+		hgt = ld->dy2 - ld->dy1 + 1;
+		wid = ld->dx2 - ld->dx1 + 1;
+
+		/* Can be placed in this dungeon? */
+		if ((hgt <= dun->row_rooms) && (wid <= dun->col_rooms)) break;
+
+		/* Try again with a smaller lake */
+		--lake_idx;
+
+		/* Level too small, give up */
+		if (lake_idx < 0) return (FALSE);
+	}
+
+	/* Try to get a location for the lake */
+	while (TRUE)
+	{
+		/* Too many tries. Reject lake */
+		if (++tries >= 75) return (FALSE);
+
+		/* Pick a random block */
+		if (!merge_lakes || solid_lake)
+		{
+			by0 = rand_int(dun->row_rooms);
+			bx0 = rand_int(dun->col_rooms);
+		}
+		/* Force lake overlapping */
+		else
+		{
+			/* Put the lakes in the middle of the level */
+			by0 = (dun->row_rooms / 2);
+
+			/* Slightly move the lake horizontally */
+			/* Big lakes (-1, +0 or +1 blocks) */
+			if (lake_idx > LAKE_DATA_2x3)
+			{
+				bx0 = (dun->col_rooms / 2) + (rand_int(3) - 1);
+			}
+			/* Small lakes (+0 or +1 blocks) */
+			else
+			{
+				bx0 = (dun->col_rooms / 2) + rand_int(2);
+			}
+		}
+
+		/* Get the blocks */
+		by1 = by0 + ld->dy1;
+		by2 = by0 + ld->dy2;
+		bx1 = bx0 + ld->dx1;
+		bx2 = bx0 + ld->dx2;
+
+		/* Ignore blocks outside the dungeon */
+		if ((by1 < 0) || (by2 >= dun->row_rooms)) continue;
+		if ((bx1 < 0) || (bx2 >= dun->col_rooms)) continue;
+
+		/* Found a suitable location */
+		break;
+	}
+
+	/* Get total height and width of the available space */
+	hgt *= BLOCK_HGT;
+	wid *= BLOCK_WID;
+
+	/* Get the center of the lake */
+	*y0 = by1 * BLOCK_HGT + hgt / 2;
+	*x0 = bx1 * BLOCK_WID + wid / 2;
+
+	/* Store extra information for passable lakes */
+	if (!solid_lake)
+	{
+		/* Forests are always lit. Others not so much */
+		if (((f_info[feat].flags3 & (FF3_LIVING)) != 0) || 
+			(p_ptr->depth <= randint(25)))
+		{
+			flag |= (STAR_BURST_LIGHT);
+		}
+	}
+
+	/*
+	 * Convenience. Get the distance from the center to the borders.
+	 * Note that we substract some space to place tunnels later and to
+	 * avoid dungeon permanent boundry
+	 */
+	hgt = (hgt - 4) / 2;
+	wid = (wid - 4) / 2;
+
+	/* Place the lake */
+	generate_starburst_room(*y0 - hgt, *x0 - wid, *y0 + hgt, *x0 + wid,
+		feat, f_info[feat].edge, flag);
+
+#ifdef ENABLE_WAVES
+	/* Special case -- Give some flavor to water lakes */
+	if ((feat == FEAT_WATER) || (feat == FEAT_WATER_H))
+	{
+		int i;
+
+		for (i = 0; i < (do_big_lake ? 2: 1); i++)
+		{
+			build_waves(*y0 - hgt, *x0 - wid, *y0 + hgt, *x0 + wid);
+		}
+	}
+#endif /* ENABLE_WAVES */
+
+	/* Success */
+	return (TRUE);
+}
+
+
+/*
+ * Build a river given a feature and its starting location
+ */
+static void build_river(int feat, int y, int x)
+{
+	/*
+	 * This map contains the directions of the grids who must be converted
+	 * to edge, given a compass direction [0-3]
+	 */
+	static byte edge_map[][3] =
+	{
+		{1, 2, 3},
+		{7, 8, 9},
+		{3, 6, 9},
+		{1, 4, 7}
+	};
+
+	int i, dir, old_dir;
+	int old_feat;
+	int edge = f_info[feat].edge;
+	/*
+	 * Notice special cases: they are replaced by passable features
+	 * sometimes (build_terrain)
+	 */
+	bool solid_river = ((f_info[feat].flags1 & (FF1_WALL)) != 0);
+
+	/* Choose a random compass direction */
+	dir = old_dir = rand_int(4);
+
+	/* Place river into dungeon */
+	while (TRUE)
+	{
+		/* Stop at dungeon edge */
+		if (!in_bounds_fully(y, x)) break;
+
+		/* Get the previous content of the grid */
+		old_feat = cave_feat[y][x];
+
+		/* Stop at permanent feature */
+		if ((f_info[old_feat].flags1 & (FF1_PERMANENT)) != 0) break;
+
+		/* Most rivers aren't pierced by rooms. */
+		if (!solid_river)
+		{
+			/* Forbid rooms here */
+			int by = y / BLOCK_HGT;
+			int bx = x / BLOCK_WID;
+
+			dun->room_map[by][bx] = TRUE;
+		}
+
+		/* Place a piece of the river, if needed */
+		if (feat != old_feat) build_terrain(y, x, feat);
+
+		/* Place river edge, if needed */
+		if (edge != FEAT_NONE)
+		{
+			for (i = 0; i < 3; i++)
+			{
+				/* Use the map to modify only grids ahead */
+				int yy = y + ddy[edge_map[dir][i]];
+				int xx = x + ddx[edge_map[dir][i]];
+
+				/* Ignore annoying locations */
+				if (!in_bounds_fully(yy, xx)) continue;
+
+				/* Get the previous content of the grid */
+				old_feat = cave_feat[yy][xx];
+
+				/* Avoid permanent features */
+				if ((f_info[old_feat].flags1 & (FF1_PERMANENT)) != 0) continue;
+
+				/* IMPORTANT: Don't overwrite the river */
+				if (old_feat == feat) continue;
+
+				/* Place river edge, if needed */
+				if (edge != old_feat) build_terrain(yy, xx, edge);
+			}
+		}
+
+		/* Stagger the river */
+		if (!rand_int(2))
+		{
+			dir = rand_int(4);
+		}
+		/* Advance the streamer using the original direction */
+		else
+		{
+			dir = old_dir;
+		}
+
+		/* Get the next coordinates */
+		y += ddy_ddd[dir];
+		x += ddx_ddd[dir];
+	}
+}
+
+
 
 /*
  * Always picks a correct direction
@@ -5376,7 +5858,7 @@ static u32b get_tunnel_style(void)
 	}
 	/* Sewer levels have width 2 corridors, or width 3 corridors, often with pillars */
 	/* The centre of the corridor is filled with pool type terrain, and the corridor style
-	   changes regularly. */
+	   is fixed for each corridor. */
 	else if (level_flag & (LF1_SEWER))
 	{
 		if (i < 50) style |= (TUNNEL_LARGE_L);
@@ -5463,7 +5945,6 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	int main_loop_count = 0;
 	int last_turn = 0, first_door, last_door, first_tunn, first_next, first_stair;
 	int start_tunnel = 0;
-	int feat = 0;
 
 	bool door_flag = FALSE;
 	bool overrun_flag = FALSE;
@@ -5488,8 +5969,8 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	/* Partition to mark array with */
 	int part1 = CENT_MAX;
 
-	/* Keep stronghold corridors tidy */
-	if ((level_flag & (LF1_STRONGHOLD | LF1_DUNGEON)) != 0) tunnel_style_timer = -1;
+	/* Keep stronghold / dungeon / sewer corridors tidy */
+	if ((level_flag & (LF1_STRONGHOLD | LF1_DUNGEON | LF1_SEWER)) != 0) tunnel_style_timer = -1;
 
 	/* Readjust movement counter for caves */
 	if ((style & TUNNEL_CAVE) != 0) rand_dir_timer = randint(DUN_TUN_CAV * 2);
@@ -5857,8 +6338,8 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 						if (dun->part[i] == part2) dun->part[i] = part1;
 					}
 
-					/* Rewrite tunnel to room if we end up on a non-floor */
-					if (cave_feat[tmp_row][tmp_col] != FEAT_FLOOR)
+					/* Rewrite tunnel to room if we end up on a non-floor, or we are a sewer level */
+					if ((cave_feat[tmp_row][tmp_col] != FEAT_FLOOR) || (level_flag & (LF1_SEWER)))
 					{
 						/* Hack -- overwrite half of tunnel */
 						if (start_tunnel)
@@ -5887,8 +6368,9 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				row1 = tmp_row;
 				col1 = tmp_col;
 
-				/* Set tunnel feature if feature is not a floor */
-				if ((cave_feat[tmp_row][tmp_col] != FEAT_FLOOR) && (dun_room[by1][bx1] < DUN_ROOMS))
+				/* Set tunnel feature if feature is not a floor, or it is a sewers level */
+				if (((cave_feat[tmp_row][tmp_col] != FEAT_FLOOR) || (level_flag & (LF1_SEWER)))
+					&& (dun_room[by1][bx1] < DUN_ROOMS))
 				{
 					start_tunnel = room_info[dun_room[by1][bx1]].tunnel;
 				}
@@ -6216,15 +6698,6 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		{
 			/* Clear previous contents, write terrain */
 			cave_set_feat(y, x, dun->tunn_feat[i]);
-		}
-		/* Put a feature in sewer tunnels */
-		else if ((dun->tunn_feat[i] == 1) && (level_flag & (LF1_SEWER)))
-		{
-			/* Pick a feature if none selected */
-			if (!feat) feat = pick_proper_feature(cave_feat_pool);
-			
-			/* Clear previous contents, write terrain */
-			if (feat) cave_set_feat(y, x, feat);
 		}
 		/* Apply bridge */
 		else if (f_info[cave_feat[y][x]].flags2 & (FF2_BRIDGE))
@@ -6759,7 +7232,7 @@ static bool build_type131415(int room, int type)
 
 	switch (type)
 	{
-		case ROOM_FILL_FRACTAL: case ROOM_HUGE_FRACTAL: fractal_type = FRACTAL_TYPE_33x65; height = 33; width = 65; break;
+		case ROOM_HUGE_FRACTAL: fractal_type = FRACTAL_TYPE_33x65; height = 33; width = 65; break;
 		case ROOM_LARGE_FRACTAL: fractal_type = FRACTAL_TYPE_33x33; height = 33; width = 33; break;
 		default: fractal_type = FRACTAL_TYPE_17x33; height = 17; width = 33; break;
 	}
@@ -6774,6 +7247,75 @@ static bool build_type131415(int room, int type)
 }
 
 
+
+/*
+ * Type 16. Lair.
+ */
+static bool build_type16(int room, int type)
+{
+	int y0, x0, height, width;
+	int y1, x1, y2, x2;
+	int size_mod = 0;
+
+	int feat;
+	
+	u32b flag = (STAR_BURST_RAW_EDGE | STAR_BURST_RAW_FLOOR | STAR_BURST_MOAT | STAR_BURST_LIGHT);
+	
+	/* Deeper in the dungeon, lairs are less likely to be lit. */
+	bool light = (rand_range(25, 60) > p_ptr->depth) ? TRUE : FALSE;
+
+	/* Get a feature to surround the lair */
+	feat = pick_proper_feature(cave_feat_lake);
+
+	/* Lairs are always constant size */
+	size_mod = 2;
+
+	/* Calculate the room size. */
+	height = BLOCK_HGT * size_mod;
+	width = BLOCK_WID * (size_mod + rand_int(3));
+
+	/* Find and reserve some space in the dungeon.  Get center of room. */
+	if (!find_space(&y0, &x0, height + 2 * BLOCK_HGT, width + 2 * BLOCK_WID)) return (FALSE);
+
+	/* Calculate the borders of the room. */
+	y1 = y0 - (height / 2);
+	x1 = x0 - (width / 2);
+	y2 = y0 + (height - 1) / 2;
+	x2 = x0 + (width - 1) / 2;
+
+	/* Make certain the room does not cross the dungeon edge. */
+	if ((!in_bounds(y1, x1)) || (!in_bounds(y2, x2))) return (FALSE);
+
+	/* Build the chambers */
+	build_chambers(y1, x1, y2, x2, 30, light);
+
+	/* Grow the moat around the chambers */
+	y1 = MAX(y1 - BLOCK_HGT * 1, 1);
+	x1 = MAX(x1 - BLOCK_WID * 1, 1);
+	y2 = MIN(y2 + BLOCK_HGT * 1, DUNGEON_HGT - 2);
+	x2 = MIN(x2 + BLOCK_WID * 1, DUNGEON_WID  - 2);
+
+	/* Place the moat */
+	generate_starburst_room(y1, x1, y2, x2,
+		feat, f_info[feat].edge, flag);
+
+	/* Set the chamber flags */
+	set_room_flags(room, type, light);
+
+	/* Paranoia */
+	if (dun->cent_n < DUN_ROOMS)
+	{
+		/* Initialize room description */
+		room_info[dun->cent_n].type = ROOM_CHAMBERS;
+	}
+	
+	return (TRUE);
+}
+
+
+
+
+
 /*
  * Attempt to build a room of the given type.
  */
@@ -6786,18 +7328,16 @@ static bool room_build(int room, int type)
 	switch (type)
 	{
 		/* Build an appropriate room */
-		case ROOM_FILL_FRACTAL: if (build_type131415(room, type)) return(TRUE); break;
+		case ROOM_LAIR: if (build_type16(room, type)) return(TRUE); break;
 		case ROOM_HUGE_FRACTAL: if (build_type131415(room, type)) return(TRUE); break;
 		case ROOM_LARGE_FRACTAL: if (build_type131415(room, type)) return(TRUE); break;
 		case ROOM_FRACTAL: if (build_type131415(room, type)) return(TRUE); break;
-		case ROOM_FILL_STAR_BURST: if (build_type1112(room, type)) return(TRUE); break;
 		case ROOM_HUGE_STAR_BURST: if (build_type1112(room, type)) return(TRUE); break;
 		case ROOM_STAR_BURST: if (build_type1112(room, type)) return(TRUE); break;
 		case ROOM_GREATER_VAULT: if (build_type8910(room, type)) return(TRUE); break;
 		case ROOM_LESSER_VAULT: if (build_type8910(room, type)) return(TRUE); break;
 		case ROOM_INTERESTING: if (build_type8910(room, type)) return(TRUE); break;
 		case ROOM_CHAMBERS: if (build_type7(room, type)) return(TRUE); break;
-		case ROOM_HUGE_FILL: if (build_type6(room, type)) return (TRUE); break;
 		case ROOM_HUGE_CENTRE: if (build_type6(room, type)) return(TRUE); break;
 		case ROOM_LARGE_CENTRE: if (build_type45(room, type)) return(TRUE); break;
 		case ROOM_LARGE_WALLS: if (build_type45(room, type)) return(TRUE); break;
@@ -6813,520 +7353,6 @@ static bool room_build(int room, int type)
 }
 
 
-
-/*#define ENABLE_WAVES 1 */
-
-#ifdef ENABLE_WAVES
-
-/*
- * Pick a point from the border of a rectangle given its top left corner (p1)
- * and its bottom right corner (p2).
- * Assumes (p1.x < p2.x) and (p1.y < p2.y)
- * Returns the selected point in "result".
- */
-static void pick_point_from_border(coord p1, coord p2, coord *result)
-{
-	/* Pick a side of the rectangle */
-	switch (rand_int(4))
-	{
-		/* Top border */
-		case 0:
-		{
-			/* Fixed coordinate */
-			result->y = p1.y;
-			result->x = rand_range(p1.x, p2.x);
-			break;
-		}
-		/* Bottom border */
-		case 1:
-		{
-			/* Fixed coordinate */
-			result->y = p2.y;
-			result->x = rand_range(p1.x, p2.x);
-			break;
-		}
-		/* Left border */
-		case 2:
-		{
-			/* Fixed coordinate */
-			result->x = p1.x;
-			result->y = rand_range(p1.y, p2.y);
-			break;
-		}
-		/* Right border */
-		case 3:
-		{
-			/* Fixed coordinate */
-			result->x = p2.x;
-			result->y = rand_range(p1.y, p2.y);
-			break;
-		}
-	}
-}
-
-
-
-/*
- * Construct a chain of waves for a water lake, given the coordinates of the
- * rectangle who contains the lake.
- */
-static void build_waves(int y1, int x1, int y2, int x2)
-{
-	coord p1, p2;
-	coord start, end;
-	int dx, dy;
-	int wid, hgt;
-
-	int tries = 0;
-
-	/* Fill in the point structures */
-	p1.x = x1;
-	p1.y = y1;
-
-	p2.x = x2;
-	p2.y = y2;
-
-	/* Paranoia */
-	if (!in_bounds_fully(y1, x1) || !in_bounds_fully(y2, x2)) return;
-
-	/* Get the size of the lake */
-	hgt = y2 - y1 + 1;
-	wid = x2 - x1 + 1;
-
-	/* We don't like small lakes */
-	if ((hgt < 15) || (wid < 15)) return;
-
-	/* Pick a pair of points from the border of the rectangle */
-	while (TRUE)
-	{
-		int chain_wid, chain_hgt;
-
-		/* Paranoia */
-		if (++tries > 2500) return;
-
-		/* Pick the points */
-		pick_point_from_border(p1, p2, &start);
-		pick_point_from_border(p1, p2, &end);
-
-		/* These points define a rectangle. Get its size */
-		chain_hgt = (int)start.y - (int)end.y;
-		chain_hgt = ABS(chain_hgt) + 1;
-
-		chain_wid = (int)start.x - (int)end.x;
-		chain_wid = ABS(chain_wid) + 1;
-
-		/* This new rectangle must be noticeable */
-		if ((chain_hgt >= (2 * hgt / 3)) &&
-			(chain_wid >= (2 * wid / 3))) break;
-	}
-
-	/* Reset the loop count */
-	tries = 0;
-
-	/* Join the points using waves (similar to build_tunnel) */
-	while ((start.x != end.x) || (start.y != end.y))
-	{
-		int x, y, i, wave;
-
-		/* Paranoia */
-		if (++tries > 2500) return;
-
-		/* Get the current coordinate of the chain */
-		y = start.y;
-		x = start.x;
-
-		/* Get the next coordinate */
-		correct_dir(&dy, &dx, start.y, start.x, end.y, end.x);
-
-		/* Get the next coordinate of the chain (for later) */
-		start.y += dy;
-		start.x += dx;
-
-		/* Paranoia */
-		if (!in_bounds_fully(y, x)) break;
-
-		/* Ignore non-water */
-		if ((f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) == 0) continue;
-
-		/* Pick the proper "crest" feature */
-		if ((f_info[cave_feat[y][x]].flags2 & (FF2_DEEP)) == 0)
-		{
-			wave = FEAT_CREST_H;
-		}
-		else
-		{
-			wave = FEAT_CREST;
-		}
-
-		/* A chain of waves is built using "crest of waves" */
-		cave_set_feat(y, x, wave);
-
-		/* Sometimes, surround the crest with "plain" waves */
-		if (rand_int(100) < 50)	continue;
-
-		/* Place the surrounding waves (similar to build_streamer) */
-		for (i = 0; i < 2; i++)
-		{
-			/* Pick a nearby location (very close) */
-			int yy = rand_spread(y, 1);
-			int xx = rand_spread(x, 1);
-
-			/* Ignore annoying locations */
-			if (!in_bounds_fully(yy, xx)) continue;
-
-			/* Ignore non-water */
-			if(!cave_ff3_match(yy, xx, FF3_WATER)) continue;
-
-			/* Pick the proper "wave" feature */
-			if (cave_ff2_match(yy, xx, FF2_DEEP))
-			{
-				wave = FEAT_WAVE_H;
-			}
-			else
-			{
-				wave = FEAT_WAVE;
-			}
-
-			/* Place the wave */
-			cave_set_feat(yy, xx, wave);
-		}
-	}
-}
-
-#endif /* ENABLE_WAVES */
-
-
-/*
- * Room type information
- */
-
-typedef struct lake_size lake_size;
-
-struct lake_size
-{
-	/* Required size in blocks */
-	s16b dy1, dy2, dx1, dx2;
-
-	/* Hack -- minimum level */
-	s16b level;
-};
-
-
-/* Available size for lakes (in blocks) */
-enum
-{
-	LAKE_DATA_2x2,
-	LAKE_DATA_2x3,
-	LAKE_DATA_3x3,
-	LAKE_DATA_3x4,
-	LAKE_DATA_4x4,
-	LAKE_DATA_4x5,
-	MAX_LAKE_DATA
-};
-
-/* Block information for lakes (sorted by size, smaller first) */
-static const lake_size lake_data[MAX_LAKE_DATA] =
-{
-	{0, 1, 0, 1, 1},		/* LAKE_DATA_2x2 */
-	{0, 1, -1, 1, 1},		/* LAKE_DATA_2x3 */
-	{-1, 1, -1, 1, 1},		/* LAKE_DATA_3x3 */
-	{-1, 1, -1, 2, 1},		/* LAKE_DATA_3x4 */
-	{-1, 2, -1, 2, 1},		/* LAKE_DATA_4x4 */
-	{-1, 2, -2, 2, 1},		/* LAKE_DATA_4x5 */
-};
-
-/*
- * Build a lake using the given feature.
- * Returns TRUE on success.
- * The coordinates of its center are stored in y0 and x0.
- */
-static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
-	int *y0, int *x0)
-{
-	int bx0, by0;
-	int bx1, by1, bx2, by2;
-	int wid, hgt;
-	int tries = 0;
-	int lake_idx;
-	const lake_size *ld;
-	/* Starburst flags */
-	u32b flag = 0;
-	/*
-	 * Notice special cases: these are replaced with passable features
-	 * sometimes (build_terrain)
-	 */
-	bool solid_lake = ((f_info[feat].flags1 & (FF1_WALL)) != 0);
-
-	/* Solid lakes are made very large sometimes */
-	if (solid_lake && !rand_int(3)) do_big_lake = TRUE;
-
-	/* Choose an initial size for the lake */
-	if (do_big_lake)
-	{
-		if (!rand_int(10)) lake_idx = LAKE_DATA_4x5;
-		else if (!rand_int(5)) lake_idx = LAKE_DATA_4x4;
-		else lake_idx = LAKE_DATA_3x4;
-	}
-	else
-	{
-		/*
-		 * Lakes at shallow levels are smaller, and some at deeper
-		 * levels too
-		 */
-		if ((p_ptr->depth >= 25) && !rand_int(7))
-		{
-			lake_idx = LAKE_DATA_3x4;
-		}
-		else
-		{
-			lake_idx = LAKE_DATA_2x3;
-		}
-	}
-
-	/* Adjust the size of the lake, if needed */
-	while (TRUE)
-	{
-		/* Get block information for this kind of lake */
-		ld = &lake_data[lake_idx];
-
-		/* Get the size of the lake in blocks */
-		hgt = ld->dy2 - ld->dy1 + 1;
-		wid = ld->dx2 - ld->dx1 + 1;
-
-		/* Can be placed in this dungeon? */
-		if ((hgt <= dun->row_rooms) && (wid <= dun->col_rooms)) break;
-
-		/* Try again with a smaller lake */
-		--lake_idx;
-
-		/* Level too small, give up */
-		if (lake_idx < 0) return (FALSE);
-	}
-
-	/* Try to get a location for the lake */
-	while (TRUE)
-	{
-		/* Too many tries. Reject lake */
-		if (++tries >= 75) return (FALSE);
-
-		/* Pick a random block */
-		if (!merge_lakes || solid_lake)
-		{
-			by0 = rand_int(dun->row_rooms);
-			bx0 = rand_int(dun->col_rooms);
-		}
-		/* Force lake overlapping */
-		else
-		{
-			/* Put the lakes in the middle of the level */
-			by0 = (dun->row_rooms / 2);
-
-			/* Slightly move the lake horizontally */
-			/* Big lakes (-1, +0 or +1 blocks) */
-			if (lake_idx > LAKE_DATA_2x3)
-			{
-				bx0 = (dun->col_rooms / 2) + (rand_int(3) - 1);
-			}
-			/* Small lakes (+0 or +1 blocks) */
-			else
-			{
-				bx0 = (dun->col_rooms / 2) + rand_int(2);
-			}
-		}
-
-		/* Get the blocks */
-		by1 = by0 + ld->dy1;
-		by2 = by0 + ld->dy2;
-		bx1 = bx0 + ld->dx1;
-		bx2 = bx0 + ld->dx2;
-
-		/* Ignore blocks outside the dungeon */
-		if ((by1 < 0) || (by2 >= dun->row_rooms)) continue;
-		if ((bx1 < 0) || (bx2 >= dun->col_rooms)) continue;
-
-		/* Found a suitable location */
-		break;
-	}
-
-	/* Get total height and width of the available space */
-	hgt *= BLOCK_HGT;
-	wid *= BLOCK_WID;
-
-	/* Get the center of the lake */
-	*y0 = by1 * BLOCK_HGT + hgt / 2;
-	*x0 = bx1 * BLOCK_WID + wid / 2;
-
-	/* Store extra information for passable lakes */
-	if (!solid_lake)
-	{
-		int by, bx;
-
-		/* Forests are always lit. Others not so much */
-		if (((f_info[feat].flags3 & (FF3_LIVING)) != 0) || 
-			(p_ptr->depth <= randint(25)))
-		{
-			flag |= (STAR_BURST_LIGHT);
-		}
-
-		/* Assign lake as room. */
-		flag |= (STAR_BURST_ROOM);
-
-		/* Connect the lake with the dungeon */
-		/* Note in order to connect the dungeon correctly, we have to set up the lake as a room,
-		   even if we do not mark it as one. We however allow big lakes to have rooms inside them. */
-		if (dun->cent_n < CENT_MAX)
-		{
-			dun->cent[dun->cent_n].y = *y0;
-			dun->cent[dun->cent_n].x = *x0;
-			dun->cent_n++;
-
-			/* Paranoia */
-			if (dun->cent_n < DUN_ROOMS)
-			{
-				/* Initialise room */
-				room_info[dun->cent_n].flags = (ROOM_BRIDGE);
-				room_info[dun->cent_n].tunnel = 0;
-				room_info[dun->cent_n].solid = 0;
-			}
-		}		
-
-		for (by = by1; by <= by2; by++)
-		{
-			for (bx = bx1; bx <= bx2; bx++)
-			{
-				/* Mark the blocks as used -- unless a big lake. */
-				dun->room_map[by][bx] = TRUE;
-				dun_room[by][bx] = dun->cent_n;
-			}
-		}
-	}
-
-	/*
-	 * Convenience. Get the distance from the center to the borders.
-	 * Note that we substract some space to place tunnels later and to
-	 * avoid dungeon permanent boundry
-	 */
-	hgt = (hgt - 4) / 2;
-	wid = (wid - 4) / 2;
-
-	/* Place the lake */
-	generate_starburst_room(*y0 - hgt, *x0 - wid, *y0 + hgt, *x0 + wid,
-		feat, f_info[feat].edge, flag);
-
-#ifdef ENABLE_WAVES
-	/* Special case -- Give some flavor to water lakes */
-	if ((feat == FEAT_WATER) || (feat == FEAT_WATER_H))
-	{
-		int i;
-
-		for (i = 0; i < (do_big_lake ? 2: 1); i++)
-		{
-			build_waves(*y0 - hgt, *x0 - wid, *y0 + hgt, *x0 + wid);
-		}
-	}
-#endif /* ENABLE_WAVES */
-
-	/* Success */
-	return (TRUE);
-}
-
-
-/*
- * Build a river given a feature and its starting location
- */
-static void build_river(int feat, int y, int x)
-{
-	/*
-	 * This map contains the directions of the grids who must be converted
-	 * to edge, given a compass direction [0-3]
-	 */
-	static byte edge_map[][3] =
-	{
-		{1, 2, 3},
-		{7, 8, 9},
-		{3, 6, 9},
-		{1, 4, 7}
-	};
-
-	int i, dir, old_dir;
-	int old_feat;
-	int edge = f_info[feat].edge;
-	/*
-	 * Notice special cases: they are replaced by passable features
-	 * sometimes (build_terrain)
-	 */
-	bool solid_river = ((f_info[feat].flags1 & (FF1_WALL)) != 0);
-
-	/* Choose a random compass direction */
-	dir = old_dir = rand_int(4);
-
-	/* Place river into dungeon */
-	while (TRUE)
-	{
-		/* Stop at dungeon edge */
-		if (!in_bounds_fully(y, x)) break;
-
-		/* Get the previous content of the grid */
-		old_feat = cave_feat[y][x];
-
-		/* Stop at permanent feature */
-		if ((f_info[old_feat].flags1 & (FF1_PERMANENT)) != 0) break;
-
-		/* Most rivers aren't pierced by rooms. */
-		if (!solid_river)
-		{
-			/* Forbid rooms here */
-			int by = y / BLOCK_HGT;
-			int bx = x / BLOCK_WID;
-
-			dun->room_map[by][bx] = TRUE;
-		}
-
-		/* Place a piece of the river, if needed */
-		if (feat != old_feat) build_terrain(y, x, feat);
-
-		/* Place river edge, if needed */
-		if (edge != FEAT_NONE)
-		{
-			for (i = 0; i < 3; i++)
-			{
-				/* Use the map to modify only grids ahead */
-				int yy = y + ddy[edge_map[dir][i]];
-				int xx = x + ddx[edge_map[dir][i]];
-
-				/* Ignore annoying locations */
-				if (!in_bounds_fully(yy, xx)) continue;
-
-				/* Get the previous content of the grid */
-				old_feat = cave_feat[yy][xx];
-
-				/* Avoid permanent features */
-				if ((f_info[old_feat].flags1 & (FF1_PERMANENT)) != 0) continue;
-
-				/* IMPORTANT: Don't overwrite the river */
-				if (old_feat == feat) continue;
-
-				/* Place river edge, if needed */
-				if (edge != old_feat) build_terrain(yy, xx, edge);
-			}
-		}
-
-		/* Stagger the river */
-		if (!rand_int(2))
-		{
-			dir = rand_int(4);
-		}
-		/* Advance the streamer using the original direction */
-		else
-		{
-			dir = old_dir;
-		}
-
-		/* Get the next coordinates */
-		y += ddy_ddd[dir];
-		x += ddx_ddd[dir];
-	}
-}
 
 /*
  * Place lakes and rivers given a feature
