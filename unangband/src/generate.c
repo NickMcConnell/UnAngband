@@ -249,7 +249,7 @@ struct dun_data
 	int tunn_n;
 	coord tunn[TUNN_MAX];
 	s16b tunn_feat[TUNN_MAX];
-
+	
 	/* Array of good potential stair grids */
 	s16b stair_n;
 	coord stair[STAIR_MAX];
@@ -5283,6 +5283,7 @@ static u32b get_tunnel_style(void)
 }
 
 
+
 /*
  * Constructs a tunnel between two points
  *
@@ -5364,6 +5365,9 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	/* Not yet worried about our progress */
 	int desperation = 0;
 
+	/* Partition to mark array with */
+	int part1 = CENT_MAX;
+
 	/* Keep stronghold corridors tidy */
 	if ((level_flag & (LF1_STRONGHOLD | LF1_DUNGEON)) != 0) tunnel_style_timer = -1;
 
@@ -5388,6 +5392,12 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	first_next = dun->next_n;
 	first_stair = dun->stair_n;
 
+	/* Record initial partition number */
+	if ((dun_room[by1][bx1]) && (dun_room[by1][bx1] < DUN_ROOMS))
+	{
+		part1 = dun->part[dun_room[by1][bx1]-1];
+	}
+
 	/* Start out in the correct direction */
 	correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
 
@@ -5397,6 +5407,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		/* Mega-Hack -- Paranoia -- prevent infinite loops */
 		if (main_loop_count++ > 2000)
 		{
+			if (cheat_xtra) msg_format("Main loop count exceeded. Aborting.", part1);
 			abort_and_cleanup = TRUE;
 			break;
 		}
@@ -5404,6 +5415,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		/* Hack -- Prevent tunnel weirdness */
 		if (dun->tunn_n >= TUNN_MAX)
 		{
+			if (cheat_xtra) msg_format("Tunnel length exceeded from %d. Aborting.", part1);
+
 			abort_and_cleanup = TRUE;
 			break;
 		}
@@ -5439,6 +5452,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			}
 			else
 			{
+				if (cheat_xtra) msg_format("Tunnel stuck from %d. Aborting.", part1);
+				
 				abort_and_cleanup = TRUE;
 				break;
 			}
@@ -5700,14 +5715,14 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				&& (dun_room[by2][bx2] < DUN_ROOMS) && (dun_room[by1][bx1] != dun_room[by2][bx2]))
 			{
 				/* Different room in same partition */
-				if (dun->part[dun_room[by1][bx1]-1] == dun->part[dun_room[by2][bx2]-1])
+				if (part1 == dun->part[dun_room[by2][bx2]-1])
 				{
 					abort_and_cleanup = TRUE;
+					if (cheat_xtra) msg_format("Loop in partition %d. Aborting.", part1);
 					break;
 				}
-				else
+				else if (part1 < CENT_MAX)
 				{
-					int part1 = dun->part[dun_room[by1][bx1]-1];
 					int part2 = dun->part[dun_room[by2][bx2]-1];
 
 					/* Merging successfully */
@@ -5762,7 +5777,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 
 			}
 		}
-
+		
 		/* Bridge features */
 		else if (f_info[cave_feat[tmp_row][tmp_col]].flags2 & (FF2_BRIDGE))
 		{
@@ -5929,6 +5944,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			{
 				if ((overrun_flag) || (dun->door_n > first_door + 6))
 				{
+					if (cheat_xtra) msg_format("Overrun in doors from %d. Aborting.", part1);
+
 					abort_and_cleanup = TRUE;
 					break;
 				}
@@ -5965,7 +5982,10 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				if (tmp_col < 0) tmp_col = (-tmp_col);
 
 				/* Terminate the tunnel */
-				if ((tmp_row > 10) || (tmp_col > 10)) break;
+				if ((tmp_row > 10) || (tmp_col > 10))
+				{
+					break;
+				}
 			}
 		}
 
@@ -5997,12 +6017,13 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 				/* Different room in same partition */
 				if (dun->part[dun_room[by1][bx1]-1] == dun->part[dun_room[by2][bx2]-1])
 				{
+					if (cheat_xtra) msg_format("Loop in partition %d endpoints. Aborting.", part1);
+
 					abort_and_cleanup = TRUE;
 					break;
 				}
-				else if ((dun_room[by1][bx1]) && (dun_room[by2][bx2]))
+				else if ((part1 < CENT_MAX) && (dun_room[by2][bx2]))
 				{
-					int part1 = dun->part[dun_room[by1][bx1]-1];
 					int part2 = dun->part[dun_room[by2][bx2]-1];
 
 					/* Merging successfully */
@@ -8397,7 +8418,7 @@ static bool cave_gen(void)
 		/* Place the tower */
 		place_tower();
 	}
-
+#if 0
 	/* No features in a tower above the surface */
 	if (((level_flag & (LF1_TOWER)) == 0) || ((level_flag & (LF1_SURFACE)) != 0))
 	{
@@ -8406,7 +8427,7 @@ static bool cave_gen(void)
 
 		build_nature();
 	}
-
+#endif
 	/* Build some rooms or tunnel endpoints */
 	if ((level_flag & (LF1_ROOMS | LF1_TUNNELS)) != 0)
 	{
