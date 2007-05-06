@@ -126,6 +126,9 @@
 #define DUN_TUN_PEN     25      /* Chance of doors at room entrances */
 #define DUN_TUN_JCT     90      /* Chance of doors at tunnel junctions */
 
+#define DUN_TRIES		5		/* Number of tries to connect two rooms, before increasing 'scope' for
+									connection attempts */
+
 
 /*
  * Dungeon streamer generation values
@@ -304,7 +307,7 @@ static room_data_type room_data[ROOM_MAX] =
    /* Centre */   {{60, 100, 120, 140, 160, 180, 200, 200, 200, 200, 200},  1,DUN_ROOMS,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_DESTROYED | LF1_TOWER | LF1_WILD)},
    /* Lrg wall */ {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS,	2, 0, LF1_STRONGHOLD | LF1_DUNGEON | LF1_CRYPT},
    /* Lrg cent */ {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS,	2, 0, LF1_STRONGHOLD | LF1_DUNGEON | LF1_SEWER},
-   /* Xlg cent */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,DUN_ROOMS/2,	3, 0, LF1_STRONGHOLD | LF1_SEWER},
+   /* Xlg cent */ {{ 0,   0,   0,   0,   0,   0,   4,   4,   4,   4,   4}, 11,DUN_ROOMS/2,	3, 0, LF1_STRONGHOLD},
    /* Chambers */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	6,		3, 0, LF1_CHAMBERS},
    /* I. Room */  {{30,  60,  70,  80,  80,  75,  70,  67,  65,  62,  60},  0,  4,		1, 0, LF1_DUNGEON},
    /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	4,		2, 0, LF1_VAULT | LF1_CRYPT},
@@ -313,10 +316,10 @@ static room_data_type room_data[ROOM_MAX] =
    /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		3, 0, LF1_MINE | LF1_CAVE | LF1_LAIR | LF1_SEWER},
    /* Fractal */  {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS * 2/3,	2, 0, LF1_MINE | LF1_CAVE},
    /* Lrg fra */  {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS / 2,	3, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE},
-   /* Huge fra */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE},
+   /* Huge fra */ {{ 0,   0,   0,   0,   0,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE},
    /* Lair */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		1, 0, LF1_LAIR},
-   /* Xlg fill */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,  2,	3, 0, 		LF1_SEWER},
-   /* Fill fra */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE},   
+   /* Xlg fill */ {{ 0,   0,   0,   0,   0,   12, 12,  12,  12,  12,  12}, 11,  2,	3, 0, 		LF1_SEWER},
+   /* Fill fra */ {{ 0,   0,   0,   4,   4,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE},   
    /* Fill star */{{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		3, 0, LF1_CAVE | LF1_SEWER}
 };
 
@@ -1724,7 +1727,7 @@ static bool room_info_feat(int f_idx)
 /*
  * Generate helper -- draw a rectangle with a feature using a series of 'pattern' flags.
  */
-static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, int dy, int dx)
+static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, u32b exclude, int dy, int dx)
 {
 	int y, x, i, k;
 
@@ -1820,10 +1823,10 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 	else if (((flag & (RG1_STARBURST)) != 0) && ((flag & (RG1_ALLOC)) == 0))
 	{
 		/* Ensure the correct ordering of directions */
-		if ((dy > 0) && (dx > 0)) generate_starburst_room(y1, x1, y2, x2, feat, edge, STAR_BURST_ROOM | (((flag & (RG1_LITE)) != 0) ? STAR_BURST_LIGHT : 0L));
-		else if ((dy < 0) && (dx > 0)) generate_starburst_room(y2, x1, y1, x2, feat, edge, STAR_BURST_ROOM | (((flag & (RG1_LITE)) != 0) ? STAR_BURST_LIGHT : 0L));
-		else if ((dy > 0) && (dx < 0)) generate_starburst_room(y1, x2, y2, x1, feat, edge, STAR_BURST_ROOM | (((flag & (RG1_LITE)) != 0) ? STAR_BURST_LIGHT : 0L));
-		else if ((dy < 0) && (dx < 0)) generate_starburst_room(y2, x2, y1, x1, feat, edge, STAR_BURST_ROOM | (((flag & (RG1_LITE)) != 0) ? STAR_BURST_LIGHT : 0L));
+		if ((dy > 0) && (dx > 0)) generate_starburst_room(y1, x1, y2, x2, feat, edge, STAR_BURST_ROOM | (((exclude & (RG1_DARK)) != 0) ? STAR_BURST_LIGHT : 0L));
+		else if ((dy < 0) && (dx > 0)) generate_starburst_room(y2, x1, y1, x2, feat, edge, STAR_BURST_ROOM | (((exclude & (RG1_DARK)) != 0) ? STAR_BURST_LIGHT : 0L));
+		else if ((dy > 0) && (dx < 0)) generate_starburst_room(y1, x2, y2, x1, feat, edge, STAR_BURST_ROOM | (((exclude & (RG1_DARK)) != 0) ? STAR_BURST_LIGHT : 0L));
+		else if ((dy < 0) && (dx < 0)) generate_starburst_room(y2, x2, y1, x1, feat, edge, STAR_BURST_ROOM | (((exclude & (RG1_DARK)) != 0) ? STAR_BURST_LIGHT : 0L));
 
 		/* Hack -- scatter items around the starburst */
 		flag |= (RG1_SCATTER);
@@ -2851,11 +2854,12 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
  * We do this for interesting rooms, vaults and anywhere else that we do not
  * explicitly generate room contents.
  */
-static void set_room_flags(int room, int type)
+static void set_room_flags(int room, int type, bool light)
 {
 	int j = 0;
 
 	u32b place_flag = 0L;
+	u32b exclude = 0L;
 
 	byte place_tval = 0;
 	byte place_min_sval = 0;
@@ -2867,8 +2871,12 @@ static void set_room_flags(int room, int type)
 	byte branch = 0;
 	byte branch_on = 0;
 
+	/* Exclude light or dark */
+	if (light) exclude |= RG1_DARK;
+	else exclude |= RG1_LITE;
+
 	/* Get room info */
-	while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name, 0L))
+	while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name, exclude))
 	{
 		/* Clear object hook */
 		if (place_tval)
@@ -2946,7 +2954,7 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 				((f_info[place_feat].flags2 & (FF2_LAKE | FF2_RIVER)) == 0))
 			{
 				/* Hack -- allow irregular edges */
-				if (!(place_flag & (RG1_CENTRE)))
+				if ((place_flag & (RG1_CENTRE)) == 0)
 				{
 					/* Overwrite 'solid' terrain */
 					room_info[room].solid = place_feat;
@@ -3076,6 +3084,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	int floor = FEAT_FLOOR;
 
 	u32b place_flag = 0L;
+	u32b exclude = 0L;
 
 	byte place_tval = 0;
 	byte place_min_sval = 0;
@@ -3093,7 +3102,10 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	if ((!in_bounds_fully(y1a, x1a)) || (!in_bounds_fully(y1b, x1b))
 		 || (!in_bounds_fully(y2a, x2a)) || (!in_bounds_fully(y2b, x2b))) return (FALSE);
 
-
+	/* Exclude light or dark */
+	if (light) exclude |= RG1_DARK;
+	else exclude |= RG1_LITE;
+	
 	/*
 	 * Get filling if required.
 	 * This has to happen before getting the room info to set the level flags correctly.
@@ -3133,7 +3145,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	generate_fill_pillars(y1b+1, x1b+1, y2b-1, x2b-1, floor, pillars ? spacing + 1: 0);
 
 	/* Get room info */
-	while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name, 0L))
+	while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name, exclude))
 	{
 		if (limit++ > 1000)
 		{
@@ -3168,7 +3180,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 					place_flag_temp |= (RG1_INNER);
 				}
 
-				generate_patt(y1c, x1c, y2c, x2c, place_feat, place_flag_temp, dy, dx);
+				generate_patt(y1c, x1c, y2c, x2c, place_feat, place_flag_temp, exclude, dy, dx);
 			}
 
 			/* Place in west of room */
@@ -3181,7 +3193,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 
 				/* Ensure some space */
 				if (x2w <= x2w) x2w = x1w + 1;
-				generate_patt(y1w, x1w, y2w, x2w, place_feat, place_flag, dy, dx);
+				generate_patt(y1w, x1w, y2w, x2w, place_feat, place_flag, exclude, dy, dx);
 			}
 
 			/* Place in east of room */
@@ -3196,7 +3208,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 				if (x1e >= x2e) x1e = x2e - 1;
 
 					/* Draw from east to west */
-					generate_patt(y1e, x2e, y2e, x1e, place_feat, place_flag, dy, -dx);
+					generate_patt(y1e, x2e, y2e, x1e, place_feat, place_flag, exclude, dy, -dx);
 			}
 
 			/* Place in north of room */
@@ -3210,7 +3222,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 				/* Ensure some space */
 				if (y2n <= y1n) y2n = y1n + 1;
 
-				generate_patt(y1n, x1n, y2n, x2n, place_feat, place_flag, dy, dx);
+				generate_patt(y1n, x1n, y2n, x2n, place_feat, place_flag, exclude, dy, dx);
 			}
 
 			/* Place in south of room */
@@ -3225,7 +3237,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 				if (y1s >= y2s) y1s = y2s - 1;
 
 				/* Draw from south to north */
-				generate_patt(y2s, x1s, y1s, x2s, place_feat, place_flag, -dy, dx);
+				generate_patt(y2s, x1s, y1s, x2s, place_feat, place_flag, exclude, -dy, dx);
 			}
 		}
 
@@ -4118,8 +4130,9 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, b
 	/* Hack - try to find a place for 'inner' room */
 	if (inner)
 	{
-		if (n_pools < 3) pool[n_pools++] = inner;
-		else if (!alloc) alloc = inner;
+		if (!alloc) alloc = inner;
+		else if (!room_info[room].solid) room_info[room].solid = inner; 
+		else if (n_pools < 3) pool[n_pools++] = inner;
 		else if (!edge) edge = inner;
 	}
 
@@ -5441,7 +5454,7 @@ static u32b get_tunnel_style(void)
  * However, we use the decorations of the room at the other end of the tunnel
  * unless that room has no decorations, in which case we use our own.
  */
-static void build_tunnel(int row1, int col1, int row2, int col2)
+static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_overrun)
 {
 	int i, j, y, x;
 	int tmp_row = row1, tmp_col = col1;
@@ -5450,6 +5463,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 	int main_loop_count = 0;
 	int last_turn = 0, first_door, last_door, first_tunn, first_next, first_stair;
 	int start_tunnel = 0;
+	int feat = 0;
 
 	bool door_flag = FALSE;
 	bool overrun_flag = FALSE;
@@ -6049,7 +6063,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			col1 = tmp_col;
 
 			/* Prevent us following corridor length */
-			if (door_flag)
+			if ((door_flag) && !(allow_overrun))
 			{
 				if ((overrun_flag) || (dun->door_n > first_door + 6))
 				{
@@ -6186,15 +6200,13 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			cave_set_feat(y, x, dun->solid_feat[i]);
 		}
 
-		return;
+		return FALSE;
 	}
 
 
 	/* Turn the tunnel into corridor */
 	for (i = 0; i < dun->tunn_n; i++)
 	{
-		int feat = 0;
-
 		/* Get the grid */
 		y = dun->tunn[i].y;
 		x = dun->tunn[i].x;
@@ -6212,7 +6224,7 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			if (!feat) feat = pick_proper_feature(cave_feat_pool);
 			
 			/* Clear previous contents, write terrain */
-			if (feat) cave_set_feat(y, x, dun->tunn_feat[i]);
+			if (feat) cave_set_feat(y, x, feat);
 		}
 		/* Apply bridge */
 		else if (f_info[cave_feat[y][x]].flags2 & (FF2_BRIDGE))
@@ -6258,6 +6270,8 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 			i++;
 		}
 	}
+	
+	return TRUE;
 }
 
 
@@ -6626,7 +6640,7 @@ static bool build_type7(int room, int type)
 	build_chambers(y1, x1, y2, x2, 30, light);
 
 	/* Set the chamber flags */
-	set_room_flags(room, type);
+	set_room_flags(room, type, light);
 
 	/* Paranoia */
 	if (dun->cent_n < DUN_ROOMS)
@@ -6674,7 +6688,7 @@ static bool build_type8910(int room, int type)
 	build_vault(y0, x0, v_ptr->hgt, v_ptr->wid, v_text + v_ptr->text);
 
 	/* Set the vault / interesting room flags */
-	set_room_flags(room, type);
+	set_room_flags(room, type, FALSE);
 
 	/* Paranoia */
 	if (dun->cent_n < DUN_ROOMS)
@@ -8111,6 +8125,7 @@ static bool place_tunnels()
 	int i, j, k, y, x, y1, x1;
 
 	int counter = 0;
+	int retries = 0;
 
 	/* Start with no tunnel doors */
 	dun->door_n = 0;
@@ -8160,6 +8175,8 @@ static bool place_tunnels()
 
 			return(FALSE);
 		}
+		
+		retries++;
 
 		/* Check each partition */
 		for (i = 0; i < dun->cent_n; i++)
@@ -8189,7 +8206,7 @@ static bool place_tunnels()
 					if (dun->part[k] == i) continue;										
 
 					/* Trying a random choice */
-					if (counter > 2 * DUN_ROOMS)
+					if (retries > 2 * DUN_TRIES)
 					{
 						dist1 = distance(dun->cent[r1].y, dun->cent[r1].x, dun->cent[k].y, dun->cent[k].x);
 					}
@@ -8202,7 +8219,7 @@ static bool place_tunnels()
 					if (dist1 < dist)
 					{
 						dist = dist1;
-						if (counter > 2 * DUN_ROOMS) c1 = r1; else c1 = j;
+						if (retries > 2 * DUN_TRIES) c1 = r1; else c1 = j;
 						c2 = k;
 					}
 
@@ -8211,17 +8228,15 @@ static bool place_tunnels()
 				}
 			}
 			/* Use the choice */
-			if ((c1 >= 0) && (c2 >= 0) && ((counter < 4 * DUN_ROOMS) || (rand_int(counter) < 50)))
+			if ((c1 >= 0) && (c2 >= 0) && (retries < 3 * DUN_TRIES) && (rand_int(4 * DUN_TRIES) > retries))
 			{
-				build_tunnel(dun->cent[c1].y, dun->cent[c1].x, dun->cent[c2].y, dun->cent[c2].x);
+				if (build_tunnel(dun->cent[c1].y, dun->cent[c1].x, dun->cent[c2].y, dun->cent[c2].x, retries > DUN_TRIES)) retries = 0;
 			}
 			/* Try a random choice */
 			else if ((r1 >= 0) && (r2 >= 0))
 			{
-				build_tunnel(dun->cent[r1].y, dun->cent[r1].x, dun->cent[r2].y, dun->cent[r2].x);
+				if (build_tunnel(dun->cent[r1].y, dun->cent[r1].x, dun->cent[r2].y, dun->cent[r2].x, TRUE)) retries = 0;
 			}
-
-
 		}
 		/* Check if we have finished. All partition numbers will be the same. */
 		for (i = 1; i < dun->cent_n; i++)
