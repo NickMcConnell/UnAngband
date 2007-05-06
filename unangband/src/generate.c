@@ -185,7 +185,7 @@
 /*
  * Maximal number of room types
  */
-#define ROOM_MAX	17
+#define ROOM_MAX	20
 #define ROOM_MIN	2
 
 
@@ -314,14 +314,18 @@ static room_data_type room_data[ROOM_MAX] =
    /* Fractal */  {{ 0,  30,  60,  80,  90,  95, 100, 100, 100, 100, 100},  3,DUN_ROOMS * 2/3,	2, 0, LF1_MINE | LF1_CAVE},
    /* Lrg fra */  {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS / 2,	3, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE},
    /* Huge fra */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE},
-   /* Lair */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		1, 0, LF1_LAIR}
+   /* Lair */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		1, 0, LF1_LAIR},
+   /* Xlg fill */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,  2,	3, 0, 		LF1_SEWER},
+   /* Fill fra */ {{ 0,   4,   4,   4,   4,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE},   
+   /* Fill star */{{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		3, 0, LF1_CAVE | LF1_SEWER}
 };
 
 
 
 /* Build rooms in descending order of difficulty of placing e.g. size, frequency. */
-static byte room_build_order[ROOM_MAX] = {ROOM_LAIR, ROOM_GREATER_VAULT, ROOM_HUGE_FRACTAL, ROOM_HUGE_STAR_BURST,
-						ROOM_CHAMBERS, ROOM_HUGE_CENTRE, ROOM_LARGE_FRACTAL, ROOM_LESSER_VAULT,
+static byte room_build_order[ROOM_MAX] = {ROOM_LAIR, ROOM_GREATER_VAULT, ROOM_FILL_FRACTAL,
+						ROOM_FILL_STAR_BURST, ROOM_CHAMBERS, ROOM_HUGE_FILL, ROOM_HUGE_FRACTAL,
+						ROOM_HUGE_STAR_BURST, ROOM_HUGE_CENTRE, ROOM_LARGE_FRACTAL, ROOM_LESSER_VAULT,
 						ROOM_INTERESTING, ROOM_STAR_BURST, ROOM_FRACTAL, ROOM_LARGE_CENTRE,
 						ROOM_LARGE_WALLS, ROOM_NORMAL_CENTRE, ROOM_NORMAL_WALLS, ROOM_NORMAL, 0};
 
@@ -2341,6 +2345,171 @@ static bool find_space(int *y, int *x, int height, int width)
 
 
 
+/*
+ *  Ensure that the terrain matches the required level flags.
+ */
+static bool check_level_flags(int f_idx)
+{
+	feature_type *f_ptr = &f_info[f_idx];
+
+	/* Exclude terrain of various types */
+	if (level_flag & (LF1_WATER | LF1_LAVA | LF1_ICE | LF1_ACID | LF1_OIL | LF1_LIVING))
+	{
+		if (!(level_flag & (LF1_LIVING)) && (f_ptr->flags3 & (FF3_LIVING)))
+		{
+			return (FALSE);
+		}
+
+		if (!(level_flag & (LF1_WATER)) && (f_ptr->flags2 & (FF2_WATER)))
+		{
+			return (FALSE);
+		}
+
+		if (!(level_flag & (LF1_LAVA)) && (f_ptr->flags2 & (FF2_LAVA)))
+		{
+			return (FALSE);
+		}
+
+		if (!(level_flag & (LF1_ICE)) && (f_ptr->flags2 & (FF2_ICE)))
+		{
+			return (FALSE);
+		}
+
+		if (!(level_flag & (LF1_ACID)) && (f_ptr->flags2 & (FF2_ACID)))
+		{
+			return (FALSE);
+		}
+
+		if (!(level_flag & (LF1_OIL)) && (f_ptr->flags2 & (FF2_OIL)))
+		{
+			return (FALSE);
+		}
+	}
+
+	return (TRUE);
+
+}
+
+
+
+/*
+ * Pick appropriate feature for lake.
+ */
+bool cave_feat_lake(int f_idx)
+{
+	feature_type *f_ptr = &f_info[f_idx];
+
+	/* Require lake or river */
+	if (!(f_ptr->flags2 & (FF2_RIVER)))
+	{
+		if (!(f_ptr->flags2 & (FF2_LAKE)))
+		{
+			return (FALSE);
+		}
+	}
+
+	/* Okay */
+	return (check_level_flags(f_idx));
+}
+
+
+/*
+ * Returns TRUE if f_idx is a valid pool feature
+ */
+static bool cave_feat_pool(int f_idx)
+{
+	feature_type *f_ptr = &f_info[f_idx];
+
+	/* Hack -- Ignore solid features */
+	if ((f_ptr->flags1 & (FF1_MOVE)) == 0)
+	{
+		return (FALSE);
+	}
+
+	/* All remaining lake features will be fine */
+	return (cave_feat_lake(f_idx));
+}
+
+
+/*
+ * Returns TRUE if f_idx is a valid island feature
+ */
+static bool cave_feat_island(int f_idx)
+{
+	feature_type *f_ptr = &f_info[f_idx];
+
+	/* Ignore non-lake features */
+	if (!(f_ptr->flags2 & (FF2_LAKE)))
+	{
+		return (FALSE);
+	}
+
+	/* Hack -- Ignore solid features, unless climbable */
+	if (((f_ptr->flags1 & (FF1_MOVE)) == 0) && ((f_ptr->flags3 & (FF3_EASY_CLIMB)) == 0))
+	{
+		return (FALSE);
+	}
+
+	/* Ignore shallow, deep or filled features */
+	if ((f_ptr->flags2 & (FF2_SHALLOW | FF2_DEEP | FF2_FILLED)) != 0)
+	{
+		return (FALSE);
+	}
+
+	return (TRUE);
+}
+
+
+/*
+ * Returns TRUE if f_idx is a valid pool feature
+ */
+static bool cave_feat_streamer(int f_idx)
+{
+	feature_type *f_ptr = &f_info[f_idx];
+
+	/* Require lake or river */
+	if (!(f_ptr->flags1 & (FF1_STREAMER)))
+	{
+		return (FALSE);
+	}
+
+	/* All remaining features depend on level flags */
+	return (check_level_flags(f_idx));
+}
+
+
+/*
+ * Choose a terrain feature for the current level.
+ * You can use a hook to ensure consistent terrain (lakes/pools).
+ * This function handles themed levels as a special case. The "feeling"
+ * global variable must be properly set to recognize the themed level. See
+ * "build_themed_level".
+ */
+static u16b pick_proper_feature(bool (*feat_hook)(int f_idx))
+{
+	/* Default depth for the feature */
+	int max_depth = p_ptr->depth;
+	u16b feat;
+
+	/* Set the given hook, if any */
+	get_feat_num_hook = feat_hook;
+
+	get_feat_num_prep();
+
+	/* Pick a feature */
+	feat = get_feat_num(max_depth);
+
+	/* Clear the hook */
+	get_feat_num_hook = NULL;
+
+	get_feat_num_prep();
+
+	/* Set the level flags based on the feature */
+	set_level_flags(feat);
+
+	/* Return the feature */
+	return (feat);
+}
 
 
 
@@ -2424,6 +2593,7 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 		while (*chart == d_info[i].chart)
 		{
 			bool good_chance = FALSE;
+			u32b exclude_hack = d_info[i].p_flag;
 
 			if (counter++ > 5000)
 			{
@@ -2435,8 +2605,18 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 			if (p_ptr->depth < d_info[i].level_min) { i++; continue; }
 			if (p_ptr->depth > d_info[i].level_max) { i++; continue; }
 
-			/* If exluding these flags, skip completely */
-			if ((exclude & (d_info[i].p_flag)) != 0) { i++; continue; }
+			/* Hack for excluding directions. This allows us to exclude 'directions' except 'all directions' */
+			if ((exclude_hack & (RG1_NORTH | RG1_SOUTH | RG1_EAST | RG1_WEST)) == (RG1_NORTH | RG1_SOUTH | RG1_EAST | RG1_WEST))
+			{
+				exclude_hack &= ~(RG1_NORTH | RG1_SOUTH | RG1_EAST | RG1_WEST);
+			}
+
+			/* If exluding these flags, skip completely. */
+			if ((exclude & (exclude_hack)) != 0) { i++; continue; }
+
+			/* Exclude items or gold */
+			if ((exclude & (RG1_HAS_ITEM)) & (d_info[i].tval < TV_GOLD)) { i++;continue; }
+			if ((exclude & (RG1_HAS_GOLD)) & (d_info[i].tval >= TV_GOLD)) { i++;continue; }
 
 			/* Reset chance */
 			chance = 0;			
@@ -2761,12 +2941,47 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 		/* Place features or items if needed */
 		if (place_feat)
 		{
-			if ((place_flag & (RG1_CENTRE)) != 0)
+			/* Hack -- only fill irregular rooms with lake-like terrain */
+			if (((place_flag & (RG1_CENTRE | RG1_EDGE | RG1_OUTER)) != 0) &&
+				((f_info[place_feat].flags2 & (FF2_LAKE | FF2_RIVER)) == 0))
+			{
+				/* Hack -- allow irregular edges */
+				if (!(place_flag & (RG1_CENTRE)))
+				{
+					/* Overwrite 'solid' terrain */
+					room_info[room].solid = place_feat;
+					
+					/* Exclude edges */
+					exclude |= (RG1_EDGE | RG1_OUTER);
+				}
+				else
+				{
+					if ((exclude & (RG1_INNER)) == 0)
+					{
+						place_flag |= (RG1_INNER);
+					}
+					else if ((exclude & (RG1_ALLOC)) == 0)
+					{
+						place_flag |= (RG1_ALLOC);
+					}
+					else if ((exclude & (RG1_RANDOM)) == 0)
+					{
+						place_flag |= (RG1_RANDOM);
+					}
+				}
+
+				/* Clear flags */
+				place_flag &= ~(RG1_CENTRE | RG1_EDGE | RG1_OUTER);
+			}
+
+			/* Place throughout room, unless scattering */
+			if (((place_flag & (RG1_CENTRE)) != 0) &&
+				((place_flag & (RG1_ALLOC | RG1_INNER | RG1_OUTER | RG1_STARBURST | RG1_SCATTER | RG1_RANDOM)) == 0))
 			{
 				exclude |= RG1_CENTRE;
 				*feat = place_feat;
 
-				if ((place_flag & (RG1_IGNORE_EDGE | RG1_BRIDGE_EDGE)) != 0)
+				if (((place_flag & (RG1_EDGE)) != 0) && ((place_flag & (RG1_IGNORE_EDGE | RG1_BRIDGE_EDGE)) != 0))
 				{
 					exclude |= RG1_EDGE | RG1_OUTER;
 					*edge = place_feat;
@@ -2794,16 +3009,19 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 				*alloc = place_feat;
 			}
 
-			if ((place_flag & (RG1_EDGE | RG1_OUTER)) != 0)
-			{
-				exclude |= RG1_EDGE | RG1_OUTER;
-				*edge = place_feat;
-			}
-
 			if ((place_flag & (RG1_INNER | RG1_STARBURST)) != 0)
 			{
 				exclude |= RG1_INNER | RG1_STARBURST;
 				*inner = place_feat;
+				
+				/* Hack -- inner and outer --> inner only */
+				place_flag &= ~(RG1_EDGE | RG1_OUTER);
+			}
+
+			if ((place_flag & (RG1_EDGE | RG1_OUTER)) != 0)
+			{
+				exclude |= RG1_EDGE | RG1_OUTER;
+				*edge = place_feat;
 			}
 
 			if ((place_flag & (RG1_SCATTER | RG1_RANDOM)) != 0)
@@ -2855,6 +3073,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	int y1b, int x1b, int y2b, int x2b, bool light, int spacing, bool pillars)
 {
 	int j = 0;
+	int floor = FEAT_FLOOR;
 
 	u32b place_flag = 0L;
 
@@ -2874,6 +3093,16 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	if ((!in_bounds_fully(y1a, x1a)) || (!in_bounds_fully(y1b, x1b))
 		 || (!in_bounds_fully(y2a, x2a)) || (!in_bounds_fully(y2b, x2b))) return (FALSE);
 
+
+	/*
+	 * Get filling if required.
+	 * This has to happen before getting the room info to set the level flags correctly.
+	 */
+	if (type == ROOM_HUGE_FILL)
+	{
+			/* Pick a feature */
+			floor = pick_proper_feature(cave_feat_pool);
+	}
 
 	/* Generate new room (a) */
 	generate_room(y1a, x1a, y2a, x2a, light);
@@ -2898,10 +3127,10 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	cave_set_feat(y2b, x1b, FEAT_WALL_SOLID);
 
 	/* Generate inner floors (a) */
-	generate_fill_pillars(y1a+1, x1a+1, y2a-1, x2a-1, FEAT_FLOOR, pillars ? spacing + 1: 0);
+	generate_fill_pillars(y1a+1, x1a+1, y2a-1, x2a-1, floor, pillars ? spacing + 1: 0);
 
 	/* Generate inner floors (b) */
-	generate_fill_pillars(y1b+1, x1b+1, y2b-1, x2b-1, FEAT_FLOOR, pillars ? spacing + 1: 0);
+	generate_fill_pillars(y1b+1, x1b+1, y2b-1, x2b-1, floor, pillars ? spacing + 1: 0);
 
 	/* Get room info */
 	while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name, 0L))
@@ -3036,168 +3265,6 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 }
 
 
-/*
- *  Ensure that the terrain matches the required level flags.
- */
-static bool check_level_flags(int f_idx)
-{
-	feature_type *f_ptr = &f_info[f_idx];
-
-	/* Exclude terrain of various types */
-	if (level_flag & (LF1_WATER | LF1_LAVA | LF1_ICE | LF1_ACID | LF1_OIL | LF1_LIVING))
-	{
-		if (!(level_flag & (LF1_LIVING)) && (f_ptr->flags3 & (FF3_LIVING)))
-		{
-			return (FALSE);
-		}
-
-		if (!(level_flag & (LF1_WATER)) && (f_ptr->flags2 & (FF2_WATER)))
-		{
-			return (FALSE);
-		}
-
-		if (!(level_flag & (LF1_LAVA)) && (f_ptr->flags2 & (FF2_LAVA)))
-		{
-			return (FALSE);
-		}
-
-		if (!(level_flag & (LF1_ICE)) && (f_ptr->flags2 & (FF2_ICE)))
-		{
-			return (FALSE);
-		}
-
-		if (!(level_flag & (LF1_ACID)) && (f_ptr->flags2 & (FF2_ACID)))
-		{
-			return (FALSE);
-		}
-
-		if (!(level_flag & (LF1_OIL)) && (f_ptr->flags2 & (FF2_OIL)))
-		{
-			return (FALSE);
-		}
-	}
-
-	return (TRUE);
-
-}
-
-
-
-/*
- * Pick appropriate feature for lake.
- */
-bool cave_feat_lake(int f_idx)
-{
-	feature_type *f_ptr = &f_info[f_idx];
-
-	/* Require lake or river */
-	if (!(f_ptr->flags2 & (FF2_RIVER)))
-	{
-		if (!(f_ptr->flags2 & (FF2_LAKE)))
-		{
-			return (FALSE);
-		}
-	}
-
-	/* Okay */
-	return (check_level_flags(f_idx));
-}
-
-
-/*
- * Returns TRUE if f_idx is a valid pool feature
- */
-static bool cave_feat_pool(int f_idx)
-{
-	feature_type *f_ptr = &f_info[f_idx];
-
-	/* Hack -- Ignore solid features */
-	if ((f_ptr->flags1 & (FF1_MOVE)) != 0)
-	{
-		return (FALSE);
-	}
-
-	/* All remaining lake features will be fine */
-	return (cave_feat_lake(f_idx));
-}
-
-
-/*
- * Returns TRUE if f_idx is a valid island feature
- */
-static bool cave_feat_island(int f_idx)
-{
-	feature_type *f_ptr = &f_info[f_idx];
-
-	/* Ignore non-lake features */
-	if (!(f_ptr->flags2 & (FF2_LAKE)))
-	{
-		return (FALSE);
-	}
-
-	/* Hack -- Ignore solid features, unless climbable */
-	if (((f_ptr->flags1 & (FF1_MOVE)) != 0) && ((f_ptr->flags3 & (FF3_EASY_CLIMB)) == 0))
-	{
-		return (FALSE);
-	}
-
-	/* Ignore shallow, deep or filled features */
-	if ((f_ptr->flags2 & (FF2_SHALLOW | FF2_DEEP | FF2_FILLED)) != 0)
-	{
-		return (FALSE);
-	}
-
-	return (TRUE);
-}
-
-
-/*
- * Returns TRUE if f_idx is a valid pool feature
- */
-static bool cave_feat_streamer(int f_idx)
-{
-	feature_type *f_ptr = &f_info[f_idx];
-
-	/* Require lake or river */
-	if (!(f_ptr->flags1 & (FF1_STREAMER)))
-	{
-		return (FALSE);
-	}
-
-	/* All remaining features depend on level flags */
-	return (check_level_flags(f_idx));
-}
-
-
-/*
- * Choose a terrain feature for the current level.
- * You can use a hook to ensure consistent terrain (lakes/pools).
- * This function handles themed levels as a special case. The "feeling"
- * global variable must be properly set to recognize the themed level. See
- * "build_themed_level".
- */
-static u16b pick_proper_feature(bool (*feat_hook)(int f_idx))
-{
-	/* Default depth for the feature */
-	int max_depth = p_ptr->depth;
-	u16b feat;
-
-	/* Set the given hook, if any */
-	get_feat_num_hook = feat_hook;
-
-	get_feat_num_prep();
-
-	/* Pick a feature */
-	feat = get_feat_num(max_depth);
-
-	/* Clear the hook */
-	get_feat_num_hook = NULL;
-
-	get_feat_num_prep();
-
-	/* Return the feature */
-	return (feat);
-}
 
 
 /* Maximum size of a fractal map */
@@ -4031,8 +4098,30 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, b
 	/* Paranoia */
 	if (type >= MAX_FRACTAL_TYPES) return (FALSE);
 
+	/*
+	 * Get filling if required.
+	 * This has to happen before set_irregular_room_info to set the level flags correctly.
+	 */
+	if (chart == ROOM_FILL_FRACTAL)
+	{
+			/* Pick a feature */
+			feat = pick_proper_feature(cave_feat_pool);
+			edge = f_info[feat].edge;
+
+			/* Get an island */
+			inner = pick_proper_feature(cave_feat_island);
+	}
+	
 	/* Set irregular room info */
 	set_irregular_room_info(room, chart, light, &feat, &edge, &inner, &alloc, &pool, &n_pools);
+
+	/* Hack - try to find a place for 'inner' room */
+	if (inner)
+	{
+		if (n_pools < 3) pool[n_pools++] = inner;
+		else if (!alloc) alloc = inner;
+		else if (!edge) edge = inner;
+	}
 
 	/* Clear remaining pools */
 	for (i = n_pools; i < 3; i++)
@@ -4106,6 +4195,9 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, b
 
 	/* Free resources */
 	FREE(map);
+
+	/* Hack -- place feature at centre */
+	if (alloc) cave_set_feat(y0, x0, alloc);
 
 	/* Success */
 	return (TRUE);
@@ -4220,6 +4312,20 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 	/* Default flags, classic rooms */
 	u32b flag = (STAR_BURST_ROOM | STAR_BURST_RAW_FLOOR |
 		STAR_BURST_RAW_EDGE);
+
+	/*
+	 * Get filling if required.
+	 * This has to happen before set_irregular_room_info to set the level flags correctly.
+	 */
+	if (type == ROOM_FILL_STAR_BURST)
+	{
+			/* Pick a feature */
+			feat = pick_proper_feature(cave_feat_pool);
+			edge = f_info[feat].edge;
+			
+			/* Get an island */
+			inner = pick_proper_feature(cave_feat_island);
+	}
 
 	/* Set irregular room info */
 	set_irregular_room_info(room, type, light, &feat, &edge, &inner, &alloc, &pool, &n_pools);
@@ -5416,6 +5522,9 @@ static void build_tunnel(int row1, int col1, int row2, int col2)
 		if (dun->tunn_n >= TUNN_MAX)
 		{
 			if (cheat_xtra) msg_format("Tunnel length exceeded from %d. Aborting.", part1);
+			
+			/* Hack -- themed tunnels can get too long. So try unthemed. */
+			level_flag &= ~(LF1_THEME);
 
 			abort_and_cleanup = TRUE;
 			break;
@@ -6608,7 +6717,7 @@ static bool build_type1112(int room, int type)
 
 	switch (type)
 	{
-		case 12: dy = 19; dx = 33; break;
+		case 14: case 13: dy = 19; dx = 33; break;
 		default: dy = 9; dx = 14; break;
 	}
 
@@ -6636,8 +6745,8 @@ static bool build_type131415(int room, int type)
 
 	switch (type)
 	{
-		case 15: fractal_type = FRACTAL_TYPE_33x65; height = 33; width = 65; break;
-		case 14: fractal_type = FRACTAL_TYPE_33x33; height = 33; width = 33; break;
+		case ROOM_FILL_FRACTAL: case ROOM_HUGE_FRACTAL: fractal_type = FRACTAL_TYPE_33x65; height = 33; width = 65; break;
+		case ROOM_LARGE_FRACTAL: fractal_type = FRACTAL_TYPE_33x33; height = 33; width = 33; break;
 		default: fractal_type = FRACTAL_TYPE_17x33; height = 17; width = 33; break;
 	}
 
@@ -6663,15 +6772,18 @@ static bool room_build(int room, int type)
 	switch (type)
 	{
 		/* Build an appropriate room */
+		case ROOM_FILL_FRACTAL: if (build_type131415(room, type)) return(TRUE); break;
 		case ROOM_HUGE_FRACTAL: if (build_type131415(room, type)) return(TRUE); break;
 		case ROOM_LARGE_FRACTAL: if (build_type131415(room, type)) return(TRUE); break;
 		case ROOM_FRACTAL: if (build_type131415(room, type)) return(TRUE); break;
+		case ROOM_FILL_STAR_BURST: if (build_type1112(room, type)) return(TRUE); break;
 		case ROOM_HUGE_STAR_BURST: if (build_type1112(room, type)) return(TRUE); break;
 		case ROOM_STAR_BURST: if (build_type1112(room, type)) return(TRUE); break;
 		case ROOM_GREATER_VAULT: if (build_type8910(room, type)) return(TRUE); break;
 		case ROOM_LESSER_VAULT: if (build_type8910(room, type)) return(TRUE); break;
 		case ROOM_INTERESTING: if (build_type8910(room, type)) return(TRUE); break;
 		case ROOM_CHAMBERS: if (build_type7(room, type)) return(TRUE); break;
+		case ROOM_HUGE_FILL: if (build_type6(room, type)) return (TRUE); break;
 		case ROOM_HUGE_CENTRE: if (build_type6(room, type)) return(TRUE); break;
 		case ROOM_LARGE_CENTRE: if (build_type45(room, type)) return(TRUE); break;
 		case ROOM_LARGE_WALLS: if (build_type45(room, type)) return(TRUE); break;

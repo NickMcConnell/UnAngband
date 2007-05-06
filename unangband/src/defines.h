@@ -368,8 +368,8 @@
 /*
  * Dungeon room types 
  */
-#define ROOM_NONE			0
-#define ROOM_NORMAL			1
+#define ROOM_NONE				0
+#define ROOM_NORMAL				1
 #define ROOM_NORMAL_WALLS		2
 #define ROOM_NORMAL_CENTRE		3
 #define ROOM_LARGE_WALLS		4
@@ -380,12 +380,15 @@
 #define ROOM_LESSER_VAULT		9
 #define ROOM_GREATER_VAULT		10
 #define ROOM_STAR_BURST			11
-#define ROOM_HUGE_STAR_BURST		12
+#define ROOM_HUGE_STAR_BURST	12
 #define ROOM_FRACTAL			13
 #define ROOM_LARGE_FRACTAL		14
 #define ROOM_HUGE_FRACTAL		15
-#define ROOM_LAIR			16
-#define ROOM_TOWER       		17
+#define ROOM_LAIR				16
+#define ROOM_HUGE_FILL			17
+#define ROOM_FILL_STAR_BURST	18
+#define ROOM_FILL_FRACTAL		19
+#define ROOM_TOWER       		20
 
 
 

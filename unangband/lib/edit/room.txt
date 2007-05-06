@@ -68,24 +68,34 @@ V:0.6.2
 # 'Empty' room.
 
 N:1:107:0:0:1:1:0:128
+A:
+B:
 
 # Wall decorated room.
 
 N:2:117:0:0:1:1:0:20
+A:
+B:
 
 # Central feature room.
 
 N:3:104:0:0:1:1:0:128
+A:
+B:
 
 # Wall decorated large room.
 
 N:4:117:0:0:1:1:0:20
+A:
+B:
 
 # Central feature large room.
 
 N:5:104:0:0:1:1:0:128
+A:
+B:
 
-# Central feature large room.
+# Central feature huge room.
 
 N:6:104:0:0:1:1:0:128
 A:
@@ -117,40 +127,94 @@ D:A
 # Small starburst room.
 
 N:11:107:0:0:1:1:0:128
+A:
+B:
 
 # Small starburst room - central feature.
 
 N:11:104:0:0:1:1:0:128
+A:
+B:
 
 # Small starburst room - wall decorations.
 
 N:11:117:0:0:1:1:0:128
+A:
+B:
 
 # Large starburst room - central feature.
 
 N:12:104:0:0:1:1:0:128
+A:
+B:
 
 # Large starburst room - wall decorations.
 
 N:12:117:0:0:1:1:0:128
+A:
+B:
 
-# Medium fractal room.
+# Medium fractal room - central feature.
 
-N:13:107:0:0:1:1:0:128
+N:13:104:0:0:1:1:0:128
 A:
 B:cave
 
-# Large fractal room.
+# Medium fractal room - wall decorations.
 
-N:14:107:0:0:1:1:0:128
+N:13:117:0:0:1:1:0:128
+A:
+B:cave
+
+# Large fractal room - central feature.
+
+N:14:104:0:0:1:1:0:128
 A:
 B:cavern
 
-# Huge fractal room.
+# Large fractal room - wall decorations.
 
-N:15:107:0:0:1:1:0:128
+N:14:117:0:0:1:1:0:128
+A:
+B:cave
+
+# Huge fractal room - central feature
+
+N:15:104:0:0:1:1:0:128
 A:
 B:cavern
+
+# Huge fractal room - wall decorations
+
+N:15:117:0:0:1:1:0:128
+A:
+B:cavern
+
+# Lair.
+
+N:16:107:0:0:1:1:0:128
+A:
+B:lair
+
+# Filled room.
+
+N:17:107:0:0:1:1:0:128
+A:
+B:chamber
+
+# Filled star-burst room.
+
+N:18:107:0:0:1:1:0:128
+A:
+B:cavern
+
+# Filled fractal room.
+
+N:19:107:0:0:1:1:0:128
+A:
+B:cavern
+
+
 
 # An inner room of some description
 
@@ -4334,7 +4398,7 @@ A:
 B:
 D:
 P:ROWS | COLS
-R:UNDEAD
+L:CRYPT
 
 N:121:102:0:0:5:5:0:128
 A:
@@ -4342,11 +4406,12 @@ B:
 D:
 P:ROWS | COLS | OUTER
 
-N:121:102:0:0:5:5:0:128
+#Inner room by itself
+
+N:121:102:0:0:15:15:0:128
 A:
 B:
 D:
-P:INNER
 
 N:121:102:0:0:5:5:0:128
 A:
@@ -5419,6 +5484,11 @@ N:145:106:0:0:15:15:0:128
 A:
 B:
 P:CENTRE
+
+N:145:106:0:0:15:15:0:128
+A:
+B:
+P:CENTRE | EDGE
 
 N:145:106:0:0:15:15:0:128
 A:
