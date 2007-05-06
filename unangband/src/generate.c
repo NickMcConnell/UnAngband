@@ -8581,6 +8581,22 @@ static bool cave_gen(void)
 		build_nature();
 	}
 #endif
+
+	/* Flavor based on zone */
+	if (zone->big)
+	{
+		set_level_flags(zone->big);
+	}
+	else
+	{
+		/* Pick a random feature */
+		int feat = pick_proper_feature(cave_feat_lake);
+		
+		/* Flavor level based on feat */
+		set_level_flags(feat);
+	}
+
+
 	/* Build some rooms or tunnel endpoints */
 	if ((level_flag & (LF1_ROOMS | LF1_TUNNELS)) != 0)
 	{
