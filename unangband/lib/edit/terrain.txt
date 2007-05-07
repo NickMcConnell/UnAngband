@@ -10363,7 +10363,7 @@ F:REMEMBER | HURT_ROCK | CAN_CLIMB | HURT_WATER
 F:POWER_40
 
 N:755:blood-stained wall
-W:80:1:10:0
+W:80:0:10:0
 G:#:r
 M:754
 U:56
@@ -10392,7 +10392,7 @@ F:REMEMBER | HURT_ROCK |
 F:POWER_40
 
 N:757:slime-covered wall
-W:1:1:10:0
+W:1:0:10:0
 G:#:g
 M:756
 U:56

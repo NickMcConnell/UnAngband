@@ -384,8 +384,10 @@
 #define ROOM_FRACTAL			13
 #define ROOM_LARGE_FRACTAL		14
 #define ROOM_HUGE_FRACTAL		15
-#define ROOM_LAIR				16
-#define ROOM_TOWER       		20
+#define ROOM_LAKE				16
+#define ROOM_HUGE_LAKE			17
+#define ROOM_LAIR				18
+#define ROOM_TOWER       		19
 
 
 

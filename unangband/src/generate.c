@@ -223,6 +223,10 @@ typedef struct dun_data dun_data;
 
 struct dun_data
 {
+	/* Number of lakes */
+	int lake_n;
+	coord lake[CENT_MAX];
+	
 	/* Array of centers of rooms */
 	int cent_n;
 	coord cent[CENT_MAX];
@@ -324,10 +328,11 @@ static room_data_type room_data[ROOM_MAX] =
 
 
 /* Build rooms in descending order of difficulty of placing e.g. size, frequency. */
-static byte room_build_order[ROOM_MAX] = {ROOM_LAIR, ROOM_GREATER_VAULT, ROOM_CHAMBERS, ROOM_HUGE_FRACTAL,
-						ROOM_HUGE_STAR_BURST, ROOM_HUGE_CENTRE, ROOM_LARGE_FRACTAL, ROOM_LESSER_VAULT,
-						ROOM_INTERESTING, ROOM_STAR_BURST, ROOM_FRACTAL, ROOM_LARGE_CENTRE,
+static byte room_build_order[ROOM_MAX] = {ROOM_LAIR, ROOM_GREATER_VAULT, ROOM_CHAMBERS,
+						ROOM_HUGE_FRACTAL, ROOM_HUGE_STAR_BURST, ROOM_HUGE_CENTRE, ROOM_LARGE_FRACTAL,
+						ROOM_LESSER_VAULT, ROOM_INTERESTING, ROOM_STAR_BURST, ROOM_FRACTAL, ROOM_LARGE_CENTRE,
 						ROOM_LARGE_WALLS, ROOM_NORMAL_CENTRE, ROOM_NORMAL_WALLS, ROOM_NORMAL, 0};
+
 
 /*
  * Count the number of walls adjacent to the given grid.
@@ -2266,10 +2271,24 @@ static bool find_space(int *y, int *x, int height, int width)
 	for (i = 0; i < 25; i++)
 	{
 		filled = FALSE;
-		
-		/* Pick a top left block at random */
-		block_y = rand_int(dun->row_rooms - blocks_high);
-		block_x = rand_int(dun->col_rooms - blocks_wide);
+
+		/* Hack -- try to put stuff near lakes */
+		if (i < dun->lake_n)
+		{
+			/* Pick a block 'near' the lake */
+			block_y = dun->lake[i].y - rand_int(blocks_high);
+			block_x = dun->lake[i].x - rand_int(blocks_wide);
+			
+			/* Keep in dungeon */
+			if (block_y < 0) block_y = 0;
+			if (block_x < 0) block_x = 0;
+		}
+		else
+		{
+			/* Pick a top left block at random */
+			block_y = rand_int(dun->row_rooms - blocks_high);
+			block_x = rand_int(dun->col_rooms - blocks_wide);
+		}
 
 		/* Itty-bitty rooms can shift about within their rectangle */
 		if (blocks_wide < 3)
@@ -2345,7 +2364,6 @@ static bool find_space(int *y, int *x, int height, int width)
 		/* Acquire the location of the room */
 		(*y) = ((by1 + by2) * BLOCK_HGT) / 2;
 		(*x) = ((bx1 + bx2) * BLOCK_WID) / 2;
-
 
 		/* Save the room location */
 		if (dun->cent_n < CENT_MAX)
@@ -4342,7 +4360,7 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 
 	bool giant_room = (dy >= 19) && (dx >= 33);
 
-	/* Default floor and edge */
+	/* Default terrain */
 	s16b feat = FEAT_FLOOR;
 	s16b edge = FEAT_WALL_OUTER;
 	s16b inner = FEAT_NONE;
@@ -7220,7 +7238,7 @@ static bool build_type8910(int room, int type)
 
 
 /*
- * Type 11 or 12. Small or large starbust.
+ * Type 11 or 12. Small or large starburst.
  */
 static bool build_type1112(int room, int type)
 {
@@ -7272,7 +7290,6 @@ static bool build_type131415(int room, int type)
 
 	return (TRUE);
 }
-
 
 
 /*
@@ -7333,7 +7350,7 @@ static bool build_type16(int room, int type)
 	if (dun->cent_n < DUN_ROOMS)
 	{
 		/* Initialize room description */
-		room_info[dun->cent_n].type = ROOM_CHAMBERS;
+		room_info[dun->cent_n].type = ROOM_LAIR;
 	}
 	
 	return (TRUE);
@@ -7409,6 +7426,10 @@ static bool build_feature(int feat, bool do_big_lake, bool merge_lakes)
 		/* Generate the river */
 		build_river(feat, y0, x0);
 	}
+	
+	/* Ensure interesting stuff in lake */
+	dun->lake[dun->lake_n].y = y0;
+	dun->lake[dun->lake_n++].x = x0;
 
 	/* Success */
 	return (TRUE);
@@ -7424,26 +7445,26 @@ static void build_nature(void)
 	bool done_big = FALSE;
 
 	int feat;
-	int count = 0;
 
 	/* Flavor */
 	bool merge_lakes = ((p_ptr->depth >= 30) && !rand_int(7));
 
+	/* Get dungeon zone */
 	dungeon_zone *zone=&t_info[0].zone[0];
 
 	/* Get the zone */
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
 	/* Allocate some lakes and rivers */
-	for (count = 0; count < DUN_MAX_LAKES; count++)
+	for (dun->lake_n = 0; dun->lake_n < DUN_MAX_LAKES; )
 	{
 		/* Have placed features */
 		if ((rand_int(100) >= DUN_FEAT) && !(zone->big) && !(zone->small))
 		{
-			continue;
+			break;
 		}
 
-		if ((count == 0) && (zone->big))
+		if ((dun->lake_n == 0) && (zone->big))
 		{
 			feat = zone->big;
 			big = TRUE;
@@ -7490,7 +7511,7 @@ static void build_nature(void)
 			}
 
 			/* Build one lake/river. */
-			build_feature(feat, big, merge_lakes);
+			if (!build_feature(feat, big, merge_lakes)) break;
 		}
 	}
 }
@@ -8569,6 +8590,9 @@ static bool cave_gen(void)
 
 	/* Start with no themes */
 	dun->theme_feat = 0;
+	
+	/* Start with no lakes */
+	dun->lake_n = 0;
 
 	/* Set up the monster ecology before placing rooms */
 	/* XXX Very early levels boring with ecologies enabled */
@@ -8598,6 +8622,7 @@ static bool cave_gen(void)
 		/* Place the tower */
 		place_tower();
 	}
+	
 #if 0
 	/* No features in a tower above the surface */
 	if (((level_flag & (LF1_TOWER)) == 0) || ((level_flag & (LF1_SURFACE)) != 0))
@@ -8608,22 +8633,6 @@ static bool cave_gen(void)
 		build_nature();
 	}
 #endif
-
-	/* Flavor based on zone */
-	if (zone->big)
-	{
-		set_level_flags(zone->big);
-	}
-	else
-	{
-		/* Pick a random feature */
-		int feat = pick_proper_feature(cave_feat_lake);
-		
-		/* Flavor level based on feat */
-		set_level_flags(feat);
-	}
-
-
 	/* Build some rooms or tunnel endpoints */
 	if ((level_flag & (LF1_ROOMS | LF1_TUNNELS)) != 0)
 	{
