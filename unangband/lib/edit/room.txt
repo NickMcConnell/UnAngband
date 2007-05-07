@@ -1982,7 +1982,7 @@ F:141:0:0
 L:CHASM
 P:PLACE
 
-N:106:107:0:0:50:3:0:128
+N:106:107:0:0:50:0:0:128
 A:bloody
 B:
 D:spattered with dried blood.  
@@ -1991,7 +1991,7 @@ F:305:305:754
 R:EVIL
 P:PLACE | SCATTER
 
-N:106:107:0:0:50:3:0:128
+N:106:107:0:0:50:0:0:128
 A:bloody
 B:
 D:covered in body parts.  
@@ -2483,7 +2483,7 @@ B:
 D:ripe with decay.  
 R:UNDEAD
 
-N:108:109:0:0:5:1:9:128
+N:108:109:0:0:5:0:9:128
 A:
 B:
 D:misty with blood.  
@@ -3932,7 +3932,7 @@ S:SEEN | CURSED
 R:EVIL
 P:OUTER
 
-N:117:102:0:0:15:1:40:128
+N:117:102:0:0:15:0:40:128
 A:
 B:
 D:Blood seeps from
@@ -4218,7 +4218,7 @@ P:OUTER
 R:DWARF
 F:750:817:750
 
-N:117:121:0:0:100:3:0:128
+N:117:121:0:0:100:0:0:128
 A:bloody
 B:
 D:Blood covers 
@@ -5082,7 +5082,7 @@ B:
 D:Someone has scratched 
 S:SEEN
 
-N:134:135:0:0:15:15:25:128
+N:134:135:0:0:15:0:25:128
 A:
 B:
 D:Someone has scrawled in blood 
