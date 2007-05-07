@@ -1608,13 +1608,13 @@ static bool generate_starburst_room(int y1, int x1, int y2, int x2,
 			/* Floor is merged with the dungeon */
 			else
 			{
-				int dummy = feat;
+				int tmp_feat = feat;
 
 				/* Hack -- make variable terrain surrounded by floors */
 				if (((f_info[cave_feat[y][x]].flags1 & (FF1_WALL)) != 0) &&
-					(variable_terrain(&dummy,feat))) cave_set_feat(y,x,FEAT_FLOOR);
+					(variable_terrain(&tmp_feat,feat))) cave_set_feat(y,x,FEAT_FLOOR);
 
-				build_terrain(y, x, feat);
+				build_terrain(y, x, tmp_feat);
 			}
 
 			/* Make part of a room if requested */
@@ -1711,8 +1711,8 @@ static bool generate_starburst_room(int y1, int x1, int y2, int x2,
 					build_terrain(yy, xx, edge);
 				}
 
-				/* Make part of a room if requested */
-				if (flag & (STAR_BURST_ROOM))
+				/* Make part of a room if requested and correct edge terrain */
+				if ((flag & (STAR_BURST_ROOM)) && (f_info[edge].flags1 & (FF1_OUTER)))
 				{
 					cave_info[yy][xx] |= (CAVE_ROOM);
 				}
@@ -4046,26 +4046,43 @@ static void fractal_map_to_room(fractal_map map, byte fractal_type, int y0, int 
 				/* Place the selected pool feature */
 				if (feat != FEAT_NONE)
 				{
-					build_terrain(yy, xx, feat);
+					int tmp_feat = feat;
+
+					/* Hack -- make variable terrain surrounded by floors */
+					if (((f_info[cave_feat[yy][xx]].flags1 & (FF1_WALL)) != 0) &&
+						(variable_terrain(&tmp_feat,feat))) cave_set_feat(y,x,FEAT_FLOOR);
+
+					build_terrain(yy, xx, tmp_feat);
 				}
 				/* Or place a floor */
 				else
 				{
-					/* Place floors */
-					cave_set_feat(yy, xx, floor);
+					int tmp_feat = floor;
+
+					/* Hack -- make variable terrain surrounded by floors */
+					if (((f_info[cave_feat[yy][xx]].flags1 & (FF1_WALL)) != 0) &&
+						(variable_terrain(&tmp_feat,floor))) cave_set_feat(y,x,FEAT_FLOOR);
+
+					build_terrain(yy, xx, tmp_feat);
 				}
+				
+				/* Mark the grid as a part of the room */
+				cave_info[yy][xx] |= (CAVE_ROOM);
 			}
-			else if (grid_type == FRACTAL_EDGE)
+			else if ((grid_type == FRACTAL_EDGE) && (wall))
 			{
 				cave_set_feat(yy, xx, wall);
+
+				if (f_info[wall].flags1 & (FF1_OUTER))
+				{
+					/* Mark the grid as a part of the room */
+					cave_info[yy][xx] |= (CAVE_ROOM);
+				}				
 			}
 			else
 			{
 				continue;
 			}
-
-			/* Mark the grid as a part of the room */
-			cave_info[yy][xx] |= (CAVE_ROOM);
 
 			/* Light the feature if needed */
 			if (light)
@@ -4151,7 +4168,7 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, b
 	/* Clear remaining pools */
 	for (i = n_pools; i < 3; i++)
 	{
-		pool[i] = feat;
+		pool[i] = FEAT_NONE;
 	}
 
 	/* Reset the loop counter */
@@ -4335,7 +4352,7 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 	int n_pools = 0;
 
 	/* Default flags, classic rooms */
-	u32b flag = (STAR_BURST_RAW_FLOOR |	STAR_BURST_RAW_EDGE);
+	u32b flag = (STAR_BURST_RAW_EDGE);
 
 	/* Set irregular room info */
 	set_irregular_room_info(room, type, light, &feat, &edge, &inner, &alloc, &pool, &n_pools);
@@ -4348,6 +4365,16 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 	
 	/* Mark as room */
 	if (room) flag |= (STAR_BURST_ROOM);
+
+	/* No floor - need inner room */
+	if ((f_info[feat].flags1 & (FF1_FLOOR)) == 0)
+	{
+		/* Floor */
+		inner = FEAT_FLOOR;
+
+		/* Hack -- no longer a room - but note we add flag later for 'inner' room */
+		flag &= ~(STAR_BURST_ROOM);
+	}
 
 	/* Case 1. Plain starburst room */
 	if ((rand_int(100) < 75) && !(inner))
@@ -4397,7 +4424,7 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 		}
 
 		generate_starburst_room (y0 - dy, x0 - dx, y0 + dy, x0 + dx,
-			feat, edge, flag);
+			feat, edge, flag | (room ? STAR_BURST_ROOM : 0L));
 	}
 
 	/* Build pools */
@@ -7259,7 +7286,7 @@ static bool build_type16(int room, int type)
 
 	int feat;
 	
-	u32b flag = (STAR_BURST_RAW_EDGE | STAR_BURST_RAW_FLOOR | STAR_BURST_MOAT | STAR_BURST_LIGHT);
+	u32b flag = (STAR_BURST_RAW_EDGE | STAR_BURST_MOAT | STAR_BURST_LIGHT);
 	
 	/* Deeper in the dungeon, lairs are less likely to be lit. */
 	bool light = (rand_range(25, 60) > p_ptr->depth) ? TRUE : FALSE;
