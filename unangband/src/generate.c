@@ -275,7 +275,16 @@ struct dun_data
 
 	/* Hack -- theme rooms */
 	s16b theme_feat;
+	
+	/* Hack -- flooded rooms */
+	s16b flood_feat;
 
+	/* Number of rooms flooded */
+	int flood_n;
+	
+	/* Hack -- flooded tunnels */
+	s16b flood_tunn;
+	
 	/* Array of which blocks are used */
 	bool room_map[MAX_ROOMS_ROW][MAX_ROOMS_COL];
 };
@@ -3021,8 +3030,20 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 	if (light) exclude |= RG1_DARK;
 	else exclude |= RG1_LITE;
 
+	/* Flooded dungeon */
+	if (dun->flood_feat)
+	{
+		/* Flood floor */
+		*feat = dun->flood_feat;
+		
+		/* Surround by edge */
+		*edge = f_info[dun->flood_feat].edge;
+
+		/* No description */		
+	}
+
 	/* Get room info */
-	while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name,
+	else while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name,
 		exclude))
 	{
 		/* Place features or items if needed */
@@ -3181,6 +3202,9 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	if ((!in_bounds_fully(y1a, x1a)) || (!in_bounds_fully(y1b, x1b))
 		 || (!in_bounds_fully(y2a, x2a)) || (!in_bounds_fully(y2b, x2b))) return (FALSE);
 
+	/* Flood dungeon if required */
+	if (dun->flood_feat) floor = dun->flood_feat;
+
 	/* Exclude light or dark */
 	if (light) exclude |= RG1_DARK;
 	else exclude |= RG1_LITE;
@@ -3213,8 +3237,14 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	/* Generate inner floors (b) */
 	generate_fill_pillars(y1b+1, x1b+1, y2b-1, x2b-1, floor, pillars ? spacing + 1: 0);
 
+	/* Flooded dungeon */
+	if (dun->flood_feat)
+	{
+		/* No description */
+	}
+
 	/* Get room info */
-	while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name, exclude))
+	else while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name, exclude))
 	{
 		if (limit++ > 1000)
 		{
@@ -6015,7 +6045,8 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	int main_loop_count = 0;
 	int last_turn = 0, first_door, last_door, first_tunn, first_next, first_stair;
 	int start_tunnel = 0;
-
+	
+	bool flood_tunnel = FALSE;
 	bool door_flag = FALSE;
 	bool overrun_flag = FALSE;
 	bool abort_and_cleanup = FALSE;
@@ -6067,6 +6098,9 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	if ((dun_room[by1][bx1]) && (dun_room[by1][bx1] < DUN_ROOMS))
 	{
 		part1 = dun->part[dun_room[by1][bx1]-1];
+		
+		/* Flood if part of flooded dungeon */
+		if (dun_room[by1][bx1] <= dun->flood_n) flood_tunnel = TRUE;
 	}
 
 	/* Start out in the correct direction */
@@ -6384,6 +6418,12 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			int by2 = tmp_row/BLOCK_HGT;
 			int bx2 = tmp_col/BLOCK_WID;
 
+			/* Flood if part of flooded dungeon */
+			if ((dun_room[by2][bx2]) && (dun_room[by2][bx2] <= dun->flood_n))
+			{
+				flood_tunnel = TRUE;
+			}	
+
 			/* Different room */
 			if ((dun_room[by1][bx1]) && (dun_room[by2][bx2]) && (dun_room[by1][bx1] < DUN_ROOMS)
 				&& (dun_room[by2][bx2] < DUN_ROOMS) && (dun_room[by1][bx1] != dun_room[by2][bx2]))
@@ -6398,7 +6438,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				else if (part1 < CENT_MAX)
 				{
 					int part2 = dun->part[dun_room[by2][bx2]-1];
-
+					
 					/* Merging successfully */
 					if (cheat_xtra) msg_format("Merging partition %d (room %d) with %d (room %d).", part1, dun_room[by1][bx1], part2, dun_room[by2][bx2]);
 
@@ -6685,6 +6725,12 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			int by2 = row1/BLOCK_HGT;
 			int bx2 = col1/BLOCK_WID;
 
+			/* Flood if part of flooded dungeon */
+			if ((dun_room[by2][bx2]) && (dun_room[by2][bx2] <= dun->flood_n))
+			{
+				flood_tunnel = TRUE;
+			}	
+
 			/* Both ends are rooms */
 			if ((dun_room[by1][bx1]) && (dun_room[by2][bx2]) &&
 				(dun_room[by1][bx1] < DUN_ROOMS) && (dun_room[by2][bx2] < DUN_ROOMS))
@@ -6700,9 +6746,6 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				else if ((part1 < CENT_MAX) && (dun_room[by2][bx2]))
 				{
 					int part2 = dun->part[dun_room[by2][bx2]-1];
-
-					/* Merging successfully */
-					if (cheat_xtra) msg_format("Merging partition %d (room %d) with endpoint %d (room %d).", part1, dun_room[by1][bx1], part2, dun_room[by2][bx2]);
 
 					/* Merge partitions */
 					for (i = 0; i < dun->cent_n; i++)
@@ -6763,8 +6806,15 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		y = dun->tunn[i].y;
 		x = dun->tunn[i].x;
 
+		/* Flood fill corridor */
+		if (flood_tunnel)
+		{
+			/* Clear previous contents, write terrain */
+			cave_set_feat(y, x, dun->flood_tunn);			
+		}
+
 		/* Apply feature - note hack */
-		if (dun->tunn_feat[i] > 1)
+		else if (dun->tunn_feat[i] > 1)
 		{
 			/* Clear previous contents, write terrain */
 			cave_set_feat(y, x, dun->tunn_feat[i]);
@@ -6795,7 +6845,14 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		{
 			cave_alter_feat(y, x, FS_DOOR);
 		}
-
+		
+		/* Flood fill corridor */
+		else if (flood_tunnel)
+		{
+			/* Clear previous contents, write terrain */
+			cave_set_feat(y, x, dun->flood_tunn);			
+		}
+		
 		/* Convert to floor grid */
 		else cave_set_feat(y, x, FEAT_FLOOR);
 
@@ -7168,7 +7225,7 @@ static bool build_type7(int room, int type)
 	width = BLOCK_WID * (size_mod + rand_int(3));
 
 	/* Find and reserve some space in the dungeon.  Get center of room. */
-	if (!find_space(&y0, &x0, height, width)) return (FALSE);
+	if (!find_space(&y0, &x0, height + dun->flood_feat ? BLOCK_HGT : 0, width + dun->flood_feat ? BLOCK_WID : 0)) return (FALSE);
 
 	/* Calculate the borders of the room. */
 	y1 = y0 - (height / 2);
@@ -7182,6 +7239,14 @@ static bool build_type7(int room, int type)
 	/* Build the chambers */
 	build_chambers(y1, x1, y2, x2, 30, light);
 
+	/* Handle flooding */
+	if (dun->flood_feat)
+	{
+		/* Place the moat */
+		generate_starburst_room(y1 - BLOCK_HGT, x1 - BLOCK_WID, y2 + BLOCK_HGT, x2 + BLOCK_WID,
+			dun->flood_feat, f_info[dun->flood_feat].edge, STAR_BURST_RAW_EDGE | STAR_BURST_MOAT);
+	}
+	
 	/* Set the chamber flags */
 	set_room_flags(room, type, light);
 
@@ -7205,6 +7270,9 @@ static bool build_type8910(int room, int type)
 	int y0, x0;
 	int limit = 0;
 
+	/* Hack -- no interesting rooms in flooded dungeon */
+	if ((type == ROOM_INTERESTING) && (dun->flood_feat)) return (FALSE);
+
 	/* Pick a lesser vault */
 	while (TRUE)
 	{
@@ -7219,7 +7287,7 @@ static bool build_type8910(int room, int type)
 	}
 
 	/* Find and reserve some space in the dungeon.  Get center of room. */
-	if (!find_space(&y0, &x0, v_ptr->hgt, v_ptr->wid)) return (FALSE);
+	if (!find_space(&y0, &x0, v_ptr->hgt + (dun->flood_feat ? BLOCK_HGT : 0), v_ptr->wid + (dun->flood_feat ? BLOCK_WID : 0))) return (FALSE);
 
 	/* Initialize room description */
 	room_info[dun->cent_n].type = ROOM_INTERESTING + type - 8;
@@ -7229,6 +7297,15 @@ static bool build_type8910(int room, int type)
 
 	/* Hack -- Build the vault */
 	build_vault(y0, x0, v_ptr->hgt, v_ptr->wid, v_text + v_ptr->text);
+
+	/* Handle flooding */
+	if (dun->flood_feat)
+	{
+		/* Place the moat */
+		generate_starburst_room(y0 - v_ptr->hgt / 2 - BLOCK_HGT, x0 - v_ptr->wid / 2 - BLOCK_WID,
+			y0 + (v_ptr->hgt + 1) / 2 + BLOCK_HGT, x0 + (v_ptr->wid + 1)/ 2 + BLOCK_WID,
+			dun->flood_feat, f_info[dun->flood_feat].edge, STAR_BURST_RAW_EDGE | STAR_BURST_MOAT);
+	}
 
 	/* Set the vault / interesting room flags */
 	set_room_flags(room, type, FALSE);
@@ -7535,8 +7612,19 @@ static void build_nature(void)
 				}
 			}
 
-			/* Build one lake/river. */
-			if (!build_feature(feat, big, merge_lakes)) break;
+			/* On surface? */
+			if (level_flag & (LF1_SURFACE))
+			{ 
+				/* Build one lake/river on surface */
+				if (!build_feature(feat, big, merge_lakes)) break;
+			}		
+			else
+			{
+				/* Flood the dungeon */
+				dun->flood_feat = feat;
+				
+				break;
+			}
 		}
 	}
 }
@@ -8126,6 +8214,19 @@ static bool place_rooms()
 			&& (rooms_built < room_data[room_type].max_number) && (dun->cent_n < DUN_ROOMS - 1) &&
 				(room_build(dun->cent_n + 1, room_type)))
 		{
+			/* Hack - Only a few rooms if flooding */
+			if ((dun->flood_feat) && (dun->cent_n > (p_ptr->depth / 20) + 1))
+			{
+				/* Record flooding */
+				dun->flood_n = dun->cent_n;
+				
+				/* Record for tunnelling */
+				dun->flood_tunn = dun->flood_feat;
+				
+				/* Stop flooding */
+				dun->flood_feat = 0;
+			}
+
 			/* Increase the room built count. */
 			rooms_built += room_data[room_type].count_as;
 
@@ -8337,6 +8438,7 @@ static bool place_tunnels()
 				if (build_tunnel(dun->cent[r1].y, dun->cent[r1].x, dun->cent[r2].y, dun->cent[r2].x, TRUE)) retries = 0;
 			}
 		}
+
 		/* Check if we have finished. All partition numbers will be the same. */
 		for (i = 1; i < dun->cent_n; i++)
 		{
@@ -8635,7 +8737,11 @@ static bool cave_gen(void)
 	dun->lake_n = 0;
 	
 	/* Start with no streamers */
-	dun->stream_n = 0;	
+	dun->stream_n = 0;
+	
+	/* Start with no flooding */
+	dun->flood_feat = 0;
+	dun->flood_n = 0;
 
 	/* Set up the monster ecology before placing rooms */
 	/* XXX Very early levels boring with ecologies enabled */
@@ -8666,7 +8772,6 @@ static bool cave_gen(void)
 		place_tower();
 	}
 	
-#if 0
 	/* No features in a tower above the surface */
 	if (((level_flag & (LF1_TOWER)) == 0) || ((level_flag & (LF1_SURFACE)) != 0))
 	{
@@ -8674,21 +8779,6 @@ static bool cave_gen(void)
 		if (cheat_room) msg_print("Building nature.");
 
 		build_nature();
-	}
-#endif
-
-	/* Flavor based on zone */ 	 
-	if (zone->big) 	 
-	{ 	 
-		set_level_flags(zone->big); 	 
-	} 	 
-	else 	 
-	{ 	 
-		/* Pick a random feature */ 	 
-		int feat = pick_proper_feature(cave_feat_lake); 	 
-
-		/* Flavor level based on feat */ 	 
-		set_level_flags(feat); 	 
 	}
 
 	/* Build some rooms or tunnel endpoints */
