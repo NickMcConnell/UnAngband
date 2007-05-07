@@ -225,8 +225,12 @@ struct dun_data
 {
 	/* Number of lakes */
 	int lake_n;
-	coord lake[CENT_MAX];
-	
+	coord lake[DUN_MAX_LAKES];
+
+	/* Streamers */
+	int stream_n;
+	s16b streamer[DUN_MAX_STREAMER];
+
 	/* Array of centers of rooms */
 	int cent_n;
 	coord cent[CENT_MAX];
@@ -2529,6 +2533,9 @@ static bool cave_feat_streamer(int f_idx)
 	{
 		return (FALSE);
 	}
+	
+	/* MegaHack -- now only quartz/magma is a valid stream */
+	if (f_idx > 54) return (FALSE);
 
 	/* All remaining features depend on level flags */
 	return (check_level_flags(f_idx));
@@ -2883,6 +2890,24 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 				{
 					/* Drop gold */
 					*place_flag |= (RG1_HAS_GOLD);
+				}
+			}
+
+			/* Record streamers for later */
+			if ((*place_feat) && (f_info[*place_feat].flags1 & (FF1_STREAMER)) && (dun->stream_n < DUN_MAX_STREAMER))
+			{
+				int n;
+				
+				for (n = 0; n < dun->stream_n; n++)
+				{
+					/* Already added */
+					if (dun->streamer[n] == *place_feat) break;
+				}
+
+				if (n == dun->stream_n)
+				{
+					/* Add dungeon streamer */
+					dun->streamer[dun->stream_n++] = *place_feat;
 				}
 			}
 
@@ -8355,9 +8380,6 @@ static bool place_tunnels()
 static void place_decorations()
 {
 	int i, y, x;
-	int n = 0;
-
-	int streams[DUN_MAX_STREAMER];
 
 	/* Place room decorations */
 	for (i = 0; i < dun->next_n; i++)
@@ -8371,12 +8393,30 @@ static void place_decorations()
 
 		/* Place feature if required */
 		if (dun->next_feat[i]) cave_set_feat(y, x, dun->next_feat[i]);
+	}
 
-		/* Does this feature stream? */
-		if ((n < DUN_MAX_STREAMER) && ((n == 0) || (dun->next_feat[i] != streams[n-1]))
-			&& ((f_info[dun->next_feat[i]].flags1 & (FF1_STREAMER)) != 0))
+	/* Check rooms for streamer types */
+	for (i = 0; i < dun->cent_n; i++)
+	{
+		int feat = room_info[i].solid;
+		int s = dun->stream_n;
+		
+		/* Record streamers for later */
+		if ((feat) && (f_info[feat].flags1 & (FF1_STREAMER)) && (dun->stream_n < DUN_MAX_STREAMER))
 		{
-			streams[n++] = dun->next_feat[i];
+			int n;
+				
+			for (n = s; n < dun->stream_n; n++)
+			{
+				/* Already added */
+				if (dun->streamer[n] == feat) break;
+			}
+
+			if (n == dun->stream_n)
+			{
+				/* Add dungeon streamer */
+				dun->streamer[dun->stream_n++] = feat;
+			}
 		}
 	}
 
@@ -8387,21 +8427,21 @@ static void place_decorations()
 		int feat;
 
 		/* Hack -- try to match dungeon themes */
-		if (i < n)
+		if (dun->stream_n)
 		{
-			feat = streams[i];
+			feat = dun->streamer[i % dun->stream_n];
 		}
 		else
 		{
 			feat = pick_proper_feature(cave_feat_streamer);
 		}
 
-		/* Generating */
-		if (cheat_xtra) msg_print("Building streamers.");
-
 		/* Got a valid feature? */
 		if (feat)
 		{
+			/* Generating */
+			if (cheat_xtra) msg_format("Building %s streamer.", f_name + f_info[feat].name);
+
 			/* Build one streamer. */
 			build_streamer(feat);
 		}
@@ -8593,6 +8633,9 @@ static bool cave_gen(void)
 	
 	/* Start with no lakes */
 	dun->lake_n = 0;
+	
+	/* Start with no streamers */
+	dun->stream_n = 0;	
 
 	/* Set up the monster ecology before placing rooms */
 	/* XXX Very early levels boring with ecologies enabled */
@@ -8633,6 +8676,21 @@ static bool cave_gen(void)
 		build_nature();
 	}
 #endif
+
+	/* Flavor based on zone */ 	 
+	if (zone->big) 	 
+	{ 	 
+		set_level_flags(zone->big); 	 
+	} 	 
+	else 	 
+	{ 	 
+		/* Pick a random feature */ 	 
+		int feat = pick_proper_feature(cave_feat_lake); 	 
+
+		/* Flavor level based on feat */ 	 
+		set_level_flags(feat); 	 
+	}
+
 	/* Build some rooms or tunnel endpoints */
 	if ((level_flag & (LF1_ROOMS | LF1_TUNNELS)) != 0)
 	{
