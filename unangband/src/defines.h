@@ -2868,7 +2868,7 @@
 #define RG1_2X2		0x00200000L	/* Place in 2x2 grids */
 #define RG1_3X3		0x00400000L	/* Place in 3x3 grids */
 #define RG1_8WAY	0x00800000L	/* Place 8 ways */
-#define RG1_DOORWAY	0x01000000L	/* Place doorway in 1 edge */
+#define RG1_FLOODED	0x01000000L	/* The room is 'flooded' */
 #define RG1_3X3HIDDEN	0x02000000L	/* Place 3x3 with hollow inside and doorway */
 #define RG1_STARBURST	0x04000000L	/* Place starburst in centre */
 #define RG1_BRIDGE_EDGE	0x08000000L	/* Replace edges of room with bridges */
@@ -2890,7 +2890,7 @@
 #define ROOM_LITE	0x00000010L	   /* room is lit */
 #define ROOM_DARK	0x00000020L	   /* room is dark */
 #define ROOM_LANGUAGE	0x00000040L	   /* room has language inscriptions */
-#define ROOM_BRIDGE	0x00000080L	   /* room has bridges running through it */
+#define ROOM_XXXX	0x00000080L	   /* xxx */
 #define ROOM_DAYLITE	0x00000100L	   /* room is lit during daytime */ 
 #define ROOM_ICKY 	0x00000200L    /* room cannot be teleport target */
 #define ROOM_BLOODY	0x00000400L    /* room causes wounds/poison to become worse */
