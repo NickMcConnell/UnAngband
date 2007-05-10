@@ -6640,10 +6640,11 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			}
 		}
 
-		/* Travel quickly through rooms -- unless we bridge this room or edge it */
-		else if ((cave_info[tmp_row][tmp_col] & (CAVE_ROOM)) &&
-			((room_has_flag(tmp_row, tmp_col, ROOM_BRIDGED | ROOM_EDGED) == 0)
-			|| ((room_has_flag(tmp_row, tmp_col, ROOM_EDGED) != 0) && !(near_edge(tmp_row, tmp_col)))))
+		/* Travel quickly through rooms -- unless we have to overwrite an edge, or are bridging it
+		 * from a non-flooded tunnel */
+		else if ((cave_info[tmp_row][tmp_col] & (CAVE_ROOM)) && 
+			((flood_tunnel) || ((room_has_flag(tmp_row, tmp_col, (ROOM_BRIDGED))) == 0)) &&
+			(((room_has_flag(tmp_row, tmp_col, (ROOM_EDGED))) == 0) || !(near_edge(tmp_row, tmp_col))))
 		{
 			/* Room */
 			int by2 = tmp_row/BLOCK_HGT;
