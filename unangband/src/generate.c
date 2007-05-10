@@ -6374,7 +6374,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		}
 
 		/* Hack -- Prevent tunnel weirdness */
-		if (dun->tunn_n >= TUNN_MAX)
+		if (dun->tunn_n >= TUNN_MAX - 1)
 		{
 			if (cheat_xtra) msg_format("Tunnel length exceeded from %d. Aborting.", part1);
 			
