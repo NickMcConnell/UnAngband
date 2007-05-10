@@ -11732,7 +11732,7 @@ F:HURT_FIRE | POWER_10 | BASH | REMEMBER | TUNNEL | INNER
 N:865:mechanism in a granite wall
 U:56
 W:1:1:10:0
-M:56
+#M:56
 G:*:v
 K:DEFAULT:1
 K:CHASM:141
@@ -11748,7 +11748,7 @@ F:POWER_40
 
 N:866:opening mechanism in a granite wall
 U:56
-M:865
+#M:865
 G:*:v
 W:1:1:10:0
 K:DEFAULT:1
@@ -11764,7 +11764,7 @@ F:POWER_40
 N:867:closing mechanism in a granite wall
 U:56
 W:1:1:10:0
-M:56
+#M:56
 G:*:v
 K:DEFAULT:1
 K:CHASM:141
@@ -11779,7 +11779,7 @@ F:POWER_40
 N:868:sliding granite wall
 U:56
 W:1:1:10:0
-M:56
+#M:56
 G:*:v
 K:DEFAULT:1
 K:CHASM:141
@@ -11796,7 +11796,7 @@ F:POWER_40
 N:869:open sliding wall
 G:.:w
 U:56
-M:1
+#M:1
 W:24:1:15:0
 K:CHASM:141
 K:TREE:541
@@ -11914,7 +11914,7 @@ F:POWER_15
 N:878:mechanism in a granite wall
 U:56
 W:1:1:10:0
-M:865
+#M:865
 G:*:v
 K:DEFAULT:1
 K:CHASM:141
@@ -11941,7 +11941,7 @@ F:POWER_15
 N:880:mechanism in a granite wall
 U:56
 W:1:1:10:0
-M:56
+#M:56
 G:*:v
 K:DEFAULT:1
 K:CHASM:141
