@@ -3020,16 +3020,24 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 	else exclude |= RG1_LITE;
 
 	/* Flooded dungeon */
-	if (room_info[room].flags & (RG1_FLOODED))
+	if (room_info[room].flags & (ROOM_FLOODED))
 	{
 		/* Flood floor */
 		*feat = dun->flood_feat;
 		
 		/* Surround by edge */
 		*edge = f_info[dun->flood_feat].edge;
-
-		/* No edge - have to bridge the room */
-		if (*edge == 0) room_info[room].flags |= (RG1_BRIDGE_IN);
+		
+		/* Has a passable feature */
+		if ((*edge) && ((f_info[*edge].flags1 & (FF1_MOVE)) != 0))
+		{
+			room_info[room].flags &= ~(ROOM_FLOODED);
+		}
+		/* Must bridge otherwise */
+		else
+		{
+			room_info[room].flags &= (ROOM_BRIDGED);			
+		}
 	}
 
 	/* Get room info */
@@ -3195,21 +3203,21 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 		 || (!in_bounds_fully(y2a, x2a)) || (!in_bounds_fully(y2b, x2b))) return (FALSE);
 
 	/* Flood dungeon if required */
-	if (room_info[room].flags & (RG1_FLOODED))
+	if (room_info[room].flags & (ROOM_FLOODED))
 	{
 		floor = dun->flood_feat;
 		edge = f_info[dun->flood_feat].edge;
 		
 		if ((!edge) || ((f_info[edge].flags1 & (FF1_MOVE)) == 0))
 		{
-			room_info[room].flags |= (RG1_BRIDGE_IN);
+			room_info[room].flags |= (ROOM_BRIDGED);
 		}
 		else
 		{
 			/* Keep edge around edge of room */
 			l = 2;
 			
-			room_info[room].flags |= (RG1_IGNORE_EDGE);
+			room_info[room].flags |= (ROOM_EDGED);
 		}
 	}
 
@@ -3256,9 +3264,10 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	generate_fill_pillars(y1b+l, x1b+l, y2b-l, x2b-l, floor, pillars ? spacing + 1: 0);
 
 	/* Flooded dungeon */
-	if (room_info[room].flags & (RG1_FLOODED))
+	if (room_info[room].flags & (ROOM_FLOODED))
 	{
-		/* No description */
+		/* Has edge we can move around. Treat as not flooded. */
+		if (room_info[room].flags & (ROOM_EDGED)) room_info[room].flags &= ~(ROOM_FLOODED);
 	}
 
 	/* Get room info */
@@ -4238,7 +4247,7 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, b
 	/* Clear remaining pools */
 	for (i = n_pools; i < 3; i++)
 	{
-		if (room_info[room].flags & (RG1_FLOODED))
+		if (room_info[room].flags & (ROOM_FLOODED))
 		{
 			pool[i] = pick_proper_feature(cave_feat_pool);
 		}
@@ -4251,7 +4260,7 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, b
 		if ((f_info[pool[i]].flags1 & (FF1_MOVE)) == 0)
 		{
 			/* Bridge into room */
-			room_info[room].flags |= (RG1_BRIDGE_IN);
+			room_info[room].flags |= (ROOM_BRIDGED);
 		}
 	}
 
@@ -4259,14 +4268,14 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, b
 	if ((f_info[feat].flags1 & (FF1_MOVE)) == 0)
 	{
 		/* Bridge into room */
-		room_info[room].flags |= (RG1_BRIDGE_IN);
+		room_info[room].flags |= (ROOM_BRIDGED);
 	}
 
 	/* Mark room if edge is not 'outer' */
 	if ((f_info[edge].flags1 & (FF1_OUTER)) == 0)
 	{
 		/* Bridge into room */
-		room_info[room].flags |= (RG1_IGNORE_EDGE);
+		room_info[room].flags |= (ROOM_EDGED);
 	}
 	
 	/* Reset the loop counter */
@@ -4478,14 +4487,14 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 	if ((f_info[feat].flags1 & (FF1_MOVE)) == 0)
 	{
 		/* Bridge into room */
-		room_info[room].flags |= (RG1_BRIDGE_IN);
+		room_info[room].flags |= (ROOM_BRIDGED);
 	}
 
 	/* Mark room if edge is not 'outer' */
 	if ((edge) && ((f_info[edge].flags1 & (FF1_MOVE)) == 0))
 	{
 		/* Bridge into room */
-		room_info[room].flags |= (RG1_IGNORE_EDGE);
+		room_info[room].flags |= (ROOM_EDGED);
 	}
 
 	/* Case 1. Plain starburst room */
@@ -4592,7 +4601,7 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 					build_pool(y, x, pool[i], giant_room);
 
 					/* Mark room */
-					if ((f_info[pool[i]].flags1 & (FF1_MOVE)) == 0) room_info[room].flags |= (RG1_BRIDGE_IN);
+					if ((f_info[pool[i]].flags1 & (FF1_MOVE)) == 0) room_info[room].flags |= (ROOM_BRIDGED);
 
 					/* Done */
 					break;
@@ -6196,6 +6205,32 @@ static bool add_door(int y, int x)
 
 
 /*
+ * Check if there are any "non-room" grids adjacent to the given grid.
+ */
+static bool near_edge(int y1, int x1)
+{
+	int i, y, x;
+
+	/* Scan adjacent grids */
+	for (i = 0; i < 4; i++)
+	{
+		/* Extract the location */
+		y = y1 + ddy_ddd[i];
+		x = x1 + ddx_ddd[i];
+
+		/* Skip grids inside rooms */
+		if (cave_info[y][x] & (CAVE_ROOM)) continue;
+
+		/* Count these grids */
+		return (TRUE);
+	}
+
+	/* Inside a room */
+	return (FALSE);
+}
+
+
+/*
  * Constructs a tunnel between two points
  *
  * This function must be called BEFORE any streamers are created,
@@ -6318,8 +6353,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		part1 = dun->part[dun_room[by1][bx1]-1];
 		
 		/* Flood if part of flooded dungeon */
-		if (((room_info[dun_room[by1][bx1]].flags & (RG1_FLOODED)) != 0)
-				&& ((room_info[dun_room[by1][bx1]].flags & (RG1_BRIDGE_IN | RG1_BRIDGE_EDGE)) == 0))
+		if ((room_info[dun_room[by1][bx1]].flags & (ROOM_FLOODED)) != 0)
 		{
 			flood_tunnel = TRUE;
 		}
@@ -6606,10 +6640,10 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			}
 		}
 
-		/* Travel quickly through rooms -- unless we bridge this room */
-		else if ((cave_info[tmp_row][tmp_col] & (CAVE_ROOM)) && (dun_room[tmp_row/BLOCK_HGT][tmp_col/BLOCK_WID] < DUN_ROOMS) &&
-			(((flood_tunnel && ((room_info[dun_room[tmp_row/BLOCK_HGT][tmp_col/BLOCK_WID]].flags & (RG1_IGNORE_EDGE)) == 0))
-				|| ((room_info[dun_room[tmp_row/BLOCK_HGT][tmp_col/BLOCK_WID]].flags & (RG1_BRIDGE_IN)) == 0))))
+		/* Travel quickly through rooms -- unless we bridge this room or edge it */
+		else if ((cave_info[tmp_row][tmp_col] & (CAVE_ROOM)) &&
+			((room_has_flag(tmp_row, tmp_col, ROOM_BRIDGED | ROOM_EDGED) == 0)
+			|| ((room_has_flag(tmp_row, tmp_col, ROOM_EDGED) != 0) && !(near_edge(tmp_row, tmp_col)))))
 		{
 			/* Room */
 			int by2 = tmp_row/BLOCK_HGT;
@@ -6628,7 +6662,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				}
 
 				/* Trying to connect flooded to unflooded area */
-				else if ((flood_tunnel) && ((room_info[dun_room[by2][bx2]].flags & (RG1_FLOODED)) == 0))
+				else if ((flood_tunnel) && ((room_info[dun_room[by2][bx2]].flags & (ROOM_FLOODED)) == 0))
 				{
 					abort_and_cleanup = TRUE;
 					if (cheat_xtra) msg_format("Trying to flood unflooded partition %d. Aborting.", part1);
@@ -7101,6 +7135,14 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					break;
 				}
 
+				/* Trying to connect flooded to unflooded area */
+				else if ((flood_tunnel) && ((room_info[dun_room[by2][bx2]].flags & (ROOM_FLOODED)) == 0))
+				{
+					abort_and_cleanup = TRUE;
+					if (cheat_xtra) msg_format("Trying to flood unflooded partition %d. Aborting.", part1);
+					break;
+				}
+				
 				else if ((part1 < CENT_MAX) && (dun_room[by2][bx2]))
 				{
 					int part2 = dun->part[dun_room[by2][bx2]-1];
@@ -7306,6 +7348,7 @@ static int next_to_corr(int y1, int x1)
 	/* Return the number of corridors */
 	return (k);
 }
+
 
 
 /*
@@ -7604,7 +7647,7 @@ static bool build_type7(int room, int type)
 	int y0, x0, height, width;
 	int y1, x1, y2, x2;
 	int size_mod = 0;
-	bool flooded = ((room_info[room].flags & (RG1_FLOODED)) != 0);
+	bool flooded = ((room_info[room].flags & (ROOM_FLOODED)) != 0);
 
 	/* Deeper in the dungeon, chambers are less likely to be lit. */
 	bool light = (rand_range(25, 60) > p_ptr->depth) ? TRUE : FALSE;
@@ -7659,7 +7702,7 @@ static bool build_type7(int room, int type)
 		generate_starburst_room(y1, x1, y2, x2, dun->flood_feat, f_info[dun->flood_feat].edge, STAR_BURST_RAW_EDGE | STAR_BURST_MOAT);
 			
 		/* Hack -- 'room' part is not flooded */
-		room_info[room].flags &= ~(RG1_FLOODED);
+		room_info[room].flags &= ~(ROOM_FLOODED);
 	}
 	
 	/* Set the chamber flags */
@@ -7687,7 +7730,7 @@ static bool build_type8910(int room, int type)
 	int height, width;
 
 	/* Hack -- no interesting rooms in flooded dungeon */
-	if (type == ROOM_INTERESTING) room_info[room].flags &= ~(RG1_FLOODED);
+	if (type == ROOM_INTERESTING) room_info[room].flags &= ~(ROOM_FLOODED);
 
 	/* Pick a lesser vault */
 	while (TRUE)
@@ -7707,7 +7750,7 @@ static bool build_type8910(int room, int type)
 	width = v_ptr->wid;
 
 	/* Calculate additional space for moat */
-	if ((room_info[room].flags & (RG1_FLOODED)) != 0)
+	if ((room_info[room].flags & (ROOM_FLOODED)) != 0)
 	{
 		height += 2 * BLOCK_HGT;
 		width += 2 * BLOCK_WID;
@@ -7726,7 +7769,7 @@ static bool build_type8910(int room, int type)
 	build_vault(y0, x0, v_ptr->hgt, v_ptr->wid, v_text + v_ptr->text);
 
 	/* Handle flooding */
-	if (room_info[room].flags & (RG1_FLOODED))
+	if (room_info[room].flags & (ROOM_FLOODED))
 	{
 		/* Grow the moat around the chambers */
 		int y1 = MAX(y0 - height / 2, 1);
@@ -7738,7 +7781,7 @@ static bool build_type8910(int room, int type)
 		generate_starburst_room(y1, x1, y2, x2, dun->flood_feat, f_info[dun->flood_feat].edge, STAR_BURST_RAW_EDGE | STAR_BURST_MOAT);			
 
 		/* Hack -- 'room' part is not flooded */
-		room_info[room].flags &= ~(RG1_FLOODED);
+		room_info[room].flags &= ~(ROOM_FLOODED);
 	}
 
 	/* Set the vault / interesting room flags */
@@ -7851,7 +7894,7 @@ static bool build_type16(int room, int type)
 	size_mod = 2;
 
 	/* Lairs are never flooded */
-	room_info[room].flags &= ~(RG1_FLOODED);
+	room_info[room].flags &= ~(ROOM_FLOODED);
 
 	/* Calculate the room size. */
 	height = BLOCK_HGT * size_mod;
@@ -7908,7 +7951,7 @@ static bool room_build(int room, int type)
 	if (cheat_xtra) msg_format("Building room type %d.", type);
 	
 	/* Flood if required */
-	if ((dun->flood_feat) && (room % 3)) room_info[room].flags |= (RG1_FLOODED);
+	if ((dun->flood_feat) && (room % 3)) room_info[room].flags |= (ROOM_FLOODED);
 
 	/* Build a room */
 	switch (type)
@@ -8843,11 +8886,11 @@ static bool place_tunnels()
 
 					/* Skip if state of flooding doesn't match */
 					if ((retries > 2 * DUN_TRIES) &&
-						((room_info[k].flags & (RG1_FLOODED)) != (room_info[r1].flags & (RG1_FLOODED))))
+						((room_info[k].flags & (ROOM_FLOODED)) != (room_info[r1].flags & (ROOM_FLOODED))))
 					{
 						continue;
 					}
-					else if ((room_info[k].flags & (RG1_FLOODED)) != (room_info[j].flags & (RG1_FLOODED)))
+					else if ((room_info[k].flags & (ROOM_FLOODED)) != (room_info[j].flags & (ROOM_FLOODED)))
 					{
 						continue;
 					}

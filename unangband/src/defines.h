@@ -2868,14 +2868,14 @@
 #define RG1_2X2		0x00200000L	/* Place in 2x2 grids */
 #define RG1_3X3		0x00400000L	/* Place in 3x3 grids */
 #define RG1_8WAY	0x00800000L	/* Place 8 ways */
-#define RG1_FLOODED	0x01000000L	/* The room is 'flooded' */
+#define RG1_DOORWAY	0x01000000L	/* Place a doorway */
 #define RG1_3X3HIDDEN	0x02000000L	/* Place 3x3 with hollow inside and doorway */
 #define RG1_STARBURST	0x04000000L	/* Place starburst in centre */
 #define RG1_BRIDGE_EDGE	0x08000000L	/* Replace edges of room with bridges */
 #define RG1_IGNORE_EDGE	0x10000000L	/* Ignore edges, run terrain to edge of room */
 #define RG1_BRIDGE_IN	0x20000000L	/* Run bridges into the centre of the room */
-#define RG1_LITE	0x40000000L	/* Generate room with light */
-#define RG1_DARK	0x80000000L	/* Generate room with darkness */
+#define RG1_LITE	0x40000000L	/* Place in lit rooms */
+#define RG1_DARK	0x80000000L	/* Place in dark rooms */
 
 
 /*** Room flags ***/
@@ -2887,10 +2887,10 @@
 #define ROOM_HEARD	0x00000002L	   /* room has been heard */
 #define ROOM_ENTERED	0x00000004L	   /* room has been entered */
 #define ROOM_QUEST	0x00000008L	   /* room is a quest */
-#define ROOM_LITE	0x00000010L	   /* room is lit */
-#define ROOM_DARK	0x00000020L	   /* room is dark */
+#define ROOM_BRIDGED	0x00000010L	   /* room must be bridged */
+#define ROOM_EDGED	0x00000020L	   /* room doesn't have 'outer' terrain */
 #define ROOM_LANGUAGE	0x00000040L	   /* room has language inscriptions */
-#define ROOM_XXXX	0x00000080L	   /* xxx */
+#define ROOM_FLOODED	0x00000080L	   /* room is flooded with terrain */
 #define ROOM_DAYLITE	0x00000100L	   /* room is lit during daytime */ 
 #define ROOM_ICKY 	0x00000200L    /* room cannot be teleport target */
 #define ROOM_BLOODY	0x00000400L    /* room causes wounds/poison to become worse */
@@ -4837,11 +4837,10 @@
  * Line 1 -- permanent flag
  */
 #define room_has_flag(Y,X,FLAG) \
- ((cave_info[Y][X] & (CAVE_ROOM)) ? \
+ (((cave_info[Y][X] & (CAVE_ROOM)) != 0) &&\
+ 	(dun_room[Y/BLOCK_HGT][X/BLOCK_WID] < DUN_ROOMS) ? \
 	 (room_info[dun_room[Y/BLOCK_HGT][X/BLOCK_WID]].flags & (FLAG)) : \
 	 (room_info[0].flags & (FLAG)))
-
-
 
 
 /*

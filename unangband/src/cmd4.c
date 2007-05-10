@@ -4903,12 +4903,16 @@ bool print_event(quest_event *event, int pronoun, int tense, cptr prefix)
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_HIDDEN))) vp[vn++] = "reveal";
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_SEALED))) vp[vn++] = "unseal";
 			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_ENTERED))) vp[vn++] = "enter";
+#if 0
 			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_LITE))) vp[vn++] = "light up";
+#endif
 			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_SEEN))) vp[vn++] = "explore";
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_LAIR))) vp[vn++] = "clear of monsters";
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_OBJECT))) vp[vn++] = "empty of objects";
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_TRAP))) vp[vn++] = "disarm";
+#if 0
 			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_DARK))) vp[vn++] = "darken";
+#endif
 		}
 		else
 		{
@@ -4916,12 +4920,16 @@ bool print_event(quest_event *event, int pronoun, int tense, cptr prefix)
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_HIDDEN))) vp[vn++] = "revealed";
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_SEALED))) vp[vn++] = "unsealed";
 			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_ENTERED))) vp[vn++] = "entered";
+#if 0
 			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_LITE))) vp[vn++] = "lit up";
+#endif
 			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_SEEN))) vp[vn++] = "explored";
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_LAIR))) vp[vn++] = "cleared of monsters";
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_OBJECT))) vp[vn++] = "emptied of objects";
 			if ((event->flags & (EVENT_UNFLAG_ROOM)) && (event->room_flags & (ROOM_TRAP))) vp[vn++] = "disarmed";
+#if 0
 			if ((event->flags & (EVENT_FLAG_ROOM)) && (event->room_flags & (ROOM_DARK))) vp[vn++] = "darkened";
+#endif
 		}
 
 		if (vn)

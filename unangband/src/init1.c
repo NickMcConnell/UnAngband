@@ -61,13 +61,13 @@
 static cptr d_info_sflags[] =
 {
 	"SEEN",
-	"HEAR",
+	"HEARD",
 	"ENTERED",
 	"QUEST",
-	"LITE",
-	"DARK",
+	"BRIDGED",
+	"EDGED",
 	"LANGUAGE",
-	"XXXX",
+	"FLOODED",
 	"DAYLITE",
 	"ICKY",
 	"BLOODY",
