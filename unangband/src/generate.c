@@ -1,5 +1,3 @@
-
-
 /* File: generate.c */
 
 /*
@@ -1731,12 +1729,11 @@ static bool generate_starburst_room(int y1, int x1, int y2, int x2,
 					build_terrain(yy, xx, edge);
 				}
 
-				/* Make part of a room if requested and correct edge terrain */
-				if ((flag & (STAR_BURST_ROOM)) && (f_info[edge].flags1 & (FF1_OUTER)))
+				/* Make part of a room if requested */
+				if (flag & (STAR_BURST_ROOM))
 				{
 					cave_info[yy][xx] |= (CAVE_ROOM);
 				}
-
 			}
 		}
 	}
@@ -4103,36 +4100,18 @@ static void fractal_map_to_room(fractal_map map, byte fractal_type, int y0, int 
 				/* Pool grid */
 				if (grid_type == FRACTAL_POOL_1)
 				{
-					/* Pick a feature if necessary */
-					if (pool[0] == FEAT_NONE)
-					{
-						pool[0] = pick_proper_feature(cave_feat_pool);
-					}
-
 					/* Use the pool feature */
 					feat = pool[0];
 				}
 				/* Pool grid */
 				else if (grid_type == FRACTAL_POOL_2)
 				{
-					/* Pick a feature if necessary */
-					if (pool[1] == FEAT_NONE)
-					{
-						pool[1] = pick_proper_feature(cave_feat_pool);
-					}
-
 					/* Use the pool feature */
 					feat = pool[1];
 				}
 				/* Pool grid */
 				else if (grid_type == FRACTAL_POOL_3)
 				{
-					/* Pick a feature if necessary */
-					if (pool[2] == FEAT_NONE)
-					{
-						pool[2] = pick_proper_feature(cave_feat_pool);
-					}
-
 					/* Use the pool feature */
 					feat = pool[2];
 				}
@@ -4167,11 +4146,8 @@ static void fractal_map_to_room(fractal_map map, byte fractal_type, int y0, int 
 			{
 				cave_set_feat(yy, xx, wall);
 
-				if (f_info[wall].flags1 & (FF1_OUTER))
-				{
-					/* Mark the grid as a part of the room */
-					cave_info[yy][xx] |= (CAVE_ROOM);
-				}				
+				/* Mark the grid as a part of the room */
+				cave_info[yy][xx] |= (CAVE_ROOM);			
 			}
 			else
 			{
@@ -4262,9 +4238,37 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, b
 	/* Clear remaining pools */
 	for (i = n_pools; i < 3; i++)
 	{
-		pool[i] = FEAT_NONE;
+		if (room_info[room].flags & (RG1_FLOODED))
+		{
+			pool[i] = pick_proper_feature(cave_feat_pool);
+		}
+		else
+		{
+			pool[i] = FEAT_NONE;
+		}
+		
+		/* Mark room if feat is not passable */
+		if ((f_info[pool[i]].flags1 & (FF1_MOVE)) == 0)
+		{
+			/* Bridge into room */
+			room_info[room].flags |= (RG1_BRIDGE_IN);
+		}
 	}
 
+	/* Mark room if feat is not passable */
+	if ((f_info[feat].flags1 & (FF1_MOVE)) == 0)
+	{
+		/* Bridge into room */
+		room_info[room].flags |= (RG1_BRIDGE_IN);
+	}
+
+	/* Mark room if edge is not 'outer' */
+	if ((f_info[edge].flags1 & (FF1_OUTER)) == 0)
+	{
+		/* Bridge into room */
+		room_info[room].flags |= (RG1_IGNORE_EDGE);
+	}
+	
 	/* Reset the loop counter */
 	tries = 0;
 
@@ -4470,6 +4474,20 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 		flag &= ~(STAR_BURST_ROOM);
 	}
 
+	/* Mark room if feat is not passable */
+	if ((f_info[feat].flags1 & (FF1_MOVE)) == 0)
+	{
+		/* Bridge into room */
+		room_info[room].flags |= (RG1_BRIDGE_IN);
+	}
+
+	/* Mark room if edge is not 'outer' */
+	if ((edge) && ((f_info[edge].flags1 & (FF1_MOVE)) == 0))
+	{
+		/* Bridge into room */
+		room_info[room].flags |= (RG1_IGNORE_EDGE);
+	}
+
 	/* Case 1. Plain starburst room */
 	if ((rand_int(100) < 75) && !(inner))
 	{
@@ -4572,6 +4590,9 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 				if (cave_feat[y][x] == feat)
 				{
 					build_pool(y, x, pool[i], giant_room);
+
+					/* Mark room */
+					if ((f_info[pool[i]].flags1 & (FF1_MOVE)) == 0) room_info[room].flags |= (RG1_BRIDGE_IN);
 
 					/* Done */
 					break;
@@ -6004,6 +6025,174 @@ static u32b get_tunnel_style(void)
 	return (style);
 }
 
+/*
+ * Record good location for stairwell, player start or quest object
+ */
+static bool add_stair(int y, int x)
+{
+	/* Needs to be in bounds */
+	if (!in_bounds_fully(y, x)) return (FALSE);
+
+	/* Record location */
+	if (dun->stair_n < STAIR_MAX)
+	{
+		dun->stair[dun->stair_n].y = y;
+		dun->stair[dun->stair_n].x = x;
+		dun->stair_n++;	
+
+		return (TRUE);
+	}
+	
+	return (FALSE);
+}
+
+/*
+ * Record location for tunnel decoration
+ */
+static bool add_decor(int y, int x, int t)
+{
+	/* Needs to be in bounds */
+	if (!in_bounds_fully(y, x)) return (FALSE);
+
+	/* Needs to be a wall */
+	if ((f_info[cave_feat[y][x]].flags1 & (FF1_WALL)) == 0) return (FALSE);
+	
+	/* Record location and tunnel length */
+	if (dun->decor_n < DECOR_MAX)
+	{
+		dun->decor[dun->decor_n].y = y;
+		dun->decor[dun->decor_n].x = x;
+		dun->decor_t[dun->decor_n] = t;
+		dun->decor_n++;
+		
+		return (TRUE);
+	}
+	
+	return (FALSE);
+}
+
+/*
+ * Record location for entrance to room through outer wall
+ */
+static bool add_wall(int y, int x)
+{
+	/* XXX Don't need to check inbounds because of use of inbounds_fully_tunnel from caller */
+
+	/* Needs an 'outer' wall */
+	if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) == 0) return (FALSE);
+
+	/* Record location */
+	if (dun->wall_n < WALL_MAX)
+	{
+		dun->wall[dun->wall_n].y = y;
+		dun->wall[dun->wall_n].x = x;
+		dun->wall_n++;	
+
+		return (TRUE);
+	}
+	
+	return (FALSE);
+}
+
+
+/*
+ * Record location for entrance to room through outer wall
+ */
+static bool add_solid(int y, int x, int feat)
+{
+	/* Needs to be in bounds */
+	if (!in_bounds_fully(y, x)) return (FALSE);
+
+	/* Needs an 'outer' wall */
+	if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) == 0) return (FALSE);
+
+	/* Record location and feature */
+	if (dun->solid_n < SOLID_MAX)
+	{
+		dun->solid[dun->solid_n].y = y;
+		dun->solid[dun->solid_n].x = x;
+		dun->solid_feat[dun->solid_n] = feat;
+		dun->solid_n++;
+
+		return (TRUE);
+	}
+	
+	return (FALSE);
+}
+
+
+/*
+ * Record location for tunnel
+ */
+static bool add_tunnel(int y, int x, int feat)
+{
+	/* XXX Don't need to check inbounds because of use of inbounds_fully_tunnel from caller */
+
+	/* XXX We could bridge or tunnel a location and add it as a 'tunnel' */
+
+	/* Record location and feature */
+	if (dun->tunn_n < TUNN_MAX)
+	{
+		dun->tunn[dun->tunn_n].y = y;
+		dun->tunn[dun->tunn_n].x = x;
+		dun->tunn_feat[dun->tunn_n] = feat;
+		dun->tunn_n++;
+
+		return (TRUE);
+	}
+	
+	return (FALSE);
+}
+
+
+/*
+ * Record location for entrance to room through outer wall
+ */
+static bool add_next(int y, int x, int feat)
+{
+	/* Needs to be in bounds */
+	if (!in_bounds_fully(y, x)) return (FALSE);
+
+	/* Needs an 'solid' wall */
+	if ((f_info[cave_feat[y][x]].flags1 & (FF1_SOLID)) == 0) return (FALSE);
+
+	/* Record location and feature */
+	if (dun->next_n < NEXT_MAX)
+	{
+		dun->next[dun->next_n].y = y;
+		dun->next[dun->next_n].x = x;
+		dun->next_feat[dun->next_n] = feat;
+		dun->next_n++;
+
+		return (TRUE);
+	}
+	
+	return (FALSE);
+}
+
+
+/*
+ * Record location for door at intersection
+ */
+static bool add_door(int y, int x)
+{
+	/* Needs to be in bounds */
+	if (!in_bounds_fully(y, x)) return (FALSE);
+
+	/* Needs not to be a wall */
+	if ((f_info[cave_feat[y][x]].flags1 & (FF1_WALL)) != 0) return (FALSE);
+
+	/* Record location */
+	if (dun->door_n < DOOR_MAX)
+	{
+		dun->door[dun->door_n].y = y;
+		dun->door[dun->door_n].x = x;
+		dun->door_n++;
+		return (TRUE);
+	}
+	
+	return (FALSE);
+}
 
 
 /*
@@ -6066,7 +6255,12 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	int main_loop_count = 0;
 	int last_turn = 0, first_door, last_door, first_tunn, first_next, first_stair;
 	int start_tunnel = 0, start_decor = 0, end_decor = 0;
+	int first_decor = dun->decor_n;
 	int last_decor = 0;
+	int door_l = 0;
+	int door_r = 0;
+	int old_row_dir = 0;
+	int old_col_dir = 0;
 	
 	bool flood_tunnel = FALSE;
 	bool door_flag = FALSE;
@@ -6135,7 +6329,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
 
 	/* Keep going until done (or bored) */
-	while ((row1 != row2) || (col1 != col2)) 
+	while (TRUE) 
 	{
 		/* Mega-Hack -- Paranoia -- prevent infinite loops */
 		if (main_loop_count++ > 2000)
@@ -6158,14 +6352,26 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		}
 
 		/* Hack -- if we are not starting in a room, include starting grid. Also add as a possible stair location. */
-		if ((dun->tunn_n == 0) && ((cave_info[row1][col1] & (CAVE_ROOM)) == 0) && (dun->stair_n < STAIR_MAX))
+		if ((dun->tunn_n == 0) && ((cave_info[row1][col1] & (CAVE_ROOM)) == 0))
 		{
 			row1 = row1 - row_dir;
 			col1 = col1 - col_dir;
 
-			dun->stair[dun->stair_n].y = row1;
-			dun->stair[dun->stair_n].x = col1;
-			dun->stair_n++;
+			/* Good candidate for stairs */
+			add_stair(row1, col1);
+			
+			/* Decorate 'left-hand' corner of dead end */
+			add_decor(row1 - row_dir + col_dir * ((style & (TUNNEL_LARGE_L)) != 0) ? 2 : 1,
+							col1 - col_dir - row_dir * ((style & (TUNNEL_LARGE_L)) != 0) ? 2 : 1,
+							dun->tunn_n);
+
+			/* Decorate 'right-hand' corner of dead end */
+			add_decor(row1 - row_dir + col_dir * ((style & (TUNNEL_LARGE_R)) != 0) ? 2 : 1,
+							col1 - col_dir + row_dir * ((style & (TUNNEL_LARGE_R)) != 0) ? 2 : 1,
+							dun->tunn_n);
+
+			/* Decorated */
+			decor_flag = TRUE;
 		}
 
 		/* Try moving randomly if we seem stuck. */
@@ -6247,7 +6453,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				/* Don't use again unless needed. */
 				correct_dir_timer = -1;
 			}
-		}
+		}		
 
 		/* Get the next location */
 		tmp_row = row1 + row_dir;
@@ -6272,6 +6478,12 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			dun->tunn_n = last_turn;
 			dun->door_n = last_door;
 
+			/* Clear decorations up to here */
+			for ( ; dun->decor_n > 0; dun->decor_n--)
+			{
+				if (dun->decor_t[dun->decor_n] < dun->tunn_n) break;
+			}
+
 			/* Back up some more */
 			last_turn /= 2;
 			last_door = first_door;
@@ -6293,7 +6505,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			int wall1 = dun->wall_n;
 			bool door = TRUE;
 			bool pillar = FALSE;
-
+			
 			/* Get the "next" location */
 			y = tmp_row + row_dir;
 			x = tmp_col + col_dir;
@@ -6307,56 +6519,38 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			decor_flag = TRUE;
 
 			/* Save the wall location */
-			if (dun->wall_n < WALL_MAX)
+			if (add_wall(tmp_row, tmp_col))
 			{
-				dun->wall[dun->wall_n].y = tmp_row;
-				dun->wall[dun->wall_n].x = tmp_col;
-				dun->wall_n++;
-			}
-
-			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
-			if (style & (TUNNEL_LARGE_L))
-			{
-				if (f_info[cave_feat[tmp_row + col_dir][tmp_col - row_dir]].flags1 & (FF1_OUTER))
+				/* Add a 'left-hand' wall piercing */
+				if (style & (TUNNEL_LARGE_L))
 				{
-					/* Save the wall location */
-					if (dun->wall_n < WALL_MAX)
+					if (add_wall(tmp_row + col_dir, tmp_col - row_dir))
 					{
-						dun->wall[dun->wall_n].y = tmp_row + col_dir;
-						dun->wall[dun->wall_n].x = tmp_col - row_dir;
-						dun->wall_n++;
-
 						/* Hack -- add regular pillars to some width 3 corridors */
 						if ((((tmp_row + tmp_col) % ((style % 4) + 2)) == 0)
 							&& ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))== 0)) pillar = TRUE;
 					}
-				}
-				else
-				{
-					door = FALSE;
-				}
-			}
-
-			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
-			if (style & (TUNNEL_LARGE_R))
-			{
-				if (f_info[cave_feat[tmp_row - col_dir][tmp_col + row_dir]].flags1 & (FF1_OUTER))
-				{
-					/* Save the wall location */
-					if (dun->wall_n < WALL_MAX)
+					else
 					{
-						if (pillar) dun->wall_n -= 2;
-
-						dun->wall[dun->wall_n].y = tmp_row - col_dir;
-						dun->wall[dun->wall_n].x = tmp_col + row_dir;
-						dun->wall_n++;
-
-						if (pillar) dun->wall_n++;
+						door = FALSE;
 					}
 				}
-				else
+
+				/* Add a 'right-hand' wall piercing */
+				if (style & (TUNNEL_LARGE_R))
 				{
-					door = FALSE;
+					if (pillar) dun->wall_n -= 2;
+					
+				 	if (add_wall(tmp_row - col_dir, tmp_col + row_dir))
+				 	{
+						/* Done */
+				 	}
+				 	else
+				 	{
+				 		door = FALSE;
+				 	}
+				 	
+				 	if (pillar) dun->wall_n++;
 				}
 			}
 
@@ -6391,50 +6585,20 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 						if (doorway) continue;
 
 						/* Convert adjacent "outer" walls as "solid" walls */
-						if (f_info[cave_feat[y][x]].flags1 & (FF1_OUTER))
+						if (add_solid(y, x, cave_feat[y][x]))
 						{
 							/* Room */
 							int by2 = tmp_row/BLOCK_HGT;
 							int bx2 = tmp_col/BLOCK_WID;
-		
-							/* Record details of walls made solid in the event we abort this tunnel */
-							if (dun->solid_n < SOLID_MAX)
-							{
-								dun->solid[dun->solid_n].y = y;
-								dun->solid[dun->solid_n].x = x;
-								dun->solid_feat[dun->solid_n] = cave_feat[y][x];
-								dun->solid_n++;
-							}
 							
 							/* Change the wall to a "solid" wall */
 							cave_alter_feat(y, x, FS_SOLID);
 
 							/* Decorate next to the start and/or end of the tunnel with the starting room decorations */
-							if ((dun_room[by1][bx1]) && (dun_room[by1][bx1] < DUN_ROOMS) && ((room_info[dun_room[by1][bx1]].solid) || (dun_room[by1][bx1] == dun_room[by2][bx2]))
-									&& (dun->next_n < NEXT_MAX))
+							if ((dun_room[by1][bx1]) && (dun_room[by1][bx1] < DUN_ROOMS) && ((room_info[dun_room[by1][bx1]].solid) || (dun_room[by1][bx1] == dun_room[by2][bx2])))
 							{
 								/* Overwrite with alternate terrain from starting room later */
-								dun->next[dun->next_n].y = y;
-								dun->next[dun->next_n].x = x;
-								dun->next_feat[dun->next_n] = room_info[dun_room[by1][bx1]].solid;
-								dun->next_n++;
-							}
-
-							/* If the ending room has decorations, overwrite the start */
-							if ((dun_room[by2][bx2]) && (dun_room[by2][bx2] < DUN_ROOMS) && (room_info[dun_room[by2][bx2]].solid) && (dun->next_n < NEXT_MAX))
-							{
-								int j;
-
-								for (j = first_next; j < dun->next_n; j++)
-								{
-									/* Overwrite with alternate terrain from ending room later */
-									dun->next_feat[j] = room_info[dun_room[by2][bx2]].solid;
-								}
-							}
-							/* If ending room does not have decorations and neither does start, clear the above 'fake' decorations */
-							else if ((dun_room[by1][bx1]) && (dun_room[by1][bx1] < DUN_ROOMS) && !(room_info[dun_room[by1][bx1]].solid) && (dun_room[by1][bx1] != dun_room[by2][bx2]))
-							{
-								dun->next_n = first_next;
+								add_next(y, x, room_info[dun_room[by1][bx1]].solid);
 							}
 						}
 					}
@@ -6504,6 +6668,23 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 						}
 					}
 					
+					/* If the ending room has decorations next to doors, overwrite the start */
+					if ((dun_room[by2][bx2]) && (dun_room[by2][bx2] < DUN_ROOMS) && (room_info[dun_room[by2][bx2]].solid) && (dun->next_n < NEXT_MAX))
+					{
+						int j;
+
+						for (j = first_next; j < dun->next_n; j++)
+						{
+							/* Overwrite with alternate terrain from ending room later */
+							dun->next_feat[j] = room_info[dun_room[by2][bx2]].solid;
+						}
+					}
+					/* If ending room does not have decorations and neither does start, clear the above 'fake' decorations */
+					else if ((dun_room[by1][bx1]) && (dun_room[by1][bx1] < DUN_ROOMS) && !(room_info[dun_room[by1][bx1]].solid) && (dun_room[by1][bx1] != dun_room[by2][bx2]))
+					{
+						dun->next_n = first_next;
+					}
+
 					/* Get end decor */
 					if (dun_room[by2][bx2] < DUN_ROOMS)
 					{
@@ -6547,53 +6728,67 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		else if (((f_info[cave_feat[tmp_row][tmp_col]].flags2 & (FF2_BRIDGE)) != 0) ||
 			((cave_info[tmp_row][tmp_col] & (CAVE_ROOM)) && !(flood_tunnel)))
 		{
+			bool left_turn = FALSE;
+			bool right_turn = FALSE;
+			
 			/* Accept this location */
 			row1 = tmp_row;
 			col1 = tmp_col;
 
-			/* Save the tunnel location */
-			if (dun->tunn_n < TUNN_MAX)
+			/* Add a bridge location */
+			if (add_tunnel(row1, col1, 0))
 			{
-				dun->tunn[dun->tunn_n].y = row1;
-				dun->tunn[dun->tunn_n].x = col1;
-				dun->tunn_feat[dun->tunn_n] = 0;
-				dun->tunn_n++;
-			}
+				/* Are we turning left? */
+				if ((row_dir == -old_col_dir) || (col_dir == old_row_dir)) left_turn = TRUE;
 
-			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
-			if ((style & (TUNNEL_LARGE_L)) && (!(style & (TUNNEL_LARGE_R)) || (style % 2)))
-			{
-				if (f_info[cave_feat[row1+col_dir][col1-row_dir]].flags2 & (FF2_BRIDGE))
+				/* Are we turning right? */
+				if ((row_dir == old_col_dir) || (col_dir == -old_row_dir)) right_turn = TRUE;				
+				
+				/* Add a 'left-hand' bridge, but ensure the full bridge is no more than 2 wide */
+				if ((style & (TUNNEL_LARGE_L)) && (!(style & (TUNNEL_LARGE_R)) || (style % 2)))
 				{
-					/* Save the tunnel location */
-					if (dun->tunn_n < TUNN_MAX)
+					if (f_info[cave_feat[row1+col_dir][col1-row_dir]].flags2 & (FF2_BRIDGE))
 					{
-						dun->tunn[dun->tunn_n].y = row1 + col_dir;
-						dun->tunn[dun->tunn_n].x = col1 - row_dir;
-						dun->tunn_feat[dun->tunn_n] = 0;
-						dun->tunn_n++;
+						/* Add a bridge location */
+						add_tunnel(row1 + col_dir, col1 - row_dir, 0);
+					}
+					
+					/* Add 'diagonally backwards left-hand' bridge if just turned right */
+					if (right_turn)
+					{
+						/* Add if bridgeable */
+						if ((f_info[cave_feat[row1 - row_dir + col_dir ][col1 - col_dir - row_dir]].flags2 & (FF2_BRIDGE)) != 0)
+						{
+							add_tunnel(row1 - row_dir + col_dir, col1 - col_dir - row_dir, 0);
+						}
+					}
+				}
+
+				/* Add a 'right-hand' bridge, but ensure the full bridge is no more than 2 wide */
+				else if (style & (TUNNEL_LARGE_L | TUNNEL_LARGE_R))
+				{
+					if (f_info[cave_feat[row1-col_dir][col1+row_dir]].flags2 & (FF2_BRIDGE))
+					{
+						/* Add a bridge location */
+						add_tunnel(row1 - col_dir, col1 + row_dir, 0);
+					}
+					
+					/* Add 'diagonally backwards right-hand' bridge if just turned left */
+					if (left_turn)
+					{
+						/* Add if tunnelable, but not inner, outer or solid */
+						if ((f_info[cave_feat[row1 - row_dir - col_dir ][col1 - col_dir + row_dir]].flags2 & (FF2_BRIDGE)) != 0)
+						{
+							add_tunnel(row1 - row_dir + col_dir, col1 - col_dir - row_dir, 0);
+						}
 					}
 				}
 			}
 
-			/* Hack -- note use of else to ensure bridges are never more than 2 units wide */
-			else if (style & (TUNNEL_LARGE_L | TUNNEL_LARGE_R))
-			{
-				if (f_info[cave_feat[row1-col_dir][col1+row_dir]].flags2 & (FF2_BRIDGE))
-				{
-					/* Save the tunnel location */
-					if (dun->tunn_n < TUNN_MAX)
-					{
-						dun->tunn[dun->tunn_n].y = row1 - col_dir;
-						dun->tunn[dun->tunn_n].x = col1 + row_dir;
-						dun->tunn_feat[dun->tunn_n] = 0;
-						dun->tunn_n++;
-					}
-				}
-			}
-
-			/* Prevent door in next grid */
+			/* Prevent door decoration in next grid */
 			door_flag = TRUE;
+			
+			/* Force decoration in next grid */
 			decor_flag = FALSE;
 		}
 
@@ -6604,160 +6799,163 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			bool pillar = FALSE;
 			bool decor_l = FALSE;
 			bool decor_r = FALSE;
-
+			bool left_turn = FALSE;
+			bool right_turn = FALSE;
+			
 			/* Accept this location */
 			row1 = tmp_row;
 			col1 = tmp_col;
 
-			/* Do we not need decoration? */
-			if ((decor_flag) && (dun->tunn_n % (7 + (style % 4) * 5)))
+			/*
+			 * Save the tunnel location unless an inner wall
+			 * Note hack to differentiate a tunnel from a bridge, if start_tunnel not set.
+			 */
+			if (((f_info[cave_feat[row1][col1]].flags1 & (FF1_INNER)) == 0) &&
+				(add_tunnel(row1, col1, start_tunnel ? start_tunnel : 1)))
 			{
-				dun->decor_n = last_decor;
-			}
-
-			/* Save the decoration */
-			last_decor = dun->decor_n;
-
-			/* Save the tunnel location unless an inner wall */
-			if ((dun->tunn_n < TUNN_MAX) && ((f_info[cave_feat[row1][col1]].flags1 & (FF1_INNER)) == 0))
-			{
-				dun->tunn[dun->tunn_n].y = row1;
-				dun->tunn[dun->tunn_n].x = col1;
-
-				/* Mark centre of tunnel with terrain type */
-				if (start_tunnel)
+				/* Did we turn around? Tunnel dead ends are good candidates for stairs.
+				 * Note use of decor flag to ensure previous move was a tunnel build.
+				 * 
+				 * XXX Could also have been a move through 'outer' wall. Should be rare
+				 * enough not to worry about.
+				 */
+				if ((decor_flag) && (row_dir == -old_row_dir) && (col_dir == -old_col_dir))
 				{
-					dun->tunn_feat[dun->tunn_n] = start_tunnel;
-				}
-				/* Hack -- mark centre in case we need to overwrite later */
-				{
-					dun->tunn_feat[dun->tunn_n] = 1;
-				}
+					add_stair(row1 + old_row_dir, col1 + old_col_dir);
 
-				dun->tunn_n++;
-			}
-
-			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
-			if ((style & (TUNNEL_CRYPT_L | TUNNEL_LARGE_L))
-				|| ((style & (TUNNEL_CRYPT_R | TUNNEL_LARGE_R))
-					&& ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)))
-			{
-				if ((f_info[cave_feat[row1+col_dir][col1-row_dir]].flags1 & (FF1_TUNNEL))
-					&& ((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) == 0)
-					&& ((style & (TUNNEL_LARGE_L)) || !((row1 + col1 + style) % 2)))
-				{
-					/* Save the tunnel location unless an inner wall */
-					if ((dun->tunn_n < TUNN_MAX) && ((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_INNER)) == 0))
+					/* Hack -- move decoration to corners of dead end. This 'fakes'
+					 * a secret door. */
+					if (dun->decor_n > 1)
+						for (i = dun->decor_n - 2; i < dun->decor_n; i++)
 					{
-						dun->tunn[dun->tunn_n].y = row1 + col_dir;
-						dun->tunn[dun->tunn_n].x = col1 - row_dir;
-						dun->tunn_feat[dun->tunn_n] = 0;
-						dun->tunn_n++;
+						dun->decor[i].y += old_row_dir;
+						dun->decor[i].x += old_col_dir;
+					}
 
-						/* Hack -- add regular pillars to some width 3 corridors */
-						if ((((row1 + col1) % ((style % 4) + 2)) == 0)
-							&& ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))== 0)) pillar = TRUE;
+					/* Force decoration */
+					decor_flag = FALSE;
+				}				
+				
+				/* Are we turning left? */
+				if ((row_dir == -old_col_dir) || (col_dir == old_row_dir)) left_turn = TRUE;
 
-						/* Save the location for later stair allocation */
-						if ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))
-							&& (crypt_timer-- == 0) && (dun->stair_n < STAIR_MAX))
+				/* Are we turning right? */
+				if ((row_dir == old_col_dir) || (col_dir == -old_row_dir)) right_turn = TRUE;
+
+				/* Do we not need decoration? */
+				if ((decor_flag) && (dun->tunn_n % (7 + (style % 4) * 5)))
+				{
+					dun->decor_n = last_decor;
+				}
+
+				/* Save the decoration */
+				last_decor = dun->decor_n;
+
+				/* Add width to tunnel if wide or crypt.
+				 * Note checks to ensure width 2 tunnels near rooms.
+				 */
+				if ((style & (TUNNEL_CRYPT_L | TUNNEL_LARGE_L))
+					|| ((style & (TUNNEL_CRYPT_R | TUNNEL_LARGE_R))
+						&& ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)))
+				{
+					/* Add 'left-hand' tunnel */
+					if ((f_info[cave_feat[row1+col_dir][col1-row_dir]].flags1 & (FF1_TUNNEL))
+						&& ((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) == 0)
+						&& ((style & (TUNNEL_LARGE_L)) || !((row1 + col1 + style) % 2)))
+					{
+						/* Save the tunnel location unless an inner wall */
+						if (((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_INNER)) == 0) &&
+							(add_tunnel(row1 + col_dir, col1 - row_dir, 0)))
 						{
-							dun->stair[dun->stair_n].y = row1 + col_dir;
-							dun->stair[dun->stair_n].x = col1 - row_dir;
-							dun->stair_n++;
+							/* Hack -- add regular pillars to some width 3 corridors */
+							if ((((row1 + col1) % ((style % 4) + 2)) == 0)
+								&& ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))== 0)) pillar = TRUE;
 
-							crypt_timer = randint(DUN_TUN_CRYPT * 2);
-						}
-						
-						/* Decorate */
-						if ((in_bounds_fully(row1 + 2 * col_dir, col1 + 2 * row_dir)) && 
-							((f_info[cave_feat[row1 + 2 * col_dir][col1 - 2 * row_dir]].flags1 & (FF1_WALL)) != 0) &&
-							(dun->decor_n < DECOR_MAX))
-						{
-							dun->decor[dun->decor_n].y = row1 + 2 * col_dir;
-							dun->decor[dun->decor_n].x = col1 - 2 * row_dir;
-							dun->decor_t[dun->decor_n] = dun->tunn_n;
-							dun->decor_n++;
+							/* Save the location for later stair allocation */
+							if ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))
+								&& (crypt_timer-- == 0) && (dun->stair_n < STAIR_MAX))
+							{
+								add_stair(row1 + col_dir, col1 - row_dir);
+
+								crypt_timer = randint(DUN_TUN_CRYPT * 2);
+							}
 							
-							decor_l = TRUE;
+							/* Decorate */
+							if (add_decor(row1 + 2 * col_dir, col1 - 2 * row_dir, dun->tunn_n)) decor_l = TRUE;
+						}
+					}
+						
+					/* Add 'diagonally backwards left-hand' tunnel if just turned right */
+					if (right_turn)
+					{
+						/* Add if tunnelable, but not inner, outer or solid */
+						if (((f_info[cave_feat[row1 - row_dir + col_dir ][col1 - col_dir - row_dir]].flags1 & (FF1_TUNNEL)) != 0)
+							&& ((f_info[cave_feat[row1 - row_dir + col_dir ][col1 - col_dir - row_dir]].flags1 & (FF1_INNER | FF1_OUTER | FF1_SOLID)) == 0))
+						{
+							add_tunnel(row1 - row_dir + col_dir, col1 - col_dir - row_dir, 0);
 						}
 					}
 				}
-			}
 
-			/* XXX Note that no bounds checking is required because of in_bounds_fully_tunnel above */
-			if ((style & (TUNNEL_CRYPT_R | TUNNEL_LARGE_R))
-				|| ((style & (TUNNEL_CRYPT_L | TUNNEL_LARGE_L))
-					&& ((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)))
-			{
-				if ((f_info[cave_feat[row1-col_dir][col1+row_dir]].flags1 & (FF1_TUNNEL))
-					&& ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) == 0)
-					&& ((style & (TUNNEL_LARGE_R)) || !((row1 + col1 + style / 2) % 2)))
+				/* Add width to tunnel if wide or crypt.
+				 * Note checks to ensure width 2 tunnels near rooms.
+				 */
+				if ((style & (TUNNEL_CRYPT_R | TUNNEL_LARGE_R))
+					|| ((style & (TUNNEL_CRYPT_L | TUNNEL_LARGE_L))
+						&& ((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)))
 				{
-					/* Save the tunnel location unless an 'inner' wall */
-					if ((dun->tunn_n < TUNN_MAX) && ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_INNER)) == 0))
+					/* Add 'right-hand' tunnel */
+					if ((f_info[cave_feat[row1-col_dir][col1+row_dir]].flags1 & (FF1_TUNNEL))
+						&& ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) == 0)
+						&& ((style & (TUNNEL_LARGE_R)) || !((row1 + col1 + style / 2) % 2)))
 					{
-						if (pillar) dun->tunn_n -= 2;
-
-						dun->tunn[dun->tunn_n].y = row1 - col_dir;
-						dun->tunn[dun->tunn_n].x = col1 + row_dir;
-						dun->tunn_feat[dun->tunn_n] = 0;
-						dun->tunn_n++;
-
-						if (pillar) dun->tunn_n++;
-
-						/* Save the location for later stair allocation */
-						if ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))
-							&& (crypt_timer-- == 0) && (dun->stair_n < STAIR_MAX))
+						/* Save the tunnel location unless an 'inner' wall */
+						if ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_INNER)) == 0)
 						{
-							dun->stair[dun->stair_n].y = row1 - col_dir;
-							dun->stair[dun->stair_n].x = col1 + row_dir;
-							dun->stair_n++;
+							if (pillar) dun->tunn_n -= 2;
 
-							crypt_timer = randint(DUN_TUN_CRYPT * 2);
+							if (add_tunnel(row1 - col_dir, col1 + row_dir, 0))
+							{
+								/* Save the location for later stair allocation */
+								if ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))
+									&& (crypt_timer-- == 0) && (dun->stair_n < STAIR_MAX))
+								{
+									add_stair(row1 - col_dir, col1 + row_dir);
+									
+									crypt_timer = randint(DUN_TUN_CRYPT * 2);
+								}
+
+								/* Decorate */
+								if (add_decor(row1 - 2 * col_dir, col1 + 2 * row_dir, dun->tunn_n)) decor_r = TRUE;
+							}
+
+							if (pillar) dun->tunn_n++;
 						}
-						
-						/* Decorate */
-						if ((in_bounds_fully(row1 - 2 * col_dir, col1 + 2 * row_dir)) &&
-							((f_info[cave_feat[row1 - 2 * col_dir][col1 + 2 * row_dir]].flags1 & (FF1_WALL)) != 0) &&
-							(dun->decor_n < DECOR_MAX))
+					}
+
+					/* Add 'diagonally backwards right-hand' tunnel if just turned left */
+					if (left_turn)
+					{
+						/* Add if tunnelable, but not inner, outer or solid */
+						if (((f_info[cave_feat[row1 - row_dir - col_dir ][col1 - col_dir + row_dir]].flags1 & (FF1_TUNNEL)) != 0)
+							&& ((f_info[cave_feat[row1 - row_dir - col_dir ][col1 - col_dir + row_dir]].flags1 & (FF1_INNER | FF1_OUTER | FF1_SOLID)) == 0))
 						{
-							dun->decor[dun->decor_n].y = row1 - 2 * col_dir;
-							dun->decor[dun->decor_n].x = col1 + 2 * row_dir;
-							dun->decor_t[dun->decor_n] = dun->tunn_n;
-							dun->decor_n++;
-							
-							decor_r = TRUE;	
+							add_tunnel(row1 - row_dir + col_dir, col1 - col_dir - row_dir, 0);
 						}
 					}
 				}
 			}
 			
-			/* Decorate if required */
-			if ((!decor_l) && (dun->decor_n < DECOR_MAX))
+			/* Decorate 'left-hand side' if required */
+			if (!decor_l)
 			{
-				/* Decorate */
-				if ((in_bounds_fully(row1 + col_dir, col1 + row_dir)) && (flood_tunnel) &&
-					((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_WALL)) != 0))
-				{
-					dun->decor[dun->decor_n].y = row1 + col_dir;
-					dun->decor[dun->decor_n].x = col1 - row_dir;
-					dun->decor_t[dun->decor_n] = dun->tunn_n;
-					dun->decor_n++;
-				}
+				add_decor(row1 + col_dir, col1 - row_dir, dun->tunn_n);
 			}
 
-			if ((!decor_r) && (dun->decor_n < DECOR_MAX))
+			/* Decorate 'left-hand side' if required */
+			if (!decor_r)
 			{
-				/* Decorate */
-				if ((in_bounds_fully(row1 - col_dir, col1 - row_dir)) && (flood_tunnel) &&
-					((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_WALL)) != 0))
-				{
-					dun->decor[dun->decor_n].y = row1 - col_dir;
-					dun->decor[dun->decor_n].x = col1 + row_dir;
-					dun->decor_t[dun->decor_n] = dun->tunn_n;
-					dun->decor_n++;
-				}
+				add_decor(row1 - col_dir, col1 + row_dir, dun->tunn_n);
 			}
 
 			/* Allow door in next grid */
@@ -6771,7 +6969,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		else
 		{
 			bool pillar = FALSE;
-			
+
 			/* Accept the location */
 			row1 = tmp_row;
 			col1 = tmp_col;
@@ -6790,96 +6988,61 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				overrun_flag = TRUE;
 			}
 
+			/* Allowed left hand side door */
+			if (!(door_flag) || (--door_l > 0))
+			{
+				/* Add 'left-hand' door */
+				if (style & (TUNNEL_LARGE_L))
+				{
+					if (add_door(tmp_row + col_dir, tmp_col - row_dir))
+					{
+						/* Hack -- add regular pillars to some width 3 corridors */
+						if ((((tmp_row + tmp_col) % ((style % 4) + 2)) == 0)
+							&& ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))== 0)) pillar = TRUE;
+					}
+					
+					/* Allow door in next grid */
+					if (!door_flag) door_l = 3;
+				}
+			}
+
+			/* Allowed left hand side door */
+			if (!(door_flag) || (--door_r > 0))
+			{			
+				/* Add 'right-hand' door */
+				if (style & (TUNNEL_LARGE_R))
+				{
+					if (pillar) dun->door_n -= 2;
+
+					if (add_door(tmp_row + col_dir, tmp_col - row_dir))
+					{
+						if (pillar) dun->door_n++;
+						
+						/* Allow door in next grid */
+						if (!door_flag) door_r = 3;
+					}
+					else if (pillar)
+					{
+						dun->door_n += 2;
+					}
+				}
+			}
+			
 			/* Collect legal door locations */
 			if (!door_flag)
 			{
 				/* Save the door location */
-				if (dun->door_n < DOOR_MAX)
-				{
-					dun->door[dun->door_n].y = row1;
-					dun->door[dun->door_n].x = col1;
-					dun->door_n++;
-				}
-
-				if (style & (TUNNEL_LARGE_L))
-				{
-					if ((in_bounds_fully(tmp_row + col_dir, tmp_col - row_dir)) &&
-						(!(f_info[cave_feat[tmp_row + col_dir][tmp_col - row_dir]].flags1 & (FF1_TUNNEL))) &&
-						(!(f_info[cave_feat[tmp_row + col_dir][tmp_col - row_dir]].flags2 & (FF2_BRIDGE))))
-					{
-						/* Save the wall location */
-						if (dun->door_n < DOOR_MAX)
-						{
-							dun->door[dun->door_n].y = tmp_row + col_dir;
-							dun->door[dun->door_n].x = tmp_col - row_dir;
-							dun->door_n++;
-
-							/* Hack -- add regular pillars to some width 3 corridors */
-							if ((((tmp_row + tmp_col) % ((style % 4) + 2)) == 0)
-								&& ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))== 0)) pillar = TRUE;
-						}
-					}
-				}
-
-				if (style & (TUNNEL_LARGE_R))
-				{
-					if ((in_bounds_fully(tmp_row - col_dir, tmp_col + row_dir)) &&
-						(!(f_info[cave_feat[tmp_row - col_dir][tmp_col + row_dir]].flags1 & (FF1_TUNNEL))) &&
-						(!(f_info[cave_feat[tmp_row - col_dir][tmp_col + row_dir]].flags2 & (FF2_BRIDGE))))
-					{
-						/* Save the wall location */
-						if (dun->door_n < DOOR_MAX)
-						{
-							if (pillar) dun->door_n -= 2;
-
-							dun->door[dun->door_n].y = tmp_row - col_dir;
-							dun->door[dun->door_n].x = tmp_col + row_dir;
-							dun->door_n++;
-
-							if (pillar) dun->door_n++;
-						}
-					}
-				}
-
-				if (style & (TUNNEL_LARGE_L))
-				{
-					if ((in_bounds_fully(tmp_row + col_dir + row_dir, tmp_col - row_dir + col_dir)) &&
-						(!(f_info[cave_feat[tmp_row + col_dir + row_dir][tmp_col - row_dir + col_dir]].flags1 & (FF1_TUNNEL))) &&
-						(!(f_info[cave_feat[tmp_row + col_dir + row_dir][tmp_col - row_dir + col_dir]].flags2 & (FF2_BRIDGE))))
-					{
-						/* Save the wall location */
-						if (dun->door_n < DOOR_MAX)
-						{
-							dun->door[dun->door_n].y = tmp_row + col_dir + row_dir;
-							dun->door[dun->door_n].x = tmp_col - row_dir + col_dir;
-							dun->door_n++;
-						}
-					}
-				}
+				add_door(row1, col1);
 				
-				if (style & (TUNNEL_LARGE_R))
-				{
-					if ((in_bounds_fully(tmp_row - col_dir + row_dir, tmp_col + row_dir + col_dir)) &&
-						(!(f_info[cave_feat[tmp_row - col_dir + row_dir][tmp_col + row_dir + col_dir]].flags1 & (FF1_TUNNEL))) &&
-						(!(f_info[cave_feat[tmp_row - col_dir + row_dir][tmp_col + row_dir + col_dir]].flags2 & (FF2_BRIDGE))))
-					{
-						/* Save the wall location */
-						if (dun->door_n < DOOR_MAX)
-						{
-							dun->door[dun->door_n].y = tmp_row - col_dir + row_dir;
-							dun->door[dun->door_n].x = tmp_col + row_dir + col_dir;
-							dun->door_n++;
-						}
-					}
-				}
-
 				/* No door in next grid */
 				door_flag = TRUE;
 
+				/* Haven't overrun doors yet */
 				overrun_flag = FALSE;
-				
-				decor_flag = FALSE;
 			}
+
+			/* Force decoration in next grid */
+			decor_flag = FALSE;
 
 			/* Hack -- allow pre-emptive tunnel termination */
 			if ((rand_int(100) >= DUN_TUN_CON) && (dun->door_n < 3))
@@ -6899,7 +7062,11 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				}
 			}
 		}
-
+		
+		/* Record old directions to check for dead ends */
+		old_row_dir = row_dir;
+		old_col_dir = col_dir;
+			
 		/* Fix up diagonals from cave tunnels after 1 move */
 		/* Never move diagonally */
 		if (row_dir && col_dir)
@@ -6975,6 +7142,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		dun->door_n = first_door;
 		dun->next_n = first_next;
 		dun->stair_n = first_stair;
+		dun->decor_n = first_decor;
 
 		/* Remove the solid walls we applied */
 		for (i = 0; i < dun->solid_n; i++)
@@ -7074,9 +7242,15 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		/* Get the grid */
 		y = dun->decor[i].y;
 		x = dun->decor[i].x;
-		
+
+		/* TODO: Should do something smarter here */
+		/*
+		 * We need to walk the decoration back to the previous location if required here
+		 */
+		if ((f_info[cave_feat[y][x]].flags1 & (FF1_WALL)) == 0) continue;
+
 		/* Convert to decor grid */
-		if (dun->decor_t < dun->tunn_n / 2)
+		if (dun->decor_t[i] < dun->tunn_n / 2)
 		{
 			cave_set_feat(y, x, start_decor);
 		}
