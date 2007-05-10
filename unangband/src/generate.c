@@ -175,6 +175,7 @@
 #define TUNN_MAX	300
 #define SOLID_MAX	120
 #define STAIR_MAX	30
+#define DECOR_MAX	30
 
 
 /*
@@ -264,6 +265,11 @@ struct dun_data
 	coord tunn[TUNN_MAX];
 	s16b tunn_feat[TUNN_MAX];
 	
+	/* Array of tunnel decorations */
+	int decor_n;
+	coord decor[DECOR_MAX];
+	int decor_t[DECOR_MAX];
+
 	/* Array of good potential stair grids */
 	s16b stair_n;
 	coord stair[STAIR_MAX];
@@ -6059,11 +6065,13 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	int start_row, start_col;
 	int main_loop_count = 0;
 	int last_turn = 0, first_door, last_door, first_tunn, first_next, first_stair;
-	int start_tunnel = 0;
+	int start_tunnel = 0, start_decor = 0, end_decor = 0;
+	int last_decor = 0;
 	
 	bool flood_tunnel = FALSE;
 	bool door_flag = FALSE;
 	bool overrun_flag = FALSE;
+	bool decor_flag = FALSE;
 	bool abort_and_cleanup = FALSE;
 
 	/* Force style change */
@@ -6095,6 +6103,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	dun->tunn_n = 0;
 	dun->wall_n = 0;
 	dun->solid_n = 0;
+	dun->decor_n = 0;
 
 	/* Save the starting location */
 	start_row = row1;
@@ -6240,7 +6249,6 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			}
 		}
 
-
 		/* Get the next location */
 		tmp_row = row1 + row_dir;
 		tmp_col = col1 + col_dir;
@@ -6293,6 +6301,10 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			/* Hack -- Avoid outer/solid walls */
 			if (f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) continue;
 			if (f_info[cave_feat[y][x]].flags1 & (FF1_SOLID)) continue;
+
+			/* No need to decorate */
+			dun->decor_n = last_decor;
+			decor_flag = TRUE;
 
 			/* Save the wall location */
 			if (dun->wall_n < WALL_MAX)
@@ -6491,6 +6503,12 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 							if ((dun_room[by2][bx2] < DUN_ROOMS) && (dun->tunn_feat[i])) dun->tunn_feat[i] = room_info[dun_room[by2][bx2]].tunnel;
 						}
 					}
+					
+					/* Get end decor */
+					if (dun_room[by2][bx2] < DUN_ROOMS)
+					{
+						end_decor = room_info[dun_room[by2][bx2]].solid;
+					}
 
 					/* Accept tunnel */
 					break;
@@ -6514,10 +6532,18 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					start_tunnel = 0;
 				}
 
+				if (dun_room[by1][bx1] < DUN_ROOMS)
+				{
+					/* Set tunnel decor */
+					start_decor = room_info[dun_room[by1][bx1]].solid;
+				}
+				
+				door_flag = FALSE;
+				decor_flag = TRUE;
 			}
 		}
 		
-		/* Bridge features (always in rooms) */
+		/* Bridge features (always in rooms, unless 'flooding') */
 		else if (((f_info[cave_feat[tmp_row][tmp_col]].flags2 & (FF2_BRIDGE)) != 0) ||
 			((cave_info[tmp_row][tmp_col] & (CAVE_ROOM)) && !(flood_tunnel)))
 		{
@@ -6568,6 +6594,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 
 			/* Prevent door in next grid */
 			door_flag = TRUE;
+			decor_flag = FALSE;
 		}
 
 		/* Tunnel through all other walls and bridge features */
@@ -6575,13 +6602,24 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				|| ((cave_info[tmp_row][tmp_col] & (CAVE_ROOM))))
 		{
 			bool pillar = FALSE;
+			bool decor_l = FALSE;
+			bool decor_r = FALSE;
 
 			/* Accept this location */
 			row1 = tmp_row;
 			col1 = tmp_col;
 
-			/* Save the tunnel location */
-			if (dun->tunn_n < TUNN_MAX)
+			/* Do we not need decoration? */
+			if ((decor_flag) && (dun->tunn_n % (7 + (style % 4) * 5)))
+			{
+				dun->decor_n = last_decor;
+			}
+
+			/* Save the decoration */
+			last_decor = dun->decor_n;
+
+			/* Save the tunnel location unless an inner wall */
+			if ((dun->tunn_n < TUNN_MAX) && ((f_info[cave_feat[row1][col1]].flags1 & (FF1_INNER)) == 0))
 			{
 				dun->tunn[dun->tunn_n].y = row1;
 				dun->tunn[dun->tunn_n].x = col1;
@@ -6608,8 +6646,8 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					&& ((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) == 0)
 					&& ((style & (TUNNEL_LARGE_L)) || !((row1 + col1 + style) % 2)))
 				{
-					/* Save the tunnel location */
-					if (dun->tunn_n < TUNN_MAX)
+					/* Save the tunnel location unless an inner wall */
+					if ((dun->tunn_n < TUNN_MAX) && ((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_INNER)) == 0))
 					{
 						dun->tunn[dun->tunn_n].y = row1 + col_dir;
 						dun->tunn[dun->tunn_n].x = col1 - row_dir;
@@ -6619,17 +6657,30 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 						/* Hack -- add regular pillars to some width 3 corridors */
 						if ((((row1 + col1) % ((style % 4) + 2)) == 0)
 							&& ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))== 0)) pillar = TRUE;
-					}
 
-					/* Save the location for later stair allocation */
-					if ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))
-						&& (crypt_timer-- == 0) && (dun->stair_n < STAIR_MAX))
-					{
-						dun->stair[dun->stair_n].y = row1 + col_dir;
-						dun->stair[dun->stair_n].x = col1 - row_dir;
-						dun->stair_n++;
+						/* Save the location for later stair allocation */
+						if ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))
+							&& (crypt_timer-- == 0) && (dun->stair_n < STAIR_MAX))
+						{
+							dun->stair[dun->stair_n].y = row1 + col_dir;
+							dun->stair[dun->stair_n].x = col1 - row_dir;
+							dun->stair_n++;
 
-						crypt_timer = randint(DUN_TUN_CRYPT * 2);
+							crypt_timer = randint(DUN_TUN_CRYPT * 2);
+						}
+						
+						/* Decorate */
+						if ((in_bounds_fully(row1 + 2 * col_dir, col1 + 2 * row_dir)) && 
+							((f_info[cave_feat[row1 + 2 * col_dir][col1 - 2 * row_dir]].flags1 & (FF1_WALL)) != 0) &&
+							(dun->decor_n < DECOR_MAX))
+						{
+							dun->decor[dun->decor_n].y = row1 + 2 * col_dir;
+							dun->decor[dun->decor_n].x = col1 - 2 * row_dir;
+							dun->decor_t[dun->decor_n] = dun->tunn_n;
+							dun->decor_n++;
+							
+							decor_l = TRUE;
+						}
 					}
 				}
 			}
@@ -6643,8 +6694,8 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					&& ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) == 0)
 					&& ((style & (TUNNEL_LARGE_R)) || !((row1 + col1 + style / 2) % 2)))
 				{
-					/* Save the tunnel location */
-					if (dun->tunn_n < TUNN_MAX)
+					/* Save the tunnel location unless an 'inner' wall */
+					if ((dun->tunn_n < TUNN_MAX) && ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_INNER)) == 0))
 					{
 						if (pillar) dun->tunn_n -= 2;
 
@@ -6654,28 +6705,73 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 						dun->tunn_n++;
 
 						if (pillar) dun->tunn_n++;
-					}
 
-					/* Save the location for later stair allocation */
-					if ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))
-						&& (crypt_timer-- == 0) && (dun->stair_n < STAIR_MAX))
-					{
-						dun->stair[dun->stair_n].y = row1 - col_dir;
-						dun->stair[dun->stair_n].x = col1 + row_dir;
-						dun->stair_n++;
+						/* Save the location for later stair allocation */
+						if ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))
+							&& (crypt_timer-- == 0) && (dun->stair_n < STAIR_MAX))
+						{
+							dun->stair[dun->stair_n].y = row1 - col_dir;
+							dun->stair[dun->stair_n].x = col1 + row_dir;
+							dun->stair_n++;
 
-						crypt_timer = randint(DUN_TUN_CRYPT * 2);
+							crypt_timer = randint(DUN_TUN_CRYPT * 2);
+						}
+						
+						/* Decorate */
+						if ((in_bounds_fully(row1 - 2 * col_dir, col1 + 2 * row_dir)) &&
+							((f_info[cave_feat[row1 - 2 * col_dir][col1 + 2 * row_dir]].flags1 & (FF1_WALL)) != 0) &&
+							(dun->decor_n < DECOR_MAX))
+						{
+							dun->decor[dun->decor_n].y = row1 - 2 * col_dir;
+							dun->decor[dun->decor_n].x = col1 + 2 * row_dir;
+							dun->decor_t[dun->decor_n] = dun->tunn_n;
+							dun->decor_n++;
+							
+							decor_r = TRUE;	
+						}
 					}
+				}
+			}
+			
+			/* Decorate if required */
+			if ((!decor_l) && (dun->decor_n < DECOR_MAX))
+			{
+				/* Decorate */
+				if ((in_bounds_fully(row1 + col_dir, col1 + row_dir)) && (flood_tunnel) &&
+					((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_WALL)) != 0))
+				{
+					dun->decor[dun->decor_n].y = row1 + col_dir;
+					dun->decor[dun->decor_n].x = col1 - row_dir;
+					dun->decor_t[dun->decor_n] = dun->tunn_n;
+					dun->decor_n++;
+				}
+			}
+
+			if ((!decor_r) && (dun->decor_n < DECOR_MAX))
+			{
+				/* Decorate */
+				if ((in_bounds_fully(row1 - col_dir, col1 - row_dir)) && (flood_tunnel) &&
+					((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_WALL)) != 0))
+				{
+					dun->decor[dun->decor_n].y = row1 - col_dir;
+					dun->decor[dun->decor_n].x = col1 + row_dir;
+					dun->decor_t[dun->decor_n] = dun->tunn_n;
+					dun->decor_n++;
 				}
 			}
 
 			/* Allow door in next grid */
 			door_flag = FALSE;
+			
+			/* Don't require decoration next to this grid */
+			decor_flag = TRUE;
 		}
 
 		/* Handle corridor intersections or overlaps */
 		else
 		{
+			bool pillar = FALSE;
+			
 			/* Accept the location */
 			row1 = tmp_row;
 			col1 = tmp_col;
@@ -6705,10 +6801,84 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					dun->door_n++;
 				}
 
+				if (style & (TUNNEL_LARGE_L))
+				{
+					if ((in_bounds_fully(tmp_row + col_dir, tmp_col - row_dir)) &&
+						(!(f_info[cave_feat[tmp_row + col_dir][tmp_col - row_dir]].flags1 & (FF1_TUNNEL))) &&
+						(!(f_info[cave_feat[tmp_row + col_dir][tmp_col - row_dir]].flags2 & (FF2_BRIDGE))))
+					{
+						/* Save the wall location */
+						if (dun->door_n < DOOR_MAX)
+						{
+							dun->door[dun->door_n].y = tmp_row + col_dir;
+							dun->door[dun->door_n].x = tmp_col - row_dir;
+							dun->door_n++;
+
+							/* Hack -- add regular pillars to some width 3 corridors */
+							if ((((tmp_row + tmp_col) % ((style % 4) + 2)) == 0)
+								&& ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))== 0)) pillar = TRUE;
+						}
+					}
+				}
+
+				if (style & (TUNNEL_LARGE_R))
+				{
+					if ((in_bounds_fully(tmp_row - col_dir, tmp_col + row_dir)) &&
+						(!(f_info[cave_feat[tmp_row - col_dir][tmp_col + row_dir]].flags1 & (FF1_TUNNEL))) &&
+						(!(f_info[cave_feat[tmp_row - col_dir][tmp_col + row_dir]].flags2 & (FF2_BRIDGE))))
+					{
+						/* Save the wall location */
+						if (dun->door_n < DOOR_MAX)
+						{
+							if (pillar) dun->door_n -= 2;
+
+							dun->door[dun->door_n].y = tmp_row - col_dir;
+							dun->door[dun->door_n].x = tmp_col + row_dir;
+							dun->door_n++;
+
+							if (pillar) dun->door_n++;
+						}
+					}
+				}
+
+				if (style & (TUNNEL_LARGE_L))
+				{
+					if ((in_bounds_fully(tmp_row + col_dir + row_dir, tmp_col - row_dir + col_dir)) &&
+						(!(f_info[cave_feat[tmp_row + col_dir + row_dir][tmp_col - row_dir + col_dir]].flags1 & (FF1_TUNNEL))) &&
+						(!(f_info[cave_feat[tmp_row + col_dir + row_dir][tmp_col - row_dir + col_dir]].flags2 & (FF2_BRIDGE))))
+					{
+						/* Save the wall location */
+						if (dun->door_n < DOOR_MAX)
+						{
+							dun->door[dun->door_n].y = tmp_row + col_dir + row_dir;
+							dun->door[dun->door_n].x = tmp_col - row_dir + col_dir;
+							dun->door_n++;
+						}
+					}
+				}
+				
+				if (style & (TUNNEL_LARGE_R))
+				{
+					if ((in_bounds_fully(tmp_row - col_dir + row_dir, tmp_col + row_dir + col_dir)) &&
+						(!(f_info[cave_feat[tmp_row - col_dir + row_dir][tmp_col + row_dir + col_dir]].flags1 & (FF1_TUNNEL))) &&
+						(!(f_info[cave_feat[tmp_row - col_dir + row_dir][tmp_col + row_dir + col_dir]].flags2 & (FF2_BRIDGE))))
+					{
+						/* Save the wall location */
+						if (dun->door_n < DOOR_MAX)
+						{
+							dun->door[dun->door_n].y = tmp_row - col_dir + row_dir;
+							dun->door[dun->door_n].x = tmp_col + row_dir + col_dir;
+							dun->door_n++;
+						}
+					}
+				}
+
 				/* No door in next grid */
 				door_flag = TRUE;
 
 				overrun_flag = FALSE;
+				
+				decor_flag = FALSE;
 			}
 
 			/* Hack -- allow pre-emptive tunnel termination */
@@ -6893,6 +7063,31 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			i++;
 		}
 	}
+	
+	/* Set up decorations */
+	if (!start_decor) start_decor = end_decor;
+	if (!end_decor) end_decor = start_decor;
+
+	/* Apply the decorations that we need */
+	if (start_decor) for (i = 0; i < dun->decor_n; i++)
+	{
+		/* Get the grid */
+		y = dun->decor[i].y;
+		x = dun->decor[i].x;
+		
+		/* Convert to decor grid */
+		if (dun->decor_t < dun->tunn_n / 2)
+		{
+			cave_set_feat(y, x, start_decor);
+		}
+		else
+		{
+			cave_set_feat(y, x, end_decor);			
+		}
+	}
+
+	/* Clear stairs if flooding tunnel */
+	if (flood_tunnel) dun->stair_n = first_stair;
 	
 	return TRUE;
 }
