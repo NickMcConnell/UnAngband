@@ -4806,16 +4806,35 @@
 /*
  * Determine if a "legal" grid is an "naked" floor grid
  *
- * Line 1 -- forbid non-floors
- * Line 2 -- forbid non-placers
- * Line 3 -- forbid non-droppers
- * Line 4 -- forbid permanent
- * Line 5 -- forbid normal objects
- * Line 6 -- forbid player/monsters
+ * Line 1 -- forbid non-placers
+ * Line 2 -- forbid non-droppers
+ * Line 3 -- forbid permanent
+ * Line 4 -- forbid normal objects
+ * Line 5 -- forbid player/monsters
  */
 #define cave_naked_bold(Y,X) \
  ((f_info[cave_feat[Y][X]].flags1 & (FF1_PLACE)) && \
 	 (f_info[cave_feat[Y][X]].flags1 & (FF1_DROP)) && \
+	 !(f_info[cave_feat[Y][X]].flags1 & (FF1_PERMANENT)) && \
+	 (cave_o_idx[Y][X] == 0) && \
+	 (cave_m_idx[Y][X] == 0))
+
+/*
+ * Determine if a "legal" grid is an "nearly naked" grid
+ * 
+ * This can help for placing stairs on completely flooded levels.
+ *
+ * Line 1 -- forbid non-placers
+ * Line 2-4 -- require drop terrain, or shallow or easy climb
+ * Line 5 -- forbid permanent
+ * Line 6 -- forbid normal objects
+ * Line 7 -- forbid player/monsters
+ */
+#define cave_nearly_naked_bold(Y,X) \
+ ((f_info[cave_feat[Y][X]].flags1 & (FF1_PLACE)) && \
+ 	((f_info[cave_feat[Y][X]].flags1 & (FF1_DROP)) || \
+ 	(f_info[cave_feat[Y][X]].flags2 & (FF2_SHALLOW)) || \
+ 	(f_info[cave_feat[Y][X]].flags3 & (FF3_EASY_CLIMB))) && \
 	 !(f_info[cave_feat[Y][X]].flags1 & (FF1_PERMANENT)) && \
 	 (cave_o_idx[Y][X] == 0) && \
 	 (cave_m_idx[Y][X] == 0))

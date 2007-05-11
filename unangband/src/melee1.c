@@ -4892,6 +4892,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (who > 0)
 			{
+				summoner = who;
+
 				if (((blind) && (known)) && (target < 0)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons %s %s.", m_name, m_poss,
 						((r_ptr->flags1) & RF1_UNIQUE ?
@@ -4975,6 +4977,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons help!", m_name);
 				else msg_print("You hear distant chanting.");
@@ -4995,6 +4999,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons monsters.", m_name);
 				else msg_print("You hear distant chanting.");
@@ -5057,6 +5063,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons plants.", m_name);
 				else msg_print("You hear distant rustling.");
@@ -5077,6 +5085,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons insects.", m_name);
 				else msg_print("You hear distant chittering.");
@@ -5097,6 +5107,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons animals.", m_name);
 				else msg_print("You hear distant chanting.");
@@ -5139,6 +5151,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons hounds.", m_name);
 				else msg_print("You hear distant howling.");
@@ -5159,6 +5173,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons spiders.", m_name);
 				else msg_print("You hear distant chittering.");
@@ -5179,6 +5195,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons allies.", m_name);
 				else msg_print("You hear distant chanting.");
@@ -5207,6 +5225,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons allies.", m_name);
 				else msg_print("You hear distant chanting.");
@@ -5244,6 +5264,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons allies.", m_name);
 				else msg_print("You hear distant chanting.");
@@ -5348,6 +5370,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons orcs.", m_name);
 				else msg_print("You hear distant drums.");
@@ -5368,6 +5392,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons trolls.", m_name);
 				else msg_print("You hear distant drums.");
@@ -5388,6 +5414,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons giants.", m_name);
 				else msg_print("You hear distant thunder.");
@@ -5408,6 +5436,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			sound(MSG_SUM_DRAGON);
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons a dragon.", m_name);
 				else msg_print("You hear distant roars.");
@@ -5430,6 +5460,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			sound(MSG_SUM_HI_DRAGON);
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons ancient dragons!", m_name);
 				else msg_print("You hear cacophonous roars.");
@@ -5492,6 +5524,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			sound(MSG_SUM_DEMON);
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons a hellish adversary!", m_name);
 				else msg_print("You hear infernal chanting.");
@@ -5513,6 +5547,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s magically summons greater demons!", m_name);
 				else msg_print("You hear an infernal chorus.");
@@ -5604,6 +5640,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s whispers.", m_name);
 				else if (known) msg_format("%^s magically summons an undead adversary!", m_name);
 				else msg_print("You hear distant whispering.");
@@ -5625,6 +5663,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s whispers.", m_name);
 				else if (known) msg_format("%^s magically summons greater undead!", m_name);
 				else msg_print("You hear loud and imperious whispering.");
@@ -5650,6 +5690,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (who > 0)
 			{
+				summoner = who;
+
 				if ((blind) && (known)) msg_format("%^s whispers.", m_name);
 				else if (known) msg_format("%^s magically summons mighty undead opponents!", m_name);
 				else msg_print("You hear thunderous, echoing whispers.");

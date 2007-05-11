@@ -3734,9 +3734,14 @@ void store_shuffle(int store_index)
 	int i, j;
 
 	store_type *st_ptr = store[store_index];
-	owner_type *ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max) + st_ptr->owner];
-
+	owner_type *ot_ptr;
+	
+	/* Justifiable paranoia */
+	if (!st_ptr) return;
+	
 	if (st_ptr->base < STORE_MIN_BUY_SELL) return;
+
+	ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max) + st_ptr->owner];
 
 	/* Pick a new owner */
 	for (j = st_ptr->owner; j == st_ptr->owner; )

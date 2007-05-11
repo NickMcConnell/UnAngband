@@ -139,6 +139,8 @@ extern u32b seed_town;
 extern s16b num_repro;
 extern s16b object_level;
 extern s16b monster_level;
+extern s16b summoner;
+extern bool	summon_strict;
 extern char summon_char_type;
 extern byte summon_attr_type;
 extern byte summon_group_type;

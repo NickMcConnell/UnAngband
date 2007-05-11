@@ -5323,7 +5323,7 @@ bool require_halo(int y, int x)
 
 bool has_halo(int y, int x)
 {
-	int this_o_idx, next_o_idx;
+	int this_o_idx, next_o_idx = 0;
 	
 	/* Glowing feature */
 	if ((f_info[cave_feat[y][x]].flags2 & (FF2_GLOW)) != 0) return TRUE;

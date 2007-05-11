@@ -10394,6 +10394,10 @@ bool project_t(int who, int y, int x, int dam, int typ)
 		{
 			if (affect_monster)
 			{
+				/* Damage-variable throw distance */
+				do_dist = 4 + dam / 25;
+				do_dist_los = TRUE;
+
 				/* Force breathers are immune */
 				if (r_ptr->flags4 & (RF4_BRTH_FORCE)) break;
 
@@ -10901,7 +10905,7 @@ bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 	handle_stuff();
 
 	/* Make certain that the radius is not too large */
-	if (rad > MAX_SIGHT) rad = MAX_SIGHT;
+	if (rad > MAX_RANGE) rad = MAX_RANGE;
 
 	/* Some projection types always PROJECT_WALL. */
 	if ((typ == GF_KILL_WALL) || (typ == GF_KILL_DOOR))

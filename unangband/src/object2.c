@@ -6182,7 +6182,7 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 
 				/* Count objects */
 				k++;
-
+				
 				/* Check for possible combination */
 				if (object_similar(o_ptr, j_ptr)) comb = TRUE;
 			}

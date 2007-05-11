@@ -3701,6 +3701,19 @@ static bool summon_specific_okay(int r_idx)
 
 	/* Hack -- no specific type specified */
 	if (!summon_specific_type) return (TRUE);
+	
+	/* Hack -- try to minimise chain summoning */
+	if (summoner)
+	{
+		/* Hack -- never summon itself */
+		if (summoner == r_idx) return (FALSE);
+
+		/* Hack -- do we strictly enforce lower level summons?
+		 * 
+		 * This prevents 'circular' chain summoning
+		 */	
+		if ((summon_strict) && (r_info[summoner].level <= r_info[r_idx].level)) return (FALSE);
+	}
 
 	/* Check our requirements */
 	switch (summon_specific_type)
@@ -4413,6 +4426,12 @@ bool summon_specific(int y1, int x1, int lev, int type)
 	/* Save the "summon" type */
 	summon_specific_type = type;
 
+	/* Hack -- prevent 'chain summoning' */
+	if ((summoner) && summon_specific_okay(summoner))
+	{
+		summon_strict = TRUE;
+	}
+
 	/* Require "okay" monsters */
 	get_mon_num_hook = summon_specific_okay;
 
@@ -4427,6 +4446,12 @@ bool summon_specific(int y1, int x1, int lev, int type)
 
 	/* Prepare allocation table */
 	get_mon_num_prep();
+	
+	/* Reset summoner */
+	summoner = 0;
+	
+	/* No longer strict */
+	summon_strict = FALSE;
 
 	/* Handle failure */
 	if (!r_idx) return (FALSE);
@@ -5032,6 +5057,12 @@ void get_monster_ecology(int r_idx)
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(place_monster_okay, 2 + rand_int(3) + (r_ptr->flags1 & (RF1_ESCORT) ? rand_int(3) : 0));
 		}
+		
+		/* Set summoner */
+		summoner = r_idx;
+		
+		/* Hack - always summon lower level monsters for ecology */
+		summon_strict = TRUE;
 
 		/* Add summon races -- summon kin */
 		if ((r_ptr->flags7 & (RF7_S_KIN)) || (hack_ecology == 1) || ((level_flag & (LF1_STRONGHOLD)) != 0))

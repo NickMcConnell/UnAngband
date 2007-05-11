@@ -1210,8 +1210,8 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		if (!f4 && !f5 && !f6 && !f7) return (0);
 	}
 
-	/* Eliminate 'direct' spells when blinded (except innate spells) * */
-	else if (m_ptr->blind)
+	/* Eliminate 'direct' spells when blinded or afraid (except innate spells) * */
+	else if ((m_ptr->blind) || (m_ptr->monfear))
 	{
 		f4 &= (rf4_no_player_mask | RF4_INNATE_MASK | RF4_SUMMON_MASK);
 		f5 &= (RF5_NO_PLAYER_MASK | RF5_INNATE_MASK | RF4_SUMMON_MASK);
@@ -5301,7 +5301,6 @@ static void process_monster(int m_idx)
 	/* Assume the monster is able to perceive the player. */
 	bool aware = TRUE;
 	bool must_use_target = FALSE;
-	bool nearby = FALSE;
 
 	/* Will the monster move randomly? */
 	bool random = FALSE;
@@ -5541,6 +5540,9 @@ static void process_monster(int m_idx)
 	/* Hack -- when blind, monster can only cast CURE spell. */
 	if ((chance_spell) && ((m_ptr->berserk) || (!aware)
 		|| ((m_ptr->blind) && !(r_ptr->flags6 & (RF6_CURE))) )) chance_spell = 0;
+
+	/* Cannot use innate attacks when fleeing. */
+	if ((chance_innate) && (!m_ptr->monfear)) chance_innate = 0;
 
 	/* Cannot use innate attacks when not aware. */
 	if ((chance_innate) && (!aware)) chance_innate = 0;

@@ -141,9 +141,9 @@
 /*
  * Dungeon treasure allocation values
  */
-#define DUN_AMT_ROOM    9       /* Amount of objects for rooms */
-#define DUN_AMT_ITEM    3       /* Amount of objects for rooms/corridors */
-#define DUN_AMT_GOLD    3       /* Amount of treasure for rooms/corridors */
+#define DUN_AMT_ROOM    9       /* Amount of objects for rooms, doubled for strongholds */
+#define DUN_AMT_ITEM    3       /* Amount of objects for rooms/corridors, quadrupled for crypts */
+#define DUN_AMT_GOLD    3       /* Amount of treasure for rooms/corridors, quadrupled for mines */
 
 /*
  * Hack -- Dungeon allocation "places"
@@ -364,254 +364,6 @@ static int next_to_walls(int y, int x)
 	if (f_info[cave_feat[y+1][x]].flags1 & (FF1_WALL)) k++;
 
 	return (k);
-}
-
-
-
-/*
- * Returns random co-ordinates for player/monster/object
- */
-static void new_player_spot(void)
-{
-	int i = 0;
-	int y = 0;
-	int x = 0;
-
-	while (TRUE)
-	{
-		i++;
-
-		/* Scan stored locations first. */
-		if ((i < dun->stair_n) && (p_ptr->create_stair > 0))
-		{
-			/* Get location */
-			y = dun->stair[i].y;
-			x = dun->stair[i].x;
-
-			/* Require exactly three adjacent walls */
-			if (next_to_walls(y, x) != 3) continue;
-
-			/* Require a "naked" floor grid */
-			if (!cave_naked_bold(y, x)) continue;
-
-			/* Success */
-			break;
-		}
-
-		/* Then, search at random */
-		else
-		{
-			/* Pick a random grid */
-			y = rand_int(DUNGEON_HGT);
-			x = rand_int(DUNGEON_WID);
-
-			/* Refuse to start on anti-teleport (vault) grids */
-			if ((cave_info[y][x] & (CAVE_ROOM)) && (room_has_flag(y, x, ROOM_ICKY))) continue;
-
-			/* Must be a floor grid clear of monsters and objects  XXX */
-			if (!cave_naked_bold(y, x)) continue;
-
-			/* Try not to start in rooms */
-			if ((i < 450) && (cave_info[y][x] & (CAVE_ROOM))) continue;
-
-			/* Player prefers to be near walls. */
-			if      ((i < 300) && (next_to_walls(y, x) < 2)) continue;
-			else if ((i < 600) && (next_to_walls(y, x) < 1)) continue;
-
-			/* Success */
-			break;
-		}
-	}
-
-	/* Place the stairs (if any) */
-	/* Don't allow stairs if connected stair option is off */
-	if ((p_ptr->create_stair) &&
-		(((f_info[p_ptr->create_stair].flags1 & (FF1_STAIRS)) == 0) || (dungeon_stair)))
-	{
-		cave_set_feat(y, x, p_ptr->create_stair);
-	}
-
-	/* Place the player */
-	player_place(y, x);
-}
-
-
-
-/*
- * Convert existing terrain type to rubble
- */
-static void place_rubble(int y, int x)
-{
-	/* Put item under rubble */
-	if (rand_int(100) < 5) cave_set_feat(y, x, FEAT_RUBBLE_H);
-
-	/* Create rubble */
-	else cave_set_feat(y, x, FEAT_RUBBLE);
-}
-
-
-/*
- * Places some staircases near walls
- */
-static void alloc_stairs(int feat, int num, int walls)
-{
-	int y, x, i = 0, j;
-
-	/* Place "num" stairs */
-	for (j = 0; j < num; j++)
-	{
-		while (TRUE)
-		{
-			i++;
-
-			/* Scan stored locations first. */
-			if (i < dun->stair_n)
-			{
-				/* Get location */
-				y = dun->stair[i].y;
-				x = dun->stair[i].x;
-
-				/* Require exactly three adjacent walls */
-				if (next_to_walls(y, x) != 3) continue;
-
-				/* Require a "naked" floor grid */
-				if (!cave_naked_bold(y, x)) continue;
-
-				/* Hack -- only half the time */
-				if (rand_int(100) < 50) continue;
-
-				/* Success */
-				break;
-			}
-
-			/* Then, search at random */
-			else
-			{
-				/* Pick a random grid */
-				y = rand_int(DUNGEON_HGT);
-				x = rand_int(DUNGEON_WID);
-
-				/* Require actual floor or ground grid */
-				if (((f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR)) == 0)
-					&& ((f_info[cave_feat[y][x]].flags3 & (FF3_GROUND)) == 0)) continue;
-
-				/* Must be a floor grid clear of monsters and objects  XXX */
-				if (!cave_naked_bold(y, x)) continue;
-
-				/* Player prefers to be near walls. */
-				if      ((i % 300) == 0) walls--;
-
-				/* Require a certain number of adjacent walls */
-				if (next_to_walls(y, x) < walls) continue;
-
-				/* Success */
-				break;
-			}
-		}
-
-		/* Place fixed stairs */
-		place_random_stairs(y, x, feat);
-	}
-}
-
-
-
-/*
- * Allocates some objects (using "place" and "type")
- */
-static void alloc_object(int set, int typ, int num)
-{
-	int y, x, k, i = 0;
-
-	/* Place some objects */
-	for (k = 0; k < num; k++)
-	{
-		/* Pick a "legal" spot */
-		while (TRUE)
-		{
-			bool room;
-
-			bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
-
-			/* Paranoia */
-			if (i++ > 2000) return;
-
-			/* Scan stored locations first if allowed to place in corridors. */
-			if ((i < dun->stair_n) && ((set == ALLOC_SET_CORR) || (set == ALLOC_SET_BOTH)))
-			{
-				/* Get location */
-				y = dun->stair[i].y;
-				x = dun->stair[i].x;
-
-				/* Require a "clean" floor grid */
-				if (!cave_clean_bold(y, x)) continue;
-
-				/* Require a "naked" floor grid */
-				if (!cave_naked_bold(y, x)) continue;
-
-				/* Success */
-				break;
-			}
-
-			/* Then search at random */
-			else
-			{
-				/* Location */
-				y = rand_int(DUNGEON_HGT);
-				x = rand_int(DUNGEON_WID);
-
-				/* Require actual floor or ground grid */
-				if (((f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR)) == 0)
-					&& ((f_info[cave_feat[y][x]].flags3 & (FF3_GROUND)) == 0)) continue;
-
-				/* Check for "room" */
-				room = (cave_info[y][x] & (CAVE_ROOM)) ? TRUE : FALSE;
-
-				/* Require corridor? */
-				if ((set == ALLOC_SET_CORR) && room && !surface) continue;
-
-				/* Require room? */
-				if ((set == ALLOC_SET_ROOM) && !room) continue;
-
-				/* Success */
-				break;
-			}
-		}
-
-		/* Place something */
-		switch (typ)
-		{
-			case ALLOC_TYP_RUBBLE:
-			{
-				place_rubble(y, x);
-				break;
-			}
-
-			case ALLOC_TYP_TRAP:
-			{
-				place_trap(y, x);
-				break;
-			}
-
-			case ALLOC_TYP_GOLD:
-			{
-				place_gold(y, x);
-				break;
-			}
-
-			case ALLOC_TYP_OBJECT:
-			{
-				place_object(y, x, FALSE, FALSE);
-				break;
-			}
-
-			case ALLOC_TYP_FEATURE:
-			{
-				place_feature(y, x);
-				break;
-			}
-		}
-	}
 }
 
 
@@ -6209,20 +5961,19 @@ static bool add_door(int y, int x)
  */
 static bool near_edge(int y1, int x1)
 {
-	int i, y, x;
+	int y, x;
 
-	/* Scan adjacent grids */
-	for (i = 0; i < 4; i++)
+	/* Scan nearby grids */
+	for (y = y1 - 2; y < y1 + 2; y++)
 	{
-		/* Extract the location */
-		y = y1 + ddy_ddd[i];
-		x = x1 + ddx_ddd[i];
+		for (x = x1 - 2; x < x1 + 2; x++)
+		{
+			/* Skip grids inside rooms */
+			if (cave_info[y][x] & (CAVE_ROOM)) continue;
 
-		/* Skip grids inside rooms */
-		if (cave_info[y][x] & (CAVE_ROOM)) continue;
-
-		/* Count these grids */
-		return (TRUE);
+			/* Count these grids */
+			return (TRUE);
+		}
 	}
 
 	/* Inside a room */
@@ -7047,24 +6798,21 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				/* Add 'right-hand' door */
 				if (style & (TUNNEL_LARGE_R))
 				{
-					if (pillar) dun->door_n -= 2;
-
+					
 					if (add_door(tmp_row + col_dir, tmp_col - row_dir))
 					{
-						if (pillar) dun->door_n++;
-						
 						/* Allow door in next grid */
 						if (!door_flag) door_r = 3;
 					}
-					else if (pillar)
-					{
-						dun->door_n += 2;
-					}
+				}
+				else
+				{
+					pillar = FALSE;
 				}
 			}
 			
 			/* Collect legal door locations */
-			if (!door_flag)
+			if ((!door_flag) && (!pillar))
 			{
 				/* Save the door location */
 				add_door(row1, col1);
@@ -7221,6 +6969,22 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			/* Clear previous contents, write terrain */
 			cave_set_feat(y, x, dun->tunn_feat[i]);
 		}
+		
+		/* Apply sewer feature */
+		else if ((dun->tunn_feat[i] == 1) && (level_flag & (LF1_SEWER)))
+		{
+			if (!dun->flood_feat)
+			{
+				dun->flood_feat = pick_proper_feature(cave_feat_lake);
+			}
+
+			if (dun->flood_feat)
+			{
+				/* Clear previous contents, write terrain */
+				cave_set_feat(y, x, dun->flood_feat);
+			}
+		}
+		
 		/* Apply bridge */
 		else if (f_info[cave_feat[y][x]].flags2 & (FF2_BRIDGE))
 		{
@@ -9045,11 +8809,290 @@ static void place_decorations()
 
 
 /*
+ * Returns a new spot for the player
+ */
+static bool new_player_spot(void)
+{
+	int i = 0;
+	int y = 0;
+	int x = 0;
+	bool tunnel = FALSE;
+
+	while (TRUE)
+	{
+		i++;
+
+		/* Scan stored locations first. */
+		if ((i < dun->stair_n) && (p_ptr->create_stair > 0))
+		{
+			/* Get location */
+			y = dun->stair[i].y;
+			x = dun->stair[i].x;
+
+			/* Require a "naked" floor grid */
+			if (!cave_naked_bold(y, x)) continue;
+
+			/* Success */
+			break;
+		}
+
+		/* Then, search at random */
+		else
+		{
+			/* Pick a random grid */
+			y = rand_int(DUNGEON_HGT);
+			x = rand_int(DUNGEON_WID);
+
+			/* Mega hack -- try to place extra tunnel */
+			if (!(tunnel) && (i == 400))
+			{
+				if (build_type0(0, 0))
+				{
+					place_tunnels();
+
+					i = 0;
+
+					tunnel = TRUE;
+				}
+			}
+
+			/* We have failed */
+			if (i > 1000) return (FALSE);
+
+			/* Refuse to start on anti-teleport (vault) grids */
+			if ((cave_info[y][x] & (CAVE_ROOM)) && (room_has_flag(y, x, ROOM_ICKY))) continue;
+
+			/* Must be a floor grid clear of monsters and objects  XXX */
+			if ((i < 700) && (!cave_naked_bold(y, x))) continue;
+			
+			/* Try nearly naked grids if desperate */
+			if ((i >= 700) && (!cave_nearly_naked_bold(y, x))) continue;
+
+			/* Try not to start in rooms */
+			if ((i < 450) && (cave_info[y][x] & (CAVE_ROOM))) continue;
+
+			/* Player prefers to be near walls. */
+			if      ((i < 300) && (next_to_walls(y, x) < 2)) continue;
+			else if ((i < 600) && (next_to_walls(y, x) < 1)) continue;
+
+			/* Success */
+			break;
+		}
+	}
+
+	/* Place the stairs (if any) */
+	/* Don't allow stairs if connected stair option is off */
+	if ((p_ptr->create_stair) &&
+		(((f_info[p_ptr->create_stair].flags1 & (FF1_STAIRS)) == 0) || (dungeon_stair)))
+	{
+		cave_set_feat(y, x, p_ptr->create_stair);
+	}
+
+	/* Place the player */
+	player_place(y, x);
+	
+	return (TRUE);
+}
+
+
+
+/*
+ * Convert existing terrain type to rubble
+ */
+static void place_rubble(int y, int x)
+{
+	/* Put item under rubble */
+	if (rand_int(100) < 5) cave_set_feat(y, x, FEAT_RUBBLE_H);
+
+	/* Create rubble */
+	else cave_set_feat(y, x, FEAT_RUBBLE);
+}
+
+
+/*
+ * Places some staircases near walls
+ */
+static int alloc_stairs(int feat, int num, int walls)
+{
+	int y, x, i = 0, j;
+
+	/* Place "num" stairs */
+	for (j = 0; j < num; j++)
+	{
+		while (num)
+		{
+			i++;
+
+			/* Scan stored locations first. */
+			if (i < dun->stair_n)
+			{
+				/* Get location */
+				y = dun->stair[i].y;
+				x = dun->stair[i].x;
+
+				/* Require a "naked" floor grid */
+				if (!cave_naked_bold(y, x)) continue;
+
+				/* Hack -- only half the time */
+				if (rand_int(100) < 50) continue;
+
+				/* Success */
+				break;
+			}
+
+			/* Then, search at random */
+			else
+			{
+				/* Pick a random grid */
+				y = rand_int(DUNGEON_HGT);
+				x = rand_int(DUNGEON_WID);
+
+				/* Reduce stairs if unable to place after a while */
+				if ((i % 400) == 0) num--;
+
+				/* Require actual floor or ground grid */
+				if (((f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR)) == 0)
+					&& ((f_info[cave_feat[y][x]].flags3 & (FF3_GROUND)) == 0)) continue;
+
+				/* Must be a floor grid clear of monsters and objects  XXX */
+				if ((i < 700) && (!cave_naked_bold(y, x))) continue;
+
+				/* Try nearly naked grids if desperate */
+				if ((i >= 700) && (!cave_nearly_naked_bold(y, x))) continue;
+
+				/* Player prefers to be near walls. */
+				if      ((i % 300) == 0) walls--;
+
+				/* Require a certain number of adjacent walls */
+				if (next_to_walls(y, x) < walls) continue;
+
+				/* Success */
+				break;
+			}
+		}
+
+		/* Place fixed stairs */
+		place_random_stairs(y, x, feat);
+	}
+	
+	/* Number of stairs placed */
+	return (num);
+}
+
+
+
+/*
+ * Allocates some objects (using "place" and "type")
+ */
+static int alloc_object(int set, int typ, int num)
+{
+	int y, x, k, i = 0;
+
+	/* Place some objects */
+	for (k = 0; k < num; k++)
+	{
+		/* Pick a "legal" spot */
+		while (num)
+		{
+			bool room;
+
+			bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
+
+			/* Paranoia */
+			i++;
+
+			/* Scan stored locations first if allowed to place in corridors. */
+			if ((i < dun->stair_n) && ((set == ALLOC_SET_CORR) || (set == ALLOC_SET_BOTH)))
+			{
+				/* Get location */
+				y = dun->stair[i].y;
+				x = dun->stair[i].x;
+
+				/* Require a "clean" floor grid */
+				if (!cave_clean_bold(y, x)) continue;
+
+				/* Require a "naked" floor grid */
+				if (!cave_naked_bold(y, x)) continue;
+
+				/* Success */
+				break;
+			}
+
+			/* Then search at random */
+			else
+			{
+				/* Location */
+				y = rand_int(DUNGEON_HGT);
+				x = rand_int(DUNGEON_WID);
+
+				/* Reduce objects if unable to place after a while */
+				if ((i % 400) == 0) num--;
+
+				/* Require actual floor or ground grid */
+				if (((f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR)) == 0)
+					&& ((f_info[cave_feat[y][x]].flags3 & (FF3_GROUND)) == 0)) continue;
+
+				/* Check for "room" */
+				room = (cave_info[y][x] & (CAVE_ROOM)) ? TRUE : FALSE;
+
+				/* Require corridor? */
+				if ((set == ALLOC_SET_CORR) && room && !surface) continue;
+
+				/* Require room? */
+				if ((set == ALLOC_SET_ROOM) && !room) continue;
+
+				/* Success */
+				break;
+			}
+		}
+
+		/* Place something */
+		switch (typ)
+		{
+			case ALLOC_TYP_RUBBLE:
+			{
+				place_rubble(y, x);
+				break;
+			}
+
+			case ALLOC_TYP_TRAP:
+			{
+				place_trap(y, x);
+				break;
+			}
+
+			case ALLOC_TYP_GOLD:
+			{
+				place_gold(y, x);
+				break;
+			}
+
+			case ALLOC_TYP_OBJECT:
+			{
+				place_object(y, x, FALSE, FALSE);
+				break;
+			}
+
+			case ALLOC_TYP_FEATURE:
+			{
+				place_feature(y, x);
+				break;
+			}
+		}
+	}
+	
+	/* Number of objects placed */
+	return (num);
+}
+
+
+
+/*
  * Place contents into dungeon.
  */
-static void place_contents()
+static bool place_contents()
 {
-	int i, k, y, x;
+	int i, k;
 
 	/* Hack -- have less monsters during day light */
 	if ((level_flag & (LF1_DAYLIGHT)) != 0) k = (p_ptr->depth / 6);
@@ -9065,10 +9108,10 @@ static void place_contents()
 		if (cheat_xtra) msg_print("Placing stairs, rubble, traps.");
 
 		/* Place 1 or 2 down stairs near some walls */
-		alloc_stairs(FEAT_MORE, rand_range(1, 2), 3);
+		if (!alloc_stairs(FEAT_MORE, rand_range(1, 2), 3)) return (FALSE);
 
 		/* Place 1 or 2 up stairs near some walls */
-		alloc_stairs(FEAT_LESS, rand_range(1, 2), 3);
+		if (!alloc_stairs(FEAT_LESS, rand_range(1, 2), 3)) return (FALSE);
 
 		/* Place 2 random stairs near some walls */
 		alloc_stairs(0, 2, 3);
@@ -9077,7 +9120,7 @@ static void place_contents()
 		if ((level_flag & (LF1_ROOMS)) != 0) alloc_object(ALLOC_SET_CORR, ALLOC_TYP_RUBBLE, randint(k * ((level_flag & (LF1_CRYPT | LF1_MINE | LF1_CAVE)) != 0) ? 3 : 1));
 	
 		/* Place some traps in the dungeon */
-		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_TRAP, randint(k * ((level_flag & (LF1_STRONGHOLD | LF1_CRYPT)) != 0) ? 3 : 1));
+		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_TRAP, randint(k * ((level_flag & (LF1_STRONGHOLD | LF1_CRYPT)) != 0) ? 2 : 1));
 	
 		/* Place some features in rooms */
 		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_FEATURE, 1);
@@ -9089,17 +9132,7 @@ static void place_contents()
 		if (cheat_xtra) msg_print("Placing dungeon entrance.");
 
 		/* Place the dungeon entrance */
-		while (TRUE)
-		{
-			/* Pick a location at least "three" from the outer walls */
-			y = rand_range(3, DUNGEON_HGT - 4);
-			x = rand_range(3, DUNGEON_WID - 4);
-
-			/* Require a "naked" floor grid */
-			if (cave_naked_bold(y, x)) break;
-		}
-
-		place_random_stairs(y, x, FEAT_ENTRANCE);
+		if (!alloc_stairs(FEAT_ENTRANCE, 1, 0)) return (FALSE);
 	}
 
 	/* Determine the character location */
@@ -9107,7 +9140,7 @@ static void place_contents()
 
 	/* Pick a base number of monsters */
 	/* Strongholds and sewers have more monsters */
-	i = MIN_M_ALLOC_LEVEL + randint(8 * ((level_flag & (LF1_STRONGHOLD | LF1_SEWER)) != 0) ? 3 : 1);
+	i = MIN_M_ALLOC_LEVEL + randint(8 * ((level_flag & (LF1_STRONGHOLD | LF1_SEWER)) != 0) ? 2 : 1);
 
 	/* Generating */
 	if (cheat_xtra) msg_print("Placing monsters.");
@@ -9125,12 +9158,15 @@ static void place_contents()
 		if (cheat_xtra) msg_print("Placing objects, treasure.");
 
 		/* Put some objects in rooms */
-		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ROOM * ((level_flag & (LF1_STRONGHOLD)) != 0) ? 3 : 1, 3));
+		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ROOM * ((level_flag & (LF1_STRONGHOLD)) != 0) ? 2 : 1, 3));
 	
 		/* Put some objects/gold in the dungeon */
-		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ITEM * ((level_flag & (LF1_CRYPT)) != 0) ? 3 : 1, 3));
-		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_GOLD, Rand_normal(DUN_AMT_GOLD* ((level_flag & (LF1_MINE)) != 0) ? 3 : 1, 3));
+		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ITEM * ((level_flag & (LF1_CRYPT)) != 0) ? 4 : 1, 3));
+		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_GOLD, Rand_normal(DUN_AMT_GOLD* ((level_flag & (LF1_MINE)) != 0) ? 4 : 1, 3));
 	}
+	
+	/* Successfully placed some stuff */
+	return (TRUE);
 }
 
 
@@ -9234,6 +9270,15 @@ static bool cave_gen(void)
 	/* Start with no flooding */
 	dun->flood_feat = 0;
 
+	/* No features in a tower above the surface */
+	if (((level_flag & (LF1_TOWER)) == 0) || ((level_flag & (LF1_SURFACE)) != 0))
+	{
+		/* Generating */
+		if (cheat_room) msg_print("Building nature.");
+
+		build_nature();
+	}
+
 	/* Set up the monster ecology before placing rooms */
 	/* XXX Very early levels boring with ecologies enabled */
 	if (p_ptr->depth > 3)
@@ -9261,15 +9306,6 @@ static bool cave_gen(void)
 
 		/* Place the tower */
 		place_tower();
-	}
-	
-	/* No features in a tower above the surface */
-	if (((level_flag & (LF1_TOWER)) == 0) || ((level_flag & (LF1_SURFACE)) != 0))
-	{
-		/* Generating */
-		if (cheat_room) msg_print("Building nature.");
-
-		build_nature();
 	}
 
 	/* Build some rooms or tunnel endpoints */
@@ -9304,7 +9340,7 @@ static bool cave_gen(void)
 	place_decorations();
 
 	/* Build traps, treasure, rubble etc and place the player */
-	place_contents();
+	if (!place_contents()) return (FALSE);
 
 	/* Apply illumination */
 	if ((level_flag & (LF1_SURFACE)) != 0) town_illuminate((level_flag & (LF1_DAYLIGHT)) != 0);
