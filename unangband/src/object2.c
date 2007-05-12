@@ -319,7 +319,6 @@ void compact_objects(int size)
 
 	int cur_lev, cur_dis, chance;
 
-
 	/* Compact */
 	if (size)
 	{

@@ -1061,8 +1061,8 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		}
 	}
 
-	/* Hack -- display debug tval/sval info in cheat_xtra mode */
-	if (cheat_xtra)
+	/* Hack -- display debug tval/sval info in cheat_peek mode */
+	if (cheat_peek)
 	{
 		object_desc_str_macro(t, "(t");
 		object_desc_num_macro(t,o_ptr->tval);
@@ -1071,8 +1071,8 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		object_desc_str_macro(t, ") ");
 	}
 
-	/* Hack -- display debug stack info in cheat_xtra mode */
-	if ((cheat_xtra) && (o_ptr->stackc))
+	/* Hack -- display debug stack info in cheat_peek mode */
+	if ((cheat_peek) && (o_ptr->stackc))
 	{
 		object_desc_str_macro(t, "(stack ");
 		object_desc_num_macro(t,o_ptr->stackc);
@@ -1080,16 +1080,16 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	}
 
 
-	/* Hack -- display debug show_idx info in cheat_xtra mode */
-	if ((cheat_xtra) && (o_ptr->show_idx))
+	/* Hack -- display debug show_idx info in cheat_peek mode */
+	if ((cheat_peek) && (o_ptr->show_idx))
 	{
 		object_desc_str_macro(t, "(show_idx ");
 		object_desc_num_macro(t,o_ptr->show_idx);
 		object_desc_str_macro(t, ") ");
 	}
 
-	/* Hack -- display debug xtra info in cheat_xtra mode */
-	if ((cheat_xtra) && (o_ptr->xtra1))
+	/* Hack -- display debug xtra info in cheat_peek mode */
+	if ((cheat_peek) && (o_ptr->xtra1))
 	{
 		object_desc_str_macro(t, "(xtra ");
 		object_desc_num_macro(t,o_ptr->xtra1);
@@ -1546,7 +1546,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	}
 
 	/* Hack -- Process food/fuel */
-	else if ((cheat_xtra) && ((o_ptr->tval == TV_FOOD) || (o_ptr->tval == TV_FLASK)))
+	else if ((cheat_peek) && ((o_ptr->tval == TV_FOOD) || (o_ptr->tval == TV_FLASK)))
 	{
 		/* Dump " (N charges)" */
 		object_desc_chr_macro(t, ' ');
@@ -4511,11 +4511,15 @@ void fake_bag_item(object_type *i_ptr, int sval, int slot)
 	{
 		charges = bag_contents[sval + 1][slot];
 
-		/* Get bag charges */
-		i_ptr->charges = charges / number;
+		/* Real object */
+		if (number)		
+		{
+			/* Get bag charges */
+			i_ptr->charges = charges / number;
 
-		/* Round up */
-		if (charges % number) i_ptr->charges++;
+			/* Round up */
+			if (charges % number) i_ptr->charges++;
+		}
 	}
 	/* Hack -- torch charges */
 	else if ((i_ptr->tval == TV_LITE) && (i_ptr->sval == SV_LITE_TORCH))
@@ -4528,11 +4532,15 @@ void fake_bag_item(object_type *i_ptr, int sval, int slot)
 		/* Round up */
 		if (charges % FUEL_TORCH) number++;
 
-		/* Get bag charges */
-		i_ptr->charges = charges / number;
+		/* Real object */
+		if (number)
+		{
+			/* Get bag charges */
+			i_ptr->charges = charges / number;
 
-		/* Round up */
-		if (charges % number) i_ptr->charges++;
+			/* Round up */
+			if (charges % number) i_ptr->charges++;
+		}
 	}
 
 	/* Hack -- limit total number */
@@ -4549,8 +4557,12 @@ void fake_bag_item(object_type *i_ptr, int sval, int slot)
 		/* Normal number */
 		i_ptr->number = number;
 
-		/* Set stack counter */
-		i_ptr->stackc = i_ptr->charges % number;
+		/* Real object */
+		if (number)
+		{
+			/* Set stack counter */
+			i_ptr->stackc = i_ptr->charges % number;
+		}
 	}
 
 	/* Awareness always gives full knowledge */

@@ -271,6 +271,28 @@ void delete_monster(int y, int x)
 
 
 /*
+ * Delete the monster lite, if any, at a given location
+ */
+void delete_monster_lite(int i)
+{
+	int x, y;
+
+	monster_type *m_ptr = &m_list[i];
+
+	/* Get location */
+	y = m_ptr->fy;
+	x = m_ptr->fx;
+	
+	/* Extinguish lite */
+	if (check_monster_lite(i))
+	{
+		/* Recheck surrounding lite */
+		check_attribute_lost(y, x, 2, CAVE_XLOS, require_torch_lit, has_torch_lit, redraw_torch_lit_loss, remove_torch_lit, reapply_torch_lit);
+	}
+}
+
+
+/*
  * Move an object from index i1 to index i2 in the object list
  */
 static void compact_monsters_aux(int i1, int i2)
@@ -578,6 +600,71 @@ errr get_mon_num_prep(void)
 
 
 
+/*
+ * Restrict a monster based on the level flags.
+ * 
+ * Note we only apply 'hard' requirements here, such
+ * as monsters needing to be immune to an element
+ * because its splashed around the level, and no
+ * 'soft' requirements, because a level may be
+ * 'thematically' interesting.
+ * 
+ * The exception is for multipliers and non-movers
+ * because it'd be unfair on the player to fill
+ * the level with multipliers, and on the monster
+ * for the player to pick them off from a distance.
+ */
+bool check_level_flags_race(int r_idx)
+{
+	/* Get the actual race */
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Must swim monsters only appear on water levels */
+	if (((r_ptr->flags2 & (RF2_MUST_SWIM)) != 0) &&
+		((level_flag & (LF1_WATER)) == 0))
+	{
+		return (FALSE);
+	}
+	
+	/* Lava level */
+	if (level_flag & (LF1_LAVA))
+	{
+		/* Require monsters immune to fire */
+		if (!(r_ptr->flags3 & (RF3_IM_FIRE))) return (FALSE);
+	}
+	
+	/* Acid level */
+	if (level_flag & (LF1_ACID))
+	{
+		/* Require monsters immune to acid */
+		if (!(r_ptr->flags3 & (RF3_IM_ACID))) return (FALSE);
+	}
+	
+	/* Surface level */
+	if (level_flag & (LF1_SURFACE))
+	{
+		/* No multiplying monsters on surface */
+		if (r_ptr->flags2 & (RF2_MULTIPLY)) return (FALSE);
+
+		/* No never moving monsters on surface */
+		if (r_ptr->flags1 & (RF1_NEVER_MOVE)) return (FALSE);
+	}
+
+	/* XXX Note we have to move this check to the ecology, to allow a nighttime
+	 * ecology to be created.
+	 */
+#if 0
+	/* Daytime */
+	if (level_flag & (LF1_DAYLIGHT))
+	{
+		/* No hurt lite monsters in daytime */
+		if (r_ptr->flags3 & (RF3_HURT_LITE)) return (FALSE);
+	}
+#endif
+
+	return (TRUE);
+}
+
 
 
 /*
@@ -607,7 +694,7 @@ s16b get_mon_num(int level)
 	int i, j, p;
 
 	int r_idx;
-	int closest_miss_r_idx;
+	int closest_miss_r_idx = 0;
 	int closest_miss_level = 0;
 
 	long value, total;
@@ -615,10 +702,6 @@ s16b get_mon_num(int level)
 	monster_race *r_ptr;
 
 	alloc_entry *table = alloc_race_table;
-
-	bool surface = (level_flag & (LF1_SURFACE)) != 0;
-
-	bool daytime = (level_flag & (LF1_DAYLIGHT)) != 0;
 
 	/*
 	 * Use the ecology model
@@ -648,6 +731,17 @@ s16b get_mon_num(int level)
 			{
 				continue;
 			}
+			
+			/*
+			 * No "hurt" lite monsters not allowed in daytime
+			 * 
+			 * We have to check this here because it it 'time-dependent'
+			 */
+			if (level_flag & (LF1_DAYLIGHT))
+			{
+				/* No hurt lite monsters in daytime */
+				if (r_ptr->flags3 & (RF3_HURT_LITE)) continue;
+			}			
 
 			/* Can choose this monster? */
 			if ((cave_ecology.get_mon[i] != 0) && !(rand_int(++j))) choice = i;
@@ -697,9 +791,12 @@ s16b get_mon_num(int level)
 
 		/* Default */
 		table[i].prob3 = 0;
-
+		
 		/* No town monsters in dungeon */
 		if ((level > 0) && (table[i].level <= 0)) continue;
+
+		/* Skip if no chance of monster appearing */
+		if (!table[i].prob2) continue;
 
 		/* Get the "r_idx" of the chosen monster */
 		r_idx = table[i].index;
@@ -720,14 +817,8 @@ s16b get_mon_num(int level)
 		/* Depth Monsters never appear out of depth */
 		if ((r_ptr->flags1 & (RF1_FORCE_DEPTH)) && (r_ptr->level > p_ptr->depth)) continue;
 
-		/* Hack -- No MULTIPLY monsters on surface */
-		if (surface && (r_ptr->flags2 & (RF2_MULTIPLY))) continue;
-
-		/* Hack -- No NEVER_MOVE monsters on surface */
-		if (surface && (r_ptr->flags1 & (RF1_NEVER_MOVE))) continue;
-
-		/* Hack -- No HURT_LITE monsters on surface in daytime */
-		if (surface && daytime && (r_ptr->flags3 & (RF3_HURT_LITE))) continue;
+		/* Check monster against level flags */
+		if (!check_level_flags_race(r_idx)) continue;
 
 		/* Ensure minimum depth for monsters, except those that have friends or level up */
 		if ((table[i].level < MIN(p_ptr->depth - 4, level - 3))
@@ -737,10 +828,18 @@ s16b get_mon_num(int level)
 		/* Ensure hard minimum depth for monsters */
 		if (table[i].level < MIN(p_ptr->depth - 19, level - 18))
 		{
+			int miss_level = table[i].level;
+			int count = 0;
+			
+			/* Modify up for powerful monsters */
+			if (r_ptr->flags9 & (RF9_LEVEL_SPEED | RF9_LEVEL_SIZE | RF9_LEVEL_POWER)) miss_level += 15;
+			
 			/* Allow a best effort choice in the event we can't find anything */
-			if (closest_miss_level < table[i].level)
+			/* Hack -- have a soft boundary, so we don't always get the same monster very deep */
+			if ((closest_miss_level + 5 < miss_level) || ((closest_miss_level <= miss_level) && (!rand_int(++count)) ))
 			{
-				closest_miss_r_idx = table[i].index;	
+				closest_miss_r_idx = table[i].index;
+				if (closest_miss_level < miss_level) closest_miss_level = miss_level;
 			}
 			
 			continue;
@@ -748,35 +847,6 @@ s16b get_mon_num(int level)
 
 		/* Accept */
 		table[i].prob3 = table[i].prob2;
-
-		/* Don't like monsters that don't 'suit' a particular level */
-		/* Currently we don't do this quite right because we should
-		   favour monsters that qualify for place_monster_here. XXX XXX */
-		if (level_flag & (LF1_WATER | LF1_LAVA | LF1_ICE | LF1_ACID | LF1_CHASM))
-		{
-			if (level_flag & (LF1_WATER))
-			{
-				if (!(r_ptr->flags2 & (RF2_CAN_SWIM))&&
-					!(r_ptr->flags3 & (RF3_NONLIVING))) table[i].prob3 /=4;
-			}
-			if (level_flag & (LF1_LAVA))
-			{
-				if (!(r_ptr->flags3 & (RF3_IM_FIRE))) table[i].prob3 /=4;
-			}
-			if (level_flag & (LF1_ICE))
-			{
-				if (!(r_ptr->flags3 & (RF3_IM_COLD))) table[i].prob3 /=4;
-			}
-			if (level_flag & (LF1_ACID))
-			{
-				if (!(r_ptr->flags3 & (RF3_IM_ACID))) table[i].prob3 /=4;
-			}
-			if (level_flag & (LF1_CHASM))
-			{
-				if (!(r_ptr->flags2 & (RF2_CAN_CLIMB)) &&
-					!(r_ptr->flags2 & (RF2_CAN_FLY))) table[i].prob3 /=4;
-			}
-		}
 
 		/* Prefer monsters closer to the actual level */
 		if (table[i].level < level - 4) table[i].prob3 /= 2;
@@ -793,7 +863,7 @@ s16b get_mon_num(int level)
 		/* We've found a near-miss */
 		if (closest_miss_level)
 		{
-			if (cheat_xtra) msg_format("Picking closest miss (%s).", r_name + r_info[closest_miss_r_idx].name);
+			if (cheat_hear) msg_format("Picking closest miss (%s).", r_name + r_info[closest_miss_r_idx].name);
 			
 			return (closest_miss_r_idx);
 		}
@@ -2478,7 +2548,7 @@ int place_monster_here(int y, int x, int r_idx)
 	/* Improve efficiency -- forced boolean */
 	bool resist;
 
-        /* Get feature */
+    /* Get feature */
 	feat = cave_feat[y][x];
 
 	/* Get feature info */
@@ -4352,11 +4422,11 @@ bool alloc_monster(int dis, bool slp)
 		y = rand_int(DUNGEON_HGT);
 		x = rand_int(DUNGEON_WID);
 
-		/* Require "naked" floor grid */
-		if (!cave_naked_bold(y, x)) continue;
+		/* Require "empty" floor grid */
+		if (!cave_empty_bold(y, x)) continue;
 
-		/* Accept far away grids */
-		if (distance(y, x, py, px) > dis) break;
+		/* Accept far away grids, or any grid if not yet placed character */
+		if ((!py) || (distance(y, x, py, px) > dis)) break;
 	}
 
 	/* Attempt to place the monster, allow groups */
@@ -4426,10 +4496,19 @@ bool summon_specific(int y1, int x1, int lev, int type)
 	/* Save the "summon" type */
 	summon_specific_type = type;
 
+	/* Don't summon strictly yet */
+	summon_strict = FALSE;
+
 	/* Hack -- prevent 'chain summoning' */
-	if ((summoner) && summon_specific_okay(summoner))
+	if (summoner)
 	{
-		summon_strict = TRUE;
+		int hack_summoner = summoner;
+		
+		summoner = 0;
+		
+		if (summon_specific_okay(hack_summoner)) summon_strict = TRUE;
+		
+		summoner = hack_summoner;
 	}
 
 	/* Require "okay" monsters */
@@ -4925,7 +5004,7 @@ bool get_monster_ecology_aux(bool (*tmp_mon_num_hook)(int r_idx), int number)
 	if (cave_ecology.num_races >= MAX_ECOLOGY_RACES) return (FALSE);
 
 	/* Reduce races required by existing races in ecology */
-	for (i = 0, count = 0; i < cave_ecology.num_races; i++)
+	for (i = 0; i < cave_ecology.num_races; i++)
 	{
 		if (tmp_mon_num_hook(cave_ecology.race[i])) races--;
 	}
@@ -4933,8 +5012,8 @@ bool get_monster_ecology_aux(bool (*tmp_mon_num_hook)(int r_idx), int number)
 	/* Limit races */
 	if (races >= MAX_ECOLOGY_RACES) races = MAX_ECOLOGY_RACES;
 
-	/* Minimum 1 additional race */
-	else if (races <= cave_ecology.num_races) races = cave_ecology.num_races + 1;
+	/* Minimum 1 additional race, for up to 8 monsters */
+	else if (cave_ecology.num_races < 8) races = cave_ecology.num_races + 1;
 
 	/* Use supplied hook */
 	get_mon_num_hook = tmp_mon_num_hook;
@@ -4957,7 +5036,8 @@ bool get_monster_ecology_aux(bool (*tmp_mon_num_hook)(int r_idx), int number)
 			cave_ecology.get_mon[cave_ecology.num_races] = TRUE;
 			cave_ecology.race[cave_ecology.num_races++] = r_idx;
 
-			if (cheat_xtra) msg_format("Ecology dependent monster (%s).",r_name + r_info[r_idx].name);
+			if (cheat_hear) msg_format("Ecology dependent monster (%s) based on %s (%d).",r_name + r_info[r_idx].name,
+				r_name + r_info[summoner].name, tmp_mon_num_hook == summon_specific_okay ? summon_specific_type : -1);
 
 			/* Is the current monster deeper */
 			if (r_info[cave_ecology.deepest_race].level < r_info[r_idx].level)
@@ -4990,6 +5070,9 @@ void get_monster_ecology(int r_idx)
 {
 	int i = cave_ecology.num_races;
 
+	/* Hack -- hack the ecology */
+	int hack_ecology = 0;
+
 	/* Store old hook */
 	bool (*get_mon_num_hook_temp)(int r_idx) = get_mon_num_hook;
 
@@ -5001,12 +5084,13 @@ void get_monster_ecology(int r_idx)
 	/* Paranoia */
 	if (cave_ecology.num_races >= MAX_ECOLOGY_RACES) return;
 
+	/* For first monster on a level, we force some related monsters to appear */
+	if (cave_ecology.num_races <= 1) hack_ecology = randint(5);
+
 	/* Pick a monster if one not specified */
 	if (!r_idx)
 	{
 		r_idx = get_mon_num(monster_level);
-		
-		if (cheat_xtra) msg_format("Ecology seed monster (%s).",r_name + r_info[r_idx].name);
 	}
 
 	/* Add the monster */
@@ -5019,19 +5103,17 @@ void get_monster_ecology(int r_idx)
 	/* Have a good race */
 	for ( ; i < cave_ecology.num_races; i++)
 	{
-		/* Hack -- hack the ecology */
-		int hack_ecology = 0;
-
 		/* Monster race pointer */
 		monster_race *r_ptr;
+		
+		/* How many monsters to generate per summons */
+		int k = cave_ecology.num_races > 16 ? 1 :
+			cave_ecology.num_races > 8 ? 2 : 3;
 
 		/* Get the monster */
 		r_idx = cave_ecology.race[i];
 		r_ptr = &r_info[r_idx];
-
-		/* For first monster on a level, we force some related monsters to appear */
-		if (cave_ecology.num_races <= 1) hack_ecology = randint(5);
-
+		
 		/* Is the current monster deeper */
 		if (r_info[cave_ecology.deepest_race].level < r_info[r_idx].level)
 		{
@@ -5049,20 +5131,20 @@ void get_monster_ecology(int r_idx)
 		/* Try slightly lower monster level */
 		monster_level = MIN(p_ptr->depth, r_ptr->level > 1 ? r_ptr->level - 1 : r_ptr->level);
 
-		/* Add escort races */
-		if (r_ptr->flags1 & (RF1_ESCORT | RF1_ESCORTS))
-		{
-			place_monster_idx = cave_ecology.race[cave_ecology.num_races];
-
-			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(place_monster_okay, 2 + rand_int(3) + (r_ptr->flags1 & (RF1_ESCORT) ? rand_int(3) : 0));
-		}
-		
 		/* Set summoner */
 		summoner = r_idx;
 		
 		/* Hack - always summon lower level monsters for ecology */
 		summon_strict = TRUE;
+		
+		/* Add escort races */
+		if (r_ptr->flags1 & (RF1_ESCORT | RF1_ESCORTS))
+		{
+			place_monster_idx = r_idx;
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(place_monster_okay, randint(k) + (r_ptr->flags1 & (RF1_ESCORT) ? rand_int(3) : 0));
+		}
 
 		/* Add summon races -- summon kin */
 		if ((r_ptr->flags7 & (RF7_S_KIN)) || (hack_ecology == 1) || ((level_flag & (LF1_STRONGHOLD)) != 0))
@@ -5071,7 +5153,7 @@ void get_monster_ecology(int r_idx)
 			summon_char_type = r_ptr->d_char;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + rand_int(2) + (r_ptr->flags1 & (RF1_UNIQUE) ? rand_int(3) : 0));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k) + (r_ptr->flags1 & (RF1_UNIQUE) ? rand_int(3) : 0));
 		}
 
 		/* Add summon races -- summon plant */
@@ -5080,7 +5162,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_PLANT;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon insect */
@@ -5089,7 +5171,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_INSECT;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon animal */
@@ -5115,7 +5197,7 @@ void get_monster_ecology(int r_idx)
 			}
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon hound */
@@ -5124,7 +5206,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_HOUND;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon spider */
@@ -5133,7 +5215,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_SPIDER;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon class */
@@ -5145,7 +5227,7 @@ void get_monster_ecology(int r_idx)
 			summon_flag_type = (r_ptr->flags2 & (RF2_CLASS_MASK));
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon race */
@@ -5161,7 +5243,7 @@ void get_monster_ecology(int r_idx)
 			summon_flag_type |= (r_ptr->flags9 & (RF9_RACE_MASK));
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon group */
@@ -5171,7 +5253,7 @@ void get_monster_ecology(int r_idx)
 			summon_group_type = r_ptr->grp_idx;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon orc */
@@ -5180,7 +5262,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_ORC;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon troll */
@@ -5189,7 +5271,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_TROLL;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon giant */
@@ -5198,7 +5280,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_GIANT;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon dragon */
@@ -5207,7 +5289,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_DRAGON;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon high dragon */
@@ -5216,7 +5298,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_HI_DRAGON;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon demon */
@@ -5225,7 +5307,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_DEMON;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon high demon */
@@ -5234,7 +5316,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_HI_DEMON;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon undead */
@@ -5243,7 +5325,7 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_UNDEAD;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
 
 		/* Add summon races -- summon high undead */
@@ -5252,8 +5334,11 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_HI_UNDEAD;
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 2 + rand_int(3));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
+		
+		/* Unhack ecology */
+		hack_ecology = 0;
 	}
 
 	/* Regenerate monster hook */

@@ -3210,6 +3210,8 @@ static void dungeon(void)
 	/* Main loop */
 	while (TRUE)
 	{
+		int i;
+		
 		/* Hack -- Compact the monster list occasionally */
 		if (m_cnt + 32 > z_info->m_max) compact_monsters(64);
 
@@ -3223,6 +3225,28 @@ static void dungeon(void)
 		/* Hack -- Compress the object list occasionally */
 		if (o_cnt + 32 < o_max) compact_objects(0);
 
+		/*** Verify the object list ***/
+		/*
+		 * This is required until we identify the source of object corruption.
+		 */
+		for (i = 1; i < z_info->o_max; i++)
+		{
+			/* Check for straightforward corruption */
+			if (o_list[i].next_o_idx == i)
+			{
+				msg_format("Object %d (%s) corrupted. Fixing.", i, k_name + k_info[o_list[i].k_idx].name);
+				o_list[i].next_o_idx = 0;
+				
+				if (o_list[i].held_m_idx)
+				{
+					msg_format("Was held by %d.", o_list[i].held_m_idx);
+				}
+				else
+				{
+					msg_format("Was held at (%d, %d).", o_list[i].iy, o_list[i].ix);					
+				}
+			}
+		}
 
 		/*** Apply energy ***/
 

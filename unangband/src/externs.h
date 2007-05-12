@@ -643,6 +643,7 @@ extern void display_roff(int r_idx);
 extern s16b poly_r_idx(int r_idx);
 extern void delete_monster_idx(int i);
 extern void delete_monster(int y, int x);
+extern void delete_monster_lite(int i);
 extern void compact_monsters(int size);
 extern void wipe_m_list(void);
 extern s16b m_pop(void);

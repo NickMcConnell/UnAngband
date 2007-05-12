@@ -980,7 +980,7 @@ static void draw_maze(int y1, int x1, int y2, int x2, byte feat_wall,
 	/* Paranoia */
 	if ((!feat_wall) || (!feat_path) || (feat_wall == feat_path)) return;
 
-	if (cheat_xtra) msg_print("Drawing maze.");
+	if (cheat_room) msg_print("Drawing maze.");
 
 	/* Start with a solid rectangle of the "wall" feat */
 	generate_fill(y1, x1, y2, x2, feat_wall);
@@ -1307,7 +1307,7 @@ static bool generate_starburst_room(int y1, int x1, int y2, int x2,
 	if (!mark_starburst_shape(y1, x1, y2, x2, flag)) return (FALSE);
 
 
-	if (cheat_xtra) msg_print("Generating starburst.");
+	if (cheat_room) msg_print("Generating starburst.");
 
 	/* Paranoia */
 	if (edge == feat) edge = FEAT_NONE;
@@ -2380,7 +2380,7 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 
 	int counter = 0;
 
-	if (cheat_xtra) msg_format("Getting room info %d.",*chart);
+	if (cheat_room) msg_format("Getting room info %d.",*chart);
 
 	/* Process the description */
 	/* Note we need 1 space at end of room_desc_sections to terminate description */
@@ -6119,19 +6119,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		/* Mega-Hack -- Paranoia -- prevent infinite loops */
 		if (main_loop_count++ > 2000)
 		{
-			if (cheat_xtra) msg_format("Main loop count exceeded. Aborting.", part1);
-			abort_and_cleanup = TRUE;
-			break;
-		}
-
-		/* Hack -- Prevent tunnel weirdness */
-		if (dun->tunn_n >= TUNN_MAX - 1)
-		{
-			if (cheat_xtra) msg_format("Tunnel length exceeded from %d. Aborting.", part1);
-			
-			/* Hack -- themed tunnels can get too long. So try unthemed. */
-			level_flag &= ~(LF1_THEME);
-
+			if (cheat_room) msg_format("Main loop count exceeded. Aborting.", part1);
 			abort_and_cleanup = TRUE;
 			break;
 		}
@@ -6179,7 +6167,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			}
 			else
 			{
-				if (cheat_xtra) msg_format("Tunnel stuck from %d. Aborting.", part1);
+				if (cheat_room) msg_format("Tunnel stuck from %d. Aborting.", part1);
 				
 				abort_and_cleanup = TRUE;
 				break;
@@ -6409,7 +6397,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				if (part1 == dun->part[dun_room[by2][bx2]-1])
 				{
 					abort_and_cleanup = TRUE;
-					if (cheat_xtra) msg_format("Loop in partition %d. Aborting.", part1);
+					if (cheat_room) msg_format("Loop in partition %d. Aborting.", part1);
 					break;
 				}
 
@@ -6417,7 +6405,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				else if ((flood_tunnel) && ((room_info[dun_room[by2][bx2]].flags & (ROOM_FLOODED)) == 0))
 				{
 					abort_and_cleanup = TRUE;
-					if (cheat_xtra) msg_format("Trying to flood unflooded partition %d. Aborting.", part1);
+					if (cheat_room) msg_format("Trying to flood unflooded partition %d. Aborting.", part1);
 					break;
 				}
 				
@@ -6426,7 +6414,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					int part2 = dun->part[dun_room[by2][bx2]-1];
 					
 					/* Merging successfully */
-					if (cheat_xtra) msg_format("Merging partition %d (room %d) with %d (room %d).", part1, dun_room[by1][bx1], part2, dun_room[by2][bx2]);
+					if (cheat_room) msg_format("Merging partition %d (room %d) with %d (room %d).", part1, dun_room[by1][bx1], part2, dun_room[by2][bx2]);
 
 					/* Merge partitions */
 					for (i = 0; i < dun->cent_n; i++)
@@ -6569,6 +6557,16 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 						}
 					}
 				}
+			}
+			else
+			{
+				if (cheat_room) msg_format("Tunnel length exceeded from %d. Aborting.", part1);
+			
+				/* Hack -- themed tunnels can get too long. So try unthemed. */
+				level_flag &= ~(LF1_THEME);
+
+				abort_and_cleanup = TRUE;
+				break;				
 			}
 
 			/* Prevent door decoration in next grid */
@@ -6765,7 +6763,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			{
 				if ((overrun_flag) || (dun->door_n > first_door + 6))
 				{
-					if (cheat_xtra) msg_format("Overrun in doors from %d. Aborting.", part1);
+					if (cheat_room) msg_format("Overrun in doors from %d. Aborting.", part1);
 
 					abort_and_cleanup = TRUE;
 					break;
@@ -6878,7 +6876,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				/* Different room in same partition */
 				if (dun->part[dun_room[by1][bx1]-1] == dun->part[dun_room[by2][bx2]-1])
 				{
-					if (cheat_xtra) msg_format("Loop in partition %d endpoints. Aborting.", part1);
+					if (cheat_room) msg_format("Loop in partition %d endpoints. Aborting.", part1);
 
 					abort_and_cleanup = TRUE;
 					break;
@@ -6888,7 +6886,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				else if ((flood_tunnel) && ((room_info[dun_room[by2][bx2]].flags & (ROOM_FLOODED)) == 0))
 				{
 					abort_and_cleanup = TRUE;
-					if (cheat_xtra) msg_format("Trying to flood unflooded partition %d. Aborting.", part1);
+					if (cheat_room) msg_format("Trying to flood unflooded partition %d. Aborting.", part1);
 					break;
 				}
 				
@@ -7713,7 +7711,7 @@ static bool build_type16(int room, int type)
 static bool room_build(int room, int type)
 {
 	/* Generating */
-	if (cheat_xtra) msg_format("Building room type %d.", type);
+	if (cheat_room) msg_format("Building room type %d.", type);
 	
 	/* Flood if required */
 	if ((dun->flood_feat) && (room % 3)) room_info[room].flags |= (ROOM_FLOODED);
@@ -8318,6 +8316,7 @@ static void init_ecology(int r_idx)
 	cave_ecology.valid_hook = TRUE;
 }
 
+
 /*
  *  Place tower in the dungeon.
  */
@@ -8603,7 +8602,7 @@ static bool place_tunnels()
 		/* Abort */
 		if (counter++ > DUN_ROOMS * DUN_ROOMS)
 		{
-			if (cheat_xtra) msg_format("Unable to connect rooms in %d attempted tunnels.", DUN_ROOMS * DUN_ROOMS);
+			if (cheat_room) msg_format("Unable to connect rooms in %d attempted tunnels.", DUN_ROOMS * DUN_ROOMS);
 
 			/* Megahack -- we have connectivity on surface anyway */
 			if (level_flag & (LF1_SURFACE)) return (TRUE);
@@ -8798,7 +8797,7 @@ static void place_decorations()
 		if (feat)
 		{
 			/* Generating */
-			if (cheat_xtra) msg_format("Building %s streamer.", f_name + f_info[feat].name);
+			if (cheat_room) msg_format("Building %s streamer.", f_name + f_info[feat].name);
 
 			/* Build one streamer. */
 			build_streamer(feat);
@@ -8861,6 +8860,9 @@ static bool new_player_spot(void)
 
 			/* Refuse to start on anti-teleport (vault) grids */
 			if ((cave_info[y][x] & (CAVE_ROOM)) && (room_has_flag(y, x, ROOM_ICKY))) continue;
+
+			/* Must be a safe start grid clear of monsters and objects  XXX */
+			if ((i < 650) && (!cave_start_bold(y, x))) continue;
 
 			/* Must be a floor grid clear of monsters and objects  XXX */
 			if ((i < 700) && (!cave_naked_bold(y, x))) continue;
@@ -8950,9 +8952,8 @@ static int alloc_stairs(int feat, int num, int walls)
 				/* Reduce stairs if unable to place after a while */
 				if ((i % 400) == 0) num--;
 
-				/* Require actual floor or ground grid */
-				if (((f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR)) == 0)
-					&& ((f_info[cave_feat[y][x]].flags3 & (FF3_GROUND)) == 0)) continue;
+				/* Must be a safe start grid clear of monsters and objects  XXX */
+				if ((i < 650) && (!cave_start_bold(y, x))) continue;
 
 				/* Must be a floor grid clear of monsters and objects  XXX */
 				if ((i < 700) && (!cave_naked_bold(y, x))) continue;
@@ -9105,7 +9106,7 @@ static bool place_contents()
 	if ((level_flag & (LF1_ROOMS | LF1_TOWER)) != 0)
 	{	
 		/* Generating */
-		if (cheat_xtra) msg_print("Placing stairs, rubble, traps.");
+		if (cheat_room) msg_print("Placing stairs, rubble, traps.");
 
 		/* Place 1 or 2 down stairs near some walls */
 		if (!alloc_stairs(FEAT_MORE, rand_range(1, 2), 3)) return (FALSE);
@@ -9129,21 +9130,21 @@ static bool place_contents()
 	else if (!dun->entrance)
 	{
 		/* Generating */
-		if (cheat_xtra) msg_print("Placing dungeon entrance.");
+		if (cheat_room) msg_print("Placing dungeon entrance.");
 
 		/* Place the dungeon entrance */
 		if (!alloc_stairs(FEAT_ENTRANCE, 1, 0)) return (FALSE);
 	}
 
 	/* Determine the character location */
-	if ((p_ptr->py == 0) || (p_ptr->px == 0)) new_player_spot();
+	if (((p_ptr->py == 0) || (p_ptr->px == 0)) && ! (new_player_spot())) return (FALSE);
 
 	/* Pick a base number of monsters */
 	/* Strongholds and sewers have more monsters */
 	i = MIN_M_ALLOC_LEVEL + randint(8 * ((level_flag & (LF1_STRONGHOLD | LF1_SEWER)) != 0) ? 2 : 1);
 
 	/* Generating */
-	if (cheat_xtra) msg_print("Placing monsters.");
+	if (cheat_room) msg_print("Placing monsters.");
 
 	/* Put some monsters in the dungeon */
 	for (i = i + k; i > 0; i--)
@@ -9155,7 +9156,7 @@ static bool place_contents()
 	if ((level_flag & (LF1_ROOMS | LF1_TOWER)) != 0)
 	{
 		/* Generating */
-		if (cheat_xtra) msg_print("Placing objects, treasure.");
+		if (cheat_room) msg_print("Placing objects, treasure.");
 
 		/* Put some objects in rooms */
 		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ROOM * ((level_flag & (LF1_STRONGHOLD)) != 0) ? 2 : 1, 3));
@@ -9284,7 +9285,7 @@ static bool cave_gen(void)
 	if (p_ptr->depth > 3)
 	{
 		/* Generating */
-		if (cheat_xtra) msg_print("Generating ecology.");
+		if (cheat_room) msg_print("Generating ecology.");
 
 		/* Place guardian if permitted */
 		if ((level_flag & (LF1_GUARDIAN)) != 0)
@@ -9312,7 +9313,7 @@ static bool cave_gen(void)
 	if ((level_flag & (LF1_ROOMS | LF1_TUNNELS)) != 0)
 	{
 		/* Generating */
-		if (cheat_xtra) msg_print("Building rooms.");
+		if (cheat_room) msg_print("Building rooms.");
 
 		/* Place the rooms */
 		if (!place_rooms()) return (FALSE);
@@ -9381,7 +9382,7 @@ static bool cave_gen(void)
 		int y, x;
 
 		/* Generating */
-		if (cheat_xtra) msg_print("Placing guardian.");
+		if (cheat_room) msg_print("Placing guardian.");
 
 		/* Pick a location */
 		while (1)
@@ -9397,7 +9398,7 @@ static bool cave_gen(void)
 	}
 
 	/* Generating */
-	if (cheat_xtra) msg_print("Finished generating dungeon.");
+	if (cheat_room) msg_print("Finished generating dungeon.");
 
 	/* Hack -- restrict teleporation in towers */
 	/* XXX Important that this occurs after placing the player */
@@ -10013,7 +10014,7 @@ void generate_cave(void)
 	character_dungeon = FALSE;
 
 	/* Generating */
-	if (cheat_xtra) msg_format("Generating new level (level %d in %s)", p_ptr->depth, t_name + t_info[p_ptr->dungeon].name);
+	if (cheat_room) msg_format("Generating new level (level %d in %s)", p_ptr->depth, t_name + t_info[p_ptr->dungeon].name);
 
 	/* Generate */
 	for (num = 0; TRUE; num++)
@@ -10098,7 +10099,7 @@ void generate_cave(void)
 			if (!town_gen()) okay = FALSE;
 
 			/* Report why */
-			if (cheat_xtra) why = "defective town";
+			if (cheat_room) why = "defective town";
 		}
 
 		/* Build a real level */
@@ -10108,7 +10109,7 @@ void generate_cave(void)
 			if (!cave_gen()) okay = FALSE;
 
 			/* Report why */
-			if (cheat_xtra) why = "defective dungeon";
+			if (cheat_room) why = "defective dungeon";
 		}
 
 #if 0

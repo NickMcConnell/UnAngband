@@ -2901,8 +2901,6 @@ int get_coin_type(const monster_race *r_ptr)
  */
 void quest_assign(int q_idx)
 {
-	int i;
-
 	(void)q_idx;
 }
 
@@ -2914,8 +2912,6 @@ void quest_assign(int q_idx)
  */
 void quest_reward(int q_idx)
 {
-	int i;
-
 	(void)q_idx;
 
 }
@@ -2927,8 +2923,6 @@ void quest_reward(int q_idx)
  */
 void quest_penalty(int q_idx)
 {
-	int i;
-
 	(void)q_idx;
 }
 
@@ -2936,14 +2930,14 @@ void quest_penalty(int q_idx)
 void scatter_objects_under_feat(int y, int x)
 {
   s16b this_o_idx, next_o_idx = 0;
+  
+  object_type *o_ptr;
 
   assert (in_bounds(y, x));
 
   /* Scan all objects in the grid */
   for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
     {
-      object_type *o_ptr;
-		
       /* Get the object */
       o_ptr = &o_list[this_o_idx];
 
@@ -2954,8 +2948,18 @@ void scatter_objects_under_feat(int y, int x)
       drop_near(o_ptr, -1, y, x);
     }
 
-  /* Objects are gone */
-  cave_o_idx[y][x] = 0;
+  /* Scan all objects in the grid */
+  for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
+    {
+      /* Get the object */
+      o_ptr = &o_list[this_o_idx];
+
+      /* Get the next object */
+      next_o_idx = o_ptr->next_o_idx;
+
+		/* Delete object */
+		delete_object_idx(this_o_idx);
+    }
 
   /* Visual update */
   lite_spot(y, x);
@@ -3013,12 +3017,8 @@ void monster_death(int m_idx)
 	y = m_ptr->fy;
 	x = m_ptr->fx;
 
-	/* Some monsters stop radiating lite when dying */
-	if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE))
-	{
-		/* Update the visuals */
-		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-	}
+	/* Extinguish lite */
+	delete_monster_lite(m_idx);
 
 	/* Monster death updates visible monsters */
 	p_ptr->window |= (PW_MONLIST);
@@ -3054,10 +3054,10 @@ void monster_death(int m_idx)
 	m_ptr->hold_o_idx = 0;
 
 	/* Hack -- only sometimes drop bodies */
-	if ((rand_int(100)<30) || (r_ptr->flags1 & (RF1_UNIQUE)) ||
-		(r_ptr->flags2 & (RF2_REGENERATE)) ||
+	if ((rand_int(100)<30) || ((r_ptr->flags1 & (RF1_UNIQUE)) != 0) ||
+		((r_ptr->flags2 & (RF2_REGENERATE)) != 0) ||
 		(r_ptr->level > p_ptr->depth) ||
-		(r_ptr->flags8 & (RF8_ASSEMBLY)))
+		((r_ptr->flags8 & (RF8_ASSEMBLY)) != 0))
 	{
 		/* Get local object */
 		i_ptr = &object_type_body;
