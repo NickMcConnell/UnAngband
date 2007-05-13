@@ -2581,10 +2581,35 @@
 #define PROJECT_XX10         0x04000000
 
 /*Who caused the projection*/
-#define SOURCE_PLAYER			-1  /*player is the source of projection*/
-#define SOURCE_TRAP			-2	/*Trap*/
-#define SOURCE_OTHER			-3	/*Terrain, something other than player or monster*/
 #define SOURCE_MONSTER_START	0 /*Greater than 0 monster is the source*/
+
+#define SOURCE_SELF				0	/* Monster comitting suicide */
+#define SOURCE_OBJECT			-1	/* Source is an object */
+#define SOURCE_FEATURE			-2	/* Source is a feature */
+#define SOURCE_SPELL			-3	/* Source is a spell */
+#define SOURCE_DISEASE			-4	/* Source is a disease */
+#define SOURCE_DAYLIGHT			-5	/* Source is the sun */
+#define SOURCE_BIRTH			-6	/* Source is birth of monster race */
+
+#define SOURCE_PLAYER_START		-7	/* Less than here, player is the source, and gets experience */
+#define SOURCE_PLAYER_ATTACK	-8
+#define SOURCE_PLAYER_SHOT		-9
+#define SOURCE_PLAYER_THROW		-10
+#define SOURCE_PLAYER_TRAP		-11
+#define SOURCE_PLAYER_CAST		-12
+#define SOURCE_PLAYER_EAT_MONSTER	-13
+#define SOURCE_PLAYER_EAT		-14
+#define SOURCE_PLAYER_QUAFF		-15
+#define SOURCE_PLAYER_READ		-16
+#define SOURCE_PLAYER_USE		-17	/* Staffs*/
+#define SOURCE_PLAYER_AIM		-18	/* Wands */
+#define SOURCE_PLAYER_ZAP		-19	/* Rods */
+#define SOURCE_PLAYER_ACT_ARTIFACT	-20
+#define SOURCE_PLAYER_ACTIVATE	-21
+#define SOURCE_PLAYER_BREAK		-22
+#define SOURCE_PLAYER_SPORE		-23
+#define SOURCE_PLAYER_SERVICE	-24
+
 
 /*
  * An arc with a width (in degrees) less than this value will lose less

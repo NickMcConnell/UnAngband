@@ -4845,10 +4845,10 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 						damage = damroll(d_dice, d_side);
 
 						/* New result routine */
-						project_p(m_idx,ny,nx,damage,effect);
+						project_p(m_idx, ap_cnt, ny, nx, damage, effect);
 
 						/* Apply teleport and other effects */
-						project_t(m_idx,ny,nx,damage,effect);
+						project_t(m_idx, ap_cnt, ny, nx, damage, effect);
 
 					}
 				}
@@ -6012,9 +6012,9 @@ static void recover_monster(int m_idx, bool regen)
 	/* Get hit by terrain continuously */
 	if (place_monster_here(y, x, m_ptr->r_idx) < MM_FAIL)
 	{
-		bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
+		bool surface = (level_flag & (LF1_SURFACE));
 
-		bool daytime = ((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2));
+		bool daytime = (level_flag & (LF1_DAYLIGHT));
 
 		bool hurt_lite = ((r_ptr->flags3 & (RF3_HURT_LITE)) ? TRUE : FALSE);
 
@@ -6026,10 +6026,10 @@ static void recover_monster(int m_idx, bool regen)
 		if (surface && daytime && hurt_lite && outside)
 		{
 			/* Burn the monster */
-			project_m(0, y, x, damroll(4,6), GF_LITE);
+			project_m(SOURCE_DAYLIGHT, 0, y, x, damroll(4,6), GF_LITE);
 
 			/* Burn the monster */
-			project_t(0, y, x, damroll(4,6), GF_LITE);
+			project_t(SOURCE_DAYLIGHT, 0, y, x, damroll(4,6), GF_LITE);
 		}
 		else if ((f_info[cave_feat[y][x]].blow.method) && !(f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP)))
 		{
@@ -6039,11 +6039,11 @@ static void recover_monster(int m_idx, bool regen)
 		/* Suffocate */
 		else
 		{
-			/* Burn the monster */
-			project_m(0, y, x, damroll(4,6), GF_SUFFOCATE);
+			/* Suffocate the monster */
+			project_m(SOURCE_FEATURE, cave_feat[y][x], y, x, damroll(4,6), GF_SUFFOCATE);
 
-			/* Burn the monster */
-			project_t(0, y, x, damroll(4,6), GF_SUFFOCATE);
+			/* Suffocate the monster */
+			project_t(SOURCE_FEATURE, cave_feat[y][x], y, x, damroll(4,6), GF_SUFFOCATE);
 		}
 
 		/* Is the monster hidden?*/

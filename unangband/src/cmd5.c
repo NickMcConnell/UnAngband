@@ -1298,7 +1298,7 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 		bool known = TRUE;
 
 		/* Apply the spell effect */
-		process_spell(spell,plev,&abort,&known);
+		process_spell(SOURCE_PLAYER_CAST, spell, spell,plev,&abort,&known);
 
 		/* Did we cancel? */
 		if (abort) return FALSE;

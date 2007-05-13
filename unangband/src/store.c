@@ -2548,7 +2548,7 @@ static void store_purchase(int store_index)
 				if (power < 0) return;
 
 				/* Apply service effect */
-				(void)process_spell(power, 0, &cancel, &known);
+				(void)process_spell(SOURCE_PLAYER_SERVICE, o_ptr->k_idx, power, 0, &cancel, &known);
 
 				/* Hack -- allow certain services to be cancelled */
 				if (cancel) return;

@@ -1973,9 +1973,9 @@ void hit_trap(int y, int x)
 					damage = d_plus;
 				}
 
-				(void)project_p(0,y,x,damage, effect);
-				(void)project_f(0,y,x,damage, effect);
-				(void)project_t(0,y,x,damage, effect);
+				(void)project_p(SOURCE_PLAYER_TRAP,o_ptr->k_idx,y,x,damage, effect);
+				(void)project_f(SOURCE_PLAYER_TRAP,o_ptr->k_idx,y,x,damage, effect);
+				(void)project_t(SOURCE_PLAYER_TRAP,o_ptr->k_idx,y,x,damage, effect);
 			}
 		}
 	}
@@ -2001,8 +2001,8 @@ void hit_trap(int y, int x)
 			dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
    
 			/* Apply the blow */
-			project_p(0, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
-			project_t(0, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
+			project_p(SOURCE_FEATURE, feat, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
+			project_t(SOURCE_FEATURE, feat, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
 		}
 
 		/* Get feature */

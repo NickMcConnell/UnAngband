@@ -182,8 +182,21 @@ void do_cmd_borg(void)
 		/* Jump around dungeons */
 		if (adult_campaign)
 		{
-			/* New dungeon */
-			p_ptr->dungeon = rand_int(z_info->t_max);
+			/* Skip towns */
+			while (TRUE)
+			{
+				/* Get dungeon zone */
+				dungeon_zone *zone=&t_info[0].zone[0];
+
+				/* New dungeon */
+				p_ptr->dungeon = rand_int(z_info->t_max);
+				
+				/* Get the zone */
+				get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+			
+				if (zone->fill) break;
+				
+			}
 
 			/* New depth */
 			p_ptr->depth = rand_range(min_depth(p_ptr->dungeon), max_depth(p_ptr->dungeon));

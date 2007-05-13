@@ -612,7 +612,7 @@ extern bool load_player(void);
 extern bool monster_scale(monster_race *n_ptr, int m_idx, int depth);
 extern int get_breath_dam(s16b hit_points, int gf_type, bool powerful);
 extern bool make_attack_normal(int m_idx);
-extern void mon_blow_ranged(int who, int x, int y, int method, int range, int flg, cptr result);
+extern void mon_blow_ranged(int who, int what, int x, int y, int method, int range, int flg, cptr result);
 extern bool make_attack_ranged(int who, int attack, int py, int px);
 extern bool mon_evade(int m_idx, int chance, int out_of, cptr r);
 extern bool mon_resist_object(int m_idx, const object_type *o_ptr);
@@ -817,12 +817,12 @@ extern void inc_stat(int stat);
 extern bool dec_stat(int stat, int amount, int permanent);
 extern bool res_stat(int stat);
 extern bool apply_disenchant(int mode);
-extern bool project_f(int who, int y, int x, int dam, int typ);
-extern bool project_o(int who, int y, int x, int dam, int typ);
-extern bool project_m(int who, int y, int x, int dam, int typ);
-extern bool project_p(int who, int y, int x, int dam, int typ);
-extern bool project_t(int who, int y, int x, int dam, int typ);
-extern bool project(int who, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
+extern bool project_f(int who, int what, int y, int x, int dam, int typ);
+extern bool project_o(int who, int what, int y, int x, int dam, int typ);
+extern bool project_m(int who, int what, int y, int x, int dam, int typ);
+extern bool project_p(int who, int what, int y, int x, int dam, int typ);
+extern bool project_t(int who, int what, int y, int x, int dam, int typ);
+extern bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
 			 u32b flg, int degrees, byte source_diameter);
 
 /* spells2.c */
@@ -870,10 +870,10 @@ extern void lite_room(int y1, int x1);
 extern void unlite_room(int y1, int x1);
 extern void change_shape(int shape, int level);
 extern bool process_spell_flags(int spell, int level, bool *cancel, bool *known);
-extern bool process_spell_blows(int spell, int level, bool *cancel);
+extern bool process_spell_blows(int who, int what, int spell, int level, bool *cancel);
 extern bool process_spell_types(int spell, int level, bool *cancel);
-extern bool process_spell_eaten(int spell, int level, bool *cancel);
-extern bool process_spell(int spell, int level, bool *cancel, bool *known);
+extern bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel);
+extern bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *known);
 extern bool process_item_blow(object_type *o_ptr, int y, int x);
 
 /* store.c */

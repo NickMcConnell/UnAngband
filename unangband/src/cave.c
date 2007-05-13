@@ -4179,7 +4179,7 @@ void update_dyna(void)
 				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice) * 2;
    
 				/* Apply the blow */
-				project(0, 2, y, x, y, x, dam, f_ptr->blow.effect, flg, 0, 0);
+				project(SOURCE_FEATURE, feat, 2, y, x, y, x, dam, f_ptr->blow.effect, flg, 0, 0);
 			}
 		}
 
@@ -4193,7 +4193,7 @@ void update_dyna(void)
 				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice) * 10;
    
 				/* Apply the blow */
-				project(0, 0, y, x, y, x, dam, f_ptr->blow.effect, flg, 0, 0);
+				project(SOURCE_FEATURE, feat, 0, y, x, y, x, dam, f_ptr->blow.effect, flg, 0, 0);
 			}
 		}
 
@@ -4223,7 +4223,7 @@ void update_dyna(void)
 				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
    
 				/* Apply the blow */
-				project(0, 0, yy, xx, yy, xx, dam, f_ptr->blow.effect, flg, 0, 0);
+				project(SOURCE_FEATURE, feat, 0, yy, xx, yy, xx, dam, f_ptr->blow.effect, flg, 0, 0);
 
 				/* Hack -- Remove adjacent grids from further processing */
 				if (adjfeat != cave_feat[yy][xx]) 
@@ -4260,7 +4260,7 @@ void update_dyna(void)
 				dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
    
 				/* Apply the blow */
-				project(0, 0, yy, xx, yy, xx, dam, f_ptr->blow.effect, flg, 0, 0);
+				project(SOURCE_FEATURE, feat, 0, yy, xx, yy, xx, dam, f_ptr->blow.effect, flg, 0, 0);
 
 				/* Hack -- require smoke/acid clouds to move */
 				if (adjfeat == cave_feat[yy][xx]) dir = 12;
