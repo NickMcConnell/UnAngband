@@ -440,11 +440,11 @@ bool disease_desc(char *desc, u32b old_disease, u32b new_disease)
 	{
 		/* Intro */
 		if (n == 0) { }
-		else if (n < vn-1) strcat(desc,", ");
-		else strcat(desc," and ");
+		else if (n < vn-1) my_strcat(desc,", ", sizeof(desc));
+		else my_strcat(desc," and ", sizeof(desc));
 
 		/* Dump */
-		strcat(desc,vp[n]);
+		my_strcat(desc,vp[n], sizeof(desc));
 	}
 
 	/* Collect causes */
@@ -458,16 +458,16 @@ bool disease_desc(char *desc, u32b old_disease, u32b new_disease)
 	for (n = 0; n < vn; n++)
 	{
 		/* Intro */
-		if (n == 0) { if ((disease & ((1 << DISEASE_TYPES_HEAVY) -1)) != 0) strcat(desc, " caused by "); }
-		else if (n < vn-1) strcat(desc,", ");
-		else strcat(desc," and ");
+		if (n == 0) { if ((disease & ((1 << DISEASE_TYPES_HEAVY) -1)) != 0) my_strcat(desc, " caused by ", sizeof(desc)); }
+		else if (n < vn-1) my_strcat(desc,", ", sizeof(desc));
+		else my_strcat(desc," and ", sizeof(desc));
 
 		/* Dump */
-		strcat(desc,vp[n]);
+		my_strcat(desc,vp[n], sizeof(desc));
 	}
 
 	/* Dump */
-	strcat(desc,".");
+	my_strcat(desc,".", sizeof(desc));
 
 	return(TRUE);
 }

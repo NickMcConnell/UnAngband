@@ -5554,7 +5554,7 @@ void display_scores_aux(int from, int to, int note, high_score *score)
 			        clev);
 
 			/* Append a "maximum level" */
-			if (mlev > clev) strcat(out_val, format(" (Max %d)", mlev));
+			if (mlev > clev) my_strcat(out_val, format(" (Max %d)", mlev), sizeof(out_val));
 
 			/* Dump the first line */
 			c_put_str(attr, out_val, n*4 + 2, 0);
@@ -5566,7 +5566,7 @@ void display_scores_aux(int from, int to, int note, high_score *score)
 				format("on Dungeon Level %d in", cdep) ) ), t_name + t_info[cdun].name);
 
 			/* Append a "maximum level" */
-			if (mdep > cdep) strcat(out_val, format(" (Max %d)", mdep));
+			if (mdep > cdep) my_strcat(out_val, format(" (Max %d)", mdep), sizeof(out_val));
 
 			/* Dump the info */
 			c_put_str(attr, out_val, n*4 + 3, 0);
