@@ -2131,7 +2131,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_GAZE:	msg_print(result);(void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_WAIL: msg_print(result);(void)project(who, what, 4, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
 				case RBM_SHRIEK: msg_print(result); (void)project(who, what, 6, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_ARC | PROJECT_HIDE, 20, 20); aggravate_monsters(who); break;
-				case RBM_SPORE:	mon_ball_shot(who, what, y, x, effect, dam, 1, hit, result); break;
+				case RBM_SPORE:	mon_ball_minor_shot(who, what, y, x, effect, dam, 1, hit, result); break;
 				case RBM_LASH:  mon_beam(who, what, y, x, effect, dam, 2, result); break;
 				case RBM_BEG:	msg_print(result);(void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_INSULT: msg_print(result);(void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
