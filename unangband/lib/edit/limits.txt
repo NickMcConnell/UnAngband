@@ -71,7 +71,7 @@ M:B:4
 M:Q:8
 
 # Maximum number of objects
-M:O:512
+M:O:1024
 
 # Maximum number of monsters
 M:M:1024

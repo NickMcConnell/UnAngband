@@ -2131,7 +2131,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_GAZE:	msg_print(result);(void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_WAIL: msg_print(result);(void)project(who, what, 4, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
 				case RBM_SHRIEK: msg_print(result); (void)project(who, what, 6, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_ARC | PROJECT_HIDE, 20, 20); aggravate_monsters(who); break;
-				case RBM_SPORE:	mon_ball(who, what, y, x, effect, dam, 1, hit, result); break;
+				case RBM_SPORE:	mon_ball_shot(who, what, y, x, effect, dam, 1, hit, result); break;
 				case RBM_LASH:  mon_beam(who, what, y, x, effect, dam, 2, result); break;
 				case RBM_BEG:	msg_print(result);(void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_INSULT: msg_print(result);(void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
@@ -2185,7 +2185,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_8WAY_III: mon_8way(who, what, y, x, effect, dam, 4, result); break;
 				case RBM_SWARM: for (k = 0; k < (rlev / 20) + 2; k++) mon_ball_minor(who, what, y, x, effect, dam, 2, TRUE, result); break;
 				case RBM_DAGGER: mon_shot(who, what, y, x, effect, dam, hit, result); break;
-				default: mon_beam(who, what, y, x, effect, dam, 2, result); /* For all hurt huge attacks */
+				default: mon_beam(who, what, y, x, effect, dam, 2, format("reaches out and %s", result)); /* For all hurt huge attacks */
 			}
 
 			/* Hack -- only one of cut or stun */
