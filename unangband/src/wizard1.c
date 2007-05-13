@@ -185,7 +185,7 @@ static void kind_info(char *buf, char *dam, char *wgt, char *pow, int *lev, s32b
 	object_desc_spoil(buf, sizeof(buf), i_ptr, FALSE, 0);
 
 	/* Misc info */
-	strcpy(dam, "");
+	my_strcpy(dam, "", sizeof(dam));
 
 	/* Damage */
 	switch (i_ptr->tval)
@@ -237,7 +237,7 @@ static void kind_info(char *buf, char *dam, char *wgt, char *pow, int *lev, s32b
 	sprintf(wgt, "%3d.%d", i_ptr->weight / 10, i_ptr->weight % 10);
 
         /* Power */
-        strcpy(pow, "");
+        my_strcpy(pow, "", sizeof(pow));
 
 	/* Fill the book with spells */
 	fill_book(i_ptr,book,&num);
@@ -952,14 +952,14 @@ static void spoil_mon_desc(cptr fname)
 
 		/* Best spell */
 		if (r_ptr->best_spell) sprintf(bsp, "%s", mon_spell_desc[r_ptr->best_spell-96]);
-		else strcpy(bsp, "");
+		else my_strcpy(bsp, "", sizeof(bsp));
 
 		/* Highest threat */
 		sprintf(thr, "%d", r_ptr->highest_threat);
 
 		/* Best spell */
 		if (r_ptr->best_threat) sprintf(bth, "%s", mon_spell_desc[r_ptr->best_threat-96]);
-		else strcpy(bth, "");
+		else my_strcpy(bth, "", sizeof(bth));
 
 		/* Speed */
 		if (r_ptr->speed >= 110)

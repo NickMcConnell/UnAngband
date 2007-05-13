@@ -2622,8 +2622,8 @@ bool load_player(void)
 		char temp[1024];
 
 		/* Extract name of lock file */
-		strcpy(temp, savefile);
-		strcat(temp, ".lok");
+		my_strcpy(temp, savefile);
+		my_strcat(temp, ".lok");
 
 		/* Grab permissions */
 		safe_setuid_grab();
@@ -2821,7 +2821,7 @@ bool load_player(void)
 		if (p_ptr->chp >= 0)
 		{
 			/* Reset cause of death */
-			strcpy(p_ptr->died_from, "(alive and well)");
+			my_strcpy(p_ptr->died_from, "(alive and well)", sizeof(p_ptr->died_from));
 		}
 
 		/* Success */
@@ -2837,8 +2837,8 @@ bool load_player(void)
 		char temp[1024];
 
 		/* Extract name of lock file */
-		strcpy(temp, savefile);
-		strcat(temp, ".lok");
+		my_strcpy(temp, savefile);
+		my_strcat(temp, ".lok");
 
 		/* Grab permissions */
 		safe_setuid_grab();

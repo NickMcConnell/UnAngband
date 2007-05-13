@@ -873,7 +873,7 @@ static errr process_pref_file_aux(cptr name)
 
 
 		/* Save a copy */
-		strcpy(old, buf);
+		my_strcpy(old, buf,sizeof(old));
 
 
 		/* Process "?:<expr>" */
@@ -1183,13 +1183,13 @@ errr check_time_init(void)
 		buf[29] = '\0';
 
 		/* Extract the info */
-		if (prefix(buf, "SUN:")) strcpy(days[0], buf);
-		if (prefix(buf, "MON:")) strcpy(days[1], buf);
-		if (prefix(buf, "TUE:")) strcpy(days[2], buf);
-		if (prefix(buf, "WED:")) strcpy(days[3], buf);
-		if (prefix(buf, "THU:")) strcpy(days[4], buf);
-		if (prefix(buf, "FRI:")) strcpy(days[5], buf);
-		if (prefix(buf, "SAT:")) strcpy(days[6], buf);
+		if (prefix(buf, "SUN:")) my_strcpy(days[0], buf, sizeof(days[0]));
+		if (prefix(buf, "MON:")) my_strcpy(days[1], buf, sizeof(days[0]));
+		if (prefix(buf, "TUE:")) my_strcpy(days[2], buf, sizeof(days[0]));
+		if (prefix(buf, "WED:")) my_strcpy(days[3], buf, sizeof(days[0]));
+		if (prefix(buf, "THU:")) my_strcpy(days[4], buf, sizeof(days[0]));
+		if (prefix(buf, "FRI:")) my_strcpy(days[5], buf, sizeof(days[0]));
+		if (prefix(buf, "SAT:")) my_strcpy(days[6], buf, sizeof(days[0]));
 	}
 
 	/* Close it */
@@ -4201,13 +4201,13 @@ bool show_file(cptr name, cptr what, int line, int mode)
 
 
 	/* Wipe finder */
-	strcpy(finder, "");
+	my_strcpy(finder, "", sizeof(finder));
 
 	/* Wipe shower */
-	strcpy(shower, "");
+	my_strcpy(shower, "", sizeof(shower));
 
 	/* Wipe caption */
-	strcpy(caption, "");
+	my_strcpy(caption, "", sizeof(caption));
 
 	/* Wipe the hooks */
 	for (i = 0; i < 10; i++) hook[i][0] = '\0';
@@ -4216,10 +4216,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 	Term_get_size(&wid, &hgt);
 
 	/* Copy the filename */
-	strncpy(filename, name, sizeof(filename));
-	filename[sizeof(filename)-1] = '\0';
-
-	n = strlen(filename);
+	n = my_strcpy(filename, name, sizeof(filename));
 
 	/* Extract the tag from the filename */
 	for (i = 0; i < n; i++)
@@ -4240,10 +4237,10 @@ bool show_file(cptr name, cptr what, int line, int mode)
 	if (what)
 	{
 		/* Caption */
-		strcpy(caption, what);
+		my_strcpy(caption, what, sizeof(caption));
 
 		/* Get the filename */
-		strcpy(path, name);
+		my_strcpy(path, name, sizeof(path));
 
 		/* Open */
 		fff = my_fopen(path, "r");
@@ -4309,7 +4306,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 				k = D2I(buf[7]);
 
 				/* Extract the menu item */
-				strcpy(hook[k], buf + 10);
+				my_strcpy(hook[k], buf + 10, sizeof(hook[k]));
 			}
 			/* Notice "tag" requests */
 			else if (buf[6] == '<')
@@ -4399,7 +4396,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 			next++;
 
 			/* Make a copy of the current line for searching */
-			strcpy(lc_buf, buf);
+			my_strcpy(lc_buf, buf, sizeof(lc_buf));
 
 			/* Make the line lower case */
 			if (!case_sensitive) string_lower(lc_buf);
@@ -4510,7 +4507,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 				if (!case_sensitive) string_lower(finder);
 
 				/* Show it */
-				strcpy(shower, finder);
+				my_strcpy(shower, finder, sizeof(shower));
 			}
 		}
 
@@ -4519,7 +4516,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		{
 			char tmp[80];
 			prt("Goto Line: ", hgt - 1, 0);
-			strcpy(tmp, "0");
+			my_strcpy(tmp, "0", sizeof(tmp));
 			if (askfor_aux(tmp, 80))
 			{
 				line = atoi(tmp);
@@ -4531,7 +4528,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		{
 			char ftmp[80];
 			prt("Goto File: ", hgt - 1, 0);
-			strcpy(ftmp, "help.hlp");
+			my_strcpy(ftmp, "help.hlp", sizeof(ftmp));
 			if (askfor_aux(ftmp, 80))
 			{
 				if (!show_file(ftmp, NULL, 0, mode)) ke.key = ESCAPE;
@@ -4686,7 +4683,7 @@ void process_player_name(bool sf)
 	/* Require a "base" name */
 	if (!op_ptr->base_name[0])
 	{
-		strcpy(op_ptr->base_name, "PLAYER");
+		my_strcpy(op_ptr->base_name, "PLAYER", sizeof(op_ptr->base_name));
 	}
 
 
@@ -4799,19 +4796,19 @@ void get_name(void)
 	char tmp[16];
 
 	/* Save the player name */
-	strcpy(tmp, op_ptr->full_name);
+	my_strcpy(tmp, op_ptr->full_name, sizeof(tmp));
 
 	/* Offer a random name */
 	if (!strlen(tmp))
 	{
-		strcpy(tmp, make_word(7, 15));
+		my_strcpy(tmp, make_word(7, 15), sizeof(tmp));
 	}
 
 	/* Prompt for a new name */
 	if (get_string("Enter a name for your character: ", tmp, sizeof(tmp)))
 	{
 		/* Use the name */
-		strcpy(op_ptr->full_name, tmp);
+		my_strcpy(op_ptr->full_name, tmp, sizeof(op_ptr->full_name));
 
 		/* Process the player name */
 		process_player_name(FALSE);
@@ -4861,7 +4858,7 @@ void do_cmd_suicide(void)
 	p_ptr->leaving = TRUE;
 
 	/* Cause of death */
-	strcpy(p_ptr->died_from, "Quitting");
+	my_strcpy(p_ptr->died_from, "Quitting", sizeof(p_ptr->died_from));
 }
 
 
@@ -4887,7 +4884,7 @@ void do_cmd_save_game(void)
 	Term_fresh();
 
 	/* The player is not dead */
-	strcpy(p_ptr->died_from, "(saved)");
+	my_strcpy(p_ptr->died_from, "(saved)", sizeof(p_ptr->died_from));
 
 	/* Forbid suspend */
 	signals_ignore_tstp();
@@ -4911,7 +4908,7 @@ void do_cmd_save_game(void)
 	Term_fresh();
 
 	/* Note that the player is not dead */
-	strcpy(p_ptr->died_from, "(alive and well)");
+	my_strcpy(p_ptr->died_from, "(alive and well)", sizeof(p_ptr->died_from));
 }
 
 
@@ -5548,7 +5545,7 @@ void display_scores_aux(int from, int to, int note, high_score *score)
 			lookup_prettyname(name, pc, ps, pp, FALSE, TRUE);
 #else
 			/* Get the class name */
-			strcpy(name, c_name + c_info[pc].name);
+			my_strcpy(name, c_name + c_info[pc].name, sizeof(name));
 #endif
 			/* Dump some info */
 			sprintf(out_val, "%3d.%9s  %s the %s %s, Level %d",
@@ -5888,7 +5885,7 @@ errr predict_score(void)
 	sprintf(the_score.turns, "%9lu", (long)turn);
 
 	/* Hack -- no time needed */
-	strcpy(the_score.day, "TODAY");
+	my_strcpy(the_score.day, "TODAY", sizeof(the_score.day));
 
 	/* Save the player name (15 chars) */
 	sprintf(the_score.who, "%-.15s", op_ptr->full_name);
@@ -5910,7 +5907,7 @@ errr predict_score(void)
 	sprintf(the_score.cur_dun, "%3d", p_ptr->dungeon);
 
 	/* Hack -- no cause of death */
-	strcpy(the_score.how, "nobody (yet!)");
+	my_strcpy(the_score.how, "nobody (yet!)", sizeof(the_score.how));
 
 
 	/* See where the entry would be placed */
@@ -5951,7 +5948,7 @@ static void kingly(void)
 	p_ptr->depth = 0;
 
 	/* Fake death */
-	strcpy(p_ptr->died_from, "Ripe Old Age");
+	my_strcpy(p_ptr->died_from, "Ripe Old Age", sizeof(p_ptr->died_from));
 
 	/* Restore the experience */
 	p_ptr->exp = p_ptr->max_exp;
@@ -6283,7 +6280,7 @@ void exit_game_panic(void)
 	signals_ignore_tstp();
 
 	/* Indicate panic save */
-	strcpy(p_ptr->died_from, "(panic save)");
+	my_strcpy(p_ptr->died_from, "(panic save)", sizeof(p_ptr->died_from));
 
 	/* Panic save, or get worried */
 	if (!save_player()) quit("panic save failed!");
@@ -6393,7 +6390,7 @@ static void handle_signal_simple(int sig)
 	if (p_ptr->is_dead)
 	{
 		/* Mark the savefile */
-		strcpy(p_ptr->died_from, "Abortion");
+		my_strcpy(p_ptr->died_from, "Abortion", sizeof(p_ptr->died_from));
 
 		/* Close stuff */
 		close_game();
@@ -6406,7 +6403,7 @@ static void handle_signal_simple(int sig)
 	else if (signal_count >= 5)
 	{
 		/* Cause of "death" */
-		strcpy(p_ptr->died_from, "Interrupting");
+		my_strcpy(p_ptr->died_from, "Interrupting", sizeof(p_ptr->died_from));
 
 		/* Commit suicide */
 		p_ptr->is_dead = TRUE;
@@ -6485,7 +6482,7 @@ static void handle_signal_abort(int sig)
 	p_ptr->panic_save = 1;
 
 	/* Panic save */
-	strcpy(p_ptr->died_from, "(panic save)");
+	my_strcpy(p_ptr->died_from, "(panic save)", sizeof(p_ptr->died_from));
 
 	/* Forbid suspend */
 	signals_ignore_tstp();

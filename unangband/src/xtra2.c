@@ -3900,16 +3900,16 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 	get_zone(&zone,p_ptr->dungeon,max_depth(p_ptr->dungeon));
 
 	/* Initialize text */
-	strcpy(name, "");
-	if (text_always) strcpy(text_always, "");
-	if (text_visible) strcpy(text_visible, "");
+	my_strcpy(name, "");
+	if (text_always) my_strcpy(text_always, "");
+	if (text_visible) my_strcpy(text_visible, "");
 
 	/* Town or not in room */
 	if (!room)
 	{
 		if ((p_ptr->depth == min_depth(p_ptr->dungeon)) || (!zone->fill))
 		{
-			strcpy(name, t_name + t_ptr->name);
+			my_strcpy(name, t_name + t_ptr->name);
 
 			if (!text_always) return;
 
@@ -3917,7 +3917,7 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 			if ((zone->guard) && (!r_info[zone->guard].max_num))
 			{
 				/* Tell player guardian is defeated */
-				strcpy(text_always, format("You have defeated %s, guardian of %s",
+				my_strcpy(text_always, format("You have defeated %s, guardian of %s",
 						r_name + r_info[zone->guard].name,
 						t_name + t_ptr->name));
 
@@ -3940,7 +3940,7 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 			else
 			{
 				/* Describe location */
-				strcpy(text_always, t_text + t_ptr->text);
+				my_strcpy(text_always, t_text + t_ptr->text);
 
 				/* Describe the guardian */
 				if (zone->guard)
@@ -3986,7 +3986,7 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 		}
 		else
 		{
-			strcpy(name, "empty room");
+			my_strcpy(name, "empty room");
 		}
 		return;
 	}
@@ -3996,16 +3996,16 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 	{
 		case (ROOM_TOWER):
 		{
-			strcpy(name, "the tower of ");
+			my_strcpy(name, "the tower of ");
 			strcat(name, t_name + t_ptr->name);
 
 			/* Brief description */
-			if (text_visible) strcpy(text_visible, "This tower is filled with monsters and traps.  ");
+			if (text_visible) my_strcpy(text_visible, "This tower is filled with monsters and traps.  ");
 
 			/* Describe height of tower */
 			if (text_visible)
 			{
-				strcpy(text_visible, format("It looks about %d feet tall.  ", (max_depth(p_ptr->dungeon) - min_depth(p_ptr->dungeon) + 1) * 50));
+				my_strcpy(text_visible, format("It looks about %d feet tall.  ", (max_depth(p_ptr->dungeon) - min_depth(p_ptr->dungeon) + 1) * 50));
 			}
 			break;
 		}
@@ -4014,11 +4014,11 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 		{
 			monster_race *r_ptr = &r_info[room_info[room].vault];
 
-			strcpy(name, "the lair of ");
+			my_strcpy(name, "the lair of ");
 			strcat(name, r_name + r_ptr->name);
 			if ((r_ptr->flags1 & (RF1_UNIQUE)) == 0) strcat(name, "s");
 
-			if (text_visible) strcpy(text_visible, "This is the lair of ");
+			if (text_visible) my_strcpy(text_visible, "This is the lair of ");
 			if (text_visible) strcat(text_visible, r_name + r_ptr->name);
 			if ((text_visible) && ((r_ptr->flags1 & (RF1_UNIQUE)) == 0)) strcat(name, "s");
 			if (text_visible) strcat(text_visible, ".  ");
@@ -4030,9 +4030,9 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 
 		case (ROOM_GREATER_VAULT):
 		{
-			strcpy(name, "greater ");
+			my_strcpy(name, "greater ");
 
-			if (text_visible) strcpy(text_visible, "This vast sealed chamber is amongst the largest of its kind and is filled with ");
+			if (text_visible) my_strcpy(text_visible, "This vast sealed chamber is amongst the largest of its kind and is filled with ");
 			if (text_visible) strcat(text_visible, "deadly monsters and rich treasure.  ");
 			beware = TRUE;
 
@@ -4059,13 +4059,13 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 		case (ROOM_INTERESTING):
 		{
 			strcat(name, v_name + v_info[room_info[room].vault].name);
-			if (text_visible) strcpy(text_visible, "There is something remarkable here.  ");
+			if (text_visible) my_strcpy(text_visible, "There is something remarkable here.  ");
 			break;
 		}
 
 		case (ROOM_CHAMBERS):
 		{
-			if (text_visible) strcpy(text_visible, "This is one of many rooms crowded with monsters.  ");
+			if (text_visible) my_strcpy(text_visible, "This is one of many rooms crowded with monsters.  ");
 			scan_name = TRUE;
 			scan_desc = TRUE;
 			break;
@@ -4105,10 +4105,10 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 			if (j < 0) break;
 
 			/* Get the name1 text if needed */
-			if (!strlen(buf_name1)) strcpy(buf_name1, (d_name + d_info[j].name1));
+			if (!strlen(buf_name1)) my_strcpy(buf_name1, (d_name + d_info[j].name1));
 
 			/* Get the name2 text if needed */
-			if (!strlen(buf_name2)) strcpy(buf_name2, (d_name + d_info[j].name2));
+			if (!strlen(buf_name2)) my_strcpy(buf_name2, (d_name + d_info[j].name2));
 
 			/* Need description? */
 			if (!scan_desc) continue;
@@ -4168,7 +4168,7 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 		{
 
 			/* Set room name */
-			if (strlen(buf_name1)) strcpy(name, buf_name1);
+			if (strlen(buf_name1)) my_strcpy(name, buf_name1);
 
 			/* And add second room name if necessary */
 			if (strlen(buf_name2))
@@ -4180,14 +4180,14 @@ static void get_room_desc(int room, char *name, char *text_visible, char *text_a
 				}
 				else
 				{
-					strcpy(name, buf_name2);
+					my_strcpy(name, buf_name2);
 				}
 			}
 		}
 	}
 
 	/* Beware */
-	if ((beware) && (text_always)) strcpy(text_always, "Beware!  ");
+	if ((beware) && (text_always)) my_strcpy(text_always, "Beware!  ");
 
 	if ((cheat_room) && (text_always))
 	{
@@ -6062,13 +6062,13 @@ bool target_set_interactive(int mode)
 			/* Allow target */
 			if ((cave_m_idx[y][x] > 0) && target_able(cave_m_idx[y][x]))
 			{
-				strcpy(info, "q,t,p,o,+,-,<dir>");
+				my_strcpy(info, "q,t,p,o,+,-,<dir>");
 			}
 
 			/* Dis-allow target */
 			else
 			{
-				strcpy(info, "q,p,o,+,-,<dir>");
+				my_strcpy(info, "q,p,o,+,-,<dir>");
 			}
 
 			/* Describe and Prompt */
@@ -6275,7 +6275,7 @@ bool target_set_interactive(int mode)
 		else
 		{
 			/* Default prompt */
-			strcpy(info, "q,t,p,m,+,-,<dir>");
+			my_strcpy(info, "q,t,p,m,+,-,<dir>");
 
 			/* Describe and Prompt (enable "TARGET_LOOK") */
 			query = target_set_interactive_aux(y, x, &room, mode | TARGET_LOOK, info);

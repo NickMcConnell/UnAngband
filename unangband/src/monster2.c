@@ -1187,7 +1187,7 @@ void monster_desc(char *desc, int m_idx, int mode)
 		}
 
 		/* Copy the result */
-		strcpy(desc, res);
+		my_strcpy(desc, res, sizeof(desc));
 	}
 
 
@@ -1195,9 +1195,9 @@ void monster_desc(char *desc, int m_idx, int mode)
 	else if ((mode & 0x02) && (mode & 0x01))
 	{
 		/* The monster is visible, so use its gender */
-		if ((r_ptr->flags1 & (RF1_FEMALE)) && (!(r_ptr->flags1 & (RF1_MALE)) || (m_idx % 2))) strcpy(desc, "herself");
-		else if ((r_ptr->flags1 & (RF1_MALE)) && (!(r_ptr->flags1 & (RF1_FEMALE)) || !(m_idx % 2))) strcpy(desc, "himself");
-		else strcpy(desc, "itself");
+		if ((r_ptr->flags1 & (RF1_FEMALE)) && (!(r_ptr->flags1 & (RF1_MALE)) || (m_idx % 2))) my_strcpy(desc, "herself", sizeof(desc));
+		else if ((r_ptr->flags1 & (RF1_MALE)) && (!(r_ptr->flags1 & (RF1_FEMALE)) || !(m_idx % 2))) my_strcpy(desc, "himself", sizeof(desc));
+		else my_strcpy(desc, "itself", sizeof(desc));
 	}
 
 
@@ -1294,7 +1294,7 @@ void monster_desc(char *desc, int m_idx, int mode)
 		if (r_ptr->flags1 & (RF1_UNIQUE))
 		{
 			/* Start with the name (thus nominative and objective) */
-			strcpy(desc, name);
+			my_strcpy(desc, name, sizeof(desc));
 		}
 
 		/* It could be an indefinite monster */
@@ -1303,20 +1303,20 @@ void monster_desc(char *desc, int m_idx, int mode)
 			/* XXX Check plurality for "some" */
 
 			/* Indefinite monsters need an indefinite article */
-			strcpy(desc, is_a_vowel(prefix ? prefix[0] : name[0]) ? "an " : "a ");
-			if (prefix) strcat(desc, prefix);
-			strcat(desc, name);
-			if (suffix) strcat(desc, suffix);
+			my_strcpy(desc, is_a_vowel(prefix ? prefix[0] : name[0]) ? "an " : "a ", sizeof(desc));
+			if (prefix) my_strcat(desc, prefix, sizeof(desc));
+			my_strcat(desc, name, sizeof(desc));
+			if (suffix) my_strcat(desc, suffix, sizeof(desc));
 		}
 
 		/* It could be a normal, definite, monster */
 		else
 		{
 			/* Definite monsters need a definite article */
-			strcpy(desc, "the ");
-			if (prefix) strcat(desc, prefix);
-			strcat(desc, name);
-			if (suffix) strcat(desc, suffix);
+			my_strcpy(desc, "the ", sizeof(desc));
+			if (prefix) my_strcat(desc, prefix, sizeof(desc));
+			my_strcat(desc, name, sizeof(desc));
+			if (suffix) my_strcat(desc, suffix, sizeof(desc));
 		}
 
 		/* Handle the Possessive as a special afterthought */
@@ -1325,7 +1325,7 @@ void monster_desc(char *desc, int m_idx, int mode)
 			/* XXX Check for trailing "s" */
 
 			/* Simply append "apostrophe" and "s" */
-			strcat(desc, "'s");
+			my_strcat(desc, "'s", sizeof(desc));
 		}
 
 		/* Mention "hidden" monsters XXX XXX */
@@ -1339,14 +1339,14 @@ void monster_desc(char *desc, int m_idx, int mode)
 		if (m_ptr->mflag & (MFLAG_HIDE))
 		{
 			/* Append special notation */
-			strcat(desc, " (hidden)");
+			my_strcat(desc, " (hidden)", sizeof(desc));
 		}
 
 		/* Mention "offscreen" monsters XXX XXX */
 		if (!panel_contains(m_ptr->fy, m_ptr->fx))
 		{
 			/* Append special notation */
-			strcat(desc, " (offscreen)");
+			my_strcat(desc, " (offscreen)", sizeof(desc));
 		}
 	}
 }

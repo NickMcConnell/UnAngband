@@ -334,7 +334,7 @@ static int auto_note_modify(int note, char ch)
 		s = quark_str(note);
 
 		/* Temporary copy */
-		my_strcpy(tmp,s,80);
+		my_strcpy(tmp,s,sizeof(tmp));
 
 		/* Process inscription */
 		while (s)
@@ -2124,10 +2124,10 @@ void do_cmd_messages(void)
 
 
 	/* Wipe finder */
-	strcpy(finder, "");
+	my_strcpy(finder, "",sizeof(finder));
 
 	/* Wipe shower */
-	strcpy(shower, "");
+	my_strcpy(shower, "",sizeof(shower));
 
 
 	/* Total messages */
@@ -2243,7 +2243,7 @@ void do_cmd_messages(void)
 			if (!askfor_aux(finder, 80)) continue;
 
 			/* Show it */
-			strcpy(shower, finder);
+			my_strcpy(shower, finder, sizeof(shower));
 
 			/* Scan messages */
 			for (z = i + 1; z < n; z++)
@@ -2340,10 +2340,10 @@ void do_cmd_pref(void)
 	char tmp[80];
 
 	/* Default */
-	strcpy(tmp, "");
+	my_strcpy(tmp, "", sizeof(tmp));
 
 	/* Ask for a "user pref command" */
-	if (!get_string("Pref: ", tmp, 80)) return;
+	if (!get_string("Pref: ", tmp, sizeof(tmp))) return;
 
 	/* Process that pref command */
 	(void)process_pref_file_command(tmp);
@@ -3274,7 +3274,7 @@ void do_cmd_macros(void)
 			else
 			{
 				/* Obtain the action */
-				strcpy(macro_buffer, macro__act[k]);
+				my_strcpy(macro_buffer, macro__act[k], sizeof(macro_buffer));
 
 				/* Analyze the current action */
 				ascii_to_text(tmp, sizeof(tmp), macro_buffer);
@@ -3393,7 +3393,7 @@ void do_cmd_macros(void)
 			else
 			{
 				/* Obtain the action */
-				strcpy(macro_buffer, act);
+				my_strcpy(macro_buffer, act, sizeof(macro_buffer));
 
 				/* Analyze the current action */
 				ascii_to_text(tmp, sizeof(tmp), macro_buffer);
@@ -4527,10 +4527,10 @@ void do_cmd_note(void)
 	char tmp[80];
 
 	/* Default */
-	strcpy(tmp, "");
+	my_strcpy(tmp, "",sizeof(tmp));
 
 	/* Input */
-	if (!get_string("Note: ", tmp, 80)) return;
+	if (!get_string("Note: ", tmp, sizeof(tmp))) return;
 
 	/* Ignore empty notes */
 	if (!tmp[0] || (tmp[0] == ' ')) return;

@@ -406,15 +406,15 @@ static void prt_depth(void)
 
 	if (!zone->fill)
 	{
-		strcpy(depths, "Town");
+		my_strcpy(depths, "Town");
 	}
 	else if ((p_ptr->depth == min_depth(p_ptr->dungeon)) && (zone->level < MAX_ZONE_WILDS))
 	{
-		strcpy(depths, "Ruins");
+		my_strcpy(depths, "Ruins");
 	}
 	else if (p_ptr->depth == min_depth(p_ptr->dungeon))
 	{
-		strcpy(depths, "Wilds");
+		my_strcpy(depths, "Wilds");
 	}
 	else if ((depth_in_feet) && !(COL_DEPTH))
 	{
@@ -638,7 +638,7 @@ static void prt_state(void)
 		int n = p_ptr->resting;
 
 		/* Start with "Rest" */
-		strcpy(text, "Rest      ");
+		my_strcpy(text, "Rest      ");
 
 		/* Extensive (timed) rest */
 		if (n >= 1000)
@@ -713,44 +713,44 @@ static void prt_state(void)
 	else if (p_ptr->rest < PY_REST_FAINT)
 	{
 		attr = TERM_RED;
-		strcpy(text, "Exhausted ");
+		my_strcpy(text, "Exhausted ");
 	}
 
 	/* Weak */
 	else if (p_ptr->rest < PY_REST_WEAK)
 	{
 		attr = TERM_ORANGE;
-		strcpy(text, "Exhausted ");
+		my_strcpy(text, "Exhausted ");
 	}
 
 	/* Tired */
 	else if (p_ptr->rest < PY_REST_ALERT)
 	{
 		attr = TERM_YELLOW;
-		strcpy(text, "Tired     ");
+		my_strcpy(text, "Tired     ");
 	}
 
 	/* Nothing interesting */
 	else
 	  {
 	    if (show_sidebar)
-	      strcpy(text, "          ");
+	      my_strcpy(text, "          ");
 	    else
 	      *text = 0;
 	  }
 
 	/* Hack -- handle some other stuff here. Don't change attr, so we inherit it from above. */
-	if (p_ptr->searching) strcpy(text, "Searching ");
-	if (p_ptr->held_song) strcpy(text, "Singing   ");
-	if (p_ptr->msleep)    strcpy(text, "Sleepy    ");
-	if (p_ptr->psleep)    strcpy(text, "Drowsy    ");
+	if (p_ptr->searching) my_strcpy(text, "Searching ");
+	if (p_ptr->held_song) my_strcpy(text, "Singing   ");
+	if (p_ptr->msleep)    my_strcpy(text, "Sleepy    ");
+	if (p_ptr->psleep)    my_strcpy(text, "Drowsy    ");
 
 	/* Asleep - attr and text always overrides */
 	if (p_ptr->psleep >= PY_SLEEP_ASLEEP)
 	{
 		attr = TERM_L_BLUE;
 
-		strcpy(text, "Asleep    ");
+		my_strcpy(text, "Asleep    ");
 	}
 
 	/* Asleep - attr and text always overrides */
@@ -758,7 +758,7 @@ static void prt_state(void)
 	{
 		attr = TERM_BLUE;
 
-		strcpy(text, "Timewarp! ");
+		my_strcpy(text, "Timewarp! ");
 	}
 
 	/* Paralysis - attr and text always overrides */
@@ -766,7 +766,7 @@ static void prt_state(void)
 	{
 		attr = TERM_VIOLET;
 
-		strcpy(text, "Paralyzed!");
+		my_strcpy(text, "Paralyzed!");
 	}
 
 	/* Display the info (or blanks) */
@@ -1065,7 +1065,7 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 
 	temp[0] = '\0';
 
-	if (short_name) strcpy(temp,c_name+c_info[class].name);
+	if (short_name) my_strcpy(temp,c_name+c_info[class].name);
 
 	if ((style == WS_MAGIC_BOOK) && (sval >= 0))
 	{
@@ -1103,121 +1103,121 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 	{
 
 		case 0:
-			if (style == WS_UNARMED) strcpy(temp,"Martial Artist");
-			if (style == WS_ONE_HANDED) strcpy(temp,"Swashbuckler");
-			if (style == WS_TWO_HANDED) strcpy(temp,"Samurai");
-			if (style == WS_TWO_WEAPON) strcpy(temp,"Gladiator");
-			if (style == WS_WEAPON_SHIELD) strcpy(temp,"Knight");
+			if (style == WS_UNARMED) my_strcpy(temp,"Martial Artist");
+			if (style == WS_ONE_HANDED) my_strcpy(temp,"Swashbuckler");
+			if (style == WS_TWO_HANDED) my_strcpy(temp,"Samurai");
+			if (style == WS_TWO_WEAPON) my_strcpy(temp,"Gladiator");
+			if (style == WS_WEAPON_SHIELD) my_strcpy(temp,"Knight");
 			if ((style == WS_HAFTED) && (long_name))
 			{
-				strcpy(temp,"Weaponmaster (Hafted)");
+				my_strcpy(temp,"Weaponmaster (Hafted)");
 			}
 			else if ((style == WS_HAFTED) && (short_name))
 			{
-				strcpy(temp,"Weaponmaster");
+				my_strcpy(temp,"Weaponmaster");
 			}
 			if ((style == WS_POLEARM) && (long_name))
 			{
-				strcpy(temp,"Weaponmaster (Polearm)");
+				my_strcpy(temp,"Weaponmaster (Polearm)");
 			}
 			else if ((style == WS_POLEARM) && (short_name))
 			{
-				strcpy(temp,"Weaponmaster");
+				my_strcpy(temp,"Weaponmaster");
 			}
-			if (style == WS_SWORD) strcpy(temp,"Swordmaster");
-			if (style == WS_THROWN) strcpy(temp,"Tribesman");
-			if (style == WS_BOW) strcpy(temp,"Nomad");
-			if (style == WS_SLAY_ORC) strcpy(temp,"Orckiller");
-			if (style == WS_SLAY_TROLL) strcpy(temp,"Trollkiller");
-			if (style == WS_SLAY_GIANT) strcpy(temp,"Giantkiller");
-			if (style == WS_SLAY_DRAGON) strcpy(temp,"Dragonkiller");
-			if (style == WS_RING) strcpy(temp,"Ringbearer");
+			if (style == WS_SWORD) my_strcpy(temp,"Swordmaster");
+			if (style == WS_THROWN) my_strcpy(temp,"Tribesman");
+			if (style == WS_BOW) my_strcpy(temp,"Nomad");
+			if (style == WS_SLAY_ORC) my_strcpy(temp,"Orckiller");
+			if (style == WS_SLAY_TROLL) my_strcpy(temp,"Trollkiller");
+			if (style == WS_SLAY_GIANT) my_strcpy(temp,"Giantkiller");
+			if (style == WS_SLAY_DRAGON) my_strcpy(temp,"Dragonkiller");
+			if (style == WS_RING) my_strcpy(temp,"Ringbearer");
 			if ((style == WS_MAGIC_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Gifted Warrior");
+				if (short_name) my_strcpy(temp,"Gifted Warrior");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Warrior Gifted %s",k_name+k_ptr->name);
 			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Chosen Warrior");
+				if (short_name) my_strcpy(temp,"Chosen Warrior");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Warrior Chosen %s",k_name+k_ptr->name);
 			}
 			break;
 
 		case 1:
-			if (style == WS_POTION) strcpy(temp,"Herbalist");
-			if (style == WS_SCROLL) strcpy(temp,"Sage");
-			if (style == WS_WAND) strcpy(temp,"Magician");
-			if (style == WS_STAFF) strcpy(temp,"Wizard");
-			if (style == WS_AMULET) strcpy(temp,"Witch");
-			if (style == WS_RING) strcpy(temp,"Ringwielder");
+			if (style == WS_POTION) my_strcpy(temp,"Herbalist");
+			if (style == WS_SCROLL) my_strcpy(temp,"Sage");
+			if (style == WS_WAND) my_strcpy(temp,"Magician");
+			if (style == WS_STAFF) my_strcpy(temp,"Wizard");
+			if (style == WS_AMULET) my_strcpy(temp,"Witch");
+			if (style == WS_RING) my_strcpy(temp,"Ringwielder");
 			if ((style == WS_MAGIC_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Magi");
+				if (short_name) my_strcpy(temp,"Magi");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Magi %s",k_name+k_ptr->name);
-				if (sval == 1) strcpy(temp,"Conjuror");
-				if (sval == 2) strcpy(temp,"Invoker");
-				if (sval == 3) strcpy(temp,"Sorcerer");
-				if (sval == 6) strcpy(temp,"Archmage");
-				if (sval == 7) strcpy(temp,"Warlock");
-				if (sval == 8) strcpy(temp,"War mage");
-				if (sval == 22) strcpy(temp,"Enchanter");
-				if (sval == 24) strcpy(temp,"Healer");
-				if (sval == 21) strcpy(temp,"Runesmith");
-				if (sval == 18) strcpy(temp,"Geomancer");
-				if (sval == 20) strcpy(temp,"Hydromancer");
-				if (sval == 9) strcpy(temp,"Pyromancer");
-				if (sval == 11) strcpy(temp,"Cyromancer");
-				if (sval == 13) strcpy(temp,"Alchemist");
-				if (sval == 14) strcpy(temp,"Necromancer");
-				if (sval == 25) strcpy(temp,"Artificer");
-				if (sval == 23) strcpy(temp,"Sage");
-				if (sval == 15) strcpy(temp,"Beastmaster");
-				if (sval == 16) strcpy(temp,"Illusionist");
+				if (sval == 1) my_strcpy(temp,"Conjuror");
+				if (sval == 2) my_strcpy(temp,"Invoker");
+				if (sval == 3) my_strcpy(temp,"Sorcerer");
+				if (sval == 6) my_strcpy(temp,"Archmage");
+				if (sval == 7) my_strcpy(temp,"Warlock");
+				if (sval == 8) my_strcpy(temp,"War mage");
+				if (sval == 22) my_strcpy(temp,"Enchanter");
+				if (sval == 24) my_strcpy(temp,"Healer");
+				if (sval == 21) my_strcpy(temp,"Runesmith");
+				if (sval == 18) my_strcpy(temp,"Geomancer");
+				if (sval == 20) my_strcpy(temp,"Hydromancer");
+				if (sval == 9) my_strcpy(temp,"Pyromancer");
+				if (sval == 11) my_strcpy(temp,"Cyromancer");
+				if (sval == 13) my_strcpy(temp,"Alchemist");
+				if (sval == 14) my_strcpy(temp,"Necromancer");
+				if (sval == 25) my_strcpy(temp,"Artificer");
+				if (sval == 23) my_strcpy(temp,"Sage");
+				if (sval == 15) my_strcpy(temp,"Beastmaster");
+				if (sval == 16) my_strcpy(temp,"Illusionist");
 
 			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Cultist");
+				if (short_name) my_strcpy(temp,"Cultist");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Cultist %s",k_name+k_ptr->name);
 			}
 			break;
 
 		case 2:
-			if (!style) strcpy(temp,"Cleric");
-			if (style == WS_UNARMED) strcpy(temp,"Warrior Monk");
-			if (style == WS_HAFTED) strcpy(temp,"Templar");
-			if (style == WS_SLAY_EVIL) strcpy(temp,"Inquisitor");
+			if (!style) my_strcpy(temp,"Cleric");
+			if (style == WS_UNARMED) my_strcpy(temp,"Warrior Monk");
+			if (style == WS_HAFTED) my_strcpy(temp,"Templar");
+			if (style == WS_SLAY_EVIL) my_strcpy(temp,"Inquisitor");
 			if ((style == WS_SLAY_DEMON) && (long_name))
 			{
-				strcpy(temp,"Exorcist (Ordo Maleficarum)");
+				my_strcpy(temp,"Exorcist (Ordo Maleficarum)");
 			}
 			else if ((style == WS_SLAY_DEMON) && (short_name))
 			{
-				strcpy(temp,"Exorcist");
+				my_strcpy(temp,"Exorcist");
 			}
 			if ((style == WS_SLAY_UNDEAD) && (long_name))
 			{
-				strcpy(temp,"Exorcist (Ordo Necros)");
+				my_strcpy(temp,"Exorcist (Ordo Necros)");
 			}
 			else if ((style == WS_SLAY_UNDEAD) && (short_name))
 			{
-				strcpy(temp,"Exorcist");
+				my_strcpy(temp,"Exorcist");
 			}
-			if (style == WS_INSTRUMENT) strcpy(temp,"Monk");
+			if (style == WS_INSTRUMENT) my_strcpy(temp,"Monk");
 			if ((style == WS_MAGIC_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Priest");
+				if (short_name) my_strcpy(temp,"Priest");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Priest of the God %s",k_name+k_ptr->name);
 			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Acolyte");
+				if (short_name) my_strcpy(temp,"Acolyte");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Acolyte of the Order %s",k_name+k_ptr->name);
 			}
@@ -1226,50 +1226,50 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 		case 3:
 			if ((style == WS_MAGIC_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Scholar");
+				if (short_name) my_strcpy(temp,"Scholar");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Scholar %s",k_name+k_ptr->name);
 			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Researcher");
+				if (short_name) my_strcpy(temp,"Researcher");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Researcher %s",k_name+k_ptr->name);
 			}
-			if (style == WS_POTION) strcpy(temp,"Chemist");
-			if (style == WS_SCROLL) strcpy(temp,"Scholar");
-			if (style == WS_AMULET) strcpy(temp,"Gypsy");
-			if (style == WS_RING) strcpy(temp,"Jeweler");
+			if (style == WS_POTION) my_strcpy(temp,"Chemist");
+			if (style == WS_SCROLL) my_strcpy(temp,"Scholar");
+			if (style == WS_AMULET) my_strcpy(temp,"Gypsy");
+			if (style == WS_RING) my_strcpy(temp,"Jeweler");
 			break;
 		case 4:
-			if (style == WS_ONE_HANDED) strcpy(temp,"Outlaw");
-			if (style == WS_TWO_WEAPON) strcpy(temp,"Bounty Hunter");
-			if (style == WS_BOW) strcpy(temp,"Huntsman");
-			if (style == WS_SLAY_ORC) strcpy(temp,"Orcslayer");
-			if (style == WS_SLAY_TROLL) strcpy(temp,"Trollslayer");
-			if (style == WS_SLAY_GIANT) strcpy(temp,"Giantslayer");
-			if (style == WS_SLAY_ANIMAL) strcpy(temp,"Tracker");
+			if (style == WS_ONE_HANDED) my_strcpy(temp,"Outlaw");
+			if (style == WS_TWO_WEAPON) my_strcpy(temp,"Bounty Hunter");
+			if (style == WS_BOW) my_strcpy(temp,"Huntsman");
+			if (style == WS_SLAY_ORC) my_strcpy(temp,"Orcslayer");
+			if (style == WS_SLAY_TROLL) my_strcpy(temp,"Trollslayer");
+			if (style == WS_SLAY_GIANT) my_strcpy(temp,"Giantslayer");
+			if (style == WS_SLAY_ANIMAL) my_strcpy(temp,"Tracker");
 			break;
 
 		case 5:
-			if (style == WS_ONE_HANDED) strcpy(temp,"Cavalier");
+			if (style == WS_ONE_HANDED) my_strcpy(temp,"Cavalier");
 			if ((style == WS_WEAPON_SHIELD) && (long_name))
 			{
-				strcpy(temp,"Knight Defender");
+				my_strcpy(temp,"Knight Defender");
 			}
 			else if (style == WS_WEAPON_SHIELD)
 			{
-				strcpy(temp,"Defender");
+				my_strcpy(temp,"Defender");
 			}
-			if (style == WS_SLAY_DRAGON) strcpy(temp,"Dragonslayer");
+			if (style == WS_SLAY_DRAGON) my_strcpy(temp,"Dragonslayer");
 			if (style == WS_INSTRUMENT)
 			{
-				 if (long_name) strcpy(temp,"Standard-bearer"); 
-				else strcpy(temp,"Standard");
+				 if (long_name) my_strcpy(temp,"Standard-bearer"); 
+				else my_strcpy(temp,"Standard");
 			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Knight Errant");
+				if (short_name) my_strcpy(temp,"Knight Errant");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Knight of the Order %s",k_name+k_ptr->name);
 			}
@@ -1277,88 +1277,88 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 		case 6:
 			if ((style == WS_MAGIC_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Gifted Thief");
+				if (short_name) my_strcpy(temp,"Gifted Thief");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Thief Gifted %s",k_name+k_ptr->name);
 			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Chosen Thief");
+				if (short_name) my_strcpy(temp,"Chosen Thief");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Thief Chosen %s",k_name+k_ptr->name);
 			}
-			if (style == WS_UNARMED) strcpy(temp,"Acrobat");
-			if (style == WS_ONE_HANDED) strcpy(temp,"Highwayman");
-			if (style == WS_TWO_HANDED) strcpy(temp,"Ninja");
-			if (style == WS_TWO_WEAPON) strcpy(temp,"Enforcer");
-			if (style == WS_THROWN) strcpy(temp,"Juggler");
-			if (style == WS_BACKSTAB) strcpy(temp,"Assassin");
-			if (style == WS_POTION) strcpy(temp,"Apothecry");
-			if (style == WS_SCROLL) strcpy(temp,"Archeologist");
-			if (style == WS_AMULET) strcpy(temp,"Merchant");
-			if (style == WS_RING) strcpy(temp,"Fence");
-			if (style == WS_SLAY_UNDEAD) strcpy(temp,"Graverobber");
-			if (style == WS_SLAY_DEMON) strcpy(temp,"Tombrobber");
+			if (style == WS_UNARMED) my_strcpy(temp,"Acrobat");
+			if (style == WS_ONE_HANDED) my_strcpy(temp,"Highwayman");
+			if (style == WS_TWO_HANDED) my_strcpy(temp,"Ninja");
+			if (style == WS_TWO_WEAPON) my_strcpy(temp,"Enforcer");
+			if (style == WS_THROWN) my_strcpy(temp,"Juggler");
+			if (style == WS_BACKSTAB) my_strcpy(temp,"Assassin");
+			if (style == WS_POTION) my_strcpy(temp,"Apothecry");
+			if (style == WS_SCROLL) my_strcpy(temp,"Archeologist");
+			if (style == WS_AMULET) my_strcpy(temp,"Merchant");
+			if (style == WS_RING) my_strcpy(temp,"Fence");
+			if (style == WS_SLAY_UNDEAD) my_strcpy(temp,"Graverobber");
+			if (style == WS_SLAY_DEMON) my_strcpy(temp,"Tombrobber");
 			break;
 
 		case 7:
 			if ((style == WS_MAGIC_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Gifted Archer");
+				if (short_name) my_strcpy(temp,"Gifted Archer");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Archer Gifted %s",k_name+k_ptr->name);
 			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Chosen Archer");
+				if (short_name) my_strcpy(temp,"Chosen Archer");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Archer Chosen %s",k_name+k_ptr->name);
 			}
-			if (style == WS_SLING) strcpy(temp,"Slinger");
-			if (style == WS_BOW) strcpy(temp,"Longbowman");
-			if (style == WS_XBOW) strcpy(temp,"Crossbowman");
+			if (style == WS_SLING) my_strcpy(temp,"Slinger");
+			if (style == WS_BOW) my_strcpy(temp,"Longbowman");
+			if (style == WS_XBOW) my_strcpy(temp,"Crossbowman");
 			break;
 		case 8:
-			if (style == WS_UNARMED) strcpy(temp,"Mystic");
+			if (style == WS_UNARMED) my_strcpy(temp,"Mystic");
 
 			if (((style == WS_PRAYER_BOOK) || (style == WS_MAGIC_BOOK)) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Druid");
+				if (short_name) my_strcpy(temp,"Druid");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Druid %s",
 					k_name+k_ptr->name);
 			}
 			break;
 		case 9:
-			if (style == WS_UNARMED) strcpy(temp,"Dervish");
-			if (style == WS_THROWN) strcpy(temp,"Jester");
-			if (style == WS_INSTRUMENT) strcpy(temp,"Musician");
+			if (style == WS_UNARMED) my_strcpy(temp,"Dervish");
+			if (style == WS_THROWN) my_strcpy(temp,"Jester");
+			if (style == WS_INSTRUMENT) my_strcpy(temp,"Musician");
 
 			if ((style == WS_SONG_BOOK) && (sval >= 0))
 			{
-				if (short_name) strcpy(temp,"Spellsinger");
+				if (short_name) my_strcpy(temp,"Spellsinger");
 				else sprintf(temp,"%s",k_name+k_ptr->name);
 				if (long_name) sprintf(temp,"Spellsinger (%s)",k_name+k_ptr->name);
 			}
 			break;
 		case 10:
-			if (style == WS_UNARMED) strcpy(temp,"Spellfist");
+			if (style == WS_UNARMED) my_strcpy(temp,"Spellfist");
 			if ((style == WS_THROWN) && (long_name))
 			{
-				strcpy(temp,"Prestidigitator");
+				my_strcpy(temp,"Prestidigitator");
 			}
 			else if ((style == WS_THROWN) && (short_name))
 			{
-				strcpy(temp,"Prestige");
+				my_strcpy(temp,"Prestige");
 			}
-			if (style == WS_HAFTED) strcpy(temp,"Spellhammer");
-			if (style == WS_SWORD) strcpy(temp,"Spellsword");
-			if (style == WS_POLEARM) strcpy(temp,"Spellspear");
+			if (style == WS_HAFTED) my_strcpy(temp,"Spellhammer");
+			if (style == WS_SWORD) my_strcpy(temp,"Spellsword");
+			if (style == WS_POLEARM) my_strcpy(temp,"Spellspear");
 
 			break;
 	}
 
-	strcpy(name,temp);
+	my_strcpy(name,temp);
 }
 
 #endif

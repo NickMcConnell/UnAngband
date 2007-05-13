@@ -1060,7 +1060,7 @@ void take_hit(int dam, cptr kb_str)
 		msg_print(NULL);
 
 		/* Note cause of death */
-		strcpy(p_ptr->died_from, kb_str);
+		my_strcpy(p_ptr->died_from, kb_str, sizeof(p_ptr->died_from));
 
 		/* No longer a winner */
 		p_ptr->total_winner = FALSE;
@@ -3380,7 +3380,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 
 			cave_alter_feat(y,x,FS_BRIDGE);
 
-			strcpy(name,f_name+f_ptr->name);
+			my_strcpy(name,f_name+f_ptr->name, sizeof(name));
 
 			if (!(strstr(name,"stone bridge")))
 			{
@@ -7384,10 +7384,6 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 }
 
 
-
-
-
-
 /*
  * Helper function for "project()" below.
  *
@@ -7471,249 +7467,8 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 	}
 	else
 	{
-		switch(who)
-		{
-			case SOURCE_SELF:
-			{
-				/* Get the source monster */
-				m_ptr = &m_list[what];
+		/* XXX Redo cause of death routine */
 
-				/* Get the monster name */
-				monster_desc(m_name, what, 0);
-
-				/* Get the monster's real name */
-				monster_desc(killer, what, 0x88);
-				
-				break;
-			}
-
-			case SOURCE_OBJECT:
-			{
-				object_kind *k_ptr = &f_info[what];
-
-				/* Get the monster name */
-				monster_desc(m_name, what, 0);
-
-				/* Get the feature description */
-				strcpy(killer,k_name + k_ptr->name);
-				
-				/* Method */
-				strcat(killer, " being destroyed under you");
-				
-				break;
-			}
-
-			case SOURCE_FEATURE:
-			{
-				feature_type *f_ptr = &f_info[what];
-
-				/* Get the feature description */
-				strcpy(killer,f_name + f_ptr->name);
-			}
-			
-			case SOURCE_SPELL:
-			{
-				strcpy(killer,"a magic spell");
-				
-				break;
-			}
-			
-			case SOURCE_DISEASE:
-			{
-				strcpy(killer,"a disease");
-				
-				break;
-			}
-			
-			case SOURCE_DAYLIGHT:
-			{
-				strcpy(killer,"daylight");
-				
-				break;
-			}
-			
-			case SOURCE_BIRTH:
-			{
-				monster_race *r_ptr = &r_info[what];
-				strcpy(killer,r_name + r_ptr->name);
-				strcat(killer,"being born");
-				break;
-			}
-			
-			case SOURCE_PLAYER_ATTACK:
-			{
-				switch(rand_int(4))
-				{
-					case 0:
-						strcpy(killer, "a swing, and a miss");
-						break;
-					case 1:
-						strcpy(killer, "overenthusiasm");
-						break;				
-					case 2:
-						strcpy(killer, "a hellavu shaving cut");
-						break;
-					case 3:
-						strcpy(killer, "you're not quite sure how you hit that part of you");
-						break;
-				}
-				break;
-			}
-			
-			case SOURCE_PLAYER_SHOT:
-			{
-				switch(rand_int(4))
-				{
-					case 0:
-						strcpy(killer, "a misfire");
-						break;
-					case 1:
-						strcpy(killer, "an unintended discharge");
-						break;				
-					case 2:
-						strcpy(killer, "a shot to the foot");
-						break;
-					case 3:
-						strcpy(killer, "you're not quite sure how you shot that part of you");
-						break;
-				}
-				break;
-			}
-
-			case SOURCE_PLAYER_THROW:
-			{
-				switch(rand_int(4))
-				{
-					case 0:
-						strcpy(killer, "a fumble");
-						break;
-					case 1:
-						strcpy(killer, "juggling a sharp object");
-						break;				
-					case 2:
-						strcpy(killer, "a bad bounce");
-						break;
-					case 3:
-						strcpy(killer, "you're not quite sure how you threw that there");
-						break;
-				}
-				break;
-			}
-
-			case SOURCE_PLAYER_TRAP:
-			{
-				feature_type *f_ptr = &f_info[what];
-
-				switch(rand_int(4))
-				{
-					case 0:
-						strcpy(killer, "walking headfirst into a ");
-						break;
-					case 1:
-						strcpy(killer, "walking backwards into a ");
-						break;				
-					case 2:
-						strcpy(killer, "stumbling into a ");
-						break;
-					case 3:
-						strcpy(killer, "forgetting where you put a ");
-						break;
-				}
-				
-				/* Get the feature description */
-				strcat(killer,f_name + f_ptr->name);
-				
-				break;
-			}	
-
-			case SOURCE_PLAYER_CAST:
-			{
-				spell_type *s_ptr = &s_info[what];
-
-				switch(rand_int(4))
-				{
-					case 0:
-						strcpy(killer, "bad luck casting ");
-						break;
-					case 1:
-						strcpy(killer, "badly casting ");
-						break;				
-					case 2:
-						strcpy(killer, "slurring a syllable casting ");
-						break;
-					case 3:
-						strcpy(killer, "magical feedback whilst casting ");
-						break;
-				}
-				
-				/* Get the feature description */
-				strcat(killer,s_name + s_ptr->name);
-				
-				break;
-			}			
-			case SOURCE_PLAYER_EAT:
-			{
-				monster_race *r_ptr = &r_info[what];
-
-				switch(rand_int(4))
-				{
-					case 0:
-						strcpy(killer, "over cooking ");
-						break;
-					case 1:
-						strcpy(killer, "undercooking ");
-						break;				
-					case 2:
-						strcpy(killer, "having a taste for ");
-						break;
-					case 3:
-						strcpy(killer, "not cutting out the poisonous bits off ");
-						break;
-				}
-				
-				/* Get the feature description */
-				strcat(killer,r_name + r_ptr->name);
-				
-				break;
-			}
-			case SOURCE_PLAYER_BREAK:
-			{
-				object_kind *k_ptr = &k_info[what];
-
-				strcpy(killer, "breaking ");
-				
-				/* Get the feature description */
-				strcat(killer,k_name + k_ptr->name);
-				
-				break;
-			}
-			case SOURCE_PLAYER_SPORE:
-			{
-				monster_race *r_ptr = &r_info[what];
-
-				switch(rand_int(4))
-				{
-					case 0:
-						strcpy(killer, "sniffing ");
-						break;
-					case 1:
-						strcpy(killer, "inhaling ");
-						break;				
-					case 2:
-						strcpy(killer, "snorting ");
-						break;
-					case 3:
-						strcpy(killer, "getting addicted to ");
-						break;
-				}
-				
-				/* Get the feature description */
-				strcat(killer,r_name + r_ptr->name);
-				strcat(killer," spores");
-
-				break;
-			}			
-		}
 	}
 
 	/* Hack -- storm can do several things */

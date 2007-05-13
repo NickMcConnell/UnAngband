@@ -102,6 +102,7 @@ extern const cptr month_name[9];
 extern const s16b bag_holds[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL][2];
 extern const cptr w_name_style[32];
 extern const s16b parasite_hack[DISEASE_BLOWS];
+extern const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES];
 
 
 /* variable.c */

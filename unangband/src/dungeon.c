@@ -1130,7 +1130,7 @@ static void process_world(void)
 				object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
 
 				/* Hack -- lites */
-				if (o_ptr->tval == TV_LITE) strcpy(o_name,"light");
+				if (o_ptr->tval == TV_LITE) my_strcpy(o_name,"light",sizeof(o_name));
 
 				/* Hack -- update torch radius */
 				if (i == INVEN_LITE) p_ptr->update |= (PU_TORCH);
@@ -3467,7 +3467,7 @@ void play_game(bool new_game)
 	/* Hack -- Default base_name */
 	if (!op_ptr->base_name[0])
 	{
-		strcpy(op_ptr->base_name, "PLAYER");
+		my_strcpy(op_ptr->base_name, "PLAYER", sizeof(op_ptr->base_name));
 	}
 
 	/* Init RNG */
@@ -3730,7 +3730,7 @@ void play_game(bool new_game)
 				}
 
 				/* Note cause of death XXX XXX XXX */
-				strcpy(p_ptr->died_from, "Cheating death");
+				my_strcpy(p_ptr->died_from, "Cheating death", sizeof(p_ptr->died_from));
 
 				/* New depth */
 				p_ptr->depth = min_depth(p_ptr->dungeon);

@@ -3125,13 +3125,13 @@ void do_cmd_rest(void)
 	{
 		cptr p = "Rest (0-9999, '*' for HP/SP, '&' as needed, '$' to sleep to recover stats): ";
 
-		char out_val[80];
+		char out_val[5];
 
 		/* Default */
-		strcpy(out_val, "&");
+		my_strcpy(out_val, "&", sizeof(out_val));
 
 		/* Ask for duration */
-		if (!get_string(p, out_val, 5)) return;
+		if (!get_string(p, out_val, sizeof(out_val))) return;
 
 		/* Fall asleep */
 		if (out_val[0] == '$')

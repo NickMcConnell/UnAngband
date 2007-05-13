@@ -2609,7 +2609,10 @@
 #define SOURCE_PLAYER_BREAK		-22
 #define SOURCE_PLAYER_SPORE		-23
 #define SOURCE_PLAYER_SERVICE	-24
+#define SOURCE_PLAYER_COATING	-25
+#define SOURCE_PLAYER_END		-26
 
+#define SOURCE_MESSAGES	4
 
 /*
  * An arc with a width (in degrees) less than this value will lose less

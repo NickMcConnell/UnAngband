@@ -18,7 +18,7 @@
 # We alias hit to 50% hit cut, 50% hit stun and handle bolt with a 10%
 # chance of beam in the actual blow setup (hit_cut:50:hit_stun and
 # bolt:10:beam respectively). Because 99% of blows are always identical
-# (except hits), we alias all other blows to mean blow:0:miss
+# (except hits), we alias all other blows to mean blow:0:(undefined)
 
 # Remember all hurt huge attacks are MON_BEAM | RAD_2 so all melee
 # attacks need to be set up with this as the default.
@@ -118,7 +118,6 @@ N:16:wail
 T:0:wail|s| horribly
 F:MELEE | RANGED
 MON_BALL | RAD_4 | SELF
-
 
 N:17:shriek
 T:0:shriek|s| horribly

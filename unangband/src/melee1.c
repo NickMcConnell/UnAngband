@@ -409,11 +409,11 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 	}
 	else if (who < 0)
 	{
-		strcpy(m_name,"you");
+		my_strcpy(m_name,"you", sizeof(m_name));
 	}
 	else
 	{
-		strcpy(m_name,"it");
+		my_strcpy(m_name,"it", sizeof(m_name));
 	}
 
 	/* Describe target */
@@ -424,11 +424,11 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 	}
 	else if (target < 0)
 	{
-		strcpy(t_name,"you");
+		my_strcpy(t_name,"you", sizeof(t_name));
 	}
 	else
 	{
-		strcpy(t_name,"it");
+		my_strcpy(t_name,"it", sizeof(t_name));
 	}
 
 	/* Describe the attack method */
@@ -590,21 +590,21 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 		case RBM_WAIL:
 		{
 			prefix = "wails horribly";
-			strcpy(t_name, "");
+			my_strcpy(t_name, "", sizeof(t_name));
 			break;
 		}
 
 		case RBM_SHRIEK:
 		{
 			prefix = "shrieks horribly";
-			strcpy(t_name, "");
+			my_strcpy(t_name, "", sizeof(t_name));
 			break;
 		}
 
 		case RBM_SPORE:
 		{
 			prefix = "releases a cloud of spores";
-			strcpy(t_name, "");
+			my_strcpy(t_name, "", sizeof(t_name));
 			break;
 		}
 
@@ -648,7 +648,7 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 
 			/* Get the monster possessive ("his"/"her"/"its") */
 			if (who > SOURCE_MONSTER_START) monster_desc(t_name, who, 0x22);
-			else strcpy (t_name,"its");
+			else my_strcpy (t_name,"its", sizeof(t_name));
 
 			break;
 		}
@@ -674,7 +674,7 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 		case RBM_EXPLODE:
 		{
 			prefix = "explodes";
-			strcpy(t_name, "");
+			my_strcpy(t_name, "", sizeof(t_name));
 			break;
 		}
 
@@ -1890,8 +1890,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		s_ptr = &r_info[0];
 		k_ptr = &l_list[0];
 
-		strcpy(t_name,"you");
-		strcpy(t_poss,"your");
+		my_strcpy(t_name,"you", sizeof(t_name));
+		my_strcpy(t_poss,"your", sizeof(t_poss));
 	}
 	else
 	{
@@ -1899,8 +1899,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		s_ptr = &r_info[0];
 		k_ptr = &l_list[0];
 
-		strcpy(t_name,"it");
-		strcpy(t_poss,"its");
+		my_strcpy(t_name,"it", sizeof(t_name));
+		my_strcpy(t_poss,"its", sizeof(t_poss));
 	}
 		
 	/* Describe caster */
@@ -1910,9 +1910,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		l_ptr = &l_list[0];
 		r_ptr = &r_info[0];
 
-		strcpy(m_name,"it");
-		strcpy(m_poss,"its");
-		strcpy(ddesc,"a trap");
+		my_strcpy(m_name,"it", sizeof(t_name));
+		my_strcpy(m_poss,"its", sizeof(t_poss));
+		my_strcpy(ddesc,"a trap", sizeof(ddesc));
 		
 		what = cave_feat[y][x];
 
@@ -5932,7 +5932,7 @@ bool mon_resist_object(int m_idx, const object_type *o_ptr)
 
 	/* Describe object */
 	if (o_ptr->k_idx) object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
-	else (strcpy(o_name,"attack"));
+	else (my_strcpy(o_name,"attack", sizeof(o_name)));
 
 	/*
 	 * Handle monsters that resist blunt and/or edged weapons. We include

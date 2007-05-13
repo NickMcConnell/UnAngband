@@ -1953,10 +1953,10 @@ static int get_haggle(cptr pmt, s32b *poffer, s32b price, int final)
 		char out_val[80];
 
 		/* Default */
-		strcpy(out_val, "");
+		my_strcpy(out_val, "", sizeof(out_val));
 
 		/* Ask the user for a response */
-		if (!get_string(buf, out_val, 80)) return (FALSE);
+		if (!get_string(buf, out_val, sizeof(out_val))) return (FALSE);
 
 		/* Skip leading spaces */
 		for (p = out_val; *p == ' '; p++) /* loop */;

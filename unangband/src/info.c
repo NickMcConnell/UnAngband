@@ -1605,23 +1605,23 @@ void spell_info(char *p, int spell, bool use_level)
 	if (!use_level) level = 0;
 
 	/* Default */
-	strcpy(p, "");
+	my_strcpy(p, "", sizeof(p));
 
 	/* Roll out the duration */
 	if ((s_ptr->l_dice) && (s_ptr->l_side) && (s_ptr->l_plus))
 	{
 		/* End */
-		strcpy(p,format(" dur %dd%d+%d",s_ptr->l_dice,s_ptr->l_side,s_ptr->l_plus));
+		my_strcpy(p,format(" dur %dd%d+%d",s_ptr->l_dice,s_ptr->l_side,s_ptr->l_plus), sizeof(p));
 	}
 	else if ((s_ptr->l_dice) && (s_ptr->l_side))
 	{
 		/* End */
-		strcpy(p,format(" dur %dd%d",s_ptr->l_dice,s_ptr->l_side));
+		my_strcpy(p,format(" dur %dd%d",s_ptr->l_dice,s_ptr->l_side), sizeof(p));
 	}
 	else if (s_ptr->l_plus)
 	{
 		/* End */
-		strcpy(p,format(" dur %d",s_ptr->l_plus));
+		my_strcpy(p,format(" dur %d",s_ptr->l_plus), sizeof(p));
 	}
 
 	rad = 0;
@@ -1720,17 +1720,17 @@ void spell_info(char *p, int spell, bool use_level)
 		if ((d1) && (d2) && (d3))
 		{
 			/* End */
-			strcpy(p,format(" %s %dd%d+%d ",q,d1,d2,d3));
+			my_strcpy(p,format(" %s %dd%d+%d ",q,d1,d2,d3), sizeof(p));
 		}
 		else if ((d1) && (d2))
 		{
 			/* End */
-			strcpy(p,format(" %s %dd%d ",q,d1,d2));
+			my_strcpy(p,format(" %s %dd%d ",q,d1,d2), sizeof(p));
 		}
 		else if (d3)
 		{
 			/* End */
-			strcpy(p,format(" %s %d ",q,d3));
+			my_strcpy(p,format(" %s %d ",q,d3), sizeof(p));
 		}
 
 	}
