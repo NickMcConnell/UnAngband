@@ -2245,7 +2245,7 @@ void py_attack(int y, int x, bool charging)
 	disturb(0, 0);
 
 	/* Extract monster name (or "it") */
-	monster_desc(m_name, cave_m_idx[y][x], 0);
+	monster_desc(m_name, sizeof(m_name), cave_m_idx[y][x], 0);
 
 	/* Auto-Recall if possible and visible */
 	if (m_ptr->ml) monster_race_track(m_ptr->r_idx);

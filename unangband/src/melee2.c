@@ -2475,7 +2475,7 @@ static bool get_move_retreat(int m_idx, int *ty, int *tx)
 				char m_name[80];
 
 				/* Get the monster name */
-				monster_desc(m_name, m_idx, 0);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s turns to fight!", m_name);
@@ -3213,7 +3213,7 @@ void monster_speech(int m_idx, cptr saying, bool understand)
 	if (speech >= MAX_LANGUAGES) return;
 
 	/* Get the monster name */
-	monster_desc(m_name, m_idx, 0);
+	monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 	/* Dump a message */
 	if (!understand) msg_format("%^s %s something.", m_name, vocalize[speech]);
@@ -3987,7 +3987,7 @@ static bool make_move(int m_idx, int *ty, int *tx, bool fear, bool *bash)
 							m_ptr->min_range = 1;  m_ptr->best_range = 1;
 
 							/* Get the monster name */
-							monster_desc(m_name, m_idx, 0);
+							monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 							/* Dump a message */
 							msg_format("%^s turns to fight!", m_name);
@@ -4192,7 +4192,7 @@ static bool make_move(int m_idx, int *ty, int *tx, bool fear, bool *bash)
 			char m_name[80];
 
 			/* Get the monster name */
-			monster_desc(m_name, m_idx, 0);
+			monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 			/* Dump a message */
 			msg_format("%^s turns on you!", m_name);
@@ -4275,7 +4275,7 @@ static bool bash_from_under(int m_idx, int y, int x, bool *bash)
 			char m_name[80];
 
 			/* Get the monster name */
-			monster_desc(m_name, m_idx, 0);
+			monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 			msg_format("%^s emerges from %s%s.",m_name,
 				((f_ptr->flags2 & (FF2_FILLED))?"":"the "),
@@ -4320,7 +4320,7 @@ static bool crash_from_above(int m_idx, int y, int x)
 			char m_name[80];
 
 			/* Get the monster name */
-			monster_desc(m_name, m_idx, 0);
+			monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 			msg_format("%^s crashes through the ceiling.",m_name);
 
@@ -4454,7 +4454,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				char m_name[80];
 
 				/* Get the monster name */
-				monster_desc(m_name, m_idx, 0);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 				msg_format("%^s emerges from %s%s.",m_name,
 					((f_info[cave_feat[oy][ox]].flags2 & (FF2_FILLED))?"":"the "),
@@ -4732,7 +4732,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 						char m_name[80];
 
 						/* Get the monster name */
-						monster_desc(m_name, m_idx, 0);
+						monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 						msg_format("%^s disarms the hidden %s.",m_name,f_name+f_info[feat].name);
 					}
@@ -4745,7 +4745,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					char m_name[80];
 
 					/* Get the monster name */
-					monster_desc(m_name, m_idx, 0);
+					monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 					msg_format("%^s disarms the %s.",m_name,f_name+f_info[feat].name);
 				}
@@ -4896,7 +4896,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			char m_name[80];
 
 			/* Get the monster name */
-			monster_desc(m_name, m_idx, 0);
+			monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 			msg_format("%^s hides in %s%s.",m_name,
 			((f_info[feat].flags2 & (FF2_FILLED))?"":"the "),
@@ -4919,7 +4919,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			char m_name[80];
 
 			/* Get the monster name */
-			monster_desc(m_name, m_idx, 0);
+			monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 			msg_format("%^s emerges from %s%s.",m_name,
 			((f_info[cave_feat[oy][ox]].flags2 & (FF2_FILLED))?"":"the "),
@@ -5031,7 +5031,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					char o_name[80];
 	
 					/* Get the monster name */
-					monster_desc(m_name, m_idx, 0);
+					monster_desc(m_name, sizeof(m_name), m_idx, 0);
 	
 					/* Get the object name */
 					object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
@@ -5060,7 +5060,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 	
 					/* Acquire the monster name */
-					monster_desc(m_name, m_idx, 0x04);
+					monster_desc(m_name, sizeof(m_name), m_idx, 0x04);
 	
 					/* React to objects that hurt the monster */
 					if (f1 & (TR1_SLAY_DRAGON)) flg3 |= (RF3_DRAGON);
@@ -5590,7 +5590,7 @@ static void process_monster(int m_idx)
 					char m_name[80];
 
 					/* Get the monster name */
-					monster_desc(m_name, m_idx, 0);
+					monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 					msg_format("%^s emerges from the %s.", m_name, f_name + f_info[cave_feat[m_ptr->fy][m_ptr->fx]].name);
 				}
@@ -5732,7 +5732,7 @@ static void process_monster(int m_idx)
 				char o_name[80];
 
 				/* Describe monster */
-				monster_desc(m_name, m_idx, 0);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 				/* Describe */
 				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
@@ -6059,7 +6059,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Get the monster name */
-				monster_desc(m_name, m_idx, 0);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 				msg_format("%^s emerges from %s%s.",m_name,
 					((f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_FILLED))?"":"the "),
@@ -6143,7 +6143,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_idx, 0);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s wakes up.", m_name);
@@ -6185,7 +6185,7 @@ static void recover_monster(int m_idx, bool regen)
 				if (m_ptr->ml)
 				{
 					/* Get the monster name */
-					monster_desc(m_name, m_idx, 0);
+					monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 					/* Dump a message */
 					msg_format("%^s wakes up.", m_name);
@@ -6239,7 +6239,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_idx, 0);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s is no longer stunned.", m_name);
@@ -6270,7 +6270,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_idx, 0);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s is no longer confused.", m_name);
@@ -6305,8 +6305,8 @@ static void recover_monster(int m_idx, bool regen)
 			if ((m_ptr->ml) && (m_ptr->min_range != FLEE_RANGE))
 			{
 				/* Acquire the monster name/poss */
-				monster_desc(m_name, m_idx, 0);
-				monster_desc(m_poss, m_idx, 0x22);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
+				monster_desc(m_poss, sizeof(m_poss), m_idx, 0x22);
 
 				/* Dump a message */
 				msg_format("%^s recovers %s courage.", m_name, m_poss);
@@ -6348,7 +6348,7 @@ static void recover_monster(int m_idx, bool regen)
 			if ((m_ptr->ml) && (m_ptr->hp < (m_ptr->cut > 200 ? 3 : (m_ptr->cut > 100 ? 2 : 1))))
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_idx, 0);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s bleeds to death.", m_name);
@@ -6368,7 +6368,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_idx, 0);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s is no longer bleeding.", m_name);
@@ -6394,7 +6394,7 @@ static void recover_monster(int m_idx, bool regen)
 			if ((m_ptr->ml) && (m_ptr->hp < 1))
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_idx, 0);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s expires from poisoning.", m_name);
@@ -6414,7 +6414,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_idx, 0);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s is no longer poisoned.", m_name);
@@ -6446,7 +6446,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_idx, 0);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s is no longer blinded.", m_name);
@@ -6511,7 +6511,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Get the monster name */
-				monster_desc(m_name, m_idx, 0);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 				msg_format("%^s appears from nowhere.",m_name);
 
@@ -6564,7 +6564,7 @@ static void recover_monster(int m_idx, bool regen)
 				if (m_ptr->ml)
 				{
 					/* Get the monster name */
-					monster_desc(m_name, m_idx, 0);
+					monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 					msg_format("%^s emerges from %s%s.",m_name,
 						((f_ptr->flags2 & (FF2_FILLED))?"":"the "), f_name+f_ptr->name);
@@ -6629,7 +6629,7 @@ static void recover_monster(int m_idx, bool regen)
 			if (m_ptr->ml)
 			{
 				/* Acquire the monster name */
-				monster_desc(m_name, m_idx, 0);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 				/* Dump a message */
 				msg_format("%^s is no longer berserk.", m_name);

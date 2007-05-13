@@ -4383,7 +4383,7 @@ void entomb(int cy, int cx, byte invalid)
 			}
 
 			/* Describe the monster */
-			monster_desc(m_name, cave_m_idx[cy][cx], 0);
+			monster_desc(m_name, sizeof(m_name), cave_m_idx[cy][cx], 0);
 
 			/* Scream in pain */
 			msg_format("%^s wails out in pain!", m_name);
@@ -4786,7 +4786,7 @@ static void cave_temp_room_lite(void)
 					char m_name[80];
 
 					/* Get the monster name */
-					monster_desc(m_name, cave_m_idx[y][x], 0);
+					monster_desc(m_name, sizeof(m_name), cave_m_idx[y][x], 0);
 
 					/* Dump a message */
 					msg_format("%^s wakes up.", m_name);

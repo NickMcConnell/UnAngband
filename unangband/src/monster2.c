@@ -1116,7 +1116,7 @@ void display_monlist(void)
  *   0x22 --> Possessive, genderized if visable ("his") or "its"
  *   0x23 --> Reflexive, genderized if visable ("himself") or "itself"
  */
-void monster_desc(char *desc, int m_idx, int mode)
+void monster_desc(char *desc, size_t max, int m_idx, int mode)
 {
 	cptr res;
 
@@ -1187,7 +1187,7 @@ void monster_desc(char *desc, int m_idx, int mode)
 		}
 
 		/* Copy the result */
-		my_strcpy(desc, res, sizeof(desc));
+		my_strcpy(desc, res, max);
 	}
 
 
@@ -1195,9 +1195,9 @@ void monster_desc(char *desc, int m_idx, int mode)
 	else if ((mode & 0x02) && (mode & 0x01))
 	{
 		/* The monster is visible, so use its gender */
-		if ((r_ptr->flags1 & (RF1_FEMALE)) && (!(r_ptr->flags1 & (RF1_MALE)) || (m_idx % 2))) my_strcpy(desc, "herself", sizeof(desc));
-		else if ((r_ptr->flags1 & (RF1_MALE)) && (!(r_ptr->flags1 & (RF1_FEMALE)) || !(m_idx % 2))) my_strcpy(desc, "himself", sizeof(desc));
-		else my_strcpy(desc, "itself", sizeof(desc));
+		if ((r_ptr->flags1 & (RF1_FEMALE)) && (!(r_ptr->flags1 & (RF1_MALE)) || (m_idx % 2))) my_strcpy(desc, "herself", max);
+		else if ((r_ptr->flags1 & (RF1_MALE)) && (!(r_ptr->flags1 & (RF1_FEMALE)) || !(m_idx % 2))) my_strcpy(desc, "himself", max);
+		else my_strcpy(desc, "itself", max);
 	}
 
 
@@ -1294,7 +1294,7 @@ void monster_desc(char *desc, int m_idx, int mode)
 		if (r_ptr->flags1 & (RF1_UNIQUE))
 		{
 			/* Start with the name (thus nominative and objective) */
-			my_strcpy(desc, name, sizeof(desc));
+			my_strcpy(desc, name, max);
 		}
 
 		/* It could be an indefinite monster */
@@ -1303,20 +1303,20 @@ void monster_desc(char *desc, int m_idx, int mode)
 			/* XXX Check plurality for "some" */
 
 			/* Indefinite monsters need an indefinite article */
-			my_strcpy(desc, is_a_vowel(prefix ? prefix[0] : name[0]) ? "an " : "a ", sizeof(desc));
-			if (prefix) my_strcat(desc, prefix, sizeof(desc));
-			my_strcat(desc, name, sizeof(desc));
-			if (suffix) my_strcat(desc, suffix, sizeof(desc));
+			my_strcpy(desc, is_a_vowel(prefix ? prefix[0] : name[0]) ? "an " : "a ", max);
+			if (prefix) my_strcat(desc, prefix, max);
+			my_strcat(desc, name, max);
+			if (suffix) my_strcat(desc, suffix, max);
 		}
 
 		/* It could be a normal, definite, monster */
 		else
 		{
 			/* Definite monsters need a definite article */
-			my_strcpy(desc, "the ", sizeof(desc));
-			if (prefix) my_strcat(desc, prefix, sizeof(desc));
-			my_strcat(desc, name, sizeof(desc));
-			if (suffix) my_strcat(desc, suffix, sizeof(desc));
+			my_strcpy(desc, "the ", max);
+			if (prefix) my_strcat(desc, prefix, max);
+			my_strcat(desc, name, max);
+			if (suffix) my_strcat(desc, suffix, max);
 		}
 
 		/* Handle the Possessive as a special afterthought */
@@ -1325,7 +1325,7 @@ void monster_desc(char *desc, int m_idx, int mode)
 			/* XXX Check for trailing "s" */
 
 			/* Simply append "apostrophe" and "s" */
-			my_strcat(desc, "'s", sizeof(desc));
+			my_strcat(desc, "'s", max);
 		}
 
 		/* Mention "hidden" monsters XXX XXX */
@@ -1339,14 +1339,14 @@ void monster_desc(char *desc, int m_idx, int mode)
 		if (m_ptr->mflag & (MFLAG_HIDE))
 		{
 			/* Append special notation */
-			my_strcat(desc, " (hidden)", sizeof(desc));
+			my_strcat(desc, " (hidden)", max);
 		}
 
 		/* Mention "offscreen" monsters XXX XXX */
 		if (!panel_contains(m_ptr->fy, m_ptr->fx))
 		{
 			/* Append special notation */
-			my_strcat(desc, " (offscreen)", sizeof(desc));
+			my_strcat(desc, " (offscreen)", max);
 		}
 	}
 }
@@ -3008,7 +3008,7 @@ void set_monster_haste(s16b m_idx, s16b counter, bool message)
 	char m_name[80];
 
 	/* Get monster name*/
-	monster_desc(m_name, m_idx, 0);
+	monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 	/*see if we need to recalculate speed*/
 	if (m_ptr->hasted)
@@ -3054,7 +3054,7 @@ void set_monster_slow(s16b m_idx, s16b counter, bool message)
 	char m_name[80];
 
 	/* Get monster name*/
-	monster_desc(m_name, m_idx, 0);
+	monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 	/*see if we need to recalculate speed*/
 	if (m_ptr->slowed)
@@ -4858,7 +4858,7 @@ void message_pain(int m_idx, int dam)
 
 
 	/* Get the monster name */
-	monster_desc(m_name, m_idx, 0);
+	monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 	/* Notice non-damage */
 	if (dam == 0)

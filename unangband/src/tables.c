@@ -4068,29 +4068,29 @@ const s16b parasite_hack[DISEASE_BLOWS] =
 const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES] =
 {
 	"","","","",	/* SOURCE_SELF */
-	"being destroyed under you","","","",	/* SOURCE_OBJECT */
+	" being destroyed under you"," being destroyed under you"," being destroyed under you"," being destroyed under you",	/* SOURCE_OBJECT */
 	"", "", "", "",
-	"a magic spell", "", "", "",
-	"a disease", "", "", "",
-	"daylight", "the sun rising", "no UV protection", "overtanning",
-	"being born", "", "", "",	/* SOURCE_BIRTH */
+	"", "", "", "",
+	"", "", "", "",
+	"daylight", "the sun rising", "no UV protection", "your unholy flesh searing in the radiance of day",
+	" being born", " being born", " being born", " being born",	/* SOURCE_BIRTH */
 	"a swing, and a miss", "overenthusiasm", "a hellavu shaving cut", "you're not quite sure how you hit that part of you", /* SOURCE_PLAYER_ATTACK */
 	"a misfire","an unintended discharge","shooting your own foot","you're not quite sure how you shot that part of you", /* SOURCE_PLAYER_SHOOT */
-	"a fumble","juggling a sharp object","a ricochet","you're not quite sure how you threw that there", /* SOURCE_PLAYER_THROW */
+	"a misthrow", "a fumble","juggling a dangerous object","you're not quite sure how you threw that there", /* SOURCE_PLAYER_THROW */
 	"walking headfirst into a ","walking backwards into a ","stumbling into a ","forgetting where you put a ", /* SOURCE_PLAYER_TRAP */
-	"bad luck casting", "badly casting", "slurring a syllable casting", "magical feedback whilst casting", /* SOURCE_PLAYER_CAST */
-	"over cooking", "undercooking", "having a taste for", "not cutting out the poisonous bits off", /* SOURCE_PLAYER_EAT_MONSTER */
-	"eating", "tasting", "nibbling", "indigestion from", /* SOURCE_PLAYER_EAT */
-	"quaffing", "drinking", "slurping", "sipping",		/* SOURCE_PLAYER_QUAFF */ 
-	"reading", "misreading", "glancing at", "reciting",		/* SOURCE_PLAYER_READ */ 
-	"using", "misusing", "abusing", "badly using",		/* SOURCE_PLAYER_USE */ 
-	"aiming", "waving", "pointing", "holding the wrong end of", /* SOURCE_PLAYER_AIM */
-	"zapping", "discharging", "rubbing", "holding the wrong end of",		/* SOURCE_PLAYER_ */ 
-	"activating", "relying too heavily on", "mistrusting the power of", "chancing the gods with",		/* SOURCE_PLAYER_ACT_ARTIFACT */ 
-	"activating", "calling on", "discharing", "misusing",		/* SOURCE_PLAYER_ACTIVATE */ 
-	"breaking", "smashing", "cracking open", "shattering", 									/* SOURCE_PLAYER_BREAK */
-	"sniffing", "inhaling", "snorting", "getting addicted to", /* SOURCE_PLAYER_SPORE */
-	"buying", "acquiring", "purchasing", "the ill-judged purchase of",		/* SOURCE_PLAYER_SERVICE */ 
-	"a nick from a weapon coated with", "extract of", "toxic", "fumes of"		/* SOURCE_PLAYER_COATING */ 
+	"bad luck casting ", "badly casting ", "slurring a syllable casting ", "magical feedback whilst casting ", /* SOURCE_PLAYER_CAST */
+	"over cooking ", "undercooking ", "having a taste for ", "not cutting out the poisonous bits off ", /* SOURCE_PLAYER_EAT_MONSTER */
+	"eating ", "tasting ", "nibbling ", "indigestion from ", /* SOURCE_PLAYER_EAT */
+	"quaffing ", "drinking ", "slurping ", "sipping ",		/* SOURCE_PLAYER_QUAFF */ 
+	"reading ", "misreading ", "glancing at ", "reciting ",		/* SOURCE_PLAYER_READ */ 
+	"using ", "misusing ", "abusing ", "badly using ",		/* SOURCE_PLAYER_USE */ 
+	"aiming ", "waving ", "pointing ", "holding the wrong end of ", /* SOURCE_PLAYER_AIM */
+	"zapping ", "discharging ", "rubbing ", "holding the wrong end of ",		/* SOURCE_PLAYER_ZAP */ 
+	"activating ", "relying too heavily on ", "mistrusting the power of ", "chancing the gods with ",		/* SOURCE_PLAYER_ACT_ARTIFACT */ 
+	"activating ", "calling on ", "discharing ", "misusing ",		/* SOURCE_PLAYER_ACTIVATE */ 
+	"breaking ", "smashing ", "cracking open ", "shattering ", 									/* SOURCE_PLAYER_BREAK */
+	"sniffing ", "inhaling ", "snorting ", "getting addicted to ", /* SOURCE_PLAYER_SPORE */
+	"buying ", "acquiring ", "purchasing ", "the ill-judged purchase of ",		/* SOURCE_PLAYER_SERVICE */ 
+	"a nick from a weapon coated with ", "extract of ", "toxic ", "fumes reeking of "		/* SOURCE_PLAYER_COATING */ 
 };
 

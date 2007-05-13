@@ -1621,7 +1621,7 @@ static int mon_inven_damage(int m_idx, inven_func typ, int perc)
 				object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 3);
 
 				/* Get "possessive" */
-				monster_desc(m_name, m_idx, 0x22);
+				monster_desc(m_name, sizeof(m_name), m_idx, 0x22);
 
 				/* Message */
 				msg_format("%^s%s %s %s destroyed!",
@@ -4689,7 +4689,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 
 	/* Get the monster name (BEFORE polymorphing) */
-	monster_desc(m_name, cave_m_idx[y][x], 0);
+	monster_desc(m_name, sizeof(m_name), cave_m_idx[y][x], 0);
 
 	/* Some monsters get "destroyed" */
 	if ((r_ptr->flags3 & (RF3_NONLIVING)) ||
@@ -7421,9 +7421,6 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 	/* Source monster */
 	monster_type *m_ptr=NULL;
 
-	/* Monster name (for attacks) */
-	char m_name[80];
-
 	/* Monster name (for damage) */
 	char killer[80];
 
@@ -7453,11 +7450,8 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		/* Get the source monster */
 		m_ptr = &m_list[who];
 
-		/* Get the monster name */
-		monster_desc(m_name, who, 0);
-
 		/* Get the monster's real name */
-		monster_desc(killer, who, 0x88);
+		monster_desc(killer, sizeof(killer), who, 0x88);
 		
 		/*
 		 * XXX Add what?
@@ -7467,8 +7461,105 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 	}
 	else
 	{
-		/* XXX Redo cause of death routine */
+		/* Add a message of destruction */
+		if (who > SOURCE_PLAYER_START)
+		{
+			my_strcpy(killer, cause_of_death[-who][rand_int(4)], sizeof(killer));
+		}
 
+		/* Cause of death routine */
+		switch(who)
+		{
+			case SOURCE_SELF:
+			{
+				/* Get the source monster */
+				m_ptr = &m_list[what];
+
+				/* Get the monster's real name */
+				monster_desc(killer, sizeof(killer), who, 0x88);
+				
+				break;
+			}
+
+			case SOURCE_FEATURE:
+			{
+				/* Get the source feature */
+				feature_type *f_ptr = &f_info[what];
+				
+				/* Get the feature name */
+				my_strcpy(killer, format("%s %s", is_a_vowel((f_name + f_ptr->name)[0]) ? "an" : "a", f_name + f_ptr->name), sizeof(killer));
+				
+				break;
+			}
+			
+			case SOURCE_SPELL:
+			{
+				/* Get the source spell */
+				spell_type *s_ptr = &s_info[what];
+				
+				/* Get the spell name */
+				my_strcpy(killer, format("%s %s", is_a_vowel((s_name + s_ptr->name)[0]) ? "an" : "a", s_name + s_ptr->name), sizeof(killer));
+				
+				break;
+			}
+			
+			case SOURCE_DISEASE:
+			{
+				/* Get the feature name */
+				my_strcpy(killer, disease_name[what], sizeof(killer));
+				
+				break;
+			}
+			
+			case SOURCE_DAYLIGHT:
+			case SOURCE_PLAYER_ATTACK:
+			case SOURCE_PLAYER_SHOT:
+			case SOURCE_PLAYER_THROW:
+			{
+				/* Nothing */
+				
+				break;	
+			}
+
+			case SOURCE_BIRTH:
+			case SOURCE_PLAYER_EAT_MONSTER:
+			case SOURCE_PLAYER_SPORE:
+			{
+				/* Get the source feature */
+				monster_race *r_ptr = &r_info[what];
+				
+				/* Get the feature name */
+				my_strcpy(killer, format("%s %s", is_a_vowel((r_name + r_ptr->name)[0]) ? "an" : "a", r_name + r_ptr->name), sizeof(killer));
+				
+				break;
+			}			
+
+			default:
+			{
+				/* Fake object */
+				object_type object_type_body;
+
+				/* Get an object */
+				object_type *o_ptr = &object_type_body;
+
+				/* Prepare the object */
+				object_prep(o_ptr, what);
+
+				/* Get the object name */
+				object_desc(killer, sizeof(killer), o_ptr, TRUE, 0); 
+				
+				break;
+			}
+		}
+
+		/* Add object what caused the fatal wound */
+		if (who <= SOURCE_PLAYER_START)
+		{
+			my_strcat(killer, cause_of_death[-who][rand_int(4)], sizeof(killer));
+
+			/* Hack -- make it clear it was a trap */
+			if (who == SOURCE_PLAYER_TRAP) my_strcat(killer, " trap you set", sizeof(killer));		
+		}
 	}
 
 	/* Hack -- storm can do several things */
@@ -9936,7 +10027,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		{
 			if ((p_ptr->cur_flags4 & (TR4_ANCHOR)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR)))
 			{
-				msg_format("%^s fails to teleport you away.", m_name);
+				msg_format("%^s fails to teleport you away.", killer);
 				if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR))) player_can_flags(who, 0x0L, 0x0L, 0x0L, TR4_ANCHOR);
 			}
 			else
@@ -10321,7 +10412,7 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 		if (m_ptr->ml) seen = TRUE;
 
 		/* Get the monster name (before teleporting) */
-		monster_desc(m_name, cave_m_idx[y][x], 0x40);
+		monster_desc(m_name, sizeof(m_name), cave_m_idx[y][x], 0x40);
 	}
 
 	/* Hack -- storm can do several things */

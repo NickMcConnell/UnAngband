@@ -3611,7 +3611,7 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 		char m_name[80];
 
 		/* Extract monster name */
-		monster_desc(m_name, m_idx, 0);
+		monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 		/* Death by Missile/Spell attack */
 		if (note)
@@ -5183,7 +5183,7 @@ static key_event target_set_interactive_aux(int y, int x, int *room, int mode, c
 				boring = FALSE;
 
 				/* Get the monster name ("a goblin") */
-				monster_desc(m_name, cave_m_idx[y][x], 0x08);
+				monster_desc(m_name, sizeof(m_name), cave_m_idx[y][x], 0x08);
 
 				/* Hack -- track this monster race */
 				monster_race_track(m_ptr->r_idx);

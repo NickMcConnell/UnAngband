@@ -3801,7 +3801,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 		      char m_name[80];
 
 		      /* Get "the monster" or "it" */
-		      monster_desc(m_name, cave_m_idx[y][x], 0);
+		      monster_desc(m_name, sizeof(m_name), cave_m_idx[y][x], 0);
 
 		      /* Near miss */
 		      if (!genuine_hit)
@@ -3872,7 +3872,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 			  char m_name[80];
 
 			  /* Get the monster name (or "it") */
-			  monster_desc(m_name, cave_m_idx[y][x], 0);
+			  monster_desc(m_name, sizeof(m_name), cave_m_idx[y][x], 0);
 
 			  /* Message */
 			  message_format(MSG_FLEE, m_ptr->r_idx,

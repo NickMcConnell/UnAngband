@@ -405,7 +405,7 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 	if (who > SOURCE_MONSTER_START)
 	{
 		/* Get the monster name (or "it") */
-		monster_desc(m_name, who, 0x00);
+		monster_desc(m_name, sizeof(m_name), who, 0x00);
 	}
 	else if (who < 0)
 	{
@@ -420,7 +420,7 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 	if (target > 0)
 	{
 		/* Get the monster name (or "it") */
-		monster_desc(t_name, target, 0x00);
+		monster_desc(t_name, sizeof(t_name), target, 0x00);
 	}
 	else if (target < 0)
 	{
@@ -647,7 +647,7 @@ static void attack_desc(int who, int target, int method, int damage, bool *do_cu
 			suffix = " aura";
 
 			/* Get the monster possessive ("his"/"her"/"its") */
-			if (who > SOURCE_MONSTER_START) monster_desc(t_name, who, 0x22);
+			if (who > SOURCE_MONSTER_START) monster_desc(t_name, sizeof(t_name), who, 0x22);
 			else my_strcpy (t_name,"its", sizeof(t_name));
 
 			break;
@@ -846,10 +846,10 @@ bool make_attack_normal(int m_idx)
 
 
 	/* Get the monster name (or "it") */
-	monster_desc(m_name, m_idx, 0);
+	monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 	/* Get the "died from" information (i.e. "a goblin") */
-	monster_desc(ddesc, m_idx, 0x88);
+	monster_desc(ddesc, sizeof(ddesc), m_idx, 0x88);
 
 
 	/* Scan through all four blows */
@@ -1879,10 +1879,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		k_ptr = &l_list[cave_m_idx[y][x]];
 
 		/* Get the monster name (or "it") */
-		monster_desc(t_name, cave_m_idx[y][x], 0x00);
+		monster_desc(t_name, sizeof(t_name), cave_m_idx[y][x], 0x00);
 
 		/* Get the monster possessive ("his"/"her"/"its") */
-		monster_desc(t_poss, cave_m_idx[y][x], 0x22);
+		monster_desc(t_poss, sizeof(t_poss), cave_m_idx[y][x], 0x22);
 	}
 	else if (target < 0)
 	{
@@ -1953,13 +1953,13 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		if (m_ptr->mflag & (MFLAG_HIDE)) return (FALSE);
 
 		/* Get the monster name (or "it") */
-		monster_desc(m_name, who, 0x00);
+		monster_desc(m_name, sizeof(m_name), who, 0x00);
 
 		/* Get the monster possessive ("his"/"her"/"its") */
-		monster_desc(m_poss, who, 0x22);
+		monster_desc(m_poss, sizeof(m_poss), who, 0x22);
 
 		/* Hack -- Get the "died from" name */
-		monster_desc(ddesc, who, 0x88);
+		monster_desc(ddesc, sizeof(ddesc), who, 0x88);
 
 		/* Extract the "see-able-ness" */
 		seen = (!blind && m_ptr->ml);
@@ -3858,7 +3858,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if ((!seen) && (m_ptr->ml))
 				{
 					/* Get the name (using "A"/"An") again. */
-					monster_desc(ddesc, who, 0x08);
+					monster_desc(ddesc, sizeof(ddesc), who, 0x08);
 
 					/* Message */
 					msg_format("%^s suddenly appears.", ddesc);
@@ -5879,7 +5879,7 @@ bool mon_evade(int m_idx, int chance, int out_of, cptr r)
 	int roll = rand_int(out_of);
 
 	/* Get "the monster" or "it" */
-	monster_desc(m_name, m_idx, 0x40);
+	monster_desc(m_name, sizeof(m_name), m_idx, 0x40);
 
 	switch(roll % 4)
 	{
@@ -5928,7 +5928,7 @@ bool mon_resist_object(int m_idx, const object_type *o_ptr)
 	char o_name[80];
 
 	/* Get "the monster" or "it" */
-	monster_desc(m_name, m_idx, 0x40);
+	monster_desc(m_name, sizeof(m_name), m_idx, 0x40);
 
 	/* Describe object */
 	if (o_ptr->k_idx) object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
@@ -6105,7 +6105,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 	f_ptr = &f_info[cave_feat[y][x]];
 
 	/* Get "the monster" or "it" */
-	monster_desc(m_name, m_idx, 0);
+	monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 	/* Hack --- trapped doors */
 	/* XXX XXX Dangerous */
