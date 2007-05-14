@@ -6499,6 +6499,35 @@ static long eval_blow_effect(int effect, int atk_dam, int rlev)
 }
 
 
+static int threat_mod(int threat, monster_race *r_ptr, bool ranged)
+{
+	/*
+	 * Adjust threat for friends.
+	 */
+	if (ranged)
+	{
+		if (r_ptr->flags1 & (RF1_FRIENDS))
+			threat *= 3;
+		else if (r_ptr->flags1 & (RF1_FRIEND))
+			r_ptr->highest_threat = r_ptr->highest_threat * 3 / 2;
+	}
+	else
+	{
+		if (r_ptr->flags1 & (RF1_FRIENDS))
+		{
+			threat *= 2;
+		}
+	}
+
+	/*
+	 * Add threat from multiplication.
+	 */
+	if (r_ptr->flags2 & (RF2_MULTIPLY))
+		threat += threat * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 5;
+	
+	return (threat);
+}
+
 
 /*
  * Go through the attack types for this monster.
@@ -6515,13 +6544,15 @@ static long eval_max_dam(monster_race *r_ptr)
 	int i, x;
 	int dam = 1;
 	int hp;
-	int melee_dam, atk_dam, spell_dam;
+	int melee_dam, atk_dam, spell_dam, spell_dam_real;
 	byte rlev;
 	u32b flag, breath_mask, attack_mask, innate_mask;
 	u32b flag_counter;
 
+	bool shriek = FALSE;
+
 	/*clear the counters*/
-	melee_dam = atk_dam = spell_dam = 0;
+	melee_dam = atk_dam = spell_dam = spell_dam_real = 0;
 
 	/* Evaluate average HP for this monster */
 	if (r_ptr->flags1 & (RF1_FORCE_MAXHP)) hp = r_ptr->hdice * r_ptr->hside;
@@ -6579,6 +6610,7 @@ static long eval_max_dam(monster_race *r_ptr)
 		for (i = 0; i < 32; i++)
 		{
 			int this_dam;
+			bool real_dam = FALSE;
 
 			this_dam = 0;
 
@@ -6745,6 +6777,8 @@ static long eval_max_dam(monster_race *r_ptr)
 						/* Slight bonus for being powerful */
 						if (r_ptr->flags2 & (RF2_POWERFUL)) this_dam = this_dam * 8 / 7;
 					}
+					
+					real_dam = TRUE;
 				}
 
 				/*Is it an arrow, bolt, beam, or ball?*/
@@ -6777,6 +6811,8 @@ static long eval_max_dam(monster_race *r_ptr)
 							break;
 						}
 					}
+					
+					real_dam = TRUE;
 				}
 
 				else switch (x)
@@ -6820,45 +6856,48 @@ static long eval_max_dam(monster_race *r_ptr)
 					/*All flag7 flags*/
 					case 3:
 					{
+						bool escalate = TRUE;
+						
 						/*Right now all flag7 are summon spells*/
 						/* All summons are assigned arbitrary values according to their levels*/
-						if 		(flag_counter == RF7_S_KIN) 	this_dam = rlev * 2;
-						else if (flag_counter == RF7_R_KIN) 	this_dam = rlev / 2;
-						else if (flag_counter == RF7_A_DEAD) 	this_dam = rlev / 5;
-						else if (flag_counter == RF7_S_MONSTER)	this_dam = rlev * 2 / 5;
-						else if (flag_counter == RF7_S_MONSTERS)this_dam = rlev * 4 / 5;
-						else if (flag_counter == RF7_R_MONSTER)	this_dam = rlev * 1 / 5;
-						else if (flag_counter == RF7_R_MONSTERS)this_dam = rlev * 2 / 5;
-						else if (flag_counter == RF7_S_PLANT)		this_dam = rlev / 5;
-						else if (flag_counter == RF7_S_INSECT)		this_dam = rlev / 5;
+						if 		(flag_counter == RF7_S_KIN) 	this_dam = rlev * 2 + 20;
+						else if (flag_counter == RF7_R_KIN){ 	this_dam = rlev / 2 + 10; escalate = FALSE; }
+						else if (flag_counter == RF7_A_DEAD){ 	this_dam = rlev / 5 + 10; escalate = FALSE; }
+						else if (flag_counter == RF7_S_MONSTER)	this_dam = rlev * 2 / 5 + 10;
+						else if (flag_counter == RF7_S_MONSTERS)this_dam = rlev * 4 / 5 + 20;
+						else if (flag_counter == RF7_R_MONSTER){	this_dam = rlev * 1 / 5 + 10; escalate = FALSE; }
+						else if (flag_counter == RF7_R_MONSTERS){	this_dam = rlev * 2 / 5 + 20; escalate = FALSE; }
+						else if (flag_counter == RF7_S_PLANT)		this_dam = rlev / 5 + 5;
+						else if (flag_counter == RF7_S_INSECT)		this_dam = rlev / 5 + 10;
 						else if (flag_counter == RF7_S_ANIMAL)
 						{
 							/* XXX Feathers, fur or skin? */
-							this_dam = rlev * 3 / 2;  /* Includes hydras */
+							this_dam = rlev / 2 + 10;  /* Includes hydras */
 							/* this_dam = rlev / 2;   Fur includes canines / cats */
 							/* this_dam = rlev / 2;   Feathers includes birds / hybrids */
 						}
-						else if (flag_counter == RF7_S_SPIDER)	this_dam = rlev / 5;
-						else if (flag_counter == RF7_S_HOUND)	this_dam = rlev;
-						else if (flag_counter == RF7_S_CLASS)	this_dam = rlev / 2;
-						else if (flag_counter == RF7_S_RACE)	this_dam = rlev / 2;
-						else if (flag_counter == RF7_S_GROUP)	this_dam = rlev / 2;
-						else if (flag_counter == RF7_S_FRIEND)	this_dam = rlev / 3;
-						else if (flag_counter == RF7_S_FRIENDS)	this_dam = rlev * 3 / 4;
-						else if (flag_counter == RF7_S_DRAGON)	this_dam = rlev * 3 / 2;
-						else if (flag_counter == RF7_S_HI_DRAGON) this_dam = rlev * 4;
-						else if (flag_counter == RF7_A_ELEMENT) this_dam = rlev / 3;
-						else if (flag_counter == RF7_A_OBJECT) 	this_dam = rlev / 5;
-						else if (flag_counter == RF7_S_DEMON)	this_dam = rlev * 3 / 2;
-						else if (flag_counter == RF7_S_HI_DEMON)this_dam = rlev * 3;
-						else if (flag_counter == RF7_S_UNDEAD)	this_dam = rlev * 3 / 2;
-						else if (flag_counter == RF7_S_HI_UNDEAD)this_dam = rlev * 4;
-						else if (flag_counter == RF7_S_WRAITH)	this_dam = rlev * 9 / 2;
-						else if (flag_counter == RF7_S_UNIQUE)	this_dam = rlev * 3;
-						else if (flag_counter == RF7_S_HI_UNIQUE)	this_dam = rlev * 5;
+						else if (flag_counter == RF7_S_SPIDER)	this_dam = rlev / 5 + 10;
+						else if (flag_counter == RF7_S_HOUND)	this_dam = rlev + 15;
+						else if (flag_counter == RF7_S_CLASS)	this_dam = rlev / 2 + 20;
+						else if (flag_counter == RF7_S_RACE)	this_dam = rlev / 2 + 20;
+						else if (flag_counter == RF7_S_GROUP)	this_dam = rlev / 2 + 20;
+						else if (flag_counter == RF7_S_FRIEND)	this_dam = rlev / 3 + 10;
+						else if (flag_counter == RF7_S_FRIENDS)	this_dam = rlev * 3 / 4 + 20;
+						else if (flag_counter == RF7_S_DRAGON)	this_dam = rlev * 3 / 2 + 20;
+						else if (flag_counter == RF7_S_HI_DRAGON) this_dam = rlev * 4 + 30;
+						else if (flag_counter == RF7_A_ELEMENT){ this_dam = rlev / 3 + 10; escalate = FALSE; }
+						else if (flag_counter == RF7_A_OBJECT){ 	this_dam = rlev / 5 + 5; escalate = FALSE; }
+						else if (flag_counter == RF7_S_DEMON)	this_dam = rlev * 3 / 2 + 20;
+						else if (flag_counter == RF7_S_HI_DEMON)this_dam = rlev * 3 + 30;
+						else if (flag_counter == RF7_S_UNDEAD)	this_dam = rlev * 3 / 2 + 20;
+						else if (flag_counter == RF7_S_HI_UNDEAD)this_dam = rlev * 4 + 30;
+						else if (flag_counter == RF7_S_WRAITH)	this_dam = rlev * 9 / 2 + 30;
+						else if (flag_counter == RF7_S_UNIQUE)	this_dam = rlev * 3 + 40;
+						else if (flag_counter == RF7_S_HI_UNIQUE)	this_dam = rlev * 5 + 50;
 
 						/* Fast summoners are more threatening */
-						this_dam = (this_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) / 10;
+						if (escalate) this_dam += (this_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) / 10;
+
 						break;
 					}
 				}
@@ -6866,9 +6905,9 @@ static long eval_max_dam(monster_race *r_ptr)
 			}
 
 			/* Hack - record most damaging spell for diagnostics */
-			if (this_dam > r_ptr->highest_threat)
+			if (threat_mod(this_dam, r_ptr, TRUE) > r_ptr->highest_threat)
 			{
-				r_ptr->highest_threat = this_dam;
+				r_ptr->highest_threat = threat_mod(this_dam, r_ptr, TRUE);
 				r_ptr->best_threat = 96 + x * 32 + i;
 			}
 
@@ -6934,8 +6973,15 @@ static long eval_max_dam(monster_race *r_ptr)
 			/* Better spell? */
 			if (this_dam > spell_dam)
 			{
-				r_ptr->best_spell = 96 + x * 32 + i;
 				spell_dam = this_dam;
+				if (this_dam > 2 * spell_dam) r_ptr->best_spell = 96 + x * 32 + i;
+			}
+
+			/* Better spell? */
+			if ((real_dam) && (this_dam > spell_dam_real))
+			{
+				r_ptr->best_spell = 96 + x * 32 + i;
+				spell_dam_real = this_dam;
 			}
 
 			/*shift one bit*/
@@ -6981,6 +7027,12 @@ static long eval_max_dam(monster_race *r_ptr)
 					atk_dam /= 5;
 					break;
 				}
+				/* shriek */
+				case RBM_SHRIEK:
+				{
+					shriek = TRUE;
+					break;
+				}
 				default: 
 				{
 					if ((effect == GF_WOUND) || (effect == GF_BATTER))
@@ -7022,9 +7074,9 @@ static long eval_max_dam(monster_race *r_ptr)
 				}
 
 				/* Hack - record most damaging spell for diagnostics */
-				if (atk_dam > r_ptr->highest_threat)
+				if (threat_mod(atk_dam, r_ptr, TRUE) > r_ptr->highest_threat)
 				{
-					r_ptr->highest_threat = atk_dam;
+					r_ptr->highest_threat = threat_mod(atk_dam, r_ptr, TRUE);
 					r_ptr->best_threat = 96 + i;
 				}
 
@@ -7073,6 +7125,7 @@ static long eval_max_dam(monster_race *r_ptr)
 					case RBM_XBOLT: mana = 0; range = 12; must_hit = TRUE; has_ammo = r_ptr->level; break;
 					case RBM_SPIKE: mana = 0; range = 4; must_hit = TRUE; has_ammo = r_ptr->level; break;
 					case RBM_DART: mana = 0; range = 8; must_hit = TRUE; has_ammo = r_ptr->level; break;
+					case RBM_DAGGER: mana = 0; range = 6; must_hit = TRUE; has_ammo = r_ptr->level; break;
 					case RBM_SHOT: mana = 0; range = 8; must_hit = TRUE; break;
 					case RBM_ARC_20: mana = 6; range = 8; break;
 					case RBM_ARC_30: mana = 5; range = 6; break;
@@ -7152,9 +7205,9 @@ static long eval_max_dam(monster_race *r_ptr)
 		}
 
 		/* Hack - record most damaging spell for diagnostics */
-		if ((melee_dam > r_ptr->highest_threat) && (!(r_ptr->flags1 & (RF1_NEVER_MOVE)) || (r_ptr->flags2 & (RF2_MULTIPLY))))
+		if ((threat_mod(melee_dam, r_ptr, FALSE) > r_ptr->highest_threat) && (!(r_ptr->flags1 & (RF1_NEVER_MOVE)) || (r_ptr->flags2 & (RF2_MULTIPLY))))
 		{
-			r_ptr->highest_threat = melee_dam;
+			r_ptr->highest_threat = threat_mod(melee_dam, r_ptr, FALSE);
 			r_ptr->best_threat = 0;
 		}
 
@@ -7166,7 +7219,8 @@ static long eval_max_dam(monster_race *r_ptr)
 		 */
 		if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL))
 				melee_dam *= 10;
-		else if (r_ptr->flags3 & (RF3_HUGE))
+		else if ((r_ptr->flags3 & (RF3_HUGE)) ||
+			(((r_ptr->flags2 & (RF2_INVISIBLE)) || (r_ptr->flags6 & (RF6_INVIS))) && (r_ptr->flags2 & (RF2_COLD_BLOOD))))
 		{
 			melee_dam = melee_dam * 4 + melee_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 6;
 		}
@@ -7215,7 +7269,7 @@ static long eval_max_dam(monster_race *r_ptr)
 					if (!(r_ptr->flags2 & RF2_STUPID)) melee_dam = melee_dam / 5 + 4 * melee_dam * MIN(75 + (rlev + 3) / 4, 100) / 500;
 				}
 				else if (r_ptr->flags2 & (RF2_HAS_AURA)) melee_dam /= 2;
-				else if (r_ptr->flags2 & (RF2_INVISIBLE)) melee_dam /= 3;
+				else if ((r_ptr->flags2 & (RF2_INVISIBLE)) && (r_ptr->flags2 & (RF2_COLD_BLOOD))) melee_dam /= 3;
 				else melee_dam /= 5;
 			}
 		}
@@ -7228,8 +7282,23 @@ static long eval_max_dam(monster_race *r_ptr)
 	 * Get the max damage attack
 	 */
 
-	if (dam < spell_dam) dam = spell_dam;
+	if (dam < spell_dam_real) dam = spell_dam_real;
 	if (dam < melee_dam) dam = melee_dam;
+	
+	/*
+	 * Limit 'unreal' spell damage boost
+	 */
+	if (dam < spell_dam)
+	{
+		if (spell_dam < 2 * dam)
+		{
+			dam = spell_dam;
+		}
+		else
+		{
+			dam *= 2;
+		}
+	}
 
 	/*
 	 * Adjust for speed.  Monster at speed 120 will do double damage,
@@ -7238,19 +7307,14 @@ static long eval_max_dam(monster_race *r_ptr)
 	dam = (dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) / 10;
 
 	/*
-	 * Adjust threat for speed -- multipliers are more threatening.
+	 * Adjust some 'global' threat values.
 	 */
-	if (r_ptr->flags2 & (RF2_MULTIPLY))
-		r_ptr->highest_threat = (r_ptr->highest_threat * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) / 5;
-
-	/*
-	 * Adjust threat for friends.
-	 */
-	if (r_ptr->flags1 & (RF1_FRIENDS))
-		r_ptr->highest_threat *= 2;
-	else if (r_ptr->flags1 & (RF1_FRIEND))
-		r_ptr->highest_threat = r_ptr->highest_threat * 3 / 2;
+	/* Shriek applies here */
+	if (shriek) r_ptr->highest_threat *= 2;
 		
+	/* Invisibility increases overall threat */
+	else if (r_ptr->flags2 & (RF2_INVISIBLE)) r_ptr->highest_threat = r_ptr->highest_threat * 3 / 2;
+
 	/*but deep in a minimum*/
 	if (dam < 1) dam  = 1;
 
@@ -7315,6 +7379,28 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	 */
 	if (r_ptr->flags2 & (RF2_MULTIPLY)) hp *= 2;
 
+
+	/* Get the monster ac */
+	ac = r_ptr->ac;
+
+	/* Some abilities modify armour */
+	if (r_ptr->flags2 & RF2_ARMOR) ac = ac * 4 / 3;
+	if (r_ptr->flags6 & RF6_SHIELD) ac += 25;
+	if (r_ptr->flags6 & RF6_BLESS) ac += 5;
+	if (r_ptr->flags6 & RF6_BESERK) ac -= 5;
+
+	/* Upper limit on ac */
+	if (ac > 150) ac = 150;
+
+	/* Immune to weapons */
+	if (r_ptr->flags9 & RF9_IM_EDGED)	ac += 500;
+	else if (r_ptr->flags9 & RF9_RES_EDGED)	ac += 200;
+	if (r_ptr->flags9 & RF9_IM_BLUNT) 	ac += 500;
+	else if (r_ptr->flags9 & RF9_RES_BLUNT) ac += 200;	
+
+	/* Hack -- Huge = tough */
+	if (r_ptr->flags3 & RF3_HUGE) ac += 300;
+	
 	/* Monsters with resistances are harder to kill.
 	   Therefore effective slays / brands against them are worth more. */
 	if (r_ptr->flags3 & RF3_IM_ACID)	resists += 2;
@@ -7336,11 +7422,8 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	if (r_ptr->flags9 & RF9_IM_BLUNT) 	resists += 5;
 	else if (r_ptr->flags9 & RF9_RES_BLUNT) resists += 2;
 
-	/* Hack -- Huge = tough */
-	if (r_ptr->flags3 & RF3_HUGE) resists += 3;
-
 	/* Hack -- Evasive = tough */
-	if (r_ptr->flags9 & RF9_EVASIVE) resists += 2;
+	if (r_ptr->flags9 & RF9_EVASIVE) resists += 3;
  
 	/* Bonus for multiple basic resists and weapon resists */
 	if (resists >= 12) resists *= 6;
@@ -7353,6 +7436,40 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	if (r_ptr->flags2 & RF2_MUST_FLY)	resists /= 2;
 	if (r_ptr->flags2 & RF2_MUST_SWIM)	resists /= 3;
 
+	/* If quite resistant, reduce resists by defense holes -- these are critical blow effects */
+	if (resists >= 6)
+	{
+		if (!(r_ptr->flags3 & RF3_NO_STUN))	resists -= 1;
+		if (!(r_ptr->flags9 & RF9_NO_CUTS))	resists -= 1;
+	}
+	
+	/* If quite resistant, bonus for high resists -- these items have weapon brands */
+	if (resists >= 3)
+	{
+		if (r_ptr->flags9 & RF9_RES_DARK)	resists += 1;
+		if (r_ptr->flags9 & RF9_RES_LITE)	resists += 1;
+	}
+
+	/* Modify ac based on resists, for weapon brands */
+	ac += resists * 10;
+
+	/* If quite resistant, modify ac directly for slays */
+	if (resists >= 3)
+	{
+		/* Modify ac by slays */
+		if (r_ptr->flags3 & RF3_ORC) ac -= 10;
+		if (r_ptr->flags3 & RF3_TROLL) ac -= 10;
+		if (r_ptr->flags3 & RF3_GIANT) ac -= 10;
+		if (r_ptr->flags3 & RF3_DRAGON) ac -= 30;
+		if (r_ptr->flags3 & RF3_DEMON) ac -= 30;
+		if (r_ptr->flags3 & RF3_UNDEAD) ac -= 30;
+		if (r_ptr->flags3 & RF3_EVIL) ac -= 20;
+		if (r_ptr->flags3 & (RF3_ANIMAL | RF3_INSECT | RF3_PLANT)) ac -= 20;
+		if (r_ptr->flags9 & RF9_MAN) ac -= 10;
+		if (r_ptr->flags9 & RF9_ELF) ac -= 10;
+		if (r_ptr->flags9 & RF9_DWARF) ac -= 10;		
+	}
+
 	/* If quite resistant, reduce resists by defense holes */
 	if (resists >= 6)
 	{
@@ -7361,10 +7478,8 @@ static long eval_hp_adjust(monster_race *r_ptr)
 		if (!(r_ptr->flags3 & RF3_NO_SLEEP))	resists -= 3;
 		if (!(r_ptr->flags3 & RF3_NO_FEAR))	resists -= 2;
 		if (!(r_ptr->flags3 & RF3_NO_CONF))	resists -= 2;
-		if (!(r_ptr->flags3 & RF3_NO_STUN))	resists -= 1;
 		if (!(r_ptr->flags9 & RF9_NO_SLOW))	resists -= 2;
 		if (!(r_ptr->flags3 & RF9_RES_BLIND))	resists -= 2;
-		if (!(r_ptr->flags9 & RF9_NO_CUTS))	resists -= 1;
 		if (!(r_ptr->flags9 & RF9_RES_TPORT))	resists -= 2;
 
 		if (resists < 5) resists = 5;
@@ -7373,9 +7488,7 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	/* If quite resistant, bonus for high resists */
 	if (resists >= 3)
 	{
-		if (r_ptr->flags9 & RF9_RES_DARK)	resists += 1;
 		if (r_ptr->flags9 & RF9_RES_CHAOS)	resists += 1;
-		if (r_ptr->flags9 & RF9_RES_LITE)	resists += 1;
 		if (r_ptr->flags3 & RF3_RES_WATER)	resists += 1;
 		if (r_ptr->flags3 & RF3_RES_NETHR)	resists += 1;
 		if (r_ptr->flags3 & RF3_RES_LAVA)	resists += 1;
@@ -7389,37 +7502,17 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	/* Apply magic resistance */
 	if (r_ptr->flags9 & RF9_RES_MAGIC)	resists += 40 + r_ptr->level;
 
-	/* Get the monster ac */
-	ac = r_ptr->ac;
-
-	/* Some abilities modify armour */
-	if (r_ptr->flags2 & RF2_ARMOR) ac = ac * 4 / 3;
-	if (r_ptr->flags6 & RF6_SHIELD) ac += 25;
-	if (r_ptr->flags6 & RF6_BLESS) ac += 5;
-	if (r_ptr->flags6 & RF6_BESERK) ac -= 5;
-
-	/* Upper limit on ac */
-	if (ac > 150) ac = 150;
-
-	/* Immune to weapons */
-	if (r_ptr->flags9 & RF9_IM_EDGED)	ac += 500;
-	else if (r_ptr->flags9 & RF9_RES_EDGED)	ac += 200;
-	if (r_ptr->flags9 & RF9_IM_BLUNT) 	ac += 500;
-	else if (r_ptr->flags9 & RF9_RES_BLUNT) ac += 200;
-
 	/* Sanity check */
 	if (ac < 0) ac = 0;
 
-	/* Easier to kill monster with magic */
+	/* Monster resistances */
 	if (resists < ac)
 	{
-		/* Modify hit points by ac */
-		hp += hp * resists / (150 + r_ptr->level);
+		hp += (hp * resists) / (150 + r_ptr->level); 	
 	}
 	else
 	{
-		/* Modify hit points by ac */
-		hp += hp * ac / (150 + r_ptr->level);
+		hp += (hp * ac) / (150 + r_ptr->level); 			
 	}
 
 	/*boundry control*/

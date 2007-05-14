@@ -11,7 +11,7 @@
 # === Understanding monster.txt ===
 
 # N: serial number : monster name
-# G: symbol : colorDY
+# G: symbol : color
 # I: speed : hit points : vision : armor class : alertness
 # W: depth : rarity : group index : experience for kill
 # B: attack method : attack effect : damage
@@ -4856,7 +4856,6 @@ M:18:18:15:35
 B:GAZE:TERRIFY:2d6
 B:HIT:HURT:4d13
 B:HIT:HURT:4d13
-B:AURA:SOUND:4d3
 F:FORCE_SLEEP | FORCE_MAXHP | ELF | DEMON | RES_MAGIC
 F:ONLY_ITEM | DROP_1D2 | DROP_2D2 | 
 F:SMART | TAKE_ITEM | OPEN_DOOR | BASH_DOOR | POWERFUL | 
