@@ -1056,7 +1056,7 @@ void object_actual_track(const object_type *j_ptr)
  *
  * We guarantee long names are distinct and try to make short names distinct.
  */
-void lookup_prettyname(char name[60], int class, int style, int sval, bool long_name, bool short_name)
+void lookup_prettyname(cptr name, size_t name_s, int class, int style, int sval, bool long_name, bool short_name)
 {
 	char temp[60];
 
@@ -1417,7 +1417,7 @@ void lookup_prettyname(char name[60], int class, int style, int sval, bool long_
 			break;
 	}
 
-	my_strcpy(name,temp, sizeof(name));
+	my_strcpy(name,temp, name_s);
 }
 
 #endif
@@ -1433,7 +1433,7 @@ static void prt_frame_basic(void)
 
 	char name[60];
 
-	if (show_sidebar) lookup_prettyname(name,p_ptr->pclass, p_ptr->pstyle,p_ptr->psval,FALSE,TRUE);
+	if (show_sidebar) lookup_prettyname(name,sizeof(name), p_ptr->pclass, p_ptr->pstyle,p_ptr->psval,FALSE,TRUE);
 
 #endif
 	/* Race and Class */
@@ -4315,7 +4315,7 @@ void redraw_stuff(void)
 
 		char name[60];
 
-		if (show_sidebar) lookup_prettyname(name,p_ptr->pclass, p_ptr->pstyle,p_ptr->psval,FALSE,TRUE);
+		if (show_sidebar) lookup_prettyname(name,sizeof(name), p_ptr->pclass, p_ptr->pstyle,p_ptr->psval,FALSE,TRUE);
 
 #endif
 		p_ptr->redraw &= ~(PR_MISC);

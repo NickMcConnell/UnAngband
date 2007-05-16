@@ -1446,7 +1446,7 @@ static void display_player_xtra_info(void)
 	/* Pretty name */
 
 #ifdef USE_CLASS_PRETTY_NAMES
-	lookup_prettyname(name,p_ptr->pclass, p_ptr->pstyle,p_ptr->psval,TRUE,TRUE);
+	lookup_prettyname(name,sizeof(name), p_ptr->pclass, p_ptr->pstyle,p_ptr->psval,TRUE,TRUE);
 	sprintf(buf,"%s, the %s",op_ptr->full_name,name);
 	c_put_str(TERM_L_BLUE, buf, 1, 8);
 #else
@@ -5542,7 +5542,7 @@ void display_scores_aux(int from, int to, int note, high_score *score)
 
 #ifdef USE_CLASS_PRETTY_NAMES
 			/* Get the class name */
-			lookup_prettyname(name, pc, ps, pp, FALSE, TRUE);
+			lookup_prettyname(name, sizeof(name), pc, ps, pp, FALSE, TRUE);
 #else
 			/* Get the class name */
 			my_strcpy(name, c_name + c_info[pc].name, sizeof(name));
