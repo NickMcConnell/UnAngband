@@ -377,9 +377,13 @@ static void prt_sp(void)
 	{
 		color = TERM_L_GREEN;
 	}
-	else if (p_ptr->csp > (p_ptr->msp * op_ptr->hitpoint_warn) / 10)
+	else if (!(p_ptr->reserves))
 	{
 		color = TERM_YELLOW;
+	}
+	else if (p_ptr->csp >= adj_con_reserve[p_ptr->stat_ind[A_CON]] / 2)
+	{
+		color = TERM_ORANGE;
 	}
 	else
 	{
@@ -2508,8 +2512,32 @@ static void calc_mana(void)
 	/* Extract total mana */
 	msp = adj_mag_mana[p_ptr->stat_ind[pc_ptr->spell_stat_mana]] * levels / 50;
 
-	/* Hack -- increase mana */
-	if (levels > 0) msp++;
+	/* Always ensure some mana */
+	if (levels > 0) msp++;	
+
+	/* Increase mana based on reserve */
+	if (levels > 0)
+	{
+		if (p_ptr->reserves)
+		{
+			if (p_ptr->csp > adj_con_reserve[p_ptr->stat_ind[A_CON]]) 
+			{
+				p_ptr->reserves = FALSE;
+				/* Message ??? */
+			}
+		}
+
+		/* Calculate new mana total with all of reserve */
+		if (p_ptr->reserves)
+		{
+			msp += adj_con_reserve[p_ptr->stat_ind[A_CON]];
+		}
+		/* Calculate new mana total with part of reserve */
+		else
+		{
+			msp += adj_con_reserve[p_ptr->stat_ind[A_CON]] / 2;
+		}
+	}
 
 	/* Assume player is not encumbered by gloves */
 	p_ptr->cumber_glove = FALSE;
@@ -2579,9 +2607,6 @@ static void calc_mana(void)
 		/* Reduce mana */
 		msp -= ((cur_wgt - max_wgt) / 10);
 	}
-
-	/* Hack -- mage types start with higher mana */
-	if ((levels > 0) && (icky_hands)) msp += 4;
 
 	/* Mana can never be negative */
 	if (msp < 0) msp = 0;

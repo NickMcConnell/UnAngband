@@ -1859,7 +1859,7 @@ static bool player_birth_aux_3(void)
 				if (!askfor_aux(inp, 9)) inp[0] = '\0';
 
 				/* Hack -- add a fake slash */
-				my_strcat(inp, "/", inp);
+				my_strcat(inp, "/", sizeof(inp));
 
 				/* Hack -- look for the "slash" */
 				s = strchr(inp, '/');

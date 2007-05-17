@@ -1352,8 +1352,47 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 	/* Sufficient mana */
 	if (sc_ptr->mana <= p_ptr->csp)
 	{
-		/* Use some mana */
-		p_ptr->csp -= sc_ptr->mana;
+		/* Over-exert the player if casting in the 'red-zone' of their reserve.
+		 * Note that if this occurs, the spell does not cost any mana.
+		 */
+		if ((p_ptr->reserves) && (p_ptr->csp < adj_con_reserve[p_ptr->stat_ind[A_CON]] / 2) &&
+			(rand_int(100) < adj_con_reserve[p_ptr->stat_ind[A_CON]]))
+		{
+			/* Temporarily weaken the player */
+			if (!p_ptr->stat_dec_tim[A_CON])
+			{
+				set_stat_dec_tim(rand_int(20) + 20, A_CON);
+			}
+			
+			/* Weaken the player */
+			else
+			{
+				/* Message */
+				msg_print("You have damaged your health!");
+
+				/* Reduce constitution */
+				(void)dec_stat(A_CON, 15 + randint(10), 0);
+			}
+		}
+		else
+		{
+			/* Use some mana */
+			p_ptr->csp -= sc_ptr->mana;
+
+			/* Need reserves */
+			if (!(p_ptr->reserves) && (p_ptr->csp < adj_con_reserve[p_ptr->stat_ind[A_CON]] / 2))
+			{
+				/* Give some mana */
+				msg_print("You draw on your reserves.");
+			
+				p_ptr->reserves = TRUE;
+
+				p_ptr->csp = (p_ptr->csp + adj_con_reserve[p_ptr->stat_ind[A_CON]]) / 2;
+				
+				/* Update mana */
+				p_ptr->update |= (PU_MANA);
+			}			
+		}
 	}
 
 	/* Over-exert the player */

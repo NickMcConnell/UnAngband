@@ -375,6 +375,9 @@ static void regenmana(int percent)
 	/* Redraw mana */
 	if (old_csp != p_ptr->csp)
 	{
+		/* Update mana */
+		p_ptr->update |= (PU_MANA);				
+
 		/* Redraw */
 		p_ptr->redraw |= (PR_MANA);
 
@@ -1093,6 +1096,9 @@ static void process_world(void)
 			p_ptr->csp_frac = 0;
 			if (p_ptr->exp <= 0) p_ptr->csp = 0;
 
+			/* Update mana */
+			p_ptr->update |= (PU_MANA);				
+
 			/* Redraw */
 			p_ptr->redraw |= (PR_MANA);		
 		}
@@ -1474,6 +1480,9 @@ static void process_world(void)
 					{
 						p_ptr->csp -= randint(30);
 						if (p_ptr->csp < 0) p_ptr->csp = 0;
+
+						/* Update mana */
+						p_ptr->update |= (PU_MANA);				
 
 						/* Redraw */
 						p_ptr->redraw |= (PR_MANA);

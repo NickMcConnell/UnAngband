@@ -10099,6 +10099,9 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 					update_smart_forget(who, SM_IMM_MANA);
 				}
 
+				/* Update mana */
+				p_ptr->update |= (PU_MANA);				
+
 				/* Redraw mana */
 				p_ptr->redraw |= (PR_MANA);
 
@@ -10137,6 +10140,9 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 					msg_print("You feel your concentration improve.");
 				}
+
+				/* Update mana */
+				p_ptr->update |= (PU_MANA);				
 
 				p_ptr->redraw |= (PR_MANA);
 				p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1 | PW_PLAYER_2 | PW_PLAYER_3);

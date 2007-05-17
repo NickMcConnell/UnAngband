@@ -1409,6 +1409,7 @@ struct player_type
 	byte climbing; /* Currently climbing */
 	byte searching; /* Currently searching */
 	byte charging;	/* Currently charging */
+	byte reserves;	/* Currently on reserve mana */
 
 	u32b disease;	/* Disease types */
 
