@@ -4043,8 +4043,8 @@ static void calc_bonuses(void)
 				p_ptr->update |= (PU_HP);
 			}
 
-			/* Change in spell stat may affect mana */
-			if ((i == cp_ptr->spell_stat_mana) &&
+			/* Change in spell stat or CON may affect mana */
+			if (((i == cp_ptr->spell_stat_mana) || (i == A_CON)) &&
 				((cp_ptr->spell_first <= PY_MAX_LEVEL) || (p_ptr->pstyle == WS_MAGIC_BOOK)
 				|| (p_ptr->pstyle == WS_PRAYER_BOOK) || (p_ptr->pstyle == WS_SONG_BOOK)))
 			{
