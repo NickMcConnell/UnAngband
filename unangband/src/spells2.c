@@ -2069,8 +2069,8 @@ bool place_random_stairs(int y, int x, int feat)
 	}
 
 	/* Random stairs -- bias towards direction player is heading */
-	else if (rand_int(100) < (((f_info[p_ptr->create_stair].flags1 & (FF1_MORE)) != 0) ? 75
-			: (((f_info[p_ptr->create_stair].flags1 & (FF1_LESS)) != 0) ? 25 : 50)) )
+	else if (rand_int(100) < (((f_info[p_ptr->create_stair].flags1 & (FF1_MORE)) != 0) ? 75 :
+					(((f_info[p_ptr->create_stair].flags1 & (FF1_LESS)) != 0) ? 25 : 50)) )
 	{
 		place_down_stairs(y, x);
 	}
@@ -4389,7 +4389,7 @@ void entomb(int cy, int cx, byte invalid)
 			msg_format("%^s wails out in pain!", m_name);
 
 			/* Take damage from the quake */
-			damage = (sn || (r_ptr->flags3 & (RF3_NONLIVING)) ? (int)damroll(4, 8) : (m_ptr->hp + 1));
+			damage = (sn || (r_ptr->flags3 & (RF3_NONLIVING))) ? (int)damroll(4, 8) : (m_ptr->hp + 1);
 
 			/* Monster is certainly awake */
 			m_ptr->csleep = 0;

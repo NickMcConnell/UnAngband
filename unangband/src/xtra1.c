@@ -4238,6 +4238,9 @@ void update_stuff(void)
 		forget_view();
 	}
 
+	/* Character is not in "dungeon" mode, no dungeon */
+	if (!character_dungeon) return;
+
 	if (p_ptr->update & (PU_UPDATE_VIEW))
 	{
 		p_ptr->update &= ~(PU_UPDATE_VIEW);

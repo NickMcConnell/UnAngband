@@ -1581,7 +1581,6 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 		get_feat_num_prep();
 	}
 
-#if 0
 	/* Draw maze if required -- ensure minimum size */
 	if (((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR)) != 0) && (y2 - y1 > 4) && (x2 - x1 > 4) && ((flag & (RG1_ALLOC)) == 0))
 	{
@@ -1597,10 +1596,10 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 		if ((f_info[cave_feat[y2][x1 + x2 / 2]].flags1 & (FF1_OUTER)) != 0) s = TRUE;
 
 		/* Ensure the correct ordering and that size is odd in both directions */
-		if ((dy > 0) && (dx > 0)) draw_maze(y1, x1, y1 + y2 % 2 ? y2 : y2 - 1, x1 + x2 % 2 ? x2 : x2 - 1, wall, path);
-		else if ((dy < 0) && (dx > 0)) draw_maze(y2, x1, y1 + y2 % 2 ? y1 : y1 - 1, x1 + x2 % 2 ? x2 : x2 - 1, wall, path);
-		else if ((dy > 0) && (dx < 0)) draw_maze(y1, x2, y1 + y2 % 2 ? y2 : y2 - 1, x1 + x2 % 2 ? x1 : x1 - 1, wall, path);
-		else if ((dy < 0) && (dx < 0)) draw_maze(y2, x2, y1 + y2 % 2 ? y1 : y1 - 1, x1 + x2 % 2 ? x1 : x1 - 1, wall, path);
+		if ((dy > 0) && (dx > 0)) draw_maze(y1, x1, y1 + (y2 % 2 ? y2 : y2 - 1), x1 + (x2 % 2 ? x2 : x2 - 1), wall, path);
+		else if ((dy < 0) && (dx > 0)) draw_maze(y2, x1, y1 + (y2 % 2 ? y1 : y1 - 1), x1 + (x2 % 2 ? x2 : x2 - 1), wall, path);
+		else if ((dy > 0) && (dx < 0)) draw_maze(y1, x2, y1 + (y2 % 2 ? y2 : y2 - 1), x1 + (x2 % 2 ? x1 : x1 - 1), wall, path);
+		else if ((dy < 0) && (dx < 0)) draw_maze(y2, x2, y1 + (y2 % 2 ? y1 : y1 - 1), x1 + (x2 % 2 ? x1 : x1 - 1), wall, path);
 
 		/* Ensure outer edges */
 		if (n) for (x = x1; (dx > 0) ? x <= x2 : x >= x2; x += dx > 0 ? 1 : -1) cave_set_feat(y1, x, FEAT_WALL_OUTER);
@@ -1615,9 +1614,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 	}
 
 	/* Use checkered for invalid mazes */
-	else
-#endif
-		if ((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR)) != 0)
+	else if ((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR)) != 0)
 	{
 		flag |= (RG1_CHECKER);
 	}
@@ -2948,11 +2945,16 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	byte branch = 0;
 	byte branch_on = 0;
 
+	bool try_simple = FALSE;
+
 	int limit = 0;
 
 	/* Make certain the overlapping room does not cross the dungeon edge. */
 	if ((!in_bounds_fully(y1a, x1a)) || (!in_bounds_fully(y1b, x1b))
 		 || (!in_bounds_fully(y2a, x2a)) || (!in_bounds_fully(y2b, x2b))) return (FALSE);
+
+	/* Try 'simple' room */
+	if ((y1a == y2a) && (y1b == y2b) && (x1a == x2a) && (x1b == x2b)) try_simple = TRUE;
 
 	/* Flood dungeon if required */
 	if (room_info[room].flags & (ROOM_FLOODED))
@@ -3047,6 +3049,15 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 				int x2c = MIN(x2a, x2b) - 1;
 				u32b place_flag_temp = place_flag;
 
+				/* Simple room - we can fill it completely */
+				if ((try_simple) && ((place_flag & (RG1_NORTH | RG1_SOUTH | RG1_EAST | RG1_WEST)) == 0))
+				{
+					/* Expand edges */
+					y1c--; y2c++; x1c--; x2c++;
+
+					exclude |= (RG1_NORTH | RG1_SOUTH | RG1_EAST | RG1_WEST);
+				}
+
 				/* Ensure some space */
 				if (y1c >= y2c) { y1c = y2c - 1; y2c = y1c + 3;}
 				if (x1c >= x2c) { x1c = x2c - 1; x2c = x1c + 3;}
@@ -3068,6 +3079,9 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 				int y2w = (x1a < x1b ? y2a : (x1a == x1b ? MAX(y2a, y2b) : y2b));
 				int x1w = MIN(x1a, x1b) + outer;
 				int x2w = (x1a == x1b ? x1a + 1 : MAX(x1a, x1b) - 1);
+				
+				/* No longer simple */
+				try_simple = FALSE;
 
 				/* Ensure some space */
 				if (x2w <= x2w) x2w = x1w + 1;
@@ -3081,6 +3095,9 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 				int y2e = (x2a > x2b ? y2a : (x1a == x1b ? MAX(y2a, y2b): y2b));
 				int x1e = (x2a == x2b ? x2a - 1 : MIN(x2a, x2b) + 1);
 				int x2e = MAX(x2a, x2b) - outer;
+
+				/* No longer simple */
+				try_simple = FALSE;
 
 				/* Ensure some space */
 				if (x1e >= x2e) x1e = x2e - 1;
@@ -3097,6 +3114,9 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 				int x1n = (y1a < y1b ? x1a : (y1a == y1b ? MIN(x1a, x1b): y1b));
 				int x2n = (y1a < y1b ? x2a : (y1a == y1b ? MAX(x2a, x2b): x2b));
 
+				/* No longer simple */
+				try_simple = FALSE;
+
 				/* Ensure some space */
 				if (y2n <= y1n) y2n = y1n + 1;
 
@@ -3110,6 +3130,9 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 				int y2s = MAX(y2a, y2b) - outer;
 				int x1s = (y2a > y2b ? x1a : (y2a == y2b ? MIN(x1a, x1b): x1b));
 				int x2s = (y2a > y2b ? x2a : (y2a == y2b ? MAX(x2a, x2b): x2b));
+
+				/* No longer simple */
+				try_simple = FALSE;
 
 				/* Ensure some space */
 				if (y1s >= y2s) y1s = y2s - 1;
@@ -6134,13 +6157,13 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			add_stair(row1, col1);
 			
 			/* Decorate 'left-hand' corner of dead end */
-			add_decor(row1 - row_dir + col_dir * ((style & (TUNNEL_LARGE_L)) != 0) ? 2 : 1,
-							col1 - col_dir - row_dir * ((style & (TUNNEL_LARGE_L)) != 0) ? 2 : 1,
+			add_decor(row1 - row_dir + col_dir * (((style & (TUNNEL_LARGE_L)) != 0) ? 2 : 1),
+							col1 - col_dir - row_dir * (((style & (TUNNEL_LARGE_L)) != 0) ? 2 : 1),
 							dun->tunn_n);
 
 			/* Decorate 'right-hand' corner of dead end */
-			add_decor(row1 - row_dir + col_dir * ((style & (TUNNEL_LARGE_R)) != 0) ? 2 : 1,
-							col1 - col_dir + row_dir * ((style & (TUNNEL_LARGE_R)) != 0) ? 2 : 1,
+			add_decor(row1 - row_dir + col_dir * (((style & (TUNNEL_LARGE_R)) != 0) ? 2 : 1),
+							col1 - col_dir + row_dir * (((style & (TUNNEL_LARGE_R)) != 0) ? 2 : 1),
 							dun->tunn_n);
 
 			/* Decorated */
@@ -7228,13 +7251,13 @@ static bool build_type123(int room, int type)
 	x2b = randint(13);
 
 	/* Sometimes express symetry */
-	if (symetry < 20)
+	if (symetry < 30)
 	{
 		x1a = x2a; x2b = x1b;
 	}
 
 	/* Sometimes express symetry */
-	if ((symetry < 10) || (symetry > 90))
+	if ((symetry < 15) || (symetry > 85))
 	{
 		y1a = y2a; y2b = y1b;
 	}
@@ -9118,10 +9141,10 @@ static bool place_contents()
 		alloc_stairs(0, 2, 3);
 
 		/* Put some rubble in corridors -- we want to exclude towers unless other rooms on level */
-		if ((level_flag & (LF1_ROOMS)) != 0) alloc_object(ALLOC_SET_CORR, ALLOC_TYP_RUBBLE, randint(k * ((level_flag & (LF1_CRYPT | LF1_MINE | LF1_CAVE)) != 0) ? 3 : 1));
+		if ((level_flag & (LF1_ROOMS)) != 0) alloc_object(ALLOC_SET_CORR, ALLOC_TYP_RUBBLE, randint(k * (((level_flag & (LF1_CRYPT | LF1_MINE | LF1_CAVE)) != 0) ? 3 : 1)));
 	
 		/* Place some traps in the dungeon */
-		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_TRAP, randint(k * ((level_flag & (LF1_STRONGHOLD | LF1_CRYPT)) != 0) ? 2 : 1));
+		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_TRAP, randint(k * (((level_flag & (LF1_STRONGHOLD | LF1_CRYPT)) != 0) ? 2 : 1)));
 	
 		/* Place some features in rooms */
 		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_FEATURE, 1);
@@ -9141,7 +9164,7 @@ static bool place_contents()
 
 	/* Pick a base number of monsters */
 	/* Strongholds and sewers have more monsters */
-	i = MIN_M_ALLOC_LEVEL + randint(8 * ((level_flag & (LF1_STRONGHOLD | LF1_SEWER)) != 0) ? 2 : 1);
+	i = MIN_M_ALLOC_LEVEL + randint(8 * (((level_flag & (LF1_STRONGHOLD | LF1_SEWER)) != 0) ? 2 : 1));
 
 	/* Generating */
 	if (cheat_room) msg_print("Placing monsters.");
@@ -9159,11 +9182,11 @@ static bool place_contents()
 		if (cheat_room) msg_print("Placing objects, treasure.");
 
 		/* Put some objects in rooms */
-		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ROOM * ((level_flag & (LF1_STRONGHOLD)) != 0) ? 2 : 1, 3));
+		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ROOM * (((level_flag & (LF1_STRONGHOLD)) != 0) ? 2 : 1), 3));
 	
 		/* Put some objects/gold in the dungeon */
-		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ITEM * ((level_flag & (LF1_CRYPT)) != 0) ? 4 : 1, 3));
-		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_GOLD, Rand_normal(DUN_AMT_GOLD* ((level_flag & (LF1_MINE)) != 0) ? 4 : 1, 3));
+		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ITEM * (((level_flag & (LF1_CRYPT)) != 0) ? 4 : 1), 3));
+		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_GOLD, Rand_normal(DUN_AMT_GOLD* (((level_flag & (LF1_MINE)) != 0) ? 4 : 1), 3));
 	}
 	
 	/* Successfully placed some stuff */
