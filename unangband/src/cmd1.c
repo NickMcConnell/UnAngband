@@ -2198,8 +2198,8 @@ bool auto_activate(const object_type *o_ptr)
  */
 void py_attack(int dir)
 {
-	int y = p_ptr->py + ddy_ddd[dir];
-	int x = p_ptr->px + ddx_ddd[dir];	
+	int y = p_ptr->py + ddy[dir];
+	int x = p_ptr->px + ddx[dir];	
 
 	int num = 0, k, bonus, chance;
 
