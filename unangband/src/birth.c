@@ -424,7 +424,7 @@ static void player_wipe(void)
 		if (r_ptr->flags1 & (RF1_UNIQUE)) r_ptr->max_num = 1;
 
 		/* Clear player kills */
-l_ptr->pkills = 0;
+		l_ptr->pkills = 0;
 	}
 
 
@@ -1234,6 +1234,7 @@ static bool get_player_class(void)
 	/* Tabulate classes */
 	for (i = 0; i < z_info->c_max; i++)
 	{
+#if 0
 		/* Analyze */
 		if (!(rp_ptr->choice & (1L << i)))
 		{
@@ -1243,10 +1244,35 @@ static bool get_player_class(void)
 		{
 			classes[i].ghost = FALSE;
 		}
+#endif
+		classes[i].ghost = FALSE;
+
+		/* Ghost if not warrior, and two stats are -4 or below, or 1 is -5 or below */
+		if (i)
+		{
+			int j;
+			bool minus_4 = FALSE;
+			
+			for (j = 0; j < A_MAX; j++)
+			{
+			    /* Obtain a "bonus" for "race" and "class" */
+				int value = rp_ptr->r_adj[j] + c_info[i].c_adj[j];
+
+				if ((value <= -5) || (minus_4 && value <= -4))
+				{
+					classes[i].ghost = TRUE;
+				}
+				else if (value <= -4)
+				{
+					minus_4 = TRUE;
+				}
+			}
+		}
 
 		/* Save the string */
 		classes[i].name = c_name + c_info[i].name;
 	}
+
 
 	p_ptr->pclass = get_player_choice(classes, z_info->c_max, CLASS_COL, 16,
 				      "classes.txt", class_aux_hook);
