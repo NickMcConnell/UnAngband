@@ -376,12 +376,22 @@ static bool variable_terrain(int *feat, int oldfeat)
 {
 	int k;
 
+	/* Hack -- ensure variable terrain creates space in granite/ice etc */
+	if (((f_info[oldfeat].flags1 & (FF1_MOVE)) == 0) &&
+		((f_info[oldfeat].flags3 & (FF3_EASY_CLIMB)) == 0))
+	{
+		if (f_info[oldfeat].flags1 & (FF1_TUNNEL)) oldfeat = feat_state(oldfeat, FS_TUNNEL);
+		else if (f_info[oldfeat].flags2 & (FF2_BRIDGE)) oldfeat = feat_state(oldfeat, FS_BRIDGE);
+		else oldfeat = FEAT_FLOOR;
+	}
+
 	/* Hack -- place trees infrequently */
 	if (f_info[*feat].flags3 & (FF3_TREE))
 	{
 		k = randint(100);
 
 		if (k<=85) *feat = oldfeat;
+		
 		return (TRUE);
 	}
 	/* Hack -- place living terrain infrequently */
@@ -922,9 +932,13 @@ static void generate_fill_pillars(int y1, int x1, int y2, int x2, int feat, int 
 		{
 			/* Check spacing */
 			if ((spacing > 1) && (y % spacing == 0) && (x % spacing == 0) && (x != x1) && (x != x2) && (y != y1) && (y != y2))
+			{
 				cave_set_feat(y, x, FEAT_WALL_INNER);
+			}
 			else
-				cave_set_feat(y, x, feat);
+			{
+				build_terrain(y, x, feat);
+			}
 		}
 	}
 }
@@ -963,8 +977,8 @@ static void generate_rect(int y1, int x1, int y2, int x2, int feat)
  *
  * Note that the edge lengths should be odd.
  */
-static void draw_maze(int y1, int x1, int y2, int x2, byte feat_wall,
-    byte feat_path)
+static void draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
+    s16b feat_path)
 {
 	int i, j;
 	int ydim, xdim;
@@ -979,6 +993,9 @@ static void draw_maze(int y1, int x1, int y2, int x2, byte feat_wall,
 
 	/* Paranoia */
 	if ((!feat_wall) || (!feat_path) || (feat_wall == feat_path)) return;
+
+	/* Paranoia */
+	if (!in_bounds_fully(y1, x1) || !in_bounds_fully(y2, x2)) return;
 
 	if (cheat_room) msg_print("Drawing maze.");
 
@@ -1022,7 +1039,7 @@ static void draw_maze(int y1, int x1, int y2, int x2, byte feat_wall,
 				/** Enumerate possible directions **/
 
 				/* Up */
-				if (y && (cave_feat[j - 2][i] == feat_wall)) dir[dirs++] = 1;
+				if (y &&(cave_feat[j - 2][i] == feat_wall)) dir[dirs++] = 1;
 
 				/* Down */
 				if ((y < ydim - 1) && (cave_feat[j + 2][i] == feat_wall)) dir[dirs++] = 2;
@@ -1584,28 +1601,14 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 	/* Draw maze if required -- ensure minimum size */
 	if (((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR)) != 0) && (y2 - y1 > 4) && (x2 - x1 > 4) && ((flag & (RG1_ALLOC)) == 0))
 	{
-		bool n = FALSE, s = FALSE, e = FALSE, w = FALSE;
-
 		int wall = ((flag & (RG1_MAZE_WALL)) != 0) ? feat : (((flag & (RG1_MAZE_DECOR)) != 0) ? FEAT_FLOOR : FEAT_WALL_INNER);
 		int path = ((flag & (RG1_MAZE_PATH)) != 0) ? feat : (edge && (edge != feat) ? edge : FEAT_FLOOR);
-
-		/* Check for outer edges */
-		if ((f_info[cave_feat[y1][x1 + x2 / 2]].flags1 & (FF1_OUTER)) != 0) n = TRUE;
-		if ((f_info[cave_feat[y1 + y2 / 2][x1]].flags1 & (FF1_OUTER)) != 0) w = TRUE;
-		if ((f_info[cave_feat[y1 + y2 / 2][x2]].flags1 & (FF1_OUTER)) != 0) e = TRUE;
-		if ((f_info[cave_feat[y2][x1 + x2 / 2]].flags1 & (FF1_OUTER)) != 0) s = TRUE;
 
 		/* Ensure the correct ordering and that size is odd in both directions */
 		if ((dy > 0) && (dx > 0)) draw_maze(y1, x1, y1 + (y2 % 2 ? y2 : y2 - 1), x1 + (x2 % 2 ? x2 : x2 - 1), wall, path);
 		else if ((dy < 0) && (dx > 0)) draw_maze(y2, x1, y1 + (y2 % 2 ? y1 : y1 - 1), x1 + (x2 % 2 ? x2 : x2 - 1), wall, path);
 		else if ((dy > 0) && (dx < 0)) draw_maze(y1, x2, y1 + (y2 % 2 ? y2 : y2 - 1), x1 + (x2 % 2 ? x1 : x1 - 1), wall, path);
 		else if ((dy < 0) && (dx < 0)) draw_maze(y2, x2, y1 + (y2 % 2 ? y1 : y1 - 1), x1 + (x2 % 2 ? x1 : x1 - 1), wall, path);
-
-		/* Ensure outer edges */
-		if (n) for (x = x1; (dx > 0) ? x <= x2 : x >= x2; x += dx > 0 ? 1 : -1) cave_set_feat(y1, x, FEAT_WALL_OUTER);
-		if (w) for (y = y1; (dy > 0) ? y <= y2 : y >= y2; y += dy > 0 ? 1 : -1) cave_set_feat(y, x1, FEAT_WALL_OUTER);
-		if (e) for (y = y1; (dy > 0) ? y <= y2 : y >= y2; y += dy > 0 ? 1 : -1) cave_set_feat(y, x2, FEAT_WALL_OUTER);
-		if (s) for (x = x1; (dx > 0) ? x <= x2 : x >= x2; x += dx > 0 ? 1 : -1) cave_set_feat(y2, x, FEAT_WALL_OUTER);
 		
 		/* Hack -- scatter items inside maze */
 		flag |= (RG1_SCATTER);
@@ -2961,7 +2964,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	{
 		floor = dun->flood_feat;
 		edge = f_info[dun->flood_feat].edge;
-		
+
 		if ((!edge) || ((f_info[edge].flags1 & (FF1_MOVE)) == 0))
 		{
 			room_info[room].flags |= (ROOM_BRIDGED);
@@ -6977,35 +6980,37 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		y = dun->tunn[i].y;
 		x = dun->tunn[i].x;
 
-		/* Flood fill corridor */
-		if (flood_tunnel)
-		{
-			/* Clear previous contents, write terrain */
-			cave_set_feat(y, x, dun->flood_feat);			
-		}
-
 		/* Apply feature - note hack */
-		else if (dun->tunn_feat[i] > 1)
+		if (dun->tunn_feat[i] > 1)
 		{
 			/* Clear previous contents, write terrain */
 			cave_set_feat(y, x, dun->tunn_feat[i]);
-		}
-		
-		/* Apply sewer feature */
-		else if ((dun->tunn_feat[i] == 1) && (level_flag & (LF1_SEWER)))
+		}		
+		/* Apply sewer feature or flood corridor */
+		else if ((flood_tunnel) || ((dun->tunn_feat[i] == 1) && (level_flag & (LF1_SEWER))))
 		{
-			if (!dun->flood_feat)
+			/* Guarantee flooded feature */
+			while (!dun->flood_feat)
 			{
 				dun->flood_feat = pick_proper_feature(cave_feat_lake);
 			}
 
-			if (dun->flood_feat)
+			/* Clear previous contents, write terrain */
+			build_terrain(y, x, dun->flood_feat);
+			
+			/* Only accept LOS / movement squares in tunnels */
+			if (f_info[cave_feat[y][x]].flags1 & (FF1_LOS | FF1_MOVE))
 			{
-				/* Clear previous contents, write terrain */
-				cave_set_feat(y, x, dun->flood_feat);
+				continue;
 			}
-		}
-		
+
+			/* Try the edge of the terrain instead */
+			else if (f_info[f_info[dun->flood_feat].edge].flags1 & (FF1_LOS | FF1_MOVE))
+			{
+				cave_set_feat(y, x, f_info[dun->flood_feat].edge);
+				continue;
+			}
+		}		
 		/* Apply bridge */
 		else if (f_info[cave_feat[y][x]].flags2 & (FF2_BRIDGE))
 		{
@@ -7031,9 +7036,20 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		if (flood_tunnel)
 		{
 			/* Clear previous contents, write terrain */
-			cave_set_feat(y, x, dun->flood_feat);
+			build_terrain(y, x, dun->flood_feat);
 			
-			continue;		
+			/* Only accept LOS / movement squares in tunnels */
+			if (f_info[cave_feat[y][x]].flags1 & (FF1_LOS | FF1_MOVE))
+			{
+				continue;
+			}
+
+			/* Try the edge of the terrain instead */
+			else if (f_info[f_info[dun->flood_feat].edge].flags1 & (FF1_LOS | FF1_MOVE))
+			{
+				cave_set_feat(y, x, f_info[dun->flood_feat].edge);
+				continue;
+			}
 		}
 		
 		/* Convert to doorway if an outer wall */
@@ -7063,6 +7079,16 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	/* Set up decorations */
 	if (!start_decor) start_decor = end_decor;
 	if (!end_decor) end_decor = start_decor;
+	
+	/*
+	 * Hack -- 'no LOS'/'no movement' tunnels get flood terrain
+	 * added as wall decorations instead.
+	 */
+	if ((flood_tunnel) && ((f_info[dun->flood_feat].flags1 & (FF1_LOS | FF1_MOVE)) == 0))
+	{
+		start_decor = dun->flood_feat;
+		end_decor = dun->flood_feat;
+	}
 
 	/* Apply the decorations that we need */
 	if (start_decor) for (i = 0; i < dun->decor_n; i++)
