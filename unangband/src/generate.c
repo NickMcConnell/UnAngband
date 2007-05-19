@@ -384,27 +384,58 @@ static bool variable_terrain(int *feat, int oldfeat)
 		if (k<=85) *feat = oldfeat;
 		return (TRUE);
 	}
+	/* Hack -- place living terrain infrequently */
+	else if (f_info[*feat].flags3 & (FF3_LIVING))
+	{
+		k = randint(100);
+		if (k<=30) *feat = oldfeat;
+		if (k<=90) *feat = FEAT_GRASS;
 
+		return (TRUE);
+	}
+
+	/* Hack -- place 'easy climb' terrain infrequently */
+	if (f_info[*feat].flags3 & (FF3_EASY_CLIMB))
+	{
+		k = randint(100);
+
+		if ((k <= 20) && (f_info[*feat].flags2 & (FF2_CAN_DIG))) *feat = FEAT_RUBBLE;
+		else if (k<=90) *feat = oldfeat;
+		return (TRUE);
+	}
+	
+	/* Hack -- place 'adjacent terrain' infrequently */
+	if (f_info[*feat].flags3 & (FF3_ADJACENT))
+	{
+		k = randint(100);
+
+		if ((k <= 20) && (f_info[*feat].flags2 & (FF2_LAVA))) *feat = FEAT_RUBBLE;
+		else if (k <= 90) *feat = f_info[*feat].edge ? f_info[*feat].edge : oldfeat;
+		else if (k <= 95) *feat = feat_state(*feat, FS_ADJACENT);
+		return (TRUE);
+	}
+
+	/* Hack -- place 'adjacent terrain' infrequently */
+	if (f_info[*feat].flags3 & (FF3_ERUPT))
+	{
+		k = randint(100);
+
+		if (k<=35) *feat = feat_state(*feat, FS_ERUPT);
+		return (TRUE);
+	}
+	
+	/* Hack -- transform some 'timed' terrain */
+	if (f_info[*feat].flags3 & (FF3_TIMED))
+	{
+		k = randint(100);
+
+		if (k<=25) *feat = feat_state(*feat, FS_TIMED);
+		return (TRUE);
+	}
+	
+	/* Some 'special' terrain types */
 	switch (*feat)
 	{
-		case FEAT_BUSH:
-		case FEAT_BUSH_HURT:
-		case FEAT_BUSH_FOOD:
-		case FEAT_BUSH_HURT_P:
-		{
-			k = randint(100);
-			if (k<=30) *feat = oldfeat;
-			if (k<=90) *feat = FEAT_GRASS;
-			break;
-		}
-
-		case FEAT_RUBBLE:
-		{
-			k = randint(100);
-			if (k<90) *feat = oldfeat;
-			break;
-		}
-
 		case FEAT_LIMESTONE:
 		{
 			k = randint(100);
@@ -442,31 +473,6 @@ static bool variable_terrain(int *feat, int oldfeat)
 			break;
 		}
 
-		case FEAT_ICE_FALLS:
-		{
-			k = randint(100);
-			if (k <= 40) *feat = FEAT_FLOOR_ICE;
-			if (k <= 60) *feat = FEAT_ICE_CHASM;
-			if ((k > 60) && (k<80)) *feat = FEAT_ICE_FALL;
-			break;
-		}
-
-		case FEAT_WATER_FALLS:
-		{
-			k = randint(100);
-			if (k <= 60) *feat = FEAT_WATER_H;
-			if ((k > 60) && (k<80)) *feat = FEAT_WATER;
-			break;
-		}
-
-		case FEAT_ACID_FALLS:
-		{
-			k = randint(100);
-			if (k <= 60) *feat = FEAT_ACID_H;
-			if ((k > 60) && (k<80)) *feat = FEAT_ACID;
-			break;
-		}
-
 		case FEAT_MUD:
 		{
 			k = randint(100);
@@ -498,14 +504,6 @@ static bool variable_terrain(int *feat, int oldfeat)
 			break;
 		}
 
-		case FEAT_BWATER_FALLS:
-		{
-			k = randint(100);
-			if (k <= 60) *feat = FEAT_BWATER;
-			if ((k > 60) && (k<80)) *feat = FEAT_FLOOR_RUBBLE;
-			break;
-		}
-
 		case FEAT_BMUD:
 		{
 			k = randint(100);
@@ -531,16 +529,18 @@ static bool variable_terrain(int *feat, int oldfeat)
 			break;
 		}
 
-		case FEAT_LAVA_FALLS:
-		{
-			k = randint(100);
-			if (k <= 60) *feat = FEAT_LAVA_H;
-			if ((k > 60) && (k<80)) *feat = FEAT_FLOOR_RUBBLE;
-			break;
-		}
-
 		default:
-		return(FALSE);
+		{
+			if ((f_info[*feat].edge) && ((f_info[f_info[*feat].edge].flags1 & (FF1_MOVE)) != 0))
+			{
+				k = randint(100);
+
+				if (k<=25) *feat = f_info[*feat].edge;
+				return (TRUE);
+			}
+		
+			return(FALSE);
+		}
 	}
 
 	return (TRUE);
@@ -7853,6 +7853,8 @@ static void build_nature(void)
 		/* Got a valid feature? */
 		if (feat)
 		{
+			int dummy = feat;
+			
 			/* Try a big lake */
 			if (!done_big)
 			{
@@ -7882,7 +7884,8 @@ static void build_nature(void)
 			}
 
 			/* On surface or dungeon filling ? */
-			if ((level_flag & (LF1_SURFACE)) || ((f_info[feat].flags1 & (FF1_WALL)) != 0))
+			if ((level_flag & (LF1_SURFACE)) ||
+				(((f_info[feat].flags1 & (FF1_WALL)) != 0) && !(variable_terrain(&dummy, feat))))
 			{ 
 				/* Build one lake/river on surface */
 				if (!build_feature(feat, big, merge_lakes)) break;
