@@ -748,6 +748,7 @@ static void prt_state(void)
 	if (p_ptr->held_song) my_strcpy(text, "Singing   ", sizeof(text));
 	if (p_ptr->msleep)    my_strcpy(text, "Sleepy    ", sizeof(text));
 	if (p_ptr->psleep)    my_strcpy(text, "Drowsy    ", sizeof(text));
+	if (p_ptr->blocking)  my_strcpy(text, "Blocking  ", sizeof(text));
 
 	/* Asleep - attr and text always overrides */
 	if (p_ptr->psleep >= PY_SLEEP_ASLEEP)

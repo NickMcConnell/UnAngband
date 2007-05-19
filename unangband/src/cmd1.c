@@ -2196,8 +2196,11 @@ bool auto_activate(const object_type *o_ptr)
  *
  * If no "weapon" is available, then "punch" the monster one time.
  */
-void py_attack(int y, int x, bool charging)
+void py_attack(int dir)
 {
+	int y = p_ptr->py + ddy_ddd[dir];
+	int x = p_ptr->px + ddx_ddd[dir];	
+
 	int num = 0, k, bonus, chance;
 
 	/* Style bonuses */
@@ -2234,6 +2237,11 @@ void py_attack(int y, int x, bool charging)
 
 	u32b n1[3], n2[3], n3[3], n4[3];
 
+	bool charging = FALSE;
+
+	/* If moving, you can charge in the direction */
+	if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
+		|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
 
 	/* Get the monster */
 	m_ptr = &m_list[cave_m_idx[y][x]];
@@ -2286,6 +2294,12 @@ void py_attack(int y, int x, bool charging)
 
 	/* Get number of blows */
 	num_blows = p_ptr->num_blow;
+
+	/*
+	 * Hack - Dodge in direction of attack.
+	 * This helps protect the player whilst in melee, from other ranged attacks.
+	 */
+	p_ptr->dodging = dir;
 
 	/* Restrict blows if charging */
 	if (charging)
@@ -2690,7 +2704,7 @@ void move_player(int dir, int jumping)
 	cptr name;
 
 	/* Move is a climb? -- force boolean */
-        bool climb = FALSE;
+	bool climb = FALSE;
 
 	/* Find the result of moving */
 	y = py + ddy[dir];
@@ -2698,10 +2712,10 @@ void move_player(int dir, int jumping)
 
 	f_ptr = &f_info[cave_feat[y][x]];
 
-        climb = ((!(f_ptr->flags1 & (FF1_MOVE))
+	climb = ((!(f_ptr->flags1 & (FF1_MOVE))
 		&& (f_ptr->flags3 & (FF3_EASY_CLIMB)))
 		|| (!(f_ptr->flags3 & (FF3_MUST_CLIMB)) 
-                && (f_info[cave_feat[py][px]].flags3 & (FF3_MUST_CLIMB)))) != 0;
+		&& (f_info[cave_feat[py][px]].flags3 & (FF3_MUST_CLIMB)))) != 0;
 
 	/* Hack -- pickup objects from locations you can't move to but can see */
 	if (((cave_o_idx[y][x]) || (f_ptr->flags3 & (FF3_GET_FEAT))) && !(f_ptr->flags1 & (FF1_MOVE)) && (play_info[y][x] & (PLAY_MARK)))
@@ -2716,14 +2730,8 @@ void move_player(int dir, int jumping)
 	/* Hack -- attack monsters --- except hidden ones */
 	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)))
 	{
-		bool charging = FALSE;
-
-		/* If moving, you can charge in the direction */
-		if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
-			|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
-
 		/* Attack */
-		py_attack(y, x, charging);
+		py_attack(dir);
 	}
 
 	else if (stuck_player(&dir))
@@ -2848,7 +2856,7 @@ void move_player(int dir, int jumping)
 		mimic = f_ptr->mimic;
 
 		/* Use existing feature if not easy climb */
-                if (!(f_ptr->flags3 & (FF3_EASY_CLIMB))) mimic = f_info[cave_feat[py][px]].mimic;
+		if (!(f_ptr->flags3 & (FF3_EASY_CLIMB))) mimic = f_info[cave_feat[py][px]].mimic;
 
 		/* Get the feature name */
 		name = (f_name + f_info[mimic].name);
@@ -2915,12 +2923,6 @@ void move_player(int dir, int jumping)
 		{
 			/* Dodging -- reverse direction 180 degrees */
 			p_ptr->dodging = 10 - dir;
-
-			/* Hack -- not blocking */
-			p_ptr->blocking = 0;
-
-			/* Hack -- update straight away */
-			update_stuff();
 
 			/* Hack -- redraw straight away */
 			redraw_stuff();

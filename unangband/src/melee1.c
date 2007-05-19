@@ -268,7 +268,72 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 static bool check_hit(int power, int level, int who, bool ranged)
 {
 	int k, ac;
+	int blocking = 0;
 
+	/* Object  */
+	object_type *o_ptr = &inventory[INVEN_ARM];
+
+	/* Is player blocking? */
+	if (p_ptr->blocking > 1)
+	{
+		/* Base blocking */
+		blocking = p_ptr->to_h;
+
+		/* No shield / secondary weapon */
+		if (!o_ptr->k_idx)
+		{
+			if (inventory[INVEN_WIELD].k_idx)
+			{
+				o_ptr = &inventory[INVEN_WIELD];
+			}
+			else if (inventory[INVEN_HANDS].k_idx)
+			{
+				o_ptr = &inventory[INVEN_HANDS];
+			}
+		}
+
+		/* Modify by object */
+		if (o_ptr->k_idx)
+		{
+			/* Adjust by ac factor */
+			blocking += o_ptr->ac + o_ptr->to_a;
+
+			/* Adjust by to hit factor */
+			blocking += o_ptr->to_h;
+		}
+
+		/* Modify by style */
+		if (!p_ptr->heavy_wield)
+		{
+			int i;
+			
+			for (i = 0; i < z_info->w_max; i++)
+			{
+				if (w_info[i].class != p_ptr->pclass) continue;
+
+				if (w_info[i].level > p_ptr->lev) continue;
+
+				/* Check for styles */
+				if (w_info[i].styles==0 
+					|| w_info[i].styles & (p_ptr->cur_style & (WS_WIELD_FLAGS)) & (1L << p_ptr->pstyle))
+				{
+					switch (w_info[i].benefit)
+					{
+						case WB_HIT:
+						case WB_AC:
+							blocking += (p_ptr->lev - w_info[i].level) /2;
+							break;
+					}
+				}
+			}
+		}
+		
+		/* Player condition */
+		if ((p_ptr->blind) || (p_ptr->confused) || (p_ptr->image) || (p_ptr->shero))
+			blocking /= 2;
+	}
+
+	/* Determine monster to hit chance */
 	if (who > SOURCE_MONSTER_START)
 	{
 		monster_type *m_ptr = &m_list[who];
@@ -306,10 +371,8 @@ static bool check_hit(int power, int level, int who, bool ranged)
 	/* Total armor */
 	ac = p_ptr->ac + p_ptr->to_a;
 
-	if ((p_ptr->blind) || (p_ptr->confused) || (p_ptr->image) || (p_ptr->shero))
-		ac += p_ptr->blocking / 2;
-	else
-		ac += p_ptr->blocking;
+	/* Modify for blocking */
+	ac += blocking;
 
 	/* Some items and effects count for more at range */
 	if (ranged)
@@ -341,7 +404,7 @@ static bool check_hit(int power, int level, int who, bool ranged)
 		if (randint(power) > ((ac * 3) / 4)) return (TRUE);
 
 		/* Give blocking message to encourage blocking */
-		if (randint(power) < ((p_ptr->blocking * 3) / 4)) msg_print("You block the attack.");
+		if (randint(power) < (blocking)) msg_print("You block the attack.");
 	}
 
 	/* Assume miss */

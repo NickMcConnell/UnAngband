@@ -1318,17 +1318,11 @@ void do_cmd_open(void)
 	/* Monster */
 	if (cave_m_idx[y][x] > 0)
 	{
-		bool charging = FALSE;
-
 		/* Message */
 		msg_print("There is a monster in the way!");
 
-		/* If moving, you can charge in the direction */
-		if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
-			|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
-
 		/* Attack */
-		py_attack(y, x, charging);
+		py_attack(dir);
 	}
 
 	/* Door */
@@ -1475,17 +1469,11 @@ void do_cmd_close(void)
 	/* Monster */
 	if (cave_m_idx[y][x] > 0)
 	{
-		bool charging = FALSE;
-
 		/* Message */
 		msg_print("There is a monster in the way!");
 
-		/* If moving, you can charge in the direction */
-		if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
-			|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
-
 		/* Attack */
-		py_attack(y, x, charging);
+		py_attack(dir);
 	}
 
 	/* Door */
@@ -1542,7 +1530,6 @@ static bool do_cmd_tunnel_aux(int y, int x)
 
 		/* Update the visuals */
 		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-
 	}
 
 	/* Permanent rock */
@@ -1709,17 +1696,11 @@ void do_cmd_tunnel(void)
 	/* Monster */
 	if (cave_m_idx[y][x] > 0)
 	{
-		bool charging = FALSE;
-
 		/* Message */
 		msg_print("There is a monster in the way!");
 
-		/* If moving, you can charge in the direction */
-		if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
-			|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
-
 		/* Attack */
-		py_attack(y, x, charging);
+		py_attack(dir);
 	}
 
 	/* Walls */
@@ -1931,17 +1912,11 @@ void do_cmd_disarm(void)
 	/* Monster */
 	if (cave_m_idx[y][x] > 0)
 	{
-		bool charging = FALSE;
-
 		/* Message */
 		msg_print("There is a monster in the way!");
 
-		/* If moving, you can charge in the direction */
-		if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
-			|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
-
 		/* Attack */
-		py_attack(y, x, charging);
+		py_attack(dir);
 	}
 
 	/* Disarm trap */
@@ -2165,7 +2140,7 @@ void do_cmd_bash(void)
 		msg_print("There is a monster in the way!");
 
 		/* Attack */
-		py_attack(y, x, charging);
+		py_attack(dir);
 	}
 
 	/* Door */
@@ -2254,17 +2229,11 @@ void do_cmd_alter(void)
 	/* Attack monsters */
 	if (cave_m_idx[y][x] > 0)
 	{
-		bool charging = FALSE;
-
 		/* Message */
 		msg_print("There is a monster in the way!");
 
-		/* If moving, you can charge in the direction */
-		if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
-			|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
-
 		/* Attack */
-		py_attack(y, x, charging);
+		py_attack(dir);
 	}
 
 	/* Disarm traps */
@@ -2419,17 +2388,11 @@ void do_cmd_set_trap_or_spike(void)
 	/* Monster */
 	if (cave_m_idx[y][x] > 0)
 	{
-		bool charging = FALSE;
-
 		/* Message */
 		msg_print("There is a monster in the way!");
 
-		/* If moving, you can charge in the direction */
-		if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
-			|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
-
 		/* Attack */
-		py_attack(y, x, charging);
+		py_attack(dir);
 	}
 
 	/* Go for it */
@@ -3023,72 +2986,14 @@ static void do_cmd_hold_or_stay(int pickup)
 	/* Blocking -- temporary bonus to ac */
 	if (!p_ptr->searching)
 	{
-		int i;
-
-		/* Slot */
-		int slot = INVEN_ARM;
-
-		/* Object  */
-		object_type *o_ptr = &inventory[INVEN_ARM];
-
-		/* Style */
-		int melee_style = p_ptr->cur_style & (WS_WIELD_FLAGS);
-
 		/* Hack -- not dodging */
 		p_ptr->dodging = 0;
 
-		/* Base blocking */
-		p_ptr->blocking = p_ptr->to_h;
-
-		/* No shield / secondary weapon */
-		if (!o_ptr->k_idx)
-		{
-			if (inventory[INVEN_WIELD].k_idx)
-			{
-				slot = INVEN_WIELD;
-			}
-			else if (inventory[INVEN_HANDS].k_idx)
-			{
-				slot = INVEN_HANDS;
-			}
-
-			o_ptr = &inventory[slot];
-		}
-
-		/* Modify by object */
-		if (o_ptr->k_idx)
-		{
-			/* Adjust by ac factor */
-			p_ptr->blocking += o_ptr->ac + o_ptr->to_a;
-
-			/* Adjust by to hit factor */
-			p_ptr->blocking += o_ptr->to_h;
-		}
-
-		/* Modify by style */
-		if (!p_ptr->heavy_wield) 
-			for (i = 0; i < z_info->w_max; i++)
-			{
-				if (w_info[i].class != p_ptr->pclass) continue;
-
-				if (w_info[i].level > p_ptr->lev) continue;
-
-			/* Check for styles */
-			if (w_info[i].styles==0 
-				|| w_info[i].styles & melee_style & (1L << p_ptr->pstyle))
-			{
-				switch (w_info[i].benefit)
-				{
-					switch (w_info[i].benefit)
-					{
-					case WB_HIT:
-					case WB_AC:
-						p_ptr->blocking += (p_ptr->lev - w_info[i].level) /2;
-						break;
-					}
-				}
-			}
-			}
+		/* Hack - block for two turns. We make this 3 to allow 'blocking' to display up to the final action. */
+		p_ptr->blocking = 3;
+		
+		/* Redraw the state */
+		p_ptr->redraw |= (PR_STATE);		
 	}
 }
 

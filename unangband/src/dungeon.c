@@ -2735,8 +2735,11 @@ static void process_player(void)
 	/*** Clear blocking ***/
 	if (p_ptr->blocking)
 	{
-		/* Clear blocking */
-		p_ptr->blocking = 0;
+		/* Reduce blocking */
+		p_ptr->blocking--;
+		
+		/* Redraw the state */
+		p_ptr->redraw |= (PR_STATE);
 	}
 
 	/*** Handle actual user input ***/
