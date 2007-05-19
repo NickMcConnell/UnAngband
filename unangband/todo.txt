@@ -34,27 +34,19 @@ TODO: Free action, see invis, res blind etc. appear deeper in the dungeon then a
 TODO: Improve self-knowledge so that it tells you what the impact of an effect is: You are blind,
 which prevents you reading scrolls or casting spells from books or rune-stones. 
 
-TODO: DEAFEN effect? POLYMORPH player. FURY effect (no spellcasting or
-throwing/missile weapons). 
-
-TODO: Update to safe string handling routines from latest Angband builds.
+TODO: DEAFEN effect? POLYMORPH player.
 
 TODO: Update to latest X11 and GCU Angband files to fix compiler warnings.
 
 TODO: Work on isometric graphics. See http://www.gamedev.net/reference/articles/article742.asp
 and http://www.gamedev.net/reference/articles/article744.asp
 
-TODO: Level up flags which add an additional prefix to the monster type.
-
 TODO: Encumberance reduces energy as opposed to speed.
 
-TODO: Additional store functions. If a store is sold an empty wand / staff, it charges it.
-If a store is sold the constituents for an object it attempts to make it.
-
-TODO: Stores, in conjunction with the character's charisma, offer additional quests based
-on what the player state is.
-
 TODO: Significant improvements to the store system.
+
+TODO: Mark items and monster bodies with blows/spells of the most dangerous monster on the 
+level (acid-marked, blood-stained).
 
 
 Release v0.7.0
@@ -63,6 +55,9 @@ Release v0.7.0
 MAIN FOCUS: Complete the quest code. Allow the player to modify and manufacture items.
 
 TODO: Complete quest code.
+
+TODO: Stores, in conjunction with the character's charisma, offer additional quests based
+on what the player state is.
 
 TODO: Create set items as per Sangband, but including sets of dragon armor.
 
@@ -79,6 +74,9 @@ TODO: Add weird terrain types.
 TODO: Strike finds nearby terrain preferentially.
 
 TODO:Implement alchemy/manufacturing items.
+
+TODO: Additional store functions. If a store is sold an empty wand / staff, it charges it.
+If a store is sold the constituents for an object it attempts to make it.
 
 TODO:Implement all magic spells so that they are level dependent.
 
