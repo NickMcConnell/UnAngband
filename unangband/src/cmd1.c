@@ -1607,13 +1607,26 @@ void hit_trap(int y, int x)
 							/* Trap description */
 							msg_format("%^s hits you.",o_name);
 
-							/* Damage, check for fear and death */
-							take_hit(k, "a player trap");
+							/* Apply damage directly */
+							project_p(SOURCE_PLAYER_TRAP, o_ptr->k_idx, y, x, k, GF_HURT);
+							
+							/* Apply additional effect from coating or sometimes activate */
+							if ((coated_p(i_ptr)) || (auto_activate(i_ptr)))
+							{
+								/* Make item strike */
+								process_item_blow(SOURCE_PLAYER_TRAP, o_ptr->k_idx, i_ptr, y, x);
+
+								/* Hack -- Remove coating on original */
+								if ((!coated_p(i_ptr)) && (o_ptr->feeling == INSCRIP_COATED)) o_ptr->feeling = 0;
+							}
 						}
 						else
 						{
 							/* Trap description */
 							msg_format("%^s narrowly misses you.",o_name);
+							
+							/* No effect */
+							power = 0;
 						}
 
 						/* Get local object */
@@ -1624,16 +1637,6 @@ void hit_trap(int y, int x)
 
 						/* Modify quantity */
 						i_ptr->number = 1;
-
-						/* Apply additional effect from coating or sometimes activate */
-						if ((coated_p(i_ptr)) || (auto_activate(i_ptr)))
-						{
-							/* Make item strike */
-							process_item_blow(i_ptr, y, x);
-
-							/* Hack -- Remove coating on original */
-							if ((!coated_p(i_ptr)) && (o_ptr->feeling == INSCRIP_COATED)) o_ptr->feeling = 0;
-						}
 
 						/* Drop nearby - some chance of breakage */
 						drop_near(i_ptr,y,x,breakage_chance(i_ptr));
@@ -1681,13 +1684,26 @@ void hit_trap(int y, int x)
 					/* Trap description */
 					msg_format("%^s hits you.",o_name);
 
-					/* Damage, check for fear and death */
-					take_hit(k, "a player trap");
+					/* Apply damage directly */
+					project_p(SOURCE_PLAYER_TRAP, o_ptr->k_idx, y, x, k, GF_HURT);
+
+					/* Apply additional effect from coating or sometimes activate */
+					if ((coated_p(i_ptr)) || (auto_activate(i_ptr)))
+					{
+						/* Make item strike */
+						process_item_blow(SOURCE_PLAYER_TRAP, o_ptr->k_idx, i_ptr, y, x);
+
+						/* Hack -- Remove coating on original */
+						if ((!coated_p(i_ptr)) && (o_ptr->feeling == INSCRIP_COATED)) o_ptr->feeling = 0;
+					}
 				}
 				else
 				{
 					/* Trap description */
-					msg_format("%^s narrowly misses you.",o_name);					
+					msg_format("%^s narrowly misses you.",o_name);
+					
+					/* No effect */
+					power = 0;			
 				}
 
 				/* Get local object */
@@ -1698,16 +1714,6 @@ void hit_trap(int y, int x)
 
 				/* Modify quantity */
 				i_ptr->number = 1;
-
-				/* Apply additional effect from coating or sometimes activate */
-				if ((coated_p(i_ptr)) || (auto_activate(i_ptr)))
-				{
-					/* Make item strike */
-					process_item_blow(i_ptr, y, x);
-
-					/* Hack -- Remove coating on original */
-					if ((!coated_p(i_ptr)) && (o_ptr->feeling == INSCRIP_COATED)) o_ptr->feeling = 0;
-				}
 
 				/* Drop nearby - some chance of breakage */
 				drop_near(i_ptr,y,x,breakage_chance(i_ptr));
@@ -2367,6 +2373,25 @@ void py_attack(int dir)
 		/* Player hits */
 		else
 		{
+			bool fumble = FALSE;
+			
+			/* Test for fumble */
+			if (((p_ptr->heavy_wield) || (o_ptr->ident & (IDENT_CURSED))) && (!rand_int(chance)))
+			{
+				/* Hack -- use the player for the attack */
+				my_strcpy(m_name, "yourself", sizeof(m_name));
+				
+				/* Hack -- use the 'fake' player */
+				r_ptr = &r_info[0];
+
+				/* Hack -- target self */
+				y = p_ptr->py;
+				x = p_ptr->px;
+
+				/* Notice fumbling later */
+				fumble = TRUE;
+			}
+			
 			/* Handle normal weapon/gauntlets/boots */
 			if (o_ptr->k_idx)
 			{
@@ -2377,14 +2402,13 @@ void py_attack(int dir)
 				{
 					case TV_POLEARM:
 					{
-						int j = rand_int(100);
-
 						/* Hack -- spears do damaging criticals, axes stun or cut */ 
 						if (!(strstr(k_name + k_info[o_ptr->k_idx].name, "Axe"))
 							&& !(strstr(k_name + k_info[o_ptr->k_idx].name, "Halberd"))
 							&& !(strstr(k_name + k_info[o_ptr->k_idx].name, "Scythe")))
 							k += critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
-						else if ((j < 50) && !(strstr(k_name + k_info[o_ptr->k_idx].name, "Scythe")))
+						else if (!(strstr(k_name + k_info[o_ptr->k_idx].name, "Scythe"))
+							&& (rand_int(100) < 50))
 							do_stun = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
 						else
 							do_cuts = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
@@ -2492,7 +2516,7 @@ void py_attack(int dir)
 
 			/* Message */
 			message_format(MSG_HIT, m_ptr->r_idx, p, m_name);
-
+			
 			/* Complex message */
 			if (p_ptr->wizard)
 			{
@@ -2502,8 +2526,14 @@ void py_attack(int dir)
 			/* Apply stun effect */
 			if (do_stun)
 			{
+				/* Hitting self */
+				if (fumble)
+				{
+					/* Fumble stun */
+					(void)set_stun(p_ptr->stun + do_stun);
+				}
 				/* Avoid overflow */
-				if ((do_stun + m_ptr->stunned) / (r_ptr->level / 10 + 1) > 875)
+				else if ((do_stun + m_ptr->stunned) / (r_ptr->level / 10 + 1) > 875)
 				{
 					k+= 4 * ((do_stun + m_ptr->stunned) / (r_ptr->level / 10 + 1) - 100) / 5;
 					m_ptr->stunned = 255;
@@ -2521,7 +2551,13 @@ void py_attack(int dir)
 			/* Apply cuts effect */
 			if (do_cuts)
 			{
-				if ((m_ptr->cut + do_cuts) / (r_ptr->level / 10 + 1) > 255)
+				/* Hitting self */
+				if (fumble)
+				{
+					/* Fumble cuts */
+					(void)set_cut(p_ptr->cut + do_cuts);
+				}
+				else if ((m_ptr->cut + do_cuts) / (r_ptr->level / 10 + 1) > 255)
 				{
 					k+= ((m_ptr->cut + do_cuts) / (r_ptr->level / 10 + 1)) - 255;
 					m_ptr->cut = 255;
@@ -2529,8 +2565,14 @@ void py_attack(int dir)
 				else m_ptr->cut += do_cuts / (r_ptr->level / 10 + 1);
 			}
 
+			/* Fumble - damage self */
+			if (fumble)
+			{
+				project_p(SOURCE_PLAYER_ATTACK, o_ptr->k_idx, y, x, k, GF_HURT);	
+			}
+
 			/* Damage, check for fear and death */
-			if (mon_take_hit(cave_m_idx[y][x], k, &fear, NULL))
+			else if (mon_take_hit(cave_m_idx[y][x], k, &fear, NULL))
 			{
 				u32b f1, f2, f3, f4;
 
@@ -2578,12 +2620,31 @@ void py_attack(int dir)
 				break;
 			}
 
-			/* Apply additional effect from coating or sometimes activate */
-			else if ((coated_p(o_ptr)) || (auto_activate(o_ptr)))
+			/* Apply additional effect from activation */
+			if (auto_activate(o_ptr))
 			{
 				/* Make item strike */
-				process_item_blow(o_ptr, y, x);
+				process_item_blow(SOURCE_PLAYER_ACT_ARTIFACT, o_ptr->name1, o_ptr, y, x);
 			}
+
+			/* Apply additional effect from coating*/
+			else if (coated_p(o_ptr))
+			{
+				/* Sometimes coating affects source player */
+				if (!rand_int(chance))
+				{
+					y = p_ptr->py;
+					x = p_ptr->px;
+					
+					fumble = TRUE;
+				}
+				
+				/* Make item strike */
+				process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x);
+			}
+			
+			/* Fumbling or coating backfiring */
+			if (fumble) break;
 		}
 	}
 
@@ -2627,6 +2688,7 @@ void py_attack(int dir)
 		if (n1[i] || n2[i] || n3[i] || n4[i]) update_slot_flags(slot, n1[i], n2[i], n3[i], n4[i]);
 	}
 }
+
 
 /*
  * Player is stuck inside terrain.

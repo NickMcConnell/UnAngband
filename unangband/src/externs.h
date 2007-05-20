@@ -876,7 +876,7 @@ extern bool process_spell_blows(int who, int what, int spell, int level, bool *c
 extern bool process_spell_types(int spell, int level, bool *cancel);
 extern bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel);
 extern bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *known);
-extern bool process_item_blow(object_type *o_ptr, int y, int x);
+extern bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x);
 
 /* store.c */
 extern void do_cmd_store(void);

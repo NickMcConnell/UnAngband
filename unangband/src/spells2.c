@@ -7385,7 +7385,7 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
  *
  * XXX We assume that there is only 1 item in the stack at present.
  */
-bool process_item_blow(object_type *o_ptr, int y, int x)
+bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x)
 {
 	int power = 0;
 	bool obvious = FALSE;
@@ -7446,7 +7446,7 @@ bool process_item_blow(object_type *o_ptr, int y, int x)
 			}
 
 			/* Hack -- apply damage as projection */
-			obvious |= project(SOURCE_PLAYER_ATTACK, 0, 0, y, x, y, x,
+			obvious |= project(who, what, 0, y, x, y, x,
 				(coated_p(o_ptr) ? damage / 5 : damage), effect, flg, 0, 0);
 		}
 

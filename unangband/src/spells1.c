@@ -7493,6 +7493,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			}
 			
 			case SOURCE_SPELL:
+			case SOURCE_PLAYER_CAST:
 			{
 				/* Get the source spell */
 				spell_type *s_ptr = &s_info[what];
