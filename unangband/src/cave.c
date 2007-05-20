@@ -5460,7 +5460,7 @@ void remove_tree(int y, int x)
 
 void reapply_tree(int y, int x)
 {
-	cave_set_feat(y, x, old_feat);
+	cave_set_feat_aux(y, x, old_feat);
 }
 
 /*
@@ -5502,7 +5502,7 @@ void remove_chasm_edge(int y, int x)
 
 void reapply_chasm_edge(int y, int x)
 {
-	cave_set_feat(y, x, old_feat);
+	cave_set_feat_aux(y, x, old_feat);
 }
 
 

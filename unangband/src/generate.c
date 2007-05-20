@@ -376,7 +376,7 @@ static bool variable_terrain(int *feat, int oldfeat)
 {
 	int k;
 
-	/* Hack -- ensure variable terrain creates space in granite/ice etc */
+	/* Hack -- ensure variable terrain creates continuous space */
 	if (((f_info[oldfeat].flags1 & (FF1_MOVE)) == 0) &&
 		((f_info[oldfeat].flags3 & (FF3_EASY_CLIMB)) == 0))
 	{
@@ -385,8 +385,18 @@ static bool variable_terrain(int *feat, int oldfeat)
 		else oldfeat = FEAT_FLOOR;
 	}
 
+	/* Hack -- place trees to support need tree terrain */
+	if (f_info[*feat].flags3 & (FF3_NEED_TREE))
+	{
+		k = randint(100);
+
+		if (k<=15) *feat = FEAT_TREE;
+		else if (k <= 25) *feat = feat_state(*feat, FS_NEED_TREE);
+		
+		return (TRUE);
+	}
 	/* Hack -- place trees infrequently */
-	if (f_info[*feat].flags3 & (FF3_TREE))
+	else if (f_info[*feat].flags3 & (FF3_TREE))
 	{
 		k = randint(100);
 
@@ -443,9 +453,25 @@ static bool variable_terrain(int *feat, int oldfeat)
 		return (TRUE);
 	}
 	
+	/* Hack -- place 'adjacent terrain' infrequently */
+	if (f_info[*feat].flags3 & (FF3_SPREAD))
+	{
+		k = randint(100);
+
+		if ((k <= 20) && (f_info[*feat].flags2 & (FF2_LAVA))) *feat = FEAT_RUBBLE;
+		else if (k <= 90) *feat = f_info[*feat].edge ? f_info[*feat].edge : oldfeat;
+		else if (k <= 95) *feat = feat_state(*feat, FS_SPREAD);
+		return (TRUE);
+	}
+	
 	/* Some 'special' terrain types */
 	switch (*feat)
 	{
+		/* Hack -- prevent random stone bridges in chasm */
+		case FEAT_CHASM:
+		case FEAT_CHASM_E:
+			return (FALSE);
+		
 		case FEAT_LIMESTONE:
 		{
 			k = randint(100);
@@ -2767,6 +2793,9 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 	byte branch = 0;
 	byte branch_on = 0;
 
+	/* Hack -- diagnostics */
+	if (cheat_room) msg_print("Setting irregular room info.");
+
 	/* Exclude light or dark */
 	if (light) exclude |= RG1_DARK;
 	else exclude |= RG1_LITE;
@@ -3910,7 +3939,7 @@ static void fractal_map_to_room(fractal_map map, byte fractal_type, int y0, int 
 
 					/* Hack -- make variable terrain surrounded by floors */
 					if (((f_info[cave_feat[yy][xx]].flags1 & (FF1_WALL)) != 0) &&
-						(variable_terrain(&tmp_feat,feat))) cave_set_feat(y,x,FEAT_FLOOR);
+						(variable_terrain(&tmp_feat,feat))) cave_set_feat(yy,xx,FEAT_FLOOR);
 
 					build_terrain(yy, xx, tmp_feat);
 				}
@@ -3921,7 +3950,7 @@ static void fractal_map_to_room(fractal_map map, byte fractal_type, int y0, int 
 
 					/* Hack -- make variable terrain surrounded by floors */
 					if (((f_info[cave_feat[yy][xx]].flags1 & (FF1_WALL)) != 0) &&
-						(variable_terrain(&tmp_feat,floor))) cave_set_feat(y,x,FEAT_FLOOR);
+						(variable_terrain(&tmp_feat,floor))) cave_set_feat(yy,xx,FEAT_FLOOR);
 
 					build_terrain(yy, xx, tmp_feat);
 				}
@@ -5262,7 +5291,7 @@ static void build_waves(int y1, int x1, int y2, int x2)
 	/* Reset the loop count */
 	tries = 0;
 
-	/* Join the points using waves (similar to build_tunnel) */
+	/* Join the points using waves */
 	while ((start.x != end.x) || (start.y != end.y))
 	{
 		int x, y, i, wave;
@@ -6985,9 +7014,12 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		{
 			/* Clear previous contents, write terrain */
 			cave_set_feat(y, x, dun->tunn_feat[i]);
-		}		
+			
+			continue;
+		}	
+			
 		/* Apply sewer feature or flood corridor */
-		else if ((flood_tunnel) || ((dun->tunn_feat[i] == 1) && (level_flag & (LF1_SEWER))))
+		if ((flood_tunnel) || ((dun->tunn_feat[i] == 1) && (level_flag & (LF1_SEWER))))
 		{
 			/* Guarantee flooded feature */
 			while (!dun->flood_feat)
@@ -6997,31 +7029,49 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 
 			/* Clear previous contents, write terrain */
 			build_terrain(y, x, dun->flood_feat);
-			
-			/* Only accept LOS / movement squares in tunnels */
-			if (f_info[cave_feat[y][x]].flags1 & (FF1_LOS | FF1_MOVE))
+
+			/*
+			 * Only accept movement squares terrain in tunnels.
+			 * Never fill tunnels with terrain that hits adjacent grids.
+			 */
+			if (((f_info[cave_feat[y][x]].flags1 & (FF1_MOVE))
+				|| (f_info[cave_feat[y][x]].flags3 & (FF3_EASY_CLIMB)))
+				&& ((f_info[dun->flood_feat].flags3 & (FF3_SPREAD | FF3_ADJACENT | FF3_ERUPT)) == 0))
 			{
 				continue;
 			}
 
 			/* Try the edge of the terrain instead */
-			else if (f_info[f_info[dun->flood_feat].edge].flags1 & (FF1_LOS | FF1_MOVE))
+			else if ((f_info[f_info[dun->flood_feat].edge].flags1 & (FF1_MOVE)) ||
+				(f_info[f_info[dun->flood_feat].edge].flags3 & (FF3_EASY_CLIMB)))
 			{
 				cave_set_feat(y, x, f_info[dun->flood_feat].edge);
 				continue;
 			}
-		}		
+
+			/* Force terrain for sewers */
+			else if ((dun->tunn_feat[i] == 1) && (level_flag & (LF1_SEWER)))
+			{
+				continue;
+			}
+		}
+		
 		/* Apply bridge */
-		else if (f_info[cave_feat[y][x]].flags2 & (FF2_BRIDGE))
+		if (f_info[cave_feat[y][x]].flags2 & (FF2_BRIDGE))
 		{
 			/* Bridge previous contents */
 			cave_alter_feat(y, x, FS_BRIDGE);
+			
+			continue;
 		}
+		
 		/* Apply tunnel */
-		else if (f_info[cave_feat[y][x]].flags1 & (FF1_TUNNEL))
+		if (f_info[cave_feat[y][x]].flags1 & (FF1_TUNNEL))
 		{
 			/* Tunnel previous contents */
 			cave_alter_feat(y, x, FS_TUNNEL);
+			
+			continue;
 		}
 	}
 
@@ -7037,15 +7087,18 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		{
 			/* Clear previous contents, write terrain */
 			build_terrain(y, x, dun->flood_feat);
-			
-			/* Only accept LOS / movement squares in tunnels */
-			if (f_info[cave_feat[y][x]].flags1 & (FF1_LOS | FF1_MOVE))
+
+			/* Only accept movement squares in tunnels */
+			if (((f_info[cave_feat[y][x]].flags1 & (FF1_MOVE))
+				|| (f_info[cave_feat[y][x]].flags3 & (FF3_EASY_CLIMB)))
+				&& ((f_info[dun->flood_feat].flags3 & (FF3_SPREAD | FF3_ADJACENT | FF3_ERUPT)) == 0))
 			{
 				continue;
 			}
 
 			/* Try the edge of the terrain instead */
-			else if (f_info[f_info[dun->flood_feat].edge].flags1 & (FF1_LOS | FF1_MOVE))
+			else if ((f_info[f_info[dun->flood_feat].edge].flags1 & (FF1_MOVE)) ||
+				(f_info[f_info[dun->flood_feat].edge].flags3 & (FF3_EASY_CLIMB)))
 			{
 				cave_set_feat(y, x, f_info[dun->flood_feat].edge);
 				continue;
@@ -7081,10 +7134,12 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	if (!end_decor) end_decor = start_decor;
 	
 	/*
-	 * Hack -- 'no LOS'/'no movement' tunnels get flood terrain
+	 * Hack -- 'no movement'/'no spread' tunnels get flood terrain
 	 * added as wall decorations instead.
 	 */
-	if ((flood_tunnel) && ((f_info[dun->flood_feat].flags1 & (FF1_LOS | FF1_MOVE)) == 0))
+	if ((flood_tunnel) && ((((f_info[dun->flood_feat].flags1 & (FF1_MOVE)) == 0)
+		&& ((f_info[dun->flood_feat].flags3 & (FF3_EASY_CLIMB)) == 0))
+		|| ((f_info[dun->flood_feat].flags3 & (FF3_SPREAD | FF3_ADJACENT | FF3_ERUPT)) != 0)))
 	{
 		start_decor = dun->flood_feat;
 		end_decor = dun->flood_feat;
@@ -7895,29 +7950,35 @@ static void build_nature(void)
 				big = FALSE;
 			}
 
-			/* Report creation of lakes/rivers */
-			if (cheat_room)
-			{
-				if (f_info[feat].edge)
-				{
-					msg_format("Building %s%s surrounded by %s.",
-							big ? "big ": "", f_name + f_info[feat].name, f_name + f_info[f_info[feat].edge].name);
-				}
-				else
-				{
-					msg_format ("Building %s%s.", big ? "big ": "", f_name + f_info[feat].name);
-				}
-			}
-
 			/* On surface or dungeon filling ? */
 			if ((level_flag & (LF1_SURFACE)) ||
 				(((f_info[feat].flags1 & (FF1_WALL)) != 0) && !(variable_terrain(&dummy, feat))))
 			{ 
+				/* Report creation of lakes/rivers */
+				if (cheat_room)
+				{
+					if (f_info[feat].edge)
+					{
+						msg_format("Building %s%s surrounded by %s.",
+								big ? "big ": "", f_name + f_info[feat].name, f_name + f_info[f_info[feat].edge].name);
+					}
+					else
+					{
+						msg_format ("Building %s%s.", big ? "big ": "", f_name + f_info[feat].name);
+					}
+				}
+
 				/* Build one lake/river on surface */
 				if (!build_feature(feat, big, merge_lakes)) break;
 			}		
 			else
 			{
+				/* Report creation of lakes/rivers */
+				if (cheat_room)
+				{
+					msg_format ("Flooding dungeon with %s.", f_name + f_info[feat].name);
+				}									
+				
 				/* Flood the dungeon */
 				dun->flood_feat = feat;
 				
@@ -8513,6 +8574,9 @@ static bool place_rooms()
 			&& (rooms_built < room_data[room_type].max_number) && (dun->cent_n < DUN_ROOMS - 1) &&
 				(room_build(dun->cent_n + 1, room_type)))
 		{
+			/* Built room */
+			if (cheat_room) msg_format("Built room type %d.", room_type);
+
 			/* Increase the room built count. */
 			rooms_built += room_data[room_type].count_as;
 
