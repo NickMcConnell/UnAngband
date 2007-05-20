@@ -375,6 +375,7 @@ static int next_to_walls(int y, int x)
 static bool variable_terrain(int *feat, int oldfeat)
 {
 	int k;
+	bool varies = FALSE;
 
 	/* Hack -- ensure variable terrain creates continuous space */
 	if (((f_info[oldfeat].flags1 & (FF1_MOVE)) == 0) &&
@@ -393,7 +394,7 @@ static bool variable_terrain(int *feat, int oldfeat)
 		if (k<=15) *feat = FEAT_TREE;
 		else if (k <= 25) *feat = feat_state(*feat, FS_NEED_TREE);
 		
-		return (TRUE);
+		varies = TRUE;
 	}
 	/* Hack -- place trees infrequently */
 	else if (f_info[*feat].flags3 & (FF3_TREE))
@@ -402,7 +403,7 @@ static bool variable_terrain(int *feat, int oldfeat)
 
 		if (k<=85) *feat = oldfeat;
 		
-		return (TRUE);
+		varies = TRUE;
 	}
 	/* Hack -- place living terrain infrequently */
 	else if (f_info[*feat].flags3 & (FF3_LIVING))
@@ -411,17 +412,17 @@ static bool variable_terrain(int *feat, int oldfeat)
 		if (k<=30) *feat = oldfeat;
 		if (k<=90) *feat = FEAT_GRASS;
 
-		return (TRUE);
+		varies = TRUE;
 	}
 
 	/* Hack -- place 'easy climb' terrain infrequently */
-	if (f_info[*feat].flags3 & (FF3_EASY_CLIMB))
+	else if (f_info[*feat].flags3 & (FF3_EASY_CLIMB))
 	{
 		k = randint(100);
 
 		if ((k <= 20) && (f_info[*feat].flags2 & (FF2_CAN_DIG))) *feat = FEAT_RUBBLE;
 		else if (k<=90) *feat = oldfeat;
-		return (TRUE);
+		varies = TRUE;
 	}
 	
 	/* Hack -- place 'adjacent terrain' infrequently */
@@ -429,43 +430,43 @@ static bool variable_terrain(int *feat, int oldfeat)
 	{
 		k = randint(100);
 
-		if ((k <= 20) && (f_info[*feat].flags2 & (FF2_LAVA))) *feat = FEAT_RUBBLE;
-		else if (k <= 90) *feat = f_info[*feat].edge ? f_info[*feat].edge : oldfeat;
-		else if (k <= 95) *feat = feat_state(*feat, FS_ADJACENT);
-		return (TRUE);
-	}
-
-	/* Hack -- place 'adjacent terrain' infrequently */
-	if (f_info[*feat].flags3 & (FF3_ERUPT))
-	{
-		k = randint(100);
-
-		if (k<=35) *feat = feat_state(*feat, FS_ERUPT);
-		return (TRUE);
-	}
-	
-	/* Hack -- transform some 'timed' terrain */
-	if (f_info[*feat].flags3 & (FF3_TIMED))
-	{
-		k = randint(100);
-
-		if (k<=25) *feat = feat_state(*feat, FS_TIMED);
-		return (TRUE);
-	}
-	
-	/* Hack -- place 'adjacent terrain' infrequently */
-	if (f_info[*feat].flags3 & (FF3_SPREAD))
-	{
-		k = randint(100);
-
-		if ((k <= 20) && (f_info[*feat].flags2 & (FF2_LAVA))) *feat = FEAT_RUBBLE;
-		else if (k <= 90) *feat = f_info[*feat].edge ? f_info[*feat].edge : oldfeat;
+		if ((k <= 90) && ((f_info[f_info[*feat].edge].flags1 & (FF1_MOVE)) != 0)) *feat = f_info[*feat].edge;
+		else if (k <= 90) *feat = oldfeat;
 		else if (k <= 95) *feat = feat_state(*feat, FS_SPREAD);
-		return (TRUE);
+		varies = TRUE;
+	}
+
+	/* Hack -- place 'spreading terrain' infrequently */
+	else if (f_info[*feat].flags3 & (FF3_SPREAD))
+	{
+		k = randint(100);
+
+		if ((k <= 90) && ((f_info[f_info[*feat].edge].flags1 & (FF1_MOVE)) != 0)) *feat = f_info[*feat].edge;
+		else if (k <= 90) *feat = oldfeat;
+		else if (k <= 95) *feat = feat_state(*feat, FS_SPREAD);
+		varies = TRUE;
+	}
+	
+	/* Hack -- place 'erupting terrain' infrequently */
+	else if (f_info[*feat].flags3 & (FF3_ERUPT))
+	{
+		k = randint(100);
+
+		if (k<=90) *feat = feat_state(*feat, FS_ERUPT);
+		varies = TRUE;
+	}
+	
+	/* Hack -- transform most 'timed' terrain */
+	else if (f_info[*feat].flags3 & (FF3_TIMED))
+	{
+		k = randint(100);
+
+		if (k<=90) *feat = feat_state(*feat, FS_TIMED);
+		varies = TRUE;
 	}
 	
 	/* Some 'special' terrain types */
-	switch (*feat)
+	if (*feat == oldfeat) switch (*feat)
 	{
 		/* Hack -- prevent random stone bridges in chasm */
 		case FEAT_CHASM:
@@ -540,46 +541,19 @@ static bool variable_terrain(int *feat, int oldfeat)
 			break;
 		}
 
-		case FEAT_BMUD:
-		{
-			k = randint(100);
-			if (k <= 10) *feat = FEAT_BWATER;
-			if ((k> 10) && (k <= 13)) *feat = FEAT_VENT_BWATER;
-			break;
-		}
-
-		case FEAT_GEOTH:
-		{
-			k = randint(100);
-			if (k <= 5) *feat = FEAT_VENT_STEAM;
-			if ((k> 5) && (k <= 10)) *feat = FEAT_VENT_GAS;
-			break;
-		}
-
-		case FEAT_GEOTH_LAVA:
-		{
-			k = randint(100);
-			if (k <= 5) *feat = FEAT_LAVA_H;
-			if ((k> 5) && (k <= 10)) *feat = FEAT_LAVA;
-			if ((k> 10) && (k <= 13)) *feat = FEAT_VENT_LAVA;
-			break;
-		}
-
 		default:
 		{
 			if ((f_info[*feat].edge) && ((f_info[f_info[*feat].edge].flags1 & (FF1_MOVE)) != 0))
 			{
 				k = randint(100);
 
-				if (k<=25) *feat = f_info[*feat].edge;
-				return (TRUE);
+				if (k<=20) *feat = f_info[*feat].edge;
+				varies = TRUE;
 			}
-		
-			return(FALSE);
 		}
 	}
 
-	return (TRUE);
+	return (varies);
 }
 
 
@@ -1630,6 +1604,17 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 		int wall = ((flag & (RG1_MAZE_WALL)) != 0) ? feat : (((flag & (RG1_MAZE_DECOR)) != 0) ? FEAT_FLOOR : FEAT_WALL_INNER);
 		int path = ((flag & (RG1_MAZE_PATH)) != 0) ? feat : (edge && (edge != feat) ? edge : FEAT_FLOOR);
 
+		/* Hack -- swap path and wall if path does not allow movement */
+		if (((f_info[path].flags1 & (FF1_MOVE)) == 0) && ((f_info[path].flags3 & (FF3_EASY_CLIMB)) == 0))
+		{
+			int temp = wall;
+			wall = path;
+			path = temp;
+			
+			/* Paranoia */
+			if (((f_info[path].flags1 & (FF1_MOVE)) == 0) && ((f_info[path].flags3 & (FF3_EASY_CLIMB)) == 0)) path = FEAT_FLOOR;
+		}
+
 		/* Ensure the correct ordering and that size is odd in both directions */
 		if ((dy > 0) && (dx > 0)) draw_maze(y1, x1, y1 + (y2 % 2 ? y2 : y2 - 1), x1 + (x2 % 2 ? x2 : x2 - 1), wall, path);
 		else if ((dy < 0) && (dx > 0)) draw_maze(y2, x1, y1 + (y2 % 2 ? y1 : y1 - 1), x1 + (x2 % 2 ? x2 : x2 - 1), wall, path);
@@ -2264,35 +2249,6 @@ static bool cave_feat_pool(int f_idx)
 
 	/* All remaining lake features will be fine */
 	return (cave_feat_lake(f_idx));
-}
-
-
-/*
- * Returns TRUE if f_idx is a valid island feature
- */
-static bool cave_feat_island(int f_idx)
-{
-	feature_type *f_ptr = &f_info[f_idx];
-
-	/* Ignore non-lake features */
-	if (!(f_ptr->flags2 & (FF2_LAKE)))
-	{
-		return (FALSE);
-	}
-
-	/* Hack -- Ignore solid features, unless climbable */
-	if (((f_ptr->flags1 & (FF1_MOVE)) == 0) && ((f_ptr->flags3 & (FF3_EASY_CLIMB)) == 0))
-	{
-		return (FALSE);
-	}
-
-	/* Ignore shallow, deep or filled features */
-	if ((f_ptr->flags2 & (FF2_SHALLOW | FF2_DEEP | FF2_FILLED)) != 0)
-	{
-		return (FALSE);
-	}
-
-	return (TRUE);
 }
 
 
