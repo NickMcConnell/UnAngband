@@ -6198,8 +6198,8 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 							col1 - col_dir + row_dir * (((style & (TUNNEL_LARGE_R)) != 0) ? 2 : 1),
 							dun->tunn_n);
 
-			/* Decorated */
-			decor_flag = TRUE;
+			/* Force decoration */
+			decor_flag = FALSE;
 		}
 
 		/* Try moving randomly if we seem stuck. */
