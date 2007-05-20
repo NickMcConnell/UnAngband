@@ -2988,7 +2988,6 @@ void monster_death(int m_idx)
 	int dump_gold = 0;
 
 	int number = 0;
-	int total = 0;
 
 	s16b this_o_idx, next_o_idx = 0;
 
@@ -4158,7 +4157,7 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 
 				/* Record last buffer for language */
 				last_buf = text_always;
-				last_buf_s = text_always;
+				last_buf_s = text_always_s;
 
 				/* Diagnostics */
 				if ((cheat_xtra) && (text_always)) my_strcat(text_always, format("%d", i), text_always_s);
