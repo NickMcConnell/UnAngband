@@ -882,7 +882,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		/* Hack -- Gold */
 		case TV_GOLD:
 		{
-			my_strcpy(buf, basenm, sizeof(buf));
+			my_strcpy(buf, basenm, max);
 			return;
 		}
 
@@ -960,7 +960,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		/* Hack -- Default -- Used in the "inventory" routine */
 		default:
 		{
-			my_strcpy(buf, "(nothing)", sizeof(buf));
+			my_strcpy(buf, "(nothing)", max);
 			return;
 		}
 	}
@@ -3107,7 +3107,7 @@ void show_floor(const int *floor_list, int floor_num)
 		out_color[k] = tval_to_attr[o_ptr->tval % N_ELEMENTS(tval_to_attr)];
 
 		/* Save the object description */
-		my_strcpy(out_desc[k], o_name, sizeof(out_desc[0]));
+		my_strcpy(out_desc[k], o_name, sizeof(out_desc[k]));
 
 		/* Find the predicted "line length" */
 		l = strlen(out_desc[k]) + 5;

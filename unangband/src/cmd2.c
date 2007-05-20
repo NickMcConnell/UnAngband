@@ -3354,7 +3354,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 	x = p_ptr->px;
 	
 	/* Test for fumble - coated weapons are riskier thrown/shot then wielded */
-	if (((p_ptr->heavy_wield) || (o_ptr->ident & (IDENT_CURSED)) || (coated_p(o_ptr))) && (!rand_int(ranged_skill)))
+	if (((p_ptr->heavy_wield) || (cursed_p(o_ptr)) || (coated_p(o_ptr))) && (!rand_int(ranged_skill)))
 	{
 		int dir;
 		
