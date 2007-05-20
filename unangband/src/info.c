@@ -1592,7 +1592,7 @@ bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detai
  *
  * Note they do not take account of modifiers to player level.
  */
-void spell_info(char *p, int spell, bool use_level)
+void spell_info(char *p, int p_s, int spell, bool use_level)
 {
 	cptr q;
 
@@ -3575,7 +3575,7 @@ void print_powers(const s16b *book, int num, int y, int x)
 		s_ptr = &s_info[spell];
 
 		/* Get extra info */
-		spell_info(info, spell, FALSE);
+		spell_info(info, sizeof(info), spell, FALSE);
 
 		/* Use that info */
 		comment = info;
@@ -3677,7 +3677,7 @@ void print_spells(const s16b *sn, int num, int y, int x)
 		}
 
 		/* Get extra info */
-		spell_info(info, spell, TRUE);
+		spell_info(info, sizeof(info), spell, TRUE);
 
 		/* Get level */
 		level = spell_level(spell);

@@ -141,7 +141,7 @@ static const grouper group_item[] =
 /*
  * Describe the kind
  */
-static void kind_info(char *buf, char *dam, char *wgt, char *pow, int *lev, s32b *val, int k)
+static void kind_info(char *buf, int buf_s, char *dam, int dam_s, char *wgt, int wgt_s, char *pow, int pow_s, int *lev, s32b *val, int k)
 {
 	object_kind *k_ptr;
 
@@ -264,7 +264,7 @@ static void kind_info(char *buf, char *dam, char *wgt, char *pow, int *lev, s32b
 	/* Power */
 	else if (book[0])
 	{
-		spell_info(pow,book[0],0);
+		spell_info(pow,sizeof(pow), book[0],0);
 	}
 
 }
@@ -331,8 +331,8 @@ static void spoil_obj_desc(cptr fname)
 					s32b t1;
 					s32b t2;
 
-					kind_info(NULL, NULL, NULL, NULL, &e1, &t1, who[i1]);
-					kind_info(NULL, NULL, NULL, NULL, &e2, &t2, who[i2]);
+					kind_info(NULL, 0, NULL, 0, NULL, 0, NULL, 0, &e1, &t1, who[i1]);
+					kind_info(NULL, 0, NULL, 0, NULL, 0, NULL, 0, &e2, &t2, who[i2]);
 
 					if ((t1 > t2) || ((t1 == t2) && (e1 > e2)))
 					{
@@ -350,7 +350,7 @@ static void spoil_obj_desc(cptr fname)
 				s32b v;
 
 				/* Describe the kind */
-				kind_info(buf, dam, wgt, pow, &e, &v, who[s]);
+				kind_info(buf, sizeof(buf), dam, sizeof(dam), wgt, sizeof(wgt), pow, sizeof(pow), &e, &v, who[s]);
 
 				/* Dump it */
                                 fprintf(fff, "  %-37s%7s%6s%4d%9ld%-12s\n",
@@ -456,8 +456,8 @@ static void spoil_object(cptr fname)
 					s32b t1;
 					s32b t2;
 
-					kind_info(NULL, NULL, NULL, NULL, &e1, &t1, who[i1]);
-					kind_info(NULL, NULL, NULL, NULL, &e2, &t2, who[i2]);
+					kind_info(NULL, 0, NULL, 0, NULL, 0, NULL, 0, &e1, &t1, who[i1]);
+					kind_info(NULL, 0, NULL, 0, NULL, 0, NULL, 0, &e2, &t2, who[i2]);
 
 					if ((t1 > t2) || ((t1 == t2) && (e1 > e2)))
 					{
