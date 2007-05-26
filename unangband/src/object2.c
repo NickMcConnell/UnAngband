@@ -5928,50 +5928,46 @@ bool break_near(object_type *j_ptr, int y, int x)
 			/* Get item effect */
 			get_spell(&power, "use", j_ptr, FALSE);
 
-			/* Has a power */
-			/* Always apply powers if ammunition */
-			if (power > 0)
+			/* Hack -- use power 0 for fake potion effects */
+			spell_type *s_ptr = &s_info[power];
+
+			/* Scan through all four blows */
+			for (i = 0; i < 4; i++)
 			{
-				spell_type *s_ptr = &s_info[power];
+				effect = s_ptr->blow[i].effect;
+				method = s_ptr->blow[i].method;
+				d_dice = s_ptr->blow[i].d_dice;
+				d_side = s_ptr->blow[i].d_side;
+				d_plus = s_ptr->blow[i].d_plus;
 
-				/* Scan through all four blows */
-				for (i = 0; i < 4; i++)
+				/* Hack -- no more attacks. Mega hack - 'fake' the first attack. */
+				if (i && !method) break;
+
+				/* Message */
+				if (!i && rad) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
+				if (!i && !rad) msg_format("The %s burst%s into flames.",o_name, (plural ? "" : "s"));
+
+				/* Mega hack --- spells in objects */
+				if (!d_side)
 				{
-					effect = s_ptr->blow[i].effect;
-					method = s_ptr->blow[i].method;
-					d_dice = s_ptr->blow[i].d_dice;
-					d_side = s_ptr->blow[i].d_side;
-					d_plus = s_ptr->blow[i].d_plus;
-
-					/* Hack -- no more attacks */
-					if (!method) break;
-
-					/* Message */
-					if (!i && rad) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
-					if (!i && !rad) msg_format("The %s burst%s into flames.",o_name, (plural ? "" : "s"));
-
-					/* Mega hack --- spells in objects */
-					if (!d_side)
-					{
-						d_plus += 25 * d_dice;
-					}
-
-					/* Roll out the damage */
-					if ((d_dice) && (d_side))
-					{
-						damage = damroll(d_dice, d_side) + d_plus;
-					}
-					else
-					{
-						damage = d_plus;
-					}
-
-					flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
-
-					/* Hit with radius 1 attack */
-					obvious |= project(SOURCE_PLAYER_BREAK, j_ptr->k_idx, rad, y, x, y, x, damage * j_ptr->number,
-						 effect, flg, 0, 0);
+					d_plus += 25 * d_dice;
 				}
+
+				/* Roll out the damage */
+				if ((d_dice) && (d_side))
+				{
+					damage = damroll(d_dice, d_side) + d_plus;
+				}
+				else
+				{
+					damage = d_plus;
+				}
+
+				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
+
+				/* Hit with projection */
+				obvious |= project(SOURCE_PLAYER_BREAK, j_ptr->k_idx, rad, y, x, y, x, damage * j_ptr->number,
+					effect, flg, 0, 0);
 
 				/* Object is used */
 				if ((obvious) && (k_info[j_ptr->k_idx].used < MAX_SHORT)) k_info[j_ptr->k_idx].used++;

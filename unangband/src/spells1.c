@@ -7017,21 +7017,28 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			/* Irrelevant */
 			skipped = TRUE;
 
-			/* No damage */
-			dam = 0;
-
 			break;
 		}
 	}
 
 
 	/* Absolutely no effect */
-	if (skipped) return (FALSE);
+	if (skipped)
+	{
+		/* Skip further if applied to a target known to be unaffected */
+		if (who <= SOURCE_PLAYER_NO_TARGET)
+			 return (FALSE);
 
+		if (seen) note = " is unaffected!";
+
+		obvious = FALSE;
+
+		/* No damage */
+		dam = 0;
+	}
 
 	/* "Unique" monsters cannot be polymorphed */
 	if (r_ptr->flags1 & (RF1_UNIQUE)) do_poly = FALSE;
-
 
 	/* "Unique" monsters can only be "killed" by the player */
 	if (r_ptr->flags1 & (RF1_UNIQUE))
