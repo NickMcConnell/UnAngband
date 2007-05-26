@@ -1784,7 +1784,8 @@ static bool do_cmd_disarm_aux(int y, int x, bool disarm)
 
 		    i_ptr = &object_type_body;
 
-		    make_feat(i_ptr, y, x);
+			/* Don't drop an object if a player trap */
+		    if (!cave_o_idx[y][x]) make_feat(i_ptr, y, x);
 
 		    /* Remove the trap */
 		    cave_alter_feat(y, x, FS_DISARM);
@@ -1805,24 +1806,6 @@ static bool do_cmd_disarm_aux(int y, int x, bool disarm)
 
 		/* We may keep trying */
 		more = TRUE;
-
-		/* Remove the trap */
-		if (!disarm)
-		  {
-		    /* A hack to e.g. get Flasks of Oil, etc. from traps */
-		    object_type *i_ptr;
-		    object_type object_type_body;
-
-		    i_ptr = &object_type_body;
-
-		    make_feat(i_ptr, y, x);
-
-		    /* Remove the trap */
-		    cave_alter_feat(y, x, FS_DISARM);
-
-		    /* Update the visuals */
-		    p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-		  }
 	}
 
 	/* Failure -- Set off the trap */
