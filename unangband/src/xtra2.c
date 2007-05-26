@@ -4125,7 +4125,7 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 				else if (last_buf)
 				{
 					/* Fake it */
-					my_strcat(last_buf, "nothing you can understand.  ", last_buf_s);
+					my_strcat(last_buf, "something you cannot understand.  ", last_buf_s);
 
 					/* Clear last buf to skip remaining language lines */
 					last_buf = NULL;

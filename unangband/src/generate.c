@@ -437,7 +437,7 @@ static bool variable_terrain(int *feat, int oldfeat)
 	}
 
 	/* Hack -- place 'spreading terrain' infrequently */
-	else if (f_info[*feat].flags3 & (FF3_SPREAD))
+	if (f_info[*feat].flags3 & (FF3_SPREAD))
 	{
 		k = randint(100);
 
@@ -448,7 +448,7 @@ static bool variable_terrain(int *feat, int oldfeat)
 	}
 	
 	/* Hack -- place 'erupting terrain' infrequently */
-	else if (f_info[*feat].flags3 & (FF3_ERUPT))
+	if (f_info[*feat].flags3 & (FF3_ERUPT))
 	{
 		k = randint(100);
 
@@ -457,11 +457,11 @@ static bool variable_terrain(int *feat, int oldfeat)
 	}
 	
 	/* Hack -- transform most 'timed' terrain */
-	else if (f_info[*feat].flags3 & (FF3_TIMED))
+	if (f_info[*feat].flags3 & (FF3_TIMED))
 	{
 		k = randint(100);
 
-		if (k<=90) *feat = feat_state(*feat, FS_TIMED);
+		if (k<=25) *feat = feat_state(*feat, FS_TIMED);
 		varies = TRUE;
 	}
 	
@@ -2523,14 +2523,16 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 
 			/* Save index if we have anything to describe */
 			/* Note hack for efficiency */
-			if ((((*name & (PICKED_NAME2)) == 0) && (strlen(d_name + d_info[i].name1) > 0))
-				|| ( ((*name & (PICKED_NAME2)) == 0) && (strlen(d_name + d_info[i].name2) > 0))
+			if (((((*name) & (PICKED_NAME1)) == 0) && (strlen(d_name + d_info[i].name1) > 0))
+				|| ( (((*name) & (PICKED_NAME2)) == 0) && (strlen(d_name + d_info[i].name2) > 0))
 				|| (strlen(d_text + d_info[i].text) > 0))
 			{
 				/* Paranoia */
 				if ((room < DUN_ROOMS) && (*j < ROOM_DESC_SECTIONS))
 				{
 					room_info[room].section[(*j)++] = i;
+					
+					if (cheat_room) msg_format("Saving room info %d.",i);
 				}
 
 				if (strlen(d_name + d_info[i].name1) > 0) *name |= PICKED_NAME1;
@@ -2661,8 +2663,8 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
  * Set room flags.
  *
  * Use the get_room_info function to set room flags only, not place anything.
- * We do this for interesting rooms, vaults and anywhere else that we do not
- * explicitly generate room contents.
+ * We do this for interesting rooms, vaults, flooded rooms of all types and
+ * anywhere else that we do not explicitly generate room contents.
  */
 static void set_room_flags(int room, int type, bool light)
 {
@@ -2680,7 +2682,6 @@ static void set_room_flags(int room, int type, bool light)
 
 	byte branch = 0;
 	byte branch_on = 0;
-	
 
 	/* Exclude light or dark */
 	if (light) exclude |= RG1_DARK;
@@ -2775,6 +2776,14 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 		{
 			room_info[room].flags &= (ROOM_BRIDGED);			
 		}
+
+		/* Get 'flooded' room flags. This is always 'boring'. */
+		set_room_flags(room, ROOM_NORMAL, light);
+		
+		/* Type */
+		room_info[room].type = type;
+
+		return;
 	}
 
 	/* Get room info */
@@ -3010,6 +3019,14 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	{
 		/* Has edge we can move around. Treat as not flooded. */
 		if (room_info[room].flags & (ROOM_EDGED)) room_info[room].flags &= ~(ROOM_FLOODED);
+		
+		/* Get 'flooded' room flags. This is always 'boring'. */
+		set_room_flags(room, ROOM_NORMAL, light);
+		
+		/* Type */
+		room_info[room].type = type;
+
+		return (TRUE);
 	}
 
 	/* Get room info */
@@ -7532,10 +7549,10 @@ static bool build_type7(int room, int type)
 	set_room_flags(room, type, light);
 
 	/* Paranoia */
-	if (dun->cent_n < DUN_ROOMS)
+	if (room < DUN_ROOMS)
 	{
 		/* Initialize room description */
-		room_info[dun->cent_n].type = ROOM_CHAMBERS;
+		room_info[room].type = ROOM_CHAMBERS;
 	}
 
 	return (TRUE);
@@ -7611,25 +7628,25 @@ static bool build_type8910(int room, int type)
 	set_room_flags(room, type, FALSE);
 
 	/* Paranoia */
-	if (dun->cent_n < DUN_ROOMS)
+	if (room < DUN_ROOMS)
 	{
 		switch (type)
 		{
 			case 8:
 				/* Initialize room description */
-				room_info[dun->cent_n].type = ROOM_INTERESTING;
+				room_info[room].type = ROOM_INTERESTING;
 
 				break;
 
 			case 9:
 				/* Initialize room description */
-				room_info[dun->cent_n].type = ROOM_LESSER_VAULT;
+				room_info[room].type = ROOM_LESSER_VAULT;
 
 				break;
 
 			case 10:
 				/* Initialize room description */
-				room_info[dun->cent_n].type = ROOM_GREATER_VAULT;
+				room_info[room].type = ROOM_GREATER_VAULT;
 
 				break;
 		}
