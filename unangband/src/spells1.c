@@ -369,11 +369,24 @@ void teleport_away(int m_idx, int dis)
 			break;
 		}
 
+		/* Paranoia -- have exhausted looking for space in dungeon */
+		if ((dis >= 200) && (min <= 0))
+		{
+			/* Sound */
+			sound(MSG_TPOTHER);
+			
+ 			/* Delete monster instead */
+			delete_monster_idx(m_idx);
+
+			return;
+		}
+
 		/* Increase the maximum distance */
 		dis = dis * 2;
 
 		/* Decrease the minimum distance */
 		min = min / 2;
+		
 	}
 
 	/* Sound */

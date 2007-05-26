@@ -6301,7 +6301,8 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		if (f_info[cave_feat[tmp_row][tmp_col]].flags1 & (FF1_SOLID)) continue;
 
 		/* Pierce "outer" walls of rooms */
-		if (f_info[cave_feat[tmp_row][tmp_col]].flags1 & (FF1_OUTER))
+		if ((f_info[cave_feat[tmp_row][tmp_col]].flags1 & (FF1_OUTER)) &&
+			(((room_has_flag(tmp_row, tmp_col, (ROOM_EDGED))) == 0) || !(near_edge(tmp_row, tmp_col))))
 		{
 			int wall1 = dun->wall_n;
 			bool door = TRUE;
@@ -8780,6 +8781,17 @@ static bool place_tunnels()
 			else if ((r1 >= 0) && (r2 >= 0) && (r1 != r2))
 			{
 				if (build_tunnel(dun->cent[r1].y, dun->cent[r1].x, dun->cent[r2].y, dun->cent[r2].x, TRUE)) retries = 0;
+			}
+			
+			/* Try 'forcing' way into irregular rooms */
+			if (((retries > 5 * DUN_TRIES) && (room_info[r1].type > ROOM_HUGE_CENTRE)) || (retries > 6 * DUN_TRIES))
+			{
+				/* Ignore outer walls */
+				if ((room_info[r1].flags & (ROOM_EDGED)) == 0)
+				{
+					retries = 0;
+					room_info[r1].flags |= (ROOM_EDGED);
+				}
 			}
 		}
 
