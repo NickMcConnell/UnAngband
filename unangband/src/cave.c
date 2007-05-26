@@ -4207,11 +4207,13 @@ void update_dyna(void)
 		if (f_ptr->flags3 & (FF3_ADJACENT))
 		{
 			int yy, xx, adjfeat, dir;
+			byte affected = 0;
 
 			for (dir = 0; dir < 8; dir ++)
 			{
-				/* Hack -- skip diagonals 50% of the time */
-				if ((dir > 3) && (rand_int(100) < 50)) continue;
+				/* Hack -- skip diagonals 50% of the time, as long as adjacent cardinal direction affected */
+				if ((dir > 3) && (rand_int(100) < 50) &&
+					(((affected & (1 << side_dirs[dir][1])) != 0) || ((affected & (1 << side_dirs[dir][2])) != 0))) continue;
 
 				yy = y + ddy_ddd[dir];
 				xx = x + ddx_ddd[dir];
@@ -4229,6 +4231,8 @@ void update_dyna(void)
 				if (adjfeat != cave_feat[yy][xx]) 
 				{
 					int j;
+
+					affected |= dir;
 
 					for (j = i + 1; j < temp_dyna_n; j++)
 					if (temp_dyna_g[j] == GRID(yy,xx))

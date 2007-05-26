@@ -4253,7 +4253,6 @@ void entomb(int cy, int cx, byte invalid)
 	/* Entomb the player */
 	if (cave_m_idx[cy][cx] < 0)
 	{
-
 		/* Check around the player */
 		for (i = 0; i < 8; i++)
 		{
@@ -4274,32 +4273,11 @@ void entomb(int cy, int cx, byte invalid)
 			sy = y; sx = x;
 		}
 
-		/* Random message */
-		switch (randint(3))
-		{
-			case 1:
-			{
-				msg_print("The cave ceiling collapses!");
-				break;
-			}
-			case 2:
-			{
-				msg_print("The cave floor twists in an unnatural way!");
-				break;
-			}
-			default:
-			{
-				msg_print("The cave quakes!");
-				msg_print("You are pummeled with debris!");
-				break;
-			}
-		}
-
 		/* Hurt the player a lot */
 		if (!sn)
 		{
 			/* Message and damage */
-			msg_print("You are severely crushed!");
+			msg_format("You are crushed by the %s!", f_name + f_info[cave_feat[cy][cx]].name);
 			damage = 300;
 		}
 
@@ -4311,20 +4289,20 @@ void entomb(int cy, int cx, byte invalid)
 			{
 				case 1:
 				{
-					msg_print("You nimbly dodge the blast!");
+					msg_format("You nimbly dodge the %s!", f_name + f_info[cave_feat[cy][cx]].name);
 					damage = 0;
 					break;
 				}
 				case 2:
 				{
-					msg_print("You are bashed by rubble!");
+					msg_format("You are bashed by %s!", f_name + f_info[cave_feat[cy][cx]].name);
 					damage = damroll(10, 4);
 					(void)set_stun(p_ptr->stun + randint(50));
 					break;
 				}
 				case 3:
 				{
-					msg_print("You are crushed between the floor and ceiling!");
+					msg_format("You are crushed between the %s and ceiling!", f_name + f_info[cave_feat[cy][cx]].name);
 					damage = damroll(10, 4);
 					(void)set_stun(p_ptr->stun + randint(50));
 					break;
@@ -4336,7 +4314,7 @@ void entomb(int cy, int cx, byte invalid)
 		}
 
 		/* Take some damage */
-		if (damage) take_hit(damage, "an earthquake");
+		if (damage) take_hit(damage, format("being entombed by %s", f_name + f_info[cave_feat[cy][cx]].name));
 	}
 	/* Entomb a monster */
 	else if (cave_m_idx[cy][cx] > 0)

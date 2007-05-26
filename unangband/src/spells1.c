@@ -3699,8 +3699,8 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 	/* Check for monster */
 	if (feat != cave_feat[y][x])
 	{
-		/* Monster was affected -- Mark grid for later processing. */
-		if (cave_m_idx[y][x] > 0) cave_temp_mark(y, x, FALSE);
+		/* Player or monster was affected -- Mark grid for later processing. */
+		if (cave_m_idx[y][x] != 0) cave_temp_mark(y, x, FALSE);
 	}
 
 	/* Return "Anything seen?" */
@@ -6817,8 +6817,9 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		{
 			if (seen) obvious = TRUE;
 
-			if (place_monster_here(y, x, m_ptr->r_idx) <= MM_FAIL) 
-			  entomb(y, x, 0x0L);
+			/* Monster was affected -- Mark grid for later processing. */
+			cave_temp_mark(y, x, FALSE);
+
 			break;
 		}
 
@@ -10555,7 +10556,7 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 		case GF_SALT_WATER:
 		case GF_SUFFOCATE:
 		{
-
+			/* XXX To do */
 			break;
 		}
 
@@ -10648,8 +10649,8 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 		}
 	}
 
-	/* Check if monster cannot survive on terrain and possibly entomb */
-	if (affect_monster)
+	/* Not teleporting: check if player or monster cannot survive on changed terrain and possibly entomb */
+	else
 	{
 		byte blocked = 0x00;
 
@@ -10660,8 +10661,18 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Check if monster can move and survive in terrain */
-		if (place_monster_here(y, x, m_ptr->r_idx) <= MM_FAIL) 
-		  entomb(y, x, blocked);
+		if ((affect_monster) && (place_monster_here(y, x, m_ptr->r_idx) <= MM_FAIL))
+		{
+			/* Entomb monster */
+			entomb(y, x, blocked);
+		}
+		/* Check if player can move in terrain */
+		else if (affect_player && ((f_info[cave_feat[y][x]].flags1 & (FF1_MOVE)) == 0)
+			&& ((f_info[cave_feat[y][x]].flags3 & (FF3_EASY_CLIMB)) == 0))
+		{
+			/* Entomb player */
+			entomb(y, x, blocked);			
+		}
 	}
 
 	if (affect_monster)
