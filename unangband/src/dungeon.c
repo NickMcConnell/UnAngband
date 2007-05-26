@@ -235,7 +235,7 @@ static void sense_inventory(void)
 		/* Hack -- we seem to get a source of corrupt objects that crash this routine. Putting this warning in. */
 		if ((o_ptr->k_idx >= z_info->k_max) || (o_ptr->k_idx < 0))
 		{
-			msg_format("BUG: Object corruption detected (%d). Please report.",o_ptr->k_idx);
+			msg_format("BUG: Object corruption detected (kind %d, held by %s). Please report.",o_ptr->k_idx, o_ptr->held_m_idx ? r_name + r_info[o_ptr->held_m_idx].name : "floor");
 
 			o_ptr->k_idx = 0;
 			continue;

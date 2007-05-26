@@ -1645,7 +1645,7 @@ static int mon_inven_damage(int m_idx, inven_func typ, int perc)
 					   ((amt > 1) ? "were" : "was"));
 
 				/* Destroy "amt" items */
-				if (k < o_ptr->number) o_ptr->number -= k;
+				if (amt < o_ptr->number) o_ptr->number -= amt;
 
 				/* Delete the object */
 				else delete_object_idx(this_o_idx);
