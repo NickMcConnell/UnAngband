@@ -10357,7 +10357,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 	{
 		char output[1024];
 
-		disease_desc(output, old_disease, p_ptr->disease);
+		disease_desc(output, sizeof(output), old_disease, p_ptr->disease);
 
 		msg_print(output);
 

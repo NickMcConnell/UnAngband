@@ -839,7 +839,7 @@ extern void identify_pack(void);
 extern bool remove_curse(void);
 extern bool remove_all_curse(void);
 extern bool restore_level(void);
-extern bool disease_desc(char *desc, u32b old_disease, u32b new_disease);
+extern bool disease_desc(char *desc, size_t desc_s, u32b old_disease, u32b new_disease);
 extern void self_knowledge_aux(bool spoil, bool random);
 extern void self_knowledge(bool spoil);
 extern bool lose_all_info(void);

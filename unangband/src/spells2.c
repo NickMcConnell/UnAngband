@@ -404,7 +404,7 @@ bool restore_level(void)
 /*
  *  Prints the diseases that the player is afflicted with or cured of.
  */
-bool disease_desc(char *desc, u32b old_disease, u32b new_disease)
+bool disease_desc(char *desc, size_t desc_s, u32b old_disease, u32b new_disease)
 {
 	cptr vp[64];
 
@@ -415,12 +415,12 @@ bool disease_desc(char *desc, u32b old_disease, u32b new_disease)
 	/* Getting worse */
 	if ((disease = (new_disease & ~(old_disease))))
 	{
-		strcpy(desc,"You are afflicted with ");
+		my_strcpy(desc,"You are afflicted with ", desc_s);
 	}
 	/* Getting better */
 	else if ((disease = (old_disease & ~(new_disease))))
 	{
-		strcpy(desc,"You are cured of ");
+		my_strcpy(desc,"You are cured of ", desc_s);
 	}
 	/* No change */
 	else
@@ -440,11 +440,11 @@ bool disease_desc(char *desc, u32b old_disease, u32b new_disease)
 	{
 		/* Intro */
 		if (n == 0) { }
-		else if (n < vn-1) my_strcat(desc,", ", sizeof(desc));
-		else my_strcat(desc," and ", sizeof(desc));
+		else if (n < vn-1) my_strcat(desc,", ", desc_s);
+		else my_strcat(desc," and ", desc_s);
 
 		/* Dump */
-		my_strcat(desc,vp[n], sizeof(desc));
+		my_strcat(desc,vp[n], desc_s);
 	}
 
 	/* Collect causes */
@@ -458,16 +458,16 @@ bool disease_desc(char *desc, u32b old_disease, u32b new_disease)
 	for (n = 0; n < vn; n++)
 	{
 		/* Intro */
-		if (n == 0) { if ((disease & ((1 << DISEASE_TYPES_HEAVY) -1)) != 0) my_strcat(desc, " caused by ", sizeof(desc)); }
-		else if (n < vn-1) my_strcat(desc,", ", sizeof(desc));
-		else my_strcat(desc," and ", sizeof(desc));
+		if (n == 0) { if ((disease & ((1 << DISEASE_TYPES_HEAVY) -1)) != 0) my_strcat(desc, " caused by ", desc_s); }
+		else if (n < vn-1) my_strcat(desc,", ", desc_s);
+		else my_strcat(desc," and ", desc_s);
 
 		/* Dump */
-		my_strcat(desc,vp[n], sizeof(desc));
+		my_strcat(desc,vp[n], desc_s);
 	}
 
 	/* Dump */
-	my_strcat(desc,".", sizeof(desc));
+	my_strcat(desc,".", desc_s);
 
 	return(TRUE);
 }
@@ -560,7 +560,7 @@ void self_knowledge_aux(bool spoil, bool random)
 		healthy = FALSE;
 
 		/* Describe diseases */
-		if (disease_desc(output, 0, p_ptr->disease))
+		if (disease_desc(output, sizeof(output), 0, p_ptr->disease))
 		{
 			text_out(format("%s  ", output));
 		}
@@ -7179,14 +7179,14 @@ bool process_spell_types(int spell, int level, bool *cancel)
 				{
 					char output[1024];
 
-					disease_desc(output, old_disease, p_ptr->disease);
+					disease_desc(output, sizeof(output), old_disease, p_ptr->disease);
 					msg_print(output);
 
 					p_ptr->redraw |= (PR_DISEASE);
 
 					if (p_ptr->disease)
 					{
-						disease_desc(output, p_ptr->disease, 0x0L);
+						disease_desc(output, sizeof(output), p_ptr->disease, 0x0L);
 						msg_print(output);
 					}
 				}
