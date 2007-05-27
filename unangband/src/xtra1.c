@@ -3334,11 +3334,19 @@ static void calc_bonuses(void)
 
 	/* Penalty for SIZ over STR */
 	if (p_ptr->stat_ind[A_SIZ] > p_ptr->stat_ind[A_STR])
-	  {
-	    int use, ind;
-	    int penalty = (p_ptr->stat_ind[A_SIZ] - p_ptr->stat_ind[A_STR]) / 2;
+	{
+	    int use, top, ind;
+	    
+	    p_ptr->siz_penalty = (p_ptr->stat_ind[A_SIZ] - p_ptr->stat_ind[A_STR]) / 2;
+
+		/* Extract the new "stat_top" value for the stat */
+		top = modify_stat_value(p_ptr->stat_max[A_AGI], -p_ptr->siz_penalty);
+
+		/* Save the new value */
+		p_ptr->stat_top[A_AGI] = top;
+
 	    /* Extract the new "stat_use" from the old "stat_use" */
-	    use = modify_stat_value(p_ptr->stat_use[A_AGI], -penalty);
+	    use = modify_stat_value(p_ptr->stat_use[A_AGI], -p_ptr->siz_penalty);
 
 	    /* Save the new value */
 	    p_ptr->stat_use[A_AGI] = use;
@@ -3354,7 +3362,11 @@ static void calc_bonuses(void)
 
 	    /* Save the new index */
 	    p_ptr->stat_ind[A_AGI] = ind;
-	  }
+	}
+	else
+	{
+		p_ptr->siz_penalty = 0;
+	}
 
 
 	/*** Temporary flags ***/

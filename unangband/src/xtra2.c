@@ -2575,7 +2575,7 @@ static void improve_stat(void)
 				sprintf(buf,"Improve which attribute%s (%d)", count > 1 ? "s" : "", count - stat_gain_selected); 
 
 				/* Select stat to improve */
-				if (get_list(print_stats, table, A_MAX, "Attribute", buf, 1, 41, &(stat_gain_selection[stat_gain_selected])))
+				if (get_list(print_stats, table, A_MAX, "Attribute", buf, 1, 36, &(stat_gain_selection[stat_gain_selected])))
 				{
 					/* Check if stat at maximum */
 					if (p_ptr->stat_max[stat_gain_selection[stat_gain_selected]] >= 18 + 999)
@@ -2607,7 +2607,7 @@ static void improve_stat(void)
 		screen_save();
 
 		/* Redisplay stats */
-		print_stats(table, A_MAX, 1, 41);
+		print_stats(table, A_MAX, 1, 36);
 
 		/* Confirm? */
 		if (get_check("Increasing highlighted stats. Are you sure? "))

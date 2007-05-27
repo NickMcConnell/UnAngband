@@ -1471,7 +1471,7 @@ static void display_player_xtra_info(void)
 	c_put_str(TERM_L_BLUE, t_name + t_info[p_ptr->dungeon].name, 8, 8);
 
 	/* Upper middle */
-	col = 32;
+	col = 27;
 	row = 2;
 
 	/* Age */
@@ -2820,16 +2820,19 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 	int i;
 
 	char buf[80];
+	
+	player_race *shape_ptr = &p_info[p_ptr->pshape != p_ptr->prace ? p_ptr->pshape : 0];
 
 	/* Hack -- display header if displaying first stat only */
 	if (min == 0)
 	{
 		/* Print out the labels for the columns */
-		c_put_str(TERM_WHITE, "  Self ", row-1, col+5);
-		c_put_str(TERM_WHITE, " EB ", row-1, col+12);
-		c_put_str(TERM_WHITE, " TB ", row-1, col+16);
-		c_put_str(TERM_WHITE, "  Best ", row-1, col+20);
-		c_put_str(TERM_WHITE, "  Curr", row-1, col+27);
+		c_put_str(TERM_WHITE, "  Self ", row-1, col+6);
+		c_put_str(TERM_WHITE, " SB ", row-1, col+13);
+		c_put_str(TERM_WHITE, " EB ", row-1, col+17);
+		c_put_str(TERM_WHITE, " TB ", row-1, col+21);
+		c_put_str(TERM_WHITE, "  Best ", row-1, col+25);
+		c_put_str(TERM_WHITE, "  Curr", row-1, col+32);
 	}
 
 	/* Display the stats */
@@ -2857,32 +2860,36 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 
 		/* Internal "natural" maximum value */
 		cnv_stat(p_ptr->stat_max[i], buf);
-		c_put_str(TERM_L_GREEN, buf, row+i, col+5);
+		c_put_str(TERM_L_GREEN, buf, row+i, col+6);
+
+		/* Shape Bonus */
+		sprintf(buf, "%+3d", shape_ptr->r_adj[i] - (i == A_AGI ? p_ptr->siz_penalty : 0));
+		c_put_str(TERM_L_BLUE, buf, row+i, col+13);
 
 		/* Equipment Bonus */
-		sprintf(buf, "%+3d", p_ptr->stat_add[i]);
-		c_put_str(TERM_L_BLUE, buf, row+i, col+12);
+		sprintf(buf, "%+3d", p_ptr->stat_add[i] - shape_ptr->r_adj[i]);
+		c_put_str(TERM_L_BLUE, buf, row+i, col+17);
 
 		/* Temporary Bonus */
 		sprintf(buf, "%+3d", 
-				(p_ptr->stat_inc_tim[i] ? 5 : 0) 
+				(p_ptr->stat_inc_tim[i] ? 5 : 0)
 				- (p_ptr->stat_dec_tim[i] ? 5 : 0));
-		c_put_str(TERM_L_BLUE, buf, row+i, col+16);
+		c_put_str(TERM_L_BLUE, buf, row+i, col+21);
 
 		/* Resulting "modified" maximum value */
 		cnv_stat(p_ptr->stat_top[i], buf);
 		if (p_ptr->stat_inc_tim[i])
-		  c_put_str(TERM_L_BLUE, buf, row+i, col+20);
+		  c_put_str(TERM_L_BLUE, buf, row+i, col+25);
 		else if (p_ptr->stat_dec_tim[i])
-		  c_put_str(TERM_ORANGE, buf, row+i, col+20);
+		  c_put_str(TERM_ORANGE, buf, row+i, col+25);
 		else
-		  c_put_str(TERM_L_GREEN, buf, row+i, col+20);
+		  c_put_str(TERM_L_GREEN, buf, row+i, col+25);
 
 		/* Only display stat_use if not maximal */
 		if (p_ptr->stat_use[i] < p_ptr->stat_top[i])
 		{
 			cnv_stat(p_ptr->stat_use[i], buf);
-			c_put_str(TERM_YELLOW, buf, row+i, col+27);
+			c_put_str(TERM_YELLOW, buf, row+i, col+32);
 		}
 	}
 }
@@ -2914,15 +2921,16 @@ static void display_player_sust_info(void)
 	row = 2;
 
 	/* Column */
-	col = 32;
+	col = 27;
 
 	/* Header */
-	c_put_str(TERM_WHITE, "abcdefghijkl@", row-1, col);
+	c_put_str(TERM_WHITE, "abcdefghijkl@", row-1, col+5);
 
 	/* Process equipment */
 	for (i = INVEN_WIELD; i < END_EQUIPMENT; ++i)
 	{
 		/* Get the object */
+		
 		o_ptr = &inventory[i];
 
 		/* Get the "known" flags */
@@ -2934,6 +2942,16 @@ static void display_player_sust_info(void)
 		/* Initialize color based of sign of pval. */
 		for (stat = 0; stat < A_MAX - 2 /* AGI coupled with DEX and SIZ with STR */; stat++)
 		{
+			if (col == 27)
+			{
+				/* Assume uppercase stat name */
+				c_put_str(TERM_WHITE, stat_names[stat], row+stat, col);
+				if (stat == A_DEX) 
+				  c_put_str(TERM_WHITE, stat_names[A_AGI], row+A_AGI, col);
+				if (stat == A_STR) 
+				  c_put_str(TERM_WHITE, stat_names[A_SIZ], row+A_SIZ, col);
+			}
+			  
 			/* Default */
 			a = TERM_SLATE;
 			c = '.';
@@ -2976,11 +2994,11 @@ static void display_player_sust_info(void)
 			}
 
 			/* Dump proper character */
-			Term_putch(col, row+stat, a, c);
+			Term_putch(col + 5, row+stat, a, c);
 			if (stat == A_DEX) 
-			  Term_putch(col, row+A_AGI, a, c);
+			  Term_putch(col + 5, row+A_AGI, a, c);
 			if (stat == A_STR) 
-			  Term_putch(col, row+A_SIZ, a, c);
+			  Term_putch(col + 5, row+A_SIZ, a, c);
 		}
 
 		/* Advance */
@@ -3006,11 +3024,11 @@ static void display_player_sust_info(void)
 		}
 
 		/* Dump */
-		Term_putch(col, row+stat, a, c);
+		Term_putch(col+5, row+stat, a, c);
 		if (stat == A_DEX) 
-		  Term_putch(col, row+A_AGI, a, c);
+		  Term_putch(col+5, row+A_AGI, a, c);
 		if (stat == A_STR) 
-		  Term_putch(col, row+A_SIZ, a, c);
+		  Term_putch(col+5, row+A_SIZ, a, c);
 	}
 }
 
@@ -3259,7 +3277,7 @@ void display_player(int mode)
 	clear_from(0);
 
 	/* Stat info */
-	display_player_stat_info(2, 46, 0, A_MAX, TERM_WHITE);
+	display_player_stat_info(2, 41, 0, A_MAX, TERM_WHITE);
 
 	/* Stat/Sustain flags */
 	if (mode)

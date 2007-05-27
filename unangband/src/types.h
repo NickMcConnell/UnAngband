@@ -1540,6 +1540,8 @@ struct player_type
 	u32b cur_flags4;
 
 	byte incr_resist[MAX_INCR_RESISTS];
+	
+	byte siz_penalty;
 
 	s16b dis_to_h;  /* Known bonus to hit */
 	s16b dis_to_d;  /* Known bonus to dam */
