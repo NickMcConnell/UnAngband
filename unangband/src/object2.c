@@ -5817,6 +5817,171 @@ void race_near(int r_idx, int y1, int x1)
 }
 
 
+
+/*
+ * Allow potion specialists to modify potion/flask/lite explosions
+ * by inscribing an object with a special formula.
+ * This takes the form of pairs of a number followed by a letter
+ * following the equals sign. e.g =1r2d3i
+ * 
+ * The letters indicate the effect:
+ * a change to arc of 0 - 90 degrees (number times 10).
+ * b changes to starburst of 0 - 9 radius.
+ * d change damage multiplier from 0 - 9
+ * e changes to beam of 0 - 9 radius.
+ * f switch PROJECT_GRID flag on (if 1) or off (if 0)
+ * h switch PROJECT_HIDE flag on (if 1) or off (if 0)
+ * i switch PROJECT_ITEM flag on (if 1) or off (if 0)
+ * j switch PROJECT_JUMP flag on (if 1) or off (if 0).
+ * k switch PROJECT_KILL & PROJECT_PLAY flag on (if 1) or off (if 0)
+ * l switch PROJECT_LITE flag on (if 1) or off (if 0). Overridden by some effects e.g. fire.
+ * n explode from 0 - 9 times
+ * r change radius from 0 - 9
+ * s scatter blast from target by 0 - 9 squares
+ * t potion explodes in approximately 0-9 turns (XXX not implemented yet)
+ * u switch PROJECT_AREA flag on (if 1) or off (if 0).
+ * w change to 8-way blast if number is 8
+ * 
+ * Return FALSE if formula not applied, or if applied successfully.
+ * Return TRUE if formula fails. We set power = 0 in calling routine to create a 'dud' effect.
+ */
+bool apply_alchemical_formula(object_type *o_ptr, int *dam, int *rad, int *rng, u32b *flg, int *num, int *deg, int *dia)
+{
+	cptr s;
+	int pow = 1;
+
+	/* No inscription */
+	if (!o_ptr->note) return (FALSE);
+
+	/* Find a '=' */
+	s = strchr(quark_str(o_ptr->note), '=');
+
+	/* Process inscription */
+	while (s)
+	{
+		if ((s[1] >= '0') && (s[1] <= '9'))
+		{
+			int n;
+
+			n = atoi(s+2);
+
+			switch (s[2])
+			{
+				case 'a':
+				{
+					*flg |= (PROJECT_ARC | PROJECT_BOOM);
+					*flg &= ~(PROJECT_BEAM | PROJECT_STAR);
+					*deg = 10 * n;
+					*dia = 15;
+					*rad = 10;
+					*rng = 5;
+					break;
+				}
+				case 'b':
+				{
+					*flg |= (PROJECT_STAR | PROJECT_BOOM);
+					*flg &= ~(PROJECT_BEAM | PROJECT_ARC);
+					*rad = n;
+					*rng = 5;
+					break;
+				}
+				case 'd':
+				{
+					*dam = n;
+					break;
+				}
+				case 'e':
+				{
+					*flg |= (PROJECT_BEAM);
+					*flg &= ~(PROJECT_ARC | PROJECT_STAR | PROJECT_BOOM);
+					*rng = 5;
+					*rad = n;
+					break;
+				}
+				case 'f':
+				{
+					if (n) *flg |= (PROJECT_GRID); else *flg &= ~(PROJECT_GRID);
+					break;
+				}
+				case 'h':
+				{
+					if (n) *flg |= (PROJECT_HIDE); else *flg &= ~(PROJECT_HIDE);
+					break;
+				}
+				case 'i':
+				{
+					if (n) *flg |= (PROJECT_ITEM); else *flg &= ~(PROJECT_ITEM);
+					break;
+				}			
+				case 'j':
+				{
+					if (n) { *flg |= (PROJECT_JUMP); *rng = n; } else *flg &= ~(PROJECT_JUMP);
+					break;
+				}					
+				case 'k':
+				{
+					if (n) *flg |= (PROJECT_KILL | PROJECT_PLAY); else *flg &= ~(PROJECT_KILL | PROJECT_PLAY);
+					break;
+				}
+				case 'l':
+				{
+					if (n) *flg |= (PROJECT_LITE); else *flg &= ~(PROJECT_LITE);
+					break;
+				}
+				case 'n':
+				{
+					*num = n;
+					break;
+				}
+				case 'r':
+				{
+					*rad = n;
+					break;
+				}
+				case 's':
+				{
+					*rng = n;
+					break;
+				}
+				case 'u':
+				{
+					if (n) *flg |= (PROJECT_AREA); else *flg &= ~(PROJECT_AREA);
+					break;
+				}				
+				case 'w':
+				{
+					if (n == 8)
+					{
+						*flg |= (PROJECT_8WAY | PROJECT_BOOM);
+						*flg &= ~(PROJECT_ARC | PROJECT_STAR | PROJECT_BEAM);
+					}
+					break;
+				}
+			}
+			
+			/* Increase difficulty */
+			pow++;
+		}
+
+		/* Find another '=' */
+		s = strchr(s + 1, '=');
+	}
+	
+	/* Increase power based on effect */
+	pow	*= (*dam) * (*rad + 1) * (*num) * ((*deg / 10) + 1) * ((*dia / 5) + 1);
+
+	/* Hack -- project area is powerful */
+	if (*flg & (PROJECT_AREA)) pow *= (*rng + 1);
+	
+	/* Test against player level. 'Dud' potion if this is true. */
+	if ((pow) && (rand_int(pow) > 5 + (p_ptr->lev / 5))) return (TRUE);
+
+	/* Don't auto pickup */
+	return (FALSE);
+}
+
+
+
 /*
  * Break an object near a location. Returns true if actually broken.
  *
@@ -5923,54 +6088,70 @@ bool break_near(object_type *j_ptr, int y, int x)
 		case TV_LITE:
 		{
 			int power;
+			
+			/* The following may all be modifiedy by alchemy */
 			int rad = j_ptr->tval == TV_LITE ? 0 : 1;
+			int dam = 1;
+			int rng = 0;
+			int num = 1;
+			int j;
+			int deg = 0;
+			int dia = 10;
+			
+			/* Initialise flags (may be modified by alchemy) */
+			flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
 			/* Get item effect */
 			get_spell(&power, "use", j_ptr, FALSE);
 
+			/* Apply alchemy */
+			if ((p_ptr->pstyle == WS_POTION) && (apply_alchemical_formula(j_ptr, &dam, &rad, &rng, &flg, &num, &deg, &dia))) power = 0;
+
 			/* Hack -- use power 0 for fake potion effects */
 			spell_type *s_ptr = &s_info[power];
 
-			/* Scan through all four blows */
-			for (i = 0; i < 4; i++)
+			/* Applly num times */
+			for (j = 0; j < num; j++)
 			{
-				effect = s_ptr->blow[i].effect;
-				method = s_ptr->blow[i].method;
-				d_dice = s_ptr->blow[i].d_dice;
-				d_side = s_ptr->blow[i].d_side;
-				d_plus = s_ptr->blow[i].d_plus;
-
-				/* Hack -- no more attacks. Mega hack - 'fake' the first attack. */
-				if (i && !method) break;
-
-				/* Message */
-				if (!i && rad) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
-				if (!i && !rad) msg_format("The %s burst%s into flames.",o_name, (plural ? "" : "s"));
-
-				/* Mega hack --- spells in objects */
-				if (!d_side)
+				/* Scan through all four blows */
+				for (i = 0; i < 4; i++)
 				{
-					d_plus += 25 * d_dice;
+					effect = s_ptr->blow[i].effect;
+					method = s_ptr->blow[i].method;
+					d_dice = s_ptr->blow[i].d_dice;
+					d_side = s_ptr->blow[i].d_side;
+					d_plus = s_ptr->blow[i].d_plus;
+
+					/* Hack -- no more attacks. Mega hack - 'fake' the first attack. */
+					if (i && !method) break;
+
+					/* Message */
+					if (!i && !j && rad) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
+					if (!i && !j && !rad) msg_format("The %s burst%s into flames.",o_name, (plural ? "" : "s"));
+
+					/* Mega hack --- spells in objects */
+					if (!d_side)
+					{
+						d_plus += 25 * d_dice;
+					}
+
+					/* Roll out the damage */
+					if ((d_dice) && (d_side))
+					{
+						damage = damroll(d_dice, d_side) + d_plus;
+					}
+					else
+					{
+						damage = d_plus;
+					}
+
+					/* Hit with projection */
+					obvious |= project(SOURCE_PLAYER_BREAK, j_ptr->k_idx, rad, y, x, rand_spread(y, rng), rand_spread(x, rng),
+						damage * j_ptr->number * dam, effect, flg, deg, dia);
+
+					/* Object is used */
+					if ((obvious) && (k_info[j_ptr->k_idx].used < MAX_SHORT)) k_info[j_ptr->k_idx].used++;
 				}
-
-				/* Roll out the damage */
-				if ((d_dice) && (d_side))
-				{
-					damage = damroll(d_dice, d_side) + d_plus;
-				}
-				else
-				{
-					damage = d_plus;
-				}
-
-				flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
-
-				/* Hit with projection */
-				obvious |= project(SOURCE_PLAYER_BREAK, j_ptr->k_idx, rad, y, x, y, x, damage * j_ptr->number,
-					effect, flg, 0, 0);
-
-				/* Object is used */
-				if ((obvious) && (k_info[j_ptr->k_idx].used < MAX_SHORT)) k_info[j_ptr->k_idx].used++;
 			}
 
 			return TRUE;

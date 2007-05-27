@@ -3891,7 +3891,7 @@ static bool project_hack(int who, int what, int typ, int dam)
 		if (!player_has_los_bold(y, x)) continue;
 
 		/* Jump directly to the target monster */
-		if (project(who, what, 0, y, x, y, x, dam, typ, flg, 0, 0)) obvious = TRUE;
+		if (project(who, what, 0, y, x, y, x, dam, typ, flg, 0, 10)) obvious = TRUE;
 	}
 
 	/* Result */
@@ -4929,7 +4929,7 @@ static bool fire_ball_minor(int who, int what, int typ, int dir, int dam, int ra
 	}
 
 	/* Analyze the "dir" and the "target".  Hurt items on floor. */
-	return (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 0));
+	return (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 10));
 }
 
 
@@ -4965,7 +4965,7 @@ static bool fire_swarm(int who, int what, int num, int typ, int dir, int dam, in
 	while (num--)
 	{
 		/* Analyze the "dir" and the "target".  Hurt items on floor. */
-		if (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 0)) noticed = TRUE;
+		if (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 10)) noticed = TRUE;
 	}
 
 	return noticed;
@@ -5001,7 +5001,7 @@ static bool fire_ball(int who, int what, int typ, int dir, int dam, int rad)
 	}
 
 	/* Analyze the "dir" and the "target".  Hurt items on floor. */
-	return (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 0));
+	return (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 10));
 }
 
 
@@ -5036,7 +5036,7 @@ static bool fire_8way(int who, int what, int typ, int dir, int dam, int rad)
 	}
 
 	/* Analyze the "dir" and the "target".  Hurt items on floor. */
-	return (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 0));
+	return (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 10));
 }
 
 
@@ -5070,7 +5070,7 @@ static bool fire_cloud(int who, int what, int typ, int dir, int dam, int rad)
 	}
 
 	/* Analyze the "dir" and the "target".  Hurt items on floor. */
-	return (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 0));
+	return (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 10));
 }
 
 
@@ -5240,7 +5240,7 @@ static bool fire_blast(int who, int what, int typ, int dir, int dam)
 
 	int flg = PROJECT_KILL | PROJECT_GRID | PROJECT_ITEM | PROJECT_BOOM | PROJECT_PLAY | PROJECT_MAGIC;
 
-	return (project(who, what, 1, py, px, ty, tx, dam, typ, flg, 0, 0));
+	return (project(who, what, 1, py, px, ty, tx, dam, typ, flg, 0, 15));
 
 }
 
