@@ -5859,7 +5859,7 @@ bool apply_alchemical_formula(object_type *o_ptr, int *dam, int *rad, int *rng, 
 	/* Process inscription */
 	while (s)
 	{
-		if ((s[1] >= '0') && (s[1] <= '9'))
+		while ((s[1] >= '0') && (s[1] <= '9'))
 		{
 			int n;
 
@@ -5961,6 +5961,9 @@ bool apply_alchemical_formula(object_type *o_ptr, int *dam, int *rad, int *rng, 
 			
 			/* Increase difficulty */
 			pow++;
+			
+			/* Check next formula */
+			s += 2;
 		}
 
 		/* Find another '=' */
