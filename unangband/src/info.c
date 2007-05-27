@@ -3179,7 +3179,7 @@ void list_object(const object_type *o_ptr, int mode)
 	}
 
 	/* Extra powers */
-	if (!random && ((object_aware_p(o_ptr)) || (spoil))
+	if (!random && ((object_aware_p(o_ptr)) || (spoil) || (o_ptr->ident & (IDENT_STORE)))
 		&& (o_ptr->tval !=TV_MAGIC_BOOK) && (o_ptr->tval != TV_PRAYER_BOOK)
 		&& (o_ptr->tval !=TV_SONG_BOOK) && (o_ptr->tval != TV_STUDY))
 	{
@@ -3435,7 +3435,13 @@ void list_object(const object_type *o_ptr, int mode)
 	if ((o_ptr->feeling) || (object_known_p(o_ptr)))
 	{
 		int feeling = o_ptr->feeling;
-		if (!feeling) feeling = value_check_aux1(o_ptr);
+		if (!feeling)
+		{
+			feeling = value_check_aux1(o_ptr);
+			
+			/* Hack -- exclude 'average' feelings for known items */
+			if ((feeling == INSCRIP_AVERAGE) && (object_known_p(o_ptr))) feeling = 0;
+		}
 		
 		if (feeling)
 		{
@@ -3532,7 +3538,7 @@ void list_object(const object_type *o_ptr, int mode)
 		}
 	}
 
-        /* *Identified* object */
+	/* *Identified* object */
 	if (spoil && anything) text_out("You know everything about this item.  ");
 
 	/* Nothing was printed */
@@ -3541,8 +3547,8 @@ void list_object(const object_type *o_ptr, int mode)
 	/* End */
 	if (!random) text_out("\n");
 	else if (anything) text_out("\n");
-
 }
+
 
 /*
  * Print a list of powers (for selection).

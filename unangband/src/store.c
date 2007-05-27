@@ -3035,21 +3035,6 @@ static void store_examine(int store_index)
 	/* Get the actual object */
 	o_ptr = &st_ptr->stock[item];
 
-	/* Cannot examine unaware object */
-	if (!object_aware_p(o_ptr))
-	{
-		msg_print("You don't have any knowledge about it.");
-		return;
-	}
-
-	/* TODO: improve this to always reveal all obvious properties */
-	if (st_ptr->base >= STORE_MIN_BUY_SELL)
-	{
-		/* Examining an object requires you to be more aware of it
-		   but don't auto-*ID* things at home */
-		object_aware(o_ptr);
-	}
-
 	/* Description */
 	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
