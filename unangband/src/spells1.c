@@ -7482,10 +7482,13 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 	}
 	else
 	{
-		/* Add a message of destruction */
-		if (who > SOURCE_PLAYER_START)
+		/* Add object what caused the fatal wound */
+		if (who <= SOURCE_PLAYER_START)
 		{
-			my_strcpy(killer, cause_of_death[-who][rand_int(4)], sizeof(killer));
+			my_strcat(killer, cause_of_death[-who][rand_int(4)], sizeof(killer));
+
+			/* Hack -- make it clear it was a trap */
+			if (who == SOURCE_PLAYER_TRAP) my_strcat(killer, " trap you set", sizeof(killer));		
 		}
 
 		/* Cause of death routine */
@@ -7573,14 +7576,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				break;
 			}
 		}
-
-		/* Add object what caused the fatal wound */
-		if (who <= SOURCE_PLAYER_START)
+		
+		/* Add a message of destruction */
+		if (who > SOURCE_PLAYER_START)
 		{
-			my_strcat(killer, cause_of_death[-who][rand_int(4)], sizeof(killer));
-
-			/* Hack -- make it clear it was a trap */
-			if (who == SOURCE_PLAYER_TRAP) my_strcat(killer, " trap you set", sizeof(killer));		
+			my_strcpy(killer, cause_of_death[-who][rand_int(4)], sizeof(killer));
 		}
 	}
 
