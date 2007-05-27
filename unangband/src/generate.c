@@ -990,6 +990,8 @@ static void draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 
 	byte dir[4];
 	byte dirs;
+	
+	s16b *saved;
 
 	/* Paranoia */
 	if ((!feat_wall) || (!feat_path) || (feat_wall == feat_path)) return;
@@ -998,6 +1000,18 @@ static void draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	if (!in_bounds_fully(y1, x1) || !in_bounds_fully(y2, x2)) return;
 
 	if (cheat_room) msg_print("Drawing maze.");
+
+	/* Save the existing terrain to overwrite the maze later */
+	C_MAKE(saved, y2 - y1 * x2 - x1, s16b);
+	
+	/* Save grids */
+	for (y = 0; y < y2 - y1; y++)
+	{
+		for (x = 0; x < x2 - x1; x++)
+		{
+			saved[y * (y2 - y1) + x] = cave_feat[y + y1][x + x1];
+		}
+	}
 
 	/* Start with a solid rectangle of the "wall" feat */
 	generate_fill(y1, x1, y2, x2, feat_wall);
@@ -1089,6 +1103,70 @@ static void draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 		y = rand_int(ydim);
 		x = rand_int(xdim);
 	}
+
+	/* Restore grids */
+	for (y = 0; y < y2 - y1; y++)
+	{
+		for (x = 0; x < x2 - x1; x++)
+		{
+			/* Hack -- skip floor quickly */
+			if (saved[y * (y2 - y1) + x] == FEAT_FLOOR) continue;
+			
+			/* Passable terrain - overwrite floor */
+			if (((f_info[saved[y * (y2 - y1) + x]].flags1 & (FF1_MOVE)) != 0) ||
+				((f_info[saved[y * (y2 - y1) + x]].flags3 & (FF3_EASY_CLIMB)) != 0))
+			{
+				/* Must be placed on floor grid */
+				if (cave_feat[y + y1][x + x1] == feat_path)
+				{
+					cave_set_feat(y + y1, x + x1, saved[y * (y2 - y1) + x]);
+				}
+				
+				/* Try adjacent saved */
+				else for (i = 0; i < 8; i++)
+				{
+					int yy = y + y1 + ddy_ddd[i];
+					int xx = x + x1 + ddx_ddd[i];
+					
+					/* Paranoia */
+					if (!in_bounds_fully(yy, xx)) continue;
+					
+					if (cave_feat[yy][xx] == feat_path)
+					{
+						cave_set_feat(yy, xx, saved[y * (y2 - y1) + x]);
+						break;
+					}
+				}
+			}
+			/* Impassable terrain - overwrite wall */
+			else
+			{
+				/* Must be placed on floor grid */
+				if (cave_feat[y + y1][x + x1] == feat_wall)
+				{
+					cave_set_feat(y, x, saved[y * (y2 - y1) + x]);
+				}
+				/* Try adjacent saved */
+				else for (i = 0; i < 8; i++)
+				{
+					int yy = y + y1 + ddy_ddd[i];
+					int xx = x + x1 + ddx_ddd[i];
+					
+					/* Paranoia */
+					if (!in_bounds_fully(yy, xx)) continue;
+					
+					if (cave_feat[yy][xx] == feat_wall)
+					{
+						cave_set_feat(yy, xx, saved[y * (y2 - y1) + x]);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	/* Free the grids */
+	FREE(saved);
 }
 
 
@@ -1250,7 +1328,6 @@ static bool mark_starburst_shape(int y1, int x1, int y2, int x2, u32b flag)
 			else arc[arc_num - 1][1] = arc[0][1] - size;
 		}
 	}
-
 
 	/* Precalculate check distance. */
 	dist_check = 21 * dist_conv / 10;
@@ -1498,10 +1575,25 @@ static bool generate_starburst_room(int y1, int x1, int y2, int x2,
 					build_terrain(yy, xx, edge);
 				}
 
-				/* Make part of a room if requested */
+				/* Allow light to spill out of rooms through transparent edges */
 				if (flag & (STAR_BURST_ROOM))
 				{
 					cave_info[yy][xx] |= (CAVE_ROOM);
+					
+					/* Allow lighting up rooms to work correctly */
+					if  (((flag & (STAR_BURST_LIGHT)) != 0) && (f_info[cave_feat[yy][xx]].flags1 & (FF1_LOS)))
+					{
+						/* Look in all directions. */
+						for (d = 0; d < 8; d++)
+						{
+							/* Extract adjacent location */
+							int yyy = yy + ddy_ddd[d];
+							int xxx = xx + ddx_ddd[d];
+							
+							/* Hack -- light up outside room */
+							cave_info[yyy][xxx] |= (CAVE_GLOW);
+						}
+					}
 				}
 			}
 		}
@@ -1616,10 +1708,12 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 		}
 
 		/* Ensure the correct ordering and that size is odd in both directions */
-		if ((dy > 0) && (dx > 0)) draw_maze(y1, x1, y1 + (y2 % 2 ? y2 : y2 - 1), x1 + (x2 % 2 ? x2 : x2 - 1), wall, path);
-		else if ((dy < 0) && (dx > 0)) draw_maze(y2, x1, y1 + (y2 % 2 ? y1 : y1 - 1), x1 + (x2 % 2 ? x2 : x2 - 1), wall, path);
-		else if ((dy > 0) && (dx < 0)) draw_maze(y1, x2, y1 + (y2 % 2 ? y2 : y2 - 1), x1 + (x2 % 2 ? x1 : x1 - 1), wall, path);
-		else if ((dy < 0) && (dx < 0)) draw_maze(y2, x2, y1 + (y2 % 2 ? y1 : y1 - 1), x1 + (x2 % 2 ? x1 : x1 - 1), wall, path);
+		if ((dy > 0) && (dx > 0)) draw_maze(y1, x1, y1 + ((y2 - y1) % 2 ? y2 : y2 - 1), x1 + ((x2 - x1) % 2 ? x2 : x2 - 1), wall, path);
+		else if ((dy < 0) && (dx > 0)) draw_maze(y2, x1, y1 + ((y2 - y1) % 2 ? y1 : y1 - 1), x1 + ((x2 - x1) % 2 ? x2 : x2 - 1), wall, path);
+		else if ((dy > 0) && (dx < 0)) draw_maze(y1, x2, y1 + ((y2 - y1) % 2 ? y2 : y2 - 1), x1 + ((x2 - x1) % 2 ? x1 : x1 - 1), wall, path);
+		else if ((dy < 0) && (dx < 0)) draw_maze(y2, x2, y1 + ((y2 - y1) % 2 ? y1 : y1 - 1), x1 + ((x2 - x1) % 2 ? x1 : x1 - 1), wall, path);
+		
+		/* Hack -- outer exits in maze XXX */
 		
 		/* Hack -- scatter items inside maze */
 		flag |= (RG1_SCATTER);
@@ -2916,6 +3010,31 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 	}
 }
 
+/* Hack - spill light out of the edge of a room */
+static void check_windows_y(int y1, int y2, int x)
+{
+	int y;
+	
+	for (y = y1; y < y2; y++)
+	{
+		if (f_info[cave_feat[y][x]].flags1 & (FF1_LOS))
+			cave_info[y][x] |= (CAVE_GLOW);	
+	}
+}
+
+
+/* Hack - spill light out of the edge of a room */
+static void check_windows_x(int x1, int x2, int y)
+{
+	int x;
+	
+	for (x = x1; x < x2; x++)
+	{
+		if (f_info[cave_feat[y][x]].flags1 & (FF1_LOS))
+			cave_info[y][x] |= (CAVE_GLOW);	
+	}	
+}
+
 
 /*
  * Build a room consisting of two overlapping rooms.
@@ -3163,6 +3282,19 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 		/* Clear placement details */
 		place_flag = 0;
 		place_feat = 0;
+	}
+
+	/* Hack - spill light out of room */
+	if (light)
+	{
+		check_windows_y(y1a, y2a, x1a);
+		check_windows_y(y1a, y2a, x2a);
+		check_windows_x(x1a, x2a, y1a);
+		check_windows_x(x1a, x2a, y2a);	
+		check_windows_y(y1b, y2b, x1b);
+		check_windows_y(y1b, y2b, x2b);
+		check_windows_x(x1b, x2b, y1b);
+		check_windows_x(x1b, x2b, y2b);			
 	}
 
 	/* Paranoia */
@@ -3937,6 +4069,32 @@ static void fractal_map_to_room(fractal_map map, byte fractal_type, int y0, int 
 
 				/* Mark the grid as a part of the room */
 				cave_info[yy][xx] |= (CAVE_ROOM);			
+
+				/* Allow light to spill out of rooms through transparent edges */
+				if (light)
+				{
+					/* Allow lighting up rooms to work correctly */
+					if (f_info[cave_feat[yy][xx]].flags1 & (FF1_LOS))
+					{
+						int d;
+						
+						/* Look in all directions. */
+						for (d = 0; d < 8; d++)
+						{
+							/* Extract adjacent location */
+							int yyy = yy + ddy_ddd[d];
+							int xxx = xx + ddx_ddd[d];
+							
+							/* Hack -- light up outside room */
+							cave_info[yyy][xxx] |= (CAVE_GLOW);
+						}
+					}
+				}
+			}
+			else if ((grid_type == FRACTAL_EDGE) && !(wall) && (light))
+			{
+				/* Hack -- light up outside room */
+				cave_info[yy][xx] |= (CAVE_GLOW);
 			}
 			else
 			{
@@ -4239,7 +4397,7 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 	int n_pools = 0;
 
 	/* Default flags, classic rooms */
-	u32b flag = (STAR_BURST_RAW_EDGE);
+	u32b flag = (room_info[room].flags & (ROOM_FLOODED)) != 0 ? 0L : (STAR_BURST_RAW_EDGE);
 
 	/* Set irregular room info */
 	set_irregular_room_info(room, type, light, &feat, &edge, &inner, &alloc, &pool, &n_pools);

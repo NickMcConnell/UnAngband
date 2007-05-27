@@ -4667,7 +4667,8 @@ void spread_cave_temp(int y1, int x1, int range, bool room)
 		x = temp_x[i], y = temp_y[i];
 
 		/* Walls get marked, but stop further spread */
-		if (!cave_project_bold(y, x)) continue;
+		/* Note that light 'projects' through many obstacles */
+		if (!cave_project_bold(y, x) && !cave_floor_bold(y, x)) continue;
 
 		/* Note limited range (note:  we spread out one grid further) */
 		if ((range) && (distance(y1, x1, y, x) >= range)) continue;
