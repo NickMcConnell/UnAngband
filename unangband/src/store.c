@@ -3050,6 +3050,9 @@ static void store_examine(int store_index)
 	screen_object(o_ptr);
 
 	(void)anykey();
+	
+	/* Browse books */
+	if (inven_book_okay(o_ptr)) do_cmd_browse_object(o_ptr);
 
 	/* Load the screen */
 	screen_load();
