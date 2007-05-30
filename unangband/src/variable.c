@@ -1061,6 +1061,12 @@ byte item_tester_tval;
 bool (*item_tester_hook)(const object_type*);
 
 
+/*
+ * Here is a "hook" used during calls to "teleport_player()" and
+ * "teleport_away()
+ */
+bool (*teleport_hook)(const int oy, const int ox, const int ny, const int nx);
+
 
 /*
  * Current "comp" function for ang_sort()

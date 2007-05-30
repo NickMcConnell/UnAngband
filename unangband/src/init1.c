@@ -253,6 +253,7 @@ static cptr r_info_blow_method[] =
 	"8WAY_III",
 	"SWARM",
 	"DAGGER",
+	"AIM_AREA",
 	NULL
 };
 
@@ -380,6 +381,9 @@ static cptr r_info_blow_effect[] =
 	"SLIME",
 	"RESIST_MAGIC",
 	"FALL_LESS",
+	"AWAY_DARK",
+	"AWAY_JUMP",
+	"HURT_WOOD",
 	NULL,
 };
 
@@ -1398,8 +1402,8 @@ static cptr s_info_types[] =
 	"IDENT_PACK",
 	"CHANGE_SHAPE",
 	"REVERT_SHAPE",
-	"XXX7",
-	"XXX8",
+	"DETECT_MIND",
+	"REFUEL",
 	"INVEN_WIELD",
 	"INVEN_BOW",
 	"INVEN_LEFT",
@@ -7110,6 +7114,7 @@ static long eval_max_dam(monster_race *r_ptr)
 					case RBM_STORM: mana = 6; range = MAX_SIGHT; break;
 					case RBM_BREATH: mana = 0; range = 6; break;
 					case RBM_AREA: mana = 3; range = (r_ptr->level / 10) + 1; break;
+					case RBM_AIM_AREA: mana = 5; range = MAX_SIGHT; break;
 					case RBM_LOS: mana = 6; range = MAX_SIGHT; break;
 					case RBM_LINE: mana = 4; range = MAX_SIGHT; break;
 					case RBM_AIM: mana = 4; range = MAX_SIGHT; break;

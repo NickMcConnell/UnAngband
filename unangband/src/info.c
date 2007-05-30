@@ -527,6 +527,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags1 & (SF1_DETECT_MONSTER))	vp[vn++] = "visible monsters";
 	if (s_ptr->flags1 & (SF1_DETECT_EVIL))	vp[vn++] = "evil monsters";
 	if (s_ptr->flags1 & (SF1_DETECT_LIFE))	vp[vn++] = "living monsters";
+	if (s_ptr->type == SPELL_DETECT_MIND)	vp[vn++] = "minds";	
 
 	/* Describe detection spells */
 	if (vn)
@@ -887,6 +888,11 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		/* End */
 		text_out(format(" for %dd%d+%d turns",s_ptr->l_dice,s_ptr->l_side,s_ptr->l_plus));
 	}
+	else if ((s_ptr->l_dice) && (s_ptr->l_side) && (s_ptr->l_side == 1))
+	{
+		/* End */
+		text_out(format(" for %d turn%s",s_ptr->l_dice, s_ptr->l_dice != 1 ? "s" : ""));
+	}
 	else if ((s_ptr->l_dice) && (s_ptr->l_side))
 	{
 		/* End */
@@ -895,7 +901,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	else if (s_ptr->l_plus)
 	{
 		/* End */
-		text_out(format(" for %d turns",s_ptr->l_plus));
+		text_out(format(" for %d turn%s",s_ptr->l_plus, s_ptr->l_plus != 1 ? "s" : ""));
 	}
 
 	/* Collect cure effects */
@@ -1099,6 +1105,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags1 & (SF1_DARK_ROOM)) vp[vn++] = "plunges the room you are in into darkness";
 	if (s_ptr->flags1 & (SF1_FORGET)) vp[vn++] = "erases the knowledge of the entire level from your mind";
 	if (s_ptr->flags1 & (SF1_SELF_KNOW)) vp[vn++] = "reveals all knowledge of yourself";
+	if (s_ptr->type == SPELL_REFUEL) vp[vn++] = format("refuels a torch by %d turns of light",s_ptr->param);
 
 	/* Describe miscellaneous effects */
 	if (vn)
@@ -1236,6 +1243,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_STORM: p = "creates a storm"; t = "your enemies"; rad = 3; break;
 			case RBM_BREATH: p = "breathes";  t = "your enemies"; break;
 			case RBM_AREA: p = "surrounds you with magic"; rad = (level/10)+1; break;
+			case RBM_AIM_AREA: p = "surrounds an area"; rad = (level/10)+1; break;
 			case RBM_LOS: t = "all your enemies in line of sight"; break;
 			case RBM_LINE: t = "one direction"; break;
 			case RBM_AIM: t = "one target"; break;
@@ -1319,6 +1327,8 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_AWAY_UNDEAD: q = "teleport"; u="away if undead";break;
 			case GF_AWAY_EVIL: q = "teleport"; u="away if evil";break;
 			case GF_AWAY_ALL: q = "teleport"; u = "away";break;
+			case GF_AWAY_DARK: q = "teleport"; u = "away only in darkness";break;
+			case GF_AWAY_JUMP: q = "jump"; u = "away"; break;
 			case GF_TURN_UNDEAD: q = "turn"; u="if undead"; break;
 			case GF_TURN_EVIL: q = "turn"; u="if evil"; break;
 			case GF_FEAR_WEAK: q = "scare";break;
@@ -1389,7 +1399,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_WEB:		q = "build"; s = "webs around"; break;
 			case GF_BLOOD:		q = "cover"; u = "in blood"; break;
 			case GF_SLIME:		q = "cover"; u = "in slime"; break;
-
+			case GF_HURT_WOOD:	q = "warp the shape of"; u = "if made of wood"; break;
 
 			/* Hack -- handle features */
 			case GF_FEATURE:
@@ -1523,6 +1533,11 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			/* End */
 			text_out(format(" for %dd%d+%d ",d1,d2,d3));
 		}
+		else if ((d1) && (d2) && (d2 == 1))
+		{
+			/* End */
+			text_out(format(" for %d ",d1));
+		}
 		else if ((d1) && (d2))
 		{
 			/* End */
@@ -1541,21 +1556,25 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_WIND: text_out("damage against flying or climbing monsters, less against others"); break;
 			case GF_LITE_WEAK: text_out("damage to monsters vulnerable to light"); break;
 			case GF_KILL_WALL: text_out("damage to monsters made from rock"); break;
+			case GF_HURT_WOOD: text_out("damage to monsters made from wood"); break;			
 			case GF_RAISE: case GF_LOWER: text_out("damage to monsters made from water"); break;
 			case GF_HOLY_ORB: text_out("damage, doubled against evil monsters"); break;
 			case GF_BLIND: text_out("damage, doubled against eye monsters"); break;
-			case GF_TURN_UNDEAD: text_out("power"); break;
-			case GF_TURN_EVIL: text_out("power");  break;
-			case GF_FEAR_WEAK: text_out("power"); break;
-			case GF_CLONE: text_out("power"); break;
+			case GF_HASTE: 
+			case GF_SLOW_WEAK: 
+			case GF_CONF_WEAK: 
+			case GF_SLEEP: 
+			case GF_BLIND_WEAK:
+			case GF_TURN_UNDEAD: 
+			case GF_TURN_EVIL: 
+			case GF_FEAR_WEAK: 
+			case GF_CLONE: 
 			case GF_POLY: text_out("power"); break;
 			case GF_HEAL: text_out("hit points"); break;
-			case GF_AWAY_ALL: text_out("distance on average"); break;
-			case GF_HASTE: text_out("power"); break;
-			case GF_SLOW_WEAK: text_out("power"); break;
-			case GF_CONF_WEAK: text_out("power"); break;
-			case GF_SLEEP: text_out("power"); break;
-			case GF_BLIND_WEAK: text_out("power"); break;
+			case GF_AWAY_ALL:
+			case GF_AWAY_JUMP:
+			case GF_AWAY_DARK:
+			case GF_AWAY_EVIL: text_out("distance on average"); break;
 			case GF_GAIN_MANA: text_out("spell points"); break;
 			default: text_out("damage"); break;
 

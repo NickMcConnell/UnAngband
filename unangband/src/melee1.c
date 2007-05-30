@@ -1163,8 +1163,21 @@ bool make_attack_normal(int m_idx)
 	/* Blink away */
 	if (blinked)
 	{
-		msg_print("There is a puff of smoke!");
-		teleport_away(m_idx, MAX_SIGHT * 2 + 5);
+		/* Hack -- haste and flee with the loot */
+		if ((!m_ptr->monfear) && (rand_int(3)))
+		{
+			/* Set monster fast */
+			set_monster_haste(m_idx, 3 + rand_int(3), FALSE);
+
+			/* Make monster 'panic' -- move away */
+			set_monster_fear(m_ptr, m_ptr->hp / 3, TRUE);
+		}
+		else
+		{
+			msg_print("There is a puff of smoke!");
+			teleport_hook = NULL;
+			teleport_away(m_idx, MAX_SIGHT * 2 + 5);
+		}
 	}
 
 	/* Shriek */
@@ -2220,7 +2233,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_CLOUD: mon_area(who, what, y, x, effect, dam, 3, result); break;
 				case RBM_STORM: mon_area(who, what, y, x, effect, dam, 3, result); break;
 				case RBM_BREATH: mon_arc(who, what, y, x, effect, MIN(dam, m_ptr->hp / d_side), 0, (powerful ? 40 : 20), result); break;
-				case RBM_AREA: (void)project(who, what, (rlev / 10) + 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
+				case RBM_AREA: (void)project(who, what, (rlev / 10) + 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_AREA, 0, 0);  break;
+				case RBM_AIM_AREA: (void)project(who, what, (rlev / 10) + 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_AREA, 0, 0);  break;
 				case RBM_LOS: (void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_LINE: mon_beam(who, what, y, x, effect, dam, 8, result); break;
 				case RBM_AIM: (void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
@@ -3993,6 +4007,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else
 				{
 					player_not_flags(who, 0x0L, 0x0L, 0x0L, TR4_ANCHOR);
+					teleport_hook = NULL;
 					teleport_player(100);
 				}
 			}
@@ -4002,6 +4017,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				{
 					disturb(1, 0);
 					msg_format("%^s teleports %s away.", m_name, t_name);
+					teleport_hook = NULL;
 					teleport_away(target, MAX_SIGHT * 2 + 5);
 				}
 			}

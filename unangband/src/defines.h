@@ -940,6 +940,10 @@
 #define GF_SLIME	115
 #define GF_RES_MAGIC	116
 #define GF_FALL_LESS    117
+#define GF_AWAY_DARK	118
+#define GF_AWAY_JUMP	119
+#define GF_HURT_WOOD	120
+
 
 /*
  * Columns for the spell cost or damage flags
@@ -1522,6 +1526,8 @@
 #define SPELL_IDENT_PACK	19
 #define SPELL_CHANGE_SHAPE	20
 #define SPELL_REVERT_SHAPE	21
+#define SPELL_DETECT_MIND	22
+#define SPELL_REFUEL		23
 #define SPELL_INVEN_WIELD      24
 #define SPELL_INVEN_BOW       25
 #define SPELL_INVEN_LEFT      26
@@ -1822,6 +1828,7 @@
 
 /* The "sval" codes for TV_STATUE */
 #define SV_STATUE_STONE       2
+#define SV_STATUE_WOOD		3
 
 
 /* The "sval" codes for TV_ASSEMBLY */
@@ -2506,6 +2513,7 @@
 #define RBM_8WAY_III	73
 #define RBM_SWARM	74
 #define RBM_DAGGER	75
+#define RBM_AIM_AREA	76
 
 #define RBM_MAX_NORMAL  23
 #define RBM_MIN_RANGED  15

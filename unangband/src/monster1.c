@@ -875,6 +875,9 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_WEB:		q = "build webs"; break;
 			case GF_BLOOD:		q = "bloody"; break;
 			case GF_SLIME:		q = "slime"; break;
+			case GF_HURT_WOOD:	q = "warp the shape of things made of wood"; break;
+			case GF_AWAY_DARK: q = "teleport away only in darkness";break;
+			case GF_AWAY_JUMP: q = "jump away"; break;			
 
 		}
 

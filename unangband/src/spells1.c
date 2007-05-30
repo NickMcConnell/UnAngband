@@ -287,6 +287,33 @@ void update_smart_racial(int m_idx)
 
 
 /*
+ * Teleport hook: Destination must be projectable from origin
+ */
+bool teleport_project_hook(const int oy, const int ox, const int ny, const int nx)
+{
+	/* Must have line of projection between origin and target */
+	if (generic_los(oy, ox, ny, nx, CAVE_XLOF)) return (TRUE);
+	
+	return (FALSE);
+}
+
+
+/*
+ * Teleport hook: Destination must be in darkness
+ */
+bool teleport_darkness_hook(const int oy, const int ox, const int ny, const int nx)
+{
+	(void)oy;
+	(void)ox;
+
+	/* Daylight or permanent light */
+	if ((cave_info[ny][nx] & (CAVE_DLIT | CAVE_GLOW)) != 0) return (FALSE);
+	
+	return (TRUE);
+}
+
+
+/*
  * Teleport a monster, normally up to "dis" grids away.
  *
  * Attempt to move the monster at least "dis/2" grids away.
@@ -348,6 +375,9 @@ void teleport_away(int m_idx, int dis)
 			/* Hack -- no teleport onto glyph of warding */
 			if (f_info[cave_feat[ny][nx]].flags1 & (FF1_GLYPH)) continue;
 
+			/* Check if teleportation restricted */
+			if (teleport_hook && !(*teleport_hook)(oy, ox, ny, nx)) continue;
+
 			/* Check room */
 			if (cave_info[oy][ox] & (CAVE_ROOM))
 			{
@@ -377,6 +407,9 @@ void teleport_away(int m_idx, int dis)
 			
  			/* Delete monster instead */
 			delete_monster_idx(m_idx);
+			
+			/* Clear hook */
+			teleport_hook = NULL;
 
 			return;
 		}
@@ -394,6 +427,9 @@ void teleport_away(int m_idx, int dis)
 
 	/* Swap the monsters */
 	monster_swap(oy, ox, ny, nx);
+	
+	/* Clear hook */
+	teleport_hook = NULL;
 }
 
 
@@ -457,6 +493,9 @@ void teleport_player(int dis)
 
 			/* Ignore illegal locations */
 			if (!in_bounds_fully(y, x)) continue;
+			
+			/* Check if teleportation restricted */
+			if (teleport_hook && !(*teleport_hook)(py, px, y, x)) continue;
 
 			/* Count tries */
 			tries++;
@@ -488,6 +527,27 @@ void teleport_player(int dis)
 			break;
 		}
 
+		/* Paranoia -- have exhausted looking for space in dungeon */
+		if ((dis >= 200) && (min <= 0))
+		{
+			/* Sound */
+			sound(MSG_TPOTHER);
+			
+			/* Set dodging -- 'random direction' */
+			p_ptr->dodging = rand_int(8);
+			
+			/* Redraw state */
+			p_ptr->redraw |= (PR_STATE);
+
+			/* Handle stuff XXX XXX XXX */
+			handle_stuff();
+			
+			/* Clear hook */
+			teleport_hook = NULL;
+
+			return;
+		}
+		
 		/* Increase the maximum distance */
 		dis = dis * 2;
 
@@ -509,6 +569,9 @@ void teleport_player(int dis)
 
 	/* Handle stuff XXX XXX XXX */
 	handle_stuff();
+	
+	/* Clear hook */
+	teleport_hook = NULL;
 }
 
 
@@ -1249,6 +1312,40 @@ static bool hates_water(object_type *o_ptr)
 
 
 /*
+ * Does a given object (usually) hate getting warped by wood?
+ * Hafted/Polearm weapons have wooden shafts.
+ * Arrows/Bows are mostly wooden.
+ */
+static bool hates_warpwood(object_type *o_ptr)
+{
+	/* Analyze the type */
+	switch (o_ptr->tval)
+	{
+		/* Wearable */
+		case TV_ARROW:
+		case TV_BOW:
+		case TV_HAFTED:
+		case TV_POLEARM:
+		case TV_DIGGING:
+		case TV_INSTRUMENT:
+
+		/* Staffs warp */
+		case TV_STAFF:
+		{
+			return (TRUE);
+		}
+		
+		/* Hack -- wooden statues warp */
+		case TV_STATUE:
+		{
+			if (o_ptr->sval == SV_STATUE_WOOD) return (TRUE);
+		}
+	}
+
+	return (FALSE);
+}
+
+/*
  * Does a given object (usually) hate a terrain type?
  */
 bool hates_terrain(object_type *o_ptr, int f_idx)
@@ -1289,6 +1386,10 @@ bool hates_terrain(object_type *o_ptr, int f_idx)
 		case GF_STEAM:
 		case GF_WATER_WEAK:
 			if (hates_water(o_ptr)) return(TRUE);
+			break;
+
+		case GF_HURT_WOOD:
+			if (hates_warpwood(o_ptr)) return (TRUE);
 			break;
 
 		default:
@@ -1392,6 +1493,17 @@ static int set_water_destroy(object_type *o_ptr)
 		object_can_flags(o_ptr,0x0L,TR2_IGNORE_WATER,0x0L,0x0L);
 		return (FALSE);
 	}
+	return (TRUE);
+}
+
+
+/*
+ * Warp wooden things
+ */
+static int set_warpwood_destroy(object_type *o_ptr)
+{
+	if (!hates_warpwood(o_ptr)) return (FALSE);
+
 	return (TRUE);
 }
 
@@ -2775,6 +2887,7 @@ static void apply_nexus(monster_type *m_ptr)
 	{
 		case 1: case 2: case 3:
 		{
+			teleport_hook = NULL;
 			teleport_player(200);
 			break;
 		}
@@ -2956,6 +3069,9 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 
 	/* Track changes */
 	feat = cave_feat[y][x];
+	
+	/* Reset the teleport hook */
+	teleport_hook = NULL;
 
 	/* Hack -- prevent smoke/vapour etc on floors unless a feature or non-player object causes this */
 	if (((who != SOURCE_FEATURE) || (who != SOURCE_OBJECT)) &&
@@ -3276,7 +3392,40 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 
 			break;
 		}
+		
+		/* Bash doors or jam doors */
+		case GF_HURT_WOOD:
+		{
+			/* Hack -- fail if terrain is not 'wooden' enough */
+			if ((f_ptr->x_attr != 'U') && (f_ptr->x_attr != 'u')
+				&& ((f_ptr->flags3 & (FF3_LIVING)) == 0))
+			{
+				break;
+			}
 
+			/* Hack -- if we can't spike it, bash it instead */
+			if ((((f_ptr->flags1 & (FF1_SPIKE)) == 0)
+				|| (feat_state(feat, FS_SPIKE) == feat)) &&
+				((f_ptr->flags1 & (FF1_BASH)) != 0))
+			{
+				/* Check line of sight */
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
+				{
+					msg_format("The %s warps.", f);
+				}
+
+				/* Notice any changes */
+				obvious = TRUE;
+
+				/* Destroy the door */
+				cave_alter_feat(y, x, FS_BASH);				
+				
+				break;
+			}
+
+			/* Fall through */
+		}
+		
 		/* Jam Doors */
 		case GF_LOCK_DOOR:
 		{
@@ -4200,6 +4349,17 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					if (summon_specific(y, x, 99, RAISE_DEAD)) do_kill = TRUE;
 				}
 			}
+			
+			/* Wood warping -- wooden objects */
+			case GF_HURT_WOOD:
+			{
+				if (hates_warpwood(o_ptr))
+				{
+					do_kill = TRUE;
+					note_kill = (plural ? " warp!" : " warps!");
+				}
+				break;
+			}			
 		}
 
 
@@ -6144,8 +6304,22 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Teleport monster only if in darkness */
+		case GF_AWAY_DARK:
+		{
+			/* Lit by permanent lite or sunlight */
+			if ((cave_info[y][x] & (CAVE_DLIT | CAVE_GLOW)) != 0)
+			{
+				dam = 0;
+				if (seen) note = " is still in the light.";
+				
+				break;
+			}
+			/* Fall through */
+		}
 
 		/* Teleport monster (Use "dam" as "power") */
+		case GF_AWAY_JUMP:
 		case GF_AWAY_ALL:
 		{
 			/* Obvious */
@@ -6158,7 +6332,6 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			dam = 0;
 			break;
 		}
-
 
 		/* Turn undead (Use "dam" as "power") */
 		case GF_TURN_UNDEAD:
@@ -7011,7 +7184,33 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
- 		/* Default */
+		/* Warp wood (Ignore "dam") */
+		case GF_HURT_WOOD:
+		{
+			if (seen) obvious = TRUE;
+
+			/* Hack -- damage trees */
+			if (r_ptr->d_char == ':')
+			{
+				if (seen)
+				{
+					note = " shudders as it warps.";
+				}
+				note_dies = " flies apart in shower of splinters.";
+			}
+			else
+			{
+				/* No "real" damage */
+				dam = 0;
+			}
+			
+			/* Do acid damage to inventory */
+			do_inven_destroy = set_warpwood_destroy;
+			
+			break;
+		}
+		
+		/* Default */
 		default:
 		{
 			/* Irrelevant */
@@ -7047,9 +7246,34 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		if ((who > SOURCE_PLAYER_START) && (dam > m_ptr->hp)) dam = m_ptr->hp;
 	}
 
+	/* Check healing first */
+	if (do_heal)
+	{
+		/* Obvious */
+		if (seen) obvious = TRUE;
+
+		/* Wake up */
+		m_ptr->csleep = 0;
+
+		/* Heal */
+		m_ptr->hp += dam;
+
+		/* No overflow */
+		if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
+
+		/* Redraw (later) if needed */
+		if (p_ptr->health_who == cave_m_idx[y][x]) p_ptr->redraw |= (PR_HEALTH);
+
+		/* Message */
+		if (r_ptr->flags3 & (RF3_NONLIVING)) note = " repairs.";
+		else note = " looks healthier.";
+
+		/* No "real" damage */
+		dam = 0;
+	}
 
 	/* Check for death */
-	if (dam > m_ptr->hp)
+	else if (dam > m_ptr->hp)
 	{
 		/* Extract method of death */
 		note = note_dies;
@@ -7075,6 +7299,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		/* Hack --- no monster left */
 		return(obvious);
 	}
+	
 	/* Mega-Hack -- Handle "polymorph" -- monsters get a saving throw */
 	else if (do_poly && (randint(90) > r_ptr->level))
 	{
@@ -7111,31 +7336,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			r_ptr = &r_info[m_ptr->r_idx];
 		}
 	}
-	else if (do_heal)
-	{
-		/* Obvious */
-		if (seen) obvious = TRUE;
-
-		/* Wake up */
-		m_ptr->csleep = 0;
-
-		/* Heal */
-		m_ptr->hp += dam;
-
-		/* No overflow */
-		if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
-
-		/* Redraw (later) if needed */
-		if (p_ptr->health_who == cave_m_idx[y][x]) p_ptr->redraw |= (PR_HEALTH);
-
-		/* Message */
-		if (r_ptr->flags3 & (RF3_NONLIVING)) note = " repairs.";
-		else note = " looks healthier.";
-
-		/* No "real" damage */
-		dam = 0;
-	}
-
+	
 	/* Still alive -- apply damage secondary effects */
 	else
 	{
@@ -7324,7 +7525,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			if (do_sleep) m_ptr->csleep = do_sleep;
 
 			/* Hack -- handle inventory damage */
-			if (do_inven_destroy) mon_inven_damage(cave_m_idx[y][x], do_inven_destroy, (dam / 15) + 1);
+			if (do_inven_destroy) mon_inven_damage(cave_m_idx[y][x], do_inven_destroy, typ == GF_HURT_WOOD ? 30 : (dam / 15) + 1);
 		}
 	}
 
@@ -10044,7 +10245,22 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Teleport the player if in the light -- use dam as power */
+		case GF_AWAY_DARK:
+		{
+			/* Lit by permanent lite or sunlight */
+			if ((cave_info[y][x] & (CAVE_DLIT | CAVE_GLOW)) != 0)
+			{
+				msg_format("You sense shadow around you for a moment, but the light banishes it.");
+				
+				dam = 0;
+				break;
+			}
+			
+			/* Fall through */
+		}
 		/* Teleport the player -- use dam as power*/
+		case GF_AWAY_JUMP:
 		case GF_AWAY_ALL:
 		{
 			if ((p_ptr->cur_flags4 & (TR4_ANCHOR)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR)))
@@ -10342,6 +10558,16 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Warp wood -- hack. Damage if an ent. */
+		case GF_HURT_WOOD:
+		{
+			if (p_ptr->pshape != RACE_ENT)
+			{
+				dam = 0;
+			}
+			break;
+		}
+
 		/* Default */
 		default:
 		{
@@ -10420,6 +10646,9 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 	/* Only process marked grids. */
 	if (!(play_info[y][x] & (PLAY_TEMP))) return (FALSE);
 
+	/* Hack -- clear teleport hook */
+	teleport_hook = NULL;
+
 	/* Clear the cave_temp flag.  (this is paranoid) */
 	play_info[y][x] &= ~(PLAY_TEMP);
 
@@ -10472,6 +10701,7 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 					msg_print("Gravity warps around you.");
 
 					/* Throw the player around unsafely. */
+					teleport_hook = teleport_project_hook;
 					teleport_player(10);
 				}
 			}
@@ -10552,11 +10782,17 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 					msg_print("The wind buffets you about.");
 
 				/* Throw the player around unsafely. */
-				if (dist) teleport_player(dist);
+				if (dist)
+				{
+					teleport_hook = teleport_project_hook;
+					teleport_player(dist);
+				}
 			}
 
 			if (affect_monster)
 			{
+				teleport_hook = teleport_project_hook;
+				
 				/* Damage-variable throw distance */
 				do_dist = 1 + dam / 25;
 				if (do_dist > 8) do_dist = 8;
@@ -10607,6 +10843,45 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 					do_dist = 2 * do_dist / 3;
 			}
 			break;
+		}
+
+		/* Teleport away - movement */
+		case GF_AWAY_DARK:
+		{
+			/* Pick darkness only */
+			teleport_hook = teleport_darkness_hook;
+			
+			if (affect_player)
+			{
+				if (dam)
+				{
+					teleport_player(dam);
+				}
+			}
+
+			if (affect_monster)
+			{
+				/* Obvious */
+				if (seen) obvious = TRUE;
+
+				/* Prepare to teleport */
+				do_dist = dam;
+
+				/* Resist even when affected */
+				if (r_ptr->flags9 & (RF9_RES_DARK | RF9_RES_TPORT)) do_dist /= 3;
+				else if (r_ptr->flags4 & (RF4_BRTH_NEXUS)) do_dist /= 2;
+				else if (r_ptr->flags3 & (RF3_RES_NEXUS)) do_dist /= 2;
+			}
+			break;			
+		}
+		
+		/* Teleport away - caster 'projects itself' towards target */
+		case GF_AWAY_JUMP:
+		{
+			/* Pick darkness only */
+			teleport_hook = teleport_project_hook;
+			
+			/* Not yet implemented */
 		}
 
 		/* Teleport away - movement */

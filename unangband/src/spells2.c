@@ -1811,8 +1811,9 @@ bool detect_objects_power(void)
 /*
  * Hook to specify "normal (non-invisible)" monsters
  */
-static bool monster_tester_hook_normal(const monster_type *m_ptr)
+static bool monster_tester_hook_normal(const int m_idx)
 {
+	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	/* Don't detect invisible monsters */
@@ -1828,8 +1829,9 @@ static bool monster_tester_hook_normal(const monster_type *m_ptr)
 /*
  * Hook to specify "evil" monsters
  */
-static bool monster_tester_hook_evil(const monster_type *m_ptr)
+static bool monster_tester_hook_evil(const int m_idx)
 {
+	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	/* Detect evil monsters */
@@ -1845,8 +1847,9 @@ static bool monster_tester_hook_evil(const monster_type *m_ptr)
 /*
  * Hook to specify "living" monsters
  */
-static bool monster_tester_hook_living(const monster_type *m_ptr)
+static bool monster_tester_hook_living(const int m_idx)
 {
+	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	/* Don't detect non-living monsters */
@@ -1862,8 +1865,9 @@ static bool monster_tester_hook_living(const monster_type *m_ptr)
 /*
  * Hook to specify "mineral" monsters
  */
-static bool monster_tester_hook_mineral(const monster_type *m_ptr)
+static bool monster_tester_hook_mineral(const int m_idx)
 {
+	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	/* Detect all mineral monsters */
@@ -1879,8 +1883,9 @@ static bool monster_tester_hook_mineral(const monster_type *m_ptr)
 /*
  * Hook to specify "mimic" monsters
  */
-static bool monster_tester_hook_mimic(const monster_type *m_ptr)
+static bool monster_tester_hook_mimic(const int m_idx)
 {
+	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	/* Detect all object-like monsters */
@@ -1896,8 +1901,9 @@ static bool monster_tester_hook_mimic(const monster_type *m_ptr)
 /*
  * Hook to specify "water" monsters
  */
-static bool monster_tester_hook_water(const monster_type *m_ptr)
+static bool monster_tester_hook_water(const int m_idx)
 {
+	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	/* Detect all magic monsters */
@@ -1913,8 +1919,9 @@ static bool monster_tester_hook_water(const monster_type *m_ptr)
 /*
  * Hook to specify "magic" monsters
  */
-static bool monster_tester_hook_magic(const monster_type *m_ptr)
+static bool monster_tester_hook_magic(const int m_idx)
 {
+	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	/* Detect all magic monsters */
@@ -1927,11 +1934,33 @@ static bool monster_tester_hook_magic(const monster_type *m_ptr)
 }
 
 
+/*
+ * Hook to specify "mental" monsters
+ */
+static bool monster_tester_hook_mental(const int m_idx)
+{
+	monster_type *m_ptr = &m_list[m_idx];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	/* Don't detect empty mind monsters */
+	if (r_ptr->flags2 & (RF2_EMPTY_MIND))
+	{
+		return (FALSE);
+	}
+	/* Detect weird mind monsters 10% of the time (matches telepathy check in update_mon) */
+	else if ((r_ptr->flags2 & (RF2_WEIRD_MIND)) && ((m_idx % 10) != 5))
+	{
+		return (FALSE);
+	}
+
+	return (TRUE);
+}
+
 
 /*
  * Detect all "normal" monsters on the current panel
  */
-bool detect_monsters(bool (*monster_test_hook)(const monster_type*), bool *known)
+bool detect_monsters(bool (*monster_test_hook)(const int m_idx), bool *known)
 {
 	int i, y, x;
 
@@ -1954,7 +1983,7 @@ bool detect_monsters(bool (*monster_test_hook)(const monster_type*), bool *known
 		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
 
 		/* Detect all non-invisible monsters */
-		if ((*monster_test_hook)(m_ptr))
+		if ((*monster_test_hook)(i))
 		{
 			/* Optimize -- Repair flags */
 			repair_mflag_mark = repair_mflag_show = TRUE;
@@ -5056,7 +5085,7 @@ static bool fire_cloud(int who, int what, int typ, int dir, int dam, int rad)
 
 	int ty, tx;
 
-	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_BOOM | PROJECT_PLAY | PROJECT_BOOM | PROJECT_AREA | PROJECT_MAGIC;
+	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_BOOM | PROJECT_PLAY | PROJECT_AREA | PROJECT_MAGIC;
 
 	/* Use the given direction */
 	ty = py + 99 * ddy[dir];
@@ -6119,8 +6148,20 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 				int py = p_ptr->py;
 				int px = p_ptr->px;
 			
-				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL | PROJECT_BOOM | PROJECT_AREA;
+				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_BOOM | PROJECT_AREA;
 				if (project(who, what, (level / 10)+1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
+				break;
+			}
+			
+			/* Applies same damage at all ranges */
+			case RBM_AIM_AREA:
+			{
+				int rad = (level / 10)+1;
+
+				/* Allow direction to be cancelled for free */
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
+				
+				if (fire_cloud(who, what, effect, dir, damage, rad)) obvious = TRUE;
 				break;
 			}
 			case RBM_LOS:
@@ -6380,8 +6421,6 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 
 
 
-
-
 bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 {
 	spell_type *s_ptr = &s_info[spell];
@@ -6513,7 +6552,7 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 
 	/* Process the flags -- detect water */
 	if (s_ptr->flags1 & (SF1_DETECT_WATER))
-        {
+       {
                 if (detect_feat_flags(0x0L, FF2_WATER, 0x0L, 2 * MAX_SIGHT, known)) vp[vn++] = "water";
                 if (detect_monsters(monster_tester_hook_water, known)) vp[vn++] = "watery creatures";
         }
@@ -6547,6 +6586,12 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 	{
 		if (detect_feat_flags(0x0L, 0x0L, FF3_LIVING, 2 * MAX_SIGHT, known)) vp[vn++] = "life";
 		if (detect_monsters(monster_tester_hook_living, known)) vp[vn++] = "living creatures";
+	}
+
+	/* Process the 'fake flag' -- detect minds */
+	if (s_ptr->type == SPELL_DETECT_MIND)
+	{
+		if (detect_monsters(monster_tester_hook_mental, known)) vp[vn++] = "minds";		
 	}
 
 	/* Describe detected magic */
@@ -7226,6 +7271,68 @@ bool process_spell_types(int spell, int level, bool *cancel)
 				obvious = TRUE;
 				break;
 			}
+			case SPELL_REFUEL:
+			{
+				int item;
+
+				object_type *o_ptr;
+
+				obvious = TRUE;
+
+				/* Get an item */
+				cptr q = "Refuel which torch? ";
+				cptr s = "You have no torches.";
+
+				/* Restrict the choices */
+				item_tester_hook = item_tester_refill_torch;
+
+				if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return (TRUE);
+
+				/* Get the item (in the pack) */
+				if (item >= 0)
+				{
+					o_ptr = &inventory[item];
+				}
+
+				/* Get the item (on the floor) */
+				else
+				{
+					o_ptr = &o_list[0 - item];
+				}
+
+				/* In a bag? */
+				if (o_ptr->tval == TV_BAG)
+				{
+					/* Get item from bag */
+					if (!get_item_from_bag(&item, q, s, o_ptr)) return (TRUE);
+
+					/* Refer to the item */
+					o_ptr = &inventory[item];
+				}
+	
+				/* Switch on light source */
+				if (o_ptr->charges)
+				{
+					o_ptr->timeout = o_ptr->charges;
+					o_ptr->charges = 0;
+				}
+				
+				/* Increase fuel */
+				o_ptr->timeout += s_ptr->param / o_ptr->number;
+				
+				/* Over-fuel message */
+				if (o_ptr->timeout >= FUEL_TORCH)
+				{
+					o_ptr->timeout = FUEL_TORCH;
+					msg_format("Your torch%s fully fueled.", o_ptr->number > 1 ? "es are" : " is");
+				}
+				
+				/* Lite if necessary */
+				if (item == INVEN_LITE) p_ptr->update |= (PU_TORCH);
+				
+				break;
+			}
+			
 			default:
 			{
 				wield_spell(s_ptr->type,s_ptr->param,lasts, level, 0);
