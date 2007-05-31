@@ -1243,7 +1243,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_STORM: p = "creates a storm"; t = "your enemies"; rad = 3; break;
 			case RBM_BREATH: p = "breathes";  t = "your enemies"; break;
 			case RBM_AREA: p = "surrounds you with magic"; rad = (level/10)+1; break;
-			case RBM_AIM_AREA: p = "surrounds an area"; rad = (level/10)+1; break;
+			case RBM_AIM_AREA: p = "affects an area"; rad = (level/10)+1; break;
 			case RBM_LOS: t = "all your enemies in line of sight"; break;
 			case RBM_LINE: t = "one direction"; break;
 			case RBM_AIM: t = "one target"; break;
@@ -1328,7 +1328,9 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_AWAY_EVIL: q = "teleport"; u="away if evil";break;
 			case GF_AWAY_ALL: q = "teleport"; u = "away";break;
 			case GF_AWAY_DARK: q = "teleport"; u = "away only in darkness";break;
-			case GF_AWAY_JUMP: q = "jump"; u = "away"; break;
+			case GF_AWAY_NATURE: q = "teleport"; u = "away if adjacent to water or nature"; break;
+			case GF_AWAY_FIRE: q = "teleport"; u = "away if adjacent to fire, smoke or lava"; break;			
+			case GF_AWAY_JUMP: q = "jump"; u = "away to a location still in line of fire"; break;
 			case GF_TURN_UNDEAD: q = "turn"; u="if undead"; break;
 			case GF_TURN_EVIL: q = "turn"; u="if evil"; break;
 			case GF_FEAR_WEAK: q = "scare";break;
@@ -1399,7 +1401,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_WEB:		q = "build"; s = "webs around"; break;
 			case GF_BLOOD:		q = "cover"; u = "in blood"; break;
 			case GF_SLIME:		q = "cover"; u = "in slime"; break;
-			case GF_HURT_WOOD:	q = "warp the shape of"; u = "if made of wood"; break;
+			case GF_HURT_WOOD:	q = "warp wood out of shape"; break;
 
 			/* Hack -- handle features */
 			case GF_FEATURE:
@@ -1574,10 +1576,28 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_AWAY_ALL:
 			case GF_AWAY_JUMP:
 			case GF_AWAY_DARK:
-			case GF_AWAY_EVIL: text_out("distance on average"); break;
+			case GF_AWAY_NATURE:
+			case GF_AWAY_FIRE:
+			case GF_AWAY_EVIL:
+			case GF_AWAY_UNDEAD:
+			{
+				text_out("distance on average");
+
+				/* Hack for questionable efficiency */
+				if (strstr(u, " "))
+				{
+					/* Skip two words */
+					u = strstr(u, " ");
+					u++;
+					u = strstr(u, " ");
+					u++;
+					
+					text_out(format(".  The destination will also be %s", u));
+				}
+				break;
+			}
 			case GF_GAIN_MANA: text_out("spell points"); break;
 			default: text_out("damage"); break;
-
 		}
 		r++;
 	}
@@ -1631,6 +1651,11 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 	{
 		/* End */
 		my_strcpy(p,format(" dur %dd%d+%d",s_ptr->l_dice,s_ptr->l_side,s_ptr->l_plus), p_s);
+	}
+	else if ((s_ptr->l_dice) && (s_ptr->l_side) && (s_ptr->l_side == 1))
+	{
+		/* End */
+		my_strcpy(p,format(" dur %d",s_ptr->l_dice), p_s);
 	}
 	else if ((s_ptr->l_dice) && (s_ptr->l_side))
 	{
@@ -1740,6 +1765,11 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 		{
 			/* End */
 			my_strcpy(p,format(" %s %dd%d+%d ",q,d1,d2,d3), p_s);
+		}
+		else if ((d1) && (d2) && (d2 == 1))
+		{
+			/* End */
+			my_strcpy(p,format(" %s %d ",q,d1), p_s);
 		}
 		else if ((d1) && (d2))
 		{

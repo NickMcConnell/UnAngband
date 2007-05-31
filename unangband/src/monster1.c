@@ -875,8 +875,10 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_WEB:		q = "build webs"; break;
 			case GF_BLOOD:		q = "bloody"; break;
 			case GF_SLIME:		q = "slime"; break;
-			case GF_HURT_WOOD:	q = "warp the shape of things made of wood"; break;
+			case GF_HURT_WOOD:	q = "warp wood out of shape"; break;
 			case GF_AWAY_DARK: q = "teleport away only in darkness";break;
+			case GF_AWAY_NATURE: q = "teleport away only adjacent to water or nature";break;
+			case GF_AWAY_FIRE: q = "teleport away only adjacent to fire or lava";break;
 			case GF_AWAY_JUMP: q = "jump away"; break;			
 
 		}

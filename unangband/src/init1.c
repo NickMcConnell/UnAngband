@@ -384,6 +384,8 @@ static cptr r_info_blow_effect[] =
 	"AWAY_DARK",
 	"AWAY_JUMP",
 	"HURT_WOOD",
+	"AWAY_NATURE",
+	"AWAY_FIRE",
 	NULL,
 };
 

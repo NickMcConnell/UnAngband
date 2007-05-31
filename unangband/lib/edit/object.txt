@@ -2696,7 +2696,7 @@ N:330:of Cantrips
 G:?:R
 I:90:0:0
 W:5:0:30:25
-A:5/1
+A:5/3
 P:0:1d1:0:0:0
 
 N:331:of Conjuring
@@ -6733,3 +6733,105 @@ I:8:7:0
 W:0:0:40:0
 A:11/1
 P:0:1d1:0:0:0
+
+N:920:of Hedges
+G:?:R
+I:90:32:0
+W:5:0:30:25
+A:5/4
+P:0:1d1:0:0:0
+
+N:921:of Tricks
+G:?:R
+I:90:33:0
+W:5:0:30:25
+A:5/4
+P:0:1d1:0:0:0
+
+N:922:of Gambits
+G:?:R
+I:90:34:0
+W:5:0:30:25
+A:5/4
+P:0:1d1:0:0:0
+
+N:923:of Prestidigitation
+G:?:R
+I:90:35:0
+W:10:0:30:100
+A:10/3
+P:0:1d1:0:0:0
+
+N:924:of Summoning
+G:?:R
+I:90:36:0
+W:10:0:30:100
+A:10/3
+P:0:1d1:0:0:0
+
+N:925:of Invectures
+G:?:R
+I:90:37:0
+W:20:0:30:400
+A:20/4
+P:0:1d1:0:0:0
+
+N:926:of Illusions
+G:?:R
+I:90:38:0
+W:20:0:30:400
+A:20/4
+P:0:1d1:0:0:0
+
+N:927:of Invocations
+G:?:R
+I:90:39:0
+W:20:0:30:400
+A:20/4
+P:0:1d1:0:0:0
+
+N:928:of Magery
+G:?:R
+I:90:40:0
+W:30:0:30:800
+A:30/3
+P:0:1d1:0:0:0
+
+N:929:of Wizardry
+G:?:R
+I:90:41:0
+W:30:0:30:800
+A:30/3
+P:0:1d1:0:0:0
+
+N:930:of Balance
+G:?:r
+I:90:42:0
+W:80:0:30:30000
+A:80/6
+P:0:1d1:0:0:0
+F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
+
+N:931:of Space
+G:?:r
+I:90:43:0
+W:80:0:30:30000
+A:80/6
+P:0:1d1:0:0:0
+F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
+
+N:932:of Immoliation
+G:?:r
+I:90:44:0
+W:60:0:30:10000
+A:60/3
+P:0:1d7:0:0:0
+F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
+
+N:933:of Annihilation
+G:?:r
+I:90:45:0
+W:60:0:30:10000
+A:60/3
+P:0:1d7:0:0:0
+F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER

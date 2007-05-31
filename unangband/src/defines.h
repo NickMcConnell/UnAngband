@@ -943,6 +943,8 @@
 #define GF_AWAY_DARK	118
 #define GF_AWAY_JUMP	119
 #define GF_HURT_WOOD	120
+#define GF_AWAY_NATURE	121
+#define GF_AWAY_FIRE	122
 
 
 /*
