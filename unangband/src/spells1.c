@@ -59,6 +59,45 @@ u32b player_smart_flags(u32b f1, u32b f2, u32b f3, u32b f4)
 }
 
 
+/*
+ * Translate monster race flags into monster smart flags
+ */
+u32b monster_smart_flags(int m_idx)
+{
+	monster_type *m_ptr = &m_list[m_idx];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+	
+	u32b tmp = 0L;
+
+	/* Know immunities */
+	if (r_ptr->flags3 & (RF3_IM_ACID)) tmp |= (SM_IMM_ACID);
+	if (r_ptr->flags3 & (RF3_IM_ELEC)) tmp |= (SM_IMM_ELEC);
+	if (r_ptr->flags3 & (RF3_IM_FIRE)) tmp |= (SM_IMM_FIRE);
+	if (r_ptr->flags3 & (RF3_IM_COLD)) tmp |= (SM_IMM_COLD);
+	if (r_ptr->flags3 & (RF3_IM_POIS)) tmp |= (SM_IMM_POIS);
+
+	/* Know protections */
+	if (r_ptr->flags9 & (RF9_NO_SLOW)) tmp |= (SM_FREE_ACT);
+
+	/* Known resistances */
+	if (m_ptr->oppose_elem) tmp |= (SM_OPP_ACID | SM_OPP_FIRE | SM_OPP_POIS | SM_OPP_ELEC | SM_OPP_COLD);
+
+	/* Know resistances */
+	if (r_ptr->flags3 & (RF3_NO_FEAR)) tmp |= (SM_RES_FEAR);
+	if (r_ptr->flags9 & (RF9_RES_LITE)) tmp |= (SM_RES_LITE);
+	if (r_ptr->flags9 & (RF9_RES_DARK)) tmp |= (SM_RES_DARK);
+	if (r_ptr->flags9 & (RF9_RES_BLIND)) tmp |= (SM_RES_BLIND);
+	if (r_ptr->flags3 & (RF3_NO_CONF)) tmp |= (SM_RES_CONFU);
+	if (r_ptr->flags3 & (RF3_NO_STUN)) tmp |= (SM_RES_SOUND);
+	if (r_ptr->flags9 & (RF9_NO_CUTS)) tmp |= (SM_RES_SHARD);
+	if (r_ptr->flags3 & (RF3_RES_NEXUS)) tmp |= (SM_RES_NEXUS);
+	if (r_ptr->flags3 & (RF3_RES_NETHR)) tmp |= (SM_RES_NETHR);
+	if (r_ptr->flags9 & (RF9_RES_CHAOS)) tmp |= (SM_RES_CHAOS);
+	if (r_ptr->flags3 & (RF3_RES_DISEN)) tmp |= (SM_RES_DISEN);
+
+	return(tmp);
+}
+
 
 /*
  * Notice that the player has equipment flags.
@@ -3779,7 +3818,8 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 
 			if (summon_group_type)
 			{
-				if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_ELEMENT)) change = TRUE;
+				if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_ELEMENT,
+					who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) change = TRUE;
 			}
 
 			if (change)
@@ -3840,7 +3880,8 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 
 			if (summon_attr_type || summon_char_type)
 			{
-				if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level-1 : p_ptr->depth, ANIMATE_OBJECT)) change = TRUE;
+				if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level-1 : p_ptr->depth, ANIMATE_OBJECT,
+					who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) change = TRUE;
 			}
 
 			if (change)
@@ -4331,11 +4372,12 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					if ((k_info[o_ptr->k_idx].tval == TV_ASSEMBLY) && (o_ptr->name3))
 					{
 						summon_race_type = o_ptr->name3;
-						if (summon_specific(y, x, 99, SUMMON_FRIEND)) do_kill = TRUE;
+						if (summon_specific(y, x, 99, SUMMON_FRIEND, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) do_kill = TRUE;
 					}
 					else
 					{
-						if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_OBJECT)) do_kill = TRUE;
+						if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_OBJECT,
+							who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) do_kill = TRUE;
 					}
 				}
 				else
@@ -4405,7 +4447,8 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 
 				if (summon_char_type || summon_attr_type || summon_flag_type)
 				{
-					if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_DEAD)) do_kill = TRUE;
+					if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_DEAD,
+						who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) do_kill = TRUE;
 				}
 				break;
 			}
@@ -4436,13 +4479,14 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 				{
 					summon_race_type = o_ptr->name3;
 
-					if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, RAISE_DEAD)) do_kill = TRUE;
+					if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, RAISE_DEAD,
+						who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) do_kill = TRUE;
 
 					summon_race_type = 0;
 				}
 				else if ((raise) && (o_ptr->name3 == summon_race_type))
 				{
-					if (summon_specific(y, x, 99, RAISE_DEAD)) do_kill = TRUE;
+					if (summon_specific(y, x, 99, RAISE_DEAD, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) do_kill = TRUE;
 				}
 			}
 			
@@ -7452,7 +7496,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			delete_monster_idx(cave_m_idx[y][x]);
 
 			/* Create a new monster (no groups) */
-			(void)place_monster_aux(y, x, tmp, FALSE, FALSE);
+			(void)place_monster_aux(y, x, tmp, FALSE, FALSE, 0L);
 
 			/* Hack -- Assume success XXX XXX XXX */
 

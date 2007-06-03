@@ -5005,7 +5005,7 @@ static bool build_chambers(int y1, int x1, int y2, int x2, int monsters_left, bo
 
 		/* Place a single monster.  Sleeping 2/3rds of the time. */
 		place_monster_aux(y, x, get_mon_num(p_ptr->depth),
-			(rand_int(3)), FALSE);
+			(rand_int(3)), FALSE, 0L);
 
 		/* One less monster to place. */
 		monsters_left--;
@@ -9630,7 +9630,7 @@ static bool cave_gen(void)
 				}
 
 				/* Place the questor */
-				place_monster_aux(y, x, i, FALSE, TRUE);
+				place_monster_aux(y, x, i, FALSE, TRUE, 0L);
 			}
 		}
 	}
@@ -9653,7 +9653,7 @@ static bool cave_gen(void)
 		}
 
 		/* Place the questor */
-		place_monster_aux(y, x, zone->guard, FALSE, TRUE);
+		place_monster_aux(y, x, zone->guard, FALSE, TRUE, 0L);
 	}
 
 	/* Generating */
@@ -10033,7 +10033,7 @@ static bool town_gen(void)
 		}
 
 		/* Place the questor */
-		place_monster_aux(y, x, zone->guard, FALSE, TRUE);
+		place_monster_aux(y, x, zone->guard, FALSE, TRUE, 0L);
 	}
 	else
 	{

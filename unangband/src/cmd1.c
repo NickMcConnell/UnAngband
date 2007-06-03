@@ -2816,8 +2816,8 @@ void move_player(int dir, int jumping)
 		disturb(0, 0);
 	}
 
-	/* Hack -- attack monsters --- except hidden ones */
-	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)))
+	/* Hack -- attack monsters --- except hidden ones or allies */
+	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE | MFLAG_ALLY)))
 	{
 		/* Attack */
 		py_attack(dir);

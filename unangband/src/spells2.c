@@ -7049,7 +7049,7 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 
 
 
-bool process_spell_types(int spell, int level, bool *cancel)
+bool process_spell_types(int who, int spell, int level, bool *cancel)
 {
 
 	spell_type *s_ptr = &s_info[spell];
@@ -7151,19 +7151,21 @@ bool process_spell_types(int spell, int level, bool *cancel)
 			}
 			case SPELL_SUMMON:
 			{
-				if (summon_specific(p_ptr->py, p_ptr->px, p_ptr->depth+5, s_ptr->param)) obvious = TRUE;
+				if (summon_specific(p_ptr->py, p_ptr->px, p_ptr->depth+5, s_ptr->param, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
 				*cancel = FALSE;
 				break;
 			}
 			case SPELL_SUMMON_RACE:
 			{
-				if (summon_specific_one(p_ptr->py, p_ptr->px, s_ptr->param, FALSE)) obvious = TRUE;
+				if (summon_specific_one(p_ptr->py, p_ptr->px, s_ptr->param, FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
 				*cancel = FALSE;
 				break;
 			}
-			case SPELL_CREATE_RACE:
+			case SPELL_SUMMON_GROUP_IDX:
 			{
-				if (summon_specific_one(p_ptr->py, p_ptr->px, s_ptr->param, TRUE)) obvious = TRUE;
+				summon_group_type = s_ptr->param;
+				
+				if (summon_specific(p_ptr->py, p_ptr->px, p_ptr->depth+5, SUMMON_GROUP, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
 				*cancel = FALSE;
 				break;
 			}
@@ -7460,7 +7462,7 @@ bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel)
 	}
 
 	/* Apply flags */
-	if (process_spell_types(spell, level, cancel)) obvious = TRUE;
+	if (process_spell_types(who, spell, level, cancel)) obvious = TRUE;
 
 	return (obvious);
 
@@ -7484,7 +7486,7 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 		ability to see spell blows that affect themselves */
 	if (process_spell_blows(who, what, spell, level, cancel)) obvious = TRUE;
 	if (process_spell_flags(spell, level, cancel, known)) obvious = TRUE;
-	if (process_spell_types(spell, level, cancel)) obvious = TRUE;
+	if (process_spell_types(who, spell, level, cancel)) obvious = TRUE;
 
 	/* Return result */
 	return (obvious);

@@ -1321,8 +1321,17 @@ void do_cmd_open(void)
 		/* Message */
 		msg_print("There is a monster in the way!");
 
-		/* Attack */
-		py_attack(dir);
+		/* Push allies out of the way */
+		if (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))
+		{
+			/* Push */
+			push_aside(py, px, &m_list[cave_m_idx[y][x]]);
+		}
+		else
+		{
+			/* Attack */
+			py_attack(dir);
+		}
 	}
 
 	/* Door */
@@ -1472,8 +1481,17 @@ void do_cmd_close(void)
 		/* Message */
 		msg_print("There is a monster in the way!");
 
-		/* Attack */
-		py_attack(dir);
+		/* Push allies out of the way */
+		if (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))
+		{
+			/* Push */
+			push_aside(py, px, &m_list[cave_m_idx[y][x]]);
+		}
+		else
+		{
+			/* Attack */
+			py_attack(dir);
+		}
 	}
 
 	/* Door */
@@ -1699,8 +1717,17 @@ void do_cmd_tunnel(void)
 		/* Message */
 		msg_print("There is a monster in the way!");
 
-		/* Attack */
-		py_attack(dir);
+		/* Push allies out of the way */
+		if (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))
+		{
+			/* Push */
+			push_aside(py, px, &m_list[cave_m_idx[y][x]]);
+		}
+		else
+		{
+			/* Attack */
+			py_attack(dir);
+		}
 	}
 
 	/* Walls */
@@ -1898,8 +1925,17 @@ void do_cmd_disarm(void)
 		/* Message */
 		msg_print("There is a monster in the way!");
 
-		/* Attack */
-		py_attack(dir);
+		/* Push allies out of the way */
+		if (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))
+		{
+			/* Push */
+			push_aside(py, px, &m_list[cave_m_idx[y][x]]);
+		}
+		else
+		{
+			/* Attack */
+			py_attack(dir);
+		}
 	}
 
 	/* Disarm trap */
@@ -2122,8 +2158,17 @@ void do_cmd_bash(void)
 		/* Message */
 		msg_print("There is a monster in the way!");
 
-		/* Attack */
-		py_attack(dir);
+		/* Push allies out of the way */
+		if (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))
+		{
+			/* Push */
+			push_aside(py, px, &m_list[cave_m_idx[y][x]]);
+		}
+		else
+		{
+			/* Attack */
+			py_attack(dir);
+		}
 	}
 
 	/* Door */
@@ -2215,8 +2260,17 @@ void do_cmd_alter(void)
 		/* Message */
 		msg_print("There is a monster in the way!");
 
-		/* Attack */
-		py_attack(dir);
+		/* Push allies out of the way */
+		if (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))
+		{
+			/* Push */
+			push_aside(py, px, &m_list[cave_m_idx[y][x]]);
+		}
+		else
+		{
+			/* Attack */
+			py_attack(dir);
+		}
 	}
 
 	/* Disarm traps */
@@ -2374,8 +2428,17 @@ void do_cmd_set_trap_or_spike(void)
 		/* Message */
 		msg_print("There is a monster in the way!");
 
-		/* Attack */
-		py_attack(dir);
+		/* Push allies out of the way */
+		if (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))
+		{
+			/* Push */
+			push_aside(py, px, &m_list[cave_m_idx[y][x]]);
+		}
+		else
+		{
+			/* Attack */
+			py_attack(dir);
+		}
 	}
 
 	/* Go for it */

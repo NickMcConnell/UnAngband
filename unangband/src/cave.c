@@ -4981,7 +4981,7 @@ void town_illuminate(bool daytime)
 		}
 
 		/* Place the questor */
-		place_monster_aux(y, x, zone->guard, TRUE, TRUE);
+		place_monster_aux(y, x, zone->guard, TRUE, TRUE, 0L);
 	}
 
 	/* Fully update the visuals */

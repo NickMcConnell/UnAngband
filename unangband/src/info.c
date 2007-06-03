@@ -1078,9 +1078,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->type == SPELL_SUMMON_RACE) vp[vn++] = format("summons %s%s",
 		is_a_vowel((r_name+r_info[s_ptr->param].name)[0])?"an ":"a ",
 		r_name+r_info[s_ptr->param].name);
-	if (s_ptr->type == SPELL_CREATE_RACE) vp[vn++] = format("creates %s%s",
-		is_a_vowel((r_name+r_info[s_ptr->param].name)[0])?"an ":"a ",
-		r_name+r_info[s_ptr->param].name);
+	if (s_ptr->type == SPELL_SUMMON_GROUP_IDX) vp[vn++] = "summons related monsters";
 	if (s_ptr->type == SPELL_CREATE_KIND) vp[vn++] = "creates gold";
 	if (s_ptr->flags2 & (SF2_CREATE_STAIR)) vp[vn++] = "creates a staircase under you";
 	if (s_ptr->type == SPELL_WARD_GLYPH) vp[vn++] = "creates a glyph of warding under you";

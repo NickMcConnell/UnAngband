@@ -1395,7 +1395,7 @@ static cptr s_info_types[] =
 	"WARD_TRAP",
 	"SUMMON",
 	"SUMMON_RACE",
-	"CREATE_RACE",
+	"SUMMON_GROUP_IDX",
 	"CREATE_KIND",
 	"EARTHQUAKE",
 	"DESTRUCTION",

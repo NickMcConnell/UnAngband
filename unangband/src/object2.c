@@ -5806,7 +5806,7 @@ void race_near(int r_idx, int y1, int x1)
 		if (place_monster_here(y, x, r_idx) <= MM_FAIL) continue;
 
 		/* Create a new monster (awake, no groups) */
-		(void)place_monster_aux(y, x, r_idx, FALSE, FALSE);
+		(void)place_monster_aux(y, x, r_idx, FALSE, FALSE, 0L);
 
 		/* Hack -- monster does not drop anything */
 		m_list[cave_m_idx[y][x]].mflag |= (MFLAG_MADE);

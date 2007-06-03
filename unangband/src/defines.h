@@ -1518,7 +1518,7 @@
 #define SPELL_WARD_TRAP  9
 #define SPELL_SUMMON     10
 #define SPELL_SUMMON_RACE       11
-#define SPELL_CREATE_RACE     12
+#define SPELL_SUMMON_GROUP_IDX     12
 #define SPELL_CREATE_KIND     13
 #define SPELL_EARTHQUAKE      14
 #define SPELL_DESTRUCTION     15
