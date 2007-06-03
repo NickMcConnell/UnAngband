@@ -6950,7 +6950,7 @@ P:0:1d1:0:0:0
 
 # Used to count down spell-based features and traps
 
-N:573:& Counter~
+N:946:& Counter~
 G:~:v
 I:10:1:5
 W:0:1:0:0

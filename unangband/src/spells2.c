@@ -6388,8 +6388,32 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
 
 				if (fire_swarm(who, what, 2 + level / 20, effect, dir,
-			           	damage + level / 2, 1)) obvious = TRUE;;
+			           	damage + level / 2, 1)) obvious = TRUE;
+			           	
+			    break;
 			}
+			case RBM_SCATTER:
+			{
+				int py = p_ptr->py;
+				int px = p_ptr->px;
+				int y = py;
+				int x = px;
+				int i;
+
+				int flg = PROJECT_KILL | PROJECT_MAGIC | PROJECT_GRID | PROJECT_PLAY | PROJECT_ITEM;
+
+				for (i = 0; i < (p_ptr->lev / 15) + 1; i++)
+				{
+					/* Pick a 'nearby' location */
+	      			scatter(&y, &x, py, px, 5, 0);
+	      		
+	      			/* Project at the location */
+					if (project(who, what, 0, py, px, y, x, damage, effect, flg, 0, 0)) obvious = TRUE;
+				}
+
+				break;	      		
+			}
+			
 			/* One adjacent target */
 			default:
 			{
@@ -6404,7 +6428,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 				/* Hack - scale damage */
 				if ((level > 8) && (d_side)) damage += damroll((level-5)/4, d_side);
 
-				if (project(who, what, 1, py, px, py + ddy[dir], px + ddx[dir], damage, effect, flg, 0, 0)) obvious = TRUE;
+				if (project(who, what, 0, py, px, py + ddy[dir], px + ddx[dir], damage, effect, flg, 0, 0)) obvious = TRUE;
 
 				break;
 			}

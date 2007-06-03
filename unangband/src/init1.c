@@ -254,6 +254,7 @@ static cptr r_info_blow_method[] =
 	"SWARM",
 	"DAGGER",
 	"AIM_AREA",
+	"SCATTER",
 	NULL
 };
 

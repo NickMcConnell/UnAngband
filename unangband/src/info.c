@@ -1271,6 +1271,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_8WAY_II: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 3; break;
 			case RBM_8WAY_III: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 4; break;
 			case RBM_SWARM: p = "creates multiple balls"; t = "your enemies"; rad = 1; d3 += level / 2; break;
+			case RBM_SCATTER: p = "scatters magic around you"; t = "your enemies"; break;
 			default: t = "one adjacent target"; if ((level > 8) && (d2)) d1+= (level-5)/4;break;
 		}
 
@@ -1409,9 +1410,9 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 				char buf[80];
 				cptr name = f_name + f_info[f_info[d3].mimic].name;
 
-				q = "create";
+				q = "magically create";
 				s = buf;
-				sprintf(buf,"%s%s around",is_a_vowel(name[0])?"a ":"an ",name);
+				sprintf(buf,"%ss %s",name,f_info[f_info[d3].mimic].flags1 & (FF1_MOVE) ? "under" : "around" );
 				if ((f_info[d3].flags1 & (FF1_MOVE)) == 0)
 				{
 					d1 = 4;
