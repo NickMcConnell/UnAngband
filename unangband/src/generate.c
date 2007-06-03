@@ -3015,7 +3015,7 @@ static void check_windows_y(int y1, int y2, int x)
 {
 	int y;
 	
-	for (y = y1; y < y2; y++)
+	for (y = y1; y <= y2; y++)
 	{
 		if (f_info[cave_feat[y][x]].flags1 & (FF1_LOS))
 			cave_info[y][x] |= (CAVE_GLOW);	
@@ -3028,7 +3028,7 @@ static void check_windows_x(int x1, int x2, int y)
 {
 	int x;
 	
-	for (x = x1; x < x2; x++)
+	for (x = x1; x <= x2; x++)
 	{
 		if (f_info[cave_feat[y][x]].flags1 & (FF1_LOS))
 			cave_info[y][x] |= (CAVE_GLOW);	
@@ -4821,9 +4821,9 @@ static bool build_chambers(int y1, int x1, int y2, int x2, int monsters_left, bo
 		bool joy = FALSE;
 
 		/* Make new doors and tunnels between magma and open floor. */
-		for (y = y1; y < y2; y++)
+		for (y = y1; y <= y2; y++)
 		{
-			for (x = x1; x < x2; x++)
+			for (x = x1; x <= x2; x++)
 			{
 				/* Current grid must be magma. */
 				if (cave_feat[y][x] != FEAT_MAGMA) continue;

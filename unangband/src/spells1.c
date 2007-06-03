@@ -323,9 +323,9 @@ bool teleport_nature_hook(const int oy, const int ox, const int ny, const int nx
 	(void)oy;
 	(void)ox;
 
-	for (y = ny - 1; y < ny + 1; y++)
+	for (y = ny - 1; y <= ny + 1; y++)
 	{
-		for (x = nx - 1; x < nx + 1; x++)
+		for (x = nx - 1; x <= nx + 1; x++)
 		{
 			/* Check for valid grid */
 			if (!in_bounds_fully(y,x)) continue;
@@ -353,9 +353,9 @@ bool teleport_fiery_hook(const int oy, const int ox, const int ny, const int nx)
 	(void)oy;
 	(void)ox;
 
-	for (y = y - 1; y < y + 1; y++)
+	for (y = y - 1; y <= y + 1; y++)
 	{
-		for (x = nx - 1; x < nx + 1; x++)
+		for (x = nx - 1; x <= nx + 1; x++)
 		{
 			/* Check for valid grid */
 			if (!in_bounds_fully(y,x)) continue;
@@ -10410,15 +10410,21 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_AWAY_FIRE:
 		{
 			/* Teleport restriction fails */
-			if (teleport_hook && !(teleport_hook(y, x, y, x)))
+			if ((teleport_hook && !(teleport_hook(y, x, y, x))) || (p_ptr->cur_flags4 & (TR4_ANCHOR)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR)))
 			{
-				/* Fails to teleport */
-				msg_format("%^s fails to teleport you away.", killer);
-			}
-			else if ((p_ptr->cur_flags4 & (TR4_ANCHOR)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR)))
-			{
-				msg_format("%^s fails to teleport you away.", killer);
-				if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR))) player_can_flags(who, 0x0L, 0x0L, 0x0L, TR4_ANCHOR);
+				/* Source is player */
+				if (who <= SOURCE_PLAYER_START)
+				{
+					msg_print("You fail to teleport away.");					
+				}
+				else
+				{
+					/* Fails to teleport */
+					msg_format("%^s fails to teleport you away.", killer);
+				}
+
+				/* Learn about anchor */
+				if (p_ptr->cur_flags4 & (TR4_ANCHOR)) player_can_flags(who, 0x0L, 0x0L, 0x0L, TR4_ANCHOR);
 			}
 			else
 			{
@@ -10427,6 +10433,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
 			}
+
 			dam = 0;
 			break;
 		}

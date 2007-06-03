@@ -6402,7 +6402,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 
 				int flg = PROJECT_KILL | PROJECT_MAGIC | PROJECT_GRID | PROJECT_PLAY | PROJECT_ITEM;
 
-				for (i = 0; i < (p_ptr->lev / 15) + 1; i++)
+				for (i = 0; i < (p_ptr->lev / 10) + 3; i++)
 				{
 					/* Pick a 'nearby' location */
 	      			scatter(&y, &x, py, px, 5, 0);
