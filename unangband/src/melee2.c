@@ -4540,7 +4540,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 	if (cave_m_idx[ny][nx] < 0)
 	{
 		/* Attack if possible */
-		if (!(r_ptr->flags1 & (RF1_NEVER_BLOW)))
+		if (!(r_ptr->flags1 & (RF1_NEVER_BLOW)) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 		{
 			(void)make_attack_normal(m_idx);
 		}
@@ -4886,7 +4886,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				if (m_ptr->mflag & (MFLAG_ALLY)) n_ptr->mflag |= (MFLAG_IGNORE);
 
 				if (!(m_ptr->monfear))
-				{
+				{					
 					/* Scan through all four blows */
 					for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
 					{
@@ -4898,7 +4898,6 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 						int d_dice = r_ptr->blow[ap_cnt].d_dice;
 						int d_side = r_ptr->blow[ap_cnt].d_side;
 
-
 						/* Hack -- no more attacks */
 						if (!method) break;
 
@@ -4908,7 +4907,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 						damage = damroll(d_dice, d_side);
 
 						/* New result routine */
-						project_p(m_idx, ap_cnt, ny, nx, damage, effect);
+						project_m(m_idx, ap_cnt, ny, nx, damage, effect);
 
 						/* Apply teleport and other effects */
 						project_t(m_idx, ap_cnt, ny, nx, damage, effect);
@@ -5970,7 +5969,7 @@ static void process_monster(int m_idx)
 	/* Is monster an ally, or fighting an ally of the player? */
 	if (m_ptr->mflag & (MFLAG_IGNORE | MFLAG_ALLY)) 
 	{
-		int k = m_ptr->cdis;
+		int k = (m_ptr->mflag & (MFLAG_ALLY)) ? MAX_SIGHT : m_ptr->cdis;
 		
 		for (i = m_max - 1; i >= 1; i--)
 		{
@@ -5991,6 +5990,8 @@ static void process_monster(int m_idx)
 					m_ptr->ty = n_ptr->fy;
 					m_ptr->tx = n_ptr->fx;
 					k = d;
+					
+					if (m_ptr->mflag & (MFLAG_ALLY)) must_use_target = TRUE;
 				}
 			}
 		}

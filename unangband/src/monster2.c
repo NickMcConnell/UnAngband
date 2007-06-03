@@ -1343,13 +1343,6 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 		}
 
 		/* XXX Perhaps we should use a different attr/char */
-		if (m_ptr->mflag & (MFLAG_IGNORE))
-		{
-			/* Append special notation */
-			my_strcat(desc, " (neutral)", max);
-		}
-		
-		/* XXX Perhaps we should use a different attr/char */
 		if (m_ptr->mflag & (MFLAG_HIDE))
 		{
 			/* Append special notation */
