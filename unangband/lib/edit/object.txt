@@ -6580,7 +6580,7 @@ P:0:1d1:0:0:0
 
 # Ranger books
 
-N:901:of Trailcraft
+N:901:of Bushcraft
 G:?:R
 I:90:47:0
 W:10:0:30:100
@@ -6931,7 +6931,7 @@ P:0:1d1:0:0:0
 
 #### The Warcraft School -- consists of the ranger books defined previously, plus this book.
 
-N:944:of Bushcraft
+N:944:of Trailcraft
 G:?:R
 I:90:46:0
 W:5:0:30:25
