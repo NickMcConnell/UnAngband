@@ -1828,10 +1828,12 @@
 #define SV_BODY_BUTCHERED  14
 #define SV_BODY_MEAT 15
 
+/* The "sval" codes for TV_SPELL */
+#define SV_SPELL_COUNTER	1
+
 /* The "sval" codes for TV_STATUE */
 #define SV_STATUE_STONE       2
 #define SV_STATUE_WOOD		3
-
 
 /* The "sval" codes for TV_ASSEMBLY */
 #define SV_ASSEMBLY_NONE   	 1

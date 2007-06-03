@@ -3577,17 +3577,50 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 		/* Make features */
 		case GF_FEATURE:
 		{
+			object_type object_type_body;
+			object_type *o_ptr = &object_type_body;
+			
 			burnout = FALSE;
 
 			/* Require a "floor or ground" grid */
 			if (!(f_ptr->flags1 & (FF1_FLOOR))
 			 && !(f_ptr->flags3 & (FF3_GROUND))) break;
 
-			/* Don't hit caster */
-			if (cave_m_idx[y][x]== who) break;
+			/* If caster is player, place a 'counter' or 'timer' */
+			if (who <= SOURCE_PLAYER_START)
+			{
+				object_prep(o_ptr, lookup_kind(TV_SPELL, SV_SPELL_COUNTER));
+				
+				/* Hack -- record feature under terrain to allow 'reversion' to old terrain */
+				o_ptr->pval = cave_feat[y][x];
+				
+				/* Traps are given so many charges */
+				if (f_info[dam].flags1 & (FF1_HIT_TRAP))
+				{
+					o_ptr->charges = (p_ptr->lev + 1) / 2;
+				}
+				/* Other features time out relatively quickly.
+				 * Note this must be the same for all terrain in a single casting
+				 * otherwise e.g. bridges of stone will time out unusually.
+				 */
+				else
+				{
+					o_ptr->timeout = (p_ptr->lev + 1) / 2;
+				}
+				
+				/* Part of the terrain */
+				o_ptr->ident |= (IDENT_STORE);
+			}
 
 			/* Place a feature */
 			if (dam) cave_set_feat(y,x,dam);
+
+			/* Place the counter */			
+			if (who <= SOURCE_PLAYER_START)
+			{
+				/* Add to the floor */
+				floor_carry(y,x,o_ptr);
+			}
 
 			/* Notice any changes */
 			obvious = TRUE;

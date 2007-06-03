@@ -6340,6 +6340,28 @@ void mon_hit_trap(int m_idx, int y, int x)
 				}
 			}
 
+			/* Similar to hitting a regular trap below, but (hack) damage increased by current player level. */
+			case TV_SPELL:
+			{
+				/* Player floats on terrain */
+				if (player_ignore_terrain(feat)) return;
+
+				if (f_ptr->spell)
+				{
+   		   			make_attack_ranged(-1,f_ptr->spell,y,x);
+				}
+				else if (f_ptr->blow.method)
+				{
+					int dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice * (((p_ptr->lev + 9) / 10) + 1) );
+
+					/* Apply the blow */
+					project_p(SOURCE_PLAYER_TRAP, feat, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
+					project_t(SOURCE_PLAYER_TRAP, feat, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
+				}
+				
+				/* Drop through to use a charge */
+			}
+
 			case TV_WAND:
 			case TV_STAFF:
 			{

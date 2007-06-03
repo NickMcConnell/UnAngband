@@ -1308,7 +1308,24 @@ static void process_world(void)
 					/* Destroy a spell if discharged */
 					if (o_ptr->timeout) floor_item_increase(i, -1);
 					else if (o_ptr->stackc) floor_item_increase(i, -(o_ptr->stackc));
-					else floor_item_increase(i,-(o_ptr->number));
+					else
+					{
+						/* Was a terrain counter - note paranoia */
+						if ((o_ptr->ident & (IDENT_STORE)) && (o_ptr->pval > 0) && !(o_ptr->held_m_idx))
+						{
+							/* Message */
+							if (play_info[o_ptr->iy][o_ptr->ix] & (PLAY_MARK))
+							{
+								msg_format("The %s fades.", f_name + f_info[cave_feat[o_ptr->iy][o_ptr->ix]].name);
+							}
+
+							/* Revert to old feature */
+							cave_set_feat(o_ptr->iy, o_ptr->ix, o_ptr->pval);
+						}
+
+						/* Destroy remaining spells */
+						floor_item_increase(i,-(o_ptr->number));
+					}
 
 					floor_item_optimize(i);
 				}
