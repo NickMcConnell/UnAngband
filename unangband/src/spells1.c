@@ -3626,7 +3626,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			 && !(f_ptr->flags3 & (FF3_GROUND))) break;
 
 			/* If caster is player, place a 'counter' or 'timer' */
-			if (who <= SOURCE_PLAYER_START)
+			if ((who <= SOURCE_PLAYER_START) || ((who > 0) && (m_list[who].mflag & (MFLAG_ALLY))))
 			{
 				object_prep(o_ptr, lookup_kind(TV_SPELL, SV_SPELL_COUNTER));
 				
@@ -3655,7 +3655,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			if (dam) cave_set_feat(y,x,dam);
 
 			/* Place the counter */			
-			if (who <= SOURCE_PLAYER_START)
+			if ((who <= SOURCE_PLAYER_START) || ((who > 0) && (m_list[who].mflag & (MFLAG_ALLY))))
 			{
 				/* Add to the floor */
 				floor_carry(y,x,o_ptr);
@@ -7572,8 +7572,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			}
 		}
 
-		/* Handle cuts from player only */
-		if (do_cuts && (who <= SOURCE_PLAYER_START) && 
+		/* Handle cuts from player or allies only */
+		if (do_cuts && ((who <= SOURCE_PLAYER_START) || ((who > 0) && (m_list[who].mflag & (MFLAG_ALLY)))) && 
 			 !(r_ptr->flags9 & (RF9_NO_CUTS)))
 		{
 			/* Obvious */
@@ -7596,7 +7596,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Handle poison from player only */
-		if (do_pois && (who <= SOURCE_PLAYER_START) &&
+		if (do_pois && ((who <= SOURCE_PLAYER_START) || ((who > 0) && (m_list[who].mflag & (MFLAG_ALLY)))) &&
 			 !(r_ptr->flags3 & (RF3_IM_POIS)))
 		{
 			/* Obvious */
@@ -7658,8 +7658,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		}
 	}
 
-	/* If another monster or trap did the damage, hurt the monster by hand */
-	if (who > SOURCE_PLAYER_START)
+	/* If another non-allied monster or trap did the damage, hurt the monster by hand */
+	if ((who > SOURCE_PLAYER_START) && ((who <= 0) || ((m_list[who].mflag & (MFLAG_ALLY)) == 0)))
 	{
 		/* Redraw (later) if needed */
 		if (p_ptr->health_who == cave_m_idx[y][x]) p_ptr->redraw |= (PR_HEALTH);
