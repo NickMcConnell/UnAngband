@@ -3899,14 +3899,18 @@ static bool summon_specific_okay(int r_idx)
 
 		case SUMMON_PLANT:
 		{
+			/* Hack -- exclude trees */
 			okay = ((r_ptr->flags3 & (RF3_PLANT)) &&
+				(r_ptr->d_char != ':') &&
 				!(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
 
 		case SUMMON_INSECT:
 		{
+			/* Hack -- exclude spiders */
 			okay = ((r_ptr->flags3 & (RF3_INSECT)) &&
+				(r_ptr->d_char != 'S') &&
 				!(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
@@ -3918,6 +3922,9 @@ static bool summon_specific_okay(int r_idx)
 			{
 				okay = ((r_ptr->flags3 & (RF3_ANIMAL)) &&
 					!(r_ptr->flags1 & (RF1_UNIQUE)) &&
+					
+					/* Hack -- exclude hounds */
+					(r_ptr->d_char != 'C') && (r_ptr->d_char != 'Z') &&
 
 					/* Check 'skin' */
 					((r_ptr->flags8 & (RF8_SKIN_MASK)) ?
@@ -3926,7 +3933,7 @@ static bool summon_specific_okay(int r_idx)
 					((r_ptr->flags8 & (summon_flag_type)) ? TRUE : FALSE) :
 
 					/* Has none of the above - treat as scales... */
-					((r_ptr->flags8 & (RF8_HAS_SCALE)) ? TRUE : FALSE)));
+					((summon_flag_type & (RF8_HAS_SCALE)) ? TRUE : FALSE)));
 			}
 			else
 			{
@@ -4048,6 +4055,13 @@ static bool summon_specific_okay(int r_idx)
 					strchr("&:;.,'!_-\\/[]~$%^*(){}+=<>?#",r_ptr->d_char));
 			}
 			break;
+		}
+		
+		case ANIMATE_TREE:
+		{
+			okay = ((r_ptr->d_char == ':') &&
+			        !(r_ptr->flags1 & (RF1_UNIQUE)));
+			break;			
 		}
 
 		case SUMMON_FRIEND:

@@ -790,7 +790,7 @@
 #define ANIMATE_DEAD	3
 /* XXX */
 #define RAISE_MONSTER   6
-/* XXX */
+#define ANIMATE_TREE	7
 #define SUMMON_PLANT    8
 #define SUMMON_INSECT   9
 #define SUMMON_ANIMAL  10
@@ -945,7 +945,18 @@
 #define GF_HURT_WOOD	120
 #define GF_AWAY_NATURE	121
 #define GF_AWAY_FIRE	122
-
+#define GF_ANIM_TREE	123
+#define GF_CHARM_INSECT	124
+#define GF_CHARM_ANIMAL	125
+#define GF_CHARM_REPTILE	126
+#define GF_CHARM_MONSTER	127
+#define GF_CHARM_PERSON	128
+#define GF_BIND_DEMON	129
+#define GF_BIND_UNDEAD	130
+#define GF_BIND_DRAGON	131
+#define GF_BIND_FAMILIAR	132
+#define GF_VAMP_DRAIN	133
+#define GF_MANA_DRAIN	134
 
 /*
  * Columns for the spell cost or damage flags

@@ -1401,6 +1401,18 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_BLOOD:		q = "cover"; u = "in blood"; break;
 			case GF_SLIME:		q = "cover"; u = "in slime"; break;
 			case GF_HURT_WOOD:	q = "warp wood out of shape"; break;
+			case GF_ANIM_TREE:	q = "animate trees"; break;
+			case GF_CHARM_INSECT:	q = "charm insects"; break;
+			case GF_CHARM_REPTILE:	q = "charm reptiles or amphibians"; break;
+			case GF_CHARM_ANIMAL:	q = "charm birds or mammals"; break;
+			case GF_CHARM_MONSTER:	q = "charm living monsters other than dragons"; break;
+			case GF_CHARM_PERSON:	q = "charm elves, dwarves, humans, orcs, trolls or giants"; break;
+			case GF_BIND_DEMON:		q = "bind demons to a cursed item"; break;
+			case GF_BIND_DRAGON:	q = "bind dragons to a cursed item"; break;
+			case GF_BIND_UNDEAD:	q = "bind undead to a cursed item"; break;
+			case GF_BIND_FAMILIAR:	q = "bind a familiar to you"; break;
+			case GF_VAMP_DRAIN:	q = "drain"; s = "health from"; break;
+			case GF_MANA_DRAIN:	q = "drain"; s = "mana from"; break;
 
 			/* Hack -- handle features */
 			case GF_FEATURE:
@@ -1570,7 +1582,17 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_TURN_EVIL: 
 			case GF_FEAR_WEAK: 
 			case GF_CLONE: 
-			case GF_POLY: text_out("power"); break;
+			case GF_POLY:
+			case GF_CHARM_INSECT:
+			case GF_CHARM_REPTILE:
+			case GF_CHARM_ANIMAL:
+			case GF_CHARM_MONSTER:
+			case GF_CHARM_PERSON:
+			case GF_BIND_DEMON:
+			case GF_BIND_DRAGON:
+			case GF_BIND_UNDEAD:
+			case GF_BIND_FAMILIAR:
+								text_out("power"); break;
 			case GF_HEAL: text_out("hit points"); break;
 			case GF_AWAY_ALL:
 			case GF_AWAY_JUMP:
@@ -1595,6 +1617,8 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 				}
 				break;
 			}
+			case GF_LOSE_MANA:
+			case GF_MANA_DRAIN:
 			case GF_GAIN_MANA: text_out("spell points"); break;
 			default: text_out("damage"); break;
 		}
@@ -1742,19 +1766,38 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 		/* Get the effect */
 		if (d1 || d2 || d3) switch (effect)
 		{
-			case GF_TURN_UNDEAD: q="pow"; break;
-			case GF_TURN_EVIL: q="pow";  break;
-			case GF_FEAR_WEAK: q="pow"; break;
-			case GF_CLONE: q="pow"; break;
-			case GF_POLY: q="pow"; break;
-			case GF_HEAL: q="heal"; break;
-			case GF_AWAY_ALL: q="range"; break;
-			case GF_HASTE: q="pow"; break;
-			case GF_SLOW_WEAK: q="pow"; break;
-			case GF_CONF_WEAK: q="pow"; break;
-			case GF_SLEEP: q="pow"; break;
-			case GF_BLIND_WEAK: q="pow"; break;
-			case GF_GAIN_MANA: q="mana"; break;
+			case GF_HASTE: 
+			case GF_SLOW_WEAK: 
+			case GF_CONF_WEAK: 
+			case GF_SLEEP: 
+			case GF_BLIND_WEAK:
+			case GF_TURN_UNDEAD: 
+			case GF_TURN_EVIL: 
+			case GF_FEAR_WEAK: 
+			case GF_CLONE: 
+			case GF_POLY:
+			case GF_CHARM_INSECT:
+			case GF_CHARM_REPTILE:
+			case GF_CHARM_ANIMAL:
+			case GF_CHARM_MONSTER:
+			case GF_CHARM_PERSON:
+			case GF_BIND_DEMON:
+			case GF_BIND_DRAGON:
+			case GF_BIND_UNDEAD:
+			case GF_BIND_FAMILIAR:
+								q = "pow"; break;
+			case GF_HEAL: q = "heal"; break;
+			case GF_AWAY_ALL:
+			case GF_AWAY_JUMP:
+			case GF_AWAY_DARK:
+			case GF_AWAY_NATURE:
+			case GF_AWAY_FIRE:
+			case GF_AWAY_EVIL:
+			case GF_AWAY_UNDEAD:
+								q = "range"; break;
+			case GF_LOSE_MANA:
+			case GF_MANA_DRAIN:
+			case GF_GAIN_MANA: q = "mana"; break;
 			default: q="dam"; break;
 		}
 

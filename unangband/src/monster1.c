@@ -882,7 +882,18 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_AWAY_NATURE: q = "teleport away only adjacent to water or nature";break;
 			case GF_AWAY_FIRE: q = "teleport away only adjacent to fire or lava";break;
 			case GF_AWAY_JUMP: q = "jump away"; break;			
-
+			case GF_ANIM_TREE:	q = "animate trees"; break;
+			case GF_CHARM_INSECT:	q = "charm insects"; break;
+			case GF_CHARM_REPTILE:	q = "charm reptiles or amphibians"; break;
+			case GF_CHARM_ANIMAL:	q = "charm birds or mammals"; break;
+			case GF_CHARM_MONSTER:	q = "charm living monsters other than dragons"; break;
+			case GF_CHARM_PERSON:	q = "charm elves, dwarves, humans, orcs, trolls or giants"; break;
+			case GF_BIND_DEMON:		q = "bind demons to a cursed item"; break;
+			case GF_BIND_DRAGON:	q = "bind dragons to a cursed item"; break;
+			case GF_BIND_UNDEAD:	q = "bind undead to a cursed item"; break;
+			case GF_BIND_FAMILIAR:	q = "bind a familiar to you"; break;
+			case GF_VAMP_DRAIN:	q = "drain health"; break;
+			case GF_MANA_DRAIN:	q = "drain mana"; break;
 		}
 
 

@@ -2263,7 +2263,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_SWARM: for (k = 0; k < (rlev / 20) + 2; k++) mon_ball_minor(who, what, y, x, effect, dam, 2, TRUE, result); break;
 				case RBM_DAGGER: mon_shot(who, what, y, x, effect, dam, hit, result); break;
 				case RBM_SCATTER: for (k = 0; k < (rlev / 10) + 3; k++) { scatter(&y, &x, m_ptr->fy, m_ptr->fx, 5, 0); (void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0); } break;
-				default: mon_beam(who, what, y, x, effect, dam, 2, format("reaches out and %s", result)); /* For all hurt huge attacks */
+				default: mon_beam(who, what, y, x, effect, dam, 2, result); /* For all hurt huge attacks */
 			}
 
 			/* Hack -- only one of cut or stun */

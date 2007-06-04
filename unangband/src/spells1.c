@@ -3798,6 +3798,22 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Animate trees */
+		case GF_ANIM_TREE:
+		{
+			bool change = FALSE;
+
+			if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_TREE,
+					who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) change = TRUE;
+
+			if (change)
+			{
+				cave_set_feat(y,x,FEAT_GROUND);
+			}
+
+			break;
+		}
+
 		/* Animate elements */
 		case GF_ANIM_ELEMENT:
 		{
@@ -3824,7 +3840,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 
 			if (change)
 			{
-				cave_set_feat(y,x,FEAT_FLOOR_EARTH);
+				cave_set_feat(y,x,FEAT_GROUND);
 			}
 
 			break;
@@ -4641,7 +4657,6 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 }
 
 
-
 /*
  * Check if enough monsters are terrified by the player.
  */
@@ -4852,6 +4867,259 @@ static bool monster_save(monster_type *m_ptr, int power, bool *near)
 	return (FALSE);
 }
 
+/*
+ * Hack -- help decide if a monster race is "okay" to charm.
+ * 
+ * Accept any insects, except spiders.
+ */
+static bool charm_insect_hook(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Require insects */
+	if ((r_ptr->flags3 & (RF3_INSECT)) == 0) return (FALSE);
+	
+	/* Reject spiders */
+	if (r_ptr->d_char == 'S') return (FALSE);
+
+	return (TRUE);
+}
+
+
+/*
+ * Hack -- help decide if a monster race is "okay" to charm.
+ * 
+ * Accept reptiles.
+ */
+static bool charm_reptile_hook(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Require animals */
+	if ((r_ptr->flags3 & (RF3_ANIMAL)) == 0) return (FALSE);
+
+	/* Explicitly reject undead, demons and dragons, plants and insects */
+	if (r_ptr->flags3 & (RF3_UNDEAD | RF3_DEMON | RF3_DRAGON | RF3_PLANT | RF3_INSECT)) return (FALSE);
+	
+	/* Reject orcs, trolls, giants */
+	if (r_ptr->flags3 & (RF3_ORC | RF3_TROLL | RF3_GIANT)) return (FALSE);
+	
+	/* Reject men, elves, dwarves */
+	if (r_ptr->flags9 & (RF9_MAN | RF9_ELF | RF9_DWARF)) return (FALSE);
+	
+	/* Hack -- Reject hydras */
+	if (r_ptr->d_char == 'y') return (FALSE);
+
+	/* Hack -- Reject zephyr hounds */
+	if (r_ptr->d_char == 'Z') return (FALSE);
+	
+	/* Ensure they do not have feathers or fur */
+	if ((r_ptr->flags8 & (RF8_HAS_FUR | RF8_HAS_FEATHER)) != 0) return (FALSE);
+
+	return (TRUE);
+}
+
+
+/*
+ * Hack -- help decide if a monster race is "okay" to charm.
+ * 
+ * Accept reptiles.
+ */
+static bool charm_animal_hook(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Require animals */
+	if ((r_ptr->flags3 & (RF3_ANIMAL)) == 0) return (FALSE);
+
+	/* Explicitly reject undead, demons and dragons, plants and insects */
+	if (r_ptr->flags3 & (RF3_UNDEAD | RF3_DEMON | RF3_DRAGON | RF3_PLANT | RF3_INSECT)) return (FALSE);
+	
+	/* Reject orcs, trolls, giants */
+	if (r_ptr->flags3 & (RF3_ORC | RF3_TROLL | RF3_GIANT)) return (FALSE);
+	
+	/* Reject men, elves, dwarves */
+	if (r_ptr->flags9 & (RF9_MAN | RF9_ELF | RF9_DWARF)) return (FALSE);
+	
+	/* Hack -- Reject hydras */
+	if (r_ptr->d_char == 'y') return (FALSE);
+
+	/* Hack -- Reject zephyr hounds */
+	if (r_ptr->d_char == 'Z') return (FALSE);
+	
+	/* If they have feathers, ensure not scales or fur */
+	if (((r_ptr->flags8 & (RF8_HAS_FEATHER)) != 0) && ((r_ptr->flags8 & (RF8_HAS_FUR | RF8_HAS_SCALE)) != 0)) return (FALSE);
+		
+	/* If they have fur, ensure not scales or feathers */
+	if (((r_ptr->flags8 & (RF8_HAS_FUR)) != 0) && ((r_ptr->flags8 & (RF8_HAS_FEATHER | RF8_HAS_SCALE)) != 0)) return (FALSE);
+
+	/* Reject if they have do not have feathers or fur */
+	if ((r_ptr->flags8 & (RF8_HAS_FUR | RF8_HAS_FEATHER)) == 0) return (FALSE);
+
+	return (TRUE);
+}
+
+
+
+/*
+ * Hack -- help decide if a monster race is "okay" to charm.
+ * 
+ * We define 'persons' as orcs, trolls, giants, elves, dwarves,
+ * humans who are not also dragons, demons or undead (currently
+ * only undead applies), animals, insects or plants.
+ */
+static bool charm_person_hook(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Explicitly reject undead, demons and dragons, plants, insects, animals */
+	if (r_ptr->flags3 & (RF3_UNDEAD | RF3_DEMON | RF3_DRAGON | RF3_INSECT | RF3_PLANT | RF3_ANIMAL)) return (FALSE);
+	
+	/* Reject non-orc, non-troll, non-giant, non-elf, non-man, non-dwarf */
+	if (((r_ptr->flags3 & (RF3_ORC | RF3_TROLL | RF3_GIANT)) == 0) &&
+		((r_ptr->flags9 & (RF9_MAN | RF9_ELF | RF9_DWARF)) == 0)) return (FALSE);
+	
+	return (TRUE);
+}
+
+
+/*
+ * Hack -- help decide if a monster race is "okay" to charm.
+ * 
+ * We define 'monsters' as creatures that are not persons (see above)
+ * who are not also dragons, demons or undead (currently only undead
+ * applies). We also exclude animals that are 'straight' animals,
+ * and not 'weird' hybrids.
+ */
+static bool charm_monster_hook(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Explicitly reject undead, demons and dragons */
+	if (r_ptr->flags3 & (RF3_UNDEAD | RF3_DEMON | RF3_DRAGON)) return (FALSE);
+	
+	/* Reject orcs, trolls, giants, that are not plant / animal / insect hybrids */
+	if (((r_ptr->flags3 & (RF3_ORC | RF3_TROLL | RF3_GIANT)) != 0) && ((r_ptr->flags3 & (RF3_PLANT | RF3_INSECT | RF3_ANIMAL)) == 0)) return (FALSE);
+	
+	/* Reject men, elves, dwarves, that are not plant / animal / insect hybrids */
+	if (((r_ptr->flags9 & (RF9_MAN | RF9_ELF | RF9_DWARF)) == 0) && ((r_ptr->flags3 & (RF3_PLANT | RF3_INSECT | RF3_ANIMAL)) == 0)) return (FALSE);
+
+	/* Reject 'pure' animals */
+	if ((r_ptr->flags3 & (RF3_ANIMAL)) != 0)
+	{
+		/* If they have feathers, but not scales or fur */
+		if (((r_ptr->flags8 & (RF8_HAS_FEATHER)) != 0) && ((r_ptr->flags8 & (RF8_HAS_FUR | RF8_HAS_SCALE)) == 0)) return (FALSE);
+		
+		/* If they have fur, but not scales or feathers */
+		if (((r_ptr->flags8 & (RF8_HAS_FUR)) != 0) && ((r_ptr->flags8 & (RF8_HAS_FEATHER | RF8_HAS_SCALE)) == 0)) return (FALSE);
+
+		/* If they have scales, but not feathers or fur */
+		if (((r_ptr->flags8 & (RF8_HAS_SCALE)) != 0) && ((r_ptr->flags8 & (RF8_HAS_FUR | RF8_HAS_FEATHER)) == 0)) return (FALSE);
+	}
+	
+	return (TRUE);
+}
+
+
+/*
+ * Hack -- help decide if a monster race is "okay" to charm.
+ * 
+ * We define simple 'familiar' as not undead, demon, dragon, plant, insect,
+ * orc etc., must have the animal flag and not be a hydra, and must not
+ * be 'mixed' hybrid animals. Also exclude 'zephyr hounds'.
+ * 
+ * However, as a nod to D&D, we allow Imps, Quasits and Homouculus'.
+ */
+static bool charm_familiar_hook(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Hack -- accept some fixed races */
+	switch(r_idx)
+	{
+		case 201: /* Homunculus */
+		case 212: /* Quasit */
+		case 213: /* Imp */
+			return (TRUE);
+	}
+
+	/* Require animals */
+	if ((r_ptr->flags3 & (RF3_ANIMAL)) == 0) return (FALSE);
+
+	/* Explicitly reject undead, demons and dragons, plants and insects */
+	if (r_ptr->flags3 & (RF3_UNDEAD | RF3_DEMON | RF3_DRAGON | RF3_PLANT | RF3_INSECT)) return (FALSE);
+	
+	/* Reject orcs, trolls, giants */
+	if (r_ptr->flags3 & (RF3_ORC | RF3_TROLL | RF3_GIANT)) return (FALSE);
+	
+	/* Reject men, elves, dwarves */
+	if (r_ptr->flags9 & (RF9_MAN | RF9_ELF | RF9_DWARF)) return (FALSE);
+	
+	/* Hack -- Reject hydras */
+	if (r_ptr->d_char == 'y') return (FALSE);
+
+	/* Hack -- Reject zephyr hounds */
+	if (r_ptr->d_char == 'Z') return (FALSE);
+	
+	/* If they have feathers, ensure not scales or fur */
+	if (((r_ptr->flags8 & (RF8_HAS_FEATHER)) != 0) && ((r_ptr->flags8 & (RF8_HAS_FUR | RF8_HAS_SCALE)) != 0)) return (FALSE);
+		
+	/* If they have fur, ensure not scales or feathers */
+	if (((r_ptr->flags8 & (RF8_HAS_FUR)) != 0) && ((r_ptr->flags8 & (RF8_HAS_FEATHER | RF8_HAS_SCALE)) != 0)) return (FALSE);
+
+	/* If they have scales, ensure not feathers or fur */
+	if (((r_ptr->flags8 & (RF8_HAS_SCALE)) != 0) && ((r_ptr->flags8 & (RF8_HAS_FUR | RF8_HAS_FEATHER)) != 0)) return (FALSE);
+
+	return (TRUE);
+}
+
+/*
+ * Hack -- help decide if a monster race is "okay" to charm.
+ * 
+ * Anything dragonnish is fine + plus hydras.
+ */
+static bool charm_dragon_hook(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Require dragons */
+	if (((r_ptr->flags3 & (RF3_DRAGON)) == 0) && (r_ptr->d_char != 'y')) return (FALSE);
+
+	return (TRUE);
+}
+
+
+/*
+ * Hack -- help decide if a monster race is "okay" to charm.
+ * 
+ * Anything demon.
+ */
+static bool charm_demon_hook(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Require demons */
+	if ((r_ptr->flags3 & (RF3_DEMON)) == 0) return (FALSE);
+
+	return (TRUE);
+}
+
+
+/*
+ * Hack -- help decide if a monster race is "okay" to charm.
+ * 
+ * Anything undead.
+ */
+static bool charm_undead_hook(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Require undead */
+	if ((r_ptr->flags3 & (RF3_UNDEAD)) == 0) return (FALSE);
+
+	return (TRUE);
+}
+
 
 /*
  * Helper function for "project()" below.
@@ -4966,6 +5234,9 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 	/* Destruction of inventory? */
 	inven_func do_inven_destroy = NULL;
+
+	/* Affected by charm */
+	bool (*charm_hook)(int r_idx) = NULL;
 
 	/* Hold the monster name */
 	char m_name[80];
@@ -5098,6 +5369,69 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		default:
 		{
 			teleport_hook = NULL;
+		}
+	}
+
+	/* Hack -- pre-stage charm hooks for efficiency */
+	switch(typ)
+	{
+		/* Teleport from darkness to darkness */
+		case GF_CHARM_INSECT:
+		{
+			charm_hook = charm_insect_hook;
+			break;
+		}
+		
+		/* Scaled / skinned animals */
+		case GF_CHARM_REPTILE:
+		{
+			charm_hook = charm_reptile_hook;
+			break;
+		}
+		
+		/* Feathered / furry animals */
+		case GF_CHARM_ANIMAL:
+		{
+			charm_hook = charm_animal_hook;
+			break;
+		}
+		
+		/* Persons */
+		case GF_CHARM_PERSON:
+		{
+			charm_hook = charm_person_hook;
+			break;
+		}
+
+		/* Living monsters other than dragons */		
+		case GF_CHARM_MONSTER:
+		{
+			charm_hook = charm_monster_hook;
+			break;
+		}
+		
+		/* Any animal */
+		case GF_BIND_FAMILIAR:
+		{
+			charm_hook = charm_familiar_hook;
+		}
+		
+		/* Any dragon */
+		case GF_BIND_DRAGON:
+		{
+			charm_hook = charm_dragon_hook;
+		}
+		
+		/* Any demon */
+		case GF_BIND_DEMON:
+		{
+			charm_hook = charm_demon_hook;
+		}
+
+		/* Any undead */
+		case GF_BIND_UNDEAD:
+		{
+			charm_hook = charm_undead_hook;
 		}
 	}
 
@@ -5999,8 +6333,9 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
-		/* Drain Life */
+		/* Drain Life and Vampiric Drain */
 		case GF_DRAIN_LIFE:
+		case GF_VAMP_DRAIN:
 		{
 			if (seen) obvious = TRUE;
 
@@ -6033,6 +6368,39 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 				obvious = FALSE;
 				dam = 0;
+			}
+			else
+			{
+				note = " is drained of health.";
+			}
+			
+			if (typ == GF_DRAIN_LIFE) break;
+			
+			/* Do not allow wimpy monsters to yield much profit */
+			if (m_ptr->hp + 1 < dam) dam = m_ptr->hp + 1;
+
+			/* Character has cast the spell */
+			if (who <= SOURCE_PLAYER_START)
+			{
+				/* Spell is damaging, and has hit a warm-blooded creature. */
+				if (dam > 0)
+				{
+					/* msg_print("You suck in some life force."); */
+
+					/* Heal caster */
+					hp_player(dam);
+
+					/* Feed caster -- protect against bloating */
+					if (p_ptr->food + dam * 8 < PY_FOOD_FULL)
+						set_food(p_ptr->food + dam * 8);
+					else
+						set_food(PY_FOOD_FULL);
+				}
+				/* Oops */
+				else if (do_heal)
+				{
+					take_hit(do_heal, "trying to draw health from an undead opponent");
+				}
 			}
 			break;
 		}
@@ -7097,6 +7465,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Melee attack - lose mana */
+		case GF_MANA_DRAIN:
 		case GF_LOSE_MANA:
 		{
 			/* Monster may have mana */
@@ -7104,6 +7473,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			{
 				/* Drain depends on maximum mana */
 				int drain = 2 + rand_int(r_ptr->mana / 10);
+
+				dam = 0;
 
 				/* Monster still has mana */
 				if (m_ptr->mana > drain)
@@ -7119,6 +7490,37 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				}
 
 				if (seen) obvious = TRUE;
+				
+				if (typ == GF_LOSE_MANA) break;
+				
+				/* Convert to player mana */
+				drain = damroll(drain,5);
+				
+				/* Monster notices */
+				update_smart_forget(cave_m_idx[y][x], SM_IMM_MANA);
+
+				/* Player gains back all mana */
+				if (p_ptr->csp + drain >= p_ptr->msp)
+				{
+					p_ptr->csp = p_ptr->msp;
+					p_ptr->csp_frac = 0;
+
+					msg_print("You feel your head clear.");
+				}
+				/* Player gains back partial mana */
+				else
+				{
+					p_ptr->csp += drain;
+
+					/*msg_print("You feel your concentration improve.");*/
+				}
+
+				/* Update mana */
+				p_ptr->update |= (PU_MANA);
+
+				p_ptr->redraw |= (PR_MANA);
+				p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1 | PW_PLAYER_2 | PW_PLAYER_3);
+				obvious = TRUE;				
 			}
 			break;
 		}
@@ -7380,7 +7782,68 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			
 			break;
 		}
-		
+
+		/* Charm effects */
+		case GF_CHARM_INSECT:
+		case GF_CHARM_ANIMAL:
+		case GF_CHARM_REPTILE:
+		case GF_CHARM_MONSTER:
+		case GF_CHARM_PERSON:
+
+		/* Bind effects for the moment */
+		case GF_BIND_DRAGON:
+		case GF_BIND_FAMILIAR:
+		case GF_BIND_UNDEAD:
+		case GF_BIND_DEMON:
+		{
+			if (charm_hook(m_ptr->r_idx))
+			{
+				if (seen) obvious = TRUE;
+
+				/* Cannot be charmed */
+				if (r_ptr->flags3 & (RF3_NO_SLEEP))
+				{
+					if ((seen) && !(l_ptr->flags3 & (RF3_NO_SLEEP)))
+					{
+						note = " cannot be charmed or slept.";
+						l_ptr->flags3 |= (RF3_NO_SLEEP);
+					}
+				}
+
+				/* Attempt a saving throw */
+				else if (monster_save(m_ptr, dam, &near))
+				{
+					if ((near) && (seen))
+					{
+						note = " appears somewhat persuaded.";
+						m_ptr->mflag |= (MFLAG_IGNORE);
+					}
+					else
+					{
+						if (seen) note = " is unaffected!";
+						obvious = FALSE;
+					}
+				}
+				else
+				{
+					/* Go to sleep (much) later */
+					note = " falls under your influence!";
+					m_ptr->mflag |= (MFLAG_ALLY);
+					m_ptr->mflag &= ~(MFLAG_IGNORE);
+				}
+
+
+			}
+			else
+			{
+				skipped = TRUE;
+			}
+
+			/* No "real" damage */
+			dam = 0;
+			break;			
+		}
+
 		/* Default */
 		default:
 		{

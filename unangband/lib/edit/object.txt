@@ -6748,7 +6748,7 @@ P:0:1d1:0:0:0
 # It is not possible to pick the 'normal' spellbooks as a speciality.
 # However, the 'high' books picked here can be specialised in.
 
-#### 'Magery' School -- corresponds to Sangband Oath of Nature ####
+#### Druidic School -- corresponds to Sangband Oath of Nature ####
 
 N:920:of Hedges
 G:?:R
@@ -6771,7 +6771,7 @@ W:20:0:30:400
 A:20/6
 P:0:1d1:0:0:0
 
-N:923:of Magery
+N:923:of Druidry
 G:?:R
 I:90:39:0
 W:30:0:30:800
@@ -6802,7 +6802,7 @@ A:80/6
 P:0:1d1:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
-#### Sorcery School -- corresponds to Sangband Oath of Blood Magic ####
+#### Thuamaturgy School -- corresponds to Sangband Oath of Blood Magic ####
 
 N:927:of Curses
 G:?:R
@@ -6825,7 +6825,7 @@ W:20:0:30:400
 A:20/6
 P:0:1d1:0:0:0
 
-N:931:of Sorcery
+N:931:of Thuamaturgy
 G:?:R
 I:90:43:0
 W:30:0:30:800
@@ -6856,7 +6856,7 @@ A:80/6
 P:0:1d1:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
-#### Thuamaturgy School -- no Sangband correspondence ####
+#### Sorcery School -- no Sangband correspondence ####
 
 N:935:of Glamours
 G:?:R
@@ -6879,7 +6879,7 @@ W:20:0:30:400
 A:20/6
 P:0:1d1:0:0:0
 
-N:938:of Thuamaturgy
+N:938:of Sorcery
 G:?:R
 I:90:47:0
 W:30:0:30:800

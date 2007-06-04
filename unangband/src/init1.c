@@ -387,7 +387,19 @@ static cptr r_info_blow_effect[] =
 	"HURT_WOOD",
 	"AWAY_NATURE",
 	"AWAY_FIRE",
-	NULL,
+	"ANIM_TREE",
+	"CHARM_INSECT",
+	"CHARM_ANIMAL",
+	"CHARM_REPTILE",
+	"CHARM_MONSTER",
+	"CHARM_PERSON",
+	"BIND_DEMON",
+	"BIND_UNDEAD",
+	"BIND_DRAGON",
+	"BIND_FAMILIAR",
+	"VAMP_DRAIN",
+	"MANA_DRAIN",
+	NULL
 };
 
 /*
