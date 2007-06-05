@@ -5863,7 +5863,7 @@ bool apply_alchemical_formula(object_type *o_ptr, int *dam, int *rad, int *rng, 
 		{
 			int n;
 
-			n = atoi(s+2);
+			n = atoi(s+1);
 
 			switch (s[2])
 			{
