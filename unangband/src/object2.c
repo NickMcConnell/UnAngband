@@ -6129,8 +6129,17 @@ bool break_near(object_type *j_ptr, int y, int x)
 					if (i && !method) break;
 
 					/* Message */
-					if (!i && !j && rad) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
-					if (!i && !j && !rad) msg_format("The %s burst%s into flames.",o_name, (plural ? "" : "s"));
+					if (!i && !j) 
+					{
+					  if (power == 0)
+					    msg_format("The %s break%s with a fizzling sound.",o_name, (plural ? "" : "s"));
+					  else if (!method)
+					    msg_format("The %s break%s with a splash.",o_name, (plural ? "" : "s"));
+					  else if (j_ptr->tval == TV_LITE) 
+					    msg_format("The %s burst%s into flames.",o_name, (plural ? "" : "s"));
+					  else
+					    msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));
+					}
 
 					/* Mega hack --- spells in objects */
 					if (!d_side)
