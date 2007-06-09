@@ -807,7 +807,7 @@ static void process_world(void)
 	if (p_ptr->cut) regen_amount = 0;
 
 	/* If disease has no other effect, prevent regeneration */
-	if ((p_ptr->disease) && !(p_ptr->disease & (DISEASE_BLOWS))) regen_amount = 0;
+	if ((p_ptr->disease) && !(p_ptr->disease & (DISEASE_DRAIN_HP))) regen_amount = 0;
 
 	if ((p_ptr->cur_flags3 & (TR3_DRAIN_HP)) != 0) regen_amount = 0;
 	if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) regen_amount = 0;
@@ -1419,6 +1419,7 @@ static void process_world(void)
 				{
 					msg_print("You vomit up your food!");
 					(void)set_food(PY_FOOD_STARVE - 1);
+					disturb(0, 0);
 					break;
 				}
 
@@ -1527,15 +1528,16 @@ static void process_world(void)
 				case DISEASE_PARALYZE:
 				{
 					(void)set_paralyzed(p_ptr->paralyzed + randint(p_ptr->disease & (DISEASE_POWER) ? 10 : 3) + 1);
+					disturb(0,0);
 					break;
 				}
 
 				case DISEASE_STASTIS:
 				{
 					(void)set_stastis(p_ptr->stastis + randint(p_ptr->disease & (DISEASE_POWER) ? 10 : 3) + 1);
+					disturb(0,0);
 					break;
 				}
-
 			}
 
 			/* The player is going to suffer further */
@@ -1579,11 +1581,18 @@ static void process_world(void)
 				if (!rand_int(20)) p_ptr->disease |= (DISEASE_LIGHT);
 			}
 		}
-
-		/* Plagues mutate to get blows */
-		else if ((p_ptr->disease & (DISEASE_DISEASE)) && !(rand_int(3)))
+		
+		/* All diseases mutate to get blows if they have no effect currently*/
+		else if ((!rand_int(3)) && ((p_ptr->disease & (1 << DISEASE_TYPES_HEAVY)) == 0))
 		{
-			p_ptr->disease |= (1 << rand_int(DISEASE_BLOWS));
+			if (p_ptr->disease & (DISEASE_HEAVY))
+			{
+				p_ptr->disease |= (1 << rand_int(DISEASE_TYPES_HEAVY));
+			}
+			else
+			{
+				p_ptr->disease |= (1 << rand_int(DISEASE_BLOWS));
+			}
 			if (!rand_int(20)) p_ptr->disease |= (DISEASE_LIGHT);
 		}
 
@@ -1596,12 +1605,6 @@ static void process_world(void)
 				p_ptr->disease |= (1 << rand_int(DISEASE_TYPES));
 		}
 
-		/* Recurrence of heavy diseases if all symptoms treated */
-		if ((p_ptr->disease & (DISEASE_HEAVY)) && !(p_ptr->disease & ((1 << DISEASE_TYPES_HEAVY)-1)) && !(rand_int(10)))
-		{
-			p_ptr->disease |= (1 << rand_int(DISEASE_TYPES_HEAVY));
-		}
-
 		/* The player is on the mend */
 		if ((p_ptr->disease & (DISEASE_LIGHT)) && !(rand_int(6)))
 		{
@@ -1609,6 +1612,8 @@ static void process_world(void)
 			p_ptr->disease &= (DISEASE_HEAVY | DISEASE_PERMANENT);
 
 			p_ptr->redraw |= (PR_DISEASE);
+			
+			if (disturb_state) disturb(0, 0);
 		}
 
 		/* Diseases? */
