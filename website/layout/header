@@ -20,7 +20,7 @@
 	<tbody>
     <tr>
 
-		<td valign="top" width="120">
+		<td valign="top" width="200">
 			
       <table border="0" cellpadding="4" cellspacing="0" width="100%">
 
@@ -47,15 +47,15 @@
 
            <b><br>Screenshots</b><br>
 						<a href="http://angband.oook.cz/screens.php?v=UnAngband">Latest screenshots</a><br>
-						<a href="caradhras.gif">Caradhras</a><br>
-						<a href="isengard.gif">Isengard</a><br>
-						<a href="lothlorien.gif">Lothlorien</a><br>
-						<a href="moria.gif">Moria</a><br>
+						<a href="screenshots/caradhras.gif">Caradhras</a><br>
+						<a href="screenshots/isengard.gif">Isengard</a><br>
+						<a href="screenshots/lothlorien.gif">Lothlorien</a><br>
+						<a href="screenshots/moria.gif">Moria</a><br>
 						<a href="http://angband.oook.cz/screens.php?v=UnAngband">Other screenshots</a><br>
             <br>
             <b>Spoilers</b><br>
-						<a href="artifact.txt">Artifacts</a><br>
-						<a href="methods.txt">Attack Methods</a>
+						<a href="art-info.txt">Artifacts</a><br>
+						<a href="methods.html">Attack Methods</a>
 						<a href="obj-desc.txt">Object List</a><br>
 						<a href="obj-info.txt">Objects</a><br>
 						<a href="mon-info.txt">Monsters</a><br>
