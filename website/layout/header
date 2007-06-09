@@ -55,14 +55,14 @@
             <br>
             <b>Spoilers</b><br>
 						<a href="art-info.txt">Artifacts</a><br>
-						<a href="methods.html">Attack Methods</a>
+						<a href="methods.html">Attack Methods</a><br>
 						<a href="obj-desc.txt">Object List</a><br>
 						<a href="obj-info.txt">Objects</a><br>
 						<a href="mon-info.txt">Monsters</a><br>
-						<a href="mon-desc.txt">Monster List</a>
-						<a href="ter-desc.txt">Terrain</a>
-						<a href="ter-desc.txt">Terrain List</a>
-						<a href="slay-tbl.txt">Slays</a>						
+						<a href="mon-desc.txt">Monster List</a><br>
+						<a href="ter-desc.txt">Terrain</a><br>
+						<a href="ter-desc.txt">Terrain List</a><br>
+						<a href="slay-tbl.txt">Slays</a><br>						
 					</td>
 				</tr>
         </tbody>
