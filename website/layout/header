@@ -1,54 +1,72 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>Unangband: <?=$title?></title>
-<link rel="stylesheet" rev="content" type="text/css" href="style.css">
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
+
+  <title>Unangband: The Unnamed Angband</title>
+  <link rel="stylesheet" rev="content" type="text/css" href="style.css">
+
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 </head>
 
-<!--<body bgcolor="#A6BAE2" text="#003373" link="#0000FF" alink="#CCDEFF" vlink="#003373">-->
-<body>
-<h1 align="center">Unangband: <?=$title?></h1>
 
-<table border="0" cellspacing="2" width="100%">
-	<tr>
+<body link="#006baa" alink="#ccdeff" bgcolor="#a6bae2" text="#003373" vlink="#568fd3">
+
+<h1 align="center">Unangband: The Unnamed Angband</h1>
+
+
+<table border="0" cellspacing="2">
+
+	<tbody>
+    <tr>
+
 		<td valign="top" width="120">
-			<table cellpadding="4" cellspacing="0" border="0" width="100%">
-				<tr>
+			
+      <table border="0" cellpadding="4" cellspacing="0" width="100%">
+
+				<tbody>
+          <tr>
+
 					<td>
-						<b><a href="/">Main Page</a></b>
+						<b>Resources</b><br>
+            <a href="http://roguelikedeveloper.blogspot.com">Blog</a><br>
+            <a href="http://developer.berlios.de/bugs/?group_id=331">Report a bug</a><br>            
+            <a href="http://angband.oook.cz/forum/forumdisplay.php?f=4">Forums</a><br>            
+            <a href="http://angband.oook.cz/ladder-browse.php?v=Unangband">Ladder</a><br>
+            <a href="http://tech.groups.yahoo.com/group/unangband/">Mailing list</a><br>
+            <a href="http://developer.berlios.de/projects/unangband/">Project page</a><br>
+            <a href="http://developer.berlios.de/svn/?group_id=331">Browse SVN</a><br>
+            <a href="http://developer.berlios.de/svn/?group_id=331">Change log</a><br>
+            <a href="http://developer.berlios.de/svn/?group_id=331">To do list</a><br>
+
+            <br><b>Downloads</b><br>
+            <a href="http://developer.berlios.de/project/showfiles.php?group_id=331">Latest releases</a><br>
+            <a href="http://download.berlios.de/unangband/unangband-062-wip5a-win.zip">Windows</a><br>
+            <a href="http://download.berlios.de/unangband/unangband-062-wip5a-src.zip">Source code</a><br>
+            <a href="http://developer.berlios.de/project/showfiles.php?group_id=331">Other platforms</a><br>
+
+           <b><br>Screenshots</b><br>
+						<a href="http://angband.oook.cz/screens.php?v=UnAngband">Latest screenshots</a><br>
+						<a href="caradhras.html">Caradhras</a><br>
+						<a href="isengard.html">Isengard</a><br>
+						<a href="lothlorien.html">Lothlorien</a><br>
+						<a href="moria.html">Moria</a><br>
+						<a href="http://angband.oook.cz/screens.php?v=UnAngband">Other screenshots</a><br>
+            <br>
+            <b>Spoilers</b><br>
+						<a href="artifact.txt">Artifacts</a><br>
+						<a href="methods.txt">Attack Methods</a>
+						<a href="obj-desc.txt">Object List</a><br>
+						<a href="obj-info.txt">Objects</a><br>
+						<a href="mon-info.txt">Monsters</a><br>
+						<a href="mon-desc.txt">Monster List</a>
+						<a href="ter-desc.txt">Terrain</a>
+						<a href="ter-desc.txt">Terrain List</a>
+						<a href="slay-tbl.txt">Slays</a>						
 					</td>
 				</tr>
-
-				<tr>
-					<td>&nbsp;</td>
-				</tr>
-
-				<tr>
-					<td>
-						<b>Screenshots</b><br>
-
-						&middot; <a href="screenshot.php?shot=caradhras">Caradhras</a><br>
-						&middot; <a href="screenshot.php?shot=isengard">Isengard</a><br>
-						&middot; <a href="screenshot.php?shot=lothlorien">Lothlorien</a><br>
-						&middot; <a href="screenshot.php?shot=moria">Moria</a>
-					</td>
-				</tr>
-
-				<tr>
-					<td>&nbsp;</td>
-				</tr>
-
-				<tr>
-					<td>
-						<b>Spoilers</b><br>
-
-						&middot; <a href="artifact.txt">Artifacts</a><br>
-						&middot; <a href="obj-desc.txt">Object List</a><br>
-						&middot; <a href="mon-info.txt">Monsters</a><br>
-						&middot; <a href="mon-desc.txt">Monster List</a>
-					</td>
-				</tr>
-			</table>
+        </tbody>
+      </table>
 		</td>
 		<td valign="top">
+		
