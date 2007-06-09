@@ -2743,20 +2743,22 @@ static void calc_runes(void)
  */
 static void calc_hitpoints(void)
 {
-	int bonus, mhp;
+	int con_bonus, siz_bonus, mhp;
 
 	/* Un-inflate "extra hit die points above SIZ" value */
-	bonus = ((int)(adj_con_die[p_ptr->stat_ind[A_CON]]) - 128);
+	con_bonus = ((int)(adj_con_die[p_ptr->stat_ind[A_CON]]) - 128);
 
 	/* Un-inflate "extra hit die points on top of standard 1d10" value */
-	bonus += ((int)(adj_siz_die[p_ptr->stat_ind[A_SIZ]]) - 128);
+	siz_bonus = ((int)(adj_siz_die[p_ptr->stat_ind[A_SIZ]]) - 128);
 
 	/* Calculate hitdice */
-	p_ptr->hitdie = 10 + bonus;
+	p_ptr->hitdie = 10 + con_bonus * 2 + siz_bonus;
 
 	/* Calculate hitpoints */
 	mhp = p_ptr->player_hp[p_ptr->lev - 1]
-	  + p_ptr->player_hp[p_ptr->lev - 1] * bonus / 10;
+	  + p_ptr->player_hp[p_ptr->lev - 1] * con_bonus / 10
+	  + p_ptr->player_hp[p_ptr->lev - 1] * siz_bonus / 20
+	  + siz_bonus;
 
 	/* New maximum hitpoints */
 	if (p_ptr->mhp != mhp)
