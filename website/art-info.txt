@@ -1,0 +1,3615 @@
+Artifact Spoilers for Unangband 0.6.2
+=====================================
+
+
+Edged Weapons
+-------------
+
+The Main Gauche of Maedhros (2d5) (+12,+15)
+-------------------------------------------
+This Sword weighs 3.0 lbs.  It does x4 damage against trolls and giants.  
+It modifies intelligence and dexterity and agility.  It protects you from 
+paralysis and magical slowness.  It gives its wielder see invisible.  It
+senses giants and trolls.  It is not damaged by acid, electricity, fire, 
+cold and water.  It cannot be stolen from your inventory.  When attacking
+or thrown, it does 2d5+15 edged damage.  When set in a trap, it does 2d5
++15 edged damage.  You know everything about this item.  
+
+Level 15, Rarity 30, 3.0 lbs, 20000 AU
+
+
+The Dagger 'Angrist' (2d4) (+10,+15) [+5]
+-----------------------------------------
+This Sword weighs 1.2 lbs.  It does x4 damage against orcs and trolls.  It
+does x3 damage from acid and holiness.  It modifies dexterity and agility.
+It sustains dexterity and agility.  It provides resistance to acid and 
+powerful darkness.  It protects you from paralysis and magical slowness.  
+It is balanced for throwing.  It is not damaged by acid, electricity, fire
+, cold and water.  It cannot be stolen from your inventory.  When
+attacking or easily thrown, it does 2d4+15 edged damage.  When set in a
+trap, it does 2d4+15 edged damage.  It increases your armor class by 5.  
+You know everything about this item.  
+
+Level 20, Rarity 80, 1.2 lbs, 100000 AU
+
+
+The Dagger 'Narthanc' (1d4) (+4,+6)
+-----------------------------------
+This Sword weighs 1.2 lbs.  It does x3 damage from fire.  It provides
+resistance to fire.  It is balanced for throwing.  It is not damaged by 
+acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When attacking or easily thrown, it does 1d4+6 edged damage.  
+When activated, it creates a powerful bolt to burn your enemies for 6d8 
+damage, recharging in d8+8 turns.  When inscribed with {=A} and attacking
+or thrown against an opponent, it burns one target for 6d8 damage,
+recharging in d8+8 turns.  When set in a trap, it does 1d4+6 edged damage
+ and burns one target for 6d8 damage, recharging in d8+8 turns.  You know
+everything about this item.  
+
+Level 4, Rarity 5, 1.2 lbs, 12000 AU
+
+
+The Dagger 'Nimthanc' (1d4) (+4,+6)
+-----------------------------------
+This Sword weighs 1.2 lbs.  It does x3 damage from cold.  It provides
+resistance to cold.  It is balanced for throwing.  It is not damaged by 
+acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When attacking or easily thrown, it does 1d4+6 edged damage.  
+When activated, it creates a bolt to freeze your enemies for 5d8 damage,
+recharging in d7+7 turns.  When inscribed with {=A} and attacking or
+thrown against an opponent, it freezes one target for 5d8 damage,
+recharging in d7+7 turns.  When set in a trap, it does 1d4+6 edged damage
+ and freezes one target for 5d8 damage, recharging in d7+7 turns.  You
+know everything about this item.  
+
+Level 4, Rarity 5, 1.2 lbs, 11000 AU
+
+
+The Dagger 'Dethanc' (1d4) (+4,+6)
+----------------------------------
+This Sword weighs 1.2 lbs.  It does x3 damage from electricity.  It
+provides resistance to electricity.  It is balanced for throwing.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When attacking or easily thrown, it does 1d4
++6 edged damage.  When activated, it creates a beam to electrify your
+enemies for 3d6 damage, recharging in d6+6 turns.  When inscribed with
+{=A} and attacking or thrown against an opponent, it electrifys one target
+ for 3d6 damage, recharging in d6+6 turns.  When set in a trap, it does 1d4
++6 edged damage and electrifys one target for 3d6 damage, recharging in
+d6+6 turns.  You know everything about this item.  
+
+Level 4, Rarity 5, 1.2 lbs, 13000 AU
+
+
+The Dagger of Rilia (2d4) (+4,+3)
+---------------------------------
+This Sword weighs 1.2 lbs.  It does x4 damage against orcs.  It does x3
+damage from poison.  It provides resistance to poison and disenchantment.  
+It protects you from the effects of poison.  It is balanced for throwing.  
+It senses orcs.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When attacking or easily
+thrown, it does 2d4+3 edged damage.  When activated, it creates a cloud of 
+radius 2 to poison your enemies for 10 damage, recharging in d4+4 turns.  
+When inscribed with {=A} and attacking or thrown against an opponent, it 
+poisons one target for 10 damage, recharging in d4+4 turns.  When set in a
+trap, it does 2d4+3 edged damage and poisons one target for 10 damage,
+recharging in d4+4 turns.  You know everything about this item.  
+
+Level 5, Rarity 40, 1.2 lbs, 15000 AU
+
+
+The Dagger 'Belangil' (2d4) (+6,+9)
+-----------------------------------
+This Sword weighs 1.2 lbs.  It does x3 damage from cold.  It modifies 
+dexterity and agility and mana regeneration.  It provides resistance to 
+cold.  It gives its wielder slow digestion and see invisible.  It is
+balanced for throwing.  It is not damaged by acid, electricity, fire, cold
+ and water.  It cannot be stolen from your inventory.  When attacking or
+easily thrown, it does 2d4+9 edged damage.  When activated, it creates a
+ball of radius 2 to freeze your enemies for 55 damage, recharging in d5+5
+turns.  When inscribed with {=A} and attacking or thrown against an
+opponent, it freezes one target for 55 damage, recharging in d5+5 turns.  
+When set in a trap, it does 2d4+9 edged damage and freezes one target for
+55 damage, recharging in d5+5 turns.  You know everything about this item.
+
+
+Level 10, Rarity 40, 1.2 lbs, 40000 AU
+
+
+The Bastard Sword 'Calris' (5d4) (-20,+20)
+------------------------------------------
+This Sword weighs 14.0 lbs.  It does x2 damage when charging.  It does x5
+damage against dragons.  It does x4 damage against trolls.  It does x3
+damage from holiness.  It does x3 damage against demons.  It modifies 
+constitution.  It provides resistance to disenchantment.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  It burdens you with aggravation.  It is heavily
+cursed.  When attacking or thrown, it does 5d4+20 edged damage.  When set
+in a trap, it does 5d4+20 edged damage.  You know everything about this
+item.  
+
+Level 30, Rarity 15, 14.0 lbs, 100000 AU
+
+
+The Broad Sword 'Arunruth' (3d5) (+20,+12)
+------------------------------------------
+This Sword weighs 15.0 lbs.  It does x2 damage when charging.  It does x4
+damage against orcs.  It does x3 damage against demons.  It modifies 
+dexterity and agility.  It provides resistance to cold.  It protects you
+from paralysis and magical slowness.  It gives its wielder slow digestion
+ and feather falling.  It is not damaged by acid, electricity, fire, cold
+ and water.  It cannot be stolen from your inventory.  When attacking or
+thrown, it does 3d5+12 edged damage.  When activated, it creates a bolt to
+ freeze your enemies for 5d16 damage, creates a bolt to freeze your enemies
+ for 5d16 damage, and creates a bolt to freeze your enemies for 5d16 
+damage, recharging in 50 turns.  When inscribed with {=A} and attacking an
+opponent, it freezes one target for 5d16 damage, freezes one target for
+5d16 damage, and freezes one target for 5d16 damage, recharging in 50
+turns.  When set in a trap, it does 3d5+12 edged damage and freezes one
+target for 5d16 damage, freezes one target for 5d16 damage, and freezes 
+one target for 5d16 damage, recharging in 50 turns.  You know everything
+about this item.  
+
+Level 20, Rarity 45, 15.0 lbs, 50000 AU
+
+
+The Broad Sword 'Glamdring' (2d5) (+10,+15)
+-------------------------------------------
+This Sword weighs 15.0 lbs.  It does x2 damage when charging.  It does x4
+damage against orcs.  It does x3 damage from fire and holiness.  It does
+x3 damage against demons.  It modifies searching and light radius.  It
+provides resistance to fire and powerful light.  It gives its wielder slow
+digestion.  It is blessed by the gods, allowing priests to wield it.  It
+is not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When attacking or thrown, it does 2d5+15 
+edged damage.  When set in a trap, it does 2d5+15 edged damage.  You know
+everything about this item.  
+
+Level 20, Rarity 20, 15.0 lbs, 40000 AU
+
+
+The Broad Sword 'Aeglin' (2d5) (+12,+16)
+----------------------------------------
+This Sword weighs 15.0 lbs.  It does x2 damage when charging.  It does x4
+damage against orcs, trolls and giants.  It does x3 damage from 
+electricity.  It modifies searching and light radius.  It provides
+resistance to electricity.  It protects you from blindness.  It gives its
+wielder slow digestion.  It is blessed by the gods, allowing priests to
+wield it.  It senses giants, orcs and trolls.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When attacking or thrown, it does 2d5+16 edged damage.  When
+set in a trap, it does 2d5+16 edged damage.  You know everything about
+this item.  
+
+Level 20, Rarity 30, 15.0 lbs, 45000 AU
+
+
+The Broad Sword 'Orcrist' (2d5) (+10,+15)
+-----------------------------------------
+This Sword weighs 15.0 lbs.  It does x2 damage when charging.  It does x4
+damage against orcs.  It does x3 damage from cold and holiness.  It does
+x3 damage against dragons.  It modifies searching and light radius.  It
+provides resistance to cold and powerful darkness.  It gives its wielder 
+slow digestion.  It is blessed by the gods, allowing priests to wield it.  
+It senses orcs.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When attacking or
+thrown, it does 2d5+15 edged damage.  When set in a trap, it does 2d5+15 
+edged damage.  You know everything about this item.  
+
+Level 20, Rarity 20, 15.0 lbs, 40000 AU
+
+
+The Two-Handed Sword 'Gurthang' (3d6) (+13,+17)
+-----------------------------------------------
+This Sword weighs 20.0 lbs.  It does x3 damage when charging.  It does x5
+damage against dragons.  It does x3 damage from poison and fire.  It
+modifies strength and size and hitpoint regeneration.  It provides
+resistance to fire and poison.  It protects you from the effects of poison
+, paralysis and magical slowness.  It gives its wielder slow digestion.  
+It senses dragons.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When attacking or
+thrown, it does 3d6+17 edged damage.  When set in a trap, it does 3d6+17 
+edged damage.  You know everything about this item.  
+
+Level 30, Rarity 30, 20.0 lbs, 100000 AU
+
+
+The Two-Handed Sword 'Zarcuthra' (4d6) (+19,+21)
+------------------------------------------------
+This Sword weighs 25.0 lbs.  It does x3 damage when charging.  It does x5
+damage against dragons.  It does x4 damage against natural creatures, orcs
+, trolls and giants.  It does x3 damage from fire and holiness.  It does
+x3 damage against undead and demons.  It modifies strength and size, 
+charisma and infravision.  It provides resistance to fire and chaos.  It
+protects you from hallucination, paralysis and magical slowness.  It gives
+its wielder see invisible.  It is not damaged by acid, electricity, fire, 
+cold and water.  It cannot be stolen from your inventory.  It burdens you
+with aggravation.  When attacking or thrown, it does 4d6+21 edged damage.  
+When set in a trap, it does 4d6+21 edged damage.  You know everything
+about this item.  
+
+Level 30, Rarity 180, 25.0 lbs, 200000 AU
+
+
+The Two-Handed Sword 'Mormegil' (3d6) (-15,-15) [-20]
+-----------------------------------------------------
+This Sword weighs 25.0 lbs.  It does x3 damage when charging.  It does x5
+damage against dragons.  It does x3 damage from poison.  It does x3 damage
+against undead.  It modifies speed.  It gives its wielder see invisible.  
+It is not damaged by acid, electricity, fire, cold and water.  It cannot
+be stolen from your inventory.  It burdens you with aggravation and 
+experience drain.  It is heavily cursed.  When attacking or thrown, it 
+does 3d6-15 edged damage.  When set in a trap, it does 3d6-15 edged damage
+.  It decreases your armor class by 20.  You know everything about this
+item.  
+
+Level 30, Rarity 15, 25.0 lbs, 10000 AU
+
+
+The Cutlass 'Gondricam' (1d7) (+10,+11)
+---------------------------------------
+This Sword weighs 11.0 lbs.  It modifies dexterity and agility, stealth
+ and hitpoint regeneration.  It provides resistance to acid, electricity, 
+fire and cold.  It gives its wielder feather falling and see invisible.  
+It is not damaged by acid, electricity, fire, cold and water.  It cannot
+be stolen from your inventory.  When attacking or thrown, it does 1d7+11 
+edged damage.  When set in a trap, it does 1d7+11 edged damage.  You know
+everything about this item.  
+
+Level 20, Rarity 8, 11.0 lbs, 28000 AU
+
+
+The Executioner's Sword 'Crisdurian' (4d5) (+18,+19)
+----------------------------------------------------
+This Sword weighs 26.0 lbs.  It does x3 damage when charging.  It does x4
+damage against orcs, trolls and giants.  It does x3 damage from holiness.  
+It does x3 damage against undead and dragons.  It gives its wielder see
+invisible.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When attacking or thrown, it 
+does 4d5+19 edged damage.  When set in a trap, it does 4d5+19 edged damage
+.  You know everything about this item.  
+
+Level 40, Rarity 25, 26.0 lbs, 100000 AU
+
+
+The Katana 'Aglarang' (8d4) (+0,+0)
+-----------------------------------
+This Sword weighs 5.0 lbs.  It modifies dexterity and agility and speed.  
+It sustains dexterity and agility.  It is not damaged by acid, electricity
+, fire, cold and water.  It cannot be stolen from your inventory.  When
+attacking or thrown, it does 8d4 edged damage.  When set in a trap, it 
+does 8d4 edged damage.  You know everything about this item.  
+
+Level 30, Rarity 25, 5.0 lbs, 40000 AU
+
+
+The Long Sword 'Ringil' (4d5) (+22,+25)
+---------------------------------------
+This Sword weighs 13.0 lbs.  It does x5 damage against demons.  It does x4
+damage against trolls.  It does x3 damage from cold and holiness.  It does
+x3 damage against undead.  It modifies speed, light radius and hitpoint
+regeneration.  It provides resistance to cold, fear and powerful light.  
+It protects you from paralysis and magical slowness.  It gives its wielder
+ slow digestion and see invisible.  It is blessed by the gods, allowing
+priests to wield it.  It is not damaged by acid, electricity, fire, cold
+ and water.  It cannot be stolen from your inventory.  When attacking or
+thrown, it does 4d5+25 edged damage.  When activated, it creates a storm
+ of radius 3 to freeze your enemies for 120 damage, recharging in 40
+turns.  When inscribed with {=A} and attacking an opponent, it freezes one
+target for 120 damage, recharging in 40 turns.  When set in a trap, it 
+does 4d5+25 edged damage and freezes one target for 120 damage, recharging
+in 40 turns.  You know everything about this item.  
+
+Level 20, Rarity 120, 13.0 lbs, 300000 AU
+
+
+The Long Sword 'Anduril' (3d5) (+10,+15) [+10]
+----------------------------------------------
+This Sword weighs 13.0 lbs.  It does x4 damage against orcs and trolls.  
+It does x3 damage from fire and holiness.  It does x3 damage against 
+undead.  It modifies strength and size and dexterity and agility.  It
+sustains strength and size and dexterity and agility.  It provides
+resistance to fire, fear and disenchantment.  It protects you from 
+paralysis and magical slowness.  It gives its wielder see invisible.  It
+is blessed by the gods, allowing priests to wield it.  It is not damaged by
+ acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When attacking or thrown, it does 3d5+15 edged damage.  When
+activated, it creates a ball of radius 2 to burn your enemies for 80 
+damage, recharging in 40 turns.  When inscribed with {=A} and attacking an
+opponent, it burns one target for 80 damage, recharging in 40 turns.  When
+set in a trap, it does 3d5+15 edged damage and burns one target for 80 
+damage, recharging in 40 turns.  It increases your armor class by 10.  You
+know everything about this item.  
+
+Level 20, Rarity 40, 13.0 lbs, 80000 AU
+
+
+The Long Sword 'Anguirel' (2d5) (+8,+12)
+----------------------------------------
+This Sword weighs 13.0 lbs.  It does x3 damage from poison and holiness.  
+It does x3 damage against demons.  It modifies strength and size, 
+constitution, speed and light radius.  It provides resistance to 
+electricity, powerful light and powerful darkness.  It protects you from 
+paralysis and magical slowness.  It gives its wielder see invisible.  It
+senses demons.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  It burdens you with 
+aggravation.  When attacking or thrown, it does 2d5+12 edged damage.  When
+set in a trap, it does 2d5+12 edged damage.  You know everything about
+this item.  
+
+Level 20, Rarity 30, 13.0 lbs, 40000 AU
+
+
+The Long Sword 'Elvagil' (2d5) (+2,+7)
+--------------------------------------
+This Sword weighs 13.0 lbs.  It does x4 damage against orcs and trolls.  
+It modifies dexterity and agility, charisma and stealth.  It gives its
+wielder feather falling and see invisible.  It senses orcs and trolls.  It
+is not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When attacking or thrown, it does 2d5+7 edged
+ damage.  When set in a trap, it does 2d5+7 edged damage.  You know
+everything about this item.  
+
+Level 20, Rarity 8, 13.0 lbs, 30000 AU
+
+
+The Rapier 'Forasgil' (1d6) (+12,+19)
+-------------------------------------
+This Sword weighs 4.0 lbs.  It does x4 damage against natural creatures.  
+It does x3 damage from cold.  It modifies light radius.  It provides
+resistance to cold and powerful light.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When attacking or thrown, it does 1d6+19 edged damage.  When
+set in a trap, it does 1d6+19 edged damage.  You know everything about
+this item.  
+
+Level 15, Rarity 8, 4.0 lbs, 15000 AU
+
+
+The Sabre 'Careth Asdriag' (1d7) (+6,+8)
+----------------------------------------
+This Sword weighs 5.0 lbs.  It does x4 damage against natural creatures, 
+orcs, trolls and giants.  It does x3 damage against dragons.  It modifies 
+attacks.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When attacking or thrown, it 
+does 1d7+8 edged damage.  When set in a trap, it does 1d7+8 edged damage.  
+You know everything about this item.  
+
+Level 15, Rarity 8, 5.0 lbs, 25000 AU
+
+
+The Small Sword 'Sting' (1d6) (+7,+8)
+-------------------------------------
+This Sword weighs 7.5 lbs.  It does x4 damage against natural creatures
+ and orcs.  It does x3 damage from holiness.  It does x3 damage against 
+undead.  It modifies strength and size, dexterity and agility, 
+constitution, speed, attacks and light radius.  It provides resistance to 
+fear and powerful light.  It protects you from paralysis and magical
+slowness.  It gives its wielder see invisible.  It senses orcs.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When attacking or thrown, it does 1d6+8 edged
+ damage.  When set in a trap, it does 1d6+8 edged damage.  You know
+everything about this item.  
+
+Level 20, Rarity 15, 7.5 lbs, 100000 AU
+
+
+The Scimitar 'Haradekket' (2d5) (+9,+11)
+----------------------------------------
+This Sword weighs 13.0 lbs.  It does x4 damage against natural creatures.  
+It does x3 damage from holiness.  It does x3 damage against undead.  It
+modifies dexterity and agility and attacks.  It gives its wielder see
+invisible.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When attacking or thrown, it 
+does 2d5+11 edged damage.  When set in a trap, it does 2d5+11 edged damage
+.  You know everything about this item.  
+
+Level 20, Rarity 15, 13.0 lbs, 30000 AU
+
+
+The Short Sword 'Gilettar' (1d7) (+3,+7)
+----------------------------------------
+This Sword weighs 8.0 lbs.  It does x4 damage against natural creatures.  
+It does x3 damage from poison.  It modifies attacks and hitpoint
+regeneration.  It gives its wielder slow digestion.  It senses natural
+creatures.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When attacking or thrown, it 
+does 1d7+7 edged damage.  When set in a trap, it does 1d7+7 edged damage.  
+You know everything about this item.  
+
+Level 20, Rarity 8, 8.0 lbs, 15000 AU
+
+
+The Blade of Chaos 'Doomcaller' (6d5) (+18,+28) [-50]
+-----------------------------------------------------
+This Sword weighs 18.0 lbs.  It does x2 damage when charging.  It does x5
+damage against dragons.  It does x4 damage against natural creatures, orcs
+ and trolls.  It does x3 damage from cold and holiness.  It provides
+resistance to acid, electricity, fire, cold and chaos.  It protects you
+from hallucination, paralysis and magical slowness.  It gives its wielder 
+telepathy and see invisible.  It is not damaged by acid, electricity, fire
+, cold and water.  It cannot be stolen from your inventory.  It burdens
+you with aggravation.  When attacking or thrown, it does 6d5+28 edged
+ damage.  When set in a trap, it does 6d5+28 edged damage.  It decreases
+your armor class by 50.  You know everything about this item.  
+
+Level 70, Rarity 25, 18.0 lbs, 200000 AU
+
+
+The Main Gauche of Azaghal (2d5) (+12,+14)
+------------------------------------------
+This Sword weighs 3.0 lbs.  It does x5 damage against dragons.  It
+provides resistance to acid and fear.  It provides immunity to fire.  It
+senses dragons.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When attacking or
+thrown, it does 2d5+14 edged damage.  When set in a trap, it does 2d5+14 
+edged damage.  You know everything about this item.  
+
+Level 18, Rarity 30, 3.0 lbs, 50000 AU
+
+
+The Broken Sword 'Narsil' (3d2) (+6,+10)
+----------------------------------------
+This Sword weighs 3.0 lbs.  It does x4 damage against orcs and trolls.  It
+modifies strength and size, dexterity and agility and attacks.  It
+provides resistance to fire.  It is blessed by the gods, allowing priests
+to wield it.  It is not damaged by acid, electricity, fire, cold and water
+.  It cannot be stolen from your inventory.  When attacking or thrown, it 
+does 3d2+10 edged damage.  When set in a trap, it does 3d2+10 edged damage
+.  You know everything about this item.  
+
+Level 10, Rarity 4, 3.0 lbs, 2000 AU
+
+
+The Bastard Sword of Eowyn (4d4) (+12,+16)
+------------------------------------------
+This Sword weighs 14.0 lbs.  It does x2 damage when charging.  It does x5
+damage against undead.  It does x4 damage against natural creatures and 
+giants.  It does x3 damage from holiness.  It modifies strength and size, 
+charisma, stealth and speed.  It provides resistance to cold, fear, 
+powerful darkness and nether.  It is not damaged by acid, electricity, 
+fire, cold and water.  It cannot be stolen from your inventory.  When
+attacking or thrown, it does 4d4+16 edged damage.  When set in a trap, it 
+does 4d4+16 edged damage.  You know everything about this item.  
+
+Level 30, Rarity 100, 14.0 lbs, 120000 AU
+
+
+The Blade of Chaos 'Anfaling' (6d5) (+8,+22) [+1]
+-------------------------------------------------
+This Sword weighs 18.0 lbs.  It does x2 damage when charging.  It does x5
+damage against demons.  It does x3 damage from fire.  It modifies 
+intelligence, searching and infravision.  It provides resistance to fire
+ and chaos.  It protects you from hallucination.  It is not damaged by 
+acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When attacking or thrown, it does 6d5+22 edged damage.  When
+activated, it removes all nearby monsters, recharging in 1000 turns.  When
+set in a trap, it does 6d5+22 edged damage, recharging in 1000 turns.  It
+increases your armor class by 1.  You know everything about this item.  
+
+Level 30, Rarity 45, 18.0 lbs, 85000 AU
+
+
+The Sabre of Tumanwent (1d7) (+19,+12)
+--------------------------------------
+This Sword weighs 5.0 lbs.  It does x4 damage against natural creatures.  
+It modifies light radius.  It is not damaged by acid, electricity, fire, 
+cold and water.  It cannot be stolen from your inventory.  When attacking
+or thrown, it does 1d7+12 edged damage.  When set in a trap, it does 1d7
++12 edged damage.  You know everything about this item.  
+
+Level 65, Rarity 15, 5.0 lbs, 15000 AU
+
+
+The Broad Sword of Tholwe (2d5) (+12,+16) [+7]
+----------------------------------------------
+This Sword weighs 15.0 lbs.  It does x2 damage when charging.  It modifies 
+intelligence.  It provides resistance to sound.  It protects you from 
+stunning, paralysis and magical slowness.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When attacking or thrown, it does 2d5+16 edged damage.  When
+set in a trap, it does 2d5+16 edged damage.  It increases your armor class
+by 7.  You know everything about this item.  
+
+Level 20, Rarity 22, 15.0 lbs, 43000 AU
+
+
+The Long Sword of Tinoldor (2d5) (+16,+12)
+------------------------------------------
+This Sword weighs 13.0 lbs.  It does x3 damage from fire and cold.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When attacking or thrown, it does 2d5+12 
+edged damage.  When set in a trap, it does 2d5+12 edged damage.  You know
+everything about this item.  
+
+Level 15, Rarity 12, 13.0 lbs, 17000 AU
+
+
+The Long Sword 'Cirein' (7d5) (+27,+31) [+19]
+---------------------------------------------
+This Sword weighs 13.0 lbs.  It does x5 damage against undead, demons and 
+dragons.  It does x4 damage against natural creatures, orcs, trolls and 
+giants.  It does x3 damage from poison, acid, electricity, fire, cold, 
+holiness, light and darkness.  It modifies all stats, searching, speed and 
+light radius.  It provides resistance to acid, electricity, cold, poison, 
+fear, powerful light, powerful darkness, nexus and losing experience.  It
+provides immunity to fire.  It protects you from the effects of poison, 
+blindness, paralysis and magical slowness.  It gives its wielder see
+invisible.  It is blessed by the gods, allowing priests to wield it.  It
+is not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  It marks you as elven.  When attacking or
+thrown, it does 7d5+31 edged damage.  When activated, it creates a storm
+ of radius 3 to freeze your enemies for 120 damage, recharging in 40
+turns.  When inscribed with {=A} and attacking an opponent, it freezes one
+target for 120 damage, recharging in 40 turns.  When set in a trap, it 
+does 7d5+31 edged damage and freezes one target for 120 damage, recharging
+in 40 turns.  It increases your armor class by 19.  You know everything
+about this item.  
+
+Level 20, Rarity 120, 13.0 lbs, 327000 AU
+
+
+The Bastard Sword of Thluinath (3d4) (+16,+12)
+----------------------------------------------
+This Sword weighs 14.0 lbs.  It does x2 damage when charging.  It does x4
+damage against giants.  It does x3 damage from poison, electricity and 
+cold.  It does x3 damage against undead.  It modifies intelligence and 
+speed.  It provides resistance to cold and powerful light.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  It burdens you with aggravation.  When attacking or
+thrown, it does 3d4+12 edged damage.  When set in a trap, it does 3d4+12 
+edged damage.  You know everything about this item.  
+
+Level 30, Rarity 33, 14.0 lbs, 47000 AU
+
+
+The Blade of Chaos of Huilimron (6d5) (+16,+15)
+-----------------------------------------------
+This Sword weighs 18.0 lbs.  It does x2 damage when charging.  It does x5
+damage against undead.  It provides resistance to chaos.  It protects you
+from hallucination.  It gives its wielder see invisible.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When attacking or thrown, it does 6d5+15 edged
+ damage.  When set in a trap, it does 6d5+15 edged damage.  You know
+everything about this item.  
+
+Level 40, Rarity 9, 18.0 lbs, 36000 AU
+
+
+The Main Gauche of Formir (3d5) (+9,+10)
+----------------------------------------
+This Sword weighs 3.0 lbs.  It is not damaged by acid, electricity, fire, 
+cold and water.  It cannot be stolen from your inventory.  When attacking
+or thrown, it does 3d5+10 edged damage.  When activated, it creates a
+powerful bolt to burn your enemies for 6d8 damage, recharging in d8+8
+turns.  When inscribed with {=A} and attacking an opponent, it burns one
+target for 6d8 damage, recharging in d8+8 turns.  When set in a trap, it 
+does 3d5+10 edged damage and burns one target for 6d8 damage, recharging
+in d8+8 turns.  You know everything about this item.  
+
+Level 4, Rarity 3, 3.0 lbs, 10000 AU
+
+
+The Blade of Chaos of Endil (8d5) (+21,+21)
+-------------------------------------------
+This Sword weighs 16.2 lbs.  It does x2 damage when charging.  It does x5
+damage against dragons.  It does x4 damage against orcs.  It does x3
+damage from poison, acid and light.  It modifies dexterity and agility and 
+hitpoint regeneration.  It provides resistance to acid, powerful darkness, 
+sound and chaos.  It protects you from stunning and hallucination.  It
+senses orcs.  It is not damaged by acid, electricity, fire, cold and water
+.  It cannot be stolen from your inventory.  When attacking or thrown, it 
+does 8d5+21 edged damage.  When activated, it hastes you for 1d20+20 turns
+, recharging in 200 turns.  When set in a trap, it does 8d5+21 edged
+ damage, recharging in 200 turns.  You know everything about this item.  
+
+Level 40, Rarity 15, 16.2 lbs, 109000 AU
+
+
+The Dagger of Uthria (1d4) (+22,+6)
+-----------------------------------
+This Sword weighs 1.2 lbs.  It does x5 damage against undead and dragons.  
+It does x4 damage against natural creatures and trolls.  It does x3 damage
+from electricity and fire.  It modifies intelligence.  It provides
+resistance to fire and powerful darkness.  It protects you from paralysis
+ and magical slowness.  It gives its wielder slow digestion.  It is
+balanced for throwing.  It is not damaged by acid, electricity, fire, cold
+ and water.  It cannot be stolen from your inventory.  When attacking or
+easily thrown, it does 1d4+6 edged damage.  When activated, it recharges
+one staff or wand for 100 power, recharging in 70 turns.  When set in a
+trap, it does 1d4+6 edged damage, recharging in 70 turns.  You know
+everything about this item.  
+
+Level 5, Rarity 25, 1.2 lbs, 48000 AU
+
+
+
+
+Polearms
+--------
+
+The Two-Handed Spear of Melkor (3d8) (-12,+20)
+----------------------------------------------
+This Polearm weighs 20.0 lbs.  It does x3 damage when charging.  It does
+x3 damage from poison.  It modifies wisdom.  It provides resistance to 
+powerful light, powerful darkness and nether.  It protects you from 
+blindness.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  It burdens you with aggravation
+ and experience drain.  It is heavily cursed.  When attacking or thrown,
+it does 3d8+20 edged damage.  When set in a trap, it does 3d8+20 edged
+ damage.  You know everything about this item.  
+
+Level 65, Rarity 45, 20.0 lbs, 100000 AU
+
+
+The Beaked Axe of Theoden (2d6) (+8,+10)
+----------------------------------------
+This Polearm weighs 18.0 lbs.  It does x2 damage when charging.  It does
+x3 damage against dragons.  It modifies wisdom and constitution.  It gives
+its wielder slow digestion and telepathy.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When attacking or thrown, it does 2d6+10 edged damage.  When
+activated, it drains life from one target for 125 damage, recharging in 40
+turns.  When inscribed with {=A} and attacking an opponent, it drains life
+from one target for 125 damage, recharging in 40 turns.  When set in a
+trap, it does 2d6+10 edged damage and drains life from one target for 125 
+damage, recharging in 40 turns.  You know everything about this item.  
+
+Level 20, Rarity 15, 18.0 lbs, 40000 AU
+
+
+The Glaive of Pain (9d6) (+0,+30)
+---------------------------------
+This Polearm weighs 30.0 lbs.  It does x4 damage when charging.  It
+provides resistance to fear.  It is not damaged by acid, electricity, fire
+, cold and water.  It cannot be stolen from your inventory.  When
+attacking or thrown, it does 9d6+30 edged damage.  When set in a trap, it 
+does 9d6+30 edged damage.  You know everything about this item.  
+
+Level 30, Rarity 25, 30.0 lbs, 50000 AU
+
+
+The Halberd 'Osondir' (3d5) (+6,+9)
+-----------------------------------
+This Polearm weighs 19.0 lbs.  It does x2 damage when charging.  It does
+x4 damage against giants.  It does x3 damage from fire.  It does x3 damage
+against undead.  It modifies charisma.  It provides resistance to fire and 
+sound.  It protects you from stunning.  It gives its wielder feather
+falling and see invisible.  It is not damaged by acid, electricity, fire, 
+cold and water.  It cannot be stolen from your inventory.  When attacking
+or thrown, it does 3d5+9 edged damage.  When set in a trap, it does 3d5+9 
+edged damage.  You know everything about this item.  
+
+Level 20, Rarity 8, 19.0 lbs, 22000 AU
+
+
+The Pike 'Til-i-arc' (2d5) (+10,+12) [+10]
+------------------------------------------
+This Polearm weighs 16.0 lbs.  It does x2 damage when charging.  It does
+x4 damage against trolls and giants.  It does x3 damage from fire and cold
+.  It does x3 damage against demons.  It modifies intelligence.  It
+sustains intelligence.  It provides resistance to fire and cold.  It gives
+its wielder slow digestion.  It is not damaged by acid, electricity, fire, 
+cold and water.  It cannot be stolen from your inventory.  When attacking
+or thrown, it does 2d5+12 edged damage.  When set in a trap, it does 2d5
++12 edged damage.  It increases your armor class by 10.  You know
+everything about this item.  
+
+Level 20, Rarity 15, 16.0 lbs, 32000 AU
+
+
+The Spear 'Aeglos' (2d8) (+15,+25) [+5]
+---------------------------------------
+This Polearm weighs 7.0 lbs.  It does x5 damage against undead.  It does
+x4 damage against orcs and trolls.  It does x3 damage from cold and 
+holiness.  It modifies wisdom and dexterity and agility.  It provides
+resistance to cold and fear.  It protects you from paralysis and magical
+slowness.  It gives its wielder slow digestion.  It is blessed by the
+gods, allowing priests to wield it.  It is balanced for throwing.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When attacking or easily thrown, it does 2d8
++25 edged damage.  When activated, it creates a storm of radius 3 to 
+freeze your enemies for 120 damage, recharging in 35 turns.  When
+inscribed with {=A} and attacking or thrown against an opponent, it freeze
+s one target for 120 damage, recharging in 35 turns.  When set in a trap,
+it does 2d8+25 edged damage and freezes one target for 120 damage,
+recharging in 35 turns.  It increases your armor class by 5.  You know
+everything about this item.  
+
+Level 15, Rarity 45, 7.0 lbs, 140000 AU
+
+
+The Spear of Orome (3d8) (+15,+15)
+----------------------------------
+This Polearm weighs 7.0 lbs.  It does x4 damage against natural creatures
+ and giants.  It does x3 damage from fire.  It modifies intelligence, 
+infravision, speed and light radius.  It provides resistance to fire and 
+powerful light.  It gives its wielder feather falling and see invisible.  
+It is blessed by the gods, allowing priests to wield it.  It is balanced
+for throwing.  It senses natural creatures.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When attacking or easily thrown, it does 3d8+15 edged damage.  
+When activated, it removes rock from one direction for 6d8 damage to
+monsters made from rock, recharging in 5 turns.  When inscribed with {=A}
+and attacking or thrown against an opponent, it removes rock from one
+target for 6d8 damage to monsters made from rock, recharging in 5 turns.  
+When set in a trap, it does 3d8+15 edged damage and removes rock from one
+target for 6d8 damage to monsters made from rock, recharging in 5 turns.  
+You know everything about this item.  
+
+Level 15, Rarity 45, 7.0 lbs, 60000 AU
+
+
+The Spear 'Nimloth' (1d8) (+11,+13)
+-----------------------------------
+This Polearm weighs 7.0 lbs.  It does x3 damage from cold.  It does x3
+damage against undead.  It modifies stealth and speed.  It provides
+resistance to cold.  It gives its wielder see invisible.  It is blessed by
+the gods, allowing priests to wield it.  It is balanced for throwing.  It
+is not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When attacking or easily thrown, it does 1d8
++13 edged damage.  When set in a trap, it does 1d8+13 edged damage.  You
+know everything about this item.  
+
+Level 15, Rarity 12, 7.0 lbs, 30000 AU
+
+
+The Lance of Eorlingas (4d8) (+13,+21)
+--------------------------------------
+This Polearm weighs 33.0 lbs.  It does x5 damage when charging.  It does
+x4 damage against orcs and trolls.  It does x3 damage from holiness.  It
+modifies strength and size and dexterity and agility.  It provides
+resistance to fear.  It gives its wielder see invisible.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When attacking or thrown, it does 4d8+21 edged
+ damage.  When set in a trap, it does 4d8+21 edged damage.  You know
+everything about this item.  
+
+Level 20, Rarity 23, 33.0 lbs, 55000 AU
+
+
+The Great Axe of Durin (4d4) (+10,+20) [+15]
+--------------------------------------------
+This Polearm weighs 23.0 lbs.  It does x3 damage when charging.  It does
+x5 damage against dragons.  It does x4 damage against orcs and trolls.  It
+does x3 damage from acid and fire.  It does x3 damage against demons.  It
+modifies strength and size, constitution and tunneling.  It provides
+resistance to acid, fire, fear, powerful light, powerful darkness, 
+powerful confusion and chaos.  It protects you from hallucination, 
+confusion, paralysis and magical slowness.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When attacking or thrown, it does 4d4+20 edged damage.  When
+set in a trap, it does 4d4+20 edged damage.  It increases your armor class
+by 15.  You know everything about this item.  
+
+Level 30, Rarity 90, 23.0 lbs, 150000 AU
+
+
+The Great Axe of Eonwe (5d4) (+15,+18) [+8]
+-------------------------------------------
+This Polearm weighs 23.0 lbs.  It does x3 damage when charging.  It does
+x5 damage against demons.  It does x4 damage against orcs.  It does x3
+damage from cold and holiness.  It does x3 damage against undead.  It
+modifies all stats.  It provides resistance to fear.  It provides immunity
+to cold.  It protects you from paralysis and magical slowness.  It gives
+its wielder see invisible.  It is blessed by the gods, allowing priests to
+wield it.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When attacking or thrown, it 
+does 5d4+18 edged damage.  When activated, it removes all nearby monsters,
+recharging in 1000 turns.  When set in a trap, it does 5d4+18 edged damage
+, recharging in 1000 turns.  It increases your armor class by 8.  You know
+everything about this item.  
+
+Level 30, Rarity 120, 23.0 lbs, 200000 AU
+
+
+The Battle Axe of Balli Stonehand (3d8) (+8,+11) [+5]
+-----------------------------------------------------
+This Polearm weighs 17.0 lbs.  It does x2 damage when charging.  It does
+x4 damage against orcs and trolls.  It does x3 damage against demons.  It
+modifies strength and size, constitution, stealth and hitpoint regeneration
+.  It provides resistance to acid, electricity, fire and cold.  It
+protects you from blindness, paralysis and magical slowness.  It gives its
+wielder feather falling and see invisible.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When attacking or thrown, it does 3d8+11 edged damage.  When
+set in a trap, it does 3d8+11 edged damage.  It increases your armor class
+by 5.  You know everything about this item.  
+
+Level 30, Rarity 15, 17.0 lbs, 90000 AU
+
+
+The Battle Axe 'Lotharang' (2d8) (+4,+3)
+----------------------------------------
+This Polearm weighs 17.0 lbs.  It does x2 damage when charging.  It does
+x4 damage against orcs and trolls.  It modifies strength and size and 
+dexterity and agility.  It senses orcs and trolls.  It is not damaged by 
+acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When attacking or thrown, it does 2d8+3 edged damage.  When
+activated, it cures you of blindness, and partially cures you of cuts, and 
+heals you for 5d10 hit points, recharging in d3+3 turns.  When inscribed
+with {=A} and attacking an opponent, it heals one target for 5d10 hit
+points, recharging in d3+3 turns.  When set in a trap, it does 2d8+3 edged
+ damage and heals one target for 5d10 hit points, recharging in d3+3
+turns.  You know everything about this item.  
+
+Level 30, Rarity 15, 17.0 lbs, 21000 AU
+
+
+The Lochaber Axe 'Mundwine' (3d8) (+12,+17)
+-------------------------------------------
+This Polearm weighs 25.0 lbs.  It does x3 damage when charging.  It does
+x4 damage against natural creatures.  It does x3 damage from holiness.  It
+does x3 damage against demons.  It provides resistance to acid, 
+electricity, fire and cold.  It is not damaged by acid, electricity, fire, 
+cold and water.  It cannot be stolen from your inventory.  When attacking
+or thrown, it does 3d8+17 edged damage.  When set in a trap, it does 3d8
++17 edged damage.  You know everything about this item.  
+
+Level 30, Rarity 8, 25.0 lbs, 30000 AU
+
+
+The Broad Axe 'Barukkheled' (2d6) (+13,+19)
+-------------------------------------------
+This Polearm weighs 16.0 lbs.  It does x2 damage when charging.  It does
+x4 damage against orcs, trolls and giants.  It does x3 damage from 
+holiness.  It modifies constitution.  It gives its wielder see invisible.  
+It is not damaged by acid, electricity, fire, cold and water.  It cannot
+be stolen from your inventory.  When attacking or thrown, it does 2d6+19 
+edged damage.  When set in a trap, it does 2d6+19 edged damage.  You know
+everything about this item.  
+
+Level 20, Rarity 8, 16.0 lbs, 50000 AU
+
+
+The Halberd of Wrath (6d4) (+16,+18)
+------------------------------------
+This Polearm weighs 30.0 lbs.  It does x4 damage when charging.  It does
+x5 damage against undead.  It does x3 damage from poison and holiness.  It
+modifies strength and size, dexterity and agility and spell resistance.  
+It provides resistance to powerful light and powerful darkness.  It gives
+its wielder see invisible.  It is blessed by the gods, allowing priests to
+wield it.  It senses undead.  It is not damaged by acid, electricity, fire
+, cold and water.  It cannot be stolen from your inventory.  When
+attacking or thrown, it does 6d4+18 edged damage.  When set in a trap, it 
+does 6d4+18 edged damage.  You know everything about this item.  
+
+Level 15, Rarity 35, 30.0 lbs, 90000 AU
+
+
+The Halberd of Ulmo (8d4) (+15,+19)
+-----------------------------------
+This Polearm weighs 7.0 lbs.  It does x4 damage against natural creatures.
+It does x3 damage against dragons.  It modifies dexterity and agility and 
+mana regeneration.  It provides resistance to nether and losing experience
+.  It provides immunity to acid.  It protects you from paralysis and 
+magical slowness.  It gives its wielder slow digestion and see invisible.  
+It is blessed by the gods, allowing priests to wield it.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When attacking or thrown, it does 8d4+19 edged
+ damage.  When activated, it teleports one direction away for 25 distance
+on average, recharging in 50 turns.  When inscribed with {=A} and
+attacking an opponent, it teleports one target away for 25 distance on
+average, recharging in 50 turns.  When set in a trap, it does 8d4+19 edged
+ damage and teleports one target away for 25 distance on average,
+recharging in 50 turns.  You know everything about this item.  
+
+Level 30, Rarity 90, 7.0 lbs, 120000 AU
+
+
+The Scythe 'Avavir' (5d3) (+8,+8) [+10]
+---------------------------------------
+This Polearm weighs 25.0 lbs.  It does x3 damage when charging.  It does
+x3 damage from fire and cold.  It modifies dexterity and agility, charisma
+ and light radius.  It provides resistance to fire, cold and powerful light
+.  It protects you from paralysis and magical slowness.  It gives its
+wielder see invisible.  It is not damaged by acid, electricity, fire, cold
+ and water.  It cannot be stolen from your inventory.  When attacking or
+thrown, it does 5d3+8 edged damage.  When activated, it returns you to the
+surface, or teleports you into the depths, recharging in 200 turns.  When
+set in a trap, it does 5d3+8 edged damage, recharging in 200 turns.  It
+increases your armor class by 10.  You know everything about this item.  
+
+Level 40, Rarity 8, 25.0 lbs, 18000 AU
+
+
+The Beaked Axe of Hurin (4d6) (+12,+15)
+---------------------------------------
+This Polearm weighs 18.0 lbs.  It does x2 damage when charging.  It does
+x5 damage against demons.  It does x4 damage against trolls.  It does x3
+damage from acid.  It does x3 damage against dragons.  It modifies 
+strength and size, constitution, attacks and light radius.  It provides
+resistance to acid, fire and powerful darkness.  It is not damaged by acid
+, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When attacking or thrown, it does 4d6+15 edged damage.  When
+activated, it makes you go berserk for 1d25+25 turns, and cures you of 
+fear and petrification, and heals you for 30 hit points, recharging in
+d80+80 turns.  When inscribed with {=A} and attacking an opponent, it heal
+s one target for 30 hit points, recharging in d80+80 turns.  When set in a
+trap, it does 4d6+15 edged damage and heals one target for 30 hit points,
+recharging in d80+80 turns.  You know everything about this item.  
+
+Level 20, Rarity 15, 18.0 lbs, 90000 AU
+
+
+The Broad Axe of Methir (2d6) (+5,+13)
+--------------------------------------
+This Polearm weighs 16.0 lbs.  It does x2 damage when charging.  It does
+x3 damage against demons.  It modifies intelligence and speed.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When attacking or thrown, it does 2d6+13 edged
+ damage.  When activated, it makes you go berserk for 1d25+25 turns, and 
+cures you of fear and petrification, and heals you for 30 hit points,
+recharging in 50 turns.  When inscribed with {=A} and attacking an
+opponent, it heals one target for 30 hit points, recharging in 50 turns.  
+When set in a trap, it does 2d6+13 edged damage and heals one target for
+30 hit points, recharging in 50 turns.  You know everything about this
+item.  
+
+Level 35, Rarity 6, 16.0 lbs, 31000 AU
+
+
+The Battle Axe 'Eitholoth' (7d8) (+11,+11)
+------------------------------------------
+This Polearm weighs 17.0 lbs.  It does x2 damage when charging.  It does
+x4 damage against orcs.  It modifies wisdom.  It is blessed by the gods,
+allowing priests to wield it.  It is not damaged by acid, electricity, 
+fire, cold and water.  It cannot be stolen from your inventory.  When
+attacking or thrown, it does 7d8+11 edged damage.  When set in a trap, it 
+does 7d8+11 edged damage.  You know everything about this item.  
+
+Level 20, Rarity 12, 17.0 lbs, 42000 AU
+
+
+The Two-Handed Spear of Celed (2d8) (+8,+10)
+--------------------------------------------
+This Polearm weighs 18.0 lbs.  It does x2 damage when charging.  It does
+x4 damage against orcs.  It does x3 damage from poison.  It provides
+resistance to powerful light.  It is not damaged by acid, electricity, 
+fire, cold and water.  It cannot be stolen from your inventory.  When
+attacking or thrown, it does 2d8+10 edged damage.  When activated, it 
+creates a powerful bolt to dissolve your enemies for 8d12 damage, and 
+creates a powerful bolt to dissolve your enemies for 8d12 damage,
+recharging in d5+5 turns.  When inscribed with {=A} and attacking an
+opponent, it dissolves one target for 8d12 damage, and dissolves one target
+ for 8d12 damage, recharging in d5+5 turns.  When set in a trap, it does
+2d8+10 edged damage and dissolves one target for 8d12 damage, and dissolve
+s one target for 8d12 damage, recharging in d5+5 turns.  You know
+everything about this item.  
+
+Level 10, Rarity 5, 18.0 lbs, 13000 AU
+
+
+The Battle Axe 'Areda' (2d8) (-12,-6)
+-------------------------------------
+This Polearm weighs 17.0 lbs.  It does x2 damage when charging.  It makes
+you vulnerable to water.  It gives its wielder feather falling.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  It burdens you with health drain and inability to
+use ranged weapons.  It is heavily cursed.  When attacking or thrown, it 
+does 2d8-6 edged damage.  When set in a trap, it does 2d8-6 edged damage.  
+You know everything about this item.  
+
+Level 40, Rarity 6, 17.0 lbs, 0 AU
+
+
+
+
+Hafted Weapons
+--------------
+
+The Mighty Hammer 'Grond' (9d9) (+5,+25) [+10]
+----------------------------------------------
+This Hafted Weapon weighs 100.0 lbs.  It does x15 damage when charging.  
+It does x5 damage against undead, demons and dragons.  It does x4 damage
+against natural creatures, orcs and trolls.  It does x3 damage from 
+holiness.  It does extra damage from earthquakes.  It gives its wielder 
+telepathy and see invisible.  It is not damaged by acid, electricity, fire
+, cold and water.  It cannot be stolen from your inventory.  It burdens
+you with aggravation.  When attacking or thrown, it does 9d9+25 blunt
+ damage.  When set in a trap, it does 9d9+25 blunt damage.  It increases
+your armor class by 10.  You know everything about this item.  
+
+Level 100, Rarity 1, 100.0 lbs, 500000 AU
+
+
+The Flail 'Totila' (3d6) (+6,+8)
+--------------------------------
+This Hafted Weapon weighs 15.0 lbs.  It does x2 damage when charging.  It
+does x3 damage from fire and holiness.  It modifies stealth.  It provides
+resistance to fire and powerful confusion.  It protects you from confusion
+.  It is not damaged by acid, electricity, fire, cold and water.  It
+cannot be stolen from your inventory.  When attacking or thrown, it does
+3d6+8 blunt damage.  When activated, it confuses one target for 25 power,
+recharging in 15 turns.  When inscribed with {=A} and attacking an
+opponent, it confuses one target for 25 power, recharging in 15 turns.  
+When set in a trap, it does 3d6+8 blunt damage and confuses one target for
+25 power, recharging in 15 turns.  You know everything about this item.  
+
+Level 20, Rarity 8, 15.0 lbs, 55000 AU
+
+
+The Two-Handed Flail 'Thunderfist' (4d6) (+5,+18)
+-------------------------------------------------
+This Hafted Weapon weighs 30.0 lbs.  It does x4 damage when charging.  It
+does x4 damage against natural creatures, orcs and trolls.  It does x3
+damage from electricity and fire.  It modifies strength and size and 
+constitution.  It provides resistance to electricity, fire, fear and 
+powerful darkness.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When attacking or
+thrown, it does 4d6+18 blunt damage.  When set in a trap, it does 4d6+18 
+blunt damage.  You know everything about this item.  
+
+Level 45, Rarity 38, 30.0 lbs, 160000 AU
+
+
+The Morning Star 'Bloodspike' (2d6) (+8,+22)
+--------------------------------------------
+This Hafted Weapon weighs 15.0 lbs.  It does x2 damage when charging.  It
+does x4 damage against natural creatures, orcs and trolls.  It does x3
+damage from poison.  It modifies strength and size.  It provides
+resistance to nexus.  It gives its wielder see invisible.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When attacking or thrown, it does 2d6+22 blunt
+ damage.  When set in a trap, it does 2d6+22 blunt damage.  You know
+everything about this item.  
+
+Level 20, Rarity 30, 15.0 lbs, 30000 AU
+
+
+The Morning Star 'Firestar' (2d6) (+5,+7) [+2]
+----------------------------------------------
+This Hafted Weapon weighs 15.0 lbs.  It does x2 damage when charging.  It
+does x3 damage from fire.  It provides resistance to fire.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When attacking or thrown, it does 2d6+7 blunt
+ damage.  When activated, it creates a ball of radius 2 to burn your
+enemies for 80 damage, recharging in 20 turns.  When inscribed with {=A}
+and attacking an opponent, it burns one target for 80 damage, recharging
+in 20 turns.  When set in a trap, it does 2d6+7 blunt damage and burns one
+target for 80 damage, recharging in 20 turns.  It increases your armor
+class by 2.  You know everything about this item.  
+
+Level 20, Rarity 15, 15.0 lbs, 35000 AU
+
+
+The Mace 'Taratol' (3d4) (+12,+12)
+----------------------------------
+This Hafted Weapon weighs 20.0 lbs.  It does x3 damage when charging.  It
+does x5 damage against dragons.  It does x3 damage from electricity.  It
+provides immunity to electricity.  It is not damaged by acid, electricity, 
+fire, cold and water.  It cannot be stolen from your inventory.  When
+attacking or thrown, it does 3d4+12 blunt damage.  When activated, it 
+hastes you for 1d20+20 turns, recharging in d100+100 turns.  When set in a
+trap, it does 3d4+12 blunt damage, recharging in d100+100 turns.  You know
+everything about this item.  
+
+Level 20, Rarity 15, 20.0 lbs, 50000 AU
+
+
+The War Hammer of Aule (9d3) (+19,+21) [+5]
+-------------------------------------------
+This Hafted Weapon weighs 12.0 lbs.  It does x5 damage against dragons.  
+It does x3 damage from acid and holiness.  It does x3 damage against 
+undead and demons.  It modifies wisdom and tunneling.  It provides
+resistance to acid, electricity, fire, cold, fear and nexus.  It protects
+you from paralysis and magical slowness.  It gives its wielder see
+invisible.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When attacking or thrown, it 
+does 9d3+21 blunt damage.  When set in a trap, it does 9d3+21 blunt damage
+.  It increases your armor class by 5.  You know everything about this
+item.  
+
+Level 40, Rarity 75, 12.0 lbs, 250000 AU
+
+
+The Quarterstaff 'Nar-i-vagil' (1d9) (+10,+20)
+----------------------------------------------
+This Hafted Weapon weighs 15.0 lbs.  It does x2 damage when charging.  It
+does x4 damage against natural creatures.  It does x3 damage from fire.  
+It modifies intelligence.  It provides resistance to fire.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When attacking or thrown, it does 1d9+20 blunt
+ damage.  When set in a trap, it does 1d9+20 blunt damage.  You know
+everything about this item.  
+
+Level 20, Rarity 18, 15.0 lbs, 70000 AU
+
+
+The Quarterstaff 'Eriril' (1d9) (+3,+5)
+---------------------------------------
+This Hafted Weapon weighs 15.0 lbs.  It does x2 damage when charging.  It
+does x3 damage from holiness.  It modifies intelligence, wisdom and light
+radius.  It provides resistance to powerful light.  It gives its wielder 
+see invisible.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When attacking or
+thrown, it does 1d9+5 blunt damage.  When activated, it can identify the
+kind, ego-item and artifact names and all bonuses on one unknown item,
+recharging in 10 turns.  When set in a trap, it does 1d9+5 blunt damage,
+recharging in 10 turns.  You know everything about this item.  
+
+Level 20, Rarity 18, 15.0 lbs, 20000 AU
+
+
+The Quarterstaff of Olorin (2d9) (+10,+13)
+------------------------------------------
+This Hafted Weapon weighs 15.0 lbs.  It does x2 damage when charging.  It
+does x4 damage against orcs and trolls.  It does x3 damage from fire and 
+holiness.  It modifies intelligence, wisdom and charisma.  It provides
+resistance to fire, nether and losing experience.  It gives its wielder 
+see invisible.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When attacking or
+thrown, it does 2d9+13 blunt damage.  When activated, it affects all your
+enemies in line of sight, recharging in 20 turns.  When inscribed with
+{=A} and attacking an opponent, it affects one target, recharging in 20
+turns.  When set in a trap, it does 2d9+13 blunt damage and affects one
+target, recharging in 20 turns.  You know everything about this item.  
+
+Level 30, Rarity 105, 15.0 lbs, 130000 AU
+
+
+The Mace of Disruption 'Deathwreaker' (7d8) (+18,+18)
+-----------------------------------------------------
+This Hafted Weapon weighs 40.0 lbs.  It does x6 damage when charging.  It
+does x5 damage against undead.  It does x4 damage against natural creatures
+.  It does x3 damage from fire and holiness.  It does x3 damage against 
+dragons.  It modifies strength and size and tunneling.  It provides
+resistance to powerful darkness, chaos and disenchantment.  It provides
+immunity to fire.  It protects you from hallucination.  It is not damaged
+by acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It burdens you with aggravation.  When attacking or thrown, it 
+does 7d8+18 blunt damage.  When set in a trap, it does 7d8+18 blunt damage
+.  You know everything about this item.  
+
+Level 80, Rarity 38, 40.0 lbs, 400000 AU
+
+
+The Lucerne Hammer 'Turmil' (2d5) (+10,+6) [+8]
+-----------------------------------------------
+This Hafted Weapon weighs 12.0 lbs.  It does x4 damage against orcs.  It
+does x3 damage from cold.  It modifies wisdom, infravision, light radius
+ and mana regeneration.  It provides resistance to cold and powerful light
+.  It is not damaged by acid, electricity, fire, cold and water.  It
+cannot be stolen from your inventory.  When attacking or thrown, it does
+2d5+6 blunt damage.  When activated, it drains life from one target for
+125 damage, recharging in 40 turns.  When inscribed with {=A} and
+attacking an opponent, it drains life from one target for 125 damage,
+recharging in 40 turns.  When set in a trap, it does 2d5+6 blunt damage
+ and drains life from one target for 125 damage, recharging in 40 turns.  
+It increases your armor class by 8.  You know everything about this item.  
+
+
+Level 20, Rarity 15, 12.0 lbs, 30000 AU
+
+
+The Whip of Gothmog (6d3) (+13,+15)
+-----------------------------------
+This Hafted Weapon weighs 9.0 lbs.  It does x5 damage against dragons.  It
+does x4 damage against natural creatures, trolls and giants.  It does x3
+damage from fire.  It modifies intelligence, wisdom, dexterity and agility
+ and light radius.  It provides resistance to electricity and powerful
+darkness.  It provides immunity to fire.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It marks you as demonic.  It burdens you with aggravation and 
+health drain.  It is heavily cursed.  When attacking or thrown, it does 6d3
++15 blunt damage.  When activated, it creates a storm of radius 3 to burn 
+your enemies for 145 damage, recharging in 15 turns.  When inscribed with
+{=A} and attacking an opponent, it burns one target for 145 damage,
+recharging in 15 turns.  When set in a trap, it does 6d3+15 blunt damage
+ and burns one target for 145 damage, recharging in 15 turns.  You know
+everything about this item.  
+
+Level 60, Rarity 25, 9.0 lbs, 25000 AU
+
+
+The Ball-and-Chain of Fundin Bluecloak (4d4) (+13,+17) [+10]
+------------------------------------------------------------
+This Hafted Weapon weighs 13.0 lbs.  It does x3 damage from holiness.  It
+does x3 damage against undead.  It modifies strength and size, wisdom, 
+speed and light radius.  It provides resistance to electricity, fire, 
+nether and losing experience.  It is not damaged by acid, electricity, 
+fire, cold and water.  It cannot be stolen from your inventory.  When
+attacking or thrown, it does 4d4+17 blunt damage.  When activated, it 
+dispels all your enemies in line of sight if evil for 250 damage,
+recharging in d100+100 turns.  When inscribed with {=A} and attacking an
+opponent, it dispels one target if evil for 250 damage, recharging in
+d100+100 turns.  When set in a trap, it does 4d4+17 blunt damage and 
+dispels one target if evil for 250 damage, recharging in d100+100 turns.  
+It increases your armor class by 10.  You know everything about this item.
+
+
+Level 65, Rarity 100, 13.0 lbs, 60000 AU
+
+
+The Ball-and-Chain 'Telim' (2d4) (+16,+11)
+------------------------------------------
+This Hafted Weapon weighs 15.0 lbs.  It does x2 damage when charging.  It
+does x3 damage from cold.  It is not damaged by acid, electricity, fire, 
+cold and water.  It cannot be stolen from your inventory.  When attacking
+or thrown, it does 2d4+11 blunt damage.  When activated, it cures you of 
+blindness, and partially cures you of cuts, and heals you for 5d10 hit
+points, recharging in d3+3 turns.  When inscribed with {=A} and attacking
+an opponent, it heals one target for 5d10 hit points, recharging in d3+3
+turns.  When set in a trap, it does 2d4+11 blunt damage and heals one
+target for 5d10 hit points, recharging in d3+3 turns.  You know everything
+about this item.  
+
+Level 30, Rarity 15, 15.0 lbs, 12000 AU
+
+
+The Lucerne Hammer of Gliel (2d5) (+12,+13)
+-------------------------------------------
+This Hafted Weapon weighs 12.0 lbs.  It does x3 damage from poison.  It
+does x3 damage against demons.  It provides resistance to powerful darkness
+.  It gives its wielder see invisible.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When attacking or thrown, it does 2d5+13 blunt damage.  When
+set in a trap, it does 2d5+13 blunt damage.  You know everything about
+this item.  
+
+Level 20, Rarity 8, 12.0 lbs, 24000 AU
+
+
+The War Hammer of Naellion (3d3) (+8,+7)
+----------------------------------------
+This Hafted Weapon weighs 12.0 lbs.  It does x4 damage against natural
+creatures.  It modifies stealth.  It protects you from paralysis and 
+magical slowness.  It gives its wielder feather falling.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When attacking or thrown, it does 3d3+7 blunt
+ damage.  When activated, it creates a beam to electrify your enemies for
+3d9 damage, and creates a beam to electrify your enemies for 3d9 damage,
+recharging in d6+6 turns.  When inscribed with {=A} and attacking an
+opponent, it electrifys one target for 3d9 damage, and electrifys one
+target for 3d9 damage, recharging in d6+6 turns.  When set in a trap, it 
+does 3d3+7 blunt damage and electrifys one target for 3d9 damage, and 
+electrifys one target for 3d9 damage, recharging in d6+6 turns.  You know
+everything about this item.  
+
+Level 10, Rarity 2, 12.0 lbs, 17000 AU
+
+
+The Quarterstaff of Armirm (1d9) (+8,+8)
+----------------------------------------
+This Hafted Weapon weighs 15.0 lbs.  It does x2 damage when charging.  It
+provides resistance to powerful confusion.  It protects you from confusion
+.  It is not damaged by acid, electricity, fire, cold and water.  It
+cannot be stolen from your inventory.  When attacking or thrown, it does
+1d9+8 blunt damage.  When activated, it creates a bolt to freeze your
+enemies for 5d12 damage, and creates a bolt to freeze your enemies for
+5d12 damage, recharging in d7+7 turns.  When inscribed with {=A} and
+attacking an opponent, it freezes one target for 5d12 damage, and freezes 
+one target for 5d12 damage, recharging in d7+7 turns.  When set in a trap,
+it does 1d9+8 blunt damage and freezes one target for 5d12 damage, and 
+freezes one target for 5d12 damage, recharging in d7+7 turns.  You know
+everything about this item.  
+
+Level 10, Rarity 2, 15.0 lbs, 14000 AU
+
+
+The Mace of Disruption of Carindiri (5d8) (+19,+21)
+---------------------------------------------------
+This Hafted Weapon weighs 36.0 lbs.  It does x5 damage when charging.  It
+does x5 damage against demons.  It does x3 damage from electricity.  It
+does x3 damage against undead.  It sustains intelligence.  It provides
+resistance to cold and fear.  It protects you from paralysis and magical
+slowness.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When attacking or thrown, it 
+does 5d8+21 blunt damage.  When activated, it surrounds you with a star to
+ electrify your enemies for 150 damage, recharging in 50 turns.  When
+inscribed with {=A} and attacking an opponent, it electrifys one target
+ for 150 damage, recharging in 50 turns.  When set in a trap, it does 5d8
++21 blunt damage and electrifys one target for 150 damage, recharging in
+50 turns.  You know everything about this item.  
+
+Level 90, Rarity 36, 36.0 lbs, 61000 AU
+
+
+
+
+Bows
+----
+
+The Long Bow 'Belthronding' (x3) (+20,+22)
+------------------------------------------
+This Bow weighs 4.0 lbs.  It modifies dexterity and agility, stealth, 
+speed and shots.  It provides resistance to disenchantment.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When shooting or set in a trap, it multiplies the
+base damage of arrows by 3.  You know everything about this item.  
+
+Level 40, Rarity 20, 4.0 lbs, 35000 AU
+
+
+The Long Bow of Bard (x3) (+17,+19)
+-----------------------------------
+This Bow weighs 4.0 lbs.  It modifies dexterity and agility and might.  It
+protects you from paralysis and magical slowness.  It senses dragons.  It
+is not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When shooting or set in a trap, it multiplies
+the base damage of arrows by 5.  You know everything about this item.  
+
+Level 30, Rarity 20, 4.0 lbs, 20000 AU
+
+
+The Light Crossbow 'Cubragol' (x3) (+10,+14)
+--------------------------------------------
+This Bow weighs 11.0 lbs.  It modifies speed.  It provides resistance to 
+fire.  It is not damaged by acid, electricity, fire, cold and water.  It
+cannot be stolen from your inventory.  When thrown, it does 1d2+14 blunt
+ damage.  When shooting or set in a trap, it multiplies the base damage of 
+bolts by 3.  When activated, it can enchant one missile to become branded,
+recharging in 999 turns.  You know everything about this item.  
+
+Level 50, Rarity 25, 11.0 lbs, 50000 AU
+
+
+The Heavy Crossbow of Umbar (x4) (+18,+18)
+------------------------------------------
+This Bow weighs 20.0 lbs.  It modifies strength and size, constitution and 
+might.  It provides resistance to electricity, powerful light and powerful
+darkness.  It protects you from blindness.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It burdens you with aggravation.  When thrown, it does 4d1+18 
+blunt damage.  When shooting or set in a trap, it multiplies the base
+damage of bolts by 6.  When activated, it creates an arrow to attack one
+target for 150 damage, recharging in d20+20 turns.  You know everything
+about this item.  
+
+Level 60, Rarity 20, 20.0 lbs, 35000 AU
+
+
+The Short Bow of Amrod (x2) (+12,+15)
+-------------------------------------
+This Bow weighs 3.0 lbs.  It modifies strength and size, constitution, 
+might and hitpoint regeneration.  It provides resistance to electricity, 
+fire and cold.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When shooting or set in
+a trap, it multiplies the base damage of arrows by 4.  You know everything
+about this item.  
+
+Level 25, Rarity 10, 3.0 lbs, 9000 AU
+
+
+The Short Bow of Amras (x2) (+12,+15)
+-------------------------------------
+This Bow weighs 3.0 lbs.  It modifies intelligence, wisdom, dexterity and
+agility, shots and might.  It provides resistance to electricity, fire and 
+cold.  It gives its wielder slow digestion.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When shooting or set in a trap, it multiplies the base damage
+of arrows by 3.  You know everything about this item.  
+
+Level 25, Rarity 10, 3.0 lbs, 9000 AU
+
+
+The Hand Crossbow of Mionda (x2) (+19,+15)
+------------------------------------------
+This Bow weighs 6.0 lbs.  It modifies dexterity and agility and might.  It
+provides resistance to fire and fear.  It protects you from paralysis and 
+magical slowness.  It gives its wielder slow digestion.  It is not damaged
+by acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d1+15 blunt damage.  When shooting or
+set in a trap, it multiplies the base damage of bolts by 4.  You know
+everything about this item.  
+
+Level 20, Rarity 36, 6.0 lbs, 31000 AU
+
+
+The Hand Crossbow of Tauglach (x2) (+20,+14)
+--------------------------------------------
+This Bow weighs 6.0 lbs.  It modifies intelligence and charisma.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When thrown, it does 1d1+14 blunt damage.  
+When shooting or set in a trap, it multiplies the base damage of bolts by
+2.  When activated, it creates a ball of radius 2 to burn your enemies for
+80 damage, recharging in 20 turns.  You know everything about this item.  
+
+Level 20, Rarity 30, 6.0 lbs, 15000 AU
+
+
+The Sling of Rannarwe (x2) (+21,+17)
+------------------------------------
+This Bow weighs 0.5 lbs.  It modifies might.  It provides resistance to 
+electricity.  It provides immunity to cold.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When shooting or set in a trap, it multiplies the base damage
+of shots or thrown items by 5.  When activated, it confuses one target for
+25 power, recharging in 15 turns.  You know everything about this item.  
+
+Level 20, Rarity 16, 0.5 lbs, 45000 AU
+
+
+The Hand Crossbow of Eldainas (x2) (+16,+11)
+--------------------------------------------
+This Bow weighs 6.0 lbs.  It modifies might.  It provides resistance to 
+electricity.  It protects you from paralysis and magical slowness.  It
+senses trolls.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When thrown, it does 1d1
++11 blunt damage.  When shooting or set in a trap, it multiplies the base
+damage of bolts by 5.  You know everything about this item.  
+
+Level 20, Rarity 45, 6.0 lbs, 30000 AU
+
+
+The Hand Crossbow 'Rufin' (x2) (+9,+9)
+--------------------------------------
+This Bow weighs 6.0 lbs.  It modifies constitution and stealth.  It
+provides resistance to powerful light.  It senses demons.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When thrown, it does 1d1+9 blunt damage.  When
+shooting or set in a trap, it multiplies the base damage of bolts by 2.  
+When activated, it creates a bolt to freeze your enemies for 5d16 damage, 
+creates a bolt to freeze your enemies for 5d16 damage, and creates a bolt
+ to freeze your enemies for 5d16 damage, recharging in 50 turns.  You know
+everything about this item.  
+
+Level 20, Rarity 90, 6.0 lbs, 44000 AU
+
+
+The Short Bow of Nimbaldin (x2) (+10,+13)
+-----------------------------------------
+This Bow weighs 3.0 lbs.  It modifies intelligence.  It provides
+resistance to acid, fire and cold.  It senses trolls.  It is not damaged by
+ acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When shooting or set in a trap, it multiplies the base damage
+of arrows by 2.  When activated, it creates a missile to blast your enemies
+ with magic for 3d4 damage, recharging in 2 turns.  You know everything
+about this item.  
+
+Level 10, Rarity 3, 3.0 lbs, 21000 AU
+
+
+The Hand Crossbow of Faegrost (x2) (+8,+29)
+-------------------------------------------
+This Bow weighs 6.0 lbs.  It modifies intelligence, constitution, 
+searching, tunneling and might.  It provides resistance to electricity, 
+cold, poison and powerful light.  It protects you from the effects of
+poison.  It gives its wielder slow digestion and see invisible.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When thrown, it does 1d1+29 blunt damage.  When
+shooting or set in a trap, it multiplies the base damage of bolts by 4.  
+You know everything about this item.  
+
+Level 40, Rarity 160, 6.0 lbs, 61000 AU
+
+
+The Heavy Crossbow of Edhor (x4) (+22,+16)
+------------------------------------------
+This Bow weighs 20.0 lbs.  It modifies intelligence, wisdom, constitution
+ and might.  It gives its wielder slow digestion and see invisible.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When thrown, it does 3d1+16 blunt damage.  
+When shooting or set in a trap, it multiplies the base damage of bolts by
+7.  When activated, it cures you of amnesia, and restores your strength
+and size, intelligence, wisdom, dexterity and agility, constitution and 
+charisma, recharging in 250 turns.  You know everything about this item.  
+
+Level 40, Rarity 160, 20.0 lbs, 48000 AU
+
+
+The Sling of Lurth (x2) (+21,+15)
+---------------------------------
+This Bow weighs 0.5 lbs.  It modifies constitution.  It provides
+resistance to acid, electricity and fire.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When shooting or set in a trap, it multiplies the base damage
+of shots or thrown items by 2.  When activated, it surrounds you with an
+aura of radius 2 to send your enemies to sleep for 25 power, recharging in
+55 turns.  You know everything about this item.  
+
+Level 5, Rarity 25, 0.5 lbs, 24000 AU
+
+
+The Hand Crossbow of Estin (x2) (+10,+16)
+-----------------------------------------
+This Bow weighs 6.0 lbs.  It modifies constitution and might.  It gives
+its wielder slow digestion and telepathy.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d1+16 blunt damage.  When shooting or
+set in a trap, it multiplies the base damage of bolts by 4.  You know
+everything about this item.  
+
+Level 20, Rarity 2, 6.0 lbs, 34000 AU
+
+
+The Light Crossbow of Falair (x3) (+16,+17)
+-------------------------------------------
+This Bow weighs 11.0 lbs.  It modifies strength and size, wisdom, 
+dexterity and agility and might.  It provides resistance to fire, sound
+ and nexus.  It protects you from stunning.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d2+17 blunt damage.  When shooting or
+set in a trap, it multiplies the base damage of bolts by 6.  You know
+everything about this item.  
+
+Level 20, Rarity 3, 11.0 lbs, 56000 AU
+
+
+The Light Crossbow of Naromin (x3) (+20,+14)
+--------------------------------------------
+This Bow weighs 11.0 lbs.  It modifies charisma, might and light radius.  
+It provides resistance to fire.  It protects you from paralysis and 
+magical slowness.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  It burdens you with 
+aggravation.  When thrown, it does 1d2+14 blunt damage.  When shooting or
+set in a trap, it multiplies the base damage of bolts by 6.  When
+activated, it protects your from evil monsters for 1d25 turns, recharging
+in d100+100 turns.  You know everything about this item.  
+
+Level 50, Rarity 20, 11.0 lbs, 48000 AU
+
+
+
+
+Diggers
+-------
+
+The Mattock of Nain (3d8) (+12,+18)
+-----------------------------------
+This Digger weighs 25.0 lbs.  You can dig pits with this to trap monsters.
+It does x3 damage when charging.  It does x4 damage against orcs, trolls
+ and giants.  It does x3 damage from acid.  It does x3 damage against 
+dragons.  It modifies strength and size, searching, infravision and 
+tunneling.  It provides resistance to acid, powerful darkness and 
+disenchantment.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When attacking or
+thrown, it does 3d8+18 blunt damage.  When activated, it removes rock from
+ one direction for 6d8 damage to monsters made from rock, recharging in 2
+turns.  When inscribed with {=A} and attacking an opponent, it removes 
+rock from one target for 6d8 damage to monsters made from rock, recharging
+in 2 turns.  You know everything about this item.  
+
+Level 60, Rarity 8, 25.0 lbs, 30000 AU
+
+
+The Dwarven Pick of Erebor (3d4) (+5,+20)
+-----------------------------------------
+This Digger weighs 20.0 lbs.  You can dig pits with this to trap monsters.
+It does x3 damage when charging.  It does x4 damage against orcs and 
+trolls.  It does x3 damage from acid.  It does x3 damage against demons.  
+It modifies strength and size, constitution, tunneling and light radius.  
+It sustains strength and size.  It provides resistance to powerful light, 
+powerful darkness and chaos.  It protects you from hallucination.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When attacking or thrown, it does 3d4+20 
+blunt damage.  You know everything about this item.  
+
+Level 55, Rarity 5, 20.0 lbs, 30000 AU
+
+
+The Pick of Noldon (2d3) (+14,+12)
+----------------------------------
+This Digger weighs 15.0 lbs.  You can dig pits with this to trap monsters.
+It does x2 damage when charging.  It does x5 damage against dragons.  It
+does x4 damage against elves.  It does x3 damage from light and darkness.  
+It modifies searching and tunneling.  It provides resistance to powerful
+darkness and chaos.  It protects you from hallucination.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  It marks you as evil.  When attacking or thrown, it 
+does 2d3+12 blunt damage.  You know everything about this item.  
+
+Level 25, Rarity 2, 15.0 lbs, 36000 AU
+
+
+
+
+Body Armor
+----------
+
+The Hard Leather Armour of Himring [6,+15]
+------------------------------------------
+This Soft Armor weighs 10.0 lbs.  It provides resistance to poison, nether
+ and chaos.  It protects you from the effects of poison and hallucination.
+It is not damaged by acid, electricity, fire, cold and water.  It cannot
+be stolen from your inventory.  When thrown, it does 1d1 blunt damage.  
+When activated, it protects your from evil monsters for 1d25 turns,
+recharging in d100+100 turns.  It increases your armor class by 21.  You
+know everything about this item.  
+
+Level 50, Rarity 20, 10.0 lbs, 35000 AU
+
+
+The Soft Leather Armour 'Hithlomir' [4,+20]
+-------------------------------------------
+This Soft Armor weighs 8.0 lbs.  It modifies stealth.  It provides
+resistance to acid, electricity, fire, cold and powerful darkness.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When thrown, it does 1d1 blunt damage.  It
+increases your armor class by 24.  You know everything about this item.  
+
+Level 20, Rarity 3, 8.0 lbs, 45000 AU
+
+
+The Leather Scale Mail 'Thalkettoth' (-1) [11,+25]
+--------------------------------------------------
+This Soft Armor weighs 6.0 lbs.  It modifies dexterity and agility.  It
+provides resistance to acid and shards.  It protects you from cuts.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When thrown, it does 1d2 blunt damage.  It
+increases your armor class by 36.  You know everything about this item.  
+
+Level 20, Rarity 3, 6.0 lbs, 25000 AU
+
+
+The Hard Studded Leather of Thalaquen (-1) [7,+16]
+--------------------------------------------------
+This Soft Armor weighs 11.0 lbs.  It modifies intelligence.  It provides
+resistance to acid, poison, sound and disenchantment.  It protects you from
+ the effects of poison and stunning.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d2 blunt damage.  It increases your
+armor class by 23.  You know everything about this item.  
+
+Level 18, Rarity 90, 11.0 lbs, 51000 AU
+
+
+The Hard Studded Leather of Oiondon (-1,+3) [7,+15]
+---------------------------------------------------
+This Soft Armor weighs 9.9 lbs.  It sustains wisdom.  It provides
+resistance to fear, powerful light, sound and nether.  It protects you from
+ stunning.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When thrown, it does 1d2+3 blunt
+ damage.  It increases your armor class by 22.  You know everything about
+this item.  
+
+Level 20, Rarity 60, 9.9 lbs, 45000 AU
+
+
+The Leather Scale Mail of Wenelon (-1) [10,+30]
+-----------------------------------------------
+This Soft Armor weighs 14.0 lbs.  It modifies dexterity and agility.  It
+provides resistance to acid, fire, powerful light, powerful darkness, 
+sound, nexus and losing experience.  It protects you from stunning, 
+paralysis and magical slowness.  It is not damaged by acid, electricity, 
+fire, cold and water.  It cannot be stolen from your inventory.  When
+thrown, it does 1d2 blunt damage.  When activated, it makes you go berserk
+ for 1d25+25 turns, and cures you of fear and petrification, and heals you
+ for 30 hit points, recharging in d80+80 turns.  It increases your armor
+class by 40.  You know everything about this item.  
+
+Level 20, Rarity 30, 14.0 lbs, 103000 AU
+
+
+The Soft Studded Leather of Essea [5,+26]
+-----------------------------------------
+This Soft Armor weighs 8.1 lbs.  It provides resistance to poison, fear, 
+powerful light, powerful darkness and powerful confusion.  It protects you
+from the effects of poison, blindness and confusion.  It is not damaged by
+ acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d1 blunt damage.  It increases your
+armor class by 31.  You know everything about this item.  
+
+Level 15, Rarity 105, 8.1 lbs, 85000 AU
+
+
+The Leather Scale Mail of Erendorog (-1,+1) [10,+8]
+---------------------------------------------------
+This Soft Armor weighs 14.0 lbs.  It modifies intelligence and light radius
+.  It provides resistance to acid, electricity, fire, cold, fear and 
+shards.  It protects you from cuts.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d2+1 blunt damage.  When activated, it 
+creates a ball of radius 2 to freeze your enemies for 55 damage,
+recharging in d5+5 turns.  It increases your armor class by 18.  You know
+everything about this item.  
+
+Level 10, Rarity 80, 14.0 lbs, 29000 AU
+
+
+The Soft Leather Armour of Hilion [4,+26]
+-----------------------------------------
+This Soft Armor weighs 8.0 lbs.  It provides resistance to acid, 
+electricity and powerful light.  It is not damaged by acid, electricity, 
+fire, cold and water.  It cannot be stolen from your inventory.  When
+activated, it creates a cloud of radius 2 to poison your enemies for 10 
+damage, recharging in d4+4 turns.  It increases your armor class by 30.  
+You know everything about this item.  
+
+Level 5, Rarity 80, 8.0 lbs, 38000 AU
+
+
+The Hard Studded Leather of Antiri (-1) [7,+8]
+----------------------------------------------
+This Soft Armor weighs 11.0 lbs.  It protects you from paralysis and 
+magical slowness.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When thrown, it does 1d2
+ blunt damage.  When activated, it creates a beam to electrify your enemies
+ for 3d6 damage, recharging in d6+6 turns.  It increases your armor class
+by 15.  You know everything about this item.  
+
+Level 4, Rarity 10, 11.0 lbs, 10000 AU
+
+
+The Hard Leather Armour of Anwente [6,+9]
+-----------------------------------------
+This Soft Armor weighs 10.0 lbs.  It provides resistance to powerful
+darkness and disenchantment.  It is not damaged by acid, electricity, fire
+, cold and water.  It cannot be stolen from your inventory.  It burdens
+you with aggravation.  When thrown, it does 1d1 blunt damage.  When
+activated, it creates a bolt to freeze your enemies for 5d8 damage,
+recharging in d7+7 turns.  It increases your armor class by 15.  You know
+everything about this item.  
+
+Level 4, Rarity 10, 10.0 lbs, 9000 AU
+
+
+The Soft Studded Leather of Aglir [5,+16]
+-----------------------------------------
+This Soft Armor weighs 9.0 lbs.  It provides resistance to acid, cold and 
+powerful light.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When thrown, it does 1d1
+ blunt damage.  It increases your armor class by 21.  You know everything
+about this item.  
+
+Level 5, Rarity 10, 9.0 lbs, 21000 AU
+
+
+The Soft Studded Leather of Varwenya [5,+9]
+-------------------------------------------
+This Soft Armor weighs 8.1 lbs.  It modifies wisdom.  It provides
+resistance to poison and powerful darkness.  It protects you from the
+effects of poison.  It gives its wielder see invisible.  It is not damaged
+by acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d1 blunt damage.  When activated, it 
+provides temporary fire, cold, acid, lightning and poison resistance for
+1d20+20 turns, recharging in 111 turns.  It increases your armor class by
+14.  You know everything about this item.  
+
+Level 5, Rarity 45, 8.1 lbs, 41000 AU
+
+
+The Adamantite Plate Armour 'Soulkeeper' (-4) [40,+20]
+------------------------------------------------------
+This Hard Armor weighs 42.0 lbs.  It modifies constitution.  It sustains 
+constitution.  It provides resistance to acid, cold, fear, powerful
+darkness, powerful confusion, nexus, nether, chaos and losing experience.  
+It protects you from hallucination and confusion.  It is not damaged by 
+acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 2d4 blunt damage.  When activated, it 
+cures you of cuts and stun damage, and heals you for 1000 hit points,
+recharging in 444 turns.  It increases your armor class by 60.  You know
+everything about this item.  
+
+Level 75, Rarity 9, 42.0 lbs, 300000 AU
+
+
+The Full Plate Armour of Isildur [25,+25]
+-----------------------------------------
+This Hard Armor weighs 30.0 lbs.  It modifies constitution.  It provides
+resistance to acid, electricity, fire, cold, powerful confusion, sound and 
+nexus.  It protects you from stunning and confusion.  It is not damaged by
+ acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 2d4 blunt damage.  It increases your
+armor class by 50.  You know everything about this item.  
+
+Level 30, Rarity 3, 30.0 lbs, 50000 AU
+
+
+The Segmented Plate Mail of the Rohirrim [19,+15]
+-------------------------------------------------
+This Hard Armor weighs 20.0 lbs.  It modifies strength and size and 
+dexterity and agility.  It provides resistance to acid, electricity, fire, 
+cold, fear, powerful confusion and sound.  It protects you from stunning
+ and confusion.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  It marks you as a man.  
+When thrown, it does 1d4 blunt damage.  It increases your armor class by
+34.  You know everything about this item.  
+
+Level 30, Rarity 3, 20.0 lbs, 30000 AU
+
+
+The Mithril Chain Mail 'Belegennon' (-1) [28,+20]
+-------------------------------------------------
+This Hard Armor weighs 15.0 lbs.  It modifies stealth.  It provides
+resistance to acid, electricity, fire, cold and poison.  It protects you
+from the effects of poison.  It is not damaged by acid, electricity, fire, 
+cold and water.  It cannot be stolen from your inventory.  When thrown, it 
+does 1d4 blunt damage.  When activated, it teleports you away for 10 
+distance on average, recharging in 2 turns.  It increases your armor class
+by 48.  You know everything about this item.  
+
+Level 40, Rarity 3, 15.0 lbs, 105000 AU
+
+
+The Mithril Plate Armour of Celeborn (-3) [35,+25]
+--------------------------------------------------
+This Hard Armor weighs 25.0 lbs.  It modifies strength and size and 
+charisma.  It provides resistance to acid, electricity, fire, cold, 
+powerful darkness and disenchantment.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 2d4 blunt damage.  When activated, it 
+allows you to remove a monster type from a level (1d4 damage per monster),
+recharging in 500 turns.  It increases your armor class by 60.  You know
+everything about this item.  
+
+Level 40, Rarity 3, 25.0 lbs, 150000 AU
+
+
+The Chain Mail of Arvedui (-2) [14,+15]
+---------------------------------------
+This Hard Armor weighs 22.0 lbs.  It modifies strength and size and 
+charisma.  It provides resistance to acid, electricity, fire, cold, shards
+ and nexus.  It protects you from cuts.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d4 blunt damage.  It increases your
+armor class by 29.  You know everything about this item.  
+
+Level 20, Rarity 3, 22.0 lbs, 32000 AU
+
+
+The Augmented Chain Mail of Caspanion (-2) [16,+20]
+---------------------------------------------------
+This Hard Armor weighs 27.0 lbs.  It modifies intelligence, wisdom and 
+constitution.  It provides resistance to acid, poison and powerful
+confusion.  It protects you from the effects of poison and confusion.  It
+is not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When thrown, it does 1d4 blunt damage.  When
+activated, it removes doors from all enemies adjacent to you, recharging
+in 10 turns.  It increases your armor class by 36.  You know everything
+about this item.  
+
+Level 25, Rarity 9, 27.0 lbs, 40000 AU
+
+
+The Mithril Chain Mail of Tinde (-1) [28,+21]
+---------------------------------------------
+This Hard Armor weighs 15.0 lbs.  It provides resistance to electricity, 
+powerful light and powerful confusion.  It protects you from confusion.  
+It is not damaged by acid, electricity, fire, cold and water.  It cannot
+be stolen from your inventory.  When thrown, it does 1d4 blunt damage.  It
+increases your armor class by 49.  You know everything about this item.  
+
+Level 25, Rarity 2, 15.0 lbs, 37000 AU
+
+
+The Metal Scale Mail 'Edriant' (-3,+2) [15,+21]
+-----------------------------------------------
+This Hard Armor weighs 25.0 lbs.  It modifies wisdom and charisma.  It
+provides resistance to cold, fear and powerful light.  It protects you from
+ paralysis and magical slowness.  It is not damaged by acid, electricity, 
+fire, cold and water.  It cannot be stolen from your inventory.  When
+thrown, it does 1d4+2 blunt damage.  When activated, it hastes you for
+1d20+20 turns, recharging in d100+100 turns.  It increases your armor
+class by 36.  You know everything about this item.  
+
+Level 20, Rarity 30, 25.0 lbs, 39000 AU
+
+
+The Chain Mail of Lendudhri (-1) [14,+20]
+-----------------------------------------
+This Hard Armor weighs 22.0 lbs.  It provides resistance to electricity, 
+powerful light and powerful confusion.  It protects you from confusion, 
+paralysis and magical slowness.  It is not damaged by acid, electricity, 
+fire, cold and water.  It cannot be stolen from your inventory.  When
+thrown, it does 1d4 blunt damage.  It increases your armor class by 34.  
+You know everything about this item.  
+
+Level 15, Rarity 12, 22.0 lbs, 44000 AU
+
+
+The Imperial Plate Armour of Nastirn (-3,+4) [28,+19]
+-----------------------------------------------------
+This Hard Armor weighs 34.2 lbs.  It modifies wisdom.  It provides
+resistance to acid, electricity, cold, powerful darkness and nether.  It
+is not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When thrown, it does 2d4+4 blunt damage.  It
+increases your armor class by 47.  You know everything about this item.  
+
+Level 30, Rarity 75, 34.2 lbs, 51000 AU
+
+
+The Full Plate Armour of Dangrin (-3) [25,+18]
+----------------------------------------------
+This Hard Armor weighs 38.0 lbs.  It modifies constitution.  It provides
+resistance to electricity.  It protects you from blindness.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When thrown, it does 2d4 blunt damage.  When
+activated, it drains life from one target for 125 damage, recharging in 40
+turns.  It increases your armor class by 43.  You know everything about
+this item.  
+
+Level 20, Rarity 30, 38.0 lbs, 41000 AU
+
+
+The Double Chain Mail of Orello (-2) [16,+17]
+---------------------------------------------
+This Hard Armor weighs 25.0 lbs.  It provides resistance to nether and 
+disenchantment.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When thrown, it does 1d4
+ blunt damage.  It increases your armor class by 33.  You know everything
+about this item.  
+
+Level 15, Rarity 24, 25.0 lbs, 30000 AU
+
+
+The Chain Mail of Nibilweth (-2) [14,+29]
+-----------------------------------------
+This Hard Armor weighs 22.0 lbs.  It provides resistance to poison and 
+powerful darkness.  It protects you from the effects of poison.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When thrown, it does 1d4 blunt damage.  It increases
+your armor class by 43.  You know everything about this item.  
+
+Level 20, Rarity 24, 22.0 lbs, 55000 AU
+
+
+The Mithril Chain Mail of Heldalmor (-1) [28,+20]
+-------------------------------------------------
+This Hard Armor weighs 15.0 lbs.  It modifies dexterity and agility.  It
+provides resistance to acid, electricity, fire, cold, fear, powerful light
+ and powerful darkness.  It is not damaged by acid, electricity, fire, 
+cold and water.  It cannot be stolen from your inventory.  When thrown, it 
+does 1d4 blunt damage.  It increases your armor class by 48.  You know
+everything about this item.  
+
+Level 30, Rarity 11, 15.0 lbs, 61000 AU
+
+
+The Full Plate Armour of Haradrith (-3) [25,+25]
+------------------------------------------------
+This Hard Armor weighs 38.0 lbs.  It modifies charisma and searching.  It
+provides resistance to acid, electricity, fire, cold and fear.  It
+protects you from blindness.  It is not damaged by acid, electricity, fire
+, cold and water.  It cannot be stolen from your inventory.  When thrown,
+it does 2d4 blunt damage.  It increases your armor class by 50.  You know
+everything about this item.  
+
+Level 15, Rarity 90, 38.0 lbs, 45000 AU
+
+
+The Mithril Chain Mail of Aldis (-1) [28,+22]
+---------------------------------------------
+This Hard Armor weighs 15.0 lbs.  It modifies strength and size, 
+constitution, charisma, speed and hitpoint regeneration.  It provides
+resistance to acid, electricity, fire, cold, poison, fear, powerful light
+ and nether.  It protects you from the effects of poison.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  It marks you as draconic.  When thrown, it does 1d4 
+blunt damage.  It increases your armor class by 50.  You know everything
+about this item.  
+
+Level 40, Rarity 5, 15.0 lbs, 152000 AU
+
+
+The Chain Mail of Telch (-2) [14,+15]
+-------------------------------------
+This Hard Armor weighs 22.0 lbs.  It modifies dexterity and agility, 
+constitution and stealth.  It sustains charisma.  It provides resistance to
+ acid, electricity, fire, cold and sound.  It protects you from stunning.  
+It is not damaged by acid, electricity, fire, cold and water.  It cannot
+be stolen from your inventory.  When thrown, it does 1d4 blunt damage.  It
+increases your armor class by 29.  You know everything about this item.  
+
+Level 30, Rarity 3, 22.0 lbs, 50000 AU
+
+
+The Laminated Plate Armour of Halingil (-3) [23,+26]
+----------------------------------------------------
+This Hard Armor weighs 34.0 lbs.  It provides resistance to fire, fear and 
+powerful confusion.  It protects you from confusion, paralysis and magical
+slowness.  It gives its wielder see invisible.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d6 blunt damage.  It increases your
+armor class by 49.  You know everything about this item.  
+
+Level 20, Rarity 3, 34.0 lbs, 50000 AU
+
+
+The Laminated Plate Armour of Hadon (-3) [23,+25]
+-------------------------------------------------
+This Hard Armor weighs 34.0 lbs.  It sustains strength and size.  It
+provides resistance to fire, cold, nexus, nether and disenchantment.  It
+is not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When thrown, it does 1d6 blunt damage.  It
+increases your armor class by 48.  You know everything about this item.  
+
+Level 30, Rarity 3, 34.0 lbs, 63000 AU
+
+
+The Multi-Hued Dragon Scale Mail 'Razorback' (-4) [30,+25]
+----------------------------------------------------------
+This Dragon Scale Mail weighs 50.0 lbs.  It provides resistance to acid, 
+fire, cold, poison, powerful light and powerful darkness.  It provides
+immunity to electricity.  It protects you from the effects of poison, 
+paralysis and magical slowness.  It gives its wielder see invisible.  It
+is not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  It marks you as draconic.  It burdens you with
+ aggravation and mana drain.  When thrown, it does 2d4 blunt damage.  When
+activated, it surrounds you with a star to electrify your enemies for 150 
+damage, recharging in 50 turns.  When set in a trap, it electrifys one
+target for 150 damage, recharging in 50 turns.  It increases your armor
+class by 55.  You know everything about this item.  
+
+Level 90, Rarity 9, 50.0 lbs, 400000 AU
+
+
+The Power Dragon Scale Mail 'Bladeturner' (-8) [50,+35]
+-------------------------------------------------------
+This Dragon Scale Mail weighs 60.0 lbs.  It provides resistance to acid, 
+electricity, fire, cold, poison, fear, powerful light, powerful darkness, 
+powerful confusion, sound, shards, nexus, nether, chaos, disenchantment
+ and losing experience.  It protects you from the effects of poison, 
+blindness, stunning, cuts, hallucination and confusion.  It is not damaged
+by acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It marks you as draconic.  It burdens you with mana drain.  
+When thrown, it does 2d4 blunt damage.  When activated, it provides
+temporary fire, cold, acid, lightning and poison resistance, makes you go
+berserk and blesses you for 1d50+50 turns, recharging in 400 turns.  It
+increases your armor class by 85.  You know everything about this item.  
+
+Level 100, Rarity 16, 60.0 lbs, 500000 AU
+
+
+The Balance Dragon Scale Mail 'Mediator' (-4) [30,+25]
+------------------------------------------------------
+This Dragon Scale Mail weighs 50.0 lbs.  It provides resistance to 
+powerful confusion, sound, shards, nexus, chaos and disenchantment.  It
+protects you from stunning, cuts, hallucination, confusion, paralysis and 
+magical slowness.  It gives its wielder slow digestion.  It is not damaged
+by acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It marks you as draconic.  It burdens you with aggravation.  
+When thrown, it does 2d4 blunt damage.  When activated, it surrounds you
+with a star to electrify your enemies for 150 damage, recharging in 50
+turns.  When set in a trap, it electrifys one target for 150 damage,
+recharging in 50 turns.  It increases your armor class by 55.  You know
+everything about this item.  
+
+Level 95, Rarity 12, 50.0 lbs, 400000 AU
+
+
+The Power Dragon Scale Mail 'Eilindor' (-3) [40,+30]
+----------------------------------------------------
+This Dragon Scale Mail weighs 20.0 lbs.  It modifies intelligence and 
+light radius.  It sustains constitution.  It provides resistance to acid, 
+electricity, fire, cold, poison, fear, powerful light, powerful darkness, 
+powerful confusion, sound, shards, nexus, nether, chaos, disenchantment
+ and losing experience.  It protects you from the effects of poison, 
+stunning, cuts, hallucination and confusion.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It marks you as draconic and elven.  It burdens you with 
+aggravation.  When thrown, it does 2d4 blunt damage.  When set in a trap,
+it blasts one target with magic for 300 damageIt increases your armor
+class by 70.  You know everything about this item.  
+
+Level 80, Rarity 4, 20.0 lbs, 177000 AU
+
+
+The Balance Dragon Scale Mail 'Egnin' (-2) [30,+31]
+---------------------------------------------------
+This Dragon Scale Mail weighs 16.2 lbs.  It modifies intelligence, 
+constitution, charisma and stealth.  It provides resistance to fire, 
+poison, sound, shards, chaos and disenchantment.  It protects you from the
+effects of poison, blindness, stunning, cuts and hallucination.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  It marks you as draconic.  When thrown, it does 2d4 
+blunt damage.  When set in a trap, it deafens one target for 130 damage,
+or blasts one target with disenchantment for 100 damage, or blasts one
+target with chaos for 220 damage, or blasts one target with shards for 230 
+damageIt increases your armor class by 61.  You know everything about this
+item.  
+
+Level 40, Rarity 9, 16.2 lbs, 119000 AU
+
+
+The White Dragon Scale Mail 'Adairi' (-2) [30,+36]
+--------------------------------------------------
+This Dragon Scale Mail weighs 20.0 lbs.  It provides resistance to 
+electricity, cold, poison, powerful light and shards.  It protects you from
+ the effects of poison, blindness and cuts.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It marks you as draconic.  When thrown, it does 2d4 blunt
+ damage.  When set in a trap, it freezes one target for 115 damageIt
+increases your armor class by 66.  You know everything about this item.  
+
+Level 45, Rarity 9, 20.0 lbs, 87000 AU
+
+
+The Black Dragon Scale Mail of Lonatan (-2,+9) [30,+30]
+-------------------------------------------------------
+This Dragon Scale Mail weighs 20.0 lbs.  It provides resistance to acid, 
+poison, fear, powerful light, powerful darkness, sound, shards and 
+disenchantment.  It protects you from the effects of poison, blindness, 
+stunning and cuts.  It gives its wielder see invisible.  It is not damaged
+by acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It marks you as draconic.  When thrown, it does 2d4+9 blunt
+ damage.  When set in a trap, it dissolves one target for 130 damageIt
+increases your armor class by 60.  You know everything about this item.  
+
+Level 30, Rarity 33, 20.0 lbs, 119000 AU
+
+
+The Red Dragon Scale Mail of Nachalim (-2) [30,+24]
+---------------------------------------------------
+This Dragon Scale Mail weighs 18.0 lbs.  It modifies constitution.  It
+provides resistance to acid, electricity, fire, cold, powerful darkness, 
+sound, nexus and nether.  It protects you from stunning.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  It marks you as draconic.  When thrown, it does 2d4 
+blunt damage.  When set in a trap, it burns one target for 200 damageIt
+increases your armor class by 54.  You know everything about this item.  
+
+Level 30, Rarity 45, 18.0 lbs, 94000 AU
+
+
+The Red Dragon Scale Mail 'Armor' (-2) [30,+23]
+-----------------------------------------------
+This Dragon Scale Mail weighs 20.0 lbs.  It modifies strength and size and 
+dexterity and agility.  It provides resistance to fire and cold.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  It marks you as draconic.  When thrown, it 
+does 2d4 blunt damage.  When activated, it creates a powerful bolt to 
+blast your enemies with magic for 100 damage, recharging in d30+30 turns.  
+When set in a trap, it blasts one target with magic for 100 damage,
+recharging in d30+30 turns.  It increases your armor class by 53.  You
+know everything about this item.  
+
+Level 55, Rarity 4, 20.0 lbs, 31000 AU
+
+
+The Red Dragon Scale Mail of Nielebor (-2) [30,+38]
+---------------------------------------------------
+This Dragon Scale Mail weighs 20.0 lbs.  It modifies intelligence, 
+dexterity and agility and constitution.  It provides resistance to acid, 
+fire, cold, powerful light, powerful confusion, chaos, disenchantment and 
+losing experience.  It provides immunity to poison.  It protects you from 
+blindness, hallucination, confusion, paralysis and magical slowness.  It
+is not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  It marks you as demonic and draconic.  When
+thrown, it does 2d4 blunt damage.  When activated, it cures you of cuts
+ and stun damage, and heals you for 500 hit points, recharging in 250
+turns.  When set in a trap, it heals one target for 500 hit points,
+recharging in 250 turns.  It increases your armor class by 68.  You know
+everything about this item.  
+
+Level 40, Rarity 5, 20.0 lbs, 162000 AU
+
+
+The Power Dragon Scale Mail of Eolvas (-2) [40,+28]
+---------------------------------------------------
+This Dragon Scale Mail weighs 20.0 lbs.  It modifies infravision and speed
+.  It provides resistance to acid, electricity, fire, cold, poison, fear, 
+powerful light, powerful darkness, powerful confusion, sound, shards, 
+nexus, nether, chaos and disenchantment.  It protects you from the effects
+of poison, blindness, stunning, cuts, hallucination and confusion.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  It marks you as undead and draconic.  When
+thrown, it does 2d4 blunt damage.  When activated, it provides temporary 
+fire, cold, acid, lightning and poison resistance, makes you go berserk
+ and blesses you for 1d50+50 turns, recharging in 400 turns.  It increases
+your armor class by 68.  You know everything about this item.  
+
+Level 100, Rarity 16, 20.0 lbs, 196000 AU
+
+
+
+
+Cloaks
+------
+
+The Cloak 'Colluin' [1,+15]
+---------------------------
+This Cloak weighs 1.0 lbs.  It provides resistance to acid, electricity, 
+fire, cold and poison.  It protects you from the effects of poison.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When activated, it provides temporary fire, 
+cold, acid, lightning and poison resistance for 1d20+20 turns, recharging
+in 111 turns.  It increases your armor class by 16.  You know everything
+about this item.  
+
+Level 5, Rarity 45, 1.0 lbs, 50000 AU
+
+
+The Cloak 'Holcolleth' [1,+4]
+-----------------------------
+This Cloak weighs 1.0 lbs.  It modifies intelligence, wisdom, stealth and 
+speed.  It provides resistance to acid.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When activated, it surrounds you with an aura of radius 2 to 
+send your enemies to sleep for 25 power, recharging in 55 turns.  It
+increases your armor class by 5.  You know everything about this item.  
+
+Level 5, Rarity 25, 1.0 lbs, 18000 AU
+
+
+The Cloak of Thingol [1,+18]
+----------------------------
+This Cloak weighs 1.0 lbs.  It modifies dexterity and agility and charisma
+.  It provides resistance to acid, fire and cold.  It protects you from 
+paralysis and magical slowness.  It is not damaged by acid, electricity, 
+fire, cold and water.  It cannot be stolen from your inventory.  When
+activated, it recharges one staff or wand for 100 power, recharging in 70
+turns.  It increases your armor class by 19.  You know everything about
+this item.  
+
+Level 5, Rarity 50, 1.0 lbs, 35000 AU
+
+
+The Cloak of Thorongil [1,+10]
+------------------------------
+This Cloak weighs 1.0 lbs.  It provides resistance to acid and fear.  It
+protects you from paralysis and magical slowness.  It gives its wielder 
+see invisible.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  It increases your armor
+class by 11.  You know everything about this item.  
+
+Level 5, Rarity 10, 1.0 lbs, 8000 AU
+
+
+The Cloak 'Colannon' [1,+15]
+----------------------------
+This Cloak weighs 1.0 lbs.  It modifies stealth and speed.  It provides
+resistance to nexus.  It is not damaged by acid, electricity, fire, cold
+ and water.  It cannot be stolen from your inventory.  When activated, it 
+teleports you away for 125 distance on average, recharging in 45 turns.  
+It increases your armor class by 16.  You know everything about this item.
+
+
+Level 5, Rarity 20, 1.0 lbs, 20000 AU
+
+
+The Shadow Cloak of Luthien [6,+20]
+-----------------------------------
+This Cloak weighs 0.5 lbs.  It modifies intelligence, wisdom, charisma, 
+stealth and speed.  It provides resistance to acid, fire and cold.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When activated, it cures you of amnesia, and 
+restores your strength and size, intelligence, wisdom, dexterity and
+agility, constitution and charisma, recharging in 250 turns.  It increases
+your armor class by 26.  You know everything about this item.  
+
+Level 40, Rarity 40, 0.5 lbs, 45000 AU
+
+
+The Shadow Cloak of Tuor [6,+12]
+--------------------------------
+This Cloak weighs 0.5 lbs.  It modifies dexterity and agility and stealth.
+It provides immunity to acid.  It protects you from paralysis and magical
+slowness.  It gives its wielder see invisible.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It increases your armor class by 18.  You know everything
+about this item.  
+
+Level 40, Rarity 40, 0.5 lbs, 35000 AU
+
+
+The Shadow Cloak of Finya [6,+26]
+---------------------------------
+This Cloak weighs 0.5 lbs.  It modifies strength and size, wisdom, 
+charisma, searching, light radius and hitpoint regeneration.  It sustains 
+intelligence.  It provides resistance to acid, cold and nether.  It
+provides immunity to poison.  It protects you from paralysis and magical
+slowness.  It gives its wielder slow digestion and feather falling.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  It marks you as an animal.  It burdens you
+with aggravation.  It increases your armor class by 32.  You know
+everything about this item.  
+
+Level 55, Rarity 5, 0.5 lbs, 213000 AU
+
+
+The Shadow Cloak of Aegyth (+3) [6,+16]
+---------------------------------------
+This Cloak weighs 0.3 lbs.  It sustains strength and size.  It provides
+resistance to acid, poison, fear and powerful confusion.  It protects you
+from the effects of poison and confusion.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It increases your armor class by 22.  You know everything
+about this item.  
+
+Level 40, Rarity 5, 0.3 lbs, 50000 AU
+
+
+The Tabard 'Eingion' (+3) [3,+20]
+---------------------------------
+This Cloak weighs 6.7 lbs.  It modifies strength and size, intelligence, 
+wisdom and dexterity and agility.  It provides resistance to acid, 
+electricity, fire, cold and nexus.  It is not damaged by acid, electricity
+, fire, cold and water.  It cannot be stolen from your inventory.  When
+thrown, it does 1d1+3 blunt damage.  When activated, it can identify the
+kind, ego-item and artifact names and all bonuses on one unknown item,
+recharging in 10 turns.  It increases your armor class by 23.  You know
+everything about this item.  
+
+Level 20, Rarity 36, 6.7 lbs, 88000 AU
+
+
+The Shadow Cloak 'Duinorgor' [6,+17]
+------------------------------------
+This Cloak weighs 0.4 lbs.  It modifies dexterity and agility, 
+constitution and stealth.  It sustains strength and size.  It provides
+resistance to acid, fire, fear and chaos.  It protects you from 
+hallucination.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When activated, it 
+returns you to the surface, or teleports you into the depths, recharging
+in 200 turns.  It increases your armor class by 23.  You know everything
+about this item.  
+
+Level 40, Rarity 4, 0.4 lbs, 91000 AU
+
+
+The Tabard of Celuirim [3,+17]
+------------------------------
+This Cloak weighs 7.5 lbs.  It modifies intelligence, constitution, 
+charisma, stealth and infravision.  It provides resistance to cold and 
+shards.  It protects you from cuts.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d1 blunt damage.  It increases your
+armor class by 20.  You know everything about this item.  
+
+Level 30, Rarity 24, 7.5 lbs, 55000 AU
+
+
+The Cloak of Galdang [1,+22]
+----------------------------
+This Cloak weighs 1.0 lbs.  It modifies strength and size, stealth and 
+hitpoint regeneration.  It sustains intelligence.  It provides resistance
+to powerful light, nether, chaos and disenchantment.  It protects you from
+ hallucination, paralysis and magical slowness.  It is not damaged by acid
+, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It increases your armor class by 23.  You know everything
+about this item.  
+
+Level 30, Rarity 30, 1.0 lbs, 85000 AU
+
+
+The Tabard of Angil [3,+16]
+---------------------------
+This Cloak weighs 7.5 lbs.  It modifies dexterity and agility.  It
+provides resistance to fear, powerful light and powerful confusion.  It
+provides immunity to poison.  It protects you from confusion, paralysis
+ and magical slowness.  It is not damaged by acid, electricity, fire, cold
+ and water.  It cannot be stolen from your inventory.  When thrown, it 
+does 1d1 blunt damage.  It increases your armor class by 19.  You know
+everything about this item.  
+
+Level 20, Rarity 60, 7.5 lbs, 65000 AU
+
+
+The Tabard of Brith [3,+21]
+---------------------------
+This Cloak weighs 7.5 lbs.  It modifies intelligence, constitution, 
+stealth and hitpoint regeneration.  It provides resistance to cold, fear
+ and powerful darkness.  It protects you from paralysis and magical
+slowness.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When thrown, it does 1d1 blunt
+ damage.  It increases your armor class by 24.  You know everything about
+this item.  
+
+Level 20, Rarity 40, 7.5 lbs, 67000 AU
+
+
+The Shadow Cloak of Tumhad (+2,+3) [6,+15]
+------------------------------------------
+This Cloak weighs 0.5 lbs.  It modifies intelligence, wisdom and charisma.
+It sustains intelligence.  It provides resistance to acid, electricity, 
+fire, cold, poison, fear, powerful confusion, sound and losing experience.
+It protects you from the effects of poison, stunning and confusion.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  It increases your armor class by 21.  You
+know everything about this item.  
+
+Level 60, Rarity 7, 0.5 lbs, 114000 AU
+
+
+The Cloak of Eloron [1,+9]
+--------------------------
+This Cloak weighs 1.0 lbs.  It modifies constitution and light radius.  It
+gives its wielder telepathy.  It is not damaged by acid, electricity, fire
+, cold and water.  It cannot be stolen from your inventory.  It increases
+your armor class by 10.  You know everything about this item.  
+
+Level 10, Rarity 2, 1.0 lbs, 27000 AU
+
+
+The Tabard of Daegas [3,+22]
+----------------------------
+This Cloak weighs 7.5 lbs.  It modifies wisdom, dexterity and agility and 
+constitution.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When thrown, it does 1d1
+ blunt damage.  It increases your armor class by 25.  You know everything
+about this item.  
+
+Level 30, Rarity 3, 7.5 lbs, 82000 AU
+
+
+
+
+Shields
+-------
+
+The Shield of Deflection of Gil-galad [10,+20]
+----------------------------------------------
+This Shield weighs 8.0 lbs.  It modifies wisdom, charisma, spell resistance
+ and light radius.  It sustains wisdom, dexterity and agility and charisma
+.  It provides resistance to electricity, powerful darkness and 
+disenchantment.  It provides immunity to acid.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d3 blunt damage.  When activated, it 
+surrounds you with a star to light up your enemies for 6d8 damage to
+monsters vulnerable to light, recharging in 100 turns.  It increases your
+armor class by 30.  You know everything about this item.  
+
+Level 70, Rarity 4, 8.0 lbs, 65000 AU
+
+
+The Small Metal Shield of Thorin [3,+25]
+----------------------------------------
+This Shield weighs 6.5 lbs.  It modifies strength and size and 
+constitution.  It provides resistance to fear, sound and chaos.  It
+protects you from stunning, hallucination, paralysis and magical slowness.
+It is not damaged by acid, electricity, fire, cold and water.  It cannot
+be stolen from your inventory.  When thrown, it does 1d2 blunt damage.  It
+increases your armor class by 28.  You know everything about this item.  
+
+Level 40, Rarity 6, 6.5 lbs, 60000 AU
+
+
+The Large Leather Shield of Celegorm [4,+20]
+--------------------------------------------
+This Shield weighs 6.0 lbs.  It provides resistance to acid, electricity, 
+fire, cold, powerful light and powerful darkness.  It is not damaged by 
+acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d2 blunt damage.  It increases your
+armor class by 24.  You know everything about this item.  
+
+Level 30, Rarity 3, 6.0 lbs, 12000 AU
+
+
+The Large Metal Shield of Anarion [5,+20]
+-----------------------------------------
+This Shield weighs 12.0 lbs.  It sustains all stats.  It provides
+resistance to acid, electricity, fire and cold.  It is not damaged by acid
+, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d3 blunt damage.  It increases your
+armor class by 25.  You know everything about this item.  
+
+Level 40, Rarity 9, 12.0 lbs, 160000 AU
+
+
+The Large Metal Shield of the Haradrim [4,+15]
+----------------------------------------------
+This Shield weighs 12.0 lbs.  It modifies strength and size and 
+constitution.  It sustains strength and size and constitution.  It
+provides resistance to poison and fear.  It protects you from the effects
+of poison and blindness.  It is not damaged by acid, electricity, fire, 
+cold and water.  It cannot be stolen from your inventory.  It marks you as
+ a man.  It burdens you with aggravation.  When thrown, it does 1d2 blunt
+ damage.  When activated, it makes you go berserk for 1d25+25 turns, and 
+cures you of fear and petrification, and heals you for 30 hit points,
+recharging in 50 turns.  It increases your armor class by 19.  You know
+everything about this item.  
+
+Level 35, Rarity 12, 12.0 lbs, 25000 AU
+
+
+The Small Leather Shield of Winwe [2,+35]
+-----------------------------------------
+This Shield weighs 5.0 lbs.  It modifies wisdom, searching and hitpoint
+regeneration.  It provides resistance to acid, electricity, fire, cold and 
+fear.  It protects you from paralysis and magical slowness.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When thrown, it does 1d1 blunt damage.  It increases
+your armor class by 37.  You know everything about this item.  
+
+Level 30, Rarity 255, 5.0 lbs, 109000 AU
+
+
+The Small Metal Shield of Berri [3,+26]
+---------------------------------------
+This Shield weighs 6.5 lbs.  It modifies strength and size, dexterity and
+agility, constitution, charisma and speed.  It sustains charisma.  It
+provides resistance to acid, powerful light, powerful confusion and 
+disenchantment.  It protects you from confusion.  It is not damaged by 
+acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It marks you as gigantic.  When thrown, it does 1d2 blunt
+ damage.  When activated, it removes rock from one direction for 6d8 
+damage to monsters made from rock, recharging in 5 turns.  It increases
+your armor class by 29.  You know everything about this item.  
+
+Level 15, Rarity 45, 6.5 lbs, 169000 AU
+
+
+The Large Leather Shield of Nionwen [4,+17]
+-------------------------------------------
+This Shield weighs 10.0 lbs.  It provides resistance to electricity and 
+poison.  It provides immunity to acid.  It protects you from the effects
+of poison.  It gives its wielder slow digestion.  It is not damaged by 
+acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d2 blunt damage.  It increases your
+armor class by 21.  You know everything about this item.  
+
+Level 20, Rarity 60, 10.0 lbs, 48000 AU
+
+
+The Small Metal Shield of Arenenwen [3,+9]
+------------------------------------------
+This Shield weighs 6.5 lbs.  It provides resistance to acid and 
+electricity.  It is not damaged by acid, electricity, fire, cold and water
+.  It cannot be stolen from your inventory.  When thrown, it does 1d2 
+blunt damage.  When activated, it teleports you away for 10 distance on
+average, recharging in 20 turns.  It increases your armor class by 12.  
+You know everything about this item.  
+
+Level 10, Rarity 15, 6.5 lbs, 11000 AU
+
+
+The Large Metal Shield of Orthar (+11) [5,+17]
+----------------------------------------------
+This Shield weighs 10.8 lbs.  It provides resistance to fear and powerful
+darkness.  It provides immunity to poison.  It protects you from paralysis
+ and magical slowness.  It is not damaged by acid, electricity, fire, cold
+ and water.  It cannot be stolen from your inventory.  When thrown, it 
+does 1d3 blunt damage.  It increases your armor class by 22.  You know
+everything about this item.  
+
+Level 30, Rarity 25, 10.8 lbs, 54000 AU
+
+
+The Shield of Deflection of Uthol [10,+27]
+------------------------------------------
+This Shield weighs 9.0 lbs.  It modifies strength and size, intelligence, 
+dexterity and agility, constitution, charisma and searching.  It sustains 
+strength and size and constitution.  It provides resistance to acid, fire, 
+cold, poison, powerful light, powerful darkness, sound and chaos.  It
+provides immunity to electricity.  It protects you from the effects of
+poison, stunning, hallucination, paralysis and magical slowness.  It gives
+its wielder slow digestion and feather falling.  It is not damaged by acid
+, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It marks you as demonic.  It burdens you with aggravation.  
+When thrown, it does 1d3 blunt damage.  When activated, it surrounds you
+with a star to light up your enemies for 6d8 damage to monsters vulnerable
+to light, recharging in 100 turns.  It increases your armor class by 37.  
+You know everything about this item.  
+
+Level 70, Rarity 4, 9.0 lbs, 158000 AU
+
+
+
+
+Helms/Crowns
+------------
+
+The Metal Cap of Celebrimbor [3,+18]
+------------------------------------
+This Helm weighs 2.0 lbs.  It modifies intelligence, dexterity and agility
+, charisma, magical devices and searching.  It provides resistance to acid
+, fire, shards and disenchantment.  It protects you from cuts.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When thrown, it does 1d1 blunt damage.  It increases
+your armor class by 21.  You know everything about this item.  
+
+Level 55, Rarity 12, 2.0 lbs, 45000 AU
+
+
+The Hard Leather Cap of Thranduil [2,+10]
+-----------------------------------------
+This Helm weighs 1.5 lbs.  It modifies intelligence and wisdom.  It
+protects you from blindness.  It gives its wielder telepathy.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  It increases your armor class by 12.  You know
+everything about this item.  
+
+Level 20, Rarity 2, 1.5 lbs, 50000 AU
+
+
+The Metal Cap of Thengel [3,+12]
+--------------------------------
+This Helm weighs 2.0 lbs.  It modifies wisdom and charisma.  It provides
+resistance to powerful confusion.  It protects you from confusion.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When thrown, it does 1d1 blunt damage.  It
+increases your armor class by 15.  You know everything about this item.  
+
+Level 10, Rarity 2, 2.0 lbs, 22000 AU
+
+
+The Steel Helm of Hammerhand [6,+20]
+------------------------------------
+This Helm weighs 6.0 lbs.  It modifies strength and size, dexterity and
+agility, constitution and spell resistance.  It sustains strength and size
+, dexterity and agility and constitution.  It provides resistance to acid, 
+cold, powerful darkness and nexus.  It is not damaged by acid, electricity
+, fire, cold and water.  It cannot be stolen from your inventory.  It
+burdens you with aggravation.  When thrown, it does 1d3 blunt damage.  It
+increases your armor class by 26.  You know everything about this item.  
+
+Level 20, Rarity 8, 6.0 lbs, 45000 AU
+
+
+The Iron Helm of Dor-Lomin [5,+20]
+----------------------------------
+This Helm weighs 7.5 lbs.  It modifies strength and size, dexterity and
+agility, constitution and light radius.  It provides resistance to acid, 
+electricity, fire, cold and fear.  It gives its wielder telepathy and see
+invisible.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When thrown, it does 1d3 blunt
+ damage.  It increases your armor class by 25.  You know everything about
+this item.  
+
+Level 40, Rarity 20, 7.5 lbs, 300000 AU
+
+
+The Iron Helm 'Holhenneth' [5,+10]
+----------------------------------
+This Helm weighs 7.5 lbs.  It modifies intelligence, wisdom and searching.
+It provides resistance to powerful confusion.  It protects you from 
+blindness and confusion.  It gives its wielder see invisible.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When thrown, it does 1d3 blunt damage.  When
+activated, it detects all doors, traps, stairs, running water, gold,
+including hidden treasures, objects, including hidden objects, visible
+monsters, evil monsters and living monsters within 40 grids, recharging in
+d55+55 turns.  It increases your armor class by 15.  You know everything
+about this item.  
+
+Level 20, Rarity 5, 7.5 lbs, 100000 AU
+
+
+The Iron Helm of Gorlim [5,+10]
+-------------------------------
+This Helm weighs 7.5 lbs.  It modifies intelligence, wisdom, magical
+devices and searching.  It provides resistance to fear.  It protects you
+from paralysis and magical slowness.  It gives its wielder see invisible.  
+It is not damaged by acid, electricity, fire, cold and water.  It cannot
+be stolen from your inventory.  It burdens you with aggravation.  It is
+heavily cursed.  When thrown, it does 1d3 blunt damage.  It increases your
+armor class by 15.  You know everything about this item.  
+
+Level 20, Rarity 5, 7.5 lbs, 1 AU
+
+
+The Metal Cap of Umbor [3,+17]
+------------------------------
+This Helm weighs 2.0 lbs.  It protects you from blindness.  It gives its
+wielder telepathy.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When thrown, it does 1d1
+ blunt damage.  It increases your armor class by 20.  You know everything
+about this item.  
+
+Level 10, Rarity 4, 2.0 lbs, 39000 AU
+
+
+The Metal Cap of Elpion (+8) [3,+8]
+-----------------------------------
+This Helm weighs 2.0 lbs.  It provides resistance to acid, electricity, 
+fire and powerful darkness.  It protects you from paralysis and magical
+slowness.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  It burdens you with aggravation.
+When thrown, it does 1d1+8 blunt damage.  It increases your armor class by
+11.  You know everything about this item.  
+
+Level 20, Rarity 16, 2.0 lbs, 36000 AU
+
+
+The Iron Helm 'Arant' [5,+14]
+-----------------------------
+This Helm weighs 7.5 lbs.  It modifies constitution and light radius.  It
+protects you from paralysis and magical slowness.  It gives its wielder 
+see invisible.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When thrown, it does 1d3
+ blunt damage.  When activated, it creates a storm of radius 3 to freeze 
+your enemies for 120 damage, recharging in 35 turns.  It increases your
+armor class by 19.  You know everything about this item.  
+
+Level 15, Rarity 45, 7.5 lbs, 84000 AU
+
+
+The Metal Cap of Finas (+5) [3,+20]
+-----------------------------------
+This Helm weighs 2.0 lbs.  It modifies strength and size, intelligence and 
+wisdom.  It provides resistance to acid, electricity, fire, cold and fear.
+It gives its wielder slow digestion and telepathy.  It is not damaged by 
+acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d1 blunt damage.  When activated, it 
+creates a ball of radius 2 to burn your enemies for 80 damage, recharging
+in 40 turns.  It increases your armor class by 23.  You know everything
+about this item.  
+
+Level 20, Rarity 80, 2.0 lbs, 98000 AU
+
+
+The Iron Helm 'Faugroth' (-4) [5,-19]
+-------------------------------------
+This Helm weighs 7.5 lbs.  It modifies dexterity and agility.  It protects
+you from involuntary teleporation.  It is not damaged by acid, electricity
+, fire, cold and water.  It cannot be stolen from your inventory.  It
+burdens you with hunger, inability to teleport and inability to use ranged
+weapons.  It is heavily cursed.  When thrown, it does 1d3 blunt damage.  
+It decreases your armor class by 14.  You know everything about this item.
+
+
+Level 10, Rarity 20, 7.5 lbs, 0 AU
+
+
+The Iron Helm of Duned [5,+22]
+------------------------------
+This Helm weighs 7.5 lbs.  It modifies strength and size, wisdom and 
+searching.  It provides resistance to electricity, fire, cold and powerful
+light.  It is not damaged by acid, electricity, fire, cold and water.  It
+cannot be stolen from your inventory.  When thrown, it does 1d3 blunt
+ damage.  It increases your armor class by 27.  You know everything about
+this item.  
+
+Level 40, Rarity 9, 7.5 lbs, 57000 AU
+
+
+The Steel Helm 'Gulos' [6,+10]
+------------------------------
+This Helm weighs 5.4 lbs.  It modifies intelligence, wisdom, constitution
+ and hitpoint regeneration.  It sustains wisdom.  It provides resistance to
+ electricity, fire, fear, powerful light and powerful darkness.  It
+protects you from paralysis and magical slowness.  It gives its wielder 
+see invisible.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When thrown, it does 1d3
+ blunt damage.  When activated, it removes doors from all enemies adjacent
+to you, recharging in 10 turns.  It increases your armor class by 16.  You
+know everything about this item.  
+
+Level 25, Rarity 9, 5.4 lbs, 57000 AU
+
+
+The Massive Iron Crown of Morgoth [0,+0]
+----------------------------------------
+This Crown weighs 2.0 lbs.  It modifies all stats, infravision and light
+radius.  It provides resistance to acid, electricity, fire, cold, poison, 
+fear, powerful light, powerful darkness, powerful confusion, nexus and 
+nether.  It protects you from the effects of poison and confusion.  It
+gives its wielder telepathy and see invisible.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It is permanently cursed.  When thrown, it does 1d5 blunt
+ damage.  You know everything about this item.  
+
+Level 100, Rarity 1, 2.0 lbs, 10000000 AU
+
+
+The Iron Crown of Beruthiel [0,+20]
+-----------------------------------
+This Crown weighs 2.0 lbs.  It modifies strength and size, dexterity and
+agility and constitution.  It protects you from paralysis and magical
+slowness.  It gives its wielder telepathy and see invisible.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  It is heavily cursed.  When thrown, it does 1d2 
+blunt damage.  It increases your armor class by 20.  You know everything
+about this item.  
+
+Level 40, Rarity 12, 2.0 lbs, 1 AU
+
+
+The Golden Crown of Gondor [0,+15]
+----------------------------------
+This Crown weighs 3.0 lbs.  It modifies strength and size, wisdom, 
+constitution, speed, light radius and mana regeneration.  It provides
+resistance to fire, cold, powerful light, powerful confusion, sound and 
+chaos.  It protects you from blindness, stunning, hallucination and 
+confusion.  It gives its wielder see invisible.  It is not damaged by acid
+, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It marks you as a man.  When thrown, it does 1d1 blunt damage.
+When activated, it cures you of cuts and stun damage, and heals you for
+500 hit points, recharging in 250 turns.  It increases your armor class by
+15.  You know everything about this item.  
+
+Level 40, Rarity 40, 3.0 lbs, 100000 AU
+
+
+The Jewel Encrusted Crown of Numenor [0,+18]
+--------------------------------------------
+This Crown weighs 4.0 lbs.  It modifies intelligence, dexterity and agility
+, charisma, spell resistance, searching, speed and light radius.  It
+provides resistance to cold, powerful light, powerful darkness, sound and 
+shards.  It protects you from blindness, stunning, cuts, paralysis and 
+magical slowness.  It gives its wielder see invisible.  It senses undead.  
+It is not damaged by acid, electricity, fire, cold and water.  It cannot
+be stolen from your inventory.  It marks you as a man.  When thrown, it 
+does 1d1 blunt damage.  It increases your armor class by 18.  You know
+everything about this item.  
+
+Level 60, Rarity 30, 4.0 lbs, 50000 AU
+
+
+The Jewel Encrusted Crown 'Sulir' [0,+28]
+-----------------------------------------
+This Crown weighs 4.0 lbs.  It modifies intelligence, wisdom, dexterity
+and agility, searching and hitpoint regeneration.  It provides resistance
+to fear, powerful darkness, nexus and chaos.  It protects you from 
+hallucination.  It gives its wielder feather falling and telepathy.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When thrown, it does 1d1 blunt damage.  When
+activated, it removes rock from one direction for 6d8 damage to monsters
+made from rock, recharging in 2 turns.  It increases your armor class by
+28.  You know everything about this item.  
+
+Level 60, Rarity 32, 4.0 lbs, 111000 AU
+
+
+The Jewel Encrusted Crown 'Belen' (+3) [0,+13]
+----------------------------------------------
+This Crown weighs 4.0 lbs.  It modifies searching and light radius.  It
+provides resistance to powerful darkness.  It protects you from blindness.
+It is not damaged by acid, electricity, fire, cold and water.  It cannot
+be stolen from your inventory.  When thrown, it does 1d1+3 blunt damage.  
+When activated, it creates an arrow to attack one target for 150 damage,
+recharging in d20+20 turns.  It increases your armor class by 13.  You
+know everything about this item.  
+
+Level 60, Rarity 20, 4.0 lbs, 37000 AU
+
+
+The Iron Crown of Bring (+5) [0,+16]
+------------------------------------
+This Crown weighs 2.0 lbs.  It modifies wisdom and speed.  It provides
+immunity to poison.  It protects you from blindness.  It gives its wielder
+ see invisible.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When thrown, it does 1d1
++5 blunt damage.  It increases your armor class by 16.  You know
+everything about this item.  
+
+Level 30, Rarity 60, 2.0 lbs, 67000 AU
+
+
+The Iron Crown of Marandos [0,+10]
+----------------------------------
+This Crown weighs 2.0 lbs.  It modifies strength and size, intelligence, 
+wisdom and charisma.  It provides resistance to acid and powerful light.  
+It protects you from blindness, paralysis and magical slowness.  It gives
+its wielder see invisible.  It is not damaged by acid, electricity, fire, 
+cold and water.  It cannot be stolen from your inventory.  When thrown, it 
+does 1d1 blunt damage.  It increases your armor class by 10.  You know
+everything about this item.  
+
+Level 20, Rarity 8, 2.0 lbs, 68000 AU
+
+
+The Jewel Encrusted Crown 'Estann' [0,+21]
+------------------------------------------
+This Crown weighs 4.0 lbs.  It modifies wisdom and dexterity and agility.  
+It provides resistance to disenchantment.  It protects you from paralysis
+ and magical slowness.  It gives its wielder slow digestion.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When thrown, it does 1d1 blunt damage.  It increases
+your armor class by 21.  You know everything about this item.  
+
+Level 55, Rarity 12, 4.0 lbs, 53000 AU
+
+
+The Golden Crown 'Arebras' [0,+11]
+----------------------------------
+This Crown weighs 3.0 lbs.  It modifies wisdom.  It protects you from 
+blindness.  It gives its wielder telepathy.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d1 blunt damage.  It increases your
+armor class by 11.  You know everything about this item.  
+
+Level 20, Rarity 3, 3.0 lbs, 41000 AU
+
+
+The Iron Crown 'Hilir' [0,+11]
+------------------------------
+This Crown weighs 2.0 lbs.  It modifies wisdom and speed.  It sustains 
+wisdom.  It provides resistance to powerful darkness.  It protects you from
+ blindness.  It gives its wielder see invisible.  It is not damaged by 
+acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d1 blunt damage.  When activated, it 
+teleports you away for 10 distance on average, recharging in 2 turns.  It
+increases your armor class by 11.  You know everything about this item.  
+
+Level 40, Rarity 12, 2.0 lbs, 48000 AU
+
+
+
+
+Gloves
+------
+
+The Set of Gauntlets of Eol (-5,-5) [3,+15]
+-------------------------------------------
+This set of Gloves weighs 2.5 lbs.  It modifies intelligence and magical
+devices.  It provides resistance to electricity, poison and powerful
+darkness.  It protects you from the effects of poison, paralysis and 
+magical slowness.  It gives its wielder feather falling.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  It burdens you with aggravation.  When thrown, it 
+does 1d1-5 blunt damage.  When activated, it creates a powerful bolt to 
+blast your enemies with magic for 100 damage, recharging in d30+30 turns.  
+It increases your armor class by 18.  You know everything about this item.
+
+
+Level 55, Rarity 35, 2.5 lbs, 40000 AU
+
+
+The Set of Leather Gloves 'Cambeleg' (+8,+8) [1,+15]
+----------------------------------------------------
+This set of Gloves weighs 0.5 lbs.  It modifies strength and size and 
+constitution.  It protects you from paralysis and magical slowness.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  It increases your armor class by 16.  You
+know everything about this item.  
+
+Level 10, Rarity 6, 0.5 lbs, 36000 AU
+
+
+The Set of Leather Gloves 'Cammithrim' [1,+10]
+----------------------------------------------
+This set of Gloves weighs 0.5 lbs.  It sustains constitution.  It provides
+resistance to powerful light.  It protects you from paralysis and magical
+slowness.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When activated, it creates a
+missile to blast your enemies with magic for 3d4 damage, recharging in 2
+turns.  It increases your armor class by 11.  You know everything about
+this item.  
+
+Level 10, Rarity 3, 0.5 lbs, 30000 AU
+
+
+The Set of Gauntlets 'Paurhach' [2,+15]
+---------------------------------------
+This set of Gloves weighs 2.5 lbs.  It provides resistance to fire.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When thrown, it does 1d1 blunt damage.  When
+activated, it creates a powerful bolt to burn your enemies for 6d12 damage
+, and creates a powerful bolt to burn your enemies for 6d12 damage,
+recharging in d8+8 turns.  It increases your armor class by 17.  You know
+everything about this item.  
+
+Level 10, Rarity 5, 2.5 lbs, 15000 AU
+
+
+The Set of Gauntlets 'Paurnimmen' [2,+15]
+-----------------------------------------
+This set of Gloves weighs 2.5 lbs.  It provides resistance to cold.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When thrown, it does 1d1 blunt damage.  When
+activated, it creates a bolt to freeze your enemies for 5d12 damage, and 
+creates a bolt to freeze your enemies for 5d12 damage, recharging in d7+7
+turns.  It increases your armor class by 17.  You know everything about
+this item.  
+
+Level 10, Rarity 5, 2.5 lbs, 13000 AU
+
+
+The Set of Gauntlets 'Pauraegen' [2,+15]
+----------------------------------------
+This set of Gloves weighs 2.5 lbs.  It provides resistance to electricity.
+It is not damaged by acid, electricity, fire, cold and water.  It cannot
+be stolen from your inventory.  When thrown, it does 1d1 blunt damage.  
+When activated, it creates a beam to electrify your enemies for 3d9 damage
+, and creates a beam to electrify your enemies for 3d9 damage, recharging
+in d6+6 turns.  It increases your armor class by 17.  You know everything
+about this item.  
+
+Level 10, Rarity 5, 2.5 lbs, 11000 AU
+
+
+The Set of Gauntlets 'Paurnen' [2,+15]
+--------------------------------------
+This set of Gloves weighs 2.5 lbs.  It provides resistance to acid.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When thrown, it does 1d1 blunt damage.  When
+activated, it creates a powerful bolt to dissolve your enemies for 8d12 
+damage, and creates a powerful bolt to dissolve your enemies for 8d12 
+damage, recharging in d5+5 turns.  It increases your armor class by 17.  
+You know everything about this item.  
+
+Level 10, Rarity 5, 2.5 lbs, 12000 AU
+
+
+The Set of Gauntlets 'Camlost' (-12,-12) [2,+0]
+-----------------------------------------------
+This set of Gloves weighs 2.5 lbs.  It modifies strength and size and 
+dexterity and agility.  It provides resistance to fire and disenchantment.
+It protects you from paralysis and magical slowness.  It is not damaged by
+ acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It burdens you with aggravation, mana drain and experience
+drain.  It is heavily cursed.  When thrown, it does 1d1-12 blunt damage.  
+It increases your armor class by 2.  You know everything about this item.  
+
+
+Level 10, Rarity 20, 2.5 lbs, 0 AU
+
+
+The Set of Cesti of Fingolfin (+10,+10) [5,+20]
+-----------------------------------------------
+This set of Gloves weighs 4.0 lbs.  It modifies dexterity and agility.  It
+provides resistance to acid.  It protects you from paralysis and magical
+slowness.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When thrown, it does 1d2+10 
+blunt damage.  When activated, it creates an arrow to attack one target
+ for 150 damage, recharging in d30+30 turns.  It increases your armor
+class by 25.  You know everything about this item.  
+
+Level 40, Rarity 15, 4.0 lbs, 110000 AU
+
+
+The Set of Cesti of Rufin [5,+24]
+---------------------------------
+This set of Gloves weighs 4.0 lbs.  It modifies charisma.  It provides
+resistance to sound.  It protects you from stunning.  It is not damaged by
+ acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d2 blunt damage.  It increases your
+armor class by 29.  You know everything about this item.  
+
+Level 30, Rarity 20, 4.0 lbs, 37000 AU
+
+
+The Set of Gauntlets of Amant [2,+13]
+-------------------------------------
+This set of Gloves weighs 2.5 lbs.  It provides resistance to electricity, 
+fire, cold and nether.  It protects you from paralysis and magical slowness
+.  It gives its wielder telepathy.  It is not damaged by acid, electricity
+, fire, cold and water.  It cannot be stolen from your inventory.  When
+thrown, it does 1d1 blunt damage.  It increases your armor class by 15.  
+You know everything about this item.  
+
+Level 20, Rarity 69, 2.5 lbs, 60000 AU
+
+
+The Set of Cesti of Aelduini [5,+9]
+-----------------------------------
+This set of Gloves weighs 4.0 lbs.  It modifies dexterity and agility.  It
+provides resistance to fire.  It protects you from paralysis and magical
+slowness.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When thrown, it does 1d2 blunt
+ damage.  It increases your armor class by 14.  You know everything about
+this item.  
+
+Level 20, Rarity 24, 4.0 lbs, 31000 AU
+
+
+The Set of Leather Gloves of Nordhelos [1,-20]
+----------------------------------------------
+This set of Gloves weighs 0.5 lbs.  It modifies infravision.  It provides
+resistance to powerful light.  It makes you vulnerable to acid.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  It burdens you with experience drain and inability
+to use ranged weapons.  It is heavily cursed.  It decreases your armor
+class by 19.  You know everything about this item.  
+
+Level 30, Rarity 30, 0.5 lbs, 0 AU
+
+
+The Set of Gauntlets of Baragor [2,+22]
+---------------------------------------
+This set of Gloves weighs 2.5 lbs.  It modifies strength and size, 
+intelligence, dexterity and agility and charisma.  It provides resistance
+to electricity, cold and disenchantment.  It protects you from blindness, 
+paralysis and magical slowness.  It is not damaged by acid, electricity, 
+fire, cold and water.  It cannot be stolen from your inventory.  When
+thrown, it does 1d1 blunt damage.  When activated, it cures you of poison, 
+fear and petrification, recharging in 5 turns.  It increases your armor
+class by 24.  You know everything about this item.  
+
+Level 10, Rarity 25, 2.5 lbs, 82000 AU
+
+
+The Set of Cesti 'Amorilya' [5,+12]
+-----------------------------------
+This set of Gloves weighs 4.0 lbs.  It modifies strength and size, 
+constitution and charisma.  It provides resistance to fire, fear, powerful
+light and powerful darkness.  It protects you from paralysis and magical
+slowness.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When thrown, it does 1d2 blunt
+ damage.  When activated, it creates an arrow to attack one target for 150 
+damage, recharging in d30+30 turns.  It increases your armor class by 17.  
+You know everything about this item.  
+
+Level 40, Rarity 15, 4.0 lbs, 67000 AU
+
+
+The Set of Gauntlets of Ninethros [2,+8]
+----------------------------------------
+This set of Gloves weighs 2.2 lbs.  It modifies constitution.  It provides
+resistance to fear and nether.  It is not damaged by acid, electricity, 
+fire, cold and water.  It cannot be stolen from your inventory.  When
+thrown, it does 1d1 blunt damage.  When activated, it creates a powerful
+bolt to burn your enemies for 6d12 damage, and creates a powerful bolt to 
+burn your enemies for 6d12 damage, recharging in d8+8 turns.  It increases
+your armor class by 10.  You know everything about this item.  
+
+Level 10, Rarity 5, 2.2 lbs, 16000 AU
+
+
+The Set of Leather Gloves of Thros (+4) [1,+10]
+-----------------------------------------------
+This set of Gloves weighs 0.5 lbs.  It modifies wisdom and charisma.  It
+provides resistance to electricity and powerful confusion.  It protects
+you from confusion.  It is not damaged by acid, electricity, fire, cold
+ and water.  It cannot be stolen from your inventory.  When activated, it 
+teleports you away for 125 distance on average, recharging in 45 turns.  
+It increases your armor class by 11.  You know everything about this item.
+
+
+Level 5, Rarity 20, 0.5 lbs, 41000 AU
+
+
+The Set of Gauntlets 'Cirmen' [2,-13]
+-------------------------------------
+This set of Gloves weighs 2.5 lbs.  It provides resistance to acid.  It
+makes you vulnerable to water.  It senses dragons.  It is not damaged by 
+acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It burdens you with random teleportation.  It is heavily
+cursed.  When thrown, it does 1d1 blunt damage.  It decreases your armor
+class by 11.  You know everything about this item.  
+
+Level 20, Rarity 5, 2.5 lbs, 0 AU
+
+
+The Set of Gauntlets of Maelor [2,+22]
+--------------------------------------
+This set of Gloves weighs 2.5 lbs.  It sustains charisma.  It protects you
+from blindness, paralysis and magical slowness.  It is not damaged by acid
+, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d1 blunt damage.  When activated, it 
+detects all doors, traps, stairs, running water, gold, including hidden
+treasures, objects, including hidden objects, visible monsters, evil
+monsters and living monsters within 40 grids, recharging in d55+55 turns.  
+It increases your armor class by 24.  You know everything about this item.
+
+
+Level 20, Rarity 5, 2.5 lbs, 39000 AU
+
+
+The Set of Cesti of Endin [5,+21]
+---------------------------------
+This set of Gloves weighs 4.0 lbs.  It modifies intelligence and stealth.  
+It sustains intelligence.  It provides resistance to electricity, fear, 
+powerful darkness and nether.  It provides immunity to fire.  It protects
+you from paralysis and magical slowness.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d2 blunt damage.  It increases your
+armor class by 26.  You know everything about this item.  
+
+Level 40, Rarity 6, 4.0 lbs, 91000 AU
+
+
+The Set of Cesti of Ratholos (+5) [5,+23]
+-----------------------------------------
+This set of Gloves weighs 4.0 lbs.  It modifies intelligence, dexterity
+and agility and speed.  It provides resistance to acid and disenchantment.
+It is not damaged by acid, electricity, fire, cold and water.  It cannot
+be stolen from your inventory.  When thrown, it does 1d2 blunt damage.  
+When activated, it allows you to remove a monster type from a level (1d4
+damage per monster), recharging in 500 turns.  It increases your armor
+class by 28.  You know everything about this item.  
+
+Level 40, Rarity 12, 4.0 lbs, 90000 AU
+
+
+The Set of Cesti of Narth (+4) [5,+14]
+--------------------------------------
+This set of Gloves weighs 4.0 lbs.  It modifies dexterity and agility.  It
+provides resistance to poison, powerful light, powerful darkness and 
+nether.  It protects you from the effects of poison.  It is not damaged by
+ acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d2+4 blunt damage.  When activated, it 
+surrounds you with a star to electrify your enemies for 150 damage,
+recharging in 50 turns.  It increases your armor class by 19.  You know
+everything about this item.  
+
+Level 95, Rarity 192, 4.0 lbs, 87000 AU
+
+
+
+
+Boots
+-----
+
+The Pair of Hard Leather Boots of Feanor [3,+20]
+------------------------------------------------
+This set of Boots weighs 4.0 lbs.  It modifies speed.  It provides
+resistance to nexus.  It is not damaged by acid, electricity, fire, cold
+ and water.  It cannot be stolen from your inventory.  When thrown, it 
+does 1d3 blunt damage.  When activated, it hastes you for 1d20+20 turns,
+recharging in 200 turns.  It increases your armor class by 23.  You know
+everything about this item.  
+
+Level 40, Rarity 120, 4.0 lbs, 300000 AU
+
+
+The Pair of Soft Leather Boots 'Dal-i-thalion' [2,+15]
+------------------------------------------------------
+This set of Boots weighs 2.0 lbs.  It modifies dexterity and agility.  It
+sustains constitution.  It provides resistance to powerful confusion, 
+nether and chaos.  It protects you from hallucination, confusion, 
+paralysis and magical slowness.  It is not damaged by acid, electricity, 
+fire, cold and water.  It cannot be stolen from your inventory.  When
+thrown, it does 1d2 blunt damage.  When activated, it cures you of poison, 
+fear and petrification, recharging in 5 turns.  It increases your armor
+class by 17.  You know everything about this item.  
+
+Level 10, Rarity 25, 2.0 lbs, 40000 AU
+
+
+The Pair of Metal Shod Boots of Thror [6,+20]
+---------------------------------------------
+This set of Boots weighs 8.0 lbs.  It modifies strength and size, 
+constitution and speed.  It provides resistance to fear.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  When thrown, it does 1d4 blunt damage.  It increases
+your armor class by 26.  You know everything about this item.  
+
+Level 30, Rarity 25, 8.0 lbs, 12000 AU
+
+
+The Pair of Soft Leather Boots of Wormtongue (-5,-5) [2,+0]
+-----------------------------------------------------------
+This set of Boots weighs 2.0 lbs.  It modifies intelligence, dexterity and
+agility, spell resistance and stealth.  It gives its wielder feather
+falling.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When thrown, it does 1d2-5 blunt
+ damage.  When activated, it teleports you away for 10 distance on average
+, recharging in 20 turns.  It increases your armor class by 2.  You know
+everything about this item.  
+
+Level 10, Rarity 15, 2.0 lbs, 17000 AU
+
+
+The Pair of Hard Leather Boots of Nienya [3,+26]
+------------------------------------------------
+This set of Boots weighs 4.0 lbs.  It modifies strength and size, 
+intelligence, stealth, infravision and light radius.  It provides
+resistance to acid, electricity, fire, poison and shards.  It protects you
+from the effects of poison, blindness and cuts.  It gives its wielder slow
+digestion and see invisible.  It is not damaged by acid, electricity, fire
+, cold and water.  It cannot be stolen from your inventory.  It marks you
+as dwarven.  When thrown, it does 1d3 blunt damage.  When activated, it 
+dispels all your enemies in line of sight if evil for 250 damage,
+recharging in d100+100 turns.  It increases your armor class by 29.  You
+know everything about this item.  
+
+Level 65, Rarity 200, 4.0 lbs, 154000 AU
+
+
+The Pair of Metal Shod Boots 'Dolvaland' [6,+16]
+------------------------------------------------
+This set of Boots weighs 7.2 lbs.  It modifies intelligence, stealth and 
+hitpoint regeneration.  It provides resistance to fear and sound.  It
+protects you from stunning.  It gives its wielder feather falling.  It is
+not damaged by acid, electricity, fire, cold and water.  It cannot be
+stolen from your inventory.  When thrown, it does 1d4 blunt damage.  When
+activated, it can enchant one missile to become branded, recharging in 999
+turns.  It increases your armor class by 22.  You know everything about
+this item.  
+
+Level 50, Rarity 25, 7.2 lbs, 38000 AU
+
+
+The Pair of Metal Shod Boots of Gorote (+6) [6,+31]
+---------------------------------------------------
+This set of Boots weighs 7.2 lbs.  It modifies intelligence, light radius
+ and mana regeneration.  It provides resistance to poison and powerful
+light.  It provides immunity to electricity.  It protects you from the
+effects of poison, paralysis and magical slowness.  It is not damaged by 
+acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d4 blunt damage.  When activated, it 
+drains life from one target for 125 damage, recharging in 40 turns.  It
+increases your armor class by 37.  You know everything about this item.  
+
+Level 20, Rarity 30, 7.2 lbs, 100000 AU
+
+
+The Pair of Hard Leather Boots 'Baudh' [3,+16]
+----------------------------------------------
+This set of Boots weighs 4.0 lbs.  It modifies wisdom, speed and light
+radius.  It provides resistance to electricity, fire, powerful darkness
+ and chaos.  It protects you from hallucination.  It gives its wielder 
+feather falling.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  It burdens you with 
+aggravation.  When thrown, it does 1d3 blunt damage.  When activated, it 
+affects all your enemies in line of sight, recharging in 20 turns.  It
+increases your armor class by 19.  You know everything about this item.  
+
+Level 30, Rarity 210, 4.0 lbs, 79000 AU
+
+
+The Pair of Metal Shod Boots of Thorn [6,+29]
+---------------------------------------------
+This set of Boots weighs 8.0 lbs.  It modifies strength and size, 
+intelligence, dexterity and agility, constitution, charisma, speed and 
+hitpoint regeneration.  It sustains intelligence and wisdom.  It provides
+resistance to acid, electricity, fire, cold and poison.  It protects you
+from the effects of poison, paralysis and magical slowness.  It gives its
+wielder feather falling.  It is not damaged by acid, electricity, fire, 
+cold and water.  It cannot be stolen from your inventory.  When thrown, it 
+does 1d4 blunt damage.  When activated, it teleports one direction away
+ for 25 distance on average, recharging in 50 turns.  It increases your
+armor class by 35.  You know everything about this item.  
+
+Level 30, Rarity 255, 8.0 lbs, 146000 AU
+
+
+The Pair of Hard Leather Boots 'Gelumin' (+4) [3,+25]
+-----------------------------------------------------
+This set of Boots weighs 4.0 lbs.  It modifies wisdom and dexterity and
+agility.  It sustains dexterity and agility.  It provides resistance to 
+acid.  It provides immunity to fire.  It gives its wielder feather falling
+.  It is not damaged by acid, electricity, fire, cold and water.  It
+cannot be stolen from your inventory.  When thrown, it does 1d3+4 blunt
+ damage.  It increases your armor class by 28.  You know everything about
+this item.  
+
+Level 70, Rarity 200, 4.0 lbs, 90000 AU
+
+
+The Pair of Metal Shod Boots of Lamenyar [6,+17]
+------------------------------------------------
+This set of Boots weighs 7.2 lbs.  It modifies constitution and stealth.  
+It sustains intelligence.  It provides resistance to fire, fear, powerful
+light, nexus, nether, chaos and disenchantment.  It protects you from 
+hallucination, paralysis and magical slowness.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When thrown, it does 1d4 blunt damage.  It increases your
+armor class by 23.  You know everything about this item.  
+
+Level 20, Rarity 45, 7.2 lbs, 82000 AU
+
+
+The Pair of Hard Leather Boots 'Neleg' [3,+17]
+----------------------------------------------
+This set of Boots weighs 4.0 lbs.  It provides immunity to electricity.  
+It is not damaged by acid, electricity, fire, cold and water.  It cannot
+be stolen from your inventory.  When thrown, it does 1d3 blunt damage.  It
+increases your armor class by 20.  You know everything about this item.  
+
+Level 20, Rarity 40, 4.0 lbs, 35000 AU
+
+
+The Pair of Metal Shod Boots of Atheldor (+6) [6,+19]
+-----------------------------------------------------
+This set of Boots weighs 7.2 lbs.  It modifies strength and size, charisma
+ and stealth.  It sustains strength and size.  It provides resistance to 
+cold and powerful light.  It gives its wielder slow digestion and feather
+falling.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  When thrown, it does 1d4 blunt
+ damage.  It increases your armor class by 25.  You know everything about
+this item.  
+
+Level 20, Rarity 160, 7.2 lbs, 60000 AU
+
+
+The Pair of Hard Leather Boots of Thith [3,+11]
+-----------------------------------------------
+This set of Boots weighs 4.0 lbs.  It modifies constitution.  It provides
+resistance to electricity, powerful darkness and powerful confusion.  It
+protects you from confusion.  It is not damaged by acid, electricity, fire
+, cold and water.  It cannot be stolen from your inventory.  When thrown,
+it does 1d3 blunt damage.  It increases your armor class by 14.  You know
+everything about this item.  
+
+Level 10, Rarity 6, 4.0 lbs, 49000 AU
+
+
+The Pair of Metal Shod Boots of Harel [6,+16]
+---------------------------------------------
+This set of Boots weighs 8.0 lbs.  It modifies intelligence, stealth, 
+infravision and speed.  It sustains intelligence.  It provides resistance
+to nexus.  It protects you from blindness, paralysis and magical slowness.
+It is not damaged by acid, electricity, fire, cold and water.  It cannot
+be stolen from your inventory.  When thrown, it does 1d4 blunt damage.  
+When activated, it cures you of cuts and stun damage, and heals you for
+1000 hit points, recharging in 444 turns.  It increases your armor class
+by 22.  You know everything about this item.  
+
+Level 75, Rarity 72, 8.0 lbs, 83000 AU
+
+
+
+
+Light Sources
+-------------
+
+The Phial of Galadriel
+----------------------
+This Lite weighs 1.0 lbs.  You can wield this as a source of light.  It
+provides resistance to disease.  It is not damaged by acid, electricity, 
+fire, cold and water.  It cannot be stolen from your inventory.  When
+activated, it lights up the room you are in, and surrounds you with magic
+ of radius 1 to light up for 25 damage to monsters vulnerable to light,
+recharging in d10+10 turns.  When thrown, it does 1d1 blunt damage and 
+lights up one target for 25 damage to monsters vulnerable to light,
+recharging in d10+10 turns.  When set in a trap, it lights up one target
+ for 25 damage to monsters vulnerable to light, recharging in d10+10
+turns.  You know everything about this item.  
+
+Level 25, Rarity 5, 1.0 lbs, 10000 AU
+
+
+The Star of Elendil
+-------------------
+This Lite weighs 0.5 lbs.  You can wield this as a source of light.  It
+gives its wielder see invisible.  It senses demons.  It is not damaged by 
+acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When activated, it maps your surroundings, recharging in
+d50+50 turns.  When thrown, it does 1d1 blunt damage, recharging in d50+50
+turns.  You know everything about this item.  
+
+Level 30, Rarity 25, 0.5 lbs, 30000 AU
+
+
+The Arkenstone of Thrain
+------------------------
+This Lite weighs 0.5 lbs.  You can wield this as a source of light.  It
+provides resistance to powerful light, powerful darkness and losing
+experience.  It gives its wielder see invisible.  It is not damaged by 
+acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  When activated, it detects all doors, traps, stairs, running
+water, gold, including hidden treasures, objects, including hidden objects
+, visible monsters, evil monsters and living monsters within 40 grids,
+recharging in d30+30 turns.  When thrown, it does 1d1 blunt damage,
+recharging in d30+30 turns.  You know everything about this item.  
+
+Level 50, Rarity 50, 0.5 lbs, 50000 AU
+
+
+The Palantir of Westernesse
+---------------------------
+This Lite weighs 20.0 lbs.  You can wield this as a source of light.  It
+modifies intelligence, wisdom, searching and infravision.  It provides
+resistance to chaos.  It protects you from blindness and hallucination.  
+It gives its wielder telepathy and see invisible.  It is not damaged by 
+acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It burdens you with aggravation, health drain and experience
+drain.  When activated, it lights up and maps the entire level, recharging
+in d50+50 turns.  When thrown, it does 10d10 blunt damage, recharging in
+d50+50 turns.  You know everything about this item.  
+
+Level 75, Rarity 60, 20.0 lbs, 100000 AU
+
+
+
+
+Amulets
+-------
+
+The Amulet of Carlammas
+-----------------------
+This Amulet weighs 0.3 lbs.  It modifies constitution and spell resistance
+.  It provides resistance to fire.  It is not damaged by acid, electricity
+, fire, cold and water.  It cannot be stolen from your inventory.  When
+activated, it protects your from evil monsters for 1d25 turns, recharging
+in d225+225 turns.  You know everything about this item.  
+
+Level 50, Rarity 10, 0.3 lbs, 60000 AU
+
+
+The Amulet of Ingwe
+-------------------
+This Amulet weighs 0.3 lbs.  It modifies intelligence, wisdom, charisma
+ and infravision.  It provides resistance to acid, electricity and cold.  
+It protects you from paralysis and magical slowness.  It gives its wielder
+ see invisible.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When activated, it 
+dispels all your enemies in line of sight if evil for 250 damage,
+recharging in d50+50 turns.  You know everything about this item.  
+
+Level 65, Rarity 30, 0.3 lbs, 90000 AU
+
+
+The Necklace of the Dwarves
+---------------------------
+This Amulet weighs 0.3 lbs.  It modifies strength and size, constitution, 
+spell resistance, infravision, light radius and hitpoint regeneration.  It
+provides resistance to fear.  It protects you from paralysis and magical
+slowness.  It gives its wielder see invisible.  It is not damaged by acid, 
+electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It marks you as dwarven.  You know everything about this item.
+
+
+Level 70, Rarity 50, 0.3 lbs, 75000 AU
+
+
+The Elfstone 'Elessar' (+7,+7) [+10]
+------------------------------------
+This Amulet weighs 0.3 lbs.  It modifies strength and size, wisdom, 
+charisma and speed.  It provides resistance to fire, poison, fear and 
+disease.  It protects you from the effects of poison.  It is not damaged by
+ acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It marks you as elven.  When activated, it cures you of cuts
+ and stun damage, and heals you for 500 hit points, recharging in 200
+turns.  It increases your armor class by 10.  You know everything about
+this item.  
+
+Level 60, Rarity 60, 0.3 lbs, 40000 AU
+
+
+The Jewel 'Evenstar'
+--------------------
+This Amulet weighs 0.3 lbs.  It sustains intelligence, wisdom and 
+constitution.  It provides resistance to cold, powerful darkness and 
+losing experience.  It is not damaged by acid, electricity, fire, cold and 
+water.  It cannot be stolen from your inventory.  When activated, it cures
+you of amnesia, and restores your strength and size, intelligence, wisdom, 
+dexterity and agility, constitution and charisma, recharging in 150 turns.
+You know everything about this item.  
+
+Level 40, Rarity 40, 0.3 lbs, 25000 AU
+
+
+
+
+Rings
+-----
+
+The Ring of Barahir
+-------------------
+This Ring weighs 0.2 lbs.  It modifies all stats, spell resistance, 
+magical devices and stealth.  It provides resistance to poison and 
+powerful darkness.  It protects you from the effects of poison.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  You know everything about this item.  
+
+Level 50, Rarity 25, 0.2 lbs, 65000 AU
+
+
+The Ring of Tulkas
+------------------
+This Ring weighs 0.2 lbs.  It modifies strength and size, dexterity and
+agility, constitution and spell resistance.  It provides resistance to 
+fear.  It is not damaged by acid, electricity, fire, cold and water.  It
+cannot be stolen from your inventory.  When activated, it hastes you for
+1d75+75 turns, recharging in d150+150 turns.  You know everything about
+this item.  
+
+Level 70, Rarity 50, 0.2 lbs, 150000 AU
+
+
+The Ring of Power 'Narya' (+6,+6)
+---------------------------------
+This Ring weighs 0.2 lbs.  It modifies all stats, speed and mana
+regeneration.  It sustains strength and size, wisdom, constitution and 
+charisma.  It provides resistance to fear and nether.  It provides
+immunity to fire.  It protects you from paralysis and magical slowness.  
+It gives its wielder slow digestion and see invisible.  It is not damaged
+by acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It marks you as elven.  When activated, it creates a storm of 
+radius 3 to burn your enemies for 145 damage, recharging in d20+20 turns.  
+You know everything about this item.  
+
+Level 70, Rarity 60, 0.2 lbs, 100000 AU
+
+
+The Ring of Power 'Nenya' (+8,+8)
+---------------------------------
+This Ring weighs 0.2 lbs.  It modifies all stats, speed and mana
+regeneration.  It sustains intelligence, wisdom and charisma.  It provides
+resistance to losing experience.  It provides immunity to cold.  It
+protects you from blindness, paralysis and magical slowness.  It gives its
+wielder feather falling, telepathy and see invisible.  It is not damaged by
+ acid, electricity, fire, cold and water.  It cannot be stolen from your
+inventory.  It marks you as elven.  When activated, it creates a storm of 
+radius 3 to freeze your enemies for 200 damage, recharging in d20+20
+turns.  You know everything about this item.  
+
+Level 80, Rarity 70, 0.2 lbs, 200000 AU
+
+
+The Ring of Power 'Vilya' (+10,+10)
+-----------------------------------
+This Ring weighs 0.2 lbs.  It modifies all stats, speed and mana
+regeneration.  It sustains strength and size, dexterity and agility and 
+constitution.  It provides resistance to poison, disenchantment and losing
+experience.  It provides immunity to electricity.  It protects you from 
+the effects of poison, paralysis and magical slowness.  It gives its
+wielder slow digestion, feather falling and see invisible.  It is not
+damaged by acid, electricity, fire, cold and water.  It cannot be stolen
+from your inventory.  It marks you as elven.  When activated, it creates a
+storm of radius 3 to electrify your enemies for 250 damage, recharging in
+d20+20 turns.  You know everything about this item.  
+
+Level 90, Rarity 80, 0.2 lbs, 300000 AU
+
+
+The Ring of Power (The One Ring) (+15,+15)
+------------------------------------------
+This Ring weighs 0.2 lbs.  It modifies all stats, speed, hitpoint
+regeneration and mana regeneration.  It sustains all stats.  It provides
+resistance to poison, fear, nether and disenchantment.  It provides
+immunity to acid, electricity, fire and cold.  It protects you from the
+effects of poison and blindness.  It gives its wielder telepathy and see
+invisible.  It is not damaged by acid, electricity, fire, cold and water.  
+It cannot be stolen from your inventory.  It burdens you with aggravation
+ and experience drain.  It is permanently cursed.  You know everything
+about this item.  
+
+Level 100, Rarity 100, 0.2 lbs, 5000000 AU
+
+

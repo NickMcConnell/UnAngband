@@ -1,0 +1,990 @@
+Spoiler File -- Terrain (0.6.2)
+
+
+Description                                Dam Lev Rar
+-------------------------------------      --- --- ---
+
+
+Floors
+
+blood-stained floor                             12   1
+slimy trail                                     12   1
+muddy floor                                     12   2
+dusty trail                                     12   3
+dusty floor                                     15   3
+broken floor                                    15   3
+earth floor                                     16   3
+wet floor                                       18   2
+burnt floor                                     18   2
+melted floor                                    18   2
+open floor                                      24   1
+open sliding wall                               24   1
+tiled floor                                     24  10
+writing-covered floor                           24  10
+
+
+Secrets
+
+vine-covered granite wall                        1   0
+painting on a granite wall                       1   0
+writing on a granite wall                        1   0
+trapped wall (multiple traps)                    1   0
+shelf                                            1   0
+cupboard                                         1   1
+shelf                                            1   1
+lit fireplace                              4d6   1   1
+weapon rack                                      1   1
+basin                                            1   1
+midden                                     0d0   1   1
+stores                                           1   1
+writing on a granite wall                        1   1
+trapped wall (multiple traps)                    1   1
+stone furnishings                                1   1
+wooden furniture                                 1   1
+open lever on a granite wall                     1   1
+closed lever on a granite wall                   1   1
+shelf                                            1   1
+weapon rack                                      1   1
+weapon rack                                      1   1
+stores                                           1   2
+locked cupboard                                  1   3
+shelf                                            1   3
+locked cupboard                                  1   3
+shelf                                            1   3
+weapon rack                                      1   4
+weapon rack                                      1   4
+wooden furniture                                 1   5
+midden                                     0d0   1   7
+lit fireplace                              4d6   1   8
+basin                                            1   8
+stone furnishings                                1  10
+thorns                                     1d4  30   1
+impassable tree trunk                           30   1
+poisonous thorns                           2d4  40   1
+impassable thicket                              40   1
+
+
+Traps
+
+invisible trap                                   1   1
+pit                                        2d6   1   1
+spring-loaded trap                         1d4   1   1
+gas trap                                   0d0   1   1
+loose rock                                       1   1
+strange rune                                     2   1
+spring-loaded trap                         1d4   2   1
+gas trap                                   0d0   2   1
+murder hole                                1d6   2   1
+stone face                                 0d0   2   2
+tripwire                                         2   2
+magic symbol                               0d0   2   3
+ancient hex                                      2   3
+magic symbol                               8d6   2   3
+spiked pit                                 4d6   3   1
+spring-loaded trap                         1d4   3   1
+gas trap                                   0d0   3   1
+loose rock                                 0d0   3   1
+stone face                                 0d0   3   2
+magic symbol                               0d0   3   3
+poisoned spiked pit                        4d6   4   1
+discolored spot                            4d6   4   1
+discolored spot                            4d6   4   1
+spring-loaded trap                         1d4   4   1
+gas trap                                   0d0   4   1
+gas trap                                   4d6   4   1
+stone face                                 0d0   4   2
+tripwire                                   4d6   4   2
+ancient hex                                      4   3
+trap door                                  6d6   5   1
+murder hole                                3d6   5   1
+deep pit                                   5d6   5   2
+stone face                                 0d0   5   2
+magic symbol                               0d0   5   3
+strange rune                                     6   1
+loose rock                                 4d6   6   1
+tripwire                                   0d0   6   2
+strange rune                                     6   2
+magic symbol                               0d0   6   3
+magic symbol                               0d0   6   3
+ancient hex                                      6   3
+murder hole                                5d6   8   1
+tripwire                                   0d0   8   2
+magic symbol                              20d1   8   3
+ancient hex                                      8   3
+strange rune                                    10   1
+explosive trap                                  10   1
+stone face                                 0d0  10   2
+stone face                                      10   2
+murder hole                                7d6  11   1
+deep spiked pit                           12d6  11   2
+loose rock                                      12   1
+strange rune                                    12   2
+ancient hex                                     12   3
+magic symbol                               8d6  12   3
+deep poisoned spiked pit                  12d6  13   2
+pit                                        6d6  13   2
+pit                                        6d6  14   2
+stone face                                 0d0  15   2
+stone face                                      15   2
+pit                                        6d6  15   2
+magic symbol                               8d6  15   3
+pit                                        6d6  16   2
+ancient hex                                     16   3
+loose rock                                 0d0  18   1
+strange rune                                    18   2
+ancient hex                                     18   3
+magic symbol                               8d6  18   3
+stone face                                 0d0  20   2
+stone face                                      20   2
+ancient hex                                8d6  21   3
+loose rock                                16d6  24   1
+strange rune                                    24   2
+ancient hex                                     24   3
+ancient hex                                8d6  24   3
+stone face                                      25   2
+pulsing pile of rubble                     0d0  25   3
+ancient hex                                8d6  27   3
+stone face                                      30   2
+magic symbol                               8d6  30   3
+loose rock                                 0d0  32   1
+magic symbol                               8d6  33   3
+magic symbol                               8d6  36   3
+stone face                                      60   2
+strange rune                                    60   2
+stone face                                      70   2
+strange rune                                    70   2
+stone face                                      80   2
+strange rune                                    80   2
+
+
+Doors
+
+curtain                                          0   1
+open curtain                                     0   1
+painting on a granite wall                       1   0
+writing on granite wall                          1   0
+burning torch on a granite wall                  1   0
+open door                                        1   1
+broken door                                      1   1
+door                                             1   1
+open door                                        1   1
+open door                                        1   1
+open door                                        1   1
+open door                                        1   1
+open door                                        1   1
+open door                                        1   1
+open door                                        1   1
+window                                           1   1
+open window                                      1   1
+broken window                                    1   1
+open gate                                        1   1
+opening gate                               0d0   1   1
+closing gate                               0d0   1   1
+shelf                                            1   1
+weapon rack                                      1   1
+locked door                                      2   1
+secret door                                      2   1
+jammed door                                      3   1
+locked door                                      4   1
+jammed door                                      6   1
+locked door                                      8   1
+trapped door (spring-loaded trap)               11   1
+trapped door                                    11   3
+trapped door (pit)                              11   3
+trapped door (explosive trap)                   11   3
+locked door                                     12   1
+jammed door                                     12   1
+trapped door (murder hole)                      12   9
+trapped door (loose rock)                       13   9
+trapped door (gas trap)                         13   9
+trapped door (tripwire)                         13  10
+trapped door (magic symbol)                     14  11
+trapped door (trap door)                        15   9
+locked door                                     16   1
+jammed door                                     16   1
+trapped door (strange rune)                     16   3
+trapped door (ancient hex)                      18  11
+locked door                                     20   1
+jammed door                                     20   1
+trapped door (stone face)                       22  10
+locked door                                     24   1
+jammed door                                     24   1
+jammed door                                     28   1
+locked gate                                     30   1
+jammed door                                     32   1
+
+
+Stairs
+
+down staircase                                   0   1
+dungeon entrance                                 0   1
+stone well                                       0   1
+empty well                                       0   1
+up staircase                                     1   1
+rope hanging over a chasm                       66   1
+chain hanging over a chasm                      66   1
+vine hanging over a chasm                       66   1
+rope swinging over a chasm                      66   1
+chain swinging over a chasm                     66   1
+vine swinging over a chasm                      66   1
+
+
+Walls
+
+permanent wall                                   0   1
+permanent wall                                   0   1
+permanent wall                                   0   1
+permanent wall                                   0   1
+granite wall                                     1   0
+burning torch on a granite wall                  1   0
+acid-marked granite wall                         1   0
+burning torch on a granite wall                  1   0
+burnt granite wall                               1   0
+web-covered granite wall                         1   0
+scratched granite wall                           1   0
+roughly-hewn granite wall                        1   0
+wet granite wall                                 1   0
+icy granite wall                                 1   0
+empty shelf                                      1   0
+empty shelf                                      1   0
+granite wall                                     1   1
+granite wall                                     1   1
+painting on a granite wall                       1   1
+burning torch on a granite wall                  1   1
+open lever on a granite wall                     1   1
+closed lever on a granite wall                   1   1
+a lit fireplace containing something       4d6   1   1
+trapped wall (multiple traps)                    1   1
+empty shelf                                      1   1
+empty fireplace                                  1   1
+empty weapon rack                                1   1
+empty basin                                      1   1
+empty midden                                     1   1
+a midden containing something              0d0   1   1
+empty stores                                     1   1
+empty cupboard                                   1   1
+scratched granite wall                           1   1
+icy granite wall                                 1   1
+painting on a granite wall                       1   1
+mechanism in a granite wall                      1   1
+sliding granite wall                             1   1
+empty weapon rack                                1   1
+empty weapon rack                                1   1
+granite wall                                     1   3
+web-covered granite wall                         1  10
+acid-marked granite wall                        20   1
+burnt granite wall                              20   1
+open vent                                       51   1
+open valve                                      51   1
+closed valve                                    51   1
+jammed valve                                    51   1
+ice-filled vent                            4d4  51   1
+
+
+Streamers
+
+impassable tree trunk                            0   1
+impassable tree trunk                            0   1
+impassable tree trunk                            0   1
+impassable tree trunk                            0   1
+slime-covered wall                               1   0
+slime-covered wall                               1   1
+mossy granite wall                               1   1
+roughly-hewn granite wall                        1   1
+wet granite wall                                 1   1
+sandstone                                        3   1
+quartz vein                                      3   2
+quartz vein with treasure                        3  40
+quartz vein                                      4   6
+magma vein                                       5   1
+magma vein with treasure                         5  90
+vine-covered granite wall                       10   1
+cracked granite wall                            10   5
+limestone features                              12   3
+water-filled cracked granite wall               13   3
+impassable pile of rubble                       15   1
+impassable pile of rubble                       15   1
+magma vein                                      15   8
+weak granite wall                               20   2
+cracked granite wall                            21   3
+water-filled cracked granite wall          4d6  23   3
+water-filled cracked granite wall               23   6
+water-filled cracked granite wall               23   9
+earth wall                                      30   2
+ice wall                                   4d4  30   2
+cracked ice wall                           4d4  30  12
+weak ice wall                              4d4  30  12
+impassable pile of ice rubble              2d4  30  12
+impassable pile of ice rubble              2d4  30  12
+cracked ice wall                           4d4  40  12
+oil shale                                       47   3
+coal                                            50   3
+burning coal                               8d6  63   3
+blood-stained wall                              80   0
+blood-stained wall                              80   1
+
+
+Stores
+
+Small Goods Store                                0   0
+General Store                                    0   1
+Armoury                                          0   1
+Weapon Smiths                                    0   1
+Temple                                           0   1
+Alchemy Shop                                     0   1
+Magic Shop                                       0   1
+Home                                             0   1
+'Bag End'                                        0   1
+House of Elrond                                  0   1
+House of Beorn                                   0   1
+Farmhouse                                        0   1
+Bilbo's House                                    0   1
+House of Tom Bombadil                            0   1
+Farmer Maggot's Mushroom Store                   1   1
+Gandalf's Firework Shop                          1   1
+Inn of the Green Dragon                          1   1
+Inn of the Prancing Pony                         1   1
+Inn                                             10   1
+Goldberry's Pool                                10   1
+Frodo's House                                   10   1
+Mill                                            15   1
+Marketplace                                     25   1
+Festhall                                        25   1
+Fletcher                                        25   1
+Barracks                                        30   1
+tomb of Balin                                   30   1
+grey slab of stone                              30   1
+Music hall                                      35   1
+Jewelers                                        35   1
+Library                                         35   1
+Shrine                                          35   1
+Heavy Armoury                                   35   1
+Heavy Weapon Smith                              35   1
+Runesmith                                       35   1
+Chemist                                         35   1
+Storeroom                                       40   1
+Storeroom                                       40   1
+Storeroom                                       40   1
+Storeroom                                       40   1
+Black Market                                    45   1
+newly erected statue in your honor              60   1
+Mirror of Galadriel                             60   1
+White Tree                                      80   1
+tree with a banner 'Happy Elventy-One'          100   1
+
+
+Chests
+
+broken chest                                     1   1
+small wooden chest (multiple traps)              1   1
+large wooden chest (multiple traps)              1   1
+small iron chest (multiple traps)                1   1
+large iron chest (multiple traps)                1   1
+small steel chest (multiple traps)               1   1
+large steel chest (multiple traps)               1   1
+small wooden chest                               5   1
+small wooden chest (locked)                      5   1
+small wooden chest (open)                        5   1
+small wooden chest (murder hole)                 5   1
+small wooden chest (spring-loaded trap)            5   1
+small wooden chest (gas trap)                    5   1
+small wooden chest (explosive trap)              5   1
+small wooden chest (locked)                      5   1
+small wooden chest                               5   5
+large wooden chest                              15   1
+large wooden chest (locked)                     15   1
+large wooden chest (open)                       15   1
+large wooden chest (murder hole)                15   1
+large wooden chest (spring-loaded trap)           15   1
+large wooden chest (gas trap)                   15   1
+large wooden chest (explosive trap)             15   1
+large wooden chest (locked)                     15   1
+large wooden chest                              15   3
+small iron chest                                25   1
+small iron chest                                25   1
+small iron chest (locked)                       25   1
+small iron chest (open)                         25   1
+small iron chest (magic symbol)                 25   1
+small iron chest (tripwire)                     25   1
+small iron chest (ancient hex)                  25   1
+small iron chest (explosive trap)               25   1
+small iron chest (locked)                       25   1
+large iron chest                                35   1
+large iron chest (locked)                       35   1
+large iron chest (open)                         35   1
+large iron chest (magic symbol)                 35   1
+large iron chest (tripwire)                     35   1
+large iron chest (ancient hex)                  35   1
+large iron chest (explosive trap)               35   1
+large iron chest (locked)                       35   1
+large iron chest                                35   3
+small steel chest                               45   1
+small steel chest                               45   1
+small steel chest (locked)                      45   1
+small steel chest (open)                        45   1
+small steel chest (magical symbol)              45   1
+small steel chest (tripwire)                    45   1
+small steel chest (ancient hex)                 45   1
+small steel chest (explosive trap)              45   1
+small steel chest (locked)                      45   1
+large steel chest                               55   1
+large steel chest (locked)                      55   1
+large steel chest (open)                        55   1
+large steel chest (magical symbol)              55   1
+large steel chest (tripwire)                    55   1
+large steel chest (ancient hex)                 55   1
+large steel chest (explosive trap)              55   1
+large steel chest (locked)                      55   1
+large steel chest                               55   5
+
+
+Furnishings
+
+broken fountain                                  0   0
+stone well                                       0   1
+water-filled well                                0   1
+empty fountain                                   1   1
+clear fountain                                   1   1
+burning torch                                    1   1
+flickering candle                                1   1
+magical light                                    1   1
+clear fountain                                   1   1
+linked chain                                     1   1
+opening chain                              0d0   1   1
+closing chain                              0d0   1   1
+loose chain                                      1   1
+loose chain                                      1   7
+winding chain                                    1   7
+linked chain                                     1   7
+shrine dedicated to blood                        5   2
+shrine dedicated to doors                        5   2
+shrine dedicated to flame                        5   2
+shrine dedicated to frost                        5   2
+shrine dedicated to summoning                    5   2
+shrine dedicated to the stars                    5   2
+shrine dedicated to storms                       5   2
+shrine dedicated to the earth                    5   2
+shrine dedicated to waves                        5   2
+shrine dedicated to the wheel                    5   2
+wooden cage                                     10   1
+open cage (wooden)                              10   1
+shrine dedicated to acid                        10   2
+cloudy fountain                                 10   3
+bubbling fountain                               10   3
+shrine dedicated to the cross                   15   2
+shrine dedicated to demons                      15   2
+shrine dedicated to explosives                  15   2
+shrine dedicated to the eye                     15   2
+shrine dedicated to the hand                    15   2
+shrine dedicated to the mouth                   15   2
+stone altar                                     17   1
+iron cage                                       20   1
+broken altar                                    20   1
+open cage (iron)                                20   1
+smoky fountain                                  20   3
+shrine dedicated to dwarves                     20   3
+shrine dedicated to trees                       20   3
+golden altar                                    22   1
+bone altar                                      22   1
+magic circle                                    23   1
+glass altar                                     25   1
+shrine dedicated to elves                       25   3
+shrine dedicated to swords                      25   3
+magic circle                                    26   1
+harpsichord                                     26   2
+wooden altar                                    30   1
+magic circle                                    30   1
+magic hexagram                                  30   1
+shrine                                          30   1
+shrine                                          30   1
+empty shrine                                    30   1
+grand harp                                      30   2
+misty fountain                                  30   3
+shrine dedicated to clouds                      30   3
+shrine dedicated to shields                     30   3
+magic triangle                                  33   1
+magic circle                                    33   2
+iron bell                                       33   2
+ashen altar                                     35   2
+magic triangle                                  36   1
+magic circle                                    36   2
+snake basket                                    36   2
+blood-stained altar                             40   1
+magic triangle                                  40   1
+magic square                                    40   1
+dusty altar                                     40   2
+great horn                                      40   2
+shrine dedicated to dragons                     40   3
+shrine dedicated to the moon                    40   3
+shrine dedicated to magic                       40   4
+magic square                                    43   1
+pipe organ                                      43   2
+iron altar                                      45   2
+giant war drum                                  46   2
+magic square                                    50   1
+brass gong                                      50   2
+shrine dedicated to arrows                      50   2
+corroded altar                                  50   4
+magic square                                    56   1
+magic triangle                                  60   1
+magic pentagram                                 60   1
+magic pentagram                                 60   2
+magic hexagram                                  60   2
+grand piano                                     60   2
+magic pentagram                                 63   1
+magic hexagram                                  63   2
+magic pentagram                                 66   1
+magic hexagram                                  70   2
+magic hexagram                                  76   2
+
+
+Bridges
+
+acidic vapour around a stone bridge        8d6   0   0
+steam around a stone bridge                3d6   0   0
+falling giant spider web                        15   3
+deep water under a stone bridge            4d6  27   1
+burning oil under a stone bridge                27   1
+deep water under ice under a stone bridge      6d6  36   1
+stone bridge                                    40   1
+wooden bridge                                   40   1
+weak wooden bridge (hidden)                     40   1
+weak wooden bridge over a chasm                 40   1
+burning wooden bridge over a chasm         4d6  40   1
+deep poisonous water under a stone bridge      4d6  46   3
+deep oil under a stone bridge                   47   1
+deep mud under a stone bridge                   48   1
+boiling mud under a stone bridge           6d6  60   1
+rope bridge                                     66   1
+chain bridge                                    66   1
+broken wooden bridge (hidden)                   66   1
+broken wooden bridge over a chasm               66   1
+burning wooden bridge over a chasm         4d6  66   1
+falling rope                                    66   1
+falling chain                                   66   1
+falling wooden bridge                      4d6  66   1
+falling burning wood                       4d6  66   1
+ice bridge                                      66   1
+broken ice bridge over a chasm                  66   1
+falling ice                                4d6  66   1
+vine bridge                                     66   1
+falling vine                                    66   1
+opening chain bridge                       0d0  66   1
+closing chain bridge                       0d0  66   1
+giant spider web hanging over a chasm           66   3
+tree trunk over a chasm                         66   4
+giant spider web over a chasm                   75   3
+deep acid under a stone bridge             4d6  78   1
+boiling water under a stone bridge         6d6  81   1
+deep lava under a stone bridge            24d6  87   1
+
+
+Water
+
+a wave breaking over rock                        0   1
+a wave breaking over pebbles                     0   1
+a wave breaking over a tree trunk                0   1
+a wave breaking over open ground                 0   1
+a wave breaking over shady ground                0   1
+stagnant water                                  18   1
+water                                           18   2
+the crest of a wave over water             4d6  18   2
+a wave over water                          4d6  18   2
+rough water                                     18   2
+the crest of a wave over poisonous water      4d6  18   2
+a wave over poisonous water                4d6  18   2
+poisonous rough water                           18   2
+water over open floor                           18   2
+a wave breaking over open floor            4d6  18   2
+water over open floor                           18   2
+the crest of a wave over open floor        4d6  18   2
+a wave over open floor                     4d6  18   2
+water over open floor                           18   2
+water over sand                                 18   2
+water over sand                                 18   2
+the crest of a wave over sand              4d6  18   2
+a wave over sand                           4d6  18   2
+water over sand                                 18   2
+water through an open door                      18   2
+a wave breaking through an open door       4d6  18   2
+water through an open door                      18   2
+the crest of a wave through an open door      4d6  18   2
+a wave through an open door                4d6  18   2
+water through an open door                      18   2
+water                                           18   2
+shady water                                     18   2
+quicksand                                  4d6  20   4
+a wave breaking over sand                  4d6  22   3
+clear deep water                           4d6  22   4
+clear water                                     27   1
+a wave breaking over a stone bridge        4d6  27   1
+a poisonous wave breaking over a stone bridge      2d6  27   1
+a wave breaking over a stone bridge        4d6  27   1
+deep water                                 4d6  27   2
+the crest of a wave over deep water        4d6  27   2
+a wave over deep water                     4d6  27   2
+deep rough water                           4d6  27   2
+the crest of a wave over deep poisonous water      4d6  27   2
+a wave over deep poisonous water           4d6  27   2
+deep poisonous rough water                 4d6  27   2
+quicksand                                  4d6  30   4
+poisonous water                                 37   6
+a wave breaking over sand                  4d6  38   2
+falling water                              4d6  41   2
+falling water                              4d6  41   2
+erupting water spout                       4d6  41   2
+hidden deep water                          4d6  45   2
+the crest of a wave over hidden deep water      4d6  45   2
+a wave over deep water                     4d6  45   2
+hidden deep rough water                    4d6  45   2
+the crest of a wave over deep poisonous water      4d6  45   2
+a wave over deep poisonous water           4d6  45   2
+hidden deep poisonous rough water          4d6  45   2
+hidden deep poisonous water                4d6  46   6
+the crest of a wave over salt water        4d6  47   2
+a wave over salt water                     4d6  47   2
+rough salt water                           4d6  47   2
+salt water                                 4d6  47   4
+water-filled vent                          4d6  51   1
+water-filled vent                          4d6  51   1
+water-filled vent                          4d6  51   1
+water-filled valve                         4d6  51   1
+water-filled valve                         4d6  51   1
+water-filled valve                         4d6  51   1
+water-filled vent which erupts water       4d6  51   1
+open vent which erupts water                    51   1
+deep rough salt water                      4d6  54   2
+the crest of a wave over deep salt water      4d6  56   2
+a wave over deep salt water                4d6  56   2
+hidden deep rough salt water               4d6  56   2
+deep salt water                            4d6  56   4
+underwater                                 4d6  60   2
+underwater                                 4d6  60   2
+deep poisonous water                       4d6  64   6
+waterfall                                 10d6  66   3
+the crest of a wave over deep salt water      4d6  74   2
+a wave over deep salt water                4d6  74   2
+deep salt water                            4d6  74   4
+underwater                                 4d6  79   6
+underwater                                 4d6  79   6
+undersea                                   4d6  89   4
+undersea                                   4d6  89   4
+
+
+Lava
+
+geothermal floor under an ice wall         4d4  30   1
+cracked ice wall over a geothermal floor      4d4  50   2
+open vent which erupts boiling water            51   1
+cracked ice wall over a geothermal floor      2d4  54   2
+boiling mud                                6d6  60   1
+steam-filled vent which erupts boiling water      4d6  60   6
+deep lava under geothermal ground        24d10  72   2
+steam over geothermal ground               1d3  72   2
+lava which erupts lava                   12d10  80   1
+steam over boiling water                   3d6  81   2
+steam over boiling water                   3d6  81   2
+boiling water                              6d6  81   2
+falling boiling water                      6d6  82   2
+falling boiling water                      6d6  82   3
+erupting boiling geyser                    6d6  82   3
+lava                                     12d10  84   1
+lava fall                                24d10  84   3
+erupting lava                            24d10  85   1
+boiling waterfall                         10d6  86   3
+deep lava under a broken magma crust       4d6  87   1
+deep lava under a magma crust            24d10  87   1
+deep lava                                24d10  87   1
+deep lava                                24d10  90   1
+broken magma crust which erupts lava            90   3
+falling lava                             24d10  91   1
+falling lava                             24d10  91   1
+
+
+Ice
+
+snowy trail                                      0   1
+deep snowy trail                                 0   1
+shady snowy trail                                0   1
+shady deep snowy trail                           0   1
+ice                                             33   3
+snow                                            35   1
+snow in the shade                               35   1
+deep water under ice                       4d6  36   3
+hidden deep water under ice                4d6  36   3
+ice fall                                   4d4  41   2
+deep snow                                       45   1
+deep snow in the shade                          45   1
+deep snow                                       50   1
+deep snow in the shade                          50   1
+pile of ice rubble                         2d4  50  12
+water under a cracked ice wall             4d6  60   3
+water under a cracked ice wall             4d6  60   3
+deep water under an ice wall               4d4  60   3
+ice chasm                                 10d6  66   2
+ice                                             66   3
+
+
+Acid
+
+acid-filled vent                           4d6  51   1
+acid-filled vent                           4d6  51   1
+acid-filled vent                           4d6  51   1
+acid-filled valve                          4d6  51   1
+acid-filled valve                          4d6  51   1
+acid-filled valve                          4d6  51   1
+acid-filled vent which erupts acid         4d6  51   1
+open vent which erupts acid                     51   1
+acidic vapour                              2d4  63   1
+acid                                       2d6  65   1
+acidic vapour over acid                    4d6  65   1
+acidic vapour over acid                    4d6  65   1
+acidic vapour over a broken floor          2d4  66   3
+deep acid                                  4d6  68   1
+acidic vapour over deep acid               4d6  68   1
+deep acid                                  4d6  71   2
+acidic vapour over deep acid               4d6  71   2
+boiling acid                               2d6  75   2
+acidic vapour over boiling acid            4d6  75   2
+deep boiling acid                          4d6  78   2
+acidic vapour over boiling acid            4d6  78   2
+acidic vapour over deep boiling acid       4d6  78   2
+falling acid                               6d6  79   2
+falling acid                               6d6  79   2
+erupting acid vent                         6d6  79   2
+deep boiling acid                          4d6  81   3
+acidic vapour over deep boiling acid       4d6  81   3
+acid fall                                 10d6  86   3
+
+
+Oil
+
+oil                                             40   1
+coal dust                                       40   2
+coal dust trail                                 40   2
+fire                                       3d6  44   1
+deep oil                                   4d6  45   4
+deep oil                                   4d6  48   2
+falling oil                                4d6  51   2
+falling oil                                4d6  51   2
+smoke                                      2d4  53   1
+smoke over a broken floor                  2d4  56   3
+deep burning oil                           4d6  65   4
+burning oil fall                          10d6  66   1
+oil fall                                  10d6  66   1
+deep burning oil                           4d6  68   4
+falling burning oil                       10d6  70   4
+falling burning oil                       10d6  70   4
+erupting fiery vent                       10d6  70   4
+
+
+Chasms
+
+chasm                                     10d6  40   2
+chasm                                     10d6  60   2
+storm cloud over chasm                     6d6  66   2
+storm cloud over chasm                          66   2
+chasm in the shade                        10d6  66   2
+
+
+Sand/Earth
+
+pile of wood                                     0   1
+a wave breaking over a pile of rubble            1   1
+pile of rubble                                   1   9
+a pile of rubble containing something            1   9
+steep sandy trail in the shade                  12   1
+salty trail                                     12   1
+pile of wood                                    15   1
+a pile of wood containing something             15   1
+pile of rubble                                  20   1
+muddy trail                                     21   1
+mud                                        4d6  21   3
+deep sand                                       22   1
+deep sandy trail                                22   3
+sand dune                                       22   3
+steep sandy trail                               22   3
+shaded sand dune                                22   3
+salt                                            22   3
+trembling pile of rubble                        25   3
+deep muddy trail                           4d6  48   1
+deep mud                                   4d6  48   3
+deep mud                                   4d6  54   3
+water over deep mud                        4d6  54   3
+shady water over deep mud                  4d6  54   3
+
+
+Ground
+
+earth                                            1  10
+dirt trail                                       1  10
+rock                                             1  10
+pebbles                                          1  10
+open ground                                      1  10
+open trail                                       1  10
+open hill                                       13   1
+earth mound                                     19   1
+burnt hillside                                  25   1
+burnt ground                                    32   1
+wet ground                                      40   2
+shady wet ground                                40   2
+
+
+Trees/Plants
+
+vine-covered granite wall                        1   0
+mossy granite wall                               1   0
+grass                                            1  10
+open trail through grass                         1  10
+shaded earth                                     1  10
+shady dirt trail                                 1  10
+rock in the shade                                1  10
+shaded grass                                     1  10
+shady trail through grass                        1  10
+shady ground                                     1  10
+shady trail                                      1  10
+pebbles in the shade                             1  10
+rapidly growing shoot                            1  10
+herbs in the shade                               4   1
+herbs                                            4   3
+bush                                             5   1
+tree                                             7   1
+tree trunk                                      10   1
+vines                                           10   1
+quivering sapling                               10   1
+apple tree                                      10   3
+grassy hill                                     16   1
+steep trail through grass                       16   1
+thicket                                         20   2
+steep trail in the shade                        24   1
+shadowy hill                                    24   1
+shady grassy hill                               27   1
+steep shady trail through grass                 27   1
+brambles                                   2d4  30   1
+thorns                                     1d2  30   1
+shaded earth mound                              30   1
+steep dirt trail in the shade                   30   1
+poisonous thorns                           2d4  40   1
+impassable tree trunk                           40   1
+impassable thicket                              40   1
+
+
+Smoke/Fire
+
+steam                                      1d3   0   0
+steam over a broken floor                  1d3   0   0
+steam over geothermal floor                1d3   0   0
+poison gas                                 3d4   0   0
+poison gas over broken floor               3d4   0   0
+glyph of warding                                 0   1
+closing lever on a granite wall            0d0   1   1
+opening lever on a granite wall            0d0   1   1
+opening mechanism in a granite wall        0d0   1   1
+closing mechanism in a granite wall        0d0   1   1
+opening sliding wall                       0d0   1   1
+closing sliding wall                       0d0   1   1
+mechanism in a granite wall                      1   1
+mechanism in a granite wall                      1   1
+wall of fire                               4d6  20   2
+crumbling floor                                 25   3
+cracked floor                              0d0  25   3
+bush fire                                  3d6  32   1
+fire                                       4d6  32   1
+smoke over burnt ground                    2d4  35   1
+burning tree                               4d6  35   1
+smoke over burnt hillside                  2d4  36   1
+wall of fire                               6d6  38   1
+burning hillside                           3d6  39   1
+storm cloud                                4d6  50   2
+storm cloud over broken floor              4d6  50   2
+storm cloud                                     50   2
+storm cloud over broken floor                   50   2
+geothermal floor                                51   1
+gas-filled vent                            4d6  51   1
+steam-filled vent                          4d6  51   1
+gas-filled vent                            4d6  51   1
+steam-filled vent                          4d6  51   1
+gas-filled vent                            4d6  51   1
+steam-filled vent                          4d6  51   1
+gas-filled valve                           4d6  51   1
+steam-filled valve                         4d6  51   1
+gas-filled valve                           4d6  51   1
+steam-filled valve                         4d6  51   1
+gas-filled valve                           4d6  51   1
+steam-filled valve                         4d6  51   1
+gas-filled vent which erupts gas           4d6  51   1
+erupting gas-filled vent                   4d6  51   1
+open vent which erupts poison                   51   1
+open vent which erupts fire                     51   1
+opening valve                              0d0  51   1
+closing valve                              0d0  51   1
+geothermal ground                               51   2
+steam over geothermal ground               1d3  51   2
+burning oil                                4d6  60   2
+burning coal dust                          4d6  60   2
+storm cloud over an open floor over a chasm      4d6  66   2
+storm cloud over an open floor over a chasm           66   2
+fiery vent                                12d6  72   1
+fiery vent                                12d6  72   1
+fiery vent                                12d6  72   1
+fiery valve                               12d6  72   1
+fiery valve                               12d6  72   1
+fiery valve                               12d6  72   1
+fiery vent which erupts fire              12d6  72   1
+
+
+Other
+
+nothing                                          0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+shallow pit                                      0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+                                                 0   0
+wooden wall                                      1   0
+wooden wall                                      1   0
+empty stone furnishings                          1   1
+wooden wall                                      1   1
+broken wood                                     10   1
+broken bars                                     10   1
+tree trunk                                      13   1
+steep trail                                     13   1
+burnt tree                                      15   1
+dusty cobwebs                                   15   3
+sand                                            16   1
+sandy trail                                     16   3
+steep dirt trail                                19   1
+wet sand                                        22   3
+wooden deck                                     24  10
+wooden deck over chasm                          24  10
+empty wooden furniture                          24  10
+giant spider web                                25   3
+broken magma crust                              75   3
