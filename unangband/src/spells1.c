@@ -7744,17 +7744,71 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		/* Hack -- curse effect - dispel plus damage */
 		case GF_CURSE:
 		{
-			/* Monster abilities removed the next round*/
-			if (m_ptr->slowed) m_ptr->slowed = 1;
-			if (m_ptr->hasted) m_ptr->hasted = 1;
-			if (m_ptr->tim_invis) m_ptr->tim_invis = 1;
-			if (m_ptr->tim_passw) m_ptr->tim_passw = 1;
-			if (m_ptr->bless) m_ptr->bless = 1;
-			if (m_ptr->berserk) m_ptr->berserk = 1;
-			if (m_ptr->shield) m_ptr->shield = 1;
-			if (m_ptr->oppose_elem) m_ptr->oppose_elem = 1;
+			/* Non-living are immune */
+			if ((r_ptr->flags3 & (RF3_NONLIVING)) && (typ == GF_CURSE))
+			{
+				dam = 0;
+				if ((seen) && (l_ptr->flags3 & (RF3_NONLIVING)))
+				{
+					note = " is unaffected.";
+					l_ptr->flags3 |= (RF3_NONLIVING);
+				}
+			}
+			/* All others */
+			else
+			{
+				/* Monster abilities removed the next round*/
+				if (m_ptr->slowed) m_ptr->slowed = 1;
+				if (m_ptr->hasted) m_ptr->hasted = 1;
+				if (m_ptr->tim_invis) m_ptr->tim_invis = 1;
+				if (m_ptr->tim_passw) m_ptr->tim_passw = 1;
+				if (m_ptr->bless) m_ptr->bless = 1;
+				if (m_ptr->berserk) m_ptr->berserk = 1;
+				if (m_ptr->shield) m_ptr->shield = 1;
+				if (m_ptr->oppose_elem) m_ptr->oppose_elem = 1;
+			}
 
 			break;
+		}
+
+		/* Damage monsters with minds only */
+		case GF_MENTAL:
+		{
+			/* Non-living are immune */
+			if (r_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND))
+			{
+				dam = 0;
+				if ((seen) && (l_ptr->flags2 & (RF2_WEIRD_MIND | RF2_EMPTY_MIND)))
+				{
+					note = " is unaffected.";
+					if (r_ptr->flags2 & (RF2_EMPTY_MIND)) l_ptr->flags2 |= (RF2_EMPTY_MIND);
+					if (r_ptr->flags2 & (RF2_WEIRD_MIND)) l_ptr->flags2 |= (RF2_WEIRD_MIND);					
+				}
+			}
+
+			break;
+		}
+
+		/* Snuff out life if damage exceeds maximum hit points */
+		case GF_SNUFF:
+		{
+			/* Non-living are immune */
+			if ((r_ptr->flags3 & (RF3_NONLIVING)) && (typ == GF_CURSE))
+			{
+				dam = 0;
+				if ((seen) && (l_ptr->flags3 & (RF3_NONLIVING)))
+				{
+					note = " is unaffected.";
+					l_ptr->flags3 |= (RF3_NONLIVING);
+				}
+			}
+
+			/* Monsters with too high hit points are immune */
+			else if (m_ptr->maxhp > dam)
+			{
+				dam = 0;
+				note = " is unaffected.";
+			}
 		}
 
 		/* Warp wood (Ignore "dam") */
@@ -7824,15 +7878,19 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 						obvious = FALSE;
 					}
 				}
+				/* Hack -- can't charm multi-headed monsters */
+				else if (strstr(r_name + r_ptr->name, "headed"))
+				{
+					if (seen) note = "'s heads fight amongst themselves.";
+					do_conf = dam;
+				}
 				else
 				{
-					/* Go to sleep (much) later */
+					/* Charm immediately */
 					note = " falls under your influence!";
 					m_ptr->mflag |= (MFLAG_ALLY);
 					m_ptr->mflag &= ~(MFLAG_IGNORE);
 				}
-
-
 			}
 			else
 			{

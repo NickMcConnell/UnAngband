@@ -1413,6 +1413,8 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_BIND_FAMILIAR:	q = "bind a familiar to you"; break;
 			case GF_VAMP_DRAIN:	q = "drain"; s = "health from"; break;
 			case GF_MANA_DRAIN:	q = "drain"; s = "mana from"; break;
+			case GF_SNUFF:		q = "snuff"; s = "the life from"; u = "with less than"; break;
+			case GF_MENTAL:		q = "blast"; u = "with mental energy"; break;
 
 			/* Hack -- handle features */
 			case GF_FEATURE:
@@ -1593,6 +1595,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_BIND_UNDEAD:
 			case GF_BIND_FAMILIAR:
 								text_out("power"); break;
+			case GF_SNUFF: text_out("maximum ");
 			case GF_HEAL: text_out("hit points"); break;
 			case GF_AWAY_ALL:
 			case GF_AWAY_JUMP:
@@ -1786,6 +1789,7 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 			case GF_BIND_UNDEAD:
 			case GF_BIND_FAMILIAR:
 								q = "pow"; break;
+			case GF_SNUFF: q = "max hp"; break;
 			case GF_HEAL: q = "heal"; break;
 			case GF_AWAY_ALL:
 			case GF_AWAY_JUMP:

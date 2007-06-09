@@ -20,7 +20,7 @@ M:F:897
 M:D:800
 
 # Maximum number of object kinds
-M:K:947
+M:K:951
 
 # Maximum number of artifacts
 M:A:137
@@ -59,7 +59,7 @@ M:C:11
 M:W:160
 
 # Maximum number of spells
-M:S:551
+M:S:568
 
 # Maximum number of runes
 M:Y:30

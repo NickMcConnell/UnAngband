@@ -957,6 +957,8 @@
 #define GF_BIND_FAMILIAR	132
 #define GF_VAMP_DRAIN	133
 #define GF_MANA_DRAIN	134
+#define GF_MENTAL		135
+#define GF_SNUFF		136
 
 /*
  * Columns for the spell cost or damage flags

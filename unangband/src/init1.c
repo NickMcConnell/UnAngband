@@ -399,6 +399,8 @@ static cptr r_info_blow_effect[] =
 	"BIND_FAMILIAR",
 	"VAMP_DRAIN",
 	"MANA_DRAIN",
+	"MENTAL",
+	"SNUFF",
 	NULL
 };
 

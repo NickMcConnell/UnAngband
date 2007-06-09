@@ -6559,21 +6559,21 @@ A:20/1
 
 N:898:of Craft
 G:?:R
-I:90:43:0
+I:90:53:0
 W:10:0:30:100
 A:10/6
 P:0:1d1:0:0:0
 
 N:899:of Art
 G:?:R
-I:90:44:0
+I:90:54:0
 W:20:0:30:400
 A:20/6
 P:0:1d1:0:0:0
 
 N:900:of Science
 G:?:R
-I:90:45:0
+I:90:55:0
 W:30:0:30:800
 A:30/6
 P:0:1d1:0:0:0
@@ -6582,21 +6582,21 @@ P:0:1d1:0:0:0
 
 N:901:of Bushcraft
 G:?:R
-I:90:47:0
+I:90:57:0
 W:10:0:30:100
 A:10/6
 P:0:1d1:0:0:0
 
 N:902:of Warcraft
 G:?:R
-I:90:48:0
+I:90:58:0
 W:20:0:30:400
 A:20/6
 P:0:1d1:0:0:0
 
 N:903:of Statecraft
 G:?:R
-I:90:49:0
+I:90:59:0
 W:30:0:30:800
 A:30/6
 P:0:1d1:0:0:0
@@ -6802,7 +6802,7 @@ A:80/6
 P:0:1d1:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
-#### Thuamaturgy School -- corresponds to Sangband Oath of Blood Magic ####
+#### Mastery School -- corresponds to Sangband Oath of Blood Magic ####
 
 N:927:of Curses
 G:?:R
@@ -6825,7 +6825,7 @@ W:20:0:30:400
 A:20/6
 P:0:1d1:0:0:0
 
-N:931:of Thuamaturgy
+N:931:of Mastery
 G:?:R
 I:90:43:0
 W:30:0:30:800
@@ -6924,7 +6924,7 @@ F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
 N:943:of Tricks
 G:?:R
-I:90:42:0
+I:90:52:0
 W:5:0:30:25
 A:5/4
 P:0:1d1:0:0:0
@@ -6933,7 +6933,7 @@ P:0:1d1:0:0:0
 
 N:944:of Trailcraft
 G:?:R
-I:90:46:0
+I:90:56:0
 W:5:0:30:25
 A:5/4
 P:0:1d1:0:0:0
@@ -6957,3 +6957,32 @@ W:0:1:0:0
 P:0:0d0:0:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 
+#### Thuamaturgy School -- no Sangband correspondence. Random attack spells after 1st book. ####
+
+N:947:of Fireworks
+G:?:R
+I:90:48:0
+W:5:0:30:25
+A:5/6
+P:0:1d1:0:0:0
+
+N:948:of Evocation
+G:?:R
+I:90:49:0
+W:10:0:30:100
+A:10/6
+P:0:1d1:0:0:0
+
+N:949:of Incendaries
+G:?:R
+I:90:50:0
+W:20:0:30:400
+A:20/6
+P:0:1d1:0:0:0
+
+N:950:of Thuamaturgy
+G:?:R
+I:90:51:0
+W:30:0:30:800
+A:30/6
+P:0:1d1:0:0:0
