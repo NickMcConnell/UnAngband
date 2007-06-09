@@ -3866,15 +3866,15 @@ F:INSTA_ART
 
 N:520:of Enchantments
 G:?:r
-I:90:22:0
-W:33:0:30:1000
-A:33/1
+I:90:0:0
+W:70:0:30:18000
+A:70/2
 P:0:1d1:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
 N:521:of Life Magic
 G:?:r
-I:90:24:0
+I:90:2:0
 W:36:0:30:1500
 A:36/1
 P:0:1d1:0:0:0
@@ -3970,7 +3970,7 @@ F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
 N:533:of Artifice
 G:?:r
-I:90:25:0
+I:90:3:0
 W:73:0:30:22000
 A:73/2
 P:0:1d1:0:0:0
@@ -3978,7 +3978,7 @@ F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
 N:534:of Lore
 G:?:r
-I:90:23:0
+I:90:1:0
 W:76:0:30:24000
 A:76/2
 P:0:1d1:0:0:0
@@ -3992,7 +3992,7 @@ A:33/2
 P:0:1d1:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
-N:536:of Illusions
+N:536:of Psychic Magic
 G:?:r
 I:90:16:0
 W:36:0:30:1750
@@ -6780,7 +6780,7 @@ P:0:1d1:0:0:0
 
 N:924:of Negation
 G:?:r
-I:90:0:0
+I:90:23:0
 W:60:0:30:10000
 A:60/3
 P:0:1d7:0:0:0
@@ -6788,7 +6788,7 @@ F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
 N:925:of Nature
 G:?:r
-I:90:1:0
+I:90:24:0
 W:70:0:30:15000
 A:70/2
 P:0:1d1:0:0:0
@@ -6796,7 +6796,7 @@ F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
 N:926:of Space
 G:?:r
-I:90:2:0
+I:90:25:0
 W:80:0:30:30000
 A:80/6
 P:0:1d1:0:0:0
@@ -6834,13 +6834,13 @@ P:0:1d1:0:0:0
 
 N:932:of Annihilation
 G:?:r
-I:90:3:0
+I:90:27:0
 W:60:0:30:10000
 A:60/3
 P:0:1d7:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
-N:933:of Blood Magic
+N:933:of Demonology
 G:?:r
 I:90:26:0
 W:70:0:30:15000
@@ -6850,7 +6850,7 @@ F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
 N:934:of the Void
 G:?:r
-I:90:27:0
+I:90:28:0
 W:80:0:30:30000
 A:80/6
 P:0:1d1:0:0:0
@@ -6888,7 +6888,7 @@ P:0:1d1:0:0:0
 
 N:939:of Immoliation
 G:?:r
-I:90:28:0
+I:90:29:0
 W:60:0:30:10000
 A:60/3
 P:0:1d7:0:0:0
@@ -6896,7 +6896,7 @@ F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
 N:940:of Gambits
 G:?:r
-I:90:29:0
+I:90:30:0
 W:70:0:30:15000
 A:70/2
 P:0:1d1:0:0:0
@@ -6904,23 +6904,21 @@ F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
 N:941:of Balance
 G:?:r
-I:90:30:0
+I:90:31:0
 W:80:0:30:30000
 A:80/6
 P:0:1d1:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
-#### The Wizardry School -- consists of the basic books, Destruction, Power and this book.
-
-N:942:of High Wizardry
+N:942:of Shapechanging
 G:?:r
-I:90:31:0
-W:70:0:30:15000
-A:70/2
+I:90:22:0
+W:33:0:30:1000
+A:33/1
 P:0:1d1:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 
-#### The Science School -- consists of the rogue books defined previously, plus this book.
+#### The Artisan School -- consists of the rogue books defined previously, plus this book.
 
 N:943:of Tricks
 G:?:R
@@ -6929,7 +6927,7 @@ W:5:0:30:25
 A:5/4
 P:0:1d1:0:0:0
 
-#### The Warcraft School -- consists of the ranger books defined previously, plus this book.
+#### The Ranger School -- consists of the ranger books defined previously, plus this book.
 
 N:944:of Trailcraft
 G:?:R
