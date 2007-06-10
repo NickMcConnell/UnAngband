@@ -2441,10 +2441,15 @@
 #define SV_CHEST_MIN_LARGE	4
 
 /*
- * Special "sval" limit -- first "good" magic/prayer book
+ * Special "sval" limit -- first/last "good" magic/prayer book
  */
 #define SV_BOOK_MIN_GOOD	4
+#define SV_BOOK_MAX_GOOD	32
 
+/*
+ * How many books in a school?
+ */
+#define SV_BOOK_SCHOOL		4
 
 /*
  * Special "sval" limit -- maximum number of bags
