@@ -97,11 +97,13 @@ TODO: Allow the player to jump. This may be needed to navigate various
 Release v0.8.0
 ==============
 
-MAIN FOCUS: Revise monster AI to fix known AI bugs and allow friendly monsters.
+MAIN FOCUS: Revise monster AI to fix known AI bugs.
 
 TODO: Implement friendly monsters and uniques.
 
-TODO: Allow spells to summon monsters.
+TODO: Improvements to spells to summon monsters.
+
+TODO: Have conversations with monsters.
 
 TODO: Allow monsters to ride other monsters.
 
@@ -313,6 +315,57 @@ The 'O'rder menu for summons is as follows:
 (D) Dismiss summons
 
 Need to look at other commands that variants allow.
+
+TODO: Have conversations with monsters.
+
+Conversations depend on the monster status:
+
+You are given a choice of approximately 5 phrases, two of which are
+'correct' to use in any situation (maybe depend on charisma).
+
+The selection of phrases depends on the 'total status' of the monster
+where medium gives one point and high gives 2.
+
+A correct match occurs if the monster has a low stat in that area
+(negative, positive):
+
+Low Strength: bully, be kind to
+Low Intelligence: insult, be polite to,
+Low Wisdom: dissemble, be honest to,
+Low Dexterity: laugh at, praise
+Low Constitution: flatter, ignore
+
+The negative phrase types lower a random stat, if the monster has that
+stat already low. The positive phrase types increase a random stat, if
+that monster has that stat already low. If the positive or negative
+phrase is used against a monster that has a high stat in that area,
+the monster ignores the player from that point onwards.
+
+With medium stats, the monster has a variety of interactions. Each
+interaction increases that stat from medium to high. Note it is
+(deliberately) not possible to raise constitution through interaction.
+
+Medium Strength: give food to
+Medium Intelligence: give money to
+Medium Wisdom: sell to
+Medium Dexterity: buy from
+Medium Constitution: N/a
+
+With high stats, townsfolk only will give up a useful
+ability/information, and then drop the stat back to medium. Charisma
+determines 'how useful'. Note that townsfolk are hacked never to start
+with good stats.
+
+High Strength: monster lore
+High Intelligence: item/ego item/artifact lore
+High Wisdom: identify item
+High Dexterity: buy good item from(then ignore)/get quest from
+High Constitution: cure disease (for free)
+
+It is possible to get a monster to ally with the player iff they max
+all stats, or minimise all stats.
+
+
 
 TODO:Implement alchemy/manufacturing items.
 	This is low priority at this stage. Perhaps do essences
