@@ -401,6 +401,7 @@ static cptr r_info_blow_effect[] =
 	"MANA_DRAIN",
 	"MENTAL",
 	"SNUFF",
+	"RAGE",
 	NULL
 };
 
@@ -1389,7 +1390,7 @@ static cptr s_info_flags3[] =
 	"DEC_FOOD",
 	"DEC_EXP",
 	"HOLD_SONG",
-	"EVIL"
+	"THUAMATURGY"
 };
 
 /*
@@ -1432,7 +1433,18 @@ static cptr s_info_types[] =
 	"INVEN_ARM",
 	"INVEN_HEAD",
 	"INVEN_HANDS",
-	"INVEN_FEET"
+	"INVEN_FEET",
+	"WONDER",
+	"IDENT_NAME",
+	"RELEASE_CURSE",
+	"CONCENTRATE_LITE",
+	"CONCENTRATE_LIFE",
+	"CONCENTRATE_WATER",
+	"SET_RETURN",
+	"SET_OR_MAKE_RETURN",
+	"BLOOD_BOND",
+	"MINDS_EYE",
+	NULL
 };
 
 
@@ -7290,7 +7302,7 @@ static long eval_max_dam(monster_race *r_ptr)
 		 */
 		if (!(r_ptr->flags9 & (RF9_NEVER_MISS)))
 		{
-			int power = rlev + (r_ptr->flags6 & (RF6_BLESS) ? 5 : 0) + (r_ptr->flags6 & (RF6_BESERK) ? 12 : 0);
+			int power = rlev + (r_ptr->flags6 & (RF6_BLESS) ? 5 : 0) + (r_ptr->flags6 & (RF6_BERSERK) ? 12 : 0);
 
 			melee_dam = melee_dam * MIN(45 + power * 3, 95) / 100;
 		}
@@ -7443,7 +7455,7 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	if (r_ptr->flags2 & RF2_ARMOR) ac = ac * 4 / 3;
 	if (r_ptr->flags6 & RF6_SHIELD) ac += 25;
 	if (r_ptr->flags6 & RF6_BLESS) ac += 5;
-	if (r_ptr->flags6 & RF6_BESERK) ac -= 5;
+	if (r_ptr->flags6 & RF6_BERSERK) ac -= 5;
 
 	/* Upper limit on ac */
 	if (ac > 150) ac = 150;

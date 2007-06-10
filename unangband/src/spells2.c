@@ -2235,6 +2235,17 @@ static bool item_tester_unknown(const object_type *o_ptr)
 		return TRUE;
 }
 
+static bool item_tester_unknown_name(const object_type *o_ptr)
+{
+	if (object_known_p(o_ptr))
+		return FALSE;
+	else if (o_ptr->ident & (IDENT_NAME))
+		return FALSE;
+	else
+		return TRUE;
+}
+
+
 static int unknown_tval;
 
 static bool item_tester_unknown_tval(const object_type *o_ptr)
@@ -2878,6 +2889,87 @@ bool ident_spell(void)
 	/* Something happened */
 	return (TRUE);
 }
+
+
+/*
+ * Identify an object in the inventory (or on the floor)
+ * This routine does *not* automatically combine objects.
+ * Returns TRUE if something was identified, else FALSE.
+ */
+bool ident_spell_name(void)
+{
+	int item;
+
+	object_type *o_ptr;
+
+	char o_name[80];
+
+	cptr q, s;
+
+
+	/* Only un-id'ed items */
+	item_tester_hook = item_tester_unknown_name;
+
+	/* Get an item */
+	q = "Identify which item name? ";
+	s = "You have nothing to identify.";
+	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return (FALSE);
+
+	/* Get the item (in the pack) */
+	if (item >= 0)
+	{
+		o_ptr = &inventory[item];
+	}
+
+	/* Get the item (on the floor) */
+	else
+	{
+		o_ptr = &o_list[0 - item];
+	}
+
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, q, s, o_ptr)) return (TRUE);
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+
+	/* Identify it fully */
+	object_aware(o_ptr);
+	o_ptr->ident |= (IDENT_NAME);
+
+	/* Combine / Reorder the pack (later) */
+	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
+
+	/* Window stuff */
+	p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
+
+	/* Description */
+	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
+
+	/* Describe */
+	if (item >= INVEN_WIELD)
+	{
+		msg_format("%^s: %s (%c).",
+			   describe_use(item), o_name, index_to_label(item));
+	}
+	else if (item >= 0)
+	{
+		msg_format("In your pack: %s (%c).",
+			   o_name, index_to_label(item));
+	}
+	else
+	{
+		msg_format("On the ground: %s.",
+			   o_name);
+	}
+	/* Something happened */
+	return (TRUE);
+}
+
 
 /*
  * Identify the bonus/charges of an object in the inventory (or on the floor)
@@ -7024,8 +7116,6 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 		}
 	}
 
-	
-
 	if (s_ptr->flags3 & (SF3_DEC_FOOD))
 	{
 		(void)set_food(PY_FOOD_STARVE - 1);
@@ -7359,6 +7449,34 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				break;
 			}
 			
+			case SPELL_IDENT_NAME:
+			{
+				if ((!ident_spell_name()) && (*cancel)) return (TRUE);
+				*cancel = FALSE;
+				obvious = TRUE;
+				break;				
+			}
+
+			case SPELL_DETECT_MIND:
+			{
+				/* Spell was processed previously */
+				break;
+			}
+
+			case SPELL_WONDER:
+			case SPELL_RELEASE_CURSE:
+			case SPELL_CONCENTRATE_LITE:
+			case SPELL_CONCENTRATE_LIFE:
+			case SPELL_CONCENTRATE_WATER:
+			case SPELL_SET_RETURN:
+			case SPELL_SET_OR_MAKE_RETURN:
+			case SPELL_BLOOD_BOND:
+			case SPELL_MINDS_EYE:
+			{
+				msg_print("Oops. Spell not yet implemented.");
+				break;
+			}
+						
 			default:
 			{
 				wield_spell(s_ptr->type,s_ptr->param,lasts, level, 0);
@@ -7484,6 +7602,7 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 
 	/* Note the order is important -- because of the impact of blinding a character on their subsequent
 		ability to see spell blows that affect themselves */
+	/*if (preprocess_spell_blows(spell, level, cancel, known, TRUE)) obvious = TRUE;*/
 	if (process_spell_blows(who, what, spell, level, cancel)) obvious = TRUE;
 	if (process_spell_flags(spell, level, cancel, known)) obvious = TRUE;
 	if (process_spell_types(who, spell, level, cancel)) obvious = TRUE;

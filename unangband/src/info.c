@@ -573,7 +573,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="the number of charges";
 	if (id_flags & (SF1_IDENT_VALUE)) vp[vn++]="the value";
 	if (id_flags & (SF1_IDENT_RUNES)) vp[vn++]="the types of runes";
-	if ((id_flags & (SF1_IDENT)) || (s_ptr->type == SPELL_IDENT_TVAL)) vp[vn++]="the kind, ego-item and artifact names";
+	if ((id_flags & (SF1_IDENT)) || (s_ptr->type == SPELL_IDENT_TVAL) || (s_ptr->type == SPELL_IDENT_NAME)) vp[vn++]="the kind, ego-item and artifact names";
 	if ((id_flags & (SF1_IDENT)) || (s_ptr->type == SPELL_IDENT_TVAL)) vp[vn++]="all bonuses";
 	if (id_flags & (SF1_IDENT_RUMOR)) vp[vn++]="some hidden powers";
 	if (id_flags & (SF1_IDENT_FULLY)) vp[vn++]="all hidden powers";
@@ -842,7 +842,6 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->type ==SPELL_INVEN_HANDS) vp[vn++]="creates magical gloves";
 	if (s_ptr->type ==SPELL_INVEN_FEET) vp[vn++]="creates magical boots";
 
-
 	/* Describe timed effects */
 	if (vn)
 	{
@@ -1103,7 +1102,15 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags1 & (SF1_DARK_ROOM)) vp[vn++] = "plunges the room you are in into darkness";
 	if (s_ptr->flags1 & (SF1_FORGET)) vp[vn++] = "erases the knowledge of the entire level from your mind";
 	if (s_ptr->flags1 & (SF1_SELF_KNOW)) vp[vn++] = "reveals all knowledge of yourself";
-	if (s_ptr->type == SPELL_REFUEL) vp[vn++] = format("refuels a torch by %d turns of light",s_ptr->param);
+	if (s_ptr->type == SPELL_CONCENTRATE_LITE) vp[vn++] = "concentrates light around you";
+	if (s_ptr->type == SPELL_CONCENTRATE_LIFE) vp[vn++] = "concentrates life around you";
+	if (s_ptr->type == SPELL_CONCENTRATE_WATER) vp[vn++] = "concentrates water around you";
+	if (s_ptr->type == SPELL_RELEASE_CURSE) vp[vn++] = "releases a curse from an item";
+	if (s_ptr->type == SPELL_WONDER) vp[vn++] = "creates random magics";
+	if (s_ptr->type == SPELL_SET_RETURN) vp[vn++] = "marks this grid as a destination for later return";
+	if (s_ptr->type == SPELL_SET_OR_MAKE_RETURN) vp[vn++] = "marks this grid as a destination for later return or returns you to a marked grid";
+	if (s_ptr->type == SPELL_BLOOD_BOND) vp[vn++] = "bonds you with a living creature to share damage and healing";
+	if (s_ptr->type == SPELL_MINDS_EYE) vp[vn++] = "bonds you with a mind to allow you to see through its eyes";
 
 	/* Describe miscellaneous effects */
 	if (vn)
@@ -1414,6 +1421,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_VAMP_DRAIN:	q = "drain"; s = "health from"; break;
 			case GF_MANA_DRAIN:	q = "drain"; s = "mana from"; break;
 			case GF_SNUFF:		q = "snuff"; s = "the life from"; u = "with less than"; break;
+			case GF_RAGE:		q = "enrage"; break;
 			case GF_MENTAL:		q = "blast"; u = "with mental energy"; break;
 
 			/* Hack -- handle features */
@@ -1594,6 +1602,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_BIND_DRAGON:
 			case GF_BIND_UNDEAD:
 			case GF_BIND_FAMILIAR:
+			case GF_RAGE:
 								text_out("power"); break;
 			case GF_SNUFF: text_out("maximum ");
 			case GF_HEAL: text_out("hit points"); break;
@@ -1788,6 +1797,7 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 			case GF_BIND_DRAGON:
 			case GF_BIND_UNDEAD:
 			case GF_BIND_FAMILIAR:
+			case GF_RAGE:
 								q = "pow"; break;
 			case GF_SNUFF: q = "max hp"; break;
 			case GF_HEAL: q = "heal"; break;

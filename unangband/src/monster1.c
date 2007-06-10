@@ -350,7 +350,7 @@ static void describe_monster_spells(int r_idx, const monster_lore *l_ptr)
 	if (l_ptr->flags6 & RF6_MIND_BLAST)  vp[vn++] = "cause mind blasting";
 	if (l_ptr->flags6 & RF6_WOUND)       vp[vn++] = "cause wounds";
 	if (l_ptr->flags6 & RF6_BLESS)       vp[vn++] = "become heroic";
-	if (l_ptr->flags6 & RF6_BESERK)      vp[vn++] = "become beserk";
+	if (l_ptr->flags6 & RF6_BERSERK)      vp[vn++] = "become beserk";
 	if (l_ptr->flags6 & RF6_SHIELD)      vp[vn++] = "create a shield";
 	if (l_ptr->flags6 & RF6_OPPOSE_ELEM) vp[vn++] = "become resistant to the elements";
 	if (l_ptr->flags6 & RF6_HUNGER)      vp[vn++] = "cause hunger";
@@ -894,6 +894,9 @@ static void describe_monster_attack(int r_idx, const monster_lore *l_ptr, bool r
 			case GF_BIND_FAMILIAR:	q = "bind a familiar to you"; break;
 			case GF_VAMP_DRAIN:	q = "drain health"; break;
 			case GF_MANA_DRAIN:	q = "drain mana"; break;
+			case GF_SNUFF:		q = "snuff the life from"; break;
+			case GF_RAGE:		q = "enrage"; break;
+			case GF_MENTAL:		q = "blast with mental energy"; break;
 		}
 
 

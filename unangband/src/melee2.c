@@ -812,8 +812,8 @@ static void remove_useless_spells(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, u3
 	/* Don't Bless if Blessed */
 	if (m_ptr->bless > 10) f6 &= ~(RF6_BLESS);
 
-	/* Don't Beserk if Beserk */
-	if (m_ptr->hasted > 10) f6 &= ~(RF6_BESERK);
+	/* Don't Berserk if Beserk */
+	if (m_ptr->berserk > 10) f6 &= ~(RF6_BERSERK);
 
 	/* Don't Shield if Shielded */
 	if (m_ptr->shield > 10) f6 &= ~(RF6_SHIELD);
@@ -4757,9 +4757,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			}
 		}
 
-		/* Hack --- smart monsters try to disarm traps */
+		/* Hack --- smart monsters try to disarm traps, unless berserk */
 		else if ((f_info[feat].flags1 & (FF1_TRAP)) &&
-			(r_ptr->flags2 & (RF2_SMART)))
+			(r_ptr->flags2 & (RF2_SMART)) && !(m_ptr->berserk))
 		{
 			int power, chance;
 

@@ -5232,6 +5232,9 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 	/* Heal amount (amount to blind) */
 	int do_blind = 0;
 
+	/* Heal amount (amount to enrage) */
+	int do_rage = 0;
+
 	/* Destruction of inventory? */
 	inven_func do_inven_destroy = NULL;
 
@@ -7701,6 +7704,49 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Enrage Monster (Use "dam" as "power") */
+		case GF_RAGE:
+		{
+			/* Cannot be slowed */
+			if (r_ptr->flags3 & (RF3_NONLIVING))
+			{
+				if ((seen) && !(l_ptr->flags3 & (RF3_NONLIVING)))
+				{
+					note = " is unaffected.";
+					l_ptr->flags3 |= (RF3_NONLIVING);
+				}
+
+				obvious = FALSE;
+			}
+
+			/* Powerful monsters can resist */
+			else if (monster_save(m_ptr, dam, &near))
+			{
+				if ((near) && (seen))
+				{
+					note = " loses its temper.";
+					do_rage = 1;
+				}
+				else
+				{
+					if (seen) note = " is unaffected!";
+
+					obvious = FALSE;
+				}
+			}
+
+			/* Normal monsters are blinded */
+			else
+			{
+				/* Blind */
+				do_rage = 50 + rand_int(50);
+			}
+
+			/* No "real" damage */
+			dam = 0;
+			break;
+		}
+		
 		/* Monster forgets things */
 		case GF_FORGET:
 		{
@@ -8075,7 +8121,6 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 			/* Apply stun */
 			m_ptr->stunned = MIN(tmp, 200);
-
 		}
 
 		/* Handle "blindness" */
@@ -8093,6 +8138,44 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			}
 		}
 
+		/* Handle "rage" */
+		if (do_rage)
+		{
+			/* Obvious */
+			if (seen) obvious = TRUE;
+
+			/* Get confused */
+			if (m_ptr->stunned)
+			{
+				note = " is more enraged.";
+				tmp = m_ptr->berserk + (do_rage / (r_ptr->level / 10 + 1));
+			}
+			else
+			{
+				if (do_rage > 1) note = " is enraged.";
+				tmp = do_rage;
+			}
+
+			/* Apply stun */
+			m_ptr->berserk = MIN(tmp, 200);
+			
+			/* Target the player */
+			if (who <= SOURCE_PLAYER_START)
+			{
+				m_ptr->ty = p_ptr->py;
+				m_ptr->tx = p_ptr->px;
+				m_ptr->mflag &= ~(MFLAG_ALLY);
+			}
+			/* Target a monster */
+			else if (who > SOURCE_MONSTER_START)
+			{
+				m_ptr->ty = m_list[who].fy;
+				m_ptr->tx = m_list[who].fy;
+				m_ptr->mflag |= (MFLAG_IGNORE);				
+			}
+
+		}
+		
 		/* Handle cuts from player or allies only */
 		if (do_cuts && ((who <= SOURCE_PLAYER_START) || ((who > 0) && (m_list[who].mflag & (MFLAG_ALLY)))) && 
 			 !(r_ptr->flags9 & (RF9_NO_CUTS)))
