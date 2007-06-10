@@ -36,8 +36,8 @@
             <a href="http://tech.groups.yahoo.com/group/unangband/">Mailing list</a><br>
             <a href="http://developer.berlios.de/projects/unangband/">Project page</a><br>
             <a href="http://developer.berlios.de/svn/?group_id=331">Browse SVN</a><br>
-            <a href="http://developer.berlios.de/svn/?group_id=331">Change log</a><br>
-            <a href="http://developer.berlios.de/svn/?group_id=331">To do list</a><br>
+            <a href="http://svn.berlios.de/wsvn/unangband/trunk/unangband/changes.txt?op=file&rev=0&sc=0">Change log</a><br>
+            <a href="http://svn.berlios.de/wsvn/unangband/trunk/unangband/todo.txt?op=file&rev=0&sc=0">To do list</a><br>
 
             <br><b>Downloads</b><br>
             <a href="http://developer.berlios.de/project/showfiles.php?group_id=331">Latest releases</a><br>
