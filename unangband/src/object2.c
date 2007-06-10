@@ -8513,6 +8513,70 @@ void reorder_pack(void)
 
 
 /*
+ * Sorting hook -- Comp function -- see below
+ *
+ * We use "u" to point to array of monster indexes,
+ * and "v" to select the type of sorting to perform on "u".
+ */
+bool book_sort_comp_hook(vptr u, vptr v, int a, int b)
+{
+	u16b *who = (u16b*)(u);
+
+	int w1 = who[a];
+	int w2 = who[b];
+
+	int z1, z2;
+
+	spell_type *s1_ptr = &s_info[w1];
+	spell_type *s2_ptr = &s_info[w2];
+
+	(void)v;
+
+	/* Extract spell level */
+	z1 = s1_ptr->cast[0].level;
+	z2 = s2_ptr->cast[0].level;
+
+	/* Compare spell levels */
+	if (z1 < z2) return (TRUE);
+	if (z1 > z2) return (FALSE);
+
+	/* Extract spell mana */
+	z1 = s1_ptr->cast[0].mana;
+	z2 = s2_ptr->cast[0].mana;
+
+	/* Compare spell mana */
+	if (z1 < z2) return (TRUE);
+	if (z1 > z2) return (FALSE);
+	
+	/* Alphabetical sort */
+	return (my_stricmp(s_name + s1_ptr->name, s_name + s2_ptr->name) <= 0);
+}
+
+
+
+/*
+ * Sorting hook -- Swap function -- see below
+ *
+ * We use "u" to point to array of monster indexes,
+ * and "v" to select the type of sorting to perform.
+ */
+void book_sort_swap_hook(vptr u, vptr v, int a, int b)
+{
+	u16b *who = (u16b*)(u);
+
+	u16b holder;
+
+	(void)v;
+
+	/* Swap */
+	holder = who[a];
+	who[a] = who[b];
+	who[b] = holder;
+}
+
+
+
+/*
  * Fills a book with spells (in order). Note hack for runestones
  * in order to fit them all in is to use book as a hashtable.
  */
@@ -8521,6 +8585,8 @@ void fill_book(const object_type *o_ptr, s16b *book, int *num)
 	int i,ii;
 
 	spell_type *s_ptr;
+
+	u16b why = 0;
 
 	/* No spells */
 	*num = 0;
@@ -8582,6 +8648,13 @@ void fill_book(const object_type *o_ptr, s16b *book, int *num)
 			}
 		}
 	}
+	
+	/* Sort book contents */
+	ang_sort_comp = book_sort_comp_hook;
+	ang_sort_swap = book_sort_swap_hook;
+
+	/* Sort the array */
+	ang_sort(book, &why, *num);
 }
 
 /*

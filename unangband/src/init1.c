@@ -7916,6 +7916,7 @@ errr eval_f_power(header *head)
 }
 
 
+
 #ifdef ALLOW_TEMPLATES_OUTPUT
 
 /*
