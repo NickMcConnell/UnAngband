@@ -5113,6 +5113,10 @@ errr parse_s_info(char *buf, header *head)
 	else if (buf[0] == 'A')
 	{
 		int tval,sval,slot;
+		
+		bool collision = FALSE;
+		bool last_slot = 0;
+		int j, k;
 
 		/* There better be a current s_ptr */
 		if (!s_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -5124,7 +5128,37 @@ errr parse_s_info(char *buf, header *head)
 		if (i==MAX_SPELL_APPEARS) return (PARSE_ERROR_GENERIC);
 
 		/* Scan for the values */
-		if (3 != sscanf(buf+2, "%d:%d:%d",&tval,&sval,&slot)) return (PARSE_ERROR_GENERIC);
+		if (3 != sscanf(buf+2, "%d:%d:%d",&tval,&sval,&slot)) return (PARSE_ERROR_GENERIC);		
+
+		/* Hack -- check for next free slot in book */
+		if (tval != TV_RUNESTONE) for (j = 0; j < error_idx; j++)
+		{
+			/* Point at the "info" */
+			spell_type *s2_ptr = (spell_type*)head->info_ptr + j;
+			
+			/* Find the next empty appears slot (if any) */
+			for (k = 0; k < MAX_SPELL_APPEARS; k++)
+			{
+				if (!s2_ptr->appears[k].tval) break;
+				
+				/* Check if same book */
+				if ((s2_ptr->appears[k].tval == tval) &&
+					(s2_ptr->appears[k].sval == sval))
+				{
+					if (last_slot < s2_ptr->appears[k].slot) last_slot = s2_ptr->appears[k].slot;
+					
+					if (s2_ptr->appears[k].slot == slot) collision = TRUE;
+				}
+			}
+		}
+		
+		/* If collision, get the next slot */
+		if /*(collision) */ (tval != TV_RUNESTONE)
+		{
+			/*return (PARSE_ERROR_GENERIC);*/
+
+			slot = last_slot + 1;
+		}
 
 		/* Extract the damage dice and sides */
 		s_ptr->appears[i].tval = tval;
