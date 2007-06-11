@@ -3851,6 +3851,16 @@ int store_init(int feat)
 	store_type *st_ptr;
 	owner_type *ot_ptr;
 
+	/* Paranoia */
+	if (total_store_count >= max_store_count)
+	{
+		/* Oops */
+		msg_print("BUG: Maximum number of stores reached.");
+		
+		/* Hack -- access home instead */
+		return (0);
+	}
+
 	/* Make a new store */
 	C_MAKE(st_ptr, 1, store_type);
 

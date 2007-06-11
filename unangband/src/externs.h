@@ -240,6 +240,7 @@ extern object_lore *e_list;
 extern object_info *x_list;
 extern quest_type *q_list;
 extern s16b total_store_count;
+extern s16b max_store_count;
 extern store_type_ptr *store;
 extern object_type *inventory;
 extern s16b bag_contents[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL];
