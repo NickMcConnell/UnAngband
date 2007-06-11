@@ -1463,19 +1463,82 @@ int value_check_aux5(const object_type *o_ptr)
 	return (INSCRIP_AVERAGE);
 }
 
+/*
+ * Returns true if an item detects as 'magic'
+ */
+static bool item_tester_magic(const object_type *o_ptr)
+{
+	/* Exclude cursed or broken */
+	if (cursed_p(o_ptr) || broken_p(o_ptr)) return (FALSE);
+	
+	/* Include artifacts and ego items */
+	if (artifact_p(o_ptr) || ego_item_p(o_ptr)) return (TRUE);
+	
+	/* Include magic items */
+	if ((o_ptr->xtra1) && (o_ptr->xtra1 < OBJECT_XTRA_MIN_COATS)) return (TRUE);
+	
+	/* Artifacts, misc magic items, or enchanted wearables */
+	switch (o_ptr->tval)
+	{
+		case TV_AMULET:
+		case TV_RING:
+		case TV_STAFF:
+		case TV_WAND:
+		case TV_ROD:
+		case TV_SCROLL:
+		case TV_POTION:
+		case TV_MAGIC_BOOK:
+		case TV_PRAYER_BOOK:
+		case TV_SONG_BOOK:
+		case TV_RUNESTONE:
+		case TV_STUDY:
+			return (TRUE);
+	}
+	
+	/* Positive bonuses */		
+	if ((o_ptr->to_a > 0) || (o_ptr->to_h + o_ptr->to_d > 0)) return (TRUE);
+	
+	return (FALSE);
+}
 
 /*
- * Detect all "magic" objects on the current panel.
+ * Returns true if an item detects as 'powerful'
+ */
+static bool item_tester_power(const object_type *o_ptr)
+{
+	/* Include cursed or broken */
+	if (cursed_p(o_ptr) || broken_p(o_ptr)) return (TRUE);
+	
+	/* Otherwise magic */
+	return (item_tester_magic(o_ptr));
+}
+
+
+/*
+ * Returns true if an item detects as 'cursed'
+ */
+static bool item_tester_cursed(const object_type *o_ptr)
+{
+	/* Exclude cursed or broken */
+	if (cursed_p(o_ptr) || broken_p(o_ptr)) return (TRUE);
+
+	return (FALSE);
+}
+
+
+/*
+ * Detect all objects on the current panel of a particular 'type'.
  *
- * This will light up all spaces with "magic" items, including artifacts,
- * ego-items, potions, scrolls, books, rods, wands, staves, amulets, rings,
- * and "enchanted" items of the "good" variety.
+ * This will light up all spaces with items matching a tester function
+ * as well as senses all objects in the inventory using a particular
+ * type of sensing function.
+ * 
+ * If ignore_feeling is set, it'll treat a feeling of that value
+ * as not inducing detection.
  *
  * It can probably be argued that this function is now too powerful.
- *
- * Now also senses all magical objects in the inventory.
  */
-bool detect_objects_magic(void)
+static bool detect_objects_type(bool (*detect_item_hook)(const object_type *o_ptr), int sense_type, int ignore_feeling)
 {
 	int i, y, x, tv;
 
@@ -1508,13 +1571,7 @@ bool detect_objects_magic(void)
 		tv = o_ptr->tval;
 
 		/* Artifacts, misc magic items, or enchanted wearables */
-		if (!(cursed_p(o_ptr)) && !(broken_p(o_ptr)) && (artifact_p(o_ptr) || ego_item_p(o_ptr) ||
-		    ((o_ptr->xtra1) && (o_ptr->xtra1 < OBJECT_XTRA_MIN_COATS)) ||
-		    (tv == TV_AMULET) || (tv == TV_RING) ||
-		    (tv == TV_STAFF) || (tv == TV_WAND) || (tv == TV_ROD) ||
-		    (tv == TV_SCROLL) || (tv == TV_POTION) ||
-		    (tv == TV_MAGIC_BOOK) || (tv == TV_PRAYER_BOOK) ||
-		    (o_ptr->to_a > 0) || (o_ptr->to_h + o_ptr->to_d > 0)))
+		if (!(detect_item_hook) || (detect_item_hook)(o_ptr))
 		{
 			/* Memorize the item */
 			if (!auto_pickup_ignore(o_ptr)) o_ptr->ident |= (IDENT_MARKED);
@@ -1532,28 +1589,32 @@ bool detect_objects_magic(void)
 			detect = TRUE;
 		}
 
-		/* Get the inscription */
-		feel = sense_magic(o_ptr, 3, TRUE);
+		/* Sense if necessary */
+		if (sense_type)
+		{
+			/* Get the inscription */
+			feel = sense_magic(o_ptr, sense_type, TRUE);
 
-		/* Sense something */
-		if (!feel) continue;
+			/* Sense something */
+			if (!feel) continue;
 
-		/* Sense the object */
-		o_ptr->feeling = feel;
+			/* Sense the object */
+			o_ptr->feeling = feel;
 
-		/* The object has been "sensed" */
-		o_ptr->ident |= (IDENT_SENSE);
+			/* The object has been "sensed" */
+			o_ptr->ident |= (IDENT_SENSE);
+		}
 	}
 
 	/* Sense inventory */
-	for (i = 0; i < INVEN_TOTAL; i++)
+	if (sense_type) for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		int feel = 0;
 
 		object_type *o_ptr = &inventory[i];
 
 		/* Get the inscription */
-		feel = sense_magic(o_ptr, 3, TRUE);
+		feel = sense_magic(o_ptr, sense_type, TRUE);
 
 		/* Sense something */
 		if (!feel) continue;
@@ -1562,7 +1623,7 @@ bool detect_objects_magic(void)
 		if (o_ptr->feeling == feel) continue;
 
 		/* Detect */
-		if (feel != INSCRIP_NONMAGICAL) detect = TRUE;
+		if (feel != ignore_feeling) detect = TRUE;
 
 		/* Sense the object */
 		o_ptr->feeling = feel;
@@ -1581,231 +1642,6 @@ bool detect_objects_magic(void)
 	return (detect);
 }
 
-
-
-/*
- * Detect all "cursed" objects on the current panel.
- *
- * This will light up all spaces with "cursed" items, including artifacts,
- * ego-items, and "enchanted" items of the cursed or broken variety.
- *
- * Should probably marked objects detected as cursed when appropriate.
- *
- * Now also senses all cursed objects in the inventory.
- */
-bool detect_objects_cursed(void)
-{
-	int i, y, x;
-
-	bool detect = FALSE;
-
-	/* Scan all objects */
-	for (i = 1; i < o_max; i++)
-	{
-		int feel;
-
-		object_type *o_ptr = &o_list[i];
-
-		/* Skip dead objects */
-		if (!o_ptr->k_idx) continue;
-
-		/* Skip held objects */
-		if (o_ptr->held_m_idx) continue;
-
-		/* Skip stored objects */
-		if (o_ptr->ident & (IDENT_STORE)) continue;
-
-		/* Location */
-		y = o_ptr->iy;
-		x = o_ptr->ix;
-
-		/* Only detect nearby objects */
-		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
-
-		/* Cursed items */
-		if (cursed_p(o_ptr) || broken_p(o_ptr))
-		{
-			/* Memorize the item */
-			if (!auto_pickup_ignore(o_ptr)) o_ptr->ident |= (IDENT_MARKED);
-
-			/* Hack -- have seen object */
-			if (!(k_info[o_ptr->k_idx].flavor)) k_info[o_ptr->k_idx].aware = TRUE;
-
-			/* XXX XXX - Mark monster objects as "seen" */
-			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights)) l_list[o_ptr->name3].sights++;
-
-			/* Redraw */
-			lite_spot(y, x);
-
-			/* Detect */
-			detect = TRUE;
-		}
-
-		/* Get the inscription */
-		feel = sense_magic(o_ptr, 4, TRUE);
-
-		/* Sense something */
-		if (!feel) continue;
-
-		/* Sense the object */
-		o_ptr->feeling = feel;
-
-		/* The object has been "sensed" */
-		o_ptr->ident |= (IDENT_SENSE);
-	}
-
-	/* Sense inventory */
-	for (i = 0; i < INVEN_TOTAL; i++)
-	{
-		int feel;
-
-		object_type *o_ptr = &inventory[i];
-
-		/* Get the inscription */
-		feel = sense_magic(o_ptr, 4, TRUE);
-
-		/* Sense something? */
-		if (!feel) continue;
-
-		/* Any different */
-		if (o_ptr->feeling == feel) continue;
-
-		/* Detect */
-		if (feel != INSCRIP_UNCURSED) detect = TRUE;
-
-		/* Sense the object */
-		o_ptr->feeling = feel;
-
-		/* The object has been "sensed" */
-		o_ptr->ident |= (IDENT_SENSE);
-
-		/* Combine / Reorder the pack (later) */
-		p_ptr->notice |= (PN_COMBINE | PN_REORDER);
-
-		/* Window stuff */
-		p_ptr->window |= (PW_INVEN | PW_EQUIP);
-	}
-
-	/* Return result */
-	return (detect);
-}
-
-
-
-/*
- * Detect all "powerful" objects on the current panel.
- *
- * This will light up all spaces with "magic" items, including artifacts,
- * ego-items, potions, scrolls, books, rods, wands, staves, amulets, rings,
- * and "enchanted" items of any time.
- *
- * Now also senses all powerful objects in the inventory.
- */
-bool detect_objects_power(void)
-{
-	int i, y, x, tv;
-
-	bool detect = FALSE;
-
-	/* Scan all objects */
-	for (i = 1; i < o_max; i++)
-	{
-		int feel = 0;
-
-		object_type *o_ptr = &o_list[i];
-
-		/* Skip dead objects */
-		if (!o_ptr->k_idx) continue;
-
-		/* Skip held objects */
-		if (o_ptr->held_m_idx) continue;
-
-		/* Skip stored objects */
-		if (o_ptr->ident & (IDENT_STORE)) continue;
-
-		/* Location */
-		y = o_ptr->iy;
-		x = o_ptr->ix;
-
-		/* Only detect nearby objects */
-		if (distance(p_ptr->py, p_ptr->px, y, x) > 2 * MAX_SIGHT) continue;
-
-		/* Examine the tval */
-		tv = o_ptr->tval;
-
-		/* Artifacts, misc magic items, or enchanted wearables */
-		if (artifact_p(o_ptr) || ego_item_p(o_ptr) ||
-		    ((o_ptr->xtra1) && (o_ptr->xtra1 < OBJECT_XTRA_MIN_COATS)) ||
-		    (tv == TV_AMULET) || (tv == TV_RING) ||
-		    (tv == TV_STAFF) || (tv == TV_WAND) || (tv == TV_ROD) ||
-		    (tv == TV_SCROLL) || (tv == TV_POTION) ||
-		    (tv == TV_MAGIC_BOOK) || (tv == TV_PRAYER_BOOK) ||
-		    (o_ptr->to_a > 0) || (o_ptr->to_h + o_ptr->to_d > 0))
-		{
-			/* Memorize the item */
-			if (!auto_pickup_ignore(o_ptr)) o_ptr->ident |= (IDENT_MARKED);
-
-			/* Hack -- have seen object */
-			if (!(k_info[o_ptr->k_idx].flavor)) k_info[o_ptr->k_idx].aware = TRUE;
-
-			/* XXX XXX - Mark monster objects as "seen" */
-			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights)) l_list[o_ptr->name3].sights++;
-
-			/* Redraw */
-			lite_spot(y, x);
-
-			/* Detect */
-			detect = TRUE;
-		}
-
-		/* Get the inscription */
-		feel = sense_magic(o_ptr, 5, TRUE);
-
-		/* Sense something */
-		if (!feel) continue;
-
-		/* Sense the object */
-		o_ptr->feeling = feel;
-
-		/* The object has been "sensed" */
-		o_ptr->ident |= (IDENT_SENSE);
-	}
-
-	/* Sense inventory */
-	for (i = 0; i < INVEN_TOTAL; i++)
-	{
-		int feel = 0;
-
-		object_type *o_ptr = &inventory[i];
-
-		/* Get the inscription */
-		feel = sense_magic(o_ptr, 5, TRUE);
-
-		/* Sense something */
-		if (!feel) continue;
-
-		/* Any different */
-		if (o_ptr->feeling == feel) continue;
-
-		/* Detect */
-		if (feel != INSCRIP_AVERAGE) detect = TRUE;
-
-		/* Sense the object */
-		o_ptr->feeling = feel;
-
-		/* The object has been "sensed" */
-		o_ptr->ident |= (IDENT_SENSE);
-
-		/* Combine / Reorder the pack (later) */
-		p_ptr->notice |= (PN_COMBINE | PN_REORDER);
-
-		/* Window stuff */
-		p_ptr->window |= (PW_INVEN | PW_EQUIP);
-	}
-
-	/* Return result */
-	return (detect);
-}
 
 
 /*
@@ -6659,8 +6495,8 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 	if ((s_ptr->flags1 & (SF1_DETECT_STAIRS)) && (detect_feat_flags(FF1_STAIRS, 0x0L, 0x0L, 2 * MAX_SIGHT, known))) vp[vn++] = "stairs";
 
 	/* Process the flags -- basic item detection */
-	if ((s_ptr->flags1 & (SF1_DETECT_CURSE)) && (detect_objects_cursed())) vp[vn++] = "cursed items";
-	if ((s_ptr->flags1 & (SF1_DETECT_POWER)) && (detect_objects_power())) vp[vn++] = "powerful items";
+	if ((s_ptr->flags1 & (SF1_DETECT_CURSE)) && (detect_objects_type(item_tester_cursed, 4, INSCRIP_UNCURSED))) vp[vn++] = "cursed items";
+	if ((s_ptr->flags1 & (SF1_DETECT_POWER)) && (detect_objects_type(item_tester_power, 5, INSCRIP_AVERAGE))) vp[vn++] = "powerful items";
 
 	/* Process the flags -- basic monster detection */
 	if ((s_ptr->flags1 & (SF1_DETECT_EVIL)) && (detect_monsters(monster_tester_hook_evil, known))) vp[vn++] = "evil";
@@ -6693,8 +6529,8 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 	/* Process the flags -- detect magic */
 	if (s_ptr->flags1 & (SF1_DETECT_MAGIC))
 	{
-		if (detect_objects_magic()) vp[vn++] = "magic items";
-                if (detect_monsters(monster_tester_hook_magic, known)) vp[vn++] = "magical monsters";
+		if (detect_objects_type(item_tester_magic, 3, INSCRIP_NONMAGICAL)) vp[vn++] = "magic items";
+		if (detect_monsters(monster_tester_hook_magic, known)) vp[vn++] = "magical monsters";
 	}
 
 	/* Process the flags -- detect life */

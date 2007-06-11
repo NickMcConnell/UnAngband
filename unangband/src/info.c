@@ -2966,7 +2966,7 @@ const cptr inscrip_info[] =
 		"It is a cursed artifact of some kind, that you may be able to enchant back to full strength.  ",
 		"It is a cursed ego item of some kind.  ",
 		"It is cursed, with negative effects if you attempt to use it.  ",
-		"It has been blasted by powerful magic.  ",
+		"It is broken, having been blasted by powerful magic.  ",
 		"It needs recharging.  ",
 		"It is of good quality, but with no additional powers.  ",
 		"It is a useful ego item.  ",
