@@ -9569,7 +9569,6 @@ K:SECRET:698
 K:STREAMER:113
 F:TUNNEL | CAN_PASS | CAN_OOZE | CAN_DIG | SECRET | GET_FEAT | STREAMER
 F:REMEMBER | HURT_ROCK | CAN_CLIMB | POWER_10 | OUTSIDE | NOTICE
-F:LAKE
 D:The rubble blocks your way!
 
 # known impassable pile of rubble
