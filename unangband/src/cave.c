@@ -5022,6 +5022,13 @@ static void cave_set_feat_aux(int y, int x, int feat)
 		msg_format("Error: Setting invalid feat %d at (%d, %d).", feat, y, x);
 		return;
 	}
+	
+	/* Paranoia */
+	if (((f_info[feat].flags1 & (FF1_ENTER)) != 0) && ((level_flag & (LF1_TOWN)) == 0))
+	{
+		msg_format("BUG: Setting store %d at (%d, %d) outside of a town level.", feat, y, x);
+		return;	
+	}
 
 	/* Really set the feature */
 	cave_feat[y][x] = feat;
