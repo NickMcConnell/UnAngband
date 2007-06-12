@@ -1560,7 +1560,7 @@ static bool get_player_school(void)
 	}
 
 	/* No spell book style */
-	if (!t) return (FALSE);
+	if (!t) return (TRUE);
 
 	/* Count schools */
 	for (i = 0;i<z_info->k_max;i++)
@@ -1573,7 +1573,7 @@ static bool get_player_school(void)
 		if (k_ptr->tval == t) schoolc++;
 	}
 
-	if (!schoolc) return (FALSE);
+	if (!schoolc) return (TRUE);
 
 	C_MAKE(schools, schoolc, birth_menu);
 	C_MAKE(school_list, schoolc, int);
