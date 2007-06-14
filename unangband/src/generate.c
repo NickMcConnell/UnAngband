@@ -9894,8 +9894,8 @@ static void town_gen_hack(void)
 		y = rand_range(3, TOWN_HGT - 4);
 		x = rand_range(3, TOWN_WID - 4);
 
-		/* Require a "naked" floor grid */
-		if (cave_naked_bold(y, x)) break;
+		/* Require a "starting" floor grid */
+		if (cave_start_bold(y, x)) break;
 	}
 
 	/* Clear previous contents, add dungeon entrance */
