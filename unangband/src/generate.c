@@ -8624,7 +8624,7 @@ static void place_tower()
 			/* Initialise room description */
 			room_info[dun->cent_n].type = ROOM_TOWER;
 
-			/* Will be set to ROOM_ICKY at end of generation */
+			/* Non-surface levels will be set to ROOM_ICKY at end of generation */
 			room_info[dun->cent_n].flags = (level_flag & (LF1_SURFACE)) != 0 ? ROOM_ICKY : 0;
 
 			room_info[dun->cent_n].tunnel = 0;
@@ -8641,12 +8641,11 @@ static void place_tower()
 		player_place(y, x);
 	}
 
-	/* Hack -- always have upstairs */
-	else if ((level_flag & LF1_SURFACE) && (level_flag & LF1_LESS))
+	/* Hack -- always have upstairs in surface of tower */
+	if ((level_flag & LF1_SURFACE) && (p_ptr->depth < max_depth(p_ptr->dungeon)))
 	{
 		feat_near(FEAT_LESS, y, x);
 	}
-
 }
 
 
@@ -9101,8 +9100,9 @@ static bool new_player_spot(void)
 			y = rand_int(DUNGEON_HGT);
 			x = rand_int(DUNGEON_WID);
 
-			/* Mega hack -- try to place extra tunnel */
-			if (!(tunnel) && (i == 400))
+			/* Mega hack -- try to place extra tunnel, except above surface in towers */
+			if ((((level_flag & (LF1_TOWER)) == 0) || ((level_flag & (LF1_SURFACE)) != 0)) &&
+				 (!(tunnel) && (i == 400)))
 			{
 				if (build_type0(0, 0))
 				{
@@ -9481,7 +9481,7 @@ static bool cave_gen(void)
 
 	/* Hack -- Build terrain */
 	/* XXX Get rid of this later */
-	if (zone->fill) for (y = 0; y < DUNGEON_HGT; y++)
+	if ((zone->fill) && (base != FEAT_CHASM)) for (y = 0; y < DUNGEON_HGT; y++)
 	{
 		for (x = 0; x < DUNGEON_WID; x++)
 		{
