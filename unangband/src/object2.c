@@ -8636,6 +8636,46 @@ void book_sort_swap_hook(vptr u, vptr v, int a, int b)
 }
 
 
+/*
+ * Does the spell match the player's style
+ */
+bool spell_match_style(int spell)
+{
+	int i;
+	
+	/* Check player styles */
+	if ((p_ptr->pstyle != WS_SONG_BOOK) && (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK)) return (FALSE);
+	
+	/* Check spells */
+	for (i = 0; i < MAX_SPELL_APPEARS; i++)
+	{
+		int tval = s_info[spell].appears[i].tval;
+		int sval = s_info[spell].appears[i].sval;
+		
+		/* Not a book */
+		if ((tval != TV_SONG_BOOK) && (tval != TV_MAGIC_BOOK) && (tval != TV_PRAYER_BOOK)) continue;
+		
+		/* Book does not match player style */
+		if ((tval == TV_SONG_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK)) continue;
+		if ((tval == TV_MAGIC_BOOK) && (p_ptr->pstyle != WS_MAGIC_BOOK)) continue;
+		if ((tval == TV_PRAYER_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK)) continue;
+
+		/* Outright match */
+		if (sval == p_ptr->psval) return (TRUE);
+
+		/* Match because we have specialised in a 'basic spellbook style, and book falls into this category */
+		if ((p_ptr->psval >= SV_BOOK_MAX_GOOD) && (sval >= SV_BOOK_MAX_GOOD))
+		{
+			/* Sval hackery */
+			if (sval - (sval % SV_BOOK_SCHOOL) + SV_BOOK_SCHOOL - 1 == p_ptr->psval) return (TRUE);
+		}
+	}
+	
+	/* No match */
+	return (FALSE);	
+}
+
+
 
 /*
  * Fills a book with spells (in order). Note hack for runestones
@@ -8754,22 +8794,16 @@ s16b spell_level(int spell)
 	    }
 
 	/* Hack -- get casting information for specialists */
-	if (!legible)
+	if ((!legible) && (spell_match_style(spell)))
 	{
-		for (i = 0; i < MAX_SPELL_APPEARS; i++)
-		{
-			if ((((s_info[spell].appears[i].tval == TV_SONG_BOOK) && (p_ptr->pstyle == WS_SONG_BOOK)) ||
-				((s_info[spell].appears[i].tval == TV_MAGIC_BOOK) && (p_ptr->pstyle == WS_MAGIC_BOOK)) ||
-				((s_info[spell].appears[i].tval == TV_PRAYER_BOOK) && (p_ptr->pstyle == WS_PRAYER_BOOK)))
-			&& (s_info[spell].appears[i].sval == p_ptr->psval))
-			{
-				legible = TRUE;
-				/* Get the first spell caster's casting info */
-				sc_ptr=&(s_ptr->cast[0]);
-				/* And remember to fix it later */
-				fix_level = TRUE;
-			}
-		}
+		/* Can read spell */
+		legible = TRUE;
+
+		/* Get the first spell caster's casting info */
+		sc_ptr=&(s_ptr->cast[0]);
+			
+		/* And remember to fix it later */
+		fix_level = TRUE;
 	}
 
 	/* Illegible */
@@ -8800,54 +8834,14 @@ s16b spell_level(int spell)
 
 		/* Check for styles */
 		/* Hack -- we don't check 'current' styles */
-		if (w_info[i].styles==0
-			|| w_info[i].styles & (1L << p_ptr->pstyle))
-		switch (p_ptr->pstyle)
+		if ((w_info[i].styles == 0)
+			|| (w_info[i].styles & (1L << p_ptr->pstyle)))
 		{
-			case WS_MAGIC_BOOK:
+			/* Check for style match */			
+			if (spell_match_style(spell))
 			{
-				int j;
-
-				for(j=0;j<MAX_SPELL_APPEARS;j++)
-				{
-					if ((s_info[spell].appears[j].tval == TV_MAGIC_BOOK) &&
-					   (s_info[spell].appears[j].sval == p_ptr->psval))
-					{
-						 level -= (level - w_info[i].level)/5;
-					}
-
-				}
-				break;
-			}
-			case WS_PRAYER_BOOK:
-			{
-				int j;
-
-				for(j=0;j<MAX_SPELL_APPEARS;j++)
-				{
-					if ((s_info[spell].appears[j].tval == TV_PRAYER_BOOK) &&
-					   (s_info[spell].appears[j].sval == p_ptr->psval))
-					{
-						 level -= (level - w_info[i].level)/5;
-					}
-
-				}
-				break;
-			}
-			case WS_SONG_BOOK:
-			{
-				int j;
-
-				for(j=0;j<MAX_SPELL_APPEARS;j++)
-				{
-					if ((s_info[spell].appears[j].tval == TV_SONG_BOOK) &&
-					   (s_info[spell].appears[j].sval == p_ptr->psval))
-					{
-						 level -= (level - w_info[i].level)/5;
-					}
-
-				}
-				break;
+				/* Reduce casting level */
+				level -= (level - w_info[i].level)/5;
 			}
 		}
 	}
@@ -8890,53 +8884,16 @@ s16b spell_power(int spell)
 		/* Check styles */
 		/* Hack -- we don't check 'current' styles
 		   except for rings, amulets, instruments, etc */
-		if (w_info[i].styles==0 
-			|| w_info[i].styles & (1L << p_ptr->pstyle))
+		if ((w_info[i].styles==0) 
+			|| (w_info[i].styles & (1L << p_ptr->pstyle)))
 		switch (p_ptr->pstyle)
 		{
 			case WS_MAGIC_BOOK:
-			{
-				int j;
-
-				for(j=0;j<MAX_SPELL_APPEARS;j++)
-				{
-					if ((s_info[spell].appears[j].tval == TV_MAGIC_BOOK) &&
-					   (s_info[spell].appears[j].sval == p_ptr->psval))
-					{
-						 plev += 10;
-					}
-
-				}
-				break;
-			}
 			case WS_PRAYER_BOOK:
-			{
-				int j;
-
-				for(j=0;j<MAX_SPELL_APPEARS;j++)
-				{
-					if ((s_info[spell].appears[j].tval == TV_PRAYER_BOOK) &&
-					   (s_info[spell].appears[j].sval == p_ptr->psval))
-					{
-						 plev += 10;
-					}
-
-				}
-				break;
-			}
 			case WS_SONG_BOOK:
 			{
-				int j;
-
-				for(j=0;j<MAX_SPELL_APPEARS;j++)
-				{
-					if ((s_info[spell].appears[j].tval == TV_SONG_BOOK) &&
-					   (s_info[spell].appears[j].sval == p_ptr->psval))
-					{
-						 plev += 10;
-					}
-
-				}
+				/* Increase by 10 levels */
+				if (spell_match_style(spell)) plev += 10;
 				break;
 			}
 			case WS_INSTRUMENT:
@@ -8959,29 +8916,12 @@ s16b spell_power(int spell)
 				}
 				break;
 			}
-			case WS_RING:
-			case WS_AMULET:
-			{
-			  /* TODO: check if the spell appear in the ring */
-				if ( w_info[i].styles & p_ptr->cur_style 
-					 & (1L << p_ptr->pstyle) ) 
-					plev += 10;
-				break;
-			}
-
-			default:
-			{
-			  /* TODO: check if the spell appear in the scroll */
-				plev += 10;
-				break;
-			}
 		}
-
 	}
 
 	return(plev);
-
 }
+
 
 /*
  * Returns chance of failure for a spell
@@ -9018,21 +8958,15 @@ s16b spell_chance(int spell)
 	    }
 
 	/* Hack -- get casting information for specialists */
-	if (!legible)
+	if ((!legible) && (spell_match_style(spell)))
 	{
-		for (i = 0; i < MAX_SPELL_APPEARS; i++)
-		{
-			if ((((s_info[spell].appears[i].tval == TV_SONG_BOOK) && (p_ptr->pstyle == WS_SONG_BOOK)) ||
-				((s_info[spell].appears[i].tval == TV_MAGIC_BOOK) && (p_ptr->pstyle == WS_MAGIC_BOOK)) ||
-				((s_info[spell].appears[i].tval == TV_PRAYER_BOOK) && (p_ptr->pstyle == WS_PRAYER_BOOK)))
-			 &&  (s_info[spell].appears[i].sval == p_ptr->psval))
-			{
-				legible = TRUE;
-				/* Get the first spell caster's casting info */
-				sc_ptr=&(s_ptr->cast[0]);
-				/* And remember to fix it later */
-			}
-		}
+		/* Can read it */
+		legible = TRUE;
+		
+		/* Get the first spell caster's casting info */
+		sc_ptr=&(s_ptr->cast[0]);
+		
+		/* And remember to fix it later */
 	}
 
 	/* Illegible */
@@ -9108,21 +9042,12 @@ bool spell_okay(int spell, bool known)
 		{
 		  legible = TRUE;
 		}
-	    }
+	}
 
 	/* Hack -- get casting information for specialists */
-	if (!legible)
+	if ((!legible) && (spell_match_style(spell)))
 	{
-		for (i = 0; i < MAX_SPELL_APPEARS; i++)
-		{
-			if ((((s_info[spell].appears[i].tval == TV_SONG_BOOK) && (p_ptr->pstyle == WS_SONG_BOOK)) ||
-				((s_info[spell].appears[i].tval == TV_MAGIC_BOOK) && (p_ptr->pstyle == WS_MAGIC_BOOK)) ||
-				((s_info[spell].appears[i].tval == TV_PRAYER_BOOK) && (p_ptr->pstyle == WS_PRAYER_BOOK)))
-			  && (s_info[spell].appears[i].sval == p_ptr->psval))
-			{
-				legible = TRUE;
-			}
-		}
+		legible = TRUE;
 	}
 
 	/* Spell is illegible */

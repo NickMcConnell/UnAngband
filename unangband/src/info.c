@@ -3770,7 +3770,8 @@ void print_spells(const s16b *sn, int num, int y, int x)
 				if ((((s_info[spell].appears[ii].tval == TV_SONG_BOOK) && (p_ptr->pstyle == WS_SONG_BOOK)) ||
 					((s_info[spell].appears[ii].tval == TV_MAGIC_BOOK) && (p_ptr->pstyle == WS_MAGIC_BOOK)) ||
 					((s_info[spell].appears[ii].tval == TV_PRAYER_BOOK) && (p_ptr->pstyle == WS_PRAYER_BOOK)))
-				&& (s_info[spell].appears[ii].sval == p_ptr->psval))
+			&& ((s_info[spell].appears[i].sval == p_ptr->psval) || ((p_ptr->psval >= SV_BOOK_MAX_GOOD) &&
+				((s_info[spell].appears[i].sval / SV_BOOK_SCHOOL) * SV_BOOK_SCHOOL + SV_BOOK_SCHOOL - 1 == p_ptr->psval))))
 				{
 				  legible = TRUE;
 				  /* Get the first spell caster's casting info */
