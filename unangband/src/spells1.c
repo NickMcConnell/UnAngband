@@ -12559,6 +12559,21 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 		dam_at_dist[i] = dam_temp;
 	}
 
+	/* Hack -- prevent arcs and starbursts from hurting the player if they are the source */
+	if ( (who < SOURCE_PLAYER_TRAP) && ((flg & (PROJECT_ARC | PROJECT_STAR)) != 0))
+	{
+		for (i = 0; i < grids; i++)
+		{
+			if (gd[i] == 0)
+			{
+				gy[i] = gy[grids-1];
+				gx[i] = gx[grids-1];
+				gd[i] = gd[grids-1];
+				grids--;
+			}
+		}
+	}
+	
 	/* Sort the blast grids by distance, starting at the origin. */
 	for (i = 0, k = 0; i < rad; i++)
 	{
