@@ -779,6 +779,7 @@ extern bool inven_carry_okay(const object_type *o_ptr);
 extern s16b inven_carry(object_type *o_ptr);
 extern s16b inven_takeoff(int item, int amt);
 extern void inven_drop(int item, int amt);
+extern void overflow_pack(void);
 extern void combine_pack(void);
 extern void reorder_pack(void);
 extern void display_spell_list(void);

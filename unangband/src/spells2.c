@@ -5433,6 +5433,9 @@ void change_shape(int shape, int level)
 
 			/* Mark as 'built-in' item */
 			inventory[i].ident |= (IDENT_STORE);
+			
+			/* Important - to prefent overflow of items, we must check for pack overflow after every item is wielded */
+			overflow_pack();
 		}
 	}
 
