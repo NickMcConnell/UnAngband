@@ -4126,7 +4126,15 @@ void do_cmd_throw_fire(bool fire)
 	}
 
 	if (fire)
-	{
+	{		
+		/* Check for valid throws */
+		if (p_ptr->num_fire <= 0)
+		{
+			msg_print("You lack the skill to fire a weapon.");
+			
+			return;
+		}
+		
 		/* Require proper missile */
 		item_tester_tval = p_ptr->ammo_tval;
 
@@ -4135,7 +4143,15 @@ void do_cmd_throw_fire(bool fire)
 			item_tester_hook = is_known_throwing_item;
 	}
 	else
-	{
+	{		
+		/* Check for valid throws */
+		if (p_ptr->num_throw <= 0)
+		{
+			msg_print("You lack the skill to throw a weapon.");
+			
+			return;
+		}
+		
 		/* Require an item that can be thrown at all */
 		item_tester_hook = item_tester_hook_throwable;
 	}
