@@ -2752,13 +2752,12 @@ static void calc_hitpoints(void)
 	siz_bonus = ((int)(adj_siz_die[p_ptr->stat_ind[A_SIZ]]) - 128);
 
 	/* Calculate hitdice */
-	p_ptr->hitdie = 10 + con_bonus * 2 + siz_bonus;
+	p_ptr->hitdie = 10 + siz_bonus;
 
 	/* Calculate hitpoints */
 	mhp = p_ptr->player_hp[p_ptr->lev - 1]
-	  + p_ptr->player_hp[p_ptr->lev - 1] * con_bonus / 10
-	  + p_ptr->player_hp[p_ptr->lev - 1] * siz_bonus / 20
-	  + siz_bonus;
+	  + p_ptr->player_hp[p_ptr->lev - 1] * siz_bonus / 10
+	  + con_bonus * p_ptr->lev;
 
 	/* New maximum hitpoints */
 	if (p_ptr->mhp != mhp)
