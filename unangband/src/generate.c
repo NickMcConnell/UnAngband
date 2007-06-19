@@ -9175,7 +9175,9 @@ static void place_rubble(int y, int x)
  */
 static int alloc_stairs(int feat, int num, int walls)
 {
-	int y, x, i = 0, j;
+	int y = 0, x = 0;
+	
+	int i = 0, j;
 
 	/* Place "num" stairs */
 	for (j = 0; j < num; j++)
@@ -9246,7 +9248,8 @@ static int alloc_stairs(int feat, int num, int walls)
  */
 static int alloc_object(int set, int typ, int num)
 {
-	int y, x, k, i = 0;
+	int y = 0, x = 0;
+	int k, i = 0;
 
 	/* Place some objects */
 	for (k = 0; k < num; k++)

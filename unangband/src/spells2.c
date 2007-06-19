@@ -7232,14 +7232,14 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 
 				object_type *o_ptr;
 
-				obvious = TRUE;
-
 				/* Get an item */
 				cptr q = "Refuel which torch? ";
 				cptr s = "You have no torches.";
 
 				/* Restrict the choices */
 				item_tester_hook = item_tester_refill_torch;
+
+				obvious = TRUE;
 
 				if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return (TRUE);
 

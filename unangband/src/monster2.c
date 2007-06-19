@@ -3667,7 +3667,6 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp, u32b fl
 	/* Save previous monster restriction value. */
 	bool (*get_mon_num_hook_temp)(int r_idx) = get_mon_num_hook;
 
-
 	/* Calculate the number of escorts we want. */
 	if (r_ptr->flags1 & (RF1_ESCORTS)) escort_size = rand_range(12, 18);
 	else escort_size = rand_range(4, 6);
@@ -3712,20 +3711,20 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp, u32b fl
 
 			/* Place a group of escorts if needed */
 			if ((r_info[escort_idx].flags1 & (RF1_FRIENDS)) &&
-				!place_monster_group(my, mx, escort_idx, slp, (rand_range(3, 5)), 0L))
+				!place_monster_group(my, mx, escort_idx, slp, (rand_range(3, 5)), flg))
 			{
 				continue;
 			}
 
 			/* Place a group of escorts if needed */
 			if ((r_info[escort_idx].flags1 & (RF1_FRIEND)) &&
-				!place_monster_group(my, mx, escort_idx, slp, 2, 0L))
+				!place_monster_group(my, mx, escort_idx, slp, 2, flg))
 			{
 				continue;
 			}
 
 			/* Attempt to place another monster */
-			if (!place_monster_one(my, mx, escort_idx, slp, 0L))
+			if (!place_monster_one(my, mx, escort_idx, slp, flg))
 			{
 				continue;
 			}

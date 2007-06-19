@@ -1796,6 +1796,7 @@ void mon_blow_ranged(int who, int what, int x, int y, int method, int range, int
 	{
 		monster_type *m_ptr = &m_list[who];
 		r_ptr = &r_info[m_ptr->r_idx];
+		l_ptr = &l_list[m_ptr->r_idx];
 
 		known = m_ptr->ml;
 
@@ -2025,6 +2026,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		l_ptr = &l_list[m_ptr->r_idx];
 		r_ptr = &r_info[m_ptr->r_idx];
 
+		/* Hack */
+		what = attack;
+		
 		/* Hack -- never make spell attacks if hidden */
 		if (m_ptr->mflag & (MFLAG_HIDE)) return (FALSE);
 

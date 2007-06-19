@@ -1611,13 +1611,13 @@ void hit_trap(int y, int x)
 							project_p(SOURCE_PLAYER_TRAP, o_ptr->k_idx, y, x, k, GF_HURT);
 							
 							/* Apply additional effect from coating or sometimes activate */
-							if ((coated_p(i_ptr)) || (auto_activate(i_ptr)))
+							if ((coated_p(o_ptr)) || (auto_activate(o_ptr)))
 							{
 								/* Make item strike */
-								process_item_blow(SOURCE_PLAYER_TRAP, o_ptr->k_idx, i_ptr, y, x);
+								process_item_blow(SOURCE_PLAYER_TRAP, o_ptr->k_idx, o_ptr, y, x);
 
 								/* Hack -- Remove coating on original */
-								if ((!coated_p(i_ptr)) && (o_ptr->feeling == INSCRIP_COATED)) o_ptr->feeling = 0;
+								if ((!coated_p(o_ptr)) && (o_ptr->feeling == INSCRIP_COATED)) o_ptr->feeling = 0;
 							}
 						}
 						else
@@ -1688,13 +1688,13 @@ void hit_trap(int y, int x)
 					project_p(SOURCE_PLAYER_TRAP, o_ptr->k_idx, y, x, k, GF_HURT);
 
 					/* Apply additional effect from coating or sometimes activate */
-					if ((coated_p(i_ptr)) || (auto_activate(i_ptr)))
+					if ((coated_p(o_ptr)) || (auto_activate(o_ptr)))
 					{
 						/* Make item strike */
-						process_item_blow(SOURCE_PLAYER_TRAP, o_ptr->k_idx, i_ptr, y, x);
+						process_item_blow(SOURCE_PLAYER_TRAP, o_ptr->k_idx, o_ptr, y, x);
 
 						/* Hack -- Remove coating on original */
-						if ((!coated_p(i_ptr)) && (o_ptr->feeling == INSCRIP_COATED)) o_ptr->feeling = 0;
+						if ((!coated_p(o_ptr)) && (o_ptr->feeling == INSCRIP_COATED)) o_ptr->feeling = 0;
 					}
 				}
 				else

@@ -590,6 +590,9 @@ void modify_grid_adjacent_view(byte *a, char *c, int y, int x, byte adj_char[16]
  */
 void modify_grid_boring_view(byte *a, char *c, int y, int x, byte cinfo, byte pinfo)
 {
+	(void)y;
+	(void)x;
+	
 	/* Handle "seen" grids */
 	if (pinfo & (PLAY_SEEN))
 	{
@@ -5454,11 +5457,17 @@ bool has_tree(int y, int x)
 
 bool redraw_tree_loss(int y, int x)
 {
+	(void)y;
+	(void)x;
+	
 	return (FALSE);
 }
 
 bool redraw_tree_gain(int y, int x)
 {
+	(void)y;
+	(void)x;
+	
 	return (FALSE);
 }
 
@@ -5491,17 +5500,24 @@ bool has_chasm_edge(int y, int x)
 
 bool redraw_chasm_edge_loss(int y, int x)
 {
+	(void)y;
+	(void)x;
+	
 	return (FALSE);	
 }
 
 bool redraw_chasm_edge_gain(int y, int x)
 {
+	(void)y;
+	(void)x;
+	
 	return (FALSE);	
 }
 
 void apply_chasm_edge(int y, int x)
 {	
-
+	(void)y;
+	(void)x;
 }
 
 void remove_chasm_edge(int y, int x)
@@ -6585,7 +6601,7 @@ void disturb(int stop_search, int wake_up)
  */
 bool is_quest(int level)
 {
-
+	(void)level;
 #if 0
 	int i;
 	/* Town is never a quest */

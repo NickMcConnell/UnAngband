@@ -6109,6 +6109,9 @@ bool break_near(object_type *j_ptr, int y, int x)
 			int deg = 0;
 			int dia = 10;
 			
+			/* Hack -- use power 0 for fake potion effects */
+			spell_type *s_ptr = &s_info[power];
+
 			/* Initialise flags (may be modified by alchemy) */
 			flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
@@ -6117,9 +6120,6 @@ bool break_near(object_type *j_ptr, int y, int x)
 
 			/* Apply alchemy */
 			if ((p_ptr->pstyle == WS_POTION) && (apply_alchemical_formula(j_ptr, &dam, &rad, &rng, &flg, &num, &deg, &dia))) power = 0;
-
-			/* Hack -- use power 0 for fake potion effects */
-			spell_type *s_ptr = &s_info[power];
 
 			/* Applly num times */
 			for (j = 0; j < num; j++)

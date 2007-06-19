@@ -392,7 +392,7 @@ bool teleport_fiery_hook(const int oy, const int ox, const int ny, const int nx)
 	(void)oy;
 	(void)ox;
 
-	for (y = y - 1; y <= y + 1; y++)
+	for (y = ny - 1; y <= ny + 1; y++)
 	{
 		for (x = nx - 1; x <= nx + 1; x++)
 		{
@@ -5252,6 +5252,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 	bool was_asleep;
 
+	(void)what;
+	
 	/* No monster here */
 	if (!(cave_m_idx[y][x] > 0)) return (FALSE);
 
@@ -11449,6 +11451,8 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 	/* Assume no note */
 	cptr note = NULL;
 
+	(void)what;
+	
 	/* Only process marked grids. */
 	if (!(play_info[y][x] & (PLAY_TEMP))) return (FALSE);
 

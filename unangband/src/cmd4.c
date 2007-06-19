@@ -402,6 +402,8 @@ static void display_member_list(int col, int row, int wid, int per_page,
 {
 	int i, pos;
 
+	(void)wid;
+	
 	for(i = 0, pos = start; i < per_page && pos < o_count; i++, pos++) {
 		int oid = object_idx[pos];
 		byte attr = curs_attrs[CURS_KNOWN][cursor == oid];
@@ -4405,7 +4407,7 @@ void do_cmd_colors(void)
 /*
  * Hack -- append all current auto-inscriptions to the given file
  */
-static errr cmd_autos_dump(cptr fname)
+static errr cmd_autos_dump(void)
 {
 	int i;
 
