@@ -7186,7 +7186,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 
 					if (p_ptr->disease)
 					{
-						disease_desc(output, sizeof(output), p_ptr->disease, 0x0L);
+						disease_desc(output, sizeof(output), 0x0L, p_ptr->disease);
 						msg_print(output);
 					}
 				}
