@@ -1352,7 +1352,7 @@ static void process_world(void)
 	}
 
 	/*** Handle disease ***/
-	if (rand_int(300) < ((p_ptr->disease & (DISEASE_QUICK | DISEASE_LIGHT)) ? 3 : 1))
+	if ((p_ptr->disease) && (rand_int(300) < ((p_ptr->disease & (DISEASE_QUICK | DISEASE_LIGHT)) ? 3 : 1)))
 	{
 		u32b old_disease = p_ptr->disease;
 
@@ -1583,7 +1583,7 @@ static void process_world(void)
 		}
 		
 		/* All diseases mutate to get blows if they have no effect currently*/
-		else if ((!rand_int(3)) && ((p_ptr->disease & (1 << DISEASE_TYPES_HEAVY)) == 0))
+		else if ((!rand_int(3)) && ((p_ptr->disease & ((1 << DISEASE_TYPES_HEAVY) -1 )) == 0))
 		{
 			if (p_ptr->disease & (DISEASE_HEAVY))
 			{
