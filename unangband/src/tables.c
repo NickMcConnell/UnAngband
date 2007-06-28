@@ -4142,7 +4142,7 @@ const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES] =
 	{"reading ", "misreading ", "glancing at ", "reciting "}, /* SOURCE_PLAYER_READ */ 
 	{"using ", "misusing ", "abusing ", "badly using "}, /* SOURCE_PLAYER_USE */ 
 	{"activating ", "relying too heavily on ", "mistrusting the power of ", "chancing the gods with "}, /* SOURCE_PLAYER_ACT_ARTIFACT */ 
-	{"activating ", "calling on ", "discharing ", "misusing "}, /* SOURCE_PLAYER_ACTIVATE */ 
+	{"activating ", "calling on ", "discharging ", "misusing "}, /* SOURCE_PLAYER_ACTIVATE */ 
 	{"buying ", "acquiring ", "purchasing ", "the ill-judged purchase of "}, /* SOURCE_PLAYER_SERVICE */ 
 	{"bad luck casting ", "badly casting ", "slurring a syllable casting ", "magical feedback whilst casting "} /* SOURCE_PLAYER_CAST */
 };
