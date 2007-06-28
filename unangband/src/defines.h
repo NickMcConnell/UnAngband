@@ -2630,29 +2630,30 @@
 #define SOURCE_DISEASE			-4	/* Source is a disease */
 #define SOURCE_DAYLIGHT			-5	/* Source is the sun */
 #define SOURCE_BIRTH			-6	/* Source is birth of monster race */
-#define SOURCE_PLAYER_ATTACK	-7
-#define SOURCE_PLAYER_SHOT		-8
-#define SOURCE_PLAYER_THROW		-9
-#define SOURCE_PLAYER_TRAP		-10
-#define SOURCE_PLAYER_BREAK		-11
-#define SOURCE_PLAYER_SPORE		-12
-#define SOURCE_PLAYER_COATING	-13
-#define SOURCE_PLAYER_EAT_MONSTER	-14
-#define SOURCE_PLAYER_EAT		-15
-#define SOURCE_PLAYER_QUAFF		-16
-#define SOURCE_PLAYER_AIM		-17	/* Wands */
-#define SOURCE_PLAYER_ZAP		-18	/* Rods - with target specified */
-#define SOURCE_PLAYER_ZAP_NO_TARGET		-19	/* Rods - with no target specified */
-#define SOURCE_PLAYER_READ		-20
-#define SOURCE_PLAYER_USE		-21	/* Staffs*/
-#define SOURCE_PLAYER_ACT_ARTIFACT	-22
-#define SOURCE_PLAYER_ACTIVATE	-23
-#define SOURCE_PLAYER_SERVICE	-24
-#define SOURCE_PLAYER_CAST		-25
-#define SOURCE_PLAYER_END		-26
+#define SOURCE_PLAYER_ALLY		-7
+#define SOURCE_PLAYER_ATTACK	-8
+#define SOURCE_PLAYER_SHOT		-9
+#define SOURCE_PLAYER_THROW		-10
+#define SOURCE_PLAYER_TRAP		-11
+#define SOURCE_PLAYER_BREAK		-12
+#define SOURCE_PLAYER_SPORE		-13
+#define SOURCE_PLAYER_COATING	-14
+#define SOURCE_PLAYER_EAT_MONSTER	-15
+#define SOURCE_PLAYER_EAT		-16
+#define SOURCE_PLAYER_QUAFF		-17
+#define SOURCE_PLAYER_AIM		-18	/* Wands */
+#define SOURCE_PLAYER_ZAP		-19	/* Rods - with target specified */
+#define SOURCE_PLAYER_ZAP_NO_TARGET		-20	/* Rods - with no target specified */
+#define SOURCE_PLAYER_READ		-21
+#define SOURCE_PLAYER_USE		-22	/* Staffs*/
+#define SOURCE_PLAYER_ACT_ARTIFACT	-23
+#define SOURCE_PLAYER_ACTIVATE	-24
+#define SOURCE_PLAYER_SERVICE	-25
+#define SOURCE_PLAYER_CAST		-26
+#define SOURCE_PLAYER_END		-27
 
 #define SOURCE_PLAYER_START		-7	/* Less than here or equal to here, player is the source, and gets experience */
-#define SOURCE_PLAYER_NO_TARGET	-19	/* Less than here or equal to here, no target is specified and some messages are suppressed.
+#define SOURCE_PLAYER_NO_TARGET	-20	/* Less than here or equal to here, no target is specified and some messages are suppressed.
 									 * Note that all items less than here that could specify a target always have a 'known' effect. */
 
 #define SOURCE_MESSAGES	4

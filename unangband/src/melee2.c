@@ -1177,7 +1177,8 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 
 	bool require_los = TRUE;
 	
-	int target_m_idx = 0;
+	/* Target the player by default unless an ally */
+	int target_m_idx = m_ptr->mflag & (MFLAG_ALLY) ? 0 : -1;
 	
 	bool is_breath = FALSE;
 
@@ -1267,6 +1268,18 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		/* No spells left */
 		if (!f4 && !f5 && !f6 && !f7) return (0);
 	}
+	
+	/* Allies do not summon */
+	if (m_ptr->mflag & (MFLAG_ALLY))
+	{
+		f4 &= ~(RF4_SUMMON_MASK);
+		f5 &= ~(RF5_SUMMON_MASK);
+		f6 &= ~(RF6_SUMMON_MASK);
+		f7 &= ~(RF7_SUMMON_MASK);		
+
+		/* No spells left */
+		if (!f4 && !f5 && !f6 && !f7) return (0);
+	}
 
 	/*default: target the player*/
 	*tar_y = p_ptr->py;
@@ -1281,6 +1294,9 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		{
 			/* Access the monster */
 			monster_type *n_ptr = &m_list[i];
+
+			/* Skip itself */
+			if (i == m_idx) continue;
 
 			/* Monster has an enemy */
 			if ((m_ptr->mflag & (MFLAG_ALLY)) != (n_ptr->mflag & (MFLAG_ALLY)))
@@ -1297,122 +1313,136 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		}
 	}
 
-	/* Check what kinds of spells can hit target */
-	path = projectable(m_ptr->fy, m_ptr->fx, *tar_y, *tar_x, PROJECT_CHCK);
-
-	/* do we have the target in sight at all? */
-	if (path == PROJECT_NO)
+	/* No valid target */
+	if (!target_m_idx)
 	{
-		bool clear_ball_spell = TRUE;
+		f4 &= (rf4_no_player_mask | RF4_SUMMON_MASK);
+		f5 &= (RF5_NO_PLAYER_MASK | RF4_SUMMON_MASK);
+		f6 &= (RF6_NO_PLAYER_MASK | RF6_SUMMON_MASK);
+		f7 &= (RF7_NO_PLAYER_MASK | RF7_SUMMON_MASK);
 
-		/* Are we in range smart or annoyed (and not stupid), and have access to ball spells
-		  or summon spells? */
-		if ((m_ptr->cdis < MAX_RANGE) && ((r_ptr->flags2 & (RF2_SMART)) ||
-			 ((m_ptr->mflag & (MFLAG_AGGR)) && (!(r_ptr->flags2 & (RF2_STUPID))))) &&
-			 ((r_ptr->flags4 & (rf4_ball_mask | RF4_SUMMON_MASK)) ||
-			  (r_ptr->flags5 & (RF5_BALL_MASK | RF5_SUMMON_MASK)) ||
-			  (r_ptr->flags6 & (RF6_BALL_MASK | RF6_SUMMON_MASK)) ||
-			  (r_ptr->flags7 & (RF7_BALL_MASK | RF7_SUMMON_MASK))))
+		/* No spells left */
+		if (!f4 && !f5 && !f6 && !f7) return (0);		
+	}
+	else
+	{	
+		/* Check what kinds of spells can hit target */
+		path = projectable(m_ptr->fy, m_ptr->fx, *tar_y, *tar_x, PROJECT_CHCK);
+
+		/* do we have the target in sight at all? */
+		if (path == PROJECT_NO)
 		{
-			int alt_y, alt_x, alt_path, best_y, best_x, best_path;
+			bool clear_ball_spell = TRUE;
 
-			/*start with no alternate shot*/
-			best_y =  best_x = best_path  = 0;
-
-			/* Check for impassable terrain */
-			for (i = 0; i < 8; i++)
+			/* Are we in range smart or annoyed (and not stupid), and have access to ball spells
+			  or summon spells? */
+			if ((m_ptr->cdis < MAX_RANGE) && ((r_ptr->flags2 & (RF2_SMART)) ||
+				 ((m_ptr->mflag & (MFLAG_AGGR)) && (!(r_ptr->flags2 & (RF2_STUPID))))) &&
+				 ((r_ptr->flags4 & (rf4_ball_mask | RF4_SUMMON_MASK)) ||
+				  (r_ptr->flags5 & (RF5_BALL_MASK | RF5_SUMMON_MASK)) ||
+				  (r_ptr->flags6 & (RF6_BALL_MASK | RF6_SUMMON_MASK)) ||
+				  (r_ptr->flags7 & (RF7_BALL_MASK | RF7_SUMMON_MASK))))
 			{
-				alt_y = p_ptr->py + ddy_ddd[i];
-				alt_x = p_ptr->px + ddx_ddd[i];
+				int alt_y, alt_x, alt_path, best_y, best_x, best_path;
 
-				alt_path = projectable(m_ptr->fy, m_ptr->fx, alt_y, alt_x, PROJECT_CHCK);
+				/*start with no alternate shot*/
+				best_y =  best_x = best_path  = 0;
 
-				if (alt_path == PROJECT_NO) continue;
-
-				if (alt_path == PROJECT_NOT_CLEAR)
+				/* Check for impassable terrain */
+				for (i = 0; i < 8; i++)
 				{
-					if (!similar_monsters(m_ptr->fy, m_ptr->fx, alt_y, alt_x)) continue;
+					alt_y = p_ptr->py + ddy_ddd[i];
+					alt_x = p_ptr->px + ddx_ddd[i];
 
-					/*we already have a NOT_CLEAR path*/
-					if ((best_path == PROJECT_NOT_CLEAR) && (rand_int(2))) continue;
+					alt_path = projectable(m_ptr->fy, m_ptr->fx, alt_y, alt_x, PROJECT_CHCK);
+
+					if (alt_path == PROJECT_NO) continue;
+
+					if (alt_path == PROJECT_NOT_CLEAR)
+					{
+						if (!similar_monsters(m_ptr->fy, m_ptr->fx, alt_y, alt_x)) continue;
+
+						/*we already have a NOT_CLEAR path*/
+						if ((best_path == PROJECT_NOT_CLEAR) && (rand_int(2))) continue;
+					}
+
+					/*
+				 	 * PROJECT_CLEAR, or monster has an
+				 	 * empty square to lob a ball spell at player
+				  	 */
+					best_y = alt_y;
+					best_x = alt_x;
+					best_path = alt_path;
+					/*we want to keep ball spells*/
+					clear_ball_spell = FALSE;
+
+					if (best_path == PROJECT_CLEAR) break;
 				}
 
-				/*
-			 	 * PROJECT_CLEAR, or monster has an
-			 	 * empty square to lob a ball spell at player
-			  	 */
-				best_y = alt_y;
-				best_x = alt_x;
-				best_path = alt_path;
-				/*we want to keep ball spells*/
-				clear_ball_spell = FALSE;
-
-				if (best_path == PROJECT_CLEAR) break;
-			}
-
-			if (best_y + best_x > 0)
-			{
-				/* Set to best target */
-				*tar_y = best_y;
-				*tar_x = best_x;
-			}
+				if (best_y + best_x > 0)
+				{
+					/* Set to best target */
+					*tar_y = best_y;
+					*tar_x = best_x;
+				}
 
 			
-			/*We don't have a reason to try a ball spell*/
-			if (clear_ball_spell)
-			{
-				f4 &= ~(rf4_ball_mask);
-				f5 &= ~(RF5_BALL_MASK);
-				f6 &= ~(RF6_BALL_MASK);
-				f7 &= ~(RF7_BALL_MASK);
+				/*We don't have a reason to try a ball spell*/
+				if (clear_ball_spell)
+				{
+					f4 &= ~(rf4_ball_mask);
+					f5 &= ~(RF5_BALL_MASK);
+					f6 &= ~(RF6_BALL_MASK);
+					f7 &= ~(RF7_BALL_MASK);
+				}
 			}
+
+			/* Flat out 75% chance of not casting if the player is not in sight */
+			/* In addition, most spells don't work without a player around */
+			if (rand_int(4)) return (0);
+		
+			require_los = FALSE;
 		}
 
-		/* Flat out 75% chance of not casting if the player is not in sight */
-		/* In addition, most spells don't work without a player around */
-		if (rand_int(4)) return (0);
-		
-		require_los = FALSE;
-	}
+		/* Melee attacks and some others have a hard maximum range */
+		for (i = 0; i < 8; i++)
+		{
+			/* XXX Fire a ball spell just short of player */
 
-	/* Melee attacks and some others have a hard maximum range */
-	for (i = 0; i < 8; i++)
-	{
-		/* XXX Fire a ball spell just short of player */
-
-		/* Out of range - eliminate spell */
-		if ((target_m_idx ? distance(m_ptr->fy, m_ptr->fx, *tar_y, *tar_x) : m_ptr->cdis) > spell_info_RF4[i][COL_SPELL_BEST_RANGE]) f4 &= ~(RF4_BLOW_1 << i);
-	}
+			/* Out of range - eliminate spell */
+			if ((target_m_idx > 0 ? distance(m_ptr->fy, m_ptr->fx, *tar_y, *tar_x) : m_ptr->cdis) > spell_info_RF4[i][COL_SPELL_BEST_RANGE]) f4 &= ~(RF4_BLOW_1 << i);
+		}
 	
-	/* No spells left */
-	if (!f4 && !f5 && !f6 && !f7) return (0);
+		/* No spells left */
+		if (!f4 && !f5 && !f6 && !f7) return (0);
 
-	/* Remove spells the 'no-brainers'*/
-	/* Spells that require LOS */
-	if ((!require_los) || (m_ptr->cdis > MAX_RANGE))
-	{
-		/* Ball spells and summon spells would have been filtered out above if not usable */
-		f4 &= (rf4_no_player_mask | rf4_ball_mask | RF4_SUMMON_MASK);
-		f5 &= (RF5_NO_PLAYER_MASK | RF5_BALL_MASK | RF5_SUMMON_MASK);
-		f6 &= (RF6_NO_PLAYER_MASK | RF6_BALL_MASK | RF6_SUMMON_MASK);
-		f7 &= (RF7_NO_PLAYER_MASK | RF7_BALL_MASK | RF7_SUMMON_MASK);
+		/* Remove spells the 'no-brainers'*/
+		/* Spells that require LOS */
+		if ((!require_los) || (m_ptr->cdis > MAX_RANGE))
+		{
+			/* Ball spells and summon spells would have been filtered out above if not usable */
+			f4 &= (rf4_no_player_mask | rf4_ball_mask | RF4_SUMMON_MASK);
+			f5 &= (RF5_NO_PLAYER_MASK | RF5_BALL_MASK | RF5_SUMMON_MASK);
+			f6 &= (RF6_NO_PLAYER_MASK | RF6_BALL_MASK | RF6_SUMMON_MASK);
+			f7 &= (RF7_NO_PLAYER_MASK | RF7_BALL_MASK | RF7_SUMMON_MASK);
+		}
+
+		/*remove bolts and archery shots*/
+		else if (path == PROJECT_NOT_CLEAR)
+		{
+			f4 &= ~(rf4_bolt_mask);
+			f4 &= ~(rf4_archery_mask);
+			f5 &= ~(RF5_BOLT_MASK);
+			f5 &= ~(RF5_ARCHERY_MASK);
+			f6 &= ~(RF6_BOLT_MASK);
+			f6 &= ~(RF6_ARCHERY_MASK);
+			f7 &= ~(RF7_BOLT_MASK);
+			f7 &= ~(RF7_ARCHERY_MASK);
+		}
+
+		/* No spells left */
+		if (!f4 && !f5 && !f6 && !f7) return (0);
 	}
-
-	/*remove bolts and archery shots*/
-	else if (path == PROJECT_NOT_CLEAR)
-	{
-		f4 &= ~(rf4_bolt_mask);
-		f4 &= ~(rf4_archery_mask);
-		f5 &= ~(RF5_BOLT_MASK);
-		f5 &= ~(RF5_ARCHERY_MASK);
-		f6 &= ~(RF6_BOLT_MASK);
-		f6 &= ~(RF6_ARCHERY_MASK);
-		f7 &= ~(RF7_BOLT_MASK);
-		f7 &= ~(RF7_ARCHERY_MASK);
-	}
-
-	/* No spells left */
-	if (!f4 && !f5 && !f6 && !f7) return (0);
 
 	/* Spells we can not afford */
 	remove_expensive_spells(m_idx, &f4, &f5, &f6, &f7);
@@ -1469,7 +1499,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	if (want_tactic > 3) want_tactic=3;
 
 	/* Check terrain for purposes of summoning spells */
-	spaces = summon_possible(*tar_y, *tar_x);
+	spaces = summon_possible(m_ptr->fy, m_ptr->fx);
 
 	if (spaces > 10) want_summon=3;
 	else if (spaces > 3) want_summon=2;
@@ -4885,18 +4915,24 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				/* Target ignores player and retaliates */
 				if (m_ptr->mflag & (MFLAG_ALLY)) n_ptr->mflag |= (MFLAG_IGNORE);
 
+				/* Attack if afraid */
 				if (!(m_ptr->monfear))
 				{					
 					/* Scan through all four blows */
 					for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
 					{
 						int damage = 0;
+						
+						bool do_cut, do_stun;
 
 						/* Extract the attack infomation */
 						int effect = r_ptr->blow[ap_cnt].effect;
 						int method = r_ptr->blow[ap_cnt].method;
 						int d_dice = r_ptr->blow[ap_cnt].d_dice;
 						int d_side = r_ptr->blow[ap_cnt].d_side;
+						
+						int who = m_ptr->mflag & (MFLAG_ALLY) ? SOURCE_PLAYER_ALLY : m_idx;
+						int what = m_ptr->mflag & (MFLAG_ALLY) ? m_idx : ap_cnt;
 
 						/* Hack -- no more attacks */
 						if (!method) break;
@@ -4906,11 +4942,14 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 						/* Roll out the damage */
 						damage = damroll(d_dice, d_side);
 
+						/* Debugging - display attacks */
+						attack_desc(who, what, cave_m_idx[ny][nx], method, damage, &do_cut, &do_stun);
+
 						/* New result routine */
-						project_m(m_idx, ap_cnt, ny, nx, damage, effect);
+						project_m(who, what, ny, nx, damage, effect);
 
 						/* Apply teleport and other effects */
-						project_t(m_idx, ap_cnt, ny, nx, damage, effect);
+						project_t(who, what, ny, nx, damage, effect);
 					}
 				}
 			}
@@ -5976,6 +6015,9 @@ static void process_monster(int m_idx)
 			/* Access the monster */
 			monster_type *n_ptr = &m_list[i];
 
+			/* Skip itself */
+			if (m_idx == i) continue;
+
 			/* Allies only find targets visible to player */
 			if ((m_ptr->mflag & (MFLAG_ALLY)) && !(n_ptr->ml)) continue;
 
@@ -5991,7 +6033,7 @@ static void process_monster(int m_idx)
 					m_ptr->tx = n_ptr->fx;
 					k = d;
 					
-					if (m_ptr->mflag & (MFLAG_ALLY)) must_use_target = TRUE;
+					must_use_target = TRUE;
 				}
 			}
 		}

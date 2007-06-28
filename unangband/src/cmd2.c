@@ -3711,7 +3711,8 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 					m_ptr->csleep = 0;
 
 					/* Mark the monster as attacked by the player */
-					m_ptr->mflag |= MFLAG_HIT_RANGE;
+					if (m_ptr->cdis > 1) m_ptr->mflag |= MFLAG_HIT_RANGE;
+					else m_ptr->mflag |= MFLAG_HIT_BLOW;
 
 					/* Some monsters get "destroyed" */
 					if (r_ptr->flags3 & RF3_NONLIVING || r_ptr->flags2 & RF2_STUPID)

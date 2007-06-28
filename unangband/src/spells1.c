@@ -5260,15 +5260,24 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 	/* Never affect projector */
 	if (cave_m_idx[y][x] == who) return (FALSE);
 
-	/* Don't affect hidden monsters */
-	if (m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)) return (FALSE);
-
 	/* Obtain monster info */
 	m_ptr = &m_list[cave_m_idx[y][x]];
+
+	/* Don't affect hidden monsters */
+	if (m_ptr->mflag & (MFLAG_HIDE)) return (FALSE);
+
+	/* Obtain remaining monster info */
 	r_ptr = &r_info[m_ptr->r_idx];
 	l_ptr = &l_list[m_ptr->r_idx];
 	name = (r_name + r_ptr->name);
 	if (m_ptr->ml) seen = TRUE;
+
+	/* Check if player attacking -- note skip attacks from allies */
+	if (who < SOURCE_PLAYER_START)
+	{
+		if (m_ptr->cdis > 1) m_ptr->mflag |= (MFLAG_HIT_RANGE);
+		else m_ptr->mflag |= (MFLAG_HIT_BLOW);
+	}
 
 	/* Check if monster asleep */
 	was_asleep = (m_ptr->csleep == 0);
@@ -8527,6 +8536,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			case SOURCE_BIRTH:
 			case SOURCE_PLAYER_EAT_MONSTER:
 			case SOURCE_PLAYER_SPORE:
+			case SOURCE_PLAYER_ALLY:
 			{
 				/* Get the source feature */
 				monster_race *r_ptr = &r_info[what];
