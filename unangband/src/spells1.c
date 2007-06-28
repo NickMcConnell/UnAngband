@@ -8274,7 +8274,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 	}
 
 	/* If another non-allied monster or trap did the damage, hurt the monster by hand */
-	if ((who > SOURCE_PLAYER_START) && ((who <= 0) || ((m_list[who].mflag & (MFLAG_ALLY)) == 0)))
+	if (who > SOURCE_PLAYER_START)
 	{
 		/* Redraw (later) if needed */
 		if (p_ptr->health_who == cave_m_idx[y][x]) p_ptr->redraw |= (PR_HEALTH);
@@ -8481,6 +8481,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		/* Cause of death routine */
 		switch(who)
 		{
+			case SOURCE_PLAYER_ALLY:
 			case SOURCE_SELF:
 			{
 				/* Get the source monster */
@@ -8536,7 +8537,6 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			case SOURCE_BIRTH:
 			case SOURCE_PLAYER_EAT_MONSTER:
 			case SOURCE_PLAYER_SPORE:
-			case SOURCE_PLAYER_ALLY:
 			{
 				/* Get the source feature */
 				monster_race *r_ptr = &r_info[what];
