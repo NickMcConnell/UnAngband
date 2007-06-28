@@ -4125,7 +4125,7 @@ const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES] =
 	{"", "", "", ""}, /* SOURCE_DISEASE */
 	{"daylight", "the sun rising", "no UV protection", "your unholy flesh searing in the radiance of day"}, /* SOURCE_DAYLIGHT */
 	{" being born", " being born", " being born", " being born"},	/* SOURCE_BIRTH */
-	{"misjudging", "treachery of", "a knife in the back from", "walking in front of the line of fire of"}, /* SOURCE_PLAYER_ALLY */
+	{"misjudging ", "treachery of ", "a knife in the back from ", "walking in front of the line of fire of "}, /* SOURCE_PLAYER_ALLY */
 	{"a swing, and a miss", "overenthusiasm", "a hellavu shaving cut", "you're not quite sure how you hit that part of you"}, /* SOURCE_PLAYER_ATTACK */
 	{"a misfire","an unintended discharge","shooting your own foot","you're not quite sure how you shot that part of you"}, /* SOURCE_PLAYER_SHOT */
 	{"a misthrow", "a fumble","juggling a dangerous object","you're not quite sure how you threw that there"}, /* SOURCE_PLAYER_THROW */
