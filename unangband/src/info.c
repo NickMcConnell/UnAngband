@@ -1106,11 +1106,13 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->type == SPELL_CONCENTRATE_LIFE) vp[vn++] = "concentrates life around you";
 	if (s_ptr->type == SPELL_CONCENTRATE_WATER) vp[vn++] = "concentrates water around you";
 	if (s_ptr->type == SPELL_RELEASE_CURSE) vp[vn++] = "releases a curse from an item";
-	if (s_ptr->type == SPELL_WONDER) vp[vn++] = "creates random magics";
 	if (s_ptr->type == SPELL_SET_RETURN) vp[vn++] = "marks this grid as a destination for later return";
 	if (s_ptr->type == SPELL_SET_OR_MAKE_RETURN) vp[vn++] = "marks this grid as a destination for later return or returns you to a marked grid";
 	if (s_ptr->type == SPELL_BLOOD_BOND) vp[vn++] = "bonds you with a living creature to share damage and healing";
 	if (s_ptr->type == SPELL_MINDS_EYE) vp[vn++] = "bonds you with a mind to allow you to see through its eyes";
+	if (s_ptr->type == SPELL_CHANGE_SHAPE) vp[vn++] = format("changes you into a %s",p_name + p_info[s_ptr->param].name);
+	if (s_ptr->type == SPELL_REVERT_SHAPE) vp[vn++] = "returns you to your normal form";
+	if (s_ptr->type == SPELL_REFUEL) vp[vn++] = "fuels a torch";
 
 	/* Describe miscellaneous effects */
 	if (vn)
@@ -1607,12 +1609,13 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_SNUFF: text_out("maximum ");
 			case GF_HEAL: text_out("hit points"); break;
 			case GF_AWAY_ALL:
+			case GF_AWAY_EVIL:
+			case GF_AWAY_UNDEAD:
+							text_out("distance on average"); break;
 			case GF_AWAY_JUMP:
 			case GF_AWAY_DARK:
 			case GF_AWAY_NATURE:
 			case GF_AWAY_FIRE:
-			case GF_AWAY_EVIL:
-			case GF_AWAY_UNDEAD:
 			{
 				text_out("distance on average");
 
@@ -3505,6 +3508,7 @@ void list_object(const object_type *o_ptr, int mode)
 				/* Display powers */
 				for (i = 0; i < num; i++)
 				{
+					/* List powers */
 					powers |= spell_desc(&s_info[book[i]],(i==0) ? (vd[n] ? " and ": vp[n]) : ", or ",0,detail, vt[n]);
 				}
 

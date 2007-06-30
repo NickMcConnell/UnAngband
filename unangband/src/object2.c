@@ -8706,7 +8706,7 @@ void fill_book(const object_type *o_ptr, s16b *book, int *num)
 	}
 
 	/* Fill book with spells */
-	for (i=0;i<z_info->s_max;i++)
+	for (i=0;(i<z_info->s_max) && (*num < 26);i++)
 	{
 		s_ptr=&s_info[i];
 
@@ -8735,7 +8735,7 @@ void fill_book(const object_type *o_ptr, s16b *book, int *num)
 						/* Collision -- minimise impact by going from end of table */
 						else
 						{
-                                                        for (slot = INVEN_PACK - 2; (slot >=0) && book[slot]; slot--) ;
+							for (slot = INVEN_PACK - 2; (slot >=0) && book[slot]; slot--) ;
 
 							if ((slot >= 0) && (!book[slot])) book[slot] = i;
 						}

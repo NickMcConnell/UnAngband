@@ -119,8 +119,8 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 
 #ifdef ALLOW_REPEAT
 
-	/* Get the spell, if available */
-	if (repeat_pull(sn))
+	/* Get the spell, if available and not randomly picked */
+	if (known && repeat_pull(sn))
 	{
 		/* Verify the spell */
 		if (!(cast) || (spell_okay(*sn, known)))
@@ -133,7 +133,7 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 #endif /* ALLOW_REPEAT */
 
 	/* Fill the book with spells */
-	fill_book(o_ptr,book,&num);
+	fill_book(o_ptr,book,&num); 
 
 	/* Assume no usable spells */
 	okay = 0;
@@ -307,7 +307,6 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 		flag = TRUE;
 	}
 
-
 	/* Restore the screen */
 	if (redraw)
 	{
@@ -318,7 +317,6 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 		/* redraw = FALSE; */
 	}
 
-
 	/* Abort if needed */
 	if (!flag) return (FALSE);
 
@@ -327,7 +325,7 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 
 #ifdef ALLOW_REPEAT
 
-	repeat_push(*sn);
+	if (!known) repeat_push(*sn);
 
 #endif /* ALLOW_REPEAT */
 
@@ -637,6 +635,31 @@ void do_cmd_browse_object(object_type *o_ptr)
 
 				/* Set text_out hook */
 				text_out_hook = text_out_to_screen;
+
+				/* Hack -- 'wonder' spells */
+				if (s_info[book[i]].type == SPELL_USE_OBJECT)
+				{
+					object_type object_type_body;
+					object_type *j_ptr = &object_type_body;
+						
+					s16b book2[26];
+
+					int num2, j;
+					
+					bool powers = FALSE;
+						
+					/* Prepare fake object */
+					object_prep(j_ptr, s_info[book[i]].param);
+						
+					/* Fill the book */
+					fill_book(j_ptr, book2, &num2);
+						
+					for (j = 0; j < num2; j++)
+					{
+						/* List powers */
+						powers |= spell_desc(&s_info[book2[j]],(j==0) ? "When cast, it " : ", or ",spell_power(spell),TRUE, j);	
+					}
+				}
 
 				/* Recall spell */
 				if (spell_desc(&s_info[spell],"When cast, it ",spell_power(spell), TRUE, 1))
@@ -1331,8 +1354,6 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 		      ((i < 96) ? (p_ptr->spell_worked3 & (1L << (i - 64))) :
 		      (p_ptr->spell_worked4 & (1L << (i - 96)))))))
 		{
-			int e = sc_ptr->level;
-
 			/* The spell worked */
 			if (i < 32)
 			{
@@ -1350,9 +1371,6 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 			{
 				p_ptr->spell_worked2 |= (1L << (i - 96));
 			}
-
-			/* Gain experience */
-			gain_exp(e * sc_ptr->level);
 
 			/* Redraw object recall */
 			p_ptr->window |= (PW_OBJECT);

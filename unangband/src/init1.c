@@ -1434,7 +1434,7 @@ static cptr s_info_types[] =
 	"INVEN_HEAD",
 	"INVEN_HANDS",
 	"INVEN_FEET",
-	"WONDER",
+	"USE_OBJECT",
 	"IDENT_NAME",
 	"RELEASE_CURSE",
 	"CONCENTRATE_LITE",

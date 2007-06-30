@@ -7296,13 +7296,13 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				break;				
 			}
 
+			case SPELL_USE_OBJECT:
 			case SPELL_DETECT_MIND:
 			{
 				/* Spell was processed previously */
 				break;
 			}
 
-			case SPELL_WONDER:
 			case SPELL_RELEASE_CURSE:
 			case SPELL_CONCENTRATE_LITE:
 			case SPELL_CONCENTRATE_LIFE:
@@ -7432,6 +7432,19 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 {
 	bool obvious = FALSE;
 
+	/* Hack -- for 'wonder' spells */
+	if (s_info[spell].type == SPELL_USE_OBJECT)
+	{
+		object_type object_type_body;
+		object_type *o_ptr = &object_type_body;
+
+		/* Create a fake object */
+		object_prep(o_ptr, s_info[spell].param);
+		
+		/* Get a power */
+		get_spell(&spell, "use", o_ptr, FALSE);
+	}
+
 	/* Inform the player */
 	if (strlen(s_text + s_info[spell].text))
 	{
@@ -7441,7 +7454,6 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 
 	/* Note the order is important -- because of the impact of blinding a character on their subsequent
 		ability to see spell blows that affect themselves */
-	/*if (preprocess_spell_blows(spell, level, cancel, known, TRUE)) obvious = TRUE;*/
 	if (process_spell_blows(who, what, spell, level, cancel)) obvious = TRUE;
 	if (process_spell_flags(spell, level, cancel, known)) obvious = TRUE;
 	if (process_spell_types(who, spell, level, cancel)) obvious = TRUE;
