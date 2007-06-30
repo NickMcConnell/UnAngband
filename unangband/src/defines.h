@@ -2161,36 +2161,24 @@
 
 /* The "sval" codes for TV_STAFF */
 #define SV_STAFF_DARKNESS		0
-#define SV_STAFF_SLOWNESS		1
-#define SV_STAFF_HASTE_MONSTERS	2
 #define SV_STAFF_SUMMONING		3
 #define SV_STAFF_TELEPORTATION	4
-#define SV_STAFF_DETECT_CURSE		5
-#define SV_STAFF_REMOVE_CURSE	6
 #define SV_STAFF_STARLITE		7
 #define SV_STAFF_LITE			8
 #define SV_STAFF_MAPPING		9
-#define SV_STAFF_DETECT_GOLD	10
-#define SV_STAFF_DETECT_ITEM	11
-#define SV_STAFF_DETECT_TRAP	12
-#define SV_STAFF_DETECT_DOOR	13
-#define SV_STAFF_DETECT_INVIS	14
-#define SV_STAFF_DETECT_EVIL	15
-#define SV_STAFF_CURE_LIGHT		16
 #define SV_STAFF_CURING			17
 #define SV_STAFF_HEALING		18
 #define SV_STAFF_THE_MAGI		19
-#define SV_STAFF_SLEEP_MONSTERS	20
-#define SV_STAFF_SLOW_MONSTERS	21
 #define SV_STAFF_SPEED			22
-#define SV_STAFF_PROBING		23
 #define SV_STAFF_DISPEL_EVIL	24
 #define SV_STAFF_POWER			25
 #define SV_STAFF_HOLINESS		26
 #define SV_STAFF_BANISHMENT		27
 #define SV_STAFF_EARTHQUAKES	28
 #define SV_STAFF_DESTRUCTION	29
-
+#define SV_STAFF_CURE_SERIOUS	31
+#define SV_STAFF_CURE_MORTAL	32
+#define SV_STAFF_PERILOUS_SUMMONING 33
 
 /* The "sval" codes for TV_WAND */
 #define SV_WAND_HEAL_MONSTER	0
@@ -2224,35 +2212,45 @@
 #define SV_WAND_DRAGON_BREATH	28
 
 /* The "sval" codes for TV_ROD */
-#define SV_ROD_DETECT_TRAP		0
-#define SV_ROD_DETECT_DOOR		1
-#define SV_ROD_DETECT_MAGIC		2
-#define SV_ROD_RECALL			3
-#define SV_ROD_ILLUMINATION		4
-#define SV_ROD_MAPPING			5
-#define SV_ROD_DETECTION		6
-#define SV_ROD_GAUGE_MAGIC    		7 /* Was probing */
-#define SV_ROD_CURING			8
-#define SV_ROD_HEALING			9
-#define SV_ROD_RESTORATION		10
-#define SV_ROD_SPEED			11
-#define SV_ROD_DOWSING			12
-#define SV_ROD_FEEDBACK			13
-#define SV_ROD_DISARMING		14
-#define SV_ROD_LITE			15
-#define SV_ROD_SLEEP_MONSTER		16
-#define SV_ROD_SLOW_MONSTER		17
-#define SV_ROD_DRAIN_LIFE		18
-#define SV_ROD_POLYMORPH		19
-#define SV_ROD_ACID_BOLT		20
-#define SV_ROD_ELEC_BOLT		21
-#define SV_ROD_FIRE_BOLT		22
-#define SV_ROD_COLD_BOLT		23
-#define SV_ROD_ACID_BALL		24
-#define SV_ROD_ELEC_BALL		25
-#define SV_ROD_FIRE_BALL		26
-#define SV_ROD_COLD_BALL		27
-#define SV_ROD_TELEPORT_AWAY		28
+#define SV_ROD_HASTE_MONSTERS	0
+#define SV_ROD_DETECT_CURSE		1
+#define SV_ROD_DETECT_GOLD		2
+#define SV_ROD_DETECT_ITEM		3
+#define SV_ROD_SLOW_MONSTERS	4
+#define SV_ROD_SLEEP_MONSTERS	5
+#define SV_ROD_CURE_MODERATE_WOUNDS	6
+#define SV_ROD_DETECT_LIFE		7
+#define SV_ROD_REMOVE_CURSE		8
+#define SV_ROD_DETECT_EVIL		9
+#define SV_ROD_DETECT_TRAP		10
+#define SV_ROD_DETECT_DOOR		11
+#define SV_ROD_DETECT_MAGIC		12
+#define SV_ROD_RECALL			13
+#define SV_ROD_ILLUMINATION		14
+#define SV_ROD_MAPPING			15
+#define SV_ROD_DETECTION		16
+#define SV_ROD_GAUGE_MAGIC    	17 /* Was probing */
+#define SV_ROD_CURING			18
+#define SV_ROD_HEALING			19
+#define SV_ROD_RESTORATION		20
+#define SV_ROD_SPEED			21
+#define SV_ROD_DOWSING			22
+#define SV_ROD_FEEDBACK			23
+#define SV_ROD_DISARMING		24
+#define SV_ROD_LITE			25
+#define SV_ROD_SLEEP_MONSTER		26
+#define SV_ROD_SLOW_MONSTER		27
+#define SV_ROD_DRAIN_LIFE		28
+#define SV_ROD_POLYMORPH		29
+#define SV_ROD_ACID_BOLT		30
+#define SV_ROD_ELEC_BOLT		31
+#define SV_ROD_FIRE_BOLT		32
+#define SV_ROD_COLD_BOLT		33
+#define SV_ROD_ACID_BALL		34
+#define SV_ROD_ELEC_BALL		35
+#define SV_ROD_FIRE_BALL		36
+#define SV_ROD_COLD_BALL		37
+#define SV_ROD_TELEPORT_AWAY		38
 
 
 /* The "sval" codes for TV_SCROLL */
@@ -2433,7 +2431,7 @@
 /*
  * Special "sval" limit -- first "aimed" rod
  */
-#define SV_ROD_MIN_DIRECTION	14
+#define SV_ROD_MIN_DIRECTION	24
 
 /*
  * Special "sval" limit -- first "large" chest

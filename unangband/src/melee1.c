@@ -2207,7 +2207,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			bool hit = TRUE;
 
 			/* Requires a monster */
-			if (who <= SOURCE_MONSTER_START) break;
+			if ((who < SOURCE_MONSTER_START) && (who != SOURCE_PLAYER_ALLY)) break;
 
 			/* Get the blow */
 			effect = r_ptr->blow[attack-96].effect;
