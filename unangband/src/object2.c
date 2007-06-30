@@ -4861,13 +4861,9 @@ static bool kind_is_good(int k_idx)
 			return (TRUE);
 		}
 
-		case TV_STAFF:
-		{
-			if (k_ptr->level < 50) return (FALSE);
-		/* Fall through */
-		}
 		/* Weapons -- Good unless damaged */
 		case TV_BOW:
+		case TV_STAFF:
 		case TV_SWORD:
 		case TV_HAFTED:
 		case TV_POLEARM:
@@ -4887,6 +4883,12 @@ static bool kind_is_good(int k_idx)
 
 		/* Books -- high level books are good if not seen previously */
 		case TV_MAGIC_BOOK:
+		{
+			if ((k_ptr->sval < SV_BOOK_MAX_GOOD) && !(k_ptr->aware)) return (TRUE);
+			return (FALSE);	
+		}
+		
+		/* Books -- high level books are good if not seen previously */
 		case TV_PRAYER_BOOK:
 		case TV_SONG_BOOK:
 		{
