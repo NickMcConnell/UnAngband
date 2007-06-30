@@ -1073,7 +1073,36 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags2 & (SF2_CURSE_WEAPON)) vp[vn++] = "curses your weapon";
 	if (s_ptr->flags2 & (SF2_CURSE_ARMOR)) vp[vn++] = "curses your armor";
 	if (s_ptr->flags2 & (SF2_AGGRAVATE)) vp[vn++] = "wakes up nearby monsters and hastes those in line of sight";
-	if (s_ptr->type == SPELL_SUMMON) vp[vn++] = "summons monsters";
+	if (s_ptr->type == SPELL_SUMMON)
+	{
+		switch(s_ptr->param)
+		{
+			case SUMMON_KIN: vp[vn++] = "summons kindred monsters"; break;
+			case SUMMON_PLANT: vp[vn++] = "summons plants"; break;
+			case SUMMON_INSECT: vp[vn++] = "summons insects"; break;
+			case SUMMON_ANIMAL: vp[vn++] = "summons animals"; break;
+			case SUMMON_HOUND: vp[vn++] = "summons hounds"; break;
+			case SUMMON_SPIDER: vp[vn++] = "summons spiders"; break;
+			case SUMMON_CLASS: vp[vn++] = "summons related classes"; break;
+			case SUMMON_RACE: vp[vn++] = "summons related races"; break;
+			case SUMMON_GROUP: vp[vn++] = "summons related monsters"; break;
+			case SUMMON_FRIEND: vp[vn++] = "summons related monsters"; break;
+			case SUMMON_UNIQUE_FRIEND : vp[vn++] = "summons related uniques"; break;
+			case SUMMON_ORC: vp[vn++] = "summons orcs"; break;
+			case SUMMON_TROLL: vp[vn++] = "summons trolls"; break;
+			case SUMMON_GIANT: vp[vn++] = "summons giants"; break;
+			case SUMMON_DRAGON: vp[vn++] = "summons dragons"; break;
+			case SUMMON_HI_DRAGON: vp[vn++] = "summons high dragons"; break;
+			case SUMMON_DEMON: vp[vn++] = "summons demons"; break;
+			case SUMMON_HI_DEMON: vp[vn++] = "summons high demons"; break;
+			case SUMMON_UNIQUE: vp[vn++] = "summons uniques"; break;
+			case SUMMON_HI_UNIQUE: vp[vn++] = "summons high uniques"; break;
+			case SUMMON_UNDEAD: vp[vn++] = "summons undead"; break;
+			case SUMMON_HI_UNDEAD: vp[vn++] = "summons high undead"; break;
+			case SUMMON_WRAITH: vp[vn++] = "summons wraiths"; break;
+			default: vp[vn++] = "summons monsters"; break;
+		}
+	}
 	if (s_ptr->type == SPELL_SUMMON_RACE) vp[vn++] = format("summons %s%s",
 		is_a_vowel((r_name+r_info[s_ptr->param].name)[0])?"an ":"a ",
 		r_name+r_info[s_ptr->param].name);
