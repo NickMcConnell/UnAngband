@@ -15534,6 +15534,7 @@ M:14:0:0:0
 B:HIT:HURT:1d6
 B:SHOT:HURT:1d5
 F:MALE | SMART | LEVEL_SIZE
+F:OPEN_DOOR | TAKE_ITEM
 D:A squat, ugly humanoid covered with grime. He looks a bit like a
 D: stunted chimpanzee.
 
@@ -15546,7 +15547,7 @@ B:HIT:HURT:2d7
 B:HIT:HURT:2d6
 B:SHOT:HURT:1d5
 F:MALE |
-F:FRIENDS |
+F:FRIENDS | TAKE_ITEM
 F:BASH_DOOR | SMART | LEVEL_SIZE
 D:A squat, man-like ape covered with fur.
 
@@ -15558,6 +15559,7 @@ M:14:0:0:0
 B:HIT:HURT:4d8
 B:SHOT:HURT:1d5
 F:MALE | BASH_DOOR | SMART | FRIEND | LEVEL_SIZE
+F:TAKE_ITEM
 D:A huge, lumbering humanoid covered with thick black fur. 
 
 N:1078:Orangutan
@@ -15569,6 +15571,7 @@ B:HIT:HURT:1d10
 B:HIT:HURT:1d10
 B:SHOT:HURT:1d5
 F:MALE | BASH_DOOR | SMART | LEVEL_SIZE
+F:TAKE_ITEM
 D:A humanoid covered with orange fur. His arms are twice as long as his
 D: legs.
 
@@ -18682,7 +18685,7 @@ M:14:0:0:0
 B:HIT:HURT:1d8
 B:SHOT:HURT:1d5
 B:SHRIEK
-F:MALE
+F:MALE | OPEN_DOOR | TAKE_ITEM
 F:FRIENDS | CAN_FLY | SMART | EVASIVE
 D:It is a monkey with wings!
 
