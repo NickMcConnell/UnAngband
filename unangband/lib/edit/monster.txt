@@ -3812,7 +3812,7 @@ I:110:20d12:15:40:10
 W:29:2:0:60
 B:STING:PARALYZE:2d13
 F:RAND_25
-F:WEIRD_MIND | BASH_DOOR | FRIENDS
+F:WEIRD_MIND | BASH_DOOR | FRIENDS | UNDEAD
 F:INSECT | IM_POIS | CAN_CLIMB | CAN_DIG | LEVEL_SIZE
 D:A hideous centipede covered in slime and with glowing tentacles around its
 D: head.
@@ -4391,7 +4391,7 @@ F:LEVEL_SIZE | LEVEL_SPEED | LEVEL_POWER
 D:It is a massive statue of purest mithril.  It looks expensive!
 
 N:319:Shadow drake
-G:d:D
+G:D:D
 I:110:30d10:20:70:70
 W:36:3:0:1100
 M:18:18:5:70
@@ -4509,7 +4509,7 @@ W:20:1:0:220
 M:25:0:0:25
 B:BITE:HURT:5d4
 B:WAIL:TERRIFY:5d6
-F:WEIRD_MIND | BASH_DOOR
+F:WEIRD_MIND | BASH_DOOR | UNDEAD
 F:INSECT | CAN_FLY | LEVEL_SIZE
 D:It is a giant beetle that produces a chilling sound.
 
@@ -4654,7 +4654,7 @@ F:NO_STUN | NO_CUTS | RES_BLIND | LEVEL_SIZE | LEVEL_POWER | LEVEL_SPEED
 D:It is the animated form of a massive troll.
 
 N:339:Chaos drake
-G:d:v
+G:D:v
 I:110:50d10:20:70:70
 W:32:3:0:1400
 M:18:18:11:43
@@ -4675,7 +4675,7 @@ D:A dragon twisted by the forces of chaos.  It seems first ugly, then fair,
 D: as its form shimmers and changes in front of your eyes.
 
 N:340:Law drake
-G:d:B
+G:D:B
 I:110:55d10:20:70:70
 W:34:3:0:1400
 M:18:18:11:43
@@ -4694,7 +4694,7 @@ D:This dragon is clever and cunning.  It laughs at your puny efforts to
 D: disturb it.
 
 N:341:Balance drake
-G:d:v
+G:D:v
 I:110:60d10:20:70:70
 W:36:3:0:1600
 M:18:18:12:63
@@ -4714,7 +4714,7 @@ D:A mighty dragon, the balance drake seeks to maintain the Cosmic Balance,
 D: and despises your feeble efforts to destroy evil.
 
 N:342:Ethereal drake
-G:d:w
+G:D:w
 I:110:50d10:20:70:70
 W:38:3:0:1200
 M:18:18:5:43
@@ -5216,7 +5216,7 @@ B:BUTT:BATTER:4d6
 B:CRUSH:HURT:4d4
 F:BASH_DOOR | HUGE
 F:ANIMAL | FRIENDS | LEVEL_SPEED
-S:BESERK
+S:BERSERK
 D:A massive elephantine form with eyes twisted by madness.
 
 N:374:Giant fire ant
@@ -5693,7 +5693,7 @@ S:BRTH_SOUND | BRTH_POIS
 D:A large dragon with scales of gleaming gold.
 
 N:404:Crystal drake
-G:d:w
+G:D:w
 I:110:45d10:20:70:70
 W:31:3:0:1350
 M:18:18:11:50
@@ -6663,7 +6663,7 @@ B:BUTT:HURT:4d8
 B:CRUSH:HURT:4d15
 B:XBOLT:HURT:30d7
 F:BASH_DOOR | RAND_25 | ANIMAL | FRIEND | WARRIOR | EVIL | LEVEL_SPEED
-S:S_CLASS | BESERK
+S:S_CLASS | BERSERK
 D:A gigantic elephant, maddened by Southron war-drugs.  Its tusks are capped 
 D:with steel, and on it ride the fearsome crossbowmen of Harad.
 
@@ -7358,7 +7358,7 @@ F:ONLY_ITEM | DROP_1D2 | DROP_2D2 | DROP_GOOD
 F:COLD_BLOOD | BASH_DOOR
 F:EVIL | UNDEAD | IM_FIRE | IM_COLD | IM_POIS
 F:HURT_LITE | NO_CONF | NO_SLEEP
-F:RES_NETHR | RES_DARK | LEVEL_POWER | LEVEL_SIZE
+F:RES_NETHR | RES_DARK | LEVEL_POWER | LEVEL_SIZE | INSECT
 S:BLIND | SCARE | MIND_BLAST
 S:BOLT_MANA | BOLT_NETHR | BALL_NETHR
 S:BRTH_NETHR | S_UNDEAD | BRTH_ACID | BRTH_POIS
@@ -8101,7 +8101,7 @@ F:RAND_25
 F:ONLY_ITEM | DROP_1D2 | DROP_GOOD
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:ANIMAL | EAT_BODY | EVIL | IM_POIS
-S:SCARE | S_MONSTERS | S_HOUND | BESERK
+S:SCARE | S_MONSTERS | S_HOUND | BERSERK
 D:Draugluin provides Sauron with a fearsome personal guard.  He is an
 D: enormous wolf inhabited with a human spirit.  He is chief of all his kind.
 
@@ -8620,7 +8620,7 @@ F:ONLY_ITEM | DROP_GOOD | DROP_4D2 | DROP_2D2
 F:OPEN_DOOR | BASH_DOOR | EAT_BODY | POWERFUL
 F:EVIL | DEMON | RES_MAGIC | NO_CONF | NO_SLEEP
 F:IM_FIRE | IM_COLD | IM_POIS | IM_ACID | IM_ELEC | HUGE | LEVEL_POWER
-S:HASTE | SLOW | SCARE | S_HI_DEMON | BESERK
+S:HASTE | SLOW | SCARE | S_HI_DEMON | BERSERK
 D:A giant humanoid demon wielding a massive, heavy and sharp scythe.  Feared
 D: by foes and friends alike when it flies into one of its berserk rages, the
 D: Horned Reaper will cut down anything in its path between it and you - even
@@ -8852,7 +8852,7 @@ F:ONLY_ITEM | DROP_90 | DROP_2D2
 F:BASH_DOOR | REGENERATE | EVIL
 F:NO_CONF | NO_SLEEP | NO_FEAR
 F:WARRIOR | NEED_LITE | LEVEL_POWER
-S:HASTE | SCARE | BESERK
+S:HASTE | SCARE | BERSERK
 D:Even the strongest of normal human warriors fears the Berserker - the one who
 D: can drive himself into such a terrible battle-frenzy that he can survive blows
 D: which should kill him, and still apparently feel no pain.  He tramples weaker
@@ -10197,7 +10197,7 @@ W:9:4:0:110
 M:0:50:3:90
 B:HIT:EXP_10:1d4
 B:HIT:EXP_10:1d4
-F:FORCE_SLEEP | NEVER_MOVE | 
+F:FORCE_SLEEP | NEVER_MOVE | UNDEAD
 F:STUPID | EMPTY_MIND | COLD_BLOOD | LEVEL_SIZE
 F:NO_CONF | NO_SLEEP | NO_FEAR | NO_STUN | NO_CUTS | RES_BLIND
 F:RES_BLUNT | PLANT | RES_BLIND
@@ -11503,7 +11503,7 @@ D:It has a form that legends are made of.  Beautiful scales of brilliant
 D: ruby cover it.
 
 N:771:Guard drake
-G:d:s
+G:D:s
 I:110:32d10:20:60:20
 W:37:2:0:420
 M:25:0:0:0
@@ -11519,7 +11519,7 @@ D:A fierce looking red dragon, with a studded iron collar and huge fangs. Smoke 
 D: from its mouth, but the fire beneath is almost choked out.
 
 N:772:Star drake
-G:d:B
+G:D:B
 I:110:30d10:25:50:30
 W:38:2:0:700
 M:18:18:18:30
@@ -11537,7 +11537,7 @@ D:It is a dragon-like form wrapped in starlight.  Glowing blue eyes shine out in
 D: the dark, and it is surrounded by the cold of deep space.
 
 N:773:Sun drake
-G:d:y
+G:D:y
 I:110:30d10:25:50:30
 W:43:2:0:700
 M:18:18:18:30
@@ -11556,7 +11556,7 @@ D:It is a dragon-like form wrapped in the fire of the sun. White hot eyes peer
 D: from the light, and it is surrounded by the burning heat of the corona.
 
 N:774:Land drake
-G:d:u
+G:D:u
 I:110:30d10:25:50:30
 W:35:2:0:700
 M:18:18:18:30
@@ -11573,7 +11573,7 @@ D:It is a wingless dragon with short clumsy legs shaped like shovels.
 D:  Fire and acidic fumes belch from its mouth.
 
 N:775:Sea drake
-G:d:v
+G:D:v
 I:110:30d10:25:50:30
 W:37:2:0:700
 M:18:18:18:30
@@ -11590,7 +11590,7 @@ D:It is a sinous serpent-like dragon with flippers instead of legs.
 D:  Acidic and poisonous fumes spill from its mouth.
 
 N:776:War drake
-G:d:s
+G:D:s
 I:110:30d10:25:50:30
 W:36:2:0:700
 M:18:18:18:30
@@ -12655,7 +12655,7 @@ F:RAND_25 | DROP_1D2 | CAN_FLY |
 F:COLD_BLOOD | TAKE_ITEM | PASS_WALL | 
 F:EVIL | UNDEAD | IM_POIS | IM_BLUNT | NO_CUTS | NO_STUN
 F:IM_COLD | NO_CONF | NO_SLEEP | CAN_FLY
-S:TPORT | DRAIN_MANA | BLIND | CONF | SLOW | BESERK
+S:TPORT | DRAIN_MANA | BLIND | CONF | SLOW | BERSERK
 D:It hates you with a malice.
 
 N:857:Dreadful soul
@@ -14391,7 +14391,7 @@ B:CRAWL:UN_BONUS:4d6
 B:CRAWL:UN_BONUS:4d6
 F:FORCE_SLEEP | 
 F:ONLY_ITEM | DROP_1D2 
-F:SMART | COLD_BLOOD | BASH_DOOR | 
+F:SMART | COLD_BLOOD | BASH_DOOR | INSECT
 F:EVIL | UNDEAD | IM_COLD | IM_POIS | HURT_LITE | NO_CONF | NO_SLEEP
 F:RES_NETHR | RES_NEXUS | RES_DISEN | RES_WATER | RES_DARK | LEVEL_SIZE | LEVEL_POWER
 S:BLIND | SCARE | 
@@ -14412,7 +14412,7 @@ B:BITE:POISON:5d7
 B:CRUSH:EXP_40:8d9
 B:CRUSH:EXP_40:8d9
 F:FORCE_SLEEP | 
-F:ONLY_ITEM | DROP_1D2 | DROP_GOOD | 
+F:ONLY_ITEM | DROP_1D2 | DROP_GOOD | ANIMAL | HAS_SCALE
 F:COLD_BLOOD | BASH_DOOR | INVISIBLE | ATTR_CLEAR |
 F:EVIL | UNDEAD | IM_COLD | IM_POIS | HURT_LITE | NO_CONF | NO_SLEEP
 F:RES_NETHR | RES_NEXUS | RES_DISEN | RES_WATER | RES_DARK | LEVEL_SIZE | LEVEL_POWER
@@ -14434,7 +14434,7 @@ B:CLAW:UN_BONUS:11d11
 B:BITE:EXP_80:8d8
 B:BITE:EXP_80:8d8
 F:FORCE_SLEEP | 
-F:ONLY_ITEM | DROP_4D2 | DROP_GOOD | 
+F:ONLY_ITEM | DROP_4D2 | DROP_GOOD | ANIMAL | HAS_FUR
 F:SMART | COLD_BLOOD | BASH_DOOR | LEVEL_SIZE | LEVEL_POWER
 F:EVIL | UNDEAD | IM_FIRE | IM_COLD | IM_ELEC | IM_POIS | RES_WATER
 F:HURT_LITE | NO_CONF | NO_SLEEP | RES_NETHR | RES_NEXUS | RES_DISEN | RES_DARK
@@ -14458,7 +14458,7 @@ B:BITE:UN_POWER:9d9
 B:BITE:UN_POWER:9d9
 F:FORCE_SLEEP | 
 F:ONLY_ITEM | DROP_4D2 | DROP_GOOD | 
-F:SMART | COLD_BLOOD | BASH_DOOR | 
+F:SMART | COLD_BLOOD | BASH_DOOR | ANIMAL | HAS_FUR
 F:EVIL | UNDEAD | IM_FIRE | IM_COLD | IM_ELEC | IM_POIS | RES_WATER
 F:HURT_LITE | NO_CONF | NO_SLEEP | RES_NETHR | RES_NEXUS | RES_DISEN | RES_DARK | LEVEL_SIZE | LEVEL_POWER
 S:BLIND | SCARE | MIND_BLAST | 
@@ -15708,7 +15708,7 @@ I:100:4d5:7:3:10
 W:3:4:0:1
 B:CRAWL:DISEASE:1d2
 F:INSECT | HURT_LITE | MULTIPLY | NO_FEAR | RAND_25 | RAND_50 | STUPID |
-F:WEIRD_MIND | LEVEL_SIZE
+F:WEIRD_MIND | LEVEL_SIZE | UNDEAD
 D:A disgusting and diseased mass of maggots.
 
 N:1087:Noxious mushroom patch
@@ -15932,7 +15932,7 @@ S:WOUND | BOLT_NETHR | BRTH_FORCE | BRTH_DARK | S_KIN | CURSE
 D:A great and ancient king, arisen to reclaim his dominion.
 
 N:1107:Diseased mass
-G:j:u
+G:w:u
 I:110:8d8:70:12:5
 W:11:3:0:33
 B:TOUCH:DISEASE:1d6
@@ -16427,7 +16427,7 @@ D:everything in sight; the very walls are blackened by its fury.
 #From Sangband
 
 N:1139:Skeleton serpent
-G:s:w
+G:J:w
 I:115:10d9:20:25:40
 W:19:3:0:60
 M:9:0:0:0
@@ -16497,7 +16497,7 @@ D:It is a dragon-like form, festooned with spikes and
 D: the armor of war.
 
 N:1143:Inertia drake
-G:d:W
+G:D:W
 I:110:45d10:30:70:70
 W:30:2:0:1500
 M:18:18:11:39
@@ -16562,7 +16562,7 @@ D:A strange creature that disguises itself as a staff to lure
 D: unsuspecting adventurers within reach of its venomous claws.
 
 N:1147:Thunder drake
-G:d:y
+G:D:y
 I:110:40d10:30:100:70
 W:28:1:0:1500
 M:18:18:11:39
@@ -16612,7 +16612,7 @@ D:A strange creature that disguises itself as a wand to lure
 D: unsuspecting adventurers within reach of its venomous teeth.
 
 N:1150:Power drake
-G:d:v
+G:D:v
 I:120:65d10:30:100:70
 W:49:1:0:2500
 M:25:25:15:56
@@ -17396,7 +17396,7 @@ S:BALL_DARK | TELE_SELF_TO | CURSE
 D:A demonic woman-headed serpent, hungering for mortal flesh and souls.
 
 N:1204:Night-drake
-G:d:D
+G:D:D
 I:110:52d10:20:25:40
 W:35:3:0:320
 M:18:18:8:50
@@ -18315,7 +18315,7 @@ B:SPIKE:HURT:7d6
 B:SPORE:LOSE_STR:5d6
 F:INSECT | SMART | BASH_DOOR | FRIENDS | FORCE_MAXHP
 F:IM_ACID | IM_POIS | NO_CONF | NO_SLEEP | CAN_SWIM | CAN_CLIMB | LEVEL_SIZE
-S:BESERK | INVIS | TELE_SELF_TO
+S:BERSERK | INVIS | TELE_SELF_TO
 D:A spined and ferocious insect: its proboscis tastes the air and its head unerringly turns to you;
 D: leaping off walls and ceilings, it runs at you to implant its children in your still warm flesh.
 
@@ -18442,12 +18442,247 @@ N:1279:Ent
 G:::G
 I:120:40d100:30:120:15
 W:46:3:0:12500:0:0
-B:CRUSH:HURT:10d11
-B:CRUSH:HURT:10d11
-B:CRUSH:HURT:10d11
-B:CRUSH:HURT:10d11
+B:CRUSH:HURT:13d11
+B:CRUSH:HURT:13d11
+B:CRUSH:HURT:13d11
+B:AURA:ANIM_TREE
 F:FORCE_SLEEP | FORCE_MAXHP
-F:ONLY_ITEM | DROP_4D2 | DROP_GOOD | HUGE |
+F:ONLY_ITEM | DROP_4D2 | DROP_GOOD | HUGE | HAS_AURA
 F:SMART | TAKE_ITEM | OPEN_DOOR | BASH_DOOR | DROP_POTION
 F:MALE
 D:A treeherd; a sentient, moving tree. Its wrath is fearsome!
+
+N:1280:Animatrix
+G:q:b
+I:110:24d8:20:10:10
+W:20:2:0:125
+M:40:40:14:75
+B:HIT:HURT:2d3
+B:DAGGER:HURT:4d3
+B:AURA:ANIM_OBJECT
+F:FEMALE
+F:FORCE_SLEEP | DROP_1D2
+F:SMART | OPEN_DOOR
+F:EVIL | NEED_LITE | ARCHER
+F:MAGE | LOW_MANA_RUN | LEVEL_POWER | HAS_AURA
+S:ADD_MANA | INVIS | BLINK | A_OBJECT | ADD_AMMO
+D:A female spell caster surrounded by flying daggers.
+
+N:1281:Zombified dog
+G:C:y
+I:110:8d6:32:18:15
+W:12:1:0:35
+M:0:30:0:20
+B:BITE:HURT:1d5
+F:FRIENDS | 
+F:ANIMAL | EAT_BODY | LEVEL_SIZE
+F:NO_FEAR | IM_POIS | UNDEAD | NONLIVING
+F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP
+F:LEVEL_SIZE | LEVEL_SPEED | LEVEL_POWER
+S:HASTE | BERSERK
+D:It is a dead dog, following you - its flesh rotting
+D: and the skin flayed from its bones.
+
+N:1282:Mummified cat
+G:f:W
+I:110:3d5:40:12:0
+W:3:2:0:8
+B:CLAW:POISON:1d6
+F:BASH_DOOR
+F:ANIMAL | EAT_BODY | LEVEL_SPEED
+F:NO_FEAR | IM_POIS | UNDEAD | NONLIVING
+F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP
+F:LEVEL_SIZE | LEVEL_SPEED | LEVEL_POWER
+D:A cat wrapped in bandages with a blank stare.  It won't
+D: give up.
+
+N:1283:Rotting horror
+G:H:R
+I:115:40d20:12:90:10
+W:39:1:0:300
+B:CLAW:WOUND:2d14
+B:VOMIT:BLOOD:2d12
+B:TOUCH:POISON:2d12
+B:CRUSH:DRAIN_LIFE:4d10
+F:BASH_DOOR | CAN_SWIM | ANIMAL | EAT_BODY | LEVEL_SIZE | LEVEL_SPEED | LEVEL_POWER
+F:UNDEAD | IM_POIS | IM_COLD | NONLIVING | NO_FEAR
+F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP
+D:A ghastly undead hybrid of all things that walk, crawl and swim, but mostly those that
+D: rot and seep fluids.
+
+N:1284:Ghostly wolf
+G:C:w
+I:120:7d7:30:30:20
+W:12:2:0:30
+B:BITE:HURT:1d6
+B:BITE:COLD:1d6
+F:RAND_25
+F:FRIENDS
+F:BASH_DOOR
+F:ANIMAL | EAT_BODY | IM_COLD | LEVEL_SIZE
+F:WEIRD_MIND | COLD_BLOOD | FRIENDS | IM_BLUNT
+F:IM_POIS | ATTR_CLEAR
+D:The outline of a wolf, howling and snapping at unseen horrors.
+
+N:1285:Skeletal dragon
+G:d:w
+I:110:15d10:25:50:30
+W:35:2:0:700
+B:CLAW:BATTER:2d4
+B:CLAW:BATTER:2d4
+B:BITE:WOUND:3d6
+F:FORCE_SLEEP | FORCE_MAXHP | 
+F:ONLY_ITEM | DROP_2D2
+F:BASH_DOOR | LEVEL_SIZE | LEVEL_POWER
+F:EVIL | DRAGON | NO_CONF | NO_SLEEP |
+F:IM_FIRE | CAN_DIG | POWERFUL | SMART
+F:UNDEAD | IM_POIS | IM_COLD | NONLIVING | NO_FEAR
+F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP | RES_EDGED | RES_EDGED | IM_ELEC
+F:NO_STUN | NO_CUTS | RES_BLIND | LEVEL_SIZE | LEVEL_SPEED | LEVEL_POWER
+D:It has the form that legends are made of, but no flesh
+D: hangs from its polished bones.  It raises its wings and
+D: launches itself at you.
+
+N:1286:Zombified drake
+G:D:w
+I:110:30d10:20:60:70
+W:22:2:0:700
+M:10:10:3:21
+B:CLAW:HURT:2d6
+B:CLAW:HURT:2d6
+B:BITE:HURT:2d8
+B:ARC_20:BLOOD:16d6
+F:FORCE_SLEEP | FORCE_MAXHP
+F:DROP_3D2 | POWERFUL
+F:BASH_DOOR
+F:EVIL | DRAGON | IM_FIRE
+F:CAN_FLY
+F:UNDEAD | IM_POIS | IM_COLD | NONLIVING | NO_FEAR
+F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP
+F:LEVEL_SIZE | LEVEL_SPEED | LEVEL_POWER
+S:SCARE
+S:BRTH_DISEA
+D:It is the reanimated form of a dragon, with an open wound
+D: of a mouth.
+
+N:1287:Giant rotting toad
+G:F:R
+I:110:10d8:12:32:50
+W:16:2:0:45
+M:20:20:0:40
+B:BITE:HURT:4d4
+B:SPIT:DRAIN_LIFE:2d4
+F:RAND_25 | 
+F:BASH_DOOR | 
+F:ANIMAL | CAN_SWIM | IM_POIS | UNDEAD
+F:NONLIVING | NO_FEAR
+F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP
+S:HASTE | BLIND | SCARE | CURSE
+S:S_UNDEAD
+D:It is ugly and covered in rotting warts.
+
+N:1288:Dead fly
+G:I:y
+I:120:7d2:6:7:10
+W:7:3:0:3
+B:BITE:POISON:1d2
+F:RAND_50
+F:WEIRD_MIND | MULTIPLY
+F:INSECT |
+F:UNDEAD | IM_POIS | IM_COLD | NONLIVING | NO_FEAR
+F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP
+D:It makes you feel like your life is slipping through your fingers just to look at it.
+
+N:1289:Skeleton naga
+G:s:g
+I:110:9d8:18:40:120
+W:10:1:0:30
+M:11:0:0:0
+B:CRUSH:WOUND:1d8
+B:SPIT:COLD:2d6
+F:RAND_25 | TAKE_ITEM | DROP_60
+F:BASH_DOOR
+F:EVIL
+F:CAN_SWIM | LEVEL_SIZE
+F:UNDEAD | IM_POIS | IM_COLD | NONLIVING | NO_FEAR
+F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP | RES_EDGED | RES_EDGED | IM_ELEC
+F:NO_STUN | NO_CUTS | RES_BLIND
+D:A large skeleton serpent with the remainder of a female's torso.
+
+N:1290:Skeletal mount
+G:Q:w
+I:110:12d12:10:35:10
+W:13:2:0:55
+B:CLAW:HURT:1d8
+B:CLAW:HURT:1d8
+B:BITE:HURT:1d12
+B:CRUSH:HURT:1d10
+F:BASH_DOOR | ANIMAL | LEVEL_SIZE
+F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP | RES_EDGED | RES_EDGED | IM_ELEC
+F:NO_STUN | NO_CUTS | RES_BLIND
+D:The four-legged skeleton of some ancient beast.
+
+N:1291:Skeletal rat
+G:r:W
+I:110:3d3:8:24:20
+W:10:3:0:2
+M:15:0:0:0
+B:BITE:WOUND:2d6
+B:SPIT:POISON:2d6
+F:RAND_25 | 
+F:ANIMAL | IM_ELEC | SMART |
+F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP | RES_EDGED | RES_EDGED | IM_ELEC
+F:NO_STUN | NO_CUTS | RES_BLIND
+D:It is a skeletal rodent of unusual bone structure.
+
+N:1292:Skeletal lizard
+G:R:w
+I:120:8d8:15:65:30
+W:34:2:0:300
+M:15:15:0:25
+B:BITE:WOUND:2d8
+F:BASH_DOOR
+F:ANIMAL | NO_CONF | NO_SLEEP | LEVEL_SIZE
+F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP | RES_EDGED | RES_EDGED | IM_ELEC
+F:NO_STUN | NO_CUTS | RES_BLIND
+D:It is a large animated lizard skeleton.
+
+N:1293:Skeletal spider
+G:S:w
+I:120:10d10:8:16:80
+W:13:2:0:35
+B:BITE:HURT:1d10
+B:BITE:WOUND:1d10
+F:WEIRD_MIND | BASH_DOOR
+F:IM_POIS | LEVEL_SIZE
+F:INSECT | CAN_CLIMB
+F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP | RES_EDGED | RES_EDGED | IM_ELEC
+F:NO_STUN | NO_CUTS | RES_BLIND
+D:It is a fast-moving skeletal spider.
+
+N:1294:Zombified ape
+G:Y:w
+I:110:20d6:20:15:10
+W:12:2:0:18
+M:14:0:0:0
+B:HIT:HURT:4d8
+B:SHOT:HURT:1d5
+F:MALE | BASH_DOOR | SMART | FRIEND | LEVEL_SIZE
+F:UNDEAD | IM_POIS | IM_COLD | NONLIVING | NO_FEAR
+F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP
+F:LEVEL_SIZE | LEVEL_SPEED | LEVEL_POWER
+D:It is an animated simian corpse.  Flesh falls off in large chunks as it
+D: shambles forward.
+
+N:1295:Flying monkey
+G:Y:o
+I:115:8d8:12:60:10
+W:20:4:0:100
+M:14:0:0:0
+B:HIT:HURT:1d8
+B:SHOT:HURT:1d5
+B:SHRIEK
+F:MALE
+F:FRIENDS | CAN_FLY | SMART | EVASIVE
+D:It is a monkey with wings!
+

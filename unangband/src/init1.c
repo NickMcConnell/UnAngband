@@ -744,7 +744,7 @@ static cptr r_info_flags6[] =
 	"ILLUSION",
 	"WOUND",
 	"BLESS",
-	"BESERK",
+	"BERSERK",
 	"SHIELD",
 	"OPPOSE_ELEM",
 	"HUNGER",

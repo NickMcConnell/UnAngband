@@ -3801,15 +3801,12 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 		/* Animate trees */
 		case GF_ANIM_TREE:
 		{
-			bool change = FALSE;
+			if (f_ptr->flags2 & (FF3_TREE)) break;
+
+			summoner = (who > SOURCE_MONSTER_START ? who : 0);
 
 			if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_TREE,
-					who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) change = TRUE;
-
-			if (change)
-			{
-				cave_set_feat(y,x,FEAT_GROUND);
-			}
+					who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) cave_set_feat(y,x,FEAT_GROUND);
 
 			break;
 		}
@@ -3819,8 +3816,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 		{
 			int i;
 
-			bool change = FALSE;
-
+			summoner = (who > SOURCE_MONSTER_START ? who : 0);
 			summon_group_type = 0;
 
 			for (i = 0; i < MAX_ELEMENTS; i++)
@@ -3835,12 +3831,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			if (summon_group_type)
 			{
 				if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_ELEMENT,
-					who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) change = TRUE;
-			}
-
-			if (change)
-			{
-				cave_set_feat(y,x,FEAT_GROUND);
+					who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) cave_set_feat(y,x,FEAT_GROUND);
 			}
 
 			break;
@@ -3851,6 +3842,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 		{
 			bool change = FALSE;
 
+			summoner = (who > SOURCE_MONSTER_START ? who : 0);
 			summon_attr_type = 0;
 			summon_char_type = 0;
 
@@ -3858,18 +3850,6 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			if (f_ptr->flags3 & (FF3_CHEST))
 			{
 				summon_char_type = '&';
-			}
-
-			/* Animate trees */
-			else if (f_ptr->flags3 & (FF3_TREE))
-			{
-				summon_char_type = ':';
-			}
-
-			/* Animate plants */
-			else if (f_ptr->flags3 & (FF3_LIVING))
-			{
-				summon_char_type = ';';
 			}
 
 			/* Animate embedded objects */
@@ -4378,6 +4358,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 			{
 				if (!is_art)
 				{
+					summoner = (who > SOURCE_MONSTER_START ? who : 0);
 					summon_attr_type = k_info[o_ptr->k_idx].d_attr;
 					summon_char_type = k_info[o_ptr->k_idx].d_char;
 
@@ -4388,12 +4369,20 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					if ((k_info[o_ptr->k_idx].tval == TV_ASSEMBLY) && (o_ptr->name3))
 					{
 						summon_race_type = o_ptr->name3;
-						if (summon_specific(y, x, 99, SUMMON_FRIEND, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) do_kill = TRUE;
+						if (summon_specific(y, x, 99, SUMMON_FRIEND, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L))
+						{
+							do_kill = TRUE;
+							note_kill = (plural ? " animate!" : " animates!");
+						}
 					}
 					else
 					{
 						if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_OBJECT,
-							who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) do_kill = TRUE;
+							who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L))
+						{
+							do_kill = TRUE;
+							note_kill = (plural ? " animate!" : " animates!");
+						}
 					}
 				}
 				else
@@ -4407,14 +4396,19 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 			/* Animate dead */
 			case GF_ANIM_DEAD:
 			{
+				summoner = (who > SOURCE_MONSTER_START ? who : 0);
 				summon_char_type = 0;
 				summon_attr_type = 0;
+				summon_flag_type = 0L;
 
 				switch (k_info[o_ptr->k_idx].tval)
 				{
 					case TV_BONE:
 					{
-						if (k_info[o_ptr->k_idx].sval == SV_BONE_SKELETON) summon_char_type = 's';
+						if (k_info[o_ptr->k_idx].sval == SV_BONE_SKELETON)
+						{
+							summon_char_type = 's';
+						}
 						else
 						{
 							summon_char_type = k_info[o_ptr->k_idx].d_char;
@@ -4427,7 +4421,9 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 						if ((k_info[o_ptr->k_idx].sval == SV_BODY_CORPSE) || 
 							(k_info[o_ptr->k_idx].sval == SV_BODY_HEADLESS) ||
 							(k_info[o_ptr->k_idx].sval == SV_BODY_BUTCHERED))
+						{
 							 summon_char_type = 'z';
+						}
 						/* Hack -- animate hands and claws */
 						else if ((k_info[o_ptr->k_idx].sval == SV_BODY_HAND) ||
 							(k_info[o_ptr->k_idx].sval == SV_BODY_CLAW))
@@ -4451,8 +4447,8 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					summon_flag_type |= r_info[o_ptr->name3].flags3 & (RF3_RACE_MASK);
 					summon_flag_type |= r_info[o_ptr->name3].flags9 & (RF9_RACE_MASK);
 
-					/* Hack -- non-humanoids animate to undead of their own graphic */
-					if ((summon_flag_type & ~(RF3_ANIMAL | RF3_PLANT | RF3_INSECT | RF3_DRAGON)) == 0)
+					/* Hack -- non-humanoids animate to undead of their own graphic. Added eyes as a hack. */
+					if (((summon_flag_type & (RF3_ANIMAL | RF3_INSECT | RF3_PLANT | RF3_DRAGON)) != 0) || (r_info[o_ptr->name3].d_char == 'e'))
 					{
 						summon_flag_type = (RF3_UNDEAD);
 						summon_attr_type = 0;
@@ -4464,7 +4460,11 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 				if (summon_char_type || summon_attr_type || summon_flag_type)
 				{
 					if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_DEAD,
-						who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) do_kill = TRUE;
+						who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L))
+						{
+							do_kill = TRUE;
+							note_kill = (plural ? " animate!" : " animates!");
+						}
 				}
 				break;
 			}
@@ -4473,6 +4473,8 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 			case GF_RAISE_DEAD:
 			{
 				bool raise = FALSE;
+				
+				summoner = (who > SOURCE_MONSTER_START ? who : 0);
 
 				switch (k_info[o_ptr->k_idx].tval)
 				{
@@ -4496,14 +4498,25 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					summon_race_type = o_ptr->name3;
 
 					if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, RAISE_DEAD,
-						who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) do_kill = TRUE;
+						who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L))
+					{
+						do_kill = TRUE;
+						note_kill = (plural ? " come back to life!" : " comes back to life!");
+					}
+						
 
 					summon_race_type = 0;
 				}
 				else if ((raise) && (o_ptr->name3 == summon_race_type))
 				{
-					if (summon_specific(y, x, 99, RAISE_DEAD, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) do_kill = TRUE;
+					if (summon_specific(y, x, 99, RAISE_DEAD, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L))
+					{
+						do_kill = TRUE;
+						note_kill = (plural ? " come back to life!" : " comes back to life!");
+					}
 				}
+				
+				break;
 			}
 			
 			/* Wood warping -- wooden objects */
