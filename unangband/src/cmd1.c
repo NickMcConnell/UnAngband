@@ -2027,7 +2027,7 @@ void hit_trap(int y, int x)
 
 		if (f_ptr->spell)
 		{
-      			make_attack_ranged(0,f_ptr->spell,y,x);
+      			make_attack_ranged(SOURCE_FEATURE,f_ptr->spell,y,x);
 		}
 		else if (f_ptr->blow.method)
 		{

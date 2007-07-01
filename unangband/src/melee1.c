@@ -5062,7 +5062,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 6; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_KIN, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_KIN, TRUE, allies);
 			}
 
 			break;
@@ -5137,7 +5137,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 1; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, 0, allies);
+				count += summon_specific(y, x, rlev - 1, 0, TRUE, allies);
 			}
 			break;
 		}
@@ -5159,7 +5159,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 4; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, 0, allies);
+				count += summon_specific(y, x, rlev - 1, 0, TRUE, allies);
 			}
 			break;
 		}
@@ -5221,7 +5221,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 4; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_PLANT, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_PLANT, TRUE, allies);
 			}
 			break;
 		}
@@ -5243,7 +5243,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 3; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_INSECT, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_INSECT, TRUE, allies);
 			}
 			break;
 		}
@@ -5287,7 +5287,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 3; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_ANIMAL, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_ANIMAL, TRUE, allies);
 			}
 			break;
 		}
@@ -5309,7 +5309,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 2; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_HOUND, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_HOUND, TRUE, allies);
 			}
 			break;
 		}
@@ -5331,7 +5331,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 4; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_SPIDER, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_SPIDER, TRUE, allies);
 			}
 			break;
 		}
@@ -5361,7 +5361,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 3; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_CLASS, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_CLASS, TRUE, allies);
 			}
 			break;
 		}
@@ -5394,7 +5394,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 3; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_RACE, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_RACE, TRUE, allies);
 			}
 			break;
 		}
@@ -5421,7 +5421,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 3; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_GROUP, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_GROUP, TRUE, allies);
 			}
 			break;
 		}
@@ -5461,7 +5461,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 1; k++)
 			{
-				count += summon_specific(y, x, rlev, summon_type, allies);
+				count += summon_specific(y, x, rlev, summon_type, TRUE, allies);
 			}
 
 			break;
@@ -5502,7 +5502,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 6; k++)
 			{
-				count += summon_specific(y, x, rlev, summon_type, allies);
+				count += summon_specific(y, x, rlev, summon_type, TRUE, allies);
 			}
 
 			break;
@@ -5525,7 +5525,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 4; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_ORC, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_ORC, TRUE, allies);
 			}
 			break;
 		}
@@ -5547,7 +5547,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 4; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_TROLL, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_TROLL, TRUE, allies);
 			}
 			break;
 		}
@@ -5569,7 +5569,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Count them for later */
 			for (k = 0; k < 4; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_GIANT, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_GIANT, TRUE, allies);
 			}
 			break;
 		}
@@ -5591,7 +5591,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			for (k = 0; k < 1; k++)
 			{
 				count += summon_specific(m_ptr->fy, m_ptr->fx,
-					rlev - 1, SUMMON_DRAGON, allies);
+					rlev - 1, SUMMON_DRAGON, TRUE, allies);
 			}
 
 			break;
@@ -5614,7 +5614,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			for (k = 0; k < 4; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_HI_DRAGON, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_HI_DRAGON, TRUE, allies);
 			}
 			break;
 		}
@@ -5678,7 +5678,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			for (k = 0; k < 1; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_DEMON, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_DEMON, TRUE, allies);
 			}
 			break;
 		}
@@ -5704,7 +5704,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			for (k = 0; k < 4; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_HI_DEMON, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_HI_DEMON, TRUE, allies);
 			}
 			break;
 		}
@@ -5728,7 +5728,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			for (k = 0; k < 1; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, summon_type, allies);
+				count += summon_specific(y, x, rlev - 1, summon_type, TRUE, allies);
 			}
 			break;
 		}
@@ -5748,7 +5748,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			for (k = 0; k < 3; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_UNIQUE, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_UNIQUE, TRUE, allies);
 			}
 			break;
 		}
@@ -5771,7 +5771,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			for (k = 0; k < 3; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_HI_UNIQUE, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_HI_UNIQUE, TRUE, allies);
 			}
 			break;
 		}
@@ -5794,7 +5794,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			for (k = 0; k < 1; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_UNDEAD, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_UNDEAD, TRUE, allies);
 			}
 			break;
 		}
@@ -5820,7 +5820,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			for (k = 0; k < 4; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_HI_UNDEAD, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_HI_UNDEAD, TRUE, allies);
 			}
 
 			break;
@@ -5847,12 +5847,12 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			for (k = 0; k < 6; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_WRAITH, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_WRAITH, TRUE, allies);
 			}
 
 			for (k = 0; k < 6; k++)
 			{
-				count += summon_specific(y, x, rlev - 1, SUMMON_HI_UNDEAD, allies);
+				count += summon_specific(y, x, rlev - 1, SUMMON_HI_UNDEAD, TRUE, allies);
 			}
 
 			break;

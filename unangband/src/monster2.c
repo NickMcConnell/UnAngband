@@ -4480,7 +4480,7 @@ bool alloc_monster(int dis, bool slp)
  *
  * Note that this function may not succeed, though this is very rare.
  */
-bool summon_specific(int y1, int x1, int lev, int type, u32b flg)
+bool summon_specific(int y1, int x1, int lev, int type, bool grp, u32b flg)
 {
 	int i, x, y, r_idx;
 
@@ -4550,8 +4550,8 @@ bool summon_specific(int y1, int x1, int lev, int type, u32b flg)
 	/* Handle failure */
 	if (!r_idx) return (FALSE);
 
-	/* Attempt to place the monster (awake, allow groups) */
-	if (!place_monster_aux(y, x, r_idx, FALSE, TRUE, flg)) return (FALSE);
+	/* Attempt to place the monster (awake, groups dependent on caller) */
+	if (!place_monster_aux(y, x, r_idx, FALSE, grp, flg)) return (FALSE);
 
 	/* Hack -- Set specific summoning parameters if not currently set */
 	switch (summon_specific_type)

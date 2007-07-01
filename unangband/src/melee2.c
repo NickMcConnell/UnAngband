@@ -1711,13 +1711,18 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 		monster_type *n_ptr = &m_list[cave_m_idx[y][x]];
 		monster_race *nr_ptr = &r_info[n_ptr->r_idx];
 
-		/* Pushed already */
-		if ((m_ptr->mflag & (MFLAG_PUSH)) || (n_ptr->mflag & (MFLAG_PUSH)))
+		/* Enemies can always attack */
+		if ((m_ptr->mflag & (MFLAG_ALLY)) != (n_ptr->mflag & (MFLAG_ALLY)))
 		{
+			/* Can always attack */
+			return (100);	
+		}
 
+		/* Pushed already */
+		else if ((m_ptr->mflag & (MFLAG_PUSH)) || (n_ptr->mflag & (MFLAG_PUSH)))
+		{
 			/* Cannot push away the other monster */
 			return (0);
-
 		}
 
 		/* Push past weaker or similar monsters */
@@ -2651,9 +2656,14 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 	/*
 	 * Monsters that cannot move will attack the character if he is 
 	 * adjacent.
+	 * 
+	 * Now also attack allies.
 	 */
 	if (r_ptr->flags1 & (RF1_NEVER_MOVE))
 	{
+		int i;
+		int d = 9;
+
 		/* Hack -- memorize lack of moves after a while. */
 		if (!(l_ptr->flags1 & (RF1_NEVER_MOVE)))
 		{
@@ -2661,8 +2671,21 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 				l_ptr->flags1 |= (RF1_NEVER_MOVE);
 		}
 
+		/* Look for adjacent enemies */
+		for (i = 0; i < 8; i++)
+		{
+			int y1 = m_ptr->fy + ddy_ddd[i];
+			int x1 = m_ptr->fx + ddx_ddd[i];
+			
+			if (!in_bounds_fully(y1, x1)) continue;
+			
+			if (!cave_m_idx[y1][x1]) continue;
+
+			if ((m_list[cave_m_idx[y1][x1]].mflag & (MFLAG_ALLY)) != (m_ptr->mflag & (MFLAG_ALLY))) d = i;			
+		}
+
 		/* Is character in range? */
-		if (m_ptr->cdis <= 1)
+		if ((m_ptr->cdis <= 1) || (d < 9))
 		{
 			/* Monster can't melee either (pathetic little creature) */
 			if (r_ptr->flags1 & (RF1_NEVER_BLOW))
@@ -2675,11 +2698,23 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 				}
 				return (FALSE);
 			}
-
-			/* Kill. */
+			
+			/* Not afraid */
 			*fear = FALSE;
-			*ty = py;
-			*tx = px;
+
+			/* Prefer player */
+			if (m_ptr->cdis <= 1)
+			{
+				/* Kill. */
+				*ty = py;
+				*tx = px;
+			}
+			else
+			{
+				/* Kill. */
+				*ty = m_ptr->fy + ddy_ddd[i];
+				*tx = m_ptr->fx + ddx_ddd[i];
+			}
 			return (TRUE);
 		}
 
@@ -2789,7 +2824,7 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 					x = px + ddx_ddd[i];
 
 					/* Check Bounds */
-					if (!in_bounds(y, x)) continue;
+					if (!in_bounds_fully(y, x)) continue;
 
 					/* Count floor grids (generic passable) */
 					if (cave_floor_bold(y, x))
@@ -3393,6 +3428,9 @@ bool tell_allies_player_can(int y, int x, u32b flag)
 		/* Ignore if monster knows already */
 		if ((flag & ~(n_ptr->smart)) == 0) continue;
 
+		/* Ignore allies or vice versa */
+		if ((n_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))) continue;
+
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
 
@@ -3482,6 +3520,9 @@ bool tell_allies_player_not(int y, int x, u32b flag)
 		/* Ignore if monster doesn't know already */
 		if ((n_ptr->smart & (flag)) == 0) continue;
 
+		/* Ignore allies or vice versa */
+		if ((n_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))) continue;
+
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
 
@@ -3566,6 +3607,9 @@ bool tell_allies_mflag(int y, int x, u32b flag, cptr saying)
 		/* Ignore itself */
 		if (i == cave_m_idx[y][x]) continue;
 
+		/* Ignore allies or vice versa */
+		if ((n_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))) continue;
+
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
 
@@ -3623,6 +3667,9 @@ bool tell_allies_death(int y, int x, cptr saying)
 		/* Ignore itself */
 		if (i == cave_m_idx[y][x]) continue;
 
+		/* Ignore allies or vice versa */
+		if ((n_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))) continue;
+
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
 
@@ -3652,6 +3699,9 @@ bool tell_allies_death(int y, int x, cptr saying)
 
 			/* Ignore the monster that died */
 			if ((n2_ptr->fy == y) && (n2_ptr->fx == x)) continue;
+
+			/* Ignore allies or vice versa */
+			if ((n2_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))) continue;
 
 			/* Ignore monsters who speak different language */
 			if (monster_language(n2_ptr->r_idx) != language) continue;
@@ -3720,6 +3770,9 @@ bool tell_allies_best_range(int y, int x, int range, cptr saying)
 		/* Ignore itself */
 		if (i == cave_m_idx[y][x]) continue;
 
+		/* Ignore allies or vice versa */
+		if ((n_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))) continue;
+
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
 
@@ -3771,6 +3824,9 @@ bool tell_allies_target(int y, int x, int ty, int tx, bool scent, cptr saying)
 
 		/* Ignore itself */
 		if (i == cave_m_idx[y][x]) continue;
+
+		/* Ignore allies or vice versa */
+		if ((n_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))) continue;
 
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
@@ -4915,9 +4971,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				/* Target ignores player and retaliates */
 				if (m_ptr->mflag & (MFLAG_ALLY)) n_ptr->mflag |= (MFLAG_IGNORE);
 
-				/* Attack if afraid */
+				/* Attack if not afraid */
 				if (!(m_ptr->monfear))
-				{					
+				{
 					/* Scan through all four blows */
 					for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
 					{
@@ -5925,6 +5981,8 @@ static void process_monster(int m_idx)
 	if ((r_ptr->flags1 & (RF1_RAND_50 | RF1_RAND_25)) && (m_ptr->cdis > 1))
 	{
 		int chance = 0;
+		
+		int i;
 
 		/* RAND_25 and RAND_50 are cumulative */
 		if (r_ptr->flags1 & (RF1_RAND_25))
@@ -5936,6 +5994,19 @@ static void process_monster(int m_idx)
 		{
 			chance += 50;
 			if (m_ptr->ml) l_ptr->flags1 |= (RF1_RAND_50);
+		}
+
+		/* Look for adjacent enemies */
+		for (i = 0; i < 8; i++)
+		{
+			int y1 = m_ptr->fy + ddy_ddd[i];
+			int x1 = m_ptr->fx + ddx_ddd[i];
+			
+			if (!in_bounds_fully(y1, x1)) continue;
+			
+			if (!cave_m_idx[y1][x1]) continue;
+
+			if ((m_list[cave_m_idx[y1][x1]].mflag & (MFLAG_ALLY)) != (m_ptr->mflag & (MFLAG_ALLY))) chance = 0;
 		}
 
 		/* Chance of moving randomly */
@@ -6036,6 +6107,16 @@ static void process_monster(int m_idx)
 					must_use_target = TRUE;
 				}
 			}
+		}
+		
+		/* Allies use player target if unable to find a target */
+		if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && (!must_use_target) && (p_ptr->target_set))
+		{
+			/* Get the target location */
+			m_ptr->ty = p_ptr->target_row;
+			m_ptr->tx = p_ptr->target_col;
+
+			must_use_target = TRUE;
 		}
 	}
 

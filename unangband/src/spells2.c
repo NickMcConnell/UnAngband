@@ -7080,7 +7080,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			}
 			case SPELL_SUMMON:
 			{
-				if (summon_specific(p_ptr->py, p_ptr->px, p_ptr->depth+5, s_ptr->param, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
+				if (summon_specific(p_ptr->py, p_ptr->px, p_ptr->depth+5, s_ptr->param, TRUE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
 				*cancel = FALSE;
 				break;
 			}
@@ -7094,7 +7094,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			{
 				summon_group_type = s_ptr->param;
 				
-				if (summon_specific(p_ptr->py, p_ptr->px, p_ptr->depth+5, SUMMON_GROUP, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
+				if (summon_specific(p_ptr->py, p_ptr->px, p_ptr->depth+5, SUMMON_GROUP, TRUE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
 				*cancel = FALSE;
 				break;
 			}

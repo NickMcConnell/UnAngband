@@ -1557,7 +1557,7 @@ static void process_world(void)
 				summon_race_type = parasite_hack[effect];
 
 				/* Drop lots of parasites */
-				for (i = 0; i < n; i++) (void)summon_specific(p_ptr->py, p_ptr->py, 99, SUMMON_FRIEND, 0L);
+				for (i = 0; i < n; i++) (void)summon_specific(p_ptr->py, p_ptr->py, 99, SUMMON_FRIEND, FALSE, 0L);
 
 				/* Aggravate if not light */
 				if (!(p_ptr->disease & (DISEASE_LIGHT))) aggravate_monsters(-1);

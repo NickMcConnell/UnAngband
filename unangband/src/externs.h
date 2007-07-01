@@ -679,7 +679,7 @@ extern int place_monster_here(int y, int x, int r_idx);
 extern bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp, u32b flg);
 extern bool place_monster(int y, int x, bool slp, bool grp);
 extern bool alloc_monster(int dis, bool slp);
-extern bool summon_specific(int y1, int x1, int lev, int type, u32b flg);
+extern bool summon_specific(int y1, int x1, int lev, int type, bool grp, u32b flg);
 extern bool summon_specific_one(int y1, int x1, int r_idx, bool slp, u32b flg);
 extern bool animate_object(int item);
 extern void set_monster_fear(monster_type *m_ptr, int v, bool panic);
