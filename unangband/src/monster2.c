@@ -3475,6 +3475,9 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 
 	/* Apply flags from caller */
 	n_ptr->mflag |= flg;
+	
+	/* Created allies do not carry treasure */
+	if (flg & (MFLAG_ALLY)) n_ptr->mflag |= (MFLAG_MADE);
 
 	/* Force monster to wait for player */
 	if (r_ptr->flags1 & (RF1_FORCE_SLEEP))

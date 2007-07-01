@@ -484,7 +484,7 @@ void attack_desc(int who, int what, int target, int method, int damage, bool *do
 	{
 		/* Get the monster possessive ("his"/"her"/"its") */
 		monster_desc(t_name, sizeof(t_name), what, 0x22);
-		my_strcat(t_name, "self", sizeof(t_name));
+		my_strcat(t_name, t_name[0] == 'i' ? "elf" : "self", sizeof(t_name));
 	}
 	else if (target > 0)
 	{
@@ -3856,7 +3856,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((known) || (direct)) disturb(1, 0);
 
-				teleport_away(who, 10);
+				/* Get the target name (using "A"/"An") again. */
+				monster_desc(t_name, sizeof(t_name), target, 0x08);
+
+				teleport_away(target, 10);
 
 				/*
 				 * If it comes into view from around a corner (unlikely)
@@ -3864,6 +3867,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				 */
 				if (!direct && m_ptr->ml)
 				{
+					/* Get the target name (using "A"/"An") again. */
+					monster_desc(t_name, sizeof(t_name), target, 0x08);
+										
 					seen = TRUE;
 					msg_format("%^s blinks into view.", t_name);
 				}
@@ -3890,7 +3896,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if ((known) || (direct)) disturb(1, 0);
 
-				teleport_away(who, MAX_SIGHT * 2 + 5);
+				/* Get the target name (using "A"/"An") again. */
+				monster_desc(t_name, sizeof(t_name), target, 0x08);
+
+				teleport_away(target, MAX_SIGHT * 2 + 5);
 
 				/*
 				 * If it comes into view from around a corner (unlikely)
@@ -3898,6 +3907,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				 */
 				if (!direct && m_ptr->ml)
 				{
+					/* Get the target name (using "A"/"An") again. */
+					monster_desc(t_name, sizeof(t_name), target, 0x08);
+
 					seen = TRUE;
 					msg_format("%^s teleports into view.", t_name);
 				}
@@ -3948,17 +3960,17 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Notify player */
 				if (n_ptr->ml)
 				{
+					/* Get the target name (using "A"/"An") again. */
+					monster_desc(t_name, sizeof(t_name), target, 0x08);
+
 					update_mon(target, FALSE);
 
 					if (!n_ptr->ml)
 					{
-						msg_format("%^s disppears!", m_name);
+						
+						msg_format("%^s disppears!", t_name);
 					}
 				}
-			}
-			else if (target < 0)
-			{
-				set_fast(p_ptr->tim_invis + rlev);
 			}
 
 			break;
@@ -3967,7 +3979,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF6_TELE_SELF_TO */
 		case 160+7:
 		{
-			if ((who > SOURCE_MONSTER_START) && (target < 0))
+			if (who > SOURCE_MONSTER_START)
 			{
 				int old_cdis = m_ptr->cdis;
 

@@ -3616,7 +3616,6 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 		if (note)
 		{
 			message_format(MSG_KILL, m_ptr->r_idx, "%^s%s", m_name, note);
-
 		}
 
 		/* Death by physical attack -- invisible monster */
@@ -3630,14 +3629,12 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 			 (r_ptr->flags2 & (RF2_STUPID)))
 		{
 			message_format(MSG_KILL, m_ptr->r_idx, "You have destroyed %s.", m_name);
-
 		}
 
 		/* Death by Physical attack -- living monster */
 		else
 		{
 			message_format(MSG_KILL, m_ptr->r_idx, "You have slain %s.", m_name);
-
 		}
 
 		/* Death by Physical attack -- non-living monster */
@@ -3653,35 +3650,36 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 			tell_allies_death(m_ptr->fy, m_ptr->fx, "& has killed one of us!");
 		}
 
-
-		/* Maximum player level */
-		div = p_ptr->max_lev;
-
-		/* Give some experience for the kill */
-		new_exp = ((long)r_ptr->mexp * r_ptr->level) / div;
-
-		/* Base adjustment */
-		new_level = -1;
-
-		/* Handle fractional experience */
-		new_exp_frac = ((((long)r_ptr->mexp * r_ptr->level) % div)
-				* 0x10000L / div) + p_ptr->exp_frac;
-
-		
-
-		/* Keep track of experience */
-		if (new_exp_frac >= 0x10000L)
+		/* Allies don't provide experience */
+		if ((m_ptr->mflag & (MFLAG_ALLY)) == 0)
 		{
-			new_exp++;
-			p_ptr->exp_frac = (u16b)(new_exp_frac - 0x10000L);
-		}
-		else
-		{
-			p_ptr->exp_frac = (u16b)new_exp_frac;
-		}
+			/* Maximum player level */
+			div = p_ptr->max_lev;
 
-		/* Gain experience */
-		gain_exp(new_exp);
+			/* Give some experience for the kill */
+			new_exp = ((long)r_ptr->mexp * r_ptr->level) / div;
+
+			/* Base adjustment */
+			new_level = -1;
+
+			/* Handle fractional experience */
+			new_exp_frac = ((((long)r_ptr->mexp * r_ptr->level) % div)
+					* 0x10000L / div) + p_ptr->exp_frac;
+
+			/* Keep track of experience */
+			if (new_exp_frac >= 0x10000L)
+			{
+				new_exp++;
+				p_ptr->exp_frac = (u16b)(new_exp_frac - 0x10000L);
+			}
+			else
+			{
+				p_ptr->exp_frac = (u16b)new_exp_frac;
+			}
+
+			/* Gain experience */
+			gain_exp(new_exp);
+		}
 
 		/* Generate treasure */
 		monster_death(m_idx);
@@ -5003,8 +5001,8 @@ static bool target_set_interactive_accept(int y, int x)
 	{
 		monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
 
-		/* Visible monsters */
-		if (m_ptr->ml) return (TRUE);
+		/* Visible monsters, except for allies */
+		if ((m_ptr->ml) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0) ) return (TRUE);
 	}
 
 	/* Scan all objects in the grid */

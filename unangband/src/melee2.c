@@ -2679,7 +2679,7 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 			
 			if (!in_bounds_fully(y1, x1)) continue;
 			
-			if (!cave_m_idx[y1][x1]) continue;
+			if (cave_m_idx[y1][x1] <= 0) continue;
 
 			if ((m_list[cave_m_idx[y1][x1]].mflag & (MFLAG_ALLY)) != (m_ptr->mflag & (MFLAG_ALLY))) d = i;			
 		}
@@ -6077,7 +6077,7 @@ static void process_monster(int m_idx)
 	}
 
 	/* Is monster an ally, or fighting an ally of the player? */
-	if (m_ptr->mflag & (MFLAG_IGNORE | MFLAG_ALLY)) 
+	if (((r_ptr->flags1 & (RF1_NEVER_MOVE)) == 0) && ((m_ptr->mflag & (MFLAG_IGNORE | MFLAG_ALLY)) != 0))
 	{
 		int k = (m_ptr->mflag & (MFLAG_ALLY)) ? MAX_SIGHT : m_ptr->cdis;
 		
