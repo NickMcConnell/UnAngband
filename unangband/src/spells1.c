@@ -3715,7 +3715,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 
 			if (f_info[feat].flags2 & (FF2_CAN_SWIM))
 			{
-				cave_set_feat(y,x,FEAT_GROUND);
+				cave_set_feat(y,x,FEAT_EARTH);
 
 				/* Notice any changes */
 				obvious = TRUE;
@@ -3806,7 +3806,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			summoner = 0;
 
 			if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_TREE,
-					FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) cave_set_feat(y,x,FEAT_GROUND);
+					FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L))) cave_set_feat(y,x,FEAT_EARTH);
 
 			break;
 		}
@@ -3831,7 +3831,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			if (summon_group_type)
 			{
 				if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_ELEMENT,
-					FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) cave_set_feat(y,x,FEAT_GROUND);
+					FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L))) cave_set_feat(y,x,FEAT_EARTH);
 			}
 
 			break;
@@ -3877,13 +3877,13 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			if (summon_attr_type || summon_char_type)
 			{
 				if (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level-1 : p_ptr->depth, ANIMATE_OBJECT,
-					FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) change = TRUE;
+					FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L))) change = TRUE;
 			}
 
 			if (change)
 			{
 				if (f_ptr->flags3 & (FF3_GET_FEAT)) cave_alter_feat(y, x, FS_GET_FEAT);
-				else if (f_ptr->flags3 & (FF3_OUTSIDE)) cave_set_feat(y,x, FEAT_GROUND);
+				else if (f_ptr->flags3 & (FF3_OUTSIDE)) cave_set_feat(y,x, FEAT_EARTH);
 				else cave_set_feat(y,x,FEAT_FLOOR);
 
 				/* Notice any changes */
@@ -4402,7 +4402,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					{
 						for (i = 0; i < o_ptr->number; i++)
 							summons |= (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_OBJECT,
-							FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L));
+							FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)));
 							
 						if (summons)
 						{
@@ -4491,7 +4491,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					
 					for (i = 0; i < o_ptr->number; i++)
 							summons |= (summon_specific(y, x, who > SOURCE_MONSTER_START ? r_info[who].level - 1 : p_ptr->depth, ANIMATE_DEAD,
-						FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L));
+						FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)));
 					
 					if (summons)
 					{
@@ -4550,7 +4550,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 				else if ((raise) && (o_ptr->name3 == summon_race_type))
 				{
 					for (i = 0; i < o_ptr->number; i++)
-							summons |= (summon_specific(y, x, 99, RAISE_DEAD, FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L));
+							summons |= (summon_specific(y, x, 99, RAISE_DEAD, FALSE, (MFLAG_MADE) | (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)));
 					
 					if (summons)
 					{

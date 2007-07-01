@@ -18711,8 +18711,8 @@ F:UNDEAD | IM_POIS | IM_COLD | NONLIVING | NO_FEAR
 F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP
 D:It is large and has venomous mandibles.
 
-N:1297:Book mimic
-G:?:v
+N:1297:Magic book mimic
+G:?:r
 I:110:30d40:30:40:0
 W:29:4:10:250
 M:20:20:15:43
@@ -18722,12 +18722,11 @@ B:BUTT:UN_POWER:4d4
 B:SPIT:LOSE_MANA:4d4
 F:CHAR_MULTI
 F:FORCE_SLEEP | NEVER_MOVE | DROP_2D2
-F:EMPTY_MIND | COLD_BLOOD | ATTR_INDEX
+F:EMPTY_MIND | COLD_BLOOD
 F:NO_CONF | NO_SLEEP | NO_FEAR | LEVEL_POWER | LEVEL_SPEED | LEVEL_SIZE
-S:BLIND | CONF | SCARE | WOUND | BALL_POIS
-S:ARC_FORCE | BEAM_ELEC | HOLY_ORB | S_GROUP
-D:A strange creature that disguises itself as a book to lure
-D: unsuspecting adventurers within reach of its razor sharp pages claws.
+S:ARC_FORCE | BEAM_ELEC | S_GROUP | BLINK | ADD_MANA
+D:A strange creature that disguises itself as a magic book to lure
+D: unsuspecting adventurers within reach of its razor sharp pages.
 
 N:1298:Skeleton giant
 G:s:U
@@ -18761,3 +18760,82 @@ F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP
 F:LEVEL_SIZE | LEVEL_SPEED | LEVEL_POWER
 D:It is an animated giant corpse.  Flesh falls off in large chunks as it
 D: shambles forward.
+
+N:1300:Prayer book mimic
+G:?:b
+I:110:30d40:30:40:0
+W:29:4:10:250
+M:20:20:15:43
+B:BITE:BATTER:4d4
+B:BITE:BATTER:4d4
+B:BUTT:UN_BONUS:4d4
+B:SPIT:CURSE:4d4
+F:CHAR_MULTI
+F:FORCE_SLEEP | NEVER_MOVE | DROP_2D2
+F:EMPTY_MIND | COLD_BLOOD
+F:NO_CONF | NO_SLEEP | NO_FEAR | LEVEL_POWER | LEVEL_SPEED | LEVEL_SIZE
+S:HOLY_ORB | HEAL | CURE | S_UNDEAD
+D:A strange creature that disguises itself as a prayer book to lure
+D: unsuspecting adventurers within reach of its thumping pronouncements.
+
+N:1301:Song book mimic
+G:?:y
+I:110:30d40:30:40:0
+W:29:4:10:250
+M:20:20:15:43
+B:BITE:WOUND:4d4
+B:BITE:BATTER:4d4
+B:BUTT:CURSE:4d4
+B:SPIT:DRAIN_LIFE:4d4
+F:CHAR_MULTI
+F:FORCE_SLEEP | NEVER_MOVE | DROP_2D2
+F:EMPTY_MIND | COLD_BLOOD
+F:NO_CONF | NO_SLEEP | NO_FEAR | LEVEL_POWER | LEVEL_SPEED | LEVEL_SIZE
+S:BALL_SOUND  | S_DEMON | ILLUSION
+D:A strange creature that disguises itself as a song book to lure
+D: unsuspecting adventurers within reach of its insidious music.
+
+N:1302:Map mimic
+G:?:U
+I:110:17d40:30:40:0
+W:18:4:10:260
+M:30:30:6:43
+B:BITE:POISON:4d4
+B:BITE:POISON:4d4
+B:BUTT:CONFUSE:4d4
+B:SHRIEK:BLIND:4d4
+F:CHAR_MULTI | FORCE_SLEEP | NEVER_MOVE | DROP_2D2 | COLD_BLOOD
+F:EMPTY_MIND | NO_FEAR | NO_STUN | NO_CONF
+F:NO_SLEEP | LEVEL_SPEED | LEVEL_POWER
+S:DARKNESS | TRAPS | FORGET | DRAIN_MANA
+S:SCARE | BLIND | CONF | SLOW | S_MONSTER
+D:A strange creature that disguises itself as a map to lure
+D: unsuspecting adventurers within reach of its venomous claws.
+
+N:1303:Runestone mimic
+G:?:g
+I:110:20d30:30:40:0
+W:23:4:10:300
+M:0:30:29:56
+B:BITE:POISON:4d4
+B:BITE:POISON:4d4
+B:BUTT:CONFUSE:4d4
+B:CLAW:CONFUSE:4d4
+F:CHAR_MULTI | FORCE_SLEEP | NEVER_MOVE | DROP_2D2 | COLD_BLOOD
+F:EMPTY_MIND | NO_FEAR | NO_STUN | NO_CONF
+F:NO_SLEEP | LEVEL_SPEED | LEVEL_POWER
+S:BALL_SHARD | BOLT_POIS | BOLT_MANA | BEAM_ELEC | SCARE
+S:BLIND | CONF | S_MONSTER
+D:A strange creature that disguises itself as a wand to lure
+D: unsuspecting adventurers within reach of its venomous teeth.
+
+N:1304:Animated limb
+G:~:r
+I:120:4d8:2:40:99
+W:10:1:0:18
+F:NEVER_BLOW
+F:RES_BLIND
+F:NO_CONF | NO_SLEEP | NO_FEAR | LEVEL_SIZE | UNDEAD | OPEN_DOOR
+F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP | TAKE_ITEM
+F:LEVEL_SIZE | LEVEL_SPEED | LEVEL_POWER | EVASIVE
+D:It is a severed limb, brought back to life and scouting for its undead master.

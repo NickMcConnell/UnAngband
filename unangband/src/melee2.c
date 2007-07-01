@@ -4933,8 +4933,60 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 	/* Monster is allowed to move */
 	if (do_move)
 	{
+		/* Attack adjacent monsters, if confused or enemies */
+		if ((cave_m_idx[ny][nx] > 0) && ((m_ptr->confused) ||
+			((m_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[ny][nx]].mflag & (MFLAG_ALLY)))))
+		{
+			monster_type *n_ptr = &m_list[cave_m_idx[ny][nx]];
+
+			int ap_cnt;
+
+			do_move = FALSE;
+
+			/* Target ignores player and retaliates */
+			if (m_ptr->mflag & (MFLAG_ALLY)) n_ptr->mflag |= (MFLAG_IGNORE);
+
+			/* Attack if not afraid */
+			if (!(m_ptr->monfear))
+			{
+				/* Scan through all four blows */
+				for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
+				{
+					int damage = 0;
+						
+					bool do_cut, do_stun;
+
+					/* Extract the attack infomation */
+					int effect = r_ptr->blow[ap_cnt].effect;
+					int method = r_ptr->blow[ap_cnt].method;
+					int d_dice = r_ptr->blow[ap_cnt].d_dice;
+					int d_side = r_ptr->blow[ap_cnt].d_side;
+						
+					int who = m_ptr->mflag & (MFLAG_ALLY) ? SOURCE_PLAYER_ALLY : m_idx;
+					int what = m_ptr->mflag & (MFLAG_ALLY) ? m_idx : ap_cnt;
+
+					/* Hack -- no more attacks */
+					if (!method) break;
+
+					/* Hack --- always hit, never display message XXX XXX XXX */
+
+					/* Roll out the damage */
+					damage = damroll(d_dice, d_side);
+
+					/* Debugging - display attacks */
+					attack_desc(who, what, cave_m_idx[ny][nx], method, damage, &do_cut, &do_stun);
+
+					/* New result routine */
+					project_m(who, what, ny, nx, damage, effect);
+
+					/* Apply teleport and other effects */
+					project_t(who, what, ny, nx, damage, effect);
+				}
+			}
+		}		
+		
 		/* Monster has to climb the grid slowly */
-		if ((mmove == MM_CLIMB) && !(r_ptr->flags2 & (RF2_CAN_CLIMB)) && !(m_ptr->mflag & (MFLAG_OVER))
+		else if ((mmove == MM_CLIMB) && !(r_ptr->flags2 & (RF2_CAN_CLIMB)) && !(m_ptr->mflag & (MFLAG_OVER))
 			&& !(m_ptr->mflag & (MFLAG_HIDE)))
 		{
 			/* Climb */
@@ -4959,80 +5011,25 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		{
 			monster_type *n_ptr = &m_list[cave_m_idx[ny][nx]];
 
-			/* Attack if confused and not fleeing */
-			/* XXX XXX Should use seperate routine */
-			/* TODO: join with other (monster?) attack routines */
-			if ((m_ptr->confused) || ((m_ptr->mflag & (MFLAG_ALLY)) != (n_ptr->mflag & (MFLAG_ALLY))))
+			/* The other monster cannot switch places */
+			if (!cave_exist_mon(n_ptr->r_idx, m_ptr->fy, m_ptr->fx, TRUE))
 			{
-				int ap_cnt;
-
-				do_move = FALSE;
-
-				/* Target ignores player and retaliates */
-				if (m_ptr->mflag & (MFLAG_ALLY)) n_ptr->mflag |= (MFLAG_IGNORE);
-
-				/* Attack if not afraid */
-				if (!(m_ptr->monfear))
+				/* Try to push it aside */
+				if (!push_aside(m_ptr->fy, m_ptr->fx, n_ptr))
 				{
-					/* Scan through all four blows */
-					for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
-					{
-						int damage = 0;
-						
-						bool do_cut, do_stun;
-
-						/* Extract the attack infomation */
-						int effect = r_ptr->blow[ap_cnt].effect;
-						int method = r_ptr->blow[ap_cnt].method;
-						int d_dice = r_ptr->blow[ap_cnt].d_dice;
-						int d_side = r_ptr->blow[ap_cnt].d_side;
-						
-						int who = m_ptr->mflag & (MFLAG_ALLY) ? SOURCE_PLAYER_ALLY : m_idx;
-						int what = m_ptr->mflag & (MFLAG_ALLY) ? m_idx : ap_cnt;
-
-						/* Hack -- no more attacks */
-						if (!method) break;
-
-						/* Hack --- always hit, never display message XXX XXX XXX */
-
-						/* Roll out the damage */
-						damage = damroll(d_dice, d_side);
-
-						/* Debugging - display attacks */
-						attack_desc(who, what, cave_m_idx[ny][nx], method, damage, &do_cut, &do_stun);
-
-						/* New result routine */
-						project_m(who, what, ny, nx, damage, effect);
-
-						/* Apply teleport and other effects */
-						project_t(who, what, ny, nx, damage, effect);
-					}
+					/* Cancel move on failure */
+					do_move = FALSE;
 				}
 			}
 
-			/* Swap with or push aside the other monster */
-			else
+			/* Mark monsters as pushed */
+			if (do_move)
 			{
-				/* The other monster cannot switch places */
-				if (!cave_exist_mon(n_ptr->r_idx, m_ptr->fy, m_ptr->fx, TRUE))
-				{
-					/* Try to push it aside */
-					if (!push_aside(m_ptr->fy, m_ptr->fx, n_ptr))
-					{
-						/* Cancel move on failure */
-						do_move = FALSE;
-					}
-				}
+				/* Monster has pushed */
+				m_ptr->mflag |= (MFLAG_PUSH);
 
-				/* Mark monsters as pushed */
-				if (do_move)
-				{
-					/* Monster has pushed */
-					m_ptr->mflag |= (MFLAG_PUSH);
-
-					/* Monster has been pushed aside */
-					n_ptr->mflag |= (MFLAG_PUSH);
-				}
+				/* Monster has been pushed aside */
+				n_ptr->mflag |= (MFLAG_PUSH);
 			}
 		}
 	}
@@ -6077,7 +6074,7 @@ static void process_monster(int m_idx)
 	}
 
 	/* Is monster an ally, or fighting an ally of the player? */
-	if (((r_ptr->flags1 & (RF1_NEVER_MOVE)) == 0) && ((m_ptr->mflag & (MFLAG_IGNORE | MFLAG_ALLY)) != 0))
+	if (((r_ptr->flags1 & (RF1_NEVER_MOVE | RF1_NEVER_BLOW)) == 0) && ((m_ptr->mflag & (MFLAG_IGNORE | MFLAG_ALLY)) != 0))
 	{
 		int k = (m_ptr->mflag & (MFLAG_ALLY)) ? MAX_SIGHT : m_ptr->cdis;
 		
