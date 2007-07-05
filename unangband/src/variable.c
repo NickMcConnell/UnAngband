@@ -1211,3 +1211,10 @@ s16b bag_kinds_cache[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL];
  * We now use a 'dungeon ecology' system to generate monsters on a level.
  */
 ecology_type cave_ecology;
+
+
+/*
+ * We now try to force monsters to have 'one of each item slot'.
+ */
+u32b hack_monster_equip;
+

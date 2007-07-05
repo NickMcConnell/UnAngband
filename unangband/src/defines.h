@@ -3889,6 +3889,16 @@
 
 
 /*
+ * Drop mask - used for hack_monster_equip. Note does not include DROP_CHEST or DROP_CLOTHES.
+ * 
+ * This ensures that a monster drops a maximum of one of each 'slot' of item.
+ */
+#define RF8_DROP_MASK \
+	(RF8_DROP_MISSILE | RF8_DROP_TOOL | RF8_DROP_WEAPON | RF8_DROP_MUSIC | \
+		 RF8_DROP_ARMOR | RF8_DROP_LITE | RF8_DROP_JEWELRY | RF8_DROP_RSW |  \
+		 RF8_DROP_WRITING | RF8_DROP_POTION | RF8_DROP_FOOD | RF8_DROP_JUNK)
+
+/*
  * Elements - used for summon elemental
  */
 #define ELEM_FIRE     0

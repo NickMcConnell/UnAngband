@@ -3155,6 +3155,9 @@ void monster_death(int m_idx)
 	/* Average dungeon and monster levels */
 	object_level = (p_ptr->depth + r_ptr->level) / 2;
 
+	/* Clear monster equipment */
+	hack_monster_equip = 0L;
+	
 	/* Drop some objects */
 	for (j = 0; j < number; j++)
 	{
@@ -3174,11 +3177,27 @@ void monster_death(int m_idx)
 
 			l_ptr->flags8 |= (RF8_DROP_CHEST);
 
+			hack_monster_equip |= (RF8_DROP_CHEST);
+			
 			continue;
 		}
 
+		/* Hack - Have applied all items in monster equipment. We force gold, then clear. */
+		if ((r_ptr->flags8 & (RF8_DROP_MASK)) &&
+				((r_ptr->flags8 & (RF8_DROP_MASK)) == (hack_monster_equip & (RF8_DROP_MASK))))
+		{
+			if (do_gold && do_item)
+			{
+				do_item = FALSE;
+			}
+			else
+			{
+				hack_monster_equip = 0L;
+			}
+		}
+		
 		/* Make Gold */
-		if (do_gold && (!do_item || (rand_int(100) < 50)))
+		if (do_gold && (!do_item || (rand_int(100) < 50) ))
 		{
 			/* Make some gold */
 			if (!make_gold(i_ptr, good, great)) continue;
@@ -3209,14 +3228,18 @@ void monster_death(int m_idx)
 			{
 				case TV_JUNK:
 				{
+					if (rand_int(100) < 50) hack_monster_equip |= (RF8_DROP_JUNK);
 					l_ptr->flags8 |= (RF8_DROP_JUNK);
 					break;
 				}
 
+				case TV_BOW:
+				{
+					hack_monster_equip |= (RF8_DROP_MISSILE);
+				}
 				case TV_SHOT:
 				case TV_ARROW:
 				case TV_BOLT:
-				case TV_BOW:
 				{
 					l_ptr->flags8 |= (RF8_DROP_MISSILE);
 					break;
@@ -3226,6 +3249,7 @@ void monster_death(int m_idx)
 				case TV_SPIKE:
 				case TV_FLASK:
 				{
+					hack_monster_equip |= (RF8_DROP_TOOL);
 					l_ptr->flags8 |= (RF8_DROP_TOOL);
 					break;
 				}
@@ -3234,52 +3258,102 @@ void monster_death(int m_idx)
 				case TV_POLEARM:
 				case TV_SWORD:
 				{
+					hack_monster_equip |= (RF8_DROP_WEAPON);
 					l_ptr->flags8 |= (RF8_DROP_WEAPON);
 					break;
 				}
 
-				case TV_INSTRUMENT:
 				case TV_SONG_BOOK:
 				{
+					if (rand_int(100) < 50) hack_monster_equip |= (RF8_DROP_MUSIC);
+					if (rand_int(100) < 50) hack_monster_equip |= (RF8_DROP_WRITING);					
+				}
+				case TV_INSTRUMENT:
+				{
+					hack_monster_equip |= (RF8_DROP_MUSIC);
 					l_ptr->flags8 |= (RF8_DROP_MUSIC);
 					break;
 				}
 
 				case TV_BOOTS:
+				{
+					hack_monster_equip |= (RF8_HAS_LEG);
+					l_ptr->flags8 |= (RF8_DROP_CLOTHES);
+					break;
+				}
 				case TV_GLOVES:
+				{
+					hack_monster_equip |= (RF8_HAS_HAND);
+					l_ptr->flags8 |= (RF8_DROP_CLOTHES);
+					break;
+				}
 				case TV_CLOAK:
 				{
+					hack_monster_equip |= (RF8_HAS_CORPSE);
+					l_ptr->flags8 |= (RF8_DROP_CLOTHES);
+					break;
+				}
+				case TV_SOFT_ARMOR:
+				{
+					hack_monster_equip |= (RF8_DROP_ARMOR);
 					l_ptr->flags8 |= (RF8_DROP_CLOTHES);
 					break;
 				}
 
 				case TV_HELM:
+				{
+					hack_monster_equip |= (RF8_HAS_HEAD);
+					l_ptr->flags8 |= (RF8_DROP_ARMOR);
+					break;
+				}
 				case TV_SHIELD:
-				case TV_SOFT_ARMOR:
+				{
+					hack_monster_equip |= (RF8_HAS_ARM);
+					l_ptr->flags8 |= (RF8_DROP_ARMOR);
+					break;
+				}
+				case TV_DRAG_ARMOR:
 				case TV_HARD_ARMOR:
 				{
+					hack_monster_equip |= (RF8_DROP_ARMOR);
 					l_ptr->flags8 |= (RF8_DROP_ARMOR);
 					break;
 				}
 
 				case TV_CROWN:
+				{
+					hack_monster_equip |= (RF8_HAS_HEAD);
+					l_ptr->flags8 |= (RF8_DROP_JEWELRY);
+					break;
+				}
 				case TV_AMULET:
+				{
+					hack_monster_equip |= (RF8_HAS_SKULL);
+					l_ptr->flags8 |= (RF8_DROP_JEWELRY);
+					break;
+				}
 				case TV_RING:
 				{
+					hack_monster_equip |= (RF8_HAS_HAND);
 					l_ptr->flags8 |= (RF8_DROP_JEWELRY);
 					break;
 				}
 
 				case TV_LITE:
 				{
+					hack_monster_equip |= (RF8_DROP_LITE);
 					l_ptr->flags8 |= (RF8_DROP_LITE);
 					break;
 				}
 
-				case TV_ROD:
 				case TV_STAFF:
+				{
+					hack_monster_equip |= (RF8_DROP_WEAPON);
+				}
+				case TV_ROD:
 				case TV_WAND:
 				{
+					if (rand_int(100) < 50) hack_monster_equip |= (RF8_DROP_RSW);
 					l_ptr->flags8 |= (RF8_DROP_RSW);
 					break;
 				}
@@ -3290,18 +3364,21 @@ void monster_death(int m_idx)
 				case TV_PRAYER_BOOK:
 				case TV_RUNESTONE:
 				{
+					if (rand_int(100) < 50) hack_monster_equip |= (RF8_DROP_WRITING);
 					l_ptr->flags8 |= (RF8_DROP_WRITING);
 					break;
 				}
 
 				case TV_POTION:
 				{
+					if (rand_int(100) < 50) hack_monster_equip |= (RF8_DROP_POTION);
 					l_ptr->flags8 |= (RF8_DROP_POTION);
 					break;
 				}
 
 				case TV_FOOD:
 				{
+					if (rand_int(100) < 50) hack_monster_equip |= (RF8_DROP_FOOD);
 					l_ptr->flags8 |= (RF8_DROP_FOOD);
 					break;
 				}
@@ -3315,6 +3392,9 @@ void monster_death(int m_idx)
 		drop_near(i_ptr, -1, y, x);
 	}
 
+	/* Reset monster equipment */
+	hack_monster_equip = 0L;
+	
 	/* Reset the object level */
 	object_level = p_ptr->depth;
 

@@ -4930,7 +4930,6 @@ static bool kind_is_good(int k_idx)
 	return (FALSE);
 }
 
-
 /*
  * Hack -- determine if a template is dropped by a race.
  */
@@ -4943,7 +4942,6 @@ static bool kind_is_tval(int k_idx)
 	return (FALSE);
 }
 
-
 /*
  * Hack -- determine if a template is dropped by a race.
  */
@@ -4952,6 +4950,7 @@ static bool kind_is_race(int k_idx)
 	monster_race *r_ptr = &r_info[race_drop_idx];
 	object_kind *k_ptr = &k_info[k_idx];
 
+	/* Handle good items */
 	if ((r_ptr->flags1 & (RF1_DROP_GOOD)) && (!kind_is_good(k_idx))) return (FALSE);
 
 	/* Handle mimics differently */
@@ -4979,22 +4978,66 @@ static bool kind_is_race(int k_idx)
 		/* Hard Armor/Dragon Armor/Shield/Helm */
 		case TV_HARD_ARMOR:
 		case TV_DRAG_ARMOR:
+		{
+			/* Hack -- monster equipment only has one armour */
+			if (hack_monster_equip & (RF8_DROP_ARMOR)) return (FALSE);
+
+			if (r_ptr->flags8 & (RF8_DROP_ARMOR)) return (TRUE);
+			return (FALSE);		
+		}
 		case TV_SHIELD:
+		{
+			/* Hack -- monster equipment only has one shield */
+			if (hack_monster_equip & (RF8_HAS_ARM)) return (FALSE);
+
+			/* Shield is heavy armour */
+			if (r_ptr->flags8 & (RF8_DROP_ARMOR)) return (TRUE);
+			return (FALSE);		
+		}
 		case TV_HELM:
 		{
+			/* Hack -- monster equipment only has one gloves */
+			if ((k_ptr->tval == TV_HELM) && (hack_monster_equip & (RF8_HAS_HEAD))) return (FALSE);
+
+			/* Helms are heavy armour */
 			if (r_ptr->flags8 & (RF8_DROP_ARMOR)) return (TRUE);
-			return (FALSE);
+			return (FALSE);		
 		}
 		/* Soft armor/boots/cloaks/gloves */
 		case TV_SOFT_ARMOR:
 		{
+			/* Hack -- monster equipment only has one armour */
+			if (hack_monster_equip & (RF8_DROP_ARMOR)) return (FALSE);
+
 			/* Hack -- armored monsters don't carry soft armor */
 			if (r_ptr->flags2 & (RF2_ARMOR)) return (FALSE);
+
+			/* Clothes are soft armour */
+			if (r_ptr->flags8 & (RF8_DROP_CLOTHES)) return (TRUE);
+			return (FALSE);
 		}
+
 		case TV_GLOVES:
+		{
+			/* Hack -- monster equipment only has one gloves */
+			if (hack_monster_equip & (RF8_HAS_HAND)) return (FALSE);
+
+			if (r_ptr->flags8 & (RF8_DROP_CLOTHES)) return (TRUE);
+			return (FALSE);
+		}
 		case TV_CLOAK:
+		{
+			/* Hack -- monster equipment only has one cloak */
+			if (hack_monster_equip & (RF8_HAS_CORPSE)) return (FALSE);
+
+			if (r_ptr->flags8 & (RF8_DROP_CLOTHES)) return (TRUE);
+			return (FALSE);
+		}
 		case TV_BOOTS:
 		{
+			/* Hack -- monster equipment only has one armour */
+			if (hack_monster_equip & (RF8_HAS_LEG)) return (FALSE);
+
 			if (r_ptr->flags8 & (RF8_DROP_CLOTHES)) return (TRUE);
 			return (FALSE);
 		}
@@ -5015,12 +5058,21 @@ static bool kind_is_race(int k_idx)
 			/* Hack -- warriors only carry weapons >= 7 lbs */
 			if ((r_ptr->flags2 & (RF2_ARMOR)) && (k_ptr->weight < 70)) return (FALSE);
 
+			/* Hack -- monster equipment only has one weapon */
+			if (hack_monster_equip & (RF8_DROP_WEAPON)) return (FALSE);
+
 			if (r_ptr->flags8 & (RF8_DROP_WEAPON)) return (TRUE);
 			return (FALSE);
 		}
 
 		/* Bows/Ammo */
 		case TV_BOW:
+		{	
+			/* Hack -- monster equipment only has one bow */
+			if (hack_monster_equip & (RF8_DROP_MISSILE)) return (FALSE);
+			
+			/* Fall through */
+		}
 		case TV_SHOT:
 		case TV_BOLT:
 		case TV_ARROW:
@@ -5038,6 +5090,9 @@ static bool kind_is_race(int k_idx)
 			/* Mega hack -- priests and paladins other than shamans do not carry magic books */
 			if ((r_ptr->d_char == 'p') && !(r_ptr->flags2 & (RF2_MAGE))) return (FALSE);                            
 
+			/* Hack -- monster equipment only has limited writings */
+			if (hack_monster_equip & (RF8_DROP_WRITING)) return (FALSE);
+			
 			if (r_ptr->flags8 & (RF8_DROP_WRITING)) return (TRUE);
 			return (FALSE);
 		}
@@ -5049,6 +5104,9 @@ static bool kind_is_race(int k_idx)
 			/* Mega hack -- mages and rangers other than shamans do not carry priest books */
 			if ((r_ptr->d_char == 'q') && !(r_ptr->flags2 & (RF2_PRIEST))) return (FALSE);                          
 
+			/* Hack -- monster equipment only has limited writings */
+			if (hack_monster_equip & (RF8_DROP_WRITING)) return (FALSE);
+			
 			if (r_ptr->flags8 & (RF8_DROP_WRITING)) return (TRUE);
 			return (FALSE);
 		}
@@ -5056,15 +5114,35 @@ static bool kind_is_race(int k_idx)
 		case TV_RUNESTONE:
 		case TV_MAP:
 		{
+			/* Hack -- monster equipment only has limited writings */
+			if (hack_monster_equip & (RF8_DROP_WRITING)) return (FALSE);
+			
 			if (r_ptr->flags8 & (RF8_DROP_WRITING)) return (TRUE);
 			return (FALSE);
 		}
 
 		/* Rings/Amulets/Crowns */
 		case TV_RING:
+		{
+			/* Hack -- monster equipment only has limited rings */
+			if (hack_monster_equip & (RF8_DROP_JEWELRY)) return (FALSE);
+
+			if (r_ptr->flags8 & (RF8_DROP_JEWELRY)) return (TRUE);
+			return (FALSE);		
+		}	
 		case TV_AMULET:
+		{
+			/* Hack -- monster equipment only has one amulet */
+			if (hack_monster_equip & (RF8_HAS_SKULL)) return (FALSE);
+			
+			if (r_ptr->flags8 & (RF8_DROP_JEWELRY)) return (TRUE);
+			return (FALSE);
+		}
 		case TV_CROWN:
 		{
+			/* Hack -- monster equipment only has one crown/amulet */
+			if (hack_monster_equip & (RF8_HAS_HEAD)) return (FALSE);
+			
 			if (r_ptr->flags8 & (RF8_DROP_JEWELRY)) return (TRUE);
 			return (FALSE);
 		}
@@ -5072,6 +5150,9 @@ static bool kind_is_race(int k_idx)
 		/* Potions */
 		case TV_POTION:
 		{
+			/* Hack -- monster equipment only has limited potions */
+			if (hack_monster_equip & (RF8_DROP_POTION)) return (FALSE);
+			
 			if (r_ptr->flags8 & (RF8_DROP_POTION)) return (TRUE);
 			return (FALSE);
 		}
@@ -5079,6 +5160,9 @@ static bool kind_is_race(int k_idx)
 		/* Food */
 		case TV_FOOD:
 		{
+			/* Hack -- monster equipment only has limited food */
+			if (hack_monster_equip & (RF8_DROP_FOOD)) return (FALSE);
+			
 			if (r_ptr->flags8 & (RF8_DROP_FOOD)) return (TRUE);
 			return (FALSE);
 		}
@@ -5086,6 +5170,9 @@ static bool kind_is_race(int k_idx)
 		/* Lite/Fuel */
 		case TV_LITE:
 		{
+			/* Hack -- monster equipment only has one lite */
+			if (hack_monster_equip & (RF8_DROP_LITE)) return (FALSE);
+			
 			if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE)) return (TRUE);
 			if (r_ptr->flags8 & (RF8_DROP_LITE)) return (TRUE);
 			return (FALSE);
@@ -5095,6 +5182,9 @@ static bool kind_is_race(int k_idx)
 		case TV_HOLD:
 		case TV_BAG:
 		{
+			/* Hack -- monster equipment only has one bag */
+			if (hack_monster_equip & (RF8_DROP_CHEST)) return (FALSE);
+			
 			if (r_ptr->flags8 & (RF8_DROP_CHEST)) return (TRUE);
 			return (FALSE);
 		}
@@ -5104,6 +5194,9 @@ static bool kind_is_race(int k_idx)
 		case TV_JUNK:
 		case TV_SKIN:
 		{
+			/* Hack -- monster equipment only has limited potions */
+			if (hack_monster_equip & (RF8_DROP_JUNK)) return (FALSE);
+			
 			if (r_ptr->flags8 & (RF8_DROP_JUNK)) return (TRUE);
 			return (FALSE);
 
@@ -5115,6 +5208,9 @@ static bool kind_is_race(int k_idx)
 		case TV_FLASK:
 		case TV_ROPE:
 		{
+			/* Hack -- monster equipment only has one tool */
+			if (hack_monster_equip & (RF8_DROP_TOOL)) return (FALSE);
+			
 			if (r_ptr->flags8 & (RF8_DROP_TOOL)) return (TRUE);
 			return (FALSE);
 
@@ -5124,20 +5220,27 @@ static bool kind_is_race(int k_idx)
 		case TV_SONG_BOOK:
 		case TV_INSTRUMENT:
 		{
+			/* Hack -- monster equipment only has limited song books / one instrument */
+			if (hack_monster_equip & (RF8_DROP_MUSIC)) return (FALSE);
+			
 			if (r_ptr->flags8 & (RF8_DROP_MUSIC)) return (TRUE);
 			return (FALSE);
 		}
 
 		/* Rod/staff/wand */
 		case TV_STAFF:
+		{
+			if (hack_monster_equip & (RF8_DROP_WEAPON)) return (FALSE);
+		}
 		case TV_ROD:
 		case TV_WAND:
 		{
+			/* Hack -- monster equipment only has limited rods/staffs/wands */
+			if (hack_monster_equip & (RF8_DROP_RSW)) return (FALSE);
+			
 			if (r_ptr->flags8 & (RF8_DROP_RSW)) return (TRUE);
 			return (FALSE);
 		}
-
-
 	}
 
 	/* Assume not allowed */

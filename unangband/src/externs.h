@@ -355,6 +355,7 @@ extern int pf_result_index;
 extern quiver_group_type quiver_group[MAX_QUIVER_GROUPS];
 extern s16b bag_kinds_cache[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL];
 extern ecology_type cave_ecology;
+extern u32b hack_monster_equip;
 
 
 /*
