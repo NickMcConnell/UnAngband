@@ -117,8 +117,10 @@
 # 20 Golem
 # 21 Ghost
 # 22 Spirit
-# 23 
-
+# 23 Golem
+# 24 Faerie
+# 25 Ant
+# 26 Termite
 
 V:0.6.2
 
@@ -459,7 +461,7 @@ D:It is a yapping snarling dog, dangerous when in a pack.
 N:30:Worker ant
 G:a:W
 I:110:2d5:10:3:10
-W:1:1:0:3
+W:1:1:25:3
 B:BITE:HURT:1d2
 F:WEIRD_MIND | BASH_DOOR
 F:INSECT | LEVEL_SIZE
@@ -603,7 +605,7 @@ D:It is as big as a wolf.
 N:42:Giant black ant
 G:a:D
 I:110:3d6:8:20:80
-W:2:2:0:8
+W:2:2:25:8
 B:BITE:HURT:1d4
 F:RAND_25
 F:WEIRD_MIND
@@ -624,7 +626,7 @@ D:A small black and orange lizard.
 N:45:Blue faerie
 G:H:B
 I:110:1d4:18:14:10
-W:2:1:0:4
+W:2:1:24:4
 M:0:10:0:8
 F:DROP_60
 F:CAN_FLY | HAS_LITE | RES_LITE | EVASIVE | NEVER_BLOW | LEVEL_SPEED | MUST_FLY
@@ -836,7 +838,7 @@ D: for a good tavern.
 N:62:Giant white ant
 G:a:w
 I:110:3d6:8:16:80
-W:2:3:0:7
+W:2:3:25:7
 B:BITE:HURT:1d4
 F:WEIRD_MIND | BASH_DOOR | FRIENDS
 F:INSECT |
@@ -1468,7 +1470,7 @@ D:with displays of excessive violence.
 N:113:Brown faerie
 G:H:U
 I:110:2d4:18:18:10
-W:3:1:0:11
+W:3:1:24:11
 M:0:14:1:12
 F:DROP_60
 F:CAN_FLY | HAS_LITE | RES_LITE | EVASIVE | NEVER_BLOW | LEVEL_SPEED | MUST_FLY
@@ -1709,7 +1711,7 @@ D: its scales a pale red.
 N:132:Giant pink ant
 G:a:R
 I:110:4d8:12:34:60
-W:9:2:0:22
+W:9:2:25:22
 B:BITE:HURT:1d4
 B:STING:LOSE_STR:1d4
 F:WEIRD_MIND | BASH_DOOR
@@ -3056,7 +3058,7 @@ F:EVIL | ORC | IM_POIS | SMART
 D:He is an orc of power and great cunning, leader of a garrison at Cirith Ungol.
 
 N:229:Shambling mound
-G:,:g
+G:;:g
 I:110:20d6:20:16:40:21
 W:13:2:0:75
 M:25:0:0:25
@@ -3068,7 +3070,7 @@ F:ONLY_GOLD | DROP_90
 F:STUPID | EMPTY_MIND | BASH_DOOR
 F:EVIL
 F:NO_CONF | NO_SLEEP | NO_FEAR
-F:PLANT | LEVEL_SIZE | LEVEL_POWER | LEVEL_SPEED
+F:PLANT | LEVEL_SIZE | LEVEL_POWER | LEVEL_SPEED | ATTR_METAL
 D:A pile of rotting vegetation that slides towards you with a disgusting
 D: stench, waking all it nears.
 
@@ -3837,15 +3839,16 @@ F:WEIRD_MIND | BASH_DOOR
 F:INSECT | CAN_FLY | LEVEL_SIZE
 D:It is a giant beetle with poisonous mandibles.
 
-N:283:Giant grey ant
+N:283:Giant grey termite
 G:a:s
 I:110:19d8:10:40:40
-W:11:1:0:90
+W:11:1:26:90
 B:BITE:HURT:2d12
 F:RAND_25
 F:WEIRD_MIND | BASH_DOOR
 F:INSECT | FRIEND |
-D:It is an ant encased in shaggy grey fur.
+D:It looks like an ant, but with shorter legs and bigger fangs. It has a grey
+D: glistening exoskeleton.
 
 N:284:Ulwarth, Son of Ulfang
 G:t:U
@@ -4447,20 +4450,21 @@ S:ADD_AMMO
 D:A great man-faced red lion with a lashing spiked tail.  The weak-minded he 
 D:lulls with song; the strong he slays with poisoned barbs.
 
-N:322:Giant blue ant
+N:322:Giant blue termite
 G:a:b
 I:110:8d8:10:50:60
-W:11:3:0:25
+W:11:3:26:25
 B:BITE:ELEC:4d4
 F:RAND_25
-F:WEIRD_MIND | BASH_DOOR | FRIENDS
+F:WEIRD_MIND | BASH_DOOR | FRIENDS | HAS_LITE
 F:INSECT | IM_ELEC
-D:It is a giant ant that crackles with energy.
+D:It looks like an ant, but with shorter legs and bigger fangs. It has a blue
+D: exoskeleton that crackles with energy.
 
 N:323:Giant army ant
 G:a:o
 I:120:19d6:10:40:40
-W:27:3:0:90
+W:27:3:25:90
 B:BITE:HURT:2d12
 F:RAND_25 | FRIENDS
 F:WEIRD_MIND | BASH_DOOR | STUPID
@@ -5229,16 +5233,17 @@ F:ANIMAL | FRIENDS | LEVEL_SPEED
 S:BERSERK
 D:A massive elephantine form with eyes twisted by madness.
 
-N:374:Giant fire ant
-G:a:R
+N:374:Giant fire termite
+G:a:r
 I:110:20d10:14:49:40
-W:31:1:0:350
+W:31:1:26:350
 B:BITE:FIRE:3d12
 B:BITE:FIRE:3d12
 F:FORCE_MAXHP | FRIENDS
 F:WEIRD_MIND | BASH_DOOR
-F:INSECT | IM_FIRE |
-D:A giant ant covered in shaggy fur.  Its powerful jaws glow with heat.
+F:INSECT | IM_FIRE | HAS_LITE
+D:It looks like an ant, but with shorter legs and bigger fangs. It has a pink
+D: exoskeleton alit with flame.
 
 N:375:Mature white dragon
 G:D:w
@@ -8315,7 +8320,7 @@ D:It is a giant bat, the beating of whose wings produces a strangely unnerving n
 N:551:Giant silver ant
 G:a:W
 I:110:5d9:10:38:40
-W:13:1:0:45
+W:13:1:25:45
 M:14:7:20:10
 B:BITE:EAT_LITE:1d3
 B:STING:POISON:3d4
@@ -10295,7 +10300,7 @@ D:It is a dangerous mass of razor sharp branches, growing furiously.
 N:679:Soldier ant
 G:a:s
 I:110:4d5:10:3:10
-W:5:4:0:4
+W:5:4:25:4
 B:BITE:HURT:2d5
 F:WEIRD_MIND | BASH_DOOR | 
 F:INSECT | FRIENDS | LEVEL_SIZE
@@ -10304,7 +10309,7 @@ D:A large ant with powerful mandibles.
 N:680:Guardian ant
 G:a:D
 I:110:8d5:10:3:10
-W:6:1:0:3
+W:6:1:25:3
 B:BITE:HURT:2d4
 F:WEIRD_MIND | BASH_DOOR | 
 F:INSECT | RES_NEXUS | FRIEND | RES_TPORT | LEVEL_SIZE
@@ -10313,7 +10318,7 @@ D:A large ant with powerful mandibles.
 N:681:Giant green ant
 G:a:g
 I:110:4d6:8:16:80
-W:7:1:0:7
+W:7:1:25:7
 B:BITE:POISON:1d6
 F:WEIRD_MIND | BASH_DOOR | 
 F:INSECT | FRIEND |
@@ -10322,7 +10327,7 @@ D:It is about three feet long and has poisonous pincers.
 N:682:Giant copper ant
 G:a:u
 I:110:8d8:12:34:60
-W:12:2:0:22
+W:12:2:25:22
 B:BITE:HURT:2d4
 B:STING:ELEC:2d4
 F:WEIRD_MIND | BASH_DOOR | IM_ACID | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
@@ -10332,7 +10337,7 @@ D:It is large and has a dangerous sting.
 N:684:Giant gold ant
 G:a:y
 I:110:12d8:12:34:60
-W:12:2:0:22
+W:12:2:25:22
 B:BITE:HURT:1d5
 B:STING:HURT:6d2
 F:WEIRD_MIND | BASH_DOOR | IM_POIS | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
@@ -10342,7 +10347,7 @@ D:It is large and has a dangerous sting.
 N:685:Giant bronze ant
 G:a:U
 I:110:10d8:12:34:60
-W:12:3:0:22
+W:12:3:25:22
 B:BITE:HURT:1d8
 B:STING:CONFUSE:1d8
 F:WEIRD_MIND | BASH_DOOR | IM_FIRE | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
@@ -10352,7 +10357,7 @@ D:It is large and has a dangerous sting.
 N:686:Giant brass ant
 G:a:o
 I:110:10d8:12:34:60
-W:12:2:0:22
+W:12:2:25:22
 B:BITE:HURT:1d8
 B:STING:UN_BONUS:1d8
 F:WEIRD_MIND | BASH_DOOR | IM_ELEC | ATTR_METAL | DROP_MINERAL | ONLY_GOLD | DROP_90
@@ -10362,7 +10367,7 @@ D:It is large and has a dangerous sting.
 N:687:Giant driver ant
 G:a:B
 I:120:14d6:10:40:40
-W:33:2:0:90
+W:33:2:25:90
 B:BITE:HURT:2d8
 F:RAND_25 | FRIENDS | MULTIPLY |
 F:WEIRD_MIND | BASH_DOOR | 
@@ -10373,7 +10378,7 @@ D:hordes of them march.
 N:688:Giant hunter ant
 G:a:W
 I:110:12d8:16:40:10
-W:11:2:0:0
+W:11:2:25:0
 B:BITE:HURT:4d8
 F:WEIRD_MIND | BASH_DOOR | 
 F:INSECT | FRIEND | SCENT | SUPER_SCENT |
@@ -10382,7 +10387,7 @@ D:A large ant with powerful mandibles.
 N:689:Giant shimmering ant
 G:a:b
 I:110:10d8:10:40:60
-W:11:2:0:0
+W:11:2:25:0
 B:BITE:ELEC:5d5
 F:WEIRD_MIND | BASH_DOOR | RAND_25 | IM_ELEC |
 F:INSECT | FRIEND | RES_LITE | RES_DARK |
@@ -10391,7 +10396,7 @@ D:It is large and has shocking mandibles.
 N:690:Giant ebony ant
 G:a:D
 I:110:15d8:12:24:60
-W:6:2:0:22
+W:6:2:25:22
 B:BITE:HURT:2d3
 F:WEIRD_MIND | BASH_DOOR | RES_EDGED
 F:INSECT | FRIEND |
@@ -10400,21 +10405,22 @@ D:It is large and has venomous mandibles.
 N:691:Giant clear ant
 G:a:w
 I:110:3d7:12:18:60
-W:8:2:0:22
+W:8:2:25:22
 B:BITE:HURT:1d4
 F:WEIRD_MIND | BASH_DOOR | ATTR_CLEAR | INVISIBLE |
 F:INSECT | FRIEND | RAND_25 |
 D:It is large and has venomous mandibles.
 
-N:692:Giant mottled ant
+N:692:Giant mottled termite
 G:a:o
 I:120:24d8:14:50:40
-W:19:1:0:90
+W:19:1:26:90
 B:BITE:HURT:2d10
 F:RAND_25 | 
 F:WEIRD_MIND | BASH_DOOR | 
-F:INSECT | FRIEND |
-D:It is an ant encased in shaggy mottled fur.
+F:INSECT | FRIEND | INVISIBLE
+D:It looks like an ant, but with shorter legs and bigger fangs. It has a mottled
+D: well-camouflagued exoskeleton.
 
 N:693:Ancient copper dragon
 G:A:u
@@ -11912,7 +11918,7 @@ D:A disembodied eye, surrounded by chaotic energies.
 N:800:Faerie light
 G:~:B
 I:120:1d1:6:1:0
-W:0:3:0:0
+W:0:3:24:0
 F:FORCE_SLEEP | 
 F:NEVER_BLOW | RAND_25 | RAND_50 | LEVEL_SPEED | MUST_FLY | CAN_FLY
 F:EMPTY_MIND | HAS_LITE | EVASIVE | NONLIVING | RES_LITE
@@ -17166,7 +17172,7 @@ D:Nasty little animated daggers looking for warm meat.
 N:1186:Yellow faerie
 G:H:y
 I:110:5d4:18:12:10
-W:7:1:0:20
+W:7:1:24:20
 M:0:25:3:12
 F:OPEN_DOOR | DROP_60 | CAN_FLY | EVASIVE | NEVER_BLOW
 F:HAS_LITE | RES_LITE | LEVEL_SPEED | MUST_FLY
@@ -18826,7 +18832,7 @@ F:EMPTY_MIND | NO_FEAR | NO_STUN | NO_CONF
 F:NO_SLEEP | LEVEL_SPEED | LEVEL_POWER
 S:BALL_SHARD | BOLT_POIS | BOLT_MANA | BEAM_ELEC | SCARE
 S:BLIND | CONF | S_MONSTER
-D:A strange creature that disguises itself as a wand to lure
+D:A strange creature that disguises itself as a runestone to lure
 D: unsuspecting adventurers within reach of its venomous teeth.
 
 N:1304:Animated limb
@@ -18839,3 +18845,48 @@ F:NO_CONF | NO_SLEEP | NO_FEAR | LEVEL_SIZE | UNDEAD | OPEN_DOOR
 F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP | TAKE_ITEM
 F:LEVEL_SIZE | LEVEL_SPEED | LEVEL_POWER | EVASIVE
 D:It is a severed limb, brought back to life and scouting for its undead master.
+
+N:1305:Faerie ring
+G:,:R
+I:120:20d2:2:10:250
+W:15:2:24:10
+M:0:100:0:50
+F:FORCE_SLEEP | NEVER_MOVE | NEVER_BLOW
+F:STUPID | EMPTY_MIND
+F:NO_CONF | NO_SLEEP | NO_FEAR
+F:PLANT | DROP_GOOD | ESCORT
+F:DROP_60 | LEVEL_SIZE | RES_MAGIC | HAS_LITE | ATTR_METAL
+S:S_GROUP | ADD_MANA
+D:It is a ring of tasty looking mushrooms, glowing with an unusual light.
+D:  There might be something valuable inside.
+
+N:1306:Ant nest
+G:<:U
+I:110:20d6:20:3:40:250
+W:13:2:25:75
+M:0:100:36:25
+F:FORCE_SLEEP | NEVER_MOVE | NEVER_BLOW
+F:ONLY_GOLD | DROP_90 | DROP_GOOD
+F:STUPID | EMPTY_MIND | BASH_DOOR
+F:ESCORT | HURT_ROCK
+F:NO_CONF | NO_SLEEP | NO_FEAR
+F:PLANT | LEVEL_SIZE | LEVEL_POWER | LEVEL_SPEED
+S:S_GROUP
+D:A mound of earth, crawling with ants of various shapes and sizes.  There might
+D: be something valuable inside.
+
+N:1307:Termite mound
+G:<:u
+I:110:40d6:20:4:40:250
+W:13:2:26:75
+M:0:100:48:25
+F:FORCE_SLEEP | NEVER_MOVE | NEVER_BLOW
+F:DROP_90 | DROP_GOOD
+F:STUPID | EMPTY_MIND | BASH_DOOR
+F:ESCORT | HURT_ROCK
+F:NO_CONF | NO_SLEEP | NO_FEAR
+F:PLANT | LEVEL_SIZE | LEVEL_POWER | LEVEL_SPEED
+S:S_GROUP
+D:A giant mound of earth, crawling with termites of various shapes and sizes.  There might
+D: be something valuable inside.
+
