@@ -3631,8 +3631,14 @@ static bool place_monster_okay(int r_idx)
 
 	monster_race *z_ptr = &r_info[r_idx];
 
+	/* Group monsters require similar "group" */
+	if (r_ptr->grp_idx)
+	{
+		if (z_ptr->grp_idx != z_ptr->grp_idx) return (FALSE);
+	}
+
 	/* Require similar "race" */
-	if (z_ptr->d_char != r_ptr->d_char) return (FALSE);
+	else if (z_ptr->d_char != r_ptr->d_char) return (FALSE);
 
 	/* Skip more advanced monsters */
 	if (z_ptr->level > r_ptr->level) return (FALSE);
@@ -3646,6 +3652,7 @@ static bool place_monster_okay(int r_idx)
 	/* Okay */
 	return (TRUE);
 }
+
 
 /*
  * Attempt to place an escort of monsters around the given location

@@ -257,6 +257,8 @@ Note that a few spells are not currently implemented, and some higher level book
 empty of spells. Priest schools will also be developed, possibly to reflect the different Middle
 Earth deities, plus a paladin school.
 
+- The unique elementals now get escorts of their ilk.
+
 
 ### User Interface ###
 
