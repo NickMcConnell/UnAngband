@@ -5699,9 +5699,6 @@ static void process_monster(int m_idx)
 	if ((chance_spell) && ((m_ptr->berserk) || (!aware)
 		|| ((m_ptr->blind) && !(r_ptr->flags6 & (RF6_CURE))) )) chance_spell = 0;
 
-	/* Cannot use innate attacks when fleeing. */
-	if ((chance_innate) && (!m_ptr->monfear)) chance_innate = 0;
-
 	/* Cannot use innate attacks when not aware. */
 	if ((chance_innate) && (!aware)) chance_innate = 0;
 
