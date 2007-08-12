@@ -723,7 +723,7 @@ s16b get_mon_num(int level)
 		for (i = 0; i < cave_ecology.num_races; i++)
 		{
 			/* Get the actual race */
-			r_ptr = &r_info[cave_ecology.race[choice]];
+			r_ptr = &r_info[cave_ecology.race[i]];
 
 			/* Hack -- "unique" monsters must be "unique" */
 			if ((r_ptr->flags1 & (RF1_UNIQUE)) &&
