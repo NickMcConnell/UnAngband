@@ -4892,6 +4892,37 @@ bool target_okay(void)
 
 
 /*
+ * Get allies to adopt the player's target
+ */
+static void player_tell_allies_target(int y, int x)
+{
+	int i;
+	
+	/* Get allies to target this location */
+	for (i = 1; i < m_max; i++)
+	{
+		monster_type *m_ptr = &m_list[i];
+
+		/* Skip dead monsters */
+		if (!m_ptr->r_idx) continue;
+		
+		/* Skip non-allies, or allies who ignore the player */
+		if ( ((m_ptr->mflag & (MFLAG_ALLY)) != 0) && ((m_ptr->mflag & (MFLAG_IGNORE)) == 0) ) continue;
+		
+		/* Skip unseen monsters that are not projectable */
+		if (!m_ptr->ml && ((play_info[m_ptr->fy][m_ptr->fx] & (PLAY_FIRE)) == 0)) continue;
+
+		/* Skip monsters with targets already */
+		if (m_ptr->ty || m_ptr->tx) continue;
+		
+		/* Set the monster target */
+		m_ptr->ty = p_ptr->target_row;
+		m_ptr->tx = p_ptr->target_col;
+	}
+}
+
+
+/*
  * Set the target to a monster (or nobody)
  */
 void target_set_monster(int m_idx)
@@ -4906,6 +4937,9 @@ void target_set_monster(int m_idx)
 		p_ptr->target_who = m_idx;
 		p_ptr->target_row = m_ptr->fy;
 		p_ptr->target_col = m_ptr->fx;
+		
+		/* Get allies to target this */
+		player_tell_allies_target(m_ptr->fy, m_ptr->fx);
 	}
 
 	/* Clear target */
@@ -4933,6 +4967,9 @@ void target_set_location(int y, int x)
 		p_ptr->target_who = 0;
 		p_ptr->target_row = y;
 		p_ptr->target_col = x;
+		
+		/* Get allies to target this */
+		player_tell_allies_target(y,x);
 	}
 
 	/* Clear target */

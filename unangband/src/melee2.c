@@ -56,7 +56,7 @@ static void find_range(monster_type *m_ptr)
 		/* Don't crowd the player */
 		else m_ptr->min_range = TURN_RANGE;
 		
-		/* Best range */
+		/* Set the best range */
 		m_ptr->best_range = m_ptr->min_range;
 		
 		return;
@@ -1269,13 +1269,16 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		if (!f4 && !f5 && !f6 && !f7) return (0);
 	}
 	
-	/* Allies do not summon */
+	/* Allies do not summon (or teleport unless afraid) */
 	if (m_ptr->mflag & (MFLAG_ALLY))
 	{
 		f4 &= ~(RF4_SUMMON_MASK);
 		f5 &= ~(RF5_SUMMON_MASK);
 		f6 &= ~(RF6_SUMMON_MASK);
-		f7 &= ~(RF7_SUMMON_MASK);		
+		f7 &= ~(RF7_SUMMON_MASK);
+		
+		/* Prevent teleporting unless afraid */
+		if (!m_ptr->monfear) f6 &= ~(RF6_BLINK | RF6_TPORT);
 
 		/* No spells left */
 		if (!f4 && !f5 && !f6 && !f7) return (0);
@@ -1298,6 +1301,19 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 			/* Skip itself */
 			if (i == m_idx) continue;
 
+			/* Allies report to player if nonvocal and smart */
+			if ((m_ptr->mflag & (MFLAG_ALLY)) && ((r_ptr->flags2 & (RF2_SMART)) != 0) && ((r_ptr->flags3 & (RF3_NONVOCAL)) != 0))
+			{
+				/* Optimize -- Repair flags */
+				repair_mflag_mark = repair_mflag_show = TRUE;
+
+				/* Hack -- Detect the monster */
+				m_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
+
+				/* Update the monster */
+				update_mon(i, FALSE);
+			}
+			
 			/* Monster has an enemy */
 			if ((m_ptr->mflag & (MFLAG_ALLY)) != (n_ptr->mflag & (MFLAG_ALLY)))
 			{
@@ -6073,7 +6089,9 @@ static void process_monster(int m_idx)
 	/* Is monster an ally, or fighting an ally of the player? */
 	if (((r_ptr->flags1 & (RF1_NEVER_MOVE | RF1_NEVER_BLOW)) == 0) && ((m_ptr->mflag & (MFLAG_IGNORE | MFLAG_ALLY)) != 0))
 	{
-		int k = (m_ptr->mflag & (MFLAG_ALLY)) ? MAX_SIGHT : m_ptr->cdis;
+		/* Note we scale this up, and use a pseudo-random hack to try to get multiple monsters
+		 * to favour different equi-distant enemies */
+		int k = ((m_ptr->mflag & (MFLAG_ALLY)) ? MAX_SIGHT : m_ptr->cdis) * 16 + 15;
 		
 		for (i = m_max - 1; i >= 1; i--)
 		{
@@ -6083,13 +6101,26 @@ static void process_monster(int m_idx)
 			/* Skip itself */
 			if (m_idx == i) continue;
 
-			/* Allies only find targets visible to player */
-			if ((m_ptr->mflag & (MFLAG_ALLY)) && !(n_ptr->ml)) continue;
+			/* Allies report to player if nonvocal and smart */
+			if ((m_ptr->mflag & (MFLAG_ALLY)) && ((r_ptr->flags2 & (RF2_SMART)) != 0) && ((r_ptr->flags3 & (RF3_NONVOCAL)) != 0))
+			{
+				/* Optimize -- Repair flags */
+				repair_mflag_mark = repair_mflag_show = TRUE;
 
+				/* Hack -- Detect the monster */
+				m_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
+
+				/* Update the monster */
+				update_mon(i, FALSE);
+			}
+			
+			/* Allies only find targets visible to player */
+			if ((m_ptr->mflag & (MFLAG_ALLY)) && !(n_ptr->ml)) continue;			
+			
 			/* Monster has an enemy */
 			if ((m_ptr->mflag & (MFLAG_ALLY)) != (n_ptr->mflag & (MFLAG_ALLY)))
 			{
-				int d = distance(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx);
+				int d = (distance(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx) * 16) + (m_idx + i) % 16;
 				
 				/* Pick a random target in line of sight */
 				if ((d < k) && (generic_los(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx, CAVE_XLOS)))
@@ -6099,18 +6130,37 @@ static void process_monster(int m_idx)
 					k = d;
 					
 					must_use_target = TRUE;
+					
+					/* Best range hack */
+					m_ptr->best_range = m_ptr->min_range;
 				}
 			}
 		}
 		
-		/* Allies use player target if unable to find a target */
-		if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && (!must_use_target) && (p_ptr->target_set))
-		{
-			/* Get the target location */
-			m_ptr->ty = p_ptr->target_row;
-			m_ptr->tx = p_ptr->target_col;
+		/* Allies use 'old' targets if the monster unable to find a target
+		 * We hackily use best range to interact with
+		 * monster targetting code for allies. The best range for an
+		 * ally is given as its distance from the player when a
+		 * target is set, and increases by one per monster turn.
+		 * If the player is moving away from the monster, the distance
+		 * will exceed the best range and the target will be aborted.
+		 */
+		if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && ((m_ptr->mflag & (MFLAG_IGNORE)) == 0) && (!must_use_target))
+		{		
+			/* Still no target - get monster target*/
+			if ((p_ptr->target_set) && (p_ptr->target_who))
+			{
+				m_ptr->ty = p_ptr->target_row;
+				m_ptr->tx = p_ptr->target_col;
 
-			must_use_target = TRUE;
+				must_use_target = TRUE;
+			}
+
+			/* Use the 'old' target */
+			else if (m_ptr->ty || m_ptr->tx)
+			{
+				must_use_target = TRUE;
+			}
 		}
 	}
 

@@ -126,6 +126,8 @@ void player_can_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
 		/* Get the flags */
 		smart = player_smart_flags(f1, f2, f3, f4);
 
+		msg_format("Debug: %ld", smart);
+		
 		/* Learn the flags */
 		m_ptr->smart |= smart;
 
@@ -4451,18 +4453,17 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 						{
 							 summon_char_type = 'z';
 						}
-						/* Hack -- animate hands and claws */
-						else if ((k_info[o_ptr->k_idx].sval == SV_BODY_HAND) ||
-							(k_info[o_ptr->k_idx].sval == SV_BODY_CLAW))
-						{
-							summon_char_type = k_info[o_ptr->k_idx].d_char;
-							summon_attr_type = k_info[o_ptr->k_idx].d_attr;
-						}
 						/* MegaHack -- animate heads */
 						else if (k_info[o_ptr->k_idx].sval == SV_BODY_HEAD)
 						{
 							summon_char_type = '~';
 							summon_attr_type = TERM_WHITE;
+						}
+						/* Hack -- other body parts */
+						else
+						{
+							summon_char_type = k_info[o_ptr->k_idx].d_char;
+							summon_attr_type = k_info[o_ptr->k_idx].d_attr;							
 						}
 						break;
 					}

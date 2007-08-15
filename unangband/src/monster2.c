@@ -3834,21 +3834,6 @@ static bool summon_specific_okay(int r_idx)
 					(strstr(r_name + r_ptr->name, "skull")) ));
 
 			}
-			/* Hack -- animate hands */
-			else if ((summon_char_type == '~') && (summon_attr_type == TERM_RED))
-			{
-				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
-
-					/* Match on undead */
-					(r_ptr->flags3 & (RF3_UNDEAD)) &&
-
-					/* Match on name */
-					((strstr(r_name + r_ptr->name, "Hand")) ||
-
-					/* Match on name */
-					(strstr(r_name + r_ptr->name, "hand")) ));
-
-			}
 			else if (summon_char_type && summon_flag_type)
 			{
 				u32b summon_flag3_type = summon_flag_type & (0x0000FFFFL);
@@ -3888,6 +3873,17 @@ static bool summon_specific_okay(int r_idx)
 
 					/* Also can match some high level undead without restriction */
 					(strchr("LN", r_ptr->d_char)) ));
+			}
+			else if (summon_char_type && summon_attr_type)
+			{
+				/* Match char */
+				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
+
+					/* Match attr */
+					(r_ptr->d_attr == summon_attr_type) &&
+						
+					/* Match char */
+					(r_ptr->d_char == summon_char_type));				
 			}
 			else if (summon_char_type)
 			{

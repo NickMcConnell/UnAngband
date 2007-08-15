@@ -1398,6 +1398,9 @@ struct player_type
 	s16b oppose_lava;       /* Timed -- oppose lava */
 
 	s16b word_recall;       /* Word of recall counter */
+	s16b word_return;		/* Word of return counter */
+	s16b return_y;			/* Player return location */
+	s16b return_x;			/* Player return location */
 
 	s16b energy;    /* Current energy */
 

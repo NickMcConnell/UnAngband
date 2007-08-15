@@ -700,6 +700,11 @@ void self_knowledge_aux(bool spoil, bool random)
 		text_out("You will soon be recalled.  ");
 	}
 
+	if (p_ptr->word_return)
+	{
+		text_out("You will soon be returned to a nearby location.  ");
+	}
+
 	/* Hack -- timed abilities that may also be from equipment */
 	if (p_ptr->tim_infra)
 	{
@@ -7303,14 +7308,120 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				break;
 			}
 
+			case SPELL_MINDS_EYE:
+			{
+				/* This whole spell is a mega-hack of the highest order */
+				int ty, tx;
+				int old_py = p_ptr->py;
+				int old_px = p_ptr->px;
+				int old_lite = p_ptr->cur_lite;
+				int old_infra = p_ptr->see_infra;
+				u32b old_cur_flags3 = p_ptr->cur_flags3;
+
+				/* Allow direction to be cancelled for free */
+				if ((!get_aim_dir(&dir)) && (*cancel)) return (FALSE);
+
+				/* Use the given direction */
+				ty = p_ptr->py + 99 * ddy[dir];
+				tx = p_ptr->px + 99 * ddx[dir];
+
+				/* Hack -- Use an actual "target" */
+				if ((dir == 5) && target_okay())
+				{
+					ty = p_ptr->target_row;
+					tx = p_ptr->target_col;
+				}
+				
+				/* Paranoia - ensure we have no outstanding updates before messing with
+				 * player variables. */
+				update_stuff();
+				redraw_stuff();
+				
+				/* Paranoia - ensure bounds */
+				if (in_bounds_fully(ty, tx))
+				{
+					/* If target is a monster */
+					if (cave_m_idx[ty][tx])
+					{
+						monster_type *m_ptr = &m_list[cave_m_idx[ty][tx]];
+						monster_race *r_ptr = &r_info[m_ptr->r_idx];
+					
+						/* Hack -- get monster light radius */
+						if (((r_ptr->flags2 & (RF2_HAS_LITE)) != 0) ||
+							((r_ptr->flags1 & (MFLAG_LITE)) != 0))
+						{
+							/* Get maximum light */
+							p_ptr->cur_lite = 2;
+						}
+						else
+						{
+							/* No lite */
+							p_ptr->cur_lite = 0;
+						}
+					
+						/* Hack - special darknes sight for monsters that don't need lite */
+						if ((r_ptr->flags2 & (RF2_NEED_LITE)) == 0)
+						{
+							/* Get maximum sight */
+							p_ptr->see_infra = MIN(MAX_SIGHT, r_ptr->aaf);
+						}
+					
+						/* Hack - monsters that see invisible */
+						if ((r_ptr->flags2 & (RF2_INVISIBLE)) != 0)
+						{
+							p_ptr->cur_flags3 |= (TR3_SEE_INVIS);
+						}
+					
+						/* XXX Show player scent?? */
+					}
+					/* Hack -- second sight */
+					else
+					{
+						/* Does not have innate light */
+						p_ptr->cur_lite = 0;
+					}
+				
+					/* Use target location */
+					p_ptr->py = ty;
+					p_ptr->px = tx;
+
+					/* Update and be paranoid about side-effects */
+					p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW |
+						PU_MONSTERS | PU_PANEL);
+					p_ptr->redraw |= (PR_MAP);
+
+					/* Update display */
+					update_stuff();
+					redraw_stuff();
+				
+					/* Message */
+					msg_print("You cast your mind adrift.");
+					msg_print("");
+								
+					/* Reset hacks */
+					p_ptr->py = old_py;
+					p_ptr->px = old_px;
+					p_ptr->cur_lite = old_lite;
+					p_ptr->see_infra = old_infra;
+					p_ptr->cur_flags3 = old_cur_flags3;
+
+					/* Update and be paranoid about side-effects */
+					p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_DISTANCE |
+						PU_MONSTERS | PU_PANEL);
+					p_ptr->redraw |= (PR_MAP);
+
+					/* Final update */
+					update_stuff();
+					redraw_stuff();
+					break;
+				}
+			}
+			
 			case SPELL_RELEASE_CURSE:
 			case SPELL_CONCENTRATE_LITE:
 			case SPELL_CONCENTRATE_LIFE:
 			case SPELL_CONCENTRATE_WATER:
-			case SPELL_SET_RETURN:
-			case SPELL_SET_OR_MAKE_RETURN:
 			case SPELL_BLOOD_BOND:
-			case SPELL_MINDS_EYE:
 			{
 				msg_print("Oops. Spell not yet implemented.");
 				break;
@@ -7452,6 +7563,46 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 		obvious = TRUE;
 	}
 
+	/* XXX We have to set return points before processing spell blows */
+	if ((s_info[spell].type == SPELL_SET_RETURN) ||
+			(s_info[spell].type == SPELL_SET_OR_MAKE_RETURN))
+	{
+		spell_type *s_ptr = &s_info[spell];
+		
+		bool return_time = FALSE;
+		
+		/* Set the return location if required */
+		if (!(p_ptr->return_y) && !(p_ptr->return_x))
+		{
+			/* Set return point */
+			p_ptr->return_y = p_ptr->py;
+			p_ptr->return_x - p_ptr->px;
+			
+			/* Set the return time */
+			if (s_ptr->type == SPELL_SET_RETURN) return_time = TRUE;
+		}
+		/* Set the return time */
+		else if (s_ptr->type == SPELL_SET_OR_MAKE_RETURN)
+		{
+			/* Set the return time */
+			return_time = TRUE;
+		}
+		
+		/* Set return time */
+		if (return_time)
+		{
+			/* Roll out the duration */
+			if ((s_ptr->l_dice) && (s_ptr->l_side))
+			{
+				p_ptr->word_return = damroll(s_ptr->l_dice, s_ptr->l_side) + s_ptr->l_plus;
+			}
+			else
+			{
+				p_ptr->word_return = s_ptr->l_plus;
+			}
+		}
+	}
+	
 	/* Note the order is important -- because of the impact of blinding a character on their subsequent
 		ability to see spell blows that affect themselves */
 	if (process_spell_blows(who, what, spell, level, cancel)) obvious = TRUE;

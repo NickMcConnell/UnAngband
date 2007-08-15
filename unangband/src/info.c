@@ -1634,6 +1634,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_BIND_UNDEAD:
 			case GF_BIND_FAMILIAR:
 			case GF_RAGE:
+			case GF_DARK_WEAK:
 								text_out("power"); break;
 			case GF_SNUFF: text_out("maximum ");
 			case GF_HEAL: text_out("hit points"); break;
@@ -1830,6 +1831,7 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 			case GF_BIND_UNDEAD:
 			case GF_BIND_FAMILIAR:
 			case GF_RAGE:
+			case GF_DARK_WEAK:
 								q = "pow"; break;
 			case GF_SNUFF: q = "max hp"; break;
 			case GF_HEAL: q = "heal"; break;
