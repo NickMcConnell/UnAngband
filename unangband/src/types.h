@@ -1410,12 +1410,15 @@ struct player_type
 	s16b water;     /* Current water */
 
 	s16b held_song;     /* Currently held song */
+	byte sneaking; 		/* Currently sneaking */
+	byte u1;
 
 	byte climbing; /* Currently climbing */
 	byte searching; /* Currently searching */
 	byte charging;	/* Currently charging */
 	byte reserves;	/* Currently on reserve mana */
 
+	
 	u32b disease;	/* Disease types */
 
 	u32b spell_learned1;    /* Spell flags */

@@ -4892,9 +4892,12 @@ bool target_okay(void)
 
 
 /*
- * Get allies to adopt the player's target
+ * Get allies to adopt the player's target.
+ * 
+ * If order is true, we order allies to this.
+ * If order is false, only allies without targets will go here.
  */
-static void player_tell_allies_target(int y, int x)
+static void player_tell_allies_target(int y, int x, bool order)
 {
 	int i;
 	
@@ -4907,13 +4910,20 @@ static void player_tell_allies_target(int y, int x)
 		if (!m_ptr->r_idx) continue;
 		
 		/* Skip non-allies, or allies who ignore the player */
-		if ( ((m_ptr->mflag & (MFLAG_ALLY)) != 0) && ((m_ptr->mflag & (MFLAG_IGNORE)) == 0) ) continue;
+		if ( ((m_ptr->mflag & (MFLAG_ALLY)) == 0) || ((m_ptr->mflag & (MFLAG_IGNORE)) != 0) ) continue;
 		
-		/* Skip unseen monsters that are not projectable */
-		if (!m_ptr->ml && ((play_info[m_ptr->fy][m_ptr->fx] & (PLAY_FIRE)) == 0)) continue;
+		/* Skip unseen monsters that the player cannot speak to or telepathically communicate with */
+		if (!m_ptr->ml && ((r_info[m_ptr->r_idx].flags3 & (RF3_NONVOCAL)) == 0))
+		{
+			/* Cannot hear the player */
+			if ((m_ptr->cdis > 3) && ((play_info[m_ptr->fy][m_ptr->fx] & (PLAY_FIRE)) == 0)) continue;
+			
+			/* Cannot understand the player */
+			if (!player_understands(monster_language(m_ptr->r_idx))) continue;
+		}
 
 		/* Skip monsters with targets already */
-		if (m_ptr->ty || m_ptr->tx) continue;
+		if ((!order) && (m_ptr->ty || m_ptr->tx)) continue;
 		
 		/* Set the monster target */
 		m_ptr->ty = p_ptr->target_row;
@@ -4939,7 +4949,7 @@ void target_set_monster(int m_idx)
 		p_ptr->target_col = m_ptr->fx;
 		
 		/* Get allies to target this */
-		player_tell_allies_target(m_ptr->fy, m_ptr->fx);
+		player_tell_allies_target(m_ptr->fy, m_ptr->fx, FALSE);
 	}
 
 	/* Clear target */
@@ -4969,7 +4979,7 @@ void target_set_location(int y, int x)
 		p_ptr->target_col = x;
 		
 		/* Get allies to target this */
-		player_tell_allies_target(y,x);
+		player_tell_allies_target(y,x, FALSE);
 	}
 
 	/* Clear target */

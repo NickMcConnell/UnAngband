@@ -4198,7 +4198,7 @@ B:GAZE:LOSE_INT:2d6
 B:GAZE:LOSE_WIS:2d6
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_60 | DROP_1D2
-F:OPEN_DOOR | BASH_DOOR
+F:OPEN_DOOR | BASH_DOOR | NONVOCAL
 F:EVIL | NO_CONF | NO_SLEEP | LEVEL_SIZE | LEVEL_POWER
 S:BLIND | HOLD | SCARE | MIND_BLAST | FORGET | ADD_MANA | A_OBJECT
 D:A humanoid form with a gruesome head, tentacular mouth, and piercing
@@ -11889,10 +11889,10 @@ M:33:33:27:60
 B:GAZE:LOSE_INT:9d6
 F:NEVER_MOVE
 F:HURT_LITE | NO_FEAR | CAN_FLY | LEVEL_SIZE | MUST_FLY
-F:SMART | NONVOCAL
+F:SMART | NONVOCAL | INVISIBLE | COLD_BLOOD
 S:DRAIN_MANA | BLINK | BLIND | CONF | WOUND | DARKNESS | 
 S:BOLT_COLD | BOLT_FIRE | BOLT_ACID
-D:A disembodied eye, crackling with magical energy.
+D:A disembodied and nearly invisible eye, crackling with magical energy.
 
 N:798:Undead eye
 G:e:G

@@ -1288,11 +1288,23 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	*tar_y = p_ptr->py;
 	*tar_x = p_ptr->px;
 	
-	/* Is monster an ally, or fighting an ally of the player? */
-	if (m_ptr->mflag & (MFLAG_IGNORE | MFLAG_ALLY))
+	/*
+	 * Is monster an ally, or fighting an ally of the player?
+	 * 
+	 * XXX Blind monsters can only cast spells at enemies if aggravated.
+	 */
+	if (((m_ptr->mflag & (MFLAG_IGNORE | MFLAG_ALLY)) != 0) &&
+		(!(m_ptr->blind) || ((m_ptr->mflag & (MFLAG_AGGR)) != 0)))
 	{
 		int k = 0;
 		
+		/* Attempt at efficiency */
+		bool ally = ((m_ptr->mflag & (MFLAG_ALLY)) != 0);
+		bool aggressive = ((m_ptr->mflag & (MFLAG_AGGR)) != 0) ;
+		bool need_lite = ((r_ptr->flags2 & (RF2_NEED_LITE)) == 0);
+		bool sneaking = p_ptr->sneaking || m_ptr->cdis > MAX_RANGE;
+		
+		/* Check all other monsters */
 		for (i = m_max - 1; i >= 1; i--)
 		{
 			/* Access the monster */
@@ -1300,25 +1312,82 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 
 			/* Skip itself */
 			if (i == m_idx) continue;
-
-			/* Allies report to player if nonvocal and smart */
-			if ((m_ptr->mflag & (MFLAG_ALLY)) && ((r_ptr->flags2 & (RF2_SMART)) != 0) && ((r_ptr->flags3 & (RF3_NONVOCAL)) != 0))
-			{
-				/* Optimize -- Repair flags */
-				repair_mflag_mark = repair_mflag_show = TRUE;
-
-				/* Hack -- Detect the monster */
-				m_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
-
-				/* Update the monster */
-				update_mon(i, FALSE);
-			}
 			
 			/* Monster has an enemy */
-			if ((m_ptr->mflag & (MFLAG_ALLY)) != (n_ptr->mflag & (MFLAG_ALLY)))
+			if (ally != (n_ptr->mflag & (MFLAG_ALLY)))
 			{
-				/* Pick a random target in line of sight */
-				if ((generic_los(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx, CAVE_XLOS)) && (!rand_int(++k)))
+				bool see_target = aggressive;
+				int d = distance(n_ptr->fy, n_ptr->fx, m_ptr->fy, m_ptr->fx);
+				
+				/* Ignore targets out of range */
+				if (d > MAX_RANGE) continue;
+				
+				/*
+				 * Check if monster can see the target. We make various assumptions about what
+				 * monsters have a yet to be implemented SEE_INVIS flag, if the target is
+				 * invisible. We check if the target is in light, if the monster needs light to
+				 * see by.
+				 */
+				if (!see_target)
+				{
+					/* Monster is invisible */
+					if ((r_info[n_ptr->r_idx].flags2 & (RF2_INVISIBLE)) || (n_ptr->tim_invis))
+					{
+						/* Cannot see invisible, or use infravision to detect the monster */
+						if ((r_ptr->d_char != 'e') && ((r_ptr->flags2 & (RF2_INVISIBLE)) == 0)
+								&& ((r_ptr->aaf < d) || ((r_info[n_ptr->r_idx].flags2 & (RF2_COLD_BLOOD)) != 0))) continue;
+					}
+					
+					/* Monster needs light to see */
+					if (need_lite)
+					{
+						/* Check for light */
+						if (((cave_info[n_ptr->fy][n_ptr->fx] & (CAVE_LITE)) == 0)
+							&& ((play_info[n_ptr->fy][n_ptr->fx] & (PLAY_LITE)) == 0))
+						{
+							continue;
+						}
+					}
+					
+					/* Needs line of sight, and (hack) sometimes line of fire. */
+					see_target = generic_los(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx, CAVE_XLOS |
+							(m_idx + turn) % 2 ? CAVE_XLOF : 0);
+				}
+				
+				/* Ignore certain targets if sneaking */
+				if (sneaking)
+				{
+					/* Target is asleep - ignore */
+					if (m_ptr->csleep) continue;
+					
+					/* Target not aggressive */
+					if ((n_ptr->mflag & (MFLAG_AGGR)) == 0)
+					{
+						monster_race *s_ptr = &r_info[n_ptr->r_idx];
+					
+						/* I'm invisible and target can't see me - ignore */
+						if ((r_ptr->flags2 & (RF2_INVISIBLE)) || (m_ptr->tim_invis))
+						{
+							/* Cannot see invisible, or use infravision to detect the monster */
+							if ((s_ptr->d_char != 'e') && ((s_ptr->flags2 & (RF2_INVISIBLE)) == 0)
+								&& ((s_ptr->aaf < d) || ((r_ptr->flags2 & (RF2_COLD_BLOOD)) != 0))) continue;
+						}
+					
+						/* I'm in darkness and target can't see in darkness - ignore */
+						if (s_ptr->flags2 & (RF2_NEED_LITE))
+						{
+							/* Check for light */
+							if (((cave_info[n_ptr->fy][n_ptr->fx] & (CAVE_LITE)) == 0)
+									&& ((play_info[n_ptr->fy][n_ptr->fx] & (PLAY_LITE)) == 0))
+							{
+								continue;
+							}
+						}
+					}
+				}
+				
+				/* If target is valid, have a chance to pick it */ 
+				if ((see_target) && (!rand_int(++k)))
 				{
 					*tar_y = n_ptr->fy;
 					*tar_x = n_ptr->fx;
@@ -6087,13 +6156,42 @@ static void process_monster(int m_idx)
 	}
 
 	/* Is monster an ally, or fighting an ally of the player? */
-	if (((r_ptr->flags1 & (RF1_NEVER_MOVE | RF1_NEVER_BLOW)) == 0) && ((m_ptr->mflag & (MFLAG_IGNORE | MFLAG_ALLY)) != 0))
+	if ((m_ptr->mflag & (MFLAG_IGNORE | MFLAG_ALLY)) != 0)
 	{
+		/* Attempt at efficiency */
+		bool ally = ((m_ptr->mflag & (MFLAG_ALLY)) != 0);
+		bool aggressive = ((m_ptr->mflag & (MFLAG_AGGR)) != 0) ;
+		bool need_lite = ((r_ptr->flags2 & (RF2_NEED_LITE)) == 0);
+		bool sneaking = p_ptr->sneaking || m_ptr->cdis > MAX_RANGE;
+		
+		/* Note: We have to prevent never move monsters from acquiring targets or they will move */
+		bool can_target = ((r_ptr->flags1 & (RF1_NEVER_MOVE | RF1_NEVER_BLOW)) != 0)
+			&& (aggressive || !(m_ptr->monfear));
+		
+		/* This allows smart monsters to report enemy positions to the player */
+		bool spying = ally && ((r_ptr->flags2 & (RF2_SMART)) != 0);
+		
+		/* This prevents player monsters from being too effective whilst the player is not around */
+		bool restrict_targets = ally && !aggressive;
+		
 		/* Note we scale this up, and use a pseudo-random hack to try to get multiple monsters
 		 * to favour different equi-distant enemies */
-		int k = ((m_ptr->mflag & (MFLAG_ALLY)) ? MAX_SIGHT : m_ptr->cdis) * 16 + 15;
+		int k = (ally ? MAX_SIGHT : m_ptr->cdis) * 16 + 15;
+
+		/* Need to understand spies, and be able to hear them.
+		 * Smart, nonvocal monsters are telepathic. */
+		if (spying && ((r_ptr->flags3 & (RF3_NONVOCAL)) == 0))
+		{
+			/* Too far away to hear */
+			if (m_ptr->cdis > 3 && !player_can_fire_bold(m_ptr->fy, m_ptr->fx)) spying = FALSE;
+			
+			/* Cannot understand language */
+			if (spying && !player_understands(monster_language(m_ptr->r_idx))) spying = FALSE;
+		}
 		
-		for (i = m_max - 1; i >= 1; i--)
+		/* We check monsters either if we are spying on them or can move to attack them */
+		if (can_target || spying)
+			for (i = m_max - 1; i >= 1; i--)
 		{
 			/* Access the monster */
 			monster_type *n_ptr = &m_list[i];
@@ -6101,26 +6199,114 @@ static void process_monster(int m_idx)
 			/* Skip itself */
 			if (m_idx == i) continue;
 
-			/* Allies report to player if nonvocal and smart */
-			if ((m_ptr->mflag & (MFLAG_ALLY)) && ((r_ptr->flags2 & (RF2_SMART)) != 0) && ((r_ptr->flags3 & (RF3_NONVOCAL)) != 0))
-			{
-				/* Optimize -- Repair flags */
-				repair_mflag_mark = repair_mflag_show = TRUE;
-
-				/* Hack -- Detect the monster */
-				m_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
-
-				/* Update the monster */
-				update_mon(i, FALSE);
-			}
-			
-			/* Allies only find targets visible to player */
-			if ((m_ptr->mflag & (MFLAG_ALLY)) && !(n_ptr->ml)) continue;			
+			/* Allies only find targets visible to player, unless aggressive */
+			if (restrict_targets && !(n_ptr->ml)) continue;
 			
 			/* Monster has an enemy */
-			if ((m_ptr->mflag & (MFLAG_ALLY)) != (n_ptr->mflag & (MFLAG_ALLY)))
+			if (ally != (n_ptr->mflag & (MFLAG_ALLY)))
 			{
-				int d = (distance(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx) * 16) + (m_idx + i) % 16;
+				bool see_target = FALSE;
+				int d = distance(n_ptr->fy, n_ptr->fx, m_ptr->fy, m_ptr->fx) * 16 + (m_idx + i) % 16;
+				
+				/* Ignore targets out of range */
+				if (d > MAX_RANGE * 16) continue;
+				
+				/*
+				 * Check if monster can see the target. We make various assumptions about what
+				 * monsters have a yet to be implemented SEE_INVIS flag, if the target is
+				 * invisible. We check if the target is in light, if the monster needs light to
+				 * see by.
+				 */
+				if (!see_target)
+				{
+					/* Monster is invisible */
+					if ((r_info[n_ptr->r_idx].flags2 & (RF2_INVISIBLE)) || (n_ptr->tim_invis))
+					{
+						/* Cannot see invisible, or use infravision to detect the monster */
+						if ((r_ptr->d_char != 'e') && ((r_ptr->flags2 & (RF2_INVISIBLE)) == 0)
+								&& ((r_ptr->aaf < d) || ((r_info[n_ptr->r_idx].flags2 & (RF2_COLD_BLOOD)) != 0))) continue;
+					}
+					
+					/* Monster needs light to see */
+					if (need_lite)
+					{
+						/* Check for light */
+						if (((cave_info[n_ptr->fy][n_ptr->fx] & (CAVE_LITE)) == 0)
+							&& ((play_info[n_ptr->fy][n_ptr->fx] & (PLAY_LITE)) == 0))
+						{
+							continue;
+						}
+					}
+					
+					/* Needs line of sight. */
+					see_target = generic_los(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx, CAVE_XLOS);
+				}
+				
+				/* Can't see the target */
+				if (!see_target) continue;
+
+				/* Allies report to player if spying on the enemy */
+				/* We need to ensure that the monster can tell the player what they are
+				 * seeing, either by using speech or telepathically from anywhere on
+				 * the map. */
+				if (spying && see_target)
+				{
+					/* Optimize -- Repair flags */
+					repair_mflag_mark = repair_mflag_show = TRUE;
+
+					/* Hack -- Detect the monster */
+					m_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
+
+					/* Update the monster */
+					update_mon(i, FALSE);
+				}
+				
+				/* Ignore certain targets if sneaking */
+				if (sneaking)
+				{
+					/* Target is asleep - ignore */
+					if (m_ptr->csleep) continue;
+					
+					/* Target not aggressive */
+					if ((n_ptr->mflag & (MFLAG_AGGR)) == 0)
+					{
+						monster_race *s_ptr = &r_info[n_ptr->r_idx];
+					
+						/* I'm invisible and target can't see me - ignore */
+						if ((r_ptr->flags2 & (RF2_INVISIBLE)) || (m_ptr->tim_invis))
+						{
+							/* Cannot see invisible, or use infravision to detect the monster */
+							if ((s_ptr->d_char != 'e') && ((s_ptr->flags2 & (RF2_INVISIBLE)) == 0)
+								&& ((s_ptr->aaf < d) || ((r_ptr->flags2 & (RF2_COLD_BLOOD)) != 0))) continue;
+						}
+					
+						/* I'm in darkness and target can't see in darkness - ignore */
+						if (s_ptr->flags2 & (RF2_NEED_LITE))
+						{
+							/* Check for light */
+							if (((cave_info[n_ptr->fy][n_ptr->fx] & (CAVE_LITE)) == 0)
+									&& ((play_info[n_ptr->fy][n_ptr->fx] & (PLAY_LITE)) == 0))
+							{
+								continue;
+							}
+						}
+					}
+				}
+
+				/* Can't attack the target */
+				if (!can_target)
+				{
+					/* Run back to the player with tails between its legs */
+					if ((r_ptr->flags1 & (RF1_NEVER_MOVE)) == 0)
+					{
+						m_ptr->ty = p_ptr->py;
+						m_ptr->tx = p_ptr->px;
+						
+						must_use_target = TRUE;
+					}
+					
+					continue;
+				}
 				
 				/* Pick a random target in line of sight */
 				if ((d < k) && (generic_los(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx, CAVE_XLOS)))
@@ -6130,9 +6316,6 @@ static void process_monster(int m_idx)
 					k = d;
 					
 					must_use_target = TRUE;
-					
-					/* Best range hack */
-					m_ptr->best_range = m_ptr->min_range;
 				}
 			}
 		}
