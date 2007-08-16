@@ -1313,6 +1313,9 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 			/* Skip itself */
 			if (i == m_idx) continue;
 			
+			/* Skip hidden targets */
+			if (n_ptr->mflag & (MFLAG_HIDE)) continue;
+			
 			/* Monster has an enemy */
 			if (ally != (n_ptr->mflag & (MFLAG_ALLY)))
 			{
@@ -1334,7 +1337,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 					if ((r_info[n_ptr->r_idx].flags2 & (RF2_INVISIBLE)) || (n_ptr->tim_invis))
 					{
 						/* Cannot see invisible, or use infravision to detect the monster */
-						if ((r_ptr->d_char != 'e') && ((r_ptr->flags2 & (RF2_INVISIBLE)) == 0)
+						if ((r_ptr->d_char != 'e') && ((r_ptr->flags9 & (RF9_RES_BLIND)) == 0)
 								&& ((r_ptr->aaf < d) || ((r_info[n_ptr->r_idx].flags2 & (RF2_COLD_BLOOD)) != 0))) continue;
 					}
 					
@@ -6219,11 +6222,17 @@ static void process_monster(int m_idx)
 				 */
 				if (!see_target)
 				{
+					/* Monster is hidden */
+					if (n_ptr->mflag & (MFLAG_HIDE))
+					{
+						if ((r_ptr->flags3 & (RF3_NONVOCAL)) == 0) continue;
+					}
+					
 					/* Monster is invisible */
 					if ((r_info[n_ptr->r_idx].flags2 & (RF2_INVISIBLE)) || (n_ptr->tim_invis))
 					{
 						/* Cannot see invisible, or use infravision to detect the monster */
-						if ((r_ptr->d_char != 'e') && ((r_ptr->flags2 & (RF2_INVISIBLE)) == 0)
+						if ((r_ptr->d_char != 'e') && ((r_ptr->flags9 & (RF9_RES_BLIND)) == 0)
 								&& ((r_ptr->aaf < d) || ((r_info[n_ptr->r_idx].flags2 & (RF2_COLD_BLOOD)) != 0))) continue;
 					}
 					
