@@ -1269,6 +1269,18 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		if (!f4 && !f5 && !f6 && !f7) return (0);
 	}
 	
+	/* Eliminate all summoning spells if monster has recently summoned or been summoned */
+	if (m_ptr->summoned)
+	{
+		f4 &= (RF4_SUMMON_MASK);
+		f5 &= (RF4_SUMMON_MASK);
+		f6 &= (RF6_SUMMON_MASK);
+		f7 &= (RF7_SUMMON_MASK);
+
+		/* No spells left */
+		if (!f4 && !f5 && !f6 && !f7) return (0);
+	}
+	
 	/* Allies do not summon (or teleport unless afraid) */
 	if (m_ptr->mflag & (MFLAG_ALLY))
 	{
@@ -1317,7 +1329,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 			if (n_ptr->mflag & (MFLAG_HIDE)) continue;
 			
 			/* Monster has an enemy */
-			if (ally != (n_ptr->mflag & (MFLAG_ALLY)))
+			if (ally != ((n_ptr->mflag & (MFLAG_ALLY)) != 0))
 			{
 				bool see_target = aggressive;
 				int d = distance(n_ptr->fy, n_ptr->fx, m_ptr->fy, m_ptr->fx);
@@ -6206,7 +6218,7 @@ static void process_monster(int m_idx)
 			if (restrict_targets && !(n_ptr->ml)) continue;
 			
 			/* Monster has an enemy */
-			if (ally != (n_ptr->mflag & (MFLAG_ALLY)))
+			if (ally != ((n_ptr->mflag & (MFLAG_ALLY)) != 0))
 			{
 				bool see_target = FALSE;
 				int d = distance(n_ptr->fy, n_ptr->fx, m_ptr->fy, m_ptr->fx) * 16 + (m_idx + i) % 16;
@@ -6461,6 +6473,23 @@ static void recover_monster(int m_idx, bool regen)
 		if (!m_ptr->summoned)
 		{
 			/* Delete monster summoned by player */
+			if (m_ptr->mflag & (MFLAG_ALLY))
+			{
+				/* Get the monster name */
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
+
+				/* "Kill" the monster */
+				delete_monster_idx(m_idx);
+
+				/* Give detailed messages if destroyed */
+				msg_format("%^s leaves your service.", m_name);
+
+				/* Redraw the monster grid */
+				lite_spot(y, x);
+				
+				/* Paranoia */
+				return;
+			}
 		}
 	}
 

@@ -7576,7 +7576,7 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 		{
 			/* Set return point */
 			p_ptr->return_y = p_ptr->py;
-			p_ptr->return_x - p_ptr->px;
+			p_ptr->return_x = p_ptr->px;
 			
 			/* Set the return time */
 			if (s_ptr->type == SPELL_SET_RETURN) return_time = TRUE;

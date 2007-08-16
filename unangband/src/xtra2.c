@@ -4926,8 +4926,8 @@ static void player_tell_allies_target(int y, int x, bool order)
 		if ((!order) && (m_ptr->ty || m_ptr->tx)) continue;
 		
 		/* Set the monster target */
-		m_ptr->ty = p_ptr->target_row;
-		m_ptr->tx = p_ptr->target_col;
+		m_ptr->ty = y;
+		m_ptr->tx = x;
 	}
 }
 

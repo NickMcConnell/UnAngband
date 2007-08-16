@@ -3515,6 +3515,9 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 	/* And start out with full mana */
 	n_ptr->mana = r_ptr->mana;
 
+	/* Monster must wait a while until summoning anything */
+	n_ptr->summoned = 100;
+	
 	/* Calculate the monster_speed*/
 	n_ptr->mspeed = calc_monster_speed(cave_m_idx[y][x]);
 

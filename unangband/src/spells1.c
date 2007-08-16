@@ -8020,6 +8020,9 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 					note = " falls under your influence!";
 					m_ptr->mflag |= (MFLAG_ALLY);
 					m_ptr->mflag &= ~(MFLAG_IGNORE);
+					
+					/* Clear 'summoned' counter */
+					m_ptr->summoned = 0;
 				}
 			}
 			else
@@ -8526,6 +8529,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 	/* If the player is blind, be more descriptive */
 	if (blind) fuzzy = TRUE;
 
+	/* Get the killer */
 	if (who > SOURCE_MONSTER_START)
 	{
 		/* Get the source monster */
