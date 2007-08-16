@@ -3023,7 +3023,7 @@ void monster_death(int m_idx)
 		if (r_ptr->level > p_ptr->csp)
 		{
 			/* Incur blood debt */
-			take_hit(damroll(r_ptr->level - p_ptr->csp, 3),"Blood debt for a summoned minion");
+			take_hit(damroll(r_ptr->level - p_ptr->csp, 3),"blood debt for a slain minion");
 			
 			/* No mana left */
 			p_ptr->csp = 0;
