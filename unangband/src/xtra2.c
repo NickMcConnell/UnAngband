@@ -3016,6 +3016,36 @@ void monster_death(int m_idx)
 	y = m_ptr->fy;
 	x = m_ptr->fx;
 
+	/* Incur summoning debt */
+	if ((m_ptr->mflag & (MFLAG_ALLY)) && (m_ptr->summoned))
+	{
+		/* Summoning debt requires blood */
+		if (r_ptr->level > p_ptr->csp)
+		{
+			/* Incur blood debt */
+			take_hit(damroll(r_ptr->level - p_ptr->csp, 3),"Blood debt for a summoned minion");
+			
+			/* No mana left */
+			p_ptr->csp = 0;
+			p_ptr->csp_frac = 0;
+		}
+		
+		/* Debt can be met by mana */
+		else
+		{
+			p_ptr->csp -= r_ptr->level;		
+		}
+
+		/* Update mana */
+		p_ptr->update |= (PU_MANA);
+		p_ptr->redraw |= (PR_MANA);
+		p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1 | PW_PLAYER_2 | PW_PLAYER_3);
+
+		/* Player death */
+		if (p_ptr->is_dead) return;
+	}
+
+	
 	/* Extinguish lite */
 	delete_monster_lite(m_idx);
 

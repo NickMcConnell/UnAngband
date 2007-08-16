@@ -8109,10 +8109,10 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 	{
 		/* Turn off the damage */
 		dam = 0;
-
+	
 		/* "Kill" the monster */
 		delete_monster_idx(cave_m_idx[y][x]);
-
+	
 		/* Paranoia --- Handle rest of monster routine here */
 
 		/* Give detailed messages if destroyed */
