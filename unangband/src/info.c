@@ -1377,7 +1377,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_ANIM_OBJECT: q = "animate objects"; break;
 			case GF_CLONE: q = "clone";break;
 			case GF_POLY: q = "polymorph";break;
-			case GF_HEAL: q = "heal";break;
+			case GF_HEAL: case GF_HEAL_PERC: q = "heal";break;
 			case GF_HASTE: q = "hasten";break;
 			case GF_SLOW_WEAK: q = "slow";break;
 			case GF_CONF_WEAK: q = "confuse";break;
@@ -1429,7 +1429,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_BATTER:		q = "batter"; break;
 			case GF_BLIND_WEAK:		q = "blind"; break;
 			case GF_RAISE_DEAD: q = "raise dead"; break;
-			case GF_GAIN_MANA:	q = "add"; s= "mana to"; break;
+			case GF_GAIN_MANA: case GF_GAIN_MANA_PERC:	q = "add"; s= "mana to"; break;
 			case GF_FORGET:		q = "forget"; break;
 			case GF_CURSE:		q = "curse"; break;
 			case GF_DISPEL:		q = "remove"; s = "enchantments from"; break;
@@ -1637,6 +1637,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_DARK_WEAK:
 								text_out("power"); break;
 			case GF_SNUFF: text_out("maximum ");
+			case GF_HEAL_PERC: text_out("percentage ");
 			case GF_HEAL: text_out("hit points"); break;
 			case GF_AWAY_ALL:
 			case GF_AWAY_EVIL:
@@ -1662,6 +1663,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 				}
 				break;
 			}
+			case GF_GAIN_MANA_PERC: text_out("percentage ");
 			case GF_LOSE_MANA:
 			case GF_MANA_DRAIN:
 			case GF_GAIN_MANA: text_out("spell points"); break;
@@ -1835,6 +1837,7 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 								q = "pow"; break;
 			case GF_SNUFF: q = "max hp"; break;
 			case GF_HEAL: q = "heal"; break;
+			case GF_HEAL_PERC: q = "heal %"; break;			
 			case GF_AWAY_ALL:
 			case GF_AWAY_JUMP:
 			case GF_AWAY_DARK:
@@ -1846,6 +1849,7 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 			case GF_LOSE_MANA:
 			case GF_MANA_DRAIN:
 			case GF_GAIN_MANA: q = "mana"; break;
+			case GF_GAIN_MANA_PERC: q = "mana %"; break;
 			default: q="dam"; break;
 		}
 

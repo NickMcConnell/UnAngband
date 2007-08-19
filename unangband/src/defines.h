@@ -960,6 +960,10 @@
 #define GF_MENTAL		135
 #define GF_SNUFF		136
 #define GF_RAGE			137
+#define GF_HEAL_PERC	138
+#define GF_GAIN_MANA_PERC	139
+
+
 
 /*
  * Columns for the spell cost or damage flags

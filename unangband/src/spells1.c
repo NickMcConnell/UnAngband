@@ -6559,9 +6559,10 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
-
+		
 		/* Heal Monster (use "dam" as amount of healing, except on undead) */
 		case GF_HEAL:
+		case GF_HEAL_PERC:
 		{
 			if (seen) obvious = TRUE;
 
@@ -7614,6 +7615,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 		/* Melee attack - gain mana */
 		case GF_GAIN_MANA:
+		case GF_GAIN_MANA_PERC:
 		{
 			/* Monster may have mana */
 			if (r_ptr->mana)
@@ -11093,6 +11095,12 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Heal the player a percentage of hitpoints */
+		case GF_HEAL_PERC:
+		{
+			dam = p_ptr->mhp * dam / 100;
+		}
+		
 		/* Heal the player, except if undead */
 		case GF_HEAL:
 		{
@@ -11248,6 +11256,12 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				update_smart_learn(who, SM_IMM_MANA);
 			}
 			break;
+		}
+
+		/* Gain a percentage of total mana */
+		case GF_GAIN_MANA_PERC:
+		{
+			dam = p_ptr->mhp * dam / 100;
 		}
 
 		/* Melee attack - gain mana */

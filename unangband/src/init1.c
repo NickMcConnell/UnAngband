@@ -402,6 +402,8 @@ static cptr r_info_blow_effect[] =
 	"MENTAL",
 	"SNUFF",
 	"RAGE",
+	"HEAL_PERC",
+	"GAIN_MANA_PERC",
 	NULL
 };
 
@@ -1444,6 +1446,7 @@ static cptr s_info_types[] =
 	"SET_OR_MAKE_RETURN",
 	"BLOOD_BOND",
 	"MINDS_EYE",
+	"REMOTE_SENSING",
 	NULL
 };
 
