@@ -649,7 +649,7 @@ extern void screen_roff(int r_idx);
 extern void display_roff(int r_idx);
 
 /* monster2.c */
-extern s16b poly_r_idx(int r_idx);
+extern s16b poly_r_idx(int y, int x, int r_idx);
 extern void delete_monster_idx(int i);
 extern void delete_monster(int y, int x);
 extern void delete_monster_lite(int i);
@@ -813,7 +813,6 @@ extern void player_not_flags(int who, u32b f1,u32b f2,u32b f3, u32b f4);
 extern void update_smart_cheat(int who);
 extern void update_smart_racial(int who);
 extern void update_smart_learn(int who, u32b flag);
-extern s16b poly_r_idx(int r_idx);
 extern void teleport_away(int m_idx, int dis);
 extern void teleport_player(int dis);
 extern void teleport_player_to(int ny, int nx);

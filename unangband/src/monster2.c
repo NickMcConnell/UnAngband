@@ -22,8 +22,11 @@
  *
  * Perform a modified version of "get_mon_num()", with exact minimum and
  * maximum depths and preferred monster types.
+ * 
+ * We know have to ensure that target race can survive on the intended
+ * terrain.
  */
-s16b poly_r_idx(int base_idx)
+s16b poly_r_idx(int y, int x, int base_idx)
 {
 	monster_race *r_ptr = &r_info[base_idx];
 
@@ -82,6 +85,9 @@ s16b poly_r_idx(int base_idx)
 		/* Hack -- No uniques */
 		if (r_ptr->flags1 & (RF1_UNIQUE)) continue;
 
+		/* Hack -- Ensure monster can survive on intended terrain */
+		if (place_monster_here(y, x, r_idx) <= MM_FAIL) continue;
+		
 		/* Accept */
 		table[i].prob3 = table[i].prob2;
 
