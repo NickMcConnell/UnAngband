@@ -18893,3 +18893,13 @@ S:S_GROUP
 D:A giant mound of earth, crawling with termites of various shapes and sizes.  There might
 D: be something valuable inside.
 
+N:1308:Shadow faerie
+G:H:s
+I:115:8d4:18:12:10
+W:7:1:24:20
+M:0:25:5:20
+F:OPEN_DOOR | DROP_60 | CAN_FLY | EVASIVE | NEVER_BLOW
+F:HAS_LITE | RES_DARK | LEVEL_SPEED | MUST_FLY | INVISIBLE
+S:DARKNESS | BLINK | ADD_MANA | BOLT_ELEC
+D:A little winged humanoid clothed surrounded by a glowing yellow lite.
+

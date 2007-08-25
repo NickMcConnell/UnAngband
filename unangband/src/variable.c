@@ -75,6 +75,9 @@ bool arg_force_roguelike;       /* Command arg -- Request roguelike keyset */
  * Various things
  */
 
+bool character_quickstart = FALSE;       /* The character has been loaded and a quickstart profile exists */
+quickstart_type normal_quickstart;		/* The quick save profile */
+
 bool character_generated;       /* The character exists */
 bool character_dungeon;	 /* The character has a dungeon */
 bool character_loaded;	  /* The character was loaded from a savefile */

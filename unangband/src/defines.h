@@ -637,6 +637,11 @@
 #define SEX_MALE		1
 
 /*
+ * Player class constants - only one hard coded.
+ */
+#define CLASS_ISTARI	11
+
+/*
  * Player race constants (hard-coded by save-files, arrays, etc)
  */
 #define RACE_MAN_OF_BREE	0
@@ -4365,6 +4370,7 @@
 #define OPT_verify_special 29
 #define OPT_allow_quantity 30
 #define OPT_easy_corpses 31
+
 /* xxx */
 #define OPT_expand_look    36
 #define OPT_expand_list    37
@@ -4430,6 +4436,12 @@
 #define OPT_birth_no_stacking       (OPT_BIRTH+9)
 #define OPT_birth_haggle (OPT_BIRTH+10)
 #define OPT_birth_scum (OPT_BIRTH+11)
+#define OPT_birth_beginner (OPT_BIRTH+12)
+#define OPT_birth_intermediate (OPT_BIRTH+13)
+#define OPT_birth_small_levels (OPT_BIRTH+14)
+#define OPT_birth_first_time (OPT_BIRTH+15)
+#define OPT_birth_quickstart (OPT_BIRTH+16)
+
 /* xxx xxx */
 #define OPT_cheat_peek     (OPT_CHEAT+0)
 #define OPT_cheat_hear     (OPT_CHEAT+1)
@@ -4449,6 +4461,11 @@
 #define OPT_adult_no_stacking       (OPT_ADULT+9)
 #define OPT_adult_haggle (OPT_ADULT+10)
 #define OPT_adult_scum (OPT_ADULT+11)
+#define OPT_adult_beginner (OPT_ADULT+12)
+#define OPT_adult_intermediate (OPT_ADULT+13)
+#define OPT_adult_small_levels (OPT_ADULT+14)
+#define OPT_adult_first_time (OPT_ADULT+15)
+#define OPT_adult_quickstart (OPT_ADULT+16)
 /* xxx xxx */
 #define OPT_score_peek     (OPT_SCORE+0)
 #define OPT_score_hear     (OPT_SCORE+1)
@@ -4557,6 +4574,12 @@
 #define birth_campaign       op_ptr->opt[OPT_birth_campaign]
 #define birth_haggle       op_ptr->opt[OPT_birth_haggle]
 #define birth_scum       op_ptr->opt[OPT_birth_scum]
+#define birth_beginner       op_ptr->opt[OPT_birth_beginner]
+#define birth_intermediate       op_ptr->opt[OPT_birth_intermediate]
+#define birth_small_levels       op_ptr->opt[OPT_birth_small_levels]
+#define birth_first_time      op_ptr->opt[OPT_birth_first_time]
+#define birth_quickstart      op_ptr->opt[OPT_birth_quickstart]
+
 
 /* xxx xxx */
 #define cheat_peek  op_ptr->opt[OPT_cheat_peek]
@@ -4578,6 +4601,11 @@
 #define adult_no_stacking   op_ptr->opt[OPT_adult_no_stacking]
 #define adult_haggle       op_ptr->opt[OPT_adult_haggle]
 #define adult_scum       op_ptr->opt[OPT_adult_scum]
+#define adult_beginner       op_ptr->opt[OPT_adult_beginner]
+#define adult_intermediate       op_ptr->opt[OPT_adult_intermediate]
+#define adult_small_levels       op_ptr->opt[OPT_adult_small_levels]
+#define adult_first_time      op_ptr->opt[OPT_adult_first_time]
+#define adult_quickstart      op_ptr->opt[OPT_adult_quickstart]
 /* xxx xxx */
 #define score_peek  op_ptr->opt[OPT_score_peek]
 #define score_hear  op_ptr->opt[OPT_score_hear]

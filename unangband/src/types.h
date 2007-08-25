@@ -120,6 +120,7 @@ typedef struct spell_type spell_type;
 typedef struct rune_type rune_type;
 typedef struct hist_type hist_type;
 typedef struct player_other player_other;
+typedef struct quickstart_type quickstart_type;
 typedef struct player_type player_type;
 typedef struct start_item start_item;
 typedef struct tval_desc tval_desc;
@@ -1298,6 +1299,25 @@ struct player_other
 
 
 /*
+ * Information about the player used for quick starts
+ */
+struct quickstart_type
+{
+	byte psex;      /* Sex index */
+	byte prace;     /* Race index */
+	byte pclass;    /* Class index */
+	byte pstyle;    /* Style specialization */
+
+	byte psval;		/* Style sub-specialization*/
+	byte pschool;	/* Current magic 'school' */
+
+	s16b stat_birth[A_MAX];	/* Birth "maximal" stat values */
+	
+	s32b birth_au;	/* Birth gold */
+};
+
+
+/*
  * Most of the "player" information goes here.
  *
  * This stucture gives us a large collection of player variables.
@@ -1334,7 +1354,8 @@ struct player_type
 	s16b wt;/* Weight */
 	s16b sc;/* Social Class */
 
-	s32b au;/* Current Gold */
+	s32b au;		/* Current Gold */
+	s32b birth_au;	/* Gold at birth */
 
 	s16b max_depth; /* Max depth */
 	s16b depth;     /* Cur depth */
@@ -1356,7 +1377,8 @@ struct player_type
 
 	s16b stat_max[A_MAX];   /* Current "maximal" stat values */
 	s16b stat_cur[A_MAX];   /* Current "natural" stat values */
-
+	s16b stat_birth[A_MAX];	/* Birth "maximal" stat values */
+	
 	s16b stat_inc_tim[A_MAX];      /* Timed -- Stat increase */
 	s16b stat_dec_tim[A_MAX];      /* Timed -- Stat decrease */
 

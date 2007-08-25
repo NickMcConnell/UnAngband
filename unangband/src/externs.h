@@ -129,6 +129,8 @@ extern bool arg_graphics;
 extern bool arg_graphics_nice;
 extern bool arg_force_original;
 extern bool arg_force_roguelike;
+extern bool character_quickstart;
+extern quickstart_type normal_quickstart;
 extern bool character_generated;
 extern bool character_dungeon;
 extern bool character_loaded;

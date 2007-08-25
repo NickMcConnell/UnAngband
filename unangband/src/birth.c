@@ -803,7 +803,10 @@ static void player_outfit(void)
 #define QUESTION_ROW	7
 #define TABLE_ROW		10
 
-#define QUESTION_COL	3	
+#define QUESTION_COL	3
+#define KEYBOARD_COL	0
+#define DIFFICULTY_COL	12
+#define QUICKSTART_COL	0
 #define SEX_COL			0
 #define RACE_COL		10
 #define RACE_AUX_COL    26
@@ -1134,7 +1137,7 @@ static void race_aux_hook(birth_menu r_str)
  */
 static bool get_player_race()
 {
-	int i;
+	int i, j = 0;
 	birth_menu *races;
 
 	C_MAKE(races, z_info->g_max, birth_menu);
@@ -1146,11 +1149,16 @@ static bool get_player_race()
 	/* Tabulate races */
 	for (i = 0; i < z_info->g_max; i++)
 	{
-		races[i].name = p_name + p_info[i].name;
-		races[i].ghost = ((p_info[i].flags3 & (TR3_RANDOM)) != 0);
+		/* Intermediates only get races that they know about */
+		if ((birth_intermediate) && (p_info[i].r_idx) && !(l_list[p_info[i].r_idx].tkills)) continue;
+
+		/* Add race to list */
+		races[j++].name = p_name + p_info[i].name;
+		races[j].ghost = ((p_info[i].flags3 & (TR3_RANDOM)) != 0);
 	}
 
-	p_ptr->prace = get_player_choice(races, z_info->g_max, RACE_COL, 17,
+	/* Get the player race */
+	p_ptr->prace = get_player_choice(races, j, RACE_COL, RACE_AUX_COL - RACE_COL - 1,
 		"races.txt", race_aux_hook);
 
 	/* No selection? */
@@ -1249,17 +1257,7 @@ static bool get_player_class(void)
 	/* Tabulate classes */
 	for (i = 0; i < z_info->c_max; i++)
 	{
-#if 0
-		/* Analyze */
-		if (!(rp_ptr->choice & (1L << i)))
-		{
-			classes[i].ghost = TRUE;
-		}
-		else
-		{
-			classes[i].ghost = FALSE;
-		}
-#endif
+		/* Don't ghost classes by default */
 		classes[i].ghost = FALSE;
 
 		/* Ghost if not warrior, and two stats are -4 or below, or 1 is -5 or below */
@@ -1288,8 +1286,7 @@ static bool get_player_class(void)
 		classes[i].name = c_name + c_info[i].name;
 	}
 
-
-	p_ptr->pclass = get_player_choice(classes, z_info->c_max, CLASS_COL, 16,
+	p_ptr->pclass = get_player_choice(classes, z_info->c_max, CLASS_COL, CLASS_AUX_COL - CLASS_COL - 1,
 				      "classes.txt", class_aux_hook);
 
 	/* No selection? */
@@ -1306,6 +1303,7 @@ static bool get_player_class(void)
 
 	return (TRUE);
 }
+
 
 /*
  * Display additional information about each class during the selection.
@@ -1393,7 +1391,7 @@ static bool get_player_style(void)
 	/* Hack */
 	styles[0].ghost = TRUE;
 
-	choice = get_player_choice(styles, num, STYLE_COL, 19,
+	choice = get_player_choice(styles, num, STYLE_COL, STYLE_AUX_COL - STYLE_COL - 1,
 				   "styles.txt", style_aux_hook);
 
 	/* No selection? */
@@ -1494,8 +1492,8 @@ static bool get_player_book(void)
 		books[i].ghost = FALSE;
 	}
 
-	choice = get_player_choice(books, num, BOOK_COL, 19,
-				     "styles.txt", NULL);
+	choice = get_player_choice(books, num, BOOK_COL, 80 - BOOK_COL - 1,
+				     "books.txt", NULL);
 
 	/* No selection? */
 	if (choice == INVALID_CHOICE)
@@ -1639,8 +1637,8 @@ static bool get_player_school(void)
 		}
 	}
 
-	choice = get_player_choice(schools, num, SCHOOL_COL, 19,
-				     "styles.txt", NULL);
+	choice = get_player_choice(schools, num, SCHOOL_COL, 80 - SCHOOL_COL - 1,
+				     "schools.txt", NULL);
 
 	/* No selection? */
 	if (choice == INVALID_CHOICE)
@@ -1684,7 +1682,7 @@ static bool get_player_roller(void)
 	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
 		    "Choose how you specify your starting stats.");
 
-	choice = get_player_choice(roller, MAX_ROLLER_CHOICES, ROLLER_COL, 19,
+	choice = get_player_choice(roller, MAX_ROLLER_CHOICES, ROLLER_COL, 80 - ROLLER_COL - 1,
 				     "rollers.txt", NULL);
 
 	/* No selection? */
@@ -1752,6 +1750,233 @@ static bool get_player_sex(void)
 }
 
 
+#define MAX_DIFFICULTY_CHOICES	4
+
+/*
+ * Player difficulty
+ */
+static bool get_player_difficulty(void)
+{
+	int     choice;
+	birth_menu difficulty[MAX_DIFFICULTY_CHOICES] =
+	{
+		{FALSE, "Beginner"},
+		{FALSE, "Played roguelikes before" },
+		{FALSE, "Played Angband before" },
+		{FALSE, "Played Unangband before"}
+	};
+
+	/*** Player roller choice ***/
+
+	/* Extra info */
+	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
+		    "Describe your experience of playing Unangband.");
+
+	choice = get_player_choice(difficulty, MAX_DIFFICULTY_CHOICES, DIFFICULTY_COL, 80 - DIFFICULTY_COL - 1,
+				     "difficulty.txt", NULL);
+
+	/* No selection? */
+    if (choice == INVALID_CHOICE)
+	{
+		return (FALSE);
+	}
+	else
+	{
+		switch(choice)
+		{
+			case 0:
+				birth_beginner = TRUE;
+				birth_small_levels = FALSE;
+				birth_intermediate = FALSE;
+				break;
+			case 1:
+				birth_beginner = FALSE;
+				birth_small_levels = TRUE;
+				birth_intermediate = TRUE;
+				break;
+			case 2:
+				birth_beginner = FALSE;
+				birth_small_levels = FALSE;
+				birth_intermediate = TRUE;
+				break;
+			case 3:
+				birth_beginner = FALSE;
+				birth_small_levels = FALSE;
+				birth_intermediate = FALSE;
+				break;
+		}
+	}
+
+	return (TRUE);
+}
+
+
+#define MAX_KEYBOARD_CHOICES	2
+
+/*
+ * Player difficulty
+ */
+static bool get_player_keyboard(void)
+{
+	int     choice;
+	birth_menu keyboard[MAX_KEYBOARD_CHOICES] =
+	{
+		{FALSE, "Desktop"},
+		{FALSE, "Laptop"}
+	};
+	
+	/*** Player roller choice ***/
+
+	/* Extra info */
+	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
+		    "Choose your current keyboard layout.");
+
+	choice = get_player_choice(keyboard, MAX_KEYBOARD_CHOICES, KEYBOARD_COL, DIFFICULTY_COL - KEYBOARD_COL - 1,
+				     "keyboard.txt", NULL);
+
+	/* No selection? */
+    if (choice == INVALID_CHOICE)
+	{
+		return (FALSE);
+	}
+	else
+	{
+		switch(choice)
+		{
+			case 0:
+				rogue_like_commands = FALSE;
+				break;
+			case 1:
+				rogue_like_commands = TRUE;
+				break;
+		}
+	}
+
+	return (TRUE);
+}
+
+#define MAX_QUICKSTART_CHOICES	2
+
+/*
+ * Player difficulty
+ */
+static bool get_player_quickstart(void)
+{
+	int     choice;
+	birth_menu quickstart[MAX_QUICKSTART_CHOICES] =
+	{
+		{FALSE, "Yes"},
+		{FALSE, "No"}
+	};
+	
+	/*** Player roller choice ***/
+
+	/* Extra info */
+	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
+		    "Quick start the game using the same choices as the last character?");
+
+	choice = get_player_choice(quickstart, MAX_QUICKSTART_CHOICES, QUICKSTART_COL, 80 - QUICKSTART_COL - 1,
+				     "quickstart.txt", NULL);
+
+	/* No selection? */
+    if (choice == INVALID_CHOICE)
+	{
+		return (FALSE);
+	}
+	else
+	{
+		switch(choice)
+		{
+			case 0:
+				birth_quickstart = TRUE;
+				break;
+			case 1:
+				birth_quickstart = FALSE;
+				break;
+		}
+	}
+
+	return (TRUE);
+}
+
+
+/*
+ * Structure used for a beginner quickstart.
+ * 
+ * Race is Maia, class is Istari, no speciality.
+ * 
+ * All stats start at 15.
+ */
+quickstart_type beginner_quickstart =
+{
+	SEX_MALE,
+	RACE_MAIA,
+	CLASS_ISTARI,
+	0, 		/* No style */
+	0,		/* No substyle */
+	0,		/* No school */
+	{15, 15, 15, 15, 15, 15, 15, 15},
+	100L
+};
+
+
+/*
+ * Quick start a character. Takes a quick start structure and fills in the
+ * required values.
+ */
+static void player_birth_quickstart(quickstart_type *q_ptr)
+{
+	int i;
+	
+	/* Copy across the quickstart structure */
+	p_ptr->psex = q_ptr->psex;
+	p_ptr->pshape = p_ptr->prace = q_ptr->prace;
+	p_ptr->pclass = q_ptr->pclass;
+	p_ptr->pstyle = q_ptr->pstyle;
+	p_ptr->psval = q_ptr->psval;
+	p_ptr->pschool = p_ptr->pschool;
+	
+	/* Set up the class and race */
+	sp_ptr = &sex_info[p_ptr->psex];
+	rp_ptr = &p_info[p_ptr->prace];
+	cp_ptr = &c_info[p_ptr->pclass];
+
+	/* Copy across the stats */
+	for (i = 0; i < A_MAX; i++)
+	{
+		/* Set up the stats */
+		p_ptr->stat_birth[i] = p_ptr->stat_cur[i] = p_ptr->stat_max[i] = q_ptr->stat_birth[i];
+	}
+
+	/* Roll for age/height/weight */
+	get_ahw();
+
+	/* Roll for social class */
+	get_history();
+
+	/* Gold get birth gold */
+	p_ptr->au = p_ptr->birth_au = q_ptr->birth_au;
+
+	/* Calculate the bonuses and hitpoints */
+	p_ptr->update |= (PU_BONUS | PU_HP);
+
+	/* Update stuff */
+	update_stuff();
+
+	/* Fully healed */
+	p_ptr->chp = p_ptr->mhp;
+
+	/* Fully rested */
+	p_ptr->csp = p_ptr->msp;
+	
+	/* Set up secondary stats */
+	p_ptr->town = rp_ptr->home;
+	p_ptr->expfact = rp_ptr->r_exp + cp_ptr->c_exp + (p_ptr->pstyle ? 10 : 0);
+}
+
+
+
+
 /*
  * Helper function for 'player_birth()'.
  *
@@ -1780,11 +2005,99 @@ static bool player_birth_aux_1(void)
 	/* Level one */
 	p_ptr->max_lev = p_ptr->lev = 1;
 
+	/* First time player */
+	if (birth_first_time)
+	{
+		FILE *fff;
+
+		char buf[1024];
+
+		/* Choose the player's keyboard layout */
+		if (!get_player_keyboard()) return (FALSE);
+
+		/* Clean up */
+		clear_question();
+
+		/* Choose the players difficulty */
+		if (!get_player_difficulty()) return (FALSE);
+
+		/* Clean up */
+		clear_question();
+		
+		/* Answered these questions for good */
+		birth_first_time = FALSE;
+		
+		/* Build the filename */
+		path_build(buf, 1024, ANGBAND_DIR_USER, "Startup.prf");
+
+		/* File type is "TEXT" */
+		FILE_TYPE(FILE_TYPE_TEXT);
+
+		/* Write to the file */
+		fff = my_fopen(buf, "w");
+
+		/* Failure */
+		if (!fff) return (FALSE);
+
+		/* Skip some lines */
+		fprintf(fff, "\n\n");
+
+		/* Start dumping */
+		fprintf(fff, "# Automatic startup option dump\n\n");
+
+		/* Dump startup options */
+		fprintf(fff, "%c:%s\n", birth_first_time ? 'Y' : 'X', option_text[OPT_birth_first_time]);
+
+		/* Dump startup options */
+		fprintf(fff, "%c:%s\n", rogue_like_commands ? 'Y' : 'X', option_text[OPT_rogue_like_commands]);
+
+		/* Dump startup options */
+		fprintf(fff, "%c:%s\n", birth_beginner ? 'Y' : 'X', option_text[OPT_birth_beginner]);
+
+		/* Dump startup options */
+		fprintf(fff, "%c:%s\n", birth_intermediate ? 'Y' : 'X', option_text[OPT_birth_intermediate]);
+		
+		/* Close */
+		my_fclose(fff);
+	}
+	
+	/* Allow quickstart? */
+	else if (character_quickstart)
+	{
+		/* Choose whether to use the last game's start-up */
+		if (!get_player_quickstart()) return (FALSE);
+
+		/* Clean up */
+		clear_question();
+		
+		/* Don't show choice any longer */
+		character_quickstart = FALSE;
+
+		/* If player is quickstarting, we are done */
+		if (birth_quickstart)
+		{
+			/* Quick start the character */
+			player_birth_quickstart(&normal_quickstart);
+		
+			return (TRUE);
+		}
+	}
+	
+	/* Choose the player's gender */
 	if (!get_player_sex()) return (FALSE);
 
 	/* Clean up */
 	clear_question();
 
+	/* If player is beginner, we are done */
+	if (birth_beginner)
+	{
+		/* Quick start the character */
+		player_birth_quickstart(&beginner_quickstart);
+		
+		return (TRUE);
+	}
+	
 	/* Choose the players race */
 	if (!get_player_race()) return (FALSE);
 
@@ -2397,8 +2710,14 @@ static bool player_birth_aux(void)
 		op_ptr->opt[OPT_SCORE + (i - OPT_CHEAT)] = op_ptr->opt[i];
 	}
 
+	/* Quickstarting */
+	if (birth_beginner || birth_quickstart)
+	{
+		/* Already rolled stats */
+	}
+	
 	/* Point-based */
-	if (adult_point_based)
+	else if (adult_point_based)
 	{
 		/* Point based */
 		if (!player_birth_aux_2()) return (FALSE);
@@ -2495,7 +2814,7 @@ void roll_hp_table(void)
 void player_birth(void)
 {
 	int n;
-
+	
 	/* Wipe the player */
 	player_wipe();
 
@@ -2509,6 +2828,14 @@ void player_birth(void)
 		if (player_birth_aux()) break;
 	}
 
+	/* Save starting money for later analysis */
+	p_ptr->birth_au = p_ptr->au;
+
+	/* Record stats for later analysis*/
+	for (n = 0; n < A_MAX; n++)
+	{
+		p_ptr->stat_birth[n] = p_ptr->stat_max[n];
+	}
 
 	/* Note player birth in the message recall */
 	message_add(" ", MSG_GENERIC);
@@ -2522,7 +2849,7 @@ void player_birth(void)
 
 	/* Hack -- outfit the player */
 	player_outfit();
-
+	
 	/* Hack -- set the dungeon. */
 	if (adult_campaign) p_ptr->dungeon = 1;
 	else p_ptr->dungeon = 0;
@@ -2546,6 +2873,4 @@ void player_birth(void)
 		COPY(&q_list[n], &q_info[n], quest_type);
 	}
 }
-
-
 

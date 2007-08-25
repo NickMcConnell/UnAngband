@@ -32,7 +32,7 @@ M:E:128
 M:X:492
 
 # Maximum number of monster races (needs to be max + 2 for player ghost)
-M:R:1310
+M:R:1311
 
 # Maximum number of vaults
 M:V:51
@@ -53,7 +53,7 @@ M:G:26
 M:H:350
 
 # Maximum number of player classes
-M:C:11
+M:C:12
 
 # Maximum number of weapon style lines
 M:W:160

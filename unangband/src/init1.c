@@ -4394,18 +4394,19 @@ errr parse_p_info(char *buf, header *head)
 	/* Process 'X' for "Extra Info" (one line only) */
 	else if (buf[0] == 'X')
 	{
-		int exp, infra;
+		int exp, infra, r_idx;
 
 		/* There better be a current pr_ptr */
 		if (!pr_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (2 != sscanf(buf+2, "%d:%d",
-			    &exp, &infra)) return (PARSE_ERROR_GENERIC);
+		if (3 != sscanf(buf+2, "%d:%d:%d",
+			    &exp, &infra, &r_idx)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		pr_ptr->r_exp = exp;
 		pr_ptr->infra = infra;
+		pr_ptr->r_idx = r_idx;
 	}
 
 	/* Hack -- Process 'I' for "info" and such */
@@ -4507,12 +4508,8 @@ errr parse_p_info(char *buf, header *head)
 				*t++ = '\0';
 			}
 
-			/* Hack - Last entry is r_idx */
-			if (i == END_EQUIPMENT - INVEN_WIELD)
-				pr_ptr->r_idx = atoi(s);
-
-			/* Hack - Parse this entry */
-			else pr_ptr->slots[i] = atoi(s);
+			/* Parse this entry */
+			pr_ptr->slots[i] = atoi(s);
 
 			/* Start the next entry */
 			s = t;

@@ -2094,11 +2094,11 @@ const cptr option_text[OPT_MAX] =
 	"birth_no_stacking",		/* xxx */
 	"birth_haggle",				/* OPT_birth_haggle */
 	"birth_scum",				/* OPT_birth_scum */
-	NULL,						/* xxx */
-	NULL,						/* xxx */
-	NULL,						/* xxx */
-	NULL,						/* xxx */
-	NULL,						/* xxx */
+	"birth_beginner",			/* OPT_birth_beginner */
+	"birth_intermediate",		/* OPT_birth_intermediate */
+	"birth_small_levels",		/* OPT_birth_small_levels */
+	"birth_first_time",			/* OPT_birth_first_time */
+	"birth_quickstart",			/* OPT_birth_quickstart */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
@@ -2158,11 +2158,11 @@ const cptr option_text[OPT_MAX] =
 	"adult_no_stacking",		/* xxx */
 	"adult_haggle",				/* OPT_adult_haggle */
 	"adult_scum",				/* OPT_adult_scum */
-	NULL,						/* xxx */
-	NULL,						/* xxx */
-	NULL,						/* xxx */
-	NULL,						/* xxx */
-	NULL,						/* xxx */
+	"adult_beginner",			/* OPT_adult_beginner */
+	"adult_intermediate",		/* OPT_adult_intermediate */
+	"adult_small_levels",		/* OPT_adult_small_levels */
+	"adult_first_time",			/* OPT_adult_first_time */
+	"adult_quickstart",			/* OPT_adult_quickstart */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
 	NULL,						/* xxx */
@@ -2250,8 +2250,8 @@ const cptr option_desc[OPT_MAX] =
 	"Verify use of special commands",			/* OPT_verify_special */
 	"Allow quantity specification",				/* OPT_allow_quantity */
 	"Ignore corpses by default",				/* OPT_easy_corpses */
-	NULL,				/* xxx */
-	NULL,				/* xxx */
+	NULL,
+	NULL,
 	NULL,										/* xxx testing_stack */
 	NULL,										/* xxx testing_carry */
 	"Expand the power of the look command",		/* OPT_expand_look */
@@ -2358,11 +2358,11 @@ const cptr option_desc[OPT_MAX] =
 	"Birth: Don't stack objects on the floor",	/* OPT_birth_no_stacking */
 	"Birth: Haggle in stores",			/* OPT_birth_haggle */									/* xxx */
 	"Birth: Scum for good levels",			/* OPT_birth_scum */
-	NULL,										/* xxx */
-	NULL,										/* xxx */
-	NULL,										/* xxx */
-	NULL,										/* xxx */
-	NULL,										/* xxx */
+	"Birth: Start the game with simplest options",	/* xxx */
+	"Birth: Reduce the number of birth options",/* xxx */
+	"Birth: Always generate small levels",		/* xxx */
+	"Birth: Show all birth menus at start",		/* xxx */
+	"Birth: Start the game with same choices",/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
@@ -2422,11 +2422,11 @@ const cptr option_desc[OPT_MAX] =
 	"Adult: Don't stack objects on the floor",	/* OPT_adult_no_stacking */
 	"Adult: Haggle in stores",			/* OPT_adult_haggle */									/* xxx */
 	"Adult: Scum for good levels",			/* OPT_adult_scum */
-	NULL,										/* xxx */
-	NULL,										/* xxx */
-	NULL,										/* xxx */
-	NULL,										/* xxx */
-	NULL,										/* xxx */
+	"Adult: Start the game with simplest options",	/* xxx */
+	"Adult: Reduce the number of birth options",/* xxx */
+	"Adult: Always generate small levels",		/* xxx */
+	"Adult: Show all birth menus at start",		/* xxx */
+	"Adult: Start the game with same choices",/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
 	NULL,										/* xxx */
@@ -2619,13 +2619,14 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* OPT_birth_no_artifacts */
 	FALSE,		/* OPT_birth_rand_artifacts */
 	TRUE,	  /* OPT_birth_campaign */
+	FALSE,		/* OPT_birth_no_stacking */
 	FALSE,		/* OPT_birth_haggle */
 	FALSE,		/* OPT_birth_scum */
-	FALSE,		/* xxx */
-	FALSE,		/* xxx */
-	FALSE,		/* xxx */
-	FALSE,		/* xxx */
-	FALSE,		/* xxx */
+	FALSE,		/* OPT_birth_beginner */
+	FALSE,		/* OPT_birth_intermediate */
+	FALSE,		/* OPT_birth_small_levels */
+	TRUE,		/* OPT_birth_first_time */
+	FALSE,		/* OPT_birth_quickstart */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
@@ -2686,11 +2687,11 @@ const bool option_norm[OPT_MAX] =
 	FALSE,		/* OPT_adult_no_stacking */
 	FALSE,		/* OPT_adult_haggle */
 	FALSE,		/* OPT_adult_scum */
-	FALSE,		/* xxx */
-	FALSE,		/* xxx */
-	FALSE,		/* xxx */
-	FALSE,		/* xxx */
-	FALSE,		/* xxx */
+	FALSE,		/* OPT_adult_beginner */
+	FALSE,		/* OPT_adult_intermdiate */
+	FALSE,		/* OPT_adult_small_levels */
+	FALSE,		/* OPT_adult_first_time */
+	FALSE,		/* OPT_adult_quickstart */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
 	FALSE,		/* xxx */
@@ -2874,21 +2875,21 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 	/*** Birth ***/
 
 	{
+		OPT_birth_beginner,
+		OPT_birth_intermediate,
+		OPT_birth_first_time,
+		OPT_birth_quickstart,
+		OPT_birth_campaign,
 		OPT_birth_point_based,
 		OPT_birth_auto_roller,
 		OPT_birth_ironman,
 		OPT_birth_no_stores,
 		OPT_birth_no_artifacts,
 		OPT_birth_rand_artifacts,
-		OPT_birth_campaign,
 		OPT_birth_no_stacking,
 		OPT_birth_haggle,
 		OPT_birth_scum,
-		255,
-		255,
-		255,
-		255,
-		255,
+		OPT_birth_small_levels,
 		255,
 		255,
 		255,
