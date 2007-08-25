@@ -1142,10 +1142,10 @@ static void race_aux_hook(birth_menu r_str)
 	xthb = rp_ptr->r_thb * 2 + 24;
 	xtht = rp_ptr->r_tht * 2 + 24;
 	xdis = rp_ptr->r_dis * 2 + 16;
-	xdev = rp_ptr->r_dev * 2 + 20;
+	xdev = rp_ptr->r_dev * 2 + 12;
 	xsav = rp_ptr->r_sav * 2 + 12;
 	xstl = rp_ptr->r_stl * 2 + 2;
-	xsrh = rp_ptr->r_srh * 2 + 20;
+	xsrh = rp_ptr->r_srh * 2 + 12;
 	xdig = rp_ptr->r_dig * 2 + 2;
 
 	put_str("Fighting", TABLE_ROW, RACE_AUX2_COL);
@@ -2085,6 +2085,9 @@ static void player_birth_quickstart(quickstart_type *q_ptr)
 	/* Set up secondary stats */
 	p_ptr->town = rp_ptr->home;
 	p_ptr->expfact = rp_ptr->r_exp + cp_ptr->c_exp + (p_ptr->pstyle ? 10 : 0);
+
+	/* Display the player */
+	display_player(0);
 }
 
 
