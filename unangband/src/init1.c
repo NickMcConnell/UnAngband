@@ -5203,6 +5203,18 @@ errr parse_s_info(char *buf, header *head)
 		s_ptr->cast[i].fail = fail;
 		s_ptr->cast[i].min = min;
 
+		/* Hack -- for Istari, for the moment */
+		if (i == 0)
+		{
+			i++;
+			
+			/* Extract the damage dice and sides */
+			s_ptr->cast[i].class = CLASS_ISTARI;
+			s_ptr->cast[i].level = level;
+			s_ptr->cast[i].mana = mana;
+			s_ptr->cast[i].fail = fail;
+			s_ptr->cast[i].min = min;			
+		}
 	}
 
 	/* Process 'P' for "Pre-requisites" */
