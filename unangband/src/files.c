@@ -1337,7 +1337,7 @@ errr check_load_init(void)
  * Returns a "rating" of x depending on y, and sets "attr" to the
  * corresponding "attribute".
  */
-static cptr likert(int x, int y, byte *attr)
+cptr likert(int x, int y, byte *attr)
 {
 	/* Paranoia */
 	if (y <= 0) y = 1;
@@ -1476,7 +1476,7 @@ static void display_player_xtra_info(void)
 
 	/* Age */
 	Term_putstr(col, row, -1, TERM_WHITE, "Age");
-	Term_putstr(col+8, row, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->age + p_ptr->max_lev / 10));
+	Term_putstr(col+7, row, -1, TERM_L_BLUE, format("%5d", (int)p_ptr->age + p_ptr->max_lev / 10));
 
 	/* Height */
 	Term_putstr(col, row + 1, -1, TERM_WHITE, "Height");
@@ -1938,7 +1938,7 @@ static void display_player_xtra_info(void)
 	c_put_str(likert_attr, format("%9s", desc), 17, col+11);
 
 	put_str("Digging", 18, col);
-	desc = likert(xdig, 6, &likert_attr);
+	desc = likert(xdig, 1, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 18, col+11);
 
 	/* Indent output by 1 character, and wrap at column 76 */
@@ -4811,7 +4811,7 @@ startover:
  */
 void get_name(void)
 {
-	char tmp[16];
+	char tmp[12];
 
 	/* Save the player name */
 	my_strcpy(tmp, op_ptr->full_name, sizeof(tmp));
@@ -4819,7 +4819,7 @@ void get_name(void)
 	/* Offer a random name */
 	if (!strlen(tmp))
 	{
-		my_strcpy(tmp, make_word(7, 15), sizeof(tmp));
+		my_strcpy(tmp, make_word(6, 10), sizeof(tmp));
 	}
 
 	/* Prompt for a new name */

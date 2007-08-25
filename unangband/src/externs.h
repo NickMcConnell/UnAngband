@@ -548,6 +548,7 @@ extern errr check_time_init(void);
 extern errr check_load(void);
 extern errr check_load_init(void);
 extern void player_flags(u32b *f1, u32b *f2, u32b *f3, u32b *f4);
+extern cptr likert(int x, int y, byte *attr);
 extern void display_player_stat_info(int row, int col, int min, int max, int attr);
 extern void display_player(int mode);
 extern errr file_character(cptr name, bool full);
