@@ -17277,7 +17277,7 @@ F:MALE
 F:DROP_1D2
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:NEED_LITE | SMART | FRIEND | LEVEL_SIZE
-F:WARRIOR
+F:WARRIOR | NO_FEAR
 D:A scarred warrior who moves with confidence.
 
 N:1194:Dwarf high priest
