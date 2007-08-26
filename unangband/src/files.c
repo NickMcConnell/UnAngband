@@ -3791,13 +3791,13 @@ errr file_character(cptr name, bool full)
 	}
 
 	/* Display current date in the Elvish calendar */
-	text_out(format(" This is %s of the %s year of the third age.  ",
+	text_out(format(" This is %s of the %s year of the third age.\n",
 	           get_month_name(day, cheat_xtra, FALSE), buf2));
 
 	/* Display location */
 	if (p_ptr->depth == min_depth(p_ptr->dungeon))
 	{
-		text_out(format("You are in %s.", t_name + t_info[p_ptr->dungeon].name));
+		text_out(format(" You are in %s.", t_name + t_info[p_ptr->dungeon].name));
 	}
 	/* Display depth in feet */
 	else if (depth_in_feet)
@@ -3807,7 +3807,7 @@ errr file_character(cptr name, bool full)
 		/* Get the zone */
 		get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
-		text_out(format("You are %d ft %s %s.",
+		text_out(format(" You are %d ft %s %s.",
 			(p_ptr->depth - min_depth(p_ptr->dungeon)) * 50 ,
 				zone->tower ? "high above" : "deep in",
 					t_name + t_info[p_ptr->dungeon].name));
@@ -3815,7 +3815,7 @@ errr file_character(cptr name, bool full)
 	/* Display depth */
 	else
 	{
-		text_out(format("You are on level %d of %s.",
+		text_out(format(" You are on level %d of %s.",
 			p_ptr->depth - min_depth(p_ptr->dungeon),
 				t_name + t_info[p_ptr->dungeon].name));
 	}
@@ -3823,18 +3823,15 @@ errr file_character(cptr name, bool full)
 	/* Skip some lines */
 	text_out("\n\n");
 
-	/* If dead, dump last messages -- Prfnoff */
-	if (p_ptr->is_dead)
-	{
-		i = message_num();
-		if (i > 15) i = 15;
-		text_out("  [Last Messages]\n\n");
-		while (i-- > 0)
-		{
-			text_out(format("> %s\n", message_str((s16b)i)));
-		}
-		text_out("\n");
-	}
+	/* Dump last messages */
+	i = message_num();
+	if (i > 15) i = 15;
+	text_out("  [Last Messages]\n\n");
+	while (i-- > 0)
+	  {
+	    text_out(format("> %s\n", message_str((s16b)i)));
+	  }
+	text_out("\n");
 
 	/* Dump the equipment */
 	if (p_ptr->equip_cnt)
@@ -3852,7 +3849,7 @@ errr file_character(cptr name, bool full)
 			identify_random_gen(&inventory[i]);
 		}
 
-		text_out("\n\n");
+		text_out("\n");
 	}
 
 	/* Dump the quiver */
@@ -3874,7 +3871,7 @@ errr file_character(cptr name, bool full)
 			identify_random_gen(&inventory[i]);
 		}
 
-		text_out("\n\n");
+		text_out("\n");
 	}
 
 	/* Dump the inventory */

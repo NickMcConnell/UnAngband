@@ -2643,7 +2643,7 @@ static bool player_birth_aux_3(void)
 				auto_round++;
 
 				/* Hack -- Prevent overflow */
-				if (auto_round >= 10000000000000L) break;
+				if (auto_round >= 1000000L) break;
 
 				/* Check and count acceptable stats */
 				for (i = 0; i < A_MAX; i++)
@@ -2699,9 +2699,9 @@ static bool player_birth_aux_3(void)
 					/* Make sure they see everything */
 					Term_fresh();
 
-					/* Delay 1/10 second 
+					/* Delay 1/10 second */
 					if (flag) Term_xtra(TERM_XTRA_DELAY, 100);
-					*/
+
 					/* Do not wait for a key */
 					inkey_scan = TRUE;
 
