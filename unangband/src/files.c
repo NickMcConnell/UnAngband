@@ -4647,6 +4647,89 @@ void do_cmd_help(void)
 }
 
 
+/*
+ * Queue up tips to be shown.
+ * 
+ * Tips are bits of context sensitive help that
+ * we want to interrupt the game with (because they are
+ * useful) but only want to interrupt the game in certain
+ * 'safe' locations. Currently, we use show a tip every
+ * 512 turns while searching, every 64 turns while in town,
+ * and when we first enter a level.
+ * 
+ * Tips go into the info directly (currently unused).
+ * 
+ * We don't show tips while repeating a command.
+ * 
+ * But because these are context sensitive, we need them
+ * to approximately appear at the time we find them. So
+ * we queue them up in a currently statically sized
+ * queue and clear the queue when they are shown.
+ * 
+ * Currently we check if the tip exists before queuing it.
+ * If we call tips frequently, we probably will want to
+ * move this check to when we show the tip.
+ */
+void queue_tip(cptr tip)
+{
+	/* Current help file */
+	FILE *fff = NULL;
+
+	/* Path buffer */
+	char path[1024];
+
+	/* Have space for tips */
+	if (tips_end != tips_start - 1)
+	{
+		/* Build the filename */
+		path_build(path, 1024, ANGBAND_DIR_INFO, tip);
+
+		/* Open the file */
+		fff = my_fopen(path, "r");
+
+		/* File doesn't exist */
+		if (!fff) return;
+
+		/* Close the file */
+		my_fclose(fff);		
+		
+		/* Add the tip, using quarks */
+		tips[tips_end++] = quark_add(tip);
+		
+		/* Wrap the queue around if required */
+		if (tips_end == TIPS_MAX) tips_end = 0;
+	}
+}
+
+
+/*
+ * Show a tip.
+ */
+void show_tip(void)
+{
+	/* Have tips to show */
+	if (tips_start != tips_end)
+	{
+		cptr tip = quark_str(tips[tips_start++]);
+
+		msg_print("You find a note.");
+		
+		msg_print("");
+		
+		/* Save screen */
+		screen_save();
+
+		/* Peruse the main help file */
+		(void)show_file(tip, NULL, 0, 0);
+
+		/* Load screen */
+		screen_load();
+		
+		/* Wrap the queue around if required */
+		if (tips_start == TIPS_MAX) tips_start = 0;
+	}
+}
+
 
 /*
  * Process the player name and extract a clean "base name".

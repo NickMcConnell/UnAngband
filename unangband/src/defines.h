@@ -274,6 +274,15 @@
 #define QUARK_MAX	512
 
 /*
+ * OPTION: Maximum number of "tips" (see "files.c")
+ * Default: assume at most 32 different tips queued
+ * 
+ * We drop excess tips.
+ */
+#define TIPS_MAX	32
+
+
+/*
  * OPTION: Maximum number of messages to remember (see "util.c")
  * Default: assume maximal memorization of 2048 total messages
  */
@@ -1014,7 +1023,7 @@
  * Maximum number of spell constants
  */
 #define MAX_SPELL_APPEARS	10
-#define MAX_SPELL_CASTERS	6
+#define MAX_SPELL_CASTERS	8
 #define MAX_SPELL_PREREQUISITES	2
 
 
@@ -4381,6 +4390,8 @@
 #define OPT_view_unsafe_grids 42
 #define OPT_view_detect_grids 43
 #define OPT_run_ignore_floors     44
+#define OPT_show_tips     45
+
 /* xxx track_target */
 /* xxx smart_learn */
 #define OPT_smart_cheat    47
@@ -4525,6 +4536,7 @@
 /* xxx track_follow */
 /* xxx track_target */
 /* xxx smart_learn */
+#define show_tips op_ptr->opt[OPT_show_tips]
 #define smart_cheat op_ptr->opt[OPT_smart_cheat]
 #define view_reduce_lite  op_ptr->opt[OPT_view_reduce_lite]
 #define hidden_player     op_ptr->opt[OPT_hidden_player]

@@ -10499,4 +10499,7 @@ void generate_cave(void)
 	{
 		t_info[p_ptr->dungeon].max_depth = p_ptr->depth - min_depth(p_ptr->dungeon);
 	}
+	
+	/* Show a tip */
+	show_tip();
 }

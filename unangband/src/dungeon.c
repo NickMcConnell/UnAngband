@@ -1265,6 +1265,13 @@ static void process_world(void)
 	/* Feel the inventory */
 	sense_inventory();
 
+	/* Show tips */
+	if  (!(p_ptr->command_rep) && ((p_ptr->searching && !(turn % 512)) ||
+			(((level_flag & (LF1_TOWN)) != 0) && !(turn % 64))))
+	{
+		/* Show a tip */
+		show_tip();
+	}
 
 	/*** Process Objects ***/
 

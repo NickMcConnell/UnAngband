@@ -319,6 +319,9 @@ extern quest_type *q_info;
 extern char *q_name;
 extern char *q_text;
 extern names_type *n_info;
+extern s16b tips[TIPS_MAX];
+extern s16b tips_start;
+extern s16b tips_end;
 extern cptr ANGBAND_SYS;
 extern cptr ANGBAND_GRAF;
 extern cptr ANGBAND_DIR;
@@ -553,6 +556,8 @@ extern void display_player_stat_info(int row, int col, int min, int max, int att
 extern void display_player(int mode);
 extern errr file_character(cptr name, bool full);
 extern bool show_file(cptr name, cptr what, int line, int mode);
+extern void queue_tip(cptr tip);
+extern void show_tip(void);
 extern void do_cmd_help(void);
 extern void process_player_name(bool sf);
 extern char *make_word(int min_len, int max_len);

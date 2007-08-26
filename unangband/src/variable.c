@@ -232,6 +232,15 @@ s16b quark__num = 1;
  */
 cptr *quark__str;
 
+/*
+ * The array [TIPS_MAX] of tips. These are held as quarks.
+ */
+s16b tips[TIPS_MAX];
+
+/*
+ * Start and end of tips.
+ */
+s16b tips_start = 0, tips_end = 0;
 
 /*
  * The next "free" index to use

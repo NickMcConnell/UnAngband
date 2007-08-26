@@ -1999,7 +1999,7 @@ const cptr option_text[OPT_MAX] =
 	"view_unsafe_grids",			/* OPT_view_unsafe_grids */
 	"view_detect_grids",			/* OPT_view_detect_grids */
 	"run_ignore_floors",			/* OPT_run_ignore_floors */
-	NULL,					/* xxx track_target */
+	"show_tips",					/* OPT_show_tips */
 	NULL,					/* xxx smart_learn */
 	"smart_cheat",				/* OPT_smart_cheat */
 	"view_reduce_lite",			/* OPT_view_reduce_lite */
@@ -2262,8 +2262,8 @@ const cptr option_desc[OPT_MAX] =
 	"Generate dungeons with connected stairs",	/* OPT_dungeon_stair */
 	"Mark where you have detected traps",		/* OPT_view_unsafe_grids */
 	"Mark where you have detected monsters",	/* OPT_view_unsafe_grids */
-	"When running, ignore interesting floors",				/* OPT_run_ignore_stairs */
-	NULL,								/* xxx */
+	"When running, ignore interesting floors",	/* OPT_run_ignore_floors */
+	"Show tips as you explore the dungeon",		/* OPT_show_tips */
 	NULL,								/* xxx */
 	NULL,								/* xxx*/
 	"Reduce lite-radius when running",			/* OPT_view_reduce_lite */
@@ -2527,7 +2527,7 @@ const bool option_norm[OPT_MAX] =
 	TRUE,		/* OPT_view_unsafe_grids */
 	TRUE,		/* OPT_view_detect_grids */
 	TRUE,		/* OPT_run_ignore_floors */
-	FALSE,		/* xxx track_target */
+	TRUE,		/* OPT_show_tips */
 	FALSE,		/* xxx smart_learn */
 	FALSE,		/* OPT_smart_cheat */
 	FALSE,		/* OPT_view_reduce_lite */
@@ -2809,7 +2809,7 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_view_unsafe_grids,
 		OPT_view_detect_grids,
 		OPT_reseed_artifacts,
-		255,
+		OPT_show_tips,
 		255,
 		255,
 		255,
