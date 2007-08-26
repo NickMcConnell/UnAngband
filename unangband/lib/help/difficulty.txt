@@ -13,9 +13,9 @@ restrict the choices you have to make in-game at this stage.
 
 As a Beginner, you'll start the game as a Maia Istari.  The
 Maia are a powerful race who come from the West.  They are 
-powerful and good at all skills.  The Istari are gifted 
+good at all skills and have high stats.  The Istari are fine 
 warriors who can also use the priestly and magical arts as
-well as the best of other classes.  Making this choice means
+well as magical devices and bows.  Making this choice means
 you'll be able to use all items that you find in the game
 equally well and allows you to progress far and learn about
 all aspects of Unangband.

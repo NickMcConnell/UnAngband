@@ -2125,8 +2125,6 @@ static bool player_birth_aux_1(void)
 	Term_clear();
 
 	/* Display some helpful information */
-	Term_putstr(QUESTION_COL, HEADER_ROW, -1, TERM_WHITE,
-		    "Please select your character from the menu below.");
 	Term_putstr(QUESTION_COL, HEADER_ROW + 2, -1, TERM_WHITE,
 		    "Use the movement keys to scroll the menu, 'Enter' to select the current");
 	Term_putstr(QUESTION_COL, HEADER_ROW + 3, -1, TERM_WHITE,
@@ -2215,6 +2213,9 @@ static bool player_birth_aux_1(void)
 		}
 	}
 	
+	Term_putstr(QUESTION_COL, HEADER_ROW, -1, TERM_L_BLUE,
+		    "Please select your character from the menu below.");
+
 	/* Choose the player's gender */
 	if (!get_player_sex()) return (FALSE);
 
