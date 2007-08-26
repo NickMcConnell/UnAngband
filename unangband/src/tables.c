@@ -4085,6 +4085,45 @@ const cptr w_name_style[32] =
 
 
 /*
+ * Tval associated with each style
+ */
+const s16b style2tval[32] =
+{
+	0,
+	0,
+	0,
+	0,
+	TV_SHIELD,
+	0,
+	TV_HAFTED,
+	TV_SWORD,
+	TV_POLEARM,
+	0,
+	TV_SHOT,
+	TV_ARROW,
+	TV_BOLT,
+	0,
+	TV_MAGIC_BOOK,
+	TV_PRAYER_BOOK,
+	TV_SONG_BOOK,
+	TV_INSTRUMENT,
+	TV_POTION,
+	TV_SCROLL,
+	TV_AMULET,
+	TV_RING,
+	TV_WAND,
+	TV_STAFF,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0
+};
+
+/*
  * Race of parasites
  *
  * This is a temporary hack.

@@ -2378,23 +2378,16 @@ bool set_rest(int v)
 }
 
 
-
 /*
  * Mark items as aware as a result of gaining a level.
  */
 void improve_aware(void)
 {
 	int i;
-
-	int aware_amulet=-1;
-	int aware_ring=-1;
-	int aware_wand=-1;
-	int aware_staff=-1;
-	int aware_potion=-1;
-	int aware_scroll=-1;
-
-	u32b aware_style;
-
+	int awareness = -1;
+	int tip_count_start = 0;
+	int tip_count = 0;
+	
 	/* Hack -- Check for id'ed */
 	for (i=1;i<z_info->w_max;i++)
 	{
@@ -2404,85 +2397,49 @@ void improve_aware(void)
 
 		if (w_info[i].level > p_ptr->lev) continue;
 
-		aware_style = (w_info[i].styles & (1L << p_ptr->pstyle));
-								   
-		if (aware_style & (1L << WS_WAND)) aware_wand = 2*(p_ptr->lev - w_info[i].level)+1;
+		if ((w_info[i].styles & (1L << p_ptr->pstyle)) == 0) continue;
+		
+		awareness = 2*(p_ptr->lev - w_info[i].level)+1;
+	}
 
-		if (aware_style & (1L << WS_STAFF)) aware_staff = 2*(p_ptr->lev - w_info[i].level)+1;
-
-		if (aware_style & (1L << WS_POTION)) aware_potion = 2*(p_ptr->lev - w_info[i].level)+1;
-
-		if (aware_style & (1L << WS_SCROLL)) aware_scroll = 2*(p_ptr->lev - w_info[i].level)+1;
-
-		if (aware_style & (1L << WS_RING)) aware_ring = 2*(p_ptr->lev - w_info[i].level)+1;
-
-		if (aware_style & (1L << WS_AMULET)) aware_amulet = 2*(p_ptr->lev - w_info[i].level)+1;
-
-	 }
-
+	/* Hack -- efficiency for tips */
+	for (i=1;i<z_info->k_max;i++)
+	{
+		/*Already aware */
+		if (k_info[i].aware) continue;
+		
+		/* Check awareness */
+		if (k_info[i].tval == style2tval[p_ptr->pstyle])
+		{
+			tip_count_start++;
+		}
+	}
+	
 	/* Hack -- Check for id'ed */
 	for (i=1;i<z_info->k_max;i++)
 	{
 		/*Already aware */
 		if (k_info[i].aware) continue;
 
-		switch (k_info[i].tval)
+		/* Check for awareness */
+		if (k_info[i].level > awareness) continue;
+		
+		/* Check awareness */
+		if (k_info[i].tval == style2tval[p_ptr->pstyle])
 		{
-			case TV_WAND:
-			{
-				if (k_info[i].level <= aware_wand)
-				{
-					k_info[i].aware=TRUE;
-					p_ptr->notice |= (PN_REORDER | PN_COMBINE);
-				}
-				break;
-			}
-			case TV_STAFF:
-			{
-				if (k_info[i].level <= aware_staff) 
-				{
-					k_info[i].aware=TRUE;					
-					p_ptr->notice |= (PN_REORDER | PN_COMBINE);
-				}
-				break;
-			}
-			case TV_POTION:
-			{
-				if (k_info[i].level <= aware_potion) 
-				{
-					k_info[i].aware=TRUE;
-					p_ptr->notice |= (PN_REORDER | PN_COMBINE);
-				}
-				break;
-			}
-			case TV_SCROLL:
-			{
-				if (k_info[i].level <= aware_scroll) 
-				{
-					k_info[i].aware=TRUE;
-					p_ptr->notice |= (PN_REORDER | PN_COMBINE);
-				}
-				break;
-			}
-			case TV_RING:
-			{
-				if (k_info[i].level <= aware_ring) 
-				{
-					k_info[i].aware=TRUE;
-					p_ptr->notice |= (PN_REORDER | PN_COMBINE);
-				}
-				break;
-			}
-			case TV_AMULET:
-			{
-				if (k_info[i].level <= aware_amulet) 
-				{
-					k_info[i].aware=TRUE;
-					p_ptr->notice |= (PN_REORDER | PN_COMBINE);
-				}
-				break;
-			}
+			queue_tip(format("kind%d.txt", i));
+			k_info[i].aware=TRUE;
+			p_ptr->notice |= (PN_REORDER | PN_COMBINE);
+			
+			tip_count++;
 		}
+	}
+	
+	/* Show all tval tips */
+	for(i = tip_count_start; i < tip_count_start + tip_count; i++)
+	{
+		/* Show tips */
+		queue_tip(format("tval%d-%d.txt", style2tval[p_ptr->pstyle], i));
 	}
 }
 

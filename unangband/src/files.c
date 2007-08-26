@@ -4651,7 +4651,7 @@ void do_cmd_help(void)
  * we want to interrupt the game with (because they are
  * useful) but only want to interrupt the game in certain
  * 'safe' locations. Currently, we use show a tip every
- * 512 turns while searching, every 64 turns while in town,
+ * 1000 turns while searching, every 100 turns while in town,
  * and when we first enter a level.
  * 
  * Tips go into the info directly (currently unused).

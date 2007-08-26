@@ -36,3 +36,19 @@ oflagnnn.txt   The player has recently become aware of the object flag nnn for t
                first time.
                See defines.h for the order that race flags are given, and use
                trx_flag to determine 32 * (x-1) + y = nnn.
+
+birthnn.txt    The player has just been born. These tips are shown every time in nn
+               order.
+
+raceaa-bb.txt  The player has just been born as race aa. These tips are shown every
+               time in bb order.
+
+classaa-bb.txt The player has just been born as class aa. These tips are shown every
+               time in bb order.
+
+wsaa-bb-cc.txt The player has just been born with class aa, style bb. These tips
+               are shown everytime for this style and class combination in cc order.
+               
+schoolaa-bb.txt The player has just been born as school aa. These tips are shown every
+               time in bb order.
+               

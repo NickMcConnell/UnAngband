@@ -1224,12 +1224,22 @@ bool detect_objects_normal(void)
 			/* Hack -- memorize it */
 			if (!auto_pickup_ignore(o_ptr)) o_ptr->ident |= (IDENT_MARKED);
 
-			/* Hack -- have seen object */
-			if (!(k_info[o_ptr->k_idx].flavor)) k_info[o_ptr->k_idx].aware = TRUE;
+			/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
+			if ((!k_info[o_ptr->k_idx].flavor) && !(k_info[o_ptr->k_idx].aware))
+			{
+				object_aware_tips(o_ptr);
+
+				k_info[o_ptr->k_idx].aware = TRUE;
+			}
 
 			/* XXX XXX - Mark monster objects as "seen" */
-			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights)) l_list[o_ptr->name3].sights++;
-
+			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights))
+			{
+				l_list[o_ptr->name3].sights++;
+				
+				queue_tip(format("look%d.txt", o_ptr->name3));
+			}
+			
 			/* Redraw */
 			lite_spot(y, x);
 

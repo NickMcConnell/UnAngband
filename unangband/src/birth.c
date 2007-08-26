@@ -2977,6 +2977,31 @@ void player_birth(void)
 	message_add("  ", MSG_GENERIC);
 	message_add(" ", MSG_GENERIC);
 
+	/* Initialise birth tips */
+	for (n = 0; n < 99; n++)
+	{
+		/* Birth tips */
+		queue_tip(format("birth%d", n));
+		
+		/* Birth tips */
+		queue_tip(format("race%d-%d", p_ptr->prace, n));
+
+		/* Birth tips */
+		queue_tip(format("class%d-%d", p_ptr->pclass, n));
+		
+		/* Style tips */
+		if (p_ptr->pstyle) queue_tip(format("ws%d-%d-%d",p_ptr->pclass, p_ptr->pstyle, n));
+
+		/* Style tips */
+		if (p_ptr->pschool) queue_tip(format("school%d-%d",p_ptr->pschool, n));
+	}
+
+	/* Tips */
+	if (style2tval[p_ptr->pstyle])
+	{
+		queue_tip(format("tval%d", style2tval[p_ptr->pstyle]));		
+	}
+
 	/* Hack -- assume the new shape */
 	change_shape(p_ptr->prace, p_ptr->lev);
 

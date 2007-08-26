@@ -1266,8 +1266,8 @@ static void process_world(void)
 	sense_inventory();
 
 	/* Show tips */
-	if  (!(p_ptr->command_rep) && ((p_ptr->searching && !(turn % 512)) ||
-			(((level_flag & (LF1_TOWN)) != 0) && !(turn % 64))))
+	if  (!(p_ptr->command_rep) && ((p_ptr->searching && !(turn % 1000)) ||
+			(((level_flag & (LF1_TOWN)) != 0) && !(turn % 100))))
 	{
 		/* Show a tip */
 		show_tip();

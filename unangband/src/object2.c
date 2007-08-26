@@ -805,7 +805,39 @@ void object_bonus(object_type *o_ptr)
 	}
 }
 
+/*
+ * Ensure tips are displayed as objects become either weakly or strongly aware
+ */
+void object_aware_tips(object_type *o_ptr)
+{
+	int i, count = 0;
 
+	/* Check all objects */
+	for (i = 0; i < z_info->k_max; i++)
+	{
+		/* Skip non-matching tvals */
+		if (k_info[i].tval != o_ptr->tval) continue;
+		
+		/* Count number of objects aware */
+		if (object_aware_p(o_ptr)) count++;
+	}
+
+	/* Show tval tips if no objects of this type known */
+	if (!count)
+	{
+		/* Show tval based tip */
+		queue_tip(format("tval%d.txt", o_ptr->tval));
+	}
+	/* Show tval tips if no objects of this type known */
+	else
+	{
+		/* Show tval based tip */
+		queue_tip(format("tval%d-%d.txt", o_ptr->tval, count));
+	}
+
+	/* Show tip for kind of object */
+	queue_tip(format("kind%d.txt", o_ptr->k_idx));
+}
 
 /*
  * The player is now aware of the effects of the given object.
@@ -819,7 +851,10 @@ void object_aware(object_type *o_ptr)
 	u32b f1, f2, f3, f4;
 
 	/* Add a tip if we're not aware */
-	if (!object_aware_p(o_ptr)) queue_tip(format("kind%d.txt", o_ptr->k_idx));
+	if (!object_aware_p(o_ptr))
+	{
+		object_aware_tips(o_ptr);
+	}
 	
 	/* Get the flags */
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
@@ -932,6 +967,12 @@ void object_aware(object_type *o_ptr)
 	/* Know about ego-type */
 	if ((o_ptr->name2) && !(o_ptr->ident & (IDENT_STORE)))
 	{
+		/* Show tips if required */
+		if (!e_info[o_ptr->name2].aware)
+		{
+			queue_tip(format("ego%d", o_ptr->name2));
+		}
+		
 		e_info[o_ptr->name2].aware = TRUE;
 	}
 }

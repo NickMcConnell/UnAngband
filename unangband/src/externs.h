@@ -102,6 +102,7 @@ extern const int month_day[9];
 extern const cptr month_name[9];
 extern const s16b bag_holds[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL][2];
 extern const cptr w_name_style[32];
+extern const s16b style2tval[32];
 extern const s16b parasite_hack[DISEASE_BLOWS];
 extern const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES];
 
@@ -736,6 +737,7 @@ extern void object_known_store(object_type *o_ptr);
 extern void object_known(object_type *o_ptr);
 extern void object_bonus(object_type *o_ptr);
 extern void object_mental(object_type *o_ptr);
+extern void object_aware_tips(object_type *o_ptr);
 extern void object_aware(object_type *o_ptr);
 extern void object_tried(object_type *o_ptr);
 extern s32b object_value_real(const object_type *o_ptr);
