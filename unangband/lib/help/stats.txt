@@ -42,6 +42,11 @@
                and will increase his chances of hitting with any weapon, both
                in melee combat and at range.  Dexterity is also useful in
                picking locks and disarming traps.
+               Magical spell casters, such as mages, artisans, rangers and
+               warrior mages require dexterity to assist in the casting of
+               their spells - a high dexterity will decrease the overall
+               failure chance of spell casting for these classes.  Wearing
+               gloves will however penalize magical spell casters however.
  
           Constitution
                Constitution is a character's ability to resist damage to his
@@ -68,6 +73,10 @@
                that charm or influence monsters, whether the magic is from
                a spell or magical device that the player uses, or from
                the abilities of their allies.
+               Priestly spell casters, such as priests and paladins require
+               charisma to assist in the casting of their spells - a high
+               charisma will decrease the overall failure chance of spell
+               casting for these classes.
                
           Agility
                Agility is a measure of your quickness and overall altheticism.
