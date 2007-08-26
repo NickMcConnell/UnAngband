@@ -953,6 +953,7 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 
 			screen_save();
 			(void)show_file(buf, NULL, 0, 0);
+			(void)show_file("birth.hlp", NULL, 0, 0);
 			screen_load();
 		}
 		else if (ke.key == '=')
@@ -1202,6 +1203,8 @@ static bool get_player_race()
 	/* Extra info */
 	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
 		"Your 'race' determines various intrinsic factors and bonuses.");
+	if (!birth_intermediate) Term_putstr(QUESTION_COL, QUESTION_ROW + 1, -1, TERM_YELLOW,
+	    "Any greyed-out entries should only be used by advanced players.");
 
 	/* Tabulate races */
 	for (i = 0; i < z_info->g_max; i++)
@@ -1211,7 +1214,7 @@ static bool get_player_race()
 
 		/* Add race to list */
 		races[j++].name = p_name + p_info[i].name;
-		races[j].ghost = ((p_info[i].flags3 & (TR3_RANDOM)) != 0);
+		races[j].ghost = p_info[i].r_idx;
 	}
 
 	/* Get the player race */
@@ -1605,13 +1608,15 @@ static bool get_player_book(void)
 	/* Extra info */
 	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
 		    "Your 'book' determines which spell book you benefit most using.");
+	if (!birth_intermediate) Term_putstr(QUESTION_COL, QUESTION_ROW + 1, -1, TERM_YELLOW,
+	    "Any greyed-out entries should only be used by advanced players.");
 
 	/* Tabulate styles */
 	for (i = 0; i < num; i++)
 	{
 		/* Save the string. Note offset to skip 'of ' */
 		books[i].name = k_name + k_info[book_list[i]].name + 3;
-		books[i].ghost = FALSE;
+		books[i].ghost = k_info[book_list[i]].sval < SV_BOOK_MAX_GOOD;
 	}
 
 	choice = get_player_choice(books, num, BOOK_COL, 80 - BOOK_COL - 1,
@@ -1719,6 +1724,8 @@ static bool get_player_school(void)
 	/* Extra info */
 	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
 		    "Your 'school' determines which spell book you start with.");
+	Term_putstr(QUESTION_COL, QUESTION_ROW + 1, -1, TERM_YELLOW,
+	    "Any greyed-out entries should only be used by advanced players.");
 
 	/* Tabulate styles */
 	for (i = 0; i < num; i++)
