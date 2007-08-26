@@ -1348,7 +1348,7 @@ static void class_aux_hook(birth_menu c_str)
  */
 static bool get_player_class(void)
 {
-	int  i;
+	int  i, k = 0;
 	birth_menu *classes;
 
 	C_MAKE(classes, z_info->c_max, birth_menu);
@@ -1356,14 +1356,14 @@ static bool get_player_class(void)
 	/* Extra info */
 	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
 		"Your 'class' determines various intrinsic abilities and bonuses.");
-	Term_putstr(QUESTION_COL, QUESTION_ROW + 1, -1, TERM_YELLOW,
+	if (!birth_intermediate) Term_putstr(QUESTION_COL, QUESTION_ROW + 1, -1, TERM_YELLOW,
 	    "Any greyed-out entries should only be used by advanced players.");
 
 	/* Tabulate classes */
 	for (i = 0; i < z_info->c_max; i++)
 	{
 		/* Don't ghost classes by default */
-		classes[i].ghost = FALSE;
+		bool ghost = FALSE;
 
 		/* Ghost if not warrior, and two stats are -4 or below, or 1 is -5 or below */
 		if (i)
@@ -1378,7 +1378,7 @@ static bool get_player_class(void)
 
 				if ((value <= -5) || (minus_4 && value <= -4))
 				{
-					classes[i].ghost = TRUE;
+					ghost = TRUE;
 				}
 				else if (value <= -4)
 				{
@@ -1387,11 +1387,17 @@ static bool get_player_class(void)
 			}
 		}
 
+		/* 'Ghosted' entries unavailable for intermediate players */
+		if (birth_intermediate && ghost) continue;
+		
 		/* Save the string */
-		classes[i].name = c_name + c_info[i].name;
+		classes[k++].name = c_name + c_info[i].name;
+		
+		/* Save the ghosting */
+		classes[k].ghost = ghost;
 	}
 
-	p_ptr->pclass = get_player_choice(classes, z_info->c_max, CLASS_COL, CLASS_AUX_COL - CLASS_COL - 1,
+	p_ptr->pclass = get_player_choice(classes, k, CLASS_COL, CLASS_AUX_COL - CLASS_COL - 1,
 				      "classes.txt", class_aux_hook);
 
 	/* No selection? */
