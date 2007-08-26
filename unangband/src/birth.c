@@ -966,22 +966,25 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 		}
 		else if (ke.key == '\xff')
 		{
-			int choice = ke.mousey - TABLE_ROW + top;
+			int row = ke.mousey - TABLE_ROW + top;
 
 			if (ke.mousebutton)
 			{
-				if ((choice >= 0) && (choice < num))
+				if ((row >= 0) && (row < num) && (row < hgt)
+						&& (ke.mousex >= col)
+						&& (ke.mousex < col + strlen(choices[top + row].name)))
 				{
-					cur = choice;
+					cur = row;
 					done = TRUE;
 				}
 			}
-			else
+			else if ((ke.mousex >= col) && (ke.mousex <= col + wid))
 			{
-				if ((choice >= 0) && (choice < num)) cur = choice;
+				if ((row >= 0) && (row < num) && (row < hgt)
+						&& (ke.mousex < col + strlen(choices[top + row].name))) cur = row;
 
 				/* Scroll up */
-				if ((top > 0) && ((cur - top) < 4))
+				if ((top > 0) && ((row - top) < 4))
 				{
 					/* Scroll up */
 					top--;
@@ -991,7 +994,7 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 				}
 
 				/* Scroll down */
-				if ((top + hgt < (num - 1)) && ((top + hgt - cur) < 4))
+				if ((top + hgt < (num - 1)) && ((top + hgt - row) < 4))
 				{
 					/* Scroll down */
 					top++;
