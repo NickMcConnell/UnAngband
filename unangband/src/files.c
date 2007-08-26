@@ -1938,7 +1938,7 @@ static void display_player_xtra_info(void)
 	c_put_str(likert_attr, format("%9s", desc), 17, col+11);
 
 	put_str("Digging", 18, col);
-	desc = likert(xdig, 1, &likert_attr);
+	desc = likert(xdig, 6, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 18, col+11);
 
 	/* Indent output by 1 character, and wrap at column 76 */

@@ -1185,7 +1185,7 @@ static void race_aux_hook(birth_menu r_str)
 	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 7, RACE_AUX2_COL+11);
 
 	put_str("Digging", TABLE_ROW + 8, RACE_AUX2_COL);
-	desc = likert(xdig, 1, &likert_attr);
+	desc = likert(xdig, 6, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 8, RACE_AUX2_COL+11);
 }
 
@@ -2643,7 +2643,7 @@ static bool player_birth_aux_3(void)
 				auto_round++;
 
 				/* Hack -- Prevent overflow */
-				if (auto_round >= 1000000L) break;
+				if (auto_round >= 10000000000000L) break;
 
 				/* Check and count acceptable stats */
 				for (i = 0; i < A_MAX; i++)
@@ -2699,9 +2699,9 @@ static bool player_birth_aux_3(void)
 					/* Make sure they see everything */
 					Term_fresh();
 
-					/* Delay 1/10 second */
+					/* Delay 1/10 second 
 					if (flag) Term_xtra(TERM_XTRA_DELAY, 100);
-
+					*/
 					/* Do not wait for a key */
 					inkey_scan = TRUE;
 
