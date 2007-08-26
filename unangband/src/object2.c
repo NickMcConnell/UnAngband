@@ -6206,7 +6206,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 		/* Non-artifact lites explode with radius 0 */
 		case TV_LITE:
 		{
-			int power;
+			int power = 0;
 			
 			/* The following may all be modifiedy by alchemy */
 			int rad = j_ptr->tval == TV_LITE ? 0 : 1;
@@ -6217,14 +6217,14 @@ bool break_near(object_type *j_ptr, int y, int x)
 			int deg = 0;
 			int dia = 10;
 			
-			/* Hack -- use power 0 for fake potion effects */
-			spell_type *s_ptr = &s_info[power];
-
 			/* Initialise flags (may be modified by alchemy) */
 			flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
 			/* Get item effect */
 			get_spell(&power, "use", j_ptr, FALSE);
+
+			/* Hack -- use power 0 for fake potion effects */
+			spell_type *s_ptr = &s_info[power];
 
 			/* Apply alchemy */
 			if ((p_ptr->pstyle == WS_POTION) && (apply_alchemical_formula(j_ptr, &dam, &rad, &rng, &flg, &num, &deg, &dia))) power = 0;
