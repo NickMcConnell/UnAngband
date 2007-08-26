@@ -818,6 +818,9 @@ void object_aware(object_type *o_ptr)
 
 	u32b f1, f2, f3, f4;
 
+	/* Add a tip if we're not aware */
+	if (!object_aware_p(o_ptr)) queue_tip(format("kind%d.txt", o_ptr->k_idx));
+	
 	/* Get the flags */
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
