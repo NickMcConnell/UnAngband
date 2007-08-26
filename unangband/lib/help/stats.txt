@@ -85,7 +85,7 @@
                encumbered. Agility also increases your overall defence against
                physical attacks and helps greatly with protecting yourself from
                some of the thieves that inhabit the dungeons. Indeed, if 
-               the character has a high enough dexterity, thieves will
+               the character has a high enough agility, thieves will
                never be successful in stealing from the player.
 
           Size
