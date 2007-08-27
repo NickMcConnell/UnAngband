@@ -1,0 +1,7 @@
+=== An Addendum to the Overview of Potions ===
+
+You could also experiment with throwing potions using the throw
+command ('t' or 'v' in the roguelike commands) or by applying
+them to weapons using the apply command ('y' or '^G' in the
+roguelike command set).  These uses of potions are probably best
+reserved for any harmful potions that you may find.

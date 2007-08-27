@@ -74,7 +74,7 @@ X:57:10
 G:h
 L:0:0:411:153:0:0
 S:264:515:265:266:772:773:0:0
-D:Here your adventure begins. Press '<' to travel elsewhere (but beware Farmer Maggot's farm).
+D:Here your adventure begins.
 
 #The following quests are from the hobbit.
 
