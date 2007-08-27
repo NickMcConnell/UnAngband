@@ -10502,10 +10502,8 @@ void generate_cave(void)
 			/* Style tips */
 			queue_tip(format("depth%d-%d.txt", p_ptr->dungeon, i));
 		}
-		
+
+		/* Set new maximum depth */
 		t_info[p_ptr->dungeon].max_depth = p_ptr->depth - min_depth(p_ptr->dungeon);
 	}
-	
-	/* Show a tip */
-	show_tip();
 }

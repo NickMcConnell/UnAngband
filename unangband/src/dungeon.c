@@ -3205,6 +3205,9 @@ static void dungeon(void)
 	/* Reset the object generation level */
 	object_level = p_ptr->depth;
 
+	/* Beginners get a tip */
+	if (birth_beginner) show_tip();
+	
 	/* Main loop */
 	while (TRUE)
 	{

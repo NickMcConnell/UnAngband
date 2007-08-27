@@ -4692,7 +4692,7 @@ bool queue_tip(cptr tip)
 	
 	/* Add the tip, using quarks */
 	tips[tips_end++] = quark_add(tip);
-	
+
 	/* Wrap the queue around if required */
 	if (tips_end >= TIPS_MAX) tips_end = 0;
 	
@@ -4708,14 +4708,7 @@ void show_tip(void)
 	/* Have tips to show */
 	if (tips_start != tips_end)
 	{
-		int tip = tips[tips_start++];
-
-		cptr tip_file;
-		
-		/* Paranoia */
-		if (!tip) return;
-
-		tip_file = quark_str(tip);
+		cptr tip = quark_str(tips[tips_start++]);
 		
 		msg_print("You find a note.");
 		
@@ -4723,7 +4716,7 @@ void show_tip(void)
 		screen_save();
 
 		/* Peruse the main help file */
-		(void)show_file(tip_file, NULL, 0, 0);
+		(void)show_file(tip, NULL, 0, 0);
 
 		/* Load screen */
 		screen_load();

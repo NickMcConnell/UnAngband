@@ -2847,7 +2847,7 @@ static bool player_birth_aux(void)
 	}
 
 	/* Quickstarting */
-	if (birth_beginner || birth_quickstart)
+	if (adult_beginner || adult_quickstart)
 	{
 		/* Already rolled stats */
 	}
@@ -2981,7 +2981,7 @@ void player_birth(void)
 	message_add(" ", MSG_GENERIC);
 
 	/* Initialise birth tips */
-	if (birth_beginner)
+	if (adult_beginner)
 	{
 		n = 1;
 
@@ -2997,7 +2997,7 @@ void player_birth(void)
 	}
 
 	/* Use quickstart as a proxy for played this class/race before */
-	if (!birth_quickstart)
+	if (!adult_quickstart)
 	{
 		/* Race tips */
 		queue_tip(format("race%d.txt", p_ptr->prace));
