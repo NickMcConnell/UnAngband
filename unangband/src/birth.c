@@ -2213,6 +2213,9 @@ static bool player_birth_aux_1(void)
 		}
 	}
 	
+	/* Not quickstarting */
+	birth_quickstart = FALSE;
+	
 	Term_putstr(QUESTION_COL, HEADER_ROW, -1, TERM_L_BLUE,
 		    "Please select your character from the menu below.");
 
@@ -2978,30 +2981,37 @@ void player_birth(void)
 	message_add(" ", MSG_GENERIC);
 
 	/* Initialise birth tips */
-	for (n = 0; n < 99; n++)
+	if (birth_beginner)
 	{
-		/* Birth tips */
-		queue_tip(format("birth%d", n));
-		
-		/* Birth tips */
-		queue_tip(format("race%d-%d", p_ptr->prace, n));
+		n = 1;
 
-		/* Birth tips */
-		queue_tip(format("class%d-%d", p_ptr->pclass, n));
+		/* Queue tips birth1, birth2, etc. */
+		while (queue_tip(format("birth%d.txt", n))) n++;
+	}
+	/* Hack -- insert a blank tip to give newly created character some 'breathing space' */
+	else
+	{
+		tips[tips_end++] = 0;
 		
-		/* Style tips */
-		if (p_ptr->pstyle) queue_tip(format("ws%d-%d-%d",p_ptr->pclass, p_ptr->pstyle, n));
-
-		/* Style tips */
-		if (p_ptr->pschool) queue_tip(format("school%d-%d",p_ptr->pschool, n));
+		if (tips_end >= TIPS_MAX) tips_end = 0;
 	}
 
-	/* Tips */
-	if (style2tval[p_ptr->pstyle])
+	/* Use quickstart as a proxy for played this class/race before */
+	if (!birth_quickstart)
 	{
-		queue_tip(format("tval%d", style2tval[p_ptr->pstyle]));		
-	}
+		/* Race tips */
+		queue_tip(format("race%d.txt", p_ptr->prace));
 
+		/* Class tips */
+		queue_tip(format("class%d.txt", p_ptr->pclass));
+
+		/* Specialists get tval tips */
+		if (style2tval[p_ptr->pstyle])
+		{
+			queue_tip(format("tval%d.txt", style2tval[p_ptr->pstyle]));		
+		}
+	}
+	
 	/* Hack -- assume the new shape */
 	change_shape(p_ptr->prace, p_ptr->lev);
 

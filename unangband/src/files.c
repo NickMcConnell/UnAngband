@@ -4667,7 +4667,7 @@ void do_cmd_help(void)
  * If we call tips frequently, we probably will want to
  * move this check to when we show the tip.
  */
-void queue_tip(cptr tip)
+bool queue_tip(cptr tip)
 {
 	/* Current help file */
 	FILE *fff = NULL;
@@ -4675,27 +4675,28 @@ void queue_tip(cptr tip)
 	/* Path buffer */
 	char path[1024];
 
-	/* Have space for tips */
-	if (tips_end != tips_start - 1)
-	{
-		/* Build the filename */
-		path_build(path, 1024, ANGBAND_DIR_INFO, tip);
+	/* Have no space for tips */
+	if (tips_end == tips_start - 1) return (FALSE);
+	
+	/* Build the filename */
+	path_build(path, 1024, ANGBAND_DIR_INFO, tip);
 
-		/* Open the file */
-		fff = my_fopen(path, "r");
+	/* Open the file */
+	fff = my_fopen(path, "r");
 
-		/* File doesn't exist */
-		if (!fff) return;
+	/* File doesn't exist */
+	if (!fff) return (FALSE);
 
-		/* Close the file */
-		my_fclose(fff);		
-		
-		/* Add the tip, using quarks */
-		tips[tips_end++] = quark_add(tip);
-		
-		/* Wrap the queue around if required */
-		if (tips_end == TIPS_MAX) tips_end = 0;
-	}
+	/* Close the file */
+	my_fclose(fff);		
+	
+	/* Add the tip, using quarks */
+	tips[tips_end++] = quark_add(tip);
+	
+	/* Wrap the queue around if required */
+	if (tips_end >= TIPS_MAX) tips_end = 0;
+	
+	return (TRUE);
 }
 
 
@@ -4707,23 +4708,28 @@ void show_tip(void)
 	/* Have tips to show */
 	if (tips_start != tips_end)
 	{
-		cptr tip = quark_str(tips[tips_start++]);
+		int tip = tips[tips_start++];
 
-		msg_print("You find a note.");
+		cptr tip_file;
 		
-		msg_print("");
+		/* Paranoia */
+		if (!tip) return;
+
+		tip_file = quark_str(tip);
+		
+		msg_print("You find a note.");
 		
 		/* Save screen */
 		screen_save();
 
 		/* Peruse the main help file */
-		(void)show_file(tip, NULL, 0, 0);
+		(void)show_file(tip_file, NULL, 0, 0);
 
 		/* Load screen */
 		screen_load();
 		
 		/* Wrap the queue around if required */
-		if (tips_start == TIPS_MAX) tips_start = 0;
+		if (tips_start >= TIPS_MAX) tips_start = 0;
 	}
 }
 

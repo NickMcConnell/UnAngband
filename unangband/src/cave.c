@@ -1952,11 +1952,11 @@ void note_spot(int y, int x)
 			if (!auto_pickup_ignore(o_ptr)) o_ptr->ident |= (IDENT_MARKED);
 
 			/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
-			if ((!k_info[o_ptr->k_idx].flavor) && !(k_info[o_ptr->k_idx].aware))
+			if ((!k_ptr->flavor) && !(k_ptr->aware))
 			{
 				object_aware_tips(o_ptr);
 
-				k_info[o_ptr->k_idx].aware = TRUE;
+				k_ptr->aware = TRUE;
 			}
 
 			/* XXX XXX - Mark monster objects as "seen" */

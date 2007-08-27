@@ -557,7 +557,7 @@ extern void display_player_stat_info(int row, int col, int min, int max, int att
 extern void display_player(int mode);
 extern errr file_character(cptr name, bool full);
 extern bool show_file(cptr name, cptr what, int line, int mode);
-extern void queue_tip(cptr tip);
+extern bool queue_tip(cptr tip);
 extern void show_tip(void);
 extern void do_cmd_help(void);
 extern void process_player_name(bool sf);

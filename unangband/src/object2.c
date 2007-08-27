@@ -970,7 +970,7 @@ void object_aware(object_type *o_ptr)
 		/* Show tips if required */
 		if (!e_info[o_ptr->name2].aware)
 		{
-			queue_tip(format("ego%d", o_ptr->name2));
+			queue_tip(format("ego%d.txt", o_ptr->name2));
 		}
 		
 		e_info[o_ptr->name2].aware = TRUE;

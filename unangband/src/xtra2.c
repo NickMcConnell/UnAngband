@@ -2718,6 +2718,18 @@ void check_experience(void)
 		/* Message */
 		message_format(MSG_LEVEL, p_ptr->lev, "Welcome to level %d.", p_ptr->lev);
 
+		/* Level tips */
+		queue_tip(format("level%d.txt", p_ptr->prace, p_ptr->lev));
+
+		/* Race tips */
+		queue_tip(format("race%d-%d.txt", p_ptr->prace, p_ptr->lev));
+
+		/* Class tips */
+		queue_tip(format("class%d-%d.txt", p_ptr->pclass, p_ptr->lev));
+
+		/* Style tips */
+		queue_tip(format("ws%d-%d-%d.txt", p_ptr->pclass, p_ptr->pstyle, p_ptr->lev));
+
 		/* Update some stuff */
 		p_ptr->update |= (PU_BONUS | PU_HP | PU_MANA | PU_SPELLS);
 
@@ -3760,6 +3772,9 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 			/* Count kills this life */
 			if (l_ptr->pkills < MAX_SHORT) l_ptr->pkills++;
 
+			/* Show killer tips */
+			if (!l_ptr->tkills) queue_tip(format("kill%d.txt", m_ptr->r_idx));
+			
 			/* Count kills in all lives */
 			if (l_ptr->tkills < MAX_SHORT) l_ptr->tkills++;
 
