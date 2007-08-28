@@ -6271,7 +6271,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 			if ((p_ptr->pstyle == WS_POTION) && (j_ptr->tval == TV_POTION) && !(apply_alchemical_formula(j_ptr, &dam, &rad, &rng, &flg, &num, &deg, &dia))) power = 0;
 
 			/* Allow power to be 0 if required -- this is used for fake potion effects */
-			s_ptr = &s_info[power];
+			s_ptr = &s_info[power > 0 ? power : 0];
 			
 			/* Applly num times */
 			for (j = 0; j < num; j++)

@@ -2571,10 +2571,10 @@ static void store_purchase(int store_index)
 				say_comment_1();
 
 				/* Get service effect */
-				get_spell(&power, "use", o_ptr, FALSE);
+				get_spell(&power, "use", o_ptr, TRUE);
 
 				/* Paranoia */
-				if (power < 0) return;
+				if (power <= 0) return;
 
 				/* Apply service effect */
 				(void)process_spell(SOURCE_PLAYER_SERVICE, o_ptr->k_idx, power, 0, &cancel, &known);
