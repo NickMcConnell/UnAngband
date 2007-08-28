@@ -819,7 +819,7 @@ void object_aware_tips(object_type *o_ptr)
 		if (k_info[i].tval != o_ptr->tval) continue;
 		
 		/* Count number of objects aware */
-		if (object_aware_p(o_ptr)) count++;
+		if (k_info[i].aware) count++;
 	}
 
 	/* Show tval tips if no objects of this type known */
