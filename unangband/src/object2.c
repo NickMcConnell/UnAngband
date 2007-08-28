@@ -5999,8 +5999,8 @@ void race_near(int r_idx, int y1, int x1)
  * u switch PROJECT_AREA flag on (if 1) or off (if 0).
  * w change to 8-way blast if number is 8
  * 
- * Return FALSE if formula not applied, or if applied successfully.
- * Return TRUE if formula fails. We set power = 0 in calling routine to create a 'dud' effect.
+ * Return FALSE if formula fails. We set power = 0 in calling routine to create a 'dud' effect.
+ * Return TRUE if formula not applied, or applied successfully.
  */
 bool apply_alchemical_formula(object_type *o_ptr, int *dam, int *rad, int *rng, u32b *flg, int *num, int *deg, int *dia)
 {
@@ -6008,7 +6008,7 @@ bool apply_alchemical_formula(object_type *o_ptr, int *dam, int *rad, int *rng, 
 	int pow = 1;
 
 	/* No inscription */
-	if (!o_ptr->note) return (FALSE);
+	if (!o_ptr->note) return (TRUE);
 
 	/* Find a '=' */
 	s = strchr(quark_str(o_ptr->note), '=');
@@ -6134,10 +6134,10 @@ bool apply_alchemical_formula(object_type *o_ptr, int *dam, int *rad, int *rng, 
 	if (*flg & (PROJECT_AREA)) pow *= (*rng + 1);
 	
 	/* Test against player level. 'Dud' potion if this is true. */
-	if ((pow) && (rand_int(pow) > 5 + (p_ptr->lev / 5))) return (TRUE);
+	if ((pow) && (rand_int(pow) > 5 + (p_ptr->lev / 5))) return (FALSE);
 
 	/* Don't auto pickup */
-	return (FALSE);
+	return (TRUE);
 }
 
 
@@ -6258,18 +6258,21 @@ bool break_near(object_type *j_ptr, int y, int x)
 			int deg = 0;
 			int dia = 10;
 			
+			/* Hack -- use power 0 for fake potion effects */
+			spell_type *s_ptr;
+			
 			/* Initialise flags (may be modified by alchemy) */
 			flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
 			/* Get item effect */
 			get_spell(&power, "use", j_ptr, FALSE);
 
-			/* Hack -- use power 0 for fake potion effects */
-			spell_type *s_ptr = &s_info[power];
+			/* Apply alchemy - if failed, use 'nothing' power */
+			if ((p_ptr->pstyle == WS_POTION) && (j_ptr->tval == TV_POTION) && !(apply_alchemical_formula(j_ptr, &dam, &rad, &rng, &flg, &num, &deg, &dia))) power = 0;
 
-			/* Apply alchemy */
-			if ((p_ptr->pstyle == WS_POTION) && (apply_alchemical_formula(j_ptr, &dam, &rad, &rng, &flg, &num, &deg, &dia))) power = 0;
-
+			/* Allow power to be 0 if required -- this is used for fake potion effects */
+			s_ptr = &s_info[power];
+			
 			/* Applly num times */
 			for (j = 0; j < num; j++)
 			{
