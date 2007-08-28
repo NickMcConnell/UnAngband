@@ -59,7 +59,7 @@ M:C:12
 M:W:160
 
 # Maximum number of spells
-M:S:589
+M:S:587
 
 # Maximum number of runes
 M:Y:30
