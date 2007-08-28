@@ -52,7 +52,7 @@
 ***** <Sorcery>
         Sorcery
                The school of Sorcery is both deceptively weak and strong.  A 
-               sorverer lacks the immediate damage dealing capacity of the Wizard
+               Sorcerer lacks the immediate damage dealing capacity of the Wizard
                and the long term damage capability of the Druid, and does not have
                the same range of minions as the Master.  The Sorcerer's spells and
                minions are useful in preparing the ground like the Druid, in
