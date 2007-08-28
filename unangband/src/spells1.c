@@ -11098,7 +11098,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		/* Heal the player a percentage of hitpoints */
 		case GF_HEAL_PERC:
 		{
-			dam = p_ptr->mhp * dam / 100;
+			if (p_ptr->mhp > 100) dam = p_ptr->mhp * dam / 100;
 		}
 		
 		/* Heal the player, except if undead */
@@ -11261,7 +11261,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		/* Gain a percentage of total mana */
 		case GF_GAIN_MANA_PERC:
 		{
-			dam = p_ptr->mhp * dam / 100;
+			if (p_ptr->msp > 100) dam = p_ptr->msp * dam / 100;
 		}
 
 		/* Melee attack - gain mana */
