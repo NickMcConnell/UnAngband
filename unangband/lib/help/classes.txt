@@ -35,7 +35,7 @@
                casting their intricate spells, they will be penalised for
                wearing gloves or impeding themeselves with too heavy armour.
  
- ***** <Priest>
+***** <Priest>
          Priest
                A Priest is a character of holy devotion.  They explore  the
                dungeon  only  to destroy the evil that lurks within, and if
@@ -59,7 +59,7 @@
                exemption for weapons that do not have edges to let blood. 
                
  
- ***** <Artisan>
+***** <Artisan>
          Artisan
                An Artisan is a character that prefers to live by his
                cunning, but  is capable of fighting his way out of a tight
@@ -78,7 +78,7 @@
                for wearing gloves or impeding themeselves with too heavy
                armour.
  
- ***** <Ranger>
+***** <Ranger>
          Ranger
                A Ranger is an archer/mage.  He is a good fighter,  and  the
                best  of  the  classes aside from an archer with a missile

@@ -107,14 +107,14 @@
                 levels.
                 The rate of progress of these abilities varies with each class.
 
-***** <Slay orcs>
-***** <Slay giants>
-***** <Slay trolls>
-***** <Slay dragons>
-***** <Slay animals>
-***** <Slay undead>
-***** <Slay demon>
-***** <Slay evil>
+***** <Slay Orcs>
+***** <Slay Giants>
+***** <Slay Trolls>
+***** <Slay Dragons>
+***** <Slay Animals>
+***** <Slay Undead>
+***** <Slay Demon>
+***** <Slay Evil>
         Slay Orcs/Giants/Trolls/Dragons/Animals/Undead/Demon/Evil
 
                 These specialists have devoted a life long training regime to
