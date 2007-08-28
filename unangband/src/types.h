@@ -1545,7 +1545,8 @@ struct player_type
 	bool heavy_wield;       /* Heavy weapon */
 	bool heavy_shoot;       /* Heavy shooter */
 	bool icky_wield;/* Icky weapon */
-
+	bool uncontrolled;		/* Uncontrolled activation */
+	
 	s16b cur_lite;  /* Radius of lite (if any) */
 
 	u32b notice;    /* Special Updates (bit flags) */

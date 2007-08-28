@@ -1161,7 +1161,7 @@ static cptr k_info_flags3[] =
 	"DRAIN_MANA",
 	"DRAIN_EXP",
 	"AGGRAVATE",
-	"TELEPORT",
+	"UNCONTROLLED",
 	"RANDOM",
 	"ACTIVATE",
 	"BLESSED",

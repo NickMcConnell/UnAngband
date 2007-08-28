@@ -1121,9 +1121,9 @@ Y:12:1
 N:138:Teleportation
 G:=:w
 I:45:4:0
-W:5:0:2:0
+W:5:20:2:0
 A:5/1
-F:LIGHT_CURSE | TELEPORT
+F:LIGHT_CURSE | UNCONTROLLED
 
 N:139:Sustaining
 G:=:w
@@ -1210,9 +1210,9 @@ Y:14:3
 N:149:Woe
 G:=:w
 I:45:0:-5
-W:50:0:2:0
+W:50:20:2:0
 A:50/1
-F:LIGHT_CURSE | TELEPORT | WIS | CHR
+F:LIGHT_CURSE | UNCONTROLLED | WIS | CHR
 
 N:150:Stupidity
 G:=:w
@@ -1349,9 +1349,9 @@ Y:12:1
 N:166:Teleportation
 G:":w
 I:40:1:0
-W:15:0:3:0
+W:15:20:3:0
 A:15/1
-F:LIGHT_CURSE | TELEPORT
+F:LIGHT_CURSE | UNCONTROLLED
 Y:7:1
 
 N:167:Slow Digestion
@@ -2157,24 +2157,24 @@ Y:21:2
 N:270:Lightning Bolts
 G:-:w
 I:65:17:0
-W:15:0:10:600
-A:15/1
+W:9:0:10:300
+A:9/1
 P:0:1d1:0:0:0
 Y:22:2
 
 N:271:Frost Bolts
 G:-:w
 I:65:19:0
-W:20:0:10:800
-A:20/1
+W:15:0:10:800
+A:15/1
 P:0:1d1:0:0:0
 Y:14:2
 
 N:272:Fire Bolts
 G:-:w
 I:65:18:0
-W:30:0:10:1000
-A:30/1
+W:20:0:10:1000
+A:20/1
 P:0:1d1:0:0:0
 Y:13:2
 
@@ -2437,7 +2437,6 @@ W:20:0:50:2000
 A:20/1
 P:0:1d6:0:0:0
 Y:7:3
-F:TELEPORT
 
 N:304:Earthquakes
 G:_:w
@@ -6211,7 +6210,7 @@ A:85/3
 P:0:1d1:0:0:0
 F:IGNORE_ELEC
 
-N:951:Spark
+N:855:Spark
 G:-:w
 I:65:67:28
 W:0:0:10:25

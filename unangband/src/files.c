@@ -2298,6 +2298,13 @@ static void put_flag_char(u32b f[4], int set, u32b flag, int y, int x, int row, 
 
 		/* MegaHack -- Check activation */
 		else if ((y == 8) &&
+			(f[3] & (TR3_UNCONTROLLED)))
+		{
+			c_put_str(TERM_RED, "x", row, col);
+		}
+
+		/* MegaHack -- Check activation */
+		else if ((y == 8) &&
 			(f[3] & (TR3_ACTIVATE)))
 		{
 			c_put_str(TERM_WHITE, "+", row, col);
@@ -2530,7 +2537,6 @@ static void put_flag_char(u32b f[4], int set, u32b flag, int y, int x, int row, 
 		if (y == 4)
 		{
 			if (f[4] & (TR4_ANCHOR)) c_put_str(TERM_RED, "x", row, col);
-			else if (f[3] & (TR3_TELEPORT)) c_put_str(TERM_WHITE, "+", row, col);
 			else c_put_str(TERM_SLATE, ".", row, col);
 		}
 

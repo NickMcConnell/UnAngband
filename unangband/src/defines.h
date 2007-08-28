@@ -2640,7 +2640,7 @@
 #define SOURCE_MONSTER_START	0 /*Greater than 0 monster is the source*/
 
 #define SOURCE_SELF				0	/* Monster comitting suicide */
-#define SOURCE_OBJECT			-1	/* Source is an object */
+#define SOURCE_OBJECT			-1	/* Source is an object on floor/monster inventory */
 #define SOURCE_FEATURE			-2	/* Source is a feature */
 #define SOURCE_SPELL			-3	/* Source is a spell */
 #define SOURCE_DISEASE			-4	/* Source is a disease */
@@ -3269,7 +3269,7 @@
 #define TR3_DRAIN_MANA   0x00020000L     /* Mana drain */
 #define TR3_DRAIN_EXP    0x00040000L     /* Experience drain */
 #define TR3_AGGRAVATE    0x00080000L     /* Aggravate monsters */
-#define TR3_TELEPORT     0x00100000L     /* Item activates spontaneously */
+#define TR3_UNCONTROLLED 0x00100000L     /* Item activates spontaneously if cursed */
 #define TR3_RANDOM       0x00200000L 	/* Item has random activation */
 #define TR3_ACTIVATE     0x00400000L     /* Item can be activated */
 #define TR3_BLESSED      0x00800000L     /* Item has been blessed */

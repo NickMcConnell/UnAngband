@@ -1637,26 +1637,52 @@ static void process_world(void)
 	}
 
 
-	/*** Involuntary Movement ***/
+	/*** Involuntary Movement/Activations ***/
 
-	/* Mega-Hack -- Ignore if anchored */
-	if ((p_ptr->cur_flags4 & (TR4_ANCHOR)) != 0)
+	/* Uncontrolled items */
+	if ((p_ptr->uncontrolled) && (rand_int(100) < 1))
 	{
-		/* No involuntary teleportation */
-	}
+		int j = 0, k = 0;
+		
+		/* Scan inventory and pick uncontrolled item */
+		for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
+		{
+			u32b f1, f2, f3, f4;
 
-	/* Mega-Hack -- Random teleportation XXX XXX XXX */
-	else if (((p_ptr->cur_flags3 & (TR3_TELEPORT)) != 0) && (rand_int(100) < 1))
-	{
-		/* Teleport player */
-		teleport_player(40);
+			o_ptr = &inventory[i];
+			
+			/* Skip non-objects */
+			if (!o_ptr->k_idx) continue;
+			
+			object_flags(o_ptr, &f1, &f2, &f3, &f4);
+			
+			/* Pick item */
+			if (((f3 & (TR3_UNCONTROLLED)) == 0) && (cursed_p(o_ptr)) && !(rand_int(k++)))
+			{
+				j = i;
+			}
+		}
+		
+		/* Apply uncontrolled power */
+		if (j)
+		{
+			bool dummy = FALSE;
+			
+			/* Get power */
+			get_spell(&k, "", &inventory[j], FALSE);
+			
+			/* Process spell - involuntary effects */
+			process_spell_eaten(SOURCE_OBJECT, inventory[j].k_idx, k, 25, &dummy);
+		}
 
 		/* Always notice */
-		equip_can_flags(0x0L,0x0L,TR3_TELEPORT,0x0L);
-
+		equip_can_flags(0x0L,0x0L,TR3_UNCONTROLLED,0x0L);
 	}
+	
+	
 	/* Mega-Hack -- Portal room */
-	else if ((room_has_flag(p_ptr->py, p_ptr->px, ROOM_PORTAL)) && (rand_int(100)<1))
+	if ((room_has_flag(p_ptr->py, p_ptr->px, ROOM_PORTAL))
+			&& ((p_ptr->cur_flags4 & (TR4_ANCHOR)) == 0) && (rand_int(100)<1))
 	{
 		/* Warn the player */
 		msg_print("There is a brilliant flash of light.");

@@ -297,7 +297,7 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 					(*f3) |= TR3_HEAVY_CURSE;
 					/* Fall through */
 				case TR3_HUNGER:
-				case TR3_TELEPORT:
+				case TR3_UNCONTROLLED:
 				case TR3_DRAIN_MANA:
 				case TR3_DRAIN_HP:
 				case TR3_DRAIN_EXP:
@@ -2217,7 +2217,7 @@ static const o_flag_desc ignore_flags2_desc[] =
 static const o_flag_desc bad_flags3_desc[] =
 {
 	{ TR3_HUNGER,		"hunger" },
-	{ TR3_TELEPORT,		"random teleportation" },
+	{ TR3_UNCONTROLLED,		"random and uncontrolled activation" },
 	{ TR3_AGGRAVATE,	"aggravation" },
 	{ TR3_DRAIN_HP,		"health drain" },
 	{ TR3_DRAIN_MANA,       "mana drain" },
@@ -6414,7 +6414,7 @@ s32b object_power(const object_type *o_ptr)
 	/* Add bonus for sustains getting 'high_resists-lock' */
 	if (high_resists > 1) p += high_resists * high_resists / 2;
 
-	ADD_POWER("teleportation",	 -40, TR3_TELEPORT, 3,);
+	ADD_POWER("random and uncontrolled activation",	 -40, TR3_UNCONTROLLED, 3,);
 	ADD_POWER("drain experience",	 -20, TR3_DRAIN_EXP, 3,);
 
 	ADD_POWER("drain health",	 -20, TR3_DRAIN_HP, 3,);

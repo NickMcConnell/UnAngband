@@ -7452,6 +7452,54 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 }
 
 /*
+ * We check the spell to see if we have to set a return point
+ * 
+ * XXX We have to set return points before processing spell blows.
+ */
+void process_spell_return(int spell)
+{
+	if ((s_info[spell].type == SPELL_SET_RETURN) ||
+			(s_info[spell].type == SPELL_SET_OR_MAKE_RETURN))
+	{
+		spell_type *s_ptr = &s_info[spell];
+		
+		bool return_time = FALSE;
+		
+		/* Set the return location if required */
+		if (!(p_ptr->return_y) && !(p_ptr->return_x))
+		{
+			/* Set return point */
+			p_ptr->return_y = p_ptr->py;
+			p_ptr->return_x = p_ptr->px;
+			
+			/* Set the return time */
+			if (s_ptr->type == SPELL_SET_RETURN) return_time = TRUE;
+		}
+		/* Set the return time */
+		else if (s_ptr->type == SPELL_SET_OR_MAKE_RETURN)
+		{
+			/* Set the return time */
+			return_time = TRUE;
+		}
+		
+		/* Set return time */
+		if (return_time)
+		{
+			/* Roll out the duration */
+			if ((s_ptr->l_dice) && (s_ptr->l_side))
+			{
+				p_ptr->word_return = damroll(s_ptr->l_dice, s_ptr->l_side) + s_ptr->l_plus;
+			}
+			else
+			{
+				p_ptr->word_return = s_ptr->l_plus;
+			}
+		}
+	}
+}
+
+
+/*
  * Hack -- we process swallowed objects a little differently.
  */
 bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel)
@@ -7470,9 +7518,9 @@ bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel)
 		obvious = TRUE;
 	}
 
-	/* Apply flags */
-	if (process_spell_flags(spell, level, cancel, &known)) obvious = TRUE;
-
+	/* Check for return flags */
+	process_spell_return(spell);
+	
 	/* Scan through all four blows */
 	for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
 	{
@@ -7540,6 +7588,9 @@ bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel)
 	}
 
 	/* Apply flags */
+	if (process_spell_flags(spell, level, cancel, &known)) obvious = TRUE;
+
+	/* Apply flags */
 	if (process_spell_types(who, spell, level, cancel)) obvious = TRUE;
 
 	return (obvious);
@@ -7573,45 +7624,8 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 		obvious = TRUE;
 	}
 
-	/* XXX We have to set return points before processing spell blows */
-	if ((s_info[spell].type == SPELL_SET_RETURN) ||
-			(s_info[spell].type == SPELL_SET_OR_MAKE_RETURN))
-	{
-		spell_type *s_ptr = &s_info[spell];
-		
-		bool return_time = FALSE;
-		
-		/* Set the return location if required */
-		if (!(p_ptr->return_y) && !(p_ptr->return_x))
-		{
-			/* Set return point */
-			p_ptr->return_y = p_ptr->py;
-			p_ptr->return_x = p_ptr->px;
-			
-			/* Set the return time */
-			if (s_ptr->type == SPELL_SET_RETURN) return_time = TRUE;
-		}
-		/* Set the return time */
-		else if (s_ptr->type == SPELL_SET_OR_MAKE_RETURN)
-		{
-			/* Set the return time */
-			return_time = TRUE;
-		}
-		
-		/* Set return time */
-		if (return_time)
-		{
-			/* Roll out the duration */
-			if ((s_ptr->l_dice) && (s_ptr->l_side))
-			{
-				p_ptr->word_return = damroll(s_ptr->l_dice, s_ptr->l_side) + s_ptr->l_plus;
-			}
-			else
-			{
-				p_ptr->word_return = s_ptr->l_plus;
-			}
-		}
-	}
+	/* Check for return flags */
+	process_spell_return(spell);	
 	
 	/* Note the order is important -- because of the impact of blinding a character on their subsequent
 		ability to see spell blows that affect themselves */
@@ -7646,6 +7660,9 @@ bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x)
 		get_spell(&power, "use", o_ptr, FALSE);
 	}
 
+	/* Check for return if player */
+	if (cave_m_idx[y][x] < 0) process_spell_return(power);
+	
 	/* Has a power */
 	if (power > 0)
 	{
