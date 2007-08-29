@@ -58,5 +58,8 @@ classnn.txt    The player has just been born as class nn. See p_class.txt for wh
 			   
 classaa-bb.txt The player has reached level bb as class aa for the first time this game.
 
+stylenn.txt    The player has just been born as style nn.  See defines.h for which nn
+               corresponds to which style.
+
 wsaa-bb-cc.txt The player has reached level cc as class aa, style bb for the first
                time this game.
