@@ -1213,8 +1213,8 @@ static bool get_player_race()
 		if ((birth_intermediate) && (p_info[i].r_idx) && !(l_list[p_info[i].r_idx].tkills)) continue;
 
 		/* Add race to list */
-		races[j++].name = p_name + p_info[i].name;
-		races[j].ghost = p_info[i].r_idx;
+		races[j].name = p_name + p_info[i].name;
+		races[j++].ghost = (p_info[i].r_idx != 0);
 	}
 
 	/* Get the player race */
@@ -1397,10 +1397,10 @@ static bool get_player_class(void)
 		if (birth_intermediate && ghost) continue;
 		
 		/* Save the string */
-		classes[k++].name = c_name + c_info[i].name;
+		classes[k].name = c_name + c_info[i].name;
 		
 		/* Save the ghosting */
-		classes[k].ghost = ghost;
+		classes[k++].ghost = ghost;
 	}
 
 	p_ptr->pclass = get_player_choice(classes, k, CLASS_COL, CLASS_AUX_COL - CLASS_COL - 1,
@@ -2998,6 +2998,9 @@ void player_birth(void)
 		/* Class tips */
 		queue_tip(format("class%d.txt", p_ptr->pclass));
 
+		/* Style tips */
+		queue_tip(format("style%d.txt", p_ptr->pstyle));
+		
 		/* Specialists get tval tips */
 		if (style2tval[p_ptr->pstyle])
 		{

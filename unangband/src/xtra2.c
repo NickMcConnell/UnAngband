@@ -2697,12 +2697,13 @@ void check_experience(void)
 		handle_stuff();
 	}
 
-
 	/* Gain levels while possible */
 	while ((p_ptr->lev < PY_MAX_LEVEL) &&
 	       (p_ptr->exp >= (player_exp[p_ptr->lev-1] *
 			       p_ptr->expfact / 100L)))
 	{
+		int i;
+
 		/* Gain a level */
 		p_ptr->lev++;
 
@@ -2712,23 +2713,27 @@ void check_experience(void)
 		/* Improve awareness */
 		if (p_ptr->lev > p_ptr->max_lev) improve_aware();
 
-		/* Save the highest level */
-		if (p_ptr->lev > p_ptr->max_lev) p_ptr->max_lev = p_ptr->lev;
-
 		/* Message */
 		message_format(MSG_LEVEL, p_ptr->lev, "Welcome to level %d.", p_ptr->lev);
 
-		/* Level tips */
-		queue_tip(format("level%d.txt", p_ptr->prace, p_ptr->lev));
+		/* Show all tips for intermediate levels */
+		for (i = p_ptr->max_lev; i <= p_ptr->lev; i++)
+		{
+			/* Level tips */
+			queue_tip(format("level%d.txt", p_ptr->prace, i));
 
-		/* Race tips */
-		queue_tip(format("race%d-%d.txt", p_ptr->prace, p_ptr->lev));
+			/* Race tips */
+			queue_tip(format("race%d-%d.txt", p_ptr->prace, i));
 
-		/* Class tips */
-		queue_tip(format("class%d-%d.txt", p_ptr->pclass, p_ptr->lev));
+			/* Class tips */
+			queue_tip(format("class%d-%d.txt", p_ptr->pclass, i));
 
-		/* Style tips */
-		queue_tip(format("ws%d-%d-%d.txt", p_ptr->pclass, p_ptr->pstyle, p_ptr->lev));
+			/* Style tips */
+			queue_tip(format("ws%d-%d-%d.txt", p_ptr->pclass, p_ptr->pstyle, i));
+		}
+
+		/* Save the highest level */
+		if (p_ptr->lev > p_ptr->max_lev) p_ptr->max_lev = p_ptr->lev;
 
 		/* Update some stuff */
 		p_ptr->update |= (PU_BONUS | PU_HP | PU_MANA | PU_SPELLS);
