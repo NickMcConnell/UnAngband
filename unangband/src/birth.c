@@ -2988,13 +2988,6 @@ void player_birth(void)
 		/* Queue tips birth1, birth2, etc. */
 		while (queue_tip(format("birth%d.txt", n))) n++;
 	}
-	/* Hack -- insert a blank tip to give newly created character some 'breathing space' */
-	else
-	{
-		tips[tips_end++] = 0;
-		
-		if (tips_end >= TIPS_MAX) tips_end = 0;
-	}
 
 	/* Use quickstart as a proxy for played this class/race before */
 	if (!adult_quickstart)
