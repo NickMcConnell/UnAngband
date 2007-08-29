@@ -1478,9 +1478,12 @@ static void display_player_xtra_info(void)
 	Term_putstr(col, row, -1, TERM_WHITE, "Age");
 	Term_putstr(col+7, row, -1, TERM_L_BLUE, format("%5d", (int)p_ptr->age + p_ptr->max_lev / 10));
 
+	/* Pre-calculate height */
+	i = (int)p_ptr->ht + p_ptr->stat_use[A_SIZ]/20;
+	
 	/* Height */
 	Term_putstr(col, row + 1, -1, TERM_WHITE, "Height");
-	Term_putstr(col+8, row + 1, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->ht + p_ptr->stat_use[A_SIZ]/20));
+	Term_putstr(col+7, row + 1, -1, TERM_L_BLUE, format("%2d'%2d", i / 12, i % 12));
 
 	/* Status */
 	Term_putstr(col, row + 2, -1, TERM_WHITE, "Status");
