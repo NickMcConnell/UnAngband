@@ -376,6 +376,8 @@ void object_obvious_flags(object_type *o_ptr)
                 object_can_flags(o_ptr, f1, f2, f3, f4);
 
                 object_not_flags(o_ptr, ~(f1), ~(f2), ~(f3), ~(f4));
+
+		return;
         }
 
 	/* Abilities of base item are always known if aware */
@@ -458,7 +460,6 @@ void object_obvious_flags(object_type *o_ptr)
 		}
 	}
 
-	/* Hack: if it stays that way, please remove the code from do_cmd_wield */
 	/* Throwing is always obvious */
 	if (f3 & TR3_THROWING)
 	{
@@ -5066,7 +5067,6 @@ void drop_all_flags(object_type *o_ptr)
 	o_ptr->not_flags4 = 0L;
 
 	return;	
-
 }
 
 /*

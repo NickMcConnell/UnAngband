@@ -9726,10 +9726,6 @@ bool is_known_throwing_item(const object_type *o_ptr)
 
   object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
 
-  /* a hack until spores are auto-identified */
-  if (o_ptr->tval == TV_EGG && o_ptr->sval == SV_EGG_SPORE)
-    return TRUE;
-
   return (f3 & TR3_THROWING ? TRUE : FALSE);
 }
 

@@ -2282,7 +2282,7 @@ void do_cmd_apply_rune_or_coating(void)
 
 	/* Hack -- split stack only if required. This is dangerous otherwise as we may
 	   be calling from a routine where we delete items later. XXX XXX */
-	/* Mega-hack -- we allow 20 arrows/bolts to be coated per application */
+	/* Mega-hack -- we allow 5 arrows/bolts to be coated per application */
 	if ((j_ptr->number > 1) && ((!brand_ammo) || (j_ptr->number > 5)))
 	{
 		int qty = (brand_ammo) ? 5 : 1;
@@ -2502,6 +2502,9 @@ void do_cmd_apply_rune_or_coating(void)
 
 		if (j_ptr->stackc) j_ptr->charges++;
 	}
+
+	/* Notice obvious flags again */
+	object_obvious_flags(j_ptr);
 
 	/* Need to carry the new object? */
 	if (split)
