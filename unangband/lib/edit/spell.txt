@@ -211,7 +211,7 @@ C:8:7:6:40:2
 C:9:7:6:40:2
 B:AIM:CONFUSE_WEAK:1d0+0
 
-N:11:Lightning Bolt
+N:11:Lightning Beam
 A:65:17:1
 A:65:24:17
 A:66:31:1
@@ -2023,7 +2023,7 @@ A:93:22:16
 C:1:1:2:26:4
 C:10:5:3:35:1
 C:8:2:2:26:4
-B:HANDS:ELEC:3d8
+B:HANDS:ELEC:3d5
 
 N:163:Resist Electricity
 A:75:64:1
@@ -2064,7 +2064,7 @@ C:9:25:25:80:12
 S:INVEN_HEAD:573
 L:1d48+48
 
-N:166:Lightning Bolt II
+N:166:Lightning Beam II
 A:65:39:1
 A:65:60:14
 A:90:12:6
@@ -2095,7 +2095,7 @@ C:10:31:23:75:4
 C:8:24:15:60:10
 B:8WAY:ELEC:1d0+45
 
-N:169:Lightning Bolt III
+N:169:Lightning Beam III
 A:65:40:1
 A:65:60:15
 A:90:12:11

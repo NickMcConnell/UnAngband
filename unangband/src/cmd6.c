@@ -640,7 +640,8 @@ void do_cmd_use_staff(void)
 	}
 
 	/* Roll for usage */
-	if ((chance < USE_DEVICE) || (randint(chance) < USE_DEVICE))
+	if (chance < USE_DEVICE
+	    || randint(chance) + chance/USE_DEVICE < USE_DEVICE)
 	{
 		if (flush_failure) flush();
 		msg_print("You failed to use the staff properly.");
@@ -918,7 +919,8 @@ void do_cmd_aim_wand(void)
 	}
 
 	/* Roll for usage */
-	if ((chance < USE_DEVICE) || (randint(chance) < USE_DEVICE))
+	if (chance < USE_DEVICE
+	    || randint(chance) + chance/USE_DEVICE < USE_DEVICE)
 	{
 		if (flush_failure) flush();
 		msg_print("You failed to use the wand properly.");
@@ -1184,7 +1186,8 @@ void do_cmd_zap_rod(void)
 	}
 
 	/* Roll for usage */
-	if ((chance < USE_DEVICE) || (randint(chance) < USE_DEVICE))
+	if (chance < USE_DEVICE
+	    || randint(chance) + chance/USE_DEVICE < USE_DEVICE)
 	{
 		if (flush_failure) flush();
 		msg_print("You failed to use the rod properly.");
@@ -1510,7 +1513,8 @@ void do_cmd_assemble(void)
 	}
 
 	/* Roll for usage */
-	if ((chance < USE_DEVICE) || (randint(chance) < USE_DEVICE))
+	if (chance < USE_DEVICE
+	    || randint(chance) + chance/USE_DEVICE < USE_DEVICE)
 	{
 		if (flush_failure) flush();
 		msg_print("You failed to understand it properly.");
@@ -1845,7 +1849,8 @@ void do_cmd_activate(void)
 	}
 
 	/* Roll for usage */
-	if ((chance < USE_DEVICE) || (randint(chance) < USE_DEVICE))
+	if (chance < USE_DEVICE
+	    || randint(chance) + chance/USE_DEVICE < USE_DEVICE)
 	{
 		if (flush_failure) flush();
 		msg_print("You failed to activate it properly.");
