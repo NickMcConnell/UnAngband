@@ -3430,7 +3430,8 @@ static int get_tag(int *cp, char tag)
 				default:	group = QUIVER_GROUP_SHOTS;	break;
 			}
 		}
-		/* Hack - Everything else is a throwing weapon, even a spore */
+		/* Hack - shots are not a throwing weapon here */
+		else
 		{
 		 	group = QUIVER_GROUP_THROWING_WEAPONS;
 		}
@@ -3443,10 +3444,8 @@ static int get_tag(int *cp, char tag)
 			/* (Paranoia) Ignore empty slots */
 			if (!o_ptr->k_idx) continue;
 
-			/* Groups must be equal, or hack */
-			if (group != QUIVER_GROUP_THROWING_WEAPONS
-			    && quiver_get_group(o_ptr) != group) 
-			  continue;
+			 /* Groups must be equal */
+			if (quiver_get_group(o_ptr) != group) continue;
 
 			/* Allow pseudo-tag override */
 			(void)get_tag_num(i, quiver_group[group].cmd, &tag_num);

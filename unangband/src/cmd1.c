@@ -763,8 +763,7 @@ bool quiver_carry(object_type *o_ptr, int o_idx)
 	/* Must be ammo. */
 	if (!ammo_p(o_ptr) 
 	    && !(is_known_throwing_item(o_ptr)
-		 && wield_slot(o_ptr) >= INVEN_WIELD)
-	    && !(o_ptr->tval == TV_EGG && o_ptr->sval == SV_EGG_SPORE)) 
+		 && wield_slot(o_ptr) >= INVEN_WIELD))
 	  return (FALSE);
 
 	/* Known or sensed cursed ammo is avoided */
