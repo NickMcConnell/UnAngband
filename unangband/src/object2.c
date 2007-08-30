@@ -9736,7 +9736,9 @@ bool is_known_throwing_item(const object_type *o_ptr)
  */
 int quiver_space_per_unit(const object_type *o_ptr)
 {
-	return (ammo_p(o_ptr) ? 1: 5);
+	return (ammo_p(o_ptr) 
+		|| (o_ptr->tval == TV_EGG && o_ptr->sval == SV_EGG_SPORE)
+		? 1 : 5);
 }
 
 /*
@@ -9793,6 +9795,7 @@ byte quiver_get_group(const object_type *o_ptr)
 		case TV_BOLT: return (QUIVER_GROUP_BOLTS);
 		case TV_ARROW: return (QUIVER_GROUP_ARROWS);
 		case TV_SHOT: return (QUIVER_GROUP_SHOTS);
+		case TV_EGG: return (QUIVER_GROUP_SPORES);
 	}
 
 	return (QUIVER_GROUP_THROWING_WEAPONS);

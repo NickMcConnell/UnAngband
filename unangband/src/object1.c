@@ -2031,6 +2031,13 @@ s16b wield_slot(const object_type *o_ptr)
       {
 	return INVEN_QUIVER;
       }
+    case TV_EGG:
+      {
+	if (o_ptr->sval == SV_EGG_SPORE)
+	  return INVEN_QUIVER;
+	else
+	  return -1;
+      }
 
     default:
       {
@@ -3423,8 +3430,7 @@ static int get_tag(int *cp, char tag)
 				default:	group = QUIVER_GROUP_SHOTS;	break;
 			}
 		}
-		/* Hack - Everything else is a throwing weapon */
-		else
+		/* Hack - Everything else is a throwing weapon, even a spore */
 		{
 		 	group = QUIVER_GROUP_THROWING_WEAPONS;
 		}
@@ -3437,8 +3443,10 @@ static int get_tag(int *cp, char tag)
 			/* (Paranoia) Ignore empty slots */
 			if (!o_ptr->k_idx) continue;
 
-			/* Groups must be equal */
-			if (quiver_get_group(o_ptr) != group) continue;
+			/* Groups must be equal, or hack */
+			if (group != QUIVER_GROUP_THROWING_WEAPONS
+			    && quiver_get_group(o_ptr) != group) 
+			  continue;
 
 			/* Allow pseudo-tag override */
 			(void)get_tag_num(i, quiver_group[group].cmd, &tag_num);

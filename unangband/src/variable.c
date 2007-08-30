@@ -1207,6 +1207,7 @@ quiver_group_type quiver_group[MAX_QUIVER_GROUPS] =
 	{'f', TERM_L_GREEN},
 	{'f', TERM_YELLOW},
 	{'v', TERM_ORANGE},
+	{'v', TERM_RED},
 };
 
 
