@@ -140,10 +140,10 @@ W:0:2:0:0
 M:5:0:0:0
 B:BEG
 B:TOUCH:EAT_GOLD
-F:MALE
+F:MALE | FEMALE
 F:RAND_25 | FRIENDS
 F:TAKE_ITEM | OPEN_DOOR | NEED_LITE | FORCE_DEPTH
-D:He looks squalid and thoroughly revolting.
+D:|He|She| looks squalid and thoroughly revolting.
 
 N:2:Scrawny cat
 G:f:U
@@ -184,27 +184,27 @@ G:t:w
 I:110:1d2:6:1:0
 W:0:1:0:0
 B:DROOL
-F:MALE
+F:MALE | FEMALE
 F:RAND_25
 F:TAKE_ITEM | HAS_LITE | NEED_LITE | FORCE_DEPTH
-D:He tends to blubber a lot.
+D:|He|She| tends to blubber a lot.
 
 N:6:Boil-covered wretch
 G:t:s
 I:110:1d2:6:1:0
 W:0:1:0:0
 B:DROOL
-F:MALE
+F:MALE | FEMALE
 F:RAND_25 | FORCE_DEPTH
 F:TAKE_ITEM | OPEN_DOOR | HAS_LITE | NEED_LITE
-D:Ugly doesn't begin to describe him.
+D:Ugly doesn't begin to describe |him|her|.
 
 N:7:Village idiot
 G:t:D
 I:120:4d4:6:1:0
 W:0:1:0:0
 B:DROOL
-F:MALE
+F:MALE | FEMALE
 F:RAND_25
 F:TAKE_ITEM | HAS_LITE | NEED_LITE | FORCE_DEPTH
 D:Drooling and comical, but then, what do you expect?
@@ -215,10 +215,10 @@ I:110:1d4:10:1:40
 W:0:1:0:0
 M:15:0:0:0
 B:BEG
-F:MALE
+F:MALE | FEMALE
 F:RAND_25
 F:TAKE_ITEM | OPEN_DOOR | HAS_LITE | NEED_LITE | FORCE_DEPTH
-D:You just can't help feeling sorry for him.
+D:You just can't help feeling sorry for |him|her|.
 
 N:9:Mangy-looking leper
 G:t:g
@@ -227,10 +227,10 @@ W:0:1:0:0
 M:10:0:0:0
 B:BEG
 B:TOUCH:DISEASE
-F:MALE
+F:MALE | FEMALE
 F:RAND_25
 F:TAKE_ITEM | OPEN_DOOR | HAS_LITE | NEED_LITE | FORCE_DEPTH
-D:You feel it isn't safe to touch him.
+D:You feel it isn't safe to touch |him|her|.
 
 N:10:Squint-eyed rogue
 G:t:R
@@ -240,12 +240,12 @@ M:20:0:0:0
 B:HIT:HURT:1d6
 B:TOUCH:EAT_ITEM
 B:INSULT
-F:MALE
+F:MALE | FEMALE
 F:DROP_60
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:EVIL | FORCE_DEPTH
 F:SNEAKY | NEED_LITE
-D:A hardy, street-wise crook that knows an easy catch when it sees one.
+D:A hardy, street-wise crook that knows an easy catch when |he|she| sees one.
 
 N:11:Singing, happy drunk
 G:t:b
@@ -254,24 +254,24 @@ W:0:1:0:0
 M:10:0:0:0
 B:BEG
 B:VOMIT
-F:MALE
+F:MALE | FEMALE
 F:RAND_50
 F:ONLY_GOLD | DROP_60
 F:TAKE_ITEM | OPEN_DOOR | TOWNSFOLK
 F:HAS_LITE | NEED_LITE | FORCE_DEPTH
-D:He makes you glad to be sober.
+D:|He|She| makes you glad to be sober.
 
 N:12:Aimless-looking merchant
 G:t:B
 I:110:3d3:10:1:255
 W:0:1:0:0
 B:HIT:HURT:1d3
-F:MALE
+F:MALE | FEMALE
 F:RAND_25
 F:ONLY_GOLD | DROP_60
 F:TAKE_ITEM | OPEN_DOOR | FRIEND
 F:HAS_LITE | NEED_LITE | FORCE_DEPTH
-D:The typical ponce around town, with purse jingling, and looking for more
+D:The typical |ponce|strumpet| around town, with purse jingling, and looking for more
 D: amulets of adornment to buy.
 
 N:13:Mean-looking mercenary
@@ -279,23 +279,23 @@ G:t:U
 I:110:5d8:10:20:250
 W:0:1:0:0
 B:HIT:HURT:1d10
-F:MALE
+F:MALE | FEMALE
 F:DROP_90
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:EVIL | FORCE_DEPTH
 F:WARRIOR | HAS_LITE | NEED_LITE
-D:No job is too low for him.
+D:No job is too low for |him|her|.
 
 N:14:Battle-scarred veteran
 G:t:o
 I:110:7d8:10:30:250
 W:0:1:0:0
 B:HIT:HURT:2d6
-F:MALE
+F:MALE | FEMALE
 F:DROP_90 | RAND_25
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:WARRIOR | HAS_LITE | NEED_LITE | FORCE_DEPTH
-D:He doesn't take to strangers kindly.
+D:|He|She| doesn't take to strangers kindly.
 
 ##### Normal monsters #####
 
@@ -518,11 +518,11 @@ I:110:7d4:20:14:5
 W:3:1:1:6
 B:HIT:HURT:1d5
 B:HIT:HURT:1d5
-F:MALE
+F:MALE | FEMALE
 F:DROP_60
 F:OPEN_DOOR | BASH_DOOR | FRIEND
 F:WARRIOR | HAS_LITE | NEED_LITE
-D:He looks inexperienced but tough.
+D:|He|She| looks inexperienced but tough.
 
 N:36:Apprentice rogue
 G:t:b
@@ -530,26 +530,26 @@ I:110:6d4:20:12:5
 W:3:1:1:6
 B:HIT:HURT:1d4
 B:TOUCH:EAT_GOLD
-F:MALE
+F:MALE | FEMALE
 F:DROP_60
 F:TAKE_ITEM | OPEN_DOOR
 F:EVIL | FRIEND
 F:SNEAKY
 D:A rather shifty individual.
 
-N:37:Apprentice priest
+N:37:Apprentice priest||ess|
 G:p:b
 I:110:5d4:20:10:10
 W:3:1:1:6
 M:0:8:2:23
 B:HIT:HURT:1d5
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:DROP_60
 F:OPEN_DOOR | FRIEND
 F:PRIEST | HAS_LITE | NEED_LITE | LOW_MANA_RUN
 S:HEAL | SCARE | HOLY_ORB | WOUND | BLESS
-D:He is tripping over his priestly robes.
+D:|He|She| is tripping over |his|her| priestly robes.
 
 N:38:Apprentice mage
 G:q:r
@@ -557,13 +557,13 @@ I:110:4d4:20:6:5
 M:0:8:2:23
 W:3:1:1:6
 B:HIT:HURT:1d4
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:DROP_60
 F:OPEN_DOOR | FRIEND
 F:MAGE | HAS_LITE | NEED_LITE | LOW_MANA_RUN
 S:BLINK | BOLT_MANA | ADD_MANA | BLIND | CONF
-D:He is leaving behind a trail of dropped spell components.
+D:|He|She| is leaving behind a trail of dropped spell components.
 
 N:39:Yellow mushroom patch
 G:,:y
@@ -827,12 +827,12 @@ I:110:3d5:16:8:10
 W:3:1:0:4
 B:HIT:HURT:1d4
 B:TOUCH:EAT_GOLD
-F:MALE
+F:MALE | FEMALE
 F:DROP_60
 F:TAKE_ITEM | OPEN_DOOR
 F:EVIL | HAS_LITE | NEED_LITE
 F:SNEAKY
-D:A short little guy, in bedraggled clothes.  He appears to be looking
+D:A short little |guy|dame|, in bedraggled clothes.  |He|She| appears to be looking
 D: for a good tavern.
 
 N:62:Giant white ant
@@ -918,7 +918,7 @@ M:8:8:2:23
 B:HIT:HURT:1d5
 B:HIT:HURT:1d5
 B:ARROW:HURT:1d6
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:DROP_60 | FRIEND
 F:OPEN_DOOR | BASH_DOOR
@@ -933,7 +933,7 @@ W:5:1:1:18
 M:0:10:1:23
 B:HIT:HURT:1d5
 B:HIT:HURT:1d5
-F:MALE | FORCE_SLEEP | DROP_60
+F:MALE | FEMALE | FORCE_SLEEP | DROP_60
 F:OPEN_DOOR | BASH_DOOR | FRIEND
 F:WARRIOR | PRIEST | HAS_LITE | NEED_LITE
 S:SCARE | HEAL | BLESS
@@ -1013,13 +1013,13 @@ I:110:6d6:20:12:10
 W:6:3:2:6
 M:0:12:2:23
 B:HIT:HURT:1d6
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:FRIENDS | DROP_60
 F:OPEN_DOOR | SMART
 F:MAGE | HAS_LITE | NEED_LITE | LOW_MANA_RUN
 S:BLINK | ADD_MANA | BOLT_MANA | BLIND | CONF
-D:He is leaving behind a trail of dropped spell components.
+D:|He|She| is leaving behind a trail of dropped spell components.
 
 N:78:Green naga
 G:n:g
@@ -1153,19 +1153,19 @@ F:DROP_60 | DROP_90 | ONLY_ITEM | LEVEL_SIZE
 S:ADD_AMMO
 D:Yum!  It looks quite tasty.
 
-N:89:Novice priest
+N:89:Novice priest||ess|
 G:p:b
 I:110:7d6:20:15:5
 W:7:3:2:6
 M:0:12:2:23
 B:HIT:HURT:1d7
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:FRIENDS | DROP_60
 F:OPEN_DOOR
 F:PRIEST | HAS_LITE | NEED_LITE
 S:HEAL | SCARE | HOLY_ORB | WOUND | BLESS
-D:He is tripping over his priestly robes.
+D:|He|She| is tripping over his priestly robes.
 
 N:90:Novice warrior
 G:t:u
@@ -1173,11 +1173,11 @@ I:110:9d6:20:16:5
 W:6:3:2:6
 B:HIT:HURT:1d6
 B:HIT:HURT:1d6
-F:MALE
+F:MALE | FEMALE
 F:FRIENDS | DROP_60
 F:OPEN_DOOR | BASH_DOOR | SMART
 F:WARRIOR | HAS_LITE | NEED_LITE
-D:He looks inexperienced but tough.
+D:|He|She| looks inexperienced but tough.
 
 N:91:Novice rogue
 G:t:b
@@ -1187,7 +1187,7 @@ M:8:0:0:0
 B:HIT:HURT:1d6
 B:TOUCH:EAT_GOLD
 B:SHOT:HURT:2d4
-F:MALE
+F:MALE | FEMALE
 F:FRIENDS | DROP_60
 F:TAKE_ITEM | OPEN_DOOR
 F:EVIL | SMART
@@ -1245,11 +1245,11 @@ G:k:U
 I:110:8d8:20:32:30
 W:6:2:0:15
 B:HIT:HURT:1d8
-F:MALE
+F:MALE | FEMALE
 F:FRIENDS | DROP_60
 F:OPEN_DOOR | BASH_DOOR
 F:EVIL | ORC | HURT_LITE | RES_DARK | LEVEL_POWER
-D:He is one of the many weaker 'slave' orcs, often mistakenly known as a
+D:|He|She| is one of the many weaker 'slave' orcs, often mistakenly known as a
 D: cave goblin.
 
 N:97:Rattlesnake
@@ -1270,11 +1270,11 @@ G:o:G
 I:110:11d9:20:32:30
 W:8:2:0:20
 B:HIT:HURT:1d10
-F:MALE
+F:MALE | FEMALE
 F:FRIENDS | DROP_60
 F:OPEN_DOOR | BASH_DOOR
 F:EVIL | ORC | HURT_LITE | RES_DARK | LEVEL_POWER
-D:He is often found in huge numbers in deep caves.
+D:|He|She| is often found in huge numbers in deep caves.
 
 N:99:Wood spider
 G:S:U
@@ -1392,7 +1392,7 @@ M:10:10:2:26
 B:HIT:HURT:1d6
 B:HIT:HURT:1d6
 B:DART:POISON:2d5
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:DROP_90
 F:OPEN_DOOR | BASH_DOOR | LOW_MANA_RUN
@@ -1485,7 +1485,7 @@ M:12:12:2:17
 B:HIT:HURT:1d7
 B:HIT:HURT:1d7
 B:ARROW:HURT:1d6
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP | FRIENDS | DROP_60
 F:OPEN_DOOR | BASH_DOOR
 F:WARRIOR | MAGE | HAS_LITE | NEED_LITE
@@ -1533,7 +1533,7 @@ W:9:3:2:18
 M:0:12:1:17
 B:HIT:HURT:1d9
 B:HIT:HURT:1d9
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:FRIENDS | DROP_60
 F:OPEN_DOOR | BASH_DOOR
@@ -1558,11 +1558,11 @@ G:o:u
 I:110:13d9:20:32:30
 W:11:2:0:25
 B:HIT:HURT:1d13
-F:MALE
+F:MALE | FEMALE
 F:FRIENDS | DROP_60
 F:OPEN_DOOR | BASH_DOOR
 F:EVIL | ORC | LEVEL_POWER
-D:He is a hardy well-weathered survivor.
+D:|He|She| is a hardy well-weathered survivor.
 
 N:121:Bandit
 G:t:r
@@ -1572,12 +1572,12 @@ M:18:0:2:0
 B:HIT:HURT:2d5
 B:TOUCH:EAT_GOLD
 B:SHOT:HURT:3d5
-F:MALE
+F:MALE | FEMALE
 F:DROP_1D2
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:EVIL | NEED_LITE
 F:SNEAKY | LEVEL_POWER
-D:He is after your cash!
+D:|He|She| is after your cash!
 
 N:122:Yeti
 G:Y:w
@@ -1620,7 +1620,7 @@ W:5:1:0:30
 M:0:15:3:43
 B:HIT:HURT:1d6
 B:HIT:HURT:1d6
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP | DROP_90
 F:OPEN_DOOR
 F:EVIL | ORC | HURT_LITE | RES_DARK | DWARF | IM_POIS
@@ -1764,7 +1764,7 @@ W:10:1:0:50
 M:0:20:6:32
 B:HIT:HURT:1d6
 B:HIT:HURT:1d6
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:ONLY_ITEM | DROP_1D2
 F:OPEN_DOOR | BASH_DOOR | LOW_MANA_RUN
@@ -1801,7 +1801,7 @@ M:20:0:2:0
 B:HIT:WOUND:2d9
 B:HIT:WOUND:2d9
 B:XBOLT:HURT:2d7
-F:MALE
+F:MALE | FEMALE
 F:DROP_1D2
 F:OPEN_DOOR | BASH_DOOR | HAS_LITE | RES_LITE | ELF | WARRIOR | LEVEL_POWER
 D:A elven figure in armour and ready with his sword.
@@ -1960,13 +1960,13 @@ B:HIT:HURT:2d8
 B:HIT:HURT:2d8
 B:TOUCH:EAT_ITEM
 B:SHOT:HURT:4d5
-F:MALE
+F:MALE | FEMALE
 F:DROP_1D2
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:EVIL | NEED_LITE | SMART
 F:SNEAKY | LEVEL_POWER
 S:TPORT | DARKNESS
-D:He is eyeing your backpack.
+D:|He|She| is eyeing your backpack.
 
 N:151:Baby multi-hued dragon
 G:d:v
@@ -2016,7 +2016,7 @@ I:110:7d8:18:20:10
 W:9:1:0:38
 M:0:25:3:28
 B:HIT:HURT:1d5
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP | DROP_1D2
 F:OPEN_DOOR | MAGE
 F:EVIL | LOW_MANA_RUN | SMART | DWARF | NO_SLOW | LEVEL_POWER
@@ -2107,14 +2107,14 @@ S:BLINK | TPORT | BLIND | SLOW | BALL_POIS
 S:S_MONSTER | ADD_MANA | TELE_SELF_TO
 D:A small ugly humanoid that radiates some power.
 
-N:161:Priest
+N:161:Priest||ess|
 G:p:B
 I:110:12d8:20:22:40
 W:9:1:0:36
 M:0:45:8:50
 B:HIT:HURT:2d3
 B:HIT:HURT:2d3
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:DROP_1D2
 F:SMART | OPEN_DOOR | BASH_DOOR
@@ -2122,7 +2122,7 @@ F:EVIL | LOW_MANA_RUN
 F:PRIEST | NEED_LITE | LEVEL_POWER
 S:HEAL | SCARE | HOLY_ORB | CURE | WOUND | BALL_LITE
 S:S_MONSTER | BLESS
-D:A robed man, dedicated to his god.
+D:A robed ||wo|man, dedicated to |his|her| god||ess|.
 
 N:162:Dark elven cultist
 G:l:D
@@ -2131,7 +2131,7 @@ W:13:2:0:95
 M:0:25:9:50
 B:HIT:HURT:2d4
 B:HIT:HURT:2d4
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:ONLY_ITEM | DROP_1D2
 F:SMART | OPEN_DOOR | BASH_DOOR | ELF
@@ -2211,7 +2211,7 @@ I:110:12d8:20:34:20
 W:12:1:0:40
 B:HIT:WOUND:3d5
 B:HIT:WOUND:3d5
-F:MALE
+F:MALE | FEMALE
 F:DROP_1D2
 F:OPEN_DOOR | BASH_DOOR
 F:WARRIOR | NEED_LITE | SMART | LEVEL_POWER
@@ -2312,7 +2312,7 @@ I:110:24d8:20:10:10
 W:20:2:0:125
 M:0:40:14:75
 B:HIT:HURT:2d3
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP | DROP_1D2
 F:SMART | OPEN_DOOR
 F:EVIL | NEED_LITE
@@ -2328,7 +2328,7 @@ W:13:1:0:50
 M:0:40:4:37
 B:HIT:HURT:2d4
 B:HIT:HURT:2d4
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP | DROP_1D2
 F:SMART | OPEN_DOOR
 F:EVIL | LOW_MANA_RUN
@@ -2346,11 +2346,11 @@ M:12:0:3:0
 B:HIT:HURT:3d4
 B:HIT:HURT:3d4
 B:ARROW:HURT:4d6
-F:MALE
+F:MALE | FEMALE
 F:FRIENDS | DROP_60
 F:OPEN_DOOR | BASH_DOOR
 F:EVIL | ORC | HURT_LITE | LEVEL_POWER
-D:He is a large orc with powerful arms and deep black skin.
+D:|He|She| is a large orc with powerful arms and deep black skin.
 
 N:179:Ochre jelly
 G:j:U
@@ -2581,11 +2581,11 @@ I:110:16d10:20:40:20
 W:20:3:0:50
 B:HIT:HURT:3d4
 B:HIT:HURT:3d4
-F:MALE
+F:MALE | FEMALE
 F:FRIENDS | DROP_60
 F:OPEN_DOOR | BASH_DOOR
 F:EVIL | ORC | NEED_LITE | MAN | LEVEL_POWER | SMART
-D:He is a hideous deformed cross-breed with man and orc, combining man's
+D:|He|She| is a hideous deformed cross-breed with man and orc, combining ||wo|man's
 D: strength and cunning with orcish evil.  The traitorous wizard Saruman is
 D: generally believed to be responsible for this abomination.
 
@@ -2668,7 +2668,7 @@ I:110:7d8:20:20:20
 W:12:2:0:40
 M:0:25:3:28
 B:HIT:HURT:1d5
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP | FRIENDS | DROP_60
 F:OPEN_DOOR | LOW_MANA_RUN | DWARF | NO_SLOW
 F:EVIL | SMART | LEVEL_POWER
@@ -2725,7 +2725,7 @@ B:HIT:HURT:3d5
 B:HIT:HURT:3d5
 B:HIT:HURT:3d5
 B:XBOLT:HURT:3d7
-F:MALE | ESCORT | DROP_90
+F:MALE | FEMALE | ESCORT | DROP_90
 F:OPEN_DOOR | BASH_DOOR | WARRIOR
 F:EVIL | ORC | RES_DARK | LEVEL_POWER
 D:An armoured orc with an air of authority.
@@ -2844,11 +2844,11 @@ I:110:20d10:20:50:40
 W:21:1:0:70
 B:HIT:HURT:2d8
 B:BITE:HURT:1d6
-F:MALE
+F:MALE | FEMALE
 F:FRIEND | DROP_60
 F:OPEN_DOOR | BASH_DOOR
 F:EVIL | TROLL | EAT_BODY | HURT_LITE | HUGE | LEVEL_SIZE | LEVEL_POWER
-D:He is green skinned and ugly.
+D:|He|She| is green skinned and ugly.
 
 N:215:Nar, the Dwarf
 G:h:y
@@ -3018,11 +3018,11 @@ M:12:0:3:0
 B:HIT:HURT:3d5
 B:HIT:HURT:3d5
 B:ARROW:HURT:3d6
-F:MALE
+F:MALE | FEMALE
 F:FORCE_MAXHP | FRIENDS | DROP_60
 F:OPEN_DOOR | BASH_DOOR
 F:EVIL | ORC | LEVEL_POWER | SMART
-D:A cunning orc of power, as tall as a man, and stronger.  It fears
+D:A cunning orc of power, as tall as a man, and stronger.  |He|She| fears
 D: little.
 
 N:227:Shagrat, the Orc Captain
@@ -3269,12 +3269,12 @@ G:t:B
 I:110:3d3:100:1:0
 W:0:1:0:0
 B:HIT:HURT:1d3
-F:MALE
+F:MALE | FEMALE
 F:RAND_25
 F:ONLY_GOLD | DROP_60
 F:TAKE_ITEM | OPEN_DOOR | FRIEND
 F:HAS_LITE | NEED_LITE | FORCE_DEPTH | TOWNSFOLK
-D:The typical ponce around town, with purse jingling, and looking for more
+D:The typical |ponce|strumpet| around town, with purse jingling, and looking for more
 D: amulets of adornment to buy.
 
 N:244:Sasquatch
@@ -3301,7 +3301,7 @@ F:ANIMAL | EAT_BODY | EVIL | FRIEND | LEVEL_SIZE | LEVEL_POWER
 S:BLINK | WOUND | HOLD | BOLT_FIRE
 D:It is a huge wolf with eyes that glow with mannish intelligence.
 
-N:246:Wood elf lord
+N:246:Wood elf |lord|lady|
 G:l:o
 I:120:18d15:20:40:30
 W:26:1:0:500
@@ -3309,7 +3309,7 @@ M:40:20:14:51
 B:HIT:HURT:3d10
 B:HIT:HURT:3d10
 B:ARROW:HURT:15d6
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:ONLY_ITEM | DROP_2D2
 F:OPEN_DOOR | BASH_DOOR | MAGE | ARCHER
@@ -3556,7 +3556,7 @@ B:HIT:EAT_ITEM:3d8
 B:HIT:EAT_GOLD:3d8
 B:SHOT:HURT:15d5
 B:DART:POISON:20d4
-F:MALE
+F:MALE | FEMALE
 F:DROP_2D2
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:EVIL | NEED_LITE
@@ -3766,7 +3766,7 @@ M:0:18:12:63
 B:HIT:HURT:1d7
 B:HIT:HURT:1d7
 B:HIT:HURT:3d8
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:ONLY_ITEM | DROP_1D2
 F:OPEN_DOOR | BASH_DOOR
@@ -3784,13 +3784,13 @@ M:15:0:4:0
 B:HIT:BATTER:3d7
 B:BITE:HURT:1d10
 B:BOULDER:HURT:2d10
-F:MALE
+F:MALE | FEMALE
 F:FRIEND | DROP_60
 F:OPEN_DOOR | BASH_DOOR | LEVEL_SIZE | LEVEL_POWER
 F:EVIL | TROLL | EAT_BODY | HURT_LITE | HURT_ROCK | HUGE
-D:He is a giant troll with scabrous black skin.
+D:|He|She| is a giant troll with scabrous black skin.
 
-N:279:Troll priest
+N:279:Troll priest||ess|
 G:T:B
 I:110:30d10:20:50:30:35
 W:22:2:0:120
@@ -3798,12 +3798,12 @@ M:0:20:8:35
 B:HIT:HURT:1d8
 B:HIT:HURT:1d8
 B:BITE:HURT:3d4
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP | FORCE_MAXHP | DROP_90
 F:OPEN_DOOR | BASH_DOOR | HUGE | PRIEST | LEVEL_SIZE | LEVEL_POWER
 F:EVIL | TROLL | EAT_BODY | HURT_LITE | NO_CONF | NO_SLEEP
 S:BLINK | SCARE | WOUND | DARKNESS | CURE | BLESS
-D:A troll who is so bright he knows how to read.
+D:A troll who is so bright |he|she| knows how to read.
 
 N:280:Wereworm
 G:w:D
@@ -4179,7 +4179,7 @@ W:17:1:0:150
 M:0:40:22:84
 B:HIT:HURT:2d5
 B:HIT:HURT:2d5
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:ONLY_ITEM | DROP_1D2
 F:SMART | OPEN_DOOR | BASH_DOOR
@@ -4187,7 +4187,7 @@ F:EVIL | NEED_LITE | LOW_MANA_RUN
 F:MAGE | LEVEL_POWER
 S:HASTE | BLINK | BLIND | CONF | ADD_MANA | SHIELD
 S:BOLT_FIRE | BOLT_COLD | BOLT_ELEC | BOLT_MANA
-D:A mage of some power - you can tell by the size of his hat.
+D:A mage of some power - you can tell by the size of |his|her| hat.
 
 N:306:Mind flayer
 G:X:v
@@ -4249,11 +4249,11 @@ B:CLAW:HURT:1d6
 B:HIT:BATTER:3d6
 B:BITE:COLD:3d6
 B:BOULDER:ICE:12d6
-F:MALE
+F:MALE | FEMALE
 F:FRIENDS | DROP_60
 F:OPEN_DOOR | BASH_DOOR | HUGE
 F:EVIL | TROLL | EAT_BODY | IM_COLD | HURT_LITE | LEVEL_SIZE | LEVEL_POWER
-D:He is a white troll with powerfully clawed hands.
+D:|He|She| is a white troll with powerfully clawed hands.
 
 N:310:Giant purple worm
 G:w:v
@@ -4553,7 +4553,7 @@ B:PUNCH:POISON:3d4
 B:PUNCH:LOSE_STR:3d4
 B:KICK:BATTER:3d4
 B:SPIKE:POISON:20d5
-F:MALE
+F:MALE | FEMALE
 F:DROP_1D2
 F:OPEN_DOOR | BASH_DOOR
 F:EVIL | NO_CONF | NO_SLEEP
@@ -4597,13 +4597,13 @@ M:15:0:0:0
 B:HIT:BATTER:2d8
 B:HIT:BATTER:2d8
 B:BITE:HURT:1d13
-B:LASH:BATTER:2d8
-F:MALE
+B:LASH:BATTER:4d8
+F:MALE | FEMALE
 F:FRIENDS | DROP_60
 F:OPEN_DOOR | BASH_DOOR | HUGE
 F:EVIL | TROLL | EAT_BODY | HURT_LITE | LEVEL_SIZE | LEVEL_POWER
-D:He is a vicious monster, feared for his ferocity. He can lash you with
-D: a chain hanging around his neck.
+D:|He|She| is a vicious monster, feared for his ferocity. |He|She| can lash you with
+D: a chain hanging around |his|her| neck.
 
 N:335:Half-troll
 G:T:U
@@ -4614,7 +4614,7 @@ B:HIT:BATTER:2d11
 B:HIT:BATTER:2d11
 B:BITE:HURT:2d6
 B:BOULDER:HURT:17d6
-F:MALE
+F:MALE | FEMALE
 F:FRIENDS
 F:ONLY_ITEM | DROP_90
 F:OPEN_DOOR | BASH_DOOR | HUGE | LEVEL_SIZE | LEVEL_POWER
@@ -4628,7 +4628,7 @@ W:39:2:0:500
 M:0:18:30:71
 B:PUNCH:HURT:2d11
 B:KICK:BATTER:18d2
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_1D2
 F:OPEN_DOOR | BASH_DOOR | SMART
@@ -4636,7 +4636,7 @@ F:IM_ACID | IM_POIS | NO_CONF | NO_SLEEP
 F:PRIEST | MAGE | NEED_LITE | LEVEL_POWER
 S:BALL_ACID | BALL_ELEC | BALL_POIS | BOLT_WATER | BLINK | TELE_SELF_TO |
 S:CURE | S_SPIDER | S_ANIMAL | CURE | S_INSECT | BLESS
-D:An adept at unarmed combat, the dervish strikes with stunning power.  He
+D:An adept at unarmed combat, the dervish strikes with stunning power.  |He|She|
 D: can summon help from nature and is able to focus his power to ease any
 D: pain.
 
@@ -4836,13 +4836,13 @@ W:35:1:0:420
 B:HIT:BATTER:2d14
 B:HIT:BATTER:2d14
 B:BITE:HURT:1d14
-F:MALE
+F:MALE | FEMALE
 F:FORCE_MAXHP
 F:FRIENDS | DROP_60
 F:OPEN_DOOR | BASH_DOOR
 F:EVIL | TROLL | EAT_BODY | IM_COLD | IM_POIS | HURT_LITE
 F:CAN_SWIM | RES_WATER | HUGE | LEVEL_SIZE | LEVEL_POWER
-D:He is a troll that reeks of brine.
+D:|He|She| is a troll that reeks of brine.
 
 N:349:Fire elemental
 G:E:r
@@ -4924,7 +4924,7 @@ B:HIT:HURT:6d13
 B:HIT:EAT_GOLD
 B:HIT:EAT_ITEM
 B:SHOT:HURT:33d5
-F:MALE
+F:MALE | FEMALE
 F:DROP_90 | DROP_2D2
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:EVIL | SMART
@@ -5084,7 +5084,7 @@ M:20:0:22:0
 B:PUNCH:POISON:6d4
 B:PUNCH:LOSE_STR:6d4
 B:DART:POISON:22d5
-F:MALE
+F:MALE | FEMALE
 F:DROP_1D2
 F:OPEN_DOOR | BASH_DOOR
 F:EVIL | NO_CONF | NO_SLEEP
@@ -5516,7 +5516,7 @@ W:53:2:0:2200
 M:0:45:50:125
 B:HIT:HURT:1d9
 B:HIT:HURT:1d9
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_1D2
 F:SMART | OPEN_DOOR | BASH_DOOR | MAGE
@@ -5554,7 +5554,7 @@ M:0:60:18:100
 B:HIT:HURT:2d6
 B:HIT:HURT:2d6
 B:HIT:HURT:2d6
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_1D2
 F:SMART | OPEN_DOOR | BASH_DOOR
@@ -6203,7 +6203,7 @@ S:BRTH_ELEC | BALL_ELEC | BOLT_ELEC | BEAM_ELEC | SCARE
 S:BLIND
 D:A strange reptilian hybrid with nine heads.  It is lightning fast.
 
-N:435:Enchantress
+N:435:Enchant|er|ress|
 G:q:B
 I:120:52d10:20:60:10
 W:51:4:0:2100
@@ -6219,8 +6219,8 @@ F:EVIL | NO_CONF | NO_SLEEP | LOW_MANA_RUN | SMART
 F:MAGE | NEED_LITE | POWERFUL | LEVEL_POWER
 S:BLIND | ADD_MANA | SHIELD | HASTE | BOLT_MANA | TPORT | CONF | HOLD
 S:S_DRAGON | ILLUSION
-D:This elusive female spellcaster has a special affinity for dragons, whom
-D: she rarely fights without.
+D:This elusive spellcaster has a special affinity for dragons, whom
+D: |he|she| rarely fights without.
 
 N:436:Knight Templar
 G:t:D
@@ -6250,7 +6250,7 @@ M:0:60:70:106
 B:HIT:HURT:2d8
 B:HIT:HURT:2d8
 B:HIT:HURT:2d8
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:ONLY_ITEM | DROP_90 | DROP_4D2
 F:OPEN_DOOR | BASH_DOOR
@@ -6259,7 +6259,7 @@ F:MAGE | NEED_LITE | SMART | LEVEL_POWER
 S:BALL_ACID | BALL_ELEC | BALL_FIRE | BALL_COLD | BOLT_MANA | 
 S:HASTE | ADD_MANA | BLINK | TPORT | SCARE | BLIND | CONF | HOLD | ILLUSION 
 S:S_MONSTER | SHIELD | OPPOSE_ELEM
-D:A human figure in robes, he moves with magically improved speed, and his
+D:A human figure in robes, |he|she| moves with magically improved speed, and |his|her|
 D: hands are ablur with spell casting.
 
 N:438:Xaren
@@ -6452,14 +6452,14 @@ S:BOLT_ACID | BOLT_FIRE | BOLT_COLD | BOLT_NETHR
 S:S_MONSTER | CURE | INVIS | WRAITHFORM | PROBE | CURSE
 D:A tall black cloaked Ringwraith.
 
-N:450:Dark elven sorcerer
+N:450:Dark elven sorcere|r|ss|
 G:l:R
 I:120:80d10:20:70:10
 W:53:2:0:3000
 M:0:50:40:119
 B:HIT:HURT:2d8
 B:HIT:HURT:2d8
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_90 | DROP_4D2
 F:SMART | OPEN_DOOR | BASH_DOOR | SMART | LOW_MANA_RUN
@@ -6469,7 +6469,7 @@ S:BLINK | BLIND | CONF | DARKNESS | OPPOSE_ELEM
 S:BALL_ACID | BALL_FIRE | BALL_COLD | HASTE | SHIELD | ADD_MANA
 S:S_MONSTER | S_UNDEAD | S_DEMON | ADD_MANA | TELE_SELF_TO
 D:A elven figure, dressed in deepest black.  Power seems to crackle
-D: from his slender frame.
+D: from |his|her| slender frame.
 
 N:451:Dread lich
 G:L:r
@@ -6839,7 +6839,7 @@ S:BRTH_ACID | BRTH_ELEC | BALL_ACID | BALL_ELEC | BOLT_ACID
 S:BOLT_ELEC | BEAM_ELEC | SCARE | CONF
 D:A strange reptilian hybrid with eleven heads.
 
-N:470:Archpriest
+N:470:Archpriest||ess|
 G:p:y
 I:120:52d10:20:60:10
 M:0:50:60:119
@@ -6847,7 +6847,7 @@ W:46:2:0:1800
 B:HIT:HURT:3d4
 B:HIT:HURT:3d4
 B:HIT:HURT:3d4
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_90 | DROP_2D2
 F:SMART | OPEN_DOOR | BASH_DOOR
@@ -6855,8 +6855,8 @@ F:EVIL | NO_CONF | NO_SLEEP | NEED_LITE | LOW_MANA_RUN
 F:PRIEST | LEVEL_POWER
 S:HEAL | BLIND | HOLD | WOUND | CURE | ADD_MANA
 S:S_MONSTER | S_UNDEAD | CURSE | ARC_HFIRE | BLESS
-D:An evil priest, dressed all in black.  Deadly spells hit you at an
-D: alarming rate as his black spiked mace rains down blow after blow on your
+D:An evil priest||ess|, dressed all in black.  Deadly spells hit you at an
+D: alarming rate as |his|her| black spiked mace rains down blow after blow on your
 D: pitiful frame.
 
 N:471:Dreadmaster
@@ -7092,7 +7092,7 @@ B:PUNCH:BATTER:2d10
 B:KICK:HURT:20d2
 B:HIT:POISON:20d1
 B:HIT:PARALYZE:15d1
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_4D2
 F:INVISIBLE | OPEN_DOOR | BASH_DOOR
@@ -7102,7 +7102,7 @@ F:MAGE | PRIEST | LEVEL_POWER
 S:BALL_ELEC | BALL_POIS | BALL_SOUND | BALL_STORM | BOLT_ICE | BOLT_WATER | 
 S:ADD_MANA | CURE | BLINK | TELE_SELF_TO | BLIND | CONF | HOLD | 
 S:S_MONSTER | S_HOUND | S_ANIMAL | S_INSECT | BLESS
-D:A lord of all that is natural, skilled in the mystic ways.  He is a master
+D:A |lord|lady| of all that is natural, skilled in the mystic ways.  |He|She| is a master
 D: of martial arts and is at one with nature, able to summon help from the
 D: wild if need be.
 
@@ -7285,7 +7285,7 @@ B:KICK:BATTER:20d2
 B:PUNCH:BATTER:10d2
 B:HIT:POISON:20d1
 B:PUNCH:PARALYZE:15d1
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_2D2 | DROP_GOOD | DROP_GREAT
 F:OPEN_DOOR | BASH_DOOR
@@ -7294,7 +7294,7 @@ F:PRIEST | MAGE
 S:BALL_ELEC | BALL_POIS | BALL_SOUND | BALL_STORM | BOLT_PLAS | BOLT_ICE | 
 S:BOLT_WATER | ADD_MANA | HEAL | CURE | BLINK | TELE_SELF_TO | TELE_TO | 
 S:BLIND | CONF | HOLD | S_MONSTERS | S_HOUND | S_ANIMAL | INVIS | BLESS
-D:He is one of the few true masters of the art, being extremely skillful in
+D:|He|She| is one of the few true masters of the art, being extremely skillful in
 D: all forms of unarmed combat and controlling the world's natural creatures
 D: with disdainful ease.
 
@@ -8806,14 +8806,14 @@ M:90:25:4:45
 B:HIT:HURT:5d4
 B:HIT:HURT:5d4
 B:ARROW:HURT:5d6
-F:MALE
+F:MALE | FEMALE
 F:DROP_1D2
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:WARRIOR | MAGE | NEED_LITE | ARCHER | LEVEL_POWER
 S:S_ANIMAL
 S:BOLT_COLD | BOLT_ELEC | BLINK | CURE
 D:A warrior who is at one with nature.  A master of both bow and sword, with
-D: minor spellcasting skills, and animals come to do his bidding.
+D: minor spellcasting skills, and animals come to do |his|her| bidding.
 
 N:581:Paladin
 G:p:s
@@ -8822,15 +8822,15 @@ W:15:1:0:55
 M:0:25:12:28
 B:HIT:HURT:4d5
 B:HIT:HURT:4d5
-F:MALE
+F:MALE | FEMALE
 F:DROP_1D2
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:WARRIOR | PRIEST | NEED_LITE | LEVEL_POWER
 S:HEAL | SLOW | SCARE | BLIND | CURE | BLESS
-D:A warrior for a holy cause.  Unfortunately, his god is not yours, and there is
-D: rivalry even between the various gods of Good, so he is your enemy.
+D:A warrior for a holy cause.  Unfortunately, |his|her| god||ess| is not yours, and there is
+D: rivalry even between the various gods of Good, so |he|she| is your enemy.
 
-N:582:Ranger Chieftain
+N:582:Ranger Chieftain||ess|
 G:q:G
 I:120:50d20:20:60:10
 W:56:2:0:1600
@@ -8839,7 +8839,7 @@ B:HIT:HURT:5d5
 B:HIT:HURT:5d5
 B:HIT:HURT:5d5
 B:ARROW:HURT:13d6
-F:MALE | FORCE_MAXHP
+F:MALE | FEMALE | FORCE_MAXHP
 F:ONLY_ITEM | DROP_2D2
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:NO_CONF | NO_SLEEP
@@ -8848,10 +8848,10 @@ F:WARRIOR | MAGE | NEED_LITE | ARCHER | LEVEL_POWER
 S:S_ANIMAL
 S:BOLT_MANA | BOLT_FIRE | BOLT_ELEC | BALL_COLD
 S:HASTE | BLINK | INVIS
-D:A chieftain among the Rangers.  His understanding of nature gives him
-D: powerful elemental spells to use against you, in addition to his skills
-D: as an archer and a warrior.  Furthermore, he is a master of camouflage, so
-D: you will need magically enhanced seeing to spot him.
+D:A chieftain among the Rangers.  |His|Her| understanding of nature gives |him|her|
+D: powerful elemental spells to use against you, in addition to |his|her| skills
+D: as an archer and a warrior.  Furthermore, |he|she| is a master of camouflage, so
+D: you will need magically enhanced seeing to spot |him|her|.
 
 N:583:Haradrim berserker
 G:t:o
@@ -8862,17 +8862,17 @@ B:HIT:WOUND:6d6
 B:HIT:WOUND:6d6
 B:HIT:WOUND:6d6
 B:XBOLT:HURT:15d7
-F:MALE | FORCE_MAXHP
+F:MALE | FEMALE | FORCE_MAXHP
 F:ONLY_ITEM | DROP_90 | DROP_2D2
 F:BASH_DOOR | REGENERATE | EVIL
 F:NO_CONF | NO_SLEEP | NO_FEAR
 F:WARRIOR | NEED_LITE | LEVEL_POWER
 S:HASTE | SCARE | BERSERK
 D:Even the strongest of normal human warriors fears the Berserker - the one who
-D: can drive himself into such a terrible battle-frenzy that he can survive blows
-D: which should kill him, and still apparently feel no pain.  He tramples weaker
-D: creatures underfoot in his eagerness to get to his real enemy, and his
-D: battle-cry strikes terror into his foes.
+D: can drive |him|her|self into such a terrible battle-frenzy that |he|she| can survive blows
+D: which should kill |him|her|, and still apparently feel no pain.  |He|She| tramples weaker
+D: creatures underfoot in |his|her| eagerness to get to |his|her| real enemy, and |his|her|
+D: battle-cry strikes terror into |his|her| foes.
 
 N:584:Cyclops
 G:P:u
@@ -12863,12 +12863,12 @@ W:5:2:0:6
 M:0:11:3:20
 B:HIT:HURT:1d7
 B:TOUCH:EAT_ITEM
-F:MALE | 
+F:MALE | FEMALE | 
 F:DROP_60 | 
 F:TAKE_ITEM | OPEN_DOOR | DWARF | NO_SLOW
 F:SNEAKY | SMART
 S:SLOW | CONF
-D:A sly fellow of short stature. He appears to be looking for a quick profit.
+D:A sly fellow of short stature. |He|She| appears to be looking for a quick profit.
 
 N:871:Hobbit reveller
 G:h:b
@@ -12876,22 +12876,22 @@ I:110:2d3:10:1:0
 W:0:2:0:0
 M:10:0:0:0
 B:SING
-F:MALE | NEVER_BLOW
+F:MALE | FEMALE | NEVER_BLOW
 F:FRIENDS | RAND_50
 F:ONLY_GOLD | DROP_60 | HAS_LITE | NEED_LITE | SMART
 F:TAKE_ITEM | OPEN_DOOR | FORCE_DEPTH
-D:He makes you glad to be sober.
+D:|He|She| makes you glad to be sober.
 
 N:872:Hobbit merchant
 G:h:B
 I:110:3d3:10:1:255
 W:0:2:0:0
 B:HIT:HURT:1d3
-F:MALE | 
+F:MALE | FEMALE | 
 F:RAND_25 | HAS_LITE | NEED_LITE
 F:ONLY_GOLD | DROP_60 | TOWNSFOLK | SMART
 F:TAKE_ITEM | OPEN_DOOR | FORCE_DEPTH
-D:The typical ponce around town, with purse jingling, and looking for more
+D:The typical |ponce|strumpet| around town, with purse jingling, and looking for more
 D: amulets of adornment to buy.
 
 N:873:Hobbit veteran
@@ -12899,7 +12899,7 @@ G:h:U
 I:110:5d8:10:20:250
 W:0:1:0:0
 B:HIT:HURT:1d10
-F:MALE | RAND_25
+F:MALE | FEMALE | RAND_25
 F:DROP_90 | HAS_LITE | NEED_LITE
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | SMART
 F:FORCE_DEPTH | TOWNSFOLK
@@ -12911,11 +12911,11 @@ I:110:10d4:16:20:10
 W:4:2:0:7
 B:HIT:HURT:1d7
 B:HIT:HURT:1d7
-F:MALE | SMART
+F:MALE | FEMALE | SMART
 F:DROP_60 | DWARF | RES_BLIND
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
-D:A scowling short chap with a two-foot beard. He appears to be looking for a good smithy
-D: to sharpen his axe.
+D:A scowling short |chap|lass| with a two-foot beard. |He|She| appears to be looking for a good smithy
+D: to sharpen |his|her| axe.
 
 N:875:Haughty looking elf
 G:l:W
@@ -12925,10 +12925,10 @@ M:14:0:0:0
 B:HIT:HURT:1d5
 B:HIT:HURT:1d5
 B:ARROW:HURT:2d6
-F:MALE | SMART
+F:MALE | FEMALE | SMART
 F:DROP_60 | FORCE_SLEEP |
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
-D:An arrogant elf with an air of disdain. He appears to be looking for somewhere a little more
+D:An arrogant elf with an air of disdain. |He|She| appears to be looking for somewhere a little more
 D: sophisticated.
 
 N:876:Gnome warrior
@@ -12937,7 +12937,7 @@ I:110:10d8:18:30:10
 W:7:2:0:30
 B:HIT:HURT:1d8
 B:HIT:HURT:1d8
-F:MALE | 
+F:MALE | FEMALE | 
 F:DROP_1D2 | SMART | LEVEL_POWER
 F:OPEN_DOOR | BASH_DOOR | EVIL | WARRIOR | DWARF | NO_SLOW
 D:A warrior of short stature.
@@ -12949,25 +12949,25 @@ W:6:2:0:35
 M:0:11:2:17
 B:HIT:HURT:2d4
 B:TOUCH:EAT_GOLD
-F:MALE |
+F:MALE | FEMALE |
 F:DROP_1D2 | SMART
 F:TAKE_ITEM | OPEN_DOOR | SNEAKY | DWARF | NO_SLOW
 F:EVIL | LEVEL_POWER
 S:BLINK | CONF | SLOW
 D:A thief of short stature.
 
-N:878:Gnome priest
+N:878:Gnome priest||ess|
 G:h:B
 I:110:8d8:18:24:10
 W:7:2:0:36
 M:0:25:3:25
 B:HIT:HURT:2d4
-F:MALE | 
+F:MALE | FEMALE | 
 F:DROP_1D2 | FORCE_SLEEP | SMART
 F:TAKE_ITEM | OPEN_DOOR | DWARF | NO_SLOW
 F:EVIL | LOW_MANA_RUN | PRIEST | LEVEL_POWER
 S:HEAL | WOUND | S_MONSTER | CURE | BLESS
-D:A priest of short stature.
+D:A priest||ess| of short stature.
 
 N:879:Gnome illusionist
 G:h:y
@@ -12975,7 +12975,7 @@ I:110:7d8:20:10:10
 W:8:2:0:50
 M:0:20:5:30
 B:HIT:HURT:1d5
-F:MALE | 
+F:MALE | FEMALE | 
 F:FORCE_SLEEP | DROP_1D2 | 
 F:OPEN_DOOR | SMART | DWARF | NO_SLOW
 F:EVIL | LOW_MANA_RUN | MAGE | LEVEL_POWER
@@ -13002,7 +13002,7 @@ I:110:10d10:18:30:10
 W:8:1:0:32
 B:HIT:HURT:1d8
 B:HIT:HURT:1d8
-F:MALE | DWARF | RES_BLIND | SMART
+F:MALE | FEMALE | DWARF | RES_BLIND | SMART
 F:DROP_1D2 | LEVEL_POWER
 F:OPEN_DOOR | BASH_DOOR | WARRIOR
 D:A dwarven warrior with a three-foot beard.
@@ -13015,26 +13015,26 @@ M:20:20:3:40
 B:HIT:HURT:1d7
 B:HIT:HURT:1d7
 B:XBOLT:HURT:3d6
-F:MALE | DWARF | RES_BLIND | SMART
+F:MALE | FEMALE | DWARF | RES_BLIND | SMART
 F:FORCE_SLEEP | LEVEL_POWER
 F:ONLY_ITEM | DROP_1D2 | 
 F:OPEN_DOOR | BASH_DOOR
 S:BOLT_MANA | BLIND
 D:A dwarven ranger with a three-foot beard, and sword and bow quick to hand.
 
-N:883:Dwarven priest
+N:883:Dwarven priest||ess|
 G:h:B
 I:110:8d10:18:28:10
 W:5:1:0:38
 M:0:25:3:25
 B:HIT:HURT:2d4
-F:MALE | DWARF | RES_BLIND | SMART
+F:MALE | FEMALE | DWARF | RES_BLIND | SMART
 F:DROP_1D2 | FORCE_SLEEP | PRIEST
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | LEVEL_POWER
 S:HEAL | BLIND | WOUND | SCARE | CURE | BLESS
-D:A dwarven priest with a three-foot beard, and hammer swung devoutly to his cause.
+D:A dwarven priest||ess| with a three-foot beard, and hammer swung devoutly to |his|her| cause.
 
-N:884:Dwarven lord
+N:884:Dwarven |lord|lady|
 G:h:o
 I:120:18d20:20:50:30
 W:22:1:0:200
@@ -13042,11 +13042,11 @@ M:15:0:0:0
 B:HIT:HURT:3d8
 B:HIT:HURT:3d5
 B:XBOLT:HURT:13d6
-F:MALE | DWARF | RES_BLIND | SMART
+F:MALE | FEMALE | DWARF | RES_BLIND | SMART
 F:FORCE_SLEEP | LEVEL_POWER
 F:ONLY_ITEM | DROP_1D2 | 
 F:OPEN_DOOR | BASH_DOOR
-D:A dwarven lord, with a four-foot beard, come to reclaim the halls of his elders.
+D:A dwarven |lord|lady|, with a four-foot beard, come to reclaim the halls of |his|her| elders.
 
 # From Sangband
 
@@ -13720,11 +13720,11 @@ W:8:2:0:20
 M:13:0:0:0
 B:HIT:HURT:1d8
 B:ARROW:HURT:3d6
-F:MALE | 
+F:MALE | FEMALE | 
 F:FRIENDS | DROP_60 | 
 F:OPEN_DOOR | BASH_DOOR | ARCHER
 F:EVIL | ORC | DWARF | IM_POIS | LEVEL_SIZE | LEVEL_POWER
-D:He is an ugly, green skinned humanoid armed with a bow.
+D:|He|She| is an ugly, green skinned humanoid armed with a bow.
 
 N:943:Night goblin
 G:k:b
@@ -13733,11 +13733,11 @@ W:10:3:0:24
 M:15:0:0:0
 B:HIT:BLIND:2d5
 B:DAGGER:HURT:2d5
-F:MALE | 
+F:MALE | FEMALE | 
 F:FRIENDS | DROP_60 | 
 F:OPEN_DOOR | BASH_DOOR | ARCHER
 F:EVIL | ORC | HURT_LITE | DWARF | IM_POIS | RES_DARK | LEVEL_SIZE | LEVEL_POWER
-D:He is an ugly, night blue skinned humanoid armed with a wicked looking knife.
+D:|He|She| is an ugly, night blue skinned humanoid armed with a wicked looking knife.
 
 N:944:Mirkwood goblin
 G:k:u
@@ -13746,11 +13746,11 @@ W:10:2:0:30
 M:20:0:0:0
 B:HIT:POISON:2d5
 B:ARROW:HURT:3d6
-F:MALE | CAN_CLIMB |
+F:MALE | FEMALE | CAN_CLIMB |
 F:FRIENDS | DROP_60 | 
 F:OPEN_DOOR | BASH_DOOR | ARCHER
 F:EVIL | ORC | DWARF | IM_POIS | LEVEL_SIZE | LEVEL_POWER
-D:He is an ugly, brown skinned humanoid armed with a variety of dangerous weapons.
+D:|He|She| is an ugly, brown skinned humanoid armed with a variety of dangerous weapons.
 
 N:945:Forest goblin
 G:k:G
@@ -13759,22 +13759,22 @@ W:7:2:0:18
 M:10:0:0:0
 B:HIT:HURT:1d5
 B:SHOT:HURT:1d5
-F:MALE | 
+F:MALE | FEMALE | 
 F:FRIENDS | DROP_60
 F:OPEN_DOOR | BASH_DOOR
 F:EVIL | ORC | DWARF | IM_POIS | LEVEL_SIZE | LEVEL_POWER
-D:He is an ugly, green skinned primative looking humanoid.
+D:|He|She| is an ugly, green skinned primative looking humanoid.
 
 N:946:River goblin
 G:k:B
 I:110:8d8:20:32:30
 W:8:3:0:23
 B:HIT:WOUND:2d4
-F:MALE | 
+F:MALE | FEMALE | 
 F:FRIENDS | DROP_60 | 
 F:OPEN_DOOR | BASH_DOOR | CAN_SWIM |
 F:EVIL | ORC | DWARF | IM_POIS | LEVEL_SIZE | LEVEL_POWER
-D:He is an ugly, piratical looking humanoid armed with a hook.
+D:|He|She| is an ugly, piratical looking humanoid armed with a hook.
 
 N:947:Killer dung beetle
 G:K:D
@@ -13895,7 +13895,7 @@ M:20:20:4:20
 B:HIT:HURT:1d7
 B:HIT:HURT:1d7
 B:ARROW:HURT:3d6
-F:MALE | 
+F:MALE | FEMALE | 
 F:FORCE_SLEEP | 
 F:ONLY_ITEM | DROP_1D2 | 
 F:OPEN_DOOR | BASH_DOOR | LEVEL_POWER
@@ -13912,10 +13912,10 @@ B:HIT:POISON:8d4
 B:HIT:POISON:8d4
 B:HIT:LOSE_CON:2d4
 B:DART:POISON:16d4
-F:MALE |
+F:MALE | FEMALE |
 F:DROP_90 | INVISIBLE | SNEAKY | RES_LITE | ELF
 F:OPEN_DOOR | BASH_DOOR | NO_CONF | NO_SLEEP | LEVEL_POWER
-D:An elven assassin, so stealthy that he is almost impossible to see.
+D:An elven assassin, so stealthy that |he|she| is almost impossible to see.
 
 N:960:Elven shade
 G:G:w
@@ -13926,7 +13926,7 @@ B:TOUCH:EXP_80:1d16
 B:TOUCH:UN_POWER
 B:TOUCH:LOSE_DEX:8d8
 B:SHRIEK:LOSE_INT:8d8
-F:MALE | 
+F:MALE | FEMALE | 
 F:FORCE_SLEEP | FORCE_MAXHP
 F:ONLY_ITEM | DROP_2D2 | NO_CUTS | NO_STUN | IM_BLUNT
 F:SMART | INVISIBLE | COLD_BLOOD | UNDEAD | ELF | RES_LITE
@@ -14492,13 +14492,13 @@ I:110:15d10:20:46:26
 W:12:3:0:50
 B:HIT:HURT:3d4
 B:HIT:HURT:3d4
-F:MALE
+F:MALE | FEMALE
 F:DROP_60 | 
 F:OPEN_DOOR | BASH_DOOR | SMART |
 F:EVIL | ORC | RES_DARK | LEVEL_POWER
-D:A large orc who barks commands to his fellows.
+D:A large orc who barks commands to |his|her| fellows.
 
-N:996:Orc chieftain
+N:996:Orc chieftain||ess|
 G:o:G
 I:110:30d10:20:72:14
 W:23:4:0:110
@@ -14507,13 +14507,13 @@ B:HIT:HURT:3d6
 B:HIT:HURT:3d6
 B:HIT:HURT:3d6
 B:HIT:HURT:3d6
-F:MALE | ESCORT | DROP_1D2 | 
+F:MALE | FEMALE | ESCORT | DROP_1D2 | 
 F:OPEN_DOOR | BASH_DOOR | WARRIOR | SMART |
 F:EVIL | ORC | RES_DARK | LEVEL_POWER
 S:S_ORC
 D:A heavily armoured orc with the mantle of leadership.
 
-N:997:Orc king
+N:997:Orc |king|queen|
 G:o:G
 I:110:40d10:20:85:14
 W:26:5:0:110
@@ -14522,25 +14522,25 @@ B:HIT:HURT:4d6
 B:HIT:HURT:4d6
 B:HIT:HURT:4d6
 B:HIT:HURT:4d6
-F:MALE | ESCORT | ESCORTS | DROP_1D2 | 
+F:MALE | FEMALE | ESCORT | ESCORTS | DROP_1D2 | 
 F:OPEN_DOOR | BASH_DOOR | WARRIOR | SMART |
 F:EVIL | ORC | IM_POIS | RES_DARK | LEVEL_POWER
 S:S_ORC
-D:A heavily armoured orc ruler who dominates his kin with his powerful blows.
+D:A heavily armoured orc ruler who dominates |his|her| kin with his powerful blows.
 
-N:998:Orc priest
+N:998:Orc priest||ess|
 G:o:B
 I:110:12d10:20:36:30
 W:13:3:0:70
 M:0:20:6:32
 B:HIT:HURT:3d4
 B:HIT:HURT:3d4
-F:MALE | 
+F:MALE | FEMALE | 
 F:FORCE_SLEEP | FORCE_MAXHP | DROP_90 | 
 F:OPEN_DOOR | BASH_DOOR | PRIEST |
 F:EVIL | ORC | NO_CONF | NO_SLEEP | RES_DARK | LEVEL_POWER
 S:BLINK | SCARE | WOUND | CURE | BLESS
-D:An orc who is so bright he knows how to cast spells.
+D:An orc who is so bright |he|she| knows how to cast spells.
 
 N:999:Orc mage
 G:o:R
@@ -14549,12 +14549,12 @@ W:11:3:0:70
 M:0:20:6:32
 B:HIT:HURT:3d4
 B:HIT:HURT:3d4
-F:MALE | 
+F:MALE | FEMALE | 
 F:FORCE_SLEEP | FORCE_MAXHP | DROP_90 | 
 F:OPEN_DOOR | BASH_DOOR | MAGE |
 F:EVIL | ORC | HURT_LITE | NO_CONF | NO_SLEEP | MAGE | RES_DARK | LEVEL_POWER
 S:BLINK | BLIND | CONF | BOLT_MANA
-D:An orc who is so bright he knows how to cast spells.
+D:An orc who is so bright |he|she| knows how to cast spells.
 
 N:1000:Green orc
 G:o:g
@@ -14564,11 +14564,11 @@ M:18:0:0:0
 B:HIT:HURT:3d4
 B:HIT:HURT:3d4
 B:ARROW:HURT:3d6
-F:MALE | 
+F:MALE | FEMALE | 
 F:FRIENDS | DROP_60 | 
 F:OPEN_DOOR | BASH_DOOR | RES_DARK | ARCHER
 F:EVIL | ORC | LEVEL_POWER
-D:He is a large orc with powerful arms and oily green skin.
+D:|He|She| is a large orc with powerful arms and oily green skin.
 
 N:1001:Night orc
 G:o:b
@@ -14578,12 +14578,12 @@ M:11:11:0:25
 B:HIT:HURT:3d4
 B:HIT:BLIND:3d6
 B:DART:BLIND:3d5
-F:MALE | 
+F:MALE | FEMALE | 
 F:FRIENDS | DROP_60 | 
 F:OPEN_DOOR | BASH_DOOR | RES_DARK | ARCHER
 F:EVIL | ORC | HURT_LITE | LEVEL_POWER
 S:DARKNESS
-D:He is a large orc with powerful arms and night blue skin.
+D:|He|She| is a large orc with powerful arms and night blue skin.
 
 N:1002:Mirkwood orc
 G:o:u
@@ -14593,11 +14593,11 @@ M:25:0:0:0
 B:HIT:WOUND:3d6
 B:HIT:POISON:3d4
 B:ARROW:HURT:3d6
-F:MALE | CAN_CLIMB |
+F:MALE | FEMALE | CAN_CLIMB |
 F:FRIENDS | DROP_60 | 
 F:OPEN_DOOR | BASH_DOOR | RES_DARK | ARCHER
 F:EVIL | ORC | LEVEL_POWER
-D:He is a large orc with powerful arms and brown barklike skin.
+D:|He|She| is a large orc with powerful arms and brown barklike skin.
 
 N:1003:Mountain orc
 G:o:U
@@ -14607,7 +14607,7 @@ M:20:0:0:0
 B:CLAW:HURT:1d6
 B:CLAW:HURT:1d6
 B:SHOT:HURT:3d5
-F:MALE | 
+F:MALE | FEMALE | 
 F:FRIENDS | DROP_60 | 
 F:OPEN_DOOR | BASH_DOOR | CAN_CLIMB | RES_DARK
 F:EVIL | ORC | LEVEL_POWER
@@ -14621,7 +14621,7 @@ M:18:0:0:0
 B:HIT:HURT:1d5
 B:BITE:HURT:1d4
 B:DART:HURT:2d5
-F:MALE | 
+F:MALE | FEMALE | 
 F:FRIENDS | DROP_60 | 
 F:OPEN_DOOR | BASH_DOOR | RES_DARK
 F:EVIL | ORC | LEVEL_POWER | IM_POIS
@@ -14634,7 +14634,7 @@ W:11:3:0:25
 M:20:0:0:0
 B:HIT:HURT:1d8
 B:DART:HURT:3d4
-F:MALE | 
+F:MALE | FEMALE | 
 F:FRIENDS | DROP_60 | 
 F:OPEN_DOOR | BASH_DOOR | CAN_SWIM | RES_DARK
 F:EVIL | ORC | LEVEL_POWER
@@ -14647,12 +14647,12 @@ W:15:3:0:25
 M:15:15:0:20
 B:HIT:HURT:2d5
 B:DAGGER:HURT:2d5
-F:MALE | 
+F:MALE | FEMALE | 
 F:FRIENDS | DROP_60 | 
 F:OPEN_DOOR | BASH_DOOR | 
 F:EVIL | ORC | RES_DARK | LEVEL_POWER
 S:BLINK
-D:He is a vicious orc with a pale grey face.
+D:|He|She| is a vicious orc with a pale grey face.
 
 N:1007:Green ogre
 G:O:g
@@ -14750,7 +14750,7 @@ W:20:3:0:140
 B:HIT:BATTER:2d10
 B:HIT:BATTER:2d10
 B:HIT:BATTER:2d10
-F:MALE |
+F:MALE | FEMALE |
 F:ESCORT | DROP_90 | 
 F:OPEN_DOOR | BASH_DOOR | WARRIOR |
 F:EVIL | GIANT | ORC | SMART | LEVEL_POWER | LEVEL_SIZE
@@ -14764,7 +14764,7 @@ B:HIT:BATTER:2d12
 B:HIT:BATTER:2d12
 B:HIT:BATTER:2d12
 B:HIT:BATTER:2d12
-F:MALE |
+F:MALE | FEMALE |
 F:ESCORT | DROP_1D2 | 
 F:OPEN_DOOR | BASH_DOOR | WARRIOR |
 F:EVIL | GIANT | ORC | SMART | LEVEL_POWER | LEVEL_SIZE
@@ -14779,13 +14779,13 @@ B:HIT:BATTER:3d12
 B:HIT:BATTER:3d12
 B:HIT:BATTER:3d12
 B:XBOLT:HURT:6d7
-F:MALE |
+F:MALE | FEMALE |
 F:ESCORT | ESCORTS | DROP_1D2 | 
 F:OPEN_DOOR | BASH_DOOR | WARRIOR | SMART
 F:EVIL | GIANT | ORC | LEVEL_POWER | LEVEL_SIZE
-D:A massive, heavily armoured figure who dominates his kind.
+D:A massive, heavily armoured figure who dominates |his|her| kind.
 
-N:1017:Ogre priest
+N:1017:Ogre priest||ess|
 G:O:B
 I:110:25d12:20:40:30
 W:33:2:0:300
@@ -14801,18 +14801,18 @@ F:EVIL | GIANT | ORC | PRIEST | LEVEL_POWER | LEVEL_SIZE
 S:HEAL | HOLD | SCARE | WOUND | TPORT | HASTE | CURE | BLESS
 D:A hideous ogre wrapped in dark priestly robes.
 
-N:1018:Bumbling priest
+N:1018:Bumbling priest||ess|
 G:p:b
 I:110:5d4:20:10:10
 W:0:2:0:0
 M:0:8:0:14
 B:HIT:HURT:1d5
-F:MALE | 
+F:MALE | FEMALE | 
 F:FORCE_SLEEP | RAND_25 |
 F:DROP_60 | HAS_LITE | NEED_LITE | PRIEST | LOW_MANA_RUN
 F:OPEN_DOOR | FORCE_DEPTH | TOWNSFOLK | PRIEST
 S:HEAL | SCARE | BLESS
-D:He is bumbling and ineffectual at the best of times.
+D:|He|She| is bumbling and ineffectual at the best of times.
 
 N:1019:Apprentice shaman
 G:p:W
@@ -14820,12 +14820,12 @@ I:110:4d4:20:6:5
 W:3:1:1:8
 M:0:8:2:23
 B:HIT:HURT:1d4
-F:MALE | 
+F:MALE | FEMALE | 
 F:FORCE_SLEEP | 
 F:DROP_60 | HAS_LITE | NEED_LITE | FRIEND
 F:OPEN_DOOR | PRIEST | MAGE | LOW_MANA_RUN
 S:BLINK | BOLT_MANA | HEAL | S_ANIMAL | SCARE | BLESS
-D:He waves a magical talisman at you.
+D:|He|She| waves a magical talisman at you.
 
 N:1020:Novice shaman
 G:p:W
@@ -14833,12 +14833,12 @@ I:110:6d6:20:6:10
 W:6:2:2:8
 M:0:15:2:23
 B:HIT:BATTER:1d6
-F:MALE | 
+F:MALE | FEMALE | 
 F:FORCE_SLEEP | 
 F:FRIENDS | DROP_60 | HAS_LITE | NEED_LITE | PRIEST | MAGE
 F:OPEN_DOOR | LOW_MANA_RUN
 S:BLINK | BOLT_MANA | HEAL | S_ANIMAL | SCARE | BLESS
-D:He waves a magical talisman at you.
+D:|He|She| waves a magical talisman at you.
 
 N:1021:Black bishop
 G:p:D
@@ -14848,12 +14848,12 @@ M:0:20:20:76
 B:HIT:HURT:5d5
 B:HIT:HURT:5d5
 B:HIT:HURT:5d5
-F:MALE | 
+F:MALE | FEMALE | 
 F:FORCE_SLEEP | DROP_1D2 | DROP_90 |
 F:SMART | OPEN_DOOR | BASH_DOOR | PRIEST | WARRIOR |
 F:EVIL | NEED_LITE | RES_NETHR | LOW_MANA_RUN | LEVEL_POWER
 S:BLIND | SCARE | WOUND | WOUND | HEAL | HOLD | CURE | BALL_DARK | BLESS
-D:He is a figure encased in deep black plate armour and
+D:|He|She| is a figure encased in deep black plate armour and
 D: wielding a black spiked mace.
 
 N:1022:Green giant
@@ -15009,14 +15009,14 @@ I:110:4d4:20:6:5
 W:0:2:0:0
 M:0:8:0:14
 B:HIT:HURT:1d3
-F:MALE | RAND_50 |
+F:MALE | FEMALE | RAND_50 |
 F:FORCE_SLEEP | 
 F:DROP_60 | HAS_LITE | NEED_LITE |
 F:OPEN_DOOR | MAGE | FORCE_DEPTH | TOWNSFOLK
 S:BLINK | CONF
-D:He can't see straight, let alone cast spells straight.
+D:|He|She| can't see straight, let alone cast spells straight.
 
-N:1034:Sorcerer
+N:1034:Sorcere|r|ss|
 G:q:v
 I:130:52d100:20:60:10
 W:82:2:0:5000
@@ -15024,7 +15024,7 @@ M:0:70:90:200
 B:HIT:HURT:6d8
 B:HIT:HURT:6d8
 B:HIT:HURT:6d8
-F:MALE | ATTR_MULTI |
+F:MALE | FEMALE | ATTR_MULTI |
 F:FORCE_SLEEP | FORCE_MAXHP | SMART | POWERFUL
 F:ONLY_ITEM | DROP_4D2 | DROP_GOOD | DROP_USEFUL |
 F:OPEN_DOOR | BASH_DOOR | TAKE_ITEM | NEED_LITE | MAGE
@@ -15034,8 +15034,8 @@ S:BOLT_ACID | BALL_FIRE | BALL_COLD | BALL_POIS | OPPOSE_ELEM | SHIELD
 S:S_MONSTER | S_UNDEAD | S_DRAGON | S_HI_DRAGON | S_HI_UNDEAD | BOLT_MANA | S_CLASS
 S:HASTE | BLINK | TPORT | SCARE | BLIND | CONF | HOLD | ILLUSION
 S:BALL_LITE | BALL_CONFU | BALL_SOUND | BALL_CHAOS | BALL_MANA | ARC_FORCE | PROBE
-D:A human figure in robes, he moves with magically improved speed, and his
-D: hands are ablur with spell casting. You stagger at the mighty sound of his
+D:A human figure in robes, |he|she| moves with magically improved speed, and |his|her|
+D: hands are ablur with spell casting. You stagger at the mighty sound of |his|her|
 D: spells as they echo hollowly through the dungeon.
 
 N:1035:Giant field mouse
@@ -15171,21 +15171,21 @@ B:BITE:POISON:1d6
 F:ANIMAL | EAT_BODY | LEVEL_SIZE
 D:It is a deep black lizard with large overlapping scales and a poisonous bite.
 
-N:1048:Errand boy
+N:1048:Errand |boy|girl|
 G:t:G
 I:110:1d4:4:1:40
 W:0:1:0:0
-F:MALE | NEVER_BLOW
+F:MALE | FEMALE | NEVER_BLOW
 F:TAKE_ITEM | OPEN_DOOR | HAS_LITE | FORCE_DEPTH | TOWNSFOLK | NEED_LITE
-D:He has no time to talk to you.
+D:|He|She| has no time to talk to you.
 
-N:1049:Hobbit good wife
+N:1049:Hobbit |gentleman|good wife|
 G:h:G
 I:110:1d4:4:1:40
 W:0:1:0:0
-F:FEMALE | NEVER_BLOW
+F:MALE | FEMALE | NEVER_BLOW
 F:OPEN_DOOR | HAS_LITE | FORCE_DEPTH | TOWNSFOLK | NEED_LITE
-D:She is a merry looking woman on an errand.
+D:|He|She| is a merry looking ||wo|man on an errand.
 
 
 #The Skeleton 2-Headed Troll:
@@ -15261,10 +15261,10 @@ I:110:3d3:10:5:10
 W:0:3:0:0
 M:5:0:0:0
 B:BEG
-F:MALE | RAND_25 | TOWNSFOLK | FORCE_DEPTH
+F:MALE | FEMALE | RAND_25 | TOWNSFOLK | FORCE_DEPTH
 F:ONLY_GOLD | DROP_60 | DROP_90 | HAS_LITE | NEED_LITE |
 F:TAKE_ITEM | OPEN_DOOR
-D:This shill seems a little out of place and down on his luck.
+D:This shill seems a little out of place and down on |his|her| luck.
 
 #The Seedy Looking Human:
 #At least 99 of these creatures have been killed by contributors to your monster
@@ -15284,13 +15284,13 @@ B:HIT:EAT_ITEM:5d5
 B:HIT:EAT_ITEM:5d5
 B:HIT:EAT_GOLD:5d5
 B:SHOT:HURT:37d5
-F:MALE | DROP_2D2 |
+F:MALE | FEMALE | DROP_2D2 |
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR | SNEAKY |
 F:EVIL | SMART | POWERFUL
 S:BLINK | TPORT | TELE_SELF_TO | CONF | TRAPS | TELE_TO
 S:DARKNESS | BLIND | SLOW
-D:A class of its own: you are already too late to protect your possessions -
-D: and he seems to have studied magic too, and is a master of setting traps.
+D:A class of |his|her| own: you are already too late to protect your possessions -
+D: and |he|her| seems to have studied magic too, and is a master of setting traps.
 
 N:1058:Easterling
 G:t:R
@@ -15301,7 +15301,7 @@ B:HIT:WOUND:3d8
 B:HIT:WOUND:3d8
 B:XBOLT:HURT:15d7
 F:FORCE_SLEEP | FORCE_MAXHP |
-F:EVIL | MALE | SMART | WARRIOR | SMART | ARCHER | LEVEL_POWER
+F:EVIL | MALE | FEMALE | SMART | WARRIOR | SMART | ARCHER | LEVEL_POWER
 F:IM_FIRE | IM_COLD | IM_ELEC | NO_CONF | NO_SLEEP | NEED_LITE
 F:DROP_2D2
 D:Easterlings are an evil warrior people, dressed in blood-red
@@ -15397,13 +15397,13 @@ B:HIT:BATTER:2d7
 B:BITE:BATTER:2d5
 B:BITE:ACID:2d5
 F:CAN_SWIM | 
-F:MALE |
+F:MALE | FEMALE |
 F:FORCE_MAXHP | FRIENDS | DROP_90 |
 F:OPEN_DOOR | BASH_DOOR | HUGE
 F:EVIL | TROLL | EAT_BODY | IM_POIS | IM_ACID | HURT_LITE | LEVEL_POWER | LEVEL_SIZE
-D:A massive and cruel troll, acidic drool drips down his hideous face.
+D:A massive and cruel troll, acidic drool drips down |his|her| hideous face.
 
-N:1066:Incubus
+N:1066:|Incubus|Succubus|
 G:U:D
 I:110:24d10:20:50:80
 W:24:2:0:1000
@@ -15416,7 +15416,7 @@ F:OPEN_DOOR | BASH_DOOR | POWERFUL |
 F:EVIL | DEMON | RES_MAGIC | 
 F:IM_FIRE | IM_POIS | NO_CONF | NO_SLEEP | LEVEL_POWER | IM_COLD
 S:BLIND | CONF | BOLT_FIRE
-D:It is a black, horned humanoid with wings.
+D:|He|She| is a |handsome|beautiful| half-dressed humanoid with small horns and wings.
 
 #The King Vampire:
 #At least 99 of these creatures have been killed by contributors to your monster
@@ -15550,9 +15550,9 @@ W:3:1:0:5
 M:14:0:0:0
 B:HIT:HURT:1d6
 B:SHOT:HURT:1d5
-F:MALE | SMART | LEVEL_SIZE
+F:MALE | FEMALE | SMART | LEVEL_SIZE
 F:OPEN_DOOR | TAKE_ITEM
-D:A squat, ugly humanoid covered with grime. He looks a bit like a
+D:A squat, ugly humanoid covered with grime. |He|She| looks a bit like a
 D: stunted chimpanzee.
 
 N:1076:Chimpanzee
@@ -15563,10 +15563,10 @@ M:14:0:0:0
 B:HIT:HURT:2d7
 B:HIT:HURT:2d6
 B:SHOT:HURT:1d5
-F:MALE |
+F:MALE | FEMALE |
 F:FRIENDS | TAKE_ITEM
 F:BASH_DOOR | SMART | LEVEL_SIZE
-D:A squat, man-like ape covered with fur.
+D:A squat, ||wo|man-like ape covered with fur.
 
 N:1077:Gorilla
 G:Y:s
@@ -15575,7 +15575,7 @@ W:12:2:0:18
 M:14:0:0:0
 B:HIT:HURT:4d8
 B:SHOT:HURT:1d5
-F:MALE | BASH_DOOR | SMART | FRIEND | LEVEL_SIZE
+F:MALE | FEMALE | BASH_DOOR | SMART | FRIEND | LEVEL_SIZE
 F:TAKE_ITEM
 D:A huge, lumbering humanoid covered with thick black fur. 
 
@@ -15587,9 +15587,9 @@ M:14:0:0:0
 B:HIT:HURT:1d10
 B:HIT:HURT:1d10
 B:SHOT:HURT:1d5
-F:MALE | BASH_DOOR | SMART | LEVEL_SIZE
+F:MALE | FEMALE | BASH_DOOR | SMART | LEVEL_SIZE
 F:TAKE_ITEM
-D:A humanoid covered with orange fur. His arms are twice as long as his
+D:A humanoid covered with orange fur. |His|Her| arms are twice as long as |his|her|
 D: legs.
 
 N:1079:Crystal hound
@@ -16714,7 +16714,7 @@ B:HIT:HURT:5d6
 B:HIT:HURT:5d5
 B:HIT:HURT:5d5
 B:HIT:HURT:5d6
-F:MALE | FORCE_MAXHP | FORCE_SLEEP | ONLY_ITEM | DROP_2D2
+F:MALE | FEMALE | FORCE_MAXHP | FORCE_SLEEP | ONLY_ITEM | DROP_2D2
 F:DROP_3D2 | SMART | HAS_LITE | OPEN_DOOR | BASH_DOOR
 F:TAKE_ITEM | LOW_MANA_RUN | POWERFUL | IM_ACID | IM_ELEC
 F:IM_FIRE | IM_COLD | IM_POIS | RES_NETHR | SMART
@@ -16768,7 +16768,7 @@ S:BOLT_PLAS | S_KIN
 D:A massive glowing eagle bathed in flames.  The searing heat chars your
 D: skin and melts your armour.
 
-N:1157:Minotaur Lord
+N:1157:Minotaur |lord|lady|
 G:H:v
 I:130:47d100:30:120:30
 W:99:4:0:24000
@@ -16777,14 +16777,14 @@ B:BUTT:HURT:24d13
 B:HIT:WOUND:20d10
 B:LASH:WOUND:20d10
 B:XBOLT:HURT:70d7
-F:MALE | FORCE_MAXHP | FORCE_SLEEP | ONLY_ITEM
+F:MALE | FEMALE | FORCE_MAXHP | FORCE_SLEEP | ONLY_ITEM
 F:DROP_2D2 | DROP_3D2 | DROP_GOOD | BASH_DOOR | EVIL
 F:IM_FIRE | IM_POIS | RES_PLAS | NO_STUN | NO_CONF
 F:NO_SLEEP | LEVEL_POWER
 S:BRTH_FORCE | BALL_ELEC | BOLT_PLAS
 S:BOLT_MANA | SLOW
-D:A fearsome bull-headed monster, Baphomet swings a mighty axe as he
-D: curses all that defy him.
+D:A fearsome bull-headed monster, |he|she| swings a mighty axe as |he|she|
+D: curses all that defy |him|her|.
 
 N:1158:Evil Iggy
 G:p:v1
@@ -16891,16 +16891,16 @@ B:GAZE:UN_BONUS:6d6
 B:GAZE:UN_POWER:6d6
 B:GAZE:LOSE_INT:6d6
 B:BITE:EXP_80:8d8
-F:MALE | FORCE_MAXHP | FORCE_SLEEP | SMART
+F:MALE | FEMALE | FORCE_MAXHP | FORCE_SLEEP | SMART
 F:CAN_FLY | BASH_DOOR | EVIL | IM_ACID | IM_FIRE
 F:IM_COLD | IM_POIS | NO_FEAR | NO_STUN
 F:NO_CONF | NO_SLEEP | LEVEL_POWER | RES_MAGIC
 S:BALL_ACID | BALL_FIRE | BALL_COLD | BALL_DARK | BALL_NETHR
 S:BOLT_MANA | FORGET | DRAIN_MANA | MIND_BLAST | SCARE | PROBE
 S:BLIND | CONF | S_KIN
-D:A beholder of great size and age, floating in the air.  His gaze seems
-D: to shred your soul and his spells crush your will.  He is ancient,
-D: his history steeped in forgotten evils, his atrocities numerous and
+D:A beholder of great size and age, floating in the air.  |His|Her| gaze seems
+D: to shred your soul and |his|her| spells crush your will.  |He|She| is ancient,
+D: his history steeped in forgotten evils, |his|her| atrocities numerous and
 D: sickening.
 
 N:1164:Diamond golem
@@ -17055,14 +17055,14 @@ D:Twelve feet long and emerald green, famed for sudden ambush and sudden death.
 
 # Good equivalent to dark elven cultist above.
 
-N:1174:Wood elf priest
+N:1174:Wood elf priest||ess|
 G:l:w
 I:115:15d10:20:30:30
 W:14:2:0:95
 M:0:25:9:50
 B:HIT:HURT:2d4
 B:HIT:HURT:2d4
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:ONLY_ITEM | DROP_1D2
 F:SMART | OPEN_DOOR | BASH_DOOR
@@ -17079,10 +17079,10 @@ M:33:33:8:35
 B:HIT:POISON:2d6
 B:HIT:WOUND:2d6
 B:DART:POISON:10d5
-F:MALE | FORCE_SLEEP | OPEN_DOOR | BASH_DOOR | 
+F:MALE | FEMALE | FORCE_SLEEP | OPEN_DOOR | BASH_DOOR | 
 F:DROP_1D2 | EVIL | NO_SLEEP | SMART | LEVEL_POWER
 S:DARKNESS | BLIND
-D:A grey-clad figure, knives in hand, moving with speed.  He has you in his 
+D:A grey-clad figure, knives in hand, moving with speed.  |He|She| has you in |his|her| 
 D:sights.
 
 N:1179:Nruling
@@ -17205,9 +17205,9 @@ W:6:2:30:25
 M:40:0:0:0
 B:HIT:HURT:1d5
 B:ARROW:HURT:2d6
-F:MALE | FORCE_SLEEP | OPEN_DOOR | FRIEND
+F:MALE | FEMALE | FORCE_SLEEP | OPEN_DOOR | FRIEND
 F:ONLY_GOLD | DROP_90 | SMART | ARCHER
-D:A nasty little fellow with a bow and arrow.
+D:A nasty little |fellow|lass| with a bow and arrow.
 
 # From Sangband
 
@@ -17219,9 +17219,9 @@ M:40:0:0:0
 B:HIT:HURT:1d5
 B:HIT:HURT:1d5
 B:ARROW:HURT:3d6
-F:MALE | FORCE_SLEEP | OPEN_DOOR | FRIENDS
+F:MALE | FEMALE | FORCE_SLEEP | OPEN_DOOR | FRIENDS
 F:ONLY_GOLD | DROP_90 | SMART | ARCHER
-D:A nasty little fellow with a bow and arrow.
+D:A nasty little |fellow|lass| with a bow and arrow.
 
 #From Sangband
 
@@ -17273,26 +17273,26 @@ M:20:0:8:0
 B:HIT:WOUND:6d5
 B:HIT:WOUND:6d5
 B:XBOLT:HURT:10d7
-F:MALE
+F:MALE | FEMALE
 F:DROP_1D2
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:NEED_LITE | SMART | FRIEND | LEVEL_SIZE
 F:WARRIOR | NO_FEAR
 D:A scarred warrior who moves with confidence.
 
-N:1194:Dwarf high priest
+N:1194:Dwarf high priest||ess|
 G:h:w
 I:110:33d10:20:28:30
 W:17:2:0:140
 M:0:33:12:70
 B:HIT:HURT:3d5
 B:HIT:HURT:3d5
-F:MALE | EVIL | FORCE_SLEEP | OPEN_DOOR | BASH_DOOR | TAKE_ITEM | 
+F:MALE | FEMALE | EVIL | FORCE_SLEEP | OPEN_DOOR | BASH_DOOR | TAKE_ITEM | 
 F:DROP_1D2 | FRIEND | PRIEST | RES_BLIND
 F:SMART | LEVEL_POWER
 S:BALL_LITE | HEAL | CURE | SCARE | BLIND | HOLD | BLESS
-D:A stocky, white-bearded dwarf with a pious but haughty expression.  Stauch is he 
-D:to defend the temples of his people; to him, all intruders are enemies.
+D:A stocky, white-bearded dwarf with a pious but haughty expression.  Stauch is |he|she| 
+D:to defend the temples of |his|her| people; to |him|her|, all intruders are enemies.
 
 N:1195:Slinger
 G:t:w
@@ -17302,7 +17302,7 @@ M:90:0:11:0
 B:HIT:HURT:1d9
 B:HIT:HURT:1d9
 B:SHOT:HURT:14d5
-F:MALE | FRIEND | OPEN_DOOR | BASH_DOOR | 
+F:MALE | FEMALE | FRIEND | OPEN_DOOR | BASH_DOOR | 
 F:DROP_60 | SMART | ARCHER | LEVEL_POWER
 D:An skilled and experienced slinger whipping missiles at you with deadly
 D: accuracy.
@@ -17384,7 +17384,7 @@ M:90:0:15:0
 B:HIT:HURT:1d8
 B:HIT:HURT:1d8
 B:ARROW:HURT:17d6
-F:MALE | FORCE_SLEEP | OPEN_DOOR | BASH_DOOR | 
+F:MALE | FEMALE | FORCE_SLEEP | OPEN_DOOR | BASH_DOOR | 
 F:DROP_1D2 | SMART | ARCHER | LEVEL_POWER
 D:A dangerous archer with a longbow and a quiver full of arrows.
 
@@ -17453,7 +17453,7 @@ I:115:36d10:20:15:10
 W:29:3:0:530
 M:0:50:22:90
 B:HIT:HURT:2d5
-F:MALE | FORCE_SLEEP | OPEN_DOOR |
+F:MALE | FEMALE | FORCE_SLEEP | OPEN_DOOR |
 F:DROP_2D2 | EVIL | SMART | LOW_MANA_RUN | LEVEL_POWER
 S:BALL_LITE | BALL_DARK | BALL_CONFU | BALL_CHAOS | 
 S:HASTE | ADD_MANA | BLINK | CONF | SLOW
@@ -17507,7 +17507,7 @@ B:HIT:ELEC:8d9
 B:CRUSH:HURT:6d3
 B:XBOLT:HURT:25d7
 B:BOULDER:SOUND:25d9
-F:MALE | FORCE_SLEEP | ESCORT | 
+F:MALE | FEMALE | FORCE_SLEEP | ESCORT | 
 F:OPEN_DOOR | BASH_DOOR | TAKE_ITEM | 
 F:DROP_2D2 | GIANT | EVIL | IM_ELEC | 
 F:SMART | HUGE | LEVEL_POWER
@@ -17635,7 +17635,7 @@ F:IM_EDGED | HURT_ROCK | IM_FIRE | IM_POIS | LEVEL_SIZE
 D:Deep beneath the surface burrow serpents that feed on gold; the very 
 D:mountains tremble as their roots are smashed and shattered.
 
-N:1220:Patriarch
+N:1220:|Patriarch|Matriarch|
 G:p:b
 I:120:160d10:20:35:25
 W:54:2:0:3300
@@ -17643,13 +17643,13 @@ M:0:50:50:110
 B:HIT:HURT:3d7
 B:HIT:HURT:3d7
 B:HIT:HURT:3d7
-F:MALE | EVIL | FORCE_SLEEP | OPEN_DOOR | BASH_DOOR | 
+F:MALE | FEMALE | EVIL | FORCE_SLEEP | OPEN_DOOR | BASH_DOOR | 
 F:DROP_90 | DROP_3D2 | EVIL | NO_CONF | NO_SLEEP | 
 F:SMART | PRIEST | LEVEL_POWER
 S:BALL_LITE | HASTE | ADD_MANA | HEAL | CURE | BLINK | CURSE | MIND_BLAST | 
 S:WOUND | SCARE | BLIND | HOLD | BLESS | CURSE
 S:S_MONSTERS | S_UNDEAD
-D:A dark priest of the highest order.  Powerful and evil, beware his many 
+D:A dark priest of the highest order.  Powerful and evil, beware |his|her| many 
 D:spells.
 
 N:1221:Legendary hobbit rogue
@@ -17661,7 +17661,7 @@ B:HIT:BLIND:4d11
 B:HIT:PARALYZE:4d11
 B:TOUCH:EAT_GOLD
 B:TOUCH:EAT_ITEM
-F:MALE | FORCE_SLEEP | EMPTY_MIND | 
+F:MALE | FEMALE | FORCE_SLEEP | EMPTY_MIND | 
 F:OPEN_DOOR | BASH_DOOR | TAKE_ITEM | EVASIVE | 
 F:DROP_4D2 | SMART 
 S:BLINK | TELE_SELF_TO | TELE_TO | DARKNESS | TRAPS | BLIND | HOLD
@@ -17708,13 +17708,13 @@ B:HIT:ELEC:1d12
 B:HIT:ACID:1d12
 B:HIT:FIRE:1d12
 B:HIT:COLD:1d12
-F:MALE | OPEN_DOOR | BASH_DOOR | ATTR_MULTI
+F:MALE | FEMALE | OPEN_DOOR | BASH_DOOR | ATTR_MULTI
 F:DROP_4D2 | IM_ACID | IM_ELEC | IM_FIRE | IM_COLD | RES_PLAS | LEVEL_POWER
 F:NO_SLEEP | SMART | LOW_MANA_RUN | ELF | RES_LITE | MAGE | NEED_LITE
 S:BALL_ACID | BALL_ELEC | BALL_FIRE | BALL_COLD | BOLT_PLAS | BOLT_ICE | 
 S:ADD_MANA | CONF | SLOW | PROBE
 D:A high-elven sorcerer clad in a shimmering gown that dances in every color 
-D:of the rainbow.  The greatest of elemental magics are his to command.
+D:of the rainbow.  The greatest of elemental magics are |his|hers| to command.
 
 N:1225:Wizard of the High Council
 G:h:w
@@ -17724,13 +17724,13 @@ M:0:50:90:80
 B:HIT:UN_POWER:1d16
 B:HIT:UN_BONUS:1d16
 B:HIT:CONFUSE:1d16
-F:MALE | OPEN_DOOR |
+F:MALE | FEMALE | OPEN_DOOR |
 F:DROP_4D2 | RES_NEXUS | MAGE
 F:NO_SLEEP | SMART | LOW_MANA_RUN | NEED_LITE | DWARF | NO_SLOW | LEVEL_POWER
 S:BALL_LITE | BALL_CONFU | BALL_SOUND | BALL_CHAOS | BALL_MANA | ARC_FORCE | 
 S:ADD_MANA | BLIND | CONF | OPPOSE_ELEM | PROBE
-D:Short of stature though this ancient gnome may be, his reputation in the 
-D:esoteric magics is unsurpassed, and his spells the stuff of wonder.
+D:Short of stature though this ancient gnome may be, |his|her| reputation in the 
+D:esoteric magics is unsurpassed, and |his|her| spells the stuff of wonder.
 
 N:1226:Tyrant of Hell
 G:U:o
@@ -17740,14 +17740,14 @@ M:50:50:85:120
 B:HIT:HURT:1d7
 B:HIT:UN_POWER:1d7
 B:SHRIEK:LOSE_CON:1d7
-F:MALE | FORCE_SLEEP | 
+F:MALE | FEMALE | FORCE_SLEEP | 
 F:OPEN_DOOR | BASH_DOOR | DEMON | RES_MAGIC
 F:DROP_4D2 | EVIL | SMART | LEVEL_POWER
 S:BOLT_MANA | ARC_HFIRE | 
 S:ADD_MANA | CURSE | MIND_BLAST | WOUND | HOLD | 
 S:S_DEMON | S_HI_DEMON | OPPOSE_ELEM
 D:A haughty-faced humanoid the size of a child, surrounded by the dark fire 
-D:of the nethermost hells.  As he gestures imperiously, demons materialize 
+D:of the nethermost hells.  As |he|she| gestures imperiously, demons materialize 
 D:and leap upon you.
 
 N:1227:Aetheroi
@@ -18088,12 +18088,12 @@ M:20:20:8:30
 B:HIT:HURT:3d5
 B:HIT:HURT:3d5
 B:FLASK:EXPLODE:12d7
-F:MALE
+F:MALE | FEMALE
 F:DROP_1D2
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:NEED_LITE | SMART | LEVEL_POWER
 S:TRAPS
-D:An expert with traps and explosives, he is missing only a couple of fingers.
+D:An expert with traps and explosives, |he|she| is missing only a couple of fingers.
 
 N:1252:Smoke hound
 G:Z:v
@@ -18136,7 +18136,7 @@ I:110:20d8:20:40:10
 W:17:1:0:200
 M:0:40:22:84
 B:HIT:WOUND:5d5
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP
 F:ONLY_ITEM | DROP_1D2
 F:SMART | OPEN_DOOR | BASH_DOOR
@@ -18388,22 +18388,22 @@ M:90:25:4:45
 B:HIT:HURT:5d4
 B:HIT:HURT:5d4
 B:ARROW:HURT:5d6
-F:MALE
+F:MALE | FEMALE
 F:DROP_1D2
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:WARRIOR | MAGE | NEED_LITE | ARCHER | ELF | RES_LITE | LEVEL_POWER
 S:S_SPIDER
 S:BOLT_COLD | BOLT_ELEC | BLINK | CURE
 D:An elven master of both bow and sword, with minor spellcasting
-D: skills, and spiders come to do his bidding.
+D: skills, and spiders come to do |his|her| bidding.
 
-N:1275:Wood elf enchanter
+N:1275:Wood elf enchant|er|ress|
 G:l:b
 I:115:24d8:20:10:10
 W:21:2:0:125
 M:0:40:14:75
 B:HIT:HURT:5d4
-F:MALE
+F:MALE | FEMALE
 F:FORCE_SLEEP | DROP_1D2
 F:SMART | OPEN_DOOR
 F:EVIL | NEED_LITE
@@ -18421,7 +18421,7 @@ M:20:0:8:0
 B:HIT:WOUND:8d5
 B:HIT:WOUND:8d5
 B:XBOLT:HURT:12d7
-F:MALE
+F:MALE | FEMALE
 F:DROP_1D2
 F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
 F:NEED_LITE | SMART | SUPER_SCENT
@@ -18469,12 +18469,13 @@ B:CRUSH:HURT:13d11
 B:CRUSH:HURT:13d11
 B:AURA:ANIM_TREE
 F:FORCE_SLEEP | FORCE_MAXHP
+F:MALE
 F:ONLY_ITEM | DROP_4D2 | DROP_GOOD | HUGE | HAS_AURA
 F:SMART | TAKE_ITEM | OPEN_DOOR | BASH_DOOR | DROP_POTION
-F:MALE
-D:A treeherd; a sentient, moving tree. Its wrath is fearsome!
+F:MALE | FEMALE
+D:A treeherd; a sentient, moving tree. His wrath is fearsome!
 
-N:1280:Animatrix
+N:1280:Animat|or|rix|
 G:q:b
 I:110:24d8:20:10:10
 W:20:2:0:125
@@ -18488,7 +18489,7 @@ F:SMART | OPEN_DOOR
 F:EVIL | NEED_LITE | ARCHER
 F:MAGE | LOW_MANA_RUN | LEVEL_POWER | HAS_AURA
 S:ADD_MANA | INVIS | BLINK | A_OBJECT | ADD_AMMO
-D:A female spell caster surrounded by flying daggers.
+D:A spell caster surrounded by flying daggers.
 
 N:1281:Zombified dog
 G:C:y
@@ -18689,7 +18690,7 @@ W:12:2:0:18
 M:14:0:0:0
 B:HIT:HURT:4d8
 B:SHOT:HURT:1d5
-F:MALE | BASH_DOOR | SMART | FRIEND | LEVEL_SIZE
+F:BASH_DOOR | SMART | FRIEND | LEVEL_SIZE
 F:UNDEAD | IM_POIS | IM_COLD | NONLIVING | NO_FEAR
 F:EMPTY_MIND | COLD_BLOOD | EVIL | NO_CONF | NO_SLEEP
 F:LEVEL_SIZE | LEVEL_SPEED | LEVEL_POWER
@@ -18704,7 +18705,7 @@ M:14:0:0:0
 B:HIT:HURT:1d8
 B:SHOT:HURT:1d5
 B:SHRIEK
-F:MALE | OPEN_DOOR | TAKE_ITEM
+F:OPEN_DOOR | TAKE_ITEM
 F:FRIENDS | CAN_FLY | SMART | EVASIVE
 D:It is a monkey with wings!
 
