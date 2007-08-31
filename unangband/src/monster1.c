@@ -1770,7 +1770,6 @@ static void cheat_monster_lore(const monster_race *r_ptr, monster_lore *l_ptr)
 {
 	int i;
 
-
 	/* Hack -- Maximal kills */
 	l_ptr->tkills = MAX_SHORT;
 
@@ -1919,7 +1918,7 @@ static void roff_top(const monster_race *r_ptr, int m_idx)
 	if (m_idx)
 	{
 		/* Describe the monster */
-		monster_desc(desc, 80, m_idx, 0x80);
+		monster_desc(desc, sizeof(desc), m_idx, 0x80);
 		
 		/* Capitalise the first letter */
 		if (islower(desc[0])) desc[0] = toupper(desc[0]);
@@ -1933,15 +1932,15 @@ static void roff_top(const monster_race *r_ptr, int m_idx)
 		/* It could be a Unique - no prefix */
 		if (r_ptr->flags1 & (RF1_UNIQUE))
 		{
-			my_strcpy(desc, "", 80);
+			my_strcpy(desc, "", sizeof(desc));
 		}
 		else
 		{
-			my_strcpy(desc, "The ", 80);			
+			my_strcpy(desc, "The ", sizeof(desc));			
 		}
 		
 		/* Start with the name (thus nominative and objective) */
-		my_strcat(desc, r_name + r_ptr->name, 80);
+		my_strcat(desc, r_name + r_ptr->name, sizeof(desc));
 		
 		/* Fix up genderised descriptions manually */
 		for (t = s = desc; *s; s++)
