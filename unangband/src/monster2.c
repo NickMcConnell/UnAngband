@@ -1133,6 +1133,9 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 
 	bool seen, pron;
 
+	int state = 0;
+	int match = 1;
+	char *s, *t;
 
 	/* Can we "see" it (forced, or not hidden + visible) */
 	seen = ((mode & (0x80)) || (!(mode & (0x40)) && m_ptr->ml));
@@ -1140,11 +1143,13 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 	/* Sexed Pronouns (seen and forced, or unseen and allowed) */
 	pron = ((seen && (mode & (0x20))) || (!seen && (mode & (0x10))));
 
+	/* Extract the gender if female */
+	if ((r_ptr->flags1 & (RF1_FEMALE)) && (!(r_ptr->flags1 & (RF1_MALE)) || (m_idx % 2))) match = 2;
 
 	/* First, try using pronouns, or describing hidden monsters */
 	if (!seen || pron)
 	{
-		/* an encoding of the monster "sex" */
+		/* Two encodings of the monster "sex" */
 		int kind = 0x00;
 
 		/* Extract the gender (if applicable) */
@@ -1196,7 +1201,6 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 		my_strcpy(desc, res, max);
 	}
 
-
 	/* Handle visible monsters, "reflexive" request */
 	else if ((mode & 0x02) && (mode & 0x01))
 	{
@@ -1205,7 +1209,6 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 		else if ((r_ptr->flags1 & (RF1_MALE)) && (!(r_ptr->flags1 & (RF1_FEMALE)) || !(m_idx % 2))) my_strcpy(desc, "himself", max);
 		else my_strcpy(desc, "itself", max);
 	}
-
 
 	/* Handle all other visible monster requests */
 	else
@@ -1265,8 +1268,8 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 					else if (((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_ARCHER)) != 0)) suffix = "ranger";
 					else if (((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_ARMOR)) != 0)) suffix = "warrior mage";
 					else if ((r_ptr->flags2 & (RF2_MAGE)) != 0) suffix = "mage";
-					else if (((r_ptr->flags2 & (RF2_PRIEST)) != 0) && ((r_ptr->flags2 & (RF2_ARMOR)) != 0)) suffix = "knight";
-					else if ((r_ptr->flags2 & (RF2_PRIEST)) != 0) suffix = "priest";
+					else if (((r_ptr->flags2 & (RF2_PRIEST)) != 0) && ((r_ptr->flags2 & (RF2_ARMOR)) != 0)) suffix = "|knight|princess|";
+					else if ((r_ptr->flags2 & (RF2_PRIEST)) != 0) suffix = "priest||ess|";
 					else if ((r_ptr->flags2 & (RF2_ARCHER)) != 0) suffix = "archer";
 					else if ((r_ptr->flags2 & (RF2_SNEAKY)) != 0) suffix = "scout";
 					else if ((r_ptr->flags2 & (RF2_ARMOR)) != 0) suffix = "warrior";
@@ -1371,6 +1374,23 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 			/* Append special notation */
 			my_strcat(desc, " (offscreen)", max);
 		}
+		
+		/* Remove gender sensitivity */
+		for (t = s = desc; *s; s++)
+		{
+			if (*s == '|')
+			{
+				state++;
+				if (state == 3) state = 0;
+			}
+			else if (!state || (state == match))
+			{
+				*t++ = *s;
+			}
+		}
+
+		/* Terminate buffer */
+		*t = '\0';
 	}
 }
 

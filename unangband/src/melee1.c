@@ -70,6 +70,9 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 
 	int d1, d2, scale;
 	int i, boost;
+	int n = 0;
+	
+	u32b flag[4];
 
 	/* Paranoia */
 	if ((r_ptr->flags9 & (RF9_LEVEL_SPEED | RF9_LEVEL_SIZE | RF9_LEVEL_POWER | RF9_LEVEL_AGE)) == 0) return (FALSE);
@@ -113,78 +116,20 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 	/* Set experience */
 	n_ptr->mexp = r_ptr->mexp * scale / 100;
 
-	/* Pick one flag out of the level flags if monster has multiple flags */
-	if ((r_ptr->flags9 & (RF9_LEVEL_AGE)) != 0)
+	/* Apply only one level flag */
+	if (n_ptr->flags9 & (RF9_LEVEL_AGE)) flag[n++] = RF9_LEVEL_AGE;
+	if (n_ptr->flags9 & (RF9_LEVEL_SPEED)) flag[n++] = RF9_LEVEL_SPEED;
+	if (n_ptr->flags9 & (RF9_LEVEL_POWER)) flag[n++] = RF9_LEVEL_POWER;
+	if (n_ptr->flags9 & (RF9_LEVEL_SIZE)) flag[n++] = RF9_LEVEL_SIZE;
+
+	/* Clear all but one flag */
+	if (n > 1)
 	{
-		if (((r_ptr->flags9 & (RF9_LEVEL_SPEED)) != 0) && ((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0)
-				 && ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0))
-		{
-			if (m_idx % 4 == 3) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_SPEED | RF9_LEVEL_SIZE);
-			else if (m_idx % 4 == 2) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_POWER | RF9_LEVEL_SIZE);
-			else if (m_idx % 4 == 1) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_POWER | RF9_LEVEL_SPEED);
-			else n_ptr->flags9 &= ~(RF9_LEVEL_SPEED | RF9_LEVEL_SIZE | RF9_LEVEL_POWER);
-		}
-		else if (((r_ptr->flags9 & (RF9_LEVEL_SPEED)) != 0) && ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0))
-		{
-			if (m_idx % 3 == 2) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_SPEED);
-			else if (m_idx % 3 == 1) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_POWER);
-			else n_ptr->flags9 &= ~(RF9_LEVEL_SPEED | RF9_LEVEL_POWER);
-		}
-		else if (((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0) && ((r_ptr->flags9 & (RF9_LEVEL_SPEED)) != 0))
-		{
-			if (m_idx % 3 == 2) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_SIZE);
-			else if (m_idx % 3 == 1) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_SPEED);
-			else n_ptr->flags9 &= ~(RF9_LEVEL_SIZE | RF9_LEVEL_SPEED);
-		}
-		else if (((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0) && ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0))
-		{
-			if (m_idx % 3 == 2) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_SIZE);
-			else if (m_idx % 3 == 1) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_POWER);
-			else n_ptr->flags9 &= ~(RF9_LEVEL_SIZE | RF9_LEVEL_POWER);
-		}
-		else if ((r_ptr->flags9 & (RF9_LEVEL_SPEED)) != 0)
-		{
-			if (m_idx % 2) n_ptr->flags9 &= ~(RF9_LEVEL_SPEED);
-			else n_ptr->flags9 &= ~(RF9_LEVEL_AGE);
-		}
-		else if ((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0)
-		{
-			if (m_idx % 2) n_ptr->flags9 &= ~(RF9_LEVEL_SIZE);
-			else n_ptr->flags9 &= ~(RF9_LEVEL_AGE);
-		}
-		else if ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0)
-		{
-			if (m_idx % 2) n_ptr->flags9 &= ~(RF9_LEVEL_POWER);
-			else n_ptr->flags9 &= ~(RF9_LEVEL_AGE);
-		}
-	}
-	else if ((r_ptr->flags9 & (RF9_LEVEL_SPEED)) != 0)
-	{
-		if (((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0) && ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0))
-		{
-			if (m_idx % 3 == 2) n_ptr->flags9 &= ~(RF9_LEVEL_SPEED | RF9_LEVEL_SIZE);
-			else if (m_idx % 3 == 1) n_ptr->flags9 &= ~(RF9_LEVEL_SPEED | RF9_LEVEL_POWER);
-			else n_ptr->flags9 &= ~(RF9_LEVEL_POWER | RF9_LEVEL_SIZE);
-		}
-		else if ((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0)
-		{
-			if (m_idx % 2) n_ptr->flags9 &= ~(RF9_LEVEL_SIZE);
-			else n_ptr->flags9 &= ~(RF9_LEVEL_SPEED);
-		}
-		else if ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0)
-		{
-			if (m_idx % 2) n_ptr->flags9 &= ~(RF9_LEVEL_POWER);
-			else n_ptr->flags9 &= ~(RF9_LEVEL_SPEED);
-		}
-	}
-	/* Pick another flag */
-	else if ((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0)
-	{
-		if ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0)
-		{
-			if (m_idx % 2) n_ptr->flags9 &= ~(RF9_LEVEL_POWER);
-			else n_ptr->flags9 &= ~(RF9_LEVEL_SIZE);
-		}
+		/* Clear all flags */
+		n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_SPEED | RF9_LEVEL_POWER | RF9_LEVEL_SIZE);
+		
+		/* Add one back in based on m_idx */
+		n_ptr->flags9 |= flag[m_idx % n];
 	}
 
 	/* Scale up for speed */

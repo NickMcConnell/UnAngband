@@ -5267,7 +5267,7 @@ static key_event target_set_interactive_aux(int y, int x, int *room, int mode, c
 						screen_save();
 
 						/* Recall on screen */
-						screen_roff(m_ptr->r_idx);
+						screen_monster_look(cave_m_idx[y][x]);
 
 						/* Hack -- Complete the prompt (again) */
 						Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
