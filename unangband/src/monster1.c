@@ -1936,7 +1936,7 @@ static void roff_top(const monster_race *r_ptr, int m_idx)
 		}
 		else
 		{
-			my_strcpy(desc, "The ", sizeof(desc));			
+			my_strcpy(desc, "The ", sizeof(desc));
 		}
 		
 		/* Start with the name (thus nominative and objective) */
@@ -1955,6 +1955,9 @@ static void roff_top(const monster_race *r_ptr, int m_idx)
 				*t++ = *s;
 			}
 		}
+		
+		/* Terminate */
+		*t = '\0';
 	}
 	
 	/* Get the chars */
