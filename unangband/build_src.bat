@@ -21,7 +21,6 @@ mkdir unangband-062-src\src
 copy lib\apex\delete.me unangband-062-src\lib\apex
 copy lib\bone\delete.me unangband-062-src\lib\bone
 copy lib\data\delete.me unangband-062-src\lib\data
-copy lib\info\delete.me unangband-062-src\lib\info
 copy lib\save\delete.me unangband-062-src\lib\save
 copy lib\user\delete.me unangband-062-src\lib\user
 copy lib\xtra\font\delete.me unangband-062-src\lib\xtra\font
@@ -34,6 +33,7 @@ copy changes.txt unangband-062-src
 copy lib\edit\*.txt unangband-062-src\lib\edit
 
 copy lib\file\*.txt unangband-062-src\lib\file
+copy lib\info\*.txt unangband-062-src\lib\info
 
 copy lib\help\*.txt unangband-062-src\lib\help
 copy lib\help\*.hlp unangband-062-src\lib\help

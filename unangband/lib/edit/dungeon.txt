@@ -75,7 +75,7 @@ D:It feels like home...
 # Alternate starting dungeon.
 
 N:1:Hobbiton
-X:57:10:53:0
+X:10:53:57:58
 G:h
 L:0:0:411:153:0:0
 S:264:515:265:266:772:773:0:0
@@ -171,7 +171,7 @@ L:6:114:0:0:111:0
 S:507:0:0:0:0:0:0:0
 
 N:11:Bree
-X:1:38:39:56
+X:57:38:39:56
 W:440:48
 Y:440:48
 L:0:0:407:408:0:0
@@ -385,21 +385,22 @@ S:264:515:265:266:772:773:774:0
 # The following are accessible from the first Hobbiton for consistency
 
 N:37:Bree
-X:38:39:1:0
+X:38:39:56:57
 W:440:48
-L:0:0:407:408:617:0
+Y:440:48
+L:0:0:407:408:0:0
 L:1:56:0:0:0:0
-L:3:56:0:0:620:0
+L:6:56:0:0:620:0
 S:8:9:10:11:12:13:268:775
 
 N:38:Barrow-downs
-X:11:12:37:40
+X:11:12:11:40
 L:7:420:420:56:0:0
 L:8:56:0:0:0:0
 L:20:56:0:0:1081:0
 
 N:39:Trollshaw Forest
-X:13:37:0:0
+X:13:11:0:0
 L:4:420:420:155:343:0
 L:5:56:0:0:344:0
 L:6:56:0:0:345:0
@@ -413,7 +414,7 @@ L:6:420:420:153:0:0
 # And the same dungeon accessible from the LOtR quest.
 
 N:41:Barrow-downs
-X:11:12:37:40
+X:11:12:40:0
 L:7:420:420:56:0:0
 L:8:56:0:0:0:0
 L:20:56:0:0:1081:0
@@ -545,11 +546,11 @@ L:19:56:0:153:215:0
 # Make it clear that there is no easy way back to Hobbiton.
 
 N:57:the East Road
-X:1:37:0:0
+X:1:11:0:0
 G:h
 R:ANIMAL
 L:0:0:435:420:0:0
-S:0:0:0:0:0:0:0:0
+S:904:0:0:0:0:0:0:0
 D:The road ahead is long but straight; it takes you to beyond the
 D: edge of the Shire to Bree.  Choose your path carefully!  Once
 D: your feet take you further, it may be a while before you return
@@ -561,7 +562,7 @@ X:1:10:53:0
 G:h
 R:ANIMAL
 L:0:0:435:155:0:0
-S:0:0:0:0:0:0:0:0
+S:903:0:0:0:0:0:0:0
 D:This is the farthest you've been from the Shire - ahead, dark
 D: clouds gather.  Choose your path carefully! Once you cross the
 D: Brandywine to Buckland, it may be a while before you return to

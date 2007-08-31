@@ -21,7 +21,6 @@ mkdir unangband-062-win\lib\xtra\help
 copy lib\apex\delete.me unangband-062-win\lib\apex
 copy lib\bone\delete.me unangband-062-win\lib\bone
 copy lib\data\delete.me unangband-062-win\lib\data
-copy lib\info\delete.me unangband-062-win\lib\info
 copy lib\save\delete.me unangband-062-win\lib\save
 copy lib\user\delete.me unangband-062-win\lib\user
 copy lib\xtra\music\delete.me unangband-062-win\lib\xtra\music
@@ -33,6 +32,7 @@ copy changes.txt unangband-062-win
 copy lib\edit\*.txt unangband-062-win\lib\edit
 
 copy lib\file\*.txt unangband-062-win\lib\file
+copy lib\info\*.txt unangband-062-win\lib\info
 
 copy lib\help\*.txt unangband-062-win\lib\help
 copy lib\help\*.hlp unangband-062-win\lib\help
