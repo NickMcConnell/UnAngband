@@ -1215,14 +1215,24 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 		int level = r_ptr->level;
 		u32b class = r_ptr->flags2 & (RF2_CLASS_MASK);
 
+		/* Hack - scale up a leader */
+		if (m_ptr->mflag & (MFLAG_LEADER)) level -= 5;
+		
 		/* Scale a monster */
-		if (((r_ptr->flags9 & (RF9_LEVEL_SIZE | RF9_LEVEL_SPEED | RF9_LEVEL_POWER)) != 0) &&
+		if (((r_ptr->flags9 & (RF9_LEVEL_SIZE | RF9_LEVEL_SPEED | RF9_LEVEL_POWER | RF9_LEVEL_AGE)) != 0) &&
 			monster_scale(&monster_race_scaled, m_idx, p_ptr->depth))
 		{
 			r_ptr = &monster_race_scaled;
 		}
 
 		/* Add prefixes to levelled monsters */
+		if (r_ptr->flags9 & (RF9_LEVEL_AGE))
+		{
+			if (p_ptr->depth >= level + 15) prefix = "Ancient ";
+			else if (p_ptr->depth >= level + 10) prefix = "Old ";
+			else if (p_ptr->depth >= level + 5) prefix = "Mature ";
+			else prefix = "Young ";
+		}
 		if (r_ptr->flags9 & (RF9_LEVEL_SIZE))
 		{
 			if (p_ptr->depth >= level + 15) prefix = "Giant ";
@@ -4235,7 +4245,7 @@ bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp, u32b flg)
 	monster_race *r_ptr = &r_info[r_idx];
 
 	/* Place one monster, or fail */
-	if (!place_monster_one(y, x, r_idx, slp, flg)) return (FALSE);
+	if (!place_monster_one(y, x, r_idx, slp, r_ptr->flags1 & (RF1_FRIENDS) ? flg | MFLAG_LEADER : flg)) return (FALSE);
 
 	/* Require the "group" flag */
 	if (!grp) return (TRUE);

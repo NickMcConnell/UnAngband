@@ -3495,17 +3495,17 @@
 #define MFLAG_HIDE      0x00000002    /* Monster is hiding in terrain */
 #define MFLAG_OVER      0x00000004    /* Monster is flying over terrain*/
 #define MFLAG_MADE      0x00000008    /* Monster is not carrying treasure */
-#define MFLAG_MOVE	0x00000010    /* Monster has moved */
-#define MFLAG_TOWN	0X00000020    /* Monster is using "townsman" AI */
+#define MFLAG_MOVE		0x00000010    /* Monster has moved */
+#define MFLAG_TOWN		0X00000020    /* Monster is using "townsman" AI */
 #define MFLAG_SHOW      0x00000040    /* Monster is recently memorized */
 #define MFLAG_MARK      0x00000080    /* Monster is currently memorized */
 
 #define MFLAG_ACTV      0x00000100    /* Monster is currently active */
 #define MFLAG_LITE      0x00000200    /* Monster is using a lite */
 #define MFLAG_PUSH      0x00000400    /* Monster has pushed/been pushed aside */
-#define MFLAG_CAST	0x00000800    	/* Monster will cast spell at first opportunity */
-#define MFLAG_SNEAKED	0x00001000    /* Monster has been sneak attacked */
-#define MFLAG_AGGR	0x00002000    	/* Monster will act in aggressive manner */
+#define MFLAG_CAST		0x00000800    /* Monster will cast spell at first opportunity */
+#define MFLAG_LEADER	0x00001000    /* Monster is a 'leader-type' */
+#define MFLAG_AGGR		0x00002000    /* Monster will act in aggressive manner */
 #define MFLAG_HIT_RANGE	0x00004000    /* Monster has just been hit by ranged attack */
 #define MFLAG_HIT_BLOW	0x00008000    /* Monster has just been hit by melee attack */
 
@@ -3865,7 +3865,7 @@
 #define RF9_NO_SLOW        0x00020000      /* Cannot be slowed / paralyzed */
 #define RF9_RES_MAGIC      0x00040000      /* Resists magic */
 #define RF9_GOOD           0x00080000      /* Good - never summon evil / never summoned by evil */
-#define RF9_NEUTRAL        0x00100000      /* Neutral - don't interact with player unless attacked */
+#define RF9_LEVEL_AGE      0x00100000      /* Levels up size deeper in the dungeon */
 #define RF9_DWARF          0x00200000      /* Hurt by slay dwarf */
 #define RF9_ELF            0x00400000      /* Hurt by slay elf */
 #define RF9_MAN            0x00800000      /* Hurt by slay man */

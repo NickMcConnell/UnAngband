@@ -65,17 +65,21 @@ static int monster_critical(int dice, int sides, int dam, int effect)
  */
 bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 {
-	monster_race *r_ptr = &r_info[m_list[m_idx].r_idx];
+	monster_type *m_ptr = &m_list[m_idx];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	int d1, d2, scale;
 	int i, boost;
 
 	/* Paranoia */
-	if ((r_ptr->flags9 & (RF9_LEVEL_SPEED | RF9_LEVEL_SIZE | RF9_LEVEL_POWER)) == 0) return (FALSE);
+	if ((r_ptr->flags9 & (RF9_LEVEL_SPEED | RF9_LEVEL_SIZE | RF9_LEVEL_POWER | RF9_LEVEL_AGE)) == 0) return (FALSE);
 
 	/* Hack -- ensure distinct monster types */
 	depth = depth - ((depth - r_ptr->level) % 5);
 
+	/* Hack -- leader monsters */
+	if (m_ptr->mflag & (MFLAG_LEADER)) depth += 5;
+	
 	/* Hack -- maximum power increase */
 	if (depth > r_ptr->level + 15) depth = r_ptr->level + 15;
 
@@ -109,24 +113,68 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 	/* Set experience */
 	n_ptr->mexp = r_ptr->mexp * scale / 100;
 
-	/* Pick which flag if multiple flags */
-	if ((r_ptr->flags9 & (RF9_LEVEL_SPEED)) != 0)
+	/* Pick one flag out of the level flags if monster has multiple flags */
+	if ((r_ptr->flags9 & (RF9_LEVEL_AGE)) != 0)
+	{
+		if (((r_ptr->flags9 & (RF9_LEVEL_SPEED)) != 0) && ((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0)
+				 && ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0))
+		{
+			if (m_idx % 4 == 3) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_SPEED | RF9_LEVEL_SIZE);
+			else if (m_idx % 4 == 2) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_POWER | RF9_LEVEL_SIZE);
+			else if (m_idx % 4 == 1) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_POWER | RF9_LEVEL_SPEED);
+			else n_ptr->flags9 &= ~(RF9_LEVEL_SPEED | RF9_LEVEL_SIZE | RF9_LEVEL_POWER);
+		}
+		else if (((r_ptr->flags9 & (RF9_LEVEL_SPEED)) != 0) && ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0))
+		{
+			if (m_idx % 3 == 2) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_SPEED);
+			else if (m_idx % 3 == 1) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_POWER);
+			else n_ptr->flags9 &= ~(RF9_LEVEL_SPEED | RF9_LEVEL_POWER);
+		}
+		else if (((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0) && ((r_ptr->flags9 & (RF9_LEVEL_SPEED)) != 0))
+		{
+			if (m_idx % 3 == 2) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_SIZE);
+			else if (m_idx % 3 == 1) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_SPEED);
+			else n_ptr->flags9 &= ~(RF9_LEVEL_SIZE | RF9_LEVEL_SPEED);
+		}
+		else if (((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0) && ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0))
+		{
+			if (m_idx % 3 == 2) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_SIZE);
+			else if (m_idx % 3 == 1) n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_POWER);
+			else n_ptr->flags9 &= ~(RF9_LEVEL_SIZE | RF9_LEVEL_POWER);
+		}
+		else if ((r_ptr->flags9 & (RF9_LEVEL_SPEED)) != 0)
+		{
+			if (m_idx % 2) n_ptr->flags9 &= ~(RF9_LEVEL_SPEED);
+			else n_ptr->flags9 &= ~(RF9_LEVEL_AGE);
+		}
+		else if ((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0)
+		{
+			if (m_idx % 2) n_ptr->flags9 &= ~(RF9_LEVEL_SIZE);
+			else n_ptr->flags9 &= ~(RF9_LEVEL_AGE);
+		}
+		else if ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0)
+		{
+			if (m_idx % 2) n_ptr->flags9 &= ~(RF9_LEVEL_POWER);
+			else n_ptr->flags9 &= ~(RF9_LEVEL_AGE);
+		}
+	}
+	else if ((r_ptr->flags9 & (RF9_LEVEL_SPEED)) != 0)
 	{
 		if (((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0) && ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0))
 		{
 			if (m_idx % 3 == 2) n_ptr->flags9 &= ~(RF9_LEVEL_SPEED | RF9_LEVEL_SIZE);
 			else if (m_idx % 3 == 1) n_ptr->flags9 &= ~(RF9_LEVEL_SPEED | RF9_LEVEL_POWER);
-			else n_ptr->flags9 &= ~(RF9_LEVEL_SPEED | RF9_LEVEL_SIZE);
+			else n_ptr->flags9 &= ~(RF9_LEVEL_POWER | RF9_LEVEL_SIZE);
 		}
 		else if ((r_ptr->flags9 & (RF9_LEVEL_SIZE)) != 0)
 		{
-			if (m_idx % 2) n_ptr->flags9 &= ~(RF9_LEVEL_SPEED);
-			else n_ptr->flags9 &= ~(RF9_LEVEL_SIZE);
+			if (m_idx % 2) n_ptr->flags9 &= ~(RF9_LEVEL_SIZE);
+			else n_ptr->flags9 &= ~(RF9_LEVEL_SPEED);
 		}
 		else if ((r_ptr->flags9 & (RF9_LEVEL_POWER)) != 0)
 		{
 			if (m_idx % 2) n_ptr->flags9 &= ~(RF9_LEVEL_POWER);
-			else n_ptr->flags9 &= ~(RF9_LEVEL_SIZE);
+			else n_ptr->flags9 &= ~(RF9_LEVEL_SPEED);
 		}
 	}
 	/* Pick another flag */
@@ -225,10 +273,60 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 		/* Boost power */
 		if (scale > 100)
 		{
-			n_ptr->power = (r_ptr->power * scale);
+			scale = (scale - 100) / 2 + 100; 
+			n_ptr->power = (r_ptr->power * scale) / 100;
 		}
 	}
 
+	/* Scale up for age */
+	else if ((n_ptr->flags9 & (RF9_LEVEL_AGE)) != 0)
+	{
+		/* Boost armour class next */
+		boost = r_ptr->ac * scale / 200;
+
+		/* Limit armour class improvement */
+		if (boost > 50 + n_ptr->ac / 3) boost = 50 + n_ptr->ac / 3;
+
+		/* Improve armour class */
+		n_ptr->ac += boost;
+
+		/* Reduce scale by actual scaled improvement in armour class */
+		scale = scale * r_ptr->ac / n_ptr->ac;
+
+		/* Boost speed next */
+		boost = scale / 200;
+
+		/* Limit to +15 faster */
+		if (boost > 15) boost = 15;
+
+		/* Increase fake speed */
+		n_ptr->speed += boost;
+
+		/* Reduce scale by actual improvement in energy */
+		scale = scale * extract_energy[r_ptr->speed] / extract_energy[n_ptr->speed];
+
+		/* Boost attack damage partially */
+		if (scale > 200)
+			for (i = 0; i < 4; i++)
+		{
+			if (!n_ptr->blow[i].d_side) continue;
+
+			boost = (scale * n_ptr->blow[i].d_dice / 50) / n_ptr->blow[i].d_side;
+
+			if (boost > 9 * n_ptr->blow[i].d_dice) boost = 9 * n_ptr->blow[i].d_dice;
+
+			if (boost > 1) n_ptr->blow[i].d_dice += boost - 1;
+		}
+
+		/* Boost power */
+		if (scale > 100)
+		{
+			scale = (scale - 100) / 2 + 100; 
+			n_ptr->power = (r_ptr->power * scale) / 100;
+		}
+	}
+
+	
 	/* Not done? */
 	if (scale > 100)
 	{

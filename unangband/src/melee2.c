@@ -141,7 +141,7 @@ static void find_range(monster_type *m_ptr)
 		else if (r_ptr->flags1 & (RF1_NEVER_BLOW)) m_ptr->best_range = 8;
 
 		/*Monsters who have had dangerous attacks happen to them are more extreme*/
-		else if (m_ptr->mflag & (MFLAG_SNEAKED))
+		else if (m_ptr->mflag & (MFLAG_AGGR))
 		{
 			/*spellcasters want to sit back*/
 			if (r_ptr->freq_spell) m_ptr->best_range = 8;
@@ -5651,7 +5651,7 @@ static void process_monster(int m_idx)
 		   or wasn't expecting player attack. */
 		if ((!player_can_fire_bold(m_ptr->fy, m_ptr->fx)) || (m_ptr->mflag & (MFLAG_TOWN | MFLAG_IGNORE)))
 		{
-			m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
+			m_ptr->mflag |= (MFLAG_AGGR);
 
 			/* Tell allies to close */
 			if (tell_allies_best_range(m_ptr->fy, m_ptr->fx, 1, (aware) ? "& has attacked me!" : "Something has attacked me!"))
@@ -5698,7 +5698,7 @@ static void process_monster(int m_idx)
 		 */
 		if ((m_ptr->cdis > 1) || (m_ptr->mflag & (MFLAG_TOWN | MFLAG_IGNORE)))
 		{
-			m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
+			m_ptr->mflag |= (MFLAG_AGGR);
 
 			/* Tell allies to close */
 			if (tell_allies_best_range(m_ptr->fy, m_ptr->fx, 1, (aware) ? "& has attacked me!" : "Something has attacked me!"))
@@ -5814,7 +5814,20 @@ static void process_monster(int m_idx)
 		|| ((r_ptr->flags3 & (RF3_HUGE)) && (m_ptr->cdis == 2))
 		|| (m_ptr->mflag & (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH)))
 	{
-		int roll = rand_int(adj_chr_taunt[p_ptr->stat_ind[A_CHR]]);
+		int roll;
+
+		/* Aggressive monsters use ranged attacks more frequently */
+		if (m_ptr->mflag & (MFLAG_AGGR))
+		{
+			roll = rand_int(200);
+			if (chance_innate) chance_innate += 100;
+			if (chance_spell) chance_spell += 100;
+		}
+		/* Normal chance based on charisma */
+		else
+		{
+			roll = rand_int(adj_chr_taunt[p_ptr->stat_ind[A_CHR]]);
+		}
 
 		/* Pick a ranged attack */
 		if ((roll < chance_innate) || (roll < chance_spell)

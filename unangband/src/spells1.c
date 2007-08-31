@@ -8431,13 +8431,13 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		/* Hack -- wake up nearby allies */
 		if (was_asleep)
 		{
-			m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
+			m_ptr->mflag |= (MFLAG_AGGR);
 
 			tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
 		}
 		else if (fear)
 		{
-			tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has hurt me badly!");
+			tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_ACTV, "& has hurt me badly!");
 		}
 	}
 

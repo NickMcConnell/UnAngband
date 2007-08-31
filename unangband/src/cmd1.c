@@ -2806,9 +2806,10 @@ void py_attack(int dir)
 	/* Hack -- wake up nearby allies */
 	if (was_asleep)
 	{
-		m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
+		m_ptr->mflag |= (MFLAG_AGGR);
 
-		tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
+		/* Cutting or stunning a monster shuts them up */
+		if ((m_ptr->cut < 20) && (m_ptr->stunned < 20)) tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
 	}
 
 	/* Hack -- delay fear messages */

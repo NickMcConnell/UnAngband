@@ -3786,7 +3786,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 						/* Alert fellows */
 						if (was_asleep)
 						{
-							m_ptr->mflag |= (MFLAG_AGGR | MFLAG_SNEAKED);
+							m_ptr->mflag |= (MFLAG_AGGR);
 
 							/* Let allies know */
 							tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, 
@@ -3794,7 +3794,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 						}
 						else if (fear)
 						{
-							tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, 
+							tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_ACTV, 
 									"& has hurt me badly!");
 						}
 
