@@ -6221,35 +6221,39 @@ bool target_set_interactive(int mode)
 				case '!':
 				case '\xff':
 				{
-					ty = y = KEY_GRID_Y(query);
-					tx = x = KEY_GRID_X(query);
-
-					/* Set target if clicked */
-					if ((query.mousebutton) || (query.key == '!'))
-					{
-						target_set_location(y, x);
-						done = TRUE;
-					}
-					else
-					{
-						flag = FALSE;
-
-						/* Calculate the path */
-						if (mode == TARGET_KILL)
+					/* Bounds check */
+					if (in_bounds(KEY_GRID_Y(query), KEY_GRID_X(query)))
+					{	
+						ty = y = KEY_GRID_Y(query);
+						tx = x = KEY_GRID_X(query);
+	
+						/* Set target if clicked */
+						if ((query.mousebutton) || (query.key == '!'))
 						{
-							target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
-
-							/* Redraw map */
-							p_ptr->redraw |= (PR_MAP);
-
-							/* Hack -- Window stuff */
-							p_ptr->window |= (PW_OVERHEAD);
-
-							/* Handle stuff */
-							handle_stuff();	
-
-							/* Force an update */
-							Term_fresh();
+							target_set_location(y, x);
+							done = TRUE;
+						}
+						else
+						{
+							flag = FALSE;
+	
+							/* Calculate the path */
+							if (mode == TARGET_KILL)
+							{
+								target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
+	
+								/* Redraw map */
+								p_ptr->redraw |= (PR_MAP);
+	
+								/* Hack -- Window stuff */
+								p_ptr->window |= (PW_OVERHEAD);
+	
+								/* Handle stuff */
+								handle_stuff();	
+	
+								/* Force an update */
+								Term_fresh();
+							}
 						}
 					}
 					break;
@@ -6433,33 +6437,37 @@ bool target_set_interactive(int mode)
 				case '!':
 				case '\xff':
 				{
-					ty = y = KEY_GRID_Y(query);
-					tx = x = KEY_GRID_X(query);
+					/* Bounds check */
+					if (in_bounds(KEY_GRID_Y(query), KEY_GRID_X(query)))
+					{	
+						ty = y = KEY_GRID_Y(query);
+						tx = x = KEY_GRID_X(query);
 
-					/* Set target if clicked */
-					if ((query.mousebutton) || (query.key == '!'))
-					{
-						target_set_location(y, x);
-						done = TRUE;
-					}
-					else
-					{
-						/* Calculate the path */
-						if (mode == TARGET_KILL)
+						/* Set target if clicked */
+						if ((query.mousebutton) || (query.key == '!'))
 						{
-							target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
+							target_set_location(y, x);
+							done = TRUE;
+						}
+						else
+						{
+							/* Calculate the path */
+							if (mode == TARGET_KILL)
+							{
+								target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
 
-							/* Redraw map */
-							p_ptr->redraw |= (PR_MAP);
+								/* Redraw map */
+								p_ptr->redraw |= (PR_MAP);
 
-							/* Hack -- Window stuff */
-							p_ptr->window |= (PW_OVERHEAD);
+								/* Hack -- Window stuff */
+								p_ptr->window |= (PW_OVERHEAD);
 
-							/* Handle stuff */
-							handle_stuff();
+								/* Handle stuff */
+								handle_stuff();
 
-							/* Force an update */
-							Term_fresh();			
+								/* Force an update */
+								Term_fresh();			
+							}
 						}
 					}
 					break;
