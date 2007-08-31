@@ -5196,13 +5196,12 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				summoner = who > SOURCE_MONSTER_START ? who : what;
 
-
 				if ((blind) && (known)) msg_format("%^s chants.", m_name);
 				else if (known) msg_format("%^s magically summons animals.", m_name);
-				else msg_print("You hear distant chants.");
+				else msg_print("You hear distant chanting.");
 
-				/* Hack -- summon undead animals */
-				if (r_ptr->flags3 & (RF3_UNDEAD)) summon_flag_type = (RF8_HAS_SKELETON);
+				/* Hack -- This lets vampires summon animals while not letting undead live with non-undead animals in general */
+				if ((r_ptr->flags3 & (RF3_UNDEAD)) && ((r_ptr->flags7 & (RF7_S_ANIMAL)) == 0)) summon_flag_type = (RF8_HAS_SKELETON);
 
 				/* Hack -- Set the skin flags to summon */
 				else summon_flag_type = (r_ptr->flags8 & (RF8_SKIN_MASK));

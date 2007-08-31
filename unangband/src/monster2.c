@@ -5219,8 +5219,8 @@ void get_monster_ecology(int r_idx)
 		{
 			summon_specific_type = SUMMON_ANIMAL;
 
-			/* Hack -- Set the skin flags to summon undead animals, if undead */
-			if (r_ptr->flags3 & (RF3_UNDEAD)) summon_flag_type = (RF8_HAS_SKELETON);
+			/* Hack -- This lets vampires summon animals while not letting undead live with non-undead animals in general */
+			if ((r_ptr->flags3 & (RF3_UNDEAD)) && ((r_ptr->flags7 & (RF7_S_ANIMAL)) == 0)) summon_flag_type = (RF8_HAS_SKELETON);
 			
 			/* Else - base skin on summoner's skin if set */
 			else summon_flag_type = (r_ptr->flags8 & (RF8_SKIN_MASK));
