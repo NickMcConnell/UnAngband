@@ -119,14 +119,15 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 
 #ifdef ALLOW_REPEAT
 
-	/* Get the spell, if available and not randomly picked */
-	if (known && repeat_pull(sn))
+	/* Get the spell, if available */
+	if (repeat_pull(sn))
 	{
 		/* Verify the spell */
 		if (!(cast) || (spell_okay(*sn, known)))
 		{
-			/* Success */
-			return (TRUE);
+			/* Success only if known */
+			/* This is required to allow wands of wonder to repeat differently every time */
+			if (known) return (TRUE);
 		}
 	}
 
@@ -141,12 +142,13 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 	/* Assume no spells available */
 	(*sn) = -2;
 
-	/* Check for "okay" spells */
+	/* Check for "okay" spells if casting */
 	if (cast) for (i = 0; i < num; i++)
 	{
 		/* Look for "okay" spells */
 		if (spell_okay(book[i], known)) okay = TRUE;
 	}
+
 	/* Get a random spell */
 	else if (!known)
 	{
@@ -325,7 +327,7 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 
 #ifdef ALLOW_REPEAT
 
-	if (!known) repeat_push(*sn);
+	repeat_push(*sn);
 
 #endif /* ALLOW_REPEAT */
 
