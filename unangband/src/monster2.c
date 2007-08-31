@@ -3932,7 +3932,14 @@ static bool summon_specific_okay(int r_idx)
 		/* Hack -- try to summon birds, beasts or reptiles based on summoner */
 		case SUMMON_ANIMAL:
 		{
-			if (summon_flag_type)
+			/* Hack for undead summoners */
+			if (summon_flag_type & (RF8_HAS_SKELETON))
+			{
+				okay = ((r_ptr->flags3 & (RF3_ANIMAL)) &&
+					!(r_ptr->flags1 & (RF1_UNIQUE)) &&
+					(r_ptr->flags3 & (RF3_UNDEAD)));
+			}
+			else if (summon_flag_type)
 			{
 				okay = ((r_ptr->flags3 & (RF3_ANIMAL)) &&
 					!(r_ptr->flags1 & (RF1_UNIQUE)) &&
@@ -4593,7 +4600,9 @@ bool summon_specific(int y1, int x1, int lev, int type, bool grp, u32b flg)
 		{
 			if (!summon_flag_type)
 			{
-				summon_flag_type |= r_info[r_idx].flags8 & (RF8_SKIN_MASK);
+				/* Undead animals */
+				if (r_info[r_idx].flags3 & (RF3_UNDEAD)) summon_flag_type |= (RF8_HAS_SKELETON);
+				else summon_flag_type |= r_info[r_idx].flags8 & (RF8_SKIN_MASK);
 
 				if (!summon_flag_type) summon_flag_type = RF8_HAS_SCALE;
 			}
@@ -5210,8 +5219,11 @@ void get_monster_ecology(int r_idx)
 		{
 			summon_specific_type = SUMMON_ANIMAL;
 
-			/* Hack -- Set the class flags to summon */
-			summon_flag_type = (r_ptr->flags8 & (RF8_SKIN_MASK));
+			/* Hack -- Set the skin flags to summon undead animals, if undead */
+			if (r_ptr->flags3 & (RF3_UNDEAD)) summon_flag_type = (RF8_HAS_SKELETON);
+			
+			/* Else - base skin on summoner's skin if set */
+			else summon_flag_type = (r_ptr->flags8 & (RF8_SKIN_MASK));
 
 			/* Mega Hack -- Other racial preferences for animals */
 			if (!summon_flag_type)

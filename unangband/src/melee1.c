@@ -5201,8 +5201,11 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else if (known) msg_format("%^s magically summons animals.", m_name);
 				else msg_print("You hear distant chants.");
 
-				/* Hack -- Set the class flags to summon */
-				summon_flag_type = (r_ptr->flags8 & (RF8_SKIN_MASK));
+				/* Hack -- summon undead animals */
+				if (r_ptr->flags3 & (RF3_UNDEAD)) summon_flag_type = (RF8_HAS_SKELETON);
+
+				/* Hack -- Set the skin flags to summon */
+				else summon_flag_type = (r_ptr->flags8 & (RF8_SKIN_MASK));
 
 				/* Mega Hack -- Other racial preferences for animals */
 				if (!summon_flag_type)
