@@ -973,7 +973,7 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 			{
 				if ((row >= 0) && (row < num) && (row < hgt)
 						&& (ke.mousex >= col)
-						&& (ke.mousex < col + strlen(choices[top + row].name)))
+						&& (ke.mousex < col + (int)strlen(choices[top + row].name)))
 				{
 					cur = row;
 					done = TRUE;
@@ -982,7 +982,7 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 			else if ((ke.mousex >= col) && (ke.mousex <= col + wid))
 			{
 				if ((row >= 0) && (row < num) && (row < hgt)
-						&& (ke.mousex < col + strlen(choices[top + row].name))) cur = row;
+						&& (ke.mousex < col + (int)strlen(choices[top + row].name))) cur = row;
 
 				/* Scroll up */
 				if ((top > 0) && ((row - top) < 4))

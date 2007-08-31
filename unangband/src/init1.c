@@ -5714,20 +5714,85 @@ errr parse_t_info(char *buf, header *head)
 	/* Process 'X' for "Xtra" (one line only) */
 	else if (buf[0] == 'X')
 	{
-		int nearby,distant;
+		int n0, n1, n2, n3;
 
 		/* There better be a current t_ptr */
 		if (!t_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (2 != sscanf(buf+2, "%d:%d", &nearby, &distant)) return (PARSE_ERROR_GENERIC);
+		if (4 != sscanf(buf+2, "%d:%d:%d:%d", &n0,&n1,&n2,&n3)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		t_ptr->nearby=nearby;
-		t_ptr->distant = distant;
-
+		t_ptr->nearby[0]=n0;
+		t_ptr->nearby[1]=n1;
+		t_ptr->nearby[2]=n2;
+		t_ptr->nearby[3]=n3;
 	}
 
+	/* Process 'Q' for "Quests" (one line only) */
+	else if (buf[0] == 'Q')
+	{
+		int quest_opens, quest_monster;
+
+		/* There better be a current t_ptr */
+		if (!t_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (2 != sscanf(buf+2, "%d:%d", &quest_opens, &quest_monster)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		t_ptr->quest_opens = quest_opens;
+		t_ptr->quest_monster = quest_monster;
+	}
+
+	/* Process 'Y' for "Lock town" (one line only) */
+	else if (buf[0] == 'Y')
+	{
+		int town_lockup_monster, town_lockup_ifvisited;
+
+		/* There better be a current t_ptr */
+		if (!t_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (2 != sscanf(buf+2, "%d:%d", &town_lockup_monster, &town_lockup_ifvisited)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		t_ptr->town_lockup_monster = town_lockup_monster;
+		t_ptr->town_lockup_ifvisited = town_lockup_ifvisited;
+	}
+	
+	/* Process 'W' for "Replace guardian by" (one line only) */
+	else if (buf[0] == 'W')
+	{
+		int replace_guardian, guardian_ifvisited;
+
+		/* There better be a current t_ptr */
+		if (!t_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (2 != sscanf(buf+2, "%d:%d", &replace_guardian, &guardian_ifvisited)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		t_ptr->replace_guardian = replace_guardian;
+		t_ptr->guardian_ifvisited = guardian_ifvisited;
+	}	
+	
+	/* Process 'Z' for "Replace by" (one line only) */
+	else if (buf[0] == 'Z')
+	{
+		int replace_with, replace_ifvisited;
+
+		/* There better be a current t_ptr */
+		if (!t_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (2 != sscanf(buf+2, "%d:%d", &replace_with, &replace_ifvisited)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		t_ptr->replace_with = replace_with;
+		t_ptr->replace_ifvisited = replace_ifvisited;
+	}
+	
 	/* Process 'L' for "Levels" (up to four lines) */
 	else if (buf[0] == 'L')
 	{

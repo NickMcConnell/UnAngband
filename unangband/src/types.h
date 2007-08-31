@@ -206,20 +206,30 @@ struct town_type
 	u32b name;     /* Name (offset) */
 	u32b text;      /* Text (offset) */
 
-	u16b nearby;
-	u16b distant;
+	u16b nearby[MAX_NEARBY];
+	
+	u16b quest_opens;
+	u16b quest_monster;
+	
+	u16b replace_with;
+	u16b replace_ifvisited;
 
+	u16b replace_guardian;
+	u16b guardian_ifvisited;
+	
+	u16b town_lockup_monster;
+	u16b town_lockup_ifvisited;
+	
 	byte r_char;    /* Add races of this char */
 	byte r_flag;    /* Add races with this flag */
-
+	byte max_depth;
+	byte visited;
+	
 	u16b store[MAX_STORES];
 	u16b store_index[MAX_STORES];
 
 	dungeon_zone zone[MAX_DUNGEON_ZONES];
 
-	byte max_depth;
-	byte unused;
-	s16b unused2;
 };
 
 

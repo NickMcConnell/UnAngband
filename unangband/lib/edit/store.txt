@@ -677,3 +677,31 @@ X:2
 
 N:42:grey slab of stone
 X:2
+
+N:43:vault of the city of Erebor
+X:2
+
+#Service of Satisfy Hunger
+N:44:the Brandywine Barge House
+X:3
+O:35:1:3
+O:80:35:3
+O:80:38:3
+O:80:38:3
+O:75:34:2
+O:75:35:1
+O:75:42:1
+O:75:28:2
+
+#Service of Satisfy Hunger
+N:45:an Inn on the East Road
+X:3
+O:35:1:3
+O:80:35:3
+O:80:38:3
+O:80:38:3
+O:75:34:2
+O:75:35:1
+O:75:42:1
+O:75:28:2
+

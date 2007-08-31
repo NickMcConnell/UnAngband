@@ -14,7 +14,7 @@
 V:0.6.2
 
 # Maximum number of feature types
-M:F:897
+M:F:905
 
 # Maximum number of room description lines
 M:D:800
@@ -38,10 +38,10 @@ M:R:1311
 M:V:51
 
 # Maximum number of towns/dungeons
-M:T:63
+M:T:64
 
 # Maximum number of stores
-M:U:43
+M:U:46
 
 # Maximum number of player races & shapes
 M:P:40

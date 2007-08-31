@@ -3191,9 +3191,6 @@ void list_object(const object_type *o_ptr, int mode)
 				text_out(t_name + t_info[o_ptr->sval].name);
 				text_out(format(" (levels %d", min_depth(o_ptr->sval)));
 				if (max_depth(o_ptr->sval) > min_depth(o_ptr->sval)) text_out(format("-%d",max_depth(o_ptr->sval)));
-				text_out(") from ");
-				if (adult_campaign) text_out(t_name + t_info[t_info[o_ptr->sval].nearby].name);
-				else text_out(t_name + t_info[0].name);
 				text_out(" with this.  ");
 				anything = TRUE;
 				break;

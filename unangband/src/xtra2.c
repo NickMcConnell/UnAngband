@@ -3997,76 +3997,8 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 
 			if (!text_always) return;
 
-			/* If defeated guardian, tell the player */
-			if ((zone->guard) && (!r_info[zone->guard].max_num))
-			{
-				/* Tell player guardian is defeated */
-				my_strcpy(text_always, format("You have defeated %s, guardian of %s",
-						r_name + r_info[zone->guard].name,
-						t_name + t_ptr->name), text_always_s);
-
-				/* Tell player where they can travel to */
-				if ((t_ptr->distant != p_ptr->dungeon) && (adult_campaign))
-				{
-					my_strcat(text_always, format(", which allows you to travel to %s",
-						t_name + t_info[t_ptr->distant].name), text_always_s);
-
-					/* Tell player if they may have difficulty getting back */
-					if (t_info[t_ptr->distant].nearby != p_ptr->dungeon)
-					{
-						my_strcat(text_always, ".  Collect anything you require from this location before you travel.  You may have difficulty returning here", text_always_s);
-					}
-				}
-
-				/* End sentence */
-				my_strcat(text_always, ".", text_always_s);
-			}
-			else
-			{
-				/* Describe location */
-				my_strcpy(text_always, t_text + t_ptr->text, text_always_s);
-
-				/* Describe the guardian */
-				if (zone->guard)
-				{
-					if (strlen(text_always)) my_strcat(text_always,"  ", text_always_s);
-
-					/* Path to be opened */
-					if ((t_ptr->distant != p_ptr->dungeon) && (adult_campaign))
-					{
-						my_strcat(text_always, format("The path to %s is guarded by %s, who you must defeat ",
-							t_name + t_info[t_ptr->distant].name,
-							r_name + r_info[zone->guard].name), text_always_s);
-					}
-					/* Dungeon guardian */
-					else
-					{
-						my_strcat(text_always, format("%^s is guarded by %s, who you must defeat ",
-							t_name + t_ptr->name,
-							r_name + r_info[zone->guard].name), text_always_s);
-					}
-
-					/* Guards surface */
-					if (t_ptr->zone[0].guard == zone->guard) my_strcat(text_always, "here", text_always_s);
-
-					/* Guards top of tower */					
-					if (t_ptr->zone[0].tower)
-					{
-						if (t_ptr->zone[0].guard == zone->guard) my_strcat(text_always, " or ", text_always_s);
-						my_strcat(text_always, "at the top of the tower", text_always_s);
-					}
-
-					/* Guards bottom of dungeon */
-					else if (min_depth(p_ptr->dungeon) != max_depth(p_ptr->dungeon))
-					{
-						if (t_ptr->zone[0].guard == zone->guard) my_strcat(text_always, " or ", text_always_s);
-						my_strcat(text_always, "at the bottom of the dungeon", text_always_s);
-					}
-
-					/* End sentence */
-					my_strcat(text_always, ".", text_always_s);
-				}
-			}
+			/* Describe location */
+			my_strcpy(text_always, t_text + t_ptr->text, text_always_s);
 		}
 		else
 		{

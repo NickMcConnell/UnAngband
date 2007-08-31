@@ -1003,6 +1003,14 @@
  */
 #define KEYMAP_MODE_ROGUE	1
 
+
+/*
+ * Maximum number of dungeons next to this one. Used in t_info.txt.
+ */
+
+#define MAX_NEARBY		 4
+
+
 /*
  * Maximum number of zones in a dungeon. Used in t_info.txt.
  */
