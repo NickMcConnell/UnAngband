@@ -47,6 +47,7 @@ struct birth_menu
 {
 	bool ghost;
 	cptr name;
+	int choice;
 };
 
 /*
@@ -899,7 +900,7 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 			Term_putstr(col, i + TABLE_ROW, wid, attr, buf);
 		}
 
-		if (done) return (cur);
+		if (done) return (choices[cur].choice);
 
 		/* Display auxiliary information if any is available. */
 		if (hook) hook(choices[cur]);
@@ -963,7 +964,7 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 		else if ((ke.key == '\n') || (ke.key == '\r'))
 		{
 			/* Done */
-			return (cur);
+			return (choices[cur].choice);
 		}
 		else if (ke.key == '\xff')
 		{
@@ -1095,13 +1096,8 @@ static void race_aux_hook(birth_menu r_str)
 	int xthn, xthb, xtht, xsrh, xdig;
 	int xdis, xdev, xsav, xstl;
 
-	/* Extract the proper race index from the string. */
-	for (race = 0; race < z_info->g_max; race++)
-	{
-		if (!strcmp(r_str.name, p_name + p_info[race].name)) break;
-	}
-
-	if (race == z_info->g_max) return;
+	/* Get the race */
+	race = r_str.choice;
 
 	/* Save the race pointer */
 	rp_ptr = &p_info[race];
@@ -1214,6 +1210,7 @@ static bool get_player_race()
 
 		/* Add race to list */
 		races[j].name = p_name + p_info[i].name;
+		races[j].choice = i;
 		races[j++].ghost = (p_info[i].r_idx != 0);
 	}
 
@@ -1255,14 +1252,9 @@ static void class_aux_hook(birth_menu c_str)
 	cptr desc;
 	int xthn, xthb, xtht, xsrh, xdig;
 	int xdis, xdev, xsav, xstl;
-	
-	/* Extract the proper class index from the string. */
-	for (class_idx = 0; class_idx < z_info->c_max; class_idx++)
-	{
-		if (!strcmp(c_str.name, c_name + c_info[class_idx].name)) break;
-	}
 
-	if (class_idx == z_info->c_max) return;
+	/* Get the class */
+	class_idx = c_str.choice;
 
 	/* Set class */
 	cp_ptr = &c_info[class_idx];
@@ -1398,6 +1390,7 @@ static bool get_player_class(void)
 		
 		/* Save the string */
 		classes[k].name = c_name + c_info[i].name;
+		classes[k].choice = i;
 		
 		/* Save the ghosting */
 		classes[k++].ghost = ghost;
@@ -1430,14 +1423,8 @@ static void style_aux_hook(birth_menu w_str)
 	int style_idx,i;
 	char s[128];
 
-	/* Extract the proper class index from the string. */
-	for (style_idx = 0; style_idx < MAX_WEAP_STYLES; style_idx++)
-	{
-		strcpy(s,w_name_style[style_idx]);
-		if (!strcmp(w_str.name, s )) break;
-	}
-
-	if (style_idx == MAX_WEAP_STYLES) return;
+	/* Style index */
+	style_idx = w_str.choice;
 
 	/* Display relevant details. */
 	for (i = 0; i < A_MAX; i++)
@@ -1460,7 +1447,7 @@ static void style_aux_hook(birth_menu w_str)
  */
 static bool get_player_style(void)
 {
-	int i,choice;
+	int i;
 	birth_menu styles[MAX_WEAP_STYLES];
 	u32b style;
 	int style_list[MAX_WEAP_STYLES];
@@ -1502,25 +1489,22 @@ static bool get_player_style(void)
 	{
 		/* Save the string */
 		styles[i].name = w_name_style[style_list[i]];
+		styles[i].choice = style_list[i];
 		styles[i].ghost = FALSE;
 	}
 
 	/* Hack */
 	styles[0].ghost = TRUE;
 
-	choice = get_player_choice(styles, num, STYLE_COL, STYLE_AUX_COL - STYLE_COL - 1,
+	p_ptr->pstyle = get_player_choice(styles, num, STYLE_COL, STYLE_AUX_COL - STYLE_COL - 1,
 				   "styles.txt", style_aux_hook);
 
 	/* No selection? */
-	if (choice == INVALID_CHOICE)
+	if (p_ptr->pstyle == INVALID_CHOICE)
 	{
 		p_ptr->pstyle = 0;
 
 		return (FALSE);
-	}
-	else
-	{
-		p_ptr->pstyle = style_list[choice];
 	}
 
 	return (TRUE);
@@ -1532,7 +1516,7 @@ static bool get_player_style(void)
  */
 static bool get_player_book(void)
 {
-	int     i,choice;
+	int     i;
 	birth_menu *books;
 
 	int *book_list;
@@ -1616,28 +1600,23 @@ static bool get_player_book(void)
 	{
 		/* Save the string. Note offset to skip 'of ' */
 		books[i].name = k_name + k_info[book_list[i]].name + 3;
+		books[i].choice = k_info[book_list[i]].sval;
 		books[i].ghost = k_info[book_list[i]].sval < SV_BOOK_MAX_GOOD;
 	}
 
-	choice = get_player_choice(books, num, BOOK_COL, 80 - BOOK_COL - 1,
+	p_ptr->psval = get_player_choice(books, num, BOOK_COL, 80 - BOOK_COL - 1,
 				     "books.txt", NULL);
 
+	FREE(book_list);
+	FREE(books);
+
 	/* No selection? */
-	if (choice == INVALID_CHOICE)
+	if (p_ptr->psval == INVALID_CHOICE)
 	{
 		p_ptr->psval = 0;
 
-		FREE(book_list);
-		FREE(books);
-
 		return (FALSE);
 	}
-	else
-    {
-    	p_ptr->psval = k_info[book_list[choice]].sval;
-    }
-	FREE(book_list);
-	FREE(books);
 
 	return (TRUE);
 }
@@ -1648,7 +1627,7 @@ static bool get_player_book(void)
  */
 static bool get_player_school(void)
 {
-	int     i,choice;
+	int     i;
 	birth_menu *schools;
 
 	int *school_list;
@@ -1734,6 +1713,7 @@ static bool get_player_school(void)
 
 		/* Save the string. Note offset to skip 'of ' */
 		schools[i].name = k_name + k_info[school_list[i]].name + 3;
+		schools[i].choice = k_info[school_list[i]].sval - SV_BOOK_SCHOOL + 1;
 		schools[i].ghost = TRUE;
 
 		/* Hack -- examine starting equipment in order to ghost stuff */
@@ -1766,25 +1746,19 @@ static bool get_player_school(void)
 		}
 	}
 
-	choice = get_player_choice(schools, num, SCHOOL_COL, 80 - SCHOOL_COL - 1,
+	p_ptr->pschool = get_player_choice(schools, num, SCHOOL_COL, 80 - SCHOOL_COL - 1,
 				     "schools.txt", NULL);
 
+	FREE(school_list);
+	FREE(schools);
+
 	/* No selection? */
-	if (choice == INVALID_CHOICE)
+	if (p_ptr->pschool == INVALID_CHOICE)
 	{
 		p_ptr->pschool = 0;
 
-		FREE(school_list);
-		FREE(schools);
-
 		return (FALSE);
 	}
-	else
-    {
-    	p_ptr->pschool = k_info[school_list[choice]].sval - SV_BOOK_SCHOOL + 1;
-    }
-	FREE(school_list);
-	FREE(schools);
 
 	return (TRUE);
 }
@@ -1800,9 +1774,9 @@ static bool get_player_roller(void)
 	int     choice;
 	birth_menu roller[MAX_ROLLER_CHOICES] =
 	{
-		{TRUE, "Just roll"},
-		{FALSE, "Choose minimum"},
-		{FALSE,	"Spend points"},		
+		{TRUE, "Just roll", 0},
+		{FALSE, "Choose minimum", 1},
+		{FALSE,	"Spend points", 2},		
 	};
 
 	/*** Player roller choice ***/
@@ -1814,28 +1788,24 @@ static bool get_player_roller(void)
 	choice = get_player_choice(roller, MAX_ROLLER_CHOICES, ROLLER_COL, 80 - ROLLER_COL - 1,
 				     "rollers.txt", NULL);
 
-	/* No selection? */
-    if (choice == INVALID_CHOICE)
+	/* Selection? */
+	switch(choice)
 	{
-		return (FALSE);
-	}
-	else
-	{
-		switch(choice)
-		{
-			case 0:
-				birth_point_based = FALSE;
-				birth_auto_roller = FALSE;
-				break;
-			case 1:
-				birth_point_based = FALSE;
-				birth_auto_roller = TRUE;
-				break;
-			case 2:
-				birth_point_based = TRUE;
-				birth_auto_roller = FALSE;
-				break;
-		}
+		case INVALID_CHOICE:
+			return (FALSE);
+	
+		case 0:
+			birth_point_based = FALSE;
+			birth_auto_roller = FALSE;
+			break;
+		case 1:
+			birth_point_based = FALSE;
+			birth_auto_roller = TRUE;
+			break;
+		case 2:
+			birth_point_based = TRUE;
+			birth_auto_roller = FALSE;
+			break;
 	}
 
 	return (TRUE);
@@ -1859,6 +1829,7 @@ static bool get_player_sex(void)
 	for (i = 0; i < 2; i++)
 	{
 		genders[i].name = sex_info[i].title;
+		genders[i].choice = i;
 		genders[i].ghost = FALSE;
 	}
 
@@ -1889,10 +1860,10 @@ static bool get_player_difficulty(void)
 	int     choice;
 	birth_menu difficulty[MAX_DIFFICULTY_CHOICES] =
 	{
-		{FALSE, "Beginner"},
-		{FALSE, "Played roguelikes before" },
-		{FALSE, "Played Angband before" },
-		{FALSE, "Played Unangband before"}
+		{FALSE, "Beginner", 0},
+		{FALSE, "Played roguelikes before", 1 },
+		{FALSE, "Played Angband before", 2 },
+		{FALSE, "Played Unangband before", 3}
 	};
 
 	/*** Player roller choice ***/
@@ -1904,36 +1875,32 @@ static bool get_player_difficulty(void)
 	choice = get_player_choice(difficulty, MAX_DIFFICULTY_CHOICES, DIFFICULTY_COL, 80 - DIFFICULTY_COL - 1,
 				     "difficulty.txt", NULL);
 
-	/* No selection? */
-    if (choice == INVALID_CHOICE)
+	/* Selection? */
+	switch(choice)
 	{
-		return (FALSE);
-	}
-	else
-	{
-		switch(choice)
-		{
-			case 0:
-				birth_beginner = TRUE;
-				birth_small_levels = FALSE;
-				birth_intermediate = FALSE;
-				break;
-			case 1:
-				birth_beginner = FALSE;
-				birth_small_levels = TRUE;
-				birth_intermediate = TRUE;
-				break;
-			case 2:
-				birth_beginner = FALSE;
-				birth_small_levels = FALSE;
-				birth_intermediate = TRUE;
-				break;
-			case 3:
-				birth_beginner = FALSE;
-				birth_small_levels = FALSE;
-				birth_intermediate = FALSE;
-				break;
-		}
+		case INVALID_CHOICE:
+			return(FALSE);
+
+		case 0:
+			birth_beginner = TRUE;
+			birth_small_levels = FALSE;
+			birth_intermediate = FALSE;
+			break;
+		case 1:
+			birth_beginner = FALSE;
+			birth_small_levels = TRUE;
+			birth_intermediate = TRUE;
+			break;
+		case 2:
+			birth_beginner = FALSE;
+			birth_small_levels = FALSE;
+			birth_intermediate = TRUE;
+			break;
+		case 3:
+			birth_beginner = FALSE;
+			birth_small_levels = FALSE;
+			birth_intermediate = FALSE;
+			break;
 	}
 
 	return (TRUE);
@@ -1950,8 +1917,8 @@ static bool get_player_keyboard(void)
 	int     choice;
 	birth_menu keyboard[MAX_KEYBOARD_CHOICES] =
 	{
-		{FALSE, "Desktop"},
-		{FALSE, "Laptop"}
+		{FALSE, "Desktop", 0},
+		{FALSE, "Laptop", 1}
 	};
 	
 	/*** Player roller choice ***/
@@ -1963,22 +1930,18 @@ static bool get_player_keyboard(void)
 	choice = get_player_choice(keyboard, MAX_KEYBOARD_CHOICES, KEYBOARD_COL, DIFFICULTY_COL - KEYBOARD_COL - 1,
 				     "keyboard.txt", NULL);
 
-	/* No selection? */
-    if (choice == INVALID_CHOICE)
+	/* Selection? */
+	switch(choice)
 	{
-		return (FALSE);
-	}
-	else
-	{
-		switch(choice)
-		{
-			case 0:
-				rogue_like_commands = FALSE;
-				break;
-			case 1:
-				rogue_like_commands = TRUE;
-				break;
-		}
+		case INVALID_CHOICE:
+			return(FALSE);
+
+		case 0:
+			rogue_like_commands = FALSE;
+			break;
+		case 1:
+			rogue_like_commands = TRUE;
+			break;
 	}
 
 	return (TRUE);
@@ -1994,8 +1957,8 @@ static bool get_player_quickstart(void)
 	int     choice;
 	birth_menu quickstart[MAX_QUICKSTART_CHOICES] =
 	{
-		{FALSE, "Yes"},
-		{FALSE, "No"}
+		{FALSE, "Yes", 0},
+		{FALSE, "No", 1}
 	};
 	
 	/*** Player roller choice ***/
@@ -2007,22 +1970,18 @@ static bool get_player_quickstart(void)
 	choice = get_player_choice(quickstart, MAX_QUICKSTART_CHOICES, QUICKSTART_COL, 80 - QUICKSTART_COL - 1,
 				     "quickstart.txt", NULL);
 
-	/* No selection? */
-    if (choice == INVALID_CHOICE)
+	/* Selection? */
+	switch(choice)
 	{
-		return (FALSE);
-	}
-	else
-	{
-		switch(choice)
-		{
-			case 0:
-				birth_quickstart = TRUE;
-				break;
-			case 1:
-				birth_quickstart = FALSE;
-				break;
-		}
+		case INVALID_CHOICE:
+			return(FALSE);
+
+		case 0:
+			birth_quickstart = TRUE;
+			break;
+		case 1:
+			birth_quickstart = FALSE;
+			break;
 	}
 
 	return (TRUE);
