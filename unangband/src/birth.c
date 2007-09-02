@@ -1447,11 +1447,9 @@ static void style_aux_hook(birth_menu w_str)
  */
 static bool get_player_style(void)
 {
-	int i;
+	int i, j = 0;
 	birth_menu styles[MAX_WEAP_STYLES];
 	u32b style;
-	int style_list[MAX_WEAP_STYLES];
-	int num = 0;
 
 	/*** Player weapon speciality ***/
 
@@ -1470,33 +1468,31 @@ static bool get_player_style(void)
 	/* Analyse styles */
 	for (i = 0;i<MAX_WEAP_STYLES;i++)
 	{
-		if (style & (1L<<i)) style_list[num++]=i;
-
+		if (style & (1L<<i))
+		{
+			/* Save the string */
+			styles[j].name = w_name_style[i];
+			styles[j].choice = i;
+			styles[j++].ghost = FALSE;
+		}
 	}
-	if (num == 1)
+	
+	/* Has one choice */
+	if (j == 1)
 	{
-		p_ptr->pstyle = style_list[0];
+		p_ptr->pstyle = styles[0].choice;
 		
 		return (TRUE);
-	}
-
-	/* Extra info */
-	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
-					"Your 'style' determines under what circumstances you get extra bonuses.");
-
-	/* Tabulate styles */
-	for (i = 0; i < num; i++)
-	{
-		/* Save the string */
-		styles[i].name = w_name_style[style_list[i]];
-		styles[i].choice = style_list[i];
-		styles[i].ghost = FALSE;
 	}
 
 	/* Hack */
 	styles[0].ghost = TRUE;
 
-	p_ptr->pstyle = get_player_choice(styles, num, STYLE_COL, STYLE_AUX_COL - STYLE_COL - 1,
+	/* Extra info */
+	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
+					"Your 'style' determines under what circumstances you get extra bonuses.");
+
+	p_ptr->pstyle = get_player_choice(styles, j, STYLE_COL, STYLE_AUX_COL - STYLE_COL - 1,
 				   "styles.txt", style_aux_hook);
 
 	/* No selection? */
@@ -1516,33 +1512,40 @@ static bool get_player_style(void)
  */
 static bool get_player_book(void)
 {
-	int     i;
+	int     i, j = 0;
 	birth_menu *books;
 
-	int *book_list;
-
+	/* Hack -- until we set up schools for prayer books and song books,
+	 * we use this to determine whether we check sval < SV_BOOK_MAX_GOOD
+	 * or sval >= SV_BOOK_MIN_GOOD */
+	bool max_good = FALSE;
+	
 	/*** Player book speciality ***/
 
 	int bookc = 0;
-	int num = 0;
 
 	object_kind *k_ptr;
 
-	int t=0;
+	int tval=0;
 
 	switch (p_ptr->pstyle)
 	{
 		case WS_MAGIC_BOOK:
-			t = TV_MAGIC_BOOK;
+			tval = TV_MAGIC_BOOK;
+			max_good = TRUE;
 			break;
 
 		case WS_PRAYER_BOOK:
-			t = TV_PRAYER_BOOK;
+			tval = TV_PRAYER_BOOK;
+			max_good = TRUE;
 			break;
 
 		case WS_SONG_BOOK:
-			t = TV_SONG_BOOK;
+			tval = TV_SONG_BOOK;
 			break;
+			
+		default:
+			return (FALSE);
 	}
 
 	/* Count books */
@@ -1551,39 +1554,52 @@ static bool get_player_book(void)
 		k_ptr = &k_info[i];
 
 		/* Hack -- ignore books that the player has not seen yet */
-		if ((birth_intermediate) && !(k_ptr->aware) && (k_ptr->sval < SV_BOOK_MAX_GOOD)) continue;
+		if ((birth_intermediate) && !(k_ptr->aware) && (max_good ? k_ptr->sval < SV_BOOK_MAX_GOOD : k_ptr->sval >= SV_BOOK_MIN_GOOD)) continue;
 		
 		/* Hack -- count one of non-dungeon books per school */
 		if ((k_ptr->sval >= SV_BOOK_MAX_GOOD) && (k_ptr->sval % SV_BOOK_SCHOOL /* != SV_BOOK_SCHOOL - 1 */)) continue;
 
+		/* Hack -- count one of non-dungeon books per school */
+		if (!(max_good) && (k_ptr->sval < SV_BOOK_MIN_GOOD) && (k_ptr->sval % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 1)) continue;
+
 		/* Book */
-		if (k_ptr->tval == t) bookc++;
+		if (k_ptr->tval == tval) bookc++;
 	}
 
+	/* No books */
 	if (!bookc) return (FALSE);
 
 	C_MAKE(books, bookc, birth_menu);
-	C_MAKE(book_list, bookc, int);
 
 	/* Analyse books */
 	for (i = 0;i<z_info->k_max;i++)
-	{
+	{	
+		/* Check spells with pre-requisites */
 		k_ptr = &k_info[i];
 
 		/* Hack -- ignore books that the player has not seen yet */
-		if ((birth_intermediate) && !(k_ptr->aware) && (k_ptr->sval < SV_BOOK_MAX_GOOD)) continue;
+		if ((birth_intermediate) && !(k_ptr->aware) && (max_good ? k_ptr->sval < SV_BOOK_MAX_GOOD : k_ptr->sval >= SV_BOOK_MIN_GOOD)) continue;
 		
 		/* Hack -- count one of non-dungeon books per school */
-		if ((k_ptr->sval >= SV_BOOK_MAX_GOOD) && (k_ptr->sval % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 1)) continue;
+		if ((max_good) && (k_ptr->sval >= SV_BOOK_MAX_GOOD) && (k_ptr->sval % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 1)) continue;
 
-		if (k_ptr->tval == t) book_list[num++] = i;
+		/* Hack -- count one of non-dungeon books per school */
+		if (!(max_good) && (k_ptr->sval < SV_BOOK_MIN_GOOD) && (k_ptr->sval % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 1)) continue;
+
+		/* Correct tval */
+		if (k_ptr->tval == tval)
+		{		
+			/* Save the string. Note offset to skip 'of ' */
+			books[j].name = k_name + k_ptr->name + 3;
+			books[j].choice = k_ptr->sval;
+			books[j++].ghost = FALSE;
+		}
 	}
 
-	if (num == 1)
+	if (j == 1)
 	{
-		p_ptr->psval = k_info[book_list[0]].sval;
+		p_ptr->psval = books[0].choice;
 
-		FREE(book_list);
 		FREE(books);
 
 		return (TRUE);
@@ -1595,19 +1611,9 @@ static bool get_player_book(void)
 	if (!birth_intermediate) Term_putstr(QUESTION_COL, QUESTION_ROW + 1, -1, TERM_YELLOW,
 	    "Any greyed-out entries should only be used by advanced players.");
 
-	/* Tabulate styles */
-	for (i = 0; i < num; i++)
-	{
-		/* Save the string. Note offset to skip 'of ' */
-		books[i].name = k_name + k_info[book_list[i]].name + 3;
-		books[i].choice = k_info[book_list[i]].sval;
-		books[i].ghost = k_info[book_list[i]].sval < SV_BOOK_MAX_GOOD;
-	}
-
-	p_ptr->psval = get_player_choice(books, num, BOOK_COL, 80 - BOOK_COL - 1,
+	p_ptr->psval = get_player_choice(books, j, BOOK_COL, 80 - BOOK_COL - 1,
 				     "books.txt", NULL);
 
-	FREE(book_list);
 	FREE(books);
 
 	/* No selection? */
@@ -1627,41 +1633,38 @@ static bool get_player_book(void)
  */
 static bool get_player_school(void)
 {
-	int     i;
+	int     i, j, k = 0;
 	birth_menu *schools;
-
-	int *school_list;
 
 	/*** Player school speciality ***/
 
 	int schoolc = 0;
-	int num = 0;
 
 	object_kind *k_ptr;
 
-	int t=0;
+	int tval=0;
 
 	switch (p_ptr->pstyle)
 	{
 		case WS_MAGIC_BOOK:
-			t = TV_MAGIC_BOOK;
+			tval = TV_MAGIC_BOOK;
 			break;
 
 		case WS_PRAYER_BOOK:
-			t = TV_PRAYER_BOOK;
+			tval = TV_PRAYER_BOOK;
 			break;
 
 		case WS_SONG_BOOK:
-			t = TV_SONG_BOOK;
+			tval = TV_SONG_BOOK;
 			break;
 			
 		default:
-			t = c_info[p_ptr->pclass].spell_book;
+			tval = c_info[p_ptr->pclass].spell_book;
 			break;
 	}
 
 	/* No spell book style */
-	if (!t) return (TRUE);
+	if (!tval) return (TRUE);
 
 	/* Count schools */
 	for (i = 0;i<z_info->k_max;i++)
@@ -1671,13 +1674,12 @@ static bool get_player_school(void)
 		/* Hack -- count one of non-dungeon books per school */
 		if ((k_ptr->sval < SV_BOOK_MAX_GOOD) || (k_ptr->sval % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 1)) continue;
 
-		if (k_ptr->tval == t) schoolc++;
+		if (k_ptr->tval == tval) schoolc++;
 	}
 
 	if (!schoolc) return (TRUE);
 
 	C_MAKE(schools, schoolc, birth_menu);
-	C_MAKE(school_list, schoolc, int);
 
 	/* Analyse books */
 	for (i = 0;i<z_info->k_max;i++)
@@ -1687,14 +1689,19 @@ static bool get_player_school(void)
 		/* Hack -- count one of non-dungeon books per school */
 		if ((k_ptr->sval < SV_BOOK_MAX_GOOD) || (k_ptr->sval % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 1)) continue;
 
-		if (k_ptr->tval == t) school_list[num++] = i;
+		if (k_ptr->tval == tval)		
+		{
+			/* Save the string. Note offset to skip 'of ' */
+			schools[k].name = k_name + k_ptr->name + 3;
+			schools[k].choice = k_ptr->sval - SV_BOOK_SCHOOL + 1;
+			schools[k++].ghost = FALSE;
+		}
 	}
 
-	if (num == 1)
+	if (k == 1)
 	{
-		p_ptr->pschool = k_info[school_list[0]].sval;
+		p_ptr->pschool = schools[0].choice;
 
-		FREE(school_list);
 		FREE(schools);
 
 		return (TRUE);
@@ -1706,50 +1713,9 @@ static bool get_player_school(void)
 	Term_putstr(QUESTION_COL, QUESTION_ROW + 1, -1, TERM_YELLOW,
 	    "Any greyed-out entries should only be used by advanced players.");
 
-	/* Tabulate styles */
-	for (i = 0; i < num; i++)
-	{
-		int j;
-
-		/* Save the string. Note offset to skip 'of ' */
-		schools[i].name = k_name + k_info[school_list[i]].name + 3;
-		schools[i].choice = k_info[school_list[i]].sval - SV_BOOK_SCHOOL + 1;
-		schools[i].ghost = TRUE;
-
-		/* Hack -- examine starting equipment in order to ghost stuff */
-		for (j = 0; j < MAX_CLASS_ITEMS; j++)
-		{
-			int tval = cp_ptr->start_items[j].tval;
-			int sval = cp_ptr->start_items[j].sval;
-			
-			bool book = FALSE;
-
-			/* Check books */
-			if ((tval == c_info[p_ptr->pclass].spell_book)
-				|| ((tval == TV_MAGIC_BOOK) && (p_ptr->pstyle == WS_MAGIC_BOOK))
-				|| ((tval == TV_PRAYER_BOOK) && (p_ptr->pstyle == WS_PRAYER_BOOK))
-				|| ((tval == TV_SONG_BOOK) && (p_ptr->pstyle == WS_SONG_BOOK)))
-			{
-				if ((sval > k_info[school_list[i]].sval - SV_BOOK_SCHOOL)
-					&& (sval <= k_info[school_list[i]].sval))
-				{						
-					schools[i].ghost = FALSE;
-					book = FALSE;
-				}
-			}
-		}
-		
-		/* Hack for mages - 5 possible schools */
-		if ((schools[0].ghost == FALSE) && (k_info[school_list[i]].sval < SV_BOOK_MAX_GOOD + SV_BOOK_SCHOOL * 5))
-		{
-			schools[i].ghost = FALSE;
-		}
-	}
-
-	p_ptr->pschool = get_player_choice(schools, num, SCHOOL_COL, 80 - SCHOOL_COL - 1,
+	p_ptr->pschool = get_player_choice(schools, k, SCHOOL_COL, 80 - SCHOOL_COL - 1,
 				     "schools.txt", NULL);
 
-	FREE(school_list);
 	FREE(schools);
 
 	/* No selection? */
@@ -2218,10 +2184,10 @@ static bool player_birth_aux_1(void)
 		if (!get_player_book()) return (FALSE);
 	}
 
-	/* Choose the school */
-	if ((p_ptr->pstyle == WS_MAGIC_BOOK) || (p_ptr->pstyle == WS_PRAYER_BOOK) || (p_ptr->pstyle == WS_SONG_BOOK)
-		|| (c_info[p_ptr->pclass].spell_book == TV_MAGIC_BOOK)|| (c_info[p_ptr->pclass].spell_book == TV_PRAYER_BOOK)
-		|| (c_info[p_ptr->pclass].spell_book == TV_SONG_BOOK))
+	/* Choose the school - hack: just magic for the moment */
+	if ((p_ptr->pstyle == WS_MAGIC_BOOK) || (p_ptr->pstyle == WS_PRAYER_BOOK) /*|| (p_ptr->pstyle == WS_SONG_BOOK) */
+		|| (c_info[p_ptr->pclass].spell_book == TV_MAGIC_BOOK) || (c_info[p_ptr->pclass].spell_book == TV_PRAYER_BOOK)
+		/*|| (c_info[p_ptr->pclass].spell_book == TV_SONG_BOOK)*/)
 	{
 		/* Clean up */
 		clear_question();
