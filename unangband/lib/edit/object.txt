@@ -6984,21 +6984,21 @@ P:0:1d1:0:0:0
 
 #### Vana - Summon Plants / Animals. Druidic like magic. TODO
 
-N:955:of Prayers
+N:955:of Sayings
 G:?:B
 I:91:44:0
 W:5:0:30:25
 A:5/9
 P:0:1d1:0:0:0
 
-N:956:of Rites
+N:956:of Prayers
 G:?:B
 I:91:45:0
 W:10:0:30:100
 A:10/9
 P:0:1d1:0:0:0
 
-N:957:of Passages
+N:957:of Canticles
 G:?:B
 I:91:46:0
 W:20:0:30:300
@@ -7012,7 +7012,7 @@ W:30:0:30:900
 A:30/9
 P:0:1d1:0:0:0
 
-#### Nienna. Vs undead / summon undead.
+#### Nienna. Vs undead / summon undead. TODO
 
 N:959:of Offerings
 G:?:B
@@ -7051,7 +7051,7 @@ W:30:0:30:900
 A:30/9
 P:0:1d1:0:0:0
 
-#### Ulmo.
+#### Ulmo. TODO
 
 N:964:of Sanctity
 G:?:B
@@ -7081,7 +7081,7 @@ W:30:0:30:900
 A:30/9
 P:0:1d1:0:0:0
 
-#### Varda. Light / divination.
+#### Varda. Light / divination. TODO
 
 N:968:of Vows
 G:?:B
@@ -7111,7 +7111,7 @@ W:30:0:30:900
 A:30/9
 P:0:1d1:0:0:0
 
-#### Manwe. Air Magic.
+#### Manwe. Air Magic. TODO
 
 N:972:of Blessings
 G:?:B
@@ -7141,7 +7141,7 @@ W:30:0:30:900
 A:30/9
 P:0:1d1:0:0:0
 
-#### Melkor.
+#### Melkor. TODO
 
 N:976:of Oaths
 G:?:B
