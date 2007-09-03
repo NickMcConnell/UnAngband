@@ -801,25 +801,25 @@ static void remove_useless_spells(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, u3
 	if (m_ptr->hp >= m_ptr->maxhp) f6 &= ~(RF6_HEAL);
 
 	/* Don't Haste if Hasted */
-	if (m_ptr->hasted > 10) f6 &= ~(RF6_HASTE);
+	if (m_ptr->hasted) f6 &= ~(RF6_HASTE);
 
-	/* Don't Invisible if Invisible */
-	if (m_ptr->tim_invis > 10) f6 &= ~(RF6_INVIS);
+	/* Don't Invisible if Invisible or Can't be seen */
+	if ((m_ptr->tim_invis) || !(m_ptr->ml)) f6 &= ~(RF6_INVIS);
 
-	/* Don't Wraithform if Wraithform */
-	if (m_ptr->tim_passw > 10) f6 &= ~(RF6_WRAITHFORM);
+	/* Don't Wraithform if Wraithform and Wraithform not running out in dangerous terrain */
+	if ((m_ptr->tim_passw) && ((m_ptr->tim_passw > 10) || (place_monster_here(m_ptr->fy,m_ptr->fx,m_ptr->r_idx) > MM_FAIL))) f6 &= ~(RF6_WRAITHFORM);
 
 	/* Don't Bless if Blessed */
-	if (m_ptr->bless > 10) f6 &= ~(RF6_BLESS);
+	if (m_ptr->bless) f6 &= ~(RF6_BLESS);
 
 	/* Don't Berserk if Beserk */
-	if (m_ptr->berserk > 10) f6 &= ~(RF6_BERSERK);
+	if (m_ptr->berserk) f6 &= ~(RF6_BERSERK);
 
 	/* Don't Shield if Shielded */
-	if (m_ptr->shield > 10) f6 &= ~(RF6_SHIELD);
+	if (m_ptr->shield) f6 &= ~(RF6_SHIELD);
 
 	/* Don't Oppose elements if Oppose Elements */
-	if (m_ptr->oppose_elem > 10) f6 &= ~(RF6_OPPOSE_ELEM);
+	if (m_ptr->oppose_elem) f6 &= ~(RF6_OPPOSE_ELEM);
 
 	/* Don't cure if not needed */
 	if (!((m_ptr->stunned) ||(m_ptr->monfear) || (m_ptr->confused) || (m_ptr->blind) ||
