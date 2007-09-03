@@ -795,7 +795,7 @@ static void remove_useless_spells(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, u3
 	if (m_ptr->mana >= r_ptr->mana) f6 &= ~(RF6_ADD_MANA);
 
 	/* Don't regain ammo if has some */
-	if ((f4 & RF4_ADD_AMMO) && (find_monster_ammo(m_idx, -1, FALSE) < 0)) f4 &= ~(RF4_ADD_AMMO);
+	if ((f4 & RF4_ADD_AMMO) && (find_monster_ammo(m_idx, -1, FALSE) >= 0)) f4 &= ~(RF4_ADD_AMMO);
 
 	/* Don't heal if full */
 	if (m_ptr->hp >= m_ptr->maxhp) f6 &= ~(RF6_HEAL);

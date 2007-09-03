@@ -3140,8 +3140,9 @@ void set_monster_slow(s16b m_idx, s16b counter, bool message)
  *
  * blow == -1: Check all blows. Return ammo slot for monster
  * ammunition. If created set true, create ammunition for
- * all blows which require it. If return 0, monster does
- * not require ammuntion.
+ * all blows which require it, and return slot of last
+ * ammunition created. If created set false, return slot of
+ * valid ammunition, return -1 if no ammunition found.
  * blow == 0..3: Check this one blow. Return -1 if there
  * is no ammunition for this blow. If created set true,
  * create ammunition for this one blow which requires it.
@@ -3264,10 +3265,9 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 				break;
 			}
 
+			default:
+				continue;
 		}
-
-		/* Blow doesn't need ammo */
-		if (!ammo_tval) continue;
 
 		/* Scan monster inventory */
 		for (this_o_idx = m_ptr->hold_o_idx; this_o_idx; this_o_idx = next_o_idx)
