@@ -1527,21 +1527,26 @@ static bool get_player_book(void)
 	object_kind *k_ptr;
 
 	int tval=0;
+	
+	cptr help = NULL;
 
 	switch (p_ptr->pstyle)
 	{
 		case WS_MAGIC_BOOK:
 			tval = TV_MAGIC_BOOK;
 			max_good = TRUE;
+			help = "magic.txt";
 			break;
 
 		case WS_PRAYER_BOOK:
 			tval = TV_PRAYER_BOOK;
 			max_good = TRUE;
+			help = "prayers.txt";
 			break;
 
 		case WS_SONG_BOOK:
 			tval = TV_SONG_BOOK;
+			help = "songs.txt";
 			break;
 			
 		default:
@@ -1612,7 +1617,7 @@ static bool get_player_book(void)
 	    "Any greyed-out entries should only be used by advanced players.");
 
 	p_ptr->psval = get_player_choice(books, j, BOOK_COL, 80 - BOOK_COL - 1,
-				     "books.txt", NULL);
+				     help, NULL);
 
 	FREE(books);
 
@@ -1644,6 +1649,9 @@ static bool get_player_school(void)
 
 	int tval=0;
 
+	cptr text = NULL;
+	cptr help = NULL;
+	
 	switch (p_ptr->pstyle)
 	{
 		case WS_MAGIC_BOOK:
@@ -1660,9 +1668,29 @@ static bool get_player_school(void)
 			
 		default:
 			tval = c_info[p_ptr->pclass].spell_book;
+	
 			break;
 	}
 
+	switch (tval)
+	{
+		case TV_MAGIC_BOOK:
+			text = "school";
+			help = "schools.txt";
+			break;
+	
+		case TV_PRAYER_BOOK:
+			text = "religion";
+			help = "religions.txt";
+			break;
+	
+		case TV_SONG_BOOK:
+			text = "college";
+			help = "colleges.txt";
+			break;
+	}
+	
+	
 	/* No spell book style */
 	if (!tval) return (TRUE);
 
@@ -1709,12 +1737,12 @@ static bool get_player_school(void)
 
 	/* Extra info */
 	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
-		    "Your 'school' determines which spell book you start with.");
+		    format("Your '%s' determines which spell book you start with.", text));
 	Term_putstr(QUESTION_COL, QUESTION_ROW + 1, -1, TERM_YELLOW,
 	    "Any greyed-out entries should only be used by advanced players.");
 
 	p_ptr->pschool = get_player_choice(schools, k, SCHOOL_COL, 80 - SCHOOL_COL - 1,
-				     "schools.txt", NULL);
+				     help, NULL);
 
 	FREE(schools);
 
