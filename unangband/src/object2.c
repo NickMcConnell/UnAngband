@@ -9246,7 +9246,8 @@ bool spell_okay(int spell, bool known)
 
 	int i;
 
-	bool legible =FALSE;
+	bool legible = FALSE;
+	bool specialist = FALSE;
 
 	/* Get the spell */
 	s_ptr = &s_info[spell];
@@ -9262,9 +9263,10 @@ bool spell_okay(int spell, bool known)
 	}
 
 	/* Hack -- get casting information for specialists */
-	if ((!legible) && (spell_match_style(spell)))
+	if (spell_match_style(spell))
 	{
 		legible = TRUE;
+		specialist = TRUE;
 	}
 
 	/* Spell is illegible */
@@ -9281,16 +9283,17 @@ bool spell_okay(int spell, bool known)
 	/* Spell okay to study, not to cast */
 	if (i == PY_MAX_SPELLS)
 	{
-		/* Spell may require pre-requisites */
+	  /* Spell may require pre-requisites */
 		if (!known)
 		{
 			int n;
 
 			bool preq = FALSE;
 
-			/* Check prerequisites */
-			for (n = 0; n < MAX_SPELL_PREREQUISITES; n++)
-			{
+			/* Check prerequisites, unless specialist */
+			if (!specialist)
+			  for (n = 0; n < MAX_SPELL_PREREQUISITES; n++)
+			  {
 				if (s_info[spell].preq[n])
 				{
 					preq = TRUE;
@@ -9300,7 +9303,7 @@ bool spell_okay(int spell, bool known)
 						if (p_ptr->spell_order[i] == s_info[spell].preq[n]) return (!known);
 					}
 				}
-			}
+			  }
 
 			return (!preq);
 		}
