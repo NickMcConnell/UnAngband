@@ -529,7 +529,7 @@ static void process_world(void)
 		/* Update the stores once a day (while in dungeon) */
 		if (!(turn % (10L * STORE_TURNS)))
 		{
-			int n;
+		  int n, i;
 
 			/* Message */
 			if (cheat_xtra) msg_print("Updating Shops...");
@@ -537,12 +537,21 @@ static void process_world(void)
 			/* Maintain each shop (except home, special locations) */
 			for (n = 0; n < total_store_count; n++)
 			{
-				/* Maintain */
-				store_maint(n);
+
+			  /* no restocking for alien towns */
+			  town_type *t_ptr = &t_info[p_ptr->town];
+			  for (i = 0; i < MAX_STORES; i++)
+			    {
+			      if (t_ptr->store_index[i] == n)
+				break;
+			    }
+			  if (i < MAX_STORES)
+			    /* Maintain */
+			    store_maint(n);
 			}
 
 			/* Sometimes, shuffle the shop-keepers */
-			if ((total_store_count) && (rand_int(STORE_SHUFFLE) == 0))
+			if ((total_store_count) && (rand_int(STORE_SHUFFLE) < 3))
 			{
 				/* Message */
 				if (cheat_xtra) msg_print("Shuffling a Shopkeeper...");
@@ -550,8 +559,16 @@ static void process_world(void)
 				/* Pick a random shop (except home) */
 				n = randint(total_store_count - 1);
 
-				/* Shuffle it */
-				store_shuffle(n);
+			  /* no shuffling for alien towns */
+			  town_type *t_ptr = &t_info[p_ptr->town];
+			  for (i = 0; i < MAX_STORES; i++)
+			    {
+			      if (t_ptr->store_index[i] == n)
+				break;
+			    }
+			  if (i < MAX_STORES)
+			    /* Shuffle it */
+			    store_shuffle(n);
 			}
 
 			/* Message */
