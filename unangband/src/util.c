@@ -4460,8 +4460,7 @@ bool is_valid_pf(int y, int x)
 		 && ( (f_info[feat].flags1 & (FF1_DISARM)) ||
 		 ( !(f_info[feat].flags1 & (FF1_MOVE)) &&
 		 !(f_info[feat].flags3 & (FF3_EASY_CLIMB)) && 
-		 ( (f_info[feat].flags1 & (FF1_BASH)) ||       
-		   (f_info[feat].flags1 & (FF1_OPEN)) ))))
+		 (f_info[feat].flags1 & (FF1_OPEN)))))
 	{
 		return (TRUE);
 	}

@@ -2262,13 +2262,14 @@ void do_cmd_alter(void)
 		more = do_cmd_bash_aux(y, x);
 	}
 #endif
+#if 0
 	/* Tunnel through walls */
 	else if (f_info[feat].flags1 & (FF1_TUNNEL))
 	{
 		/* Tunnel */
 		more = do_cmd_tunnel_aux(y, x);
 	}
-
+#endif
 #if 0
 
 	/* Close open doors */
@@ -2723,8 +2724,6 @@ static bool do_cmd_walk_test(int y, int x)
 
 		if (easy_alter)
 		{
-
-			if (f_info[feat].flags1 & (FF1_BASH)) return(TRUE);
 			if (f_info[feat].flags1 & (FF1_OPEN)) return(TRUE);
 		}
 
