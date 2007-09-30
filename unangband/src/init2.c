@@ -294,7 +294,7 @@ void create_user_dirs(void)
 	/* Create the directory */
 	mkdir(subdirpath, 0700);
 
-#ifdef USE_PRIVATE_PATHS
+#ifdef PRIVATE_USER_PATHS
 	/* Build the path to the scores sub-directory */
 	path_build(dirpath, sizeof(dirpath), subdirpath, "scores");
 
@@ -318,7 +318,7 @@ void create_user_dirs(void)
 
 	/* Create the directory */
 	mkdir(dirpath, 0700);
-#endif /* USE_PRIVATE_PATHS */
+#endif /* PRIVATE_USER_PATHS */
 }
 
 #endif /* PRIVATE_USER_PATH */

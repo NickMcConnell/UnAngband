@@ -393,10 +393,13 @@
 #define ROOM_FRACTAL			13
 #define ROOM_LARGE_FRACTAL		14
 #define ROOM_HUGE_FRACTAL		15
-#define ROOM_LAKE				16
-#define ROOM_HUGE_LAKE			17
-#define ROOM_LAIR				18
-#define ROOM_TOWER       		19
+#define ROOM_LAIR				16
+#define ROOM_MAZE				17
+#define ROOM_LARGE_MAZE			18
+#define ROOM_HUGE_MAZE			19
+#define ROOM_LAKE				20
+#define ROOM_HUGE_LAKE			21
+#define ROOM_TOWER       		22
 
 
 
@@ -2922,7 +2925,7 @@
 #define LF1_CAVE	0x00080000L	/* Cave level */
 #define LF1_TOWN	0x00100000L	/* Town level */
 #define LF1_WILD	0x00200000L	/* Wilderness level */
-#define LF1_RUIN	0x00400000L	/* Chambers level */
+#define LF1_LABYRINTH	0x00400000L	/* Labyrinth level */
 #define LF1_FEATURE	0x00800000L	/* Chambers level */
 #define LF1_CHAMBERS	0x01000000L	/* Chambers level */
 #define LF1_DARK	0x02000000L	/* Dark room */
@@ -2937,7 +2940,7 @@
 #define LF1_THEME \
 	(LF1_DESTROYED | LF1_VAULT | LF1_DUNGEON | LF1_STRONGHOLD | \
 	LF1_CRYPT | LF1_LAIR | LF1_MINE | LF1_CAVE | LF1_WILD | \
-	LF1_SEWER | LF1_TOWER)
+	LF1_SEWER | LF1_LABYRINTH)
 
 /* Room generation flags */
 #define RG1_NORTH	0x00000001L	/* Place in north */

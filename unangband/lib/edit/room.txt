@@ -196,6 +196,25 @@ N:16:107:0:0:1:1:0:128
 A:
 B:lair
 
+# Maze.
+
+N:17:107:0:0:1:1:0:128
+A:
+B:maze
+
+# Large maze.
+
+N:18:117:0:0:1:1:0:128
+A:
+B:labyrinth
+
+# Huge maze.
+
+N:19:113:0:0:1:1:0:128
+A:
+B:labyrinth
+
+
 # An inner room of some description
 
 N:102:107:0:0:5:0:3:128
