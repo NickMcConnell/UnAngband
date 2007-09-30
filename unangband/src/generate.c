@@ -1005,7 +1005,7 @@ static void generate_rect(int y1, int x1, int y2, int x2, int feat)
  * solid and outer walls respectively if the feat_wall feature is a WALL. This allows the
  * construction of maze rooms required for labrynth levels.
  */
-static void draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
+static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
     s16b feat_path, int width_wall, int width_path, byte flag)
 {
 	int i, j;
@@ -1023,10 +1023,10 @@ static void draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	s16b *saved;
 
 	/* Paranoia */
-	if ((!feat_wall) || (!feat_path) || (feat_wall == feat_path) || (width_wall < 1) || (width_path < 1)) return;
+	if ((!feat_wall) || (!feat_path) || (feat_wall == feat_path) || (width_wall < 1) || (width_path < 1)) return (FALSE);
 
 	/* Paranoia */
-	if (!in_bounds_fully(y1, x1) || !in_bounds_fully(y2, x2)) return;
+	if (!in_bounds_fully(y1, x1) || !in_bounds_fully(y2, x2)) return (FALSE);
 
 #if 0
 
@@ -1035,7 +1035,8 @@ static void draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	if ((x2 - x1) % (width_wall + width_path) != (width_wall + 2) % (width_wall + width_path)) return;
 #endif
 	
-	if (cheat_room) msg_print(format("Drawing maze of %s filled with %s.", f_name + f_info[feat_wall].name, f_name + f_info[feat_path].name));	
+	if (cheat_room) msg_print(format("Drawing maze of %s (%d) filled with %s (%d).", f_name + f_info[feat_wall].name, width_wall,
+			f_name + f_info[feat_path].name, width_path));	
 	
 	/* Save the existing terrain to overwrite the maze later */
 	if (flag & (MAZE_SAVE))
@@ -1259,6 +1260,9 @@ static void draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 		/* Free the grids */
 		FREE(saved);
 	}
+	
+	/* Successful */
+	return (TRUE);
 }
 
 
@@ -1800,10 +1804,10 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 		}
 
 		/* Ensure the correct ordering and that size is odd in both directions */
-		if ((dy > 0) && (dx > 0)) draw_maze(y1, x1, y1 + ((y2 - y1) % 2 ? y2 : y2 - 1), x1 + ((x2 - x1) % 2 ? x2 : x2 - 1), wall, path, 1, 1, MAZE_SAVE);
-		else if ((dy < 0) && (dx > 0)) draw_maze(y2, x1, y1 + ((y2 - y1) % 2 ? y1 : y1 - 1), x1 + ((x2 - x1) % 2 ? x2 : x2 - 1), wall, path, 1, 1, MAZE_SAVE);
-		else if ((dy > 0) && (dx < 0)) draw_maze(y1, x2, y1 + ((y2 - y1) % 2 ? y2 : y2 - 1), x1 + ((x2 - x1) % 2 ? x1 : x1 - 1), wall, path, 1, 1, MAZE_SAVE);
-		else if ((dy < 0) && (dx < 0)) draw_maze(y2, x2, y1 + ((y2 - y1) % 2 ? y1 : y1 - 1), x1 + ((x2 - x1) % 2 ? x1 : x1 - 1), wall, path, 1, 1, MAZE_SAVE);
+		if ((dy > 0) && (dx > 0)) draw_maze(y1, x1, y2 - ((y2 - y1) % 2 ? 0 : 1), x2 - ((x2 - x1) % 2 ? 0 : 1), wall, path, 1, 1, MAZE_SAVE);
+		else if ((dy < 0) && (dx > 0)) draw_maze(y2 + ((y1 - y2) % 2 ? 0 : 1), x1, y1, x2 - ((x2 - x1) % 2 ? 0 : 1), wall, path, 1, 1, MAZE_SAVE);
+		else if ((dy > 0) && (dx < 0)) draw_maze(y1, x2 + ((x1 - x2) % 2 ? 0 : 1), y2 - ((y2 - y1) % 2 ? 0 : 1), x1, wall, path, 1, 1, MAZE_SAVE);
+		else if ((dy < 0) && (dx < 0)) draw_maze(y2 + ((y1 - y2) % 2 ? 0 : 1), x2 + ((x1 - x2) % 2 ? 0 : 1), y1, x1, wall, path, 1, 1, MAZE_SAVE);
 		
 		/* Hack -- outer exits in maze XXX */
 		
@@ -8048,17 +8052,24 @@ static bool build_type171819(int room, int type)
 
 	switch (type)
 	{
-		case ROOM_HUGE_MAZE: width_wall = rand_int(9) / 2 + 1; width_path = rand_int(9) / 6 + 1; ydim = 33; xdim = 65; break;
-		case ROOM_LARGE_MAZE: width_wall = rand_int(9) / 4 + 1; width_path = 1; ydim = 33; xdim = 33; break;
-		default: width_wall = 1; width_path = 1; ydim = rand_int(9) + 3; ydim = 17; xdim = 33; break;
+		case ROOM_HUGE_MAZE: width_wall = rand_int(9) / 3 + 1; width_path = rand_int(15) / 6 + 1; height = 33; width = 65; break;
+		case ROOM_LARGE_MAZE: width_wall = rand_int(15) / 4 + 1; width_path = 1; height = 33; width = 33; break;
+		default: width_wall = rand_int(9) / 6 + 1; width_path = rand_int(9) / 6 + 1; height = 17; width = 33; break;
 	}
 	
 	/* Ensure bigger paths on stronghold levels. This allows these corridors to connect correctly to the maze. */
 	if (level_flag & (LF1_STRONGHOLD)) width_path++;
+	if (level_flag & (LF1_CRYPT)) width_path = 3;
 
-	/* Width and height */
-	ydim = (ydim + width_wall - 2) / (width_wall + width_path);
-	xdim = (xdim + width_wall - 2) / (width_wall + width_path);
+	/* Calculate maze size */
+	ydim = (height + width_wall - 1) / (width_wall + width_path);
+	xdim = (width + width_wall - 1) / (width_wall + width_path);
+	
+	/* Ensure minimums */
+	if (ydim < 3) ydim = 3;
+	if (xdim < 3) xdim = 3;	
+	
+	/* Recalculate height and width based on maze size */
 	height = (ydim * width_path) + ((ydim - 1) * width_wall) + 2;
 	width = (xdim * width_path) + ((xdim - 1) * width_wall) + 2;
 	
@@ -8078,9 +8089,19 @@ static bool build_type171819(int room, int type)
 	generate_room(y1, x1, y2, x2, light);
 
 	/* Draw maze */
-	draw_maze(y1, x1, y2, x2, FEAT_WALL_OUTER, FEAT_FLOOR, width_wall, width_path, MAZE_ROOM);	
+	if (draw_maze(y1, x1, y2, x2, FEAT_WALL_OUTER, FEAT_FLOOR, width_wall, width_path, MAZE_ROOM)) return (TRUE);	
 	
-	return (TRUE);
+	/* Remove room */
+	for (y0 = y1; y0 <= y2; y0++)
+	{
+		for (x0 = x1; x0 <= x2; x0++)
+		{
+			cave_info[y0][x0] &= ~(CAVE_ROOM | CAVE_GLOW);
+		}
+	}
+	
+	/* Clear down room */
+	return (FALSE);
 }
 
 
