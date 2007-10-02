@@ -6323,7 +6323,6 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	int main_loop_count = 0;
 	int last_turn = 0, first_door, last_door, first_tunn, first_next, first_stair;
 	int start_tunnel = 0, start_decor = 0, end_decor = 0;
-	int first_decor = 0;
 	int last_decor = 0;
 	int door_l = 0;
 	int door_r = 0;
@@ -6788,12 +6787,16 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			bool left_turn = FALSE;
 			bool right_turn = FALSE;
 			
+			bool made_tunnel;
+			
 			/* Accept this location */
 			row1 = tmp_row;
 			col1 = tmp_col;
 
 			/* Add a bridge location */
-			if (add_tunnel(row1, col1, 0))
+			made_tunnel = add_tunnel(row1, col1, 0);
+				
+			if (made_tunnel)
 			{
 				/* Are we turning left? */
 				if ((row_dir == -old_col_dir) || (col_dir == old_row_dir)) left_turn = TRUE;
@@ -6807,16 +6810,16 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					if (f_info[cave_feat[row1+col_dir][col1-row_dir]].flags2 & (FF2_BRIDGE))
 					{
 						/* Add a bridge location */
-						add_tunnel(row1 + col_dir, col1 - row_dir, 0);
+						made_tunnel = add_tunnel(row1 + col_dir, col1 - row_dir, 0);
 					}
 					
 					/* Add 'diagonally backwards left-hand' bridge if just turned right */
-					if (right_turn)
+					if (made_tunnel && right_turn)
 					{
 						/* Add if bridgeable */
 						if ((f_info[cave_feat[row1 - row_dir + col_dir ][col1 - col_dir - row_dir]].flags2 & (FF2_BRIDGE)) != 0)
 						{
-							add_tunnel(row1 - row_dir + col_dir, col1 - col_dir - row_dir, 0);
+							made_tunnel = add_tunnel(row1 - row_dir + col_dir, col1 - col_dir - row_dir, 0);
 						}
 					}
 				}
@@ -6827,21 +6830,23 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					if (f_info[cave_feat[row1-col_dir][col1+row_dir]].flags2 & (FF2_BRIDGE))
 					{
 						/* Add a bridge location */
-						add_tunnel(row1 - col_dir, col1 + row_dir, 0);
+						made_tunnel = add_tunnel(row1 - col_dir, col1 + row_dir, 0);
 					}
 					
 					/* Add 'diagonally backwards right-hand' bridge if just turned left */
-					if (left_turn)
+					if (made_tunnel && left_turn)
 					{
 						/* Add if tunnelable, but not inner, outer or solid */
 						if ((f_info[cave_feat[row1 - row_dir - col_dir ][col1 - col_dir + row_dir]].flags2 & (FF2_BRIDGE)) != 0)
 						{
-							add_tunnel(row1 - row_dir + col_dir, col1 - col_dir - row_dir, 0);
+							made_tunnel = add_tunnel(row1 - row_dir + col_dir, col1 - col_dir - row_dir, 0);
 						}
 					}
 				}
 			}
-			else
+			
+			/* Ran out of tunnel space */
+			if (!made_tunnel)
 			{
 				if (cheat_room) msg_format("Tunnel length exceeded from %d. Aborting.", part1);
 			
@@ -6869,6 +6874,8 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			bool left_turn = FALSE;
 			bool right_turn = FALSE;
 			
+			bool made_tunnel = TRUE;
+			
 			/* Accept this location */
 			row1 = tmp_row;
 			col1 = tmp_col;
@@ -6877,142 +6884,164 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			 * Save the tunnel location unless an inner wall
 			 * Note hack to differentiate a tunnel from a bridge, if start_tunnel not set.
 			 */
-			if (((f_info[cave_feat[row1][col1]].flags1 & (FF1_INNER)) == 0) &&
-				(add_tunnel(row1, col1, start_tunnel ? start_tunnel : 1)))
+			if ((f_info[cave_feat[row1][col1]].flags1 & (FF1_INNER)) == 0)
 			{
-				/* Did we turn around? Tunnel dead ends are good candidates for stairs.
-				 * Note use of decor flag to ensure previous move was a tunnel build.
-				 * 
-				 * XXX Could also have been a move through 'outer' wall. Should be rare
-				 * enough not to worry about.
-				 */
-				if ((decor_flag) && (row_dir == -old_row_dir) && (col_dir == -old_col_dir))
-				{
-					add_stair(row1 + old_row_dir, col1 + old_col_dir);
-
-					/* Hack -- move decoration to corners of dead end. This 'fakes'
-					 * a secret door. */
-					if (dun->decor_n > 1)
-						for (i = dun->decor_n - 2; i < dun->decor_n; i++)
-					{
-						dun->decor[i].y += old_row_dir;
-						dun->decor[i].x += old_col_dir;
-					}
-
-					/* Force decoration */
-					decor_flag = FALSE;
-				}				
+				made_tunnel = add_tunnel(row1, col1, start_tunnel ? start_tunnel : 1);
 				
-				/* Are we turning left? */
-				if ((row_dir == -old_col_dir) || (col_dir == old_row_dir)) left_turn = TRUE;
-
-				/* Are we turning right? */
-				if ((row_dir == old_col_dir) || (col_dir == -old_row_dir)) right_turn = TRUE;
-
-				/* Do we not need decoration? */
-				if ((decor_flag) && (dun->tunn_n % (7 + (style % 4) * 5)))
+				if (made_tunnel)
 				{
-					dun->decor_n = last_decor;
-				}
-
-				/* Save the decoration */
-				last_decor = dun->decor_n;
-
-				/* Add width to tunnel if wide or crypt.
-				 * Note checks to ensure width 2 tunnels near rooms.
-				 */
-				if ((style & (TUNNEL_CRYPT_L | TUNNEL_LARGE_L))
-					|| ((style & (TUNNEL_CRYPT_R | TUNNEL_LARGE_R))
-						&& ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)))
-				{
-					/* Add 'left-hand' tunnel */
-					if ((f_info[cave_feat[row1+col_dir][col1-row_dir]].flags1 & (FF1_TUNNEL))
-						&& ((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) == 0)
-						&& ((style & (TUNNEL_LARGE_L)) || !((row1 + col1 + style) % 2)))
+					/* Did we turn around? Tunnel dead ends are good candidates for stairs.
+					 * Note use of decor flag to ensure previous move was a tunnel build.
+					 * 
+					 * XXX Could also have been a move through 'outer' wall. Should be rare
+					 * enough not to worry about.
+					 */
+					if ((decor_flag) && (row_dir == -old_row_dir) && (col_dir == -old_col_dir))
 					{
-						/* Save the tunnel location unless an inner wall */
-						if (((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_INNER)) == 0) &&
-							(add_tunnel(row1 + col_dir, col1 - row_dir, 0)))
+						add_stair(row1 + old_row_dir, col1 + old_col_dir);
+	
+						/* Hack -- move decoration to corners of dead end. This 'fakes'
+						 * a secret door. */
+						if (dun->decor_n > 1)
+							for (i = dun->decor_n - 2; i < dun->decor_n; i++)
 						{
-							/* Hack -- add regular pillars to some width 3 corridors */
-							if ((((row1 + col1) % ((style % 4) + 2)) == 0)
-								&& ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))== 0)) pillar = TRUE;
-
-							/* Save the location for later stair allocation */
-							if ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))
-								&& (crypt_timer-- == 0) && (dun->stair_n < STAIR_MAX))
-							{
-								add_stair(row1 + col_dir, col1 - row_dir);
-
-								crypt_timer = randint(DUN_TUN_CRYPT * 2);
-							}
-							
-							/* Decorate */
-							if (add_decor(row1 + 2 * col_dir, col1 - 2 * row_dir, dun->tunn_n)) decor_l = TRUE;
+							dun->decor[i].y += old_row_dir;
+							dun->decor[i].x += old_col_dir;
 						}
-					}
-						
-					/* Add 'diagonally backwards left-hand' tunnel if just turned right */
-					if (right_turn)
+	
+						/* Force decoration */
+						decor_flag = FALSE;
+					}				
+					
+					/* Are we turning left? */
+					if ((row_dir == -old_col_dir) || (col_dir == old_row_dir)) left_turn = TRUE;
+	
+					/* Are we turning right? */
+					if ((row_dir == old_col_dir) || (col_dir == -old_row_dir)) right_turn = TRUE;
+	
+					/* Do we not need decoration? */
+					if ((decor_flag) && (dun->tunn_n % (7 + (style % 4) * 5)))
 					{
-						/* Add if tunnelable, but not inner, outer or solid */
-						if (((f_info[cave_feat[row1 - row_dir + col_dir ][col1 - col_dir - row_dir]].flags1 & (FF1_TUNNEL)) != 0)
-							&& ((f_info[cave_feat[row1 - row_dir + col_dir ][col1 - col_dir - row_dir]].flags1 & (FF1_INNER | FF1_OUTER | FF1_SOLID)) == 0))
-						{
-							add_tunnel(row1 - row_dir + col_dir, col1 - col_dir - row_dir, 0);
-						}
+						dun->decor_n = last_decor;
 					}
-				}
-
-				/* Add width to tunnel if wide or crypt.
-				 * Note checks to ensure width 2 tunnels near rooms.
-				 */
-				if ((style & (TUNNEL_CRYPT_R | TUNNEL_LARGE_R))
-					|| ((style & (TUNNEL_CRYPT_L | TUNNEL_LARGE_L))
-						&& ((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)))
-				{
-					/* Add 'right-hand' tunnel */
-					if ((f_info[cave_feat[row1-col_dir][col1+row_dir]].flags1 & (FF1_TUNNEL))
-						&& ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) == 0)
-						&& ((style & (TUNNEL_LARGE_R)) || !((row1 + col1 + style / 2) % 2)))
+	
+					/* Save the decoration */
+					last_decor = dun->decor_n;
+	
+					/* Add width to tunnel if wide or crypt.
+					 * Note checks to ensure width 2 tunnels near rooms.
+					 */
+					if ((style & (TUNNEL_CRYPT_L | TUNNEL_LARGE_L))
+						|| ((style & (TUNNEL_CRYPT_R | TUNNEL_LARGE_R))
+							&& ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)))
 					{
-						/* Save the tunnel location unless an 'inner' wall */
-						if ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_INNER)) == 0)
+						/* Add 'left-hand' tunnel */
+						if ((f_info[cave_feat[row1+col_dir][col1-row_dir]].flags1 & (FF1_TUNNEL))
+							&& ((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) == 0)
+							&& ((style & (TUNNEL_LARGE_L)) || !((row1 + col1 + style) % 2)))
 						{
-							if (pillar) dun->tunn_n -= 2;
-
-							if (add_tunnel(row1 - col_dir, col1 + row_dir, 0))
+							/* Save the tunnel location unless an inner wall */
+							if ((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_INNER)) == 0)
 							{
-								/* Save the location for later stair allocation */
-								if ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))
-									&& (crypt_timer-- == 0) && (dun->stair_n < STAIR_MAX))
+								made_tunnel = add_tunnel(row1 + col_dir, col1 - row_dir, 0);
+								
+								if (made_tunnel)						
 								{
-									add_stair(row1 - col_dir, col1 + row_dir);
+									/* Hack -- add regular pillars to some width 3 corridors */
+									if ((((row1 + col1) % ((style % 4) + 2)) == 0)
+										&& ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))== 0)) pillar = TRUE;
+		
+									/* Save the location for later stair allocation */
+									if ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))
+										&& (crypt_timer-- == 0) && (dun->stair_n < STAIR_MAX))
+									{
+										add_stair(row1 + col_dir, col1 - row_dir);
+		
+										crypt_timer = randint(DUN_TUN_CRYPT * 2);
+									}
 									
-									crypt_timer = randint(DUN_TUN_CRYPT * 2);
+									/* Decorate */
+									if (add_decor(row1 + 2 * col_dir, col1 - 2 * row_dir, dun->tunn_n)) decor_l = TRUE;
 								}
-
-								/* Decorate */
-								if (add_decor(row1 - 2 * col_dir, col1 + 2 * row_dir, dun->tunn_n)) decor_r = TRUE;
 							}
-
-							if (pillar) dun->tunn_n++;
+						}
+							
+						/* Add 'diagonally backwards left-hand' tunnel if just turned right */
+						if (made_tunnel && right_turn)
+						{
+							/* Add if tunnelable, but not inner, outer or solid */
+							if (((f_info[cave_feat[row1 - row_dir + col_dir ][col1 - col_dir - row_dir]].flags1 & (FF1_TUNNEL)) != 0)
+								&& ((f_info[cave_feat[row1 - row_dir + col_dir ][col1 - col_dir - row_dir]].flags1 & (FF1_INNER | FF1_OUTER | FF1_SOLID)) == 0))
+							{
+								made_tunnel = add_tunnel(row1 - row_dir + col_dir, col1 - col_dir - row_dir, 0);
+							}
 						}
 					}
-
-					/* Add 'diagonally backwards right-hand' tunnel if just turned left */
-					if (left_turn)
+	
+					/* Add width to tunnel if wide or crypt.
+					 * Note checks to ensure width 2 tunnels near rooms.
+					 */
+					if ((style & (TUNNEL_CRYPT_R | TUNNEL_LARGE_R))
+						|| ((style & (TUNNEL_CRYPT_L | TUNNEL_LARGE_L))
+							&& ((f_info[cave_feat[row1 + col_dir][col1 - row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)))
 					{
-						/* Add if tunnelable, but not inner, outer or solid */
-						if (((f_info[cave_feat[row1 - row_dir - col_dir ][col1 - col_dir + row_dir]].flags1 & (FF1_TUNNEL)) != 0)
-							&& ((f_info[cave_feat[row1 - row_dir - col_dir ][col1 - col_dir + row_dir]].flags1 & (FF1_INNER | FF1_OUTER | FF1_SOLID)) == 0))
+						/* Add 'right-hand' tunnel */
+						if ((f_info[cave_feat[row1-col_dir][col1+row_dir]].flags1 & (FF1_TUNNEL))
+							&& ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_OUTER | FF1_SOLID)) == 0)
+							&& ((style & (TUNNEL_LARGE_R)) || !((row1 + col1 + style / 2) % 2)))
 						{
-							add_tunnel(row1 - row_dir + col_dir, col1 - col_dir - row_dir, 0);
+							/* Save the tunnel location unless an 'inner' wall */
+							if ((f_info[cave_feat[row1 - col_dir][col1 + row_dir]].flags1 & (FF1_INNER)) == 0)
+							{
+								if (made_tunnel && pillar) dun->tunn_n -= 2;
+	
+								made_tunnel = add_tunnel(row1 - col_dir, col1 + row_dir, 0);
+								
+								if (made_tunnel)
+								{
+									/* Save the location for later stair allocation */
+									if ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))
+										&& (crypt_timer-- == 0) && (dun->stair_n < STAIR_MAX))
+									{
+										add_stair(row1 - col_dir, col1 + row_dir);
+										
+										crypt_timer = randint(DUN_TUN_CRYPT * 2);
+									}
+	
+									/* Decorate */
+									if (add_decor(row1 - 2 * col_dir, col1 + 2 * row_dir, dun->tunn_n)) decor_r = TRUE;
+								}
+	
+								if (made_tunnel && pillar) dun->tunn_n++;
+							}
+						}
+	
+						/* Add 'diagonally backwards right-hand' tunnel if just turned left */
+						if (made_tunnel && left_turn)
+						{
+							/* Add if tunnelable, but not inner, outer or solid */
+							if (((f_info[cave_feat[row1 - row_dir - col_dir ][col1 - col_dir + row_dir]].flags1 & (FF1_TUNNEL)) != 0)
+								&& ((f_info[cave_feat[row1 - row_dir - col_dir ][col1 - col_dir + row_dir]].flags1 & (FF1_INNER | FF1_OUTER | FF1_SOLID)) == 0))
+							{
+								made_tunnel = add_tunnel(row1 - row_dir + col_dir, col1 - col_dir - row_dir, 0);
+							}
 						}
 					}
 				}
 			}
 			
+			/* Ran out of tunnel space */
+			if (!made_tunnel)
+			{
+				if (cheat_room) msg_format("Tunnel length exceeded from %d. Aborting.", part1);
+			
+				/* Hack -- themed tunnels can get too long. So try unthemed. */
+				level_flag &= ~(LF1_THEME);
+
+				abort_and_cleanup = TRUE;
+				break;				
+			}
+
 			/* Decorate 'left-hand side' if required */
 			if (!decor_l)
 			{
@@ -7214,7 +7243,6 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		dun->door_n = first_door;
 		dun->next_n = first_next;
 		dun->stair_n = first_stair;
-		dun->decor_n = first_decor;
 
 		/* Remove the solid walls we applied */
 		for (i = 0; i < dun->solid_n; i++)
