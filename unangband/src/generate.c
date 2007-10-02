@@ -6323,7 +6323,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	int main_loop_count = 0;
 	int last_turn = 0, first_door, last_door, first_tunn, first_next, first_stair;
 	int start_tunnel = 0, start_decor = 0, end_decor = 0;
-	int first_decor = dun->decor_n;
+	int first_decor = 0;
 	int last_decor = 0;
 	int door_l = 0;
 	int door_r = 0;
