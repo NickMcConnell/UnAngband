@@ -108,8 +108,8 @@
  * Dungeon generation values
  */
 /* DUN_ROOMS now defined in defines.h */
-#define DUN_UNUSUAL     200     /* Level/chance of unusual room */
-#define DUN_FEAT	60	/* Chance in 100 of having features */
+#define DUN_NATURE_SURFACE	80	/* Chance in 100 of having lakes on surface */
+#define DUN_NATURE_DEEP		20	/* Chance in 100 of having lakes on surface */
 #define DUN_MAX_LAKES   3       /* Maximum number of lakes/rivers */
 #define DUN_FEAT_RNG    2       /* Width of lake */
 
@@ -1787,7 +1787,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 	}
 
 	/* Draw maze if required -- ensure minimum size */
-	if (((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR)) != 0) && (y2 - y1 > 4) && (x2 - x1 > 4) && ((flag & (RG1_ALLOC)) == 0))
+	if (((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR)) != 0) && (ABS(y2 - y1) > 4) && (ABS(x2 - x1) > 4) && ((flag & (RG1_ALLOC)) == 0))
 	{
 		int wall = ((flag & (RG1_MAZE_WALL)) != 0) ? feat : (((flag & (RG1_MAZE_DECOR)) != 0) ? FEAT_FLOOR : FEAT_WALL_INNER);
 		int path = ((flag & (RG1_MAZE_PATH)) != 0) ? feat : (edge && (edge != feat) ? edge : FEAT_FLOOR);
@@ -8212,7 +8212,7 @@ static void build_nature(void)
 	for (dun->lake_n = 0; dun->lake_n < DUN_MAX_LAKES; )
 	{
 		/* Have placed features */
-		if ((rand_int(100) >= DUN_FEAT) && !(zone->big) && !(zone->small))
+		if ((rand_int(100) >= ((level_flag & (LF1_SURFACE)) ? DUN_NATURE_SURFACE : DUN_NATURE_DEEP)) && !(zone->big) && !(zone->small))
 		{
 			break;
 		}
