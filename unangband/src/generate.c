@@ -1870,7 +1870,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 
 	/* Draw maze if required -- ensure minimum size of 5 in both directions (==> y2 - y1 >= 4), or 3 if maze decor (which has no outer walls) */
 	if (((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR)) != 0) && (ABS(y2 - y1) >= ((flag & (RG1_MAZE_DECOR)) ? 2 : 4))
-			&& (ABS(x2 - x1) >= ((flag & (RG1_MAZE_DECOR)) ? 2 : 4)) && ((flag & (RG1_ALLOC)) == 0))
+			&& (ABS(x2 - x1) >= ((flag & (RG1_MAZE_DECOR)) ? 2 : 4)) && ((flag & (RG1_ALLOC)) == 0) && (feat))
 	{
 		/* Maze dimensions */
 		/* Note: Ensure the correct ordering and that size is odd in both directions (==> y2 - y1 is even) */
@@ -1963,7 +1963,6 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 				if (((maze_flags & (MAZE_OUTER_N)) == 0) && !(rand_int(++k))) maze_exits = MAZE_EXIT_N;
 				if (((maze_flags & (MAZE_OUTER_S)) == 0) && !(rand_int(++k))) maze_exits = MAZE_EXIT_S;
 				if (((maze_flags & (MAZE_OUTER_W)) == 0) && !(rand_int(++k))) maze_exits = MAZE_EXIT_W;
-
 				if (((maze_flags & (MAZE_OUTER_E)) == 0) && !(rand_int(++k))) maze_exits = MAZE_EXIT_E;
 				
 				maze_flags |= maze_exits;				
@@ -2009,7 +2008,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 		int x3 = (dx > 0) ? x2 : x1;
 
 		/* Create the starburst */
-		generate_starburst_room(y0, x0, y3, x3, feat, edge, STAR_BURST_ROOM | (((exclude & (RG1_DARK)) != 0) ? STAR_BURST_LIGHT : 0L));
+		if (feat) generate_starburst_room(y0, x0, y3, x3, feat, edge, STAR_BURST_ROOM | (((exclude & (RG1_DARK)) != 0) ? STAR_BURST_LIGHT : 0L));
 
 		/* Hack -- scatter items around the starburst */
 		flag |= (RG1_SCATTER);
@@ -6716,6 +6715,9 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			{
 				if (dun->decor_t[dun->decor_n] < dun->tunn_n) break;
 			}
+			
+			/* Set last decor */
+			if (last_decor > dun->decor_n) last_decor = dun->decor_n;
 
 			/* Back up some more */
 			last_turn /= 2;
