@@ -978,14 +978,23 @@ static void generate_rect(int y1, int x1, int y2, int x2, int feat)
 #define XPOS(x, x1)		((x1) + (x * (width_path + width_wall)) + outer)
 
 
-#define MAZE_WALL	0x01	/* Surround maze with width 1 wall */
-#define MAZE_ROOM	0x02	/* Surround maze with outer and solid walls to allow room connections (needs MAZE_WALL) */
-#define MAZE_SAVE	0x04	/* Save contents overwritten by maze and try to place them again afterwards */
-#define MAZE_FILL	0x08	/* Fill some dead ends with walls */
-#define MAZE_POOL	0x10	/* Fill some dead ends with pools */
-#define MAZE_DOOR	0x20	/* Hide some dead ends with secret doors */
-#define MAZE_CRYPT	0x40	/* Paths in maze have ragged edges like crypt corridors (width_path must be greater than 1)*/
-#define MAZE_CAVE	0x80	/* Paths in maze wander like cave corridors (width_path must be 2) */
+#define MAZE_WALL		0x00000001L	/* Surround maze with width 1 wall */
+#define MAZE_SAVE		0x00000002L	/* Save contents overwritten by maze and try to place them again afterwards */
+#define MAZE_ROOM		0x00000004L	/* Set the cave_room flag */
+#define MAZE_LITE		0x00000008L	/* Set the cave_glow flag */
+#define MAZE_OUTER_N	0x00000010L	/* Make north edge of maze have 'outer' walls (requires MAZE_WALL set) */
+#define MAZE_OUTER_S	0x00000020L	/* Make south edge of maze have 'outer' walls (requires MAZE_WALL set) */
+#define MAZE_OUTER_W	0x00000040L	/* Make west edge of maze have 'outer' walls (requires MAZE_WALL set) */
+#define MAZE_OUTER_E	0x00000080L	/* Make east edge of maze have 'outer' walls (requires MAZE_WALL set) */
+#define MAZE_EXIT_N		0x00000100L	/* Make exit on north edge of maze */
+#define MAZE_EXIT_S		0x00000200L	/* Make exit on south edge of maze */
+#define MAZE_EXIT_W		0x00000400L	/* Make exit on west edge of maze */
+#define MAZE_EXIT_E		0x00000800L	/* Make exit on east edge of maze */
+#define MAZE_FILL		0x00001000L	/* Fill some dead ends with walls */
+#define MAZE_POOL		0x00002000L	/* Fill some dead ends with pools */
+#define MAZE_DOOR		0x00004000L	/* Hide some dead ends with secret doors */
+#define MAZE_CRYPT		0x00010000L	/* Paths in maze have ragged edges like crypt corridors (width_path must be greater than 1)*/
+#define MAZE_CAVE		0x00020000L	/* Paths in maze wander like cave corridors (width_path must be 2) */
 
 
 /*
@@ -1013,7 +1022,7 @@ static void generate_rect(int y1, int x1, int y2, int x2, int feat)
  * construction of maze rooms required for labrynth levels.
  */
 static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
-    s16b feat_path, int width_wall, int width_path, byte flag)
+    s16b feat_path, int width_wall, int width_path, u32b flag)
 {
 	int i, j;
 	int ydim, xdim;
@@ -1050,45 +1059,46 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	/* Save the existing terrain to overwrite the maze later */
 	if (flag & (MAZE_SAVE))
 	{
-		C_MAKE(saved, (y2 - y1) * (x2 - x1), s16b);
+		C_MAKE(saved, (1 + y2 - y1) * (1 + x2 - x1), s16b);
 	
 		/* Save grids */
-		for (y = 0; y < y2 - y1; y++)
+		for (y = 0; y <= y2 - y1; y++)
 		{
-			for (x = 0; x < x2 - x1; x++)
+			for (x = 0; x <= x2 - x1; x++)
 			{
-				saved[y * (y2 - y1) + x] = cave_feat[y + y1][x + x1];
+				saved[y * (1 + y2 - y1) + x] = cave_feat[y + y1][x + x1];
 			}
 		}
 	}
+
+	/* Start with a solid rectangle of the "inner" wall feat */
+	generate_fill(y1, x1, y2, x2, ((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) ? feat_state(feat_wall, FS_INNER) : feat_wall);	
 	
-	/* If room flag is set and feat_wall is an outer wall, surround by outer and solid pillars */
-	if (((flag & (MAZE_ROOM)) != 0) && ((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0))
+	/* Draw room if requested */
+	if (flag & (MAZE_ROOM)) generate_room(y1, x1, y2, x2, ((flag & (MAZE_LITE)) != 0));
+	
+	/* If maze has a wall and feat_wall is an outer wall, surround by 'outer' and 'solid' sections of wall to allow corridor connections */
+	if (((flag & (MAZE_WALL)) != 0) && ((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0))
 	{
 		int solid = feat_state(feat_wall, FS_SOLID);
 		
-		/* Start with a solid rectangle of the 'inner' wall feat */
-		generate_fill(y1, x1, y2, x2, feat_state(feat_wall, FS_INNER));
-
-		if (outer)
+		if (flag & (MAZE_OUTER_W | MAZE_OUTER_E))
 		{
 			for (y = y1; y <= y2; y++)
 			{
-				cave_set_feat(y, x1, (y - y1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
-				cave_set_feat(y, x2, (y - y1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
-			}
-
-			for (x = x1; x <= x2; x++)
-			{
-				cave_set_feat(y1, x, (x - x1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
-				cave_set_feat(y2, x, (x - x1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
+				if (flag & (MAZE_OUTER_W)) cave_set_feat(y, x1, (y - y1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
+				if (flag & (MAZE_OUTER_E)) cave_set_feat(y, x2, (y - y1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
 			}
 		}
-	}
-	else
-	{
-		/* Start with a solid rectangle of the "wall" feat */
-		generate_fill(y1, x1, y2, x2, feat_wall);
+		
+		if (flag & (MAZE_OUTER_N | MAZE_OUTER_S))
+		{
+			for (x = x1; x <= x2; x++)
+			{
+				if (flag & (MAZE_OUTER_N)) cave_set_feat(y1, x, (x - x1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
+				if (flag & (MAZE_OUTER_S)) cave_set_feat(y2, x, (x - x1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
+			}
+		}
 	}
 	
 	/* Calculate dimensions.*/
@@ -1194,36 +1204,92 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 		y = rand_int(ydim);
 		x = rand_int(xdim);
 	}
+	
+	/* Create exits */
+	if (flag & (MAZE_EXIT_N | MAZE_EXIT_S | MAZE_EXIT_W | MAZE_EXIT_E))
+	{
+		int feat = feat_path;
 		
+		/* Get door instead */
+		if (f_info[feat_wall].flags1 & (FF1_OUTER)) feat = feat_state(feat_wall, FS_DOOR);
+
+		if (flag & (MAZE_EXIT_N))
+		{
+			dx = rand_int(xdim);
+			
+			for (x = 0; x < width_path; x++)
+			{
+				/* Convert to path grid */
+				cave_set_feat(y1, XPOS(dx, x1) + x, feat);
+			}
+		}
+
+		if (flag & (MAZE_EXIT_S))
+		{
+			dx = rand_int(xdim);
+			
+			for (x = 0; x < width_path; x++)
+			{
+				/* Convert to path grid */
+				cave_set_feat(y2, XPOS(dx, x1) + x, feat);
+			}
+		}	
+		
+		if (flag & (MAZE_EXIT_W))
+		{
+			dy = rand_int(ydim);
+			
+			for (y = 0; y < width_path; y++)
+			{
+				/* Convert to path grid */
+				cave_set_feat(YPOS(dy, y1) + y, x1, feat);
+			}
+		}
+		
+		if (flag & (MAZE_EXIT_E))
+		{
+			dy = rand_int(ydim);
+			
+			for (y = 0; y < width_path; y++)
+			{
+				/* Convert to path grid */
+				cave_set_feat(YPOS(dy, y1) + y, x2, feat);
+			}
+		}
+	}
+	
 	/* Restore grids */
 	if (flag & (MAZE_SAVE))
 	{
-		for (y = 0; y < y2 - y1; y++)
+		for (y = 0; y <= y2 - y1; y++)
 		{
-			for (x = 0; x < x2 - x1; x++)
+			for (x = 0; x <= x2 - x1; x++)
 			{
 				/* Hack -- always overwrite if room flag set and room flag is clear */
 				if (((flag & (MAZE_ROOM)) != 0) && ((cave_info[y + y1][x + x1] & (CAVE_ROOM)) == 0))
 				{
-					cave_set_feat(y + y1, x + x1, saved[y * (y2 - y1) + x]);
+					cave_set_feat(y + y1, x + x1, saved[y * (1 + y2 - y1) + x]);
 	
 					continue;
 				}
 				
 				/* Hack -- skip floor quickly */
-				if (saved[y * (y2 - y1) + x] == FEAT_FLOOR) continue;
+				if (saved[y * (1 + y2 - y1) + x] == FEAT_FLOOR) continue;
 				
 				/* Hack -- skip 'extra' walls quickly */
-				if (saved[y * (y2 - y1) + x] == FEAT_WALL_EXTRA) continue;
+				if (saved[y * (1 + y2 - y1) + x] == FEAT_WALL_EXTRA) continue;
+
+				/* Hack -- skip 'outer' and 'solid' terrain quickly */
+				if (f_info[saved[y * (1 + y2 - y1) + x] == FEAT_WALL_EXTRA].flags1 & (FF1_OUTER | FF1_SOLID)) continue;
 				
 				/* Passable terrain - overwrite floor */
-				if (((f_info[saved[y * (y2 - y1) + x]].flags1 & (FF1_MOVE)) != 0) ||
-					((f_info[saved[y * (y2 - y1) + x]].flags3 & (FF3_EASY_CLIMB)) != 0))
+				if (((f_info[saved[y * (1 + y2 - y1) + x]].flags1 & (FF1_MOVE)) != 0) ||
+					((f_info[saved[y * (1 + y2 - y1) + x]].flags3 & (FF3_EASY_CLIMB)) != 0))
 				{
 					/* Must be placed on floor grid */
 					if (cave_feat[y + y1][x + x1] == feat_path)
 					{
-						cave_set_feat(y + y1, x + x1, saved[y * (y2 - y1) + x]);
+						cave_set_feat(y + y1, x + x1, saved[y * (1 + y2 - y1) + x]);
 					}
 					
 					/* Try adjacent saved */
@@ -1237,18 +1303,20 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 						
 						if (cave_feat[yy][xx] == feat_path)
 						{
-							cave_set_feat(yy, xx, saved[y * (y2 - y1) + x]);
+							cave_set_feat(yy, xx, saved[y * (1 + y2 - y1) + x]);
 							break;
 						}
 					}
 				}
-				/* Impassable terrain - overwrite wall */
+				/* Impassable terrain - overwrite walls */
 				else
 				{
-					/* Must be placed on wall grid */
-					if (cave_feat[y + y1][x + x1] == feat_wall)
+					/* Must be placed on wall grid -- except outer or solid wall */
+					if (((f_info[cave_feat[y + y1][x + x1]].flags1 & (FF1_OUTER | FF1_SOLID)) == 0) &&
+							((cave_feat[y + y1][x + x1] == feat_wall) ||
+							(((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) && cave_feat[y + y1][x + x1] == feat_state(feat_wall, FS_INNER))))
 					{
-						cave_set_feat(y, x, saved[y * (y2 - y1) + x]);
+						cave_set_feat(y, x, saved[y * (1 + y2 - y1) + x]);
 					}
 					/* Try adjacent saved */
 					else for (i = 0; i < 8; i++)
@@ -1259,9 +1327,11 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 						/* Paranoia */
 						if (!in_bounds_fully(yy, xx)) continue;
 						
-						if (cave_feat[yy][xx] == feat_wall)
+						if (((f_info[cave_feat[yy][xx]].flags1 & (FF1_OUTER | FF1_SOLID)) == 0) &&
+							((cave_feat[yy][xx] == feat_wall) ||
+							(((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) && cave_feat[yy][xx] == feat_state(feat_wall, FS_INNER))))
 						{
-							cave_set_feat(yy, xx, saved[y * (y2 - y1) + x]);
+							cave_set_feat(yy, xx, saved[y * (1 + y2 - y1) + x]);
 							break;
 						}
 					}
@@ -1809,9 +1879,97 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 		int y3 = (dy > 0) ? (y2 - ((y2 - y1) % 2 ? 1 : 0)) : y1;
 		int x3 = (dx > 0) ? (x2 - ((x2 - x1) % 2 ? 1 : 0)) : x1;
 
-		int wall = ((flag & (RG1_MAZE_WALL)) != 0) ? feat : (((flag & (RG1_MAZE_DECOR)) != 0) ? (edge && (edge != feat) ? edge : FEAT_FLOOR) : FEAT_WALL_INNER);
+		int wall = ((flag & (RG1_MAZE_WALL)) != 0) ? feat : (((flag & (RG1_MAZE_DECOR)) != 0) ? (edge && (edge != feat) ? edge : FEAT_FLOOR) : FEAT_WALL_OUTER);
 		int path = ((flag & (RG1_MAZE_PATH | RG1_MAZE_DECOR)) != 0) ? feat : (edge && (edge != feat) ? edge : FEAT_FLOOR);
 
+		u32b maze_flags = MAZE_SAVE | ((flag & (RG1_MAZE_DECOR)) ? 0 : MAZE_WALL);
+		
+		/* Need an exit? */
+		if ((flag & (RG1_MAZE_DECOR)) == 0)
+		{
+			u32b temp_flags;
+			
+			do
+			{
+				temp_flags = 0L;
+				
+				/* Hack -- extend maze north & south if either side is directly next to outer wall */
+				for (x = x0 + 1; x < x3; x++)
+				{
+					if (((maze_flags & (MAZE_OUTER_N)) == 0) && (y0 > 0) && ((f_info[cave_feat[y0-1][x]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)) temp_flags |= MAZE_OUTER_N;
+					if (((maze_flags & (MAZE_OUTER_S)) == 0) && (y3 < DUNGEON_HGT-1) && ((f_info[cave_feat[y3+1][x]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)) temp_flags |= MAZE_OUTER_S;				                          
+				}
+
+				/* Extend north and south */
+				if (temp_flags)
+				{
+					y0--; y3++;
+				
+					/* Add extra flags */
+					maze_flags |= temp_flags;
+				}
+			} while (temp_flags);
+
+			do
+			{
+				temp_flags = 0L;
+				
+				/* Hack -- extend maze east & west if either side is directly next to outer wall */
+				for (y = y0 + 1; y < y3; y++)
+				{
+					if (((maze_flags & (MAZE_OUTER_W)) == 0) && (x0 > 0) && ((f_info[cave_feat[y][x0-1]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)) temp_flags |= MAZE_OUTER_W;
+					if (((maze_flags & (MAZE_OUTER_E)) == 0) && (x3 < DUNGEON_WID-1) && ((f_info[cave_feat[y][x3+1]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)) temp_flags |= MAZE_OUTER_E; 
+				}
+
+				/* Extend north and south */
+				if (temp_flags)
+				{
+					y0--; y3++;
+				
+					/* Add extra flags */
+					maze_flags |= temp_flags;
+				}
+			} while (temp_flags);
+			
+			/* Outer wall north/south */
+			for (x = x0 + 1; x < x3; x++)
+			{
+				if ((f_info[cave_feat[y0][x]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0) maze_flags |= MAZE_OUTER_N;
+				if ((f_info[cave_feat[y3][x]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0) maze_flags |= MAZE_OUTER_S;				                          
+			}
+			
+			/* Outer wall east/west */
+			for (y = y0 + 1; y < y3; y++)
+			{
+				if ((f_info[cave_feat[y][x0]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0) maze_flags |= MAZE_OUTER_W;
+				if ((f_info[cave_feat[y][x3]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0) maze_flags |= MAZE_OUTER_E;				                          
+			}
+			
+			/* Two exits required? */
+			if (((maze_flags & (MAZE_OUTER_N)) != 0) && ((maze_flags & (MAZE_OUTER_S)) != 0) && ((maze_flags & (MAZE_OUTER_E | MAZE_OUTER_W)) == 0))
+			{
+				maze_flags |= (MAZE_EXIT_W | MAZE_EXIT_E);
+			}
+			else if (((maze_flags & (MAZE_OUTER_W)) != 0) && ((maze_flags & (MAZE_OUTER_E)) != 0) && ((maze_flags & (MAZE_OUTER_N | MAZE_OUTER_S)) == 0))
+			{
+				maze_flags |= (MAZE_EXIT_N | MAZE_EXIT_S);
+			}
+			/* Zero or one exits required */
+			else
+			{
+				u32b maze_exits = 0L;
+				int k = 0;
+				
+				if (((maze_flags & (MAZE_OUTER_N)) == 0) && !(rand_int(++k))) maze_exits = MAZE_EXIT_N;
+				if (((maze_flags & (MAZE_OUTER_S)) == 0) && !(rand_int(++k))) maze_exits = MAZE_EXIT_S;
+				if (((maze_flags & (MAZE_OUTER_W)) == 0) && !(rand_int(++k))) maze_exits = MAZE_EXIT_W;
+
+				if (((maze_flags & (MAZE_OUTER_E)) == 0) && !(rand_int(++k))) maze_exits = MAZE_EXIT_E;
+				
+				maze_flags |= maze_exits;				
+			}
+		}
+		
 		/* Paranoia */
 		if (wall == path) path = FEAT_FLOOR;
 		
@@ -1827,9 +1985,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 		}
 
 		/* Draw the maze. */
-		draw_maze(y0, x0, y3, x3, wall, path, 1, 1, MAZE_SAVE | ((flag & (RG1_MAZE_DECOR)) ? 0 : MAZE_WALL));
-		
-		/* Hack -- outer exits in maze XXX */
+		draw_maze(y0, x0, y3, x3, wall, path, 1, 1, maze_flags);
 		
 		/* Hack -- scatter items inside maze */
 		flag |= (RG1_SCATTER);
@@ -8094,15 +8250,12 @@ static bool build_type171819(int room, int type)
 	int y0, x0, width_wall, width_path, ydim, xdim, height, width;
 	
 	int y1, x1, y2, x2;
-
-	/* Mazes are usually dark */
-	bool light = FALSE;
 	
 	/* Maze flags */
-	bool flag = MAZE_ROOM | MAZE_WALL;
+	u32b maze_flags = (MAZE_OUTER_N | MAZE_OUTER_S | MAZE_OUTER_E | MAZE_OUTER_W | MAZE_WALL | MAZE_ROOM);
 
 	/* Occasional light */
-	if (p_ptr->depth <= randint(25)) light = TRUE;
+	if (p_ptr->depth <= randint(25)) maze_flags |= (MAZE_LITE);
 
 	switch (type)
 	{
@@ -8139,22 +8292,10 @@ static bool build_type171819(int room, int type)
 	y2 = y0 + (height - 1) / 2;
 	x2 = x0 + (width - 1) / 2;
 
-	/* Draw room */
-	generate_room(y1, x1, y2, x2, light);
-
 	/* Draw maze */
-	if (draw_maze(y1, x1, y2, x2, FEAT_WALL_OUTER, FEAT_FLOOR, width_wall, width_path, flag)) return (TRUE);	
+	if (draw_maze(y1, x1, y2, x2, FEAT_WALL_OUTER, FEAT_FLOOR, width_wall, width_path, maze_flags)) return (TRUE);
 	
-	/* Remove room */
-	for (y0 = y1; y0 <= y2; y0++)
-	{
-		for (x0 = x1; x0 <= x2; x0++)
-		{
-			cave_info[y0][x0] &= ~(CAVE_ROOM | CAVE_GLOW);
-		}
-	}
-	
-	/* Clear down room */
+	/* Failed */
 	return (FALSE);
 }
 
