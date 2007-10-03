@@ -974,15 +974,19 @@ static void generate_rect(int y1, int x1, int y2, int x2, int feat)
 
 
 /* Convert a maze coordinate into a dungeon coordinate */
-#define YPOS(y, y1)		((y1) + (y * (width_path + width_wall)) + 1)
-#define XPOS(x, x1)		((x1) + (x * (width_path + width_wall)) + 1)
+#define YPOS(y, y1)		((y1) + (y * (width_path + width_wall)) + outer)
+#define XPOS(x, x1)		((x1) + (x * (width_path + width_wall)) + outer)
 
 
-#define MAZE_ROOM	0x01	/* Surround maze with outer and solid walls to define room connections */
-#define MAZE_SAVE	0x02	/* Save contents overwritten by maze and try to place them again afterwards */
-#define MAZE_FILL	0x04	/* Fill some dead ends with walls */
-#define MAZE_POOL	0x08	/* Fill some dead ends with pools */
-#define MAZE_DOOR	0x10	/* Hide some dead ends with secret doors */
+#define MAZE_WALL	0x01	/* Surround maze with width 1 wall */
+#define MAZE_ROOM	0x02	/* Surround maze with outer and solid walls to allow room connections (needs MAZE_WALL) */
+#define MAZE_SAVE	0x04	/* Save contents overwritten by maze and try to place them again afterwards */
+#define MAZE_FILL	0x08	/* Fill some dead ends with walls */
+#define MAZE_POOL	0x10	/* Fill some dead ends with pools */
+#define MAZE_DOOR	0x20	/* Hide some dead ends with secret doors */
+#define MAZE_CRYPT	0x40	/* Paths in maze have ragged edges like crypt corridors (width_path must be greater than 1)*/
+#define MAZE_CAVE	0x80	/* Paths in maze wander like cave corridors (width_path must be 2) */
+
 
 /*
  * Build an acyclic maze inside a given rectangle.  - Eric Bock -
@@ -995,6 +999,9 @@ static void generate_rect(int y1, int x1, int y2, int x2, int feat)
  * 
  * Note that the outer walls of the maze are always width 1, which makes the maze math a little
  * more complicated, but allows tunnels to correctly connect to the edge of the maze.
+ * 
+ * Important note particular for developers: width and height is given by x2 - x1 + 1 and
+ * y2 - y1 + 1. So this means an odd width (for instance) 
  * 
  * Filled indicates how much of the maze dead ends are 're-filled' with walls.
  * Secrets indicates how much of the maze dead ends are hidden by secret doors.
@@ -1016,6 +1023,8 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	int ty, tx;
 	int dy, dx;
 	int yi, xi;
+	
+	int outer = flag & (MAZE_WALL) ? 1 : 0;
 
 	byte dir[4];
 	byte dirs;
@@ -1061,16 +1070,19 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 		/* Start with a solid rectangle of the 'inner' wall feat */
 		generate_fill(y1, x1, y2, x2, feat_state(feat_wall, FS_INNER));
 
-		for (y = y1; y <= y2; y++)
+		if (outer)
 		{
-			cave_set_feat(y, x1, (y - y1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
-			cave_set_feat(y, x2, (y - y1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
-		}
+			for (y = y1; y <= y2; y++)
+			{
+				cave_set_feat(y, x1, (y - y1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
+				cave_set_feat(y, x2, (y - y1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
+			}
 
-		for (x = x1; x <= x2; x++)
-		{
-			cave_set_feat(y1, x, (x - x1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
-			cave_set_feat(y2, x, (x - x1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
+			for (x = x1; x <= x2; x++)
+			{
+				cave_set_feat(y1, x, (x - x1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
+				cave_set_feat(y2, x, (x - x1 - 1) % (width_wall + width_path) < width_path ? feat_wall : solid);
+			}
 		}
 	}
 	else
@@ -1085,8 +1097,8 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	 * minus two (for the requirement of two outer width 1 walls)
 	 * plus 1 because y1 = 10, y2 = 10 implies a width 1 room. */
 	
-	ydim = ((y2 - y1) + width_wall - 1) / (width_wall + width_path);
-	xdim = ((x2 - x1) + width_wall - 1) / (width_wall + width_path);
+	ydim = ((y2 - y1) + width_wall - (2 * outer) + 1) / (width_wall + width_path);
+	xdim = ((x2 - x1) + width_wall - (2 * outer) + 1) / (width_wall + width_path);
 
 	/* Number of unexamined grids */
 	grids = ydim * xdim - 1;
@@ -1182,7 +1194,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 		y = rand_int(ydim);
 		x = rand_int(xdim);
 	}
-
+		
 	/* Restore grids */
 	if (flag & (MAZE_SAVE))
 	{
@@ -1233,7 +1245,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 				/* Impassable terrain - overwrite wall */
 				else
 				{
-					/* Must be placed on floor grid */
+					/* Must be placed on wall grid */
 					if (cave_feat[y + y1][x + x1] == feat_wall)
 					{
 						cave_set_feat(y, x, saved[y * (y2 - y1) + x]);
@@ -1786,12 +1798,23 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 		get_feat_num_prep();
 	}
 
-	/* Draw maze if required -- ensure minimum size */
-	if (((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR)) != 0) && (ABS(y2 - y1) > 4) && (ABS(x2 - x1) > 4) && ((flag & (RG1_ALLOC)) == 0))
+	/* Draw maze if required -- ensure minimum size of 5 in both directions (==> y2 - y1 >= 4), or 3 if maze decor (which has no outer walls) */
+	if (((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR)) != 0) && (ABS(y2 - y1) >= ((flag & (RG1_MAZE_DECOR)) ? 2 : 4))
+			&& (ABS(x2 - x1) >= ((flag & (RG1_MAZE_DECOR)) ? 2 : 4)) && ((flag & (RG1_ALLOC)) == 0))
 	{
-		int wall = ((flag & (RG1_MAZE_WALL)) != 0) ? feat : (((flag & (RG1_MAZE_DECOR)) != 0) ? FEAT_FLOOR : FEAT_WALL_INNER);
-		int path = ((flag & (RG1_MAZE_PATH)) != 0) ? feat : (edge && (edge != feat) ? edge : FEAT_FLOOR);
+		/* Maze dimensions */
+		/* Note: Ensure the correct ordering and that size is odd in both directions (==> y2 - y1 is even) */
+		int y0 = (dy > 0) ? y1 : (y2 + ((y1 - y2) % 2 ? 1 : 0));
+		int x0 = (dx > 0) ? x1 : (x2 + ((x1 - x2) % 2 ? 1 : 0));
+		int y3 = (dy > 0) ? (y2 - ((y2 - y1) % 2 ? 1 : 0)) : y1;
+		int x3 = (dx > 0) ? (x2 - ((x2 - x1) % 2 ? 1 : 0)) : x1;
 
+		int wall = ((flag & (RG1_MAZE_WALL)) != 0) ? feat : (((flag & (RG1_MAZE_DECOR)) != 0) ? (edge && (edge != feat) ? edge : FEAT_FLOOR) : FEAT_WALL_INNER);
+		int path = ((flag & (RG1_MAZE_PATH | RG1_MAZE_DECOR)) != 0) ? feat : (edge && (edge != feat) ? edge : FEAT_FLOOR);
+
+		/* Paranoia */
+		if (wall == path) path = FEAT_FLOOR;
+		
 		/* Hack -- swap path and wall if path does not allow movement */
 		if (((f_info[path].flags1 & (FF1_MOVE)) == 0) && ((f_info[path].flags3 & (FF3_EASY_CLIMB)) == 0))
 		{
@@ -1803,11 +1826,8 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 			if (((f_info[path].flags1 & (FF1_MOVE)) == 0) && ((f_info[path].flags3 & (FF3_EASY_CLIMB)) == 0)) path = FEAT_FLOOR;
 		}
 
-		/* Ensure the correct ordering and that size is odd in both directions */
-		if ((dy > 0) && (dx > 0)) draw_maze(y1, x1, y2 - ((y2 - y1) % 2 ? 0 : 1), x2 - ((x2 - x1) % 2 ? 0 : 1), wall, path, 1, 1, MAZE_SAVE);
-		else if ((dy < 0) && (dx > 0)) draw_maze(y2 + ((y1 - y2) % 2 ? 0 : 1), x1, y1, x2 - ((x2 - x1) % 2 ? 0 : 1), wall, path, 1, 1, MAZE_SAVE);
-		else if ((dy > 0) && (dx < 0)) draw_maze(y1, x2 + ((x1 - x2) % 2 ? 0 : 1), y2 - ((y2 - y1) % 2 ? 0 : 1), x1, wall, path, 1, 1, MAZE_SAVE);
-		else if ((dy < 0) && (dx < 0)) draw_maze(y2 + ((y1 - y2) % 2 ? 0 : 1), x2 + ((x1 - x2) % 2 ? 0 : 1), y1, x1, wall, path, 1, 1, MAZE_SAVE);
+		/* Draw the maze. */
+		draw_maze(y0, x0, y3, x3, wall, path, 1, 1, MAZE_SAVE | ((flag & (RG1_MAZE_DECOR)) ? 0 : MAZE_WALL));
 		
 		/* Hack -- outer exits in maze XXX */
 		
@@ -1827,10 +1847,13 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 	else if (((flag & (RG1_STARBURST)) != 0) && ((flag & (RG1_ALLOC)) == 0))
 	{
 		/* Ensure the correct ordering of directions */
-		if ((dy > 0) && (dx > 0)) generate_starburst_room(y1, x1, y2, x2, feat, edge, STAR_BURST_ROOM | (((exclude & (RG1_DARK)) != 0) ? STAR_BURST_LIGHT : 0L));
-		else if ((dy < 0) && (dx > 0)) generate_starburst_room(y2, x1, y1, x2, feat, edge, STAR_BURST_ROOM | (((exclude & (RG1_DARK)) != 0) ? STAR_BURST_LIGHT : 0L));
-		else if ((dy > 0) && (dx < 0)) generate_starburst_room(y1, x2, y2, x1, feat, edge, STAR_BURST_ROOM | (((exclude & (RG1_DARK)) != 0) ? STAR_BURST_LIGHT : 0L));
-		else if ((dy < 0) && (dx < 0)) generate_starburst_room(y2, x2, y1, x1, feat, edge, STAR_BURST_ROOM | (((exclude & (RG1_DARK)) != 0) ? STAR_BURST_LIGHT : 0L));
+		int y0 = (dy > 0) ? y1 : y2;
+		int x0 = (dx > 0) ? x1 : x2;
+		int y3 = (dy > 0) ? y2 : y1;
+		int x3 = (dx > 0) ? x2 : x1;
+
+		/* Create the starburst */
+		generate_starburst_room(y0, x0, y3, x3, feat, edge, STAR_BURST_ROOM | (((exclude & (RG1_DARK)) != 0) ? STAR_BURST_LIGHT : 0L));
 
 		/* Hack -- scatter items around the starburst */
 		flag |= (RG1_SCATTER);
@@ -1964,7 +1987,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 							{
 								cave_set_feat(y, x, (f_info[place_feat].flags1 & (FF1_OUTER)) != 0 ? feat_state(place_feat, FS_SOLID) : place_feat);
 							}
-							else
+							else if (dun->next_n < NEXT_MAX)
 							{
 								/* Overwrite solid wall later */
 								dun->next[dun->next_n].y = y;
@@ -2063,7 +2086,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 						/* Hack -- if we are placing one feature, we replace it with a solid wall to ensure that it
 						 * is not overwritten later on. We take advantage of the dun->next array to do this.
 						 */
-						if (k == 0) cave_feat[y][x] = FEAT_WALL_SOLID;
+						if ((k == 0) && (dun->next_n < NEXT_MAX)) cave_feat[y][x] = FEAT_WALL_SOLID;
 
 						/* Preserve the 'solid' status of a wall */
 						if (cave_feat[y][x] == FEAT_WALL_SOLID)
@@ -2073,7 +2096,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 							{
 								cave_set_feat(y, x, (f_info[place_feat].flags1 & (FF1_OUTER)) != 0 ? feat_state(place_feat, FS_SOLID) : place_feat);
 							}
-							else
+							else if (dun->next_n < NEXT_MAX)
 							{
 								/* Overwrite solid wall later */
 								dun->next[dun->next_n].y = y;
@@ -8074,6 +8097,9 @@ static bool build_type171819(int room, int type)
 
 	/* Mazes are usually dark */
 	bool light = FALSE;
+	
+	/* Maze flags */
+	bool flag = MAZE_ROOM | MAZE_WALL;
 
 	/* Occasional light */
 	if (p_ptr->depth <= randint(25)) light = TRUE;
@@ -8117,7 +8143,7 @@ static bool build_type171819(int room, int type)
 	generate_room(y1, x1, y2, x2, light);
 
 	/* Draw maze */
-	if (draw_maze(y1, x1, y2, x2, FEAT_WALL_OUTER, FEAT_FLOOR, width_wall, width_path, MAZE_ROOM)) return (TRUE);	
+	if (draw_maze(y1, x1, y2, x2, FEAT_WALL_OUTER, FEAT_FLOOR, width_wall, width_path, flag)) return (TRUE);	
 	
 	/* Remove room */
 	for (y0 = y1; y0 <= y2; y0++)
