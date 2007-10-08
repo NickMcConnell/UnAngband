@@ -186,6 +186,10 @@
 #define STAR_BURST_RAW_FLOOR	0x00000008	/* Floor overwrites dungeon */
 #define STAR_BURST_RAW_EDGE	0x00000010	/* Edge overwrites dungeon */
 #define STAR_BURST_MOAT		0x00000020	/* Skip areas defined as a room */
+#define STAR_BURST_RANDOM	0x00000040	/* Write terrain 60% of the time, else floor */
+#define STAR_BURST_NEED_FLOOR	0x00000080	/* Write terrain only over floors */
+
+
 
 
 /*
@@ -1642,8 +1646,18 @@ static bool generate_starburst_room(int y1, int x1, int y2, int x2,
 				cave_info[y][x] &= ~(CAVE_GLOW);
 			}
 
+			/* Only place on floor grids */
+			if ((flag & (STAR_BURST_NEED_FLOOR)) && (cave_feat[y][x] != FEAT_FLOOR))
+			{
+				/* Do nothing */
+			}
+			/* Random sometimes places floor */
+			else if ((flag & (STAR_BURST_RANDOM)) && (rand_int(100) < 40))
+			{
+				cave_set_feat(y, x, FEAT_FLOOR);
+			}
 			/* Floor overwrites the dungeon */
-			if (flag & (STAR_BURST_RAW_FLOOR))
+			else if (flag & (STAR_BURST_RAW_FLOOR))
 			{
 				cave_set_feat(y, x, feat);
 			}
@@ -1673,8 +1687,8 @@ static bool generate_starburst_room(int y1, int x1, int y2, int x2,
 				 * avoid lakes surrounded with blackness.
 				 * We only do this if the lake is lit.
 				 */
-				if (!(flag & (STAR_BURST_LIGHT |
-					STAR_BURST_ROOM))) continue;
+				if ((flag & (STAR_BURST_LIGHT |
+					STAR_BURST_ROOM)) == 0) continue;
 
 				/* Look in all directions. */
 				for (d = 0; d < 8; d++)
@@ -2006,9 +2020,17 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 		int x0 = (dx > 0) ? x1 : x2;
 		int y3 = (dy > 0) ? y2 : y1;
 		int x3 = (dx > 0) ? x2 : x1;
+		
+		u32b star_flags = STAR_BURST_ROOM | STAR_BURST_NEED_FLOOR;
 
+		/* Ensure light */
+		if ((exclude & (RG1_DARK)) != 0) star_flags |= STAR_BURST_LIGHT;
+		 
+		/* Ensure random floor space */
+		if (flag & (RG1_RANDOM | RG1_SCATTER | RG1_CHECKER)) star_flags |= STAR_BURST_RANDOM;
+		
 		/* Create the starburst */
-		if (feat) generate_starburst_room(y0, x0, y3, x3, feat, edge, STAR_BURST_ROOM | (((exclude & (RG1_DARK)) != 0) ? STAR_BURST_LIGHT : 0L));
+		if (feat) generate_starburst_room(y0, x0, y3, x3, feat, edge, star_flags);
 
 		/* Hack -- scatter items around the starburst */
 		flag |= (RG1_SCATTER);
@@ -2524,6 +2546,42 @@ static bool find_space(int *y, int *x, int height, int width)
 			}
 		}
 
+		/* Get matching ecology */
+		if (dun->cent_n <= cave_ecology.num_ecologies)
+		{
+			/* Pick which ecology */
+			room_info[dun->cent_n].ecology = (1L << dun->cent_n);
+		
+			/* Pick which deepest monster */
+			room_info[dun->cent_n].deepest_race = cave_ecology.deepest_race[dun->cent_n];
+		}
+		
+		/* Get the closest ecology */
+		else
+		{
+			int min_d = 3000;
+			int d, pick = 1;
+
+			for (i = 0; i < cave_ecology.num_ecologies; i++)
+			{
+				/* Find distance */
+				d = distance((*y), (*x), dun->cent[i].y, dun->cent[i].x);
+			
+				/* Pick nearest ecology */
+				if (d < min_d)
+				{
+					pick = i + 1;
+					min_d = d;
+				}
+			}
+
+			/* Pick which ecology */
+			room_info[dun->cent_n].ecology = room_info[pick].ecology;
+		
+			/* Pick which deepest monster */
+			room_info[dun->cent_n].deepest_race = room_info[pick].deepest_race;
+		}		
+		
 		/* Success. */
 		return (TRUE);
 	}
@@ -2791,7 +2849,7 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 			else if ((cave_ecology.ready) && (cave_ecology.num_races))
 			{
 				/* Match main monster */
-				monster_race *r_ptr = &r_info[cave_ecology.deepest_race];
+				monster_race *r_ptr = &r_info[room_info[room].deepest_race];
 
 				/* Check for char match */
 				if ((d_info[i].r_char) && (d_info[i].r_char == r_ptr->d_char)) good_chance = TRUE;
@@ -2965,6 +3023,9 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 
 			/* Add flags */
 			*place_flag |= d_info[i].p_flag;
+
+			/* Rows and columns exclude mazes and star bursts for next placement */
+			if (d_info[i].p_flag & (RG1_ROWS | RG1_COLS)) exclude |= (RG1_STARBURST | RG1_MAZE_DECOR | RG1_MAZE_PATH | RG1_MAZE_WALL);
 
 			/* Don't place yet */
 			if ((*place_flag & (RG1_PLACE)) == 0) continue;
@@ -3455,6 +3516,24 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 
 					exclude |= (RG1_NORTH | RG1_SOUTH | RG1_EAST | RG1_WEST);
 				}
+				
+				/* Fill all of vertical room */
+				else if (((place_flag & (RG1_NORTH | RG1_SOUTH)) != 0) && ((place_flag & (RG1_WEST | RG1_EAST)) == 0))
+				{
+					if (place_flag & (RG1_NORTH)) y1c = MIN(y1a, y1b) + outer;
+					if (place_flag & (RG1_SOUTH)) y2c = MAX(y2a, y2b) - outer;
+						
+					place_flag &= ~(RG1_NORTH | RG1_SOUTH);
+				}
+								
+				/* Fill all of horizontal room */
+				else if (((place_flag & (RG1_WEST | RG1_EAST)) != 0) && ((place_flag & (RG1_NORTH | RG1_SOUTH)) == 0))
+				{
+					if (place_flag & (RG1_WEST)) x1c = MIN(x1a, x1b) + outer;
+					if (place_flag & (RG1_EAST)) x2c = MAX(x2a, x2b) - outer;
+						
+					place_flag &= ~(RG1_WEST | RG1_EAST);
+				}
 
 				/* Ensure some space */
 				if (y1c >= y2c) { y1c = y2c - 1; y2c = y1c + 3;}
@@ -3509,7 +3588,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 			{
 				int y1n = MIN(y1a, y1b) + outer;
 				int y2n = (y1a == y1b ? y1a + 1 : MAX(y1a, y1b) - 1);
-				int x1n = (y1a < y1b ? x1a : (y1a == y1b ? MIN(x1a, x1b): y1b));
+				int x1n = (y1a < y1b ? x1a : (y1a == y1b ? MIN(x1a, x1b): x1b));
 				int x2n = (y1a < y1b ? x2a : (y1a == y1b ? MAX(x2a, x2b): x2b));
 
 				/* No longer simple */
@@ -5277,9 +5356,16 @@ static bool build_chambers(int y1, int x1, int y2, int x2, int monsters_left, bo
 		/* Require a floor square with no monster in it already. */
 		if (!cave_naked_bold(y, x)) continue;
 
+		/* Enforce monster selection */
+		cave_ecology.use_ecology = dun_room[y/BLOCK_HGT][x/BLOCK_WID];
+		cave_ecology.single_ecology = TRUE;
+		
 		/* Place a single monster.  Sleeping 2/3rds of the time. */
 		place_monster_aux(y, x, get_mon_num(p_ptr->depth),
 			(rand_int(3)), FALSE, 0L);
+		
+		/* End enforcement of monster selection */
+		cave_ecology.single_ecology = FALSE;
 
 		/* One less monster to place. */
 		monsters_left--;
@@ -5294,13 +5380,26 @@ static bool build_chambers(int y1, int x1, int y2, int x2, int monsters_left, bo
  */
 static void vault_monster(int y, int x)
 {
+	int i;
+	
 	place_monster(y, x, TRUE, TRUE);
 
 	if (cave_m_idx[y][x])
 	{
 		s16b r_idx = m_list[cave_m_idx[y][x]].r_idx;
-
-		get_monster_ecology(r_idx);
+		bool needed = TRUE;
+		
+		/* Check if vault monster in ecology */
+		for (i = 0; i < cave_ecology.num_races; i++)
+		{
+			if (cave_ecology.race[i] == r_idx) needed = FALSE;
+		}
+		
+		/* Get monster ecology */
+		if (needed)
+		{
+			get_monster_ecology(r_idx);
+		}
 	}
 }
 
@@ -5308,17 +5407,19 @@ static void vault_monster(int y, int x)
 /*
  * Hack -- fill in "vault" rooms
  */
-static void build_vault(int y0, int x0, int ymax, int xmax, cptr data)
+static void build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
 {
 	int dx, dy, x, y;
 
 	cptr t;
 
 	bool old_ecology = cave_ecology.ready;
+	int old_num_ecologies = cave_ecology.num_ecologies;
+	int new_num_ecologies = old_num_ecologies;
 
 	/* Allow any monster */
 	cave_ecology.ready = FALSE;
-
+	
 	/* Place dungeon features and objects */
 	for (t = data, dy = 0; dy < ymax; dy++)
 	{
@@ -5468,11 +5569,23 @@ static void build_vault(int y0, int x0, int ymax, int xmax, cptr data)
 					break;
 				}
 			}
+			
+			/* Ensure vault has a single ecology */
+			if (cave_ecology.num_ecologies > old_num_ecologies)
+			{
+				cave_ecology.num_ecologies = old_num_ecologies;
+				new_num_ecologies = old_num_ecologies + 1;
+			}
 		}
 	}
 
+	/* Vault supports this room */
+	room_info[room].ecology = (1L << ++cave_ecology.num_ecologies);
+	room_info[room].deepest_race = cave_ecology.deepest_race[cave_ecology.num_ecologies];
+	
 	/* Ecology */
 	cave_ecology.ready = old_ecology;
+	cave_ecology.num_ecologies = new_num_ecologies;
 }
 
 
@@ -6382,7 +6495,7 @@ static bool add_next(int y, int x, int feat)
 	{
 		dun->next[dun->next_n].y = y;
 		dun->next[dun->next_n].x = x;
-		dun->next_feat[dun->next_n] = feat;
+		dun->next_feat[dun->next_n] = f_info[feat].flags1 & (FF1_OUTER) ? feat_state(feat, FS_SOLID) : feat;
 		dun->next_n++;
 
 		return (TRUE);
@@ -7781,12 +7894,16 @@ static bool build_type123(int room, int type)
 	}
 
 	/* Calculate dimensions */
-	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 5;
-	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 5;
+	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 3;
+	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 3;
 
 	/* Find and reserve some space in the dungeon.  Get center of room. */
 	if (!find_space(&y0, &x0, height, width)) return (FALSE);
-
+	
+	/* Rebalance centre */
+	y0 -= (1 + MAX(y2a, y2b) - MAX(y1a, y1b)) / 2;
+	x0 -= (1 + MAX(x2a, x2b) - MAX(x1a, x1b)) / 2;
+	
 	/* locate room (a) */
 	y1a = y0 - y1a - 1;
 	x1a = x0 - x1a - 1;
@@ -7849,12 +7966,16 @@ static bool build_type45(int room, int type)
 	}
 
 	/* Calculate dimensions */
-	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 5;
-	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 5;
+	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 3;
+	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 3;
 
 	/* Find and reserve some space in the dungeon.  Get center of room. */
 	if (!find_space(&y0, &x0, height, width)) return (FALSE);
 
+	/* Rebalance centre */
+	y0 -= (1 + MAX(y2a, y2b) - MAX(y1a, y1b)) / 2;
+	x0 -= (1 + MAX(x2a, x2b) - MAX(x1a, x1b)) / 2;
+	
 	/* locate room (a) */
 	y1a = y0 - y1a - 1;
 	x1a = x0 - x1a - 1;
@@ -7918,12 +8039,16 @@ static bool build_type6(int room, int type)
 	}
 
 	/* Calculate dimensions */
-	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 5;
-	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 5;
+	height = MAX(y1a, y1b) + MAX(y2a, y2b) + 3;
+	width = MAX(x1a, x1b) + MAX(x2a, x2b) + 3;
 
 	/* Find and reserve some space in the dungeon.  Get center of room. */
 	if (!find_space(&y0, &x0, height, width)) return (FALSE);
 
+	/* Rebalance centre */
+	y0 -= (1 + MAX(y2a, y2b) - MAX(y1a, y1b)) / 2;
+	x0 -= (1 + MAX(x2a, x2b) - MAX(x1a, x1b)) / 2;
+	
 	/* locate room (a) */
 	y1a = y0 - y1a - 1;
 	x1a = x0 - x1a - 1;
@@ -8070,7 +8195,7 @@ static bool build_type8910(int room, int type)
 	rating += v_ptr->rat;
 
 	/* Hack -- Build the vault */
-	build_vault(y0, x0, v_ptr->hgt, v_ptr->wid, v_text + v_ptr->text);
+	build_vault(room, y0, x0, v_ptr->hgt, v_ptr->wid, v_text + v_ptr->text);
 
 	/* Handle flooding */
 	if (room_info[room].flags & (ROOM_FLOODED))
@@ -8314,7 +8439,7 @@ static bool room_build(int room, int type)
 	
 	/* Flood if required */
 	if ((dun->flood_feat) && (room % 3)) room_info[room].flags |= (ROOM_FLOODED);
-
+	
 	/* Build a room */
 	switch (type)
 	{
@@ -8833,11 +8958,10 @@ static void init_ecology(int r_idx)
 	int l = 0;
 
 	/* Initialise the dungeon ecology */
-	cave_ecology.num_races = 0;
-	cave_ecology.ready = FALSE;
+	(void)WIPE(&cave_ecology, ecology_type);
 
 	/* Count of different non-unique monsters in ecology */
-	k = MIN_ECOLOGY_RACES + rand_int(MIN_ECOLOGY_RACES);
+	k = (MIN_ECOLOGY_RACES / 2) + rand_int((MIN_ECOLOGY_RACES + 1) / 2);
 
 	/* Initialise ecology based on seed race */
 	if ((r_idx) && ((level_flag & (LF1_BATTLE)) == 0))
@@ -8874,7 +8998,7 @@ static void init_ecology(int r_idx)
 			bool differs = TRUE;
 
 			/* Don't count uniques */
-			if ((r_info[cave_ecology.race[i]].flags1 & (RF1_UNIQUE)) != 0) continue;				
+			if ((r_info[cave_ecology.race[i]].flags1 & (RF1_UNIQUE)) != 0) continue;
 
 			/* Check if appears already */
 			for (j = 0; j < i; j++)
@@ -8884,11 +9008,11 @@ static void init_ecology(int r_idx)
 
 			/* Race not already counted */
 			if (differs) k--;
-
-			/* Select last race */
-			l = cave_ecology.num_races;
 		}
-
+		
+		/* Note last race checked */
+		l = cave_ecology.num_races;
+		
 		/* Not enough different monsters */
 		if ((k >= 0) && (cave_ecology.num_races < MAX_ECOLOGY_RACES))
 		{
@@ -8915,7 +9039,6 @@ static void init_ecology(int r_idx)
 				get_mon_num_prep();
 			}
 		}
-		/* We are done */
 		else
 		{
 			break;
@@ -9777,7 +9900,7 @@ static bool place_contents()
 		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_FEATURE, 1);
 		
 		/* If deepest monster is powerful, place lots of bodies around */
-		if (r_info[cave_ecology.deepest_race].level > p_ptr->depth * 5 / 4)
+		if (r_info[cave_ecology.deepest_race[0]].level > p_ptr->depth * 5 / 4)
 		{
 			/* Place some bodies in the dungeon */
 			alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_BODY, randint(k * (((level_flag & (LF1_STRONGHOLD | LF1_WILD)) != 0) ? 3 : 1)));
@@ -9804,7 +9927,7 @@ static bool place_contents()
 	if (cheat_room) msg_print("Placing monsters.");
 
 	/* If deepest monster is powerful, reduce total number of monsters */
-	if (r_info[cave_ecology.deepest_race].level > p_ptr->depth * 5 / 4) i = (i + 2) / 3;
+	if (r_info[cave_ecology.deepest_race[0]].level > p_ptr->depth * 5 / 4) i = (i + 2) / 3;
 	
 	/* Put some monsters in the dungeon */
 	for (i = i + k; i > 0; i--)

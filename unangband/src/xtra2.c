@@ -3986,7 +3986,7 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 	/* Initialize text */
 	my_strcpy(name, "", name_s);
 	if (text_always) my_strcpy(text_always, "", text_always_s);
-	if (text_visible) my_strcpy(text_visible, "", sizeof(text_visible));
+	if (text_visible) my_strcpy(text_visible, "", text_visible_s);
 
 	/* Town or not in room */
 	if (!room)
@@ -4112,6 +4112,8 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 			
 		i = 0;
 
+		if (cheat_xtra && text_always) my_strcat(text_always, format ("%s (%ld)", r_name + r_info[room_info[room].deepest_race].name, room_info[room].ecology), text_always_s);
+		
 		while ((room >= 0) && (i < ROOM_DESC_SECTIONS))
 		{
 			/* Get description */
@@ -4134,7 +4136,7 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 			{
 				/* Does the player understand the main language of the level? */
 				if ((last_buf) && (cave_ecology.ready) && (cave_ecology.num_races)
-					&& player_understands(monster_language(cave_ecology.deepest_race)))
+					&& player_understands(monster_language(room_info[room].deepest_race)))
 				{
 					/* Get the textual history */
 					my_strcat(last_buf, (d_text + d_info[j].text), last_buf_s);
@@ -4142,7 +4144,7 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 				else if (last_buf)
 				{
 					/* Fake it */
-					my_strcat(last_buf, "something you cannot understand.  ", last_buf_s);
+					my_strcat(last_buf, "nothing you can understand.  ", last_buf_s);
 
 					/* Clear last buf to skip remaining language lines */
 					last_buf = NULL;

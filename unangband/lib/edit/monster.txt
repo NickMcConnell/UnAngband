@@ -112,6 +112,8 @@
 
 # Monster group indexes
 
+# 1  Apprentices
+
 # 10 Mimic
 # 11 - 19 Elementals
 # 20 Golem
@@ -554,7 +556,7 @@ D:|He|She| is tripping over |his|her| priestly robes.
 N:38:Apprentice mage
 G:q:r
 I:110:4d4:20:6:5
-M:0:8:2:23
+M:0:8:1:23
 W:3:1:1:6
 B:HIT:HURT:1d4
 F:MALE | FEMALE
@@ -17189,7 +17191,7 @@ D:A little winged humanoid clothed surrounded by a glowing yellow lite.
 N:1187:Goblin dart-thrower
 G:k:g
 I:110:9d5:24:13:20:1
-W:7:3:20:12
+W:7:3:0:12
 M:20:0:0:0
 B:HIT:HURT:1d8
 B:DART:POISON:4d5
@@ -17203,7 +17205,7 @@ D:found in small groups.
 N:1188:Apprentice archer
 G:t:w
 I:110:5d5:20:8:20
-W:6:2:30:25
+W:6:2:1:25
 M:40:0:0:0
 B:HIT:HURT:1d5
 B:ARROW:HURT:2d6
@@ -18073,7 +18075,7 @@ D:It is a bloated human form decomposing and leaking foul water.
 N:1250:Goblin grenadier
 G:k:r
 I:110:12d5:24:13:20:1
-W:8:3:20:12
+W:8:3:0:12
 M:20:0:0:0
 B:HIT:HURT:1d8
 B:FLASK:EXPLODE:6d5
@@ -18902,7 +18904,7 @@ I:115:8d4:18:12:10
 W:7:1:24:20
 M:0:25:5:20
 F:OPEN_DOOR | DROP_60 | CAN_FLY | EVASIVE | NEVER_BLOW
-F:HAS_LITE | RES_DARK | LEVEL_SPEED | MUST_FLY | INVISIBLE
-S:DARKNESS | BLINK | ADD_MANA | BOLT_ELEC
-D:A little winged humanoid clothed surrounded by a glowing yellow lite.
+F:HAS_LITE | RES_DARK | LEVEL_SPEED | MUST_FLY
+S:DARKNESS | BLINK | ADD_MANA | BOLT_ELEC | INVIS
+D:A little winged humanoid clothed surrounded by shadow.
 

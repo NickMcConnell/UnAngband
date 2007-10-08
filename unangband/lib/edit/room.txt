@@ -73,7 +73,7 @@ B:
 
 # Wall decorated room.
 
-N:2:117:0:0:1:1:0:20
+N:2:117:0:0:1:1:0:128
 A:
 B:
 
@@ -85,7 +85,7 @@ B:
 
 # Wall decorated large room.
 
-N:4:117:0:0:1:1:0:20
+N:4:117:0:0:1:1:0:128
 A:
 B:
 
@@ -410,78 +410,87 @@ D:A sunken pit
 S:SEEN
 F:457:457:457
 
-N:104:120:0:0:60:2:0:128
+N:104:120:0:0:12:2:0:128
 A:
 B:garden
 D:A garden 
 S:SEEN
 L:LIVING
+F:0:0:831
 
-N:104:120:0:0:60:2:0:128
+N:104:120:0:0:12:2:0:128
 A:
 B:garden
 D:A garden 
 S:SEEN
 L:LIVING
 P:ROWS
+F:0:0:831
 
-N:104:120:0:0:60:2:0:128
+N:104:120:0:0:12:2:0:128
 A:
 B:garden
 D:A garden 
 S:SEEN
 L:LIVING
 P:COLS
+F:0:0:831
 
-N:104:120:0:0:60:2:0:128
+N:104:120:0:0:12:2:0:128
 A:
 B:garden
 D:A garden 
 S:SEEN
 L:LIVING
 P:CHECKER
+F:0:0:831
 
-N:104:120:0:0:60:2:0:128
+N:104:120:0:0:12:2:0:128
 A:
 B:garden
 D:A garden 
 S:SEEN
 L:LIVING
 P:ROWS | COLS
+F:0:0:831
 
-N:104:120:0:0:60:2:0:128
+N:104:120:0:0:12:2:0:128
 A:
 B:garden
 D:A garden  
 S:SEEN
 L:LIVING
 P:MAZE_WALL
+F:0:0:831
 
-N:104:120:0:0:60:2:0:128
+N:104:120:0:0:12:2:0:128
 A:
 B:garden
 D:A garden  
 S:SEEN
 L:LIVING
 P:MAZE_DECOR
+F:0:0:831
 
-N:104:120:0:0:60:2:0:128
+N:104:120:0:0:12:2:0:128
 A:
 B:garden
 D:A garden  
 S:SEEN
 L:LIVING
 P:MAZE_PATH
+F:0:0:831
 
-N:104:120:0:0:60:2:0:128
+N:104:120:0:0:12:2:0:128
 A:
 B:garden
 D:A garden 
 S:SEEN
 L:LIVING
 P:STARBURST
+F:0:0:831
 
-N:104:119:0:0:25:1:0:128
+N:104:119:0:0:12:1:0:128
 A:
 B:festhall
 D:A stone table 
@@ -489,7 +498,7 @@ F:807:0:807
 S:SEEN
 R:SMART
 
-N:104:119:0:0:25:1:0:128
+N:104:119:0:0:12:1:0:128
 A:
 B:dining room
 D:A wooden table 
@@ -513,7 +522,7 @@ F:7:0:0
 S:SEEN
 P:ALLOC
 
-N:104:119:0:0:100:5:45:128
+N:104:119:0:0:20:5:45:128
 A:
 B:
 D:A stone pillar 
@@ -530,7 +539,7 @@ F:111:111:111
 S:SEEN
 P:ALLOC
 
-N:104:119:0:0:25:2:3:128
+N:104:119:0:0:5:2:3:128
 A:
 B:
 D:A shallow grave 
@@ -539,7 +548,7 @@ S:SEEN
 P:SCATTER
 F:457:457:457
 
-N:104:119:0:0:25:2:3:128
+N:104:119:0:0:5:2:3:128
 A:
 B:
 D:A trench 
@@ -548,7 +557,7 @@ S:SEEN
 P:MAZE_DECOR
 F:457:457:457
 
-N:104:119:0:0:25:2:0:128
+N:104:119:0:0:5:2:0:128
 A:
 B:plaza
 D:A broken fountain 
@@ -556,7 +565,7 @@ S:SEEN
 F:383:136:764
 R:STUPID
 
-N:104:119:0:0:10:1:0:128
+N:104:119:0:0:2:1:0:128
 A:
 B:plaza
 D:An empty fountain 
@@ -564,7 +573,7 @@ S:SEEN
 F:384:0:764
 R:STUPID
 
-N:104:119:0:0:10:1:1:128
+N:104:119:0:0:2:1:1:128
 A:
 B:plaza
 D:A clear fountain 
@@ -572,7 +581,7 @@ S:SEEN
 F:385:0:744
 R:SMART
 
-N:104:119:0:0:60:1:10:128
+N:104:119:0:0:12:1:10:128
 A:
 B:plaza
 D:A cloudy fountain 
@@ -580,7 +589,7 @@ S:SEEN
 F:386:0:744
 R:FORGET
 
-N:104:119:0:0:60:1:10:128
+N:104:119:0:0:12:1:10:128
 A:
 B:plaza
 D:A bubbling fountain 
@@ -588,7 +597,7 @@ S:SEEN
 F:387:0:744
 R:HEAL
 
-N:104:119:0:0:60:1:30:128
+N:104:119:0:0:12:1:30:128
 A:
 B:plaza
 D:A misty fountain 
@@ -596,7 +605,7 @@ S:SEEN
 F:387:0:744
 R:CURSE
 
-N:104:119:0:0:60:1:20:128
+N:104:119:0:0:12:1:20:128
 A:
 B:plaza
 D:A smoky fountain 
@@ -604,7 +613,7 @@ S:SEEN
 F:387:0:744
 R:ILLUSION
 
-N:104:119:0:0:20:2:20:128
+N:104:119:0:0:12:2:20:128
 A:
 B:cell
 D:An iron cage 
@@ -613,7 +622,7 @@ F:314:0:726
 K:1:0:99
 R:MAN
 
-N:104:119:0:0:15:2:20:128
+N:104:119:0:0:3:2:20:128
 A:
 B:cell
 D:A wooden cage 
@@ -622,7 +631,7 @@ F:314:0:726
 K:1:0:99
 R:ORC
 
-N:104:119:0:0:15:0:10:128
+N:104:119:0:0:3:0:10:128
 A:
 B:torture room
 D:A torture rack 
@@ -639,7 +648,7 @@ F:49:49:113
 S:SEEN
 P:SCATTER
 
-N:104:119:0:0:30:3:1:128
+N:104:119:0:0:6:3:1:128
 A:
 B:
 D:A pile of rubble 
@@ -648,7 +657,7 @@ S:SEEN
 R:CAN_DIG
 P:SCATTER
 
-N:104:119:0:0:30:3:1:128
+N:104:119:0:0:6:3:1:128
 A:
 B:
 D:A pile of rubble 
@@ -657,7 +666,7 @@ S:SEEN
 R:GIANT
 P:SCATTER
 
-N:104:119:0:0:25:1:1:128
+N:104:119:0:0:5:1:1:128
 A:
 B:
 D:A fallen statue 
@@ -666,16 +675,16 @@ F:0:0:732
 S:SEEN
 R:MAN
 
-N:104:119:0:0:25:1:1:128
+N:104:119:0:0:5:1:1:128
 A:
 B:
 D:A statue 
-K:11:2:99
+K:11:2:24
 F:0:0:732
 S:SEEN
 R:MAN
 
-N:104:119:0:0:75:2:30:128
+N:104:119:0:0:15:2:30:128
 A:
 B:chapel
 F:373:0:831
@@ -683,7 +692,7 @@ R:PRIEST
 D:A wooden altar 
 S:SEEN
 
-N:104:119:0:0:25:1:20:128
+N:104:119:0:0:5:1:20:128
 A:
 B:temple
 F:374:0:723
@@ -691,7 +700,7 @@ R:PRIEST
 D:A stone altar 
 S:SEEN
 
-N:104:119:0:0:25:0:20:128
+N:104:119:0:0:5:0:20:128
 A:unholy
 B:temple
 F:375:0:754
@@ -700,7 +709,7 @@ R:EVIL
 D:A blood-stained altar 
 S:SEEN
 
-N:104:119:0:0:20:2:40:128
+N:104:119:0:0:4:2:40:128
 A:
 B:mausoleum
 F:376:0:829
@@ -708,7 +717,7 @@ D:A dusty altar
 S:SEEN
 R:UNDEAD
 
-N:104:119:0:0:20:2:30:128
+N:104:119:0:0:4:2:30:128
 A:magic
 B:
 F:637:0:406
@@ -716,7 +725,7 @@ D:A magic circle
 S:SEEN
 R:MAGE
 
-N:104:119:0:0:30:2:40:128
+N:104:119:0:0:6:2:40:128
 A:magic
 B:
 F:638:0:406
@@ -724,7 +733,7 @@ D:A magic triangle
 S:SEEN
 R:MAGE
 
-N:104:119:0:0:40:2:50:128
+N:104:119:0:0:8:2:50:128
 A:magic
 B:
 F:639:0:406
@@ -733,7 +742,7 @@ S:SEEN
 R:MAGE
 
 
-N:104:119:0:0:50:2:60:128
+N:104:119:0:0:10:2:60:128
 A:magic
 B:
 F:640:0:406
@@ -742,7 +751,7 @@ S:SEEN
 R:MAGE
 
 
-N:104:119:0:0:60:2:70:128
+N:104:119:0:0:12:2:70:128
 A:magic
 B:
 F:640:0:406
@@ -751,7 +760,7 @@ S:SEEN
 R:MAGE
 
 
-N:104:119:0:0:35:2:5:128
+N:104:119:0:0:7:2:5:128
 A:
 B:shrine
 F:668:0:405
@@ -760,7 +769,7 @@ S:SEEN
 R:PRIEST
 P:ALLOC
 
-N:104:119:0:0:25:3:0:128
+N:104:119:0:0:5:3:0:128
 A:
 B:well
 F:391:0:764
@@ -768,7 +777,7 @@ D:A stone well
 S:SEEN
 R:SMART
 
-N:104:119:0:0:75:1:0:128
+N:104:119:0:0:15:1:0:128
 A:
 B:
 F:425:0:22
@@ -777,7 +786,7 @@ S:SEEN
 R:PLANT
 P:SCATTER
 
-N:104:119:0:0:75:1:0:128
+N:104:119:0:0:15:1:0:128
 A:tree
 B:
 F:427:0:831
@@ -787,7 +796,7 @@ S:SEEN
 R:PLANT
 P:SCATTER
 
-N:104:119:0:0:50:0:0:128
+N:104:119:0:0:10:0:0:128
 A:tree
 B:
 F:420:0:831
@@ -796,7 +805,7 @@ S:SEEN
 L:LIVING
 P:SCATTER
 
-N:104:119:0:0:50:0:40:128
+N:104:119:0:0:10:0:40:128
 A:tree
 B:
 F:454:0:831
@@ -805,7 +814,7 @@ S:SEEN
 L:LIVING
 P:SCATTER
 
-N:104:119:0:0:50:0:0:128
+N:104:119:0:0:10:0:0:128
 A:tree
 B:
 F:421:0:831
@@ -814,9 +823,9 @@ S:SEEN
 L:LIVING
 P:SCATTER
 
-N:104:119:0:0:50:0:0:128
+N:104:119:0:0:10:0:0:128
 A:
-B:
+B:orchard
 F:426:0:435
 D:An apple tree 
 S:SEEN
@@ -824,7 +833,7 @@ R:ELF
 L:LIVING
 P:SCATTER
 
-N:104:119:0:0:50:2:10:128
+N:104:119:0:0:10:2:10:128
 A:
 B:pen
 D:A wooden cage 
@@ -833,7 +842,7 @@ F:313:0:313
 K:2:4:4
 R:ANIMAL
 
-N:104:105:107:126:25:2:50:128
+N:104:105:107:126:5:2:50:128
 A:
 B:throneroom
 D:A stone throne 
@@ -843,7 +852,7 @@ F:807:0:732
 P:ALLOC
 R:NONLIVING
 
-N:104:105:107:127:25:2:45:128
+N:104:105:107:127:5:2:45:128
 A:
 B:throneroom
 D:An iron throne 
@@ -853,7 +862,7 @@ F:807:0:732
 S:SEEN
 P:ALLOC
 
-N:104:105:107:127:25:1:45:128
+N:104:105:107:127:5:1:45:128
 A:
 B:throneroom
 D:A gold-leafed throne 
@@ -863,7 +872,7 @@ F:807:0:732
 S:SEEN
 P:ALLOC
 
-N:104:105:0:0:50:0:40:128
+N:104:105:0:0:10:0:40:128
 A:
 B:nest
 D:A huge nest 
@@ -872,7 +881,7 @@ S:SEEN
 K:8:3:3
 P:SCATTER
 
-N:104:105:0:0:50:0:25:128
+N:104:105:0:0:10:0:25:128
 A:
 B:cocoon
 G:I
@@ -882,7 +891,7 @@ F:306:306:756
 K:8:1:1
 P:8WAY
 
-N:104:105:0:0:50:0:12:128
+N:104:105:0:0:10:0:12:128
 A:
 B:
 D:A huge spiderweb 
@@ -891,7 +900,7 @@ S:SEEN
 F:446:447:829
 P:8WAY
 
-N:104:119:0:0:15:0:4:128
+N:104:119:0:0:3:0:4:128
 A:
 B:temple
 D:A sacrificial stone 
@@ -901,7 +910,7 @@ F:136:0:754
 K:6:0:99
 P:SCATTER
 
-N:104:119:0:0:25:1:9:128
+N:104:119:0:0:5:1:9:128
 A:
 B:tomb
 D:A great sarcophagus 
@@ -910,7 +919,7 @@ R:UNDEAD
 S:SEEN
 P:ALLOC
 
-N:104:119:0:0:25:3:5:128
+N:104:119:0:0:5:3:5:128
 A:
 B:mine
 D:A deep shaft 
@@ -919,7 +928,7 @@ F:64:136:835
 S:SEEN
 G:$
 
-N:104:119:0:0:25:3:5:128
+N:104:119:0:0:5:3:5:128
 A:
 B:mine
 D:A deep shaft 
@@ -928,7 +937,7 @@ F:64:136:835
 S:SEEN
 R:DWARF
 
-N:104:105:0:0:25:1:2:128
+N:104:105:0:0:5:1:2:128
 A:
 B:
 D:A giant stone head 
@@ -937,7 +946,7 @@ K:12:14:14
 F:57:0:0
 R:GIANT
 
-N:104:105:0:0:25:1:2:128
+N:104:105:0:0:5:1:2:128
 A:
 B:
 D:A giant stone head 
@@ -946,7 +955,7 @@ K:12:14:14
 F:57:0:0
 R:DWARF
 
-N:104:119:0:0:25:2:0:128
+N:104:119:0:0:5:2:0:128
 A:
 B:
 D:A window 
@@ -955,7 +964,7 @@ F:723:0:0
 S:SEEN
 P:OUTER | LITE
 
-N:104:119:0:0:25:2:0:128
+N:104:119:0:0:5:2:0:128
 A:
 B:
 D:An open window 
@@ -964,7 +973,7 @@ F:724:0:0
 S:SEEN
 P:OUTER | LITE
 
-N:104:119:0:0:25:2:0:128
+N:104:119:0:0:5:2:0:128
 A:
 B:
 D:A broken window 
@@ -973,7 +982,7 @@ F:725:0:0
 S:SEEN
 P:OUTER | LITE
 
-N:104:119:0:0:25:2:0:128
+N:104:119:0:0:5:2:0:128
 A:
 B:prison
 D:A locked gate 
@@ -982,7 +991,7 @@ F:726:0:0
 S:SEEN
 P:OUTER
 
-N:104:119:107:123:25:2:0:128
+N:104:119:107:123:5:2:0:128
 A:portrait
 B:
 D:A painting 
@@ -991,7 +1000,7 @@ F:732:0:732
 S:SEEN
 P:OUTER
 
-N:104:119:0:0:25:2:0:128
+N:104:119:0:0:5:2:0:128
 A:
 B:
 D:A lit fireplace 
@@ -1000,7 +1009,7 @@ F:734:0:734
 S:SEEN
 P:OUTER
 
-N:104:119:0:0:25:2:0:128
+N:104:119:0:0:5:2:0:128
 A:
 B:
 D:An empty fireplace 
@@ -1009,7 +1018,7 @@ F:762:0:734
 S:SEEN
 P:OUTER
 
-N:104:119:0:0:25:2:0:128
+N:104:119:0:0:5:2:0:128
 A:
 B:
 D:A burning torch 
@@ -1018,7 +1027,7 @@ F:736:0:736
 S:SEEN
 P:OUTER | DARK
 
-N:104:119:0:0:25:2:0:128
+N:104:119:0:0:5:2:0:128
 A:
 B:
 D:A burning torch 
@@ -1027,7 +1036,7 @@ F:736:0:736
 S:SEEN
 P:OUTER | DARK
 
-N:104:105:106:140:25:2:0:128
+N:104:105:106:140:5:2:0:128
 A:
 B:
 D:A lever 
@@ -1036,7 +1045,7 @@ F:753:0:753
 S:SEEN
 P:OUTER | ALLOC
 
-N:104:105:106:140:25:2:30:128
+N:104:105:106:140:5:2:30:128
 A:
 B:
 D:A lever 
@@ -1045,7 +1054,7 @@ F:752:0:752
 S:SEEN
 P:OUTER | ALLOC
 
-N:104:105:106:140:50:2:0:128
+N:104:105:106:140:10:2:0:128
 A:
 B:
 D:A lever 
@@ -1054,7 +1063,7 @@ F:753:0:753
 S:SEEN
 P:OUTER | ALLOC
 
-N:104:105:106:140:50:2:30:128
+N:104:105:106:140:10:2:30:128
 A:
 B:
 D:A lever 
@@ -1063,7 +1072,7 @@ F:752:0:752
 S:SEEN
 P:OUTER | ALLOC
 
-N:104:119:0:0:25:2:0:128
+N:104:119:0:0:5:2:0:128
 A:
 B:washroom
 D:A basin 
@@ -1072,7 +1081,7 @@ F:744:547:744
 S:SEEN
 P:OUTER
 
-N:104:119:0:0:25:2:0:128
+N:104:119:0:0:5:2:0:128
 A:
 B:washroom
 D:An empty basin 
@@ -1081,7 +1090,7 @@ F:764:547:764
 S:SEEN
 P:OUTER
 
-N:104:119:0:0:25:2:0:128
+N:104:119:0:0:5:2:0:128
 A:
 B:midden
 D:A midden 
@@ -1090,7 +1099,7 @@ F:746:547:744
 S:SEEN
 P:OUTER
 
-N:104:119:0:0:25:2:0:128
+N:104:119:0:0:5:2:0:128
 A:
 B:midden
 D:An empty midden 
@@ -1126,7 +1135,7 @@ F:127:0:0
 S:SEEN
 P:ALLOC
 
-N:104:105:0:0:25:2:5:128
+N:104:105:0:0:5:2:5:128
 A:
 B:
 D:A small wooden chest 
@@ -1135,7 +1144,7 @@ F:316:0:0
 S:SEEN
 P:ALLOC
 
-N:104:105:0:0:25:2:15:128
+N:104:105:0:0:5:2:15:128
 A:
 B:
 D:A large wooden chest 
@@ -1144,7 +1153,7 @@ F:327:0:0
 S:SEEN
 P:ALLOC
 
-N:104:105:0:0:25:2:25:128
+N:104:105:0:0:5:2:25:128
 A:
 B:
 D:A small iron chest 
@@ -1153,7 +1162,7 @@ F:336:0:0
 S:SEEN
 P:ALLOC
 
-N:104:105:0:0:25:2:35:128
+N:104:105:0:0:5:2:35:128
 A:
 B:
 D:A large iron chest 
@@ -1162,7 +1171,7 @@ F:345:0:0
 S:SEEN
 P:ALLOC
 
-N:104:105:0:0:25:2:45:128
+N:104:105:0:0:5:2:45:128
 A:
 B:
 D:A small steel chest 
@@ -1171,7 +1180,7 @@ F:355:0:0
 S:SEEN
 P:ALLOC
 
-N:104:105:0:0:25:2:55:128
+N:104:105:0:0:5:2:55:128
 A:
 B:
 D:A large steel chest 
@@ -1180,7 +1189,7 @@ F:345:0:0
 S:SEEN
 P:ALLOC
 
-N:104:105:0:0:30:3:5:128
+N:104:105:0:0:6:3:5:128
 A:
 B:
 D:A chess set 
@@ -1372,6 +1381,16 @@ K:0:0:835
 S:SEEN
 R:MAN
 P:PLACE | SCATTER
+
+N:106:107:0:0:15:1:45:128
+A:tiled
+B:
+D:decorated with a tile mosaic.  
+F:439:0:732
+K:11:28:28
+S:SEEN
+R:MAN
+P:PLACE | OUTER
 
 N:106:107:0:0:35:3:0:128
 A:tiled
@@ -1989,7 +2008,7 @@ F:141:0:0
 L:CHASM
 P:PLACE
 
-N:106:107:0:0:50:0:0:128
+N:106:107:0:0:10:0:0:128
 A:bloody
 B:
 D:spattered with dried blood.  
@@ -2294,20 +2313,39 @@ A:grafittied
 B:
 D:covered with crude grafitti.  
 F:817:817:750
-P:OUTER
+P:OUTER | PLACE | SCATTER
 S:SEEN
 R:SMART
-P:PLACE | SCATTER
+
+N:106:134:0:0:5:1:25:128
+A:grafittied
+B:
+D:covered with crude grafitti.  
+F:817:817:750
+K:11:25:25
+P:OUTER | PLACE | SCATTER
+S:SEEN
+R:SMART
 
 N:106:128:0:0:50:2:0:128
 A:
 B:
 D:covered with hieroglyphics.  
 F:817:817:750
-P:OUTER
+P:OUTER | PLACE | SCATTER
 G:z
 S:SEEN
 P:PLACE | SCATTER
+
+N:106:128:0:0:10:1:30:128
+A:
+B:
+D:covered with hieroglyphics.  
+F:817:817:750
+K:11:26:26
+P:OUTER | PLACE | SCATTER
+G:z
+S:SEEN
 
 N:106:128:0:0:25:2:0:128
 A:written
@@ -2420,7 +2458,7 @@ B:
 D:filled with gas.  
 F:181:181:0
 L:LAVA
-P:PLACE | ALLOC
+P:PLACE | RANDOM
 
 N:108:109:0:0:15:1:72:128
 A:
@@ -2428,7 +2466,7 @@ B:
 D:filled with smoke.  
 F:162:162:729
 L:LAVA
-P:PLACE | ALLOC
+P:PLACE | RANDOM
 
 N:108:109:0:0:15:1:36:128
 A:
@@ -2436,7 +2474,7 @@ B:
 D:filled with smoke.  
 F:162:162:729
 L:OIL
-P:PLACE | ALLOC
+P:PLACE | RANDOM
 
 N:108:109:0:0:15:1:51:128
 A:
@@ -2444,7 +2482,7 @@ B:
 D:filled with acidic vapours.  
 F:165:165:728
 L:ACID
-P:PLACE | ALLOC
+P:PLACE | RANDOM
 
 N:108:109:0:0:15:1:51:128
 A:
@@ -2452,7 +2490,7 @@ B:
 D:misty with droplets.  
 F:307:307:837
 L:WATER
-P:PLACE | ALLOC
+P:PLACE | RANDOM
 
 N:108:109:0:0:15:1:4:128
 A:smokey
@@ -2490,14 +2528,6 @@ B:
 D:ripe with decay.  
 R:UNDEAD
 
-N:108:109:0:0:5:0:9:128
-A:
-B:
-D:misty with blood.  
-R:EVIL
-F:305:305:754
-P:PLACE | SCATTER
-
 N:108:109:0:0:15:0:9:128
 A:
 B:
@@ -2518,7 +2548,7 @@ B:
 D:rank with mildew.  
 F:306:306:756
 G:,
-P:PLACE | SCATTER
+P:PLACE | RANDOM
 
 N:108:109:0:0:30:1:12:128
 A:
@@ -3311,15 +3341,25 @@ P:OUTER
 S:SEEN
 R:SMART
 
-N:117:102:107:123:25:2:25:128
+N:117:102:107:123:25:2:65:128
 A:painted
 B:
 D:Paintings cover 
-P:OUTER
+P:OUTER | CHECKER
 F:0:0:732
 S:SEEN
 R:SMART
-K:11:25:99
+K:11:29:29
+
+N:117:102:107:123:25:2:70:128
+A:painted
+B:
+D:Paintings cover 
+P:OUTER | CHECKER
+F:0:0:732
+S:SEEN
+R:SMART
+K:11:30:30
 
 N:117:102:0:0:50:1:9:128
 A:
@@ -4030,6 +4070,14 @@ S:SEEN
 G:g
 P:SCATTER
 
+N:117:102:0:0:150:2:45:128
+A:
+B:workshop
+D:Diagrams cover
+K:11:27:27
+S:SEEN
+P:SCATTER
+
 N:117:121:107:123:50:2:0:128
 A:windowed
 B:
@@ -4341,7 +4389,7 @@ B:
 D: 
 P:MAZE_DECOR
 
-N:119:105:0:0:5:5:0:128
+N:119:105:0:0:10:10:0:128
 A:
 B:
 D:
@@ -5088,25 +5136,25 @@ B:
 D:Some wag has written 
 S:SEEN
 
-N:134:135:0:0:5:1:0:128
+N:134:135:0:0:5:2:0:128
 A:
 B:
 D:Someone has scrawled 
 S:SEEN
 
-N:134:135:0:0:5:1:0:128
+N:134:135:0:0:5:2:0:128
 A:
 B:
 D:You can make out 
 S:SEEN
 
-N:134:135:0:0:5:1:0:128
+N:134:135:0:0:5:2:0:128
 A:
 B:
 D:Someone has scratched 
 S:SEEN
 
-N:134:135:0:0:15:0:25:128
+N:134:135:0:0:5:0:25:128
 A:
 B:
 D:Someone has scrawled in blood 
@@ -5514,7 +5562,7 @@ A:
 B:
 P:CENTRE | EDGE
 
-N:145:106:0:0:15:15:0:128
+N:145:106:0:0:45:45:0:128
 A:
 B:
 P:CENTRE | STARBURST

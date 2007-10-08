@@ -979,6 +979,11 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			}
 			else
 			{
+				if (o_ptr->tval == TV_STATUE)
+				{
+					 my_strcpy(mon_buf, format("%s %s", is_a_vowel(mon_buf[0]) ? "an" : "a", mon_buf), sizeof(mon_buf));
+				}
+
 				modstr = mon_buf;
 			}
 			break;

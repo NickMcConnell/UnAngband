@@ -1500,7 +1500,7 @@ static void do_cmd_wiz_query(void)
 
 void do_cmd_wiz_ecology(void)
 {
-	int num, row, col;
+	int num, row, col, i;
 	
 	/* No ecology */
 	if (!cave_ecology.get_mon)
@@ -1522,13 +1522,20 @@ void do_cmd_wiz_ecology(void)
 		row = 2 + (num % 26);
 		col = 30 * (num / 26);
 		prt(r_name + r_info[cave_ecology.race[num]].name, row, col);
+		
+		col += 20;
+		
+		for (i = 0; i <= cave_ecology.num_ecologies; i++)
+		{
+			if (cave_ecology.race_ecologies[num] & (1L << i))
+			{
+				prt(format("%d", i), row, col += 1);
+			}
+		}
 	}
 	
 	/* Total monsters */
-	msg_format("Ecology has %d races.", cave_ecology.num_races);
-	
-	/* Wait for a keypress */
-	anykey();
+	msg_format("Ecology has %d races and %d sub-ecologies.", cave_ecology.num_races, cave_ecology.num_ecologies);
 	
 	/* Screen_load */
 	screen_load();

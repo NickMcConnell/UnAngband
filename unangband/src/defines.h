@@ -3965,8 +3965,11 @@
 /*
  *  Ecologies - used for monster placement
  */
-#define MIN_ECOLOGY_RACES	4	/* Minimum different races in ecology */
+#define MIN_ECOLOGY_RACES	8	/* Minimum different races in ecology */
 #define MAX_ECOLOGY_RACES	64	/* Maximum total races in ecology (including duplicates) */
+
+#define MAX_ECOLOGIES		(DUN_ROOMS + 1)	/* Maximum total ecologies */
+
 
 /*
  * Hack -- Bit masks to control what spells are considered

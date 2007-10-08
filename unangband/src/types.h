@@ -285,6 +285,9 @@ struct room_info_type
 	s16b	solid;		/* Feature to use as solid wall */
 	s16b	tunnel;		/* Feature to use as tunnel */
 	
+	u32b ecology;	/* What ecologies appear in the room */
+	s16b deepest_race;	/* Deepest race in this ecology */
+	
 #if 0
 	byte d_attr[5];    	/* Desired feature attribute (basic / inner / outer / solid) */
 	char d_char[5];    	/* Desired feature character (basic / inner / outer / solid) */
@@ -1756,11 +1759,15 @@ struct quiver_group_type
  */
 struct ecology_type
 {
-	s16b deepest_race;	/* Race that defines what the dungeon looks like */
 	s16b race[MAX_ECOLOGY_RACES];
+	u32b race_ecologies[MAX_ECOLOGY_RACES];	/* Which ecologies the race appears in */
+	s16b deepest_race[MAX_ECOLOGIES];
+	byte num_ecologies;	/* Number of ecologies */
 	byte num_races;
 	bool ready;		/* Are we forced to use this ecology? */
+	bool single_ecology;	/* Are we forced to use a single 'sub' ecology */
+	byte use_ecology;		/* Use this ecology when forced */
 	bool valid_hook;	/* Is at least one monster valid using current get_mon_hook */
-	bool get_mon[MAX_ECOLOGY_RACES];	/* Are we permitted to pick this race */	
+	bool get_mon[MAX_ECOLOGY_RACES];	/* Are we permitted to pick this race */
 };
 
