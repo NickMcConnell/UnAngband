@@ -4699,6 +4699,9 @@ static bool name_drop_okay(int r_idx)
 	/* Skip uniques */
 	if ((j_ptr->tval != TV_STATUE) && (r_ptr->flags1 & (RF1_UNIQUE))) return (FALSE);
 
+	/* Skip monsters with assemblies, unless an assembly */
+	if ((j_ptr->tval != TV_ASSEMBLY) && (r_ptr->flags8 & (RF8_ASSEMBLY))) return (FALSE);
+	
 	if (j_ptr->tval == TV_BONE)
 	{
 		/* Skip if monster does not have body part */
@@ -4751,6 +4754,9 @@ static bool name_drop_okay(int r_idx)
 	}
 	else if (j_ptr->tval == TV_ASSEMBLY)
 	{
+		/* Skip if monster is not assembly */
+		if (!(r_ptr->flags8 & (RF8_ASSEMBLY))) return (FALSE);		
+		
 		/* Skip if monster does not have body part */
 		if ((j_ptr->sval == SV_ASSEMBLY_NONE) && !(r_ptr->flags8 & (RF8_HAS_CORPSE))) return (FALSE);
 		else if ((j_ptr->sval == SV_ASSEMBLY_HEAD) && !(r_ptr->flags8 & (RF8_HAS_HEAD))) return (FALSE);

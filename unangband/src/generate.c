@@ -109,7 +109,7 @@
  */
 /* DUN_ROOMS now defined in defines.h */
 #define DUN_NATURE_SURFACE	80	/* Chance in 100 of having lakes on surface */
-#define DUN_NATURE_DEEP		20	/* Chance in 100 of having lakes on surface */
+#define DUN_NATURE_DEEP		40	/* Chance in 100 of having lakes at depth */
 #define DUN_MAX_LAKES   3       /* Maximum number of lakes/rivers */
 #define DUN_FEAT_RNG    2       /* Width of lake */
 
@@ -173,6 +173,7 @@
 #define WALL_MAX	40
 #define TUNN_MAX	300
 #define SOLID_MAX	120
+#define QUEST_MAX	30
 #define STAIR_MAX	30
 #define DECOR_MAX	30
 
@@ -273,6 +274,10 @@ struct dun_data
 	coord decor[DECOR_MAX];
 	int decor_t[DECOR_MAX];
 
+	/* Array of good potential quest grids */
+	s16b quest_n;
+	coord quest[QUEST_MAX];
+
 	/* Array of good potential stair grids */
 	s16b stair_n;
 	coord stair[STAIR_MAX];
@@ -333,7 +338,7 @@ static room_data_type room_data[ROOM_MAX] =
    /* Xlg cent */ {{ 0,   0,   0,   0,   0,   0,   4,   4,   4,   4,   4}, 11,DUN_ROOMS/2,	3, 0, LF1_STRONGHOLD},
    /* Chambers */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	6,		3, 0, LF1_CHAMBERS},
    /* I. Room */  {{30,  60,  70,  80,  80,  75,  70,  67,  65,  62,  60},  0,  4,		1, 0, LF1_DUNGEON},
-   /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	4,		2, 0, LF1_VAULT | LF1_CRYPT},
+   /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	4,		2, 0, LF1_VAULT | LF1_CRYPT | LF1_DUNGEON},
    /* G. Vault */ {{ 0,   0,   1,   2,   3,   4,   6,   7,   8,  10,  12}, 20,	1,		3, 0, LF1_VAULT | LF1_STRONGHOLD},
    /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS,	2, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE | LF1_LAIR | LF1_SEWER},
    /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		3, 0, LF1_MINE | LF1_CAVE | LF1_LAIR | LF1_SEWER},
@@ -341,19 +346,19 @@ static room_data_type room_data[ROOM_MAX] =
    /* Lrg fra */  {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS / 2,	3, 0, LF1_MINE | LF1_DUNGEON | LF1_CAVE},
    /* Huge fra */ {{ 0,   0,   0,   0,   0,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE},
    /* Lair */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		1, 0, LF1_LAIR},
-   /* Maze */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,DUN_ROOMS/3,		1, 0, LF1_LABYRINTH | LF1_STRONGHOLD | LF1_DUNGEON | LF1_CHAMBERS},
-   /* Lrg maze */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 41,	3,		1, 0, LF1_LABYRINTH | LF1_STRONGHOLD},
-   /* Huge maze */{{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 41,	1,		1, 0, LF1_LABYRINTH},
-   /* Lake */     {{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 41,	1,		1, 0, LF1_WILD},
-   /* Huge lake */{{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 41,	1,		1, 0, LF1_WILD},
-   /* Tower */    {{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 41,	1,		1, 0, LF1_TOWER}
+   /* Maze */     {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 41,DUN_ROOMS/3,		1, 0, LF1_THEME & ~(LF1_DESTROYED | LF1_WILD)},
+   /* Lrg maze */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 41,	3,		2, 0, LF1_LABYRINTH | LF1_STRONGHOLD | LF1_CAVE | LF1_CRYPT},
+   /* Huge maze */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 41,	1,		3, 0, LF1_LABYRINTH},
+   /* Lake */     {{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 41,	1,		2, 0, LF1_WILD},
+   /* Huge lake */{{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 41,	1,		3, 0, LF1_WILD},
+   /* Tower */    {{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 41,	1,		3, 0, LF1_TOWER}
 };
 
 
 
 /* Build rooms in descending order of difficulty of placing e.g. size, frequency. */
-static byte room_build_order[ROOM_MAX] = {ROOM_LAIR, ROOM_GREATER_VAULT, ROOM_CHAMBERS,
-						ROOM_HUGE_MAZE, ROOM_HUGE_FRACTAL, ROOM_HUGE_STAR_BURST, ROOM_HUGE_CENTRE, ROOM_LARGE_MAZE, ROOM_LARGE_FRACTAL, 
+static byte room_build_order[ROOM_MAX] = {ROOM_LAIR, ROOM_GREATER_VAULT, ROOM_HUGE_MAZE, ROOM_CHAMBERS,
+						ROOM_HUGE_FRACTAL, ROOM_HUGE_STAR_BURST, ROOM_HUGE_CENTRE, ROOM_LARGE_MAZE, ROOM_LARGE_FRACTAL, 
 						ROOM_LESSER_VAULT, ROOM_INTERESTING, ROOM_STAR_BURST, ROOM_MAZE, ROOM_FRACTAL, ROOM_LARGE_CENTRE,
 						ROOM_LARGE_WALLS, ROOM_NORMAL_CENTRE, ROOM_NORMAL_WALLS, ROOM_NORMAL, 0};
 
@@ -933,7 +938,7 @@ static void generate_fill(int y1, int x1, int y2, int x2, int feat)
 /*
  * Generate helper -- fill a rectangle with a feature. Place pillars if spacing set.
  */
-static void generate_fill_pillars(int y1, int x1, int y2, int x2, int feat, int spacing)
+static void generate_fill_pillars(int y1, int x1, int y2, int x2, int feat, int spacing, int scale)
 {
 	int y, x;
 
@@ -942,7 +947,8 @@ static void generate_fill_pillars(int y1, int x1, int y2, int x2, int feat, int 
 		for (x = x1; x <= x2; x++)
 		{
 			/* Check spacing */
-			if ((spacing > 1) && (y % spacing == 0) && (x % spacing == 0) && (x != x1) && (x != x2) && (y != y1) && (y != y2))
+			if ((spacing > 1) && (y % spacing < scale) && (x % spacing < scale) &&
+					(x != x1) && (x != x2) && (y != y1) && (y != y2))
 			{
 				cave_set_feat(y, x, FEAT_WALL_INNER);
 			}
@@ -976,10 +982,32 @@ static void generate_rect(int y1, int x1, int y2, int x2, int feat)
 }
 
 
+/*
+ * Record good location for quest objects
+ */
+static bool add_quest(int y, int x)
+{
+	/* Needs to be in bounds */
+	if (!in_bounds_fully(y, x)) return (FALSE);
+
+	/* Record location */
+	if (dun->quest_n < QUEST_MAX)
+	{
+		dun->quest[dun->quest_n].y = y;
+		dun->quest[dun->quest_n].x = x;
+		dun->quest_n++;
+
+		return (TRUE);
+	}
+	
+	return (FALSE);
+}
+
+
 
 /* Convert a maze coordinate into a dungeon coordinate */
-#define YPOS(y, y1)		((y1) + (y * (width_path + width_wall)) + outer)
-#define XPOS(x, x1)		((x1) + (x * (width_path + width_wall)) + outer)
+#define YPOS(y, y1)		((y1) + (y * (width_path + width_wall)) + width_outer)
+#define XPOS(x, x1)		((x1) + (x * (width_path + width_wall)) + width_outer)
 
 
 #define MAZE_WALL		0x00000001L	/* Surround maze with width 1 wall */
@@ -994,9 +1022,10 @@ static void generate_rect(int y1, int x1, int y2, int x2, int feat)
 #define MAZE_EXIT_S		0x00000200L	/* Make exit on south edge of maze */
 #define MAZE_EXIT_W		0x00000400L	/* Make exit on west edge of maze */
 #define MAZE_EXIT_E		0x00000800L	/* Make exit on east edge of maze */
-#define MAZE_FILL		0x00001000L	/* Fill some dead ends with walls */
+#define MAZE_DEAD		0x00001000L	/* Fill some dead ends with walls */
 #define MAZE_POOL		0x00002000L	/* Fill some dead ends with pools */
 #define MAZE_DOOR		0x00004000L	/* Hide some dead ends with secret doors */
+#define MAZE_FILL		0x00008000L	/* Fill some dead ends with useful goodies */
 #define MAZE_CRYPT		0x00010000L	/* Paths in maze have ragged edges like crypt corridors (width_path must be greater than 1)*/
 #define MAZE_CAVE		0x00020000L	/* Paths in maze wander like cave corridors (width_path must be 2) */
 
@@ -1026,7 +1055,7 @@ static void generate_rect(int y1, int x1, int y2, int x2, int feat)
  * construction of maze rooms required for labrynth levels.
  */
 static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
-    s16b feat_path, int width_wall, int width_path, u32b flag)
+    s16b feat_path, int width_wall, int width_path, s16b feat_pool, u32b flag)
 {
 	int i, j;
 	int ydim, xdim;
@@ -1037,13 +1066,15 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	int dy, dx;
 	int yi, xi;
 	
-	int outer = flag & (MAZE_WALL) ? 1 : 0;
+	int width_outer = flag & (MAZE_WALL) ? 1 : 0;
 
 	byte dir[4];
 	byte dirs;
 	
 	s16b *saved;
 
+	int solid = ((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) ? feat_state(feat_wall, FS_SOLID) : 0;	
+	
 	/* Paranoia */
 	if ((!feat_wall) || (!feat_path) || (feat_wall == feat_path) || (width_wall < 1) || (width_path < 1)) return (FALSE);
 
@@ -1082,10 +1113,8 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	if (flag & (MAZE_ROOM)) generate_room(y1, x1, y2, x2, ((flag & (MAZE_LITE)) != 0));
 	
 	/* If maze has a wall and feat_wall is an outer wall, surround by 'outer' and 'solid' sections of wall to allow corridor connections */
-	if (((flag & (MAZE_WALL)) != 0) && ((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0))
+	if (((flag & (MAZE_WALL)) != 0) && (solid))
 	{
-		int solid = feat_state(feat_wall, FS_SOLID);
-		
 		if (flag & (MAZE_OUTER_W | MAZE_OUTER_E))
 		{
 			for (y = y1; y <= y2; y++)
@@ -1111,8 +1140,8 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	 * minus two (for the requirement of two outer width 1 walls)
 	 * plus 1 because y1 = 10, y2 = 10 implies a width 1 room. */
 	
-	ydim = ((y2 - y1) + width_wall - (2 * outer) + 1) / (width_wall + width_path);
-	xdim = ((x2 - x1) + width_wall - (2 * outer) + 1) / (width_wall + width_path);
+	ydim = ((y2 - y1) + width_wall - (2 * width_outer) + 1) / (width_wall + width_path);
+	xdim = ((x2 - x1) + width_wall - (2 * width_outer) + 1) / (width_wall + width_path);
 
 	/* Number of unexamined grids */
 	grids = ydim * xdim - 1;
@@ -1188,6 +1217,19 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 				{
 					for (xi = i - (dx < 0 ? width_wall + width_path : 0); xi < i + (dx < 0 ? 0 : width_path) + (dx > 0 ? width_wall + width_path : 0); xi++)
 					{
+						/* Leave pillars in centre of width 3 corridors, except crypts and caves */
+						if ((width_path == 3) && ((flag & (MAZE_CRYPT | MAZE_CAVE)) == 0))
+						{
+							/* Pillar in current grid */
+							if ((yi == j + 1) && (xi == i + 1)) continue;
+							
+							/* Pillar in destination grid (note width_path replaced by 3) */
+							if ((yi == j + 1 + (dy * (width_wall + 3))) && (xi == i + 1 + (dx * (width_wall + 3)))) continue;
+							
+							/* Pillar in-between if width_wall is 3 */
+							if ((width_wall == 3) && ((yi == j + 1 + (dy * 3)) && (xi == i + 1 + (dx * 3)))) continue;
+						}
+
 						cave_set_feat(yi, xi, feat_path);
 					}
 				}
@@ -1262,6 +1304,204 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 		}
 	}
 	
+	/* Partially fill the maze back in */
+	if (flag & (MAZE_DEAD | MAZE_POOL))
+	{
+		int pools = (flag & (MAZE_POOL)) ? ydim * xdim / 4 : 0;
+		int doors = (flag & (MAZE_DOOR)) ? ydim * xdim / 4 : 0;
+		int stuff = (flag & (MAZE_FILL)) ? ydim * xdim / 4 : 0;
+		
+		/* Number of grids to fill back in */
+		if (flag & (MAZE_DEAD)) grids = ydim * xdim / 4;
+
+		/* Less dead ends if not surrounded by wall */
+		if ((flag & (MAZE_WALL)) == 0)
+		{
+			int n = 2 * ydim + 2 * xdim - 4;
+			grids -= n;
+			if (pools) pools -= n;
+			if (doors) doors -= n;
+			if (stuff) stuff -= n;
+		}
+		
+		/* Dead end filler */
+		while (grids || pools || doors || stuff)
+		{
+			int k = 0;
+			
+			for (y = 0; y < ydim; y++)
+			{
+				for (x = 0; x < xdim; x++)
+				{
+					dirs = 0;
+					
+					j = YPOS(y, y1);
+					i = YPOS(x, x1);
+					
+					/* Already filled */
+					if (cave_feat[j][i] != feat_path) continue;
+					
+					/* Up */
+					if ((y || (width_outer)) && (cave_feat[j - 1][i] == feat_path)) dir[dirs++] = 1;
+	
+					/* Down */
+					if (((y < ydim - 1) || (width_outer)) && (cave_feat[j + width_path][i] == feat_path)) dir[dirs++] = 2;
+	
+					/* Left */
+					if ((x || (width_outer)) && (cave_feat[j][i - 1] == feat_path)) dir[dirs++] = 3;
+	
+					/* Right */
+					if (((x < xdim - 1) || (width_outer)) && (cave_feat[j][i + width_path] == feat_path)) dir[dirs++] = 4;
+					
+					/* Dead end */
+					if ((dirs == 1) && (!rand_int(++k)))
+					{
+						ty = y;
+						tx = x;
+						
+						/* Note the direction */
+						switch (dir[0])
+						{
+							/* Move up */
+							case 1:  dy = -1; dx = 0;  break;
+
+							/* Move down */
+							case 2:  dy =  1; dx = 0;  break;
+
+							/* Move left */
+							case 3:  dx = -1; dy = 0; break;
+
+							/* Move right */
+							case 4:  dx =  1; dy = 0; break;
+						}
+					}
+				}
+			}
+			
+			/* Paranoia */
+			if (!k) break;
+			
+			/* Convert coordinates */
+			y = ty;
+			x = tx;
+			j = YPOS(y, y1);
+			i = YPOS(x, x1);
+			
+			/* Fill in dead-end */
+			if (grids)
+			{
+				int feat = solid ? feat_state(feat_wall, FS_INNER) : feat_wall;
+				
+				/* Fill in floors */
+				for (yi = j - (dy < 0 ? width_wall : 0); yi < j + width_path + (dy > 0 ? width_wall : 0); yi++)
+				{
+					for (xi = i - (dx < 0 ? width_wall : 0); xi < i + width_path + (dx > 0 ? width_wall : 0); xi++)
+					{
+						cave_set_feat(yi, xi, feat);
+					}
+				}
+
+				/* Move outer walls in and remove parts of room */
+				if ((width_outer) && (solid) && ((flag & (MAZE_ROOM)) != 0))
+				{
+					/* Clear room flags as required */
+					for (yi = j - (y ? width_wall : 1); yi < j + width_path + ((y < ydim - 1) ? width_wall : 1); yi++)
+					{
+						for (xi = i - (x ? width_wall : 1); xi < i + width_path + ((x < xdim - 1) ? width_wall : 1); xi++)
+						{
+							bool clear = TRUE;
+							
+							if ((yi < j - width_wall + 1) && (y) && ((cave_info[j - width_wall - 1][i] & (CAVE_ROOM)) != 0)) clear = FALSE;
+							if ((xi < i - width_wall + 1) && (x) && ((cave_info[j][i - (x ? width_wall : 1) - 1] & (CAVE_ROOM)) != 0)) clear = FALSE;
+							if ((yi >= j + width_path + width_wall - 1) && (y < ydim - 1) && ((cave_info[j + width_path + width_wall][i] & (CAVE_ROOM)) != 0)) clear = FALSE;
+							if ((xi >= i + width_path + width_wall - 1) && (x < xdim - 1) && ((cave_info[j][i + width_path + width_wall] & (CAVE_ROOM)) != 0)) clear = FALSE;
+							
+							/* No longer in room */
+							if (clear) cave_info[yi][xi] &= ~(CAVE_ROOM | CAVE_LITE);
+							
+							/* On edge of room */
+							else
+							{
+								if (((yi - y1 - 1) % (width_wall + width_path) < width_path) &&
+										((xi - x1 - 1) % (width_wall + width_path) < width_path)) cave_set_feat(yi, xi, feat_wall);
+								else cave_set_feat(yi, xi, solid);
+							}
+						}
+					}
+				}
+				
+				grids--;
+			}
+			
+			/* Fill in pool */
+			else if (pools)
+			{
+				/* Fill in floors */
+				for (yi = j - (dy < 0 ? width_wall : 0); yi < j + width_path + (dy > 0 ? width_wall : 0); yi++)
+				{
+					for (xi = i - (dx < 0 ? width_wall : 0); xi < i + width_path + (dx > 0 ? width_wall : 0); xi++)
+					{
+						if (cave_feat[yi][xi] != feat_path) continue;
+						cave_set_feat(yi, xi, feat_pool);
+					}
+				}
+
+				/* Ensure that external tunnels don't connect to flooded dead ends */
+				if (solid)
+				{
+					/* Check west & east */
+					for (yi = j - 1; yi <= j + width_path; yi++)
+					{
+						if (cave_feat[yi][i - 1] == feat_wall) cave_set_feat(yi, i - 1, solid);
+						if (cave_feat[yi][i + width_path] == feat_wall) cave_set_feat(yi, i + width_path, solid);
+					}
+	
+					/* Check north & south */
+					for (xi = i - 1; xi <= i + width_path; xi++)
+					{
+						if (cave_feat[j - 1][xi] == feat_wall) cave_set_feat(j - 1, xi, solid);
+						if (cave_feat[j + width_path][xi] == feat_wall) cave_set_feat(j + width_path, xi, solid);
+					}
+				}
+
+				pools--;
+			}
+			
+			/* Fill in door */
+			else if (doors)
+			{
+				/* Fill in floors */
+				for (yi = j - (dy < 0 ? width_wall : 0); yi < j + width_path + (dy > 0 ? width_wall : 0); yi++)
+				{
+					for (xi = i - (dx < 0 ? width_wall : 0); xi < i + width_path + (dx > 0 ? width_wall : 0); xi++)
+					{
+						cave_set_feat(yi, xi, feat_pool);
+					}
+				}
+				
+				doors--;
+			}
+
+			/* Fill in stuff */
+			else if (stuff)
+			{
+				/* Fill in stuff */
+				for (yi = j; yi < j + width_path; yi++)
+				{
+					for (xi = i; xi < i + width_path; xi++)
+					{
+						if (cave_feat[yi][xi] != feat_path) continue;
+						
+						/* Good candidate for quest */
+						add_quest(yi, xi);
+					}
+				}
+				
+				stuff--;
+			}
+		}
+	}
+		
 	/* Restore grids */
 	if (flag & (MAZE_SAVE))
 	{
@@ -1833,7 +2073,7 @@ static bool room_info_feat(int f_idx)
 /*
  * Generate helper -- draw a rectangle with a feature using a series of 'pattern' flags.
  */
-static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, u32b exclude, int dy, int dx)
+static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, u32b exclude, int dy, int dx, int scale)
 {
 	int y, x, i, k;
 
@@ -1895,9 +2135,13 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 
 		int wall = ((flag & (RG1_MAZE_WALL)) != 0) ? feat : (((flag & (RG1_MAZE_DECOR)) != 0) ? (edge && (edge != feat) ? edge : FEAT_FLOOR) : FEAT_WALL_OUTER);
 		int path = ((flag & (RG1_MAZE_PATH | RG1_MAZE_DECOR)) != 0) ? feat : (edge && (edge != feat) ? edge : FEAT_FLOOR);
+		int pool = 0;
 
-		u32b maze_flags = MAZE_SAVE | ((flag & (RG1_MAZE_DECOR)) ? 0 : MAZE_WALL);
+		u32b maze_flags = MAZE_SAVE | MAZE_ROOM | ((flag & (RG1_MAZE_DECOR)) ? 0 : MAZE_WALL);
 		
+		/* Ensure light */
+		if ((exclude & (RG1_DARK)) != 0) maze_flags |= MAZE_LITE;
+				
 		/* Need an exit? */
 		if ((flag & (RG1_MAZE_DECOR)) == 0)
 		{
@@ -1994,11 +2238,17 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 			path = temp;
 			
 			/* Paranoia */
-			if (((f_info[path].flags1 & (FF1_MOVE)) == 0) && ((f_info[path].flags3 & (FF3_EASY_CLIMB)) == 0)) path = FEAT_FLOOR;
+			if (((f_info[path].flags1 & (FF1_MOVE)) == 0) && ((f_info[path].flags3 & (FF3_EASY_CLIMB)) == 0))
+			{
+				pool = path;
+				path = FEAT_FLOOR;
+				
+				if (pool) maze_flags |= (MAZE_POOL);
+			}
 		}
 
 		/* Draw the maze. */
-		draw_maze(y0, x0, y3, x3, wall, path, 1, 1, maze_flags);
+		draw_maze(y0, x0, y3, x3, wall, path, 1, scale, pool, maze_flags);
 		
 		/* Hack -- scatter items inside maze */
 		flag |= (RG1_SCATTER);
@@ -2006,14 +2256,9 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 		edge = 0;
 	}
 
-	/* Use checkered for invalid mazes */
-	else if ((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR)) != 0)
-	{
-		flag |= (RG1_CHECKER);
-	}
-
 	/* Place starburst if required */
-	else if (((flag & (RG1_STARBURST)) != 0) && ((flag & (RG1_ALLOC)) == 0))
+	else if (((flag & (RG1_STARBURST)) != 0) && ((flag & (RG1_ALLOC)) == 0) &&
+			(ABS(y2 - y1) >= 4) && (ABS(y2 - y1) >= 4))
 	{
 		/* Ensure the correct ordering of directions */
 		int y0 = (dy > 0) ? y1 : y2;
@@ -2038,6 +2283,12 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 		edge = 0;
 	}
 
+	/* Use checkered for invalid mazes / starbursts */
+	else if ((flag & (RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR | RG1_STARBURST)) != 0)
+	{
+		flag |= (RG1_CHECKER);
+	}
+	
 	/* Scatter several about if requested */
 	for (k = 0; k < ( ((flag & (RG1_SCATTER | RG1_TRAIL)) != 0) && ((flag & (RG1_ALLOC)) == 0) ? NUM_SCATTER : 1); k++)
 	{
@@ -2313,67 +2564,81 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 		else if (((flag & (RG1_ALLOC | RG1_SCATTER | RG1_TRAIL)) != 0) && choice)
 		{
 			int place_feat = feat;
+			int alloc_scale = ((flag & (RG1_SCATTER)) == 0) ? scale : 1;
 
+			/* Occasionally scale up single allocation */
+			if (((flag & (RG1_SCATTER | RG1_TRAIL)) == 0) && (rand_int(100) < p_ptr->depth))
+			{
+				alloc_scale++;
+			}
+			
 			/* Get location */
-			y = y_alloc;
-			x = x_alloc;
-
-			outer = ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) != 0);
-
-			/* Pick a random feature? */
-			if ((feat) && (f_info[feat].mimic == feat))
+			for (y = y_alloc; (dy > 0) ? y < (y_alloc + dy * alloc_scale) : y > (y_alloc + dy * alloc_scale); y += dy)
 			{
-				place_feat = get_feat_num(object_level);
-
-				if (!place_feat) place_feat = feat;
-			}
-
-			/* Assign feature */
-			if (place_feat)
-			{
-				/* Hack -- if we are placing one feature, we replace it with a solid wall to ensure that it
-				 * is not overwritten later on. We take advantage of the dun->next array to do this.
-				 */
-				if (k == 0) cave_feat[y][x] = FEAT_WALL_SOLID;
-
-				/* Preserve the 'solid' status of a wall */
-				if (cave_feat[y][x] == FEAT_WALL_SOLID)
+				for (x = x_alloc; (dx > 0) ? x < (x_alloc + dx * alloc_scale) : x > (x_alloc + dx * alloc_scale); x += dx)
 				{
-					/* Place solid wall now */
-					if ((f_info[place_feat].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)
+					/* Don't overwrite anything interesting */
+					if ((cave_feat[y][x] != FEAT_FLOOR) && (cave_feat[y][x] != FEAT_WALL_OUTER) && (cave_feat[y][x] != FEAT_WALL_SOLID)) continue;
+					
+					/* Is outer? */
+					outer = ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) != 0);
+		
+					/* Pick a random feature? */
+					if ((feat) && (f_info[feat].mimic == feat))
 					{
-						cave_set_feat(y, x, (f_info[place_feat].flags1 & (FF1_OUTER)) != 0 ? feat_state(place_feat, FS_SOLID) : place_feat);
+						place_feat = get_feat_num(object_level);
+		
+						if (!place_feat) place_feat = feat;
 					}
-					else
+		
+					/* Assign feature */
+					if (place_feat)
 					{
-						/* Overwrite solid wall later */
-						dun->next[dun->next_n].y = y;
-						dun->next[dun->next_n].x = x;
-						dun->next_feat[dun->next_n] = place_feat;
-						dun->next_n++;
+						/* Hack -- if we are placing one feature, we replace it with a solid wall to ensure that it
+						 * is not overwritten later on. We take advantage of the dun->next array to do this.
+						 */
+						if (k == 0) cave_feat[y][x] = FEAT_WALL_SOLID;
+		
+						/* Preserve the 'solid' status of a wall */
+						if (cave_feat[y][x] == FEAT_WALL_SOLID)
+						{
+							/* Place solid wall now */
+							if ((f_info[place_feat].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)
+							{
+								cave_set_feat(y, x, (f_info[place_feat].flags1 & (FF1_OUTER)) != 0 ? feat_state(place_feat, FS_SOLID) : place_feat);
+							}
+							else
+							{
+								/* Overwrite solid wall later */
+								dun->next[dun->next_n].y = y;
+								dun->next[dun->next_n].x = x;
+								dun->next_feat[dun->next_n] = place_feat;
+								dun->next_n++;
+							}
+						}
+						else
+						{
+							cave_set_feat(y, x, place_feat);
+		
+							/* Hack - fix outer walls if placing inside a room */
+							if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) && !(outer)) cave_alter_feat(y, x, FS_INNER);
+						}
 					}
-				}
-				else
-				{
-					cave_set_feat(y, x, place_feat);
-
-					/* Hack - fix outer walls if placing inside a room */
-					if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) && !(outer)) cave_alter_feat(y, x, FS_INNER);
-				}
-			}
-
-			/* Require "clean" floor space */
-			if ((flag & (RG1_HAS_GOLD | RG1_HAS_ITEM)) != 0)
-			{
-				/* Either place or overwrite outer wall if required */
-				if ((cave_clean_bold(y, x)) || (((flag & (RG1_OUTER)) != 0) && (cave_feat[y][x] == FEAT_WALL_OUTER)))
-				{
-					/* Hack -- erase outer wall */
-					if (cave_feat[y][x] == FEAT_WALL_OUTER) cave_set_feat(y, x, FEAT_FLOOR);
-
-					/* Drop gold 50% of the time if both defined */
-					if (((flag & (RG1_HAS_GOLD)) != 0) && (((flag & (RG1_HAS_ITEM)) == 0) || (rand_int(100) < 50))) place_gold(y, x);
-					else place_object(y, x, FALSE, FALSE);
+		
+					/* Require "clean" floor space */
+					if ((flag & (RG1_HAS_GOLD | RG1_HAS_ITEM)) != 0)
+					{
+						/* Either place or overwrite outer wall if required */
+						if ((cave_clean_bold(y, x)) || (((flag & (RG1_OUTER)) != 0) && (cave_feat[y][x] == FEAT_WALL_OUTER)))
+						{
+							/* Hack -- erase outer wall */
+							if (cave_feat[y][x] == FEAT_WALL_OUTER) cave_set_feat(y, x, FEAT_FLOOR);
+		
+							/* Drop gold 50% of the time if both defined */
+							if (((flag & (RG1_HAS_GOLD)) != 0) && (((flag & (RG1_HAS_ITEM)) == 0) || (rand_int(100) < 50))) place_gold(y, x);
+							else place_object(y, x, FALSE, FALSE);
+						}
+					}
 				}
 			}
 		}
@@ -2727,7 +2992,7 @@ static u16b pick_proper_feature(bool (*feat_hook)(int f_idx))
 
 	/* Set the level flags based on the feature */
 	set_level_flags(feat);
-
+	
 	/* Return the feature */
 	return (feat);
 }
@@ -2786,10 +3051,26 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 {
 	int i, count, pick, match, chance;
 
+	byte last_tval;
+	s16b last_feat;
+	
+	bool placement = FALSE;
+	
 	int counter = 0;
 
 	if (cheat_room) msg_format("Getting room info %d.",*chart);
 
+	/* Record last placements */
+	last_feat = *place_feat;
+	last_tval = *place_tval;
+	
+	/* Clear placements */
+	*place_tval = 0;
+	*place_min_sval = 0;
+	*place_max_sval = 0;
+	*place_flag = 0;
+	*place_feat = 0;
+	
 	/* Process the description */
 	/* Note we need 1 space at end of room_desc_sections to terminate description */
 	while ((*chart != 0) && (*j < ROOM_DESC_SECTIONS - 1))
@@ -2836,9 +3117,13 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 			if ((exclude & (exclude_hack)) != 0) { i++; continue; }
 
 			/* Exclude items or gold */
-			if ((exclude & (RG1_HAS_ITEM)) & (d_info[i].tval < TV_GOLD)) { i++;continue; }
-			if ((exclude & (RG1_HAS_GOLD)) & (d_info[i].tval >= TV_GOLD)) { i++;continue; }
+			if ((exclude & (RG1_HAS_ITEM)) && (d_info[i].tval) && (d_info[i].tval < TV_GOLD)) { i++;continue; }
+			if ((exclude & (RG1_HAS_GOLD)) /* && (d_info[i].tval) */ && (d_info[i].tval >= TV_GOLD)) { i++;continue; }
 
+			/* Don't place same features or objects twice */
+			if (last_tval && (d_info[i].tval == last_tval)) {i++; continue;}
+			if (last_feat && (d_info[i].feat == last_feat)) {i++; continue;}
+			
 			/* Reset chance */
 			chance = 0;			
 
@@ -3073,18 +3358,21 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 				}
 			}
 
-			return (TRUE);
+			/* Placement */
+			placement = TRUE;
+			
+			break;
 		}
 
 		/* Report errors */
 		if (pick < 0)
 		{
-			return (FALSE);
+			break;
 		}
 	}
 
 	/* Finished (chart = 0) */
-	return (FALSE);
+	return (placement);
 }
 
 
@@ -3119,22 +3407,16 @@ static void set_room_flags(int room, int type, bool light)
 	/* Get room info */
 	while (get_room_info(room, &type, &j, &place_flag, &place_feat, &place_tval, &place_min_sval, &place_max_sval, &branch, &branch_on, &name, exclude))
 	{
-		/* Clear object hook */
-		if (place_tval)
-		{
-			get_obj_num_hook = NULL;
+		/* Don't place anything */
+	}
+	
+	/* Clear object hook */
+	if (get_obj_num_hook)
+	{
+		get_obj_num_hook = NULL;
 
-			/* Prepare allocation table */
-			get_obj_num_prep();
-
-			place_tval = 0;
-			place_min_sval = 0;
-			place_max_sval = 0;
-		}
-
-		/* Clear placement details */
-		place_flag = 0;
-		place_feat = 0;
+		/* Prepare allocation table */
+		get_obj_num_prep();
 	}
 
 	/* Paranoia */
@@ -3148,7 +3430,7 @@ static void set_room_flags(int room, int type, bool light)
 		{
 			/* Terminate index list */
 			room_info[room].section[j] = -1;
-		}
+		}		
 	}
 }
 
@@ -3159,12 +3441,8 @@ typedef s16b pool_type[3];
 /*
  *  Get room info for rooms where we do not have any north / south / east / west or clear place to drop items.
  */
-static void set_irregular_room_info(int room, int type, bool light, s16b *feat, s16b *edge, s16b *inner, s16b *alloc, pool_type *pool, int *n_pools)
+static void set_irregular_room_info(int room, int type, bool light, u32b exclude, s16b *feat, s16b *edge, s16b *inner, s16b *alloc, pool_type *pool, int *n_pools)
 {
-	u32b exclude = (RG1_NORTH | RG1_SOUTH | RG1_EAST | RG1_WEST | RG1_HAS_ITEM | RG1_HAS_GOLD |
-			RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR | RG1_CHECKER | RG1_ROWS | RG1_COLS |
-			RG1_8WAY | RG1_3X3HIDDEN);
-
 	int j = 0;
 
 	u32b place_flag = 0L;
@@ -3179,6 +3457,11 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 	byte branch = 0;
 	byte branch_on = 0;
 
+	/* Default exclusions */
+	exclude |= (RG1_NORTH | RG1_SOUTH | RG1_EAST | RG1_WEST | RG1_HAS_ITEM | RG1_HAS_GOLD |
+			RG1_MAZE_PATH | RG1_MAZE_WALL | RG1_MAZE_DECOR | RG1_CHECKER | RG1_ROWS | RG1_COLS |
+			RG1_8WAY | RG1_3X3HIDDEN);
+	
 	/* Hack -- diagnostics */
 	if (cheat_room) msg_print("Setting irregular room info.");
 
@@ -3222,20 +3505,14 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 		/* Place features or items if needed */
 		if (place_feat)
 		{
-			/* Hack -- only fill irregular rooms with lake-like terrain */
-			if (((place_flag & (RG1_CENTRE | RG1_EDGE | RG1_OUTER)) != 0) &&
-				((f_info[place_feat].flags2 & (FF2_LAKE | FF2_RIVER)) == 0))
+			/* Place throughout room, unless scattering */
+			if (((place_flag & (RG1_CENTRE)) != 0) &&
+				((place_flag & (RG1_ALLOC | RG1_INNER | RG1_OUTER | RG1_STARBURST | RG1_SCATTER | RG1_RANDOM)) == 0))
 			{
-				/* Hack -- allow irregular edges */
-				if ((place_flag & (RG1_CENTRE)) == 0)
-				{
-					/* Overwrite 'solid' terrain */
-					room_info[room].solid = place_feat;
-					
-					/* Exclude edges */
-					exclude |= (RG1_EDGE | RG1_OUTER);
-				}
-				else
+				/* Hack -- only fill irregular rooms with lake-like terrain, floors or ground */
+				if (((f_info[place_feat].flags1 & (FF1_FLOOR)) == 0) &&
+					((f_info[place_feat].flags2 & (FF2_LAKE | FF2_RIVER)) == 0) &&
+					((f_info[place_feat].flags3 & (FF3_GROUND)) == 0))
 				{
 					if ((exclude & (RG1_INNER)) == 0)
 					{
@@ -3249,36 +3526,34 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 					{
 						place_flag |= (RG1_RANDOM);
 					}
+
+					/* Clear flags */
+					place_flag &= ~(RG1_CENTRE);
 				}
-
-				/* Clear flags */
-				place_flag &= ~(RG1_CENTRE | RG1_EDGE | RG1_OUTER);
-			}
-
-			/* Place throughout room, unless scattering */
-			if (((place_flag & (RG1_CENTRE)) != 0) &&
-				((place_flag & (RG1_ALLOC | RG1_INNER | RG1_OUTER | RG1_STARBURST | RG1_SCATTER | RG1_RANDOM)) == 0))
-			{
-				exclude |= RG1_CENTRE;
-				*feat = place_feat;
-
-				if (((place_flag & (RG1_EDGE)) != 0) && ((place_flag & (RG1_IGNORE_EDGE | RG1_BRIDGE_EDGE)) != 0))
+				/* Fill room with terrain */
+				else
 				{
-					exclude |= RG1_EDGE | RG1_OUTER;
-					*edge = place_feat;
-
-					if ((place_flag & (RG1_BRIDGE_EDGE)) != 0)
+					exclude |= RG1_CENTRE;
+					*feat = place_feat;
+					
+					if (((place_flag & (RG1_EDGE)) != 0) && ((place_flag & (RG1_IGNORE_EDGE | RG1_BRIDGE_EDGE)) != 0))
 					{
-						if (f_info[*feat].flags2 & (FF2_BRIDGE))
+						exclude |= RG1_EDGE;
+						*edge = place_feat;
+	
+						if ((place_flag & (RG1_BRIDGE_EDGE)) != 0)
 						{
-							/* Bridge previous contents */
-							*edge = feat_state(*feat, FS_BRIDGE);
-						}
-						/* Apply tunnel */
-						else if (f_info[*feat].flags1 & (FF1_TUNNEL))
-						{
-							/* Tunnel previous contents */
-							*edge = feat_state(*feat, FS_TUNNEL);
+							if (f_info[*feat].flags2 & (FF2_BRIDGE))
+							{
+								/* Bridge previous contents */
+								*edge = feat_state(*feat, FS_BRIDGE);
+							}
+							/* Apply tunnel */
+							else if (f_info[*feat].flags1 & (FF1_TUNNEL))
+							{
+								/* Tunnel previous contents */
+								*edge = feat_state(*feat, FS_TUNNEL);
+							}
 						}
 					}
 				}
@@ -3288,6 +3563,8 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 			{
 				exclude |= RG1_ALLOC;
 				*alloc = place_feat;
+				
+				place_flag &= ~(RG1_INNER | RG1_STARBURST | RG1_OUTER | RG1_EDGE | RG1_SCATTER | RG1_RANDOM);
 			}
 
 			if ((place_flag & (RG1_INNER | RG1_STARBURST)) != 0)
@@ -3296,40 +3573,38 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 				*inner = place_feat;
 				
 				/* Hack -- inner and outer --> inner only */
-				place_flag &= ~(RG1_EDGE | RG1_OUTER);
+				place_flag &= ~(RG1_OUTER);
 			}
 
-			if ((place_flag & (RG1_EDGE | RG1_OUTER)) != 0)
-			{
-				exclude |= RG1_EDGE | RG1_OUTER;
+			if ((place_flag & (RG1_EDGE)) != 0)
+			{				
+				exclude |= RG1_EDGE;
 				*edge = place_feat;
+			}
+
+			if ((place_flag & (RG1_OUTER)) != 0)
+			{				
+				exclude |= RG1_OUTER;
+				room_info[room].solid = place_feat;
 			}
 
 			if ((place_flag & (RG1_SCATTER | RG1_RANDOM)) != 0)
 			{
-				if (*n_pools > 2) exclude |= RG1_SCATTER | RG1_RANDOM;
+				if (*n_pools >= 2) exclude |= RG1_SCATTER | RG1_RANDOM;
 				*pool[(*n_pools)++] = place_feat;
 			}
 		}
-
-		/* Clear object hook */
-		if (place_tval)
-		{
-			get_obj_num_hook = NULL;
-
-			/* Prepare allocation table */
-			get_obj_num_prep();
-
-			place_tval = 0;
-			place_min_sval = 0;
-			place_max_sval = 0;
-		}
-
-		/* Clear placement details */
-		place_flag = 0;
-		place_feat = 0;
 	}
 
+	/* Clear object hook */
+	if (get_obj_num_hook)
+	{
+		get_obj_num_hook = NULL;
+
+		/* Prepare allocation table */
+		get_obj_num_prep();
+	}
+	
 	/* Paranoia */
 	if (room < DUN_ROOMS)
 	{
@@ -3344,6 +3619,7 @@ static void set_irregular_room_info(int room, int type, bool light, s16b *feat, 
 		}
 	}
 }
+
 
 /* Hack - spill light out of the edge of a room */
 static void check_windows_y(int y1, int y2, int x)
@@ -3376,7 +3652,7 @@ static void check_windows_x(int x1, int x2, int y)
  * Get the room description, and place stuff accordingly.
  */
 static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int x2a,
-	int y1b, int x1b, int y2b, int x2b, bool light, int spacing, bool pillars)
+	int y1b, int x1b, int y2b, int x2b, bool light, int spacing, int scale, bool pillars)
 {
 	int j = 0;
 	int l = 1;
@@ -3463,11 +3739,11 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	}
 	
 	/* Generate inner floors (a) */
-	generate_fill_pillars(y1a+l, x1a+l, y2a-l, x2a-l, floor, pillars ? spacing + 1: 0);
+	generate_fill_pillars(y1a+l, x1a+l, y2a-l, x2a-l, floor, pillars ? spacing + 1: 0, scale);
 
 	/* Generate inner floors (b) */
-	generate_fill_pillars(y1b+l, x1b+l, y2b-l, x2b-l, floor, pillars ? spacing + 1: 0);
-
+	generate_fill_pillars(y1b+l, x1b+l, y2b-l, x2b-l, floor, pillars ? spacing + 1: 0, scale);
+	
 	/* Flooded dungeon */
 	if (room_info[room].flags & (ROOM_FLOODED))
 	{
@@ -3546,7 +3822,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 					place_flag_temp |= (RG1_INNER);
 				}
 
-				generate_patt(y1c, x1c, y2c, x2c, place_feat, place_flag_temp, exclude, dy, dx);
+				generate_patt(y1c, x1c, y2c, x2c, place_feat, place_flag_temp, exclude, dy, dx, scale);
 			}
 
 			/* Place in west of room */
@@ -3562,7 +3838,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 
 				/* Ensure some space */
 				if (x2w <= x2w) x2w = x1w + 1;
-				generate_patt(y1w, x1w, y2w, x2w, place_feat, place_flag, exclude, dy, dx);
+				generate_patt(y1w, x1w, y2w, x2w, place_feat, place_flag, exclude, dy, dx, scale);
 			}
 
 			/* Place in east of room */
@@ -3580,7 +3856,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 				if (x1e >= x2e) x1e = x2e - 1;
 
 					/* Draw from east to west */
-					generate_patt(y1e, x2e, y2e, x1e, place_feat, place_flag, exclude, dy, -dx);
+					generate_patt(y1e, x2e, y2e, x1e, place_feat, place_flag, exclude, dy, -dx, scale);
 			}
 
 			/* Place in north of room */
@@ -3597,7 +3873,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 				/* Ensure some space */
 				if (y2n <= y1n) y2n = y1n + 1;
 
-				generate_patt(y1n, x1n, y2n, x2n, place_feat, place_flag, exclude, dy, dx);
+				generate_patt(y1n, x1n, y2n, x2n, place_feat, place_flag, exclude, dy, dx, scale);
 			}
 
 			/* Place in south of room */
@@ -3615,7 +3891,7 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 				if (y1s >= y2s) y1s = y2s - 1;
 
 				/* Draw from south to north */
-				generate_patt(y2s, x1s, y1s, x2s, place_feat, place_flag, exclude, -dy, dx);
+				generate_patt(y2s, x1s, y1s, x2s, place_feat, place_flag, exclude, -dy, dx, scale);
 			}
 		}
 
@@ -3626,17 +3902,18 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 
 			/* Prepare allocation table */
 			get_obj_num_prep();
-
-			place_tval = 0;
-			place_min_sval = 0;
-			place_max_sval = 0;
-		}
-
-		/* Clear placement details */
-		place_flag = 0;
-		place_feat = 0;
+		}		
 	}
 
+	/* Clear object hook */
+	if (get_obj_num_hook)
+	{
+		get_obj_num_hook = NULL;
+
+		/* Prepare allocation table */
+		get_obj_num_prep();
+	}
+	
 	/* Hack - spill light out of room */
 	if (light)
 	{
@@ -4332,6 +4609,58 @@ static void fractal_map_mark_edge(fractal_map map, fractal_template *t_ptr)
 }
 
 
+/*
+ * Ensures that the fractal map has at least n_pools differing pool types (at most 3).
+ * 
+ * Ensures that the pools it does have are sequentially numbered from 1 up
+ */
+static bool fractal_map_has_pools(fractal_map map, fractal_template *t_ptr, int n_pools)
+{
+	byte pools = 0;
+	int x, y;
+	
+	/* Basic cases */
+	if ((n_pools < 1) && (n_pools > 3)) return (TRUE);
+
+	/* Process the whole map */
+	for (y = 0; y < t_ptr->size; y++)
+	{
+		for (x = 0; x < t_ptr->size; x++)
+		{
+			/* Count different pool types */
+			if ((map[y][x] >= FRACTAL_POOL_1) && ((pools & (1 << ((map[y][x]) - FRACTAL_POOL_1))) == 0))
+			{
+				pools |= 1 << ((map[y][x]) - FRACTAL_POOL_1);
+				n_pools--;
+			}
+		}
+	}
+
+	/* Check that pools are sequentially numbered */
+	if (!pools || (pools == 1) || (pools == 3) || (pools == 7)) return ((n_pools <= 0));
+	
+	/* Process the whole map */
+	for (y = 0; y < t_ptr->size; y++)
+	{
+		for (x = 0; x < t_ptr->size; x++)
+		{			
+			/* Missing pool 2 */
+			if ((map[y][x] >= FRACTAL_POOL_3) && (!(pools & 1)))
+			{
+				map[y][x]--;
+			}							
+
+			/* Missing pool 1 */
+			if ((map[y][x] >= FRACTAL_POOL_2) && (!(pools & 1)))
+			{
+				map[y][x]--;
+			}
+		
+		}
+	}
+	
+	return (TRUE);
+}
 
 
 
@@ -4514,6 +4843,8 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, b
 	s16b edge = FEAT_WALL_OUTER;
 	s16b inner = FEAT_NONE;
 	s16b alloc = FEAT_NONE;
+	u32b exclude = (RG1_INNER | RG1_STARBURST);
+	
 	pool_type pool;
 
 	int n_pools = 0;
@@ -4524,16 +4855,7 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, b
 	if (type >= MAX_FRACTAL_TYPES) return (FALSE);
 	
 	/* Set irregular room info */
-	set_irregular_room_info(room, chart, light, &feat, &edge, &inner, &alloc, &pool, &n_pools);
-
-	/* Hack - try to find a place for 'inner' room */
-	if (inner)
-	{
-		if (!alloc) alloc = inner;
-		else if (!room_info[room].solid) room_info[room].solid = inner; 
-		else if (n_pools < 3) pool[n_pools++] = inner;
-		else if (!edge) edge = inner;
-	}
+	set_irregular_room_info(room, chart, light, exclude, &feat, &edge, &inner, &alloc, &pool, &n_pools);
 
 	/* Clear remaining pools */
 	for (i = n_pools; i < 3; i++)
@@ -4611,8 +4933,8 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, b
 		if (do_merge) fractal_map_merge_another(map, t_ptr);
 
 		/* Accept only connected maps */
-		if (fractal_map_is_connected(map, t_ptr)) break;
-
+		if ((fractal_map_is_connected(map, t_ptr)) && (fractal_map_has_pools(map, t_ptr, n_pools))) break;
+		
 		/* Avoid infinite loops */
 		if (++tries >= 100)
 		{
@@ -4637,7 +4959,22 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, b
 	FREE(map);
 
 	/* Hack -- place feature at centre */
-	if (alloc) cave_set_feat(y0, x0, alloc);
+	if (alloc)
+	{
+		cave_set_feat(y0, x0, alloc);
+
+		for (i = 0; i < 8; i++)
+		{
+			int y = y0 + ddy_ddd[i];
+			int x = x0 + ddx_ddd[i];
+			
+			/* Don't overwrite anything interesting */
+			if ((cave_feat[y][x] != FEAT_FLOOR) && (cave_feat[y][x] != FEAT_WALL_OUTER) && (cave_feat[y][x] != FEAT_WALL_SOLID)) continue;
+
+			if (rand_int(100) < (i >= 4 ? 40 : 20)) continue;
+			cave_set_feat(y, x, alloc);
+		}
+	}
 
 	/* Success */
 	return (TRUE);
@@ -4753,7 +5090,7 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 	u32b flag = (room_info[room].flags & (ROOM_FLOODED)) != 0 ? 0L : (STAR_BURST_RAW_EDGE);
 
 	/* Set irregular room info */
-	set_irregular_room_info(room, type, light, &feat, &edge, &inner, &alloc, &pool, &n_pools);
+	set_irregular_room_info(room, type, light, 0L, &feat, &edge, &inner, &alloc, &pool, &n_pools);
 
 	/* Have pool contents */
 	if (n_pools) want_pools = TRUE;
@@ -4765,10 +5102,10 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 	if (room) flag |= (STAR_BURST_ROOM);
 
 	/* No floor - need inner room */
-	if ((f_info[feat].flags1 & (FF1_FLOOR)) == 0)
+	if ((f_info[feat].flags1 & (FF1_MOVE)) == 0)
 	{
 		/* Floor */
-		inner = FEAT_FLOOR;
+		if (!inner) inner = FEAT_FLOOR;
 
 		/* Hack -- no longer a room - but note we add flag later for 'inner' room */
 		flag &= ~(STAR_BURST_ROOM);
@@ -4789,7 +5126,7 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 	}
 
 	/* Case 1. Plain starburst room */
-	if ((rand_int(100) < 75) && !(inner))
+	if (!(inner) && (rand_int(100) < 75))
 	{
 		/* Allow cloverleaf rooms if pools are disabled */
 		if (!want_pools) flag |= (STAR_BURST_CLOVER);
@@ -4809,8 +5146,8 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 		{
 			if (!inner) inner = edge;
 
-			/* Classic rooms */
-			if ((f_info[inner].flags1 & (FF1_OUTER)) != 0)
+			/* Classic inner room (unless whole thing is not a room) */
+			if (((f_info[inner].flags1 & (FF1_OUTER)) != 0) && ((room) || (flag & STAR_BURST_ROOM)))
 			{
 				feat = feat_state(inner, FS_INNER);
 			}
@@ -4835,6 +5172,10 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 			dx /= 3;
 		}
 
+		/* Minimum size */
+		if (dy < 1) dy = 1;
+		if (dx < 1) dx = 1;
+		
 		generate_starburst_room (y0 - dy, x0 - dx, y0 + dy, x0 + dx,
 			feat, edge, flag | (room ? STAR_BURST_ROOM : 0L));
 	}
@@ -4902,7 +5243,24 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 	}
 
 	/* Hack -- place feature at centre */
-	if (alloc) cave_set_feat(y0, x0, alloc);
+	if (alloc)
+	{
+		int i;
+		
+		cave_set_feat(y0, x0, alloc);
+
+		if ((dy > 1) && (dx > 1)) for (i = 0; i < 8; i++)
+		{
+			int y = y0 + ddy_ddd[i];
+			int x = x0 + ddx_ddd[i];
+			
+			/* Don't overwrite anything interesting */
+			if ((cave_feat[y][x] != FEAT_FLOOR) && (cave_feat[y][x] != FEAT_WALL_OUTER) && (cave_feat[y][x] != FEAT_WALL_SOLID)) continue;
+
+			if (rand_int(100) < (i >= 4 ? 40 : 20)) continue;
+			cave_set_feat(y, x, alloc);
+		}
+	}
 }
 
 
@@ -6181,6 +6539,27 @@ static void build_river(int feat, int y, int x)
 }
 
 
+/*
+ * Record good location for stairwell, player start or quest object
+ */
+static bool add_stair(int y, int x)
+{
+	/* Needs to be in bounds */
+	if (!in_bounds_fully(y, x)) return (FALSE);
+
+	/* Record location */
+	if (dun->stair_n < STAIR_MAX)
+	{
+		dun->stair[dun->stair_n].y = y;
+		dun->stair[dun->stair_n].x = x;
+		dun->stair_n++;	
+
+		return (TRUE);
+	}
+	
+	return (FALSE);
+}
+
 
 /*
  * Always picks a correct direction
@@ -6254,12 +6633,9 @@ static void rand_dir(int *row_dir, int *col_dir, int y, int x)
 	if ((-(*row_dir) == row_dir_tmp) && (-(*col_dir) == col_dir_tmp))
 	{
 		/* Save the current tunnel location if surrounded by walls. */
-		if ((in_bounds_fully(y, x)) && (dun->stair_n < STAIR_MAX) &&
-			(next_to_walls(y, x) == 4))
+		if (next_to_walls(y, x) == 4)
 		{
-			dun->stair[dun->stair_n].y = y;
-			dun->stair[dun->stair_n].x = x;
-			dun->stair_n++;
+			add_stair(y, x);
 		}
 	}
 
@@ -6359,26 +6735,6 @@ static u32b get_tunnel_style(void)
 	return (style);
 }
 
-/*
- * Record good location for stairwell, player start or quest object
- */
-static bool add_stair(int y, int x)
-{
-	/* Needs to be in bounds */
-	if (!in_bounds_fully(y, x)) return (FALSE);
-
-	/* Record location */
-	if (dun->stair_n < STAIR_MAX)
-	{
-		dun->stair[dun->stair_n].y = y;
-		dun->stair[dun->stair_n].x = x;
-		dun->stair_n++;	
-
-		return (TRUE);
-	}
-	
-	return (FALSE);
-}
 
 /*
  * Record location for tunnel decoration
@@ -7917,7 +8273,7 @@ static bool build_type123(int room, int type)
 	x2b = x0 + x2b + 1;
 
 	/* Build an overlapping room with the above shape */
-	if (!build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, pillars)) return (FALSE);
+	if (!build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, 1, pillars)) return (FALSE);
 
 	return (TRUE);
 }
@@ -7989,7 +8345,7 @@ static bool build_type45(int room, int type)
 	x2b = x0 + x2b + 1;
 
 	/* Build an overlapping room with the above shape */
-	if (!build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, pillars)) return (FALSE);
+	if (!build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, 1, pillars)) return (FALSE);
 
 	return (TRUE);
 }
@@ -8010,10 +8366,18 @@ static bool build_type6(int room, int type)
 	bool light = FALSE;
 	int spacing = 4 + rand_int(4);
 	bool pillars = TRUE;
+	int scale = 1;
 
 	/* Occasional light */
 	if (p_ptr->depth <= randint(25)) light = TRUE;
 
+	/* Occasional fat pillars */
+	if (rand_int(100) < p_ptr->depth)
+	{
+		scale++;
+		spacing += 4;
+	}
+	
 	/* Determine extents of room (a) */
 	y1a = randint(8) + 4;
 	x1a = randint(26) + 13;
@@ -8062,7 +8426,7 @@ static bool build_type6(int room, int type)
 	x2b = x0 + x2b + 1;
 
 	/* Build an overlapping room with the above shape */
-	if (!build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, pillars)) return (FALSE);
+	if (!build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, scale, pillars)) return (FALSE);
 
 	return (TRUE);
 }
@@ -8378,22 +8742,52 @@ static bool build_type171819(int room, int type)
 	
 	int y1, x1, y2, x2;
 	
+	int pool = 0;
+	
 	/* Maze flags */
-	u32b maze_flags = (MAZE_OUTER_N | MAZE_OUTER_S | MAZE_OUTER_E | MAZE_OUTER_W | MAZE_WALL | MAZE_ROOM);
+	u32b maze_flags = (MAZE_OUTER_N | MAZE_OUTER_S | MAZE_OUTER_E | MAZE_OUTER_W | MAZE_WALL | MAZE_ROOM | MAZE_FILL);
 
 	/* Occasional light */
 	if (p_ptr->depth <= randint(25)) maze_flags |= (MAZE_LITE);
 
+	/* Occasionally fill in dead-ends */
+	if (randint(100) < p_ptr->depth) maze_flags |= (MAZE_DEAD | MAZE_SAVE);
+	
+	/* Hack -- maze and no theme: pick one at random */
+	if ((level_flag & (LF1_THEME)) == 0)
+	{
+		switch(randint(4))
+		{
+			case 1: level_flag |= (LF1_LABYRINTH); break;
+			case 2: level_flag |= (LF1_CRYPT); break;
+			case 3: level_flag |= (LF1_CAVE); break;
+			case 4: level_flag |= (LF1_STRONGHOLD); break;
+		}
+	}
+	
 	switch (type)
 	{
-		case ROOM_HUGE_MAZE: width_wall = rand_int(9) / 3 + 1; width_path = rand_int(15) / 6 + 1; height = 33; width = 65; break;
+		case ROOM_HUGE_MAZE: width_wall = rand_int(9) / 3 + 1; width_path = rand_int(15) / 6 + 1; height = 33; width = 65; level_flag |= (LF1_LABYRINTH); break;
 		case ROOM_LARGE_MAZE: width_wall = rand_int(15) / 4 + 1; width_path = 1; height = 33; width = 33; break;
 		default: width_wall = rand_int(9) / 6 + 1; width_path = rand_int(9) / 6 + 1; height = 17; width = 33; break;
 	}
 	
 	/* Ensure bigger paths on stronghold levels. This allows these corridors to connect correctly to the maze. */
 	if (level_flag & (LF1_STRONGHOLD)) width_path++;
-	if (level_flag & (LF1_CRYPT)) width_path = 3;
+	
+	/* Fill crypt mazes with pillars */
+	else if (level_flag & (LF1_CRYPT))
+	{
+		width_path++;
+		maze_flags |= (MAZE_CRYPT);
+	}
+	
+	/* Fill cave mazes with lots of twisty passages */
+	else if (level_flag & (LF1_CAVE))
+	{
+		width_path = 2;
+		maze_flags |= (MAZE_CAVE);
+	}
 
 	/* Calculate maze size */
 	ydim = (height + width_wall - 1) / (width_wall + width_path);
@@ -8413,6 +8807,15 @@ static bool build_type171819(int room, int type)
 	/* Set the vault / interesting room flags */
 	set_room_flags(room, type, FALSE);
 	
+	/* Flooded dungeon */
+	if (room_info[room].flags & (ROOM_FLOODED))
+	{
+		/* Flood floor */
+		pool = dun->flood_feat;
+		
+		if (pool) maze_flags |= (MAZE_POOL);
+	}
+	
 	/* Dimensions of room */
 	y1 = y0 - (height / 2);
 	x1 = x0 - (width / 2);
@@ -8420,7 +8823,7 @@ static bool build_type171819(int room, int type)
 	x2 = x0 + (width - 1) / 2;
 
 	/* Draw maze */
-	if (draw_maze(y1, x1, y2, x2, FEAT_WALL_OUTER, FEAT_FLOOR, width_wall, width_path, maze_flags)) return (TRUE);
+	if (draw_maze(y1, x1, y2, x2, FEAT_WALL_OUTER, FEAT_FLOOR, width_wall, width_path, pool, maze_flags)) return (TRUE);
 	
 	/* Failed */
 	return (FALSE);
@@ -8438,7 +8841,17 @@ static bool room_build(int room, int type)
 	if (cheat_room) msg_format("Building room type %d.", type);
 	
 	/* Flood if required */
-	if ((dun->flood_feat) && (room % 3)) room_info[room].flags |= (ROOM_FLOODED);
+	if (dun->flood_feat)
+	{
+		/* Always flood the first room */
+		if (room == 1) room_info[room].flags |= (ROOM_FLOODED);
+		
+		/* Flood additional rooms if deep in dungeon - up to 2/3rds of all rooms */
+		else if ((room % 3) && (room < (p_ptr->depth - f_info[dun->flood_feat].level) / 5)) room_info[room].flags |= (ROOM_FLOODED);
+		
+		/* This floods 1 room, plus a second room if terrain is more than 10 levels shallow, plus a third room if terrain is more than
+		 * 20 levels shallow, then 25, 35, 40, 50, 55 etc. */
+	}
 	
 	/* Build a room */
 	switch (type)

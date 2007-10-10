@@ -4028,7 +4028,7 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 
 		case (ROOM_LAIR):
 		{
-			monster_race *r_ptr = &r_info[room_info[room].vault];
+			monster_race *r_ptr = &r_info[room_info[room].deepest_race];
 
 			my_strcpy(name, "the lair of ", name_s);
 			my_strcat(name, r_name + r_ptr->name, name_s);
@@ -4394,8 +4394,9 @@ void describe_room(void)
 	{
 		if (room_names)
 		{
-			msg_format("You have entered %s %s.",
-				 (is_a_vowel(name[0]) ? "an" : "a"),name);
+			msg_format("You have entered %s%s.",
+				 (prefix(name, "the ") ? "" :
+				 (is_a_vowel(name[0]) ? "an " : "a ")),name);
 		}
 
 		if (!(room_descriptions) || (room_info[room].flags & (ROOM_ENTERED)))

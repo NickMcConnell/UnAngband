@@ -3693,7 +3693,7 @@ static bool place_monster_okay(int r_idx)
 	/* Group monsters require similar "group" */
 	if (r_ptr->grp_idx)
 	{
-		if (z_ptr->grp_idx != z_ptr->grp_idx) return (FALSE);
+		if (z_ptr->grp_idx != r_ptr->grp_idx) return (FALSE);
 	}
 
 	/* Require similar "race" */
