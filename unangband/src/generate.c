@@ -448,7 +448,7 @@ static bool variable_terrain(int *feat, int oldfeat)
 
 		if ((k <= 90) && ((f_info[f_info[*feat].edge].flags1 & (FF1_MOVE)) != 0)) *feat = f_info[*feat].edge;
 		else if (k <= 90) *feat = oldfeat;
-		else if (k <= 95) *feat = feat_state(*feat, FS_SPREAD);
+		else if (k <= 95) *feat = feat_state(*feat, FS_ADJACENT);
 		varies = TRUE;
 	}
 
@@ -458,7 +458,7 @@ static bool variable_terrain(int *feat, int oldfeat)
 		k = randint(100);
 
 		if ((k <= 90) && ((f_info[f_info[*feat].edge].flags1 & (FF1_MOVE)) != 0)) *feat = f_info[*feat].edge;
-		else if (k <= 90) *feat = oldfeat;
+		else if ((k <= 90) && ((f_info[*feat].flags2 & (FF2_LAVA)) == 0)) *feat = oldfeat;
 		else if (k <= 95) *feat = feat_state(*feat, FS_SPREAD);
 		varies = TRUE;
 	}
@@ -488,77 +488,10 @@ static bool variable_terrain(int *feat, int oldfeat)
 		case FEAT_CHASM:
 		case FEAT_CHASM_E:
 			return (FALSE);
-		
-		case FEAT_LIMESTONE:
-		{
-			k = randint(100);
-			if (k<40) *feat = FEAT_FLOOR;
-			if ((k > 40) && (k <= 60)) *feat = FEAT_WATER;
-			break;
-		}
-
-		case FEAT_ICE:
-		{
-			k = randint(100);
-			if (k <= 10) *feat = FEAT_ICE_C;
-			break;
-		}
-
-		case FEAT_ICE_GEOTH:
-		{
-			k = randint(100);
-			if (k <= 10) *feat = FEAT_ICE_GEOTH_HC;
-			break;
-		}
-
-		case FEAT_ICE_WATER_K:
-		{
-			k = randint(100);
-			if (k<= 15) *feat = FEAT_WATER_K;
-			break;
-		}
-
-		case FEAT_ICE_CHASM:
-		{
-			k = randint(100);
-			if (k <= 80) *feat = FEAT_FLOOR_ICE;
-			if ((k > 80) && (k<90)) *feat = FEAT_CHASM_E;
-			break;
-		}
-
-		case FEAT_MUD:
-		{
-			k = randint(100);
-			if (k <= 10) *feat = FEAT_FLOOR_EARTH;
-			if ((k> 10) && (k <= 13)) *feat = FEAT_WATER;
-			break;
-		}
-
-		case FEAT_MUD_H:
-		{
-			k = randint(100);
-			if (k <= 10) *feat = FEAT_FLOOR_EARTH;
-			if ((k> 10) && (k <= 23)) *feat = FEAT_WATER_H;
-			break;
-		}
-
-		case FEAT_MUD_K:
-		{
-			k = randint(100);
-			if (k <= 5) *feat = FEAT_WATER_K;
-			break;
-		}
-
-		case FEAT_QSAND_H:
-		{
-			k = randint(100);
-			if (k <= 25) *feat = FEAT_SAND_H;
-			if ((k> 25) && (k <= 28)) *feat = FEAT_WATER;
-			break;
-		}
-
+			
 		default:
 		{
+			
 			if ((f_info[*feat].edge) && ((f_info[f_info[*feat].edge].flags1 & (FF1_MOVE)) != 0))
 			{
 				k = randint(100);
@@ -1397,7 +1330,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 				{
 					for (xi = i - (dx < 0 ? width_wall : 0); xi < i + width_path + (dx > 0 ? width_wall : 0); xi++)
 					{
-						cave_set_feat(yi, xi, feat);
+						build_terrain(yi, xi, feat);
 					}
 				}
 
@@ -7354,8 +7287,8 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 						if (dun->part[i] == part2) dun->part[i] = part1;
 					}
 
-					/* Rewrite tunnel to room if we end up on a non-floor, or we are a sewer level */
-					if ((cave_feat[tmp_row][tmp_col] != FEAT_FLOOR) || (level_flag & (LF1_SEWER)))
+					/* Rewrite tunnel to room if we end up on a non-floor, or we are a sewer level, or 20% of the time otherwise */
+					if ((cave_feat[tmp_row][tmp_col] != FEAT_FLOOR) || (level_flag & (LF1_SEWER)) || (rand_int(100) < 20))
 					{
 						/* Hack -- overwrite half of tunnel */
 						if (start_tunnel)

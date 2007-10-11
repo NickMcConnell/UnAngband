@@ -4196,6 +4196,8 @@ void update_dyna(void)
    
 				/* Apply the blow */
 				project(SOURCE_FEATURE, feat, 2, y, x, y, x, dam, f_ptr->blow.effect, flg, 0, 0);
+				
+				alter = FS_ERUPT;
 			}
 		}
 
@@ -4210,6 +4212,8 @@ void update_dyna(void)
    
 				/* Apply the blow */
 				project(SOURCE_FEATURE, feat, 0, y, x, y, x, dam, f_ptr->blow.effect, flg, 0, 0);
+				
+				alter = FS_STRIKE;
 			}
 		}
 
@@ -4260,7 +4264,7 @@ void update_dyna(void)
 				}
 			}
 
-			alter = FS_ADJACENT;
+			if (!alter) alter = FS_ADJACENT;
 		}
 
 		/* Spread */
@@ -4300,7 +4304,7 @@ void update_dyna(void)
 				}
 			}
 
-			if (dir < 9)
+			if ((dir < 9) && (!alter))
 			{
 				alter = FS_SPREAD;
 			}

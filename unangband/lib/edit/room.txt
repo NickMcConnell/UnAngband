@@ -713,7 +713,7 @@ R:UNDEAD
 N:104:119:0:0:20:2:30:128
 A:magic
 B:
-F:637:0:406
+F:637:0:736
 D:A magic circle 
 S:SEEN
 R:MAGE
@@ -721,7 +721,7 @@ R:MAGE
 N:104:119:0:0:30:2:40:128
 A:magic
 B:
-F:638:0:406
+F:638:0:736
 D:A magic triangle 
 S:SEEN
 R:MAGE
@@ -729,7 +729,7 @@ R:MAGE
 N:104:119:0:0:40:2:50:128
 A:magic
 B:
-F:639:0:406
+F:639:0:736
 D:A magic square 
 S:SEEN
 R:MAGE
@@ -737,7 +737,7 @@ R:MAGE
 N:104:119:0:0:50:2:60:128
 A:magic
 B:
-F:640:0:406
+F:640:0:736
 D:A magic pentagram 
 S:SEEN
 R:MAGE
@@ -745,7 +745,7 @@ R:MAGE
 N:104:119:0:0:60:2:70:128
 A:magic
 B:
-F:640:0:406
+F:640:0:736
 D:A magic hexagram 
 S:SEEN
 R:MAGE
@@ -753,7 +753,7 @@ R:MAGE
 N:104:119:0:0:35:2:5:128
 A:
 B:shrine
-F:668:0:405
+F:668:0:736
 D:A shrine 
 S:SEEN
 R:PRIEST
@@ -1788,7 +1788,7 @@ N:106:107:0:0:70:1:0:128
 A:
 B:
 D:criss-crossed with rays of light.  
-F:2:0:406
+F:2:0:736
 S:SEEN
 R:SNEAKY
 P:PLACE | SCATTER | DARK
@@ -2245,8 +2245,7 @@ N:106:107:0:0:80:8:0:128
 A:torch-lit
 B:
 D:surrounded by torches. 
-F:404:0:736
-L:DARK
+F:736:0:736
 S:SEEN
 R:NEED_LITE
 P:PLACE | SCATTER | ROWS | COLS | DARK
@@ -2255,21 +2254,19 @@ N:106:107:0:0:80:8:0:128
 A:candle-lit
 B:
 D:lit by candles.  
-F:405:0:405
-L:DARK
+F:0:0:736
 S:SEEN
 R:NEED_LITE
-P:PLACE | SCATTER | ROWS | COLS | DARK
+P:PLACE | SCATTER | ROWS | COLS | LITE
 
 N:106:107:0:0:80:4:0:128
 A:magical
 B:
 D:lit by magical light.  
-F:406:0:406
-L:DARK
+F:0:0:0
 S:SEEN
 R:MAGE
-P:PLACE | SCATTER | ROWS | COLS | DARK
+P:PLACE | SCATTER | ROWS | COLS | LITE
 
 N:106:107:0:0:50:2:0:128
 A:dusty
@@ -3154,7 +3151,7 @@ N:115:116:0:0:15:2:0:128
 A:gloomy
 B:
 S:GLOOMY
-L:DARK
+P:DARK
 R:HURT_LITE
 
 N:115:116:0:0:15:3:0:128
@@ -3363,11 +3360,10 @@ N:117:102:0:0:25:1:0:128
 A:candle-lit
 B:
 D:Candles line 
-F:405:0:405
+F:0:0:736
 S:SEEN
-L:DARK
 R:PRIEST
-P:ROWS | COLS
+P:ROWS | COLS | LITE
 
 N:117:102:107:124:50:2:0:128
 A:curtained
@@ -3598,7 +3594,7 @@ A:
 B:guardroom
 D:Missile weapons line 
 K:19:0:99
-R:DROP_WEAPON
+R:DROP_MISSILE
 S:SEEN
 P:SCATTER
 
@@ -3607,7 +3603,7 @@ A:
 B:guardroom
 D:Weapon racks line 
 K:21:0:99
-R:DROP_WEAPON
+R:WARRIOR
 S:SEEN
 P:SCATTER
 
@@ -3616,7 +3612,7 @@ A:
 B:guardroom
 D:Weapon racks line 
 K:22:0:99
-R:DROP_WEAPON
+R:WARRIOR
 S:SEEN
 P:SCATTER
 
@@ -3625,7 +3621,7 @@ A:
 B:guardroom
 D:Weapon racks line 
 K:23:0:99
-R:DROP_WEAPON
+R:WARRIOR
 S:SEEN
 P:SCATTER
 
@@ -3995,11 +3991,19 @@ R:MAN
 P:SCATTER
 
 N:117:102:0:0:80:8:0:128
+A:
+B:forge
+D:Braziers line 
+F:404:0:736
+S:SEEN
+R:NEED_LITE
+P:ROWS | COLS | DARK
+
+N:117:102:0:0:80:8:0:128
 A:torch-lit
 B:
 D:Torches line 
-F:404:0:736
-L:DARK
+F:736:0:736
 S:SEEN
 R:NEED_LITE
 P:ROWS | COLS | DARK
@@ -4008,11 +4012,10 @@ N:117:102:0:0:80:4:10:128
 A:magical
 B:
 D:Magical lights line 
-F:406:0:406
-L:DARK
+F:0:0:736
 S:SEEN
 R:MAGE
-P:ROWS | COLS | DARK
+P:ROWS | COLS | LITE
 
 N:117:102:0:0:75:3:2:128
 A:thieves
@@ -4115,7 +4118,7 @@ R:NONLIVING
 N:117:121:0:0:50:3:0:128
 A:
 B:storeroom
-D:Stores line 
+D:Stone coffers line 
 S:SEEN
 P:OUTER
 R:SMART
@@ -4124,7 +4127,7 @@ F:748:0:748
 N:117:121:0:0:50:3:0:128
 A:
 B:storeroom
-D:Ransacked stores line 
+D:Ransacked stone coffers line 
 S:SEEN
 P:OUTER
 R:STUPID
@@ -5266,6 +5269,12 @@ B:
 F:730:0:730
 P:OUTER | RANDOM | PLACE
 
+N:137:118:0:0:5:5:0:128
+A:
+B:
+F:730:0:730
+P:MAZE_DECOR | PLACE
+
 # Place weapon racks around.
 
 N:138:118:0:0:5:5:0:128
@@ -5292,6 +5301,12 @@ B:
 F:740:0:740
 P:OUTER | RANDOM | PLACE
 
+N:138:118:0:0:5:5:0:128
+A:
+B:
+F:740:0:740
+P:MAZE_DECOR | PLACE
+
 # Place stores around.
 
 N:139:118:0:0:5:5:0:128
@@ -5317,6 +5332,12 @@ A:
 B:
 F:748:0:748
 P:OUTER | RANDOM | PLACE
+
+N:139:118:0:0:5:5:0:128
+A:
+B:
+F:748:0:748
+P:MAZE_DECOR | PLACE
 
 # Stuff to manipulate with levers.
 
