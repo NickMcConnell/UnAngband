@@ -232,6 +232,11 @@ struct town_type
 
 };
 
+#define THEME_TUNNEL	0
+#define THEME_SOLID		1
+#define THEME_TRAP		2
+#define THEME_BRIDGE	3
+#define MAX_THEMES		4
 
 /*
  * Information about room descriptions
@@ -260,14 +265,17 @@ struct desc_type
 	u16b r_flag;    /* Restrict to levels with these monster types */
 
 	s16b feat;      /* Extra features of this type */
-	s16b solid;	/* Place solid walls of this type */
-	s16b tunnel;	/* Fill tunnels with floors of this type */
+	s16b theme[MAX_THEMES];	/* Theme parts of this room using these features */
 
 	byte tval;      /* Add objects of this tval */
 	byte min_sval;  /* And from this sval */
 	byte max_sval;  /*   ... to this sval */
 	byte r_char;    /* Add races of this char */
 };
+
+
+
+
 
 
 /*
@@ -279,16 +287,21 @@ struct room_info_type
 	s16b vault;				/* Vault chosen */
 	s16b section[ROOM_DESC_SECTIONS];	/* Array of room descriptions */
 
+	s16b deepest_race;	/* Deepest race in this ecology */
+	u32b ecology;	/* What ecologies appear in the room */
+	
 	u32b flags;		/* Room flags */
 
-	/* Decorations */
-	s16b	solid;		/* Feature to use as solid wall */
-	s16b	tunnel;		/* Feature to use as tunnel */
+	/* Decorations: TODO some of these could be discarded after dungeon generation*/
 	
-	u32b ecology;	/* What ecologies appear in the room */
-	s16b deepest_race;	/* Deepest race in this ecology */
+	s16b	theme[MAX_THEMES];	/* Features to use for placement around the room */
 	
 #if 0
+	s16b	solid;		/* Feature to use as solid wall */
+	s16b	tunnel;		/* Feature to use as tunnel */
+	s16b	trap;		/* Feature to use as trap */
+	s16b	bridge;		/* Feature to use as bridge over chasm */
+	
 	byte d_attr[5];    	/* Desired feature attribute (basic / inner / outer / solid) */
 	char d_char[5];    	/* Desired feature character (basic / inner / outer / solid) */
 

@@ -4367,9 +4367,7 @@ void display_room_info(int room)
  */
 void describe_room(void)
 {
-	int by = p_ptr->py / BLOCK_HGT;
-	int bx = p_ptr->px / BLOCK_WID;
-	int room = dun_room[by][bx];
+	int room = room_idx(p_ptr->py, p_ptr->px);
 	char name[32];
 	char text_visible[1024];
 	char text_always[1024];

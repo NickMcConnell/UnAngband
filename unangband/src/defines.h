@@ -4987,11 +4987,34 @@
  (f_info[cave_feat[Y][X]].flags1  & (FF1_PERMANENT))
 
 
+/*
+ * Get the index number of the room. Return 0 if not in a valid room.
+ * 
+ * This should only be used once all rooms are initialised.
+ */
+#define room_idx(Y,X) \
+ (((cave_info[Y][X] & (CAVE_ROOM)) != 0) ?\
+ 	((dun_room[Y/BLOCK_HGT][X/BLOCK_WID] < DUN_ROOMS) ? \
+	 (dun_room[Y/BLOCK_HGT][X/BLOCK_WID]) : \
+	 (0)) : (0))
+
+/*
+ * Get the index number of the room. Return 0 if not in a valid room.
+ * 
+ * This should only be used once all rooms are initialised.
+ */
+#define room_idx_ignore_valid(Y,X) \
+ ((dun_room[Y/BLOCK_HGT][X/BLOCK_WID] < DUN_ROOMS) ? \
+	 (dun_room[Y/BLOCK_HGT][X/BLOCK_WID]) : \
+	 (0))
 
 /*
  * Determine if a "room" grid has a flag
- *
- * Line 1 -- permanent flag
+ * 
+ * Note that we don't check for flags for room 0 (e.g. the dungeon)
+ * for various sanity reasons such as teleportation and so on.
+ * 
+ * This means dungeon room flags will never apply.
  */
 #define room_has_flag(Y,X,FLAG) \
  (((cave_info[Y][X] & (CAVE_ROOM)) != 0) &&\

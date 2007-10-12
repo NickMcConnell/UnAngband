@@ -2542,10 +2542,10 @@ const bool option_norm[OPT_MAX] =
 	TRUE,		/* OPT_view_player_lite */
 	TRUE,		/* OPT_compress_savefile */
 	FALSE,		/* OPT_hilite_player */
-	TRUE,		/* OPT_view_yellow_lite */
-	TRUE,		/* OPT_view_bright_lite */
-	TRUE,		/* OPT_view_granite_lite */
-	TRUE,		/* OPT_view_special_lite */
+	FALSE,		/* OPT_view_yellow_lite */
+	FALSE,		/* OPT_view_bright_lite */
+	FALSE,		/* OPT_view_granite_lite */
+	FALSE,		/* OPT_view_special_lite */
 	FALSE,		/* OPT_easy_open */
 	FALSE,		/* OPT_easy_alter */
 	FALSE,		/* OPT_easy_floor */

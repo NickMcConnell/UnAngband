@@ -506,6 +506,54 @@ static bool variable_terrain(int *feat, int oldfeat)
 }
 
 
+
+
+/*
+ * Hack -- mimic'ed feature for "room_info_feat()"
+ */
+static s16b room_info_feat_mimic;
+
+/*
+ *
+ */
+static bool room_info_feat(int f_idx)
+{
+	feature_type *f_ptr = &f_info[f_idx];
+
+	if (f_ptr->mimic == room_info_feat_mimic) return(TRUE);
+
+	return(FALSE);
+}
+
+
+/*
+ * Gets a feature that may match one of the 'mimic'ed features instead
+ */
+static s16b pick_room_feat(s16b feat)
+{
+	/* Paranoia */
+	if (feat != f_info[feat].mimic) return (feat);
+	
+	/* Set feature hook */
+	room_info_feat_mimic = feat;
+
+	get_feat_num_hook = room_info_feat;
+
+	/* Prepare allocation table */
+	get_feat_num_prep();
+	
+	feat = get_feat_num(object_level);
+	
+	get_feat_num_hook = NULL;
+
+	/* Prepare allocation table */
+	get_feat_num_prep();
+	
+	return(feat);
+}
+
+
+
 /*
  * Note that the order we generate the dungeon is terrain features, then
  * rooms, then corridors, then streamers. This is important, because 
@@ -786,6 +834,11 @@ static void build_terrain(int y, int x, int feat)
 	{
 		newfeat = feat;
 	}
+	/* Pick features if needed */
+	else if (f_info[newfeat].flags1 & (FF1_HAS_ITEM | FF1_HAS_GOLD))
+	{
+		newfeat = pick_room_feat(feat);
+	}
 
 	/* Hack -- no change */
 	if (newfeat == oldfeat) return;
@@ -1004,9 +1057,12 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	byte dir[4];
 	byte dirs;
 	
+	int offset = ((flag & (MAZE_CRYPT | MAZE_CAVE)) != 0) && (rand_int(100) < 50) ? 1 : 0;
+	
 	s16b *saved;
 
 	int solid = ((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) ? feat_state(feat_wall, FS_SOLID) : 0;	
+	int inner = ((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) ? feat_state(feat_wall, FS_INNER) : feat_wall;
 	
 	/* Paranoia */
 	if ((!feat_wall) || (!feat_path) || (feat_wall == feat_path) || (width_wall < 1) || (width_path < 1)) return (FALSE);
@@ -1040,7 +1096,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	}
 
 	/* Start with a solid rectangle of the "inner" wall feat */
-	generate_fill(y1, x1, y2, x2, ((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) ? feat_state(feat_wall, FS_INNER) : feat_wall);	
+	generate_fill(y1, x1, y2, x2, inner);	
 	
 	/* Draw room if requested */
 	if (flag & (MAZE_ROOM)) generate_room(y1, x1, y2, x2, ((flag & (MAZE_LITE)) != 0));
@@ -1096,7 +1152,8 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	while (grids)
 	{
 		/* Only use maze grids */
-		if (cave_feat[YPOS(y, y1)][XPOS(x, x1)] == feat_path)
+		if ((cave_feat[YPOS(y, y1)][XPOS(x, x1)] == feat_path) || ((width_path > 1) &&
+				(cave_feat[YPOS(y, y1)][XPOS(x, x1) + 1] == feat_path)))
 		{
 			/* Pick a target */
 			ty = rand_int(ydim);
@@ -1115,16 +1172,20 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 				/** Enumerate possible directions **/
 
 				/* Up */
-				if (y &&(cave_feat[j - width_wall - width_path][i] != feat_path)) dir[dirs++] = 1;
+				if (y && (cave_feat[j - width_wall - width_path][i] != feat_path) && ((width_path == 1) ||
+					(cave_feat[j - width_wall - width_path][i + 1] != feat_path)))  dir[dirs++] = 1;
 
 				/* Down */
-				if ((y < ydim - 1) && (cave_feat[j + width_wall + width_path][i] != feat_path)) dir[dirs++] = 2;
+				if ((y < ydim - 1) && (cave_feat[j + width_wall + width_path][i] != feat_path) && ((width_path == 1) ||
+					(cave_feat[j + width_wall + width_path][i + 1] != feat_path))) dir[dirs++] = 2;
 
 				/* Left */
-				if (x && (cave_feat[j][i - width_wall - width_path] != feat_path)) dir[dirs++] = 3;
+				if (x && (cave_feat[j][i - width_wall - width_path] != feat_path) && ((width_path == 1) ||
+					(cave_feat[j + 1][i - width_wall - width_path] != feat_path))) dir[dirs++] = 3;
 
 				/* Right */
-				if ((x < xdim - 1) && (cave_feat[j][i + width_wall + width_path] != feat_path)) dir[dirs++] = 4;
+				if ((x < xdim - 1) && (cave_feat[j][i + width_wall + width_path] != feat_path) && ((width_path == 1) ||
+					(cave_feat[j + 1][i + width_wall + width_path] != feat_path))) dir[dirs++] = 4;
 
 				/* Dead end; go to the next valid grid */
 				if (!dirs) break;
@@ -1162,11 +1223,23 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 							/* Pillar in-between if width_wall is 3 */
 							if ((width_wall == 3) && ((yi == j + 1 + (dy * 3)) && (xi == i + 1 + (dx * 3)))) continue;
 						}
+						
+						/* Leave pillars on edge of corridor for crypts */
+						else if ((width_path > 2) && ((flag & (MAZE_CRYPT)) != 0))
+						{
+							/* Leave pillars on edges of corridor */
+							if ((xi + yi) % 2 == offset)
+							{
+								if ((dy) && ((xi < i + 1) || (xi >= i + width_path - 1))) continue;
+								else if ((dx) && ((yi < j + 1) || (yi >= j + width_path - 1))) continue;
+							}
+						}
 
+						/* Draw the path */
 						cave_set_feat(yi, xi, feat_path);
 					}
 				}
-
+				
 				/* Advance */
 				y += dy;
 				x += dx;
@@ -1275,17 +1348,17 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 					if (cave_feat[j][i] != feat_path) continue;
 					
 					/* Up */
-					if ((y || (width_outer)) && (cave_feat[j - 1][i] == feat_path)) dir[dirs++] = 1;
+					if ((y || (width_outer)) && (cave_feat[j - 1][i + width_path / 2] == feat_path)) dir[dirs++] = 1;
 	
 					/* Down */
-					if (((y < ydim - 1) || (width_outer)) && (cave_feat[j + width_path][i] == feat_path)) dir[dirs++] = 2;
+					if (((y < ydim - 1) || (width_outer)) && (cave_feat[j + width_path][i + width_path / 2] == feat_path)) dir[dirs++] = 2;
 	
 					/* Left */
-					if ((x || (width_outer)) && (cave_feat[j][i - 1] == feat_path)) dir[dirs++] = 3;
+					if ((x || (width_outer)) && (cave_feat[j + width_path / 2][i - 1] == feat_path)) dir[dirs++] = 3;
 	
 					/* Right */
-					if (((x < xdim - 1) || (width_outer)) && (cave_feat[j][i + width_path] == feat_path)) dir[dirs++] = 4;
-					
+					if (((x < xdim - 1) || (width_outer)) && (cave_feat[j + width_path / 2][i + width_path] == feat_path)) dir[dirs++] = 4;
+
 					/* Dead end */
 					if ((dirs == 1) && (!rand_int(++k)))
 					{
@@ -1323,14 +1396,12 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 			/* Fill in dead-end */
 			if (grids)
 			{
-				int feat = solid ? feat_state(feat_wall, FS_INNER) : feat_wall;
-				
 				/* Fill in floors */
 				for (yi = j - (dy < 0 ? width_wall : 0); yi < j + width_path + (dy > 0 ? width_wall : 0); yi++)
 				{
 					for (xi = i - (dx < 0 ? width_wall : 0); xi < i + width_path + (dx > 0 ? width_wall : 0); xi++)
 					{
-						build_terrain(yi, xi, feat);
+						build_terrain(yi, xi, inner);
 					}
 				}
 
@@ -1434,6 +1505,51 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 			}
 		}
 	}
+	
+#if 0
+	
+	/* Distribute cave grids */
+	if (flag & (MAZE_CAVE))
+	{
+		msg_print("cave maze");
+		
+		for (y = y1 + width_outer; y <= y2 - width_outer; y++)
+		{
+			for (x = x1 + width_outer; x <= x2 - width_outer; x++)
+			{
+				int move;
+				
+				if (cave_feat[y][x] == inner) continue;
+
+				move = 0;
+				if (((y - y1 - width_outer) % (width_wall + width_path) < width_path) && (rand_int(100) < 50)) move += 1;
+				if (((x - x1 - width_outer) % (width_wall + width_path) < width_path) && (rand_int(100) < 50)) move += 2;
+				
+				switch(move)
+				{
+					case 1:
+					{
+						cave_set_feat(y + 1, x, cave_feat[y][x]);
+						cave_set_feat(y, x, inner);
+						break;
+					}
+					case 2:
+					{
+						cave_set_feat(y, x + 1, cave_feat[y][x]);
+						cave_set_feat(y, x, inner);
+						break;
+					}
+					case 3:
+					{
+						cave_set_feat(y + 1, x + 1, cave_feat[y][x]);
+						cave_set_feat(y, x, inner);
+						break;
+					}
+				}
+			}	
+		}
+	}
+#endif
 		
 	/* Restore grids */
 	if (flag & (MAZE_SAVE))
@@ -1979,22 +2095,6 @@ static bool generate_starburst_room(int y1, int x1, int y2, int x2,
 
 
 
-/*
- * Hack -- mimic'ed feature for "room_info_feat()"
- */
-static s16b room_info_feat_mimic;
-
-/*
- *
- */
-static bool room_info_feat(int f_idx)
-{
-	feature_type *f_ptr = &f_info[f_idx];
-
-	if (f_ptr->mimic == room_info_feat_mimic) return(TRUE);
-
-	return(FALSE);
-}
 
 
 /*
@@ -3127,19 +3227,45 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 			}
 
 			/* Themes */
-			if ((dun->theme_feat) && ((d_info[i].feat == dun->theme_feat) ||
-				(d_info[i].solid == dun->theme_feat) || (d_info[i].tunnel == dun->theme_feat)))
+			if (dun->theme_feat)
 			{
-				if (match < MATCH_THEME)
+				int k;
+				bool theme_match = FALSE;
+				bool any_match = FALSE;
+				
+				for (k = 0; k < MAX_THEMES; k++)
 				{
-					count = 0;
-					match = MATCH_THEME;
+					if (d_info[i].theme[k])
+					{
+						any_match = TRUE;
+					}
+					
+					if (d_info[i].theme[k] == dun->theme_feat)
+					{
+						theme_match = TRUE;
+					}
 				}
-			}
-			else if (match == MATCH_THEME)
-			{
-				/* No chance if matching theme */
-				chance = 0;
+
+				/* Chance to match a theme */
+				if (any_match)
+				{
+					/* Matched a theme */
+					if (theme_match)
+					{
+						/* Must choose a matching theme for this section */
+						if (match < MATCH_THEME)
+						{
+							chance = 0;
+							match = MATCH_THEME;
+						}
+					}
+					/* Already has a match to a theme in this section, and this choice doesn't match */
+					else if (match == MATCH_THEME)
+					{
+						/* No chance of picking this choice */
+						chance = 0;
+					}
+				}
 			}
 
 			/* Default chance */
@@ -3200,14 +3326,16 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 			/* Paranoia */
 			if (room < DUN_ROOMS)
 			{
+				int k;
+				
 				/* Place flags except SEEN or HEARD */
 				room_info[room].flags |= (d_info[i].flags & ~(ROOM_SEEN | ROOM_HEARD));
 
-				/* Set tunnel */
-				if (!(room_info[room].tunnel) && (d_info[i].tunnel)) room_info[room].tunnel = d_info[i].tunnel;
-
-				/* Set decoration */
-				if (!(room_info[room].solid) && (d_info[i].solid)) room_info[room].solid = d_info[i].solid;
+				/* Set room themes */
+				for (k = 0; k < MAX_THEMES; k++)
+				{
+					if (!(room_info[room].theme[k]) && (d_info[i].theme[k])) room_info[room].theme[k] = d_info[i].theme[k];					
+				}
 			}
 		
 			/* Get tval */
@@ -3227,16 +3355,20 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 			/* Get branch condition */
 			if (d_info[i].branch_on) *branch_on = d_info[i].branch_on;
 
-			/* Set feature match -- the math for the 3rd choice is wrong here. It makes solid too common, which may be better anyway. */
-			if (!(dun->theme_feat) && ((*place_feat) || (d_info[i].tunnel) || (d_info[i].solid)))
+			/* Set dungeon theme. */
+			if (!(dun->theme_feat))
 			{
-				dun->theme_feat = *place_feat;
-				if ((d_info[i].tunnel) && ((!*place_feat) || (rand_int(100) < 50)))
+				int l;
+				int k = 0;
+				
+				/* Try room themes */
+				for (l = 0; l < MAX_THEMES; l++)
 				{
-					dun->theme_feat = d_info[i].tunnel;
-					if ((d_info[i].solid) && (rand_int(100) < 50)) dun->theme_feat = d_info[i].solid;
+					if ((d_info[i].theme[l]) && !(rand_int(++k))) dun->theme_feat = d_info[i].theme[l];
 				}
-				else if ((d_info[i].solid) && ((!*place_feat) || (rand_int(100) < 50))) dun->theme_feat = d_info[i].solid;
+				
+				/* Also try the feature we are placing */
+				if ((*place_feat) && !(rand_int(++k))) dun->theme_feat = *place_feat;
 			}
 
 			/* Add flags */
@@ -3455,7 +3587,7 @@ static void set_irregular_room_info(int room, int type, bool light, u32b exclude
 					{
 						place_flag |= (RG1_ALLOC);
 					}
-					else if ((exclude & (RG1_RANDOM)) == 0)
+					else if (((exclude & (RG1_RANDOM)) == 0) && ((place_flag & (RG1_SCATTER)) == 0))
 					{
 						place_flag |= (RG1_RANDOM);
 					}
@@ -3492,9 +3624,9 @@ static void set_irregular_room_info(int room, int type, bool light, u32b exclude
 				}
 			}
 
-			if ((place_flag & (RG1_ALLOC)) != 0)
+			if ((place_flag & (RG1_ALLOC | RG1_SCATTER)) != 0)
 			{
-				exclude |= RG1_ALLOC;
+				exclude |= (RG1_ALLOC | RG1_SCATTER);
 				*alloc = place_feat;
 				
 				place_flag &= ~(RG1_INNER | RG1_STARBURST | RG1_OUTER | RG1_EDGE | RG1_SCATTER | RG1_RANDOM);
@@ -3518,12 +3650,12 @@ static void set_irregular_room_info(int room, int type, bool light, u32b exclude
 			if ((place_flag & (RG1_OUTER)) != 0)
 			{				
 				exclude |= RG1_OUTER;
-				room_info[room].solid = place_feat;
+				room_info[room].theme[THEME_SOLID] = place_feat;
 			}
 
-			if ((place_flag & (RG1_SCATTER | RG1_RANDOM)) != 0)
+			if ((place_flag & (RG1_RANDOM)) != 0)
 			{
-				if (*n_pools >= 2) exclude |= RG1_SCATTER | RG1_RANDOM;
+				if (*n_pools >= 2) exclude |= RG1_RANDOM;
 				*pool[(*n_pools)++] = place_feat;
 			}
 		}
@@ -4894,6 +5026,8 @@ static bool build_type_fractal(int room, int chart, int y0, int x0, byte type, b
 	/* Hack -- place feature at centre */
 	if (alloc)
 	{
+		alloc = pick_room_feat(alloc);
+		
 		cave_set_feat(y0, x0, alloc);
 
 		for (i = 0; i < 8; i++)
@@ -5179,6 +5313,8 @@ static void build_type_starburst(int room, int type, int y0, int x0, int dy, int
 	if (alloc)
 	{
 		int i;
+		
+		alloc = pick_room_feat(alloc);
 		
 		cave_set_feat(y0, x0, alloc);
 
@@ -5648,7 +5784,7 @@ static bool build_chambers(int y1, int x1, int y2, int x2, int monsters_left, bo
 		if (!cave_naked_bold(y, x)) continue;
 
 		/* Enforce monster selection */
-		cave_ecology.use_ecology = dun_room[y/BLOCK_HGT][x/BLOCK_WID];
+		cave_ecology.use_ecology = room_idx(y, x);
 		cave_ecology.single_ecology = TRUE;
 		
 		/* Place a single monster.  Sleeping 2/3rds of the time. */
@@ -6915,11 +7051,12 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	bool decor_flag = FALSE;
 	bool abort_and_cleanup = FALSE;
 
+	
 	/* Force style change */
 	u32b style = get_tunnel_style();
 
-	int by1 = row1/BLOCK_HGT;
-	int bx1 = col1/BLOCK_WID;
+	int start_room = room_idx_ignore_valid(row1, col1);
+	int end_room = 0;
 
 	/* Initialize some movement counters */
 	int adjust_dir_timer = randint(DUN_TUN_ADJ * 2) * (((level_flag & (LF1_MINE)) != 0) ? 2 : 1);
@@ -6960,12 +7097,12 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	first_stair = dun->stair_n;
 
 	/* Record initial partition number */
-	if ((dun_room[by1][bx1]) && (dun_room[by1][bx1] < DUN_ROOMS))
+	if (start_room)
 	{
-		part1 = dun->part[dun_room[by1][bx1]-1];
+		part1 = dun->part[start_room-1];
 		
 		/* Flood if part of flooded dungeon */
-		if ((room_info[dun_room[by1][bx1]].flags & (ROOM_FLOODED)) != 0)
+		if ((room_info[start_room].flags & (ROOM_FLOODED)) != 0)
 		{
 			flood_tunnel = TRUE;
 		}
@@ -7226,17 +7363,16 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 						if (add_solid(y, x, cave_feat[y][x]))
 						{
 							/* Room */
-							int by2 = tmp_row/BLOCK_HGT;
-							int bx2 = tmp_col/BLOCK_WID;
+							end_room = room_idx_ignore_valid(tmp_row, tmp_col);
 							
 							/* Change the wall to a "solid" wall */
 							cave_alter_feat(y, x, FS_SOLID);
 
 							/* Decorate next to the start and/or end of the tunnel with the starting room decorations */
-							if ((dun_room[by1][bx1]) && (dun_room[by1][bx1] < DUN_ROOMS) && ((room_info[dun_room[by1][bx1]].solid) || (dun_room[by1][bx1] == dun_room[by2][bx2])))
+							if ((start_room) && ((room_info[start_room].theme[THEME_SOLID]) || (start_room == end_room)))
 							{
 								/* Overwrite with alternate terrain from starting room later */
-								add_next(y, x, room_info[dun_room[by1][bx1]].solid);
+								add_next(y, x, room_info[start_room].theme[THEME_SOLID]);
 							}
 						}
 					}
@@ -7251,15 +7387,14 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			(((room_has_flag(tmp_row, tmp_col, (ROOM_EDGED))) == 0) || !(near_edge(tmp_row, tmp_col))))
 		{
 			/* Room */
-			int by2 = tmp_row/BLOCK_HGT;
-			int bx2 = tmp_col/BLOCK_WID;
+			end_room = room_idx_ignore_valid(tmp_row, tmp_col);
 
 			/* Different room */
-			if ((dun_room[by1][bx1]) && (dun_room[by2][bx2]) && (dun_room[by1][bx1] < DUN_ROOMS)
-				&& (dun_room[by2][bx2] < DUN_ROOMS) && (dun_room[by1][bx1] != dun_room[by2][bx2]))
+			if ((start_room) && (end_room) && (start_room < DUN_ROOMS)
+				&& (end_room < DUN_ROOMS) && (start_room != end_room))
 			{
 				/* Different room in same partition */
-				if (part1 == dun->part[dun_room[by2][bx2]-1])
+				if (part1 == dun->part[end_room-1])
 				{
 					abort_and_cleanup = TRUE;
 					if (cheat_room) msg_format("Loop in partition %d. Aborting.", part1);
@@ -7267,7 +7402,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				}
 
 				/* Trying to connect flooded to unflooded area */
-				else if ((flood_tunnel) && ((room_info[dun_room[by2][bx2]].flags & (ROOM_FLOODED)) == 0))
+				else if ((flood_tunnel) && ((room_info[end_room].flags & (ROOM_FLOODED)) == 0))
 				{
 					abort_and_cleanup = TRUE;
 					if (cheat_room) msg_format("Trying to flood unflooded partition %d. Aborting.", part1);
@@ -7276,10 +7411,10 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				
 				else if (part1 < CENT_MAX)
 				{
-					int part2 = dun->part[dun_room[by2][bx2]-1];
+					int part2 = dun->part[end_room-1];
 					
 					/* Merging successfully */
-					if (cheat_room) msg_format("Merging partition %d (room %d) with %d (room %d).", part1, dun_room[by1][bx1], part2, dun_room[by2][bx2]);
+					if (cheat_room) msg_format("Merging partition %d (room %d) with %d (room %d).", part1, start_room, part2, end_room);
 
 					/* Merge partitions */
 					for (i = 0; i < dun->cent_n; i++)
@@ -7303,31 +7438,31 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 						/* Overwrite starting tunnel terrain with end tunnel terrain */
 						for (i = first_tunn; i < dun->tunn_n; i++)
 						{
-							if ((dun_room[by2][bx2] < DUN_ROOMS) && (dun->tunn_feat[i])) dun->tunn_feat[i] = room_info[dun_room[by2][bx2]].tunnel;
+							if ((end_room) && (end_room < DUN_ROOMS) && (dun->tunn_feat[i])) dun->tunn_feat[i] = room_info[end_room].theme[THEME_TUNNEL];
 						}
 					}
 					
 					/* If the ending room has decorations next to doors, overwrite the start */
-					if ((dun_room[by2][bx2]) && (dun_room[by2][bx2] < DUN_ROOMS) && (room_info[dun_room[by2][bx2]].solid) && (dun->next_n < NEXT_MAX))
+					if ((end_room) && (end_room < DUN_ROOMS) && (room_info[end_room].theme[THEME_SOLID]) && (dun->next_n < NEXT_MAX))
 					{
 						int j;
 
 						for (j = first_next; j < dun->next_n; j++)
 						{
 							/* Overwrite with alternate terrain from ending room later */
-							dun->next_feat[j] = room_info[dun_room[by2][bx2]].solid;
+							dun->next_feat[j] = room_info[end_room].theme[THEME_SOLID];
 						}
 					}
 					/* If ending room does not have decorations and neither does start, clear the above 'fake' decorations */
-					else if ((dun_room[by1][bx1]) && (dun_room[by1][bx1] < DUN_ROOMS) && !(room_info[dun_room[by1][bx1]].solid) && (dun_room[by1][bx1] != dun_room[by2][bx2]))
+					else if ((start_room) && !(room_info[start_room].theme[THEME_SOLID]) && (start_room != end_room))
 					{
 						dun->next_n = first_next;
 					}
 
 					/* Get end decor */
-					if (dun_room[by2][bx2] < DUN_ROOMS)
+					if (end_room < DUN_ROOMS)
 					{
-						end_decor = room_info[dun_room[by2][bx2]].solid;
+						end_decor = room_info[end_room].theme[THEME_SOLID];
 					}
 
 					/* Accept tunnel */
@@ -7342,9 +7477,9 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 
 				/* Set tunnel feature if feature is not a floor, or it is a sewers level */
 				if (((cave_feat[tmp_row][tmp_col] != FEAT_FLOOR) || (level_flag & (LF1_SEWER)))
-					&& (dun_room[by1][bx1] < DUN_ROOMS))
+					&& (start_room < DUN_ROOMS))
 				{
-					start_tunnel = room_info[dun_room[by1][bx1]].tunnel;
+					start_tunnel = room_info[start_room].theme[THEME_TUNNEL];
 				}
 				/* Clear tunnel feature if feature is a floor */
 				else
@@ -7352,10 +7487,10 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					start_tunnel = 0;
 				}
 
-				if (dun_room[by1][bx1] < DUN_ROOMS)
+				if (start_room < DUN_ROOMS)
 				{
 					/* Set tunnel decor */
-					start_decor = room_info[dun_room[by1][bx1]].solid;
+					start_decor = room_info[start_room].theme[THEME_SOLID];
 				}
 				
 				door_flag = FALSE;
@@ -7761,15 +7896,14 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		if ((row1 == row2) && (col1 == col2)) 
 		{
 			/* Room */
-			int by2 = row1/BLOCK_HGT;
-			int bx2 = col1/BLOCK_WID;
-
+			end_room = room_idx_ignore_valid(row1, row1);
+			
 			/* Both ends are rooms */
-			if ((dun_room[by1][bx1]) && (dun_room[by2][bx2]) &&
-				(dun_room[by1][bx1] < DUN_ROOMS) && (dun_room[by2][bx2] < DUN_ROOMS))
+			if ((start_room) && (end_room) &&
+				(start_room < DUN_ROOMS) && (end_room < DUN_ROOMS))
 			{
 				/* Different room in same partition */
-				if (dun->part[dun_room[by1][bx1]-1] == dun->part[dun_room[by2][bx2]-1])
+				if (dun->part[start_room-1] == dun->part[end_room-1])
 				{
 					if (cheat_room) msg_format("Loop in partition %d endpoints. Aborting.", part1);
 
@@ -7778,16 +7912,16 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				}
 
 				/* Trying to connect flooded to unflooded area */
-				else if ((flood_tunnel) && ((room_info[dun_room[by2][bx2]].flags & (ROOM_FLOODED)) == 0))
+				else if ((flood_tunnel) && ((room_info[end_room].flags & (ROOM_FLOODED)) == 0))
 				{
 					abort_and_cleanup = TRUE;
 					if (cheat_room) msg_format("Trying to flood unflooded partition %d. Aborting.", part1);
 					break;
 				}
 				
-				else if ((part1 < CENT_MAX) && (dun_room[by2][bx2]))
+				else if ((part1 < CENT_MAX) && (end_room))
 				{
-					int part2 = dun->part[dun_room[by2][bx2]-1];
+					int part2 = dun->part[end_room-1];
 
 					/* Merge partitions */
 					for (i = 0; i < dun->cent_n; i++)
@@ -8711,14 +8845,15 @@ static bool build_type171819(int room, int type)
 	/* Fill crypt mazes with pillars */
 	else if (level_flag & (LF1_CRYPT))
 	{
-		width_path++;
+		width_path = 3;
 		maze_flags |= (MAZE_CRYPT);
 	}
 	
 	/* Fill cave mazes with lots of twisty passages */
 	else if (level_flag & (LF1_CAVE))
 	{
-		width_path = 2;
+		width_path = 1;
+		width_wall++;
 		maze_flags |= (MAZE_CAVE);
 	}
 
@@ -9462,8 +9597,8 @@ static void place_tower()
 			/* Non-surface levels will be set to ROOM_ICKY at end of generation */
 			room_info[dun->cent_n].flags = (level_flag & (LF1_SURFACE)) != 0 ? ROOM_ICKY : 0;
 
-			room_info[dun->cent_n].tunnel = 0;
-			room_info[dun->cent_n].solid = 0;
+			room_info[dun->cent_n].theme[THEME_TUNNEL] = 0;
+			room_info[dun->cent_n].theme[THEME_SOLID] = 0;
 		}
 	}
 
@@ -9848,7 +9983,7 @@ static void place_decorations()
 	/* Check rooms for streamer types */
 	for (i = 0; i < dun->cent_n; i++)
 	{
-		int feat = room_info[i].solid;
+		int feat = room_info[i].theme[THEME_SOLID];
 		int s = dun->stream_n;
 		
 		/* Record streamers for later */
@@ -11137,7 +11272,7 @@ void ensure_quest()
  */
 void generate_cave(void)
 {
-	int i, y, x, num;
+	int i, j, y, x, num;
 
 	/* The dungeon is not ready */
 	character_dungeon = FALSE;
@@ -11191,11 +11326,16 @@ void generate_cave(void)
 		{
 			/* Initialise room */
 			room_info[i].flags = 0;
-			room_info[i].tunnel = 0;
-			room_info[i].solid = 0;
+			
 			room_info[i].section[0] = -1;
 			room_info[i].type = ROOM_NONE;
 			room_info[i].vault = 0;
+			room_info[i].deepest_race = 0;
+
+			for (j = 0; j < MAX_THEMES; j++)
+			{
+				room_info[i].theme[j] = 0;
+			}
 		}
 
 		/* Mega-Hack -- no player yet */
