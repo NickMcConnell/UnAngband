@@ -414,6 +414,7 @@ extern void apply_halo(int y, int x);
 extern void remove_halo(int y, int x);
 extern void reapply_halo(int y, int x);
 extern void set_level_flags(int feat);
+extern void cave_set_feat_aux(int y, int x, int feat);
 extern void cave_set_feat(int y, int x, int feat);
 extern int feat_state(int feat, int action);
 extern void cave_alter_feat(int y, int x, int action);

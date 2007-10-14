@@ -531,6 +531,8 @@ static bool room_info_feat(int f_idx)
  */
 static s16b pick_room_feat(s16b feat)
 {
+	int newfeat;
+	
 	/* Paranoia */
 	if (feat != f_info[feat].mimic) return (feat);
 	
@@ -542,7 +544,9 @@ static s16b pick_room_feat(s16b feat)
 	/* Prepare allocation table */
 	get_feat_num_prep();
 	
-	feat = get_feat_num(object_level);
+	newfeat = get_feat_num(object_level);
+	
+	if (newfeat) feat = newfeat;
 	
 	get_feat_num_hook = NULL;
 
@@ -1144,7 +1148,10 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	{
 		for (xi = XPOS(x, x1); xi < XPOS(x, x1) + width_path; xi++)
 		{
-			cave_set_feat(yi, xi, feat_path);
+			/* XXX We have to use the auxiliary cave_set_feat function.
+			 * This is because trees and chasms would otherwise create infinite loops, as cave_set_feat(yi, xi, feat)
+			 * does not guarantee that cave_feat[yi][xi] = feat_path. */
+			cave_set_feat_aux(yi, xi, feat_path);
 		}
 	}
 
@@ -1236,7 +1243,10 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 						}
 
 						/* Draw the path */
-						cave_set_feat(yi, xi, feat_path);
+						/* XXX We have to use the auxiliary cave_set_feat function.
+						 * This is because trees and chasms would otherwise create infinite loops, as cave_set_feat(yi, xi, feat)
+						 * does not guarantee that cave_feat[yi][xi] = feat_path. */
+						cave_set_feat_aux(yi, xi, feat_path);
 					}
 				}
 				
@@ -1505,9 +1515,8 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 			}
 		}
 	}
-	
+
 #if 0
-	
 	/* Distribute cave grids */
 	if (flag & (MAZE_CAVE))
 	{
@@ -1518,8 +1527,13 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 			for (x = x1 + width_outer; x <= x2 - width_outer; x++)
 			{
 				int move;
+				byte add_info = ((flag & (MAZE_ROOM)) != 0 ? CAVE_ROOM : 0) | ((flag & (MAZE_LITE)) != 0 ? CAVE_LITE : 0);
 				
 				if (cave_feat[y][x] == inner) continue;
+				if (cave_feat[y][x] == feat_wall) continue;
+				if (cave_feat[y][x] == solid) continue;
+				
+				if (!y || !x) continue;
 
 				move = 0;
 				if (((y - y1 - width_outer) % (width_wall + width_path) < width_path) && (rand_int(100) < 50)) move += 1;
@@ -1530,27 +1544,77 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 					case 1:
 					{
 						cave_set_feat(y + 1, x, cave_feat[y][x]);
-						cave_set_feat(y, x, inner);
+						cave_info[y+1][x] |= add_info;
+						
+						/* Important - this ensures the top and left hand walls are affected correctly */
+						if  ((feat_wall != inner) && ((cave_feat[y-1][x] == solid) || (cave_feat[y-1][x] == feat_wall)) && 
+								((cave_feat[y-1][x+1] == solid) || (cave_feat[y-1][x+1] == feat_wall) || (cave_feat[y-1][x+1] == inner)))
+						{
+							if (rand_int(100) < 75)
+							{
+								cave_set_feat(y, x, cave_feat[y-1][x]);
+								cave_set_feat(y - 1, x, FEAT_WALL_EXTRA);
+								if (flag & (MAZE_ROOM)) cave_info[y-1][x] &= ~(CAVE_ROOM | CAVE_GLOW);
+							}
+						}
+						else if ((cave_feat[y-1][x] == inner) && (cave_feat[y-1][x+1] == inner) && (rand_int(100) < 75)) cave_set_feat(y, x, inner);
 						break;
 					}
 					case 2:
 					{
 						cave_set_feat(y, x + 1, cave_feat[y][x]);
-						cave_set_feat(y, x, inner);
+						cave_info[y][x+1] |= add_info;
+						
+						/* Important - this ensures the top and left hand walls are affected correctly */
+						if  ((feat_wall != inner) && ((cave_feat[y][x-1] == solid) || (cave_feat[y][x-1] == feat_wall)) &&
+								((cave_feat[y+1][x-1] == solid) || (cave_feat[y+1][x-1] == feat_wall) || (cave_feat[y+1][x-1] == inner)))
+						{
+							if (rand_int(100) < 75)
+							{
+								cave_set_feat(y, x, cave_feat[y][x-1]);
+								cave_set_feat(y, x - 1, FEAT_WALL_EXTRA);
+								if (flag & (MAZE_ROOM)) cave_info[y][x-1] &= ~(CAVE_ROOM | CAVE_GLOW);
+							}
+						}
+						else if ((cave_feat[y][x-1] == inner) && (cave_feat[y+1][x-1] == inner) && (rand_int(100) < 75)) cave_set_feat(y, x, inner);
 						break;
 					}
 					case 3:
 					{
 						cave_set_feat(y + 1, x + 1, cave_feat[y][x]);
-						cave_set_feat(y, x, inner);
+						cave_info[y+1][x+1] |= add_info;
+						
+						/* Important - this ensures the top and left hand walls are affected correctly */
+						if  ((feat_wall != inner) && ((cave_feat[y-1][x-1] == solid) || (cave_feat[y-1][x-1] == feat_wall)))
+						{
+							/* Nothing - this is rare enough that I don't want to write an overly complicated test for it */
+						}
+						else if ((cave_feat[y-1][x] == inner) && (cave_feat[y-1][x+1] == inner) && 
+								(cave_feat[y][x-1] == inner) && (cave_feat[y+1][x-1] == inner) && (rand_int(100) < 75)) cave_set_feat(y, x, inner);
 						break;
 					}
 				}
 			}	
 		}
 	}
+	
+	/* Re-process tree / chasm / glowing /outside grids.  This is required because
+	 * of the use of the cave_set_feat auxiliary function above. */
+	if (((f_info[feat_path].flags2 & (FF2_GLOW | FF2_CHASM)) != 0) ||
+			((f_info[feat_path].flags2 & (FF3_TREE | FF3_OUTSIDE)) != 0))
+	{
+		for (y = y1 + width_outer; y <= y2 - width_outer; y++)
+		{
+			for (x = x1 + width_outer; x <= x2 - width_outer; x++)
+			{
+				int feat = cave_feat[y][x];
+				cave_set_feat(y, x, FEAT_FLOOR);
+				cave_set_feat(y, x, feat);
+			}
+		}
+	}
 #endif
-		
+
 	/* Restore grids */
 	if (flag & (MAZE_SAVE))
 	{
@@ -10641,7 +10705,7 @@ static bool cave_gen(void)
 	}
 
 	/* Ensure guardian monsters */
-	if ((level_flag & (LF1_GUARDIAN)) != 0)
+	if (((level_flag & (LF1_GUARDIAN)) != 0) && ((level_flag & (LF1_DAYLIGHT)) == 0))
 	{
 		int y, x;
 

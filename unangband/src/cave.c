@@ -5019,7 +5019,7 @@ void town_illuminate(bool daytime)
 /*
  * Hack -- Really change the feature
  */
-static void cave_set_feat_aux(int y, int x, int feat)
+void cave_set_feat_aux(int y, int x, int feat)
 {
 	/* Set if blocks los */
 	bool los = cave_floor_bold(y,x);
@@ -6652,7 +6652,7 @@ void init_level_flags(void)
 
 	/* Add 'common' level flags */
 	if (zone->tower) level_flag |= (LF1_TOWER);
-	if ((zone->guard) && (r_info[zone->guard].cur_num <= 0)) level_flag |= (LF1_GUARDIAN);
+	if ((zone->guard) && (r_info[zone->guard].max_num > 0)) level_flag |= (LF1_GUARDIAN);
 	if (is_quest(p_ptr->depth)) level_flag |= (LF1_QUEST);
 
 	/* Define town */
