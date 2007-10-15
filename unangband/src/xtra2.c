@@ -3985,8 +3985,8 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 
 	/* Initialize text */
 	my_strcpy(name, "", name_s);
-	if (text_always) my_strcpy(text_always, "", text_always_s);
-	if (text_visible) my_strcpy(text_visible, "", text_visible_s);
+	if (text_always) my_strcpy(text_always,"", text_always_s);
+	if (text_visible) my_strcpy(text_visible,  cheat_xtra ? format("Room %d:", room) : "", text_visible_s);
 
 	/* Town or not in room */
 	if (!room)
@@ -4112,7 +4112,7 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 			
 		i = 0;
 
-		if (cheat_xtra && text_always) my_strcat(text_always, format ("%s (%ld)", r_name + r_info[room_info[room].deepest_race].name, room_info[room].ecology), text_always_s);
+		if (cheat_xtra && text_always) my_strcat(text_visible, format ("%s (%ld)", r_name + r_info[room_info[room].deepest_race].name, room_info[room].ecology), text_visible_s);
 		
 		while ((room >= 0) && (i < ROOM_DESC_SECTIONS))
 		{

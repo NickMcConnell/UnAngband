@@ -119,7 +119,8 @@
  */
 #define DUN_TUN_RND     30      /* 1 in # chance of random direction */
 #define DUN_TUN_ADJ     10      /* 1 in # chance of adjusting direction */
-#define DUN_TUN_CAV     2      	/* 1 in # chance of random direction in caves */
+#define DUN_TUN_CAV     3      	/* 1 in # chance of random direction in caves */
+#define DUN_TUN_LEN     10      /* 1 in # chance of cave tunnel becoming less random as it grows */
 #define DUN_TUN_STYLE   10      /* 1 in # chance of changing style */
 #define DUN_TUN_CRYPT   6       /* 1 in # chance of crypt niche having stairs or a monster */
 #define DUN_TUN_CON     15      /* Chance of extra tunneling */
@@ -1673,7 +1674,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 							((cave_feat[y + y1][x + x1] == feat_wall) ||
 							(((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) && cave_feat[y + y1][x + x1] == feat_state(feat_wall, FS_INNER))))
 					{
-						cave_set_feat(y, x, saved[y * (1 + y2 - y1) + x]);
+						cave_set_feat(y + y1, x + x1, saved[y * (1 + y2 - y1) + x]);
 					}
 					/* Try adjacent saved */
 					else for (i = 0; i < 8; i++)
@@ -6857,7 +6858,7 @@ static u32b get_tunnel_style(void)
 		if ((i < 25) || (i >= 75)) style |= (TUNNEL_CRYPT_R);
 	}
 	/* Cave levels have narrow, frequently random corridors. Mines occasionally do. */
-	/* The corridor style changes regularly for caves. Mines have longer straights than other levels. */
+	/* Mines have longer straights than other levels. */
 	else if (((level_flag & (LF1_CAVE)) != 0) || (((level_flag & (LF1_MINE)) != 0) && (i < 33)))
 	{
 		style |= (TUNNEL_CAVE);
@@ -7114,7 +7115,6 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	bool overrun_flag = FALSE;
 	bool decor_flag = FALSE;
 	bool abort_and_cleanup = FALSE;
-
 	
 	/* Force style change */
 	u32b style = get_tunnel_style();
@@ -7128,6 +7128,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	int correct_dir_timer = 0;
 	int tunnel_style_timer = randint(DUN_TUN_STYLE * 2);
 	int crypt_timer = randint(DUN_TUN_CRYPT * 2);
+	int cave_length_timer = ((style & TUNNEL_CAVE) != 0) ? randint(DUN_TUN_LEN * 2) : 0;
 
 	/* Not yet worried about our progress */
 	int desperation = 0;
@@ -7247,12 +7248,21 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			if (rand_dir_timer > 0) rand_dir_timer--;
 			if (correct_dir_timer > 0) correct_dir_timer--;
 			if (tunnel_style_timer > 0) tunnel_style_timer--;
+			if (cave_length_timer > 0) cave_length_timer--;
 
 			/* Adjust the tunnel style if required */
 			if (tunnel_style_timer == 0)
 			{
-				style = get_tunnel_style();
+				/* Caves re-pick style less frequently due to hacking style */
+				if (!cave_length_timer || (style % 4 == 3)) style = get_tunnel_style();
 				tunnel_style_timer = randint(DUN_TUN_STYLE * 2);
+			}
+			
+			/* Decrease cave tunnel randomness to allow it to find rooms further away */
+			if (cave_length_timer == 0)
+			{
+				if ((style % 4) < 3) style++;
+				cave_length_timer = randint(DUN_TUN_LEN * 2);
 			}
 
 			/* Make a random turn, set timer. */
@@ -7261,7 +7271,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				if ((style & TUNNEL_CAVE) != 0)
 				{
 					rand_dir_cave(&row_dir, &col_dir, row1, col1);
-					rand_dir_timer = randint(DUN_TUN_CAV * 2);
+					rand_dir_timer = randint((DUN_TUN_CAV * (1 + (style % 4))) * 2);
 				}
 				else
 				{
@@ -7273,7 +7283,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			}
 
 			/* Adjust direction, set timer. */
-			else if (adjust_dir_timer == 0)
+			if (adjust_dir_timer == 0)
 			{
 				adjust_dir(&row_dir, &col_dir, row1, col1, row2, col2);
 
@@ -7281,14 +7291,14 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			}
 
 			/* Go in correct direction. */
-			else if (correct_dir_timer == 0)
+			if (correct_dir_timer == 0)
 			{
 				correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
 
 				/* Don't use again unless needed. */
 				correct_dir_timer = -1;
 			}
-		}		
+		}
 
 		/* Get the next location */
 		tmp_row = row1 + row_dir;
@@ -7478,7 +7488,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					int part2 = dun->part[end_room-1];
 					
 					/* Merging successfully */
-					if (cheat_room) msg_format("Merging partition %d (room %d) with %d (room %d).", part1, start_room, part2, end_room);
+					if (cheat_room) msg_format("Merging partition %d (room %d) with %d (room %d) (length %d).", part1, start_room, part2, end_room, dun->tunn_n);
 
 					/* Merge partitions */
 					for (i = 0; i < dun->cent_n; i++)
@@ -7486,49 +7496,10 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 						if (dun->part[i] == part2) dun->part[i] = part1;
 					}
 
-					/* Rewrite tunnel to room if we end up on a non-floor, or we are a sewer level, or 20% of the time otherwise */
-					if ((cave_feat[tmp_row][tmp_col] != FEAT_FLOOR) || (level_flag & (LF1_SEWER)) || (rand_int(100) < 20))
-					{
-						/* Hack -- overwrite half of tunnel */
-						if (start_tunnel)
-						{
-							/* Round up some times */
-							if (((dun->tunn_n - first_tunn) % 2) && (rand_int(100) < 50)) first_tunn++;
-
-							/* Adjust from half-way */
-							first_tunn = first_tunn + (dun->tunn_n - first_tunn) / 2;
-						}
-
-						/* Overwrite starting tunnel terrain with end tunnel terrain */
-						for (i = first_tunn; i < dun->tunn_n; i++)
-						{
-							if ((end_room) && (end_room < DUN_ROOMS) && (dun->tunn_feat[i])) dun->tunn_feat[i] = room_info[end_room].theme[THEME_TUNNEL];
-						}
-					}
+					/* Accept the location */
+					row1 = tmp_row;
+					col1 = tmp_col;
 					
-					/* If the ending room has decorations next to doors, overwrite the start */
-					if ((end_room) && (end_room < DUN_ROOMS) && (room_info[end_room].theme[THEME_SOLID]) && (dun->next_n < NEXT_MAX))
-					{
-						int j;
-
-						for (j = first_next; j < dun->next_n; j++)
-						{
-							/* Overwrite with alternate terrain from ending room later */
-							dun->next_feat[j] = room_info[end_room].theme[THEME_SOLID];
-						}
-					}
-					/* If ending room does not have decorations and neither does start, clear the above 'fake' decorations */
-					else if ((start_room) && !(room_info[start_room].theme[THEME_SOLID]) && (start_room != end_room))
-					{
-						dun->next_n = first_next;
-					}
-
-					/* Get end decor */
-					if (end_room < DUN_ROOMS)
-					{
-						end_decor = room_info[end_room].theme[THEME_SOLID];
-					}
-
 					/* Accept tunnel */
 					break;
 				}
@@ -7559,6 +7530,9 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				
 				door_flag = FALSE;
 				decor_flag = TRUE;
+				
+				/* End tunnel if required */
+				if (start_room != end_room) break;
 			}
 		}
 		
@@ -7570,6 +7544,9 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			bool right_turn = FALSE;
 			
 			bool made_tunnel;
+			
+			/* Force bridges to consider correct direction frequently */
+			if (correct_dir_timer < 0) correct_dir_timer = randint(4);
 			
 			/* Accept this location */
 			row1 = tmp_row;
@@ -7960,14 +7937,14 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		if ((row1 == row2) && (col1 == col2)) 
 		{
 			/* Room */
-			end_room = room_idx_ignore_valid(row1, row1);
+			end_room = room_idx_ignore_valid(row1, col1);
 			
 			/* Both ends are rooms */
 			if ((start_room) && (end_room) &&
 				(start_room < DUN_ROOMS) && (end_room < DUN_ROOMS))
-			{
+			{	
 				/* Different room in same partition */
-				if (dun->part[start_room-1] == dun->part[end_room-1])
+				if (part1 == dun->part[end_room-1])
 				{
 					if (cheat_room) msg_format("Loop in partition %d endpoints. Aborting.", part1);
 
@@ -7983,32 +7960,22 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					break;
 				}
 				
-				else if ((part1 < CENT_MAX) && (end_room))
+				else if (part1 < CENT_MAX)
 				{
 					int part2 = dun->part[end_room-1];
+
+					/* Merging successfully */
+					if (cheat_room) msg_format("Merging partition %d (room %d) with %d (room %d) by reaching end point (length %d).", part1, start_room, part2, end_room, dun->tunn_n);
 
 					/* Merge partitions */
 					for (i = 0; i < dun->cent_n; i++)
 					{
 						if (dun->part[i] == part2) dun->part[i] = part1;
 					}
+					
+					/* Paranoia */
+					abort_and_cleanup = FALSE;
 				}
-			}
-
-			/* Hack -- overwrite half of tunnel */
-			if (start_tunnel)
-			{
-				/* Round up some times */
-				if (((dun->tunn_n - first_tunn) % 2) && (rand_int(100) < 50)) first_tunn++;
-
-				/* Adjust from half-way */
-				first_tunn = first_tunn + (dun->tunn_n - first_tunn) / 2;
-			}
-
-			/* Remove tunnel terrain */
-			for (i = first_tunn; i < dun->tunn_n; i++)
-			{
-				dun->tunn_feat[i] = 0;
 			}
 
 			/* Accept tunnel */
@@ -8038,6 +8005,60 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		return FALSE;
 	}
 
+	/* Rewrite tunnel to room if we end up on a non-floor, or we are a sewer level, or the start or end tunnel is not a room, or 20% of the time otherwise */
+	if ((cave_feat[row1][col1] != FEAT_FLOOR) || (level_flag & (LF1_SEWER)) || (!start_room) || (!end_room) || (rand_int(100) < 20))
+	{
+		/* Hack -- overwrite half of tunnel */
+		if ((start_tunnel) || (!start_room))
+		{
+			/* Round up some times */
+			if (((dun->tunn_n - first_tunn) % 2) && (rand_int(100) < 50)) first_tunn++;
+
+			/* Adjust from half-way */
+			first_tunn = first_tunn + (dun->tunn_n - first_tunn) / 2;
+		}
+
+		/* Remove tunnel terrain */
+		if ((!start_room) || (!end_room))
+		{
+			for (i = ((!start_room) ? 0 : first_tunn); i < ((!end_room) ? dun->tunn_n : first_tunn); i++)
+			{
+				dun->tunn_feat[i] = 0;
+			}
+		}
+
+		/* Overwrite starting tunnel terrain with end tunnel terrain */
+		if ((end_room) && (end_room < DUN_ROOMS) && (room_info[end_room].theme[THEME_TUNNEL]))
+		{
+			for (i = first_tunn; i < dun->tunn_n; i++)
+			{
+				if (dun->tunn_feat[i]) dun->tunn_feat[i] = room_info[end_room].theme[THEME_TUNNEL];
+			}
+		}
+	}
+	
+	/* If the ending room has decorations next to doors, overwrite the start */
+	if ((end_room) && (end_room < DUN_ROOMS) && (room_info[end_room].theme[THEME_SOLID]) && (dun->next_n < NEXT_MAX))
+	{
+		int j;
+
+		for (j = first_next; j < dun->next_n; j++)
+		{
+			/* Overwrite with alternate terrain from ending room later */
+			dun->next_feat[j] = room_info[end_room].theme[THEME_SOLID];
+		}
+	}
+	/* If ending room does not have decorations and neither does start, clear the above 'fake' decorations */
+	else if ((start_room) && !(room_info[start_room].theme[THEME_SOLID]) && (start_room != end_room))
+	{
+		dun->next_n = first_next;
+	}
+
+	/* Get end decor */
+	if ((end_room) && (end_room < DUN_ROOMS))
+	{
+		end_decor = room_info[end_room].theme[THEME_SOLID];
+	}	
 
 	/* Turn the tunnel into corridor */
 	for (i = 0; i < dun->tunn_n; i++)
