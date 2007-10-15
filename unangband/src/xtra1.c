@@ -2833,7 +2833,7 @@ static void calc_torch(void)
 			p_ptr->cur_lite = 2;
 
 #ifdef ALLOW_OBJECT_INFO_MORE
-			object_can_flags(o_ptr,0x0L,0x0L,TR3_INSTA_ART,0x0L);
+			object_can_flags(o_ptr,0x0L,0x0L,TR3_INSTA_ART,0x0L, FALSE);
 #endif
 
 		}
@@ -2847,7 +2847,7 @@ static void calc_torch(void)
 			p_ptr->cur_lite = 2;
 
 #ifdef ALLOW_OBJECT_INFO_MORE
-			object_can_flags(o_ptr,0x0L,0x0L,TR3_LITE,0x0L);
+			object_can_flags(o_ptr,0x0L,0x0L,TR3_LITE,0x0L, FALSE);
 #endif
 		}
 		else

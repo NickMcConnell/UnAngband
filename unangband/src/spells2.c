@@ -238,7 +238,7 @@ void identify_pack(void)
 		if (!o_ptr->k_idx) continue;
 
 		/* Aware and Known */
-		object_aware(o_ptr);
+		object_aware(o_ptr, FALSE);
 		object_known(o_ptr);
 	}
 
@@ -319,7 +319,7 @@ static int remove_curse_aux(int all)
 		if (!all && (f3 & (TR3_HEAVY_CURSE)))
 		{
 			/* Learn about the object */
-			object_can_flags(o_ptr,0x0L,0x0L,TR3_HEAVY_CURSE,0x0L);
+			object_can_flags(o_ptr,0x0L,0x0L,TR3_HEAVY_CURSE,0x0L, FALSE);
 
 			continue;
 		}
@@ -328,16 +328,16 @@ static int remove_curse_aux(int all)
 		if (f3 & (TR3_PERMA_CURSE))
 		{
 			/* Learn about the object */
-			if (all) object_can_flags(o_ptr,0x0L,0x0L,TR3_PERMA_CURSE,0x0L);
+			if (all) object_can_flags(o_ptr,0x0L,0x0L,TR3_PERMA_CURSE,0x0L, FALSE);
 
 			continue;
 		}
 
 		/* Learn about the object */
-		if (!all) object_not_flags(o_ptr,0x0L,0x0L,TR3_HEAVY_CURSE,0x0L);
+		if (!all) object_not_flags(o_ptr,0x0L,0x0L,TR3_HEAVY_CURSE,0x0L, FALSE);
 
 		/* Learn about the object */
-		object_not_flags(o_ptr,0x0L,0x0L,TR3_PERMA_CURSE,0x0L);
+		object_not_flags(o_ptr,0x0L,0x0L,TR3_PERMA_CURSE,0x0L, FALSE);
 
 		/* Uncurse the object */
 		uncurse_object(o_ptr);
@@ -903,9 +903,9 @@ void self_knowledge_aux(bool spoil, bool random)
 
 			if (spoil)
 			{	
-				object_can_flags(o_ptr,t1,t2,t3,t4);
+				object_can_flags(o_ptr,t1,t2,t3,t4, FALSE);
 	
-				object_not_flags(o_ptr,TR1_WEAPON_FLAGS & ~(t1),TR2_WEAPON_FLAGS & ~(t2),TR3_WEAPON_FLAGS & ~(t3), TR4_WEAPON_FLAGS & ~(t4));
+				object_not_flags(o_ptr,TR1_WEAPON_FLAGS & ~(t1),TR2_WEAPON_FLAGS & ~(t2),TR3_WEAPON_FLAGS & ~(t3), TR4_WEAPON_FLAGS & ~(t4), FALSE);
 			}
 
 			text_out("\n");
@@ -1608,7 +1608,7 @@ static bool detect_objects_type(bool (*detect_item_hook)(const object_type *o_pt
 		if (sense_type)
 		{
 			/* Get the inscription */
-			feel = sense_magic(o_ptr, sense_type, TRUE);
+			feel = sense_magic(o_ptr, sense_type, TRUE, TRUE);
 
 			/* Sense something */
 			if (!feel) continue;
@@ -1629,7 +1629,7 @@ static bool detect_objects_type(bool (*detect_item_hook)(const object_type *o_pt
 		object_type *o_ptr = &inventory[i];
 
 		/* Get the inscription */
-		feel = sense_magic(o_ptr, sense_type, TRUE);
+		feel = sense_magic(o_ptr, sense_type, TRUE, TRUE);
 
 		/* Sense something */
 		if (!feel) continue;
@@ -2605,19 +2605,19 @@ bool brand_item(int brand, cptr act)
 
 		if (object_xtra_what[brand] == 1)
 		{
-    			object_can_flags(o_ptr,object_xtra_base[brand] << o_ptr->xtra2,0x0L,0x0L,0x0L);
+    			object_can_flags(o_ptr,object_xtra_base[brand] << o_ptr->xtra2,0x0L,0x0L,0x0L, item < 0);
 		}
 		else if (object_xtra_what[brand] == 2)
 		{
-	    		object_can_flags(o_ptr,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L,0x0L);
+	    		object_can_flags(o_ptr,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L,0x0L, item < 0);
 		}
 		else if (object_xtra_what[brand] == 3)
 		{
-    			object_can_flags(o_ptr,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L);
+    			object_can_flags(o_ptr,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L, item < 0);
 		}
 		else if (object_xtra_what[brand] == 4)
 		{
-    			object_can_flags(o_ptr,0x0L,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2);
+    			object_can_flags(o_ptr,0x0L,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2, item < 0);
 		}
 
 		/* Hack -- some items become marked with a brand feeling */
@@ -2706,7 +2706,7 @@ bool ident_spell(void)
 	}
 
 	/* Identify it fully */
-	object_aware(o_ptr);
+	object_aware(o_ptr, item < 0);
 	object_known(o_ptr);
 
 	/* Recalculate bonuses */
@@ -2789,7 +2789,7 @@ bool ident_spell_name(void)
 	}
 
 	/* Identify it fully */
-	object_aware(o_ptr);
+	object_aware(o_ptr, item < 0);
 	o_ptr->ident |= (IDENT_NAME);
 
 	/* Combine / Reorder the pack (later) */
@@ -2869,7 +2869,7 @@ bool ident_spell_bonus(void)
 	}
 
 	/* Identify it's bonuses */
-	object_bonus(o_ptr);
+	object_bonus(o_ptr, item < 0);
 
 	/* Recalculate bonuses */
 	p_ptr->update |= (PU_BONUS);
@@ -2951,7 +2951,7 @@ bool ident_spell_sense(void)
 	}
 
 	/* Identify it's bonuses */
-	o_ptr->feeling = sense_magic(o_ptr, cp_ptr->sense_type, TRUE);
+	o_ptr->feeling = sense_magic(o_ptr, cp_ptr->sense_type, TRUE, item < 0);
 
 	/* Sense non-wearable items */
 	if (!o_ptr->feeling)
@@ -3046,10 +3046,10 @@ bool ident_spell_magic(void)
 	}
 
 	/* Identify name if a magic item */
-	if (!o_ptr->name1 && !o_ptr->name2 && o_ptr->xtra1) object_aware(o_ptr);
+	if (!o_ptr->name1 && !o_ptr->name2 && o_ptr->xtra1) object_aware(o_ptr, item < 0);
 
 	/* Else identify one random flag -- if none left, get item name unless flavoured */
-	else if ((value_check_aux10(o_ptr, FALSE, FALSE)) && !(k_info[o_ptr->k_idx].flavor)) object_aware(o_ptr);
+	else if ((value_check_aux10(o_ptr, FALSE, FALSE, item < 0)) && !(k_info[o_ptr->k_idx].flavor)) object_aware(o_ptr, item < 0);
 
 	/* List object abilities */
 	else examine = TRUE;
@@ -3369,17 +3369,17 @@ bool ident_spell_rumor(void)
 		if (done)
 		{
 			/* Do we know absolutely everything? */
-			if (object_known_p(o_ptr)) object_mental(o_ptr);
+			if (object_known_p(o_ptr)) object_mental(o_ptr, item < 0);
 			else
 			{
-				object_aware(o_ptr);
+				object_aware(o_ptr, item < 0);
 				object_known(o_ptr);
 			}
 
 		}
 
 		/* Learn more about the item */
-		object_can_flags(o_ptr,f1,f2,f3,f4);
+		object_can_flags(o_ptr,f1,f2,f3,f4, item < 0);
 
 		/* Description */
 		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
@@ -3494,7 +3494,7 @@ bool ident_spell_tval(int tval)
 	}
 
 	/* Identify it fully */
-	object_aware(o_ptr);
+	object_aware(o_ptr, item < 0);
 	object_known(o_ptr);
 
 	/* Recalculate bonuses */
@@ -3579,9 +3579,9 @@ bool identify_fully(void)
 	}
 
 	/* Identify it fully */
-	object_aware(o_ptr);
+	object_aware(o_ptr, item < 0);
 	object_known(o_ptr);
-	object_mental(o_ptr);
+	object_mental(o_ptr, item < 0);
 
 	/* Recalculate bonuses */
 	p_ptr->update |= (PU_BONUS);
@@ -5297,7 +5297,7 @@ static void wield_spell(int item, int k_idx, int time, int level, int r_idx)
 	/* Create the spell */
 	object_prep(i_ptr, k_idx);
 	i_ptr->timeout = time;
-	object_aware(i_ptr);
+	object_aware(i_ptr, item < 0);
 	object_known(i_ptr);
 	i_ptr->weight = 0;
 

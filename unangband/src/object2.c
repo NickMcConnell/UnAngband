@@ -749,7 +749,7 @@ s16b get_obj_num(int level)
  * Call this after knowing an object. Currently just marks object with
  * mental flag.
  */
-void object_mental(object_type *o_ptr)
+void object_mental(object_type *o_ptr, bool floor)
 {
 	u32b f1,f2,f3,f4;
 
@@ -759,9 +759,9 @@ void object_mental(object_type *o_ptr)
 	/* Spoil the object */
 	object_flags(o_ptr,&f1,&f2,&f3,&f4);
 
-	object_can_flags(o_ptr,f1,f2,f3,f4);
+	object_can_flags(o_ptr,f1,f2,f3,f4, floor);
 
-	object_not_flags(o_ptr,~(f1),~(f2),~(f3),~(f4));
+	object_not_flags(o_ptr,~(f1),~(f2),~(f3),~(f4), floor);
 }
 
 
@@ -813,7 +813,7 @@ void object_known(object_type *o_ptr)
  * Note under some circumstances, we fully know the object (When
  * its bonuses/charges are all there is to know about it).
  */
-void object_bonus(object_type *o_ptr)
+void object_bonus(object_type *o_ptr, bool floor)
 {
 	/* Identify the bonuses */
 	o_ptr->ident |= (IDENT_BONUS | IDENT_CHARGES | IDENT_PVAL);
@@ -833,7 +833,7 @@ void object_bonus(object_type *o_ptr)
 	/* Sense the item (if appropriate) */
 	if (!object_known_p(o_ptr))
 	{
-		sense_magic(o_ptr, 1, TRUE);
+		sense_magic(o_ptr, 1, TRUE, floor);
 	}
 }
 
@@ -874,7 +874,7 @@ void object_aware_tips(object_type *o_ptr)
 /*
  * The player is now aware of the effects of the given object.
  */
-void object_aware(object_type *o_ptr)
+void object_aware(object_type *o_ptr, bool floor)
 {
 	object_kind *k_ptr = &k_info[o_ptr->k_idx];
 
@@ -978,23 +978,23 @@ void object_aware(object_type *o_ptr)
 	}
 
 	/* Set the obvious flags */
-	object_obvious_flags(o_ptr);
+	object_obvious_flags(o_ptr, floor);
 
 	/* Now we know what it is, update what we know about it */
 	object_can_flags(o_ptr,o_ptr->can_flags1,
 			o_ptr->can_flags2,
 			o_ptr->can_flags3,
-			o_ptr->can_flags4);
+			o_ptr->can_flags4, floor);
 
 	object_not_flags(o_ptr,o_ptr->not_flags1,
 			o_ptr->not_flags2,
 			o_ptr->not_flags3,
-			o_ptr->not_flags4);
+			o_ptr->not_flags4, floor);
 
 	object_may_flags(o_ptr,o_ptr->may_flags1,
 			o_ptr->may_flags2,
 			o_ptr->may_flags3,
-			o_ptr->may_flags4);
+			o_ptr->may_flags4, floor);
 
 	/* Know about ego-type */
 	if ((o_ptr->name2) && !(o_ptr->ident & (IDENT_STORE)))
@@ -1826,7 +1826,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
  * negative numbers is undefined in C.
  */
 
-void object_absorb(object_type *o_ptr, const object_type *j_ptr)
+void object_absorb(object_type *o_ptr, const object_type *j_ptr, bool floor)
 {
 	int total = o_ptr->number + j_ptr->number;
 
@@ -1974,9 +1974,9 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 	if (j_ptr->note != 0) o_ptr->note = j_ptr->note;
 
 	/* Hack -- Blend flags */
-	object_can_flags(o_ptr,j_ptr->can_flags1,j_ptr->can_flags2,j_ptr->can_flags3,j_ptr->can_flags4);
-	object_not_flags(o_ptr,j_ptr->not_flags1,j_ptr->not_flags2,j_ptr->not_flags3,j_ptr->not_flags4);
-	object_may_flags(o_ptr,j_ptr->may_flags1,j_ptr->may_flags2,j_ptr->may_flags3,j_ptr->may_flags4);
+	object_can_flags(o_ptr,j_ptr->can_flags1,j_ptr->can_flags2,j_ptr->can_flags3,j_ptr->can_flags4, floor);
+	object_not_flags(o_ptr,j_ptr->not_flags1,j_ptr->not_flags2,j_ptr->not_flags3,j_ptr->not_flags4, floor);
+	object_may_flags(o_ptr,j_ptr->may_flags1,j_ptr->may_flags2,j_ptr->may_flags3,j_ptr->may_flags4, floor);
 
 	/* Mega-Hack -- Blend "discounts" */
 	if (o_ptr->discount < j_ptr->discount) o_ptr->discount = j_ptr->discount;
@@ -2812,7 +2812,7 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 	if (cheat_auto) o_ptr->note = e_info[o_ptr->name2].note;
 
 	/* Apply obvious flags */
-	object_obvious_flags(o_ptr);
+	object_obvious_flags(o_ptr, TRUE);
 
 	return (TRUE);
 }
@@ -3751,18 +3751,18 @@ static void a_m_aux_4(object_type *o_ptr, int level, int power)
 /*
  * Test player and item for a racial flag and update knowledge
  */
-static void value_check_race_flag(object_type *o_ptr, u32b object_flag, u32b flag)
+static void value_check_race_flag(object_type *o_ptr, u32b object_flag, u32b flag, bool floor)
 {
 	/* Sense race flag */
 	if (object_flag & (flag))
 	{
 		if (p_ptr->cur_flags4 & (flag)) o_ptr->ident |= (IDENT_NAME);
 
-		object_can_flags(o_ptr, 0x0L, 0x0L, 0x0L, flag);
+		object_can_flags(o_ptr, 0x0L, 0x0L, 0x0L, flag, floor);
 	}
 	else
 	{
-		object_not_flags(o_ptr, 0x0L, 0x0L, 0x0L, flag);
+		object_not_flags(o_ptr, 0x0L, 0x0L, 0x0L, flag, floor);
 	}
 }
 
@@ -3770,20 +3770,20 @@ static void value_check_race_flag(object_type *o_ptr, u32b object_flag, u32b fla
 /*
  * Return a "feeling" (or NULL) about an item.  Method 0 (Racial).
  */
-int value_check_aux0(object_type *o_ptr)
+int value_check_aux0(object_type *o_ptr, bool floor)
 {
 	u32b f1, f2, f3, f4;
 
 	/* Extract the flags */
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
-	value_check_race_flag(o_ptr, f4, TR4_UNDEAD);
-	value_check_race_flag(o_ptr, f4, TR4_ORC);
-	value_check_race_flag(o_ptr, f4, TR4_TROLL);
-	value_check_race_flag(o_ptr, f4, TR4_GIANT);
-	value_check_race_flag(o_ptr, f4, TR4_MAN);
-	value_check_race_flag(o_ptr, f4, TR4_DWARF);
-	value_check_race_flag(o_ptr, f4, TR4_ELF);
+	value_check_race_flag(o_ptr, f4, TR4_UNDEAD, floor);
+	value_check_race_flag(o_ptr, f4, TR4_ORC, floor);
+	value_check_race_flag(o_ptr, f4, TR4_TROLL, floor);
+	value_check_race_flag(o_ptr, f4, TR4_GIANT, floor);
+	value_check_race_flag(o_ptr, f4, TR4_MAN, floor);
+	value_check_race_flag(o_ptr, f4, TR4_DWARF, floor);
+	value_check_race_flag(o_ptr, f4, TR4_ELF, floor);
 
 	/* No feeling */
 	return (0);
@@ -3835,7 +3835,7 @@ int value_check_aux7(object_type *o_ptr)
 /*
  * Return a "feeling" (or NULL) about an item.  Method 8 (Name magic).
  */
-int value_check_aux8(object_type *o_ptr)
+int value_check_aux8(object_type *o_ptr, bool floor)
 {
 	/* Important!!! Note different treatment for artifacts. Otherwise the player can
 	   potentially lose artifacts by leaving a level after they are 'automatically'
@@ -3850,7 +3850,7 @@ int value_check_aux8(object_type *o_ptr)
 	else
 	{
 		/* Become aware of object */
-		object_aware(o_ptr);
+		object_aware(o_ptr, floor);
 	}
 
 	/* No feeling */
@@ -3900,7 +3900,7 @@ int value_check_aux9(object_type *o_ptr)
  *
  * If limit is set, only return either weapon or nonweapon flags.
  */
-int value_check_aux10(object_type *o_ptr, bool limit, bool weapon)
+int value_check_aux10(object_type *o_ptr, bool limit, bool weapon, bool floor)
 {
 	int feel = 0;
 
@@ -3952,16 +3952,16 @@ int value_check_aux10(object_type *o_ptr, bool limit, bool weapon)
 	switch(flag1)
 	{
 		case 1:
-			object_can_flags(o_ptr, flag2, 0x0L, 0x0L, 0x0L);
+			object_can_flags(o_ptr, flag2, 0x0L, 0x0L, 0x0L, floor);
 			break;
 		case 2:
-			object_can_flags(o_ptr, 0x0L, flag2, 0x0L, 0x0L);
+			object_can_flags(o_ptr, 0x0L, flag2, 0x0L, 0x0L, floor);
 			break;
 		case 3:
-			object_can_flags(o_ptr, 0x0L, 0x0L, flag2, 0x0L);
+			object_can_flags(o_ptr, 0x0L, 0x0L, flag2, 0x0L, floor);
 			break;
 		case 4:
-			object_can_flags(o_ptr, 0x0L, 0x0L, 0x0L, flag2);
+			object_can_flags(o_ptr, 0x0L, 0x0L, 0x0L, flag2, floor);
 			break;
 	}
 
@@ -4158,7 +4158,7 @@ int value_check_aux13(object_type *o_ptr)
  * Level 8 is equivalent to identify name only.
  * Level 9 is equivalent to full identify on restricted objects only.
  */
-int sense_magic(object_type *o_ptr, int sense_type, bool heavy)
+int sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
 {
 	int feel = 0;
 
@@ -4208,7 +4208,7 @@ int sense_magic(object_type *o_ptr, int sense_type, bool heavy)
 	if (object_known_p(o_ptr)) return (0);
 
 	/* Always update racial information */
-	(void)value_check_aux0(o_ptr);
+	(void)value_check_aux0(o_ptr, floor);
 
 	switch (sense_type)
 	{
@@ -4234,16 +4234,16 @@ int sense_magic(object_type *o_ptr, int sense_type, bool heavy)
 			feel = heavy ? value_check_aux7(o_ptr) : value_check_aux11(o_ptr);
 			break;
 		case 8:
-			feel = heavy ? value_check_aux8(o_ptr) : value_check_aux11(o_ptr);
+			feel = heavy ? value_check_aux8(o_ptr, floor) : value_check_aux11(o_ptr);
 			break;
 		case 9:
 			feel = heavy ? value_check_aux9(o_ptr) : value_check_aux11(o_ptr);
 			break;
 		case 10:
-			feel = heavy ? value_check_aux10(o_ptr, TRUE, FALSE) : value_check_aux11(o_ptr);
+			feel = heavy ? value_check_aux10(o_ptr, TRUE, FALSE, floor) : value_check_aux11(o_ptr);
 			break;
 		case 11:
-			feel = heavy ? value_check_aux10(o_ptr, TRUE, TRUE) : value_check_aux11(o_ptr);
+			feel = heavy ? value_check_aux10(o_ptr, TRUE, TRUE, floor) : value_check_aux11(o_ptr);
 			break;
 	}
 
@@ -5030,13 +5030,13 @@ static bool kind_is_good(int k_idx)
 
 		/* Books -- high level books are good if not seen previously */
 		case TV_MAGIC_BOOK:
+		case TV_PRAYER_BOOK:
 		{
 			if ((k_ptr->sval < SV_BOOK_MAX_GOOD) && !(k_ptr->aware)) return (TRUE);
 			return (FALSE);	
 		}
 		
 		/* Books -- high level books are good if not seen previously */
-		case TV_PRAYER_BOOK:
 		case TV_SONG_BOOK:
 		{
 			if ((k_ptr->sval >= SV_BOOK_MIN_GOOD) && !(k_ptr->aware)) return (TRUE);
@@ -5060,7 +5060,7 @@ static bool kind_is_good(int k_idx)
 		case TV_WAND:
 		case TV_FLASK:
 		{
-			if ((k_ptr->level >= 40) && !(k_ptr->flags3 & (TR3_LIGHT_CURSE))) return (TRUE);
+			if ((k_ptr->level >= 40) && (k_ptr->level > object_level + 9) && !(k_ptr->flags3 & (TR3_LIGHT_CURSE))) return (TRUE);
 			return (FALSE);
 		}
 
@@ -5574,13 +5574,13 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 	}
 
 	/* Sense some magic on object at creation time */
-	j_ptr->feeling = sense_magic(j_ptr, cp_ptr->sense_type, (p_ptr->lev >= 40) || rand_int(100) < 20 + p_ptr->lev * 2);
+	j_ptr->feeling = sense_magic(j_ptr, cp_ptr->sense_type, (p_ptr->lev >= 40) || rand_int(100) < 20 + p_ptr->lev * 2, TRUE);
 
 	/* Hack -- theme chests */
 	if (opening_chest) tval_drop_idx = j_ptr->tval;
 
 	/* Apply obvious flags */
-	object_obvious_flags(j_ptr);
+	object_obvious_flags(j_ptr, TRUE);
 
 	/* Success */
 	return (TRUE);
@@ -5971,7 +5971,7 @@ bool make_feat(object_type *j_ptr, int y, int x)
 	/* Auto-inscribe if necessary */
 	if ((cheat_auto) || (object_aware_p(j_ptr))) j_ptr->note = k_info[k_idx].note;
 	/* Apply obvious flags */
-	object_obvious_flags(j_ptr);
+	object_obvious_flags(j_ptr, TRUE);
 
 	/* Add to the floor */
 	if (floor_carry(y,x,j_ptr)) return (TRUE);
@@ -6007,7 +6007,7 @@ s16b floor_carry(int y, int x, object_type *j_ptr)
 		if (object_similar(o_ptr, j_ptr))
 		{
 			/* Combine the items */
-			object_absorb(o_ptr, j_ptr);
+			object_absorb(o_ptr, j_ptr, TRUE);
 
 			/* Result */
 			return (this_o_idx);
@@ -8168,7 +8168,7 @@ s16b inven_carry(object_type *o_ptr)
 		{
 
 			/* Combine the items */
-			object_absorb(j_ptr, o_ptr);
+			object_absorb(j_ptr, o_ptr, FALSE);
 
 			/* Increase the weight */
 			p_ptr->total_weight += (o_ptr->number * o_ptr->weight);
@@ -8709,7 +8709,7 @@ void combine_pack(void)
 				flag = TRUE;
 
 				/* Add together the item counts */
-				object_absorb(j_ptr, o_ptr);
+				object_absorb(j_ptr, o_ptr, FALSE);
 
 				/* One object is gone */
 				p_ptr->inven_cnt--;
@@ -9529,7 +9529,7 @@ void combine_quiver(void)
 				flag = TRUE;
 
 				/* Add together the item counts */
-				object_absorb(j_ptr, i_ptr);
+				object_absorb(j_ptr, i_ptr, FALSE);
 
 				/* Slide everything down */
 				for (k = i; k < (END_QUIVER - 1); k++)

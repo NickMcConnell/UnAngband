@@ -3689,7 +3689,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 					}
 
 					/* Apply special damage XXX XXX XXX */
-					tdam = tot_dam_aux(i_ptr, tdam, m_ptr);
+					tdam = tot_dam_aux(i_ptr, tdam, m_ptr, item < 0);
 
 					/* The third piece of fire/throw dependent code */
 					if (fire)

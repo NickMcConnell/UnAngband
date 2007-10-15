@@ -167,7 +167,7 @@ static int quiver_wield(int item, object_type *i_ptr)
 	{
 	  slot = i;
 	  use_new_slot = FALSE;
-	  object_absorb(o_ptr, i_ptr);
+	  object_absorb(o_ptr, i_ptr, FALSE);
 	  break;
 	}
     }
@@ -564,7 +564,7 @@ void do_cmd_wield(void)
 	if (rings) 
 	  {
 	    /* Wear the new rings */
-	    object_absorb(j_ptr, i_ptr);
+	    object_absorb(j_ptr, i_ptr, FALSE);
 	  }
 	else if (!IS_QUIVER_SLOT(slot))
 	/* Normal rules for non-ammo */
@@ -683,67 +683,67 @@ void do_cmd_wield(void)
 		TR1_INT | TR1_DEX | TR1_CON | TR1_CHR)) j_ptr->ident |= (IDENT_PVAL);
 
 	/* Hack -- the following are obvious from the displayed combat statistics */
-	if (f1 & (TR1_BLOWS)) object_can_flags(j_ptr,TR1_BLOWS,0x0L,0x0L,0x0L);
-	else object_not_flags(j_ptr,TR1_BLOWS,0x0L,0x0L,0x0L);
+	if (f1 & (TR1_BLOWS)) object_can_flags(j_ptr,TR1_BLOWS,0x0L,0x0L,0x0L, FALSE);
+	else object_not_flags(j_ptr,TR1_BLOWS,0x0L,0x0L,0x0L, FALSE);
 
-	if (f1 & (TR1_SHOTS)) object_can_flags(j_ptr,TR1_SHOTS,0x0L,0x0L,0x0L);
-	else object_not_flags(j_ptr,TR1_SHOTS,0x0L,0x0L,0x0L);
+	if (f1 & (TR1_SHOTS)) object_can_flags(j_ptr,TR1_SHOTS,0x0L,0x0L,0x0L, FALSE);
+	else object_not_flags(j_ptr,TR1_SHOTS,0x0L,0x0L,0x0L, FALSE);
 
 	/* Hack -- the following are obvious from the displayed combat statistics */
-	if (f1 & (TR1_SPEED)) object_can_flags(j_ptr,TR1_SPEED,0x0L,0x0L,0x0L);
-	else object_not_flags(j_ptr,TR1_SPEED,0x0L,0x0L,0x0L);
+	if (f1 & (TR1_SPEED)) object_can_flags(j_ptr,TR1_SPEED,0x0L,0x0L,0x0L, FALSE);
+	else object_not_flags(j_ptr,TR1_SPEED,0x0L,0x0L,0x0L, FALSE);
 
 	/* Hack -- the following are obvious from the displayed stats */
-	if (f1 & (TR1_STR)) object_can_flags(j_ptr,TR1_STR,0x0L,0x0L,0x0L);
-	else object_not_flags(j_ptr,TR1_STR,0x0L,0x0L,0x0L);
+	if (f1 & (TR1_STR)) object_can_flags(j_ptr,TR1_STR,0x0L,0x0L,0x0L, FALSE);
+	else object_not_flags(j_ptr,TR1_STR,0x0L,0x0L,0x0L, FALSE);
 
-	if (f1 & (TR1_INT)) object_can_flags(j_ptr,TR1_INT,0x0L,0x0L,0x0L);
-	else object_not_flags(j_ptr,TR1_INT,0x0L,0x0L,0x0L);
+	if (f1 & (TR1_INT)) object_can_flags(j_ptr,TR1_INT,0x0L,0x0L,0x0L, FALSE);
+	else object_not_flags(j_ptr,TR1_INT,0x0L,0x0L,0x0L, FALSE);
 
-	if (f1 & (TR1_WIS)) object_can_flags(j_ptr,TR1_WIS,0x0L,0x0L,0x0L);
-	else object_not_flags(j_ptr,TR1_WIS,0x0L,0x0L,0x0L);
+	if (f1 & (TR1_WIS)) object_can_flags(j_ptr,TR1_WIS,0x0L,0x0L,0x0L, FALSE);
+	else object_not_flags(j_ptr,TR1_WIS,0x0L,0x0L,0x0L, FALSE);
 
-	if (f1 & (TR1_DEX)) object_can_flags(j_ptr,TR1_DEX,0x0L,0x0L,0x0L);
-	else object_not_flags(j_ptr,TR1_DEX,0x0L,0x0L,0x0L);
+	if (f1 & (TR1_DEX)) object_can_flags(j_ptr,TR1_DEX,0x0L,0x0L,0x0L, FALSE);
+	else object_not_flags(j_ptr,TR1_DEX,0x0L,0x0L,0x0L, FALSE);
 
-	if (f1 & (TR1_CON)) object_can_flags(j_ptr,TR1_CON,0x0L,0x0L,0x0L);
-	else object_not_flags(j_ptr,TR1_CON,0x0L,0x0L,0x0L);
+	if (f1 & (TR1_CON)) object_can_flags(j_ptr,TR1_CON,0x0L,0x0L,0x0L, FALSE);
+	else object_not_flags(j_ptr,TR1_CON,0x0L,0x0L,0x0L, FALSE);
 
-	if (f1 & (TR1_CHR)) object_can_flags(j_ptr,TR1_CHR,0x0L,0x0L,0x0L);
-	else object_not_flags(j_ptr,TR1_CHR,0x0L,0x0L,0x0L);
+	if (f1 & (TR1_CHR)) object_can_flags(j_ptr,TR1_CHR,0x0L,0x0L,0x0L, FALSE);
+	else object_not_flags(j_ptr,TR1_CHR,0x0L,0x0L,0x0L, FALSE);
 
 #ifndef ALLOW_OBJECT_INFO_MORE
 	/* Hack --- we do these here, because they are too computationally expensive in the 'right' place */
 	if (f1 & (TR1_INFRA))
 	{
-		object_can_flags(j_ptr,TR1_INFRA,0x0L,0x0L,0x0L);
+		object_can_flags(j_ptr,TR1_INFRA,0x0L,0x0L,0x0L, FALSE);
 	}
-	else object_not_flags(j_ptr,TR1_INFRA,0x0L,0x0L,0x0L);
+	else object_not_flags(j_ptr,TR1_INFRA,0x0L,0x0L,0x0L, FALSE);
 
 	if (f3 & (TR3_LITE))
 	{
-		object_can_flags(j_ptr,0x0L,0x0L,TR3_LITE,0x0L);
+		object_can_flags(j_ptr,0x0L,0x0L,TR3_LITE,0x0L, FALSE);
 	}
-	else object_not_flags(j_ptr,0x0L,0x0L,TR3_LITE,0x0L);
+	else object_not_flags(j_ptr,0x0L,0x0L,TR3_LITE,0x0L, FALSE);
 
 	/* Hack --- also computationally expensive. But note we notice these only if we don't already */
 	/* have these abilities */
-	if ((f3 & (TR3_TELEPATHY)) && !(p_ptr->cur_flags3 & (TR3_TELEPATHY)))) object_can_flags(j_ptr,0x0L,0x0L,TR3_TELEPATHY,0x0L);
-	else object_not_flags(j_ptr,0x0L,0x0L,TR3_TELEPATHY,0x0L);
+	if ((f3 & (TR3_TELEPATHY)) && !(p_ptr->cur_flags3 & (TR3_TELEPATHY)))) object_can_flags(j_ptr,0x0L,0x0L,TR3_TELEPATHY,0x0L, FALSE);
+	else object_not_flags(j_ptr,0x0L,0x0L,TR3_TELEPATHY,0x0L, FALSE);
 
-	if ((f3 & (TR3_SEE_INVIS)) && !(p_ptr->cur_flags3 & (TR3_SEE_INVIS)) && (!p_ptr->tim_invis)) object_can_flags(j_ptr,0x0L,0x0L,TR3_SEE_INVIS,0x0L);
-	else object_not_flags(j_ptr,0x0L,0x0L,TR3_SEE_INVIS,0x0L);
+	if ((f3 & (TR3_SEE_INVIS)) && !(p_ptr->cur_flags3 & (TR3_SEE_INVIS)) && (!p_ptr->tim_invis)) object_can_flags(j_ptr,0x0L,0x0L,TR3_SEE_INVIS,0x0L, FALSE);
+	else object_not_flags(j_ptr,0x0L,0x0L,TR3_SEE_INVIS,0x0L, FALSE);
 #endif
 
 	/* Hack --- the following are either obvious or (relatively) unimportant */
 	if (f3 & (TR3_BLESSED))
 	{
-		object_can_flags(j_ptr,0x0L,0x0L,TR3_BLESSED,0x0L);
+		object_can_flags(j_ptr,0x0L,0x0L,TR3_BLESSED,0x0L, FALSE);
 	}
-	else object_not_flags(j_ptr,0x0L,0x0L,TR3_BLESSED,0x0L);
+	else object_not_flags(j_ptr,0x0L,0x0L,TR3_BLESSED,0x0L, FALSE);
 
-	if (f3 & (TR3_LIGHT_CURSE)) object_can_flags(j_ptr,0x0L,0x0L,TR3_LIGHT_CURSE,0x0L);
-	else object_not_flags(j_ptr,0x0L,0x0L,TR3_LIGHT_CURSE,0x0L);
+	if (f3 & (TR3_LIGHT_CURSE)) object_can_flags(j_ptr,0x0L,0x0L,TR3_LIGHT_CURSE,0x0L, FALSE);
+	else object_not_flags(j_ptr,0x0L,0x0L,TR3_LIGHT_CURSE,0x0L, FALSE);
 
 	/* Check for new flags */
 	n1 = j_ptr->can_flags1 & ~(k1);

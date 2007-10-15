@@ -6360,7 +6360,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 							k = damroll(o_ptr->dd, o_ptr->ds);
 							k *= mult;
 
-							k = tot_dam_aux(o_ptr, k, m_ptr);
+							k = tot_dam_aux(o_ptr, k, m_ptr, TRUE);
 
 							k += critical_shot(o_ptr->weight, o_ptr->to_h + j_ptr->to_h, k);
 							k += o_ptr->to_d + j_ptr->to_d;
@@ -6649,7 +6649,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 					k = damroll(o_ptr->dd, o_ptr->ds);
 
-					k = tot_dam_aux(o_ptr, k, m_ptr);
+					k = tot_dam_aux(o_ptr, k, m_ptr, TRUE);
 
 					k += critical_norm(o_ptr->weight, 2 * o_ptr->to_h, k);
 					k += o_ptr->to_d;

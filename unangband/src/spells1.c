@@ -1520,7 +1520,7 @@ static int set_acid_destroy(object_type *o_ptr)
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 	if (f2 & (TR2_IGNORE_ACID))
 	{
-		object_can_flags(o_ptr,0x0L,TR2_IGNORE_ACID,0x0L,0x0L);
+		object_can_flags(o_ptr,0x0L,TR2_IGNORE_ACID,0x0L,0x0L, FALSE);
 		return (FALSE);
 	}
 	return (TRUE);
@@ -1537,7 +1537,7 @@ static int set_fire_destroy(object_type *o_ptr)
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 	if (f2 & (TR2_IGNORE_FIRE))
 	{
-		object_can_flags(o_ptr,0x0L,TR2_IGNORE_FIRE,0x0L,0x0L);
+		object_can_flags(o_ptr,0x0L,TR2_IGNORE_FIRE,0x0L,0x0L, FALSE);
 		return (FALSE);
 	}
 	return (TRUE);
@@ -1554,7 +1554,7 @@ static int set_cold_destroy(object_type *o_ptr)
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 	if (f2 & (TR2_IGNORE_COLD))
 	{
-		object_can_flags(o_ptr,0x0L,TR2_IGNORE_COLD,0x0L,0x0L);
+		object_can_flags(o_ptr,0x0L,TR2_IGNORE_COLD,0x0L,0x0L, FALSE);
 		return (FALSE);
 	}
 	return (TRUE);
@@ -1576,7 +1576,7 @@ static int set_elec_destroy(object_type *o_ptr)
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 	if (f2 & (TR2_IGNORE_ELEC))
 	{
-		object_can_flags(o_ptr,0x0L,TR2_IGNORE_ELEC,0x0L,0x0L);
+		object_can_flags(o_ptr,0x0L,TR2_IGNORE_ELEC,0x0L,0x0L, FALSE);
 		return (FALSE);
 	}
 	return (TRUE);
@@ -1594,7 +1594,7 @@ static int set_water_destroy(object_type *o_ptr)
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 	if (f2 & (TR2_IGNORE_WATER))
 	{
-		object_can_flags(o_ptr,0x0L,TR2_IGNORE_WATER,0x0L,0x0L);
+		object_can_flags(o_ptr,0x0L,TR2_IGNORE_WATER,0x0L,0x0L, FALSE);
 		return (FALSE);
 	}
 	return (TRUE);
@@ -1939,7 +1939,7 @@ static int minus_ac(int ac)
 	if (f2 & (TR2_IGNORE_ACID))
 	{
 		/* Always notice */
-		object_can_flags(o_ptr,0x0L,TR2_IGNORE_ACID,0x0L,0x0L);
+		object_can_flags(o_ptr,0x0L,TR2_IGNORE_ACID,0x0L,0x0L, FALSE);
 
 		msg_format("Your %s is unaffected!", o_name);
 
@@ -1947,7 +1947,7 @@ static int minus_ac(int ac)
 	}
 
 	/* Always notice */
-	object_not_flags(o_ptr,0x0L,TR2_IGNORE_ACID,0x0L,0x0L);
+	object_not_flags(o_ptr,0x0L,TR2_IGNORE_ACID,0x0L,0x0L, FALSE);
 
 	/* Message */
 	msg_format("Your %s is %s!", o_name, destroy ? "destroyed" : "damaged");
@@ -2566,7 +2566,7 @@ bool player_ignore_terrain(int f_idx)
 			if ((p_ptr->oppose_fire) || (p_ptr->oppose_lava)) ignore = TRUE;
 			else if (f2 & (TR2_RES_FIRE))
 			{
-				object_can_flags(i_ptr, 0x0L, TR2_RES_FIRE, 0x0L, 0x0L);
+				object_can_flags(i_ptr, 0x0L, TR2_RES_FIRE, 0x0L, 0x0L, FALSE);
 				ignore = TRUE;
 			}
 			else if (p_ptr->cur_flags2 & (TR2_IM_FIRE))
@@ -2582,7 +2582,7 @@ bool player_ignore_terrain(int f_idx)
 			if (p_ptr->oppose_acid) ignore = TRUE;
 			else if (f2 & (TR2_RES_ACID))
 			{
-				object_can_flags(i_ptr, 0x0L, TR2_RES_ACID, 0x0L, 0x0L);
+				object_can_flags(i_ptr, 0x0L, TR2_RES_ACID, 0x0L, 0x0L, FALSE);
 				ignore = TRUE;
 			}
 			else if (p_ptr->cur_flags2 & (TR2_IM_ACID))
@@ -2598,7 +2598,7 @@ bool player_ignore_terrain(int f_idx)
 			if (p_ptr->oppose_cold) ignore = TRUE;
 			else if (f2 & (TR2_RES_COLD))
 			{
-				object_can_flags(i_ptr, 0x0L, TR2_RES_COLD, 0x0L, 0x0L);
+				object_can_flags(i_ptr, 0x0L, TR2_RES_COLD, 0x0L, 0x0L, FALSE);
 				ignore = TRUE;
 			}
 			else if (p_ptr->cur_flags2 & (TR2_IM_COLD))
@@ -2615,7 +2615,7 @@ bool player_ignore_terrain(int f_idx)
 			if (p_ptr->oppose_water) ignore = TRUE;
 			else if (f4 & (TR4_RES_WATER))
 			{
-				object_can_flags(i_ptr, 0x0L, 0x0L, 0x0L, TR4_RES_WATER);
+				object_can_flags(i_ptr, 0x0L, 0x0L, 0x0L, TR4_RES_WATER, FALSE);
 				ignore = TRUE;
 			}
 			break;
@@ -2627,17 +2627,17 @@ bool player_ignore_terrain(int f_idx)
 			if ((p_ptr->oppose_water) && (p_ptr->oppose_fire)) ignore = TRUE;
 			else if ((f4 & (TR4_RES_WATER)) && (p_ptr->oppose_fire))
 			{
-				object_can_flags(i_ptr, 0x0L, 0x0L, 0x0L, TR4_RES_WATER);
+				object_can_flags(i_ptr, 0x0L, 0x0L, 0x0L, TR4_RES_WATER, FALSE);
 				ignore = TRUE;
 			}
 			else if ((f2 & (TR2_RES_FIRE)) && (p_ptr->oppose_water))
 			{
-				object_can_flags(i_ptr, 0x0L, TR2_RES_FIRE, 0x0L, 0x0L);
+				object_can_flags(i_ptr, 0x0L, TR2_RES_FIRE, 0x0L, 0x0L, FALSE);
 				ignore = TRUE;
 			}
 			else if ((f4 & (TR4_RES_WATER)) && (f2 & (TR2_RES_FIRE)))
 			{
-				object_can_flags(i_ptr, 0x0L, TR2_RES_FIRE, 0x0L, TR4_RES_WATER);
+				object_can_flags(i_ptr, 0x0L, TR2_RES_FIRE, 0x0L, TR4_RES_WATER, FALSE);
 				ignore = TRUE;
 			}
 
@@ -2940,7 +2940,7 @@ bool apply_disenchant(int mode)
 			   ((o_ptr->number != 1) ? "" : "s"));
 
 		/* Always notice */
-		object_can_flags(o_ptr,0x0L,TR2_IGNORE_MASK,TR3_INSTA_ART,0x0L);
+		object_can_flags(o_ptr,0x0L,TR2_IGNORE_MASK,TR3_INSTA_ART,0x0L, FALSE);
 
 		/* Notice */
 		return (TRUE);
@@ -4607,7 +4607,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					/* Learn about resistences */
 					if (if1 | if2 | if3 | if4)
 					{
-						object_can_flags(o_ptr,if1,if2,if3,if4);
+						object_can_flags(o_ptr,if1,if2,if3,if4, TRUE);
 					}
 
 					/* Item is unbreakable */
@@ -4626,7 +4626,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 							o_ptr->ident |= (IDENT_SENSE);
 						}
 
-						object_can_flags(o_ptr,0x0L,TR2_IGNORE_MASK,0x0L,0x0L);
+						object_can_flags(o_ptr,0x0L,TR2_IGNORE_MASK,0x0L,0x0L, TRUE);
 					}
 
 					/* Check for new flags */
@@ -9866,7 +9866,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				object_flags(o_ptr,&f1,&f2,&f3,&f4);
 
 				/* Sometimes notice theft-protection */
-				if ((rand_int(100)<10) && (f2 & (TR2_IGNORE_THEFT))) object_can_flags(o_ptr,0x0L,TR2_IGNORE_THEFT,0x0L,0x0L);
+				if ((rand_int(100)<10) && (f2 & (TR2_IGNORE_THEFT))) object_can_flags(o_ptr,0x0L,TR2_IGNORE_THEFT,0x0L,0x0L, FALSE);
 
 				/* Skip artifacts */
 				if (f2 & (TR2_IGNORE_THEFT)) continue;
@@ -10019,7 +10019,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			}
 			else if (artifact_p(o_ptr))
 			{
-				if (rand_int(100)<30) object_can_flags(o_ptr,0x0L,0x0L,TR3_INSTA_ART,0x0L);
+				if (rand_int(100)<30) object_can_flags(o_ptr,0x0L,0x0L,TR3_INSTA_ART,0x0L, FALSE);
 			}
 			break;
 		}

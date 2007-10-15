@@ -4616,8 +4616,9 @@ void fake_bag_item(object_type *i_ptr, int sval, int slot)
 		/* Auto-inscribe */
 		if (!i_ptr->note) i_ptr->note = k_info[i_ptr->k_idx].note;
 
-		/* Apply obvious flags, e.g. for throwing items */
-		object_obvious_flags(i_ptr);
+		/* Apply obvious flags, e.g. for throwing items. XXX
+		 * This is, of course, *really dangerous* due to the calls in object_obvious_flags */
+		/* object_obvious_flags(i_ptr); */
 	}
 }
 

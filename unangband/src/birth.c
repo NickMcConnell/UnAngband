@@ -677,7 +677,7 @@ static void player_outfit(void)
 			  }
 			else
 			  {
-			    object_aware(i_ptr);
+			    object_aware(i_ptr, FALSE);
 			    object_known(i_ptr);
 			  }
 
@@ -740,7 +740,7 @@ static void player_outfit(void)
 					else
 					{
 						/* Combine */
-						object_absorb(o_ptr, i_ptr);
+						object_absorb(o_ptr, i_ptr, FALSE);
 					}
 
 					/* Increase the weight by hand */

@@ -2062,7 +2062,7 @@ s16b monster_carry(int m_idx, object_type *j_ptr)
 		if (object_similar(o_ptr, j_ptr))
 		{
 			/* Combine the items */
-			object_absorb(o_ptr, j_ptr);
+			object_absorb(o_ptr, j_ptr, TRUE);
 
 			/* Result */
 			return (this_o_idx);
@@ -3336,13 +3336,13 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		if ((ammo_tval == TV_JUNK) || (ammo_tval == TV_FLASK) || (ammo_tval == TV_POTION)) o_ptr->number = (o_ptr->number + 1) / 2;
 
 		/* Sense magic */
-		o_ptr->feeling = sense_magic(o_ptr,cp_ptr->sense_type,TRUE);
+		o_ptr->feeling = sense_magic(o_ptr,cp_ptr->sense_type,TRUE, TRUE);
 
 		/* Auto-inscribe if necessary */
 		if ((cheat_auto) || (object_aware_p(o_ptr))) o_ptr->note = k_info[ammo_kind].note;
 
 		/* Apply obvious flags */
-		object_obvious_flags(o_ptr);
+		object_obvious_flags(o_ptr, TRUE);
 
 		/* Monster carries the object */
 		ammo = monster_carry(m_idx, o_ptr);

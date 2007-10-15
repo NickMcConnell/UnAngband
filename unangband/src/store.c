@@ -882,7 +882,7 @@ static int home_carry(object_type *o_ptr, int store_index)
 		if (object_similar(j_ptr, o_ptr))
 		{
 			/* Save the new number of items */
-			object_absorb(j_ptr, o_ptr);
+			object_absorb(j_ptr, o_ptr, TRUE);
 
 			/* All done */
 			return (slot);
@@ -1293,7 +1293,7 @@ static void store_create(int store_index)
 			/* Hack -- set in store */
 			i_ptr->ident |= (IDENT_STORE);
 
-			object_aware(i_ptr);
+			object_aware(i_ptr, TRUE);
 			object_known(i_ptr);
 
 			/* Hack -- remove from store */
@@ -2620,7 +2620,7 @@ static void store_purchase(int store_index)
 				store_prt_gold();
 
 				/* Buying an object makes you aware of it */
-				object_aware(i_ptr);
+				object_aware(i_ptr, FALSE);
 
 				/* The object kind is not guessed */
 				k_info[i_ptr->k_idx].guess = 0;
@@ -2944,7 +2944,7 @@ static void store_sell(int store_index)
 			o_ptr->feeling = 0;
 
 			/* Identify original object */
-			object_aware(o_ptr);
+			object_aware(o_ptr, TRUE);
 			object_known(o_ptr);
 
 			/* Combine / Reorder the pack (later) */

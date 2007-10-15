@@ -928,7 +928,7 @@ static void wiz_create_item(void)
 	apply_magic(i_ptr, p_ptr->depth, FALSE, FALSE, FALSE);
 
 	/* Apply obvious flags */
-	object_obvious_flags(i_ptr);
+	object_obvious_flags(i_ptr, TRUE);
 
 	/* Hack -- use repeat count to specify quantity */
 	if (p_ptr->command_arg) i_ptr->number = p_ptr->command_arg;
@@ -1149,7 +1149,7 @@ static void do_cmd_wiz_learn(void)
 			object_prep(i_ptr, i);
 
 			/* Awareness */
-			object_aware(i_ptr);
+			object_aware(i_ptr, TRUE);
 		}
 	}
 }

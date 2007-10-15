@@ -363,7 +363,7 @@ void object_flags(const object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3, u32b *
 /*
  * Set obvious flags for items 
  */
-void object_obvious_flags(object_type *o_ptr)
+void object_obvious_flags(object_type *o_ptr, bool floor)
 {
         u32b f1, f2, f3, f4;
 
@@ -373,9 +373,9 @@ void object_obvious_flags(object_type *o_ptr)
 	/* Fully identified */
         if (o_ptr->ident & (IDENT_MENTAL))
         {
-                object_can_flags(o_ptr, f1, f2, f3, f4);
+                object_can_flags(o_ptr, f1, f2, f3, f4, floor);
 
-                object_not_flags(o_ptr, ~(f1), ~(f2), ~(f3), ~(f4));
+                object_not_flags(o_ptr, ~(f1), ~(f2), ~(f3), ~(f4), floor);
 
 		return;
         }
@@ -394,12 +394,12 @@ void object_obvious_flags(object_type *o_ptr)
 		object_can_flags(o_ptr,x_list[k_info[o_ptr->k_idx].flavor].can_flags1,
 				x_list[k_info[o_ptr->k_idx].flavor].can_flags2,
 				x_list[k_info[o_ptr->k_idx].flavor].can_flags3,
-				x_list[k_info[o_ptr->k_idx].flavor].can_flags4);
+				x_list[k_info[o_ptr->k_idx].flavor].can_flags4, floor);
 
 		object_not_flags(o_ptr,x_list[o_ptr->name1].not_flags1,
 				x_list[k_info[o_ptr->k_idx].flavor].not_flags2,
 				x_list[k_info[o_ptr->k_idx].flavor].not_flags3,
-				x_list[k_info[o_ptr->k_idx].flavor].not_flags4);	
+				x_list[k_info[o_ptr->k_idx].flavor].not_flags4, floor);	
 	}
 
 	/* Identified name */
@@ -411,12 +411,12 @@ void object_obvious_flags(object_type *o_ptr)
 			object_can_flags(o_ptr,a_list[o_ptr->name1].can_flags1,
 					a_list[o_ptr->name1].can_flags2,
 					a_list[o_ptr->name1].can_flags3,
-					a_list[o_ptr->name1].can_flags4);
+					a_list[o_ptr->name1].can_flags4, floor);
 
 			object_not_flags(o_ptr,a_list[o_ptr->name1].not_flags1,
 					a_list[o_ptr->name1].not_flags2,
 					a_list[o_ptr->name1].not_flags3,
-					a_list[o_ptr->name1].not_flags4);
+					a_list[o_ptr->name1].not_flags4, floor);
 		}
 		/* Now we know what it is, update what we know about it from our ego item memory */
 		else if (o_ptr->name2)
@@ -425,18 +425,18 @@ void object_obvious_flags(object_type *o_ptr)
 			object_can_flags(o_ptr,e_info[o_ptr->name2].obv_flags1,
 					 e_info[o_ptr->name2].obv_flags2,
 					 e_info[o_ptr->name2].obv_flags3,
-					 e_info[o_ptr->name2].obv_flags4);
+					 e_info[o_ptr->name2].obv_flags4, floor);
 
 			/* Known flags */
 			object_can_flags(o_ptr,e_list[o_ptr->name2].can_flags1,
 					 e_list[o_ptr->name2].can_flags2,
 					 e_list[o_ptr->name2].can_flags3,
-					 e_list[o_ptr->name2].can_flags4);
+					 e_list[o_ptr->name2].can_flags4, floor);
 			
 			object_not_flags(o_ptr,e_list[o_ptr->name2].not_flags1,
 					 e_list[o_ptr->name2].not_flags2,
 					 e_list[o_ptr->name2].not_flags3,
-					 e_list[o_ptr->name2].not_flags4);
+					 e_list[o_ptr->name2].not_flags4, floor);
 		}
 		/* Hack -- Magic items have an 'obvious' ability for which they are named */
 		else if ((o_ptr->xtra1) && (o_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES) && (o_ptr->feeling < INSCRIP_MIN_HIDDEN))
@@ -456,16 +456,16 @@ void object_obvious_flags(object_type *o_ptr)
 			object_not_flags(o_ptr, ~(o_ptr->can_flags1), 
 				~(o_ptr->can_flags2),
 				~(o_ptr->can_flags3),
-				~(o_ptr->can_flags4));
+				~(o_ptr->can_flags4), floor);
 		}
 	}
 
 	/* Throwing is always obvious */
 	if (f3 & TR3_THROWING)
 	{
-		object_can_flags(o_ptr,0x0L,0x0L,TR3_THROWING,0x0L);
+		object_can_flags(o_ptr,0x0L,0x0L,TR3_THROWING,0x0L, floor);
 	}
-	else object_not_flags(o_ptr,0x0L,0x0L,TR3_THROWING,0x0L);
+	else object_not_flags(o_ptr,0x0L,0x0L,TR3_THROWING,0x0L, floor);
 }
 
 
@@ -4488,7 +4488,7 @@ void object_guess_name(object_type *o_ptr)
  * already known.
  *
  */
-void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
+void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4, bool floor)
 {
 	u32b xf1 = 0, xf2 = 0, xf3 = 0, xf4 = 0;
 	int i;
@@ -4505,7 +4505,7 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 	o_ptr->not_flags4 &= ~(f4);
 
 	/* Clear may flags on all kit - include inventory */
-	for (i = 0; i < INVEN_TOTAL; i++)
+	if (!floor) for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		object_type *i_ptr = &inventory[i];
 
@@ -4550,8 +4550,13 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 			i_ptr->can_flags3 |= (f3);
 			i_ptr->can_flags4 |= (f4);
 
+			o_ptr->can_flags1 |= i_ptr->can_flags1;
+			o_ptr->can_flags2 |= i_ptr->can_flags2;
+			o_ptr->can_flags3 |= i_ptr->can_flags3;
+			o_ptr->can_flags4 |= i_ptr->can_flags4;	
+
 			/* Guess name */
-			object_guess_name(o_ptr);
+			object_guess_name(i_ptr);
 		}
 
 		/* Process objects */
@@ -4571,9 +4576,17 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 			i_ptr->can_flags3 |= (f3);
 			i_ptr->can_flags4 |= (f4);
 
+			o_ptr->can_flags1 |= i_ptr->can_flags1;
+			o_ptr->can_flags2 |= i_ptr->can_flags2;
+			o_ptr->can_flags3 |= i_ptr->can_flags3;
+			o_ptr->can_flags4 |= i_ptr->can_flags4;
+
 			/* Guess name */
-			object_guess_name(o_ptr);
+			object_guess_name(i_ptr);
 		}
+
+		/* Guess name */
+		object_guess_name(o_ptr);
 	}
 
 	/* Must be identified to continue */
@@ -4691,7 +4704,6 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 		n_ptr->may_flags3 &= ~(n_ptr->can_flags3);
 		n_ptr->may_flags4 &= ~(n_ptr->can_flags4);
 	}
-
 }
 
 /*
@@ -4862,7 +4874,7 @@ static void equip_may_flags(u32b f1, u32b f2, u32b f3, u32b f4)
 /*
  * Object does not have flags.
  */
-void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
+void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4, bool floor)
 {
 	int i;
 
@@ -4943,7 +4955,7 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 			i_ptr->may_flags4 &= ~(f4);
 
 			/* Guess name */
-			object_guess_name(o_ptr);
+			object_guess_name(i_ptr);
 		}
 
 		/* Process objects */
@@ -4964,12 +4976,12 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
 			i_ptr->not_flags4 |= (f4);
 
 			/* Guess name */
-			object_guess_name(o_ptr);
+			object_guess_name(i_ptr);
 		}
 	}
 
 	/* Check inventory */
-	inven_may_flags();
+	if (!floor) inven_may_flags();
 
 	/* Must be identified to continue */
 	if (!object_named_p(o_ptr))
@@ -5016,8 +5028,11 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4)
  * Object may have these flags. If only object in equipment
  * to do so, will have these flags. Use for object absorbtion.
  */
-void object_may_flags(object_type *o_ptr, u32b f1,u32b f2,u32b f3, u32b f4)
+void object_may_flags(object_type *o_ptr, u32b f1,u32b f2,u32b f3, u32b f4, bool floor)
 {
+	/* Important: Object must be in inventory */
+	if (floor) return;
+	
 	/* Clear bits with not flags */
 	f1 &= ~(o_ptr->not_flags1);
 	f2 &= ~(o_ptr->not_flags2);
@@ -5127,7 +5142,7 @@ void object_usage(int slot)
 		msg_format("You feel you know more about the %s you are %s.",o_name,describe_use(slot));
 
 		/* Mark the item as partially known */
-		object_bonus(o_ptr);
+		object_bonus(o_ptr, slot < 0);
 
 		/* Recalculate bonuses */
 		p_ptr->update |= (PU_BONUS);
@@ -5206,7 +5221,7 @@ void update_slot_flags(int slot, u32b f1, u32b f2, u32b f3, u32b f4)
 	else i_ptr= &o_list[0-slot];
 
 	/* Update the object */
-	object_can_flags(i_ptr,f1,f2,f3,f4);
+	object_can_flags(i_ptr,f1,f2,f3,f4, slot < 0);
 
 	/* Describe the object */
 	object_desc(o_name, sizeof(o_name), i_ptr, FALSE, 0);
@@ -5339,7 +5354,7 @@ void equip_not_flags(u32b f1,u32b f2,u32b f3, u32b f4)
 		/* Skip non-objects */
 		if (!i_ptr->k_idx) continue;
 
-		object_not_flags(i_ptr,f1,f2,f3,f4);
+		object_not_flags(i_ptr,f1,f2,f3,f4, TRUE);
 	}
 }
 
