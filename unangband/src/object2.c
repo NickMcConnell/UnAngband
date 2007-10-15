@@ -555,8 +555,40 @@ errr get_obj_num_prep(void)
 		/* Accept objects which pass the restriction, if any */
 		if (!get_obj_num_hook || (*get_obj_num_hook)(table[i].index))
 		{
+			int chance = table[i].prob1;
+			int level = k_info[table[i].index].level;
+			
+			/* As objects appear in stacks, their frequency decreases */
+			switch(table[i].index)
+			{
+				case TV_POTION:
+				case TV_SCROLL:
+				case TV_FLASK:
+				{
+					if ((level < 75) && (object_level > level + 9)) chance /= (level >= 50 ? 2 : (level >= 25 ? 4 : 8));
+					else if ((level < 50) && (object_level > level + 4)) chance /= (level >= 25 ? 2 : 4);
+					break;
+				}
+				/* Activatable rings stack */
+				case TV_RING:
+				{
+					if ((k_info[table[i].index].flags3 & (TR3_ACTIVATE | TR3_UNCONTROLLED)) == 0) break;
+					
+					/* Fall through */
+				}
+				case TV_ROD:
+				case TV_STAFF:
+				case TV_WAND:
+				case TV_FOOD:
+				{
+					if (object_level > level + 9) chance /= 3;
+					else if (object_level > level + 4) chance /= 2;
+					break;
+				}		
+			}
+			
 			/* Accept this object */
-			table[i].prob2 = table[i].prob1;
+			table[i].prob2 = chance;
 		}
 
 		/* Do not use this object */
@@ -2253,7 +2285,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 			case 6: case 7: case 8:
 
 				/* Increase to_a */
-				if (o_ptr->to_a
+				if ((o_ptr->to_a || o_ptr->tval == TV_CROWN)
 				    && o_ptr->to_a + sign < o_ptr->ac + 5)
 				  o_ptr->to_a += sign;
 				else tryagain = TRUE;
@@ -3129,13 +3161,13 @@ static void a_m_aux_2(object_type *o_ptr, int level, int power)
 	if (power > 0)
 	{
 		/* Enchant */
-		o_ptr->to_a = MIN(o_ptr->ac, o_ptr->to_a + 5 + toac1);
+		o_ptr->to_a = MIN(o_ptr->tval == TV_CROWN ? 30 : o_ptr->ac + toac1, o_ptr->to_a + 5 + toac1);
 
 		/* Very good */
 		if (power > 1)
 		{
 			/* Enchant again */
-			o_ptr->to_a = MIN(o_ptr->ac, o_ptr->to_a + 5 + toac2);
+			o_ptr->to_a = MIN(o_ptr->tval == TV_CROWN ? 30 : o_ptr->ac + toac2, o_ptr->to_a + 5 + toac2);
 		}
 	}
 
@@ -5500,6 +5532,24 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 
 			/* Hack -- reduce stack sizes of deep items */
 			j_ptr->number /= (k_info[j_ptr->k_idx].level / 25) + 1;
+
+			if (j_ptr->number < 1) j_ptr->number = 1;
+			break;
+		}
+		/* Activatable rings stack */
+		case TV_RING:
+		{
+			if ((k_info[j_ptr->k_idx].flags3 & (TR3_ACTIVATE | TR3_UNCONTROLLED)) == 0) break;
+			
+			/* Fall through */
+		}
+		case TV_ROD:
+		case TV_STAFF:
+		case TV_WAND:
+		case TV_FOOD:
+		{
+			if (object_level > k_info[j_ptr->k_idx].level + 9) j_ptr->number = randint(5);
+			else if (object_level > k_info[j_ptr->k_idx].level + 4) j_ptr->number = randint(3);
 
 			if (j_ptr->number < 1) j_ptr->number = 1;
 			break;

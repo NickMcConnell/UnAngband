@@ -3327,6 +3327,7 @@ void list_object(const object_type *o_ptr, int mode)
 		cptr vp[128];
 		int vt[128];
 		bool vd[128];
+		bool fired = FALSE;
 
 		cptr vp_set_trap = "When set in a trap, it ";
 		cptr vp_throw = "When thrown, it ";
@@ -3408,16 +3409,19 @@ void list_object(const object_type *o_ptr, int mode)
 			case TV_BOLT:
 				vp[vn] = "When fired from a crossbow, it "; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
 				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				fired = TRUE;
 				break;
 
 			case TV_ARROW:
 				vp[vn] = "When fired from a bow, it "; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
 				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				fired = TRUE;
 				break;
 
 			case TV_SHOT:
 				vp[vn] = "When fired from a sling, it "; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
 				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				fired = TRUE;
 				break;
 
 			case TV_SERVICE:
@@ -3492,6 +3496,23 @@ void list_object(const object_type *o_ptr, int mode)
 							o_ptr->tval == TV_ARROW || o_ptr->tval == TV_BOLT)
 							? "edged" : "blunt"));
 					text_out(" damage");
+					if (vp[n] != vp_throw)
+					{
+						switch(o_ptr->tval)
+						{
+							case TV_BOLT:
+								text_out(" times the crossbow multiplier");
+								break;
+		
+							case TV_ARROW:
+								text_out(" times the bow multiplier");
+								break;
+		
+							case TV_SHOT:
+								text_out(" times the sling multiplier");
+								break;
+						}
+					}
 					anything = TRUE;
 					powers = TRUE;
 				}
@@ -5990,6 +6011,20 @@ s32b object_power(const object_type *o_ptr)
 			break;
 		}
 
+		case TV_BOOTS:
+		{
+			/* Bonus for resistance on boots due to terrain protection */
+			ADD_POWER("resist acid",	 3, TR2_RES_ACID, 2, );
+#if 0
+			ADD_POWER("resist elec",	 5, TR2_RES_ELEC, 2, );
+#endif
+			ADD_POWER("resist fire",	 3, TR2_RES_FIRE, 2, );
+			ADD_POWER("resist cold",	 1, TR2_RES_COLD, 2, );
+			ADD_POWER("resist water",	 3, TR2_RES_COLD, 4, );
+
+			/* Fall through */
+		}
+
 		case TV_GLOVES:
 		{
 			/* Note this is 'uncorrected' */
@@ -6030,20 +6065,6 @@ s32b object_power(const object_type *o_ptr)
 
 		}
 
-		case TV_BOOTS:
-		{
-			/* Bonus for resistance on boots due to terrain protection */
-			ADD_POWER("resist acid",	 3, TR2_RES_ACID, 2, );
-#if 0
-			ADD_POWER("resist elec",	 5, TR2_RES_ELEC, 2, );
-#endif
-			ADD_POWER("resist fire",	 3, TR2_RES_FIRE, 2, );
-			ADD_POWER("resist cold",	 1, TR2_RES_COLD, 2, );
-			ADD_POWER("resist water",	 3, TR2_RES_COLD, 4, );
-
-			/* Fall through */
-		}
-
 		case TV_CLOAK:
 		{
 			/* Bonus as we may choose to use a swap armour */
@@ -6064,8 +6085,8 @@ s32b object_power(const object_type *o_ptr)
 			if (o_ptr->ac != k_ptr->ac)
 			{
 				p += o_ptr->ac - k_ptr->ac;
-			}
-
+			}			
+			
 			p += sign(o_ptr->to_h) * ((ABS(o_ptr->to_h) * 2) / 3);
 
 			p += o_ptr->to_d * 2;
@@ -6191,7 +6212,6 @@ s32b object_power(const object_type *o_ptr)
 		case TV_BOOTS:
 		case TV_GLOVES:
 		case TV_HELM:
-		case TV_CROWN:
 		case TV_SHIELD:
 		case TV_CLOAK:
 		case TV_SOFT_ARMOR:
@@ -6219,6 +6239,7 @@ s32b object_power(const object_type *o_ptr)
 			}
 			break;
 		}
+		case TV_CROWN:
 		case TV_SWORD:
 		case TV_DIGGING:
 		case TV_STAFF:
