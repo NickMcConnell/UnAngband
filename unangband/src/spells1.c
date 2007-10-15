@@ -201,6 +201,8 @@ void update_smart_save(int who)
 			/* Learn the flags */
 			m_ptr->smart |= smart;
 
+			msg_format("Debug save: %ld", smart);
+			
 			/* Tell the allies */
 			tell_allies_player_can(m_ptr->fy, m_ptr->fx, smart);
 			
@@ -216,6 +218,8 @@ void update_smart_save(int who)
 			/* Learn the flags */
 			m_ptr->smart &= ~(SM_GOOD_SAVE | SM_PERF_SAVE);
 
+			msg_print("Debug forgetting save");
+			
 			/* Tell the allies */
 			tell_allies_player_not(m_ptr->fy, m_ptr->fx, SM_GOOD_SAVE | SM_PERF_SAVE);			
 		}
@@ -243,6 +247,8 @@ void update_smart_learn(int who, u32b flag)
 
 		/* Learn ability */
 		m_ptr->smart |= flag;
+		
+		msg_format("Debug temporary: %ld", flag);
 		
 		/* Tell the allies */
 		tell_allies_player_can(m_ptr->fy, m_ptr->fx, flag);
