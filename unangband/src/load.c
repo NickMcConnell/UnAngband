@@ -1854,7 +1854,7 @@ u16b limit;
 	}
 
 	/* Place player in dungeon */
-	if (!player_place(py, px))
+	if (!player_place(py, px, FALSE))
 	{
 		note(format("Cannot place player (%d,%d)!", py, px));
 		return (-1);

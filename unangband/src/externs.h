@@ -680,7 +680,7 @@ extern void update_mon(int m_idx, bool full);
 extern void update_monsters(bool full);
 extern s16b monster_carry(int m_idx, object_type *j_ptr);
 extern void monster_swap(int y1, int x1, int y2, int x2);
-extern s16b player_place(int y, int x);
+extern s16b player_place(int y, int x, bool escort_allowed);
 extern void monster_hide(int y, int x, int mmove, monster_type *n_ptr);
 extern s16b monster_place(int y, int x, monster_type *n_ptr);
 extern bool mon_resist_feat(int feat, int r_idx);

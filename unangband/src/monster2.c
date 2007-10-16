@@ -1234,7 +1234,7 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 	else
 	{
 		monster_race monster_race_scaled;
-		cptr prefix = NULL, suffix = NULL;
+		cptr prefix = NULL, suffix = NULL, infix = NULL;
 		int level = r_ptr->level;
 		u32b class = r_ptr->flags2 & (RF2_CLASS_MASK);
 
@@ -1247,7 +1247,7 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 		{
 			r_ptr = &monster_race_scaled;
 		}
-
+		
 		/* Add prefixes to levelled monsters */
 		if (r_ptr->flags9 & (RF9_LEVEL_AGE))
 		{
@@ -1328,6 +1328,26 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 			}
 		}
 
+		/* Add prefixes to non-evil warrior allies in battle. */
+		if ((level_flag & (LF1_BATTLE)) && (m_ptr->mflag & (MFLAG_ALLY)) &&
+				(r_ptr->d_char == 't') && ((r_ptr->flags3 & (RF3_EVIL)) ==0))
+		{
+			/* Use current home if a monstrous race */
+			if (rp_ptr->r_idx)
+			{
+				infix = t_name + t_info[p_ptr->town].name;
+			}
+			/* Use adjective if available */
+			else if (strlen(p_text + rp_ptr->text))
+			{
+				infix = p_text + rp_ptr->text;
+			}
+			/* Otherwise use race name */
+			else
+			{
+				infix = p_name + rp_ptr->name;
+			}
+		}
 
 		/* It could be a Unique */
 		if (r_ptr->flags1 & (RF1_UNIQUE))
@@ -1344,6 +1364,7 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 			/* Indefinite monsters need an indefinite article */
 			my_strcpy(desc, is_a_vowel(prefix ? prefix[0] : name[0]) ? "an " : "a ", max);
 			if (prefix) my_strcat(desc, prefix, max);
+			if (infix) { my_strcat(desc, infix, max); my_strcat(desc, " ", max); }
 			my_strcat(desc, name, max);
 			if (suffix) my_strcat(desc, suffix, max);
 		}
@@ -1354,6 +1375,7 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 			/* Definite monsters need a definite article */
 			my_strcpy(desc, "the ", max);
 			if (prefix) my_strcat(desc, prefix, max);
+			if (infix) { my_strcat(desc, infix, max); my_strcat(desc, " ", max); }
 			my_strcat(desc, name, max);
 			if (suffix) my_strcat(desc, suffix, max);
 		}
@@ -2338,28 +2360,7 @@ void monster_swap(int y1, int x1, int y2, int x2)
 }
 
 
-/*
- * Place the player in the dungeon XXX XXX
- */
-s16b player_place(int y, int x)
-{
-	/* Paranoia XXX XXX */
-	if (cave_m_idx[y][x] != 0) return (0);
 
-	/* Save player location */
-	p_ptr->py = y;
-	p_ptr->px = x;
-
-	/* Mark cave grid */
-	cave_m_idx[y][x] = -1;
-
-	/* Update view if moved outside/inside */
-	p_ptr->outside = ((p_ptr->depth == min_depth(p_ptr->dungeon)) && 
-			(f_info[cave_feat[p_ptr->py][p_ptr->px]].flags3 & (FF3_OUTSIDE)));
-
-	/* Success */
-	return (-1);
-}
 
 /* XXX XXX Checking by blow method is broken currently, because we
  * historically damage monsters even when they are immune to fire etc. So we
@@ -3571,8 +3572,8 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 	/* And start out with full mana */
 	n_ptr->mana = r_ptr->mana;
 
-	/* Monster must wait a while until summoning anything */
-	n_ptr->summoned = 100;
+	/* Monster must wait a while until summoning anything if summoned/wandering */
+	if (character_dungeon) n_ptr->summoned = 100;
 	
 	/* Calculate the monster_speed*/
 	n_ptr->mspeed = calc_monster_speed(cave_m_idx[y][x]);
@@ -3690,6 +3691,16 @@ static bool place_monster_okay(int r_idx)
 
 	monster_race *z_ptr = &r_info[r_idx];
 
+	/* Hack -- player escort */
+	if (!place_monster_idx)
+	{
+		/* Hack -- place warriors/thieves */
+		return ((z_ptr->d_char == 't') &&
+				((z_ptr->flags1 & (RF1_UNIQUE)) == 0) &&
+					((z_ptr->flags2 & (RF2_ARMOR)) != 0) &&
+					((p_ptr->cur_flags4 & (TR4_EVIL)) == ((z_ptr->flags3 & (RF3_EVIL)) != 0)));
+	}
+	
 	/* Group monsters require similar "group" */
 	if (r_ptr->grp_idx)
 	{
@@ -3726,8 +3737,6 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp, u32b fl
 
 	monster_race *r_ptr = &r_info[leader_idx];
 
-	int level = r_ptr->level;
-
 	int hack_n = 0;
 
 	byte hack_y[GROUP_MAX];
@@ -3737,7 +3746,7 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp, u32b fl
 	bool (*get_mon_num_hook_temp)(int r_idx) = get_mon_num_hook;
 
 	/* Calculate the number of escorts we want. */
-	if (r_ptr->flags1 & (RF1_ESCORTS)) escort_size = rand_range(12, 18);
+	if ((r_ptr->flags1 & (RF1_ESCORTS)) || (level_flag & (LF1_BATTLE))) escort_size = rand_range(12, 18);
 	else escort_size = rand_range(4, 6);
 
 	/* Can never have more escorts than maximum group size */
@@ -3804,7 +3813,7 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp, u32b fl
 			hack_n++;
 
 			/* Get index of the next escort */
-			escort_idx = get_mon_num(level);
+			escort_idx = get_mon_num(monster_level);
 		}
 	}
 
@@ -3818,6 +3827,37 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp, u32b fl
 	(void)get_mon_num(monster_level);
 }
 
+
+/*
+ * Place the player in the dungeon XXX XXX
+ */
+s16b player_place(int y, int x, bool escort_allowed)
+{
+	/* Paranoia XXX XXX */
+	if (cave_m_idx[y][x] != 0) return (0);
+
+	/* Save player location */
+	p_ptr->py = y;
+	p_ptr->px = x;
+
+	/* Mark cave grid */
+	cave_m_idx[y][x] = -1;
+
+	/* Update view if moved outside/inside */
+	p_ptr->outside = ((p_ptr->depth == min_depth(p_ptr->dungeon)) && 
+			(f_info[cave_feat[p_ptr->py][p_ptr->px]].flags3 & (FF3_OUTSIDE)));
+
+	/* Place escorts on battle-field */
+	if ((escort_allowed) && (level_flag & (LF1_BATTLE)))
+	{
+		place_monster_escort(y, x, rp_ptr->r_idx, FALSE, (MFLAG_ALLY));
+		
+		msg_print("You are joined by companions in battle.  Many of the bravest will not leave this place.");
+	}
+
+	/* Success */
+	return (-1);
+}
 
 
 /*
@@ -4516,8 +4556,8 @@ bool alloc_monster(int dis, bool slp)
 		if ((!py) || (distance(y, x, py, px) > dis)) break;
 	}
 
-	/* Cave ecology enforced */
-	if (cave_ecology.ready)
+	/* Cave ecology enforced, except where there is no rooms */
+	if ((cave_ecology.ready) && ((level_flag & (LF1_ROOMS)) != 0))
 	{
 		cave_ecology.single_ecology = TRUE;
 
@@ -5249,8 +5289,10 @@ void get_monster_ecology(int r_idx)
 			case 3:
 				if ((r_info[r_idx].flags2 & (RF2_CLASS_MASK)) != 0) break;
 	
-				/* Two thirds of failures match on d_char - the rest use animals */
-				if (rand_int(100) < 66) hack_ecology = 1;
+			case 2:
+			case 1:
+				/* Battle-fields and two thirds of failures match on d_char - the rest use animals */
+				if ((level_flag & (LF1_BATTLE)) || (rand_int(100) < 66)) hack_ecology = 1;
 				else hack_ecology = 2;
 				break;
 		}

@@ -9813,7 +9813,7 @@ static void place_tower()
 		/* Clear previous contents, add dungeon entrance */
 		place_random_stairs(y, x, FEAT_MORE);
 
-		player_place(y, x);
+		player_place(y, x, TRUE);
 	}
 
 	/* Hack -- always have upstairs in surface of tower */
@@ -10325,8 +10325,8 @@ static bool new_player_spot(void)
 	}
 
 	/* Place the player */
-	player_place(y, x);
-	
+	player_place(y, x, TRUE);
+
 	return (TRUE);
 }
 
@@ -10624,7 +10624,7 @@ static bool place_contents()
 
 	/* Pick a base number of monsters */
 	/* Strongholds and sewers have more monsters */
-	i = MIN_M_ALLOC_LEVEL + randint(8 * (((level_flag & (LF1_STRONGHOLD | LF1_SEWER)) != 0) ? 2 : 1));
+	i = MIN_M_ALLOC_LEVEL + randint(8 * (((level_flag & (LF1_STRONGHOLD | LF1_SEWER | LF1_BATTLE)) != 0) ? 2 : 1));
 
 	/* Generating */
 	if (cheat_room) msg_print("Placing monsters.");
@@ -11134,7 +11134,7 @@ static void town_gen_hack(void)
 	place_random_stairs(y, x, FEAT_ENTRANCE);
 
 	/* Place the player */
-	player_place(y, x);
+	player_place(y, x, TRUE);
 
 	/* Sometimes we have to place upstairs as well */
 	if (((t_info[p_ptr->dungeon].zone[0].tower) &&

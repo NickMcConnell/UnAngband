@@ -366,6 +366,20 @@ void print_routes(const s16b *route, int num, int y, int x)
 
 
 /*
+ * This gives either the route, or a replacement route if one is defined.
+ */
+int actual_route(int town)
+{
+	while(t_info[t_info[town].replace_ifvisited].visited)
+	{
+		town = t_info[town].replace_with;
+	}
+	
+	return (town);
+}
+
+
+/*
  * Set routes
  *
  * Set up the possible routes from this location.
@@ -503,21 +517,6 @@ int set_routes(s16b *routes, int max_num, int from)
 
 	/* Return number of routes */
 	return(num);
-}
-
-
-
-/*
- * This gives either the route, or a replacement route if one is defined.
- */
-int actual_route(int town)
-{
-	while(t_info[t_info[town].replace_ifvisited].visited)
-	{
-		town = t_info[town].replace_with;
-	}
-	
-	return (town);
 }
 
 

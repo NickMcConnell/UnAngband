@@ -492,7 +492,7 @@ G:C
 R:ESCORT
 Q:42:235
 Z:42:42
-L:20:420:56:153:235:0
+L:20:414:56:153:235:0
 D:Five great armies have gathered at the promise of Smaug's riches hidden in the
 D: Lonely Mountain. Meanwhile the mouth of Moria has opened and vomitted forth its hordes.
 
