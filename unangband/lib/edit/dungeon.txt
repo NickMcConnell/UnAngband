@@ -500,6 +500,8 @@ R:EVIL
 L:40:420:56:420:474:44
 L:41:56:0:0:0:44
 L:65:56:0:0:645:44
+D:You have disturbed a terrible evil here... much has gone wrong with the land
+D: since its waking.
 
 N:49:Morannon
 X:25:50:0:0
@@ -527,6 +529,9 @@ Y:475:7
 Q:42:475
 L:0:0:530:153:0:0
 S:509:516:517:11:12:13:268:508
+D:The Dale-landers are a hardy people, living as they do under the twin shadows
+D: of the Lonely Mountain and Dol Guldur.  Of the two, many treasure hunters risk
+D: the wrath of Smaug but only the most foolhardy seek anything at Dol Guldur.
 
 # Extend the LotR quests to give starters more
 # 'breathing space'.
