@@ -508,6 +508,20 @@ int set_routes(s16b *routes, int max_num, int from)
 
 
 /*
+ * This gives either the route, or a replacement route if one is defined.
+ */
+int actual_route(int town)
+{
+	while(t_info[t_info[town].replace_ifvisited].visited)
+	{
+		town = t_info[town].replace_with;
+	}
+	
+	return (town);
+}
+
+
+/*
  * Travel to a different dungeon.
  *
  * This whole thing is a hack -- I haven't decided how elegant it is yet.

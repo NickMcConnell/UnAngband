@@ -110,7 +110,7 @@ L:14:0:435:0:566:0
 S:269:0:0:0:0:0:0:0
 
 N:5:Mirkwood
-X:4:6:0:0
+X:4:6:52:0
 G:l
 R:CAN_CLIMB
 L:14:420:56:153:637:0
@@ -135,6 +135,7 @@ X:8:52:0:0
 R:DRAGON
 G:B
 Q:9:475
+Z:47:9
 L:20:435:56:154:0:0
 L:21:56:0:0:0:0
 L:38:56:0:0:475:0
@@ -143,7 +144,7 @@ D: air... Smaug has taken flight. You desperately
 D: cower for cover on the open mountainside... he
 D: wheels once, twice over you and departs. In the
 D: distance, you see smoke start to rise as Lake-
-D: town burns.
+D:town burns.
 
 # With disasterous consequences.
 
@@ -200,7 +201,7 @@ L:5:420:154:126:0:0
 # It gets replaced by a gate after the Battle of Five Armies
 
 N:14:the mines of Moria
-X:2:0:0:0
+X:2:42:0:0
 Z:16:42
 L:6:49:397:56:0:0
 L:7:56:0:0:0:0
@@ -484,15 +485,16 @@ L:60:148:145:0:0:0
 
 N:47:the Battle of Five Armies
 X:52:48:14:0
-Z:42:235
 G:C
 R:ESCORT
 Q:42:235
 Z:42:42
 L:20:420:56:153:235:0
+D:Five great armies have gathered at the promise of Smaug's riches hidden in the
+D: Lonely Mountain.
 
 N:48:Dol Guldur
-X:20:17:0:0
+X:52:7:20:17
 G:q
 R:EVIL
 L:40:420:56:420:474:44
@@ -520,7 +522,7 @@ R:EVIL
 L:80:407:218:208:511:0
 
 N:52:the Dale
-X:47:0:0:0
+X:5:6:14:48
 Y:475:7
 Q:42:475
 L:0:0:530:153:0:0

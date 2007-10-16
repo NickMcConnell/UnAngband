@@ -5049,15 +5049,6 @@
 	((play_info[Y][X] & (PLAY_FIRE)) != 0)
 
 
-
-/*
- * This gives either the route, or a replacement route if one is defined.
- */
-#define actual_route(X) \
-	((t_info[(X)].replace_ifvisited) && \
-			(t_info[t_info[(X)].replace_ifvisited].visited) ? \
-			t_info[(X)].replace_ifvisited : (X))
-
 /*
  * This gives either the zone guard, or a replacement guardian, if one is defined.
  */
