@@ -3552,28 +3552,32 @@ void monster_death(int m_idx)
 	}
 
 	/* Dungeon guardian defeated - need some stairs except on surface */
-	if ((r_ptr->flags1 & (RF1_GUARDIAN)) && (p_ptr->depth != min_depth(p_ptr->dungeon)))
+	if (r_ptr->flags1 & (RF1_GUARDIAN))
 	{
-	  /* Stagger around */
-	  while (!cave_valid_bold(y, x) && !cave_clean_bold(y,x))
-	    {
-	      int d = 1;
-
-	      /* Pick a location */
-	      scatter(&ny, &nx, y, x, d, 0);
-
-	      /* Stagger */
-	      y = ny; x = nx;
-	    }
-
-	  /* Explain the staircase */
-	  msg_print("A magical staircase appears...");
-
-	  /* Create stairs down */
-	  cave_set_feat(y, x, FEAT_MORE);
-
-	  /* Save any objects in that place */
-	  scatter_objects_under_feat(y, x);
+		/* Generate stairs if path is opened from this location */
+		if ((p_ptr->depth != min_depth(p_ptr->dungeon)) && (t_info[p_ptr->dungeon].quest_monster == m_ptr->r_idx))
+		{
+			/* Stagger around */
+			while (!cave_valid_bold(y, x) && !cave_clean_bold(y,x))
+		    {
+				int d = 1;
+	
+				/* Pick a location */
+				scatter(&ny, &nx, y, x, d, 0);
+	
+		    	/* Stagger */
+				y = ny; x = nx;
+		    }
+	
+		  /* Explain the staircase */
+		  msg_print("A magical staircase appears...");
+	
+		  /* Create stairs down */
+		  cave_set_feat(y, x, FEAT_MORE);
+	
+		  /* Save any objects in that place */
+		  scatter_objects_under_feat(y, x);
+		}
 	}
 
 

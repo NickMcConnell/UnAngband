@@ -3621,25 +3621,27 @@ void play_game(bool new_game)
 
 		for (i = 0; i < z_info->t_max; i++)
 		{
-			int ii, guard;
+			int guard;
 			
-			guard = t_info[i].replace_guardian;
+			guard = t_info[i].quest_monster;
 
+			/* Only 'quest monsters' get marked as guardians, as this is used to
+			 * indicate 'stair generation' at death to open up a new route.
+			 */
 			if (guard)
 			{
 				r_info[guard].flags1 |= (RF1_GUARDIAN | RF1_UNIQUE);
 				if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
 			}
 			
-			for (ii = 0; ii < MAX_DUNGEON_ZONES;ii++)
+			/* However, we must ensure that town lockup monsters are
+			 * unique to allow the town to be unlocked later.
+			 */
+			guard = t_info[i].town_lockup_monster;
+			if (guard)
 			{
-				guard = t_info[i].zone[ii].guard;
-
-				if (guard)
-				{
-					r_info[guard].flags1 |= (RF1_GUARDIAN | RF1_UNIQUE);
-					if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
-				}
+				r_info[guard].flags1 |= (RF1_UNIQUE);
+				if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
 			}
 		}
 	}
