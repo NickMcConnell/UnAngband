@@ -3549,16 +3549,16 @@ void do_cmd_store(void)
 		switch(store_index % 4)
 		{
 			case 0:
-				closed_reason =	"A sign reads 'No animals allowed'.";
+				closed_reason = "You can't open the shop door in this form.";
 				break;
 			case 1:
-				closed_reason =	"The shopkeeper chases you out with a broom.";
+				closed_reason =	"A sign reads 'No animals allowed'.";
 				break;
 			case 2:
-				closed_reason = "The shopkeeper feeds you a scrap, picks you up and puts you gently down outside.";
+				closed_reason =	"The shopkeeper chases you out with a broom.";
 				break;
 			case 3:
-				closed_reason = "You can't open the shop door in this form.";
+				closed_reason = "The shopkeeper feeds you a scrap, picks you up and puts you gently down outside.";
 				break;
 		}
 		msg_print(closed_reason);
@@ -3573,6 +3573,9 @@ void do_cmd_store(void)
 		
 		switch(store_index % 4)
 		{
+			case 0:
+				closed_reason = "The shop front has been damaged by %s and boarded up.";
+				break;
 			case 1:
 				closed_reason =	"A sign reads 'Closed for business due to %s.'";
 				break;
@@ -3581,9 +3584,6 @@ void do_cmd_store(void)
 				break;
 			case 3:
 				closed_reason = "'It's not safe here with %s about.' the shopkeeper whispers before closing the shutters.";
-				break;
-			case 4:
-				closed_reason = "The shop front has been damaged by %s and boarded up.";
 				break;
 		}
 		
@@ -3598,6 +3598,9 @@ void do_cmd_store(void)
 		
 		switch(store_index % 4)
 		{
+			case 0:
+				closed_reason = "A sign reads 'Trespassers not welcome. Signed %s.'";
+				break;
 			case 1:
 				closed_reason =	"The door is locked. %s must be about.";
 				break;
@@ -3606,9 +3609,6 @@ void do_cmd_store(void)
 				break;
 			case 3:
 				closed_reason = "'Come back when %s isn't around.' a voice whispers before closing the shutters.";
-				break;
-			case 4:
-				closed_reason = "A sign reads 'Trespassers not welcome. Signed %s.'";
 				break;
 		}
 		
