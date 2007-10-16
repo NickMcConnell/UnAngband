@@ -11699,8 +11699,33 @@ void generate_cave(void)
 	/* Redraw state */
 	p_ptr->redraw |= (PR_STATE);
 
-	/* Set this dungeon as visited */
-	t_info[p_ptr->dungeon].visited = TRUE;
+	/* Notify the player of changes to the map */
+	if (!t_info[p_ptr->dungeon].visited)
+	{
+		/* This breaks for Angband */
+		if (p_ptr->dungeon) for (i = 0; i < z_info->t_max; i++)
+		{
+			if (t_info[i].replace_ifvisited == p_ptr->dungeon)
+			{
+				msg_format("%^s has fallen.", t_name + t_info[i].name);
+				msg_format("%^s now stands in its place.", t_name + t_info[t_info[i].replace_with].name);
+			}
+
+			if ((t_info[i].town_lockup_ifvisited == p_ptr->dungeon) && (r_info[t_info[i].town_lockup_monster].max_num > 0))
+			{
+				msg_format("%^s now terrorizes %s.", r_name + r_info[t_info[i].town_lockup_monster].name, t_name + t_info[i].name);
+			}
+			
+			if ((t_info[i].guardian_ifvisited == p_ptr->dungeon) && (r_info[t_info[i].replace_guardian].max_num > 0))
+			{
+				msg_format("%^s now guards %s.", r_name + r_info[t_info[i].replace_guardian].name, t_name + t_info[i].name);
+			}
+		}
+		
+		/* Set this dungeon as visited */
+		t_info[p_ptr->dungeon].visited = TRUE;
+		
+	}
 	
 	/* Set maximum depth for this dungeon */
 	if (t_info[p_ptr->dungeon].max_depth < p_ptr->depth - min_depth(p_ptr->dungeon))
