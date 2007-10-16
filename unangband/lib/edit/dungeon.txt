@@ -177,6 +177,7 @@ S:507:0:0:0:0:0:0:0
 
 N:11:Bree
 X:38:39:56:0
+Q:35:546
 W:440:48
 Y:440:48
 L:0:0:407:408:0:0
@@ -362,30 +363,41 @@ L:79:56:209:0:595:0
 
 N:33:Orodruin
 X:32:34:0:0
+Q:2:546
 R:BRTH_FIRE
 L:79:432:218:218:0:0
 L:80:56:218:218:0:0
 L:99:56:218:218:546:0
+D:You can choose to confront Sauron here, deep in the blasted bowels of this mountain.
 
 N:34:Barad-dur
-X:33:35:0:0
+X:33:0:0:0
+Q:2:546
 G:M
 R:EVIL
 L:65:409:218:216:541:20
 L:66:56:218:216:0:20
 L:99:56:218:216:546:20
+D:You can choose to confront Sauron here, high in a tower lit by a flaming eye.
 
-N:35:Hobbiton
-X:36:0:0:0
-G:h
-L:60:0:407:159:532:0
+N:35:Hobbiton, in ruins
+X:11:53:0:0
+Q:36:532
+Z:36:36
+G:g
+L:99:0:407:159:532:0
 S:516:517:14:266:509:0:0:0
+D:Someone with a silver-tongue and guile-ful words has brought fair Hobbiton to 
+D:its knees in a whir of devilish industry and foul pollution.
 
 N:36:Hobbiton, rebuilt
-X:36:0:0:0
+X:63:0:0:0
 G:h
 L:0:0:407:153:0:0
 S:264:515:265:266:772:773:774:0
+D:One last challenge awaits, to visit Angband to defeat an ancient evil.  Or you 
+D:can choose to sail from here into the West and let another take on the might of
+D:Morgoth.
 
 # The following are accessible from the first Hobbiton for consistency
 
@@ -519,6 +531,7 @@ S:509:516:517:11:12:13:268:508
 
 N:53:Buckland
 X:40:54:0:0
+Q:35:546
 G:h
 R:ANIMAL
 L:0:0:420:408:0:0
@@ -608,6 +621,7 @@ D:Drums. Drums. Drums in the deep.
 
 N:62:Angband
 X:43:0:0:0
+Q:63:547
 L:0:0:407:0:0:0
 L:1:56:0:0:0:0
 L:100:56:0:0:547:0
