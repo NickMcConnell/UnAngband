@@ -75,11 +75,15 @@ D:It feels like home...
 # Alternate starting dungeon.
 
 N:1:Hobbiton
-X:10:53:57:58
+X:10:57:0:0
+Q:58:111
 G:h
 L:0:0:411:153:0:0
 S:264:515:265:266:772:773:0:0
-D:Here your adventure begins.
+D:Here your adventure begins.  You can travel to Farmer Maggot's Farm or 
+D:the East Road from here - the easiest route by far is the East Road and 
+D:then to Bree.  Press < to travel from any town, or when near the edge of 
+D:the larger wilderness locations.
 
 N:2:Rivendell
 X:3:13:14:17
@@ -162,16 +166,17 @@ D:grateful townsfolk.
 #The following levels are from the Fellowship of the Ring.
 
 N:10:Farmer Maggot's farm
-X:1:58:0:0
+X:1:0:0:0
 G:,
 R:ANIMAL
+Q:58:111
 L:2:0:435:0:4:0
 L:3:114:0:0:0:0
 L:6:114:0:0:111:0
 S:507:0:0:0:0:0:0:0
 
 N:11:Bree
-X:57:38:39:56
+X:38:39:56:0
 W:440:48
 Y:440:48
 L:0:0:407:408:0:0
@@ -385,7 +390,7 @@ S:264:515:265:266:772:773:774:0
 # The following are accessible from the first Hobbiton for consistency
 
 N:37:Bree
-X:38:39:56:57
+X:38:39:56:0
 W:440:48
 Y:440:48
 L:0:0:407:408:0:0
@@ -513,7 +518,7 @@ S:509:516:517:11:12:13:268:508
 # 'breathing space'.
 
 N:53:Buckland
-X:40:54:58:0
+X:40:54:0:0
 G:h
 R:ANIMAL
 L:0:0:420:408:0:0
@@ -592,7 +597,7 @@ D: Moria, from the outside.  Your only choice is to press onwards.  And downward
 
 N:61:Khazad-Dum
 X:60:0:0:0
-Q:483:18
+Q:18:483
 L:31:1:141:0:483:0
 L:32:56:141:0:0:0
 L:49:56:141:0:0:0
