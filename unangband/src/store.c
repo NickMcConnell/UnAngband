@@ -3544,7 +3544,7 @@ void do_cmd_store(void)
 	/* Hack -- Check the "locked doors". Restrict unusual shapes. */
 	if (p_ptr->pshape >= z_info->g_max)
 	{
-		cptr closed_reason;
+		cptr closed_reason = 0; /* to silence a warning */
 		
 		switch(store_index % 4)
 		{
@@ -3569,7 +3569,7 @@ void do_cmd_store(void)
 	if ((t_ptr->town_lockup_monster) && (r_info[t_ptr->town_lockup_monster].max_num > 0)
 		&& (!(t_ptr->town_lockup_ifvisited) || t_info[t_ptr->town_lockup_ifvisited].visited))
 	{
-		cptr closed_reason;
+		cptr closed_reason = 0; /* to silence a warning */
 		
 		switch(store_index % 4)
 		{
@@ -3594,7 +3594,7 @@ void do_cmd_store(void)
 	/* Doors locked if guardian about */
 	if ((actual_guardian(zone->guard, p_ptr->dungeon)) && (r_info[actual_guardian(zone->guard, p_ptr->dungeon)].cur_num > 0))
 	{
-		cptr closed_reason;
+		cptr closed_reason = 0; /* to silence a warning */
 		
 		switch(store_index % 4)
 		{

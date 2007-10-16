@@ -3693,8 +3693,6 @@ static void calc_bonuses(void)
 			
 			/* Paranoia */
 			if (p_ptr->num_fire < 0) p_ptr->num_fire = 0;
-			
-			if (p_ptr->ammo_mult < 0) p_ptr->ammo_mult = 0;
 		}
 	}
 

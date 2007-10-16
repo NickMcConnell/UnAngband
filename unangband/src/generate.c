@@ -1067,7 +1067,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	
 	int offset = ((flag & (MAZE_CRYPT | MAZE_CAVE)) != 0) && (rand_int(100) < 50) ? 1 : 0;
 	
-	s16b *saved;
+	s16b *saved = 0; /* to silence the warning */
 
 	int solid = ((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) ? feat_state(feat_wall, FS_SOLID) : 0;	
 	int inner = ((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) ? feat_state(feat_wall, FS_INNER) : feat_wall;
@@ -1419,6 +1419,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 			if (!k) break;
 			
 			/* Convert coordinates */
+			/* FIXME: ty and tx may be uninitialized here!!! */
 			y = ty;
 			x = tx;
 			j = YPOS(y, y1);
@@ -1428,6 +1429,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 			if (loops)
 			{
 				/* Place floors */
+			        /* FIXME: dy and dx may be uninitialized here!!! */
 				for (yi = j - (dy < 0 ? width_wall + width_path : 0); yi < j + (dy < 0 ? 0 : width_path) + (dy > 0 ? width_wall + width_path : 0); yi++)
 				{
 					for (xi = i - (dx < 0 ? width_wall + width_path : 0); xi < i + (dx < 0 ? 0 : width_path) + (dx > 0 ? width_wall + width_path : 0); xi++)
