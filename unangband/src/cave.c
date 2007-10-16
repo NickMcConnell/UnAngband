@@ -4987,7 +4987,7 @@ void town_illuminate(bool daytime)
 	}
 
 	/* Megahack --- darkness brings out the bad guys */
-	if ((!daytime) && (zone->guard) && (r_info[zone->guard].cur_num <= 0))
+	if ((!daytime) && actual_guardian(zone->guard, p_ptr->dungeon) && (r_info[actual_guardian(zone->guard, p_ptr->dungeon)].cur_num <= 0))
 	{
 		int y, x;
 
@@ -5001,7 +5001,7 @@ void town_illuminate(bool daytime)
 		}
 
 		/* Place the questor */
-		place_monster_aux(y, x, zone->guard, TRUE, TRUE, 0L);
+		place_monster_aux(y, x, actual_guardian(zone->guard, p_ptr->dungeon), TRUE, TRUE, 0L);
 	}
 
 	/* Fully update the visuals */
@@ -6652,7 +6652,7 @@ void init_level_flags(void)
 
 	/* Add 'common' level flags */
 	if (zone->tower) level_flag |= (LF1_TOWER);
-	if ((zone->guard) && (r_info[zone->guard].max_num > 0)) level_flag |= (LF1_GUARDIAN);
+	if (actual_guardian(zone->guard, p_ptr->dungeon) && (r_info[actual_guardian(zone->guard, p_ptr->dungeon)].max_num > 0)) level_flag |= (LF1_GUARDIAN);
 	if (is_quest(p_ptr->depth)) level_flag |= (LF1_QUEST);
 
 	/* Define town */

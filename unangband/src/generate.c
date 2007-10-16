@@ -10777,7 +10777,7 @@ static bool cave_gen(void)
 		/* Place guardian if permitted */
 		if ((level_flag & (LF1_GUARDIAN)) != 0)
 		{
-			init_ecology(zone->guard);
+			init_ecology(actual_guardian(zone->guard, p_ptr->dungeon));
 		}
 		/* Place any monster */
 		else
@@ -10866,10 +10866,12 @@ static bool cave_gen(void)
 	/* Ensure guardian monsters */
 	if (((level_flag & (LF1_GUARDIAN)) != 0) && ((level_flag & (LF1_DAYLIGHT)) == 0))
 	{
-		int y, x;
+		int y, x, guard;
+		
+		guard = actual_guardian(zone->guard, p_ptr->dungeon);
 
 		/* Generating */
-		if (cheat_room) msg_print("Placing guardian.");
+		if (cheat_room) msg_format("Placing guardian (%s).", r_name + r_info[guard].name);
 
 		/* Pick a location */
 		while (1)
@@ -10877,11 +10879,11 @@ static bool cave_gen(void)
 			y = rand_int(DUNGEON_HGT);
 			x = rand_int(DUNGEON_WID);
 
-			if (place_monster_here(y, x, zone->guard) > MM_FAIL) break;
+			if (place_monster_here(y, x, guard) > MM_FAIL) break;
 		}
 
 		/* Place the questor */
-		place_monster_aux(y, x, zone->guard, FALSE, TRUE, 0L);
+		place_monster_aux(y, x, guard, FALSE, TRUE, 0L);
 	}
 
 	/* Generating */
@@ -11250,18 +11252,24 @@ static bool town_gen(void)
 	/* Ensure guardian monsters */
 	if (((level_flag & (LF1_GUARDIAN)) != 0) && ((level_flag & (LF1_DAYLIGHT)) == 0))
 	{
+		int y, x, guard;
+		
+		guard = actual_guardian(zone->guard, p_ptr->dungeon);
+
+		/* Generating */
+		if (cheat_room) msg_format("Placing guardian (%s).", r_name + r_info[guard].name);
+
 		/* Pick a location */
 		while (1)
 		{
 			y = rand_range(3, TOWN_HGT - 4);
 			x = rand_range(3, TOWN_WID - 4);
 
-			/* Require a "naked" floor grid */
-			if (cave_naked_bold(y, x)) break;
+			if (place_monster_here(y, x, guard) > MM_FAIL) break;
 		}
 
 		/* Place the questor */
-		place_monster_aux(y, x, zone->guard, FALSE, TRUE, 0L);
+		place_monster_aux(y, x, guard, FALSE, TRUE, 0L);
 	}
 	else
 	{

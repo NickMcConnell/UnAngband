@@ -3621,13 +3621,25 @@ void play_game(bool new_game)
 
 		for (i = 0; i < z_info->t_max; i++)
 		{
-			int ii;
+			int ii, guard;
+			
+			guard = t_info[i].replace_guardian;
 
+			if (guard)
+			{
+				r_info[guard].flags1 |= (RF1_GUARDIAN | RF1_UNIQUE);
+				if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
+			}
+			
 			for (ii = 0; ii < MAX_DUNGEON_ZONES;ii++)
 			{
-				int guard = t_info[i].zone[ii].guard;
+				guard = t_info[i].zone[ii].guard;
 
-				if (guard) r_info[guard].flags1 |= RF1_GUARDIAN;
+				if (guard)
+				{
+					r_info[guard].flags1 |= (RF1_GUARDIAN | RF1_UNIQUE);
+					if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
+				}
 			}
 		}
 	}

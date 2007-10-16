@@ -392,13 +392,16 @@ int set_routes(s16b *routes, int max_num, int from)
 		/* Add nearby route */
 		for (i = 0; i < MAX_NEARBY; i++)
 		{
-			if (t_ptr->nearby[i]) routes[num++] = t_ptr->nearby[i];
+			if (t_ptr->nearby[i])
+			{
+				routes[num++] = actual_route(t_ptr->nearby[i]);
+			}
 		}
 		
 		/* Add quest route if possible */
 		if ((t_ptr->quest_monster) && (!r_info[t_ptr->quest_monster].max_num) && (t_ptr->quest_opens))
 		{
-				routes[num++] = t_ptr->quest_opens;
+				routes[num++] = actual_route(t_ptr->quest_opens);
 		}
 	}
 
@@ -411,7 +414,7 @@ int set_routes(s16b *routes, int max_num, int from)
 			if ((inventory[i].k_idx) && (inventory[i].tval == TV_MAP))
 			{
 				/* Add map routes */
-				routes[num++] = inventory[i].sval;
+				routes[num++] = actual_route(inventory[i].sval);
 			}
 
 			/* Check for bags for maps */
@@ -424,7 +427,7 @@ int set_routes(s16b *routes, int max_num, int from)
 					if ((bag_holds[inventory[i].sval][ii][0] == TV_MAP) && (bag_contents[inventory[i].sval][ii]))
 					{
 						/* Add route */
-						routes[num++] = bag_holds[inventory[i].sval][ii][1];
+						routes[num++] = actual_route(bag_holds[inventory[i].sval][ii][1]);
 					}
 				}
 			}
@@ -448,22 +451,6 @@ int set_routes(s16b *routes, int max_num, int from)
 	/* Add routes further away if visited, while in campaign mode */
 	if (adult_campaign) for (i = 0; i < num; i++)
 	{
-		/* Scan and repace routes that are 'overrun' */
-		for (ii = i; ii < num; ii++)
-		{
-			/* Check if this route is not replaced */
-			if (!(t_info[routes[ii]].replace_with)) continue;
-
-			/* Replace route */
-			if (t_info[t_info[routes[ii]].ifvisited].visited)
-			{
-				routes[ii] = t_info[routes[ii]].replace_with;
-				
-				/* Check new route as well */
-				ii--;
-			}
-		}
-		
 		/* Only add routes from visited locations */
 		if (!t_info[routes[i]].visited) continue;
 		
@@ -474,14 +461,14 @@ int set_routes(s16b *routes, int max_num, int from)
 			if (!(t_info[routes[i]].nearby[ii]) || (t_info[routes[i]].nearby[ii] == p_ptr->dungeon)) continue;
 			
 			/* Add the route */
-			routes[num++] = t_info[routes[i]].nearby[ii];
+			routes[num++] = actual_route(t_info[routes[i]].nearby[ii]);
 		}
 		
 		/* Add quest route if possible */
 		if ((num < max_num) &&
 				(t_info[routes[i]].quest_monster) && (!r_info[t_info[routes[i]].quest_monster].max_num) && (t_info[routes[i]].quest_opens))
 		{
-				routes[num++] = t_info[routes[i]].quest_opens;
+				routes[num++] = actual_route(t_info[routes[i]].quest_opens);
 		}
 
 		/* Scan and remove duplicate routes and routes looping back to start */

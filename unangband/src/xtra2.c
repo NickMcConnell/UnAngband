@@ -6904,6 +6904,7 @@ int max_depth(int dungeon)
 	return (zone->level);
 }
 
+
 int town_depth(int dungeon)
 {
 	town_type *t_ptr=&t_info[dungeon];
@@ -6926,9 +6927,6 @@ void get_zone(dungeon_zone **zone_handle, int dungeon, int depth)
 	town_type *t_ptr = &t_info[dungeon];
 	dungeon_zone *zone = &t_ptr->zone[0];
 	int i;
-
-	/* Hack -- handle towers */
-	if (depth < min_depth(dungeon)) depth = 2 * min_depth(dungeon) - depth;
 
 	/* Get the zone */	
 	for (i = 0;i<MAX_DUNGEON_ZONES;i++)
