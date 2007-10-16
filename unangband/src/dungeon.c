@@ -3621,12 +3621,12 @@ void play_game(bool new_game)
 
 		for (i = 0; i < z_info->t_max; i++)
 		{
-			int guard;
+			int guard, ii;
 			
 			guard = t_info[i].quest_monster;
 
-			/* Only 'quest monsters' get marked as guardians, as this is used to
-			 * indicate 'stair generation' at death to open up a new route.
+			/* Mark map quest monsters as 'unique guardians'. This allows
+			 * the map quests to be completed successfully.
 			 */
 			if (guard)
 			{
@@ -3642,6 +3642,28 @@ void play_game(bool new_game)
 			{
 				r_info[guard].flags1 |= (RF1_UNIQUE);
 				if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
+			}
+			
+			for (ii = 0; ii < MAX_DUNGEON_ZONES; ii++)
+			{
+				/*
+				 * And we ensure dungeon mini-bosses are marked as
+				 * guardians, so that they do not appear elsewhere
+				 */
+				guard = t_info[i].zone[ii].guard;
+				if (guard)
+				{
+					r_info[guard].flags1 |= (RF1_GUARDIAN);
+				}
+			}
+
+			/*
+			 * And this includes 'replacement' mini-bosses.
+			 */
+			guard = t_info[i].replace_guardian;
+			if (guard)
+			{
+				r_info[guard].flags1 |= (RF1_GUARDIAN);
 			}
 		}
 	}

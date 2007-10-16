@@ -2969,7 +2969,7 @@ void player_birth(void)
 	
 	/* Hack -- set the dungeon. */
 	if (adult_campaign) p_ptr->dungeon = 1;
-	else p_ptr->dungeon = 0;
+	else p_ptr->dungeon = z_info->t_max - 2;
 
 	/* Set last disturb */
 	p_ptr->last_disturb = turn;

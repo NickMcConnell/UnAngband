@@ -128,10 +128,9 @@ D:The locals eye you suspiciously, afraid of treasure-hunters
 D:who would disturb the Lonely Mountain at great risk to all.
 
 # We disturb Smaug while entering his lair...
-# Note Smaug is out of depth by 10 levels at bottom.
 
 N:7:the Lonely Mountain
-X:8:52:48:0
+X:8:52:41:48
 R:DRAGON
 G:B
 Q:9:475
@@ -163,8 +162,6 @@ L:0:0:155:152:0:0
 S:509:516:517:11:12:13:506:508
 D:Visit the statue to collect a reward from the 
 D:grateful townsfolk.
-
-#The following levels are from the Fellowship of the Ring.
 
 N:10:Farmer Maggot's farm
 X:1:0:0:0
@@ -221,7 +218,7 @@ D:Since Gandalf closed the path created by the Goblins through the Misty Mountai
 D: this has been the only route through.  In summer, it is passable.  Now, however,
 D: the storms of the mountain echo around you.  Turn back, while you can!
 
-N:16:the gates of Moria
+N:16:the west gates of Moria
 X:15:17:0:0
 L:21:49:397:56:0:0
 L:22:56:393:0:0:0
@@ -400,19 +397,17 @@ D:One last challenge awaits, to visit Angband to defeat an ancient evil.  Or you
 D:can choose to sail from here into the West and let another take on the might of
 D:Morgoth.
 
-# The following are accessible from the first Hobbiton for consistency
+### 37 is now inaccessible and should be removed at some point ###
 
 N:37:Bree
 X:38:39:56:0
-W:440:48
-Y:440:48
 L:0:0:407:408:0:0
 L:1:56:0:0:0:0
 L:6:56:0:0:620:0
 S:8:9:10:11:12:13:268:775
 
 N:38:Barrow-downs
-X:11:12:11:40
+X:11:12:38:40
 L:7:420:420:56:0:0
 L:8:56:0:0:0:0
 L:20:56:0:0:1081:0
@@ -423,24 +418,32 @@ L:4:420:420:155:343:0
 L:5:56:0:0:344:0
 L:6:56:0:0:345:0
 
-N:40:the Old Forest
-X:38:53:54:0
-Q:55:602
-R:ANIMAL
-L:6:420:420:153:0:0
+N:40:the east gates of Moria
+X:15:17:0:0
+Z:61:61
+L:40:49:397:56:0:0
+D:The door to Moria is closed from this direction, as Thorin has
+D: returned to Moria to claim his bequest with dragon-gold.  You
+D: may be able to find the door to Moria from the west, from
+D: Rivendell.  There is nothing here for you.
 
-# And the same dungeon accessible from the LOtR quest.
+### The east gates of Moria before they are closed ###
 
-N:41:Barrow-downs
-X:11:12:40:0
-L:7:420:420:56:0:0
-L:8:56:0:0:0:0
-L:20:56:0:0:1081:0
+N:41:the mines of Moria
+X:2:7:52:0
+Z:40:42
+L:6:49:397:56:0:0
+L:7:56:0:0:0:0
+L:24:56:0:0:262:0
+D:In older days, the gates to Moria were always open, and a meeting point for dwarves, men and
+D: elves.  The doors now stand ajar, but the mines behind them are home to only fouler things.
 
 N:42:the vaults of Erebor
-X:52:48:0:0
+X:52:41:48:0
 L:21:0:56:1:0:0
-L:40:0:56:0:0:0
+L:22:56:0:0:0:0
+L:40:56:0:0:0:0
+S:897:897:897:897:897:897:0:0
 D:The innermost vaults of the dwarven city of Erebor,
 D: ripped open by the casting down of the mountainside
 D: by Thorin, crushing many thousands of orcs and turning
@@ -491,7 +494,7 @@ Q:42:235
 Z:42:42
 L:20:420:56:153:235:0
 D:Five great armies have gathered at the promise of Smaug's riches hidden in the
-D: Lonely Mountain.
+D: Lonely Mountain. Meanwhile the mouth of Moria has opened and vomitted forth its hordes.
 
 N:48:Dol Guldur
 X:52:7:20:17
@@ -524,7 +527,7 @@ R:EVIL
 L:80:407:218:208:511:0
 
 N:52:the Dale
-X:5:6:48:0
+X:5:6:40:48
 Y:475:7
 Q:42:475
 L:0:0:530:153:0:0
@@ -533,11 +536,8 @@ D:The Dale-landers are a hardy people, living as they do under the twin shadows
 D: of the Lonely Mountain and Dol Guldur.  Of the two, many treasure hunters risk
 D: the wrath of Smaug but only the most foolhardy seek anything at Dol Guldur.
 
-# Extend the LotR quests to give starters more
-# 'breathing space'.
-
 N:53:Buckland
-X:40:54:0:0
+X:38:54:0:0
 Q:35:546
 G:h
 R:ANIMAL
@@ -545,7 +545,7 @@ L:0:0:420:408:0:0
 S:8:9:10:11:12:13:268:778
 
 N:54:a clearing in the Old Forest
-X:38:40:53:0
+X:38:53:0:0
 R:PLANT
 Q:55:622
 L:6:0:420:153:622:0
