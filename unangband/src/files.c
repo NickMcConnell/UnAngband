@@ -4684,6 +4684,9 @@ bool queue_tip(cptr tip)
 	/* Path buffer */
 	char path[1024];
 
+	/* Check show tips option */
+	if (!show_tips) return (FALSE);
+	
 	/* Have no space for tips */
 	if (tips_end == tips_start - 1) return (FALSE);
 	
