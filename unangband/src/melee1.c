@@ -5996,22 +5996,30 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	/* Monster updates */
 	if (who > SOURCE_MONSTER_START)
 	{
-		/* Learn Player Resists */
-		if (attack < 128)
+		/* Ensure only learn this about the player */
+		/* TODO: Its possible to learn stuff about the player while targetting them even
+		 * if the monster doesn't successfully hit them or see the player. This needs to
+		 * be improved.
+		 */
+		if (target < 0)
 		{
-			  update_smart_memory(who, spell_smart_RF4[attack-96]);
-		}
-		else if (attack < 160)
-		{
-			  update_smart_memory(who, spell_smart_RF5[attack-128]);
-		}
-		else if (attack < 192)
-		{
-			  update_smart_memory(who, spell_smart_RF6[attack-160]);
-		}
-		else if (attack < 224)
-		{
-			  update_smart_memory(who, spell_smart_RF7[attack-192]);
+			/* Learn Player Resists */
+			if (attack < 128)
+			{
+				  update_smart_memory(who, spell_smart_RF4[attack-96]);
+			}
+			else if (attack < 160)
+			{
+				  update_smart_memory(who, spell_smart_RF5[attack-128]);
+			}
+			else if (attack < 192)
+			{
+				  update_smart_memory(who, spell_smart_RF6[attack-160]);
+			}
+			else if (attack < 224)
+			{
+				  update_smart_memory(who, spell_smart_RF7[attack-192]);
+			}
 		}
 
 		/* Mark minimum desired range for recalculation */
