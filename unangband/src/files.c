@@ -5417,6 +5417,9 @@ static void death_examine(void)
 		screen_object(o_ptr);
 
 		(void)anykey();
+		
+		/* Needed to handle bags */
+		notice_stuff();
 
 		/* Load the screen */
 		screen_load();
