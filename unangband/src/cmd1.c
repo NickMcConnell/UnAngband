@@ -666,6 +666,12 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 /*
  * Find a secret at the specified location and change it according to
  * the state.
+ * 
+ * TODO: Its very repetitive having to walk up a corridor and find
+ * every square is dusty. We should flow out from the initial secret
+ * and find all other nearby squares that have the same feature, and
+ * reveal the secrets on those as well. e.g. adjacent secret doors,
+ * dusty corridors, deep water and so on.
  */
 void find_secret(int y, int x)
 {
@@ -3035,11 +3041,9 @@ void move_player(int dir, int jumping)
 				((f_ptr->flags2 & (FF2_FILLED)) ? "" :
 					(is_a_vowel(name[0]) ? "an " : "a ")),name);
 
+			play_info[y][x] |= (PLAY_MARK);
 
-				play_info[y][x] |= (PLAY_MARK);
-
-				lite_spot(y, x);
-
+			lite_spot(y, x);
 		}
 
 		/* Mention known obstacles */
@@ -3055,6 +3059,14 @@ void move_player(int dir, int jumping)
 			msg_format("There is %s%s blocking your way.",
 				((f_ptr->flags2 & (FF2_FILLED)) ? "" :
 				(is_a_vowel(name[0]) ? "an " : "a ")),name);
+			
+			/* If the mimiced feature appears movable, reveal secret */
+			if (((((f_info[mimic].flags1 & (FF1_MOVE)) != 0) ||
+				((f_info[mimic].flags3 & (FF3_EASY_CLIMB)) != 0))
+				&& ((f_ptr->flags1 & (FF1_SECRET)) != 0)))
+			{
+				find_secret(y, x);
+			}
 		}
 	}
 
