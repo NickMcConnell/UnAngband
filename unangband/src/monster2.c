@@ -3697,7 +3697,7 @@ static bool place_monster_okay(int r_idx)
 		/* Hack -- place warriors/thieves */
 		return ((z_ptr->d_char == 't') &&
 				((z_ptr->flags1 & (RF1_UNIQUE)) == 0) &&
-					((z_ptr->flags2 & (RF2_ARMOR)) != 0) &&
+					((z_ptr->flags2 & (RF2_SNEAKY)) == 0) &&
 					((p_ptr->cur_flags4 & (TR4_EVIL)) == ((z_ptr->flags3 & (RF3_EVIL)) != 0)));
 	}
 	
@@ -4410,17 +4410,17 @@ bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp, u32b flg)
 			}
 		}
 	}
+	/* Friends for certain monsters and battlefields */
+	else if (((r_ptr->flags1 & (RF1_FRIENDS)) != 0) || (((level_flag & (LF1_BATTLE)) != 0)))
+	{
+		/* Attempt to place a large group */
+		(void)place_monster_group(y, x, r_idx, slp, (s16b)rand_range(3, 5), flg);
+	}
 	/* A friend for certain monsters */
 	else if (r_ptr->flags1 & (RF1_FRIEND))
 	{
 		/* Attempt to place a second monster */
 		(void)place_monster_group(y, x, r_idx, slp, 2, flg);
-	}
-	/* Friends for certain monsters */
-	else if (r_ptr->flags1 & (RF1_FRIENDS))
-	{
-		/* Attempt to place a large group */
-		(void)place_monster_group(y, x, r_idx, slp, (s16b)rand_range(3, 5), flg);
 	}
 
 	/* Escorts for certain monsters */

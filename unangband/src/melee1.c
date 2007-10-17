@@ -1902,6 +1902,68 @@ void mon_blow_ranged(int who, int what, int x, int y, int method, int range, int
 
 
 /*
+ * Update monster's knowledge of a flag. This is used when a monster has potentially learnt that
+ * a player has or has not got the associated flags.
+ * 
+ * TODO: Note extreme similarity to player_smart_cheat and maybe combine.
+ *
+ * TODO: Note that update_smart_learn and update_smart_forget are also very similar and
+ * could potentially be combined. This may be inefficient and those functions may be required
+ * for more direct manipulation of the smart flags.
+ */
+static void update_smart_memory(int who, u32b flag)
+{
+	u32b all_flags, has_flags, not_flags;
+	
+	/* Paranoia */
+	if (!flag) return;
+	
+	/* Monster notices ability */
+	if (who > SOURCE_MONSTER_START)
+	{
+	 	monster_type *m_ptr = &m_list[who];
+	 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	 	/* Too stupid to learn anything */
+ 		if (r_ptr->flags2 & (RF2_STUPID)) return;
+
+	 	/* Not intelligent, only learn sometimes */
+ 		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return;
+
+ 		/* Get smart flags */
+ 		all_flags = player_smart_flags(p_ptr->cur_flags1, p_ptr->cur_flags2, p_ptr->cur_flags3, p_ptr->cur_flags4);
+ 		
+ 		/* Know weirdness */
+ 		if (!p_ptr->msp) all_flags |= (SM_IMM_MANA);
+ 		if (p_ptr->skill_sav >= 75) all_flags |= (SM_GOOD_SAVE);
+ 		if (p_ptr->skill_sav >= 100) all_flags |= (SM_PERF_SAVE);
+
+ 		/* Know temporary effects */
+ 		if (p_ptr->oppose_acid) all_flags |= (SM_OPP_ACID);
+ 		if (p_ptr->oppose_elec) all_flags |= (SM_OPP_ELEC);
+ 		if (p_ptr->oppose_fire) all_flags |= (SM_OPP_FIRE);
+ 		if (p_ptr->oppose_cold) all_flags |= (SM_OPP_COLD);
+ 		if (p_ptr->oppose_pois) all_flags |= (SM_OPP_POIS);
+ 		if (p_ptr->free_act) all_flags |= (SM_FREE_ACT);
+ 		if (p_ptr->hero) all_flags |= (SM_OPP_FEAR);
+ 		if (p_ptr->shero) all_flags |= (SM_OPP_FEAR);
+
+		/* Learn abilities */
+		has_flags = flag & (all_flags);
+		
+		/* Learn abilities not possessed */
+		not_flags = flag & ~(all_flags);
+		
+		/* Prefer not flags */
+		if (not_flags) tell_allies_player_not(m_ptr->fy, m_ptr->fx, not_flags);
+		
+		/* Tell the allies */
+		else if (has_flags) tell_allies_player_can(m_ptr->fy, m_ptr->fx, has_flags);
+	}
+}
+
+
+/*
  * Monster attempts to make a ranged (non-melee) attack.
  * TODO: join with other (monster?) attack routines
  *
@@ -5937,19 +5999,19 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* Learn Player Resists */
 		if (attack < 128)
 		{
-			  update_smart_learn(who, spell_desire_RF4[attack-96][D_RES]);
+			  update_smart_memory(who, spell_smart_RF4[attack-96]);
 		}
 		else if (attack < 160)
 		{
-			  update_smart_learn(who, spell_desire_RF5[attack-128][D_RES]);
+			  update_smart_memory(who, spell_smart_RF5[attack-128]);
 		}
 		else if (attack < 192)
 		{
-			  update_smart_learn(who, spell_desire_RF6[attack-160][D_RES]);
+			  update_smart_memory(who, spell_smart_RF6[attack-160]);
 		}
 		else if (attack < 224)
 		{
-			  update_smart_learn(who, spell_desire_RF7[attack-192][D_RES]);
+			  update_smart_memory(who, spell_smart_RF7[attack-192]);
 		}
 
 		/* Mark minimum desired range for recalculation */

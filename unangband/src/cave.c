@@ -6641,9 +6641,13 @@ bool is_quest(int level)
 void init_level_flags(void)
 {
 	dungeon_zone *zone=&t_info[0].zone[0];
+	int guard;
 
 	/* Get the zone */
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+
+	/* Get the guardian */
+	guard = actual_guardian(zone->guard, p_ptr->dungeon);
 
 	/* Set night and day level flag */
 	level_flag =  (p_ptr->depth == min_depth(p_ptr->dungeon)) ?
@@ -6652,7 +6656,7 @@ void init_level_flags(void)
 
 	/* Add 'common' level flags */
 	if (zone->tower) level_flag |= (LF1_TOWER);
-	if (actual_guardian(zone->guard, p_ptr->dungeon) && (r_info[actual_guardian(zone->guard, p_ptr->dungeon)].max_num > 0)) level_flag |= (LF1_GUARDIAN);
+	if (guard && (r_info[guard].max_num > 0)) level_flag |= (LF1_GUARDIAN);
 	if (is_quest(p_ptr->depth)) level_flag |= (LF1_QUEST);
 
 	/* Define town */
@@ -6719,9 +6723,12 @@ void init_level_flags(void)
 	if ((p_ptr->depth > 20) && (level_flag & (LF1_SURFACE))) level_flag |= (LF1_DESTROYED);
 
 	/* Hack -- All levels with escorts are 'battlefields' */
-	if (RF1_ESCORT & (1L << (t_info[p_ptr->dungeon].r_flag-1))) level_flag |= (LF1_BATTLE);
-	if (RF1_ESCORTS & (1L << (t_info[p_ptr->dungeon].r_flag-1))) level_flag |= (LF1_BATTLE);
-
+	if (t_info[p_ptr->dungeon].r_flag <= 32)
+	{
+		if (RF1_ESCORT & (1L << (t_info[p_ptr->dungeon].r_flag-1))) level_flag |= (LF1_BATTLE);
+		if (RF1_ESCORTS & (1L << (t_info[p_ptr->dungeon].r_flag-1))) level_flag |= (LF1_BATTLE);
+	}
+		
 	/* Surface battlefields don't have rooms, but do have paths across the level */
 	if (((level_flag & (LF1_SURFACE)) != 0) && ((level_flag & (LF1_BATTLE)) != 0)) level_flag &= ~(LF1_ROOMS);
 

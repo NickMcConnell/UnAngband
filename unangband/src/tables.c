@@ -3347,6 +3347,9 @@ const cptr disease_name[33] =
  *
  * This range is considered a preference if d_range in spell_desire is > 0.
  * It is a hard limit if d_range = 0.
+ * 
+ * Note that _RF4 tables are non-constant due to updating the blow effects
+ * for each monster type.
  */
 
 /*{Mana_cost,dam_mult,dam_div,dam_var,best_range}*/
@@ -3448,7 +3451,7 @@ const byte spell_info_RF6[32][5]=
 	{4,     0,     0,     0,     0},        /* RF6_ILLUSION */
 	{4,     5,     2,     6,     6},        /* RF6_WOUND */
 	{2,     0,     0,     0,     0},        /* RF6_BLESS */
-	{3,     0,     0,     0,     0},        /* RF6_BESERK */
+	{3,     0,     0,     0,     0},        /* RF6_BERSERK */
 	{4,     0,     0,     0,     0},        /* RF6_SHIELD */
 	{3,     0,     0,     0,     0},        /* RF6_OPPOSE_ELEM */
 	{2,     0,     0,     0,     0},        /* RF6_HUNGER */
@@ -3618,7 +3621,7 @@ const byte spell_desire_RF6[32][8] =
 	{ 30,  0,   0,   0,	0,   0, GF_HALLU,  100}, /* RF6_ILLUSION*/
 	{ 40,  0,   0,   0,	0,   0, GF_HURT,  100}, /* RF6_WOUND	    */
 	{ 50,  0,   0,   0,	0,   0,	   0	  ,  100}, /* RF6_BLESS	    */
-	{ 50,  0,   0,   0,	0,   0,	   0	  ,  100}, /* RF6_BESERK    */
+	{ 50,  0,   0,   0,	0,   0,	   0	  ,  100}, /* RF6_BERSERK    */
 	{ 50,  0,   0,   0,	0,   0,	   0	  ,  100}, /* RF6_SHIELD    */
 	{ 50,  0,   0,   0,	0,   0,	   0	  ,  100}, /* RF6_OPPOSE_ELEM */
 	{ 25,  0,   0,   0,	0,   0,	GF_HUNGER,  100}, /* RF6_HUNGER    */
@@ -3668,6 +3671,154 @@ const byte spell_desire_RF7[32][8] =
 	{ 0,   18,  0,   0,	0,   0,	   0	  ,  100}  /* RF7_S_WRAITH  */
 };
 
+/*
+ * Note that this table should stop being const if we define in the
+ * learn_resist function.
+ */
+const u32b spell_smart_RF4[32] =
+{
+	0L ,
+	0L ,
+	0L ,
+	0L ,
+	0L ,
+	0L ,
+	0L ,
+	0L ,
+	(SM_IMM_ACID | SM_RES_ACID | SM_OPP_ACID), /* RF4_BRTH_ACID */
+	(SM_IMM_ELEC | SM_RES_ELEC | SM_OPP_ELEC), /* RF4_BRTH_ELEC */
+	(SM_IMM_FIRE | SM_RES_FIRE | SM_OPP_FIRE), /* RF4_BRTH_FIRE */
+	(SM_IMM_COLD | SM_RES_COLD | SM_OPP_COLD), /* RF4_BRTH_COLD */
+	(SM_IMM_POIS | SM_RES_POIS | SM_OPP_POIS), /* RF4_BRTH_POIS */
+	(SM_RES_SOUND), /* RF4_BRTH_PLAS */
+	(SM_RES_BLIND | SM_RES_LITE), /* RF4_BRTH_LITE */
+	(SM_RES_BLIND | SM_RES_DARK), /* RF4_BRTH_DARK */
+	(SM_RES_CONFU), /* RF4_BRTH_CONFU*/
+	(SM_RES_SOUND), /* RF4_BRTH_SOUND*/
+	(SM_RES_SHARD), /* RF4_BRTH_SHARD*/
+	0L , /* RF4_BRTH_INER */
+	0L , /* RF4_BRTH_GRAV */
+	(SM_RES_CONFU), /* RF4_BRTH_WIND */
+	(SM_RES_SOUND), /* RF4_BRTH_FORCE*/
+	(SM_RES_NEXUS), /* RF4_BRTH_NEXUS*/
+	(SM_RES_NETHR), /* RF4_BRTH_NETHR*/
+	(SM_RES_CHAOS | SM_RES_NETHR | SM_RES_CONFU), /* RF4_BRTH_CHAOS*/
+	(SM_RES_DISEN), /* RF4_BRTH_DISEN*/
+	0L , /* RF4_BRTH_TIME */
+	0L , /* RF4_BRTH_MANA */
+	0L , /* RF4_BRTH_HOLY */
+	(SM_RES_ACID | SM_OPP_ACID), /* RF4_BRTH_FEAR */
+	0L   /* RF4_BRTH_DISEASE */
+};
+
+const u32b spell_smart_RF5[32] =
+{
+	(SM_IMM_ACID | SM_RES_ACID | SM_OPP_ACID), /* RF5_BALL_ACID */
+	(SM_IMM_ELEC | SM_RES_ELEC | SM_OPP_ELEC), /* RF5_BALL_ELEC */
+	(SM_IMM_FIRE | SM_RES_FIRE | SM_OPP_FIRE), /* RF5_BALL_FIRE */
+	(SM_IMM_COLD | SM_RES_COLD | SM_OPP_COLD), /* RF5_BALL_COLD */
+	(SM_IMM_POIS | SM_RES_POIS | SM_OPP_POIS), /* RF5_BALL_POIS */
+	(SM_RES_BLIND | SM_RES_LITE), /* RF5_BALL_LITE */
+	(SM_RES_BLIND | SM_RES_DARK), /* RF5_BALL_DARK */
+	(SM_RES_CONFU), /* RF5_BALL_CONFU*/
+	(SM_RES_SOUND), /* RF5_BALL_SOUND*/
+	(SM_RES_SHARD), /* RF5_BALL_SHARD*/
+	(SM_RES_CONFU), /* RF5_BALL_WIND */
+	(SM_IMM_ELEC | SM_RES_ELEC | SM_OPP_ELEC | SM_RES_SOUND | SM_RES_CONFU), /* RF5_BALL_STORM*/
+	(SM_RES_NETHR), /* RF5_BALL_NETHR*/
+	(SM_RES_CHAOS | SM_RES_NETHR | SM_RES_CONFU), /* RF5_BALL_CHAOS*/
+	0L , /* RF5_BALL_MANA */
+	(SM_RES_SOUND | SM_RES_CONFU), /* RF5_BALL_WATER*/
+	(SM_IMM_ACID | SM_RES_ACID | SM_OPP_ACID), /* RF5_BOLT_ACID */
+	(SM_IMM_ELEC | SM_RES_ELEC | SM_OPP_ELEC), /* RF5_BOLT_ELEC */
+	(SM_IMM_FIRE | SM_RES_FIRE | SM_OPP_FIRE), /* RF5_BOLT_FIRE */
+	(SM_IMM_COLD | SM_RES_COLD | SM_OPP_COLD), /* RF5_BOLT_COLD */
+	(SM_IMM_POIS | SM_RES_POIS | SM_OPP_POIS), /* RF5_BOLT_POIS */
+	(SM_RES_SOUND), /* RF5_BOLT_PLAS */
+	(SM_IMM_COLD | SM_RES_COLD | SM_OPP_COLD | SM_RES_SOUND | SM_RES_SHARD), /* RF5_BOLT_ICE  */
+	(SM_RES_SOUND | SM_RES_CONFU), /* RF5_BOLT_WATER*/
+	(SM_RES_NETHR), /* RF5_BOLT_NETHR*/
+	0L , /* RF5_BOLT_MANA */
+	0L , /* RF5_HOLY_ORB*/
+	(SM_IMM_ELEC | SM_RES_ELEC | SM_OPP_ELEC), /* RF5_BEAM_ELEC */
+	(SM_IMM_COLD | SM_RES_COLD | SM_OPP_COLD | SM_RES_SOUND | SM_RES_SHARD), /* RF5_BEAM_ICE  */
+	(SM_RES_NETHR), /* RF5_BEAM_NETHR*/
+	(SM_IMM_FIRE | SM_RES_FIRE | SM_OPP_FIRE | SM_RES_DARK),  /* RF5_ARC_HFIRE*/
+	(SM_RES_SOUND) 	/* RF5_ARC_FORCE */
+};
+
+
+const u32b spell_smart_RF6[32] =
+{
+	0L , /* RF6_HASTE	    */
+	(SM_IMM_MANA), /* RF6_ADD_MANA  */
+	0L , /* RF6_HEAL	    */
+	0L , /* RF6_CURE	    */
+	0L , /* RF6_BLINK	    */
+	0L , /* RF6_TPORT	    */
+	(SM_SEE_INVIS), /* RF6_INVIS	    */
+	0L , /* RF6_TELE_SELF_TO*/
+	0L , /* RF6_TELE_TO   */
+	0L , /* RF6_TELE_AWAY */
+	0L , /* RF6_TELE_LEVEL */
+	0L , /* RF6_WRAITHFORM*/
+	(SM_RES_DARK), /* RF6_DARKNESS  */
+	0L , /* RF6_TRAPS	    */
+	(SM_GOOD_SAVE | SM_PERF_SAVE), /* RF6_FORGET    */
+	(SM_IMM_MANA), /* RF6_DRAIN_MANA*/
+	(SM_GOOD_SAVE | SM_PERF_SAVE), /* RF6_CURSE	    */
+	0L , /* RF6_DISPEL   */
+	(SM_GOOD_SAVE | SM_PERF_SAVE), /* RF6_MIND_BLAST*/
+	(SM_GOOD_SAVE | SM_PERF_SAVE | SM_RES_CONFU), /* RF6_ILLUSION*/
+	(SM_GOOD_SAVE | SM_PERF_SAVE), /* RF6_WOUND	    */
+	0L , /* RF6_BLESS	    */
+	0L , /* RF6_BERSERK    */
+	0L , /* RF6_SHIELD    */
+	(SM_OPP_ACID | SM_OPP_FIRE | SM_OPP_ELEC | SM_OPP_COLD), /* RF6_OPPOSE_ELEM */
+	(SM_GOOD_SAVE | SM_PERF_SAVE), /* RF6_HUNGER    */
+	0L , /* RF6_PROBE	    */
+	(SM_GOOD_SAVE | SM_PERF_SAVE | SM_RES_FEAR | SM_OPP_FEAR), /* RF6_SCARE	 */
+	(SM_GOOD_SAVE | SM_PERF_SAVE | SM_RES_BLIND), /* RF6_BLIND	  */
+	(SM_GOOD_SAVE | SM_PERF_SAVE | SM_RES_CONFU), /* RF6_CONF	  */
+	(SM_GOOD_SAVE | SM_PERF_SAVE | SM_FREE_ACT), /* RF6_SLOW	 */
+	(SM_GOOD_SAVE | SM_PERF_SAVE | SM_FREE_ACT) /* RF6_HOLD	*/
+};
+
+const u32b spell_smart_RF7[32] =
+{
+	0L , /* RF7_S_KIN	    */
+	0L , /* RF7_R_KIN	    */
+	0L , /* RF7_A_DEAD    */
+	0L , /* RF7_S_MONSTER */
+	0L , /* RF7_S_MONSTERS*/
+	0L , /* RF7_R_MONSTER */
+	0L , /* RF7_R_MONSTERS*/
+	0L , /* RF7_S_PLANT   */
+	0L , /* RF7_S_INSECT  */
+	0L , /* RF7_S_ANIMAL  */
+	0L , /* RF7_S_HOUND   */
+	0L , /* RF7_S_SPIDER  */
+	0L , /* RF7_S_CLASS   */
+	0L , /* RF7_S_RACE    */
+	0L , /* RF7_S_ELEMENT */
+	0L , /* RF7_S_FRIEND  */
+	0L , /* RF7_S_FRIENDS */
+	0L , /* RF7_S_ORC     */
+	0L , /* RF7_S_TROLL   */
+	0L , /* RF7_S_GIANT   */
+	0L , /* RF7_S_DRAGON  */
+	0L , /* RF7_S_HI_DRAGON*/
+	0L , /* RF7_A_ELEMENT */
+	0L , /* RF7_A_OBJECT  */
+	0L , /* RF7_S_DEMON   */
+	0L , /* RF7_S_HI_DEMON*/
+	0L , /* RF7_R_UNIQUE  */
+	0L , /* RF7_S_UNIQUE  */
+	0L , /* RF7_S_HI_UNIQUE */
+	0L , /* RF7_S_UNDEAD  */
+	0L , /* RF7_S_HI_UNDEAD*/
+	0L   /* RF7_S_WRAITH  */
+};
 
 /*
  * Define which element the monster belongs to.

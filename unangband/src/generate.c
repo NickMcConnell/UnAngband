@@ -9648,9 +9648,9 @@ static void init_ecology(int r_idx)
 
 	/* Count of different non-unique monsters in ecology */
 	k = (MIN_ECOLOGY_RACES / 2) + rand_int((MIN_ECOLOGY_RACES + 1) / 2);
-
+	
 	/* Initialise ecology based on seed race */
-	if ((r_idx) && ((level_flag & (LF1_BATTLE)) == 0))
+	if (r_idx)
 	{
 		/* Get seed monster for ecology */
 		get_monster_ecology(r_idx);
@@ -9702,28 +9702,20 @@ static void init_ecology(int r_idx)
 		/* Not enough different monsters */
 		if ((k >= 0) && (cave_ecology.num_races < MAX_ECOLOGY_RACES))
 		{
-			/* Hack -- battlefield monsters continue to honour the same hook */
-			if ((level_flag & (LF1_BATTLE)) != 0)
-			{
-				/* Set monster hook */
-				get_mon_num_hook = dun_level_mon;
+			/* Set monster hook */
+			get_mon_num_hook = dun_level_mon;
 
-				/* Prepare allocation table */
-				get_mon_num_prep();
-			}
+			/* Prepare allocation table */
+			get_mon_num_prep();
 
 			/* Get seed monster for ecology */
 			get_monster_ecology(0);
 
-			/* Hack -- battlefield monsters continue to honour the same hook */
-			if ((level_flag & (LF1_BATTLE)) != 0)
-			{
-				/* Clear monster hook */
-				get_mon_num_hook = NULL;
+			/* Clear monster hook */
+			get_mon_num_hook = NULL;
 
-				/* Prepare allocation table */
-				get_mon_num_prep();
-			}
+			/* Prepare allocation table */
+			get_mon_num_prep();
 		}
 		else
 		{
@@ -10866,7 +10858,7 @@ static bool cave_gen(void)
 	}
 
 	/* Ensure guardian monsters */
-	if (((level_flag & (LF1_GUARDIAN)) != 0) && ((level_flag & (LF1_DAYLIGHT)) == 0))
+	if ((level_flag & (LF1_GUARDIAN)) != 0)
 	{
 		int y, x, guard;
 		

@@ -126,8 +126,6 @@ void player_can_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
 		/* Get the flags */
 		smart = player_smart_flags(f1, f2, f3, f4);
 
-		msg_format("Debug: %ld", smart);
-		
 		/* Learn the flags */
 		m_ptr->smart |= smart;
 
@@ -201,8 +199,6 @@ void update_smart_save(int who)
 			/* Learn the flags */
 			m_ptr->smart |= smart;
 
-			msg_format("Debug save: %ld", smart);
-			
 			/* Tell the allies */
 			tell_allies_player_can(m_ptr->fy, m_ptr->fx, smart);
 			
@@ -218,8 +214,6 @@ void update_smart_save(int who)
 			/* Learn the flags */
 			m_ptr->smart &= ~(SM_GOOD_SAVE | SM_PERF_SAVE);
 
-			msg_print("Debug forgetting save");
-			
 			/* Tell the allies */
 			tell_allies_player_not(m_ptr->fy, m_ptr->fx, SM_GOOD_SAVE | SM_PERF_SAVE);			
 		}
@@ -247,8 +241,6 @@ void update_smart_learn(int who, u32b flag)
 
 		/* Learn ability */
 		m_ptr->smart |= flag;
-		
-		msg_format("Debug temporary: %ld", flag);
 		
 		/* Tell the allies */
 		tell_allies_player_can(m_ptr->fy, m_ptr->fx, flag);
@@ -7931,7 +7923,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		case GF_SNUFF:
 		{
 			/* Non-living are immune */
-			if ((r_ptr->flags3 & (RF3_NONLIVING)) && (typ == GF_CURSE))
+			if (r_ptr->flags3 & (RF3_NONLIVING))
 			{
 				dam = 0;
 				if ((seen) && (l_ptr->flags3 & (RF3_NONLIVING)))
@@ -7947,6 +7939,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				dam = 0;
 				note = " is unaffected.";
 			}
+			break;
 		}
 
 		/* Warp wood (Ignore "dam") */
@@ -11412,6 +11405,9 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			/* Dispel worked */
 			obvious = TRUE;
 
+			/* Monster forgets about enchantments */
+			update_smart_forget(who, (SM_OPP_ACID | SM_OPP_ELEC | SM_OPP_FIRE | SM_OPP_COLD | SM_OPP_POIS | SM_OPP_FEAR));
+			
 			break;
 		}
 
