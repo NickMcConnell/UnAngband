@@ -1209,7 +1209,18 @@ static errr rd_extra(void)
 	for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->stat_cur[i]);
 	for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->stat_inc_tim[i]);
 	for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->stat_dec_tim[i]);
-	if (!older_than(0, 6, 2, 3)) for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->stat_birth[i]);
+
+	/* Initialise quickstart */
+	if (!older_than(0, 6, 2, 3))
+	{
+		character_quickstart = TRUE;
+
+		for (i = 0; i < a_max; i++)
+		{
+			rd_s16b(&p_ptr->stat_birth[i]);
+			if (!p_ptr->stat_birth[i]) character_quickstart = FALSE;
+		}
+	}
 
 	strip_bytes(24);	/* oops */
 

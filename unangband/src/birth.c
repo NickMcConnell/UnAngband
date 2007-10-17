@@ -347,12 +347,37 @@ static void get_money(void)
 
 
 /*
+ * Structure for quickstart information
+ */
+quickstart_type normal_quickstart;
+
+/*
  * Clear all the global "character" data
  */
 static void player_wipe(void)
 {
 	int i, j;
 
+	/* Copy player quickstart information */
+	if (character_quickstart)
+	{
+		/* Copy across the quickstart structure */
+		normal_quickstart.psex = p_ptr->psex;
+		normal_quickstart.prace = p_ptr->prace;
+		normal_quickstart.pclass = p_ptr->pclass;
+		normal_quickstart.pstyle = p_ptr->pstyle;
+		normal_quickstart.psval = p_ptr->psval;
+		normal_quickstart.pschool = p_ptr->pschool;
+		normal_quickstart.birth_au = p_ptr->birth_au;
+		
+		/* Copy across the stats */
+		for (i = 0; i < A_MAX; i++)
+		{
+			/* Set up the stats */
+			normal_quickstart.stat_birth[i] = p_ptr->stat_birth[i];
+		}		
+	}
+	
 	/* Wipe the player */
 	(void)WIPE(p_ptr, player_type);
 
@@ -2016,7 +2041,7 @@ static void player_birth_quickstart(quickstart_type *q_ptr)
 	p_ptr->pclass = q_ptr->pclass;
 	p_ptr->pstyle = q_ptr->pstyle;
 	p_ptr->psval = q_ptr->psval;
-	p_ptr->pschool = p_ptr->pschool;
+	p_ptr->pschool = q_ptr->pschool;
 	
 	/* Set up the class and race */
 	sp_ptr = &sex_info[p_ptr->psex];
