@@ -3015,7 +3015,7 @@ const cptr inscrip_info[] =
 		"It is a useful ego item, with a random hidden ability.  ",
 		"It is an artifact that has resisted your destruction.  ",
 		"It is an ego item or artifact that resisted being picked up or used.  ",
-		"It is of average quality or worse, and may be cursed.  It may be an ego item or artifact.  ",
+		"It is of average quality or worse, and may be cursed.  It may be an cursed ego item or artifact.  ",
 		"It is better than average quality, and not cursed.  It may be an ego item or artifact.  ",
 		"It is an ego item or artifact.  ",
 		"It is an ego item, but may or may not be cursed.  ",
