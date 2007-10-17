@@ -2089,7 +2089,7 @@ u16b limit;
 		if (!older_than(0, 6, 2, 3)) rd_byte(&cave_ecology.num_ecologies);
 		
 		/* Try to fix 'broken' save files */
-		if ((limit == 1) && (older_than(0, 6, 2, 3))) limit = 0;
+		if ((limit >= 1) && (older_than(0, 6, 2, 3))) limit--;
 		
 		/* Hack -- verify */
 		if (limit >= MAX_ECOLOGY_RACES)
