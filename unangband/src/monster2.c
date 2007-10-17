@@ -5139,7 +5139,7 @@ void message_pain(int m_idx, int dam)
 /*
  * Update monster ecology deepest monster for the room
  */
-void deepest_in_ecology(int r_idx)
+static void deepest_in_ecology(int r_idx)
 {
 	int r;
 	
@@ -5166,7 +5166,7 @@ void deepest_in_ecology(int r_idx)
 /*
  * Auxiliary helper function for get_monster_ecology.
  */
-bool get_monster_ecology_aux(bool (*tmp_mon_num_hook)(int r_idx), int number)
+static bool get_monster_ecology_aux(bool (*tmp_mon_num_hook)(int r_idx), int number)
 {
 	int i, count;
 	int races = cave_ecology.num_races + number;

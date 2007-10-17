@@ -907,6 +907,8 @@ struct monster_type
 
 	byte shield;	/* Monster is temporarily shielded */
 	byte oppose_elem; /* Monster is temporarily resistant to elements */
+	byte petrify;	/* TODO: Monster is petrified / off-balance */
+	byte facing; /* TODO: Monster facing for huge monsters and 'stealth' mode */
 
 	byte ty;	/* Current target */
 	byte tx;
@@ -1455,7 +1457,7 @@ struct player_type
 	s16b food;      /* Current nutrition */
 
 	s16b rest;      /* Current rest */
-	s16b water;     /* Current water */
+	s16b water;     /* TODO: Current water */
 
 	s16b held_song;     /* Currently held song */
 	byte sneaking; 		/* Currently sneaking */
