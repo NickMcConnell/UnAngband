@@ -3786,7 +3786,12 @@ bool tell_allies_player_can(int y, int x, u32b flag)
 	if (!vocal) return (FALSE);
 
 	/* Define saying */
-	if (((flag & (SM_OPP_ACID)) != 0) || ((flag & (SM_RES_ACID)) != 0)) saying = "& resists acid.";
+	if (flag & (SM_IMM_ACID)) saying = "& is immune to acid.";
+	else if (flag & (SM_IMM_ELEC)) saying = "& is immune to electricity.";
+	else if (flag & (SM_IMM_FIRE)) saying = "& is immune to fire.";
+	else if (flag & (SM_IMM_COLD)) saying = "& is immune to cold.";
+	else if (flag & (SM_IMM_POIS)) saying = "& is immune to poison.";
+	else if (((flag & (SM_OPP_ACID)) != 0) || ((flag & (SM_RES_ACID)) != 0)) saying = "& resists acid.";
 	else if (((flag & (SM_OPP_ELEC)) != 0) || ((flag & (SM_RES_ELEC)) != 0)) saying = "& resists electricity.";
 	else if (((flag & (SM_OPP_FIRE)) != 0) || ((flag & (SM_RES_FIRE)) != 0)) saying = "& resists fire.";
 	else if (((flag & (SM_OPP_COLD)) != 0) || ((flag & (SM_RES_COLD)) != 0)) saying = "& resists cold.";
@@ -3796,13 +3801,7 @@ bool tell_allies_player_can(int y, int x, u32b flag)
 	else if (flag & (SM_GOOD_SAVE)) saying = "& can easily resist magic.";
 	else if (flag & (SM_PERF_SAVE)) saying = "& can always resist magic.";
 	else if (flag & (SM_FREE_ACT)) saying = "& resists paralyzation.";
-	else if (flag & (SM_IMM_POIS)) saying = "& is immune to poison.";
 	else if (flag & (SM_IMM_MANA)) saying = "& has no mana.";
-	else if (flag & (SM_IMM_ACID)) saying = "& is immune to acid.";
-	else if (flag & (SM_IMM_ELEC)) saying = "& is immune to electricity.";
-	else if (flag & (SM_IMM_FIRE)) saying = "& is immune to fire.";
-	else if (flag & (SM_IMM_COLD)) saying = "& is immune to cold.";
-	else if (flag & (SM_RES_ACID)) saying = "& is immune to acid.";
 	else if (flag & (SM_RES_LITE)) saying = "& resists lite.";
 	else if (flag & (SM_RES_DARK)) saying = "& resists darkness.";
 	else if (flag & (SM_RES_BLIND)) saying = "& resists blindness.";
@@ -3878,7 +3877,12 @@ bool tell_allies_player_not(int y, int x, u32b flag)
 	if (!vocal) return (FALSE);
 
 	/* Define saying */
-	if (((flag & (SM_OPP_ACID)) != 0) || ((flag & (SM_RES_ACID)) != 0)) saying = "& no longer resists acid.";
+	if (flag & (SM_IMM_ACID)) saying = "& no longer is immune to acid.";
+	else if (flag & (SM_IMM_ELEC)) saying = "& no longer is immune to electricity.";
+	else if (flag & (SM_IMM_FIRE)) saying = "& no longer is immune to fire.";
+	else if (flag & (SM_IMM_COLD)) saying = "& no longer is immune to cold.";
+	else if (flag & (SM_IMM_POIS)) saying = "& no longer is immune to poison.";
+	else if (((flag & (SM_OPP_ACID)) != 0) || ((flag & (SM_RES_ACID)) != 0)) saying = "& no longer resists acid.";
 	else if (((flag & (SM_OPP_ELEC)) != 0) || ((flag & (SM_RES_ELEC)) != 0)) saying = "& no longer resists electricity.";
 	else if (((flag & (SM_OPP_FIRE)) != 0) || ((flag & (SM_RES_FIRE)) != 0)) saying = "& no longer resists fire.";
 	else if (((flag & (SM_OPP_COLD)) != 0) || ((flag & (SM_RES_COLD)) != 0)) saying = "& no longer resists cold.";
@@ -3888,13 +3892,7 @@ bool tell_allies_player_not(int y, int x, u32b flag)
 	else if (flag & (SM_GOOD_SAVE)) saying = "& no longer easily resists magic.";
 	else if (flag & (SM_PERF_SAVE)) saying = "& no longer always resists magic.";
 	else if (flag & (SM_FREE_ACT)) saying = "& no longer resists paralyzation.";
-	else if (flag & (SM_IMM_POIS)) saying = "& no longer is immune to poison.";
 	else if (flag & (SM_IMM_MANA)) saying = "& no longer has no mana.";
-	else if (flag & (SM_IMM_ACID)) saying = "& no longer is immune to acid.";
-	else if (flag & (SM_IMM_ELEC)) saying = "& no longer is immune to electricity.";
-	else if (flag & (SM_IMM_FIRE)) saying = "& no longer is immune to fire.";
-	else if (flag & (SM_IMM_COLD)) saying = "& no longer is immune to cold.";
-	else if (flag & (SM_RES_ACID)) saying = "& no longer is immune to acid.";
 	else if (flag & (SM_RES_LITE)) saying = "& no longer resists lite.";
 	else if (flag & (SM_RES_DARK)) saying = "& no longer resists darkness.";
 	else if (flag & (SM_RES_BLIND)) saying = "& no longer resists blindness.";
