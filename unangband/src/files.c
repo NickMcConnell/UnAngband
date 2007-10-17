@@ -4721,17 +4721,20 @@ void show_tip(void)
 	if (tips_start != tips_end)
 	{
 		cptr tip = quark_str(tips[tips_start++]);
-		
-		msg_print("You find a note.");
-		
-		/* Save screen */
-		screen_save();
 
-		/* Peruse the main help file */
-		(void)show_file(tip, NULL, 0, 0);
-
-		/* Load screen */
-		screen_load();
+		if (show_tips)
+		{
+			msg_print("You find a note.");
+			
+			/* Save screen */
+			screen_save();
+	
+			/* Peruse the main help file */
+			(void)show_file(tip, NULL, 0, 0);
+	
+			/* Load screen */
+			screen_load();
+		}
 		
 		/* Wrap the queue around if required */
 		if (tips_start >= TIPS_MAX) tips_start = 0;
