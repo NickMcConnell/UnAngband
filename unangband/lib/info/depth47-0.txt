@@ -45,9 +45,11 @@ targets near the grid that you are assaulting, but will
 prefer to move back towards your position if they are too
 close to the target in question.
 
-Once you have specified a grid target, or specified an assault
-on a grid, you need to target again, and hit the Escape key
-to cancel your orders.
+Once you have specified a grid target, either to hold or
+assault it, your troops will continue to prefer that
+location. To cancel the orders, you must either specify
+another target, or hit the Escape key whilst targetting.  At
+that point they will begin to follow you again.
 
 As always,
 
