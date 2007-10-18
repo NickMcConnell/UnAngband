@@ -1436,7 +1436,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 				}
 
 				/* Check if forcing a particular kind */
-				if (p_ptr->target_race)
+				if (ally && p_ptr->target_race)
 				{
 					/* No match */
 					if (p_ptr->target_race != n_ptr->r_idx)
@@ -1444,9 +1444,11 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 						/* Have already found a match */
 						if (force_one_race) continue;
 					}
-					else
+					else if (!force_one_race)
 					{
 						force_one_race = TRUE;
+						k = MAX_RANGE * 16;
+						i = m_max;
 					}
 				}
 
@@ -6519,7 +6521,7 @@ static void process_monster(int m_idx)
 				}
 				
 				/* Check if forcing a particular kind */
-				if (p_ptr->target_race)
+				if (ally && p_ptr->target_race)
 				{
 					/* No match */
 					if (p_ptr->target_race != n_ptr->r_idx)
@@ -6527,9 +6529,12 @@ static void process_monster(int m_idx)
 						/* Have already found a match */
 						if (force_one_race) continue;
 					}
-					else
+					else if (!force_one_race)
 					{
 						force_one_race = TRUE;
+						force_one_race = TRUE;
+						k = MAX_RANGE * 16;
+						i = m_max;
 					}
 				}
 
