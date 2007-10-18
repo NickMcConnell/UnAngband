@@ -6323,7 +6323,7 @@ static void process_monster(int m_idx)
 			if (ally != ((n_ptr->mflag & (MFLAG_ALLY)) != 0))
 			{
 				bool see_target = FALSE;
-				int d = distance(n_ptr->fy, n_ptr->fx, m_ptr->fy, m_ptr->fx) * 16 + (m_idx + i) % 16;
+				int d = (distance(n_ptr->fy, n_ptr->fx, m_ptr->fy, m_ptr->fx) * 16) + ((m_idx + i) % 16);
 				
 				/* Ignore targets out of range */
 				if (d > MAX_RANGE * 16) continue;
@@ -6419,8 +6419,9 @@ static void process_monster(int m_idx)
 				/* Can't attack the target */
 				if (!can_target)
 				{
-					/* Run back to the player with tails between its legs */
-					if ((r_ptr->flags1 & (RF1_NEVER_MOVE)) == 0)
+					/* Run back to the player with tails between its legs,
+					 * unless ordered otherwise. */
+					if (((r_ptr->flags1 & (RF1_NEVER_MOVE)) == 0) && (!p_ptr->target_set))
 					{
 						m_ptr->ty = p_ptr->py;
 						m_ptr->tx = p_ptr->px;
@@ -6443,8 +6444,8 @@ static void process_monster(int m_idx)
 			}
 		}
 		
-		/* Allies use 'old' targets if the monster unable to find a target
-		 * We hackily use best range to interact with
+		/* Allies use 'player' targets if the monster unable to find a target
+		 * TODO: We hackily use best range to interact with
 		 * monster targetting code for allies. The best range for an
 		 * ally is given as its distance from the player when a
 		 * target is set, and increases by one per monster turn.
@@ -6453,17 +6454,39 @@ static void process_monster(int m_idx)
 		 */
 		if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && ((m_ptr->mflag & (MFLAG_IGNORE)) == 0) && (!must_use_target))
 		{		
-			/* Still no target - get monster target*/
-			if ((p_ptr->target_set) && (p_ptr->target_who))
+			/* Player has target set. */
+			if (p_ptr->target_set)
 			{
-				m_ptr->ty = p_ptr->target_row;
-				m_ptr->tx = p_ptr->target_col;
+				/* Player is targetting a monster. */
+				if (p_ptr->target_who > 0)
+				{
+					monster_type *n_ptr = &m_list[p_ptr->target_who];
+					
+					/* Target it if visible. Note can use more information than 'easily' visible. */
+					if ((n_ptr->ml) || ((n_ptr->mflag & (MFLAG_VIEW)) != 0))
+					{
+						m_ptr->ty = n_ptr->fy;
+						m_ptr->tx = n_ptr->fx;			
+					}
+				}
 
-				must_use_target = TRUE;
+				/* Player has targetted a grid. Hold at that position. */
+				else
+				{
+					m_ptr->ty = p_ptr->target_row;
+					m_ptr->tx = p_ptr->target_col;
+				}
+			}
+			
+			/* Player does not have target set and not nearby. Return monster.*/
+			else if (m_ptr->cdis > MAX_SIGHT)
+			{
+				m_ptr->ty = p_ptr->py;
+				m_ptr->tx = p_ptr->px;
 			}
 
-			/* Use the 'old' target */
-			else if (m_ptr->ty || m_ptr->tx)
+			/* If holding position, return to position */
+			if (m_ptr->ty || m_ptr->tx)
 			{
 				must_use_target = TRUE;
 			}

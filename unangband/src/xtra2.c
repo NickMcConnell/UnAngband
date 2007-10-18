@@ -2557,6 +2557,11 @@ static void improve_stat(void)
 							msg_print("You must choose another attribute.");
 					}
 				}
+				else
+				{
+					/* Clear the attributes */
+					stat_gain_selected = 0;
+				}
 			}
 		}
 

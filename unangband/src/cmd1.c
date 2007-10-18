@@ -3134,6 +3134,7 @@ void move_player(int dir, int jumping)
 			{
 				int dy = n_ptr->fy - y;
 				int dx = n_ptr->fx - x;
+				int count = 0;
 				
 				n_ptr->ty = n_ptr->fy;
 				n_ptr->tx = n_ptr->fx;
@@ -3142,7 +3143,8 @@ void move_player(int dir, int jumping)
 				 * pushed. We do this with a walking stick approach to prevent us getting
 				 * invalid target locations like (0,0) */
 				while (in_bounds_fully(n_ptr->ty + dy, n_ptr->tx + dx)
-						&& cave_exist_mon(n_ptr->r_idx, n_ptr->ty + dy, n_ptr->tx + dx, TRUE))
+						&& cave_exist_mon(n_ptr->r_idx, n_ptr->ty + dy, n_ptr->tx + dx, TRUE)
+						&& (count++ < (MAX_SIGHT / 2)))
 				{
 					n_ptr->ty = n_ptr->ty + dy;
 					n_ptr->tx = n_ptr->tx + dx;
