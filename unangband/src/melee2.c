@@ -804,6 +804,9 @@ static void remove_useless_spells(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, u3
 
 	/* Don't Invisible if Invisible or Can't be seen */
 	if ((m_ptr->tim_invis) || !(m_ptr->ml)) f6 &= ~(RF6_INVIS);
+	
+	/* Don't Invisible if player known to see invisible */
+	if (m_ptr->smart & (SM_SEE_INVIS)) f6 &= ~(RF6_INVIS);
 
 	/* Don't Wraithform if Wraithform and Wraithform not running out in dangerous terrain */
 	if ((m_ptr->tim_passw) && ((m_ptr->tim_passw > 10) || (place_monster_here(m_ptr->fy,m_ptr->fx,m_ptr->r_idx) > MM_FAIL))) f6 &= ~(RF6_WRAITHFORM);
@@ -2938,7 +2941,7 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 				 * Take character weakness into account (this 
 				 * always adds at least one)
 				 */
-				if (p_ptr->chp <= 3) p_ptr->vulnerability = 100;
+				if (p_ptr->chp <= 10) p_ptr->vulnerability = 100;
 				else p_ptr->vulnerability += (p_ptr->mhp / p_ptr->chp);
 			}
 
@@ -2976,7 +2979,7 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 			}
 		}
 	}
-
+	
 	/* Monster groups try to surround the character. */
 	if ((!*fear) && (r_ptr->flags1 & (RF1_FRIENDS)) && (m_ptr->cdis <= 3))
 	{
@@ -5681,10 +5684,19 @@ static void process_monster(int m_idx)
 		}
 		/* Invisible monsters notice if the player can see invisible */
 		else if ((((r_ptr->flags2 & (RF2_INVISIBLE)) != 0) || (m_ptr->tim_invis)) &&
-					(((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->tim_invis)))
+					(((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->tim_invis) ||
+					 (((r_ptr->flags2 & (RF2_COLD_BLOOD)) == 0) && (p_ptr->see_infra >= m_ptr->cdis))))
 		{
 			/* Tell allies as well */
-			update_smart_learn(m_idx, (SM_SEE_INVIS));
+			if (((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->tim_invis))
+			{
+				update_smart_learn(m_idx, (SM_SEE_INVIS));
+			}
+			/* Just quietly note we're too close and warm blooded */
+			else
+			{
+				m_ptr->smart |= (SM_SEE_INVIS);
+			}
 		}
 
 		/* Clear the ignore flag */
@@ -5741,10 +5753,19 @@ static void process_monster(int m_idx)
 		}
 		/* Invisible monsters notice if the player can see invisible */
 		else if ((((r_ptr->flags2 & (RF2_INVISIBLE)) != 0) || (m_ptr->tim_invis)) &&
-					(((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->tim_invis)))
+					(((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->tim_invis) ||
+					 (((r_ptr->flags2 & (RF2_COLD_BLOOD)) == 0) && (p_ptr->see_infra >= m_ptr->cdis))))
 		{
 			/* Tell allies as well */
-			update_smart_learn(m_idx, (SM_SEE_INVIS));
+			if (((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->tim_invis))
+			{
+				update_smart_learn(m_idx, (SM_SEE_INVIS));
+			}
+			/* Just quietly note we're too close and warm blooded */
+			else
+			{
+				m_ptr->smart |= (SM_SEE_INVIS);
+			}
 		}
 		
 		/* Clear the ignore flag */
@@ -6146,6 +6167,61 @@ static void process_monster(int m_idx)
 		else random = TRUE;
 	}
 
+
+	/* Invisible monsters 'dance' around the player in order to make their
+	 * location less predictable. If the player can see invisible, don't do
+	 * this. */
+	if (((r_ptr->flags2 & (RF2_INVISIBLE)) || (m_ptr->tim_invis)) &&
+			((m_ptr->smart & (SM_SEE_INVIS)) == 0))
+	{
+		/* At close range, check for available space */
+		if ((m_ptr->cdis == 1)  &&
+				(((r_ptr->flags2 & (RF2_COLD_BLOOD)) == 0) ||
+				 !(p_ptr->see_infra)))
+		{
+			/*
+			 * If character vulnerability has not yet been 
+			 * calculated this turn, calculate it now.
+			 */
+			if (p_ptr->vulnerability == 0)
+			{
+				/* Count passable grids next to player */
+				for (i = 0; i < 8; i++)
+				{
+					y = p_ptr->py + ddy_ddd[i];
+					x = p_ptr->px + ddx_ddd[i];
+
+					/* Check Bounds */
+					if (!in_bounds_fully(y, x)) continue;
+
+					/* Count floor grids (generic passable) */
+					if (cave_floor_bold(y, x))
+					{
+						p_ptr->vulnerability++;
+					}
+				}
+
+				/*
+				 * Take character weakness into account (this 
+				 * always adds at least one)
+				 * 
+				 * We don't have to do this here, however, for
+				 * animals, this calculation is important, so ensure
+				 * computation.
+				 */
+				if (p_ptr->chp <= 10) p_ptr->vulnerability = 100;
+				else p_ptr->vulnerability += (p_ptr->mhp / p_ptr->chp);
+			}
+
+			/* Character is sufficiently vulnerable */
+			if (p_ptr->vulnerability > 4)
+			{
+				/* Move randomly some of the time */
+				random = (rand_int(100) < 30);
+			}
+		}
+	}	
+	
 	/* Monster is using the special "townsman" AI */
 	if (m_ptr->mflag & (MFLAG_TOWN))
 	{
