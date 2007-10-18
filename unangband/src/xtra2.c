@@ -6180,13 +6180,13 @@ bool target_set_interactive(int mode)
 			/* Allow target */
 			if ((cave_m_idx[y][x] > 0) && target_able(cave_m_idx[y][x]))
 			{
-				my_strcpy(info, "q,t,p,o,d,g,+,-,.,?,<dir>", sizeof (info));
+				my_strcpy(info, "q,t,p,o,a,g,+,-,.,?,<dir>", sizeof (info));
 			}
 
 			/* Dis-allow target */
 			else
 			{
-				my_strcpy(info, "q,p,o,d,g,+,-,.,?,<dir>", sizeof (info));
+				my_strcpy(info, "q,p,o,a,g,+,-,.,?,<dir>", sizeof (info));
 			}
 
 			/* Describe and Prompt */
@@ -6328,7 +6328,7 @@ bool target_set_interactive(int mode)
 				}
 				
 				/* Get allies to attack anything near here */
-				case 'd':
+				case 'a':
 				{
 					target_set_location(y, x, mode | (TARGET_NEAR));
 					done = TRUE;
@@ -6573,7 +6573,7 @@ bool target_set_interactive(int mode)
 					break;
 				}
 				
-				case 'd':
+				case 'a':
 				{
 					target_set_location(y, x, mode | (TARGET_NEAR));
 					done = TRUE;

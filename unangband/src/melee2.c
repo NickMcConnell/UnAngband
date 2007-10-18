@@ -6610,9 +6610,19 @@ static void process_monster(int m_idx)
 			/* Forget the target if it is too close and we can shoot it */
 			if ((m_ptr->best_range > 1) && (k < ((int)m_ptr->best_range * 16)) && generic_los(m_ptr->fy, m_ptr->fx, m_ptr->ty, m_ptr->tx, CAVE_XLOF))
 			{
-				must_use_target = FALSE;
-				m_ptr->ty = 0;
-				m_ptr->tx = 0;
+				/* Player has specified a position to hold */
+				if ((p_ptr->target_set) && !(p_ptr->target_who) && ((p_ptr->target_set & (TARGET_NEAR)) == 0))
+				{
+					m_ptr->ty = p_ptr->target_row;
+					m_ptr->tx = p_ptr->target_col;					
+				}
+				/* Go to player position */
+				else
+				{
+					must_use_target = FALSE;
+					m_ptr->ty = 0;
+					m_ptr->tx = 0;
+				}
 				
 				/* Hack -- speed up combat */
 				m_ptr->mflag |= (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH);
