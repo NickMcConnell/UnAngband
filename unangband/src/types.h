@@ -912,6 +912,8 @@ struct monster_type
 
 	byte ty;	/* Current target */
 	byte tx;
+	
+	s16b target_m_idx;	/* Current target m_idx */
 
 	u32b mflag;     /* Extra monster flags */
 	u32b smart;     /* Field for "smart_learn" */

@@ -104,7 +104,7 @@ u32b monster_smart_flags(int m_idx)
  * This is similar to equip_can_flags except we allow the casting
  * monster to also notice this ability.
  */
-void player_can_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
+bool player_can_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
 {
 	/* Player notices ability */
 	equip_can_flags(f1, f2, f3, f4);
@@ -118,10 +118,10 @@ void player_can_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
 		u32b smart;
 
 	 	/* Too stupid to learn anything */
- 		if (r_ptr->flags2 & (RF2_STUPID)) return;
+ 		if (r_ptr->flags2 & (RF2_STUPID)) return (FALSE);
 
 	 	/* Not intelligent, only learn sometimes */
- 		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return;
+ 		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return (FALSE);
 
 		/* Get the flags */
 		smart = player_smart_flags(f1, f2, f3, f4);
@@ -130,8 +130,10 @@ void player_can_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
 		m_ptr->smart |= smart;
 
 		/* Tell the allies */
-		tell_allies_player_can(m_ptr->fy, m_ptr->fx, smart);
+		return (tell_allies_player_can(m_ptr->fy, m_ptr->fx, smart));
 	}
+	
+	return (FALSE);
 }
 
 
@@ -140,7 +142,7 @@ void player_can_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
  * This is similar to equip_not_flags except we allow the casting
  * monster to also notice this ability.
  */
-void player_not_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
+bool player_not_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
 {
 	/* Player notices ability */
 	equip_not_flags(f1, f2, f3, f4);
@@ -154,10 +156,10 @@ void player_not_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
 		u32b smart;
 
 	 	/* Too stupid to learn anything */
- 		if (r_ptr->flags2 & (RF2_STUPID)) return;
+ 		if (r_ptr->flags2 & (RF2_STUPID)) return (FALSE);
 
 	 	/* Not intelligent, only learn sometimes */
- 		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return;
+ 		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return (FALSE);
 
 		/* Learn the flags */
 		smart = player_smart_flags(f1, f2, f3, f4);
@@ -166,15 +168,17 @@ void player_not_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
 		m_ptr->smart &= ~(smart);
 
 		/* Tell the allies */
-		tell_allies_player_not(m_ptr->fy, m_ptr->fx, smart);
+		return (tell_allies_player_not(m_ptr->fy, m_ptr->fx, smart));
 	}
+	
+	return (FALSE);
 }
 
 
 /*
  * Update monster's knowledge of the player save.
  */
-void update_smart_save(int who)
+bool update_smart_save(int who, bool saved)
 {
 	/* Monster notices ability */
 	if (who > SOURCE_MONSTER_START)
@@ -185,10 +189,10 @@ void update_smart_save(int who)
 	 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	 	/* Too stupid to learn anything */
- 		if (r_ptr->flags2 & (RF2_STUPID)) return;
+ 		if (r_ptr->flags2 & (RF2_STUPID)) return (FALSE);
 
 	 	/* Not intelligent, only learn sometimes */
- 		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return;
+ 		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return (FALSE);
 
 		/* Learn saving throw */
 		if (p_ptr->skill_sav >= 75) smart |= (SM_GOOD_SAVE);
@@ -199,15 +203,15 @@ void update_smart_save(int who)
 			/* Learn the flags */
 			m_ptr->smart |= smart;
 
-			/* Tell the allies */
-			tell_allies_player_can(m_ptr->fy, m_ptr->fx, smart);
-			
 			/* Notice lack of perfect save */
 			if ((smart & (SM_PERF_SAVE)) == 0)
 			{
 				m_ptr->smart &= ~(SM_PERF_SAVE);
-				tell_allies_player_not(m_ptr->fy, m_ptr->fx, SM_PERF_SAVE);
+				if (!saved && tell_allies_player_not(m_ptr->fy, m_ptr->fx, SM_PERF_SAVE)) return (TRUE);
 			}
+
+			/* Tell the allies */
+			return (saved && tell_allies_player_can(m_ptr->fy, m_ptr->fx, smart));
 		}
 		else
 		{
@@ -215,9 +219,11 @@ void update_smart_save(int who)
 			m_ptr->smart &= ~(SM_GOOD_SAVE | SM_PERF_SAVE);
 
 			/* Tell the allies */
-			tell_allies_player_not(m_ptr->fy, m_ptr->fx, SM_GOOD_SAVE | SM_PERF_SAVE);			
+			return (!saved && tell_allies_player_not(m_ptr->fy, m_ptr->fx, SM_GOOD_SAVE | SM_PERF_SAVE));			
 		}
 	}
+	
+	return (FALSE);
 }
 
 
@@ -225,7 +231,7 @@ void update_smart_save(int who)
  * Update monster's knowledge of a flag. This is used when it is known a player has the ability,
  * primarily for when a player has a temporary stat.
  */
-void update_smart_learn(int who, u32b flag)
+bool update_smart_learn(int who, u32b flag)
 {
 	/* Monster notices ability */
 	if (who > SOURCE_MONSTER_START)
@@ -234,10 +240,10 @@ void update_smart_learn(int who, u32b flag)
 	 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	 	/* Too stupid to learn anything */
- 		if (r_ptr->flags2 & (RF2_STUPID)) return;
+ 		if (r_ptr->flags2 & (RF2_STUPID)) return (FALSE);
 
 	 	/* Not intelligent, only learn sometimes */
- 		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return;
+ 		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return (FALSE);
 
 		/* Learn ability */
 		m_ptr->smart |= flag;
@@ -252,7 +258,7 @@ void update_smart_learn(int who, u32b flag)
  * Forgot monster's knowledge of a flag. This is used when it is known a player has the lost the ability,
  * primarily for when a player has a temporary stat.
  */
-void update_smart_forget(int who, u32b flag)
+bool update_smart_forget(int who, u32b flag)
 {
 	/* Monster notices ability */
 	if (who > SOURCE_MONSTER_START)
@@ -261,17 +267,19 @@ void update_smart_forget(int who, u32b flag)
 	 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	 	/* Too stupid to learn anything */
- 		if (r_ptr->flags2 & (RF2_STUPID)) return;
+ 		if (r_ptr->flags2 & (RF2_STUPID)) return (FALSE);
 
 	 	/* Not intelligent, only learn sometimes */
- 		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return;
+ 		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return (FALSE);
 
 		/* Learn ability */
 		m_ptr->smart &= ~(flag);
 
 		/* Tell the allies */
-		tell_allies_player_not(m_ptr->fy, m_ptr->fx, flag);
+		return (tell_allies_player_not(m_ptr->fy, m_ptr->fx, flag));
 	}
+	
+	return (FALSE);
 }
 
 

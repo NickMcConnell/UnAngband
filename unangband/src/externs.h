@@ -825,11 +825,13 @@ extern bool save_player(void);
 /* spells1.c */
 extern u32b player_smart_flags(u32b f1,u32b f2,u32b f3, u32b f4);
 extern u32b monster_smart_flags(int m_idx);
-extern void player_can_flags(int who, u32b f1,u32b f2,u32b f3, u32b f4);
-extern void player_not_flags(int who, u32b f1,u32b f2,u32b f3, u32b f4);
+extern bool player_can_flags(int who, u32b f1,u32b f2,u32b f3, u32b f4);
+extern bool player_not_flags(int who, u32b f1,u32b f2,u32b f3, u32b f4);
 extern void update_smart_cheat(int who);
 extern void update_smart_racial(int who);
-extern void update_smart_learn(int who, u32b flag);
+extern bool update_smart_learn(int who, u32b flag);
+extern bool update_smart_forget(int who, u32b flag);
+extern bool update_smart_save(int who, bool saved);
 extern void teleport_away(int m_idx, int dis);
 extern void teleport_player(int dis);
 extern void teleport_player_to(int ny, int nx);

@@ -328,235 +328,6 @@ static bool similar_monsters(int m1y, int m1x, int m2y, int m2x)
 	return(FALSE);
 }
 
-#if 0
-/*
- * Used to determine which flags are learnt about when casting
- * a particular spell.
- * 
- * TODO: Very similar to routine below. Consider an effects.txt
- * file that defines this and other information for effects.
- * Probably not worth it at this stage.
- * 
- * TODO: May not be required, given that we learn any GF_ resist
- * in spells1.c. This consequently is defined out.
- */
-static u32b learn_resist(int effect)
-{
-	/* Which spell */
-	switch (effect)
-	{
-		/* Acid Spells */
-		case GF_ACID:
-		case GF_VAPOUR:
-		{
-			return (SM_IMM_ACID | SM_RES_ACID | SM_OPP_ACID);
-		}
-
-		/* Lightning Spells */
-		case GF_ELEC:
-		{
-			return (SM_IMM_ELEC | SM_RES_ELEC | SM_OPP_ELEC);
-		}
-
-		/* Fire Spells */
-		case GF_FIRE:
-		case GF_SMOKE:
-		{
-			return (SM_IMM_FIRE | SM_RES_FIRE | SM_OPP_FIRE);
-		}
-
-		/* Cold Spells */
-		case GF_COLD:
-		{
-			return (SM_IMM_COLD | SM_RES_COLD | SM_OPP_COLD);
-		}
-
-		/* Poison Spells */
-		case GF_POIS:
-		{
-			return (SM_IMM_POIS | SM_RES_POIS | SM_OPP_POIS);
-		}
-
-		/* Plasma Spells */
-		case GF_PLASMA:
-		{
-			return (SM_RES_SOUND);
-		}
-
-		/* Nether Spells */
-		case GF_NETHER:
-		{
-			return (SM_RES_NETHR);
-		}
-
-		/* Water Spells */
-		case GF_WATER:
-		{
-			return (SM_RES_SOUND | SM_RES_CONFU);
-		}
-
-		/* Storm Spells */
-		case GF_STORM:
-		{
-			return (SM_IMM_ELEC | SM_RES_ELEC | SM_OPP_ELEC | SM_RES_SOUND | SM_RES_CONFU);
-		}
-
-		/* Wind spells */
-		case GF_WIND:
-		{
-			/* Maybe should notice feather fall */
-			return (0L);
-		}
-
-		/* Chaos Spells */
-		case GF_CHAOS:
-		{
-			return (SM_RES_CHAOS | SM_RES_NETHR | SM_RES_CONFU);
-		}
-
-		/* Shards Spells */
-		case GF_SHARD:
-		{
-			return (SM_RES_SHARD);
-		}
-
-		/* Sound Spells */
-		case GF_SOUND:
-		case GF_FORCE:
-		{
-			return (SM_RES_SOUND);
-		}
-
-		/* Confusion Spells, damage dealing */
-		case GF_CONFUSION:
-		{
-			return (SM_RES_CONFU);
-		}
-
-		/* Hallucination or save */
-		case GF_HALLU:
-		{
-			return (SM_GOOD_SAVE | SM_PERF_SAVE | SM_RES_CHAOS);
-		}
-
-		/* Disenchantment Spells */
-		case GF_DISENCHANT:
-		{
-			return (SM_RES_DISEN);
-		}
-
-		/* Nexus Spells */
-		case GF_NEXUS:
-		{
-			return (SM_RES_NEXUS);
-		}
-
-		/* Light Spells */
-		case GF_LITE_WEAK:
-		{
-			return (SM_RES_BLIND | SM_RES_LITE);
-		}
-		case GF_LITE:
-		{
-			return (SM_RES_LITE | SM_RES_BLIND);
-		}
-
-		/* Darkness Spells */
-		case GF_DARK_WEAK:
-		{
-			return (SM_RES_BLIND | SM_RES_DARK);
-		}
-		case GF_DARK:
-		{
-			return (SM_RES_BLIND | SM_RES_DARK);
-		}
-
-		/* Ice Spells */
-		case GF_ICE:
-		{
-			return (SM_IMM_COLD | SM_RES_COLD | SM_OPP_COLD | SM_RES_SOUND | SM_RES_SHARD);
-		}
-
-		/* Terrify spells */
-		case GF_TERRIFY:
-		/* Spells Requiring Save or Resist Fear */
-		case GF_FEAR_WEAK:
-		{
-			return (SM_GOOD_SAVE | SM_PERF_SAVE | SM_RES_FEAR | SM_OPP_FEAR);
-		}
-
-		/* Save-able spells */
-		case GF_BLIND:
-		/* Spells Requiring Save or Resist Blindness */
-		case GF_BLIND_WEAK:
-		{
-			return (SM_GOOD_SAVE | SM_PERF_SAVE | SM_RES_BLIND);
-		}
-
-		/* Save-able spells */
-		case GF_SLOW:
-		case GF_PARALYZE:
-		{
-			return (SM_GOOD_SAVE | SM_PERF_SAVE | SM_FREE_ACT);
-		}
-
-		/* Lava Spells */
-		case GF_LAVA:
-
-		/* Geothermal Spells */
-		case GF_BWATER:
-		case GF_BMUD:
-		{
-			return (SM_IMM_FIRE | SM_RES_FIRE | SM_OPP_FIRE | SM_RES_CONFU | SM_RES_SOUND);
-		}
-
-		/* Geothermal Spells */
-		case GF_STEAM:
-		{
-			return (SM_IMM_FIRE | SM_RES_FIRE | SM_OPP_FIRE);
-		}
-
-		/* Spells that attack player mana */
-		case GF_LOSE_MANA:
-		case GF_GAIN_MANA:
-		{
-			return (SM_IMM_MANA);
-		}
-
-		/* Spells Requiring Save or Resist Confusion */
-		case GF_CONF_WEAK:
-		{
-			return (SM_GOOD_SAVE | SM_PERF_SAVE | SM_RES_CONFU);
-		}
-
-		/* Spells Requiring Save or Free Action */
-		case GF_SLEEP:
-		case GF_SLOW_WEAK:
-		{
-			return (SM_GOOD_SAVE | SM_PERF_SAVE | SM_FREE_ACT);
-		}
-
-		/* Spells that require the player not be evil or fire resistant */
-		case GF_HELLFIRE:
-		{
-			return (SM_IMM_FIRE | SM_RES_FIRE | SM_OPP_FIRE | SM_RES_DARK);
-		}
-
-		/* Spells that probe the player */
-		case GF_PROBE:
-		{
-			return (0xFFFFFFFFL);
-		}
-
-		/* Anything else */
-		default:
-		{
-			return (0);
-		}
-	}
-}
-#endif
-
 
 /*
  * Used to determine the player's known level of resistance to a
@@ -1071,6 +842,8 @@ static void remove_useless_spells(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, u3
 
 }
 
+
+
 /*
  * Count the number of castable spells.
  *
@@ -1366,7 +1139,6 @@ static void init_ranged_attack(monster_race *r_ptr)
 		spell_desire_RF4[hack][D_TACT] = 0;
 		spell_desire_RF4[hack][D_RES] = effect;
 		spell_desire_RF4[hack][D_RANGE] = 0;
-		/*spell_smart_RF4[hack] = learn_resist(effect);*/
 	}
 }
 
@@ -5907,6 +5679,13 @@ static void process_monster(int m_idx)
 				m_ptr->mspeed = calc_monster_speed(m_idx);
 			}
 		}
+		/* Invisible monsters notice if the player can see invisible */
+		else if ((((r_ptr->flags2 & (RF2_INVISIBLE)) != 0) || (m_ptr->tim_invis)) &&
+					(((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->tim_invis)))
+		{
+			/* Tell allies as well */
+			update_smart_learn(m_idx, (SM_SEE_INVIS));
+		}
 
 		/* Clear the ignore flag */
 		m_ptr->mflag &= ~(MFLAG_IGNORE);
@@ -5959,6 +5738,13 @@ static void process_monster(int m_idx)
 				else if (rand_int(2)) m_ptr->mflag |= (MFLAG_FAST);
 				m_ptr->mspeed = calc_monster_speed(m_idx);
 			}
+		}
+		/* Invisible monsters notice if the player can see invisible */
+		else if ((((r_ptr->flags2 & (RF2_INVISIBLE)) != 0) || (m_ptr->tim_invis)) &&
+					(((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->tim_invis)))
+		{
+			/* Tell allies as well */
+			update_smart_learn(m_idx, (SM_SEE_INVIS));
 		}
 		
 		/* Clear the ignore flag */
