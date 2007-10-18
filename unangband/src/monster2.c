@@ -217,7 +217,7 @@ void delete_monster_idx(int i)
 	if (r_ptr->flags2 & (RF2_MULTIPLY)) num_repro--;
 
 	/* Hack -- remove target monster */
-	if (p_ptr->target_who == i) target_set_monster(0);
+	if (p_ptr->target_who == i) target_set_monster(0, 0);
 
 	/* Hack -- remove tracked monster */
 	if (p_ptr->health_who == i) health_track(0);
@@ -482,7 +482,7 @@ void wipe_m_list(void)
 	num_repro = 0;
 
 	/* Hack -- no more target */
-	target_set_monster(0);
+	target_set_monster(0, 0);
 
 	/* Hack -- no more tracking */
 	health_track(0);

@@ -4884,7 +4884,7 @@ static void player_tell_allies_target(int y, int x, bool order)
 /*
  * Set the target to a monster (or nobody)
  */
-void target_set_monster(int m_idx)
+void target_set_monster(int m_idx, s16b flags)
 {
 	/* Acceptable target */
 	if ((m_idx > 0) && target_able(m_idx))
@@ -4892,7 +4892,7 @@ void target_set_monster(int m_idx)
 		monster_type *m_ptr = &m_list[m_idx];
 
 		/* Save target info */
-		p_ptr->target_set = TRUE;
+		p_ptr->target_set = flags | (TARGET_KILL);
 		p_ptr->target_who = m_idx;
 		p_ptr->target_row = m_ptr->fy;
 		p_ptr->target_col = m_ptr->fx;
@@ -4905,7 +4905,7 @@ void target_set_monster(int m_idx)
 	else
 	{
 		/* Reset target info */
-		p_ptr->target_set = FALSE;
+		p_ptr->target_set = 0;
 		p_ptr->target_who = 0;
 		p_ptr->target_row = 0;
 		p_ptr->target_col = 0;
@@ -4916,13 +4916,13 @@ void target_set_monster(int m_idx)
 /*
  * Set the target to a location
  */
-void target_set_location(int y, int x)
+void target_set_location(int y, int x, s16b flags)
 {
 	/* Legal target */
 	if (in_bounds_fully(y, x))
 	{
 		/* Save target info */
-		p_ptr->target_set = TRUE;
+		p_ptr->target_set = flags | (TARGET_GRID);
 		p_ptr->target_who = 0;
 		p_ptr->target_row = y;
 		p_ptr->target_col = x;
@@ -4935,7 +4935,7 @@ void target_set_location(int y, int x)
 	else
 	{
 		/* Reset target info */
-		p_ptr->target_set = FALSE;
+		p_ptr->target_set = 0;
 		p_ptr->target_who = 0;
 		p_ptr->target_row = 0;
 		p_ptr->target_col = 0;
@@ -5059,7 +5059,7 @@ static s16b target_pick(int y1, int x1, int dy, int dx)
 /*
  * Hack -- determine if a given location is "interesting"
  */
-static bool target_set_interactive_accept(int y, int x)
+static bool target_set_interactive_accept(int y, int x, int mode)
 {
 	s16b this_o_idx, next_o_idx = 0;
 
@@ -5077,8 +5077,8 @@ static bool target_set_interactive_accept(int y, int x)
 	{
 		monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
 
-		/* Visible monsters, except for allies */
-		if ((m_ptr->ml) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0) ) return (TRUE);
+		/* Visible monsters */
+		if (m_ptr->ml) return (TRUE);
 	}
 
 	/* Scan all objects in the grid */
@@ -5128,7 +5128,7 @@ static void target_set_interactive_prepare(int mode)
 			if (!expand_look && !player_has_los_bold(y, x)) continue;
 
 			/* Require "interesting" contents */
-			if (!target_set_interactive_accept(y, x)) continue;
+			if (!target_set_interactive_accept(y, x, mode)) continue;
 
 			/* Special mode */
 			if (mode & (TARGET_KILL))
@@ -5138,6 +5138,29 @@ static void target_set_interactive_prepare(int mode)
 
 				/* Must be a targettable monster */
 				if (!target_able(cave_m_idx[y][x])) continue;
+				
+				/* Must not be an ally */
+				if (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY)) continue;
+			}
+
+			/* Special mode */
+			if (mode & (TARGET_ALLY))
+			{
+				/* Must contain a monster */
+				if (!(cave_m_idx[y][x] > 0)) continue;
+
+				/* Must be an ally */
+				if ((m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY)) == 0) continue;
+			}
+			
+			/* If matching race, must match race */
+			if (p_ptr->target_race)
+			{
+				/* Must contain a monster */
+				if (!(cave_m_idx[y][x] > 0)) continue;
+
+				/* Must match the monster */
+				if (m_list[cave_m_idx[y][x]].r_idx != p_ptr->target_race) continue;
 			}
 
 			/* Save the location */
@@ -5280,7 +5303,7 @@ static key_event target_set_interactive_aux(int y, int x, int *room, int mode, c
 						screen_monster_look(cave_m_idx[y][x]);
 
 						/* Hack -- Complete the prompt (again) */
-						Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
+						Term_addstr(-1, TERM_WHITE, format("  [r,s,%s]", info));
 
 						/* Command */
 						query = inkey_ex();
@@ -5293,7 +5316,7 @@ static key_event target_set_interactive_aux(int y, int x, int *room, int mode, c
 					else
 					{
 						/* Describe, and prompt for recall */
-						sprintf(out_val, "%s%s%s%s (%s) [r,%s]",
+						sprintf(out_val, "%s%s%s%s (%s) [r,s,%s]",
 							s1, s2, s3, m_name, look_mon_desc(cave_m_idx[y][x]), info);
 						prt(out_val, 0, 0);
 
@@ -5304,6 +5327,19 @@ static key_event target_set_interactive_aux(int y, int x, int *room, int mode, c
 						query = inkey_ex();
 					}
 
+					/* Select any monsters similar to this */
+					if (query.key == 's')
+					{
+						if (p_ptr->target_race)
+						{
+							p_ptr->target_race = 0;
+						}
+						else
+						{
+							p_ptr->target_race = m_list[cave_m_idx[y][x]].r_idx;
+						}
+					}
+					
 					/* Normal commands */
 					if (query.key != 'r') break;
 
@@ -5413,7 +5449,6 @@ static key_event target_set_interactive_aux(int y, int x, int *room, int mode, c
 				}
 			}
 		}
-
 
 		/* Assume not floored */
 		floored = FALSE;
@@ -6076,7 +6111,7 @@ bool target_set_interactive(int mode)
 	int room = -1;
 
 	/* Cancel target */
-	target_set_monster(0);
+	target_set_monster(0, 0);
 
 
 	/* Cancel tracking */
@@ -6085,9 +6120,17 @@ bool target_set_interactive(int mode)
 
 	/* Prepare the "temp" array */
 	target_set_interactive_prepare(mode);
+	
+	/* Nothing in it. Clear race filter if set and try again. */
+	if (!temp_n && (p_ptr->target_race))
+	{
+		p_ptr->target_race = 0;
+		
+		target_set_interactive_prepare(mode);
+	}
 
 	/* If targetting monsters, display projectable grids */
-	if (mode == TARGET_KILL)
+	if (mode & (TARGET_KILL))
 	{
 		/* Set path */
 		target_path_n = 0;
@@ -6120,7 +6163,7 @@ bool target_set_interactive(int mode)
 			tx = x = temp_x[m];
 
 			/* Calculate the path */
-			if (mode == TARGET_KILL)
+			if (mode & (TARGET_KILL))
 			{
 				target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
 
@@ -6137,13 +6180,13 @@ bool target_set_interactive(int mode)
 			/* Allow target */
 			if ((cave_m_idx[y][x] > 0) && target_able(cave_m_idx[y][x]))
 			{
-				my_strcpy(info, "q,t,p,o,+,-,<dir>", sizeof (info));
+				my_strcpy(info, "q,t,p,o,d,g,+,-,.,?,<dir>", sizeof (info));
 			}
 
 			/* Dis-allow target */
 			else
 			{
-				my_strcpy(info, "q,p,o,+,-,<dir>", sizeof (info));
+				my_strcpy(info, "q,p,o,d,g,+,-,.,?,<dir>", sizeof (info));
 			}
 
 			/* Describe and Prompt */
@@ -6191,9 +6234,9 @@ bool target_set_interactive(int mode)
 				{
 					y = py;
 					x = px;
-
+					
 					/* Calculate the path */
-					if (mode == TARGET_KILL)
+					if (mode & (TARGET_KILL))
 					{
 						target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
 
@@ -6240,7 +6283,7 @@ bool target_set_interactive(int mode)
 						/* Set target if clicked */
 						if ((query.mousebutton) || (query.key == '!'))
 						{
-							target_set_location(y, x);
+							target_set_location(y, x, mode);
 							done = TRUE;
 						}
 						else
@@ -6248,7 +6291,7 @@ bool target_set_interactive(int mode)
 							flag = FALSE;
 	
 							/* Calculate the path */
-							if (mode == TARGET_KILL)
+							if (mode & (TARGET_KILL))
 							{
 								target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
 	
@@ -6276,6 +6319,22 @@ bool target_set_interactive(int mode)
 					break;
 				}
 
+				case '?':
+				{
+					screen_save();
+					(void)show_file("target.txt", NULL, 0, 0);
+					screen_load();
+					break;
+				}
+				
+				/* Get allies to attack anything near here */
+				case 'd':
+				{
+					target_set_location(y, x, mode | (TARGET_NEAR));
+					done = TRUE;
+					break;
+				}
+
 				case '.':
 				case 't':
 				case '5':
@@ -6286,13 +6345,29 @@ bool target_set_interactive(int mode)
 					if ((m_idx > 0) && target_able(m_idx))
 					{
 						health_track(m_idx);
-						target_set_monster(m_idx);
+						target_set_monster(m_idx, mode);
 						done = TRUE;
 					}
 					else
 					{
 						bell("Illegal target!");
 					}
+					break;
+				}
+				
+				/* Have set or changed race filter */
+				case 's':
+				{
+					/* Forget */
+					temp_n = 0;
+
+					/* Re-prepare targets */
+					target_set_interactive_prepare(mode);
+					
+					/* Start near the player again and fake movement */
+					m = 0;
+					d = 5;
+					
 					break;
 				}
 
@@ -6389,7 +6464,7 @@ bool target_set_interactive(int mode)
 					x = px;
 
 					/* Calculate the path */
-					if (mode == TARGET_KILL)
+					if (mode & (TARGET_KILL))
 					{
 						target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
 
@@ -6456,13 +6531,13 @@ bool target_set_interactive(int mode)
 						/* Set target if clicked */
 						if ((query.mousebutton) || (query.key == '!'))
 						{
-							target_set_location(y, x);
+							target_set_location(y, x, mode);
 							done = TRUE;
 						}
 						else
 						{
 							/* Calculate the path */
-							if (mode == TARGET_KILL)
+							if (mode & (TARGET_KILL))
 							{
 								target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
 
@@ -6490,13 +6565,44 @@ bool target_set_interactive(int mode)
 					break;
 				}
 
+				case '?':
+				{
+					screen_save();
+					(void)show_file("target.txt", NULL, 0, 0);
+					screen_load();
+					break;
+				}
+				
+				case 'd':
+				{
+					target_set_location(y, x, mode | (TARGET_NEAR));
+					done = TRUE;
+					break;
+				}
+
 				case '.':
 				case 't':
 				case '5':
 				case '0':
 				{
-					target_set_location(y, x);
+					target_set_location(y, x, mode);
 					done = TRUE;
+					break;
+				}
+
+				/* Have set or changed race filter */
+				case 's':
+				{
+					/* Forget */
+					temp_n = 0;
+
+					/* Re-prepare targets */
+					target_set_interactive_prepare(mode);
+					
+					/* Start near the player again and fake movement */
+					m = 0;
+					d = 5;
+					
 					break;
 				}
 
@@ -6555,7 +6661,7 @@ bool target_set_interactive(int mode)
 				tx = x;
 
 				/* Calculate the path */
-				if (mode == TARGET_KILL)
+				if (mode & (TARGET_KILL))
 				{
 					target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
 
@@ -6583,7 +6689,7 @@ bool target_set_interactive(int mode)
 	modify_grid_unseen_hook = modify_grid_unseen_view;
 	modify_grid_interesting_hook = modify_grid_interesting_view;
 
-	if (mode == TARGET_KILL)
+	if (mode & (TARGET_KILL))
 	{
 		/* Redraw map */
 		p_ptr->redraw |= (PR_MAP);
@@ -6682,7 +6788,7 @@ bool get_aim_dir(int *dp)
 			{
 				if (ke.mousebutton)
 				{
-					target_set_location(KEY_GRID_Y(ke), KEY_GRID_X(ke));
+					target_set_location(KEY_GRID_Y(ke), KEY_GRID_X(ke), 0);
 					dir = 5;
 					break;
 				}

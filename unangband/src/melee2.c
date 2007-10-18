@@ -77,7 +77,8 @@ static void find_range(int m_idx)
 	/* Breeders cannot be terrified */
 	else if (r_ptr->flags2 & (RF2_MULTIPLY)) m_ptr->min_range = 1;
 
-	else
+	/* Weak enemies may flee */
+	else if ((m_ptr->mflag & (MFLAG_ALLY)) == 0)
 	{
 		/* Minimum distance - stay at least this far if possible */
 		m_ptr->min_range=1;
@@ -1213,22 +1214,22 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	}
 
 	/* Eliminate innate spells if not set */
-	if (!(choose & 0x01))
+	if ((choose & 0x01) == 0)
 	{
 		/* Remove ranged blows */
-		if (!(m_ptr->mflag & (MFLAG_SHOT)) && !(r_ptr->flags3 & (RF3_HUGE)))
+		if (((m_ptr->mflag & (MFLAG_SHOT)) == 0) && !(r_ptr->flags3 & (RF3_HUGE)))
 		{
 			f4 &= ~(0x0FL);
 		}
 
 		/* Remove other shot options */
-		if (!(m_ptr->mflag & (MFLAG_SHOT)))
+		if ((m_ptr->mflag & (MFLAG_SHOT)) == 0)
 		{
 			f4 &= ~(0xF0L);
 		}
 
 		/* Remove breaths */
-		if (!(m_ptr->mflag & (MFLAG_BREATH)))
+		if ((m_ptr->mflag & (MFLAG_BREATH)) == 0)
 		{
 			f4 &= ~(RF4_BREATH_MASK);
 		}
@@ -1243,7 +1244,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	}
 
 	/* Eliminate other spells if not set */
-	if (!(choose & 0x02) && !(m_ptr->mflag & (MFLAG_CAST)))
+	if (((choose & 0x02) == 0) && ((m_ptr->mflag & (MFLAG_CAST)) == 0))
 	{
 		f4 &= (RF4_INNATE_MASK);
 		f5 &= (RF5_INNATE_MASK);
@@ -1317,13 +1318,24 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	if (((m_ptr->mflag & (MFLAG_IGNORE | MFLAG_ALLY)) != 0) &&
 		(!(m_ptr->blind) || ((m_ptr->mflag & (MFLAG_AGGR)) != 0)))
 	{
-		int k = 0;
-		
 		/* Attempt at efficiency */
 		bool ally = ((m_ptr->mflag & (MFLAG_ALLY)) != 0);
 		bool aggressive = ((m_ptr->mflag & (MFLAG_AGGR)) != 0) ;
 		bool need_lite = ((r_ptr->flags2 & (RF2_NEED_LITE)) == 0);
 		bool sneaking = p_ptr->sneaking || m_ptr->cdis > MAX_RANGE;
+
+		/* Note we scale this up, and use a pseudo-random hack to try to get multiple monsters
+		 * to favour different equi-distant enemies */
+		int k = (ally ? MAX_SIGHT : m_ptr->cdis) * 16 + 15;
+
+		/* Note the player can set target_near in the targetting routine to force allies to consider
+		 * targets closest to another monster or a point, as opposed to themselves. */
+		int ny = (ally && ((p_ptr->target_set & (TARGET_NEAR)) != 0)) ? (p_ptr->target_who ? m_list[p_ptr->target_who].fy : p_ptr->target_row) : m_ptr->fy;
+		int nx = (ally && ((p_ptr->target_set & (TARGET_NEAR)) != 0)) ? (p_ptr->target_who ? m_list[p_ptr->target_who].fx : p_ptr->target_col) : m_ptr->fx;
+		
+		/* Note the player can set target_race in the targetting routine to force allies to consider
+		 * targets only of a particular race if they can see at least one of them. */
+		bool force_one_race = FALSE;
 		
 		/* Check all other monsters */
 		for (i = m_max - 1; i >= 1; i--)
@@ -1341,11 +1353,17 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 			if (ally != ((n_ptr->mflag & (MFLAG_ALLY)) != 0))
 			{
 				bool see_target = aggressive;
-				int d = distance(n_ptr->fy, n_ptr->fx, m_ptr->fy, m_ptr->fx);
+				
+				/* XXX Note we prefer closer targets, however, reverse this for range 3 or less
+				 * This discourages the monster hitting itself with ball spells */
+				int d = (distance(n_ptr->fy, n_ptr->fx, ny, nx) * 16) + ((m_idx + i) % 16);
 				
 				/* Ignore targets out of range */
-				if (d > MAX_RANGE) continue;
+				if (d > MAX_RANGE * 16) continue;
 				
+				/* Prefer targets at about range 3 */
+				if (d < 4 * 16) d = (6 * 16) - d;
+
 				/*
 				 * Check if monster can see the target. We make various assumptions about what
 				 * monsters have a yet to be implemented SEE_INVIS flag, if the target is
@@ -1376,6 +1394,13 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 					/* Needs line of sight, and (hack) sometimes line of fire. */
 					see_target = generic_los(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx, CAVE_XLOS |
 							(m_idx + turn) % 2 ? CAVE_XLOF : 0);
+				}
+				/*
+				 * Sometimes check for line of fire
+				 */
+				else if ((m_idx + turn) % 2)
+				{
+					see_target = generic_los(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx, CAVE_XLOF);
 				}
 				
 				/* Ignore certain targets if sneaking */
@@ -1409,14 +1434,31 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 						}
 					}
 				}
-				
-				/* If target is valid, have a chance to pick it */ 
-				if ((see_target) && (!rand_int(++k)))
+
+				/* Check if forcing a particular kind */
+				if (p_ptr->target_race)
+				{
+					/* No match */
+					if (p_ptr->target_race != n_ptr->r_idx)
+					{
+						/* Have already found a match */
+						if (force_one_race) continue;
+					}
+					else
+					{
+						force_one_race = TRUE;
+					}
+				}
+
+				/* Pick a random target. Have checked for LOS already. */
+				if ((see_target) && (d < k))
 				{
 					*tar_y = n_ptr->fy;
 					*tar_x = n_ptr->fx;
 					
 					target_m_idx = i;
+					
+					k = d;
 				}
 			}
 		}
@@ -1424,7 +1466,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 
 	/* No valid target */
 	if (!target_m_idx)
-	{
+	{		
 		f4 &= (rf4_no_player_mask | RF4_SUMMON_MASK);
 		f5 &= (RF5_NO_PLAYER_MASK | RF4_SUMMON_MASK);
 		f6 &= (RF6_NO_PLAYER_MASK | RF6_SUMMON_MASK);
@@ -1434,7 +1476,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		if (!f4 && !f5 && !f6 && !f7) return (0);		
 	}
 	else
-	{	
+	{			
 		/* Check what kinds of spells can hit target */
 		path = projectable(m_ptr->fy, m_ptr->fx, *tar_y, *tar_x, PROJECT_CHCK);
 
@@ -5874,8 +5916,14 @@ static void process_monster(int m_idx)
 	{
 		int roll;
 
+		/* Monster must cast */
+		if (m_ptr->mflag & (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH))
+		{
+			roll = 0;
+		}
+		
 		/* Aggressive monsters use ranged attacks more frequently */
-		if (m_ptr->mflag & (MFLAG_AGGR))
+		else if (m_ptr->mflag & (MFLAG_AGGR))
 		{
 			roll = rand_int(200);
 			if (chance_innate) chance_innate += 100;
@@ -5889,8 +5937,7 @@ static void process_monster(int m_idx)
 
 		/* Pick a ranged attack */
 		if ((roll < chance_innate) || (roll < chance_spell)
-			|| ((r_ptr->flags3 & (RF3_HUGE)) && (roll < 50) && (m_ptr->cdis == 2))
-			|| (m_ptr->mflag & (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH)))
+			|| ((r_ptr->flags3 & (RF3_HUGE)) && (roll < 50) && (m_ptr->cdis == 2)))
 		{
 			/* Set up ranged melee attacks */
 			init_ranged_attack(r_ptr);
@@ -6322,6 +6369,15 @@ static void process_monster(int m_idx)
 		 * to favour different equi-distant enemies */
 		int k = (ally ? MAX_SIGHT : m_ptr->cdis) * 16 + 15;
 
+		/* Note the player can set target_near in the targetting routine to force allies to consider
+		 * targets closest to another monster or a point, as opposed to themselves. */
+		int ny = (ally && ((p_ptr->target_set & (TARGET_NEAR)) != 0)) ? (p_ptr->target_who ? m_list[p_ptr->target_who].fy : p_ptr->target_row) : m_ptr->fy;
+		int nx = (ally && ((p_ptr->target_set & (TARGET_NEAR)) != 0)) ? (p_ptr->target_who ? m_list[p_ptr->target_who].fx : p_ptr->target_col) : m_ptr->fx;
+
+		/* Note the player can set target_race in the targetting routine to force allies to consider
+		 * targets only of a particular race if they can see at least one of them. */
+		bool force_one_race = FALSE;
+
 		/* Need to understand spies, and be able to hear them.
 		 * Smart, nonvocal monsters are telepathic. */
 		if (spying && ((r_ptr->flags3 & (RF3_NONVOCAL)) == 0))
@@ -6350,7 +6406,7 @@ static void process_monster(int m_idx)
 			if (ally != ((n_ptr->mflag & (MFLAG_ALLY)) != 0))
 			{
 				bool see_target = FALSE;
-				int d = (distance(n_ptr->fy, n_ptr->fx, m_ptr->fy, m_ptr->fx) * 16) + ((m_idx + i) % 16);
+				int d = (distance(n_ptr->fy, n_ptr->fx, ny, nx) * 16) + ((m_idx + i) % 16);
 				
 				/* Ignore targets out of range */
 				if (d > MAX_RANGE * 16) continue;
@@ -6462,6 +6518,21 @@ static void process_monster(int m_idx)
 					continue;
 				}
 				
+				/* Check if forcing a particular kind */
+				if (p_ptr->target_race)
+				{
+					/* No match */
+					if (p_ptr->target_race != n_ptr->r_idx)
+					{
+						/* Have already found a match */
+						if (force_one_race) continue;
+					}
+					else
+					{
+						force_one_race = TRUE;
+					}
+				}
+
 				/* Pick a random target. Have checked for LOS already. */
 				if (d < k)
 				{
@@ -6525,15 +6596,22 @@ static void process_monster(int m_idx)
 			}
 		}
 		
-		/* If the monster is closing, forget the target if it is too close */
-		if (closing && must_use_target && (m_ptr->best_range > 1) && (k < ((int)m_ptr->best_range * 16)))
-		{
-			must_use_target = FALSE;
-			m_ptr->ty = 0;
-			m_ptr->tx = 0;
-			
+		/* If the monster is closing, find the range */
+		if (closing && must_use_target)
+		{	
 			/* Refind range */
 			find_range(m_idx);
+
+			/* Forget the target if it is too close and we can shoot it */
+			if ((m_ptr->best_range > 1) && (k < ((int)m_ptr->best_range * 16)) && generic_los(m_ptr->fy, m_ptr->fx, m_ptr->ty, m_ptr->tx, CAVE_XLOF))
+			{
+				must_use_target = FALSE;
+				m_ptr->ty = 0;
+				m_ptr->tx = 0;
+				
+				/* Hack -- speed up combat */
+				m_ptr->mflag |= (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH);
+			}
 		}
 	}
 

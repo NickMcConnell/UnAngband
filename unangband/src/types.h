@@ -1523,7 +1523,9 @@ struct player_type
 	s16b target_who;/* Target identity */
 	s16b target_row;/* Target location */
 	s16b target_col;/* Target location */
-
+	
+	s16b target_race;/* Target monsters of this race only */	
+	
 	s16b health_who;/* Health bar trackee */
 
 	s16b monster_race_idx;  /* Monster race trackee */

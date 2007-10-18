@@ -2561,7 +2561,7 @@ static void process_command(void)
 			}
 			else if (p_ptr->command_cmd_ex.mousebutton == 2)
 			{
-				target_set_location(y, x);
+				target_set_location(y, x, 0);
 				msg_print("Target set.");
 			}
 			else
@@ -3125,7 +3125,7 @@ static void dungeon(void)
 
 
 	/* Cancel the target */
-	target_set_monster(0);
+	target_set_monster(0, 0);
 
 	/* Cancel the health bar */
 	health_track(0);
@@ -3728,7 +3728,7 @@ void play_game(bool new_game)
 
 
 		/* Cancel the target */
-		target_set_monster(0);
+		target_set_monster(0, 0);
 
 		/* Cancel the health bar */
 		health_track(0);

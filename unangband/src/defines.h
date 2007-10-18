@@ -2706,18 +2706,25 @@
  *
  *	KILL: Target monsters
  *	LOOK: Describe grid fully
- *	XTRA: Currently unused flag
+ *	NEAR: Target monsters near the location
  *	GRID: Select from all grids
  *	PATH: Computer path instead of projection.
  *	PEEK: Describe without waiting for keypress.
- *
+ *  KIND: Target monsters of the same kind.
+ *  EASY: If target is killed/lost, find another.
+ *  LOST: Retargetting because killed/lost target.
  */
-#define TARGET_KILL		0x01
-#define TARGET_LOOK		0x02
-#define TARGET_XTRA		0x04
-#define TARGET_GRID		0x08
-#define TARGET_PATH		0x10
-#define TARGET_PEEK		0x20
+#define TARGET_KILL		0x0001
+#define TARGET_LOOK		0x0002
+#define TARGET_NEAR		0x0004
+#define TARGET_GRID		0x0008
+#define TARGET_PATH		0x0010
+#define TARGET_PEEK		0x0020
+#define TARGET_EASY		0x0040
+#define TARGET_LOST		0x0080
+#define TARGET_ALLY		0x0100
+
+
 
 
 /*
