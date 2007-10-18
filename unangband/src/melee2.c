@@ -31,8 +31,9 @@
 /*
  * Calculate minimum and desired combat ranges.  -BR-
  */
-static void find_range(monster_type *m_ptr)
+static void find_range(int m_idx)
 {
+	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	u16b p_lev, m_lev;
@@ -40,8 +41,9 @@ static void find_range(monster_type *m_ptr)
 	u16b m_chp, m_mhp;
 	u32b p_val, m_val;
 
-	/* Allied monsters */
-	if (m_ptr->mflag & (MFLAG_ALLY))
+	/* Allied monsters without a target, or targetting the player */
+	if ((m_ptr->mflag & (MFLAG_ALLY)) && (!(m_ptr->ty) ||
+			((m_ptr->ty == p_ptr->py) && (m_ptr->tx == p_ptr->px))))
 	{
 		/* Breeders are deliberately annoying */
 		if (r_ptr->flags2 & (RF2_MULTIPLY)) m_ptr->min_range = 1;
@@ -128,27 +130,30 @@ static void find_range(monster_type *m_ptr)
 	/* Now find prefered range */
 	m_ptr->best_range = m_ptr->min_range;
 
+	/*Monsters who have had dangerous attacks happen to them are more extreme*/
+	if (m_ptr->mflag & (MFLAG_AGGR))
+	{
+		/*spellcasters want to sit back*/
+		if (r_ptr->freq_spell || r_ptr->freq_innate) m_ptr->best_range = 8;
+
+		/*those who can't will close immediately*/
+		else m_ptr->min_range = 1;
+	}
+
 	/* Frequent spell casters / breathers / archers */
-	if ((r_ptr->freq_spell > 24) || (r_ptr->freq_innate > 24))
+	else if ((r_ptr->freq_spell > 24) || (r_ptr->freq_innate > 24) || ((r_ptr->flags2 & (RF2_ARCHER)) != 0))
 	{
 		/* Heavy spell casters will sit back and cast */
-		if (m_ptr->mana > r_ptr->mana / 5) m_ptr->best_range = 6;
+		if ((r_ptr->mana) && (m_ptr->mana > r_ptr->mana / 5)) m_ptr->best_range = 6;
+
+		/* Archers will sit back and shoot until out of ammo */
+		else if (((r_ptr->flags2 & (RF2_ARCHER)) != 0) && !(find_monster_ammo(m_idx, -1, FALSE) < 0))  m_ptr->best_range = 6;
 
 		/* Creatures that don't move never like to get too close */
 		else if (r_ptr->flags1 & (RF1_NEVER_MOVE)) m_ptr->best_range = 6;
 
 		/* Spellcasters that don't strike never like to get too close */
 		else if (r_ptr->flags1 & (RF1_NEVER_BLOW)) m_ptr->best_range = 8;
-
-		/*Monsters who have had dangerous attacks happen to them are more extreme*/
-		else if (m_ptr->mflag & (MFLAG_AGGR))
-		{
-			/*spellcasters want to sit back*/
-			if (r_ptr->freq_spell) m_ptr->best_range = 8;
-
-			/*those who can't will close immediately*/
-			else m_ptr->min_range = 1;
-		}
 
 		/* Breathers like point blank range */
 		if (((r_ptr->flags4 & (RF4_BREATH_MASK)) ||
@@ -1804,6 +1809,9 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 	{
 		/* Monster has no melee blows - character's grid is off-limits. */
 		if (r_ptr->flags1 & (RF1_NEVER_BLOW)) return (0);
+		
+		/* Monster is an ally - character's grid is off-limits */
+		else if (m_ptr->mflag & (MFLAG_ALLY)) return (0);
 
 		/* Any monster with melee blows can attack the character. */
 		else move_chance = 100;
@@ -1819,7 +1827,7 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 		if ((m_ptr->mflag & (MFLAG_ALLY)) != (n_ptr->mflag & (MFLAG_ALLY)))
 		{
 			/* Can always attack */
-			return (100);	
+			return (100);
 		}
 
 		/* Pushed already */
@@ -1858,9 +1866,25 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 			move_chance = 80;
 		}
 
-
 		/* Cannot do anything to clear away the other monster */
 		else return (0);
+		
+		/* Attempt to move around monsters in combat, instead of pushing through them */
+		/* This allows fronts to form in combat in large groups */
+		if (move_chance < 100)
+		{
+			/* Allies check for the aggressive flag */
+			if (m_ptr->mflag & (MFLAG_ALLY))
+			{
+				if (n_ptr->mflag & (MFLAG_AGGR)) return (0);
+			}
+			
+			/* Enemies check for distance from player */
+			else
+			{
+				if (n_ptr->cdis == 0) return (0);
+			}
+		}
 	}
 
 	/* Hack -- avoid less interesting squares if collecting items */
@@ -2844,7 +2868,7 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 		     (p_ptr->pspeed > m_ptr->mspeed))
 		{
 			/* Recalculate range */
-			find_range(m_ptr);
+			find_range(m_idx);
 
 			/* Note changes in monster attitude */
 			if (m_ptr->min_range < m_ptr->cdis)
@@ -5567,7 +5591,7 @@ static void process_monster(int m_idx)
 	if (m_ptr->csleep) return;
 
 	/* Calculate the monster's preferred combat range when needed */
-	if (m_ptr->min_range == 0) find_range(m_ptr);
+	if (m_ptr->min_range == 0) find_range(m_idx);
 
 	/* Monster is in active mode. */
 	if (m_ptr->mflag & (MFLAG_ACTV))
@@ -6279,10 +6303,10 @@ static void process_monster(int m_idx)
 		bool ally = ((m_ptr->mflag & (MFLAG_ALLY)) != 0);
 		bool aggressive = ((m_ptr->mflag & (MFLAG_AGGR)) != 0) ;
 		bool need_lite = ((r_ptr->flags2 & (RF2_NEED_LITE)) == 0);
-		bool sneaking = p_ptr->sneaking || m_ptr->cdis > MAX_RANGE;
+		bool sneaking = (p_ptr->sneaking) || (m_ptr->cdis > MAX_RANGE);
 		
 		/* Note: We have to prevent never move monsters from acquiring targets or they will move */
-		bool can_target = ((r_ptr->flags1 & (RF1_NEVER_MOVE | RF1_NEVER_BLOW)) != 0)
+		bool can_target = ((r_ptr->flags1 & (RF1_NEVER_MOVE | RF1_NEVER_BLOW)) == 0)
 			&& (aggressive || !(m_ptr->monfear));
 		
 		/* This allows smart monsters to report enemy positions to the player */
@@ -6290,6 +6314,9 @@ static void process_monster(int m_idx)
 		
 		/* This prevents player monsters from being too effective whilst the player is not around */
 		bool restrict_targets = ally && !aggressive;
+		
+		/* This encourages archers and magic users to stay at a distance in combat */
+		bool closing = !ally || ((m_ptr->ty) != 0);
 		
 		/* Note we scale this up, and use a pseudo-random hack to try to get multiple monsters
 		 * to favour different equi-distant enemies */
@@ -6417,11 +6444,14 @@ static void process_monster(int m_idx)
 				}
 
 				/* Can't attack the target */
-				if (!can_target)
+				if (!(can_target))
 				{
+					/* Target set already */
+					if (m_ptr->ty) continue;
+					
 					/* Run back to the player with tails between its legs,
-					 * unless ordered otherwise. */
-					if (((r_ptr->flags1 & (RF1_NEVER_MOVE)) == 0) && (!p_ptr->target_set))
+					 * unless ordered somewhere. */
+					if (((r_ptr->flags1 & (RF1_NEVER_MOVE)) == 0) && ((!p_ptr->target_set) || (p_ptr->target_who)))
 					{
 						m_ptr->ty = p_ptr->py;
 						m_ptr->tx = p_ptr->px;
@@ -6432,8 +6462,8 @@ static void process_monster(int m_idx)
 					continue;
 				}
 				
-				/* Pick a random target in line of sight */
-				if ((d < k) && (generic_los(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx, CAVE_XLOS)))
+				/* Pick a random target. Have checked for LOS already. */
+				if (d < k)
 				{
 					m_ptr->ty = n_ptr->fy;
 					m_ptr->tx = n_ptr->fx;
@@ -6463,7 +6493,7 @@ static void process_monster(int m_idx)
 					monster_type *n_ptr = &m_list[p_ptr->target_who];
 					
 					/* Target it if visible. Note can use more information than 'easily' visible. */
-					if ((n_ptr->ml) || ((n_ptr->mflag & (MFLAG_VIEW)) != 0))
+					if ((n_ptr->ml) || ((n_ptr->mflag & (MFLAG_SHOW | MFLAG_MARK)) != 0))
 					{
 						m_ptr->ty = n_ptr->fy;
 						m_ptr->tx = n_ptr->fx;			
@@ -6475,11 +6505,14 @@ static void process_monster(int m_idx)
 				{
 					m_ptr->ty = p_ptr->target_row;
 					m_ptr->tx = p_ptr->target_col;
+					
+					/* But not closing anymore */
+					closing = FALSE;
 				}
 			}
 			
-			/* Player does not have target set and not nearby. Return monster.*/
-			else if (m_ptr->cdis > MAX_SIGHT)
+			/* Follow the player.*/
+			else
 			{
 				m_ptr->ty = p_ptr->py;
 				m_ptr->tx = p_ptr->px;
@@ -6490,6 +6523,17 @@ static void process_monster(int m_idx)
 			{
 				must_use_target = TRUE;
 			}
+		}
+		
+		/* If the monster is closing, forget the target if it is too close */
+		if (closing && must_use_target && (m_ptr->best_range > 1) && (k < ((int)m_ptr->best_range * 16)))
+		{
+			must_use_target = FALSE;
+			m_ptr->ty = 0;
+			m_ptr->tx = 0;
+			
+			/* Refind range */
+			find_range(m_idx);
 		}
 	}
 
@@ -6908,7 +6952,7 @@ static void recover_monster(int m_idx, bool regen)
 			set_monster_fear(m_ptr, 0, FALSE);
 
 			/* Recalculate minimum range immediately */
-			find_range(m_ptr);
+			find_range(m_idx);
 
 			/* Visual note - only if monster isn't terrified */
 			if ((m_ptr->ml) && (m_ptr->min_range != FLEE_RANGE))

@@ -5036,16 +5036,15 @@ void message_pain(int m_idx, int dam)
 	/* Hack -- avoid mentioning if out of sight */
 	if (m_ptr->cdis > MAX_SIGHT) return;
 
-#if 0
 	/* Hack -- if seen, only report changes in 'damage state'*/
-	if (m_ptr->ml)
+	if ((m_ptr->ml) && (m_idx != p_ptr->health_who))
 	{
 		int percentage2;
 
-		tmp = (oldhp * 100L) / (long)(m_ptr->maxhp);
+		tmp = (oldhp * 100L) / (long)(m_ptr->maxhp + 1);
 		percentage = (int)(tmp);
 
-		tmp = (newhp * 100L) / (long)(m_ptr->maxhp);
+		tmp = (newhp * 100L) / (long)(m_ptr->maxhp + 1);
 		percentage2 = (int)(tmp);
 
 		/* Notify the player only if monster 'damage state' changes */
@@ -5057,7 +5056,7 @@ void message_pain(int m_idx, int dam)
 		}
 		return;
 	}
-#endif
+
 	/* Nonvocal monsters */
 	if (r_ptr->flags3 & (RF3_NONVOCAL))
 	{
