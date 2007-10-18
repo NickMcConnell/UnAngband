@@ -46,11 +46,8 @@ prefer to move back towards your position if they are too
 close to the target in question.
 
 Once you have specified a grid target, or specified an assault
-on a grid, you either need to move out of line of sight of
-your troops or specify a monster target for them to stop
-holding or assaulting it.  This is an inadequacy in their
-current training, I'm sure to upgrade this at a later date
-when I have the chance.
+on a grid, you need to target again, and hit the Escape key
+to cancel your orders.
 
 As always,
 
