@@ -1718,6 +1718,7 @@ static void describe_monster_movement(const monster_race *r_ptr, const monster_l
 	/* Describe the improvements */
 	if (l_ptr->flags9 & (RF9_LEVEL_SIZE)) vp[vn++] ="larger";
 	if (l_ptr->flags9 & (RF9_LEVEL_SPEED)) vp[vn++] ="faster";
+	if (l_ptr->flags9 & (RF9_LEVEL_AGE)) vp[vn++] ="older";
 	if (l_ptr->flags9 & (RF9_LEVEL_POWER)) vp[vn++] ="more powerful";
 
 	/* Describe "improvements" */

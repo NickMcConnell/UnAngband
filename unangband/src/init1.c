@@ -3956,6 +3956,13 @@ errr parse_r_info(char *buf, header *head)
 			r_ptr->flags3 |= RF3_NONVOCAL;
 		}
 
+		/* Hack -- older monsters */
+		if (strchr("eQCfBrhtlpqnoOPTY", r_ptr->d_char))
+		{
+			r_ptr->flags9 |= RF9_LEVEL_AGE;
+		}
+		
+		
 		/* Canines and hounds and ring wraiths have super scent */
 		if ((strchr("CZ", r_ptr->d_char)) || ((r_ptr->d_char == 'W') && (r_ptr->flags1 & (RF1_UNIQUE))))
 		{
