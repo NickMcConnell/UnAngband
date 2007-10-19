@@ -1158,9 +1158,9 @@ static void race_aux_hook(birth_menu r_str)
 	p_ptr->expfact = rp_ptr->r_exp;
 
 	sprintf(s, "Experience: %d%%  ", p_ptr->expfact);
-	Term_putstr(RACE_AUX_COL, TABLE_ROW + A_MAX + 2, -1, TERM_WHITE, s);
+	Term_putstr(RACE_AUX2_COL, TABLE_ROW + A_MAX + 2, -1, TERM_WHITE, s);
 	sprintf(s, "Infravision: %d ft  ", rp_ptr->infra * 10);
-	Term_putstr(RACE_AUX_COL, TABLE_ROW + A_MAX + 3, -1, TERM_WHITE, s);
+	Term_putstr(RACE_AUX2_COL, TABLE_ROW + A_MAX + 3, -1, TERM_WHITE, s);
 
 	/* Skills - scaled up to exaggerate differences */
 	xthn = rp_ptr->r_thn * 2 + 24;
@@ -1315,8 +1315,11 @@ static void class_aux_hook(birth_menu c_str)
 	p_ptr->expfact = rp_ptr->r_exp + cp_ptr->c_exp;
 
 	sprintf(s, "Experience: %d%%  ", p_ptr->expfact);
-	Term_putstr(CLASS_AUX_COL, TABLE_ROW + A_MAX + 2, -1, TERM_WHITE, s);
-	
+	Term_putstr(CLASS_AUX2_COL, TABLE_ROW + A_MAX + 2, -1, TERM_WHITE, s);
+	sprintf(s, "Infravision: %d ft  ", rp_ptr->infra * 10);
+	Term_putstr(CLASS_AUX2_COL, TABLE_ROW + A_MAX + 3, -1, TERM_WHITE, s);
+
+
 	/* Skills */
 	xthn = rp_ptr->r_thn + cp_ptr->c_thn + cp_ptr->x_thn;
 	xthb = rp_ptr->r_thb + cp_ptr->c_thb + cp_ptr->x_thb;
@@ -1463,7 +1466,9 @@ static void style_aux_hook(birth_menu w_str)
 	p_ptr->expfact = rp_ptr->r_exp + cp_ptr->c_exp + (style_idx ? 10 : 0);
 
 	sprintf(s, "Experience: %d%%  ", p_ptr->expfact);
-	Term_putstr(STYLE_AUX_COL, TABLE_ROW + A_MAX + 1, -1, TERM_WHITE, s);
+	Term_putstr(STYLE_AUX_COL, TABLE_ROW + A_MAX + 2, -1, TERM_WHITE, s);
+	sprintf(s, "Infravision: %d ft  ", rp_ptr->infra * 10);
+	Term_putstr(STYLE_AUX_COL, TABLE_ROW + A_MAX + 3, -1, TERM_WHITE, s);
 }
 
 

@@ -2209,7 +2209,7 @@ void init_angband(void)
 	(void)process_pref_file("pref.prf");
 
 	/* Done */
-	note("[Initialization complete]");
+	note("    [Initialization complete]");
 }
 
 void ang_atexit(void (*arg)(void) ){
