@@ -249,8 +249,10 @@ bool update_smart_learn(int who, u32b flag)
 		m_ptr->smart |= flag;
 		
 		/* Tell the allies */
-		tell_allies_player_can(m_ptr->fy, m_ptr->fx, flag);
+		return (tell_allies_player_can(m_ptr->fy, m_ptr->fx, flag));
 	}
+	
+	return (FALSE);
 }
 
 

@@ -1416,6 +1416,25 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 			/* Append special notation */
 			my_strcat(desc, " (offscreen)", max);
 		}
+
+		/* Show additional flags */
+		if (cheat_xtra)
+		{			
+			if (m_ptr->mflag & (MFLAG_AGGR))
+			{
+				/* Append special notation */
+				my_strcat(desc, " (aggro)", max);
+			}
+
+			if (m_ptr->mflag & (MFLAG_IGNORE))
+			{
+				/* Append special notation */
+				my_strcat(desc, " (ignore)", max);
+			}
+		
+		}
+
+
 		
 		/* Remove gender sensitivity */
 		for (t = s = desc; *s; s++)
@@ -3750,6 +3769,8 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp, u32b fl
 
 	/* Save previous monster restriction value. */
 	bool (*get_mon_num_hook_temp)(int r_idx) = get_mon_num_hook;
+	
+	int old_monster_level = monster_level;
 
 	/* Calculate the number of escorts we want. */
 	if ((r_ptr->flags1 & (RF1_ESCORTS)) || (level_flag & (LF1_BATTLE))) escort_size = rand_range(12, 18);
@@ -3770,7 +3791,7 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp, u32b fl
 
 	/* Build monster table, get index of first escort */
 	escort_idx = get_mon_num(monster_level);
-
+		
 	/* Start on the monster */
 	hack_n = 1;
 	hack_x[0] = x;
@@ -3794,14 +3815,14 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp, u32b fl
 			int my = hy + ddy_ddd[i % 8];
 
 			/* Place a group of escorts if needed */
-			if ((r_info[escort_idx].flags1 & (RF1_FRIENDS)) &&
+			if ((old_monster_level == monster_level) && (r_info[escort_idx].flags1 & (RF1_FRIENDS)) &&
 				!place_monster_group(my, mx, escort_idx, slp, (rand_range(3, 5)), flg))
 			{
 				continue;
 			}
 
 			/* Place a group of escorts if needed */
-			if ((r_info[escort_idx].flags1 & (RF1_FRIEND)) &&
+			if ((old_monster_level == monster_level) && (r_info[escort_idx].flags1 & (RF1_FRIEND)) &&
 				!place_monster_group(my, mx, escort_idx, slp, 2, flg))
 			{
 				continue;
@@ -3821,8 +3842,13 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp, u32b fl
 			/* Get index of the next escort */
 			escort_idx = get_mon_num(monster_level);
 		}
+		
+		/* No luck -- boost */
+		if (!escort_idx) monster_level += 3;
 	}
 
+	monster_level = old_monster_level;
+	
 	/* Return to previous monster restrictions (usually none) */
 	get_mon_num_hook = get_mon_num_hook_temp;
 
@@ -3856,9 +3882,14 @@ s16b player_place(int y, int x, bool escort_allowed)
 	/* Place escorts on battle-field */
 	if ((escort_allowed) && (level_flag & (LF1_BATTLE)))
 	{
+		/* Help the player out */
+		monster_level += 5;
+		
 		place_monster_escort(y, x, rp_ptr->r_idx, FALSE, (MFLAG_ALLY));
 		
 		msg_print("You are joined by companions in battle.  Many of the bravest will not leave this place.");
+
+		monster_level -= 5;
 	}
 
 	/* Success */

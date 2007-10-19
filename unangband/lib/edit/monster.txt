@@ -18909,7 +18909,7 @@ S:DARKNESS | BLINK | ADD_MANA | BOLT_ELEC | INVIS
 D:A little winged humanoid clothed surrounded by shadow.
 
 N:1309:Uruk berserker
-G:t:o
+G:o:o
 I:120:60d25:20:80:10
 W:58:2:0:2500
 M:25:25:12:60

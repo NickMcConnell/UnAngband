@@ -455,6 +455,10 @@ static bool check_hit(int power, int level, int who, bool ranged)
 }
 
 
+
+
+
+
 /*
  * Hack -- possible "insult" messages
  */
@@ -917,6 +921,80 @@ static int attack_power(int effect)
 		/* Need to add extra flavours in here */
 	}
 	return power;
+}
+
+
+/*
+ * Determine if a monster attack against another monster succeeds.
+ * Always miss 5% of the time, Always hit 5% of the time.
+ * Otherwise, match monster power against monster armor.
+ */
+bool mon_check_hit(int m_idx, int method, int effect, int level, int who, bool ranged)
+{
+	monster_type *m_ptr = &m_list[m_idx];
+	monster_type *n_ptr = &m_list[who];
+	monster_race *r_ptr = &r_info[n_ptr->r_idx];
+
+	int k, ac;
+	int power = attack_power(effect);
+	
+	/* Monster never misses */
+	if (r_ptr->flags9 & (RF9_NEVER_MISS)) return (TRUE);
+
+	/* Calculate the "attack quality".  Blind monsters are greatly hindered. Stunned monsters are hindered. */
+	power = (power + (n_ptr->blind ? level * 1 : (n_ptr->stunned ? level * 2 : level * 3)));
+
+	/* Apply monster stats */
+	if (n_ptr->mflag & (MFLAG_CLUMSY)) power -= 5;
+	else if (n_ptr->mflag & (MFLAG_SKILLFUL)) power += 5;
+
+	/* Apply temporary conditions */
+	if (n_ptr->bless) power += 10;
+	if (n_ptr->berserk) power += 24;
+
+	/* Blind monsters almost always miss at ranged combat */
+	if ((ranged) && (n_ptr->blind)) power /= 10;
+
+	/* Monsters can evade */
+	if (mon_evade(m_idx, 
+		(ranged ? 5 : 3) + (m_ptr->confused 
+				 || m_ptr->stunned ? 1 : 3),
+		9, "")) return (FALSE);
+
+	/* Huge monsters are hard to hit. */
+	if (r_info[m_ptr->r_idx].flags3 & (RF3_HUGE))
+	{
+		/* Easier for climbers, flyers and other huge monsters */
+		if (((n_ptr->mflag & (MFLAG_OVER)) == 0)
+				&& (r_ptr->flags3 & (RF3_HUGE)) &&
+				(rand_int(100) < (r_ptr->flags2 & (RF3_GIANT)) ? 35 : 70)) return (FALSE);
+	}
+
+	/* Hack -- make armoured monsters much more effective against monster arrows. */
+	if ((ranged) && (r_info[m_ptr->r_idx].flags2 & (RF2_ARMOR)))
+	{
+		/* XXX Tune this to make warriors useful against archers. */
+		if (rand_int(100) < 40) return (FALSE);
+	}
+
+	/* Percentile dice */
+	k = rand_int(100);
+
+	/* Hack -- Always miss or hit */
+	if (k < 10) return (k < 5);
+
+	/* Total armor */
+	ac = calc_monster_ac(m_idx, ranged);
+	
+	/* Power and Level compete against Armor */
+	if (power > 0)
+	{
+		/* Armour or blocking protects */
+		if (randint(power) > ((ac * 3) / 4)) return (TRUE);
+	}
+
+	/* Assume miss */
+	return (FALSE);
 }
 
 
@@ -2172,7 +2250,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		else if (m_ptr->mflag & (MFLAG_SMART)) failrate /= 2;
 
 		/* Check for spell failure (breath/shot attacks never fail) */
-		if ((attack >= 128) && (rand_int(100) < failrate))
+		if ((attack >= 128) && (rand_int(100) < failrate) && ((m_ptr->mflag != (MFLAG_ALLY)) == 0))
 		{
 			/* Message */
 			msg_format("%^s tries to cast a spell, but fails.", m_name);
@@ -2293,6 +2371,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (target < 0)
 			{
 				hit = check_hit(attack_power(effect), rlev - m_ptr->cdis, who, TRUE);
+			}
+			else if (target > 0)
+			{
+				hit = mon_check_hit(target, method, effect, rlev - m_ptr->cdis, who, TRUE);
 			}
 
 			/* Get attack */
@@ -6163,8 +6245,12 @@ bool mon_evade(int m_idx, int chance, int out_of, cptr r)
 
 	cptr p;
 
-	int roll = rand_int(out_of);
+	int roll;
+	
+	if ((r_ptr->flags9 & (RF9_EVASIVE)) == 0) return (FALSE);
 
+	roll = rand_int(out_of);
+	
 	/* Get "the monster" or "it" */
 	monster_desc(m_name, sizeof(m_name), m_idx, 0x40);
 
@@ -6177,7 +6263,7 @@ bool mon_evade(int m_idx, int chance, int out_of, cptr r)
 	}
 
 	/* Hack -- evasive monsters may ignore trap */
-	if ((r_ptr->flags9 & (RF9_EVASIVE)) && (!m_ptr->berserk) && (!m_ptr->blind)
+	if ((!m_ptr->blind) && (!m_ptr->csleep)
 		&& (roll < chance))
 	{
 		if (m_ptr->ml)

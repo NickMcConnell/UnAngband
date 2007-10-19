@@ -1868,7 +1868,7 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 		monster_race *nr_ptr = &r_info[n_ptr->r_idx];
 
 		/* Enemies can always attack */
-		if ((m_ptr->mflag & (MFLAG_ALLY)) != (n_ptr->mflag & (MFLAG_ALLY)))
+		if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) != ((n_ptr->mflag & (MFLAG_ALLY)) != 0))
 		{
 			/* Can always attack */
 			return (100);
@@ -2853,7 +2853,7 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 			
 			if (cave_m_idx[y1][x1] <= 0) continue;
 
-			if ((m_list[cave_m_idx[y1][x1]].mflag & (MFLAG_ALLY)) != (m_ptr->mflag & (MFLAG_ALLY))) d = i;			
+			if (((m_list[cave_m_idx[y1][x1]].mflag & (MFLAG_ALLY)) != 0) != ((m_ptr->mflag & (MFLAG_ALLY)) != 0)) d = i;			
 		}
 
 		/* Is character in range? */
@@ -3493,7 +3493,7 @@ void monster_speech(int m_idx, cptr saying, bool understand)
 	}
 
 	/* Check if player understands language */
-	understand = player_understands(language);
+	understand |= player_understands(language);
 
 	/* Get accent */
 	if (!speech)
@@ -3601,7 +3601,7 @@ bool tell_allies_player_can(int y, int x, u32b flag)
 		if ((flag & ~(n_ptr->smart)) == 0) continue;
 
 		/* Ignore allies or vice versa */
-		if ((n_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))) continue;
+		if (((n_ptr->mflag & (MFLAG_ALLY)) != 0) != ((m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY)) != 0)) continue;
 
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
@@ -3692,8 +3692,8 @@ bool tell_allies_player_not(int y, int x, u32b flag)
 		if ((n_ptr->smart & (flag)) == 0) continue;
 
 		/* Ignore allies or vice versa */
-		if ((n_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))) continue;
-
+		if (((n_ptr->mflag & (MFLAG_ALLY)) != 0) != ((m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY)) != 0)) continue;
+		
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
 
@@ -3778,8 +3778,8 @@ bool tell_allies_mflag(int y, int x, u32b flag, cptr saying)
 		if (i == cave_m_idx[y][x]) continue;
 
 		/* Ignore allies or vice versa */
-		if ((n_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))) continue;
-
+		if (((n_ptr->mflag & (MFLAG_ALLY)) != 0) != ((m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY)) != 0)) continue;
+		
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
 
@@ -3838,7 +3838,7 @@ bool tell_allies_death(int y, int x, cptr saying)
 		if (i == cave_m_idx[y][x]) continue;
 
 		/* Ignore allies or vice versa */
-		if ((n_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))) continue;
+		if (((n_ptr->mflag & (MFLAG_ALLY)) != 0) != ((m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY)) != 0)) continue;
 
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
@@ -3871,7 +3871,7 @@ bool tell_allies_death(int y, int x, cptr saying)
 			if ((n2_ptr->fy == y) && (n2_ptr->fx == x)) continue;
 
 			/* Ignore allies or vice versa */
-			if ((n2_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))) continue;
+			if (((n2_ptr->mflag & (MFLAG_ALLY)) != 0) != ((n_ptr->mflag & (MFLAG_ALLY)) != 0)) continue;
 
 			/* Ignore monsters who speak different language */
 			if (monster_language(n2_ptr->r_idx) != language) continue;
@@ -3941,7 +3941,7 @@ bool tell_allies_best_range(int y, int x, int range, cptr saying)
 		if (i == cave_m_idx[y][x]) continue;
 
 		/* Ignore allies or vice versa */
-		if ((n_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))) continue;
+		if (((n_ptr->mflag & (MFLAG_ALLY)) != 0) != ((m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY)) != 0)) continue;
 
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
@@ -3996,7 +3996,7 @@ bool tell_allies_target(int y, int x, int ty, int tx, bool scent, cptr saying)
 		if (i == cave_m_idx[y][x]) continue;
 
 		/* Ignore allies or vice versa */
-		if ((n_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY))) continue;
+		if (((n_ptr->mflag & (MFLAG_ALLY)) != 0) != ((m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY)) != 0)) continue;
 
 		/* Ignore monsters who speak different language */
 		if (monster_language(n_ptr->r_idx) != language) continue;
@@ -5105,7 +5105,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 	{
 		/* Attack adjacent monsters, if confused or enemies */
 		if ((cave_m_idx[ny][nx] > 0) && ((m_ptr->confused) ||
-			((m_ptr->mflag & (MFLAG_ALLY)) != (m_list[cave_m_idx[ny][nx]].mflag & (MFLAG_ALLY)))))
+			(((m_ptr->mflag & (MFLAG_ALLY)) != 0) != ((m_list[cave_m_idx[ny][nx]].mflag & (MFLAG_ALLY)) != 0))))
 		{
 			monster_type *n_ptr = &m_list[cave_m_idx[ny][nx]];
 
@@ -5124,27 +5124,76 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				{
 					int damage = 0;
 						
-					bool do_cut, do_stun;
-
 					/* Extract the attack infomation */
 					int effect = r_ptr->blow[ap_cnt].effect;
 					int method = r_ptr->blow[ap_cnt].method;
 					int d_dice = r_ptr->blow[ap_cnt].d_dice;
 					int d_side = r_ptr->blow[ap_cnt].d_side;
 						
+					bool do_cut = (effect == GF_WOUND ? TRUE : FALSE);
+					bool do_stun = (effect == GF_BATTER ? TRUE : FALSE);
+
 					int who = m_ptr->mflag & (MFLAG_ALLY) ? SOURCE_PLAYER_ALLY : m_idx;
 					int what = m_ptr->mflag & (MFLAG_ALLY) ? m_idx : ap_cnt;
+					
+					int ac = calc_monster_ac(cave_m_idx[ny][nx], FALSE);
 
 					/* Hack -- no more attacks */
 					if (!method) break;
+					
+					/* Hack -- ignore ineffective attacks */
+					if (!effect) continue;
 
-					/* Hack --- always hit, never display message XXX XXX XXX */
+					/* Never display message XXX XXX XXX */
+					if (!n_ptr->csleep && !mon_check_hit(cave_m_idx[ny][nx], method, effect, r_ptr->level, m_idx , FALSE)) continue;
 
-					/* Roll out the damage */
-					damage = damroll(d_dice, d_side);
-
+					/* Roll out the damage. Note hack to make fights faster */
+					damage = damroll(d_dice, d_side) * (n_ptr->csleep ? 5 : 3);
+					
+					/* Monster armor reduces total damage */
+					damage -= (damage * ((ac < 150) ? ac: 150) / 250);
+					
 					/* Debugging - display attacks */
 					attack_desc(who, what, cave_m_idx[ny][nx], method, damage, &do_cut, &do_stun);
+
+					/* Hack -- use cut or stun for resistance only */
+					if (do_cut && do_stun)
+					{
+						/* Cancel cut */
+						if (m_idx % 2)
+						{
+							do_cut = FALSE;
+						}
+
+						/* Cancel stun */
+						else
+						{
+							do_stun = FALSE;
+						}
+					}
+					
+					/* Check resistances */
+					if (do_cut)
+					{
+						/* Immunity */
+						if (((r_ptr->flags9 & (RF9_IM_EDGED)) != 0) && (rand_int(100) < 85)) continue;
+
+						/* Resist */
+						else if (((r_ptr->flags9 & (RF9_RES_EDGED)) != 0) && (rand_int(100) < 60)) continue;
+					}
+					else if (do_stun)
+					{
+						/* Immunity */
+						if (((r_ptr->flags9 & (RF9_IM_BLUNT)) != 0) && (rand_int(100) < 85)) continue;
+
+						/* Resist */
+						else if (((r_ptr->flags9 & (RF9_RES_BLUNT)) != 0) && (rand_int(100) < 60)) continue;
+					}
+					else
+					{
+						/* Resist */
+						if (((r_ptr->flags9 & (RF9_RES_MAGIC)) != 0) && (rand_int(100) < 60)) continue;
+					}
 
 					/* New result routine */
 					project_m(who, what, ny, nx, damage, effect);
@@ -6123,6 +6172,9 @@ static void process_monster(int m_idx)
 			/* Get the next object */
 			next_o_idx = o_ptr->next_o_idx;
 
+			/* Only undead cannibals */
+			if ((o_ptr->name3) && (r_info[o_ptr->name3].d_char == r_ptr->d_char) && ((r_ptr->flags3 & (RF3_UNDEAD | RF3_INSECT)) == 0)) continue;
+			
 			/* Edible? */
 			switch (o_ptr->tval)
 			{
@@ -6157,6 +6209,9 @@ static void process_monster(int m_idx)
 			/* Get the next object */
 			next_o_idx = o_ptr->next_o_idx;
 
+			/* Only undead/insect cannibals */
+			if ((o_ptr->name3) && (r_info[o_ptr->name3].d_char == r_ptr->d_char) && ((r_ptr->flags3 & (RF3_UNDEAD | RF3_INSECT)) == 0)) continue;
+			
 			/* Edible? */
 			switch (o_ptr->tval)
 			{
@@ -6324,7 +6379,7 @@ static void process_monster(int m_idx)
 			
 			if (!cave_m_idx[y1][x1]) continue;
 
-			if ((m_list[cave_m_idx[y1][x1]].mflag & (MFLAG_ALLY)) != (m_ptr->mflag & (MFLAG_ALLY))) chance = 0;
+			if (((m_list[cave_m_idx[y1][x1]].mflag & (MFLAG_ALLY)) != 0) != ((m_ptr->mflag & (MFLAG_ALLY)) != 0)) chance = 0;
 		}
 
 		/* Chance of moving randomly */
