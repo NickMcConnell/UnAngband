@@ -1432,6 +1432,17 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 				my_strcat(desc, " (ignore)", max);
 			}
 		
+			if (m_ptr->ty && m_ptr->tx)
+			{
+				/* Append special notation */
+				my_strcat(desc, format(" (t:%d, %d)", m_ptr->ty - m_ptr->fy, m_ptr->tx - m_ptr->fx) , max);
+			}
+			
+			if (m_ptr->min_range)
+			{
+				/* Append special notation */
+				my_strcat(desc, format(" (mr %d, br %d)", m_ptr->min_range, m_ptr->best_range) , max);
+			}
 		}
 
 
@@ -3813,16 +3824,16 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp, u32b fl
 		{
 			int mx = hx + ddx_ddd[i % 8];
 			int my = hy + ddy_ddd[i % 8];
-
+			
 			/* Place a group of escorts if needed */
-			if ((old_monster_level == monster_level) && (r_info[escort_idx].flags1 & (RF1_FRIENDS)) &&
+			if (((r_info[escort_idx].level < old_monster_level - 9) || (r_info[escort_idx].flags1 & (RF1_FRIENDS))) &&
 				!place_monster_group(my, mx, escort_idx, slp, (rand_range(3, 5)), flg))
 			{
 				continue;
 			}
 
-			/* Place a group of escorts if needed */
-			if ((old_monster_level == monster_level) && (r_info[escort_idx].flags1 & (RF1_FRIEND)) &&
+			/* Place a few escorts if needed */
+			else if (((r_info[escort_idx].level < old_monster_level - 4) || (r_info[escort_idx].flags1 & (RF1_FRIEND))) &&
 				!place_monster_group(my, mx, escort_idx, slp, 2, flg))
 			{
 				continue;

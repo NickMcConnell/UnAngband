@@ -5352,9 +5352,9 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		if (m_ptr->cdis > 1) m_ptr->mflag |= (MFLAG_HIT_RANGE);
 		else m_ptr->mflag |= (MFLAG_HIT_BLOW);
 	}
-	/* Check if monsters are fighting */
-	else if ((who > SOURCE_MONSTER_START)
-			&& (((m_list[who].mflag & (MFLAG_ALLY)) != 0) != ((m_ptr->mflag & (MFLAG_ALLY)) != 0)))
+	/* Check if monsters are fighting out of player LOS.*/
+	else if ((who > SOURCE_MONSTER_START) && !(player_has_los_bold(y, x)) && 
+			(((m_list[who].mflag & (MFLAG_ALLY)) != 0) != ((m_ptr->mflag & (MFLAG_ALLY)) != 0)))
 	{
 		/* If so, make them aggressive. */
 		m_ptr->mflag |= (MFLAG_AGGR);

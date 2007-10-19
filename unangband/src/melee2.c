@@ -42,7 +42,7 @@ static void find_range(int m_idx)
 	u32b p_val, m_val;
 
 	/* Allied monsters without a target, or targetting the player */
-	if ((m_ptr->mflag & (MFLAG_ALLY)) && (!(m_ptr->ty) ||
+	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && (!(m_ptr->ty) ||
 			((m_ptr->ty == p_ptr->py) && (m_ptr->tx == p_ptr->px))))
 	{
 		/* Breeders are deliberately annoying */
@@ -178,7 +178,6 @@ static void find_range(int m_idx)
 	{
 		/* Hack and back against another monster */
 		if ((m_ptr->mflag & (MFLAG_ALLY | MFLAG_IGNORE)) &&
-				(m_ptr->mflag & (MFLAG_AGGR)) && 
 				(cave_m_idx[m_ptr->ty][m_ptr->tx]) &&
 				(distance(m_ptr->ty, m_ptr->tx, m_ptr->fy, m_ptr->fx) == 1))
 		{
@@ -198,8 +197,6 @@ static void find_range(int m_idx)
 				
 				/* Ensure we don't push anyone else into this space */
 				m_ptr->mflag |= (MFLAG_PUSH);
-				
-				msg_print("backing");
 			}
 		}
 		/* Hack and back against player */
@@ -1970,21 +1967,10 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 		/* Cannot do anything to clear away the other monster */
 		else return (0);
 		
-		/* Attempt to move around monsters in combat, instead of pushing through them */
-		/* This allows fronts to form in combat in large groups */
-		if (move_chance < 100)
+		/* Attempt to move around monsters in combat with player, instead of pushing through them */
+		if ((move_chance < 100) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0) && (n_ptr->cdis == 1))
 		{
-			/* Allies check for the aggressive flag */
-			if (m_ptr->mflag & (MFLAG_ALLY))
-			{
-				if (n_ptr->mflag & (MFLAG_AGGR)) return (0);
-			}
-			
-			/* Enemies check for distance from player */
-			else
-			{
-				if (n_ptr->cdis == 0) return (0);
-			}
+			return (0);
 		}
 	}
 
@@ -5252,8 +5238,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 						if (((r_ptr->flags9 & (RF9_RES_MAGIC)) != 0) && (rand_int(100) < 60)) continue;
 					}
 					
-					/* Notice we made an attack */
-					if (m_ptr->mflag & (MFLAG_ALLY)) m_ptr->mflag |= (MFLAG_AGGR);
+					/* Notice we made an attack. This prevents others pushing into our position
+					 * and allows fronts to form in combat in large groups */
+					if (m_ptr->mflag & (MFLAG_ALLY)) m_ptr->mflag |= (MFLAG_PUSH);
 
 					/* New result routine */
 					project_m(who, what, ny, nx, damage, effect);
@@ -6750,7 +6737,6 @@ static void process_monster(int m_idx)
 					else if (!force_one_race)
 					{
 						force_one_race = TRUE;
-						force_one_race = TRUE;
 						k = MAX_RANGE * 16;
 						i = m_max;
 					}
@@ -6781,7 +6767,7 @@ static void process_monster(int m_idx)
 							(ally != ((m_list[cave_m_idx[yy][xx]].mflag & (MFLAG_ALLY)) != 0)))
 						{
 							v++;
-							if (v > 5) d /= 2;
+							if (v > 4) d -= 32;
 						}
 					}
 				}
@@ -6807,7 +6793,7 @@ static void process_monster(int m_idx)
 		 * will exceed the best range and the target will be aborted.
 		 */
 		if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && ((m_ptr->mflag & (MFLAG_IGNORE)) == 0) && (!must_use_target))
-		{		
+		{
 			/* Player has target set. */
 			if (p_ptr->target_set)
 			{
@@ -6851,7 +6837,11 @@ static void process_monster(int m_idx)
 		
 		/* If the monster is closing, find the range */
 		if (closing && must_use_target)
-		{	
+		{
+			/* Important -- clear existing ranges */
+			m_ptr->min_range = 1;
+			m_ptr->best_range = 1;
+			
 			/* Refind range */
 			find_range(m_idx);
 
@@ -6871,6 +6861,9 @@ static void process_monster(int m_idx)
 					m_ptr->ty = 0;
 					m_ptr->tx = 0;
 				}
+				
+				/* Find range again */
+				find_range(m_idx);
 				
 				/* Hack -- speed up combat */
 				m_ptr->mflag |= (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH);
