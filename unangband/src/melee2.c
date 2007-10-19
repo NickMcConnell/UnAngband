@@ -131,41 +131,98 @@ static void find_range(int m_idx)
 	/* Now find prefered range */
 	m_ptr->best_range = m_ptr->min_range;
 
-	/*Monsters who have had dangerous attacks happen to them are more extreme*/
-	if (m_ptr->mflag & (MFLAG_AGGR))
-	{
-		/*spellcasters want to sit back*/
-		if (r_ptr->freq_spell || r_ptr->freq_innate) m_ptr->best_range = 8;
+	/*Note below: Monsters who have had dangerous attacks happen to them are more extreme*/
 
-		/*those who can't will close immediately*/
-		else m_ptr->min_range = 1;
+	/* Spellcasters want to sit back */
+	if ((r_ptr->freq_spell > ((m_ptr->mflag & (MFLAG_AGGR)) != 0 ? 0 : 24)) &&
+			(((r_ptr->flags5 & (RF5_ATTACK_MASK)) != 0) ||
+			((r_ptr->flags6 & (RF6_ATTACK_MASK)) != 0) ||
+			((r_ptr->flags7 & (RF7_ATTACK_MASK)) != 0)))
+	{
+		/* Sit back - further if aggressive */
+		m_ptr->best_range = 6 + ((m_ptr->mflag & (MFLAG_AGGR)) != 0 ? 2 : 0);
 	}
 
-	/* Frequent spell casters / breathers / archers */
-	else if ((r_ptr->freq_spell > 24) || (r_ptr->freq_innate > 24) || ((r_ptr->flags2 & (RF2_ARCHER)) != 0))
+	/* Breathers want to mix it up a little */
+	else if ((r_ptr->freq_innate > ((m_ptr->mflag & (MFLAG_AGGR)) != 0 ? 0 : 24)) &&
+			((r_ptr->flags4 & (RF4_BREATH_MASK)) != 0))
 	{
-		/* Heavy spell casters will sit back and cast */
-		if ((r_ptr->mana) && (m_ptr->mana > r_ptr->mana / 5)) m_ptr->best_range = 6;
+		m_ptr->best_range = 6;
+	}
+	
+	/* Archers want to sit back */
+	else if (((r_ptr->flags2 & (RF2_ARCHER)) != 0) && (find_monster_ammo(m_idx, -1, FALSE) >= 0))
+	{
+		/* Don't back off for aggression due to limited range */
+		m_ptr->best_range = 6;
+	}
+	
+	/* Innate magic users want to sit back */
+	else if ((r_ptr->freq_innate > ((m_ptr->mflag & (MFLAG_AGGR)) != 0 ? 0 : 24)) &&
+			((r_ptr->flags4 & (RF4_ATTACK_MASK)) != 0))
+	{
+		m_ptr->best_range = 6 + ((m_ptr->mflag & (MFLAG_AGGR)) != 0 ? 2 : 0);
+	}
 
-		/* Archers will sit back and shoot until out of ammo */
-		else if (((r_ptr->flags2 & (RF2_ARCHER)) != 0) && (find_monster_ammo(m_idx, -1, FALSE) >= 0))  m_ptr->best_range = 6;
-
-		/* Creatures that don't move never like to get too close */
-		else if (r_ptr->flags1 & (RF1_NEVER_MOVE)) m_ptr->best_range = 6;
-
-		/* Spellcasters that don't strike never like to get too close */
-		else if (r_ptr->flags1 & (RF1_NEVER_BLOW)) m_ptr->best_range = 8;
-
-		/* Breathers like point blank range */
-		if (((r_ptr->flags4 & (RF4_BREATH_MASK)) ||
-		     (r_ptr->flags5 & (RF5_BREATH_MASK)) ||
-		     (r_ptr->flags6 & (RF6_BREATH_MASK)) ||
-		     (r_ptr->flags7 & (RF7_BREATH_MASK))) &&
-		    (m_ptr->best_range < 6) &&
-		    (m_ptr->hp > m_ptr->maxhp / 2))
+	/* Creatures that don't move never like to get too close */
+	else if (r_ptr->flags1 & (RF1_NEVER_MOVE)) m_ptr->best_range = 6;
+	
+	/* Spellcasters that don't strike never like to get too close */
+	else if (r_ptr->flags1 & (RF1_NEVER_BLOW)) m_ptr->best_range = 8;
+	
+	/* Allow faster monsters to hack and back */
+	/* Check speed differential. If we are fast enough to move more than once
+	 * for every 1 targets move, and next to it, and have exactly 1
+	 * move left, we set best_range to 4. */
+	else if (m_ptr->mspeed > 115)
+	{
+		/* Hack and back against another monster */
+		if ((m_ptr->mflag & (MFLAG_ALLY | MFLAG_IGNORE)) &&
+				(m_ptr->mflag & (MFLAG_AGGR)) && 
+				(cave_m_idx[m_ptr->ty][m_ptr->tx]) &&
+				(distance(m_ptr->ty, m_ptr->tx, m_ptr->fy, m_ptr->fx) == 1))
 		{
-			m_ptr->best_range = 6;
+			monster_type *n_ptr = &m_list[cave_m_idx[m_ptr->ty][m_ptr->tx]];
+			
+			/* Ensure that its an enemy */
+			if ((((m_ptr->mflag & (MFLAG_ALLY)) != 0) != ((m_ptr->mflag & (MFLAG_ALLY)) != 0)) &&
+			
+			/* Enough of a differential. This doesn't have to be exact */
+				(n_ptr->mspeed < m_ptr->mspeed - 5) &&
+				/* This is more important. The other monster will be
+				 * able to act before us again. Therefore we are currently
+				 * doing our last move. */
+				(n_ptr->energy + extract_energy[n_ptr->mspeed] >= 100))
+			{
+				m_ptr->best_range = 4;
+				
+				/* Ensure we don't push anyone else into this space */
+				m_ptr->mflag |= (MFLAG_PUSH);
+				
+				msg_print("backing");
+			}
 		}
+		/* Hack and back against player */
+		else if (((m_ptr->mflag & (MFLAG_ALLY)) == 0) && (m_ptr->cdis == 1))
+		{
+			/* Enough of a differential. This doesn't have to be exact */
+			if ((p_ptr->pspeed < m_ptr->mspeed - 5) &&
+				/* This is more important. The other monster will be
+				 * able to act before us again. Therefore we are currently
+				 * doing our last move. */
+				(p_ptr->energy + extract_energy[p_ptr->pspeed] >= 100))
+			{
+				m_ptr->best_range = 4;
+				
+				/* Ensure we don't push anyone else into this space */
+				m_ptr->mflag |= (MFLAG_PUSH);
+			}			
+		}
+	}
+	/* Other aggressive monsters close immediately */
+	else if (m_ptr->mflag & (MFLAG_AGGR))
+	{
+		m_ptr->min_range = 1;
 	}
 }
 
@@ -5148,7 +5205,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					if (!n_ptr->csleep && !mon_check_hit(cave_m_idx[ny][nx], method, effect, r_ptr->level, m_idx , FALSE)) continue;
 
 					/* Roll out the damage. Note hack to make fights faster */
-					damage = damroll(d_dice, d_side) * (n_ptr->csleep ? 5 : 3);
+					damage = damroll(d_dice, d_side) * (n_ptr->csleep ? 4 : 2);
 					
 					/* Monster armor reduces total damage */
 					damage -= (damage * ((ac < 150) ? ac: 150) / 250);
@@ -5194,6 +5251,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 						/* Resist */
 						if (((r_ptr->flags9 & (RF9_RES_MAGIC)) != 0) && (rand_int(100) < 60)) continue;
 					}
+					
+					/* Notice we made an attack */
+					if (m_ptr->mflag & (MFLAG_ALLY)) m_ptr->mflag |= (MFLAG_AGGR);
 
 					/* New result routine */
 					project_m(who, what, ny, nx, damage, effect);
@@ -5999,7 +6059,6 @@ static void process_monster(int m_idx)
 	/* A monster in passive mode will end its turn at this point. */
 	if (!(m_ptr->mflag & (MFLAG_ACTV))) return;
 
-
 	/* Hack -- Always redraw the current target monster health bar */
 	if (p_ptr->health_who == cave_m_idx[m_ptr->fy][m_ptr->fx]) 
 		p_ptr->redraw |= (PR_HEALTH);
@@ -6351,7 +6410,7 @@ static void process_monster(int m_idx)
 	 * Innate semi-random movement.  Monsters adjacent to the character 
 	 * can always strike accurately at him (monster isn't confused).
 	 */
-	if ((r_ptr->flags1 & (RF1_RAND_50 | RF1_RAND_25)) && (m_ptr->cdis > 1))
+	if ((r_ptr->flags1 & (RF1_RAND_50 | RF1_RAND_25)) && (m_ptr->cdis > 1) && ((level_flag & (LF1_BATTLE)) == 0))
 	{
 		int chance = 0;
 		
@@ -6696,6 +6755,36 @@ static void process_monster(int m_idx)
 						i = m_max;
 					}
 				}
+				
+				/* High speed differential. Compute vulnerability. */
+				if (m_ptr->mspeed > n_ptr->mspeed + 5)
+				{
+					/* We do the monster equivalent of computing vulnerability.
+					 * This allows fast monsters to try to surround isolated
+					 * individuals. Otherwise, they tend to get chewed up in
+					 * combat.
+					 */
+					int ii;
+					int v = 0;
+					
+					for (ii = 0; ii < 8; ii++)
+					{
+						int yy = n_ptr->fy + ddy[ii];
+						int xx = n_ptr->fx + ddx[ii];
+						
+						if (!in_bounds_fully(yy, xx)) continue;
+						
+						if (place_monster_here(yy,xx,m_ptr->r_idx) <= MM_FAIL) continue;
+						
+						/* Decrease range if the target has unaligned space around it */
+						if ((cave_m_idx[yy][xx]) ||
+							(ally != ((m_list[cave_m_idx[yy][xx]].mflag & (MFLAG_ALLY)) != 0)))
+						{
+							v++;
+							if (v > 5) d /= 2;
+						}
+					}
+				}
 
 				/* Pick a random target. Have checked for LOS already. */
 				if (d < k)
@@ -6786,7 +6875,7 @@ static void process_monster(int m_idx)
 				/* Hack -- speed up combat */
 				m_ptr->mflag |= (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH);
 			}
-		}
+		}		
 	}
 
 
