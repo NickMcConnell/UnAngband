@@ -925,8 +925,6 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 			Term_putstr(col, i + TABLE_ROW, wid, attr, buf);
 		}
 
-		if (done) return (choices[cur].choice);
-
 		/* Display auxiliary information if any is available. */
 		if (hook) hook(choices[cur]);
 
@@ -943,6 +941,8 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 
 			delay = 0;
 		}
+
+		if (done) return (choices[cur].choice);
 
 		ke = inkey_ex();
 
