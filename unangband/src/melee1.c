@@ -529,9 +529,8 @@ void attack_desc(int who, int what, int target, int method, int damage, bool *do
 	/* Describe target */
 	if ((who == SOURCE_MONSTER_START) && (what > SOURCE_MONSTER_START))
 	{
-		/* Get the monster possessive ("his"/"her"/"its") */
-		monster_desc(t_name, sizeof(t_name), what, 0x22);
-		my_strcat(t_name, t_name[0] == 'i' ? "elf" : "self", sizeof(t_name));
+		/* Get the monster reflexive ("himself"/"herself"/"itself") */
+		monster_desc(t_name, sizeof(t_name), who, 0x23);
 	}
 	else if (target > 0)
 	{
@@ -2011,6 +2010,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 	char t_name[80];
 	char t_poss[80];
+	char t_nref[80]; /* Not reflexive if required */
 
 	cptr result = NULL;
 
@@ -2089,8 +2089,11 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		s_ptr = &r_info[n_ptr->r_idx];
 		k_ptr = &l_list[who];
 
+		/* Get the monster name (or "it") */
+		monster_desc(t_nref, sizeof(t_name), target, 0x00);
+
 		/* Get the monster reflexive ("himself"/"herself"/"itself") */
-		monster_desc(t_name, sizeof(t_name), who, 0x23);
+		monster_desc(t_name, sizeof(t_nref), who, 0x23);
 
 		/* Get the monster possessive ("his"/"her"/"its") */
 		monster_desc(t_poss, sizeof(t_poss), who, 0x22);
@@ -2105,6 +2108,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* Get the monster name (or "it") */
 		monster_desc(t_name, sizeof(t_name), target, 0x00);
 
+		/* Get the monster name (or "it") */
+		monster_desc(t_nref, sizeof(t_nref), target, 0x00);
+
 		/* Get the monster possessive ("the goblin's") */
 		monster_desc(t_poss, sizeof(t_poss), target, 0x02);
 	}
@@ -2116,6 +2122,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		k_ptr = &l_list[0];
 
 		my_strcpy(t_name,"you", sizeof(t_name));
+		my_strcpy(t_nref,"you", sizeof(t_nref));
 		my_strcpy(t_poss,"your", sizeof(t_poss));
 	}
 	/* Describe target - target is an empty grid/feature */
@@ -2125,9 +2132,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		s_ptr = &r_info[0];
 		k_ptr = &l_list[0];
 
+		my_strcpy(t_name,f_name + f_info[cave_feat[y][x]].name, sizeof(t_name));
+		my_strcpy(t_nref,f_name + f_info[cave_feat[y][x]].name, sizeof(t_nref));
 		my_strcpy(t_poss,"the ", sizeof(t_poss));
-		my_strcat(t_name,f_name + f_info[cave_feat[y][x]].name, sizeof(t_name));
-		my_strcpy(t_poss,f_name + f_info[cave_feat[y][x]].name, sizeof(t_poss));
+		my_strcat(t_poss,f_name + f_info[cave_feat[y][x]].name, sizeof(t_poss));
 		my_strcat(t_poss,"'s",sizeof(t_poss));
 	}
 		
@@ -2143,15 +2151,15 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* Feature is seen */
 		if (play_info[y][x] & (PLAY_SEEN))
 		{
-			my_strcpy(t_poss,"the ", sizeof(t_poss));
-			my_strcat(m_name,f_name + f_info[what].name, sizeof(t_name));
-			my_strcpy(m_poss,f_name + f_info[what].name, sizeof(t_poss));
-			my_strcat(t_poss,"'s",sizeof(t_poss));
+			my_strcat(m_name,f_name + f_info[what].name, sizeof(m_name));
+			my_strcpy(m_poss,"the ", sizeof(m_poss));
+			my_strcpy(m_poss,f_name + f_info[what].name, sizeof(m_poss));
+			my_strcat(m_poss,"'s",sizeof(t_poss));
 		}
 		else
 		{
-			my_strcpy(t_poss,"it", sizeof(t_poss));
-			my_strcpy(m_poss,"its", sizeof(t_poss));
+			my_strcpy(m_name,"it", sizeof(m_name));
+			my_strcpy(m_poss,"its", sizeof(m_poss));
 		}
 		
 		/* Hack -- Message text depends on feature description */
@@ -3193,21 +3201,21 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if (blind) result = format("%^s mumbles.", m_name);
 				else result = format("%^s gestures fluidly.", m_name);
-				msg_format("%^s %s surrounded by a dust devil.", t_name, target < 0 ? "are" : "is");
+				msg_format("%^s %s surrounded by a dust devil.", t_nref, target < 0 ? "are" : "is");
 				rad = 2;
 			}
 			else if (spower < 40)
 			{
 				if (blind) result = format("%^s mumbles.", m_name);
 				else result = format("%^s gestures fluidly.", m_name);
-				msg_format("%^s %s engulfed in a twister.", t_name, target < 0 ? "are" : "is");
+				msg_format("%^s %s engulfed in a twister.", t_nref, target < 0 ? "are" : "is");
 				rad = 3;
 			}
 			else
 			{
 				if (blind) result = format("%^s chants powerfully.", m_name);
 				else result = format("%^s gestures fluidly.", m_name);
-				msg_format("%^s %s lost in a raging tornado!", t_name, target < 0 ? "are" : "is");
+				msg_format("%^s %s lost in a raging tornado!", t_nref, target < 0 ? "are" : "is");
 				rad = 5;
 			}
 			mon_ball(who, what, y, x, GF_WIND, get_dam(spower, attack), rad, TRUE, result);
@@ -3223,21 +3231,21 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if (blind) result = format("%^s mumbles.", m_name);
 				else result = format("%^s gestures fluidly.", m_name);
-				msg_format("%^s %s surrounded by a little storm.", t_name, target < 0 ? "are" : "is");
+				msg_format("%^s %s surrounded by a little storm.", t_nref, target < 0 ? "are" : "is");
 				rad = 2;
 			}
 			else if (spower < 40)
 			{
 				if (blind) result = format("%^s mumbles.", m_name);
 				else result = format("%^s gestures fluidly.", m_name);
-				msg_format("%^s %s engulfed in a whirlpool.", t_name, target < 0 ? "are" : "is");
+				msg_format("%^s %s engulfed in a whirlpool.", t_nref, target < 0 ? "are" : "is");
 				rad = 3;
 			}
 			else
 			{
 				if (blind) result = format("%^s chants powerfully.", m_name);
 				else result = format("%^s gestures fluidly.", m_name);
-				msg_format("%^s %s lost in a raging tempest of wind and water!", t_name, target < 0 ? "are" : "is");
+				msg_format("%^s %s lost in a raging tempest of wind and water!", t_nref, target < 0 ? "are" : "is");
 				rad = 5;
 			}
 			mon_ball(who, what, y, x, GF_WATER, get_dam(spower, attack), rad, TRUE, result);
@@ -3750,7 +3758,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					if (known)
 					{
 						if ((!blind) && (n_ptr->ml)) msg_format("%^s looks very healthy!",  t_name);
-						else msg_format("%^s sounds very healthy!", t_name);
+						else msg_format("%^s sounds very healthy!", t_nref);
 					}
 				}
 
@@ -3761,7 +3769,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					if (known)
 					{
 						if ((!blind) && (n_ptr->ml)) msg_format("%^s looks healthier.",  t_name);
-						else msg_format("%^s sounds healthier.", t_name);
+						else msg_format("%^s sounds healthier.", t_nref);
 					}
 				}
 
@@ -3778,7 +3786,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 					/* Message */
 					if (n_ptr->ml)
-						msg_format("%^s recovers %s courage.", t_name, t_poss);
+						msg_format("%^s recovers %s courage.", t_nref, t_poss);
 				}
 
 				/* Recalculate combat range later */
@@ -3824,7 +3832,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					n_ptr->stunned = 0;
 
 					/* Message */
-					if (n_ptr->ml) msg_format("%^s is no longer stunned.", t_name);
+					if (n_ptr->ml) msg_format("%^s is no longer stunned.", t_nref);
 				}
 
 				/* Cancel fear */
@@ -3834,7 +3842,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					n_ptr->monfear = 0;
 
 					/* Message */
-					if (n_ptr->ml) msg_format("%^s recovers %s courage.", t_name, t_poss);
+					if (n_ptr->ml) msg_format("%^s recovers %s courage.", t_nref, t_poss);
 				}
 
 				/* Cancel confusion */
@@ -3844,7 +3852,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					n_ptr->confused = 0;
 
 					/* Message */
-					if (n_ptr->ml) msg_format("%^s is no longer confused.", t_name);
+					if (n_ptr->ml) msg_format("%^s is no longer confused.", t_nref);
 				}
 
 				/* Cancel cuts */
@@ -3854,7 +3862,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					n_ptr->cut = 0;
 
 					/* Message */
-					if (n_ptr->ml) msg_format("%^s is no longer bleeding.", t_name);
+					if (n_ptr->ml) msg_format("%^s is no longer bleeding.", t_nref);
 				}
 
 				/* Cancel confusion */
@@ -3864,7 +3872,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					n_ptr->poisoned = 0;
 
 					/* Message */
-					if (n_ptr->ml) msg_format("%^s is no longer poisoned.", t_name);
+					if (n_ptr->ml) msg_format("%^s is no longer poisoned.", t_nref);
 				}
 
 				/* Cancel blindness */
@@ -3874,7 +3882,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					n_ptr->blind = 0;
 
 					/* Message */
-					if (n_ptr->ml) msg_format("%^s is no longer blind.", t_name);
+					if (n_ptr->ml) msg_format("%^s is no longer blind.", t_nref);
 				}
 
 				/* Redraw (later) if needed */
@@ -3973,19 +3981,19 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					monster_desc(t_name, sizeof(t_name), target, 0x08);
 										
 					seen = TRUE;
-					msg_format("%^s blinks into view.", t_name);
+					msg_format("%^s blinks into view.", t_nref);
 				}
 
 				/* Normal message */
 				else if (direct)
 				{
-					msg_format("%^s blinks away.", t_name);
+					msg_format("%^s blinks away.", t_nref);
 				}
 
 				/* Telepathic message */
 				else if (known)
 				{
-					msg_format("%^s blinks.", t_name);
+					msg_format("%^s blinks.", t_nref);
 				}
 			}
 			break;
@@ -4013,19 +4021,19 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					monster_desc(t_name, sizeof(t_name), target, 0x08);
 
 					seen = TRUE;
-					msg_format("%^s teleports into view.", t_name);
+					msg_format("%^s teleports into view.", t_nref);
 				}
 
 				/* Normal message */
 				else if (direct)
 				{
-					msg_format("%^s teleports away.", t_name);
+					msg_format("%^s teleports away.", t_nref);
 				}
 
 				/* Telepathic message */
 				else if (known)
 				{
-					msg_format("%^s teleports.", t_name);
+					msg_format("%^s teleports.", t_nref);
 				}
 			}
 			break;
@@ -4059,7 +4067,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 					if (!n_ptr->ml)
 					{
-						msg_format("%^s disppears!", t_name);
+						msg_format("%^s disppears!", t_nref);
 					}
 				}
 			}
@@ -4226,7 +4234,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Notify player */
 				if ((n_ptr->ml) && !(n_ptr->tim_passw))
 				{
-					msg_format("%^s becomes more insubstantial!", t_name);
+					msg_format("%^s becomes more insubstantial!", t_nref);
 				}
 
 				/* Add to the monster haste counter */
@@ -4701,7 +4709,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Notify player */
 				if ((n_ptr->ml) && !(n_ptr->bless))
 				{
-					msg_format("%^s appears righteous!", t_name);
+					msg_format("%^s appears righteous!", t_nref);
 				}
 
 				/* Add to the monster bless counter */
@@ -4734,7 +4742,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Notify player */
 				if ((n_ptr->ml) && !(n_ptr->berserk))
 				{
-					msg_format("%^s goes berserk!", t_name);
+					msg_format("%^s goes berserk!", t_nref);
 				}
 
 				/* Add to the monster haste counter */
@@ -4767,7 +4775,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Notify player */
 				if ((n_ptr->ml) && !(n_ptr->shield))
 				{
-					msg_format("%^s becomes magically shielded.", t_name);
+					msg_format("%^s becomes magically shielded.", t_nref);
 				}
 
 				/* Add to the monster shield counter */
@@ -4800,7 +4808,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Notify player */
 				if ((n_ptr->ml) && !(n_ptr->oppose_elem))
 				{
-					msg_format("%^s becomes temporarily resistant to the elements.", t_name);
+					msg_format("%^s becomes temporarily resistant to the elements.", t_nref);
 				}
 
 				/* Add to the monster haste counter */
@@ -4825,7 +4833,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (!direct) break;
 			if (target == 0) break;
 
-			if (blind) msg_format("%^s %s commanded to feel hungry.", t_name, target < 0 ? "are" : "is");
+			if (blind) msg_format("%^s %s commanded to feel hungry.", t_nref, target < 0 ? "are" : "is");
 			else msg_format("%^s gestures at %s, and commands that %s feel%s hungry.", m_name, t_name, t_name, target < 0 ? "" : "s");
 
 			if (target < 0)
