@@ -148,7 +148,7 @@ static void find_range(int m_idx)
 		if ((r_ptr->mana) && (m_ptr->mana > r_ptr->mana / 5)) m_ptr->best_range = 6;
 
 		/* Archers will sit back and shoot until out of ammo */
-		else if (((r_ptr->flags2 & (RF2_ARCHER)) != 0) && !(find_monster_ammo(m_idx, -1, FALSE) < 0))  m_ptr->best_range = 6;
+		else if (((r_ptr->flags2 & (RF2_ARCHER)) != 0) && (find_monster_ammo(m_idx, -1, FALSE) >= 0))  m_ptr->best_range = 6;
 
 		/* Creatures that don't move never like to get too close */
 		else if (r_ptr->flags1 & (RF1_NEVER_MOVE)) m_ptr->best_range = 6;
@@ -5178,7 +5178,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 
 		/* The grid is occupied by a monster. */
 		else if (cave_m_idx[ny][nx] > 0)
-		{
+		{	
 			monster_type *n_ptr = &m_list[cave_m_idx[ny][nx]];
 
 			/* The other monster cannot switch places */
@@ -5200,6 +5200,110 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 
 				/* Monster has been pushed aside */
 				n_ptr->mflag |= (MFLAG_PUSH);
+			}
+			
+			/* Monsters trade objects */
+			if (m_ptr->hold_o_idx)
+			{
+				/* For efficiency in large groups of archers */
+				bool swap = TRUE;
+				
+				/* Average the size of top of stacks if stackable */
+				if (n_ptr->hold_o_idx)
+				{
+					object_type *o_ptr = &o_list[m_ptr->hold_o_idx];
+					object_type *j_ptr = &o_list[n_ptr->hold_o_idx];
+					
+					if (object_similar(o_ptr, j_ptr))
+					{
+						int n = (o_ptr->number + j_ptr->number) / 2;
+						int c = (o_ptr->number + j_ptr->number) % 2;
+						
+						o_ptr->number = n;
+						j_ptr->number = n + c;
+						
+						swap = FALSE;
+					}
+				}
+				
+				/* Give some ammunition to archers */
+				/* Not we do this as a give, because monsters in front tend to run out of
+				 * ammunition, and monsters from behind tend to push.
+				 * We also act slightly greedy and hold onto 1 object, otherwise the
+				 * archers end up carrying with 1 carrying 1 huge stack */
+				if ((swap) && (r_info[n_ptr->r_idx].flags2 & (RF2_ARCHER)) &&
+						(o_list[m_ptr->hold_o_idx].next_o_idx))
+				{
+					/* Swap stacks. Identify ammunition. Either give the whole stack
+					 * back, or bottom below the ammo. */
+					int temp_o_idx = n_ptr->hold_o_idx;
+					int ammo;
+					
+					n_ptr->hold_o_idx = m_ptr->hold_o_idx;
+					m_ptr->hold_o_idx = temp_o_idx;
+					
+					/* Find ammo in stack */
+					ammo = find_monster_ammo(cave_m_idx[ny][nx], -1, FALSE);
+					
+					/* Ammunition */
+					if (ammo >= 0)
+					{
+						object_type *o_ptr = &o_list[o_list[ammo].next_o_idx];
+						object_type *j_ptr = &o_list[ammo];
+						
+						int this_o_idx, next_o_idx;
+						
+						if (cheat_xtra) msg_format("Debug before swap: ammo %d, ammo next %d, temp %d, m_ptr->held %d, n_ptr->held %d", ammo, o_list[ammo].next_o_idx, temp_o_idx, m_ptr->hold_o_idx, n_ptr->hold_o_idx);
+						
+						/* Very carefully */
+						temp_o_idx = o_list[ammo].next_o_idx;
+						o_list[ammo].next_o_idx = m_ptr->hold_o_idx;
+						m_ptr->hold_o_idx = temp_o_idx;
+						n_ptr->hold_o_idx = ammo;
+						
+						/* Fix monster held. This is for efficiency. */
+						for (this_o_idx = ammo; this_o_idx; this_o_idx = next_o_idx)
+						{
+							/* Get the object */
+							o_ptr = &o_list[this_o_idx];
+
+							/* Get the next object */
+							next_o_idx = o_ptr->next_o_idx;
+
+							/* Manually correct this */
+							o_list[this_o_idx].held_m_idx = cave_m_idx[ny][nx];
+						}
+						
+						/* Paranoia */
+						/* Hack -- encourage archers to carry 2 stacks */
+						if ((o_list[ammo].next_o_idx) && (o_list[o_list[ammo].next_o_idx].next_o_idx))
+						{						
+							/* Get next in stack */
+							o_ptr = &o_list[o_list[ammo].next_o_idx];
+								
+							/* Combine if possible */
+							if (object_similar(o_ptr, j_ptr))
+							{
+								/* Paranoia */
+								temp_o_idx = o_list[ammo].next_o_idx;
+								
+								object_absorb(o_ptr, j_ptr, TRUE);
+								n_ptr->hold_o_idx = temp_o_idx;
+								
+								if (cheat_xtra) msg_format("Debug after swap and absorb: m_ptr->held %d, n_ptr->held %d", m_ptr->hold_o_idx, n_ptr->hold_o_idx);
+							}
+							else if (cheat_xtra) msg_format("Debug after swap: m_ptr->held %d, n_ptr->held %d, n_ptr->held next %d", m_ptr->hold_o_idx, n_ptr->hold_o_idx, o_list[n_ptr->hold_o_idx].next_o_idx);						
+						}	
+						else if (cheat_xtra) msg_format("Debug after swap: m_ptr->held %d, n_ptr->held %d, n_ptr->held next %d", m_ptr->hold_o_idx, n_ptr->hold_o_idx, o_list[n_ptr->hold_o_idx].next_o_idx);						
+					}
+					/* No ammunition - swap back */
+					else
+					{
+						temp_o_idx = m_ptr->hold_o_idx;
+						m_ptr->hold_o_idx = n_ptr->hold_o_idx;
+						n_ptr->hold_o_idx = temp_o_idx;
+					}
+				}				
 			}
 		}
 	}
@@ -5343,7 +5447,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				next_o_idx = o_ptr->next_o_idx;
 	
 				/* Skip gold */
-				if (o_ptr->tval == TV_GOLD) continue;
+				if (o_ptr->tval >= TV_GOLD) continue;
 	
 				/* Sneaky monsters hide behind big objects */
 				if ((o_ptr->weight > 1500)

@@ -3299,6 +3299,9 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 			/* Get the next object */
 			next_o_idx = o_ptr->next_o_idx;
 
+			/* Important -- skip artifacts */
+			if (o_ptr->name1) continue;
+			
 			/* Check if ammo */
 			if (o_ptr->tval == ammo_tval) ammo = this_o_idx;
 
@@ -3310,7 +3313,10 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		if ((blow >= 0) && !(ammo)) return (-1);
 
 		/* Monster has ammo */
-		if (!created || (ammo != 0)) continue;
+		if (ammo != 0) continue;
+		
+		/* Monster not creating ammo */
+		if (!created) continue;
 
 		/* Create some ammo for the monster */
 		if (!ammo_kind) ammo_kind = lookup_kind(ammo_tval, ammo_sval);
@@ -3322,7 +3328,7 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		object_prep(o_ptr, ammo_kind);
 
 		/* Give uniques maximum shots */
-		if (r_ptr->flags1 & (RF1_UNIQUE)) o_ptr->number = (byte)r_ptr->level;
+		if (r_ptr->flags1 & (RF1_UNIQUE)) o_ptr->number = MIN(99, (byte)r_ptr->level);
 
 		/* Archers get more shots */
 		else if (r_ptr->flags2 & (RF2_ARCHER)) o_ptr->number += (byte)MIN(99,damroll(2, (r_ptr->level + 1) / 2));
