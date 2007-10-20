@@ -131,10 +131,11 @@ static void find_range(int m_idx)
 	/* Now find prefered range */
 	m_ptr->best_range = m_ptr->min_range;
 
-	/*Note below: Monsters who have had dangerous attacks happen to them are more extreme*/
+	/*Note below: Monsters who have had dangerous attacks happen to them are more extreme
+	 * as are monsters that are currenty hidden. */
 
 	/* Spellcasters want to sit back */
-	if ((r_ptr->freq_spell > ((m_ptr->mflag & (MFLAG_AGGR)) != 0 ? 0 : 24)) &&
+	if ((r_ptr->freq_spell > ((m_ptr->mflag & (MFLAG_AGGR | MFLAG_HIDE)) != 0 ? 0 : 24)) &&
 			(((r_ptr->flags5 & (RF5_ATTACK_MASK)) != 0) ||
 			((r_ptr->flags6 & (RF6_ATTACK_MASK)) != 0) ||
 			((r_ptr->flags7 & (RF7_ATTACK_MASK)) != 0)))
@@ -144,7 +145,7 @@ static void find_range(int m_idx)
 	}
 
 	/* Breathers want to mix it up a little */
-	else if ((r_ptr->freq_innate > ((m_ptr->mflag & (MFLAG_AGGR)) != 0 ? 0 : 24)) &&
+	else if ((r_ptr->freq_innate > ((m_ptr->mflag & (MFLAG_AGGR | MFLAG_HIDE)) != 0 ? 0 : 24)) &&
 			((r_ptr->flags4 & (RF4_BREATH_MASK)) != 0))
 	{
 		m_ptr->best_range = 6;
@@ -158,7 +159,7 @@ static void find_range(int m_idx)
 	}
 	
 	/* Innate magic users want to sit back */
-	else if ((r_ptr->freq_innate > ((m_ptr->mflag & (MFLAG_AGGR)) != 0 ? 0 : 24)) &&
+	else if ((r_ptr->freq_innate > ((m_ptr->mflag & (MFLAG_AGGR | MFLAG_HIDE)) != 0 ? 0 : 24)) &&
 			((r_ptr->flags4 & (RF4_ATTACK_MASK)) != 0))
 	{
 		m_ptr->best_range = 6 + ((m_ptr->mflag & (MFLAG_AGGR)) != 0 ? 2 : 0);
@@ -4825,7 +4826,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					((f_info[cave_feat[oy][ox]].flags2 & (FF2_FILLED))?"":"the "),
 					f_name+f_info[cave_feat[oy][ox]].name);
 			}
-
+			
 			/* Disturb on "move" */
 			if (m_ptr->ml &&
 			    (disturb_move ||

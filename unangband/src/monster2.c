@@ -2762,7 +2762,10 @@ int place_monster_here(int y, int x, int r_idx)
 }
 
 /*
- * Hide a monster in terrain or position it over terrain as necessary
+ * Hide a monster in terrain or position it over terrain as necessary.
+ * 
+ * If check is set to true, we just return whether or not the monster
+ * would have hidden.
  */
 void monster_hide(int y, int x, int mmove, monster_type *m_ptr)
 {
@@ -2773,8 +2776,8 @@ void monster_hide(int y, int x, int mmove, monster_type *m_ptr)
 	/* Get the feature */
 	feature_type *f_ptr = &f_info[cave_feat[y][x]];
 
-        /* Get the race */
-        monster_race *r_ptr = &r_info[m_ptr->r_idx];
+	/* Get the race */
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 	/* Over the ceiling of a building */
 	if ((m_ptr->mflag & (MFLAG_OVER)) &&
