@@ -745,6 +745,7 @@ static void prt_state(void)
 
 	/* Hack -- handle some other stuff here. Don't change attr, so we inherit it from above. */
 	if (p_ptr->searching) my_strcpy(text, "Searching ", sizeof(text));
+	if (p_ptr->sneaking)  my_strcpy(text, "Sneaking  ", sizeof(text));
 	if (p_ptr->held_song) my_strcpy(text, "Singing   ", sizeof(text));
 	if (p_ptr->msleep)    my_strcpy(text, "Sleepy    ", sizeof(text));
 	if (p_ptr->psleep)    my_strcpy(text, "Drowsy    ", sizeof(text));

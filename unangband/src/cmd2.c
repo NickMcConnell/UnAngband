@@ -984,11 +984,30 @@ void do_cmd_toggle_search(void)
 		msg_print("You finish your song.");
 	}
 
-	/* Stop searching */
-	if (p_ptr->searching)
+	/* TODO: Stop searching, start sneaking */
+	else if (p_ptr->searching)
 	{
 		/* Clear the searching flag */
 		p_ptr->searching = FALSE;
+
+		/* Set the sneaking flag */
+		p_ptr->sneaking = TRUE;
+		
+		/* Recalculate bonuses */
+		p_ptr->update |= (PU_BONUS);
+
+		/* Redraw the state */
+		p_ptr->redraw |= (PR_STATE);		
+	}
+
+	/* Stop searching */
+	else if (p_ptr->sneaking)
+	{
+		/* Clear the searching flag */
+		p_ptr->searching = FALSE;
+
+		/* Clear the sneaking flag */
+		p_ptr->sneaking = FALSE;
 
 		/* Clear the last disturb */
 		p_ptr->last_disturb = turn;
