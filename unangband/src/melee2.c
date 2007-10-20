@@ -184,7 +184,10 @@ static void find_range(int m_idx)
 			monster_type *n_ptr = &m_list[cave_m_idx[m_ptr->ty][m_ptr->tx]];
 			
 			/* Ensure that its an enemy */
-			if ((((m_ptr->mflag & (MFLAG_ALLY)) != 0) != ((m_ptr->mflag & (MFLAG_ALLY)) != 0)) &&
+			if ((((m_ptr->mflag & (MFLAG_ALLY)) != 0) != ((n_ptr->mflag & (MFLAG_ALLY)) != 0)) &&
+					
+			/* Hack -- check min_range, best_range instead of figuring out the monster's range */
+				(n_ptr->min_range <= 1) && (n_ptr->best_range <= 1) &&
 			
 			/* Enough of a differential. This doesn't have to be exact */
 				(n_ptr->mspeed < m_ptr->mspeed - 5) &&
@@ -197,6 +200,8 @@ static void find_range(int m_idx)
 				
 				/* Ensure we don't push anyone else into this space */
 				m_ptr->mflag |= (MFLAG_PUSH);
+				
+				msg_print("backing");
 			}
 		}
 		/* Hack and back against player */
@@ -4754,8 +4759,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 	/* Get the feature in the grid that the monster is trying to enter. */
 	feat = cave_feat[ny][nx];
 
-	/* The monster is hidden in terrain, trying to attack the player.*/
-	if (do_move && (m_ptr->mflag & (MFLAG_HIDE)) && (cave_m_idx[ny][nx] < 0))
+	/* The monster is hidden in terrain, trying to attack.*/
+	if (do_move && (m_ptr->mflag & (MFLAG_HIDE)) && ((cave_m_idx[ny][nx] < 0) ||
+			(((m_ptr->mflag & (MFLAG_ALLY)) != 0) != ((m_list[cave_m_idx[ny][nx]].mflag & (MFLAG_ALLY)) != 0))))
 	{
 		/* Monster is under covered terrain and can't slip out */
 		if (!(r_ptr->flags2 & (RF2_PASS_WALL)) && !(m_ptr->tim_passw) && 
@@ -6197,7 +6203,7 @@ static void process_monster(int m_idx)
 	/*** Monster hungry? ***/
 	/*** This is a bit unnecessarily complicated */
 	if ((((m_ptr->mflag & (MFLAG_WEAK | MFLAG_STUPID | MFLAG_NAIVE | MFLAG_CLUMSY | MFLAG_SICK)) != 0)
-		|| (m_ptr->hp < m_ptr->maxhp) || (m_ptr->blind))
+		|| (m_ptr->hp < m_ptr->maxhp) || (m_ptr->blind)) && !(m_ptr->ty) && !(m_ptr->tx)
 		&& (((m_ptr->mflag & (MFLAG_AGGR)) == 0) || !(player_has_los_bold(m_ptr->fy, m_ptr->fx)) ||
 			(m_ptr->hp < m_ptr->maxhp / 10) || ((m_ptr->blind) && (r_ptr->freq_spell >= 25)))
 		&& (!(r_ptr->flags3 & (RF3_NONLIVING)) || (r_ptr->flags2 & (RF2_EAT_BODY))))
@@ -6572,10 +6578,15 @@ static void process_monster(int m_idx)
 		/* This encourages archers and magic users to stay at a distance in combat */
 		bool closing = !ally || ((m_ptr->ty) != 0);
 		
+		/* k is used to record the distance of the closest enemy */
 		/* Note we scale this up, and use a pseudo-random hack to try to get multiple monsters
 		 * to favour different equi-distant enemies */
 		int k = (ally ? MAX_SIGHT : m_ptr->cdis) * 16 + 15;
-
+		
+		/* And sometimes we artificially manipulate k to prefer enemies at a distance. 
+		 * We need the real distance later on, so have to fix it.*/
+		int fix_k = 0;
+		
 		/* Note the player can set target_near in the targetting routine to force allies to consider
 		 * targets closest to another monster or a point, as opposed to themselves. */
 		int ny = (ally && ((p_ptr->target_set & (TARGET_NEAR)) != 0)) ? (p_ptr->target_who ? m_list[p_ptr->target_who].fy : p_ptr->target_row) : m_ptr->fy;
@@ -6590,12 +6601,25 @@ static void process_monster(int m_idx)
 		if (spying && ((r_ptr->flags3 & (RF3_NONVOCAL)) == 0))
 		{
 			/* Too far away to hear */
-			if (m_ptr->cdis > 3 && !player_can_fire_bold(m_ptr->fy, m_ptr->fx)) spying = FALSE;
+			if ((m_ptr->cdis > 3) && !player_can_fire_bold(m_ptr->fy, m_ptr->fx)) spying = FALSE;
 			
 			/* Cannot understand language */
 			if (spying && !player_understands(monster_language(m_ptr->r_idx))) spying = FALSE;
 		}
 		
+		/* Spies report their own position */
+		if (spying && !(m_ptr->ml))
+		{
+			/* Optimize -- Repair flags */
+			repair_mflag_mark = repair_mflag_show = TRUE;
+
+			/* Hack -- Detect the monster */
+			m_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
+
+			/* Update the monster */
+			update_mon(m_idx, FALSE);
+		}
+
 		/* We check monsters either if we are spying on them or can move to attack them */
 		if (can_target || spying)
 			for (i = m_max - 1; i >= 1; i--)
@@ -6613,14 +6637,24 @@ static void process_monster(int m_idx)
 			if (ally != ((n_ptr->mflag & (MFLAG_ALLY)) != 0))
 			{
 				bool see_target = FALSE;
+				
+				/* We calculate the distance with a scale factor to get monsters to prefer
+				 * difference equidistant enemies */
 				int d = (distance(n_ptr->fy, n_ptr->fx, ny, nx) * 16) + ((m_idx + i) % 16);
+				
+				/* We may also manipulate the distance to get monsters to prefer differing
+				 * types of enemies. Currently this is used to get fast monsters to favour
+				 * isolated enemies so they can hack-and-back them more effectively, using
+				 * code similar to the player vulnerability code.
+				 * TODO: This could be used to implement racial hatred. */
+				int hack_d = 0;
 				
 				/* Ignore targets out of range */
 				if (d > MAX_RANGE * 16) continue;
 				
 				/*
 				 * Check if monster can see the target. We make various assumptions about what
-				 * monsters have a yet to be implemented SEE_INVIS flag, if the target is
+				 * monsters have a yet to be implemented TODO: SEE_INVIS flag, if the target is
 				 * invisible. We check if the target is in light, if the monster needs light to
 				 * see by.
 				 */
@@ -6662,13 +6696,13 @@ static void process_monster(int m_idx)
 				/* We need to ensure that the monster can tell the player what they are
 				 * seeing, either by using speech or telepathically from anywhere on
 				 * the map. */
-				if (spying && see_target)
+				if (spying && !(n_ptr->ml))
 				{
 					/* Optimize -- Repair flags */
 					repair_mflag_mark = repair_mflag_show = TRUE;
 
 					/* Hack -- Detect the monster */
-					m_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
+					n_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
 
 					/* Update the monster */
 					update_mon(i, FALSE);
@@ -6767,7 +6801,9 @@ static void process_monster(int m_idx)
 							(ally != ((m_list[cave_m_idx[yy][xx]].mflag & (MFLAG_ALLY)) != 0)))
 						{
 							v++;
-							if (v > 4) d -= 32;
+							if (v > 4) hack_d -= 32;
+							
+							/* Note we have to fix the distance later on by this adjustment factor */
 						}
 					}
 				}
@@ -6777,12 +6813,19 @@ static void process_monster(int m_idx)
 				{
 					m_ptr->ty = n_ptr->fy;
 					m_ptr->tx = n_ptr->fx;
-					k = d;
+					k = d + hack_d;
+					
+					/* Fix adjustment factor later */
+					fix_k = hack_d;
+					hack_d = 0;
 					
 					must_use_target = TRUE;
 				}
 			}
 		}
+		
+		/* Fix the distance */
+		k = k - fix_k;
 		
 		/* Allies use 'player' targets if the monster unable to find a target
 		 * TODO: We hackily use best range to interact with
