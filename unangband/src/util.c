@@ -2487,7 +2487,7 @@ void messages_easy(bool command)
 	(void)Term_get_size(&w, &h);
 
 	/* Display remaining messages on line 2 of the display onwards */
-	for (y = 1, x = 0 ; (message__easy != message__next); )
+	for (y = (msg_flag ? 0 : 1), x = 0 ; (message__easy != message__next); )
 	{
 		/* Get the "offset" for the message */
 		int o = message__ptr[message__easy];
@@ -2500,12 +2500,17 @@ void messages_easy(bool command)
 
 		int n = strlen(msg);
 		
-		/* Go to next row if required */
-		if ((x) && ((x + n) > (w - 8)))
+		bool long_line = FALSE;
+		
+		if ((x) && (x + n) > (w - 8))
 		{
+			/* Go to next row if required */
 			x = 0;
 			y++;
 		}
+		
+		/* Improve legibility of long entries */		
+		if (n > (w - 2)) long_line = TRUE;
 		
 		/* Copy it */
 		strncpy(buf, msg, sizeof(buf));
@@ -2515,17 +2520,17 @@ void messages_easy(bool command)
 		t = buf;
 
 		/* Split message */
-		while (n > (w - 8))
+		while (n > (w - 2))
 		{
 			char oops;
 
 			int check, split;
 
 			/* Default split */
-			split = (w - 8);
+			split = (w - 2);
 
 			/* Find the "best" split point */
-			for (check = (w / 2); check < (w - 8); check++)
+			for (check = (w / 2); check < (w - 2); check++)
 			{
 				/* Found a valid split point */
 				if (t[check] == ' ') split = check;
@@ -2540,14 +2545,20 @@ void messages_easy(bool command)
 			/* Display part of the message */
 			Term_putstr(x, y, split, color, t);
 			
-			/* Add a space for legibility */
-			Term_putstr(x + split, y, -1, TERM_WHITE, " ");
-
+			/* Erase to end of line to improve legibility */
+			if (long_line)
+			{
+				/* Clear top line */
+				Term_erase(x + split, y, 255);			
+			}
+			else
+			{
+				/* Add a space for legibility */
+				Term_putstr(x + split, y, -1, TERM_WHITE, " ");
+			}
+			
 			/* Restore the split character */
 			t[split] = oops;
-
-			/* Insert a space */
-			t[--split] = ' ';
 
 			/* Prepare to recurse on the rest of "buf" */
 			t += split; n -= split;
@@ -2569,8 +2580,10 @@ void messages_easy(bool command)
 		/* Get next position */
 		x += n + 1;
 		
-		/* Display more prompt if required */
-		if ((y == (h < 12 ? h - 1 : (h > 23 ? h / 2 : 11))) || (message__easy == message__next))
+		/* Display more prompt if reached near end of page */
+		if ((y >= (h < 12 ? h - (show_sidebar ? 3 : 2) : (h > 23 ? (h / 2) - (show_sidebar ? 2 : 1) : 11 - (show_sidebar ? 3 : 2))))
+				/* Display more prompt if out of messages */
+				|| (message__easy == message__next))
 		{
 			/* Pause for response */
 			Term_putstr(0, y + 1, -1, a, message__easy == message__next ? "-end-" : "-more-");
@@ -2609,14 +2622,14 @@ void messages_easy(bool command)
 			if (message__easy != message__next) screen_save();
 			
 			/* Start at top left hand side */
-			y = 0;
+			y = (use_trackmouse ? 1 : 0);
 			x = 0;
 		}
 	}
 	
 	/* Allow 1 line messages again */
 	must_more = FALSE;
-	
+
 	/* Clear top line */
 	Term_erase(0, 0, 255);
 
@@ -2858,7 +2871,15 @@ static void msg_print_aux(u16b type, cptr msg)
 		/* Reset */
 		message_column = 0;
 	}
-
+	/* Hack -- get messages_easy to display the whole message */
+	else if ((easy_more) && (!must_more) && (n > (w - 8)))
+	{
+		/* Flush */
+		msg_flush(message_column);
+		
+		/* Hack -- use first line */
+		msg_flag = TRUE;
+	}
 
 	/* No message */
 	if (!msg) return;
@@ -3028,6 +3049,9 @@ void message_format(u16b message_type, s16b extra, cptr fmt, ...)
  */
 void message_flush(void)
 {
+	/* Hack -- no effect with easy_more */
+	if (easy_more) return;
+	
 	/* Hack -- Reset */
 	if (!msg_flag) message_column = 0;
 

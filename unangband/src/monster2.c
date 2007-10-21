@@ -3902,7 +3902,6 @@ s16b player_place(int y, int x, bool escort_allowed)
 		place_monster_escort(y, x, rp_ptr->r_idx, FALSE, (MFLAG_ALLY));
 		
 		msg_print("You are joined by companions in battle.");
-		msg_print("Many of the bravest will not leave this place.");
 
 		monster_level -= 5;
 	}
