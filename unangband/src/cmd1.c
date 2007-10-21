@@ -2636,7 +2636,7 @@ void py_attack(int dir)
 			if (r_ptr->flags3 & (RF3_NO_STUN)) do_stun = 0;
 
 			/* Some monsters resist cuts */
-			if (r_ptr->flags9 & (RF9_NO_CUTS)) do_stun = 0;
+			if (r_ptr->flags9 & (RF9_NO_CUTS)) do_cuts = 0;
 
 			/* Hack --- backstab. Weapon of 10 lbs or less */
 			if (melee_style & (1L << WS_BACKSTAB))
