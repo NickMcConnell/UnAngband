@@ -1878,6 +1878,12 @@ char inkey(void)
 
 
 /*
+ * We are delaying message display
+ */
+static bool must_more = FALSE;
+
+
+/*
  * Flush the screen, make a noise
  */
 void bell(cptr reason)
@@ -1886,7 +1892,7 @@ void bell(cptr reason)
 	Term_fresh();
 
 	/* Hack -- memorize the reason if possible */
-	if (character_generated && reason) message_add(reason, MSG_BELL);
+	if (character_generated && reason && !must_more) message_add(reason, MSG_BELL);
 
 	/* Make a bell noise (if allowed) */
 	if (ring_bell) Term_xtra(TERM_XTRA_NOISE, 0);
@@ -2085,6 +2091,14 @@ static u16b message__head;
  * The offset to the oldest used char (none yet)
  */
 static u16b message__tail;
+
+/*
+ * The next message to display for the easy_more code (none yet)
+ */
+static u16b message__easy;
+
+
+
 
 /*
  * The array[MESSAGE_MAX] of offsets, by index
@@ -2288,6 +2302,9 @@ void message_add(cptr str, u16b type)
 		/* Kill last message if needed */
 		if (message__next == message__last)
 		{
+			/* Update the 'message__easy', wrap if needed */
+			if ((message__last == message__easy) && (++message__last == MESSAGE_MAX)) message__easy = 0;
+			
 			/* Advance 'message__last', wrap if needed */
 			if (++message__last == MESSAGE_MAX) message__last = 0;
 		}
@@ -2308,6 +2325,8 @@ void message_add(cptr str, u16b type)
 	/* Kill messages, and wrap, if needed */
 	if (message__head + (n + 1) >= MESSAGE_BUF)
 	{
+		bool update_easy = FALSE;
+		
 		/* Kill all "dead" messages */
 		for (i = message__last; TRUE; i++)
 		{
@@ -2316,6 +2335,9 @@ void message_add(cptr str, u16b type)
 
 			/* Stop before the new message */
 			if (i == message__next) break;
+			
+			/* Update message__easy if required */
+			if (i == message__easy) update_easy = TRUE;
 
 			/* Get offset */
 			o = message__ptr[i];
@@ -2325,6 +2347,9 @@ void message_add(cptr str, u16b type)
 			{
 				/* Track oldest message */
 				message__last = i + 1;
+				
+				/* Update easy if required */
+				if (update_easy) message__easy = i + 1;
 			}
 		}
 
@@ -2341,6 +2366,8 @@ void message_add(cptr str, u16b type)
 	/* Kill messages, if needed */
 	if (message__head + (n + 1) > message__tail)
 	{
+		bool update_easy = FALSE;
+		
 		/* Advance to new "tail" location */
 		message__tail += (MESSAGE_BUF / 4);
 
@@ -2353,6 +2380,9 @@ void message_add(cptr str, u16b type)
 			/* Stop before the new message */
 			if (i == message__next) break;
 
+			/* Update message__easy if required */
+			if (i == message__easy) update_easy = TRUE;
+
 			/* Get offset */
 			o = message__ptr[i];
 
@@ -2361,6 +2391,9 @@ void message_add(cptr str, u16b type)
 			{
 				/* Track oldest message */
 				message__last = i + 1;
+				
+				/* Update easy if required */
+				if (update_easy) message__easy = i + 1;
 			}
 		}
 	}
@@ -2377,6 +2410,9 @@ void message_add(cptr str, u16b type)
 	/* Kill last message if needed */
 	if (message__next == message__last)
 	{
+		/* Update the 'message__easy', wrap if needed */
+		if ((message__last == message__easy) && (++message__last == MESSAGE_MAX)) message__easy = 0;
+		
 		/* Advance 'message__last', wrap if needed */
 		if (++message__last == MESSAGE_MAX) message__last = 0;
 	}
@@ -2401,6 +2437,114 @@ void message_add(cptr str, u16b type)
 
 
 /*
+ * This displays all the messages on the screen, trying to
+ * minimise the amount of times the -more- key has to be
+ * pressed, by using all the available screen space.
+ */
+void messages_easy(byte prompt_attr, cptr prompt)
+{
+	int y, x;
+	byte a = TERM_L_BLUE;
+
+	/* Easy more option not selected. */
+	if (!easy_more)
+	{
+		message__easy = message__next;
+		
+		return;
+	}
+	
+	/* Nothing to display. */
+	else if (!must_more)
+	{
+		return;
+	}
+
+	/* Nothing to display. */
+	else if (message__easy == message__next)
+	{
+		return;
+	}
+	
+	/* Save the screen */
+	screen_save();
+	
+	/* Display remaining messages on line 2 of the display onwards */
+	for (y = 1, x = 0 ; (message__easy != message__next); )
+	{
+		/* Get the "offset" for the message */
+		int o = message__ptr[message__easy];
+
+		/* Get the message text */
+		cptr msg = &message__buf[o];
+
+		/* Get the color */
+		byte attr = message_type_color(message__type[message__easy]);
+
+		int n = strlen(msg);
+		
+		/* Dump the messages, bottom to top */
+		Term_putstr(x, y, -1, attr, msg);
+		
+		/* Add trailing space to improve legibility */
+		Term_putstr(x + n, y, -1, attr, " ");
+		
+		/* Get next message */
+		message__easy = (message__easy + 1) % MESSAGE_MAX;
+
+		/* Get next position */
+		y += 1;
+		x = 0;
+		
+		/* Display more prompt if required */
+		if ((y == Term->hgt - 1) || (message__easy == message__next))
+		{
+			/* Pause for response */
+			Term_putstr(x, y, -1, a, "-more-");
+	
+			/* Get an acceptable keypress. */
+			while (1)
+			{
+				key_event ke;
+				ke = anykey();
+	
+				if ((ke.key == '\xff') && !(ke.mousebutton)) continue;
+		#if 0
+				if ((p_ptr->chp < warning) && (ke.key != 'c')) { bell("Press c to continue."); continue; }
+		#endif
+				if (quick_messages) break;
+				if ((ke.key == ESCAPE) || (ke.key == ' ')) break;
+				if ((ke.key == '\n') || (ke.key == '\r')) break;
+				if ((ke.key == '\xff') && (ke.mousebutton == 1)) break;
+				bell("Illegal response to a 'more' prompt!");
+			}
+			
+			/*
+			Term_clear();
+			*/
+			
+			/* Refresh screen */
+			screen_load();
+			if (message__easy != message__next) screen_save();
+			
+			/* Start at top left hand side */
+			y = 0;
+			x = 0;
+		}
+	}
+	
+	/* Allow 1 line messages again */
+	must_more = FALSE;
+	
+	/* Clear top line */
+	Term_erase(0, 0, 255);
+
+	/* Display command prompt */
+	if (prompt) Term_putstr(0, 0, -1, prompt_attr, prompt);
+}
+
+
+/*
  * Initialize the "message" package
  */
 errr messages_init(void)
@@ -2416,6 +2560,9 @@ errr messages_init(void)
 	/* Hack -- No messages yet */
 	message__tail = MESSAGE_BUF;
 
+	/* Hack -- No messages for easy_more */
+	message__easy = MESSAGE_BUF;
+	
 	/* Success */
 	return (0);
 }
@@ -2496,6 +2643,23 @@ static void msg_flush(int x)
 {
 	byte a = TERM_L_BLUE;
 
+	/* Handle easy_more */
+	if (easy_more)
+	{
+		/* Display additional messages on the same screen */
+		if (!must_more)
+		{
+			/* Display messages from this point onwards */
+			message__easy = message__next;
+
+			/* Delay displaying remaining messages */
+			must_more = TRUE;
+		}
+
+		return;
+	}
+	
+	
 #if 0
 	int warning = (p_ptr->mhp * op_ptr->hitpoint_warn / 10);
 
@@ -2573,7 +2737,7 @@ static void msg_print_aux(u16b type, cptr msg)
 
 #ifdef ALLOW_BORG
 	/* Hack -- No messages for the borg */
-	if ((count_stop) && !(auto_more)) return;
+	if ((count_stop) && !(auto_more) && !(must_more)) return;
 #endif
 
 	/* Obtain the size */
@@ -2614,8 +2778,8 @@ static void msg_print_aux(u16b type, cptr msg)
 	p_ptr->window |= (PW_MESSAGE);
 
 
-	/* Handle "auto_more" */
-	if (auto_more)
+	/* Handle "auto_more"/"must_more" */
+	if (auto_more || must_more)
 	{
 		/* Force window update */
 		window_stuff();
@@ -3403,8 +3567,11 @@ bool get_check(cptr prompt)
 
 	char buf[80];
 
+	/* Flush easy_more messages */
+	if (easy_more) messages_easy(TERM_WHITE, NULL);
+	
 	/* Paranoia XXX XXX XXX */
-	message_flush();
+	else message_flush();
 
 	/* Hack -- Build a "useful" prompt */
 	strnfmt(buf, 78, "%.70s[y/n] ", prompt);
@@ -3545,6 +3712,8 @@ void request_command(bool shopping)
 
 	cptr act;
 
+	/* Flush messages */
+	if (easy_more && must_more) messages_easy(TERM_WHITE, "Command:");
 
 	/* Roguelike */
 	if (rogue_like_commands)
@@ -4705,6 +4874,9 @@ bool get_list(print_list_func print_list, const s16b *sn, int num, cptr p, cptr 
 	key_event ke;
 
 	char out_val[160];
+	
+	/* Clear messages */
+	if (easy_more) messages_easy(TERM_WHITE, NULL);
 
 	/* Nothing chosen yet */
 	flag = FALSE;

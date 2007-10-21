@@ -2030,7 +2030,7 @@ const cptr option_text[OPT_MAX] =
 	"toggle_xp",				/* OPT_toggle_xp */
 	"stack_force_charges",						/* xxx */
 	"stack_force_times",						/* xxx */
-	NULL,						/* xxx */
+	"easy_more",						/* xxx */
 	"room_descriptions",						/* xxx */
 	"room_names",						/* xxx */
 	"verify_mana",						/* xxx */
@@ -2294,7 +2294,7 @@ const cptr option_desc[OPT_MAX] =
 	"Reverse experience display",				/* OPT_toggle_xp */
 	"Merge charges when stacking",				/* OPT_stack_force_charges */
 	"Merge timeouts when stacking",			/* OPT_stack_force_timeouts */
-	NULL,							/* xxx */
+	"Minimise '-more-' prompts",		/* OPT_easy_more */
 	"Display room descriptions",				/* OPT_room_descriptions */
 	"Display room names",					/* OPT_room_names */
 	"Verify critical mana",					/* xxx */
@@ -2483,7 +2483,7 @@ const cptr option_desc[OPT_MAX] =
 const bool option_norm[OPT_MAX] =
 {
 	FALSE,		/* OPT_rogue_like_commands */
-	TRUE,		/* OPT_quick_messages */
+	FALSE,		/* OPT_quick_messages */
 	FALSE,		/* OPT_floor_query_flag */
 	TRUE,		/* OPT_carry_query_flag */
 	FALSE,		/* OPT_use_old_target */
@@ -2558,7 +2558,7 @@ const bool option_norm[OPT_MAX] =
 	TRUE,		/* OPT_toggle_xp */
 	FALSE,	  /* OPT_stack_force_charges */
 	FALSE,	  /* OPT_stack_force_times */
-	FALSE,	   /* xxx */
+	TRUE,	   /* OPT_easy_more */
 	FALSE,	   /* OPT_room_descriptions */
 	TRUE,	   /* OPT_room_names */
 	FALSE,	  /* OPT_verify_mana */
@@ -2788,10 +2788,10 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_verify_destroy,
 		OPT_verify_special,
 		OPT_allow_quantity,
+		OPT_easy_more,
 		OPT_auto_more,
 		OPT_verify_mana,
 		OPT_verify_safe,
-		255,
 		255,
 		255,
 		255

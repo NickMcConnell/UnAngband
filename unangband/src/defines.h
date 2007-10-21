@@ -4445,7 +4445,7 @@
 #define OPT_toggle_xp	   73
 #define OPT_stack_force_charges			74
 #define OPT_stack_force_times		75
-/* xxx */
+#define OPT_easy_more      76
 #define OPT_room_descriptions			77
 #define OPT_room_names				78
 #define OPT_verify_mana			79
@@ -4588,7 +4588,7 @@
 #define toggle_xp op_ptr->opt[OPT_toggle_xp]
 #define stack_force_charges  op_ptr->opt[OPT_stack_force_charges]
 #define stack_force_times  op_ptr->opt[OPT_stack_force_times]
-/* xxx */
+#define easy_more   op_ptr->opt[OPT_easy_more]
 #define verify_mana      op_ptr->opt[OPT_verify_mana]
 #define room_descriptions    op_ptr->opt[OPT_room_descriptions]
 #define room_names      op_ptr->opt[OPT_room_names]
