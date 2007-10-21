@@ -9642,6 +9642,7 @@ static void init_ecology(int r_idx)
 {
 	int i, j, k;
 	int l = 0;
+	int count;
 
 	/* Initialise the dungeon ecology */
 	(void)WIPE(&cave_ecology, ecology_type);
@@ -9700,22 +9701,31 @@ static void init_ecology(int r_idx)
 		l = cave_ecology.num_races;
 		
 		/* Not enough different monsters */
-		if ((k >= 0) && (cave_ecology.num_races < MAX_ECOLOGY_RACES))
+		if ((k >= 0) && (cave_ecology.num_races < MAX_ECOLOGY_RACES) && (count++ < 100))
 		{
-			/* Set monster hook */
-			get_mon_num_hook = dun_level_mon;
-
-			/* Prepare allocation table */
-			get_mon_num_prep();
-
+			/* XXX Sometimes we have to cancel out due to not being able to
+			 * find a dun_level_mon match for the level we are on.
+			 */
+			if (count < 10)
+			{
+				/* Set monster hook */
+				get_mon_num_hook = dun_level_mon;
+	
+				/* Prepare allocation table */
+				get_mon_num_prep();
+			}
+	
 			/* Get seed monster for ecology */
 			get_monster_ecology(0);
-
-			/* Clear monster hook */
-			get_mon_num_hook = NULL;
-
-			/* Prepare allocation table */
-			get_mon_num_prep();
+	
+			if (get_mon_num_hook)
+			{
+				/* Clear monster hook */
+				get_mon_num_hook = NULL;
+	
+				/* Prepare allocation table */
+				get_mon_num_prep();
+			}
 		}
 		else
 		{
