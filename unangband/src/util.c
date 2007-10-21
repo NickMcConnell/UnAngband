@@ -2447,10 +2447,13 @@ void message_add(cptr str, u16b type)
  */
 void messages_easy(bool command)
 {
-	int y, x;
+	int y, x, w, h;
 	byte a = TERM_L_BLUE;
 	key_event ke;
 
+	char *t;
+	char buf[1024];
+	
 	/* Easy more option not selected. */
 	if (!easy_more)
 	{
@@ -2480,6 +2483,9 @@ void messages_easy(bool command)
 	/* Save the screen */
 	screen_save();
 	
+	/* Obtain the size */
+	(void)Term_get_size(&w, &h);
+
 	/* Display remaining messages on line 2 of the display onwards */
 	for (y = 1, x = 0 ; (message__easy != message__next); )
 	{
@@ -2490,28 +2496,84 @@ void messages_easy(bool command)
 		cptr msg = &message__buf[o];
 
 		/* Get the color */
-		byte attr = message_type_color(message__type[message__easy]);
+		byte color = message_type_color(message__type[message__easy]);
 
 		int n = strlen(msg);
 		
-		/* Dump the messages, bottom to top */
-		Term_putstr(x, y, -1, attr, msg);
+		/* Go to next row if required */
+		if ((x) && ((x + n) > (w - 8)))
+		{
+			x = 0;
+			y++;
+		}
 		
-		/* Add trailing space to improve legibility */
-		Term_putstr(x + n, y, -1, attr, " ");
-		
+		/* Copy it */
+		strncpy(buf, msg, sizeof(buf));
+		buf[sizeof(buf)-1] = '\0';
+
+		/* Analyze the buffer */
+		t = buf;
+
+		/* Split message */
+		while (n > (w - 8))
+		{
+			char oops;
+
+			int check, split;
+
+			/* Default split */
+			split = (w - 8);
+
+			/* Find the "best" split point */
+			for (check = (w / 2); check < (w - 8); check++)
+			{
+				/* Found a valid split point */
+				if (t[check] == ' ') split = check;
+			}
+
+			/* Save the split character */
+			oops = t[split];
+
+			/* Split the message */
+			t[split] = '\0';
+
+			/* Display part of the message */
+			Term_putstr(x, y, split, color, t);
+			
+			/* Add a space for legibility */
+			Term_putstr(x + split, y, -1, TERM_WHITE, " ");
+
+			/* Restore the split character */
+			t[split] = oops;
+
+			/* Insert a space */
+			t[--split] = ' ';
+
+			/* Prepare to recurse on the rest of "buf" */
+			t += split; n -= split;
+			
+			/* Reset column and line */
+			x = 0;
+			y++;
+		}
+
+		/* Display the tail of the message */
+		Term_putstr(x, y, n, color, t);
+
+		/* Add a space for legibility */
+		Term_putstr(x + n, y, -1, TERM_WHITE, " ");
+
 		/* Get next message */
 		message__easy = (message__easy + 1) % MESSAGE_MAX;
 
 		/* Get next position */
-		y += 1;
-		x = 0;
+		x += n + 1;
 		
 		/* Display more prompt if required */
-		if ((y == Term->hgt - 1) || (message__easy == message__next))
+		if ((y == (h < 12 ? h - 1 : (h > 23 ? h / 2 : 11))) || (message__easy == message__next))
 		{
 			/* Pause for response */
-			Term_putstr(x, y, -1, a, "-more-");
+			Term_putstr(0, y + 1, -1, a, message__easy == message__next ? "-end-" : "-more-");
 	
 			/* Get an acceptable keypress. */
 			while (1)
