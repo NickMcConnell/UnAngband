@@ -4722,6 +4722,10 @@ void show_tip(void)
 	{
 		cptr tip = quark_str(tips[tips_start++]);
 
+#ifdef ALLOW_BORG
+		if (count_stop) { /* Do nothing */ } else
+#endif
+	
 		if (show_tips)
 		{
 			msg_print("You find a note.");

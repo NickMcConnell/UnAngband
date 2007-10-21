@@ -11718,7 +11718,9 @@ void generate_cave(void)
 		
 		/* Set this dungeon as visited */
 		t_info[p_ptr->dungeon].visited = TRUE;
-		
+
+		/* Style tips */
+		queue_tip(format("dungeon%d.txt", p_ptr->dungeon, i));
 	}
 	
 	/* Set maximum depth for this dungeon */
