@@ -1,22 +1,19 @@
-=== Stores and Shopping ===
+=== Equipment and Inventory ===
 
-Once inside a store, you will see the name and race of the store owner, the
-name of the store, the maximum amount of cash that the store owner will pay
-for any one item, and the store inventory, listed along with the prices. If 
-auto-haggle is on, the price listed is the price you pay: if you are haggling 
-manually, the price listed is his starting offer, which you can haggle 
-downwards.
+Your character will begin his adventure with some basic supplies, and some
+extra gold with which to purchase more supplies at the town stores.  To see
+what you currently are carrying, you can use the inventory ('i') and
+equipment ('e') commands.  Items in your equipment affect your current
+status: armour that you wear increases or decreases your armour class (AC).
+You use the wield command ('w') to wear or wield an item into your equip-
+ment, and the take off command ('t' or 'T' in the roguelike keyset) to
+remove an item from your equipment and put it into your inventory.
 
-You will also see an (incomplete) list of available commands.  Note that
-many of the commands which work in the dungeon work in the stores as well,
-but some do not, especially those which involve "using" objects.
+You can evaluate how useful an object is by examinining it ('x' or letter
+'O' in the roguelike keyset).  The amount of gold you are carrying is shown
+by the AU number at the bottom of the screen or while in a store.
 
-Stores do not always have everything in stock.  As the game progresses,
-they may get new items so check from time to time.  Also, if you sell them
-an item, it may get sold to a customer while you are adventuring, so don't
-always expect to be able to get back everything you have sold.  Note that
-the inventory of a store will not change while you are in town, even if you
-save the game and return.  You must spend time in the dungeon if you wish
-the store owner to clear out his stock and acquire new items.  If you have
-a lot of spare gold, you can purchase every item in a store, which will
-induce the store owner to bring out new stock, and perhaps even retire.
+It is recommended that you buy some additional potions of Cure Light Wounds
+and scrolls of Phase Door before entering the dungeon.  With any left over
+money buy enough torches to carry around 10 of them.  Have a look 
+at each of the stores to see if and where you can find these.

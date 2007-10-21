@@ -1,19 +1,20 @@
-=== Equipment and Inventory ===
+=== A Heartfelt Love Letter ===
 
-Your character will begin his adventure with some basic supplies, and some
-extra gold with which to purchase more supplies at the town stores.  To see
-what you currently are carrying, you can use the inventory ('i') and
-equipment ('e') commands.  Items in your equipment affect your current
-status: armour that you wear increases or decreases your armour class (AC).
-You use the wield command ('w') to wear or wield an item into your equip-
-ment, and the take off command ('t' or 'T' in the roguelike keyset) to
-remove an item from your equipment and put it into your inventory.
+To Mrs Maggot,
 
-You can evaluate how useful an object is by examinining it ('x' or letter
-'O' in the roguelike keyset).  The amount of gold you are carrying is shown
-by the AU number at the bottom of the screen or while in a store.
+I'll be out in the fields all day again.  As always,
+I'm looking forward to your home cooking, especially
+your mushroom pie with a nice cold pint of cider.
 
-It is recommended that you buy some additional potions of Cure Light Wounds
-and scrolls of Phase Door before entering the dungeon.  With any left over
-money buy enough torches to carry around 10 of them.  Have a look 
-at each of the stores to see if and where you can find these.
+Don't stay up for me, I'll be home at sundown.  Have
+you seen the dogs?  I'm in two minds about them now:
+that new one seems to have got a wild side to him and
+if I find they've jumped the fence and are chasing
+the neighbour's sheep again, I may have to lock them
+in the cellar.
+
+Yours,
+
+
+Mr Maggot
+ 
