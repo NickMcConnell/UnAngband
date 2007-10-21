@@ -812,7 +812,7 @@ static void Term_fresh_row_both(int y, int x1, int x2)
 				}
 
 				/* Hack -- Erase "leading" spaces */
-				else
+				else if (!Term->never_lwipe)
 				{
 					(void)((*Term->wipe_hook)(fx, y, fn));
 				}
@@ -935,7 +935,7 @@ static void Term_fresh_row_text(int y, int x1, int x2)
 				}
 
 				/* Hack -- Erase "leading" spaces */
-				else
+				else if (!Term->never_lwipe)
 				{
 					(void)((*Term->wipe_hook)(fx, y, fn));
 				}
