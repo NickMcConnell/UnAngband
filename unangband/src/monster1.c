@@ -777,7 +777,7 @@ static void describe_monster_attack(const monster_race *r_ptr, const monster_lor
 		/* Get the effect */
 		switch (effect)
 		{
-			case GF_NOTHING: q = "nothing"; break;
+			case GF_NOTHING: q = "no effect"; break;
 			case GF_STORM: p= "lash with wind, rain and lightning"; break;
 			case GF_WIND: p= "blast with wind"; break;
 			case GF_HELLFIRE: q="blast with hellfire";break;
