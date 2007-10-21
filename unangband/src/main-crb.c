@@ -1908,6 +1908,13 @@ static errr Term_wipe_mac(int x, int y, int n)
  */
 static errr Term_text_mac(int x, int y, int n, byte a, const char *cp)
 {
+	/* Hack - try to fix crashes */
+	char buf[1024];
+	
+	/* Copy it */
+	strncpy(buf, cp, sizeof(buf));
+	buf[sizeof(buf)-1] = '\0';
+	
 	if(!focus.ctx) activate(focus.active);
 
 	/* Draw the string */
