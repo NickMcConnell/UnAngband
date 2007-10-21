@@ -4842,6 +4842,16 @@
 	((int) ((p_ptr->wx) + ( ((K.mousex) - COL_MAP) / \
 		((use_trptile ? 3 : (use_dbltile ? 2 : 1)) * (use_bigtile ? 2 : 1)) )))
 
+/*
+ * Define which mouse buttons correspond to which actions
+ * 
+ * 1 is usually left-mouse button
+ * 2 is usually right-mouse button
+ */
+#define BUTTON_AIM		1
+#define BUTTON_MOVE		2
+
+
 
 /*
  * Determines if a map location is "meaningful"

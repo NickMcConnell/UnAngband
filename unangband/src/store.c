@@ -3631,7 +3631,7 @@ void do_cmd_store(void)
 	p_ptr->command_rep = 0;
 
 	/* No automatic command */
-	p_ptr->command_new = 0;
+	p_ptr->command_new.key = 0;
 
 	/* Start at the beginning */
 	store_top = 0;
@@ -3783,7 +3783,7 @@ void do_cmd_store(void)
 
 
 	/* Hack -- Cancel automatic command */
-	p_ptr->command_new = 0;
+	p_ptr->command_new.key = 0;
 
 	/* Hack -- Cancel "see" mode */
 	p_ptr->command_see = FALSE;

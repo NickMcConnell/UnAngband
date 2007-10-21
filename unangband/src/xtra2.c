@@ -5201,7 +5201,7 @@ static void target_set_interactive_prepare(int mode)
  *
  * This function must handle blindness/hallucination.
  */
-static key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr info)
+key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr info)
 {
 	s16b this_o_idx, next_o_idx = 0;
 
@@ -6280,8 +6280,14 @@ bool target_set_interactive(int mode)
 						ty = y = KEY_GRID_Y(query);
 						tx = x = KEY_GRID_X(query);
 	
-						/* Set target if clicked */
-						if ((query.mousebutton) || (query.key == '!'))
+						/* Go to if clicked with BUTTON_MOVE */
+						if (query.mousebutton == BUTTON_MOVE)
+						{
+							do_cmd_pathfind(y,x);
+							done = TRUE;
+						}
+						/* Set target if clicked. ! is mainly for macro use. */
+						else if ((query.mousebutton == BUTTON_AIM) || (query.key == '!'))
 						{
 							target_set_location(y, x, mode);
 							done = TRUE;
@@ -6528,8 +6534,14 @@ bool target_set_interactive(int mode)
 						ty = y = KEY_GRID_Y(query);
 						tx = x = KEY_GRID_X(query);
 
-						/* Set target if clicked */
-						if ((query.mousebutton) || (query.key == '!'))
+						/* Go to if clicked with BUTTON_MOVE */
+						if (query.mousebutton == BUTTON_MOVE)
+						{
+							do_cmd_pathfind(y,x);
+							done = TRUE;
+						}
+						/* Set target if clicked. ! is mainly for macro use. */
+						else if ((query.mousebutton == BUTTON_AIM) || (query.key == '!'))
 						{
 							target_set_location(y, x, mode);
 							done = TRUE;

@@ -3009,7 +3009,7 @@ static void do_cmd_hold_or_stay(int pickup)
 		disturb(0, 0);
 
 		/* Hack -- enter store */
-		p_ptr->command_new = '_';
+		p_ptr->command_new.key = '_';
 
 		/* Free turn XXX XXX XXX */
 		p_ptr->energy_use = 0;

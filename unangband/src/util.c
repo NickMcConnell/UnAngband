@@ -2440,11 +2440,16 @@ void message_add(cptr str, u16b type)
  * This displays all the messages on the screen, trying to
  * minimise the amount of times the -more- key has to be
  * pressed, by using all the available screen space.
+ * 
+ * If command is set to true, we re-display the command
+ * prompt once this is done, and pass back the last key
+ * press as a command.
  */
-void messages_easy(byte prompt_attr, cptr prompt)
+void messages_easy(bool command)
 {
 	int y, x;
 	byte a = TERM_L_BLUE;
+	key_event ke;
 
 	/* Easy more option not selected. */
 	if (!easy_more)
@@ -2462,6 +2467,12 @@ void messages_easy(byte prompt_attr, cptr prompt)
 
 	/* Nothing to display. */
 	else if (message__easy == message__next)
+	{
+		return;
+	}
+	
+	/* Don't display if character is dead or not yet generated */
+	else if (!character_generated || p_ptr->is_dead)
 	{
 		return;
 	}
@@ -2505,10 +2516,18 @@ void messages_easy(byte prompt_attr, cptr prompt)
 			/* Get an acceptable keypress. */
 			while (1)
 			{
-				key_event ke;
-				ke = anykey();
+				ke = inkey_ex();
 	
-				if ((ke.key == '\xff') && !(ke.mousebutton)) continue;
+				if ((ke.key == '\xff') && !(ke.mousebutton))
+				{
+					int y = KEY_GRID_Y(p_ptr->command_cmd_ex);
+					int x = KEY_GRID_X(p_ptr->command_cmd_ex);
+					int room;
+
+					target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
+					
+					continue;
+				}
 		#if 0
 				if ((p_ptr->chp < warning) && (ke.key != 'c')) { bell("Press c to continue."); continue; }
 		#endif
@@ -2519,12 +2538,12 @@ void messages_easy(byte prompt_attr, cptr prompt)
 				bell("Illegal response to a 'more' prompt!");
 			}
 			
-			/*
-			Term_clear();
-			*/
-			
 			/* Refresh screen */
 			screen_load();
+			
+			/* Tried a command - avoid rest of messages */
+			if (ke.key != ' ') break;
+			
 			if (message__easy != message__next) screen_save();
 			
 			/* Start at top left hand side */
@@ -2540,7 +2559,23 @@ void messages_easy(byte prompt_attr, cptr prompt)
 	Term_erase(0, 0, 255);
 
 	/* Display command prompt */
-	if (prompt) Term_putstr(0, 0, -1, prompt_attr, prompt);
+	if (command)
+	{
+		Term_putstr(0, 0, -1, TERM_WHITE, "Command:");
+		
+		/* Requeue command just pressed */
+		p_ptr->command_new = ke;
+		
+		/* Hack -- Process "Escape"/"Spacebar"/"Return" */
+		if ((p_ptr->command_new.key == ESCAPE) ||
+			(p_ptr->command_new.key == ' ') ||
+			(p_ptr->command_new.key == '\r') ||
+			(p_ptr->command_new.key == '\n'))
+		{
+			/* Reset stuff */
+			p_ptr->command_new.key = 0;
+		}
+	}
 }
 
 
@@ -2644,7 +2679,7 @@ static void msg_flush(int x)
 	byte a = TERM_L_BLUE;
 
 	/* Handle easy_more */
-	if (easy_more)
+	if (easy_more || use_trackmouse)
 	{
 		/* Display additional messages on the same screen */
 		if (!must_more)
@@ -2778,8 +2813,8 @@ static void msg_print_aux(u16b type, cptr msg)
 	p_ptr->window |= (PW_MESSAGE);
 
 
-	/* Handle "auto_more"/"must_more" */
-	if (auto_more || must_more)
+	/* Handle "auto_more"/"must_more"/"use_trackmouse" */
+	if (auto_more || must_more || use_trackmouse)
 	{
 		/* Force window update */
 		window_stuff();
@@ -3568,7 +3603,7 @@ bool get_check(cptr prompt)
 	char buf[80];
 
 	/* Flush easy_more messages */
-	if (easy_more) messages_easy(TERM_WHITE, NULL);
+	if (easy_more) messages_easy(FALSE);
 	
 	/* Paranoia XXX XXX XXX */
 	else message_flush();
@@ -3712,9 +3747,6 @@ void request_command(bool shopping)
 
 	cptr act;
 
-	/* Flush messages */
-	if (easy_more && must_more) messages_easy(TERM_WHITE, "Command:");
-
 	/* Roguelike */
 	if (rogue_like_commands)
 	{
@@ -3737,21 +3769,23 @@ void request_command(bool shopping)
 	/* No "direction" yet */
 	p_ptr->command_dir = 0;
 
+	/* Flush messages */
+	if (easy_more && must_more) messages_easy(TRUE);
 
 	/* Get command */
 	while (1)
 	{
 		/* Hack -- auto-commands */
-		if (p_ptr->command_new)
+		if (p_ptr->command_new.key)
 		{
 			/* Flush messages */
 			message_flush();
 
 			/* Use auto-command */
-			ke.key = (char)p_ptr->command_new;
+			ke = p_ptr->command_new;
 
 			/* Forget it */
-			p_ptr->command_new = 0;
+			p_ptr->command_new.key = 0;
 		}
 
 		/* Get a keypress in "command" mode */
@@ -4876,7 +4910,7 @@ bool get_list(print_list_func print_list, const s16b *sn, int num, cptr p, cptr 
 	char out_val[160];
 	
 	/* Clear messages */
-	if (easy_more) messages_easy(TERM_WHITE, NULL);
+	if (easy_more) messages_easy(FALSE);
 
 	/* Nothing chosen yet */
 	flag = FALSE;

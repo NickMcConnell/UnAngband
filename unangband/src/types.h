@@ -1553,7 +1553,7 @@ struct player_type
 	s16b command_see;       /* See "cmd1.c" */
 	s16b command_wrk;       /* See "cmd1.c" */
 
-	s16b command_new;       /* Hack -- command chaining XXX XXX */
+	key_event command_new;       /* Hack -- command chaining XXX XXX */
 
 	s16b new_spells;/* Number of spells available */
 

@@ -3224,13 +3224,13 @@ void move_player(int dir, int jumping)
 		py_pickup(y, x, jumping != always_pickup);
 
 		/* Handle "store doors" */
-		if (f_ptr->flags1 & (FF1_ENTER))
+		if ((f_ptr->flags1 & (FF1_ENTER)) && !(p_ptr->running_withpathfind))
 		{
 			/* Disturb */
 			disturb(0, 0);
 
 			/* Hack -- Enter store */
-			p_ptr->command_new = '_';
+			p_ptr->command_new.key = '_';
 
 			/* Free turn XXX XXX XXX */
 			p_ptr->energy_use = 0;

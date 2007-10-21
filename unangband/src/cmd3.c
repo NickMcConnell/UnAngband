@@ -45,17 +45,17 @@ void do_cmd_inven(void)
 	prt("(Inventory) Command: ", 0, 0);
 
 	/* Hack -- Get a new command */
-	p_ptr->command_new = inkey();
+	p_ptr->command_new = inkey_ex();
 
 	/* Load screen */
 	screen_load();
 
 
 	/* Hack -- Process "Escape" */
-	if (p_ptr->command_new == ESCAPE)
+	if (p_ptr->command_new.key == ESCAPE)
 	{
 		/* Reset stuff */
-		p_ptr->command_new = 0;
+		p_ptr->command_new.key = 0;
 	}
 
 	/* Hack -- Process normal keys */
@@ -91,17 +91,17 @@ void do_cmd_equip(void)
 	prt("(Equipment) Command: ", 0, 0);
 
 	/* Hack -- Get a new command */
-	p_ptr->command_new = inkey();
+	p_ptr->command_new = inkey_ex();
 
 	/* Load screen */
 	screen_load();
 
 
 	/* Hack -- Process "Escape" */
-	if (p_ptr->command_new == ESCAPE)
+	if (p_ptr->command_new.key == ESCAPE)
 	{
 		/* Reset stuff */
-		p_ptr->command_new = 0;
+		p_ptr->command_new.key = 0;
 	}
 
 	/* Hack -- Process normal keys */

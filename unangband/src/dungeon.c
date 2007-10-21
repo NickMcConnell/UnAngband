@@ -2542,13 +2542,14 @@ static void process_command(void)
 		{
 			int y = KEY_GRID_Y(p_ptr->command_cmd_ex);
 			int x = KEY_GRID_X(p_ptr->command_cmd_ex);
+			int room;
 
 			/* Hack -- we could try various things here like travelling or going up/down stairs */
 			if ((p_ptr->py == y) && (p_ptr->px == x) && (p_ptr->command_cmd_ex.mousebutton))
 			{
 				do_cmd_rest();
 			}
-			else if (p_ptr->command_cmd_ex.mousebutton == 1)
+			else if (p_ptr->command_cmd_ex.mousebutton == BUTTON_MOVE)
 			{
 				if (p_ptr->confused)
 				{
@@ -2559,16 +2560,14 @@ static void process_command(void)
 					do_cmd_pathfind(y, x);
 				}
 			}
-			else if (p_ptr->command_cmd_ex.mousebutton == 2)
+			else if (p_ptr->command_cmd_ex.mousebutton == BUTTON_AIM)
 			{
 				target_set_location(y, x, 0);
 				msg_print("Target set.");
 			}
-			else
+			else if (use_trackmouse)
 			{
-#if 0
-				target_set_interactive_aux(y, x, TARGET_PEEK, (use_mouse ? "*,left-click to move to, right-click to target" : "*"));
-#endif
+				target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
 			}
 			break;
 		}
@@ -2845,7 +2844,7 @@ static void process_player(void)
 		overflow_pack();
 
 		/* Hack -- cancel "lurking browse mode" */
-		if (!p_ptr->command_new) p_ptr->command_see = FALSE;
+		if (!p_ptr->command_new.key) p_ptr->command_see = FALSE;
 
 
 		/* Assume free turn */
@@ -3118,7 +3117,7 @@ static void dungeon(void)
 
 	/* Reset the "command" vars */
 	p_ptr->command_cmd = 0;
-	p_ptr->command_new = 0;
+	p_ptr->command_new.key = 0;
 	p_ptr->command_rep = 0;
 	p_ptr->command_arg = 0;
 	p_ptr->command_dir = 0;
