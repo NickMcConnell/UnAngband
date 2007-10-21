@@ -4410,7 +4410,7 @@ void describe_room(void)
 		{
 			/* Nothing more */
 		}
-		else if (strlen(text_visible) + strlen(text_always) > 80)
+		else if ((!easy_more) && (!auto_more) && (strlen(text_visible) + strlen(text_always) > 80))
 		{
 			message_flush();
 
@@ -4426,12 +4426,18 @@ void describe_room(void)
 			{
 				/* Message */
 				text_out(text_visible);
+				
+				/* Add it to the buffer */
+				message_add(text_visible, MSG_GENERIC);
 			}
 
 			if (strlen(text_always))
 			{
 				/* Message */
 				text_out(text_always);
+
+				/* Add it to the buffer */
+				message_add(text_always, MSG_GENERIC);
 			}
 
 			(void)anykey();
@@ -4441,15 +4447,15 @@ void describe_room(void)
 		}
 		else if (strlen(text_visible) && strlen(text_always))
 		{
-			msg_format("%s  %s", text_visible, text_always);
+			msg_format("%s %s", text_visible, text_always);
 		}
 		else if (strlen(text_visible))
 		{
-			msg_format("%s", text_visible);
+			msg_print(text_visible);
 		}
 		else if (strlen(text_always))
 		{
-			msg_format("%s", text_always);
+			msg_print(text_always);
 		}
 
 		/* Room has been entered */
@@ -4471,22 +4477,29 @@ void describe_room(void)
 
 		if (strlen(text_always))
 		{
-			message_flush();
-
-			screen_save();
-
-			/* Set text_out hook */
-			text_out_hook = text_out_to_screen;
-
-			text_out_c(TERM_L_BLUE, name);
-			text_out("\n");
-
-			/* Message */
-			text_out(text_always);
-
-			(void)anykey();
-
-			screen_load();
+			if (easy_more || auto_more)
+			{
+				msg_print(text_always);
+			}
+			else
+			{
+				message_flush();
+	
+				screen_save();
+	
+				/* Set text_out hook */
+				text_out_hook = text_out_to_screen;
+	
+				text_out_c(TERM_L_BLUE, name);
+				text_out("\n");
+	
+				/* Message */
+				text_out(text_always);
+	
+				(void)anykey();
+	
+				screen_load();
+			}
 		}
 	}
 

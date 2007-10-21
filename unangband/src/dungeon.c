@@ -2565,7 +2565,7 @@ static void process_command(void)
 				target_set_location(y, x, 0);
 				msg_print("Target set.");
 			}
-			else if (use_trackmouse)
+			else if (use_trackmouse && (easy_more || auto_more))
 			{
 				target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
 			}
