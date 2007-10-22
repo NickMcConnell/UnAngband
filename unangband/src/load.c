@@ -2534,7 +2534,21 @@ static errr rd_savefile_new_aux(void)
 		if (rd_dungeon())
 		{
 			note("Error reading dungeon data");
-			return (-1);
+			note("--------");
+			note("It looks like there's a problem that I can attempt to recover from in your save file.");
+			note("However, I'd recommend that you make a backup of the save file first, in the unlikely");
+			note("event that a root cause of the problem is found and a fix implemented in a later");
+			note("version of Unangband.");
+			note("Please note that recovery will involve generating a new dungeon level.");			
+			note("--------");			
+			if(!get_check("Attempt a recovery? ")) return(-1);
+			if(!get_check("Have you made a backup of this save file? ")) return(-1);
+			if(!get_check("Are you sure you wish to continue (All dungeon data will be lost)? ")) return(-1);
+			
+			p_ptr->leaving = TRUE;
+			
+			/* Don't bother reading the rest of the file */
+			return (0);
 		}
 
 		/* Read the ghost info */
