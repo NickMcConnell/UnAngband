@@ -2474,9 +2474,12 @@ void py_attack(int dir)
 	/* Hack -- no blows */
 	if (num_blows <= 0)
 	{
-		msg_print("You lack the skill to attack.");
+/*		msg_print("You lack the skill to attack.");
 		
-		return;
+		return; */
+		
+		/* Always get one blow */
+		num_blows = 1;
 	}
 
 	/* Attack once for each legal blow */
