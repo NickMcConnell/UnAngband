@@ -911,6 +911,7 @@ static void describe_monster_attack(const monster_race *r_ptr, const monster_lor
 			case GF_SNUFF:		q = "snuff the life from"; break;
 			case GF_RAGE:		q = "enrage"; break;
 			case GF_MENTAL:		q = "blast with mental energy"; break;
+			case GF_TANGLE:		q = "entangle with nearby plants or water weeds"; break;
 		}
 
 

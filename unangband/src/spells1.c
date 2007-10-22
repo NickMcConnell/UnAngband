@@ -5309,6 +5309,9 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 	/* Heal amount (amount to enrage) */
 	int do_rage = 0;
 
+	/* Heal amount (amount to petrify) */
+	int do_petrify = 0;
+
 	/* Destruction of inventory? */
 	inven_func do_inven_destroy = NULL;
 
@@ -6687,7 +6690,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				if ((near) && (seen))
 				{
 					note = " appears drowsy.";
-					do_sleep = 1;
+					do_sleep = 2;
 				}
 				else
 				{
@@ -6729,7 +6732,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				if ((near) && (seen))
 				{
 					note = " appears dizzy.";
-					do_conf = 1;
+					do_conf = 2;
 				}
 				else
 				{
@@ -6989,7 +6992,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 					if ((near) && (seen))
 					{
 						note = " appears to recoil.";
-						do_fear = 1;
+						do_fear = 2;
 					}
 					else
 					{
@@ -7035,7 +7038,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 					if ((near) && (seen))
 					{
 						note = " appears to recoil.";
-						do_fear = 1;
+						do_fear = 2;
 					}
 					else
 					{
@@ -7085,7 +7088,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				if ((near) && (seen))
 				{
 					note = " appears to recoil.";
-					do_fear = 1;
+					do_fear = 2;
 				}
 				else
 				{
@@ -7209,7 +7212,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				if ((near) && (seen))
 				{
 					note = " appears cross-eyed.";
-					do_blind = 1;
+					do_blind = 2;
 				}
 				else
 				{
@@ -7259,7 +7262,6 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 		/* Melee attack - paralyze */
 		case GF_STASTIS:
-		case GF_PETRIFY:
 		case GF_PARALYZE:
 		{
 			if (seen) obvious = TRUE;
@@ -7295,6 +7297,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				/* Go to sleep (much) later */
 				note = " is paralyzed!";
 				do_sleep = 500;
+				do_petrify = 10;
 			}
 			break;
 		}
@@ -7776,7 +7779,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				if ((near) && (seen))
 				{
 					note = " appears cross-eyed.";
-					do_blind = 1;
+					do_blind = 2;
 				}
 				else
 				{
@@ -7819,7 +7822,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				if ((near) && (seen))
 				{
 					note = " loses its temper.";
-					do_rage = 1;
+					do_rage = 2;
 				}
 				else
 				{
@@ -7978,6 +7981,79 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Petrify monster (Use "dam" as "power", and do damage) */
+		case GF_PETRIFY:
+		{
+			/* Obvious */
+			if (seen) obvious = TRUE;
+
+			/* Apply some fear */
+			do_petrify = damroll(3, (dam / 2)) + 1;
+
+			/* Attempt a saving throw - immune to edged are immune (but not resist) */
+			if (r_ptr->flags9 & (RF9_IM_EDGED))
+			{
+				if ((seen) && !(l_ptr->flags9 & (RF9_IM_EDGED)))
+				{
+					l_ptr->flags9 |= (RF9_IM_EDGED);
+					note = " is immune to petrification.";
+
+					do_petrify = 0;
+				}
+			}
+			else if (monster_save(m_ptr, dam, &near))
+			{
+				if ((near) && (seen))
+				{
+					note = " grinds to a halt for a moment.";
+					do_petrify = 2;
+				}
+				else
+				{
+					if (seen) note = " is unaffected!";
+					do_petrify = 0;
+
+					obvious = FALSE;
+				}
+			}
+			break;
+		}
+
+		
+		/* Entangle monsters in nearby plants (Use "dam" as "power") */
+		case GF_TANGLE:
+		{
+			/* Must be next to plants/water */
+			if (!teleport_nature_hook(y, x, y, x)) break;
+			
+			/* Obvious */
+			if (seen) obvious = TRUE;
+
+			/* Apply some petrification */
+			do_petrify = damroll(3, (dam / 2)) + 1;
+
+			/* Big, heavy monsters, metallic monsters and ghosts */
+			if (r_ptr->flags9 & (RF9_IM_BLUNT)) do_petrify = 0;
+			else if ((r_ptr->flags3 & (RF3_HUGE)) || (r_ptr->flags9 & (RF9_IM_BLUNT))) do_petrify /= 5;
+			else if ((r_ptr->flags3 & (RF3_GIANT)) || (r_ptr->flags9 & (RF9_RES_BLUNT | RF9_RES_EDGED))) do_petrify /= 3;
+
+			if (do_petrify <= 1)
+			{
+				note = " breaks free of the plants.";
+			}
+			else
+			{
+				note = " is entangled.";
+			}
+			
+			/* No real damage */
+			dam = 0;
+			
+			break;
+		}
+		
+		
+		
 		/* Charm effects */
 		case GF_CHARM_INSECT:
 		case GF_CHARM_ANIMAL:
@@ -8177,7 +8253,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 	else
 	{
 		/*Slowing*/
-		if (do_slow)
+		if (do_slow > 1)
 		{
 			/* Increase slowness */
 			tmp = m_ptr->slowed + do_slow;
@@ -8188,7 +8264,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Hasting */
-		if (do_haste)
+		if (do_haste > 1)
 		{
 			/* Increase haste */
 			tmp = m_ptr->hasted + do_haste;
@@ -8199,7 +8275,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Handle "stun" */
-		if (do_stun &&
+		if ((do_stun > 1) &&
 			 !(r_ptr->flags3 & (RF3_NO_STUN)))
 		{
 			/* Obvious */
@@ -8208,12 +8284,12 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			/* Get confused */
 			if (m_ptr->stunned)
 			{
-				note = " is more dazed.";
+				if (!note) note =  " is more dazed.";
 				tmp = m_ptr->stunned + (do_stun / (r_ptr->level / 10 + 1));
 			}
 			else
 			{
-				note = " is dazed.";
+				if (!note) note =  " is dazed.";
 				tmp = do_stun;
 			}
 
@@ -8222,14 +8298,14 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Handle "blindness" */
-		if (do_blind &&
+		if ((do_blind > 1) &&
 			 !(r_ptr->flags9 & (RF9_RES_BLIND)))
 		{
 			/* Don't blind already blinded monsters -- but allow cross-eyed to be blinded */
 			if (m_ptr->blind <= 1)
 			{
 				if (seen) obvious = TRUE;
-				if (do_blind > 1) note = " is blinded.";
+				if (do_blind > 1) if (!note) note =  " is blinded.";
 
 				/* Apply blindness */
 				m_ptr->blind = MIN(do_blind, 200);
@@ -8237,7 +8313,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Handle "rage" */
-		if (do_rage)
+		if (do_rage > 1)
 		{
 			/* Obvious */
 			if (seen) obvious = TRUE;
@@ -8245,12 +8321,12 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			/* Get confused */
 			if (m_ptr->stunned)
 			{
-				note = " is more enraged.";
+				if (!note) note =  " is more enraged.";
 				tmp = m_ptr->berserk + (do_rage / (r_ptr->level / 10 + 1));
 			}
 			else
 			{
-				if (do_rage > 1) note = " is enraged.";
+				if (do_rage > 1) if (!note) note =  " is enraged.";
 				tmp = do_rage;
 			}
 
@@ -8275,7 +8351,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		}
 		
 		/* Handle cuts from player or allies only */
-		if (do_cuts && ((who <= SOURCE_PLAYER_START) || ((who > 0) && (m_list[who].mflag & (MFLAG_ALLY)))) && 
+		if ((do_cuts > 1) && ((who <= SOURCE_PLAYER_START) || ((who > 0) && (m_list[who].mflag & (MFLAG_ALLY)))) && 
 			 !(r_ptr->flags9 & (RF9_NO_CUTS)))
 		{
 			/* Obvious */
@@ -8284,11 +8360,11 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			/* Bleed */
 			if (m_ptr->cut)
 			{
-				note = " bleeds more.";
+				if (!note) note =  " bleeds more.";
 			}
 			else
 			{
-				note = " is bleeding.";
+				if (!note) note =  " is bleeding.";
 			}
 
 			tmp = do_cuts / (r_ptr->level / 10 + 1);
@@ -8298,7 +8374,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Handle poison from player only */
-		if (do_pois && ((who <= SOURCE_PLAYER_START) || ((who > 0) && (m_list[who].mflag & (MFLAG_ALLY)))) &&
+		if ((do_pois > 1) && ((who <= SOURCE_PLAYER_START) || ((who > 0) && (m_list[who].mflag & (MFLAG_ALLY)))) &&
 			 !(r_ptr->flags3 & (RF3_IM_POIS)))
 		{
 			/* Obvious */
@@ -8307,12 +8383,12 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			/* Get confused */
 			if (m_ptr->poisoned)
 			{
-				note = " is more poisoned.";
+				if (!note) if (!note) note =  " is more poisoned.";
 			}
 
 			else
 			{
-				note = " is poisoned.";
+				if (!note) if (!note) note =  " is poisoned.";
 			}
 
 			tmp = do_pois / (r_ptr->level / 10 + 1);
@@ -8322,7 +8398,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Handle confusion */
-		if (do_conf &&
+		if ((do_conf > 1) &&
 			 !(r_ptr->flags3 & (RF3_NO_CONF)))
 		{
 			/* Obvious */
@@ -8331,33 +8407,68 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			/* Already partially confused */
 			if (m_ptr->confused)
 			{
-				note = " looks more confused.";
+				if (!note) note = " looks more confused.";
 				tmp = m_ptr->confused + (do_conf / (r_ptr->level / 10 + 1));
 			}
 
 			/* Was not confused */
 			else
 			{
-				if (do_conf > 1) note = " looks confused.";
+				if (!note) note = " looks confused.";
 				tmp = do_conf;
 			}
 
 			/* Apply confusion */
 			m_ptr->confused = (tmp < 200) ? tmp : 200;
 		}
-
+		
 		/* Fear */
-		if (do_fear)
+		if (do_fear > 1)
 		{
 			/* Increase fear */
 			tmp = m_ptr->monfear + do_fear;
 
+			/* Hack -- excess fear causes petrification */
+			if (tmp > 100)
+			{
+				do_petrify = tmp - 100;
+				tmp = 100;
+			}
+			
 			/* Set monster fear */
 			set_monster_fear(m_ptr, tmp, TRUE);
 
 			/* Quest monster */
 			if (r_ptr->flags1 & (RF1_QUESTOR)) check_fear_quest(cave_m_idx[y][x]);
 		}
+
+		/* Handle petrify. Im_edged resists. */
+		if ((do_petrify > 1) &&
+			 !(r_ptr->flags9 & (RF9_IM_EDGED)))
+		{
+			/* Obvious */
+			if (seen) obvious = TRUE;
+
+			/* Already partially petrify */
+			if (m_ptr->petrify)
+			{
+				if (!note) note = " looks more petrified.";
+				tmp = m_ptr->petrify + (do_conf / (r_ptr->level / 10 + 1));
+			}
+
+			/* Was not petrify */
+			else
+			{
+				if (do_conf > 1) if (!note) note = " looks petrified.";
+				tmp = do_conf;
+			}
+
+			/* Apply confusion */
+			m_ptr->petrify = (tmp < 200) ? tmp : 200;
+			
+			/* As we can't move, need to find new range */
+			find_range(cave_m_idx[y][x]);
+		}	
 	}
 
 	/* If another non-allied monster or trap did the damage, hurt the monster by hand */

@@ -1454,6 +1454,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_SNUFF:		q = "snuff"; s = "the life from"; u = "with less than"; break;
 			case GF_RAGE:		q = "enrage"; break;
 			case GF_MENTAL:		q = "blast"; u = "with mental energy"; break;
+			case GF_TANGLE:		q = "entangle"; u = "with nearby plants or waterweeds"; break;
 
 			/* Hack -- handle features */
 			case GF_FEATURE:
@@ -1635,6 +1636,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_BIND_FAMILIAR:
 			case GF_RAGE:
 			case GF_DARK_WEAK:
+			case GF_TANGLE:
 								text_out("power"); break;
 			case GF_SNUFF: text_out("maximum ");
 			case GF_HEAL_PERC: text_out("percentage ");
@@ -1834,6 +1836,7 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 			case GF_BIND_FAMILIAR:
 			case GF_RAGE:
 			case GF_DARK_WEAK:
+			case GF_TANGLE:
 								q = "pow"; break;
 			case GF_SNUFF: q = "max hp"; break;
 			case GF_HEAL: q = "heal"; break;

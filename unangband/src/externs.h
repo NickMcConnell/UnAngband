@@ -653,6 +653,7 @@ extern bool tell_allies_death(int y, int x, cptr saying);
 extern bool tell_allies_best_range(int y, int x, int range, cptr saying);
 extern bool tell_allies_target(int y, int x, int ty, int tx, bool scent, cptr saying);
 extern void feed_monster(int m_idx);
+extern void find_range(int m_idx);
 extern void process_monsters(byte minimum_energy);
 extern int get_scent(int y, int x);
 extern bool cave_exist_mon(int r_idx, int y, int x, bool occupied_ok);

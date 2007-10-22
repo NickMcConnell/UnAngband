@@ -404,6 +404,7 @@ static cptr r_info_blow_effect[] =
 	"RAGE",
 	"HEAL_PERC",
 	"GAIN_MANA_PERC",
+	"TANGLE",
 	NULL
 };
 

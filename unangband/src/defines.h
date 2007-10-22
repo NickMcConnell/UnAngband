@@ -980,6 +980,8 @@
 #define GF_RAGE			137
 #define GF_HEAL_PERC	138
 #define GF_GAIN_MANA_PERC	139
+#define GF_TANGLE		140
+
 
 
 

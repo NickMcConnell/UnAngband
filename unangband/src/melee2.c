@@ -31,7 +31,7 @@
 /*
  * Calculate minimum and desired combat ranges.  -BR-
  */
-static void find_range(int m_idx)
+void find_range(int m_idx)
 {
 	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
@@ -118,6 +118,9 @@ static void find_range(int m_idx)
 
 		/* Spellcasters that don't stike never like to get too close */
 		if (r_ptr->flags1 & (RF1_NEVER_BLOW)) m_ptr->min_range += 3;
+		
+		/* Petrified monsters would get away if they could */
+		if (m_ptr->petrify) m_ptr->min_range += 3;
 	}
 
 	/* Maximum range to flee to (reduced elsewhere for themed levels */
@@ -167,6 +170,9 @@ static void find_range(int m_idx)
 
 	/* Creatures that don't move never like to get too close */
 	else if (r_ptr->flags1 & (RF1_NEVER_MOVE)) m_ptr->best_range = 6;
+	
+	/* Petrified creatures never like to get too close */
+	else if (m_ptr->petrify) m_ptr->best_range = 6;
 	
 	/* Spellcasters that don't strike never like to get too close */
 	else if (r_ptr->flags1 & (RF1_NEVER_BLOW)) m_ptr->best_range = 8;
@@ -2880,13 +2886,13 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 	 * 
 	 * Now also attack allies.
 	 */
-	if (r_ptr->flags1 & (RF1_NEVER_MOVE))
+	if ((r_ptr->flags1 & (RF1_NEVER_MOVE)) || (m_ptr->petrify))
 	{
 		int i;
 		int d = 9;
 
 		/* Hack -- memorize lack of moves after a while. */
-		if (!(l_ptr->flags1 & (RF1_NEVER_MOVE)))
+		if ((r_ptr->flags1 & (RF1_NEVER_MOVE)) && !(l_ptr->flags1 & (RF1_NEVER_MOVE)))
 		{
 			if ((m_ptr->ml) && (randint(20) == 1)) 
 				l_ptr->flags1 |= (RF1_NEVER_MOVE);
@@ -6568,6 +6574,7 @@ static void process_monster(int m_idx)
 		
 		/* Note: We have to prevent never move monsters from acquiring targets or they will move */
 		bool can_target = ((r_ptr->flags1 & (RF1_NEVER_MOVE | RF1_NEVER_BLOW)) == 0)
+			&& !(m_ptr->petrify)
 			&& (aggressive || !(m_ptr->monfear));
 		
 		/* This allows smart monsters to report enemy positions to the player */
@@ -6749,7 +6756,7 @@ static void process_monster(int m_idx)
 					
 					/* Run back to the player with tails between its legs,
 					 * unless ordered somewhere. */
-					if (((r_ptr->flags1 & (RF1_NEVER_MOVE)) == 0) && ((!p_ptr->target_set) || (p_ptr->target_who)))
+					if (((r_ptr->flags1 & (RF1_NEVER_MOVE)) == 0) && !(m_ptr->petrify) && ((!p_ptr->target_set) || (p_ptr->target_who)))
 					{
 						m_ptr->ty = p_ptr->py;
 						m_ptr->tx = p_ptr->px;
@@ -6937,6 +6944,7 @@ static void process_monster(int m_idx)
 
 		/* Is the monster scared? */
 		if ((!(r_ptr->flags1 & (RF1_NEVER_MOVE))) &&
+				!(m_ptr->petrify) &&
 		    ((m_ptr->min_range == FLEE_RANGE) ||
 		     (m_ptr->monfear)))
 		{
@@ -7514,6 +7522,41 @@ static void recover_monster(int m_idx, bool regen)
 
 	}
 
+	/*
+	 * Handle petrify counter
+	 */
+	if (m_ptr->petrify)
+	{
+		int d = 1;
+
+		/* Still invisible */
+		if (m_ptr->petrify > d)
+		{
+			/* Reduce the confusion */
+			m_ptr->petrify -= d;
+		}
+
+		/* Expired */
+		else
+		{
+			/* No longer invisible */
+			m_ptr->petrify = 0;
+
+			/* Message if visible */
+			if (m_ptr->ml)
+			{
+				/* Acquire the monster name */
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
+
+				/* Dump a message */
+				if ((r_ptr->flags1 & (RF1_NEVER_MOVE)) == 0) msg_format("%^s is now able to move again.", m_name);
+			}
+			
+			/* As we can now move, need to find new range */
+			find_range(m_idx);
+		}
+	}	
+	
 
 	/*
 	 * Handle timed invisibility counter

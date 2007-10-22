@@ -4306,7 +4306,7 @@ void entomb(int cy, int cx, byte invalid)
 			sn = 0;
 
 			/* Monster can move to escape the wall */
-			if (!(r_ptr->flags1 & (RF1_NEVER_MOVE)))
+			if (!(r_ptr->flags1 & (RF1_NEVER_MOVE)) && !(m_ptr->petrify))
 			{
 				/* Look for safety */
 				for (i = 0; i < 8; i++)
