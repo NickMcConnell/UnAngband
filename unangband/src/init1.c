@@ -3955,13 +3955,6 @@ errr parse_r_info(char *buf, header *head)
 		{
 			r_ptr->flags3 |= RF3_NONVOCAL;
 		}
-
-		/* Hack -- older monsters */
-		if (strchr("eQCfBrhtlpqnoOPTY", r_ptr->d_char))
-		{
-			r_ptr->flags9 |= RF9_LEVEL_AGE;
-		}
-		
 		
 		/* Canines and hounds and ring wraiths have super scent */
 		if ((strchr("CZ", r_ptr->d_char)) || ((r_ptr->d_char == 'W') && (r_ptr->flags1 & (RF1_UNIQUE))))
@@ -4163,6 +4156,12 @@ errr parse_r_info(char *buf, header *head)
 			r_ptr->flags3 |= RF3_NONLIVING;
 		}
 
+		/* Hack -- older monsters */
+		if ((r_ptr->flags9 & (RF9_LEVEL_POWER | RF9_LEVEL_SIZE)) && (strchr("eQCfBhtlpqnoOPTY", r_ptr->d_char)))
+		{
+			r_ptr->flags9 |= RF9_LEVEL_AGE;
+		}
+		
 		/* Catch fraudulent NEVER_BLOW monsters */
 		if (r_ptr->flags1 & RF1_NEVER_BLOW)
 		  for (i = 0; i < 4; i++) 

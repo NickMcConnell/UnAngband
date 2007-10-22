@@ -1445,7 +1445,31 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 			}
 		}
 
-
+		/* Show additional info */
+		if (cheat_hear)
+		{
+			if (m_ptr->hp < m_ptr->maxhp)
+			{
+				/* Append special notation */
+				my_strcat(desc, format(" (hp:%d/%d)", m_ptr->hp, m_ptr->maxhp) , max);
+			}
+			else
+			{
+				/* Append special notation */
+				my_strcat(desc, format(" (hp:%d)", m_ptr->maxhp) , max);				
+			}
+			
+			if (m_ptr->mana < r_ptr->mana)
+			{
+				/* Append special notation */
+				my_strcat(desc, format(" (sp:%d/%d)", m_ptr->mana, r_ptr->mana) , max);
+			}
+			else if (r_ptr->mana)
+			{
+				/* Append special notation */
+				my_strcat(desc, format(" (sp:%d)", r_ptr->mana) , max);				
+			}
+		}
 		
 		/* Remove gender sensitivity */
 		for (t = s = desc; *s; s++)

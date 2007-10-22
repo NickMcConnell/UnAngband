@@ -2299,9 +2299,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			known = (m_ptr->ml && player_can_see_bold(y,x));
 
-			/* Always known if target */
-			known = TRUE;
-
 			/* Assume "normal" target */
 			normal = TRUE;
 
