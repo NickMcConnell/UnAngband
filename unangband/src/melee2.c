@@ -973,7 +973,7 @@ static int choose_attack_spell_fast(int m_idx, int target_m_idx, u32b *f4p, u32b
 			
 			u32b smart = m_ptr->smart;
 			
-			if (target_m_idx) smart = monster_smart_flags(target_m_idx);
+			if (target_m_idx > 0) smart = monster_smart_flags(target_m_idx);
 
 			if (spells[0] < 128)
 			{
@@ -1810,7 +1810,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 
 		/* Penalty if this spell is resisted */
 		if (spell_desire[D_RES])
-		      cur_spell_rating = (cur_spell_rating * (100 - find_resist(target_m_idx ? monster_smart_flags(target_m_idx) : m_ptr->smart, spell_desire[D_RES])))/100;
+		      cur_spell_rating = (cur_spell_rating * (100 - find_resist(target_m_idx > 0 ? monster_smart_flags(target_m_idx) : m_ptr->smart, spell_desire[D_RES])))/100;
 
 		/* Penalty for range if attack drops off in power */
 		if (spell_range)

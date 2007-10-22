@@ -2268,7 +2268,8 @@ void monster_swap(int y1, int x1, int y2, int x2)
 		r_ptr = &r_info[m_ptr->r_idx];
 
 		/* Check monster lite at origin */
-		lite1 = check_monster_lite(m1);
+		if (m2 > 0) lite1 = check_monster_lite(m1);
+		else lite1 = FALSE;
 
 		/* Move monster */
 		m_ptr->fy = y2;
@@ -2314,7 +2315,8 @@ void monster_swap(int y1, int x1, int y2, int x2)
 		r_ptr = &r_info[m_ptr->r_idx];
 
 		/* Check monster lite at origin */
-		lite3 = check_monster_lite(m1);
+		if (m1 > 0) lite3 = check_monster_lite(m1);
+		else lite3 = FALSE;
 
 		/* Move monster */
 		m_ptr->fy = y1;
