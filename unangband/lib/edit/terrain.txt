@@ -12478,7 +12478,7 @@ F:POWER_5
 
 N:916:vine-covered granite wall
 U:56
-W:1:10:10:0
+W:10:10:10:0
 G:*:G
 M:742
 K:DEFAULT:1
