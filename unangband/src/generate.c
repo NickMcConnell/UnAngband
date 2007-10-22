@@ -1080,6 +1080,11 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	/* Paranoia */
 	if (!in_bounds_fully(y1, x1) || !in_bounds_fully(y2, x2)) return (FALSE);
 
+	/* Paranoia */
+	if ((y2 - y1 <= 0) || (x2 - x1 <= 0)) return (FALSE);
+	
+	flag &= ~(MAZE_SAVE);
+	
 #if 0
 
 	/* Extra crispy paranoia */
@@ -1091,7 +1096,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 			f_name + f_info[feat_path].name, width_path));	
 	
 	/* Save the existing terrain to overwrite the maze later */
-	if (flag & (MAZE_SAVE))
+	if ((flag & (MAZE_SAVE)) != 0)
 	{
 		saved = C_ZNEW((1 + y2 - y1) * (1 + x2 - x1), s16b);
 	
@@ -1691,7 +1696,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 #endif
 
 	/* Restore grids */
-	if (flag & (MAZE_SAVE))
+	if ((flag & (MAZE_SAVE)) != 0)
 	{
 		for (y = 0; y <= y2 - y1; y++)
 		{
@@ -7398,7 +7403,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			/* Clear decorations up to here */
 			for ( ; dun->decor_n > 0; dun->decor_n--)
 			{
-				if (dun->decor_t[dun->decor_n] < dun->tunn_n) break;
+				if (dun->decor_t[dun->decor_n - 1] < dun->tunn_n) break;
 			}
 			
 			/* Set last decor */
@@ -9647,7 +9652,7 @@ static void init_ecology(int r_idx)
 {
 	int i, j, k;
 	int l = 0;
-	int count;
+	int count = 0;
 
 	/* Initialise the dungeon ecology */
 	(void)WIPE(&cave_ecology, ecology_type);

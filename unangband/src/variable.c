@@ -698,7 +698,7 @@ s16b max_store_count;
 /*
  * The size of "store" (at most z_info->t_max * MAX_STORES)
  */
-s16b total_store_count;
+s16b total_store_count = 0;
 
 
 /*
