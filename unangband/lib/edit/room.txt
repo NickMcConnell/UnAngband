@@ -2739,13 +2739,13 @@ R:DRAGON
 N:112:115:0:0:15:1:15:128
 A:
 B:
-D:distant chanting of infernal voices... 
+D:the distant chanting of infernal voices... 
 R:S_DEMON
 
 N:112:115:0:0:15:1:15:128
 A:
 B:
-D:distant chorus of infernal voices... 
+D:the distant chorus of infernal voices... 
 R:S_HI_DEMON
 
 N:112:115:0:0:15:1:15:128
