@@ -3946,6 +3946,12 @@ static bool build_overlapping(int room, int type, int y1a, int x1a, int y2a, int
 	}
 	
 	/* Generate inner floors (a) */
+	generate_fill(y1a+l, x1a+l, y2a-l, x2a-l, FEAT_FLOOR);
+
+	/* Generate inner floors (b) */
+	generate_fill(y1b+l, x1b+l, y2b-l, x2b-l, FEAT_FLOOR);
+	
+	/* Generate inner floors (a) */
 	generate_fill_pillars(y1a+l, x1a+l, y2a-l, x2a-l, floor, pillars ? spacing + 1: 0, scale);
 
 	/* Generate inner floors (b) */
