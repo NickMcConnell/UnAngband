@@ -10861,14 +10861,22 @@ static bool cave_gen(void)
 			    (r_ptr->cur_num <= 0))
 			{
 				int y, x;
+				int count = 0;
 
 				/* Pick a location */
-				while (1)
+				while (count++ < 1000)
 				{
 					y = rand_int(DUNGEON_HGT);
 					x = rand_int(DUNGEON_WID);
 
 					if (cave_naked_bold(y, x)) break;
+				}
+
+				if (count >= 1000)
+				{
+					if (cheat_room) msg_format("Could not place questor (%s).", r_name + r_info[i].name);
+					
+					return (FALSE);
 				}
 
 				/* Place the questor */
@@ -10881,6 +10889,7 @@ static bool cave_gen(void)
 	if ((level_flag & (LF1_GUARDIAN)) != 0)
 	{
 		int y, x, guard;
+		int count = 0;
 		
 		guard = actual_guardian(zone->guard, p_ptr->dungeon);
 
@@ -10888,12 +10897,19 @@ static bool cave_gen(void)
 		if (cheat_room) msg_format("Placing guardian (%s).", r_name + r_info[guard].name);
 
 		/* Pick a location */
-		while (1)
+		while (count++ < 1000)
 		{
 			y = rand_int(DUNGEON_HGT);
 			x = rand_int(DUNGEON_WID);
 
 			if (place_monster_here(y, x, guard) > MM_FAIL) break;
+		}
+		
+		if (count >= 1000)
+		{
+			if (cheat_room) msg_format("Could not place guardian (%s).", r_name + r_info[guard].name);
+			
+			return (FALSE);
 		}
 
 		/* Place the questor */
