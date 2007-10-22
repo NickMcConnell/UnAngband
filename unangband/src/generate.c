@@ -1065,6 +1065,8 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	byte dir[4];
 	byte dirs;
 	
+	int count = 0;
+	
 	int offset = ((flag & (MAZE_CRYPT | MAZE_CAVE)) != 0) && (rand_int(100) < 50) ? 1 : 0;
 	
 	s16b *saved = 0; /* to silence the warning */
@@ -1160,7 +1162,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	}
 
 	/* Now build the maze */
-	while (grids)
+	while ((grids) && (++count < 10000))
 	{
 		/* Only use maze grids */
 		if ((cave_feat[YPOS(y, y1)][XPOS(x, x1)] == feat_path) || ((width_path > 1) &&
@@ -1270,6 +1272,9 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 		y = rand_int(ydim);
 		x = rand_int(xdim);
 	}
+	
+	/* Warn the player */
+	if (count >= 10000) msg_print("Bug: Bad maze on level. Please report.");
 	
 	/* Create exits */
 	if (flag & (MAZE_EXIT_N | MAZE_EXIT_S | MAZE_EXIT_W | MAZE_EXIT_E))
