@@ -2463,9 +2463,13 @@ void py_attack(int dir)
 	/* Restrict blows if charging */
 	if (charging)
 	{
+		/* Charging halves number of blows */
+		num_blows /= 2;
+		
+		/* Ensure at least some blows */
 		if (melee_style & (1L << WS_TWO_WEAPON)) 
-		  num_blows = MIN(2, num_blows);
-		else 
+		  num_blows = MAX(2, num_blows);
+		else if (!num_blows)
 		  num_blows = 1;
 	}
 	
@@ -2484,7 +2488,7 @@ void py_attack(int dir)
 		blows++;
 
 		/* Get weapon slot */
-		slot = weapon_slot(melee_style,blows,charging);
+		slot = weapon_slot(melee_style,blows,charging && (blows == 1));
 
 		/* Weapon slot */
 		o_ptr = &inventory[slot];
@@ -2524,7 +2528,10 @@ void py_attack(int dir)
 			/* No need for message */
 		}
 		/* Test for huge monsters -- they resist non-charging attacks */
-		else if ((r_ptr->flags3 & (RF3_HUGE)) && (!charging) && (rand_int(100) < 60))
+		else if ((r_ptr->flags3 & (RF3_HUGE)) && (!charging) && (rand_int(100) < 60) &&
+
+				/* Easy climb locations provide enough of a boost to attack from on high */
+				((f_info[cave_feat[p_ptr->py][p_ptr->px]].flags3 & (FF3_EASY_CLIMB)) == 0))
 		{
 			/* Message */
 			message_format(MSG_MISS, m_ptr->r_idx, "You cannot reach %s.", m_name);
@@ -2622,8 +2629,8 @@ void py_attack(int dir)
 			/* Adjust for style */
 			k += style_dam;
 
-			/* Adjust for charging */
-			if (charging)
+			/* Adjust for charging - for first attack only */
+			if ((charging) && (blows == 1))
 			  k *= p_ptr->num_charge;
 
 			/* Monster armor reduces total damage */
@@ -2654,7 +2661,7 @@ void py_attack(int dir)
 				/* Message */
 				p = "You wound %s!";
 			}
-			else if (charging)
+			else if ((charging) && (blows <= 1))
 			{
 				/* Unarmed */
 				if (melee_style & (1L << WS_UNARMED)) p = "You flying kick %s!";

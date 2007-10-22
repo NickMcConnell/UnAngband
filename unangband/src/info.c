@@ -7106,6 +7106,11 @@ static void describe_feature_misc(int f_idx)
 
 		if (effect) text_out(" continuously.  ");
 	}
+
+	if (f_ptr->flags3 & (FF3_EASY_CLIMB))
+	{
+		text_out("You can melee huge monsters more easily from here.  ");
+	}
 }
 
 
