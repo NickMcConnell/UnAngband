@@ -10869,7 +10869,7 @@ static bool cave_gen(void)
 					y = rand_int(DUNGEON_HGT);
 					x = rand_int(DUNGEON_WID);
 
-					if (cave_naked_bold(y, x)) break;
+					if (place_monster_here(y, x, i) > MM_FAIL) break;
 				}
 
 				if (count >= 1000)
