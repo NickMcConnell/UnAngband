@@ -11544,6 +11544,11 @@ void generate_cave(void)
 	/* The dungeon is not ready */
 	character_dungeon = FALSE;
 
+	/* Important - prevent getting stuck in rock */
+	p_ptr->word_return = 0;
+	p_ptr->return_y = 0;
+	p_ptr->return_x = 0;
+	
 	/* Generating */
 	if (cheat_room) msg_format("Generating new level (level %d in %s)", p_ptr->depth, t_name + t_info[p_ptr->dungeon].name);
 

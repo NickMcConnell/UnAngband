@@ -7436,7 +7436,14 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				msg_print("Oops. Spell not yet implemented.");
 				break;
 			}
-						
+			
+			case SPELL_SET_RETURN:
+			case SPELL_SET_OR_MAKE_RETURN:
+			{
+				/* Implemented elsewhere */
+				break;
+			}
+			
 			default:
 			{
 				wield_spell(s_ptr->type,s_ptr->param,lasts, level, 0);

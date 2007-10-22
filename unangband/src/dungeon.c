@@ -1708,6 +1708,29 @@ static void process_world(void)
 		teleport_player(40);
 	}
 
+	/* Delayed Word-of-Return */
+	if (p_ptr->word_return)
+	{
+		/* Count down towards return */
+		p_ptr->word_return--;
+
+		/* Activate the return */
+		if (!p_ptr->word_return)
+		{
+			/* Disturbing! */
+			disturb(0, 0);
+
+			msg_print("You feel yourself yanked sideways!");
+
+			/* Teleport the player back to their original location */
+			teleport_player_to(p_ptr->return_y, p_ptr->return_x);
+			
+			/* Clear the return coordinates */
+			p_ptr->return_y = 0;
+			p_ptr->return_x = 0;
+		}
+	}
+
 	/* Delayed Word-of-Recall */
 	if (p_ptr->word_recall)
 	{
@@ -1751,8 +1774,8 @@ static void process_world(void)
 				msg_print("A tension leaves the air around you...");
 			}
 		}
-	}
-
+	}	
+	
 	/* Update dynamic terrain */
 	update_dyna();
 
