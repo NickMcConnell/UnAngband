@@ -2629,6 +2629,9 @@ void messages_easy(bool command)
 	
 	/* Allow 1 line messages again */
 	must_more = FALSE;
+	
+	/* Clear the message flag */
+	msg_flag = FALSE;
 
 	/* Clear top line */
 	Term_erase(0, 0, 255);
@@ -2879,6 +2882,13 @@ static void msg_print_aux(u16b type, cptr msg)
 		
 		/* Hack -- use first line */
 		msg_flag = TRUE;
+	}
+	/* Hack -- blank message or zero length message implies we want interruption */
+	else if ((easy_more) && ((!msg) || !(strlen(msg))))
+	{
+		messages_easy(FALSE);
+		
+		return;
 	}
 
 	/* No message */

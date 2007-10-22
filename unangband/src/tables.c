@@ -2559,7 +2559,7 @@ const bool option_norm[OPT_MAX] =
 	FALSE,	  /* OPT_stack_force_charges */
 	FALSE,	  /* OPT_stack_force_times */
 	TRUE,	   /* OPT_easy_more */
-	FALSE,	   /* OPT_room_descriptions */
+	TRUE,	   /* OPT_room_descriptions */
 	TRUE,	   /* OPT_room_names */
 	FALSE,	  /* OPT_verify_mana */
 	TRUE,		/* OPT_reseed_artifacts */
