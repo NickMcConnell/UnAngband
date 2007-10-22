@@ -1083,8 +1083,6 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	/* Paranoia */
 	if ((y2 - y1 <= 0) || (x2 - x1 <= 0)) return (FALSE);
 	
-	flag &= ~(MAZE_SAVE);
-	
 #if 0
 
 	/* Extra crispy paranoia */
@@ -1098,7 +1096,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	/* Save the existing terrain to overwrite the maze later */
 	if ((flag & (MAZE_SAVE)) != 0)
 	{
-		saved = C_ZNEW((1 + y2 - y1) * (1 + x2 - x1), s16b);
+		saved = C_ZNEW((3 + y2 - y1) * (3 + x2 - x1), s16b);
 	
 		/* Save grids */
 		for (y = 0; y <= y2 - y1; y++)
