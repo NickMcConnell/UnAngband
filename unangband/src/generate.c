@@ -1069,6 +1069,8 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	
 	int offset = ((flag & (MAZE_CRYPT | MAZE_CAVE)) != 0) && (rand_int(100) < 50) ? 1 : 0;
 	
+	/* For some reason, allocating this on the heap causes problems. Thus we allocate on the stack
+	 * and worry about debugging memory errors another day. */
 	s16b saved[DUNGEON_HGT * DUNGEON_WID];
 
 	int solid = ((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) ? feat_state(feat_wall, FS_SOLID) : 0;	
@@ -1103,7 +1105,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 		{
 			for (x = 0; x <= x2 - x1; x++)
 			{
-				saved[y * (1 + y2 - y1) + x] = cave_feat[y + y1][x + x1];
+				saved[y * (2 + y2 - y1) + x] = cave_feat[y + y1][x + x1];
 			}
 		}
 	}
