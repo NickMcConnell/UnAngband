@@ -730,7 +730,7 @@ static errr rd_store(int n)
 	}
 
 	/* Make a new store */
-	C_MAKE(st_ptr, 1, store_type);
+	st_ptr = C_ZNEW(1, store_type);
 
 	/* Copy basic information for older versions */
 	if (older_than(0, 6, 2, 0))
@@ -752,7 +752,7 @@ static errr rd_store(int n)
 	st_ptr->stock_size = STORE_INVEN_MAX;
 
 	/* Allocate the stock */
-	C_MAKE(st_ptr->stock, st_ptr->stock_size, object_type);
+	st_ptr->stock = C_ZNEW(st_ptr->stock_size, object_type);
 
 	/* Add it to the list of stores */
 	store[total_store_count++] = st_ptr;

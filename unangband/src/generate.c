@@ -1093,7 +1093,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	/* Save the existing terrain to overwrite the maze later */
 	if (flag & (MAZE_SAVE))
 	{
-		C_MAKE(saved, (1 + y2 - y1) * (1 + x2 - x1), s16b);
+		saved = C_ZNEW((1 + y2 - y1) * (1 + x2 - x1), s16b);
 	
 		/* Save grids */
 		for (y = 0; y <= y2 - y1; y++)
@@ -4497,7 +4497,7 @@ static fractal_map fractal_map_create(fractal_template *t_ptr)
 	fractal_map map;
 
 	/* Allocate the map */
-	C_MAKE(map, t_ptr->size, fractal_map_wid);
+	map = C_ZNEW(t_ptr->size, fractal_map_wid);
 
 	/* Reset the contents of the map */
 	fractal_map_reset(map, t_ptr);
@@ -4687,7 +4687,7 @@ static int fractal_map_is_connected(fractal_map map, fractal_template *t_ptr)
 	grid_queue_type queue, *q_ptr = &queue;
 
 	/* Allocate a "visited" matrix */
-	C_MAKE(visited, t_ptr->size, fractal_map_wid);
+	visited = C_ZNEW(t_ptr->size, fractal_map_wid);
 
 	/* Create the queue */
 	grid_queue_create(q_ptr, 500);

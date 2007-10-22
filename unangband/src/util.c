@@ -1262,10 +1262,10 @@ errr macro_add(cptr pat, cptr act)
 errr macro_init(void)
 {
 	/* Macro patterns */
-	C_MAKE(macro__pat, MACRO_MAX, cptr);
+	macro__pat = C_ZNEW(MACRO_MAX, cptr);
 
 	/* Macro actions */
-	C_MAKE(macro__act, MACRO_MAX, cptr);
+	macro__act = C_ZNEW(MACRO_MAX, cptr);
 
 	/* Success */
 	return (0);
@@ -1948,7 +1948,7 @@ static s16b quark__num = 1;
 /*
  * The array[QUARK_MAX] of pointers to the quarks
  */
-static cptr *quark__str;
+static char **quark__str;
 
 
 /*
@@ -2003,7 +2003,7 @@ cptr quark_str(s16b i)
 errr quarks_init(void)
 {
 	/* Quark variables */
-	C_MAKE(quark__str, QUARK_MAX, cptr);
+	quark__str = C_ZNEW(QUARK_MAX, cptr);
 
 	/* Success */
 	return (0);
@@ -2024,7 +2024,7 @@ errr quarks_free(void)
 	}
 
 	/* Free the list of "quarks" */
-	FREE((void*)quark__str);
+	FREE(quark__str);
 
 	/* Success */
 	return (0);
@@ -2660,12 +2660,12 @@ void messages_easy(bool command)
 errr messages_init(void)
 {
 	/* Message variables */
-	C_MAKE(message__ptr, MESSAGE_MAX, u16b);
-	C_MAKE(message__buf, MESSAGE_BUF, char);
-	C_MAKE(message__type, MESSAGE_MAX, u16b);
+	message__ptr = C_ZNEW(MESSAGE_MAX, u16b);
+	message__buf = C_ZNEW(MESSAGE_BUF, char);
+	message__type = C_ZNEW(MESSAGE_MAX, u16b);
 
 	/* Init the message colors to white */
-	(void)C_BSET(message__color, TERM_WHITE, MSG_MAX, byte);
+	memset(message__color,TERM_WHITE,MSG_MAX * sizeof(byte));
 
 	/* Hack -- No messages yet */
 	message__tail = MESSAGE_BUF;
@@ -5114,7 +5114,7 @@ void grid_queue_create(grid_queue_type *q, size_t max_size)
 	q->max_size = max_size;
 
 	/* Allocate the grid storage */
-	C_MAKE(q->data, max_size, coord);
+	q->data = C_ZNEW(max_size, coord);
 
 	/* Initialize head and tail of the queue */
 	q->head = q->tail = 0;

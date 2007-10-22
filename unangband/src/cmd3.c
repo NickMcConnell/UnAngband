@@ -2368,7 +2368,7 @@ void do_cmd_query_symbol(void)
 
 
 	/* Allocate the "who" array */
-	C_MAKE(who, z_info->r_max, u16b);
+	who = C_ZNEW(z_info->r_max, u16b);
 
 	/* Collect matching monsters */
 	for (n = 0, i = 1; i < z_info->r_max - 1; i++)
@@ -2393,7 +2393,7 @@ void do_cmd_query_symbol(void)
 	if (!n)
 	{
 		/* XXX XXX Free the "who" array */
-		KILL(who);
+		FREE(who);
 
 		return;
 	}
@@ -2427,7 +2427,7 @@ void do_cmd_query_symbol(void)
 	if (query != 'y')
 	{
 		/* XXX XXX Free the "who" array */
-		KILL(who);
+		FREE(who);
 
 		return;
 	}
@@ -2527,5 +2527,5 @@ void do_cmd_query_symbol(void)
 	prt(buf, 0, 0);
 
 	/* Free the "who" array */
-	KILL(who);
+	FREE(who);
 }

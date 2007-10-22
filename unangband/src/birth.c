@@ -1219,7 +1219,7 @@ static bool get_player_race()
 	int i, j = 0;
 	birth_menu *races;
 
-	C_MAKE(races, z_info->g_max, birth_menu);
+	races = C_ZNEW(z_info->g_max, birth_menu);
 
 	/* Extra info */
 	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
@@ -1377,7 +1377,7 @@ static bool get_player_class(void)
 	int  i, k = 0;
 	birth_menu *classes;
 
-	C_MAKE(classes, z_info->c_max, birth_menu);
+	classes = C_ZNEW(z_info->c_max, birth_menu);
 
 	/* Extra info */
 	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
@@ -1604,7 +1604,7 @@ static bool get_player_book(void)
 	/* No books */
 	if (!bookc) return (FALSE);
 
-	C_MAKE(books, bookc, birth_menu);
+	books = C_ZNEW(bookc, birth_menu);
 
 	/* Analyse books */
 	for (i = 0;i<z_info->k_max;i++)
@@ -1737,7 +1737,7 @@ static bool get_player_school(void)
 
 	if (!schoolc) return (TRUE);
 
-	C_MAKE(schools, schoolc, birth_menu);
+	schools = C_ZNEW(schoolc, birth_menu);
 
 	/* Analyse books */
 	for (i = 0;i<z_info->k_max;i++)

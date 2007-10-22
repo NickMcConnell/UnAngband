@@ -3964,7 +3964,7 @@ int store_init(int feat)
 	}
 
 	/* Make a new store */
-	C_MAKE(st_ptr, 1, store_type);
+	st_ptr = C_ZNEW(1, store_type);
 
 	/* Copy basic store information to it */
 	COPY(st_ptr, &u_info[f_info[feat].power], store_type);
@@ -3993,7 +3993,7 @@ int store_init(int feat)
 	st_ptr->stock_size = STORE_INVEN_MAX;
 
 	/* Allocate the stock */
-	C_MAKE(st_ptr->stock, st_ptr->stock_size, object_type);
+	st_ptr->stock = C_ZNEW(st_ptr->stock_size, object_type);
 
 	/* Store index */
 	store_index = total_store_count++;

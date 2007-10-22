@@ -2833,7 +2833,7 @@ static XImage *ReadFONT(Display *dpy, char *Name, u16b size)
 	}
 
 	/* Allocate image memory */
-	C_MAKE(Data, total, char);
+	Data = C_ZNEW(total, char);
 
 	Res = XCreateImage(dpy, visual, depth, ZPixmap, 0,
 	                   Data, size * 32, size * 128,
@@ -2842,7 +2842,7 @@ static XImage *ReadFONT(Display *dpy, char *Name, u16b size)
 	/* Failure */
 	if (Res == NULL)
 	{
-		KILL(Data);
+		FREE(Data);
 		fclose(fp);
 
 		return (NULL);
