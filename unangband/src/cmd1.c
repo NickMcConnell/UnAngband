@@ -2467,7 +2467,7 @@ void py_attack(int dir)
 		num_blows = (num_blows + 1) / 2;
 		
 		/* Ensure at least some blows */
-		if (melee_style & (1L << WS_TWO_WEAPON)) 
+		if ((melee_style & (1L << WS_TWO_WEAPON)) && (num_blows > 0))
 		  num_blows = MAX(2, num_blows);
 	}
 	
