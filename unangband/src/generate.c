@@ -1069,7 +1069,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	
 	int offset = ((flag & (MAZE_CRYPT | MAZE_CAVE)) != 0) && (rand_int(100) < 50) ? 1 : 0;
 	
-	s16b *saved = 0; /* to silence the warning */
+	s16b saved[DUNGEON_HGT * DUNGEON_WID];
 
 	int solid = ((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) ? feat_state(feat_wall, FS_SOLID) : 0;	
 	int inner = ((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) ? feat_state(feat_wall, FS_INNER) : feat_wall;
@@ -1096,7 +1096,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	/* Save the existing terrain to overwrite the maze later */
 	if ((flag & (MAZE_SAVE)) != 0)
 	{
-		saved = C_ZNEW((3 + y2 - y1) * (3 + x2 - x1), s16b);
+		/*saved = C_ZNEW((3 + y2 - y1) * (3 + x2 - x1), s16b);*/
 	
 		/* Save grids */
 		for (y = 0; y <= y2 - y1; y++)
@@ -1703,28 +1703,28 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 				/* Hack -- always overwrite if room flag set and room flag is clear */
 				if (((flag & (MAZE_ROOM)) != 0) && ((cave_info[y + y1][x + x1] & (CAVE_ROOM)) == 0))
 				{
-					cave_set_feat(y + y1, x + x1, saved[y * (1 + y2 - y1) + x]);
+					cave_set_feat(y + y1, x + x1, saved[y * (2 + y2 - y1) + x]);
 	
 					continue;
 				}
 				
 				/* Hack -- skip floor quickly */
-				if (saved[y * (1 + y2 - y1) + x] == FEAT_FLOOR) continue;
+				if (saved[y * (2 + y2 - y1) + x] == FEAT_FLOOR) continue;
 				
 				/* Hack -- skip 'extra' walls quickly */
-				if (saved[y * (1 + y2 - y1) + x] == FEAT_WALL_EXTRA) continue;
+				if (saved[y * (2 + y2 - y1) + x] == FEAT_WALL_EXTRA) continue;
 
 				/* Hack -- skip 'outer' and 'solid' terrain quickly */
-				if (f_info[saved[y * (1 + y2 - y1) + x] == FEAT_WALL_EXTRA].flags1 & (FF1_OUTER | FF1_SOLID)) continue;
+				if (f_info[saved[y * (2 + y2 - y1) + x] == FEAT_WALL_EXTRA].flags1 & (FF1_OUTER | FF1_SOLID)) continue;
 				
 				/* Passable terrain - overwrite floor */
-				if (((f_info[saved[y * (1 + y2 - y1) + x]].flags1 & (FF1_MOVE)) != 0) ||
-					((f_info[saved[y * (1 + y2 - y1) + x]].flags3 & (FF3_EASY_CLIMB)) != 0))
+				if (((f_info[saved[y * (2 + y2 - y1) + x]].flags1 & (FF1_MOVE)) != 0) ||
+					((f_info[saved[y * (2 + y2 - y1) + x]].flags3 & (FF3_EASY_CLIMB)) != 0))
 				{
 					/* Must be placed on floor grid */
 					if (cave_feat[y + y1][x + x1] == feat_path)
 					{
-						cave_set_feat(y + y1, x + x1, saved[y * (1 + y2 - y1) + x]);
+						cave_set_feat(y + y1, x + x1, saved[y * (2 + y2 - y1) + x]);
 					}
 					
 					/* Try adjacent saved */
@@ -1738,7 +1738,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 						
 						if (cave_feat[yy][xx] == feat_path)
 						{
-							cave_set_feat(yy, xx, saved[y * (1 + y2 - y1) + x]);
+							cave_set_feat(yy, xx, saved[y * (2 + y2 - y1) + x]);
 							break;
 						}
 					}
@@ -1751,7 +1751,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 							((cave_feat[y + y1][x + x1] == feat_wall) ||
 							(((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) && cave_feat[y + y1][x + x1] == feat_state(feat_wall, FS_INNER))))
 					{
-						cave_set_feat(y + y1, x + x1, saved[y * (1 + y2 - y1) + x]);
+						cave_set_feat(y + y1, x + x1, saved[y * (2 + y2 - y1) + x]);
 					}
 					/* Try adjacent saved */
 					else for (i = 0; i < 8; i++)
@@ -1766,7 +1766,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 							((cave_feat[yy][xx] == feat_wall) ||
 							(((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) && cave_feat[yy][xx] == feat_state(feat_wall, FS_INNER))))
 						{
-							cave_set_feat(yy, xx, saved[y * (1 + y2 - y1) + x]);
+							cave_set_feat(yy, xx, saved[y * (2 + y2 - y1) + x]);
 							break;
 						}
 					}
@@ -1775,7 +1775,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 		}
 	
 		/* Free the grids */
-		FREE(saved);
+		/*FREE(saved);*/
 	}
 	
 	/* Successful */
