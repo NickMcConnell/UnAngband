@@ -6054,7 +6054,7 @@ static int thaumacurse(bool verbose, int power)
 	 * Increase damage for each curse found (10x inflation).
 	 * Diminishing effect for each, but damage can potentially be very high indeed.
 	 */
-	dam *= curse_count * 10; /* Was sqrt(curse_count * 100);
+	dam *= curse_count * 10; /* Was sqrt(curse_count * 100);*/
 
 	/* Deflate */
 	dam = dam /100;
