@@ -97,7 +97,7 @@ APPRES = $(APPCONT)/Resources
 # of 8x8.bmp for Vanilla.  Make sure setting dpi to 72, *not* preserving
 # the actual size of image.  When you have them ready, put them in the src
 # directory and "make install-tiles".
-ICONFILES = osx/Angband.icns osx/Save.icns osx/Edit.icns osx/Data.icns
+ICONFILES = osx/unangband.icns osx/Save.icns osx/Edit.icns osx/Data.icns
 PLIST = osx/Angband.xml
 
 RFLAGS = -i /Developer/Headers/FlatCarbon -d MACH_O_CARBON
