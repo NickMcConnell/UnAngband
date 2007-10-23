@@ -28,6 +28,9 @@ copy lib\xtra\music\delete.me unangband-062-win\lib\xtra\music
 copy unangband.exe unangband-062-win
 copy readme.txt unangband-062-win
 copy changes.txt unangband-062-win
+copy faq.txt unangband-062-win
+copy bugs.txt unangband-062-win
+copy nocompile.txt unangband-062-win\compile.txt
 
 copy lib\edit\*.txt unangband-062-win\lib\edit
 
