@@ -323,10 +323,6 @@ version.
 - Invisible monsters now 'dance' around the player in melee to avoid being too easily
 guessable as to where they are.
 
-- Fix long outstanding bugs where you would incorrectly guess flags on items you have.
-
-- Fix long outstanding bugs where monsters would 
-
 - Revert to old inaccessible Hobbiton layout. In general, you won't run into any high level
 uniques in towns, like you used to, until certain key conditions have been met. Similarly,
 there are very few dungeon uniques you are required to fight. Certain events have much
@@ -354,6 +350,18 @@ twice as fast as you are, but no longer -7 does (Mikolaj Konarski).
 
 - Beefed up HAFTED a little bit for priests --- with free constant Bless it was too weak
 an advantage (Mikolaj Konarski).
+
+- Make Smeagol a more interesting opponent.
+
+- There's no point having monsters that cast invisible never be seen - they may as well just
+have INVISIBLE flag. Likewise for blessed etc.
+
+- Significant bug-fixes and improvements to the dungeon generation code to the point where
+its pretty much feature complete. "I've just played current V (Farm dungeon) and the dungeon
+generation is so much better after your recent work. Rooms, tunnels and even monsters are much
+more interesting and not just random, but with a nontrivial pattern that you start to grasp
+after several levels."
+
 
 ### User Interface ###
 
@@ -410,17 +418,6 @@ Please note this is initial work only and may need some testing / cause some mes
 
 - You can now press 's' while looking/targetting a monster to cycle between monsters of that
 race only. You can press 'a' to assault a location with any allied troops.
-
-- Make Smeagol a more interesting opponent.
-
-- There's no point having monsters that cast invisible never be seen - they may as well just
-have INVISIBLE flag. Likewise for blessed etc.
-
-- Significant bug-fixes and improvements to the dungeon generation code to the point where
-its pretty much feature complete. "I've just played current V (Farm dungeon) and the dungeon
-generation is so much better after your recent work. Rooms, tunnels and even monsters are much
-more interesting and not just random, but with a nontrivial pattern that you start to grasp
-after several levels."
 
 
 ### Bug fixes ###
@@ -612,6 +609,9 @@ or Lothlorien.
 
 - Fix monsters not generating ammo using ADD_AMMO flag.
 
+- Fix long outstanding bugs where you would incorrectly guess flags on items you have.
+
+- Fix long outstanding bugs where monsters would talk about incorrect player resistances.
 
 
 ### Build / Platform ###
