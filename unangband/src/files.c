@@ -4717,6 +4717,12 @@ bool queue_tip(cptr tip)
  */
 void show_tip(void)
 {
+	/* Don't interrupt running with tips */
+	if (p_ptr->running) return;
+	
+	/* Don't interrupt repeating with tips */
+	if (p_ptr->command_rep) return;
+	
 	/* Have tips to show */
 	if (tips_start != tips_end)
 	{
