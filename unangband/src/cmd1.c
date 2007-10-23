@@ -3232,7 +3232,10 @@ void move_player(int dir, int jumping)
 		py_pickup(y, x, jumping != always_pickup);
 
 		/* Handle "store doors" */
-		if ((f_ptr->flags1 & (FF1_ENTER)) && !(p_ptr->running_withpathfind))
+		/* The running with pathfind check ensures we don't interrupt ourselves
+		 * if we accidentally walk on a shop due to route finding */
+		if ((f_ptr->flags1 & (FF1_ENTER))
+				&& (!(p_ptr->running_withpathfind) || (pf_result_index <= 0)))
 		{
 			/* Disturb */
 			disturb(0, 0);
