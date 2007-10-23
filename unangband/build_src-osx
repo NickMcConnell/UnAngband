@@ -1,0 +1,56 @@
+mkdir unangband-062-src
+mkdir unangband-062-src/lib
+mkdir unangband-062-src/lib/apex
+mkdir unangband-062-src/lib/bone
+mkdir unangband-062-src/lib/data
+mkdir unangband-062-src/lib/edit
+mkdir unangband-062-src/lib/file
+mkdir unangband-062-src/lib/help
+mkdir unangband-062-src/lib/info
+mkdir unangband-062-src/lib/pref
+mkdir unangband-062-src/lib/save
+mkdir unangband-062-src/lib/user
+mkdir unangband-062-src/lib/xtra
+mkdir unangband-062-src/lib/xtra/font
+mkdir unangband-062-src/lib/xtra/graf
+mkdir unangband-062-src/lib/xtra/music
+mkdir unangband-062-src/lib/xtra/sound
+mkdir unangband-062-src/lib/xtra/help
+mkdir unangband-062-src/src
+
+cp lib/apex/delete.me unangband-062-src/lib/apex
+cp lib/bone/delete.me unangband-062-src/lib/bone
+cp lib/data/delete.me unangband-062-src/lib/data
+cp lib/save/delete.me unangband-062-src/lib/save
+cp lib/user/delete.me unangband-062-src/lib/user
+cp lib/xtra/font/delete.me unangband-062-src/lib/xtra/font
+cp lib/xtra/graf/delete.me unangband-062-src/lib/xtra/graf
+cp lib/xtra/music/delete.me unangband-062-src/lib/xtra/music
+
+cp readme.txt unangband-062-src
+cp changes.txt unangband-062-src
+
+cp lib/edit/*.txt unangband-062-src/lib/edit
+
+cp lib/file/*.txt unangband-062-src/lib/file
+cp lib/info/*.txt unangband-062-src/lib/info
+
+cp lib/help/*.txt unangband-062-src/lib/help
+cp lib/help/*.hlp unangband-062-src/lib/help
+
+cp lib/pref/*.prf unangband-062-src/lib/pref
+
+cp lib/xtra/sound/sound.cfg unangband-062-src/lib/xtra/sound
+
+cp lib/xtra/help/angband.hlp unangband-062-src/lib/xtra/help
+cp lib/xtra/help/angband.cnt unangband-062-src/lib/xtra/help
+
+cp src/*.h unangband-062-src/src
+cp src/*.c unangband-062-src/src
+cp src/*.inc unangband-062-src/src
+cp src/*.rc unangband-062-src/src
+cp src/*.ico unangband-062-src/src
+cp src/Makefile.* unangband-062-src/src
+
+zip a -9 -r unangband-062-src.zip unangband-062-src
+
