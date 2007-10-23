@@ -1,4 +1,3 @@
-/* File: store.c */
 
 /*
  * Copyright (c) 1997 Ben Harrison, James E. Wilson, Robert A. Koeneke
@@ -411,7 +410,7 @@ static int mass_roll(int num, int max)
  *
  * Standard percentage discounts include 10, 25, 50, 75, and 90.
  */
-static void mass_produce(object_type *o_ptr)
+static void mass_produce(object_type *o_ptr, bool allow_discount)
 {
 	int size = 1;
 
@@ -483,6 +482,7 @@ more frequent while expensive */
 		}
 	}
 
+	if (!allow_discount) return;
 
 	/* Pick a discount */
 	if (cost < 5)
@@ -1289,15 +1289,9 @@ static void store_create(int store_index)
 			/* Reset depth */
 			p_ptr->depth = depth;
 			object_level = depth;
-
-			/* Hack -- set in store */
+			
+			/* Item belongs to the store */
 			i_ptr->ident |= (IDENT_STORE);
-
-			object_aware(i_ptr, TRUE);
-			object_known(i_ptr);
-
-			/* Hack -- remove from store */
-			i_ptr->ident &= ~(IDENT_STORE);
 
 			/* Attempt to carry the (known) object */
 			(void)store_carry(i_ptr, store_index);
@@ -1318,7 +1312,6 @@ static void store_create(int store_index)
 
 			/* Handle failure */
 			if (!k_idx) continue;
-
 		}
 
 		/* Normal Store */
@@ -1358,7 +1351,7 @@ static void store_create(int store_index)
 		}
 
 		/* Item belongs to a store */
-		i_ptr->ident |= IDENT_STORE;
+		if (st_ptr->base != STORE_STORAGE) i_ptr->ident |= IDENT_STORE;
 
 		/* The object is "known" */
 		object_known(i_ptr);
@@ -1367,7 +1360,7 @@ static void store_create(int store_index)
 		if (object_value(i_ptr) <= 0) continue;
 
 		/* Mass produce and/or Apply discount */
-		mass_produce(i_ptr);
+		mass_produce(i_ptr, (st_ptr->base != STORE_STORAGE));
 
 		/* Attempt to carry the (known) object */
 		(void)store_carry(i_ptr, store_index);
@@ -1441,6 +1434,47 @@ static void updatebargain(s32b price, s32b minprice, int store_index)
 }
 
 
+/*
+ * Guesstimate a cost.
+ */
+static long guess_cost(int item, int store_index)
+{
+	store_type *st_ptr = store[store_index];
+	owner_type *ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max) + st_ptr->owner];
+
+	int x;
+	
+	/* Get the object */
+	object_type *o_ptr = &st_ptr->stock[item];
+
+	/* Display a "fixed" cost */
+	if (o_ptr->ident & (IDENT_FIXED))
+	{
+		/* Extract the "minimum" price */
+		x = price_item(o_ptr, ot_ptr->min_inflate, FALSE, store_index);
+	}
+
+	/* Display a "haggle" cost */
+	else if (adult_haggle)
+	{
+		/* Extrect the "maximum" price */
+		x = price_item(o_ptr, ot_ptr->max_inflate, FALSE, store_index);
+	}
+
+	/* Display a "taxed" cost */
+	else
+	{
+		/* Extract the "minimum" price */
+		x = price_item(o_ptr, ot_ptr->min_inflate, FALSE, store_index);
+
+		/* Hack -- Apply Sales Tax if needed */
+		if (!noneedtobargain(x, store_index)) x += x / 10;
+	}
+	
+	return (x);
+}
+
+
 
 /*
  * Redisplay a single store entry
@@ -1449,14 +1483,12 @@ static void display_entry(int item, int store_index)
 {
 	int y;
 	object_type *o_ptr;
-	s32b x;
 
 	char o_name[80];
 	char out_val[160];
 	int maxwid;
 
 	store_type *st_ptr = store[store_index];
-	owner_type *ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max) + st_ptr->owner];
 
 	/* Must be on current "page" to get displayed */
 	if (!((item >= store_top) && (item < store_top + store_size))) return;
@@ -1576,41 +1608,9 @@ static void display_entry(int item, int store_index)
 			queue_tip(format("ego%d.txt", o_ptr->name2));
 		}
 
-		/* Display a "fixed" cost */
-		if (o_ptr->ident & (IDENT_FIXED))
-		{
-			/* Extract the "minimum" price */
-			x = price_item(o_ptr, ot_ptr->min_inflate, FALSE, store_index);
-
-			/* Actually draw the price (not fixed) */
-			sprintf(out_val, "%9ld F", (long)x);
-			put_str(out_val, y, 68);
-		}
-
-		/* Display a "haggle" cost */
-		else if (adult_haggle)
-		{
-			/* Extrect the "maximum" price */
-			x = price_item(o_ptr, ot_ptr->max_inflate, FALSE, store_index);
-
-			/* Actually draw the price (not fixed) */
-			sprintf(out_val, "%9ld  ", (long)x);
-			put_str(out_val, y, 68);
-		}
-
-		/* Display a "taxed" cost */
-		else
-		{
-			/* Extract the "minimum" price */
-			x = price_item(o_ptr, ot_ptr->min_inflate, FALSE, store_index);
-
-			/* Hack -- Apply Sales Tax if needed */
-			if (!noneedtobargain(x, store_index)) x += x / 10;
-
-			/* Actually draw the price (with tax) */
-			sprintf(out_val, "%9ld  ", (long)x);
-			put_str(out_val, y, 68);
-		}
+		/* Actually draw the price (not fixed) */
+		sprintf(out_val, "%9ld %d", guess_cost(item, store_index), o_ptr->ident & (IDENT_FIXED) ? 'F' : ' ');
+		put_str(out_val, y, 68);
 	}
 }
 
@@ -2514,9 +2514,26 @@ static void store_purchase(int store_index)
 
 	/* Get the actual object */
 	o_ptr = &st_ptr->stock[item];
-
+	
+	/* Guess maximum items can afford */
+	n = p_ptr->au / guess_cost(item, store_index);
+	
+	/* Maybe able to haggle */
+	if (!n)
+	{
+		if (adult_haggle)
+		{
+			n = 1;
+		}
+		else
+		{
+			msg_print("You can't afford that item.");
+			return;
+		}
+	}
+	
 	/* Get a quantity */
-	amt = get_quantity(NULL, o_ptr->number);
+	amt = get_quantity(NULL, n > o_ptr->number ? o_ptr->number : n);
 
 	/* Allow user abort */
 	if (amt <= 0) return;
@@ -2753,6 +2770,13 @@ static void store_purchase(int store_index)
 
 		/* The object no longer belongs to the store */
 		i_ptr->ident &= ~(IDENT_STORE);
+		
+		/* However, its now identified if we are a quest or store location */
+		if (st_ptr->base == STORE_QUEST_REWARD)
+		{
+			object_aware(i_ptr, TRUE);
+			object_known(i_ptr);
+		}
 
 		/* Give it to the player */
 		item_new = inven_carry(i_ptr);
