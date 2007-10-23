@@ -139,6 +139,8 @@ install: $(EXE) $(ICONFILES) $(PLIST) $(LIBFILES)
 	-cp ../lib/xtra/graf/*.png $(APPRES)/lib/xtra/graf
 	-cp ../lib/xtra/sound/*.wav $(APPRES)/lib/xtra/sound
 
+	-cp ../lib/xtra/sound/sound.cfg $(APPRES)/lib/xtra/sound
+
 	install -m 755 $(EXE) $(APPBIN)
 	install -m 644 $(ICONFILES) $(APPRES)
 	cp osx/English.lproj/main.nib/*ib $(APPRES)/English.lproj/main.nib
