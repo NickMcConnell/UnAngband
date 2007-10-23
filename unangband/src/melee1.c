@@ -1984,8 +1984,13 @@ void mon_blow_ranged(int who, int what, int x, int y, int method, int range, int
  * their recovery of hit points and mana.
  *
  * Return TRUE if the monster did anything.
+ * 
+ * Note we force 'destroy' to FALSE to keep druidic monsters
+ * more interesting. This means they don't destroy the
+ * resources that they concentrate - forcing the player to
+ * consider how to do so.
  */
-static int mon_concentrate_power(int m_idx, int y, int x, int spower, bool concentrate_hook(const int y, const int x, const bool modify))
+static int mon_concentrate_power(int m_idx, int y, int x, int spower, bool use_los, bool destroy, bool concentrate_hook(const int y, const int x, const bool modify))
 {
 	int damage, radius, lit_grids;
 	
@@ -1994,14 +1999,14 @@ static int mon_concentrate_power(int m_idx, int y, int x, int spower, bool conce
 
 	/* Check to see how much we would gain (use a radius of 6) */
 	lit_grids = concentrate_power(m_idx, y, x, 6,
-		FALSE, TRUE, concentrate_hook);
+		FALSE, use_los, concentrate_hook);
 
 	/* We have enough juice to make it worthwhile (make a hasty guess) */
 	if (lit_grids >= rand_range(40, 60))
 	{
 		/* Actually concentrate the light */
 		(void)concentrate_power(m_idx, y, x, radius,
-			TRUE, FALSE, concentrate_hook);
+			destroy, use_los, concentrate_hook);
 
 		/* Calculate damage (60 grids => break-even point) */
 		damage = lit_grids * spower / 20;
@@ -3109,7 +3114,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if ((rand_int(100) < 50) && ((who <= 0) || (generic_los(y, x, m_ptr->fy, m_ptr->fx, CAVE_XLOF))))
 			{
 				/* Check to see if doing so would be worthwhile */
-				int damage = mon_concentrate_power(who, y, x, spower, concentrate_light_hook);
+				int damage = mon_concentrate_power(who, y, x, spower, TRUE, FALSE, concentrate_light_hook);
 
 				/* We decided to concentrate light */
 				if (damage)
@@ -3157,7 +3162,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if ((rand_int(100) < 50) && ((who <= 0) || (generic_los(y, x, m_ptr->fy, m_ptr->fx, CAVE_XLOF))))
 			{
 				/* Check to see if doing so would be worthwhile */
-				int damage = mon_concentrate_power(who, y, x, spower, concentrate_light_hook);
+				int damage = mon_concentrate_power(who, y, x, spower, TRUE, TRUE, concentrate_light_hook);
 
 				/* We decided to concentrate light */
 				if (damage)
@@ -3770,7 +3775,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if (rand_int(100) < 50)
 				{
 					/* Check to see if doing so would be worthwhile */
-					int power = mon_concentrate_power(who, y, x, spower, concentrate_water_hook);
+					int power = mon_concentrate_power(who, y, x, spower, FALSE, FALSE, concentrate_water_hook);
 	
 					/* We decided to concentrate light */
 					if (power)
@@ -3837,7 +3842,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if ((who > 0) && (target == who) && ((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_PRIEST)) != 0) && (rand_int(100) < 50))
 			{
 				/* Check to see if doing so would be worthwhile */
-				int power = mon_concentrate_power(who, y, x, spower, concentrate_life_hook);
+				int power = mon_concentrate_power(who, y, x, spower, FALSE, FALSE, concentrate_life_hook);
 
 				/* We decided to concentrate life */
 				if (power)
