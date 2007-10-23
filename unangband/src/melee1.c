@@ -1977,6 +1977,48 @@ void mon_blow_ranged(int who, int what, int x, int y, int method, int range, int
 }
 
 
+/*
+ * Monsters can concentrate light or conjure up darkness.
+ * 
+ * Also, druidic type monsters use water and trees to boost
+ * their recovery of hit points and mana.
+ *
+ * Return TRUE if the monster did anything.
+ */
+static int mon_concentrate_power(int m_idx, int y, int x, int spower, bool concentrate_hook(const int y, const int x, const bool modify))
+{
+	int damage, radius, lit_grids;
+	
+	/* Radius of darkness-creation varies depending on spower */
+	radius = MIN(6, 3 + spower / 20);
+
+	/* Check to see how much we would gain (use a radius of 6) */
+	lit_grids = concentrate_power(m_idx, y, x, 6,
+		FALSE, TRUE, concentrate_hook);
+
+	/* We have enough juice to make it worthwhile (make a hasty guess) */
+	if (lit_grids >= rand_range(40, 60))
+	{
+		/* Actually concentrate the light */
+		(void)concentrate_power(m_idx, y, x, radius,
+			TRUE, FALSE, concentrate_hook);
+
+		/* Calculate damage (60 grids => break-even point) */
+		damage = lit_grids * spower / 20;
+
+		/* Limit damage, but allow fairly high values */
+		if (damage > 9 * spower / 2) damage = 9 * spower / 2;
+
+		/* We did something */
+		return (damage);
+	}
+
+	/* We decided not to do anything */
+	return (0);
+}
+
+
+
 
 /*
  * Monster attempts to make a ranged (non-melee) attack.
@@ -3062,6 +3104,28 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		case 128+5:
 		{
 			if (target < 0) disturb(1, 0);
+			
+			/* Sometimes try to concentrate light */
+			if ((rand_int(100) < 50) && ((who <= 0) || (generic_los(y, x, m_ptr->fy, m_ptr->fx, CAVE_XLOF))))
+			{
+				/* Check to see if doing so would be worthwhile */
+				int damage = mon_concentrate_power(who, y, x, spower, concentrate_light_hook);
+
+				/* We decided to concentrate light */
+				if (damage)
+				{
+					/* Message */
+					if (blind) result = format("%^s mumbles.", m_name);
+					else result = format("%^s concentrates light... and releases it.", m_name);
+
+					/* Fire bolt */
+					mon_bolt(who, what, y, x, GF_LITE, damage, result);
+
+					/* Done */
+					break;
+				}
+			}
+			
 			if (spower < 10)
 			{
 				if (blind) result = format("%^s mumbles.", m_name);
@@ -3088,6 +3152,28 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		case 128+6:
 		{
 			if (target < 0) disturb(1, 0);
+			
+			/* Sometimes try to concentrate light */
+			if ((rand_int(100) < 50) && ((who <= 0) || (generic_los(y, x, m_ptr->fy, m_ptr->fx, CAVE_XLOF))))
+			{
+				/* Check to see if doing so would be worthwhile */
+				int damage = mon_concentrate_power(who, y, x, spower, concentrate_light_hook);
+
+				/* We decided to concentrate light */
+				if (damage)
+				{
+					/* Message */
+					if (blind) result = format("%^s mumbles.", m_name);
+					else result = format("%^s conjures up darkness... and releases it.", m_name);
+
+					/* Fire bolt */
+					mon_bolt(who, what, y, x, GF_LITE, damage, result);
+
+					/* Done */
+					break;
+				}
+			}
+
 			if (spower < 20)
 			{
 				if (blind) result = format("%^s mumbles.", m_name);
@@ -3678,6 +3764,34 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			if (target == 0) break;
 
+			/* Druids/shamans sometimes add mana from water */
+			if ((who > 0) && ((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_PRIEST)) != 0))
+			{
+				if (rand_int(100) < 50)
+				{
+					/* Check to see if doing so would be worthwhile */
+					int power = mon_concentrate_power(who, y, x, spower, concentrate_water_hook);
+	
+					/* We decided to concentrate light */
+					if (power)
+					{
+						/* Message */
+						if (blind) msg_format("%^s mumbles.", m_name);
+						else msg_format("%^s absorbs mana from the surrounding water.", m_name);
+	
+						/* Big boost to mana */
+						n_ptr->mana += (power / 5) + 1;
+						if (n_ptr->mana > s_ptr->mana) n_ptr->mana = s_ptr->mana;
+	
+						/* Done */
+						break;
+					}
+				}
+				
+				/* Benefit less from gaining mana any other way */
+				spower /= 2;
+			}
+			
 			if (known)
 			{
 				disturb(1,0);
@@ -3719,7 +3833,24 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (target == 0) break;
 
-			if (known)
+			/* Druids/shamans sometimes add health from trees/plants */
+			if ((who > 0) && (target == who) && ((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_PRIEST)) != 0) && (rand_int(100) < 50))
+			{
+				/* Check to see if doing so would be worthwhile */
+				int power = mon_concentrate_power(who, y, x, spower, concentrate_life_hook);
+
+				/* We decided to concentrate life */
+				if (power)
+				{
+					/* Message */
+					if (blind) msg_format("%^s mumbles.", m_name);
+					else msg_format("%^s absorbs life from the surrounding plants.", m_name);
+
+					/* Big boost to mana */
+					spower = MAX(spower, power);
+				}
+			}
+			else if (known)
 			{
 				disturb(1,0);
 
@@ -3732,7 +3863,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				/* We regain lost hitpoints (up to spower * 3) */
 				gain = MIN(n_ptr->maxhp - n_ptr->hp, spower * 3);
-
+	
 				/* We do not gain more than mana * 15 HPs at a time */
 				gain = MIN(gain, m_ptr->mana * 15);
 
@@ -3769,7 +3900,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						else msg_format("%^s sounds healthier.", t_nref);
 					}
 				}
-
 
 				/* Redraw (later) if needed */
 				if ((p_ptr->health_who == target) && (n_ptr->ml))

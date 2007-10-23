@@ -586,7 +586,7 @@ extern void display_scores_aux(int from, int to, int note, high_score *score);
 extern void generate_cave(void);
 
 /* info.c */
-extern bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detail, int target);
+extern bool spell_desc(spell_type *s_ptr, const cptr intro, int level, bool detail, int target);
 extern void spell_info(char *p, int p_s, int spell, bool use_level);
 extern bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode);
 extern void list_object(const object_type *o_ptr, int mode);
@@ -900,6 +900,11 @@ extern void spread_cave_temp(int y1, int x1, int range, bool room);
 extern void lite_room(int y1, int x1);
 extern void unlite_room(int y1, int x1);
 extern void change_shape(int shape, int level);
+extern bool concentrate_water_hook(const int y, const int x, const bool modify);
+extern bool concentrate_life_hook(const int y, const int x, const bool modify);
+extern bool concentrate_light_hook(const int y, const int x, const bool modify);
+extern int concentrate_power(int who, int y0, int x0, int radius, bool for_real, bool use_los,
+		bool concentrate_hook(const int y, const int x, const bool modify));
 extern bool process_spell_flags(int spell, int level, bool *cancel, bool *known);
 extern bool process_spell_blows(int who, int what, int spell, int level, bool *cancel);
 extern bool process_spell_types(int who, int spell, int level, bool *cancel);

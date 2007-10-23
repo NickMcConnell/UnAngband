@@ -513,7 +513,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 
 	/* Only apply effects to player */
 	if ((target != SPELL_TARGET_NORMAL) && (target != SPELL_TARGET_SELF)) return (FALSE);
-
+	
 	/* Collect detects */
 	vn = 0;
 	if (s_ptr->flags1 & (SF1_DETECT_DOORS))	vp[vn++] = "doors";
@@ -1139,6 +1139,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->type == SPELL_SET_OR_MAKE_RETURN) vp[vn++] = "marks this grid as a destination for later return or returns you to a marked grid";
 	if (s_ptr->type == SPELL_BLOOD_BOND) vp[vn++] = "bonds you with a living creature to share damage and healing";
 	if (s_ptr->type == SPELL_MINDS_EYE) vp[vn++] = "bonds you with a mind to allow you to see through its eyes";
+	if (s_ptr->type == SPELL_LIGHT_CHAMBERS) vp[vn++] = "lights all rooms on the level, except vaults";
 	if (s_ptr->type == SPELL_CHANGE_SHAPE) vp[vn++] = format("changes you into a %s",p_name + p_info[s_ptr->param].name);
 	if (s_ptr->type == SPELL_REVERT_SHAPE) vp[vn++] = "returns you to your normal form";
 	if (s_ptr->type == SPELL_REFUEL) vp[vn++] = "fuels a torch";
@@ -1680,12 +1681,64 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 
 
 /*
+ * Update spell details if required.
+ * 
+ * This analyses the surrounding area and modifies the spell blow.
+ */
+static void spell_update_power(spell_type *s_ptr, int level)
+{
+	int power = 0;
+	
+	if (character_dungeon) switch(s_ptr->type)
+	{
+		case SPELL_CONCENTRATE_LITE:
+		{
+			power = concentrate_power(SOURCE_PLAYER_START, p_ptr->py, p_ptr->px,
+					5 + level / 10, FALSE, TRUE, concentrate_light_hook);
+			
+			if (s_ptr->l_dice && !s_ptr->l_side) s_ptr->l_side = power;
+			else s_ptr->l_plus = power;
+			break;
+		}
+	
+		case SPELL_CONCENTRATE_LIFE:
+		{
+			power = s_ptr->l_plus = concentrate_power(SOURCE_PLAYER_START, p_ptr->py, p_ptr->px,
+					5 + level / 10, FALSE, FALSE, concentrate_life_hook);
+			
+			if (s_ptr->l_dice && !s_ptr->l_side) s_ptr->l_side = power;
+			else s_ptr->l_plus = power;
+			break;
+		}
+		
+		case SPELL_CONCENTRATE_WATER:
+		{
+			power = concentrate_power(SOURCE_PLAYER_START, p_ptr->py, p_ptr->px,
+					5 + level / 10, FALSE, FALSE, concentrate_water_hook);
+			
+			if (s_ptr->l_dice && !s_ptr->l_side) s_ptr->l_side = power;
+			else s_ptr->l_plus = power;
+			break;
+		}
+	}
+	
+	/* Hack -- modify spell power */
+	if (power)
+	{
+		if (s_ptr->l_dice && !s_ptr->l_side) s_ptr->l_side = power;
+		else s_ptr->l_plus += power;
+	}
+}
+
+
+/*
  * Hack -- Get spell description.
  */
-bool spell_desc(const spell_type *s_ptr, const cptr intro, int level, bool detail, int target)
+bool spell_desc(spell_type *s_ptr, const cptr intro, int level, bool detail, int target)
 {
 	bool anything = FALSE;
-
+	
+	spell_update_power(s_ptr, level);
 	anything |= spell_desc_flags(s_ptr, intro, level, detail, target, anything);
 	anything |= spell_desc_blows(s_ptr, intro, level, detail, target, anything);
 
@@ -1715,6 +1768,9 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 
 	if (!use_level) level = 0;
 
+	/* Update spell if required */
+	spell_update_power(s_ptr, use_level);
+	
 	/* Default */
 	my_strcpy(p, "", p_s);
 

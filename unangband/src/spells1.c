@@ -3721,9 +3721,13 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 		{
 			int feat = cave_feat[y][x];
 
-			if (prefix(f_name+f_info[feat].name,"stone bridge")) break;
-
-			if (f_info[feat].flags2 & (FF2_CAN_SWIM))
+			if (prefix(f_name+f_info[feat].name,"stone bridge"))
+			{
+				/* Hack -- change bridges to prevent exploits */
+				cave_set_feat(y, x, FEAT_BRIDGE_CHASM);
+			}
+			
+			else if (f_info[feat].flags2 & (FF2_CAN_SWIM))
 			{
 				cave_set_feat(y,x,FEAT_EARTH);
 

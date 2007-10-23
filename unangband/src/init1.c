@@ -1447,7 +1447,7 @@ static cptr s_info_types[] =
 	"SET_OR_MAKE_RETURN",
 	"BLOOD_BOND",
 	"MINDS_EYE",
-	"REMOTE_SENSING",
+	"LIGHT_CHAMBERS",
 	NULL
 };
 

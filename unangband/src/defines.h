@@ -1598,6 +1598,8 @@
 #define SPELL_SET_OR_MAKE_RETURN	43
 #define SPELL_BLOOD_BOND		44
 #define SPELL_MINDS_EYE			45
+#define SPELL_LIGHT_CHAMBERS	46
+
 
 /*** Important artifact indexes (see "lib/edit/artifact.txt") ***/
 
