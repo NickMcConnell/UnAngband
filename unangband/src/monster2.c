@@ -3916,7 +3916,7 @@ s16b player_place(int y, int x, bool escort_allowed)
 	cave_m_idx[y][x] = -1;
 
 	/* Update view if moved outside/inside */
-	p_ptr->outside = ((p_ptr->depth == min_depth(p_ptr->dungeon)) && 
+	p_ptr->outside = (((level_flag & (LF1_SURFACE)) != 0) && 
 			(f_info[cave_feat[p_ptr->py][p_ptr->px]].flags3 & (FF3_OUTSIDE)));
 
 	/* Place escorts on battle-field */

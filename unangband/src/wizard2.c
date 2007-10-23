@@ -1513,9 +1513,6 @@ void do_cmd_wiz_ecology(void)
 	/* Save screen */
 	screen_save();
 	
-	/* Clear screen */
-	Term_clear();
-
 	/* Print all members of the ecology and their descriptions */
         for (num = 0; num < cave_ecology.num_races; num++)
 	{
@@ -1536,6 +1533,8 @@ void do_cmd_wiz_ecology(void)
 	
 	/* Total monsters */
 	msg_format("Ecology has %d races and %d sub-ecologies.", cave_ecology.num_races, cave_ecology.num_ecologies);
+
+	anykey();
 	
 	/* Screen_load */
 	screen_load();

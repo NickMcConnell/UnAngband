@@ -6173,10 +6173,12 @@ static void build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
  */
 static void build_tower(int y0, int x0, int ymax, int xmax, cptr data)
 {
-	int dx, dy, x, y;
+	int dx, dy, x, y, i;
 
 	cptr t;
 
+	int monsters_left = 30;
+	
 	/* Place dungeon features and objects */
 	for (t = data, dy = 0; dy < ymax; dy++)
 	{
@@ -6243,6 +6245,30 @@ static void build_tower(int y0, int x0, int ymax, int xmax, cptr data)
 			}
 		}
 	}
+	
+	/*** Now we get to place the monsters. ***/
+
+	/* Place the monsters. */
+	for (i = 0; i < 300; i++)
+	{
+		/* Check for early completion. */
+		if (!monsters_left) break;
+
+		/* Pick a random in-room square. */
+		y = rand_range(y0 - ymax, y0 + ymax);
+		x = rand_range(x0 - xmax, x0 + xmax);
+
+		/* Require a floor square with no monster in it already. */
+		if (!cave_naked_bold(y, x)) continue;
+
+		/* Place a single monster.  Sleeping 2/3rds of the time. */
+		place_monster_aux(y, x, get_mon_num(p_ptr->depth),
+			(rand_int(3)), FALSE, 0L);
+		
+		/* One less monster to place. */
+		monsters_left--;
+	}
+
 }
 
 
@@ -11164,8 +11190,16 @@ static void town_gen_hack(void)
 		if (cave_start_bold(y, x)) break;
 	}
 
-	/* Clear previous contents, add dungeon entrance */
-	place_random_stairs(y, x, FEAT_ENTRANCE);
+	/* Hack -- always have upstairs in surface of tower */
+	if (((level_flag & (LF1_TOWER)) != 0) && (p_ptr->depth == min_depth(p_ptr->dungeon)))
+	{
+		cave_set_feat(y, x, FEAT_LESS);
+	}
+	else
+	{
+		/* Clear previous contents, add dungeon entrance */
+		place_random_stairs(y, x, FEAT_ENTRANCE);
+	}
 
 	/* Place the player */
 	player_place(y, x, TRUE);

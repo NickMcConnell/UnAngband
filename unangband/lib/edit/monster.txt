@@ -18929,3 +18929,36 @@ D: which should kill |him|her|, and still apparently feel no pain.  |He|She| tra
 D: creatures underfoot in |his|her| eagerness to get to |his|her| real enemy, and |his|her|
 D: battle-cry strikes terror into |his|her| foes.
 
+#Needs new stats. Using Farmer Maggot.
+
+N:1310:Hama, Doorwarden of the Golden Hall
+G:t:u
+I:110:35d10:40:10:3
+W:0:4:0:0
+M:20:0:0:10
+F:UNIQUE | MALE | 
+F:FORCE_MAXHP | 
+F:ONLY_ITEM | DROP_90 | DROP_GOOD | 
+F:OPEN_DOOR | BASH_DOOR | HAS_LITE | NEED_LITE |
+F:FORCE_DEPTH
+#D:A majordomo of Theoden and captain of the guard, he requests you put aside
+#D: your weapons before entering the Golden Hall.
+
+N:1311:King Theoden, possessed by Saruman
+G:t:y
+I:120:10d100:20:90:40
+W:33:5:0:1200
+M:20:10:0:40
+B:HIT:WOUND:5d5
+B:HIT:WOUND:5d5
+B:HIT:WOUND:5d5
+B:SPIT:POISON:5d6
+F:UNIQUE | MALE
+F:FORCE_MAXHP
+F:ONLY_ITEM | DROP_2D2 | DROP_GOOD
+F:TAKE_ITEM | OPEN_DOOR | BASH_DOOR
+F:NEED_LITE | WARRIOR | TAKE_ITEM | POWERFUL
+S:S_CLASS | SLOW
+D:The noble king of the Riddermark, he has been poisoned by Saruman's words
+D: and appears unnaturally aged and weak. The grip on his sword is still strong
+D: however.
