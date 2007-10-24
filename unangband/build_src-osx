@@ -33,6 +33,7 @@ cp lib/xtra/music/delete.me unangband-062-src/lib/xtra/music
 cp *.txt unangband-062-src
 cp *.bat unangband-062-src
 cp config* unangband-062-src
+cp install* unangband-062-src
 
 cp Makefile* unangband-062-src
 cp *.m4 unangband-062-src

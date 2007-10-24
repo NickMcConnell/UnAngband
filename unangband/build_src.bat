@@ -33,6 +33,7 @@ copy lib\xtra\music\delete.me unangband-062-src\lib\xtra\music
 copy *.txt unangband-062-src
 copy *.bat unangband-062-src
 copy config*.* unangband-062-src
+copy config*.* unangband-062-src
 
 copy Makefile* unangband-062-src
 copy *.m4 unangband-062-src
