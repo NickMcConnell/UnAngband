@@ -64,6 +64,10 @@ copy lib\help\*.txt unangband-062-src\lib\help
 copy lib\help\*.hlp unangband-062-src\lib\help
 copy lib\pref\*.prf unangband-062-src\lib\pref
 
+copy lib\xtra\font\*.fon unangband-062-src\lib\xtra\font
+copy lib\xtra\graf\*.bmp unangband-062-src\lib\xtra\graf
+copy lib\xtra\sound\*.wav unangband-062-src\lib\xtra\sound
+
 copy lib\xtra\sound\sound.cfg unangband-062-src\lib\xtra\sound
 copy lib\xtra\help\angband.hlp unangband-062-src\lib\xtra\help
 copy lib\xtra\help\angband.cnt unangband-062-src\lib\xtra\help
