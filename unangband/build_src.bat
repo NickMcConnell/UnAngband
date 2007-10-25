@@ -9,6 +9,7 @@ mkdir unangband-062-src\lib\help
 mkdir unangband-062-src\lib\info
 mkdir unangband-062-src\lib\pref
 mkdir unangband-062-src\lib\save
+mkdir unangband-062-src\lib\todo
 mkdir unangband-062-src\lib\user
 mkdir unangband-062-src\lib\xtra
 mkdir unangband-062-src\lib\xtra\font
@@ -48,6 +49,7 @@ copy lib\help\Makefile* unangband-062-src\lib\help
 copy lib\info\Makefile* unangband-062-src\lib\info
 copy lib\pref\Makefile* unangband-062-src\lib\pref
 copy lib\save\Makefile* unangband-062-src\lib\save
+copy lib\todo\Makefile* unangband-062-src\lib\todo
 copy lib\user\Makefile* unangband-062-src\lib\user
 copy lib\xtra\Makefile* unangband-062-src\lib\xtra
 copy lib\xtra\font\Makefile* unangband-062-src\lib\xtra\font
@@ -63,6 +65,7 @@ copy lib\info\*.txt unangband-062-src\lib\info
 copy lib\help\*.txt unangband-062-src\lib\help
 copy lib\help\*.hlp unangband-062-src\lib\help
 copy lib\pref\*.prf unangband-062-src\lib\pref
+copy lib\todo\*.txt unangband-062-src\lib\todo
 
 copy lib\xtra\font\*.fon unangband-062-src\lib\xtra\font
 copy lib\xtra\graf\*.bmp unangband-062-src\lib\xtra\graf

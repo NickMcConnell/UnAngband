@@ -1,11 +1,3 @@
-#New objects.
-
-# 0 - Altar/Throne/Well
-# 9 - Statue/Chest (Looks like 'g' for golem)
-# ! - Fountain (Looks like potion)
-# ~ - Body (red)/Skeleton
-# ~ - Candle/Lantern
-
 # Thrones are equivelent of non-directional rods, that are used.
 
 # Candles are lights that are destroyed when their pval is used up, and
