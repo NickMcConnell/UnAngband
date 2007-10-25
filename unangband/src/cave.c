@@ -4986,13 +4986,24 @@ void town_illuminate(bool daytime)
 		}
 	}
 
+	/* XXX WARNING:
+	 * 
+	 * Town_illuminate is called once whilst loading a character.
+	 * 
+	 * The following will cause a monster to be generated before loading
+	 * the monsters, and cause the save file to fail to load.
+	 *
+	 * Therefore we need to ensure that the character is loaded first.
+	 * 
+	 */
+	
 	/* Megahack --- darkness brings out the bad guys */
-	if ((!daytime) && actual_guardian(zone->guard, p_ptr->dungeon) && (r_info[actual_guardian(zone->guard, p_ptr->dungeon)].cur_num <= 0))
+	if ((character_loaded) && (!daytime) && actual_guardian(zone->guard, p_ptr->dungeon) && (r_info[actual_guardian(zone->guard, p_ptr->dungeon)].cur_num <= 0))
 	{
-		int y, x;
+		int y, x, count = 0;
 
 		/* Pick a location */
-		while (1)
+		while (++count < 1000)
 		{
 			y = rand_int(dungeon_hgt);
 			x = rand_int(dungeon_wid);
