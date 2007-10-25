@@ -3829,8 +3829,6 @@ void print_spells(const s16b *sn, int num, int y, int x)
 {
 	int i, ii, spell, level;
 
-	bool legible;
-
 	cptr comment;
 
 	char info[80];
@@ -3865,39 +3863,11 @@ void print_spells(const s16b *sn, int num, int y, int x)
 		/* Get the spell info */
 		s_ptr = &s_info[spell];
 
-		legible = FALSE;
-
 		/* Get the spell details; warriors (class 0) have no spells */
-		if (p_ptr->pclass)
-		  for (ii = 0; ii < MAX_SPELL_CASTERS; ii++)
-		    {
-		      if (s_ptr->cast[ii].class == p_ptr->pclass)
-			{
-			  legible = TRUE;
-			  sc_ptr=&(s_ptr->cast[ii]);
-			}
-		    }
-
-		/* Hack -- get casting information for specialists */
-		if (!legible)
-		{
-			for (ii = 0; ii < MAX_SPELL_APPEARS; ii++)
-			{
-				if ((((s_info[spell].appears[ii].tval == TV_SONG_BOOK) && (p_ptr->pstyle == WS_SONG_BOOK)) ||
-					((s_info[spell].appears[ii].tval == TV_MAGIC_BOOK) && (p_ptr->pstyle == WS_MAGIC_BOOK)) ||
-					((s_info[spell].appears[ii].tval == TV_PRAYER_BOOK) && (p_ptr->pstyle == WS_PRAYER_BOOK)))
-			&& ((s_info[spell].appears[i].sval == p_ptr->psval) || ((p_ptr->psval >= SV_BOOK_MAX_GOOD) &&
-				((s_info[spell].appears[i].sval / SV_BOOK_SCHOOL) * SV_BOOK_SCHOOL + SV_BOOK_SCHOOL - 1 == p_ptr->psval))))
-				{
-				  legible = TRUE;
-				  /* Get the first spell caster's casting info */
-				  sc_ptr=&(s_ptr->cast[0]);
-				}
-			}
-		}
+		sc_ptr = spell_cast_details(spell);
 
 		/* Skip illegible spells */
-		if (!legible)
+		if ((!spell_legible(spell)) || !(sc_ptr))
 		{
 			sprintf(out_val, "  %c) %-30s", I2A(i), s_name+s_info[0].name);
 			c_prt(TERM_L_DARK, out_val, y + i + 1, x);

@@ -9052,6 +9052,69 @@ void fill_book(const object_type *o_ptr, s16b *book, int *num)
 	ang_sort(book, &why, *num);
 }
 
+
+/*
+ * Returns the spell casting details that the caster
+ * uses. This may later be modified.
+ */
+spell_cast *spell_cast_details(int spell)
+{
+	/* Get spell details */
+	spell_type *s_ptr = &s_info[spell];
+	
+	/* Spell cast details to return */
+	spell_cast *sc_ptr = NULL;
+	
+	/* Get our casting information */
+	if (p_ptr->pclass)
+	{
+		int i;
+		
+		for (i = 0;i < MAX_SPELL_CASTERS; i++)
+		{
+			if (s_ptr->cast[i].class == p_ptr->pclass)
+			{
+				sc_ptr=&(s_ptr->cast[i]);
+			}
+		}
+	}
+	
+	/* Hack -- if the character doesn't have the ability to cast a spell,
+	 * choose the first one if they are a specialist */
+	if (spell_match_style(spell)) sc_ptr = &(s_ptr->cast[0]);
+	
+	return (sc_ptr);
+}
+
+
+/*
+ * Spell could be learnt by the player.
+ * 
+ * This differs from spell_read_okay, in that the spell could appear
+ * in another book that the player is allowed to use.
+ */
+bool spell_legible(int spell)
+{
+	int i;
+	spell_type *s_ptr = &s_info[spell];
+	
+	/* Warriors (class 0) have no spells naturally, but may have as a part of being gifted or chosen below. */
+	if (p_ptr->pclass)
+	{
+		for (i = 0; i < MAX_SPELL_CASTERS; i++)
+		{
+			/* Class is allowed to cast the spell */
+			if (s_ptr->cast[i].class == p_ptr->pclass) return (TRUE);
+	    }
+	}
+
+	/* Gifted and chosen spell casters can read all spells from the book they have specialised in */
+	if (spell_match_style(spell)) return (TRUE);
+
+	return (FALSE);
+}
+
+
 /*
  * Returns level for a spell
  */
@@ -9061,47 +9124,31 @@ s16b spell_level(int spell)
 
 	s16b level;
 
-	spell_type *s_ptr;
+	spell_type *s_ptr = &s_info[spell];
 
-	spell_cast *sc_ptr = NULL;
+	spell_cast *sc_ptr = spell_cast_details(spell);
 
-	bool legible = FALSE;
-	bool fix_level = FALSE;
-
-	/* Paranoia -- must be literate */
-	if ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
-		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
-			return (100);
-
-	/* Get the spell */
-	s_ptr = &s_info[spell];
-
-	/* Get our casting information; warriors (class 0) have no spells */
-	if (p_ptr->pclass)
-	  for (i = 0;i < MAX_SPELL_CASTERS; i++)
-	    {
-	      if (s_ptr->cast[i].class == p_ptr->pclass)
-		{
-		  legible = TRUE;
-		  sc_ptr=&(s_ptr->cast[i]);
-		}
-	    }
-
-	/* Hack -- get casting information for specialists */
-	if ((!legible) && (spell_match_style(spell)))
-	{
-		/* Can read spell */
-		legible = TRUE;
-
-		/* Get the first spell caster's casting info */
-		sc_ptr=&(s_ptr->cast[0]);
-			
-		/* And remember to fix it later */
-		fix_level = TRUE;
-	}
+	bool fix_level = TRUE;
 
 	/* Illegible */
-	if (!legible) return (100);
+	if (!spell_legible(spell)) return (100);
+	
+	/* Check we have casting details */
+	if (!sc_ptr) return (100);
+
+	/* Hack -- check if we can 'naturally' cast it,
+	 * as opposed to relying on speciality. */
+	if (p_ptr->pclass)
+	{
+		for (i = 0;i < MAX_SPELL_CASTERS; i++)
+		{
+			if (s_ptr->cast[i].class == p_ptr->pclass)
+			{
+				/* Use the native casting level */
+				fix_level = FALSE;
+			}
+		}
+	}
 
 	/* Get the level */
 	level = sc_ptr->level;
@@ -9144,6 +9191,9 @@ s16b spell_level(int spell)
 }
 
 
+/*
+ * Get the spell power
+ */
 s16b spell_power(int spell)
 {
 	int i;
@@ -9224,47 +9274,13 @@ s16b spell_chance(int spell)
 {
 	int chance, minfail;
 
-	spell_type *s_ptr;
-
-	spell_cast *sc_ptr = NULL;
-
-	bool legible = FALSE;
-
-	int i;
-
-	/* Paranoia -- must be literate */
-	if ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
-		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
-			return (100);
-
-	/* Get the spell */
-	s_ptr = &s_info[spell];
-
-	/* Get our casting information; warriors (class 0) have no spells */
-	if (p_ptr->pclass)
-	  for (i = 0; i < MAX_SPELL_CASTERS; i++)
-	    {
-	      if (s_ptr->cast[i].class == p_ptr->pclass)
-		{
-		  legible = TRUE;
-		  sc_ptr=&(s_ptr->cast[i]);
-		}
-	    }
-
-	/* Hack -- get casting information for specialists */
-	if ((!legible) && (spell_match_style(spell)))
-	{
-		/* Can read it */
-		legible = TRUE;
-		
-		/* Get the first spell caster's casting info */
-		sc_ptr=&(s_ptr->cast[0]);
-		
-		/* And remember to fix it later */
-	}
+	spell_cast *sc_ptr = spell_cast_details(spell);
 
 	/* Illegible */
-	if (!legible) return (100);
+	if (!spell_legible(spell)) return (100);
+	
+	/* Check we have casting details */
+	if (!sc_ptr) return (100);
 
 	/* Extract the base spell failure rate */
 	chance = sc_ptr->fail;
@@ -9312,6 +9328,8 @@ s16b spell_chance(int spell)
 
 
 
+
+
 /*
  * Determine if a spell is "okay" for the player to cast or study
  * The spell must be legible, not forgotten, and also, to cast,
@@ -9323,35 +9341,16 @@ bool spell_okay(int spell, bool known)
 
 	int i;
 
-	bool legible = FALSE;
-	bool specialist = FALSE;
-
 	/* Get the spell */
 	s_ptr = &s_info[spell];
 
-	/* Get our casting information; warriors (class 0) have no spells */
-	if (p_ptr->pclass)
-	  for (i = 0; i < MAX_SPELL_CASTERS; i++)
-	    {
-	      if (s_ptr->cast[i].class == p_ptr->pclass)
-		{
-		  legible = TRUE;
-		}
-	}
-
-	/* Hack -- get casting information for specialists */
-	if (spell_match_style(spell))
-	{
-		legible = TRUE;
-		specialist = TRUE;
-	}
-
 	/* Spell is illegible */
-	if (!legible) return (FALSE);
+	if (!spell_legible(spell)) return (FALSE);
 
 	/* Spell is illegal */
 	if (spell_level(spell) > p_ptr->lev) return (FALSE);
 
+	/* Get the spell from the spells the player has learnt */
 	for (i=0;i<PY_MAX_SPELLS;i++)
 	{
 		if (p_ptr->spell_order[i] == spell) break;
@@ -9368,7 +9367,7 @@ bool spell_okay(int spell, bool known)
 			bool preq = FALSE;
 
 			/* Check prerequisites, unless specialist */
-			if (!specialist)
+			if (!spell_match_style(spell))
 			  for (n = 0; n < MAX_SPELL_PREREQUISITES; n++)
 			  {
 				if (s_info[spell].preq[n])
@@ -9411,6 +9410,7 @@ bool spell_okay(int spell, bool known)
 	/* Okay to study, not to cast */
 	return (!known);
 }
+
 
 /*
  * Returns in tag_num the numeric value of the inscription tag associated with
