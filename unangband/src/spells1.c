@@ -8875,6 +8875,8 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		/* Standard damage -- also disease player */
 		case GF_DISEASE:
 		{
+			u32b old_disease = p_ptr->disease;
+			
 			if (fuzzy) msg_print("You are hit by disease!");
 
 			/* Disease resistance */
@@ -8962,19 +8964,13 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 						p_ptr->disease |= (DISEASE_LIGHT);
 					}
 				}
-				/* Very light disease - stops recovery of hp for limited time */
-				else
-				{
-					if (!p_ptr->disease)
-						p_ptr->disease |= (DISEASE_LIGHT);
-				}
 			}
 
 			/* Apply damage */
 			take_hit(dam, killer);
 			
 			/* Suffer the disease */
-			if (!p_ptr->is_dead) suffer_disease();
+			if ((old_disease == p_ptr->disease) && (!p_ptr->is_dead)) suffer_disease();
 
 			break;
 		}
