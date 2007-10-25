@@ -8972,6 +8972,9 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 			/* Apply damage */
 			take_hit(dam, killer);
+			
+			/* Suffer the disease */
+			if (!p_ptr->is_dead) suffer_disease();
 
 			break;
 		}
