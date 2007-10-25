@@ -1051,6 +1051,43 @@ void object_actual_track(const object_type *j_ptr)
 #ifdef USE_CLASS_PRETTY_NAMES
 
 
+const char *mage_sval_name[SV_BOOK_MAX_GOOD] =
+{
+		"Enchanter",
+		"Loremaster",
+		"Healer",
+		"Artificer",
+		"Sufferer",
+		"Houdini",
+		"Archmage",
+		"Warlock",
+		"War Mage",
+		"Pyromancer",
+		"Acid Mage",
+		"Cyromancer",
+		"Storm Mage",
+		"Alchemist",
+		"Necromancer",
+		"Beastmaster",
+		"Psychic",
+		"Celestial Mage",
+		"Geomancer",
+		"Aeromancer",
+		"Hydromancer",
+		"Runesmith",
+		"Shapechanger",
+		"Negater",
+		"Naturalist",
+		"Astromancer",
+		"Demonologist",
+		"Death Mage",
+		"Void Mage",
+		"Immoliator",
+		"Gambler",
+		"Balancer"
+};
+
+
 /*
  * Hack plus -- defines 'pretty' names for various class + style combinations.
  * Absolutely cosmetic.
@@ -1176,30 +1213,16 @@ void lookup_prettyname(char *name, size_t name_s, int class, int style, int sval
 					my_strcpy(temp,"Mage ", sizeof(temp));
 					my_strcat(temp,k_name+k_ptr->name, sizeof(temp));
 				}
-				if (sval == 6) my_strcpy(temp,"Archmage", sizeof(temp));
-				if (sval == 7) my_strcpy(temp,"Warlock", sizeof(temp));
-				if (sval == 8) my_strcpy(temp,"War mage", sizeof(temp));
-				if (sval == 22) my_strcpy(temp,"Enchanter", sizeof(temp));
-				if (sval == 24) my_strcpy(temp,"Healer", sizeof(temp));
-				if (sval == 21) my_strcpy(temp,"Runesmith", sizeof(temp));
-				if (sval == 18) my_strcpy(temp,"Geomancer", sizeof(temp));
-				if (sval == 20) my_strcpy(temp,"Hydromancer", sizeof(temp));
-				if (sval == 9) my_strcpy(temp,"Pyromancer", sizeof(temp));
-				if (sval == 11) my_strcpy(temp,"Cyromancer", sizeof(temp));
-				if (sval == 13) my_strcpy(temp,"Alchemist", sizeof(temp));
-				if (sval == 14) my_strcpy(temp,"Necromancer", sizeof(temp));
-				if (sval == 25) my_strcpy(temp,"Artificer", sizeof(temp));
-				if (sval == 23) my_strcpy(temp,"Sage", sizeof(temp));
-				if (sval == 15) my_strcpy(temp,"Beastmaster", sizeof(temp));
-				if (sval == 16) my_strcpy(temp,"Illusionist", sizeof(temp));
+
+				if (sval < SV_BOOK_MAX_GOOD) my_strcpy(temp, mage_sval_name[sval], sizeof(temp));
 				
-				if ((sval >= 32) && (sval < 36)) my_strcpy(temp,"Wizard", sizeof(temp));
-				if ((sval >= 36) && (sval < 39)) my_strcpy(temp,"Druid", sizeof(temp));
-				if ((sval >= 40) && (sval < 44)) my_strcpy(temp,"Master", sizeof(temp));
-				if ((sval >= 45) && (sval < 48)) my_strcpy(temp,"Sorceror", sizeof(temp));
-				if ((sval >= 48) && (sval < 52)) my_strcpy(temp,"Thuamaturgist", sizeof(temp));
-				if ((sval >= 52) && (sval < 56)) my_strcpy(temp,"Scientist", sizeof(temp));
-				if ((sval >= 56) && (sval < 60)) my_strcpy(temp,"Statesman", sizeof(temp));
+				else if ((sval >= 32) && (sval < 36)) my_strcpy(temp,"Wizard", sizeof(temp));
+				else if ((sval >= 36) && (sval < 39)) my_strcpy(temp,"Druid", sizeof(temp));
+				else if ((sval >= 40) && (sval < 44)) my_strcpy(temp,"Master", sizeof(temp));
+				else if ((sval >= 45) && (sval < 48)) my_strcpy(temp,"Sorceror", sizeof(temp));
+				else if ((sval >= 48) && (sval < 52)) my_strcpy(temp,"Thuamaturgist", sizeof(temp));
+				else if ((sval >= 52) && (sval < 56)) my_strcpy(temp,"Scientist", sizeof(temp));
+				else if ((sval >= 56) && (sval < 60)) my_strcpy(temp,"Statesman", sizeof(temp));
 
 			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
