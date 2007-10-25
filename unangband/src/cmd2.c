@@ -549,7 +549,7 @@ static void do_cmd_travel(void)
 		if (p_ptr->food < PY_FOOD_FULL)
 		{
 			msg_print("You'll need a full stomach for the road ahead.");
-			msg_print("Hint: Try the 'E' (shift-E) command to eat something.")
+			msg_print("Hint: Try the 'E' (shift-E) command to eat something.");
 		}
 		else if (p_ptr->blind)
 		{
