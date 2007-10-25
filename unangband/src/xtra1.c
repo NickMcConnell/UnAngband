@@ -1062,7 +1062,7 @@ void object_actual_track(const object_type *j_ptr)
  *
  * We guarantee long names are distinct and try to make short names distinct.
  */
-void lookup_prettyname(cptr name, size_t name_s, int class, int style, int sval, bool long_name, bool short_name)
+void lookup_prettyname(char *name, size_t name_s, int class, int style, int sval, bool long_name, bool short_name)
 {
 	char temp[60];
 
@@ -1164,7 +1164,7 @@ void lookup_prettyname(cptr name, size_t name_s, int class, int style, int sval,
 			if (style == WS_POTION) my_strcpy(temp,"Herbalist", sizeof(temp));
 			if (style == WS_SCROLL) my_strcpy(temp,"Sage", sizeof(temp));
 			if (style == WS_WAND) my_strcpy(temp,"Magician", sizeof(temp));
-			if (style == WS_STAFF) my_strcpy(temp,"Wizard", sizeof(temp));
+			if (style == WS_STAFF) my_strcpy(temp,"Conjuror", sizeof(temp));
 			if (style == WS_AMULET) my_strcpy(temp,"Witch", sizeof(temp));
 			if (style == WS_RING) my_strcpy(temp,"Ringwielder", sizeof(temp));
 			if ((style == WS_MAGIC_BOOK) && (sval >= 0))
@@ -1176,9 +1176,6 @@ void lookup_prettyname(cptr name, size_t name_s, int class, int style, int sval,
 					my_strcpy(temp,"Mage ", sizeof(temp));
 					my_strcat(temp,k_name+k_ptr->name, sizeof(temp));
 				}
-				if (sval == 1) my_strcpy(temp,"Conjuror", sizeof(temp));
-				if (sval == 2) my_strcpy(temp,"Invoker", sizeof(temp));
-				if (sval == 3) my_strcpy(temp,"Sorcerer", sizeof(temp));
 				if (sval == 6) my_strcpy(temp,"Archmage", sizeof(temp));
 				if (sval == 7) my_strcpy(temp,"Warlock", sizeof(temp));
 				if (sval == 8) my_strcpy(temp,"War mage", sizeof(temp));
@@ -1195,6 +1192,14 @@ void lookup_prettyname(cptr name, size_t name_s, int class, int style, int sval,
 				if (sval == 23) my_strcpy(temp,"Sage", sizeof(temp));
 				if (sval == 15) my_strcpy(temp,"Beastmaster", sizeof(temp));
 				if (sval == 16) my_strcpy(temp,"Illusionist", sizeof(temp));
+				
+				if ((sval >= 32) && (sval < 36)) my_strcpy(temp,"Wizard", sizeof(temp));
+				if ((sval >= 36) && (sval < 39)) my_strcpy(temp,"Druid", sizeof(temp));
+				if ((sval >= 40) && (sval < 44)) my_strcpy(temp,"Master", sizeof(temp));
+				if ((sval >= 45) && (sval < 48)) my_strcpy(temp,"Sorceror", sizeof(temp));
+				if ((sval >= 48) && (sval < 52)) my_strcpy(temp,"Thuamaturgist", sizeof(temp));
+				if ((sval >= 52) && (sval < 56)) my_strcpy(temp,"Scientist", sizeof(temp));
+				if ((sval >= 56) && (sval < 60)) my_strcpy(temp,"Statesman", sizeof(temp));
 
 			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
