@@ -458,7 +458,7 @@ static void player_wipe(void)
 	r_info[z_info->r_max-1].max_num = 0;
 
 	/* Hack -- Well fed player */
-	p_ptr->food = PY_FOOD_FULL - 1;
+	p_ptr->food = PY_FOOD_MAX - 1000;
 
 	/* Hack -- Well rested player */
 	p_ptr->rest = PY_REST_FULL - 1;
