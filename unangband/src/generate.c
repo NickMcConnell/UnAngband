@@ -11816,4 +11816,7 @@ void generate_cave(void)
 		/* Set new maximum depth */
 		t_info[p_ptr->dungeon].max_depth = p_ptr->depth - min_depth(p_ptr->dungeon);
 	}
+	
+	/* Hit by the plague */
+	if (p_ptr->disease) suffer_disease();
 }
