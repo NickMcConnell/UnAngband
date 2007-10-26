@@ -5659,11 +5659,10 @@ G:?:v
 I:99:24:0
 W:20:0:0:250
 
-#Unused
-#N:774:Restore Wisdom
-#G:?:v
-#I:99:25:0
-#W:20:0:0:250
+N:774:Healing
+G:?:v
+I:99:25:0
+W:20:0:0:250
 
 #Unused
 #N:775:Restore Charisma
