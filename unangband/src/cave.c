@@ -6707,7 +6707,7 @@ void init_level_flags(void)
 	}
 	/* Others */
 	else
-	{
+	{		
 		/* Surface -- must go down */
 		if (p_ptr->depth == min_depth(p_ptr->dungeon))
 		{

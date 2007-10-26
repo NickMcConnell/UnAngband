@@ -2181,6 +2181,67 @@ s16b monster_carry(int m_idx, object_type *j_ptr)
 
 
 /*
+ * Position player on a grid and update information.
+ * 
+ * Used by player_swap and player_place.
+ * 
+ * TODO: Consider using when cave information (e.g. light) is under
+ * player or when terrain is updated under the player.
+ */
+static void player_position()
+{
+	int y = p_ptr->py;
+	int x = p_ptr->px;
+	int by = y/BLOCK_HGT;
+	int bx = x/BLOCK_WID;
+
+	bool outside;
+
+	feature_type *f_ptr = &f_info[cave_feat[y][x]];
+	
+	/* Room is perma-lit */
+	if (cave_info[y][x] & (CAVE_GLOW)) room_info[dun_room[by][bx]].flags |= (ROOM_SEEN);
+	
+	/* Player has heard the room */
+	room_info[dun_room[by][bx]].flags |= (ROOM_HEARD);
+
+	/* Update view if moved outside/inside */
+	outside = (((level_flag & (LF1_SURFACE)) != 0) && 
+		(f_ptr->flags3 & (FF3_OUTSIDE)));
+
+	/* Changed inside/outside */
+	if (outside != p_ptr->outside)
+	{
+		p_ptr->redraw |= (PR_MAP);
+	}
+
+	/* Change state */
+	p_ptr->outside = outside;
+
+	/* Hack -- display 'furnishings' */
+	if (((f_ptr->flags3 & (FF3_ALLOC)) != 0) &&
+		((f_ptr->flags1 & (FF1_TRAP)) == 0))
+	{
+		msg_format("You %s %s %s.", p_ptr->blind || no_lite()? "feel" : "see", is_a_vowel((f_name + f_ptr->name)[0]) ? "an" : "a",
+			f_name + f_ptr->name);
+
+		play_info[y][x] |= (PLAY_MARK);
+
+		lite_spot(y, x);
+	}
+
+	/* If blind, silently notice what the player is on */
+	else if ((p_ptr->blind || no_lite()) && ((play_info[y][x] & (PLAY_MARK)) == 0) &&
+		((f_info[cave_feat[y][x]].flags1 & (FF1_NOTICE)) != 0))
+	{
+		play_info[y][x] |= (PLAY_MARK);
+
+		lite_spot(y, x);
+	}
+}
+
+
+/*
  *  Helper function for monster swap. Update player based on moving y1, x1 to y2, x2
  */
 static void player_swap(const int y1, const int x1, const int y2, const int x2)
@@ -2189,10 +2250,6 @@ static void player_swap(const int y1, const int x1, const int y2, const int x2)
 	int bx1 = x1/BLOCK_WID;
 	int by2 = y2/BLOCK_HGT;
 	int bx2 = x2/BLOCK_WID;
-
-	bool outside;
-
-	feature_type *f_ptr = &f_info[cave_feat[y2][x2]];
 
 	/* Move player */
 	p_ptr->py = y2;
@@ -2222,44 +2279,10 @@ static void player_swap(const int y1, const int x1, const int y2, const int x2)
 	{
 		p_ptr->window |= (PW_ROOM_INFO);
 		p_ptr->update |= (PU_ROOM_INFO);
-
-		/* Room is perma-lit */
-		if (cave_info[y2][x2] & (CAVE_GLOW)) room_info[dun_room[by2][bx2]].flags |= (ROOM_SEEN);
 	}
-
-	/* Update view if moved outside/inside */
-	outside = ((p_ptr->depth == min_depth(p_ptr->dungeon)) && 
-		(f_ptr->flags3 & (FF3_OUTSIDE)));
-
-	/* Changed inside/outside */
-	if (outside != p_ptr->outside)
-	{
-		p_ptr->redraw |= (PR_MAP);
-	}
-
-	/* Change state */
-	p_ptr->outside = outside;
-
-	/* Hack -- display 'furnishings' */
-	if (((f_ptr->flags3 & (FF3_ALLOC)) != 0) &&
-		((f_ptr->flags1 & (FF1_TRAP)) == 0))
-	{
-		msg_format("You %s %s %s.", p_ptr->blind || no_lite()? "feel" : "see", is_a_vowel((f_name + f_ptr->name)[0]) ? "an" : "a",
-			f_name + f_ptr->name);
-
-		play_info[y2][x2] |= (PLAY_MARK);
-
-		lite_spot(y2, x2);
-	}
-
-	/* If blind, silently notice what the player is on */
-	else if ((p_ptr->blind || no_lite()) && ((play_info[y2][x2] & (PLAY_MARK)) == 0) &&
-		((f_info[cave_feat[y2][x2]].flags1 & (FF1_NOTICE)) != 0))
-	{
-		play_info[y2][x2] |= (PLAY_MARK);
-
-		lite_spot(y2, x2);
-	}
+	
+	/* Update positional information */
+	player_position();
 }
 
 
@@ -3902,22 +3925,23 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp, u32b fl
 
 /*
  * Place the player in the dungeon XXX XXX
+ * 
+ * Note similarity to player_swap.
  */
 s16b player_place(int y, int x, bool escort_allowed)
-{
+{	
 	/* Paranoia XXX XXX */
 	if (cave_m_idx[y][x] != 0) return (0);
 
-	/* Save player location */
-	p_ptr->py = y;
-	p_ptr->px = x;
-
 	/* Mark cave grid */
 	cave_m_idx[y][x] = -1;
-
-	/* Update view if moved outside/inside */
-	p_ptr->outside = (((level_flag & (LF1_SURFACE)) != 0) && 
-			(f_info[cave_feat[p_ptr->py][p_ptr->px]].flags3 & (FF3_OUTSIDE)));
+	
+	/* Update player position */
+	p_ptr->py = y;
+	p_ptr->px = x;
+	
+	/* Update positional information*/
+	player_position();
 
 	/* Place escorts on battle-field */
 	if ((escort_allowed) && (level_flag & (LF1_BATTLE)))

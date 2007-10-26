@@ -1921,7 +1921,7 @@ bool place_random_stairs(int y, int x, int feat)
 	if (!cave_clean_bold(y, x)) return (FALSE);
 
 	/* No dungeon, no stairs */
-	if (!(level_flag & (LF1_LESS | LF1_MORE)))
+	if ((level_flag & (LF1_LESS | LF1_MORE)) == 0)
 	{
 		return (FALSE);
 	}
@@ -1930,20 +1930,20 @@ bool place_random_stairs(int y, int x, int feat)
 	else if (feat)
 	{
 		/* Hack -- restrict stairs */
-		if ((f_info[feat].flags1 &(FF1_LESS)) && !(level_flag & (LF1_LESS))) feat = feat_state(feat, FS_MORE);
-		else if ((f_info[feat].flags1 &(FF1_MORE)) && !(level_flag & (LF1_MORE))) feat = feat_state(feat, FS_LESS);
+		if (((f_info[feat].flags1 & (FF1_LESS)) != 0) && ((level_flag & (LF1_LESS)) == 0)) feat = feat_state(feat, FS_MORE);
+		else if (((f_info[feat].flags1 & (FF1_MORE)) != 0) && ((level_flag & (LF1_MORE)) == 0)) feat = feat_state(feat, FS_LESS);
 
 		cave_set_feat(y, x, feat);
 	}
 
 	/* Cannot go down, must go up */
-	else if (!(level_flag & (LF1_MORE)))
+	else if ((level_flag & (LF1_MORE)) == 0)
 	{
 		place_up_stairs(y, x);
 	}
 
 	/* Cannot go up, must go down */
-	else if (!(level_flag & (LF1_LESS)))
+	else if ((level_flag & (LF1_LESS)) == 0)
 	{
 		place_down_stairs(y, x);
 	}
