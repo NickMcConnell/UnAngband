@@ -4322,7 +4322,10 @@
 #define WS_WIELD_FLAGS  0x000001FF /* WS_UNARMED--WS_POLEARM + WS_NONE*/
 #define WS_LAUNCHER_FLAGS  0x00001C01 /* WS_SLING--WS_XBOW + WS_NONE*/
 #define WS_THROWN_FLAGS  0x00000201 /* WS_THROWN + WS_NONE*/
-#define WS_AWARE_FLAGS  0x00FC0001 /* ? */
+#define WS_AWARE_FLAGS  0x00FC0001L /* These increase players awareness of objects as he increases level */
+#define WS_NON_WIELD_FLAGS  0xFF406F00L /* Its not possible to 'wield' any of these styles, so to compensate
+											they accrue the none benefits as well (for the moment) */
+
 
 /* Weapon style improvements */
 #define WB_NONE   0

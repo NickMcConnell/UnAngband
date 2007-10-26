@@ -3922,24 +3922,24 @@ static void calc_bonuses(void)
 			/* Set shooting preference styles */
 			switch(o_ptr->sval)
 			{
-			case SV_SLING:
-			{
-				p_ptr->cur_style |= (1L << WS_SLING);
-				break;
-			}
-			case SV_SHORT_BOW:
-			case SV_LONG_BOW:
-			{
-				p_ptr->cur_style |= (1L << WS_BOW);
-				break;
-			}
-			case SV_HAND_XBOW:
-			case SV_LIGHT_XBOW:
-			case SV_HEAVY_XBOW:
-			{
-				p_ptr->cur_style |= (1L << WS_XBOW);
-				break;
-			}
+				case SV_SLING:
+				{
+					p_ptr->cur_style |= (1L << WS_SLING);
+					break;
+				}
+				case SV_SHORT_BOW:
+				case SV_LONG_BOW:
+				{
+					p_ptr->cur_style |= (1L << WS_BOW);
+					break;
+				}
+				case SV_HAND_XBOW:
+				case SV_LIGHT_XBOW:
+				case SV_HEAVY_XBOW:
+				{
+					p_ptr->cur_style |= (1L << WS_XBOW);
+					break;
+				}
 			}
 		}
 	}
@@ -3963,6 +3963,8 @@ static void calc_bonuses(void)
 			{
 				if (!(p_ptr->cur_style & (1L << WS_UNARMED)))
 					p_ptr->cur_style |= (1L << WS_WEAPON_SHIELD);
+				/* Not one-handed or two-handed */
+				p_ptr->cur_style &= ~(WS_ONE_HANDED | WS_TWO_HANDED);
 				break;
 			}
 			case TV_HAFTED:
@@ -3985,8 +3987,14 @@ static void calc_bonuses(void)
 		if (w_info[i].level > p_ptr->lev) continue;
 
 		/* Check for styles */
-		if (w_info[i].styles==0 
-		    || w_info[i].styles & p_ptr->cur_style & (1L << p_ptr->pstyle))
+		/* Match either if the line has no styles specified */
+		if ((w_info[i].styles == 0) ||
+				/* Or the line matches the characters style, computed above */
+				(w_info[i].styles & (p_ptr->cur_style & (1L << p_ptr->pstyle))) ||
+				/* Or if the character does not have a melee/missile/thrown style,
+				 * match the none style instead */
+				((w_info[i].styles == (1L << WS_NONE)) &&
+						(((1L << p_ptr->pstyle) & (WS_NON_WIELD_FLAGS)) != 0)))				
 		{
 			switch (w_info[i].benefit)
 			{
@@ -4038,7 +4046,6 @@ static void calc_bonuses(void)
 					break;
 			 }
 		}
-
 	}
 
 	/* Don't like our weapon */
