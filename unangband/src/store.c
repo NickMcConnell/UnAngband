@@ -2689,8 +2689,11 @@ static void store_purchase(int store_index)
 				store_item_increase(item, -amt, store_index);
 				store_item_optimize(item, store_index);
 
-				/* Store is empty */
-				if (st_ptr->stock_num == 0)
+				/* Store is empty. */
+				/* Note that if the last item is a service, then
+				 * all items in store are services. This simplifies things
+				 * a lot */
+				if ((st_ptr->stock_num == 0) || (st_ptr->stock[st_ptr->stock_num - 1].tval == TV_SERVICE))
 				{
 					int i;
 
