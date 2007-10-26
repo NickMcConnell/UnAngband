@@ -1738,20 +1738,48 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 	if (((o_ptr->ident & (IDENT_CURSED)) != (j_ptr->ident & (IDENT_CURSED))) ||
 	    ((o_ptr->ident & (IDENT_BROKEN)) != (j_ptr->ident & (IDENT_BROKEN))) ||
 	    ((o_ptr->ident & (IDENT_BREAKS)) != (j_ptr->ident & (IDENT_BREAKS))) ||
+	    ((o_ptr->ident & (IDENT_FORGED)) != (j_ptr->ident & (IDENT_FORGED))) ||
 	    ((o_ptr->ident & (IDENT_STORE)) != (j_ptr->ident & (IDENT_STORE))))
 	{
+		/* Debugging code for stacking problems */
+		if (cheat_xtra)
+		{
+			if ((o_ptr->ident & (IDENT_CURSED)) != (j_ptr->ident & (IDENT_CURSED))) msg_print("Ident cursed not matching");
+			if ((o_ptr->ident & (IDENT_BROKEN)) != (j_ptr->ident & (IDENT_BROKEN))) msg_print("Ident broken not matching");
+			if ((o_ptr->ident & (IDENT_BREAKS)) != (j_ptr->ident & (IDENT_BREAKS))) msg_print("Ident breaks not matching");
+			if ((o_ptr->ident & (IDENT_STORE)) != (j_ptr->ident & (IDENT_STORE))) msg_print("Ident store not matching");
+			if ((o_ptr->ident & (IDENT_FORGED)) != (j_ptr->ident & (IDENT_FORGED))) msg_print("Ident forged not matching");
+		}
+		
 		return (0);
 	}
 
-	/* Hack -- Require identical "xtra1" and "xtra2" status */
-	if ((o_ptr->xtra1 != j_ptr->xtra1) || (o_ptr->xtra2 != j_ptr->xtra2)) return (0);
+	/* Hack -- Require identical "xtra1" status */
+	if (o_ptr->xtra1 != j_ptr->xtra1)
+	{
+		if (cheat_xtra) msg_format("xtra1 %d does not match xtra1 %d", o_ptr->xtra1, j_ptr->xtra1);
+		return (0);
+	}
 
-	/* Hack -- Require identical "name3" */
-	if (o_ptr->name3 != j_ptr->name3) return(0);
+	/* Hack -- Require identical "xtra2" status */
+	if (o_ptr->xtra2 != j_ptr->xtra2)
+	{
+		if (cheat_xtra) msg_format("xtra2 %d does not match xtra2 %d", o_ptr->xtra2, j_ptr->xtra2);
+		return (0);
+	}
+
+	/* Hack -- Require identical "xtra2" status */
+	if (o_ptr->name3 != j_ptr->name3)
+	{
+		if (cheat_xtra) msg_format("name3 %d does not match name3 %d", o_ptr->name3, j_ptr->name3);
+		return (0);
+	}
 
 	/* Hack -- Require compatible inscriptions */
 	if (o_ptr->note != j_ptr->note)
 	{
+		if (cheat_xtra) msg_format("note %d does not match note %d", o_ptr->note, j_ptr->note);
+		
 		/* Normally require matching inscriptions */
 		if (!stack_force_notes && !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) ) return (0);
 
@@ -1762,6 +1790,8 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 	/* Hack -- Require compatible "discount" fields */
 	if (o_ptr->discount != j_ptr->discount)
 	{
+		if (cheat_xtra) msg_format("discount %d does not match discount %d", o_ptr->discount, j_ptr->discount);
+		
 		/* Normally require matching discounts */
 		if (!stack_force_costs && !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr))) return (0);
 	}
@@ -1769,6 +1799,8 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 	/* Hack -- Require compatible "feeling" fields */
 	if (o_ptr->feeling != j_ptr->feeling)
 	{
+		if (cheat_xtra) msg_format("feeling %d does not match feeling %d", o_ptr->feeling, j_ptr->feeling);
+
 		/* Both are (different) special inscriptions */
 		if ((o_ptr->feeling) && (j_ptr->feeling))
 		{
