@@ -4735,6 +4735,7 @@ void show_tip(void)
 		if (show_tips)
 		{
 			msg_print("You find a note.");
+			msg_print(NULL);
 			
 			/* Save screen */
 			screen_save();

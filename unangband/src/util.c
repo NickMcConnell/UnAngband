@@ -2862,8 +2862,16 @@ static void msg_print_aux(u16b type, cptr msg)
 	/* Message Length */
 	n = (msg ? strlen(msg) : 0);
 
+	/* Hack -- blank message or zero length message implies we want interruption */
+	if ((easy_more) && (!n))
+	{
+		must_more = TRUE;
+		messages_easy(FALSE);
+		
+		return;
+	}
 	/* Hack -- flush when requested or needed */
-	if (message_column && (!msg || ((message_column + n) > (w - 8))))
+	else if (message_column && (!msg || ((message_column + n) > (w - 8))))
 	{
 		/* Flush */
 		msg_flush(message_column);
@@ -2882,13 +2890,6 @@ static void msg_print_aux(u16b type, cptr msg)
 		
 		/* Hack -- use first line */
 		msg_flag = TRUE;
-	}
-	/* Hack -- blank message or zero length message implies we want interruption */
-	else if ((easy_more) && ((!msg) || !(strlen(msg))))
-	{
-		messages_easy(FALSE);
-		
-		return;
 	}
 
 	/* No message */
@@ -3056,12 +3057,13 @@ void message_format(u16b message_type, s16b extra, cptr fmt, ...)
 
 /*
  * Print the queued messages.
+ * 
+ * Note we'd like to call messages_easy here but can't
+ * because this causes an infinite loop between here,
+ * messages_easy and screen_save.
  */
 void message_flush(void)
 {
-	/* Hack -- no effect with easy_more */
-	if (easy_more) return;
-	
 	/* Hack -- Reset */
 	if (!msg_flag) message_column = 0;
 
