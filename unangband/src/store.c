@@ -2552,10 +2552,25 @@ static void store_purchase(int store_index)
 	i_ptr->number = amt;
 
 	/* Hack -- require room in pack */
-	if ((i_ptr->tval != TV_SERVICE) && (!inven_carry_okay(i_ptr)))
+	if (i_ptr->tval != TV_SERVICE)
 	{
-		msg_print("You cannot carry that many items.");
-		return;
+		bool hack_ident_store = (i_ptr->ident & (IDENT_STORE)) != 0;
+		bool can_carry;
+		
+		/* Hack -- manipulate store flag */
+		if (hack_ident_store) i_ptr->ident &= ~(IDENT_STORE);
+		
+		can_carry = inven_carry_okay(i_ptr);
+
+		/* Hack -- manipulate store flag */
+		if (hack_ident_store) i_ptr->ident |= (IDENT_STORE);
+		
+		if (!can_carry)
+		{
+			msg_print("You cannot carry that many items.");
+			
+			return;
+		}
 	}
 
 	/* Attempt to buy it */
