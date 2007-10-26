@@ -1609,7 +1609,7 @@ static void display_entry(int item, int store_index)
 		}
 
 		/* Actually draw the price (not fixed) */
-		sprintf(out_val, "%9ld %d", guess_cost(item, store_index), o_ptr->ident & (IDENT_FIXED) ? 'F' : ' ');
+		sprintf(out_val, "%9ld %c", guess_cost(item, store_index), o_ptr->ident & (IDENT_FIXED) ? 'F' : ' ');
 		put_str(out_val, y, 68);
 	}
 }

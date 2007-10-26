@@ -776,7 +776,7 @@ static void prt_state(void)
 	}
 
 	/* Display the info (or blanks) */
-	if (text)
+	if (*text)
 	  c_put_str(attr, text, ROW_STATE, COL_STATE);
 }
 
