@@ -2575,6 +2575,9 @@ static void process_command(void)
 			int y = KEY_GRID_Y(p_ptr->command_cmd_ex);
 			int x = KEY_GRID_X(p_ptr->command_cmd_ex);
 			int room;
+			
+			/* Paranoia */
+			if (!in_bounds_fully(y, x)) break;
 
 			/* Hack -- we could try various things here like travelling or going up/down stairs */
 			if ((p_ptr->py == y) && (p_ptr->px == x) && (p_ptr->command_cmd_ex.mousebutton))
@@ -2598,7 +2601,7 @@ static void process_command(void)
 				msg_print("Target set.");
 			}
 			else if (use_trackmouse && (easy_more || auto_more))
-			{
+			{				
 				target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
 			}
 			break;
