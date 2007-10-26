@@ -548,10 +548,12 @@ static void do_cmd_travel(void)
 		/* Need to be full to travel for trip */
 		if (p_ptr->food < PY_FOOD_FULL)
 		{
-			msg_print("You'll need a full stomach for the road ahead.");
+			msg_print("You'll want a full stomach for the road ahead.");
 			msg_print("Hint: Try the 'E' (shift-E) command to eat something.");
+			msg_print(NULL);
 		}
-		else if (p_ptr->blind)
+		
+		if (p_ptr->blind)
 		{
 			msg_print("You can't read any maps.");
 		}
