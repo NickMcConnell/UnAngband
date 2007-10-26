@@ -2467,7 +2467,7 @@ static bool sell_haggle(object_type *o_ptr, s32b *price, cptr selling, char labe
  */
 static void store_purchase(int store_index)
 {
-	int n;
+	int n = 99;
 	int amt, choice;
 	int item, item_new;
 
@@ -2515,20 +2515,24 @@ static void store_purchase(int store_index)
 	/* Get the actual object */
 	o_ptr = &st_ptr->stock[item];
 	
-	/* Guess maximum items can afford */
-	n = p_ptr->au / guess_cost(item, store_index);
-	
-	/* Maybe able to haggle */
-	if (!n)
+	/* Try to restrict quantity based on what the player can afford */
+	if (st_ptr->base >= STORE_MIN_BUY_SELL)
 	{
-		if (adult_haggle)
+		/* Guess maximum items can afford */
+		n = p_ptr->au / guess_cost(item, store_index);
+		
+		/* Maybe able to haggle */
+		if (!n)
 		{
-			n = 1;
-		}
-		else
-		{
-			msg_print("You can't afford that item.");
-			return;
+			if (adult_haggle)
+			{
+				n = 1;
+			}
+			else
+			{
+				msg_print("You can't afford that item.");
+				return;
+			}
 		}
 	}
 	
