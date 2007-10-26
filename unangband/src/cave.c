@@ -4950,13 +4950,30 @@ void town_illuminate(bool daytime)
 	dungeon_hgt = (!(zone->fill)) ? TOWN_HGT : DUNGEON_HGT;
 	dungeon_wid = (!(zone->fill)) ? TOWN_WID : DUNGEON_WID;
 
-	/* Apply light or darkness */
+	/* Darken at night */
 	for (y = 0; y < dungeon_hgt; y++)
 	{
 		for (x = 0; x < dungeon_wid; x++)
 		{
 			/* Light outside and adjacent indoors */
-			if ((daytime) && (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
+			if ((!daytime) || ((f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)) == 0))
+			{
+				/* Darken the grid */
+				cave_info[y][x] &= ~(CAVE_DLIT);
+			}
+		}
+	}
+	
+	/* Apply light during day */
+	if (daytime) for (y = 0; y < dungeon_hgt; y++)
+	{
+		for (x = 0; x < dungeon_wid; x++)
+		{
+			/* Location is outside */
+			if (((f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)) != 0)
+
+				/* or light rooms lit by daylight */
+				|| ((room_has_flag(y, x, ROOM_DAYLITE)) != 0))
 			{
 				/* Illuminate the grid */
 				cave_info[y][x] |= (CAVE_DLIT);
@@ -4967,25 +4984,15 @@ void town_illuminate(bool daytime)
 					int xx = x + ddx_ddd[i];
 
 					/* Ignore annoying locations */
-					if (!in_bounds_fully(yy, xx)) continue;
+					if (!in_bounds(yy, xx)) continue;
 
 					/* Illuminate the grid */
 					cave_info[yy][xx] |= (CAVE_DLIT);
 				}
 			}
-
-			/* Darken */
-			else
-			{
-				/* Darken the grid */
-				cave_info[y][x] &= ~(CAVE_DLIT);
-			}
-
-			/* Reveal it */
-			lite_spot(y,x);
 		}
 	}
-
+	
 	/* XXX WARNING:
 	 * 
 	 * Town_illuminate is called once whilst loading a character.
