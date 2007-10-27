@@ -1967,8 +1967,6 @@ static void process_command(void)
 		/* Ignore */
 		case ESCAPE:
 		case ' ':
-		case '\n':
-		case '\r':
 		{
 			break;
 		}
@@ -2387,6 +2385,13 @@ static void process_command(void)
 		/*** Help and Such ***/
 
 		/* Help */
+		case '\r':
+		case '\n':
+		{
+			do_cmd_quick_help();
+			break;
+		}
+		
 		case '?':
 		{
 			do_cmd_help();
@@ -2610,7 +2615,7 @@ static void process_command(void)
 		/* Hack -- Unknown command */
 		default:
 		{
-			prt("Type '?' for help.", 0, 0);
+			prt("Type '?' or press ENTER for help.", 0, 0);
 			break;
 		}
 	}

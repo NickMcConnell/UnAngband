@@ -565,6 +565,7 @@ extern bool show_file(cptr name, cptr what, int line, int mode);
 extern bool queue_tip(cptr tip);
 extern void show_tip(void);
 extern void do_cmd_help(void);
+extern void do_cmd_quick_help(void);
 extern void process_player_name(bool sf);
 extern char *make_word(int min_len, int max_len);
 extern void get_name(void);
