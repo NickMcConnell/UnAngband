@@ -2960,7 +2960,9 @@ void move_player(int dir, int jumping)
 	}
 
 	/* Hack -- attack monsters --- except hidden ones or allies */
-	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE | MFLAG_ALLY)))
+	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE | MFLAG_ALLY)) &&
+			/* Allow the player to run over most monsters -- except those that can't move */
+			(!(p_ptr->running) || (r_info[m_list[cave_m_idx[y][x]].r_idx].flags1 & (RF1_NEVER_MOVE))))
 	{
 		/* Attack */
 		py_attack(dir);

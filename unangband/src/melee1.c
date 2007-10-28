@@ -3752,7 +3752,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (target > 0)
 			{
 				/* Add to the monster haste counter */
-				set_monster_haste(target, n_ptr->hasted + rlev + rand_int(rlev), m_ptr->ml);
+				set_monster_haste(target, n_ptr->hasted + rlev + rand_int(rlev), n_ptr->ml);
 			}
 			else if (target < 0)
 			{
