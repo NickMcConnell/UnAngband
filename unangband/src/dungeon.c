@@ -447,14 +447,14 @@ void suffer_disease(void)
 
 		disturb(0,0);
 
-		n = 1;
+		n = 0;
 
 		/* Select one of the possible effects that the player can suffer */
 		for (i = 1; i < (1 << DISEASE_BLOWS); i <<=1)
 		{
 			if (!(p_ptr->disease & i)) continue;
 		
-			if (!rand_int(n++)) effect = i;
+			if (!rand_int(++n)) effect = i;
 		}
 
 		switch (effect)
