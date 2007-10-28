@@ -1293,7 +1293,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		}
 
 		/* Special lighting effects */
-		else if ((view_special_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE)))
+		else if ((view_special_lite) && (view_granite_lite) && (f_ptr->flags3 & (FF3_ATTR_LITE)))
 		{
 			/* Modify lighting */
 			(*modify_grid_boring_hook)(&a, &c, y, x, cinfo, pinfo);
