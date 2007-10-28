@@ -2862,38 +2862,30 @@ static void msg_print_aux(u16b type, cptr msg)
 	/* Message Length */
 	n = (msg ? strlen(msg) : 0);
 
-	/* Hack -- blank message or zero length message implies we want interruption */
-	if ((easy_more) && (!n))
-	{
-		must_more = TRUE;
-		messages_easy(FALSE);
-		
-		return;
-	}
 	/* Hack -- flush when requested or needed */
-	else if (message_column && (!msg || ((message_column + n) > (w - 8))))
+	if ((message_column || must_more) && (!msg || !strlen(msg) || ((message_column + n) > (w - 8))))
 	{
+		bool force_flag = (easy_more && !must_more && !message_column) ? TRUE : FALSE;
+		bool hack_flush = (easy_more && !must_more && !msg) ? TRUE : FALSE;
+		
+		/* Hack -- allow single line '-more-' */
+		if (hack_flush) easy_more = FALSE;
+		
 		/* Flush */
 		msg_flush(message_column);
 
+		/* Hack -- allow single line '-more-' */
+		if (hack_flush) easy_more = TRUE;
+
 		/* Forget it */
-		msg_flag = FALSE;
+		msg_flag = force_flag;
 
 		/* Reset */
 		message_column = 0;
 	}
-	/* Hack -- get messages_easy to display the whole message */
-	else if ((easy_more) && (!must_more) && (n > (w - 8)))
-	{
-		/* Flush */
-		msg_flush(message_column);
-		
-		/* Hack -- use first line */
-		msg_flag = TRUE;
-	}
 
 	/* No message */
-	if (!msg) return;
+	if ((!msg) || !strlen(msg)) return;
 
 	/* Paranoia */
 	if (n > 1000) return;
@@ -2975,7 +2967,7 @@ static void msg_print_aux(u16b type, cptr msg)
 
 	/* Remember the position */
 	message_column += n + 1;
-
+	
 	/* Optional refresh */
 	if (fresh_after) Term_fresh();
 }

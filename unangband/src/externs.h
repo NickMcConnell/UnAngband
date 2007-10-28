@@ -963,6 +963,7 @@ extern u16b message_type(s16b age);
 extern byte message_color(s16b age);
 extern errr message_color_define(u16b type, byte color);
 extern void message_add(cptr str, u16b type);
+extern void messages_easy(bool command);
 extern errr messages_init(void);
 extern void messages_free(void);
 extern void move_cursor(int row, int col);

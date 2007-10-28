@@ -4230,6 +4230,8 @@ bool show_file(cptr name, cptr what, int line, int mode)
 
 	int wid, hgt;
 
+	/* Show messages first */
+	if (easy_more) messages_easy(FALSE);
 
 	/* Wipe finder */
 	my_strcpy(finder, "", sizeof(finder));
