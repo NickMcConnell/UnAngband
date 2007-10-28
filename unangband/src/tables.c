@@ -3751,22 +3751,22 @@ const cptr vocalize[MAX_LANGUAGES] =
 	"croaks", 	/* 'F' */
 	"says",
 	"roars",
-	"says",
+	"chirps",
 	"hisses",
 	"clicks", 	/* 'K' */
 	"whispers",
 	"says",
 	"whispers",
-	"says",
-	"says", 	/* 'P' */
-	"roars",
+	"barks",
+	"thunders", /* 'P' */
+	"grunts",
 	"hisses",
 	"says",
 	"roars",
 	"utters", 	/* 'U' */
 	"whispers",
 	"whispers",
-	"grunts",
+	"clacks",
 	"hoots",
 	"howls", 	/* 'Z' */
 	"releases", 	/* 'a' */
@@ -3774,7 +3774,7 @@ const cptr vocalize[MAX_LANGUAGES] =
 	"clicks",
 	"roars",
 	"blinks",
-	"chirps", 	/* 'f' */
+	"growls", 	/* 'f' */
 	"beeps",
 	"says",
 	"squelches",
