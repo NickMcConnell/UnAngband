@@ -2119,7 +2119,20 @@ void object_prep(object_type *o_ptr, int k_idx)
 	if (k_ptr->flags3 & (TR3_HEAVY_CURSE | TR3_PERMA_CURSE))  o_ptr->ident |= (IDENT_CURSED);
 	else if (k_ptr->flags3 & (TR3_LIGHT_CURSE))
 	{
-		if (rand_int(100) < 30) o_ptr->ident |= (IDENT_CURSED);
+		/* Some 'easily noticeable' attributes always result in cursing an item.
+		 * See do_cmd_wield(). */
+		if (k_ptr->flags1 & (TR1_BLOWS | TR1_SHOTS | TR1_SPEED | TR1_STR |
+				TR1_INT | TR1_WIS | TR1_DEX | TR1_CON | TR1_CHR))
+		{
+			o_ptr->ident |= (IDENT_CURSED);
+		}
+#ifndef ALLOW_OBJECT_INFO_MORE
+		else if ((k_ptr->flags1 & (TR1_INFRA)) || (k_ptr->flags3 & (TR3_LITE | TR3_TELEPATHY | TR3_SEE_INVIS)))
+		{
+			o_ptr->ident |= (IDENT_CURSED);			
+		}
+#endif
+		else if (rand_int(100) < 30) o_ptr->ident |= (IDENT_CURSED);
 		else o_ptr->ident |= (IDENT_BROKEN);
 	}
 	
@@ -3277,15 +3290,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					/* Cursed */
 					if (power < 0)
 					{
-						/* Broken */
-						o_ptr->ident |= (IDENT_BROKEN);
-
-						if ((power < -1) || (rand_int(100) < 30))
-						{
-							/* Cursed */
-							o_ptr->ident |= (IDENT_CURSED);
-						}
-
 						/* Reverse pval */
 						o_ptr->pval = 0 - (o_ptr->pval);
 					}
@@ -3305,15 +3309,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					/* Cursed Ring; Hack: above DL30 sure */
 					if (power < 0 || p_ptr->depth < 30 + rand_int (20))
 					{
-						/* Broken */
-						o_ptr->ident |= (IDENT_BROKEN);
-
-						if ((power < -1) || (rand_int(100) < 30))
-						{
-							/* Cursed */
-							o_ptr->ident |= (IDENT_CURSED);
-						}
-
 						/* Reverse pval */
 						o_ptr->pval = 0 - (o_ptr->pval);
 
@@ -3338,15 +3333,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					/* Cursed */
 					if (power < 0)
 					{
-						/* Broken */
-						o_ptr->ident |= (IDENT_BROKEN);
-
-						if ((power < -1) || (rand_int(100) < 30))
-						{
-							/* Cursed */
-							o_ptr->ident |= (IDENT_CURSED);
-						}
-
 						/* Reverse pval */
 						o_ptr->pval = 0 - (o_ptr->pval);
 					}
@@ -3368,15 +3354,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_RING_WEAKNESS:
 				case SV_RING_STUPIDITY:
 				{
-					/* Broken */
-					o_ptr->ident |= (IDENT_BROKEN);
-
-					if ((power < -1) || (rand_int(100) < 30))
-					{
-						/* Cursed */
-						o_ptr->ident |= (IDENT_CURSED);
-					}
-
 					/* Penalize */
 					o_ptr->pval = 0 - (1 + m_bonus(5, level));
 
@@ -3386,15 +3363,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				/* WOE, Stupidity */
 				case SV_RING_WOE:
 				{
-					/* Broken */
-					o_ptr->ident |= (IDENT_BROKEN);
-
-					if ((power < -1) || (rand_int(100) < 30))
-					{
-						/* Cursed */
-						o_ptr->ident |= (IDENT_CURSED);
-					}
-
 					/* Penalize */
 					o_ptr->to_a = 0 - (5 + m_bonus(10, level));
 					o_ptr->pval = 0 - (1 + m_bonus(5, level));
@@ -3412,15 +3380,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					/* Cursed */
 					if (power < 0)
 					{
-						/* Broken */
-						o_ptr->ident |= (IDENT_BROKEN);
-
-						if ((power < -1) || (rand_int(100) < 30))
-						{
-							/* Cursed */
-							o_ptr->ident |= (IDENT_CURSED);
-						}
-
 						/* Reverse bonus */
 						o_ptr->to_d = 0 - (o_ptr->to_d);
 					}
@@ -3437,15 +3396,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					/* Cursed */
 					if (power < 0)
 					{
-						/* Broken */
-						o_ptr->ident |= (IDENT_BROKEN);
-
-						if ((power < -1) || (rand_int(100) < 30))
-						{
-							/* Cursed */
-							o_ptr->ident |= (IDENT_CURSED);
-						}
-
 						/* Reverse tohit */
 						o_ptr->to_h = 0 - (o_ptr->to_h);
 					}
@@ -3462,15 +3412,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					/* Cursed */
 					if (power < 0)
 					{
-						/* Broken */
-						o_ptr->ident |= (IDENT_BROKEN);
-						
-						if ((power < -1) || (rand_int(100) < 30))
-						{
-							/* Cursed */
-							o_ptr->ident |= (IDENT_CURSED);
-						}
-
 						/* Reverse toac */
 						o_ptr->to_a = 0 - (o_ptr->to_a);
 					}
@@ -3488,15 +3429,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					/* Cursed */
 					if (power < 0)
 					{
-						/* Broken */
-						o_ptr->ident |= (IDENT_BROKEN);
-
-						if ((power < -1) || (rand_int(100) < 30))
-						{
-							/* Cursed */
-							o_ptr->ident |= (IDENT_CURSED);
-						}
-
 						/* Reverse bonuses */
 						o_ptr->to_h = 0 - (o_ptr->to_h);
 						o_ptr->to_d = 0 - (o_ptr->to_d);
@@ -3524,15 +3456,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					/* Cursed */
 					if (power < 0)
 					{
-						/* Broken */
-						o_ptr->ident |= (IDENT_BROKEN);
-
-						if ((power < -1) || (rand_int(100) < 30))
-						{
-							/* Cursed */
-							o_ptr->ident |= (IDENT_CURSED);
-						}
-
 						/* Reverse bonuses */
 						o_ptr->pval = 0 - (o_ptr->pval);
 					}
@@ -3548,15 +3471,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					/* Cursed */
 					if (power < 0)
 					{
-						/* Broken */
-						o_ptr->ident |= (IDENT_BROKEN);
-
-						if ((power < -1) || (rand_int(100) < 30))
-						{
-							/* Cursed */
-							o_ptr->ident |= (IDENT_CURSED);
-						}
-
 						/* Reverse bonuses */
 						o_ptr->pval = 0 - (o_ptr->pval);
 					}
@@ -3573,15 +3487,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					/* Cursed */
 					if (power < 0)
 					{
-						/* Broken */
-						o_ptr->ident |= (IDENT_BROKEN);
-
-						if ((power < -1) || (rand_int(100) < 30))
-						{
-							/* Cursed */
-							o_ptr->ident |= (IDENT_CURSED);
-						}
-
 						/* Reverse pval */
 						o_ptr->pval = 0 - (o_ptr->pval);
 					}
@@ -3650,15 +3555,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					/* Cursed */
 					if (p_ptr->depth < 20 + rand_int (30))
 					{
-						/* Broken */
-						o_ptr->ident |= (IDENT_BROKEN);
-
-						if ((power < -1) || (rand_int(100) < 30))
-						{
-							/* Cursed */
-							o_ptr->ident |= (IDENT_CURSED);
-						}
-
 						/* Reverse pval */
 						o_ptr->pval = 0 - (o_ptr->pval);
 
@@ -3677,12 +3573,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				/* Amulet of Doom -- always cursed */
 				case SV_AMULET_DOOM:
 				{
-					/* Broken */
-					o_ptr->ident |= (IDENT_BROKEN);
-
-					/* Cursed */
-					o_ptr->ident |= (IDENT_CURSED);
-
 					/* Penalize */
 					o_ptr->pval = 0 - (randint(5) + m_bonus(5, level));
 					o_ptr->to_a = 0 - (randint(5) + m_bonus(5, level));
@@ -3698,15 +3588,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					/* Cursed */
 					if (power < 0)
 					{
-						/* Broken */
-						o_ptr->ident |= (IDENT_BROKEN);
-
-						if ((power < -1) || (rand_int(100) < 30))
-						{
-							/* Cursed */
-							o_ptr->ident |= (IDENT_CURSED);
-						}
-
 						/* Reverse pval */
 						o_ptr->pval = 0 - (o_ptr->pval);
 
@@ -3724,6 +3605,36 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 			}
 
 			break;
+		}
+	}
+
+	/* Check if has negatives */
+	if ((o_ptr->to_h < 0) || (o_ptr->to_d < 0) || (o_ptr->to_a < 0) || (o_ptr->pval < 0))
+	{
+		if ((power < -1) || (rand_int(100) < 30))
+		{
+			/* Cursed */
+			o_ptr->ident |= (IDENT_CURSED);
+		}
+		else if (power < 0)
+		{
+			/* Some 'easily noticeable' attributes always result in cursing an item.
+			 * See do_cmd_wield(). */
+			if (k_info[o_ptr->k_idx].flags1 & (TR1_BLOWS | TR1_SHOTS | TR1_SPEED | TR1_STR |
+					TR1_INT | TR1_WIS | TR1_DEX | TR1_CON | TR1_CHR))
+			{
+				o_ptr->ident |= (IDENT_CURSED);
+			}
+		#ifndef ALLOW_OBJECT_INFO_MORE
+			else if ((k_info[o_ptr->k_idx].flags1 & (TR1_INFRA)) || (k_ptr->flags3 & (TR3_LITE | TR3_TELEPATHY | TR3_SEE_INVIS)))
+			{
+				o_ptr->ident |= (IDENT_CURSED);			
+			}
+		#endif
+			else
+			{
+				o_ptr->ident |= (IDENT_BROKEN);
+			}
 		}
 	}
 }
