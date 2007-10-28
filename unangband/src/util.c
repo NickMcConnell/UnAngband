@@ -2852,7 +2852,7 @@ static void msg_print_aux(u16b type, cptr msg)
 	if ((message_column || easy_more) && (!msg || ((message_column + n) > (w - 8))))
 	{
 		bool hack_use_first_line = (easy_more && !must_more && !message_column && msg) ? TRUE : FALSE;
-		bool hack_flush = (easy_more && message_column && !must_more && !msg) ? TRUE : FALSE;
+		bool hack_flush = (easy_more && message_column && ((message_column + n) <= (w - 8)) && !must_more && !msg) ? TRUE : FALSE;
 		
 		/* Handle easy_more */
 		if (easy_more && msg && !must_more)
