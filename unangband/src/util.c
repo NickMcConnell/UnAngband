@@ -2757,21 +2757,7 @@ static void msg_flush(int x)
 	byte a = TERM_L_BLUE;
 
 	/* Handle easy_more */
-	if (easy_more || use_trackmouse)
-	{
-		/* Display additional messages on the same screen */
-		if (!must_more)
-		{
-			/* Display messages from this point onwards */
-			message__easy = message__next;
-
-			/* Delay displaying remaining messages */
-			must_more = TRUE;
-		}
-
-		return;
-	}
-	
+	if (easy_more) return;	
 	
 #if 0
 	int warning = (p_ptr->mhp * op_ptr->hitpoint_warn / 10);
@@ -2863,10 +2849,20 @@ static void msg_print_aux(u16b type, cptr msg)
 	n = (msg ? strlen(msg) : 0);
 
 	/* Hack -- flush when requested or needed */
-	if ((message_column || must_more) && (!msg || !strlen(msg) || ((message_column + n) > (w - 8))))
+	if ((message_column || easy_more) && (!msg || ((message_column + n) > (w - 8))))
 	{
-		bool force_flag = (easy_more && !must_more && !message_column) ? TRUE : FALSE;
-		bool hack_flush = (easy_more && !must_more && !msg) ? TRUE : FALSE;
+		bool hack_use_first_line = (easy_more && !must_more && !message_column && msg) ? TRUE : FALSE;
+		bool hack_flush = (easy_more && message_column && !must_more && !msg) ? TRUE : FALSE;
+		
+		/* Handle easy_more */
+		if (easy_more && msg && !must_more)
+		{
+			/* Display messages from this point onwards */
+			message__easy = message__next;
+
+			/* Delay displaying remaining messages */
+			must_more = TRUE;
+		}
 		
 		/* Hack -- allow single line '-more-' */
 		if (hack_flush) easy_more = FALSE;
@@ -2878,14 +2874,14 @@ static void msg_print_aux(u16b type, cptr msg)
 		if (hack_flush) easy_more = TRUE;
 
 		/* Forget it */
-		msg_flag = force_flag;
+		msg_flag = hack_use_first_line;
 
 		/* Reset */
 		message_column = 0;
 	}
 
 	/* No message */
-	if ((!msg) || !strlen(msg)) return;
+	if (!msg) return;
 
 	/* Paranoia */
 	if (n > 1000) return;
@@ -2967,7 +2963,7 @@ static void msg_print_aux(u16b type, cptr msg)
 
 	/* Remember the position */
 	message_column += n + 1;
-	
+
 	/* Optional refresh */
 	if (fresh_after) Term_fresh();
 }
