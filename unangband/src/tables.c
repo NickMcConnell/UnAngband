@@ -213,6 +213,8 @@ const byte adj_mag_study_max[] =
 
 /*
  * Stat Table -- one (or 4 for mages) less than the amount of mana at level 50
+ * 
+ * Now also used for 'reach' with size.
  */
 const s16b adj_mag_mana[] =
 {

@@ -2529,7 +2529,10 @@ void py_attack(int dir)
 			/* No need for message */
 		}
 		/* Test for huge monsters -- they resist non-charging attacks */
-		else if ((r_ptr->flags3 & (RF3_HUGE)) && (!charging) && (rand_int(100) < 60) &&
+		else if ((r_ptr->flags3 & (RF3_HUGE)) && (!charging) &&
+				
+				/* Modify chance to hit using the characters size */
+				(rand_int(adj_mag_mana[p_ptr->stat_ind[A_SIZ]]) < (20 + p_ptr->depth)) &&
 
 				/* Easy climb locations provide enough of a boost to attack from on high */
 				((f_info[cave_feat[p_ptr->py][p_ptr->px]].flags3 & (FF3_EASY_CLIMB)) == 0))
