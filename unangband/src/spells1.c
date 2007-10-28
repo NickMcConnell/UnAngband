@@ -7514,7 +7514,11 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 			if (new_maxhp < m_ptr->maxhp)
 			{
-				note = " appears sicklier.";
+				if (seen)
+				{
+					note = " appears sicklier.";
+					obvious = TRUE;
+				}
 
 				/* Scale down hit points */
 				m_ptr->hp = m_ptr->hp * new_maxhp / m_ptr->maxhp;
