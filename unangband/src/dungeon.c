@@ -1683,7 +1683,7 @@ static void process_world(void)
 			object_flags(o_ptr, &f1, &f2, &f3, &f4);
 			
 			/* Pick item */
-			if (((f3 & (TR3_UNCONTROLLED)) == 0) && (cursed_p(o_ptr)) && !(rand_int(k++)))
+			if (((f3 & (TR3_UNCONTROLLED)) != 0) && (cursed_p(o_ptr)) && !(rand_int(k++)))
 			{
 				j = i;
 			}
