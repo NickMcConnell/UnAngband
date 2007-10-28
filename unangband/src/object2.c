@@ -837,18 +837,20 @@ void object_bonus(object_type *o_ptr, bool floor)
 	}
 }
 
+
 /*
  * Ensure tips are displayed as objects become either weakly or strongly aware
  */
-void object_aware_tips(object_type *o_ptr)
+void object_aware_tips(int kind)
 {
 	int i, count = 0;
+	int tval = k_info[kind].tval;
 
 	/* Check all objects */
 	for (i = 0; i < z_info->k_max; i++)
 	{
 		/* Skip non-matching tvals */
-		if (k_info[i].tval != o_ptr->tval) continue;
+		if (k_info[i].tval != tval) continue;
 		
 		/* Count number of objects aware */
 		if (k_info[i].aware) count++;
@@ -858,17 +860,17 @@ void object_aware_tips(object_type *o_ptr)
 	if (!count)
 	{
 		/* Show tval based tip */
-		queue_tip(format("tval%d.txt", o_ptr->tval));
+		queue_tip(format("tval%d.txt", tval));
 	}
 	/* Show tval tips if no objects of this type known */
 	else
 	{
 		/* Show tval based tip */
-		queue_tip(format("tval%d-%d.txt", o_ptr->tval, count));
+		queue_tip(format("tval%d-%d.txt", tval, count));
 	}
 
 	/* Show tip for kind of object */
-	queue_tip(format("kind%d.txt", o_ptr->k_idx));
+	queue_tip(format("kind%d.txt", kind));
 }
 
 /*
@@ -885,7 +887,7 @@ void object_aware(object_type *o_ptr, bool floor)
 	/* Add a tip if we're not aware */
 	if (!object_aware_p(o_ptr))
 	{
-		object_aware_tips(o_ptr);
+		object_aware_tips(o_ptr->k_idx);
 	}
 	
 	/* Get the flags */
@@ -920,6 +922,20 @@ void object_aware(object_type *o_ptr, bool floor)
 	/* Fully aware of the effects */
 	k_info[o_ptr->k_idx].aware = TRUE;
 
+	/* Hack -- fully aware of the coating effects */
+	if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_COATS)
+	{
+		int coating = lookup_kind(o_ptr->xtra1, o_ptr->xtra2);
+
+		/* Queue tips */
+		if (!k_info[coating].aware) object_aware_tips(coating);
+
+		/* Make coating aware */
+		k_info[coating].aware = TRUE;
+		
+		k_info[coating].tried = FALSE;
+	}
+	
 	/* Identify the name */
 	o_ptr->ident |= (IDENT_NAME);
 
@@ -1018,9 +1034,6 @@ void object_tried(object_type *o_ptr)
 	object_kind *k_ptr = &k_info[o_ptr->k_idx];
 
 	/* Don't mark it if aware */
-	if (k_ptr->aware) return;
-
-	/* Don't mark it if guessed */
 	if (k_ptr->aware) return;
 
 	/* Mark it as tried */
@@ -1675,23 +1688,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			if (o_ptr->to_a != j_ptr->to_a) return (FALSE);
 			if (o_ptr->pval != j_ptr->pval) return (FALSE);
 
-			/* Require similar "charges" code */
-			if (o_ptr->charges != j_ptr->charges)
-			{
-				/* Check for sign difference */
-				if ((o_ptr->charges > 0)&&(j_ptr->charges <= 0)) return (0);
-				if ((o_ptr->charges < 0)&&(j_ptr->charges >= 0)) return (0);
-				if ((o_ptr->charges == 0)&&(j_ptr->charges != 0)) return (0);
-
-				/* Line 1 -- no force charge stacking option */
-				/* Line 2 -- 1st charges is not 1 less than 2nd charges, or 1st charges is a charges stack */
-				/* Line 3 -- 1st charges is not 1 greater than 2nd charges, or 2nd charges is a charges stack */
-				/* Line 4 -- an item has auto_stack */
-				if ((!stack_force_charges)
-					&& ((o_ptr->charges != j_ptr->charges-1) || (o_ptr->stackc))
-					&& ((o_ptr->charges != j_ptr->charges+1) || (j_ptr->stackc))
-					&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr))) return (0);
-			}
+			/* XXX Just merge coating "charges" */
 
 			/* Require identical "artifact" names */
 			if (o_ptr->name1 != j_ptr->name1) return (FALSE);

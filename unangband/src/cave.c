@@ -1954,7 +1954,7 @@ void note_spot(int y, int x)
 			/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
 			if ((!k_ptr->flavor) && !(k_ptr->aware))
 			{
-				object_aware_tips(o_ptr);
+				object_aware_tips(o_ptr->k_idx);
 
 				k_ptr->aware = TRUE;
 			}

@@ -1531,7 +1531,7 @@ static void display_entry(int item, int store_index)
 			if (!object_aware_p(o_ptr))
 			{
 				/* Display tips */
-				object_aware_tips(o_ptr);
+				object_aware_tips(o_ptr->k_idx);
 			}
 			
 			/* Make object aware - short routine */
@@ -1595,7 +1595,7 @@ static void display_entry(int item, int store_index)
 		/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
 		if ((!k_info[o_ptr->k_idx].flavor) && !(k_info[o_ptr->k_idx].aware))
 		{
-			object_aware_tips(o_ptr);
+			object_aware_tips(o_ptr->k_idx);
 
 			k_info[o_ptr->k_idx].aware = TRUE;
 		}
