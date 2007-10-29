@@ -4217,6 +4217,101 @@ static bool summon_specific_okay(int r_idx)
 			}
 			break;
 		}
+		
+		case SUMMON_COLOUR:
+		{
+			if ((summon_attr_type) || (summon_flag_type))
+			{
+				u32b summon_flag1_type = summon_flag_type & (0x0000FFFFL);
+				u32b summon_flag9_type = summon_flag_type & (0xFFFF0000L);
+
+				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
+
+					/* Hack - Reject index color */
+					((r_ptr->flags9 & (RF9_ATTR_INDEX)) == 0) && 
+					
+					/* Match colour */
+					(((r_ptr->d_attr == summon_attr_type) &&
+
+					/* Match 'metallic-ness' */
+					((r_ptr->flags9 & (RF9_ATTR_METAL)) == summon_flag9_type) &&
+					
+					/* Reject clear or multi-hued */
+					((r_ptr->flags1 & (RF1_ATTR_CLEAR | RF1_ATTR_MULTI)) == 0)) ||
+					
+					/* Match 'clearness or multi-huedness */
+					((summon_flag1_type) &&
+						((r_ptr->flags1 & (RF1_ATTR_CLEAR | RF1_ATTR_MULTI)) == summon_flag1_type))));
+			}
+			else
+			{
+				okay = /* Hack - Reject index color */
+					(((r_ptr->flags9 & (RF9_ATTR_INDEX)) == 0) &&
+					!(r_ptr->flags1 & (RF1_UNIQUE)));				
+			}
+			break;
+		}
+
+		case SUMMON_PREFIX:
+		{
+			if (summoner)
+			{
+				/* Match monster prefixes */
+				char *t = r_name + r_ptr->name;
+				char *s = r_name + r_info[summoner].name;
+				
+				okay = TRUE;
+					
+				/* Scan "t" and "s" simultaneously */
+				while (*t && *s)
+				{
+					if ((*t == ' ') || (*s == ' ')) break;
+					
+					/* Compare content and length */
+					if (*t++ != *s++) { okay = FALSE; break; }
+				}
+				
+				/* Check for premature termination */
+				if (*t != *s) okay = FALSE;
+			}
+			else
+			{
+				okay = /* Hack - Reject monsters without prefix */
+					(!(strchr(r_name + r_ptr->name, ' ')) &&
+					!(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			break;
+		}
+		
+		case SUMMON_ALL_BUT_PREFIX:
+		case SUMMON_SUFFIX:
+		{
+			if (summoner)
+			{
+				/* Match monster prefixes */
+				char *t = r_name + r_ptr->name;
+				char *s = r_name + r_info[summoner].name;
+				
+				okay = TRUE;
+				
+				/* Find last word in "s" */
+				while (strchr(s, ' '))
+				{
+					s++;
+					if ((summon_specific_type == SUMMON_ALL_BUT_PREFIX) && (*s = ' ')) { s++; break; }
+				}
+				
+				/* Check suffix of "t" */
+				okay = suffix(t, s);
+			}
+			else
+			{
+				okay = /* Hack - Reject monsters without prefix */
+					(!(strchr(r_name + r_ptr->name, ' ')) &&
+					!(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			break;
+		}
 
 		case SUMMON_GROUP:
 		case ANIMATE_ELEMENT:
@@ -4824,6 +4919,31 @@ bool summon_specific(int y1, int x1, int lev, int type, bool grp, u32b flg)
 			}
 			break;
 		}
+		
+		case SUMMON_COLOUR:
+		{
+			if (!summon_flag_type)
+			{
+				summon_flag_type |= r_info[r_idx].flags1 & (RF1_ATTR_CLEAR | RF1_ATTR_MULTI);
+				summon_flag_type |= r_info[r_idx].flags9 & (RF9_ATTR_METAL);
+			}
+			if (!summon_attr_type)
+			{
+				summon_attr_type = r_info[r_idx].d_attr;
+			}
+			break;
+		}
+		
+		case SUMMON_PREFIX:
+		case SUMMON_SUFFIX:
+		case SUMMON_ALL_BUT_PREFIX:
+		{
+			if (!summoner)
+			{
+				summoner = r_idx;
+			}
+			break;
+		}
 
 		case SUMMON_GROUP:
 		case ANIMATE_ELEMENT:
@@ -5350,7 +5470,7 @@ void get_monster_ecology(int r_idx)
 	if (cave_ecology.num_races >= MAX_ECOLOGY_RACES) return;
 
 	/* For first few monsters on a level, we force some related monsters to appear */
-	if (cave_ecology.num_races <= 7) hack_ecology = randint(5);
+	if (cave_ecology.num_races <= 7) hack_ecology = randint(8);
 
 	/* Pick a monster if one not specified */
 	if (!r_idx)
@@ -5379,6 +5499,16 @@ void get_monster_ecology(int r_idx)
 		/* Try to ensure we have a hack */
 		switch(hack_ecology)
 		{
+			case 9:
+			case 8:
+			case 7:
+				if (!strchr(r_name + r_info[r_idx].name, ' ')) hack_ecology--;
+				else break;
+				if (hack_ecology == 8) hack_ecology--;
+				if (hack_ecology == 7) hack_ecology--;
+			case 6:
+				if ((r_info[r_idx].flags9 & (RF9_ATTR_METAL)) == 0) hack_ecology--;
+				else break;
 			case 5:
 				if (!r_info[r_idx].grp_idx) hack_ecology--;
 				else break;
@@ -5541,6 +5671,45 @@ void get_monster_ecology(int r_idx)
 			summon_specific_type = SUMMON_GROUP;
 			summon_group_type = r_ptr->grp_idx;
 
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
+		}
+
+		/* Add summon races -- summon colour. Note this is only done via ecology hacks. */
+		if (hack_ecology == 6)
+		{
+			summon_specific_type = SUMMON_COLOUR;
+			summon_attr_type = r_ptr->d_attr;
+			summon_flag_type = r_ptr->flags1 & (RF1_ATTR_CLEAR | RF1_ATTR_MULTI);
+			summon_flag_type |= r_ptr->flags9 & (RF9_ATTR_METAL);
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));		
+		}
+		
+		/* Add summon races -- summon prefix. Note this is only done via ecology hacks. */
+		if (hack_ecology == 7)
+		{
+			summon_specific_type = SUMMON_PREFIX;
+			
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
+		}
+
+		/* Add summon races -- summon prefix. Note this is only done via ecology hacks. */
+		if (hack_ecology == 8)
+		{
+			summon_specific_type = SUMMON_SUFFIX;
+			
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
+		}
+		
+		/* Add summon races -- summon prefix. Note this is only done via ecology hacks. */
+		if (hack_ecology == 9)
+		{
+			summon_specific_type = SUMMON_ALL_BUT_PREFIX;
+			
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
 		}

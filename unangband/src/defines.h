@@ -835,6 +835,10 @@
 #define SUMMON_HI_UNDEAD  31
 #define SUMMON_WRAITH     32
 #define RAISE_HI_UNIQUE   33
+#define SUMMON_COLOUR   34
+#define SUMMON_PREFIX   35
+#define SUMMON_SUFFIX   36
+#define SUMMON_ALL_BUT_PREFIX   37
 
 
 /*
