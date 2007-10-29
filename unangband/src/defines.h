@@ -837,8 +837,10 @@
 #define RAISE_HI_UNIQUE   33
 #define SUMMON_COLOUR   34
 #define SUMMON_PREFIX   35
-#define SUMMON_SUFFIX   36
+#define SUMMON_SUFFIX   36		/* Not used. Use SUMMON_ALL_BUT_PREFIX */
 #define SUMMON_ALL_BUT_PREFIX   37
+#define SUMMON_INFIX_WYRM_OF   38
+#define SUMMON_DRAGON_BREATH   39
 
 
 /*

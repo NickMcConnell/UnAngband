@@ -154,6 +154,7 @@ extern byte summon_attr_type;
 extern byte summon_group_type;
 extern u32b summon_flag_type;
 extern s16b summon_race_type;
+extern char summon_word_type[80];
 extern s32b turn;
 extern s32b old_turn;
 extern s32b player_turn;

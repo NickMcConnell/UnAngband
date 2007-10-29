@@ -4254,25 +4254,10 @@ static bool summon_specific_okay(int r_idx)
 
 		case SUMMON_PREFIX:
 		{
-			if (summoner)
+			if (strlen(summon_word_type))
 			{
-				/* Match monster prefixes */
-				char *t = r_name + r_ptr->name;
-				char *s = r_name + r_info[summoner].name;
-				
-				okay = TRUE;
-					
-				/* Scan "t" and "s" simultaneously */
-				while (*t && *s)
-				{
-					if ((*t == ' ') || (*s == ' ')) break;
-					
-					/* Compare content and length */
-					if (*t++ != *s++) { okay = FALSE; break; }
-				}
-				
-				/* Check for premature termination */
-				if (*t != *s) okay = FALSE;
+				/* Match on prefix */
+				okay = prefix(r_name + r_ptr->name, summon_word_type);
 			}
 			else
 			{
@@ -4286,31 +4271,56 @@ static bool summon_specific_okay(int r_idx)
 		case SUMMON_ALL_BUT_PREFIX:
 		case SUMMON_SUFFIX:
 		{
-			if (summoner)
+			if (strlen(summon_word_type))
 			{
-				/* Match monster prefixes */
-				char *t = r_name + r_ptr->name;
-				char *s = r_name + r_info[summoner].name;
-				
-				okay = TRUE;
-				
-				/* Find last word in "s" */
-				while (strchr(s, ' '))
-				{
-					s++;
-					if ((summon_specific_type == SUMMON_ALL_BUT_PREFIX) && (*s = ' ')) { s++; break; }
-				}
-				
-				/* Check suffix of "t" */
-				okay = suffix(t, s);
+				/* Match on prefix */
+				okay = suffix(r_name + r_ptr->name, summon_word_type);
 			}
 			else
 			{
-				okay = /* Hack - Reject monsters without prefix */
+				okay = /* Hack - Reject monsters without suffix */
 					(!(strchr(r_name + r_ptr->name, ' ')) &&
 					!(r_ptr->flags1 & (RF1_UNIQUE)));
 			}
 			break;
+		}
+		
+		case SUMMON_INFIX_WYRM_OF:
+		{
+			if (strlen(summon_word_type))
+			{
+				/* Match on infix */
+				okay = (strstr(r_name + r_ptr->name, summon_word_type) != 0);
+			}
+			else
+			{
+				okay = /* Hack - Reject monsters without suffix */
+					(!(strchr(r_name + r_ptr->name, ' ')) &&
+					!(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			break;			
+		}
+		
+		case SUMMON_DRAGON_BREATH:
+		{
+			if (summon_flag_type)
+			{
+				/* Match on dragon */
+				okay = (strchr("AdD",r_ptr->d_char) &&
+				
+				/* Hack - Match on undead if requested */
+				(((summon_flag_type & (0x0000001L)) &&
+						(r_ptr->flags3 & (RF3_UNDEAD))) ||
+				
+				/* Match on breath */
+				((summon_flag_type & (RF4_BREATH_MASK)) &&
+						(r_ptr->flags4 & (RF4_BREATH_MASK)) == summon_flag_type)));
+			}
+			else
+			{
+				/* Reject non-dragons */
+				okay = ((strchr("AdD",r_ptr->d_char)) != 0);
+			}
 		}
 
 		case SUMMON_GROUP:
@@ -4716,6 +4726,222 @@ bool place_monster(int y, int x, bool slp, bool grp)
 
 
 
+/*
+ * Set additional summon_specific parameters based on monster race and summon specific type
+ */
+static void summon_specific_params(int r_idx, int summon_specific_type)
+{
+	/* Hack -- Set specific summoning parameters if not currently set */
+	switch (summon_specific_type)
+	{
+		case SUMMON_KIN:
+		{
+			if (!summon_char_type) summon_char_type = r_info[r_idx].d_char;
+			break;
+		}
+
+		/* Hack -- we combine two different flag types */
+		case SUMMON_RACE:
+		{
+			if (!summon_flag_type)
+			{
+				summon_flag_type |= r_info[r_idx].flags3 & (RF3_RACE_MASK);
+				summon_flag_type |= r_info[r_idx].flags9 & (RF9_RACE_MASK);
+			}
+			break;
+		}
+
+		/* Hack -- try to summon birds, beasts or reptiles based on summoner */
+		case SUMMON_ANIMAL:
+		{
+			if (!summon_flag_type)
+			{
+				/* Undead animals */
+				if (r_info[r_idx].flags3 & (RF3_UNDEAD)) summon_flag_type |= (RF8_HAS_SKELETON);
+				else summon_flag_type |= r_info[r_idx].flags8 & (RF8_SKIN_MASK);
+
+				if (!summon_flag_type) summon_flag_type = RF8_HAS_SCALE;
+			}
+			break;
+		}
+
+		/* Hack -- mage priests only hang out with mage priests, but
+			warrior priests hang out with warriors and priests */
+		case SUMMON_CLASS:
+		{
+			if (!summon_flag_type)
+			{
+				summon_flag_type = r_info[r_idx].flags2 & (RF2_CLASS_MASK);
+			}
+			break;
+		}
+		
+		case SUMMON_COLOUR:
+		{
+			if (!summon_flag_type)
+			{
+				summon_flag_type |= r_info[r_idx].flags1 & (RF1_ATTR_CLEAR | RF1_ATTR_MULTI);
+				summon_flag_type |= r_info[r_idx].flags9 & (RF9_ATTR_METAL);
+			}
+			if (!summon_attr_type)
+			{
+				summon_attr_type = r_info[r_idx].d_attr;
+			}
+			break;
+		}
+		
+		case SUMMON_PREFIX:
+		{
+			/* Copy prefix */
+			char *t = r_name + r_info[r_idx].name;
+			char *s = summon_word_type;
+			
+			if (!strlen(summon_word_type))
+			{
+				/* Copy string */
+				my_strcpy(s, t, sizeof(summon_word_type));
+	
+				/* Find first space */
+				while ((*s) && (*s != ' ')) s++;
+				
+				/* Terminate string */
+				*s = '\0';
+			}
+			break;
+		}
+
+		case SUMMON_SUFFIX:
+		case SUMMON_ALL_BUT_PREFIX:
+		{
+			/* Copy prefix */
+			char *t = r_name + r_info[r_idx].name;
+			char *s = summon_word_type;
+			
+			if (!strlen(summon_word_type))
+			{
+				/* Find space */
+				while (strchr(t, ' '))
+				{
+					t++;
+					
+					if ((summon_specific_type == SUMMON_ALL_BUT_PREFIX) && (*t == ' ')) break;
+				}
+				
+				/* Copy string */
+				my_strcpy(s, t, sizeof(summon_word_type));
+			}
+			break;
+		}
+		
+		case SUMMON_INFIX_WYRM_OF:
+		{
+			/* Copy prefix */
+			char *u = NULL;
+			char *t = r_name + r_info[r_idx].name;
+			char *s = summon_word_type;
+			
+			int k = 0;
+			
+			if (!strlen(summon_word_type))
+			{
+				/* Copy string. Note offset. */
+				my_strcpy(s, t, sizeof(summon_word_type) - 1);
+				
+				/* Break up into words */
+				while (*s)
+				{
+					if (*s == ' ') *s = '\0';
+					s++;
+				}
+				
+				/* Ensure double \0 at end of string */
+				*(++s) = '\0';
+				
+				/* Scan words */
+				s = summon_word_type;
+				
+				while (*s && (s < summon_word_type + sizeof(summon_word_type)))
+				{
+					/* Skip 'the', 'of', 'great', 'wyrm' */
+					if ((my_stricmp(s, "the")) && (my_stricmp(s, "of")) && (my_stricmp(s, "Wyrm")) &&
+							(my_stricmp(s,"Great")))
+					{
+						/* Maybe get this word */
+						if (!rand_int(++k)) u = t;
+					}
+					
+					s += strlen(s) + 1;
+					t += strlen(s) + 1;
+					continue;
+				}
+				
+				if (u)
+				{
+					my_strcpy(s, u, sizeof(s));
+	
+					/* Find first space */
+					while ((*s) && (*s != ' ')) s++;
+					
+					/* Terminate string */
+					*s = '\0';
+				}
+				/* Paranoia */
+				else
+				{
+					my_strcpy(s, "", sizeof(s));
+				}
+			}
+			break;
+		}
+
+		case SUMMON_DRAGON_BREATH:
+		{
+			if (!summon_flag_type)
+			{
+				/* Hack - match on undead */
+				if (r_info[r_idx].flags3 & (RF3_UNDEAD))
+				{
+					summon_flag_type = 0x00000001L;
+				}
+				/* Match on breath */
+				else
+				{
+					summon_flag_type = r_info[r_idx].flags4 & (RF4_BREATH_MASK);
+				}
+			}
+			break;
+		}
+		
+		case SUMMON_GROUP:
+		case ANIMATE_ELEMENT:
+		{
+			if (!summon_group_type)
+			{
+				summon_group_type = r_info[r_idx].grp_idx;
+			}
+			break;
+		}
+
+		case SUMMON_FRIEND:
+		{
+			if (!summon_race_type)
+			{
+				summon_race_type = r_idx;
+			}
+			break;
+		}
+
+		case SUMMON_UNIQUE_FRIEND:
+		{
+			if (!summon_attr_type && !summon_char_type)
+			{
+				summon_char_type = r_info[r_idx].d_char;
+				summon_attr_type = r_info[r_idx].d_attr;
+			}
+			break;
+		}
+	}
+}
 
 
 /*
@@ -4875,106 +5101,9 @@ bool summon_specific(int y1, int x1, int lev, int type, bool grp, u32b flg)
 	/* Attempt to place the monster (awake, groups dependent on caller) */
 	if (!place_monster_aux(y, x, r_idx, FALSE, grp, flg)) return (FALSE);
 
-	/* Hack -- Set specific summoning parameters if not currently set */
-	switch (summon_specific_type)
-	{
-		case SUMMON_KIN:
-		{
-			if (!summon_char_type) summon_char_type = r_info[r_idx].d_char;
-			break;
-		}
-
-		/* Hack -- we combine two different flag types */
-		case SUMMON_RACE:
-		{
-			if (!summon_flag_type)
-			{
-				summon_flag_type |= r_info[r_idx].flags3 & (RF3_RACE_MASK);
-				summon_flag_type |= r_info[r_idx].flags9 & (RF9_RACE_MASK);
-			}
-			break;
-		}
-
-		/* Hack -- try to summon birds, beasts or reptiles based on summoner */
-		case SUMMON_ANIMAL:
-		{
-			if (!summon_flag_type)
-			{
-				/* Undead animals */
-				if (r_info[r_idx].flags3 & (RF3_UNDEAD)) summon_flag_type |= (RF8_HAS_SKELETON);
-				else summon_flag_type |= r_info[r_idx].flags8 & (RF8_SKIN_MASK);
-
-				if (!summon_flag_type) summon_flag_type = RF8_HAS_SCALE;
-			}
-			break;
-		}
-
-		/* Hack -- mage priests only hang out with mage priests, but
-			warrior priests hang out with warriors and priests */
-		case SUMMON_CLASS:
-		{
-			if (!summon_flag_type)
-			{
-				summon_flag_type = r_info[r_idx].flags2 & (RF2_CLASS_MASK);
-			}
-			break;
-		}
-		
-		case SUMMON_COLOUR:
-		{
-			if (!summon_flag_type)
-			{
-				summon_flag_type |= r_info[r_idx].flags1 & (RF1_ATTR_CLEAR | RF1_ATTR_MULTI);
-				summon_flag_type |= r_info[r_idx].flags9 & (RF9_ATTR_METAL);
-			}
-			if (!summon_attr_type)
-			{
-				summon_attr_type = r_info[r_idx].d_attr;
-			}
-			break;
-		}
-		
-		case SUMMON_PREFIX:
-		case SUMMON_SUFFIX:
-		case SUMMON_ALL_BUT_PREFIX:
-		{
-			if (!summoner)
-			{
-				summoner = r_idx;
-			}
-			break;
-		}
-
-		case SUMMON_GROUP:
-		case ANIMATE_ELEMENT:
-		{
-			if (!summon_group_type)
-			{
-				summon_group_type = r_info[r_idx].grp_idx;
-			}
-			break;
-		}
-
-		case SUMMON_FRIEND:
-		{
-			if (!summon_race_type)
-			{
-				summon_race_type = r_idx;
-			}
-			break;
-		}
-
-		case SUMMON_UNIQUE_FRIEND:
-		{
-			if (!summon_attr_type && !summon_char_type)
-			{
-				summon_char_type = r_info[r_idx].d_char;
-				summon_attr_type = r_info[r_idx].d_attr;
-			}
-			break;
-		}
-	}
-
+	/* Set additional paramaters if we haven't yet set a restriction */
+	if (summon_specific_type) summon_specific_params(r_idx, summon_specific_type);
+	
 	/* Success */
 	return (TRUE);
 }
@@ -5470,7 +5599,7 @@ void get_monster_ecology(int r_idx)
 	if (cave_ecology.num_races >= MAX_ECOLOGY_RACES) return;
 
 	/* For first few monsters on a level, we force some related monsters to appear */
-	if (cave_ecology.num_races <= 7) hack_ecology = randint(8);
+	if (cave_ecology.num_races <= 7) hack_ecology = randint(9);
 
 	/* Pick a monster if one not specified */
 	if (!r_idx)
@@ -5500,6 +5629,10 @@ void get_monster_ecology(int r_idx)
 		switch(hack_ecology)
 		{
 			case 9:
+				/* Hack -- dragons, except wyrms 'of' match on breath */
+				if (strchr("adD", r_info[r_idx].d_char) &&
+						(!strstr(r_name +  + r_info[r_idx].name, " of ")))
+							{ hack_ecology++; break; }
 			case 8:
 			case 7:
 				if (!strchr(r_name + r_info[r_idx].name, ' ')) hack_ecology--;
@@ -5567,8 +5700,13 @@ void get_monster_ecology(int r_idx)
 		if ((r_ptr->flags7 & (RF7_S_KIN)) || (hack_ecology == 1))
 		{
 			summon_specific_type = SUMMON_KIN;
-			summon_char_type = r_ptr->d_char;
 
+			/* Clear existing restrictions */
+			summon_char_type = 0;
+
+			/* Set the restrictions */
+			summon_specific_params(r_idx, SUMMON_KIN);
+			
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k) + (r_ptr->flags1 & (RF1_UNIQUE) ? rand_int(3) : 0));
 		}
@@ -5596,26 +5734,12 @@ void get_monster_ecology(int r_idx)
 		{
 			summon_specific_type = SUMMON_ANIMAL;
 
-			/* Hack -- This lets vampires summon animals while not letting undead live with non-undead animals in general */
-			if ((r_ptr->flags3 & (RF3_UNDEAD)) && ((r_ptr->flags7 & (RF7_S_ANIMAL)) == 0)) summon_flag_type = (RF8_HAS_SKELETON);
+			/* Clear existing restrictions */
+			summon_flag_type = 0L;
 			
-			/* Else - base skin on summoner's skin if set */
-			else summon_flag_type = (r_ptr->flags8 & (RF8_SKIN_MASK));
-
-			/* Mega Hack -- Other racial preferences for animals */
-			if (!summon_flag_type)
-			{
-				/* Everyone likes lions, tigers, wolves */
-				summon_flag_type |= RF8_HAS_FUR;
-
-				/* Surface dwellers like birds */
-				if ((r_ptr->flags9 & (RF9_RACE_MASK)) && ! (r_ptr->flags3 & (RF3_RACE_MASK))) 
-					summon_flag_type |= RF8_HAS_FEATHER;
-
-				/* Dungeon dwellers like reptiles, fish and worse */
-				else summon_flag_type |= RF8_HAS_SCALE;
-			}
-
+			/* Set the restrictions */
+			summon_specific_params(r_idx, SUMMON_ANIMAL);
+			
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
 		}
@@ -5643,8 +5767,11 @@ void get_monster_ecology(int r_idx)
 		{
 			summon_specific_type = SUMMON_CLASS;
 
-			/* Hack -- Set the class flags to summon */
-			summon_flag_type = (r_ptr->flags2 & (RF2_CLASS_MASK));
+			/* Clear existing restrictions */
+			summon_flag_type = 0L;
+			
+			/* Set the restrictions */
+			summon_specific_params(r_idx, SUMMON_CLASS);
 
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
@@ -5655,11 +5782,11 @@ void get_monster_ecology(int r_idx)
 		{
 			summon_specific_type = SUMMON_RACE;
 
-			/* Hack -- Set the class flags to summon */
-			summon_flag_type = (r_ptr->flags3 & (RF3_RACE_MASK));
-
-			/* Mega Hack -- Combine two flags XXX */
-			summon_flag_type |= (r_ptr->flags9 & (RF9_RACE_MASK));
+			/* Clear existing restrictions */
+			summon_flag_type = 0L;
+			
+			/* Set the restrictions */
+			summon_specific_params(r_idx, SUMMON_RACE);
 
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
@@ -5669,8 +5796,13 @@ void get_monster_ecology(int r_idx)
 		if ((r_ptr->flags7 & (RF7_S_GROUP)) || (hack_ecology == 5))
 		{
 			summon_specific_type = SUMMON_GROUP;
-			summon_group_type = r_ptr->grp_idx;
 
+			/* Clear existing restrictions */
+			summon_group_type = 0;
+			
+			/* Set the restrictions */
+			summon_specific_params(r_idx, SUMMON_GROUP);
+			
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
 		}
@@ -5679,10 +5811,14 @@ void get_monster_ecology(int r_idx)
 		if (hack_ecology == 6)
 		{
 			summon_specific_type = SUMMON_COLOUR;
-			summon_attr_type = r_ptr->d_attr;
-			summon_flag_type = r_ptr->flags1 & (RF1_ATTR_CLEAR | RF1_ATTR_MULTI);
-			summon_flag_type |= r_ptr->flags9 & (RF9_ATTR_METAL);
 
+			/* Clear existing restrictions */
+			summon_attr_type = 0;
+			summon_flag_type = 0L;
+			
+			/* Set the restrictions */
+			summon_specific_params(r_idx, SUMMON_COLOUR);
+			
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));		
 		}
@@ -5692,24 +5828,57 @@ void get_monster_ecology(int r_idx)
 		{
 			summon_specific_type = SUMMON_PREFIX;
 			
-			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
-		}
-
-		/* Add summon races -- summon prefix. Note this is only done via ecology hacks. */
-		if (hack_ecology == 8)
-		{
-			summon_specific_type = SUMMON_SUFFIX;
+			/* Clear existing restrictions */
+			summon_word_type[0] = '\0';
+			
+			/* Set the restrictions */
+			summon_specific_params(r_idx, SUMMON_PREFIX);
 			
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
 		}
 		
 		/* Add summon races -- summon prefix. Note this is only done via ecology hacks. */
-		if (hack_ecology == 9)
+		if (hack_ecology == 8)
 		{
 			summon_specific_type = SUMMON_ALL_BUT_PREFIX;
+
+			/* Clear existing restrictions */
+			summon_word_type[0] = '\0';
 			
+			/* Set the restrictions */
+			summon_specific_params(r_idx, SUMMON_ALL_BUT_PREFIX);
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
+		}
+
+		/* Add summon races -- summon infix. Note this is only done via ecology hacks. */
+		if (hack_ecology == 9)
+		{
+			summon_specific_type = SUMMON_INFIX_WYRM_OF;
+
+			/* Clear existing restrictions */
+			summon_word_type[0] = '\0';
+			
+			/* Set the restrictions */
+			summon_specific_params(r_idx, SUMMON_INFIX_WYRM_OF);
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
+		}
+		
+		/* Add summon races -- summon infix. Note this is only done via ecology hacks. */
+		if (hack_ecology == 10)
+		{
+			summon_specific_type = SUMMON_DRAGON_BREATH;
+
+			/* Clear existing restrictions */
+			summon_flag_type = 0L;
+			
+			/* Set the restrictions */
+			summon_specific_params(r_idx, SUMMON_DRAGON_BREATH);
+
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
 		}
