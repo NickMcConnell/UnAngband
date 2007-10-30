@@ -4851,6 +4851,7 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 				while (*s)
 				{
 					if (*s == ' ') *s = '\0';
+					if ((*s == '-') && (rand_int(100) < 30)) *s = '\0';
 					s++;
 				}
 				
@@ -4860,25 +4861,31 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 				/* Scan words */
 				s = summon_word_type;
 				
+				/* Skip unique names */
+				while (strchr(s, ',')) { s++; t++; }
+				
 				while (*s && (s < summon_word_type + sizeof(summon_word_type)))
 				{
+					int n = strlen(s);
+					
 					/* Skip 'the', 'of', 'great', 'wyrm' */
 					if ((my_stricmp(s, "the")) && (my_stricmp(s, "of")) && (my_stricmp(s, "Wyrm")) &&
-							(my_stricmp(s,"Great")))
+							(my_stricmp(s,"Great ")))
 					{
 						/* Maybe get this word */
 						if (!rand_int(++k)) u = t;
 					}
 					
-					s += strlen(s) + 1;
-					t += strlen(s) + 1;
-					continue;
+					s += n + 1;
+					t += n + 1;
 				}
 				
 				if (u)
 				{
-					my_strcpy(s, u, sizeof(s));
+					my_strcpy(summon_word_type, u, sizeof(summon_word_type));
 	
+					s = summon_word_type;
+					
 					/* Find first space */
 					while ((*s) && (*s != ' ')) s++;
 					
@@ -5599,7 +5606,7 @@ void get_monster_ecology(int r_idx)
 	if (cave_ecology.num_races >= MAX_ECOLOGY_RACES) return;
 
 	/* For first few monsters on a level, we force some related monsters to appear */
-	if (cave_ecology.num_races <= 7) hack_ecology = randint(9);
+	if (cave_ecology.num_races <= 7) hack_ecology = randint(7);
 
 	/* Pick a monster if one not specified */
 	if (!r_idx)
@@ -5628,17 +5635,13 @@ void get_monster_ecology(int r_idx)
 		/* Try to ensure we have a hack */
 		switch(hack_ecology)
 		{
-			case 9:
+			case 7:
 				/* Hack -- dragons, except wyrms 'of' match on breath */
 				if (strchr("adD", r_info[r_idx].d_char) &&
 						(!strstr(r_name +  + r_info[r_idx].name, " of ")))
 							{ hack_ecology++; break; }
-			case 8:
-			case 7:
 				if (!strchr(r_name + r_info[r_idx].name, ' ')) hack_ecology--;
 				else break;
-				if (hack_ecology == 8) hack_ecology--;
-				if (hack_ecology == 7) hack_ecology--;
 			case 6:
 				if ((r_info[r_idx].flags9 & (RF9_ATTR_METAL)) == 0) hack_ecology--;
 				else break;
@@ -5822,39 +5825,9 @@ void get_monster_ecology(int r_idx)
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));		
 		}
-		
-		/* Add summon races -- summon prefix. Note this is only done via ecology hacks. */
-		if (hack_ecology == 7)
-		{
-			summon_specific_type = SUMMON_PREFIX;
-			
-			/* Clear existing restrictions */
-			summon_word_type[0] = '\0';
-			
-			/* Set the restrictions */
-			summon_specific_params(r_idx, SUMMON_PREFIX);
-			
-			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
-		}
-		
-		/* Add summon races -- summon prefix. Note this is only done via ecology hacks. */
-		if (hack_ecology == 8)
-		{
-			summon_specific_type = SUMMON_ALL_BUT_PREFIX;
-
-			/* Clear existing restrictions */
-			summon_word_type[0] = '\0';
-			
-			/* Set the restrictions */
-			summon_specific_params(r_idx, SUMMON_ALL_BUT_PREFIX);
-
-			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
-		}
 
 		/* Add summon races -- summon infix. Note this is only done via ecology hacks. */
-		if (hack_ecology == 9)
+		if (hack_ecology == 7)
 		{
 			summon_specific_type = SUMMON_INFIX_WYRM_OF;
 
@@ -5869,7 +5842,7 @@ void get_monster_ecology(int r_idx)
 		}
 		
 		/* Add summon races -- summon infix. Note this is only done via ecology hacks. */
-		if (hack_ecology == 10)
+		if (hack_ecology == 8)
 		{
 			summon_specific_type = SUMMON_DRAGON_BREATH;
 
