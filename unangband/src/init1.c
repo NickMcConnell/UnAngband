@@ -4160,7 +4160,7 @@ errr parse_r_info(char *buf, header *head)
 		}
 
 		/* Hack -- older monsters */
-		if ((r_ptr->flags9 & (RF9_LEVEL_POWER | RF9_LEVEL_SIZE)) && (strchr("eQCfBhtlpqnoOPTY", r_ptr->d_char)))
+		if ((r_ptr->flags9 & RF9_LEVEL_MASK) && (strchr("eQCfBhtlpqnoOPTY", r_ptr->d_char)))
 		{
 			r_ptr->flags9 |= RF9_LEVEL_AGE;
 		}

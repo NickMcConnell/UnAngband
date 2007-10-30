@@ -3888,7 +3888,7 @@
 #define RF9_NO_SLOW        0x00020000      /* Cannot be slowed / paralyzed */
 #define RF9_RES_MAGIC      0x00040000      /* Resists magic */
 #define RF9_GOOD           0x00080000      /* Good - never summon evil / never summoned by evil */
-#define RF9_LEVEL_AGE      0x00100000      /* Levels up size deeper in the dungeon */
+#define RF9_LEVEL_AGE      0x00100000      /* ??? */
 #define RF9_DWARF          0x00200000      /* Hurt by slay dwarf */
 #define RF9_ELF            0x00400000      /* Hurt by slay elf */
 #define RF9_MAN            0x00800000      /* Hurt by slay man */

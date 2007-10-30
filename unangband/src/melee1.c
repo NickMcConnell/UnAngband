@@ -127,7 +127,7 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 	if (n > 1)
 	{
 		/* Clear all flags */
-		n_ptr->flags9 &= ~(RF9_LEVEL_AGE | RF9_LEVEL_SPEED | RF9_LEVEL_POWER | RF9_LEVEL_SIZE);
+		n_ptr->flags9 &= ~RF9_LEVEL_MASK;
 		
 		/* Add one back in based on m_idx */
 		n_ptr->flags9 |= flag[m_idx % n];
