@@ -1739,7 +1739,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	breath_maxhp = (m_ptr->maxhp > 2000 ? m_ptr->maxhp : 2000);
 
 	/* Cheat if requested. */
-	if ((smart_cheat) || (r_ptr->flags9 & (RF9_PLAYER_GHOST)))
+	if ((smart_cheat)/* || (r_ptr->flags9 & (RF9_PLAYER_GHOST)) */)
 	{
 		update_smart_cheat(m_idx);
 	}
@@ -5216,7 +5216,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					if (do_cut && do_stun)
 					{
 						/* Cancel cut */
-						if (m_idx % 2)
+						if ((m_idx % 11) < 4)
 						{
 							do_cut = FALSE;
 						}

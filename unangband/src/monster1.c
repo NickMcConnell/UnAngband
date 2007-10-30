@@ -1721,6 +1721,7 @@ static void describe_monster_movement(const monster_race *r_ptr, const monster_l
 	if (l_ptr->flags9 & (RF9_LEVEL_SPEED)) vp[vn++] ="faster";
 	if (l_ptr->flags9 & (RF9_LEVEL_AGE)) vp[vn++] ="older";
 	if (l_ptr->flags9 & (RF9_LEVEL_POWER)) vp[vn++] ="more powerful";
+	if (l_ptr->flags9 & (RF9_LEVEL_POWER)) vp[vn++] ="specialised";
 
 	/* Describe "improvements" */
 	if (vn)

@@ -843,7 +843,7 @@ static cptr r_info_flags8[] =
  */
 static cptr r_info_flags9[] =
 {
-	"PLAYER_GHOST",
+	"LEVEL_CLASS",
 	"NEVER_MISS",
 	"LEVEL_SPEED",
 	"EVASIVE",

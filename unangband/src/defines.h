@@ -2563,7 +2563,7 @@
 #define RBM_EXPLODE	52
 #define RBM_ARROW	53
 #define RBM_XBOLT	54		/* Crossbow bolt */
-#define RBM_SPIKE	55
+#define RBM_DAGGER	55
 #define RBM_DART	56
 #define RBM_SHOT 	57
 #define RBM_ARC_20	58
@@ -2583,7 +2583,7 @@
 #define RBM_8WAY_II	72
 #define RBM_8WAY_III	73
 #define RBM_SWARM	74
-#define RBM_DAGGER	75
+#define RBM_SPIKE	75
 #define RBM_AIM_AREA	76
 #define RBM_SCATTER		77
 
@@ -3868,7 +3868,7 @@
 /*
  * Monster racial flags - extra flags from Sangband etc.
  */
-#define RF9_PLAYER_GHOST   0x00000001      /* Ghost of a former player */
+#define RF9_LEVEL_CLASS    0x00000001      /* Levels up class deeper in the dungeon */
 #define RF9_NEVER_MISS     0x00000002      /* Never miss when attacking */
 #define RF9_LEVEL_SPEED    0x00000004      /* Levels up speed deeper in the dungeon */
 #define RF9_EVASIVE        0x00000008      /* Evade melee blows / missiles / bolts */
@@ -3935,6 +3935,14 @@
  */
 #define RF8_SKIN_MASK \
 	(RF8_HAS_FUR | RF8_HAS_FEATHER | RF8_HAS_SCALE)
+
+
+/*
+ * "level" flags - used for scaling up monsters to match dungeon level
+ */
+#define RF9_LEVEL_MASK \
+	(RF9_LEVEL_AGE | RF9_LEVEL_CLASS | RF9_LEVEL_POWER | RF9_LEVEL_SPEED | RF9_LEVEL_SIZE)
+
 
 
 /*
