@@ -436,6 +436,7 @@ race only. You can press 'a' to assault a location with any allied troops.
 
 - Prevent show_tips interrupting running and repeated actions.
 
+- Added ecologies based on monster name and dragon breaths.
 
 
 ### Bug fixes ###
@@ -700,6 +701,9 @@ or Lothlorien.
 - Fix for #12234 cannot parse savefile.
 
 - Fix moving to stores with mouse.
+
+- Fix bug #12291 ancient hex garbles display.
+
 
 ### Build / Platform ###
 
