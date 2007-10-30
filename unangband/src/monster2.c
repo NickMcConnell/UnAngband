@@ -1366,7 +1366,7 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 			if (prefix) my_strcat(desc, prefix, max);
 			if (infix) { my_strcat(desc, infix, max); my_strcat(desc, " ", max); }
 			my_strcat(desc, name, max);
-			if (suffix) my_strcat(desc, suffix, max);
+			if (suffix) { my_strcat(desc, " ", max); my_strcat(desc, suffix, max); }
 		}
 
 		/* It could be a normal, definite, monster */
