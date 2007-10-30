@@ -4731,12 +4731,14 @@ bool place_monster(int y, int x, bool slp, bool grp)
  */
 static void summon_specific_params(int r_idx, int summon_specific_type)
 {
+	monster_race *r_ptr = &r_info[r_idx];
+	
 	/* Hack -- Set specific summoning parameters if not currently set */
 	switch (summon_specific_type)
 	{
 		case SUMMON_KIN:
 		{
-			if (!summon_char_type) summon_char_type = r_info[r_idx].d_char;
+			if (!summon_char_type) summon_char_type = r_ptr->d_char;
 			break;
 		}
 
@@ -4745,8 +4747,8 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 		{
 			if (!summon_flag_type)
 			{
-				summon_flag_type |= r_info[r_idx].flags3 & (RF3_RACE_MASK);
-				summon_flag_type |= r_info[r_idx].flags9 & (RF9_RACE_MASK);
+				summon_flag_type |= r_ptr->flags3 & (RF3_RACE_MASK);
+				summon_flag_type |= r_ptr->flags9 & (RF9_RACE_MASK);
 			}
 			break;
 		}
@@ -4757,10 +4759,21 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 			if (!summon_flag_type)
 			{
 				/* Undead animals */
-				if (r_info[r_idx].flags3 & (RF3_UNDEAD)) summon_flag_type |= (RF8_HAS_SKELETON);
-				else summon_flag_type |= r_info[r_idx].flags8 & (RF8_SKIN_MASK);
+				if (r_ptr->flags3 & (RF3_UNDEAD)) summon_flag_type |= (RF8_HAS_SKELETON);
+				else summon_flag_type |= r_ptr->flags8 & (RF8_SKIN_MASK);
 
-				if (!summon_flag_type) summon_flag_type = RF8_HAS_SCALE;
+				if (!summon_flag_type)
+				{
+					/* Everyone likes lions, tigers, wolves */
+					summon_flag_type |= RF8_HAS_FUR;
+
+					/* Surface dwellers like birds */
+					if ((r_ptr->flags9 & (RF9_RACE_MASK)) && ! (r_ptr->flags3 & (RF3_RACE_MASK))) 
+						summon_flag_type |= RF8_HAS_FEATHER;
+
+					/* Dungeon dwellers like reptiles, fish and worse */
+					else summon_flag_type |= RF8_HAS_SCALE;
+				}
 			}
 			break;
 		}
@@ -4771,7 +4784,7 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 		{
 			if (!summon_flag_type)
 			{
-				summon_flag_type = r_info[r_idx].flags2 & (RF2_CLASS_MASK);
+				summon_flag_type = r_ptr->flags2 & (RF2_CLASS_MASK);
 			}
 			break;
 		}
@@ -4780,12 +4793,12 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 		{
 			if (!summon_flag_type)
 			{
-				summon_flag_type |= r_info[r_idx].flags1 & (RF1_ATTR_CLEAR | RF1_ATTR_MULTI);
-				summon_flag_type |= r_info[r_idx].flags9 & (RF9_ATTR_METAL);
+				summon_flag_type |= r_ptr->flags1 & (RF1_ATTR_CLEAR | RF1_ATTR_MULTI);
+				summon_flag_type |= r_ptr->flags9 & (RF9_ATTR_METAL);
 			}
 			if (!summon_attr_type)
 			{
-				summon_attr_type = r_info[r_idx].d_attr;
+				summon_attr_type = r_ptr->d_attr;
 			}
 			break;
 		}
@@ -4793,7 +4806,7 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 		case SUMMON_PREFIX:
 		{
 			/* Copy prefix */
-			char *t = r_name + r_info[r_idx].name;
+			char *t = r_name + r_ptr->name;
 			char *s = summon_word_type;
 			
 			if (!strlen(summon_word_type))
@@ -4814,7 +4827,7 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 		case SUMMON_ALL_BUT_PREFIX:
 		{
 			/* Copy prefix */
-			char *t = r_name + r_info[r_idx].name;
+			char *t = r_name + r_ptr->name;
 			char *s = summon_word_type;
 			
 			if (!strlen(summon_word_type))
@@ -4837,7 +4850,7 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 		{
 			/* Copy prefix */
 			char *u = NULL;
-			char *t = r_name + r_info[r_idx].name;
+			char *t = r_name + r_ptr->name;
 			char *s = summon_word_type;
 			
 			int k = 0;
@@ -4906,14 +4919,14 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 			if (!summon_flag_type)
 			{
 				/* Hack - match on undead */
-				if (r_info[r_idx].flags3 & (RF3_UNDEAD))
+				if (r_ptr->flags3 & (RF3_UNDEAD))
 				{
 					summon_flag_type = 0x00000001L;
 				}
 				/* Match on breath */
 				else
 				{
-					summon_flag_type = r_info[r_idx].flags4 & (RF4_BREATH_MASK);
+					summon_flag_type = r_ptr->flags4 & (RF4_BREATH_MASK);
 				}
 			}
 			break;
@@ -4924,7 +4937,7 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 		{
 			if (!summon_group_type)
 			{
-				summon_group_type = r_info[r_idx].grp_idx;
+				summon_group_type = r_ptr->grp_idx;
 			}
 			break;
 		}
@@ -4942,8 +4955,8 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 		{
 			if (!summon_attr_type && !summon_char_type)
 			{
-				summon_char_type = r_info[r_idx].d_char;
-				summon_attr_type = r_info[r_idx].d_attr;
+				summon_char_type = r_ptr->d_char;
+				summon_attr_type = r_ptr->d_attr;
 			}
 			break;
 		}
