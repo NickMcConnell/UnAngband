@@ -207,8 +207,6 @@ void find_range(int m_idx)
 				
 				/* Ensure we don't push anyone else into this space */
 				m_ptr->mflag |= (MFLAG_PUSH);
-				
-				msg_print("backing");
 			}
 		}
 		/* Hack and back against player */
