@@ -3935,6 +3935,13 @@ errr file_character(cptr name, bool full)
 			text_out(t_name + t_info[i].name);
 			text_out(".\n");
 		}
+		else if (t_info[i].visited)
+		{
+			text_out("You have visited ");
+
+			text_out(t_name + t_info[i].name);
+			text_out(".\n");
+		}
 	}
 
 	text_out("\n");
