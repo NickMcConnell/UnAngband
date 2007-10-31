@@ -4113,7 +4113,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					/* Message */
 					if (known)
 					{
-						if ((!blind) && (n_ptr->ml)) msg_format("%^s looks very healthy!",  t_name);
+						if ((!blind) && (n_ptr->ml)) msg_format("%^s looks very healthy!",  t_nref);
 						else msg_format("%^s sounds very healthy!", t_nref);
 					}
 				}
@@ -4124,7 +4124,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					/* Message */
 					if (known)
 					{
-						if ((!blind) && (n_ptr->ml)) msg_format("%^s looks healthier.",  t_name);
+						if ((!blind) && (n_ptr->ml)) msg_format("%^s looks healthier.",  t_nref);
 						else msg_format("%^s sounds healthier.", t_nref);
 					}
 				}
