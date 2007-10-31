@@ -11108,7 +11108,7 @@ N:813:clear fountain
 G:0:b
 U:56
 M:385
-W:1:1:20:0
+W:1:6:20:0
 K:DEFAULT:1
 K:BASH:383
 K:OPEN:383
