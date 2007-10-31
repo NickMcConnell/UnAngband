@@ -418,7 +418,7 @@ W:3:1:0:6
 B:HIT:HURT:1d8
 F:DROP_60
 F:OPEN_DOOR | BASH_DOOR
-F:EVIL | ORC | IM_POIS | DWARF | LEVEL_POWER | LEVEL_CLASS
+F:EVIL | ORC | IM_POIS | DWARF | LEVEL_POWER
 D:It is a small ugly humanoid.
 
 N:26:White worm mass
@@ -2295,7 +2295,7 @@ F:FRIENDS
 F:DROP_60
 F:OPEN_DOOR | BASH_DOOR
 F:EVIL | GIANT
-F:ORC | LEVEL_POWER | LEVEL_CLASS | LEVEL_SIZE
+F:ORC | LEVEL_POWER | LEVEL_SIZE
 D:A hideous, smallish giant that is often found near or with orcs.
 
 N:175:Creeping mithril coins
