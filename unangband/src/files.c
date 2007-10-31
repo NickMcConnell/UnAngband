@@ -6170,6 +6170,12 @@ static void close_game_aux(void)
 	bool wants_to_quit = FALSE;
 	cptr p = "[(i)nformation, (m)essages, (f)ile dump, (v)iew scores, e(x)amine item, ESC]";
 
+	char ftmp[80];
+
+	errr err;
+
+
+	sprintf(ftmp, "%s.txt", op_ptr->base_name);
 
 	/* Handle retirement */
 	if (p_ptr->total_winner) kingly();
@@ -6179,6 +6185,28 @@ static void close_game_aux(void)
 	{
 		msg_print("death save failed!");
 		message_flush();
+	}
+
+	/* Easy more? */
+	if (easy_more) messages_easy(FALSE);
+	
+	/* Save screen */
+	screen_save();
+
+	/* Dump a character file */
+	err = file_character(ftmp, FALSE);
+
+	/* Load screen */
+	screen_load();
+
+	/* Check result */
+	if (err)
+	{
+		msg_print("Character dump failed!");
+	}
+	else
+	{
+		msg_print("Character dump successful.");
 	}
 
 	/* Get time of death */
@@ -6223,16 +6251,10 @@ static void close_game_aux(void)
 			case 'f':
 			case 'F':
 			{
-				char ftmp[80];
-
-				sprintf(ftmp, "%s.txt", op_ptr->base_name);
-
 				if (get_string("File name: ", ftmp, 80))
 				{
 					if (ftmp[0] && (ftmp[0] != ' '))
 					{
-						errr err;
-
 						/* Save screen */
 						screen_save();
 
