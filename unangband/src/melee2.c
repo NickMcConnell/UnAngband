@@ -6933,6 +6933,13 @@ static void process_monster(int m_idx)
 		ty = m_ptr->fy + ddy_ddd[dir];
 		tx = m_ptr->fx + ddx_ddd[dir];
 	}
+	
+	/* Allies try not to disturb the players rest */
+	else if ((m_ptr->mflag & (MFLAG_ALLY)) && !(m_ptr->ty) && !(m_ptr->tx) && (p_ptr->resting))
+	{
+		/* Don't move as this disturbs the player */
+		return;
+	}
 
 	/* Monster isn't confused, just moving semi-randomly, or monster is partially confused */
 	else if ((random) || ((m_ptr->confused) && (m_ptr->confused > rand_int(50))))
