@@ -8767,6 +8767,9 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 				/* Prepare the object */
 				object_prep(o_ptr, what);
+				
+				/* Hack -- fake knowledge */
+				o_ptr->ident |= (IDENT_STORE);
 
 				/* Get the object name */
 				object_desc(killer, sizeof(killer), o_ptr, TRUE, 0); 
