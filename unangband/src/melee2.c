@@ -5915,7 +5915,11 @@ static void process_monster(int m_idx)
 		}
 
 		/* Player has attacked the monster */
-		if ((m_ptr->mflag & (MFLAG_HIT_RANGE | MFLAG_HIT_BLOW)))
+		if (((m_ptr->mflag & (MFLAG_HIT_RANGE | MFLAG_HIT_BLOW)) != 0) &&
+		
+				/* Hack -- ensure monster cannot move before getting target */
+				((r_ptr->flags1 & (RF1_NEVER_MOVE | RF1_NEVER_BLOW)) == 0) &&
+			!(m_ptr->petrify))
 		{
 			m_ptr->ty = p_ptr->py;
 			m_ptr->tx = p_ptr->px;
@@ -6841,13 +6845,15 @@ static void process_monster(int m_idx)
 		 * If the player is moving away from the monster, the distance
 		 * will exceed the best range and the target will be aborted.
 		 */
-		if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && ((m_ptr->mflag & (MFLAG_IGNORE)) == 0) && (!must_use_target))
+		if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && ((m_ptr->mflag & (MFLAG_IGNORE)) == 0) && (!must_use_target) &&
+				/* Hack - never move monsters never get a target */
+				((r_ptr->flags1 & (RF1_NEVER_MOVE)) == 0) && !(m_ptr->petrify))
 		{
 			/* Player has target set. */
 			if (p_ptr->target_set)
 			{
-				/* Player is targetting a monster. */
-				if (p_ptr->target_who > 0)
+				/* Player is targetting a monster and ally is allowed to attack. */
+				if ((p_ptr->target_who > 0) && ((r_ptr->flags1 & (RF1_NEVER_BLOW)) == 0))
 				{
 					monster_type *n_ptr = &m_list[p_ptr->target_who];
 					
@@ -6871,7 +6877,7 @@ static void process_monster(int m_idx)
 			}
 			
 			/* Follow the player.*/
-			else
+			else if (m_ptr->min_range > m_ptr->cdis)
 			{
 				m_ptr->ty = p_ptr->py;
 				m_ptr->tx = p_ptr->px;
