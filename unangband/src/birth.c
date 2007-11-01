@@ -3051,6 +3051,10 @@ void player_birth(void)
 	if (adult_campaign) p_ptr->dungeon = 1;
 	else p_ptr->dungeon = z_info->t_max - 2;
 
+	/* Hack -- set the town. This is now required for shop restocking. */
+	if (adult_campaign) p_ptr->town = 1;
+	else p_ptr->town = z_info->t_max - 2;
+
 	/* Set last disturb */
 	p_ptr->last_disturb = turn;
 
