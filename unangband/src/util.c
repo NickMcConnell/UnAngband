@@ -2955,8 +2955,11 @@ static void msg_print_aux(u16b type, cptr msg)
 		t += split; n -= split;
 	}
 
+	/* Insert a space */
+	t[n] = ' ';
+
 	/* Display the tail of the message */
-	Term_putstr(message_column, 0, n, color, t);
+	Term_putstr(message_column, 0, n + 1, color, t);
 
 	/* Remember the message */
 	msg_flag = TRUE;
