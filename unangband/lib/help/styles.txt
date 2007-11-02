@@ -162,7 +162,8 @@
                 these devices and the magic they manifest.  Amulet specialists
                 may identify simple amulets as they see them, and slowly
                 improve in the range of magical amulets identified at higher
-                levels.
+                levels. They can also wear a second amulet and use amulets
+                as an extra protection for their chests.
 
 ***** <Wands>
         Wands
@@ -207,14 +208,17 @@
                 them, and slowly improve in the range of magical scrolls
                 identified at higher levels.  In addition, the effects of
                 scrolls they use or set in traps is increased at up to 3 times
-                the damage that a non-specialist benefits fro
+                the damage that a non-specialist benefits from.
 
 ***** <Rings>
         Rings
                 Ring specialists have a refined knowledge of the interactions
-                of metals, minerals and settings required for magical jewelery
+                of metals, minerals and settings required for magical jewelry
                 such as rings. Jewelers may identify simple rings, improving
-                in the number of types identified at higher levels.
+                in the number of types identified at higher levels. 
+		They can also wear one extra ring among their equipment.
+                Some fighters are so used to magic rings on their fingers 
+                that they have trouble gripping weapons without rings.
 
 ***** <Instruments>
         Instruments
