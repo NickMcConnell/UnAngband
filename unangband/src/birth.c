@@ -400,6 +400,7 @@ static void player_wipe(void)
 	for (i = 0; i < z_info->t_max; i++)
 	{
 		t_info[i].max_depth = 0;
+		t_info[i].visited = 0;
 	}
 
 	/* Start with no artifacts made yet */
