@@ -19,9 +19,12 @@
  
  [2] If you have allies, they will attack this monster.  Allies with
  ranged attacks will stand back from the monster and attack it with their
- ranged attacks.  Allies without ranged attacks will advance to the
- monster.  If the monster moves, allies will continue to follow it, as
- long as the monster stays visible to you.
+ ranged attacks.  Allies without ranged attacks will go to the monster. If
+ the monster moves, allies will continue to follow it, as long as the
+ monster stays visible to you.
+ 
+ If you target a grid without a monster, allies will go to the grid.
+ Note the difference between this and 'a' assaulting a grid.
  
  [3] This computes the lowest cost path to the grid, and then begins
  'running' the player towards the grid. If the path is too long, or no
@@ -30,8 +33,8 @@
  
  [4] If you have allies, they will 'assault' this grid.  Allies with
  ranged attacks will stand back from the grid and attack monsters near
- it with their ranged attacks.  Allies without ranged attacks will advance
- on the grid.
+ it with their ranged attacks.  Allies without ranged attacks will go to
+ the grid.
  
  [5] If you have allies, they will seek out monsters of the same race as
  this monster, in preference to all others.
