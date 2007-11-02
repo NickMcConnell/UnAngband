@@ -542,6 +542,8 @@ static void do_cmd_travel(void)
 			msg_print("You'll want a full stomach for the road ahead.");
 			msg_print("Hint: Try the 'E' (shift-E) command to eat something.");
 			msg_print(NULL);
+			
+			if (easy_more) messages_easy(FALSE);
 		}
 		
 		if (p_ptr->blind)
@@ -746,6 +748,9 @@ static void do_cmd_travel(void)
 			p_ptr->max_depth = min_depth(p_ptr->dungeon);
 #endif
 
+			/* Clear stairs */
+			p_ptr->create_stair = 0;
+			
 			/* Leaving */
 			p_ptr->leaving = TRUE;
 		}
