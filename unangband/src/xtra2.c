@@ -6344,7 +6344,17 @@ bool target_set_interactive(int mode)
 				case '?':
 				{
 					screen_save();
-					(void)show_file("target.txt", NULL, 0, 0);
+					
+					/* Help file depends on mode */
+					if (mode & (TARGET_KILL))
+					{
+						(void)show_file("cmdkill.txt", NULL, 0, 0);
+					}
+					else
+					{
+						(void)show_file("cmdlook.txt", NULL, 0, 0);
+					}
+					
 					screen_load();
 					break;
 				}

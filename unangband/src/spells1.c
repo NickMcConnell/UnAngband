@@ -1372,6 +1372,9 @@ static bool hates_fire(object_type *o_ptr)
 
 		/* Flasks burn */
 		case TV_FLASK:
+			
+		/* Bodies get cooked */
+		case TV_BODY:
 		{
 			return (TRUE);
 		}
@@ -4588,6 +4591,13 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 			}			
 		}
 
+		/* Hack -- cook meat */
+		if ((o_ptr->tval == TV_BODY) && (prefix(note_kill, " burn")))
+		{
+			note_kill = (plural ? " cooks!" : " cook!");
+			
+			/* TODO: Paranoia - we should produce slabs of cooked meat, but don't yet */
+		}
 
 		/* Attempt to destroy the object */
 		if (do_kill)
