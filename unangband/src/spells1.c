@@ -1340,7 +1340,7 @@ static bool hates_acid(object_type *o_ptr)
  * Hafted/Polearm weapons have wooden shafts.
  * Arrows/Bows are mostly wooden.
  */
-static bool hates_fire(object_type *o_ptr)
+bool hates_fire(object_type *o_ptr)
 {
 	/* Analyze the type */
 	switch (o_ptr->tval)

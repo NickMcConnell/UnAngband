@@ -2762,6 +2762,7 @@
 #define USE_FEATG		0x10	/* Allow features (gettable) */
 #define USE_QUIVER		0x20	/* Allow quiver items, forbid classic equipment */
 #define USE_SELF		0x40	/* Allow selection of player */
+#define USE_FEATH		0x80	/* Allow features (hurt by fire) */
 
 
 /*** Player flags ***/
