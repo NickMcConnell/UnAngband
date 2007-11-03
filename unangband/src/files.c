@@ -1873,8 +1873,11 @@ static void display_player_xtra_info(void)
 	dam = 0;
 	hit_real = p_ptr->to_h;
 
+	/* Check shooting styles only */
+	style = p_ptr->cur_style & WS_THROWN_FLAGS;
+
 	/* Get style benefits */
-	mon_style_benefits(NULL, WS_THROWN_FLAGS, &style_hit, &style_dam, &style_crit);
+	mon_style_benefits(NULL, style, &style_hit, &style_dam, &style_crit);
 	hit += style_hit;
 	dam += style_dam;
 	hit_real += style_hit;
