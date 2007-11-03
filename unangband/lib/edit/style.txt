@@ -9,6 +9,8 @@
 # everybody enjoys the benefit, regardless of style chosen or exercised.
 # This is caught by "w_info[i].styles==0" in the code).
 
+#!!!All below should be somehow moved to help files and removed from here!!!
+
 #NONE: No style. Limited benefits, but available regardless 
 #  of weapon wielded, etc.
 #UNARMED: Not wielding a weapon or shield.
@@ -22,7 +24,7 @@
 #  With two weapons, if players get more than one attack,
 #  2nd weapon gets every 2nd attack. Also, when charging,
 #  players with two equipped weapons always get two attacks, instead of one.
-#THROWN: Not firing with an item (or whilst using a musical instrument in bow slow).
+#THROWN: Throwing (not firing) an item.
 #SLING: Firing with a sling.
 #BOW: Firing with a bow.
 #XBOW: Firing with a crossbow.
@@ -47,10 +49,9 @@
 #XTRA_BLOW: Additional blow.
 #XTRA_SHOT: Additional shot. With "S:NONE" works for both launchers and thrown.
 #XTRA_MIGHT: Additional multiple on damage when fired/thrown.
-#CRITICAL: Additional critical damage against normal size humanoid 
-#  opponents only. With "S:NONE" works for melee, launchers and thrown.
+#CRITICAL: Additional critical damage. With "S:NONE" works for melee, launchers and thrown.
 #POWER: Gets bonus of 10 levels to effective spell level when computing damage, radius
-# etc and learn spells at 80% of the listed level requirement.
+# etc. and learn spells at 80% of the listed level requirement.
 #ICKY_HANDS: Gets spell casting penalty when wearing non-free action gloves.
 #  A Priest specializing in a single Magic Book
 #  will be penalized with ICKY_HANDS for all his prayers, too.
