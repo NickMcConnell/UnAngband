@@ -2731,6 +2731,9 @@ static bool do_cmd_walk_test(int y, int x)
 
 	/* Hack -- walking allows pickup XXX XXX */
 	if (cave_o_idx[y][x] >0) return (TRUE);
+	
+	/* Hack -- walking allows gathering XXX XXX */
+	if (f_info[feat].flags3 & (FF3_GET_FEAT)) return (TRUE);
 
 	/* Player can not walk through "walls" */
 	/* Also cannot climb over unknown "trees/rubble" */
