@@ -849,7 +849,7 @@ C:9:34:20:75:80
 F:SHIELD
 L:1d20+30
 
-N:57:Beserker
+N:57:Berserker
 A:75:33:1
 A:90:7:10
 A:92:9:2
