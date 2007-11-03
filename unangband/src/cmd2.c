@@ -3384,7 +3384,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 	y = p_ptr->py;
 	x = p_ptr->px;
 	
-	/* Test for fumble - coated weapons are riskier thrown/shot then wielded */
+	/* Test for fumble - coated weapons are riskier thrown/shot than wielded */
 	if (((p_ptr->heavy_wield) || (cursed_p(o_ptr)) || (coated_p(o_ptr))) && (!rand_int(ranged_skill)))
 	{
 		int dir;
@@ -3396,7 +3396,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 	}
 
 	/* Iterate through trick throw targets;
-	 the last pass if for returning to player;
+	 the last pass is for returning to player;
 	 if no tricks, just one iteration */
 	else for (tricks = 0; tricks < num_tricks; tricks++)
 	{
@@ -3506,7 +3506,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 			if (!cave_project_bold(ny, nx)) 
 			{
 				/* 1st cause of failure: returning weapon hits a wall */
-				trick_failure = tdis == 256;
+			        trick_failure = (tdis == 256);
 
 				break;
 			}
@@ -3586,6 +3586,10 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 				/* Pause anyway, for consistancy */
 				Term_xtra(TERM_XTRA_DELAY, msec);
 			}
+
+			/* Always catch returning weapon */
+			if (tdis == 256 && x == p_ptr->px && y == p_ptr->py)
+			  break;
 
 			/* Handle monster */
 			if (cave_m_idx[y][x] > 0)
@@ -3689,7 +3693,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 					/* Note the collision */
 					ammo_can_break = TRUE;
 
-					/* 2nd and last cause of failure: bounce off monster */
+					/* 2nd cause of failure: bounce off monster */
 					trick_failure = !genuine_hit;
 
 					/* Disturb the monster */
@@ -3853,6 +3857,9 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 				}
 			}
 		}
+
+		/* 3rd and last cause of failure: out of range, unless returning */
+		trick_failure = (i == path_n && tdis != 256);
 	}
 
 	/* Reenable auto-target */
@@ -3885,7 +3892,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 	}
 
 	/* Is this a trick throw and has the weapon returned? */
-	if (trick_throw && !trick_failure)
+	if (fumble || (trick_throw && !trick_failure))
 	{
 		if (!fumble)
 		{
@@ -3949,6 +3956,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 			}
 
 			/* Weapon caught */
+			msg_format("Ouch!");
 		}
 		else if (catch_chance <= 10 + catch_chance / 10)
 		/* You don't catch the returning weapon; it almost hits you */
@@ -3956,7 +3964,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 			/* Describe */
 			object_desc(o_name, sizeof(o_name), i_ptr, FALSE, 0);
 
-			msg_format("The returning %^s narrowly misses you.", o_name);
+			msg_format("The returning %^s bumps off your torso.", o_name);
 
 			/* Weapon not caught */
 			trick_failure = TRUE;
