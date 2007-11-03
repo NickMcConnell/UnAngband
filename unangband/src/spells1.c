@@ -4050,6 +4050,8 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 	u32b if4=0;
 
 	char o_name[80];
+	
+	int make_meat = 0;
 
 	/* Prevent warning */
 	(void)who;
@@ -4188,11 +4190,22 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 				break;
 			}
 
+			/* Salt water -- salts meat */
+			case GF_SALT_WATER:
+			{
+				if (o_ptr->tval == TV_BODY)
+				{
+					do_kill = TRUE;
+					note_kill = (plural ? " salt!" : " salts!");
+					make_meat += o_ptr->weight;
+					break;
+				}				
+			}
+
 			/* Water -- books, lites, scrolls, food */
 			case GF_WATER:
 			case GF_BWATER:
 			case GF_WATER_WEAK:
-			case GF_SALT_WATER:
 			{
 				if (hates_water(o_ptr))
 				{
@@ -4594,9 +4607,9 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 		/* Hack -- cook meat */
 		if ((o_ptr->tval == TV_BODY) && (prefix(note_kill, " burn")))
 		{
-			note_kill = (plural ? " cooks!" : " cook!");
+			note_kill = (plural ? " cook!" : " cooks!");
 			
-			/* TODO: Paranoia - we should produce slabs of cooked meat, but don't yet */
+			make_meat += o_ptr->weight;
 		}
 
 		/* Attempt to destroy the object */
@@ -4738,6 +4751,31 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 
 			continue;
 		}
+	}
+	
+	/* Make meat */
+	while (make_meat > 0)
+	{
+		/* Local object */
+		object_type object_type_body;
+	
+		/* Get local object */
+		object_type *i_ptr = &object_type_body;
+	
+		/* Wipe the new object */
+		object_wipe(i_ptr);
+	
+		/* Prepare the object */
+		object_prep(i_ptr, 981);
+
+		/* Drop it near the new location */
+		drop_near(i_ptr, -1, y, x);
+	
+		/* Redraw */
+		lite_spot(y, x);
+		
+		/* Reduce meat */
+		make_meat -= i_ptr->weight;
 	}
 
 	/* Return "Anything seen?" */
