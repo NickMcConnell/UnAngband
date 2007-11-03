@@ -576,6 +576,7 @@ static void player_outfit(void)
 				}
 
 				case TV_BOW:
+				case TV_INSTRUMENT:
 				{
 					switch (p_ptr->pstyle)
 					{
