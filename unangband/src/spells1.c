@@ -9338,7 +9338,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				else if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0)
 				{
 					msg_print("You feel your life slipping away!");
-					lose_exp(500 + (p_ptr->exp/1000) * MON_DRAIN_LIFE);
+					lose_exp(100 + (p_ptr->exp/1000) * MON_DRAIN_LIFE);
 
 					/* Always notice */
 					if (!p_ptr->blessed) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
@@ -9346,7 +9346,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				else
 				{
 					msg_print("You feel your life draining away!");
-					lose_exp(5000 + (p_ptr->exp/100) * MON_DRAIN_LIFE);
+					lose_exp(100 + (p_ptr->exp/100) * MON_DRAIN_LIFE);
 
 					/* Always notice */
 					player_not_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
