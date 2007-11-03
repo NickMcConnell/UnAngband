@@ -4767,7 +4767,10 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 	
 		/* Prepare the object */
 		object_prep(i_ptr, 981);
-
+		
+		/* Hack -- ensure we don't violate conservation of mass */
+		if (make_meat < i_ptr->weight) i_ptr->weight = make_meat;
+	
 		/* Drop it near the new location */
 		drop_near(i_ptr, -1, y, x);
 	
