@@ -3942,7 +3942,7 @@
  * "level" flags - used for scaling up monsters to match dungeon level
  */
 #define RF9_LEVEL_MASK \
-	(RF9_LEVEL_AGE | RF9_LEVEL_CLASS | RF9_LEVEL_POWER | RF9_LEVEL_SPEED | RF9_LEVEL_SIZE)
+	(RF9_LEVEL_AGE | /* RF9_LEVEL_CLASS | */ RF9_LEVEL_POWER | RF9_LEVEL_SPEED | RF9_LEVEL_SIZE)
 
 
 

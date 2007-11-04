@@ -118,7 +118,7 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 
 	/* Apply only one level flag */
 	if (n_ptr->flags9 & (RF9_LEVEL_AGE)) flag[n++] = RF9_LEVEL_AGE;
-	if (n_ptr->flags9 & (RF9_LEVEL_CLASS)) flag[n++] = RF9_LEVEL_CLASS;
+	/* if (n_ptr->flags9 & (RF9_LEVEL_CLASS)) flag[n++] = RF9_LEVEL_CLASS;*/
 	if (n_ptr->flags9 & (RF9_LEVEL_SPEED)) flag[n++] = RF9_LEVEL_SPEED;
 	if (n_ptr->flags9 & (RF9_LEVEL_POWER)) flag[n++] = RF9_LEVEL_POWER;
 	if (n_ptr->flags9 & (RF9_LEVEL_SIZE)) flag[n++] = RF9_LEVEL_SIZE;
