@@ -1378,7 +1378,7 @@ void py_pickup(int py, int px, int pickup)
 	}
 
 	/* Are we allowed to pick up anything here? */
-	if (!(f_ptr->flags1 & (FF1_DROP)) && !gather) return;
+	if (!(f_ptr->flags1 & (FF1_DROP)) && (f_ptr->flags1 & (FF1_MOVE)) && !gather) return;
 	
 	/* Scan the pile of objects */
 	for (this_o_idx = cave_o_idx[py][px]; this_o_idx || gather; this_o_idx = next_o_idx)
