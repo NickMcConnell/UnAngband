@@ -1372,7 +1372,7 @@ void py_pickup(int py, int px, int pickup)
 	feature_type *f_ptr = &f_info[cave_feat[py][px]];
 	
 	/* Hack -- gather features from walls */
-	if (!(f_ptr->flags1 & (FF1_MOVE)) && (f_ptr->flags3 & (FF3_GET_FEAT)))
+	if (!(f_ptr->flags1 & (FF1_MOVE)) && !(f_ptr->flags3 & (FF3_EASY_CLIMB)) && (f_ptr->flags3 & (FF3_GET_FEAT)))
 	{
 		gather = TRUE;
 	}
