@@ -4605,7 +4605,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Hack -- cook meat */
-		if ((o_ptr->tval == TV_BODY) && (prefix(note_kill, " burn")))
+		if ((o_ptr->tval == TV_BODY) && (who == SOURCE_FEATURE) && (note_kill) && (prefix(note_kill, " burn")))
 		{
 			note_kill = (plural ? " cook!" : " cooks!");
 			
