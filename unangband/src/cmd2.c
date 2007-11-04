@@ -3521,7 +3521,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 			if (!cave_project_bold(ny, nx)) 
 			{
 				/* 1st cause of failure: returning weapon hits a wall */
-			        trick_failure = (tdis == 256);
+			        trick_failure = trick_failure || (tdis == 256);
 
 				break;
 			}
@@ -3709,7 +3709,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 					ammo_can_break = TRUE;
 
 					/* 2nd cause of failure: bounce off monster */
-					trick_failure = !genuine_hit;
+					trick_failure = trick_failure || !genuine_hit;
 
 					/* Disturb the monster */
 					m_ptr->csleep = 0;
@@ -3874,7 +3874,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 		}
 
 		/* 3rd and last cause of failure: out of range, unless returning */
-		trick_failure = (i == path_n && tdis != 256);
+		trick_failure = trick_failure || (i == path_n && tdis != 256);
 	}
 
 	/* Reenable auto-target */
