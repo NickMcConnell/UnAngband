@@ -373,6 +373,22 @@ gives them some grace e.g. preventing small chance of paralysis on the first blo
 - Different approach to applying disease effects. They now only hit you when you enter a level,
 unless a quick disease (which retains the old process).
 
+- Added ecologies based on monster name and dragon breaths.
+
+- If you have a torch or weapon with a known fire brand wielded, you can use this to light the terrain directly under you, using the | command.
+
+- Added 'dungeon chicken'.
+
+- Tweaked Bree so that it's doable in one go without WOR, made Bill Fenry and a pair of similar uniques bit weaker  (Mikolaj Konarski)
+
+- Give druids another spell at 3rd level. They didn't have enough of a choice otherwise.
+
+- Every dungeon guardian creates a stairwell at death.
+
+- Allow torches to be taken from walls.
+
+
+
 
 ### User Interface ###
 
@@ -436,25 +452,11 @@ race only. You can press 'a' to assault a location with any allied troops.
 
 - Prevent show_tips interrupting running and repeated actions.
 
-- Added ecologies based on monster name and dragon breaths.
-
-- Every dungeon guardian creates a stairwell at death.
-
-- Allow torches to be taken from walls.
-
 - Tweaked trick throws, etc. a little bit (Mikolaj Konarski)
 
 - Tips about spikes, cooking, body parts and magical bags added.
 
-- If you have a torch or weapon with a known fire brand wielded, you can use this to light the terrain directly under you, using the | command.
-
-- Added 'dungeon chicken'.
-
 - Added help files for when looking/targetting.
-
-- Tweaked Bree so that it's doable in one go without WOR, made Bill Fenry and a pair of similar uniques bit weaker  (Mikolaj Konarski)
-
-- Give druids another spell at 3rd level. They didn't have enough of a choice otherwise.
 
 - Always dump character file at death.
 
