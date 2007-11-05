@@ -3101,7 +3101,6 @@ N:241:Love Potion
 A:90:13:8
 A:90:0:5
 A:93:2:19
-A:99:26:1
 A:90:53:21
 C:1:10:15:95:160
 C:3:15:20:95:100
@@ -6260,7 +6259,7 @@ B:SELF:AWAY_ALL:2d0+0
 
 N:595:Rest until Dusk
 A:99:26:1
-A:90:22:3
+A:97:22:3
 S:REST_UNTIL_DUSK
 
 N:596:Rest until Dawn

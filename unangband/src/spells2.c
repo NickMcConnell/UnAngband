@@ -7783,7 +7783,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				}
 				
 				/* Hack -- Set time to one turn before sun down / sunrise */
-				turn += ((10L * TOWN_DAWN) / 2) - (turn % (10L * TOWN_DAWN)) - 1 +
+				turn += ((10L * TOWN_DAWN) / 2) - (turn % ((10L * TOWN_DAWN)) / 2) - 1 +
 					((level_flag & (LF1_DAYLIGHT)) == (spell == SPELL_REST_UNTIL_DUSK)) ?
 						(10L * TOWN_DAWN) / 2 : 0;
 
