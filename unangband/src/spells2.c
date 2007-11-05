@@ -6247,7 +6247,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 				/* Hack - scale damage */
 				if ((level > 8) && (d_side)) damage += damroll((level-5)/4, d_side);
 				
-				if (fire_bolt_or_beam(beam - 10, who, what, effect, dir, damage)) obvious = TRUE;
+				if (fire_bolt_or_beam(who, what, beam - 10, effect, dir, damage)) obvious = TRUE;
 				break;
 			}
 
@@ -6263,7 +6263,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 				/* Hack - scale damage */
 				if ((level > 8) && (d_side)) damage += damroll((level-5)/4, d_side);
 				
-				if (fire_bolt_or_beam(beam, who, what, effect, dir, damage)) obvious = TRUE;
+				if (fire_bolt_or_beam(who, what, beam, effect, dir, damage)) obvious = TRUE;
 
 				break;
 			}
