@@ -6828,7 +6828,12 @@ bool get_aim_dir(int *dp)
 			{
 				if (ke.mousebutton)
 				{
-					target_set_location(KEY_GRID_Y(ke), KEY_GRID_X(ke), 0);
+					int y = KEY_GRID_Y(ke);
+					int x = KEY_GRID_X(ke);
+					
+					if (!in_bounds_fully(y, x)) break;
+					
+					target_set_location(y, x, 0);
 					dir = 5;
 					break;
 				}
@@ -6951,8 +6956,12 @@ bool get_rep_dir(int *dp)
 				int y = KEY_GRID_Y(ke);
 				int x = KEY_GRID_X(ke);
 
+				int angle;
+				
+				if (!in_bounds_fully(y, x)) break;
+				
 				/* Calculate approximate angle */
-				int angle = get_angle_to_target(p_ptr->py, p_ptr->px,y, x, 0);
+				angle = get_angle_to_target(p_ptr->py, p_ptr->px,y, x, 0);
 
 				/* Convert angle to direction */
 				if (angle < 15) dir = 6;
