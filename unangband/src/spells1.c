@@ -4193,7 +4193,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 			/* Salt water -- salts meat */
 			case GF_SALT_WATER:
 			{
-				if (o_ptr->tval == TV_BODY)
+				if ((o_ptr->tval == TV_BODY) && (who != (SOURCE_FEATURE)))
 				{
 					do_kill = TRUE;
 					note_kill = (plural ? " salt!" : " salts!");
