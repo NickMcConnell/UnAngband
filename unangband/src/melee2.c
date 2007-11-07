@@ -7041,6 +7041,39 @@ static void recover_monster(int m_idx, bool regen)
 			/* Delete monster summoned by player */
 			if (m_ptr->mflag & (MFLAG_ALLY))
 			{
+				s16b this_o_idx, next_o_idx = 0;
+				
+				/* Drop objects being carried */
+				for (this_o_idx = m_ptr->hold_o_idx; this_o_idx; this_o_idx = next_o_idx)
+				{
+					object_type *o_ptr, *i_ptr;
+					object_type object_type_body;
+
+					/* Get the object */
+					o_ptr = &o_list[this_o_idx];
+
+					/* Get the next object */
+					next_o_idx = o_ptr->next_o_idx;
+
+					/* Paranoia */
+					o_ptr->held_m_idx = 0;
+
+					/* Get local object */
+					i_ptr = &object_type_body;
+
+					/* Copy the object */
+					object_copy(i_ptr, o_ptr);
+
+					/* Delete the object */
+					delete_object_idx(this_o_idx);
+
+					/* Drop it */
+					drop_near(i_ptr, -1, y, x);
+				}
+
+				/* Forget objects */
+				m_ptr->hold_o_idx = 0;
+
 				/* Get the monster name */
 				monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
