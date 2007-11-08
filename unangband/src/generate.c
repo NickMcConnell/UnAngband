@@ -1429,7 +1429,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 			if (!k) break;
 			
 			/* Convert coordinates */
-			/* FIXME: ty and tx may be uninitialized here!!! */
+			/* FIXME: ty and tx may probably be 0 here from initialization, is it correct? */
 			y = ty;
 			x = tx;
 			j = YPOS(y, y1);
@@ -1439,7 +1439,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 			if (loops)
 			{
 				/* Place floors */
-			        /* FIXME: dy and dx may be uninitialized here!!! */
+			        /* FIXME: dy and dx may probably be 0 here from initialization, is it correct? */
 				for (yi = j - (dy < 0 ? width_wall + width_path : 0); yi < j + (dy < 0 ? 0 : width_path) + (dy > 0 ? width_wall + width_path : 0); yi++)
 				{
 					for (xi = i - (dx < 0 ? width_wall + width_path : 0); xi < i + (dx < 0 ? 0 : width_path) + (dx > 0 ? width_wall + width_path : 0); xi++)
