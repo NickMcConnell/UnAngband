@@ -1056,8 +1056,8 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	int grids;
 
 	int y, x;
-	int ty, tx;
-	int dy, dx;
+	int ty = 0, tx = 0;
+	int dy = 0, dx = 0;
 	int yi, xi;
 	
 	int width_outer = flag & (MAZE_WALL) ? 1 : 0;
