@@ -232,7 +232,7 @@ static cptr r_info_blow_method[] =
 	"EXPLODE",
 	"ARROW",
 	"XBOLT",
-	"SPIKE",
+	"DAGGER",
 	"DART",
 	"SHOT",
 	"ARC_20",
@@ -252,7 +252,7 @@ static cptr r_info_blow_method[] =
 	"8WAY_II",
 	"8WAY_III",
 	"SWARM",
-	"DAGGER",
+	"SPIKE",
 	"AIM_AREA",
 	"SCATTER",
 	NULL

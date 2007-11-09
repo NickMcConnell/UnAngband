@@ -1363,9 +1363,18 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		f6 &= ~(RF6_SUMMON_MASK);
 		f7 &= ~(RF7_SUMMON_MASK);
 		
+		/* Prevent blinking unless target is at wrong range - note check to see if we can blink for efficiency */
+		if (((f6 & (RF6_BLINK)) != 0) && (!(m_ptr->ty) || !(m_ptr->tx) || (ABS(m_ptr->best_range - distance(m_ptr->fy, m_ptr->fx, m_ptr->ty, m_ptr->tx)) < 4)))
+		{
+			f6 &= ~(RF6_BLINK);
+		}
+		
 		/* Prevent teleporting unless afraid */
-		if (!m_ptr->monfear) f6 &= ~(RF6_BLINK | RF6_TPORT);
-
+		if (!m_ptr->monfear)
+		{
+			f6 &= ~(RF6_TPORT);
+		}
+		
 		/* No spells left */
 		if (!f4 && !f5 && !f6 && !f7) return (0);
 	}
@@ -1657,6 +1666,79 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 			f7 &= ~(RF7_ARCHERY_MASK);
 		}
 
+		/* Additional checks for allies */
+		if ((m_ptr->mflag & (MFLAG_ALLY)) && (!(r_ptr->flags2 & (RF2_STUPID))))
+		{
+			/* Prevent ball spells if they could hit player */
+			if ((player_can_fire_bold(*tar_y, *tar_x)) &&
+					(((f4 & (RF4_BALL_MASK)) != 0) ||
+					 ((f5 & (RF5_BALL_MASK)) != 0) ||
+					 ((f6 & (RF6_BALL_MASK)) != 0) ||
+					 ((f7 & (RF7_BALL_MASK)) != 0)))
+			{
+				int rad = (r_ptr->spell_power < 10 ? 2 : (r_ptr->spell_power < 40 ? 3 : (r_ptr->spell_power < 80 ? 4 : 5)));
+				int d = distance(p_ptr->py, p_ptr->py, *tar_y, *tar_x);
+
+				/* Hack -- melee attacks */
+				if (d < 2)
+				{
+					f4 &= ~(rf4_ball_mask);
+				}
+				
+				/* Check for spell range */
+				if (d < rad)
+				{
+					f4 &= ~(RF4_BALL_MASK);
+					f5 &= ~(RF5_BALL_MASK);
+					f6 &= ~(RF6_BALL_MASK);
+					f7 &= ~(RF7_BALL_MASK);
+				}
+
+				/* Hack -- some balls are bigger */
+				else if (d == rad)
+				{
+					f5 &= ~(RF5_BALL_POIS | RF5_BALL_WIND | RF5_BALL_WATER);
+				}
+			}
+			
+			/* Prevent breath / arc weapons if player in line of breath */
+			if ((player_can_fire_bold(m_ptr->fy, m_ptr->fx)) &&
+					(((f4 & (RF4_BREATH_MASK | RF4_ARC_MASK)) != 0) ||
+					((f5 & (RF5_BREATH_MASK | RF5_ARC_MASK)) != 0) ||
+					((f6 & (RF6_BREATH_MASK | RF6_ARC_MASK)) != 0) ||
+					((f7 & (RF7_BREATH_MASK | RF7_ARC_MASK)) != 0)))						
+			{
+				int angle1 = get_angle_to_target(m_ptr->fy, m_ptr->fx, *tar_y, *tar_x, 0) * 2;
+				int angle2 = get_angle_to_target(m_ptr->fy, m_ptr->fx, p_ptr->py, p_ptr->px, 0) * 2;
+				
+				int angle = (360 + angle1 - angle2) % 360;
+				
+				/* Check arcs */
+				if (angle < 60)
+				{
+					f4 &= ~(RF4_ARC_MASK);
+					f5 &= ~(RF5_ARC_MASK);
+					f6 &= ~(RF6_ARC_MASK);
+					f7 &= ~(RF7_ARC_MASK);
+				}
+				
+				/* Check breaths */
+				if (angle < ((r_ptr->flags2 & (RF2_POWERFUL)) ? 40 : 20))
+				{
+					f4 &= ~(RF4_BREATH_MASK);
+					f5 &= ~(RF5_BREATH_MASK);
+					f6 &= ~(RF6_BREATH_MASK);
+					f7 &= ~(RF7_BREATH_MASK);
+				}
+				
+				/* Hack -- certain breaths are wider */
+				else if (angle < ((r_ptr->flags2 & (RF2_POWERFUL)) ? 50 : 30))
+				{
+					f4 &= ~(RF4_BRTH_POIS | RF4_BRTH_SOUND);
+				}
+			}
+		}
+		
 		/* No spells left */
 		if (!f4 && !f5 && !f6 && !f7) return (0);
 	}
