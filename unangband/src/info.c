@@ -83,6 +83,11 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 			*f2 |= o_ptr->can_flags2;
 			*f3 |= o_ptr->can_flags3;
 			*f4 |= o_ptr->can_flags4;
+
+			/* Hack: throwing is always obvious */
+			if (k_info[o_ptr->k_idx].flags3 & TR3_THROWING)
+			  *f3 |= TR3_THROWING;
+
 			return;
 		}
 
