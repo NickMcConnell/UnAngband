@@ -138,7 +138,7 @@ Z:47:9
 L:20:435:56:154:0:0
 L:21:56:0:0:0:0
 L:38:56:0:0:475:0
-D:There is a sudden flash of gold and flame in the 
+D:There is a sudden flash of gold and flame in the
 D: air... Smaug has taken flight. You desperately
 D: cower for cover on the open mountainside... he
 D: wheels once, twice over you and departs. In the
@@ -266,7 +266,6 @@ N:21:Edoras
 X:20:0:0:0
 G:p
 R:WARRIOR
-W:514:23
 Z:22:23
 Q:29:1311
 L:0:0:533:529:1310:49
@@ -274,7 +273,7 @@ L:1:56:0:0:0:49
 L:22:56:0:0:1311:49
 S:271:516:517:519:504:511:509:508
 D:The slumbering city of Edoras.  King Theoden has gathered
-D: many warriors around him, but seeks less than wise council... 
+D: many warriors around him, but seeks less than wise council...
 
 N:22:the siege of Hornburg
 X:17:21:0:0
@@ -500,8 +499,9 @@ R:ESCORT
 Q:42:235
 Z:42:42
 L:20:414:56:153:235:0
-D:Five great armies have gathered at the promise of Smaug's riches hidden in the
-D: Lonely Mountain. Meanwhile the mouth of Moria has opened and vomitted forth its hordes.
+D:Five great armies have gathered at the promise of Smaug's riches hidden
+D: in the Lonely Mountain. Meanwhile the mouth of Moria has opened
+D: and vomitted forth its hordes.
 
 N:48:Dol Guldur
 X:52:7:20:17
@@ -540,8 +540,9 @@ Q:42:475
 L:0:0:530:153:0:0
 S:509:516:517:11:12:13:268:508
 D:The Dale-landers are a hardy people, living as they do under the twin shadows
-D: of the Lonely Mountain and Dol Guldur.  Of the two, many treasure hunters risk
-D: the wrath of Smaug but only the most foolhardy seek anything at Dol Guldur.
+D: of the Lonely Mountain and Dol Guldur.  Of the two, many treasure hunters
+D: risk the wrath of Smaug but only the most foolhardy seek anything
+D: at Dol Guldur.
 
 N:53:Buckland
 X:38:54:0:0
@@ -618,9 +619,10 @@ L:22:56:0:0:0:0
 L:29:56:0:0:0:0
 L:30:0:1:56:1277:0
 S:805:0:0:0:0:0:0:0
-D:There is a thunderous roar and rocks tumble about you.  You are plunged into darkness.
-D:  Your heart shudders; the dust finally settles. Something has closed the door to
-D: Moria, from the outside.  Your only choice is to press onwards.  And downwards...
+D:There is a thunderous roar and rocks tumble about you.  You are plunged
+D: into darkness.  Your heart shudders; the dust finally settles.
+D: Something has closed the door to Moria, from the outside.
+D: Your only choice is to press onwards.  And downwards...
 
 N:61:Khazad-Dum
 X:60:0:0:0
