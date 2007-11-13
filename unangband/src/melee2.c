@@ -6899,6 +6899,12 @@ static void process_monster(int m_idx)
 						}
 					}
 				}
+				
+				/* Prefer not to attack fleeing targets */
+				if (n_ptr->monfear)
+				{
+					hack_d += 16 * n_ptr->monfear;
+				}
 
 				/* Pick a random target. Have checked for LOS already. */
 				if (d < k)
