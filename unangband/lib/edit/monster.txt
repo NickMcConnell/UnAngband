@@ -1630,7 +1630,7 @@ F:OPEN_DOOR
 F:EVIL | ORC | HURT_LITE | RES_DARK | DWARF | IM_POIS
 F:PRIEST | MAGE | LEVEL_POWER
 S:BLINK | WOUND | BOLT_MANA | CURE | BLESS
-D:An goblin dressed in skins who gestures wildly.
+D:A goblin dressed in skins who gestures wildly.
 
 N:127:Baby blue dragon
 G:d:b
@@ -6029,7 +6029,7 @@ F:ONLY_ITEM | DROP_1D2
 F:OPEN_DOOR | BASH_DOOR | HUGE | LEVEL_POWER | LEVEL_CLASS | LEVEL_SIZE
 F:EVIL | TROLL | EAT_BODY | IM_POIS | NO_CONF | NO_SLEEP | IM_ACID | RES_BLIND
 D:A massive two-headed troll of huge strength, ettins are stupid but violent.
-D: They are also living proof that two heads are not more intelligent than one...
+D:  They are also living proof that two heads are not more intelligent than one...
 
 N:422:the King of Water
 G:E:b
@@ -6049,7 +6049,7 @@ F:NO_CONF | NO_SLEEP | NO_FEAR | RES_BLUNT
 F:RES_WATER | HURT_WATER | HAS_AURA | CAN_SWIM | NONLIVING | HUGE | RES_BLIND
 S:BOLT_ICE | BOLT_WATER | BALL_COLD | BALL_WATER | ADD_MANA | S_GROUP
 D:A towering water elemental king, he is master of all things liquid.
-D: Wave after wave drowns your frail body.
+D:  Wave after wave drowns your frail body.
 
 N:424:Ancient white dragon
 G:A:w
@@ -6243,7 +6243,7 @@ D:It seems that the more devout the person, the more likely they are to cross
 D: the boundary between piety and sanctimoniousness.  And such is the case with
 D: the Order of the Knights Templar; they are among the most pious and
 D: powerful of the religious knightly orders, but noted for their intolerance.
-D: Thus it is Morgoth's will that is unwittingly done, as the forces of good
+D:  Thus it is Morgoth's will that is unwittingly done, as the forces of good
 D: are set against each other.
 
 N:437:Conjurer
@@ -6552,7 +6552,7 @@ F:WARRIOR | NEED_LITE
 S:WOUND | BOLT_WATER | BOLT_MANA
 D:This sad creature - once a mighty warrior - betrayed his former friends to
 D: Morgoth's army in return for, he thought, safety for himself and his wife.
-D: And so he fell under Morgoth's power and became little more than a mindless
+D:  And so he fell under Morgoth's power and became little more than a mindless
 D: servant of evil, even though the other side of his "bargain" was not kept.
 
 N:455:Fallen
@@ -6921,7 +6921,7 @@ F:CAN_FLY | HUGE
 S:CONF | WOUND
 S:BRTH_COLD
 D:An ancient and wise Dragon.  Scatha has grown clever over the long years.
-D: His scales are covered with frost, and his breath sends a shower of ice
+D:  His scales are covered with frost, and his breath sends a shower of ice
 D: into the air.
 
 # Was Dwar, Dog Lord of War
@@ -7382,8 +7382,8 @@ S:BLIND | SCARE | MIND_BLAST
 S:BOLT_MANA | BOLT_NETHR | BALL_NETHR
 S:BRTH_NETHR | S_UNDEAD | BRTH_ACID | BRTH_POIS
 D:This intensely evil creature bears the form of a gargantuan black worm.
-D: Its gaping maw is a void of blackness, acid drips from its steely hide.
-D: It is like nothing you have ever seen before, and a terrible chill runs
+D:  Its gaping maw is a void of blackness, acid drips from its steely hide.
+D:  It is like nothing you have ever seen before, and a terrible chill runs
 D: down your spine as you face it.
 
 N:499:Hand druj
@@ -7558,7 +7558,7 @@ S:HEAL | HASTE | TPORT | TELE_AWAY | BLIND | CONF | SCARE |
 S:WOUND | MIND_BLAST | FORGET | TRAPS | SHIELD
 S:S_KIN | S_CLASS
 D:Sent by Orome as one of the five Istari sent to Middle-earth by the Valar.
-D: A powerful wizard, he traveled to the East with Saruman the White and his
+D:  A powerful wizard, he traveled to the East with Saruman the White and his
 D: companion Pallando the Blue.  There he was ensnared by Sauron and became one
 D: of his servants, never returning to the West again.
 
@@ -7716,7 +7716,7 @@ F:BASH_DOOR
 F:ANIMAL | EAT_BODY | RES_CHAOS | LEVEL_POWER
 S:BRTH_CHAOS
 D:"Beware the Jabberwock, my son! The jaws that bite, the claws that catch!"
-D: Run and run quickly, for death incarnate chases behind you!
+D:  Run and run quickly, for death incarnate chases behind you!
 
 N:518:Chaos hound
 G:Z:v
@@ -8527,7 +8527,7 @@ B:CRUSH:HURT:2d6
 F:BASH_DOOR | OPEN_DOOR
 F:ANIMAL | EVIL | DROP_1D2 | LEVEL_SIZE | LEVEL_POWER | LEVEL_CLASS | SMART
 D:In the eyes of this bear, there glimmers the faintest light of intelligence.
-D: And then its form begins to change... The combination of animal cunning,
+D:  And then its form begins to change... The combination of animal cunning,
 D: human intelligence and the great physical strength of the bear makes for
 D: a dangerous enemy.
 
@@ -10981,7 +10981,7 @@ B:BITE:EXP_80:3d4
 F:RAND_50 | COLD_BLOOD | REGENERATE | FRIENDS | CAN_FLY | 
 F:EVIL | ANIMAL | UNDEAD | IM_COLD | IM_POIS | 
 F:NO_CONF | NO_SLEEP | NO_FEAR
-D:An gargantuan undead bat that flies at you. It could bite your head off!
+D:A gargantuan undead bat that flies at you. It could bite your head off!
 
 N:732:Werebat
 G:b:B
@@ -13248,7 +13248,7 @@ W:0:1:0:0
 B:CRAWL:DISEASE
 F:RAND_50 | RAND_25 | FRIENDS | 
 F:INSECT | FORCE_DEPTH
-D:An cockroach the size of your fist.
+D:A cockroach the size of your fist.
 
 N:902:Giant brown locust
 G:I:u
@@ -17308,7 +17308,7 @@ B:HIT:HURT:1d9
 B:SHOT:HURT:14d5
 F:MALE | FEMALE | FRIEND | OPEN_DOOR | BASH_DOOR | TAKE_ITEM
 F:DROP_60 | SMART | ARCHER | LEVEL_POWER
-D:An skilled and experienced slinger whipping missiles at you with deadly
+D:A skilled and experienced slinger whipping missiles at you with deadly
 D: accuracy.
 
 N:1196:Spectral hunter
@@ -18131,7 +18131,7 @@ F:DROP_2D2 | DROP_3D2 | DROP_4D2 | ONLY_GOLD
 F:NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP | HAS_AURA | RES_BLIND | LEVEL_SIZE | LEVEL_SPEED
 S:BRTH_SHARD | QUAKE
 S:ADD_AMMO
-D:An thundering, grinding, churning vortex of razor-sharp rubble that tears through
+D:A thundering, grinding, churning vortex of razor-sharp rubble that tears through
 D: the dungeon leaving a ruined jumble of rock in its wake.
 
 N:1254:Inquisitor
@@ -18381,7 +18381,7 @@ F:CAN_SWIM | RES_DARK | HUGE | LEVEL_SIZE | LEVEL_POWER
 S:BLIND | CONF | SCARE | WOUND |
 S:BALL_WATER | DARKNESS | BRTH_DARK | TELE_TO | PROBE
 D:A huge many-tentacled creature, long forgotten but rising from the endless depths.
-D:  An inky stench comes from its foul bulk, and its massive arms reach out to crush
+D: An inky stench comes from its foul bulk, and its massive arms reach out to crush
 D: you and drag you below.
 
 N:1274:Wood elf ranger
