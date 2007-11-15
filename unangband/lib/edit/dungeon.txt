@@ -80,10 +80,10 @@ Q:58:111
 G:h
 L:0:0:411:153:0:0
 S:264:515:265:266:772:773:0:0
-D:Here your adventure begins.  You can travel to Farmer Maggot's Farm or 
-D:the East Road from here - the easiest route by far is the East Road and 
-D:then to Bree.  Press < to travel from any town, or when near the edge of 
-D:the larger wilderness locations.
+D:Here your adventure begins.  You can travel to Farmer Maggot's Farm or
+D: the East Road from here - the easiest route by far is the East Road and
+D: then to Bree.  Press < to travel from any town, or when near the edge of
+D: the larger wilderness locations.
 
 N:2:Rivendell
 X:3:13:14:17
@@ -124,8 +124,8 @@ X:5:7:52:0
 L:0:0:155:152:0:0
 S:8:9:10:11:12:13:14:508
 Z:8:7
-D:The locals eye you suspiciously, afraid of treasure-hunters 
-D:who would disturb the Lonely Mountain at great risk to all.
+D:The locals eye you suspiciously, afraid of treasure-hunters
+D: who would disturb the Lonely Mountain at great risk to all.
 
 # We disturb Smaug while entering his lair...
 
@@ -153,15 +153,15 @@ R:CAN_SWIM
 G:t
 Z:9:9
 L:22:155:407:49:475:0
-D:Smaug has laid waste to Lake-town. The townsfolk 
-D:gather, angry at you for disturbing his lair...
+D:Smaug has laid waste to Lake-town. The townsfolk
+D: gather, angry at you for disturbing his lair...
 
 N:9:Lake-town, rebuilt
 X:5:7:52:0
 L:0:0:155:152:0:0
 S:509:516:517:11:12:13:506:508
-D:Visit the statue to collect a reward from the 
-D:grateful townsfolk.
+D:Visit the statue to collect a reward from the
+D: grateful townsfolk.
 
 N:10:Farmer Maggot's farm
 X:1:0:0:0
@@ -357,7 +357,7 @@ R:ANIMAL
 L:0:0:410:56:0:0
 S:777:0:0:0:0:0:0:0
 D:A white tree has found root here.  Claim your reward which
-D:lies beneath the tree.
+D: lies beneath the tree.
 
 N:32:the Plains of Gorgoroth
 X:51:33:0:0
@@ -391,17 +391,17 @@ Z:36:36
 G:g
 L:99:0:407:159:532:0
 S:516:517:14:266:509:0:0:0
-D:Someone with a silver-tongue and guile-ful words has brought fair Hobbiton to 
-D:its knees in a whir of devilish industry and foul pollution.
+D:Someone with a silver-tongue and guile-ful words has brought fair Hobbiton to
+D: its knees in a whir of devilish industry and foul pollution.
 
 N:36:Hobbiton, rebuilt
 X:63:0:0:0
 G:h
 L:0:0:407:153:0:0
 S:264:515:265:266:772:773:774:0
-D:One last challenge awaits, to visit Angband to defeat an ancient evil.  Or you 
-D:can choose to sail from here into the West and let another take on the might of
-D:Morgoth.
+D:One last challenge awaits, to visit Angband to defeat an ancient evil.  Or you
+D: can choose to sail from here into the West and let another take on the might of
+D: Morgoth.
 
 ### 37 is now inaccessible and should be removed at some point ###
 
