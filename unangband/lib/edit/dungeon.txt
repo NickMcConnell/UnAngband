@@ -139,9 +139,9 @@ L:20:435:56:154:0:0
 L:21:56:0:0:0:0
 L:38:56:0:0:475:0
 D:There is a sudden flash of gold and flame in the
-D: air... Smaug has taken flight. You desperately
+D: air... Smaug has taken flight.  You desperately
 D: cower for cover on the open mountainside... he
-D: wheels once, twice over you and departs. In the
+D: wheels once, twice over you and departs.  In the
 D: distance, you see smoke start to rise as Lake-
 D:town burns.
 
@@ -238,16 +238,16 @@ D: the White, head of the order of Istari.  However, you are not
 D: yet a member...
 
 N:18:Lothlorien
-X:19:20:61:0
+X:19:20:0:0
+Q:61:1277
 G:l
 L:0:0:420:420:0:0
 S:270:503:11:12:13:504:510:0
-D:The enchanted woods which can only be found by true heroes.
-D:  Galadriel's gifts can be found at her mirror.
+D:The enchanted woods which only true heroes can enter.
+D:  Galadriel awaits you with gifts at her mirror.
 
 N:19:Parth Galen
-X:20:24:0:0
-Q:18:483
+X:20:24:18:0
 L:20:420:155:56:0:0
 L:21:56:0:0:0:0
 L:50:56:0:0:0:0
@@ -500,7 +500,7 @@ Q:42:235
 Z:42:42
 L:20:414:56:153:235:0
 D:Five great armies have gathered at the promise of Smaug's riches hidden
-D: in the Lonely Mountain. Meanwhile the mouth of Moria has opened
+D: in the Lonely Mountain.  Meanwhile the mouth of Moria has opened
 D: and vomitted forth its hordes.
 
 N:48:Dol Guldur
@@ -598,7 +598,7 @@ R:ANIMAL
 L:0:0:435:155:0:0
 S:903:0:0:0:0:0:0:0
 D:This is the farthest you've been from the Shire - ahead, dark
-D: clouds gather.  Choose your path carefully! Once you cross the
+D: clouds gather.  Choose your path carefully!  Once you cross the
 D: Brandywine to Buckland, it may be a while before you return to
 D: Hobbiton, and in some ways you can never come back.  The East
 D: Road from Hobbiton looks a fairer route, and safer too.
@@ -621,8 +621,8 @@ L:30:0:1:56:1277:0
 S:805:0:0:0:0:0:0:0
 D:There is a thunderous roar and rocks tumble about you.  You are plunged
 D: into darkness.  Your heart shudders; the dust finally settles.
-D: Something has closed the door to Moria, from the outside.
-D: Your only choice is to press onwards.  And downwards...
+D:  Something has closed the door to Moria, from the outside.
+D:  Your only choice is to press onwards.  And downwards...
 
 N:61:Khazad-Dum
 X:60:0:0:0
