@@ -234,7 +234,7 @@ X:15:17:0:0
 L:21:49:397:56:0:0
 L:22:56:393:0:0:0
 L:50:56:393:393:639:0
-D:Thorin has returned to Moria sealed the door so that it's almost impossible
+D:Thorin has returned to Moria and sealed the door so that it's almost impossible
 D: to find.  You need a map to guide you.  While you search, something
 D: deadly stirs in the water outside and you follow.
 
@@ -464,7 +464,7 @@ X:9:0:0:0
 L:21:0:56:1:0:0
 L:22:56:0:0:0:0
 L:40:56:0:0:0:0
-S:897:897:897:897:897:897:0:0
+S:897:898:899:900:901:902:0:0
 D:The innermost vaults of the dwarven city of Erebor,
 D: ripped open by the casting down of the mountainside
 D: by Thorin, crushing many thousands of orcs and turning
