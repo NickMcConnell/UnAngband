@@ -1829,6 +1829,13 @@ static bool do_cmd_disarm_aux(int y, int x, bool disarm)
 		/* Message */
 		msg_format("You failed to %s the %s.", act, name);
 
+		/* Disarming? */
+		if (!disarm)
+		{
+			/* Disarm the grid */
+			cave_alter_feat(y, x, FS_DISARM);
+		}
+		
 		/* We may keep trying */
 		more = TRUE;
 	}
