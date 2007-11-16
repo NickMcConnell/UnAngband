@@ -17,7 +17,7 @@
 
 # Format:
 # N: dungeon number: dungeon name
-# X: easily connected to these dungeons (up to 4 - unused connections should point back to itself)
+# X: easily connected to these dungeons (up to 4)
 # L: level : fill with terrain (0=town) : big terrain : small terrain : quest monster : vault
 # Q: dungeon connected to once quest monster defeated : quest monster
 # Y: lock all shops until this monster is defeated : if player has visited this dungeon
@@ -36,8 +36,7 @@
 # 'N' indicates the beginning of an entry. The serial number must
 # increase for each new item.
 
-# 'X' indicates the dungeons that may be reached from this dungeon. The 'distant' dungeon
-# can only be reached when the quest monster at the bottom of the dungeon is killed.
+# 'X' indicates the dungeons that may be reached from this dungeon. 
 
 # 'L' defines dungeon 'zones'. A dungeon zone extends from the level listed until 1 below
 # the next level listed. Zones must be shown in increasing order of level. The last L:
@@ -52,7 +51,7 @@
 # 'R' indicates that all 'wandering' monsters on the level will have this flag. Acts as an
 # either/or with the 'G' entry.
 
-# 'S' indicates up to 8 stores from the store.txt file, that are placed on the level with
+# 'S' indicates up to 8 stores that are placed on the level with
 # the fill with terrain 0 tag.
 
 # 'D' indicates the description displayed on the surface of the dungeon.
@@ -86,7 +85,7 @@ D: then to Bree.  Press < to travel from any town, or when near the edge of
 D: the larger wilderness locations.
 
 N:2:Rivendell
-X:3:13:14:17
+X:3:13:15:0
 L:0:0:420:155:0:0
 S:267:9:10:11:519:13:268:513
 
@@ -97,7 +96,6 @@ X:2:0:0:0
 G:k
 R:HURT_LITE
 Q:4:173
-Z:15:42
 L:5:420:56:56:0:0
 L:6:56:0:153:52:0
 L:7:56:0:153:0:0
@@ -110,7 +108,8 @@ L:14:0:435:0:566:0
 S:269:0:0:0:0:0:0:0
 
 N:5:Mirkwood
-X:4:6:52:0
+X:4:6:48:41
+Q:18:483
 G:l
 R:CAN_CLIMB
 L:14:420:56:153:637:0
@@ -120,17 +119,20 @@ L:26:56:155:0:1082:0
 S:270:271:503:11:12:504:505:0
 
 N:6:Lake-town
-X:5:7:52:0
+X:5:7:0:0
 L:0:0:155:152:0:0
 S:8:9:10:11:12:13:14:508
 Z:8:7
-D:The locals eye you suspiciously, afraid of treasure-hunters
-D: who would disturb the Lonely Mountain at great risk to all.
+D:The locals are a hardy people, living as they do under the twin shadows
+D: of the Lonely Mountain and Dol Guldur.  Of the two, some treasure hunters
+D: risk the wrath of Smaug but only the most foolhardy seek anything
+D: at Dol Guldur.  You are eyed suspiciously --- trouble-makers
+D: disturbing the Lonely Mountain bring a great risk to all.
 
 # We disturb Smaug while entering his lair...
 
 N:7:the Lonely Mountain
-X:8:52:41:48
+X:8:0:0:0
 R:DRAGON
 G:B
 Q:9:475
@@ -142,13 +144,12 @@ D:There is a sudden flash of gold and flame in the
 D: air... Smaug has taken flight.  You desperately
 D: cower for cover on the open mountainside... he
 D: wheels once, twice over you and departs.  In the
-D: distance, you see smoke start to rise as Lake-
-D:town burns.
+D: distance, you see smoke rising as Lake-town burns.
 
 # With disasterous consequences.
 
 N:8:the ruins of Lake-town
-X:5:7:52:0:0
+X:5:7:0:0
 R:CAN_SWIM
 G:t
 Z:9:9
@@ -156,11 +157,14 @@ L:22:155:407:49:475:0
 D:Smaug has laid waste to Lake-town. The townsfolk
 D: gather, angry at you for disturbing his lair...
 
-N:9:Lake-town, rebuilt
-X:5:7:52:0
-L:0:0:155:152:0:0
+# But then people abandon burnt Lake-town and rebuid ancient Dale
+
+N:9:the Dale
+X:5:7:0:0
+L:0:0:530:153:0:0
 S:509:516:517:11:12:13:506:508
-D:Visit the statue to collect a reward from the
+D:The people of burnt Lake-town have elected to rebuid the nearby ancient Dale
+D: as their new abode.  Visit the statue to collect a reward from the
 D: grateful townsfolk.
 
 N:10:Farmer Maggot's farm
@@ -184,7 +188,7 @@ L:4:56:0:0:620:0
 S:8:9:10:11:12:13:268:775
 
 N:12:Weathertop
-X:56:13:0:0
+X:56:13:38:0
 W:449:48
 L:20:420:56:49:0:31
 L:31:56:0:0:0:31
@@ -194,20 +198,24 @@ X:2:12:39:0
 W:453:48
 L:5:420:154:126:0:0
 
-# This set of mines is shallower and easy access from Isengard.
-# It gets replaced by a gate after the Battle of Five Armies
+# This western set of mines is shallower and easy access.
+# It gets replaced by a gate after the Battle of Five Armies.
+# It lets you get to Smaug without visiting Dol Guldur
 
-N:14:the mines of Moria
-X:2:7:52:0
+N:14:the western entrance to Moria
+X:15:17:0:0
 Z:16:42
+Q:41:262
 L:6:49:397:56:0:0
 L:7:56:0:0:0:0
 L:24:56:0:0:262:0
 D:In older days, the gates to Moria were always open, and a meeting point for dwarves, men and
 D: elves.  The doors now stand ajar, but the mines behind them are home to only fouler things.
 
+# Caradhras is closer to Rivendell
+
 N:15:Caradhras
-X:14:16:17:0
+X:14:2:0:0
 R:GIANT
 G:C
 Q:19:1272
@@ -218,16 +226,24 @@ D:Since Gandalf closed the path created by the Goblins through the Misty Mountai
 D: this has been the only route through.  In summer, it is passable.  Now, however,
 D: the storms of the mountain echo around you.  Turn back, while you can!
 
+# TODO: make sure this dungeon has wilderness features, watery, etc., 
+# not caves and rock or perhaps remove the dungeon below altogether 
+
 N:16:the west gates of Moria
 X:15:17:0:0
 L:21:49:397:56:0:0
 L:22:56:393:0:0:0
 L:50:56:393:393:639:0
-D:The door to Moria is almost impossible to find.  You need a map to
-D: guide you.  While you search, something deadly stirs in the water.
+D:Thorin has returned to Moria sealed the door so that it's almost impossible
+D: to find.  You need a map to guide you.  While you search, something
+D: deadly stirs in the water outside and you follow.
+
+# The only free pass to the other side of the Misty Mountains,
+# but to avoid all battle you have to stir evil at Dol Guldur
+# and then there is no free way back
 
 N:17:Isengard
-X:14:16:20:21
+X:20:21:14:0
 R:MAGE
 Z:23:48
 L:6:420:141:141:0:31
@@ -238,8 +254,7 @@ D: the White, head of the order of Istari.  However, you are not
 D: yet a member...
 
 N:18:Lothlorien
-X:19:20:0:0
-Q:61:1277
+X:19:20:5:41
 G:l
 L:0:0:420:420:0:0
 S:270:503:11:12:13:504:510:0
@@ -256,14 +271,14 @@ D: hillocks strewn with the toppled statues of kings and
 D: conquerors.
 
 N:20:Fangorn
-X:17:21:48:0
+X:17:48:0:0
 Q:18:483
 G:o
 R:PLANT
 L:20:420:420:420:634:0
 
 N:21:Edoras
-X:20:0:0:0
+X:17:0:0:0
 G:p
 R:WARRIOR
 Z:22:23
@@ -276,13 +291,13 @@ D:The slumbering city of Edoras.  King Theoden has gathered
 D: many warriors around him, but seeks less than wise council...
 
 N:22:the siege of Hornburg
-X:17:21:0:0
+X:23:0:0:0
 R:ESCORT
 L:21:420:56:155:249:49
 L:50:420:56:155:249:49
 
 N:23:Darkened Isengard
-X:20:48:0:0
+X:20:48:22:0
 Q:28:532
 L:21:420:141:141:514:31
 L:22:56:0:0:0:31
@@ -346,7 +361,7 @@ D: Dead - the entrance to the Paths of the Dead.  You can leave supplies here on
 D: stone while you search this lifeless place.
 
 N:30:the Battle of Pelennor Fields
-X:28:31:0:0
+X:28:0:0:0
 G:W
 R:ESCORT
 L:56:435:411:420:535:0
@@ -413,7 +428,7 @@ L:6:56:0:0:620:0
 S:8:9:10:11:12:13:268:775
 
 N:38:Barrow-downs
-X:11:12:38:40
+X:11:12:0:0
 L:4:420:420:56:0:0
 L:5:56:0:0:0:0
 L:20:56:0:0:1081:0
@@ -424,28 +439,28 @@ L:4:420:420:155:343:0
 L:5:56:0:0:344:0
 L:6:56:0:0:345:0
 
+# East part of Moria
+
 N:40:the east gates of Moria
-X:15:17:0:0
+X:5:0:0:0
 Z:61:61
 L:40:49:397:56:0:0
 D:The door to Moria is closed from this direction, as Thorin has
 D: returned to Moria to claim his bequest with dragon-gold.  You
-D: may be able to find the door to Moria from the west, from
+D: may try to find the door to Moria from the west, from
 D: Rivendell.  There is nothing here for you.
 
 ### The east gates of Moria before they are closed ###
+# TODO: make the terrain somewhat different than that of N:14
 
-N:41:the mines of Moria
-X:2:7:52:0
+N:41:the eastern entrance to Moria
+X:14:5:0:0
 Z:40:42
-L:6:49:397:56:0:0
-L:7:56:0:0:0:0
-L:24:56:0:0:262:0
-D:In older days, the gates to Moria were always open, and a meeting point for dwarves, men and
-D: elves.  The doors now stand ajar, but the mines behind them are home to only fouler things.
+L:20:49:397:56:0:0
+D: The old dwarven doors to Moria are broken open and only foul air and darkness welcome those who come inside. Broken stairs and archways make the way difficult and retreat almost impossible.
 
 N:42:the vaults of Erebor
-X:52:41:48:0
+X:9:0:0:0
 L:21:0:56:1:0:0
 L:22:56:0:0:0:0
 L:40:56:0:0:0:0
@@ -469,7 +484,7 @@ L:81:56:0:0:0:0
 # Sunken dungeon.
 
 N:44:the sunken city of Numenor
-X:2:44:0:0
+X:2:0:0:0
 G:G
 R:CAN_SWIM
 L:21:403:400:49:0:0
@@ -477,7 +492,7 @@ L:22:399:56:0:0:0
 L:60:399:56:0:0:0
 
 N:45:the temple of Elemental Evil
-X:2:45:0:0
+X:2:0:0:0
 G:E
 R:PRIEST
 L:21:425:141:141:0:0
@@ -485,7 +500,7 @@ L:22:56:0:0:0:0
 L:60:56:0:0:0:0
 
 N:46:the Crystal Castle
-X:2:45:0:0
+X:2:0:0:0
 G:g
 R:MAGE
 L:21:56:144:145:0:0
@@ -493,18 +508,17 @@ L:22:148:145:0:0:0
 L:60:148:145:0:0:0
 
 N:47:the Battle of Five Armies
-X:52:48:0:0
+X:9:0:0:0
 G:C
 R:ESCORT
 Q:42:235
 Z:42:42
 L:20:414:56:153:235:0
 D:Five great armies have gathered at the promise of Smaug's riches hidden
-D: in the Lonely Mountain.  Meanwhile the mouth of Moria has opened
-D: and vomitted forth its hordes.
+D: in the Lonely Mountain.
 
 N:48:Dol Guldur
-X:52:7:20:17
+X:5:20:0:0
 G:q
 R:EVIL
 L:40:420:56:420:474:44
@@ -533,10 +547,11 @@ X:32:50:0:0
 R:EVIL
 L:80:407:218:208:511:0
 
+### 52 is now inaccessible and should be removed at some point ###
+# Left only for compatibility; see the other Dale that replaces burnt Lake-town
+
 N:52:the Dale
-X:5:6:40:48
-Y:475:7
-Q:42:475
+X:5:7:0:0
 L:0:0:530:153:0:0
 S:509:516:517:11:12:13:268:508
 D:The Dale-landers are a hardy people, living as they do under the twin shadows
@@ -603,10 +618,10 @@ D: Brandywine to Buckland, it may be a while before you return to
 D: Hobbiton, and in some ways you can never come back.  The East
 D: Road from Hobbiton looks a fairer route, and safer too.
 
-# Break Moria up into several sections to be more like what I originally intended.
+# Break Moria up into several sections to be more like what I originally intended. The door to Moria can only by found with a map. This is the western door, actually; not that it matters.
 
 N:59:the door to Moria
-X:16:60:0:0
+X:14:60:0:0
 G:E
 L:0:0:1:56:0:0
 S:0:0:0:0:0:0:0:0
