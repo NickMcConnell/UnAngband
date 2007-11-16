@@ -149,8 +149,8 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 		if (spell_okay(book[i], known)) okay = TRUE;
 	}
 
-	/* Get a random spell */
-	else if (!known)
+	/* Get a random spell/only one choice */
+	else if ((!known) || (num == 1))
 	{
 		/* Get a random spell */
 		*sn = book[rand_int(num)];
