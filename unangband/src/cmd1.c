@@ -733,9 +733,11 @@ void search(void)
 			/* Get adjusted chance */
 			int chance2 = chance - ((range-1) * 40);
 
-			/* Require that grid be fully in bounds and in LOS */
+			/* Require that grid be fully in bounds, in LOS and lit */
 			if (!in_bounds_fully(y, x)) continue;
 			if (!generic_los(py, px, y, x, CAVE_XLOS)) continue;
+			if (((cave_info[y][x] & (CAVE_LITE)) == 0) &&
+				((play_info[y][x] & (PLAY_LITE)) == 0)) continue;
 
 			/* Sometimes, notice things */
 			if (rand_int(100) < chance2)
