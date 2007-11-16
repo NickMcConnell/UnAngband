@@ -4243,7 +4243,7 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 static void room_info_top(int room)
 {
 	char first[2];
-	char name[40];
+	char name[70];
 	char text_visible[1024];
 	char text_always[1024];
 
@@ -4277,7 +4277,7 @@ static void room_info_top(int room)
  */
 static void screen_room_info(int room)
 {
-	char name[32];
+	char name[62];
 	char text_visible[1024];
 	char text_always[1024];
 
@@ -4328,7 +4328,7 @@ static void screen_room_info(int room)
 void display_room_info(int room)
 {
 	int y;
-	char name[32];
+	char name[62];
 	char text_visible[1024];
 	char text_always[1024];
 
@@ -4382,7 +4382,7 @@ void display_room_info(int room)
 void describe_room(void)
 {
 	int room = room_idx(p_ptr->py, p_ptr->px);
-	char name[32];
+	char name[62];
 	char text_visible[1024];
 	char text_always[1024];
 
@@ -5761,7 +5761,7 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 			int by = y/BLOCK_HGT;
 			int bx = x/BLOCK_HGT;
 
-			char name[32];
+			char name[62];
 			*room = dun_room[by][bx];
 
 			/* Get the actual room description */

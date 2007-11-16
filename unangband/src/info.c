@@ -3253,7 +3253,7 @@ void list_object(const object_type *o_ptr, int mode)
 				text_out("You can travel to ");
 				text_out(t_name + t_info[o_ptr->sval].name);
 				text_out(format(" (levels %d", min_depth(o_ptr->sval)));
-				if (max_depth(o_ptr->sval) > min_depth(o_ptr->sval)) text_out(format("-%d",max_depth(o_ptr->sval)));
+				if (max_depth(o_ptr->sval) > min_depth(o_ptr->sval)) text_out(format("-%d)",max_depth(o_ptr->sval)));
 				text_out(" with this.  ");
 				anything = TRUE;
 				break;

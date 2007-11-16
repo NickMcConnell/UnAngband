@@ -285,8 +285,8 @@ G:o
 R:PLANT
 L:20:420:420:420:634:0
 D:Fangorn is a dark and mysterious forest, but Mirkwood across Anduin
-D: is even darker and it is said Death itself has made home
-D: among its twisted trees.
+D: is even darker.  They say Death itself has made home
+D: among the twisted trees of Dol Guldur and even animals avoid its shadow.
 
 N:21:Edoras
 X:17:0:0:0
@@ -634,7 +634,7 @@ D: Brandywine to Buckland, it may be a while before you return to
 D: Hobbiton, and in some ways you can never come back.  The East
 D: Road from Hobbiton looks a fairer route, and safer too.
 
-# Break Moria up into several sections to be more like what I originally intended. The door to Moria can only by found with a map. This is the western door, actually; not that it matters.
+# Break Moria up into several sections to be more like what I originally intended. The door to Moria can only by found with a map. This is the western door, actually; not that it matters. If we find the map before the west gate is closed, we assume the map actually helps in getting to N:60, as opposed to the normal N:14 dungeon one gets without the map. So, avoid mention of the door cracking open in the description...
 
 N:59:the door to Moria
 X:14:60:0:0
