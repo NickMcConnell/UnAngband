@@ -91,7 +91,7 @@ S:267:9:10:11:519:13:268:513
 
 # Misty Mountains are quite wet (Underground rivers etc).
 
-N:3:the Misty Mountains
+N:3:a path through Misty Mountains
 X:2:0:0:0
 G:k
 R:HURT_LITE
@@ -101,8 +101,8 @@ L:5:420:56:56:0:0
 L:6:56:0:153:52:0
 L:7:56:0:153:0:0
 L:13:56:0:154:173:0
-D:This is said to be the easiest way east, to Mirkwood and further
-D: to Smaug's lair.  If you can only find the path through...
+D:This is said to be the easiest road east, to Mirkwood and further
+D: to Smaug's lair.  If you can only find the way through...
 
 N:4:the house of Beorn
 X:3:5:0:0
@@ -223,7 +223,7 @@ N:15:Caradhras
 X:14:2:0:0
 R:GIANT
 G:C
-Q:19:1272
+Q:18:1272
 L:20:451:56:148:473:0
 L:21:56:144:145:0:0
 L:50:56:144:145:1272:0
@@ -270,11 +270,11 @@ D:The enchanted woods which only true heroes can enter.
 D:  Galadriel awaits you with gifts at her mirror.
 
 N:19:Parth Galen
-X:20:24:18:0
+X:24:18:0:0
 L:20:420:155:56:0:0
 L:21:56:0:0:0:0
 L:50:56:0:0:0:0
-D:The ruins of a more ancient race lies here: the glens and
+D:The ruins of a more ancient race lie here: the glens and
 D: hillocks strewn with the toppled statues of kings and
 D: conquerors.
 
@@ -317,10 +317,13 @@ D:If you conquer Isengard,
 D: darkened by the clouds of Saruman's machinations,
 D: you open the easier path to Minas Tirith.
 
+# Hint there is no way back
+
 N:24:the Marshes of the Dead
 X:19:25:0:0
 R:UNDEAD
 L:52:199:200:201:505:0
+D:A dreadful place. Nobody who crosses these marshes returns.
 
 #Should be guarded by Faramir
 
@@ -470,7 +473,7 @@ N:41:the eastern entrance to Moria
 X:14:5:0:0
 Z:40:42
 L:20:49:397:56:0:0
-D: The old dwarven doors to Moria are broken open and only foul air and darkness welcome those who come inside. Broken stairs and archways make the way difficult and retreat almost impossible.
+D:The old dwarven doors to Moria are broken open and only foul air and darkness welcome those who come inside. Broken stairs and archways make the way difficult and retreat almost impossible.
 
 N:42:the vaults of Erebor
 X:9:5:0:0
@@ -638,7 +641,7 @@ X:14:60:0:0
 G:E
 L:0:0:1:56:0:0
 S:0:0:0:0:0:0:0:0
-D:Starlight leads the way.  'Speak friend, and enter'.
+D:As you read the map, starlight leads the way.  'Speak friend, and enter'.
 
 N:60:the mines of Moria
 X:0:0:0:0
