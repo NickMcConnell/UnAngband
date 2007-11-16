@@ -96,10 +96,13 @@ X:2:0:0:0
 G:k
 R:HURT_LITE
 Q:4:173
+Z:15:9
 L:5:420:56:56:0:0
 L:6:56:0:153:52:0
 L:7:56:0:153:0:0
 L:13:56:0:154:173:0
+D:This is said to be the easiest way east, to Mirkwood and further
+D: to Smaug's lair.  If you can only find the path through...
 
 N:4:the house of Beorn
 X:3:5:0:0
@@ -119,7 +122,7 @@ L:26:56:155:0:1082:0
 S:270:271:503:11:12:504:505:0
 
 N:6:Lake-town
-X:5:7:0:0
+X:5:7:48:0
 L:0:0:155:152:0:0
 S:8:9:10:11:12:13:14:508
 Z:8:7
@@ -132,7 +135,7 @@ D: disturbing the Lonely Mountain bring a great risk to all.
 # We disturb Smaug while entering his lair...
 
 N:7:the Lonely Mountain
-X:8:0:0:0
+X:8:5:0:0
 R:DRAGON
 G:B
 Q:9:475
@@ -146,10 +149,10 @@ D: cower for cover on the open mountainside... he
 D: wheels once, twice over you and departs.  In the
 D: distance, you see smoke rising as Lake-town burns.
 
-# With disasterous consequences.
+# With disastrous consequences.
 
 N:8:the ruins of Lake-town
-X:5:7:0:0
+X:5:7:48:0
 R:CAN_SWIM
 G:t
 Z:9:9
@@ -157,13 +160,13 @@ L:22:155:407:49:475:0
 D:Smaug has laid waste to Lake-town. The townsfolk
 D: gather, angry at you for disturbing his lair...
 
-# But then people abandon burnt Lake-town and rebuid ancient Dale
+# But then people abandon burnt Lake-town and rebuild ancient Dale
 
 N:9:the Dale
-X:5:7:0:0
+X:5:7:48:0
 L:0:0:530:153:0:0
 S:509:516:517:11:12:13:506:508
-D:The people of burnt Lake-town have elected to rebuid the nearby ancient Dale
+D:The people of burnt Lake-town have elected to rebuild the nearby ancient Dale
 D: as their new abode.  Visit the statue to collect a reward from the
 D: grateful townsfolk.
 
@@ -198,9 +201,11 @@ X:2:12:39:0
 W:453:48
 L:5:420:154:126:0:0
 
-# This western set of mines is shallower and easy access.
-# It gets replaced by a gate after the Battle of Five Armies.
-# It lets you get to Smaug without visiting Dol Guldur
+# We take the liberty of assuming the West-gate of Moria was left open
+# after the first fall of Khazad-dum.
+# It gets closed by Balin after the Battle of Five Armies.
+# Just like Misty Mountains, it lets you get to Smaug 
+# without visiting Dol Guldur, if you fight your way through.
 
 N:14:the western entrance to Moria
 X:15:17:0:0
@@ -210,7 +215,7 @@ L:6:49:397:56:0:0
 L:7:56:0:0:0:0
 L:24:56:0:0:262:0
 D:In older days, the gates to Moria were always open, and a meeting point for dwarves, men and
-D: elves.  The doors now stand ajar, but the mines behind them are home to only fouler things.
+D: elves.  The ancient doors now stand ajar, but the mines behind them are home to only fouler things.
 
 # Caradhras is closer to Rivendell
 
@@ -222,25 +227,28 @@ Q:19:1272
 L:20:451:56:148:473:0
 L:21:56:144:145:0:0
 L:50:56:144:145:1272:0
-D:Since Gandalf closed the path created by the Goblins through the Misty Mountains,
-D: this has been the only route through.  In summer, it is passable.  Now, however,
+D:Since the path created by the Goblins through the Misty Mountains is blocked,
+D: this is the only route through.  In summer, it is passable.  Now, however,
 D: the storms of the mountain echo around you.  Turn back, while you can!
 
 # TODO: make sure this dungeon has wilderness features, watery, etc., 
-# not caves and rock or perhaps remove the dungeon below altogether 
+# not caves and rock; The dungeon is very short --- it does
+# not open the gates, so no point in misleading the player.
 
 N:16:the west gates of Moria
 X:15:17:0:0
-L:21:49:397:56:0:0
-L:22:56:393:0:0:0
-L:50:56:393:393:639:0
-D:Thorin has returned to Moria and sealed the door so that it's almost impossible
-D: to find.  You need a map to guide you.  While you search, something
-D: deadly stirs in the water outside and you follow.
+L:36:49:397:56:0:0
+L:37:56:393:0:0:0
+L:40:56:393:393:639:0
+D:Balin has returned to Moria and sealed the ancient door so that
+D: it's almost impossible to find.  You'll need a map to guide you.
+D:  It's been long since you've last heard from Balin,
+D: old friend from the Battle of Five Armies, and you begin to worry.
+D:  While you search in vain for an entrance, something
+D: deadly stirs in the water outside.
 
 # The only free pass to the other side of the Misty Mountains,
-# but to avoid all battle you have to stir evil at Dol Guldur
-# and then there is no free way back
+# but to avoid visiting dungeons you have to stir evil at Dol Guldur
 
 N:17:Isengard
 X:20:21:14:0
@@ -249,7 +257,7 @@ Z:23:48
 L:6:420:141:141:0:31
 L:7:50:0:0:0:31
 L:35:56:0:0:0:31
-D:The tower of Isengard is home to the wise counciller Saruman
+D:The tower of Isengard is home to the wise councillor Saruman
 D: the White, head of the order of Istari.  However, you are not
 D: yet a member...
 
@@ -276,6 +284,9 @@ Q:18:483
 G:o
 R:PLANT
 L:20:420:420:420:634:0
+D:Fangorn is a dark and mysterious forest, but Mirkwood across Anduin
+D: is even darker and it is said Death itself has made home
+D: among its twisted trees.
 
 N:21:Edoras
 X:17:0:0:0
@@ -328,7 +339,7 @@ L:53:407:56:397:492:46
 L:54:56:0:397:0:46
 L:85:56:0:0:535:46
 
-#Note that we need a map to travel from Minas Morgol to Cirith Ungol now.
+#Note that we need a map to travel from Minas Morgul to Cirith Ungol now.
 
 N:27:Cirith Ungol
 X:26:0:0:0
@@ -406,7 +417,7 @@ Z:36:36
 G:g
 L:99:0:407:159:532:0
 S:516:517:14:266:509:0:0:0
-D:Someone with a silver-tongue and guile-ful words has brought fair Hobbiton to
+D:Someone with a silver-tongue and guile-full words has brought fair Hobbiton to
 D: its knees in a whir of devilish industry and foul pollution.
 
 N:36:Hobbiton, rebuilt
@@ -445,13 +456,15 @@ N:40:the east gates of Moria
 X:5:0:0:0
 Z:61:61
 L:40:49:397:56:0:0
-D:The door to Moria is closed from this direction, as Thorin has
-D: returned to Moria to claim his bequest with dragon-gold.  You
-D: may try to find the door to Moria from the west, from
-D: Rivendell.  There is nothing here for you.
+D:The door to Moria is closed from this direction, as Balin has
+D: returned to Moria to claim his bequest with dragon-gold.
+D:  Traces of orc camps and months old troll carcasses tell the story
+D: of orc attempts to recapture Moria from outside. You are wondering
+D: what is happening inside, but the door is barricaded
+D: and nobody responds so you cannot get through.
+D:  You have to try to find the door to Moria from the west, from Rivendell.
 
 ### The east gates of Moria before they are closed ###
-# TODO: make the terrain somewhat different than that of N:14
 
 N:41:the eastern entrance to Moria
 X:14:5:0:0
@@ -460,7 +473,7 @@ L:20:49:397:56:0:0
 D: The old dwarven doors to Moria are broken open and only foul air and darkness welcome those who come inside. Broken stairs and archways make the way difficult and retreat almost impossible.
 
 N:42:the vaults of Erebor
-X:9:0:0:0
+X:9:5:0:0
 L:21:0:56:1:0:0
 L:22:56:0:0:0:0
 L:40:56:0:0:0:0
@@ -508,7 +521,7 @@ L:22:148:145:0:0:0
 L:60:148:145:0:0:0
 
 N:47:the Battle of Five Armies
-X:9:0:0:0
+X:9:5:0:0
 G:C
 R:ESCORT
 Q:42:235
