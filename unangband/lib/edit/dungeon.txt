@@ -120,6 +120,11 @@ L:15:56:0:0:0:0
 L:25:0:1:155:0:0
 L:26:56:155:0:1082:0
 S:270:271:503:11:12:504:505:0
+D:Dark shapes scuttle in the shadows and now and again you hear clicking
+D: and hissing.  It may be your imagination, but among odours of decay
+D: and poison you sometimes have the impression
+D: of a charming fragrance and among echoes you can sometimes almost
+D: hear the sounds as if of some captivating music.
 
 N:6:Lake-town
 X:5:7:48:0
