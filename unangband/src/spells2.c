@@ -1260,7 +1260,7 @@ int value_check_aux3(const object_type *o_ptr)
 {
 	/* If sensed cursed, have no more value to add */
 	if ((o_ptr->feeling == INSCRIP_CURSED) || (o_ptr->feeling == INSCRIP_TERRIBLE)
-		|| (o_ptr->feeling == INSCRIP_WORTHLESS) || (o_ptr->feeling == INSCRIP_MAGICAL)) return (0);
+		|| (o_ptr->feeling == INSCRIP_WORTHLESS)) return (0);
 
 	/* Artifacts */
 	if (artifact_p(o_ptr))
@@ -1415,11 +1415,11 @@ int value_check_aux5(const object_type *o_ptr)
 {
 	/* If sensed magical, have no more value to add */
 	if ((o_ptr->feeling == INSCRIP_GOOD) || (o_ptr->feeling == INSCRIP_VERY_GOOD)
-		|| (o_ptr->feeling == INSCRIP_GREAT) || (o_ptr->feeling == INSCRIP_EXCELLENT)
+		|| (o_ptr->feeling == INSCRIP_GREAT)
 		|| (o_ptr->feeling == INSCRIP_SUPERB) || (o_ptr->feeling == INSCRIP_SPECIAL)
-		|| (o_ptr->feeling == INSCRIP_MAGICAL) || (o_ptr->feeling == INSCRIP_UNUSUAL)
+		|| (o_ptr->feeling == INSCRIP_ARTIFACT) || (o_ptr->feeling == INSCRIP_EGO_ITEM)		
 		|| (o_ptr->feeling == INSCRIP_TERRIBLE) || (o_ptr->feeling == INSCRIP_WORTHLESS)
-		|| (o_ptr->feeling == INSCRIP_CURSED)) return (0);
+		|| (o_ptr->feeling == INSCRIP_CURSED)|| (o_ptr->feeling == INSCRIP_HIGH_EGO_ITEM)) return (0);
 
 	/* Artifacts */
 	if (artifact_p(o_ptr))
@@ -1445,14 +1445,6 @@ int value_check_aux5(const object_type *o_ptr)
 		return (INSCRIP_EGO_ITEM);
 	}
 
-	/* Cursed items */
-	if (cursed_p(o_ptr))
-	{
-		if (o_ptr->feeling == INSCRIP_NONMAGICAL) return (INSCRIP_CURSED);
-
-		return (INSCRIP_UNUSUAL);
-	}
-
 	/* Broken items */
 	/*if (broken_p(o_ptr)) return (INSCRIP_NONMAGICAL);*/
 
@@ -1461,6 +1453,15 @@ int value_check_aux5(const object_type *o_ptr)
 
 	/* Magical item */
 	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_EGO_ITEM);
+	if (o_ptr->feeling == INSCRIP_MAGICAL) return (0);
+
+	/* Cursed items */
+	if (cursed_p(o_ptr))
+	{
+		if (o_ptr->feeling == INSCRIP_NONMAGICAL) return (INSCRIP_CURSED);
+
+		return (INSCRIP_UNUSUAL);
+	}
 
 	/* Good "armor" bonus */
 	if (o_ptr->to_a > 0)
@@ -2371,7 +2372,7 @@ static bool item_tester_unknown_sense(const object_type *o_ptr)
 	if (object_known_p(o_ptr))
 		return FALSE;
 	else if (o_ptr->ident & IDENT_SENSE)
-		return FALSE;
+	  return TRUE; /* TODO: should be done via IDENT_HEAVY_SENSE, etc. */
 	else
 		return TRUE;
 }
@@ -3110,7 +3111,7 @@ bool ident_spell_bonus(void)
  */
 bool ident_spell_sense(void)
 {
-	int item;
+  int item, feel;
 
 	object_type *o_ptr;
 
@@ -3150,10 +3151,10 @@ bool ident_spell_sense(void)
 	}
 
 	/* Identify it's bonuses */
-	o_ptr->feeling = sense_magic(o_ptr, cp_ptr->sense_type, TRUE, item < 0);
+	feel = sense_magic(o_ptr, cp_ptr->sense_type, TRUE, item < 0);
 
 	/* Sense non-wearable items */
-	if (!o_ptr->feeling)
+	if (!feel)
 	{
 		int i, j;
 
@@ -3164,9 +3165,18 @@ bool ident_spell_sense(void)
 		for (j = 0; j < INVEN_BAG_TOTAL; j++)
 		{
 			if ((bag_holds[i][j][0] == o_ptr->tval)
-				&& (bag_holds[i][j][1] == o_ptr->sval)) o_ptr->feeling = MAX_INSCRIP + i;
+				&& (bag_holds[i][j][1] == o_ptr->sval)) 
+			  {
+			    o_ptr->feeling = MAX_INSCRIP + i;
+			    feel = 1; 
+			  }
 		}
-	}
+	} 
+	else
+	  o_ptr->feeling = feel;
+
+	/* Nothing sensed */
+	if (!feel) return (FALSE);
 
 	/* Item is sensed */
 	o_ptr->ident |= (IDENT_SENSE);

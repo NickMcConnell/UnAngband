@@ -4102,6 +4102,8 @@ int sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
 {
 	int feel = 0;
 
+	int old_feel;
+
 	bool okay = FALSE;
 
 	/* Skip empty slots */
@@ -4150,6 +4152,8 @@ int sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
 	/* Always update racial information */
 	(void)value_check_aux0(o_ptr, floor);
 
+	old_feel = o_ptr->feeling;
+
 	switch (sense_type)
 	{
 		case 1:
@@ -4186,6 +4190,8 @@ int sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
 			feel = heavy ? value_check_aux10(o_ptr, TRUE, TRUE, floor) : value_check_aux11(o_ptr);
 			break;
 	}
+
+	if (feel == old_feel) return(0);
 
 	/* Mark as sensed */
 	if ((sense_type) && ((heavy) || (o_ptr->tval == TV_RING) || (o_ptr->tval == TV_AMULET))) o_ptr->ident |= (IDENT_SENSE);
