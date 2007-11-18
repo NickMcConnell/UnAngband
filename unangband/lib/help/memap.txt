@@ -22,29 +22,29 @@ about wilderness and dungeons, see "dungeon.txt".
                    /                 |               ##                 | 
                   /   Midgewater     |                #                 |
 Hobbiton*        /   / Marshes |     |          Misty Mountains      Lake-town*
-|     \         /   /  (12-19) |     |            path ##             /  |
-|      \       Bree*           |     |           (6-13)<---Beorn's   /   |
-|  East Road-->(1-4)   Weathertop    |          /      #    House   /    |
-|                   \    (21-31) \   |  Rivendell*     ##       \  /     |
-|  Brandywine        \      |     \  | / |    \        ##      Mirkwood  |
-|  | Ferry  |         \     |      Ford  |     \      ##        (15-26)  |
-|  |        V     ?    \    |            |      \   ###        /   |     |
-|  V   Buckland*  |     \   |            |     Caradhras      /    |     |
-Farmer    |       V      \  |            |    / (21-50)      /     |     |
-Maggot's  Old Forest-->Barrow Downs      |   /      ##      /      |     |
- Farm       (7-10)        (5-20)         |  /      ###     /       |     |
- (3-6)                                  West gates  ##    /        |     |
-                                         of Moria <--- East gates  |     |
-                                          (7-24)  ####  of Moria   |     |
-                                            |      ###             |     |
-                                            |      ##            Dol Guldur
-                                            |     ##Lorien*     /  (41-65)
-                                            |    ##            /  
-                                            |   ##            /
-                                            |  ###    Fangorn/
-                                            |   ##   /
-                                            Isengard/
-                                             (7--35)             Parth Galen
+ |    \         /   /  (12-19) |     |            path ##             /  |
+ |     \       Bree*           |     |           (6-13)<---Beorn's   /   |
+ | East Road-->(1-4)   Weathertop    |          /      #    House   /    |
+ |                  \    (21-31) \   |  Rivendell*     ##       \  /     |
+ |  Brandywine       \      |     \  | /  |   \        ##      Mirkwood  |
+ |  | Ferry  |        \     |      Ford   |    \      ##        (15-26)  |
+ |  |        V     ?   \    |             |     \   ###        /   |     |
+ |  V   Buckland*  |    \   |             |    Caradhras      /    |     |
+Farmer    |        V     \  |             |   / (21-50)      /     |     |
+Maggot's  Old Forest-->Barrow Downs       |  /      ##      /      |     |
+ Farm       (7-10)        (5-20)          | /      ###     /       |     |
+ (3-6)                                   West gates ##    /        |     |
+                                          of Moria<----East gates  |     |
+                                           (7-24)  ###  of Moria   |     |
+                                             |    ####             |     |
+                                             |     ##            Dol Guldur
+                                             |    ##Lorien*     /  (41-65)
+                                             |   ##            /  
+                                             |  ##            /
+                                             | ###    Fangorn/
+                                             |  ##   /
+                                             Isengard
+                                              (7-35)             Parth Galen
                                                    \              
                                                ##   \                  Marshes
                                   #################  Edoras*        of the Dead
