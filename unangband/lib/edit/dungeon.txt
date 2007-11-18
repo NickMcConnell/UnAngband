@@ -124,7 +124,8 @@ S:270:271:503:11:12:504:505:0
 D:Dark shapes scuttle in the shadows and now and again you hear clicking
 D: and hissing.  Among odours of decay you sometimes catch a sweet scent
 D: and among echoes you can sometimes almost hear the sounds as if
-D: of captivating music.
+D: of captivating music.  The impression vanishes as soon as a wind blows
+D: from south, from Dol Guldur, bringing chilling, poisonous fumes.
 
 N:6:Lake-town
 X:5:7:48:0
