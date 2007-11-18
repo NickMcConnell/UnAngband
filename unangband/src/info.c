@@ -1190,8 +1190,11 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 {
 	int m,n,r;
 
-	cptr p, q, s, t, u;
-
+	cptr p, q, s, t, u, v;
+	
+	/* Preposition */
+	v = "for";
+	
 	/* Count the number of "known" attacks */
 	for (n = 0, m = 0; m < 4; m++)
 	{
@@ -1457,7 +1460,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_BIND_FAMILIAR:	q = "bind a familiar to you"; break;
 			case GF_VAMP_DRAIN:	q = "drain"; s = "health from"; break;
 			case GF_MANA_DRAIN:	q = "drain"; s = "mana from"; break;
-			case GF_SNUFF:		q = "snuff"; s = "the life from"; u = "with less than"; break;
+			case GF_SNUFF:		q = "snuff"; s = "the life from"; u ="if they have less than a maximum"; v="of";break;
 			case GF_RAGE:		q = "enrage"; break;
 			case GF_MENTAL:		q = "blast"; u = "with mental energy"; break;
 			case GF_TANGLE:		q = "entangle"; u = "with nearby plants or waterweeds"; break;
@@ -1580,8 +1583,8 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			if (max)
 			{
 				/* End */
-				if (max != min) text_out(format(" for %d-%d ", min, max));
-				else text_out(format(" for %d ", max));
+				if (max != min) text_out(format(" %s %d-%d ", v, min, max));
+				else text_out(format(" %s %d ", v, max));
 			}
 			else
 			{
@@ -1592,22 +1595,22 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		else if ((d1) && (d2) && (d3))
 		{
 			/* End */
-			text_out(format(" for %dd%d+%d ",d1,d2,d3));
+			text_out(format(" %s %dd%d+%d ",v, d1,d2,d3));
 		}
 		else if ((d1) && (d2) && (d2 == 1))
 		{
 			/* End */
-			text_out(format(" for %d ",d1));
+			text_out(format(" %s %d ",v, d1));
 		}
 		else if ((d1) && (d2))
 		{
 			/* End */
-			text_out(format(" for %dd%d ",d1,d2));
+			text_out(format(" %s %dd%d ",v, d1,d2));
 		}
 		else if (d3)
 		{
 			/* End */
-			text_out(format(" for %d ",d3));
+			text_out(format(" %s %d ",v, d3));
 		}
 
 		/* Get the effect */
@@ -1644,8 +1647,8 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_DARK_WEAK:
 			case GF_TANGLE:
 								text_out("power"); break;
-			case GF_SNUFF: text_out("maximum ");
-			case GF_HEAL_PERC: text_out("percentage ");
+			case GF_HEAL_PERC: text_out("percent of ");
+			case GF_SNUFF: 
 			case GF_HEAL: text_out("hit points"); break;
 			case GF_AWAY_ALL:
 			case GF_AWAY_EVIL:
@@ -1671,7 +1674,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 				}
 				break;
 			}
-			case GF_GAIN_MANA_PERC: text_out("percentage ");
+			case GF_GAIN_MANA_PERC: text_out("percent of ");
 			case GF_LOSE_MANA:
 			case GF_MANA_DRAIN:
 			case GF_GAIN_MANA: text_out("spell points"); break;
