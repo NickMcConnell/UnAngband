@@ -1293,7 +1293,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_LEVEL: t = "the current level"; break;
 			case RBM_ORB: p = "creates an orb"; t = "your enemies"; rad = (level < 30 ? 2 : 3); d3 += level/2; break;
 			case RBM_CROSS: p = "surrounds you with a cross"; t = "your enemies"; break;
-			case RBM_STRIKE: p = "strikes"; t = "your enemy"; rad = (level/10)+2; if ((level > 5) && (d2)) d1+= (level-1)/5; break;
+			case RBM_STRIKE: p = "strikes"; t = "your enemy"; if ((level > 5) && (d2)) d1+= (level-1)/5; break;
 			case RBM_STAR: p = "surrounds you with a star"; t = "your enemies"; break;
 			case RBM_SPHERE: p = "creates a sphere";  t = "your enemies";  rad = (level/10)+2;break;
 			case RBM_ARROW: p = "creates an arrow"; t="one target"; break;

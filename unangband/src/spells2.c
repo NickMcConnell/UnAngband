@@ -6523,14 +6523,10 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 
 			case RBM_STRIKE:
 			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
 				/* Hack - scale damage */
 				if ((level > 5) && (d_side)) damage += damroll((level-1)/5, d_side);
 
-				/* Hack -- scale radius  */
-				if (fire_cloud(who, what, effect, dir, damage, (level / 20) + 2)) obvious = TRUE;
+				if (fire_ball(who, what, effect, dir, damage, 0)) obvious = TRUE;
 
 				break;
 			}
