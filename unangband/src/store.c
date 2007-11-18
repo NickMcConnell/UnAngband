@@ -3834,6 +3834,11 @@ void do_cmd_store(void)
 	/* Hack -- Cancel "see" mode */
 	p_ptr->command_see = FALSE;
 
+	/* Message from store */
+	if (strlen(f_text + f_info[cave_feat[p_ptr->py][p_ptr->px]].text))
+	{
+		msg_print(f_text + f_info[cave_feat[p_ptr->py][p_ptr->px]].text);
+	}
 
 	/* Flush messages XXX XXX XXX */
 	msg_print(NULL);

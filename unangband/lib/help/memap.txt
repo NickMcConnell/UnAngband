@@ -29,8 +29,8 @@ Hobbiton*        /   / Marshes |     |          Misty Mountains      Lake-town*
  |  Brandywine       \      |     \  | /  |   \        ##      Mirkwood  |
  |  | Ferry  |        \     |      Ford   |    \      ##        (15-26)  |
  |  |        V     ?   \    |             |     \   ###        /   |     |
- |  V   Buckland*  |    \   |             |    Caradhras      /    |     |
-Farmer    |        V     \  |             |   / (21-50)      /     |     |
+ |  V   Buckland*  |    \   |             |    the Redhorn    /    |     |
+Farmer    |        V     \  |             |   / pass (7-37)  /     |     |
 Maggot's  Old Forest-->Barrow Downs       |  /      ##      /      |     |
  Farm       (7-10)        (5-20)          | /      ###     /       |     |
  (3-6)                                   West gates ##    /        |     |

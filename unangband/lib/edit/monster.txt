@@ -18973,3 +18973,22 @@ F:RAND_50 | UNDEAD
 F:EMPTY_MIND | LEVEL_SIZE
 #D:It is a smallish, slimy, icky, undead creature. It looks unstable...
 
+#Need new stats. Using Khim.
+
+N:1313:Radagast the Brown
+G:M:o
+I:110:82d10:20:80:10
+W:28:2:0:300
+M:0:25:16:63
+B:HIT:HURT:3d6
+B:HIT:HURT:3d6
+B:HIT:UN_POWER
+F:UNIQUE | MALE | 
+F:FORCE_SLEEP | FORCE_MAXHP | 
+F:ONLY_ITEM | DROP_1D2 | DROP_GOOD | 
+F:OPEN_DOOR | BASH_DOOR | MAGE
+F:IM_FIRE | IM_COLD | NO_CONF | NO_SLEEP
+S:HEAL | SLOW | BOLT_FIRE | S_ANIMAL | S_PLANT
+D:He believes you to be a spy of Saruman's, sent here to confront him.  The only
+D: way to convince him otherwise is to best him in battle.
+

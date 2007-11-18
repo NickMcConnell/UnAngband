@@ -86,7 +86,7 @@ D: then to Bree.  Press < to travel from any town, or when near the edge of
 D: the larger wilderness locations.
 
 N:2:Rivendell
-X:3:13:15:14
+X:3:13:52:14
 L:0:0:420:155:0:0
 S:267:9:10:11:519:13:268:513
 
@@ -218,7 +218,7 @@ D: it flows within the borders of the hidden valley of Rivendell.
 # without visiting Dol Guldur, if you fight your way through.
 
 N:14:the western entrance to Moria
-X:15:17:2:0
+X:52:17:2:0
 Z:16:42
 Q:41:262
 L:6:49:397:56:0:0
@@ -238,7 +238,7 @@ L:20:451:56:148:473:0
 L:21:56:144:145:0:0
 L:50:56:144:145:1272:0
 D:Since the path created by the Goblins through the Misty Mountains is blocked,
-D: this is the only route through.  In summer, it is passable.  Now, however,
+D: this is the only route through.  In summer, it was passable.  Now, however,
 D: the storms of the mountain echo around you.  Turn back, while you can!
 
 # TODO: make sure this dungeon has wilderness features, watery, etc., 
@@ -246,7 +246,7 @@ D: the storms of the mountain echo around you.  Turn back, while you can!
 # not open the gates, so no point in misleading the player.
 
 N:16:the west gates of Moria
-X:15:17:0:0
+X:52:17:0:0
 L:36:49:397:56:0:0
 L:37:56:393:0:0:0
 L:40:56:393:393:639:0
@@ -290,10 +290,11 @@ D: conquerors.
 
 N:20:Fangorn
 X:17:48:0:0
-Q:18:483
-G:o
+Q:23:1313
+Z:37:23
+G::
 R:PLANT
-L:20:420:420:420:634:0
+L:20:420:420:420:1313:0
 D:Fangorn is a dark and mysterious forest, but Mirkwood across Anduin
 D: is even darker.  They say Death itself has made home
 D: among the twisted trees of Dol Guldur and even animals avoid its shadow.
@@ -312,10 +313,15 @@ D:The slumbering city of Edoras.  King Theoden has gathered
 D: many warriors around him, but seeks less than wise council...
 
 N:22:the siege of Hornburg
-X:23:0:0:0
+X:0:0:0:0
+Q:62:249
 R:ESCORT
 L:21:420:56:155:249:49
 L:50:420:56:155:249:49
+D:Saruman's orcs have laid siege to the Hornburg.  You stand with
+D: your allies to relieve the siege - fight your way to the Helm's Deep
+D: and scale the tower to confront the leader of the armies, or find him
+D: here on the field of battle and slay him.
 
 N:23:Darkened Isengard
 X:20:48:22:0
@@ -442,14 +448,17 @@ D:One last challenge awaits, to visit Angband to defeat an ancient evil.  Or you
 D: can choose to sail from here into the West and let another take on the might of
 D: Morgoth.
 
-### 37 is now inaccessible and should be removed at some point ###
-
-N:37:Bree
-X:38:39:56:0
-L:0:0:407:408:0:0
-L:1:56:0:0:0:0
-L:6:56:0:0:620:0
-S:8:9:10:11:12:13:268:775
+N:37:Fangorn, aflame
+X:17:48:0:0
+Q:62:249
+Z:62:62
+G:o
+R:PLANT
+L:21:420:420:420:249:0
+D:Fangorn is aflame: Saruman's orcs have taken axe and fire to the trees
+D: and the haunted moans of the ancient wood fill the air.  Some say the
+D: trees have begun to march in response - but you can only see dark and
+D: mysterious Dol Guldur wreathed by smoke and death.
 
 N:38:Barrow-downs
 X:11:12:0:0
@@ -574,17 +583,19 @@ X:32:50:0:0
 R:EVIL
 L:80:407:218:208:511:0
 
-### 52 is now inaccessible and should be removed at some point ###
-# Left only for compatibility; see the other Dale that replaces burnt Lake-town
-
-N:52:the Dale
-X:5:7:0:0
-L:0:0:530:153:0:0
-S:509:516:517:11:12:13:268:508
-D:The Dale-landers are a hardy people, living as they do under the twin shadows
-D: of the Lonely Mountain and Dol Guldur.  Of the two, many treasure hunters
-D: risk the wrath of Smaug but only the most foolhardy seek anything
-D: at Dol Guldur.
+N:52:the Redhorn
+X:14:2:0:0
+R:GIANT
+G:o
+Z:15:9
+Q:5:140
+L:7:544:56:148:140:0
+L:8:56:145:0:0:0
+L:37:56:145:0:297:0
+D:Legend has it that this mighty mountain is Morgoth's minion.  If so,
+D: it appears asleep at the moment: nonetheless the pass is treacherous in
+D: summer and impassable in winter. Orcs have overrun the passage at the
+D: moment, and to pass, you must defeat their leader.
 
 N:53:Buckland
 X:54:0:0:0
@@ -677,9 +688,20 @@ L:49:56:141:0:0:0
 L:50:56:393:393:483:0
 D:Drums. Drums. Drums in the deep.
 
+N:62:the Ent Moot
+X:17:48:0:0
+Q:18:483
+L:21:0:420:153:0:0
+R:PLANT
+S:949:950:951:952:953:0:0:0
+D:Ents fill a clearing in the forest, rooted deep and gently swaying.
+D: You think you can hear timbrous voices amidst the creaks and groans
+D: of their ancient boughs. Perhaps a closer look will help you
+D: understand if they have come to a decision...
+
 # Must always be second to last position
 
-N:62:Angband
+N:63:Angband
 X:43:0:0:0
 Q:63:547
 L:0:0:407:0:0:0
@@ -690,7 +712,7 @@ D:It feels like home...
 
 # Must always be last position
 
-N:63:the West
+N:64:the West
 G:M
 L:0:0:420:0:0:0
 S:777:0:0:0:0:0:0:0
