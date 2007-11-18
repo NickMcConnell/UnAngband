@@ -8490,7 +8490,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			/* Hack -- excess fear causes petrification */
 			if (tmp > 100)
 			{
-				do_petrify = tmp - 100;
+				do_petrify += tmp - 100;
 				tmp = 100;
 			}
 			
@@ -8503,7 +8503,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 		/* Handle petrify. Im_edged resists. */
 		if ((do_petrify > 1) &&
-			 !(r_ptr->flags9 & (RF9_IM_EDGED)))
+			 ((r_ptr->flags9 & (RF9_IM_EDGED)) == 0))
 		{
 			/* Obvious */
 			if (seen) obvious = TRUE;
@@ -8512,14 +8512,14 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			if (m_ptr->petrify)
 			{
 				if (!note) note = " looks more petrified.";
-				tmp = m_ptr->petrify + (do_conf / (r_ptr->level / 10 + 1));
+				tmp = m_ptr->petrify + (do_petrify / (r_ptr->level / 10 + 1));
 			}
 
 			/* Was not petrify */
 			else
 			{
 				if (do_conf > 1) if (!note) note = " looks petrified.";
-				tmp = do_conf;
+				tmp = do_petrify;
 			}
 
 			/* Apply confusion */

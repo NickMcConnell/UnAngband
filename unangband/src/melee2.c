@@ -2949,16 +2949,6 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 	*tx = m_ptr->fx;
 
 
-	/*
-	 * Monster is only allowed to use targetting information.
-	 */
-	if (must_use_target)
-	{
-		*ty = m_ptr->ty;
-		*tx = m_ptr->tx;
-		return (TRUE);
-	}
-
 
 	/*
 	 * Monsters that cannot move will attack the character if he is 
@@ -3030,6 +3020,17 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 		{
 			return (FALSE);
 		}
+	}
+
+	
+	/*
+	 * Monster is only allowed to use targetting information.
+	 */
+	if (must_use_target)
+	{
+		*ty = m_ptr->ty;
+		*tx = m_ptr->tx;
+		return (TRUE);
 	}
 
 
@@ -5342,7 +5343,13 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					project_t(who, what, ny, nx, damage, effect);
 				}
 			}
-		}		
+		}
+		
+		/* Never move if petrified or never move monster */
+		else if ((r_ptr->flags1 & (RF1_NEVER_MOVE)) || (m_ptr->petrify))
+		{
+			do_move = FALSE;
+		}
 		
 		/* Monster has to climb the grid slowly */
 		else if ((mmove == MM_CLIMB) && !(r_ptr->flags2 & (RF2_CAN_CLIMB)) && !(m_ptr->mflag & (MFLAG_OVER))
