@@ -76,6 +76,7 @@ D:It feels like home...
 N:1:Hobbiton
 X:10:57:0:0
 Q:58:111
+Z:35:35
 G:h
 L:0:0:411:153:0:0
 S:264:515:265:266:772:773:0:0
@@ -85,7 +86,7 @@ D: then to Bree.  Press < to travel from any town, or when near the edge of
 D: the larger wilderness locations.
 
 N:2:Rivendell
-X:3:13:15:0
+X:3:13:15:14
 L:0:0:420:155:0:0
 S:267:9:10:11:519:13:268:513
 
@@ -216,7 +217,7 @@ D: it flows within the borders of the hidden valley of Rivendell.
 # without visiting Dol Guldur, if you fight your way through.
 
 N:14:the western entrance to Moria
-X:15:17:0:0
+X:15:17:2:0
 Z:16:42
 Q:41:262
 L:6:49:397:56:0:0
@@ -225,7 +226,7 @@ L:24:56:0:0:262:0
 D:In older days, the gates to Moria were always open, and a meeting point for dwarves, men and
 D: elves.  The ancient doors now stand ajar, but the mines behind them are home to only fouler things.
 
-# Caradhras is closer to Rivendell
+# Caradhras is closer to Rivendell, but it's on the shortest way to Moria
 
 N:15:Caradhras
 X:14:2:0:0
@@ -451,6 +452,7 @@ S:8:9:10:11:12:13:268:775
 
 N:38:Barrow-downs
 X:11:12:0:0
+Q:54:546
 L:4:420:420:56:0:0
 L:5:56:0:0:0:0
 L:20:56:0:0:1081:0
@@ -542,7 +544,7 @@ D:Five great armies have gathered at the promise of Smaug's riches hidden
 D: in the Lonely Mountain.
 
 N:48:Dol Guldur
-X:5:20:0:0
+X:5:20:6:0
 G:q
 R:EVIL
 L:40:420:56:420:474:44
@@ -584,8 +586,8 @@ D: risk the wrath of Smaug but only the most foolhardy seek anything
 D: at Dol Guldur.
 
 N:53:Buckland
-X:38:54:0:0
-Q:35:546
+X:54:0:0:0
+Q:58:546
 G:h
 R:ANIMAL
 L:0:0:420:408:0:0
@@ -633,7 +635,7 @@ D: gather. At least the way ahead seems fair and true.
 #TODO: change the graphics from bridge to ferry or just plain river
 
 N:58:the Brandywine Ferry
-X:1:10:53:0
+X:10:53:0:0
 G:h
 R:ANIMAL
 L:0:0:435:155:0:0
