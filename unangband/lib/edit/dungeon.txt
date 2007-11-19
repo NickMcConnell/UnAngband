@@ -440,7 +440,7 @@ D:Someone with a silver-tongue and guile-full words has brought fair Hobbiton to
 D: its knees in a whir of devilish industry and foul pollution.
 
 N:36:Hobbiton, rebuilt
-X:63:0:0:0
+X:64:0:0:0
 G:h
 L:0:0:407:153:0:0
 S:264:515:265:266:772:773:774:0
@@ -510,7 +510,7 @@ D: spill from the vaults long hidden inside.
 # Alternate to bypass Moria etc. and reach Angband...
 
 N:43:the ruins of Angmar
-X:2:62:0:0
+X:2:63:0:0
 R:UNDEAD
 L:21:425:141:141:0:0
 L:22:56:141:0:0:0
@@ -703,7 +703,7 @@ D: understand if they have come to a decision...
 
 N:63:Angband
 X:43:0:0:0
-Q:63:547
+Q:64:547
 L:0:0:407:0:0:0
 L:1:56:0:0:0:0
 L:100:56:0:0:547:0
