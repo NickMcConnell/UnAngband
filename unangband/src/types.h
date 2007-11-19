@@ -1590,6 +1590,9 @@ struct player_type
 	byte dodging;   	/* Currently dodging */
 	byte blocking;   	/* Currently blocking */
 
+	byte branded_blows;	/* Current blow is branded with */
+	byte unused2;
+	
 	/*** Extracted fields ***/
 
 	s16b stat_add[A_MAX];   /* Equipment stat bonuses */
