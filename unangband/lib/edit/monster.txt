@@ -18989,7 +18989,9 @@ F:ONLY_ITEM | DROP_1D2 | DROP_GOOD |
 F:OPEN_DOOR | BASH_DOOR | MAGE
 F:IM_FIRE | IM_COLD | NO_CONF | NO_SLEEP
 S:HEAL | SLOW | BOLT_FIRE | S_ANIMAL | S_PLANT
-D:He believes you to be a spy of Saruman's, sent here to confront him.  The only
+D:He keeps crying about something terrible he's found in Fangorn,
+D: but he won't talk.  He believes you to be a spy of Saruman's,
+D: sent here to confront him.  The only
 D: way to convince him otherwise is to best him in battle.
 
 # The following are from ToME.
