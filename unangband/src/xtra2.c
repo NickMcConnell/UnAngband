@@ -659,6 +659,7 @@ bool set_stastis(int v)
 	{
 		msg_print("You are thrown into an alternate reality!");
 		p_ptr->leaving = TRUE;
+		p_ptr->create_stair = 0;
 		notice = TRUE;
 		v = 0;
 	}

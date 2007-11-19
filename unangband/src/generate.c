@@ -9878,6 +9878,9 @@ static void place_tower()
 	{
 		/* Clear previous contents, add dungeon entrance */
 		place_random_stairs(y, x, FEAT_MORE);
+		
+		/* Have created stairs */
+		p_ptr->create_stair = 0;
 
 		player_place(y, x, TRUE);
 	}
@@ -10387,7 +10390,11 @@ static bool new_player_spot(void)
 	if ((p_ptr->create_stair) &&
 		(((f_info[p_ptr->create_stair].flags1 & (FF1_STAIRS)) == 0) || (dungeon_stair)))
 	{
+		/* Create the feature */
 		cave_set_feat(y, x, p_ptr->create_stair);
+		
+		/* Have created stairs */
+		p_ptr->create_stair = 0;
 	}
 
 	/* Place the player */

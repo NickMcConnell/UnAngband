@@ -1765,6 +1765,9 @@ static void process_world(void)
 
 				/* Leaving */
 				p_ptr->leaving = TRUE;
+				
+				/* No stairs under the player */
+				p_ptr->create_stair = 0;
 			}
 			else if (min_depth(p_ptr->dungeon) < max_depth(p_ptr->dungeon))
 			{
@@ -1777,6 +1780,9 @@ static void process_world(void)
 
 				/* Leaving */
 				p_ptr->leaving = TRUE;
+
+				/* No stairs under the player */
+				p_ptr->create_stair = 0;
 			}
 			else 
 			{
