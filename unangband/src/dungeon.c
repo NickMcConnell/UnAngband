@@ -729,6 +729,9 @@ static void process_world(void)
 
 	cptr name;
 
+	/* no shuffling for alien towns */
+	  town_type *t_ptr = &t_info[p_ptr->town];
+
 	/* Every 10 game turns */
 	if (turn % 10) return;
 
@@ -843,8 +846,6 @@ static void process_world(void)
 				/* Pick a random shop (except home) */
 				n = randint(total_store_count - 1);
 
-			  /* no shuffling for alien towns */
-			  town_type *t_ptr = &t_info[p_ptr->town];
 			  for (i = 0; i < MAX_STORES; i++)
 			    {
 			      if (t_ptr->store_index[i] == n)
