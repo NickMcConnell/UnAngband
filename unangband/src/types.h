@@ -1758,6 +1758,7 @@ struct element_type
 	int effect;
 	u32b flags2;
 	int grp_idx;
+	s16b k_idx;
 };
 
 

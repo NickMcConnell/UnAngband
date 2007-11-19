@@ -18000,7 +18000,7 @@ D:A viscious spirit of hot flames, burning brightly and casting spells furiously
 N:1243:Naiad
 G:E:b
 I:120:14d10:18:12:10
-W:20:1:13:20
+W:20:1:12:20
 M:0:25:20:39
 B:TOUCH:WATER:2d6
 F:OPEN_DOOR | BASH_DOOR | DROP_1D2 | CAN_SWIM

@@ -4484,6 +4484,7 @@ N:307:wet floor
 U:56
 G:.:b
 W:18:2:7:0
+O:224
 K:DEFAULT:1
 K:CHASM:141
 #K:HURT_WATER:611
@@ -5654,7 +5655,7 @@ K:OPEN:383
 K:USE_FEAT:385
 O:224
 F:CAN_CLIMB | CAN_FLY | LOS | MOVE | PROJECT | REMEMBER | NOTICE | HURT_ROCK | BASH |
-F:USE_FEAT | ALLOC |
+F:USE_FEAT | ALLOC
 F:POWER_5
 
 # cloudy fountain - equivalent to potion of lose memories

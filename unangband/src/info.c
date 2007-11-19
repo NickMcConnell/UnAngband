@@ -1872,6 +1872,9 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 			case RBM_ORB: rad = (level < 30 ? 2 : 3); d3 += level/2; break;
 			case RBM_SWARM: d3 += level / 2; rad = 1; break;
 			case RBM_BREATH: d3 = p_ptr->chp * d3 / 300; break;
+			case RBM_STRIKE: if ((level > 5) && (d2)) d1+= (level-1)/5; break;
+			case RBM_SPHERE: rad = (level/10)+2;break;
+			case RBM_FLASK: rad = 1; break;
 		}
 
 		/* Default */

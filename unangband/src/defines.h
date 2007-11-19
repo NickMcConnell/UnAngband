@@ -1216,6 +1216,7 @@
 #define FEAT_CHASM_WEB 459
 
 #define FEAT_GROUND 407
+#define FEAT_GROUND_EMPTY 414
 #define FEAT_GRASS 411
 #define FEAT_TREE      420
 #define FEAT_TREE_SHADE   421

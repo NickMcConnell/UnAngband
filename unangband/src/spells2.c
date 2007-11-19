@@ -1977,8 +1977,8 @@ bool concentrate_water_hook(const int y, const int x, const bool modify)
 	/* Need 'running water' */
 	if (((f_ptr->flags2 & (FF2_WATER)) == 0)
 
-	/* Allow stagnant water */
-		&& !(suffix(f_name+f_ptr->name, "water"))) return (FALSE);
+	/* Allow wet floors/fountains/wells */
+		&& (f_ptr->k_idx != 224)) return (FALSE);
 
 	/* Not modifying yet */
 	if (!modify) return (TRUE);
@@ -5252,6 +5252,39 @@ static bool fire_cloud(int who, int what, int typ, int dir, int dam, int rad)
 
 
 /*
+ * Cast an area spell
+ * Stop if we hit a monster, act as a "ball"
+ * However damages all targets in area of effect equally
+ * Allow "target" mode to pass over monsters
+ * Affect monsters only
+ */
+static bool fire_area(int who, int what, int typ, int dir, int dam, int rad)
+{
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int ty, tx;
+
+	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_KILL | PROJECT_BOOM | PROJECT_PLAY | PROJECT_AREA | PROJECT_MAGIC;
+
+	/* Use the given direction */
+	ty = py + 99 * ddy[dir];
+	tx = px + 99 * ddx[dir];
+
+	/* Hack -- Use an actual "target" */
+	if ((dir == 5) && target_okay())
+	{
+		flg &= ~(PROJECT_STOP);
+
+		ty = p_ptr->target_row;
+		tx = p_ptr->target_col;
+	}
+
+	/* Analyze the "dir" and the "target".  Hurt items on floor. */
+	return (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 10));
+}
+
+/*
  * Hack -- apply a "projection()" in a direction (or at the target)
  */
 static bool project_hook(int who, int what, int typ, int dir, int dam, int flg)
@@ -6406,7 +6439,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 				/* Allow direction to be cancelled for free */
 				if (!get_aim_dir(&dir)) return (!(*cancel));
 				
-				if (fire_cloud(who, what, effect, dir, damage, rad)) obvious = TRUE;
+				if (fire_area(who, what, effect, dir, damage, rad)) obvious = TRUE;
 				break;
 			}
 			case RBM_LOS:
