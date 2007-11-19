@@ -86,7 +86,7 @@ D: then to Bree.  Press < to travel from any town, or when near the edge of
 D: the larger wilderness locations.
 
 N:2:Rivendell
-X:3:13:52:14
+X:3:13:52:0
 L:0:0:420:155:0:0
 S:267:9:10:11:519:13:268:513
 
@@ -102,11 +102,13 @@ L:5:420:56:56:0:0
 L:6:56:0:153:52:0
 L:7:56:0:153:0:0
 L:13:56:0:154:173:0
-D:This is said to be the easiest road east, to Mirkwood and further
-D: towards Smaug's lair.  If you can only find the way through...
+D:The path called High Pass is said to be the easiest road east
+D: to Mirkwood and further towards Smaug's lair.  Easiest does not mean easy.
+D: It is too steep and too high to be even attempted when it shows
+D: and in other times goblins are known to set traps for unwary travelers.
 
 N:4:the house of Beorn
-X:3:5:0:0
+X:3:5:52:0
 R:ANIMAL
 L:14:0:435:0:566:0
 S:269:0:0:0:0:0:0:0
@@ -237,9 +239,12 @@ Q:18:1272
 L:20:451:56:148:473:0
 L:21:56:144:145:0:0
 L:50:56:144:145:1272:0
-D:Since the path created by the Goblins through the Misty Mountains is blocked,
-D: this is the only route through.  In summer, it was passable.  Now, however,
-D: the storms of the mountain echo around you.  Turn back, while you can!
+D:Legend has it that this mighty mountain is Morgoth's minion.
+D:  In good weather you'd laugh at it, easily traversing the nearby pass.
+D:  Now, however, the storms of the mountain echo around and you can't even
+D: tell the pass from the mountain slopes.  Even if you manage to
+D: fight your way through, you have no idea where you'll end.
+D:  Turn back, while you can!
 
 # TODO: make sure this dungeon has wilderness features, watery, etc., 
 # not caves and rock; The dungeon is very short --- it does
@@ -264,7 +269,6 @@ N:17:Isengard
 X:20:21:14:0
 R:MAGE
 G:B
-Z:23:48
 L:6:420:141:141:0:31
 L:7:50:0:0:0:31
 L:35:56:0:0:1365:31
@@ -458,8 +462,8 @@ R:PLANT
 L:21:420:420:420:249:0
 D:Fangorn is aflame: Saruman's orcs have taken axe and fire to the trees
 D: and the haunted moans of the ancient wood fill the air.  Some say the
-D: trees have begun to march in response - but you can only see dark and
-D: mysterious Dol Guldur wreathed by smoke and death.
+D: trees have begun to march in response - but you can only see dark smoke
+D: and east, even darker shape among dark, Dol Guldur.
 
 N:38:Barrow-downs
 X:11:12:0:0
@@ -584,19 +588,23 @@ X:32:50:0:0
 R:EVIL
 L:80:407:218:208:511:0
 
-N:52:the Redhorn
+# Redhorn is actually another name for Caradhras; 
+# 'Redhorn pass' is the pass nearby
+
+N:52:the Redhorn pass
 X:14:2:0:0
 R:GIANT
 G:o
 Z:15:9
-Q:5:140
+Q:4:140
 L:7:544:56:148:140:0
 L:8:56:145:0:0:0
 L:37:56:145:0:297:0
-D:Legend has it that this mighty mountain is Morgoth's minion.  If so,
-D: it appears asleep at the moment: nonetheless the pass is treacherous in
-D: summer and impassable in winter. Orcs have overrun the passage at the
-D: moment, and to pass, you must defeat their leader.
+D:Legend has it that Caradhras, called also Redhorn, is Morgoth's minion.
+D:  If so, it appears asleep at the moment:
+D: nonetheless the Redhorn Pass is treacherous in
+D: summer and deadly in winter.  Orcs have overrun the passage
+D: at the moment, and to pass, you must defeat their leader.
 
 N:53:Buckland
 X:54:0:0:0

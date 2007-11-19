@@ -12979,7 +12979,7 @@ F:ENTER | CAN_FLY | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW 
 F:POWER_46
 D:'Ask my lichen-covered brother what he thinks.' this ent says.
 
-N:953:lichen=covered ent at the Ent Moot
+N:953:lichen-covered ent at the Ent Moot
 G:0:w
 W:50:0:20:0
 F:ENTER | CAN_FLY | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW | OUTSIDE

@@ -17,7 +17,7 @@ one-way only; they are marked with an arrow.  For more information
 about wilderness and dungeons, see "dungeon.txt".
 
                                          
-                                                    ##           Lonely Mountain
+                                                   ##            Lonely Mountain
                   Trollshaw Forest (5-6)            ###              (21-38)
                    /                 |               ##                 | 
                   /   Midgewater     |                #                 |
@@ -25,14 +25,14 @@ Hobbiton*        /   / Marshes |     |          Misty Mountains      Lake-town*
  |    \         /   /  (12-19) |     |            path ##             /  |
  |     \       Bree*           |     |           (6-13)<---Beorn's   /   |
  | East Road-->(1-4)   Weathertop    |          /      #    House   /    |
- |                  \    (21-31) \   |  Rivendell*     ##       \  /     |
- |  Brandywine       \      |     \  | /  |   \        ##      Mirkwood  |
- |  | Ferry  |        \     |      Ford   |    \      ##        (15-26)  |
- |  |        V     ?   \    |             |     \   ###        /   |     |
- |  V   Buckland*  |    \   |             |    the Redhorn    /    |     |
-Farmer    |        V     \  |             |   / pass (7-37)  /     |     |
-Maggot's  Old Forest-->Barrow Downs       |  /      ##      /      |     |
- Farm       (7-10)        (5-20)          | /      ###     /       |     |
+ |                  \    (21-31) \   |  Rivendell*     ##   /   \  /     |
+ |  Brandywine       \      |     \  | /      \        ##  /   Mirkwood  |
+ |  | Ferry  |        \     |      Ford        \      ##  /     (15-26)  |
+ |  |        V     ?   \    |                   \   ###  |     /   |     |
+ |  V   Buckland*  |    \   |                   Redhorn  V    /    |     |
+Farmer    |        V     \  |                  /Pass (8-37)  /     |     |
+Maggot's  Old Forest-->Barrow Downs           /     ##      /      |     |
+ Farm       (7-10)        (5-20)             /     ###     /       |     |
  (3-6)                                   West gates ##    /        |     |
                                           of Moria<----East gates  |     |
                                            (7-24)  ###  of Moria   |     |
