@@ -6382,7 +6382,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 				/* Allow direction to be cancelled for free */
 				if (!get_aim_dir(&dir)) return (!(*cancel));
 
-				if (fire_ball(who, what, effect, dir, MIN(p_ptr->chp,damage), 2)) obvious = TRUE;
+				if (fire_arc(who, what, effect, dir, p_ptr->chp * damage / 300, 0, (effect == GF_SOUND) || (effect == GF_POIS) ? 30 : 20)) obvious = TRUE;
 
 				break;
 			}

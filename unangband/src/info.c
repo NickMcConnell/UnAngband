@@ -1286,7 +1286,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_BALL_III: p = "creates a ball"; t = "your enemies"; rad = 4; break;
 			case RBM_CLOUD: p = "creates a cloud"; t = "your enemies"; rad = 2; d3 += level/2; break;
 			case RBM_STORM: p = "creates a storm"; t = "your enemies"; rad = 3; break;
-			case RBM_BREATH: p = "breathes";  t = "your enemies"; break;
+			case RBM_BREATH: p = "breathes";  t = "your enemies"; d3 = p_ptr->chp * d3 / 300; break;
 			case RBM_AREA: p = "surrounds you with magic"; rad = (level/10)+1; break;
 			case RBM_AIM_AREA: p = "affects an area"; rad = (level/10)+1; break;
 			case RBM_LOS: t = "all your enemies in line of sight"; break;
@@ -1871,6 +1871,7 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 			case RBM_AREA: rad = (level/10)+2; break;
 			case RBM_ORB: rad = (level < 30 ? 2 : 3); d3 += level/2; break;
 			case RBM_SWARM: d3 += level / 2; rad = 1; break;
+			case RBM_BREATH: d3 = p_ptr->chp * d3 / 300; break;
 		}
 
 		/* Default */
