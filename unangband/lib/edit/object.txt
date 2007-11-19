@@ -1763,6 +1763,11 @@ A:0/1
 P:0:1d1:0:0:0
 F:THROWING
 
+# after the competition, perhaps set it to 
+#W:2:0:4:200
+#A:2/2:50/1
+# and similarly for other stat potions
+#
 N:225:Strength and Size
 G:!:w
 I:75:48:0
