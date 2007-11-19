@@ -87,7 +87,7 @@ cp src/osx/*.icns unangband-062-src/src/osx
 cp src/osx/*.xml unangband-062-src/src/osx
 cp src/osx/*.h unangband-062-src/src/osx
 cp src/osx/English.lproj/*.strings unangband-062-src/src/osx/English.lproj
-cp src/osx/English.lproj/main.nib/*.nib unangband-062-src/src/osx/English.lproj/main.nib
+cp src/osx/English.lproj/main.nib/*.?ib unangband-062-src/src/osx/English.lproj/main.nib
 
 zip -9 -r unangband-062-src.zip unangband-062-src
 
