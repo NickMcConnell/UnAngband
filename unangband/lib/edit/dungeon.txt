@@ -263,10 +263,11 @@ D: deadly stirs in the water outside.
 N:17:Isengard
 X:20:21:14:0
 R:MAGE
+G:B
 Z:23:48
 L:6:420:141:141:0:31
 L:7:50:0:0:0:31
-L:35:56:0:0:0:31
+L:35:56:0:0:1365:31
 D:The tower of Isengard is home to the wise councillor Saruman
 D: the White, head of the order of Istari.  However, you are not
 D: yet a member...
