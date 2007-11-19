@@ -269,6 +269,7 @@ N:17:Isengard
 X:20:21:14:0
 R:MAGE
 G:B
+Z:23:48
 L:6:420:141:141:0:31
 L:7:50:0:0:0:31
 L:35:56:0:0:1365:31
@@ -463,7 +464,7 @@ L:21:420:420:420:249:0
 D:Fangorn is aflame: Saruman's orcs have taken axe and fire to the trees
 D: and the haunted moans of the ancient wood fill the air.  Some say the
 D: trees have begun to march in response - but you can only see dark smoke
-D: and, east, even darker shape among dark, Dol Guldur.
+D: and, east, the even darker shape amongst the darkness: Dol Guldur.
 
 N:38:Barrow-downs
 X:11:12:0:0
@@ -600,7 +601,7 @@ Q:4:140
 L:7:544:56:148:140:0
 L:8:56:145:0:0:0
 L:37:56:145:0:297:0
-D:Legend has it that Caradhras, called also Redhorn, is Morgoth's minion.
+D:Legend has it that Caradhras, called also the Redhorn, is Morgoth's minion.
 D:  If so, it appears asleep at the moment:
 D: nonetheless the Redhorn Pass is treacherous in
 D: summer and deadly in winter.  Orcs have overrun the passage
