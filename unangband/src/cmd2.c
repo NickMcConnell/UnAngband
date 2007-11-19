@@ -3678,7 +3678,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 				}
 
 				/* Actually "fire" the object */
-				bonus = (p_ptr->to_h + i_ptr->to_h + bow_to_h + style_hit);
+				bonus = (p_ptr->to_h + i_ptr->to_h + bow_to_h + style_hit + (p_ptr->blocking ? 15 : 0));
 				chance = ranged_skill + bonus * BTH_PLUS_ADJ;
 				chance2 = chance - distance(old_y, old_x, y, x);
 

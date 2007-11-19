@@ -2607,6 +2607,11 @@ void py_attack(int dir)
 		/* Calculate the "attack quality" */
 		if (o_ptr->k_idx) bonus = p_ptr->to_h + o_ptr->to_h + style_hit;
 		else bonus = p_ptr->to_h + style_hit;
+		
+		/*
+		 * Blocking - the player gets a big to-hit bonus on the riposte
+		 */
+		if (p_ptr->blocking) bonus += 20;
 
 		chance = (p_ptr->skill_thn + (bonus * BTH_PLUS_ADJ));
 
