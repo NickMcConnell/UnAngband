@@ -1204,6 +1204,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		u32b f4 = 0L;
 		
 		int param = s_ptr->param;
+		int pval = (p_ptr->lev + 19) / 20;
 		
 		/* Hack - upgrade slays */
 		switch (param)
@@ -1234,18 +1235,18 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		if ((f1 == TR1_MIGHT) && (s_ptr->type == SPELL_MAGIC_BLOW))
 		{
 			/* Message */
-			text_out("It modifies charging.  ");
+			text_out(format("It increases your charging by x%d.  ", pval));
 		}
 		/* Hack - shots for throws modifies number of throws */
 		else if ((f1 == TR1_SHOTS) && (s_ptr->type == SPELL_MAGIC_HURL))
 		{
 			/* Message */
-			text_out("It modifies hurls.  ");
+			text_out(format("It increases your hurls by %d.  ", pval));
 		}
 		else
 		{
 			/* List the flags */
-			list_object_flags(f1, f2, f3, f4, LIST_FLAGS_CAN);
+			list_object_flags(f1, f2, f3, f4, pval, LIST_FLAGS_CAN);
 		}
 	}
 	
@@ -2538,7 +2539,7 @@ void screen_self_object(object_type *o_ptr, int slot)
 /*
  * This function displays lists of properties
  */
-static bool outlist(cptr header, const cptr *list, byte attr)
+static bool outlist_pval(cptr header, const cptr *list, byte attr, int pval)
 {
 	/* Ignore an empty list */
 	if (*list == NULL) return (FALSE);
@@ -2570,6 +2571,11 @@ static bool outlist(cptr header, const cptr *list, byte attr)
 		/* Advance, with break */
 		if (!*++list) break;
 	}
+	
+	if (pval)
+	{
+		text_out_c(attr, format(" by %d", ABS(pval)));
+	}
 
 	/* End the current list */
 	text_out_c(attr, ".  ");
@@ -2578,11 +2584,21 @@ static bool outlist(cptr header, const cptr *list, byte attr)
 	return (TRUE);
 }
 
+
+/*
+ * This function displays a list of non-pval dependent properties
+ */
+static bool outlist(cptr header, const cptr *list, byte attr)
+{
+	return (outlist_pval(header, list, attr, 0));
+}
+
+
 /* 
  * Create a spoiler file entry for an artifact.
  * We use this to list the flags.
  */
-bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
+bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 {
 	const u32b all_stats = (TR1_STR | TR1_INT | TR1_WIS |
 							TR1_DEX | TR1_CON | TR1_CHR);
@@ -2787,18 +2803,20 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode)
 			switch (mode)
 			{
 				case LIST_FLAGS_CAN:
-					text_out_c(TERM_WHITE,"It modifies ");
+					if (pval > 0) text_out_c(TERM_WHITE, "It increases your ");
+					else if (pval < 0) text_out_c(TERM_WHITE, "It decreases your ");
+					else text_out_c(TERM_WHITE,"It modifies your ");
 					break;
 				case LIST_FLAGS_MAY:
-					text_out_c(TERM_L_WHITE,"It may modify ");
+					text_out_c(TERM_L_WHITE,"It may modify your ");
 					attr= TERM_L_WHITE;
 					break;
 				case LIST_FLAGS_NOT:
-					text_out_c(TERM_SLATE,"It does not modify ");
+					text_out_c(TERM_SLATE,"It does not modify your ");
 					attr = TERM_SLATE;
 					break;
 			} 
-			anything |= outlist(NULL, list,attr);
+			anything |= outlist_pval(NULL, list,attr, mode == LIST_FLAGS_CAN ? pval : 0);
 		}
 	}
 
@@ -3352,7 +3370,7 @@ void list_object(const object_type *o_ptr, int mode)
 	object_flags_aux(mode, o_ptr, &f1, &f2, &f3, &f4);
 
 	/* Display the flags */
-	anything |= list_object_flags(f1, f2, f3, f4, LIST_FLAGS_CAN); 
+	anything |= list_object_flags(f1, f2, f3, f4, spoil || (o_ptr->ident & (IDENT_PVAL | IDENT_MENTAL | IDENT_KNOWN)) ? o_ptr->pval : 0, LIST_FLAGS_CAN); 
 
 	/*
 	 * Handle cursed objects here to avoid redundancies such as noting
@@ -3801,13 +3819,13 @@ void list_object(const object_type *o_ptr, int mode)
 	if (!random && !spoil)
 	{
 		/* Display the flags */
-		anything |= list_object_flags(o_ptr->may_flags1, o_ptr->may_flags2, o_ptr->may_flags3, o_ptr->may_flags4, LIST_FLAGS_MAY); 
+		anything |= list_object_flags(o_ptr->may_flags1, o_ptr->may_flags2, o_ptr->may_flags3, o_ptr->may_flags4, o_ptr->ident & (IDENT_PVAL | IDENT_MENTAL | IDENT_KNOWN) ? o_ptr->pval : 0, LIST_FLAGS_MAY); 
 
 #if 0
                 /* Equipment only */
                 if (wield_slot(o_ptr) >= INVEN_WIELD)
                         /* Display the flags */
-                        anything |= list_object_flags(o_ptr->not_flags1, o_ptr->not_flags2, o_ptr->not_flags3, o_ptr->not_flags4, LIST_FLAGS_NOT);
+                        anything |= list_object_flags(o_ptr->not_flags1, o_ptr->not_flags2, o_ptr->not_flags3, o_ptr->not_flags4, o_ptr->ident & (IDENT_PVAL | IDENT_MENTAL | IDENT_KNOWN) ? o_ptr->pval : 0, LIST_FLAGS_NOT);
 #endif
 	}
 
@@ -5046,7 +5064,7 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4, bo
 		Term_gotoxy(0, 1);
 
 		/* Actually display the item */
-		list_object_flags(f1 & (o_ptr->can_flags1), f2 & (o_ptr->can_flags2), f3 & (o_ptr->can_flags3), f4 & (o_ptr->can_flags4), LIST_FLAGS_CAN);
+		list_object_flags(f1 & (o_ptr->can_flags1), f2 & (o_ptr->can_flags2), f3 & (o_ptr->can_flags3), f4 & (o_ptr->can_flags4), o_ptr->pval, LIST_FLAGS_CAN);
 
 		(void)anykey();
 	
@@ -5377,7 +5395,7 @@ void update_slot_flags(int slot, u32b f1, u32b f2, u32b f3, u32b f4)
 	Term_gotoxy(0, 1);
 
 	/* Actually display the item */
-	list_object_flags(f1, f2, f3, f4, LIST_FLAGS_CAN);
+	list_object_flags(f1, f2, f3, f4, i_ptr->ident & (IDENT_PVAL | IDENT_MENTAL | IDENT_KNOWN) ? i_ptr->pval : 0, LIST_FLAGS_CAN);
 
 	(void)anykey();
 	

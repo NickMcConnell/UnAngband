@@ -591,7 +591,7 @@ extern void generate_cave(void);
 /* info.c */
 extern bool spell_desc(spell_type *s_ptr, const cptr intro, int level, bool detail, int target);
 extern void spell_info(char *p, int p_s, int spell, bool use_level);
-extern bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int mode);
+extern bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode);
 extern void list_object(const object_type *o_ptr, int mode);
 extern void screen_object(object_type *o_ptr);
 extern void screen_self_object(object_type *o_ptr, int slot);

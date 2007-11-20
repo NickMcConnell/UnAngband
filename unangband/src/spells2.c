@@ -786,7 +786,7 @@ void self_knowledge_aux(bool spoil, bool random)
 	{
 		text_out("Your race affects you.  ");
 
-		list_object_flags(rp_ptr->flags1,rp_ptr->flags1,rp_ptr->flags1,rp_ptr->flags4,1);
+		list_object_flags(rp_ptr->flags1,rp_ptr->flags1,rp_ptr->flags1,rp_ptr->flags4, 1, 1);
 
 		text_out("\n");
 	}
@@ -813,7 +813,7 @@ void self_knowledge_aux(bool spoil, bool random)
 
 			intro = TRUE;
 
-			list_object_flags(shape_ptr->flags1,shape_ptr->flags1,shape_ptr->flags1,shape_ptr->flags4,1);
+			list_object_flags(shape_ptr->flags1,shape_ptr->flags1,shape_ptr->flags1,shape_ptr->flags4, 1, 1);
 		}
 
 		/* Intro? */
@@ -831,7 +831,7 @@ void self_knowledge_aux(bool spoil, bool random)
 	{
 		text_out("Your training affects you.  ");
 
-		list_object_flags(t1,t2,t3,t4,1);
+		list_object_flags(t1,t2,t3,t4,1, 1);
 
 		text_out("\n");
 	}
@@ -865,7 +865,7 @@ void self_knowledge_aux(bool spoil, bool random)
 	{
 		text_out("Your equipment affects you.  ");
 
-		list_object_flags(f1,f2,f3,f4,1);
+		list_object_flags(f1,f2,f3,f4,0, 1);
 
 		if (spoil)
 		{
@@ -899,7 +899,7 @@ void self_knowledge_aux(bool spoil, bool random)
 		{
 			text_out("Your weapon has special powers.  ");
 	
-			list_object_flags(t1,t2,t3,t4,1);
+			list_object_flags(t1,t2,t3,t4,o_ptr->pval, 1);
 
 			if (spoil)
 			{	
@@ -933,7 +933,7 @@ remainder:
 	{
 		text_out("You are carrying equipment that you have not fully identified.  ");
 
-		list_object_flags(t1,t2,t3,t4,1);
+		list_object_flags(t1,t2,t3,t4,0, 1);
 
 		text_out("\n");
 	}
@@ -3637,7 +3637,7 @@ bool ident_spell_rumor(void)
 		Term_gotoxy(0, 1);
 
 		/* Actually display the item */
-		list_object_flags(f1, f2, f3, f4, 1);
+		list_object_flags(f1, f2, f3, f4, o_ptr->ident & (IDENT_PVAL | IDENT_MENTAL | IDENT_KNOWN) ? o_ptr->pval : 0, 1);
 
 		(void)anykey();
 	

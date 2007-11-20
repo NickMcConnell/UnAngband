@@ -1410,13 +1410,13 @@ static void desc_ego_fake(int oid)
 
 	/* List can flags */
 	if(cheat_lore) list_object_flags(e_ptr->flags1, e_ptr->flags2, e_ptr->flags3,
-									e_ptr->flags4, 1);
+									e_ptr->flags4, 0, 1);
 
 	else {
 		list_object_flags(n_ptr->can_flags1, n_ptr->can_flags2, n_ptr->can_flags3,
-							n_ptr->can_flags4, 1);
+							n_ptr->can_flags4, 0, 1);
 		/* List may flags */
-		list_object_flags(n_ptr->may_flags1,n_ptr->may_flags2,n_ptr->may_flags3,n_ptr->may_flags4,2);
+		list_object_flags(n_ptr->may_flags1,n_ptr->may_flags2,n_ptr->may_flags3,n_ptr->may_flags4,0, 2);
 	}
 
 	for(i = 0, f3 = TR3_PERMA_CURSE; i < 3 ; f3 >>= 1, i++) {
