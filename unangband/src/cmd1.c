@@ -2877,11 +2877,11 @@ void py_attack(int dir)
 				object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 				/* We've killed it - Suck blood from the corpse */
-				if ((f4 & (TR4_VAMP_HP)) & (r_ptr->flags8 & (RF8_HAS_BLOOD)))
+				if (((f4 & (TR4_VAMP_HP)) || (p_ptr->branded_blows == 101)) & (r_ptr->flags8 & (RF8_HAS_BLOOD)))
 				{
 					hp_player(r_ptr->level);
 
-					if (p_ptr->branded_blows != 1) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_HP, FALSE);
+					if (p_ptr->branded_blows != 101) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_HP, FALSE);
 					l_ptr->flags8 |= (RF8_HAS_BLOOD);
 				}
 				else if (l_ptr->flags8 & (RF8_HAS_BLOOD))
@@ -2890,7 +2890,7 @@ void py_attack(int dir)
 				}
 
 				/* We've killed it - Drain mana from the corpse*/
-				if ((f4 & (TR4_VAMP_MANA)) & (r_ptr->mana > 0))
+				if (((f4 & (TR4_VAMP_MANA)) || (p_ptr->branded_blows == 102)) & (r_ptr->mana > 0))
 				{
 					if (p_ptr->csp < p_ptr->msp)
 					{
@@ -2904,7 +2904,7 @@ void py_attack(int dir)
 						p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
 					}
 
-					if (p_ptr->branded_blows != 1) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_MANA, FALSE);
+					if (p_ptr->branded_blows != 102) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_MANA, FALSE);
 				}
 				else if (r_ptr->mana > 0)
 				{

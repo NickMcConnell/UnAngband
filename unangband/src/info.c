@@ -1148,6 +1148,17 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->type == SPELL_CHANGE_SHAPE) vp[vn++] = format("changes you into a %s",p_name + p_info[s_ptr->param].name);
 	if (s_ptr->type == SPELL_REVERT_SHAPE) vp[vn++] = "returns you to your normal form";
 	if (s_ptr->type == SPELL_REFUEL) vp[vn++] = "fuels a torch";
+	if (s_ptr->type == SPELL_MAGIC_BLOW) vp[vn++] = "increases the effectiveness of a single round of blows";
+	if (s_ptr->type == SPELL_MAGIC_SHOT) vp[vn++] = "increases the effectiveness of a single round of firing";
+	if (s_ptr->type == SPELL_MAGIC_HURL) vp[vn++] = "increases the effectiveness of a single round of thrown weapons";
+	if (s_ptr->type == SPELL_ACCURATE_BLOW) vp[vn++] = "increases the accuracy of a single round of blows";
+	if (s_ptr->type == SPELL_ACCURATE_SHOT) vp[vn++] = "increases the accuracy of a single round of firing";
+	if (s_ptr->type == SPELL_ACCURATE_HURL) vp[vn++] = "increases the accuracy of a single round of thrown weapons";
+	if (s_ptr->type == SPELL_DAMAGING_BLOW) vp[vn++] = "increases the damage of a single round of blows";
+	if (s_ptr->type == SPELL_DAMAGING_SHOT) vp[vn++] = "increases the damage of a single round of firing";
+	if (s_ptr->type == SPELL_DAMAGING_HURL) vp[vn++] = "increases the damage of a single round of thrown weapons";
+	if (s_ptr->type == SPELL_REFUEL) vp[vn++] = "fuels a torch";
+	
 
 	/* Describe miscellaneous effects */
 	if (vn)
@@ -1176,6 +1187,72 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 			/* Dump */
 			text_out(vp[n]);
 		}
+	}
+	
+	/* Note for the player */
+	if ((s_ptr->type >= SPELL_MAGIC_BLOW) && (s_ptr->type <= SPELL_DAMAGING_HURL))
+	{
+		text_out(".  ");
+	}
+
+	/* Hack -- describe the blow/shot/hurl effect */
+	if ((s_ptr->type >= SPELL_MAGIC_BLOW) && (s_ptr->type <= SPELL_MAGIC_HURL))
+	{
+		u32b f1 = 0L;
+		u32b f2 = 0L;
+		u32b f3 = 0L;
+		u32b f4 = 0L;
+		
+		int param = s_ptr->param;
+		
+		/* Hack - upgrade slays */
+		switch (param)
+		{
+			case 19:
+			{
+				if (p_ptr->lev >= 30) param = 28;
+				break;
+			}
+			case 20:
+			{
+				if (p_ptr->lev >= 30) param = 27;
+				break;
+			}
+			case 25:
+			{
+				if (p_ptr->lev >= 30) param = 26;
+				break;
+			}
+		}
+		
+		if (param < 33) f1 |= 1L << (param - 1);
+		else if (param < 65) f2 |= 1L << (param - 33);
+		else if (param < 97) f3 |= 1L << (param - 65);
+		else if (param < 129) f4 |= 1L << (param - 97);
+		
+		/* Hack - might for blows modifies charging */
+		if ((f1 == TR1_MIGHT) && (s_ptr->type == SPELL_MAGIC_BLOW))
+		{
+			/* Message */
+			text_out("It modifies charging.  ");
+		}
+		/* Hack - shots for throws modifies number of throws */
+		else if ((f1 == TR1_SHOTS) && (s_ptr->type == SPELL_MAGIC_HURL))
+		{
+			/* Message */
+			text_out("It modifies hurls.  ");
+		}
+		else
+		{
+			/* List the flags */
+			list_object_flags(f1, f2, f3, f4, LIST_FLAGS_CAN);
+		}
+	}
+	
+	/* Note for the player */
+	if ((s_ptr->type >= SPELL_MAGIC_BLOW) && (s_ptr->type <= SPELL_DAMAGING_HURL))
+	{
+		text_out("This initiates the attack if successful");
 	}
 
 	return (introduced);

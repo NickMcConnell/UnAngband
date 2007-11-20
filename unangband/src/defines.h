@@ -1608,6 +1608,15 @@
 #define SPELL_LIGHT_CHAMBERS	46
 #define SPELL_REST_UNTIL_DUSK	47
 #define SPELL_REST_UNTIL_DAWN	48
+#define SPELL_MAGIC_BLOW	49
+#define SPELL_MAGIC_SHOT	50
+#define SPELL_MAGIC_HURL	51
+#define SPELL_ACCURATE_BLOW	52
+#define SPELL_ACCURATE_SHOT	53
+#define SPELL_ACCURATE_HURL	54
+#define SPELL_DAMAGING_BLOW	55
+#define SPELL_DAMAGING_SHOT	56
+#define SPELL_DAMAGING_HURL	57
 
 
 /*** Important artifact indexes (see "lib/edit/artifact.txt") ***/

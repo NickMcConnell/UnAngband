@@ -7322,8 +7322,65 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 }
 
 
+#define SPELL_BLOW_HACK	0
+#define SPELL_SHOT_HACK	1
+#define SPELL_HURL_HACK	2
+
+/*
+ * This helper function allows the player to ensorcle a single
+ * round of attacks, round of shots or round of shooting with
+ * various effects.
+ * 
+ * Returns FALSE if cancelled
+ */
+bool process_spell_blow_shot_hurl(int type)
+{
+	switch (type)
+	{
+		case SPELL_BLOW_HACK:
+		{
+			int dir;
+			
+			/* Allow direction to be cancelled for free */
+			if (!get_rep_dir(&dir)) return (FALSE);
+			
+			/* Attack */
+			py_attack(dir);
+			
+			break;
+		}
+		case SPELL_SHOT_HACK:
+		{
+			/* Fire */
+			do_cmd_fire();
+			
+			/* Cancelled */
+			if (!p_ptr->energy_use) return (FALSE);
+			
+			break;
+		}
+		case SPELL_HURL_HACK:
+		{
+			/* Fire */
+			do_cmd_throw();
+			
+			/* Cancelled */
+			if (!p_ptr->energy_use) return (FALSE);
+			
+			break;
+		}
+	}
+	
+	return (TRUE);
+}
 
 
+
+/*
+ * Process the spell types.
+ * 
+ * Basically a collection of hacks
+ */
 bool process_spell_types(int who, int spell, int level, bool *cancel)
 {
 
@@ -7853,6 +7910,129 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				/* Hack -- regenerate level */
 				p_ptr->leaving = TRUE;
 				
+				break;
+			}
+			
+			case SPELL_MAGIC_BLOW:
+			case SPELL_MAGIC_SHOT:
+			case SPELL_MAGIC_HURL:
+			{
+				bool result;
+				
+				/* Magical blow */
+				p_ptr->branded_blows = s_ptr->param;
+				
+				/* Hack - try to assist a couple of things.
+				 * Note that a lot of flags don't actually work
+				 * such as e.g. stat bonuses. We hackily adjust
+				 * blows, shots, might and a 'fake' hurls here,
+				 * and use 'melee might' to increase charge bonus.
+				 */
+				switch (s_ptr->param)
+				{
+					case 14: case 15:
+					{
+						p_ptr->num_blow += (p_ptr->lev + 19) / 20;
+						p_ptr->num_fire += (p_ptr->lev + 19) / 20;
+						p_ptr->num_throw += (p_ptr->lev + 19) / 20;
+						break;
+					}
+					case 16:
+					{
+						p_ptr->num_charge += (p_ptr->lev + 19) / 20;
+						p_ptr->ammo_mult += (p_ptr->lev + 19) / 20;
+						break;
+					}
+					/* Hack -- upgrade slays to executions, where possible */
+					case 19:
+					{
+						if (p_ptr->lev >= 30) p_ptr->branded_blows = 28;
+						break;
+					}
+					case 20:
+					{
+						if (p_ptr->lev >= 30) p_ptr->branded_blows = 27;
+						break;
+					}
+					case 25:
+					{
+						if (p_ptr->lev >= 30) p_ptr->branded_blows = 26;
+						break;
+					}
+				}
+				
+				/* Allow direction to be cancelled for free */
+				result = process_spell_blow_shot_hurl(s_ptr->type - SPELL_MAGIC_BLOW);
+
+				/* End branding */
+				p_ptr->branded_blows = 0;
+
+				/* Undo above hacks */
+				switch (s_ptr->param)
+				{
+					case 14: case 15:
+					{
+						p_ptr->num_blow -= (p_ptr->lev + 19) / 20;
+						p_ptr->num_fire -= (p_ptr->lev + 19) / 20;
+						p_ptr->num_throw -= (p_ptr->lev + 19) / 20;
+						break;
+					}
+					case 16:
+					{
+						p_ptr->num_charge -= (p_ptr->lev + 19) / 20;
+						p_ptr->ammo_mult -= (p_ptr->lev + 19) / 20;
+						break;
+					}
+				}
+				
+				if (!result) return (!(*cancel));
+
+				*cancel = FALSE;
+				obvious = TRUE;				
+				break;
+			}
+			
+			case SPELL_ACCURATE_BLOW:
+			case SPELL_ACCURATE_SHOT:
+			case SPELL_ACCURATE_HURL:
+			{
+				bool result;
+				
+				/* Accurate blow */
+				p_ptr->to_h = s_ptr->param + p_ptr->lev;
+				
+				/* Allow direction to be cancelled for free */
+				result = process_spell_blow_shot_hurl(s_ptr->type - SPELL_ACCURATE_BLOW);
+
+				/* End branding */
+				p_ptr->to_h -= s_ptr->param + p_ptr->lev;
+
+				if (!result) return (!(*cancel));
+
+				*cancel = FALSE;
+				obvious = TRUE;
+				break;
+			}
+
+			case SPELL_DAMAGING_BLOW:
+			case SPELL_DAMAGING_SHOT:
+			case SPELL_DAMAGING_HURL:
+			{
+				bool result;
+				
+				/* Damaging blow */
+				p_ptr->to_h += s_ptr->param + p_ptr->lev;
+				
+				/* Allow direction to be cancelled for free */
+				result = process_spell_blow_shot_hurl(s_ptr->type - SPELL_DAMAGING_BLOW);
+
+				/* End branding */
+				p_ptr->to_h -= s_ptr->param + p_ptr->lev;
+
+				if (!result) return (!(*cancel));
+
+				*cancel = FALSE;
+				obvious = TRUE;				
 				break;
 			}
 			
