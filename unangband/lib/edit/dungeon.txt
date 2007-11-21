@@ -98,13 +98,13 @@ G:k
 R:HURT_LITE
 Q:4:173
 Z:15:9
-L:5:420:56:56:0:0
+L:5:420:56:56:0:0:Front Perch
 L:6:56:0:153:52:0
-L:7:56:0:153:0:0
-L:13:56:0:154:173:0
+L:7:56:0:153:0:0:Goblin Town
+L:13:56:0:154:173:0:Big Cavern
 D:The path called High Pass is said to be the easiest road east
 D: to Mirkwood and further towards Smaug's lair.  Easiest does not mean easy.
-D: It is too steep and too high to be even attempted when it snows
+D: It is too steep and too high to be even attempted when fresh snow has fallen
 D: and in other times goblins are known to set traps for unwary travelers.
 
 N:4:the house of Beorn
@@ -184,9 +184,9 @@ X:1:0:0:0
 G:,
 R:ANIMAL
 Q:58:111
-L:2:0:435:0:4:0
-L:3:114:0:0:0:0
-L:6:114:0:0:111:0
+L:2:0:435:0:4:0:Courtyard
+L:3:114:0:0:0:0:Cellars
+L:6:114:0:0:111:0:Back Exit
 S:507:0:0:0:0:0:0:0
 
 N:11:Bree
@@ -194,9 +194,9 @@ X:38:39:56:0
 Q:35:546
 W:440:48
 Y:440:48
-L:0:0:407:408:0:0
-L:1:56:0:0:0:0
-L:4:56:0:0:620:0
+L:0:0:407:408:0:0:Main Street
+L:1:56:0:0:0:0:Sewers
+L:4:56:0:0:620:0:Dump
 S:8:9:10:11:12:13:268:775
 
 N:12:Weathertop
@@ -236,9 +236,9 @@ X:14:2:0:0
 R:GIANT
 G:C
 Q:18:1272
-L:20:451:56:148:473:0
-L:21:56:144:145:0:0
-L:50:56:144:145:1272:0
+L:20:451:56:148:473:0:The Pass
+L:21:56:144:145:0:0:Mountain Slopes
+L:50:56:144:145:1272:0:Caradhras
 D:Legend has it that this mighty mountain is Morgoth's minion.
 D:  In good weather you'd laugh at it, easily traversing the nearby pass.
 D:  Now, however, the storms of the mountain echo around and you can't even
@@ -477,9 +477,9 @@ L:20:56:0:0:1081:0
 
 N:39:Trollshaw Forest
 X:13:11:0:0
-L:4:420:420:155:343:0
-L:5:56:0:0:344:0
-L:6:56:0:0:345:0
+L:4:420:420:155:343:0:Troll Hill
+L:5:56:0:0:344:0:Troll Clearing
+L:6:56:0:0:345:0:Troll Cave
 
 # East part of Moria
 
@@ -600,9 +600,9 @@ R:GIANT
 G:o
 Z:15:9
 Q:4:140
-L:7:544:56:148:140:0
-L:8:56:145:0:0:0
-L:37:56:145:0:297:0
+L:7:544:56:148:140:0:The Pass
+L:8:56:145:0:0:0:Orc Camp
+L:37:56:145:0:297:0:Ogre Camp
 D:Legend has it that Caradhras, called also the Redhorn, is Morgoth's minion.
 D:  If so, it appears asleep at the moment:
 D: nonetheless the Redhorn Pass is treacherous in
