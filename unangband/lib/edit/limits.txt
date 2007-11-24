@@ -38,7 +38,7 @@ M:R:1367
 M:V:51
 
 # Maximum number of towns/dungeons
-M:T:65
+M:T:71
 
 # Maximum number of stores
 M:U:47

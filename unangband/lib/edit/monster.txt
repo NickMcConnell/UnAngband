@@ -4755,7 +4755,7 @@ D: ethereal drake's eyes glare with white hatred from the shadows.
 N:343:Bert, the Stone Troll
 G:T:s
 I:110:23d10:20:40:50
-W:7:1:0:110
+W:12:1:0:110
 M:15:0:4:0
 B:HIT:BATTER:3d7
 B:BITE:HURT:1d10
@@ -4770,7 +4770,7 @@ D: Bill and Tom.
 N:344:Bill, the Stone Troll
 G:T:s
 I:110:23d10:20:40:50
-W:7:1:0:110
+W:12:1:0:110
 M:15:0:4:0
 B:HIT:BATTER:3d7
 B:BITE:HURT:1d10
@@ -4785,7 +4785,7 @@ D: Bert and Tom.
 N:345:Tom, the Stone Troll
 G:T:s
 I:110:23d10:20:40:50
-W:7:1:0:110
+W:12:1:0:110
 M:15:0:4:0
 B:HIT:BATTER:3d7
 B:BITE:HURT:1d10
