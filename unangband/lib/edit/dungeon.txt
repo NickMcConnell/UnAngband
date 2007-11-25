@@ -60,25 +60,24 @@
 
 V:0.6.2
 
-# The non-existent dungeon. This used to be Angband, so we keep it here for compatibility.
-# The non-campaign start is instead the second to last dungeon.
+# The non-existent dungeon.
+# The non-campaign start is the second to last dungeon.
 
-N:0:Angband
-X:43:0:0:0
-L:0:0:407:0:0:0
-L:1:56:0:0:0:0
-L:100:56:0:0:547:0
+N:0:Nowhere Town
+X:0:0:0:0
+L:0:0:407:0:0:0:Nowhere
 S:8:9:10:11:12:13:14:15
-D:It feels like home...
+D:It feels like in the middle of nowhere. You shouldn't be there.
+D:  Please report the bug.
 
-# Alternate starting dungeon.
+# Campaign starting dungeon.
 
 N:1:Hobbiton
 X:10:57:0:0
 Q:58:111
 Z:35:35
 G:h
-L:0:0:411:153:0:0
+L:0:0:411:153:0:0:Bywater Road
 S:264:515:265:266:772:773:0:0
 D:Here your adventure begins.  You can travel to Farmer Maggot's Farm or
 D: the East Road from here - the easiest route by far is the East Road and
@@ -87,7 +86,7 @@ D: the larger wilderness locations.
 
 N:2:Rivendell
 X:3:13:52:64
-L:0:0:420:155:0:0
+L:0:0:420:155:0:0:Last Homely House
 S:267:9:10:11:519:13:268:513
 D:Last Homely House on the Edge of the Wild,
 D:full of laughter and singing.
@@ -102,7 +101,7 @@ G:k
 R:HURT_LITE
 Q:4:173
 Z:41:9
-L:5:420:56:56:0:0:The Pass
+L:5:420:56:56:0:0:The High Pass
 L:6:56:0:153:52:0:Front Perch
 L:7:56:0:153:0:0:Goblin Town
 L:13:56:0:154:173:0:Big Cavern
@@ -111,24 +110,23 @@ D: to Mirkwood and further towards Smaug's lair.  Easiest does not mean easy.
 D: It is too steep and too high to be even attempted when fresh snow has fallen
 D: and in other times goblins are known to set traps for unwary travelers.
 D:  After a long walk up the pass you are exhausted, but fortunately
-D: you find an entrance '>' to a cave where you can rest...
+D: you find an entrance '>' to a cave...
 
 N:4:the house of Beorn
 X:3:5:0:0
 R:ANIMAL
-L:14:0:435:0:566:0
+L:14:0:435:0:566:0:Beorn's Hall
 S:269:0:0:0:0:0:0:0
 D:Beorn lives in a big hall with a veranda.  He is not fond of guests.
 
 N:5:road through Mirkwood the Great
 X:4:6:63:0
-Q:18:483
 G:l
 R:CAN_CLIMB
-L:14:420:56:153:637:0
-L:15:56:0:0:0:0
-L:25:0:1:155:0:0
-L:26:56:155:0:1082:0
+L:14:420:56:153:637:0:The Road
+L:15:56:0:0:0:0:Elvenking's Halls
+L:25:0:1:155:0:0:Trade Cellars
+L:26:56:155:0:1082:0:Great Hall
 S:270:271:503:11:12:504:505:0
 D:Dark shapes scuttle in the shadows and now and again you hear clicking
 D: and hissing.  Among odours of decay you sometimes catch a sweet scent
@@ -137,7 +135,7 @@ D: of captivating music.
 
 N:6:Lake-town
 X:5:7:48:0
-L:0:0:155:152:0:0
+L:0:0:155:152:0:0:Market-place
 S:8:9:10:11:12:13:14:508
 Z:8:7
 D:The dwellers of Esgaroth on the Long Lake are a hardy people, 
@@ -155,9 +153,10 @@ R:DRAGON
 G:B
 Q:9:475
 Z:47:9
-L:20:435:56:154:0:0
-L:21:56:0:0:0:0
-L:38:56:0:0:475:0
+L:20:435:56:154:0:0:Mountain Slopes
+L:21:56:0:0:0:0:Hidden Western Passage
+L:22:56:0:0:0:0:Tunnels
+L:38:56:0:0:475:0:Bottommost Hall
 D:There is a sudden flash of gold and flame in the
 D: air... Smaug has taken flight.  You desperately
 D: cower for cover on the open mountainside... he
@@ -171,7 +170,7 @@ X:5:7:48:0
 R:CAN_SWIM
 G:t
 Z:9:9
-L:22:155:407:49:475:0
+L:22:155:407:49:475:0:Burned Town
 D:Smaug has laid waste to Lake-town. The townsfolk
 D: gather, angry at you for disturbing his lair...
 
@@ -179,7 +178,7 @@ D: gather, angry at you for disturbing his lair...
 
 N:9:the Dale
 X:5:7:48:0
-L:0:0:530:153:0:0
+L:0:0:530:153:0:0:Trader's Street
 S:509:516:517:11:12:13:506:508
 D:The people of burnt Lake-town have elected to rebuild the nearby ancient Dale
 D: as their new abode.  Visit the statue to collect a reward from the
@@ -195,36 +194,38 @@ L:3:114:0:0:0:0:Cellars
 L:6:114:0:0:111:0:Back Exit
 S:507:0:0:0:0:0:0:0
 
-N:11:Bree
+N:11:the town of Bree
 X:38:39:56:0
 Q:35:546
 W:440:48
 Y:440:48
-L:0:0:407:408:0:0:Main Street
+L:0:0:407:408:0:0:Greenway
 L:1:56:0:0:0:0:Sewers
 L:4:56:0:0:620:0:Dump
 S:8:9:10:11:12:13:268:775
 
+# Goes upwards, so all levels, except 20, are described by the L:31 line!
+
 N:12:Weathertop
 X:13:38:56:0
 W:449:48
-L:20:420:56:49:0:31
-L:31:56:0:0:0:31
+L:20:420:56:49:0:31:Ruins on a Hill
+L:31:56:0:0:0:31:Crumbling Tower
 
 N:13:the Ford to Rivendell
 X:2:12:39:0
 W:453:48
-L:8:420:154:126:0:0
+L:8:420:154:126:0:0:River among Moors
 D:River Bruinen runs here swiftly over its rocky bed.
 D:  From the nearby sources in Misty Mountains down to the ford,
 D: the river is under the rule of Lord of Rivendell.
 D:  The hidden valley of Rivendell is not yet visible from here.
 
+# TODO: from here on level names unfinished
+
 # We take the liberty of assuming the West-gate of Moria was left open
 # after the first fall of Khazad-dum.
 # It gets closed by Balin after the Battle of Five Armies.
-# Just like Misty Mountains, it lets you get to Smaug 
-# without visiting Dol Guldur, if you fight your way through.
 
 N:14:the western entrance to Moria
 X:52:64:0:0
@@ -237,26 +238,25 @@ D:In older days, the gates to Moria were always open, and a meeting point for dw
 D: elves.  The ancient doors now stand ajar, but the mines behind them are home to only fouler things.
 
 # Keep the dungeon here identical to the one above
-# Vary the topmost level only
+# TODO: vary the topmost level
 
 N:15:the eastern entrance to Moria
 X:63:0:0:0
 Z:17:42
-L:20:49:397:56:0:0
 Q:14:262
 L:6:49:397:56:0:0
 L:7:56:0:0:0:0
 L:24:56:0:0:262:0
 D:The old dwarven doors to Moria are broken open and only foul air and darkness welcome those who come inside.  Broken stairs and archways make the way difficult and retreat almost impossible.
 
-### The gates of Moria after they are closed by Balin ###
+# The gates of Moria after they are closed by Balin
 
 # TODO: make sure this dungeon has wilderness features, watery, etc., 
 # not caves and rock; The dungeon is very short --- it does
 # not open the gates, so no point in misleading the player.
 
 N:16:the west gates of Moria
-X:52:40:0:0
+X:52:64:0:0
 L:36:49:397:56:0:0
 L:37:56:393:0:0:0
 L:40:56:393:393:639:0
@@ -272,17 +272,18 @@ D: deadly stirs in the water outside.
 N:17:the east gates of Moria
 X:63:0:0:0
 Z:61:61
-L:40:49:397:56:0:0
+L:40:49:397:56:0:0:Dimril Dale
 D:The door to Moria is closed from this direction, as Balin has
 D: returned to Moria to claim his bequest with dragon-gold.
-D:  Traces of orc camps and months old troll carcasses tell the story
+D:  Traces of orc camps on the shores of Kheled-Zaram
+D: and months old troll carcasses tell the story
 D: of orc attempts to recapture Moria from outside.  You are wondering
 D: what is happening inside, but the door is firmly barricaded
 D: and nobody responds.  You have to try to find the door to Moria
 D: from the west, from Rivendell.
 
 N:18:Lothlorien
-X:19:20:5:15
+X:19:20:15:0
 G:l
 L:0:0:420:420:0:0
 S:270:503:11:12:13:504:510:0
@@ -346,15 +347,13 @@ D:  If you conquer Isengard,
 D: darkened by the clouds of Saruman's machinations,
 D: you open the easier path to Minas Tirith.
 
-# Hint there is no way back
-
 N:24:Dead Marshes
 X:19:25:0:0
 R:UNDEAD
 L:52:199:200:201:505:0
 D:A dreadful place. Nobody who crosses these marshes returns.
 
-#Should be guarded by Faramir
+# TODO:Should be guarded by Faramir
 
 N:25:Ithilien
 X:26:49:0:0
@@ -371,7 +370,7 @@ L:53:407:56:397:492:46
 L:54:56:0:397:0:46
 L:85:56:0:0:535:46
 
-#Note that we need a map to travel from Minas Morgul to Cirith Ungol now.
+# Note that we need a map to travel from Minas Morgul to Cirith Ungol now.
 
 N:27:Cirith Ungol
 X:26:0:0:0
@@ -390,10 +389,13 @@ L:1:56:0:0:0:46
 L:55:56:0:0:1085:46
 S:505:516:517:503:519:518:509:508
 
+# TODO: Too deep for one-time dungeon?
+
 N:29:the Paths of the Dead
-X:28:0:0:0
+X:0:0:0:0
 G:W
 R:UNDEAD
+Q:28:528
 L:56:0:420:0:528:0
 L:57:56:0:0:0:0
 L:85:56:0:0:522:0
@@ -447,7 +449,7 @@ X:11:53:0:0
 Q:36:532
 Z:36:36
 G:g
-L:99:0:407:159:532:0
+L:99:0:407:159:532:0:Bywater Road
 S:516:517:14:266:509:0:0:0
 D:Someone with a silver-tongue and guile-full words has brought fair Hobbiton to
 D: its knees in a whir of devilish industry and foul pollution.
@@ -455,11 +457,13 @@ D: its knees in a whir of devilish industry and foul pollution.
 N:36:Hobbiton, rebuilt
 X:70:0:0:0
 G:h
-L:0:0:407:153:0:0
+L:0:0:407:153:0:0:Bywater Road
 S:264:515:265:266:772:773:774:0
 D:One last challenge awaits, to visit Angband to defeat an ancient evil.  Or you
 D: can choose to sail from here into the West and let another take on the might of
 D: Morgoth.
+
+# TODO: guardian?
 
 N:37:Fangorn, aflame
 X:23:48:0:0
@@ -467,7 +471,7 @@ Q:62:249
 Z:62:62
 G:o
 R:PLANT
-L:21:420:420:420:249:0
+L:21:420:420:420:0:0
 D:Fangorn is aflame: Saruman's orcs have taken axe and fire to the trees
 D: and the haunted moans of the ancient wood fill the air.  Some say the
 D: trees have begun to march in response - but you can only see dark smoke
@@ -502,9 +506,6 @@ D:The tower of Isengard is home to the wise councillor Saruman
 D: the White, head of the order of Istari.  However, you are not
 D: yet a member...
 
-# Caradhras is closer to Rivendell than Moria, 
-# but it's on the shortest way to Moria
-
 N:41:Caradhras
 X:14:2:0:0
 R:GIANT
@@ -512,7 +513,7 @@ G:C
 Q:18:1272
 L:20:451:56:148:473:0:The Pass
 L:21:56:144:145:0:0:Mountain Slopes
-L:50:56:144:145:1272:0:Caradhras
+L:50:56:144:145:1272:0:Caradhras Peak
 D:Legend has it that this mighty mountain is Morgoth's minion.
 D:  In good weather you'd laugh at it, easily traversing the nearby pass.
 D:  Now, however, the storms of the mountain echo around and you can't even
@@ -521,7 +522,7 @@ D: fight your way through, you have no idea where you'll end.
 D:  Turn back, while you can!
 
 N:42:the vaults of Erebor
-X:9:5:0:0
+X:9:0:0:0
 L:21:0:56:1:0:0
 L:22:56:0:0:0:0
 L:40:56:0:0:0:0
@@ -543,7 +544,7 @@ L:22:56:141:0:0:0
 L:80:56:0:0:535:0
 L:81:56:0:0:0:0
 
-# Sunken dungeon.
+# Sunken dungeon
 
 N:44:the sunken city of Numenor
 X:2:0:0:0
@@ -570,7 +571,7 @@ L:22:148:145:0:0:0
 L:60:148:145:0:0:0
 
 N:47:the Battle of Five Armies
-X:9:5:0:0
+X:9:0:0:0
 G:C
 R:ESCORT
 Q:42:235
@@ -618,7 +619,7 @@ X:14:2:0:0
 R:GIANT
 G:o
 Z:41:9
-Q:4:140
+Q:63:140
 L:7:544:56:148:140:0:The Pass
 L:8:56:145:0:0:0:Orc Camp
 L:37:56:145:0:297:0:Ogre Camp
@@ -633,7 +634,7 @@ X:54:0:0:0
 Q:58:546
 G:h
 R:ANIMAL
-L:0:0:420:408:0:0
+L:0:0:420:408:0:0:Bucklebury
 S:8:9:10:11:12:13:268:778
 
 N:54:a clearing in the Old Forest
@@ -679,7 +680,7 @@ N:58:the Brandywine Ferry
 X:10:53:0:0
 G:h
 R:ANIMAL
-L:0:0:435:155:0:0
+L:0:0:435:155:0:0:Bucklebury Ferry
 S:903:0:0:0:0:0:0:0
 D:This is the farthest you've been from the Shire - ahead, dark
 D: clouds gather.  Choose your path carefully!  Once you cross the
@@ -718,7 +719,7 @@ L:50:56:393:393:483:0
 D:Drums. Drums. Drums in the deep.
 
 N:62:the Ent Moot
-X:23:48:0:0
+X:66:48:0:0
 Q:18:483
 L:21:0:420:153:0:0
 R:PLANT
@@ -728,15 +729,15 @@ D: You think you can hear timbrous voices amidst the creaks and groans
 D: of their ancient boughs. Perhaps a closer look will help you
 D: understand if they have come to a decision...
 
-# canines dungeon, shops closed until Great Grey Wolf killed; small goods, potions, food.
+# canines dungeon, shops closed until Great Grey Wolf killed; small goods, potions, food, one or two more.
 #TODO
 
 N:63:Woodmen Village
 X:5:15:52:0
 G:C
 Y:186:5
-L:11:0:420:408:0:0:TODO
-L:14:56:420:420:186:0:TODO and the S: line too
+L:11:0:420:408:0:0
+L:14:56:420:420:186:0
 S:264:515:265:0:0:0:0:0
 D:Wolves are howling around. Villagers hide in their fenced village on the western edge of Mirkwood.
 
@@ -746,20 +747,20 @@ D:Wolves are howling around. Villagers hide in their fenced village on the weste
 N:64:Dunland
 X:2:14:40:0
 Z:65:48
-L:12:420:154:126:0:0:TODO
+L:12:420:154:126:0:0
 
 # deep dungeon with evil humans after Isengard darkens; blocks way to Isengard
 #TODO
 
 N:65:Dunland in war fervor
 X:2:14:0:0
-Q:23:523
-L:12:420:154:126:0:0:TODO
-L:21:420:141:141:532:31:DUMMY
+Q:40:407
+L:12:420:154:126:0:0
+L:21:420:141:141:407:31
 D:Dunland is brewing for war stirred by dark emisaries that long laboured in secret.
 D:  Whence they came? Nobody knows...
 
-#TODO
+#TODO: possibly only vary the 21 level to show it's empty
 
 N:66:emptied Isengard
 X:37:64:0:0
@@ -773,14 +774,15 @@ D:Almost all of the Saruman's army went for Hornburg.  What are the tidings?
 
 #N:68 unused
 
+# The non-campaign starting dungeon.
 # Must always be second to last position
 
 N:69:Angband
 X:43:0:0:0
 Q:70:547
-L:0:0:407:0:0:0
-L:1:56:0:0:0:0
-L:100:56:0:0:547:0
+L:0:0:407:0:0:0:Town
+L:1:56:0:0:0:0:Dungeon
+L:100:56:0:0:547:0:Seat of Morgoth
 S:8:9:10:11:12:13:14:15
 D:It feels like home...
 
