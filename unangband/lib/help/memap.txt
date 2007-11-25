@@ -44,10 +44,10 @@ Maggot's  Old Forest-->Barrow Downs    |       Pass (8-37)<--Village    |
                                            \  ###                 /
                                             \ ####  Fangorn Forest
                                              \ ##  /
-                                              Isengard
-                                               (7-35)             Parth Galen
-                                                     \             
-                                               ##     \             Dead Marshes
+                                            Isengard
+                                             (7-35)               Parth Galen
+                                                   \             
+                                               ##   \               Dead Marshes
                                   #################  Edoras*        
                         ##############            ## (1-22)             
                                              Paths #####
