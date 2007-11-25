@@ -3581,7 +3581,7 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 		if (r_ptr->flags9 & (RF9_TOWNSFOLK)) n_ptr->mflag |= (MFLAG_TOWN);
 
 		/* Mega-hack -- no nasty town dwellers when starting out */
-		else if (!p_ptr->max_exp) return (FALSE);
+		else if (turn < 1000) return (FALSE);
 	}
 
 	/* Enforce sleeping if needed */

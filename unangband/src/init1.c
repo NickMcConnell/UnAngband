@@ -5831,14 +5831,15 @@ errr parse_t_info(char *buf, header *head)
 		if (!t_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Oops, no more slots */
-		if (zone == 4) return (PARSE_ERROR_GENERIC);
+		if (zone == MAX_DUNGEON_ZONES) return (PARSE_ERROR_GENERIC);
 
 		/* Scan for the values */
 		if (6 != sscanf(buf+2, "%d:%d:%d:%d:%d:%d",
 			&level, &fill, &big, &small, &guard, &tower)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		t_ptr->zone[zone].level=level;
+		t_ptr->zone[zone].text = 0; /* TODO */
+		t_ptr->zone[zone].level = level;
 		t_ptr->zone[zone].fill = fill;
 		t_ptr->zone[zone].big = big;
 		t_ptr->zone[zone].small = small;
@@ -5847,7 +5848,6 @@ errr parse_t_info(char *buf, header *head)
 
 		/* Find the next empty zone slot (if any) */
 		zone++;
-
 	}
 
 	/* Process 'S' for "Stores" */

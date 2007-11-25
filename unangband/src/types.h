@@ -185,6 +185,8 @@ struct maxima
  */
 struct dungeon_zone
 {
+	u32b text;     /* Text (offset) */
+
 	s16b level;
 	s16b fill;
 
@@ -204,7 +206,7 @@ struct dungeon_zone
 struct town_type
 {
 	u32b name;     /* Name (offset) */
-	u32b text;      /* Text (offset) */
+	u32b text;     /* Text (offset) */
 
 	u16b nearby[MAX_NEARBY];
 	
