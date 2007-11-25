@@ -18,7 +18,7 @@
 # Format:
 # N: dungeon number: dungeon name
 # X: easily connected to these dungeons (up to 4)
-# L: level : fill with terrain (0=town) : big terrain : small terrain : quest monster : vault
+# L: level : fill with terrain (0=town) : big terrain : small terrain : quest monster : vault : level name
 # Q: dungeon connected to once quest monster defeated : quest monster
 # Y: lock all shops until this monster is defeated : if player has visited this dungeon
 # Z: substitute this dungeon instead : if player has visited this dungeon
@@ -213,7 +213,7 @@ W:449:48
 L:20:420:56:49:0:31:Ruins on a Hill
 L:31:56:0:0:0:31:Crumbling Tower
 
-N:13:Ford to Rivendell
+N:13:the Ford to Rivendell
 X:2:12:39:0
 W:453:48
 L:8:420:154:126:0:0:River among Moors
@@ -326,8 +326,10 @@ D: many warriors around him, but seeks less than wise council...
 
 #TODO: remove "the Battle of", add this automatically via L: flags
 #in places where long form is needed
+#
+#TODO: also add "the Tower of " to dungeons going upwards
 
-N:22:the Battle of Helm's Deep
+N:22:Helm's Deep
 X:29:0:0:0
 Q:62:249
 R:ESCORT
@@ -338,7 +340,7 @@ D: your allies to relieve the siege - fight your way to the Helm's Deep
 D: and scale the tower to confront the leader of the armies, or find him
 D: here on the field of battle and slay him.
 
-N:23:Isengard war-ready
+N:23:Isengard, war-ready
 X:37:21:22:64
 Q:28:532
 Z:66:22
@@ -395,7 +397,7 @@ S:505:516:517:503:519:518:509:508
 
 # TODO: Too deep for one-time dungeon?
 
-N:29:Paths of the Dead
+N:29:the Paths of the Dead
 X:0:0:0:0
 G:W
 R:UNDEAD
@@ -412,7 +414,7 @@ D: stone while you search this lifeless place.
 #TODO: remove "the Battle of", add this automatically via L: flags
 #in places where long form is needed
 
-N:30:the Battle of Pelennor Fields
+N:30:Pelennor Fields
 X:28:0:0:0
 G:W
 R:ESCORT
@@ -561,8 +563,6 @@ L:21:403:400:49:0:0
 L:22:399:56:0:0:0
 L:60:399:56:0:0:0
 
-# TODO shorten by 1 char
-
 N:45:Elemental Evil Temple
 X:2:0:0:0
 G:E
@@ -582,7 +582,7 @@ L:60:148:145:0:0:0
 #TODO: remove "the Battle of", add this automatically via L: flags
 #in places where long form is needed
 
-N:47:the Battle of Five Armies
+N:47:Five Armies
 X:9:0:0:0
 G:C
 R:ESCORT

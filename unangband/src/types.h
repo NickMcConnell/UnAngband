@@ -185,7 +185,7 @@ struct maxima
  */
 struct dungeon_zone
 {
-	u32b text;     /* Text (offset) */
+	u32b name;     /* Text (offset) */
 
 	s16b level;
 	s16b fill;

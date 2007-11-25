@@ -5704,6 +5704,10 @@ errr parse_t_info(char *buf, header *head)
 		/* Point at the "info" */
 		t_ptr = (town_type*)head->info_ptr + i;
 
+		/* Take care it displays properly */
+		if (strlen(s) > 21)
+		  return (PARSE_ERROR_GENERIC);
+
 		/* Store the name */
 		if (!(t_ptr->name = add_name(head, s)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
@@ -5825,7 +5829,7 @@ errr parse_t_info(char *buf, header *head)
 	/* Process 'L' for "Levels" (up to four lines) */
 	else if (buf[0] == 'L')
 	{
-		int level,fill,big,small,guard,tower;
+		int name,level,fill,big,small,guard,tower;
 
 		/* There better be a current t_ptr */
 		if (!t_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -5837,8 +5841,30 @@ errr parse_t_info(char *buf, header *head)
 		if (6 != sscanf(buf+2, "%d:%d:%d:%d:%d:%d",
 			&level, &fill, &big, &small, &guard, &tower)) return (PARSE_ERROR_GENERIC);
 
+		/* Find the 7th colon, the one before text (if any) */
+		s = strchr(buf, ':');
+		s = strchr(s+1, ':');
+		s = strchr(s+1, ':');
+		s = strchr(s+1, ':');
+		s = strchr(s+1, ':');
+		s = strchr(s+1, ':');
+		s = strchr(s+1, ':');
+
+		/* Verify that colon */
+		if (!s) {
+		  name = 0;
+		}
+		else {
+		  /* Take care it displays properly */
+		  if (strlen(s+1) > 22)
+		    return (PARSE_ERROR_GENERIC);
+		  /* Store the level name */
+		  if (!(name = add_name(head, s+1)))
+		    return (PARSE_ERROR_OUT_OF_MEMORY);
+		}
+		
 		/* Save the values */
-		t_ptr->zone[zone].text = 0; /* TODO */
+		t_ptr->zone[zone].name = name;
 		t_ptr->zone[zone].level = level;
 		t_ptr->zone[zone].fill = fill;
 		t_ptr->zone[zone].big = big;

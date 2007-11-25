@@ -377,15 +377,15 @@ static void display_group_list(int col, int row, int wid, int per_page,
 	/* Display lines until done */
 	for (i = 0, pos = start; i < per_page && pos < max; i++, pos++)
 	{
-		char buffer[21];
+		char buffer[22];
 		byte attr = curs_attrs[CURS_KNOWN][cursor == pos];
 
 		/* Erase the line */
 		Term_erase(col, row + i, wid);
 
-		/* Display it (width should not exceed 20) */
-		strncpy(buffer, group_text[pos], 20);
-		buffer[20] = 0;
+		/* Display it (width should not exceed 21) */
+		strncpy(buffer, group_text[pos], 21);
+		buffer[21] = 0;
 		c_put_str(attr, buffer, row + i, col);
 	}
 	/* Wipe the rest? */
@@ -509,7 +509,7 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 		len = strlen(g_names[i]);
 		if(len > g_name_len) g_name_len = len;
 	}
-	if(g_name_len >= 20) g_name_len = 20;
+	if(g_name_len >= 21) g_name_len = 21;
 
 	while ((!flag) && (grp_cnt))
 	{
@@ -1875,23 +1875,54 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 {
         int zone = oid % MAX_DUNGEON_ZONES;
         int dun = oid / MAX_DUNGEON_ZONES;
+	int depth = t_info[dun].max_depth + t_info[dun].zone[0].level;
 
         byte attr = curs_attrs[CURS_KNOWN][(int)cursor];
         
-        if(zone == 0) {
-                if(t_info[dun].zone[0].level == 0) {
-                        c_prt(attr, format("Town of %s", t_info[dun].name + t_name), row, col);
-                }
-                else {
-                        c_prt(attr, t_info[dun].name + t_name, row, col);
-                }
-                c_prt(attr, format("Lev %3d",
-                                        t_info[dun].max_depth + t_info[dun].zone[0].level), row, 65);
-        }
-        else {
-                c_prt(attr, format("Level %d of %s", t_info[dun].zone[zone].level,
-                                                                                t_info[dun].name + t_name),  row, col);
-        }
+        if(!t_info[dun].zone[zone].name) {
+	  if(zone == 0) {
+	    if(t_info[dun].zone[0].level == 0) {
+	      c_prt(attr, format("Town of %s", t_info[dun].name + t_name), row, col);
+	    }
+	    else {
+	      c_prt(attr, t_info[dun].name + t_name, row, col);
+	    }
+	    c_prt(attr, format("Lev %3d", depth), row, 65);
+	  }
+	  else {
+	    c_prt(attr, format("Level %d of %s", t_info[dun].zone[zone].level,
+			       t_info[dun].name + t_name),  row, col);
+	  }
+	}
+	else {
+	  /* TODO: fix this for upward dungeons */
+	  if (zone == MAX_DUNGEON_ZONES 
+	      || t_info[dun].zone[zone+1].level == 0
+	      || t_info[dun].zone[zone+1].level - 1 == t_info[dun].zone[zone].level) {
+	      /* one-level zone */ 
+	    c_prt(attr, format("%s,  level %d", 
+			       t_info[dun].zone[zone].name + t_name, 
+			       t_info[dun].zone[zone].level), 
+		  row, col);
+	  }
+	  else {
+	    c_prt(attr, format("%s,  levels %d-%d", 
+			       t_info[dun].zone[zone].name + t_name, 
+			       t_info[dun].zone[zone].level,
+			       t_info[dun].zone[zone+1].level - 1), 
+		  row, col);
+	  }
+	  if (depth >= t_info[dun].zone[zone].level) {
+	    if (zone == MAX_DUNGEON_ZONES || t_info[dun].zone[zone+1].level == 0) {
+	      /* last zone */ 
+	    }
+	    else {
+	      /* depth in that zone is less than start of the next zone */
+	      depth = MIN(depth, t_info[dun].zone[zone+1].level - 1);
+	    }
+	    c_prt(attr, format("Lev %3d", depth), row, 65);
+	  }
+	}
 }
 
 static int oiddiv4 (int oid) { return oid/MAX_DUNGEON_ZONES; }
@@ -1917,7 +1948,6 @@ static void do_cmd_knowledge_dungeons(void)
 		for(j = 0; (j < 1 || t_info[i].zone[j].level != 0 )
 											 && j < MAX_DUNGEON_ZONES; j++)
 		{
-			if(j == 0 || t_info[i].zone[j].fill == 0 || t_info[i].zone[j].guard)
 				zones[z_count++] = MAX_DUNGEON_ZONES*i + j;
 		}
 	}
