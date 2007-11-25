@@ -5856,7 +5856,7 @@ errr parse_t_info(char *buf, header *head)
 		}
 		else {
 		  /* Take care it displays properly */
-		  if (strlen(s+1) > 22)
+		  if (strlen(s+1) > 17)
 		    return (PARSE_ERROR_GENERIC);
 		  /* Store the level name */
 		  if (!(name = add_name(head, s+1)))

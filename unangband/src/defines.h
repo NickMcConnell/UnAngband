@@ -789,7 +789,7 @@
 
 #define ROW_STUDY		(show_sidebar ? (Term->wid >= 96 ? (BOTTOM_LINE) : 14) \
 					: (BOTTOM_LINE))
-#define COL_STUDY		(show_sidebar ? (Term->wid >= 96 ? 91 : 0) : 67)	/* "Study" */
+#define COL_STUDY		(show_sidebar ? (Term->wid >= 96 ? 91 : 0) : 66)	/* "Study" */
 
 #define ROW_DEPTH		(show_sidebar ? (Term->wid >= 105 ? (BOTTOM_LINE) : 7) \
 					: (BOTTOM_LINE))

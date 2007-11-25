@@ -2880,8 +2880,11 @@ static void msg_print_aux(u16b type, cptr msg)
 		message_column = 0;
 	}
 
-	/* No message */
-	if (!msg) return;
+	/* No message --- display current dungeon and level names */
+	if (!msg) {
+	  /* TODO */
+	  return;
+	}
 
 	/* Paranoia */
 	if (n > 1000) return;

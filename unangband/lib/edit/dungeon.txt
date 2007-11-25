@@ -89,7 +89,7 @@ X:3:13:52:64
 L:0:0:420:155:0:0:Last Homely House
 S:267:9:10:11:519:13:268:513
 D:Last Homely House on the Edge of the Wild,
-D:full of laughter and singing.
+D: full of laughter and singing.
 D:  Evil things do not come into this valley.
 
 # Misty Mountains are quite wet (Underground rivers etc).
@@ -155,7 +155,7 @@ G:B
 Q:9:475
 Z:47:9
 L:20:435:56:154:0:0:Mountain Slopes
-L:21:56:0:0:0:0:Hidden Western Passage
+L:21:56:0:0:0:0:Western Passage
 L:22:56:0:0:0:0:Tunnels
 L:38:56:0:0:475:0:Bottommost Hall
 D:There is a sudden flash of gold and flame in the

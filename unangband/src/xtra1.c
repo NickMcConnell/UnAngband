@@ -400,7 +400,7 @@ static void prt_sp(void)
  */
 static void prt_depth(void)
 {
-	char depths[32];
+	char depths[8];
 
 	town_type *t_ptr = &t_info[p_ptr->dungeon];
 	dungeon_zone *zone = &t_ptr->zone[0];
