@@ -3301,13 +3301,12 @@ static void dungeon(void)
 	while (TRUE)
 	{
 		int i;
-		
+
 		/* Hack -- Compact the monster list occasionally */
 		if (m_cnt + 32 > z_info->m_max) compact_monsters(64);
 
 		/* Hack -- Compress the monster list occasionally */
 		if (m_cnt + 32 < m_max) compact_monsters(0);
-
 
 		/* Hack -- Compact the object list occasionally */
 		if (o_cnt + 32 > z_info->o_max) compact_objects(64);
@@ -3432,6 +3431,29 @@ static void dungeon(void)
 		/* Handle "leaving" */
 		if (p_ptr->leaving) break;
 
+		/* Hack: I cannot trace when the messages line is cleared, so I redraw the display dungeon and level name every turn instead */
+		/* FIXME: this overwrites some messages, e.g. refuelling */
+		{
+		  char str[45];
+		  int length;
+		  int wid, h;
+		  dungeon_zone *zone;
+
+		  /* Get the zone */
+		  get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+		  
+		  if (zone->name)
+		    sprintf(str, "%s of %s", zone->name + t_name, t_info[p_ptr->dungeon].name + t_name);
+		  else
+		    sprintf(str, "%s", t_info[p_ptr->dungeon].name + t_name);
+
+		  length = strlen(str) + 1;
+
+		  /* Obtain the size */
+		  (void)Term_get_size(&wid, &h);
+
+		  Term_putstr(wid - length, 0, -1, TERM_L_DARK, str);
+		}
 
 		/* Count game turns */
 		turn++;

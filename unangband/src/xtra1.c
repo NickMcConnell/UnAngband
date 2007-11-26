@@ -1458,7 +1458,7 @@ void lookup_prettyname(char *name, size_t name_s, int class, int style, int sval
 
 
 /*
- * Display basic info (mostly left of map, unless show_sidebar is on)
+ * Display basic info (mostly left of map, unless show_sidebar is off)
  */
 static void prt_frame_basic(void)
 {

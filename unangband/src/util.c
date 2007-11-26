@@ -2851,8 +2851,8 @@ static void msg_print_aux(u16b type, cptr msg)
 	/* Hack -- flush when requested or needed */
 	if ((message_column || easy_more) && (!msg || ((message_column + n) > (w - 8))))
 	{
-		bool hack_use_first_line = (easy_more && !must_more && !message_column && msg && !use_trackmouse) ? TRUE : FALSE;
-		bool hack_flush = (easy_more && message_column && !use_trackmouse && ((message_column + n) <= (w - 8)) && !must_more && !msg) ? TRUE : FALSE;
+		bool hack_use_first_line = (easy_more && !must_more && !message_column && msg && !use_trackmouse);
+		bool hack_flush = (easy_more && message_column && !use_trackmouse && ((message_column + n) <= (w - 8)) && !must_more && !msg);
 		
 		/* Handle easy_more */
 		if (easy_more && msg && !must_more)
@@ -2880,11 +2880,8 @@ static void msg_print_aux(u16b type, cptr msg)
 		message_column = 0;
 	}
 
-	/* No message --- display current dungeon and level names */
-	if (!msg) {
-	  /* TODO */
-	  return;
-	}
+	/* No message */
+	if (!msg) return;
 
 	/* Paranoia */
 	if (n > 1000) return;
