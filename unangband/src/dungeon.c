@@ -3372,6 +3372,30 @@ static void dungeon(void)
 		/* Hack -- Hilite the player */
 		move_cursor_relative(p_ptr->py, p_ptr->px);
 
+		/* Hack: I cannot trace when the messages line is cleared, so I redraw the display dungeon and level name every turn instead */
+		/* FIXME: this overwrites some messages, e.g. refuelling */
+		{
+		  char str[50];
+		  int length;
+		  int wid, h;
+		  dungeon_zone *zone;
+
+		  /* Get the zone */
+		  get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+		  
+		  if (zone->name)
+		    sprintf(str, "%s %s", zone->name + t_name, t_info[p_ptr->dungeon].name + t_name);
+		  else
+		    sprintf(str, "%s", t_info[p_ptr->dungeon].name + t_name);
+
+		  length = strlen(str) + 1;
+
+		  /* Obtain the size */
+		  (void)Term_get_size(&wid, &h);
+
+		  Term_putstr(wid - length, 0, -1, TERM_L_DARK, str);
+		}
+
 		/* Optional fresh */
 		if (fresh_after) Term_fresh();
 
@@ -3408,8 +3432,6 @@ static void dungeon(void)
 		/* Process the world */
 		process_world();
 
-
-
 		/* Notice stuff */
 		if (p_ptr->notice) notice_stuff();
 
@@ -3430,30 +3452,6 @@ static void dungeon(void)
 
 		/* Handle "leaving" */
 		if (p_ptr->leaving) break;
-
-		/* Hack: I cannot trace when the messages line is cleared, so I redraw the display dungeon and level name every turn instead */
-		/* FIXME: this overwrites some messages, e.g. refuelling */
-		{
-		  char str[45];
-		  int length;
-		  int wid, h;
-		  dungeon_zone *zone;
-
-		  /* Get the zone */
-		  get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
-		  
-		  if (zone->name)
-		    sprintf(str, "%s of %s", zone->name + t_name, t_info[p_ptr->dungeon].name + t_name);
-		  else
-		    sprintf(str, "%s", t_info[p_ptr->dungeon].name + t_name);
-
-		  length = strlen(str) + 1;
-
-		  /* Obtain the size */
-		  (void)Term_get_size(&wid, &h);
-
-		  Term_putstr(wid - length, 0, -1, TERM_L_DARK, str);
-		}
 
 		/* Count game turns */
 		turn++;

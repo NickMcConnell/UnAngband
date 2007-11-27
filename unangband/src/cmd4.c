@@ -1856,7 +1856,21 @@ static void dungeon_lore(int oid) {
 	int guard = t_info[dun].zone[zone].guard;
 
 	screen_save();
-	c_prt(TERM_L_BLUE, format("Level %d of %s", t_info[dun].zone[zone].level, t_info[dun].name+t_name), 0, 0);
+
+	/* TODO: fix this for upward dungeons */
+	if (zone == MAX_DUNGEON_ZONES - 1
+	    || t_info[dun].zone[zone+1].level == 0
+	    || t_info[dun].zone[zone+1].level - 1 == t_info[dun].zone[zone].level) {
+	  /* one-level zone */ 
+	  c_prt(TERM_L_BLUE, format("Level %d of %s", t_info[dun].zone[zone].level, t_info[dun].name+t_name), 0, 0);
+	}
+	else {
+	  c_prt(TERM_L_BLUE, format("Levels (%d-%d) of %s", 
+				    t_info[dun].zone[zone].level,
+				    t_info[dun].zone[zone+1].level - 1, 
+				    t_info[dun].name+t_name), 0, 0);
+	}
+
 	Term_gotoxy(0, 1);
 
 	text_out_c(TERM_WHITE, t_info[dun].text + t_text);
@@ -1895,32 +1909,25 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 	  }
 	}
 	else {
-	  /* TODO: fix this for upward dungeons */
-	  if (zone == MAX_DUNGEON_ZONES 
-	      || t_info[dun].zone[zone+1].level == 0
-	      || t_info[dun].zone[zone+1].level - 1 == t_info[dun].zone[zone].level) {
-	      /* one-level zone */ 
-	    c_prt(attr, format("%s,  level %d", 
-			       t_info[dun].zone[zone].name + t_name, 
-			       t_info[dun].zone[zone].level), 
-		  row, col);
+	  c_prt(attr, format("%s %s", 
+			     t_info[dun].zone[zone].name + t_name, 
+			     t_info[dun].name + t_name, 
+			     t_info[dun].zone[zone].level), 
+		row, col);
+	}
+
+	if (depth >= t_info[dun].zone[zone].level) {
+	  if (zone == MAX_DUNGEON_ZONES - 1 || t_info[dun].zone[zone+1].level == 0) {
+	    /* last zone */ 
+	    c_prt(attr, format("Lev %3d", depth), row, 65);
+	  }
+	  else if (depth < t_info[dun].zone[zone+1].level) {
+	    /* depth in that dungeon is less than start of the next zone */
+	    c_prt(attr, format("Lev %3d", depth), row, 65);
 	  }
 	  else {
-	    c_prt(attr, format("%s,  levels %d-%d", 
-			       t_info[dun].zone[zone].name + t_name, 
-			       t_info[dun].zone[zone].level,
-			       t_info[dun].zone[zone+1].level - 1), 
-		  row, col);
-	  }
-	  if (depth >= t_info[dun].zone[zone].level) {
-	    if (zone == MAX_DUNGEON_ZONES || t_info[dun].zone[zone+1].level == 0) {
-	      /* last zone */ 
-	    }
-	    else {
-	      /* depth in that zone is less than start of the next zone */
-	      depth = MIN(depth, t_info[dun].zone[zone+1].level - 1);
-	    }
-	    c_prt(attr, format("Lev %3d", depth), row, 65);
+	    /* we are already past it */
+	    c_prt(attr, "passed", row, 65);
 	  }
 	}
 }
