@@ -67,7 +67,7 @@ N:0:Nowhere Town
 X:0:0:0:0
 L:0:0:407:0:0:0
 S:8:9:10:11:12:13:14:15
-D:It feels like in the middle of nowhere. You shouldn't be there.
+D:It feels like in the middle of nowhere.  You shouldn't be there.
 D:  Please report the bug.
 
 # Campaign starting dungeon.
@@ -185,14 +185,14 @@ D:The people of burnt Lake-town have elected to rebuild the nearby ancient Dale
 D: as their new abode.  Visit the statue to collect a reward from the
 D: grateful townsfolk.
 
-N:10:Farmer Maggot's farm
+N:10:Maggot's farm
 X:1:0:0:0
 G:,
 R:ANIMAL
 Q:58:111
-L:2:0:435:0:4:0
+L:2:0:435:0:4:0:Farmer
 L:3:114:0:0:0:0:cellars of
-L:6:114:0:0:111:0:back exit from
+L:6:114:0:0:111:0:back exit from cellars of
 S:507:0:0:0:0:0:0:0
 
 N:11:Bree
@@ -202,7 +202,7 @@ W:440:48
 Y:440:48
 L:0:0:407:408:0:0:the town of
 L:1:56:0:0:0:0:sewers of
-L:4:56:0:0:620:0:dump outside
+L:4:56:0:0:620:0:the waste pool outside
 S:8:9:10:11:12:13:268:775
 
 # Goes upwards, so all levels, except 20, are described by the L:31 line!
@@ -324,14 +324,14 @@ S:271:516:517:519:504:511:509:508
 D:The slumbering city of Edoras.  King Theoden has gathered
 D: many warriors around him, but seeks less than wise council...
 
-N:22:Helm's Deep
+N:22:Hornburg
 X:29:0:0:0
 Q:62:249
 R:ESCORT
-L:21:420:56:155:249:49:the Battle of
+L:21:420:56:155:249:49:the Siege of 
 L:50:420:56:155:249:49:the Siege of
-D:Saruman's orcs have laid siege to the Hornburg.  You stand with
-D: your allies to relieve the siege - fight your way to the Helm's Deep
+D:Saruman's orcs have laid siege to the fortress of Hornburg.  You stand with
+D: your allies to relieve the siege - fight your way through the narrow ravine of Helm's Deep
 D: and scale the tower to confront the leader of the armies, or find him
 D: here on the field of battle and slay him.
 
@@ -510,8 +510,8 @@ X:14:2:0:0
 R:GIANT
 G:C
 Q:18:1272
-L:20:451:56:148:473:0:the mountain
-L:21:56:144:145:0:0:the slopes of
+L:20:451:56:148:473:0:the blizzard-covered mountain
+L:21:56:144:145:0:0:the snowy slopes of
 L:50:56:144:145:1272:0:the peak of
 D:Legend has it that this mighty mountain is Morgoth's minion.
 D:  In good weather you'd laugh at it, easily traversing the nearby pass.
@@ -545,6 +545,7 @@ L:81:56:0:0:0:0
 
 # Sunken dungeon
 
+# TODO: revert to the original name, put part of it into first level description, the same for some other abridged names
 N:44:sunken Numenor
 X:2:0:0:0
 G:G
@@ -557,7 +558,7 @@ N:45:Elemental Evil
 X:2:0:0:0
 G:E
 R:PRIEST
-L:21:425:141:141:0:0:the Temple of
+L:21:425:141:141:0:0:the entrance to the Temple of
 L:22:56:0:0:0:0:the Temple of
 L:60:56:0:0:0:0:the Temple of
 
@@ -633,22 +634,22 @@ X:54:0:0:0
 Q:58:546
 G:h
 R:ANIMAL
-L:0:0:420:408:0:0:Bucklebury in
+L:0:0:420:408:0:0:Bucklebury town in
 S:8:9:10:11:12:13:268:778
 
-N:54:Old Forest clearing
+N:54:Old Forest
 X:38:53:0:0
 R:PLANT
 Q:55:622
-L:6:0:420:153:622:0
+L:6:0:420:153:622:0:a clearing in the
 L:7:56:420:420:0:0
 L:10:56:420:420:622:0
 S:0:0:0:0:0:0:0:0
 
-N:55:Tom Bombadil's house
+N:55:Bombadil's house
 X:54:0:0:0
 G:H
-L:11:0:420:153:307:0
+L:11:0:420:153:307:0:Tom
 L:12:56:1:420:307:0
 S:514:776:0:0:0:0:0:0
 D:Goldberry's gifts can be found at her pool.
@@ -675,11 +676,11 @@ D: gather. At least the way ahead seems fair and true.
 
 #TODO: change the graphics from bridge to ferry or just plain river
 
-N:58:the Brandywine Ferry
+N:58:the Bucklebury Ferry
 X:10:53:0:0
 G:h
 R:ANIMAL
-L:0:0:435:155:0:0
+L:0:0:435:155:0:0:on Brandywine
 S:903:0:0:0:0:0:0:0
 D:This is the farthest you've been from the Shire - ahead, dark
 D: clouds gather.  Choose your path carefully!  Once you cross the
@@ -779,7 +780,7 @@ D:Almost all of the Saruman's army went for Hornburg.  What are the tidings?
 N:69:Angband
 X:43:0:0:0
 Q:70:547
-L:0:0:407:0:0:0:the town of
+L:0:0:407:0:0:0:the siege camp atop
 L:1:56:0:0:0:0:the dungeon of
 L:100:56:0:0:547:0:the seat of Morgoth in
 S:8:9:10:11:12:13:14:15
