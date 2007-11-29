@@ -410,8 +410,8 @@ int set_routes(s16b *routes, int max_num, int from)
 		}
 	}
 
-	/* Add maps if not in Moria */
-	if (t_ptr->nearby[0])
+	/* Add maps if not in Moria; TODO: print a message if in Moria */
+	if (t_ptr->store_index[0] != 805)
 	{
 		for (i = 0; (i < INVEN_WIELD) && (num < max_num); i++)
 		{

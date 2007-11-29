@@ -697,6 +697,8 @@ L:0:0:1:56:0:0
 S:0:0:0:0:0:0:0:0
 D:As you read the map, starlight leads the way.  'Speak friend, and enter'.
 
+# TODO: why the L:29 defnition here? what would be the name?
+
 N:60:the mines of Moria
 X:0:0:0:0
 Q:61:1277
