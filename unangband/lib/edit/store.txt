@@ -724,3 +724,16 @@ O:39:0:3
 
 N:46:the branches of an Ent
 X:2
+
+N:47:Noman's store
+X:2
+
+N:48:Travellers' aid outlet
+X:8
+O:72:15:10
+O:72:16:10
+O:72:17:10
+O:72:42:10
+O:72:43:10
+O:72:44:10
+O:72:45:10
