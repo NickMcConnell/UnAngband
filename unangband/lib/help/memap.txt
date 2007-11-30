@@ -49,7 +49,7 @@ Maggot's  Old Forest-->Barrow Downs    |       Pass (8-37)<--Village    |
                                                    \             
                                                ##   \               Dead Marshes
                                   #################  Edoras*        
-                        ##############            ## (1-22)             
+                        ##############            ## (8-27)             
                                              Paths #####
                                           of the Dead ######
                                                           ############## Minas

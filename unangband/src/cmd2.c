@@ -361,7 +361,7 @@ void print_routes(const s16b *route, int num, int y, int x)
  */
 int actual_route(int town)
 {
-	while(t_info[t_info[town].replace_ifvisited].visited)
+	while(t_info[town].replace_ifvisited && t_info[t_info[town].replace_ifvisited].visited)
 	{
 		town = t_info[town].replace_with;
 	}
@@ -410,8 +410,9 @@ int set_routes(s16b *routes, int max_num, int from)
 		}
 	}
 
-	/* Add maps if not in Moria; TODO: print a message if in Moria */
-	if (t_ptr->store_index[0] != 805)
+	/* Add maps if not in Moria or other level with no exits */
+	if (t_ptr->nearby[0])
+	/* or only Moria --- if (t_ptr->store_index[0] != 805) */
 	{
 		for (i = 0; (i < INVEN_WIELD) && (num < max_num); i++)
 		{

@@ -64,7 +64,7 @@ V:0.6.2
 # The non-campaign start is the second to last dungeon.
 
 N:0:Nowhere Town
-X:0:0:0:0
+X:69:0:0:0
 L:0:0:407:0:0:0
 S:954:955:0:0:0:0:0:0
 D:It feels like in the middle of nowhere.  You shouldn't be there.
@@ -317,9 +317,9 @@ G:p
 Z:22:22
 R:WARRIOR
 Q:29:1311
-L:0:0:533:529:1310:49
-L:1:56:0:0:0:49
-L:22:56:0:0:1311:49
+L:7:0:533:529:1310:49
+L:8:56:0:0:0:49
+L:27:56:0:0:1311:49
 S:271:516:517:519:504:511:509:508
 D:The slumbering city of Edoras.  King Theoden has gathered
 D: many warriors around him, but seeks less than wise council...
@@ -328,12 +328,14 @@ N:22:Hornburg
 X:29:0:0:0
 Q:62:249
 R:ESCORT
-L:21:420:56:155:249:49:the Siege of 
+L:21:420:56:155:249:49:the Siege of
 L:50:420:56:155:249:49:the Siege of
 D:Saruman's orcs have laid siege to the fortress of Hornburg.  You stand with
 D: your allies to relieve the siege - fight your way through the narrow ravine of Helm's Deep
 D: and scale the tower to confront the leader of the armies, or find him
-D: here on the field of battle and slay him.
+D: here on the field of battle and slay him.  If the odds turn against you,
+D: do not flee into the mountains!  They are haunted and even
+D: maps will not let you find your way back.
 
 N:23:Isengard, war-ready
 X:37:21:22:64
@@ -404,7 +406,8 @@ S:806:0:0:0:0:0:0:0
 D:A single slab of grey stone covered with bones sits here, deep in the Dimholt woods.
 D:  Beyond, you can see the pale, flickering torches that light the Dark Door of the
 D: Dead - the entrance to the Paths of the Dead.  You can leave supplies here on the
-D: stone while you search this lifeless place.
+D: stone while you search this lifeless place.  No hope lies ahead,
+D: with or without supplies, and your old maps don't even let you retrace the way you came here.
 
 N:30:Pelennor Fields
 X:28:0:0:0
@@ -676,11 +679,11 @@ D: gather. At least the way ahead seems fair and true.
 
 #TODO: change the graphics from bridge to ferry or just plain river
 
-N:58:the Bucklebury Ferry
+N:58:Brandywine Ferry
 X:10:53:0:0
 G:h
 R:ANIMAL
-L:0:0:435:155:0:0:on Brandywine
+L:0:0:435:155:0:0:the
 S:903:0:0:0:0:0:0:0
 D:This is the farthest you've been from the Shire - ahead, dark
 D: clouds gather.  Choose your path carefully!  Once you cross the

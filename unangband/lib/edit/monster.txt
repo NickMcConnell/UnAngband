@@ -18934,7 +18934,7 @@ D: battle-cry strikes terror into |his|her| foes.
 N:1310:Hama, Doorwarden of the Golden Hall
 G:t:u
 I:110:35d10:40:10:3
-W:0:4:0:0
+W:10:4:0:0
 M:20:0:0:10
 F:UNIQUE | MALE | 
 F:FORCE_MAXHP | 
@@ -18947,7 +18947,7 @@ F:FORCE_DEPTH
 N:1311:King Theoden, possessed by Saruman
 G:t:y
 I:120:10d100:20:90:40
-W:33:5:0:1200
+W:47:5:0:1200
 M:20:10:0:40
 B:HIT:WOUND:5d5
 B:HIT:WOUND:5d5

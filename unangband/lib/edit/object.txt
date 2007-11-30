@@ -5126,13 +5126,13 @@ P:0:1d1:0:0:0
 
 N:692:& map~ to the mountain Caradhras
 G:?:U
-I:72:41:0
+I:72:52:0
 W:20:0:5:250
 A:20/2
 
-N:693:& map~ to Khazad-Dum
+N:693:& map~ to the Paths of the Dead
 G:?:U
-I:72:61:0
+I:72:29:0
 W:30:0:5:250
 A:30/2
 
