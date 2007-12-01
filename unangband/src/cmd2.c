@@ -727,7 +727,7 @@ static void do_cmd_travel(void)
 			}
 
 			/* Hack -- Get hungry/tired/sore */
-			set_food(MAX(500, p_ptr->food-(PY_FOOD_FULL/10*journey)));
+			set_food(p_ptr->food-(PY_FOOD_FULL/10*journey));
 
 			/* Hack -- Time passes (at 4* food use rate) */
 			turn += PY_FOOD_FULL/10*journey*4;
