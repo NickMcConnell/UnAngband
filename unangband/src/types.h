@@ -1057,6 +1057,8 @@ struct store_type
 	byte tval[STORE_CHOICES];
 	byte sval[STORE_CHOICES];
 	s16b count[STORE_CHOICES];
+	
+	byte tvals_will_buy[STORE_WILL_BUY]; /* Tvals that the store will buy */
 
 	byte stock_num; /* Stock -- Number of entries */
 	s16b stock_size;/* Stock -- Total Size of Array */

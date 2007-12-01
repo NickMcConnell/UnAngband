@@ -10,8 +10,10 @@
 # Format:
 # N:store:store name (interior)
 # O:tval:sval:count - must offer at least 15 item types
+# B:tval - tvals that the store will purchase
 
 # Maximum number of O: entries is currently 32 lines.
+# Maximum number of B: entries is currently 16 lines.
 
 # Version stamp (required)
 

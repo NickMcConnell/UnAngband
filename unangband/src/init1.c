@@ -5938,6 +5938,7 @@ errr parse_u_info(char *buf, header *head)
 	static store_type *u_ptr = NULL;
 
 	static int cur_t = 0;
+	static int cur_w = 0;
 
 	/* Process 'N' for "New/Number/Name" */
 	if (buf[0] == 'N')
@@ -5977,6 +5978,7 @@ errr parse_u_info(char *buf, header *head)
 		
 		/* Reset the store */
 		cur_t = 0;
+		cur_w = 0;
 	}
 
 	/* Process 'X' for "Extra" */
@@ -5988,6 +5990,97 @@ errr parse_u_info(char *buf, header *head)
 		if (1 != sscanf(buf+2, "%d", &base)) return (PARSE_ERROR_GENERIC);
 
 		u_ptr->base = base;
+		
+		/* Switch on the store */
+		switch (u_ptr->base)
+		{
+			/* General Store */
+			case STORE_GENERAL:
+			{
+				u_ptr->tvals_will_buy[0] = TV_FOOD;
+				u_ptr->tvals_will_buy[1] = TV_LITE;
+				u_ptr->tvals_will_buy[2] = TV_FLASK;
+				u_ptr->tvals_will_buy[3] = TV_SPIKE;
+				u_ptr->tvals_will_buy[4] = TV_SHOT;
+				u_ptr->tvals_will_buy[5] = TV_ARROW;
+				u_ptr->tvals_will_buy[6] = TV_BOLT;
+				u_ptr->tvals_will_buy[7] = TV_DIGGING;
+				u_ptr->tvals_will_buy[8] = TV_CLOAK;
+				u_ptr->tvals_will_buy[9] = TV_INSTRUMENT;
+				u_ptr->tvals_will_buy[10] = TV_MAP;
+				u_ptr->tvals_will_buy[11] = TV_BAG;
+				u_ptr->tvals_will_buy[12] = TV_ROPE;
+				break;
+			}
+
+			/* Armoury */
+			case STORE_ARMOR:
+			{
+				u_ptr->tvals_will_buy[0] = TV_BOOTS;
+				u_ptr->tvals_will_buy[1] = TV_GLOVES;
+				u_ptr->tvals_will_buy[2] = TV_CROWN;
+				u_ptr->tvals_will_buy[3] = TV_HELM;
+				u_ptr->tvals_will_buy[4] = TV_SHIELD;
+				u_ptr->tvals_will_buy[5] = TV_CLOAK;
+				u_ptr->tvals_will_buy[6] = TV_SOFT_ARMOR;
+				u_ptr->tvals_will_buy[7] = TV_HARD_ARMOR;
+				u_ptr->tvals_will_buy[8] = TV_DRAG_ARMOR;
+				break;
+			}
+
+			/* Weapon Shop */
+			case STORE_WEAPON:
+			{
+				u_ptr->tvals_will_buy[0] = TV_SHOT;
+				u_ptr->tvals_will_buy[1] = TV_BOLT;
+				u_ptr->tvals_will_buy[2] = TV_ARROW;
+				u_ptr->tvals_will_buy[3] = TV_BOW;
+				u_ptr->tvals_will_buy[4] = TV_DIGGING;
+				u_ptr->tvals_will_buy[5] = TV_HAFTED;
+				u_ptr->tvals_will_buy[6] = TV_POLEARM;
+				u_ptr->tvals_will_buy[7] = TV_SWORD;
+				break;
+			}
+
+			/* Temple */
+			case STORE_TEMPLE:
+			{
+				u_ptr->tvals_will_buy[0] = TV_PRAYER_BOOK;
+				u_ptr->tvals_will_buy[1] = TV_SCROLL;
+				u_ptr->tvals_will_buy[2] = TV_POTION;
+				u_ptr->tvals_will_buy[3] = TV_HAFTED;
+				u_ptr->tvals_will_buy[4] = TV_STATUE;
+				u_ptr->tvals_will_buy[5] = TV_SHOT;				
+				/*u_ptr->tvals_will_buy[6] = TV_POLEARM; Was blessed only */
+				/*u_ptr->tvals_will_buy[7] = TV_SWORD; Was blessed only */
+				break;
+			}
+
+			/* Alchemist */
+			case STORE_ALCHEMY:
+			{
+				u_ptr->tvals_will_buy[0] = TV_FOOD; /* Was mushrooms only */
+				u_ptr->tvals_will_buy[1] = TV_SCROLL;
+				u_ptr->tvals_will_buy[2] = TV_POTION;
+				u_ptr->tvals_will_buy[3] = TV_RUNESTONE;
+				break;
+			}
+
+			/* Magic Shop */
+			case STORE_MAGIC:
+			{
+				u_ptr->tvals_will_buy[0] = TV_MAGIC_BOOK;
+				u_ptr->tvals_will_buy[1] = TV_AMULET;
+				u_ptr->tvals_will_buy[2] = TV_RING;
+				u_ptr->tvals_will_buy[3] = TV_STAFF;
+				u_ptr->tvals_will_buy[4] = TV_WAND;
+				u_ptr->tvals_will_buy[5] = TV_ROD;
+				u_ptr->tvals_will_buy[6] = TV_SCROLL;
+				u_ptr->tvals_will_buy[7] = TV_POTION;
+				u_ptr->tvals_will_buy[8] = TV_RUNESTONE;
+				break;
+			}
+		}
 	}
 
 	/* Process 'O' for "Offered" (up to thirty two lines) */
@@ -6009,6 +6102,25 @@ errr parse_u_info(char *buf, header *head)
 		/* increase counter for 'possible tval' index */
 		cur_t++;
 	}
+	
+	/* Process 'B' for "Buy" (up to sixteen lines) */
+	else if (buf[0] == 'B')
+	{
+		int tval;
+
+		/* Scan for the values */
+		if (1 != sscanf(buf+2, "%d", &tval)) return (PARSE_ERROR_GENERIC);
+
+		/* only thirty two O: lines allowed */
+		if (cur_w >= STORE_CHOICES) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		u_ptr->tvals_will_buy[cur_w] = (byte)tval;
+
+		/* increase counter for 'possible tval' index */
+		cur_w++;
+	}
+	
 	else
 	{
 		/* Oops */
