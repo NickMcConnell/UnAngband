@@ -3375,7 +3375,7 @@ static void dungeon(void)
 		/* Hack: I cannot trace when the messages line is cleared, so I redraw the display dungeon and level name every turn instead */
 		/* FIXME: this overwrites some messages, e.g. refuelling */
 		{
-		  char str[50];
+		  char str[51];
 		  int length;
 		  int wid, h;
 		  dungeon_zone *zone;

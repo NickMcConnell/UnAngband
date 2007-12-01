@@ -5705,7 +5705,7 @@ errr parse_t_info(char *buf, header *head)
 		t_ptr = (town_type*)head->info_ptr + i;
 
 		/* Take care it displays properly */
-		if (strlen(s) > 21)
+		if (strlen(s) > 19)
 		  return (PARSE_ERROR_GENERIC);
 
 		/* Store the name */

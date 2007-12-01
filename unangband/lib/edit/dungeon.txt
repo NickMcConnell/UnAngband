@@ -16,9 +16,9 @@
 # === Understanding dungeon.txt ===
 
 # Format:
-# N: dungeon number: dungeon name
+# N: dungeon number: abbreviated dungeon name
 # X: easily connected to these dungeons (up to 4)
-# L: level : fill with terrain (0=town) : big terrain : small terrain : quest monster : vault : level name
+# L: level : fill with terrain (0=town) : big terrain : small terrain : quest monster : vault : level name prefix
 # Q: dungeon connected to once quest monster defeated : quest monster
 # Y: lock all shops until this monster is defeated : if player has visited this dungeon
 # Z: substitute this dungeon instead : if player has visited this dungeon
@@ -34,14 +34,16 @@
 # put any feature here you want.
 
 # 'N' indicates the beginning of an entry. The serial number must
-# increase for each new item.
+# increase for each new item. Full name of the dungeon is obtained
+# by concatenating the name of the first level and the abbreviated dungeon name.
 
-# 'X' indicates the dungeons that may be reached from this dungeon. 
+# 'X' indicates the dungeons that may be reached from this dungeon.
 
 # 'L' defines dungeon 'zones'. A dungeon zone extends from the level listed until 1 below
 # the next level listed. Zones must be shown in increasing order of level. The last L:
 # entry defines the maximum depth of the dungeon. The first L: entry defines the 'surface level'
-# of the dungeon and apparent depth is determined as offsets from this surface level.
+# of the dungeon and apparent depth is determined as offsets from this surface level. Full name of the level is obtained
+# by concatenating the level name prefix and the abbreviated dungeon name.
 
 # The quest monster must be a unique. The vault indicates an entry in the vault.txt file
 # and places the vault in the centre of the level, but without any monsters, traps or treasure.
@@ -77,7 +79,7 @@ X:10:57:0:0
 Q:58:111
 Z:35:35
 G:h
-L:0:0:411:153:0:0:the town of 
+L:0:0:411:153:0:0:the town of
 S:264:515:265:266:772:773:0:0
 D:Here your adventure begins.  You can travel to Farmer Maggot's Farm or
 D: the East Road from here - the easiest route by far is the East Road and
@@ -112,20 +114,20 @@ D: and in other times goblins are known to set traps for unwary travelers.
 D:  After a long walk up the pass you are exhausted, but fortunately
 D: you find an entrance '>' to a cave...
 
-N:4:the house of Beorn
+N:4:house of Beorn
 X:3:5:0:0
 R:ANIMAL
-L:14:0:435:0:566:0
+L:14:0:435:0:566:0:the
 S:269:0:0:0:0:0:0:0
 D:Beorn lives in a big hall with a veranda.  He is not fond of guests.
 
-N:5:Mirkwood
+N:5:Mirkwood the Great
 X:4:6:63:0
 G:l
 R:CAN_CLIMB
 L:14:420:56:153:637:0:a road through
 L:15:56:0:0:0:0:Elvenking's halls in
-L:25:0:1:155:0:0:trade cellars under
+L:25:0:1:155:0:0:storage cellars under
 L:26:56:155:0:1082:0:great hall under
 S:270:271:503:11:12:504:505:0
 D:Dark shapes scuttle in the shadows on the sides of the road through
@@ -139,7 +141,7 @@ X:5:7:48:0
 L:0:0:155:152:0:0
 S:8:9:10:11:12:13:14:508
 Z:8:7
-D:The dwellers of Esgaroth on the Long Lake are a hardy people, 
+D:The dwellers of Esgaroth on the Long Lake are a hardy people,
 D: living as they do under the twin shadows
 D: of the Lonely Mountain and Dol Guldur.  Of the two, some treasure hunters
 D: risk the wrath of Smaug but only the most foolhardy seek anything
@@ -156,7 +158,7 @@ Q:9:475
 Z:47:9
 L:20:435:56:154:0:0:the
 L:21:56:0:0:0:0:western passage into
-L:22:56:0:0:0:0:the tunnels of 
+L:22:56:0:0:0:0:the tunnels of
 L:38:56:0:0:475:0:bottommost hall under the
 D:There is a sudden flash of gold and flame in the
 D: air... Smaug has taken flight.  You desperately
@@ -166,12 +168,12 @@ D: distance, you see smoke rising as Lake-town burns.
 
 # With disastrous consequences.
 
-N:8:Lake-town ruins
+N:8:ruins of Lake-town
 X:5:7:48:0
 R:CAN_SWIM
 G:t
 Z:9:9
-L:22:155:407:49:475:0
+L:22:155:407:49:475:0:the
 D:Smaug has laid waste to Lake-town. The townsfolk
 D: gather, angry at you for disturbing his lair...
 
@@ -192,7 +194,7 @@ R:ANIMAL
 Q:58:111
 L:2:0:435:0:4:0:Farmer
 L:3:114:0:0:0:0:cellars of
-L:6:114:0:0:111:0:back exit from cellars of
+L:6:114:0:0:111:0:cellars' back exit in the
 S:507:0:0:0:0:0:0:0
 
 N:11:Bree
@@ -202,7 +204,7 @@ W:440:48
 Y:440:48
 L:0:0:407:408:0:0:the town of
 L:1:56:0:0:0:0:sewers of
-L:4:56:0:0:620:0:the waste pool outside
+L:4:56:0:0:620:0:the dump outside
 S:8:9:10:11:12:13:268:775
 
 # Goes upwards, so all levels, except 20, are described by the L:31 line!
@@ -213,10 +215,10 @@ W:449:48
 L:20:420:56:49:0:31:the hill of
 L:31:56:0:0:0:31:the tower of
 
-N:13:the Ford to Rivendell
+N:13:Ford to Rivendell
 X:2:12:39:0
 W:453:48
-L:8:420:154:126:0:0
+L:8:420:154:126:0:0:the
 D:River Bruinen runs here swiftly over its rocky bed.
 D:  From the nearby sources in Misty Mountains down to the ford,
 D: the river is under the rule of Lord of Rivendell.
@@ -252,7 +254,7 @@ D:The old dwarven doors to Moria are broken open and only foul air and darkness 
 
 # The gates of Moria after they are closed by Balin
 
-# TODO: make sure this dungeon has wilderness features, watery, etc., 
+# TODO: make sure this dungeon has wilderness features, watery, etc.,
 # not caves and rock; The dungeon is very short --- it does
 # not open the gates, so no point in misleading the player.
 
@@ -317,7 +319,7 @@ G:p
 Z:22:22
 R:WARRIOR
 Q:29:1311
-L:7:0:533:529:1310:49
+L:7:0:533:529:1310:49:the town of
 L:8:56:0:0:0:49
 L:27:56:0:0:1311:49
 S:271:516:517:519:504:511:509:508
@@ -394,12 +396,12 @@ S:505:516:517:503:519:518:509:508
 
 # TODO: Too deep for a one-time dungeon?
 
-N:29:the Paths of the Dead
+N:29:Paths of the Dead
 X:0:0:0:0
 G:W
 R:UNDEAD
 Q:28:528
-L:56:0:420:0:528:0
+L:56:0:420:0:528:0:the
 L:57:56:0:0:0:0
 L:85:56:0:0:522:0
 S:806:0:0:0:0:0:0:0
@@ -415,18 +417,18 @@ G:W
 R:ESCORT
 L:56:435:411:420:535:0:the Battle of
 
-N:31:the White Tree
+N:31:Kings' courts
 X:28:0:0:0
 R:ANIMAL
-L:0:0:410:56:0:0
+L:0:0:410:56:0:0:the white tree in the
 S:777:0:0:0:0:0:0:0
-D:A white tree has found root here, beyond Minas Tirith.  Claim your reward which
+D:A white tree has found root here, in the Court of the Fountain in front of the Tower of Ecthelion.  Claim your reward, which
 D: lies beneath the tree.
 
 N:32:Plains of Gorgoroth
 X:51:33:0:0
 G:o
-L:65:441:201:431:0:0
+L:65:441:201:431:0:0:the
 L:79:56:209:0:595:0
 
 N:33:Orodruin
@@ -523,9 +525,9 @@ D: tell the pass from the mountain slopes.  Even if you manage to
 D: fight your way through, you have no idea where you'll end.
 D:  Turn back, while you can!
 
-N:42:the vaults of Erebor
+N:42:vaults of Erebor
 X:9:0:0:0
-L:21:0:56:1:0:0
+L:21:0:56:1:0:0:the
 L:22:56:0:0:0:0
 L:40:56:0:0:0:0
 S:897:898:899:900:901:902:0:0
@@ -538,10 +540,10 @@ D: rebuild their kingdom using the wealth, your share is here for taking.
 
 # Alternate to bypass Moria etc. and reach Angband...
 
-N:43:the ruins of Angmar
+N:43:ruins of Angmar
 X:2:69:0:0
 R:UNDEAD
-L:21:425:141:141:0:0
+L:21:425:141:141:0:0:the
 L:22:56:141:0:0:0
 L:80:56:0:0:535:0
 L:81:56:0:0:0:0
@@ -549,11 +551,11 @@ L:81:56:0:0:0:0
 # Sunken dungeon
 
 # TODO: revert to the original name, put part of it into first level description, the same for some other abridged names
-N:44:sunken Numenor
+N:44:Numenor
 X:2:0:0:0
 G:G
 R:CAN_SWIM
-L:21:403:400:49:0:0
+L:21:403:400:49:0:0:the sunken city of
 L:22:399:56:0:0:0
 L:60:399:56:0:0:0
 
@@ -561,15 +563,15 @@ N:45:Elemental Evil
 X:2:0:0:0
 G:E
 R:PRIEST
-L:21:425:141:141:0:0:the entrance to the Temple of
-L:22:56:0:0:0:0:the Temple of
-L:60:56:0:0:0:0:the Temple of
+L:21:425:141:141:0:0:entrance to the temple of
+L:22:56:0:0:0:0:the temple of
+L:60:56:0:0:0:0:the temple of
 
-N:46:the Crystal Castle
+N:46:Crystal Castle
 X:2:0:0:0
 G:g
 R:MAGE
-L:21:56:144:145:0:0
+L:21:56:144:145:0:0:the
 L:22:148:145:0:0:0
 L:60:148:145:0:0:0
 
@@ -613,7 +615,7 @@ X:32:50:0:0
 R:EVIL
 L:80:407:218:208:511:0
 
-# Redhorn is actually another name for Caradhras; 
+# Redhorn is actually another name for Caradhras;
 # 'Redhorn pass' is the pass nearby
 # East-west passage is free because orcs are on lookout from the west.
 
@@ -661,15 +663,15 @@ N:56:Midgewater Marshes
 X:11:12:0:0
 G:R
 R:INSECT
-L:11:435:153:199:0:0
+L:11:435:153:199:0:0:the
 L:12:56:0:153:0:0
 L:19:56:0:153:215:0
 
-N:57:the East Road
+N:57:East Road
 X:1:11:0:0
 G:h
 R:ANIMAL
-L:0:0:435:420:0:0
+L:0:0:435:420:0:0:the
 S:904:0:0:0:0:0:0:0
 D:The road ahead is long but straight; it takes you to beyond the
 D: edge of the Shire to Bree.  Choose your path carefully!  Once

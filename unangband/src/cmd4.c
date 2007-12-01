@@ -377,15 +377,15 @@ static void display_group_list(int col, int row, int wid, int per_page,
 	/* Display lines until done */
 	for (i = 0, pos = start; i < per_page && pos < max; i++, pos++)
 	{
-		char buffer[22];
+		char buffer[20];
 		byte attr = curs_attrs[CURS_KNOWN][cursor == pos];
 
 		/* Erase the line */
 		Term_erase(col, row + i, wid);
 
-		/* Display it (width should not exceed 21) */
-		strncpy(buffer, group_text[pos], 21);
-		buffer[21] = 0;
+		/* Display it (width should not exceed 19) */
+		strncpy(buffer, group_text[pos], 19);
+		buffer[19] = 0;
 		c_put_str(attr, buffer, row + i, col);
 	}
 	/* Wipe the rest? */
@@ -509,7 +509,7 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 		len = strlen(g_names[i]);
 		if(len > g_name_len) g_name_len = len;
 	}
-	if(g_name_len >= 21) g_name_len = 21;
+	if(g_name_len >= 19) g_name_len = 19;
 
 	while ((!flag) && (grp_cnt))
 	{
@@ -1895,13 +1895,7 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
         
         if(!t_info[dun].zone[zone].name) {
 	  if(zone == 0) {
-	    if(t_info[dun].zone[0].level == 0) {
-	      c_prt(attr, format("Town of %s", t_info[dun].name + t_name), row, col);
-	    }
-	    else {
-	      c_prt(attr, t_info[dun].name + t_name, row, col);
-	    }
-	    c_prt(attr, format("Lev %3d", depth), row, 65);
+	    c_prt(attr, t_info[dun].name + t_name, row, col);
 	  }
 	  else {
 	    c_prt(attr, format("Level %d of %s", t_info[dun].zone[zone].level,
@@ -1911,8 +1905,7 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 	else {
 	  c_prt(attr, format("%s %s", 
 			     t_info[dun].zone[zone].name + t_name, 
-			     t_info[dun].name + t_name, 
-			     t_info[dun].zone[zone].level), 
+			     t_info[dun].name + t_name), 
 		row, col);
 	}
 
@@ -1927,7 +1920,7 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 	  }
 	  else {
 	    /* we are already past it */
-	    c_prt(attr, "passed", row, 65);
+	    c_prt(attr, "***", row, 65);
 	  }
 	}
 }
@@ -1935,6 +1928,18 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 static int oiddiv4 (int oid) { return oid/MAX_DUNGEON_ZONES; }
 static const char* town_name(int gid) { return t_info[gid].name+t_name; }
 
+void long_current_level_name(char* str) 
+{
+  dungeon_zone *zone;
+
+  /* Get the zone */
+  get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+  
+  if (zone->name)
+    sprintf(str, "%s %s", zone->name + t_name, t_info[p_ptr->dungeon].name + t_name);
+  else
+    sprintf(str, "%s", t_info[p_ptr->dungeon].name + t_name);
+}
 
 static void do_cmd_knowledge_dungeons(void)
 {
@@ -4657,12 +4662,19 @@ void do_cmd_timeofday()
 	/* Display location */
 	if (p_ptr->depth == min_depth(p_ptr->dungeon))
 	{
-		msg_format("You are in %s.", t_name + t_info[p_ptr->dungeon].name);
+		char str[51];
+
+		long_current_level_name(str);
+
+		msg_format("You are in %s.", str);
 	}
 	/* Display depth in feet */
 	else if (depth_in_feet)
 	{
 		dungeon_zone *zone=&t_info[0].zone[0];
+		char str[51];
+
+		long_current_level_name(str);
 
 		/* Get the zone */
 		get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
@@ -4670,14 +4682,15 @@ void do_cmd_timeofday()
 		msg_format("You are %d ft %s %s.",
 			(p_ptr->depth - min_depth(p_ptr->dungeon)) * 50 ,
 				zone->tower ? "high above" : "deep in",
-					t_name + t_info[p_ptr->dungeon].name);
+					str);
 	}
 	/* Display depth */
 	else
 	{
-		msg_format("You are on level %d of %s.",
-			p_ptr->depth - min_depth(p_ptr->dungeon),
-				t_name + t_info[p_ptr->dungeon].name);
+	  char str[51];
+	  long_current_level_name(str);
+	  msg_format("You are on level %d of %s.",
+		     p_ptr->depth - min_depth(p_ptr->dungeon), str);
 	}
 
 	/* Message */

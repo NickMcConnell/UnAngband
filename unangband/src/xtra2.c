@@ -4008,7 +4008,7 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 	{
 		if ((p_ptr->depth == min_depth(p_ptr->dungeon)) || (!zone->fill))
 		{
-			my_strcpy(name, t_name + t_ptr->name, name_s);
+			long_current_level_name(name);
 
 			if (!text_always) return;
 
