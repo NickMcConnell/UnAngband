@@ -2083,11 +2083,11 @@ D: the air, you....
 N:159:Boldog, the Orc Captain
 G:o:y
 I:110:24d10:20:60:20
-W:12:3:0:230
-B:HIT:HURT:1d12
-B:HIT:HURT:1d12
-B:HIT:HURT:1d10
-B:HIT:HURT:1d10
+W:14:3:0:230
+M:20:0:0:0
+B:HIT:HURT:2d12
+B:HIT:HURT:2d10
+B:ARROW:HURT:3d10
 F:UNIQUE | MALE
 F:FORCE_MAXHP
 F:ESCORT
@@ -12834,10 +12834,11 @@ N:868:Howling spirit
 G:G:B
 I:120:14d8:14:20:10
 W:33:2:22:125
-M:0:16:31:75
+M:16:16:31:75
 B:TOUCH:LOSE_STR:1d10
 B:TOUCH:LOSE_STR:1d10
 B:BITE:HURT:2d6
+B:HOWL:LOSE_WIS
 F:FORCE_SLEEP | RAND_25 | 
 F:DROP_2D2 | CAN_FLY | IM_BLUNT | NO_CUTS | NO_STUN
 F:INVISIBLE | COLD_BLOOD | PASS_WALL | 
@@ -19613,6 +19614,22 @@ F:CAN_FLY | UNIQUE | FORCE_MAXHP
 F:ANIMAL | RAND_50
 S:S_KIN
 D:Among all the eagles of Middle-earth he is the swiftest, and in his time 
-D:has borne messages between all of the Wise.  He is looking for Gandalf the
+D:has borne messages between all of the Wise.  He is looking for Gandalf the 
 D:Grey and believes you withhold that information from him.
+
+N:1366:the Great Grey Wolf
+G:C:s
+I:120:27d9:60:60:40
+W:17:1:0:35
+M:16:0:0:10
+B:BITE:HURT:2d5
+B:BITE:POISON:2d5
+B:HOWL:TERRIFY
+F:RAND_25 | UNIQUE | FORCE_MAXHP
+F:ESCORT | 
+F:BASH_DOOR | IM_POIS | IM_COLD | IM_ACID | RES_MAGIC
+F:ANIMAL | EAT_BODY
+D:Among all the wolves you have fought so far, this one stands head and shoulders above its kin.
+D:  Its fetid breath cloys the air, choking you in terror, and your spells
+D: seem to slide off its coat as if it was somehow magically protected.
 
