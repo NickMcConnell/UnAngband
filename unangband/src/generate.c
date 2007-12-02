@@ -9718,8 +9718,6 @@ static void init_ecology(int r_idx)
 	cave_ecology.ready = FALSE;
 	cave_ecology.valid_hook = FALSE;
 	
-	r_idx = 1307;
-	
 	/* Initialise ecology based on seed race */
 	if (r_idx)
 	{
