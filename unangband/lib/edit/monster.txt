@@ -13286,7 +13286,7 @@ D:It voraciously eats and breeds leaving nothing in its wake.
 N:905:Giant grub
 G:I:U
 I:110:3d3:8:6:20
-W:3:2:0:2
+W:3:2:26:2
 B:BITE:HURT:1d2
 F:RAND_50 | 
 F:MULTIPLY | 

@@ -9713,6 +9713,12 @@ static void init_ecology(int r_idx)
 
 	/* Count of different non-unique monsters in ecology */
 	k = (MIN_ECOLOGY_RACES / 2) + rand_int((MIN_ECOLOGY_RACES + 1) / 2);
+
+	/* Ecology is not yet valid */
+	cave_ecology.ready = FALSE;
+	cave_ecology.valid_hook = FALSE;
+	
+	r_idx = 1307;
 	
 	/* Initialise ecology based on seed race */
 	if (r_idx)
