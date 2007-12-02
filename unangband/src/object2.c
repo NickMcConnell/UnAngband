@@ -2132,6 +2132,13 @@ void object_prep(object_type *o_ptr, int k_idx)
 		else if (rand_int(100) < 30) o_ptr->ident |= (IDENT_CURSED);
 		else o_ptr->ident |= (IDENT_BROKEN);
 	}
+	else if (k_ptr->flags3 & (TR3_UNCONTROLLED))
+	{
+		int i = rand_int(100);
+		
+		if (i < 30) o_ptr->ident |= (IDENT_CURSED);
+		else if (i < 60) o_ptr->ident |= (IDENT_BROKEN);
+	}
 	
 	o_ptr->can_flags1 = 0x0L;
 	o_ptr->can_flags2 = 0x0L;
@@ -5442,6 +5449,9 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 
 		/* Prepare the object */
 		object_prep(j_ptr, k_idx);
+		
+		/* Hack -- good / great objects are never cursed */
+		if (good || great) j_ptr->ident &= ~(IDENT_CURSED);
 
 		/* Auto-inscribe if necessary */
 		if ((cheat_auto) || (object_aware_p(j_ptr))) j_ptr->note = k_info[k_idx].note;
