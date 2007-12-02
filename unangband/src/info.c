@@ -4013,7 +4013,7 @@ void print_spells(const s16b *sn, int num, int y, int x)
 				}
 				else
 				{
-					comment = " prerequsite";
+					comment = " prerequisite";
 					line_attr = TERM_VIOLET;
 				}
 			}
