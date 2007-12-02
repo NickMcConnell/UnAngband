@@ -79,7 +79,7 @@ X:10:57:0:0
 Q:58:111
 Z:35:35
 G:h
-L:0:0:411:153:0:0:the town of
+L:0:0:411:155:0:0:the town of
 S:264:515:265:266:772:773:0:0
 D:Here your adventure begins.  You can travel to Farmer Maggot's Farm or
 D: the East Road from here - the easiest route by far is the East Road and
@@ -241,7 +241,7 @@ D:In older days, the gates to Moria were always open, and a meeting point for dw
 D: elves.  The ancient doors now stand ajar, but the mines behind them are home to only fouler things.
 
 # Keep the dungeon here identical to the one above
-# TODO: vary the topmost level
+# TODO: vary the topmost level wrt N:14
 
 N:15:east Moria entrance
 X:63:0:0:0
@@ -254,8 +254,7 @@ D:The old dwarven doors to Moria are broken open and only foul air and darkness 
 
 # The gates of Moria after they are closed by Balin
 
-# TODO: make sure this dungeon has wilderness features, watery, etc.,
-# not caves and rock; The dungeon is very short --- it does
+# This dungeon is very short --- it does
 # not open the gates, so no point in misleading the player.
 
 N:16:west gates of Moria
@@ -394,22 +393,20 @@ L:1:56:0:0:0:46
 L:55:56:0:0:1085:46
 S:505:516:517:503:519:518:509:508
 
-# TODO: Too deep for a one-time dungeon?
-
 N:29:Paths of the Dead
 X:0:0:0:0
 G:W
 R:UNDEAD
 Q:28:528
-L:56:0:420:0:528:0:the
-L:57:56:0:0:0:0
-L:85:56:0:0:522:0
+L:66:0:420:0:528:0:the
+L:67:56:0:0:0:0
+L:75:56:0:0:522:0
 S:806:0:0:0:0:0:0:0
 D:A single slab of grey stone covered with bones sits here, deep in the Dimholt woods.
 D:  Beyond, you can see the pale, flickering torches that light the Dark Door of the
 D: Dead - the entrance to the Paths of the Dead.  You can leave supplies here on the
 D: stone while you search this lifeless place.  No hope lies ahead,
-D: with or without supplies, and your old maps don't even let you retrace the way you came here.
+D: with or without supplies, and on your old maps you can't even find the way you came here.
 
 N:30:Pelennor Fields
 X:28:0:0:0
@@ -422,7 +419,7 @@ X:28:0:0:0
 R:ANIMAL
 L:0:0:410:56:0:0:the white tree in the
 S:777:0:0:0:0:0:0:0
-D:A white tree has found root here, in the Court of the Fountain in front of the Tower of Ecthelion.  Claim your reward, which
+D:A white tree has found root here, in the Court of the Fountain in front of the Tower of Ecthelion, grown from a seedling found among snows of mountain Mindolluin above Minas Tirith.  Claim your reward, which
 D: lies beneath the tree.
 
 N:32:Plains of Gorgoroth
@@ -492,7 +489,7 @@ L:20:56:0:0:1081:0
 N:39:Trollshaws Forest
 X:11:13:0:0
 L:4:420:420:155:343:0:a hill in
-L:5:56:0:0:344:0:troll clearing in
+L:5:419:0:0:344:0:troll clearing in
 L:6:56:0:0:345:0:troll cave in
 
 # The only free pass to the other side of the Misty Mountains,
@@ -548,9 +545,8 @@ L:22:56:141:0:0:0
 L:80:56:0:0:535:0
 L:81:56:0:0:0:0
 
-# Sunken dungeon
+# Sunken/outer plane dungeons
 
-# TODO: revert to the original name, put part of it into first level description, the same for some other abridged names
 N:44:Numenor
 X:2:0:0:0
 G:G
@@ -679,13 +675,11 @@ D: your feet take you further, it may be a while before you return
 D: to Hobbiton, older, wiser and wearier.  Elsewhere, dark clouds
 D: gather. At least the way ahead seems fair and true.
 
-#TODO: change the graphics from bridge to ferry or just plain river
-
 N:58:Brandywine Ferry
 X:10:53:0:0
 G:h
 R:ANIMAL
-L:0:0:435:155:0:0:the
+L:0:0:435:153:0:0:the
 S:903:0:0:0:0:0:0:0
 D:This is the farthest you've been from the Shire - ahead, dark
 D: clouds gather.  Choose your path carefully!  Once you cross the
@@ -702,13 +696,10 @@ L:0:0:1:56:0:0
 S:0:0:0:0:0:0:0:0
 D:As you read the map, starlight leads the way.  'Speak friend, and enter'.
 
-# TODO: why the L:29 defnition here? what would be the name?
-
 N:60:the mines of Moria
 X:0:0:0:0
 Q:61:1277
 L:22:56:0:0:0:0
-L:29:56:0:0:0:0
 L:30:0:1:56:1277:0
 S:805:0:0:0:0:0:0:0
 D:There is a thunderous roar and rocks tumble about you.  You are plunged
@@ -736,45 +727,46 @@ D: You think you can hear timbrous voices amidst the creaks and groans
 D: of their ancient boughs. Perhaps a closer look will help you
 D: understand if they have come to a decision...
 
-# canines dungeon, shops closed until Great Grey Wolf killed; small goods, potions, food, one or two more.
-#TODO
+# canines dungeon, shops closed until Great Grey Wolf (TODO) killed 
 
 N:63:Woodmen Village
 X:5:15:52:0
 G:C
 Y:186:5
 L:11:0:420:408:0:0
-L:14:56:420:420:186:0
-S:264:515:265:0:0:0:0:0
+L:12:419:436:422:0:0
+L:14:436:407:404:186:0
+S:503:12:515:956:512:0:0:0
 D:Wolves are howling around. Villagers hide in their fenced village on the western edge of Mirkwood.
 
 # No dungeon, part of the one-time free pass east around Misty Mountains.
-#TODO
 
 N:64:Dunland
 X:2:14:40:0
 Z:65:48
-L:12:420:154:126:0:0
+G:t
+L:12:419:149:422:0:0
 
 # deep dungeon with evil humans after Isengard darkens; blocks way to Isengard
-#TODO
+# guardian TODO (a man)
 
 N:65:Dunland in war rage
 X:2:14:0:0
+G:t
 Q:40:407
-L:12:420:154:126:0:0
-L:21:420:141:141:407:31
-D:Dunland is brewing for war stirred by dark emisaries that long laboured in secret.
-D:  Whence they came? Nobody knows...
+L:12:419:149:422:0:0
+L:28:414:141:140:407:0
+D:Dunland is brewing for war rallied by dark emisaries that so far laboured in secret.
+D:  Whence they came? It does not matter to the men of Dunland, so long craving for revenge.
 
-#TODO: possibly only vary the 21 level to show it's empty
+# the emptiness is represented by the dungeon being shallower and by some water
 
 N:66:emptied Isengard
 X:37:64:0:0
 Q:28:532
-L:21:420:141:141:514:31
+L:21:420:397:141:514:31
 L:22:56:0:0:0:31
-L:50:56:0:0:532:31
+L:35:56:0:0:532:31
 D:Almost all of the Saruman's army went for Hornburg.  What are the tidings?
 
 #N:67 unused
