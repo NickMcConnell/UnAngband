@@ -255,6 +255,7 @@ static cptr r_info_blow_method[] =
 	"SPIKE",
 	"AIM_AREA",
 	"SCATTER",
+	"HOWL",
 	NULL
 };
 

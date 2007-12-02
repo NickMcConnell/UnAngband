@@ -711,6 +711,7 @@ static void describe_monster_attack(const monster_race *r_ptr, const monster_lor
 			case RBM_SPIT:	p = "spit"; break;
 			case RBM_GAZE:	p = "gaze"; break;
 			case RBM_WAIL:	p = "wail"; break;
+			case RBM_HOWL:	p = "howl"; break;
 			case RBM_SHRIEK:	p = "shriek"; break;
 			case RBM_SPORE:	p = "release spores"; break;
 			case RBM_LASH:	p = "lash you with a whip"; break;
