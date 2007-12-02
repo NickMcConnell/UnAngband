@@ -727,15 +727,15 @@ D: You think you can hear timbrous voices amidst the creaks and groans
 D: of their ancient boughs. Perhaps a closer look will help you
 D: understand if they have come to a decision...
 
-# canines dungeon, shops closed until Great Grey Wolf (TODO) killed 
+# canines dungeon, shops closed until Great Grey Wolf killed 
 
 N:63:Woodmen Village
 X:5:15:52:0
 G:C
-Y:186:5
+Y:1366:5
 L:11:0:420:408:0:0
 L:12:419:436:422:0:0
-L:14:436:407:404:186:0
+L:14:436:407:404:1366:0
 S:503:12:515:956:512:0:0:0
 D:Wolves are howling around. Villagers hide in their fenced village on the western edge of Mirkwood.
 
