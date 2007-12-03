@@ -4008,7 +4008,7 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 	{
 		if ((p_ptr->depth == min_depth(p_ptr->dungeon)) || (!zone->fill))
 		{
-			long_current_level_name(name);
+			current_long_level_name(name);
 
 			if (!text_always) return;
 
@@ -4028,6 +4028,7 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 		case (ROOM_TOWER):
 		{
 			my_strcpy(name, "the tower of ", name_s);
+			/* only short dungeon name here, long usually has 'tower' in it already */
 			my_strcat(name, t_name + t_ptr->name, name_s);
 
 			/* Brief description */

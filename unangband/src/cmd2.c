@@ -318,35 +318,30 @@ void print_routes(const s16b *route, int num, int y, int x)
 {
 	int i, town;
 
-	char out_val[160];
+	char out_val[60];
 
 	byte line_attr;
-
-	town_type *t_ptr = &t_info[p_ptr->dungeon];
-	dungeon_zone *zone = &t_ptr->zone[0];
 
 	/* Title the list */
 	prt("", y, x);
 	put_str("Location", y, x + 5);
-	put_str(" Level", y, x + 45);
+	put_str(" Level", y, x + 50);
 
 	/* Dump the routes */
 	for (i = 0; i < num; i++)
 	{
-		line_attr = TERM_WHITE;
+		char str[46];
 
 		/* Get the town index */
 		town = route[i];
+
+		long_level_name(str, town, 0);
+
+		line_attr = TERM_WHITE;
 		
-		/* Get the destination info */
-		t_ptr = &t_info[town];
-
-		/* Get the top of the dungeon */
-		zone = &(t_ptr->zone[0]);
-
-		/* Dump the spell --(-- */
-		sprintf(out_val, "  %c) %-30s %-10s%2d%3s ",
-			I2A(i), t_name + t_ptr->name,"",zone->level,max_depth(town) > min_depth(town) ? format("-%-2d",max_depth(town)) : "");
+		/* Dump the route --(-- */
+		sprintf(out_val, "  %c) %-45s %2d%3s ",
+			I2A(i), str, min_depth(town), max_depth(town) > min_depth(town) ? format("-%-2d", max_depth(town)) : "");
 		c_prt(line_attr, out_val, y + i + 1, x);
 	}
 
@@ -532,6 +527,10 @@ static void do_cmd_travel(void)
 	bool edge_y = ((by < 2) || (by > ((DUNGEON_HGT/BLOCK_HGT)-3)));
 	bool edge_x = ((bx < 2) || (bx > ((DUNGEON_WID/BLOCK_WID)-3)));
 
+	char str[46];
+
+	current_long_level_name(str);
+
 	/* Get the top of the dungeon */
 	get_zone(&zone,p_ptr->dungeon,min_depth(p_ptr->dungeon));
 
@@ -573,7 +572,7 @@ static void do_cmd_travel(void)
 		}
 		else if (!edge_y && !edge_x && zone->fill)
 		{
-			msg_format("You need to be close to the edge of %s.",t_name + t_ptr->name);
+			msg_format("You need to be close to the edge of %s.", str);
 		}
 		else
 		{
@@ -607,8 +606,8 @@ static void do_cmd_travel(void)
 				/* Save screen */
 				screen_save();
 
-				/* Display a list of spells */
-				print_routes(routes, num, 1, 20);
+				/* Display a list of routes */
+				print_routes(routes, num, 1, 22);
 			}
 
 			/* Get a spell from the user */
@@ -649,7 +648,7 @@ static void do_cmd_travel(void)
 						screen_save();
 
 						/* Display a list of spells */
-						print_routes(routes, num, 1, 20);
+						print_routes(routes, num, 1, 22);
 					}
 
 					/* Ask again */
@@ -775,6 +774,10 @@ void do_cmd_go_up(void)
 	
 	town_type *t_ptr = &t_info[p_ptr->dungeon];
 
+	char str[46];
+
+	current_long_level_name(str);
+
 	/* Verify stairs */
 	if (!(f_ptr->flags1 & (FF1_STAIRS)) || !(f_ptr->flags1 & (FF1_LESS)))
 	{
@@ -806,7 +809,7 @@ void do_cmd_go_up(void)
 		if ((t_ptr->quest_opens) && (r_info[t_ptr->quest_monster].max_num == 0))
 		{
 			/* Success */
-			message(MSG_STAIRS_DOWN,0,format("You have found a way through %s.",t_name + t_ptr->name));
+			message(MSG_STAIRS_DOWN,0,format("You have found a way through %s.", str));
 	
 			/* Change the dungeon */
 			p_ptr->dungeon = t_ptr->quest_opens;
@@ -814,7 +817,7 @@ void do_cmd_go_up(void)
 		else
 		{
 			/* Success */
-			message(MSG_STAIRS_DOWN,0,format("Congratulations. You have defeated the guardian of %s.",t_name + t_ptr->name));
+			message(MSG_STAIRS_DOWN,0,format("Congratulations. You have defeated the guardian of %s.", str));
 		}
 
 		/* Set the new depth */
@@ -871,6 +874,10 @@ void do_cmd_go_down(void)
 
 	town_type *t_ptr = &t_info[p_ptr->dungeon];
 
+	char str[46];
+
+	current_long_level_name(str);
+
 	/* Verify stairs */
 	if (!(f_ptr->flags1 & (FF1_STAIRS)) || !(f_ptr->flags1 & (FF1_MORE)))
 	{
@@ -891,7 +898,7 @@ void do_cmd_go_down(void)
 		if ((t_ptr->quest_opens) && (r_info[t_ptr->quest_monster].max_num == 0))
 		{
 			/* Success */
-			message(MSG_STAIRS_DOWN,0,format("You have found a way through %s.",t_name + t_ptr->name));
+			message(MSG_STAIRS_DOWN,0,format("You have found a way through %s.", str));
 	
 			/* Change the dungeon */
 			p_ptr->dungeon = t_ptr->quest_opens;
@@ -899,7 +906,7 @@ void do_cmd_go_down(void)
 		else
 		{
 			/* Success */
-			message(MSG_STAIRS_DOWN,0,format("Congratulations. You have defeated the guardian of %s.",t_name + t_ptr->name));
+			message(MSG_STAIRS_DOWN,0,format("Congratulations. You have defeated the guardian of %s.", str));
 		}
 		
 		/* Set the new depth */

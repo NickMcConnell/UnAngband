@@ -1854,6 +1854,9 @@ static void dungeon_lore(int oid) {
 	int dun = oid / MAX_DUNGEON_ZONES;
 	int zone = oid % MAX_DUNGEON_ZONES;
 	int guard = t_info[dun].zone[zone].guard;
+	char str[46];
+
+	long_level_name(str, dun, t_info[dun].zone[zone].level);
 
 	screen_save();
 
@@ -1862,18 +1865,19 @@ static void dungeon_lore(int oid) {
 	    || t_info[dun].zone[zone+1].level == 0
 	    || t_info[dun].zone[zone+1].level - 1 == t_info[dun].zone[zone].level) {
 	  /* one-level zone */ 
-	  c_prt(TERM_L_BLUE, format("Level %d of %s", t_info[dun].zone[zone].level, t_info[dun].name+t_name), 0, 0);
+	  c_prt(TERM_L_BLUE, format("Level %d of %s", t_info[dun].zone[zone].level, str), 0, 0);
 	}
 	else {
-	  c_prt(TERM_L_BLUE, format("Levels (%d-%d) of %s", 
+	  c_prt(TERM_L_BLUE, format("Levels %d-%d of %s", 
 				    t_info[dun].zone[zone].level,
 				    t_info[dun].zone[zone+1].level - 1, 
-				    t_info[dun].name+t_name), 0, 0);
+				    str), 0, 0);
 	}
 
 	Term_gotoxy(0, 1);
 
-	text_out_c(TERM_WHITE, t_info[dun].text + t_text);
+	if (!zone)
+	  text_out_c(TERM_WHITE, t_info[dun].text + t_text);
 
 	if(t_info[dun].zone[zone].guard) {
 		text_out_c(TERM_WHITE, format(" It %s guarded by %s.",
@@ -1887,12 +1891,16 @@ static void dungeon_lore(int oid) {
 
 static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 {
-        int zone = oid % MAX_DUNGEON_ZONES;
         int dun = oid / MAX_DUNGEON_ZONES;
+        int zone = oid % MAX_DUNGEON_ZONES;
 	int depth = t_info[dun].max_depth + t_info[dun].zone[0].level;
 
         byte attr = curs_attrs[CURS_KNOWN][(int)cursor];
-        
+
+	char str[46];
+
+	long_level_name(str, dun, t_info[dun].zone[zone].level);
+
         if(!t_info[dun].zone[zone].name) {
 	  if(zone == 0) {
 	    c_prt(attr, t_info[dun].name + t_name, row, col);
@@ -1903,24 +1911,21 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 	  }
 	}
 	else {
-	  c_prt(attr, format("%s %s", 
-			     t_info[dun].zone[zone].name + t_name, 
-			     t_info[dun].name + t_name), 
-		row, col);
+	  c_prt(attr, format("%s", str), row, col);
 	}
 
 	if (depth >= t_info[dun].zone[zone].level) {
 	  if (zone == MAX_DUNGEON_ZONES - 1 || t_info[dun].zone[zone+1].level == 0) {
 	    /* last zone */ 
-	    c_prt(attr, format("Lev %3d", depth), row, 65);
+	    c_prt(attr, format(" Lev %3d", depth), row, 67);
 	  }
 	  else if (depth < t_info[dun].zone[zone+1].level) {
 	    /* depth in that dungeon is less than start of the next zone */
-	    c_prt(attr, format("Lev %3d", depth), row, 65);
+	    c_prt(attr, format(" Lev %3d", depth), row, 67);
 	  }
 	  else {
 	    /* we are already past it */
-	    c_prt(attr, "***", row, 65);
+	    c_prt(attr, " ***", row, 67);
 	  }
 	}
 }
@@ -1928,17 +1933,22 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 static int oiddiv4 (int oid) { return oid/MAX_DUNGEON_ZONES; }
 static const char* town_name(int gid) { return t_info[gid].name+t_name; }
 
-void long_current_level_name(char* str) 
+void long_level_name(char* str, int town, int depth) 
 {
   dungeon_zone *zone;
 
   /* Get the zone */
-  get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+  get_zone(&zone, town, depth);
   
   if (zone->name)
-    sprintf(str, "%s %s", zone->name + t_name, t_info[p_ptr->dungeon].name + t_name);
+    sprintf(str, "%s %s", zone->name + t_name, t_info[town].name + t_name);
   else
-    sprintf(str, "%s", t_info[p_ptr->dungeon].name + t_name);
+    sprintf(str, "%s", t_info[town].name + t_name);
+}
+
+void current_long_level_name(char* str) 
+{
+  long_level_name(str, p_ptr->dungeon, p_ptr->depth);
 }
 
 static void do_cmd_knowledge_dungeons(void)
@@ -1964,7 +1974,7 @@ static void do_cmd_knowledge_dungeons(void)
 		}
 	}
 
-	display_knowledge("locations", zones, z_count, dun_f, zone_f, "Reached");
+	display_knowledge("locations", zones, z_count, dun_f, zone_f, "   Reached");
 	FREE(zones);
 }
 
@@ -4662,9 +4672,9 @@ void do_cmd_timeofday()
 	/* Display location */
 	if (p_ptr->depth == min_depth(p_ptr->dungeon))
 	{
-		char str[51];
+		char str[46];
 
-		long_current_level_name(str);
+		current_long_level_name(str);
 
 		msg_format("You are in %s.", str);
 	}
@@ -4672,9 +4682,9 @@ void do_cmd_timeofday()
 	else if (depth_in_feet)
 	{
 		dungeon_zone *zone=&t_info[0].zone[0];
-		char str[51];
+		char str[46];
 
-		long_current_level_name(str);
+		current_long_level_name(str);
 
 		/* Get the zone */
 		get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
@@ -4687,8 +4697,8 @@ void do_cmd_timeofday()
 	/* Display depth */
 	else
 	{
-	  char str[51];
-	  long_current_level_name(str);
+	  char str[46];
+	  current_long_level_name(str);
 	  msg_format("You are on level %d of %s.",
 		     p_ptr->depth - min_depth(p_ptr->dungeon), str);
 	}
@@ -4862,6 +4872,7 @@ bool print_event(quest_event *event, int pronoun, int tense, cptr prefix)
 		else if ((intro) && (!vn)) text_out(" in ");
 		else if (!vn) text_out("In ");
 
+		/* TODO: full level 0 name? level n name? */
 		text_out(t_name + t_info[event->dungeon].name);
 
 		if ((event->owner) || (event->store) || ((event->feat) && (event->action)) ||

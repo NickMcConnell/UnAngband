@@ -512,7 +512,7 @@ X:14:2:0:0
 R:GIANT
 G:C
 Q:18:1272
-L:20:451:56:148:473:0:the blizzard-covered mountain
+L:20:451:56:148:473:0:the blizzard-covered
 L:21:56:144:145:0:0:the snowy slopes of
 L:50:56:144:145:1272:0:the peak of
 D:Legend has it that this mighty mountain is Morgoth's minion.
@@ -737,7 +737,7 @@ L:11:0:420:408:0:0
 L:12:419:436:422:0:0
 L:14:436:407:404:1366:0
 S:503:12:515:956:512:0:0:0
-D:Wolves are howling around. Villagers hide in their fenced village on the western edge of Mirkwood.
+D:Wolves are howling around.  Woodmen keep hidden inside their fenced village on the western edge of Mirkwood.
 
 # No dungeon, part of the one-time free pass east around Misty Mountains.
 
@@ -779,7 +779,7 @@ D:Almost all of the Saruman's army went for Hornburg.  What are the tidings?
 N:69:Angband
 X:43:0:0:0
 Q:70:547
-L:0:0:407:0:0:0:the siege camp atop
+L:0:0:407:0:0:0:the siege camp around
 L:1:56:0:0:0:0:the dungeon of
 L:100:56:0:0:547:0:the seat of Morgoth in
 S:8:9:10:11:12:13:14:15

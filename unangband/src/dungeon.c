@@ -3375,18 +3375,11 @@ static void dungeon(void)
 		/* Hack: I cannot trace when the messages line is cleared, so I redraw the display dungeon and level name every turn instead */
 		/* FIXME: this overwrites some messages, e.g. refuelling */
 		{
-		  char str[51];
 		  int length;
 		  int wid, h;
-		  dungeon_zone *zone;
-
-		  /* Get the zone */
-		  get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
-		  
-		  if (zone->name)
-		    sprintf(str, "%s %s", zone->name + t_name, t_info[p_ptr->dungeon].name + t_name);
-		  else
-		    sprintf(str, "%s", t_info[p_ptr->dungeon].name + t_name);
+		  char str[46];
+	
+		  current_long_level_name(str);
 
 		  length = strlen(str) + 1;
 

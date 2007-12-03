@@ -3352,13 +3352,19 @@ void list_object(const object_type *o_ptr, int mode)
 				anything = TRUE;
 				break;
 			case TV_MAP:
-				text_out("You can travel to ");
-				text_out(t_name + t_info[o_ptr->sval].name);
-				text_out(format(" (levels %d", min_depth(o_ptr->sval)));
-				if (max_depth(o_ptr->sval) > min_depth(o_ptr->sval)) text_out(format("-%d)",max_depth(o_ptr->sval)));
-				text_out(" with this.  ");
-				anything = TRUE;
-				break;
+			  {
+			    char str[46];
+
+			    long_level_name(str, o_ptr->sval, 0);
+
+			    text_out("You can travel to ");
+			    text_out(str);
+			    text_out(format(" (%d", min_depth(o_ptr->sval)));
+			    if (max_depth(o_ptr->sval) > min_depth(o_ptr->sval)) text_out(format("-%d)",max_depth(o_ptr->sval)));
+			    text_out(" with this.  ");
+			    anything = TRUE;
+			    break;
+			  }
 			case TV_BAG:
 				text_out("You can carry numerous objects inside it.  ");
 				anything = TRUE;
