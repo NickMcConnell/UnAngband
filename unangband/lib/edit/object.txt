@@ -145,7 +145,7 @@ A:15/1
 N:11:Restore Constitution and Charisma
 G:,:w
 I:80:18:0
-W:10:500:1:150
+W:10:500:1:50
 A:20/1
 
 N:12:Restoring
@@ -187,7 +187,7 @@ A:20/1
 N:18:Restore Strength and Size
 G:,:w
 I:80:17:0
-W:10:500:1:150
+W:10:500:1:50
 A:20/1
 
 N:19:Disease
@@ -1763,16 +1763,11 @@ A:0/1
 P:0:1d1:0:0:0
 F:THROWING
 
-# after the competition, perhaps set it to 
-#W:2:0:4:200
-#A:2/2:50/1
-# and similarly for other stat potions
-#
 N:225:Strength and Size
 G:!:w
 I:75:48:0
-W:20:0:4:400
-A:2/1:50/1
+W:1:0:4:50
+A:1/4:50/4
 P:0:1d1:0:0:0
 F:THROWING
 
@@ -1784,20 +1779,20 @@ A:3/1
 P:0:1d1:0:0:0
 F:THROWING
 
-#junk, remove before a major revision
-N:227:Restore Strength and Size
-G:!:d
-I:75:42:0
-W:15:0:4:200
-A:15/1
-P:0:1d1:0:0:0
-F:THROWING
+#unused
+#N:227:Restore Strength and Size
+#G:!:d
+#I:75:42:0
+#W:15:0:4:200
+#A:15/1
+#P:0:1d1:0:0:0
+#F:THROWING
 
 N:228:Intelligence and Wisdom
 G:!:w
 I:75:49:0
-W:25:0:4:400
-A:2/1:50/1
+W:1:0:4:50
+A:1/4:50/4
 P:0:1d1:0:0:0
 Y:17:2
 F:THROWING
@@ -1810,14 +1805,14 @@ A:20/1
 P:0:1d1:0:0:0
 F:THROWING
 
-#junk, remove before a major revision
-N:230:Restore Intelligence and Wisdom
-G:!:d
-I:75:43:0
-W:15:0:4:200
-A:15/1
-P:0:1d1:0:0:0
-F:THROWING
+#unused
+#N:230:Restore Intelligence and Wisdom
+#G:!:d
+#I:75:43:0
+#W:15:0:4:200
+#A:15/1
+#P:0:1d1:0:0:0
+#F:THROWING
 
 #Unused
 #N:231:Wisdom
@@ -1930,8 +1925,8 @@ F:THROWING
 N:243:Constitution and Charisma
 G:!:w
 I:75:52:0
-W:20:0:4:400
-A:2/1:50/1
+W:1:0:4:50
+A:1/4:50/4
 P:0:1d1:0:0:0
 Y:24:2
 F:THROWING
@@ -1999,29 +1994,29 @@ F:THROWING
 N:251:Dexterity and Agility
 G:!:w
 I:75:51:0
-W:20:0:4:400
-A:2/1:50/1
+W:1:0:4:50
+A:1/4:50/4
 P:0:1d1:0:0:0
 Y:26:2
 F:THROWING
 
-#junk, remove before a major revision
-N:252:Restore Dexterity and Agility
-G:!:d
-I:75:45:0
-W:15:0:4:200
-A:15/1
-P:0:1d1:0:0:0
-F:THROWING
+#unused
+#N:252:Restore Dexterity and Agility
+#G:!:d
+#I:75:45:0
+#W:15:0:4:200
+#A:15/1
+#P:0:1d1:0:0:0
+#F:THROWING
 
-#junk, remove before a major revision
-N:253:Restore Constitution and Charisma
-G:!:d
-I:75:46:0
-W:15:0:4:200
-A:15/1
-P:0:1d1:0:0:0
-F:THROWING
+#unused
+#N:253:Restore Constitution and Charisma
+#G:!:d
+#I:75:46:0
+#W:15:0:4:200
+#A:15/1
+#P:0:1d1:0:0:0
+#F:THROWING
 
 N:254:Lose Memories
 G:!:w
@@ -3390,8 +3385,8 @@ F:THROWING
 N:418:Augmentation
 G:!:w
 I:75:55:0
-W:40:0:4:60000
-A:40/16
+W:20:0:4:6000
+A:20/16
 P:0:1d1:0:0:0
 F:THROWING
 
@@ -3453,7 +3448,6 @@ Y:8:3
 # to now wear a combination of armor and shield, neither of which has the basic
 # four resists, without having to find Colluin or Dor-Lomin first. To have this 
 # power too early in the game would make it too easy.
-
 
 N:425:Regeneration
 G:":w
@@ -3522,7 +3516,7 @@ Y:22:3
 N:432:Restore Body
 G:!:w
 I:75:54:0
-W:40:0:1:1000
+W:40:0:1:500
 A:40/1:60/1
 P:0:1d1:0:0:0
 F:THROWING
@@ -5596,7 +5590,7 @@ W:25:0:0:180
 N:759:Restoration
 G:?:v
 I:99:10:0
-W:25:0:0:1500
+W:25:0:0:1000
 
 N:760:Remembrance
 G:?:v
@@ -5661,12 +5655,12 @@ W:25:0:0:40
 N:772:Restore Strength and Size
 G:?:v
 I:99:23:0
-W:20:0:0:250
+W:20:0:0:150
 
 N:773:Restore Intelligence and Wisdom
 G:?:v
 I:99:24:0
-W:20:0:0:250
+W:20:0:0:150
 
 N:774:Healing
 G:?:v
@@ -5960,7 +5954,7 @@ F:THROWING
 N:822:Restore Mind
 G:!:w
 I:75:75:0
-W:40:0:1:1000
+W:40:0:1:500
 A:40/1:60/1
 P:0:1d1:0:0:0
 F:THROWING
@@ -6441,12 +6435,12 @@ A:10/1
 N:884:Restore Dexterity and Agility
 G:?:v
 I:99:46:0
-W:20:0:0:250
+W:20:0:0:150
 
 N:885:Restore Constitution and Charisma
 G:?:v
 I:99:47:0
-W:20:0:0:250
+W:20:0:0:150
 
 N:886:Cure Plague
 G:?:v

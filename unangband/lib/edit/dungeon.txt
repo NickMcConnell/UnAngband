@@ -196,8 +196,8 @@ L:2:0:435:0:4:0:Farmer
 L:3:114:0:0:0:0:the cellars of
 L:6:114:0:0:111:0:cellars' back exit in the
 S:507:0:0:0:0:0:0:0
-D:You have entered the barnyard of Farmer Maggot's farm.  There is fear
-D: in the air and you hear distant vicious barking, but the buildings
+D:Fear hangs in the air of the barnyard of Farmer Maggot's farm
+D: and you hear muffled vicious barking, though the buildings around
 D: seem empty.  The trap doors of the famous farm cellars are open;
 D: to climb down, press '>' when standing on the entrance '>'.
 
@@ -210,12 +210,14 @@ L:0:0:407:408:0:0:the town of
 L:1:56:0:0:0:0:sewers of
 L:4:56:0:0:620:0:the dump outside
 S:8:9:10:11:12:13:268:775
-D:In Bree life goes are usual.  Men and hobbits live peacefully together,
-D: though recently more and more unpleasant strangers appear out of the south.
-D:  People stopped feeling safe in the lowest part of town,
-D: where the southerners tend to hang around by sewers exit or,
-D: as some claim, inside the sewers main tunnel.
-D:  To investigate town sewers press '>', when standing on the entrance '>'.
+D:Life goes as usual in Bree.  Men and hobbits trade peacefully together,
+D: though strange men recently started coming from the south.
+D:  Some hobbits can't help feeling not so absolutely safe any more
+D: in the lowest outskirts of the town,
+D: where the southerners tend to hang around by sewers exit and,
+D: as some boys claim, even disappear in sewers' main tunnel occasionally.
+D:  If you, per chance, would like to investigate the town sewers,
+D: press '>' when standing on the entrance '>'.
 
 # Goes upwards, so all levels, except 20, are described by the L:31 line!
 

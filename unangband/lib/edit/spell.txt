@@ -3347,7 +3347,6 @@ F:CURE_CONF
 S:CURE_DISEASE:14
 
 N:270:Restore Strength and Size
-A:75:42:1
 A:80:17:1
 A:90:4:8
 C:1:16:28:95:160
@@ -3360,7 +3359,6 @@ F:CURE_STR
 S:CURE_DISEASE:3
 
 N:271:Restore Constition and Charisma
-A:75:46:1
 A:80:18:1
 A:90:4:9
 C:1:20:36:95:160
@@ -3549,7 +3547,6 @@ C:8:37:75:90:215
 S:CURE_DISEASE:26
 
 N:306:Restore Dexterity and Agility
-A:75:45:1
 A:90:4:6
 C:1:12:22:95:160
 C:3:16:28:95:100
@@ -4441,7 +4438,6 @@ L:1d5
 F:CUT | STUN | BLIND | CONFUSE | HALLUC
 
 N:417:Restore Intelligence and Wisdom
-A:75:43:1
 A:90:4:10
 C:1:24:44:95:160
 C:3:28:52:95:100

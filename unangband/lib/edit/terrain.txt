@@ -12987,13 +12987,13 @@ F:ENTER | CAN_FLY | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW 
 F:POWER_46
 D:'Ask my mossy brother what he thinks.' this ent says.
 
-N:954:Noman's store
+N:954:an abandoned store
 G:+:U
 W:0:1:20:0
 F:ENTER | CAN_FLY | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW | OUTSIDE
 F:POWER_47
 
-N:955:Travellers' aid outlet
+N:955:Chart Scribe
 G:6:R
 W:35:1:20:0
 F:ENTER | CAN_FLY | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW | OUTSIDE

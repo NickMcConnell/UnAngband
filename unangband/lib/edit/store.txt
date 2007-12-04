@@ -663,7 +663,6 @@ O:80:38:3
 O:80:38:3
 O:75:34:2
 O:75:35:1
-O:75:42:1
 O:75:28:2
 O:77:0:1
 O:5:0:1
@@ -701,7 +700,6 @@ O:80:33:1
 O:80:40:1
 O:75:34:1
 O:75:35:1
-O:75:42:1
 O:5:0:1
 O:20:1:1
 O:20:4:2
@@ -727,10 +725,10 @@ O:39:0:3
 N:46:the branches of an Ent
 X:2
 
-N:47:Noman's store
+N:47:an abandoned shop
 X:2
 
-N:48:Travellers' aid outlet
+N:48:Chart Scribe
 X:8
 O:72:52:10
 O:72:59:10
