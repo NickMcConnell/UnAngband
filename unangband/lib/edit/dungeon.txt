@@ -70,7 +70,7 @@ X:69:0:0:0
 L:0:0:407:0:0:0
 S:954:955:0:0:0:0:0:0
 D:It feels like in the middle of nowhere.  You shouldn't be there.
-D:  Please report the bug and collect your reward from the Noman's store.
+D:  Please report the bug and collect your reward from the abandoned store.
 
 # Campaign starting dungeon.
 
@@ -104,13 +104,13 @@ R:HURT_LITE
 Q:4:173
 Z:41:9
 L:5:420:56:56:0:0:a path through
-L:6:56:0:153:52:0:front perch atop
-L:7:56:0:153:0:0:goblin town under
-L:13:56:0:154:173:0:big cavern under
+L:6:56:0:153:52:0:Front Perch atop
+L:7:56:0:153:0:0:Goblin Town under
+L:13:56:0:154:173:0:the big cavern under
 D:The path called High Pass is said to be the easiest road east
-D: to Mirkwood and further towards Smaug's lair.  Easiest does not mean easy.
-D: It is too steep and too high to be even attempted when fresh snow has fallen
-D: and in other times goblins are known to set traps for unwary travelers.
+D: to Mirkwood and further towards Smaug's lair.  'Easiest' means little.
+D:  It is too steep and too high to be even attempted when fresh snow has fallen
+D: and in other times goblins set traps for adventurers entering the Wild.
 D:  After a long walk up the pass you are exhausted, but fortunately
 D: you find an entrance '>' to a cave...
 
@@ -127,8 +127,8 @@ G:l
 R:CAN_CLIMB
 L:14:420:56:153:637:0:a road through
 L:15:56:0:0:0:0:Elvenking's halls in
-L:25:0:1:155:0:0:storage cellars under
-L:26:56:155:0:1082:0:great hall under
+L:25:0:1:155:0:0:the storage cellars under
+L:26:56:155:0:1082:0:the great hall under
 S:270:271:503:11:12:504:505:0
 D:Dark shapes scuttle in the shadows on the sides of the road through
 D: Mirkwood the Great.  Now and again you hear clicking
@@ -157,9 +157,9 @@ G:B
 Q:9:475
 Z:47:9
 L:20:435:56:154:0:0:the
-L:21:56:0:0:0:0:western passage into
+L:21:56:0:0:0:0:western passage into the
 L:22:56:0:0:0:0:the tunnels of
-L:38:56:0:0:475:0:bottommost hall under the
+L:38:56:0:0:475:0:the bottommost hall under
 D:There is a sudden flash of gold and flame in the
 D: air... Smaug has taken flight.  You desperately
 D: cower for cover on the open mountainside... he
@@ -193,9 +193,13 @@ G:,
 R:ANIMAL
 Q:58:111
 L:2:0:435:0:4:0:Farmer
-L:3:114:0:0:0:0:cellars of
+L:3:114:0:0:0:0:the cellars of
 L:6:114:0:0:111:0:cellars' back exit in the
 S:507:0:0:0:0:0:0:0
+D:You have entered the barnyard of Farmer Maggot's farm.  There is fear
+D: in the air and you hear distant vicious barking, but the buildings
+D: seem empty.  The trap doors of the famous farm cellars are open;
+D: to climb down, press '>' when standing on the entrance '>'.
 
 N:11:Bree
 X:38:39:56:0
@@ -206,6 +210,12 @@ L:0:0:407:408:0:0:the town of
 L:1:56:0:0:0:0:sewers of
 L:4:56:0:0:620:0:the dump outside
 S:8:9:10:11:12:13:268:775
+D:In Bree life goes are usual.  Men and hobbits live peacefully together,
+D: though recently more and more unpleasant strangers appear out of the south.
+D:  People stopped feeling safe in the lowest part of town,
+D: where the southerners tend to hang around by sewers exit or,
+D: as some claim, inside the sewers main tunnel.
+D:  To investigate town sewers press '>', when standing on the entrance '>'.
 
 # Goes upwards, so all levels, except 20, are described by the L:31 line!
 
@@ -312,6 +322,8 @@ D:Fangorn is a dark and mysterious forest, but Mirkwood across Anduin
 D: is even darker.  They say Death itself has made home
 D: among the twisted trees of Dol Guldur and even animals avoid its shadow.
 
+# Goes upwards
+
 N:21:Edoras
 X:40:0:0:0
 G:p
@@ -325,6 +337,8 @@ S:271:516:517:519:504:511:509:508
 D:The slumbering city of Edoras.  King Theoden has gathered
 D: many warriors around him, but seeks less than wise council...
 
+# Goes upwards
+
 N:22:Hornburg
 X:29:0:0:0
 Q:62:249
@@ -337,6 +351,8 @@ D: and scale the tower to confront the leader of the armies, or find him
 D: here on the field of battle and slay him.  If the odds turn against you,
 D: do not flee into the mountains!  They are haunted and even
 D: maps will not let you find your way back.
+
+# Goes upwards
 
 N:23:Isengard, war-ready
 X:37:21:22:64
@@ -367,6 +383,8 @@ L:20:420:155:199:0:0
 L:21:0:1:155:1084:0
 S:512:520:521:522:0:0:0:0
 
+# Goes upwards
+
 N:26:Minas Morgul
 X:25:0:0:0
 R:UNDEAD
@@ -375,6 +393,7 @@ L:54:56:0:397:0:46
 L:85:56:0:0:535:46
 
 # Note that we need a map to travel from Minas Morgul to Cirith Ungol now.
+# Goes upwards
 
 N:27:Cirith Ungol
 X:26:0:0:0
@@ -382,6 +401,8 @@ Q:33:530
 L:53:56:141:141:530:11
 L:54:56:1:0:0:11
 L:65:56:1:0:597:11
+
+# Goes upwards
 
 N:28:Minas Tirith
 X:40:25:30:0
@@ -414,13 +435,12 @@ G:W
 R:ESCORT
 L:56:435:411:420:535:0:the Battle of
 
-N:31:Kings' courts
+N:31:Mount Mindolluin
 X:28:0:0:0
 R:ANIMAL
-L:0:0:410:56:0:0:the white tree in the
+L:0:0:410:56:0:0:southern slopes of
 S:777:0:0:0:0:0:0:0
-D:A white tree has found root here, in the Court of the Fountain in front of the Tower of Ecthelion, grown from a seedling found among snows of mountain Mindolluin above Minas Tirith.  Claim your reward, which
-D: lies beneath the tree.
+D:A white tree has found root here, among snows of mountain Mindolluin above Minas Tirith, a descendant of the sapling rescued from Numenor by King Isildur.  Come closer...
 
 N:32:Plains of Gorgoroth
 X:51:33:0:0
@@ -436,6 +456,8 @@ L:79:432:218:218:0:0
 L:80:56:218:218:0:0
 L:99:56:218:218:546:0
 D:You can choose to confront Sauron here, deep in the blasted bowels of this mountain.
+
+# Goes upwards
 
 N:34:Barad-dur
 X:33:0:0:0
@@ -489,11 +511,12 @@ L:20:56:0:0:1081:0
 N:39:Trollshaws Forest
 X:11:13:0:0
 L:4:420:420:155:343:0:a hill in
-L:5:419:0:0:344:0:troll clearing in
-L:6:56:0:0:345:0:troll cave in
+L:5:419:0:0:344:0:the Troll Clearing in
+L:6:56:0:0:345:0:the Troll Cave in
 
-# The only free pass to the other side of the Misty Mountains,
+# The only (one-time) free pass to the other side of the Misty Mountains,
 # but to avoid visiting dungeons you have to stir evil at Dol Guldur
+# Goes upwards
 
 N:40:Isengard
 X:20:21:64:0
@@ -559,7 +582,7 @@ N:45:Elemental Evil
 X:2:0:0:0
 G:E
 R:PRIEST
-L:21:425:141:141:0:0:entrance to the temple of
+L:21:425:141:141:0:0:the temple of
 L:22:56:0:0:0:0:the temple of
 L:60:56:0:0:0:0:the temple of
 
@@ -581,6 +604,8 @@ L:20:414:56:153:235:0:the Battle of
 D:Five great armies have gathered at the promise of Smaug's riches hidden
 D: in the Lonely Mountain.
 
+# Goes upwards
+
 N:48:Dol Guldur
 X:20:37:6:0
 G:q
@@ -590,6 +615,8 @@ L:41:56:0:0:0:44
 L:65:56:0:0:645:44
 D:You have disturbed a terrible evil here... much has gone wrong with the land
 D: since its waking.
+
+# Goes upwards
 
 N:49:Morannon
 X:25:50:0:0
@@ -727,7 +754,7 @@ D: You think you can hear timbrous voices amidst the creaks and groans
 D: of their ancient boughs. Perhaps a closer look will help you
 D: understand if they have come to a decision...
 
-# canines dungeon, shops closed until Great Grey Wolf killed 
+# canines dungeon, shops closed until Great Grey Wolf killed
 
 N:63:Woodmen Village
 X:5:15:52:0
@@ -756,10 +783,11 @@ G:t
 Q:40:407
 L:12:419:149:422:0:0
 L:28:414:141:140:407:0
-D:Dunland is brewing for war rallied by dark emisaries that so far laboured in secret.
+D:Dunland is brewing for war rallied by dark emissaries that so far laboured in secret.
 D:  Whence they came? It does not matter to the men of Dunland, so long craving for revenge.
 
 # the emptiness is represented by the dungeon being shallower and by some water
+# Goes upwards
 
 N:66:emptied Isengard
 X:37:64:0:0
