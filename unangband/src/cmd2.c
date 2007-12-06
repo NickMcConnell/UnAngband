@@ -374,7 +374,7 @@ int actual_route(int town)
  */
 int set_routes(s16b *routes, int max_num, int from)
 {
-	town_type *t_ptr = &t_info[p_ptr->dungeon];
+	town_type *t_ptr = &t_info[from];
 	dungeon_zone *zone1 = &t_ptr->zone[0];
 	dungeon_zone *zone2 = &t_ptr->zone[0];
 
@@ -406,7 +406,7 @@ int set_routes(s16b *routes, int max_num, int from)
 	}
 
 	/* Add maps if not in Moria or other level with no exits */
-	if (t_ptr->nearby[0])
+	if (num)
 	/* or only Moria --- if (t_ptr->store_index[0] != 805) */
 	{
 		for (i = 0; (i < INVEN_WIELD) && (num < max_num); i++)
@@ -491,7 +491,7 @@ int set_routes(s16b *routes, int max_num, int from)
 	/* One final scan and remove duplicate routes and routes looping back to start */
 	for (i = 0; i < num; i++)
 	{
-		if (routes[i] == p_ptr->dungeon) routes[i] = routes[--num];
+		if (routes[i] == from) routes[i] = routes[--num];
 		
 		for (ii = i + 1; ii < num; ii++)
 		{

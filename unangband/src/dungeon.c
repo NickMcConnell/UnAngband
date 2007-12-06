@@ -3693,6 +3693,16 @@ void play_game(bool new_game)
 				if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
 			}
 			
+			/*
+			 * The same for replacement guardians
+			 */
+			guard = t_info[i].replace_guardian;
+			if (guard)
+			{
+				r_info[guard].flags1 |= (RF1_GUARDIAN | RF1_UNIQUE);
+				if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
+			}
+
 			/* However, we must ensure that town lockup monsters are
 			 * unique to allow the town to be unlocked later.
 			 */
@@ -3714,15 +3724,6 @@ void play_game(bool new_game)
 				{
 					r_info[guard].flags1 |= (RF1_GUARDIAN);
 				}
-			}
-
-			/*
-			 * And this includes 'replacement' mini-bosses.
-			 */
-			guard = t_info[i].replace_guardian;
-			if (guard)
-			{
-				r_info[guard].flags1 |= (RF1_GUARDIAN);
 			}
 		}
 	}

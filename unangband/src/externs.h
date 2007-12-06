@@ -474,6 +474,7 @@ extern void do_cmd_rest(void);
 extern int breakage_chance(object_type *o_ptr);
 extern void do_cmd_fire(void);
 extern void do_cmd_throw(void);
+extern int set_routes(s16b *routes, int max_num, int from);
 
 /* cmd3.c */
 extern void mark_cursed_feeling(object_type *o_ptr);

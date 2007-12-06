@@ -1854,7 +1854,12 @@ static void dungeon_lore(int oid) {
 	int dun = oid / MAX_DUNGEON_ZONES;
 	int zone = oid % MAX_DUNGEON_ZONES;
 	int guard = t_info[dun].zone[zone].guard;
+	int myd;
 	char str[46];
+	s16b routes[24];
+	int i, num;
+
+	myd = p_ptr->dungeon;
 
 	long_level_name(str, dun, t_info[dun].zone[zone].level);
 
@@ -1876,12 +1881,38 @@ static void dungeon_lore(int oid) {
 
 	Term_gotoxy(0, 1);
 
-	if (!zone)
+	if (!zone) {
+	  if (t_info[dun].visited || dun == rp_ptr->home)
 	  text_out_c(TERM_WHITE, t_info[dun].text + t_text);
+	  else
+	    text_out_c(TERM_WHITE, " You can travel to this place and you've heard about it, but you can't yet see it clearly.");
+	}
 
 	if(t_info[dun].zone[zone].guard) {
 		text_out_c(TERM_WHITE, format(" It %s guarded by %s.",
 			r_info[guard].max_num ? "is" : "was", r_info[guard].name + r_name));
+	}
+
+	if (!zone) {
+	  num = set_routes(routes, 24, dun);
+
+	  if (dun != myd) {
+	    for (i = 0; i < num; i++)
+	      if (myd == routes[i]) break;
+	    if (i == num) {
+	      /* no road back */
+	      int mynum;
+	      mynum = set_routes(routes, 24, myd);
+	      for (i = 0; i < mynum; i++)
+		if (dun == routes[i]) break;
+	      if (i < mynum)
+		/* road forth --- one way */
+		text_out_c(TERM_RED, format(" There is no way back from %s to %s!", t_info[dun].name + t_name, t_info[myd].name + t_name));
+	    }
+	  }
+
+	  if (!num)
+	    text_out_c(TERM_RED, format(" You feel your old maps will fail you %s.", dun == myd ? "here" : "there"));	  
 	}
 	
 	/* Load the screen */
@@ -1958,14 +1989,22 @@ static void do_cmd_knowledge_dungeons(void)
 	int *zones;
 	member_funcs zone_f = {display_dungeon_zone, dungeon_lore, 0, 0, 0, 0};
 	group_funcs dun_f = {z_info->t_max, FALSE, town_name, 0, oiddiv4, 0};
+	int myd = p_ptr->dungeon;
 
 	zones = C_ZNEW(z_info->t_max*MAX_DUNGEON_ZONES, int);
 
-	for(i = 0; i < z_info->t_max; i++) {
-		/* HACK: there should be a better way to determine visitation */
-		int guard0 = t_info[i].zone[0].guard;
-		if(t_info[i].max_depth == 0 && i != p_ptr->dungeon &&
-			(!guard0 || r_info[guard0].max_num)) continue;
+	for(i = 1; i < z_info->t_max; i++) {
+
+	  if (!t_info[i].visited 
+	      && !(i == rp_ptr->home)
+	      && !(i == t_info[myd].nearby[0]) 
+	      && !(i == t_info[myd].nearby[1]) 
+	      && !(i == t_info[myd].nearby[2]) 
+	      && !(i == t_info[myd].nearby[3]))
+	    continue;
+
+	  if (t_info[i].replace_ifvisited && t_info[t_info[i].replace_ifvisited].visited)
+	    continue;
 
 		for(j = 0; (j < 1 || t_info[i].zone[j].level != 0 )
 											 && j < MAX_DUNGEON_ZONES; j++)

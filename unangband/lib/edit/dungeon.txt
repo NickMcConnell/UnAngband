@@ -214,7 +214,7 @@ D:Life goes as usual in Bree.  Men and hobbits trade peacefully together,
 D: though strange men recently started coming from the south.
 D:  Some hobbits can't help feeling not so absolutely safe any more
 D: in the lowest outskirts of the town,
-D: where the southerners tend to hang around by sewers exit and,
+D: where the southerners tend to hang around a house by sewers exit and,
 D: as some boys claim, even disappear in sewers' main tunnel occasionally.
 D:  If you, per chance, would like to investigate the town sewers,
 D: press '>' when standing on the entrance '>'.
@@ -346,7 +346,7 @@ X:29:0:0:0
 Q:62:249
 R:ESCORT
 L:21:420:56:155:249:49:the Siege of
-L:50:420:56:155:249:49:the Siege of
+L:50:420:56:155:249:49
 D:Saruman's orcs have laid siege to the fortress of Hornburg.  You stand with
 D: your allies to relieve the siege - fight your way through the narrow ravine of Helm's Deep
 D: and scale the tower to confront the leader of the armies, or find him
@@ -428,8 +428,7 @@ S:806:0:0:0:0:0:0:0
 D:A single slab of grey stone covered with bones sits here, deep in the Dimholt woods.
 D:  Beyond, you can see the pale, flickering torches that light the Dark Door of the
 D: Dead - the entrance to the Paths of the Dead.  You can leave supplies here on the
-D: stone while you search this lifeless place.  No hope lies ahead,
-D: with or without supplies, and on your old maps you can't even find the way you came here.
+D: stone while you search this lifeless place.
 
 N:30:Pelennor Fields
 X:28:0:0:0
@@ -585,8 +584,8 @@ X:2:0:0:0
 G:E
 R:PRIEST
 L:21:425:141:141:0:0:the temple of
-L:22:56:0:0:0:0:the temple of
-L:60:56:0:0:0:0:the temple of
+L:22:56:0:0:0:0:depths of the temple of
+L:60:56:0:0:0:0:bottom of the temple of
 
 N:46:Crystal Castle
 X:2:0:0:0
