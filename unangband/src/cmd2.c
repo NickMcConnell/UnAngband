@@ -352,16 +352,16 @@ void print_routes(const s16b *route, int num, int y, int x)
 
 
 /*
- * This gives either the route, or a replacement route if one is defined.
+ * This gives either the dungeon, or a replacement one if it is defined.
  */
-int actual_route(int town)
+int actual_route(int dun)
 {
-	while(t_info[town].replace_ifvisited && t_info[t_info[town].replace_ifvisited].visited)
+	while(t_info[dun].replace_ifvisited && t_info[t_info[dun].replace_ifvisited].visited)
 	{
-		town = t_info[town].replace_with;
+		dun = t_info[dun].replace_with;
 	}
 	
-	return (town);
+	return (dun);
 }
 
 

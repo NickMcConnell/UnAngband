@@ -1895,10 +1895,29 @@ static void describe_surface_dungeon(int dun)
     text_out_c(TERM_SLATE, format("  You feel your old maps will not avail you %s.", dun == myd ? "here" : "there"));	  
 }
 
+static void describe_zone_guardian(int dun, int zone) 
+{
+  int guard = actual_guardian(t_info[dun].zone[zone].guard, dun);
+
+  if (guard) {
+    bool bars = (r_info[guard].max_num 
+		 && t_info[dun].quest_monster == guard);
+    char str[46];
+
+    if (bars)
+      long_level_name(str, actual_route(t_info[dun].quest_opens), 0);
+
+    text_out_c(TERM_SLATE, format("  It %s guarded by %s%s%s.",
+				  r_info[guard].max_num ? "is" : "was", 
+				  r_info[guard].name + r_name,
+				  bars ? ", who bars the way to " : "",
+				  bars ? str : ""));
+  }
+}
+
 static void dungeon_lore(int oid) {
 	int dun = oid / MAX_DUNGEON_ZONES;
 	int zone = oid % MAX_DUNGEON_ZONES;
-	int guard = t_info[dun].zone[zone].guard;
 	char str[46];
 
 	long_level_name(str, dun, t_info[dun].zone[zone].level);
@@ -1923,11 +1942,7 @@ static void dungeon_lore(int oid) {
 	if (!zone) 
 	  describe_surface_dungeon(dun);
 
-	if(t_info[dun].zone[zone].guard) {
-		text_out_c(TERM_SLATE, format("  It %s guarded by %s.",
-			r_info[guard].max_num ? "is" : "was", r_info[guard].name + r_name));
-
-	}
+	describe_zone_guardian(dun, zone);
 
 	if (dun == p_ptr->dungeon && (zone || dun != rp_ptr->home)) {
 	  dungeon_zone *my_zone;
@@ -1949,6 +1964,7 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
         int dun = oid / MAX_DUNGEON_ZONES;
         int zone = oid % MAX_DUNGEON_ZONES;
 	int depth = t_info[dun].max_depth + t_info[dun].zone[0].level;
+	int guard = actual_guardian(t_info[dun].zone[zone].guard, dun);
 
         byte attr = curs_attrs[CURS_KNOWN][(int)cursor];
 
@@ -1979,10 +1995,18 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 	    c_prt(attr, format(" Lev %3d", depth), row, 67);
 	  }
 	  else {
-	    /* we are already past it */
-	    c_prt(attr, " ***", row, 67);
+	    if (guard && r_info[guard].max_num)
+	      /* we've reached the guardian and escaped (or he did) */
+	      c_prt(attr, " guard", row, 67);
+	    else
+	      /* we are already past the zone */
+	      c_prt(attr, " ***", row, 67);
 	  }
 	}
+
+	if (guard && !r_info[guard].max_num)
+	  /* we've killed the guardian, regardless if we've been there */
+	  c_prt(attr, " victory", row, 67);
 }
 
 static int oiddiv4 (int oid) { return oid/MAX_DUNGEON_ZONES; }
