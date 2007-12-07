@@ -1850,22 +1850,61 @@ static void do_cmd_knowledge_home(void)
 
 /* =================== TOWNS AND DUNGEONS ================================ */
 
+int count_routes(int from, int to)
+{
+  s16b routes[24];
+  int i, num;
+
+  num = set_routes(routes, 24, from);
+
+  for (i = 0; i < num; i++)
+    if (to == routes[i]) return num;
+
+    /* no route */
+    return -num;
+}
+
+static void describe_surface_dungeon(int dun) 
+{
+  int myd = p_ptr->dungeon;;
+  int num;
+
+  if (dun == rp_ptr->home) {
+    text_out_c(TERM_WHITE, t_info[dun].text + t_text);
+
+    if (dun == myd)
+      text_out_c(TERM_SLATE, "  You were born right here.");
+    else
+      text_out_c(TERM_SLATE, "  This is where you were born, though it was quite long ago");
+  } 
+  else if (t_info[dun].visited)
+    text_out_c(TERM_WHITE, t_info[dun].text + t_text);
+  else
+    text_out_c(TERM_SLATE, "  You've heard about this place and you can already spot it far away ahead.");
+
+  /* routes from descibed dungeon to current dungeon */
+  num = count_routes(dun, myd);
+
+  if (num <= 0 && dun != myd)
+    /* no road back to current */
+    if (count_routes(myd, dun) > 0)
+      /* road forth, hence one way */
+      text_out_c(TERM_RED, format("  You know of no way back from %s to %s!", t_info[dun].name + t_name, t_info[myd].name + t_name));
+	  
+  if (!num)
+    text_out_c(TERM_SLATE, format("  You feel your old maps will not avail you %s.", dun == myd ? "here" : "there"));	  
+}
+
 static void dungeon_lore(int oid) {
 	int dun = oid / MAX_DUNGEON_ZONES;
 	int zone = oid % MAX_DUNGEON_ZONES;
 	int guard = t_info[dun].zone[zone].guard;
-	int myd;
 	char str[46];
-	s16b routes[24];
-	int i, num;
-
-	myd = p_ptr->dungeon;
 
 	long_level_name(str, dun, t_info[dun].zone[zone].level);
 
 	screen_save();
 
-	/* TODO: fix this for upward dungeons */
 	if (zone == MAX_DUNGEON_ZONES - 1
 	    || t_info[dun].zone[zone+1].level == 0
 	    || t_info[dun].zone[zone+1].level - 1 == t_info[dun].zone[zone].level) {
@@ -1881,38 +1920,23 @@ static void dungeon_lore(int oid) {
 
 	Term_gotoxy(0, 1);
 
-	if (!zone) {
-	  if (t_info[dun].visited || dun == rp_ptr->home)
-	  text_out_c(TERM_WHITE, t_info[dun].text + t_text);
-	  else
-	    text_out_c(TERM_WHITE, " You can travel to this place and you've heard about it, but you can't yet see it clearly.");
-	}
+	if (!zone) 
+	  describe_surface_dungeon(dun);
 
 	if(t_info[dun].zone[zone].guard) {
-		text_out_c(TERM_WHITE, format(" It %s guarded by %s.",
+		text_out_c(TERM_SLATE, format("  It %s guarded by %s.",
 			r_info[guard].max_num ? "is" : "was", r_info[guard].name + r_name));
+
 	}
 
-	if (!zone) {
-	  num = set_routes(routes, 24, dun);
+	if (dun == p_ptr->dungeon && (zone || dun != rp_ptr->home)) {
+	  dungeon_zone *my_zone;
 
-	  if (dun != myd) {
-	    for (i = 0; i < num; i++)
-	      if (myd == routes[i]) break;
-	    if (i == num) {
-	      /* no road back */
-	      int mynum;
-	      mynum = set_routes(routes, 24, myd);
-	      for (i = 0; i < mynum; i++)
-		if (dun == routes[i]) break;
-	      if (i < mynum)
-		/* road forth --- one way */
-		text_out_c(TERM_RED, format(" There is no way back from %s to %s!", t_info[dun].name + t_name, t_info[myd].name + t_name));
-	    }
-	  }
+	  /* Get the zone */
+	  get_zone(&my_zone, dun, p_ptr->depth);
 
-	  if (!num)
-	    text_out_c(TERM_RED, format(" You feel your old maps will fail you %s.", dun == myd ? "here" : "there"));	  
+	  if (my_zone == &t_info[dun].zone[zone])
+	    text_out_c(TERM_SLATE, "  This is where you stand right now.");
 	}
 	
 	/* Load the screen */
@@ -1981,7 +2005,7 @@ void current_long_level_name(char* str)
 {
   long_level_name(str, p_ptr->dungeon, p_ptr->depth);
 }
-
+	       
 static void do_cmd_knowledge_dungeons(void)
 {
 	int i, j;
@@ -1997,20 +2021,18 @@ static void do_cmd_knowledge_dungeons(void)
 
 	  if (!t_info[i].visited 
 	      && !(i == rp_ptr->home)
-	      && !(i == t_info[myd].nearby[0]) 
-	      && !(i == t_info[myd].nearby[1]) 
-	      && !(i == t_info[myd].nearby[2]) 
-	      && !(i == t_info[myd].nearby[3]))
+	      && !(count_routes(myd, i) > 0))
 	    continue;
 
-	  if (t_info[i].replace_ifvisited && t_info[t_info[i].replace_ifvisited].visited)
+	  if (t_info[i].replace_ifvisited 
+	      && t_info[t_info[i].replace_ifvisited].visited)
 	    continue;
 
-		for(j = 0; (j < 1 || t_info[i].zone[j].level != 0 )
-											 && j < MAX_DUNGEON_ZONES; j++)
-		{
-				zones[z_count++] = MAX_DUNGEON_ZONES*i + j;
-		}
+	  for(j = 0; (j < 1 || t_info[i].zone[j].level != 0 )
+		&& j < MAX_DUNGEON_ZONES; j++)
+	    {
+	      zones[z_count++] = MAX_DUNGEON_ZONES*i + j;
+	    }
 	}
 
 	display_knowledge("locations", zones, z_count, dun_f, zone_f, "   Reached");
