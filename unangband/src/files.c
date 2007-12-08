@@ -3960,7 +3960,7 @@ errr file_character(cptr name, bool full)
 	  int j;
 	  bool victory = FALSE;
 	  int depth = t_info[i].max_depth + t_info[i].zone[0].level;
-	  bool please_print_depths = FALSE;
+	  bool please_print_depths = TRUE;
 
 	  long_level_name(str, i, depth);
 
@@ -4009,8 +4009,6 @@ errr file_character(cptr name, bool full)
 		/* Express in feet or level*/
 		if (depth_in_feet) text_out(format("%d foot depth in ", depth));
 		else text_out(format("level %d in ", depth));
-		
-		please_print_depths = TRUE;
 	      }
 	    }
 	    else if (t_info[i].visited) {
@@ -4019,7 +4017,9 @@ errr file_character(cptr name, bool full)
 	      if (!x) 
 		continue;
 
-	      text_out("You have visited ");
+	      please_print_depths = FALSE;
+
+	      text_out("You have visited ");		
 	    }
 	    else 
 	      /* no impact whatsoever on this dungeon; not printing */
@@ -4028,8 +4028,12 @@ errr file_character(cptr name, bool full)
 
 	  text_out(str);
 
-	  if (please_print_depths)
-	    text_out(format(" (%d-%d).\n",  min_depth(i), max_depth(i)));
+	  if (please_print_depths) {
+	    if (min_depth(i) == max_depth(i))
+	      text_out(format(" (%d).\n",  min_depth(i)));
+	    else
+	      text_out(format(" (%d-%d).\n",  min_depth(i), max_depth(i)));
+	  }
 	  else
 	    text_out(".\n");
 	}
