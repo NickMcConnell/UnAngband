@@ -11834,10 +11834,18 @@ void generate_cave(void)
 			  msg_format("%^s now terrorizes %s.", r_name + r_info[t_info[i].town_lockup_monster].name, str);
 			}
 			
-			if ((t_info[i].guardian_ifvisited == p_ptr->dungeon) && (r_info[t_info[i].replace_guardian].max_num > 0))
-			{
-			  long_level_name(str, i, 0);
-			  msg_format("%^s now guards %s.", r_name + r_info[t_info[i].replace_guardian].name, str);
+			if (t_info[i].guardian_ifvisited == p_ptr->dungeon) {
+			  if (r_info[t_info[i].replace_guardian].max_num > 0)
+			    {
+			      long_level_name(str, i, 0);
+			      msg_format("%^s now guards %s.", r_name + r_info[t_info[i].replace_guardian].name, str);
+			    }
+			  else {
+			    /* remove the guardian to avoid fake victories */
+			    /* TODO: save these for each dungeon */
+			    t_info[i].guardian_ifvisited = 0;
+			    t_info[i].replace_guardian = 0;
+			  }
 			}
 		}
 		

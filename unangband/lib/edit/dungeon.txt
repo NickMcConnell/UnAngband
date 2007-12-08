@@ -22,7 +22,7 @@
 # Q: dungeon connected to once quest monster defeated : quest monster
 # Y: lock all shops until this monster is defeated : if player has visited this dungeon
 # Z: substitute this dungeon instead : if player has visited this dungeon
-# W: substitute this guardian monster for guardians of all zones, even for zones without guardians: if player has visited this dungeon
+# W: substitute this guardian monster for guardian of zone 0, even if no guardian till now: if player has visited this dungeon
 # G: generate monsters with this character
 # R: generate monsters with this flag
 # S: store1 : store2 : store3 : store4 : store5 : store6 : store7 : store8
@@ -269,9 +269,11 @@ D:The old dwarven doors to Moria are broken open and only foul air and darkness 
 
 # This dungeon is very short --- it does
 # not open the gates, so no point in misleading the player.
+# Smeagol recycled from Misty Mountans
 
 N:16:west gates of Moria
 X:52:64:0:0
+W:52:42
 L:36:49:397:56:0:0
 L:37:56:393:0:0:0
 L:40:56:393:393:639:0
@@ -283,11 +285,12 @@ D:  While you search in vain for an entrance, something
 D: deadly stirs in the water outside.
 
 # No dungeon here, nor passage west
+# 262 recycled from east Moria entrance, but only till Khazad-Dum entered
 
 N:17:east gates of Moria
 X:63:0:0:0
 Z:61:61
-L:40:49:397:56:0:0
+L:40:49:397:56:262:0
 D:The door to Moria is closed from this direction, as Balin has
 D: returned to Moria to claim his bequest with dragon-gold.
 D:  Traces of orc camps on the shores of Kheled-Zaram
@@ -326,6 +329,7 @@ D: is even darker.  They say Death itself has made home
 D: among the twisted trees of Dol Guldur and even animals avoid its shadow.
 
 # Goes upwards
+# These guardians are not recycled, they are location-tied and not evil enough
 
 N:21:Edoras
 X:40:0:0:0
@@ -497,7 +501,7 @@ Q:62:249
 Z:62:62
 G:o
 R:PLANT
-L:21:420:420:420:0:0
+L:21:420:420:420:1313:0
 D:Fangorn is aflame: Saruman's orcs have taken axe and fire to the trees
 D: and the haunted moans of the ancient wood fill the air.  Some say the
 D: trees have begun to march in response - but you can only see dark smoke
@@ -520,6 +524,7 @@ L:6:56:0:0:345:0:the Troll Cave in
 # The only (one-time) free pass to the other side of the Misty Mountains,
 # but to avoid visiting dungeons you have to stir evil at Dol Guldur
 # Goes upwards
+# TODO: recycle 1365
 
 N:40:Isengard
 X:20:21:64:0
@@ -538,8 +543,9 @@ X:14:2:0:0
 R:GIANT
 G:C
 Q:18:1272
-L:20:451:56:148:473:0:the blizzard-covered
-L:21:56:144:145:0:0:the snowy slopes of
+L:20:451:56:148:140:0:the blizzard-covered
+L:21:56:144:145:473:0:a vanishing path below
+L:22:56:144:145:0:0:the snowy slopes of
 L:50:56:144:145:1272:0:the peak of
 D:Legend has it that this mighty mountain is Morgoth's minion.
 D:  In good weather you'd laugh at it, easily traversing the nearby pass.
@@ -644,6 +650,7 @@ L:80:407:218:208:511:0
 # Redhorn is actually another name for Caradhras;
 # 'Redhorn pass' is the pass nearby
 # East-west passage is free because orcs are on lookout from the west.
+# TODO: recycle 297
 
 N:52:Redhorn pass
 X:14:2:0:0
@@ -749,7 +756,7 @@ D:Drums. Drums. Drums in the deep.
 N:62:the Ent Moot
 X:66:48:0:0
 Q:18:483
-L:21:0:420:153:0:0
+L:21:0:420:153:1313:0
 R:PLANT
 S:949:950:951:952:953:0:0:0
 D:Ents fill a clearing in the forest, rooted deep and gently swaying.
@@ -758,11 +765,13 @@ D: of their ancient boughs. Perhaps a closer look will help you
 D: understand if they have come to a decision...
 
 # canines dungeon, shops closed until Great Grey Wolf killed
+# Goblin King recycled from Misty Mountans
 
 N:63:Woodmen Village
 X:5:15:52:0
 G:C
 Y:1366:5
+W:173:9
 L:11:0:420:408:0:0:the
 L:12:419:436:422:0:0:the
 L:14:436:407:404:1366:0:the
