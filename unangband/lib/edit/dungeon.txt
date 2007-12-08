@@ -22,7 +22,7 @@
 # Q: dungeon connected to once quest monster defeated : quest monster
 # Y: lock all shops until this monster is defeated : if player has visited this dungeon
 # Z: substitute this dungeon instead : if player has visited this dungeon
-# W: substitute this guardian monster instead: if player has visited this dungeon
+# W: substitute this guardian monster for guardians of all zones, even for zones without guardians: if player has visited this dungeon
 # G: generate monsters with this character
 # R: generate monsters with this flag
 # S: store1 : store2 : store3 : store4 : store5 : store6 : store7 : store8
@@ -219,7 +219,7 @@ D: as some boys claim, even disappear in sewers' main tunnel occasionally.
 D:  If you, per chance, would like to investigate the town sewers,
 D: press '>' when standing on the entrance '>'.
 
-# Goes upwards, so all levels, except 20, are described by the L:31 line!
+# Goes upwards
 
 N:12:Weathertop
 X:13:38:56:0

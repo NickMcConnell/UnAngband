@@ -1889,7 +1889,9 @@ static void describe_surface_dungeon(int dun)
     /* no road back to current */
     if (count_routes(myd, dun) > 0)
       /* road forth, hence one way */
-      text_out_c(TERM_RED, format("  You know of no way back from %s to %s!", t_info[dun].name + t_name, t_info[myd].name + t_name));
+      text_out_c(TERM_RED, format("  You know of no way back from %s to %s!", 
+				  t_info[dun].name + t_name, 
+				  t_info[myd].name + t_name));
 	  
   if (!num)
     text_out_c(TERM_SLATE, format("  You feel your old maps will not avail you %s.", dun == myd ? "here" : "there"));	  
@@ -1924,6 +1926,7 @@ static void dungeon_lore(int oid) {
 
 	screen_save();
 
+	/* FIXME: count differently for towers */
 	if (zone == MAX_DUNGEON_ZONES - 1
 	    || t_info[dun].zone[zone+1].level == 0
 	    || t_info[dun].zone[zone+1].level - 1 == t_info[dun].zone[zone].level) {
@@ -1997,7 +2000,7 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 	  else {
 	    if (guard && r_info[guard].max_num)
 	      /* we've reached the guardian and escaped (or he did) */
-	      c_prt(attr, " guard", row, 67);
+	      c_prt(attr, " !!!", row, 67);
 	    else
 	      /* we are already past the zone */
 	      c_prt(attr, " ***", row, 67);

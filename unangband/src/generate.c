@@ -1069,7 +1069,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	
 	int offset = ((flag & (MAZE_CRYPT | MAZE_CAVE)) != 0) && (rand_int(100) < 50) ? 1 : 0;
 	
-	s16b *saved;
+	s16b *saved = NULL; 
 
 	int solid = ((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) ? feat_state(feat_wall, FS_SOLID) : 0;	
 	int inner = ((f_info[feat_wall].flags1 & (FF1_OUTER)) != 0) ? feat_state(feat_wall, FS_INNER) : feat_wall;
@@ -11817,20 +11817,27 @@ void generate_cave(void)
 		/* This breaks for Angband */
 		if (p_ptr->dungeon) for (i = 0; i < z_info->t_max; i++)
 		{
+		  char str[46];
+
 			if (t_info[i].replace_ifvisited == p_ptr->dungeon)
 			{
-				msg_format("%^s has fallen.", t_name + t_info[i].name);
-				msg_format("%^s now stands in its place.", t_name + t_info[t_info[i].replace_with].name);
+			  long_level_name(str, i, 0);
+			  msg_format("%^s has fallen.", str);
+
+			  long_level_name(str, t_info[i].replace_with, 0);
+			  msg_format("%^s now stands in its place.", str);
 			}
 
 			if ((t_info[i].town_lockup_ifvisited == p_ptr->dungeon) && (r_info[t_info[i].town_lockup_monster].max_num > 0))
 			{
-				msg_format("%^s now terrorizes %s.", r_name + r_info[t_info[i].town_lockup_monster].name, t_name + t_info[i].name);
+			  long_level_name(str, i, 0);
+			  msg_format("%^s now terrorizes %s.", r_name + r_info[t_info[i].town_lockup_monster].name, str);
 			}
 			
 			if ((t_info[i].guardian_ifvisited == p_ptr->dungeon) && (r_info[t_info[i].replace_guardian].max_num > 0))
 			{
-				msg_format("%^s now guards %s.", r_name + r_info[t_info[i].replace_guardian].name, t_name + t_info[i].name);
+			  long_level_name(str, i, 0);
+			  msg_format("%^s now guards %s.", r_name + r_info[t_info[i].replace_guardian].name, str);
 			}
 		}
 		
