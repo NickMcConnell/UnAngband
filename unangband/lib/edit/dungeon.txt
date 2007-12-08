@@ -88,7 +88,7 @@ D: the larger wilderness locations.
 
 N:2:Rivendell
 X:3:13:52:64
-L:0:0:420:155:0:0:the stronghold of
+L:3:0:420:155:0:0:the stronghold of
 S:267:9:10:11:519:13:268:513
 D:Last Homely House on the Edge of the Wild,
 D: full of laughter and singing.
@@ -138,7 +138,7 @@ D: of captivating music.
 
 N:6:Lake-town
 X:5:7:48:0
-L:0:0:155:152:0:0
+L:5:0:155:152:0:0
 S:8:9:10:11:12:13:14:508
 Z:8:7
 D:The dwellers of Esgaroth on the Long Lake are a hardy people,
@@ -181,7 +181,7 @@ D: gather, angry at you for disturbing his lair...
 
 N:9:the Dale
 X:5:7:48:0
-L:0:0:530:153:0:0:the marketplace of
+L:5:0:530:153:0:0:the marketplace of
 S:509:516:517:11:12:13:506:508
 D:The people of burnt Lake-town have elected to rebuild the nearby ancient Dale
 D: as their new abode.  Visit the statue to collect a reward from the
@@ -413,8 +413,8 @@ X:40:25:30:0
 G:t
 R:MAGE
 Q:31:1085
-L:0:0:410:56:0:46
-L:1:56:0:0:0:46
+L:5:0:410:56:0:46
+L:6:56:0:0:0:46
 L:55:56:0:0:1085:46
 S:505:516:517:503:519:518:509:508
 
@@ -441,7 +441,7 @@ L:56:435:411:420:535:0:the Battle of
 N:31:Mount Mindolluin
 X:28:0:0:0
 R:ANIMAL
-L:0:0:410:56:0:0:southern slopes of
+L:3:0:410:56:0:0:southern slopes of
 S:777:0:0:0:0:0:0:0
 D:A white tree has found root here, among snows of mountain Mindolluin above Minas Tirith, a descendant of the sapling rescued from Numenor by King Isildur.  Come closer...
 
@@ -722,7 +722,7 @@ D: Road from Hobbiton looks a fairer route, and safer too.
 N:59:the door to Moria
 X:14:60:0:0
 G:E
-L:0:0:1:56:0:0
+L:20:0:1:56:0:0
 S:0:0:0:0:0:0:0:0
 D:As you read the map, starlight leads the way.  'Speak friend, and enter'.
 

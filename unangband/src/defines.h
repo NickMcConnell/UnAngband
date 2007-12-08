@@ -1031,11 +1031,6 @@
 #define MAX_DUNGEON_ZONES	 4
 
 /*
- * Maximum surface level before we become ruins, rather than wilderness.
- */
-#define MAX_ZONE_WILDS		15
-
-/*
  * Number of feats we change to (Excluding default). Used in f_info.txt.
  */
 #define MAX_FEAT_STATES	 8
