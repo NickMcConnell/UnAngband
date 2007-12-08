@@ -10860,7 +10860,7 @@ static bool cave_gen(void)
 		/* Place guardian if permitted */
 		if ((level_flag & (LF1_GUARDIAN)) != 0)
 		{
-			init_ecology(actual_guardian(zone->guard, p_ptr->dungeon));
+			init_ecology(actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone));
 		}
 		/* Place any monster */
 		else
@@ -10960,7 +10960,7 @@ static bool cave_gen(void)
 		int y, x, guard;
 		int count = 0;
 		
-		guard = actual_guardian(zone->guard, p_ptr->dungeon);
+		guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
 
 		/* Generating */
 		if (cheat_room) msg_format("Placing guardian (%s).", r_name + r_info[guard].name);
@@ -11361,7 +11361,7 @@ static bool town_gen(void)
 	{
 		int y, x, guard;
 		
-		guard = actual_guardian(zone->guard, p_ptr->dungeon);
+		guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
 
 		/* Generating */
 		if (cheat_room) msg_format("Placing guardian (%s).", r_name + r_info[guard].name);

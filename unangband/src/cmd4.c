@@ -1899,7 +1899,7 @@ static void describe_surface_dungeon(int dun)
 
 static void describe_zone_guardian(int dun, int zone) 
 {
-  int guard = actual_guardian(t_info[dun].zone[zone].guard, dun);
+  int guard = actual_guardian(t_info[dun].zone[zone].guard, dun, zone);
 
   if (guard) {
     bool bars = (r_info[guard].max_num 
@@ -1966,7 +1966,7 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
         int dun = oid / MAX_DUNGEON_ZONES;
         int zone = oid % MAX_DUNGEON_ZONES;
 	int depth = t_info[dun].max_depth + t_info[dun].zone[0].level;
-	int guard = actual_guardian(t_info[dun].zone[zone].guard, dun);
+	int guard = actual_guardian(t_info[dun].zone[zone].guard, dun, zone);
 
         byte attr = curs_attrs[CURS_KNOWN][(int)cursor];
 

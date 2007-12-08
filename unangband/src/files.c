@@ -3966,7 +3966,7 @@ errr file_character(cptr name, bool full)
 
 	  for (j = 0; j < MAX_DUNGEON_ZONES; j++)
 	    {
-	      int guard = actual_guardian(t_info[i].zone[j].guard, i);
+	      int guard = actual_guardian(t_info[i].zone[j].guard, i, j);
 	      if (guard) {
 		if (r_info[guard].max_num > 0) {
 		  victory = FALSE;

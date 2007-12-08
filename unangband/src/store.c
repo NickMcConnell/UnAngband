@@ -3506,7 +3506,7 @@ void do_cmd_store(void)
 	}
 
 	/* Doors locked if guardian about */
-	if ((actual_guardian(zone->guard, p_ptr->dungeon)) && (r_info[actual_guardian(zone->guard, p_ptr->dungeon)].cur_num > 0))
+	if ((actual_guardian(zone->guard, p_ptr->dungeon, zone - t_ptr->zone)) && (r_info[actual_guardian(zone->guard, p_ptr->dungeon, zone - t_ptr->zone)].cur_num > 0))
 	{
 		cptr closed_reason = 0; /* to silence a warning */
 		
@@ -3526,7 +3526,7 @@ void do_cmd_store(void)
 				break;
 		}
 		
-		msg_format(closed_reason, r_name + r_info[actual_guardian(zone->guard, p_ptr->dungeon)].name);
+		msg_format(closed_reason, r_name + r_info[actual_guardian(zone->guard, p_ptr->dungeon, zone - t_ptr->zone)].name);
 		return;
 	}
 	
