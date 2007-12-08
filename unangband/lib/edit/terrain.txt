@@ -13004,3 +13004,4 @@ W:0:1:20:0
 G:8:u
 F:ENTER | CAN_FLY | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW | OUTSIDE
 F:POWER_49
+D:A note on the door says 'Refugees welcome. Back soon. Radagast'.

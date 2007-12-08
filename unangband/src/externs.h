@@ -520,6 +520,7 @@ extern void do_cmd_save_screen(void);
 extern void do_cmd_save_screen_html(void);
 extern const cptr feature_group_text[];
 extern int feat_order(int feat);
+extern void do_knowledge_dungeons(void);
 
 /* cmd5.c */
 extern int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known);

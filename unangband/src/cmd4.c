@@ -1926,7 +1926,6 @@ static void dungeon_lore(int oid) {
 
 	screen_save();
 
-	/* FIXME: count differently for towers */
 	if (zone == MAX_DUNGEON_ZONES - 1
 	    || t_info[dun].zone[zone+1].level == 0
 	    || t_info[dun].zone[zone+1].level - 1 == t_info[dun].zone[zone].level) {
@@ -2065,6 +2064,41 @@ static void do_cmd_knowledge_dungeons(void)
 	display_knowledge("locations", zones, z_count, dun_f, zone_f, "   Reached");
 	FREE(zones);
 }
+
+/* Keep macro counts happy. */
+static void cleanup_cmds () {
+	FREE(obj_group_order);
+}
+
+/* The stand-alone version, e.g. for travel menu help */
+/* TODO: this is blindly copied from do_cmd_menu, please simplify */
+void do_knowledge_dungeons(void)
+{
+	/* Set text_out hook */
+	text_out_hook = text_out_to_screen;
+
+	/* initialize static variables */
+	if(!obj_group_order) {
+		int i, n = 0;
+		for(n = 0; object_group_tval[n]; n++)
+		obj_group_order = C_ZNEW(TV_GEMS+1, int);
+		ang_atexit(cleanup_cmds);
+		for(i = 0; i <= TV_GEMS; i++) /* allow for missing values */
+			obj_group_order[i] = -1;
+		for(i = 0; i < n; i++) {
+			obj_group_order[object_group_tval[i]] = i;
+		}
+	}
+
+	/* File type is "TEXT" */
+	FILE_TYPE(FILE_TYPE_TEXT);
+
+	do_cmd_knowledge_dungeons();
+
+	/* Flush messages */
+	message_flush();
+}
+
 
 /* =================== END JOIN DEFINITIONS ================================ */
 
@@ -6273,10 +6307,6 @@ static command_menu knowledge_actions[] = {
 	{'V', "Interact with visuals", (action_f) do_cmd_visuals, 0},
 };
 
-/* Keep macro counts happy. */
-static void cleanup_cmds () {
-	FREE(obj_group_order);
-}
 /*
  * Set or unset various options.
  *

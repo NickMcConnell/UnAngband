@@ -588,7 +588,7 @@ static void do_cmd_travel(void)
 			num = set_routes(routes, 24, p_ptr->dungeon);
 
 			/* Build a prompt (accept all spells) */
-			strnfmt(out_val, 78, "(Travel %c-%c, *=List, ESC=exit) Travel where? ",
+			strnfmt(out_val, 78, "(Travel %c-%c, 'r' to recall, *=List, ESC=exit) Travel where? ",
 			I2A(0), I2A(num - 1) );
 
 			/* Nothing chosen yet */
@@ -653,7 +653,43 @@ static void do_cmd_travel(void)
 
 					/* Ask again */
 					continue;
+				}
 
+				/* Request recall */
+				if (ke.key == 'r')
+				{
+				  if (redraw) {
+				    do_knowledge_dungeons();
+
+				    /* Load screen */
+				    screen_load();
+
+				    /* Save screen */
+				    screen_save();
+
+				    /* Display a list of spells */
+				    print_routes(routes, num, 1, 22);
+				  }
+				  else {
+				    redraw = TRUE;
+				    
+				    /* Save screen */
+				    screen_save();
+
+				    do_knowledge_dungeons();
+
+				    /* Load screen */
+				    screen_load();
+
+				    /* Save screen */
+				    screen_save();
+
+				    /* Display a list of spells */
+				    print_routes(routes, num, 1, 22);
+				  }
+
+				  /* Ask again */
+				  continue;
 				}
 
 				/* Lowercase 1+ */
