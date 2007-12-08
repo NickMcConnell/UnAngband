@@ -1965,8 +1965,8 @@ static void display_player_xtra_info(void)
 	desc = likert(xdig, 6, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 18, col+11);
 
-	/* Indent output by 1 character, and wrap at column 78 */
-	text_out_wrap = 78;
+	/* Indent output by 1 character, and wrap at column 80 */
+	text_out_wrap = 80;
 	text_out_indent = 1;
 
 	/* History */
@@ -3787,9 +3787,6 @@ errr file_character(cptr name, bool full)
 	/* Invalid file */
 	if (!fff) return (-1);
 
-	/* We have lots of long text to format */
-	text_out_wrap = 79;
-
 	text_out_hook = text_out_to_file;
 	text_out_file = fff;
 
@@ -4233,9 +4230,6 @@ errr file_character(cptr name, bool full)
 
 	/* Close it */
 	my_fclose(fff);
-
-	/* Restoring to default */
-	text_out_wrap = 0;
 
 	/* Success */
 	return (0);

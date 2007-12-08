@@ -3286,7 +3286,7 @@ void text_out_to_screen(byte a, cptr str)
  * Hook function for text_out(). Make sure that text_out_file points
  * to an open text-file.
  *
- * Long lines will be wrapped at text_out_wrap, or at column 75 if that
+ * Long lines will be wrapped at text_out_wrap, or at column 80 if that
  * is not set; or at a newline character.
  *
  * You must be careful to end all file output with a newline character
@@ -3298,7 +3298,7 @@ void text_out_to_file(byte a, cptr str)
 	static int pos = 0;
 
 	/* Wrap width */
-	int wrap = (text_out_wrap ? text_out_wrap : 75);
+	int wrap = (text_out_wrap ? text_out_wrap : 80);
 
 	/* Current location within "str" */
 	cptr s = str;
