@@ -3149,12 +3149,12 @@ void monster_death(int m_idx)
 
 
 	/* Determine how much we can drop */
+	if ((r_ptr->flags1 & (RF1_DROP_30)) && (rand_int(100) < 30)) number++;
 	if ((r_ptr->flags1 & (RF1_DROP_60)) && (rand_int(100) < 60)) number++;
 	if ((r_ptr->flags1 & (RF1_DROP_90)) && (rand_int(100) < 90)) number++;
 	if (r_ptr->flags1 & (RF1_DROP_1D2)) number += damroll(1, 2);
-	if (r_ptr->flags1 & (RF1_DROP_2D2)) number += damroll(2, 2);
-	if (r_ptr->flags1 & (RF1_DROP_3D2)) number += damroll(3, 2);
-	if (r_ptr->flags1 & (RF1_DROP_4D2)) number += damroll(4, 2);
+	if (r_ptr->flags1 & (RF1_DROP_1D3)) number += damroll(1, 3);
+	if (r_ptr->flags1 & (RF1_DROP_1D4)) number += damroll(1, 4);
 
 	/* Hack -- handle mushroom patches */
 	food_type = force_food;

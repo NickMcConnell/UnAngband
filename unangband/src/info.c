@@ -7516,7 +7516,7 @@ static void describe_feature_actions(int f_idx)
 					effect = TRUE;
 
 					if (f_ptr->flags3 & (FF3_DROP_1D2)) count += 2;
-					if (f_ptr->flags3 & (FF3_DROP_2D2)) count += 4;
+					if (f_ptr->flags3 & (FF3_DROP_1D3)) count += 3;
 
 					if (i == FS_USE_FEAT)
 					{

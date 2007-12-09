@@ -1793,12 +1793,12 @@ static void cheat_monster_lore(const monster_race *r_ptr, monster_lore *l_ptr)
 
 	/* Hack -- maximal drops */
 	l_ptr->drop_gold = l_ptr->drop_item =
-	(((r_ptr->flags1 & RF1_DROP_4D2) ? 8 : 0) +
-	 ((r_ptr->flags1 & RF1_DROP_3D2) ? 6 : 0) +
-	 ((r_ptr->flags1 & RF1_DROP_2D2) ? 4 : 0) +
+	(((r_ptr->flags1 & RF1_DROP_1D4) ? 4 : 0) +
+	 ((r_ptr->flags1 & RF1_DROP_1D3) ? 3 : 0) +
 	 ((r_ptr->flags1 & RF1_DROP_1D2) ? 2 : 0) +
 	 ((r_ptr->flags1 & RF1_DROP_90)  ? 1 : 0) +
-	 ((r_ptr->flags1 & RF1_DROP_60)  ? 1 : 0));
+	 ((r_ptr->flags1 & RF1_DROP_60)  ? 1 : 0) +
+	 ((r_ptr->flags1 & RF1_DROP_30)  ? 1 : 0));
 
 	/* Hack -- but only "valid" drops */
 	if (r_ptr->flags1 & RF1_ONLY_GOLD) l_ptr->drop_item = 0;

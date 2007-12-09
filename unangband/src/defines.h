@@ -1312,7 +1312,7 @@
 #define FF3_ALLOC       0x00000004
 #define FF3_CHEST       0x00000008
 #define FF3_DROP_1D2    0x00000010
-#define FF3_DROP_2D2    0x00000020
+#define FF3_DROP_1D3    0x00000020
 #define FF3_DROP_GOOD   0x00000040
 #define FF3_DROP_GREAT  0x00000080
 #define FF3_HURT_POIS   0x00000100
@@ -3600,12 +3600,12 @@
 #define RF1_RAND_50       0x00080000      /* Moves randomly (50%) */
 #define RF1_ONLY_GOLD    0x00100000      /* Drop only gold */
 #define RF1_ONLY_ITEM    0x00200000      /* Drop only items */
-#define RF1_DROP_60       0x00400000      /* Drop an item/gold (60%) */
-#define RF1_DROP_90       0x00800000      /* Drop an item/gold (90%) */
-#define RF1_DROP_1D2     0x01000000      /* Drop 1d2 items/gold */
-#define RF1_DROP_2D2     0x02000000      /* Drop 2d2 items/gold */
-#define RF1_DROP_3D2     0x04000000      /* Drop 3d2 items/gold */
-#define RF1_DROP_4D2     0x08000000      /* Drop 4d2 items/gold */
+#define RF1_DROP_30       0x00400000     /* Drop an item/gold (30%) */
+#define RF1_DROP_60       0x00800000     /* Drop an item/gold (60%) */
+#define RF1_DROP_90     0x01000000       /* Drop an item/gold (90%) */
+#define RF1_DROP_1D2     0x02000000      /* Drop 1d2 items/gold */
+#define RF1_DROP_1D3     0x04000000      /* Drop 1d3 items/gold */
+#define RF1_DROP_1D4     0x08000000      /* Drop 1d4 items/gold */
 #define RF1_DROP_GOOD    0x10000000      /* Drop good items */
 #define RF1_DROP_GREAT   0x20000000      /* Drop great items */
 #define RF1_DROP_USEFUL  0x40000000      /* Drop "useful" items */

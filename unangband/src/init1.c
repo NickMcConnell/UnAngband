@@ -497,7 +497,7 @@ static cptr f_info_flags3[] =
 	"ALLOC",
 	"CHEST",
 	"DROP_1D2",
-	"DROP_2D2",
+	"DROP_1D3",
 	"DROP_GOOD",
 	"DROP_GREAT",
 	"HURT_POIS",
@@ -553,12 +553,12 @@ static cptr r_info_flags1[] =
 	"RAND_50",
 	"ONLY_GOLD",
 	"ONLY_ITEM",
+	"DROP_30",
 	"DROP_60",
 	"DROP_90",
 	"DROP_1D2",
-	"DROP_2D2",
-	"DROP_3D2",
-	"DROP_4D2",
+	"DROP_1D3",
+	"DROP_1D4",
 	"DROP_GOOD",
 	"DROP_GREAT",
 	"DROP_USEFUL",
@@ -7869,7 +7869,7 @@ errr eval_r_power(header *head)
 		/* Point at the "info" */
 		r_ptr = (monster_race*)head->info_ptr + i;
 		
-		if ((r_ptr->flags1 & (RF1_DROP_60 | RF1_DROP_90 | RF1_DROP_1D2 | RF1_DROP_2D2 | RF1_DROP_3D2 | RF1_DROP_4D2)) == 0)
+		if ((r_ptr->flags1 & (RF1_DROP_30 | RF1_DROP_60 | RF1_DROP_90 | RF1_DROP_1D2 | RF1_DROP_1D3 | RF1_DROP_1D4)) == 0)
 		{
 			r_ptr->flags1 &= ~(RF1_ONLY_GOLD | RF1_ONLY_ITEM | RF1_DROP_GOOD | RF1_DROP_GREAT | RF1_DROP_USEFUL);
 			r_ptr->flags8 &= ~(RF8_DROP_CHEST | RF8_DROP_MISSILE | RF8_DROP_TOOL | RF8_DROP_WEAPON | RF8_DROP_MUSIC |

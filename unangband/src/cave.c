@@ -5727,7 +5727,7 @@ void cave_set_feat(int y, int x, int feat)
 		object_type object_type_body;
 
 		if (f_ptr->flags3 & (FF3_DROP_1D2)) number += damroll(1, 2);
-		if (f_ptr->flags3 & (FF3_DROP_2D2)) number += damroll(2, 2);
+		if (f_ptr->flags3 & (FF3_DROP_1D3)) number += damroll(1, 3);
 
 		/* Always drop something */
 		if (!number) number = 1;

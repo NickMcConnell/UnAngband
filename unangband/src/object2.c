@@ -7205,7 +7205,7 @@ static bool vault_trap_chest(int f_idx)
 {
 	feature_type *f_ptr = &f_info[f_idx];
 
-	int test_drops =  ((f_ptr->flags3 & (FF3_DROP_2D2)) ? 4 : 0) + ((f_ptr->flags3 & (FF3_DROP_1D2)) ? 2 : 0);
+	int test_drops =  ((f_ptr->flags3 & (FF3_DROP_1D3)) ? 3 : 0) + ((f_ptr->flags3 & (FF3_DROP_1D2)) ? 2 : 0);
 	bool test_drop_good = (f_ptr->flags3 & (FF3_DROP_GOOD)) ? TRUE : FALSE;
 	bool test_drop_great = (f_ptr->flags3 & (FF3_DROP_GREAT)) ? TRUE : FALSE;
 	bool test_has_item = (f_ptr->flags1 & (FF1_HAS_ITEM)) ? TRUE : FALSE;
@@ -7309,7 +7309,7 @@ void pick_trap(int y, int x)
 		{
 			feature_type *f_ptr = &f_info[feat];
 
-			chest_drops =  ((f_ptr->flags3 & (FF3_DROP_2D2)) ? 4 : 0) + ((f_ptr->flags3 & (FF3_DROP_1D2)) ? 2 : 0);
+			chest_drops =  ((f_ptr->flags3 & (FF3_DROP_1D3)) ? 3 : 0) + ((f_ptr->flags3 & (FF3_DROP_1D2)) ? 2 : 0);
 			chest_drop_good = (f_ptr->flags3 & (FF3_DROP_GOOD)) ? TRUE : FALSE;
 			chest_drop_great = (f_ptr->flags3 & (FF3_DROP_GREAT)) ? TRUE : FALSE;
 			chest_has_item = (f_ptr->flags1 & (FF1_HAS_ITEM)) ? TRUE : FALSE;
