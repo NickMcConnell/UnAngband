@@ -18937,13 +18937,15 @@ G:t:u
 I:110:35d10:40:10:3
 W:10:4:0:0
 M:20:0:0:10
+B:HIT:HURT:2d3
+B:HIT:WOUND:1d3
 F:UNIQUE | MALE | 
 F:FORCE_MAXHP | 
 F:ONLY_ITEM | DROP_90 | DROP_GOOD | 
 F:OPEN_DOOR | BASH_DOOR | HAS_LITE | NEED_LITE |
 F:FORCE_DEPTH
-#D:A majordomo of Theoden and captain of the guard, he requests you put aside
-#D: your weapons before entering the Golden Hall.
+D:A majordomo of Theoden and captain of the guard, he requests you put aside
+D: your weapons before entering the Golden Hall.
 
 N:1311:King Theoden, possessed by Saruman
 G:t:y

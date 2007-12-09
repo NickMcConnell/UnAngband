@@ -35,10 +35,10 @@ Farmer    |        V     \   |         |       Redhorn #     Woodmen*   |
 Maggot's  Old Forest-->Barrow Downs    |       Pass (8-37)<--Village    |
  Farm       (7-10)        (5-23)       |         /  ###      (11-13)    |
  (3-6)                                 |        /  ####        /        |
-                                       | West gates ##        /         |
-                                       |  of Moria ## East gates        |
-                                       |   (7-24) #### of Moria         |
-                                       |    /    ####   (7-24)          |
+                                       | West Moria ##        /         |
+                                       |  entrance ## East Moria        |
+                                       |   (7-24) #### entrance         |
+                                       |    /    ####   (13-24)         |
                                        |   /     ##                 Dol Guldur
                                      Dunland    ##Lorien*          / (43-65)
                                            \  ###                 /

@@ -198,7 +198,7 @@ L:6:114:0:0:111:0:cellars' back exit in the
 S:507:0:0:0:0:0:0:0
 D:The barnyard of Farmer Maggot's farm looks deserted in a hurry,
 D: and you hear vicious barking muffled as if by great distance.
-D: The trap doors of the famous farm cellars are open;
+D:  The trap doors of the famous farm cellars are open;
 D: to climb down, press '>' when standing on the entrance '>'.
 
 N:11:Bree
@@ -236,7 +236,7 @@ W:453:48
 L:8:420:154:126:0:0:the
 D:River Bruinen runs here swiftly over its rocky bed.
 D:  From the nearby sources in Misty Mountains down to the ford,
-D: the river is under the rule of Lord of Rivendell.
+D: the river is under the rule of the Lord of Rivendell.
 D:  The hidden valley of Rivendell is not yet visible from here.
 
 # TODO: from here on level names unfinished
@@ -255,17 +255,16 @@ L:24:56:0:0:262:0
 D:In older days, the gates to Moria were always open, and a meeting point for dwarves, men and
 D: elves.  The ancient doors now stand ajar, but the mines behind them are home to only fouler things.
 
-# Keep the dungeon here identical to the one above
-# TODO: vary the topmost level wrt N:14
+# Keep the dungeon here identical to the one above, except the top
 
 N:15:east Moria entrance
 X:63:0:0:0
 Z:17:42
 Q:14:262
-L:6:49:397:56:0:0
-L:7:56:0:0:0:0
+L:12:411:607:49:0:0:Kheled-Zaram at the
+L:13:56:0:0:0:0
 L:24:56:0:0:262:0
-D:The old dwarven doors to Moria are broken open and only foul air and darkness welcome those who come inside.  Broken stairs and archways make the way difficult and retreat almost impossible.
+D:The old dwarven doors to Moria are broken open and only foul air and darkness welcome those who come inside.  Broken stairs and archways make the way difficult but, coming into Moria from east, from the Wild, you expect deadlier perils soon.
 
 # The gates of Moria after they are closed by Balin
 
@@ -276,11 +275,11 @@ D:The old dwarven doors to Moria are broken open and only foul air and darkness 
 N:16:west gates of Moria
 X:52:64:0:0
 W:52:42
-L:36:49:397:56:0:0
+L:36:49:397:56:0:0:the
 L:37:56:393:0:0:0
-L:40:56:393:393:639:0
+L:39:56:393:393:639:0
 D:Balin has returned to Moria and sealed the ancient door so that
-D: it's almost impossible to find.  You'll need a map to guide you.
+D: it's impossible to find.  You'll need a map to guide you.
 D:  It's been long since you've last heard from Balin,
 D: old friend from the Battle of Five Armies, and you begin to worry.
 D:  While you search in vain for an entrance, something
@@ -292,7 +291,7 @@ D: deadly stirs in the water outside.
 N:17:east gates of Moria
 X:63:0:0:0
 Z:61:61
-L:40:49:397:56:262:0
+L:42:411:607:49:262:0:the
 D:The door to Moria is closed from this direction, as Balin has
 D: returned to Moria to claim his bequest with dragon-gold.
 D:  Traces of orc camps on the shores of Kheled-Zaram
@@ -300,7 +299,7 @@ D: and months old troll carcasses tell the story
 D: of orc attempts to recapture Moria from outside.  You are wondering
 D: what is happening inside, but the door is firmly barricaded
 D: and nobody responds.  You have to try to find the door to Moria
-D: from the west, from Rivendell.
+D: from the west.
 
 N:18:Lothlorien
 X:19:20:15:0
@@ -319,16 +318,20 @@ D:The ruins of a more ancient race lie here: the glens and
 D: hillocks strewn with the toppled statues of kings and
 D: conquerors.
 
+# We warn about crossing to Dol Guldur
+
 N:20:Fangorn Forest
 X:40:48:0:0
 Q:37:1313
 Z:37:37
 G::
 R:PLANT
-L:20:420:420:420:1313:0
+L:20:420:420:420:1313:0:the
 D:Fangorn is a dark and mysterious forest, but Mirkwood across Anduin
-D: is even darker.  They say Death itself has made home
-D: among the twisted trees of Dol Guldur and even animals avoid its shadow.
+D: is even darker.  In Fangorn the trees are rumoured to be alive
+D: and eager to strangle trespassers with their roots,
+D: but in Dol Guldur, wise people say, Death itself has made home
+D: among the twisted trees...
 
 # Goes upwards
 # These guardians are not recycled, they are location-tied and not evil enough
@@ -381,9 +384,7 @@ N:24:Dead Marshes
 X:19:25:0:0
 R:UNDEAD
 L:52:199:200:201:505:0
-D:A dreadful place. Nobody who crosses these marshes returns.
-
-# TODO:Should be guarded by Faramir
+D:A dreadful place.  Nobody who crosses these marshes returns.
 
 N:25:Ithilien
 X:26:49:0:0
@@ -716,7 +717,7 @@ D:The road ahead is long but straight; it takes you to beyond the
 D: edge of the Shire to Bree.  Choose your path carefully!  Once
 D: your feet take you further, it may be a while before you return
 D: to Hobbiton, older, wiser and wearier.  Elsewhere, dark clouds
-D: gather. At least the way ahead seems fair and true.
+D: gather.  At least the way ahead seems fair and true.
 
 N:58:Brandywine Ferry
 X:10:53:0:0
@@ -766,8 +767,8 @@ L:21:0:420:153:1313:0
 R:PLANT
 S:949:950:951:952:953:0:0:0
 D:Ents fill a clearing in the forest, rooted deep and gently swaying.
-D: You think you can hear timbrous voices amidst the creaks and groans
-D: of their ancient boughs. Perhaps a closer look will help you
+D:  You think you can hear timbrous voices amidst the creaks and groans
+D: of their ancient boughs.  Perhaps a closer look will help you
 D: understand if they have come to a decision...
 
 # canines dungeon, shops closed until Great Grey Wolf killed
