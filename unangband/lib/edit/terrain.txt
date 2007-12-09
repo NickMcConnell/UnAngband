@@ -12987,7 +12987,7 @@ F:ENTER | CAN_FLY | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW 
 F:POWER_46
 D:'Ask my mossy brother what he thinks.' this ent says.
 
-N:954:an abandoned store
+N:954:Ranger's cache
 G:+:U
 W:0:1:20:0
 F:ENTER | CAN_FLY | PERMANENT | LOS | MOVE | PROJECT | REMEMBER | NOTICE | GLOW | OUTSIDE

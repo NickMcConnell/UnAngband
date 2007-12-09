@@ -725,7 +725,7 @@ O:39:0:3
 N:46:the branches of an Ent
 X:2
 
-N:47:an abandoned shop
+N:47:Ranger's cache
 X:2
 
 N:48:Chart Scribe
