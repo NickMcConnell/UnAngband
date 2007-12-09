@@ -22,7 +22,7 @@
 # Q: dungeon connected to once quest monster defeated : quest monster
 # Y: lock all shops until this monster is defeated : if player has visited this dungeon
 # Z: substitute this dungeon instead : if player has visited this dungeon
-# W: substitute this guardian monster for guardian of zone 0, even if no guardian till now: if player has visited this dungeon
+# W: substitute this guardian monster for guardian of zone 0, even if no guardian till now: if player has visited this dungeon (warning, Q: and Y: guardians are always unchanged)
 # G: generate monsters with this character
 # R: generate monsters with this flag
 # S: store1 : store2 : store3 : store4 : store5 : store6 : store7 : store8
@@ -220,6 +220,7 @@ D:  If you, per chance, would like to investigate the town sewers,
 D: press '>' when standing on the entrance '>'.
 
 # Goes upwards
+# No guardian at the top, but worth exploring due to treasure at the top
 
 N:12:Weathertop
 X:13:38:56:0
@@ -227,7 +228,7 @@ W:449:48
 Y:449:48
 L:17:420:56:49:0:31:the hill of
 L:18:56:0:0:0:31:the tower of
-L:31:0:407:0:0:0:the crown of
+L:31:0:407:0:0:31:the crown of
 S:954:0:0:0:0:0:0:0
 
 N:13:Ford to Rivendell
@@ -309,6 +310,9 @@ S:270:503:11:12:13:504:510:0
 D:The enchanted woods which only true heroes can enter.
 D:  Galadriel awaits you with gifts at her mirror.
 
+# No guardian at the bottom, TODO: find an exciting reason to explore
+# FIXME: if no guardian place downstairs at the bottom level
+
 N:19:Parth Galen
 X:24:18:0:0
 L:20:420:155:56:0:0
@@ -379,6 +383,8 @@ D: and he no longer conceals his war preparations.
 D:  If you conquer Isengard,
 D: darkened by the clouds of Saruman's machinations,
 D: you open the easier path to Minas Tirith.
+
+# TODO: find anything to do here, e.g. guardian that opens the way forth
 
 N:24:Dead Marshes
 X:19:25:0:0
@@ -564,8 +570,6 @@ D:  Turn back, while you can!
 N:42:vaults of Erebor
 X:9:0:0:0
 L:21:0:56:1:0:0:the
-L:22:56:0:0:0:0:the
-L:40:56:0:0:0:0:the
 S:897:898:899:900:901:902:0:0
 D:The innermost vaults of the dwarven city of Erebor,
 D: ripped open by the casting down of the mountainside
@@ -585,6 +589,7 @@ L:80:56:0:0:535:0:the
 L:81:56:0:0:0:0:the
 
 # Sunken/outer plane dungeons
+# TODO: add guardian
 
 N:44:Numenor
 X:2:0:0:0
@@ -594,6 +599,8 @@ L:21:403:400:49:0:0:the sunken city of
 L:22:399:56:0:0:0
 L:60:399:56:0:0:0
 
+# TODO: add guardian
+
 N:45:Elemental Evil
 X:2:0:0:0
 G:E
@@ -601,6 +608,8 @@ R:PRIEST
 L:21:425:141:141:0:0:the temple of
 L:22:56:0:0:0:0:depths of the temple of
 L:60:56:0:0:0:0:bottom of the temple of
+
+# TODO: add guardian
 
 N:46:Crystal Castle
 X:2:0:0:0
@@ -794,7 +803,7 @@ G:t
 L:12:419:149:422:0:0
 
 # deep dungeon with evil humans after Isengard darkens; blocks way to Isengard
-# guardian TODO (a man)
+# bottom guardian TODO (a man)
 
 N:65:Dunland in war rage
 X:2:14:0:0

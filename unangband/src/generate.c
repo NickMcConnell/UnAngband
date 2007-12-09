@@ -11242,9 +11242,11 @@ static void town_gen_hack(void)
 	player_place(y, x, TRUE);
 
 	/* Sometimes we have to place upstairs as well */
-	if (((t_info[p_ptr->dungeon].zone[0].tower) &&
-		(p_ptr->depth < max_depth(p_ptr->dungeon)) && (p_ptr->depth > min_depth(p_ptr->dungeon)))
-		|| (p_ptr->depth > min_depth(p_ptr->dungeon)))
+	if ((t_info[p_ptr->dungeon].zone[0].tower 
+	     && p_ptr->depth < max_depth(p_ptr->dungeon) 
+	     && p_ptr->depth > min_depth(p_ptr->dungeon))
+	    || (!t_info[p_ptr->dungeon].zone[0].tower
+		&& p_ptr->depth > min_depth(p_ptr->dungeon)))
 	{
 		/* Place the up stairs */
 		while (TRUE)
@@ -11263,7 +11265,6 @@ static void town_gen_hack(void)
 
 	/* Hack -- use the "complex" RNG */
 	Rand_quick = FALSE;
-
 }
 
 

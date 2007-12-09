@@ -838,22 +838,30 @@ void do_cmd_go_up(void)
 	/* Hack -- travel through wilderness */
 	if ((adult_campaign) && (p_ptr->depth == max_depth(p_ptr->dungeon)) && (t_ptr->zone[0].tower))
 	{
+	  int guard;
+	  dungeon_zone *zone;
+
+	  /* Get the zone */
+	  get_zone(&zone, p_ptr->dungeon, p_ptr->depth);
+
+	  guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
+
 		/* Check quests due to travelling - cancel if requested */
 		if (!check_travel_quest(t_ptr->quest_opens, min_depth(p_ptr->dungeon), TRUE)) return;
 
-		/* Check that quest opens monster is dead */
-		if ((t_ptr->quest_opens) && (r_info[t_ptr->quest_monster].max_num == 0))
-		{
+		/* Check that travel opening monster is dead and of this zone */
+		if ((t_ptr->quest_opens) && (t_ptr->quest_monster == guard) && (r_info[guard].max_num == 0))
+		{			
 			/* Success */
-			message(MSG_STAIRS_DOWN,0,format("You have found a way through %s.", str));
+			message(MSG_STAIRS_DOWN,0,format("You have valiantly defeated the guardian of %s opening the way through.", str));
 	
 			/* Change the dungeon */
 			p_ptr->dungeon = t_ptr->quest_opens;
 		}
 		else
 		{
-			/* Success */
-			message(MSG_STAIRS_DOWN,0,format("Congratulations. You have defeated the guardian of %s.", str));
+		        /* Success */
+			message(MSG_STAIRS_DOWN,0,format("You have found a way through %s.", str));
 		}
 
 		/* Set the new depth */
@@ -927,14 +935,22 @@ void do_cmd_go_down(void)
 	/* Hack -- travel through wilderness */
 	if ((adult_campaign) && (p_ptr->depth == max_depth(p_ptr->dungeon)) && !(t_ptr->zone[0].tower))
 	{
-		/* Check quests due to travelling - cancel if requested */
+	  int guard;
+	  dungeon_zone *zone;
+
+	  /* Get the zone */
+	  get_zone(&zone, p_ptr->dungeon, p_ptr->depth);
+
+	  guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
+
+	        /* Check quests due to travelling - cancel if requested */
 		if (!check_travel_quest(t_ptr->quest_opens, min_depth(p_ptr->dungeon), TRUE)) return;
 
-		/* Check that quest opens monster is dead */
-		if ((t_ptr->quest_opens) && (r_info[t_ptr->quest_monster].max_num == 0))
+		/* Check that quest opens monster is dead and of this zone */
+		if ((t_ptr->quest_opens) && (t_ptr->quest_monster == guard) && (r_info[guard].max_num == 0))
 		{
 			/* Success */
-			message(MSG_STAIRS_DOWN,0,format("You have found a way through %s.", str));
+			message(MSG_STAIRS_DOWN,0,format("You have valiantly defeated the guardian of %s opening the way through.", str));
 	
 			/* Change the dungeon */
 			p_ptr->dungeon = t_ptr->quest_opens;
@@ -942,7 +958,7 @@ void do_cmd_go_down(void)
 		else
 		{
 			/* Success */
-			message(MSG_STAIRS_DOWN,0,format("Congratulations. You have defeated the guardian of %s.", str));
+			message(MSG_STAIRS_DOWN,0,format("You have found a way through %s.", str));
 		}
 		
 		/* Set the new depth */
