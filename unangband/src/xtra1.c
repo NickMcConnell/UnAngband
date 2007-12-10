@@ -408,7 +408,7 @@ static void prt_depth(void)
 	/* Get the zone */	
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
-	if (!zone->fill && zone->level < 6 && t_ptr->store[3])
+	if (!zone->fill && zone->level <= 10 && t_ptr->store[3])
 	{
 		my_strcpy(depths, "Town", sizeof(depths));
 	}

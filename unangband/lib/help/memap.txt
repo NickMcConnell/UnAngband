@@ -38,14 +38,14 @@ Maggot's  Old Forest-->Barrow Downs    |       Pass (8-37)<--Village    |
                                        | West Moria ##        /         |
                                        |  entrance ## East Moria        |
                                        |   (7-24) #### entrance         |
-                                       |    /    ####   (13-24)         |
+                                       |    /    ####   (14-24)         |
                                        |   /     ##                 Dol Guldur
                                      Dunland    ##Lorien*          / (43-65)
                                            \  ###                 /
                                             \ ####  Fangorn Forest
                                              \ ##  /
                                             Isengard
-                                             (7-35)               Parth Galen
+                                             (4-35)               Parth Galen
                                                    \             
                                                ##   \               Dead Marshes
                                   #################  Edoras*        

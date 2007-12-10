@@ -62,6 +62,20 @@
 
 V:0.6.2
 
+
+# TODO: play-test if the guardians are similarly powerful as uniques
+# of the level they appear in, with few exceptions, e.g. Caradhras
+# (mark the exception in comments above dungeon definitions)
+
+# TODO: change the tone of some descriptions (mine, by mikon:) from modern 
+# to high fantasy. Think: Tolkien, both The Hobbit 
+# (less serious but still not modern) and LOTR (mostly deadly serious, 
+# very elegant, archaic, biblical at places).
+# Also make them correct English and more subtle wrt. psychology and plot.
+# Current text is mostly flavour, plot ideas and justification for
+# purely game-play decisions, chaotically collected from The Hobbit and the net
+
+
 # The non-existent dungeon.
 # The non-campaign start is the second to last dungeon.
 
@@ -88,7 +102,7 @@ D: the larger wilderness locations.
 
 N:2:Rivendell
 X:3:13:52:64
-L:3:0:420:155:0:0:the stronghold of
+L:0:0:420:155:0:0:the stronghold of
 S:267:9:10:11:519:13:268:513
 D:This is the Last Homely House on the Edge of the Wild,
 D: full of laughter and singing.
@@ -137,7 +151,7 @@ D: a captivating music.
 
 N:6:Lake-town
 X:5:7:48:0
-L:5:0:155:152:0:0
+L:0:0:155:152:0:0
 S:8:9:10:11:12:13:14:508
 Z:8:7
 D:The dwellers of Esgaroth on the Long Lake are a hardy people,
@@ -181,11 +195,13 @@ D:  What is left of the songs of treasures and splendour you set out with?
 
 N:9:the Dale
 X:5:7:48:0
-L:5:0:530:153:0:0:the marketplace of
+L:0:0:530:153:0:0:the marketplace of
 S:509:516:517:11:12:13:506:508
 D:The people of burnt Lake-town have elected to rebuild the nearby ancient Dale
 D: as their new abode.  Visit the statue to collect a reward from the
 D: grateful townsfolk.
+
+# Guardian purposefully more powerful than 6
 
 N:10:Maggot's farm
 X:1:0:0:0
@@ -262,8 +278,8 @@ N:15:east Moria entrance
 X:63:0:0:0
 Z:17:42
 Q:14:262
-L:12:411:607:49:0:0:Kheled-Zaram at the
-L:13:56:0:0:0:0
+L:13:411:607:49:0:0:Kheled-Zaram at the
+L:14:56:0:0:0:0
 L:24:56:0:0:262:0
 D:The old dwarven doors to Moria are broken open and only foul air and darkness welcome those who come inside.  Broken stairs and archways make the way difficult but, coming into Moria from east, from the Wild, you expect deadlier perils soon.
 
@@ -311,7 +327,6 @@ D:The enchanted woods which only true heroes can enter.
 D:  Galadriel awaits you with gifts at her mirror.
 
 # No guardian at the bottom, TODO: find an exciting reason to explore
-# FIXME: if no guardian place downstairs at the bottom level
 
 N:19:Parth Galen
 X:24:18:0:0
@@ -354,13 +369,16 @@ D:The slumbering city of Edoras.  King Theoden has gathered
 D: many warriors around him, but seeks less than wise council...
 
 # Goes upwards
+# TODO: there is not enough ecologies in wilderness (1 only?)
+# to make it interesting, in particular no men and no trolls
 
 N:22:Hornburg
 X:29:0:0:0
 Q:62:249
+G:t
 R:ESCORT
-L:21:420:56:155:249:49:the Siege of
-L:22:420:56:155:249:49
+L:22:420:56:155:249:49:the Siege of
+L:23:420:56:155:249:49
 L:50:420:56:155:249:49
 D:Saruman's orcs have laid siege to the fortress of Hornburg.  You stand with
 D: your allies to relieve the siege --- fight your way through the narrow ravine of Helm's Deep
@@ -426,8 +444,8 @@ X:40:25:30:0
 G:t
 R:MAGE
 Q:31:1085
-L:5:0:410:56:0:46
-L:6:56:0:0:0:46
+L:0:0:410:56:0:46
+L:1:56:0:0:0:46
 L:55:56:0:0:1085:46
 S:505:516:517:503:519:518:509:508
 
@@ -510,14 +528,14 @@ Q:62:249
 Z:62:62
 G:o
 R:PLANT
-L:21:420:420:420:1313:0
+L:27:420:420:420:1313:0
 D:Fangorn is aflame: Saruman's orcs have taken axe and fire to the trees
 D: and the haunted moans of the ancient wood fill the air.  Some say the
 D: trees have begun to march in response --- but you can only see dark smoke
-D: and, east, the even darker shape amongst the darkness: Dol Guldur.
+D: and, to the east, the even darker shape amongst the darkness: Dol Guldur.
 D:  Now it is clear that the lust for power corrupted Saruman beyond help.
 
-# TODO: split them: 5--17 initially, weak guardian at the bottom
+# TODO: perhaps split them: 5--17 initially, weak guardian at the bottom
 # after Dol Guldur: 11--23 (Barrow-downs stirred by Dark Captain)
 # weak guardian at the surface, current big guardian at the bottom
 
@@ -537,6 +555,8 @@ L:6:56:0:0:345:0:the Troll Cave in
 # The only (one-time) free pass to the other side of the Misty Mountains,
 # but to avoid visiting dungeons you have to stir evil at Dol Guldur
 # Goes upwards
+# shallow (but very high) tower to enable revenge to players
+# nearly killed and chased off embarasingly at Weathertop
 # TODO: recycle 1365
 
 N:40:Isengard
@@ -544,12 +564,14 @@ X:20:21:64:0
 R:MAGE
 G:B
 Z:23:37
-L:6:420:141:141:0:31
-L:7:50:0:0:0:31
+L:3:420:141:141:0:31
+L:4:50:0:0:0:31
 L:35:56:0:0:1365:31
 D:The tower of Isengard is home to the wise councillor Saruman
 D: the White, head of the order of Istari.  However, you are not
 D: yet a member...
+
+# Guardian purposefully more powerful than 50 (verify!)
 
 N:41:Caradhras
 X:14:2:0:0
@@ -561,11 +583,15 @@ L:21:56:144:145:473:0:a vanishing path below
 L:22:56:144:145:0:0:the snowy slopes of
 L:50:56:144:145:1272:0:the peak of
 D:Legend has it that this mighty mountain is Morgoth's minion.
-D:  In good weather you'd laugh at it, easily traversing the nearby pass.
-D:  Now, however, the storms of the mountain echo around and you can't even
-D: tell the pass from the mountain slopes.  Even if you manage to
-D: fight your way through, you have no idea where you'll end.
+D:  In good weather you'd laugh at the childlish tales,
+D: confidently traversing the nearby pass.
+D:  Now, however, the storms of the mountain echo around you and
+D: the location of the pass can only be guessed.  Even if you manage to
+D: fight your way across the treacherous precipices filled with snow,
+D: nobody knows where you'll end.
 D:  Turn back, while you can!
+
+# This is evidently the dwarven version of the story. ;)
 
 N:42:vaults of Erebor
 X:9:0:0:0
@@ -573,9 +599,9 @@ L:21:0:56:1:0:0:the
 S:897:898:899:900:901:902:0:0
 D:The innermost vaults of the dwarven city of Erebor,
 D: ripped open by the casting down of the mountainside
-D: by Thorin, crushing many thousands of orcs and turning
-D: the tide of the Battle of Five Armies.  Treasures
-D: spill from the vaults long hidden inside; while the dwarves
+D: by Thorin Oakenshield, which crushed many orcs and wargs and let the dwarves
+D: issue forth and turn the tide of the Battle of Five Armies.
+D:  Treasures spill from the vaults long hidden inside.  While the dwarves
 D: rebuild their kingdom using the wealth, your share is here for taking.
 
 # Alternate to bypass Moria etc. and reach Angband...
@@ -589,7 +615,7 @@ L:80:56:0:0:535:0:the
 L:81:56:0:0:0:0:the
 
 # Sunken/outer plane dungeons
-# TODO: add guardian
+# TODO: add guardian or remove
 
 N:44:Numenor
 X:2:0:0:0
@@ -599,17 +625,17 @@ L:21:403:400:49:0:0:the sunken city of
 L:22:399:56:0:0:0
 L:60:399:56:0:0:0
 
-# TODO: add guardian
+# TODO: add guardian or remove
 
 N:45:Elemental Evil
 X:2:0:0:0
 G:E
 R:PRIEST
-L:21:425:141:141:0:0:the temple of
-L:22:56:0:0:0:0:depths of the temple of
-L:60:56:0:0:0:0:bottom of the temple of
+L:21:425:141:141:0:0:the Temple of
+L:22:56:0:0:0:0:depths of the Temple of
+L:60:56:0:0:0:0:bottom of the Temple of
 
-# TODO: add guardian
+# TODO: add guardian or remove
 
 N:46:Crystal Castle
 X:2:0:0:0
@@ -619,13 +645,15 @@ L:21:56:144:145:0:0:the
 L:22:148:145:0:0:0:the
 L:60:148:145:0:0:0:the
 
+# TODO: make Bolg more powerful or Smaug less or both
+
 N:47:Five Armies
 X:9:0:0:0
 G:C
 R:ESCORT
 Q:42:235
 Z:42:42
-L:20:414:56:153:235:0:the Battle of
+L:30:414:56:153:235:0:the Battle of
 D:Five great armies have gathered at the promise of Smaug's riches hidden
 D: in the Lonely Mountain.
 
@@ -677,11 +705,13 @@ Q:63:140
 L:7:544:56:148:140:0:the
 L:8:56:145:0:0:0:Orc Camp across
 L:37:56:145:0:297:0:Ogre Camp beneath
-D:Legend has it that Caradhras, called also the Redhorn, is Morgoth's minion.
+D:Legend has it that Mount Redhorn,
+D: called also Caradhras, is Morgoth's minion.
 D:  If so, it appears asleep at the moment:
-D: nonetheless the Redhorn Pass is treacherous in
-D: summer and deadly in winter.  Orcs have overrun the passage
-D: at the moment, and to pass, you must defeat their leader.
+D: the Redhorn Pass, torturous and treacherous in winter,
+D: is clearly visible and calm.
+D:  However, you notice orcs have overrun the track
+D: and they won't let you pass while their leader stands.
 
 N:53:Buckland
 X:54:0:0:0
@@ -740,7 +770,11 @@ D: Brandywine to Buckland, it may be a while before you return to
 D: Hobbiton, and in some ways you can never come back.  The East
 D: Road from Hobbiton looks a fairer route, and safer too.
 
-# Break Moria up into several sections to be more like what I originally intended. The door to Moria can only by found with a map. This is the western door, actually; not that it matters. If we find the map before the west gate is closed, we assume the map actually helps in getting to N:60, as opposed to the normal N:14 dungeon one gets without the map. So, avoid mention of the door cracking open in the description...
+# The door to Moria can only by found with a map. 
+# This is the western door, actually; not that it matters. 
+# If we find the map before the west gate is closed, we assume the map actually helps in getting to N:60, as opposed to the normal N:14 dungeon one gets without the map. So, avoid mention of the door cracking open in the description below...
+# TODO: make the features a little more interesting: the 1:56 do not seem
+# to do anything, just flat empty space
 
 N:59:the door to Moria
 X:14:60:0:0
@@ -800,7 +834,7 @@ N:64:Dunland
 X:2:14:40:0
 Z:65:48
 G:t
-L:12:419:149:422:0:0
+L:9:419:149:422:0:0
 
 # deep dungeon with evil humans after Isengard darkens; blocks way to Isengard
 # bottom guardian TODO (a man)
@@ -809,20 +843,21 @@ N:65:Dunland in war rage
 X:2:14:0:0
 G:t
 Q:40:407
-L:12:419:149:422:0:0
-L:28:414:141:140:407:0
-D:Dunland is brewing for war rallied by dark emissaries that so far laboured in secret.
-D:  Whence they came? It does not matter to the men of Dunland, so long craving for revenge.
+L:22:419:149:422:0:0
+L:45:414:141:140:407:0
+D:Dunland is brewing for war, rallied by dark emissaries, who so far laboured in secret.
+D:  Whence they came?  It does not matter to the men of Dunland, long years waiting for a chance at revenge.
 
 # the emptiness is represented by the dungeon being shallower and by some water
+# This description is good that short, isn't it?
 # Goes upwards
 
 N:66:emptied Isengard
 X:37:64:0:0
 Q:28:532
-L:21:420:397:141:514:31
-L:22:56:0:0:0:31
-L:35:56:0:0:532:31
+L:31:420:397:141:514:31
+L:32:56:0:0:0:31
+L:45:56:0:0:532:31
 D:Almost all of the Saruman's army went for Hornburg.  What are the tidings?
 
 #N:67 unused
