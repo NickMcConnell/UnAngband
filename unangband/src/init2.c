@@ -1129,6 +1129,11 @@ static errr init_c_info(void)
 	/* Save a pointer to the parsing function */
 	c_head.parse_info_txt = parse_c_info;
 
+#ifdef ALLOW_TEMPLATES_OUTPUT
+
+	/* Save a pointer to the evaluate power function*/
+	c_head.emit_info_txt_index = emit_c_info_index;
+#endif /* ALLOW_TEMPLATES_OUTPUT */
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("p_class", &c_head);
@@ -1182,6 +1187,12 @@ static errr init_s_info(void)
 
 	/* Save a pointer to the parsing function */
 	s_head.parse_info_txt = parse_s_info;
+
+#ifdef ALLOW_TEMPLATES_OUTPUT
+
+	/* Save a pointer to the evaluate power function*/
+	s_head.emit_info_txt_index = emit_s_info_index;
+#endif /* ALLOW_TEMPLATES_OUTPUT */
 
 #endif /* ALLOW_TEMPLATES */
 

@@ -5220,7 +5220,7 @@ errr parse_s_info(char *buf, header *head)
 		for (i = 0; i < MAX_SPELL_CASTERS; i++) if (!s_ptr->cast[i].class) break;
 
 		/* Check bounds */
-		if (i==MAX_SPELL_APPEARS) return (PARSE_ERROR_GENERIC);
+		if (i==MAX_SPELL_CASTERS) return (PARSE_ERROR_GENERIC);
 
 		/* Scan for the values */
 		if (5 != sscanf(buf+2, "%d:%d:%d:%d:%d",
@@ -8979,7 +8979,7 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 	emit_desc(fp, "D:", head->text_ptr + pr_ptr->text);
 
 	/* Start stats output */
-	fprintf(fp, "A");
+	fprintf(fp, "S");
 	
 	/* Output stats */
 	for (n = 0; n < A_MAX; n++)
@@ -9014,7 +9014,7 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 	emit_flags_32(fp, "F:", pr_ptr->flags4, k_info_flags4);
 
 	/* Start object slots output */
-	fprintf(fp, "A");
+	fprintf(fp, "O");
 	
 	/* Output stats */
 	for (n = 0; n < END_EQUIPMENT - INVEN_WIELD + 1; n++)
@@ -9031,7 +9031,7 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 	/* Output class choices */
 	for (n = 0; n < 32; n++)
 	{
-		if (introduced) fprintf(fp, " | ", n);
+		if (introduced) fprintf(fp, " | ");
 		if (pr_ptr->choice & (1 << n)) fprintf(fp, "%d", n);
 		introduced = TRUE;
 	}
@@ -9043,6 +9043,189 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 	return (0);	
 }
 
+
+
+/*
+ * Emit the "c_info" array into an ascii "template" file
+ */
+errr emit_c_info_index(FILE *fp, header *head, int i)
+{
+	int n;
+
+	/* Current entry */
+	player_class *pc_ptr = (player_class*)head->info_ptr + i;
+	
+	/* Output 'N' for "New/Number/Name" */
+	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + pc_ptr->name);
+
+	/* Start stats output */
+	fprintf(fp, "S");
+	
+	/* Output stats */
+	for (n = 0; n < A_MAX; n++)
+	{
+		fprintf(fp, ":%d", pc_ptr->c_adj[n]);
+	}
+	
+	/* Finish stats output */
+	fprintf(fp, "\n");
+	
+	/* Output 'C' for "Class Skills" (one line only) */
+	fprintf(fp, "C:%d:%d:%d:%d:%d:%d:%d:%d:%d\n",
+		    pc_ptr->c_dis, pc_ptr->c_dev, pc_ptr->c_sav, pc_ptr->c_stl,
+		    pc_ptr->c_srh, pc_ptr->c_dig, pc_ptr->c_tht, pc_ptr->c_thn, pc_ptr->c_thb);
+
+	/* Output 'X' for "eXtra Skills" (one line only) */
+	fprintf(fp, "X:%d:%d:%d:%d:%d:%d:%d:%d:%d\n",
+		    pc_ptr->x_dis, pc_ptr->x_dev, pc_ptr->x_sav, pc_ptr->x_stl,
+		    pc_ptr->x_srh, pc_ptr->x_dig, pc_ptr->x_tht, pc_ptr->x_thn, pc_ptr->x_thb);
+	
+	/* Output 'I' for "Info" (one line only) */
+	fprintf(fp, "I:%d:%ld:%d:%d:%d", pc_ptr->c_exp, pc_ptr->sense_base, pc_ptr->sense_div, pc_ptr->sense_type, pc_ptr->sense_squared);
+
+	/* Output 'A' for "Attack Info" (one line only) */
+	fprintf(fp, "A:%d:%d:%d:%d\n", pc_ptr->max_attacks, pc_ptr->min_weight, pc_ptr->att_multiply, pc_ptr->chg_weight);
+
+	/* Output 'M' for "Magic Info" (one line only) */
+	fprintf(fp, "M:%d:%d:%d:%d:%d:%d:%d\n",
+		pc_ptr->spell_book, pc_ptr->spell_stat_study, pc_ptr->spell_stat_mana, pc_ptr->spell_stat_fail,
+		pc_ptr->spell_first, pc_ptr->spell_weight, pc_ptr->spell_power);
+
+	/* Output titles */
+	for (n = 0; n < PY_MAX_LEVEL / 5; n++)
+	{
+		fprintf(fp, "T:%s\n", head->text_ptr + pc_ptr->title[n]);
+	}
+	
+	/* Output starting equipment */
+	for (n = 0; n < MAX_CLASS_ITEMS; n++)
+	{
+		if (!pc_ptr->start_items[n].tval) continue;
+		
+		fprintf(fp, "E:%d:%d:%d:%d:%d:%d:%d:%d\n",
+			    pc_ptr->start_items[n].tval, pc_ptr->start_items[n].sval,
+			    pc_ptr->start_items[n].number_min, pc_ptr->start_items[n].number_max,
+			    pc_ptr->start_items[n].charge_min, pc_ptr->start_items[n].charge_max,
+			    pc_ptr->start_items[n].social_min, pc_ptr->start_items[n].social_max);
+	}
+
+	fprintf(fp,"\n");
+	
+	/* Success */
+	return (0);
+}
+
+
+/*
+ * Emit the "s_info" array into an ascii "template" file
+ */
+errr emit_s_info_index(FILE *fp, header *head, int i)
+{
+	int n, l;
+	bool mage_spell = FALSE;
+	bool priest_spell = FALSE;
+
+	/* Current entry */
+	spell_type *s_ptr = (spell_type*)head->info_ptr + i;
+	
+	/* Output 'N' for "New/Number/Name" */
+	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + s_ptr->name);
+
+	/* Output appears in */
+	for (n = 0; n < MAX_SPELL_APPEARS; n++)
+	{
+		if (!s_ptr->appears[n].tval) continue;
+
+		fprintf(fp, "A:%d:%d:%d\n", s_ptr->appears[n].tval, s_ptr->appears[n].sval,
+				s_ptr->appears[n].slot);
+	}
+
+	/* Reorder spells in class order */
+	for (l = 0; l < z_info->c_max; l++)
+	{
+		bool class_spell, note_spell;
+		
+		class_spell = FALSE;
+		note_spell = FALSE;
+		
+		/* Output casters */
+		for (n = 0; n < MAX_SPELL_CASTERS; n++)
+		{
+			if (!s_ptr->cast[n].class) continue;
+			
+			if (s_ptr->cast[n].class != l) continue;
+	
+			fprintf(fp, "C:%d:%d:%d:%d:%d\n",
+					s_ptr->cast[n].class,s_ptr->cast[n].level,s_ptr->cast[n].mana,s_ptr->cast[n].fail,s_ptr->cast[n].min);
+			
+			class_spell = TRUE;
+			
+			if (s_ptr->cast[n].class == 1) mage_spell = TRUE;
+			if (s_ptr->cast[n].class == 2) priest_spell = TRUE;
+		}
+		
+		/* Hack -- note when sub-classes cannot cast spell */
+		if (!class_spell)
+		{
+			switch (l)
+			{
+				case 3: case 4: case 10: note_spell = mage_spell; break;
+				case 5: note_spell = priest_spell; break;
+				case 8: case 9: case 11: note_spell = (s_ptr->cast[0].class != 0); break;
+			}
+			
+			if (note_spell)
+			{
+				fprintf(fp, "#$# %s cannot cast this spell.\n", c_name + c_info[l].name);
+			}
+		}
+	}
+	
+	/* Output 'P' for "Pre-requisites" (one line only) */
+	fprintf(fp,"P:%d:%d\n",s_ptr->preq[0], s_ptr->preq[1]);
+
+	/* Output blows */
+	for (n = 0; n < 4; n++)
+	{
+		if (!s_ptr->blow[n].method) continue;
+
+		fprintf(fp, "B:%s", r_info_blow_method[s_ptr->blow[n].method]);
+		
+		if (s_ptr->blow[n].effect)
+		{
+			fprintf(fp, ":%s:%dd%d+%d", r_info_blow_effect[s_ptr->blow[n].effect],
+					s_ptr->blow[n].d_dice, s_ptr->blow[n].d_side, s_ptr->blow[n].d_plus);
+		}
+		
+		fprintf(fp, "\n");
+	}
+
+	/* Output 'F' for "Flags" */
+	emit_flags_32(fp, "F:", s_ptr->flags1, s_info_flags1);
+	emit_flags_32(fp, "F:", s_ptr->flags2, s_info_flags2);
+	emit_flags_32(fp, "F:", s_ptr->flags3, s_info_flags3);
+
+	/* Output 'S' for 'Spell types' */
+	if (s_ptr->type)
+	{
+		fprintf(fp, "S:%s:%d\n", s_info_types[s_ptr->type], s_ptr->param);
+	}
+	
+	/* Output 'L' for lasts */
+	if (s_ptr->l_dice || s_ptr->l_side || s_ptr->l_plus)
+	{
+		fprintf(fp, "L:%dd%d+%d\n", 
+				s_ptr->l_dice, s_ptr->l_side, s_ptr->l_plus);
+	}
+	
+	/* Output 'D' for "Description" */
+	emit_desc(fp, "D:", head->text_ptr + s_ptr->text);
+
+	fprintf(fp,"\n");
+
+	/* Success */
+	return (0);	
+}
 
 
 
