@@ -64,7 +64,7 @@ V:0.6.2
 
 
 # TODO: play-test if the guardians are similarly powerful as uniques
-# of the level they appear in, with few exceptions, e.g. Caradhras
+# of the level they appear in, with few exceptions, e.g. Caradhras, Maggot
 # (mark the exception in comments above dungeon definitions)
 
 # TODO: change the tone of some descriptions (mine, by mikon:) from modern 
@@ -74,6 +74,8 @@ V:0.6.2
 # Also make them correct English and more subtle wrt. psychology and plot.
 # Current text is mostly flavour, plot ideas and justification for
 # purely game-play decisions, chaotically collected from The Hobbit and the net
+
+# TODO: finish level names and fit level design to level names
 
 
 # The non-existent dungeon.
@@ -287,7 +289,7 @@ D:The old dwarven doors to Moria are broken open and only foul air and darkness 
 
 # This dungeon is very short --- it does
 # not open the gates, so no point in misleading the player.
-# Smeagol recycled from Misty Mountans
+# Smeagol recycled from Misty Mountains
 
 N:16:west gates of Moria
 X:52:64:0:0
@@ -556,7 +558,7 @@ L:6:56:0:0:345:0:the Troll Cave in
 # but to avoid visiting dungeons you have to stir evil at Dol Guldur
 # Goes upwards
 # shallow (but very high) tower to enable revenge to players
-# nearly killed and chased off embarasingly at Weathertop
+# nearly killed and chased off embarrassingly at Weathertop
 # TODO: recycle 1365
 
 N:40:Isengard
@@ -583,7 +585,7 @@ L:21:56:144:145:473:0:a vanishing path below
 L:22:56:144:145:0:0:the snowy slopes of
 L:50:56:144:145:1272:0:the peak of
 D:Legend has it that this mighty mountain is Morgoth's minion.
-D:  In good weather you'd laugh at the childlish tales,
+D:  In good weather you'd laugh at the childish tales,
 D: confidently traversing the nearby pass.
 D:  Now, however, the storms of the mountain echo around you and
 D: the location of the pass can only be guessed.  Even if you manage to
@@ -645,7 +647,7 @@ L:21:56:144:145:0:0:the
 L:22:148:145:0:0:0:the
 L:60:148:145:0:0:0:the
 
-# TODO: make Bolg more powerful or Smaug less or both
+# TODO: make Bolg more powerful, I guess, he's fought after Smaug
 
 N:47:Five Armies
 X:9:0:0:0
@@ -815,7 +817,7 @@ D: of their ancient boughs.  Perhaps a closer look will help you
 D: understand if they have come to a decision...
 
 # canines dungeon, shops closed until Great Grey Wolf killed
-# Goblin King recycled from Misty Mountans
+# Goblin King recycled from Misty Mountains
 
 N:63:Woodmen Village
 X:5:15:52:0
