@@ -2041,76 +2041,88 @@ bool set_food(int v)
 	/* Hack -- Force good values */
 	v = (v > 20000) ? 20000 : (v < 0) ? 0 : v;
 
-	/* Fainting / Starving */
-	if (p_ptr->food < PY_FOOD_FAINT)
+	/* Starving */
+	if (p_ptr->food < PY_FOOD_STARVE)
 	{
 		old_aux = 0;
+	}
+
+	/* Fainting */
+	else if (p_ptr->food < PY_FOOD_FAINT)
+	{
+		old_aux = 1;
 	}
 
 	/* Weak */
 	else if (p_ptr->food < PY_FOOD_WEAK)
 	{
-		old_aux = 1;
+		old_aux = 2;
 	}
 
 	/* Hungry */
 	else if (p_ptr->food < PY_FOOD_ALERT)
 	{
-		old_aux = 2;
+		old_aux = 3;
 	}
 
 	/* Normal */
 	else if (p_ptr->food < PY_FOOD_FULL)
 	{
-		old_aux = 3;
+		old_aux = 4;
 	}
 
 	/* Full */
 	else if (p_ptr->food < PY_FOOD_MAX)
 	{
-		old_aux = 4;
+		old_aux = 5;
 	}
 
 	/* Gorged */
 	else
 	{
-		old_aux = 5;
+		old_aux = 6;
 	}
 
-	/* Fainting / Starving */
-	if (v < PY_FOOD_FAINT)
+	/* Starving */
+	if (v < PY_FOOD_STARVE)
 	{
 		new_aux = 0;
+	}
+
+	/* Fainting */
+	else if (v < PY_FOOD_FAINT)
+	{
+		new_aux = 1;
 	}
 
 	/* Weak */
 	else if (v < PY_FOOD_WEAK)
 	{
-		new_aux = 1;
+		new_aux = 2;
 	}
 
 	/* Hungry */
 	else if (v < PY_FOOD_ALERT)
 	{
-		new_aux = 2;
+		new_aux = 3;
 	}
 
 	/* Normal */
 	else if (v < PY_FOOD_FULL)
 	{
-		new_aux = 3;
+		new_aux = 4;
 	}
 
 	/* Full */
 	else if (v < PY_FOOD_MAX)
 	{
-		new_aux = 4;
+		new_aux = 5;
 	}
 
 	/* Gorged */
 	else
 	{
-		new_aux = 5;
+		new_aux = 6;
 	}
 
 	/* Food increase */
@@ -2121,34 +2133,35 @@ bool set_food(int v)
 		{
 			/* Weak */
 			case 1:
+			case 2:
 			{
 				msg_print("You are still weak.");
 				break;
 			}
 
 			/* Hungry */
-			case 2:
+			case 3:
 			{
 				msg_print("You are still hungry.");
 				break;
 			}
 
 			/* Normal */
-			case 3:
+			case 4:
 			{
 				msg_print("You are no longer hungry.");
 				break;
 			}
 
 			/* Full */
-			case 4:
+			case 5:
 			{
 				msg_print("You are full!");
 				break;
 			}
 
 			/* Bloated */
-			case 5:
+			case 6:
 			{
 				msg_print("You have gorged yourself!");
 				break;
@@ -2160,41 +2173,48 @@ bool set_food(int v)
 	}
 
 	/* Food decrease */
-	else if (new_aux < old_aux)
+	else if (!new_aux || new_aux < old_aux)
 	{
 		/* Describe the state */
 		switch (new_aux)
 		{
-			/* Fainting / Starving */
+		        /* A step from hunger death */
 			case 0:
+			{
+				msg_print("You are dying from hunger!");
+				break;
+			}
+
+			/* Fainting / Starving */
+			case 1:
 			{
 				msg_print("You are getting faint from hunger!");
 				break;
 			}
 
 			/* Weak */
-			case 1:
+			case 2:
 			{
 				msg_print("You are getting weak from hunger!");
 				break;
 			}
 
 			/* Hungry */
-			case 2:
+			case 3:
 			{
 				msg_print("You are getting hungry.");
 				break;
 			}
 
 			/* Normal */
-			case 3:
+			case 4:
 			{
 				msg_print("You are no longer full.");
 				break;
 			}
 
 			/* Full */
-			case 4:
+			case 5:
 			{
 				msg_print("You are no longer gorged.");
 				break;
