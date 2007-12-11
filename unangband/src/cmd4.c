@@ -599,12 +599,12 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 			const char *pnote1 = (!o_funcs.note || !o_funcs.note(oid)) ? "" : 
 								", '{', '}', 'k', 'g', ...";
 
-			const char *pvs = (!o_funcs.xattr) ? "" : ", 'v' for visuals";
+			const char *pvs = (!o_funcs.xattr) ? ", " : ", 'v' for visuals, ";
 
 			if(visual_list)
-				prt(format("<dir>, 'r' to recall, ENTER to accept%s, ESC", pedit), hgt-1, 0);
+				prt(format("<dir>, 'r' to recall, ENTER to accept%s, ESC to exit", pedit), hgt-1, 0);
 			else 
-				prt(format("<dir>, 'r' to recall%s ESC%s%s%s",
+				prt(format("<dir>, 'r' to recall%sESC%s%s%s",
 											pvs, pedit, pnote, pnote1), hgt-1, 0);
 		}
 
@@ -1880,7 +1880,7 @@ static void describe_surface_dungeon(int dun)
   else if (t_info[dun].visited)
     text_out_c(TERM_WHITE, t_info[dun].text + t_text);
   else
-    text_out_c(TERM_SLATE, "  You've heard about this place and you can already spot it far away ahead.");
+    text_out_c(TERM_SLATE, "You've heard about this place and you can already spot it far away ahead.");
 
   /* routes from descibed dungeon to current dungeon */
   num = count_routes(dun, myd);

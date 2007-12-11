@@ -588,7 +588,7 @@ static void do_cmd_travel(void)
 			num = set_routes(routes, 24, p_ptr->dungeon);
 
 			/* Build a prompt (accept all spells) */
-			strnfmt(out_val, 78, "(Travel %c-%c, 'r' to recall, *=List, ESC=exit) Travel where? ",
+			strnfmt(out_val, 78, "(Travel %c-%c, L=locations, M=map, ESC=exit) Travel where? ",
 			I2A(0), I2A(num - 1) );
 
 			/* Nothing chosen yet */
@@ -656,7 +656,7 @@ static void do_cmd_travel(void)
 				}
 
 				/* Request recall */
-				if (ke.key == 'r')
+				if (ke.key == 'L')
 				{
 				  if (redraw) {
 				    do_knowledge_dungeons();
@@ -677,6 +677,43 @@ static void do_cmd_travel(void)
 				    screen_save();
 
 				    do_knowledge_dungeons();
+
+				    /* Load screen */
+				    screen_load();
+
+				    /* Save screen */
+				    screen_save();
+
+				    /* Display a list of spells */
+				    print_routes(routes, num, 1, 22);
+				  }
+
+				  /* Ask again */
+				  continue;
+				}
+
+				/* Request map */
+				if (ke.key == 'M')
+				{
+				  if (redraw) {
+				    (void)show_file("memap.txt", NULL, 0, 0);
+
+				    /* Load screen */
+				    screen_load();
+
+				    /* Save screen */
+				    screen_save();
+
+				    /* Display a list of spells */
+				    print_routes(routes, num, 1, 22);
+				  }
+				  else {
+				    redraw = TRUE;
+				    
+				    /* Save screen */
+				    screen_save();
+
+				    (void)show_file("memap.txt", NULL, 0, 0);
 
 				    /* Load screen */
 				    screen_load();
