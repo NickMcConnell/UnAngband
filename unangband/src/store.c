@@ -1574,14 +1574,18 @@ static void display_store(int store_index)
 		cptr store_name = (u_name + u_info[st_ptr->index].name);
 		cptr owner_name = &(b_name[ot_ptr->owner_name]);
 		cptr race_name = p_name + p_info[ot_ptr->owner_race].name;
+		int pos_store = 77 - strlen(store_name) - 8;
+		int pos_owner = 10;
 
 		/* Put the owner name and race */
 		sprintf(buf, "%s (%s)", owner_name, race_name);
-		put_str(buf, 3, 10);
+		if (pos_owner + strlen(buf) + 2 > pos_store)
+		  pos_owner = 1;
+		put_str(buf, 3, pos_owner);
 
 		/* Show the max price in the store (above prices) */
 		sprintf(buf, "%s (%ld)", store_name, (long)(ot_ptr->max_cost));
-		prt(buf, 3, 50);
+		prt(buf, 3, pos_store);
 
 		/* Label the object descriptions */
 		put_str("Item Description", 5, 3);

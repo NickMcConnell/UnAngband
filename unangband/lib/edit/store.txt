@@ -197,7 +197,7 @@ O:90:35:1
 N:7:Black Market
 X:9
 
-N:8:Your home
+N:8:your home
 X:0
 
 N:9:Farmer Maggot's Mushroom Store
