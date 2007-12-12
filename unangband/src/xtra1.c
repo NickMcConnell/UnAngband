@@ -164,7 +164,10 @@ static void prt_stat(int stat)
 	  else
 	    if (p_ptr->stat_inc_tim[stat])
 	      {
-		c_put_str(TERM_L_BLUE, stat_names[stat], 
+		char stat_name[4];
+		sprintf(stat_name, "%.3s", stat_names[stat]);
+
+		c_put_str(TERM_L_BLUE, stat_name, 
 			  ROW_STAT, COL_STAT + 3 * stat);
 	      }
 	    else
@@ -1509,22 +1512,8 @@ static void prt_frame_basic(void)
  */
 static void prt_frame_extra(void)
 {
-	/* Cut/Stun */
-	prt_cut();
-	prt_stun();
-
-	/* Food */
-	prt_hunger();
-
-	/* Various */
-	prt_blind();
-	prt_confused();
-	prt_afraid();
-	prt_poisoned();
-	prt_disease();
-	prt_cursed();
-	prt_amnesia();
-	prt_petrify();
+	/* Study spells */
+	prt_study();
 
 	/* Speed */
 	prt_speed();
@@ -1532,8 +1521,45 @@ static void prt_frame_extra(void)
 	/* State */
 	prt_state();
 
-	/* Study spells */
-	prt_study();
+	/* Food */
+	prt_hunger();
+
+	/* Disease */
+	prt_disease();
+
+	/* Cursed */
+	prt_cursed();
+
+	/* To here level name does not reach, with no show_sidebar */
+
+	/* Cut/Stun */
+	prt_cut();
+	prt_stun();
+
+	/* Various */
+	prt_blind();
+	prt_confused();
+	prt_afraid();
+	prt_poisoned();
+	prt_amnesia();
+	prt_petrify();
+
+        /* Level name displayed */
+	/* FIXME: if (no stun && no blind, etc.) display this */
+	if (!show_sidebar && adult_campaign) {
+	  int length;
+	  int wid, h;
+	  char str[46];
+	  
+	  current_long_level_name(str);
+		  
+	  length = strlen(str) + 1;
+
+	  /* Obtain the size */
+	  (void)Term_get_size(&wid, &h);
+
+	  Term_putstr(wid - length, SECOND_FROM_BOTTOM, -1, TERM_L_UMBER, str);
+	}
 }
 
 

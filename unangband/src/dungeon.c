@@ -3279,7 +3279,6 @@ static void dungeon(void)
 	/* Refresh */
 	Term_fresh();
 
-
 	/* Handle delayed death */
 	if (p_ptr->is_dead) return;
 
@@ -3371,23 +3370,6 @@ static void dungeon(void)
 
 		/* Hack -- Hilite the player */
 		move_cursor_relative(p_ptr->py, p_ptr->px);
-
-		/* Hack: I cannot trace when the messages line is cleared, so I redraw the display dungeon and level name every turn instead */
-		/* FIXME: this overwrites some messages, e.g. refuelling */
-		if (adult_campaign) {
-		  int length;
-		  int wid, h;
-		  char str[46];
-	
-		  current_long_level_name(str);
-
-		  length = strlen(str) + 1;
-
-		  /* Obtain the size */
-		  (void)Term_get_size(&wid, &h);
-
-		  Term_putstr(wid - length, 0, -1, TERM_L_DARK, str);
-		}
 
 		/* Optional fresh */
 		if (fresh_after) Term_fresh();

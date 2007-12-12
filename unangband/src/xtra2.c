@@ -2181,8 +2181,17 @@ bool set_food(int v)
 		        /* A step from hunger death */
 			case 0:
 			{
-				msg_print("You are dying from hunger!");
-				break;
+			  /* Disturb */
+			  disturb(1, 1);
+
+			  /* Hack -- bell on first notice */
+			  if (new_aux < old_aux)
+			    bell("You are dying from hunger!");
+
+			  /* Message */
+			  msg_print("You are dying from hunger!");
+			  msg_print(NULL);
+			  break;
 			}
 
 			/* Fainting / Starving */
