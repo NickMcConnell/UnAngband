@@ -226,12 +226,12 @@ static void prt_level(void)
 
 	if (p_ptr->lev >= p_ptr->max_lev)
 	{
-		put_str((show_sidebar ? "LEVEL " : "LVL "), ROW_LEVEL, COL_LEVEL);
+		put_str((show_sidebar ? "LEVEL " : " CL "), ROW_LEVEL, COL_LEVEL);
 		c_put_str(TERM_L_GREEN, tmp, ROW_LEVEL, COL_LEVEL + (show_sidebar ? 6 : 4));
 	}
 	else
 	{
-		put_str((show_sidebar ? "Level " : "Lvl "), ROW_LEVEL, COL_LEVEL);
+		put_str((show_sidebar ? "Level " : " CL "), ROW_LEVEL, COL_LEVEL);
 		c_put_str(TERM_YELLOW, tmp, ROW_LEVEL, COL_LEVEL + (show_sidebar ? 6 : 4));
 	}
 }
@@ -245,6 +245,7 @@ static void prt_exp(void)
 	char out_val[32];
 	s32b exp_display;
 	byte attr;
+	int max_number;
 
 	/*use different color if player's experience is drained*/
 	if (p_ptr->exp >= p_ptr->max_exp)
@@ -259,26 +260,38 @@ static void prt_exp(void)
 	/*some players want to see how much they need to gain to get to the next level*/
 	if ((toggle_xp) && (p_ptr->lev < PY_MAX_LEVEL))
 	{
-		exp_display = ((player_exp[p_ptr->lev - 1] * p_ptr->expfact / 100L) -
-									p_ptr->exp);
-
+		exp_display = ((player_exp[p_ptr->lev - 1] 
+				* p_ptr->expfact / 100L) -
+			       p_ptr->exp);
 		/*Print experience label*/
 		put_str("NEXT ", ROW_EXP, COL_EXP);
-	}
 
+		max_number = 99999;
+	}
 	else
 	{
-
 		exp_display = p_ptr->exp;
 
 		/*Print experience label*/
 		put_str("EXP ", ROW_EXP, COL_EXP);
+
+		max_number = 999999;
 	}
 
-	sprintf(out_val, "%8ld", exp_display);
+	if (show_sidebar) {
+	  sprintf(out_val, "%8ld", exp_display);
+	}
+	else {
+	  if (exp_display > max_number) {
+	    exp_display = exp_display / 1000;
+	    sprintf(out_val, "%5ldK", exp_display);
+	  }
+	  else {
+	    sprintf(out_val, "%6ld", exp_display);
+	  }
+	}
 
 	c_put_str(attr, out_val, ROW_EXP, COL_EXP + 4);
-
 }
 
 
@@ -301,11 +314,14 @@ static void prt_gold(void)
  */
 static void prt_ac(void)
 {
+  if (show_sidebar) 
+    {
 	char tmp[32];
 
 	put_str((show_sidebar ? "Cur AC " : "AC "), ROW_AC, COL_AC);
 	sprintf(tmp, (show_sidebar ? "%5d" : "%3d"), p_ptr->dis_ac + p_ptr->dis_to_a);
 	c_put_str(TERM_L_GREEN, tmp, ROW_AC, COL_AC + (show_sidebar ? 7 : 3));
+    }
 }
 
 
@@ -319,17 +335,17 @@ static void prt_hp(void)
 	byte color;
 
 
-	put_str((show_sidebar ? "Max HP " : "/"), ROW_MAXHP, COL_MAXHP);
+	put_str((show_sidebar ? "Max HP " : "/    "), ROW_MAXHP, COL_MAXHP);
 
-	sprintf(tmp, (show_sidebar ? "%5d" : "%4d"), p_ptr->mhp);
+	sprintf(tmp, (show_sidebar ? "%5d" : "%d"), p_ptr->mhp);
 	color = TERM_L_GREEN;
 
 	c_put_str(color, tmp, ROW_MAXHP, COL_MAXHP + (show_sidebar ? 7 : 1));
 
 
-	put_str((show_sidebar ? "Cur HP " : "HP:"), ROW_CURHP, COL_CURHP);
+	put_str((show_sidebar ? "Cur HP " : "HP:    "), ROW_CURHP, COL_CURHP);
 
-	sprintf(tmp, (show_sidebar ? "%5d" : "%4d"), p_ptr->chp);
+	sprintf(tmp, (show_sidebar ? "%5d" : "%d"), p_ptr->chp);
 
 	if (p_ptr->chp >= p_ptr->mhp)
 	{
@@ -344,7 +360,7 @@ static void prt_hp(void)
 		color = TERM_RED;
 	}
 
-	c_put_str(color, tmp, ROW_CURHP, COL_CURHP + (show_sidebar ? 7 : 3));
+	c_put_str(color, tmp, ROW_CURHP, COL_CURHP + (show_sidebar ? 7 : 7 - strlen(tmp)));
 }
 
 
@@ -364,17 +380,17 @@ static void prt_sp(void)
 		&& p_ptr->pstyle != WS_SONG_BOOK)
 		return;
 
-	put_str((show_sidebar ? "Max SP " : "/"), ROW_MAXSP, COL_MAXSP);
+	put_str((show_sidebar ? "Max SP " : "/    "), ROW_MAXSP, COL_MAXSP);
 
-	sprintf(tmp, (show_sidebar ? "%5d" : "%4d"), p_ptr->msp);
+	sprintf(tmp, (show_sidebar ? "%5d" : "%d"), p_ptr->msp);
 	color = TERM_L_GREEN;
 
 	c_put_str(color, tmp, ROW_MAXSP, COL_MAXSP + (show_sidebar ? 7 : 1));
 
 
-	put_str((show_sidebar ? "Cur SP " : "SP:"), ROW_CURSP, COL_CURSP);
+	put_str((show_sidebar ? "Cur SP " : "SP:    "), ROW_CURSP, COL_CURSP);
 
-	sprintf(tmp, (show_sidebar ? "%5d" : "%4d"), p_ptr->csp);
+	sprintf(tmp, (show_sidebar ? "%5d" : "%d"), p_ptr->csp);
 
 	if (p_ptr->csp >= p_ptr->msp)
 	{
@@ -394,7 +410,7 @@ static void prt_sp(void)
 	}
 
 	/* Show mana */
-	c_put_str(color, tmp, ROW_CURSP, COL_CURSP + (show_sidebar ? 7 : 3));
+	c_put_str(color, tmp, ROW_CURSP, COL_CURSP + (show_sidebar ? 7 : 7 - strlen(tmp)));
 }
 
 
@@ -403,8 +419,9 @@ static void prt_sp(void)
  */
 static void prt_depth(void)
 {
-	char depths[8];
+  if (!adult_campaign) {
 
+	char depths[8];
 	town_type *t_ptr = &t_info[p_ptr->dungeon];
 	dungeon_zone *zone = &t_ptr->zone[0];
 
@@ -432,8 +449,11 @@ static void prt_depth(void)
 		sprintf(depths, "%d", p_ptr->depth);
 	}
 
-	if (COL_DEPTH == 0) put_str("DEPTH ", ROW_DEPTH, COL_DEPTH);
+	if (COL_DEPTH == 0) 
+	  put_str("DEPTH ", ROW_DEPTH, COL_DEPTH);
 	c_put_str(TERM_L_GREEN, format("%7s", depths), ROW_DEPTH, COL_DEPTH ? COL_DEPTH : COL_DEPTH + 5);
+
+  }
 }
 
 
@@ -793,18 +813,18 @@ static void prt_speed(void)
 	if (i > 110)
 	{
 		attr = TERM_L_GREEN;
-		sprintf(buf, (1/*show_sidebar*/ ? "Fast (+%d)" : "Spd+%d"), (i - 110));
+		sprintf(buf, (show_sidebar ? "Fast (+%d)" : "Fast +%d"), (i - 110));
 	}
 
 	/* Slow */
 	else if (i < 110)
 	{
 		attr = TERM_L_UMBER;
-		sprintf(buf, (1/*show_sidebar*/ ? "Slow (-%d)" : "Spd-%d"), (110 - i));
+		sprintf(buf, (show_sidebar ? "Slow (-%d)" : "Slow -%d"), (110 - i));
 	}
 
 	/* Display the speed */
-	c_put_str(attr, format((1/*show_sidebar*/ ? "%-10s" : "%-6s"), buf), ROW_SPEED, COL_SPEED);
+	c_put_str(attr, format(show_sidebar ? "%-10s" : "%12s", buf), ROW_SPEED, COL_SPEED);
 }
 
 
@@ -1530,8 +1550,6 @@ static void prt_frame_extra(void)
 	/* Cursed */
 	prt_cursed();
 
-	/* To here level name does not reach, with no show_sidebar */
-
 	/* Cut/Stun */
 	prt_cut();
 	prt_stun();
@@ -1545,20 +1563,27 @@ static void prt_frame_extra(void)
 	prt_petrify();
 
         /* Level name displayed */
-	/* FIXME: if (no stun && no blind, etc.) display this */
-	if (!show_sidebar && adult_campaign) {
+	if (adult_campaign) {
 	  int length;
 	  int wid, h;
-	  char str[46];
+	  char str[50];
 	  
 	  current_long_level_name(str);
-		  
-	  length = strlen(str) + 1;
+
+	  if (p_ptr->depth > 0)
+	    sprintf(str, "%s %d", str, p_ptr->depth);
+
+	  length = strlen(str);
 
 	  /* Obtain the size */
 	  (void)Term_get_size(&wid, &h);
 
-	  Term_putstr(wid - length, SECOND_FROM_BOTTOM, -1, TERM_L_UMBER, str);
+	  if (!show_sidebar) { 
+	    /* FIXME: if (no stun && no blind, etc.) display this */
+	  }
+
+	  Term_putstr(wid - length - (show_sidebar ? 1 : 0), 
+		      SECOND_FROM_BOTTOM, -1, TERM_L_DARK, str);
 	}
 }
 

@@ -102,6 +102,7 @@
  * Number of grids in each panel (vertically)
  * Must be a multiple of BLOCK_HGT
  */
+
 #define PANEL_HGT	(use_trptile ? 3 : (use_dbltile ? 5 : 11))
 
 /*
@@ -129,14 +130,14 @@
  * Number of grids in each screen (vertically)
  * Must be a multiple of PANEL_HGT (at least 2x)
  */
-#define SCREEN_HGT	(((Term->hgt - ROW_MAP - 1 - (show_sidebar ? 0 : 1)) / \
-				(use_trptile ? 3 : (use_dbltile ? 2 : 1)) - (show_itemlist ? 1 : 0)))
+#define SCREEN_HGT	(((Term->hgt - ROW_MAP - 2)) / \
+				(use_trptile ? 3 : (use_dbltile ? 2 : 1)) - (show_itemlist ? 1 : 0))
 
 /*
  * Number of grids in each screen (horizontally)
  * Must be a multiple of PANEL_WID (at least 2x)
  */
-#define SCREEN_WID	((Term->wid - COL_MAP - 1) / ((use_trptile && use_bigtile) ?  6 : (use_trptile ? 3 : \
+#define SCREEN_WID	((Term->wid - COL_MAP - (show_sidebar ? 1 : 0)) / ((use_trptile && use_bigtile) ?  6 : (use_trptile ? 3 : \
 			((use_dbltile && use_bigtile) ? 4 :((use_dbltile || use_bigtile) ? 2 : 1)))))
 
 
@@ -161,7 +162,7 @@
 #define DUNGEON_WID		198
 
 #define TOWN_WID 66
-#define TOWN_HGT 22
+#define TOWN_HGT 21
 
 /*
  * Maximum numbers of rooms along each axis (currently 6x18)
@@ -720,82 +721,85 @@
 #define COL_TITLE		0	/* <title> or <mode> */
 
 #define ROW_LEVEL		(show_sidebar ? 4 : (BOTTOM_LINE))
-#define COL_LEVEL		0	/* "LEVEL xxxxxx" */
+#define COL_LEVEL		(show_sidebar ? 0 : 74)	/* "LEVEL xxxxxx" */
 
 #define ROW_EXP			(show_sidebar ? 5 : (BOTTOM_LINE))
-#define COL_EXP			(show_sidebar ? 0 : 7)	/* "EXP xxxxxxxx" */
+#define COL_EXP			(show_sidebar ? 0 : 64)	/* "EXP xxxxxxxx" */
 
 #define ROW_GOLD		(show_sidebar ? 6 : (BOTTOM_LINE))
-#define COL_GOLD		(show_sidebar ? 0 : 20)	/* "AU xxxxxxxxx" */
+#define COL_GOLD		(show_sidebar ? 0 : 26)	/* "AU xxxxxxxxx" */
 
 #define ROW_STAT		(show_sidebar ? 8 : (SECOND_FROM_BOTTOM))
-#define COL_STAT		24	/* "xxx   xxxxxx" */
+#define COL_STAT	       0	/* "xxx   xxxxxx" */
 
 #define ROW_AC			(show_sidebar ? 17 : (BOTTOM_LINE))
 #define COL_AC			(show_sidebar ? 0 : 33)	/* "Cur AC xxxxx" */
 
 #define ROW_MAXHP		(show_sidebar ? 18 : (BOTTOM_LINE))
-#define COL_MAXHP		(show_sidebar ? 0 : 47)	/* "Max HP xxxxx" */
+#define COL_MAXHP		(show_sidebar ? 0 : 7)	/* "Max HP xxxxx" */
 
 #define ROW_CURHP		(show_sidebar ? 19 : (BOTTOM_LINE))
-#define COL_CURHP		(show_sidebar ? 0 : 40)	/* "Cur HP xxxxx" */
+#define COL_CURHP		(show_sidebar ? 0 : 0)	/* "Cur HP xxxxx" */
 
 #define ROW_MAXSP		(show_sidebar ? 20 : (BOTTOM_LINE))
-#define COL_MAXSP		(show_sidebar ? 0 : 60)	/* "Max SP xxxxx" */
+#define COL_MAXSP		(show_sidebar ? 0 : 20)	/* "Max SP xxxxx" */
 
 #define ROW_CURSP		(show_sidebar ? 21 : (BOTTOM_LINE))
-#define COL_CURSP		(show_sidebar ? 0 : 53)	/* "Cur SP xxxxx" */
+#define COL_CURSP		(show_sidebar ? 0 : 13)	/* "Cur SP xxxxx" */
 
 #define ROW_INFO		(show_sidebar ? 22 : (BOTTOM_LINE))
-#define COL_INFO		(show_sidebar ? 0 : 20)	/* "xxxxxxxxxxxx" */
+#define COL_INFO		(show_sidebar ? 0 : 26)	/* "xxxxxxxxxxxx" */
 
-#define ROW_CUT			(show_sidebar ? 23 : (SECOND_FROM_BOTTOM))
-#define COL_CUT			(show_sidebar ? 0 : 52)	/* <cut> */
+#define ROW_HUNGRY		(show_sidebar ? (BOTTOM_LINE) : (BOTTOM_LINE))
+#define COL_HUNGRY		(show_sidebar ? 0 : 59)	/* "Weak" / "Hungry" / "Full" / "Gorged" */
 
-#define ROW_STUN		(show_sidebar ? 24 : (SECOND_FROM_BOTTOM))
-#define COL_STUN		(show_sidebar ? 0 : 56)	/* <stun> */
+#define ROW_STATE	(show_sidebar ? (BOTTOM_LINE) : (BOTTOM_LINE))
+#define COL_STATE		(show_sidebar ? (Term->wid >= 90  ? 69 : 60) : 39)	/* <state> */
 
-#define ROW_HUNGRY		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_HUNGRY		(show_sidebar ? 0 : 11)	/* "Weak" / "Hungry" / "Full" / "Gorged" */
+#define ROW_SPEED	(show_sidebar ? (BOTTOM_LINE) : (BOTTOM_LINE))
+#define COL_SPEED		(show_sidebar ? (Term->wid >= 90  ? 80 : 70) : 39)	/* "Slow (-NN)" or "Fast (+NN)" */
 
-#define ROW_BLIND		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_BLIND		(show_sidebar ? (Term->wid >= 90  ? 7 : 6)  : 68)	/* "Blind" */
-
-#define ROW_CONFUSED		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_CONFUSED		(show_sidebar ? (Term->wid >= 90  ? 13 : 11) : 76)	/* "Confused" */
-
-#define ROW_AFRAID		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_AFRAID		(show_sidebar ? (Term->wid >= 90  ? 22 : 19) : 48)	/* "Afraid" */
-
-#define ROW_POISONED		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_POISONED		(show_sidebar ? (Term->wid >= 90  ? 29 : 25) : 60)	/* "Poisoned" */
-
-#define ROW_DISEASE		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_DISEASE	(show_sidebar ? (Term->wid >= 90  ? 38 : 33) : 16)	/* "Disease" / "Dise" */
-
-#define ROW_CURSED	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_CURSED	(show_sidebar ? (Term->wid >= 90  ? 46 : 40) : 20)	/* "Cursed" / "Curs" */
-
-#define ROW_AMNESIA	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_AMNESIA	(show_sidebar ? (Term->wid >= 90  ? 53 : 46) : 64)	/* "Amnesia" / "Forg" */
-
-#define ROW_PETRIFY	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_PETRIFY	(show_sidebar ? (Term->wid >= 90  ? 61 : 53) : 72)	/* "Petrify" / "Petr" */
-
-#define ROW_STATE	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_STATE		(show_sidebar ? (Term->wid >= 90  ? 69 : 60) : 0)	/* <state> */
-
-#define ROW_SPEED	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
-#define COL_SPEED		(show_sidebar ? (Term->wid >= 90  ? 80 : 70) : 0)	/* "Slow (-NN)" or "Fast (+NN)" */
-
-#define ROW_STUDY		(show_sidebar ? (Term->wid >= 96 ? (BOTTOM_LINE) : 14) \
+#define ROW_STUDY		(show_sidebar ? (Term->wid >= 96 ? (BOTTOM_LINE) : 16) \
 					: (BOTTOM_LINE))
-#define COL_STUDY		(show_sidebar ? (Term->wid >= 96 ? 91 : 0) : 66)	/* "Study" */
+#define COL_STUDY		(show_sidebar ? (Term->wid >= 96 ? 91 : 0) : 53)	/* "Study" */
 
 #define ROW_DEPTH		(show_sidebar ? (Term->wid >= 105 ? (BOTTOM_LINE) : 7) \
-					: (BOTTOM_LINE))
-#define COL_DEPTH		(show_sidebar ? (Term->wid >= 105 ? 97 : 0) : 72)	/* "Lev NNN" / "NNNN ft" */
+					: (SECOND_FROM_BOTTOM))
+#define COL_DEPTH		(show_sidebar ? (Term->wid >= 105 ? 97 : 0) : 73)	/* "Lev NNN" / "NNNN ft" */
 
+/*
+ * From most likely to last long to least likely; SECOND_FROM_BOTTOM in !sidebar
+ */
+
+#define ROW_DISEASE		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_DISEASE	(show_sidebar ? (Term->wid >= 90  ? 38 : 33) : 24)	/* "Disease" / "Dise" */
+
+#define ROW_CURSED	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_CURSED	(show_sidebar ? (Term->wid >= 90  ? 46 : 40) : 28)	/* "Cursed" / "Curs" */
+
+#define ROW_AFRAID		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_AFRAID		(show_sidebar ? (Term->wid >= 90  ? 22 : 19) : 32)	/* "Afraid" */
+
+#define ROW_CUT			(show_sidebar ? 23 : (SECOND_FROM_BOTTOM))
+#define COL_CUT			(show_sidebar ? 0 : 36)	/* <cut> */
+
+#define ROW_STUN		(show_sidebar ? 24 : (SECOND_FROM_BOTTOM))
+#define COL_STUN		(show_sidebar ? 0 : 40)	/* <stun> */
+
+#define ROW_POISONED		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_POISONED		(show_sidebar ? (Term->wid >= 90  ? 29 : 25) : 44)	/* "Poisoned" */
+
+#define ROW_AMNESIA	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_AMNESIA	(show_sidebar ? (Term->wid >= 90  ? 53 : 46) : 48)	/* "Amnesia" / "Forg" */
+
+#define ROW_PETRIFY	(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_PETRIFY	(show_sidebar ? (Term->wid >= 90  ? 61 : 53) : 52)	/* "Petrify" / "Petr" */
+
+#define ROW_CONFUSED		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_CONFUSED		(show_sidebar ? (Term->wid >= 90  ? 13 : 11) : 56)	/* "Confused" */
+
+#define ROW_BLIND		(show_sidebar ? (BOTTOM_LINE) : (SECOND_FROM_BOTTOM))
+#define COL_BLIND		(show_sidebar ? (Term->wid >= 90  ? 7 : 6)  : 60)	/* "Blind" */
 
 
 /*** General index values ***/
