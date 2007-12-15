@@ -1236,6 +1236,19 @@ void take_hit(int dam, cptr kb_str)
 	/* Hurt the player */
 	p_ptr->chp -= dam;
 
+	/* Make test-id and traps less deadly */
+	if (p_ptr->chp < 1
+	    && (cause_of_damage == SOURCE_FEATURE
+		|| cause_of_damage == SOURCE_PLAYER_COATING
+		|| cause_of_damage == SOURCE_PLAYER_EAT_MONSTER
+		|| cause_of_damage == SOURCE_PLAYER_EAT
+		|| cause_of_damage == SOURCE_PLAYER_QUAFF
+		|| cause_of_damage == SOURCE_PLAYER_READ
+		|| cause_of_damage == SOURCE_PLAYER_ZAP_NO_TARGET
+		|| cause_of_damage == SOURCE_OBJECT)
+	    && dam > p_ptr->mhp / 2)
+	  p_ptr->chp = 1;
+
 	/* Display the hitpoints */
 	p_ptr->redraw |= (PR_HP);
 
@@ -8736,6 +8749,9 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 	}
 	else
 	{
+	  /* to make traps and test-id less deadly */
+	  cause_of_damage = who;
+
 		/* Start with empty string */
 		killer[0] = '\0';
 		

@@ -188,6 +188,7 @@ extern s16b m_max;
 extern s16b m_cnt;
 extern s16b q_max;
 extern s16b q_cnt;
+extern int cause_of_damage;
 extern object_type term_object;
 extern bool term_obj_real;
 extern byte feeling;
