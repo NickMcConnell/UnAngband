@@ -788,7 +788,7 @@ s16b get_mon_num(int level)
 		if (rand_int(NASTY_MON) == 0)
 		{
 			/* Pick a level bonus */
-			int d = level / 4 + 2;
+			int d = level / 5 + 1;
 
 			/* Boost the level */
 			level += ((d < 5) ? d : 5);
@@ -798,7 +798,7 @@ s16b get_mon_num(int level)
 		if (rand_int(NASTY_MON) == 0)
 		{
 			/* Pick a level bonus */
-			int d = level / 4 + 2;
+			int d = level / 3;
 
 			/* Boost the level */
 			level += ((d < 5) ? d : 5);
