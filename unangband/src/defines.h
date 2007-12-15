@@ -733,7 +733,7 @@
 #define COL_STAT	       0	/* "xxx   xxxxxx" */
 
 #define ROW_AC			(show_sidebar ? 17 : (BOTTOM_LINE))
-#define COL_AC			(show_sidebar ? 0 : 33)	/* "Cur AC xxxxx" */
+#define COL_AC			(show_sidebar ? 0 : 13)	/* "Cur AC xxxxx" */
 
 #define ROW_MAXHP		(show_sidebar ? 18 : (BOTTOM_LINE))
 #define COL_MAXHP		(show_sidebar ? 0 : 7)	/* "Max HP xxxxx" */
