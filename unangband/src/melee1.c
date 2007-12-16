@@ -1284,6 +1284,8 @@ bool make_attack_normal(int m_idx)
 		int method = r_ptr->blow[ap_cnt].method;
 		int d_dice = r_ptr->blow[ap_cnt].d_dice;
 		int d_side = r_ptr->blow[ap_cnt].d_side;
+	
+		if (cheat_xtra) msg_format("base dice in this blow: dice %d, sides %d", d_dice, d_side);
 
 		/* Hack -- no more attacks */
 		if (!method) break;
@@ -1302,15 +1304,19 @@ bool make_attack_normal(int m_idx)
 		do_stun = FALSE;
 		touched = FALSE;
 
+		if (cheat_xtra) msg_format("dice (2) in this blow: dice %d, sides %d", d_dice, d_side);
+
 		/* Apply monster stats */
 		if (d_side > 1)
 		{
 			/* Apply monster stats */
 			if (m_ptr->mflag & (MFLAG_WEAK)) d_side = MIN(d_side - 2, d_side * 9 / 10);
-			else if (m_ptr->mflag & (MFLAG_STRONG)) d_side += MAX(d_side + 2, d_side * 11 / 10);
+			else if (m_ptr->mflag & (MFLAG_STRONG)) d_side = MAX(d_side + 2, d_side * 11 / 10);
 
 			if (d_side <= 0) d_side = 1;
 		}
+
+		if (cheat_xtra) msg_format("dice (3) in this blow: dice %d, sides %d", d_dice, d_side);
 
 		/* Roll out the damage */
 		damage = damroll(d_dice, d_side);
@@ -1394,6 +1400,8 @@ bool make_attack_normal(int m_idx)
 
 			/* Player armor reduces total damage */
 			damage -= (damage * ((p_ptr->ac + p_ptr->to_a < 150) ? p_ptr->ac + p_ptr->to_a: 150) / 250);
+
+			if (cheat_xtra) msg_format("base damage dealt by monster in this blow: %d, dice %d, sides %d", damage, d_dice, d_side);
 
 			if (effect)
 			{

@@ -1768,7 +1768,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 	/* Hack -- Require identical "xtra2" status */
 	if (o_ptr->name3 != j_ptr->name3)
 	{
-		if (cheat_xtra) msg_format("name3 %d does not match name3 %d", o_ptr->name3, j_ptr->name3);
+	  if (cheat_xtra) msg_format("name3 %d does not match name3 %d for tval=%d sval=%d, tval=%d sval=%d", o_ptr->name3, j_ptr->name3, o_ptr->tval, o_ptr->sval, j_ptr->tval, j_ptr->sval);
 		return (0);
 	}
 
