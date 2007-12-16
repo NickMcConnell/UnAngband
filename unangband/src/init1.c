@@ -7698,9 +7698,9 @@ static long eval_hp_adjust(monster_race *r_ptr)
 		 (r_ptr->flags6 & RF6_TELE_LEVEL)) hp = (hp * 6) / 5;
 
 	/*
- 	 * Monsters that multiply are tougher to kill
+ 	 * Monsters that multiply are tougher to kill and each takes a blow
 	 */
-	if (r_ptr->flags2 & (RF2_MULTIPLY)) hp *= 2;
+	if (r_ptr->flags2 & (RF2_MULTIPLY)) hp = 10 + hp * 7;
 
 
 	/* Get the monster ac */
