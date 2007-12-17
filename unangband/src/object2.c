@@ -2133,12 +2133,8 @@ void object_prep(object_type *o_ptr, int k_idx)
 		else o_ptr->ident |= (IDENT_BROKEN);
 	}
 	else if (k_ptr->flags3 & (TR3_UNCONTROLLED))
-	{
-		int i = rand_int(100);
-		
-		if (i < 30) o_ptr->ident |= (IDENT_CURSED);
-		else if (i < 60) o_ptr->ident |= (IDENT_BROKEN);
-	}
+	  /* always start cursed so that uncontrolled effects can occur */
+	  o_ptr->ident |= (IDENT_CURSED);
 	
 	o_ptr->can_flags1 = 0x0L;
 	o_ptr->can_flags2 = 0x0L;
@@ -3945,7 +3941,7 @@ int value_check_aux11(object_type *o_ptr)
 	if (cursed_p(o_ptr)) return (INSCRIP_UNUSUAL);
 
 	/* Broken items */
-	/* if (broken_p(o_ptr)) return (INSCRIP_UNUSUAL); */
+	if (broken_p(o_ptr)) return (INSCRIP_UNUSUAL);
 
 	/* Magic item */
 	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_UNUSUAL);

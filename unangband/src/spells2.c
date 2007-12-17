@@ -1292,9 +1292,17 @@ int value_check_aux3(const object_type *o_ptr)
 	}
 
 	/* Cursed or broken items */
-	if ((cursed_p(o_ptr)) || (broken_p(o_ptr)))
+	if (cursed_p(o_ptr))
 	{
 		if (o_ptr->feeling == INSCRIP_UNUSUAL) return (INSCRIP_CURSED);
+
+		return (INSCRIP_NONMAGICAL);
+	}
+
+	/* Cursed or broken items */
+	if (broken_p(o_ptr))
+	{
+		if (o_ptr->feeling == INSCRIP_UNUSUAL) return (INSCRIP_BROKEN);
 
 		return (INSCRIP_NONMAGICAL);
 	}
@@ -1393,7 +1401,7 @@ int value_check_aux4(const object_type *o_ptr)
 	if (cursed_p(o_ptr)) return (INSCRIP_CURSED);
 
 	/* Broken items */
-	/* if (broken_p(o_ptr)) return (INSCRIP_BROKEN); */
+	if (broken_p(o_ptr)) return (INSCRIP_UNCURSED);
 
 	/* Known to be unusual */
 	if (o_ptr->feeling == INSCRIP_UNUSUAL) return (INSCRIP_MAGICAL);
@@ -1446,7 +1454,7 @@ int value_check_aux5(const object_type *o_ptr)
 	}
 
 	/* Broken items */
-	/*if (broken_p(o_ptr)) return (INSCRIP_NONMAGICAL);*/
+	if (broken_p(o_ptr)) return (INSCRIP_NONMAGICAL);
 
 	/* Coated item */
 	if (coated_p(o_ptr)) return (INSCRIP_COATED);
