@@ -890,7 +890,7 @@ void do_cmd_go_up(void)
 		if ((t_ptr->quest_opens) && (t_ptr->quest_monster == guard) && (r_info[guard].max_num == 0))
 		{			
 			/* Success */
-			message(MSG_STAIRS_DOWN,0,format("You have valiantly defeated the guardian of %s opening the way through.", str));
+			message(MSG_STAIRS_DOWN,0,format("You have valiantly defeated the guardian of %s, opening the way through.", str));
 	
 			/* Change the dungeon */
 			p_ptr->dungeon = t_ptr->quest_opens;

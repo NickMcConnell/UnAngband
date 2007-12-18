@@ -727,18 +727,37 @@ static void prt_disease(void)
 
 static bool visible;
 static int level_name_start;
-static char level_name_str[50];
+static char level_name_str[46];
+static int level_depth_start;
+static char level_depth_str[5];
+
+static void print_level_depth(void)
+{
+  Term_putstr(level_depth_start, 
+	      SECOND_FROM_BOTTOM, -1, TERM_SLATE, 
+	      level_depth_str);
+}
 
 static void print_level_name(void)
 {
   Term_putstr(level_name_start, 
 	      SECOND_FROM_BOTTOM, -1, TERM_L_DARK, 
 	      level_name_str);
+
+  if (p_ptr->depth > 0)
+    print_level_depth();
 }
 
 static void wipe_level_name(void)
 {
   Term_erase(level_name_start, SECOND_FROM_BOTTOM, 255);
+
+  if (p_ptr->depth > 0) {
+    print_level_depth();
+    Term_putstr(level_depth_start - 3, 
+		SECOND_FROM_BOTTOM, -1, TERM_L_DARK, 
+		"Lev");
+  }
 }
 
 static void init_level_name(void)
@@ -749,14 +768,18 @@ static void init_level_name(void)
     visible = TRUE;
 
     current_long_level_name(level_name_str);
-
+ 
     if (p_ptr->depth > 0)
-      sprintf(level_name_str, "%s %d", level_name_str, p_ptr->depth);
+      sprintf(level_depth_str, " %2d", p_ptr->depth);
+    else
+      level_depth_str[0] = 0;
 
     /* Obtain the size */
     (void)Term_get_size(&wid, &h);
 
-    level_name_start = wid - strlen(level_name_str) - (show_sidebar ? 1 : 0);
+    level_depth_start = wid - strlen(level_depth_str) - (show_sidebar ? 1 : 0);
+
+    level_name_start = level_depth_start - strlen(level_name_str);
   }
 }
 
@@ -1643,7 +1666,7 @@ static void prt_frame_extra(void)
 
 	/* Below things overwritten by level description in no-sidebar mode */
 	init_level_name();
-	if (adult_campaign && show_sidebar)
+	if (adult_campaign)
 	  print_level_name();
 
 	/* Various */

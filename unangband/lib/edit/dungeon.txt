@@ -92,7 +92,6 @@ D:  Please report the bug and collect your reward from the abandoned store.
 
 N:1:Hobbiton
 X:10:57:0:0
-Q:58:111
 Z:35:35
 G:h
 L:0:0:411:155:0:0:the town of
