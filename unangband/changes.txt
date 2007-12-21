@@ -936,6 +936,8 @@ Fix for Bug #12538 Chain-summoning Termite Mounds.
 
 - crashes when inspecting bags, etc. fixed, I hope
 
+- fixed another crash with bags and lack of equip term refresh when canceling item selection from a bag
+
 
 ### Build / Platform ###
 
