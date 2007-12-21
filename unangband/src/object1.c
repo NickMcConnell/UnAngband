@@ -2485,9 +2485,7 @@ sint scan_feat(int y, int x)
 void display_inven(void)
 {
   register int i, k, n = 0;
-
 	object_type *o_ptr;
-
 	byte attr;
 
 	char tmp_val[80];
@@ -2559,7 +2557,7 @@ void display_inven(void)
  */
 void display_equip(void)
 {
-	register int i, n;
+  register int i, n;
 	object_type *o_ptr;
 	byte attr;
 
@@ -2626,7 +2624,7 @@ void display_equip(void)
 		tmp_val[0] = tmp_val[1] = tmp_val[2] = ' ';
 
 		/* Is this item "acceptable"? */
-		if (item_tester_okay(o_ptr))
+		if (o_ptr->k_idx && item_tester_okay(o_ptr))
 		{
 			/* Prepare an "index" */
 			tmp_val[0] = index_to_label(i);
@@ -2639,13 +2637,19 @@ void display_equip(void)
 		Term_putstr(0, i - INVEN_WIELD, 3, TERM_WHITE, tmp_val);
 
 		/* Obtain an item description */
-		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
+		if (o_ptr->k_idx)
+		  object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
+		else
+		  o_name[0] = 0;
 
 		/* Obtain the length of the description */
 		n = strlen(o_name);
 
 		/* Get inventory color */
-		attr = tval_to_attr[o_ptr->tval & 0x7F];
+		if (o_ptr->k_idx)
+		  attr = tval_to_attr[o_ptr->tval & 0x7F];
+		else
+		  attr = 0;
 
 		/* Regular slots don't have a pseudo-tag */
 		ptag_space = 0;
@@ -2683,7 +2687,7 @@ void display_equip(void)
 		}
 
 		/* Display the weight (if needed) */
-		if (show_weights && o_ptr->weight)
+		if (o_ptr->k_idx && show_weights && o_ptr->weight)
 		{
 			int wgt = o_ptr->weight * o_ptr->number;
 			int col = (show_labels ? 52 : 71);
@@ -4719,13 +4723,29 @@ bool get_item_from_bag(int *cp, cptr pmt, cptr str, object_type *o_ptr)
 	inventory = inventory_old;
 
 	/* Cancelled? */
-	if (cancel) return (FALSE);
+	if (cancel) {
+	  /* Window stuff */
+	  p_ptr->window |= (PW_INVEN | PW_EQUIP);
+
+	  /* Redraw stuff */
+	  p_ptr->redraw |= (PR_ITEM_LIST);
+
+	  return (FALSE);
+	}
 
 	/* Get the item */
 	i_ptr = &inventory_fake[item];
 
 	/* Paranoia */
-	if (p_ptr->inven_cnt > INVEN_PACK) return (FALSE);
+	if (p_ptr->inven_cnt > INVEN_PACK) {
+	  /* Window stuff */
+	  p_ptr->window |= (PW_INVEN | PW_EQUIP);
+
+	  /* Redraw stuff */
+	  p_ptr->redraw |= (PR_ITEM_LIST);
+
+	  return (FALSE);
+	}
 
 	/* Reduce bag contents - wands hack */
 	if (i_ptr->tval == TV_WAND)
@@ -4791,7 +4811,7 @@ bool get_item_from_bag(int *cp, cptr pmt, cptr str, object_type *o_ptr)
 	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
 
 	/* Window stuff */
-	p_ptr->window |= (PW_INVEN);
+	p_ptr->window |= (PW_INVEN | PW_EQUIP);
 
 	/* Redraw stuff */
 	p_ptr->redraw |= (PR_ITEM_LIST);
