@@ -1657,7 +1657,6 @@ static int inven_damage(inven_func typ, int perc)
 
 	char o_name[80];
 
-
 	/* Count the casualties */
 	k = 0;
 
@@ -1686,82 +1685,82 @@ static int inven_damage(inven_func typ, int perc)
 			switch (o_ptr->tval)
 			{
 				/* Weapons */
-				case TV_BOW:
-				case TV_SWORD:
-				case TV_HAFTED:
-				case TV_POLEARM:
-				case TV_DIGGING:
+			case TV_BOW:
+			case TV_SWORD:
+			case TV_HAFTED:
+			case TV_POLEARM:
+			case TV_DIGGING:
+			{
+				/* Chance to damage it */
+				if (rand_int(100) < perc)
 				{
-					/* Chance to damage it */
-					if (rand_int(100) < perc)
-					{
-						/* Damage the item */
-						o_ptr->to_h--;
-						o_ptr->to_d--;
-
-						/* Damaged! */
-						damage = TRUE;
-					}
-					else continue;
-
-					break;
-				}
-
-				/* Wearable items */
-				case TV_HELM:
-				case TV_CROWN:
-				case TV_SHIELD:
-				case TV_BOOTS:
-				case TV_GLOVES:
-				case TV_CLOAK:
-				case TV_SOFT_ARMOR:
-				case TV_HARD_ARMOR:
-				case TV_DRAG_ARMOR:
-				{
-					/* Chance to damage it */
-					if (rand_int(100) < perc)
-					{
-						/* Damage the item */
-						o_ptr->to_a--;
-
-						/* Damaged! */
-						damage = TRUE;
-					}
-					else continue;
-
-					break;
-				}
-				/* Rods, staffs and wands */
-			        case TV_STAFF:
-			        case TV_WAND:
-				  {
-				    if (rand_int(100) < perc)
-				      {
-					/* Only drain charges, don't destroy */
-					o_ptr->charges = 0;
-					o_ptr->stackc = 0;
+					/* Damage the item */
+					o_ptr->to_h--;
+					o_ptr->to_d--;
 
 					/* Damaged! */
 					damage = TRUE;
-				      }
-				    else continue;
+				}
+				else continue;
+				
+				break;
+			}
+
+			/* Wearable items */
+			case TV_HELM:
+			case TV_CROWN:
+			case TV_SHIELD:
+			case TV_BOOTS:
+			case TV_GLOVES:
+			case TV_CLOAK:
+			case TV_SOFT_ARMOR:
+			case TV_HARD_ARMOR:
+			case TV_DRAG_ARMOR:
+			{
+				/* Chance to damage it */
+				if (rand_int(100) < perc)
+				{
+					/* Damage the item */
+					o_ptr->to_a--;
+					
+					/* Damaged! */
+					damage = TRUE;
+				}
+				else continue;
+				
+				break;
+			}
+			/* Rods, staffs and wands */
+			case TV_STAFF:
+			case TV_WAND:
+			{
+				if (rand_int(100) < perc)
+				{
+					/* Only drain charges, don't destroy */
+					o_ptr->charges = 0;
+					o_ptr->stackc = 0;
+					
+					/* Damaged! */
+					damage = TRUE;
+				}
+				else continue;
 				    
-				    break;
-				  }
-			        case TV_ROD:
-				  {
-				    if (rand_int(100) < perc)
-				      {
+				break;
+			}
+			case TV_ROD:
+			{
+				if (rand_int(100) < perc)
+				{
 					/* Discharge */
 					int t = randint(999);
 					if (o_ptr->timeout < t) o_ptr->timeout = t;
 					/* Damaged! */
 					damage = TRUE;
-				      }
-				    else continue;
-				    
-				    break;
-				  }
+				}
+				else continue;
+				
+				break;
+			}
 			}
 
 			/* Damage instead of destroy */

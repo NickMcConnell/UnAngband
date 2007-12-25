@@ -890,14 +890,14 @@ void do_cmd_go_up(void)
 		if ((t_ptr->quest_opens) && (t_ptr->quest_monster == guard) && (r_info[guard].max_num == 0))
 		{			
 			/* Success */
-			message(MSG_STAIRS_DOWN,0,format("You have valiantly defeated the guardian of %s, opening the way through.", str));
+			message(MSG_STAIRS_DOWN,0,format("You have valiantly defeated the guardian blocking access to %s. The way lies open before you.", str));
 	
 			/* Change the dungeon */
 			p_ptr->dungeon = t_ptr->quest_opens;
 		}
 		else
 		{
-		        /* Success */
+			/* Success */
 			message(MSG_STAIRS_DOWN,0,format("You have found a way through %s.", str));
 		}
 
@@ -980,14 +980,14 @@ void do_cmd_go_down(void)
 
 	  guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
 
-	        /* Check quests due to travelling - cancel if requested */
+		/* Check quests due to travelling - cancel if requested */
 		if (!check_travel_quest(t_ptr->quest_opens, min_depth(p_ptr->dungeon), TRUE)) return;
 
 		/* Check that quest opens monster is dead and of this zone */
 		if ((t_ptr->quest_opens) && (t_ptr->quest_monster == guard) && (r_info[guard].max_num == 0))
 		{
 			/* Success */
-			message(MSG_STAIRS_DOWN,0,format("You have valiantly defeated the guardian of %s opening the way through.", str));
+			message(MSG_STAIRS_DOWN,0,format("You have valiantly defeated the guardian blocking access to %s. The way lies open before you.", str));
 	
 			/* Change the dungeon */
 			p_ptr->dungeon = t_ptr->quest_opens;
