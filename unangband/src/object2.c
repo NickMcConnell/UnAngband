@@ -1272,10 +1272,12 @@ s32b object_value(const object_type *o_ptr)
 	else
 	{
 		/* Hack -- Felt broken items */
-		if ((o_ptr->ident & (IDENT_SENSE)) && broken_p(o_ptr)) return (0L);
-
-		/* Hack -- Felt cursed items */
-		if ((o_ptr->ident & (IDENT_SENSE)) && cursed_p(o_ptr)) return (0L);
+		if (o_ptr->ident & (IDENT_SENSE)
+			 && (o_ptr->feeling == INSCRIP_TERRIBLE
+				  || o_ptr->feeling == INSCRIP_WORTHLESS
+				  || o_ptr->feeling == INSCRIP_CURSED
+				  || o_ptr->feeling == INSCRIP_BROKEN))
+			return (0L);
 
 		/* Named value (use 'real' value and attempt to hack) */
 		if (object_named_p(o_ptr))
