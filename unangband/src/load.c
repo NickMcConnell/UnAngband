@@ -1719,13 +1719,6 @@ u16b limit;
 	}
 
 	/* Ignore illegal dungeons */
-	if ((depth < 0) || (depth > max_depth(dungeon)))
-	{
-		note(format("Ignoring illegal dungeon depth (%d)", depth));
-		return (0);
-	}
-
-	/* Ignore illegal dungeons */
 	if ((ymax != DUNGEON_HGT) || (xmax != DUNGEON_WID))
 	{
 		/* XXX XXX XXX */
@@ -1871,10 +1864,16 @@ u16b limit;
 	/*** Player ***/
 
 	/* Fix depth */
-	if (depth < 1) depth = min_depth(dungeon);
-
-	/* Fix depth */
-	if (depth > max_depth(dungeon)) depth = max_depth(dungeon);
+	if (depth < min_depth(dungeon))
+	{
+		note(format("Fixing too small dungeon depth (%d)", depth));
+		depth = min_depth(dungeon);
+	} 
+	else if (depth > max_depth(dungeon))
+	{
+		note(format("Fixing too big dungeon depth (%d)", depth));
+		depth = max_depth(dungeon);
+	}
 
 	/* Load depth */
 	p_ptr->depth = depth;

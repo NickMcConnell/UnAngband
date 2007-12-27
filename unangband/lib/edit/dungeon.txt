@@ -558,7 +558,7 @@ L:6:56:0:0:345:0:the Troll Cave in
 # Goes upwards
 # shallow (but very high) tower to enable revenge to players
 # nearly killed and chased off embarrassingly at Weathertop
-# TODO: recycle 1365
+# not recycling 1365, because he drops nothing and summons
 
 N:40:Isengard
 X:20:21:64:0

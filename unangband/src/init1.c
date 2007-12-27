@@ -7726,11 +7726,11 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	
 	/* Monsters with resistances are harder to kill.
 	   Therefore effective slays / brands against them are worth more. */
-	if (r_ptr->flags3 & RF3_IM_ACID)	resists += 2;
-	if (r_ptr->flags3 & RF3_IM_FIRE) 	resists += 2;
-	if (r_ptr->flags3 & RF3_IM_COLD)	resists += 2;
-	if (r_ptr->flags3 & RF3_IM_ELEC)	resists += 2;
-	if (r_ptr->flags3 & RF3_IM_POIS)	resists += 2;
+	if (r_ptr->flags3 & RF3_IM_ACID) resists += 2;
+	if (r_ptr->flags3 & RF3_IM_FIRE) resists += 2;
+	if (r_ptr->flags3 & RF3_IM_COLD) resists += 2;
+	if (r_ptr->flags3 & RF3_IM_ELEC) resists += 2;
+	if (r_ptr->flags3 & RF3_IM_POIS) resists += 2;
 
 	/* Oppose elements */
 	if (r_ptr->flags6 & RF6_OPPOSE_ELEM)
@@ -7796,14 +7796,14 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	/* If quite resistant, reduce resists by defense holes */
 	if (resists >= 6)
 	{
-		if (r_ptr->flags3 & RF3_HURT_ROCK) 	resists -= 1;
-		if (r_ptr->flags3 & RF3_HURT_WATER) 	resists -= 1;
-		if (!(r_ptr->flags3 & RF3_NO_SLEEP))	resists -= 3;
-		if (!(r_ptr->flags3 & RF3_NO_FEAR))	resists -= 2;
-		if (!(r_ptr->flags3 & RF3_NO_CONF))	resists -= 2;
-		if (!(r_ptr->flags9 & RF9_NO_SLOW))	resists -= 2;
-		if (!(r_ptr->flags3 & RF9_RES_BLIND))	resists -= 2;
-		if (!(r_ptr->flags9 & RF9_RES_TPORT))	resists -= 2;
+		if (r_ptr->flags3 & RF3_HURT_ROCK) resists -= 1;
+		if (r_ptr->flags3 & RF3_HURT_WATER) resists -= 1;
+		if (!(r_ptr->flags3 & RF3_NO_SLEEP)) resists -= 3;
+		if (!(r_ptr->flags3 & RF3_NO_FEAR)) resists -= 2;
+		if (!(r_ptr->flags3 & RF3_NO_CONF)) resists -= 2;
+		if (!(r_ptr->flags9 & RF9_NO_SLOW)) resists -= 2;
+		if (!(r_ptr->flags3 & RF9_RES_BLIND)) resists -= 2;
+		if (!(r_ptr->flags9 & RF9_RES_TPORT)) resists -= 2;
 
 		if (resists < 5) resists = 5;
 	}
@@ -7820,7 +7820,7 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	}
 
 	/* Scale resists to ac */
-	resists = resists * 25;
+	resists *= 25;
 
 	/* Apply magic resistance */
 	if (r_ptr->flags9 & RF9_RES_MAGIC)	resists += 40 + r_ptr->level;
@@ -7838,7 +7838,7 @@ static long eval_hp_adjust(monster_race *r_ptr)
 		hp += (hp * ac) / (150 + r_ptr->level); 			
 	}
 
-	/*boundry control*/
+	/* boundary control */
 	if (hp < 1) hp = 1;
 
 	return (hp);
