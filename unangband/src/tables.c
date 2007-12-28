@@ -559,13 +559,13 @@ const byte adj_chr_taunt[] =
 /*
  * Stat Table (CHR) -- Fear
  */
-const byte adj_chr_fear[] = StatTable_1_31;
+const byte adj_chr_fear[] = StatTable_1_31
 
 
 /*
  * Stat Table (INT) -- Breakage chance for ammo and weapons
  */
-const byte adj_int_break[] = StatTable_1_31;
+const byte adj_int_break[] = StatTable_1_31
 
 
 /*

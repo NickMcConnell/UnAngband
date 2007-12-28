@@ -2090,7 +2090,7 @@ bool concentrate_light_hook(const int y, const int x, const bool modify)
  * 
  * -DarkGod-, -LM-
  */
-int concentrate_power(int who, int y0, int x0, int radius, bool for_real, bool use_los,
+int concentrate_power(int y0, int x0, int radius, bool for_real, bool use_los,
 		bool concentrate_hook(const int y, const int x, const bool modify))
 {
 	int power = 0;
@@ -8068,7 +8068,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
  * We also concentrate spells here, in order to hackily set
  * the spell power for later processing in spell blows.
  */
-void process_spell_prepare(int who, int what, int spell, int level)
+void process_spell_prepare(int spell, int level)
 {
 	spell_type *s_ptr = &s_info[spell];
 	
@@ -8118,21 +8118,21 @@ void process_spell_prepare(int who, int what, int spell, int level)
 		
 		case SPELL_CONCENTRATE_LITE:
 		{
-			power = concentrate_power(who != 0 ? who : what, p_ptr->py, p_ptr->px,
+			power = concentrate_power(p_ptr->py, p_ptr->px,
 					5 + level / 10, TRUE, TRUE, concentrate_light_hook);
 			break;
 		}
 	
 		case SPELL_CONCENTRATE_LIFE:
 		{
-			power = s_ptr->l_plus = concentrate_power(who != 0 ? who : what, p_ptr->py, p_ptr->px,
+			power = s_ptr->l_plus = concentrate_power(p_ptr->py, p_ptr->px,
 					5 + level / 10, TRUE, FALSE, concentrate_life_hook);
 			break;
 		}
 		
 		case SPELL_CONCENTRATE_WATER:
 		{
-			power = concentrate_power(who != 0 ? who : what, p_ptr->py, p_ptr->px,
+			power = concentrate_power(p_ptr->py, p_ptr->px,
 					5 + level / 10, TRUE, FALSE, concentrate_water_hook);
 			break;
 		}
@@ -8173,7 +8173,7 @@ bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel)
 	}
 
 	/* Check for return flags */
-	process_spell_prepare(who, what, spell, level);
+	process_spell_prepare(spell, level);
 	
 	/* Scan through all four blows */
 	for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
@@ -8279,7 +8279,7 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 	}
 
 	/* Check for return flags */
-	process_spell_prepare(who, what, spell, level);	
+	process_spell_prepare(spell, level);	
 	
 	/* Note the order is important -- because of the impact of blinding a character on their subsequent
 		ability to see spell blows that affect themselves */
@@ -8315,7 +8315,7 @@ bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x)
 	}
 
 	/* Check for return if player */
-	if (cave_m_idx[y][x] < 0) process_spell_prepare(who, what, power, 25);
+	if (cave_m_idx[y][x] < 0) process_spell_prepare(power, 25);
 	
 	/* Has a power */
 	if (power > 0)

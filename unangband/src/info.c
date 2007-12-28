@@ -1779,7 +1779,7 @@ static void spell_update_power(spell_type *s_ptr, int level)
 	{
 		case SPELL_CONCENTRATE_LITE:
 		{
-			power = concentrate_power(SOURCE_PLAYER_START, p_ptr->py, p_ptr->px,
+			power = concentrate_power(p_ptr->py, p_ptr->px,
 					5 + level / 10, FALSE, TRUE, concentrate_light_hook);
 			
 			if (s_ptr->l_dice && !s_ptr->l_side) s_ptr->l_side = power;
@@ -1789,7 +1789,7 @@ static void spell_update_power(spell_type *s_ptr, int level)
 	
 		case SPELL_CONCENTRATE_LIFE:
 		{
-			power = s_ptr->l_plus = concentrate_power(SOURCE_PLAYER_START, p_ptr->py, p_ptr->px,
+			power = s_ptr->l_plus = concentrate_power(p_ptr->py, p_ptr->px,
 					5 + level / 10, FALSE, FALSE, concentrate_life_hook);
 			
 			if (s_ptr->l_dice && !s_ptr->l_side) s_ptr->l_side = power;
@@ -1799,7 +1799,7 @@ static void spell_update_power(spell_type *s_ptr, int level)
 		
 		case SPELL_CONCENTRATE_WATER:
 		{
-			power = concentrate_power(SOURCE_PLAYER_START, p_ptr->py, p_ptr->px,
+			power = concentrate_power(p_ptr->py, p_ptr->px,
 					5 + level / 10, FALSE, FALSE, concentrate_water_hook);
 			
 			if (s_ptr->l_dice && !s_ptr->l_side) s_ptr->l_side = power;

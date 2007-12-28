@@ -1579,7 +1579,7 @@ static void display_store(int store_index)
 
 		/* Put the owner name and race */
 		sprintf(buf, "%s (%s)", owner_name, race_name);
-		if (pos_owner + strlen(buf) + 2 > pos_store)
+		if (pos_owner + (int) strlen(buf) + 2 > pos_store)
 		  pos_owner = 1;
 		put_str(buf, 3, pos_owner);
 

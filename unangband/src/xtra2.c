@@ -5108,7 +5108,7 @@ static s16b target_pick(int y1, int x1, int dy, int dx)
 /*
  * Hack -- determine if a given location is "interesting"
  */
-static bool target_set_interactive_accept(int y, int x, int mode)
+static bool target_set_interactive_accept(int y, int x)
 {
 	s16b this_o_idx, next_o_idx = 0;
 
@@ -5177,7 +5177,7 @@ static void target_set_interactive_prepare(int mode)
 			if (!expand_look && !player_has_los_bold(y, x)) continue;
 
 			/* Require "interesting" contents */
-			if (!target_set_interactive_accept(y, x, mode)) continue;
+			if (!target_set_interactive_accept(y, x)) continue;
 
 			/* Special mode */
 			if (mode & (TARGET_KILL))

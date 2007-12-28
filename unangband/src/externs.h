@@ -639,7 +639,7 @@ extern bool load_player(void);
 /* melee1.c */
 extern bool monster_scale(monster_race *n_ptr, int m_idx, int depth);
 extern int get_breath_dam(s16b hit_points, int gf_type, bool powerful);
-extern bool mon_check_hit(int m_idx, int method, int power, int level, int who, bool ranged);
+extern bool mon_check_hit(int m_idx, int power, int level, int who, bool ranged);
 extern void attack_desc(int who, int what, int target, int method, int damage, bool *do_cut, bool *do_stun);
 extern bool make_attack_normal(int m_idx);
 extern void mon_blow_ranged(int who, int what, int x, int y, int method, int range, int flg, cptr result);
@@ -914,7 +914,7 @@ extern void change_shape(int shape, int level);
 extern bool concentrate_water_hook(const int y, const int x, const bool modify);
 extern bool concentrate_life_hook(const int y, const int x, const bool modify);
 extern bool concentrate_light_hook(const int y, const int x, const bool modify);
-extern int concentrate_power(int who, int y0, int x0, int radius, bool for_real, bool use_los,
+extern int concentrate_power(int y0, int x0, int radius, bool for_real, bool use_los,
 		bool concentrate_hook(const int y, const int x, const bool modify));
 extern bool process_spell_flags(int spell, int level, bool *cancel, bool *known);
 extern bool process_spell_blows(int who, int what, int spell, int level, bool *cancel);

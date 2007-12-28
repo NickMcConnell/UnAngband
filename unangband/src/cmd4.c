@@ -1814,8 +1814,7 @@ static const char *store_name(int gid)
 static void do_cmd_knowledge_home(void)
 {
 	member_funcs contents_f = {display_store_object, screen_store_object, 0, 0, 0, 0};
-	group_funcs home_f =
-		{total_store_count, FALSE, store_name, 0, default_group, 0};
+	group_funcs home_f = {total_store_count, FALSE, store_name, 0, default_group, 0};
 
 	int *objects, store_count = 0;
 	int i, j;
@@ -1866,7 +1865,7 @@ int count_routes(int from, int to)
 
 static void describe_surface_dungeon(int dun) 
 {
-  int myd = p_ptr->dungeon;;
+  int myd = p_ptr->dungeon;
   int num;
 
   if (dun == rp_ptr->home) {
