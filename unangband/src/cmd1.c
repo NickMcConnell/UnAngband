@@ -1523,13 +1523,13 @@ void py_pickup(int py, int px, int pickup)
 #ifdef ALLOW_EASY_FLOOR
 
 		/* Easy Floor */
-		if (easy_floor)
+		if (easy_floor && !auto_pickup_never(o_ptr))
 		{
 			/* Pickup if possible */
 			if (pickup && inven_carry_okay(o_ptr))
 			{
 				/* Pick up if allowed */
-				if ((!carry_query_flag) && !auto_pickup_never(o_ptr))
+				if ((!carry_query_flag))
 				{
 					/* Pick up the object */
 					py_pickup_aux(this_o_idx);
