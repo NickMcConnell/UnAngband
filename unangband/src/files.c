@@ -3825,34 +3825,34 @@ errr file_character(cptr name, bool full)
 	           get_month_name(day, cheat_xtra, FALSE), buf2));
 
 	{
-	  char str[46];
+		char str[46];
 
-	  current_long_level_name(str);
+		current_long_level_name(str);
 
-	/* Display location */
-	if (p_ptr->depth == min_depth(p_ptr->dungeon))
-	{
-		text_out(format(" You are in %s.", str));
-	}
-	/* Display depth in feet */
-	else if (depth_in_feet)
-	{
-		dungeon_zone *zone=&t_info[0].zone[0];
+		/* Display location */
+		if (p_ptr->depth == min_depth(p_ptr->dungeon))
+		{
+			text_out(format(" You are in %s.", str));
+		}
+		/* Display depth in feet */
+		else if (depth_in_feet)
+		{
+			dungeon_zone *zone=&t_info[0].zone[0];
 
-		/* Get the zone */
-		get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+			/* Get the zone */
+			get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
-		text_out(format(" You are %d ft %s %s.",
-			(p_ptr->depth - min_depth(p_ptr->dungeon)) * 50 ,
-				zone->tower ? "high above" : "deep in",
-					str));
-	}
-	/* Display depth */
-	else
-	{
-		text_out(format(" You are on level %d of %s.",
-			p_ptr->depth - min_depth(p_ptr->dungeon), str));
-	}
+			text_out(format(" You are %d ft %s %s.",
+								 (p_ptr->depth - min_depth(p_ptr->dungeon)) * 50 ,
+								 zone->tower ? "high above" : "deep in",
+								 str));
+		}
+		/* Display depth */
+		else
+		{
+			text_out(format(" You are on level %d of %s.",
+								 p_ptr->depth, str));
+		}
 	}
 
 	/* Skip some lines */

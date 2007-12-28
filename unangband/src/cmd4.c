@@ -4821,7 +4821,7 @@ void do_cmd_timeofday()
 	  char str[46];
 	  current_long_level_name(str);
 	  msg_format("You are on level %d of %s.",
-		     p_ptr->depth - min_depth(p_ptr->dungeon), str);
+		     p_ptr->depth, str);
 	}
 
 	/* Message */
