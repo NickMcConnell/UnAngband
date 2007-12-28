@@ -638,7 +638,7 @@ D:A small winged figure surrounded by glowing blue light.
 N:46:Grip, Farmer Maggot's dog
 G:C:W
 I:120:5d5:30:30:0
-W:2:1:0:30
+W:3:1:0:30
 B:BITE:HURT:1d4
 F:UNIQUE
 F:FORCE_MAXHP | RAND_25
@@ -651,7 +651,7 @@ D: stealing mushrooms.
 N:47:Fang, Farmer Maggot's dog
 G:C:W
 I:120:5d5:30:30:0
-W:2:1:0:30
+W:3:1:0:30
 B:BITE:HURT:1d4
 F:UNIQUE
 F:FORCE_MAXHP | RAND_25
@@ -9424,7 +9424,7 @@ D: his people by letting Saruman's thugs into the city.
 N:618:Wolf, Farmer Maggot's dog
 G:C:W
 I:120:5d5:30:30:0
-W:2:1:0:30
+W:3:1:0:30
 B:BITE:HURT:1d4
 F:UNIQUE | 
 F:FORCE_MAXHP | RAND_25 | FRIENDS | FORCE_DEPTH
