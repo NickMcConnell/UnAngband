@@ -1770,12 +1770,13 @@ static void process_world(void)
 				/* No stairs under the player */
 				p_ptr->create_stair = 0;
 			}
-			else if (min_depth(p_ptr->dungeon) < max_depth(p_ptr->dungeon))
+			else
 			{
 				msg_print("You feel yourself yanked downwards!");
 
 				/* New depth */
-				p_ptr->depth = p_ptr->max_depth;
+				p_ptr->depth = t_info[p_ptr->dungeon].max_depth + t_info[p_ptr->dungeon].zone[0].level;
+				/* Repair, in case of old savefile */
 				if (p_ptr->depth <= min_depth(p_ptr->dungeon)) p_ptr->depth = min_depth(p_ptr->dungeon)+1;
 				if (p_ptr->depth > max_depth(p_ptr->dungeon)) p_ptr->depth = max_depth(p_ptr->dungeon);
 
@@ -1784,10 +1785,6 @@ static void process_world(void)
 
 				/* No stairs under the player */
 				p_ptr->create_stair = 0;
-			}
-			else 
-			{
-				msg_print("A tension leaves the air around you...");
 			}
 		}
 	}	

@@ -1047,14 +1047,15 @@ void set_recall(void)
 		  }
 
 		/* Reset recall depth */
-		if ((p_ptr->depth > min_depth(p_ptr->dungeon)) && (p_ptr->depth != p_ptr->max_depth))
+		if (p_ptr->depth > min_depth(p_ptr->dungeon) 
+			 && p_ptr->depth != t_info[p_ptr->dungeon].max_depth + t_info[p_ptr->dungeon].zone[0].level)
 		{
 			/*
 			 * ToDo: Add a new player_type field "recall_depth"
 			 * ToDo: Poll: Always reset recall depth?
 			 */
 			 if (get_check("Reset recall depth? "))
-				p_ptr->max_depth = p_ptr->depth;
+				 t_info[p_ptr->dungeon].max_depth = p_ptr->depth - t_info[p_ptr->dungeon].zone[0].level;
 		}
 
 		p_ptr->word_recall = rand_int(20) + 15;
