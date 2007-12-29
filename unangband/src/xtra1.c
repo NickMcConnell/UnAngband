@@ -2746,7 +2746,9 @@ static void calc_mana(void)
 	cur_wgt = 0;
 	cur_wgt += inventory[INVEN_BODY].weight;
 	cur_wgt += inventory[INVEN_HEAD].weight;
-	cur_wgt += inventory[INVEN_ARM].weight;
+	/* do not count rings and off-hand weapons */
+	if (inventory[INVEN_ARM].tval == TV_SHIELD)
+		cur_wgt += inventory[INVEN_ARM].weight;
 	cur_wgt += inventory[INVEN_OUTER].weight;
 	cur_wgt += inventory[INVEN_HANDS].weight;
 	cur_wgt += inventory[INVEN_FEET].weight;

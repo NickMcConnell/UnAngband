@@ -4790,40 +4790,6 @@ void do_cmd_timeofday()
 	msg_format("This is %s of the %s year of the third age.",
 	           get_month_name(day, cheat_xtra, FALSE), buf2);
 
-	/* Display location */
-	if (p_ptr->depth == min_depth(p_ptr->dungeon))
-	{
-		char str[46];
-
-		current_long_level_name(str);
-
-		msg_format("You are in %s.", str);
-	}
-	/* Display depth in feet */
-	else if (depth_in_feet)
-	{
-		dungeon_zone *zone=&t_info[0].zone[0];
-		char str[46];
-
-		current_long_level_name(str);
-
-		/* Get the zone */
-		get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
-
-		msg_format("You are %d ft %s %s.",
-			(p_ptr->depth - min_depth(p_ptr->dungeon)) * 50 ,
-				zone->tower ? "high above" : "deep in",
-					str);
-	}
-	/* Display depth */
-	else
-	{
-	  char str[46];
-	  current_long_level_name(str);
-	  msg_format("You are on level %d of %s.",
-		     p_ptr->depth, str);
-	}
-
 	/* Message */
 	if (cheat_xtra)
 	{
