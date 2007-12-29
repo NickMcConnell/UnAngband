@@ -750,7 +750,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (vn)
 	{
 
-		if (s_ptr->flags1 & (SF1_ENCHANT_HIGH)) vp[vn++]="highly ";
+		if (s_ptr->flags1 & (SF1_ENCHANT_HIGH)) text_out(" highly");
 
 		/* Scan */
 		for (n = 0; n < vn; n++)
