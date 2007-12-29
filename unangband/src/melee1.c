@@ -5442,7 +5442,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					(void)set_confused(p_ptr->confused + rlev / 8 + 4 + rand_int(4));
 
 					/* Always notice */
-					if (!player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L) && who)
+					if (!player_not_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L) && who)
 					{
 						update_smart_save(who, FALSE);
 					}
