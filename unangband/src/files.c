@@ -3956,10 +3956,9 @@ errr file_character(cptr name, bool full)
 	  char str[46];
 	  int j;
 	  bool victory = FALSE;
-	  int depth = t_info[i].max_depth + t_info[i].zone[0].level;
 	  bool please_print_depths = TRUE;
 
-	  long_level_name(str, i, depth);
+	  long_level_name(str, i, t_info[i].attained_depth);
 
 	  for (j = 0; j < MAX_DUNGEON_ZONES; j++)
 	    {
@@ -3983,7 +3982,7 @@ errr file_character(cptr name, bool full)
 	    if (x) 
 	      continue;
 
-	    if (t_info[i].max_depth)
+	    if (t_info[i].attained_depth > min_depth(i))
 	      /* descended to the dungeon and conquered */
 	      text_out("You have emerged victorious from ");
 	    else
@@ -3992,20 +3991,20 @@ errr file_character(cptr name, bool full)
 	  }
 	  else {
 	    /* no guardians or not all killed */
-	    if (t_info[i].max_depth) {
+	    if (t_info[i].attained_depth > min_depth(i)) {
 
 	      /* too interesting */
 	      if (x) 
 		continue;
 
-	      if (depth == max_depth(i))
+	      if (t_info[i].attained_depth == max_depth(i))
 		text_out("You've fought through to the other side of ");
 	      else {
 		text_out("You have reached ");
 		
 		/* Express in feet or level*/
-		if (depth_in_feet) text_out(format("%d foot depth in ", depth));
-		else text_out(format("level %d in ", depth));
+		if (depth_in_feet) text_out(format("%d foot depth in ", t_info[i].attained_depth));
+		else text_out(format("level %d in ", t_info[i].attained_depth));
 	      }
 	    }
 	    else if (t_info[i].visited) {

@@ -1775,7 +1775,7 @@ static void process_world(void)
 				msg_print("You feel yourself yanked downwards!");
 
 				/* New depth */
-				p_ptr->depth = t_info[p_ptr->dungeon].max_depth + t_info[p_ptr->dungeon].zone[0].level;
+				p_ptr->depth = t_info[p_ptr->dungeon].attained_depth;
 				/* Repair, in case of old savefile */
 				if (p_ptr->depth <= min_depth(p_ptr->dungeon)) p_ptr->depth = min_depth(p_ptr->dungeon)+1;
 				if (p_ptr->depth > max_depth(p_ptr->dungeon)) p_ptr->depth = max_depth(p_ptr->dungeon);

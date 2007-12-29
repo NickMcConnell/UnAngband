@@ -224,7 +224,7 @@ struct town_type
 	
 	byte r_char;    /* Add races of this char */
 	byte r_flag;    /* Add races with this flag */
-	byte max_depth;
+	byte attained_depth; /* Absolute, not from dungeon surface */
 	byte visited;
 	
 	u16b store[MAX_STORES];

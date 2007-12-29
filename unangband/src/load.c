@@ -2500,14 +2500,27 @@ static errr rd_savefile_new_aux(void)
 			/* Load the maximum depth */
 			rd_byte(&tmp8u);
 
-			/* Silently reduce depth */
-			if (tmp8u > max_depth(i) - min_depth(i)) tmp8u = max_depth(i) - min_depth(i);
+			if (older_than(0, 6, 2, 5))
+				tmp8u += min_depth(i);
 
-			/* Set the max_depth */
-			t_info[i].max_depth = tmp8u;
+			/* Silently fix depth */
+			if (tmp8u > max_depth(i)) 
+				tmp8u = max_depth(i);
+			else if (tmp8u < min_depth(i)) 
+				tmp8u = min_depth(i);
+
+			/* Set the maximal attained depth */
+			t_info[i].attained_depth = tmp8u;
 			
 			/* Oops */
-			if (!older_than(0, 6, 2, 4)) rd_byte(&t_info[i].visited);
+			if (!older_than(0, 6, 2, 4)) 
+				rd_byte(&t_info[i].visited);
+
+			if (!older_than(0, 6, 2, 5)) 
+			{
+				rd_u16b(&t_info[i].guardian_ifvisited);
+				rd_u16b(&t_info[i].replace_guardian);
+			}
 
 			/* Read the store indexes */
 			if (!older_than(0, 6, 2, 0) && !p_ptr->is_dead)
