@@ -1465,7 +1465,7 @@ bool item_tester_refill_torch(const object_type *o_ptr)
 static bool item_tester_empty_flask_or_lite(const object_type *o_ptr)
 {
 	/* Empty flasks are okay */
-	if ((o_ptr->tval == TV_FLASK) && (o_ptr->sval == SV_FLASK_EMPTY)) return (TRUE);
+	if ((o_ptr->tval == TV_HOLD) && (o_ptr->sval == SV_FLASK_EMPTY)) return (TRUE);
 
 	/* Empty bottles are okay */
 	if ((o_ptr->tval == TV_HOLD) && (o_ptr->sval == SV_HOLD_BOTTLE) && !(o_ptr->name3)) return (TRUE);
