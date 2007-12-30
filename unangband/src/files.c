@@ -3732,7 +3732,7 @@ static void dump_home_stat_info(FILE *fff)
  */
 errr file_character(cptr name, bool full)
 {
-	int i, w, x, y, z;
+	int i, j, w, x, y, z;
 
 	byte a;
 	char c;
@@ -3924,7 +3924,7 @@ errr file_character(cptr name, bool full)
 
 	text_out("\n");
 
-	/* Dump the Home Flags , then the inventory -- if anything there */
+	/* Dump the Home Flags, then the inventory -- if anything there */
 	if (st_ptr->stock_num)
 	{
 		/* Header */
@@ -3944,6 +3944,30 @@ errr file_character(cptr name, bool full)
 		text_out("\n");
 	}
 
+	/* Print other storages */
+	for (j = 0; j < total_store_count; j++) 
+	{
+		store_type *st_ptr = store[j];
+
+		if ((st_ptr->base != 1 && st_ptr->base != 2) || !st_ptr->stock_num) 
+			continue;
+
+		/* Header */
+		text_out(format("  [%s Inventory]\n\n", u_name + st_ptr->name));
+
+		/* Dump all available items */
+		for (i = 0; i < st_ptr->stock_num; i++)
+		{
+			object_desc(o_name, sizeof(o_name), &st_ptr->stock[i], TRUE, 3);
+			text_out(format("%c) %s\n", I2A(i), o_name));
+
+			/* Describe random object attributes */
+			identify_random_gen(&st_ptr->stock[i]);
+		}
+
+		/* Add an empty line */
+		text_out("\n");
+	}
 
 	/* Dump dungeons */
 	text_out("  [Dungeons Explored]\n\n");
@@ -4220,7 +4244,7 @@ errr file_character(cptr name, bool full)
 	else text_out("  [Your Home Is Empty]\n\n");
 
 	/* Dump options */
-	text_out("  [Options]\n");
+	text_out("  [Options]\n\n");
 
 	/* Dump options */
 	for (i = 0; i < OPT_MAX; i++)
