@@ -3792,7 +3792,7 @@ errr file_character(cptr name, bool full)
 
 	/* Begin dump */
 	text_out(format("  [%s %s Character Dump]\n\n",
-	        VERSION_NAME, VERSION_STRING));
+						 VERSION_NAME, VERSION_STRING));
 
 	/* Display player */
 	display_player(0);
@@ -3822,7 +3822,7 @@ errr file_character(cptr name, bool full)
 
 	/* Display current date in the Elvish calendar */
 	text_out(format(" This is %s of the %s year of the third age.\n",
-	           get_month_name(day, cheat_xtra, FALSE), buf2));
+						 get_month_name(day, cheat_xtra, FALSE), buf2));
 
 	{
 		char str[46];
@@ -3863,9 +3863,9 @@ errr file_character(cptr name, bool full)
 	if (i > 15) i = 15;
 	text_out("  [Last Messages]\n\n");
 	while (i-- > 0)
-	  {
-	    text_out(format("> %s\n", message_str((s16b)i)));
-	  }
+	{
+		text_out(format("> %s\n", message_str((s16b)i)));
+	}
 	text_out("\n");
 
 	/* Dump the equipment */
@@ -3876,7 +3876,7 @@ errr file_character(cptr name, bool full)
 		for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
 		{
 			object_desc(o_name, sizeof(o_name), &inventory[i],
-				TRUE, 3);
+							TRUE, 3);
 
 			text_out(format("%c) %s\n", index_to_label(i), o_name));
 
@@ -3898,7 +3898,7 @@ errr file_character(cptr name, bool full)
 			if (!inventory[i].k_idx) continue;
 
 			object_desc(o_name, sizeof(o_name), &inventory[i],
-				TRUE, 3);
+							TRUE, 3);
 
 			text_out(format("%c) %s\n", index_to_label(i), o_name));
 
@@ -3951,88 +3951,102 @@ errr file_character(cptr name, bool full)
 	/* Two passes: interesting and boring dungeons */
 	for (x = 0; x < 2; x++)
 	{
-	for (i = 0; i < z_info->t_max; i++)
-	{
-	  char str[46];
-	  int j;
-	  bool victory = FALSE;
-	  bool please_print_depths = TRUE;
+		for (i = 0; i < z_info->t_max; i++)
+		{
+			char str[46];
+			int j;
+			bool victory = FALSE;
+			bool please_print_depths = TRUE;
 
-	  long_level_name(str, i, t_info[i].attained_depth);
+			long_level_name(str, i, t_info[i].attained_depth);
 
-	  for (j = 0; j < MAX_DUNGEON_ZONES; j++)
-	    {
-	      int guard = actual_guardian(t_info[i].zone[j].guard, i, j);
-	      if (guard) {
-		if (r_info[guard].max_num > 0) {
-		  victory = FALSE;
-		  break;
-		}
-		else {
-		  victory = TRUE;
-		  /* and now check the other guardians */
-		}
-	      }
-	    }
+			for (j = 0; j < MAX_DUNGEON_ZONES; j++)
+			{
+				int guard = actual_guardian(t_info[i].zone[j].guard, i, j);
+				if (guard) {
+					if (r_info[guard].max_num > 0) {
+						victory = FALSE;
+						break;
+					}
+					else {
+						victory = TRUE;
+						/* and now check the other guardians */
+					}
+				}
+			}
 
-	  if (victory) {
-	    /* guardians present and all killed */
+			if (victory) {
+				/* guardians present and all killed */
 
-	    /* too interesting */
-	    if (x) 
-	      continue;
+				/* too interesting */
+				if (x) 
+					continue;
 
-	    if (t_info[i].attained_depth > min_depth(i))
-	      /* descended to the dungeon and conquered */
-	      text_out("You have emerged victorious from ");
-	    else
-	      /* won, even if not visited, e.g. guardian killed elsewhere */
-	      text_out("You've cleared the passage through ");
-	  }
-	  else {
-	    /* no guardians or not all killed */
-	    if (t_info[i].attained_depth > min_depth(i)) {
+				if (t_info[i].attained_depth > min_depth(i))
+					/* descended to the dungeon and conquered */
+					text_out("You emerged victorious from ");
+				else
+					/* won, even if not visited, e.g. guardian killed elsewhere */
+					text_out("You cleared the passage through ");
+			}
+			else {
+				/* no guardians or not all killed */
+				if (t_info[i].attained_depth > min_depth(i)) {
 
-	      /* too interesting */
-	      if (x) 
-		continue;
+					/* too interesting */
+					if (x) 
+						continue;
 
-	      if (t_info[i].attained_depth == max_depth(i))
-		text_out("You've fought through to the other side of ");
-	      else {
-		text_out("You have reached ");
+					if (t_info[i].attained_depth == max_depth(i))
+						text_out("You fought through to the other side of ");
+					else {
+						text_out("You have reached ");
 		
-		/* Express in feet or level*/
-		if (depth_in_feet) text_out(format("%d foot depth in ", t_info[i].attained_depth));
-		else text_out(format("level %d in ", t_info[i].attained_depth));
-	      }
-	    }
-	    else if (t_info[i].visited) {
+						/* Express in feet or level*/
+						if (depth_in_feet) text_out(format("%d foot depth in ", t_info[i].attained_depth));
+						else text_out(format("level %d in ", t_info[i].attained_depth));
+					}
+				}
+				else if (t_info[i].visited) {
+					/* not descended, but visited */
 
-	      /* not interesting enough */
-	      if (!x) 
-		continue;
+					/* not descended nor cleared, but another location opened */
+					if (t_info[i].quest_monster 
+						 && r_info[t_info[i].quest_monster].max_num == 0) 
+					{
+						/* too interesting */
+						if (x) 
+							continue;
 
-	      please_print_depths = FALSE;
+						text_out("You opened the passage through ");
+					}
+					else
+					{
+						/* not interesting enough */
+						if (!x) 
+							continue;
 
-	      text_out("You have visited ");		
-	    }
-	    else 
-	      /* no impact whatsoever on this dungeon; not printing */
-	      continue;
-	  }
+						please_print_depths = FALSE;
 
-	  text_out(str);
+						text_out("You have visited ");		
+					}
+				}
+				else 
+					/* no impact whatsoever on this dungeon; not printing */
+					continue;
+			}
 
-	  if (please_print_depths) {
-	    if (min_depth(i) == max_depth(i))
-	      text_out(format(" (%d).\n",  min_depth(i)));
-	    else
-	      text_out(format(" (%d-%d).\n",  min_depth(i), max_depth(i)));
-	  }
-	  else
-	    text_out(".\n");
-	}
+			text_out(str);
+
+			if (please_print_depths) {
+				if (min_depth(i) == max_depth(i))
+					text_out(format(" (%d).\n",  min_depth(i)));
+				else
+					text_out(format(" (%d-%d).\n",  min_depth(i), max_depth(i)));
+			}
+			else
+				text_out(".\n");
+		}
 	}
 
 	text_out("\n");
@@ -4047,7 +4061,7 @@ errr file_character(cptr name, bool full)
 
 	/* Dump spells learnt */
 	if ((c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL)
-		|| (p_ptr->pstyle == WS_MAGIC_BOOK) || (p_ptr->pstyle == WS_PRAYER_BOOK) || (p_ptr->pstyle == WS_SONG_BOOK))
+		 || (p_ptr->pstyle == WS_MAGIC_BOOK) || (p_ptr->pstyle == WS_PRAYER_BOOK) || (p_ptr->pstyle == WS_SONG_BOOK))
 	{
 		/* Dump spells */
 		text_out("  [Spells Learnt]\n\n");
@@ -4218,9 +4232,9 @@ errr file_character(cptr name, bool full)
 		if (option_desc[i])
 		{
 			text_out(format("%-45s: %s (%s)\n",
-			        format("%s%s", (i >= OPT_GAME_PLAY) && (i < OPT_EFFICIENCY) ? "Game: " : "", option_desc[i]),
-			        op_ptr->opt[i] ? "yes" : "no ",
-			        option_text[i]));
+								 format("%s%s", (i >= OPT_GAME_PLAY) && (i < OPT_EFFICIENCY) ? "Game: " : "", option_desc[i]),
+								 op_ptr->opt[i] ? "yes" : "no ",
+								 option_text[i]));
 		}
 	}
 
