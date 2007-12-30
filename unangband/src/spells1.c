@@ -1233,21 +1233,21 @@ void take_hit(int dam, cptr kb_str)
 	/* Mega-Hack -- Apply "invulnerability" */
 	if (p_ptr->invuln && (dam < 9000)) return;
 
-	/* Hurt the player */
-	p_ptr->chp -= dam;
-
 	/* Make test-id and traps less deadly */
-	if (p_ptr->chp < 1
+	if (p_ptr->chp >= p_ptr->mhp / 2
+		 && dam >= p_ptr->chp
 	    && (cause_of_damage == SOURCE_FEATURE
-		|| cause_of_damage == SOURCE_PLAYER_COATING
-		|| cause_of_damage == SOURCE_PLAYER_EAT_MONSTER
-		|| cause_of_damage == SOURCE_PLAYER_EAT
-		|| cause_of_damage == SOURCE_PLAYER_QUAFF
-		|| cause_of_damage == SOURCE_PLAYER_READ
-		|| cause_of_damage == SOURCE_PLAYER_ZAP_NO_TARGET
-		|| cause_of_damage == SOURCE_OBJECT)
-	    && dam > p_ptr->mhp / 2)
-	  p_ptr->chp = 1;
+			  || cause_of_damage == SOURCE_PLAYER_COATING
+			  || cause_of_damage == SOURCE_PLAYER_EAT_MONSTER
+			  || cause_of_damage == SOURCE_PLAYER_EAT
+			  || cause_of_damage == SOURCE_PLAYER_QUAFF
+			  || cause_of_damage == SOURCE_PLAYER_READ
+			  || cause_of_damage == SOURCE_PLAYER_ZAP_NO_TARGET
+			  || cause_of_damage == SOURCE_OBJECT))
+		 p_ptr->chp = 1;
+	else
+		/* Hurt the player */
+		p_ptr->chp -= dam;
 
 	/* Display the hitpoints */
 	p_ptr->redraw |= (PR_HP);

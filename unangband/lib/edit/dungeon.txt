@@ -536,9 +536,9 @@ D: trees have begun to march in response --- but you can only see dark smoke
 D: and, to the east, the even darker shape amongst the darkness: Dol Guldur.
 D:  Now it is clear that the lust for power corrupted Saruman beyond help.
 
-# TODO: perhaps split them: 5--17 initially, weak guardian at the bottom
-# after Dol Guldur: 11--23 (Barrow-downs stirred by Dark Captain)
-# weak guardian at the surface, current big guardian at the bottom
+# TODO: perhaps split them: 5--17 initially, weak guardian at the bottom.
+# After Dol Guldur: 11--23 (Barrow-downs stirred by Dark Captain)
+# weak guardian at the surface, current big guardian at the bottom.
 
 N:38:Barrow-downs
 X:11:12:0:0
