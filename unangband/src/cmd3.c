@@ -649,11 +649,11 @@ void do_cmd_wield(void)
 	{
 		switch (j_ptr->feeling)
 		{
-			case INSCRIP_NONMAGICAL: j_ptr->feeling = INSCRIP_AVERAGE; break;
+/* TODO	case INSCRIP_NONMAGICAL: j_ptr->feeling = INSCRIP_AVERAGE; break; */
 			case INSCRIP_ARTIFACT: j_ptr->feeling = INSCRIP_SPECIAL; break;
 			case INSCRIP_HIGH_EGO_ITEM: j_ptr->feeling = INSCRIP_SUPERB; break;
 			case INSCRIP_EGO_ITEM: j_ptr->feeling = INSCRIP_EXCELLENT; break;
-			case INSCRIP_UNUSUAL: j_ptr->feeling = INSCRIP_MAGICAL; break;
+/*	TODO	case INSCRIP_UNUSUAL: j_ptr->feeling = INSCRIP_MAGICAL; break; */
 		}
 	}
 
