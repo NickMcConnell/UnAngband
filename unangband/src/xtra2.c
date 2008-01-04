@@ -3778,7 +3778,7 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 			tell_allies_death(m_ptr->fy, m_ptr->fx, "& has killed one of us!");
 		}
 
-		/* Allies don't provide experience */
+		/* Death of player allies doesn't provide experience */
 		if ((m_ptr->mflag & (MFLAG_ALLY)) == 0)
 		{
 			/* Maximum player level */

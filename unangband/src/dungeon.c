@@ -3186,20 +3186,12 @@ static void dungeon(void)
 	/* Disturb */
 	disturb(1, 0);
 
-
-	/* Track maximum player level */
-	if (p_ptr->max_lev < p_ptr->lev)
-	{
-		p_ptr->max_lev = p_ptr->lev;
-	}
-
-
-	/* Track maximum dungeon level */
-	if (p_ptr->max_depth < p_ptr->depth)
+	/* Track maximum dungeon level; surface does not count */
+	if (p_ptr->max_depth < p_ptr->depth 
+		 && p_ptr->depth > min_depth(p_ptr->dungeon))
 	{
 		p_ptr->max_depth = p_ptr->depth;
 	}
-
 
 	/* Choose panel */
 	verify_panel();
@@ -3280,7 +3272,7 @@ static void dungeon(void)
 	if (p_ptr->is_dead) return;
 
 	/* Announce (or repeat) the feeling */
-	if (p_ptr->depth>min_depth(p_ptr->dungeon)) do_cmd_feeling();
+	if (p_ptr->depth > min_depth(p_ptr->dungeon)) do_cmd_feeling();
 
 	/*** Process this dungeon level ***/
 

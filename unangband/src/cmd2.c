@@ -816,11 +816,6 @@ static void do_cmd_travel(void)
 			/* Set the new depth */
 			p_ptr->depth = min_depth(p_ptr->dungeon);
 
-#if 0
-			/* Reset the recall depth */
-			p_ptr->max_depth = min_depth(p_ptr->dungeon);
-#endif
-
 			/* Clear stairs */
 			p_ptr->create_stair = 0;
 			
