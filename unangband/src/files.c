@@ -1554,34 +1554,38 @@ static void display_player_xtra_info(void)
 	}
 
 	/* Current dungeon level */
-	Term_putstr(col, 14, -1, TERM_WHITE, "Depth"); 	 
+	Term_putstr(col, 14, -1, TERM_WHITE, "Curr Danger"); 	 
   	 
-	/* Has he actually left the town? */ 	 
-	if (p_ptr->max_depth) 	 
-	{ 	 
-		/*express in feet or level*/ 	 
-		if (depth_in_feet) strnfmt(buf, sizeof(buf), "%5d ft", p_ptr->depth * 50); 	 
-		else strnfmt(buf, sizeof(buf), " Lev %3d", p_ptr->depth); 	 
+	if (p_ptr->depth) 	 
+	{ 
+		if (p_ptr->depth < 100)
+		{
+			/* express in feet or level */ 	 
+			if (depth_in_feet) strnfmt(buf, sizeof(buf), "%4d ft", p_ptr->depth * 50);
+			else strnfmt(buf, sizeof(buf), " Lev%3d", p_ptr->depth); 	 
+		}
+		else strnfmt(buf, sizeof(buf), " Absurd");
 	} 	 
-	/*hasn't left town*/ 	 
-	else strnfmt(buf, sizeof(buf), "    Town"); 	 
-	
-	Term_putstr(col+10, 14, -1, TERM_L_GREEN, buf);
+	else strnfmt(buf, sizeof(buf), " Benign"); 	 
+
+	Term_putstr(col+11, 14, -1, TERM_L_GREEN, buf);
 
 	/* Max dungeon level */ 	 
-	Term_putstr(col, 15, -1, TERM_WHITE, "MaxDepth"); 	 
+	Term_putstr(col, 15, -1, TERM_WHITE, "Max Dungeon"); 	 
   	 
-	/* Has he actually left the town? */ 	 
 	if (p_ptr->max_depth) 	 
-	{ 	 
-		/*express in feet or level*/ 	 
-		if (depth_in_feet) strnfmt(buf, sizeof(buf), "%5d ft", p_ptr->max_depth * 50); 	 
-		else strnfmt(buf, sizeof(buf), " Lev %3d", p_ptr->max_depth); 	 
-	} 	 
-	/*hasn't left town*/ 	 
-	else strnfmt(buf, sizeof(buf), "    Town"); 	 
-	
-	Term_putstr(col+10, 15, -1, TERM_L_GREEN, buf);
+	{
+		if (p_ptr->max_depth < 100)
+		{
+			/* express in feet or level */ 	 
+			if (depth_in_feet) strnfmt(buf, sizeof(buf), "%4d ft", p_ptr->max_depth * 50); 	 
+			else strnfmt(buf, sizeof(buf), " Lev%3d", p_ptr->max_depth); 	 
+		}
+		else strnfmt(buf, sizeof(buf), " Bottom");
+	}
+	else strnfmt(buf, sizeof(buf), "   None"); 	 
+
+	Term_putstr(col+11, 15, -1, TERM_L_GREEN, buf);
 
 	/* Game Turn */
 	Term_putstr(col, 16, -1, TERM_WHITE, "Game Turn");
