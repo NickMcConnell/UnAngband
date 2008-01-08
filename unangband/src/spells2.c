@@ -1051,8 +1051,7 @@ void set_recall(void)
 			 && p_ptr->depth != t_info[p_ptr->dungeon].attained_depth)
 		{
 			/*
-			 * ToDo: Add a new player_type field "recall_depth"
-			 * ToDo: Poll: Always reset recall depth?
+			 * TODO: Poll? Always reset recall depth?
 			 */
 			 if (get_check("Reset recall depth? "))
 				 t_info[p_ptr->dungeon].attained_depth = p_ptr->depth;

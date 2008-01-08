@@ -674,7 +674,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
  * Find a secret at the specified location and change it according to
  * the state.
  * 
- * TODO: Its very repetitive having to walk up a corridor and find
+ * TODO: It's very repetitive having to walk up a corridor and find
  * every square is dusty. We should flow out from the initial secret
  * and find all other nearby squares that have the same feature, and
  * reveal the secrets on those as well. e.g. adjacent secret doors,
@@ -2215,8 +2215,6 @@ void hit_trap(int y, int x)
 				if (!method) break;
 
 				/* Mega hack -- dispel evil/undead objects */
-				/* FIXME: how is player supposed to be unded?
-				   Also in many other places */
 				if (!d_side)
 				{
 					d_plus += 25 * d_dice;

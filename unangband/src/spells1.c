@@ -11963,7 +11963,7 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 		case GF_SALT_WATER:
 		case GF_SUFFOCATE:
 		{
-			/* XXX To do */
+			/* XXX TODO */
 			break;
 		}
 
