@@ -1053,11 +1053,29 @@ static void store_delete(int store_index)
 	/* Determine how many objects are in the slot */
 	num = st_ptr->stock[what].number;
 
-	/* Hack -- sometimes, only destroy half the objects */
-	if (rand_int(100) < 50) num = (num + 1) / 2;
+	if (st_ptr->base == STORE_B_MARKET)
+	{
+		object_type *o_ptr;
 
-	/* Hack -- sometimes, only destroy a single object */
-	if (rand_int(100) < 50) num = 1;
+		/* Get the object */
+		o_ptr = &st_ptr->stock[what];
+
+		/* keep expensive stuff */
+		if (rand_int(k_info[o_ptr->k_idx].cost) > 500
+			 && rand_int(k_info[o_ptr->k_idx].cost) > 500
+			 && rand_int(k_info[o_ptr->k_idx].cost) > 500)
+			return;
+	}
+	else 
+	{
+		/* Hack -- sometimes, only destroy half the objects */
+		if (rand_int(100) < 50) 
+			num = (num + 1) / 2;
+
+		/* Hack -- sometimes, only destroy a single object */
+		if (rand_int(100) < 50) 
+			num = 1;
+	}
 
 	/* Actually destroy (part of) the object */
 	store_item_increase(what, -num, store_index);
@@ -3445,7 +3463,7 @@ void do_cmd_store(void)
 		t_ptr->store_index[i] = store_index;
 
 		/* Maintain store */
-		for (i = 0; i< 10; i++)
+		for (i = 0; i < 10; i++)
 		{
 			store_maint(store_index);
 		}
@@ -3837,7 +3855,8 @@ void store_maint(int store_index)
 	if (j < 0) j = 0;
 
 	/* Destroy objects until only "j" slots are left -- fail if tried too many times */
-	while ((st_ptr->stock_num > j) && (tries++ < 100)) store_delete(store_index);
+	while ((st_ptr->stock_num > j) && (tries++ < 100)) 
+		store_delete(store_index);
 
 	/* Reset tries */
 	tries = 0;
@@ -3858,7 +3877,8 @@ void store_maint(int store_index)
 	if (j >= st_ptr->stock_size) j = st_ptr->stock_size - 1;
 
 	/* Create some new items -- fail if tried too many times */
-	while ((st_ptr->stock_num < j) && (tries++ < 100)) store_create(store_index);
+	while ((st_ptr->stock_num < j) && (tries++ < 100)) 
+		store_create(store_index);
 
 	/* Hack -- Restore the rating */
 	rating = old_rating;

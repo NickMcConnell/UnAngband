@@ -730,7 +730,7 @@ static void process_world(void)
 	cptr name;
 
 	/* no shuffling for alien towns */
-	  town_type *t_ptr = &t_info[p_ptr->town];
+	town_type *t_ptr = &t_info[p_ptr->town];
 
 	/* Every 10 game turns */
 	if (turn % 10) return;
@@ -821,20 +821,19 @@ static void process_world(void)
 			/* Message */
 			if (cheat_xtra) msg_print("Updating Shops...");
 
-			/* Maintain each shop (except home, special locations) */
+			/* Maintain each shop */
 			for (n = 0; n < total_store_count; n++)
 			{
-
-			  /* no restocking for alien towns */
-			  town_type *t_ptr = &t_info[p_ptr->town];
-			  for (i = 0; i < MAX_STORES; i++)
-			    {
+				/* no restocking for alien towns; at most 1 shop n in each town */
+				town_type *t_ptr = &t_info[p_ptr->town];
+				for (i = 0; i < MAX_STORES; i++)
+				{
 			      if (t_ptr->store_index[i] == n)
-				break;
-			    }
-			  if (i < MAX_STORES)
-			    /* Maintain */
-			    store_maint(n);
+					{
+						store_maint(n);
+						break;
+					}
+				}
 			}
 
 			/* Sometimes, shuffle the shop-keepers */
@@ -846,14 +845,14 @@ static void process_world(void)
 				/* Pick a random shop (except home) */
 				n = randint(total_store_count - 1);
 
-			  for (i = 0; i < MAX_STORES; i++)
-			    {
+				for (i = 0; i < MAX_STORES; i++)
+				{
 			      if (t_ptr->store_index[i] == n)
-				break;
-			    }
-			  if (i < MAX_STORES)
-			    /* Shuffle it */
-			    store_shuffle(n);
+					{
+						store_shuffle(n);
+						break;
+					}
+				}
 			}
 
 			/* Message */

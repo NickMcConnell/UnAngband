@@ -671,7 +671,7 @@ N:36:tree hung with a banner 'Happy Elventy-One'
 X:2
 
 N:37:at the Prancing Pony
-X:1
+X:0
 
 N:38:the pool of Goldberry
 X:2
