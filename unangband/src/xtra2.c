@@ -3612,14 +3612,16 @@ void monster_death(int m_idx)
 		  /* Explain the staircase */
 		  msg_print("A magical staircase appears...");
 	
-		  /* Create stairs down */
-		  cave_set_feat(y, x, FEAT_MORE);
-	
+		  /* Create stairs */
+		  if (t_info[p_ptr->dungeon].zone[0].tower)
+			  cave_set_feat(y, x, FEAT_LESS);
+		  else
+			  cave_set_feat(y, x, FEAT_MORE);
+
 		  /* Save any objects in that place */
 		  scatter_objects_under_feat(y, x);
 		}
 	}
-
 
 	/* Hack -- Finishing quest 1 completes the game */
 	/* Nothing left, game over... */

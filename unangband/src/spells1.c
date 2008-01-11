@@ -7434,8 +7434,12 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		{
 			if (seen) obvious = TRUE;
 
-			/* Hack -- no chasm/trap doors/down stairs on quest levels */
-			if (is_quest(p_ptr->depth) ||  (p_ptr->depth == max_depth(p_ptr->dungeon)))
+			/* Hack -- no chasm/trap doors/down stairs on quest/bottom levels */
+			if (is_quest(p_ptr->depth) 
+				 || (p_ptr->depth == max_depth(p_ptr->dungeon) 
+					  && !t_info[p_ptr->dungeon].zone[0].tower)
+				 || (p_ptr->depth == min_depth(p_ptr->dungeon) 
+					  && t_info[p_ptr->dungeon].zone[0].tower))
 			{
 				note = "falls into a chasm.";
 
@@ -11048,7 +11052,8 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_can_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
 
 				msg_print("You float gently down to the bottom of the pit.");
-				dam=0;
+
+				dam = 0;
 			}
 			else
 			{
@@ -11063,64 +11068,69 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 		case GF_FALL_MORE:
 		case GF_FALL_LESS:
-		  {
-		    if (typ == GF_FALL_MORE && 
-			(p_ptr->cur_flags3 & TR3_FEATHER) != 0)
-		      {
-			/* Always notice */
-			player_can_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+		{
+			if (typ == GF_FALL_MORE && 
+				 (p_ptr->cur_flags3 & TR3_FEATHER) != 0)
+			{
+				/* Always notice */
+				player_can_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
 
-			if (typ == GF_FALL_MORE)
-			  msg_print("You gently float down to the next level.");
+				if (typ == GF_FALL_MORE)
+					msg_print("You gently float down.");
 				
-			dam = 0;
-		      }
-		    else
-		      {
-			if (typ == GF_FALL_MORE)
-			  /* Always notice */
-			  player_not_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+				dam = 0;
+			}
+			else
+			{
+				if (typ == GF_FALL_MORE)
+					/* Always notice */
+					player_not_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
 			  
-			take_hit(dam, killer);
-		      }
+				take_hit(dam, killer);
+			}
 
-		    /* Hack -- no chasm/trap doors on quest levels */
-		    if (!max_depth(p_ptr->dungeon)
-			|| (typ == GF_FALL_MORE 
-			    && (is_quest(p_ptr->depth) 
-				|| p_ptr->depth == max_depth(p_ptr->dungeon)))
-			|| (typ == GF_FALL_LESS
-			    && p_ptr->depth == min_depth(p_ptr->dungeon)))
-		      {
-			/* Mark grid for later processing. */
-			cave_temp_mark(y, x, FALSE);
-		      }
-		    /* Hack -- tower level decreases depth */
-		    else if ((typ == GF_FALL_MORE 
-			      && !t_info[p_ptr->dungeon].zone[0].tower)
-			     || (typ == GF_FALL_LESS 
-				 && t_info[p_ptr->dungeon].zone[0].tower))
-		      {
-			/* New depth */
-			p_ptr->depth++;
+			/* Hack -- no chasm/trap doors on quest/bottom levels */
+			if (is_quest(p_ptr->depth)
+				 || (typ == GF_FALL_MORE 
+					  && ((p_ptr->depth == max_depth(p_ptr->dungeon) 
+							 && !t_info[p_ptr->dungeon].zone[0].tower)
+							|| (p_ptr->depth == min_depth(p_ptr->dungeon) 
+								 && t_info[p_ptr->dungeon].zone[0].tower)))
+				 || (typ == GF_FALL_LESS
+					  && ((p_ptr->depth == max_depth(p_ptr->dungeon) 
+							 && t_info[p_ptr->dungeon].zone[0].tower)
+							|| (p_ptr->depth == min_depth(p_ptr->dungeon) 
+								 && !t_info[p_ptr->dungeon].zone[0].tower))))
+			{
+				/* Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
+			}
+			/* Hack -- tower level decreases depth */
+			else if ((typ == GF_FALL_MORE 
+						 && !t_info[p_ptr->dungeon].zone[0].tower)
+						|| (typ == GF_FALL_LESS 
+							 && t_info[p_ptr->dungeon].zone[0].tower))
+			{
+				/* New depth */
+				p_ptr->depth++;
 
-			/* Leaving */
-			p_ptr->leaving = TRUE;
-		      }
-		    else
-		      {
-			/* New depth */
-			p_ptr->depth--;
+				/* Leaving */
+				p_ptr->leaving = TRUE;
+			}
+			else
+			{
+				/* New depth */
+				p_ptr->depth--;
 
-			/* Leaving */
-			p_ptr->leaving = TRUE;
-		      }
+				/* Leaving */
+				p_ptr->leaving = TRUE;
+			}
 
-		    /* Clear stairs */
-		    p_ptr->create_stair = 0;
+			/* Clear stairs */
+			p_ptr->create_stair = 0;
 
-		    break;
-		  }
+			break;
+		}
 
 		case GF_FALL_SPIKE:
 		{
