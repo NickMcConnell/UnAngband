@@ -533,6 +533,8 @@ extern bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t);
 extern void do_cmd_cast(void);
 
 /* cmd6.c */
+extern bool item_tester_hook_food_edible(const object_type *o_ptr);
+extern bool player_eat_food(int item);
 extern void do_cmd_eat_food(void);
 extern void do_cmd_quaff_potion(void);
 extern void do_cmd_read_scroll(void);

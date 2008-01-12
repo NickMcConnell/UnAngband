@@ -61,9 +61,9 @@
 
 
 /*
- * Hook to determine if an object is activatable and charged
+ * Hook to determine if an object is edible
  */
-static bool item_tester_hook_food_edible(const object_type *o_ptr)
+bool item_tester_hook_food_edible(const object_type *o_ptr)
 {
 	/* Check based on tval */
 	switch(o_ptr->tval)
@@ -115,16 +115,12 @@ static bool item_tester_hook_food_edible(const object_type *o_ptr)
 }
 
 
-
 /*
- * Eat some food (from the pack or floor)
+ * The player eats some food
  */
-void do_cmd_eat_food(void)
+bool player_eat_food(int item)
 {
-	int item, ident, lev;
-
-	/* Must be true to let us cancel */
-	bool cancel = TRUE;
+	int ident, lev;
 
 	object_type *o_ptr;
 
@@ -134,18 +130,8 @@ void do_cmd_eat_food(void)
 
 	bool use_feat = FALSE;
 
-	/* Restrict choices to food */
-	item_tester_hook = item_tester_hook_food_edible;
-
-#if 0
-	/* Restrict choices to food */
-	item_tester_tval = TV_FOOD;
-#endif
-
-	/* Get an item */
-	q = "Eat which item? ";
-	s = "You have nothing to eat.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
+	/* Must be true to let us cancel */
+	bool cancel = TRUE;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -255,6 +241,39 @@ void do_cmd_eat_food(void)
 		floor_item_optimize(0 - item);
 		if (use_feat && (scan_feat(p_ptr->py,p_ptr->px) < 0)) cave_alter_feat(p_ptr->py,p_ptr->px,FS_USE_FEAT);
 	}
+	
+	/* Eaten */
+	return (!cancel);
+}
+
+
+/*
+ * Eat some food (from the pack or floor)
+ */
+void do_cmd_eat_food(void)
+{
+	int item;
+
+	/* Must be true to let us cancel */
+	bool cancel = TRUE;
+
+	cptr q, s;
+
+	/* Restrict choices to food */
+	item_tester_hook = item_tester_hook_food_edible;
+
+#if 0
+	/* Restrict choices to food */
+	item_tester_tval = TV_FOOD;
+#endif
+
+	/* Get an item */
+	q = "Eat which item? ";
+	s = "You have nothing to eat.";
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
+	
+	/* Auxiliary function */
+	cancel = !player_eat_food(item);
 }
 
 

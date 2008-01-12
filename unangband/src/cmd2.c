@@ -366,6 +366,41 @@ int actual_route(int dun)
 
 
 /*
+ * Determine if the object can be eaten, and has "=<" in its inscription.
+ */
+static bool auto_consume_okay(const object_type *o_ptr)
+{
+	cptr s;
+
+	/* Inedible */
+	if (!item_tester_hook_food_edible(o_ptr)) return (FALSE);
+	
+	/* No inscription */
+	if (!o_ptr->note) return (FALSE);
+
+	/* Find a '=' */
+	s = strchr(quark_str(o_ptr->note), '=');
+
+	/* Process inscription */
+	while (s)
+	{
+		/* Auto-consume on "=<" */
+		if (s[1] == '<')
+		{
+			/* Pick up */
+			return (TRUE);
+		}
+
+		/* Find another '=' */
+		s = strchr(s + 1, '=');
+	}
+
+	/* Don't auto consume */
+	return (FALSE);
+}
+
+
+/*
  * Set routes
  *
  * Set up the possible routes from this location.
@@ -803,6 +838,19 @@ static void do_cmd_travel(void)
 
 			/* Hack -- Time passes (at 4* food use rate) */
 			turn += PY_FOOD_FULL/10*journey*4;
+			
+			/* Hack -- Consume ration inscribed with =< */
+			for (i = 0; i < INVEN_PACK; i++)
+			{
+				/* Eat the food */
+				if (auto_consume_okay(&inventory[i]))
+				{
+					/* Eat the food */
+					player_eat_food(i);
+					
+					break;
+				}
+			}
 
 			/* XXX Recharges, stop temporary speed etc. */
 			/* We don't do this to e.g. allow the player to buff themselves before fighting Beorn. */
