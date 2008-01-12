@@ -4279,6 +4279,6 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 	{ player_refill2, '`', "Refill with which source of oil? ", "You have no sources of oil.",
 			item_tester_refill_lantern, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_BAGC), 0L, 0, NULL},
 	
-	{ player_refill, '|', "Light/Douse which light source? ", "You have nothing to light or douse.",
+	{ player_light_and_douse, '|', "Light/Douse which light source? ", "You have nothing to light or douse.",
 			item_tester_light_source, 0, (USE_EQUIP | USE_FLOOR), 0L, 0, NULL},
 };
