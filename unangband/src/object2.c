@@ -8829,28 +8829,43 @@ void reorder_pack(void)
 bool book_sort_comp_hook(vptr u, vptr v, int a, int b)
 {
 	u16b *who = (u16b*)(u);
+	u16b *why = (u16b*)(v);
 
 	int w1 = who[a];
 	int w2 = who[b];
 
 	int z1, z2;
+	int i, j;
 
 	spell_type *s1_ptr = &s_info[w1];
 	spell_type *s2_ptr = &s_info[w2];
 
-	(void)v;
+	for (i = 0; i < MAX_SPELL_CASTERS; i++)
+	{
+		if (s1_ptr->cast[i].class == *why) break;
+	}
+		
+	for (j = 0; j < MAX_SPELL_CASTERS; j++)
+	{
+		if (s2_ptr->cast[j].class == *why) break;
+	}
+	
+	/* One spell is illegible */
+	if ((i == MAX_SPELL_CASTERS) && (j == MAX_SPELL_CASTERS)) return (my_stricmp(s_name + s1_ptr->name, s_name + s2_ptr->name) <= 0);
+	else if (i == MAX_SPELL_CASTERS) return (FALSE);
+	else if (j == MAX_SPELL_CASTERS) return (TRUE);
 
 	/* Extract spell level */
-	z1 = s1_ptr->cast[0].level;
-	z2 = s2_ptr->cast[0].level;
+	z1 = s1_ptr->cast[i].level;
+	z2 = s2_ptr->cast[j].level;
 
 	/* Compare spell levels */
 	if (z1 < z2) return (TRUE);
 	if (z1 > z2) return (FALSE);
 
 	/* Extract spell mana */
-	z1 = s1_ptr->cast[0].mana;
-	z2 = s2_ptr->cast[0].mana;
+	z1 = s1_ptr->cast[i].mana;
+	z2 = s2_ptr->cast[j].mana;
 
 	/* Compare spell mana */
 	if (z1 < z2) return (TRUE);
@@ -8934,7 +8949,7 @@ void fill_book(const object_type *o_ptr, s16b *book, int *num)
 
 	spell_type *s_ptr;
 
-	u16b why = 0;
+	u16b why = p_ptr->pclass;
 
 	/* No spells */
 	*num = 0;
