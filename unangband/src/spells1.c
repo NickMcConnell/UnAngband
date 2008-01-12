@@ -3698,13 +3698,16 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 		case GF_BRIDGE:
 		{
 			int old_feat = cave_feat[y][x];
+			int new_feat;
 			char name[80];
 
 			if (f_ptr->flags1 & (FF1_SECRET)) cave_alter_feat(y,x,FS_SECRET);
 
 			cave_alter_feat(y,x,FS_BRIDGE);
 
-			my_strcpy(name,f_name+f_ptr->name, sizeof(name));
+			new_feat = cave_feat[y][x];
+
+			my_strcpy(name,f_name+f_info[new_feat].name, sizeof(name));
 
 			if (!(strstr(name,"stone bridge")))
 			{
