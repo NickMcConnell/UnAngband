@@ -1936,7 +1936,7 @@ static bool do_cmd_disarm_aux(int y, int x, bool disarm)
 		msg_format("You have %sed the %s.", act, name);
 
 		/* Reward, unless player trap */
-		/* TODO: ensure no player-made traps give exp, unless very dangerous or consume heavy/expensive objects */
+		/* Note that player traps have an object in the trap */
 		if (disarm && !cave_o_idx[y][x])
 		  gain_exp(power);
 
