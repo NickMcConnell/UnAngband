@@ -61,6 +61,69 @@
 
 
 /*
+ * Do a command to an item.
+ */
+void do_cmd_item(int command)
+{
+	int item;
+
+	/* Must be true to let us cancel */
+	bool cancel = TRUE;
+
+	/* Check some conditions */
+	if ((cmd_item_list[command].conditions & (CONDITION_NOT_BLIND)) && (p_ptr->blind))
+	{
+		msg_print("You can't see anything.");
+		return;
+	}
+	
+	if ((cmd_item_list[command].conditions & (CONDITION_LITE)) && (no_lite()))
+	{
+		msg_print("You have no light to read by.");
+		return;
+	}
+	
+	if ((cmd_item_list[command].conditions & (CONDITION_NOT_BERSERK)) && (p_ptr->shero))
+	{
+		msg_print("You are too enraged!");
+		return;
+	}
+
+	/* Amnesia */
+	if ((cmd_item_list[command].conditions & (CONDITION_NOT_FORGET)) && (p_ptr->amnesia))
+	{
+		msg_print("You have forgotten how!");
+		return;
+	}
+
+	/* Hack -- prepare a fake item for innate racial abilities of the current shape */
+	if ((command == COMMAND_ITEM_ACTIVATE) && (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE)))
+	{
+		/* Prepare a 'fake' object */
+		object_prep(&inventory[INVEN_SELF], lookup_kind(TV_RACE, 0));
+
+		/* Object is known */
+		object_known(&inventory[INVEN_SELF]);
+
+		/* Hack -- set sval */
+		inventory[INVEN_SELF].sval = p_ptr->pshape;
+	}
+	
+	/* Restrict choices to tval */
+	item_tester_hook = cmd_item_list[command].item_tester_hook;
+
+	/* Restrict choices to food */
+	item_tester_tval = cmd_item_list[command].item_tester_tval;
+
+	/* Get an item */
+	if (!get_item(&item, cmd_item_list[command].item_query, cmd_item_list[command].item_not_found, cmd_item_list[command].use_from)) return;
+	
+	/* Auxiliary function */
+	cancel = !(cmd_item_list[command].player_command)(item);
+}
+
+
+/*
  * Hook to determine if an object is edible
  */
 bool item_tester_hook_food_edible(const object_type *o_ptr)
@@ -124,8 +187,6 @@ bool player_eat_food(int item)
 
 	object_type *o_ptr;
 
-	cptr q, s;
-
 	int power;
 
 	bool use_feat = FALSE;
@@ -149,7 +210,7 @@ bool player_eat_food(int item)
 	if (o_ptr->tval == TV_BAG)
 	{
 		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_ITEM_QUAFF].item_query, cmd_item_list[COMMAND_ITEM_QUAFF].item_not_found, o_ptr)) return (FALSE);
 
 		/* Refer to the item */
 		o_ptr = &inventory[item];
@@ -180,7 +241,7 @@ bool player_eat_food(int item)
 			get_spell(&power, "use", o_ptr, FALSE);
 
 			/* Paranoia */
-			if (power < 0) return;
+			if (power < 0) return (FALSE);
 
 			/* Apply food effect */
 			if (process_spell_eaten(SOURCE_PLAYER_EAT, o_ptr->k_idx, power,0,&cancel)) ident = TRUE;
@@ -247,61 +308,20 @@ bool player_eat_food(int item)
 }
 
 
-/*
- * Eat some food (from the pack or floor)
- */
-void do_cmd_eat_food(void)
-{
-	int item;
-
-	/* Must be true to let us cancel */
-	bool cancel = TRUE;
-
-	cptr q, s;
-
-	/* Restrict choices to food */
-	item_tester_hook = item_tester_hook_food_edible;
-
-#if 0
-	/* Restrict choices to food */
-	item_tester_tval = TV_FOOD;
-#endif
-
-	/* Get an item */
-	q = "Eat which item? ";
-	s = "You have nothing to eat.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
-	
-	/* Auxiliary function */
-	cancel = !player_eat_food(item);
-}
-
-
-
 
 /*
- * Quaff a potion (from the pack or the floor)
+ * The player quaffs a potion
  */
-void do_cmd_quaff_potion(void)
+bool player_quaff_potion(int item)
 {
-	int item, ident, lev, power;
+	int ident, lev, power;
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
 
 	object_type *o_ptr;
 
-	cptr q, s;
-
 	bool use_feat = FALSE;
-
-	/* Restrict choices to potions */
-	item_tester_tval = TV_POTION;
-
-	/* Get an item */
-	q = "Quaff which potion? ";
-	s = "You have no potions to quaff.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -319,7 +339,7 @@ void do_cmd_quaff_potion(void)
 	if (o_ptr->tval == TV_BAG)
 	{
 		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_ITEM_QUAFF].item_query, cmd_item_list[COMMAND_ITEM_QUAFF].item_not_found, o_ptr)) return (FALSE);
 
 		/* Refer to the item */
 		o_ptr = &inventory[item];
@@ -344,7 +364,7 @@ void do_cmd_quaff_potion(void)
 
 	/* Apply food effect */
 	if (power >= 0) ident = process_spell_eaten(SOURCE_PLAYER_QUAFF, o_ptr->k_idx, power,0,&cancel);
-	else return;
+	else return (FALSE);
 
 	/* Clear styles */
 	p_ptr->cur_style &= ~(1L << WS_POTION);
@@ -388,6 +408,8 @@ void do_cmd_quaff_potion(void)
 		floor_item_optimize(0 - item);
 		if (use_feat && (scan_feat(p_ptr->py,p_ptr->px) < 0)) cave_alter_feat(p_ptr->py,p_ptr->px,FS_USE_FEAT);
 	}
+	
+	return (!cancel);
 }
 
 
@@ -398,9 +420,9 @@ void do_cmd_quaff_potion(void)
  * include scrolls with no effects but recharge or identify, which are
  * cancelled before use.  XXX Reading them still takes a turn, though.
  */
-void do_cmd_read_scroll(void)
+bool player_read_scroll(int item)
 {
-	int item, ident, lev,power;
+	int ident, lev, power;
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
@@ -408,35 +430,7 @@ void do_cmd_read_scroll(void)
 
 	object_type *o_ptr;
 
-	cptr q, s;
-
 	bool use_feat = FALSE;
-
-	/* Check some conditions */
-	if (p_ptr->blind)
-	{
-		msg_print("You can't see anything.");
-		return;
-	}
-	if (no_lite())
-	{
-		msg_print("You have no light to read by.");
-		return;
-	}
-	if (p_ptr->shero)
-	{
-		msg_print("You are too enraged!");
-		return;
-	}
-
-
-	/* Restrict choices to scrolls */
-	item_tester_tval = TV_SCROLL;
-
-	/* Get an item */
-	q = "Read which scroll? ";
-	s = "You have no scrolls to read.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -454,7 +448,7 @@ void do_cmd_read_scroll(void)
 	if (o_ptr->tval == TV_BAG)
 	{
 		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_ITEM_READ].item_query, cmd_item_list[COMMAND_ITEM_READ].item_not_found, o_ptr)) return (FALSE);
 
 		/* Refer to the item */
 		o_ptr = &inventory[item];
@@ -483,7 +477,7 @@ void do_cmd_read_scroll(void)
 
 	/* Apply scroll effect */
 	if (power >= 0) ident = process_spell(SOURCE_PLAYER_READ, o_ptr->k_idx, power, 0, &cancel, &known);
-	else return;
+	else return (TRUE);
 
 	/* Clear styles */
 	p_ptr->cur_style &= ~(1L << WS_SCROLL);
@@ -507,7 +501,7 @@ void do_cmd_read_scroll(void)
 	p_ptr->window |= (PW_INVEN | PW_EQUIP);
 
 	/* Hack -- allow certain scrolls to be "preserved" */
-	if (cancel) return;
+	if (cancel) return (FALSE);
 
 	/* Destroy a scroll in the pack */
 	if (item >= 0)
@@ -527,6 +521,8 @@ void do_cmd_read_scroll(void)
 		floor_item_optimize(0 - item);
 		if (use_feat && (scan_feat(p_ptr->py,p_ptr->px) < 0)) cave_alter_feat(p_ptr->py,p_ptr->px,FS_USE_FEAT);
 	}
+	
+	return (!cancel);
 }
 
 
@@ -538,9 +534,9 @@ void do_cmd_read_scroll(void)
  *
  * Hack -- staffs of identify can be "cancelled".
  */
-void do_cmd_use_staff(void)
+bool player_use_staff(int item)
 {
-	int item, ident, chance, lev, power;
+	int ident, chance, lev, power;
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
@@ -548,24 +544,7 @@ void do_cmd_use_staff(void)
 
 	object_type *o_ptr;
 
-	cptr q, s;
-
 	int i;
-
-	/* Berserk */
-	if (p_ptr->shero)
-	{
-		msg_print("You are too enraged!");
-		return;
-	}
-
-	/* Restrict choices to wands */
-	item_tester_tval = TV_STAFF;
-
-	/* Get an item */
-	q = "Use which staff? ";
-	s = "You have no staff to use.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_EQUIP))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -584,7 +563,7 @@ void do_cmd_use_staff(void)
 	if (o_ptr->tval == TV_BAG)
 	{
 		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_QUAFF].item_query, cmd_item_list[COMMAND_QUAFF].item_not_found, o_ptr)) return;
 
 		/* Refer to the item */
 		o_ptr = &inventory[item];
@@ -594,7 +573,7 @@ void do_cmd_use_staff(void)
 	if ((item < 0) && (o_ptr->number > 1))
 	{
 		msg_print("You must first pick up the staffs.");
-		return;
+		return (FALSE);
 	}
 
 	/* Take a turn */
@@ -664,7 +643,7 @@ void do_cmd_use_staff(void)
 	{
 		if (flush_failure) flush();
 		msg_print("You failed to use the staff properly.");
-		return;
+		return (TRUE);
 	}
 
 	/* Notice empty staffs */
@@ -673,7 +652,7 @@ void do_cmd_use_staff(void)
 		if (flush_failure) flush();
 		msg_print("The staff has no charges left.");
 		o_ptr->ident |= (IDENT_CHARGES);
-		return;
+		return (TRUE);
 	}
 
 	/* Sound */
@@ -690,7 +669,7 @@ void do_cmd_use_staff(void)
 
 	/* Apply staff effect */
 	if (power >= 0) ident = process_spell(SOURCE_PLAYER_USE, o_ptr->k_idx, power, 0, &cancel, &known);
-	else return;
+	else return (TRUE);
 
 	/* Clear styles */
 	p_ptr->cur_style &= ~(1L << WS_STAFF);
@@ -714,7 +693,7 @@ void do_cmd_use_staff(void)
 	p_ptr->window |= (PW_INVEN | PW_EQUIP);
 
 	/* Hack -- some uses are "free" */
-	if (cancel) return;
+	if (cancel) return (FALSE);
 
 	/* XXX Hack -- new unstacking code */
 	o_ptr->stackc++;
@@ -794,6 +773,8 @@ void do_cmd_use_staff(void)
 	{
 		floor_item_charges(0 - item);
 	}
+	
+	return (!cancel);
 }
 
 
@@ -817,9 +798,9 @@ void do_cmd_use_staff(void)
  * basic "bolt" rods, but the basic "ball" wands do the same damage
  * as the basic "ball" rods.
  */
-void do_cmd_aim_wand(void)
+bool player_aim_wand(int item)
 {
-	int item, lev, ident, chance, power;
+	int lev, ident, chance, power;
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
@@ -827,24 +808,7 @@ void do_cmd_aim_wand(void)
 
 	object_type *o_ptr;
 
-	cptr q, s;
-
 	int i;
-
-	/* Berserk */
-	if (p_ptr->shero)
-	{
-		msg_print("You are too enraged!");
-		return;
-	}
-
-	/* Restrict choices to wands */
-	item_tester_tval = TV_WAND;
-
-	/* Get an item */
-	q = "Aim which wand? ";
-	s = "You have no wand to aim.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -862,7 +826,7 @@ void do_cmd_aim_wand(void)
 	if (o_ptr->tval == TV_BAG)
 	{
 		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_ITEM_AIM].item_query, cmd_item_list[COMMAND_ITEM_AIM].item_not_found, o_ptr)) return (FALSE);
 
 		/* Refer to the item */
 		o_ptr = &inventory[item];
@@ -872,7 +836,7 @@ void do_cmd_aim_wand(void)
 	if ((item < 0) && (o_ptr->number > 1))
 	{
 		msg_print("You must first pick up the wands.");
-		return;
+		return (FALSE);
 	}
 
 
@@ -943,7 +907,7 @@ void do_cmd_aim_wand(void)
 	{
 		if (flush_failure) flush();
 		msg_print("You failed to use the wand properly.");
-		return;
+		return (TRUE);
 	}
 
 	/* The wand is already empty! */
@@ -953,7 +917,7 @@ void do_cmd_aim_wand(void)
 		msg_print("The wand has no charges left.");
 		o_ptr->ident |= (IDENT_CHARGES);
 		if (object_aware_p(o_ptr)) object_known(o_ptr);
-		return;
+		return (TRUE);
 	}
 
 	/* Sound */
@@ -970,7 +934,7 @@ void do_cmd_aim_wand(void)
 
 	/* Apply wand effect */
 	if (power >= 0) ident = process_spell(SOURCE_PLAYER_AIM, o_ptr->k_idx, power, 0, &cancel, &known);
-	else return;
+	else return (TRUE);
 
 	/* Clear styles */
 	p_ptr->cur_style &= ~(1L << WS_WAND);
@@ -994,7 +958,7 @@ void do_cmd_aim_wand(void)
 	p_ptr->window |= (PW_INVEN | PW_EQUIP);
 
 	/* Hack -- allow cancel */
-	if (cancel) return;
+	if (cancel) return (FALSE);
 
 	/* XXX Hack -- new unstacking code */
 	o_ptr->stackc++;
@@ -1073,13 +1037,15 @@ void do_cmd_aim_wand(void)
 	{
 		floor_item_charges(0 - item);
 	}
+	
+	return (!cancel);
 }
 
 
 /*
  * Hook to determine if an object is activatable and charged
  */
-static bool item_tester_hook_rod_charged(const object_type *o_ptr)
+bool item_tester_hook_rod_charged(const object_type *o_ptr)
 {
 	/* Confirm this is a rod */
 	if (o_ptr->tval != TV_ROD) return(FALSE);
@@ -1101,9 +1067,9 @@ static bool item_tester_hook_rod_charged(const object_type *o_ptr)
  * Hack -- rods of perception/banishment can be "cancelled"
  * All rods can be cancelled at the "Direction?" prompt
  */
-void do_cmd_zap_rod(void)
+bool player_zap_rod(int item)
 {
-	int item, ident, chance, lev, power;
+	int ident, chance, lev, power;
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
@@ -1111,24 +1077,7 @@ void do_cmd_zap_rod(void)
 
 	object_type *o_ptr;
 
-	cptr q, s;
-
 	int tmpval, dir;
-
-	/* Berserk */
-	if (p_ptr->shero)
-	{
-		msg_print("You are too enraged!");
-		return;
-	}
-
-	/* Restrict choices to charged items */
-	item_tester_hook = item_tester_hook_rod_charged;
-
-	/* Get an item */
-	q = "Zap which rod? ";
-	s = "You have no rod to zap.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -1146,7 +1095,7 @@ void do_cmd_zap_rod(void)
 	if (o_ptr->tval == TV_BAG)
 	{
 		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_QUAFF].item_query, cmd_item_list[COMMAND_QUAFF].item_not_found, o_ptr)) return (FALSE);
 
 		/* Refer to the item */
 		o_ptr = &inventory[item];
@@ -1156,7 +1105,7 @@ void do_cmd_zap_rod(void)
 	if ((item < 0) && (o_ptr->number > 1))
 	{
 		msg_print("You must first pick up the rods.");
-		return;
+		return (FALSE);
 	}
 
 	/* Take a turn */
@@ -1210,7 +1159,7 @@ void do_cmd_zap_rod(void)
 	{
 		if (flush_failure) flush();
 		msg_print("You failed to use the rod properly.");
-		return;
+		return (TRUE);
 	}
 #if 0
 	/* Still charging */
@@ -1240,7 +1189,7 @@ void do_cmd_zap_rod(void)
 	/* Apply rod effect */
 	/* Note we use two different sources to suppress messages from dispel evil, in the even the rod is known to be ineffective against non-evil monsters */
 	if (power >= 0) ident = process_spell(known && (o_ptr->sval >= SV_ROD_MIN_DIRECTION) ? SOURCE_PLAYER_ZAP_NO_TARGET : SOURCE_PLAYER_ZAP, o_ptr->k_idx, power, 0, &cancel, &known);
-	else return;
+	else return (TRUE);
 
 	/* Time rod out */
 	o_ptr->timeout = o_ptr->charges;
@@ -1269,7 +1218,7 @@ void do_cmd_zap_rod(void)
 		/* Restore charge */
 		o_ptr->timeout = tmpval;
 
-		return;
+		return (FALSE);
 	}
 
 	/* Hack -- check if we are stacking rods */
@@ -1284,7 +1233,7 @@ void do_cmd_zap_rod(void)
 		/* Hack -- always use maximum timeout */
 		if (tmpval > o_ptr->timeout) o_ptr->timeout = tmpval;
 
-		return;
+		return (TRUE);
 	}
 
 	/* XXX Hack -- unstack if necessary */
@@ -1330,7 +1279,9 @@ void do_cmd_zap_rod(void)
 		msg_print("You unstack your rod.");
 	}
 
+	return (!cancel);
 }
+
 
 /*
  * Procedure for assembling parts into a whole.
@@ -1416,13 +1367,10 @@ static void assemble_parts(int *src_sval, int *tgt_sval, const int r_idx)
 	}
 }
 
-static int assembly_sval;
-static int assembly_name3;
-
 /*
  * Hook to determine if an object is assembly and activatable
  */
-static bool item_tester_hook_assemble(const object_type *o_ptr)
+bool item_tester_hook_assemble(const object_type *o_ptr)
 {
 	u32b f1, f2, f3, f4;
 
@@ -1443,18 +1391,37 @@ static bool item_tester_hook_assemble(const object_type *o_ptr)
 /*
  * Hook to determine if an object can be assembled to
  */
-static bool item_tester_hook_assembly(const object_type *o_ptr)
+bool item_tester_hook_assembly(const object_type *o_ptr)
 {
+	object_type *j_ptr;
+	int item2 = p_ptr->command_trans_item;
+	
+	/* Paranoia */
+	if (p_ptr->command_trans != COMMAND_ITEM_ASSEMBLE) return (FALSE);
+
+	/* Get the item (in the pack) */
+	if (item2 >= 0)
+	{
+		j_ptr = &inventory[item2];
+	}
+
+	/* Get the item (on the floor) */
+	else
+	{
+		j_ptr = &o_list[0 - item2];
+	}
+	
 	/* Make sure the same type */
-	if (o_ptr->name3 != assembly_name3) return (FALSE);	
+	if (o_ptr->name3 != j_ptr->name3) return (FALSE);	
 
 	/* Re-attached assemblies to assemblies */
 	if (o_ptr->tval == TV_ASSEMBLY)
 	{
 		int tgt_sval = o_ptr->sval;
-		int src_sval = assembly_sval;
+		int src_sval = j_ptr->sval;
 
-		assemble_parts(&src_sval,&tgt_sval, assembly_name3);
+		/* Hack - pre-assemble and see if they fit */
+		assemble_parts(&src_sval,&tgt_sval, j_ptr->name3);
 
 		if (tgt_sval != o_ptr->sval) return (TRUE);
 	}
@@ -1465,25 +1432,18 @@ static bool item_tester_hook_assembly(const object_type *o_ptr)
 
 
 /*
- * Assemble an assembly.
+ * Assemble an assembly (part two)
  */
-void do_cmd_assemble(void)
+bool player_assembly(int item2)
 {
-	int item, item2, lev, chance;
-
-	object_type *o_ptr, *j_ptr;
-
-	cptr q, s;
-
 	int src_sval, tgt_sval = 0;
 
-	/* Prepare the hook */
-	item_tester_hook = item_tester_hook_assemble;
+	object_type *o_ptr, *j_ptr;
+	
+	int item = p_ptr->command_trans_item;
 
-	/* Get an item */
-	q = "Assemble which item? ";
-	s = "You have nothing to assemble.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) return;
+	/* Paranoia */
+	if (p_ptr->command_trans != COMMAND_ITEM_ASSEMBLE) return (FALSE);
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -1496,61 +1456,6 @@ void do_cmd_assemble(void)
 	{
 		o_ptr = &o_list[0 - item];
 	}
-#if 0
-	/* In a bag? */
-	if (o_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
-
-		/* Refer to the item */
-		o_ptr = &inventory[item];
-	}
-#endif
-	/* Take a turn */
-	p_ptr->energy_use = 100;
-
-	/* Extract the item level */
-	lev = k_info[o_ptr->k_idx].level;
-
-	/* Hack -- use monster level instead */
-	if (o_ptr->name3) lev = r_info[o_ptr->name3].level;
-
-	/* Base chance of success */
-	chance = p_ptr->skill_dev;
-
-	/* Confusion hurts skill */
-	if (p_ptr->confused) chance = chance / 2;
-
-	/* High level objects are harder */
-	chance = chance - ((lev > 50) ? 50 : lev);
-
-	/* Give everyone a (slight) chance */
-	if ((chance < USE_DEVICE) && (rand_int(USE_DEVICE - chance + 1) == 0))
-	{
-		chance = USE_DEVICE;
-	}
-
-	/* Roll for usage */
-	if (chance < USE_DEVICE
-	    || randint(chance) + chance/USE_DEVICE < USE_DEVICE)
-	{
-		if (flush_failure) flush();
-		msg_print("You failed to understand it properly.");
-		return;
-	}
-
-	/* Initialise static variables */
-	assembly_name3 = o_ptr->name3;
-	assembly_sval = o_ptr->sval;
-
-	/* Prepare the hook */
-	item_tester_hook = item_tester_hook_assembly;
-
-	/* Get an item */
-	q = "Assemble with which item? ";
-	s = "You have nothing to assemble this with.";
-	if (!get_item(&item2, q, s, (USE_INVEN | USE_FLOOR))) return;
 	
 	/* Get the item (in the pack) */
 	if (item2 >= 0)
@@ -1568,7 +1473,7 @@ void do_cmd_assemble(void)
 	if (j_ptr->tval == TV_BAG)
 	{
 		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, j_ptr)) return;
+		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_ITEM_ASSEMBLE].item_query, cmd_item_list[COMMAND_ITEM_ASSEMBLE].item_not_found, j_ptr)) return;
 
 		/* Refer to the item */
 		j_ptr = &inventory[item2];
@@ -1685,6 +1590,80 @@ void do_cmd_assemble(void)
 			}
 		}
 	}
+	
+	return (TRUE);
+}
+
+
+/*
+ * Assemble an assembly.
+ */
+bool player_assemble(int item)
+{
+	int lev, chance;
+
+	object_type *o_ptr;
+
+	/* Get the item (in the pack) */
+	if (item >= 0)
+	{
+		o_ptr = &inventory[item];
+	}
+
+	/* Get the item (on the floor) */
+	else
+	{
+		o_ptr = &o_list[0 - item];
+	}
+#if 0
+	/* In a bag? */
+	if (o_ptr->tval == TV_BAG)
+	{
+		/* Get item from bag */
+		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_QUAFF].item_query, cmd_item_list[COMMAND_QUAFF].item_not_found, o_ptr)) return;
+
+		/* Refer to the item */
+		o_ptr = &inventory[item];
+	}
+#endif
+	/* Take a turn */
+	p_ptr->energy_use = 100;
+
+	/* Extract the item level */
+	lev = k_info[o_ptr->k_idx].level;
+
+	/* Hack -- use monster level instead */
+	if (o_ptr->name3) lev = r_info[o_ptr->name3].level;
+
+	/* Base chance of success */
+	chance = p_ptr->skill_dev;
+
+	/* Confusion hurts skill */
+	if (p_ptr->confused) chance = chance / 2;
+
+	/* High level objects are harder */
+	chance = chance - ((lev > 50) ? 50 : lev);
+
+	/* Give everyone a (slight) chance */
+	if ((chance < USE_DEVICE) && (rand_int(USE_DEVICE - chance + 1) == 0))
+	{
+		chance = USE_DEVICE;
+	}
+
+	/* Roll for usage */
+	if (chance < USE_DEVICE
+	    || randint(chance) + chance/USE_DEVICE < USE_DEVICE)
+	{
+		if (flush_failure) flush();
+		msg_print("You failed to understand it properly.");
+		return (FALSE);
+	}
+	
+	/* Initialise stuff for the second part of the command */
+	p_ptr->command_trans = COMMAND_ITEM_ASSEMBLE;
+	p_ptr->command_trans_item = item;
+	
+	return (TRUE);
 }
 
 
@@ -1692,7 +1671,7 @@ void do_cmd_assemble(void)
 /*
  * Hook to determine if an object is activatable and charged
  */
-static bool item_tester_hook_activate(const object_type *o_ptr)
+bool item_tester_hook_activate(const object_type *o_ptr)
 {
 	u32b f1, f2, f3, f4;
 
@@ -1732,9 +1711,9 @@ static bool item_tester_hook_activate(const object_type *o_ptr)
  * Note that it always takes a turn to activate an artifact, even if
  * the user hits "escape" at the "direction" prompt.
  */
-void do_cmd_activate(void)
+bool player_activate(int item)
 {
-	int item, power, lev, chance;
+	int power, lev, chance;
 
 	/* Must be true to let us cancel */
 	bool cancel= TRUE;
@@ -1742,46 +1721,9 @@ void do_cmd_activate(void)
 
 	object_type *o_ptr;
 
-	cptr q, s;
-
 	int tmpval;
 
 	int i;
-
-	/* Berserk */
-	if (p_ptr->shero)
-	{
-		msg_print("You are too enraged!");
-		return;
-	}
-
-	/* Amnesia */
-	if (p_ptr->amnesia)
-	{
-		msg_print("You have forgotten how!");
-		return;
-	}
-
-	/* Hack -- prepare a fake item for innate racial abilities of the current shape */
-	if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE))
-	{
-		/* Prepare a 'fake' object */
-		object_prep(&inventory[INVEN_SELF], lookup_kind(TV_RACE, 0));
-
-		/* Object is known */
-		object_known(&inventory[INVEN_SELF]);
-
-		/* Hack -- set sval */
-		inventory[INVEN_SELF].sval = p_ptr->pshape;
-	}
-
-	/* Prepare the hook */
-	item_tester_hook = item_tester_hook_activate;
-
-	/* Get an item */
-	q = "Activate which item? ";
-	s = "You have nothing to activate.";
-	if (!get_item(&item, q, s, (USE_EQUIP | (p_ptr->rest < PY_REST_FAINT ? 0 : USE_SELF)))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -1799,7 +1741,7 @@ void do_cmd_activate(void)
 	if (o_ptr->tval == TV_BAG)
 	{
 		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_ITEM_ACTIVATE].item_query, cmd_item_list[COMMAND_ITEM_ACTIVATE].item_not_found, o_ptr)) return;
 
 		/* Refer to the item */
 		o_ptr = &inventory[item];
@@ -1880,7 +1822,7 @@ void do_cmd_activate(void)
 		/* Clear racial activation */
 		if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE)) object_wipe(&inventory[INVEN_SELF]);
 
-		return;
+		return (TRUE);
 	}
 	
 	/* Item is broken */
@@ -1889,7 +1831,7 @@ void do_cmd_activate(void)
 		if (flush_failure) flush();
 		msg_print("It whines, glows and fades...");
 		o_ptr->feeling = INSCRIP_BROKEN;
-		return;
+		return (TRUE);
 	}
 
 #if 0
@@ -1925,7 +1867,7 @@ void do_cmd_activate(void)
 			get_spell(&power, "use", o_ptr, FALSE);
 
 			/* Paranoia */
-			if (power < 0) return;
+			if (power < 0) return (TRUE);
 
 			/* Apply object effect */
 			(void)process_spell(SOURCE_PLAYER_ACTIVATE, o_ptr->k_idx, power, 0, &cancel, &known);
@@ -1965,7 +1907,7 @@ void do_cmd_activate(void)
 		if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE)) object_wipe(&inventory[INVEN_SELF]);
 
 		/* Paranoia */
-		if (power < 0) return;
+		if (power < 0) return (TRUE);
 
 		/* Apply object effect */
 		(void)process_spell(SOURCE_PLAYER_ACTIVATE, o_ptr->k_idx, power, 0, &cancel, &known);
@@ -2002,7 +1944,7 @@ void do_cmd_activate(void)
 		/* Hack -- always use maximum timeout */
 		if (tmpval > o_ptr->timeout) o_ptr->timeout = tmpval;
 
-		return;
+		return (TRUE);
 	}
 
 	/* XXX Hack -- unstack if necessary */
@@ -2056,6 +1998,7 @@ void do_cmd_activate(void)
 	/* Clear styles */
 	p_ptr->cur_style &= ~((1L << WS_WAND) | (1L << WS_STAFF));
 
+	return (!cancel);
 }
 
 
@@ -2063,7 +2006,7 @@ void do_cmd_activate(void)
 /*
  * Hook to determine if an object can be 'applied' to another object.
  */
-static bool item_tester_hook_apply(const object_type *o_ptr)
+bool item_tester_hook_apply(const object_type *o_ptr)
 {
 	switch(o_ptr->tval)
 	{
@@ -2084,7 +2027,7 @@ static bool item_tester_hook_apply(const object_type *o_ptr)
 /*
  * Hook to determine if an object can be coated with a potion, mushroom or flask.
  */
-static bool item_tester_hook_coating(const object_type *o_ptr)
+bool item_tester_hook_coating(const object_type *o_ptr)
 {
 	switch(o_ptr->tval)
 	{
@@ -2109,34 +2052,9 @@ static bool item_tester_hook_coating(const object_type *o_ptr)
  * polearms, bolts and arrows for various damaging effects. Note that for
  * balance, these only do 1/5 of the damage that throwing them would apply.
  */
-void do_cmd_apply_rune_or_coating(void)
+bool player_apply_rune_or_coating(int item)
 {
-	int item, item2;
-
 	object_type *o_ptr;
-	object_type *j_ptr;
-	object_type *i_ptr;
-	object_type object_type_body;
-
-	cptr q, s;
-
-	int i,ii;
-
-	int rune;
-	int tval, sval;
-
-	bool aware = FALSE;
-	bool use_feat = FALSE;
-	bool brand_ammo = FALSE;
-	bool split = FALSE;
-
-	/* Restrict the choices */
-	item_tester_hook = item_tester_hook_apply;
-
-	/* Get an item */
-	q = "Apply which runestone, potion, mushroom or flask? ";
-	s = "You have no runestones, potions, mushrooms or flasks.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -2154,32 +2072,86 @@ void do_cmd_apply_rune_or_coating(void)
 	if (o_ptr->tval == TV_BAG)
 	{
 		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_ITEM_APPLY].item_query, cmd_item_list[COMMAND_ITEM_APPLY].item_not_found, o_ptr)) return (FALSE);
 
 		/* Refer to the item */
 		o_ptr = &inventory[item];
 	}
 
-	/* Use feat */
-	if (o_ptr->ident & (IDENT_STORE)) use_feat = TRUE;
+	/* Set up for second command */
+	p_ptr->command_trans = COMMAND_ITEM_APPLY;
+	p_ptr->command_trans_item = item;
+	
+	return (TRUE);
+}
 
-	if (o_ptr->tval == TV_RUNESTONE)
+
+/*
+ * Determine whether rune or coating command based on current item
+ */
+int cmd_tester_rune_or_coating(int item)
+{
+	object_type *o_ptr;
+	
+	/* Get the item (in the pack) */
+	if (item >= 0)
 	{
-		/* Get an item to rune */
-		q = "Apply rune to which item? ";
-		s = "You have nothing to apply it to.";
+		o_ptr = &inventory[item];
 	}
+
+	/* Get the item (on the floor) */
 	else
 	{
-		/* Get an item to coat */
-		q = "Apply coating to which item? ";
-		s = "You have nothing to apply it to.";
+		o_ptr = &o_list[0 - item];
+	}	
+	
+	/* Check command */
+	if (o_ptr->tval == TV_RUNESTONE)
+		return (COMMAND_ITEM_APPLY_RUNE);
 
-		item_tester_hook = item_tester_hook_coating;
+	return (COMMAND_ITEM_APPLY_COAT);
+}
+
+
+/*
+ * Apply a rune to an item
+ */
+bool player_apply_rune_or_coating2(int item2)
+{
+	int item = p_ptr->command_trans_item;
+
+	object_type *o_ptr;
+	object_type *j_ptr;
+	object_type *i_ptr;
+	object_type object_type_body;
+
+	int i,ii;
+
+	int rune;
+	int tval, sval;
+	
+	bool aware = FALSE;
+	bool use_feat = FALSE;
+	bool brand_ammo = FALSE;
+	bool split = FALSE;
+
+	/* Paranoia */
+	if (p_ptr->command_trans != COMMAND_ITEM_APPLY) return (FALSE);
+
+	/* Get the item (in the pack) */
+	if (item >= 0)
+	{
+		o_ptr = &inventory[item];
 	}
 
-	/* Get item */
-	if (!get_item(&item2, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR))) return;
+	/* Get the item (on the floor) */
+	else
+	{
+		o_ptr = &o_list[0 - item];
+	}
+
+	/* Use feat */
+	if (o_ptr->ident & (IDENT_STORE)) use_feat = TRUE;
 
 	/* Get the item (in the pack) */
 	if (item2 >= 0)
@@ -2192,17 +2164,7 @@ void do_cmd_apply_rune_or_coating(void)
 	{
 		j_ptr = &o_list[0 - item2];
 	}
-
-	/* In a bag? */
-	if (j_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item2, q, s, j_ptr)) return;
-
-		/* Refer to the item */
-		j_ptr = &inventory[item2];
-	}
-
+	
 	/* Remove coating */
 	if ((coated_p(j_ptr)) && ((j_ptr->xtra1 != o_ptr->tval) || (j_ptr->xtra2 != o_ptr->sval)))
 	{
@@ -2211,7 +2173,7 @@ void do_cmd_apply_rune_or_coating(void)
 		/* Verify */
 		if (!get_check("Remove the coating? "))
 		{
-			return;
+			return (FALSE);
 		}
 
 		/* Clear feeling */
@@ -2228,7 +2190,7 @@ void do_cmd_apply_rune_or_coating(void)
 		msg_print("It has hidden powers that prevent this.");
 
 		/* Sense the item? */
-		return;
+		return (FALSE);
 	}
 
 	/* Get rune */
@@ -2257,7 +2219,7 @@ void do_cmd_apply_rune_or_coating(void)
 		/* Verify */
 		if (!get_check("Overwrite them? "))
 		{
-			return;
+			return (FALSE);
 		}
 	}
 
@@ -2551,7 +2513,7 @@ void do_cmd_apply_rune_or_coating(void)
 		/* Wipe the object */
 		object_wipe(j_ptr);
 
-		return;
+		return (TRUE);
 	      }
 
 	  /* Carry the new item */
@@ -2566,4 +2528,7 @@ void do_cmd_apply_rune_or_coating(void)
 	      floor_item_describe(item);
 	    }
 	}
+	
+	return (TRUE);
 }
+

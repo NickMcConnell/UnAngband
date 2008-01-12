@@ -2265,14 +2265,14 @@ static void process_command(void)
 		/* Activate an artifact */
 		case 'A':
 		{
-			do_cmd_activate();
+			do_cmd_item(COMMAND_ITEM_ACTIVATE);
 			break;
 		}
 
 		/* Eat some food */
 		case 'E':
 		{
-			do_cmd_eat_food();
+			do_cmd_item(COMMAND_ITEM_EAT);
 			break;
 		}
 
@@ -2300,49 +2300,49 @@ static void process_command(void)
 		/* Aim a wand */
 		case 'a':
 		{
-			do_cmd_aim_wand();
+			do_cmd_item(COMMAND_ITEM_AIM);
 			break;
 		}
 
 		/* Zap a rod */
 		case 'z':
 		{
-			do_cmd_zap_rod();
+			do_cmd_item(COMMAND_ITEM_ZAP);
 			break;
 		}
 
 		/* Quaff a potion */
 		case 'q':
 		{
-			do_cmd_quaff_potion();
+			do_cmd_item(COMMAND_ITEM_QUAFF);
 			break;
 		}
 
 		/* Read a scroll */
 		case 'r':
 		{
-			do_cmd_read_scroll();
+			do_cmd_item(COMMAND_ITEM_READ);
 			break;
 		}
 
 		/* Use a staff */
 		case 'u':
 		{
-			do_cmd_use_staff();
+			do_cmd_item(COMMAND_ITEM_USE);
 			break;
 		}
 
 		/* Apply a rune */
 		case 'y':
 		{
-			do_cmd_apply_rune_or_coating();
+			do_cmd_item(COMMAND_ITEM_APPLY);
 			break;
 		}
 
 		/* Assemble a mechanism */
 		case 'Y':
 		{
-			do_cmd_assemble();
+			do_cmd_item(COMMAND_ITEM_ASSEMBLE);
 			break;
 		}
 
@@ -2621,6 +2621,27 @@ static void process_command(void)
 			prt("Type '?' or press ENTER for help.", 0, 0);
 			break;
 		}
+	}
+	
+	/* If there is a transitive component to the command, process it */
+	if (p_ptr->command_trans)
+	{
+		const do_cmd_item_type *cmd = &cmd_item_list[p_ptr->command_trans];
+		
+		int cmd_next = cmd->next_command;
+		
+		/* Evaluate which command to do */
+		if (cmd->next_command_eval)
+		{
+			/* Determine new command based on item selected */
+			cmd_next = cmd->next_command_eval(p_ptr->command_trans_item);
+		}
+		
+		/* Process next command */
+		do_cmd_item(cmd_next);
+		
+		/* Processed */
+		p_ptr->command_trans = 0;
 	}
 }
 

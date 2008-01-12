@@ -628,6 +628,41 @@
 
 
 
+
+
+/*
+ * Indexes of various commands.
+ */
+#define COMMAND_ITEM_EAT		1
+#define COMMAND_ITEM_QUAFF		2
+#define COMMAND_ITEM_READ		3
+#define COMMAND_ITEM_USE		4
+#define COMMAND_ITEM_AIM		5
+#define COMMAND_ITEM_ZAP		6
+#define COMMAND_ITEM_ASSEMBLE	7
+#define COMMAND_ITEM_ASSEMBLY	8
+#define COMMAND_ITEM_ACTIVATE	9
+#define COMMAND_ITEM_APPLY		10
+#define COMMAND_ITEM_APPLY_RUNE	11
+#define COMMAND_ITEM_APPLY_COAT	12
+
+
+#define MAX_COMMANDS	100
+
+
+/*
+ * Conditional checks to ensure player status does not prevent commands
+ */
+#define CONDITION_NOT_BLIND		0x00000001L
+#define CONDITION_LITE			0x00000002L
+#define CONDITION_NOT_BERSERK	0x00000004L
+#define CONDITION_NOT_FORGET	0x00000008L
+
+
+
+
+
+
 /*
  * Indexes of the various "stats" (hard-coded by savefiles, etc).
  */

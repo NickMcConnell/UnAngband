@@ -109,6 +109,7 @@ extern const cptr w_name_style[32];
 extern const s16b style2tval[32];
 extern const s16b parasite_hack[DISEASE_BLOWS];
 extern const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES];
+extern const do_cmd_item_type cmd_item_list[MAX_COMMANDS];
 
 
 /* variable.c */
@@ -533,17 +534,26 @@ extern bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t);
 extern void do_cmd_cast(void);
 
 /* cmd6.c */
+extern void do_cmd_item(int item);
 extern bool item_tester_hook_food_edible(const object_type *o_ptr);
+extern bool item_tester_hook_rod_charged(const object_type *o_ptr);
+extern bool item_tester_hook_assembly(const object_type *o_ptr);
+extern bool item_tester_hook_assemble(const object_type *o_ptr);
+extern bool item_tester_hook_activate(const object_type *o_ptr);
+extern bool item_tester_hook_apply(const object_type *o_ptr);
+extern bool item_tester_hook_coating(const object_type *o_ptr);
+extern int cmd_tester_rune_or_coating(int item);
 extern bool player_eat_food(int item);
-extern void do_cmd_eat_food(void);
-extern void do_cmd_quaff_potion(void);
-extern void do_cmd_read_scroll(void);
-extern void do_cmd_use_staff(void);
-extern void do_cmd_aim_wand(void);
-extern void do_cmd_zap_rod(void);
-extern void do_cmd_assemble(void);
-extern void do_cmd_activate(void);
-extern void do_cmd_apply_rune_or_coating(void);
+extern bool player_quaff_potion(int item);
+extern bool player_read_scroll(int item);
+extern bool player_use_staff(int item);
+extern bool player_aim_wand(int item);
+extern bool player_zap_rod(int item);
+extern bool player_assembly(int item);
+extern bool player_assemble(int item);
+extern bool player_activate(int item);
+extern bool player_apply_rune_or_coating(int item);
+extern bool player_apply_rune_or_coating2(int item);
 
 /* dungeon.c */
 extern bool dun_level_mon(int r_idx);

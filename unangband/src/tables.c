@@ -4192,3 +4192,52 @@ const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES] =
 	{"bad luck casting ", "badly casting ", "slurring a syllable casting ", "magical feedback whilst casting "} /* SOURCE_PLAYER_CAST */
 };
 
+
+/*
+ * Item manipulation commands.
+ * 
+ * TODO: We could combine player_eat_food & player_quaff potion to a 'player_consume'
+ * function and player_use_staff and player_aim_wand to a 'player_use_charge' function etc.
+ */
+const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
+{
+	{ NULL, '\0', " which ? ", "You have nothing to .",
+			NULL, 0, (USE_INVEN | USE_FLOOR | USE_FEATU), 0L, 0, NULL},
+			
+	{ player_eat_food, 'E', "Eat which item? ", "You have nothing to eat.",
+			item_tester_hook_food_edible, 0, (USE_INVEN | USE_FLOOR | USE_FEATU), 0L, 0, NULL},
+			
+	{ player_quaff_potion, 'q', "Quaff which potion? ", "You have nothing to quaff.",
+			NULL, TV_POTION, (USE_INVEN | USE_FLOOR | USE_FEATU), 0L, 0, NULL},
+			
+	{ player_read_scroll, 'r', "Read which scroll? ", "You have no scrolls to read.",
+			NULL, TV_SCROLL, (USE_INVEN | USE_FLOOR | USE_FEATU), (CONDITION_NOT_BLIND | CONDITION_LITE | CONDITION_NOT_BERSERK), 0, NULL},
+	
+	{ player_use_staff, 'u', "Use which staff? ", "You have no staffs to use.",
+			NULL, TV_STAFF, (USE_INVEN | USE_FLOOR | USE_FEATU), (CONDITION_NOT_BERSERK), 0, NULL},
+			
+	{ player_aim_wand, 'u', "Aim which wand? ", "You have no wands to aim.",
+			NULL, TV_WAND, (USE_INVEN | USE_FLOOR | USE_FEATU), (CONDITION_NOT_BERSERK), 0, NULL},
+
+	{ player_zap_rod, 'z', "Zap which rod? ", "You have no rods to zap.",
+			item_tester_hook_rod_charged, 0, (USE_INVEN | USE_FLOOR | USE_FEATU), (CONDITION_NOT_BERSERK), 0, NULL},
+	
+	{ player_assemble, 'Y', "Assemble which item? ", "You have no items to assemble.",
+			item_tester_hook_assemble, 0, (USE_INVEN | USE_FLOOR | USE_FEATU), 0L, COMMAND_ITEM_ASSEMBLY, NULL},
+	
+	{ player_assembly, 'Y', "Assemble with which item? ", "You have no items to assemble it with.",
+			item_tester_hook_assembly, 0, (USE_INVEN | USE_FLOOR), 0L, 0, NULL},
+
+	{ player_activate, 'A', "Activate which item? ", "You have no items you know how to activate.",
+			item_tester_hook_activate, 0, (USE_EQUIP), 0L, 0, NULL},
+			
+	{ player_apply_rune_or_coating, 'y', "Apply which runestone, mushroom, flask or potion? ", "You have no runestones, mushrooms, flasks or potions.",
+			item_tester_hook_apply, 0, (USE_INVEN | USE_FLOOR | USE_FEATU), 0L, 0, cmd_tester_rune_or_coating},
+	
+	{ player_apply_rune_or_coating2, 'y', "Apply rune to which item? ", "You have nothing to apply runes to.",
+			NULL, 0, (USE_INVEN | USE_EQUIP | USE_FLOOR), 0L, 0, NULL},
+
+	{ player_apply_rune_or_coating2, 'y', "Coat which item? ", "You have nothing which will hold a coating.",
+			item_tester_hook_coating, 0, (USE_INVEN | USE_EQUIP | USE_FLOOR), 0L, 0, NULL},
+			
+};
