@@ -629,8 +629,9 @@ void self_knowledge_aux(bool spoil, bool random)
 		/* Can cure by treating symptoms */
 		if (!(p_ptr->disease & (DISEASE_PERMANENT | (1 << DISEASE_SPECIAL))))
 		{
-			text_out(", or can have the symptoms treated");
-			if (p_ptr->disease & (DISEASE_HEAVY)) text_out(" for a temporary respite");
+			text_out(", or you can treat the symptoms ");
+			if (p_ptr->disease & (DISEASE_HEAVY)) text_out("for a temporary respite");
+			else text_out("to cure the disease");
 		}
 
 		/* Dump */
