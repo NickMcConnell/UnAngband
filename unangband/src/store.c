@@ -3165,14 +3165,14 @@ static void store_process_command(char *choice, int store_index)
 		/* Wear/wield equipment */
 		case 'w':
 		{
-			do_cmd_wield();
+			do_cmd_item(COMMAND_ITEM_WIELD);
 			break;
 		}
 
 		/* Take off equipment */
 		case 't':
 		{
-			do_cmd_takeoff();
+			do_cmd_item(COMMAND_ITEM_TAKEOFF);
 			break;
 		}
 
@@ -3190,7 +3190,7 @@ static void store_process_command(char *choice, int store_index)
 		/* Destroy an item */
 		case 'k':
 		{
-			do_cmd_destroy();
+			do_cmd_item(COMMAND_ITEM_DESTROY);
 			break;
 		}
 
@@ -3214,7 +3214,7 @@ static void store_process_command(char *choice, int store_index)
 		/* Identify an object */
 		case 'I':
 		{
-			do_cmd_observe();
+			do_cmd_item(COMMAND_ITEM_EXAMINE);
 			break;
 		}
 
@@ -3239,14 +3239,14 @@ static void store_process_command(char *choice, int store_index)
 		/* Inscribe an object */
 		case '{':
 		{
-			do_cmd_inscribe();
+			do_cmd_item(COMMAND_ITEM_INSCRIBE);
 			break;
 		}
 
 		/* Uninscribe an object */
 		case '}':
 		{
-			do_cmd_uninscribe();
+			do_cmd_item(COMMAND_ITEM_UNINSCRIBE);
 			break;
 		}
 

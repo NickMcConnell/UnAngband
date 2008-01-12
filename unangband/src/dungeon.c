@@ -2031,28 +2031,28 @@ static void process_command(void)
 		/* Wear/wield equipment */
 		case 'w':
 		{
-			do_cmd_wield();
+			do_cmd_item(COMMAND_ITEM_WIELD);
 			break;
 		}
 
 		/* Take off equipment */
 		case 't':
 		{
-			do_cmd_takeoff();
+			do_cmd_item(COMMAND_ITEM_TAKEOFF);
 			break;
 		}
 
 		/* Drop an item */
 		case 'd':
 		{
-			do_cmd_drop();
+			do_cmd_item(COMMAND_ITEM_DROP);
 			break;
 		}
 
 		/* Destroy an item */
 		case 'k':
 		{
-			do_cmd_destroy();
+			do_cmd_item(COMMAND_ITEM_DESTROY);
 			break;
 		}
 
@@ -2076,7 +2076,7 @@ static void process_command(void)
 		/* Identify an object */
 		case 'I':
 		{
-			do_cmd_observe();
+			do_cmd_item(COMMAND_ITEM_EXAMINE);
 			break;
 		}
 
@@ -2251,14 +2251,14 @@ static void process_command(void)
 		/* Inscribe an object */
 		case '{':
 		{
-			do_cmd_inscribe();
+			do_cmd_item(COMMAND_ITEM_INSCRIBE);
 			break;
 		}
 
 		/* Uninscribe an object */
 		case '}':
 		{
-			do_cmd_uninscribe();
+			do_cmd_item(COMMAND_ITEM_UNINSCRIBE);
 			break;
 		}
 
@@ -2279,7 +2279,7 @@ static void process_command(void)
 		/* Fuel your lantern/torch */
 		case 'F':
 		{
-			do_cmd_refill();
+			do_cmd_item(COMMAND_ITEM_FUEL);
 			break;
 		}
 
@@ -2349,7 +2349,7 @@ static void process_command(void)
 		/* Light or douse a light source */
 		case '|':
 		{
-			do_cmd_light_and_douse();
+			do_cmd_item(COMMAND_ITEM_LITE);
 			break;
 		}
 

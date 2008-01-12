@@ -69,6 +69,9 @@ void do_cmd_item(int command)
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
+	
+	/* Flags we can use the item from */
+	byte flags = cmd_item_list[command].use_from;
 
 	/* Check some conditions */
 	if ((cmd_item_list[command].conditions & (CONDITION_NOT_BLIND)) && (p_ptr->blind))
@@ -109,6 +112,22 @@ void do_cmd_item(int command)
 		inventory[INVEN_SELF].sval = p_ptr->pshape;
 	}
 	
+	/* Hack -- see equipment first */
+	if (command == COMMAND_ITEM_FUEL) p_ptr->command_wrk = (USE_EQUIP);
+	
+	/* Hack -- allow player to light terrain */
+	if (command == COMMAND_ITEM_LITE)
+	{
+		/* Check if using a torch */
+		if (item_tester_refill_torch(&inventory[INVEN_LITE])) flags |= (USE_FEATH);
+		
+		/* Check if using a torch */
+		else if ((inventory[INVEN_LITE].tval == TV_LITE) && (inventory[INVEN_LITE].sval == SV_LITE_LANTERN)) flags |= (USE_FEATH);
+		
+		/* Check if wielding a known fire brand */
+		else if (inventory[INVEN_WIELD].can_flags1 & (TR1_BRAND_FIRE)) flags |= (USE_FEATH);
+	}
+	
 	/* Restrict choices to tval */
 	item_tester_hook = cmd_item_list[command].item_tester_hook;
 
@@ -116,7 +135,25 @@ void do_cmd_item(int command)
 	item_tester_tval = cmd_item_list[command].item_tester_tval;
 
 	/* Get an item */
-	if (!get_item(&item, cmd_item_list[command].item_query, cmd_item_list[command].item_not_found, cmd_item_list[command].use_from)) return;
+	if (!get_item(&item, cmd_item_list[command].item_query, cmd_item_list[command].item_not_found, flags & ~(USE_BAGS))) return;
+
+	/* Get the item from a bag */
+	if (flags & (USE_BAGC))
+	{
+		object_type *o_ptr;
+
+		/* Get the item (in the pack) */
+		if (item >= 0)
+		{
+			o_ptr = &inventory[item];
+		}
+
+		/* Get the item (on the floor) */
+		else
+		{
+			o_ptr = &o_list[0 - item];
+		}
+	}
 	
 	/* Auxiliary function */
 	cancel = !(cmd_item_list[command].player_command)(item);
@@ -204,16 +241,6 @@ bool player_eat_food(int item)
 	else
 	{
 		o_ptr = &o_list[0 - item];
-	}
-
-	/* In a bag? */
-	if (o_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_ITEM_QUAFF].item_query, cmd_item_list[COMMAND_ITEM_QUAFF].item_not_found, o_ptr)) return (FALSE);
-
-		/* Refer to the item */
-		o_ptr = &inventory[item];
 	}
 
 	/* Use feat */
@@ -335,16 +362,6 @@ bool player_quaff_potion(int item)
 		o_ptr = &o_list[0 - item];
 	}
 
-	/* In a bag? */
-	if (o_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_ITEM_QUAFF].item_query, cmd_item_list[COMMAND_ITEM_QUAFF].item_not_found, o_ptr)) return (FALSE);
-
-		/* Refer to the item */
-		o_ptr = &inventory[item];
-	}
-
 	if (o_ptr->ident & (IDENT_STORE)) use_feat = TRUE;
 
 	/* Sound */
@@ -442,16 +459,6 @@ bool player_read_scroll(int item)
 	else
 	{
 		o_ptr = &o_list[0 - item];
-	}
-
-	/* In a bag? */
-	if (o_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_ITEM_READ].item_query, cmd_item_list[COMMAND_ITEM_READ].item_not_found, o_ptr)) return (FALSE);
-
-		/* Refer to the item */
-		o_ptr = &inventory[item];
 	}
 
 	/* Use feat */
@@ -558,17 +565,6 @@ bool player_use_staff(int item)
 		o_ptr = &o_list[0 - item];
 	}
 
-#if 0
-	/* In a bag? */
-	if (o_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_QUAFF].item_query, cmd_item_list[COMMAND_QUAFF].item_not_found, o_ptr)) return;
-
-		/* Refer to the item */
-		o_ptr = &inventory[item];
-	}
-#endif
 	/* Mega-Hack -- refuse to use a pile from the ground */
 	if ((item < 0) && (o_ptr->number > 1))
 	{
@@ -820,16 +816,6 @@ bool player_aim_wand(int item)
 	else
 	{
 		o_ptr = &o_list[0 - item];
-	}
-
-	/* In a bag? */
-	if (o_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_ITEM_AIM].item_query, cmd_item_list[COMMAND_ITEM_AIM].item_not_found, o_ptr)) return (FALSE);
-
-		/* Refer to the item */
-		o_ptr = &inventory[item];
 	}
 
 	/* Mega-Hack -- refuse to aim a pile from the ground */
@@ -1090,17 +1076,7 @@ bool player_zap_rod(int item)
 	{
 		o_ptr = &o_list[0 - item];
 	}
-#if 0
-	/* In a bag? */
-	if (o_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_QUAFF].item_query, cmd_item_list[COMMAND_QUAFF].item_not_found, o_ptr)) return (FALSE);
 
-		/* Refer to the item */
-		o_ptr = &inventory[item];
-	}
-#endif
 	/* Mega-Hack -- refuse to zap a pile from the ground */
 	if ((item < 0) && (o_ptr->number > 1))
 	{
@@ -1468,17 +1444,6 @@ bool player_assembly(int item2)
 	{
 		j_ptr = &o_list[0 - item2];
 	}
-#if 0
-	/* In a bag? */
-	if (j_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_ITEM_ASSEMBLE].item_query, cmd_item_list[COMMAND_ITEM_ASSEMBLE].item_not_found, j_ptr)) return;
-
-		/* Refer to the item */
-		j_ptr = &inventory[item2];
-	}
-#endif
 
 	/* Initialise svals */
 	src_sval = o_ptr->sval;
@@ -1615,17 +1580,7 @@ bool player_assemble(int item)
 	{
 		o_ptr = &o_list[0 - item];
 	}
-#if 0
-	/* In a bag? */
-	if (o_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_QUAFF].item_query, cmd_item_list[COMMAND_QUAFF].item_not_found, o_ptr)) return;
 
-		/* Refer to the item */
-		o_ptr = &inventory[item];
-	}
-#endif
 	/* Take a turn */
 	p_ptr->energy_use = 100;
 
@@ -1736,17 +1691,7 @@ bool player_activate(int item)
 	{
 		o_ptr = &o_list[0 - item];
 	}
-#if 0
-	/* In a bag? */
-	if (o_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_ITEM_ACTIVATE].item_query, cmd_item_list[COMMAND_ITEM_ACTIVATE].item_not_found, o_ptr)) return;
 
-		/* Refer to the item */
-		o_ptr = &inventory[item];
-	}
-#endif
 	/* Take a turn */
 	p_ptr->energy_use = 100;
 
@@ -2054,30 +1999,6 @@ bool item_tester_hook_coating(const object_type *o_ptr)
  */
 bool player_apply_rune_or_coating(int item)
 {
-	object_type *o_ptr;
-
-	/* Get the item (in the pack) */
-	if (item >= 0)
-	{
-		o_ptr = &inventory[item];
-	}
-
-	/* Get the item (on the floor) */
-	else
-	{
-		o_ptr = &o_list[0 - item];
-	}
-
-	/* In a bag? */
-	if (o_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, cmd_item_list[COMMAND_ITEM_APPLY].item_query, cmd_item_list[COMMAND_ITEM_APPLY].item_not_found, o_ptr)) return (FALSE);
-
-		/* Refer to the item */
-		o_ptr = &inventory[item];
-	}
-
 	/* Set up for second command */
 	p_ptr->command_trans = COMMAND_ITEM_APPLY;
 	p_ptr->command_trans_item = item;

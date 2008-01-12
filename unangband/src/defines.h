@@ -645,6 +645,20 @@
 #define COMMAND_ITEM_APPLY		10
 #define COMMAND_ITEM_APPLY_RUNE	11
 #define COMMAND_ITEM_APPLY_COAT	12
+#define COMMAND_ITEM_WIELD		12
+#define COMMAND_ITEM_WIELD_OFF	13
+#define COMMAND_ITEM_READY		14
+#define COMMAND_ITEM_TAKEOFF	15
+#define COMMAND_ITEM_DROP		16
+#define COMMAND_ITEM_DESTROY	17
+#define COMMAND_ITEM_EXAMINE	18
+#define COMMAND_ITEM_UNINSCRIBE	19
+#define COMMAND_ITEM_INSCRIBE	20
+#define COMMAND_ITEM_FUEL		21
+#define COMMAND_ITEM_FILL		22
+#define COMMAND_ITEM_FUEL_TORCH	23
+#define COMMAND_ITEM_FUEL_LAMP	24
+#define COMMAND_ITEM_LITE		25
 
 
 #define MAX_COMMANDS	100
@@ -2801,14 +2815,17 @@
 /*
  * Bit flags for the "get_item" function
  */
-#define USE_EQUIP		0x01	/* Allow equip items */
-#define USE_INVEN		0x02	/* Allow inven items */
-#define USE_FLOOR		0x04	/* Allow floor items */
-#define USE_FEATU		0x08	/* Allow features (usable) */
-#define USE_FEATG		0x10	/* Allow features (gettable) */
-#define USE_QUIVER		0x20	/* Allow quiver items, forbid classic equipment */
-#define USE_SELF		0x40	/* Allow selection of player */
-#define USE_FEATH		0x80	/* Allow features (hurt by fire) */
+#define USE_EQUIP		0x0001	/* Allow equip items */
+#define USE_INVEN		0x0002	/* Allow inven items */
+#define USE_FLOOR		0x0004	/* Allow floor items */
+#define USE_FEATU		0x0008	/* Allow features (usable) */
+#define USE_FEATG		0x0010	/* Allow features (gettable) */
+#define USE_QUIVER		0x0020	/* Allow quiver items, forbid classic equipment */
+#define USE_SELF		0x0040	/* Allow selection of player */
+#define USE_FEATH		0x0080	/* Allow features (hurt by fire) */
+#define USE_BAGC		0x0100	/* Allow bag contents */
+#define USE_BAGS		0x0200	/* Allow whole of bag */
+
 
 
 /*** Player flags ***/
