@@ -4102,6 +4102,9 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 		/* Paranoia - don't break again */
 		if (o_ptr->ident & (IDENT_BREAKS)) continue;
 
+		/* Don't destroy items 'in' terrain */
+		if (o_ptr->ident & (IDENT_STORE)) continue;
+
 		/* Extract the flags */
 		object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
