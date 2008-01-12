@@ -7534,15 +7534,8 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			{
 				int v;
 				u32b old_disease = p_ptr->disease;
-
-				*cancel = FALSE;
-
-				/* Mega Hack -- one disease is hard to cure. */
-				if ((p_ptr->disease & (1 << DISEASE_SPECIAL)) && (s_ptr->param != DISEASE_SPECIAL))
-				{
-					msg_print("This disease requires a special cure.");
-					return (TRUE);
-				}
+				
+				char output[1024];
 
 				/* Hack -- cure disease */
 				if (s_ptr->param >= 32)
@@ -7564,42 +7557,55 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					v = (1L << s_ptr->param);
 				}
 
-				/* Cure diseases */
-				if ((p_ptr->disease & v) != 0)
+				/* Character not affected by this disease */
+				if ((p_ptr->disease & v) == 0)
 				{
+					/* Message */
+					if (p_ptr->disease) msg_print("This cure is ineffective for what ails you.");
 					obvious = TRUE;
-
-					/* Hack -- always cure light diseases by treating any symptom */
-					if (p_ptr->disease & (DISEASE_LIGHT))
-						p_ptr->disease &= (DISEASE_HEAVY | DISEASE_PERMANENT);
-					/* Remove a symptom/cause */
-					else
-						p_ptr->disease &= ~(v);
-
-					/* Cured all symptoms or cured all origins of disease? */
-					/* Note for heavy diseases - curing the symptoms is temporary only */
-					if ( ((s_ptr->param >= DISEASE_TYPES_HEAVY) && (p_ptr->disease < (1L << DISEASE_TYPES_HEAVY)))
-						|| ( ((p_ptr->disease & ((1L << DISEASE_TYPES_HEAVY) -1)) == 0) && !(p_ptr->disease & (DISEASE_HEAVY)) ) )
-					{
-						p_ptr->disease &= (DISEASE_PERMANENT);
-					}
+					
+					break;
 				}
 
-				/* Print diseases cured */
-				if (obvious)
+				/* Don't allow cancellation */
+				*cancel = FALSE;
+
+				/* Mega Hack -- one disease is hard to cure. */
+				if ((p_ptr->disease & (1 << DISEASE_SPECIAL)) && (s_ptr->param != DISEASE_SPECIAL))
 				{
-					char output[1024];
+					msg_print("This disease requires a special cure.");
+					return (TRUE);
+				}
 
-					disease_desc(output, sizeof(output), old_disease, p_ptr->disease);
+				/* Cure diseases */
+				obvious = TRUE;
+
+				/* Hack -- always cure light diseases by treating any symptom */
+				if (p_ptr->disease & (DISEASE_LIGHT))
+					p_ptr->disease &= (DISEASE_HEAVY | DISEASE_PERMANENT);
+				/* Remove a symptom/cause */
+				else
+					p_ptr->disease &= ~(v);
+
+				/* Cured all symptoms or cured all origins of disease? */
+				/* Note for heavy diseases - curing the symptoms is temporary only */
+				if ( ((s_ptr->param >= DISEASE_TYPES_HEAVY) && (p_ptr->disease < (1L << DISEASE_TYPES_HEAVY)))
+					|| ( ((p_ptr->disease & ((1L << DISEASE_TYPES_HEAVY) -1)) == 0) && !(p_ptr->disease & (DISEASE_HEAVY)) ) )
+				{
+					p_ptr->disease &= (DISEASE_PERMANENT);
+				}
+
+				/* Describe diseases lost */
+				disease_desc(output, sizeof(output), old_disease, p_ptr->disease);
+				msg_print(output);
+
+				p_ptr->redraw |= (PR_DISEASE);
+
+				/* Describe new disease */
+				if (p_ptr->disease)
+				{
+					disease_desc(output, sizeof(output), 0x0L, p_ptr->disease);
 					msg_print(output);
-
-					p_ptr->redraw |= (PR_DISEASE);
-
-					if (p_ptr->disease)
-					{
-						disease_desc(output, sizeof(output), 0x0L, p_ptr->disease);
-						msg_print(output);
-					}
 				}
 
 				break;
