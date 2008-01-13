@@ -2815,16 +2815,16 @@
 /*
  * Bit flags for the "get_item" function
  */
-#define USE_EQUIP		0x0001	/* Allow equip items */
-#define USE_INVEN		0x0002	/* Allow inven items */
-#define USE_FLOOR		0x0004	/* Allow floor items */
-#define USE_FEATU		0x0008	/* Allow features (usable) */
-#define USE_FEATG		0x0010	/* Allow features (gettable) */
-#define USE_QUIVER		0x0020	/* Allow quiver items, forbid classic equipment */
-#define USE_SELF		0x0040	/* Allow selection of player */
-#define USE_FEATH		0x0080	/* Allow features (hurt by fire) */
-#define USE_BAGC		0x0100	/* Allow bag contents */
-#define USE_BAGS		0x0200	/* Allow whole of bag */
+#define USE_EQUIP		0x00000001L	/* Allow equip items */
+#define USE_INVEN		0x00000002L	/* Allow inven items */
+#define USE_FLOOR		0x00000004L	/* Allow floor items */
+#define USE_FEATU		0x00000008L	/* Allow features (usable) */
+#define USE_FEATG		0x00000010L	/* Allow features (gettable) */
+#define USE_QUIVER		0x00000020L	/* Allow quiver items, forbid classic equipment */
+#define USE_SELF		0x00000040L	/* Allow selection of player */
+#define USE_FEATH		0x00000080L	/* Allow features (hurt by fire) */
+#define USE_BAGC		0x00000100L	/* Allow bag contents */
+#define USE_BAGS		0x00000200L	/* Allow whole of bag */
 
 
 

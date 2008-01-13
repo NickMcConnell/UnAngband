@@ -375,6 +375,34 @@ static bool auto_consume_okay(const object_type *o_ptr)
 	/* Inedible */
 	if (!item_tester_hook_food_edible(o_ptr)) return (FALSE);
 	
+	/* Hack -- normal food is fine except waybread and pints of spirits */
+	/* You can inscribe them with !< to prevent this however */
+	if ((o_ptr->tval == TV_FOOD) && (o_ptr->sval >= SV_FOOD_MIN_FOOD)
+		&& (o_ptr->sval != SV_FOOD_WAYBREAD) && (o_ptr->sval != SV_FOOD_PINT_OF_SPIRITS))
+	{
+		/* No inscription */
+		if (!o_ptr->note) return (TRUE);		
+		
+		/* Find a '=' */
+		s = strchr(quark_str(o_ptr->note), '!');
+
+		/* Process inscription */
+		while (s)
+		{
+			/* Auto-consume on "=<" */
+			if (s[1] == '<')
+			{
+				/* Pick up */
+				return (FALSE);
+			}
+
+			/* Find another '=' */
+			s = strchr(s + 1, '!');
+		}
+		
+		return (TRUE);
+	}
+
 	/* No inscription */
 	if (!o_ptr->note) return (FALSE);
 
@@ -840,16 +868,22 @@ static void do_cmd_travel(void)
 			turn += PY_FOOD_FULL/10*journey*4;
 			
 			/* Hack -- Consume ration inscribed with =< */
-			for (i = 0; i < INVEN_PACK; i++)
+			while (p_ptr->food < PY_FOOD_ALERT)
 			{
-				/* Eat the food */
-				if (auto_consume_okay(&inventory[i]))
+				for (i = 0; i < INVEN_PACK; i++)
 				{
 					/* Eat the food */
-					player_eat_food(i);
-					
-					break;
+					if (auto_consume_okay(&inventory[i]))
+					{
+						/* Eat the food */
+						player_eat_food(i);
+						
+						break;
+					}
 				}
+				
+				/* Escape out if no food */
+				if (i == INVEN_PACK) break;
 			}
 
 			/* XXX Recharges, stop temporary speed etc. */

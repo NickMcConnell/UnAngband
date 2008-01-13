@@ -1815,8 +1815,8 @@ struct do_cmd_item_type
 	bool (*item_tester_hook)(const object_type*);	/* The item tester function */
 	int item_tester_tval;				/* The item tester tval */
 
-	u32b conditions;					/* Restrictions on what state the player must be in */
 	u16b use_from;						/* Where item can be used from */
+	u32b conditions;					/* Restrictions on what state the player must be in */
 	
 	byte next_command;					/* The next command to use */
 	int (*next_command_eval)(int item);	/* The next command to use - evaluation function */
