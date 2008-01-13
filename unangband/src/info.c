@@ -86,7 +86,7 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 
 			/* Hack: throwing is always obvious */
 			if (k_info[o_ptr->k_idx].flags3 & TR3_THROWING)
-			  *f3 |= TR3_THROWING;
+			  *f3 |= TR3_THROWING;			
 
 			return;
 		}
@@ -386,7 +386,7 @@ void object_obvious_flags(object_type *o_ptr, bool floor)
         }
 
 	/* Abilities of base item are always known if aware */
-	if (object_aware_p(o_ptr))
+	if ((object_aware_p(o_ptr)) || (o_ptr->ident & (IDENT_STORE)))
 	{
         	o_ptr->can_flags1 |= k_info[o_ptr->k_idx].flags1;
                 o_ptr->can_flags2 |= k_info[o_ptr->k_idx].flags2;
@@ -408,7 +408,7 @@ void object_obvious_flags(object_type *o_ptr, bool floor)
 	}
 
 	/* Identified name */
-	if (object_named_p(o_ptr))
+	if ((object_named_p(o_ptr)) || (o_ptr->ident & (IDENT_STORE)))
 	{
 		/* Now we know what it is, update what we know about it from our artifact memory */
 		if (o_ptr->name1)
@@ -3376,7 +3376,7 @@ void list_object(const object_type *o_ptr, int mode)
 	object_flags_aux(mode, o_ptr, &f1, &f2, &f3, &f4);
 
 	/* Display the flags */
-	anything |= list_object_flags(f1, f2, f3, f4, spoil || (o_ptr->ident & (IDENT_PVAL | IDENT_MENTAL | IDENT_KNOWN)) ? o_ptr->pval : 0, LIST_FLAGS_CAN); 
+	anything |= list_object_flags(f1, f2, f3, f4, spoil || (o_ptr->ident & (IDENT_PVAL | IDENT_MENTAL | IDENT_KNOWN | IDENT_STORE)) ? o_ptr->pval : 0, LIST_FLAGS_CAN); 
 
 	/*
 	 * Handle cursed objects here to avoid redundancies such as noting
@@ -4688,7 +4688,7 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4, bo
 	o_ptr->can_flags4 |= (f4);
 
 	/* If object flavored, learn flags about that flavor */
-	if (!object_aware_p(o_ptr) && (k_info[o_ptr->k_idx].flavor))
+	if (!object_aware_p(o_ptr) && !(o_ptr->ident & IDENT_STORE) && (k_info[o_ptr->k_idx].flavor))
 	{
 		/* Learn for base flavor */
 		x_list[k_info[o_ptr->k_idx].flavor].can_flags1 |= (f1);
@@ -4750,6 +4750,9 @@ void object_can_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4, bo
 		/* Guess name */
 		object_guess_name(o_ptr);
 	}
+	
+	/* If in store, stop here */
+	if (o_ptr->ident & (IDENT_STORE)) return;
 
 	/* Must be identified to continue */
 	if (!object_named_p(o_ptr))
@@ -5087,7 +5090,7 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4, bo
 	o_ptr->can_flags4 &= ~(f4);
 
 	/* If object flavored, learn flags about that flavor */
-	if (!object_aware_p(o_ptr) && (k_info[o_ptr->k_idx].flavor))
+	if (!object_aware_p(o_ptr) && !(o_ptr->ident & (IDENT_STORE)) && (k_info[o_ptr->k_idx].flavor))
 	{
 		x_list[k_info[o_ptr->k_idx].flavor].not_flags1 |= (f1);
 		x_list[k_info[o_ptr->k_idx].flavor].not_flags2 |= (f2);
@@ -5141,6 +5144,9 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4, bo
 			object_guess_name(i_ptr);
 		}
 	}
+	
+	/* Stop here if item in a store */
+	if (o_ptr->ident & (IDENT_STORE)) return;
 
 	/* Check inventory */
 	if (!floor) inven_may_flags();
@@ -5186,6 +5192,7 @@ void object_not_flags(object_type *o_ptr, u32b f1, u32b f2, u32b f3, u32b f4, bo
 	}
 }
 
+
 /*
  * Object may have these flags. If only object in equipment
  * to do so, will have these flags. Use for object absorbtion.
@@ -5222,6 +5229,7 @@ void object_may_flags(object_type *o_ptr, u32b f1,u32b f2,u32b f3, u32b f4, bool
 		object_guess_name(o_ptr);
 	}
 }
+
 
 /*
  * Object forgets all may flags

@@ -847,6 +847,12 @@ static int store_carry(object_type *o_ptr, int store_index)
 	/* Remove special inscription, if any */
 	o_ptr->feeling = 0;
 
+	/* Item belongs to a store */
+	o_ptr->ident |= IDENT_STORE;
+	
+	/* All obvious flags are learnt about the object - important this happens after IDENT_STORE set */
+	object_obvious_flags(o_ptr, TRUE);
+	
 	/* Check each existing object (try to combine) */
 	for (slot = 0; slot < st_ptr->stock_num; slot++)
 	{
@@ -953,9 +959,6 @@ static bool store_services(object_type *i_ptr, int store_index)
 
 			/* Create a new object of the chosen kind */
 			object_prep(j_ptr, k_idx);
-
-			/* Item belongs to a store */
-			j_ptr->ident |= IDENT_STORE;
 
 			/* The object is "known" */
 			object_known(j_ptr);
@@ -1176,9 +1179,6 @@ static void store_create(int store_index)
 			p_ptr->depth = depth;
 			object_level = depth;
 			
-			/* Item belongs to the store */
-			i_ptr->ident |= (IDENT_STORE);
-
 			/* Attempt to carry the (known) object */
 			(void)store_carry(i_ptr, store_index);
 
@@ -3991,9 +3991,6 @@ int store_init(int feat)
 
 			/* Create a new object of the chosen kind */
 			object_prep(i_ptr, k_idx);
-
-			/* Item belongs to a store */
-			i_ptr->ident |= IDENT_STORE;
 
 			/* The object is "known" */
 			object_known(i_ptr);
