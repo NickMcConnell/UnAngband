@@ -121,9 +121,6 @@ void do_cmd_item(int command)
 		/* Check if using a torch */
 		if (item_tester_refill_torch(&inventory[INVEN_LITE])) flags |= (USE_FEATH);
 		
-		/* Check if using a torch */
-		else if ((inventory[INVEN_LITE].tval == TV_LITE) && (inventory[INVEN_LITE].sval == SV_LITE_LANTERN)) flags |= (USE_FEATH);
-		
 		/* Check if wielding a known fire brand */
 		else if (inventory[INVEN_WIELD].can_flags1 & (TR1_BRAND_FIRE)) flags |= (USE_FEATH);
 	}

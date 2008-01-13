@@ -3412,6 +3412,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 	bool trick_failure = FALSE;
 	bool chasm = FALSE;
 	bool fumble = FALSE;
+	bool activate = FALSE;
 	int feat;
 
 	byte missile_attr;
@@ -3655,6 +3656,9 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 			/* Otherwise not breaking by default */
 			ammo_can_break = FALSE;
 		}
+		
+		/* Throwing/firing an item at the character's feet */
+		if (!path_n) activate = TRUE;
 
 		/* Project along the path */
 		for (i = 0; i < path_n; ++i)
@@ -4004,21 +4008,8 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 								 "%^s flees in terror!", m_name);
 						}
 
-						/* Apply additional effect from activation */
-						if (auto_activate(o_ptr))
-						
-						{
-							/* Make item strike */
-							process_item_blow(SOURCE_PLAYER_ACT_ARTIFACT, o_ptr->name1, o_ptr, y, x);
-						}
-
-						/* Apply additional effect from coating*/
-						else if (coated_p(o_ptr))
-						{
-							/* Make item strike */
-							process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x);
-						}
-
+						/* Apply additional effect from activation/coating */
+						activate = TRUE;
 					}
 
 					/* Check usage */
@@ -4028,10 +4019,43 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 					break;
 				}
 			}
+			/* Handle reaching targetted grid */
+			else if ((i == path_n - 1) && !(trick_throw))
+			{
+				/* Activate item */
+				activate = TRUE;
+			}	
 		}
 
 		/* 3rd and last cause of failure: out of range, unless returning */
 		trick_failure = trick_failure || (i == path_n && tdis != 256);
+		
+		/* Apply effects of activation/coating */
+		if (activate)
+		{
+			/* Apply additional effect from activation */
+			if (auto_activate(o_ptr))
+			{
+				/* Make item strike */
+				process_item_blow(SOURCE_PLAYER_ACT_ARTIFACT, o_ptr->name1, o_ptr, y, x);
+			}
+
+			/* Apply additional effect from coating*/
+			else if (coated_p(o_ptr))
+			{
+				/* Make item strike */
+				process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x);
+			}
+			
+			/* Check usage */
+			object_usage(item);
+			
+			/* Chance of breakage */
+			ammo_can_break = TRUE;
+			
+			/* Paranoia */
+			activate = FALSE;
+		}
 	}
 
 	/* Reenable auto-target */
