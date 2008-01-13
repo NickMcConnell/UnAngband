@@ -2647,8 +2647,8 @@
 #define RBM_SCATTER		77
 #define RBM_HOWL 		78
 
-#define RBM_MAX_NORMAL  23
-#define RBM_MIN_RANGED  15
+#define RBM_MAX_NORMAL  24
+#define RBM_MIN_RANGED  16
 
 
 /*** Function flags ***/

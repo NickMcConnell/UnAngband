@@ -1451,7 +1451,7 @@ bool player_refill(int item)
  */
 bool player_refill2(int item2)
 {
-	int item;
+	int item = p_ptr->command_trans_item;
 
 	object_type *o_ptr;
 	object_type *i_ptr;

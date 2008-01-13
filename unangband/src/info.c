@@ -598,7 +598,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		}
 		else
 		{
-			text_out(", and ");
+			text_out(" and ");
 		}
 
 		/* Intro */
@@ -713,7 +713,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		}
 		else
 		{
-			text_out(", and can enchant one ");
+			text_out(" and can enchant one ");
 		}
 		/* Scan */
 		for (n = 0; n < vn; n++)
@@ -795,7 +795,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		}
 		else
 		{
-			text_out(", and ");
+			text_out(" and ");
 		}
 
 		/* Scan */
@@ -866,7 +866,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		}
 		else
 		{
-			text_out(", and ");
+			text_out(" and ");
 		}
 
 		/* Scan */
@@ -906,7 +906,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		}
 		else
 		{
-			text_out(", and ");
+			text_out(" and ");
 		}
 
 		/* Scan */
@@ -980,7 +980,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		}
 		else
 		{
-			text_out(", and ");
+			text_out(" and ");
 		}
 
 		/* Scan */
@@ -1016,7 +1016,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		}
 		else
 		{
-			text_out(", and ");
+			text_out(" and ");
 		}
 
 		/* Scan */
@@ -1055,7 +1055,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		}
 		else
 		{
-			text_out(", and ");
+			text_out(" and ");
 		}
 
 		/* Scan */
@@ -1173,7 +1173,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		}
 		else
 		{
-			text_out(", and ");
+			text_out(" and ");
 		}
 
 		/* Scan */
@@ -1578,7 +1578,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		}
 		else if (!r)
 		{
-			text_out(", and ");
+			text_out(" and ");
 		}
 		else if (r < n-1)
 		{
@@ -1586,7 +1586,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		}
 		else
 		{
-			text_out(", and ");
+			text_out(" and ");
 		}
 
 		/* Describe the method */
@@ -3734,7 +3734,7 @@ void list_object(const object_type *o_ptr, int mode)
 				for (i = 0; i < num; i++)
 				{
 					/* List powers */
-					powers |= spell_desc(&s_info[book[i]],(i==0) ? (vd[n] ? " and ": vp[n]) : ", or ",0,detail, vt[n]);
+					powers |= spell_desc(&s_info[book[i]],(i==0) ? (vd[n] ? " and ": vp[n]) : " or ",0,detail, vt[n]);
 				}
 
 				if ((charge) && (powers))

@@ -11948,7 +11948,7 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 
 				/* Messages */
 				if (dist >= 6)
-					msg_print("The wind grabs you, and whirls you around!");
+					msg_print("The wind grabs you and whirls you around!");
 				else if (dist >= 1)
 					msg_print("The wind buffets you about.");
 
