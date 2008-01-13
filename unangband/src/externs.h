@@ -876,7 +876,7 @@ extern bool hates_terrain(object_type *o_ptr, int f_idx);
 extern bool player_ignore_terrain(int f_idx);
 extern int  calc_inc_stat(int value, int auto_roll);
 extern void inc_stat(int stat);
-extern bool dec_stat(int stat, int amount, int permanent);
+extern bool dec_stat(int stat, int amount);
 extern bool res_stat(int stat);
 extern bool apply_disenchant(int mode);
 extern bool hates_fire(object_type *o_ptr);

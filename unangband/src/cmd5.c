@@ -1373,7 +1373,7 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 				msg_print("You have damaged your health!");
 
 				/* Reduce constitution */
-				(void)dec_stat(A_CON, 15 + randint(10), 0);
+				(void)dec_stat(A_CON, 15 + randint(10));
 			}
 		}
 		else
@@ -1419,7 +1419,7 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 			msg_print("You have damaged your health!");
 
 			/* Reduce constitution */
-			(void)dec_stat(A_CON, 15 + randint(10), FALSE);
+			(void)dec_stat(A_CON, 15 + randint(10));
 			
 			/* Add to the temporary drain */
 			set_stat_dec_tim(p_ptr->stat_dec_tim[A_CON] + rand_int(20) + 20, A_CON);	

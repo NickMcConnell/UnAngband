@@ -461,25 +461,25 @@ void suffer_disease(void)
 		{
 			case DISEASE_LOSE_STR:
 			{
-				dec_stat(A_STR, p_ptr->disease & (DISEASE_POWER) ? randint(6) : 1, 0);
+				dec_stat(A_STR, p_ptr->disease & (DISEASE_POWER) ? randint(6) : 1);
 				break;
 			}
 
 			case DISEASE_LOSE_INT:
 			{
-				dec_stat(A_INT, p_ptr->disease & (DISEASE_POWER) ? randint(6) : 1, 0);
+				dec_stat(A_INT, p_ptr->disease & (DISEASE_POWER) ? randint(6) : 1);
 				break;
 			}
 
 			case DISEASE_LOSE_WIS:
 			{
-				dec_stat(A_WIS, p_ptr->disease & (DISEASE_POWER) ? randint(6) : 1, 0);
+				dec_stat(A_WIS, p_ptr->disease & (DISEASE_POWER) ? randint(6) : 1);
 				break;
 			}
 
 			case DISEASE_LOSE_DEX:
 			{
-				dec_stat(A_DEX, p_ptr->disease & (DISEASE_POWER) ? randint(6) : 1, 0);
+				dec_stat(A_DEX, p_ptr->disease & (DISEASE_POWER) ? randint(6) : 1);
 				/* An exception --- disease does not glue DEX and AGI.
 				   See DISEASE_SLOW below, however. */
 				break;
@@ -487,13 +487,13 @@ void suffer_disease(void)
 
 			case DISEASE_LOSE_CON:
 			{
-				dec_stat(A_CON, p_ptr->disease & (DISEASE_POWER) ? randint(6) : 1, 0);
+				dec_stat(A_CON, p_ptr->disease & (DISEASE_POWER) ? randint(6) : 1);
 				break;
 			}
 
 			case DISEASE_LOSE_CHR:
 			{
-				dec_stat(A_CHR, p_ptr->disease & (DISEASE_POWER) ? randint(6) : 1, 0);
+				dec_stat(A_CHR, p_ptr->disease & (DISEASE_POWER) ? randint(6) : 1);
 				break;
 			}
 
@@ -569,7 +569,7 @@ void suffer_disease(void)
 			{
 				(void)set_slow(p_ptr->slow + randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10);
 				/* Also slightly reduce agility. */
-				dec_stat(A_AGI, p_ptr->disease & (DISEASE_POWER) ? randint(3) : 1, 0);
+				dec_stat(A_AGI, p_ptr->disease & (DISEASE_POWER) ? randint(3) : 1);
 				break;
 			}
 

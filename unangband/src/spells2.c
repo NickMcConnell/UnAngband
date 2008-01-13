@@ -167,7 +167,7 @@ bool do_dec_stat(int stat)
 	}
 
 	/* Attempt to reduce the stat */
-	if (dec_stat(stat, 10, FALSE))
+	if (dec_stat(stat, 10))
 	{
 		/* Message */
 		msg_format("You feel very %s.", desc_stat_neg[stat]);

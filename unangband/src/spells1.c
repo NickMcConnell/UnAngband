@@ -2771,7 +2771,7 @@ void inc_stat(int stat)
  * if your stat is already drained, the "max" value will not drop all
  * the way down to the "cur" value.
  */
-bool dec_stat(int stat, int amount, int permanent)
+bool dec_stat(int stat, int amount)
 {
 	int cur, max, loss, same, res = FALSE;
 
@@ -2824,43 +2824,6 @@ bool dec_stat(int stat, int amount, int permanent)
 
 		/* Something happened */
 		if (cur != p_ptr->stat_cur[stat]) res = TRUE;
-	}
-
-	/* Damage "max" value */
-	if (permanent && (max > 3))
-	{
-		/* Handle "low" values */
-		if (max <= 18)
-		{
-			if (amount > 90) max--;
-			if (amount > 50) max--;
-			if (amount > 20) max--;
-			max--;
-		}
-
-		/* Handle "high" values */
-		else
-		{
-			/* Hack -- Decrement by a random amount between one-quarter */
-			/* and one-half of the stat bonus times the percentage, with a */
-			/* minimum damage of half the percentage. -CWS */
-			loss = (((max-18) / 2 + 1) / 2 + 1);
-			if (loss < 1) loss = 1;
-			loss = ((randint(loss) + loss) * amount) / 100;
-			if (loss < amount/2) loss = amount/2;
-
-			/* Lose some points */
-			max = max - loss;
-
-			/* Hack -- Only reduce stat to 17 sometimes */
-			if (max < 18) max = (amount <= 20) ? 18 : 17;
-		}
-
-		/* Hack -- keep it clean */
-		if (same || (max < cur)) max = cur;
-
-		/* Something happened */
-		if (max != p_ptr->stat_max[stat]) res = TRUE;
 	}
 
 	/* Apply changes */
