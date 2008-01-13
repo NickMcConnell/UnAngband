@@ -6512,12 +6512,12 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if (r_ptr->flags2 & (RF2_POWERFUL)) l_ptr->flags2 |= (RF2_POWERFUL);
 
 				/* Hack -- blows */
-				if (attack < 4)
+				if (attack - 32*3 < 4)
 				{
 					/* Count attacks of this type */
-					if (l_ptr->blows[attack] < MAX_UCHAR)
+					if (l_ptr->blows[attack - 32*3] < MAX_UCHAR)
 					{
-						l_ptr->blows[attack]++;
+						l_ptr->blows[attack - 32*3]++;
 					}
 				}
 			}
