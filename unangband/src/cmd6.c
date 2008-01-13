@@ -71,7 +71,7 @@ void do_cmd_item(int command)
 	bool cancel = TRUE;
 	
 	/* Flags we can use the item from */
-	byte flags = cmd_item_list[command].use_from;
+	u16b flags = cmd_item_list[command].use_from;
 
 	/* Check some conditions */
 	if ((cmd_item_list[command].conditions & (CONDITION_NOT_BLIND)) && (p_ptr->blind))
@@ -149,6 +149,16 @@ void do_cmd_item(int command)
 		else
 		{
 			o_ptr = &o_list[0 - item];
+		}
+		
+		/* In a bag? */
+		if (o_ptr->tval == TV_BAG)
+		{
+			/* Get item from bag */
+			if (!get_item_from_bag(&item, cmd_item_list[command].item_query, cmd_item_list[command].item_not_found, o_ptr))
+			{
+				if ((flags & (USE_BAGS)) == 0) return;
+			}
 		}
 	}
 	
