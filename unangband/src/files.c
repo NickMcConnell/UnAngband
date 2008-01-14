@@ -3986,6 +3986,9 @@ errr file_character(cptr name, bool full)
 			bool victory = FALSE;
 			bool please_print_depths = TRUE;
 
+			/* dungeons with guardians killed elsehwere are too confusing */
+			if (!t_info[i].visited) continue;
+
 			long_level_name(str, i, t_info[i].attained_depth);
 
 			for (j = 0; j < MAX_DUNGEON_ZONES; j++)
@@ -4003,7 +4006,8 @@ errr file_character(cptr name, bool full)
 				}
 			}
 
-			if (victory) {
+			if (victory) 
+			{
 				/* guardians present and all killed */
 
 				/* too interesting */
@@ -4014,12 +4018,15 @@ errr file_character(cptr name, bool full)
 					/* descended to the dungeon and conquered */
 					text_out("You emerged victorious from ");
 				else
-					/* won, even if not visited, e.g. guardian killed elsewhere */
+					/* won on the surface */
 					text_out("You cleared the passage through ");
 			}
-			else {
+			else 
+			{
 				/* no guardians or not all killed */
+
 				if (t_info[i].attained_depth > min_depth(i)) {
+					/* descended */
 
 					/* too interesting */
 					if (x) 
@@ -4035,13 +4042,15 @@ errr file_character(cptr name, bool full)
 						else text_out(format("level %d in ", t_info[i].attained_depth));
 					}
 				}
-				else if (t_info[i].visited) {
+				else 
+				{
 					/* not descended, but visited */
 
-					/* not descended nor cleared, but another location opened */
 					if (t_info[i].quest_monster 
 						 && r_info[t_info[i].quest_monster].max_num == 0) 
 					{
+						/* not descended nor cleared, but another location opened */
+
 						/* too interesting */
 						if (x) 
 							continue;
@@ -4050,6 +4059,8 @@ errr file_character(cptr name, bool full)
 					}
 					else
 					{
+						/* only visited on the surface */
+
 						/* not interesting enough */
 						if (!x) 
 							continue;
@@ -4059,9 +4070,6 @@ errr file_character(cptr name, bool full)
 						text_out("You have visited ");		
 					}
 				}
-				else 
-					/* no impact whatsoever on this dungeon; not printing */
-					continue;
 			}
 
 			text_out(str);

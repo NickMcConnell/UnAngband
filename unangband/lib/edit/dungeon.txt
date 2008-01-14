@@ -610,10 +610,10 @@ D: rebuild their kingdom using the wealth, your share is here for taking.
 N:43:ruins of Angmar
 X:2:69:0:0
 R:UNDEAD
-L:21:425:141:141:0:0:the
-L:22:56:141:0:0:0:the
-L:80:56:0:0:535:0:the
-L:81:56:0:0:0:0:the
+L:31:425:141:141:0:0:the
+L:32:56:141:0:0:0:the
+L:72:56:0:0:535:0:the
+L:73:56:0:0:0:0:the
 
 # Sunken/outer plane dungeons
 # TODO: add guardian or remove
@@ -622,9 +622,9 @@ N:44:Numenor
 X:2:0:0:0
 G:G
 R:CAN_SWIM
-L:21:403:400:49:0:0:the sunken city of
-L:22:399:56:0:0:0
-L:60:399:56:0:0:0
+L:41:403:400:49:0:0:the sunken city of
+L:42:399:56:0:0:0
+L:65:399:56:0:0:0
 
 # TODO: add guardian or remove
 
@@ -634,7 +634,7 @@ G:E
 R:PRIEST
 L:21:425:141:141:0:0:the Temple of
 L:22:56:0:0:0:0:depths of the Temple of
-L:60:56:0:0:0:0:bottom of the Temple of
+L:50:56:0:0:0:0:bottom of the Temple of
 
 # TODO: add guardian or remove
 
@@ -642,8 +642,8 @@ N:46:Crystal Castle
 X:2:0:0:0
 G:g
 R:MAGE
-L:21:56:144:145:0:0:the
-L:22:148:145:0:0:0:the
+L:31:56:144:145:0:0:the
+L:32:148:145:0:0:0:the
 L:60:148:145:0:0:0:the
 
 # TODO: make Bolg more powerful, I guess, he's fought after Smaug

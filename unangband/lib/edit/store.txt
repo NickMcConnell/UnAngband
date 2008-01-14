@@ -667,7 +667,7 @@ O:75:28:2
 O:77:0:1
 O:5:0:1
 
-N:36:tree hung with a banner 'Happy Elventy-One'
+N:36:tree hung with a banner 'Happy Eleventy-One'
 X:2
 
 N:37:at the Prancing Pony
