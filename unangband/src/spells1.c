@@ -5557,24 +5557,28 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		case GF_BIND_FAMILIAR:
 		{
 			charm_hook = charm_familiar_hook;
+			break;
 		}
 		
 		/* Any dragon */
 		case GF_BIND_DRAGON:
 		{
 			charm_hook = charm_dragon_hook;
+			break;
 		}
 		
 		/* Any demon */
 		case GF_BIND_DEMON:
 		{
 			charm_hook = charm_demon_hook;
+			break;
 		}
 
 		/* Any undead */
 		case GF_BIND_UNDEAD:
 		{
 			charm_hook = charm_undead_hook;
+			break;
 		}
 	}
 
@@ -5593,6 +5597,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 					l_ptr->flags9 |= (RF9_RES_MAGIC);
 				}
 			}
+
+			break;
 		}
 
 		/* Explosion -- destructive -- pure damage */
@@ -6796,8 +6802,6 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
-
-
 		/* Lite, but only hurts susceptible creatures */
 		case GF_LITE_WEAK:
 		{
@@ -6831,8 +6835,6 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 			break;
 		}
-
-
 
 		/* Lite -- opposite of Dark */
 		case GF_LITE:
@@ -6869,7 +6871,6 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			}
 			break;
 		}
-
 
 		/* Dark weak, but only blinds non-resistant creatures */
 		case GF_DARK_WEAK:
@@ -6962,7 +6963,6 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			dam = 0;
 			break;
 		}
-
 
 		/* Teleport evil (Use "dam" as "power") */
 		case GF_AWAY_EVIL:
@@ -7271,6 +7271,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				/* Get blinded later */
 				do_blind = damroll(3, (dam / 2)) + 1;
 			}
+
+			break;
 		}
 
 		/* Melee attack - fear */
@@ -7932,10 +7934,11 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Monster stripped of enchantments */
-		{
 		case GF_DISPEL:
+		{
 			/* No "real" damage */
 			dam = 0;
+			/* Fall through */
 		}
 		/* Hack -- curse effect - dispel plus damage */
 		case GF_CURSE:
@@ -11286,6 +11289,8 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_HEAL_PERC:
 		{
 			if (p_ptr->mhp > 100) dam = p_ptr->mhp * dam / 100;
+
+			/* Fall through */
 		}
 		
 		/* Heal the player, except if undead */
@@ -11449,6 +11454,8 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_GAIN_MANA_PERC:
 		{
 			if (p_ptr->msp > 100) dam = p_ptr->msp * dam / 100;
+
+			/* Fall through */
 		}
 
 		/* Melee attack - gain mana */
