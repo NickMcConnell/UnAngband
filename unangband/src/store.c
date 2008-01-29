@@ -1237,7 +1237,7 @@ static void store_create(int store_index)
 		}
 
 		/* Item belongs to a store */
-		if (st_ptr->base != STORE_STORAGE) i_ptr->ident |= IDENT_STORE;
+		i_ptr->ident |= IDENT_STORE;
 
 		/* The object is "known" */
 		object_known(i_ptr);
@@ -2684,7 +2684,7 @@ static void store_purchase(int store_index)
 		i_ptr->ident &= ~(IDENT_STORE);
 		
 		/* However, its now identified if we are a quest or store location */
-		if (st_ptr->base == STORE_QUEST_REWARD)
+		if (st_ptr->base == STORE_QUEST_REWARD || st_ptr->base == STORE_STORAGE)
 		{
 			object_aware(i_ptr, TRUE);
 			object_known(i_ptr);
@@ -4005,7 +4005,7 @@ int store_init(int feat)
 	if (st_ptr->base > STORE_HOME)
 	{
 		/* Create some new items */
-		while (st_ptr->stock_num < ((st_ptr->base == STORE_STORAGE) || (st_ptr->base == STORE_QUEST_REWARD) ? 4 : 8)) store_create(store_index);
+		while (st_ptr->stock_num < ((st_ptr->base == STORE_STORAGE) || (st_ptr->base == STORE_QUEST_REWARD) ? 3 + rand_int(3) : 8)) store_create(store_index);
 	}
 
 
