@@ -829,12 +829,12 @@ void teleport_player_level(void)
 	if (rand_int(100) < 50)
 	{
 		/* Crack open the floor */
-		place_random_stairs(p_ptr->py, p_ptr->px, FEAT_CRUMBLING_FLOOR);
+		(void)place_random_stairs(p_ptr->py, p_ptr->px, FEAT_CRUMBLING_FLOOR);
 	}
 	else
 	{
 		/* Crack open the ceiling */
-		place_random_stairs(p_ptr->py, p_ptr->px, FEAT_TREMBLING_RUBBLE);
+		(void)place_random_stairs(p_ptr->py, p_ptr->px, FEAT_TREMBLING_RUBBLE);
 	}
 
 	/* Message depends on actual terrain */
@@ -1263,7 +1263,7 @@ void take_hit(int dam, cptr kb_str)
 		msg_print(NULL);
 
 		/* Note cause of death */
-		my_strcpy(p_ptr->died_from, kb_str, sizeof(p_ptr->died_from));
+		(void)my_strcpy(p_ptr->died_from, kb_str, sizeof(p_ptr->died_from));
 
 		/* No longer a winner */
 		p_ptr->total_winner = FALSE;
@@ -2023,13 +2023,13 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 	if ((p_ptr->cur_flags4 & (TR4_HURT_ACID)) != 0)
 	{
 		/* Always notice */
-		player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ACID);
+		(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ACID);
 
 		/* Immunity reduced to partial protection */
 		if ((p_ptr->cur_flags2 & (TR2_IM_ACID)) != 0)
 		{
 			/* Always notice */
-			player_can_flags(who, 0x0L,TR2_IM_ACID,0x0L,0x0L);	
+			(void)player_can_flags(who, 0x0L,TR2_IM_ACID,0x0L,0x0L);	
 
 			/* Hack -- always assume 'armor hit' */
 			dam = (dam + 5) / 6;
@@ -2048,8 +2048,8 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_ACID)) != 0)
 	{
 		/* Always notice */
-		player_can_flags(who, 0x0L,TR2_IM_ACID,0x0L,0x0L);
-		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ACID);
+		(void)player_can_flags(who, 0x0L,TR2_IM_ACID,0x0L,0x0L);
+		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ACID);
 
 		return;
 	}
@@ -2058,28 +2058,28 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_ACID)) != 0)
 	{
 		/* Always notice */
-		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ACID);
+		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ACID);
 	}
 
 	/* Resist the damage */
 	if ((p_ptr->cur_flags2 & (TR2_RES_ACID)) != 0)
 	{
 		/* Sometimes notice */
-		player_can_flags(who, 0x0L,TR2_RES_ACID,0x0L,0x0L);
+	(void)	player_can_flags(who, 0x0L,TR2_RES_ACID,0x0L,0x0L);
 
 		inv /= res;
 	}
 	else
 	{
 		/* Sometimes notice */
-		player_not_flags(who, 0x0L,TR2_RES_ACID,0x0L,0x0L);
+		(void)player_not_flags(who, 0x0L,TR2_RES_ACID,0x0L,0x0L);
 	}
 
 	/* Resist the damage */
 	if (p_ptr->oppose_acid)
 	{
 		/* Monster notices */
-		update_smart_learn(who, SM_OPP_ACID);
+		(void)update_smart_learn(who, SM_OPP_ACID);
 
 		/* Increase resistance */
 		res += 3;
@@ -2087,14 +2087,15 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 	else
 	{
 		/* Monster notices */
-		update_smart_forget(who, SM_OPP_ACID);
+		(void)update_smart_forget(who, SM_OPP_ACID);
 	}
 
 	/* If any armor gets hit, defend the player */
 	if (minus_ac(inv)) dam = (dam + 1) / 2;
 
 	/* Inventory damage */
-	if ((inven) && (inv)) inven_damage(set_acid_destroy, inv);
+	if ((inven) && (inv))
+		(void)inven_damage(set_acid_destroy, inv);
 
 	/* Reduce the damage */
 	dam = (dam - res - 1) / res;
@@ -2120,13 +2121,13 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 	if ((p_ptr->cur_flags4 & (TR4_HURT_ELEC)) != 0)
 	{
 		/* Always notice */
-		player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ELEC);
+		(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ELEC);
 
 		/* Immunity reduced to partial protection */
 		if ((p_ptr->cur_flags2 & (TR2_IM_ELEC)) != 0)
 		{
 			/* Always notice */
-			player_can_flags(who, 0x0L,TR2_IM_ELEC,0x0L,0x0L);	
+			(void)player_can_flags(who, 0x0L,TR2_IM_ELEC,0x0L,0x0L);	
 
 			/* Reduce effect to basic resistance */
 			dam = (dam + 2) / 3;
@@ -2145,8 +2146,8 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_ELEC)) != 0)
 	{
 		/* Always notice */
-		player_can_flags(who, 0x0L,TR2_IM_ELEC,0x0L,0x0L);
-		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ELEC);
+		(void)player_can_flags(who, 0x0L,TR2_IM_ELEC,0x0L,0x0L);
+		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ELEC);
 
 		return;
 	}
@@ -2155,28 +2156,28 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_ELEC)) != 0)
 	{
 		/* Always notice */
-		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ELEC);
+		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ELEC);
 	}
 
 	/* Resist the damage */
 	if ((p_ptr->cur_flags2 & (TR2_RES_ELEC)) != 0)
 	{
 		/* Sometimes notice */
-		player_can_flags(who, 0x0L,TR2_RES_ELEC,0x0L,0x0L);
+		(void)player_can_flags(who, 0x0L,TR2_RES_ELEC,0x0L,0x0L);
 
 		inv /= res;
 	}
 	else
 	{
 		/* Sometimes notice */
-		player_not_flags(who, 0x0L,TR2_RES_ELEC,0x0L,0x0L);
+		(void)player_not_flags(who, 0x0L,TR2_RES_ELEC,0x0L,0x0L);
 	}
 
 	/* Resist the damage */
 	if (p_ptr->oppose_elec)
 	{
 		/* Monster notices */
-		update_smart_learn(who, SM_OPP_ELEC);
+		(void)update_smart_learn(who, SM_OPP_ELEC);
 
 		/* Increase resistance */
 		res += 3;
@@ -2184,11 +2185,12 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 	else
 	{
 		/* Monster notices */
-		update_smart_forget(who, SM_OPP_ELEC);
+		(void)update_smart_forget(who, SM_OPP_ELEC);
 	}
 
 	/* Inventory damage */
-	if ((inven) && (inv)) inven_damage(set_elec_destroy, inv);
+	if ((inven) && (inv)) 
+		(void)inven_damage(set_elec_destroy, inv);
 
 	/* Reduce the damage */
 	dam = (dam - res - 1) / res;
@@ -2216,13 +2218,13 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 	if ((p_ptr->cur_flags4 & (TR4_HURT_FIRE)) != 0)
 	{
 		/* Always notice */
-		player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_FIRE);
+		(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_FIRE);
 
 		/* Immunity reduced to partial protection */
 		if ((p_ptr->cur_flags2 & (TR2_IM_FIRE)) != 0)
 		{
 			/* Always notice */
-			player_can_flags(who, 0x0L,TR2_IM_FIRE,0x0L,0x0L);	
+			(void)player_can_flags(who, 0x0L,TR2_IM_FIRE,0x0L,0x0L);	
 
 			/* Reduce effect to basic resistance */
 			dam = (dam + 2) / 3;
@@ -2241,8 +2243,8 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_FIRE)) != 0)
 	{
 		/* Always notice */
-		player_can_flags(who, 0x0L,TR2_IM_FIRE,0x0L,0x0L);
-		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_FIRE);
+		(void)player_can_flags(who, 0x0L,TR2_IM_FIRE,0x0L,0x0L);
+		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_FIRE);
 
 		return;
 	}
@@ -2251,39 +2253,40 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_FIRE)) != 0)
 	{
 		/* Always notice */
-		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_FIRE);
+		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_FIRE);
 	}
 
 	/* Resist the damage */
 	if ((p_ptr->cur_flags2 & (TR2_RES_FIRE)) != 0)
 	{
 		/* Sometimes notice */
-		player_can_flags(who, 0x0L,TR2_RES_FIRE,0x0L,0x0L);
+		(void)player_can_flags(who, 0x0L,TR2_RES_FIRE,0x0L,0x0L);
 
 		inv /= res;
 	}
 	else
 	{
 		/* Sometimes notice */
-		player_not_flags(who, 0x0L,TR2_RES_FIRE,0x0L,0x0L);
+		(void)player_not_flags(who, 0x0L,TR2_RES_FIRE,0x0L,0x0L);
 	}
 
 	/* Resist the damage */
 	if (p_ptr->oppose_fire)
 	{
 		/* Monster notices */
-		update_smart_learn(who, SM_OPP_FIRE);
+		(void)update_smart_learn(who, SM_OPP_FIRE);
 
 		res += 3;
 	}
 	else
 	{
 		/* Monster notices */
-		update_smart_forget(who, SM_OPP_FIRE);
+		(void)update_smart_forget(who, SM_OPP_FIRE);
 	}
 
 	/* Inventory damage */
-	if ((inven) && (inv)) inven_damage(set_fire_destroy, inv);
+	if ((inven) && (inv)) 
+		(void)inven_damage(set_fire_destroy, inv);
 
 	/* Reduce the damage */
 	dam = (dam - res - 1) / res;
@@ -2309,13 +2312,13 @@ static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 	if ((p_ptr->cur_flags4 & (TR4_HURT_COLD)) != 0)
 	{
 		/* Always notice */
-		player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_COLD);
+		(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_COLD);
 
 		/* Immunity reduced to partial protection */
 		if ((p_ptr->cur_flags2 & (TR2_IM_COLD)) != 0)
 		{
 			/* Always notice */
-			player_can_flags(who, 0x0L,TR2_IM_COLD,0x0L,0x0L);	
+			(void)player_can_flags(who, 0x0L,TR2_IM_COLD,0x0L,0x0L);	
 
 			/* Reduce effect to basic resistance */
 			dam = (dam + 2) / 3;
@@ -2334,8 +2337,8 @@ static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_COLD)) != 0)
 	{
 		/* Always notice */
-		player_can_flags(who, 0x0L,TR2_IM_COLD,0x0L,0x0L);
-		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_COLD);
+		(void)player_can_flags(who, 0x0L,TR2_IM_COLD,0x0L,0x0L);
+		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_COLD);
 
 		return;
 	}
@@ -2344,39 +2347,40 @@ static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_COLD)) != 0)
 	{
 		/* Always notice */
-		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_COLD);
+		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_COLD);
 	}
 
 	/* Resist the damage */
 	if ((p_ptr->cur_flags2 & (TR2_RES_COLD)) != 0)
 	{
 		/* Sometimes notice */
-		player_can_flags(who, 0x0L,TR2_RES_COLD,0x0L,0x0L);
+		(void)player_can_flags(who, 0x0L,TR2_RES_COLD,0x0L,0x0L);
 
 		inv /= res;
 	}
 	else
 	{
 		/* Sometimes notice */
-		player_not_flags(who, 0x0L,TR2_RES_COLD,0x0L,0x0L);
+		(void)player_not_flags(who, 0x0L,TR2_RES_COLD,0x0L,0x0L);
 	}
 
 	/* Resist the damage */
 	if (p_ptr->oppose_cold)
 	{
 		/* Monster notices */
-		update_smart_learn(who, SM_OPP_COLD);
+		(void)update_smart_learn(who, SM_OPP_COLD);
 
 		res += 3;
 	}
 	else
 	{
 		/* Monster notices */
-		update_smart_forget(who, SM_OPP_COLD);
+		(void)update_smart_forget(who, SM_OPP_COLD);
 	}
 
 	/* Inventory damage */
-	if ((inven) && (inv)) inven_damage(set_cold_destroy, inv);
+	if ((inven) && (inv)) 
+		(void)inven_damage(set_cold_destroy, inv);
 
 	/* Reduce the damage */
 	dam = (dam - res - 1) / res;
@@ -2401,13 +2405,13 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 	if ((p_ptr->cur_flags4 & (TR4_HURT_POIS)) != 0)
 	{
 		/* Always notice */
-		player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
+		(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
 
 		/* Immunity reduced to partial protection */
 		if ((p_ptr->cur_flags4 & (TR4_IM_POIS)) != 0)
 		{
 			/* Always notice */
-			player_can_flags(who, 0x0L,0x0L,0x0L,TR4_IM_POIS);
+			(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_IM_POIS);
 
 			/* Reduce effect to basic resistance */
 			dam = (dam + 2) / 3;
@@ -2426,8 +2430,8 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 	else if ((p_ptr->cur_flags4 & (TR4_IM_POIS)) != 0)
 	{
 		/* Always notice */
-		player_can_flags(who, 0x0L,0x0L,0x0L,TR4_IM_POIS);
-		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
+		(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_IM_POIS);
+		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
 
 		return;
 	}
@@ -2436,33 +2440,33 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 	else if ((p_ptr->cur_flags4 & (TR4_IM_POIS)) != 0)
 	{
 		/* Always notice */
-		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
+		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
 	}
 
 	/* Resist the damage */
 	if ((p_ptr->cur_flags2 & (TR2_RES_POIS)) != 0)
 	{
 		/* Sometimes notice */
-		player_can_flags(who, 0x0L,TR2_RES_POIS,0x0L,0x0L);
+		(void)player_can_flags(who, 0x0L,TR2_RES_POIS,0x0L,0x0L);
 	}
 	else
 	{
 		/* Sometimes notice */
-		player_not_flags(who, 0x0L,TR2_RES_POIS,0x0L,0x0L);
+		(void)player_not_flags(who, 0x0L,TR2_RES_POIS,0x0L,0x0L);
 	}
 
 	/* Resist the damage */
 	if (p_ptr->oppose_pois)
 	{
 		/* Monster notices */
-		update_smart_learn(who, SM_OPP_POIS);
+		(void)update_smart_learn(who, SM_OPP_POIS);
 
 		res += 3;
 	}
 	else
 	{
 		/* Monster notices */
-		update_smart_forget(who, SM_OPP_POIS);
+		(void)update_smart_forget(who, SM_OPP_POIS);
 	}
 
 	/* Reduce the damage */
@@ -2531,14 +2535,14 @@ static void water_dam(int who, int dam, cptr kb_str, bool inven)
 	if ((p_ptr->cur_flags4 & (TR4_RES_WATER)) != 0)
 	{
 		/* Sometimes notice */
-		player_can_flags(who, 0x0L,0x0L,0x0L,TR4_RES_WATER);
+		(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_RES_WATER);
 
 		inv /= res;
 	}
 	else
 	{
 		/* Sometimes notice */
-		player_not_flags(who, 0x0L,0x0L,0x0L,TR4_RES_WATER);
+		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_RES_WATER);
 	}
 
 	/* Resist the damage */
@@ -2548,7 +2552,8 @@ static void water_dam(int who, int dam, cptr kb_str, bool inven)
 	}
 
 	/* Inventory damage */
-	if (inven) inven_damage(set_water_destroy, inv);
+	if (inven) 
+		(void)inven_damage(set_water_destroy, inv);
 
 	/* Reduce the damage */
 	dam = (dam - res - 1) / res;
@@ -2591,12 +2596,12 @@ bool player_ignore_terrain(int f_idx)
 			if ((p_ptr->oppose_fire) || (p_ptr->oppose_lava)) ignore = TRUE;
 			else if (f2 & (TR2_RES_FIRE))
 			{
-				object_can_flags(i_ptr, 0x0L, TR2_RES_FIRE, 0x0L, 0x0L, FALSE);
+				(void)object_can_flags(i_ptr, 0x0L, TR2_RES_FIRE, 0x0L, 0x0L, FALSE);
 				ignore = TRUE;
 			}
 			else if (p_ptr->cur_flags2 & (TR2_IM_FIRE))
 			{
-				equip_can_flags(0x0L, TR2_IM_FIRE, 0x0L, 0x0L);
+				(void)equip_can_flags(0x0L, TR2_IM_FIRE, 0x0L, 0x0L);
 				ignore = TRUE;
 			}
 			break;
@@ -3216,7 +3221,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			/* Hack -- halve fire damage in water */
 			if (f_ptr->flags2 & (FF2_WATER)) dam /= 2;
 		
-			/* Drop through */
+			/* Fall through */
 		}
 		case GF_LAVA:
 		case GF_PLASMA:
@@ -3247,7 +3252,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			/* Hack -- double cold damage in water */
 			if (f_ptr->flags2 & (FF2_WATER)) dam *= 2;
 
-			/* Drop through */
+			/* Fall through */
 		}
 		case GF_ICE:
 		{
@@ -3418,7 +3423,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 				obvious = TRUE;
 
 				/* Temporarily lite the square */
-				temp_lite(y,x);
+				(void)temp_lite(y,x);
 
 				/* Destroy the trap */
 				cave_alter_feat(y, x, FS_DISARM);
@@ -3479,7 +3484,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 				cave_alter_feat(y, x, FS_TUNNEL);
 
 				/* Temporarily lite */
-				temp_lite(y, x);
+				(void)temp_lite(y, x);
 			}
 
 			break;
@@ -3648,7 +3653,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			if ((who <= SOURCE_PLAYER_START) || ((who > 0) && (m_list[who].mflag & (MFLAG_ALLY))))
 			{
 				/* Add to the floor */
-				floor_carry(y,x,o_ptr);
+				(void)floor_carry(y,x,o_ptr);
 			}
 
 			/* Notice any changes */
@@ -3670,7 +3675,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 
 			new_feat = cave_feat[y][x];
 
-			my_strcpy(name,f_name+f_info[new_feat].name, sizeof(name));
+			(void)my_strcpy(name,f_name+f_info[new_feat].name, sizeof(name));
 
 			if (!(strstr(name,"stone bridge")))
 			{
@@ -4186,7 +4191,9 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					note_kill = (plural ? " salt!" : " salts!");
 					make_meat += o_ptr->weight;
 					break;
-				}				
+				}	
+
+				/* Fall through */
 			}
 
 			/* Water -- books, lites, scrolls, food */
@@ -5301,8 +5308,6 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 	monster_race *r_ptr;
 	monster_lore *l_ptr;
 
-	cptr name;
-
 	/* Is the monster "seen"? */
 	bool seen = FALSE;
 
@@ -5391,7 +5396,6 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 	/* Obtain remaining monster info */
 	r_ptr = &r_info[m_ptr->r_idx];
 	l_ptr = &l_list[m_ptr->r_idx];
-	name = (r_name + r_ptr->name);
 	if (m_ptr->ml) seen = TRUE;
 
 	/* Check if player attacking -- note skip attacks from allies */
@@ -6537,13 +6541,13 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 					/* msg_print("You suck in some life force."); */
 
 					/* Heal caster */
-					hp_player(dam);
+					(void)hp_player(dam);
 
 					/* Feed caster -- protect against bloating */
 					if (p_ptr->food + dam * 8 < PY_FOOD_FULL)
-						set_food(p_ptr->food + dam * 8);
+						(void)set_food(p_ptr->food + dam * 8);
 					else
-						set_food(PY_FOOD_FULL);
+						(void)set_food(PY_FOOD_FULL);
 				}
 				/* Oops */
 				else if (do_heal)
@@ -7651,7 +7655,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				drain = damroll(drain,5);
 				
 				/* Monster notices */
-				update_smart_forget(cave_m_idx[y][x], SM_IMM_MANA);
+				(void)update_smart_forget(cave_m_idx[y][x], SM_IMM_MANA);
 
 				/* Player gains back all mana */
 				if (p_ptr->csp + drain >= p_ptr->msp)
@@ -7938,6 +7942,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		{
 			/* No "real" damage */
 			dam = 0;
+
 			/* Fall through */
 		}
 		/* Hack -- curse effect - dispel plus damage */
@@ -8565,7 +8570,10 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			if (do_sleep) m_ptr->csleep = do_sleep;
 
 			/* Hack -- handle inventory damage */
-			if (do_inven_destroy) mon_inven_damage(cave_m_idx[y][x], do_inven_destroy, typ == GF_HURT_WOOD ? 30 : (dam / 15) + 1);
+			if (do_inven_destroy) 
+				(void)mon_inven_damage(cave_m_idx[y][x], 
+											  do_inven_destroy, 
+											  typ == GF_HURT_WOOD ? 30 : (dam / 15) + 1);
 		}
 	}
 
@@ -8601,7 +8609,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			if (do_sleep) m_ptr->csleep = do_sleep;
 
 			/* Hack -- handle inventory damage */
-			if (do_inven_destroy) mon_inven_damage(cave_m_idx[y][x], do_inven_destroy, (dam / 15) + 1);
+			if (do_inven_destroy) 
+				(void)mon_inven_damage(cave_m_idx[y][x], do_inven_destroy, (dam / 15) + 1);
 		}
 
 		/* Hack -- wake up nearby allies */
@@ -8609,11 +8618,11 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		{
 			m_ptr->mflag |= (MFLAG_AGGR);
 
-			tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
+			(void)tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
 		}
 		else if (fear)
 		{
-			tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_ACTV, "& has hurt me badly!");
+			(void)tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_ACTV, "& has hurt me badly!");
 		}
 	}
 
@@ -8733,10 +8742,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		/* Add object what caused the fatal wound */
 		if (who <= SOURCE_PLAYER_START)
 		{
-			my_strcat(killer, cause_of_death[-who][rand_int(4)], sizeof(killer));
+			(void)my_strcat(killer, cause_of_death[-who][rand_int(4)], sizeof(killer));
 
 			/* Hack -- make it clear it was a trap */
-			if (who == SOURCE_PLAYER_TRAP) my_strcat(killer, " trap you set", sizeof(killer));		
+			if (who == SOURCE_PLAYER_TRAP) 
+				(void)my_strcat(killer, " trap you set", sizeof(killer));		
 		}
 
 		/* Cause of death routine */
@@ -8760,7 +8770,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				feature_type *f_ptr = &f_info[what];
 				
 				/* Get the feature name */
-				my_strcat(killer, format("%s %s", is_a_vowel((f_name + f_ptr->name)[0]) ? "an" : "a", f_name + f_ptr->name), sizeof(killer));
+				(void)my_strcat(killer, format("%s %s", is_a_vowel((f_name + f_ptr->name)[0]) ? "an" : "a", f_name + f_ptr->name), sizeof(killer));
 				
 				break;
 			}
@@ -8772,7 +8782,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				spell_type *s_ptr = &s_info[what];
 				
 				/* Get the spell name */
-				my_strcat(killer, format("%s %s", is_a_vowel((s_name + s_ptr->name)[0]) ? "an" : "a", s_name + s_ptr->name), sizeof(killer));
+				(void)my_strcat(killer, format("%s %s", is_a_vowel((s_name + s_ptr->name)[0]) ? "an" : "a", s_name + s_ptr->name), sizeof(killer));
 				
 				break;
 			}
@@ -8780,7 +8790,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			case SOURCE_DISEASE:
 			{
 				/* Get the feature name */
-				my_strcat(killer, disease_name[what], sizeof(killer));
+				(void)my_strcat(killer, disease_name[what], sizeof(killer));
 				
 				break;
 			}
@@ -8803,7 +8813,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				monster_race *r_ptr = &r_info[what];
 				
 				/* Get the feature name */
-				my_strcat(killer, format("%s %s", is_a_vowel((r_name + r_ptr->name)[0]) ? "an" : "a", r_name + r_ptr->name), sizeof(killer));
+				(void)my_strcat(killer, format("%s %s", is_a_vowel((r_name + r_ptr->name)[0]) ? "an" : "a", r_name + r_ptr->name), sizeof(killer));
 				
 				break;
 			}			
@@ -8832,7 +8842,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		/* Add a message of destruction */
 		if (who > SOURCE_PLAYER_START)
 		{
-			my_strcat(killer, cause_of_death[-who][rand_int(4)], sizeof(killer));
+			(void)my_strcat(killer, cause_of_death[-who][rand_int(4)], sizeof(killer));
 		}
 	}
 
@@ -8944,7 +8954,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if ((p_ptr->cur_flags4 & (TR4_RES_DISEASE)) != 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,0x0L,TR4_RES_DISEASE);
+				(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_RES_DISEASE);
 
 				/* Reduce damage */
 				dam *= 6; dam /= (randint(6) + 6);				
@@ -8954,7 +8964,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				int rating = dam / (adj_con_fix[p_ptr->stat_ind[A_CON]] + 1);
 
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_RES_DISEASE);
+				(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_RES_DISEASE);
 
 				/* Critical disease - multiple effects either quickly, powerfully or heavily */
 				if (rating > 45)
@@ -12540,16 +12550,17 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 					move_cursor_relative(y, x);
 					if (op_ptr->delay_factor)
 					{
-					    Term_fresh();
+						(void)Term_fresh();
 						if (p_ptr->window) window_stuff();
 					}
 
 					/* Delay */
-					Term_xtra(TERM_XTRA_DELAY, msec);
+					(void)Term_xtra(TERM_XTRA_DELAY, msec);
 
 					/* Erase the visual effects */
 					lite_spot(y, x);
-					if (op_ptr->delay_factor) Term_fresh();
+					if (op_ptr->delay_factor) 
+						(void)Term_fresh();
 
 					/* Re-display the beam  XXX */
 					if (flg & (PROJECT_BEAM))
@@ -12573,7 +12584,7 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 				else if (visual)
 				{
 					/* Delay for consistency */
-					Term_xtra(TERM_XTRA_DELAY, msec);
+					(void)Term_xtra(TERM_XTRA_DELAY, msec);
 				}
 			}
 		}
@@ -12945,7 +12956,7 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 				/* Flush each radius separately */
 				if (op_ptr->delay_factor)
 				{
-				    Term_fresh();
+					(void)Term_fresh();
 					if (p_ptr->window) window_stuff();
 				}
 
@@ -12955,7 +12966,7 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 				/* Delay (efficiently) */
 				if (visual || drawn)
 				{
-					Term_xtra(TERM_XTRA_DELAY, msec);
+					(void)Term_xtra(TERM_XTRA_DELAY, msec);
 				}
 			}
 		}
@@ -12963,8 +12974,9 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 		/* Delay for a while if there are pretty graphics to show */
 		if ((grids > 1) && (visual || drawn))
 		{
-			if (!op_ptr->delay_factor) Term_fresh();
-			Term_xtra(TERM_XTRA_DELAY, 50 + msec);
+			if (!op_ptr->delay_factor) 
+				(void)Term_fresh();
+			(void)Term_xtra(TERM_XTRA_DELAY, 50 + msec);
 		}
 
 		/* Flush the erasing -- except if we specify lingering graphics */
@@ -12990,7 +13002,7 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 			/* Flush the explosion */
 			if (op_ptr->delay_factor)
 			{
-			    Term_fresh();
+				(void)Term_fresh();
 				if (p_ptr->window) window_stuff();
 			}
 		}
@@ -13172,7 +13184,7 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 
 		/* Break the copy of the object. Note that this recursively calls project routines which is why
                    we have to be so careful. */
-		break_near(i_ptr, i_ptr->iy, i_ptr->ix);
+		(void)break_near(i_ptr, i_ptr->iy, i_ptr->ix);
 
 		/* Redraw */
 		lite_spot(i_ptr->iy, i_ptr->ix);
