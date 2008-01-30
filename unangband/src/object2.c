@@ -2528,7 +2528,7 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		/* Reverse sign */
 		if (power < 0) obj_pow2 = -obj_pow2;
 
-		/* Pick this flag? */
+		/* Pick this flag with default pval? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect? */
 			((!great) || (obj_pow2 >= ((lev * 19) / 20))) && 	/* Great forces at least 95% */
 			(obj_pow2 <= lev) &&			/* No more than 100% */
@@ -2539,7 +2539,7 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 			max_pval = 0;
 		}
 
-		/* Hack -- try increasing pval */
+		/* Try increasing pval in addition to the flag */
 		else
 		{
 			int old_pval = o_ptr->pval;
@@ -2566,7 +2566,7 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 					obj_pow2 = -object_power(o_ptr);
 				}
 
-			} while (!(obj_pow2 <= old_pow2) && (obj_pow2 < ((lev * 19) / 20)));
+			} while (obj_pow2 > old_pow2 && obj_pow2 < lev * 19 / 20);
 
 			/* Can find valid pval? */
 			if ((obj_pow2 > obj_pow1) && (obj_pow2 < lev) && (rand_int(++count) == 0))
@@ -2686,7 +2686,7 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 			if (max_pval > 0)
 				o_ptr->pval += great ? max_pval : rand_range(1, max_pval);
 			else
-				o_ptr->pval -= great ? max_pval : rand_range(1, -max_pval);
+				o_ptr->pval -= great ? -max_pval : rand_range(1, -max_pval);
 		}
 
 		return(TRUE);

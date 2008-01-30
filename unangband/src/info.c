@@ -6463,60 +6463,60 @@ s32b object_power(const object_type *o_ptr)
 	{
 		if (f1 & TR1_STR)
 		{
-			p += 3 * o_ptr->pval * o_ptr->pval / 4;  /* Was 3 * o_ptr->pval */
+			p += 2 * o_ptr->pval * o_ptr->pval;  /* Was 3 * o_ptr->pval */
 		}
 		if (f1 & TR1_INT)
 		{
-			p += o_ptr->pval * o_ptr->pval / 2;  /* Was 2 * o_ptr->pval */
+			p += o_ptr->pval * o_ptr->pval;  /* Was 2 * o_ptr->pval */
 		}
 		if (f1 & TR1_WIS)
 		{
-			p += o_ptr->pval * o_ptr->pval / 2;  /* Was 2 * o_ptr->pval */
+			p += o_ptr->pval * o_ptr->pval;  /* Was 2 * o_ptr->pval */
 		}
 		if (f1 & TR1_DEX)
 		{
-			p += o_ptr->pval * o_ptr->pval;  /* Was 3 * o_ptr->pval */
+			p += 2 * o_ptr->pval * o_ptr->pval;  /* Was 3 * o_ptr->pval */
 		}
 		if (f1 & TR1_CON)
 		{
-			p += o_ptr->pval * o_ptr->pval;  /* Was 4 * o_ptr->pval */
+			p += 2 * o_ptr->pval * o_ptr->pval;  /* Was 4 * o_ptr->pval */
 		}
 		if (f1 & TR1_CHR)
 		{
-			p += o_ptr->pval * o_ptr->pval / 4; /* Was o_ptr->pval */
+			p += MAX(1, o_ptr->pval * o_ptr->pval / 2); /* Was o_ptr->pval */
 		}
 		if (f1 & TR1_SAVE)
 		{
-			p += o_ptr->pval * o_ptr->pval / 4; /* Was o_ptr->pval */
+			p += MAX(1, o_ptr->pval * o_ptr->pval / 2); /* Was o_ptr->pval */
 		}
 		if (f1 & TR1_DEVICE)
 		{
-			p += o_ptr->pval * o_ptr->pval / 6; /* Was o_ptr->pval */
+			p += MAX(1, o_ptr->pval * o_ptr->pval / 3); /* Was o_ptr->pval */
 		}
 		if (f1 & TR1_STEALTH)
 		{
-			p += o_ptr->pval * o_ptr->pval / 4; /* Was o_ptr->pval */
+			p += MAX(1, o_ptr->pval * o_ptr->pval / 2); /* Was o_ptr->pval */
 		}
 		if (f1 & TR1_TUNNEL)
 		{
-			p += o_ptr->pval * o_ptr->pval / 6; /* Was o_ptr->pval */
+			p += MAX(1, o_ptr->pval * o_ptr->pval / 5); /* Was o_ptr->pval */
 		}
 		/* For now add very small amount for searching */
 		if (f1 & TR1_SEARCH)
 		{
-			p += o_ptr->pval * o_ptr->pval / 12;
+			p += MAX(1, o_ptr->pval * o_ptr->pval / 10);
 		}
 		if (f3 & TR3_REGEN_HP)
 		{
-			p += (o_ptr->pval * o_ptr->pval) * 3 / 2; /* Was constant 3 */
+			p += 3 * o_ptr->pval * o_ptr->pval; /* Was constant 3 */
 		}
 		if (f3 & TR3_REGEN_MANA)
 		{
-			p += (o_ptr->pval * o_ptr->pval) * 3 / 2; /* Was constant 3 */
+			p += 3 * o_ptr->pval * o_ptr->pval; /* Was constant 3 */
 		}
 		if (f3 & TR3_LITE)
 		{
-			p += (o_ptr->pval * o_ptr->pval) * 3; /* Was constant 3 */
+			p += 2 ^ o_ptr->pval; /* Was constant 3 */
 		}
 	}
 
