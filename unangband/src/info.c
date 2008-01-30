@@ -4175,12 +4175,10 @@ void display_koff(const object_type *o_ptr)
 			if ((s_ptr->appears[ii].tval == o_ptr->tval) &&
 			    (s_ptr->appears[ii].sval == o_ptr->sval))
 			{
-			  /* Warriors (class 0) have no spells */
-			  if (p_ptr->pclass)
-			    for (iii = 0; iii < MAX_SPELL_CASTERS; iii++)
-			      {
-				if (s_ptr->cast[iii].class == p_ptr->pclass) browse=TRUE;
-			      }
+				for (iii = 0; iii < MAX_SPELL_CASTERS; iii++)
+				{
+					if (s_ptr->cast[iii].class == p_ptr->pclass) browse=TRUE;
+				}
 			}
 		}
 

@@ -2286,7 +2286,6 @@ void calc_spells(void)
 		default:
 			p="spell";
 		break;
-
 	}
 
 	/* Paranoia -- ensure class is literate */
@@ -2341,23 +2340,21 @@ void calc_spells(void)
 	if (levels) num_allowed++;
 
 	/* Hack --- adjust num_allowed */
-	if (num_allowed >  PY_MAX_SPELLS) num_allowed = PY_MAX_SPELLS;
+	if (num_allowed > PY_MAX_SPELLS) num_allowed = PY_MAX_SPELLS;
 
 	/* Hack --- Assume no spells available */
 	k = 0;
 
 	/* Number of spells can be learnt */
-	for (j = 0; j < z_info->s_max;j++)
+	for (j = 0; j < z_info->s_max; j++)
 	{
-	  /* Get the spell details; warriors (class 0) have no spells */
-	  if (p_ptr->pclass)
-	    for (ii = 0; ii < MAX_SPELL_CASTERS; ii++)
-	      {
-		if (s_info[j].cast[ii].class == p_ptr->pclass)
-		  {
-		    k++;
-		  }
-	      }
+		for (ii = 0; ii < MAX_SPELL_CASTERS; ii++)
+			if (s_info[j].cast[ii].class == p_ptr->pclass)
+				k++;
+
+		/* Gifted and chosen spell casters can read from their book */
+		if (spell_match_style(j))
+			k++;
 	}
 
 	/* Hack --- Assume cannot learn more than spells in spell books */

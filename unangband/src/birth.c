@@ -1703,7 +1703,6 @@ static bool get_player_school(void)
 			
 		default:
 			tval = c_info[p_ptr->pclass].spell_book;
-	
 			break;
 	}
 

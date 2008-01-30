@@ -9034,16 +9034,13 @@ spell_cast *spell_cast_details(int spell)
 	spell_cast *sc_ptr = NULL;
 	
 	/* Get our casting information */
-	if (p_ptr->pclass)
-	{
-		int i;
+	int i;
 		
-		for (i = 0;i < MAX_SPELL_CASTERS; i++)
+	for (i = 0;i < MAX_SPELL_CASTERS; i++)
+	{
+		if (s_ptr->cast[i].class == p_ptr->pclass)
 		{
-			if (s_ptr->cast[i].class == p_ptr->pclass)
-			{
-				sc_ptr=&(s_ptr->cast[i]);
-			}
+			sc_ptr=&(s_ptr->cast[i]);
 		}
 	}
 	
@@ -9066,14 +9063,10 @@ bool spell_legible(int spell)
 	int i;
 	spell_type *s_ptr = &s_info[spell];
 	
-	/* Warriors (class 0) have no spells naturally, but may have as a part of being gifted or chosen below. */
-	if (p_ptr->pclass)
+	for (i = 0; i < MAX_SPELL_CASTERS; i++)
 	{
-		for (i = 0; i < MAX_SPELL_CASTERS; i++)
-		{
-			/* Class is allowed to cast the spell */
-			if (s_ptr->cast[i].class == p_ptr->pclass) return (TRUE);
-	    }
+		/* Class is allowed to cast the spell */
+		if (s_ptr->cast[i].class == p_ptr->pclass) return (TRUE);
 	}
 
 	/* Gifted and chosen spell casters can read all spells from the book they have specialised in */
@@ -9106,15 +9099,12 @@ s16b spell_level(int spell)
 
 	/* Hack -- check if we can 'naturally' cast it,
 	 * as opposed to relying on speciality. */
-	if (p_ptr->pclass)
+	for (i = 0;i < MAX_SPELL_CASTERS; i++)
 	{
-		for (i = 0;i < MAX_SPELL_CASTERS; i++)
+		if (s_ptr->cast[i].class == p_ptr->pclass)
 		{
-			if (s_ptr->cast[i].class == p_ptr->pclass)
-			{
-				/* Use the native casting level */
-				fix_level = FALSE;
-			}
+			/* Use the native casting level */
+			fix_level = FALSE;
 		}
 	}
 
