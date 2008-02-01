@@ -6270,7 +6270,7 @@ s32b object_power(const object_type *o_ptr)
 				p += o_ptr->ac - k_ptr->ac;
 			}			
 			
-			p += sign(o_ptr->to_h) * ((ABS(o_ptr->to_h) * 2) / 3);
+			p += sign(o_ptr->to_h - k_ptr->to_h) * ((ABS(o_ptr->to_h - k_ptr->to_h) * 2) / 3);
 
 			p += o_ptr->to_d * 2;
 
