@@ -19362,7 +19362,7 @@ D:evil-looking eyes and a sharp beak, which it aims at your eyes
 D:as it flies at you!
 
 N:1346:Goblin sapper
-G:o:U
+G:k:U
 I:111:8d8:20:32:30
 W:14:1:0:15
 B:HIT:HURT:1d8
