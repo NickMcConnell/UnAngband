@@ -6039,8 +6039,9 @@ s32b object_power(const object_type *o_ptr)
 			else
 				p = 0;
 
-			/* Hack -- small swords can be used as secondary weapons */
-			if ((p > 0) && (o_ptr->tval == TV_SWORD) && (o_ptr->weight < 100)) p++;
+			/* Hack -- throwing weapons can be used as secondary weapons */
+			if (p > 0 && (f3 & (TR3_THROWING)))
+				p++;
 
 			if (o_ptr->ac != k_ptr->ac)
 			{

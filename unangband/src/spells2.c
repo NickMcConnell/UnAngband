@@ -1283,7 +1283,7 @@ int value_check_aux3(const object_type *o_ptr)
 	if (ego_item_p(o_ptr))
 	{
 		/* Cursed/Broken */
-		if (cursed_p(o_ptr) || broken_p(o_ptr))	return (INSCRIP_NONMAGICAL);
+		if (cursed_p(o_ptr) || broken_p(o_ptr)) return (INSCRIP_NONMAGICAL);
 
 		/* Superb */
 		if (o_ptr->xtra1) return (INSCRIP_SUPERB);
@@ -1312,7 +1312,13 @@ int value_check_aux3(const object_type *o_ptr)
 	if (coated_p(o_ptr)) return (INSCRIP_COATED);
 
 	/* Magic item */
-	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_EXCELLENT);
+	if (o_ptr->xtra1)
+	{
+		if (object_power(o_ptr) > 0)
+			return (INSCRIP_EXCELLENT);
+		else
+			return (INSCRIP_NONMAGICAL);
+	}
 
 	/* Great "armor" bonus */
 	if (o_ptr->to_a > MAX(7, o_ptr->ac)) 
