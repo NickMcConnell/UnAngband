@@ -7961,17 +7961,17 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					/* Hack -- upgrade slays to executions, where possible */
 					case 19:
 					{
-						if (p_ptr->lev >= 30) p_ptr->branded_blows = 28;
+						if (p_ptr->lev >= 30) p_ptr->branded_blows = 27;
 						break;
 					}
 					case 20:
 					{
-						if (p_ptr->lev >= 30) p_ptr->branded_blows = 27;
+						if (p_ptr->lev >= 30) p_ptr->branded_blows = 26;
 						break;
 					}
-					case 25:
+					case 24:
 					{
-						if (p_ptr->lev >= 30) p_ptr->branded_blows = 26;
+						if (p_ptr->lev >= 30) p_ptr->branded_blows = 25;
 						break;
 					}
 				}
