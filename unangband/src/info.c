@@ -511,6 +511,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 
 	int n,r;
 	cptr vp[64];
+	bool timed_effect = FALSE;
 
 	u32b id_flags = s_ptr->flags1;
 
@@ -622,7 +623,6 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		/* Intro */
 		if (id_flags & (SF1_IDENT_PACK)) text_out(" on all ");
 		else text_out(" on one ");
-
 	}
 
 	/* Collect identifies */
@@ -651,7 +651,6 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	/* Describe identify spells */
 	if (vn)
 	{
-
 		/* Scan */
 		for (n = 0; n < vn; n++)
 		{
@@ -677,7 +676,6 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		if (id_flags & (SF1_FORGET)) text_out(" except when the item is fully identified");
 
 	}
-
 
 	/* Collect enchantments */
 	vn = 0;
@@ -749,7 +747,6 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	/* Describe enchantment spells */
 	if (vn)
 	{
-
 		if (s_ptr->flags1 & (SF1_ENCHANT_HIGH)) text_out(" highly");
 
 		/* Scan */
@@ -763,13 +760,10 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 			/* Dump */
 			text_out(vp[n]);
 		}
-
 	}
 
 	/* Hack */
 	r = 0;
-
-
 
 	/* Collect timed effects */
 	vn = 0;
@@ -782,6 +776,8 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	/* Describe timed effects */
 	if (vn)
 	{
+		timed_effect = TRUE;
+
 		/* Hack -- continue sentence */
 		r = 1;
 
@@ -851,6 +847,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	/* Describe timed effects */
 	if (vn)
 	{
+		timed_effect = TRUE;
 
 		if (!introduced)
 		{
@@ -896,6 +893,8 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	/* Describe stat effects */
 	if (vn)
 	{
+		timed_effect = TRUE;
+
 		if (!introduced)
 		{
 			/* Intro */
@@ -923,7 +922,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	}
 
 	/* Roll out the duration */
-	if (!detail)
+	if (!detail || !timed_effect)
 	{
 		/* Nothing */
 	}
@@ -1042,7 +1041,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags3 & (SF3_CURE_CHR)) vp[vn++]="charisma";
 	if (s_ptr->flags3 & (SF3_CURE_EXP)) vp[vn++]="experience";
 
-	/* Describe stat effects */
+	/* Describe restore stat effects */
 	if (vn)
 	{
 		if (!introduced)
