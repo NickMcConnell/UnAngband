@@ -2991,8 +2991,15 @@ static void apply_nexus(monster_type *m_ptr)
 
 		case 4: case 5:
 		{
-			teleport_player_to(m_ptr->fy, m_ptr->fx);
-			break;
+			if (m_ptr)
+			{
+				teleport_player_to(m_ptr->fy, m_ptr->fx);
+				break;
+			}
+			else
+			{
+				/* Fall through */
+			}
 		}
 
 		case 6:
@@ -9565,7 +9572,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 				dam *= 6; dam /= (randint(6) + 6);
 			}
-			else if (who > SOURCE_MONSTER_START)
+			else
 			{
 				/* Always notice */
 				player_not_flags(who, 0x0L,TR2_RES_NEXUS,0x0L,0x0L);
@@ -11962,12 +11969,17 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 		/* Nexus - movement */
 		case GF_NEXUS:
 		{
-			if ((affect_player) && (who > SOURCE_MONSTER_START))
+			if (affect_player)
 			{
 				if ((p_ptr->cur_flags2 & (TR2_RES_NEXUS)) == 0)
 				{
-					/* Get caster */
-					monster_type *n_ptr = &m_list[who];
+					monster_type *n_ptr = NULL;
+
+					/* Get caster, if any */
+					if (who > SOURCE_MONSTER_START)
+					{
+						n_ptr = &m_list[who];
+					}
 
 					/* Various effects. */
 					apply_nexus(n_ptr);
