@@ -127,52 +127,53 @@ static void prt_stat(int stat)
 	char tmp[32];
 
 	/* Display "injured" stat */
-	if (p_ptr->stat_use[stat] < p_ptr->stat_top[stat])
+	if (p_ptr->stat_use[stat] < p_ptr->stat_top[stat] 
+		 || p_ptr->stat_dec_tim[stat])
 	{
-	  if (show_sidebar)
-	    {
-	      put_str(stat_names_reduced[stat], ROW_STAT + stat, 0);
-	      cnv_stat(p_ptr->stat_use[stat], tmp);
-	      if (p_ptr->stat_dec_tim[stat])
-		c_put_str(TERM_ORANGE, tmp, ROW_STAT + stat, COL_STAT + 6);
-	      else
-		c_put_str(TERM_YELLOW, tmp, ROW_STAT + stat, COL_STAT + 6);
-	    }
-	  else
-	    {
-	      if (p_ptr->stat_dec_tim[stat])
-		c_put_str(TERM_ORANGE, stat_names_reduced_short[stat], 
-			  ROW_STAT, COL_STAT + 3 * stat);
-	      else
-		c_put_str(TERM_YELLOW, stat_names_reduced_short[stat], 
-			  ROW_STAT, COL_STAT + 3 * stat);
-	    }
+		if (show_sidebar)
+		{
+			put_str(stat_names_reduced[stat], ROW_STAT + stat, 0);
+			cnv_stat(p_ptr->stat_use[stat], tmp);
+			if (p_ptr->stat_dec_tim[stat])
+				c_put_str(TERM_ORANGE, tmp, ROW_STAT + stat, COL_STAT + 6);
+			else
+				c_put_str(TERM_YELLOW, tmp, ROW_STAT + stat, COL_STAT + 6);
+		}
+		else
+		{
+			if (p_ptr->stat_dec_tim[stat])
+				c_put_str(TERM_ORANGE, stat_names_reduced_short[stat], 
+							 ROW_STAT, COL_STAT + 3 * stat);
+			else
+				c_put_str(TERM_YELLOW, stat_names_reduced_short[stat], 
+							 ROW_STAT, COL_STAT + 3 * stat);
+		}
 	}
 
 	/* Display "healthy" stat */
 	else
 	{
-	  if (show_sidebar)
-	    {
+		if (show_sidebar)
+		{
 	      put_str(stat_names[stat], ROW_STAT + stat, 0);
 	      cnv_stat(p_ptr->stat_use[stat], tmp);
 	      if (p_ptr->stat_inc_tim[stat])
-		c_put_str(TERM_L_BLUE, tmp, ROW_STAT + stat, COL_STAT + 6);
+				c_put_str(TERM_L_BLUE, tmp, ROW_STAT + stat, COL_STAT + 6);
 	      else
-		c_put_str(TERM_L_GREEN, tmp, ROW_STAT + stat, COL_STAT + 6);
-	    }
-	  else
-	    if (p_ptr->stat_inc_tim[stat])
+				c_put_str(TERM_L_GREEN, tmp, ROW_STAT + stat, COL_STAT + 6);
+		}
+		else
+			if (p_ptr->stat_inc_tim[stat])
 	      {
-		char stat_name[4];
-		sprintf(stat_name, "%.3s", stat_names[stat]);
+				char stat_name[4];
+				sprintf(stat_name, "%.3s", stat_names[stat]);
 
-		c_put_str(TERM_L_BLUE, stat_name, 
-			  ROW_STAT, COL_STAT + 3 * stat);
+				c_put_str(TERM_L_BLUE, stat_name, 
+							 ROW_STAT, COL_STAT + 3 * stat);
 	      }
-	    else
+			else
 	      {
-		put_str("   ", ROW_STAT, COL_STAT + 3 * stat);
+				put_str("   ", ROW_STAT, COL_STAT + 3 * stat);
 	      }
 	}
 
