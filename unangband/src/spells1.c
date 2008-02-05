@@ -2978,7 +2978,7 @@ bool apply_disenchant(int mode)
  */
 static void apply_nexus(monster_type *m_ptr)
 {
-	int max1, cur1, max2, cur2, ii, jj;
+	int ii, jj, lasts;
 
 	switch (randint(7))
 	{
@@ -3019,20 +3019,16 @@ static void apply_nexus(monster_type *m_ptr)
 			msg_print("Your body starts to scramble...");
 
 			/* Pick a pair of stats */
-			ii = rand_int(6);
-			for (jj = ii; jj == ii; jj = rand_int(6)) /* loop */;
+			ii = rand_int(A_MAX);
+			for (jj = ii; jj == ii; jj = rand_int(A_MAX)) /* loop */;
 
-			max1 = p_ptr->stat_max[ii];
-			cur1 = p_ptr->stat_cur[ii];
-			max2 = p_ptr->stat_max[jj];
-			cur2 = p_ptr->stat_cur[jj];
+			lasts = 1000 + rand_int(1000);
 
-			p_ptr->stat_max[ii] = max2;
-			p_ptr->stat_cur[ii] = cur2;
-			p_ptr->stat_max[jj] = max1;
-			p_ptr->stat_cur[jj] = cur1;
+			p_ptr->stat_dec_tim[ii] = 0;
+			set_stat_inc_tim(lasts, ii);
 
-			p_ptr->update |= (PU_BONUS);
+			p_ptr->stat_inc_tim[jj] = 0;
+			set_stat_dec_tim(lasts, jj);
 
 			break;
 		}
