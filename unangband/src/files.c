@@ -2912,9 +2912,9 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 
 		/* Resulting "modified" maximum value */
 		cnv_stat(p_ptr->stat_top[i], buf);
-		if (p_ptr->stat_inc_tim[i])
+		if (p_ptr->stat_inc_tim[i] && !p_ptr->stat_dec_tim[i])
 		  c_put_str(TERM_L_BLUE, buf, row+i, col+25);
-		else if (p_ptr->stat_dec_tim[i])
+		else if (p_ptr->stat_dec_tim[i] && !p_ptr->stat_inc_tim[i])
 		  c_put_str(TERM_ORANGE, buf, row+i, col+25);
 		else
 		  c_put_str(TERM_L_GREEN, buf, row+i, col+25);
