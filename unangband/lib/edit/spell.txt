@@ -1039,7 +1039,7 @@ C:9:9:8:40:3
 B:SELF:AWAY_ALL:3d0+0
 
 N:70:Cure Moderate Wounds
-A:55:16:1
+A:66:6:1
 A:75:83:1
 A:91:33:3
 A:91:6:2
