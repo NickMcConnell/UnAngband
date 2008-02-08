@@ -821,8 +821,8 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags3 & (SF3_FREE_ACT)) vp[vn++] = "protects you from paralysis and magical slowness";
 	if (s_ptr->flags2 & (SF2_SEE_INVIS)) vp[vn++]="allows you to see invisible monsters";
 	if (s_ptr->flags2 & (SF2_PROT_EVIL)) vp[vn++]="protects your from evil monsters";
-	if (s_ptr->flags2 & (SF2_HASTE)) vp[vn++]="hastes you";
-	if (s_ptr->flags2 & (SF2_SLOW)) vp[vn++]="slows you";
+	if (s_ptr->flags2 & (SF2_HASTE)) vp[vn++]="makes you faster";
+	if (s_ptr->flags2 & (SF2_SLOW)) vp[vn++]="slows you down";
 	if (s_ptr->flags2 & (SF2_CUT)) vp[vn++]="makes you bleed";
 	if (s_ptr->flags2 & (SF2_STUN)) vp[vn++]="stuns you";
 	if (s_ptr->flags2 & (SF2_POISON)) vp[vn++]="poisons you";
@@ -2302,10 +2302,10 @@ static const o_flag_desc vulner_flags4_desc[] =
  */
 static const o_flag_desc misc_flags3_desc[] =
 {
-	{ TR3_SLOW_DIGEST,	"slow digestion" },
-	{ TR3_FEATHER,		"feather falling" },
-	{ TR3_TELEPATHY,	"telepathy" },
-	{ TR3_SEE_INVIS,	"see invisible" }
+	{ TR3_SLOW_DIGEST,	"digest food more efficiently" },
+	{ TR3_FEATHER,		"fall like a feather" },
+	{ TR3_TELEPATHY,	"detect monsters by telepathy" },
+	{ TR3_SEE_INVIS,	"see invisible monters" }
 };
 
 /*
@@ -2983,13 +2983,13 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 		switch (mode)
 		{
 			case LIST_FLAGS_CAN:
-				anything |= outlist("It gives its wielder", list, TERM_WHITE);
+				anything |= outlist("It causes its wielder to", list, TERM_WHITE);
 				break;
 			case LIST_FLAGS_MAY:
-				anything |= outlist("It may give its wielder", list, TERM_L_WHITE);
+				anything |= outlist("It may causes its wielder to", list, TERM_L_WHITE);
 				break;
 			case LIST_FLAGS_NOT:
-				anything |= outlist("It does not give its wielder", list, TERM_SLATE);
+				anything |= outlist("It doesn't cause its wielder to", list, TERM_SLATE);
 				break;
 		} 
 
