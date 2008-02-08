@@ -1502,6 +1502,10 @@ bool player_refill2(int item2)
 		relite = TRUE;
 	}
 
+	/* Hack: if the light is worn, light it up afterwards, anyway */
+	if (item == INVEN_LITE && !artifact_p(o_ptr))
+		relite = TRUE;
+
 	if (o_ptr->number > 1)
 	{
 		/* Get local object */

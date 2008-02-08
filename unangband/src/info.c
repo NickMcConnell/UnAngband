@@ -3729,11 +3729,22 @@ void list_object(const object_type *o_ptr, int mode)
 					num = 1;
 				}
 
-				/* Display powers */
-				for (i = 0; i < num; i++)
+				/* No listing of numerous powers, as in wands of wonder,
+					since it overflows the standard screen */
+				if (num > 10)
 				{
-					/* List powers */
-					powers |= spell_desc(&s_info[book[i]],(i==0) ? (vd[n] ? " and ": vp[n]) : " or ",0,detail, vt[n]);
+					text_out(vd[n] ? " and ": vp[n]);
+					text_out("produces a random effect");
+					powers = TRUE;
+				}
+				else
+				{
+					/* Display powers */
+					for (i = 0; i < num; i++)
+					{
+						/* List powers */
+						powers |= spell_desc(&s_info[book[i]],(i==0) ? (vd[n] ? " and ": vp[n]) : " or ",0,detail, vt[n]);
+					}
 				}
 
 				if ((charge) && (powers))
