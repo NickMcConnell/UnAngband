@@ -1184,8 +1184,8 @@ Y:4:1
 
 N:146:Flames
 G:=:w
-I:45:18:50
-W:50:0:2:3000
+I:45:18:0
+W:50:50:2:3000
 A:50/2
 P:0:0d0:0:0:0
 F:RES_FIRE | IGNORE_FIRE | ACTIVATE | BRAND_FIRE
@@ -1193,8 +1193,8 @@ Y:13:3
 
 N:147:Acid
 G:=:w
-I:45:17:50
-W:50:0:2:3000
+I:45:17:0
+W:50:50:2:3000
 A:50/2
 P:0:0d0:0:0:0
 F:RES_ACID | IGNORE_ACID | ACTIVATE | BRAND_ACID
@@ -1202,8 +1202,8 @@ Y:1:3
 
 N:148:Ice
 G:=:w
-I:45:19:50
-W:50:0:2:3000
+I:45:19:0
+W:50:50:2:3000
 A:50/2
 P:0:0d0:0:0:0
 F:RES_COLD | IGNORE_COLD | ACTIVATE | BRAND_COLD
@@ -3530,7 +3530,7 @@ Y:22:1
 N:431:Lightning
 G:=:w
 I:45:38:0
-W:50:0:2:5000
+W:50:50:2:5000
 A:50/2
 F:RES_ELEC | IGNORE_ELEC | ACTIVATE | BRAND_ELEC
 Y:22:3
@@ -4232,7 +4232,7 @@ F:LITE
 N:568:& Psychic Crown~
 G:]:v
 I:10:13:0
-W:0:0:0:0
+W:0:50:0:0
 P:0:1d1:0:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:TELEPATHY | ACTIVATE
@@ -4256,7 +4256,7 @@ F:SLAY_DEMON | RES_FIRE | BLESSED
 N:571:& Runestaff~
 G:\:y
 I:10:30:0
-W:0:0:0:0
+W:0:50:0:0
 P:0:6d4:10:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:BRAND_FIRE | BRAND_ELEC | RES_FIRE | RES_ELEC | LITE | BLESSED | ACTIVATE
@@ -4288,7 +4288,7 @@ F:BLOWS | SHOTS | DEVICE
 N:575:& Wolf's Hide~
 G:[:u
 I:10:34:5
-W:0:0:0:0
+W:0:20:0:0
 P:20:0d0:0:0:0
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_ELEC | IGNORE_COLD | IGNORE_THEFT | IGNORE_WATER |
 F:RES_COLD | STEALTH | ANIMAL | REGEN_HP | ACTIVATE
@@ -5257,7 +5257,7 @@ P:0:1d1:0:0:0
 N:709:& # Arm~ (left)
 G:~:s
 I:12:2:0
-W:0:0:10:0
+W:0:20:10:0
 P:0:1d1:0:0:0
 F:ACTIVATE
 
@@ -5271,7 +5271,7 @@ D:The left arm is attached.
 N:711:& # Arm~ (right)
 G:~:s
 I:12:4:0
-W:0:0:10:0
+W:0:20:10:0
 P:0:1d1:0:0:0
 F:ACTIVATE
 
@@ -5285,7 +5285,7 @@ D:The arms are attached.
 N:713:& # Hand~ (left)
 G:~:s
 I:12:6:0
-W:0:0:5:0
+W:0:20:5:0
 P:0:1d1:0:0:0
 F:ACTIVATE
 
@@ -5299,7 +5299,7 @@ D:The arms are attached. The right hand is missing.
 N:715:& # Hand~ (right)
 G:~:s
 I:12:8:0
-W:0:0:5:0
+W:0:20:5:0
 P:0:1d1:0:0:0
 F:ACTIVATE
 
@@ -5313,7 +5313,7 @@ D:The hands are attached.
 N:717:& # Leg (left)
 G:~:s
 I:12:10:0
-W:0:0:15:0
+W:0:20:15:0
 P:0:1d1:0:0:0
 D:The legs must be added after any upper limbs.
 F:ACTIVATE
@@ -5328,7 +5328,7 @@ D:The left leg is attached.
 N:719:& # Leg (right)
 G:~:s
 I:12:12:0
-W:0:0:15:0
+W:0:20:15:0
 P:0:1d1:0:0:0
 D:The legs must be added after any upper limbs.
 F:ACTIVATE
@@ -5343,7 +5343,7 @@ D:The legs are attached.
 N:721:& # Head~
 G:~:s
 I:12:14:0
-W:0:0:15:0
+W:0:20:15:0
 P:0:1d1:0:0:0
 D:The head must be added last.
 F:ACTIVATE
@@ -5359,14 +5359,14 @@ P:0:1d1:0:0:0
 N:723:& set~ of # Arms
 G:~:s
 I:12:16:0
-W:0:0:20:0
+W:0:20:20:0
 P:0:1d1:0:0:0
 F:ACTIVATE
 
 N:724:& set~ of # Hands
 G:~:s
 I:12:17:0
-W:0:0:100:0
+W:0:20:100:0
 P:0:1d1:0:0:0
 F:ACTIVATE
 
@@ -5401,7 +5401,7 @@ D:The arms are attached. The left hand is missing.
 N:729:& set~ of # Legs
 G:~:s
 I:12:22:0
-W:0:0:30:0
+W:0:20:30:0
 P:0:1d1:0:0:0
 D:The legs must be added after any upper limbs.
 F:ACTIVATE
@@ -6656,8 +6656,8 @@ P:13:1d4:-3:0:0
 # Amulet with DEX, as opposed to SPEED (Trickery)
 N:911:the Serpents
 G:":w
-I:40:23:1
-W:35:0:3:20000
+I:40:23:0
+W:35:50:3:20000
 A:35/2
 F:RES_POIS | DEX | ACTIVATE
 Y:4:4

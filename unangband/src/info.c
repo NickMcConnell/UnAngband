@@ -3519,7 +3519,7 @@ void list_object(const object_type *o_ptr, int mode)
 		{
 			vp[vn] = vp_activate; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
 			charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
-			time = 0;
+			time = o_ptr->charges;
 			randtime = o_ptr->charges;
 
 			switch (o_ptr->tval)
@@ -3565,6 +3565,8 @@ void list_object(const object_type *o_ptr, int mode)
 				vp[vn] = "When zapped, it "; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
 				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
 				charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
+				time = o_ptr->charges;
+				randtime = o_ptr->charges;
 				break;
 
 			case TV_STAFF:
@@ -3625,7 +3627,6 @@ void list_object(const object_type *o_ptr, int mode)
 
 			case TV_DRAG_ARMOR:
 				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
-				charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
 				break;
 
 			case TV_RUNESTONE:
@@ -3752,6 +3753,7 @@ void list_object(const object_type *o_ptr, int mode)
 					if ((time) && (randtime)) text_out(format(", recharging in d%d+%d turns.  ",randtime, time));
 					else if (randtime) text_out(format(", recharging in d%d turns.  ",randtime));
 					else if (time) text_out(format(", recharging in %d turns.  ",time));
+					else assert(FALSE); /* activable item with no recharge time */
 				}
 				else if (powers) text_out(".  ");
 
