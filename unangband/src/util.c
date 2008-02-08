@@ -3239,11 +3239,12 @@ void text_out_to_screen(byte a, cptr str)
 					/* Grab existing attr/char */
 					Term_what(i, y, &av[i], &cv[i]);
 
+					/* Track current word */
+					n = i;
+
 					/* Break on space */
 					if (cv[i] == ' ') break;
 
-					/* Track current word */
-					n = i;
 				}
 			}
 

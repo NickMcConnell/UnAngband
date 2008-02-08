@@ -2447,8 +2447,8 @@ void screen_object(object_type *o_ptr)
 	Term_gotoxy(0, 1);
 
 	/* Actually display the item */
-        if (o_ptr->ident & (IDENT_MENTAL)) list_object(o_ptr, OBJECT_FLAGS_FULL);
-        else list_object(o_ptr, OBJECT_FLAGS_KNOWN);
+	if (o_ptr->ident & (IDENT_MENTAL)) list_object(o_ptr, OBJECT_FLAGS_FULL);
+	else list_object(o_ptr, OBJECT_FLAGS_KNOWN);
 
 	/* Display monster attributes */
 	if ((o_ptr->name3) && ((o_ptr->tval != TV_HOLD) || (object_named_p(o_ptr)))) screen_roff(&r_info[o_ptr->name3],&l_list[o_ptr->name3]);
