@@ -1147,6 +1147,8 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->type == SPELL_CHANGE_SHAPE) vp[vn++] = format("changes you into a %s",p_name + p_info[s_ptr->param].name);
 	if (s_ptr->type == SPELL_REVERT_SHAPE) vp[vn++] = "returns you to your normal form";
 	if (s_ptr->type == SPELL_REFUEL) vp[vn++] = "fuels a torch";
+	if (s_ptr->type == SPELL_REST_UNTIL_DUSK) vp[vn++] = "lets you await the night undisturbed in peaceful room";
+	if (s_ptr->type == SPELL_REST_UNTIL_DAWN) vp[vn++] = "lets you sleep at the inn until the day comes";
 	if (s_ptr->type == SPELL_MAGIC_BLOW) vp[vn++] = "increases the effectiveness of a single round of blows";
 	if (s_ptr->type == SPELL_MAGIC_SHOT) vp[vn++] = "increases the effectiveness of a single round of firing";
 	if (s_ptr->type == SPELL_MAGIC_HURL) vp[vn++] = "increases the effectiveness of a single round of thrown weapons";
