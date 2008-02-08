@@ -1140,7 +1140,7 @@ int text_out_indent = 0;
 /*
  * Hack -- Where to stop text output in number of lines. The function will
  * write at most this many lines before aborting. Use the default
- * value (for example the screen height) when 'text_out_wrap' is 0. Note
+ * value (for example the screen height) when 'text_out_lines' is 0. Note
  * that the starting y position in screen output will assume that already
  * (y - 1) lines have been written (Similiar to text_out_indent).
  */

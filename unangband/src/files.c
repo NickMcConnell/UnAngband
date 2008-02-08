@@ -1969,18 +1969,9 @@ static void display_player_xtra_info(void)
 	desc = likert(xdig, 6, &likert_attr);
 	c_put_str(likert_attr, format("%9s", desc), 18, col+11);
 
-	/* Indent output by 1 character, and wrap at column 80 */
-	text_out_wrap = 80;
-	text_out_indent = 1;
-
 	/* History */
-	Term_gotoxy(text_out_indent, 20);
+	Term_gotoxy(1, 20);
 	text_out_to_screen(TERM_WHITE, p_ptr->history);
-
-	/* Reset text_out() vars */
-	text_out_wrap = 0;
-	text_out_indent = 0;
-
 }
 
 

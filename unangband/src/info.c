@@ -489,7 +489,7 @@ void object_flags_known(const object_type *o_ptr, u32b *f1, u32b *f2, u32b *f3, 
 void identify_random_gen(const object_type *o_ptr)
 {
 	/* Set the indent/wrap */
-	text_out_indent = 3;
+	text_out_indent = 1;
 	text_out_wrap = 75;
 
 	list_object(o_ptr, OBJECT_FLAGS_RANDOM);

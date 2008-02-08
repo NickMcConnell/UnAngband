@@ -933,7 +933,6 @@ F:BLESS
 L:1d12+12
 
 N:63:Holy Water
-A:75:28:1
 A:91:32:6
 A:91:13:2
 A:93:23:3
@@ -2381,6 +2380,7 @@ C:8:7:6:40:2
 B:BLAST:CONFUSE_WEAK:0d0+10
 
 N:180:Philtre of Fearlessness
+A:75:28:1
 A:80:14:1
 A:90:13:2
 A:93:28:23
