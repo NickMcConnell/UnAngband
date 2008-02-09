@@ -1534,9 +1534,9 @@ static void display_object(int col, int row, bool cursor, int oid)
 	byte attr = curs_attrs[(int)k_ptr->flavor == 0 || k_ptr->aware][(int)cursor];
 
 	/* Symbol is unknown.  This should never happen.*/	
-	if (!k_ptr->aware && !k_ptr->flavor && !p_ptr->wizard)
+	if (!k_ptr->aware && !k_ptr->flavor && !p_ptr->wizard && !cheat_lore)
 	{
-		assert(0);
+		assert(FALSE);
 		c = ' ';
 		a = TERM_DARK;
 	}
