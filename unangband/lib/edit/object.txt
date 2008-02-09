@@ -1891,7 +1891,7 @@ I:75:34:0
 W:0:50:4:15
 A:0/1:1/1:3/1
 P:0:1d1:0:0:0
-Y:21:1
+Y:3:1
 F:THROWING
 
 N:238:Clumsiness
@@ -1918,7 +1918,7 @@ I:75:35:0
 W:5:100:4:100
 A:5/1
 P:0:1d1:0:0:0
-Y:3:1
+Y:3:2
 F:THROWING
 
 N:241:Cure Critical Wounds
@@ -1927,7 +1927,7 @@ I:75:36:0
 W:10:100:4:200
 A:10/1
 P:0:1d1:0:0:0
-Y:3:2
+Y:3:4
 F:THROWING
 
 # Note level appears hack to force this to be a good drop.
@@ -1938,7 +1938,7 @@ I:75:37:0
 W:40:200:4:750
 A:25/1:60/1
 P:0:1d1:0:0:0
-Y:3:3
+Y:24:3
 F:THROWING
 
 N:243:Constitution and Charisma
@@ -2135,7 +2135,7 @@ F:THROWING
 #W:1:0:4:25
 #A:1/1
 #P:0:1d1:0:0:0
-#Y:4:2
+#Y:4:6
 #F:THROWING
 
 N:265:Neutralize Poison
@@ -3388,6 +3388,7 @@ W:10:0:4:50
 A:10/1
 P:0:1d1:0:0:0
 F:THROWING
+Y:7:1
 
 N:416:Ruination
 G:!:w
@@ -3396,6 +3397,7 @@ W:35:0:4:0
 A:35/8
 P:0:1d1:0:0:0
 F:THROWING
+Y:4:2
 
 N:417:Detonations
 G:!:w
@@ -3413,6 +3415,7 @@ W:20:0:4:6000
 A:20/16
 P:0:1d1:0:0:0
 F:THROWING
+Y:17:4
 
 N:419:*Healing*
 G:!:w
@@ -3421,6 +3424,7 @@ W:50:200:4:1500
 A:50/4:80/2
 P:0:1d1:0:0:0
 F:THROWING
+Y:24:4
 
 N:420:Life
 G:!:w
@@ -3429,6 +3433,7 @@ W:75:200:4:5000
 A:75/4:100/4
 P:0:1d1:0:0:0
 F:THROWING
+Y:24:5
 
 N:421:Self Knowledge
 G:!:w
@@ -3437,6 +3442,7 @@ W:40:0:4:2000
 A:40/1
 P:0:1d1:0:0:0
 F:THROWING
+Y:12:3
 
 N:422:*Enlightenment*
 G:!:w
@@ -3445,6 +3451,7 @@ W:70:0:4:80000
 A:70/4
 P:0:1d1:0:0:0
 F:THROWING
+Y:12:4
 
 
 ##### Items 423 to 430 are new amulets thought up by JLE #####
@@ -3467,7 +3474,6 @@ A:60/8
 F:RES_FIRE | RES_ACID | RES_ELEC | RES_COLD
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER
 Y:8:3
-
 # Note: It looks useless at its depth. In fact, it isn't: it allows the player 
 # to now wear a combination of armor and shield, neither of which has the basic
 # four resists, without having to find Colluin or Dor-Lomin first. To have this 
@@ -3544,6 +3550,7 @@ W:40:0:1:500
 A:40/1:60/1
 P:0:1d1:0:0:0
 F:THROWING
+Y:27:5
 
 ### New light hafted weapon ###
 
@@ -4812,7 +4819,7 @@ I:75:65:0
 W:15:200:4:300
 A:15/2
 P:0:1d1:0:0:0
-Y:3:2
+Y:3:5
 F:THROWING
 
 N:651:Cure All Wounds
@@ -4821,6 +4828,7 @@ I:75:66:0
 W:40:200:4:700
 A:40/2:60/1
 P:0:1d1:0:0:0
+Y:3:6
 F:THROWING
 
 N:652:*Cure All Wounds*
@@ -4830,6 +4838,7 @@ W:60:200:4:1400
 A:60/2:80/1
 P:0:1d1:0:0:0
 F:THROWING
+Y:3:7
 
 N:653:Remove Fear & Poison
 G:!:w
@@ -5983,6 +5992,7 @@ W:40:0:1:500
 A:40/1:60/1
 P:0:1d1:0:0:0
 F:THROWING
+Y:27:6
 
 N:823:Dragon's Flame
 G:!:w
@@ -6288,7 +6298,7 @@ I:75:83:0
 W:3:100:4:40
 A:3/1
 P:0:1d1:0:0:0
-Y:3:1
+Y:3:3
 F:THROWING
 
 N:861:Cure Serious Wounds
