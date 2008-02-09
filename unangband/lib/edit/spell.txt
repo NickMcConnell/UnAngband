@@ -3855,7 +3855,7 @@ F:CURE_INT
 D:You feel your head clear.
 
 N:352:Slow Monsters
-A:55:21:1
+A:66:4:1
 A:90:0:17
 A:55:23:20
 C:1:30:50:80:230
