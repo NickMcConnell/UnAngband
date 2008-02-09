@@ -804,7 +804,7 @@ static void do_cmd_travel(void)
 
 					msg_print("You'll want a full stomach for the road ahead.");
 
-					break;
+					return;
 				}
 
 				/* Lowercase 1+ */
