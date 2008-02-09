@@ -5151,7 +5151,7 @@ errr parse_s_info(char *buf, header *head)
 			return (PARSE_ERROR_OUT_OF_MEMORY);
 	}
 
-	/* Process 'A' for "Appears in" (up to five lines) */
+	/* Process 'A' for "Appears in" (up to 10 lines) */
 	else if (buf[0] == 'A')
 	{
 		int tval,sval,slot;
@@ -5171,6 +5171,12 @@ errr parse_s_info(char *buf, header *head)
 
 		/* Scan for the values */
 		if (3 != sscanf(buf+2, "%d:%d:%d",&tval,&sval,&slot)) return (PARSE_ERROR_GENERIC);		
+
+		/* Debug: check if objects tval, sval exist, 
+			except shapechanges and WIP books;
+			may be too slow on some platforms, so disabled by default */
+		/* if (tval != 97 && tval != 91 && !lookup_kind(tval, sval))
+			return (PARSE_ERROR_GENERIC); */
 
 		/* Hack -- check for next free slot in book */
 		if (tval != TV_RUNESTONE) for (j = 0; j < error_idx; j++)
