@@ -792,6 +792,21 @@ static void do_cmd_travel(void)
 				  continue;
 				}
 
+				/* Request eating; break instead */
+				if (ke.key == 'E')
+				{
+					/* Restore the screen */
+					if (redraw)
+					{
+						/* Load screen */
+						screen_load();
+					}
+
+					msg_print("You'll want a full stomach for the road ahead.");
+
+					break;
+				}
+
 				/* Lowercase 1+ */
 				choice = tolower(ke.key);
 
