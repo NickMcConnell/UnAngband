@@ -862,7 +862,7 @@ void object_aware_tips(int kind)
 		/* Show tval based tip */
 		queue_tip(format("tval%d.txt", tval));
 	}
-	/* Show tval tips if no objects of this type known */
+	/* Show tval tips if 'count' svals of this type known */
 	else
 	{
 		/* Show tval based tip */

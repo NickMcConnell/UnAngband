@@ -2767,7 +2767,7 @@ void check_experience(void)
 			queue_tip(format("class%d-%d.txt", p_ptr->pclass, i));
 
 			/* Style tips */
-			queue_tip(format("ws%d-%d-%d.txt", p_ptr->pclass, p_ptr->pstyle, i));
+			queue_tip(format("class_style%d-%d-%d.txt", p_ptr->pclass, p_ptr->pstyle, i));
 		}
 
 		/* Save the highest level */
