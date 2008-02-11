@@ -276,12 +276,10 @@
 #define QUARK_MAX	512
 
 /*
- * OPTION: Maximum number of "tips" (see "files.c")
- * Default: assume at most 32 different tips queued
- * 
- * We drop excess tips.
+ * OPTION: Maximum total number of "tips" (see "files.c")
+ * in the lib/file/ directory
  */
-#define TIPS_MAX	32
+#define TIPS_MAX	2048
 
 
 /*

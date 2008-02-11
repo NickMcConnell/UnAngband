@@ -4846,10 +4846,10 @@ void do_cmd_quick_help(void)
  * 
  * But because these are context sensitive, we need them
  * to approximately appear at the time we find them. So
- * we queue them up in a currently statically sized
- * queue and clear the queue when they are shown.
+ * we queue them up in the permanent array of already shown tips
+ * clear the queue markers in show_tip when they are shown.
  * 
- * Currently we check if the tip exists before queuing it.
+ * Currently we check if the tip file exists before queuing it.
  * If we call tips frequently, we probably will want to
  * move this check to when we show the tip.
  */
@@ -4864,8 +4864,8 @@ bool queue_tip(cptr tip)
 	/* Check show tips option */
 	if (!show_tips) return (FALSE);
 	
-	/* Have no space for tips */
-	if (tips_end == tips_start - 1) return (FALSE);
+	/* If no space for tips; panic */
+	assert(tips_end < TIPS_MAX - 1);
 	
 	/* Build the filename */
 	path_build(path, 1024, ANGBAND_DIR_INFO, tip);
@@ -4881,9 +4881,6 @@ bool queue_tip(cptr tip)
 	
 	/* Add the tip, using quarks */
 	tips[tips_end++] = quark_add(tip);
-
-	/* Wrap the queue around if required */
-	if (tips_end >= TIPS_MAX) tips_end = 0;
 	
 	return (TRUE);
 }
@@ -4917,15 +4914,12 @@ void show_tip(void)
 			/* Save screen */
 			screen_save();
 	
-			/* Peruse the main help file */
+			/* Peruse the help tip file */
 			(void)show_file(tip, NULL, 0, 0);
 	
 			/* Load screen */
 			screen_load();
 		}
-		
-		/* Wrap the queue around if required */
-		if (tips_start >= TIPS_MAX) tips_start = 0;
 	}
 }
 
