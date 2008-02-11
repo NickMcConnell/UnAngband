@@ -3214,7 +3214,7 @@ void list_object(const object_type *o_ptr, int mode)
 
 	s16b book[26];
 
-	int num;
+	int num = 1;
 
 	int time = 0;
 	int randtime = 0;
