@@ -4861,11 +4861,8 @@ bool queue_tip(cptr tip)
 	/* Path buffer */
 	char path[1024];
 
-	/* Check show tips option */
-	if (!show_tips) return (FALSE);
-	
-	/* If no space for tips; panic */
-	assert(tips_end < TIPS_MAX - 1);
+	/* If no space for more tips; panic */
+	assert(tips_end < TIPS_MAX);
 	
 	/* Build the filename */
 	path_build(path, 1024, ANGBAND_DIR_INFO, tip);

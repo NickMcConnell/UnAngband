@@ -1791,11 +1791,10 @@ static void screen_store_object(int oid)
 	/* Save the screen */
 	screen_save();
 
-
 	/* Describe */
 	screen_object(o_ptr);
-	/* Load the screen */
 
+	/* Load the screen */
 	(void)anykey();
 
 	screen_load();
@@ -2093,6 +2092,68 @@ void do_knowledge_dungeons(void)
 
 	/* Flush messages */
 	message_flush();
+}
+
+/* =================== HELP TIPS ================================ */
+
+static void display_tip_title(int col, int row, bool cursor, int oid)
+{
+/*	store_type *s_ptr = store[default_join[oid].gid];
+	object_type *o_ptr = &s_ptr->stock[default_join[oid].oid];
+	char buffer[60];
+*/
+	/* Should be UNKNOWN for unreachable locations like Bombadil's */
+	byte attr = curs_attrs[CURS_KNOWN][(int)cursor];
+
+/*	object_desc(buffer, sizeof buffer, o_ptr, TRUE, 3);
+
+	c_prt(attr, buffer, row, col); */
+
+	c_prt(attr, "a help tip", row, col);
+}
+
+static void display_help_tip(int oid)
+{
+	cptr tip = quark_str(tips[default_join[oid].oid]);
+
+	/* Save the screen */
+	screen_save();
+
+	/* Peruse the help tip file */
+	(void)show_file(tip, NULL, 0, 0);
+
+	/* Load the screen */
+	screen_load();
+}
+
+static const char *tip_group_name(int gid)
+{
+	return "All help tips";
+}
+
+static void do_cmd_knowledge_help_tips(void)
+{
+	member_funcs contents_f = {display_tip_title, display_help_tip, 0, 0, 0, 0};
+	group_funcs home_f = {tips_start, FALSE, tip_group_name, 0, default_group, 0};
+
+	int *objects;
+	int i;
+
+	objects = C_ZNEW(tips_start, int);
+
+	default_join = C_ZNEW(tips_start, join_t);
+
+	for(i = 0; i < tips_start; i++) 
+	{
+		objects[i] = i;
+		default_join[i].gid = 0;
+		default_join[i].oid = i;
+	}
+
+	display_knowledge("help tips", objects, tips_start,
+							home_f, contents_f, 0);
+	FREE(default_join);
+	default_join = 0;
 }
 
 
@@ -6263,6 +6324,7 @@ static command_menu knowledge_actions[] = {
 	{'6', "Display contents of your homes", (action_f)do_cmd_knowledge_home, 0},
 	{'7', "Display dungeon knowledge", (action_f)do_cmd_knowledge_dungeons, 0},
 	{'8', "Display self-knowledge", (action_f)self_knowledge, 0},
+	{'9', "Display this game help tips", (action_f)do_cmd_knowledge_help_tips, 0},
 	{0, 0, 0, 0}, /* other stuff */
 	{'D', "Dump auto-inscriptions", (action_f) cmd_autos_dump, 0},
 	{'L', "Load a user pref file", (action_f) do_cmd_pref_file_hack, 20},

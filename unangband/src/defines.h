@@ -271,7 +271,7 @@
 
 /*
  * OPTION: Maximum number of "quarks" (see "util.c")
- * Default: assume at most 512 different inscriptions are used
+ * Default: assume at most 2048 different inscriptions and tips are used
  */
 #define QUARK_MAX	2048
 
