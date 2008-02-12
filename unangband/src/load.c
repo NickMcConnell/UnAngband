@@ -784,6 +784,8 @@ static errr rd_store(int n)
 	rd_byte(&num);
 	rd_s16b(&st_ptr->good_buy);
 	rd_s16b(&st_ptr->bad_buy);
+	if (!older_than(0, 6, 2, 6))
+		rd_byte(&st_ptr->level);
 
 	/* Paranoia */
 	if (own >= z_info->b_max)
@@ -1659,6 +1661,33 @@ static void rd_messages(void)
 	}
 }
 
+/*
+ * Read saved help tip file names
+ */
+static void rd_tip_files(void)
+{
+	int i;
+	char buf[128];
+
+	s16b num;
+
+	/* Total */
+	rd_s16b(&tips_end);
+
+	/* Read the help tip file names */
+	for (i = 0; i < tips_end; i++)
+	{
+		/* Read the file name */
+		rd_string(buf, 128);
+
+		/* Add the tip, using quarks */
+		tips[i] = quark_add(buf);
+	}
+
+	/* Read the position of the first not shown tip */
+	rd_s16b(&tips_start);
+}
+
 
 /*
  * Read the dungeon
@@ -2218,6 +2247,12 @@ static errr rd_savefile_new_aux(void)
 	rd_messages();
 	if (arg_fiddle) note("Loaded Messages");
 
+	if (!older_than(0, 6, 2, 6))
+	{
+		/* Then the help tips */
+		rd_tip_files();
+		if (arg_fiddle) note("Loaded Help Tips");
+	}
 
 	/* Monster Memory */
 	rd_u16b(&tmp16u);

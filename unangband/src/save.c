@@ -420,6 +420,9 @@ static void wr_store(const store_type *st_ptr)
 	wr_s16b(st_ptr->good_buy);
 	wr_s16b(st_ptr->bad_buy);
 
+	/* Save the store generation level */
+	wr_byte(st_ptr->level);
+
 	/* Save the stock */
 	for (j = 0; j < st_ptr->stock_num; j++)
 	{
@@ -1069,6 +1072,8 @@ static bool wr_savefile_new(void)
 
 	u16b tmp16u;
 
+	s16b tmp16s;
+
 	/* Guess at the current time */
 	now = time((time_t *)0);
 
@@ -1129,16 +1134,29 @@ static bool wr_savefile_new(void)
 
 
 	/* Dump the number of "messages" */
-	tmp16u = message_num();
-	if (compress_savefile && (tmp16u > 40)) tmp16u = 40;
-	wr_u16b(tmp16u);
+	tmp16s = message_num();
+	if (compress_savefile && (tmp16s > 40)) tmp16s = 40;
+	wr_s16b(tmp16s);
 
 	/* Dump the messages (oldest first!) */
-	for (i = tmp16u - 1; i >= 0; i--)
+	for (i = tmp16s - 1; i >= 0; i--)
 	{
 		wr_string(message_str((s16b)i));
 		wr_u16b(message_type((s16b)i));
 	}
+
+	/* Dump the number of help tip file names */
+	wr_s16b(tips_end);
+
+	/* Dump the help tip file names */
+	for (i = 0; i < tips_end; i++)
+	{
+		/* Read the file name */
+		wr_string(quark_str(tips[i]));
+	}
+
+	/* Dump the position of the first not shown tip */
+	wr_s16b(tips_start);
 
 
 	/* Dump the monster lore */
