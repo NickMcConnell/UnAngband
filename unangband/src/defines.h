@@ -273,13 +273,13 @@
  * OPTION: Maximum number of "quarks" (see "util.c")
  * Default: assume at most 512 different inscriptions are used
  */
-#define QUARK_MAX	512
+#define QUARK_MAX	2048
 
 /*
  * OPTION: Maximum total number of "tips" (see "files.c")
  * in the lib/file/ directory
  */
-#define TIPS_MAX	2048
+#define TIPS_MAX	1024
 
 
 /*
@@ -5395,7 +5395,7 @@ extern int PlayerUID;
 # undef MACRO_MAX
 # define MACRO_MAX	128
 # undef QUARK_MAX
-# define QUARK_MAX	128
+# define QUARK_MAX	256
 # undef MESSAGE_MAX
 # define MESSAGE_MAX	128
 # undef MESSAGE_BUF
@@ -5422,7 +5422,7 @@ extern int PlayerUID;
 # undef MACRO_MAX
 # define MACRO_MAX	128
 # undef QUARK_MAX
-# define QUARK_MAX	128
+# define QUARK_MAX	256
 # undef MESSAGE_MAX
 # define MESSAGE_MAX	128
 # undef MESSAGE_BUF
