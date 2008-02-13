@@ -403,6 +403,10 @@ static void player_wipe(void)
 		t_info[i].visited = 0;
 	}
 
+	/* Clear help tips; quarks not freed, will be reused */
+	tips_start = 0;
+	tips_end = 0;
+
 	/* Start with no artifacts made yet */
 	for (i = 0; i < z_info->a_max; i++)
 	{

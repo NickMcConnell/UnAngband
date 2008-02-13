@@ -2096,20 +2096,65 @@ void do_knowledge_dungeons(void)
 
 /* =================== HELP TIPS ================================ */
 
+/*
+ * File name prefix of each group
+ */
+static cptr tip_prefix[] = 
+{
+	"All current tips",
+	"birth",
+	"race",
+	"class",
+	"style",
+	"spec",
+	"tval",
+	"kind",
+	"ego",
+	"look",
+	"dungeon",
+	"depth",
+	"level",
+	"kill",
+	NULL
+};
+
 static void display_tip_title(int col, int row, bool cursor, int oid)
 {
-/*	store_type *s_ptr = store[default_join[oid].gid];
-	object_type *o_ptr = &s_ptr->stock[default_join[oid].oid];
-	char buffer[60];
-*/
-	/* Should be UNKNOWN for unreachable locations like Bombadil's */
 	byte attr = curs_attrs[CURS_KNOWN][(int)cursor];
 
-/*	object_desc(buffer, sizeof buffer, o_ptr, TRUE, 3);
+	cptr tip = quark_str(tips[default_join[oid].oid]);
 
-	c_prt(attr, buffer, row, col); */
+	/* Current help file */
+	FILE *fff = NULL;
 
-	c_prt(attr, "a help tip", row, col);
+	/* General buffer */
+	char buf[128];
+
+	/* Path buffer */
+	char path[1024];
+
+	/* Build the filename */
+	path_build(path, 1024, ANGBAND_DIR_INFO, tip);
+
+	/* Open the file */
+	fff = my_fopen(path, "r");
+
+	/* File doesn't exist or is empty */
+	if (!fff || my_fgets(fff, buf, sizeof(buf)))
+	{
+		/* Message */
+		msg_format("Cannot open '%s'.", tip);
+		message_flush();
+
+		/* Oops */
+		c_prt(attr, "an unreadable help tip", row, col);
+		return;
+	}
+
+	/* Close the file */
+	my_fclose(fff);		
+
+	c_prt(attr, buf, row, col);
 }
 
 static void display_help_tip(int oid)
@@ -2128,32 +2173,48 @@ static void display_help_tip(int oid)
 
 static const char *tip_group_name(int gid)
 {
-	return "All help tips";
+	return tip_prefix[gid];
+}
+
+static int tip_group_cmp(const void *a, const void *b) {
+	int gid = default_join[*(int*)a].gid;
+	int c = gid - default_join[*(int*)b].gid;
+	return c;
 }
 
 static void do_cmd_knowledge_help_tips(void)
 {
-	member_funcs contents_f = {display_tip_title, display_help_tip, 0, 0, 0, 0};
-	group_funcs home_f = {tips_start, FALSE, tip_group_name, 0, default_group, 0};
+	member_funcs tip_f = {display_tip_title, display_help_tip, 0, 0, 0, 0};
+	group_funcs prefix_f = {N_ELEMENTS(tip_prefix), FALSE, tip_group_name, tip_group_cmp, default_group, 0};
 
-	int *objects;
-	int i;
+	int cloned_tip_count = 0;
+	int *help_tips;
+	int i, j;
 
-	objects = C_ZNEW(tips_start, int);
-
-	default_join = C_ZNEW(tips_start, join_t);
+	help_tips = C_ZNEW(tips_start * 2, int);
+	default_join = C_ZNEW(tips_start * 2, join_t);
 
 	for(i = 0; i < tips_start; i++) 
 	{
-		objects[i] = i;
-		default_join[i].gid = 0;
-		default_join[i].oid = i;
+		for(j = 0; j < N_ELEMENTS(tip_prefix) - 1; j++) {
+			const char *pat = tip_prefix[j];
+			const cptr tip = quark_str(tips[i]);
+
+			if (j > 0 && strncmp(pat, tip, strlen(pat)) != 0)
+				continue;
+
+			help_tips[cloned_tip_count] = cloned_tip_count;
+			default_join[cloned_tip_count].oid = i;
+			default_join[cloned_tip_count++].gid = j;
+		}
 	}
 
-	display_knowledge("help tips", objects, tips_start,
-							home_f, contents_f, 0);
+	display_knowledge("help tips", help_tips, cloned_tip_count,
+							prefix_f, tip_f, 0);
+
 	FREE(default_join);
 	default_join = 0;
+	FREE(help_tips);
 }
 
 
