@@ -6543,7 +6543,7 @@ s32b object_power(const object_type *o_ptr)
 		if (f1 & TR1_CHR) p += o_ptr->pval;
 		if (f1 & TR1_SAVE) p += o_ptr->pval;
 		if (f1 & TR1_DEVICE) p += o_ptr->pval;
-		if (f1 & TR1_STEALTH) p += o_ptr->pval;
+		if (f1 & TR1_STEALTH) p += 2 * o_ptr->pval;
 		if (f1 & TR1_TUNNEL) p += o_ptr->pval;
 		if (f1 & TR1_SEARCH) p += o_ptr->pval;
 		if (f1 & TR1_INFRA) p += o_ptr->pval;

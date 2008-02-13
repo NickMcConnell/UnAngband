@@ -1158,11 +1158,11 @@ s32b object_value_real(const object_type *o_ptr)
 	/* Apply power modifier to cost */
 	if ((o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_ARROW) || (o_ptr->tval == TV_BOLT))
 	{
-		value += power * (power > 0 ? (power + 2) / 3 : -power) * 5L;
+		value += power * (power > 0 ? (power + 2) / 3 : (-power + 2) / 3) * 5L;
 	}
 	else
 	{
-		value += power * (power > 0 ? (power + 2) / 3 : -power) * 100L;
+		value += power * (power > 0 ? (power + 2) / 3 : (-power + 2) / 3) * 100L;
 	}		
 
 	/* Hack -- object power assumes (+11,+9) on weapons and ammo so we need to include some smaller bonuses,
