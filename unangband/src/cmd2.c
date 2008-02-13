@@ -366,7 +366,9 @@ int actual_route(int dun)
 
 
 /*
- * Determine if the object can be eaten, and has "=<" in its inscription.
+ * Determine if the object is a reasonable auto-consume food
+ * and has no "!<" in its inscription.
+ * Also, if it has "=<' it will be always eaten, reasonable or not.
  */
 static bool auto_consume_okay(const object_type *o_ptr)
 {
@@ -375,21 +377,24 @@ static bool auto_consume_okay(const object_type *o_ptr)
 	/* Inedible */
 	if (!item_tester_hook_food_edible(o_ptr)) return (FALSE);
 	
-	/* Hack -- normal food is fine except waybread and pints of spirits */
+	/* Hack -- normal food is fine except gorging meet, etc. */
 	/* You can inscribe them with !< to prevent this however */
 	if ((o_ptr->tval == TV_FOOD) && (o_ptr->sval >= SV_FOOD_MIN_FOOD)
-		&& (o_ptr->sval != SV_FOOD_WAYBREAD) && (o_ptr->sval != SV_FOOD_PINT_OF_SPIRITS))
+		 && (o_ptr->sval != SV_FOOD_WAYBREAD) 
+		 && (o_ptr->sval != SV_FOOD_SPRIG_OF_ATHELAS)
+		 && (o_ptr->sval != SV_FOOD_COOKED_MEET)
+		 && (o_ptr->sval != SV_FOOD_PINT_OF_SPIRITS))
 	{
 		/* No inscription */
 		if (!o_ptr->note) return (TRUE);		
 		
-		/* Find a '=' */
+		/* Find a '!' */
 		s = strchr(quark_str(o_ptr->note), '!');
 
 		/* Process inscription */
 		while (s)
 		{
-			/* Auto-consume on "=<" */
+			/* Not auto-consume on "!<" */
 			if (s[1] == '<')
 			{
 				/* Pick up */
@@ -599,16 +604,6 @@ static void do_cmd_travel(void)
 
 	if (p_ptr->depth == min_depth(p_ptr->dungeon))
 	{
-		/* Need to be full to travel for trip */
-		if (p_ptr->food < PY_FOOD_FULL)
-		{
-			msg_print("You'll want a full stomach for the road ahead.");
-			msg_print("Hint: Try the 'E' (shift-E) command to eat something.");
-			msg_print(NULL);
-			
-			if (easy_more) messages_easy(FALSE);
-		}
-		
 		if (p_ptr->blind)
 		{
 			msg_print("You can't read any maps.");
@@ -792,21 +787,6 @@ static void do_cmd_travel(void)
 				  continue;
 				}
 
-				/* Request eating; break instead */
-				if (ke.key == 'E')
-				{
-					/* Restore the screen */
-					if (redraw)
-					{
-						/* Load screen */
-						screen_load();
-					}
-
-					msg_print("You'll want a full stomach for the road ahead.");
-
-					return;
-				}
-
 				/* Lowercase 1+ */
 				choice = tolower(ke.key);
 
@@ -845,10 +825,44 @@ static void do_cmd_travel(void)
 				/* redraw = FALSE; */
 			}
 
-
 			/* Abort if needed */
 			if (!flag) return;
+
+			/* Will try to auto-eat? */
+			if (p_ptr->food < PY_FOOD_FULL)
+			{
+				msg_print("You set about filling your stomach for the long road ahead.");
+			}
 			
+			/* Hack -- Consume most food not inscribed with !< */
+			while (p_ptr->food < PY_FOOD_FULL)
+			{
+				for (i = 0; i < INVEN_PACK; i++)
+				{
+					/* Eat the food */
+					if (auto_consume_okay(&inventory[i]))
+					{
+						/* Eat the food */
+						player_eat_food(i);
+						
+						break;
+					}
+				}
+				
+				/* Escape out if no food */
+				if (i == INVEN_PACK) break;
+			}
+
+			if (easy_more) messages_easy(FALSE);
+
+			/* Need to be full to travel */
+			if (p_ptr->food < PY_FOOD_FULL)
+			{
+				msg_print("You notice you don't have enough food to fully satiate you before the travel!");
+				/* Bail out */
+				return;
+			}
+
 			/* Longer and more random journeys via map */
 			journey = damroll(3 + (level_flag & LF1_DAYLIGHT ? 1 : 0), 4);
 
@@ -882,25 +896,6 @@ static void do_cmd_travel(void)
 			/* Hack -- Time passes (at 4* food use rate) */
 			turn += PY_FOOD_FULL/10*journey*4;
 			
-			/* Hack -- Consume ration inscribed with =< */
-			while (p_ptr->food < PY_FOOD_ALERT)
-			{
-				for (i = 0; i < INVEN_PACK; i++)
-				{
-					/* Eat the food */
-					if (auto_consume_okay(&inventory[i]))
-					{
-						/* Eat the food */
-						player_eat_food(i);
-						
-						break;
-					}
-				}
-				
-				/* Escape out if no food */
-				if (i == INVEN_PACK) break;
-			}
-
 			/* XXX Recharges, stop temporary speed etc. */
 			/* We don't do this to e.g. allow the player to buff themselves before fighting Beorn. */
 

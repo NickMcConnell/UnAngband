@@ -2508,6 +2508,7 @@
 /* These are correct */
 #define SV_FOOD_BISCUIT			32
 #define SV_FOOD_JERKY			33
+#define SV_FOOD_COOKED_MEET	34
 #define SV_FOOD_RATION			35
 #define SV_FOOD_SLIME_MOLD		36
 #define SV_FOOD_WAYBREAD		37
@@ -2515,6 +2516,7 @@
 #define SV_FOOD_PINT_OF_ALE		40
 #define SV_FOOD_PINT_OF_WINE	        41
 #define SV_FOOD_PINT_OF_SPIRITS	        42
+#define SV_FOOD_SPRIG_OF_ATHELAS	        43
 
 
 /*
