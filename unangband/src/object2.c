@@ -1158,11 +1158,11 @@ s32b object_value_real(const object_type *o_ptr)
 	/* Apply power modifier to cost */
 	if ((o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_ARROW) || (o_ptr->tval == TV_BOLT))
 	{
-		value += power * (power > 0 ? (power + 2) / 3 : 1) * 5L;
+		value += power * (power > 0 ? (power + 2) / 3 : -power) * 5L;
 	}
 	else
 	{
-		value += power * (power > 0 ? (power + 2) / 3 : 1) * 100L;
+		value += power * (power > 0 ? (power + 2) / 3 : -power) * 100L;
 	}		
 
 	/* Hack -- object power assumes (+11,+9) on weapons and ammo so we need to include some smaller bonuses,
@@ -2292,7 +2292,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 	boost_power = object_power(o_ptr);
 
 	/* Reverse sign */
-	if (power < 0) boost_power = -boost_power;
+	if (boost_power < 0) boost_power = -boost_power;
 
 	/* Too powerful already */
 	if (boost_power >= lev) return;
@@ -2388,7 +2388,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 		/* Evaluate power */
 		boost_power = object_power(o_ptr);
 
-		if (power < 0) boost_power = -boost_power;
+		if (boost_power < 0) boost_power = -boost_power;
 
 		/* Hack -- boost to-hit, to-dam, to-ac to 10 if required to increase power */
 		if ((boost_power <= old_boost_power) && !(tryagain) && (choice < 10))
@@ -2417,7 +2417,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 
 			boost_power = object_power(o_ptr);
 
-			if (power < 0) boost_power = -boost_power;
+			if (boost_power < 0) boost_power = -boost_power;
 		}
 	} while ((!(boost_power <= old_boost_power) && (boost_power < lev)) || (tryagain && (tries < 40)));
 
@@ -2472,13 +2472,13 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 	if (o_ptr->name2) o_ptr->xtra1 = 0;
 
 	/* Boost level for great drops */
-	if ((power < -1) || (power > 1)) lev += 10;
+	if (great) lev += 10;
 
 	/* Recompute power */
 	obj_pow1 = object_power(o_ptr);
 
 	/* Reverse sign */
-	if (power < 0) obj_pow1 = -obj_pow1;
+	if (obj_pow1 < 0) obj_pow1 = -obj_pow1;
 
 	/* Already too magical */
 	if (obj_pow1 >= lev) return (FALSE);
@@ -2487,13 +2487,13 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 	if ((o_ptr->tval != TV_LITE) && (o_ptr->tval != TV_INSTRUMENT) && rand_int(3))
 	{
 		/* Boost the item */
-		boost_item(o_ptr, power, power);
+		boost_item(o_ptr, lev, power);
 
 		/* Recompute power */
 		obj_pow1 = object_power(o_ptr);
 
 		/* Reverse sign */
-		if (power < 0) obj_pow1 = -obj_pow1;
+		if (obj_pow1 < 0) obj_pow1 = -obj_pow1;
 
 		/* Already too magical */
 		if (obj_pow1 >= lev) return (FALSE);
@@ -2526,7 +2526,7 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		obj_pow2 = object_power(o_ptr);
 
 		/* Reverse sign */
-		if (power < 0) obj_pow2 = -obj_pow2;
+		if (obj_pow2 < 0) obj_pow2 = -obj_pow2;
 
 		/* Pick this flag with default pval? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect? */
@@ -2603,7 +2603,7 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		obj_pow2 = object_power(o_ptr);
 
 		/* Reverse sign */
-		if (power < 0) obj_pow2 = -obj_pow2;
+		if (obj_pow2 < 0) obj_pow2 = -obj_pow2;
 
 		/* Pick this flag? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
@@ -2627,7 +2627,7 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		obj_pow2 = object_power(o_ptr);
 
 		/* Reverse sign */
-		if (power < 0) obj_pow2 = -obj_pow2;
+		if (obj_pow2 < 0) obj_pow2 = -obj_pow2;
 
 		/* Pick this flag? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
@@ -2660,7 +2660,7 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		obj_pow2 = object_power(o_ptr);
 
 		/* Reverse sign */
-		if (power < 0) obj_pow2 = -obj_pow2;
+		if (obj_pow2 < 0) obj_pow2 = -obj_pow2;
 
 		/* Pick this flag? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
@@ -3688,7 +3688,6 @@ static void a_m_aux_4(object_type *o_ptr, int level, int power)
 			/* Hack -- eggs/spores will hatch */
 			if (o_ptr->name3 > 0) o_ptr->timeout = o_ptr->weight * damroll(2,6) * 10;
 		}
-
 	}
 }
 
@@ -4550,7 +4549,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		/* Boost under-powered ego items if possible */
 		if (ego_power < lev)
 		{
-			boost_item(o_ptr, power, lev);
+			boost_item(o_ptr, lev, power);
 		}
 
 		/* Hack -- apply rating bonus */
