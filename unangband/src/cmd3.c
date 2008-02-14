@@ -1562,8 +1562,6 @@ bool player_refill2(int item2)
 		/* Refuel */
 		o_ptr->charges += j_ptr->charges + 5;
 
-		/* Message */
-		msg_print("You combine the torches.");
 
 		/* Over-fuel message */
 		if (o_ptr->charges >= FUEL_TORCH)
@@ -1634,15 +1632,12 @@ bool player_refill2(int item2)
 			/* No longer 'stored' */
 			i_ptr->ident &= ~(IDENT_STORE);
 
-			/* Unstack the used item */
+			/* Unstack the used item; will be merge later */
 			j_ptr->number--;
 
 			/* Adjust the weight and carry */
 			p_ptr->total_weight -= i_ptr->weight;
 			item = inven_carry(i_ptr);
-
-			/* Message */
-			msg_print("You unstack your lantern.");
 		}
 		else
 		{

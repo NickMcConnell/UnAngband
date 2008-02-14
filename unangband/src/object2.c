@@ -1309,8 +1309,9 @@ s32b object_value(const object_type *o_ptr)
 			/* Hack -- negative bonuses are bad */
 			if (o_ptr->pval < 0) return (0L);
 
-			/* Guess value of pval */
-			value += o_ptr->pval * o_ptr->pval * 100L;
+			/* Guess value of pval, ignore default pval of 1 */
+			if (o_ptr->pval > 1)
+				value += o_ptr->pval * o_ptr->pval * 100L;
 		}
 
 		/* Hack -- Partially identified items */
