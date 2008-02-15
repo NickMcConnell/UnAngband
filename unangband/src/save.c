@@ -15,7 +15,7 @@
  */
 
 #include "angband.h"
-
+#include "option.h"
 
 /*
  * XXX XXX XXX Ignore this for now...

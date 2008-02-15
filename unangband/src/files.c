@@ -13,7 +13,7 @@
  */
 
 #include "angband.h"
-
+#include "option.h"
 
 
 /*

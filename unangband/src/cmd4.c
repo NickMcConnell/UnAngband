@@ -22,7 +22,7 @@
 */
 
 #include "angband.h"
-
+#include "option.h"
 
 
 #define CURS_UNKNOWN (0)

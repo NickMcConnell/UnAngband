@@ -16,7 +16,7 @@
  */
 
 #include "angband.h"
-
+#include "option.h"
 #include "init.h"
 
 /*
