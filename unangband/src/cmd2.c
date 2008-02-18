@@ -32,7 +32,7 @@ bool do_cmd_test(int y, int x, int action)
 	feature_type *f_ptr;
 	int feat;
 
-	if ((verify_safe) && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
+	if (disturb_detect && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
 	{
 		disturb(1,0);
 		msg_print("This doesn't feel safe.");
@@ -656,7 +656,7 @@ static void do_cmd_travel(void)
 			redraw = FALSE;
 
 			/* Show the list */
-			if (auto_display_lists)
+			if (show_lists)
 			{
 				/* Show list */
 				redraw = TRUE;
@@ -3240,7 +3240,7 @@ static void do_cmd_hold_or_stay(int pickup)
 void do_cmd_hold(void)
 {
 	/* Hold still (usually pickup) */
-	do_cmd_hold_or_stay(always_pickup);
+	do_cmd_hold_or_stay(pickup_always);
 }
 
 
@@ -3250,7 +3250,7 @@ void do_cmd_hold(void)
 void do_cmd_stay(void)
 {
 	/* Stay still (usually do not pickup) */
-	do_cmd_hold_or_stay(!always_pickup);
+	do_cmd_hold_or_stay(!pickup_always);
 }
 
 
@@ -3341,7 +3341,7 @@ void do_cmd_rest(void)
 	handle_stuff();
 
 	/* Refresh XXX XXX XXX */
-	if (fresh_before) Term_fresh();
+	Term_fresh();
 }
 
 
@@ -3782,11 +3782,9 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 				/* Visual effects */
 				print_rel(missile_char, missile_attr, y, x);
 				move_cursor_relative(y, x);
-				if (fresh_before) 
 				Term_fresh();
 				Term_xtra(TERM_XTRA_DELAY, msec);
 				lite_spot(y, x);
-				if (fresh_before) 
 				Term_fresh();
 			}
 

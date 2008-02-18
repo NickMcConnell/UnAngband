@@ -1648,7 +1648,7 @@ key_event inkey_ex(void)
 			/* Refresh the term to draw the cursor */
 			/*
 			 * The main screen is ignored because of some screen
-			 * flickering when "auto_display_lists" is on. -DG-
+			 * flickering when "show_lists" is on. -DG-
 			 */
 			if ((j > 0) && !cursor_state[j]) (void)Term_fresh();
 		}
@@ -1822,7 +1822,7 @@ key_event inkey_ex(void)
 
 			/* Refresh to erase the cursor
 			 * The main screen is ignored because of some screen
-			 * flickering when "auto_display_lists" is on. -DG-
+			 * flickering when "show_lists" is on. -DG-
 			 */
 			if ((j > 0) && !cursor_state[j])
  			{
@@ -2896,7 +2896,7 @@ static void msg_print_aux(u16b type, cptr msg)
 
 
 	/* Handle "auto_more"/"must_more"/"use_trackmouse" */
-	if (auto_more || must_more)
+	if ((auto_more && !easy_more) || must_more)
 	{
 		/* Force window update */
 		window_stuff();
@@ -2966,9 +2966,6 @@ static void msg_print_aux(u16b type, cptr msg)
 
 	/* Remember the position */
 	message_column += n + 1;
-
-	/* Optional refresh */
-	if (fresh_after) Term_fresh();
 }
 
 
@@ -3647,7 +3644,7 @@ s16b get_quantity(cptr prompt, int max)
 #ifdef ALLOW_REPEAT
 
 	/* Get the item index */
-	else if ((max != 1) && allow_quantity && repeat_pull(&amt))
+	else if ((max != 1)&& repeat_pull(&amt))
 	{
 		/* nothing */
 	}
@@ -3655,7 +3652,7 @@ s16b get_quantity(cptr prompt, int max)
 #endif /* ALLOW_REPEAT */
 
 	/* Prompt if needed */
-	else if ((max != 1) && allow_quantity)
+	else if ((max != 1))
 	{
 		char tmp[80];
 
@@ -4060,7 +4057,7 @@ void request_command(bool shopping)
 	}
 
 	/* Hack -- Auto-repeat certain commands */
-	if (always_repeat && (p_ptr->command_arg <= 0))
+	if (p_ptr->command_arg <= 0)
 	{
 		/* Hack -- auto repeat certain commands */
 		if (strchr(AUTO_REPEAT_COMMANDS, p_ptr->command_cmd))
@@ -5031,7 +5028,7 @@ bool get_list(print_list_func print_list, const s16b *sn, int num, cptr p, cptr 
 	redraw = FALSE;
 
 	/* Show the list */
-	if (auto_display_lists)
+	if (show_lists)
 	{
 		/* Show list */
 		redraw = TRUE;

@@ -1587,12 +1587,7 @@ static errr init_other(void)
 
 	/*** Prepare the options ***/
 
-	/* Initialize the options */
-	for (i = 0; i < OPT_MAX; i++)
-	{
-		/* Default value */
-		op_ptr->opt[i] = option_norm[i];
-	}
+	option_set_defaults();
 
 	/* Initialize the window flags */
 	for (n = 0; n < ANGBAND_TERM_MAX; n++)

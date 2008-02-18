@@ -20,6 +20,7 @@ COMMONOBJS = \
 	monster2$(OBJEXT) \
 	object1$(OBJEXT) \
 	object2$(OBJEXT) \
+	option$(OBJEXT) \
 	randart$(OBJEXT) \
 	save$(OBJEXT) \
 	spells1$(OBJEXT) \

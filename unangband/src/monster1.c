@@ -1857,12 +1857,11 @@ void describe_monster_race(const monster_race *r_ptr, const monster_lore *l_ptr,
 	if (cheat_know || spoilers) cheat_monster_lore(r_ptr, &lore);
 
 	/* Show kills of monster vs. player(s) */
-	if (!spoilers && show_details)
+	if (!spoilers)
 		describe_monster_kills(r_ptr, &lore);
 
 	/* Monster description */
-	if (spoilers || show_details)
-		describe_monster_desc(r_ptr);
+	describe_monster_desc(r_ptr);
 
 	/* Describe the movement and level of the monster */
 	describe_monster_movement(r_ptr, &lore);

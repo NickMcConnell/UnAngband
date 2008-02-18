@@ -173,7 +173,7 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 	redraw = FALSE;
 
 	/* Option -- automatically show lists */
-	if (auto_display_lists)
+	if (show_lists)
 	{
 		/* Show list */
 		redraw = TRUE;

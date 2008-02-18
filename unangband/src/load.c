@@ -920,16 +920,6 @@ static void rd_options(void)
 	u32b window_flag[ANGBAND_TERM_MAX];
 	u32b window_mask[ANGBAND_TERM_MAX];
 
-        /* Hack -- unset all Save File Options for compatibility */
-	for (i = 0; i < OPT_PAGE_PER; i++)
-	{
-		/* Collect options on this "page" */
-		if (option_page[8][i] != 255)
-		{
-			op_ptr->opt[option_page[8][i]] = FALSE;
-		}
-	}
-
 	/*** Oops ***/
 
 	/* Ignore old options */
@@ -965,7 +955,7 @@ static void rd_options(void)
 		int ob = i % 32;
 
 		/* Process real entries */
-		if (option_text[i])
+		if (option_desc(i))
 		{
 			/* Process saved entries */
 			if (mask[os] & (1L << ob))
@@ -985,6 +975,18 @@ static void rd_options(void)
 				}
 			}
 		}
+	}
+
+	/* Wipe options if saved before the move to V option setup */ 
+	if (older_than(0, 6, 2, 7))
+	{
+		note("All options will be reset to defaults (savefile format change).");
+		note("Please visit the '=' menu and reenter your preferences. ");
+
+		if (!get_check("Continue? ")) 
+			return(-1);
+
+		option_set_defaults();
 	}
 
 
@@ -1668,8 +1670,6 @@ static void rd_tip_files(void)
 {
 	int i;
 	char buf[128];
-
-	s16b num;
 
 	/* Total */
 	rd_s16b(&tips_end);
@@ -2465,7 +2465,7 @@ static errr rd_savefile_new_aux(void)
 	}
 
 	/* Read random artifacts */
-	if (adult_rand_artifacts)
+	if (adult_randarts)
 	{
 		if (rd_randarts()) return (-1);
 		if (arg_fiddle) note("Loaded Random Artifacts");

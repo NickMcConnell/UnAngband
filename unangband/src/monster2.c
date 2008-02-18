@@ -2029,7 +2029,7 @@ void update_mon(int m_idx, bool full)
 			if (p_ptr->health_who == m_idx) p_ptr->redraw |= (PR_HEALTH);
 
 			/* Mega Hack -- If not seen before, disturb */
-			if ((!l_ptr->sights) && (disturb_new)) disturb(1, 0);
+			if (!l_ptr->sights) disturb(1, 0);
 
 			/* Hack -- Count "fresh" sightings */
 			if (l_ptr->sights < MAX_SHORT) l_ptr->sights++;

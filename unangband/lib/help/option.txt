@@ -128,7 +128,7 @@ Merge timeouts when stacking    [stack_force_times]
     set.
 
 ***** <easy_autos>
-Automatically inscribe all objects [easy_search]
+Automatically inscribe all objects [easy_autos]
     Whenever you inscribe or uninscribe an object, all objects of the same
     kind will be inscribed or uninscribed, including objects that are
     subsequently created. To edit this, use the ~ command and display the
@@ -136,7 +136,7 @@ Automatically inscribe all objects [easy_search]
     inscriptions, and save them to a preference file.
 
 ***** <easy_search>
-Start searching if not disturbed   [easy_autos]
+Start searching if not disturbed   [easy_search]
     After 20 turns without being disturbed, the character will auto-
     matically enter Search mode.
 

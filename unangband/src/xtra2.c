@@ -4515,7 +4515,7 @@ void describe_room(void)
 
 		if (strlen(text_always))
 		{
-			if (easy_more || auto_more)
+			if (easy_more || (auto_more && !easy_more))
 			{
 				msg_print(text_always);
 			}
@@ -4569,7 +4569,7 @@ void verify_panel(void)
 
 
 	/* Scroll screen vertically when off-center */
-	if (center_player && (!p_ptr->running || !run_avoid_center) &&
+	if (center_player &&
 	    (py != wy + SCREEN_HGT / 2))
 	{
 		wy = py - SCREEN_HGT / 2;
@@ -4583,7 +4583,7 @@ void verify_panel(void)
 
 
 	/* Scroll screen horizontally when off-center */
-	if (center_player && (!p_ptr->running || !run_avoid_center) &&
+	if (center_player &&
 	    (px != wx + SCREEN_WID / 2))
 	{
 		wx = px - SCREEN_WID / 2;
@@ -4595,13 +4595,8 @@ void verify_panel(void)
 		wx = ((px - PANEL_WID / 2) / PANEL_WID) * PANEL_WID;
 	}
 
-
 	/* Scroll if needed */
-	if (modify_panel(wy, wx))
-	{
-		/* Optional disturb on "panel change" */
-		if (disturb_panel && !center_player) disturb(0, 0);
-	}
+	modify_panel(wy, wx);
 }
 
 
@@ -5175,9 +5170,6 @@ static void target_set_interactive_prepare(int mode)
 	{
 		for (x = p_ptr->wx; ((x < p_ptr->wx + SCREEN_WID)&&(temp_n<TEMP_MAX)); x++)
 		{
-			/* Require line of sight, unless "look" is "expanded" */
-			if (!expand_look && !player_has_los_bold(y, x)) continue;
-
 			/* Require "interesting" contents */
 			if (!target_set_interactive_accept(y, x)) continue;
 
@@ -5507,7 +5499,7 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 #ifdef ALLOW_EASY_FLOOR
 
 		/* Scan all objects in the grid */
-		if (easy_floor)
+		if (1/*easy_floor*/)
 		{
 			int floor_list[MAX_FLOOR_STACK];
 			int floor_num;
@@ -6100,9 +6092,7 @@ void modify_grid_interesting_project(byte *a, char *c, int y, int x, byte cinfo,
  *
  * Note that this code can be called from "get_aim_dir()".
  *
- * All locations must be on the current panel, unless the "scroll_target"
- * option is used, which allows changing the current panel during "look"
- * and "target" commands.  Currently, when "flag" is true, that is, when
+ * Currently, when "flag" is true, that is, when
  * "interesting" grids are being used, and a directional key is used, we
  * only scroll by a single panel, in the direction requested, and check
  * for any interesting grids on that panel.  The "correct" solution would
@@ -6266,7 +6256,6 @@ bool target_set_interactive(int mode)
 					if (++m == temp_n)
 					{
 						m = 0;
-						if (!expand_list) done = TRUE;
 					}
 					break;
 				}
@@ -6276,7 +6265,6 @@ bool target_set_interactive(int mode)
 					if (m-- == 0)
 					{
 						m = temp_n - 1;
-						if (!expand_list) done = TRUE;
 					}
 					break;
 				}
@@ -6301,14 +6289,11 @@ bool target_set_interactive(int mode)
 						handle_stuff();					
 					}
 
-					if (scroll_target)
-					{
-						/* Recenter around player */
-						verify_panel();
+					/* Recenter around player */
+					verify_panel();
 
-						/* Handle stuff */
-						handle_stuff();
-					}
+					/* Handle stuff */
+					handle_stuff();
 				}
 
 				case 'o':
@@ -6460,7 +6445,7 @@ bool target_set_interactive(int mode)
 				i = target_pick(old_y, old_x, ddy[d], ddx[d]);
 
 				/* Scroll to find interesting grid */
-				if (scroll_target && (i < 0))
+				if (i < 0)
 				{
 					int old_wy = p_ptr->wy;
 					int old_wx = p_ptr->wx;
@@ -6545,14 +6530,11 @@ bool target_set_interactive(int mode)
 						handle_stuff();					
 					}
 
-					if (scroll_target)
-					{
-						/* Recenter around player */
-						verify_panel();
+					/* Recenter around player */
+					verify_panel();
 
-						/* Handle stuff */
-						handle_stuff();
-					}
+					/* Handle stuff */
+					handle_stuff();
 				}
 
 				case 'o':
@@ -6698,25 +6680,22 @@ bool target_set_interactive(int mode)
 				x += ddx[d];
 				y += ddy[d];
 
-				if (scroll_target)
+				/* Slide into legality */
+				if (x >= DUNGEON_WID - 1) x--;
+				else if (x <= 0) x++;
+
+				/* Slide into legality */
+				if (y >= DUNGEON_HGT - 1) y--;
+				else if (y <= 0) y++;
+
+				/* Adjust panel if needed */
+				if (adjust_panel(y, x))
 				{
-					/* Slide into legality */
-					if (x >= DUNGEON_WID - 1) x--;
-					else if (x <= 0) x++;
+					/* Handle stuff */
+					handle_stuff();
 
-					/* Slide into legality */
-					if (y >= DUNGEON_HGT - 1) y--;
-					else if (y <= 0) y++;
-
-					/* Adjust panel if needed */
-					if (adjust_panel(y, x))
-					{
-						/* Handle stuff */
-						handle_stuff();
-
-						/* Recalculate interesting grids */
-						target_set_interactive_prepare(mode);
-					}
+					/* Recalculate interesting grids */
+					target_set_interactive_prepare(mode);
 				}
 
 				else
@@ -6774,14 +6753,11 @@ bool target_set_interactive(int mode)
 		handle_stuff();
 	}
 
-	if (scroll_target)
-	{
-		/* Recenter around player */
-		verify_panel();
+	/* Recenter around player */
+	verify_panel();
 
-		/* Handle stuff */
-		handle_stuff();
-	}
+	/* Handle stuff */
+	handle_stuff();
 
 	/* Failure to set target */
 	if (!p_ptr->target_set) return (FALSE);

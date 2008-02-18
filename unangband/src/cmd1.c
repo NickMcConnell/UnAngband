@@ -1254,7 +1254,7 @@ static void py_destroy_aux(int o_idx)
 	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 	/* Verify destruction */
-	if (verify_destroy && !auto_pickup_ignore(o_ptr))
+	if (!auto_pickup_ignore(o_ptr))
 	{
 		sprintf(out_val, "Really destroy %s? ", o_name);
 		if (!get_check(out_val)) return;
@@ -1523,13 +1523,13 @@ void py_pickup(int py, int px, int pickup)
 #ifdef ALLOW_EASY_FLOOR
 
 		/* Easy Floor */
-		if (easy_floor && !auto_pickup_never(o_ptr))
+		if (/*easy_floor && */!auto_pickup_never(o_ptr))
 		{
 			/* Pickup if possible */
 			if (pickup && inven_carry_okay(o_ptr))
 			{
 				/* Pick up if allowed */
-				if ((!carry_query_flag))
+				if ((!1/*carry_query_flag*/))
 				{
 					/* Pick up the object */
 					py_pickup_aux(this_o_idx);
@@ -1590,7 +1590,7 @@ void py_pickup(int py, int px, int pickup)
 		}
 
 		/* Query before picking up */
-		else if (carry_query_flag)
+		else if (1/*carry_query_flag*/)
 		{
 			char out_val[160];
 			sprintf(out_val, "Pick up %s? ", o_name);
@@ -1607,7 +1607,7 @@ void py_pickup(int py, int px, int pickup)
 #ifdef ALLOW_EASY_FLOOR
 
 	/* Easy floor, objects left */
-	if (easy_floor && (can_pickup + not_pickup > 0))
+	if (/*easy_floor && */(can_pickup + not_pickup > 0))
 	{
 		/* Not picking up */
 		if (!pickup)
@@ -2070,7 +2070,7 @@ void hit_trap(int y, int x)
 
 					/* Has a power */
 					/* Hack -- check if we are stacking rods */
-					if ((o_ptr->timeout > 0) && (!(tmpval) || stack_force_times))
+					if (o_ptr->timeout > 0)
 					{
 						/* Hack -- one more rod charging */
 						if (o_ptr->timeout) o_ptr->stackc++;
@@ -3110,17 +3110,13 @@ void move_player(int dir, int jumping)
 		 (f_ptr->flags1 & (FF1_OPEN)))))
 	{
 		/* Not already repeating */
-		if (!p_ptr->command_rep)
+		if (!p_ptr->command_rep && p_ptr->command_arg <= 0)
 		{
-			/* Hack -- auto-repeat */
-			if (always_repeat && (p_ptr->command_arg <= 0))
-			{
-				/* Repeat 99 times */
-				p_ptr->command_rep = 99;
+			/* Repeat 99 times */
+			p_ptr->command_rep = 99;
 
-				/* Reset the command count */
-				p_ptr->command_arg = 0;
-			}
+			/* Reset the command count */
+			p_ptr->command_arg = 0;
 		}
 
 		/* Alter */
@@ -3144,7 +3140,7 @@ void move_player(int dir, int jumping)
 	else if (!(f_ptr->flags1 & (FF1_MOVE))
 	&& (!(f_ptr->flags3 & (FF3_EASY_CLIMB)) || !(play_info[y][x] & (PLAY_MARK))))
 	{
-		if ((verify_safe) && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
+		if (disturb_detect && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
 		{
 			disturb(1,0);
 			msg_print("This doesn't feel safe.");
@@ -3209,7 +3205,7 @@ void move_player(int dir, int jumping)
 	/* Partial movement */
 	else if ((climb) && (dir != p_ptr->climbing))
 	{
-		if ((verify_safe) && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
+		if (disturb_detect && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
 		{
 			disturb(1,0);
 			msg_print("This doesn't feel safe.");		
@@ -3242,7 +3238,7 @@ void move_player(int dir, int jumping)
 	/* Normal movement */
 	else
 	{
-		if ((verify_safe) && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
+		if ((disturb_detect) && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
 		{
 			disturb(1,0);
 			msg_print("This doesn't feel safe.");		
@@ -3357,7 +3353,7 @@ void move_player(int dir, int jumping)
 		}
 
 		/* Handle "objects" */
-		py_pickup(y, x, jumping != always_pickup);
+		py_pickup(y, x, jumping != pickup_always);
 
 		/* Handle "store doors" */
 		/* The running with pathfind check ensures we don't interrupt ourselves
@@ -3482,29 +3478,6 @@ static int see_stop(int dir, int y, int x)
 	/* Default */
 	return (TRUE);
 }
-
-
-/*
- * Hack -- Check for an "unknown corner" (see below)
- */
-static int see_nothing(int dir, int y, int x)
-{
-	/* Get the new location */
-	y += ddy[dir];
-	x += ddx[dir];
-
-	/* Illegal grids are unknown XXX XXX XXX */
-	if (!in_bounds(y, x)) return (TRUE);
-
-	/* Memorized grids are always known */
-	if (play_info[y][x] & (PLAY_MARK)) return (FALSE);
-
-	/* Default */
-	return (TRUE);
-}
-
-
-
 
 
 /*
@@ -3872,27 +3845,9 @@ static bool run_test(void)
 
 			if ((notice) && (f_info[feat].flags1 & (FF1_MOVE)))
 			{
-				if ((run_ignore_doors) && (f_info[feat].flags1 & (FF1_DOOR)) &&
-					(f_info[feat].flags1 & (FF1_CLOSE)))
-				{
-					/* Option -- ignore */
-					notice = FALSE;
-				}
-
-				/* Stairs */
-				if ((run_ignore_stairs) && (f_info[feat].flags1 & (FF1_STAIRS)))
-				{
-					/* Option -- ignore */
-					notice = FALSE;
-				}
-
-				/* Unusual floors */
-				if ((run_ignore_floors) && (f_info[feat].flags1 & (FF1_FLOOR)))
-				{
-					/* Option -- ignore */
-					notice = FALSE;
-				}
-
+				/* Ignore unusual floors; don't run if you want to inspect them */
+				if (f_info[feat].flags1 & (FF1_FLOOR))
+					notice = FALSE;				
 			}
 
 			/* Interesting feature */
@@ -4065,58 +4020,13 @@ static bool run_test(void)
 		}
 
 		/* Two options, examining corners */
-		else if (run_use_corners && !run_cut_corners)
+		else
 		{
 			/* Primary option */
 			p_ptr->run_cur_dir = option;
 
 			/* Hack -- allow curving */
 			p_ptr->run_old_dir = option2;
-		}
-
-		/* Two options, pick one */
-		else
-		{
-			/* Get next location */
-			row = py + ddy[option];
-			col = px + ddx[option];
-
-			/* Don't see that it is closed off. */
-			/* This could be a potential corner or an intersection. */
-			if (!see_wall(option, row, col) ||
-			    !see_wall(check_dir, row, col))
-			{
-				/* Can not see anything ahead and in the direction we */
-				/* are turning, assume that it is a potential corner. */
-				if (run_use_corners &&
-				    see_nothing(option, row, col) &&
-				    see_nothing(option2, row, col))
-				{
-					p_ptr->run_cur_dir = option;
-					p_ptr->run_old_dir = option2;
-				}
-
-				/* STOP: we are next to an intersection or a room */
-				else
-				{
-					return (TRUE);
-				}
-			}
-
-			/* This corner is seen to be enclosed; we cut the corner. */
-			else if (run_cut_corners)
-			{
-				p_ptr->run_cur_dir = option2;
-				p_ptr->run_old_dir = option2;
-			}
-
-			/* This corner is seen to be enclosed, and we */
-			/* deliberately go the long way. */
-			else
-			{
-				p_ptr->run_cur_dir = option;
-				p_ptr->run_old_dir = option2;
-			}
 		}
 	}
 

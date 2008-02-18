@@ -1398,7 +1398,7 @@ static void display_entry(int item, int store_index)
 		maxwid = 75;
 
 		/* Leave room for weights, if necessary -DRS- */
-		if (show_weights) maxwid -= 10;
+		maxwid -= 10;
 
 		/* Describe the object */
 		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
@@ -1438,14 +1438,10 @@ static void display_entry(int item, int store_index)
 			e_info[o_ptr->name2].aware = TRUE;
 		}
 
-		/* Show weights */
-		if (show_weights)
-		{
-			/* Only show the weight of a single object */
-			int wgt = o_ptr->weight;
-			sprintf(out_val, "%3d.%d lb", wgt / 10, wgt % 10);
-			put_str(out_val, y, 68);
-		}
+		/* Only show the weight of a single object */
+		int wgt = o_ptr->weight;
+		sprintf(out_val, "%3d.%d lb", wgt / 10, wgt % 10);
+		put_str(out_val, y, 68);
 	}
 
 	/* Describe an object (fully) in a store */
@@ -1457,7 +1453,7 @@ static void display_entry(int item, int store_index)
 		maxwid = 65;
 
 		/* Leave room for weights, if necessary -DRS- */
-		if (show_weights) maxwid -= 7;
+		maxwid -= 7;
 
 		/* Describe the object (fully) */
 		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
@@ -1469,14 +1465,10 @@ static void display_entry(int item, int store_index)
 		/* Display the object */
 		c_put_str(attr, o_name, y, 3);
 
-		/* Show weights */
-		if (show_weights)
-		{
-			/* Only show the weight of a single object */
-			int wgt = o_ptr->weight;
-			sprintf(out_val, "%3d.%d", wgt / 10, wgt % 10);
-			put_str(out_val, y, 61);
-		}
+		/* Only show the weight of a single object */
+		int wgt = o_ptr->weight;
+		sprintf(out_val, "%3d.%d", wgt / 10, wgt % 10);
+		put_str(out_val, y, 61);
 
 		/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
 		if ((!k_info[o_ptr->k_idx].flavor) && !(k_info[o_ptr->k_idx].aware))
@@ -1580,10 +1572,7 @@ static void display_store(int store_index)
 		put_str("Item Description", 5, 3);
 
 		/* If showing weights, show label */
-		if (show_weights)
-		{
-			put_str("Weight", 5, 70);
-		}
+		put_str("Weight", 5, 70);
 	}
 
 	/* Normal stores */
@@ -1609,10 +1598,7 @@ static void display_store(int store_index)
 		put_str("Item Description", 5, 3);
 
 		/* If showing weights, show label */
-		if (show_weights)
-		{
-			put_str("Weight", 5, 60);
-		}
+		put_str("Weight", 5, 60);
 
 		/* Label the asking price (in stores) */
 		put_str("Price", 5, 72);

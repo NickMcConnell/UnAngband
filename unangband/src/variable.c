@@ -109,7 +109,6 @@ s32b old_turn;		      /* Hack -- Level feeling counter */
 bool surface;
 bool daytime;
 
-bool use_sound;		 /* The "sound" mode is enabled */
 bool use_mouse;		 /* The "mouse" mode is enabled */
 bool use_trackmouse;	 /* The "trackmouse" mode is enabled */
 bool use_graphics;	      /* The "graphics" mode is enabled */

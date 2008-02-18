@@ -502,7 +502,7 @@ static void wr_options(void)
 		int ob = i % 32;
 
 		/* Process real entries */
-		if (option_text[i])
+		if (option_desc(i))
 		{
 			/* Set flag */
 			if (op_ptr->opt[i])
@@ -1135,7 +1135,7 @@ static bool wr_savefile_new(void)
 
 	/* Dump the number of "messages" */
 	tmp16s = message_num();
-	if (compress_savefile && (tmp16s > 40)) tmp16s = 40;
+	if (tmp16s > 80) tmp16s = 80;
 	wr_s16b(tmp16s);
 
 	/* Dump the messages (oldest first!) */
@@ -1275,7 +1275,7 @@ static bool wr_savefile_new(void)
 		}
         }
 
-	if (adult_rand_artifacts) wr_randarts();
+	if (adult_randarts) wr_randarts();
 
 	/* Write the inventory */
 	for (i = 0; i < INVEN_TOTAL; i++)

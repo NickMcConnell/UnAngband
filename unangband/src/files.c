@@ -507,7 +507,7 @@ errr process_pref_file_command(char *buf)
 		/* Check non-adult options */
 		for (i = 0; i < OPT_ADULT; i++)
 		{
-			if (option_text[i] && streq(option_text[i], buf + 2))
+			if (option_desc(i) && streq(option_name(i), buf + 2))
 			{
 				op_ptr->opt[i] = FALSE;
 				return (0);
@@ -521,7 +521,7 @@ errr process_pref_file_command(char *buf)
 		/* Check non-adult options */
 		for (i = 0; i < OPT_ADULT; i++)
 		{
-			if (option_text[i] && streq(option_text[i], buf + 2))
+			if (option_desc(i) && streq(option_name(i), buf + 2))
 			{
 				op_ptr->opt[i] = TRUE;
 				return (0);
@@ -1540,9 +1540,6 @@ static void display_player_xtra_info(void)
 	{
 		s32b advance = (player_exp[p_ptr->lev - 1] *
 		                p_ptr->expfact / 100L);
-
-		/*some players want to see experience needed to gain next level*/
-		if (toggle_xp) advance -= p_ptr->exp;
 
 		Term_putstr(col+9, 13, -1, TERM_L_GREEN,
 		            format("%9ld", advance));
@@ -4250,18 +4247,14 @@ errr file_character(cptr name, bool full)
 	text_out("  [Options]\n\n");
 
 	/* Dump options */
-	for (i = 0; i < OPT_MAX; i++)
+	for (i = OPT_ADULT; i < OPT_MAX; i++)
 	{
-		/* hack - use game play options */
-		if (i < OPT_GAME_PLAY) continue;
-		if ((i >= OPT_EFFICIENCY) && (i < OPT_ADULT)) continue;
-
-		if (option_desc[i])
+		if (option_name(i))
 		{
 			text_out(format("%-45s: %s (%s)\n",
-								 format("%s%s", (i >= OPT_GAME_PLAY) && (i < OPT_EFFICIENCY) ? "Game: " : "", option_desc[i]),
+								 option_desc(i),
 								 op_ptr->opt[i] ? "yes" : "no ",
-								 option_text[i]));
+								 option_name(i)));
 		}
 	}
 

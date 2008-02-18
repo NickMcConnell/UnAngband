@@ -1472,35 +1472,6 @@ s32b object_value(const object_type *o_ptr)
 	return (value);
 }
 
-
-/*
- * Determine if the object has "=s" in its inscription.
- */
-static bool auto_stack_okay(const object_type *o_ptr)
-{
-	cptr s;
-
-	/* No inscription */
-	if (!o_ptr->note) return (FALSE);
-
-	/* Find a '=' */
-	s = strchr(quark_str(o_ptr->note), '=');
-
-	/* Process inscription */
-	while (s)
-	{
-		/* Auto-stack on "=s" */
-		if (s[1] == 's') return (TRUE);
-
-		/* Find another '=' */
-		s = strchr(s + 1, '=');
-	}
-
-	/* Don't auto pickup */
-	return (FALSE);
-}
-
-
 /*
  * Determine if an item can "absorb" a second item
  *
@@ -1577,13 +1548,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		case TV_SKIN:
 		case TV_HOLD:
 		{
-			/* Require 'similar' timeouts */
-			if ((o_ptr->timeout != j_ptr->timeout) && (!stack_force_times)
-				&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) )
-			{
-				if ((o_ptr->timeout != 0) && (j_ptr->timeout != 0)) return (0);
-			}
-
 			/* Probably okay */
 			break;
 		}
@@ -1619,15 +1583,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 				if ((o_ptr->charges > 0)&&(j_ptr->charges <= 0)) return (0);
 				if ((o_ptr->charges < 0)&&(j_ptr->charges >= 0)) return (0);
 				if ((o_ptr->charges == 0)&&(j_ptr->charges != 0)) return (0);
-
-				/* Line 1 -- no force charge stacking option */
-				/* Line 2 -- 1st charges is not 1 less than 2nd charges, or 1st charges is a charges stack */
-				/* Line 3 -- 1st charges is not 1 greater than 2nd charges, or 2nd charges is a charges stack */
-				/* Line 4 -- an item has auto_stack */
-				if ((!stack_force_charges)
-					&& ((o_ptr->charges != j_ptr->charges-1) || (o_ptr->stackc))
-					&& ((o_ptr->charges != j_ptr->charges+1) || (j_ptr->stackc))
-					&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr))) return (0);
 			}
 
 			/* Probably okay */
@@ -1637,13 +1592,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		/* Rods */
 		case TV_ROD:
 		{
-			/* Require 'similar' timeouts */
-			if ((o_ptr->timeout != j_ptr->timeout) && (!stack_force_times)
-				&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) )
-			{
-				if ((o_ptr->timeout != 0) && (j_ptr->timeout != 0)) return (0);
-			}
-
 			/* Probably okay */
 			break;
 		}
@@ -1698,13 +1646,6 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 
 			/* Require identical "ego-item" names */
 			if (o_ptr->name2 != j_ptr->name2) return (FALSE);
-
-			/* Require 'similar' timeouts */
-			if ((o_ptr->timeout != j_ptr->timeout) && (!stack_force_times)
-				&& !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) )
-			{
-				if ((o_ptr->timeout != 0) && (j_ptr->timeout != 0)) return (0);
-			}
 
 			/* Require identical "values" */
 			if (o_ptr->ac != j_ptr->ac) return (FALSE);
@@ -1776,39 +1717,20 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 	}
 
 	/* Hack -- Require compatible inscriptions */
-	if (o_ptr->note != j_ptr->note)
+	if (o_ptr->note != j_ptr->note && o_ptr->note && j_ptr->note)
 	{
 		if (cheat_xtra) msg_format("note %d does not match note %d", o_ptr->note, j_ptr->note);
-		
-		/* Normally require matching inscriptions */
-		if (!stack_force_notes && !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr)) ) return (0);
 
-		/* Never combine different inscriptions */
-		if (o_ptr->note && j_ptr->note) return (0);
-	}
-
-	/* Hack -- Require compatible "discount" fields */
-	if (o_ptr->discount != j_ptr->discount)
-	{
-		if (cheat_xtra) msg_format("discount %d does not match discount %d", o_ptr->discount, j_ptr->discount);
-		
-		/* Normally require matching discounts */
-		if (!stack_force_costs && !(auto_stack_okay(o_ptr) && auto_stack_okay(j_ptr))) return (0);
+		return (0);
 	}
 
 	/* Hack -- Require compatible "feeling" fields */
-	if (o_ptr->feeling != j_ptr->feeling)
+	if (o_ptr->feeling != j_ptr->feeling && (o_ptr->feeling) && (j_ptr->feeling))
 	{
 		if (cheat_xtra) msg_format("feeling %d does not match feeling %d", o_ptr->feeling, j_ptr->feeling);
 
-		/* Both are (different) special inscriptions */
-		if ((o_ptr->feeling) && (j_ptr->feeling))
-		{
-			/* Normally require matching inscriptions */
-			return (0);
-		}
+		return (0);
 	}
-
 
 	/* Maximal "stacking" limit */
 	if (total >= MAX_STACK_SIZE) return (0);
@@ -1836,19 +1758,9 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
  * These assumptions are enforced by the "object_similar()" code.
  *
  * We now support 'blending' of timeouts and charges. - ANDY
- *
- * With stack_force_charges, charges are averaged across a stack of items.
- *
- * Without, we only stack items that have 1 charge difference,
- * and use the charges field to tell us how many of the higher charges
- * items are in the stack. This should be particularly helpful with
- * wands and staves as we will not unstack a pile of same charge items
- * by using them until a wand is emptied completely.
- *
- * With stack_force_timeouts, timeouts are the maximum across a stack
+ * Charges are averaged across a stack of items.
+ * Timeouts are the maximum across a stack
  * of items.
- *
- * Without, we allow 1 charging item to stack with charged items.
  *
  * Note we treat rods like timeout items rather than charges items. This
  * unnecessarily complicates the code in a lot of places.

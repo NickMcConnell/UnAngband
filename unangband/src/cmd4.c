@@ -2728,9 +2728,9 @@ static void do_cmd_options_aux(int page, cptr info)
 
 			/* Display the option text */
 			sprintf(buf, "%-48s: %s  (%s)",
-				option_desc[opt[i]],
-				op_ptr->opt[opt[i]] ? "yes" : "no ",
-				option_text[opt[i]]);
+					  option_desc(opt[i]),
+					  op_ptr->opt[opt[i]] ? "yes" : "no ",
+					  option_name(opt[i]));
 			c_prt(a, buf, i + 2, 0);
 		}
 
@@ -2799,7 +2799,7 @@ static void do_cmd_options_aux(int page, cptr info)
 
 			case '?':
 			{
-				sprintf(buf, "option.txt#%s", option_text[opt[k]]);
+				sprintf(buf, "option.txt#%s", option_name(opt[k]));
 				show_file(buf, NULL, 0, 0);
 				Term_clear();
 				break;
@@ -3037,19 +3037,19 @@ static errr option_dump(cptr fname)
 	for (i = 0; i < OPT_CHEAT; i++)
 	{
 		/* Require a real option */
-		if (!option_text[i]) continue;
+		if (!option_desc(i)) continue;
 
 		/* Comment */
-		fprintf(fff, "# Option '%s'\n", option_desc[i]);
+		fprintf(fff, "# Option '%s'\n", option_desc(i));
 
 		/* Dump the option */
 		if (op_ptr->opt[i])
 		{
-			fprintf(fff, "Y:%s\n", option_text[i]);
+			fprintf(fff, "Y:%s\n", option_name(i));
 		}
 		else
 		{
-			fprintf(fff, "X:%s\n", option_text[i]);
+			fprintf(fff, "X:%s\n", option_name(i));
 		}
 
 		/* Skip a line */
@@ -6359,6 +6359,26 @@ typedef struct {
 	int page;
 } command_menu;
 
+static command_menu option_actions [] = 
+{
+	{'1', "Interface options", do_cmd_options_aux, 0}, 
+	{'2', "Display options", do_cmd_options_aux, 1},
+	{'3', "Warning and disturbance options", do_cmd_options_aux, 2}, 
+	{'4', "Birth (difficulty) options", do_cmd_options_aux, 3}, 
+	{'5', "Cheat options", do_cmd_options_aux, 4}, 
+	{0, 0, 0, 0},
+	{'W', "Subwindow display settings", (action_f) do_cmd_options_win, 0}, 
+	{'D', "Set base delay factor", (action_f) do_cmd_delay, 0}, 
+	{'H', "Set hitpoint warning", (action_f) do_cmd_hp_warn, 0}, 
+	{0, 0, 0, 0},
+	{'L', "Load a user pref file", (action_f) do_cmd_pref_file_hack, 20},
+	{'A', "Append options to a file", do_cmd_options_append, 0},
+	{'M', "Interact with macros (advanced)", (action_f) do_cmd_macros, 0},
+	{'V', "Interact with visuals (advanced)", (action_f) do_cmd_visuals, 0},
+	{'C', "Interact with colours (advanced)", (action_f) do_cmd_colors, 0},
+};
+
+/*
 static command_menu option_actions [] = {
 	{'1', "User Interface Options", do_cmd_options_aux, 0},
 	{'2', "Disturbance Options", do_cmd_options_aux, 1},
@@ -6367,14 +6387,15 @@ static command_menu option_actions [] = {
 	{'5', "Display Options", do_cmd_options_aux, 4},
 	{'6', "Birth Options", do_cmd_options_aux, 5},
 	{'7', "Cheat Options", do_cmd_options_aux, 6},
-	{ 0, 0, 0, 0}, /* Load and append */
+	{ 0, 0, 0, 0},
 	{'W', "Window Flags", (action_f) do_cmd_options_win, 0},
 	{'L', "Load a user pref file", (action_f) do_cmd_pref_file_hack, 20},
 	{'A', "Append options to a file", do_cmd_options_append, 0},
-	{ 0, 0, 0, 0}, /* Special choices */
+	{ 0, 0, 0, 0},
 	{'D', "Base Delay Factor", (action_f) do_cmd_delay, 0},
 	{'H', "Hitpoint Warning", (action_f) do_cmd_hp_warn, 0}
 };
+*/
 
 static command_menu knowledge_actions[] = {
 	{'1', "Display artifact knowledge", (action_f)do_cmd_knowledge_artifacts, 0},

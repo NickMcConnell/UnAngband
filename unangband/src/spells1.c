@@ -12335,7 +12335,7 @@ static void calc_starburst(int height, int width, byte *arc_first,
  *
  * Usage and graphics notes:
  *
- * If the option "fresh_before" is on, or the delay factor is anything other
+ * If the delay factor is anything other
  * than zero, bolt and explosion pictures will be momentarily shown on screen.
  *
  * Only 256 grids can be affected per projection, limiting the effective

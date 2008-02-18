@@ -246,7 +246,6 @@ static void prt_exp(void)
 	char out_val[32];
 	s32b exp_display;
 	byte attr;
-	int max_number;
 
 	/*use different color if player's experience is drained*/
 	if (p_ptr->exp >= p_ptr->max_exp)
@@ -257,33 +256,23 @@ static void prt_exp(void)
 	{
 		attr = TERM_YELLOW;
 	}
-
-	/*some players want to see how much they need to gain to get to the next level*/
-	if ((toggle_xp) && (p_ptr->lev < PY_MAX_LEVEL))
+	
+	/* On the main screen print additional experience needed to advance */
+	if (p_ptr->lev < PY_MAX_LEVEL)
 	{
 		exp_display = ((player_exp[p_ptr->lev - 1] 
 				* p_ptr->expfact / 100L) -
 			       p_ptr->exp);
+
 		/*Print experience label*/
 		put_str("NEXT ", ROW_EXP, COL_EXP);
-
-		max_number = 99999;
-	}
-	else
-	{
-		exp_display = p_ptr->exp;
-
-		/*Print experience label*/
-		put_str("EXP ", ROW_EXP, COL_EXP);
-
-		max_number = 999999;
 	}
 
 	if (show_sidebar) {
 	  sprintf(out_val, "%8ld", exp_display);
 	}
 	else {
-	  if (exp_display > max_number) {
+	  if (exp_display > 99999) {
 	    exp_display = exp_display / 1000;
 	    sprintf(out_val, "%5ldK", exp_display);
 	  }
@@ -3025,13 +3014,6 @@ static void calc_torch(void)
 		p_ptr->cur_lite += p_ptr->glowing;
 	}
 
-	/* Reduce lite when running if requested */
-	if (p_ptr->running && view_reduce_lite)
-	{
-		/* Reduce the lite radius if needed */
-		if (p_ptr->cur_lite > 1) p_ptr->cur_lite = 1;
-	}
-
 	/* Notice changes in the "lite radius" */
 	if (p_ptr->old_lite != p_ptr->cur_lite)
 	{
@@ -4597,7 +4579,7 @@ void redraw_stuff(void)
 		 * using this command when graphics mode is on
 		 * causes the character to be a black square.
 		 */
-		if ((view_player_lite) && (arg_graphics == GRAPHICS_NONE))
+		if (arg_graphics == GRAPHICS_NONE)
 		{
 		 	lite_spot(p_ptr->py, p_ptr->px);
 		}
