@@ -294,7 +294,7 @@ static option_entry options[OPT_MAX] =
 { NULL,                  NULL,                                          FALSE }, /* 147 */
 { "birth_campaign",      "Play in Lord of the Rings campaign",          TRUE }, /* 148 */
 { "birth_haggle",        "Haggle in stores",                            FALSE }, /* 149 */
-{ "birth_beginner",      "Start the game with no birth choices",        FALSE }, /* 150 */
+{ "birth_beginner",      "Start the game with almost no birth choices", FALSE }, /* 150 */
 { "birth_intermediate",  "Reduce the number of birth choices",          FALSE }, /* 151 */
 { "birth_first_time",    "Ask all birth setup question at start",       TRUE }, /* 152 */
 { "birth_reseed_artifacts", "Reseed random artifacts on death",         TRUE }, /* 153 */
@@ -358,7 +358,7 @@ static option_entry options[OPT_MAX] =
 { NULL,                  NULL,                                          FALSE }, /* 211 */
 { "adult_campaign",      "Play in Lord of the Rings campaign",          TRUE }, /* 212 */
 { "adult_haggle",        "Haggle in stores",                            FALSE }, /* 213 */
-{ "adult_beginner",      "Start the game with no birth choices",        FALSE }, /* 214 */
+{ "adult_beginner",      "Start the game with almost no birth choices", FALSE }, /* 214 */
 { "adult_intermediate",  "Reduce the number of birth choices",          FALSE }, /* 215 */
 { "adult_first_time",    "Ask all birth setup question at start",       TRUE }, /* 216 */
 { "adult_reseed_artifacts", "Reseed random artifacts on death",         TRUE }, /* 217 */
