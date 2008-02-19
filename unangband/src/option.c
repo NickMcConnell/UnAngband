@@ -47,16 +47,12 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 
 	/* Display */
 	{
-		OPT_show_sidebar,
-		OPT_show_itemlist,
-		OPT_room_names,
-		OPT_room_descriptions,
 		OPT_hilite_player,
  		OPT_center_player,
 		OPT_show_piles,
-		OPT_show_labels,
 		OPT_show_flavors,
 		OPT_view_flavors,
+		OPT_show_labels,
 		OPT_view_yellow_lite,
 		OPT_view_bright_lite,
 		OPT_view_granite_lite,
@@ -64,6 +60,10 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_view_perma_grids,
 		OPT_view_torch_grids,
 		OPT_view_glowing_lite,
+		OPT_show_sidebar,
+		OPT_show_itemlist,
+		OPT_room_names,
+		OPT_room_descriptions,
 		OPT_show_tips,
 	},
 
@@ -73,13 +73,13 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_disturb_near,
 		OPT_disturb_detect,
 		OPT_disturb_state,
-		OPT_easy_corpses,
-		OPT_easy_more,
 		OPT_quick_messages,
 		OPT_auto_more,
 		OPT_ring_bell,
 		OPT_flush_failure,
 		OPT_flush_disturb,
+		OPT_easy_corpses,
+		OPT_easy_more,
 		OPT_verify_mana,
 		OPT_view_unsafe_grids,
 		OPT_view_detect_grids,
@@ -91,18 +91,18 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 
 	/* Birth/Difficulty */
 	{
-		OPT_birth_campaign,
-		OPT_birth_haggle,
-		OPT_birth_beginner,
-		OPT_birth_intermediate,
-		OPT_birth_first_time,
 		OPT_birth_randarts,
-		OPT_birth_reseed_artifacts,
 		OPT_birth_ironman,
 		OPT_birth_no_stores,
 		OPT_birth_no_artifacts,
 		OPT_birth_no_stacking,
 		OPT_birth_no_stairs,
+		OPT_birth_campaign,
+		OPT_birth_haggle,
+		OPT_birth_beginner,
+		OPT_birth_intermediate,
+		OPT_birth_first_time,
+		OPT_birth_reseed_artifacts,
 		OPT_NONE,
 		OPT_NONE,
 		OPT_NONE,
@@ -151,7 +151,7 @@ static option_entry options[OPT_MAX] =
 { "use_old_target",      "Use old target by default",                   FALSE }, /* 4 */
 { "pickup_always",       "Always pickup items",                         FALSE }, /* 5 */
 { "pickup_inven",        "Always pickup items matching inventory",      TRUE },  /* 6 */
-{ "depth_in_feet",       "Show dungeon level in feet",                  FALSE }, /* 7 */
+{ NULL,                  NULL,                                          FALSE }, /* 7 */
 { NULL,                  NULL,                                          FALSE }, /* 8 */
 { NULL,                  NULL,                                          FALSE }, /* 9 */
 { "show_labels",         "Show labels in equipment listings",           TRUE },  /* 10 */
@@ -169,13 +169,13 @@ static option_entry options[OPT_MAX] =
 { "disturb_detect",      "Disturb whenever leaving detected area",      TRUE },  /* 22 */
 { "disturb_state",       "Disturb whenever player state changes",       TRUE },  /* 23 */
 { NULL,                  NULL,                                          FALSE }, /* 24 */
-{ "view_flavors",        "Show flavors in object graphics",             TRUE }, /* 25 */
+{ NULL,                  NULL,                                          FALSE }, /* 25 */
 { NULL,                  NULL,                                          FALSE }, /* 26 */
 { NULL,                  NULL,                                          FALSE }, /* 27 */
 { NULL,                  NULL,                                          FALSE }, /* 28 */
 { NULL,                  NULL,                                          FALSE }, /* 29 */
 { NULL,                  NULL,                                          FALSE }, /* 30 */
-{ "easy_corpses",        "Ignore corpses by default",                   TRUE }, /* 31 */
+{ NULL,                  NULL,                                          FALSE }, /* 31 */
 { NULL,                  NULL,                                          FALSE }, /* 32 */
 { NULL,                  NULL,                                          FALSE }, /* 33 */
 { NULL,                  NULL,                                          FALSE }, /* 34 */
@@ -184,12 +184,12 @@ static option_entry options[OPT_MAX] =
 { NULL,                  NULL,                                          FALSE }, /* 37 */
 { "view_perma_grids",    "Map remembers all perma-lit grids",           TRUE },  /* 38 */
 { "view_torch_grids",    "Map remembers all torch-lit grids",           TRUE },  /* 39 */
-{ NULL,                  NULL,                                          TRUE }, /* 40 */
-{ NULL,                  NULL,                                          TRUE }, /* 41 */
-{ "view_unsafe_grids",  "Mark where you have detected traps",           TRUE }, /* 42 */
-{ "view_detect_grids",  "Mark where you have detected monsters",        TRUE }, /* 43 */
+{ NULL,                  NULL,                                          FALSE }, /* 40 */
+{ NULL,                  NULL,                                          FALSE }, /* 41 */
+{ NULL,                  NULL,                                          FALSE }, /* 42 */
+{ NULL,                  NULL,                                          FALSE }, /* 43 */
 { NULL,                  NULL,                                          FALSE }, /* 44 */
-{ "show_tips",           "Show tips as you explore the dungeon",        TRUE }, /* 45 */
+{ NULL,                  NULL,                                          FALSE }, /* 45 */
 { NULL,                  NULL,                                          FALSE }, /* 46 */
 { NULL,                  NULL,                                          FALSE }, /* 47 */
 { NULL,                  NULL,                                          FALSE }, /* 48 */
@@ -220,7 +220,7 @@ static option_entry options[OPT_MAX] =
 { NULL,                  NULL,                                          FALSE }, /* 73 */
 { NULL,                  NULL,                                          FALSE }, /* 74 */
 { NULL,                  NULL,                                          FALSE }, /* 75 */
-{ "easy_more",           "Minimise '-more-' prompts",                   TRUE }, /* 76 */
+{ NULL,                  NULL,                                          FALSE }, /* 76 */
 { "mouse_movement",      "Allow mouse clicks to move the player",       FALSE }, /* 77 */
 { "mouse_buttons",       "Show mouse status line buttons",              FALSE }, /* 78 */
 { NULL,                  NULL,                                          FALSE }, /* 79 */
@@ -234,21 +234,21 @@ static option_entry options[OPT_MAX] =
 { NULL,                  NULL,                                          FALSE }, /* 87 */
 { NULL,                  NULL,                                          FALSE }, /* 88 */
 { NULL,                  NULL,                                          FALSE }, /* 89 */
-{ "room_descriptions",     "Display room descriptions",                 TRUE }, /* 90 */
-{ "room_names",            "Display room names",                        TRUE }, /* 91 */
-{ "verify_mana",           "Verify critical mana",                      FALSE }, /* 92 */
-{ NULL,                  NULL,                                          FALSE }, /* 93 */
-{ "easy_autos",            "Automatically inscribe all objects",        FALSE }, /* 94 */
-{ "easy_search",           "Start searching if not disturbed",          FALSE }, /* 95 */
-{ "view_glowing_lite",     "Use special colours for glowing lite",      TRUE }, /* 96 */
-{ "show_sidebar",          "Display stats in main window",              FALSE }, /* 97 */
-{ "show_itemlist",         "Display all items on the bottom line",      FALSE }, /* 98 */
-{ NULL,                  NULL,                                          FALSE }, /* 99 */
-{ NULL,                  NULL,                                          FALSE }, /* 100 */
-{ NULL,                  NULL,                                          FALSE }, /* 101 */
-{ NULL,                  NULL,                                          FALSE }, /* 102 */
-{ NULL,                  NULL,                                          FALSE }, /* 103 */
-{ NULL,                  NULL,                                          FALSE }, /* 104 */
+{ "room_descriptions",   "Display room descriptions",                   TRUE }, /* 90 */
+{ "room_names",          "Display room names",                          TRUE }, /* 91 */
+{ "verify_mana",         "Verify critical mana",                        FALSE }, /* 92 */
+{ "easy_autos",          "Automatically inscribe all objects",          FALSE }, /* 93 */
+{ "easy_search",         "Start searching if not disturbed",            FALSE }, /* 94 */
+{ "view_glowing_lite",   "Use special colours for glowing lite",        TRUE }, /* 95 */
+{ "show_sidebar",        "Display stats in main window",                FALSE }, /* 96 */
+{ "show_itemlist",       "Display all items on the bottom line",        FALSE }, /* 97 */
+{ "depth_in_feet",       "Show dungeon level in feet",                  FALSE }, /* 98 */
+{ "view_flavors",        "Show flavors in object graphics",             TRUE }, /* 99 */
+{ "easy_corpses",        "Ignore corpses by default",                   TRUE }, /* 100 */
+{ "view_unsafe_grids",  "Mark where you have detected traps",           TRUE }, /* 101 */
+{ "view_detect_grids",  "Mark where you have detected monsters",        TRUE }, /* 102 */
+{ "show_tips",           "Show tips as you explore the dungeon",        TRUE }, /* 103 */
+{ "easy_more",           "Minimise '-more-' prompts",                   TRUE }, /* 104 */
 { NULL,                  NULL,                                          FALSE }, /* 105 */
 { NULL,                  NULL,                                          FALSE }, /* 106 */
 { NULL,                  NULL,                                          FALSE }, /* 107 */
@@ -310,8 +310,8 @@ static option_entry options[OPT_MAX] =
 { "cheat_xtra",          "Cheat: Peek into something else",             FALSE }, /* 163 */
 { "cheat_know",          "Cheat: Know complete monster info",           FALSE }, /* 164 */
 { "cheat_live",          "Cheat: Allow player to avoid death",          FALSE }, /* 165 */
-{ "cheat_lore",          "Cheat: Know complete artifact/ego info",      FALSE }, /* 166 */
-{ "cheat_auto",          "Cheat: Auto-inscribe items as if known",      FALSE }, /* 167 */
+{ NULL,                  NULL,                                          FALSE }, /* 166 */
+{ NULL,                  NULL,                                          FALSE }, /* 167 */
 { NULL,                  NULL,                                          FALSE }, /* 168 */
 { NULL,                  NULL,                                          FALSE }, /* 169 */
 { NULL,                  NULL,                                          FALSE }, /* 170 */
@@ -324,8 +324,8 @@ static option_entry options[OPT_MAX] =
 { NULL,                  NULL,                                          FALSE }, /* 177 */
 { NULL,                  NULL,                                          FALSE }, /* 178 */
 { NULL,                  NULL,                                          FALSE }, /* 179 */
-{ NULL,                  NULL,                                          FALSE }, /* 180 */
-{ NULL,                  NULL,                                          FALSE }, /* 181 */
+{ "cheat_lore",          "Cheat: Know complete artifact/ego info",      FALSE }, /* 180 */
+{ "cheat_auto",          "Cheat: Auto-inscribe items as if known",      FALSE }, /* 181 */
 { NULL,                  NULL,                                          FALSE }, /* 182 */
 { NULL,                  NULL,                                          FALSE }, /* 183 */
 { NULL,                  NULL,                                          FALSE }, /* 184 */
@@ -374,8 +374,8 @@ static option_entry options[OPT_MAX] =
 { "score_xtra",          "Score: Peek into something else",             FALSE }, /* 227 */
 { "score_know",          "Score: Know complete monster info",           FALSE }, /* 228 */
 { "score_live",          "Score: Allow player to avoid death",          FALSE }, /* 229 */
-{ "score_lore",          "Score: Know complete artifact/ego info",      FALSE }, /* 230 */
-{ "score_auto",          "Score: Auto-inscribe items as if known",      FALSE }, /* 231 */
+{ NULL,                  NULL,                                          FALSE }, /* 230 */
+{ NULL,                  NULL,                                          FALSE }, /* 231 */
 { NULL,                  NULL,                                          FALSE }, /* 232 */
 { NULL,                  NULL,                                          FALSE }, /* 233 */
 { NULL,                  NULL,                                          FALSE }, /* 234 */
@@ -388,8 +388,8 @@ static option_entry options[OPT_MAX] =
 { NULL,                  NULL,                                          FALSE }, /* 241 */
 { NULL,                  NULL,                                          FALSE }, /* 242 */
 { NULL,                  NULL,                                          FALSE }, /* 243 */
-{ NULL,                  NULL,                                          FALSE }, /* 244 */
-{ NULL,                  NULL,                                          FALSE }, /* 245 */
+{ "score_lore",          "Score: Know complete artifact/ego info",      FALSE }, /* 244 */
+{ "score_auto",          "Score: Auto-inscribe items as if known",      FALSE }, /* 245 */
 { NULL,                  NULL,                                          FALSE }, /* 246 */
 { NULL,                  NULL,                                          FALSE }, /* 247 */
 { NULL,                  NULL,                                          FALSE }, /* 248 */

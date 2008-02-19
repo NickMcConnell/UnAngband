@@ -984,7 +984,7 @@ static void rd_options(void)
 		note("Please visit the '=' menu and reenter your preferences. ");
 
 		if (!get_check("Continue? ")) 
-			return(-1);
+			return;
 
 		option_set_defaults();
 	}

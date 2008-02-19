@@ -47,8 +47,6 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 #define OPT_pickup_always			5
 /* unused, from V, TODO */
 #define OPT_pickup_inven			6
-/* Un */
-#define OPT_depth_in_feet        7
 
 #define OPT_show_labels				10
 #define OPT_show_lists           11
@@ -61,20 +59,8 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 #define OPT_disturb_detect       22
 #define OPT_disturb_state			23
 
-/* Un */
-#define OPT_view_flavors         25
-/* Un */
-#define OPT_easy_corpses         31
-
 #define OPT_view_perma_grids		38
 #define OPT_view_torch_grids		39
-
-/* Un */
-#define OPT_view_unsafe_grids    42
-/* Un */
-#define OPT_view_detect_grids    43
-/* Un */
-#define OPT_show_tips            45
 
 #define OPT_flush_failure			52
 #define OPT_flush_disturb			53
@@ -91,22 +77,28 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 #define OPT_center_player			68
 
 #define OPT_auto_more		   	71
-/* Un */
-#define OPT_easy_more  		      76
+
 /* unused, from V */
 #define OPT_mouse_movement	   	77
 /* unused, from V */
 #define OPT_mouse_buttons	   	78
 
-/* next 9 from Un */
+/* options specific to Un */
 #define OPT_room_descriptions	   90
 #define OPT_room_names				91
 #define OPT_verify_mana			   92
-#define OPT_easy_autos           94
-#define OPT_easy_search			   95
-#define OPT_view_glowing_lite    96
-#define OPT_show_sidebar	      97
-#define OPT_show_itemlist	      98
+#define OPT_easy_autos           93
+#define OPT_easy_search			   94
+#define OPT_view_glowing_lite    95
+#define OPT_show_sidebar	      96
+#define OPT_show_itemlist	      97
+#define OPT_depth_in_feet        98
+#define OPT_view_flavors         99
+#define OPT_easy_corpses         100
+#define OPT_view_unsafe_grids    101
+#define OPT_view_detect_grids    102
+#define OPT_show_tips            103
+#define OPT_easy_more  		      104
 
 #define OPT_birth_randarts          (OPT_BIRTH+1)
 #define OPT_birth_ironman           (OPT_BIRTH+3)
@@ -114,7 +106,7 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 #define OPT_birth_no_artifacts      (OPT_BIRTH+5)
 #define OPT_birth_no_stacking       (OPT_BIRTH+6)
 #define OPT_birth_no_stairs			(OPT_BIRTH+8)
-/* Un */
+/* options specific to Un */
 #define OPT_birth_campaign  (OPT_BIRTH+20)
 #define OPT_birth_haggle (OPT_BIRTH+21)
 #define OPT_birth_beginner (OPT_BIRTH+22)
@@ -128,9 +120,9 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 #define OPT_cheat_xtra				(OPT_CHEAT+3)
 #define OPT_cheat_know				(OPT_CHEAT+4)
 #define OPT_cheat_live				(OPT_CHEAT+5)
-/* Un */
-#define OPT_cheat_lore           (OPT_CHEAT+6)
-#define OPT_cheat_auto           (OPT_CHEAT+7)
+/* options specific to Un */
+#define OPT_cheat_lore           (OPT_CHEAT+20)
+#define OPT_cheat_auto           (OPT_CHEAT+21)
 
 #define OPT_adult_randarts          (OPT_ADULT+1)
 #define OPT_adult_ironman           (OPT_ADULT+3)
@@ -138,7 +130,7 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 #define OPT_adult_no_artifacts      (OPT_ADULT+5)
 #define OPT_adult_no_stacking       (OPT_ADULT+6)
 #define OPT_adult_no_stairs			(OPT_ADULT+8)
-/* Un */
+/* options specific to Un */
 #define OPT_adult_campaign  (OPT_ADULT+20)
 #define OPT_adult_haggle (OPT_ADULT+21)
 #define OPT_adult_beginner (OPT_ADULT+22)
@@ -152,9 +144,9 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 #define OPT_score_xtra				(OPT_SCORE+3)
 #define OPT_score_know				(OPT_SCORE+4)
 #define OPT_score_live				(OPT_SCORE+5)
-/* Un */
-#define OPT_score_lore           (OPT_SCORE+6)
-#define OPT_score_auto           (OPT_SCORE+7)
+/* options specific to Un */
+#define OPT_score_lore           (OPT_SCORE+20)
+#define OPT_score_auto           (OPT_SCORE+21)
 
 /*
  * Hack -- Option symbols
@@ -170,7 +162,6 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 #define use_old_target			OPT(use_old_target)
 #define pickup_always			OPT(pickup_always)
 #define pickup_inven			OPT(pickup_inven)
-#define depth_in_feet      OPT(depth_in_feet)   
 #define show_labels				OPT(show_labels)
 #define show_lists            OPT(show_lists)
 #define ring_bell				OPT(ring_bell)
@@ -179,13 +170,8 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 #define disturb_near			OPT(disturb_near)
 #define disturb_detect			OPT(disturb_detect)
 #define disturb_state			OPT(disturb_state)
-#define view_flavors       OPT(view_flavors)
-#define easy_corpses      	OPT(easy_corpses)
 #define view_perma_grids		OPT(view_perma_grids)
 #define view_torch_grids		OPT(view_torch_grids)
-#define view_unsafe_grids 	OPT(view_unsafe_grids)
-#define view_detect_grids 	OPT(view_detect_grids)
-#define show_tips         	OPT(show_tips)
 #define flush_failure			OPT(flush_failure)
 #define flush_disturb			OPT(flush_disturb)
 #define hilite_player			OPT(hilite_player)
@@ -198,7 +184,6 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 #define show_piles				OPT(show_piles)
 #define center_player			OPT(center_player)
 #define auto_more				OPT(auto_more)
-#define easy_more		         OPT(easy_more)
 #define mouse_movement			OPT(mouse_movement)
 #define mouse_buttons			OPT(mouse_buttons)
 #define room_descriptions 	OPT(room_descriptions)
@@ -209,6 +194,13 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 #define view_glowing_lite 	OPT(view_glowing_lite)
 #define show_sidebar      	OPT(show_sidebar)
 #define show_itemlist      OPT(show_itemlist)    
+#define depth_in_feet      OPT(depth_in_feet)   
+#define view_flavors       OPT(view_flavors)
+#define easy_corpses      	OPT(easy_corpses)
+#define view_unsafe_grids 	OPT(view_unsafe_grids)
+#define view_detect_grids 	OPT(view_detect_grids)
+#define show_tips         	OPT(show_tips)
+#define easy_more	         OPT(easy_more)
 
 #define birth_randarts			OPT(birth_randarts)
 #define birth_ironman			OPT(birth_ironman)
