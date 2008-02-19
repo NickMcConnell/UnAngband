@@ -11606,8 +11606,6 @@ void ensure_quest()
  *
  * Hack -- regenerate any "overflow" levels
  *
- * Hack -- allow auto-scumming via a gameplay option.
- *
  * Note that this function resets "cave_feat" and "cave_info" directly.
  */
 void generate_cave(void)

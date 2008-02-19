@@ -279,7 +279,7 @@ s16b tokenize(char *buf, s16b num, char **tokens)
  *
  * Create a macro, given an encoded macro trigger.
  *   P:<str>
-  *
+ *
  * Create a keymap, given an encoded keymap trigger.
  *   C:<num>:<str>
  *
