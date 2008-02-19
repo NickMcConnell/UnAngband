@@ -3239,7 +3239,7 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 			NULL, TV_SCROLL, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGC), (CONDITION_NOT_BLIND | CONDITION_LITE | CONDITION_NOT_BERSERK), 0, NULL},
 	
 	{ player_use_staff, 'u', "Use which staff? ", "You have no staffs to use.",
-			NULL, TV_STAFF, (USE_INVEN | USE_FLOOR | USE_FEATU), (CONDITION_NOT_BERSERK), 0, NULL},
+			NULL, TV_STAFF, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATU), (CONDITION_NOT_BERSERK), 0, NULL},
 			
 	{ player_aim_wand, 'u', "Aim which wand? ", "You have no wands to aim.",
 			NULL, TV_WAND, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGC), (CONDITION_NOT_BERSERK), 0, NULL},
