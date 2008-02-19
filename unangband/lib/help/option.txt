@@ -2,6 +2,8 @@
 
 Most of the "options" are accessible through the '=' command, which provides
 an interface to the various "sets" of options available to the player.
+You can reset all your options to defaults with the 'R' command 
+in the options menu (this does not change *.prf files).
 
 In the decriptions below, each option is listed as the textual summary
 which is shown on the "options" screen, plus the internal name of the

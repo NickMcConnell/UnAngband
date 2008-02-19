@@ -2660,7 +2660,7 @@ static void do_cmd_pref_file_hack(int row)
 	prt("Command: Load a user pref file", row, 0);
 
 	/* Prompt */
-	prt("File: ", row + 2, 0);
+	prt("File: ", row + 1, 0);
 
 	/* Default filename */
 	sprintf(ftmp, "%s.prf", op_ptr->base_name);
@@ -3099,13 +3099,13 @@ void do_cmd_options_append(int dummy, const char *dummy2)
 {
 	char ftmp[80];
 
-	/* Unused paramaters */
+	/* Unused parameters */
 	(void)dummy;
 	(void)dummy2;
 
 	/* Prompt */
-	prt("Command: Append options to a file", 20, 0);
-	prt("File: ", 21, 0);
+	prt("Command: Append options to a file", 22, 0);
+	prt("File: ", 23, 0);
 
 	/* Default filename */
 	sprintf(ftmp, "%s.prf", op_ptr->base_name);
@@ -3126,11 +3126,28 @@ void do_cmd_options_append(int dummy, const char *dummy2)
 	}
 }
 
+void do_cmd_reset_options(int dummy, const char *dummy2)
+{
+	/* Unused parameters */
+	(void)dummy;
+	(void)dummy2;
+
+	/* Prompt */
+	prt("Command: Reset all options to defaults", 22, 0);
+	/* Verify */
+	if (!get_check("Do you really want to reset all options? ")) return;
+
+	option_set_defaults();
+
+	/* Success!!! */
+	msg_print("Done.");
+}
+
 /* Hack -- Base Delay Factor */
 void do_cmd_delay(void)
 {
 	/* Prompt */
-	prt("Command: Base Delay Factor", 20, 0);
+	prt("Command: Base Delay Factor", 22, 0);
 
 	/* Get a new value */
 	while (1)
@@ -3138,8 +3155,8 @@ void do_cmd_delay(void)
 		char cx;
 		int msec = op_ptr->delay_factor * op_ptr->delay_factor;
 		prt(format("Current base delay factor: %d (%d msec)",
-					   op_ptr->delay_factor, msec), 22, 0);
-		prt("New base delay factor (0-9 or ESC to accept): ", 21, 0);
+					   op_ptr->delay_factor, msec), 24, 0);
+		prt("New base delay factor (0-9 or ESC to accept): ", 23, 0);
 
 		cx = inkey();
 		if (cx == ESCAPE) break;
@@ -3152,15 +3169,15 @@ void do_cmd_delay(void)
 void do_cmd_hp_warn(void)
 {
 	/* Prompt */
-	prt("Command: Hitpoint Warning", 20, 0);
+	prt("Command: Hitpoint Warning", 22, 0);
 
 	/* Get a new value */
 	while (1)
 	{
 		char cx;
 		prt(format("Current hitpoint warning: %2d%%",
-			   op_ptr->hitpoint_warn * 10), 22, 0);
-		prt("New hitpoint warning (0-9 or ESC to accept): ", 21, 0);
+			   op_ptr->hitpoint_warn * 10), 24, 0);
+		prt("New hitpoint warning (0-9 or ESC to accept): ", 23, 0);
 
 		cx = inkey();
 		if (cx == ESCAPE) break;
@@ -4709,9 +4726,9 @@ static errr cmd_autos_dump(void)
 	char ftmp[80];
 
 	/* Prompt */
-	prt("Command: Dump auto-inscriptions", 13, 0);
+	prt("Command: Dump auto-inscriptions", 22, 0);
 	/* Prompt */
-	prt("File: ", 15, 0);
+	prt("File: ", 23, 0);
 
 	/* Default filename */
 	sprintf(ftmp, "%s.prf", op_ptr->base_name);
@@ -6371,8 +6388,10 @@ static command_menu option_actions [] =
 	{'D', "Set base delay factor", (action_f) do_cmd_delay, 0}, 
 	{'H', "Set hitpoint warning", (action_f) do_cmd_hp_warn, 0}, 
 	{0, 0, 0, 0},
-	{'L', "Load a user pref file", (action_f) do_cmd_pref_file_hack, 20},
+	{'L', "Load a user pref file", (action_f) do_cmd_pref_file_hack, 22},
 	{'A', "Append options to a file", do_cmd_options_append, 0},
+	{'R', "Reset all options to defaults", do_cmd_reset_options, 0},
+	{0, 0, 0, 0},
 	{'M', "Interact with macros (advanced)", (action_f) do_cmd_macros, 0},
 	{'V', "Interact with visuals (advanced)", (action_f) do_cmd_visuals, 0},
 	{'C', "Interact with colours (advanced)", (action_f) do_cmd_colors, 0},
@@ -6403,14 +6422,18 @@ static command_menu knowledge_actions[] = {
 	{'3', "Display ego item knowledge", (action_f)do_cmd_knowledge_ego_items, 0},
 	{'4', "Display object knowledge", (action_f)do_cmd_knowledge_objects, 0},
 	{'5', "Display feature knowledge", (action_f)do_cmd_knowledge_features, 0},
+	{0, 0, 0, 0},
 	{'6', "Display contents of your homes", (action_f)do_cmd_knowledge_home, 0},
 	{'7', "Display dungeon knowledge", (action_f)do_cmd_knowledge_dungeons, 0},
-	{'8', "Display self-knowledge", (action_f)self_knowledge, 0},
-	{'9', "Display this game help tips", (action_f)do_cmd_knowledge_help_tips, 0},
-	{0, 0, 0, 0}, /* other stuff */
+	{'8', "Display help tips from the current game", (action_f)do_cmd_knowledge_help_tips, 0},
+	{'9', "Display self-knowledge", (action_f)self_knowledge, 0},
+	{0, 0, 0, 0},
+	{'L', "Load a user pref file", (action_f) do_cmd_pref_file_hack, 22},
 	{'D', "Dump auto-inscriptions", (action_f) cmd_autos_dump, 0},
-	{'L', "Load a user pref file", (action_f) do_cmd_pref_file_hack, 20},
-	{'V', "Interact with visuals", (action_f) do_cmd_visuals, 0},
+	{0, 0, 0, 0},
+	{'M', "Interact with macros (advanced)", (action_f) do_cmd_macros, 0},
+	{'V', "Interact with visuals (advanced)", (action_f) do_cmd_visuals, 0},
+	{'C', "Interact with colours (advanced)", (action_f) do_cmd_colors, 0},
 };
 
 /*
@@ -6482,7 +6505,7 @@ void do_cmd_menu(int menuID, const char *title)
 			}
 		}
 
-		prt("Command: ", 19, 0);
+		prt("Command: ", 22, 0);
 
 		/* Get command */
 		ke = inkey_ex();

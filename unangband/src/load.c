@@ -981,7 +981,10 @@ static void rd_options(void)
 	if (older_than(0, 6, 2, 7))
 	{
 		note("All options will be reset to defaults (savefile format change).");
-		note("Please visit the '=' menu and reenter your preferences. ");
+		note("Some options from the *.prf files will be silently disregarded.");
+		note("Please visit the '=' menu, review your preferences");
+		note("and optionally save them in a pref file ('A' command).");
+		note("You can reset your options to defaults any time with 'R'.");
 
 		if (!get_check("Continue? ")) 
 			return;

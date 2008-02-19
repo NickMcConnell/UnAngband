@@ -279,7 +279,7 @@ s16b tokenize(char *buf, s16b num, char **tokens)
  *
  * Create a macro, given an encoded macro trigger.
  *   P:<str>
- *
+  *
  * Create a keymap, given an encoded keymap trigger.
  *   C:<num>:<str>
  *
@@ -513,6 +513,8 @@ errr process_pref_file_command(char *buf)
 				return (0);
 			}
 		}
+		/* Hack: let abandoned options slip though, remove in the future */
+		return (0);
 	}
 
 	/* Process "Y:<str>" -- turn option on */
@@ -527,6 +529,8 @@ errr process_pref_file_command(char *buf)
 				return (0);
 			}
 		}
+		/* Hack: let abandoned options slip though, remove in the future */
+		return (0);
 	}
 
 
