@@ -2213,16 +2213,16 @@ static bool player_birth_aux_1(void)
 		fprintf(fff, "# Automatic startup option dump\n\n");
 
 		/* Dump startup options */
-		fprintf(fff, "%c:%s\n", birth_first_time ? 'Y' : 'X', option_desc(OPT_birth_first_time));
+		fprintf(fff, "%c:%s\n", birth_first_time ? 'Y' : 'X', option_name(OPT_birth_first_time));
 
 		/* Dump startup options */
-		fprintf(fff, "%c:%s\n", rogue_like_commands ? 'Y' : 'X', option_desc(OPT_rogue_like_commands));
+		fprintf(fff, "%c:%s\n", rogue_like_commands ? 'Y' : 'X', option_name(OPT_rogue_like_commands));
 
 		/* Dump startup options */
-		fprintf(fff, "%c:%s\n", birth_beginner ? 'Y' : 'X', option_desc(OPT_birth_beginner));
+		fprintf(fff, "%c:%s\n", birth_beginner ? 'Y' : 'X', option_name(OPT_birth_beginner));
 
 		/* Dump startup options */
-		fprintf(fff, "%c:%s\n", birth_intermediate ? 'Y' : 'X', option_desc(OPT_birth_intermediate));
+		fprintf(fff, "%c:%s\n", birth_intermediate ? 'Y' : 'X', option_name(OPT_birth_intermediate));
 		
 		/* Close */
 		my_fclose(fff);

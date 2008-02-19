@@ -507,7 +507,7 @@ errr process_pref_file_command(char *buf)
 		/* Check non-adult options */
 		for (i = 0; i < OPT_ADULT; i++)
 		{
-			if (option_desc(i) && streq(option_name(i), buf + 2))
+			if (option_name(i) && streq(option_name(i), buf + 2))
 			{
 				op_ptr->opt[i] = FALSE;
 				return (0);
@@ -521,7 +521,7 @@ errr process_pref_file_command(char *buf)
 		/* Check non-adult options */
 		for (i = 0; i < OPT_ADULT; i++)
 		{
-			if (option_desc(i) && streq(option_name(i), buf + 2))
+			if (option_name(i) && streq(option_name(i), buf + 2))
 			{
 				op_ptr->opt[i] = TRUE;
 				return (0);
@@ -4249,7 +4249,7 @@ errr file_character(cptr name, bool full)
 	/* Dump options */
 	for (i = OPT_ADULT; i < OPT_MAX; i++)
 	{
-		if (option_name(i))
+		if (option_desc(i))
 		{
 			text_out(format("%-45s: %s (%s)\n",
 								 option_desc(i),

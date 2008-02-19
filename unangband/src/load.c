@@ -955,7 +955,7 @@ static void rd_options(void)
 		int ob = i % 32;
 
 		/* Process real entries */
-		if (option_desc(i))
+		if (option_name(i))
 		{
 			/* Process saved entries */
 			if (mask[os] & (1L << ob))

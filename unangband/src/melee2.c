@@ -1819,8 +1819,8 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	breath_hp = (m_ptr->hp > 2000 ? m_ptr->hp : 2000);
 	breath_maxhp = (m_ptr->maxhp > 2000 ? m_ptr->maxhp : 2000);
 
-	/* Cheat if requested. */
-	if (1/* || (r_ptr->flags9 & (RF9_PLAYER_GHOST)) */)
+	/* Cheat if a player ghost. */
+	if (0/* r_ptr->flags9 & (RF9_PLAYER_GHOST) */)
 	{
 		update_smart_cheat(m_idx);
 	}

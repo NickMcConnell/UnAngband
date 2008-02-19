@@ -3037,7 +3037,7 @@ static errr option_dump(cptr fname)
 	for (i = 0; i < OPT_CHEAT; i++)
 	{
 		/* Require a real option */
-		if (!option_desc(i)) continue;
+		if (!option_name(i)) continue;
 
 		/* Comment */
 		fprintf(fff, "# Option '%s'\n", option_desc(i));
