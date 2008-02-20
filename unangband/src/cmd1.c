@@ -1003,20 +1003,48 @@ bool quiver_carry(object_type *o_ptr, int o_idx)
 	return (TRUE);
 }
 
+/*
+ * Check to see if an item is stackable in the inventory
+ */
+bool inven_stack_okay(const object_type *o_ptr)
+{
+	int j;
+
+	/* Similar slot? */
+	for (j = 0; j < INVEN_PACK; j++)
+	{
+		object_type *j_ptr = &inventory[j];
+
+		/* Skip non-objects */
+		if (!j_ptr->k_idx) continue;
+
+		/* Check if the two items can be combined */
+		if (object_similar(j_ptr, o_ptr)) return (TRUE);
+	}
+
+	/* Nope */
+	return (FALSE);
+}
 
 /*
- * Determine if the object can be picked up, and has "=g" in its inscription.
- * If "=g" is followed by a number, pick up if the player has less than this number of similar objects in their inventory.
+ * Determine if the object can be picked up and has "=g" in its inscription 
+ * or options determine it should be picked up.
+ *
+ * If "=g" is followed by a number, pick up if the player has 
+ * less than this number of similar objects in their inventory.
  */
 static bool auto_pickup_okay(const object_type *o_ptr)
 {
 	cptr s;
 
 	/* It can't be carried */
-	if (!inven_carry_okay(o_ptr)) return (FALSE);
+	if (!inven_carry_okay(o_ptr)) return FALSE;
+
+	if (OPT(pickup_inven) && inven_stack_okay(o_ptr)) return TRUE;
+	if (OPT(pickup_always)) return TRUE;
 
 	/* No inscription */
-	if (!o_ptr->note) return (FALSE);
+	if (!o_ptr->note) return FALSE;
 
 	/* Find a '=' */
 	s = strchr(quark_str(o_ptr->note), '=');
@@ -1033,23 +1061,23 @@ static bool auto_pickup_okay(const object_type *o_ptr)
 
 				n = atoi(s+2);
 
-				if (o_ptr->number > n) return (FALSE);
+				if (o_ptr->number > n) return FALSE;
 
 				for (i = 0; i < INVEN_WIELD; i++)
 				{
 					if (object_similar(o_ptr, &inventory[i]))
 					{
 						/* If too many, don't pick up */
-						if (inventory[i].number > n) return (FALSE);
+						if (inventory[i].number > n) return FALSE;
 					}
 				}
 
 				/* Pick up */
-				return (TRUE);
+				return TRUE;
 			}
 
 			/* No number specified */
-			else return (TRUE);
+			else return TRUE;
 
 		}
 
@@ -1058,7 +1086,7 @@ static bool auto_pickup_okay(const object_type *o_ptr)
 	}
 
 	/* Don't auto pickup */
-	return (FALSE);
+	return FALSE;
 }
 
 
