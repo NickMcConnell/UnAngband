@@ -3083,12 +3083,10 @@ void show_equip(void)
 }
 
 
-#ifdef ALLOW_EASY_FLOOR
-
 /*
  * Display a list of the items on the floor at the given location.
  */
-void show_floor(const int *floor_list, int floor_num)
+void show_floor(const int *floor_list, int floor_num, bool gold)
 {
 	int i, j, k, l;
 	int col, len, lim;
@@ -3110,16 +3108,23 @@ void show_floor(const int *floor_list, int floor_num)
 	/* Maximum space allowed for descriptions */
 	lim = 79 - 3;
 
-	/* Require space for weight (if needed) */
+	/* Require space for weight */
 	lim -= 9;
 
-	/* Display the inventory */
+	/* Limit displayed floor items to 23 (screen limits) */
+	if (floor_num > MAX_FLOOR_STACK) floor_num = MAX_FLOOR_STACK;
+
+	/* Display the floor */
 	for (k = 0, i = 0; i < floor_num; i++)
 	{
 		o_ptr = &o_list[floor_list[i]];
 
-		/* Is this item acceptable? */
-		if (!item_tester_okay(o_ptr)) continue;
+		/* Optionally, show gold */
+		if ((o_ptr->tval != TV_GOLD) || (!gold))
+		{
+			/* Is this item acceptable?  (always rejects gold) */
+			if (!item_tester_okay(o_ptr)) continue;
+		}
 
 		/* Describe the object */
 		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
@@ -3155,6 +3160,8 @@ void show_floor(const int *floor_list, int floor_num)
 	/* Output each entry */
 	for (j = 0; j < k; j++)
 	{
+		int wgt;
+
 		/* Get the index */
 		i = floor_list[out_index[j]];
 
@@ -3173,17 +3180,15 @@ void show_floor(const int *floor_list, int floor_num)
 		/* Display the entry itself */
 		c_put_str(out_color[j], out_desc[j], j + 1, col + 3);
 
-		/* Display the weight if needed */
-		int wgt = o_ptr->weight * o_ptr->number;
+		/* Display the weight */
+		wgt = o_ptr->weight * o_ptr->number;
 		sprintf(tmp_val, "%3d.%1d lb", wgt / 10, wgt % 10);
 		put_str(tmp_val, j + 1, 71);
 	}
 
 	/* Make a "shadow" below the list (only if needed) */
-	if (j && (j < Term->hgt)) prt("", j + 1, col ? col - 2 : col);
+	if (j && (j < 23)) prt("", j + 1, col ? col - 2 : col);
 }
-
-#endif /* ALLOW_EASY_FLOOR */
 
 
 /*
@@ -3579,8 +3584,6 @@ static int get_tag(int *cp, char tag)
  * We always erase the prompt when we are done, leaving a blank line,
  * or a warning message, if appropriate, if no items are available.
  *
- * Note that the "easy_floor" option affects this function in several ways.
- *
  * Note that only "acceptable" floor objects get indexes, so between two
  * commands, the indexes of floor objects may change.  XXX XXX XXX
  */
@@ -3797,20 +3800,9 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 			p_ptr->command_wrk = (USE_EQUIP);
 		}
 
-#ifdef ALLOW_EASY_FLOOR
-
-		/* Use floor if allowed */
-		else if (1/*easy_floor*/)
-		{
-			p_ptr->command_wrk = (USE_FLOOR);
-		}
-
-#endif /* ALLOW_EASY_FLOOR */
-
-		/* Hack -- Use (empty) inventory */
 		else
 		{
-			p_ptr->command_wrk = (USE_INVEN);
+			p_ptr->command_wrk = (USE_FLOOR);
 		}
 	}
 
@@ -3949,13 +3941,11 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 			if (allow_floor) my_strcat(out_val, " - for floor,", sizeof(out_val));
 		}
 
-#ifdef ALLOW_EASY_FLOOR
-
 		/* Viewing floor */
 		else
 		{
 			/* Redraw if needed */
-			if (p_ptr->command_see) show_floor(floor_list, floor_num);
+			if (p_ptr->command_see) show_floor(floor_list, floor_num, FALSE);
 
 			/* Begin the prompt */
 			sprintf(out_val, "Floor:");
@@ -3976,8 +3966,6 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 			/* Append */
 			else if (use_equip) my_strcat(out_val, " / for Equip,", sizeof(out_val));
 		}
-
-#endif /* ALLOW_EASY_FLOOR */
 
 		/* Indicate ability to "view" */
 		if (!p_ptr->command_see) my_strcat(out_val, " * to see,", sizeof(out_val));
@@ -4146,74 +4134,42 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 					break;
 				}
 
-#ifdef ALLOW_EASY_FLOOR
-
-				if (1/*easy_floor*/)
+				/* There is only one item */
+				if (floor_num == 1)
 				{
-					/* There is only one item */
-					if (floor_num == 1)
+					/* Auto-Select */
+					if (p_ptr->command_wrk == (USE_FLOOR))
 					{
-						/* Hack -- Auto-Select */
-						if ((p_ptr->command_wrk == (USE_FLOOR)) /*||
-																				(!floor_query_flag)*/)
+						/* Special index */
+						k = 0 - floor_list[0];
+
+						/* Allow player to "refuse" certain actions */
+						if (!get_item_allow(k))
 						{
-							/* Special index */
-							k = 0 - floor_list[0];
-
-							/* Allow player to "refuse" certain actions */
-							if (!get_item_allow(k))
-							{
-								done = TRUE;
-								break;
-							}
-
-							/* Accept that choice */
-							(*cp) = k;
-							item = TRUE;
 							done = TRUE;
-
 							break;
 						}
+
+						/* Accept that choice */
+						(*cp) = k;
+						item = TRUE;
+						done = TRUE;
+
+						break;
 					}
-
-					/* Hack -- Fix screen */
-					if (p_ptr->command_see)
-					{
-						/* Load screen */
-						screen_load();
-
-						/* Save screen */
-						screen_save();
-					}
-
-					p_ptr->command_wrk = (USE_FLOOR);
-
-					break;
 				}
 
-#endif /* ALLOW_EASY_FLOOR */
-
-				/* Check each legal object */
-				for (i = 0; i < floor_num; ++i)
+				/* Hack -- Fix screen */
+				if (p_ptr->command_see)
 				{
-					/* Special index */
-					k = 0 - floor_list[i];
+					/* Load screen */
+					screen_load();
 
-					/* Skip non-okay objects */
-					if (!get_item_okay(k)) continue;
-
-					/* Verify the item (if required) */
-					if (/*floor_query_flag && */!verify_item("Try", k)) continue;
-
-					/* Allow player to "refuse" certain actions */
-					if (!get_item_allow(k)) continue;
-
-					/* Accept that choice */
-					(*cp) = k;
-					item = TRUE;
-					done = TRUE;
-					break;
+					/* Save screen */
+					screen_save();
 				}
+
+				p_ptr->command_wrk = (USE_FLOOR);
 
 				break;
 			}
@@ -4292,8 +4248,6 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 					k = e1;
 				}
 
-#ifdef ALLOW_EASY_FLOOR
-
 				/* Choose "default" floor item */
 				else
 				{
@@ -4305,8 +4259,6 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 
 					k = 0 - floor_list[f1];
 				}
-
-#endif /* ALLOW_EASY_FLOOR */
 
 				/* Validate the item */
 				if (!get_item_okay(k))
@@ -4423,8 +4375,6 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 					}
 				}
 
-#ifdef ALLOW_EASY_FLOOR
-
 				/* Convert letter to floor index */
 				else
 				{
@@ -4439,8 +4389,6 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 					/* Special index */
 					k = 0 - floor_list[k];
 				}
-
-#endif /* ALLOW_EASY_FLOOR */
 
 				/* Validate the item */
 				if (!get_item_okay(k))

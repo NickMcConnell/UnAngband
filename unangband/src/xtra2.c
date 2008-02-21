@@ -5496,10 +5496,6 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 		/* Assume not floored */
 		floored = FALSE;
 
-#ifdef ALLOW_EASY_FLOOR
-
-		/* Scan all objects in the grid */
-		if (1/*easy_floor*/)
 		{
 			int floor_list[MAX_FLOOR_STACK];
 			int floor_num;
@@ -5533,7 +5529,7 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 						screen_save();
 
 						/* Display */
-						show_floor(floor_list, floor_num);
+						show_floor(floor_list, floor_num, FALSE);
 
 						/* Describe the pile */
 						prt(out_val, 0, 0);
@@ -5563,8 +5559,6 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 				s2 = "on ";
 			}
 		}
-
-#endif /* ALLOW_EASY_FLOOR */
 
 		/* Scan all objects in the grid */
 		for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)

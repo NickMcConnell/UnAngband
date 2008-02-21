@@ -440,7 +440,7 @@ extern sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr,
 extern void find_secret(int y, int x);
 extern void search(void);
 extern bool auto_pickup_ignore(const object_type *o_ptr);
-extern void py_pickup(int py, int px, int pickup);
+extern byte py_pickup(int py, int px, int pickup);
 extern void hit_trap(int y, int x);
 extern void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hit, int *to_dam, int *to_crit);
 extern bool auto_activate(const object_type *o_ptr);
@@ -466,7 +466,7 @@ extern void do_cmd_jump(void);
 extern void do_cmd_pathfind(int y, int x);
 extern void do_cmd_run(void);
 extern void do_cmd_hold(void);
-extern void do_cmd_stay(void);
+extern void do_cmd_pickup(void);
 extern void do_cmd_rest(void);
 extern int breakage_chance(object_type *o_ptr);
 extern void do_cmd_fire(void);
@@ -1151,12 +1151,8 @@ extern void repeat_clear(void);
 extern void repeat_check(void);
 #endif /* ALLOW_REPEAT */
 
-
-#ifdef ALLOW_EASY_FLOOR
 /* object1.c */
-extern void show_floor(const int *floor_list, int floor_num);
-#endif /* ALLOW_EASY_FLOOR */
-
+extern void show_floor(const int *floor_list, int floor_num, bool gold);
 
 #ifdef GJW_RANDART
 /* randart.c */

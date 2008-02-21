@@ -258,11 +258,6 @@
  */
 #define ALLOW_EASY_ALTER
 
-/*
- * OPTION: Make floor stacks easy.
- */
-#define ALLOW_EASY_FLOOR
-
 
 /*
  * OPTION: Delay the loading of the "f_text" array until it is actually

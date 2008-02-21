@@ -2138,7 +2138,7 @@ static void process_command(void)
 		/* Stay still */
 		case 'g':
 		{
-			do_cmd_stay();
+			do_cmd_pickup();
 			break;
 		}
 
@@ -2931,6 +2931,14 @@ static void process_player(void)
 				/* Rest the player */
 				set_rest(p_ptr->rest + PY_REST_RATE - p_ptr->tiring);
 			}
+		}
+
+		/* Picking up objects */
+		else if (p_ptr->notice & (PN_PICKUP))
+		{
+			/* Recursively call the pickup function, use energy */
+			p_ptr->energy_use = py_pickup(p_ptr->py, p_ptr->px, 0) * 10;
+			p_ptr->notice &= ~(PN_PICKUP);
 		}
 
 		/* Resting */

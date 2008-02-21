@@ -2836,6 +2836,7 @@
  */
 #define PN_COMBINE		0x00000001L	/* Combine the pack */
 #define PN_REORDER		0x00000002L	/* Reorder the pack */
+#define PN_PICKUP       0x00000008L	/* Pick stuff up */
 /* xxx (many) */
 
 

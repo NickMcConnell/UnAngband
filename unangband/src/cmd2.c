@@ -3165,9 +3165,8 @@ void do_cmd_pathfind(int y, int x)
 
 /*
  * Stay still.  Search.  Enter stores.
- * Pick up treasure if "pickup" is true.
  */
-static void do_cmd_hold_or_stay(int pickup)
+void do_cmd_hold(void)
 {
 	int py = p_ptr->py;
 	int px = p_ptr->px;
@@ -3188,7 +3187,7 @@ static void do_cmd_hold_or_stay(int pickup)
 		p_ptr->command_arg = 0;
 	}
 
-	/* Take time */
+	/* Take a turn */
 	p_ptr->energy_use = 100;
 
 	/* Catch breath */
@@ -3198,14 +3197,20 @@ static void do_cmd_hold_or_stay(int pickup)
 		set_rest(p_ptr->rest + PY_REST_RATE - p_ptr->tiring);
 	}
 
-	/* Spontaneous Searching - doubly effective */
+	/* Spontaneous Searching */
 	if ((p_ptr->skill_srh >= 25) || (0 == rand_int(25 - p_ptr->skill_srh)))
 	{
 		search();
 	}
 
-	/* Handle "objects" */
-	py_pickup(py, px, pickup);
+	/* Continuous Searching */
+	if (p_ptr->searching)
+	{
+		search();
+	}
+
+	/* Handle objects now.  XXX XXX XXX */
+	p_ptr->energy_use += py_pickup(py, px, 0) * 10;
 
 	/* Hack -- enter a store if we are on one */
 	if (f_info[cave_feat[py][px]].flags1 & (FF1_ENTER))
@@ -3234,23 +3239,22 @@ static void do_cmd_hold_or_stay(int pickup)
 	}
 }
 
-/*
- * Hold still (usually pickup)
- */
-void do_cmd_hold(void)
-{
-	/* Hold still (usually pickup) */
-	do_cmd_hold_or_stay(pickup_always);
-}
-
 
 /*
- * Stay still (usually do not pickup)
+ * Pick up objects on the floor beneath you.  -LM-
  */
-void do_cmd_stay(void)
+void do_cmd_pickup(void)
 {
-	/* Stay still (usually do not pickup) */
-	do_cmd_hold_or_stay(!pickup_always);
+	int energy_cost;
+
+	/* Pick up floor objects, forcing a menu for multiple objects. */
+	energy_cost = py_pickup(p_ptr->py, p_ptr->px, 1) * 10;
+
+	/* Maximum time expenditure is a full turn. */
+	if (energy_cost > 100) energy_cost = 100;
+
+	/* Charge this amount of energy. */
+	p_ptr->energy_use = energy_cost;
 }
 
 
