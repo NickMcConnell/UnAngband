@@ -3137,7 +3137,7 @@ bool stuck_player(int *dir)
  * Note that this routine handles monsters in the destination grid,
  * and also handles attempting to move into walls/doors/rubble/etc.
  */
-void move_player(int dir, int jumping)
+void move_player(int dir)
 {
 	int py = p_ptr->py;
 	int px = p_ptr->px;
@@ -3190,8 +3190,8 @@ void move_player(int dir, int jumping)
 
 #ifdef ALLOW_EASY_ALTER
 
-	/* Optionally alter known traps/doors on (non-jumping) movement */
-	else if (easy_alter && !jumping &&
+	/* Optionally alter known traps/doors on movement */
+	else if (easy_alter &&
 	 (play_info[y][x] & (PLAY_MARK)) &&
 		 ( (f_ptr->flags1 & (FF1_DISARM)) ||
 		 ( !(f_ptr->flags1 & (FF1_MOVE)) &&
@@ -3457,7 +3457,7 @@ void move_player(int dir, int jumping)
 			p_ptr->energy_use = 0;
 		}
 
-		/* All other grids (including traps) [is jumping handled OK?] */
+		/* All other grids (including traps) */
 		else
 		{
 			/* Handle objects (later) */
@@ -4254,7 +4254,7 @@ void run_step(int dir)
 	p_ptr->energy_use = 100;
 
 	/* Move the player */
-	move_player(p_ptr->run_cur_dir, FALSE);
+	move_player(p_ptr->run_cur_dir);
 
 	return;
 }

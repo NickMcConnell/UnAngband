@@ -2966,17 +2966,15 @@ static bool do_cmd_walk_test(int y, int x)
 	return (TRUE);
 }
 
-
 /*
- * Helper function for the "walk" and "jump" commands.
+ * Walk into a grid. For mouse movement when confused.
  */
-static void do_cmd_walk_or_jump(int jumping)
+void do_cmd_walk()
 {
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
 	int y, x, dir;
-
 
 	/* Get a direction (or abort) */
 	if (!get_rep_dir(&dir)) return;
@@ -2984,7 +2982,6 @@ static void do_cmd_walk_or_jump(int jumping)
 	/* Get location */
 	y = py + ddy[dir];
 	x = px + ddx[dir];
-
 
 	/* Verify legality */
 	if (!do_cmd_walk_test(y, x)) return;
@@ -3016,10 +3013,8 @@ static void do_cmd_walk_or_jump(int jumping)
 
 	}
 
-
 	/* Verify legality */
 	if (!do_cmd_walk_test(y, x)) return;
-
 
 	/* Allow repeated command */
 	if (p_ptr->command_arg)
@@ -3035,27 +3030,7 @@ static void do_cmd_walk_or_jump(int jumping)
 	}
 
 	/* Move the player */
-	move_player(dir, jumping);
-}
-
-
-/*
- * Walk into a grid.
- */
-void do_cmd_walk(void)
-{
-	/* Move (normal) */
-	do_cmd_walk_or_jump(FALSE);
-}
-
-
-/*
- * Jump into a grid.
- */
-void do_cmd_jump(void)
-{
-	/* Move (jump) */
-	do_cmd_walk_or_jump(TRUE);
+	move_player(dir);
 }
 
 

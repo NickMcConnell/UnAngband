@@ -446,7 +446,7 @@ extern void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hi
 extern bool auto_activate(const object_type *o_ptr);
 extern void py_attack(int dir);
 extern bool stuck_player(int *dir);
-extern void move_player(int dir, int jumping);
+extern void move_player(int dir);
 extern void run_step(int dir);
 
 /* cmd2.c */
@@ -462,7 +462,6 @@ extern void do_cmd_bash(void);
 extern void do_cmd_alter(void);
 extern void do_cmd_set_trap_or_spike(void);
 extern void do_cmd_walk(void);
-extern void do_cmd_jump(void);
 extern void do_cmd_pathfind(int y, int x);
 extern void do_cmd_run(void);
 extern void do_cmd_hold(void);

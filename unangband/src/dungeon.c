@@ -2104,22 +2104,7 @@ static void process_command(void)
 			break;
 		}
 
-		/* Walk */
-		case ';':
-		{
-			do_cmd_walk();
-			break;
-		}
-
-		/* Jump */
-		case '-':
-		{
-			do_cmd_jump();
-			break;
-		}
-
-
-		/*** Running, Resting, Searching, Staying */
+		/*** Running, Resting, Searching, Pickup */
 
 		/* Begin Running -- Arg is Max Distance */
 		case '.':
@@ -2135,7 +2120,7 @@ static void process_command(void)
 			break;
 		}
 
-		/* Stay still */
+		/* Pickup */
 		case 'g':
 		{
 			do_cmd_pickup();
@@ -2429,27 +2414,6 @@ static void process_command(void)
 		case '"':
 		{
 			do_cmd_pref();
-			break;
-		}
-
-		/* Interact with macros */
-		case '@':
-		{
-			do_cmd_macros();
-			break;
-		}
-
-		/* Interact with visuals */
-		case '%':
-		{
-			do_cmd_visuals();
-			break;
-		}
-
-		/* Interact with colors */
-		case '&':
-		{
-			do_cmd_colors();
 			break;
 		}
 
