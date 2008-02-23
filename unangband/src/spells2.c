@@ -733,7 +733,7 @@ void self_knowledge_aux(bool spoil, bool random)
 		if (p_ptr->stat_dec_tim[n]) vp[vn++] = desc_stat_dec[n];
 	}
 
-	if ((p_ptr->oppose_acid) || (p_ptr->oppose_elec) || (p_ptr->oppose_fire) || (p_ptr->oppose_cold)) vp[vn++]= "resistant to";
+	if ((p_ptr->oppose_acid) || (p_ptr->oppose_elec) || (p_ptr->oppose_fire) || (p_ptr->oppose_cold)) vp[vn++]= "resistant to ";
 
 	/* Introduce */
 	if (vn) text_out("You are temporarily ");

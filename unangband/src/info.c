@@ -31,7 +31,7 @@
 #define SPELL_TARGET_SELF     2 /* Always targets self */
 #define SPELL_TARGET_AIMED    3 /* Always targets aimed target */
 #define SPELL_TARGET_COATED   4 /* Target applied from a weapon attack */
-#define SPELL_TARGET_EXPLODE   5 /* Always targets radius 1 ball attack */
+#define SPELL_TARGET_EXPLODE  5 /* Always targets radius 1 ball attack */
 
 
 /*
@@ -1350,7 +1350,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_SPIT: p = "spits"; t = "one target"; break;
 			case RBM_AURA: p = "surrounds you with an aura";  t = "your enemies"; rad = 2; break;
 			case RBM_AURA_MINOR: p = "surrounds you with an aura";  t = "your enemies"; rad = 1; break;
-			case RBM_SELF: t = "you";break;
+			case RBM_SELF: t = "you"; break;
 			case RBM_EXPLODE: t = "you and all enemies adjacent to you"; break;
 			case RBM_ADJACENT: t = "all enemies adjacent to you"; break;
 			case RBM_HANDS: t = "a beam"; rng = 3; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
@@ -1377,7 +1377,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_CROSS: p = "surrounds you with a cross"; t = "your enemies"; break;
 			case RBM_STRIKE: p = "strikes"; t = "your enemy"; if ((level > 5) && (d2)) d1+= (level-1)/5; break;
 			case RBM_STAR: p = "surrounds you with a star"; t = "your enemies"; break;
-			case RBM_SPHERE: p = "creates a sphere";  t = "your enemies";  rad = (level/10)+2;break;
+			case RBM_SPHERE: p = "creates a sphere";  t = "your enemies";  rad = (level/10)+2; break;
 			case RBM_ARROW: p = "creates an arrow"; t="one target"; break;
 			case RBM_XBOLT: p = "creates a crossbow bolt"; t="one target"; break;
 			case RBM_SPIKE: p = "creates a spike"; t="one target"; break;
@@ -1389,7 +1389,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_ARC_50: p = "creates an arc"; arc = 50; break;
 			case RBM_ARC_60: p = "creates an arc"; arc = 60; break;
 			case RBM_FLASK: p = "creates a ball"; t = "your enemies"; rad = 1; break;
-			case RBM_BOLT_MINOR: p = "creates a bolt"; t = "your enemies"; rng = 4; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
+			case RBM_BOLT_MINOR: p = "creates a bolt"; t = "your enemies"; rng = 4; if ((level > 5) && (d2)) d1+= (level-1)/5; break;
 			case RBM_BALL_MINOR: p = "throws a ball"; t = "your enemies"; rad = 1; break;
 			case RBM_8WAY: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 2; break;
 			case RBM_8WAY_II: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 3; break;
@@ -1543,6 +1543,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_RAGE:		q = "enrage"; break;
 			case GF_MENTAL:		q = "blast"; u = "with mental energy"; break;
 			case GF_TANGLE:		q = "entangle"; u = "with nearby plants or waterweeds"; break;
+			case GF_EXPLODE: q="explode"; t = 0; break;       
 
 			/* Hack -- handle features */
 			case GF_FEATURE:

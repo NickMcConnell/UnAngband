@@ -1080,69 +1080,6 @@ bool inven_stack_okay(const object_type *o_ptr)
 	return (FALSE);
 }
 
-/*
- * Determine if the object can be picked up and has "=g" in its inscription 
- * or options determine it should be picked up.
- *
- * If "=g" is followed by a number, pick up if the player has 
- * less than this number of similar objects in their inventory.
- */
-static bool auto_pickup_okay(const object_type *o_ptr)
-{
-	cptr s;
-
-	/* It can't be carried */
-	if (!inven_carry_okay(o_ptr)) return FALSE;
-
-	if (OPT(pickup_inven) && inven_stack_okay(o_ptr)) return TRUE;
-	if (OPT(pickup_always)) return TRUE;
-
-	/* No inscription */
-	if (!o_ptr->note) return FALSE;
-
-	/* Find a '=' */
-	s = strchr(quark_str(o_ptr->note), '=');
-
-	/* Process inscription */
-	while (s)
-	{
-		/* Auto-pickup on "=g" */
-		if (s[1] == 'g')
-		{
-			if ((s[2] >= '0') && (s[2] <= '9'))
-			{
-				int i, n;
-
-				n = atoi(s+2);
-
-				if (o_ptr->number > n) return FALSE;
-
-				for (i = 0; i < INVEN_WIELD; i++)
-				{
-					if (object_similar(o_ptr, &inventory[i]))
-					{
-						/* If too many, don't pick up */
-						if (inventory[i].number > n) return FALSE;
-					}
-				}
-
-				/* Pick up */
-				return TRUE;
-			}
-
-			/* No number specified */
-			else return TRUE;
-
-		}
-
-		/* Find another '=' */
-		s = strchr(s + 1, '=');
-	}
-
-	/* Don't auto pickup */
-	return FALSE;
-}
-
 
 /*
  * Determine if the object has a "=d" in its inscription.
@@ -1211,6 +1148,73 @@ static bool auto_pickup_never(const object_type *o_ptr)
 
 	/* Can pickup */
 	return (FALSE);
+}
+
+
+/*
+ * Determine if the object can be picked up and has "=g" in its inscription 
+ * or options determine it should be picked up.
+ *
+ * If "=g" is followed by a number, pick up if the player has 
+ * less than this number of similar objects in their inventory.
+ */
+static bool auto_pickup_okay(const object_type *o_ptr)
+{
+	cptr s;
+
+	/* It can't be carried */
+	if (!inven_carry_okay(o_ptr)) return FALSE;
+
+	/* It can't be picked up */
+	if (auto_pickup_never(o_ptr)) return FALSE;
+
+	if (OPT(pickup_inven) && inven_stack_okay(o_ptr)) return TRUE;
+	if (OPT(pickup_always)) return TRUE;
+
+	/* No inscription */
+	if (!o_ptr->note) return FALSE;
+
+	/* Find a '=' */
+	s = strchr(quark_str(o_ptr->note), '=');
+
+	/* Process inscription */
+	while (s)
+	{
+		/* Auto-pickup on "=g" */
+		if (s[1] == 'g')
+		{
+			if ((s[2] >= '0') && (s[2] <= '9'))
+			{
+				int i, n;
+
+				n = atoi(s+2);
+
+				if (o_ptr->number > n) return FALSE;
+
+				for (i = 0; i < INVEN_WIELD; i++)
+				{
+					if (object_similar(o_ptr, &inventory[i]))
+					{
+						/* If too many, don't pick up */
+						if (inventory[i].number > n) return FALSE;
+					}
+				}
+
+				/* Pick up */
+				return TRUE;
+			}
+
+			/* No number specified */
+			else return TRUE;
+
+		}
+
+		/* Find another '=' */
+		s = strchr(s + 1, '=');
+	}
+
+	/* Don't auto pickup */
+	return FALSE;
 }
 
 
@@ -3130,7 +3134,7 @@ bool stuck_player(int *dir)
 
 
 /*
- * Move player in the given direction, with the given "pickup" flag.
+ * Move player in the given direction.
  * 
  * This routine should only be called when energy has been expended.
  *
@@ -3915,7 +3919,9 @@ static bool run_test(void)
 			next_o_idx = o_ptr->next_o_idx;
 
 			/* Visible object */
-			if ((o_ptr->ident & (IDENT_MARKED)) && !(auto_pickup_never(o_ptr))) return (TRUE);
+			if ((o_ptr->ident & (IDENT_MARKED)) 
+				 && !(auto_pickup_never(o_ptr))) 
+				return (TRUE);
 		}
 
 
