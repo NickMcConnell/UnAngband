@@ -2104,6 +2104,13 @@ static void process_command(void)
 			break;
 		}
 
+		/* Walk */
+		case ';':
+		{
+			do_cmd_walk();
+			break;
+		}
+
 		/*** Running, Resting, Searching, Pickup */
 
 		/* Begin Running -- Arg is Max Distance */

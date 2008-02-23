@@ -44,7 +44,7 @@
  _  Enter store                         ^P  Show previous messages
  +  Alter grid                          ^Q  Display current quest
  =  Set options                         ^R  Redraw the screen
- ;  (unused)                            ^S  Save and don't quit
+ ;  Walk                                ^S  Save and don't quit
  :  Take notes                          ^T  Display time of day
  '  (unused)                            ^U  (unused)
  "  Enter a user pref command           ^V  Repeat last command
