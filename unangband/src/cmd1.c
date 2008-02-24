@@ -1167,6 +1167,7 @@ static bool auto_pickup_okay(const object_type *o_ptr)
 
 	/* It can't be picked up */
 	if (auto_pickup_never(o_ptr)) return FALSE;
+	if (auto_pickup_ignore(o_ptr)) return FALSE;
 
 	if (OPT(pickup_inven) && inven_stack_okay(o_ptr)) return TRUE;
 	if (OPT(pickup_always)) return TRUE;
@@ -1586,7 +1587,9 @@ byte py_pickup(int py, int px, int pickup)
 		}
 
 		/* Hack -- disturb */
-		if (!auto_pickup_never(o_ptr)) disturb(0, 0);
+		if (!auto_pickup_never(o_ptr) 
+			 && !auto_pickup_ignore(o_ptr))
+			disturb(0, 0);
 
 		/* Test for auto-destroy */
 		if (auto_destroy_okay(o_ptr))
@@ -1668,7 +1671,7 @@ byte py_pickup(int py, int px, int pickup)
 			else       object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 			/* Message */
-			message_flush();
+			/* message_flush(); this overwrites msgs when running with easy_more */
 			msg_format("You %s %s.", p, o_name);
 		}
 		else
@@ -3907,7 +3910,7 @@ static bool run_test(void)
 			if (m_ptr->ml) return (TRUE);
 		}
 
-		/* Visible objects abort running */
+		/* Visible pickable objects abort running */
 		for (this_o_idx = cave_o_idx[row][col]; this_o_idx; this_o_idx = next_o_idx)
 		{
 			object_type *o_ptr;
@@ -3919,11 +3922,11 @@ static bool run_test(void)
 			next_o_idx = o_ptr->next_o_idx;
 
 			/* Visible object */
-			if ((o_ptr->ident & (IDENT_MARKED)) 
-				 && !(auto_pickup_never(o_ptr))) 
+			if (o_ptr->ident & (IDENT_MARKED)
+				 && !auto_pickup_never(o_ptr)
+				 && !auto_pickup_ignore(o_ptr))
 				return (TRUE);
 		}
-
 
 		/* Assume unknown */
 		inv = TRUE;
