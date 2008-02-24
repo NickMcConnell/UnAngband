@@ -5243,6 +5243,8 @@ static void target_set_interactive_prepare(int mode)
  * and terrain features in the same grid, though the latter never happens.
  *
  * This function must handle blindness/hallucination.
+ *
+ * TODO: rewrite this from Vanilla, especially the floor list
  */
 key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr info)
 {

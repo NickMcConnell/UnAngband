@@ -3187,7 +3187,7 @@ void show_floor(const int *floor_list, int floor_num, bool gold)
 	}
 
 	/* Make a "shadow" below the list (only if needed) */
-	if (j && (j < 23)) prt("", j + 1, col ? col - 2 : col);
+	if (j && (j < Term->hgt)) prt("", j + 1, col ? col - 2 : col);
 }
 
 
@@ -3753,13 +3753,14 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 	}
 
 	/* Scan oneself */
-	if ((use_self) && (item_tester_okay(&inventory[INVEN_SELF]))) allow_self = TRUE;
+	if ((use_self) && (item_tester_okay(&inventory[INVEN_SELF]))) 
+		allow_self = TRUE;
 
 	/* Require at least one legal choice */
 	if (!allow_inven && !allow_equip && !allow_floor && !allow_feats && !allow_self)
 	{
 		/* Cancel p_ptr->command_see */
-		p_ptr->command_see = FALSE;
+		if (!OPT(show_lists)) p_ptr->command_see = FALSE;
 
 		/* Oops */
 		oops = TRUE;
@@ -3800,9 +3801,16 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 			p_ptr->command_wrk = (USE_EQUIP);
 		}
 
-		else
+		/* Use floor if allowed */
+		else if (use_floor)
 		{
 			p_ptr->command_wrk = (USE_FLOOR);
+		}
+
+		/* Hack -- Use (empty) inventory */
+		else
+		{
+			p_ptr->command_wrk = (USE_INVEN);
 		}
 	}
 

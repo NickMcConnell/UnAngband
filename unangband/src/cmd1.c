@@ -1035,8 +1035,9 @@ static void py_pickup_gold(void)
 		value = o_ptr->number * o_ptr->charges - o_ptr->stackc;
 
 		/* Message */
-		if (o_ptr->tval == TV_GOLD) msg_format("You have found %ld gold pieces worth of %s.",
-															value, o_name);
+		if (o_ptr->tval == TV_GOLD) 
+			msg_format("You have found %ld gold pieces worth of %s.",
+						  value, o_name);
 		else msg_format("You have found %s worth %ld gold pieces.", 
 							 o_name, value);
 
@@ -1449,7 +1450,7 @@ static void py_pickup_aux(int o_idx, bool msg)
  *
  * Called with pickup:
  * 0 to act according to the player's settings
- * 1 to quickly pickup single objects and present a menu for more
+ * 1 to quickly pickup single objects or present a menu
  * 2 to force a menu for any number of objects
  *
  * Scan the list of objects in that floor grid. Pick up gold automatically.
@@ -1636,11 +1637,8 @@ byte py_pickup(int py, int px, int pickup)
 	if (!floor_num)
 		return objs_picked_up;
 
-
 	/* Get hold of the last floor index */
 	floor_o_idx = floor_list[floor_num - 1];
-
-
 
 	/* Mention the objects if player is not picking them up. */
 	if (pickup == 0 || !can_pickup)
@@ -1709,7 +1707,6 @@ byte py_pickup(int py, int px, int pickup)
 		return (objs_picked_up);
 	}
 
-
 	/* We can pick up objects.  Menus are not requested (yet). */
 	if (pickup == 1)
 	{
@@ -1722,7 +1719,6 @@ byte py_pickup(int py, int px, int pickup)
 		else
 			this_o_idx = floor_o_idx;
 	}
-
 
 	/* Display a list if requested. */
 	if (pickup == 2)
