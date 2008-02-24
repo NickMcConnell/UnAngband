@@ -253,11 +253,6 @@
  */
 #define ALLOW_EASY_OPEN
 
-/*
- * OPTION: Allow open/disarm doors/traps on motion.
- */
-#define ALLOW_EASY_ALTER
-
 
 /*
  * OPTION: Delay the loading of the "f_text" array until it is actually

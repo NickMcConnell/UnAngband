@@ -48,7 +48,7 @@
  :  Take notes                          ^T  Dig a Tunnel
  '  Display time of day                 ^U  (alter - north east)
  "  Enter a user pref command           ^V  Repeat last command
- ,  Run                                 ^W  (special - wizard mode)
+ ,  Run (over floor or monster)         ^W  (special - wizard mode)
  <  Go up staircase or travel           ^X  Save and quit
  .  Stay still                          ^Y  (alter - north west)
  >  Go down staircase                   ^Z  (special - borg command)

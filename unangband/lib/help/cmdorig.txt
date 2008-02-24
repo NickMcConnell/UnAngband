@@ -50,7 +50,7 @@
  "  Enter a user pref command           ^V  Repeat last command
  ,  Stay still                          ^W  (special - wizard mode)
  <  Go up staircase or travel           ^X  Save and quit
- .  Run                                 ^Y  (unused)
+ .  Run (over floor or monster)         ^Y  (unused)
  >  Go down staircase                   ^Z  (special - borg command)
  \  (special - bypass keymap)            |  Light or douse a light source
  `  (special - escape)                   ~  Check knowledge

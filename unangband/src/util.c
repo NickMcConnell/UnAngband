@@ -4765,8 +4765,6 @@ bool is_valid_pf(int y, int x)
 	/* Get mimiced feat */
 	feat = f_info[cave_feat[y][x]].mimic;
 
-#ifdef ALLOW_EASY_ALTER
-
 	/* Optionally alter known traps/doors on (non-jumping) movement */
 	if ((easy_alter)
 		 && ( (f_info[feat].flags1 & (FF1_DISARM)) ||
@@ -4776,8 +4774,6 @@ bool is_valid_pf(int y, int x)
 	{
 		return (TRUE);
 	}
-
-#endif /* ALLOW_EASY_ALTER */
 
 	/* Require moveable space*/
 	if (!(f_info[feat].flags1 & (FF1_MOVE)) && !(f_info[feat].flags3 & (FF3_EASY_CLIMB))) return (FALSE);

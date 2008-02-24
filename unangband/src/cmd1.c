@@ -1220,7 +1220,7 @@ static bool auto_pickup_okay(const object_type *o_ptr)
 
 
 /*
- * Determine if the object can be destroyed, and has "=k" in its inscription.
+ * Determine if the object has "=k" in its inscription.
  * If "=k" is followed by a number, destroy if the player has more than this number of similar objects in their inventory.
  */
 static bool auto_destroy_okay(const object_type *o_ptr)
@@ -1452,21 +1452,14 @@ static void py_pickup_aux(int o_idx, bool msg)
  * 1 to quickly pickup single objects and present a menu for more
  * 2 to force a menu for any number of objects
  *
- * Scan the list of objects in that floor grid.   Pick up gold automatically.
- * Pick up objects automatically until pile or backpack space is full if
- * auto-pickup option is on, carry_query_floor option is not, and menus are
- * not forced (which the "get" command does). Otherwise, store objects on
+ * Scan the list of objects in that floor grid. Pick up gold automatically.
+ * Pick up objects automatically until backpack space is full if
+ * auto-pickup option is on. Otherwise, store objects on
  * floor in an array, and tally both how many there are and can be picked up.
  *
  * If not picking up anything, indicate objects on the floor.  Show more
  * details if the "pickup_detail" option is set.  Do the same thing if we
  * don't have room for anything.
- *
- * If we are picking up objects automatically, and have room for at least
- * one, allow the "pickup_detail" option to display information about objects
- *    [the previous line probably no longer true, please correct]
- * and prompt the player.  Otherwise, automatically pick up a single object
- * or use a menu for more than one.
  *
  * Pick up multiple objects using Tim Baker's menu system.   Recursively
  * call this function (forcing menus for any number of objects) until
@@ -1476,9 +1469,6 @@ static void py_pickup_aux(int o_idx, bool msg)
  * This tally is incremented even for automatic pickup, so we are careful
  * (in "dungeon.c" and elsewhere) to handle pickup as either a separate
  * automated move or a no-cost part of the stay still or 'g'et command.
- *
- * Note the lack of chance for the character to be disturbed by unmarked
- * objects.  They are truly "unknown".
  */
 byte py_pickup(int py, int px, int pickup)
 {
@@ -1671,7 +1661,6 @@ byte py_pickup(int py, int px, int pickup)
 			else       object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 			/* Message */
-			/* message_flush(); this overwrites msgs when running with easy_more */
 			msg_format("You %s %s.", p, o_name);
 		}
 		else
@@ -3183,8 +3172,8 @@ void move_player(int dir)
 
 	/* Hack -- attack monsters --- except hidden ones or allies */
 	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE | MFLAG_ALLY)) &&
-			/* Allow the player to run over most monsters -- except those that can't move */
-			(!(p_ptr->running) || (r_info[m_list[cave_m_idx[y][x]].r_idx].flags1 & (RF1_NEVER_MOVE))))
+		 /* Allow the player to run over most monsters -- except those that can't move */
+		 (!(p_ptr->running) || (r_info[m_list[cave_m_idx[y][x]].r_idx].flags1 & (RF1_NEVER_MOVE))))
 	{
 		/* Attack */
 		py_attack(dir);
@@ -3194,8 +3183,6 @@ void move_player(int dir)
 	{
 		/* Do nothing */
 	}
-
-#ifdef ALLOW_EASY_ALTER
 
 	/* Optionally alter known traps/doors on movement */
 	else if (easy_alter &&
@@ -3218,8 +3205,6 @@ void move_player(int dir)
 		/* Alter */
 		do_cmd_alter();
 	}
-
-#endif /* ALLOW_EASY_ALTER */
 
 	/* Petrified */
 	else if (p_ptr->petrify)
@@ -3277,7 +3262,7 @@ void move_player(int dir)
 		/* Mention known obstacles */
 		else
 		{
-			/* Get the mimiced feature */
+			/* Get the mimicked feature */
 			mimic = f_ptr->mimic;
 
 			/* Get the feature name */
@@ -3345,7 +3330,7 @@ void move_player(int dir)
 		/* Sound XXX XXX XXX */
 		/* sound(MSG_WALK); */
 
-		/* Players can push aside allies */
+		/* Players can push aside allies or run over moving monsters */
 		/* This would normally be the only situation where the target grid still
 		 * contains a monster */
 		if (cave_m_idx[y][x] > 0)
@@ -3507,7 +3492,6 @@ void move_player(int dir)
 				msg_format("%s",text);
 			}
 
-
 			cave_alter_feat(y,x, FS_KILL_MOVE);
 		}
 
@@ -3517,7 +3501,6 @@ void move_player(int dir)
 		(f_ptr->flags2 & (FF2_DEEP)) ||
 		(f_ptr->flags2 & (FF2_FILLED)) ))
 		{
-
 			/* Get the mimiced feature */
 			mimic = f_ptr->mimic;
 

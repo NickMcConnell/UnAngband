@@ -2944,14 +2944,10 @@ static bool do_cmd_walk_test(int y, int x)
 	&& (!(f_info[feat].flags3 & (FF3_EASY_CLIMB))
 	|| !(play_info[y][x] & (PLAY_MARK))))
 	{
-#ifdef ALLOW_EASY_ALTER
-
 		if (easy_alter)
 		{
 			if (f_info[feat].flags1 & (FF1_OPEN)) return(TRUE);
 		}
-
-#endif /* ALLOW_EASY_ALTER */
 
 		/* Message */
 		msg_format("There is %s %s in the way.",
