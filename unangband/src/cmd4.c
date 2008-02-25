@@ -4892,7 +4892,7 @@ void do_cmd_feeling(void)
 	if (feeling > 10) feeling = 10;
 
 	/* No useful feeling in town */
-	if (is_typical_town(p_ptr->dungeon))
+	if (is_typical_town(p_ptr->dungeon, p_ptr->depth))
 	{
 		msg_print("Looks like a typical town.");
 		return;

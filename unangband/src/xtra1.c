@@ -424,7 +424,7 @@ static void prt_depth(void)
 
 	char depths[8];
 
-	if (is_typical_town(p_ptr->dungeon))
+	if (is_typical_town(p_ptr->dungeon, p_ptr->depth))
 	{
 		my_strcpy(depths, "Town", sizeof(depths));
 	}

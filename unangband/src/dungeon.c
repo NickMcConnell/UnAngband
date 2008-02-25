@@ -1565,7 +1565,7 @@ static void process_world(void)
 
 	/* Show tips */
 	if  (!(p_ptr->command_rep) && ((p_ptr->searching && !(turn % 1000)) ||
-			(is_typical_town(p_ptr->dungeon) && !(turn % 100))))
+			(is_typical_town(p_ptr->dungeon, p_ptr->depth) && !(turn % 100))))
 	{
 		/* Show a tip */
 		show_tip();

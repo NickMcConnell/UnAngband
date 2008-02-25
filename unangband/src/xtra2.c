@@ -4034,7 +4034,7 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 	if (!room)
 	{
 		if (p_ptr->depth == min_depth(p_ptr->dungeon) 
-			 || is_typical_town(p_ptr->dungeon))
+			 || is_typical_town(p_ptr->dungeon, p_ptr->depth))
 		{
 			current_long_level_name(name);
 
@@ -4505,7 +4505,7 @@ void describe_room(void)
 		/* Room has been heard */
 		if (room_descriptions) room_info[room].flags |= (ROOM_HEARD);
 	}
-	else if (is_typical_town(p_ptr->dungeon)
+	else if (is_typical_town(p_ptr->dungeon, p_ptr->depth)
 				|| p_ptr->depth == min_depth(p_ptr->dungeon))
 	{
 		msg_format("You have entered %s.",name);
@@ -7070,12 +7070,14 @@ int max_depth(int dungeon)
 	return (zone->level);
 }
 
-bool is_typical_town(int dungeon)
+bool is_typical_town(int dungeon, int depth)
 {
-	town_type *t_ptr=&t_info[dungeon];
-	dungeon_zone *zone = &t_ptr->zone[0];
+	dungeon_zone *zone;
 
-	return (!zone->fill && zone->level <= 10 && t_ptr->store[3]);
+	/* Get the zone */
+	get_zone(&zone, dungeon, depth);
+
+	return (!zone->fill && zone->level <= 10 && t_info[dungeon].store[3]);
 }
 
 int town_depth(int dungeon)
