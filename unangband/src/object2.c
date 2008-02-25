@@ -2970,7 +2970,6 @@ static void charge_item(object_type *o_ptr)
  *
  * Hack -- note special base damage dice boosting
  * Hack -- note special processing for weapon/digger
- * Hack -- note special rating boost for dragon scale mail
  */
 static void a_m_aux_1(object_type *o_ptr, int level, int power)
 {
@@ -3158,9 +3157,6 @@ static void a_m_aux_2(object_type *o_ptr, int level, int power)
 	{
 		case TV_DRAG_ARMOR:
 		{
-			/* Rating boost */
-			rating += 30;
-
 			/* Mention the item */
 			if (cheat_peek) object_mention(o_ptr);
 
@@ -3174,8 +3170,6 @@ static void a_m_aux_2(object_type *o_ptr, int level, int power)
 /*
  * Apply magic to an item known to be a "ring" or "amulet"
  *
- * Hack -- note special rating boost for ring of speed
- * Hack -- note special rating boost for amulet of the magi
  * Hack -- note special "pval boost" code for ring of speed
  * Hack -- note that some items must be cursed (or blessed)
  */
@@ -3229,9 +3223,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 
 						break;
 					}
-
-					/* Rating boost */
-					rating += 25;
 
 					/* Mention the item */
 					if (cheat_peek) object_mention(o_ptr);
@@ -3423,9 +3414,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					o_ptr->pval = 1 + m_bonus(3, level);
 					o_ptr->to_a = randint(5) + m_bonus(5, level);
 
-					/* Boost the rating */
-					rating += 25;
-
 					/* Mention the item */
 					if (cheat_peek) object_mention(o_ptr);
 
@@ -3436,9 +3424,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_AMULET_DEVOTION:
 				{
 					o_ptr->pval = 1 + m_bonus(3, level);
-
-					/* Boost the rating */
-					rating += 25;
 
 					/* Mention the item */
 					if (cheat_peek) object_mention(o_ptr);
@@ -3452,9 +3437,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					o_ptr->to_h = 1 + m_bonus(4, level);
 					o_ptr->to_d = 1 + m_bonus(4, level);
 					o_ptr->pval = 1 + m_bonus(1, level);
-
-					/* Boost the rating */
-					rating += 25;
 
 					/* Mention the item */
 					if (cheat_peek) object_mention(o_ptr);
@@ -3475,9 +3457,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 
 						break;
 					}
-
-					/* Boost the rating */
-					rating += 25;
 
 					/* Mention the item */
 					if (cheat_peek) object_mention(o_ptr);
@@ -3508,9 +3487,6 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 
 						break;
 					}
-
-					/* Boost the rating */
-					rating += 25;
 
 					/* Mention the item */
 					if (cheat_peek) object_mention(o_ptr);
@@ -4242,12 +4218,6 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		/* Hack -- extract the "cursed" flag */
 		if (a_ptr->flags3 & (TR3_LIGHT_CURSE)) o_ptr->ident |= (IDENT_CURSED);
 
-		/* Mega-Hack -- increase the rating */
-		rating += 10;
-
-		/* Mega-Hack -- increase the rating again */
-		if (a_ptr->cost > 50000L) rating += 10;
-
 		/* Set the good item flag */
 		good_item_flag = TRUE;
 
@@ -4464,9 +4434,6 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		{
 			boost_item(o_ptr, lev, power);
 		}
-
-		/* Hack -- apply rating bonus */
-		rating += e_ptr->rating;
 
 		/* Cheat -- describe the item */
 		if (cheat_peek) object_mention(o_ptr);
@@ -5431,9 +5398,6 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 	if (!cursed_p(j_ptr) && !broken_p(j_ptr) &&
 	    (k_info[j_ptr->k_idx].level > p_ptr->depth))
 	{
-		/* Rating increase */
-		rating += (k_info[j_ptr->k_idx].level - p_ptr->depth);
-
 		/* Cheat -- peek at items */
 		if (cheat_peek) object_mention(j_ptr);
 	}

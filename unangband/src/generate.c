@@ -11730,12 +11730,12 @@ void generate_cave(void)
 #endif
 		/* Extract the feeling */
 		if (rating > 100) feeling = 2;
-		else if (rating > 80) feeling = 3;
-		else if (rating > 60) feeling = 4;
-		else if (rating > 40) feeling = 5;
-		else if (rating > 30) feeling = 6;
-		else if (rating > 20) feeling = 7;
-		else if (rating > 10) feeling = 8;
+		else if (rating > 70) feeling = 3;
+		else if (rating > 40) feeling = 4;
+		else if (rating > 30) feeling = 5;
+		else if (rating > 20) feeling = 6;
+		else if (rating > 10) feeling = 7;
+		else if (rating > 5) feeling = 8;
 		else if (rating > 0) feeling = 9;
 		else feeling = 10;
 
