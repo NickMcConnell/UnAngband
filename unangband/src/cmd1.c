@@ -1484,7 +1484,8 @@ byte py_pickup(int py, int px, int pickup)
 	/* Objects picked up.  Used to determine time cost of command. */
 	byte objs_picked_up = 0;
 
-	int floor_num = 0, floor_list[MAX_FLOOR_STACK + 1], floor_o_idx = 0;
+	int floor_num = 0, feature_num = 0, 
+		floor_list[MAX_FLOOR_STACK + 1], floor_o_idx = 0;
 
 	int can_pickup = 0;
 	bool call_function_again = FALSE;
@@ -1537,7 +1538,8 @@ byte py_pickup(int py, int px, int pickup)
 			this_o_idx = scan_feat(py, px);
 			
 			/* And we have to be doubly paranoid */
-			if (this_o_idx == next_o_idx) next_o_idx = o_list[this_o_idx].next_o_idx;
+			if (this_o_idx == next_o_idx) 
+				next_o_idx = o_list[this_o_idx].next_o_idx;
 		}
 		else
 		{
@@ -1545,8 +1547,12 @@ byte py_pickup(int py, int px, int pickup)
 			o_ptr = &o_list[this_o_idx];
 			next_o_idx = o_ptr->next_o_idx;
 
-			/* Ignore 'store' items */
-			if (o_ptr->ident & (IDENT_STORE)) continue;		
+			/* Ignore, but count, 'store' items */
+			if (o_ptr->ident & (IDENT_STORE)) 
+			{
+				feature_num++;
+				continue;		
+			}
 
 			/* Ignore all hidden objects and non-objects */
 			if (!o_ptr->k_idx) continue;
@@ -1634,8 +1640,12 @@ byte py_pickup(int py, int px, int pickup)
 	}
 
 	/* There are no objects left */
-	if (!floor_num)
+	if ((pickup != 1 && floor_num == 0) 
+		 || floor_num + feature_num == 0)
 		return objs_picked_up;
+
+	if (floor_num > 0)
+	{
 
 	/* Get hold of the last floor index */
 	floor_o_idx = floor_list[floor_num - 1];
@@ -1670,7 +1680,7 @@ byte py_pickup(int py, int px, int pickup)
 				else if (!can_pickup) p = "have no room for the following objects";
 
 				/* Scan all marked objects in the grid */
-				floor_num = scan_floor(floor_list, N_ELEMENTS(floor_list), py, px, 0x03);
+				floor_num = scan_floor(floor_list, N_ELEMENTS(floor_list), py, px, 0x0B);
 
 				/* Save screen */
 				screen_save();
@@ -1707,17 +1717,20 @@ byte py_pickup(int py, int px, int pickup)
 		return (objs_picked_up);
 	}
 
+	}
+
 	/* We can pick up objects.  Menus are not requested (yet). */
 	if (pickup == 1)
 	{
 		/* Scan floor (again) */
-		floor_num = scan_floor(floor_list, N_ELEMENTS(floor_list), py, px, 0x03);
+		floor_num = scan_floor(floor_list, N_ELEMENTS(floor_list), py, px, 0x0B);
 
-		/* Use a menu interface for multiple objects, or pickup single objects */
-		if (floor_num > 1)
-			pickup = 2;
-		else
+		/* Use a menu interface for multiple objects or feature objects, 
+			or pickup single objects */
+		if (floor_num == 1)
 			this_o_idx = floor_o_idx;
+		else
+			pickup = 2;
 	}
 
 	/* Display a list if requested. */
@@ -1757,19 +1770,28 @@ byte py_pickup(int py, int px, int pickup)
 		if (done)
 			return (objs_picked_up);
 
+		this_o_idx = 0 - item;
+
 		/* Destroy the feature */
-		if (o_list[0-item].ident & (IDENT_STORE)) 
+		if (o_list[this_o_idx].ident & (IDENT_STORE)) 
 			gathered = TRUE;
-			
+
 		/* Get the feature */
 		if (gathered && (scan_feat(py,px) < 0)) 
 			cave_alter_feat(py,px,FS_GET_FEAT);
-		
-		this_o_idx = 0 - item;
-		call_function_again = TRUE;
 
-		/* With a list, we do not need explicit pickup messages */
-		msg = FALSE;
+		if (gathered) 
+		{
+			/* Features are somewhat special, disturb */
+			msg = TRUE;
+			call_function_again = FALSE;
+		}
+		else
+		{
+			/* With a list, we do not need explicit pickup messages */
+			msg = FALSE;
+			call_function_again = TRUE;
+		}
 	}
 
 	/* Pick up object, if legal */
