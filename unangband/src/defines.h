@@ -364,11 +364,11 @@
 #define GREAT_EGO	20
 
 /*
- * There is a 1/50 (2%) chance of inflating the requested monster_level
+ * There is a small chance of inflating the requested monster_level
  * during the creation of a monsters (see "get_mon_num()" in "monster.c").
  * Lower values yield harder monsters more often.
  */
-#define NASTY_MON	50		/* 1/chance of inflated monster level */
+#define NASTY_MON	30		/* 1/chance of inflated monster level */
 
 /*
  * Maximum amount of sections in room description.
