@@ -1006,12 +1006,9 @@ bool quiver_carry(object_type *o_ptr, int o_idx)
 /*
  * Pickup all gold at the player's current location.
  */
-static void py_pickup_gold(void)
+static void py_pickup_gold(int py, int px)
 {
 	char o_name[80];
-
-	int py = p_ptr->py;
-	int px = p_ptr->px;
 
 	s16b this_o_idx, next_o_idx = 0;
 
@@ -1033,6 +1030,7 @@ static void py_pickup_gold(void)
 			continue;
 
 		value = o_ptr->number * o_ptr->charges - o_ptr->stackc;
+		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 		/* Message */
 		if (o_ptr->tval == TV_GOLD) 
@@ -1510,7 +1508,7 @@ byte py_pickup(int py, int px, int pickup)
 		return 0;
 
 	/* Always pickup gold, effortlessly */
-	py_pickup_gold();
+	py_pickup_gold(py, px);
 
 	/* Scan the remaining objects */
 	for (this_o_idx = cave_o_idx[py][px]; this_o_idx || gather; this_o_idx = next_o_idx)
