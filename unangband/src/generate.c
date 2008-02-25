@@ -11739,12 +11739,6 @@ void generate_cave(void)
 		else if (rating > 0) feeling = 9;
 		else feeling = 10;
 
-		/* It takes 1000 game turns for "feelings" to recharge */
-		if ((old_turn) && ((turn - old_turn) < 1000)) feeling = 0;
-
-		/* Hack -- no feeling in the town */
-		if (level_flag & (LF1_TOWN)) feeling = 0;
-
 		/* Prevent object over-flow */
 		if (o_max >= z_info->o_max)
 		{
@@ -11785,12 +11779,6 @@ void generate_cave(void)
 
 	/* The dungeon is ready */
 	character_dungeon = TRUE;
-
-	/* Remember when this level was "created", except in town or surface locations */
-	if (!(level_flag & (LF1_TOWN | LF1_SURFACE))) old_turn = turn;
-
-	/* Hack -- always get a feeling leaving town or surface */
-	else old_turn = 0;
 
 	/* XXX Hurt light players sleep until it gets dark before entering surface levels */
 	/* FIXME - Should really check that the player knows they are vulnerable to light */

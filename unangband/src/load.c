@@ -2961,7 +2961,7 @@ bool load_player(void)
 			sf_lives++;
 
 			/* Forget turns */
-			turn = old_turn = 0;
+			turn = 0;
 			p_ptr->player_turn = p_ptr->resting_turn = 0;
 
 			/* Done */

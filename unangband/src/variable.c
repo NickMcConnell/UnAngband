@@ -104,7 +104,7 @@ s16b summon_race_type = 0;	   /* Hack -- See summon_specific() */
 char summon_word_type[80];		/* Hack -- See summon_specific() */
 
 s32b turn;			      /* Current game turn */
-s32b old_turn;		      /* Hack -- Level feeling counter */
+s32b old_turn;		      /* unused */
 
 bool surface;
 bool daytime;
