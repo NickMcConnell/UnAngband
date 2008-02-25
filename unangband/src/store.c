@@ -1394,6 +1394,7 @@ static void display_entry(int item, int store_index)
 	if (st_ptr->base < STORE_MIN_BUY_SELL)
 	{
 		byte attr;
+		int wgt;
 
 		maxwid = 75;
 
@@ -1439,7 +1440,7 @@ static void display_entry(int item, int store_index)
 		}
 
 		/* Only show the weight of a single object */
-		int wgt = o_ptr->weight;
+		wgt = o_ptr->weight;
 		sprintf(out_val, "%3d.%d lb", wgt / 10, wgt % 10);
 		put_str(out_val, y, 68);
 	}
@@ -1448,6 +1449,7 @@ static void display_entry(int item, int store_index)
 	else
 	{
 		byte attr;
+		int wgt;
 
 		/* Must leave room for the "price" */
 		maxwid = 65;
@@ -1466,7 +1468,7 @@ static void display_entry(int item, int store_index)
 		c_put_str(attr, o_name, y, 3);
 
 		/* Only show the weight of a single object */
-		int wgt = o_ptr->weight;
+		wgt = o_ptr->weight;
 		sprintf(out_val, "%3d.%d", wgt / 10, wgt % 10);
 		put_str(out_val, y, 61);
 

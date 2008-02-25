@@ -2196,7 +2196,7 @@ static void do_cmd_knowledge_help_tips(void)
 
 	for(i = 0; i < tips_start; i++) 
 	{
-		for(j = 0; j < N_ELEMENTS(tip_prefix) - 1; j++) {
+		for(j = 0; j < (int)N_ELEMENTS(tip_prefix) - 1; j++) {
 			const char *pat = tip_prefix[j];
 			const cptr tip = quark_str(tips[i]);
 

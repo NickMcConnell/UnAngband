@@ -2789,6 +2789,8 @@ void show_inven(void)
 	/* Output each entry */
 	for (j = 0; j < k; j++)
 	{
+		int wgt;
+
 		/* Get the index */
 		i = out_index[j];
 
@@ -2808,7 +2810,7 @@ void show_inven(void)
 		c_put_str(out_color[j], out_desc[j], j + 1, col + 3);
 
 		/* Display the weight if needed */
-		int wgt = o_ptr->weight * o_ptr->number;
+		wgt = o_ptr->weight * o_ptr->number;
 		sprintf(tmp_val, "%3d.%1d lb", wgt / 10, wgt % 10);
 		put_str(tmp_val, j + 1, 71);
 	}
@@ -3008,6 +3010,8 @@ void show_equip(void)
 	/* Output each entry */
 	for (j = 0; j < k; j++)
 	{
+		int wgt;
+
 		/* Get the index */
 		i = out_index[j];
 
@@ -3073,7 +3077,7 @@ void show_equip(void)
 		}
 
 		/* Display the weight if needed */
-		int wgt = o_ptr->weight * o_ptr->number;
+		wgt = o_ptr->weight * o_ptr->number;
 		sprintf(tmp_val, "%3d.%d lb", wgt / 10, wgt % 10);
 		put_str(tmp_val, j+1, 71);
 	}

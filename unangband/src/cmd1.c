@@ -1558,7 +1558,7 @@ byte py_pickup(int py, int px, int pickup)
 			if (!o_ptr->k_idx) continue;
 
 			/* XXX Hack -- Enforce limit */
-			if (floor_num >= N_ELEMENTS(floor_list)) break;
+			if (floor_num >= (int)N_ELEMENTS(floor_list)) break;
 		}
 
 		/* Mark the object */

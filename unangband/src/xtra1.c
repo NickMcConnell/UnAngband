@@ -246,6 +246,7 @@ static void prt_exp(void)
 	char out_val[32];
 	s32b exp_display;
 	byte attr;
+	int max_number;
 
 	/*use different color if player's experience is drained*/
 	if (p_ptr->exp >= p_ptr->max_exp)
@@ -263,16 +264,26 @@ static void prt_exp(void)
 		exp_display = ((player_exp[p_ptr->lev - 1] 
 				* p_ptr->expfact / 100L) -
 			       p_ptr->exp);
-
 		/*Print experience label*/
 		put_str("NEXT ", ROW_EXP, COL_EXP);
+
+		max_number = 99999;
+	}
+	else
+	{
+		exp_display = p_ptr->exp;
+
+		/*Print experience label*/
+		put_str("EXP ", ROW_EXP, COL_EXP);
+
+		max_number = 999999;
 	}
 
 	if (show_sidebar) {
 	  sprintf(out_val, "%8ld", exp_display);
 	}
 	else {
-	  if (exp_display > 99999) {
+	  if (exp_display > max_number) {
 	    exp_display = exp_display / 1000;
 	    sprintf(out_val, "%5ldK", exp_display);
 	  }
