@@ -3582,7 +3582,7 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 	/* Save the race */
 	n_ptr->r_idx = r_idx;
 
-	/* Town level has some special rules */
+	/* Small (often town) levels have some special rules */
 	if (!zone->fill)
 	{
 		/* Hack -- harmless townsmen are not threatening */

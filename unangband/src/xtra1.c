@@ -423,13 +423,8 @@ static void prt_depth(void)
   if (!adult_campaign) {
 
 	char depths[8];
-	town_type *t_ptr = &t_info[p_ptr->dungeon];
-	dungeon_zone *zone = &t_ptr->zone[0];
 
-	/* Get the zone */	
-	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
-
-	if (!zone->fill && zone->level <= 10 && t_ptr->store[3])
+	if (is_typical_town(p_ptr->dungeon))
 	{
 		my_strcpy(depths, "Town", sizeof(depths));
 	}

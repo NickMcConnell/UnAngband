@@ -4892,10 +4892,33 @@ void do_cmd_feeling(void)
 	if (feeling > 10) feeling = 10;
 
 	/* No useful feeling in town */
-	if (!p_ptr->depth)
+	if (is_typical_town(p_ptr->dungeon))
 	{
 		msg_print("Looks like a typical town.");
 		return;
+	}
+
+	/* Wilderness is easy to escape, so make it harder by no level feeling */
+	if (p_ptr->depth == min_depth(p_ptr->dungeon)) 
+	{
+		switch (p_ptr->dungeon % 3)
+		{
+		case 0:
+		{
+			msg_print("You feel free as a bird.");
+			return;
+		}
+		case 1:
+		{
+			msg_print("The future unfolds before you.");
+			return;
+		}
+		case 2:
+		{
+			msg_print("Something is about to begin.");
+			return;
+		}
+		}
 	}
 
 	/* Display the feeling */

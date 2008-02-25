@@ -1123,6 +1123,7 @@ extern bool get_rep_dir(int *dp);
 extern bool confuse_dir(int *dp);
 extern int min_depth(int dungeon);
 extern int max_depth(int dungeon);
+extern bool is_typical_town(int dungeon);
 extern int town_depth(int dungeon);
 extern void get_zone(dungeon_zone **zone_handle, int dungeon, int depth);
 extern void long_level_name(char* str, int town, int depth);

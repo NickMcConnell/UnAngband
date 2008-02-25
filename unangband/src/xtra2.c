@@ -4024,10 +4024,6 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 	bool beware = FALSE;
 
 	town_type *t_ptr = &t_info[p_ptr->dungeon];
-	dungeon_zone *zone=&t_ptr->zone[0];
-
-	/* Get the zone */ 
-	get_zone(&zone,p_ptr->dungeon,max_depth(p_ptr->dungeon));
 
 	/* Initialize text */
 	my_strcpy(name, "", name_s);
@@ -4037,7 +4033,8 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 	/* Town or not in room */
 	if (!room)
 	{
-		if ((p_ptr->depth == min_depth(p_ptr->dungeon)) || (!zone->fill))
+		if (p_ptr->depth == min_depth(p_ptr->dungeon) 
+			 || is_typical_town(p_ptr->dungeon))
 		{
 			current_long_level_name(name);
 
@@ -4508,8 +4505,8 @@ void describe_room(void)
 		/* Room has been heard */
 		if (room_descriptions) room_info[room].flags |= (ROOM_HEARD);
 	}
-	else if ((p_ptr->depth == town_depth(p_ptr->dungeon))
-		|| (p_ptr->depth == min_depth(p_ptr->dungeon)))
+	else if (is_typical_town(p_ptr->dungeon)
+				|| p_ptr->depth == min_depth(p_ptr->dungeon))
 	{
 		msg_format("You have entered %s.",name);
 
@@ -7073,6 +7070,13 @@ int max_depth(int dungeon)
 	return (zone->level);
 }
 
+bool is_typical_town(int dungeon)
+{
+	town_type *t_ptr=&t_info[dungeon];
+	dungeon_zone *zone = &t_ptr->zone[0];
+
+	return (!zone->fill && zone->level <= 10 && t_ptr->store[3]);
+}
 
 int town_depth(int dungeon)
 {
@@ -7089,7 +7093,6 @@ int town_depth(int dungeon)
 
 	return (zone->level);
 }
-
 
 void get_zone(dungeon_zone **zone_handle, int dungeon, int depth)
 {
