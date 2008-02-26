@@ -7331,8 +7331,10 @@ static long eval_max_dam(monster_race *r_ptr)
 			/* Hack -- no more attacks */
 			if (!method) continue;
 
-			/* Assume maximum damage*/
-			atk_dam = eval_blow_effect(effect, d_dice * d_side, r_ptr->level);
+			/* Multiply average damage by 2 to simplify calculations */
+			atk_dam = eval_blow_effect(effect, 
+												d_dice * (d_side + 1), 
+												r_ptr->level);
 
 			switch (method)
 			{
@@ -7655,14 +7657,16 @@ static long eval_max_dam(monster_race *r_ptr)
 /* Evaluate and adjust a monsters hit points for how easily the monster is damaged */
 static long eval_hp_adjust(monster_race *r_ptr)
 {
-	long hp;
+	long raw_hp, hp;
 	int resists = 1;
 	int ac = 0;
 	int hide_bonus = 0;
 
 	/* Get the monster base hitpoints */
-	if (r_ptr->flags1 & (RF1_FORCE_MAXHP)) hp = r_ptr->hdice * r_ptr->hside;
-	else hp = r_ptr->hdice * (r_ptr->hside + 1) / 2;
+	if (r_ptr->flags1 & (RF1_FORCE_MAXHP)) raw_hp = r_ptr->hdice * r_ptr->hside;
+	else raw_hp = r_ptr->hdice * (r_ptr->hside + 1) / 2;
+
+	hp = raw_hp;
 
 	/* Never moves with no ranged attacks - high hit points count for less */
 	if ((r_ptr->flags1 & (RF1_NEVER_MOVE)) && !(r_ptr->freq_innate || r_ptr->freq_spell))
@@ -7706,7 +7710,10 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	/*
  	 * Monsters that multiply are tougher to kill and each takes a blow
 	 */
-	if (r_ptr->flags2 & (RF2_MULTIPLY)) hp = 10 + hp * 7;
+	if (r_ptr->flags2 & (RF2_MULTIPLY)) 
+		hp = (3 + hp * 3) 
+			* extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] 
+			/ 10;
 
 
 	/* Get the monster ac */
@@ -7844,11 +7851,13 @@ static long eval_hp_adjust(monster_race *r_ptr)
 		hp += (hp * ac) / (150 + r_ptr->level); 			
 	}
 
+	/* Low level monsters don't gain anything above */
+	hp += (raw_hp + resists/3) / 4;			
+
 	/* boundary control */
 	if (hp < 1) hp = 1;
 
 	return (hp);
-
 }
 
 
@@ -8031,9 +8040,9 @@ for (iteration = 0; iteration < 3; iteration ++)
 		else if (r_ptr->flags1 & RF1_FRIENDS) power[i] *= 5;
 
 		/* Adjust for multiplying monsters. This is modified by the speed,
-                 * as fast multipliers are much worse than slow ones. We also adjust for
+		 * as fast multipliers are much worse than slow ones. We also adjust for
 		 * ability to bypass walls or doors.
-                 */
+		 */
 		if (r_ptr->flags2 & RF2_MULTIPLY)
 		{
 			if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL))
@@ -8087,7 +8096,8 @@ for (iteration = 0; iteration < 3; iteration ++)
 			}
 
 			/*
-			 * Hack - if it's a group monster or multiplying monster, add several to the count
+			 * Hack - if it's a group monster or multiplying monster, 
+			 * add several to the count
 			 * so that the averages don't get thrown off
 			 */
 

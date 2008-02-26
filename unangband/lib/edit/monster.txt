@@ -341,10 +341,10 @@ D:It is about four feet long and carnivorous.
 
 N:18:Giant white centipede
 G:c:w
-I:110:3d5:7:10:40
+I:110:2d5:7:8:40
 W:1:1:0:2
-B:BITE:HURT:1d2
-B:STING:HURT:1d2
+B:BITE:HURT:1d1
+B:STING:HURT:1d1
 F:RAND_50
 F:WEIRD_MIND | BASH_DOOR | FRIEND
 F:INSECT
