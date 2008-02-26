@@ -4136,16 +4136,16 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 
 
 	/* Base chance of being "good" */
-	f1 = lev + 10;
+	f1 = lev + 16;
 
 	/* Maximal chance of being "good" */
-	if (f1 > 75) f1 = 75;
+	if (f1 > 80) f1 = 80;
 
 	/* Base chance of being "great" */
 	f2 = f1 / 2;
 
 	/* Maximal chance of being "great" */
-	if (f2 > 20) f2 = 20;
+	if (f2 > 25) f2 = 25;
 
 
 	/* Assume normal */
