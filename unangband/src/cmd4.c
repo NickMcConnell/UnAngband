@@ -4862,25 +4862,23 @@ void do_cmd_version(void)
 }
 
 
-
 /*
  * Array of feeling strings
  */
 static cptr do_cmd_feeling_text[11] =
 {
-	"Looks like any other level.",
-	"You feel there is something special about this level.",
-	"You have a superb feeling about this level.",
-	"You have an excellent feeling...",
-	"You have a very good feeling...",
-	"You have a good feeling...",
-	"You feel strangely lucky...",
-	"You feel your luck is turning...",
-	"You like the look of this place...",
-	"This level can't be all bad...",
-	"What a boring place..."
+	"You are still uncertain about this place...",
+	"You feel there is something special here...",
+	"Premonitions of death appall you!  This place is murderous!",
+	"This place feels terribly dangerous!",
+	"You have a nasty feeling about this place.",
+	"You have a bad feeling about this place.",
+	"You feel nervous.",
+	"You have an uneasy feeling.",
+	"You have a faint uneasy feeling.",
+	"This place seems reasonably safe.",
+	"This seems a quiet, peaceful place."
 };
-
 
 /*
  * Note that "feeling" is set to zero unless some time has passed.
