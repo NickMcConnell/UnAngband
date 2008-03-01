@@ -7823,7 +7823,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		/* Blind Monster (Use "dam" as "power") */
 		case GF_BLIND_WEAK:
 		{
-			/* Cannot be slowed */
+			/* Cannot be blinded */
 			if (r_ptr->flags9 & (RF9_RES_BLIND))
 			{
 				if (seen) obvious = TRUE;
