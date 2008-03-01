@@ -586,7 +586,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (id_flags & (SF1_IDENT_FULLY)) vp[vn++]="all hidden powers";
 	if (id_flags & (SF1_FORGET)) vp[vn++]="all information";
 
-	/* Describe enchantment spells */
+	/* Describe identify spells */
 	if (vn)
 	{
 		if (!introduced)
@@ -642,13 +642,16 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	{
 		int i=0;
 
-		while ((object_group_tval[i]) && (object_group_tval[i] != s_ptr->param)) i++;
+		while ((object_group_tval[i]) && (object_group_tval[i] != s_ptr->param)) 
+			i++;
 
 		if (object_group_tval[i] == s_ptr->param) vp[vn++]=object_group_text[i];
-
 	}
 
-	/* Describe identify spells */
+	if (s_ptr->type == SPELL_IDENT_NAME)
+		vp[vn++]="unknown item";
+
+	/* Finish describing identify spells */
 	if (vn)
 	{
 		/* Scan */
@@ -664,7 +667,6 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 
 			/* Intro */
 			if (id_flags & (SF1_IDENT_PACK)) text_out("s");
-
 		}
 
 		/* Intro */
@@ -674,8 +676,8 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 
 		if (id_flags & (SF1_IDENT_FULLY)) text_out(" and prevents you from magically forgetting this information");
 		if (id_flags & (SF1_FORGET)) text_out(" except when the item is fully identified");
-
 	}
+
 
 	/* Collect enchantments */
 	vn = 0;
@@ -820,7 +822,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags2 & (SF2_INVULN)) vp[vn++]="makes you invulnerable to damage";
 	if (s_ptr->flags3 & (SF3_FREE_ACT)) vp[vn++] = "protects you from paralysis and magical slowness";
 	if (s_ptr->flags2 & (SF2_SEE_INVIS)) vp[vn++]="allows you to see invisible monsters";
-	if (s_ptr->flags2 & (SF2_PROT_EVIL)) vp[vn++]="protects your from evil monsters";
+	if (s_ptr->flags2 & (SF2_PROT_EVIL)) vp[vn++]="protects you from evil monsters";
 	if (s_ptr->flags2 & (SF2_HASTE)) vp[vn++]="makes you faster";
 	if (s_ptr->flags2 & (SF2_SLOW)) vp[vn++]="slows you down";
 	if (s_ptr->flags2 & (SF2_CUT)) vp[vn++]="makes you bleed";
