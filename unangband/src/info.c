@@ -7381,15 +7381,19 @@ static void describe_feature_actions(int f_idx)
 			switch (i)
 			{
 				case FS_SECRET: vp[vn++] = "search"; break;
-				case FS_OPEN: if (f_ptr->flags1 & (FF1_OPEN)) vp[vn++] = "open";
-					      if (f_ptr->flags1 & (FF1_BASH)) vp[vn++] = "bash"; break;    
+				case FS_OPEN: 
+					if (f_ptr->flags1 & (FF1_OPEN)) vp[vn++] = "open";
+					if (f_ptr->flags1 & (FF1_BASH)) vp[vn++] = "bash"; 
+					break;    
 				case FS_CLOSE: vp[vn++] = "close"; break;
 				case FS_BASH: vp[vn++] = "bash"; break;
 				case FS_DISARM: vp[vn++] ="disarm"; break;
 				case FS_SPIKE: vp[vn++] ="spike"; break;
 				case FS_ENTER: vp[vn++] ="enter"; break;
-				case FS_TUNNEL: if (f_ptr->flags2 & (FF2_CAN_DIG)) vp[vn++] ="dig";
-						else vp[vn++] ="tunnel"; break;
+				case FS_TUNNEL: 
+					if (f_ptr->flags2 & (FF2_CAN_DIG)) vp[vn++] ="dig";
+					else vp[vn++] ="tunnel"; 
+					break;
 				case FS_FLOOR: vp[vn++] ="set traps on"; break;
 				case FS_GLYPH: vp[vn++] ="create glyphs on"; break;
 				case FS_HIT_TRAP: vp[vn++] = "stumble on"; break;

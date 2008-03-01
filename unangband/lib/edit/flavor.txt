@@ -1645,8 +1645,8 @@ D:Divining
 ### More Mushrooms ###
 
 N:409:80:20
-G:,:B
-D:Light Blue
+G:,:u
+D:Light Brown
 
 N:410:80:6
 G:,:B
