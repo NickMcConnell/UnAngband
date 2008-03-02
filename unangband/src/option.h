@@ -41,11 +41,9 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 #define OPT_rogue_like_commands	0
 #define OPT_quick_messages			1
 #define OPT_use_sound            2
-/* unused, from V, TODO */
 #define OPT_pickup_detail			3
 #define OPT_use_old_target			4
 #define OPT_pickup_always			5
-/* unused, from V, TODO */
 #define OPT_pickup_inven			6
 
 #define OPT_show_labels				10
