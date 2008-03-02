@@ -1474,6 +1474,7 @@ byte py_pickup(int py, int px, int pickup)
 	char o_name[80];
 
 	bool gather = FALSE;
+	bool gathered2 = FALSE;
 
 	s16b this_o_idx, next_o_idx = 0;
 
@@ -1743,9 +1744,6 @@ byte py_pickup(int py, int px, int pickup)
 			
 		bool done = FALSE;
 
-		/* Gathering? */
-		bool gathered = FALSE;
-
 		p_ptr->py = py;
 		p_ptr->px = px;
 
@@ -1771,15 +1769,9 @@ byte py_pickup(int py, int px, int pickup)
 		this_o_idx = 0 - item;
 
 		/* Destroy the feature */
-		if (o_list[this_o_idx].ident & (IDENT_STORE)) 
-			gathered = TRUE;
-
-		/* Get the feature */
-		if (gathered && (scan_feat(py,px) < 0)) 
-			cave_alter_feat(py,px,FS_GET_FEAT);
-
-		if (gathered) 
+		if (o_list[this_o_idx].ident & (IDENT_STORE))
 		{
+			gathered2 = TRUE;
 			/* Features are somewhat special, disturb */
 			msg = TRUE;
 			call_function_again = FALSE;
@@ -1797,6 +1789,10 @@ byte py_pickup(int py, int px, int pickup)
 	{
 		/* Pick up the object */
 		py_pickup_aux(this_o_idx, msg);
+
+		/* Get the feature */
+		if (gathered2 && (scan_feat(py,px) < 0)) 
+			cave_alter_feat(py,px,FS_GET_FEAT);
 
 		/* Indicate an object picked up. */
 		objs_picked_up = 1;
@@ -3184,6 +3180,8 @@ void move_player(int dir)
 		
 		/* Disturb the player */
 		disturb(0, 0);
+
+		return;
 	}
 
 	/* Hack -- attack monsters --- except hidden ones or allies */
@@ -3235,7 +3233,8 @@ void move_player(int dir)
 	/* Player can not walk through "walls" */
 	/* Also cannot climb over unknown "trees/rubble" */
 	else if (!(f_ptr->flags1 & (FF1_MOVE))
-	&& (!(f_ptr->flags3 & (FF3_EASY_CLIMB)) || !(play_info[y][x] & (PLAY_MARK))))
+				&& (!(f_ptr->flags3 & (FF3_EASY_CLIMB)) 
+					 || !(play_info[y][x] & (PLAY_MARK))))
 	{
 		if (disturb_detect && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
 		{
@@ -3268,7 +3267,7 @@ void move_player(int dir)
 			/* Tell the player */
 			msg_format("You feel %s%s blocking your way.",
 				((f_ptr->flags2 & (FF2_FILLED)) ? "" :
-					(is_a_vowel(name[0]) ? "an " : "a ")),name);
+					(is_a_vowel(name[0]) ? "an " : "a ")), name);
 
 			play_info[y][x] |= (PLAY_MARK);
 
