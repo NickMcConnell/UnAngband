@@ -350,4 +350,57 @@ CHAR_MULTI monsters are those which look like objects, and use the symbols of ob
 \pard\pardeftab720\ql\qnatural
 
 \f1\fs24 \cf0 \
+\
+\pard\pardeftab720
+
+\f0\fs22 \cf0 # === Understanding p_race.txt ===\
+\
+# Format:\
+# N:race number:race name\
+# S:str:int:wis:dex:con:chr:agi:siz\
+# R:dis:dev:sav:stl:srh:dig:tht:thn:thb\
+# X:expbase:infra:monster race equivalent\
+# I:history:agebase:agemod:hometown\
+# H:hgtmale:modhgtmale:hgtfemale:modhgtfemale\
+# W:wgtmale:wgtfemale\
+# F:racial flags\
+# C:classes (numeric)\
+# O:wield:bow:left_ring:right_ring:neck:lite:body:outer:arm:head:hands:feet\
+# D:adjective\
+\
+# 'N' indicates the beginning of an entry. The serial number must\
+# increase for each new race.\
+\
+# 'S' is for the stat modifiers - strength, intelligence, wisdom,\
+# dexterity, constitution, charisma, agility, size.\
+\
+# 'R' is for the base skills - disarming, magic devices, saving throws,\
+# stealth, searching ability, digging, to hit (throws), to hit (melee),\
+# to hit (bows).\
+\
+# 'X' is for extra info - experience factor in percent, \
+# range of infravision in 10 feets.\
+\
+# 'I' is for info - starting point of the player history, base age,\
+# random age modifier, home town.\
+\
+# 'H' is height info - base height (males), mod height (males),\
+# base height (females), mod height (females).\
+\
+# 'W' is weight info - base weight (males), base weight (females).\
+\
+# 'F' is for racial flags.\
+\
+# 'C' is for class choices.\
+\
+# 'O' is for objects. This defines if the class has a built in object\
+# in a particular equipment slot.\
+\
+# XXX We also use this file to define possible shapes that a player can shape\
+# change into as an effect, in addition to their starting race. To define that\
+# a race is selectable as a starting race, it must have an index less than\
+# the number of 'playable' races defined in the limits.txt file.\
+\pard\pardeftab720\ql\qnatural
+
+\f1\fs24 \cf0 \
 }

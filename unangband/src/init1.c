@@ -8827,19 +8827,29 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 	
 	/* Finish object slots output */
 	fprintf(fp, "\n");
-	
-	/* Start class choices output */
-	fprintf(fp, "C:");
-	
-	/* Output class choices */
-	for (n = 0; n < 32; n++)
+
+	/* Only output classes for starting races */
+	if (i< z_info->g_max)
 	{
-		if (introduced) fprintf(fp, " | ");
-		if (pr_ptr->choice & (1 << n)) fprintf(fp, "%d", n);
-		introduced = TRUE;
+		/* Start class choices output */
+		fprintf(fp, "C:");
+		
+		/* Output class choices */
+		for (n = 0; n < z_info->c_max; n++)
+		{			
+			if (pr_ptr->choice & (1 << n))
+			{
+				if (introduced) fprintf(fp, "|");
+				fprintf(fp, "%d", n);
+				introduced = TRUE;
+			}
+		}
 	}
 	
 	/* Finish class choices output */
+	fprintf(fp, "\n");
+
+	/* Finish output */
 	fprintf(fp, "\n");
 
 	/* Success */

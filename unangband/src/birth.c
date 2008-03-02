@@ -1402,30 +1402,8 @@ static bool get_player_class(void)
 	/* Tabulate classes */
 	for (i = 0; i < z_info->c_max; i++)
 	{
-		/* Don't ghost classes by default */
-		bool ghost = FALSE;
-
-		/* Ghost if not warrior, and two stats are -4 or below, or 1 is -5 or below */
-		if (i)
-		{
-			int j;
-			bool minus_4 = FALSE;
-			
-			for (j = 0; j < A_MAX; j++)
-			{
-			    /* Obtain a "bonus" for "race" and "class" */
-				int value = rp_ptr->r_adj[j] + c_info[i].c_adj[j];
-
-				if ((value <= -5) || (minus_4 && value <= -4))
-				{
-					ghost = TRUE;
-				}
-				else if (value <= -4)
-				{
-					minus_4 = TRUE;
-				}
-			}
-		}
+		/* Ghost classes based on available choices */
+		bool ghost = (rp_ptr->choice & (1 << i)) == FALSE;
 
 		/* 'Ghosted' entries unavailable for intermediate players */
 		if (birth_intermediate && ghost) continue;
