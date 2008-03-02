@@ -150,10 +150,10 @@ static cptr desc_stat_neg[] =
 /*
  * Lose a "point"
  */
-bool do_dec_stat(int stat)
+int do_dec_stat(int stat)
 {
 	/* Sustain */
-        if (p_ptr->cur_flags2 & (TR2_SUST_STR << (stat == A_AGI ? A_DEX : (stat == A_SIZ ? A_STR : stat))))
+	if (p_ptr->cur_flags2 & (TR2_SUST_STR << (stat == A_AGI ? A_DEX : (stat == A_SIZ ? A_STR : stat))))
 	{
 		/* Message */
 		msg_format("You feel very %s for a moment, but the feeling passes.",
@@ -163,7 +163,7 @@ bool do_dec_stat(int stat)
 		equip_can_flags(0x0L, TR2_SUST_STR << (stat == A_AGI ? A_DEX : (stat == A_SIZ ? A_STR : stat)), 0x0L, 0x0L);
 
 		/* Notice effect */
-		return (TRUE);
+		return -1;
 	}
 
 	/* Attempt to reduce the stat */
@@ -176,11 +176,11 @@ bool do_dec_stat(int stat)
 		equip_not_flags(0x0L, TR2_SUST_STR << (stat == A_AGI ? A_DEX : (stat == A_SIZ ? A_STR : stat)), 0x0L, 0x0L);
 
 		/* Notice effect */
-		return (TRUE);
+		return 1;
 	}
 
 	/* Nothing obvious */
-	return (FALSE);
+	return 0;
 }
 
 

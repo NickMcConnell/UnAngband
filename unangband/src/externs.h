@@ -886,7 +886,7 @@ extern bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, 
 extern bool hp_player(int num);
 extern void warding_glyph(void);
 extern void warding_trap(int feat, int dir);
-extern bool do_dec_stat(int stat);
+extern int do_dec_stat(int stat);
 extern bool do_res_stat(int stat);
 extern bool do_inc_stat(int stat);
 extern void identify_pack(void);

@@ -8686,6 +8686,9 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 	/* Hack -- assume obvious */
 	bool obvious = TRUE;
 
+	/* Hack -- for stat drains */
+	bool drained = -1;
+
 	/* Player blind-ness */
 	bool blind = (p_ptr->blind ? TRUE : FALSE);
 
@@ -10732,17 +10735,19 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Damage (stat) */
-			if (do_dec_stat(A_STR))
+			if ((drained = do_dec_stat(A_STR)))
 			{
 				obvious = TRUE;
-				set_stat_dec_tim(p_ptr->stat_dec_tim[A_STR] + rand_int(20) + 20, A_STR);
+				if (drained > 0) 
+					set_stat_dec_tim(p_ptr->stat_dec_tim[A_STR] + rand_int(20) + 20, A_STR);
 			}
 
 			/* Damage (stat) */
-			if (do_dec_stat(A_SIZ))
+			if ((drained = do_dec_stat(A_SIZ)))
 			{
 				obvious = TRUE;
-				set_stat_dec_tim(p_ptr->stat_dec_tim[A_SIZ] + rand_int(20) + 20, A_SIZ);
+				if (drained > 0) 
+					set_stat_dec_tim(p_ptr->stat_dec_tim[A_SIZ] + rand_int(20) + 20, A_SIZ);
 			}
 
 			break;
@@ -10754,10 +10759,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Damage (stat) */
-			if (do_dec_stat(A_INT))
+			if ((drained = do_dec_stat(A_INT)))
 			{
 				obvious = TRUE;
-				set_stat_dec_tim(p_ptr->stat_dec_tim[A_INT] + rand_int(20) + 20, A_INT);
+				if (drained > 0) 
+					set_stat_dec_tim(p_ptr->stat_dec_tim[A_INT] + rand_int(20) + 20, A_INT);
 			}
 
 			break;
@@ -10769,10 +10775,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Damage (stat) */
-			if (do_dec_stat(A_WIS))
+			if ((drained = do_dec_stat(A_WIS)))
 			{
 				obvious = TRUE;
-				set_stat_dec_tim(p_ptr->stat_dec_tim[A_WIS] + rand_int(20) + 20, A_WIS);
+				if (drained > 0) 
+					set_stat_dec_tim(p_ptr->stat_dec_tim[A_WIS] + rand_int(20) + 20, A_WIS);
 			}
 
 			break;
@@ -10784,16 +10791,18 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Damage (stat) */
-			if (do_dec_stat(A_DEX))
+			if ((drained = do_dec_stat(A_DEX)))
 			{
 				obvious = TRUE;
-				set_stat_dec_tim(p_ptr->stat_dec_tim[A_DEX] + rand_int(20) + 20, A_DEX);
+				if (drained > 0) 
+					set_stat_dec_tim(p_ptr->stat_dec_tim[A_DEX] + rand_int(20) + 20, A_DEX);
 			}
 			/* Damage (stat) */
-			if (do_dec_stat(A_AGI))
+			if ((drained = do_dec_stat(A_AGI)))
 			{
 				obvious = TRUE;
-				set_stat_dec_tim(p_ptr->stat_dec_tim[A_AGI] + rand_int(20) + 20, A_AGI);
+				if (drained > 0) 
+					set_stat_dec_tim(p_ptr->stat_dec_tim[A_AGI] + rand_int(20) + 20, A_AGI);
 			}
 
 			break;
@@ -10805,10 +10814,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Damage (stat) */
-			if (do_dec_stat(A_CON))
+			if ((drained = do_dec_stat(A_CON)))
 			{
 				obvious = TRUE;
-				set_stat_dec_tim(p_ptr->stat_dec_tim[A_CON] + rand_int(20) + 20, A_CON);
+				if (drained > 0) 
+					set_stat_dec_tim(p_ptr->stat_dec_tim[A_CON] + rand_int(20) + 20, A_CON);
 			}
 
 			break;
@@ -10820,10 +10830,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 
 			/* Damage (stat) */
-			if (do_dec_stat(A_CHR))
+			if ((drained = do_dec_stat(A_CHR)))
 			{
 				obvious = TRUE;
-				set_stat_dec_tim(p_ptr->stat_dec_tim[A_CHR] + rand_int(20) + 20, A_CHR);
+				if (drained > 0) 
+					set_stat_dec_tim(p_ptr->stat_dec_tim[A_CHR] + rand_int(20) + 20, A_CHR);
 			}
 
 			break;
@@ -10838,10 +10849,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			for (k = 0; k < A_MAX; k++)
 			{
 				/* Damage (stats) */
-				if (do_dec_stat(k))
+				if ((drained = do_dec_stat(k)))
 				{
 					obvious = TRUE;
-					set_stat_dec_tim(p_ptr->stat_dec_tim[k] + rand_int(20) + 20, k);
+					if (drained > 0) 
+						set_stat_dec_tim(p_ptr->stat_dec_tim[k] + rand_int(20) + 20, k);
 				}
 			}
 
