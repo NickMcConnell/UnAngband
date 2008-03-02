@@ -457,4 +457,62 @@ CHAR_MULTI monsters are those which look like objects, and use the symbols of ob
 \pard\pardeftab720\ql\qnatural
 
 \f1\fs24 \cf0 \
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+
+\f0\fs22 \cf0 \
+\pard\pardeftab720
+\cf0 # === Understanding spell.txt ===\
+\
+# N: number : name\
+# A: tval : sval : slot\
+# C: class : level : mana : failure : min failure\
+# F: flags\
+# B: attack method : attack effect : damage\
+# L: duration\
+# S: other effect : parameter\
+# D: description\
+\
+# 'N' indicates the beginning of an entry. The serial number must\
+# increase for each new item.\
+\
+# 'A' is for appears in which objects, referenced by tval and sval.\
+# Slot must be unique for objects which have multiple spells\
+# associated with them, and slots must be numbered from 1 upwards.\
+# The exception is rune stones, where the slot corresponds to the\
+# second ('verb') runestone sval.\
+\
+# 'C' indicates the casting details listed by class. Note that currently\
+# no more than 5 classes can cast a particular spell.\
+\
+# 'F' flags indicating many effects that take place when the spell is\
+# cast.A\
+\
+# 'B' indicates the attack effect of the spell similar to monster attacks.\
+# Note that blow specifies whether a directional parameter is needed,\
+# and the increase in spell effect based on player level.\
+# Note that we can specify a constant bonus to damage in this file, and\
+# up to 4 blows are permitted.\
+\
+# If dice is > 0 and sides == 0, we use dice * level + bonus, or\
+# dice * 25 + bonus, if the spell is the result of using an object.\
+\
+# Note that if you are applying blows to a player, you should apply the blow\
+# that blinds them last, if possible, because they will not know the results\
+# of the other blows.\
+\
+# 'L' indicates how long the duration component of the spell lasts.\
+\
+# 'S' indicates another parametised effect. The parameter value\
+# depends on the effect in question.\
+\
+# 'D' description indicates the description display when the spell\
+# takes effect. If an item has a description, it will be identified\
+# as a part of the activation of the item.\
+\
+# ToDo: Explain the other monster and spell flags.  But maybe in another file.\
+\pard\pardeftab720\ql\qnatural
+
+\f1\fs24 \cf0 \
 }

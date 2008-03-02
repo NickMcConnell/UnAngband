@@ -8064,7 +8064,7 @@ errr emit_info_txt(FILE *fp, FILE *template, char *buf, header *head,
 		if (buf[0] == '#')
 		{
 			/* Skip comments created by emission process */
-			if ((buf[1] == '$') && (buf[2] == '#')) continue;
+			if (buf[1] == '$') continue;
 
 			while (blanklines--) fprintf(fp,"\n");
 			fprintf(fp,"%s\n",buf);
@@ -8501,7 +8501,7 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	{
 		fprintf(fp, "M:%d\n", f_ptr->mimic);
 		f2_ptr = (feature_type*)head->info_ptr + f_ptr->mimic;
-		fprintf(fp, "#$# %s\n",head->name_ptr + f2_ptr->name);
+		fprintf(fp, "#$ %s\n",head->name_ptr + f2_ptr->name);
 	}
 
 	/* Output 'U' for "Unseen" (one line only) */
@@ -8509,7 +8509,7 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	{
 		fprintf(fp, "U:%d\n",f_ptr->unseen);
 		f2_ptr = (feature_type*)head->info_ptr + f_ptr->unseen;
-		fprintf(fp, "#$# %s\n",head->name_ptr + f2_ptr->name);
+		fprintf(fp, "#$ %s\n",head->name_ptr + f2_ptr->name);
 	}
 
 	/* Output 'O' for "Object" (one line only) */
@@ -8518,7 +8518,7 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	/* Output 'W' for "More Info" (one line only) */
 	fprintf(fp,"W:%d:%d:%d:%d\n",f_ptr->level, f_ptr->rarity, f_ptr->priority, f_ptr->edge);
 		f2_ptr = (feature_type*)head->info_ptr + f_ptr->edge;
-		if (f_ptr->edge) fprintf(fp, "#$# %s\n",head->name_ptr + f2_ptr->name);
+		if (f_ptr->edge) fprintf(fp, "#$ %s\n",head->name_ptr + f2_ptr->name);
 
 	/* Output 'T' for "Trap" (one line only) */
 	if (f_ptr->blow.method)
@@ -8556,7 +8556,7 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	{
 		fprintf(fp,"K:DEFAULT:%d:%d\n",f_ptr->defaults, f_ptr->power);
 		f2_ptr = (feature_type*)head->info_ptr + f_ptr->mimic;
-		if (f_ptr->defaults != i) fprintf(fp, "#$# %s\n",head->name_ptr + f2_ptr->name);
+		if (f_ptr->defaults != i) fprintf(fp, "#$ %s\n",head->name_ptr + f2_ptr->name);
 	}
 
 	for (n = 0; n < MAX_FEAT_STATES; n++)
@@ -8569,7 +8569,7 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 							 (f_ptr->state[n].action < 128 ? f_info_flags3[f_ptr->state[n].action - 64] : "Error"))
 							 ,f_ptr->state[n].result, f_ptr->power);
 		f2_ptr = (feature_type*)head->info_ptr + f_ptr->state[n].result;
-		fprintf(fp, "#$# %s\n",head->name_ptr + f2_ptr->name);
+		fprintf(fp, "#$ %s\n",head->name_ptr + f2_ptr->name);
 	}
 
 	/* Output 'F' for "Flags" */
@@ -8989,7 +8989,7 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 			
 			if (note_spell)
 			{
-				fprintf(fp, "#$# %s cannot cast this spell.\n", c_name + c_info[l].name);
+				fprintf(fp, "#$ %s cannot cast this spell.\n", c_name + c_info[l].name);
 			}
 		}
 	}
