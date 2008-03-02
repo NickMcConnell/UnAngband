@@ -7314,7 +7314,8 @@ static bool is_player_action_valid(int f_idx, int action)
 				return (TRUE);
 		/* Hack -- bashable features are opened 50% of the time */
 		else if ((f_ptr->flags1 & (FF1_BASH)) &&
-			((1L << action) & (FF1_OPEN)))
+			((1L << action) & (FF1_OPEN)) &&
+			(feat_state(f_idx, FS_BASH) != feat_state(f_idx, FS_OPEN)))
 				return (TRUE);
 
 		/* Hack -- glyphs can be set on a floor */
