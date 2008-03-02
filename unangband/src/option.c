@@ -61,10 +61,11 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_view_torch_grids,
 		OPT_view_glowing_lite,
 		OPT_show_sidebar,
-		OPT_show_itemlist,
+		/*OPT_show_itemlist,*/
 		OPT_room_names,
 		OPT_room_descriptions,
 		OPT_show_tips,
+		OPT_NONE
 	},
 
 	/* Warning */
