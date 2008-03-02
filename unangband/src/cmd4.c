@@ -438,10 +438,36 @@ static void display_member_list(int col, int row, int wid, int per_page,
 /*
  * Interactive group by. 
  * Recognises inscriptions, graphical symbols, lore
-*/
-static void display_knowledge(const char *title, int *obj_list, int o_count,
-							group_funcs g_funcs, member_funcs o_funcs,
-							const char *otherfields)
+ * Some more enlightment by Pete Mac:
+
+The basic design of this command is a database 'GROUP BY'
+using a merge join.
+
+First, ensure both lists are sorted by group id (gid).  This
+is the 'primary key' of the grouping relation, ie dungeon #,
+monster class, etc.
+This sort is generally implicit, because the grouping
+relations are in constructed in order.
+
+For the dependent relation (objects, oid), some relations
+can be defined in order, if group_id can be constructed
+directly from oid. Otherwise, use qsort, with gid for the
+comparator.  For objects with the same group, order by
+preferred order.  (Like 'd' before 'D', then lower depth to
+higher depth.)
+
+Then do a nested loop, with the outer iterating the grouping
+relation, and the inner the dependent relation.  Display
+them all together.  This is implicit in the way the menus
+are set up.
+
+For more information, check a database book like (Jim) Gray.
+
+ */
+static void display_knowledge_start_at(
+	const char *title, int *obj_list, int o_count,
+	group_funcs g_funcs, member_funcs o_funcs,
+	const char *otherfields, int g_cur)
 {
 	/* maximum number of groups to display */
 	int max_group = g_funcs.maxnum < o_count ? g_funcs.maxnum : o_count ;
@@ -455,7 +481,7 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 
 	int grp_cnt = 0; /* total number groups */
 
-	int g_cur = 0, grp_old = -1, grp_top = 0; /* group list positions */
+	int grp_old = -1, grp_top = 0; /* group list positions */
 	int o_cur = 0, object_top = 0; /* object list positions */
 	int g_o_count = 0; /* object count for group */
 	int o_first = 0, g_o_max = 0; /* group limits in object list */
@@ -554,6 +580,16 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 			g_o_max = g_offset[g_cur+1];
 			grp_old = g_cur;
 			old_oid = -1;
+
+			/* Tweak the starting object position
+			if(init_obj >= 0) {
+				o_cur = init_obj - g_offset[g_cur];
+				assert(OK(o_cur));
+				init_obj = -1;
+			}
+			else o_cur = 0;
+
+			object_menu.cursor = o_cur; */
 		}
 
 		/* Display a scrollable list of groups */
@@ -826,6 +862,15 @@ static void display_knowledge(const char *title, int *obj_list, int o_count,
 	FREE(g_names);
 	FREE(g_offset);
 	FREE(g_list);
+}
+
+static void display_knowledge(const char *title, int *obj_list, int o_count,
+										group_funcs g_funcs, member_funcs o_funcs,
+										const char *otherfields)
+{
+	display_knowledge_start_at(title, obj_list, o_count,
+										g_funcs, o_funcs,
+										otherfields, 0);
 }
 
 /*
@@ -2035,6 +2080,7 @@ static void do_cmd_knowledge_dungeons(void)
 	member_funcs zone_f = {display_dungeon_zone, dungeon_lore, 0, 0, 0, 0};
 	group_funcs dun_f = {z_info->t_max, FALSE, town_name, 0, oiddiv4, 0};
 	int myd = p_ptr->dungeon;
+	int start_at = 0;
 
 	zones = C_ZNEW(z_info->t_max*MAX_DUNGEON_ZONES, int);
 
@@ -2049,6 +2095,9 @@ static void do_cmd_knowledge_dungeons(void)
 	      && t_info[t_info[i].replace_ifvisited].visited)
 	    continue;
 
+	  if (i < p_ptr->dungeon)
+		  start_at++;
+
 	  for(j = 0; (j < 1 || t_info[i].zone[j].level != 0 )
 		&& j < MAX_DUNGEON_ZONES; j++)
 	    {
@@ -2056,7 +2105,8 @@ static void do_cmd_knowledge_dungeons(void)
 	    }
 	}
 
-	display_knowledge("locations", zones, z_count, dun_f, zone_f, "   Reached");
+	display_knowledge_start_at(
+		"locations", zones, z_count, dun_f, zone_f, "   Reached", start_at);
 	FREE(zones);
 }
 
