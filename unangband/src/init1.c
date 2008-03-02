@@ -8749,7 +8749,7 @@ errr emit_x_info_index(FILE *fp, header *head, int i)
 	flavor_type *x_ptr = (flavor_type*)head->info_ptr + i;
 	
 	/* Output 'N' for "New/Number/Name" */
-	fprintf(fp, "N:%d:%d:%d", i,x_ptr->tval, x_ptr->sval);
+	fprintf(fp, "N:%d:%d%s\n", i,x_ptr->tval, x_ptr->sval == 255 ? "" : format(":%d", x_ptr->sval));
 
 	/* Output 'G' for "Graphics" (one line only) */
 	fprintf(fp, "G:%c:%c\n",x_ptr->d_char,color_attr_to_char[x_ptr->d_attr]);
