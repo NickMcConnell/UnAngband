@@ -8,7 +8,7 @@
 # unless you wish to risk possible system crashes and broken savefiles.
 # After modifying this file, delete the "lib/data/monster.raw" file.
 
-# See lib\docs\monster.rtf to understand this file and how to modify
+# See "lib/docs/monster.rtf" to understand this file and how to modify
 # it and related files.
 
 # Version stamp (required)
