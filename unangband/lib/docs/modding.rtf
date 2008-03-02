@@ -353,6 +353,60 @@ CHAR_MULTI monsters are those which look like objects, and use the symbols of ob
 \
 \pard\pardeftab720
 
+\f0\fs22 \cf0 # === Understanding p_class.txt ===\
+\
+# Format:\
+# N:class number:class name\
+# S:str:int:wis:dex:con:chr:agi:siz\
+# C:dis:dev:sav:stl:srh:dig:tht:thn:thb\
+# X:dis:dev:sav:stl:srh:dig:tht:thn:thb\
+# I:exp:sense_base:sense_div:sense_type:sense_squared\
+# A:max_attacks:min_weight:att_multiply:chg_weight\
+# M:spellbook tval:spell-stat-study:spell-stat-mana:spell-stat-fail:first-level:max weight:high-power\
+# B:spell number:level:mana:fail:exp\
+# T:title\
+# E:tval:sval:min:maxef\
+# F:school flags\
+\
+# 'N' indicates the beginning of an entry. The serial number must\
+# increase for each new class.\
+\
+# 'S' is for the stat modifiers - strength, intelligence, wisdom,\
+# dexterity, constitution, charisma, agility, size.\
+\
+# 'C' is for the base skills - disarming, magic devices, saving throws,\
+# stealth, searching ability, digging, to hit (throws), to hit (normal),\
+# to hit (bows).\
+\
+# 'X' is for the skill modifiers - disarming, magic devices, saving\
+# throws, stealth, searching ability, digging, to hit (throws), to hit\
+# (normal), to hit (bows).  The modifiers are added to the base skill\
+# every ten levels.\
+\
+# 'I' is for extra info - experience factor in percent, \
+# base chance for pseudo-id (smaller is better),\
+# level dependent divisor for the pseudo-id chance, type of sensing\
+# (see object2.c), sense squared.\
+\
+# 'A' is for attack info - maximum possible number of attacks, minimum\
+# weapon weight for calculating the number of attacks, multiplier for\
+# attack calculations, weight divisor for charging.\
+\
+# 'M' is for magic info - tval of the used spellbook, number of the\
+# spell-stat, level of the first spell, weight that hurts spells.\
+\
+# 'T' is for class titles (Up to 10 entries).\
+\
+# 'E' is for starting equipment - tval of the item, sval of the item,\
+# minimum amount, maximum amount.\
+\
+# 'F' is for class flags.\
+\pard\pardeftab720\ql\qnatural
+
+\f1\fs24 \cf0 \
+\
+\pard\pardeftab720
+
 \f0\fs22 \cf0 # === Understanding p_race.txt ===\
 \
 # Format:\
