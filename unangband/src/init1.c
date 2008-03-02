@@ -8896,7 +8896,7 @@ errr emit_c_info_index(FILE *fp, header *head, int i)
 		    pc_ptr->x_srh, pc_ptr->x_dig, pc_ptr->x_tht, pc_ptr->x_thn, pc_ptr->x_thb);
 	
 	/* Output 'I' for "Info" (one line only) */
-	fprintf(fp, "I:%d:%ld:%d:%d:%d", pc_ptr->c_exp, pc_ptr->sense_base, pc_ptr->sense_div, pc_ptr->sense_type, pc_ptr->sense_squared);
+	fprintf(fp, "I:%d:%ld:%d:%d:%d\n", pc_ptr->c_exp, pc_ptr->sense_base, pc_ptr->sense_div, pc_ptr->sense_type, pc_ptr->sense_squared);
 
 	/* Output 'A' for "Attack Info" (one line only) */
 	fprintf(fp, "A:%d:%d:%d:%d\n", pc_ptr->max_attacks, pc_ptr->min_weight, pc_ptr->att_multiply, pc_ptr->chg_weight);
