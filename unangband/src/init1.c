@@ -7878,6 +7878,7 @@ errr eval_r_power(header *head)
 
 	int iteration;
 
+#ifdef ALLOW_TEMPLATES_OUTPUT
 	/* Hack -- Clear item drop flags when monster doesn't drop anything */
 	for (i = 0; i < z_info->r_max; i++)
 	{
@@ -7892,291 +7893,296 @@ errr eval_r_power(header *head)
 								RF8_DROP_POTION | RF8_DROP_FOOD | RF8_DROP_JUNK);			
 		}
 	}
-
+#endif /* ALLOW_TEMPLATES_OUTPUT */
 
 	/* Allocate space for power */
 	power = C_ZNEW(z_info->r_max, long);
 
-
-for (iteration = 0; iteration < 3; iteration ++)
-{
-
-	/* Reset the sum of all monster power values */
-	tot_mon_power = 0;
-
-
-	/* Make sure all arrays start at zero */
-	for (i = 0; i < MAX_DEPTH; i++)
+#ifdef ALLOW_TEMPLATES_OUTPUT
+	/* We iterate through the following evaluation multiple times to try to find 'settled' values.
+	 * This is because evaluating the monster can result in it changing depth and/or rarity */
+	for (iteration = 0; iteration < 3; iteration ++)
 	{
-		tot_hp[i] = 0;
-		tot_dam[i] = 0;
-		mon_count[i] = 0;
-	}
-
-	/*
-	 * Go through r_info and evaluate power ratings & flows.
-	 */
-	for (i = 0; i < z_info->r_max; i++)
-	{
-		/* Point at the "info" */
-		r_ptr = (monster_race*)head->info_ptr + i;
-#if 0
-		/*** Evaluate flows ***/
-
-		/* Evaluate 'unusual' flows */
-		if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL)) r_ptr->flows |= (1L << FLOW_WALK_WALL);
-		if (r_ptr->flags2 & (RF2_MUST_FLY)) r_ptr->flows |= (1L << FLOW_FLY);
-		if (r_ptr->flags2 & (RF2_MUST_SWIM)) r_ptr->flows |= (1L << FLOW_SWIM);
-
-		/* Evaluate walking flows */
-		if ((r_ptr->flags2 & (RF2_MUST_FLY | RF2_MUST_SWIM)) == 0)
+#endif /* ALLOW_TEMPLATES_OUTPUT */
+		/* Reset the sum of all monster power values */
+		tot_mon_power = 0;
+	
+		/* Make sure all arrays start at zero */
+		for (i = 0; i < MAX_DEPTH; i++)
 		{
-			/* Use walking */
-			r_ptr->flows |= (1L << FLOW_WALK);
-
-			/* Evaluate walk + other */
-			if (r_ptr->flags2 & (RF2_CAN_DIG)) r_ptr->flows |= (1L << FLOW_WALK_DIG) | (1L << FLOW_DIG);
-			if (r_ptr->flags2 & (RF2_CAN_FLY)) r_ptr->flows |= (1L << FLOW_WALK_FLY) | (1L << FLOW_FLY_CHASM);
-			if (r_ptr->flags2 & (RF2_CAN_SWIM)) r_ptr->flows |= (1L << FLOW_WALK_SWIM) | (1L << FLOW_SWIM);
-			if (r_ptr->flags2 & (RF2_CAN_CLIMB)) r_ptr->flows |= (1L << FLOW_WALK_CLIMB);
-			if (r_ptr->flags2 & (RF2_BASH_DOOR)) r_ptr->flows |= (1L << FLOW_WALK_BASH);
-			if (r_ptr->flags2 & (RF2_OPEN_DOOR)) r_ptr->flows |= (1L << FLOW_WALK_OPEN);
-			if ((r_ptr->flags2 & (RF2_BASH_DOOR)) && (r_ptr->flags2 & (RF2_OPEN_DOOR))) r_ptr->flows |= (1L << FLOW_WALK_BASH_OPEN);
-			if (r_ptr->flags3 & (RF3_OOZE)) r_ptr->flows |= (1L << FLOW_WALK_OOZE);
-			if (r_ptr->flags3 & (RF3_NONLIVING)) r_ptr->flows |= (1L << FLOW_WALK_NONLIVING);
-			if (r_ptr->flags3 & (RF3_IM_ACID)) r_ptr->flows |= (1L << FLOW_WALK_ACID) | (1L << FLOW_ACID);
-			if (r_ptr->flags3 & (RF3_IM_COLD)) r_ptr->flows |= (1L << FLOW_WALK_COLD);
-			if (r_ptr->flags3 & (RF3_IM_ELEC)) r_ptr->flows |= (1L << FLOW_WALK_ELEC);
-
-			/* Evaluate fire immunity flows */
-			if (r_ptr->flags3 & (RF3_IM_FIRE))
-			{
-				/* Use walking + fire immunity */
-				r_ptr->flows |= (1L << FLOW_WALK_FIRE) | (1L << FLOW_FIRE);
-
-				if (r_ptr->flags2 & (RF2_CAN_DIG)) r_ptr->flows |= (1L << FLOW_WALK_FIRE_DIG) | (1L << FLOW_FIRE_DIG);
-				if (r_ptr->flags2 & (RF2_CAN_SWIM)) r_ptr->flows |= (1L << FLOW_WALK_FIRE_SWIM) | (1L << FLOW_FIRE_SWIM);
-			}
+			tot_hp[i] = 0;
+			tot_dam[i] = 0;
+			mon_count[i] = 0;
 		}
-#endif
-		/*** Evaluate power ratings ***/
-
-		/* Set the current level */
-		lvl = r_ptr->level;
-
-		/* Maximum damage this monster can do in 10 game turns */
-		dam = eval_max_dam(r_ptr);
-
-		/* Adjust hit points based on resistances */
-		hp = eval_hp_adjust(r_ptr);
-
-		/* Hack -- set exp */
-		if (lvl == 0) r_ptr->mexp = 0L;
-		else
-		{
-			/* Compute depths of non-unique monsters */
-			if (!(r_ptr->flags1 & (RF1_UNIQUE)))
-			{
-				long mexp = (hp * dam) / 25;
-				long threat = r_ptr->highest_threat;
-
-				/* Compute level algorithmically */
-				for (j = 1; (mexp > j + 4) || (threat > j + 5); mexp -= j * j, threat -= (j + 4), j++);
-
-				/* Set level */
-				lvl = MIN(( j > 250 ? 90 + (j - 250) / 20 : 	/* Level 90 and above */
-						(j > 130 ? 70 + (j - 130) / 6 :	/* Level 70 and above */
-						(j > 40 ? 40 + (j - 40) / 3 :	/* Level 40 and above */
-						j))), 99);
-
-				/* Set level */
-				r_ptr->level = lvl;
-			}
-
-			/* Hack -- for Ungoliant */
-			if (hp > 10000) r_ptr->mexp = (hp / 25) * (dam / lvl);
-			else r_ptr->mexp = (hp * dam) / (lvl * 25);
-
-			/* Round to 2 significant figures */
-			if (r_ptr->mexp > 100)
-			{
-				if (r_ptr->mexp < 1000) { r_ptr->mexp = (r_ptr->mexp + 5) / 10; r_ptr->mexp *= 10; }
-				else if (r_ptr->mexp < 10000) { r_ptr->mexp = (r_ptr->mexp + 50) / 100; r_ptr->mexp *= 100; }
-				else if (r_ptr->mexp < 100000) { r_ptr->mexp = (r_ptr->mexp + 500) / 1000; r_ptr->mexp *= 1000; }
-				else if (r_ptr->mexp < 1000000) { r_ptr->mexp = (r_ptr->mexp + 5000) / 10000; r_ptr->mexp *= 10000; }
-				else if (r_ptr->mexp < 10000000) { r_ptr->mexp = (r_ptr->mexp + 50000) / 100000; r_ptr->mexp *= 100000; }
-			}
-		}
-
-		if ((lvl) && (r_ptr->mexp < 1L)) r_ptr->mexp = 1L;
-
+	
 		/*
-		 * Hack - We have to use an adjustment factor to prevent overflow.
-                 */
-		if (lvl >= 90)
-		{
-			hp /= 1000;
-			dam /= 1000;
-		}
-		else if (lvl >= 65)
-		{
-			hp /= 100;
-			dam /= 100;
-		}
-		else if (lvl >= 40)
-		{
-			hp /= 10;
-			dam /= 10;
-		}
-
-		/* Define the power rating */
-		power[i] = hp * dam;
-
-		/* Adjust for group monsters.  Average in-level group size is 5 */
-		if (r_ptr->flags1 & RF1_UNIQUE) ;
-
-		else if (r_ptr->flags1 & RF1_FRIEND) power[i] *= 2;
-
-		else if (r_ptr->flags1 & RF1_FRIENDS) power[i] *= 5;
-
-		/* Adjust for multiplying monsters. This is modified by the speed,
-		 * as fast multipliers are much worse than slow ones. We also adjust for
-		 * ability to bypass walls or doors.
+		 * Go through r_info and evaluate power ratings & flows.
 		 */
-		if (r_ptr->flags2 & RF2_MULTIPLY)
+		for (i = 0; i < z_info->r_max; i++)
 		{
-			if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL))
-				power[i] = MAX(power[i], power[i] * extract_energy[r_ptr->speed
-					+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]);
-			else if (r_ptr->flags2 & (RF2_OPEN_DOOR | RF2_BASH_DOOR))
-				power[i] = MAX(power[i], power[i] *  extract_energy[r_ptr->speed
-					+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] * 3 / 2);
+			/* Point at the "info" */
+			r_ptr = (monster_race*)head->info_ptr + i;
+	#if 0
+			/*** Evaluate flows ***/
+	
+			/* Evaluate 'unusual' flows */
+			if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL)) r_ptr->flows |= (1L << FLOW_WALK_WALL);
+			if (r_ptr->flags2 & (RF2_MUST_FLY)) r_ptr->flows |= (1L << FLOW_FLY);
+			if (r_ptr->flags2 & (RF2_MUST_SWIM)) r_ptr->flows |= (1L << FLOW_SWIM);
+	
+			/* Evaluate walking flows */
+			if ((r_ptr->flags2 & (RF2_MUST_FLY | RF2_MUST_SWIM)) == 0)
+			{
+				/* Use walking */
+				r_ptr->flows |= (1L << FLOW_WALK);
+	
+				/* Evaluate walk + other */
+				if (r_ptr->flags2 & (RF2_CAN_DIG)) r_ptr->flows |= (1L << FLOW_WALK_DIG) | (1L << FLOW_DIG);
+				if (r_ptr->flags2 & (RF2_CAN_FLY)) r_ptr->flows |= (1L << FLOW_WALK_FLY) | (1L << FLOW_FLY_CHASM);
+				if (r_ptr->flags2 & (RF2_CAN_SWIM)) r_ptr->flows |= (1L << FLOW_WALK_SWIM) | (1L << FLOW_SWIM);
+				if (r_ptr->flags2 & (RF2_CAN_CLIMB)) r_ptr->flows |= (1L << FLOW_WALK_CLIMB);
+				if (r_ptr->flags2 & (RF2_BASH_DOOR)) r_ptr->flows |= (1L << FLOW_WALK_BASH);
+				if (r_ptr->flags2 & (RF2_OPEN_DOOR)) r_ptr->flows |= (1L << FLOW_WALK_OPEN);
+				if ((r_ptr->flags2 & (RF2_BASH_DOOR)) && (r_ptr->flags2 & (RF2_OPEN_DOOR))) r_ptr->flows |= (1L << FLOW_WALK_BASH_OPEN);
+				if (r_ptr->flags3 & (RF3_OOZE)) r_ptr->flows |= (1L << FLOW_WALK_OOZE);
+				if (r_ptr->flags3 & (RF3_NONLIVING)) r_ptr->flows |= (1L << FLOW_WALK_NONLIVING);
+				if (r_ptr->flags3 & (RF3_IM_ACID)) r_ptr->flows |= (1L << FLOW_WALK_ACID) | (1L << FLOW_ACID);
+				if (r_ptr->flags3 & (RF3_IM_COLD)) r_ptr->flows |= (1L << FLOW_WALK_COLD);
+				if (r_ptr->flags3 & (RF3_IM_ELEC)) r_ptr->flows |= (1L << FLOW_WALK_ELEC);
+	
+				/* Evaluate fire immunity flows */
+				if (r_ptr->flags3 & (RF3_IM_FIRE))
+				{
+					/* Use walking + fire immunity */
+					r_ptr->flows |= (1L << FLOW_WALK_FIRE) | (1L << FLOW_FIRE);
+	
+					if (r_ptr->flags2 & (RF2_CAN_DIG)) r_ptr->flows |= (1L << FLOW_WALK_FIRE_DIG) | (1L << FLOW_FIRE_DIG);
+					if (r_ptr->flags2 & (RF2_CAN_SWIM)) r_ptr->flows |= (1L << FLOW_WALK_FIRE_SWIM) | (1L << FLOW_FIRE_SWIM);
+				}
+			}
+	#endif
+			/*** Evaluate power ratings ***/
+	
+			/* Set the current level */
+			lvl = r_ptr->level;
+	
+			/* Maximum damage this monster can do in 10 game turns */
+			dam = eval_max_dam(r_ptr);
+	
+			/* Adjust hit points based on resistances */
+			hp = eval_hp_adjust(r_ptr);
+
+#ifdef ALLOW_TEMPLATES_OUTPUT
+			/* Hack -- set exp */
+			if (lvl == 0) r_ptr->mexp = 0L;
 			else
-				power[i] = MAX(power[i], power[i] * extract_energy[r_ptr->speed
-					+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
-		}
-
-		/*
-		 * Update the running totals - these will be used as divisors later
-		 * Total HP / dam / count for everything up to the current level
-		 */
-		for (j = lvl; j < (lvl == 0 ? lvl + 1: MAX_DEPTH); j++)
-		{
-			int count = 10;
+			{
+				/* Compute depths of non-unique monsters */
+				if (!(r_ptr->flags1 & (RF1_UNIQUE)))
+				{
+					long mexp = (hp * dam) / 25;
+					long threat = r_ptr->highest_threat;
+	
+					/* Compute level algorithmically */
+					for (j = 1; (mexp > j + 4) || (threat > j + 5); mexp -= j * j, threat -= (j + 4), j++);
+	
+					/* Set level */
+					lvl = MIN(( j > 250 ? 90 + (j - 250) / 20 : 	/* Level 90 and above */
+							(j > 130 ? 70 + (j - 130) / 6 :	/* Level 70 and above */
+							(j > 40 ? 40 + (j - 40) / 3 :	/* Level 40 and above */
+							j))), 99);
+	
+					/* Set level */
+					r_ptr->level = lvl;
+				}
+	
+				/* Hack -- for Ungoliant */
+				if (hp > 10000) r_ptr->mexp = (hp / 25) * (dam / lvl);
+				else r_ptr->mexp = (hp * dam) / (lvl * 25);
+	
+				/* Round to 2 significant figures */
+				if (r_ptr->mexp > 100)
+				{
+					if (r_ptr->mexp < 1000) { r_ptr->mexp = (r_ptr->mexp + 5) / 10; r_ptr->mexp *= 10; }
+					else if (r_ptr->mexp < 10000) { r_ptr->mexp = (r_ptr->mexp + 50) / 100; r_ptr->mexp *= 100; }
+					else if (r_ptr->mexp < 100000) { r_ptr->mexp = (r_ptr->mexp + 500) / 1000; r_ptr->mexp *= 1000; }
+					else if (r_ptr->mexp < 1000000) { r_ptr->mexp = (r_ptr->mexp + 5000) / 10000; r_ptr->mexp *= 10000; }
+					else if (r_ptr->mexp < 10000000) { r_ptr->mexp = (r_ptr->mexp + 50000) / 100000; r_ptr->mexp *= 100000; }
+				}
+			}
+	
+			if ((lvl) && (r_ptr->mexp < 1L)) r_ptr->mexp = 1L;
+#endif /* ALLOW_TEMPLATES_OUTPUT */
 
 			/*
-			 * Uniques don't count towards monster power on the level.
+			 * Hack - We have to use an adjustment factor to prevent overflow.
 			 */
-			if (r_ptr->flags1 & RF1_UNIQUE) continue;
-
-			/*
-			 * Specifically placed monsters don't count towards monster power on the level.
-			 */
-			if (!(r_ptr->rarity)) continue;
-
-			/*
-			 * Hack -- provide adjustment factor to prevent overflow
-			 */
-			if ((j == 90) && (r_ptr->level < 90))
+			if (lvl >= 90)
+			{
+				hp /= 1000;
+				dam /= 1000;
+			}
+			else if (lvl >= 65)
+			{
+				hp /= 100;
+				dam /= 100;
+			}
+			else if (lvl >= 40)
 			{
 				hp /= 10;
 				dam /= 10;
 			}
-
-			if ((j == 65) && (r_ptr->level < 65))
-			{
-				hp /= 10;
-				dam /= 10;
-			}
-
-			if ((j == 40) && (r_ptr->level < 40))
-			{
-				hp /= 10;
-				dam /= 10;
-			}
-
-			/*
-			 * Hack - if it's a group monster or multiplying monster, 
-			 * add several to the count
-			 * so that the averages don't get thrown off
+	
+			/* Define the power rating */
+			power[i] = hp * dam;
+	
+			/* Adjust for group monsters.  Average in-level group size is 5 */
+			if (r_ptr->flags1 & RF1_UNIQUE) ;
+	
+			else if (r_ptr->flags1 & RF1_FRIEND) power[i] *= 2;
+	
+			else if (r_ptr->flags1 & RF1_FRIENDS) power[i] *= 5;
+	
+			/* Adjust for multiplying monsters. This is modified by the speed,
+			 * as fast multipliers are much worse than slow ones. We also adjust for
+			 * ability to bypass walls or doors.
 			 */
-
-			if (r_ptr->flags1 & RF1_FRIEND) count = 20;
-			else if (r_ptr->flags1 & RF1_FRIENDS) count = 50;
-
 			if (r_ptr->flags2 & RF2_MULTIPLY)
 			{
 				if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL))
-					count = MAX(1, extract_energy[r_ptr->speed
-						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) * count;
+					power[i] = MAX(power[i], power[i] * extract_energy[r_ptr->speed
+						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]);
 				else if (r_ptr->flags2 & (RF2_OPEN_DOOR | RF2_BASH_DOOR))
-					count = MAX(1, extract_energy[r_ptr->speed
-						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] * 3 / 2) * count;
+					power[i] = MAX(power[i], power[i] *  extract_energy[r_ptr->speed
+						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] * 3 / 2);
 				else
-					count = MAX(1, extract_energy[r_ptr->speed
-						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2) * count;
+					power[i] = MAX(power[i], power[i] * extract_energy[r_ptr->speed
+						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
 			}
-
+	
 			/*
-			 * Very rare monsters count less towards total monster power on the level.
+			 * Update the running totals - these will be used as divisors later
+			 * Total HP / dam / count for everything up to the current level
 			 */
-			if (r_ptr->rarity > count)
+			for (j = lvl; j < (lvl == 0 ? lvl + 1: MAX_DEPTH); j++)
 			{
-				hp = hp * count / r_ptr->rarity;
-				dam = dam * count / r_ptr->rarity;
-
-				count = r_ptr->rarity;
+				int count = 10;
+	
+				/*
+				 * Uniques don't count towards monster power on the level.
+				 */
+				if (r_ptr->flags1 & RF1_UNIQUE) continue;
+	
+				/*
+				 * Specifically placed monsters don't count towards monster power on the level.
+				 */
+				if (!(r_ptr->rarity)) continue;
+	
+				/*
+				 * Hack -- provide adjustment factor to prevent overflow
+				 */
+				if ((j == 90) && (r_ptr->level < 90))
+				{
+					hp /= 10;
+					dam /= 10;
+				}
+	
+				if ((j == 65) && (r_ptr->level < 65))
+				{
+					hp /= 10;
+					dam /= 10;
+				}
+	
+				if ((j == 40) && (r_ptr->level < 40))
+				{
+					hp /= 10;
+					dam /= 10;
+				}
+	
+				/*
+				 * Hack - if it's a group monster or multiplying monster, 
+				 * add several to the count
+				 * so that the averages don't get thrown off
+				 */
+	
+				if (r_ptr->flags1 & RF1_FRIEND) count = 20;
+				else if (r_ptr->flags1 & RF1_FRIENDS) count = 50;
+	
+				if (r_ptr->flags2 & RF2_MULTIPLY)
+				{
+					if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL))
+						count = MAX(1, extract_energy[r_ptr->speed
+							+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]) * count;
+					else if (r_ptr->flags2 & (RF2_OPEN_DOOR | RF2_BASH_DOOR))
+						count = MAX(1, extract_energy[r_ptr->speed
+							+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] * 3 / 2) * count;
+					else
+						count = MAX(1, extract_energy[r_ptr->speed
+							+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2) * count;
+				}
+	
+				/*
+				 * Very rare monsters count less towards total monster power on the level.
+				 */
+				if (r_ptr->rarity > count)
+				{
+					hp = hp * count / r_ptr->rarity;
+					dam = dam * count / r_ptr->rarity;
+	
+					count = r_ptr->rarity;
+				}
+	
+				tot_hp[j] += hp;
+				tot_dam[j] += dam;
+	
+				mon_count[j] += count / r_ptr->rarity;
 			}
-
-			tot_hp[j] += hp;
-			tot_dam[j] += dam;
-
-			mon_count[j] += count / r_ptr->rarity;
 		}
-
-	}
-
-	/* Apply divisors now */
-	for (i = 0; i < z_info->r_max; i++)
-	{
-		int new_power;
-
-		/* Point at the "info" */
-		r_ptr = (monster_race*)head->info_ptr + i;
-
-		/* Extract level */
-		lvl = r_ptr->level;
-
-		/* Paranoia */
-		if (tot_hp[lvl] != 0 && tot_dam[lvl] != 0)
+	
+		/* Apply divisors now */
+		for (i = 0; i < z_info->r_max; i++)
 		{
-			/* Divide by average HP and av damage for all in-level monsters */
-			/* Note we have factored in the above 'adjustment factor' */
-			av_hp = tot_hp[lvl] * 10 / mon_count[lvl];
-			av_dam = tot_dam[lvl] * 10 / mon_count[lvl];
+			int new_power;
+	
+			/* Point at the "info" */
+			r_ptr = (monster_race*)head->info_ptr + i;
+	
+			/* Extract level */
+			lvl = r_ptr->level;
+	
+			/* Paranoia */
+			if (tot_hp[lvl] != 0 && tot_dam[lvl] != 0)
+			{
+				/* Divide by average HP and av damage for all in-level monsters */
+				/* Note we have factored in the above 'adjustment factor' */
+				av_hp = tot_hp[lvl] * 10 / mon_count[lvl];
+				av_dam = tot_dam[lvl] * 10 / mon_count[lvl];
+	
+				/* XXX Justifiable paranoia - avoid divide by zero errors */
+				if (av_hp > 0) power[i] = power[i] / av_hp;
+				if (av_dam > 0) power[i] = power[i] / av_dam;
+	
+				/* Assign monster power */
+				r_ptr->power = (s16b)power[i];
+	
+				/* Never less than 1 */
+				if (r_ptr->power < 1) r_ptr->power = 1;
 
-			/* XXX Justifiable paranoia - avoid divide by zero errors */
-			if (av_hp > 0) power[i] = power[i] / av_hp;
-			if (av_dam > 0) power[i] = power[i] / av_dam;
-
-			/* Assign monster power */
-			r_ptr->power = (s16b)power[i];
-
-			/* Never less than 1 */
-			if (r_ptr->power < 1) r_ptr->power = 1;
-
-			/* Get power */
-			new_power = r_ptr->power;
-
-			/* Compute rarity algorithmically */
-			for (j = 1; new_power > j; new_power -= j * j, j++);
-
-			/* Set rarity */
-			r_ptr->rarity = j;
-		}
+#ifdef ALLOW_TEMPLATES_OUTPUT
+				/* Get power */
+				new_power = r_ptr->power;
+	
+				/* Compute rarity algorithmically */
+				for (j = 1; new_power > j; new_power -= j * j, j++);
+	
+				/* Set rarity */
+				r_ptr->rarity = j;
+#endif /* ALLOW_TEMPLATES_OUTPUT */
+			}
+		}	
+#ifdef ALLOW_TEMPLATES_OUTPUT
 	}
-
-}
+#endif /* ALLOW_TEMPLATES_OUTPUT */
 
 	/* Free power array */
 	FREE(power);
