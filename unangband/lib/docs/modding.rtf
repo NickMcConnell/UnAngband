@@ -3,7 +3,7 @@
 {\colortbl;\red255\green255\blue255;}
 \paperw11900\paperh16840\margl1440\margr1440\vieww19180\viewh12600\viewkind0
 \deftab720
-\pard\pardeftab720
+\pard\pardeftab720\ql\qnatural
 
 \f0\fs22 \cf0 # The artifact indexes are defined in "defines.h", and must not be changed.\
 \
@@ -88,7 +88,7 @@
 \pard\pardeftab720\ql\qnatural
 
 \f1\fs24 \cf0 \
-\pard\pardeftab720
+\pard\pardeftab720\ql\qnatural
 
 \f0\fs22 \cf0 # Here is the list of "Special" artifacts - Amulets, Light Sources, Rings.\
 # Only the FIRST 15 artifacts may be of these types currently: artifacts\
@@ -97,7 +97,98 @@
 \pard\pardeftab720\ql\qnatural
 
 \f1\fs24 \cf0 \
+\pard\pardeftab720
+
+\f0\fs22 \cf0 # The ego-item indexes are defined in "defines.h", and must not be changed.\
 \
+# Ego-items 1-63 are "armor", and 64-127 are "weapons"\
+\
+# Note that every "ego-item" type has a different "index", and can only be\
+# created from items that belong to a certain "slot" in the equipment, if\
+# one assumes that "ammo" belongs to an imaginary slot (23).\
+#\
+# Note that the above is not true and was not true even before my patch. \
+# The 'slot' seems very useless to me right now. -MWK-\
+#\
+# Note that several "ego-item" types may share the same "textual name",\
+# such as with "Armor of Resistance" and "Shield of Resistance".\
+\
+# === Understanding ego_item.txt ===\
+\
+# N: serial number : ego type\
+# X: inventory slot : rating : xtra\
+# C: max to-hit : max to-dam : max to-ac : pval\
+# W: depth : rarity : weight : cost\
+# T: tval : min_sval : max_sval\
+# F: flag | flag | etc\
+\
+# 'N' indicates the beginning of an entry. The serial number must\
+# increase for each new item.\
+\
+# 'X' is for extra information - inventory slot and rating. Slots\
+# range from 23 (for ammunition) to 35 (for boots). Rating affects\
+# level feelings.  The xtra value determines random extra flags for\
+# the ego-item.  Nothing happens with a value of 0, 1 stands for\
+# "one random extra sustain", 2 is "one random extra resist", and\
+# 3 is "one random extra ability".\
+\
+# 'C' is for creation bonusses - maximum to-hit, to-dam, to-ac, and\
+# pval. Cursed ego-items will negate the given value.\
+\
+# 'W' is for extra information. Depth is the depth the object is\
+# normally found at, rarity determines how common the object is,\
+# weight is in tenth-pounds and cost is the items value.\
+\
+# 'F' is for flags. These are fairly self-explanatory. As many F:\
+# lines may be used as are needed to specify all the flags and flags\
+# are separated by the '|' symbol.\
+\
+# 'T' is for possible 'tval' and 'sval' values of the base-item.\
+# Up to three 'T' entries are possible for a single object. The\
+# ego-item can only be generated from items of this tval, with sval\
+# in the specified range.\
+\
+# New ego-items added by JLE are:\
+# 10: Armor of Vulnerability (cursed ego-type for armor)\
+# 12: Dwarven Armor (heavy metal armor only)\
+# 21: Shield of Elvenkind (returning from Angband 2.7.8 and previous versions)\
+# 22: Shield of Preservation\
+# 23: Shield of Vulnerability (cursed ego-type for shields)\
+# 36: Crown of Serenity (adapted from OAngband: replaces Helm of Stupidity)\
+# 37: Crown of Night & Day (partially adapted from an OAngband ego-item)\
+# 43: Cloak of the Magi\
+# 52: Gloves of Thievery (leather gloves only)\
+# 53: Gauntlets of Combat (gauntlets and cesti only)\
+# 60: Boots of Stability (from OAngband)\
+# 61: Boots of Elvenkind (replaces Boots of Noise - too many cursed types of boot)\
+# 67: Weapon of Gondolin (rarer and more powerful than Westernesse)\
+# 70: Weapon of Fury (nastier than a Weapon of Extra Attacks, but also aggravates)\
+# 76: Weapon of Venom (Poison Brand: does NOT, however, provide poison resist)\
+# 101: Shovel/Pick of Impact\
+# 106: Bow of Lothlorien\
+# 107: Crossbow of the Haradrim\
+# 110: Sling of Buckland\
+# 111: Bow/Crossbow of the Nazgul (cursed bow ego-type)\
+# 120: Ammo of Holy Might (seeker, silver and mithril stuff only)\
+# 121: Ammo of Venom\
+\
+# Changes for Unangband.\
+\
+# Added Slay Evil to Defender. Made Blessed weapons have a high resist rather than\
+# special ability (Should make them more useful sometimes, except for telepathy).\
+# Moved some of these items around for compatibility with Unangband save files.\
+# Heavily discounted basic slay weapons and made more common, so that low level\
+# characters are more likely to find and use them.\
+# Added 4 additional 'branded' ego weapons, Enchanted weapon, and other ego items.\
+# Added instruments of the Might/Lordliness/Serenity/Dullness.\
+#\
+# Changes related to AGI/DEX rebalance:\
+# moved Seven League deeper and Thievery shallower\
+# added Cloaks of the Bat\
+#\
+\pard\pardeftab720\ql\qnatural
+
+\f1\fs24 \cf0 \
 \
 \
 === Understanding monster.txt ===\
@@ -122,13 +213,15 @@ D: Description\
 \
 'G' is for graphics - symbol and color. There are currently 16 colors, as follows:\
 \
+\pard\pardeftab720\ql\qnatural
 
-\f0 D - Dark Gray    w - White          s - Gray          o - Orange\
+\f0 \cf0 D - Dark Gray    w - White          s - Gray          o - Orange\
 r - Red          g - Green          b - Blue          u - Brown\
 d - Black        W - Light Gray     v - Violet        y - Yellow\
 R - Light Red    G - Light Green    B - Light Blue    U - Light Brown\
+\pard\pardeftab720\ql\qnatural
 
-\f1 \
+\f1 \cf0 \
 (note that "black" is the same color as the screen background, and thus the monster will appear to be an empty black space if its color is "d".)\
 \
 'I' is for information - speed, health, vision in tens of feet, armor class, and alertness. 110 is normal speed. Alertness ranges from 0 (ever vigilant for intruders) to 255 (prefers to ignore intruders).\
