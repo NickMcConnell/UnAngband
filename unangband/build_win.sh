@@ -40,6 +40,7 @@ cp faq.txt $DEST
 cp bugs.txt $DEST
 cp nocompile.txt $DEST/compile.txt
 
+cp lib/docs/*.rtf $DEST/lib/docs
 cp lib/edit/*.txt $DEST/lib/edit
 
 cp lib/file/*.txt $DEST/lib/file
