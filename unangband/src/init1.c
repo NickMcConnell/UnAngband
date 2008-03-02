@@ -7657,9 +7657,9 @@ errr eval_r_power(header *head)
 	long mon_count[MAX_DEPTH];
 	monster_race *r_ptr = NULL;
 
+#ifdef ALLOW_TEMPLATES_OUTPUT
 	int iteration;
 
-#ifdef ALLOW_TEMPLATES_OUTPUT
 	/* Hack -- Clear item drop flags when monster doesn't drop anything */
 	for (i = 0; i < z_info->r_max; i++)
 	{
@@ -7923,7 +7923,9 @@ errr eval_r_power(header *head)
 		/* Apply divisors now */
 		for (i = 0; i < z_info->r_max; i++)
 		{
+#ifdef ALLOW_TEMPLATES_OUTPUT
 			int new_power;
+#endif /* ALLOW_TEMPLATES_OUTPUT */
 	
 			/* Point at the "info" */
 			r_ptr = (monster_race*)head->info_ptr + i;
