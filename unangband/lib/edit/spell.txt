@@ -5,8 +5,8 @@
 # unless you wish to risk possible system crashes and broken savefiles.
 # After modifying this file, delete the "lib/data/spell.raw" file.
 
-# Note that all spells, object effects and artifact activations are
-# now specified in this file.
+# See "lib/docs/modding.rtf" to understand this file and how to modify
+# it and related files.
 
 
 # Version stamp (required)
