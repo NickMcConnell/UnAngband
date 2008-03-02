@@ -1,16 +1,111 @@
 {\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf440
-{\fonttbl\f0\fswiss\fcharset77 ArialMT;\f1\fnil\fcharset77 Monaco;}
+{\fonttbl\f0\fnil\fcharset77 Monaco;\f1\fswiss\fcharset77 ArialMT;}
 {\colortbl;\red255\green255\blue255;}
 \paperw11900\paperh16840\margl1440\margr1440\vieww19180\viewh12600\viewkind0
 \deftab720
+\pard\pardeftab720
+
+\f0\fs22 \cf0 # The artifact indexes are defined in "defines.h", and must not be changed.\
+\
+# Hack -- "Grond" and "Morgoth" MUST have a rarity of one, or they might\
+# not be dropped when Morgoth is killed.  Note that they, like the "special"\
+# artifacts, are never created "accidentally".\
+\
+# === Understanding artifact.txt ===\
+\
+# N: serial number : item name\
+# I: tval : sval : pval\
+# W: depth : rarity : weight : cost\
+# P: base armor class : base damage : plus to-hit : plus to-dam : plus to-ac\
+# F: flag | flag | etc\
+# A: activation : recharge time : recharge time dice\
+\
+# 'N' indicates the beginning of an entry. The serial number must\
+# increase for each new item.\
+\
+# 'I' is for basic information. The tval is for the type of item, the\
+# sval identifies the subtype and the pval indicates the amount of\
+# effect the item has, if applicable.\
+\
+# 'W' is for extra information. Depth is the depth the object is\
+# normally found at, rarity determines how common the object is,\
+# weight is in tenth-pounds and cost is the item's value.\
+\
+# 'P' is for power information. The items base armor class, its base\
+# damage and pluses to-hit, to-dam and to-ac.\
+\
+# 'F' is for flags. These are fairly self-explanatory. As many F:\
+# lines may be used as are needed to specify all the flags and flags\
+# are separated by the '|' symbol.\
+\
+# 'A' is for activation.  Activation is the effect the artifact\
+# activates for. The recharge time calculates from the recharge time\
+# plus a random value between 1 and the recharge time dice (if not 0).\
+# If an activation is given then the artifact must also have the\
+# ACTIVATE flag.\
+\
+# The activation is now an index into s_info.txt, except for the one ring.\
+\
+### IMPORTANT NOTES ###\
+# (1.) Any changes or additions to the file will have influence on randarts \
+# and may break savefile compatibility for old savegames with randarts.  If \
+# using random artifacts, finish your existing game before making any changes\
+# to the artifact.txt file at all.\
+# (2.) Removing any artifact, or changing its "base" type (as defined by \
+# the tval and sval entries in the "I:" line), will break savefile compatibility\
+# for ALL savefiles.\
+# (3.) Adding a new artifact, or changing the powers of existing ones, will NOT \
+# affect savefile compatibility for games with the standard artifact set: it is \
+# perfectly safe to do this. (If your new artifact is a new kind of object, or a \
+# new one at the end of the file, you must also amend object.txt or limits.txt.)\
+\
+# New artifacts (22) are as follows:\
+# 7: The Palantir of Westernesse (original creation by JLE)\
+# 14: The Elfstone 'Elessar'\
+# 15: The Jewel 'Evenstar'\
+# 18: The Balance Dragon Scale Mail 'Mediator' (original JLE creation)\
+# 26: The Hard Leather Armor of Himring (adapted from OAngband)\
+# 29: The Shield of Deflection of Gil-galad (adapted from OAngband)\
+# 33: The Metal Cap of Celebrimbor (suggested by Matthias Kurzke)\
+# 43: The Jewel-Encrusted Crown of Numenor (adapted from OAngband)\
+# 51: The Gauntlets of Eol (adapted from OAngband)\
+# 63: The Soft Leather Boots of Wormtongue (original JLE creation)\
+# 92: The Spear of Melkor (adapted from KAngband)\
+# 110: The Beaked Axe of Hurin (adapted from KAngband)\
+# 123: The Whip of Gothmog (original JLE creation)\
+# 127: The Heavy Crossbow of Umbar (adapted from OAngband)\
+# 128, 129: The Short Bows of Amrod and Amras (original JLE creations)\
+# 130: The Mattock of Nain (original JLE creation)\
+# 131: The Dwarven Pick of Erebor (adapted from SAngband)\
+# 132: The Ball-and-Chain of Fundin Bluecloak (suggested by Skylar Thompson)\
+# 133: The Main Gauche of Azaghal (adapted from KAngband)\
+# 134: The Large Leather Shield of the Haradrim (suggested by Skylar Thompson)\
+# 135: The Broken Sword 'Narsil' (original JLE creation)\
+# 136: The Bastard Sword of Eowyn (original JLE creation)\
+\
+# Changes related to AGI/DEX rebalance:\
+# reduced the speed bonuses of the Big Three speed arts; removed speed bonus from arts that also have DEX boost: 'Thalkettoth', Wormtongue, Maedhros, 'Angrist', Eorlingas, Bard, Amras, ; but not removed the double boost on the Rings of Power, 'Sting', 'Belthronding', 'Aglarang' and Numenor, but lowered pval on the last two\
 \pard\pardeftab720\ql\qnatural
 
-\f0\fs24 \cf0 === Understanding monster.txt ===\
+\f1\fs24 \cf0 \
+\pard\pardeftab720
+
+\f0\fs22 \cf0 # Here is the list of "Special" artifacts - Amulets, Light Sources, Rings.\
+# Only the FIRST 15 artifacts may be of these types currently: artifacts\
+# from index number 16 onwards must be Armor or Weapons.\
+\
+\pard\pardeftab720\ql\qnatural
+
+\f1\fs24 \cf0 \
+\
+\
+\
+=== Understanding monster.txt ===\
 \
 This file describes the monster.txt file in the lib\\edit folder.  The monster.txt file is used to initialise almost all information about the monster races in the game.  The file is parsed into the monster.raw file in lib\\data which is a raw data file which is loaded into memory.  The raw file is created if it does not exist, or if the date on the monster.txt file is later than the raw file.  It is best practise to always delete the raw file if you \
 \
 The monster.txt file consists of one entry for each monster race, which is laid out as follows:
-\f1 \
+\f0 \
 \
 N: serial number : monster name\
 G: symbol : color\
@@ -23,17 +118,17 @@ F: flag | flag | etc\
 D: Description\
 \
 
-\f0 'N' indicates the beginning of an entry. The serial number must increase for each new item. Entry 0 is used for the player.\
+\f1 'N' indicates the beginning of an entry. The serial number must increase for each new item. Entry 0 is used for the player.\
 \
 'G' is for graphics - symbol and color. There are currently 16 colors, as follows:\
 \
 
-\f1 D - Dark Gray    w - White          s - Gray          o - Orange\
+\f0 D - Dark Gray    w - White          s - Gray          o - Orange\
 r - Red          g - Green          b - Blue          u - Brown\
 d - Black        W - Light Gray     v - Violet        y - Yellow\
 R - Light Red    G - Light Green    B - Light Blue    U - Light Brown\
 
-\f0 \
+\f1 \
 (note that "black" is the same color as the screen background, and thus the monster will appear to be an empty black space if its color is "d".)\
 \
 'I' is for information - speed, health, vision in tens of feet, armor class, and alertness. 110 is normal speed. Alertness ranges from 0 (ever vigilant for intruders) to 255 (prefers to ignore intruders).\
@@ -66,7 +161,7 @@ are separated by the '|' symbol.\
 \
 'D' is for description. As many D: lines may be used as are needed to describe the monster.\
 \
-=== Understanding monster.txt flags ===\
+=== Understanding monster race flags ===\
 \
 To understand the additional monster flags, you should grep the code base using the regular expression RF[0-9]_ followed by the monster flag as shown in the monster.txt file.\
 \
