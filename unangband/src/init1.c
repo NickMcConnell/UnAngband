@@ -7430,7 +7430,7 @@ static long eval_max_dam(monster_race *r_ptr)
 	else if (r_ptr->flags2 & (RF2_INVISIBLE)) r_ptr->highest_threat = r_ptr->highest_threat * 3 / 2;
 
 	/*but deep in a minimum*/
-	if (dam < 1) dam  = 1;
+	if (dam < 2) dam  = 2;
 
 	/* We're done */
 	return (dam);
