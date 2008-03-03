@@ -7429,8 +7429,8 @@ static long eval_max_dam(monster_race *r_ptr)
 	/* Invisibility increases overall threat */
 	else if (r_ptr->flags2 & (RF2_INVISIBLE)) r_ptr->highest_threat = r_ptr->highest_threat * 3 / 2;
 
-	/*but deep in a minimum*/
-	if (dam < 2) dam  = 2;
+	/* Even helpless monsters are after the player */
+	if (dam < 3) dam  = 3;
 
 	/* We're done */
 	return (dam);
@@ -8118,7 +8118,7 @@ errr emit_info_txt(FILE *fp, FILE *template, char *buf, header *head,
 
 			while (error_idx < idx)
 			{
-				fprintf(fp,"### %d - Unused ###\n\n",error_idx++);	
+				fprintf(fp,"#$# %d - Unused ###\n\n",error_idx++);	
 			}
 
 			if ((err = (emit_info_txt_index(fp, head, idx))) != 0)
