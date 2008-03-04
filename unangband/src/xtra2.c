@@ -3674,9 +3674,6 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 
 	monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
-	s32b div, new_exp, new_exp_frac;
-	byte new_level;
-
 	/* Redraw (later) if needed */
 	if (p_ptr->health_who == m_idx) p_ptr->redraw |= (PR_HEALTH);
 
@@ -3783,17 +3780,23 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 		/* Death of player allies doesn't provide experience */
 		if ((m_ptr->mflag & (MFLAG_ALLY)) == 0)
 		{
-			/* Maximum player level */
-			div = p_ptr->max_lev;
+			s32b mult, div, new_exp, new_exp_frac;
+			byte new_level;
+
+			/* 10 + killed monster level */
+			mult = 10 + r_ptr->level;
+
+			/* 10 + maximum player level */
+			div = 10 + p_ptr->max_lev;
 
 			/* Give some experience for the kill */
-			new_exp = ((long)r_ptr->mexp * r_ptr->level) / div;
+			new_exp = ((long)r_ptr->mexp * mult) / div;
 
 			/* Base adjustment */
 			new_level = -1;
 
 			/* Handle fractional experience */
-			new_exp_frac = ((((long)r_ptr->mexp * r_ptr->level) % div)
+			new_exp_frac = ((((long)r_ptr->mexp * mult) % div)
 					* 0x10000L / div) + p_ptr->exp_frac;
 
 			/* Keep track of experience */

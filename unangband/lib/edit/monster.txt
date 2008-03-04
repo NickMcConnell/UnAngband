@@ -5465,7 +5465,7 @@ D: drake's eyes glare with white hatred from the shadows.
 N:343:Bert, the Stone Troll
 G:T:s
 I:110:23d10:20:40:50
-W:12:4:0:110
+W:4:4:0:100
 M:15:0:4:0
 B:HIT:BATTER:3d7
 B:BITE:HURT:1d10
@@ -5484,7 +5484,7 @@ D: Bill and Tom.
 N:344:Bill, the Stone Troll
 G:T:s
 I:110:23d10:20:40:50
-W:12:4:0:110
+W:5:4:0:100
 M:15:0:4:0
 B:HIT:BATTER:3d7
 B:BITE:HURT:1d10
@@ -5503,7 +5503,7 @@ D: Bert and Tom.
 N:345:Tom, the Stone Troll
 G:T:s
 I:110:23d10:20:40:50
-W:12:4:0:110
+W:6:4:0:100
 M:15:0:4:0
 B:HIT:BATTER:3d7
 B:BITE:HURT:1d10
@@ -11657,7 +11657,7 @@ F:STUPID | COLD_BLOOD | EMPTY_MIND |
 F:PLANT | NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP |
 F:RES_BLIND | RES_BLUNT | NO_CUTS | LEVEL_SIZE |
 S:HEAL | INVIS | TELE_SELF_TO | TRAPS |
-D:A mass of brown vegetation. Its fronds move cloyinglytowards you, then
+D:A mass of brown vegetation. Its fronds move cloyingly towards you, then
 D: dart away.
 
 N:672:Maggoty moss
@@ -11685,7 +11685,8 @@ F:STUPID | EMPTY_MIND |
 F:UNDEAD | EVIL | NONLIVING | PLANT | IM_COLD | NO_FEAR | NO_CONF | NO_SLEEP |
 F:RES_BLIND | RES_BLUNT | LEVEL_SIZE |
 S:DARKNESS | DRAIN_MANA | SCARE | BLIND | HOLD |
-D:It is a twisted black-barked tree.
+D:It is a twisted black-barked tree. A tree can't possibly hurt you,
+D: but you feel fear, disorientation and drowsiness as you approach.
 
 N:674:Thorn tree
 G:::U
