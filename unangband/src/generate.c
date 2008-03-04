@@ -10853,7 +10853,7 @@ static bool cave_gen(void)
 
 	/* Set up the monster ecology before placing rooms */
 	/* XXX Very early levels boring with ecologies enabled */
-	if (p_ptr->depth > 3)
+	if (p_ptr->depth > 2)
 	{
 		/* Generating */
 		if (cheat_room) msg_print("Generating ecology.");
