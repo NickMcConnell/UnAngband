@@ -1151,6 +1151,10 @@ s32b object_value_real(const object_type *o_ptr)
 	/* Now evaluate object power */
 	power = object_power(o_ptr);
 
+	/* A hack caused by "inhibit" in info.c */
+	if (power > 1000) 
+		return 0;
+
 #if 0
 	/* Hack -- No negative power on uncursed objects */
 	if ((power < 0) && !(cursed_p(o_ptr))) power = 0;
