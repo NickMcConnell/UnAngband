@@ -375,11 +375,8 @@ static void prt_sp(void)
 	if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL
 	    && p_ptr->pstyle != WS_MAGIC_BOOK
 	    && p_ptr->pstyle != WS_PRAYER_BOOK
-	    && p_ptr->pstyle != WS_SONG_BOOK) {
-	  if (!show_sidebar)
-	    prt_ac();
-	  return;
-	}
+	    && p_ptr->pstyle != WS_SONG_BOOK)
+		return;
 
 	put_str((show_sidebar ? "Max SP " : "/    "), ROW_MAXSP, COL_MAXSP);
 
@@ -1622,8 +1619,12 @@ static void prt_frame_basic(void)
 	for (i = 0; i < A_MAX; i++) prt_stat(i);
 
 	/* Armor */
-	if (show_sidebar) 
-	  prt_ac();
+	if (show_sidebar
+		 || (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL
+			  && p_ptr->pstyle != WS_MAGIC_BOOK
+			  && p_ptr->pstyle != WS_PRAYER_BOOK
+			  && p_ptr->pstyle != WS_SONG_BOOK)) 
+		prt_ac();
 
 	/* Hitpoints */
 	prt_hp();
@@ -4570,8 +4571,12 @@ void redraw_stuff(void)
 	if (p_ptr->redraw & (PR_ARMOR))
 	{
 		p_ptr->redraw &= ~(PR_ARMOR);
-		if (show_sidebar) 
-		  prt_ac();
+		if (show_sidebar
+			 || (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL
+				  && p_ptr->pstyle != WS_MAGIC_BOOK
+				  && p_ptr->pstyle != WS_PRAYER_BOOK
+				  && p_ptr->pstyle != WS_SONG_BOOK)) 
+			prt_ac();
 	}
 
 	if (p_ptr->redraw & (PR_HP))
