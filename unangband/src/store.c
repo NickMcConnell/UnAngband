@@ -1582,7 +1582,9 @@ static void display_store(int store_index)
 	{
 		cptr store_name = (u_name + u_info[st_ptr->index].name);
 		cptr owner_name = &(b_name[ot_ptr->owner_name]);
-		cptr race_name = p_name + p_info[ot_ptr->owner_race].name;
+		/* Maias may run shops, but their race remains hidden */
+		cptr race_name = ot_ptr->owner_race == RACE_MAIA ? "???"
+			: p_name + p_info[ot_ptr->owner_race].name;
 		int pos_store = 77 - strlen(store_name) - 8;
 		int pos_owner = 10;
 
@@ -3882,7 +3884,7 @@ int store_init(int feat)
 	int store_index = 0;
 
 	store_type *st_ptr;
-	owner_type *ot_ptr;
+	owner_type *ot_ptr = NULL;
 
 	/* Paranoia */
 	if (total_store_count >= max_store_count)
@@ -3935,18 +3937,23 @@ int store_init(int feat)
 	/* Set the store level */
 	st_ptr->level = f_info[feat].level;
 
-	/* Pick an owner */
-	st_ptr->owner = (byte)rand_int(z_info->b_max);
+	if (st_ptr->base >= STORE_MIN_BUY_SELL)
+	{
+		int count = 0;
+		do 
+		{
+			/* Pick an owner */
+			st_ptr->owner = (byte)rand_int(z_info->b_max);
 
-	if (st_ptr->base < STORE_MIN_BUY_SELL)
-	{
-		ot_ptr = &b_info[0];
+			/* Activate the new owner */
+			ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max)
+								  + st_ptr->owner];
+		} 
+		while (!ot_ptr->owner_name && count++ < 1000);
 	}
-	else
-	{
-		/* Activate the new owner */
-		ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max) + st_ptr->owner];
-	}
+
+	if (!ot_ptr || !ot_ptr->owner_name)
+		st_ptr->owner = 0;
 
 	/* Initialize the store */
 	st_ptr->store_open = 0;
