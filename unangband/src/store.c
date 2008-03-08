@@ -1582,8 +1582,10 @@ static void display_store(int store_index)
 	{
 		cptr store_name = (u_name + u_info[st_ptr->index].name);
 		cptr owner_name = &(b_name[ot_ptr->owner_name]);
-		/* Maias may run shops, but their race remains hidden */
-		cptr race_name = ot_ptr->owner_race == RACE_MAIA ? "Human"
+		/* Maias and evil shapechangers hide their race */
+		cptr race_name = ot_ptr->owner_race == RACE_MAIA
+			|| ot_ptr->owner_race == RACE_WEREWOLF
+			|| ot_ptr->owner_race == RACE_VAMPIRE ? "Human"
 			: p_name + p_info[ot_ptr->owner_race].name;
 		int pos_store = 77 - strlen(store_name) - 8;
 		int pos_owner = 10;
