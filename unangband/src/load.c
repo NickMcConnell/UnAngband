@@ -697,6 +697,8 @@ static errr rd_store(int n)
 
 	byte own, num;
 
+	owner_type *ot_ptr;
+
 	/* Paranoia */
 	if (total_store_count >= max_store_count)
 	{
@@ -795,6 +797,11 @@ static errr rd_store(int n)
 	}
 
 	st_ptr->owner = own;
+	
+	/* Activate the owner */
+	ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max) 
+						  + st_ptr->owner];
+	ot_ptr->busy = TRUE;
 
 	/* Read the items */
 	for (j = 0; j < num; j++)

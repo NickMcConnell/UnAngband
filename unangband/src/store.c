@@ -1583,9 +1583,11 @@ static void display_store(int store_index)
 		cptr store_name = (u_name + u_info[st_ptr->index].name);
 		cptr owner_name = &(b_name[ot_ptr->owner_name]);
 		/* Maias and evil shapechangers hide their race */
-		cptr race_name = ot_ptr->owner_race == RACE_MAIA
-			|| ot_ptr->owner_race == RACE_WEREWOLF
-			|| ot_ptr->owner_race == RACE_VAMPIRE ? "Human"
+		cptr race_name = 
+			(ot_ptr->owner_race == RACE_MAIA
+			 || ot_ptr->owner_race == RACE_WEREWOLF
+			 || ot_ptr->owner_race == RACE_VAMPIRE)
+			? "Human"
 			: p_name + p_info[ot_ptr->owner_race].name;
 		int pos_store = 77 - strlen(store_name) - 8;
 		int pos_owner = 10;
@@ -3754,7 +3756,7 @@ void do_cmd_store(void)
  */
 void store_shuffle(int store_index)
 {
-	int i, j;
+	int i;
 
 	store_type *st_ptr = store[store_index];
 	owner_type *ot_ptr;
@@ -3762,18 +3764,43 @@ void store_shuffle(int store_index)
 	/* Justifiable paranoia */
 	if (!st_ptr) return;
 	
-	if (st_ptr->base < STORE_MIN_BUY_SELL) return;
-
-	ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max) + st_ptr->owner];
-
-	/* Pick a new owner */
-	for (j = st_ptr->owner; j == st_ptr->owner; )
+	if (st_ptr->base < STORE_MIN_BUY_SELL) 
 	{
-		st_ptr->owner = (byte)rand_int(z_info->b_max);
+		return;
+	}
+	else
+	{
+		/* Release the previous owner */
+		ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max) + st_ptr->owner];
+		ot_ptr->busy = FALSE;
+
+		int j = st_ptr->owner;
+		int count = 0;
+		do 
+		{
+			count++;
+
+			/* Pick an owner */
+			st_ptr->owner = (byte)rand_int(z_info->b_max);
+
+			/* Activate the new owner */
+			ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max)
+								  + st_ptr->owner];
+		} 
+		while (j == st_ptr->owner
+				 || (count < 500 && ot_ptr->busy)
+				 || (count < 1000 && !ot_ptr->owner_name));
 	}
 
-	/* Activate the new owner */
-	ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max) + st_ptr->owner];
+	if (!ot_ptr || !ot_ptr->owner_name)
+	{
+		st_ptr->owner = 0;
+
+		/* Activate the new owner */
+		ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max)
+							  + st_ptr->owner];
+	}
+	ot_ptr->busy = TRUE;
 
 	/* Reset the owner data */
 	st_ptr->insult_cur = 0;
@@ -3813,12 +3840,8 @@ void store_maint(int store_index)
 	int services = 0;
 
 	store_type *st_ptr = store[store_index];
-	owner_type *ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max) + st_ptr->owner];
 
 	if (st_ptr->base < STORE_MIN_BUY_SELL) return;
-
-	/* Activate the owner */
-	ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max) + st_ptr->owner];
 
 	/* Store keeper forgives the player */
 	st_ptr->insult_cur = 0;
@@ -3944,6 +3967,8 @@ int store_init(int feat)
 		int count = 0;
 		do 
 		{
+			count++;
+
 			/* Pick an owner */
 			st_ptr->owner = (byte)rand_int(z_info->b_max);
 
@@ -3951,11 +3976,19 @@ int store_init(int feat)
 			ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max)
 								  + st_ptr->owner];
 		} 
-		while (!ot_ptr->owner_name && count++ < 1000);
+		while ((count < 500 && ot_ptr->busy)
+				 || (count < 1000 && !ot_ptr->owner_name));
 	}
 
 	if (!ot_ptr || !ot_ptr->owner_name)
+	{
 		st_ptr->owner = 0;
+
+		/* Activate the new owner */
+		ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max)
+							  + st_ptr->owner];
+	}
+	ot_ptr->busy = TRUE;
 
 	/* Initialize the store */
 	st_ptr->store_open = 0;
