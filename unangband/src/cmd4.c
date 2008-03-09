@@ -1918,7 +1918,7 @@ static void describe_surface_dungeon(int dun)
     if (dun == myd)
       text_out_c(TERM_SLATE, "  You were born right here.");
     else
-      text_out_c(TERM_SLATE, "  This is where you were born, though it was quite long ago");
+      text_out_c(TERM_SLATE, "  This is where you were born, though it was quite long ago.");
   } 
   else if (t_info[dun].visited)
     text_out_c(TERM_WHITE, t_info[dun].text + t_text);
