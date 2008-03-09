@@ -832,6 +832,9 @@ static int store_carry(object_type *o_ptr, int store_index)
 
 	store_type *st_ptr = store[store_index];
 
+	/* Item belongs to a store */
+	o_ptr->ident |= IDENT_STORE;
+	
 	/* Evaluate the object */
 	value = object_value(o_ptr);
 
@@ -847,9 +850,6 @@ static int store_carry(object_type *o_ptr, int store_index)
 	/* Remove special inscription, if any */
 	o_ptr->feeling = 0;
 
-	/* Item belongs to a store */
-	o_ptr->ident |= IDENT_STORE;
-	
 	/* All obvious flags are learnt about the object - important this happens after IDENT_STORE set */
 	object_obvious_flags(o_ptr, TRUE);
 	
