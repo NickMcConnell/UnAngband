@@ -776,7 +776,7 @@ N:183:80:3
 G:,:s
 D:Grey
 
-N:184:80:20
+N:184:80:4
 G:,:u
 D:Light Brown
 
@@ -1651,7 +1651,7 @@ D:Divining
 
 #Fixed
 
-N:409:80:4
+N:409:80:20
 G:,:B
 D:Light Blue
 
