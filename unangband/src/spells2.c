@@ -1351,6 +1351,7 @@ int value_check_aux3(const object_type *o_ptr)
 	if (o_ptr->to_h + o_ptr->to_d > 0) return (INSCRIP_GOOD);
 
 	/* Have already got nonmagical sensed */
+	if (o_ptr->feeling == INSCRIP_AVERAGE) return(INSCRIP_AVERAGE);
 	if (o_ptr->feeling == INSCRIP_UNCURSED) return(INSCRIP_AVERAGE);
 	if (o_ptr->feeling == INSCRIP_UNUSUAL) return(INSCRIP_MAGICAL);
 
