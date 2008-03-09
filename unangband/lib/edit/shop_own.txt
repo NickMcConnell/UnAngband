@@ -79,7 +79,7 @@ N:4:2:Ga-nat the Greedy
 I:4:15000:200:116:6:9
 N:4:3:Vella the Slender
 I:11:15000:220:111:4:9
-N:4:4:Hakyria the Broadside
+N:4:4:Hakyria Broadside
 I:15:12000:190:110:5:12
 
 # Magic Shop
@@ -107,5 +107,5 @@ N:6:3:Drago the Fair
 I:3:30000:250:150:10:5
 N:6:4:Narvious the Betrayer
 I:6:25000:250:150:10:5
-N:6:5:Rawuest the Lore-master
+N:6:5:Rawuest Lore-Master
 I:4:30000:250:150:10:5
