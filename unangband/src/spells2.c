@@ -1369,10 +1369,11 @@ int value_check_aux3(const object_type *o_ptr)
  */
 int value_check_aux4(const object_type *o_ptr)
 {
-	/* If sensed magical, have no more value to add */
+	/* If sensed precisely, have no more value to add */
 	if ((o_ptr->feeling == INSCRIP_GOOD) || (o_ptr->feeling == INSCRIP_VERY_GOOD)
 		|| (o_ptr->feeling == INSCRIP_GREAT) || (o_ptr->feeling == INSCRIP_EXCELLENT)
 		|| (o_ptr->feeling == INSCRIP_SUPERB) || (o_ptr->feeling == INSCRIP_SPECIAL)
+		|| (o_ptr->feeling == INSCRIP_AVERAGE)
 		|| (o_ptr->feeling == INSCRIP_MAGICAL) || (o_ptr->feeling == INSCRIP_UNCURSED)) return (0);
 
 	/* Artifacts */
@@ -1409,7 +1410,10 @@ int value_check_aux4(const object_type *o_ptr)
 	if (cursed_p(o_ptr)) return (INSCRIP_CURSED);
 
 	/* Broken items */
-	if (broken_p(o_ptr)) return (INSCRIP_UNCURSED);
+	if (o_ptr->feeling == INSCRIP_BROKEN) 
+		return (INSCRIP_BROKEN);
+	else if (broken_p(o_ptr)) 
+		return (INSCRIP_UNCURSED);
 
 	/* Known to be unusual */
 	if (o_ptr->feeling == INSCRIP_UNUSUAL) return (INSCRIP_MAGICAL);
