@@ -2207,9 +2207,8 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 
 	/* Evaluate power */
 	boost_power = object_power(o_ptr);
-
-	/* Reverse sign */
-	if (boost_power < 0) boost_power = -boost_power;
+	/* Reverse sign so that the same code applied to cursed items */
+	if (power < 0) boost_power = -boost_power;
 
 	/* Too powerful already */
 	if (boost_power >= lev) return;
@@ -2304,8 +2303,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 
 		/* Evaluate power */
 		boost_power = object_power(o_ptr);
-
-		if (boost_power < 0) boost_power = -boost_power;
+		if (power < 0) boost_power = -boost_power;
 
 		/* Hack -- boost to-hit, to-dam, to-ac to 10 if required to increase power */
 		if ((boost_power <= old_boost_power) && !(tryagain) && (choice < 10))
@@ -2333,8 +2331,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 			}
 
 			boost_power = object_power(o_ptr);
-
-			if (boost_power < 0) boost_power = -boost_power;
+			if (power < 0) boost_power = -boost_power;
 		}
 	} while ((!(boost_power <= old_boost_power) && (boost_power < lev)) || (tryagain && (tries < 40)));
 
@@ -2356,7 +2353,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 
 /*
  * Attempt to change an object into an magic-item
- * This function picks a magic item that has 95% to 100% of the power supplied to this
+ * This function picks a magic item that has 90% to 100% of the power supplied to this
  * function, in a manner similar to random artifacts.
  */
 static bool make_magic_item(object_type *o_ptr, int lev, int power)
@@ -2393,9 +2390,8 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 
 	/* Recompute power */
 	obj_pow1 = object_power(o_ptr);
-
-	/* Reverse sign */
-	if (obj_pow1 < 0) obj_pow1 = -obj_pow1;
+	/* Reverse sign so that the same code applied to cursed items */
+	if (power < 0) obj_pow1 = -obj_pow1;
 
 	/* Already too magical */
 	if (obj_pow1 >= lev) return (FALSE);
@@ -2408,9 +2404,7 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 
 		/* Recompute power */
 		obj_pow1 = object_power(o_ptr);
-
-		/* Reverse sign */
-		if (obj_pow1 < 0) obj_pow1 = -obj_pow1;
+		if (power < 0) obj_pow1 = -obj_pow1;
 
 		/* Already too magical */
 		if (obj_pow1 >= lev) return (FALSE);
@@ -2441,13 +2435,11 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 
 		/* Evaluate power */
 		obj_pow2 = object_power(o_ptr);
-
-		/* Reverse sign */
-		if (obj_pow2 < 0) obj_pow2 = -obj_pow2;
+		if (power < 0) obj_pow2 = -obj_pow2;
 
 		/* Pick this flag with default pval? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect? */
-			((!great) || (obj_pow2 >= ((lev * 19) / 20))) && 	/* Great forces at least 95% */
+			((!great) || (obj_pow2 >= ((lev * 18) / 20))) && 	/* Great forces at least 90% */
 			(obj_pow2 <= lev) &&			/* No more than 100% */
 			(rand_int(++count) == 0))		/* Sometimes pick */
 		{
@@ -2490,13 +2482,14 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 			{
 				x1 = 16;
 				x2 = i;
-				max_pval = o_ptr->pval;
+				if (o_ptr->pval > 0) 
+					max_pval = o_ptr->pval - old_pval;
+				else 
+					max_pval = o_ptr->pval + old_pval;
 			}
 
 			/* Reset pval */
 			o_ptr->pval = old_pval;
-			if (old_pval > 0) max_pval -= old_pval;
-			else max_pval += old_pval;
 		}
 	}
 
@@ -2518,13 +2511,11 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 
 		/* Evaluate power */
 		obj_pow2 = object_power(o_ptr);
-
-		/* Reverse sign */
-		if (obj_pow2 < 0) obj_pow2 = -obj_pow2;
+		if (power < 0) obj_pow2 = -obj_pow2;
 
 		/* Pick this flag? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
-			((!great) || (obj_pow2 >= ((lev * 19) / 20))) && 	/* Great forces at least 95% */
+			((!great) || (obj_pow2 >= ((lev * 18) / 20))) && 	/* Great forces at least 90% */
 			(obj_pow2 <= lev) &&			/* No more than 100% */
 			(rand_int(++count) == 0))		/* Sometimes pick */
 		{
@@ -2542,13 +2533,11 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 
 		/* Evaluate power */
 		obj_pow2 = object_power(o_ptr);
-
-		/* Reverse sign */
-		if (obj_pow2 < 0) obj_pow2 = -obj_pow2;
+		if (power < 0) obj_pow2 = -obj_pow2;
 
 		/* Pick this flag? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
-			((!great) || (obj_pow2 >= ((lev * 19) / 20))) && 	/* Great forces at least 95% */
+			((!great) || (obj_pow2 >= ((lev * 18) / 20))) && 	/* Great forces at least 90% */
 			(obj_pow2 <= lev) &&			/* No more than 100% */
 			(rand_int(++count) == 0))		/* Sometimes pick */
 		{
@@ -2575,13 +2564,11 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 
 		/* Evaluate power */
 		obj_pow2 = object_power(o_ptr);
-
-		/* Reverse sign */
-		if (obj_pow2 < 0) obj_pow2 = -obj_pow2;
+		if (power < 0) obj_pow2 = -obj_pow2;
 
 		/* Pick this flag? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
-			((!great) || (obj_pow2 >= ((lev * 19) / 20))) && 	/* Great forces at least 95% */
+			((!great) || (obj_pow2 >= ((lev * 18) / 20))) && 	/* Great forces at least 90% */
 			(obj_pow2 <= lev) &&			/* No more than 100% */
 			(rand_int(++count) == 0))		/* Sometimes pick */
 		{
@@ -2603,7 +2590,7 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 			if (max_pval > 0)
 				o_ptr->pval += great ? max_pval : rand_range(1, max_pval);
 			else
-				o_ptr->pval -= great ? -max_pval : rand_range(1, -max_pval);
+				o_ptr->pval += great ? max_pval : -rand_range(1, -max_pval);
 		}
 
 		return(TRUE);
@@ -2709,7 +2696,7 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 		/* Fake ego power */
 		o_ptr->name2 = e_idx;
 		j = object_power(o_ptr);
-		if (j < 0) j = -j;
+		if (cursed) j = -j;
 
 		/* Force better for non-weapons as we can't modify power as easily */
 		if ((great) && (j < level / 2) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_HAFTED)
@@ -4394,7 +4381,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 
 		/* Get ego power */
 		ego_power = object_power(o_ptr);
-		if (ego_power < 0) ego_power = -ego_power;
+		if (power < 0) ego_power = -ego_power;
 
 		/* Choose extra power appropriate to ego item */
 		if (e_ptr->xtra)
@@ -4409,7 +4396,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			for (o_ptr->xtra2 = 0; o_ptr->xtra2 < object_xtra_size[e_ptr->xtra]; o_ptr->xtra2++)
 			{
 				ego_power = object_power(o_ptr);
-				if (ego_power < 0) ego_power = -ego_power;
+				if (power < 0) ego_power = -ego_power;
 
 				/* Is this weakest ability? */
 				if (ego_power < w1)
@@ -4430,6 +4417,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 
 			/* Reset ego power */
 			ego_power = object_power(o_ptr);
+			if (power < 0) ego_power = -ego_power;
 
 		}
 

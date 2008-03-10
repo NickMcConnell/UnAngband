@@ -6502,28 +6502,27 @@ s32b object_power(const object_type *o_ptr)
 		}
 		if (f1 & TR1_CHR)
 		{
-			p += MAX(1, o_ptr->pval * o_ptr->pval / 2); /* Was o_ptr->pval */
+			p += 1 + o_ptr->pval * o_ptr->pval / 2; /* Was o_ptr->pval */
 		}
 		if (f1 & TR1_SAVE)
 		{
-			p += MAX(1, o_ptr->pval * o_ptr->pval / 2); /* Was o_ptr->pval */
+			p += 1 + o_ptr->pval * o_ptr->pval / 2; /* Was o_ptr->pval */
 		}
 		if (f1 & TR1_DEVICE)
 		{
-			p += MAX(1, o_ptr->pval * o_ptr->pval / 3); /* Was o_ptr->pval */
+			p += 1 + o_ptr->pval * o_ptr->pval / 3; /* Was o_ptr->pval */
 		}
 		if (f1 & TR1_STEALTH)
 		{
-			p += MAX(1, o_ptr->pval * o_ptr->pval / 2); /* Was o_ptr->pval */
+			p += 1 + o_ptr->pval * o_ptr->pval / 2; /* Was o_ptr->pval */
 		}
 		if (f1 & TR1_TUNNEL)
 		{
-			p += MAX(1, o_ptr->pval * o_ptr->pval / 5); /* Was o_ptr->pval */
+			p += 1 + o_ptr->pval * o_ptr->pval / 4; /* Was o_ptr->pval */
 		}
-		/* For now add very small amount for searching */
 		if (f1 & TR1_SEARCH)
 		{
-			p += MAX(1, o_ptr->pval * o_ptr->pval / 10);
+			p += 1 + o_ptr->pval * o_ptr->pval / 4; /* Can't get lower */
 		}
 		if (f3 & TR3_REGEN_HP)
 		{

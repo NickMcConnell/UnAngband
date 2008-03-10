@@ -4699,7 +4699,7 @@ static void scramble_artifact(int a_idx)
 				continue;
 			}
 
-			else if (ap >= (power * 19) / 20)	/* just right */
+			else if (ap >= (power * 18) / 20)	/* just right */
 			{
 
 				/* Hack -- add a restriction on the most powerful artifacts */
