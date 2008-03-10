@@ -376,72 +376,74 @@ void object_obvious_flags(object_type *o_ptr, bool floor)
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 	/* Fully identified */
-        if (o_ptr->ident & (IDENT_MENTAL))
-        {
-                object_can_flags(o_ptr, f1, f2, f3, f4, floor);
+	if (o_ptr->ident & (IDENT_MENTAL))
+	{
+		object_can_flags(o_ptr, f1, f2, f3, f4, floor);
 
-                object_not_flags(o_ptr, ~(f1), ~(f2), ~(f3), ~(f4), floor);
-
+		object_not_flags(o_ptr, ~(f1), ~(f2), ~(f3), ~(f4), floor);
+		
 		return;
-        }
+	}
 
 	/* Abilities of base item are always known if aware */
-	if ((object_aware_p(o_ptr)) || (o_ptr->ident & (IDENT_STORE)))
+	if (object_aware_p(o_ptr) || o_ptr->ident & (IDENT_STORE))
 	{
-        	o_ptr->can_flags1 |= k_info[o_ptr->k_idx].flags1;
-                o_ptr->can_flags2 |= k_info[o_ptr->k_idx].flags2;
-                o_ptr->can_flags3 |= k_info[o_ptr->k_idx].flags3;
-                o_ptr->can_flags4 |= k_info[o_ptr->k_idx].flags4;
+		o_ptr->can_flags1 |= k_info[o_ptr->k_idx].flags1;
+		o_ptr->can_flags2 |= k_info[o_ptr->k_idx].flags2;
+		o_ptr->can_flags3 |= k_info[o_ptr->k_idx].flags3;
+		o_ptr->can_flags4 |= k_info[o_ptr->k_idx].flags4;
 	}
 	/* Learnt abilities of flavored items are added if not aware */
 	else if (k_info[o_ptr->k_idx].flavor)
 	{
 		object_can_flags(o_ptr,x_list[k_info[o_ptr->k_idx].flavor].can_flags1,
-				x_list[k_info[o_ptr->k_idx].flavor].can_flags2,
-				x_list[k_info[o_ptr->k_idx].flavor].can_flags3,
-				x_list[k_info[o_ptr->k_idx].flavor].can_flags4, floor);
+							  x_list[k_info[o_ptr->k_idx].flavor].can_flags2,
+							  x_list[k_info[o_ptr->k_idx].flavor].can_flags3,
+							  x_list[k_info[o_ptr->k_idx].flavor].can_flags4, floor);
 
-		object_not_flags(o_ptr,x_list[o_ptr->name1].not_flags1,
-				x_list[k_info[o_ptr->k_idx].flavor].not_flags2,
-				x_list[k_info[o_ptr->k_idx].flavor].not_flags3,
-				x_list[k_info[o_ptr->k_idx].flavor].not_flags4, floor);	
+		object_not_flags(o_ptr,x_list[k_info[o_ptr->k_idx].flavor].not_flags1,
+							  x_list[k_info[o_ptr->k_idx].flavor].not_flags2,
+							  x_list[k_info[o_ptr->k_idx].flavor].not_flags3,
+							  x_list[k_info[o_ptr->k_idx].flavor].not_flags4, floor);	
 	}
 
 	/* Identified name */
 	if ((object_named_p(o_ptr)) || (o_ptr->ident & (IDENT_STORE)))
 	{
-		/* Now we know what it is, update what we know about it from our artifact memory */
+		/* Now we know what it is, 
+			update what we know about it from our artifact memory */
 		if (o_ptr->name1)
 		{
 			object_can_flags(o_ptr,a_list[o_ptr->name1].can_flags1,
-					a_list[o_ptr->name1].can_flags2,
-					a_list[o_ptr->name1].can_flags3,
-					a_list[o_ptr->name1].can_flags4, floor);
+								  a_list[o_ptr->name1].can_flags2,
+								  a_list[o_ptr->name1].can_flags3,
+								  a_list[o_ptr->name1].can_flags4, floor);
 
 			object_not_flags(o_ptr,a_list[o_ptr->name1].not_flags1,
-					a_list[o_ptr->name1].not_flags2,
-					a_list[o_ptr->name1].not_flags3,
-					a_list[o_ptr->name1].not_flags4, floor);
+								  a_list[o_ptr->name1].not_flags2,
+								  a_list[o_ptr->name1].not_flags3,
+								  a_list[o_ptr->name1].not_flags4, floor);
 		}
-		/* Now we know what it is, update what we know about it from our ego item memory */
+		/* Now we know what it is, 
+			update what we know about it from our ego item memory */
 		else if (o_ptr->name2)
 		{
 			/* Obvious flags */
 			object_can_flags(o_ptr,e_info[o_ptr->name2].obv_flags1,
-					 e_info[o_ptr->name2].obv_flags2,
-					 e_info[o_ptr->name2].obv_flags3,
-					 e_info[o_ptr->name2].obv_flags4, floor);
+								  e_info[o_ptr->name2].obv_flags2,
+								  e_info[o_ptr->name2].obv_flags3,
+								  e_info[o_ptr->name2].obv_flags4, floor);
 
 			/* Known flags */
 			object_can_flags(o_ptr,e_list[o_ptr->name2].can_flags1,
-					 e_list[o_ptr->name2].can_flags2,
-					 e_list[o_ptr->name2].can_flags3,
-					 e_list[o_ptr->name2].can_flags4, floor);
+								  e_list[o_ptr->name2].can_flags2,
+								  e_list[o_ptr->name2].can_flags3,
+								  e_list[o_ptr->name2].can_flags4, floor);
 			
 			object_not_flags(o_ptr,e_list[o_ptr->name2].not_flags1,
-					 e_list[o_ptr->name2].not_flags2,
-					 e_list[o_ptr->name2].not_flags3,
-					 e_list[o_ptr->name2].not_flags4, floor);
+								  e_list[o_ptr->name2].not_flags2,
+								  e_list[o_ptr->name2].not_flags3,
+								  e_list[o_ptr->name2].not_flags4, floor);
 		}
 		/* Hack -- Magic items have an 'obvious' ability for which they are named */
 		else if ((o_ptr->xtra1) && (o_ptr->xtra1 < OBJECT_XTRA_MIN_RUNES) && (o_ptr->feeling < INSCRIP_MIN_HIDDEN))
@@ -459,9 +461,9 @@ void object_obvious_flags(object_type *o_ptr, bool floor)
 		else if (object_aware_p(o_ptr))
 		{
 			object_not_flags(o_ptr, ~(o_ptr->can_flags1), 
-				~(o_ptr->can_flags2),
-				~(o_ptr->can_flags3),
-				~(o_ptr->can_flags4), floor);
+								  ~(o_ptr->can_flags2),
+								  ~(o_ptr->can_flags3),
+								  ~(o_ptr->can_flags4), floor);
 		}
 	}
 
