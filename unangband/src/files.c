@@ -3976,6 +3976,7 @@ errr file_character(cptr name, bool full)
 			char str[46];
 			int j;
 			bool victory = FALSE;
+			bool havoc = FALSE;
 			bool please_print_depths = TRUE;
 
 			/* dungeons with guardians killed elsehwere are too confusing */
@@ -3992,6 +3993,7 @@ errr file_character(cptr name, bool full)
 						break;
 					}
 					else {
+						havoc = TRUE;
 						victory = TRUE;
 						/* and now check the other guardians */
 					}
@@ -4008,10 +4010,10 @@ errr file_character(cptr name, bool full)
 
 				if (t_info[i].attained_depth > min_depth(i))
 					/* descended to the dungeon and conquered */
-					text_out("You emerged victorious from ");
+					text_out("You emerged victorious from");
 				else
 					/* won on the surface */
-					text_out("You cleared the passage through ");
+					text_out("You cleared the passage through");
 			}
 			else 
 			{
@@ -4025,18 +4027,26 @@ errr file_character(cptr name, bool full)
 						continue;
 
 					if (t_info[i].attained_depth == max_depth(i))
-						text_out("You fought through to the other side of ");
-					else {
-						text_out("You have reached ");
+					{
+						text_out("You fought through to the other side of");
+					}
+					else 
+					{
+						if (havoc)
+							text_out("You broke through to");
+						else
+							text_out("You have reached");
 		
 						/* Express in feet or level*/
-						if (depth_in_feet) text_out(format("%d foot depth in ", t_info[i].attained_depth));
-						else text_out(format("level %d in ", t_info[i].attained_depth));
+						if (depth_in_feet) text_out(format(" %d foot depth in", t_info[i].attained_depth));
+						else text_out(format(" level %d in", t_info[i].attained_depth));
 					}
 				}
 				else 
 				{
 					/* not descended, but visited */
+
+					please_print_depths = FALSE;
 
 					if (t_info[i].quest_monster 
 						 && r_info[t_info[i].quest_monster].max_num == 0) 
@@ -4047,7 +4057,17 @@ errr file_character(cptr name, bool full)
 						if (x) 
 							continue;
 
-						text_out("You opened the passage through ");
+						text_out("You opened the passage through");
+					}
+					else if (havoc) 
+					{
+						/* not descended nor cleared, but killed a guardian */
+
+						/* too interesting */
+						if (x) 
+							continue;
+
+						text_out("You wrecked havoc at");
 					}
 					else
 					{
@@ -4057,14 +4077,12 @@ errr file_character(cptr name, bool full)
 						if (!x) 
 							continue;
 
-						please_print_depths = FALSE;
-
-						text_out("You have visited ");		
+						text_out("You have visited");		
 					}
 				}
 			}
 
-			text_out(str);
+			text_out(format(" %s", str));
 
 			if (please_print_depths) {
 				if (min_depth(i) == max_depth(i))
