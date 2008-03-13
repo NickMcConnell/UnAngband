@@ -1486,9 +1486,8 @@ s32b object_value(const object_type *o_ptr)
  * (if necessary) when they are used.
  *
  * If permitted, we allow weapons/armor to stack, if fully "known".
- *
- * Missiles will combine if both stacks have the same "known" status.
- * This is done to make unidentified stacks of missiles useful.
+ * or if both stacks have the same "known" status.
+ * This is done mostly to make unidentified stacks of missiles useful.
  *
  * Food, potions, scrolls, and "easy know" items always stack.
  *
@@ -1624,7 +1623,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		case TV_RING:
 		case TV_AMULET:
 		case TV_LITE:
-	        case TV_INSTRUMENT:
+		case TV_INSTRUMENT:
 
 		/* Missiles */
 		case TV_BOLT:
@@ -1713,7 +1712,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		return (0);
 	}
 
-	/* Hack -- Require identical "xtra2" status */
+	/* Hack -- Require identical "name3" status */
 	if (o_ptr->name3 != j_ptr->name3)
 	{
 	  if (cheat_xtra) msg_format("name3 %d does not match name3 %d for tval=%d sval=%d, tval=%d sval=%d", o_ptr->name3, j_ptr->name3, o_ptr->tval, o_ptr->sval, j_ptr->tval, j_ptr->sval);

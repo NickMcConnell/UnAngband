@@ -1877,7 +1877,7 @@ static void do_cmd_knowledge_home(void)
 		/* Check for current home */
 		if(!cheat_xtra && i != STORE_HOME && store[i]->base != 1 && store[i]->base != 2) 
 			continue;
-		for(j = 0; store[i]->stock[j].k_idx; j++) {
+		for(j = 0; j < store[i]->stock_size && store[i]->stock[j].k_idx; j++) {
 			objects[o_count] = o_count;
 			default_join[o_count].gid = i;
 			default_join[o_count++].oid = j;
