@@ -1280,7 +1280,8 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	}
 	
 	/* Warn the player */
-	if (count >= 10000) msg_print("Bug: Bad maze on level. Please report.");
+	if (cheat_xtra && count >= 10000) 
+		msg_print("Bug: Bad maze on level. Please report.");
 	
 	/* Create exits */
 	if (flag & (MAZE_EXIT_N | MAZE_EXIT_S | MAZE_EXIT_W | MAZE_EXIT_E))
