@@ -4068,7 +4068,9 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 			/* Describe height of tower */
 			if (text_visible)
 			{
-				my_strcpy(text_visible, format("It looks about %d feet tall.  ", (max_depth(p_ptr->dungeon) - min_depth(p_ptr->dungeon) + 1) * 50), text_visible_s);
+				int height = (1 + max_depth(p_ptr->dungeon) 
+								  - min_depth(p_ptr->dungeon));
+				my_strcpy(text_visible, format("It looks about %d %s tall.  ", depth_in_feet ? height * 50 : height, depth_in_feet ? "feet" : "stories"), text_visible_s);
 			}
 			break;
 		}
