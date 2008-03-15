@@ -985,7 +985,7 @@ void do_cmd_go_up(void)
 		else
 		{
 			/* Success */
-			message(MSG_STAIRS_DOWN,0,format("You have found a way through %s.", str));
+			message(MSG_STAIRS_DOWN,0,format("You have reached the top of %s and you climb down outside.", str));
 		}
 
 		/* Set the new depth */
@@ -1082,7 +1082,7 @@ void do_cmd_go_down(void)
 		else
 		{
 			/* Success */
-			message(MSG_STAIRS_DOWN,0,format("You have found a way through %s.", str));
+			message(MSG_STAIRS_DOWN,0,format("You have reached the bottom of %s and uncovered a secret shaft back up to the surface.", str));
 		}
 		
 		/* Set the new depth */
