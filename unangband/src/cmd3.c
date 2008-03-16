@@ -665,8 +665,10 @@ bool player_wield(int item)
 	object_flags(j_ptr, &f1, &f2, &f3, &f4);
 
 	/* Hack -- identify pval */
-	if (f1 & (TR1_BLOWS | TR1_SHOTS | TR1_SPEED | TR1_STR |
-		TR1_INT | TR1_DEX | TR1_CON | TR1_CHR)) j_ptr->ident |= (IDENT_PVAL);
+	if (!object_pval_p(j_ptr) &&
+		 f1 & (TR1_BLOWS | TR1_SHOTS | TR1_SPEED | TR1_STR |
+				 TR1_INT | TR1_DEX | TR1_CON | TR1_CHR)) 
+		j_ptr->ident |= (IDENT_PVAL);
 
 	/* Hack -- the following are obvious from the displayed combat statistics */
 	if (f1 & (TR1_BLOWS)) object_can_flags(j_ptr,TR1_BLOWS,0x0L,0x0L,0x0L, FALSE);
