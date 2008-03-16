@@ -1988,7 +1988,7 @@ const cptr inscrip_text[MAX_INSCRIP] =
 	"slaying",
 	"branded",
 	"poisoned",
-	"lite",
+	"light source",
 	"acidproof",
 	"fireproof",
 	"waterproof",
