@@ -858,9 +858,12 @@ static void do_cmd_travel(void)
 			/* Need to be full to travel */
 			if (p_ptr->food < PY_FOOD_FULL)
 			{
-				msg_print("You notice you don't have enough food to fully satiate you before the travel!");
-				/* Bail out */
-				return;
+				msg_print("You notice you don't have enough food to fully satiate you before the travel.");
+				msg_print("You realize you will face the unforeseen dangers with a half-empty stomach!");
+
+				if (!get_check("Are you sure you want to travel? ")) 
+					/* Bail out */
+					return;
 			}
 
 			/* Longer and more random journeys via map */
