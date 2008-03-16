@@ -3773,23 +3773,24 @@ void store_shuffle(int store_index)
 		/* Release the previous owner */
 		ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max) + st_ptr->owner];
 		ot_ptr->busy = FALSE;
-
-		int j = st_ptr->owner;
-		int count = 0;
-		do 
 		{
-			count++;
+			int j = st_ptr->owner;
+			int count = 0;
+			do 
+			{
+				count++;
 
-			/* Pick an owner */
-			st_ptr->owner = (byte)rand_int(z_info->b_max);
+				/* Pick an owner */
+				st_ptr->owner = (byte)rand_int(z_info->b_max);
 
-			/* Activate the new owner */
-			ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max)
+				/* Activate the new owner */
+				ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max)
 								  + st_ptr->owner];
-		} 
-		while (j == st_ptr->owner
-				 || (count < 500 && ot_ptr->busy)
-				 || (count < 1000 && !ot_ptr->owner_name));
+			} 
+			while (j == st_ptr->owner
+					 || (count < 500 && ot_ptr->busy)
+					 || (count < 1000 && !ot_ptr->owner_name));
+		}
 	}
 
 	if (!ot_ptr || !ot_ptr->owner_name)
