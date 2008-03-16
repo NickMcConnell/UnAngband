@@ -4169,7 +4169,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 			}
 
 			/* Weapon caught */
-			msg_format("Ouch!");
+			msg_print("Ouch! You prick yourself!");
 		}
 		else if (catch_chance <= 10 + catch_chance / 10)
 		/* You don't catch the returning weapon; it almost hits you */
