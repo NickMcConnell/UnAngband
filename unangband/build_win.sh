@@ -16,6 +16,7 @@ mkdir $DEST/lib/bone
 mkdir $DEST/lib/data
 mkdir $DEST/lib/edit
 mkdir $DEST/lib/file
+mkdir $DEST/lib/docs
 mkdir $DEST/lib/help
 mkdir $DEST/lib/info
 mkdir $DEST/lib/pref
