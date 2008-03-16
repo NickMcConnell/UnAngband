@@ -43,6 +43,8 @@ N:1:3:Mauglin the Grumpy
 I:23:30000:200:112:4:5
 N:1:4:Rizwan the Silent
 I:5:20000:195:110:4:7
+N:1:5:Kathoum the Defender
+I:4:30000:200:110:5:8
 
 # Weapon Smith
 N:2:0:Ithyl-Mak the Beastly
@@ -57,6 +59,10 @@ N:2:4:Malak Darkhunter
 I:4:20000:200:113:5:6
 N:2:5:Nick the Wanderer
 I:1:30000:190:114:6:8
+N:2:6:Narvious the Betrayer
+I:6:25000:200:113:6:9
+N:2:7:Baldir Spellsword
+I:6:20000:205:114:5:7
 
 # Temple
 N:3:0:Ludwig the Humble
@@ -69,6 +75,8 @@ N:3:3:Bosk the Wise
 I:5:30000:185:109:5:15
 N:3:4:Will Centipede
 I:3:30000:180:108:5:21
+N:3:5:Pete the Knowledgeable
+I:25:25000:185:109:5:18
 
 # Alchemist
 N:4:0:Mauser the Chemist
@@ -81,6 +89,8 @@ N:4:3:Vella the Slender
 I:11:15000:220:111:4:9
 N:4:4:Hakyria Broadside
 I:15:12000:190:110:5:12
+N:4:5:Fungo the Whelp
+I:2:12000:185:110:6:9
 
 # Magic Shop
 N:5:0:Ariel the Sorceress
@@ -95,6 +105,10 @@ N:5:4:Pauroth the Crook
 I:1:30000:220:117:6:13
 N:5:5:Seany the Black
 I:19:25000:210:112:6:7
+N:5:6:Eddie the Tinkerer
+I:0:20000:190:111:6:12
+N:5:7:Drome the Ghost
+I:3:25000:210:114:6:11
 
 # Black Market
 N:6:0:Lo-Hak the Awful
@@ -105,7 +119,11 @@ N:6:2:Durwin the Shifty
 I:24:25000:250:150:10:5
 N:6:3:Drago the Fair
 I:3:30000:250:150:10:5
-N:6:4:Narvious the Betrayer
-I:6:25000:250:150:10:5
-N:6:5:Rawuest Lore-Master
+N:6:4:Rawuest Lore-Master
+I:4:30000:250:150:10:5
+N:6:5:Arendil the Elf
+I:24:25000:250:150:10:5
+N:6:6:Paffa the Mad
+I:5:20000:250:150:10:5
+N:6:7:Gror the Dispossessed
 I:4:30000:250:150:10:5
