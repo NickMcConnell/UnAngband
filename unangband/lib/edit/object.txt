@@ -7272,7 +7272,7 @@ P:0:0d0:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER |
 F:IGNORE_THEFT |
 
-#### Thuamaturgy School -- no Sangband correspondence. Random attack spells after 1st book. ####
+#### Thaumaturgy School -- no Sangband correspondence. Random attack spells after 1st book. ####
 
 N:947:of Fireworks
 G:?:R
@@ -7295,7 +7295,7 @@ W:20:0:30:400
 A:20/7
 P:0:1d1:0:0:0
 
-N:950:of Thuamaturgy
+N:950:of Thaumaturgy
 G:?:R
 I:90:51:0
 W:30:0:30:800

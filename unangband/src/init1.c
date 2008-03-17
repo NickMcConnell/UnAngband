@@ -1254,7 +1254,7 @@ static cptr s_info_flags3[] =
 	"DEC_FOOD",
 	"DEC_EXP",
 	"HOLD_SONG",
-	"THUAMATURGY"
+	"THAUMATURGY"
 };
 
 /*

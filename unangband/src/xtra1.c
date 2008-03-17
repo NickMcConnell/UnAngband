@@ -1346,7 +1346,7 @@ void lookup_prettyname(char *name, size_t name_s, int class, int style, int sval
 				else if ((sval >= 36) && (sval < 39)) my_strcpy(temp,"Druid", sizeof(temp));
 				else if ((sval >= 40) && (sval < 44)) my_strcpy(temp,"Master", sizeof(temp));
 				else if ((sval >= 45) && (sval < 48)) my_strcpy(temp,"Sorceror", sizeof(temp));
-				else if ((sval >= 48) && (sval < 52)) my_strcpy(temp,"Thuamaturgist", sizeof(temp));
+				else if ((sval >= 48) && (sval < 52)) my_strcpy(temp,"Thaumaturgist", sizeof(temp));
 				else if ((sval >= 52) && (sval < 56)) my_strcpy(temp,"Scientist", sizeof(temp));
 				else if ((sval >= 56) && (sval < 60)) my_strcpy(temp,"Statesman", sizeof(temp));
 
