@@ -2341,7 +2341,7 @@ const cptr disease_name[33] =
 	"slow stumble",
 	"black eye",
 	"a hangover",
-	"paranoia",
+	"faint heart",
 	"dementia",
 	"bad luck",
 	"narcolepsy",
