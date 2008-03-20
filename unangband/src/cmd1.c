@@ -2593,6 +2593,13 @@ void py_attack(int dir)
 
 	bool charging = FALSE;
 
+	if (cave_m_idx[y][x] <= 0) 
+	{
+		/* Oops */
+		msg_print("You spin around.");
+		return;
+	}
+
 	/* If moving, you can charge in the direction */
 	if ((p_ptr->charging == dir) || (side_dirs[dir][1] == p_ptr->charging)
 		|| (side_dirs[dir][2] == p_ptr->charging)) charging = TRUE;
@@ -2601,7 +2608,6 @@ void py_attack(int dir)
 	m_ptr = &m_list[cave_m_idx[y][x]];
 	r_ptr = &r_info[m_ptr->r_idx];
 	l_ptr = &l_list[m_ptr->r_idx];
-
 
 	/* Disturb the player */
 	disturb(0, 0);
