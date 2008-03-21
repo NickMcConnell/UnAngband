@@ -11858,5 +11858,5 @@ void generate_cave(void)
 	}
 	
 	/* Hit by the plague */
-	if (p_ptr->disease) suffer_disease();
+	if (p_ptr->disease) suffer_disease(TRUE);
 }

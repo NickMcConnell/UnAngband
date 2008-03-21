@@ -7544,7 +7544,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			}
 			case SPELL_CURE_DISEASE:
 			{
-				int v;
+				u32b v;
 				u32b old_disease = p_ptr->disease;
 				
 				char output[1024];
@@ -7552,16 +7552,15 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				/* Hack -- cure disease */
 				if (s_ptr->param >= 32)
 				{
+					/* Cure minor disease */
+					v = DISEASE_LIGHT;
+
 					/* Hack -- Cure 'normal disease' */
 					if (p_ptr->disease < (1L << DISEASE_TYPES_HEAVY))
 					{
-						obvious = TRUE;
-
-						p_ptr->disease = 0;
+						/* Cures all normal diseases */
+						v |= (1L << DISEASE_TYPES_HEAVY) - 1;
 					}
-
-					/* Also cure minor disease */
-					v = DISEASE_LIGHT;
 				}
 				/* Cure symptom / specific disease */
 				else
@@ -7573,9 +7572,11 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				if ((p_ptr->disease & v) == 0)
 				{
 					/* Message */
-					if (p_ptr->disease) msg_print("This cure is ineffective for what ails you.");
-					obvious = TRUE;
-					
+					if (p_ptr->disease)
+					{
+						msg_print("This cure is ineffective for what ails you.");
+						obvious = TRUE;						
+					}
 					break;
 				}
 
@@ -7607,11 +7608,12 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					p_ptr->disease &= (DISEASE_PERMANENT);
 				}
 
+				/* Redraw disease status */
+				p_ptr->redraw |= (PR_DISEASE);
+
 				/* Describe diseases lost */
 				disease_desc(output, sizeof(output), old_disease, p_ptr->disease);
 				msg_print(output);
-
-				p_ptr->redraw |= (PR_DISEASE);
 
 				/* Describe new disease */
 				if (p_ptr->disease)

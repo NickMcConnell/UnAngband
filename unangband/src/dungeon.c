@@ -433,8 +433,11 @@ bool dun_level_mon(int r_idx)
  * 
  * This now occurs whilst changing levels, and while in dungeon for
  * quick diseases only.
+ * 
+ * allow_cure is set to true if the disease is a result of time
+ * passing, and false if it's the result of monster blows.
  */
-void suffer_disease(void)
+void suffer_disease(bool allow_cure)
 {
 	u32b old_disease = p_ptr->disease;
 
@@ -625,22 +628,30 @@ void suffer_disease(void)
 		/* The player is going to suffer further */
 		if ((p_ptr->disease & (DISEASE_QUICK)) && !(rand_int(3)))
 		{
+			bool ecology_ready = cave_ecology.ready;
+			
 			/* Breakfast time... */
 			msg_print("Something pushes through your skin.");
-			msg_print("Its... hatching...");
+			msg_print("It's... hatching...");
 
 			/* How many eggs? */
 			n = randint(p_ptr->depth / 5) + 1;
 
 			/* A nasty chest wound */
 			take_hit(damroll(n, 8),"the birth of a parasite");
-		
+
+			/* Stop using ecology */
+			cave_ecology.ready = FALSE;
+			
 			/* Set parasite race */
 			summon_race_type = parasite_hack[effect];
 
 			/* Drop lots of parasites */
 			for (i = 0; i < n; i++) (void)summon_specific(p_ptr->py, p_ptr->py, 0, 99, SUMMON_FRIEND, FALSE, 0L);
 
+			/* Start using ecology again */
+			cave_ecology.ready = ecology_ready;
+			
 			/* Aggravate if not light */
 			if (!(p_ptr->disease & (DISEASE_LIGHT))) aggravate_monsters(-1);
 
@@ -688,7 +699,7 @@ void suffer_disease(void)
 	}
 
 	/* The player is on the mend */
-	if ((p_ptr->disease & (DISEASE_LIGHT)) && !(rand_int(6)))
+	if ((allow_cure) && (p_ptr->disease & (DISEASE_LIGHT)) && !(rand_int(6)))
 	{
 		msg_print("The illness has subsided.");
 		p_ptr->disease &= (DISEASE_HEAVY | DISEASE_PERMANENT);
@@ -1659,7 +1670,7 @@ static void process_world(void)
 	/*** Handle disease ***/
 	if ((p_ptr->disease) && (p_ptr->disease & (DISEASE_QUICK)) && !(rand_int(100)))
 	{
-		suffer_disease();
+		suffer_disease(TRUE);
 	}
 
 
