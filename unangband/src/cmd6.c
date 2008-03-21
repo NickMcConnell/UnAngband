@@ -117,16 +117,6 @@ void do_cmd_item(int command)
 		p_ptr->command_wrk = (USE_EQUIP); /* TODO: this one does not work here */
 	if (command == COMMAND_ITEM_FUEL_TORCH || command == COMMAND_ITEM_FUEL_LAMP) 
 		p_ptr->command_wrk = (USE_INVEN);
-
-	/* Hack -- allow player to light terrain */
-	if (command == COMMAND_ITEM_LITE)
-	{
-		/* Check if using a torch */
-		if (item_tester_refill_torch(&inventory[INVEN_LITE])) flags |= (USE_FEATH);
-		
-		/* Check if wielding a known fire brand */
-		else if (inventory[INVEN_WIELD].can_flags1 & (TR1_BRAND_FIRE)) flags |= (USE_FEATH);
-	}
 	
 	/* Restrict choices to tval */
 	item_tester_hook = cmd_item_list[command].item_tester_hook;
