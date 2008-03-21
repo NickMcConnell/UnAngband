@@ -2516,6 +2516,38 @@ void print_stats(const s16b *sn, int num, int y, int x)
 
 
 /*
+ * Other stat functions.
+ */
+bool stat_commands(char choice, const s16b *sn, int i, bool *redraw)
+{
+	(void)sn;
+	(void)i;
+	
+	switch (choice)
+	{
+		case '?':
+		{
+			/* Save the screen */
+			if (!(*redraw)) screen_save();
+			
+			/* Show stats help */
+			(void)show_file("stats.txt", NULL, 0, 0);
+			
+			/* Load the screen */
+			screen_load();
+			
+			break;
+		}
+		
+		default:
+		{
+			return (FALSE);
+		}
+	}
+	return (TRUE);
+}
+
+/*
  * Improve a player-chosen set of stats.
  * TODO: upon pressing ESC restart the choice.
  * Note the hack to always improve the maximal value of a stat.
@@ -2565,7 +2597,7 @@ static void improve_stat(void)
 				sprintf(buf,"Improve which attribute%s (%d)", count > 1 ? "s" : "", count - stat_gain_selected); 
 
 				/* Select stat to improve */
-				if (get_list(print_stats, table, A_MAX, "Attribute", buf, 1, 36, &(stat_gain_selection[stat_gain_selected])))
+				if (get_list(print_stats, table, A_MAX, "Attribute", buf, ", ?=help", 1, 36, stat_commands, &(stat_gain_selection[stat_gain_selected])))
 				{
 					/* Check if stat at maximum */
 					if (p_ptr->stat_max[stat_gain_selection[stat_gain_selected]] >= 18 + 999)

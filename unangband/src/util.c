@@ -5005,7 +5005,7 @@ cptr get_month_name(int day, bool full, bool compact)
 /*
  * Generic display a list and pick a choice function. Returns TRUE selection or -1 if not selection made.
  */
-bool get_list(print_list_func print_list, const s16b *sn, int num, cptr p, cptr q, int y, int x, int *selection)
+bool get_list(print_list_func print_list, const s16b *sn, int num, cptr p, cptr q, cptr r, int y, int x, list_command_func list_command, int *selection)
 {
 	int i;
 
@@ -5037,14 +5037,12 @@ bool get_list(print_list_func print_list, const s16b *sn, int num, cptr p, cptr 
 	}
 
 	/* Build a prompt (accept all spells) */
-	strnfmt(out_val, 78, "(%s %c-%c, *=List, ESC=exit) %s? ",
-	p, I2A(0), I2A(num - 1), q);
+	strnfmt(out_val, 78, "(%s %c-%c%s, *=List, ESC=exit) %s? ",
+	p, I2A(0), I2A(num - 1), r, q);
 
 	/* Get a spell from the user */
 	while (!flag && get_com_ex(out_val, &ke))
 	{
-		char choice;
-
 		if (ke.key == '\xff')
 		{
 			if (ke.mousebutton)
@@ -5056,7 +5054,7 @@ bool get_list(print_list_func print_list, const s16b *sn, int num, cptr p, cptr 
 		}
 
 		/* Request redraw */
-		if ((ke.key == ' ') || (ke.key == '*') || (ke.key == '?'))
+		if ((ke.key == ' ') || (ke.key == '*'))
 		{
 			/* Hide the list */
 			if (redraw)
@@ -5086,16 +5084,27 @@ bool get_list(print_list_func print_list, const s16b *sn, int num, cptr p, cptr 
 
 		}
 
-		/* Lowercase 1+*/
-		choice = tolower(ke.key);
-
 		/* Extract request */
-		i = (islower(choice) ? A2I(choice) : -1);
+		i = (islower(ke.key) ? A2I(ke.key) : -1);
 
 		/* Totally Illegal */
 		if ((i < 0) || (i >= num))
 		{
-			bell("Illegal choice!");
+			if (list_command(ke.key, sn, i, &redraw))
+			{
+				if (redraw)
+				{
+					/* Save screen */
+					screen_save();
+
+					/* Display a list of spells */
+					print_list(sn, num, y, x);
+				}
+			}
+			else
+			{
+				bell("Illegal choice!");
+			}
 			continue;
 		}
 

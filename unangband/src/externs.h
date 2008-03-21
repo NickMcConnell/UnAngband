@@ -1023,7 +1023,7 @@ extern bool findpath(int y, int x);
 extern s32b bst(s32b what, s32b t);
 extern cptr get_month_name(int day, bool full, bool compact);
 extern cptr get_day(int day);
-extern bool get_list(print_list_func print_list, const s16b *sn, int num, cptr p1, cptr p2, int y, int x, int *selection);
+extern bool get_list(print_list_func print_list, const s16b *sn, int num, cptr p, cptr q, cptr r, int y, int x, list_command_func list_command, int *selection);
 
 #ifdef SUPPORT_GAMMA
 extern void build_gamma_table(int gamma);

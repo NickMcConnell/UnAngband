@@ -72,6 +72,7 @@ typedef s16b s16b_wid[DUNGEON_WID];
 /**** Available Function Definitions ****/
 
 typedef void (*print_list_func)(const s16b *sn, int num, int y, int x);
+typedef bool (*list_command_func)(char choice, const s16b *sn, int i, bool *redraw);
 
 
 typedef bool (*tester_attribute_func)(int y, int x);
