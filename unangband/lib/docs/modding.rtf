@@ -1,11 +1,48 @@
-{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf440
-{\fonttbl\f0\fnil\fcharset77 Monaco;\f1\fswiss\fcharset77 ArialMT;}
+{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf470
+{\fonttbl\f0\fswiss\fcharset77 Helvetica;\f1\fnil\fcharset77 Monaco;\f2\fswiss\fcharset77 ArialMT;
+}
 {\colortbl;\red255\green255\blue255;}
 \paperw11900\paperh16840\margl1440\margr1440\vieww19180\viewh12600\viewkind0
-\deftab720
-\pard\pardeftab720\ql\qnatural
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
 
-\f0\fs22 \cf0 # The artifact indexes are defined in "defines.h", and must not be changed.\
+\f0\fs24 \cf0 Unangband takes a data driven approach to much of the game design. Where possible, game rules are abstracted into external edit files which are contained in the lib/edit subdirectory. These files are parsed in using code within init1.c and then turned into binary data which is then reparsed in init2.c. The binary data is held in the lib/data subdirectory with a .raw file corresponding to each .txt file in lib/edit.\
+\
+This allows high performance loading of the data contained in the edit files in a platform independent manner - they are only reparsed in the event the edit file date is newer than the data file date, or the Unangband version number increased. If you change the internal Unangband code to read these files or the type definitions of any data structure used in these files, you should delete the .raw files before reloading - otherwise you may end up with unusual errors due to bad data which could potentially crash the game and/or corrupt save files and other data.\
+\
+Although game logic is contained in the edit files, it is not equivalent to scripting. The edit file language is simple, consisting of comment lines, starting with a # symbol, blank lines and data definition lines. The data definition lines almost always act as defining part of a row of a data table. This is almost always a large array of elements of a C structure. e.g. the monster.txt file defines a large array of elements of monster_race. The edit files are simply a way of extending the existing tables.c file to include a lot more elements, and should be read in conjunction with the relevant structures defined in types.h and with heavy use of grep to determine where the data and structures are used in the Unangband code.\
+\
+The Unangband table based data design would be better supported in a SQL like language, or Lisp or even extended with Lua or another scripting language. Unangband may be rewritten using one of these languages at some point. The paper Scaling Games to Epic Proportions (http://www.cs.cornell.edu/%7Ewmwhite/papers/2007-SIGMOD-Games.pdf) discusses a SQL like language supporting game elements on a massive scale that may be of interest. Avoiding scripting is not without complications in the game design, but at the moment there are no compelling reasons to make Unangband support scripting.\
+\
+A data definition line starts with a letter followed by a colon, followed by either one or more colon separated fields, or flags separated by white space and vertical bars (|). There are three basic types of edit file: indexed files, Markov chained files, and table files.\
+\
+In the first type of file, the data is organised in blocks starting with a N: data line, which defines data block as corresponding to the nth element of the array, and usually the name of the element. e.g.\
+\
+N:1:the first element\
+A:1:2:3\
+B:4:5\
+F:FIRST_FLAG | SECOND_FLAG\
+\
+N:2:the second element\
+\
+etc. These are used where the index is important, such as when referring to a particular monster race or character class number.\
+\
+The second type consists of array elements that are strung together using a Markov chain approach. The first line of each element usually defines the block number, and a simple algorithm goes through the array, finds elements corresponding to the same block and picks one, then chooses the next block based on selection criteria within the element chosen, and repeats until a block number of 0 is chosen. These files usually build a sentence such as a room description, or character history. Because of the design of these files, the unique element number is not as important, so it is not usually defined in the file.\
+\
+The third type is where the file builds a table. Each line corresponds to one row of the table, with numeric values separated by colons corresponding to each column.\
+\
+To emphasise: the data structure in all three types is an array of elements of a C structure - it's just a matter of how the information is presented in the file and parsed is slightly different.\
+\
+String values in the files are stored as indexes into a separate chunk of contiguous zero byte delimited strings. Each string currently has a unique index even though the string may be potentially duplicated elsewhere in the file. Usually two separate chunks of strings are used for a file: one for names, and one for descriptions. During the parsing process in init1.c, a maximal size chunk is allocated using malloc, the size of which is defined in lib/edit/limits.txt - and then once the size is known, it is written to the .raw file so that the correct size is allocated when the .raw file is read in.\
+\
+It is possible to build a distribution of Unangband which does not allow the lib/edit files to be parsed. To do this, disable the ALLOW_TEMPLATES define in config.h and distribute Unangband with the .raw files in lib/data. Note that this distribution is now heavily dependent on the endianess and integer size of the machine it is created on, so you should ensure that this is a binary only distribution.\
+\
+There is some in game calculations used in the lib/edit files as well. For instance, level, rarity and experience reward for monsters is algorithmically determined. To output a new copy of the edit files containing the generated values, enable ALLOW_TEMPLATES_OUTPUT and the edit files will be output to the lib/user directory when the game launches. Note that e.g. level is dependent on power, which can depend on level, so that the depths for monsters you have not changed will also vary in the output file.
+\f1\fs22 \
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+\
+\
+# The artifact indexes are defined in "defines.h", and must not be changed.\
 \
 # Hack -- "Grond" and "Morgoth" MUST have a rarity of one, or they might\
 # not be dropped when Morgoth is killed.  Note that they, like the "special"\
@@ -87,19 +124,19 @@
 # reduced the speed bonuses of the Big Three speed arts; removed speed bonus from arts that also have DEX boost: 'Thalkettoth', Wormtongue, Maedhros, 'Angrist', Eorlingas, Bard, Amras, ; but not removed the double boost on the Rings of Power, 'Sting', 'Belthronding', 'Aglarang' and Numenor, but lowered pval on the last two\
 \pard\pardeftab720\ql\qnatural
 
-\f1\fs24 \cf0 \
+\f2\fs24 \cf0 \
 \pard\pardeftab720\ql\qnatural
 
-\f0\fs22 \cf0 # Here is the list of "Special" artifacts - Amulets, Light Sources, Rings.\
+\f1\fs22 \cf0 # Here is the list of "Special" artifacts - Amulets, Light Sources, Rings.\
 # Only the FIRST 15 artifacts may be of these types currently: artifacts\
 # from index number 16 onwards must be Armor or Weapons.\
 \
 \pard\pardeftab720\ql\qnatural
 
-\f1\fs24 \cf0 \
-\pard\pardeftab720
+\f2\fs24 \cf0 \
+\pard\pardeftab720\ql\qnatural
 
-\f0\fs22 \cf0 # The ego-item indexes are defined in "defines.h", and must not be changed.\
+\f1\fs22 \cf0 # The ego-item indexes are defined in "defines.h", and must not be changed.\
 \
 # Ego-items 1-63 are "armor", and 64-127 are "weapons"\
 \
@@ -188,20 +225,20 @@
 #\
 \pard\pardeftab720\ql\qnatural
 
-\f1\fs24 \cf0 \
+\f2\fs24 \cf0 \
 === Understanding flavor.txt ===\
 \
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\ql\qnatural\pardirnatural
 
-\f0\fs22 \cf0 \
-\pard\pardeftab720
+\f1\fs22 \cf0 \
+\pard\pardeftab720\ql\qnatural
 \cf0 \
 # N:<index>:<tval>:<sval>\
 # G:<char>:<attr>\
 # D:<text>\
 \pard\pardeftab720\ql\qnatural
 
-\f1\fs24 \cf0 \
+\f2\fs24 \cf0 \
 \
 \
 === Understanding monster.txt ===\
@@ -209,7 +246,7 @@
 This file describes the monster.txt file in the lib\\edit folder.  The monster.txt file is used to initialise almost all information about the monster races in the game.  The file is parsed into the monster.raw file in lib\\data which is a raw data file which is loaded into memory.  The raw file is created if it does not exist, or if the date on the monster.txt file is later than the raw file.  It is best practise to always delete the raw file if you \
 \
 The monster.txt file consists of one entry for each monster race, which is laid out as follows:
-\f0 \
+\f1 \
 \
 N: serial number : monster name\
 G: symbol : color\
@@ -222,19 +259,19 @@ F: flag | flag | etc\
 D: Description\
 \
 
-\f1 'N' indicates the beginning of an entry. The serial number must increase for each new item. Entry 0 is used for the player.\
+\f2 'N' indicates the beginning of an entry. The serial number must increase for each new item. Entry 0 is used for the player.\
 \
 'G' is for graphics - symbol and color. There are currently 16 colors, as follows:\
 \
 \pard\pardeftab720\ql\qnatural
 
-\f0 \cf0 D - Dark Gray    w - White          s - Gray          o - Orange\
+\f1 \cf0 D - Dark Gray    w - White          s - Gray          o - Orange\
 r - Red          g - Green          b - Blue          u - Brown\
 d - Black        W - Light Gray     v - Violet        y - Yellow\
 R - Light Red    G - Light Green    B - Light Blue    U - Light Brown\
 \pard\pardeftab720\ql\qnatural
 
-\f1 \cf0 \
+\f2 \cf0 \
 (note that "black" is the same color as the screen background, and thus the monster will appear to be an empty black space if its color is "d".)\
 \
 'I' is for information - speed, health, vision in tens of feet, armor class, and alertness. 110 is normal speed. Alertness ranges from 0 (ever vigilant for intruders) to 255 (prefers to ignore intruders).\
@@ -290,9 +327,9 @@ CHAR_MULTI monsters are those which look like objects, and use the symbols of ob
 \
 === Understanding object.txt ===\
 \
-\pard\pardeftab720
+\pard\pardeftab720\ql\qnatural
 
-\f0\fs22 \cf0 # Add some "IGNORE_XXX" flags to Rings, Amulets, etc.  XXX XXX\
+\f1\fs22 \cf0 # Add some "IGNORE_XXX" flags to Rings, Amulets, etc.  XXX XXX\
 \
 # === Understanding k_info.txt ===\
 \
@@ -349,11 +386,11 @@ CHAR_MULTI monsters are those which look like objects, and use the symbols of ob
 # are separated by the '|' symbol.\
 \pard\pardeftab720\ql\qnatural
 
-\f1\fs24 \cf0 \
+\f2\fs24 \cf0 \
 \
-\pard\pardeftab720
+\pard\pardeftab720\ql\qnatural
 
-\f0\fs22 \cf0 # === Understanding p_class.txt ===\
+\f1\fs22 \cf0 # === Understanding p_class.txt ===\
 \
 # Format:\
 # N:class number:class name\
@@ -403,11 +440,11 @@ CHAR_MULTI monsters are those which look like objects, and use the symbols of ob
 # 'F' is for class flags.\
 \pard\pardeftab720\ql\qnatural
 
-\f1\fs24 \cf0 \
+\f2\fs24 \cf0 \
 \
-\pard\pardeftab720
+\pard\pardeftab720\ql\qnatural
 
-\f0\fs22 \cf0 # === Understanding p_race.txt ===\
+\f1\fs22 \cf0 # === Understanding p_race.txt ===\
 \
 # Format:\
 # N:race number:race name\
@@ -456,13 +493,13 @@ CHAR_MULTI monsters are those which look like objects, and use the symbols of ob
 # the number of 'playable' races defined in the limits.txt file.\
 \pard\pardeftab720\ql\qnatural
 
-\f1\fs24 \cf0 \
+\f2\fs24 \cf0 \
 \
 \
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\ql\qnatural\pardirnatural
 
-\f0\fs22 \cf0 \
-\pard\pardeftab720
+\f1\fs22 \cf0 \
+\pard\pardeftab720\ql\qnatural
 \cf0 # === Understanding spell.txt ===\
 \
 # N: number : name\
@@ -514,5 +551,5 @@ CHAR_MULTI monsters are those which look like objects, and use the symbols of ob
 # ToDo: Explain the other monster and spell flags.  But maybe in another file.\
 \pard\pardeftab720\ql\qnatural
 
-\f1\fs24 \cf0 \
+\f2\fs24 \cf0 \
 }
