@@ -3296,7 +3296,7 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 			item_tester_empty_flask_or_lite, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_BAGC), 0L, 0, cmd_tester_fill_or_fuel},
 			
 	{ player_refill2, '!', "Fill it from where? ", "You have nothing to fill it with.",
-			item_tester_refill_flask, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_BAGC), 0L, 0, NULL},
+			item_tester_refill_flask, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_BAGC | USE_FEATU), 0L, 0, NULL},
 			
 	{ player_refill2, '~', "Refuel with which torch? ", "You have no torches.",
 			item_tester_refill_torch, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_BAGC), 0L, 0, NULL},
