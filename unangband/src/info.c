@@ -2768,7 +2768,7 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 
 
 	/* Pval-affected flags */
-	if (f1)
+	if (f1 || f3)
 	{
 		list_ptr = list;
 

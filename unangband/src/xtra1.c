@@ -3367,7 +3367,7 @@ static void calc_bonuses(void)
 		if (f3 & (TR3_REGEN_HP)) p_ptr->regen_hp += o_ptr->pval;
 
 		/* Affect mana regeneration */
-		if (f3 & (TR3_REGEN_MANA)) p_ptr->regen_hp += o_ptr->pval;
+		if (f3 & (TR3_REGEN_MANA)) p_ptr->regen_mana += o_ptr->pval;
 
 		/* Affect light radius */
 		if (f3 & (TR3_LITE)) p_ptr->glowing += o_ptr->pval;
