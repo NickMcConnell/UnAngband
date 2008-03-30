@@ -4,6 +4,47 @@
     <meta name="DC.creator" content="Kamiel Martinet, http://www.martinet.nl/">
     <meta name="DC.publisher" content="Mozilla Developer Center, http://developer.mozilla.org">
     <script type="text/javascript">
+		/*
+		 * Draw a regular polyhedron using the passed line style centered on (x,y)
+		 */
+		function drawPolyhedron(ctx, points, radius, x, y, rotation, quadratic)
+		{
+			ctx.beginPath();
+		    
+		    // We degenerate to a circle if points are less than 3. Note that rotation is meaningless here.
+		    if (points < 3)
+		    {
+		       ctx.arc(x, y, radius, 0, 2*Math.PI, false); // Start Radians = 0, End Radians =1, Anticlockwise = False
+		    }
+		    else
+		    {
+				// Move to first point position
+			    ctx.moveTo(x + radius * Math.sin(rotation),y + radius * Math.cos(rotation))
+			    
+			    // Choose equal points on the circle. Basic trig.
+			    for (i = 1; i < points; i++)
+			    {
+			    	// Quadratic curve. Control point is midpoint on the circle between two points.
+			        if (quadratic)
+			        {
+						ctx.quadraticCurveTo(x + radius * Math.sin((i * 2 * Math.PI / points) + rotation),y + radius * Math.cos((i * 2 * Math.PI / points) + rotation),
+												x + radius * Math.sin(((i + .5) * 2 * Math.PI / points) + rotation), x + radius * Math.cos(((i + .5) * 2 * Math.PI / points) + rotation)
+						);
+			        }
+			        else
+			        {
+						ctx.lineTo(x + radius * Math.sin((i * 2 * Math.PI / points) + rotation),y + radius * Math.cos((i * 2 * Math.PI / points) + rotation));
+					}
+				}
+			        
+			    //Close path
+			    ctx.closePath();
+		    }
+
+			// Draw the polyhedron
+		 	ctx.fill();
+		}
+
       function drawShape(){
         // get the canvas element using the DOM
         var canvas = document.getElementById('tutorial');
@@ -11,17 +52,15 @@
         // Make sure we don't execute when canvas isn't supported
         if (canvas.getContext){
 
-          // use getContext to use the canvas for drawing
-          var ctx = canvas.getContext('2d');
+        	// use getContext to use the canvas for drawing
+       		var ctx = canvas.getContext('2d');
 
-          // Draw shapes
-          ctx.fillRect(25,25,100,100);
-          ctx.clearRect(45,45,60,60);
-          ctx.strokeRect(50,50,50,50);
+	    	// Draw shapes
+    		drawPolyhedron(ctx, 2, 25, 50, 50, Math.PI, true);
 
         } else {
           alert('You need Safari or Firefox 1.5+ to see this demo.');
-        }
+        }        
       }
     </script>
     <style type="text/css">
@@ -33,26 +72,13 @@
   </head>
 
   <body onload="drawShape();">
-    <h1>An example of fillRect, clearRect and strokeRect</h1>
+    <h1>Testing</h1>
     <div>
       <canvas id="tutorial" width="150" height="150"></canvas>
 <pre>
-function drawShape(){
-  // get the canvas element using the DOM
-  var canvas = document.getElementById('tutorial');
 
-  // Make sure we don't execute when canvas isn't supported
-  if (canvas.getContext){
+This is just a test. Please ignore.
 
-    // use getContext to use the canvas for drawing
-    var ctx = canvas.getContext('2d');
-
-    // Draw shapes
-    ctx.fillRect(25,25,100,100);
-    ctx.clearRect(45,45,60,60);
-    ctx.strokeRect(50,50,50,50);
-  }
-}
 </pre>
     </div>
   </body>
