@@ -1,48 +1,241 @@
 <html>
   <head>
-    <title>A canvas fillRect, strokeRect and clearRect example</title>
-    <meta name="DC.creator" content="Kamiel Martinet, http://www.martinet.nl/">
-    <meta name="DC.publisher" content="Mozilla Developer Center, http://developer.mozilla.org">
+    <title>Microscopic Monsters - Create a Monster test</title>
+    <meta name="DC.creator" content="Andrew Doull, http://roguelikedeveloper.blogspot.com/">
     <script type="text/javascript">
-		/*
-		 * Draw a regular polyhedron using the passed line style centered on (x,y)
-		 */
-		function drawPolyhedron(ctx, points, radius, x, y, rotation, quadratic)
+    
+    	// A 'polyhedronoid' as a regular polygon, or a polystar. If sides < 3, it is instead a circle.
+    	function Polyhedronoid()
+    	{
+			this.y = 0;
+			this.x = 0;
+			this.star = false;
+			this.points = 0;
+			this.radius = 10;
+			this.filled = false;
+			this.rotation = 0;
+			this.color = "rgb(255,165,0)";
+    	}
+    
+		Polyhedronoid.prototype.Draw = function(ctx)
 		{
+			// Draw the polyhedron
+		 	if (this.filled)
+		 	{
+		 		ctx.fillStyle = this.color;
+		 	}
+
+			// Set the stroke style
+		 	ctx.strokeStyle = this.color;
+
 			ctx.beginPath();
 		    
-		    // We degenerate to a circle if points are less than 3. Note that rotation is meaningless here.
-		    if (points < 3)
+		    // We degenerate to a circle if points are less than 3. Note that rotation is meaningless in this case.
+		    if (this.points < 3)
 		    {
-		       ctx.arc(x, y, radius, 0, 2*Math.PI, false); // Start Radians = 0, End Radians =1, Anticlockwise = False
+		    	// Don't use a wide line
+				ctx.lineWidth = 1;
+
+		       ctx.arc(this.x, this.y, this.radius, 0, 2*Math.PI, false); // Start Radians = 0, End Radians = 2*Math.PI, Anticlockwise = False
 		    }
 		    else
 		    {
+		    	// Use round edges
+		    	ctx.lineJoin = 'round';
+		    
+			 	// Set the stroke width. We use a big value to ensure that the lines are suitably round.
+			 	ctx.lineWidth = 1 + this.radius / 2;
+		 	
 				// Move to first point position
-			    ctx.moveTo(x + radius * Math.sin(rotation),y + radius * Math.cos(rotation))
+			    ctx.moveTo(this.x + (this.radius * 0.75) * Math.sin(this.rotation),this.y + (this.radius * 0.75) * Math.cos(this.rotation))
 			    
 			    // Choose equal points on the circle. Basic trig.
-			    for (i = 1; i < points; i++)
-			    {
-			    	// Quadratic curve. Control point is midpoint on the circle between two points.
-			        if (quadratic)
+			   	// Note we only use 0.75 of radius, due to the width of the line about (0.5 times radius). This makes edges suitably round.
+			    for (i = 1; i <= this.points; i++)
+			  	{
+			    	// Draw a star instead of a polyhedron.
+			        if (this.star)
 			        {
-						ctx.quadraticCurveTo(x + radius * Math.sin((i * 2 * Math.PI / points) + rotation),y + radius * Math.cos((i * 2 * Math.PI / points) + rotation),
-												x + radius * Math.sin(((i + .5) * 2 * Math.PI / points) + rotation), x + radius * Math.cos(((i + .5) * 2 * Math.PI / points) + rotation)
-						);
-			        }
-			        else
-			        {
-						ctx.lineTo(x + radius * Math.sin((i * 2 * Math.PI / points) + rotation),y + radius * Math.cos((i * 2 * Math.PI / points) + rotation));
+						ctx.lineTo(this.x + (this.radius * 0.375) * Math.sin(( (i - 0.5) * 2 * Math.PI / this.points) + this.rotation),
+							this.y + (this.radius * 0.375) * Math.cos(( (i - 0.5) * 2 * Math.PI / this.points) + this.rotation));
 					}
+
+					ctx.lineTo(this.x + (this.radius * 0.75) * Math.sin((i * 2 * Math.PI / this.points) + this.rotation),
+							this.y + (this.radius * 0.75) * Math.cos((i * 2 * Math.PI / this.points) + this.rotation));
 				}
-			        
+
 			    //Close path
 			    ctx.closePath();
 		    }
 
 			// Draw the polyhedron
-		 	ctx.fill();
+		 	if (this.filled)
+		 	{
+		 		ctx.fill();
+		 	}
+
+			// Always stroke it
+		 	ctx.stroke();
+		}
+		
+		//This returns the y component of the edge of the polyhedron that corresponds to angle.
+		Polyhedronoid.prototype.edgeY = function(angle)
+		{
+			return (Math.cos(angle + this.rotation) * this.radius + this.y);
+		}
+		
+		//This returns the y component of the edge of the polyhedron that corresponds to angle.
+		Polyhedronoid.prototype.edgeX = function(angle)
+		{
+			return (Math.sin(angle + this.rotation) * this.radius + this.x);
+		}
+		
+		//This returns the normal of the edge of the polyhedron that corresponds to angle.
+		Polyhedronoid.prototype.edgeNormal = function(angle)
+		{
+			return (angle + this.rotation);
+		}
+		
+		// A specific instance of a monster eye.
+		function MonsterEye()
+		{
+			this.angle = 0;
+			this.startY = 0;
+			this.startX = 0;
+			this.stalkLength = 0;
+			this.stalkWidth = 0;
+			this.stalkColor = "rgb(0,0,0)";
+			this.whiteSize = 0;			
+			this.pupilSize = 0;
+			this.lidSize = 0;
+			this.whiteColor = "rgb(0,0,0)";
+			this.pupilColor = "rgb(0,0,0)";
+			this.lidColor = "rgb(0,0,0)";
+		}
+		
+		MonsterEye.prototype.Draw = function(ctx)
+		{
+			var eyeX = this.startX + Math.sin(this.angle) * this.stalkLength;
+			var eyeY = this.startY + Math.cos(this.angle) * this.stalkLength;
+		
+			// Draw stalk
+			if (this.stalkLength > 0)
+			{
+				ctx.lineWidth = this.stalkWidth;
+				ctx.lineColor = this.stalkColor;
+				ctx.beginPath();
+				ctx.moveTo(this.startX, this.startY);
+				ctx.lineTo(eyeX, eyeY);
+				ctx.stroke();
+			}
+		
+			// Draw eyelid
+			ctx.lineWidth = this.lidSize;
+			ctx.lineColor = this.lidColor;
+			ctx.beginPath();
+			ctx.arc(eyeX, eyeY, this.whiteSize + this.lidSize / 2, 2*Math.PI, false); // Start Radians = 0, End Radians = 2*Math.PI, Anticlockwise = False
+			ctx.stroke();
+
+			// Draw white circle for eye
+			ctx.lineWidth = 1;
+			ctx.fillColor = this.whiteColor;
+			ctx.beginPath();
+			ctx.arc(eyeX, eyeY, this.whiteSize, 2*Math.PI, false); // Start Radians = 0, End Radians = 2*Math.PI, Anticlockwise = False
+			ctx.fill();
+
+			// Draw pupil
+			ctx.fillColor = this.pupilColor;
+			ctx.beginPath();
+			ctx.arc(eyeX, eyeY + this.whiteSize - this.pupilSize, this.pupilSize, 2*Math.PI, false); // Start Radians = 0, End Radians = 2*Math.PI, Anticlockwise = False
+			ctx.fill();
+		}
+		
+		
+		// A specific instance of a monster.
+		function MonsterInstance()
+		{
+			this.y = 50;
+			this.x = 50;
+			this.facing = 0;
+			this.bodysize = 25;
+			this.red = 255;
+			this.green = 100;
+			this.blue = 0;
+			this.bodystar = false;
+			this.bodypoints = 2;
+			this.bodyrotation = Math.PI;
+			this.mouthsize = 12;
+			this.eyesize = 4;
+			this.numeyes = 2;
+		}
+		
+		MonsterInstance.prototype.Draw = function(ctx)
+		{
+			// Draw the body.
+			monsterbody = new Polyhedronoid;
+			monsterbody.y = this.y;
+			monsterbody.x = this.x;
+			monsterbody.star = this.bodystar;
+			monsterbody.points = this.bodypoints;
+			monsterbody.radius = this.bodysize;
+			monsterbody.filled = true;
+			monsterbody.rotation = this.bodyrotation;
+			monsterbody.color = "rgb("+this.red+","+this.green+","+this.blue+")";
+			
+			monsterbody.Draw(ctx);
+			
+			// Draw the legs - below the body.
+
+			// Draw the mouth - always circular and black.
+			monstermouth = new Polyhedronoid;
+			monstermouth.y = this.y + (this.bodysize - this.mouthsize) / 3;
+			monstermouth.x = this.x;
+			monstermouth.star = false;
+			monstermouth.points = 0;
+			monstermouth.radius = this.mouthsize;
+			monstermouth.filled = true;
+			monstermouth.color = "rgb(0,0,0)";
+			
+			var mouthLimit = this.bodysize - 4;
+			if (this.bodystar) mouthLimit = mouthLimit / 2;
+			
+			//If mouth bigger than body or nearly as big, we have to hack a bit. Otherwise, the mouth obscures the body.
+			if (monstermouth.radius > mouthLimit)
+			{
+				monsterlips = new Polyhedronoid;
+				monsterlips.y = monstermouth.y - this.mouthsize / 2 - 4; monstermouth.y = monstermouth.y - this.mouthsize / 2 - 4;
+				monsterlips.x = monstermouth.x - this.mouthsize / 2 - 4; monstermouth.x = monstermouth.x - this.mouthsize / 2 - 4;
+				monsterlips.radius = this.mouthsize + 4;
+				monsterlips.filled = true;
+				monsterlips.color = "rgb("+this.red+","+this.green+","+this.blue+")";
+				
+				monsterlips.Draw(ctx);
+			}
+			
+			// Draw the mouth
+			monstermouth.Draw(ctx);
+			
+			// Draw the eyes
+			for (i = 0; i < this.numeyes; i++)
+			{
+				// Subdivide top half of body for eyes
+				var angle = ((i + 2) / (this.numeyes + 2) * Math.PI) - Math.PI;
+	
+				eye = new MonsterEye;
+				eye.angle = monsterbody.edgeNormal(angle);
+				eye.startY = monsterbody.edgeY(angle);
+				eye.startX = monsterbody.edgeX(angle);
+				eye.stalkLength = 0;
+				eye.stalkWidth = 2;
+				eye.stalkColor = monsterbody.color;
+				eye.lidSize = 2;
+				eye.whiteSize = this.eyesize;
+				eye.pupilSize = this.eyesize / 2;
+				eye.lidColor = monsterbody.color;
+				eye.whiteColor = "rgb(255,255,255)";
+				eye.pupilColor = "rgb(0,0,0)";
+				eye.Draw(ctx);
+			}
 		}
 
       function drawShape(){
@@ -55,12 +248,16 @@
         	// use getContext to use the canvas for drawing
        		var ctx = canvas.getContext('2d');
 
-	    	// Draw shapes
-    		drawPolyhedron(ctx, 2, 25, 50, 50, Math.PI, true);
+			monster1 = new MonsterInstance;
+			monster1.bodypoints = 4;
+			monster1.bodystar = true;
 
+	    	// Draw shapes
+    		monster1.Draw(ctx);
+    		
         } else {
           alert('You need Safari or Firefox 1.5+ to see this demo.');
-        }        
+        }
       }
     </script>
     <style type="text/css">
