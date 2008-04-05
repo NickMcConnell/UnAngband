@@ -147,8 +147,7 @@ L:26:56:155:0:1082:0:the Great Hall under
 S:270:271:503:11:12:504:505:0
 D:Dark shapes scuttle in the shadows on the right side of the road through
 D: Mirkwood the Great.  Among odours of decay you sometimes imagine catching a sweet scent
-D: and among echoes of clicking and hissing you can sometimes almost hear as if
-D: a captivating music.
+D: and among echoes of clicking and hissing you can sometimes faintly hear something like a captivating music.
 
 N:6:Lake-town
 X:5:7:48:0

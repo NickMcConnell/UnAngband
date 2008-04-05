@@ -2312,7 +2312,7 @@ static const o_flag_desc misc_flags3_desc[] =
 	{ TR3_SLOW_DIGEST,	"digest food more efficiently" },
 	{ TR3_FEATHER,		"fall like a feather" },
 	{ TR3_TELEPATHY,	"detect monsters by telepathy" },
-	{ TR3_SEE_INVIS,	"see invisible monters" }
+	{ TR3_SEE_INVIS,	"see invisible monsters" }
 };
 
 /*
@@ -2993,7 +2993,7 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 				anything |= outlist("It causes its wielder to", list, TERM_WHITE);
 				break;
 			case LIST_FLAGS_MAY:
-				anything |= outlist("It may causes its wielder to", list, TERM_L_WHITE);
+				anything |= outlist("It may cause its wielder to", list, TERM_L_WHITE);
 				break;
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It doesn't cause its wielder to", list, TERM_SLATE);
