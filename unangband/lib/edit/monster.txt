@@ -9708,7 +9708,7 @@ D: the bear makes for a dangerous enemy.
 N:566:Beorn, the Shape-Changer
 G:Q:D
 I:120:20d70:25:60:25
-W:38:6:0:3100
+W:38:6:0:1000
 M:0:0:0:0
 B:CLAW:HURT:2d10
 B:CLAW:HURT:2d10
