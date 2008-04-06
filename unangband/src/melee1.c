@@ -5,7 +5,7 @@
  *
  * This software may be copied and distributed for educational, research,
  * and not for profit purposes provided that this cofxright and statement
- * are included in all such copies.  Other cofxrights may also apply.
+ * are included in  all such copies.  Other cofxrights may also apply.
  *
  * UnAngband (c) 2001-6 Andrew Doull. Modifications to the Angband 2.9.1
  * source code are released under the Gnu Public License. See www.fsf.org

@@ -110,11 +110,12 @@ extern errr eval_info(eval_info_power_func eval_info_process, header *head);
 extern errr emit_info_txt(FILE *fp, FILE *template, char *buf, header *head,
    emit_info_txt_index_func emit_info_txt_index, emit_info_txt_always_func emit_info_txt_always);
 
-#ifdef ALLOW_TEMPLATES
+#if 1
 extern errr parse_z_info(char *buf, header *head);
 extern errr parse_v_info(char *buf, header *head);
 extern errr parse_f_info(char *buf, header *head);
 extern errr parse_d_info(char *buf, header *head);
+extern errr parse_blow_info(char *buf, header *head);
 extern errr parse_k_info(char *buf, header *head);
 extern errr parse_a_info(char *buf, header *head);
 extern errr parse_e_info(char *buf, header *head);
@@ -168,6 +169,7 @@ extern int error_line;
 extern header z_head;
 extern header v_head;
 extern header d_head;
+extern header blow_head;
 extern header f_head;
 extern header k_head;
 extern header a_head;

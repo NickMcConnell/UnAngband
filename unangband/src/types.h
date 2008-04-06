@@ -85,6 +85,10 @@ typedef void (*modify_attribute_func)(int y, int x);
 typedef struct maxima maxima;
 typedef struct dungeon_zone dungeon_zone;
 typedef struct town_type town_type;
+typedef struct blow_desc_type blow_desc_type;
+typedef struct blow_level_scalar_type blow_level_scalar_type;
+typedef struct blow_level_dice_type blow_level_dice_type;
+typedef struct blow_type blow_type;
 typedef struct desc_type desc_type;
 typedef struct room_info_type room_info_type;
 typedef struct feature_state feature_state;
@@ -174,7 +178,8 @@ struct maxima
 	u16b y_max;     /* Max size per element of "y_info[]" */
 
 	u16b w_max;	/* Max size per element of "w_info[]" */
-
+	u16b blow_max;	/* Max size per element of "blow_info[]" */
+	
 	u16b o_max;     /* Max size for "o_list[]" */
 	u16b m_max;     /* Max size for "m_list[]" */
 };
@@ -235,6 +240,70 @@ struct town_type
 	dungeon_zone zone[MAX_DUNGEON_ZONES];
 
 };
+
+/*
+ * Text used for blow descriptions
+ */
+struct blow_desc_type
+{
+	s16b min;
+	s16b max;
+	u32b text;	
+};
+
+/*
+ * Scalar for blow effect per level
+ * 
+ * Returned value is value + gain * actual_level / levels;
+ */
+struct blow_level_scalar_type
+{
+	s16b value;
+	s16b gain;
+	s16b levels;
+};
+
+
+/*
+ * Dice-based scalar for blow per level
+ * 
+ * Returned value is damroll(d_dice, d_side) + d_base + damroll (l_dice * actual_level / levels, l_side)
+ *  + l_base * actual_level / level
+ */
+struct blow_level_dice_type
+{
+	int d_dice;
+	int d_side;
+	int d_base;
+	int l_dice;
+	int l_side;
+	int l_base;
+	int levels;
+};
+
+
+/*
+ * Information about blow and projection types.
+ */
+struct blow_type
+{
+	u32b name;     /* Name (offset) */
+
+	u32b flags1;	/* Projection flags */
+	u32b flags2;	/* Projection flags */
+
+	blow_desc_type desc[MAX_BLOW_DESCRIPTIONS];	/* Possible text strings describing blow */
+
+	blow_level_scalar_type arc;
+	blow_level_scalar_type diameter_of_source;
+	blow_level_scalar_type radius;
+	blow_level_scalar_type max_range;
+	blow_level_scalar_type number;
+	blow_level_scalar_type power;
+	
+	blow_level_dice_type damage;
+};
+
 
 #define THEME_TUNNEL	0
 #define THEME_SOLID		1

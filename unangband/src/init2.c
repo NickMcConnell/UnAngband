@@ -366,6 +366,7 @@ static cptr err_str[PARSE_ERROR_MAX] =
 header z_head;
 header v_head;
 header d_head;
+header blow_head;
 header f_head;
 header k_head;
 header a_head;
@@ -808,6 +809,34 @@ static errr init_d_info(void)
 	d_info = d_head.info_ptr;
 	d_name = d_head.name_ptr;
 	d_text = d_head.text_ptr;
+
+	return (err);
+}
+
+
+/*
+ * Initialize the "blow_info" array
+ */
+static errr init_blow_info(void)
+{
+	errr err;
+
+	/* Init the header */
+	init_header(&blow_head, z_info->blow_max, sizeof(blow_type));
+
+#ifdef ALLOW_TEMPLATES
+
+	/* Save a pointer to the parsing function */
+	blow_head.parse_info_txt = parse_blow_info;
+
+#endif /* ALLOW_TEMPLATES */
+
+	err = init_info("blows", &blow_head);
+
+	/* Set the global variables */
+	blow_info = blow_head.info_ptr;
+	blow_name = blow_head.name_ptr;
+	blow_text = blow_head.text_ptr;
 
 	return (err);
 }
@@ -2114,7 +2143,6 @@ void init_angband(void)
 	/* Failure */
 	if (fd < 0)
 	{
-
 		/* File type is "DATA" */
 		FILE_TYPE(FILE_TYPE_DATA);
 
@@ -2150,6 +2178,10 @@ void init_angband(void)
 	note("[Initializing array sizes...]");
 	if (init_z_info()) quit("Cannot initialize sizes");
 
+	/* Initialize feature info */
+	note("[Initializing arrays... (blows)]");
+	if (init_blow_info()) quit("Cannot initialize blows");	
+	
 	/* Initialize feature info */
 	note("[Initializing arrays... (features)]");
 	if (init_f_info()) quit("Cannot initialize features");
@@ -2388,6 +2420,7 @@ void cleanup_angband(void)
 	free_info(&f_head);
 	free_info(&d_head);
 	free_info(&q_head);
+	free_info(&blow_head);
 	free_info(&z_head);
 
 	/* Free the format() buffer */

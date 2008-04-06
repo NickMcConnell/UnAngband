@@ -2566,6 +2566,11 @@
 
 
 /*
+ * Maximum number of blow descriptions
+ */
+#define MAX_BLOW_DESCRIPTIONS	8
+
+/*
  * New monster blow methods
  */
 #define RBM_HIT		1
@@ -2688,8 +2693,8 @@
 #define PROJECT_ARC          0x00000002
 #define PROJECT_STAR         0x00000004
 #define PROJECT_8WAY         0x00000008
-#define PROJECT_XXX2         0x00000010
-#define PROJECT_XXX3         0x00000020
+#define PROJECT_4WAY         0x00000010
+#define PROJECT_SCATTER      0x00000020
 
 /* What projections do */
 #define PROJECT_BOOM         0x00000040
@@ -2703,22 +2708,44 @@
 #define PROJECT_ITEM         0x00001000
 #define PROJECT_KILL         0x00002000
 #define PROJECT_PLAY         0x00004000
-#define PROJECT_SAFE         0x00008000 /*(unused)*/
+#define PROJECT_SELF         0x00008000
 #define PROJECT_LITE         0x00010000
 #define PROJECT_MAGIC        0x00020000 /* Resistable by monsters with resist magic */
 
 /* Graphics */
 #define PROJECT_HIDE         0x00040000
 #define PROJECT_NO_REDRAW    0x00080000
-#define PROJECT_XXX         0x00100000
 
 /* How projections travel */
+#define PROJECT_SAFE         0x00100000 /* Projection doesn't affect caster */
 #define PROJECT_STOP         0x00200000
 #define PROJECT_JUMP         0x00400000
 #define PROJECT_THRU         0x00800000
 #define PROJECT_CHCK         0x01000000
 #define PROJECT_ORTH         0x02000000 /*(unused)*/
-#define PROJECT_XX10         0x04000000
+
+/* Projections that don't use projection function, or do in an unusual way */
+#define PROJECT_LOS          0x04000000
+#define PROJECT_HOOK         0x08000000
+#define PROJECT_PANEL        0x10000000
+#define PROJECT_LEVEL        0x20000000
+#define PROJECT_FORK		 0x40000000 /* Doesn't follow a straight path */
+#define PROJECT_WIDE         0x80000000 /* Follows a wide path */
+
+/* Melee specific flags */
+#define PR2_MELEE        0x00000001
+#define PR2_RANGED       0x08000002
+#define PR2_BREATH       0x00000004
+#define PR2_INNATE       0x00000008
+#define PR2_CUTS         0x00000010
+#define PR2_STUN         0x00000020
+#define PR2_SHRIEK       0x00000040
+#define PR2_SLIME        0x00000080
+#define PR2_TOUCH        0x00000080
+
+
+
+
 
 /*Who caused the projection*/
 #define SOURCE_MONSTER_START	0 /*Greater than 0 monster is the source*/

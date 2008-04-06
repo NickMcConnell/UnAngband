@@ -261,6 +261,86 @@ static cptr r_info_blow_method[] =
 
 
 /*
+ * Blow and projection flags
+ */
+static cptr blow_info_flags1[] =
+{
+	"BEAM",
+	"ARC",
+	"STAR",
+	"8WAY",
+	"4WAY",
+	"SCATTER",
+	"BOOM",
+	"WALL",
+	"PASS",
+	"MISS",
+	"AREA",
+	"GRID",
+	"ITEM",
+	"KILL",
+	"PLAY",
+	"SELF",
+	"LITE",
+	"MAGIC",
+	"HIDE",
+	"NO_REDRAW",
+	"SAFE",
+	"STOP",
+	"JUMP",
+	"THRU",
+	"CHCK",
+	"ORTH",
+	"LOS",
+	"HOOK",
+	"PANEL",
+	"LEVEL",
+	"FORK",
+	"WIDE"
+};
+
+
+/*
+ * Blow and projection flags
+ */
+static cptr blow_info_flags2[] =
+{
+	"MELEE",
+	"RANGED",
+	"BREATH",
+	"INNATE",
+	"CUTS",
+	"STUN",
+	"SHRIEK",
+	"SLIME",
+	"TOUCH",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	""	
+};
+
+
+/*
  * Monster/Trap/Spell Blow Effects
  */
 static cptr r_info_blow_effect[] =
@@ -1735,6 +1815,18 @@ errr parse_z_info(char *buf, header *head)
 		z_info->b_max = max;
 	}
 
+	/* Process 'b' for "Maximum blow_info[] subindex" */
+	else if (buf[2] == 'b')
+	{
+		int max;
+
+		/* Scan for the value */
+		if (1 != sscanf(buf+4, "%d", &max)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the value */
+		z_info->blow_max = max;
+	}
+
 	/* Process 'Q' for "Maximum q_info[] subindex" */
 	else if (buf[2] == 'Q')
 	{
@@ -1908,19 +2000,384 @@ errr parse_v_info(char *buf, header *head)
 static errr grab_one_flag(u32b *flags, cptr names[], cptr what)
 {
 	int i;
-
+	
 	/* Check flags */
 	for (i = 0; i < 32; i++)
 	{
 		if (streq(what, names[i]))
 		{
 			*flags |= (1L << i);
+			
 			return (0);
 		}
 	}
 
 	return (-1);
 }
+
+
+/*
+ * Grab one level scalar from a textual string
+ */
+static errr grab_one_level_scalar(blow_level_scalar_type *scalar, char *what)
+{
+	char *s, *t, *u;
+
+	/* Start at start of string */
+	s = what;
+	
+	/* Find either a plus or slash */
+	for (t = s; *t && (*t != '+') && (*t != '/') && (*t != '\n'); ++t) /* loop */;
+
+	/* Find a slash */
+	for (u = s; *u && (*u != '/') && (*u != '\n'); ++u) /* loop */;
+	
+	/* No plus sign */
+	if (*t == '/')
+	{
+		/* Move t backwards */
+		t = s;
+		
+		/* Find the end of line */
+		for (; *s && (*s != '\n'); ++s) /* loop */;			
+	}
+	/* Prepare t */
+	else if (*t == '+')
+	{
+		/* Nuke plus sign and advance */
+		*t++ = '\0';
+	}
+	
+	/* Prepare u */
+	if (*u == '/')
+	{
+		/* Nuke divisor and advance */
+		*u++ = '\0';
+	}
+
+	/* Parse values */
+	scalar->value = atoi(s);
+	scalar->gain = atoi(t);
+	scalar->levels = atoi(u);
+
+	return (0);
+}
+
+
+
+/*
+ * Grab one level dice from a textual string
+ * 
+ * This string format is 1d2+3+(4d5+6)/7
+ */
+static errr grab_one_level_dice(blow_level_dice_type *dice, char *what)
+{
+	char *s, *t, *u, *w;
+	char *v = NULL;
+
+	/* Start at start of string */
+	s = what;
+	
+	/* Find a left bracket */
+	for (t = s; *t && (*t != '(') && (*t != '\n'); ++t) /* loop */;
+
+	/* Find a slash */
+	for (u = s; *u && (*u != '/') && (*u != '\n'); ++u) /* loop */;
+	
+	/* Find a plus before a left bracket */
+	for (v = s; *t && (*v != '+') && (*v != '(') && (*v != '\n'); ++v) /* loop */;
+
+	/* Find a plus following t */
+	for (w = t; *w && (*w != '+') && (*w != '\n'); ++w) /* loop */;
+	
+	/* Prepare t */
+	if (*t == '(')
+	{
+		/* Nuke plus sign and advance */
+		*t++ = '\0';
+	}
+	else
+	{
+		char *t1 = t;
+		
+		/* Move t backwards */
+		if (*v == '+')
+		{
+			/* Swap around */
+			t = v;
+			v = t1;
+		}
+		else
+		{
+			/* Swap around */
+			t = s;
+			w = v;
+			s = t1;
+			v = t1;
+		}
+	}
+	
+	/* Prepare u */
+	if (*u == '/')
+	{
+		/* Nuke divisor and advance */
+		*u++ = '\0';
+	}
+	
+	/* Prepare v */
+	if (*v == '+')
+	{
+		/* Nuke divisor and advance */
+		*v++ = '\0';
+	}
+
+	/* Prepare w */
+	if (*w == '+')
+	{
+		/* Nuke divisor and advance */
+		*w++ = '\0';
+	}
+
+	/* Scan for the values */
+	if (2 != sscanf(s, "%dd%d", &dice->d_dice, &dice->d_side)) dice->d_base = atoi(s); 
+	else dice->d_base = atoi(v);
+
+	/* Scan for the values */
+	if (2 != sscanf(t, "%dd%d", &dice->l_dice, &dice->l_side)) dice->l_base = atoi(t);
+	else dice->l_base = atoi(w);
+
+	/* Get levels */
+	dice->levels = atoi(u);
+
+	return (0);
+}
+
+
+/*
+ * Grab one blow flag in a blow_type from a textual string
+ */
+static errr grab_one_blow_flag(blow_type *blow_ptr, cptr what)
+{
+	if (grab_one_flag(&blow_ptr->flags1, blow_info_flags1, what) == 0)
+		return (0);
+
+	if (grab_one_flag(&blow_ptr->flags2, blow_info_flags2, what) == 0)
+		return (0);
+
+	/* Oops */
+	msg_format("Unknown blow flag '%s'.", what);
+
+	/* Error */			
+	return (PARSE_ERROR_GENERIC);
+	
+	return (0);
+}
+
+
+/*
+ * Initialize the "project_info" array, by parsing an ascii "template" file
+ */
+errr parse_blow_info(char *buf, header *head)
+{
+	int i;
+
+	char *s, *t;
+
+	/* Current entry */
+	static blow_type *blow_ptr = NULL;
+
+	/* Process 'N' for "New/Number/Name" */
+	if (buf[0] == 'N')
+	{
+		/* Find the colon before the name */
+		s = strchr(buf+2, ':');
+
+		/* Verify that colon */
+		if (!s) return (PARSE_ERROR_GENERIC);
+
+		/* Nuke the colon, advance to the name */
+		*s++ = '\0';
+
+		/* Paranoia -- require a name */
+		if (!*s) return (PARSE_ERROR_GENERIC);
+
+		/* Get the index */
+		i = atoi(buf+2);
+
+		/* Verify information */
+		if (i <= error_idx) return (PARSE_ERROR_NON_SEQUENTIAL_RECORDS);
+
+		/* Verify information */
+		if (i >= head->info_num) return (PARSE_ERROR_TOO_MANY_ENTRIES);
+
+		/* Save the index */
+		error_idx = i;
+
+		/* Point at the "info" */
+		blow_ptr = (blow_type*)head->info_ptr + i;
+
+		/* Store the name */
+		if (!(blow_ptr->name = add_name(head, s)))
+			return (PARSE_ERROR_OUT_OF_MEMORY);
+		
+		/* Set some values */
+		blow_ptr->max_range.value = MAX_SIGHT;		
+	}
+
+	/* Hack -- Process 'F' for flags */
+	else if (buf[0] == 'F')
+	{
+		/* There better be a current f_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Parse every entry textually */
+		for (s = buf + 2; *s; )
+		{
+			/* Find the end of this entry */
+			for (t = s; *t && (*t != ' ') && (*t != '|'); ++t) /* loop */;
+
+			/* Nuke and skip any dividers */
+			if (*t)
+			{
+				*t++ = '\0';
+				while (*t == ' ' || *t == '|') t++;
+			}
+
+			/* Parse this entry */
+			if (0 != grab_one_blow_flag(blow_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
+
+			/* Start the next entry */
+			s = t;
+		}
+	}
+
+	/* Process 'T' for "Blow Description" */
+	else if (buf[0] == 'T')
+	{
+		int n1;
+		
+		/* There better be a current blow_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Analyze effect */
+		for (n1 = 0; blow_ptr->desc[n1].max > 0; n1++) /* loop */ ;
+
+		if (n1 >= MAX_BLOW_DESCRIPTIONS) return (PARSE_ERROR_GENERIC);
+
+		/* Find either a minus sign or colon */
+		for (t = s = buf + 2; *t && (*t != '-') && (*t != '<') && (*t != ':'); ++t) /* loop */;
+
+		/* Parse max */
+		if ((*t == '-') || (*t == '<'))
+		{
+			/* Nuke minus size and advance */
+			*t++ = '\0';
+			
+			blow_ptr->desc[n1].max = atoi(t);
+			
+			/* Find the colon */
+			for (; *t && (*t != ':'); ++t) /* loop */;			
+		}
+		else
+		{
+			/* TODO: Define a MAX_DAMAGE and start using it */
+			blow_ptr->desc[n1].max = 10000;
+		}
+
+		/* No colon */
+		if (*t == 0) return (PARSE_ERROR_GENERIC);
+
+		/* Nuke colon size and advance */
+		*t++ = '\0';
+
+		/* Hack -- allow greater than */
+		if (*s == '>') *s++;
+		
+		/* Parse min */
+		blow_ptr->desc[n1].min = atoi(s);
+		
+		/* Store the description */
+		if (!(blow_ptr->desc[n1].text = add_text(&blow_ptr->desc[n1].text, head, t)))
+			return (PARSE_ERROR_OUT_OF_MEMORY);
+	}
+
+	/* Process 'A' for "Arc" */
+	else if (buf[0] == 'A')
+	{
+		/* There better be a current blow_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		if (grab_one_level_scalar(&blow_ptr->arc, s)) return (PARSE_ERROR_GENERIC);
+	}
+	
+	/* Process 'D' for "Diameter of Source" */
+	else if (buf[0] == 'D')
+	{
+		/* There better be a current blow_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		if (grab_one_level_scalar(&blow_ptr->diameter_of_source, buf + 2)) return (PARSE_ERROR_GENERIC);
+	}
+	
+	/* Process 'M' for "Maximum Range" */
+	else if (buf[0] == 'M')
+	{
+		/* There better be a current blow_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		if (grab_one_level_scalar(&blow_ptr->max_range, buf + 2)) return (PARSE_ERROR_GENERIC);
+	}
+	
+	/* Process 'U' for "Number" */
+	else if (buf[0] == 'U')
+	{
+		/* There better be a current blow_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		if (grab_one_level_scalar(&blow_ptr->number, buf + 2)) return (PARSE_ERROR_GENERIC);
+	}
+	
+	/* Process 'R' for "Radius" */
+	else if (buf[0] == 'R')
+	{
+		/* There better be a current blow_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		if (grab_one_level_scalar(&blow_ptr->radius, buf + 2)) return (PARSE_ERROR_GENERIC);
+	}
+	
+	/* Process 'P' for "Power" */
+	else if (buf[0] == 'P')
+	{
+		/* There better be a current blow_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		if (grab_one_level_scalar(&blow_ptr->power, buf + 2)) return (PARSE_ERROR_GENERIC);
+	}
+	
+	/* Process 'D' for "Damage" */
+	else if (buf[0] == 'D')
+	{
+		/* There better be a current blow_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		if (grab_one_level_dice(&blow_ptr->damage, buf + 2)) return (PARSE_ERROR_GENERIC);		
+	}
+	
+	else
+	{
+		/* Oops */
+		return (PARSE_ERROR_UNDEFINED_DIRECTIVE);
+	}
+
+	/* Success */
+	return (0);
+	
+}
+
+
+
+
 
 
 /*
@@ -2124,13 +2581,12 @@ errr parse_d_info(char *buf, header *head)
 		s = buf+2;
 
 		/* Store the name */
-		if (!(d_ptr->name1 = add_name(head, s)))
+		if (!(d_ptr->name1 = add_name(head, buf)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
 	}
 	/* Process 'B' for "Name2" */
 	else if (buf[0] == 'B')
 	{
-
 		/* There better be a current d_ptr */
 		if (!d_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
@@ -2138,9 +2594,8 @@ errr parse_d_info(char *buf, header *head)
 		s = buf+2;
 
 		/* Store the name */
-		if (!(d_ptr->name2 = add_name(head, s)))
+		if (!(d_ptr->name2 = add_name(head, buf)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
-
 	}
 
 	/* Process 'D' for "Description" */

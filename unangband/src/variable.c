@@ -843,6 +843,13 @@ char *v_text;
 /*
  * The terrain feature arrays
  */
+blow_type *blow_info;
+char *blow_name;
+char *blow_text;
+
+/*
+ * The terrain feature arrays
+ */
 feature_type *f_info;
 char *f_name;
 char *f_text;
