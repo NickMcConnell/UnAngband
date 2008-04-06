@@ -339,7 +339,8 @@ N:56:area
 T:0:calls~ * around &
 T:0:summon~ * around &
 T:0:create~ * around &
-F:BOOM | GRID | ITEM | KILL | PLAY | WALL | AREA | MAGIC
+F:BOOM | GRID | ITEM | KILL | PLAY | WALL | AREA | MAGIC | SELF
+R:1+1/10
 
 N:57:los
 T:0:call~ down *
@@ -358,7 +359,7 @@ R:0
 N:60:orb
 T:0:hurl~ an orb of * at &
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | AREA | MAGIC
-R:2
+R:2+1/30
 
 N:61:star
 T:0:create~ * in eight directions
@@ -432,10 +433,12 @@ N:75:swarm
 T:0:throw~ a swarm of * at &
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC | STOP
 R:1
+U:2+1/20
 
 N:76:scatter
 T:0:scatter~ * around &
 F:SCATTER
+U:3+1/10
 
 N:77:howl
 T:0:howls~ at &
@@ -459,3 +462,9 @@ T:0:shoot~ a forked bolt of * at &
 F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC
 R:10
 
+N:81:aim area
+T:0:calls~ * around &
+T:0:summon~ * around &
+T:0:create~ * around &
+F:BOOM | GRID | ITEM | KILL | PLAY | WALL | AREA | MAGIC
+R:1+1/10

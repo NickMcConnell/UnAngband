@@ -15,6 +15,8 @@
 V:0.6.2
 
 N:0:(illegible)
+#$ Shaman cannot cast this spell.
+#$ Bard cannot cast this spell.
 C:11:99:99:100:100
 P:0:0
 
@@ -31,7 +33,7 @@ C:8:2:2:30:1
 C:10:3:2:30:1
 C:11:1:2:22:4
 P:0:0
-B:MISSILE:MANA:3d4
+B:MISSILE:MANA:3d4+(1d4)/5
 
 N:2:Detect Monsters
 A:90:32:2
@@ -170,7 +172,7 @@ C:8:7:5:40:3
 C:10:7:5:40:3
 C:11:3:3:27:3
 P:0:0
-B:CLOUD:POISON:10
+B:CLOUD:POISON:10+1/2
 
 N:10:Confuse Monster
 A:65:10:1
@@ -205,7 +207,7 @@ C:8:5:4:30:4
 C:10:9:7:40:3
 C:11:5:4:30:4
 P:162:1
-B:BEAM:ELEC:3d6
+B:BEAM:ELEC:2d6+(1d6)/4
 
 N:12:Trap/Door Destruction
 A:70:39:1
@@ -221,7 +223,7 @@ C:9:21:19:60:3
 C:10:21:19:60:3
 C:11:11:7:45:8
 P:0:0
-B:ADJACENT:KILL_DOOR:0
+B:ADJACENT:KILL_DOOR
 
 N:13:Sleep Monster
 A:65:8:1
@@ -314,7 +316,7 @@ C:8:7:6:40:6
 C:10:15:12:50:4
 C:11:7:6:40:6
 P:445:1
-B:BOLT_10:COLD:5d8
+B:BOLT_10:COLD:4d8+(1d8)/4
 
 N:18:Turn Stone to Mud
 A:65:6:1
@@ -459,7 +461,7 @@ C:8:10:7:50:7
 C:10:25:20:60:3
 C:11:10:7:50:7
 P:387:162
-B:BOLT:FIRE:6d8
+B:BOLT:FIRE:5d8+(1d8)/4
 
 N:26:Slow Monster
 A:65:9:1
@@ -596,7 +598,7 @@ C:9:25:17:60:17
 C:10:25:17:60:17
 C:11:15:7:60:29
 P:0:0
-B:BEAM:DISPEL:0
+B:BEAM:DISPEL
 
 N:34:Door Creation
 A:70:79:1
@@ -611,7 +613,7 @@ C:4:13:9:20:25
 C:10:8:17:20:25
 C:11:7:7:20:28
 P:0:0
-B:ADJACENT:MAKE_DOOR:0
+B:ADJACENT:MAKE_DOOR
 
 N:35:Stair Creation
 A:70:80:1
@@ -695,7 +697,7 @@ C:8:15:9:50:8
 C:10:25:20:60:3
 C:11:15:9:50:8
 P:154:440
-B:BOLT:ACID:8d8
+B:BOLT:ACID:7d8+(1d8)/4
 
 N:40:Cloud Kill
 A:65:29:1
@@ -762,8 +764,7 @@ C:8:30:25:85:34
 C:10:36:45:80:35
 C:11:30:25:85:34
 P:0:0
-U:2+1/20
-B:SWARM:METEOR:30
+B:SWARM:METEOR:30+1/2
 
 N:44:Mana Storm
 A:90:6:3
@@ -1096,7 +1097,7 @@ C:8:7:3:35:4
 C:9:3:2:25:4
 C:11:3:2:25:4
 P:62:0
-B:BLAST:HOLY_ORB:1d4
+B:BLAST:HOLY_ORB:1d4+1/1
 
 N:64:Call Light
 A:91:32:5
@@ -1345,7 +1346,7 @@ C:8:13:11:44:4
 #$ Bard cannot cast this spell.
 C:11:9:7:38:4
 P:74:398
-B:ORB:HOLY_ORB:3d6
+B:ORB:HOLY_ORB:3d6+3/2
 
 N:78:Cure Critical Wounds
 A:91:34:3
@@ -1629,7 +1630,7 @@ C:8:25:10:80:150
 #$ Bard cannot cast this spell.
 C:11:25:10:80:150
 P:0:0
-B:LOS:PROBE:0
+B:LOS:PROBE
 
 N:95:Clairvoyance
 A:75:56:1
@@ -1798,7 +1799,7 @@ C:8:9:8:45:3
 #$ Bard cannot cast this spell.
 C:11:5:6:50:40
 P:66:0
-B:ADJACENT:KILL_DOOR:0
+B:ADJACENT:KILL_DOOR
 
 N:107:Recharging
 A:91:7:2
@@ -2101,7 +2102,7 @@ C:8:33:55:90:15
 C:9:37:70:90:5
 C:11:33:55:90:15
 P:0:0
-B:AREA:RAISE_DEAD:0
+B:AREA:RAISE_DEAD
 
 N:130:Detect Curse
 A:66:1:1
@@ -2253,7 +2254,7 @@ C:8:10:9:42:5
 #$ Bard cannot cast this spell.
 C:11:7:6:37:6
 P:138:0
-B:AIM:DRAIN_LIFE:3d10+0
+B:AIM:DRAIN_LIFE:3d10
 
 N:141:Animate Dead
 A:91:14:5
@@ -2265,7 +2266,7 @@ C:8:9:7:40:7
 C:9:13:11:45:8
 C:11:9:7:40:7
 P:0:0
-B:AREA:ANIM_DEAD:0
+B:AREA:ANIM_DEAD
 F:HOLD_SONG |
 
 N:142:Cause Serious Wounds
@@ -2326,7 +2327,7 @@ C:8:2:2:26:4
 C:10:5:3:35:1
 C:11:1:2:26:4
 P:0:0
-B:HANDS:FIRE:3d5
+B:HANDS:FIRE:3d5+(1d5)/5
 
 N:147:Fire Trap
 A:90:9:5
@@ -2399,8 +2400,8 @@ C:8:20:15:60:12
 C:10:35:41:70:9
 C:11:20:15:60:12
 P:25:0
-B:BOLT:FIRE:6d12
-B:BOLT:FIRE:6d12
+B:BOLT:FIRE:5d12+(1d12)/4
+B:BOLT:FIRE:5d12+(1d12)/4
 
 N:152:Fire Bolt III
 A:65:34:1
@@ -2415,9 +2416,9 @@ C:8:30:22:70:18
 C:10:45:61:80:15
 C:11:30:22:70:18
 P:151:0
-B:BOLT:FIRE:6d16
-B:BOLT:FIRE:6d16
-B:BOLT:FIRE:6d16
+B:BOLT:FIRE:5d16+(1d16)/4
+B:BOLT:FIRE:5d16+(1d16)/4
+B:BOLT:FIRE:5d16+(1d16)/4
 
 N:153:Fire Storm
 A:65:35:1
@@ -2446,7 +2447,7 @@ C:8:3:3:29:2
 C:10:5:3:35:1
 C:11:1:2:26:4
 P:0:0
-B:HANDS:ACID:3d5
+B:HANDS:ACID:3d5+(1d5)/5
 
 N:155:Acid Trap
 A:90:10:5
@@ -2490,8 +2491,8 @@ C:8:25:19:60:18
 C:10:35:41:60:12
 C:11:25:19:60:18
 P:39:0
-B:BOLT:ACID:8d12
-B:BOLT:ACID:8d12
+B:BOLT:ACID:7d12+(1d12)/4
+B:BOLT:ACID:7d12+(1d12)/4
 
 N:158:Summon Ooze Elemental
 A:90:10:7
@@ -2548,9 +2549,9 @@ C:8:35:28:70:24
 C:10:45:61:70:18
 C:11:35:28:70:24
 P:157:0
-B:BOLT:ACID:8d16
-B:BOLT:ACID:8d16
-B:BOLT:ACID:8d16
+B:BOLT:ACID:7d16+(1d16)/4
+B:BOLT:ACID:7d16+(1d16)/4
+B:BOLT:ACID:7d16+(1d16)/4
 
 N:162:Lightning Spark
 A:90:36:2
@@ -2565,7 +2566,7 @@ C:8:2:2:26:4
 C:10:5:3:35:1
 C:11:1:2:26:4
 P:0:0
-B:HANDS:ELEC:3d5
+B:HANDS:ELEC:3d5+(1d5)/5
 
 N:163:Resist Electricity
 A:75:64:1
@@ -2628,8 +2629,8 @@ C:8:15:9:40:10
 C:10:19:15:50:9
 C:11:15:9:40:10
 P:11:453
-B:BEAM:ELEC:3d9
-B:BEAM:ELEC:3d9
+B:BEAM:ELEC:2d9+(1d9)/4
+B:BEAM:ELEC:2d9+(1d9)/4
 
 N:167:Wall of Thunder
 A:90:12:6
@@ -2671,9 +2672,9 @@ C:8:25:13:50:16
 C:10:29:22:60:15
 C:11:25:13:50:16
 P:166:0
-B:BEAM:ELEC:3d12
-B:BEAM:ELEC:3d12
-B:BEAM:ELEC:3d12
+B:BEAM:ELEC:2d12+(1d12)/4
+B:BEAM:ELEC:2d12+(1d12)/4
+B:BEAM:ELEC:2d12+(1d12)/4
 
 N:170:Lightning Storm
 A:65:41:1
@@ -2701,7 +2702,7 @@ C:8:2:2:26:4
 C:10:5:3:35:1
 C:11:1:2:26:4
 P:0:0
-B:HANDS:COLD:3d5+1
+B:HANDS:COLD:3d5+1+(1d5)/5
 
 N:172:Frost Trap
 A:90:11:6
@@ -2745,8 +2746,8 @@ C:8:17:13:50:12
 C:10:25:25:60:10
 C:11:17:13:50:12
 P:17:447
-B:BOLT_10:COLD:5d12
-B:BOLT_10:COLD:5d12
+B:BOLT_10:COLD:4d12+(1d12)/4
+B:BOLT_10:COLD:4d12+(1d12)/4
 
 N:175:Summon Ice Elemental
 A:90:11:8
@@ -2775,9 +2776,9 @@ C:8:27:19:60:18
 C:10:35:37:70:16
 C:11:27:19:60:18
 P:174:0
-B:BOLT_10:COLD:5d16
-B:BOLT_10:COLD:5d16
-B:BOLT_10:COLD:5d16
+B:BOLT_10:COLD:4d16+(1d16)/4
+B:BOLT_10:COLD:4d16+(1d16)/4
+B:BOLT_10:COLD:4d16+(1d16)/4
 
 N:177:Wall of Ice
 A:90:11:10
@@ -2820,7 +2821,7 @@ C:8:7:6:40:2
 C:10:7:6:40:2
 C:11:3:4:30:1
 P:0:0
-B:BLAST:CONFUSE_WEAK:10
+B:BLAST:CONFUSE_WEAK:10+1/1
 
 N:180:Philtre of Fearlessness
 A:75:28:1
@@ -2895,8 +2896,8 @@ C:1:15:10:50:8
 C:10:23:17:60:3
 C:11:15:10:50:8
 P:0:0
-B:BLAST:FIRE:2d10
-B:BLAST:SOUND:2d10
+B:BLAST:FIRE:2d10+1/1
+B:BLAST:SOUND:2d10+1/1
 
 N:185:Strength Serum
 A:90:13:8
@@ -2987,7 +2988,7 @@ C:9:13:11:55:4
 C:10:13:11:55:4
 C:11:7:6:30:5
 P:0:0
-B:AREA:ANIM_DEAD:0
+B:AREA:ANIM_DEAD
 
 N:191:Turn Undead
 A:93:23:18
@@ -3362,7 +3363,7 @@ C:8:22:17:50:11
 C:10:32:27:60:8
 C:11:22:17:50:11
 P:0:0
-B:BOLT:METEOR:10d8
+B:BOLT:METEOR:9d8+(1d8)/4
 
 N:216:Stoneskin
 A:90:18:6
@@ -3391,7 +3392,7 @@ C:8:17:11:70:6
 C:10:27:24:90:3
 C:11:17:11:70:6
 P:0:0
-B:LINE:BRIDGE:0
+B:LINE:BRIDGE
 
 N:218:Summon Earth Elemental
 A:90:18:8
@@ -3449,7 +3450,7 @@ C:8:14:9:45:5
 C:10:22:18:55:2
 C:11:14:9:45:5
 P:9:0
-B:CLOUD:COLD:20
+B:CLOUD:COLD:20+1/2
 
 N:222:Acidic Cloud
 A:65:46:1
@@ -3464,7 +3465,7 @@ C:8:15:13:60:7
 C:10:25:22:60:3
 C:11:15:13:60:7
 P:221:0
-B:CLOUD:ACID:30
+B:CLOUD:ACID:30+1/2
 
 N:223:Storm Cloud
 A:65:47:1
@@ -3510,7 +3511,7 @@ C:8:27:17:60:7
 C:10:30:22:70:4
 C:11:25:13:55:10
 P:223:40
-B:CLOUD:FIRE:50+1/1
+B:CLOUD:FIRE:50+1/2
 
 N:226:Death Fog
 A:90:19:9
@@ -3586,7 +3587,7 @@ C:8:17:13:50:12
 C:10:25:25:60:10
 C:11:17:13:50:12
 P:227:0
-B:BOLT:WATER:6d8
+B:BOLT:WATER:5d8+(1d8)/4
 
 N:231:Summon Water Elemental
 A:90:20:5
@@ -3643,7 +3644,7 @@ C:9:13:16:50:20
 C:10:13:16:50:20
 C:11:9:7:50:40
 P:0:0
-B:ADJACENT:KILL_DOOR:0
+B:ADJACENT:KILL_DOOR
 
 N:235:Power Word Sleep
 A:90:21:6
@@ -3660,7 +3661,7 @@ C:9:25:22:70:6
 C:10:25:22:70:6
 C:11:15:9:60:10
 P:0:0
-B:LOS:SLEEP:0
+B:LOS:SLEEP
 F:HOLD_SONG |
 
 N:236:Symbol of Pain
@@ -3949,7 +3950,7 @@ C:9:14:10:55:8
 C:10:25:20:85:80
 C:11:20:12:85:120
 P:0:0
-B:BLAST:SOUND:4d10
+B:BLAST:SOUND:4d10+1/1
 
 N:255:Sound Bolt
 A:65:51:1
@@ -3960,7 +3961,7 @@ A:93:19:19
 C:9:25:20:60:3
 C:11:25:20:60:3
 P:0:0
-B:BOLT:SOUND:8d8
+B:BOLT:SOUND:7d8+(1d8)/4
 
 # Additional Food effects.
 
@@ -3968,7 +3969,7 @@ N:256:Poison
 A:75:81:1
 A:80:0:1
 P:0:0
-B:SELF:POISON:0
+B:SELF:POISON
 
 N:257:Blindness
 A:75:7:1
@@ -4086,6 +4087,22 @@ S:CURE_DISEASE:4
 
 ### 279 - Unused ###
 
+#$# 272 - Unused ###
+
+#$# 273 - Unused ###
+
+#$# 274 - Unused ###
+
+#$# 275 - Unused ###
+
+#$# 276 - Unused ###
+
+#$# 277 - Unused ###
+
+#$# 278 - Unused ###
+
+#$# 279 - Unused ###
+
 N:280:Mana
 A:80:20:1
 P:0:0
@@ -4127,7 +4144,7 @@ D:You feel less thirsty.
 N:285:Slowness
 A:75:4:1
 P:0:0
-B:SELF:SLOW_WEAK:0
+B:SELF:SLOW_WEAK
 F:SLOW |
 L:1d10+10
 
@@ -4150,8 +4167,8 @@ D:You fall asleep.
 N:288:Lose Memories
 A:75:13:1
 P:0:0
-B:SELF:LOSE_INT:0
-B:SELF:FORGET:0
+B:SELF:LOSE_INT
+B:SELF:FORGET
 F:DEC_EXP |
 S:CURE_DISEASE:15
 D:You feel your memories fade.
@@ -4166,32 +4183,32 @@ D:Your nerves and muscles feel weak and lifeless.
 N:290:Weakness
 A:75:16:1
 P:0:0
-B:SELF:LOSE_STR:0
+B:SELF:LOSE_STR
 
 N:291:Stupidity
 A:75:17:1
 P:0:0
-B:SELF:LOSE_INT:0
+B:SELF:LOSE_INT
 
 N:292:Naivety
 A:75:18:1
 P:0:0
-B:SELF:LOSE_WIS:0
+B:SELF:LOSE_WIS
 
 N:293:Clumsiness
 A:75:19:1
 P:0:0
-B:SELF:LOSE_DEX:0
+B:SELF:LOSE_DEX
 
 N:294:Sickliness
 A:75:20:1
 P:0:0
-B:SELF:LOSE_CON:0
+B:SELF:LOSE_CON
 
 N:295:Ugliness
 A:75:21:1
 P:0:0
-B:SELF:LOSE_CHR:0
+B:SELF:LOSE_CHR
 
 N:296:Detonations
 A:75:22:1
@@ -4319,6 +4336,8 @@ S:CURE_DISEASE:3
 
 ### 307 - Unused ###
 
+#$# 307 - Unused ###
+
 N:308:Strength and Size
 A:75:48:1
 P:0:0
@@ -4339,6 +4358,8 @@ L:1d30+30
 
 ### 310 - Unused ###
 
+#$# 310 - Unused ###
+
 N:311:Dexterity and Agility
 A:75:51:1
 P:0:0
@@ -4358,6 +4379,8 @@ L:1d30+30
 #F:CURE_CHR | INC_CHR
 
 ### 313 - Unused ###
+
+#$# 313 - Unused ###
 
 N:314:Augmentation
 A:75:55:1
@@ -4446,7 +4469,7 @@ S:SUMMON:30
 N:324:Trap Creation
 A:70:7:1
 P:0:0
-B:ADJACENT:MAKE_TRAP:0
+B:ADJACENT:MAKE_TRAP
 
 N:325:Burning Liquor
 A:80:42:1
@@ -4479,6 +4502,8 @@ P:0:0
 F:ENCHANT_TOH | ENCHANT_TOD | ENCHANT_HIGH |
 
 ### 330 - Unused ###
+
+#$# 330 - Unused ###
 
 N:331:Recharging
 A:70:22:1
@@ -4552,7 +4577,7 @@ A:65:4:1
 A:65:24:18
 A:66:24:1
 P:0:0
-B:BEAM:KILL_TRAP:0
+B:BEAM:KILL_TRAP
 
 N:340:Drain Life
 A:65:12:1
@@ -4573,7 +4598,7 @@ N:342:Heal Monster
 A:65:0:1
 A:65:24:21
 P:0:0
-B:BOLT:HEAL_PERC:3d6
+B:BOLT:HEAL_PERC:2d6+(1d6)/4
 
 N:343:Haste Monster
 A:65:1:1
@@ -4585,13 +4610,13 @@ N:344:Clone Monster
 A:65:2:1
 A:65:24:23
 P:0:0
-B:BOLT:CLONE:0
+B:BOLT:CLONE
 
 N:345:Trap/Door Destruction
 A:65:5:1
 A:65:24:24
 P:0:0
-B:BOLT:KILL_DOOR:0
+B:BOLT:KILL_DOOR
 
 N:346:Dragon's Frost
 A:65:27:1
@@ -4958,7 +4983,7 @@ C:8:2:2:30:1
 C:10:3:2:30:1
 C:11:1:2:22:4
 P:0:0
-B:BOLT_MINOR:FIRE:3d6
+B:BOLT_MINOR:FIRE:2d6+(1d6)/4
 
 N:388:Fire Blast
 A:77:0:1
@@ -4974,7 +4999,7 @@ C:8:7:5:40:3
 C:10:7:5:40:3
 C:11:3:3:27:3
 P:0:0
-B:BLAST:FIRE:2d6
+B:BLAST:FIRE:2d6+1/1
 
 N:389:Acid Splash
 A:77:2:1
@@ -5129,7 +5154,7 @@ C:9:5:3:35:1
 C:10:3:2:35:1
 C:11:1:1:26:4
 P:0:0
-B:AIM_AREA:LOCK_DOOR:0
+B:AIM_AREA:LOCK_DOOR
 
 # Intermediate priest attack spell
 
@@ -5414,7 +5439,7 @@ N:418:Perilous Summoning
 A:55:33:1
 A:55:23:24
 P:0:0
-B:LOS:CLONE:0
+B:LOS:CLONE
 
 N:419:Restore Body
 A:75:54:1
@@ -5560,7 +5585,7 @@ C:8:10:7:50:7
 C:10:25:20:60:3
 C:11:10:7:50:7
 P:1:318
-B:BOLT:DARK:5d8
+B:BOLT:DARK:4d8+(1d8)/4
 
 N:429:Nexus Burst
 A:77:11:1
@@ -5574,7 +5599,7 @@ C:8:25:20:70:16
 C:10:30:25:70:13
 C:11:20:15:70:20
 P:0:0
-B:BOLT_10:NEXUS:6d8
+B:BOLT_10:NEXUS:5d8+(1d8)/4
 
 N:430:Ice Lance
 A:77:8:1
@@ -5588,7 +5613,7 @@ C:8:25:20:70:16
 C:10:30:25:70:13
 C:11:20:15:70:20
 P:171:0
-B:BEAM:ICE:6d8
+B:BEAM:ICE:5d8+(1d8)/4
 
 N:431:Path of Blood
 A:65:68:1
@@ -5601,7 +5626,7 @@ C:8:30:30:70:40
 #$ Warrior Mage cannot cast this spell.
 C:11:30:30:70:40
 P:0:0
-B:BEAM:BLOOD:10d8
+B:BEAM:BLOOD:9d8+(1d8)/4
 
 N:432:Spider's Web
 A:65:70:1
@@ -5616,7 +5641,7 @@ C:8:10:7:50:7
 C:10:20:14:55:3
 C:11:10:7:50:7
 P:0:0
-B:8WAY_II:WEB:0
+B:8WAY_II:WEB
 
 N:433:Gust of Wind
 A:65:71:1
@@ -5630,7 +5655,7 @@ C:8:10:7:50:7
 C:10:20:14:55:3
 C:11:10:7:50:7
 P:0:0
-B:ARC_20:WIND:4d10
+B:ARC_20:WIND:3d10+(1d10)/4
 
 ### Here we _greatly_ expand the mage spells ###
 
@@ -5809,7 +5834,7 @@ C:8:2:2:26:4
 C:10:5:3:35:1
 C:11:1:2:26:4
 P:0:0
-B:STRIKE:COLD:3d5
+B:STRIKE:COLD:2d5+(1d5)/4
 
 N:446:Freeze
 A:90:11:14
@@ -5822,7 +5847,7 @@ C:8:10:7:50:7
 C:10:25:20:60:3
 C:11:10:7:50:7
 P:445:171
-B:STRIKE:COLD:3d8
+B:STRIKE:COLD:2d8+(1d8)/4
 
 N:447:Minor Frost Ball
 A:90:11:15
@@ -5993,7 +6018,7 @@ C:8:2:2:26:4
 C:10:5:3:35:1
 C:11:1:2:26:4
 P:0:0
-B:TOUCH:POISON:3d6
+B:TOUCH:POISON:2d6+(1d6)/4
 
 N:460:Poison Missile
 A:10:11:1
@@ -6007,7 +6032,7 @@ C:8:5:4:30:4
 C:10:9:7:40:3
 C:11:5:4:30:4
 P:459:1
-B:MISSILE:POISON:3d6
+B:MISSILE:POISON:3d6+(1d6)/5
 
 N:461:Ball Lightning II
 A:90:12:14
@@ -6057,9 +6082,8 @@ C:8:29:18:65:12
 #$ Bard cannot cast this spell.
 C:10:35:25:80:5
 C:11:29:18:65:12
-U:2+1/20
 P:25:434
-B:SWARM:FIRE:55
+B:SWARM:FIRE:55+1/2
 
 N:466:Frost Swarm
 A:90:11:21
@@ -6071,8 +6095,7 @@ C:8:19:12:55:8
 C:10:27:21:65:3
 C:11:19:12:55:8
 P:17:447
-U:2+1/20
-B:SWARM:COLD:30
+B:SWARM:COLD:30+1/2
 
 N:467:Acid Swarm
 A:90:10:19
@@ -6084,8 +6107,7 @@ C:8:25:20:70:16
 C:10:30:25:70:13
 C:11:20:15:70:20
 P:39:440
-U:2+1/20
-B:SWARM:ACID:40
+B:SWARM:ACID:40+1/2
 
 N:468:Lightning Swarm
 A:90:12:16
@@ -6097,8 +6119,7 @@ C:8:24:15:60:10
 C:10:31:23:75:4
 C:11:24:15:60:10
 P:166:453
-U:2+1/20
-B:SWARM:ELEC:45
+B:SWARM:ELEC:45+1/2
 
 N:469:Cure Disease
 A:75:82:1
@@ -6673,7 +6694,7 @@ C:9:13:11:55:4
 C:10:13:11:55:4
 C:11:7:6:30:5
 P:0:0
-B:BEAM:ELEC:3d6
+B:BEAM:ELEC:2d6+(1d6)/4
 
 #Replace with timed lightning effect when spell effects implemented
 
@@ -6704,7 +6725,6 @@ C:9:13:11:55:4
 C:10:13:11:55:4
 C:11:7:6:30:5
 P:0:0
-U:3+1/10
 B:SCATTER:FEATURE:895
 
 N:512:Snuff Small Life
@@ -6731,7 +6751,7 @@ C:9:13:11:55:4
 C:10:13:11:55:4
 C:11:7:6:30:5
 P:0:0
-B:AREA:ANIM_OBJECT:0
+B:AREA:ANIM_OBJECT
 
 N:514:Water Spirit
 A:90:38:7
@@ -6877,7 +6897,7 @@ C:8:17:9:50:7
 C:10:25:21:65:3
 C:11:17:15:50:7
 P:0:0
-B:AIM_AREA:ANIM_TREE:0
+B:AIM_AREA:ANIM_TREE
 
 N:525:Miasma
 A:90:38:9
@@ -6906,9 +6926,9 @@ C:8:25:13:50:16
 C:10:29:22:60:15
 C:11:25:13:50:16
 P:166:0
-B:BEAM:ELEC:3d12
-B:BEAM:ELEC:3d12
-B:BEAM:ELEC:3d12
+B:BEAM:ELEC:2d12+(1d12)/4
+B:BEAM:ELEC:2d12+(1d12)/4
+B:BEAM:ELEC:2d12+(1d12)/4
 
 #Replace with timed lightning effect when spell effects implemented
 
@@ -7037,7 +7057,7 @@ C:8:17:9:50:7
 C:10:25:21:65:3
 C:11:17:15:50:7
 P:0:0
-B:AIM_AREA:ANIM_ELEMENT:0
+B:AIM_AREA:ANIM_ELEMENT
 
 N:536:Ent's Draught
 A:90:38:12
@@ -7145,6 +7165,8 @@ B:LOS:VAMP_DRAIN:2/1
 
 ### 543 - Unused ###
 
+#$# 543 - Unused ###
+
 N:544:Summon Insects
 A:90:42:8
 C:1:13:7:50:6
@@ -7232,7 +7254,7 @@ C:9:25:17:60:17
 C:10:25:17:60:17
 C:11:15:7:60:29
 P:0:0
-B:BOLT:VAMP_DRAIN:6d8
+B:BOLT:VAMP_DRAIN:5d8+(1d8)/4
 
 N:551:Temporary Displacement
 A:90:44:7
@@ -7262,7 +7284,7 @@ C:8:2:2:30:1
 C:10:3:2:30:1
 C:11:1:2:22:4
 P:0:0
-B:AIM:MENTAL:3d5
+B:AIM:MENTAL:3d5+(1d5)/5
 
 N:553:Force Bolt
 A:90:44:9
@@ -7275,7 +7297,7 @@ C:8:7:5:40:3
 C:10:7:5:40:3
 C:11:3:3:27:3
 P:0:0
-B:BOLT_MINOR:FORCE:3d4
+B:BOLT_MINOR:FORCE:2d4+(1d4)/4
 
 N:554:Ego Whip
 A:90:44:10
@@ -7288,7 +7310,7 @@ C:8:7:5:40:3
 C:10:7:5:40:3
 C:11:3:3:27:3
 P:552:0
-B:HANDS:MENTAL:6d5
+B:HANDS:MENTAL:6d5+(1d5)/5
 
 N:555:Pyrokinesis
 A:90:45:14
@@ -7317,6 +7339,8 @@ P:0:0
 B:BALL_MINOR:COLD:3+1/1
 
 ### 557 - Unused ###
+
+#$# 557 - Unused ###
 
 N:558:Psychometry
 A:90:46:9
@@ -7459,7 +7483,7 @@ C:9:5:3:40:1
 C:10:5:3:40:1
 C:11:3:3:25:3
 P:0:0
-B:MISSILE:MANA:3d4
+B:MISSILE:MANA:3d4+(1d4)/5
 F:THAUMATURGY |
 
 N:569:Thaumaturgic Minor Bolt
@@ -7472,7 +7496,7 @@ C:8:5:4:30:4
 C:10:9:7:40:3
 C:11:5:4:30:4
 P:0:0
-B:BOLT:MANA:3d6
+B:BOLT:MANA:2d6+(1d6)/4
 F:THAUMATURGY |
 
 N:570:Thaumaturgic Minor Beam
@@ -7485,7 +7509,7 @@ C:9:13:11:55:4
 C:10:13:11:55:4
 C:11:7:6:30:5
 P:0:0
-B:BEAM:MANA:4d8
+B:BEAM:MANA:3d8+(1d8)/4
 F:THAUMATURGY |
 
 N:571:Thaumaturgic Bolt
@@ -7498,7 +7522,7 @@ C:8:10:7:50:7
 C:10:25:20:60:3
 C:11:10:7:50:7
 P:0:0
-B:BOLT:MANA:6d8
+B:BOLT:MANA:5d8+(1d8)/4
 F:THAUMATURGY |
 
 N:572:Thaumaturgic Minor Ball
@@ -7524,7 +7548,7 @@ C:9:25:17:60:17
 C:10:25:17:60:17
 C:11:15:7:60:29
 P:0:0
-B:BEAM:MANA:8d8
+B:BEAM:MANA:7d8+(1d8)/4
 F:THAUMATURGY |
 
 N:574:Thaumaturgic Ball
@@ -7552,8 +7576,7 @@ C:8:19:12:55:8
 C:10:27:21:65:3
 C:11:19:12:55:8
 P:0:0
-U:2+1/20
-B:SWARM:MANA:30+1/1
+B:SWARM:MANA:30+1/2
 F:THAUMATURGY |
 
 N:576:Thaumaturgic Bolt II
@@ -7566,8 +7589,8 @@ C:8:25:19:60:18
 C:10:35:41:60:12
 C:11:25:19:60:18
 P:0:0
-B:BOLT:MANA:8d12
-B:BOLT:MANA:8d12
+B:BOLT:MANA:7d12+(1d12)/4
+B:BOLT:MANA:7d12+(1d12)/4
 F:THAUMATURGY |
 
 N:577:Arc of Thaumaturgy
@@ -7619,9 +7642,9 @@ C:8:35:28:70:24
 C:10:45:61:70:18
 C:11:35:28:70:24
 P:0:0
-B:BOLT:MANA:8d16
-B:BOLT:MANA:8d16
-B:BOLT:MANA:8d16
+B:BOLT:MANA:7d16+(1d16)/4
+B:BOLT:MANA:7d16+(1d16)/4
+B:BOLT:MANA:7d16+(1d16)/4
 F:THAUMATURGY |
 
 N:581:Thaumaturgic Major Ball II
@@ -7660,7 +7683,7 @@ C:9:25:17:60:17
 C:10:25:17:60:17
 C:11:15:7:60:29
 P:0:0
-B:BEAM:MANA:8d8
+B:BEAM:MANA:7d8+(1d8)/4
 F:THAUMATURGY |
 
 N:584:Change into Ent
@@ -7773,7 +7796,7 @@ C:8:5:4:35:4
 #$ Bard cannot cast this spell.
 C:11:3:2:25:4
 P:590:0
-B:HANDS:BLOOD:3d5
+B:HANDS:BLOOD:3d5+(1d5)/5
 B:SELF:WOUND:1d4
 F:HOLD_SONG |
 
@@ -7805,7 +7828,7 @@ C:8:5:5:35:4
 C:9:5:5:35:4
 C:11:3:3:25:4
 P:592:0
-B:HANDS:FIRE:3d5
+B:HANDS:FIRE:3d5+(1d5)/5
 
 N:594:Teleport
 A:45:4:1
@@ -8173,6 +8196,6 @@ C:9:5:3:35:1
 C:10:5:3:35:1
 C:11:1:2:26:4
 P:0:0
-B:AREA:SOUND:0
+B:AREA:SOUND
 F:HOLD_SONG |
 

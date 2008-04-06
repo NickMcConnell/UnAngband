@@ -2038,6 +2038,53 @@ static errr grab_one_blow_flag(blow_type *blow_ptr, cptr what)
 
 
 /*
+* Grab one level scalar from a textual string 		 
+*/ 		 
+static errr grab_one_level_scalar(blow_level_scalar_type *scalar, char *what) 		 
+{ 		 
+	char *s, *t, *u; 		 
+	  		 
+	/* Start at start of string */ 		 
+	s = what; 		 
+	  		 
+	/* Find either a plus or slash */
+	for (t = s; *t && (*t != '+') && (*t != '/'); ++t) /* loop */;
+
+	/* Find a slash */
+	for (u = s; *u && (*u != '/'); ++u) /* loop */;
+	
+	/* No plus sign */
+	if (*t == '/')
+	{
+		/* Move t backwards */
+		t = s;
+		
+		/* Find the end of line */
+		for (; *s && (*s != '\n'); ++s) /* loop */;			
+	}
+	/* Prepare t */
+	else if (*t == '+')
+	{
+		/* Nuke plus sign and advance */
+		*t++ = '\0';
+	}
+	
+	/* Prepare u */
+	if (*u == '/')
+	{
+		/* Nuke divisor and advance */
+		*u++ = '\0';
+	}
+
+	/* Parse values */
+	scalar->base = atoi(s);
+	scalar->gain = atoi(t);
+	scalar->levels = atoi(u);
+	
+	return (0); 		 
+}
+
+/*
  * Initialize the "project_info" array, by parsing an ascii "template" file
  */
 errr parse_blow_info(char *buf, header *head)
@@ -2194,14 +2241,22 @@ errr parse_blow_info(char *buf, header *head)
 		blow_ptr->max_range = atoi(buf + 2);
 	}
 	
-	/* Process 'R' for "Radius" */
 	else if (buf[0] == 'R')
 	{
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
-		/* Get the value */
-		blow_ptr->radius = atoi(buf + 2);
+		/* Get the radius information */
+		if (grab_one_level_scalar(&blow_ptr->radius, s + 2)) return (PARSE_ERROR_GENERIC);
+	}
+	
+	else if (buf[0] == 'U')
+	{
+		/* There better be a current blow_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Get the radius information */
+		if (grab_one_level_scalar(&blow_ptr->number, s + 2)) return (PARSE_ERROR_GENERIC);
 	}
 	
 	/* Process 'P' for "Power" */
@@ -5323,19 +5378,6 @@ errr parse_s_info(char *buf, header *head)
 		s_ptr->cast[i].mana = mana;
 		s_ptr->cast[i].fail = fail;
 		s_ptr->cast[i].min = min;
-
-		/* Hack -- for Istari, for the moment */
-		if (i == 0)
-		{
-			i++;
-			
-			/* Extract the damage dice and sides */
-			s_ptr->cast[i].class = CLASS_ISTARI;
-			s_ptr->cast[i].level = level;
-			s_ptr->cast[i].mana = mana;
-			s_ptr->cast[i].fail = fail;
-			s_ptr->cast[i].min = min;			
-		}
 	}
 
 	/* Process 'P' for "Pre-requisites" */
@@ -5379,52 +5421,8 @@ errr parse_s_info(char *buf, header *head)
 			/* Start the next entry */
 			s = t;
 		}
-
 	}
 
-	else if (buf[0] == 'U')
-	{
-		/* There better be a current s_ptr */
-		if (!s_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* Start at start of string */
-		s = buf + 2;
-		
-		/* Find either a plus or slash */
-		for (t = s; *t && (*t != '+') && (*t != '/') && (*t != '\n'); ++t) /* loop */;
-
-		/* Find a slash */
-		for (u = s; *u && (*u != '/') && (*u != '\n'); ++u) /* loop */;
-		
-		/* No plus sign */
-		if (*t == '/')
-		{
-			/* Move t backwards */
-			t = s;
-			
-			/* Find the end of line */
-			for (; *s && (*s != '\n'); ++s) /* loop */;			
-		}
-		/* Prepare t */
-		else if (*t == '+')
-		{
-			/* Nuke plus sign and advance */
-			*t++ = '\0';
-		}
-		
-		/* Prepare u */
-		if (*u == '/')
-		{
-			/* Nuke divisor and advance */
-			*u++ = '\0';
-		}
-
-		/* Parse values */
-		s_ptr->n_base = atoi(s);
-		s_ptr->n_gain = atoi(t);
-		s_ptr->n_per_levels = atoi(u);
-	}
-	
 	/* Process 'B' for "Blows" (up to four lines) */
 	else if (buf[0] == 'B')
 	{
@@ -5565,7 +5563,7 @@ errr parse_s_info(char *buf, header *head)
 		else s_ptr->blow[i].l_plus = atoi(t);
 
 		/* Get levels */
-		s_ptr->blow[i].levels = atoi(u);
+		s_ptr->blow[i].levels = atoi(u);		
 	}
 
 	/* Process 'S' for "Spell" */
@@ -9418,26 +9416,6 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 	/* Output 'P' for "Pre-requisites" (one line only) */
 	fprintf(fp,"P:%d:%d\n",s_ptr->preq[0], s_ptr->preq[1]);
 
-	/* Output number */
-	if ((s_ptr->n_base != 0) || (s_ptr->n_gain != 0) || (s_ptr->n_per_levels != 0))
-	{
-		fprintf(fp,"U:");
-		
-		if (s_ptr->n_base != 0)
-		{
-			fprintf(fp, "%d", s_ptr->n_base);
-		}
-		
-		if ((s_ptr->n_gain != 0) || (s_ptr->n_per_levels != 0))
-		{
-			if (s_ptr->n_base != 0) fprintf(fp, "+");
-
-			fprintf(fp, "%d/%d", s_ptr->n_gain, s_ptr->n_per_levels);			
-		}
-
-		fprintf(fp, "\n");
-	}
-
 	/* Output blows */
 	for (n = 0; n < 4; n++)
 	{
@@ -9506,7 +9484,7 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 				{
 					fprintf(fp, "/%d", s_ptr->blow[n].levels);
 				}
-			}
+			}			
 		}
 		
 		fprintf(fp, "\n");

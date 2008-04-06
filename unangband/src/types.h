@@ -240,6 +240,7 @@ struct town_type
 
 };
 
+
 /*
  * Text used for blow descriptions
  */
@@ -248,6 +249,19 @@ struct blow_desc_type
 	s16b min;
 	s16b max;
 	u32b text;	
+};
+
+
+/*
+ * Scalar for blow effect per level
+ * 
+ * Returned value is value + gain * actual_level / levels;
+ */
+struct blow_level_scalar_type
+{
+	s16b base;
+	s16b gain;
+	s16b levels;
 };
 
 
@@ -265,9 +279,11 @@ struct blow_type
 
 	byte arc;
 	byte diameter_of_source;
-	byte radius;
 	byte max_range;
 	byte power;
+
+	blow_level_scalar_type radius;
+	blow_level_scalar_type number;
 };
 
 
@@ -1277,19 +1293,6 @@ struct spell_cast
 
 
 /*
- * Scalar for blow effect per level
- * 
- * Returned value is value + gain * actual_level / levels;
- */
-struct blow_level_scalar_type
-{
-	s16b value;
-	s16b gain;
-	s16b levels;
-};
-
-
-/*
  * Spell blow structure
  *
  *      - Book (RBM_*)
@@ -1323,11 +1326,6 @@ struct spell_type
 
 	s16b type;
 	s16b param;
-
-	byte n_base;
-	byte n_gain;
-	byte n_per_levels;
-	byte unused;
 
 	byte l_dice;
 	byte l_side;
