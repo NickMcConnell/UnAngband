@@ -2482,7 +2482,7 @@ errr parse_d_info(char *buf, header *head)
 		s = buf+2;
 
 		/* Store the name */
-		if (!(d_ptr->name1 = add_name(head, buf)))
+		if (!(d_ptr->name1 = add_name(head, s)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
 	}
 	/* Process 'B' for "Name2" */
@@ -2495,7 +2495,7 @@ errr parse_d_info(char *buf, header *head)
 		s = buf+2;
 
 		/* Store the name */
-		if (!(d_ptr->name2 = add_name(head, buf)))
+		if (!(d_ptr->name2 = add_name(head, s)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
 	}
 
@@ -5348,7 +5348,7 @@ errr parse_s_info(char *buf, header *head)
 			slot = last_slot + 1;
 		}
 
-		/* Extract the damage dice and sides */
+		/* Extract the info */
 		s_ptr->appears[i].tval = tval;
 		s_ptr->appears[i].sval = sval;
 		s_ptr->appears[i].slot = slot;
