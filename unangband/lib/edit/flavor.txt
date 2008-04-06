@@ -1656,7 +1656,7 @@ G:,:B
 D:Light Blue
 
 N:410:80:6
-G:,:B
+G:,:R
 D:Pink
 
 N:411:80:7
