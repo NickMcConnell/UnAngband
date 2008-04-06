@@ -87,7 +87,6 @@ typedef struct dungeon_zone dungeon_zone;
 typedef struct town_type town_type;
 typedef struct blow_desc_type blow_desc_type;
 typedef struct blow_level_scalar_type blow_level_scalar_type;
-typedef struct blow_level_dice_type blow_level_dice_type;
 typedef struct blow_type blow_type;
 typedef struct desc_type desc_type;
 typedef struct room_info_type room_info_type;
@@ -251,36 +250,6 @@ struct blow_desc_type
 	u32b text;	
 };
 
-/*
- * Scalar for blow effect per level
- * 
- * Returned value is value + gain * actual_level / levels;
- */
-struct blow_level_scalar_type
-{
-	s16b value;
-	s16b gain;
-	s16b levels;
-};
-
-
-/*
- * Dice-based scalar for blow per level
- * 
- * Returned value is damroll(d_dice, d_side) + d_base + damroll (l_dice * actual_level / levels, l_side)
- *  + l_base * actual_level / level
- */
-struct blow_level_dice_type
-{
-	int d_dice;
-	int d_side;
-	int d_base;
-	int l_dice;
-	int l_side;
-	int l_base;
-	int levels;
-};
-
 
 /*
  * Information about blow and projection types.
@@ -294,14 +263,11 @@ struct blow_type
 
 	blow_desc_type desc[MAX_BLOW_DESCRIPTIONS];	/* Possible text strings describing blow */
 
-	blow_level_scalar_type arc;
-	blow_level_scalar_type diameter_of_source;
-	blow_level_scalar_type radius;
-	blow_level_scalar_type max_range;
-	blow_level_scalar_type number;
-	blow_level_scalar_type power;
-	
-	blow_level_dice_type damage;
+	byte arc;
+	byte diameter_of_source;
+	byte radius;
+	byte max_range;
+	byte power;
 };
 
 
@@ -1309,6 +1275,20 @@ struct spell_cast
 	byte min;
 };
 
+
+/*
+ * Scalar for blow effect per level
+ * 
+ * Returned value is value + gain * actual_level / levels;
+ */
+struct blow_level_scalar_type
+{
+	s16b value;
+	s16b gain;
+	s16b levels;
+};
+
+
 /*
  * Spell blow structure
  *
@@ -1322,7 +1302,12 @@ struct spell_blow
 	byte d_dice;
 	byte d_side;
 	s16b d_plus;
+	byte l_dice;
+	byte l_side;
+	s16b l_plus;
+	byte levels;	
 };
+
 
 /*
  * Spell type info
@@ -1338,6 +1323,11 @@ struct spell_type
 
 	s16b type;
 	s16b param;
+
+	byte n_base;
+	byte n_gain;
+	byte n_per_levels;
+	byte unused;
 
 	byte l_dice;
 	byte l_side;

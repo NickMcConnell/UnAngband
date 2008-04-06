@@ -29,7 +29,6 @@
 # D:dice d sides + bonus ( dice d sides + bonus / levels)
 # P:power + power / levels
 # M:max range + max range / levels
-# U:number + number / levels
 
 # MISS - Check to see if this blow hits or not.
 # TOUCH - Report misses and disturb the character.
@@ -141,13 +140,12 @@ F:JUMP | KILL | PLAY | MAGIC
 N:17:shriek
 T:0:shriek~ horribly
 F:MELEE | RANGED | SHRIEK
-F:ARC | BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC | HIDE
 R:6
 
 N:18:spore
 T:0:release~ a cloud of spores
 F:MELEE | RANGED | MISS
-F:BOOM | GRID | ITEM | KILL | STOP | PLAY | WALL
+F:BOOM | KILL | STOP | PLAY | WALL
 R:1
 
 N:19:lash
@@ -434,12 +432,10 @@ N:75:swarm
 T:0:throw~ a swarm of * at &
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC | STOP
 R:1
-U:2+1/20
 
 N:76:scatter
 T:0:scatter~ * around &
 F:SCATTER
-U:3+1/10
 
 N:77:howl
 T:0:howls~ at &

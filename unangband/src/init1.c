@@ -2017,143 +2017,6 @@ static errr grab_one_flag(u32b *flags, cptr names[], cptr what)
 
 
 /*
- * Grab one level scalar from a textual string
- */
-static errr grab_one_level_scalar(blow_level_scalar_type *scalar, char *what)
-{
-	char *s, *t, *u;
-
-	/* Start at start of string */
-	s = what;
-	
-	/* Find either a plus or slash */
-	for (t = s; *t && (*t != '+') && (*t != '/') && (*t != '\n'); ++t) /* loop */;
-
-	/* Find a slash */
-	for (u = s; *u && (*u != '/') && (*u != '\n'); ++u) /* loop */;
-	
-	/* No plus sign */
-	if (*t == '/')
-	{
-		/* Move t backwards */
-		t = s;
-		
-		/* Find the end of line */
-		for (; *s && (*s != '\n'); ++s) /* loop */;			
-	}
-	/* Prepare t */
-	else if (*t == '+')
-	{
-		/* Nuke plus sign and advance */
-		*t++ = '\0';
-	}
-	
-	/* Prepare u */
-	if (*u == '/')
-	{
-		/* Nuke divisor and advance */
-		*u++ = '\0';
-	}
-
-	/* Parse values */
-	scalar->value = atoi(s);
-	scalar->gain = atoi(t);
-	scalar->levels = atoi(u);
-
-	return (0);
-}
-
-
-
-/*
- * Grab one level dice from a textual string
- * 
- * This string format is 1d2+3+(4d5+6)/7
- */
-static errr grab_one_level_dice(blow_level_dice_type *dice, char *what)
-{
-	char *s, *t, *u, *w;
-	char *v = NULL;
-
-	/* Start at start of string */
-	s = what;
-	
-	/* Find a left bracket */
-	for (t = s; *t && (*t != '(') && (*t != '\n'); ++t) /* loop */;
-
-	/* Find a slash */
-	for (u = s; *u && (*u != '/') && (*u != '\n'); ++u) /* loop */;
-	
-	/* Find a plus before a left bracket */
-	for (v = s; *t && (*v != '+') && (*v != '(') && (*v != '\n'); ++v) /* loop */;
-
-	/* Find a plus following t */
-	for (w = t; *w && (*w != '+') && (*w != '\n'); ++w) /* loop */;
-	
-	/* Prepare t */
-	if (*t == '(')
-	{
-		/* Nuke plus sign and advance */
-		*t++ = '\0';
-	}
-	else
-	{
-		char *t1 = t;
-		
-		/* Move t backwards */
-		if (*v == '+')
-		{
-			/* Swap around */
-			t = v;
-			v = t1;
-		}
-		else
-		{
-			/* Swap around */
-			t = s;
-			w = v;
-			s = t1;
-			v = t1;
-		}
-	}
-	
-	/* Prepare u */
-	if (*u == '/')
-	{
-		/* Nuke divisor and advance */
-		*u++ = '\0';
-	}
-	
-	/* Prepare v */
-	if (*v == '+')
-	{
-		/* Nuke divisor and advance */
-		*v++ = '\0';
-	}
-
-	/* Prepare w */
-	if (*w == '+')
-	{
-		/* Nuke divisor and advance */
-		*w++ = '\0';
-	}
-
-	/* Scan for the values */
-	if (2 != sscanf(s, "%dd%d", &dice->d_dice, &dice->d_side)) dice->d_base = atoi(s); 
-	else dice->d_base = atoi(v);
-
-	/* Scan for the values */
-	if (2 != sscanf(t, "%dd%d", &dice->l_dice, &dice->l_side)) dice->l_base = atoi(t);
-	else dice->l_base = atoi(w);
-
-	/* Get levels */
-	dice->levels = atoi(u);
-
-	return (0);
-}
-
-
-/*
  * Grab one blow flag in a blow_type from a textual string
  */
 static errr grab_one_blow_flag(blow_type *blow_ptr, cptr what)
@@ -2221,7 +2084,7 @@ errr parse_blow_info(char *buf, header *head)
 			return (PARSE_ERROR_OUT_OF_MEMORY);
 		
 		/* Set some values */
-		blow_ptr->max_range.value = MAX_SIGHT;		
+		blow_ptr->max_range = MAX_SIGHT;		
 	}
 
 	/* Hack -- Process 'F' for flags */
@@ -2307,7 +2170,8 @@ errr parse_blow_info(char *buf, header *head)
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
-		if (grab_one_level_scalar(&blow_ptr->arc, s)) return (PARSE_ERROR_GENERIC);
+		/* Get the value */
+		blow_ptr->arc = atoi(buf + 2);
 	}
 	
 	/* Process 'D' for "Diameter of Source" */
@@ -2316,7 +2180,8 @@ errr parse_blow_info(char *buf, header *head)
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
-		if (grab_one_level_scalar(&blow_ptr->diameter_of_source, buf + 2)) return (PARSE_ERROR_GENERIC);
+		/* Get the value */
+		blow_ptr->diameter_of_source = atoi(buf + 2);
 	}
 	
 	/* Process 'M' for "Maximum Range" */
@@ -2325,16 +2190,8 @@ errr parse_blow_info(char *buf, header *head)
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
-		if (grab_one_level_scalar(&blow_ptr->max_range, buf + 2)) return (PARSE_ERROR_GENERIC);
-	}
-	
-	/* Process 'U' for "Number" */
-	else if (buf[0] == 'U')
-	{
-		/* There better be a current blow_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		if (grab_one_level_scalar(&blow_ptr->number, buf + 2)) return (PARSE_ERROR_GENERIC);
+		/* Get the value */
+		blow_ptr->max_range = atoi(buf + 2);
 	}
 	
 	/* Process 'R' for "Radius" */
@@ -2343,7 +2200,8 @@ errr parse_blow_info(char *buf, header *head)
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
-		if (grab_one_level_scalar(&blow_ptr->radius, buf + 2)) return (PARSE_ERROR_GENERIC);
+		/* Get the value */
+		blow_ptr->radius = atoi(buf + 2);
 	}
 	
 	/* Process 'P' for "Power" */
@@ -2352,16 +2210,8 @@ errr parse_blow_info(char *buf, header *head)
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
-		if (grab_one_level_scalar(&blow_ptr->power, buf + 2)) return (PARSE_ERROR_GENERIC);
-	}
-	
-	/* Process 'D' for "Damage" */
-	else if (buf[0] == 'D')
-	{
-		/* There better be a current blow_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		if (grab_one_level_dice(&blow_ptr->damage, buf + 2)) return (PARSE_ERROR_GENERIC);		
+		/* Get the value */
+		blow_ptr->power = atoi(buf + 2);
 	}
 	
 	else
@@ -2374,10 +2224,6 @@ errr parse_blow_info(char *buf, header *head)
 	return (0);
 	
 }
-
-
-
-
 
 
 /*
@@ -5347,7 +5193,8 @@ errr parse_s_info(char *buf, header *head)
 {
 	int i;
 
-	char *s,*t;
+	char *s, *t, *u, *v, *w;
+
 
 	/* Current entry */
 	static spell_type *s_ptr = NULL;
@@ -5535,10 +5382,54 @@ errr parse_s_info(char *buf, header *head)
 
 	}
 
+	else if (buf[0] == 'U')
+	{
+		/* There better be a current s_ptr */
+		if (!s_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Start at start of string */
+		s = buf + 2;
+		
+		/* Find either a plus or slash */
+		for (t = s; *t && (*t != '+') && (*t != '/') && (*t != '\n'); ++t) /* loop */;
+
+		/* Find a slash */
+		for (u = s; *u && (*u != '/') && (*u != '\n'); ++u) /* loop */;
+		
+		/* No plus sign */
+		if (*t == '/')
+		{
+			/* Move t backwards */
+			t = s;
+			
+			/* Find the end of line */
+			for (; *s && (*s != '\n'); ++s) /* loop */;			
+		}
+		/* Prepare t */
+		else if (*t == '+')
+		{
+			/* Nuke plus sign and advance */
+			*t++ = '\0';
+		}
+		
+		/* Prepare u */
+		if (*u == '/')
+		{
+			/* Nuke divisor and advance */
+			*u++ = '\0';
+		}
+
+		/* Parse values */
+		s_ptr->n_base = atoi(s);
+		s_ptr->n_gain = atoi(t);
+		s_ptr->n_per_levels = atoi(u);
+	}
+	
 	/* Process 'B' for "Blows" (up to four lines) */
 	else if (buf[0] == 'B')
 	{
 		int n1, n2;
+		int tmp1, tmp2;
 
 		/* There better be a current s_ptr */
 		if (!s_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -5579,11 +5470,75 @@ errr parse_s_info(char *buf, header *head)
 		/* Invalid effect */
 		if (!r_info_blow_effect[n2]) return (PARSE_ERROR_GENERIC);
 
-		/* Analyze the third field */
-		for (s = t; *t && (*t != 'd'); t++) /* loop */;
+		/* Advance */
+		s = t;
+		
+		/* Find a left bracket */
+		for (; *t && (*t != '('); ++t) /* loop */;
 
-		/* Terminate the field (if necessary) */
-		if (*t == 'd') *t++ = '\0';
+		/* Find a slash */
+		for (u = s; *u && (*u != '/'); ++u) /* loop */;
+		
+		/* Find a plus before a left bracket */
+		for (v = s; *v && (*v != '+') && (*v != '('); ++v) /* loop */;
+
+		/* Find a plus following t */
+		for (w = t; *w && (*w != '+'); ++w) /* loop */;
+		
+		/* Prepare t */
+		if (*t == '(')
+		{
+			/* Nuke plus sign and advance */
+			*t++ = '\0';
+		}
+		else if (*u == '/')
+		{
+			char *t1 = t;
+			
+			/* Move t backwards */
+			if (*v == '+')
+			{
+				*v++ = '\0';
+				
+				/* Swap around */
+				t = v;
+			}
+			else
+			{
+				/* Swap around */
+				t = s;
+				v = t1;
+				s = t1;
+			}
+		}
+		
+		/* Prepare u */
+		if (*u == '/')
+		{
+			/* Nuke divisor and advance */
+			*u++ = '\0';
+		}
+		
+		/* Prepare v */
+		if (*v == '+')
+		{
+			/* Nuke divisor and advance */
+			*v++ = '\0';
+		}
+		
+		/* Prepare v */
+		if (*v == '(')
+		{
+			/* Nuke divisor and advance */
+			*v++ = '\0';
+		}
+
+		/* Prepare w */
+		if (*w == '+')
+		{
+			/* Nuke divisor and advance */
+			*w++ = '\0';
+		}
 
 		/* Save the method */
 		s_ptr->blow[i].method = n1;
@@ -5591,19 +5546,26 @@ errr parse_s_info(char *buf, header *head)
 		/* Save the effect */
 		s_ptr->blow[i].effect = n2;
 
-		/* Extract the damage dice */
-		s_ptr->blow[i].d_dice = atoi(s);
+		/* Scan for the values */
+		if (2 == sscanf(s, "%dd%d", &tmp1, &tmp2))
+		{
+			s_ptr->blow[i].d_dice = tmp1;
+			s_ptr->blow[i].d_side = tmp2;
+			s_ptr->blow[i].d_plus = atoi(v); 
+		}
+		else s_ptr->blow[i].d_plus = atoi(s);
 
-		/* Analyze the fourth field */
-		for (s = t; *t && (*t != '+'); t++) /* loop */;
+		/* Scan for the values */
+		if (2 == sscanf(t, "%dd%d", &tmp1, &tmp2))
+		{
+			s_ptr->blow[i].l_dice = tmp1;
+			s_ptr->blow[i].l_side = tmp2;
+			s_ptr->blow[i].l_plus = atoi(w); 
+		}	
+		else s_ptr->blow[i].l_plus = atoi(t);
 
-		/* Terminate the field (if necessary) */
-		if (*t == 'd') *t++ = '\0';
-
-		/* Extract the damage sides and plus */
-		s_ptr->blow[i].d_side = atoi(s);
-		s_ptr->blow[i].d_plus = atoi(t);
-
+		/* Get levels */
+		s_ptr->blow[i].levels = atoi(u);
 	}
 
 	/* Process 'S' for "Spell" */
@@ -9456,6 +9418,26 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 	/* Output 'P' for "Pre-requisites" (one line only) */
 	fprintf(fp,"P:%d:%d\n",s_ptr->preq[0], s_ptr->preq[1]);
 
+	/* Output number */
+	if ((s_ptr->n_base != 0) || (s_ptr->n_gain != 0) || (s_ptr->n_per_levels != 0))
+	{
+		fprintf(fp,"U:");
+		
+		if (s_ptr->n_base != 0)
+		{
+			fprintf(fp, "%d", s_ptr->n_base);
+		}
+		
+		if ((s_ptr->n_gain != 0) || (s_ptr->n_per_levels != 0))
+		{
+			if (s_ptr->n_base != 0) fprintf(fp, "+");
+
+			fprintf(fp, "%d/%d", s_ptr->n_gain, s_ptr->n_per_levels);			
+		}
+
+		fprintf(fp, "\n");
+	}
+
 	/* Output blows */
 	for (n = 0; n < 4; n++)
 	{
@@ -9465,8 +9447,66 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 		
 		if (s_ptr->blow[n].effect)
 		{
-			fprintf(fp, ":%s:%dd%d+%d", r_info_blow_effect[s_ptr->blow[n].effect],
-					s_ptr->blow[n].d_dice, s_ptr->blow[n].d_side, s_ptr->blow[n].d_plus);
+			fprintf(fp, ":%s", r_info_blow_effect[s_ptr->blow[n].effect]);
+
+			if ((s_ptr->blow[n].d_dice != 0) || (s_ptr->blow[n].d_side != 0))
+			{
+				fprintf(fp, ":%dd%d", s_ptr->blow[n].d_dice, s_ptr->blow[n].d_side);
+			}
+
+			if ((s_ptr->blow[n].d_plus != 0) || (s_ptr->blow[n].l_side != 0) || (s_ptr->blow[n].l_dice != 0)
+					|| (s_ptr->blow[n].levels != 0))
+			{
+				if ((s_ptr->blow[n].d_dice == 0) && (s_ptr->blow[n].d_side == 0))
+				{
+					fprintf(fp, ":");
+				}
+				else if (s_ptr->blow[n].d_plus)
+				{
+					fprintf(fp, "+");
+				}
+
+				if (s_ptr->blow[n].d_plus)
+				{
+					fprintf(fp, "%d", s_ptr->blow[n].d_plus);
+				}
+
+				if (((s_ptr->blow[n].d_dice != 0) || (s_ptr->blow[n].d_side != 0) || (s_ptr->blow[n].d_plus))
+					&& ((s_ptr->blow[n].l_dice != 0) || (s_ptr->blow[n].l_side != 0) || (s_ptr->blow[n].l_plus)))
+				{
+					fprintf(fp, "+");
+				}
+				
+				if (((s_ptr->blow[n].d_dice != 0) || (s_ptr->blow[n].d_side != 0)) && ((s_ptr->blow[n].l_dice != 0) || (s_ptr->blow[n].l_side != 0)))
+				{
+					fprintf(fp, "(");
+				}
+				
+				if ((s_ptr->blow[n].l_dice != 0) || (s_ptr->blow[n].l_side != 0))
+				{
+					fprintf(fp, "%dd%d", s_ptr->blow[n].l_dice, s_ptr->blow[n].l_side);
+					
+					if (s_ptr->blow[n].l_plus != 0)
+					{
+						fprintf(fp, "+");
+					}
+				}
+				
+				if (s_ptr->blow[n].l_plus != 0)
+				{
+					fprintf(fp, "%d", s_ptr->blow[n].l_plus);
+				}				
+				
+				if (((s_ptr->blow[n].d_dice != 0) || (s_ptr->blow[n].d_side != 0)) && ((s_ptr->blow[n].l_dice != 0) || (s_ptr->blow[n].l_side != 0)))
+				{
+					fprintf(fp, ")");
+				}
+
+				if (s_ptr->blow[n].levels != 0)
+				{
+					fprintf(fp, "/%d", s_ptr->blow[n].levels);
+				}
+			}
 		}
 		
 		fprintf(fp, "\n");
