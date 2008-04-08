@@ -7228,13 +7228,17 @@ void pick_trap(int y, int x)
 
 				case TV_FOOD:
 					if (o_list[cave_o_idx[y][x]].sval < SV_FOOD_MIN_FOOD) pick_attr = TERM_GREEN;		/* Gas trap */
-					else pick_attr = TERM_VIOLET;
+					else pick_attr = TERM_VIOLET;	/* Loose rock */
 					break;
 
 				case TV_RUNESTONE:
 					pick_attr = TERM_ORANGE;	/* Strange rune */
 					break;
 
+				case TV_SPIKE:
+					pick_attr = TERM_SLATE;	/* Pit */
+					break;
+					
  				default:
 					pick_attr = TERM_VIOLET;	/* Loose rock */
 					break;

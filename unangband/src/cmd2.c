@@ -2634,12 +2634,16 @@ void do_cmd_set_trap_or_spike(void)
                objects in the grid OR the existing objects in the grid have
                the same tval and sval as the trap being set OR the trap
                being set is TV_BOW and all the objects in the grid can be fired
-               by the bow in question */
+               by the bow in question OR the object selected is a digger,
+               we substitute the above rules with spikes */
 		else
 		{
 			int this_o_idx, next_o_idx;
 
 			bool trap_allowed = TRUE;
+
+			/* Hack */
+			int tmp = p_ptr->skill_dis;
 
 			object_type object_type_body;
 
@@ -2699,6 +2703,12 @@ void do_cmd_set_trap_or_spike(void)
 						}
 					}
 				}
+				/* Check if spike -- use digger & spikes to build pits */
+				else if (j_ptr->tval == TV_DIGGING)
+				{
+					if (i_ptr->tval != TV_SPIKE) trap_allowed = FALSE;
+				}
+				
 				else if ((j_ptr->tval != i_ptr->tval) || (j_ptr->sval != i_ptr->sval))
 				{
 					/* Not allowed */
@@ -2709,33 +2719,68 @@ void do_cmd_set_trap_or_spike(void)
 			/* Hack -- Dig trap? */
 			if (j_ptr->tval == TV_DIGGING)
 			{
-				/* Hack */
-				int tmp = p_ptr->skill_dis;
-
 				/* Hack -- use tunnelling skill to build trap */
 				p_ptr->skill_dis = p_ptr->skill_dig;
+				
+				/* Restrict an item */
+				item_tester_tval = TV_SPIKE;
 
-				/* Hack -- base trap directly on digging skill */
-				object_level = MIN(128, p_ptr->skill_dig * 3);
+				/* Get an item */
+				q = "Add which spikes? ";
+				s = "You have no spikes to add.";
+				if (get_item(&item, q, s, (USE_INVEN | USE_FLOOR)))
+				{
+					/* Get the item (in the pack) */
+					if (item >= 0)
+				        {
+						o_ptr = &inventory[item];
+					}
 
-				/* Set the floor trap */
-				cave_set_feat(y,x,FEAT_TRAP_ROCK_NONE);
+					/* Get the item (on the floor) */
+					else
+					{
+						o_ptr = &o_list[0 - item];
+					}
 
-				/* Set the trap */
-				pick_trap(y,x);
+					/* In a bag? */
+					if (j_ptr->tval == TV_BAG)
+					{
+						/* Get item from bag */
+						if (!get_item_from_bag(&item, q, s, o_ptr)) return;
 
-				/* Reset object level */
-				object_level = p_ptr->depth;
+						/* Refer to the item */
+						o_ptr = &inventory[item];
+					}
+					
+					/* Structure Copy */
+					object_copy(j_ptr, o_ptr);
 
-				/* Check if we can arm it? */
-				do_cmd_disarm_aux(y,x, FALSE);
+					/* Set one object only */
+					j_ptr->number = 1;
 
-				/* Reset disarm skill */
-				p_ptr->skill_dis = tmp;
+				}
+				else if (!cave_o_idx[y][x])
+				{
+					/* Hack -- no spikes. Dig a shallow pit instead. */
+					cave_set_feat(y, x, FEAT_SHALLOW_PIT);
+					
+					return;
+				}
+				else
+				{
+					/* Hack -- use existing floor spikes */
+					item = -cave_o_idx[y][x];
+					
+					/* Structure Copy */
+					object_copy(j_ptr, &o_list[cave_o_idx[y][x]]);
+
+					/* Set one object only */
+					j_ptr->number = 1;
+				}
 			}
 
 			/* Trap allowed? */
-			else if ((trap_allowed) && (floor_carry(y,x,j_ptr)))
+			if ((trap_allowed) && (floor_carry(y,x,j_ptr)))
 			{
 				/* Hack -- ensure trap is created */
 				object_level = 128;
@@ -2773,6 +2818,9 @@ void do_cmd_set_trap_or_spike(void)
 			{
 				msg_print("You can't set this trap here.");
 			}
+			
+			/* Reset skill - hacked for pit traps */
+			p_ptr->skill_dis = tmp;
 		}
 	}
 }

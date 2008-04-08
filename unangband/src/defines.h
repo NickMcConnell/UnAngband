@@ -1280,6 +1280,8 @@
 #define FEAT_BUSH_FOOD  440
 #define FEAT_BUSH_HURT_P 441
 
+#define FEAT_SHALLOW_PIT 457
+
 #define FEAT_ENTRANCE 471
 
 #define FEAT_GEYSER 711
@@ -1288,6 +1290,9 @@
 #define FEAT_CRUMBLING_FLOOR 873
 #define FEAT_TREMBLING_RUBBLE 874
 #define FEAT_PULSING_RUBBLE 875
+
+
+
 
 /*Feature flags - should be used instead of feature indexes unless generating.*/
 

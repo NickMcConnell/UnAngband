@@ -2272,6 +2272,25 @@ void hit_trap(int y, int x)
 
 				break;
 			}
+			
+			case TV_SPIKE:
+			{
+				/* Apply damage directly */
+				project_p(SOURCE_PLAYER_TRAP, o_ptr->k_idx, y, x, damroll(6, 6), GF_FALL_SPIKE);
+				
+				/* Hack -- should really check if we get spiked somehow */
+				if (((p_ptr->cur_flags3 & (TR3_FEATHER)) == 0) && (rand_int(100) < 25))
+				{
+					/* Decrease the item */
+					floor_item_increase(cave_o_idx[y][x], -1);
+					floor_item_optimize(cave_o_idx[y][x]);
+	
+					/* Disarm if runs out */
+					if (!cave_o_idx[y][x]) cave_alter_feat(y,x,FS_DISARM);
+				}
+
+				break;
+			}
 
 			default:
 			{
