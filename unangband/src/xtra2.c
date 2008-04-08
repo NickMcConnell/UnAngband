@@ -2790,7 +2790,7 @@ void check_experience(void)
 		for (i = p_ptr->max_lev; i <= p_ptr->lev; i++)
 		{
 			/* Level tips */
-			queue_tip(format("level%d.txt", p_ptr->prace, i));
+			queue_tip(format("level%d.txt", i));
 
 			/* Race tips */
 			queue_tip(format("race%d-%d.txt", p_ptr->prace, i));
