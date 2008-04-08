@@ -3093,9 +3093,6 @@ void monster_death(int m_idx)
 	/* Extinguish lite */
 	delete_monster_lite(m_idx);
 
-	/* Monster death updates visible monsters */
-	p_ptr->window |= (PW_MONLIST);
-
 	/* Drop objects being carried */
 	for (this_o_idx = m_ptr->hold_o_idx; this_o_idx; this_o_idx = next_o_idx)
 	{
@@ -3151,6 +3148,9 @@ void monster_death(int m_idx)
 			drop_near(i_ptr, -1, y, x);
 		}
 	}
+
+	/* Monster death updates visible monsters */
+	p_ptr->window |= (PW_MONLIST);
 
 	/* Add some residue */
 	if (r_ptr->flags3 & (RF3_DEMON)) feat_near(FEAT_FLOOR_FIRE_T,m_ptr->fy,m_ptr->fx);
