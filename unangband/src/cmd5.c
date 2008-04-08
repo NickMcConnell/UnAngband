@@ -1386,7 +1386,8 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 		 * Note that if this occurs, the spell does not cost any mana.
 		 */
 		if ((p_ptr->reserves) && (p_ptr->csp < adj_con_reserve[p_ptr->stat_ind[A_CON]] / 2) &&
-			(rand_int(100) < adj_con_reserve[p_ptr->stat_ind[A_CON]]) && (p_ptr->stat_ind[A_CON]))
+			(rand_int(100) < adj_con_reserve[p_ptr->stat_ind[A_CON]]) && 
+			(sc_ptr->mana) && (p_ptr->stat_ind[A_CON]))
 		{
 			/* Temporarily weaken the player */
 			if (!p_ptr->stat_dec_tim[A_CON])
