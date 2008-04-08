@@ -7360,7 +7360,6 @@ bool process_spell_blow_shot_hurl(int type)
  */
 bool process_spell_types(int who, int spell, int level, bool *cancel)
 {
-
 	spell_type *s_ptr = &s_info[spell];
 
 	bool obvious = FALSE;
@@ -7672,7 +7671,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				
 				/* Lite if necessary */
 				if (item == INVEN_LITE) p_ptr->update |= (PU_TORCH);
-				
+				*cancel = FALSE;
 				break;
 			}
 			
@@ -7796,6 +7795,10 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					/* Final update */
 					update_stuff();
 					redraw_stuff();
+					
+					/* Obvious */
+					*cancel = FALSE;
+					obvious = TRUE;
 					break;
 				}
 			}
@@ -7822,6 +7825,9 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 									cave_info[y + ddy_ddd[i]][x + ddx_ddd[i]] |= (CAVE_GLOW);								
 								}
 							}
+							
+							*cancel = FALSE;
+							obvious = TRUE;
 						}
 					}
 				}
@@ -7836,7 +7842,8 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			
 			case SPELL_RELEASE_CURSE:
 			{
-				thaumacurse(TRUE, 2 * level + level * level / 20);
+				obvious |= thaumacurse(TRUE, 2 * level + level * level / 20);
+				*cancel = FALSE;
 				break;
 			}
 			
@@ -7869,15 +7876,20 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					break;
 				}
 				
+				/* Check that it's day or night */
+				if (((level_flag & (LF1_DAYLIGHT)) != 0) != (s_ptr->type == SPELL_REST_UNTIL_DAWN))
+				{
+					msg_format("It's still %s.", s_ptr->type == SPELL_REST_UNTIL_DAWN ? "daylight" : "night");
+					return (TRUE);
+				}
+				
 				/* Hack -- Set time to one turn before sun down / sunrise */
-				turn += ((10L * TOWN_DAWN) / 2) - (turn % ((10L * TOWN_DAWN)) / 2) - 1 +
-					((level_flag & (LF1_DAYLIGHT)) == (spell == SPELL_REST_UNTIL_DUSK)) ?
-						(10L * TOWN_DAWN) / 2 : 0;
+				turn += ((10L * TOWN_DAWN) / 2) - (turn % ((10L * TOWN_DAWN) / 2)) - 1;
 
 				/* XXX Set food, etc */
 
 				/* Inform the player */
-				if (spell == SPELL_REST_UNTIL_DUSK) msg_print("You sleep during the day.");
+				if (s_ptr->type == SPELL_REST_UNTIL_DUSK) msg_print("You sleep during the day.");
 				
 				/* Heroes don't sleep easy */
 				else
@@ -7894,6 +7906,9 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 
 				/* Hack -- regenerate level */
 				p_ptr->leaving = TRUE;
+				
+				*cancel = FALSE;
+				obvious = TRUE;
 				
 				break;
 			}

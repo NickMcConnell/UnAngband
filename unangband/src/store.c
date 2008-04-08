@@ -3705,6 +3705,9 @@ void do_cmd_store(void)
 
 		/* Hack -- get kicked out of the store */
 		if (st_ptr->store_open >= turn) leave_store = TRUE;
+		
+		/* Hack -- leave store if leaving */
+		if (p_ptr->leaving) leave_store = TRUE;
 	}
 
 
