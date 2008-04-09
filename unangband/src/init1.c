@@ -4622,19 +4622,20 @@ errr parse_p_info(char *buf, header *head)
 	/* Process 'X' for "Extra Info" (one line only) */
 	else if (buf[0] == 'X')
 	{
-		int exp, infra, r_idx;
+		int exp, infra, r_idx, slot;
 
 		/* There better be a current pr_ptr */
 		if (!pr_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (3 != sscanf(buf+2, "%d:%d:%d",
-			    &exp, &infra, &r_idx)) return (PARSE_ERROR_GENERIC);
+		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
+			    &exp, &infra, &r_idx, &slot)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		pr_ptr->r_exp = exp;
 		pr_ptr->infra = infra;
 		pr_ptr->r_idx = r_idx;
+		pr_ptr->slots[END_EQUIPMENT - INVEN_WIELD] = slot;
 	}
 
 	/* Hack -- Process 'I' for "info" and such */
@@ -4725,7 +4726,7 @@ errr parse_p_info(char *buf, header *head)
 		if (!pr_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Parse every entry textually */
-		for (s = buf + 2; *s && (i < END_EQUIPMENT - INVEN_WIELD + 1); )
+		for (s = buf + 2; *s && (i < END_EQUIPMENT - INVEN_WIELD); )
 		{
 			/* Find the end of this entry */
 			for (t = s; *t && (*t != ':'); ++t) /* loop */;
@@ -9355,7 +9356,8 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 {
 	int n;
 	bool introduced = FALSE;
-
+	bool output = FALSE;
+	
 	/* Current entry */
 	player_race *pr_ptr = (player_race*)head->info_ptr + i;
 	
@@ -9383,16 +9385,28 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 		    pr_ptr->r_srh, pr_ptr->r_dig, pr_ptr->r_tht, pr_ptr->r_thn, pr_ptr->r_thb);
 	
 	/* Output 'X' for "Extra Info" (one line only) */
-	fprintf(fp, "X:%d:%d:%d\n", pr_ptr->r_exp, pr_ptr->infra, pr_ptr->r_idx);
+	if (pr_ptr->r_exp || pr_ptr->infra || pr_ptr->r_idx || pr_ptr->slots[END_EQUIPMENT - INVEN_WIELD])
+	{
+		fprintf(fp, "X:%d:%d:%d:%d\n", pr_ptr->r_exp, pr_ptr->infra, pr_ptr->r_idx, pr_ptr->slots[END_EQUIPMENT - INVEN_WIELD]);
+	}
 
-	/* Output 'I' for "Info" (one line only) */
-	fprintf(fp, "I:%d:%d:%d:%d\n", pr_ptr->hist, pr_ptr->b_age, pr_ptr->m_age, pr_ptr->home);
+	/* Output 'I' for "Info" (one line only) */	
+	if (pr_ptr->hist || pr_ptr->b_age || pr_ptr->m_age || pr_ptr->home)
+	{
+		fprintf(fp, "I:%d:%d:%d:%d\n", pr_ptr->hist, pr_ptr->b_age, pr_ptr->m_age, pr_ptr->home);
+	}
 
 	/* Output 'H' for "Height" (one line only) */
-	fprintf(fp, "H:%d:%d:%d:%d\n", pr_ptr->m_b_ht, pr_ptr->m_m_ht, pr_ptr->f_b_ht, pr_ptr->f_m_ht);
-
-	/* Output 'H' for "Height" (one line only) */
-	fprintf(fp, "W:%d:%d\n", pr_ptr->m_b_wt, pr_ptr->f_b_wt);
+	if  (pr_ptr->m_b_ht || pr_ptr->m_m_ht || pr_ptr->f_b_ht || pr_ptr->f_m_ht)
+	{
+		fprintf(fp, "H:%d:%d:%d:%d\n", pr_ptr->m_b_ht, pr_ptr->m_m_ht, pr_ptr->f_b_ht, pr_ptr->f_m_ht);
+	}
+		
+	/* Output 'W' for "Weight" (one line only) */
+	if (pr_ptr->m_b_wt || pr_ptr->f_b_wt)
+	{
+		fprintf(fp, "W:%d:%d\n", pr_ptr->m_b_wt, pr_ptr->f_b_wt);
+	}
 
 	/* Output 'F' for "Flags" */
 	emit_flags_32(fp, "F:", pr_ptr->flags1, k_info_flags1);
@@ -9400,17 +9414,26 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 	emit_flags_32(fp, "F:", pr_ptr->flags3, k_info_flags3);
 	emit_flags_32(fp, "F:", pr_ptr->flags4, k_info_flags4);
 
-	/* Start object slots output */
-	fprintf(fp, "O");
-	
-	/* Output stats */
-	for (n = 0; n < END_EQUIPMENT - INVEN_WIELD + 1; n++)
+	/* Check if 'O' required */
+	for (n = 0; n < END_EQUIPMENT - INVEN_WIELD; n++)
 	{
-		fprintf(fp, ":%d", pr_ptr->slots[n]);
+		if (pr_ptr->slots[n]) output = TRUE;
 	}
 	
-	/* Finish object slots output */
-	fprintf(fp, "\n");
+	if (output)
+	{
+		/* Start object slots output */
+		fprintf(fp, "O");
+		
+		/* Output stats */
+		for (n = 0; n < END_EQUIPMENT - INVEN_WIELD; n++)
+		{
+			fprintf(fp, ":%d", pr_ptr->slots[n]);
+		}
+		
+		/* Finish object slots output */
+		fprintf(fp, "\n");
+	}
 
 	/* Only output classes for starting races */
 	if (i< z_info->g_max)
@@ -9428,11 +9451,12 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 				introduced = TRUE;
 			}
 		}
+		
+		/* Finish class choices output */
+		fprintf(fp, "\n");
+
 	}
 	
-	/* Finish class choices output */
-	fprintf(fp, "\n");
-
 	/* Finish output */
 	fprintf(fp, "\n");
 
