@@ -3207,11 +3207,12 @@ const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES] =
 	{"eating ", "tasting ", "nibbling ", "indigestion from "}, /* SOURCE_PLAYER_EAT */
 	{"quaffing ", "drinking ", "slurping ", "sipping "}, /* SOURCE_PLAYER_QUAFF */ 
 	{"aiming ", "waving ", "pointing ", "holding the wrong end of "}, /* SOURCE_PLAYER_AIM */
-	{"zapping ", "discharging ", "rubbing ", "holding the wrong end of "}, /* SOURCE_PLAYER_ZAP */ 
-	{"zapping ", "discharging ", "rubbing ", "holding the wrong end of "}, /* SOURCE_PLAYER_ZAP_NO_TARGET */ 
+	{"zapping ", "plughing ", "xyzzying ", "holding the wrong end of "}, /* SOURCE_PLAYER_ZAP */ 
+	{"rubbing ", "wondering how to zap ", "seeing which end glows of ", "pressing a hidden stud on "}, /* SOURCE_PLAYER_ZAP_NO_TARGET */ 
 	{"reading ", "misreading ", "glancing at ", "reciting "}, /* SOURCE_PLAYER_READ */ 
 	{"using ", "misusing ", "abusing ", "badly using "}, /* SOURCE_PLAYER_USE */ 
 	{"activating ", "relying too heavily on ", "mistrusting the power of ", "chancing the gods with "}, /* SOURCE_PLAYER_ACT_ARTIFACT */ 
+	{"activating ", "relying on ", "having an argument with ", "chancing fate with "}, /* SOURCE_PLAYER_ACT_EGO_ITEM */ 
 	{"activating ", "calling on ", "discharging ", "misusing "}, /* SOURCE_PLAYER_ACTIVATE */ 
 	{"buying ", "acquiring ", "purchasing ", "the ill-judged purchase of "}, /* SOURCE_PLAYER_SERVICE */ 
 	{"bad luck casting ", "badly casting ", "slurring a syllable casting ", "magical feedback whilst casting "} /* SOURCE_PLAYER_CAST */

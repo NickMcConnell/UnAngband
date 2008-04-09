@@ -2785,10 +2785,11 @@
 #define SOURCE_PLAYER_READ		-21
 #define SOURCE_PLAYER_USE		-22	/* Staffs*/
 #define SOURCE_PLAYER_ACT_ARTIFACT	-23
-#define SOURCE_PLAYER_ACTIVATE	-24
-#define SOURCE_PLAYER_SERVICE	-25
-#define SOURCE_PLAYER_CAST		-26
-#define SOURCE_PLAYER_END		-27
+#define SOURCE_PLAYER_ACT_EGO_ITEM	-24
+#define SOURCE_PLAYER_ACTIVATE	-25
+#define SOURCE_PLAYER_SERVICE	-26
+#define SOURCE_PLAYER_CAST		-27
+#define SOURCE_PLAYER_END		-28
 
 #define SOURCE_PLAYER_START		-7	/* Less than here or equal to here, player is the source, and gets experience */
 #define SOURCE_PLAYER_NO_TARGET	-20	/* Less than here or equal to here, no target is specified and some messages are suppressed.

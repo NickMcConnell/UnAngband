@@ -1800,9 +1800,10 @@ bool player_activate(int item)
 
 	/* Paranoia */
 	if (power < 0) return (TRUE);
-
+	
 	/* Apply object effect */
-	(void)process_spell(o_ptr->name1 ? SOURCE_PLAYER_ACT_ARTIFACT : SOURCE_PLAYER_ACTIVATE, o_ptr->k_idx, power, 0, &cancel, &known);
+	(void)process_spell(o_ptr->name1 ? SOURCE_PLAYER_ACT_ARTIFACT : (o_ptr->name2 ? SOURCE_PLAYER_ACT_EGO_ITEM : SOURCE_PLAYER_ACTIVATE),
+			o_ptr->name1 ? o_ptr->name1 : (o_ptr->name2 ? o_ptr->name2 : o_ptr->k_idx), power, 0, &cancel, &known);
 
 	/* We know it activates */
 	object_can_flags(o_ptr,0x0L,0x0L,TR3_ACTIVATE,0x0L, item < 0);

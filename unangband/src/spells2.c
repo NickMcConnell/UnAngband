@@ -8294,17 +8294,8 @@ bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x)
 	int power = 0;
 	bool obvious = FALSE;
 
-	/* Get artifact activation */
-	if (artifact_p(o_ptr))
-	{
-		power = a_info[o_ptr->name1].activation;
-	}
-
 	/* Get item effect */
-	else
-	{
-		get_spell(&power, "use", o_ptr, FALSE);
-	}
+	get_spell(&power, "use", o_ptr, FALSE);
 
 	/* Check for return if player */
 	if (cave_m_idx[y][x] < 0) process_spell_prepare(power, 25);

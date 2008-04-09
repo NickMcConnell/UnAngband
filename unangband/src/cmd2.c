@@ -3969,7 +3969,8 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 			if (auto_activate(o_ptr))
 			{
 				/* Make item strike */
-				process_item_blow(SOURCE_PLAYER_ACT_ARTIFACT, o_ptr->name1, o_ptr, y, x);
+				process_item_blow(o_ptr->name1 ? SOURCE_PLAYER_ACT_ARTIFACT : (o_ptr->name2 ? SOURCE_PLAYER_ACT_EGO_ITEM : SOURCE_PLAYER_ACTIVATE),
+						o_ptr->name1 ? o_ptr->name1 : (o_ptr->name2 ? o_ptr->name2 : o_ptr->k_idx), o_ptr, y, x);
 			}
 
 			/* Apply additional effect from coating*/

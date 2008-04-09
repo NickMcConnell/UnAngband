@@ -8752,7 +8752,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 			/* Hack -- make it clear it was a trap */
 			if (who == SOURCE_PLAYER_TRAP) 
-				(void)my_strcat(killer, " trap you set", sizeof(killer));		
+				(void)my_strcat(killer, "trap you set with ", sizeof(killer));		
 		}
 
 		/* Cause of death routine */
@@ -8769,7 +8769,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				
 				break;
 			}
-
+			
 			case SOURCE_FEATURE:
 			{
 				/* Get the source feature */
@@ -8823,7 +8823,14 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				
 				break;
 			}			
-
+			
+			case SOURCE_PLAYER_ACT_EGO_ITEM:
+			{
+				my_strcat(killer, "an ego item ", sizeof(killer));
+				my_strcat(killer, e_name + e_info[what].name, sizeof(killer));
+				break;
+			}
+			
 			default:
 			{
 				/* Fake object */
@@ -8831,15 +8838,35 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 				/* Get an object */
 				object_type *o_ptr = &object_type_body;
+				
+				char o_name[80];
+				
+				int kind;
 
+				/* Set up artifact */
+				if (who == SOURCE_PLAYER_ACT_ARTIFACT)
+				{
+					kind = lookup_kind(a_info[what].tval, a_info[what].sval);
+				}
+				/* Set up other item */
+				else
+				{
+					kind = what;
+				}
+				
 				/* Prepare the object */
-				object_prep(o_ptr, what);
+				object_prep(o_ptr, kind);
 				
 				/* Hack -- fake knowledge */
 				o_ptr->ident |= (IDENT_STORE);
+				
+				/* Artifact */
+				if (who == SOURCE_PLAYER_ACT_ARTIFACT) o_ptr->name1 = what;
 
 				/* Get the object name */
-				object_desc(killer, sizeof(killer), o_ptr, TRUE, 0); 
+				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
+				
+				(void)my_strcat(killer, o_name, sizeof(killer));
 				
 				break;
 			}
