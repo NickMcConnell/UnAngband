@@ -1846,6 +1846,12 @@
 /*** Object "tval" and "sval" codes ***/
 
 
+/*
+ * Used for uncontrolled objects
+ */
+#define UNCONTROLLED_CHANCE		100	/* Chance in 1 in x chance of uncontrolled object activating */	
+#define UNCONTROLLED_CONTROL	200	/* Number of random activations before controlling this object */
+
 
 /*
  * XXX XXX XXX Do not use these hard-coded values.
@@ -4569,6 +4575,16 @@
  */
 #define cursed_p(T) \
 	((T)->ident & (IDENT_CURSED))
+
+/*
+ * Uncontrolled items.
+ * 
+ * Note should always test for f3 & (TR3_UNCONTROLLED) in addition to this.
+ */
+#define uncontrolled_p(T) \
+	(((T)->ident & (IDENT_CURSED)) || \
+	((T)->usage <= (UNCONTROLLED_CONTROL)))
+
 
 /*
  * Coated items.

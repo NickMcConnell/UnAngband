@@ -1645,8 +1645,8 @@ bool item_tester_hook_activate(const object_type *o_ptr)
 	/* Check activation flag */
 	if (f3 & (TR3_ACTIVATE)) return (TRUE);
 
-	/* Check uncontrolled flag and not cursed */
-	if ((f3 & (TR3_UNCONTROLLED)) && !(cursed_p(o_ptr))) return (TRUE);
+	/* Check uncontrolled flag and not cursed, or has grown to control ability */
+	if ((f3 & (TR3_UNCONTROLLED)) && !(uncontrolled_p(o_ptr))) return (TRUE);
 
 	/* Assume not */
 	return (FALSE);

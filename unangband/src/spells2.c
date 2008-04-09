@@ -272,7 +272,7 @@ static int enchant_table[16] =
 /*
  * Hack -- Removes curse from an object.
  */
-static void uncurse_object(object_type *o_ptr)
+void uncurse_object(object_type *o_ptr)
 {
 	/* Uncurse it */
 	o_ptr->ident &= ~(IDENT_CURSED);

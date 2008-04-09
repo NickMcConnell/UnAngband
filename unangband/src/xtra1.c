@@ -3381,7 +3381,7 @@ static void calc_bonuses(void)
 		if (f4 & (TR4_RES_WATER)) p_ptr->incr_resist[INCR_RES_WATER]++;
 
 		/* Affect uncontrolled status */
-		if ((f3 & (TR3_UNCONTROLLED)) && (cursed_p(o_ptr))) p_ptr->uncontrolled = TRUE;
+		if ((f3 & (TR3_UNCONTROLLED)) && (uncontrolled_p(o_ptr))) p_ptr->uncontrolled = TRUE;
 
 		/* Affect flags */
 		p_ptr->cur_flags1 |= f1;

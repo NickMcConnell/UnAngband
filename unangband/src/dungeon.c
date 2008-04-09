@@ -1677,7 +1677,7 @@ static void process_world(void)
 	/*** Involuntary Movement/Activations ***/
 
 	/* Uncontrolled items */
-	if ((p_ptr->uncontrolled) && (rand_int(100) < 1))
+	if ((p_ptr->uncontrolled) && (rand_int(UNCONTROLLED_CHANCE) < 1))
 	{
 		int j = 0, k = 0;
 		
@@ -1694,7 +1694,7 @@ static void process_world(void)
 			object_flags(o_ptr, &f1, &f2, &f3, &f4);
 			
 			/* Pick item */
-			if (((f3 & (TR3_UNCONTROLLED)) != 0) && (cursed_p(o_ptr)) && !(rand_int(k++)))
+			if (((f3 & (TR3_UNCONTROLLED)) != 0) && (uncontrolled_p(o_ptr)) && !(rand_int(k++)))
 			{
 				j = i;
 			}
@@ -1705,11 +1705,50 @@ static void process_world(void)
 		{
 			bool dummy = FALSE;
 			
+			o_ptr = &inventory[j];
+			
 			/* Get power */
 			get_spell(&k, "", &inventory[j], FALSE);
 			
-			/* Process spell - involuntary effects */
-			process_spell_eaten(SOURCE_OBJECT, inventory[j].k_idx, k, 25, &dummy);
+			if (rand_int(200) < o_ptr->usage)
+			{
+				/* Process spell - involuntary effects */
+				process_spell_eaten(SOURCE_OBJECT, o_ptr->k_idx, k, 25, &dummy);
+				
+				/* Warn the player */
+				sound(MSG_CURSED);
+
+				/* Curse the object */
+				o_ptr->ident |= (IDENT_CURSED);
+				mark_cursed_feeling(o_ptr);
+			}
+			else if (o_ptr->usage < UNCONTROLLED_CONTROL)
+			{
+				/* Message only */
+				msg_print("You feel yourself gain a measure of control.");
+			}
+			else if (o_ptr->usage >= UNCONTROLLED_CONTROL)
+			{
+				char o_name[80];
+				
+				/* Uncurse the object */
+				uncurse_object(o_ptr);
+
+				/* Get a description */
+				object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
+
+				/* Message only */
+				msg_print("Congratulations.");
+
+				/* Describe victory */
+				msg_format("You have mastered the %s.", o_name);
+				
+				/* Reveal functionality */
+				msg_print("You may now activate it when you wish.");				
+			}
+			
+			/* Used the object */
+			if (o_ptr->usage < MAX_SHORT) o_ptr->usage++;
 		}
 
 		/* Always notice */
