@@ -2207,66 +2207,127 @@ errr parse_blow_info(char *buf, header *head)
 		blow_ptr->desc[n1].min = atoi(s);
 		
 		/* Store the description */
-		if (!(blow_ptr->desc[n1].text = add_text(&blow_ptr->desc[n1].text, head, t)))
+		if (!(add_text(&(blow_ptr->desc[n1].text), head, t)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
+	}
+
+	/* Process 'I' for "Info" */
+	else if (buf[0] == 'I')
+	{
+		int mana, best, max;
+		
+		/* There better be a current blow_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (3 != sscanf(buf, "I:%d:%d:%d",
+			    &mana, &best, &max)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		blow_ptr->mana_cost = mana;
+		blow_ptr->best_range = best;
+		blow_ptr->max_range = max;		
+	}
+	
+	/* Process 'D' for "Damage" */
+	else if (buf[0] == 'D')
+	{
+		int mult, div, var, max;
+		int n, n1;
+		char *s;
+		
+		/* There better be a current blow_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* TODO: This is bound to cause memory problems. Should have effect listed first */
+		/* Scan for 5th colon */
+		for (s = buf, n = 0; *s && (n < 5);)
+		{
+			s++;
+			if (*s == ':') n++;
+		}
+		
+		/* Nuke colon and advance */
+		*s++ = '\0';
+		
+		/* Analyze the effect */
+		for (n1 = 0; r_info_blow_effect[n1]; n1++)
+		{
+			if (streq(s, r_info_blow_effect[n1])) break;
+		}
+		
+		/* Save the value */
+		blow_ptr->d_res = n1;
+		
+		/* Scan for the values */
+		if (4 != sscanf(buf, "D:%d:%d:%d:%d",
+			    &mult, &div, &var, &max)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		blow_ptr->dam_mult = mult;
+		blow_ptr->dam_div = div;
+		blow_ptr->dam_var = var;		
+		blow_ptr->dam_max = max;		
+	}
+	
+	/* Process 'C' for "Choice" */
+	else if (buf[0] == 'C')
+	{
+		int base, summ, hurt, mana, esc, tact, range;
+		
+		/* There better be a current blow_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (7 != sscanf(buf, "C:%d:%d:%d:%d:%d:%d:%d",
+				&base, &summ, &hurt, &mana, &esc, &tact, &range)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		blow_ptr->d_base = base;
+		blow_ptr->d_summ = summ;
+		blow_ptr->d_hurt = hurt;		
+		blow_ptr->d_mana = mana;
+		blow_ptr->d_esc = esc;
+		blow_ptr->d_tact = tact;
+		blow_ptr->d_range = range;		
 	}
 
 	/* Process 'A' for "Arc" */
 	else if (buf[0] == 'A')
 	{
+		int arc, dia, deg;
+		
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
-		/* Get the value */
-		blow_ptr->arc = atoi(buf + 2);
-	}
-	
-	/* Process 'D' for "Diameter of Source" */
-	else if (buf[0] == 'D')
-	{
-		/* There better be a current blow_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+		/* Scan for the values */
+		if (3 != sscanf(buf, "A:%d:%d:%d",
+			    &arc, &dia, &deg)) return (PARSE_ERROR_GENERIC);
 
-		/* Get the value */
-		blow_ptr->diameter_of_source = atoi(buf + 2);
+		/* Save the values */
+		blow_ptr->arc = arc;
+		blow_ptr->diameter_of_source = dia;
+		blow_ptr->degree_factor = deg;		
 	}
 	
-	/* Process 'M' for "Maximum Range" */
-	else if (buf[0] == 'M')
-	{
-		/* There better be a current blow_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* Get the value */
-		blow_ptr->max_range = atoi(buf + 2);
-	}
-	
+	/* Process 'R' for "Radius" */
 	else if (buf[0] == 'R')
 	{
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Get the radius information */
-		if (grab_one_level_scalar(&blow_ptr->radius, s + 2)) return (PARSE_ERROR_GENERIC);
+		if (grab_one_level_scalar(&blow_ptr->radius, buf + 2)) return (PARSE_ERROR_GENERIC);
 	}
 	
+	/* Process 'U' for "Number" */
 	else if (buf[0] == 'U')
 	{
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Get the radius information */
-		if (grab_one_level_scalar(&blow_ptr->number, s + 2)) return (PARSE_ERROR_GENERIC);
-	}
-	
-	/* Process 'P' for "Power" */
-	else if (buf[0] == 'P')
-	{
-		/* There better be a current blow_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* Get the value */
-		blow_ptr->power = atoi(buf + 2);
+		if (grab_one_level_scalar(&blow_ptr->number, buf + 2)) return (PARSE_ERROR_GENERIC);
 	}
 	
 	else
@@ -6350,7 +6411,6 @@ errr parse_b_info(char *buf, header *head)
 	/* Current entry */
 	static owner_type *ot_ptr = NULL;
 
-
 	/* Process 'N' for "New/Number/Name" */
 	if (buf[0] == 'N')
 	{
@@ -8724,6 +8784,111 @@ static char color_attr_to_char[] =
 		'B',
 		'U'
 };
+
+
+
+/*
+ * Emit the "d_info" array into an ascii "template" file
+ */
+errr emit_blow_info_index(FILE *fp, header *head, int i)
+{
+	int n;
+
+	/* Point at the "info" */
+	blow_type *blow_ptr = (blow_type*)head->info_ptr + i;
+
+	/* Output 'N' for "New/Number/Name" */
+	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + blow_ptr->name);
+	
+	/* Output 'T' for "Text" */
+	for (n = 0; n < MAX_BLOW_DESCRIPTIONS; n++)
+	{
+		if ((blow_ptr->desc[n].max) && (blow_ptr->desc[n].max < 10000))
+		{
+			/* Output 'T' for "Text" */
+			fprintf(fp, "T:%d-%d:%s\n", blow_ptr->desc[n].min, blow_ptr->desc[n].max,head->text_ptr + blow_ptr->desc[n].text);			
+		}
+		else if (blow_ptr->desc[n].max)
+		{
+			/* Output 'T' for "Text" */
+			fprintf(fp, "T:%d:%s\n", blow_ptr->desc[n].min, head->text_ptr + blow_ptr->desc[n].text);
+		}
+	}
+
+	/* Output 'I' for "Blow information" */
+	if (blow_ptr->mana_cost || blow_ptr->best_range || blow_ptr->max_range)
+	{
+		fprintf(fp, "I:%d:%d:%d\n",blow_ptr->mana_cost,blow_ptr->best_range, blow_ptr->max_range);
+	}
+	
+	/* Output 'D' for "Blow damage" */
+	if (blow_ptr->dam_mult || blow_ptr->dam_div || blow_ptr->dam_var || blow_ptr->dam_max || blow_ptr->d_res)
+	{
+		fprintf(fp, "D:%d:%d:%d:%d:%s\n",blow_ptr->dam_mult, blow_ptr->dam_div, blow_ptr->dam_var, blow_ptr->dam_max,
+			r_info_blow_effect[blow_ptr->d_res]);
+	}
+	
+	/* Output 'C' for "Blow choices" */
+	if (blow_ptr->d_base || blow_ptr->d_hurt || blow_ptr->d_esc
+			|| blow_ptr->d_summ || blow_ptr->d_mana || blow_ptr->d_tact || blow_ptr->d_range)
+	{
+		fprintf(fp, "C:%d:%d:%d:%d:%d:%d:%d\n",blow_ptr->d_base, blow_ptr->d_summ, blow_ptr->d_hurt, blow_ptr->d_mana,
+				blow_ptr->d_esc, blow_ptr->d_tact, blow_ptr->d_range);
+	}
+	
+	/* Output 'S' for "Summoning choices" */
+	if (blow_ptr->summon_type)
+	{
+		fprintf(fp, "S:%d\n",blow_ptr->summon_type);
+	}
+	
+	/* Output 'A' for "Arc information" */
+	if (blow_ptr->arc)
+	{
+		fprintf(fp, "A:%d:%d:%d\n", blow_ptr->arc, blow_ptr->diameter_of_source, blow_ptr->degree_factor);
+	}
+	
+	/* Output 'R' for "Radius information */
+	if ((blow_ptr->radius.base) || (blow_ptr->radius.gain))
+	{
+		fprintf(fp, "R:");
+		if (blow_ptr->radius.base)
+		{
+			fprintf(fp,"%d", blow_ptr->radius.base);
+			if (blow_ptr->radius.gain) fprintf(fp, "+");
+		}
+		if (blow_ptr->radius.gain)
+		{
+			fprintf(fp,"%d/%d", blow_ptr->radius.gain, blow_ptr->radius.levels);
+		}
+		fprintf(fp, "\n");
+	}
+	
+	/* Output 'U' for "Number information */
+	if ((blow_ptr->number.base) || (blow_ptr->number.gain))
+	{
+		fprintf(fp, "U:");
+		if (blow_ptr->number.base)
+		{
+			fprintf(fp,"%d", blow_ptr->number.base);
+			if (blow_ptr->number.gain) fprintf(fp, "+");
+		}
+		if (blow_ptr->number.gain)
+		{
+			fprintf(fp,"%d/%d", blow_ptr->number.gain, blow_ptr->number.levels);
+		}
+		fprintf(fp, "\n");
+	}
+	
+	/* Output 'F' for "Flags" */
+	emit_flags_32(fp, "F:", blow_ptr->flags1, blow_info_flags1);
+	emit_flags_32(fp, "F:", blow_ptr->flags2, blow_info_flags2);
+
+	fprintf(fp, "\n");	
+	
+	/* Success */
+	return (0);
+}
 
 
 

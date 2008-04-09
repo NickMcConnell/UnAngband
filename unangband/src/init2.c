@@ -829,6 +829,12 @@ static errr init_blow_info(void)
 	/* Save a pointer to the parsing function */
 	blow_head.parse_info_txt = parse_blow_info;
 
+#ifdef ALLOW_TEMPLATES_OUTPUT
+
+	/* Save a pointer to the emit function*/
+	blow_head.emit_info_txt_index = emit_blow_info_index;
+#endif /* ALLOW_TEMPLATES_OUTPUT */
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("blows", &blow_head);
@@ -859,7 +865,7 @@ static errr init_f_info(void)
 
 #ifdef ALLOW_TEMPLATES_OUTPUT
 
-	/* Save a pointer to the evaluate power function*/
+	/* Save a pointer to the emit function*/
 	f_head.emit_info_txt_index = emit_f_info_index;
 #endif /* ALLOW_TEMPLATES_OUTPUT */
 
@@ -894,7 +900,7 @@ static errr init_k_info(void)
 
 #ifdef ALLOW_TEMPLATES_OUTPUT
 
-	/* Save a pointer to the evaluate power function*/
+	/* Save a pointer to the emit function*/
 	k_head.emit_info_txt_index = emit_k_info_index;
 #endif /* ALLOW_TEMPLATES_OUTPUT */
 	
@@ -929,7 +935,7 @@ static errr init_a_info(void)
 
 #ifdef ALLOW_TEMPLATES_OUTPUT
 
-	/* Save a pointer to the evaluate power function*/
+	/* Save a pointer to the emit function*/
 	a_head.emit_info_txt_index = emit_a_info_index;
 #endif /* ALLOW_TEMPLATES_OUTPUT */
 	

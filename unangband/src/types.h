@@ -273,15 +273,37 @@ struct blow_type
 	u32b name;     /* Name (offset) */
 
 	u32b flags1;	/* Projection flags */
-	u32b flags2;	/* Projection flags */
+	u32b flags2;	/* Melee and spell flags */
 
 	blow_desc_type desc[MAX_BLOW_DESCRIPTIONS];	/* Possible text strings describing blow */
 
 	byte arc;
 	byte diameter_of_source;
+	byte degree_factor;
+	byte unused;
+	
+	byte mana_cost;
+	byte best_range;
 	byte max_range;
-	byte power;
+	byte summon_type;
 
+	/* Monster spell/breath damage  */
+	byte dam_mult;
+	byte dam_div;
+	byte dam_var;
+	byte dam_max;
+	
+	/* Monster spell desirability */
+	byte d_base;
+	byte d_hurt;
+	byte d_esc;
+	byte d_res;
+	
+	byte d_summ;
+	byte d_mana;
+	byte d_tact;
+	byte d_range;
+	
 	blow_level_scalar_type radius;
 	blow_level_scalar_type number;
 };

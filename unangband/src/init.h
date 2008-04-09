@@ -133,13 +133,15 @@ extern errr parse_b_info(char *buf, header *head);
 extern errr parse_g_info(char *buf, header *head);
 extern errr parse_q_info(char *buf, header *head);
 extern errr parse_n_info(char *buf, header *head);
-extern errr parse_flavor_info(char *buf, header *head);
+extern errr parse_flavor_info(char *buf, header *head);\
+extern errr eval_blow_power(header *head);
 extern errr eval_r_power(header *head);
 extern errr eval_e_power(header *head);
 
 #ifdef ALLOW_TEMPLATES_OUTPUT
 extern errr emit_d_info_always(FILE *fp, header *head);
 
+extern errr emit_blow_info_index(FILE *fp, header *head, int i);
 extern errr emit_r_info_index(FILE *fp, header *head, int i);
 extern errr emit_f_info_index(FILE *fp, header *head, int i);
 extern errr emit_k_info_index(FILE *fp, header *head, int i);
