@@ -3936,6 +3936,19 @@ errr parse_e_info(char *buf, header *head)
 			s = t;
 		}
 	}
+	/* Process 'A' for "Activation & time" */
+	else if (buf[0] == 'A')
+	{
+		int act, time, rand;
+
+		/* Scan for the values */
+		if (3 != sscanf(buf + 2, "%d:%d:%d",&act, &time, &rand)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		e_ptr->activation = act;
+		e_ptr->time = time;
+		e_ptr->randtime = rand;
+	}
 	else
 	{
 		/* Oops */
@@ -9251,7 +9264,7 @@ errr emit_a_info_index(FILE *fp, header *head, int i)
 	/* Output 'P' for "Power" (one line only) */
 	fprintf(fp,"P:%d:%dd%d:%d:%d:%d\n",a_ptr->ac, a_ptr->dd, a_ptr->ds, a_ptr->to_h, a_ptr->to_d, a_ptr->to_a);
 
-	/* Output 'I' for "Info" (one line only) */
+	/* Output 'A' for "Activation" (one line only) */
 	if (a_ptr->activation) fprintf(fp, "A:%d:%d:%d\n",a_ptr->activation,a_ptr->time,a_ptr->randtime);
 
 	/* Output 'F' for "Flags" */
@@ -9298,6 +9311,9 @@ errr emit_e_info_index(FILE *fp, header *head, int i)
 	
 	/* Output 'C' for "Creation" (one line only) */
 	fprintf(fp,"C:%d:%d:%d:%d\n",e_ptr->max_to_h, e_ptr->max_to_d, e_ptr->max_to_a, e_ptr->max_pval);
+
+	/* Output 'A' for "Activation" (one line only) */
+	if (e_ptr->activation) fprintf(fp, "A:%d:%d:%d\n",e_ptr->activation,e_ptr->time,e_ptr->randtime);
 
 	/* Output 'Y' for "Runes" (up to one line only) */
 	if (e_ptr->runest) fprintf(fp, "Y:%d:%d\n",e_ptr->runest, e_ptr->runesc);

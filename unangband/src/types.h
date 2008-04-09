@@ -669,9 +669,15 @@ struct ego_item_type
 	byte runest;   /* Rune type */
 	byte runesc;   /* Rune count */
 
-        byte aware;
+    byte aware;
 
-	s32b slay_power;	/* Pre-computed power from brands/slays */
+    s16b activation;/* Activation to use */
+    u16b time;      /* Activation time */
+    u16b randtime;  /* Activation time dice */
+
+    s16b activated; /* Count of times activated */
+
+    s32b slay_power;	/* Pre-computed power from brands/slays */
 };
 
 struct flavor_type

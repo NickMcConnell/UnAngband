@@ -8857,7 +8857,7 @@ void fill_book(const object_type *o_ptr, s16b *book, int *num)
 					if (p_ptr->cur_runes & (2 << (slot-1)))
 					{
 						/* Use book as hash table */
-                                                slot = (slot - 1) % (INVEN_PACK - 1);
+						slot = (slot - 1) % (INVEN_PACK - 1);
 
 						/* Free entry in book */
 						if (book[slot] == 0)
@@ -8884,13 +8884,37 @@ void fill_book(const object_type *o_ptr, s16b *book, int *num)
 			}
 		}
 	}
-	
+
 	/* Sort book contents */
 	ang_sort_comp = book_sort_comp_hook;
 	ang_sort_swap = book_sort_swap_hook;
 
 	/* Sort the array */
 	ang_sort(book, &why, *num);
+	
+	/* Paranoia */
+	if (*num >= 26) return;
+	
+	/* Get artifact spells */
+	if (o_ptr->name1)
+	{
+		artifact_type *a_ptr = &a_info[o_ptr->name1];
+
+		if (a_ptr->activation)
+		{
+			book[(*num)++] = a_ptr->activation;
+		}
+	}
+	/* Get ego item spells */
+	else if (o_ptr->name2)
+	{
+		ego_item_type *e_ptr = &e_info[o_ptr->name2];
+
+		if (e_ptr->activation)
+		{
+			book[(*num)++] = e_ptr->activation;
+		}
+	}
 }
 
 

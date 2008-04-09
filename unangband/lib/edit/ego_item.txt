@@ -468,15 +468,21 @@ F:STATIC | WINDY |
 
 ### Boots ###
 
-# 57 unused
-
 ### 54 - Unused ###
 
 ### 55 - Unused ###
 
 ### 56 - Unused ###
 
-### 57 - Unused ###
+N:57:of Dancing
+W:45:40:0:5000
+X:35:30:3
+T:30:0:99
+C:0:0:0:5
+Y:15:3
+A:3:10:10
+F:DEX | 
+F:UNCONTROLLED
 
 N:58:(Seven League)
 W:45:40:0:50000
@@ -484,10 +490,10 @@ X:35:30:0
 T:30:0:99
 C:0:0:0:5
 Y:15:3
-F:STEALTH | SPEED |
-F:FREE_ACT |
+A:594:100:100
+F:STEALTH | SPEED | 
+F:FREE_ACT | UNCONTROLLED
 
-# TELEPORT
 
 #Cloak/Boots
 

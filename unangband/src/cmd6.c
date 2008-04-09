@@ -1789,34 +1789,41 @@ bool player_activate(int item)
 	}
 #endif
 
-
 	/* Store charges */
 	tmpval = o_ptr->timeout;
 
 	/* Activate the artifact */
 	message(MSG_ACT_ARTIFACT, 0, "You activate it...");
 
+	/* Get object effect --- choose if required */
+	get_spell(&power, "use", o_ptr, TRUE);
+
+	/* Paranoia */
+	if (power < 0) return (TRUE);
+
+	/* Apply object effect */
+	(void)process_spell(o_ptr->name1 ? SOURCE_PLAYER_ACT_ARTIFACT : SOURCE_PLAYER_ACTIVATE, o_ptr->k_idx, power, 0, &cancel, &known);
+
+	/* We know it activates */
+	object_can_flags(o_ptr,0x0L,0x0L,TR3_ACTIVATE,0x0L, item < 0);
+
+	/* Used the object */
+	if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
+
+	/* Tire the player */
+	if ((item == INVEN_SELF) || (o_ptr->tval == TV_SPELL))
+	{
+		/* Tire out the player */
+		p_ptr->rest -= PY_REST_FAINT;
+
+		/* Redraw stuff */
+		p_ptr->redraw |= (PR_STATE);
+	}
+
 	/* Artifacts */
 	if (o_ptr->name1)
 	{
 		artifact_type *a_ptr = &a_info[o_ptr->name1];
-
-		if (a_ptr->activation)
-		{
-			/* Apply artifact effect */
-			(void)process_spell(SOURCE_PLAYER_ACT_ARTIFACT, o_ptr->name1, a_ptr->activation, 0, &cancel, &known);
-		}
-		else
-		{
-			/* Get object effect --- choose if required */
-			get_spell(&power, "use", o_ptr, FALSE);
-
-			/* Paranoia */
-			if (power < 0) return (TRUE);
-
-			/* Apply object effect */
-			(void)process_spell(SOURCE_PLAYER_ACTIVATE, o_ptr->k_idx, power, 0, &cancel, &known);
-		}
 
 		/* Set the recharge time */
 		if (a_ptr->randtime)
@@ -1829,53 +1836,38 @@ bool player_activate(int item)
 			o_ptr->timeout = a_ptr->time;
 		}
 
-		/* We know it activates */
-		object_can_flags(o_ptr,0x0L,0x0L,TR3_ACTIVATE,0x0L, item < 0);
-
 		/* Count activations */
 		if (a_ptr->activated < MAX_SHORT) a_ptr->activated++;
-
-		/* Window stuff */
-		p_ptr->window |= (PW_INVEN | PW_EQUIP);
-
 	}
 
-	/* Hack -- Other objects can be activated as well */
-	else
+	/* Ego Items */
+	else if (o_ptr->name2)
 	{
-		int power;
+		ego_item_type *e_ptr = &e_info[o_ptr->name2];
 
-		/* Get object effect --- choose if required */
-		get_spell(&power, "use", o_ptr, TRUE);
-
-		/* Clear racial activation */
-		if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE)) object_wipe(&inventory[INVEN_SELF]);
-
-		/* Paranoia */
-		if (power < 0) return (TRUE);
-
-		/* Apply object effect */
-		(void)process_spell(SOURCE_PLAYER_ACTIVATE, o_ptr->k_idx, power, 0, &cancel, &known);
-
-		/* Used the object */
-		if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
-
-		/* Tire the player */
-		if ((item == INVEN_SELF) || (o_ptr->tval == TV_SPELL))
+		/* Set the recharge time */
+		if (e_ptr->randtime)
 		{
-			/* Tire out the player */
-			p_ptr->rest -= PY_REST_FAINT;
-
-			/* Redraw stuff */
-			p_ptr->redraw |= (PR_STATE);
+			o_ptr->timeout = e_ptr->time + (byte)randint(e_ptr->randtime);
+		}
+		/* Set the recharge time */
+		else
+		{
+			o_ptr->timeout = e_ptr->time;
 		}
 
-		/* Time object out */
-		else if (o_ptr->charges) o_ptr->timeout = rand_int(o_ptr->charges)+o_ptr->charges;
-
-		/* Window stuff */
-		p_ptr->window |= (PW_INVEN | PW_EQUIP);
+		/* Count activations */
+		if (e_ptr->activated < MAX_SHORT) e_ptr->activated++;
 	}
+
+	/* Time object out */
+	else if (o_ptr->charges) o_ptr->timeout = rand_int(o_ptr->charges)+o_ptr->charges;
+
+	/* Clear racial activation */
+	if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE)) object_wipe(&inventory[INVEN_SELF]);
+
+	/* Window stuff */
+	p_ptr->window |= (PW_INVEN | PW_EQUIP);
 
 	/* Hack -- check if we are stacking rods */
 	if (o_ptr->timeout > 0)
