@@ -8100,9 +8100,6 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		/* Monster stripped of enchantments */
 		case GF_DISPEL:
 		{
-			/* No "real" damage */
-			dam = 0;
-
 			/* Fall through */
 		}
 		/* Hack -- curse effect - dispel plus damage */
@@ -11489,8 +11486,6 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		/* Remove enchantments from the player */
 		case GF_DISPEL:
 		{
-			dam = 0;
-
 			msg_print("You have been stripped of enchantments!");
 
 			/* Hack -- give player one round to react */

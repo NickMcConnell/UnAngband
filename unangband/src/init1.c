@@ -7004,6 +7004,7 @@ static long eval_blow_effect(int effect, int atk_dam, int rlev)
 		case GF_LITE:
 		case GF_DARK:
 		case GF_SLOW:
+		case GF_DISPEL:
 		{
 			atk_dam += 10;
 			break;
@@ -7022,6 +7023,7 @@ static long eval_blow_effect(int effect, int atk_dam, int rlev)
 		case GF_LOSE_WIS:
 		case GF_LOSE_DEX:
 		case GF_HALLU:
+		case GF_PETRIFY:
 		{
 			atk_dam += 20;
 			break;
