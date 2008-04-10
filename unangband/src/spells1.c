@@ -11401,14 +11401,16 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Source is player */
 				if (who <= SOURCE_PLAYER_START)
 				{
-					msg_print("You fail to teleport away.");					
+					msg_print("You fail to teleport.");					
 				}
 				else if (who >= SOURCE_MONSTER_START)
 				{
 					char m_name[80];
 					
+					int m_idx = who ? who : what;
+					
 					/* Get the monster's real name */
-					monster_desc(p_ptr->died_from, sizeof(p_ptr->died_from), who, 0x40);
+					monster_desc(p_ptr->died_from, sizeof(p_ptr->died_from), m_idx, 0x40);
 					
 					/* Fails to teleport */
 					msg_format("%^s fails to teleport you away.", m_name);

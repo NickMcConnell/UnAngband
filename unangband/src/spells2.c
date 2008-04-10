@@ -6251,10 +6251,10 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 				int px = p_ptr->px;
 
 				/* Apply damage */
-				if (project_p(SOURCE_SELF, 0, py, px, damage, effect)) obvious = TRUE;
+				if (project_p(who, what, py, px, damage, effect)) obvious = TRUE;
 
 				/* Apply teleport and other effects */
-				if (project_t(SOURCE_SELF, 0, py, px, damage, effect)) obvious = TRUE;
+				if (project_t(who, what, py, px, damage, effect)) obvious = TRUE;
 				break;
 			}
 
