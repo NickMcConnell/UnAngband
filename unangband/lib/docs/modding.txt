@@ -459,6 +459,12 @@ Note that post conversion, the runes are stripped off, so that the additional ru
 in rune.txt do not apply until a further rune is added again. Ego items will identify as having so 
 many runes of a particular type as listed here even if they do not ‘internally’ have the runes 
 applied.
+'A' is for activation.  Activation is the effect the ego item activates for, referring to an entry number 
+in spell.txt. The recharge time calculates from the recharge time plus a random value between 1 
+and the recharge time dice (if not 0). If an activation is given then the ego item must also have the 
+ACTIVATE or UNCONTROLLED flag. Ego item weapons with activations can also be inscribed with =A 
+by the player which will mean that the activation is used against the monster that the ego item hits, 
+provided the activation has recharged.
 Customising this file
 There are probably already too many ego items, particularly weapons, in Unangband, particularly 
 with the addition of magic items. Care should be taken when adding additional ego types, that the 
