@@ -3194,7 +3194,7 @@ const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES] =
 	{"", "", "", ""}, /* SOURCE_SPELL */
 	{"", "", "", ""}, /* SOURCE_DISEASE */
 	{"daylight", "the sun rising", "no UV protection", "your unholy flesh searing in the radiance of day"}, /* SOURCE_DAYLIGHT */
-	{" being born", " hatching", " emerging", " erupting"},	/* SOURCE_BIRTH */
+	{" being born", " hatching", " emerging", " erupting from you"},	/* SOURCE_BIRTH */
 	{"an untreated scratch", "a nasty cut", "a fatal wound", "poor bandaging"},	/* SOURCE_CUTS */
 	{"poison", "venom", "toxin", "unnatural swelling"},	/* SOURCE_POISON */
 	{"hunger", "starvation", "lack of food", "poor management"},	/* SOURCE_HUNGER */
