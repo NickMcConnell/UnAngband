@@ -1419,6 +1419,9 @@ void take_hit(int who, int what, int dam)
 			}
 		}
 		
+		/* Note killer in messages */
+		message_add(format("You were killed by %s.", p_ptr->died_from), MSG_DEATH);
+		
 		/* No longer a winner */
 		p_ptr->total_winner = FALSE;
 
