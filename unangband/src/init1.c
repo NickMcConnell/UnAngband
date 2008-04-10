@@ -8804,7 +8804,7 @@ static char color_attr_to_char[] =
 
 
 /*
- * Emit the "d_info" array into an ascii "template" file
+ * Emit the "blow_info" array into an ascii "template" file
  */
 errr emit_blow_info_index(FILE *fp, header *head, int i)
 {
@@ -9021,7 +9021,45 @@ errr emit_r_info_index(FILE *fp, header *head, int i)
 
 	/* Output 'G' for "Graphics" (one line only) */
 	fprintf(fp, "G:%c:%c\n",r_ptr->d_char,color_attr_to_char[r_ptr->d_attr]);
-
+	
+#if 0 /* TODO: Enable this when we go to 256 colours to help reduce duplicate monster appearances */
+	/* Show other monsters with same appearance */
+	for (n = 1; n < z_info->r_max; n++)
+	{
+		monster_race *r2_ptr = (monster_race*)head->info_ptr + n;
+		
+		if (r_ptr->d_char != r2_ptr->d_char) continue;
+		
+		if (n == i) continue;
+		
+		if (((r_ptr->flags1 & (RF1_ATTR_CLEAR)) == 
+			(r2_ptr->flags1 & (RF1_ATTR_CLEAR))) &&
+			((r_ptr->flags1 & (RF1_ATTR_CLEAR)) ||
+					(r2_ptr->flags1 & (RF1_ATTR_CLEAR))))
+		{
+			fprintf(fp, "#$ Matches %s\n", head->name_ptr + r2_ptr->name);
+		}
+		else if (((r_ptr->flags1 & (RF1_ATTR_MULTI)) == 
+			(r2_ptr->flags1 & (RF1_ATTR_MULTI))) &&
+			((r_ptr->flags1 & (RF1_ATTR_MULTI)) ||
+					(r2_ptr->flags1 & (RF1_ATTR_MULTI))))
+		{
+			fprintf(fp, "#$ Matches %s\n", head->name_ptr + r2_ptr->name);
+		}
+		else if ((r_ptr->d_attr == r2_ptr->d_attr) &&
+				((r_ptr->flags9 & (RF9_ATTR_METAL)) == 
+								(r2_ptr->flags9 & (RF9_ATTR_METAL))) &&
+								((r_ptr->flags1 & (RF1_ATTR_MULTI)) == 
+											(r2_ptr->flags1 & (RF1_ATTR_MULTI))) &&
+											((r_ptr->flags1 & (RF1_ATTR_CLEAR)) == 
+														(r2_ptr->flags1 & (RF1_ATTR_CLEAR))))
+		{
+			fprintf(fp, "#$ Matches %s\n", head->name_ptr + r2_ptr->name);
+		}
+	}
+	
+#endif
+	
 	/* Output 'I' for "Info" (one line only) */
 	fprintf(fp, "I:%d:%dd%d:%d:%d:%d\n",r_ptr->speed,r_ptr->hdice,r_ptr->hside,r_ptr->aaf,r_ptr->ac,r_ptr->sleep);
 
@@ -9612,11 +9650,12 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 				case 5: note_spell = priest_spell; break;
 				case 8: case 9: case 11: note_spell = (s_ptr->cast[0].class != 0); break;
 			}
-			
+#if 0 /* This causes dangerous memory access on some OS'es and needs p_class initialised first. */			
 			if (note_spell)
 			{
 				fprintf(fp, "#$ %s cannot cast this spell.\n", c_name + c_info[l].name);
 			}
+#endif
 		}
 	}
 	

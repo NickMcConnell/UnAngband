@@ -3980,7 +3980,7 @@ D:It is a giant beetle with vicious claws.
 
 N:258:Iron golem
 G:g:s
-I:100:80d12:12:80:10
+I:105:80d12:12:80:10
 W:37:3:20:420
 M:15:15:8:50
 B:HIT:HURT:1d12
@@ -5068,7 +5068,7 @@ F:HAS_CORPSE | HAS_HEAD | HAS_HAND | HAS_ARM | HAS_LEG | DROP_TOOL |
 F:DROP_WEAPON | DROP_RSW | ASSEMBLE |
 F:LEVEL_SPEED | RES_BLUNT | IM_EDGED | DROP_MINERAL | LEVEL_SIZE |
 F:LEVEL_POWER |
-S:BLOW_2 | BLOW_2 | ADD_AMMO
+S:BLOW_3 | BLOW_4 | ADD_AMMO
 D:It is a massive statue of purest mithril.  It looks expensive!
 
 N:319:Shadow drake
@@ -5815,7 +5815,7 @@ D:It is a giant dog that glows with heat.  Flames pour from its nostrils.
 
 N:362:Eog golem
 G:g:u
-I:100:100d20:12:125:10
+I:105:100d20:12:125:10
 W:51:4:20:2600
 M:0:25:10:20
 B:HIT:HURT:8d6
@@ -8251,7 +8251,7 @@ D: you sense trouble.
 
 N:488:Lead golem
 G:g:y
-I:100:80d10:12:80:10
+I:105:80d10:12:80:10
 W:40:3:20:530
 M:0:0:0:0
 B:HIT:HURT:3d10
@@ -14132,13 +14132,13 @@ D:It is ugly and covered in horned warts.
 
 N:827:Steel golem
 G:g:w
-I:100:80d14:12:130:10
+I:105:80d14:12:130:10
 W:42:3:20:770
 M:10:0:0:0
 B:HIT:HURT:2d10
 B:HIT:HURT:2d10
 B:HIT:HURT:2d10
-B:SHOT:BATTER:10d10
+B:SHOT:BATTER:20d10
 F:FORCE_SLEEP |
 F:COLD_BLOOD | EMPTY_MIND | BASH_DOOR |
 F:HUGE | NONLIVING | IM_ELEC | IM_FIRE | IM_COLD | IM_POIS | NO_FEAR |
@@ -14146,12 +14146,12 @@ F:NO_CONF | NO_SLEEP |
 F:HAS_CORPSE | HAS_HEAD | HAS_HAND | HAS_ARM | HAS_LEG | ASSEMBLE |
 F:LEVEL_SPEED | ATTR_METAL | LEVEL_SIZE | LEVEL_POWER | IM_EDGED | RES_BLUNT
 S:BLOW_4
-D:It is a massive steel statue that moves steadily towards you.  A port
-D: opens in its chest, revealing the muzzle of a great cannon.
+D:It is a massive steel statue of a rivetted armoured figure that moves steadily towards you.  A port
+D: open in its chest reveals the muzzle of a great cannon.
 
 N:828:Copper golem
 G:g:U
-I:100:80d8:12:100:10
+I:105:80d8:12:100:10
 W:33:3:20:330
 M:0:14:23:60
 B:HIT:HURT:2d7
@@ -14159,17 +14159,17 @@ B:AURA:ELEC:2d4
 F:FORCE_SLEEP | ONLY_GOLD | DROP_1D2 | DROP_1D3 | DROP_1D4 |
 F:COLD_BLOOD | EMPTY_MIND | BASH_DOOR |
 F:HUGE | NONLIVING | IM_ELEC | IM_FIRE | IM_COLD | IM_POIS | NO_FEAR |
-F:NO_CONF | NO_SLEEP |
+F:NO_CONF | NO_SLEEP | HAS_AURA
 F:HAS_CORPSE | HAS_HEAD | HAS_HAND | HAS_ARM | HAS_LEG | DROP_TOOL |
 F:DROP_WEAPON | DROP_RSW | ASSEMBLE | IM_EDGED | RES_BLUNT
 F:LEVEL_SPEED | DROP_MINERAL | ATTR_METAL | LEVEL_SIZE | LEVEL_POWER |
-S:BOLT_ELEC |
-D:It is a massive copper statue that moves steadily towards you.  Sparks
+S:BEAM_ELEC | AURA
+D:It is a massive copper statue of weird geometric shapes that moves steadily towards you.  Sparks
 D: shoot from coils and wires atop its three legged body.
 
 N:829:Brass golem
 G:g:o
-I:100:80d11:12:100:10
+I:105:80d11:12:100:10
 W:42:3:20:770
 M:0:14:27:80
 B:HIT:HURT:2d12
@@ -14177,22 +14177,22 @@ B:AURA:ACID:2d4
 F:FORCE_SLEEP | ONLY_GOLD | DROP_1D2 | DROP_1D3 | DROP_1D4 |
 F:COLD_BLOOD | EMPTY_MIND | BASH_DOOR |
 F:HUGE | NONLIVING | IM_ACID | IM_ELEC | IM_FIRE | IM_COLD | IM_POIS |
-F:RES_DISEN | NO_FEAR | NO_CONF | NO_SLEEP |
+F:RES_DISEN | NO_FEAR | NO_CONF | NO_SLEEP | HAS_AURA
 F:HAS_CORPSE | HAS_HEAD | HAS_HAND | HAS_ARM | HAS_LEG | DROP_TOOL |
 F:DROP_WEAPON | DROP_RSW | ASSEMBLE | IM_EDGED | RES_BLUNT
 F:LEVEL_SPEED | DROP_MINERAL | ATTR_METAL | LEVEL_SIZE | LEVEL_POWER |
-S:BALL_ACID | BOLT_ACID |
-D:It is a massive brass statue that moves steadily towards you.  Acid
+S:BALL_ACID | BOLT_ACID | AURA
+D:It is a massive brass statue of a mishapen figure that moves steadily towards you.  Acid
 D: leaks from a multitude of pipes in its body.
 
 N:830:Silver golem
 G:g:W
-I:110:80d9:12:100:10
+I:110:80d19:12:100:10
 W:39:3:20:460
 M:14:14:24:80
 B:HIT:HURT:2d8
 B:HIT:HURT:2d8
-B:GAZE:BLIND:2d6
+B:GAZE:BLIND:12d6
 F:FORCE_SLEEP | ONLY_GOLD | DROP_1D2 | DROP_1D4 |
 F:COLD_BLOOD | EMPTY_MIND | BASH_DOOR |
 F:HUGE | NONLIVING | IM_ACID | IM_ELEC | IM_FIRE | IM_COLD | IM_POIS |
@@ -14200,8 +14200,8 @@ F:NO_FEAR | NO_CONF | NO_SLEEP |
 F:HAS_CORPSE | HAS_HEAD | HAS_HAND | HAS_ARM | HAS_LEG | DROP_TOOL |
 F:DROP_WEAPON | DROP_RSW | ASSEMBLE | IM_EDGED | RES_BLUNT
 F:LEVEL_SPEED | DROP_MINERAL | ATTR_METAL | LEVEL_SIZE | LEVEL_POWER |
-S:BALL_LITE
-D:It is a massive silver statue that moves steadily towards you.  Its
+S:BALL_LITE | BLOW_3
+D:It is a massive silver statue of a beautiful figure that moves steadily towards you.  Its
 D: mirror sheen reflects the light all around it.
 
 N:831:Gold golem
@@ -14224,7 +14224,7 @@ D: charges towards you, roaring in a facisimilie of anger.
 
 N:832:Coal golem
 G:g:D
-I:100:80d12:12:80:10
+I:105:80d12:12:80:10
 W:33:3:20:330
 M:0:14:26:75
 B:HIT:HURT:1d12
@@ -14233,15 +14233,15 @@ B:AURA:STEAM:3d4
 F:FORCE_SLEEP |
 F:COLD_BLOOD | EMPTY_MIND | BASH_DOOR |
 F:HUGE | NONLIVING | HURT_ROCK | IM_ELEC | IM_FIRE | IM_COLD | IM_POIS |
-F:NO_FEAR | NO_CONF | NO_SLEEP |
+F:NO_FEAR | NO_CONF | NO_SLEEP | HAS_AURA
 F:HAS_CORPSE | HAS_HEAD | HAS_HAND | HAS_ARM | HAS_LEG | ASSEMBLE |
 F:LEVEL_SPEED | ATTR_METAL | LEVEL_SIZE | LEVEL_POWER | IM_EDGED
-S:BOLT_FIRE |
+S:BOLT_FIRE | AURA
 S:DARKNESS |
 D:It is a massive coal-powered statue that moves steadily towards you.
 
 N:833:Brass monkey
-G:g:o
+G:Y:o
 I:110:14d8:12:30:10
 W:32:3:0:65
 M:14:0:0:0
@@ -22876,8 +22876,8 @@ W:2:4:0:2
 M:0:0:0:0
 B:CRUSH:HURT:1d4
 B:HIT:PETRIFY
-F:FORCE_SLEEP | FRIENDS | NEVER_MOVE | DROP_60 |
-F:STUPID | COLD_BLOOD | EMPTY_MIND |
+F:FORCE_SLEEP | FRIENDS | NEVER_MOVE | DROP_30 |
+F:STUPID | COLD_BLOOD | EMPTY_MIND | DROP_JEWELRY | DROP_JUNK
 F:PLANT | NO_FEAR | NO_CONF | NO_SLEEP |
 F:RES_BLIND | RES_BLUNT | NO_CUTS | LEVEL_SIZE |
 D:A mass of vegetation.  As you pass near it, it reaches out tendrils to
@@ -22911,7 +22911,8 @@ F:MALE | FEMALE |
 F:OPEN_DOOR | BASH_DOOR | NEED_LITE |
 F:ORC | EVIL | IM_POIS |
 F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_HAND |
-F:HAS_ARM | HAS_LEG | HAS_BLOOD | DROP_ARMOR |
+F:HAS_ARM | HAS_LEG | HAS_BLOOD | DROP_TOOL | DROP_WEAPON |
+F:DROP_CLOTHES | DROP_ARMOR | DROP_FOOD | DROP_JUNK |
 F:SCENT | DWARF |
 S:BLOW_2 |
 D:|He|She| is equipped with a pick axe and an explosive charge, neither of
