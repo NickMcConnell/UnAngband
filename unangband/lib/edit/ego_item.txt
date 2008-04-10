@@ -10,6 +10,17 @@
 # See "lib/docs/modding.rtf" to understand this file and how to modify
 # it and related files.
 
+# Ego_Item.txt entry format
+
+# N: serial number : ego type
+# X: inventory slot : rating : xtra
+# C: max to-hit : max to-dam : max to-ac : pval
+# W: depth : rarity : weight : cost
+# T: tval : min_sval : max_sval
+# F: flag | flag | etc
+# Y:rune type : rune count
+# A: activation : recharge time : recharge time dice
+
 # Version stamp (required)
 
 

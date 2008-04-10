@@ -11,6 +11,19 @@
 # See "lib/docs/modding.rtf" to understand this file and how to modify
 # it and related files.
 
+# P_race.txt entry format
+
+# N:race number:race name
+# S:str:int:wis:dex:con:chr:agi:siz
+# R:dis:dev:sav:stl:srh:dig:tht:thn:thb
+# X:expbase:infra:monster race equivalent
+# I:history:agebase:agemod:hometown
+# H:hgtmale:modhgtmale:hgtfemale:modhgtfemale
+# W:wgtmale:wgtfemale
+# F:racial flags
+# C:classes (numeric)
+# O:wield:bow:left_ring:right_ring:neck:lite:body:outer:arm:head:hands:feet
+# D:adjective
 
 # Version stamp (required)
 

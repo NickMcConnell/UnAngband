@@ -11,6 +11,18 @@
 # See "lib/docs/modding.rtf" to understand this file and how to modify
 # it and related files.
 
+# Monster.txt entry format
+
+# N: serial number : monster name
+# G: symbol : color
+# I: speed : hit points : vision : armor class : alertness
+# W: depth : rarity : group index : experience for kill
+# M: innate frequency : spell frequency : spell power : mana
+# B: attack method : attack effect : damage
+# S: spell type | spell type | etc
+# F: flag | flag | etc
+# D: Description
+
 # Version stamp (required)
 
 

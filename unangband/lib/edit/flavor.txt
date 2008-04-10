@@ -11,6 +11,11 @@
 # See "lib/docs/modding.rtf" to understand this file and how to modify
 # it and related files.
 
+# Flavor.txt entry format
+
+# N:<index>:<tval>:<sval>
+# G:<char>:<attr>
+# D:<text>
 
 # Version stamp (required)
 

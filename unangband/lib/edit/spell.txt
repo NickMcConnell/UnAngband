@@ -8,6 +8,16 @@
 # See "lib/docs/modding.rtf" to understand this file and how to modify
 # it and related files.
 
+# Spell.txt entry format
+
+# N: number : name
+# A: tval : sval : slot
+# C: class : level : mana : failure : min failure
+# F: flags
+# B: attack method : attack effect : damage
+# L: duration
+# S: other effect : parameter
+# D: description
 
 # Version stamp (required)
 

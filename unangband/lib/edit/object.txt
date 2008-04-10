@@ -11,6 +11,16 @@
 # See "lib/docs/modding.rtf" to understand this file and how to modify
 # it and related files.
 
+# Object.txt entry format
+
+# N: serial number : & object name~
+# G: symbol : color
+# I: tval : sval : pval
+# W: depth : charges : weight : cost
+# P: base armor class : base damage : plus to-hit : plus to-dam : plus to-ac
+# A: depth/rarity : depth/rarity : etc
+# F: flag | flag | etc
+# Y: rune type | rune count
 
 # Version stamp (required)
 
