@@ -8814,6 +8814,25 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 	return (obvious);
 }
 
+/*
+ * Inflict a disease on the player if damage exceeds threshold
+ */
+static void inflict_disease(u32b disease, int dam, int serious)
+{
+	/* Serious affliction */
+	if (dam > serious)
+	{
+		if (p_ptr->disease == (disease | DISEASE_LIGHT)) p_ptr->disease = 0;
+		p_ptr->disease |= (disease);
+
+	}
+	else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
+	{
+		p_ptr->disease |= (disease | DISEASE_LIGHT);
+	}
+}
+
+
 
 /*
  * Helper function for "project()" below.
@@ -9089,7 +9108,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		{
 			if (fuzzy) msg_print("You are hit by something!");
 
-			/* Disease resistance */
+			/* Vulnerability */
 			if ((p_ptr->cur_flags4 & (TR4_EVIL)) != 0)
 			{
 				/* Always notice */
@@ -9419,20 +9438,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,TR2_RES_SHARD,0x0L,0x0L);
 
 				/* Inflict disease */
-				if ((p_ptr->cut) && (randint(150) < dam))
-				{
-					/* Serious affliction */
-					if (dam > 50)
-					{
-						if (p_ptr->disease == (DISEASE_CUT | DISEASE_LIGHT)) p_ptr->disease = 0;
-						p_ptr->disease |= (DISEASE_CUT);
-
-					}
-					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
-					{
-						p_ptr->disease |= (DISEASE_CUT | DISEASE_LIGHT);
-					}
-				}
+				if ((p_ptr->cut) && (randint(150) < dam)) inflict_disease(DISEASE_CUT, dam, 50);
 
 				/* Inflict cuts */
 				(void)set_cut(p_ptr->cut + dam);
@@ -9460,19 +9466,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
 				/* Inflict disease */
-				if ((p_ptr->stun) && (randint(100) < k))
-				{
-					/* Serious affliction */
-					if (k > 20)
-					{
-						if (p_ptr->disease == (DISEASE_STUN | DISEASE_LIGHT)) p_ptr->disease = 0;
-						p_ptr->disease |= (DISEASE_STUN);
-					}
-					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
-					{
-						p_ptr->disease |= (DISEASE_STUN | DISEASE_LIGHT);
-					}
-				}
+				if ((p_ptr->stun) && (randint(100) < k)) inflict_disease(DISEASE_STUN, k, 20);
 
 				/* Inflict stun */
 				(void)set_stun(p_ptr->stun ? p_ptr->stun + randint(MIN(10, k)) : k);
@@ -9498,19 +9492,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
 
 				/* Inflict disease */
-				if ((p_ptr->confused) && (randint(300) < dam))
-				{
-					/* Serious affliction */
-					if (dam > 50)
-					{
-						if (p_ptr->disease == (DISEASE_CONFUSE | DISEASE_LIGHT)) p_ptr->disease = 0;
-						p_ptr->disease |= (DISEASE_CONFUSE);
-					}
-					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
-					{
-						p_ptr->disease |= (DISEASE_CONFUSE | DISEASE_LIGHT);
-					}
-				}
+				if ((p_ptr->confused) && (randint(300) < dam)) inflict_disease(DISEASE_CONFUSE, dam, 50);
 
 				/* Inflict confusion */
 				(void)set_confused(p_ptr->confused ? p_ptr->confused + 1 : randint(20) + 10);
@@ -9535,19 +9517,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				int k = 6 + randint(dam / 2);
 
 				/* Inflict disease */
-				if ((p_ptr->image) && (randint(100) < k))
-				{
-					/* Serious affliction */
-					if (k > 20)
-					{
-						if (p_ptr->disease == (DISEASE_HALLUC | DISEASE_LIGHT)) p_ptr->disease = 0;
-						p_ptr->disease |= (DISEASE_HALLUC);
-					}
-					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
-					{
-						p_ptr->disease |= (DISEASE_HALLUC | DISEASE_LIGHT);
-					}
-				}
+				if ((p_ptr->image) && (randint(100) < k)) inflict_disease(DISEASE_HALLUC, k, 20);
 
 				/* Inflict hallucination */
 				if (set_image(p_ptr->image ? p_ptr->image + 1 : k))
@@ -10276,19 +10246,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,TR2_RES_BLIND,0x0L,0x0L);
 
 				/* Inflict disease */
-				if ((p_ptr->blind) && (randint(400) < dam))
-				{
-					/* Serious affliction */
-					if (dam > 50)
-					{
-						if (p_ptr->disease == (DISEASE_BLIND | DISEASE_LIGHT)) p_ptr->disease = 0;
-						p_ptr->disease |= (DISEASE_BLIND);
-					}
-					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
-					{
-						p_ptr->disease |= (DISEASE_BLIND | DISEASE_LIGHT);
-					}
-				}
+				if ((p_ptr->blind) && (randint(400) < dam)) inflict_disease(DISEASE_BLIND, dam, 50);
 
 				/* Inflict blindness -- always cumulative */
 				if (set_blind(p_ptr->blind + 10 + randint(dam)))
@@ -10346,19 +10304,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L);
 
 				/* Inflict disease */
-				if ((p_ptr->afraid) && (randint(400) < dam))
-				{
-					/* Serious affliction */
-					if (dam > 50)
-					{
-						if (p_ptr->disease == (DISEASE_FEAR | DISEASE_LIGHT)) p_ptr->disease =0;
-						p_ptr->disease |= (DISEASE_FEAR);
-					}
-					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
-					{
-						p_ptr->disease |= (DISEASE_FEAR | DISEASE_LIGHT);
-					}
-				}
+				if ((p_ptr->afraid) && (randint(400) < dam)) inflict_disease(DISEASE_FEAR, dam, 50);
 
 				/* Inflict fear - always cumulative */
 				if (set_afraid(p_ptr->afraid + 3 + randint(dam)))
@@ -10394,19 +10340,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (p_ptr->msleep)
 			{
 				/* Inflict disease */
-				if (randint(400) < dam)
-				{
-					/* Serious affliction */
-					if (dam > 150)
-					{
-						if (p_ptr->disease == (DISEASE_SLEEP | DISEASE_LIGHT)) p_ptr->disease = 0;
-						p_ptr->disease |= (DISEASE_SLEEP);
-					}
-					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
-					{
-						p_ptr->disease |= (DISEASE_SLEEP | DISEASE_LIGHT);
-					}
-				}
+				if (randint(400) < dam) inflict_disease(DISEASE_SLEEP, dam, 150);
 
 				/* Inflict sleepiness */
 				if (set_msleep(p_ptr->msleep + dam))
@@ -10450,20 +10384,8 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (p_ptr->cursed)
 			{
 				/* Inflict disease */
-				if (randint(400) < dam)
-				{
-					/* Serious affliction */
-					if (dam > 150)
-					{
-						if (p_ptr->disease == (DISEASE_CURSE | DISEASE_LIGHT)) p_ptr->disease = 0;
-						p_ptr->disease |= (DISEASE_CURSE);
-					}
-					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
-					{
-						p_ptr->disease |= (DISEASE_CURSE | DISEASE_LIGHT);
-					}
-				}
-
+				if (randint(400) < dam) inflict_disease(DISEASE_CURSE, dam, 150);
+				
 				/* Inflict curse */
 				if (set_cursed(p_ptr->cursed + k))
 				{
@@ -10499,19 +10421,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (p_ptr->amnesia)
 			{
 				/* Inflict disease */
-				if (randint(400) < dam)
-				{
-					/* Serious affliction */
-					if (dam > 150)
-					{
-						if (p_ptr->disease == (DISEASE_AMNESIA | DISEASE_LIGHT)) p_ptr->disease = 0;
-						p_ptr->disease |= (DISEASE_AMNESIA);
-					}
-					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
-					{
-						p_ptr->disease |= (DISEASE_AMNESIA | DISEASE_LIGHT);
-					}
-				}
+				if (randint(400) < dam) inflict_disease(DISEASE_AMNESIA, dam, 150);
 
 				/* Inflict amnesia */
 				if (set_amnesia(k))
@@ -10559,19 +10469,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (p_ptr->petrify)
 			{
 				/* Inflict disease */
-				if (randint(200) < dam)
-				{
-					/* Serious affliction */
-					if (dam > 100)
-					{
-						if (p_ptr->disease == (DISEASE_PETRIFY | DISEASE_LIGHT)) p_ptr->disease = 0;
-						p_ptr->disease |= (DISEASE_PETRIFY);
-					}
-					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
-					{
-						p_ptr->disease |= (DISEASE_PETRIFY | DISEASE_LIGHT);
-					}
-				}
+				if (randint(200) < dam) inflict_disease(DISEASE_PETRIFY, dam, 100);
 
 				/* Inflict petrification */
 				if (set_petrify(p_ptr->petrify + k))
@@ -10624,19 +10522,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (p_ptr->paralyzed)
 			{
 				/* Inflict disease */
-				if (randint(20) < dam)
-				{
-					/* Serious affliction */
-					if (dam > 50)
-					{
-						if (p_ptr->disease == (DISEASE_PARALYZE | DISEASE_LIGHT)) p_ptr->disease = 0;
-						p_ptr->disease |= (DISEASE_PARALYZE);
-					}
-					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
-					{
-						p_ptr->disease |= (DISEASE_PARALYZE | DISEASE_LIGHT);
-					}
-				}
+				if (randint(20) < dam) inflict_disease(DISEASE_PARALYZE, dam, 20);
 			}
 			else
 			{
@@ -10673,19 +10559,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (p_ptr->stastis)
 			{
 				/* Inflict disease */
-				if (randint(400) < dam)
-				{
-					/* Serious affliction */
-					if (dam > 250)
-					{
-						if (p_ptr->disease == (DISEASE_STASTIS | DISEASE_LIGHT)) p_ptr->disease = 0;
-						p_ptr->disease |= (DISEASE_STASTIS);
-					}
-					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT)))
-					{
-						p_ptr->disease |= (DISEASE_STASTIS | DISEASE_LIGHT);
-					}
-				}
+				if (randint(400) < dam) inflict_disease(DISEASE_STASTIS, dam, 250);
 			}
 			else
 			{
@@ -10730,19 +10604,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
 
 				/* Inflict disease */
-				if ((p_ptr->slow) && (randint(200) < dam))
-				{
-					/* Serious affliction */
-					if (dam > 50)
-					{
-						if (p_ptr->disease == (DISEASE_SLOW | DISEASE_LIGHT)) p_ptr->disease = 0;
-						p_ptr->disease |= (DISEASE_SLOW);
-					}
-					else if ((p_ptr->disease == 0) || (p_ptr->disease & (DISEASE_LIGHT | DISEASE_DISEASE)))
-					{
-						p_ptr->disease |= (DISEASE_SLOW | DISEASE_LIGHT);
-					}
-				}
+				if ((p_ptr->slow) && (randint(200) < dam)) inflict_disease(DISEASE_SLOW, dam, 50);
 
 				/* Inflict slowness */
 				if (set_slow(p_ptr->slow ? p_ptr->slow + 3 : randint(25) + 15)) obvious = TRUE;
