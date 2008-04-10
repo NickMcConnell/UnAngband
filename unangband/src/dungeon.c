@@ -638,7 +638,7 @@ void suffer_disease(bool allow_cure)
 			n = randint(p_ptr->depth / 5) + 1;
 
 			/* A nasty chest wound */
-			take_hit(damroll(n, 8),"the birth of a parasite");
+			take_hit(SOURCE_BIRTH, parasite_hack[effect], damroll(n, 8));
 
 			/* Stop using ecology */
 			cave_ecology.ready = FALSE;
@@ -962,7 +962,7 @@ static void process_world(void)
 	if (p_ptr->poisoned)
 	{
 		/* Take damage */
-		take_hit(1, "poison");
+		take_hit(SOURCE_POISON, 0, 1);
 	}
 
 	/* Take damage from cuts */
@@ -987,9 +987,8 @@ static void process_world(void)
 		}
 
 		/* Take damage */
-		take_hit(i, "a fatal wound");
+		take_hit(SOURCE_CUTS, i, i);
 	}
-
 
 	/*** Check the Food, Rest, and Regenerate ***/
 
@@ -1044,7 +1043,7 @@ static void process_world(void)
 		i = (PY_FOOD_STARVE - p_ptr->food) / 10;
 
 		/* Take damage */
-		take_hit(i, "starvation");
+		take_hit(SOURCE_HUNGER, 0, i);
 	}
 
 	/* Default regeneration */
@@ -1386,10 +1385,11 @@ static void process_world(void)
 			if (!(p_ptr->disease & (DISEASE_DRAIN_HP))) equip_can_flags(0x0L,0x0L,TR3_DRAIN_HP,0x0L);
 
 			if (p_ptr->disease & (DISEASE_DRAIN_HP))
-				take_hit(1, "disease");
+				take_hit(SOURCE_DISEASE, DISEASE_DRAINING, 1);
 			else
-				take_hit(1, "curse");
-
+			{
+				take_hit(SOURCE_CURSED_ITEM, 0, 1);
+			}
 		}
 	}
 

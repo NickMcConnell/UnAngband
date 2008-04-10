@@ -1642,7 +1642,7 @@ void do_cmd_debug(void)
 			bool cancel = FALSE;
 			bool known = TRUE;
 
-			process_spell_flags(92, 100, &cancel, &known);
+			process_spell_flags(SOURCE_PLAYER_WIZARD, 0, 92, 100, &cancel, &known);
 			break;
 		}
 		

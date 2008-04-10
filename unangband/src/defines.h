@@ -1609,6 +1609,7 @@
 /* Maximum number of disease flags that can randomly affect the player */
 #define DISEASE_TYPES 17
 #define DISEASE_BLOWS 23
+#define DISEASE_DRAINING 23	/* Index of disease_drain_hp */
 #define DISEASE_SPECIAL 25
 #define DISEASE_TYPES_HEAVY 26
 
@@ -2768,31 +2769,40 @@
 #define SOURCE_DISEASE			-4	/* Source is a disease */
 #define SOURCE_DAYLIGHT			-5	/* Source is the sun */
 #define SOURCE_BIRTH			-6	/* Source is birth of monster race */
-#define SOURCE_PLAYER_ALLY		-7
-#define SOURCE_PLAYER_ATTACK	-8
-#define SOURCE_PLAYER_SHOT		-9
-#define SOURCE_PLAYER_THROW		-10
-#define SOURCE_PLAYER_TRAP		-11
-#define SOURCE_PLAYER_BREAK		-12
-#define SOURCE_PLAYER_SPORE		-13
-#define SOURCE_PLAYER_COATING	-14
-#define SOURCE_PLAYER_EAT_MONSTER	-15
-#define SOURCE_PLAYER_EAT		-16
-#define SOURCE_PLAYER_QUAFF		-17
-#define SOURCE_PLAYER_AIM		-18	/* Wands */
-#define SOURCE_PLAYER_ZAP		-19	/* Rods - with target specified */
-#define SOURCE_PLAYER_ZAP_NO_TARGET		-20	/* Rods - with no target specified */
-#define SOURCE_PLAYER_READ		-21
-#define SOURCE_PLAYER_USE		-22	/* Staffs*/
-#define SOURCE_PLAYER_ACT_ARTIFACT	-23
-#define SOURCE_PLAYER_ACT_EGO_ITEM	-24
-#define SOURCE_PLAYER_ACTIVATE	-25
-#define SOURCE_PLAYER_SERVICE	-26
-#define SOURCE_PLAYER_CAST		-27
-#define SOURCE_PLAYER_END		-28
+#define SOURCE_CUTS				-7	/* Source is accumulated cuts */
+#define SOURCE_POISON			-8	/* Source is accumulated poison */
+#define SOURCE_HUNGER			-9	/* Source is hunger */
+#define SOURCE_CURSED_ITEM		-10	/* Source is a cursed item that drains you */
+#define SOURCE_ENTOMB			-11	/* Source is a feature that crushes you */
+#define SOURCE_BLOOD_DEBT		-12	/* Source is a blood debt */
+#define SOURCE_PLAYER_ALLY		-13
+#define SOURCE_PLAYER_ATTACK	-14
+#define SOURCE_PLAYER_SHOT		-15
+#define SOURCE_PLAYER_THROW		-16
+#define SOURCE_PLAYER_TRAP		-17
+#define SOURCE_PLAYER_BREAK		-18
+#define SOURCE_PLAYER_SPORE		-19
+#define SOURCE_PLAYER_COATING	-20
+#define SOURCE_PLAYER_EAT_MONSTER	-21
+#define SOURCE_PLAYER_VAMP_DRAIN	-22
+#define SOURCE_PLAYER_EAT		-23
+#define SOURCE_PLAYER_QUAFF		-24
+#define SOURCE_PLAYER_AIM		-25	/* Wands */
+#define SOURCE_PLAYER_ZAP		-26	/* Rods - with target specified */
+#define SOURCE_PLAYER_ZAP_NO_TARGET		-27	/* Rods - with no target specified */
+#define SOURCE_PLAYER_READ		-28
+#define SOURCE_PLAYER_USE		-29	/* Staffs*/
+#define SOURCE_PLAYER_ACT_ARTIFACT	-30
+#define SOURCE_PLAYER_ACT_EGO_ITEM	-31
+#define SOURCE_PLAYER_ACTIVATE	-32
+#define SOURCE_PLAYER_SERVICE	-33
+#define SOURCE_PLAYER_WIZARD	-34
+#define SOURCE_PLAYER_CAST		-35
+#define SOURCE_PLAYER_END		-36
 
-#define SOURCE_PLAYER_START		-7	/* Less than here or equal to here, player is the source, and gets experience */
-#define SOURCE_PLAYER_NO_TARGET	-20	/* Less than here or equal to here, no target is specified and some messages are suppressed.
+#define SOURCE_PREFIX			-11	/* Less than here or equal to here, we suffix the string, otherwise we prefix it */
+#define SOURCE_PLAYER_START		-13	/* Less than here or equal to here, player is the source, and gets experience */
+#define SOURCE_PLAYER_NO_TARGET	-27	/* Less than here or equal to here, no target is specified and some messages are suppressed.
 									 * Note that all items less than here that could specify a target always have a 'known' effect. */
 
 #define SOURCE_MESSAGES	4

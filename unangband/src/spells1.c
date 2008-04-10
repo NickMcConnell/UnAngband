@@ -1212,12 +1212,12 @@ static u16b bolt_pict(int y, int x, int ny, int nx, int typ)
  * when he dies, since the "You die." message is shown before setting
  * the player to "dead".
  */
-void take_hit(int dam, cptr kb_str)
+void take_hit(int who, int what, int dam)
 {
 	int old_chp = p_ptr->chp;
 
 	int warning = (p_ptr->mhp * op_ptr->hitpoint_warn / 10);
-
+	
 #ifdef ALLOW_BORG
 	/* Mega-Hack -- Borg can't be hurt. */
 	if (count_stop) return;
@@ -1236,14 +1236,15 @@ void take_hit(int dam, cptr kb_str)
 	/* Make test-id and traps less deadly */
 	if (p_ptr->chp >= p_ptr->mhp / 2
 		 && dam >= p_ptr->chp
-	    && (cause_of_damage == SOURCE_FEATURE
-			  || cause_of_damage == SOURCE_PLAYER_COATING
-			  || cause_of_damage == SOURCE_PLAYER_EAT_MONSTER
-			  || cause_of_damage == SOURCE_PLAYER_EAT
-			  || cause_of_damage == SOURCE_PLAYER_QUAFF
-			  || cause_of_damage == SOURCE_PLAYER_READ
-			  || cause_of_damage == SOURCE_PLAYER_ZAP_NO_TARGET
-			  || cause_of_damage == SOURCE_OBJECT))
+	    && (who == SOURCE_FEATURE
+			  || who == SOURCE_PLAYER_COATING
+			  || who == SOURCE_PLAYER_EAT_MONSTER
+			  || who == SOURCE_PLAYER_VAMP_DRAIN
+			  || who == SOURCE_PLAYER_EAT
+			  || who == SOURCE_PLAYER_QUAFF
+			  || who == SOURCE_PLAYER_READ
+			  || who == SOURCE_PLAYER_ZAP_NO_TARGET
+			  || who == SOURCE_OBJECT))
 		 p_ptr->chp = 1;
 	else
 		/* Hurt the player */
@@ -1261,10 +1262,163 @@ void take_hit(int dam, cptr kb_str)
 		/* Hack -- Note death */
 		message(MSG_DEATH, 0, "You die.");
 		msg_print(NULL);
+		
+		/* Get the killer */
+		if (who > SOURCE_MONSTER_START)
+		{
+			/* Get the monster's real name */
+			monster_desc(p_ptr->died_from, sizeof(p_ptr->died_from), who, 0x88);
+			
+			/*
+			 * XXX Add what?
+			 * This will be 1-4 for blows 1-4
+			 * and the spell cast for 96 and over.
+			 */
+		}
+		else
+		{
+			/* Start with empty string */
+			p_ptr->died_from[0] = '\0';
+			
+			/* Add object what caused the fatal wound */
+			if (who <= SOURCE_PREFIX)
+			{
+				(void)my_strcat(p_ptr->died_from, cause_of_death[-who][rand_int(4)], sizeof(p_ptr->died_from));
 
-		/* Note cause of death */
-		(void)my_strcpy(p_ptr->died_from, kb_str, sizeof(p_ptr->died_from));
+				/* Hack -- make it clear it was a trap */
+				if (who == SOURCE_PLAYER_TRAP) 
+					(void)my_strcat(p_ptr->died_from, "trap you set with ", sizeof(p_ptr->died_from));		
+			}
 
+			/* Cause of death routine */
+			switch(who)
+			{
+				case SOURCE_PLAYER_ALLY:
+				case SOURCE_SELF:
+				{
+					/* Get the monster's real name */
+					monster_desc(p_ptr->died_from, sizeof(p_ptr->died_from), who, 0x88);
+					
+					break;
+				}
+				
+				case SOURCE_FEATURE:
+				case SOURCE_ENTOMB:
+				{
+					/* Get the source feature */
+					feature_type *f_ptr = &f_info[what];
+					
+					/* Get the feature name */
+					(void)my_strcat(p_ptr->died_from, format("%s %s", is_a_vowel((f_name + f_ptr->name)[0]) ? "an" : "a", f_name + f_ptr->name), sizeof(p_ptr->died_from));
+					
+					break;
+				}
+				
+				case SOURCE_SPELL:
+				case SOURCE_PLAYER_CAST:
+				{
+					/* Get the source spell */
+					spell_type *s_ptr = &s_info[what];
+					
+					/* Get the spell name */
+					(void)my_strcat(p_ptr->died_from, format("%s %s", is_a_vowel((s_name + s_ptr->name)[0]) ? "an" : "a", s_name + s_ptr->name), sizeof(p_ptr->died_from));
+					
+					break;
+				}
+				
+				case SOURCE_DISEASE:
+				{
+					/* Get the feature name */
+					(void)my_strcat(p_ptr->died_from, disease_name[what], sizeof(p_ptr->died_from));
+					
+					break;
+				}
+				
+				case SOURCE_DAYLIGHT:
+				case SOURCE_PLAYER_ATTACK:
+				case SOURCE_PLAYER_SHOT:
+				case SOURCE_PLAYER_THROW:
+				case SOURCE_HUNGER:
+				case SOURCE_POISON:
+				case SOURCE_CUTS:
+				case SOURCE_CURSED_ITEM:
+				case SOURCE_PLAYER_WIZARD:
+				{
+					/* Nothing */
+					
+					break;	
+				}
+
+				case SOURCE_BIRTH:
+				case SOURCE_PLAYER_EAT_MONSTER:
+				case SOURCE_PLAYER_SPORE:
+				case SOURCE_PLAYER_VAMP_DRAIN:
+				case SOURCE_BLOOD_DEBT:
+				{
+					/* Get the source feature */
+					monster_race *r_ptr = &r_info[what];
+					
+					/* Get the feature name */
+					(void)my_strcat(p_ptr->died_from, format("%s %s", is_a_vowel((r_name + r_ptr->name)[0]) ? "an" : "a", r_name + r_ptr->name), sizeof(p_ptr->died_from));
+					
+					break;
+				}			
+				
+				case SOURCE_PLAYER_ACT_EGO_ITEM:
+				{
+					my_strcat(p_ptr->died_from, "an ego item ", sizeof(p_ptr->died_from));
+					my_strcat(p_ptr->died_from, e_name + e_info[what].name, sizeof(p_ptr->died_from));
+					break;
+				}
+				
+				default:
+				{
+					/* Fake object */
+					object_type object_type_body;
+
+					/* Get an object */
+					object_type *o_ptr = &object_type_body;
+					
+					char o_name[80];
+					
+					int kind;
+
+					/* Set up artifact */
+					if (who == SOURCE_PLAYER_ACT_ARTIFACT)
+					{
+						kind = lookup_kind(a_info[what].tval, a_info[what].sval);
+					}
+					/* Set up other item */
+					else
+					{
+						kind = what;
+					}
+					
+					/* Prepare the object */
+					object_prep(o_ptr, kind);
+					
+					/* Hack -- fake knowledge */
+					o_ptr->ident |= (IDENT_STORE);
+					
+					/* Artifact */
+					if (who == SOURCE_PLAYER_ACT_ARTIFACT) o_ptr->name1 = what;
+
+					/* Get the object name */
+					object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
+					
+					(void)my_strcat(p_ptr->died_from, o_name, sizeof(p_ptr->died_from));
+					
+					break;
+				}
+			}
+			
+			/* Add a message of destruction */
+			if (who > SOURCE_PREFIX)
+			{
+				(void)my_strcat(p_ptr->died_from, cause_of_death[-who][rand_int(4)], sizeof(p_ptr->died_from));
+			}
+		}
+		
 		/* No longer a winner */
 		p_ptr->total_winner = FALSE;
 
@@ -2013,7 +2167,7 @@ static int minus_ac(int ac)
 /*
  * Hurt the player with Acid
  */
-static void acid_dam(int who, int dam, cptr kb_str, bool inven)
+static void acid_dam(int who, int what, int dam, bool inven)
 {
 	int inv = (dam / 15) + 1;
 
@@ -2035,7 +2189,7 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 			dam = (dam + 5) / 6;
 
 			/* Take damage */
-			take_hit(dam, kb_str);
+			take_hit(who, what, dam);
 
 			return;
 		}
@@ -2104,14 +2258,14 @@ static void acid_dam(int who, int dam, cptr kb_str, bool inven)
 	if (dam <= 0) return;
 
 	/* Take damage */
-	take_hit(dam, kb_str);
+	take_hit(who, what, dam);
 }
 
 
 /*
  * Hurt the player with electricity
  */
-static void elec_dam(int who, int dam, cptr kb_str, bool inven)
+static void elec_dam(int who, int what, int dam, bool inven)
 {
 	int inv = (dam / 15) + 1;
 
@@ -2133,7 +2287,7 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 			dam = (dam + 2) / 3;
 
 			/* Take damage */
-			take_hit(dam, kb_str);
+			take_hit(who, what, dam);
 
 			return;
 		}
@@ -2199,7 +2353,7 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 	if (dam <= 0) return;
 
 	/* Take damage */
-	take_hit(dam, kb_str);
+	take_hit(who, what, dam);
 }
 
 
@@ -2208,7 +2362,7 @@ static void elec_dam(int who, int dam, cptr kb_str, bool inven)
 /*
  * Hurt the player with Fire
  */
-static void fire_dam(int who, int dam, cptr kb_str, bool inven)
+static void fire_dam(int who, int what, int dam, bool inven)
 {
 	int inv = (dam / 15) + 1;
 
@@ -2230,7 +2384,7 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 			dam = (dam + 2) / 3;
 
 			/* Take damage */
-			take_hit(dam, kb_str);
+			take_hit(who, what, dam);
 
 			return;
 		}
@@ -2295,14 +2449,14 @@ static void fire_dam(int who, int dam, cptr kb_str, bool inven)
 	if (dam <= 0) return;
 
 	/* Take damage */
-	take_hit(dam, kb_str);
+	take_hit(who, what, dam);
 }
 
 
 /*
  * Hurt the player with Cold
  */
-static void cold_dam(int who, int dam, cptr kb_str, bool inven)
+static void cold_dam(int who, int what, int dam, bool inven)
 {
 	int inv = (dam / 15) + 1;
 
@@ -2324,7 +2478,7 @@ static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 			dam = (dam + 2) / 3;
 
 			/* Take damage */
-			take_hit(dam, kb_str);
+			take_hit(who, what, dam);
 
 			return;
 		}
@@ -2389,13 +2543,13 @@ static void cold_dam(int who, int dam, cptr kb_str, bool inven)
 	if (dam <= 0) return;
 
 	/* Take damage */
-	take_hit(dam, kb_str);
+	take_hit(who, what, dam);
 }
 
 /*
  * Hurt the player with Poison
  */
-static void poison_dam(int who, int dam, cptr kb_str, bool inven)
+static void poison_dam(int who, int what, int dam, bool inven)
 {
 	int res = p_ptr->incr_resist[INCR_RES_POIS];
 
@@ -2417,7 +2571,7 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 			dam = (dam + 2) / 3;
 
 			/* Take damage */
-			take_hit(dam, kb_str);
+			take_hit(who, what, dam);
 
 			return;
 		}
@@ -2483,7 +2637,7 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 	}
 
 	/* Take damage */
-	take_hit(dam, kb_str);
+	take_hit(who, what, dam);
 }
 
 
@@ -2491,7 +2645,7 @@ static void poison_dam(int who, int dam, cptr kb_str, bool inven)
 /*
  * Hurt the player with Water
  */
-static void water_dam(int who, int dam, cptr kb_str, bool inven)
+static void water_dam(int who, int what, int dam, bool inven)
 {
 	int inv = (dam / 15) /* + 1 */;
 
@@ -2562,7 +2716,7 @@ static void water_dam(int who, int dam, cptr kb_str, bool inven)
 	if (dam <= 0) return;
 
 	/* Take damage */
-	take_hit(dam, kb_str);
+	take_hit(who, what, dam);
 }
 
 
@@ -6555,7 +6709,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				/* Oops */
 				else if (do_heal)
 				{
-					take_hit(do_heal, "trying to draw health from an undead opponent");
+					take_hit(SOURCE_PLAYER_VAMP_DRAIN, m_ptr->r_idx, do_heal);
 				}
 			}
 			break;
@@ -8698,9 +8852,6 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 	/* Source monster */
 	monster_type *m_ptr=NULL;
 
-	/* Monster name (for damage) */
-	char killer[80];
-
 	/* Target object*/
 	object_type *o_ptr;
 
@@ -8721,163 +8872,6 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 	/* If the player is blind, be more descriptive */
 	if (blind) fuzzy = TRUE;
-
-	/* Get the killer */
-	if (who > SOURCE_MONSTER_START)
-	{
-		/* Get the source monster */
-		m_ptr = &m_list[who];
-
-		/* Get the monster's real name */
-		monster_desc(killer, sizeof(killer), who, 0x88);
-		
-		/*
-		 * XXX Add what?
-		 * This will be 1-4 for blows 1-4
-		 * and the spell cast for 96 and over.
-		 */
-	}
-	else
-	{
-	  /* to make traps and test-id less deadly */
-	  cause_of_damage = who;
-
-		/* Start with empty string */
-		killer[0] = '\0';
-		
-		/* Add object what caused the fatal wound */
-		if (who <= SOURCE_PLAYER_START)
-		{
-			(void)my_strcat(killer, cause_of_death[-who][rand_int(4)], sizeof(killer));
-
-			/* Hack -- make it clear it was a trap */
-			if (who == SOURCE_PLAYER_TRAP) 
-				(void)my_strcat(killer, "trap you set with ", sizeof(killer));		
-		}
-
-		/* Cause of death routine */
-		switch(who)
-		{
-			case SOURCE_PLAYER_ALLY:
-			case SOURCE_SELF:
-			{
-				/* Get the source monster */
-				m_ptr = &m_list[what];
-
-				/* Get the monster's real name */
-				monster_desc(killer, sizeof(killer), who, 0x88);
-				
-				break;
-			}
-			
-			case SOURCE_FEATURE:
-			{
-				/* Get the source feature */
-				feature_type *f_ptr = &f_info[what];
-				
-				/* Get the feature name */
-				(void)my_strcat(killer, format("%s %s", is_a_vowel((f_name + f_ptr->name)[0]) ? "an" : "a", f_name + f_ptr->name), sizeof(killer));
-				
-				break;
-			}
-			
-			case SOURCE_SPELL:
-			case SOURCE_PLAYER_CAST:
-			{
-				/* Get the source spell */
-				spell_type *s_ptr = &s_info[what];
-				
-				/* Get the spell name */
-				(void)my_strcat(killer, format("%s %s", is_a_vowel((s_name + s_ptr->name)[0]) ? "an" : "a", s_name + s_ptr->name), sizeof(killer));
-				
-				break;
-			}
-			
-			case SOURCE_DISEASE:
-			{
-				/* Get the feature name */
-				(void)my_strcat(killer, disease_name[what], sizeof(killer));
-				
-				break;
-			}
-			
-			case SOURCE_DAYLIGHT:
-			case SOURCE_PLAYER_ATTACK:
-			case SOURCE_PLAYER_SHOT:
-			case SOURCE_PLAYER_THROW:
-			{
-				/* Nothing */
-				
-				break;	
-			}
-
-			case SOURCE_BIRTH:
-			case SOURCE_PLAYER_EAT_MONSTER:
-			case SOURCE_PLAYER_SPORE:
-			{
-				/* Get the source feature */
-				monster_race *r_ptr = &r_info[what];
-				
-				/* Get the feature name */
-				(void)my_strcat(killer, format("%s %s", is_a_vowel((r_name + r_ptr->name)[0]) ? "an" : "a", r_name + r_ptr->name), sizeof(killer));
-				
-				break;
-			}			
-			
-			case SOURCE_PLAYER_ACT_EGO_ITEM:
-			{
-				my_strcat(killer, "an ego item ", sizeof(killer));
-				my_strcat(killer, e_name + e_info[what].name, sizeof(killer));
-				break;
-			}
-			
-			default:
-			{
-				/* Fake object */
-				object_type object_type_body;
-
-				/* Get an object */
-				object_type *o_ptr = &object_type_body;
-				
-				char o_name[80];
-				
-				int kind;
-
-				/* Set up artifact */
-				if (who == SOURCE_PLAYER_ACT_ARTIFACT)
-				{
-					kind = lookup_kind(a_info[what].tval, a_info[what].sval);
-				}
-				/* Set up other item */
-				else
-				{
-					kind = what;
-				}
-				
-				/* Prepare the object */
-				object_prep(o_ptr, kind);
-				
-				/* Hack -- fake knowledge */
-				o_ptr->ident |= (IDENT_STORE);
-				
-				/* Artifact */
-				if (who == SOURCE_PLAYER_ACT_ARTIFACT) o_ptr->name1 = what;
-
-				/* Get the object name */
-				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
-				
-				(void)my_strcat(killer, o_name, sizeof(killer));
-				
-				break;
-			}
-		}
-		
-		/* Add a message of destruction */
-		if (who > SOURCE_PLAYER_START)
-		{
-			(void)my_strcat(killer, cause_of_death[-who][rand_int(4)], sizeof(killer));
-		}
-	}
 
 	/* Hack -- storm can do several things */
 	if (typ == GF_STORM)
@@ -8930,7 +8924,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam /= 2;
 
 			msg_print ("You are covered in acid!");
-			acid_dam(who, dam, killer, TRUE);
+			acid_dam(who, what, dam, TRUE);
 			break;
 		}
 
@@ -8941,7 +8935,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam /= 2;
 
 			msg_print ("You are enveloped in flames!");
-			fire_dam(who, dam, killer, TRUE);
+			fire_dam(who, what, dam, TRUE);
 			break;
 		}
 
@@ -8952,7 +8946,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam *= 2;
 
 			msg_print ("You are covered in frost!");
-			cold_dam(who, dam, killer, TRUE);
+			cold_dam(who, what, dam, TRUE);
 			break;
 		}
 
@@ -8964,7 +8958,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam *= 2;
 
 			msg_print("You are struck by electricity!");
-			elec_dam(who, dam, killer, TRUE);
+			elec_dam(who, what, dam, TRUE);
 			break;
 		}
 
@@ -8972,7 +8966,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_POIS:
 		{
 			if (fuzzy) msg_print("You are hit by poison!");
-			poison_dam(who, dam, killer, TRUE);
+			poison_dam(who, what, dam, TRUE);
 			break;
 		}
 
@@ -9071,7 +9065,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			/* Apply damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			
 			/* Suffer the disease */
 			if ((old_disease == p_ptr->disease) && (!p_ptr->is_dead)) suffer_disease(FALSE);
@@ -9083,7 +9077,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_EXPLODE:
 		{
 			if (fuzzy) msg_print("You are hit by something!");
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			break;
 		}
 
@@ -9108,14 +9102,14 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				dam /= 2;
 			}
 
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			break;
 		}
 
 		case GF_HELLFIRE:
 		{
 			if (fuzzy) msg_print("You are hit by hellfire!");
-			fire_dam(2 * dam / 3, 0, killer, TRUE);
+			fire_dam(who, what, 2 * dam / 3, TRUE);
 
 			if (p_ptr->cur_flags4 & (TR4_EVIL))
 			{
@@ -9139,7 +9133,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Hack -- ignore resist blindness */
 				(void)set_blind(p_ptr->blind + rand_range(4, 8));
 			}
-			take_hit(dam /  3, killer);
+			take_hit(who, what, dam /  3);
 
 			/* Test player's saving throw. */
 			if (!(p_ptr->cur_flags4 & (TR4_EVIL)) || (rand_int(100) > p_ptr->skill_sav))
@@ -9203,7 +9197,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_PLASMA:
 		{
 			if (fuzzy) msg_print("You are hit by something!");
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) == 0)
 			{
 				int k = (randint((dam > 40) ? 35 : (dam * 3 / 4 + 5)));
@@ -9262,7 +9256,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 					player_not_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
 				}
 			}
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			break;
 		}
 
@@ -9296,7 +9290,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_WATER);
 			}
 
-			water_dam(who, dam, killer, TRUE);
+			water_dam(who, what, dam, TRUE);
 
 			/* Mark grid for later processing. */
 			cave_temp_mark(y, x, FALSE);
@@ -9324,7 +9318,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				dam = 0;
 			}
 
-			water_dam(who, dam, killer, TRUE);
+			water_dam(who, what, dam, TRUE);
 
 			break;
 		}
@@ -9401,7 +9395,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,TR2_RES_NETHR,0x0L,0x0L);
 			}
 
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			break;
 		}
 
@@ -9440,7 +9434,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Inflict cuts */
 				(void)set_cut(p_ptr->cut + dam);
 			}
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			break;
 		}
 
@@ -9480,7 +9474,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Inflict stun */
 				(void)set_stun(p_ptr->stun ? p_ptr->stun + randint(MIN(10, k)) : k);
 			}
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			break;
 		}
 
@@ -9520,7 +9514,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 			}
 
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			break;
 		}
 
@@ -9530,7 +9524,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (fuzzy) msg_print("You are hit by something!");
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Increase "image" */
 			if ((p_ptr->cur_flags2 & (TR2_RES_CHAOS)) == 0)
@@ -9587,7 +9581,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 				(void)apply_disenchant(0);
 			}
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			break;
 		}
 
@@ -9609,7 +9603,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 				apply_nexus(m_ptr);
 			}
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			break;
 		}
 
@@ -9628,7 +9622,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			{
 				player_can_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
 			}
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Mark grid for later processing. */
 			cave_temp_mark(y, x, FALSE);
@@ -9641,7 +9635,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		{
 			if (fuzzy) msg_print("You are hit by something strange!");
 			(void)set_slow(p_ptr->slow + rand_int(4) + 4);
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			break;
 		}
 
@@ -9690,7 +9684,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Always notice */
 				player_not_flags(who, 0x0L,(TR2_RES_LITE),0x0L,0x0L);
 			}
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			break;
 		}
 
@@ -9725,7 +9719,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Always notice */
 				player_not_flags(who, 0x0L,(TR2_RES_DARK),0x0L,0x0L);
 			}
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			break;
 		}
 
@@ -9768,7 +9762,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 					break;
 				}
 			}
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			break;
 		}
 
@@ -9783,7 +9777,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				k = (randint((dam > 90) ? 35 : (dam / 3 + 5)));
 				(void)set_stun(p_ptr->stun + k);
 			}
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Mark grid for later processing. */
 			cave_temp_mark(y, x, FALSE);
@@ -9795,7 +9789,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_MANA:
 		{
 			if (fuzzy) msg_print("You are hit by something!");
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			break;
 		}
 
@@ -9803,7 +9797,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_METEOR:
 		{
 			if (fuzzy) msg_print("You are hit by something!");
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 			break;
 		}
 
@@ -9812,7 +9806,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		{
 			if (fuzzy) msg_print("You are hit by something sharp!");
 
-			cold_dam(who, dam, killer, TRUE);
+			cold_dam(who, what, dam, TRUE);
 
 			if ((p_ptr->cur_flags2 & (TR2_RES_SHARD)) == 0)
 			{
@@ -9877,7 +9871,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Mark grid for later processing. */
 			cave_temp_mark(y, x, FALSE);
@@ -9894,7 +9888,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			obvious = TRUE;
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			break;
 		}
@@ -9902,7 +9896,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_UN_BONUS:
 		{
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Allow complete resist */
 			if ((p_ptr->cur_flags2 & (TR2_RES_DISEN)) == 0)
@@ -9930,7 +9924,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_UN_POWER:
 		{
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Find an item */
 			for (k = 0; k < 10; k++)
@@ -9993,7 +9987,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_EAT_GOLD:
 		{
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Obvious */
 			obvious = TRUE;
@@ -10049,7 +10043,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_EAT_ITEM:
 		{
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Saving throw (unless paralyzed) based on agi and level */
 			if (!p_ptr->paralyzed &&
@@ -10165,7 +10159,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_EAT_FOOD:
 		{
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Steal some food */
 			for (k = 0; k < 10; k++)
@@ -10216,7 +10210,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_EAT_LITE:
 		{
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Get the lite */
 			o_ptr = &inventory[INVEN_LITE];
@@ -10270,7 +10264,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Increase "blind" */
 			if ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) == 0)
@@ -10327,7 +10321,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Increase "afraid" */
 			if ((p_ptr->cur_flags2 & (TR2_RES_FEAR)) != 0)
@@ -10438,7 +10432,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			int k =	10 + randint(15);
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Blessing protects */
 			if (p_ptr->blessed)
@@ -10491,7 +10485,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			int k =	10 + randint(15);
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Only save protects */
 			if (rand_int(100) < p_ptr->skill_sav)
@@ -10540,7 +10534,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			int k = randint((dam / 3) + 2);
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Increase "petrification" */
 			if ((p_ptr->cur_flags2 & (TR2_RES_SHARD)) != 0)
@@ -10604,7 +10598,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (p_ptr->paralyzed && (dam < 1)) dam = 1;
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Increase "paralyzed" */
 			if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->free_act))
@@ -10665,7 +10659,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (p_ptr->stastis && (dam < 1)) dam = 1;
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Only save protects */
 			if (rand_int(100) < p_ptr->skill_sav)
@@ -10707,7 +10701,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_SLOW:
 		{
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Increase "paralyzed" */
 			if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->free_act))
@@ -10759,7 +10753,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_LOSE_STR:
 		{
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Damage (stat) */
 			if ((drained = do_dec_stat(A_STR)))
@@ -10783,7 +10777,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_LOSE_INT:
 		{
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Damage (stat) */
 			if ((drained = do_dec_stat(A_INT)))
@@ -10799,7 +10793,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_LOSE_WIS:
 		{
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Damage (stat) */
 			if ((drained = do_dec_stat(A_WIS)))
@@ -10815,7 +10809,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_LOSE_DEX:
 		{
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Damage (stat) */
 			if ((drained = do_dec_stat(A_DEX)))
@@ -10838,7 +10832,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_LOSE_CON:
 		{
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Damage (stat) */
 			if ((drained = do_dec_stat(A_CON)))
@@ -10854,7 +10848,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_LOSE_CHR:
 		{
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Damage (stat) */
 			if ((drained = do_dec_stat(A_CHR)))
@@ -10870,7 +10864,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_LOSE_ALL:
 		{
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Lose all stats */
 			for (k = 0; k < A_MAX; k++)
@@ -10896,7 +10890,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			dam -= (dam * ((p_ptr->ac < 150) ? p_ptr->ac : 150) / 250);
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			if (who > SOURCE_MONSTER_START)
 			{
@@ -10920,7 +10914,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			obvious = TRUE;
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0)  && (rand_int(100) < 95))
 			{
@@ -10958,7 +10952,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			obvious = TRUE;
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0) && (rand_int(100) < 90))
 			{
@@ -10997,7 +10991,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			obvious = TRUE;
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0) && (rand_int(100) < 75))
 			{
@@ -11035,7 +11029,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			obvious = TRUE;
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0) && (rand_int(100) < 50))
 			{
@@ -11084,7 +11078,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Always notice */
 				player_not_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
 
-				take_hit(dam, killer);
+				take_hit(who, what, dam);
 			}
 
 			break;
@@ -11110,7 +11104,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 					/* Always notice */
 					player_not_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
 			  
-				take_hit(dam, killer);
+				take_hit(who, what, dam);
 			}
 
 			/* Hack -- no chasm/trap doors on quest/bottom levels */
@@ -11182,7 +11176,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				}
 
 				/* Take the damage */
-				take_hit(dam, killer);
+				take_hit(who, what, dam);
 			}
 			break;
 		}
@@ -11212,11 +11206,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 					(void)set_cut(p_ptr->cut + randint(dam));
 
 					/* Poison the player */
-					poison_dam(who, dam, killer, TRUE);
+					poison_dam(who, what, dam, TRUE);
 				}
 
 				/* Take the damage */
-				take_hit(dam, killer);
+				take_hit(who, what, dam);
 			}
 
 			break;
@@ -11251,7 +11245,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
 			}
 
-			fire_dam(who, dam, killer, TRUE);
+			fire_dam(who, what, dam, TRUE);
 			break;
 		}
 
@@ -11285,7 +11279,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
 			}
 
-			fire_dam(who, dam/3,killer, FALSE);
+			fire_dam(who, what, dam/3, FALSE);
 
 			if ((p_ptr->cur_flags4 & (TR4_HURT_WATER)) != 0)
 			{
@@ -11300,7 +11294,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_WATER);
 			}
 
-			water_dam(who, (dam*2)/3,killer, TRUE);
+			water_dam(who, what, (dam*2)/3, TRUE);
 			break;
 		}
 		case GF_BMUD: /* Fire, water damage */
@@ -11332,8 +11326,8 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
 			}
 
-			water_dam(who, (dam*2)/3,killer, FALSE);
-			fire_dam(who, dam/3,killer, FALSE);
+			water_dam(who, what, (dam*2)/3, FALSE);
+			fire_dam(who, what, dam/3, FALSE);
 			break;
 		}
 
@@ -11351,7 +11345,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (p_ptr->cur_flags4 & (TR4_UNDEAD))
 			{
 				obvious = TRUE;
-				take_hit(dam, killer);
+				take_hit(who, what, dam);
 
 				/* Always notice */
 				player_can_flags(who, 0x0L,0x0L,0x0L,TR4_UNDEAD);
@@ -11383,7 +11377,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				obvious = TRUE;
-				take_hit(dam, killer);
+				take_hit(who, what, dam);
 
 				/* Always notice */
 				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_UNDEAD);
@@ -11406,10 +11400,19 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				{
 					msg_print("You fail to teleport away.");					
 				}
+				else if (who >= SOURCE_MONSTER_START)
+				{
+					char m_name[80];
+					
+					/* Get the monster's real name */
+					monster_desc(p_ptr->died_from, sizeof(p_ptr->died_from), who, 0x40);
+					
+					/* Fails to teleport */
+					msg_format("%^s fails to teleport you away.", m_name);
+				}
 				else
 				{
-					/* Fails to teleport */
-					msg_format("%^s fails to teleport you away.", killer);
+					msg_print("It fails to teleport you away.");
 				}
 
 				/* Learn about anchor */
@@ -11431,8 +11434,8 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		{
 			msg_print("You are scalded by steam.");
 
-			water_dam(who, (dam*2)/3,killer, FALSE);
-			fire_dam(who, dam/3,killer, FALSE);
+			water_dam(who, what, (dam*2)/3, FALSE);
+			fire_dam(who, what, dam/3, FALSE);
 			break;
 		}
 
@@ -11440,7 +11443,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		{
 			msg_print("You are surrounded by acidic vapour.");
 
-			acid_dam(who, dam, killer, FALSE);
+			acid_dam(who, what, dam, FALSE);
 			break;
 		}
 
@@ -11448,7 +11451,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		{
 			msg_print("You are surrounded by smoke.");
 
-			fire_dam(who, dam, killer, FALSE);
+			fire_dam(who, what, dam, FALSE);
 			break;
 		}
 
@@ -11457,7 +11460,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			int drain;
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* Damage (mana) */
 			if (p_ptr->csp)
@@ -11559,7 +11562,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			obvious = TRUE;
 
 			/* Take damage */
-			take_hit(dam, killer);
+			take_hit(who, what, dam);
 
 			/* We're not dead yet */
 			if (!p_ptr->is_dead)
@@ -11674,7 +11677,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				msg_print("You are dispelled!");
 
 				/* Take damage */
-				take_hit(dam, killer);
+				take_hit(who, what, dam);
 			}
 
 			/* Others ignore */
@@ -11704,7 +11707,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				msg_print("You are dispelled!");
 
 				/* Take damage */
-				take_hit(dam, killer);
+				take_hit(who, what, dam);
 			}
 
 			/* Others ignore */

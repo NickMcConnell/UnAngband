@@ -3194,16 +3194,23 @@ const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES] =
 	{"", "", "", ""}, /* SOURCE_SPELL */
 	{"", "", "", ""}, /* SOURCE_DISEASE */
 	{"daylight", "the sun rising", "no UV protection", "your unholy flesh searing in the radiance of day"}, /* SOURCE_DAYLIGHT */
-	{" being born", " being born", " being born", " being born"},	/* SOURCE_BIRTH */
+	{" being born", " hatching", " emerging", " erupting"},	/* SOURCE_BIRTH */
+	{"an untreated scratch", "a nasty cut", "a fatal wound", "poor bandaging"},	/* SOURCE_CUTS */
+	{"poison", "venom", "toxin", "unnatural swelling"},	/* SOURCE_POISON */
+	{"hunger", "starvation", "lack of food", "poor management"},	/* SOURCE_HUNGER */
+	{"an ancient curse", "a perpetual weakness", "a black pact", "the spoor of Morgoth"},	/* SOURCE_CURSED_ITEM */	
+	{"being entombed by ", "being crushed by ", "being buried under ", "a falling cask of Amontillado stored by "},	/* SOURCE_ENTOMB */
+	{"blood debt for a slain ", "backlash for summoning a ", "a dark pact claimed by a dying ", "unearthly powers seeking vengeance on behalf of a "}, /* SOURCE_BLOOD_DEBT */ 
 	{"misjudging ", "treachery of ", "a knife in the back from ", "walking in front of the line of fire of "}, /* SOURCE_PLAYER_ALLY */
-	{"a swing, and a miss", "overenthusiasm", "a hellavu shaving cut", "you're not quite sure how you hit that part of you"}, /* SOURCE_PLAYER_ATTACK */
-	{"a misfire","an unintended discharge","shooting your own foot","you're not quite sure how you shot that part of you"}, /* SOURCE_PLAYER_SHOT */
-	{"a misthrow", "a fumble","juggling a dangerous object","you're not quite sure how you threw that there"}, /* SOURCE_PLAYER_THROW */
+	{"a swing, and a miss", "overenthusiasm", "a hellavu shaving cut", "hmmm... you're not quite sure how you hit that part of you"}, /* SOURCE_PLAYER_ATTACK */
+	{"a misfire","an unintended discharge","shooting your own foot","hmmm... you're not quite sure how you shot that part of you"}, /* SOURCE_PLAYER_SHOT */
+	{"a misthrow", "a fumble","juggling a dangerous object","hmmm... you're not quite sure how you threw that there"}, /* SOURCE_PLAYER_THROW */
 	{"walking headfirst into a ","walking backwards into a ","stumbling into a ","forgetting where you put a "}, /* SOURCE_PLAYER_TRAP */
 	{"breaking ", "smashing ", "cracking open ", "shattering "}, /* SOURCE_PLAYER_BREAK */
 	{"sniffing ", "inhaling ", "snorting ", "getting addicted to "}, /* SOURCE_PLAYER_SPORE */
 	{"a nick from a weapon coated with ", "extract of ", "toxic ", "fumes reeking of "		}, /* SOURCE_PLAYER_COATING */ 
 	{"over cooking ", "undercooking ", "having a taste for ", "not cutting out the poisonous bits off "}, /* SOURCE_PLAYER_EAT_MONSTER */
+	{"trying to draw health from ", "the eldritch power of ", "taking the place of ", "connecting to the Negative Plane through "}, /* SOURCE_PLAYER_VAMP_DRAIN */	
 	{"eating ", "tasting ", "nibbling ", "indigestion from "}, /* SOURCE_PLAYER_EAT */
 	{"quaffing ", "drinking ", "slurping ", "sipping "}, /* SOURCE_PLAYER_QUAFF */ 
 	{"aiming ", "waving ", "pointing ", "holding the wrong end of "}, /* SOURCE_PLAYER_AIM */
@@ -3215,6 +3222,7 @@ const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES] =
 	{"activating ", "relying on ", "having an argument with ", "chancing fate with "}, /* SOURCE_PLAYER_ACT_EGO_ITEM */ 
 	{"activating ", "calling on ", "discharging ", "misusing "}, /* SOURCE_PLAYER_ACTIVATE */ 
 	{"buying ", "acquiring ", "purchasing ", "the ill-judged purchase of "}, /* SOURCE_PLAYER_SERVICE */ 
+	{"if you died here, you shouldn't be using wizard commands", "are you reading the source again?", "hmmph", "i'm going to ROT13 this table"}, /* SOURCE_PLAYER_WIZARD */
 	{"bad luck casting ", "badly casting ", "slurring a syllable casting ", "magical feedback whilst casting "} /* SOURCE_PLAYER_CAST */
 };
 

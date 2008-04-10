@@ -4153,17 +4153,14 @@ void aggravate_monsters(int who)
 /*
  * Delete all non-unique monsters of a given "type" from the level
  */
-bool banishment(void)
+bool banishment(int who, int what, char typ)
 {
 	int i;
 
-	char typ;
-
 	bool result = FALSE;
 
-
 	/* Mega-Hack -- Get a monster symbol */
-	(void)(get_com("Choose a monster race (by symbol) to banishment: ", &typ));
+	if (typ == '\0') (void)(get_com("Choose a monster race (by symbol) to banish: ", &typ));
 
 	/* Delete the monsters of that "type" */
 	for (i = 1; i < m_max; i++)
@@ -4184,7 +4181,7 @@ bool banishment(void)
 		delete_monster_idx(i);
 
 		/* Take some damage */
-		take_hit(randint(4), "the strain of casting Banishment");
+		if (who <= SOURCE_MONSTER_START) take_hit(who, what, randint(4));
 
 		/* Take note */
 		result = TRUE;
@@ -4200,13 +4197,22 @@ bool banishment(void)
 /*
  * Delete all nearby (non-unique) monsters
  */
-bool mass_banishment(void)
+bool mass_banishment(int who, int what, int y, int x)
 {
 	int i;
 
 	bool result = FALSE;
 
-
+	/* Banishment affects player */
+	if (who > SOURCE_PLAYER_START)
+	{
+		if (distance(y, x, p_ptr->py, p_ptr->px) < MAX_SIGHT)
+		{
+			msg_print("You are banished.");
+			p_ptr->leaving = TRUE;
+		}
+	}
+	
 	/* Delete the (nearby) monsters */
 	for (i = 1; i < m_max; i++)
 	{
@@ -4220,13 +4226,13 @@ bool mass_banishment(void)
 		if (r_ptr->flags1 & (RF1_UNIQUE)) continue;
 
 		/* Skip distant monsters */
-		if (m_ptr->cdis > MAX_SIGHT) continue;
+		if (distance(y, x, m_ptr->fy, m_ptr->fx) > MAX_SIGHT) continue;
 
 		/* Delete the monster */
 		delete_monster_idx(i);
 
 		/* Take some damage */
-		take_hit(randint(3), "the strain of casting Mass Banishment");
+		if (who <= SOURCE_PLAYER_START) take_hit(who, what, randint(3));
 
 		/* Note effect */
 		result = TRUE;
@@ -4510,7 +4516,7 @@ void entomb(int cy, int cx, byte invalid)
 		}
 
 		/* Take some damage */
-		if (damage) take_hit(damage, format("being entombed by %s", f_name + f_info[cave_feat[cy][cx]].name));
+		if (damage) take_hit(SOURCE_ENTOMB, cave_feat[cy][cx], damage);
 	}
 	/* Entomb a monster */
 	else if (cave_m_idx[cy][cx] > 0)
@@ -6699,7 +6705,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 
 
 
-bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
+bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, bool *known)
 {
 	spell_type *s_ptr = &s_info[spell];
 
@@ -6994,13 +7000,13 @@ bool process_spell_flags(int spell, int level, bool *cancel, bool *known)
 
 	if (s_ptr->flags2 & (SF2_BANISHMENT))
 	{
-		(void)banishment();
+		(void)banishment(who, what, '\0');
 		obvious = TRUE;
 	}
 
 	if (s_ptr->flags2 & (SF2_MASS_BANISHMENT))
 	{
-		mass_banishment();
+		mass_banishment(who, what, p_ptr->py, p_ptr->px);
 		obvious = TRUE;
 	}
 
@@ -8234,7 +8240,7 @@ bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel)
 	}
 
 	/* Apply flags */
-	if (process_spell_flags(spell, level, cancel, &known)) obvious = TRUE;
+	if (process_spell_flags(who, what, spell, level, cancel, &known)) obvious = TRUE;
 
 	/* Apply flags */
 	if (process_spell_types(who, spell, level, cancel)) obvious = TRUE;
@@ -8276,7 +8282,7 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 	/* Note the order is important -- because of the impact of blinding a character on their subsequent
 		ability to see spell blows that affect themselves */
 	if (process_spell_blows(who, what, spell, level, cancel)) obvious = TRUE;
-	if (process_spell_flags(spell, level, cancel, known)) obvious = TRUE;
+	if (process_spell_flags(who, what, spell, level, cancel, known)) obvious = TRUE;
 	if (process_spell_types(who, spell, level, cancel)) obvious = TRUE;
 
 	/* Return result */
