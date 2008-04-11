@@ -4928,13 +4928,43 @@ extern int PlayerUID;
 #define TERM_UMBER		7	/* 'u' */	/* 2,1,0 */
 #define TERM_L_DARK		8	/* 'D' */	/* 1,1,1 */
 #define TERM_L_WHITE	9	/* 'W' */	/* 3,3,3 */
-#define TERM_VIOLET		10	/* 'v' */	/* 4,0,4 */
+#define TERM_L_PURPLE	10	/* 'P' */	/* ??? */
 #define TERM_YELLOW		11	/* 'y' */	/* 4,4,0 */
 #define TERM_L_RED		12	/* 'R' */	/* 4,0,0 */
 #define TERM_L_GREEN	13	/* 'G' */	/* 0,4,0 */
 #define TERM_L_BLUE		14	/* 'B' */	/* 0,4,4 */
 #define TERM_L_UMBER	15	/* 'U' */	/* 3,2,1 */
 
+#define TERM_PURPLE     16	/* 'p' */
+#define TERM_VIOLET     17	/* 'v' */
+#define TERM_TEAL       18	/* 't' */
+#define TERM_MUD        19	/* 'm' */
+#define TERM_L_YELLOW   20	/* 'Y' */
+#define TERM_MAGENTA    21	/* 'M' */
+#define TERM_L_TEAL     22	/* 'T' */
+#define TERM_L_VIOLET   23	/* 'V' */
+#define TERM_L_PINK     24	/* 'I' */
+#define TERM_MUSTARD    25	/* 'i' */
+#define TERM_BLUE_SLATE 26	/* 'z' */
+#define TERM_DEEP_L_BLUE 27	/* 'Z' */
+
+#define MAX_COLORS 		28	/* Maximum 'normal' colours */
+
+
+#define ATTR_FULL		0	/* full color translation */
+#define ATTR_MONO		1	/* mono color translation */
+#define ATTR_VGA		2	/* 16 color translation */
+#define ATTR_BLIND		3	/* "Blind" color translation */
+#define ATTR_LITE		4	/* "Torchlit" color translation */
+#define ATTR_DARK		5	/* "Dark" color translation */
+#define ATTR_HIGH		6	/* "Highlight" color translation */
+#define ATTR_METAL		7	/* "Metallic" color translation */
+
+/* Strongly consider the following for accessibility reasons */
+#define ATTR_COLOR_RG	8	/* Red/green colorblind users */
+#define ATTR_CONTRAST	9	/* High contrast colors */
+
+#define MAX_ATTR		8
 
 /*** Message constants ***/
 

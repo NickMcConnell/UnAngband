@@ -5924,7 +5924,7 @@ void modify_grid_boring_project(byte *a, char *c, int y, int x, byte cinfo, byte
 		else
 		{
 			/* Use "dark gray" */
-			*a = dark_attr[dark_attr[*a]];
+			*a = get_color(*a, ATTR_DARK, 2);
 		}
 	}
 
@@ -5956,7 +5956,7 @@ void modify_grid_boring_project(byte *a, char *c, int y, int x, byte cinfo, byte
 				else
 				{
 					/* Use "yellow" */
-					*a = lite_attr[*a];
+					*a = get_color(*a, ATTR_LITE, 1);
 				}
 
 				/* Important -- exit loop */
@@ -5982,7 +5982,7 @@ void modify_grid_boring_project(byte *a, char *c, int y, int x, byte cinfo, byte
 		else
 		{
 			/* Use "dark tile" */
-			*a = dark_attr[*a];
+			*a = get_color(*a, ATTR_DARK, 2);
 		}
 	}
 }
@@ -6007,7 +6007,7 @@ void modify_grid_unseen_project(byte *a, char *c)
 		else
 		{
 			/* Use "dark gray" */
-			*a = dark_attr[dark_attr[*a]];
+			*a = get_color(*a, ATTR_DARK, 2);
 		}
 	}
 
@@ -6026,7 +6026,7 @@ void modify_grid_unseen_project(byte *a, char *c)
 		else
 		{
 			/* Use "dark tile" */
-			*a = dark_attr[*a];
+			*a = get_color(*a, ATTR_DARK, 1);
 		}
 	}
 }
@@ -6053,7 +6053,7 @@ void modify_grid_interesting_project(byte *a, char *c, int y, int x, byte cinfo,
 		else
 		{
 			/* Use "dark gray" */
-			*a = dark_attr[dark_attr[*a]];
+			*a = get_color(*a, ATTR_BLIND, 1);
 		}
 	}
 
@@ -6085,7 +6085,7 @@ void modify_grid_interesting_project(byte *a, char *c, int y, int x, byte cinfo,
 				else
 				{
 					/* Use "yellow" */
-					*a = lite_attr[*a];
+					*a = get_color(*a, ATTR_LITE, 1);
 				}
 
 				/* Important -- exit loop */
@@ -6111,7 +6111,7 @@ void modify_grid_interesting_project(byte *a, char *c, int y, int x, byte cinfo,
 		else
 		{
 			/* Use "dark tile" */
-			*a = dark_attr[*a];
+			*a = get_color(*a, ATTR_DARK, 1);
 		}
 	}
 }

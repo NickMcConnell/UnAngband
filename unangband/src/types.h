@@ -132,7 +132,7 @@ typedef struct element_type element_type;
 typedef struct quiver_group_type quiver_group_type;
 typedef struct ecology_type ecology_type;
 typedef struct do_cmd_item_type do_cmd_item_type;
-
+typedef struct color_type color_type;
 
 
 
@@ -1906,5 +1906,18 @@ struct do_cmd_item_type
 	
 	byte next_command;					/* The next command to use */
 	int (*next_command_eval)(int item);	/* The next command to use - evaluation function */
+};
+
+
+/*
+ * A game color.
+ */
+struct color_type
+{
+	char index_char;            /* Character index:  'r' = red, etc. */
+
+	char name[32];              /* Color name */
+
+	byte color_translate[MAX_ATTR];       /* Index for various in-game translations */
 };
 

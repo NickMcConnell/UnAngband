@@ -1761,10 +1761,10 @@ static void display_feature(int col, int row, bool cursor, int oid )
 	else
 	{
 		/* Use "yellow" */
-		big_pad(col2+1, row, lite_attr[f_ptr->x_attr], f_ptr->x_char);
+		big_pad(col2+1, row, get_color(f_ptr->x_attr, ATTR_LITE, 1), f_ptr->x_char);
 
 		/* Use "grey" */
-		big_pad(col3+1, row, dark_attr[f_ptr->x_attr], f_ptr->x_char);
+		big_pad(col3+1, row, get_color(f_ptr->x_attr, ATTR_DARK, 1), f_ptr->x_char);
 	}
 }
 
