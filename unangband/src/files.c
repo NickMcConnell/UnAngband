@@ -3979,7 +3979,7 @@ errr file_character(cptr name, bool full)
 			bool havoc = FALSE;
 			bool please_print_depths = TRUE;
 
-			/* dungeons with guardians killed elsehwere are too confusing */
+			/* dungeons with guardians killed elsewhere are too confusing */
 			if (!t_info[i].visited) continue;
 
 			long_level_name(str, i, t_info[i].attained_depth);
@@ -4022,16 +4022,22 @@ errr file_character(cptr name, bool full)
 				if (t_info[i].attained_depth > min_depth(i)) {
 					/* descended */
 
-					/* too interesting */
-					if (x) 
-						continue;
-
 					if (t_info[i].attained_depth == max_depth(i))
 					{
+						/* completed */
+
+						/* too interesting */
+						if (x) 
+							continue;
+
 						text_out("You fought through to the other side of");
 					}
 					else 
 					{
+						/* not interesting enough */
+						if (!x) 
+							continue;
+
 						if (havoc)
 							text_out("You broke through to");
 						else
@@ -4084,7 +4090,8 @@ errr file_character(cptr name, bool full)
 
 			text_out(format(" %s", str));
 
-			if (please_print_depths) {
+			if (please_print_depths || min_depth(i) != max_depth(i)) 
+			{
 				if (min_depth(i) == max_depth(i))
 					text_out(format(" (%d).\n",  min_depth(i)));
 				else

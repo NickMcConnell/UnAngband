@@ -8892,6 +8892,12 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 	/* If the player is blind, be more descriptive */
 	if (blind) fuzzy = TRUE;
 
+	if (who > SOURCE_MONSTER_START)
+	{
+		/* Get the source monster */
+		m_ptr = &m_list[who];
+	}
+
 	/* Hack -- storm can do several things */
 	if (typ == GF_STORM)
 	{
