@@ -4041,7 +4041,7 @@ errr file_character(cptr name, bool full)
 						if (havoc)
 							text_out("You broke through to");
 						else
-							text_out("You have reached");
+							text_out("You reached");
 		
 						/* Express in feet or level*/
 						if (depth_in_feet) text_out(format(" %d foot depth in", t_info[i].attained_depth));
