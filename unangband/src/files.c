@@ -2162,9 +2162,9 @@ static cptr display_player_flag_names[6][10] =
 		" Save:",	/* TR1_SAVE */
 		"Devic:",	/* TR1_DEVICE */
 		"Steal:",	/* TR1_STEALTH */
-		"Sear.:",	/* TR1_SEARCH */
+		" Sear:",	/* TR1_SEARCH */
 		"Infra:",	/* TR1_INFRA */
-		"Tunn.:",	/* TR1_TUNNEL */
+		" Tunn:",	/* TR1_TUNNEL */
 		"Speed:",	/* TR1_SPEED */
 		"Blows:",	/* TR1_BLOWS */
 		"Shots:",	/* TR1_SHOTS */
@@ -3437,17 +3437,17 @@ static void dump_player_stat_info(FILE *fff)
 
 	/*Hack - record spaces for the character*/
 
-	fprintf(fff,"(+/-) ");
+	fprintf(fff,"(+/-)  ");
 
 	dump_player_plus_minus(fff);
 
-	fprintf(fff,"\n      %s               %s\n",equippy, equippy);
+	fprintf(fff,"\n       %s               %s\n ",equippy, equippy);
 
 	fprintf(fff,"      abcdefghijkl@              abcdefghijkl@\n");
 
 	for (stats = 0; stats < A_MAX; stats++)
 	{
-		fprintf(fff, "%6s", stat_names_reduced[stats]);
+		fprintf(fff, "   %s:", stat_names_reduced_short[stats]);
 
 		/* Process equipment, show stat modifiers */
 		for (x = 0, y = INVEN_WIELD; y < END_EQUIPMENT; ++y, ++x)
@@ -3496,7 +3496,7 @@ static void dump_player_stat_info(FILE *fff)
 		}
 
 		/*a couple spaces, then do the sustains*/
-		fprintf(fff, ".      %7s ", stat_names_reduced[stats]);
+		fprintf(fff, ".         s%s:", stat_names_reduced_short[stats]);
 
 		/* Process equipment, show stat modifiers */
 		for (y = INVEN_WIELD; y < END_EQUIPMENT; ++y)
@@ -3864,6 +3864,80 @@ errr file_character(cptr name, bool full)
 	}
 	text_out("\n");
 
+	text_out("  [Character Equipment Stat Modifiers, Sustains and Flags]\n\n");
+
+	/*dump stat modifiers and sustains*/
+	dump_player_stat_info(fff);
+
+	/* Display player */
+	display_player(1);
+
+	/* Dump flags, but in two separate rows */
+	for (w = 0; w < 2; w ++)
+	{
+		for (y = 11; y < 21; y++)
+		{
+			/* Dump each row */
+			for (z = 0, x = 0; x < 79; x++, z++)
+			{
+				/* Get the attr/char */
+				(void)(Term_what(x, y, &a, &c));
+
+				/*Go through the whole thing twice, printing
+				 *two of the sets of resist flags each time.
+				 */
+				if ((!w) && (x < 40))
+				{
+					/*hack - space it out a bit*/
+					if (x == 0) text_out(" ");
+					if (x == 20) text_out("       ");
+
+					/* Dump it */
+					text_out(format("%c", c));
+				}
+
+				else if ((w) && (x > 39))
+				{
+					/*hack - space it out a bit*/
+					if (x == 40) text_out(" ");
+					if (x == 60) text_out("       ");
+
+					/* Dump it */
+					text_out(format("%c", c));
+				}
+
+			}
+
+			/* End the row */
+			text_out("\n");
+		}
+	}
+
+	/* Display player */
+	display_player(2);
+
+	/* Display remaining flags */
+	for (y = 11; y < 23; y++)
+	{
+		/* Dump each row */
+		for (x = 0; x < 40; x++)
+		{
+			/* Get the attr/char */
+			(void)(Term_what(x, y, &a, &c));
+
+			/*hack - space it out a bit*/
+			if (x == 0) text_out(" ");
+			if (x == 20) text_out("       ");
+
+			/* Dump it */
+			text_out(format("%c", c));
+		}
+
+		/* End the row */
+		text_out("\n");
+	}
+	text_out("\n");
+
 	/* Dump the equipment */
 	if (p_ptr->equip_cnt)
 	{
@@ -4150,127 +4224,6 @@ errr file_character(cptr name, bool full)
 
 	text_out("\n");
 #endif
-
-	text_out("  [Character Equipment Stat Modifiers, Sustains and Flags]\n\n");
-
-	/*dump stat modifiers and sustains*/
-	dump_player_stat_info(fff);
-
-	/* Display player */
-	display_player(1);
-
-	/* Dump flags, but in two separate rows */
-	for (w = 0; w < 2; w ++)
-	{
-		for (y = 11; y < 21; y++)
-		{
-			/* Dump each row */
-			for (z = 0, x = 0; x < 79; x++, z++)
-			{
-				/* Get the attr/char */
-				(void)(Term_what(x, y, &a, &c));
-
-				/*Go through the whole thing twice, printing
-				 *two of the sets of resist flags each time.
-				 */
-				if ((!w) && (x < 40))
-				{
-					/*hack - space it out a bit*/
-					if (x == 20) text_out("       ");
-
-					/* Dump it */
-					text_out(format("%c", c));
-				}
-
-				else if ((w) && (x > 39))
-				{
-					/*hack - space it out a bit*/
-					if (x == 60) text_out("       ");
-
-					/* Dump it */
-					text_out(format("%c", c));
-				}
-
-			}
-
-			/* End the row */
-			text_out("\n");
-		}
-	}
-
-	/* Display player */
-	display_player(2);
-
-	/* Display remaining flags */
-	for (y = 11; y < 23; y++)
-	{
-		/* Dump each row */
-		for (x = 0; x < 40; x++)
-		{
-			/* Get the attr/char */
-			(void)(Term_what(x, y, &a, &c));
-
-			/*hack - space it out a bit*/
-			if (x == 20) text_out("       ");
-
-			/* Dump it */
-			text_out(format("%c", c));
-		}
-
-		/* End the row */
-		text_out("\n");
-	}
-
-	/* Create some space */
-	text_out("\n\n");
-
-	/* Dump the Home Flags , then the inventory -- if anything there */
-	if (st_ptr->stock_num)
-	{
-		/* Header */
-		text_out("  [Home Inventory Stat Modifiers, Sustains and Flags]\n\n");
-
-		/*dump stat modifiers and sustains*/
-		dump_home_stat_info(fff);
-
-		/*dump the home resists and abilities display*/
-		for (i =3; i <6; ++i)
-		{
-			/* Display player */
-			display_player(i);
-
-			/* Dump part of the screen */
-			for (y = 10; y < 20; y++)
-			{
-				/* Dump each row */
-				for (x = 0; x < 79; x++)
-				{
-					/* Get the attr/char */
-					(void)(Term_what(x, y, &a, &c));
-
-					/* Dump it */
-					buf[x] = c;
-				}
-
-				/* Back up over spaces */
-				while ((x > 0) && (buf[x-1] == ' ')) --x;
-
-				/* Terminate */
-				buf[x] = '\0';
-
-				/* End the row */
-				text_out(format("%s\n", buf));
-			}
-		}
-
-		/* Display player */
-		display_player(0);
-
-		/* End the row */
-		text_out("\n");
-	}
-
-	else text_out("  [Your Home Is Empty]\n\n");
 
 	/* Dump options */
 	text_out("  [Options]\n\n");
