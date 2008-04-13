@@ -2027,16 +2027,25 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 		c_prt(attr, format("%s", str), row, col);
 	}
 
-	if (t_info[dun].attained_depth >= t_info[dun].zone[zone].level) {
-		if (zone == MAX_DUNGEON_ZONES - 1 || t_info[dun].zone[zone+1].level == 0) {
-			/* last zone */ 
-			c_prt(attr, format(" Lev %3d", t_info[dun].attained_depth), row, 67);
-		}
-		else if (t_info[dun].attained_depth < t_info[dun].zone[zone+1].level) {
+	if (t_info[dun].attained_depth >= t_info[dun].zone[zone].level) 
+	{
+		if (/* last zone */
+			(zone == MAX_DUNGEON_ZONES - 1 
+			 || t_info[dun].zone[zone+1].level == 0)
 			/* depth in that dungeon is less than start of the next zone */
-			c_prt(attr, format(" Lev %3d", t_info[dun].attained_depth), row, 67);
+			|| (t_info[dun].attained_depth < t_info[dun].zone[zone+1].level)) 
+		{
+			if (t_info[dun].attained_depth)
+				c_prt(attr, format(" Lev %3d", t_info[dun].attained_depth), 
+						row, 67);
+			else if (zone == 1 
+						|| t_info[dun].zone[zone+1].level == 0)
+				; /* no dungeon nor tower --- no babbling */
+			else
+				c_prt(attr, " surface", row, 67);
 		}
-		else {
+		else 
+		{
 			if (guard && r_info[guard].max_num)
 				/* we've reached the guardian and escaped (or he did) */
 				c_prt(attr, " !!!", row, 67);
