@@ -486,6 +486,7 @@ static cptr r_info_blow_effect[] =
 	"HEAL_PERC",
 	"GAIN_MANA_PERC",
 	"TANGLE",
+	"POISON_WATER",
 	NULL
 };
 
@@ -8781,26 +8782,10 @@ static errr emit_desc(FILE *fp, cptr intro_text, cptr text)
 }
 
 
-static char color_attr_to_char[] =
+static char color_attr_to_char(int a)
 {
-		'd',
-		'w',
-		's',
-		'o',
-		'r',
-		'g',
-		'b',
-		'u',
-		'D',
-		'W',
-		'v',
-		'y',
-		'R',
-		'G',
-		'B',
-		'U'
-};
-
+	return (color_table[a].index_char);
+}
 
 
 /*
@@ -9012,17 +8997,22 @@ errr emit_r_info_index(FILE *fp, header *head, int i)
 {
 	int n;
 
+	/* Used to determine 'free' colours */
+	u32b metallics = 0;
+	u32b chromatics = 0;
+	bool clear = FALSE;
+	bool multi = FALSE;
+	
 	/* Current entry */
 	monster_race *r_ptr = (monster_race*)head->info_ptr + i;
-	
 	
 	/* Output 'N' for "New/Number/Name" */
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + r_ptr->name);
 
 	/* Output 'G' for "Graphics" (one line only) */
-	fprintf(fp, "G:%c:%c\n",r_ptr->d_char,color_attr_to_char[r_ptr->d_attr]);
+	fprintf(fp, "G:%c:%c\n",r_ptr->d_char,color_attr_to_char(r_ptr->d_attr));
 	
-#if 0 /* TODO: Enable this when we go to 256 colours to help reduce duplicate monster appearances */
+	/* TODO: Enable this when we go to 256 colours to help reduce duplicate monster appearances */
 	/* Show other monsters with same appearance */
 	for (n = 1; n < z_info->r_max; n++)
 	{
@@ -9030,7 +9020,16 @@ errr emit_r_info_index(FILE *fp, header *head, int i)
 		
 		if (r_ptr->d_char != r2_ptr->d_char) continue;
 		
+		if (r2_ptr->flags1 & (RF1_ATTR_CLEAR)) clear = TRUE;
+		else if (r2_ptr->flags1 & (RF1_ATTR_MULTI)) multi = TRUE;
+		else if (r2_ptr->flags9 & (RF9_ATTR_METAL)) metallics |= 1 << (r2_ptr->d_attr);
+		else chromatics |= 1 << (r2_ptr->d_attr);
+		
 		if (n == i) continue;
+		
+		/* Town monsters allowed to match dungeon monsters */
+		if ((!r2_ptr->level) && (r_ptr->level)) continue;
+		if ((!r_ptr->level) && (r2_ptr->level)) continue;
 		
 		if (((r_ptr->flags1 & (RF1_ATTR_CLEAR)) == 
 			(r2_ptr->flags1 & (RF1_ATTR_CLEAR))) &&
@@ -9058,7 +9057,23 @@ errr emit_r_info_index(FILE *fp, header *head, int i)
 		}
 	}
 	
-#endif
+	/* Display free colours */
+	if (!clear) fprintf(fp, "#$ Clear available\n");
+	if (!multi) fprintf(fp, "#$ Multihued available\n");
+	
+	fprintf(fp, "#$ Metallics available:");
+	for (i = 0; i < MAX_COLORS; i++)
+	{
+		if ((metallics & (1 << i)) == 0) fprintf(fp, "%c",color_table[i].index_char);
+	}
+	fprintf(fp, "\n");
+	
+	fprintf(fp, "#$ Colors available:");
+	for (i = 0; i < MAX_COLORS; i++)
+	{
+		if ((chromatics & (1 << i)) == 0) fprintf(fp, "%c",color_table[i].index_char);
+	}
+	fprintf(fp, "\n");
 	
 	/* Output 'I' for "Info" (one line only) */
 	fprintf(fp, "I:%d:%dd%d:%d:%d:%d\n",r_ptr->speed,r_ptr->hdice,r_ptr->hside,r_ptr->aaf,r_ptr->ac,r_ptr->sleep);
@@ -9132,7 +9147,7 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + f_ptr->name);
 
 	/* Output 'G' for "Graphics" (one line only) */
-	fprintf(fp, "G:%c:%c\n",f_ptr->d_char,color_attr_to_char[f_ptr->d_attr]);
+	fprintf(fp, "G:%c:%c\n",f_ptr->d_char,color_attr_to_char(f_ptr->d_attr));
 
 	/* Output 'M' for "Mimic" (one line only) */
 	if (f_ptr->mimic != i)
@@ -9240,7 +9255,7 @@ errr emit_k_info_index(FILE *fp, header *head, int i)
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + k_ptr->name);
 
 	/* Output 'G' for "Graphics" (one line only) */
-	fprintf(fp, "G:%c:%c\n",k_ptr->d_char,color_attr_to_char[k_ptr->d_attr]);
+	fprintf(fp, "G:%c:%c\n",k_ptr->d_char,color_attr_to_char(k_ptr->d_attr));
 
 	/* Output 'I' for "Info" (one line only) */
 	fprintf(fp, "I:%d:%d:%d\n",k_ptr->tval,k_ptr->sval,k_ptr->pval);
@@ -9393,7 +9408,7 @@ errr emit_x_info_index(FILE *fp, header *head, int i)
 	fprintf(fp, "N:%d:%d%s\n", i,x_ptr->tval, x_ptr->sval == 255 ? "" : format(":%d", x_ptr->sval));
 
 	/* Output 'G' for "Graphics" (one line only) */
-	fprintf(fp, "G:%c:%c\n",x_ptr->d_char,color_attr_to_char[x_ptr->d_attr]);
+	fprintf(fp, "G:%c:%c\n",x_ptr->d_char,color_attr_to_char(x_ptr->d_attr));
 
 	/* Output 'D' for "Description" */
 	emit_desc(fp, "D:", head->text_ptr + x_ptr->text);

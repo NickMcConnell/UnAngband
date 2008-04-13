@@ -1039,6 +1039,7 @@
 #define GF_HEAL_PERC	138
 #define GF_GAIN_MANA_PERC	139
 #define GF_TANGLE		140
+#define GF_POISON_WATER	141
 
 
 

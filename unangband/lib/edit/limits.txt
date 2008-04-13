@@ -32,7 +32,7 @@ M:A:137
 M:E:128
 
 # Maximum number of flavors
-M:X:492
+M:X:620
 
 # Maximum number of monster races (needs to be max + 2 for player ghost)
 M:R:1368

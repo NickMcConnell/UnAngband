@@ -1422,6 +1422,8 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case GF_LITE_WEAK: q="light"; s ="up";break;
 			case GF_DARK_WEAK: q="plunge"; s ="into darkness"; break;
 			case GF_WATER_WEAK: q="soak"; u = "with water";break;
+			case GF_POISON_WATER: q="soak"; u = "with poisonous water";break;
+			case GF_SALT_WATER: q="soak"; u = "with salt water";break;
 			case GF_PLASMA: q="blast"; u = "with plasma";break;
 			case GF_METEOR: q="blast"; u = "with meteors";break;
 			case GF_ICE: q="cover"; u = "with ice";break;

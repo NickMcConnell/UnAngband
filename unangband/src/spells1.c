@@ -906,8 +906,8 @@ static byte cold_color(void)
 {
 	switch (rand_int(3))
 	{
-		case 0: case 1: return (TERM_WHITE);
-		case 2: return (TERM_L_WHITE);
+		case 0: case 1: return (TERM_BLUE_SLATE);
+		case 2: return (TERM_DEEP_L_BLUE);
 	}
 	return (TERM_WHITE);
 }
@@ -916,8 +916,8 @@ static byte pois_color(void)
 {
 	switch (rand_int(3))
 	{
-		case 0: case 1: return (TERM_VIOLET);
-		case 2: return (TERM_GREEN);
+		case 0: case 1: return (TERM_PURPLE);
+		case 2: return (TERM_L_PURPLE);
 	}
 	return (TERM_WHITE);
 }
@@ -970,8 +970,8 @@ static byte ice_color(void)
 {
 	switch (rand_int(3))
 	{
-		case 0: case 1: return (TERM_WHITE);
-		case 2: return (TERM_L_BLUE);
+		case 0: case 1: return (TERM_L_BLUE);
+		case 2: return (TERM_BLUE_SLATE);
 	}
 
 	return (TERM_WHITE);
@@ -982,7 +982,7 @@ static byte lite_color(void)
 	switch (rand_int(4))
 	{
 		case 0: case 1: case 2: return (TERM_YELLOW);
-		case 3: return (TERM_ORANGE);
+		case 3: return (TERM_L_YELLOW);
 	}
 
 	return (TERM_WHITE);
@@ -1079,14 +1079,24 @@ static byte disease_color(void)
 {
 	switch (rand_int(4))
 	{
-		case 0: case 1: return (TERM_GREEN);
+		case 0: case 1: return (TERM_TEAL);
 		case 2: return (TERM_VIOLET);
-		case 3: return (TERM_L_RED);
+		case 3: return (TERM_L_PINK);
 	}
 
 	return (TERM_VIOLET);
 }
 
+
+static byte chaos_color(void)
+{
+	switch (rand_int(4))
+	{
+		case 0: case 1: return (TERM_L_PURPLE);
+		case 2: return (TERM_VIOLET);
+		case 3: return (TERM_L_PINK);
+	}
+}
 
 /*
  * Return a color to use for the bolt/ball spells
@@ -1118,6 +1128,8 @@ byte spell_color(int type)
 		case GF_GRAVITY:      return (grav_color());
 		case GF_FORCE:        return (TERM_GREEN);
 
+		case GF_POISON_WATER:	return (TERM_VIOLET);
+		case GF_SALT_WATER:		return (TERM_TEAL);
 		case GF_WATER_WEAK:	return (water_color());
 		case GF_WATER:        return (water_color());
 
@@ -1126,7 +1138,7 @@ byte spell_color(int type)
 
 		case GF_NEXUS:        return (TERM_L_RED);
 		case GF_NETHER:       return (TERM_L_GREEN);
-		case GF_CHAOS:        return (mh_attr());
+		case GF_CHAOS:        return (chaos_color());
 		case GF_DISENCHANT:   return (TERM_VIOLET);
 		case GF_TIME:         return (TERM_L_BLUE);
 		case GF_MANA:         return (mana_color());
@@ -1141,7 +1153,6 @@ byte spell_color(int type)
 		case GF_LAVA:	   	return (lava_color());
 
 		case GF_TERRIFY:	return (TERM_L_WHITE);
-		case GF_SALT_WATER:     return (TERM_L_GREEN);
 		case GF_STEAM:		return (TERM_L_WHITE);
 		case GF_VAPOUR:		return (TERM_L_GREEN);
 		case GF_SMOKE:		return (TERM_L_DARK);
@@ -1672,6 +1683,8 @@ bool hates_terrain(object_type *o_ptr, int f_idx)
 		case GF_BMUD:
 		case GF_STEAM:
 		case GF_WATER_WEAK:
+		case GF_SALT_WATER:
+		case GF_POISON_WATER:			
 			if (hates_water(o_ptr)) return(TRUE);
 			break;
 
@@ -2798,6 +2811,7 @@ bool player_ignore_terrain(int f_idx)
 		case GF_WATER:
 		case GF_WATER_WEAK:
 		case GF_SALT_WATER:
+		case GF_POISON_WATER:
 		{
 			if (p_ptr->oppose_water) ignore = TRUE;
 			else if (f4 & (TR4_RES_WATER))
@@ -3486,6 +3500,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 		case GF_WATER_WEAK:
 		case GF_SALT_WATER:
 		case GF_WATER:
+		case GF_POISON_WATER:
 		{
 			if ((f_ptr->flags3 & (FF3_HURT_WATER)) &&
 			       (dam > (f_ptr->power*10)))
@@ -4360,6 +4375,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 			case GF_WATER:
 			case GF_BWATER:
 			case GF_WATER_WEAK:
+			case GF_POISON_WATER:
 			{
 				if (hates_water(o_ptr))
 				{
@@ -6122,6 +6138,13 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			do_inven_destroy = set_water_destroy;
 
 			break;
+		}
+		
+		case GF_POISON_WATER:
+		{
+			do_pois = dam;
+			
+			/* Fall through */
 		}
 
 		/* Weak water damage -- Heavily stunned/confused take damage */
@@ -9323,6 +9346,31 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+		case GF_POISON_WATER:
+		{
+			/* Increase poison counter */
+			if (!(p_ptr->oppose_pois) && !(p_ptr->cur_flags2 & (TR2_RES_POIS)))
+			{
+				/* Sometimes notice */
+				(void)player_not_flags(who, 0x0L,TR2_RES_POIS,0x0L,0x0L);
+
+				/* Monster notices */
+				(void)update_smart_forget(who, SM_OPP_POIS);
+
+				/* Set poison counter */
+				(void)set_poisoned(p_ptr->poisoned + rand_int(dam + 1) + 10);
+			}
+			/* Notice temporary poison resistance */
+			else if (p_ptr->oppose_pois)
+			{
+				/* Monster notices */
+				(void)update_smart_learn(who, SM_OPP_POIS);
+			}
+			/* Sometimes notice */
+			else (void)player_can_flags(who, 0x0L,TR2_RES_POIS,0x0L,0x0L);
+
+			/* Fall through */
+		}
 
 		/* Weak water -- wet only */
 		case GF_SALT_WATER:
@@ -9344,7 +9392,6 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			water_dam(who, what, dam, TRUE);
-
 			break;
 		}
 
