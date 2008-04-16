@@ -736,7 +736,7 @@ void do_cmd_browse(void)
 	/* Get an item */
 	q = "Browse which book or runestone? ";
 	s = "You have no books or runestones that you can read.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) return;
+	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -1527,7 +1527,7 @@ void do_cmd_cast(void)
 	item_tester_hook = inven_cast_okay;
 
 	/* Get an item */
-	q = "Use which book? ";
+	q = "Use which book or runestone? ";
 	s = "You have nothing you have studied!";
 	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 
