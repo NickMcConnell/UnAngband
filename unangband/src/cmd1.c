@@ -2749,7 +2749,7 @@ void py_attack(int dir)
 			message_format(MSG_MISS, m_ptr->r_idx, "You miss %s.", m_name);
 		}
 		/* Test for resistance */
-		else if (mon_resist_object(cave_m_idx[y][x], o_ptr))
+		else if (o_ptr->k_idx && mon_resist_object(cave_m_idx[y][x], o_ptr))
 		{
 			/* No need for message */
 		}
@@ -2773,7 +2773,9 @@ void py_attack(int dir)
 			bool fumble = FALSE;
 			
 			/* Test for fumble */
-			if (((p_ptr->heavy_wield) || (o_ptr->ident & (IDENT_CURSED))) && (!rand_int(chance)))
+			if (((p_ptr->heavy_wield) 
+				  || (o_ptr->k_idx && o_ptr->ident & (IDENT_CURSED))) 
+				 && (!rand_int(chance)))
 			{
 				/* Hack -- use the player for the attack */
 				my_strcpy(m_name, "yourself", sizeof(m_name));
@@ -2863,6 +2865,9 @@ void py_attack(int dir)
 					equip_not_flags(0x0L,0x0L,TR3_IMPACT,0x0L);
 				}
 
+				/* Adjust for equipment/stats to_d bounded by dice */
+				k += MIN(p_ptr->to_d, 
+							o_ptr->dd * o_ptr->ds + 5);
 			}
 			/* Handle bare-hand/bare-foot attack */
 			else
@@ -2870,10 +2875,6 @@ void py_attack(int dir)
 				k = 1;
 				do_stun = critical_norm(c_info[p_ptr->pclass].min_weight, (style_crit * 30), k);
 			}
-
-			/* Adjust for equipment/stats to_d bounded by dice */
-			k += MIN(p_ptr->to_d, 
-				 o_ptr->dd * o_ptr->ds + 5);
 
 			/* Adjust for style */
 			k += style_dam;
@@ -2989,7 +2990,8 @@ void py_attack(int dir)
 			}
 
 			/* Damage, check for fear and death */
-			else if (mon_take_hit(cave_m_idx[y][x], k, &fear, NULL))
+			else if (o_ptr->k_idx 
+						&& mon_take_hit(cave_m_idx[y][x], k, &fear, NULL))
 			{
 				u32b f1, f2, f3, f4;
 
@@ -3038,7 +3040,7 @@ void py_attack(int dir)
 			}
 
 			/* Apply additional effect from activation */
-			if (auto_activate(o_ptr))
+			if (o_ptr->k_idx && auto_activate(o_ptr))
 			{
 				/* Make item strike */
 				process_item_blow(o_ptr->name1 ? SOURCE_PLAYER_ACT_ARTIFACT : (o_ptr->name2 ? SOURCE_PLAYER_ACT_EGO_ITEM : SOURCE_PLAYER_ACTIVATE),
@@ -3046,7 +3048,7 @@ void py_attack(int dir)
 			}
 
 			/* Apply additional effect from coating*/
-			else if (coated_p(o_ptr))
+			else if (o_ptr->k_idx && coated_p(o_ptr))
 			{
 				/* Sometimes coating affects source player */
 				if (!rand_int(chance))
