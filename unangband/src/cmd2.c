@@ -691,6 +691,17 @@ static void do_cmd_travel(void)
 			/* Display the list and get a selection */
 			if (get_list(print_routes, routes, num, "Routes", "Travel to where", ", L=locations, M=map", 1, 22, route_commands, &selection))
 			{
+			
+				if (count_routes(selection, p_ptr->dungeon) < 0)
+				{
+					msg_print("You have a feeling you might not be able to get back this way for a long while.");
+					msg_print(NULL);
+					
+					if (!get_check("Are you sure you want to travel? ")) 
+						/* Bail out */
+						return;
+				}
+			
 				/* Will try to auto-eat? */
 				if (p_ptr->food < PY_FOOD_FULL)
 				{

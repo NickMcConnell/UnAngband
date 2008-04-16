@@ -1893,7 +1893,7 @@ static void do_cmd_knowledge_home(void)
 
 /* =================== TOWNS AND DUNGEONS ================================ */
 
-static int count_routes(int from, int to)
+int count_routes(int from, int to)
 {
   s16b routes[24];
   int i, num;
