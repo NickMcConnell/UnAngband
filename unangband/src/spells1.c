@@ -3024,10 +3024,13 @@ bool dec_stat(int stat, int amount)
 bool res_stat(int stat)
 {
 	/* Restore if needed */
-	if (p_ptr->stat_cur[stat] != p_ptr->stat_max[stat])
+	if (p_ptr->stat_cur[stat] != p_ptr->stat_max[stat] || p_ptr->stat_dec_tim[stat])
 	{
 		/* Restore */
 		p_ptr->stat_cur[stat] = p_ptr->stat_max[stat];
+		
+		/* Remove negative timed effect */
+		p_ptr->stat_dec_tim[stat] = 0;
 
 		/* Recalculate bonuses */
 		p_ptr->update |= (PU_BONUS);
