@@ -692,10 +692,9 @@ static void do_cmd_travel(void)
 			if (get_list(print_routes, routes, num, "Routes", "Travel to where", ", L=locations, M=map", 1, 22, route_commands, &selection))
 			{
 			
-				if (count_routes(selection, p_ptr->dungeon) < 0)
+				if (count_routes(selection, p_ptr->dungeon) <= 0)
 				{
-					msg_print("You have a feeling you might not be able to get back this way for a long while.");
-					msg_print(NULL);
+					msg_print("As you set foot upon the path, you have the sudden feeling you might not be able to get back this way for a long while.");
 					
 					if (!get_check("Are you sure you want to travel? ")) 
 						/* Bail out */
