@@ -1818,7 +1818,7 @@ static void display_store_object(int col, int row, bool cursor, int oid)
 	/* Do something about bags */
 	store_type *s_ptr = store[default_join[oid].gid];
 	object_type *o_ptr = &s_ptr->stock[default_join[oid].oid];
-	char buffer[60];
+	char buffer[160];
 
 	/* Should be UNKNOWN for unreachable locations like Bombadil's */
 	byte attr = curs_attrs[CURS_KNOWN][(int)cursor];
