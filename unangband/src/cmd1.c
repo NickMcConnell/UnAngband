@@ -566,7 +566,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 			{
 				if (m_ptr->ml)
 				{
-					if (p_ptr->branded_blows != 98) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_HURT_LITE, floor);
+					if (p_ptr->branded_blows != 98) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_BRAND_LITE, floor);
 					l_ptr->flags3 |= (RF3_HURT_LITE);
 				}
 
@@ -574,7 +574,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 			}
 			else if ((l_ptr->flags3 & (RF3_HURT_LITE)) && (m_ptr->ml))
 			{
-				object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_HURT_LITE, floor);
+				object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_BRAND_LITE, floor);
 			}
 
 			/* Brand (Dark) */
