@@ -2264,7 +2264,7 @@ static void put_flag_char(u32b f[4], int set, u32b flag, int y, int x, int row, 
 		}
 		
 		/* Hack -- show resistances as fake pvals */
-		else if (y < 5)
+		else if ((y < 5) && (f[set] & flag))
 		{
 			c_put_str(TERM_L_GREEN, "1", row, col);
 		}
