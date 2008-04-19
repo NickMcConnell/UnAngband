@@ -1092,9 +1092,9 @@ static byte chaos_color(void)
 {
 	switch (rand_int(4))
 	{
-		case 0: case 1: return (TERM_L_PURPLE);
-		case 2: return (TERM_VIOLET);
-		case 3: return (TERM_L_PINK);
+		case 0: return (TERM_L_PINK);
+		case 1: return (TERM_VIOLET);
+		default: return (TERM_L_PURPLE);
 	}
 }
 
