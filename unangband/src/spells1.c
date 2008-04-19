@@ -8902,6 +8902,40 @@ static void inflict_disease(u32b disease, int dam, int serious)
 	}
 }
 
+/*
+ * Centralise various hold life checks
+ */
+static void check_hold_life(int who, int chance, int amt)
+{
+	if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0) && (rand_int(100) < chance))
+	{
+		/* Always notice */
+		if (!p_ptr->blessed) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
+
+		msg_print("You keep hold of your life force!");
+	}
+	else
+	{
+		s32b d = amt + (p_ptr->exp/100) * MON_DRAIN_LIFE;
+		if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0)
+		{
+			/* Always notice */
+			if (!p_ptr->blessed) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
+
+			msg_print("You feel your life slipping away!");
+			lose_exp(d/10);
+		}
+		else
+		{
+			/* Always notice */
+			player_not_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
+
+			msg_print("You feel your life draining away!");
+			lose_exp(d);
+		}
+	}
+}
+
 
 
 /*
@@ -9329,30 +9363,8 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Always notice */
 				player_not_flags(who, 0x0L,TR2_RES_NETHR,0x0L,0x0L);
 
-				if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0) && (rand_int(100) < 75))
-				{
-					msg_print("You keep hold of your life force!");
-
-					/* Always notice */
-					if (!p_ptr->blessed) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-				}
-				else if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0)
-				{
-					msg_print("You feel your life slipping away!");
-					lose_exp(200 + (p_ptr->exp/1000) * MON_DRAIN_LIFE);
-
-					/* Always notice */
-					if (!p_ptr->blessed) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-
-				}
-				else
-				{
-					msg_print("You feel your life draining away!");
-					lose_exp(200 + (p_ptr->exp/100) * MON_DRAIN_LIFE);
-
-					/* Always notice */
-					player_not_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-				}
+				/* Lose grip on life */
+				check_hold_life(who, 75, 200);				
 			}
 			take_hit(who, what, dam);
 			break;
@@ -9487,29 +9499,8 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Notice */
 				player_not_flags(who, 0x0L,TR2_RES_NETHR,0x0L,0x0L);
 
-				if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0) && (rand_int(100) < 75))
-				{
-					msg_print("You keep hold of your life force!");
-
-					/* Always notice */
-					if (!p_ptr->blessed) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-				}
-				else if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0)
-				{
-					msg_print("You feel your life slipping away!");
-					lose_exp(100 + (p_ptr->exp/1000) * MON_DRAIN_LIFE);
-
-					/* Always notice */
-					if (!p_ptr->blessed) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-				}
-				else
-				{
-					msg_print("You feel your life draining away!");
-					lose_exp(100 + (p_ptr->exp/100) * MON_DRAIN_LIFE);
-
-					/* Always notice */
-					player_not_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-				}
+				/* Lose grip on life force */
+				check_hold_life(who, 75, 100);
 			}
 			else if ((p_ptr->cur_flags2 & (TR2_RES_NETHR)) != 0)
 			{
@@ -10881,33 +10872,9 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			/* Take damage */
 			take_hit(who, what, dam);
 
-			if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0)  && (rand_int(100) < 95))
-			{
-				/* Always notice */
-				if (!p_ptr->blessed) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-
-				msg_print("You keep hold of your life force!");
-			}
-			else
-			{
-				s32b d = damroll(10, 6) + (p_ptr->exp/100) * MON_DRAIN_LIFE;
-				if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0)
-				{
-					/* Always notice */
-					if (!p_ptr->blessed) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-
-					msg_print("You feel your life slipping away!");
-					lose_exp(d/10);
-				}
-				else
-				{
-					/* Always notice */
-					player_not_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-
-					msg_print("You feel your life draining away!");
-					lose_exp(d);
-				}
-			}
+			/* Lose grip on life */
+			check_hold_life(who, 95, damroll(10,6));
+			
 			break;
 		}
 
@@ -10919,34 +10886,9 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			/* Take damage */
 			take_hit(who, what, dam);
 
-			if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0) && (rand_int(100) < 90))
-			{
-				/* Always notice */
-				if (!p_ptr->blessed) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-
-				msg_print("You keep hold of your life force!");
-			}
-			else
-			{
-				s32b d = damroll(20, 6) + (p_ptr->exp/100) * MON_DRAIN_LIFE;
-				if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0)
-				{
-					msg_print("You feel your life slipping away!");
-
-					/* Always notice */
-					if (!p_ptr->blessed) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-
-					lose_exp(d/10);
-				}
-				else
-				{
-					/* Always notice */
-					player_not_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-
-					msg_print("You feel your life draining away!");
-					lose_exp(d);
-				}
-			}
+			/* Lose grip on life */
+			check_hold_life(who, 90, damroll(20,6));
+			
 			break;
 		}
 
@@ -10958,33 +10900,9 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			/* Take damage */
 			take_hit(who, what, dam);
 
-			if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0) && (rand_int(100) < 75))
-			{
-				/* Always notice */
-				if (!p_ptr->blessed) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-
-				msg_print("You keep hold of your life force!");
-			}
-			else
-			{
-				s32b d = damroll(40, 6) + (p_ptr->exp/100) * MON_DRAIN_LIFE;
-				if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0)
-				{
-					/* Always notice */
-					if (!p_ptr->blessed) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-
-					msg_print("You feel your life slipping away!");
-					lose_exp(d/10);
-				}
-				else
-				{
-					/* Always notice */
-					player_not_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-
-					msg_print("You feel your life draining away!");
-					lose_exp(d);
-				}
-			}
+			/* Lose grip on life */
+			check_hold_life(who, 75, damroll(40,6));
+			
 			break;
 		}
 
@@ -10996,33 +10914,9 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			/* Take damage */
 			take_hit(who, what, dam);
 
-			if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0) && (rand_int(100) < 50))
-			{
-				/* Always notice */
-				if (!p_ptr->blessed) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-
-				msg_print("You keep hold of your life force!");
-			}
-			else
-			{
-				s32b d = damroll(80, 6) + (p_ptr->exp/100) * MON_DRAIN_LIFE;
-				if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0)
-				{
-					/* Always notice */
-					if (!p_ptr->blessed) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-
-					msg_print("You feel your life slipping away!");
-					lose_exp(d/10);
-				}
-				else
-				{
-					/* Always notice */
-					player_not_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-
-					msg_print("You feel your life draining away!");
-					lose_exp(d);
-				}
-			}
+			/* Lose grip on life */
+			check_hold_life(who, 50, damroll(80,6));
+			
 			break;
 		}
 
