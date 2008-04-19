@@ -2254,13 +2254,19 @@ static void put_flag_char(u32b f[4], int set, u32b flag, int y, int x, int row, 
 		else if ((y == 8) &&
 			(f[4] & (TR4_RES_WATER)))
 		{
-			c_put_str(TERM_WHITE, "+", row, col);
+			c_put_str(TERM_L_GREEN, "1", row, col);
 		}
 
 		/* MegaHack -- Skip water */
 		else if (y == 8)
 		{
 			c_put_str(TERM_SLATE, ".", row, col);
+		}
+		
+		/* Hack -- show resistances as fake pvals */
+		else if (y < 5)
+		{
+			c_put_str(TERM_L_GREEN, "1", row, col);
 		}
 
 		/* Check flags */

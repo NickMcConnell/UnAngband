@@ -139,6 +139,7 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 
 				/* Obvious flags (pval) */
 				(*f1) |= (a_ptr->flags1 & (TR1_PVAL_MASK));
+				(*f3) |= (a_ptr->flags3 & (TR3_PVAL_MASK));
 
 				(*f2) |= (a_ptr->flags2 & (TR2_IGNORE_MASK));
 			}

@@ -3553,6 +3553,13 @@
 	 TR1_STEALTH | TR1_SEARCH | TR1_INFRA | TR1_TUNNEL | \
 	 TR1_SPEED | TR1_BLOWS | TR1_SHOTS | TR1_MIGHT)
 
+/* Oops. Ended up with some pval dependent flags in TR3_
+ * Ah well.  We need to reorganise the pvals anyway.
+ */
+#define TR3_PVAL_MASK \
+	(TR3_LITE | TR3_REGEN_HP | TR3_REGEN_MANA)
+
+
 /*
  * Flag set 2 -- mask for "ignore element" flags.
  */
