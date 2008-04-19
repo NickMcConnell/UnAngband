@@ -2787,24 +2787,27 @@
 #define SOURCE_PLAYER_COATING	-20
 #define SOURCE_PLAYER_EAT_MONSTER	-21
 #define SOURCE_PLAYER_VAMP_DRAIN	-22
-#define SOURCE_PLAYER_EAT		-23
-#define SOURCE_PLAYER_QUAFF		-24
-#define SOURCE_PLAYER_AIM		-25	/* Wands */
-#define SOURCE_PLAYER_ZAP		-26	/* Rods - with target specified */
-#define SOURCE_PLAYER_ZAP_NO_TARGET		-27	/* Rods - with no target specified */
-#define SOURCE_PLAYER_READ		-28
-#define SOURCE_PLAYER_USE		-29	/* Staffs*/
-#define SOURCE_PLAYER_ACT_ARTIFACT	-30
-#define SOURCE_PLAYER_ACT_EGO_ITEM	-31
-#define SOURCE_PLAYER_ACTIVATE	-32
-#define SOURCE_PLAYER_SERVICE	-33
-#define SOURCE_PLAYER_WIZARD	-34
-#define SOURCE_PLAYER_CAST		-35
-#define SOURCE_PLAYER_END		-36
+#define SOURCE_PLAYER_EAT_UNKNOWN	-23
+#define SOURCE_PLAYER_QUAFF_UNKNOWN	-24
+#define SOURCE_PLAYER_READ_UNKNOWN	-25
+#define SOURCE_PLAYER_EAT		-26
+#define SOURCE_PLAYER_QUAFF		-27
+#define SOURCE_PLAYER_AIM		-28	/* Wands */
+#define SOURCE_PLAYER_ZAP		-29	/* Rods - with target specified */
+#define SOURCE_PLAYER_ZAP_NO_TARGET		-30	/* Rods - with no target specified */
+#define SOURCE_PLAYER_READ		-31
+#define SOURCE_PLAYER_USE		-32	/* Staffs*/
+#define SOURCE_PLAYER_ACT_ARTIFACT	-33
+#define SOURCE_PLAYER_ACT_EGO_ITEM	-34
+#define SOURCE_PLAYER_ACTIVATE	-35
+#define SOURCE_PLAYER_SERVICE	-36
+#define SOURCE_PLAYER_WIZARD	-37
+#define SOURCE_PLAYER_CAST		-38
+#define SOURCE_PLAYER_END		-39
 
 #define SOURCE_PREFIX			-11	/* Less than here or equal to here, we suffix the string, otherwise we prefix it */
 #define SOURCE_PLAYER_START		-13	/* Less than here or equal to here, player is the source, and gets experience */
-#define SOURCE_PLAYER_NO_TARGET	-27	/* Less than here or equal to here, no target is specified and some messages are suppressed.
+#define SOURCE_PLAYER_NO_TARGET	-30	/* Less than here or equal to here, no target is specified and some messages are suppressed.
 									 * Note that all items less than here that could specify a target always have a 'known' effect. */
 
 #define SOURCE_MESSAGES	4

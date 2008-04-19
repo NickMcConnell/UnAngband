@@ -271,7 +271,8 @@ bool player_eat_food(int item)
 			if (power < 0) return (FALSE);
 
 			/* Apply food effect */
-			if (process_spell_eaten(SOURCE_PLAYER_EAT, o_ptr->k_idx, power,0,&cancel)) ident = TRUE;
+			if (process_spell_eaten(object_aware_p(o_ptr) ? SOURCE_PLAYER_EAT : SOURCE_PLAYER_EAT_UNKNOWN,
+					o_ptr->k_idx, power,0,&cancel)) ident = TRUE;
 
 			/* Combine / Reorder the pack (later) */
 			p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -380,7 +381,8 @@ bool player_quaff_potion(int item)
 	get_spell(&power, "use", o_ptr, FALSE);
 
 	/* Apply food effect */
-	if (power >= 0) ident = process_spell_eaten(SOURCE_PLAYER_QUAFF, o_ptr->k_idx, power,0,&cancel);
+	if (power >= 0) ident = process_spell_eaten(object_aware_p(o_ptr) ? SOURCE_PLAYER_QUAFF : SOURCE_PLAYER_QUAFF_UNKNOWN,
+			 o_ptr->k_idx, power,0,&cancel);
 	else return (FALSE);
 
 	/* Clear styles */
@@ -483,7 +485,8 @@ bool player_read_scroll(int item)
 	get_spell(&power, "use", o_ptr, FALSE);
 
 	/* Apply scroll effect */
-	if (power >= 0) ident = process_spell(SOURCE_PLAYER_READ, o_ptr->k_idx, power, 0, &cancel, &known);
+	if (power >= 0) ident = process_spell(object_aware_p(o_ptr) ? SOURCE_PLAYER_READ : SOURCE_PLAYER_READ_UNKNOWN,
+			 o_ptr->k_idx, power, 0, &cancel, &known);
 	else return (TRUE);
 
 	/* Clear styles */

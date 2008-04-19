@@ -1248,9 +1248,9 @@ void take_hit(int who, int what, int dam)
 			  || who == SOURCE_PLAYER_COATING
 			  || who == SOURCE_PLAYER_EAT_MONSTER
 			  || who == SOURCE_PLAYER_VAMP_DRAIN
-			  || who == SOURCE_PLAYER_EAT
-			  || who == SOURCE_PLAYER_QUAFF
-			  || who == SOURCE_PLAYER_READ
+			  || who == SOURCE_PLAYER_EAT_UNKNOWN
+			  || who == SOURCE_PLAYER_QUAFF_UNKNOWN
+			  || who == SOURCE_PLAYER_READ_UNKNOWN
 			  || who == SOURCE_PLAYER_ZAP_NO_TARGET
 			  || who == SOURCE_OBJECT))
 		 p_ptr->chp = 1;

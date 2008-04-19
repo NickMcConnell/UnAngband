@@ -3211,12 +3211,15 @@ const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES] =
 	{"a nick from a weapon coated with ", "extract of ", "toxic ", "fumes reeking of "		}, /* SOURCE_PLAYER_COATING */ 
 	{"over cooking ", "undercooking ", "having a taste for ", "not cutting out the poisonous bits off "}, /* SOURCE_PLAYER_EAT_MONSTER */
 	{"trying to draw health from ", "the eldritch power of ", "taking the place of ", "connecting to the Negative Plane through "}, /* SOURCE_PLAYER_VAMP_DRAIN */	
-	{"eating ", "tasting ", "nibbling ", "indigestion from "}, /* SOURCE_PLAYER_EAT */
-	{"quaffing ", "drinking ", "slurping ", "sipping "}, /* SOURCE_PLAYER_QUAFF */ 
+	{"nibbling ", "tasting ", "trying ", "an unknown allergy to "}, /* SOURCE_PLAYER_EAT_UNKNOWN */
+	{"sipping ", "sniffing ", "fumes from ", "not spitting out "}, /* SOURCE_PLAYER_QUAFF_UNKNOWN */ 
+	{"glancing at ", "casting your eyes over ", "browsing ", "looking sideways at "}, /* SOURCE_PLAYER_READ_UNKNOWN */ 
+	{"eating ", "chewing ", "choking on ", "indigestion from "}, /* SOURCE_PLAYER_EAT */
+	{"quaffing ", "drinking ", "slurping ", "guzzling "}, /* SOURCE_PLAYER_QUAFF */ 
 	{"aiming ", "waving ", "pointing ", "holding the wrong end of "}, /* SOURCE_PLAYER_AIM */
 	{"zapping ", "plughing ", "xyzzying ", "holding the wrong end of "}, /* SOURCE_PLAYER_ZAP */ 
 	{"rubbing ", "wondering how to zap ", "seeing which end glows of ", "pressing a hidden stud on "}, /* SOURCE_PLAYER_ZAP_NO_TARGET */ 
-	{"reading ", "misreading ", "glancing at ", "reciting "}, /* SOURCE_PLAYER_READ */ 
+	{"reading ", "misreading ", "reciting ", "holding upside down "}, /* SOURCE_PLAYER_READ */ 
 	{"using ", "misusing ", "abusing ", "badly using "}, /* SOURCE_PLAYER_USE */ 
 	{"activating ", "relying too heavily on ", "mistrusting the power of ", "chancing the gods with "}, /* SOURCE_PLAYER_ACT_ARTIFACT */ 
 	{"activating ", "relying on ", "having an argument with ", "chancing fate with "}, /* SOURCE_PLAYER_ACT_EGO_ITEM */ 
