@@ -3225,6 +3225,7 @@
 #define AWARE_EXISTS	0x04	/* Item is known to exist in a game. */
 #define AWARE_TRIED		0x08	/* Item has been tried. */
 #define AWARE_RUNES		0x10	/* Item runes are known. */
+#define AWARE_RUNEX		0x10	/* Item runes are known to be associated with a particular flavor. */
 #define AWARE_MASTER	0x20	/* Item has been mastered. */
 #define AWARE_CLASS		0x40	/* Item "flavor" will be known when the item is known to exist. */
 

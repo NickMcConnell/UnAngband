@@ -437,7 +437,7 @@ static void player_wipe(void)
 		k_ptr->guess = 0;
 
 		/* Reset "tried" and "flavor" */
-		k_ptr->aware &= ~(AWARE_TRIED | AWARE_FLAVOR);
+		k_ptr->aware &= ~(AWARE_TRIED | AWARE_FLAVOR | AWARE_RUNES);
 	}
 
 

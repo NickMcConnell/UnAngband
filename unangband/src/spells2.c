@@ -3403,7 +3403,6 @@ bool ident_spell_runes(void)
 
 	cptr q, s;
 
-
 	/* Only un-id'ed items */
 	item_tester_hook = item_tester_unknown_runes;
 
@@ -3437,6 +3436,12 @@ bool ident_spell_runes(void)
 	/* Identify it's bonuses */
 	o_ptr->ident |= (IDENT_RUNES);
 
+	/* Make the object aware if player knows the rune recipe */
+	if (k_info[o_ptr->k_idx].aware & (AWARE_RUNEX))
+	{
+		object_aware(o_ptr, item < 0);
+	}
+	
 	/* Description */
 	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
@@ -3455,6 +3460,19 @@ bool ident_spell_runes(void)
 	{
 		msg_format("On the ground: %s.",
 			   o_name);
+	}
+	
+	/* Aware of runes */
+	k_info[o_ptr->k_idx].aware |= (AWARE_RUNES);
+	
+	/* Learn kind rune recipe */
+	if (object_aware_p(o_ptr)) k_info[o_ptr->k_idx].aware |= (AWARE_RUNEX);
+	
+	/* Add ego item rune awareness */
+	if ((object_named_p(o_ptr)) && (o_ptr->name2))
+	{
+		/* Learn ego runes */
+		e_info[o_ptr->name2].aware |= (AWARE_RUNES);
 	}
 
 	/* Something happened */

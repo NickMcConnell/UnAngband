@@ -1424,7 +1424,7 @@ static void display_entry(int item, int store_index)
 		/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
 		if (o_ptr->name2)
 		{
-			if (!e_info[o_ptr->name2].aware)
+			if (!(e_info[o_ptr->name2].aware & (AWARE_EXISTS)))
 			{
 				queue_tip(format("ego%d.txt", o_ptr->name2));
 			}
@@ -1471,7 +1471,7 @@ static void display_entry(int item, int store_index)
 		/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
 		if (o_ptr->name2)
 		{			
-			e_info[o_ptr->name2].aware = TRUE;
+			e_info[o_ptr->name2].aware |= (AWARE_EXISTS);
 			
 			queue_tip(format("ego%d.txt", o_ptr->name2));
 		}

@@ -3219,6 +3219,7 @@ void list_object(const object_type *o_ptr, int mode)
 	bool charge = FALSE;
 	bool detail = FALSE;
 	bool powers = FALSE;
+	bool learn = FALSE;
 
 	s16b book[26];
 
@@ -3290,7 +3291,7 @@ void list_object(const object_type *o_ptr, int mode)
 		switch(o_ptr->tval)
 		{
 			case TV_DIGGING:
-				text_out("You can dig pits with this to trap monsters.  ");
+				text_out("You can dig pits with this and spikes to trap monsters.  ");
 				anything = TRUE;
 				/* Fall through */
 			case TV_SWORD:
@@ -3706,7 +3707,7 @@ void list_object(const object_type *o_ptr, int mode)
 				if ((vp[n] == vp_player_eat) && (o_ptr->charges))
 				{
 					text_out(vp[n]);
-					text_out(k_info[o_ptr->k_idx].used >= 10 ? format("provides %d units of nourishment", o_ptr->charges * o_ptr->weight) : "provides nourishment");
+					text_out(detail ? format("provides %d units of nourishment", o_ptr->charges * o_ptr->weight) : "provides nourishment");
 					switch (o_ptr->tval)
 					{
 						case TV_FOOD:
@@ -3756,8 +3757,14 @@ void list_object(const object_type *o_ptr, int mode)
 					/* Display powers */
 					for (i = 0; i < num; i++)
 					{
+						bool tmp;
+						
 						/* List powers */
-						powers |= spell_desc(&s_info[book[i]],(i==0) ? (vd[n] ? " and ": vp[n]) : " or ",0,detail, vt[n]);
+						tmp = spell_desc(&s_info[book[i]],(i==0) ? (vd[n] ? " and ": vp[n]) : " or ",0,detail, vt[n]);
+						
+						/* Any output */
+						powers |= tmp;
+						if (!detail) learn |= tmp;
 					}
 				}
 
@@ -3824,6 +3831,139 @@ void list_object(const object_type *o_ptr, int mode)
 				text_out(inscrip_info[INSCRIP_COATED + 1]);
 			}
 		}
+	}
+
+	/* Know how to make this item */
+	if ((!random) && (k_info[o_ptr->k_idx].runesc))
+	{
+		/* Show runes */
+		if (spoil || (object_aware_p(o_ptr) && (k_info[o_ptr->k_idx].aware & (AWARE_RUNEX))) ||
+				(k_info[o_ptr->k_idx].aware & (AWARE_RUNES)))
+		{
+			for (i = 0; object_group_tval[i]; i++)
+			{
+				if (o_ptr->tval == object_group_tval[i])
+				{
+					anything = TRUE;
+
+					/* 'Basic' object */
+					text_out(format("You can apply %d %s rune%s to any %s to make this.  ",
+							k_info[o_ptr->k_idx].runesc,
+							y_name + y_info[k_info[o_ptr->k_idx].runest].name,
+							k_info[o_ptr->k_idx].runesc != 1 ? "s" : "",
+							object_group_text[i]));
+				}
+			}
+			
+			/* Check for other recipes */
+			for (i = 0; i < z_info->k_max; i++)
+			{
+				if (((spoil) || (k_info[i].aware & (AWARE_RUNEX))) &&
+						(k_info[i].runest == k_info[o_ptr->k_idx].runest) &&
+						(k_info[i].runesc < k_info[o_ptr->k_idx].runesc) &&
+						(k_info[i].tval == k_info[o_ptr->k_idx].tval))
+				{
+					object_type object_type_body;
+					object_type *i_ptr = &object_type_body;
+					char o_name[80];
+					
+					object_prep(i_ptr, i);
+					if (spoil) i_ptr->ident |= (IDENT_KNOWN);
+					object_desc(o_name, sizeof(o_name), i_ptr, TRUE, 1);
+					
+					text_out(format("You can apply %d %s rune%s to %s to make this.  ",
+							k_info[o_ptr->k_idx].runesc - k_info[i].runesc,
+							y_name + y_info[k_info[o_ptr->k_idx].runest].name,
+							(k_info[o_ptr->k_idx].runesc  - k_info[i].runesc) != 1 ? "s" : "",
+							o_name));
+				}	
+			}
+		}
+	}
+	
+	/* Know how to make this item */
+	if ((!random) && (o_ptr->name2) && (spoil || object_named_p(o_ptr)) && (e_info[o_ptr->name2].runesc))
+	{
+		/* Show runes */
+		if (spoil || (e_info[o_ptr->name2].aware & (AWARE_RUNES)))
+		{
+			bool output = FALSE;
+			int k, l;
+			
+			anything = TRUE;
+			
+			/* 'Basic' object */
+			text_out(format("You can apply %d %s rune%s to any ", 
+					e_info[o_ptr->name2].runest,
+					y_name + y_info[k_info[o_ptr->name2].runest].name,
+					e_info[o_ptr->name2].runesc != 0 ? "s" : ""));
+
+			for (n = 3; n >= 0; n--)
+			{
+				for (i = 0; object_group_tval[i]; i++)
+				{
+					if (e_info[o_ptr->name2].tval[n] == object_group_tval[i])
+					{
+						output = TRUE;
+						
+						text_out(object_group_text[i]);
+						if (n > 1) text_out(", ");
+						else if (n == 1) text_out("or ");
+					}
+				}
+			}
+			
+			/* No match */
+			if (!output) text_out("ego item ");
+			
+			
+			/* Check for other recipes */
+			for (k = 0; k < z_info->e_max; k++)
+			{
+				if (((spoil) || (e_info[k].aware & (AWARE_RUNES))) &&
+						(e_info[k].runest == k_info[o_ptr->k_idx].runest) &&
+						(e_info[k].runesc == k_info[o_ptr->k_idx].runesc))
+				{
+					/* 'Basic' object */
+					text_out(format("You can apply %d %s rune%s to any ", 
+							e_info[o_ptr->name2].runesc - e_info[k].runesc,
+							y_name + y_info[e_info[o_ptr->name2].runest].name,
+							e_info[o_ptr->name2].runesc != 0 ? "s" : ""));
+
+					for (n = 3; n >= 0; n--)
+					{
+						for (l = 0; l < 3; l++)
+						{
+							/* Must match tvals */
+							if ((e_info[k].tval[l]) && (e_info[k].tval[l] != e_info[o_ptr->name2].tval[n])) continue;
+							
+							/* Must match svals */
+							if (e_info[k].min_sval[l] > e_info[o_ptr->name2].max_sval[n]) continue;
+							if (e_info[k].max_sval[l] < e_info[o_ptr->name2].min_sval[n]) continue;
+							
+							for (i = 0; object_group_tval[i]; i++)
+							{
+								if (e_info[k].tval[n] == object_group_tval[i])
+								{
+									output = TRUE;
+									
+									text_out(object_group_text[i]);
+									if (n > 1) text_out(", ");
+									else if (n == 1) text_out("or ");
+								}
+							}
+						}
+					}
+				}	
+			}
+		}
+	}
+	
+	/* Can learn more about this item through use */
+	if (learn)
+	{
+		text_out_c(TERM_L_VIOLET, "You will learn more about this item through further use.  ");
+		anything = TRUE;		
 	}
 
 	/* Can enchant this further? */

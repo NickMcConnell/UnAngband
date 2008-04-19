@@ -1426,7 +1426,7 @@ static void display_ego_item(int col, int row, bool cursor, int oid)
 	ego_item_type *e_ptr = &e_info[default_join[oid].oid];
 
 	/* Choose a color */
-	byte attr = curs_attrs[(e_ptr->aware)][(int)cursor];
+	byte attr = curs_attrs[(e_ptr->aware) ? 1 : 0][(int)cursor];
 
 	/* Display the name */
 	c_prt(attr, e_name + e_ptr->name, row, col);
@@ -1510,7 +1510,7 @@ static void do_cmd_knowledge_ego_items(void)
 	egoitems = C_ZNEW(z_info->e_max*3, int);
 	default_join = C_ZNEW(z_info->e_max*3, join_t);
 	for(i = 0; i < z_info->e_max; i++) {
-		if(e_info[i].aware || cheat_lore) {
+		if((e_info[i].aware & (AWARE_EXISTS)) || cheat_lore) {
 			for(j = 0; j < 3 && e_info[i].tval[j]; j++) {
 				int gid = obj_group_order[e_info[i].tval[j]];
 				/* HACK: Ignore duplicate tvals */

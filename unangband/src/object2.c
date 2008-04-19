@@ -942,6 +942,12 @@ void object_aware(object_type *o_ptr, bool floor)
 	/* Fully aware of the effects */
 	k_info[o_ptr->k_idx].aware |= (AWARE_FLAVOR);
 
+	/* Learn rune recipe if runes known */
+	if (k_info[o_ptr->k_idx].aware & (AWARE_RUNES))
+	{
+		k_info[o_ptr->k_idx].aware |= (AWARE_RUNEX);
+	}
+	
 	/* Hack -- fully aware of the coating effects */
 	if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_COATS)
 	{
@@ -959,6 +965,7 @@ void object_aware(object_type *o_ptr, bool floor)
 		/* Make coating aware */
 		k_info[coating].aware |= (AWARE_FLAVOR);
 		
+		/* Forget tried flag */
 		k_info[coating].aware &= ~(AWARE_TRIED);
 	}
 	
@@ -1009,7 +1016,7 @@ void object_aware(object_type *o_ptr, bool floor)
 	}
 
 	/* Process objects */
-	for (i = 1; i < INVEN_TOTAL; i++)
+	for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		/* Get the object */
 		object_type *i_ptr = &inventory[i];
@@ -1047,12 +1054,19 @@ void object_aware(object_type *o_ptr, bool floor)
 	if ((o_ptr->name2) && !(o_ptr->ident & (IDENT_STORE)))
 	{
 		/* Show tips if required */
-		if (!e_info[o_ptr->name2].aware)
+		if (!(e_info[o_ptr->name2].aware & (AWARE_EXISTS)))
 		{
 			queue_tip(format("ego%d.txt", o_ptr->name2));
 		}
 		
-		e_info[o_ptr->name2].aware = TRUE;
+		/* Know ego exists */
+		e_info[o_ptr->name2].aware |= (AWARE_EXISTS);
+		
+		/* Learn ego runes */
+		if (o_ptr->ident & (IDENT_RUNES))
+		{
+			e_info[o_ptr->name2].aware |= (AWARE_RUNES);
+		}
 	}
 }
 
