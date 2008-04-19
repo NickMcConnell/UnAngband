@@ -1506,8 +1506,6 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			/* Use underlying attribute/char */
 		}
 
-		/* 
-		
 		/* Get the "player" attr */
 		/*  DSV:  I've chosen the following sequence of colors to indicate
 				the player's current HP.  There are colors are left over, but I
@@ -5045,6 +5043,8 @@ void cave_set_feat_aux(int y, int x, int feat)
 
 	bool hide_item = (f_info[cave_feat[y][x]].flags2 & (FF2_HIDE_ITEM)) != 0;
 
+	bool use_feat = (f_info[cave_feat[y][x]].flags3 & (FF3_USE_FEAT)) != 0 ? f_info[cave_feat[y][x]].k_idx : 0;
+
 	bool outside;
 
 	s16b this_o_idx, next_o_idx = 0;
@@ -5185,11 +5185,19 @@ void cave_set_feat_aux(int y, int x, int feat)
 			o_ptr->ident &= ~(IDENT_MARKED);
 		}
 
-		/* Destroy stored items --- Hack: changed to get Flasks of Oil, etc. from traps; I have no clue what more it does change */
+		/* Destroy stored items */
 		if (o_ptr->ident & (IDENT_STORE))
 		{
-		  o_ptr->ident &= ~IDENT_STORE;
-		  /*			delete_object_idx(this_o_idx); */
+			/* Destroy anything that has a 'used' object that never really exists */
+			if (use_feat && (!(f_ptr->flags3 & (FF3_USE_FEAT)) || (use_feat != f_ptr->k_idx)))
+			{
+				  delete_object_idx(this_o_idx);
+			}
+			/* Reveal other objects from e.g. traps */
+			else if (!use_feat)
+			{
+				o_ptr->ident &= ~IDENT_STORE;
+			}
 			continue;
 		}
 	}
