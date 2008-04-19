@@ -3868,7 +3868,7 @@ void list_object(const object_type *o_ptr, int mode)
 					char o_name[80];
 					
 					object_prep(i_ptr, i);
-					if (spoil) i_ptr->ident |= (IDENT_KNOWN);
+					if (spoil) i_ptr->ident |= (IDENT_STORE);
 					object_desc(o_name, sizeof(o_name), i_ptr, TRUE, 1);
 					
 					text_out(format("You can apply %d %s rune%s to %s to make this.  ",

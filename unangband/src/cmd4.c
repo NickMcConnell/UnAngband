@@ -1535,16 +1535,18 @@ static void do_cmd_knowledge_ego_items(void)
 /*
  * Strip an "object kind name" into a buffer
  */
-static void strip_name(char *buf, int k_idx)
+static void strip_name(char *buf, int oid)
 {
 	char *t;
 
+	int k_idx = oid >= 0 ? oid : -oid;
+	
 	object_kind *k_ptr = &k_info[k_idx];
 
 	cptr str = (k_name + k_ptr->name);
 
 	/* If not aware, use flavor */
-	if (k_ptr->flavor && !(k_ptr->aware & (AWARE_FLAVOR))) str = x_text + x_info[k_ptr->flavor].text;
+	if (oid < 0) str = x_text + x_info[k_ptr->flavor].text;
 
 	/* Skip past leading characters */
 	while ((*str == ' ') || (*str == '&') || (*str == '#')) str++;
@@ -1565,7 +1567,7 @@ static void strip_name(char *buf, int k_idx)
  */
 static void display_object(int col, int row, bool cursor, int oid)
 {
-	int k_idx = oid;
+	int k_idx = oid >= 0 ? oid : -oid;
 	
 	/* Access the object */
 	object_kind *k_ptr = &k_info[k_idx];
@@ -1573,10 +1575,11 @@ static void display_object(int col, int row, bool cursor, int oid)
 	char o_name[80];
 
 	/* Choose a color */
-	bool aware = (k_ptr->flavor == 0) || (!view_flavors && (k_ptr->aware & (AWARE_FLAVOR)));
+	bool aware = (oid >= 0) || (!view_flavors && (k_ptr->aware & (AWARE_FLAVOR)));
 	byte a = aware ? k_ptr->x_attr : x_info[k_ptr->flavor].x_attr;
 	byte c = aware ? k_ptr->x_char : x_info[k_ptr->flavor].x_char;
-	byte attr = curs_attrs[(int)k_ptr->flavor == 0 || k_ptr->aware][(int)cursor];
+	byte attr = curs_attrs[(int)oid >= 0  && k_ptr->flavor != 0 ? ((k_ptr->aware & (AWARE_FLAVOR)) != 0 ? 1 : 0)
+						: ((k_ptr->aware & (AWARE_SEEN)) != 0) ? 1 : 0][(int)cursor];
 
 	/* Symbol is unknown.  This should never happen.*/	
 	if (!(k_ptr->aware & (AWARE_EXISTS)) && !k_ptr->flavor && !p_ptr->wizard && !cheat_lore)
@@ -1587,7 +1590,7 @@ static void display_object(int col, int row, bool cursor, int oid)
 	}
 
 	/* Tidy name */
-	strip_name(o_name,k_idx);
+	strip_name(o_name,oid);
 
 	/* Display the name */
 	c_prt(attr, o_name, row, col);
@@ -1604,8 +1607,10 @@ static void display_object(int col, int row, bool cursor, int oid)
 /*
  * Describe fake object
  */
-static void desc_obj_fake(int k_idx)
+static void desc_obj_fake(int oid)
 {
+	int k_idx = oid >= 0 ? oid : -oid;
+	
 	object_type object_type_body;
 	object_type *o_ptr = &object_type_body;
 	/* Wipe the object */
@@ -1615,10 +1620,7 @@ static void desc_obj_fake(int k_idx)
 	object_prep(o_ptr, k_idx);
 
 	/* Hack -- its in the store */
-	if (k_info[k_idx].aware & (AWARE_EXISTS)) o_ptr->ident |= (IDENT_STORE);
-
-	/* It's fully know */
-	if (!k_info[k_idx].flavor) object_known(o_ptr);
+	if (oid >= 0) o_ptr->ident |= (IDENT_STORE);
 
 	/* Track the object */
 	object_actual_track(o_ptr);
@@ -1643,17 +1645,18 @@ static void desc_obj_fake(int k_idx)
 
 static int o_cmp_tval(const void *a, const void *b)
 {
-	object_kind *k_a = &k_info[*(int*)a];
-	object_kind *k_b = &k_info[*(int*)b];
+	object_kind *k_a = &k_info[*(int*)a >= 0 ? *(int*)a : -*(int*)a];
+	object_kind *k_b = &k_info[*(int*)b >= 0 ? *(int*)b : -*(int*)b];
 	/*group by */
 	int ta = obj_group_order[k_a->tval];
 	int tb = obj_group_order[k_b->tval];
 	int c = ta - tb;
 	if(c) return c;
 	/* order by */
-	c = k_a->aware - k_b->aware;
+	c = (*(int*)a >= 0 ? 1 : 0) - (*(int*)b >= 0 ? 1 : 0)
+		+ ((k_a->aware & (AWARE_SEEN)) ? 2 : 0) - ((k_b->aware & (AWARE_SEEN)) ? 2 : 0);
 	if(c) return -c; /* aware has low sort weight */
-	if(!k_a->aware & (AWARE_FLAVOR)) {
+	if(*(int*)a < 0) {
 		return strcmp(x_text + x_info[k_a->flavor].text,
 									x_text +x_info[k_b->flavor].text);
 	}
@@ -1661,20 +1664,20 @@ static int o_cmp_tval(const void *a, const void *b)
 	if(c) return c;
 	return strcmp(k_name + k_a->name, k_name + k_b->name);
 }
-static int obj2tval(int oid) { return k_info[oid].tval; }
+static int obj2tval(int oid) { return k_info[oid >= 0 ? oid : -oid].tval; }
 static char *o_xchar(int oid) {
-	object_kind *k_ptr = &k_info[oid];
-	if(!k_ptr->flavor || (k_ptr->aware & (AWARE_FLAVOR))) return &k_ptr->x_char;
+	object_kind *k_ptr = &k_info[oid >= 0 ? oid : -oid];
+	if(oid >= 0) return &k_ptr->x_char;
 	else return &x_info[k_ptr->flavor].x_char;
 }
 static byte *o_xattr(int oid) {
-	object_kind *k_ptr = &k_info[oid];
-	if(!k_ptr->flavor || (k_ptr->aware & (AWARE_FLAVOR))) return &k_ptr->x_attr;
+	object_kind *k_ptr = &k_info[oid >= 0 ? oid : -oid];
+	if(oid >= 0) return &k_ptr->x_attr;
 	else return &x_info[k_ptr->flavor].x_attr;
 }
 static u16b *o_note(int oid) {
-	object_kind *k_ptr = &k_info[oid];
-	if(!k_ptr->flavor || (k_ptr->aware & (AWARE_FLAVOR))) return &k_ptr->note;
+	object_kind *k_ptr = &k_info[oid >= 0 ? oid : -oid];
+	if(oid >= 0) return &k_ptr->note;
 	else return 0;
 }
 
@@ -1692,13 +1695,20 @@ static void do_cmd_knowledge_objects(void)
 	int o_count = 0;
 	int i;
 
-	objects = C_ZNEW(z_info->k_max, int);
+	objects = C_ZNEW(z_info->k_max * 2, int);
 
 	for(i = 0; i < z_info->k_max; i++) {
 		if((k_info[i].aware & (AWARE_EXISTS)) || k_info[i].flavor || cheat_lore) {
 			int c = obj_group_order[k_info[i].tval];
 			if(c >= 0 && object_group_text[c]) {
-				objects[o_count++] = i;
+				if ((k_info[i].aware & (AWARE_EXISTS)) || (cheat_lore))
+				{
+					objects[o_count++] = i;
+				}
+				if (k_info[i].flavor && !(k_info[i].aware & (AWARE_FLAVOR)))
+				{
+					objects[o_count++] = -i;
+				}
 			}
 		}
 	}
