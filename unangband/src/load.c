@@ -2307,7 +2307,7 @@ static errr rd_savefile_new_aux(void)
 
 			rd_byte(&tmp8u);
 
-			k_ptr->aware |= (tmp8u == 1) ? (k_ptr->flavor ? (AWARE_FLAVOR | AWARE_EXISTS) : (AWARE_EXISTS)): 0x00;
+			k_ptr->aware |= (tmp8u == 1) ? (AWARE_FLAVOR | AWARE_EXISTS): 0x00;
 			k_ptr->aware |= (tmp8u >= 2) ? AWARE_TRIED: 0x00;
 			if (tmp8u > 2) k_ptr->guess = (tmp8u - 2);
 		}
