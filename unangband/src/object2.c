@@ -7721,7 +7721,7 @@ void inven_item_increase(int item, int num)
 			o_ptr->stackc = 0;
 
 			/* Decrease charges */
-			if (o_ptr->charges) o_ptr->charges--;
+			if ((o_ptr->charges) && (o_ptr->number > 0)) o_ptr->charges--;
 
 			/* Reset timeout */
 			if (o_ptr->timeout) o_ptr->timeout = 0;
