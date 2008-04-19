@@ -436,11 +436,8 @@ static void player_wipe(void)
 		/* Reset "guess" */
 		k_ptr->guess = 0;
 
-		/* Reset "tried" */
-		k_ptr->tried = FALSE;
-
-		/* Reset "aware" */
-		k_ptr->aware = FALSE;
+		/* Reset "tried" and "flavor" */
+		k_ptr->aware &= ~(AWARE_TRIED | AWARE_FLAVOR);
 	}
 
 
@@ -1581,7 +1578,7 @@ static bool get_player_book(void)
 		k_ptr = &k_info[i];
 
 		/* Hack -- ignore books that the player has not seen yet */
-		if ((birth_intermediate) && !(k_ptr->aware) && (max_good ? k_ptr->sval < SV_BOOK_MAX_GOOD : k_ptr->sval >= SV_BOOK_MIN_GOOD)) continue;
+		if ((birth_intermediate) && !(k_ptr->aware & (AWARE_EXISTS)) && (max_good ? k_ptr->sval < SV_BOOK_MAX_GOOD : k_ptr->sval >= SV_BOOK_MIN_GOOD)) continue;
 		
 		/* Hack -- count one of non-dungeon books per school */
 		if ((k_ptr->sval >= SV_BOOK_MAX_GOOD) && (k_ptr->sval % SV_BOOK_SCHOOL /* != SV_BOOK_SCHOOL - 1 */)) continue;
@@ -1605,7 +1602,7 @@ static bool get_player_book(void)
 		k_ptr = &k_info[i];
 
 		/* Hack -- ignore books that the player has not seen yet */
-		if ((birth_intermediate) && !(k_ptr->aware) && (max_good ? k_ptr->sval < SV_BOOK_MAX_GOOD : k_ptr->sval >= SV_BOOK_MIN_GOOD)) continue;
+		if ((birth_intermediate) && !(k_ptr->aware & (AWARE_EXISTS)) && (max_good ? k_ptr->sval < SV_BOOK_MAX_GOOD : k_ptr->sval >= SV_BOOK_MIN_GOOD)) continue;
 		
 		/* Hack -- count one of non-dungeon books per school */
 		if ((max_good) && (k_ptr->sval >= SV_BOOK_MAX_GOOD) && (k_ptr->sval % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 1)) continue;

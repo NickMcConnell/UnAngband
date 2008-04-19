@@ -509,17 +509,14 @@ struct object_kind
 
 
 	s16b flavor;    /* Special object flavor (or zero) */
-
-	bool aware;     /* The player is "aware" of the item's effects */
-
-	bool tried;     /* The player has "tried" one of the items. Tried */
-
 	u16b note;     /* Auto-inscription */
 
 	byte runest;   /* Rune type */
 	byte runesc;   /* Rune count */
 
 	byte guess;
+	byte aware;     /* The player is "aware" of the item. */
+
 	s16b used;	/* Number of times used */
 };
 

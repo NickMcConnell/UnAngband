@@ -1411,23 +1411,16 @@ static void display_entry(int item, int store_index)
 		/* Display the object */
 		c_put_str(attr, o_name, y, 3);
 
-		/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
-		if (!k_info[o_ptr->k_idx].flavor)
+		/* Class learning */
+		if (k_info[o_ptr->k_idx].aware & (AWARE_CLASS))
 		{
-			/* Object not known */
-			if (!object_aware_p(o_ptr))
-			{
-				/* Display tips */
-				object_aware_tips(o_ptr->k_idx);
-			}
-			
-			/* Make object aware - short routine */
-			k_info[o_ptr->k_idx].aware = TRUE;
+			/* Learn flavor */
+			object_aware(o_ptr, TRUE);
 		}
-
-		/* XXX XXX - Mark monster objects as "seen" */
-		if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights)) l_list[o_ptr->name3].sights++;
-
+		
+		/* Mark object seen */
+		object_aware_tips(o_ptr, TRUE);
+		
 		/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
 		if (o_ptr->name2)
 		{
@@ -1436,7 +1429,7 @@ static void display_entry(int item, int store_index)
 				queue_tip(format("ego%d.txt", o_ptr->name2));
 			}
 			
-			e_info[o_ptr->name2].aware = TRUE;
+			e_info[o_ptr->name2].aware |= (AWARE_EXISTS);
 		}
 
 		/* Only show the weight of a single object */
@@ -1472,14 +1465,9 @@ static void display_entry(int item, int store_index)
 		sprintf(out_val, "%3d.%d", wgt / 10, wgt % 10);
 		put_str(out_val, y, 61);
 
-		/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
-		if ((!k_info[o_ptr->k_idx].flavor) && !(k_info[o_ptr->k_idx].aware))
-		{
-			object_aware_tips(o_ptr->k_idx);
+		/* Make object aware - short routine */
+		k_info[o_ptr->k_idx].aware |= (AWARE_EXISTS);
 
-			k_info[o_ptr->k_idx].aware = TRUE;
-		}
-		
 		/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
 		if (o_ptr->name2)
 		{			
@@ -2475,7 +2463,7 @@ static void store_purchase(int store_index)
 			/* Mark as fixed price */
 			o_ptr->ident |= (IDENT_FIXED);
 		}
-
+		
 		/* Player wants a service */
 		if ((choice == 0) && (i_ptr->tval == TV_SERVICE))
 		{
@@ -2511,6 +2499,15 @@ static void store_purchase(int store_index)
 				/* Update the display */
 				store_prt_gold();
 
+				/* Class learning */
+				if (k_info[o_ptr->k_idx].aware & (AWARE_CLASS))
+				{
+					/* Learn flavor */
+					object_aware(o_ptr, TRUE);
+				}
+				
+				/* Mark object seen */
+				object_aware_tips(o_ptr, TRUE);
 			}
 
 			/* Player cannot afford it */
@@ -2542,6 +2539,9 @@ static void store_purchase(int store_index)
 				/* Buying an object makes you aware of it */
 				object_aware(i_ptr, FALSE);
 
+				/* Mark object seen */
+				object_aware_tips(o_ptr, TRUE);
+			
 				/* The object kind is not guessed */
 				k_info[i_ptr->k_idx].guess = 0;
 

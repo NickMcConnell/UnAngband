@@ -1944,21 +1944,15 @@ void note_spot(int y, int x)
 			/* Memorize objects */
 			if (!auto_pickup_ignore(o_ptr)) o_ptr->ident |= (IDENT_MARKED);
 
-			/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
-			if ((!k_ptr->flavor) && !(k_ptr->aware))
+			/* Class learning */
+			if (k_ptr->aware & (AWARE_CLASS))
 			{
-				object_aware_tips(o_ptr->k_idx);
-
-				k_ptr->aware = TRUE;
+				/* Learn flavor */
+				object_aware(o_ptr, TRUE);
 			}
 
-			/* XXX XXX - Mark monster objects as "seen" */
-			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights))
-			{
-				l_list[o_ptr->name3].sights++;
-				
-				queue_tip(format("look%d.txt", o_ptr->name3));
-			}
+			/* Mark objects seen */
+			object_aware_tips(o_ptr, TRUE);
 		}
 	}
 

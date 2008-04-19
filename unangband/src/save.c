@@ -378,15 +378,11 @@ static void wr_event(int n, int s)
  */
 static void wr_xtra(int k_idx)
 {
-	byte tmp8u = 0;
-
 	object_kind *k_ptr = &k_info[k_idx];
 
-	if (k_ptr->aware) tmp8u = 1;
-	else if (k_ptr->guess) tmp8u = k_ptr->guess+2;
-	else if (k_ptr->tried) tmp8u = 2;
-
-	wr_byte(tmp8u);
+	/* Write awareness */
+	wr_byte(k_ptr->aware);
+	wr_byte(k_ptr->guess);
 
 	/* Activations */
 	wr_u16b(k_ptr->used);	

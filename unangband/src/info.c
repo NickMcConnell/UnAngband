@@ -4249,7 +4249,7 @@ void object_guess_name(object_type *o_ptr)
 	if (object_named_p(o_ptr)) return;
 
 	/* Remove flags on aware objects */
-	if (k_info[o_ptr->k_idx].aware)
+	if (object_aware_p(o_ptr))
 	{
 		f1 &= ~(k_info[o_ptr->k_idx].flags1);
 		f2 &= ~(k_info[o_ptr->k_idx].flags2);
@@ -4406,7 +4406,7 @@ void object_guess_name(object_type *o_ptr)
 		if (!k_ptr->name) continue;
 
 		/* Must not already be aware? */
-		if (k_ptr->aware) continue;
+		if (k_ptr->aware & (AWARE_FLAVOR)) continue;
 
 		/* Must be flavored */
 		if (!k_ptr->flavor) continue;
@@ -4639,7 +4639,7 @@ void object_guess_name(object_type *o_ptr)
 		k_info[o_ptr->k_idx].guess = guess3;
 
 		/* Guess is tried */
-		k_info[o_ptr->k_idx].tried = TRUE;
+		k_info[o_ptr->k_idx].aware |= (AWARE_TRIED);
 
 		/* Describe the object */
 		object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);

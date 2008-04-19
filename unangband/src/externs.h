@@ -771,7 +771,7 @@ extern void object_known_store(object_type *o_ptr);
 extern void object_known(object_type *o_ptr);
 extern void object_bonus(object_type *o_ptr, bool floor);
 extern void object_mental(object_type *o_ptr, bool floor);
-extern void object_aware_tips(int kind);
+extern void object_aware_tips(object_type *o_ptr, bool seen);
 extern void object_aware(object_type *o_ptr, bool floor);
 extern void object_tried(object_type *o_ptr);
 extern s32b object_value_real(const object_type *o_ptr);

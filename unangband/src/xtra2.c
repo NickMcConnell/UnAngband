@@ -2423,8 +2423,6 @@ void improve_aware(void)
 {
 	int i;
 	int awareness = -1;
-	int tip_count_start = 0;
-	int tip_count = 0;
 	
 	/* Hack -- Check for id'ed */
 	for (i=1;i<z_info->w_max;i++)
@@ -2440,44 +2438,35 @@ void improve_aware(void)
 		awareness = 2*(p_ptr->lev - w_info[i].level)+1;
 	}
 
-	/* Hack -- efficiency for tips */
-	for (i=1;i<z_info->k_max;i++)
-	{
-		/*Already aware */
-		if (k_info[i].aware) continue;
-		
-		/* Check awareness */
-		if (k_info[i].tval == style2tval[p_ptr->pstyle])
-		{
-			tip_count_start++;
-		}
-	}
-	
 	/* Hack -- Check for id'ed */
 	for (i=1;i<z_info->k_max;i++)
 	{
-		/*Already aware */
-		if (k_info[i].aware) continue;
-
 		/* Check for awareness */
 		if (k_info[i].level > awareness) continue;
 		
 		/* Check awareness */
 		if (k_info[i].tval == style2tval[p_ptr->pstyle])
 		{
-			queue_tip(format("kind%d.txt", i));
-			k_info[i].aware=TRUE;
-			p_ptr->notice |= (PN_REORDER | PN_COMBINE);
+			/* Aware next time player sees an object */
+			k_info[i].aware |= (AWARE_CLASS);
 			
-			tip_count++;
+			/* Recalculate bonuses */
+			p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW);
 		}
 	}
 	
-	/* Show all tval tips */
-	for(i = tip_count_start; i < tip_count_start + tip_count; i++)
+	/* Check inventory */
+	for (i = 0; i < INVEN_TOTAL; i++)
 	{
-		/* Show tips */
-		queue_tip(format("tval%d-%d.txt", style2tval[p_ptr->pstyle], i));
+		if (((k_info[inventory[i].k_idx].aware & (AWARE_CLASS)) != 0) &&
+		((k_info[inventory[i].k_idx].aware & (AWARE_CLASS)) != 0))
+		{
+			/* Become aware of object */
+			object_aware(&inventory[i], FALSE);
+		}
+
+		/* Notice stuff */
+		p_ptr->notice |= (PN_COMBINE | PN_REORDER);
 	}
 }
 

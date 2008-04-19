@@ -1565,21 +1565,15 @@ byte py_pickup(int py, int px, int pickup)
 		{
 			o_ptr->ident |= (IDENT_MARKED);
 
-			/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
-			if ((!k_info[o_ptr->k_idx].flavor) && !(k_info[o_ptr->k_idx].aware))
+			/* Class learning */
+			if (k_info[o_ptr->k_idx].aware & (AWARE_CLASS))
 			{
-				object_aware_tips(o_ptr->k_idx);
-
-				k_info[o_ptr->k_idx].aware = TRUE;
+				/* Learn flavor */
+				object_aware(o_ptr, TRUE);
 			}
 
-			/* XXX XXX - Mark monster objects as "seen" */
-			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights))
-			{
-				l_list[o_ptr->name3].sights++;
-				
-				queue_tip(format("look%d.txt", o_ptr->name3));
-			}
+			/* Mark objects seen */
+			object_aware_tips(o_ptr, TRUE);
 		}
 
 		/* Hack -- disturb */

@@ -841,37 +841,63 @@ void object_bonus(object_type *o_ptr, bool floor)
 /*
  * Ensure tips are displayed as objects become either weakly or strongly aware
  */
-void object_aware_tips(int kind)
+void object_aware_tips(object_type *o_ptr, bool seen)
 {
 	int i, count = 0;
-	int tval = k_info[kind].tval;
+	object_kind *k_ptr = &k_info[o_ptr->k_idx];
 
 	/* Check all objects */
 	for (i = 0; i < z_info->k_max; i++)
 	{
 		/* Skip non-matching tvals */
-		if (k_info[i].tval != tval) continue;
+		if (k_info[i].tval != k_ptr->tval) continue;
 		
-		/* Count number of objects aware */
-		if (k_info[i].aware) count++;
+		/* Count number of objects known */
+		if (k_info[i].aware & (AWARE_SEEN | AWARE_EXISTS)) count++;
 	}
 
-	/* Show tval tips if no objects of this type known */
-	if (!count)
+	/* We didn't know the object */
+	if ((seen) && !(k_ptr->aware & (AWARE_SEEN)))
 	{
-		/* Show tval based tip */
-		queue_tip(format("tval%d.txt", tval));
-	}
-	/* Show tval tips if 'count' svals of this type known */
-	else
-	{
-		/* Show tval based tip */
-		queue_tip(format("tval%d-%d.txt", tval, count));
+		/* Seen the object */
+		k_ptr->aware |= (AWARE_SEEN);
+
+		/* Increase tvals seen */
+		count++;
+
+		/* Show tval tips if no objects of this type known */
+		if (!count)
+		{
+			/* Show tval based tip */
+			queue_tip(format("tval%d.txt", k_ptr->tval));
+		}
+		/* Show tval tips if 'count' svals of this type known */
+		else
+		{
+			/* Show tval based tip */
+			queue_tip(format("tval%d-%d.txt", k_ptr->tval, count));
+		}
+		
+		/* XXX XXX - Mark monster objects as "seen" */
+		if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights))
+		{
+			l_list[o_ptr->name3].sights++;
+			
+			queue_tip(format("look%d.txt", o_ptr->name3));
+		}
 	}
 
-	/* Show tip for kind of object */
-	queue_tip(format("kind%d.txt", kind));
+	/* We didn't note the object */
+	if (!(k_ptr->aware & (AWARE_EXISTS)) && (object_aware_p(o_ptr)))
+	{
+		/* Noted object */
+		k_ptr->aware |= (AWARE_EXISTS);
+		
+		/* Show tip for kind of object */
+		queue_tip(format("kind%d.txt", o_ptr->k_idx));
+	}
 }
+
 
 /*
  * The player is now aware of the effects of the given object.
@@ -884,12 +910,6 @@ void object_aware(object_type *o_ptr, bool floor)
 
 	u32b f1, f2, f3, f4;
 
-	/* Add a tip if we're not aware */
-	if (!object_aware_p(o_ptr))
-	{
-		object_aware_tips(o_ptr->k_idx);
-	}
-	
 	/* Get the flags */
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
@@ -901,7 +921,7 @@ void object_aware(object_type *o_ptr, bool floor)
 	o_ptr->guess2 = 0;
 
 	/* No longer tried */
-	k_ptr->tried = FALSE;
+	k_ptr->aware &= ~(AWARE_TRIED);
 
 	/* Auto-inscribe */
 	if (o_ptr->name2)
@@ -920,20 +940,26 @@ void object_aware(object_type *o_ptr, bool floor)
 	if (o_ptr->feeling >= MAX_INSCRIP) o_ptr->feeling = 0;
 
 	/* Fully aware of the effects */
-	k_info[o_ptr->k_idx].aware = TRUE;
+	k_info[o_ptr->k_idx].aware |= (AWARE_FLAVOR);
 
 	/* Hack -- fully aware of the coating effects */
 	if (o_ptr->xtra1 >= OBJECT_XTRA_MIN_COATS)
 	{
+		object_type object_type_body;
+		object_type *i_ptr = &object_type_body;
+		
 		int coating = lookup_kind(o_ptr->xtra1, o_ptr->xtra2);
 
+		/* Prepare object */
+		object_prep(i_ptr,coating);
+		
 		/* Queue tips */
-		if (!k_info[coating].aware) object_aware_tips(coating);
+		object_aware_tips(i_ptr, FALSE);
 
 		/* Make coating aware */
-		k_info[coating].aware = TRUE;
+		k_info[coating].aware |= (AWARE_FLAVOR);
 		
-		k_info[coating].tried = FALSE;
+		k_info[coating].aware &= ~(AWARE_TRIED);
 	}
 	
 	/* Identify the name */
@@ -1014,6 +1040,9 @@ void object_aware(object_type *o_ptr, bool floor)
 			o_ptr->may_flags3,
 			o_ptr->may_flags4, floor);
 
+	/* Add a tip */
+	object_aware_tips(o_ptr, FALSE);
+	
 	/* Know about ego-type */
 	if ((o_ptr->name2) && !(o_ptr->ident & (IDENT_STORE)))
 	{
@@ -1036,10 +1065,10 @@ void object_tried(object_type *o_ptr)
 	object_kind *k_ptr = &k_info[o_ptr->k_idx];
 
 	/* Don't mark it if aware */
-	if (k_ptr->aware) return;
+	if (object_aware_p(o_ptr)) return;
 
 	/* Mark it as tried */
-	k_ptr->tried = TRUE;
+	k_ptr->aware |= (AWARE_TRIED);
 }
 
 
@@ -4904,14 +4933,14 @@ static bool kind_is_good(int k_idx)
 		case TV_MAGIC_BOOK:
 		case TV_PRAYER_BOOK:
 		{
-			if ((k_ptr->sval < SV_BOOK_MAX_GOOD) && !(k_ptr->aware)) return (TRUE);
+			if ((k_ptr->sval < SV_BOOK_MAX_GOOD) && !(k_ptr->aware & (AWARE_SEEN))) return (TRUE);
 			return (FALSE);	
 		}
 		
 		/* Books -- high level books are good if not seen previously */
 		case TV_SONG_BOOK:
 		{
-			if ((k_ptr->sval >= SV_BOOK_MIN_GOOD) && !(k_ptr->aware)) return (TRUE);
+			if ((k_ptr->sval >= SV_BOOK_MIN_GOOD) && !(k_ptr->aware & (AWARE_SEEN))) return (TRUE);
 			return (FALSE);
 		}
 
@@ -4919,7 +4948,7 @@ static bool kind_is_good(int k_idx)
 		case TV_BAG:
 		case TV_RUNESTONE:
 		{
-			if (!(k_ptr->aware)) return (TRUE);
+			if (!(k_ptr->aware & (AWARE_SEEN))) return (TRUE);
 			return (FALSE);
 		}
 

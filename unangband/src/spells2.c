@@ -1225,22 +1225,9 @@ bool detect_objects_normal(void)
 			/* Hack -- memorize it */
 			if (!auto_pickup_ignore(o_ptr)) o_ptr->ident |= (IDENT_MARKED);
 
-			/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
-			if ((!k_info[o_ptr->k_idx].flavor) && !(k_info[o_ptr->k_idx].aware))
-			{
-				object_aware_tips(o_ptr->k_idx);
+			/* Get awareness */
+			object_aware_tips(o_ptr, TRUE);
 
-				k_info[o_ptr->k_idx].aware = TRUE;
-			}
-
-			/* XXX XXX - Mark monster objects as "seen" */
-			if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights))
-			{
-				l_list[o_ptr->name3].sights++;
-				
-				queue_tip(format("look%d.txt", o_ptr->name3));
-			}
-			
 			/* Redraw */
 			lite_spot(y, x);
 
@@ -8357,8 +8344,22 @@ bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x)
 		/* Evaluate coating */
 		if (obvious && (coated_p(o_ptr)))
 		{
-			int k_idx = lookup_kind(o_ptr->xtra1, o_ptr->xtra2);
-			k_info[k_idx].aware = TRUE;
+			object_type object_type_body;
+			object_type *i_ptr = &object_type_body;
+			
+			int coating = lookup_kind(o_ptr->xtra1, o_ptr->xtra2);
+
+			/* Prepare object */
+			object_prep(i_ptr,coating);
+			
+			/* Queue tips */
+			object_aware_tips(i_ptr, FALSE);
+
+			/* Make coating aware */
+			k_info[coating].aware |= (AWARE_FLAVOR);
+			
+			k_info[coating].aware &= ~(AWARE_TRIED);
+
 			if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
 		}
 

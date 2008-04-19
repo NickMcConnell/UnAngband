@@ -2122,7 +2122,7 @@ bool player_apply_rune_or_coating2(int item2)
 		rune = -1;
 		tval = o_ptr->tval;
 		sval = o_ptr->sval;
-		aware = k_info[o_ptr->k_idx].aware;
+		aware = k_info[o_ptr->k_idx].aware & (AWARE_FLAVOR) != 0;
 	}
 
 	/* Overwrite runes */

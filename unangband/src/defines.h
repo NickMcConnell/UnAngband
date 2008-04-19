@@ -67,7 +67,7 @@
 #define VERSION_MAJOR	0
 #define VERSION_MINOR	6
 #define VERSION_PATCH	2
-#define VERSION_EXTRA	7
+#define VERSION_EXTRA	8
 
 
 /*
@@ -3218,6 +3218,18 @@
 
 
 /*
+ * Special Awareness Flags
+ */
+#define AWARE_SEEN		0x01	/* Item "seen" this game. */
+#define AWARE_FLAVOR	0x02	/* Item "flavor" is known this game. */
+#define AWARE_EXISTS	0x04	/* Item is known to exist in a game. */
+#define AWARE_TRIED		0x08	/* Item has been tried. */
+#define AWARE_RUNES		0x10	/* Item runes are known. */
+#define AWARE_MASTER	0x20	/* Item has been mastered. */
+#define AWARE_CLASS		0x40	/* Item "flavor" will be known when the item is known to exist. */
+
+
+/*
  * Special Object Flags
  */
 #define IDENT_SENSE	0x0001	/* Item has been "sensed" */
@@ -4500,13 +4512,15 @@
  * Determine if a given inventory item is "aware"
  */
 #define object_aware_p(T) \
-	(k_info[(T)->k_idx].aware)
+	(k_info[(T)->k_idx].flavor ? \
+	  k_info[(T)->k_idx].aware & (AWARE_FLAVOR) : \
+	  k_info[(T)->k_idx].aware & (AWARE_EXISTS))
 
 /*
  * Determine if a given inventory item is "tried"
  */
 #define object_tried_p(T) \
-	(k_info[(T)->k_idx].tried)
+	(k_info[(T)->k_idx].aware & (AWARE_TRIED))
 
 
 /*
@@ -4523,7 +4537,7 @@
 #define object_named_p(T) \
 	(((T)->ident & (IDENT_KNOWN | IDENT_NAME)) || \
 	 (k_info[(T)->k_idx].flavor && \
-	  k_info[(T)->k_idx].aware))
+	  k_info[(T)->k_idx].aware & (AWARE_FLAVOR)))
 
 
 /*
@@ -4557,7 +4571,7 @@
  * Default to user definitions.
  */
 #define object_attr(T) \
-	((k_info[(T)->k_idx].flavor && (view_flavors || !k_info[(T)->k_idx].aware)) ? \
+	((k_info[(T)->k_idx].flavor && (view_flavors || !(k_info[(T)->k_idx].aware & (AWARE_FLAVOR)))) ? \
 	 (x_info[k_info[(T)->k_idx].flavor].x_attr) : \
 	 (k_info[(T)->k_idx].x_attr))
 
@@ -4567,7 +4581,7 @@
  * Default to user definitions.
  */
 #define object_char(T) \
-	((k_info[(T)->k_idx].flavor && (view_flavors || !k_info[(T)->k_idx].aware)) ? \
+	((k_info[(T)->k_idx].flavor && (view_flavors || !(k_info[(T)->k_idx].aware & (AWARE_FLAVOR)))) ? \
 	 (x_info[k_info[(T)->k_idx].flavor].x_char) : \
 	 (k_info[(T)->k_idx].x_char))
 
