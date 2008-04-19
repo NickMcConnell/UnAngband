@@ -821,7 +821,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags2 & (SF2_SHERO)) vp[vn++]="makes you go berserk";
 	if (s_ptr->flags2 & (SF2_BLESS)) vp[vn++]="blesses you";
 	if (s_ptr->flags2 & (SF2_SHIELD)) vp[vn++]="shields you";
-	if (s_ptr->flags2 & (SF2_INVULN)) vp[vn++]="makes you invulnerable to damage";
+	if (s_ptr->flags2 & (SF2_INVIS)) vp[vn++]="makes you invisible";
 	if (s_ptr->flags3 & (SF3_FREE_ACT)) vp[vn++] = "protects you from paralysis and magical slowness";
 	if (s_ptr->flags2 & (SF2_SEE_INVIS)) vp[vn++]="allows you to see invisible monsters";
 	if (s_ptr->flags2 & (SF2_PROT_EVIL)) vp[vn++]="protects you from evil monsters";

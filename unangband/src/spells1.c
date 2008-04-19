@@ -1241,9 +1241,6 @@ void take_hit(int who, int what, int dam)
 	/* Disturb */
 	disturb(1, 1);
 
-	/* Mega-Hack -- Apply "invulnerability" */
-	if (p_ptr->invuln && (dam < 9000)) return;
-
 	/* Make test-id and traps less deadly */
 	if (p_ptr->chp >= p_ptr->mhp / 2
 		 && dam >= p_ptr->chp
@@ -5538,6 +5535,9 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 	/* Heal amount (amount to enrage) */
 	int do_rage = 0;
 
+	/* Heal amount (amount to turn invisible for) */
+	int do_invis = 0;
+
 	/* Heal amount (amount to petrify) */
 	int do_petrify = 0;
 
@@ -8089,6 +8089,17 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 		
+		/* Turn monster invisible */
+		case GF_INVISIBILITY:
+		{
+			/* Blind */
+			do_invis = dam;
+
+			/* No "real" damage */
+			dam = 0;
+			break;
+		}
+		
 		/* Monster forgets things */
 		case GF_FORGET:
 		{
@@ -8562,8 +8573,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			/* Obvious */
 			if (seen) obvious = TRUE;
 
-			/* Get confused */
-			if (m_ptr->stunned)
+			/* Get berserk */
+			if (m_ptr->berserk)
 			{
 				if (!note) note =  " is more enraged.";
 				tmp = m_ptr->berserk + (do_rage / (r_ptr->level / 10 + 1));
@@ -8592,6 +8603,42 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				m_ptr->mflag |= (MFLAG_IGNORE);				
 			}
 
+		}
+		
+		/* Handle "invisibility" */
+		if (do_invis > 1)
+		{
+			/* Obvious */
+			if (seen) obvious = TRUE;
+
+			/* Get confused */
+			if (m_ptr->tim_invis)
+			{
+				tmp = m_ptr->tim_invis + (do_invis / (r_ptr->level / 10 + 1));
+			}
+			else
+			{
+				if (do_invis > 1) if (!note) note =  " disappears.";
+				tmp = do_invis;
+			}
+
+			/* Apply stun */
+			m_ptr->tim_invis = MIN(tmp, 200);
+			
+			/* Target the player */
+			if (who <= SOURCE_PLAYER_START)
+			{
+				m_ptr->ty = p_ptr->py;
+				m_ptr->tx = p_ptr->px;
+				m_ptr->mflag &= ~(MFLAG_ALLY);
+			}
+			/* Target a monster */
+			else if (who > SOURCE_MONSTER_START)
+			{
+				m_ptr->ty = m_list[who].fy;
+				m_ptr->tx = m_list[who].fy;
+				m_ptr->mflag |= (MFLAG_IGNORE);				
+			}
 		}
 		
 		/* Handle cuts from player or allies only */
@@ -11550,7 +11597,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (p_ptr->stastis) set_stastis(1);
 
 			if (p_ptr->protevil) set_protevil(1);
-			if (p_ptr->invuln) set_invuln(1);
+			if (p_ptr->invis) set_invis(1);
 			if (p_ptr->hero) set_hero(1);
 			if (p_ptr->shero) set_shero(1);
 			if (p_ptr->shield) set_shield(1);

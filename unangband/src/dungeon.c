@@ -1173,6 +1173,12 @@ static void process_world(void)
 		(void)set_psleep(p_ptr->psleep + 1);
 	}
 
+	/* Times invisible */
+	if (p_ptr->invis)
+	{
+		(void)set_invis(p_ptr->invis - 1);
+	}
+
 	/* Times see-invisible */
 	if (p_ptr->tim_invis)
 	{
@@ -1243,12 +1249,6 @@ static void process_world(void)
 	if (p_ptr->protevil)
 	{
 		(void)set_protevil(p_ptr->protevil - 1);
-	}
-
-	/* Invulnerability */
-	if (p_ptr->invuln)
-	{
-		(void)set_invuln(p_ptr->invuln - 1);
 	}
 
 	/* Heroism */

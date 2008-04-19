@@ -1500,6 +1500,14 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 	{
 		monster_race *r_ptr = &r_info[0];
 
+		/* Hack - can't see invisible player due to see_invis */
+		if ((p_ptr->invis) && !(p_ptr->tim_invis) && !(p_ptr->cur_flags3 & (TR3_SEE_INVIS)))
+		{
+			/* Use underlying attribute/char */
+		}
+
+		/* 
+		
 		/* Get the "player" attr */
 		/*  DSV:  I've chosen the following sequence of colors to indicate
 				the player's current HP.  There are colors are left over, but I
@@ -1526,8 +1534,14 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			TERM_VIOLET		-% of HP remaining
 		*/
 
-		if (arg_graphics == GRAPHICS_NONE)
+		else if (arg_graphics == GRAPHICS_NONE)
 		{
+			/* Invisible players are 'clear' */
+			if (p_ptr->invis)
+			{
+				/* Use underlying attr */
+			}
+			
 			switch(p_ptr->chp * 10 / p_ptr->mhp)
 				{
 				case 10:

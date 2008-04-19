@@ -721,7 +721,7 @@ void self_knowledge_aux(bool spoil, bool random)
 	/* Collect temporary effects */
 	vn = 0;
 
-	if (p_ptr->invuln) vp[vn++] = "invulnerable";
+	if (p_ptr->invis) vp[vn++] = "invisible";
 	if (p_ptr->free_act) vp[vn++] = "protected from paralysis and magical slowing";
 
 	for (n = 0; n < A_CHR; n++)
@@ -6961,7 +6961,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	if ((s_ptr->flags2 & (SF2_SHERO)) && (set_shero(p_ptr->shero + lasts))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_BLESS)) && (set_blessed(p_ptr->blessed + lasts))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_SHIELD)) && (set_shield(p_ptr->shield + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_INVULN)) && (set_invuln(p_ptr->invuln + lasts))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_INVIS)) && (set_invis(p_ptr->invis + lasts))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_SEE_INVIS)) && (set_tim_invis(p_ptr->tim_invis + lasts))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_PROT_EVIL)) && (set_protevil(p_ptr->protevil + lasts + (level== 0 ? 3 * p_ptr->lev : 0)))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_SLOW_CURSE)) && (set_cursed(0))) obvious = TRUE;

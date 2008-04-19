@@ -3538,13 +3538,6 @@ static void calc_bonuses(void)
 		p_ptr->dis_to_d -= 5;
 	}
 
-	/* Invulnerability */
-	if (p_ptr->invuln)
-	{
-		p_ptr->to_a += 100;
-		p_ptr->dis_to_a += 100;
-	}
-
 	/* Temporary blessing */
 	if (p_ptr->blessed)
 	{

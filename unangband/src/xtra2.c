@@ -1216,9 +1216,9 @@ bool set_protevil(int v)
 
 
 /*
- * Set "p_ptr->invuln", notice observable changes
+ * Set "p_ptr->invis", notice observable changes
  */
-bool set_invuln(int v)
+bool set_invis(int v)
 {
 	bool notice = FALSE;
 
@@ -1228,9 +1228,14 @@ bool set_invuln(int v)
 	/* Open */
 	if (v)
 	{
-		if (!p_ptr->invuln)
+		if (!p_ptr->invis)
 		{
-			msg_print("You feel invulnerable!");
+			msg_print("You seem to fade away.");
+			if (p_ptr->cur_lite)
+			{
+				if (inventory[INVEN_LITE].k_idx) msg_print("The light you carry is still visible.");
+				else msg_print("The glow from your equipment is still visible.");
+			}
 			notice = TRUE;
 		}
 	}
@@ -1238,15 +1243,15 @@ bool set_invuln(int v)
 	/* Shut */
 	else
 	{
-		if (p_ptr->invuln)
+		if (p_ptr->invis)
 		{
-			msg_print("You feel vulnerable once more.");
+			msg_print("You feel visible once more.");
 			notice = TRUE;
 		}
 	}
 
 	/* Use the value */
-	p_ptr->invuln = v;
+	p_ptr->invis = v;
 
 	/* Nothing to notice */
 	if (!notice) return (FALSE);
@@ -1254,8 +1259,11 @@ bool set_invuln(int v)
 	/* Disturb */
 	if (disturb_state) disturb(0, 0);
 
-	/* Recalculate bonuses */
-	p_ptr->update |= (PU_BONUS);
+	/* Redraw map */
+	p_ptr->redraw |= (PR_MAP);
+
+	/* Window stuff */
+	p_ptr->window |= (PW_OVERHEAD);
 
 	/* Handle stuff */
 	handle_stuff();
@@ -1288,7 +1296,7 @@ bool set_free_act(int v)
 	/* Shut */
 	else
 	{
-		if (p_ptr->invuln)
+		if (p_ptr->free_act)
 		{
 			msg_print("You feel less free in your actions.");
 			notice = TRUE;

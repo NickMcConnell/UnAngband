@@ -1332,7 +1332,7 @@ static errr rd_extra(void)
 	rd_s16b(&p_ptr->poisoned);
 	rd_s16b(&p_ptr->image);
 	rd_s16b(&p_ptr->protevil);
-	rd_s16b(&p_ptr->invuln);
+	rd_s16b(&p_ptr->invis);
 	rd_s16b(&p_ptr->hero);
 	rd_s16b(&p_ptr->shero);
 	rd_s16b(&p_ptr->shield);

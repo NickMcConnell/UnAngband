@@ -487,6 +487,7 @@ static cptr r_info_blow_effect[] =
 	"GAIN_MANA_PERC",
 	"TANGLE",
 	"POISON_WATER",
+	"INVISIBILITY",
 	NULL
 };
 
@@ -1288,7 +1289,7 @@ static cptr s_info_flags2[] =
 	"SHERO",
 	"BLESS",
 	"SHIELD",
-	"INVULN",
+	"INVIS",
 	"SEE_INVIS",
 	"PROT_EVIL",
 	"RECALL",
