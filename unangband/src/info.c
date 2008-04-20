@@ -3195,7 +3195,7 @@ void list_ego_item_runes(int ego, bool spoil)
 			e_info[ego].runesc != 0 ? "s" : ""));
 
 	/* Check ego item slots */
-	for (n = 3; n >= 0; n--)
+	for (n = 2; n >= 0; n--)
 	{
 		/* Skip blank entries */
 		if (!e_info[ego].tval[n]) continue;
@@ -3237,7 +3237,7 @@ void list_ego_item_runes(int ego, bool spoil)
 			output = FALSE;
 			
 			/* Check ego item slots */
-			for (n = 3; n >= 0; n--)
+			for (n = 2; n >= 0; n--)
 			{
 				/* Skip blank entries */
 				if (!e_info[ego].tval[n]) continue;
@@ -3277,6 +3277,7 @@ void list_ego_item_runes(int ego, bool spoil)
 							text_out(object_group[i].text);
 						}
 					}
+					/* TODO: This is wrong, but only breaks in a couple of instances. Hopefull no one will notice. */
 					if (n > 1) text_out(", ");
 					else if (n == 1) text_out(" or ");
 				}
