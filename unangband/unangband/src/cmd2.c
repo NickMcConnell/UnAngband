@@ -3459,6 +3459,10 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 	{
 		int mul, div;
 
+		/* Compensating the lack of bow, add item bonuses twice; once here: */
+		bow_to_h = i_ptr->to_h;
+		bow_to_d = i_ptr->to_d;
+
 		ranged_skill = p_ptr->skill_tht;
 
 		/* Badly balanced big weapons waste the throwing skill.
