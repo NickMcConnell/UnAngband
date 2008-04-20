@@ -3878,6 +3878,30 @@ void list_object(const object_type *o_ptr, int mode)
 							o_name));
 				}	
 			}
+			
+			/* Check for rune upgrades */
+			for (i = 0; i < z_info->k_max; i++)
+			{
+				if (((spoil) || (k_info[i].aware & (AWARE_RUNEX))) &&
+						(k_info[i].runest == k_info[o_ptr->k_idx].runest) &&
+						(k_info[i].runesc > k_info[o_ptr->k_idx].runesc) &&
+						(k_info[i].tval == k_info[o_ptr->k_idx].tval))
+				{
+					object_type object_type_body;
+					object_type *i_ptr = &object_type_body;
+					char o_name[80];
+					
+					object_prep(i_ptr, i);
+					if (spoil) i_ptr->ident |= (IDENT_STORE);
+					object_desc(o_name, sizeof(o_name), i_ptr, TRUE, 1);
+					
+					text_out(format("You can apply %d %s rune%s to this to make %s.  ",
+							k_info[i].runesc - k_info[o_ptr->k_idx].runesc,
+							y_name + y_info[k_info[o_ptr->k_idx].runest].name,
+							(k_info[i].runesc - k_info[o_ptr->k_idx].runesc) != 1 ? "s" : "",
+							o_name));
+				}
+			}
 		}
 	}
 	
@@ -3894,12 +3918,14 @@ void list_object(const object_type *o_ptr, int mode)
 			
 			/* 'Basic' object */
 			text_out(format("You can apply %d %s rune%s to any ", 
-					e_info[o_ptr->name2].runest,
-					y_name + y_info[k_info[o_ptr->name2].runest].name,
+					e_info[o_ptr->name2].runesc,
+					y_name + y_info[e_info[o_ptr->name2].runest].name,
 					e_info[o_ptr->name2].runesc != 0 ? "s" : ""));
 
 			for (n = 3; n >= 0; n--)
 			{
+				if (!e_info[o_ptr->name2].tval[n]) continue;
+				
 				for (i = 0; object_group_tval[i]; i++)
 				{
 					if (e_info[o_ptr->name2].tval[n] == object_group_tval[i])
@@ -3908,30 +3934,36 @@ void list_object(const object_type *o_ptr, int mode)
 						
 						text_out(object_group_text[i]);
 						if (n > 1) text_out(", ");
-						else if (n == 1) text_out("or ");
+						else if (n == 1) text_out(" or ");
 					}
 				}
 			}
 			
 			/* No match */
-			if (!output) text_out("ego item ");
+			if (!output) text_out("ego item");
 			
+			text_out(format(" to make an ego item %s.  ", e_name + e_info[o_ptr->name2].name));
 			
 			/* Check for other recipes */
 			for (k = 0; k < z_info->e_max; k++)
 			{
 				if (((spoil) || (e_info[k].aware & (AWARE_RUNES))) &&
-						(e_info[k].runest == k_info[o_ptr->k_idx].runest) &&
-						(e_info[k].runesc == k_info[o_ptr->k_idx].runesc))
+						(e_info[k].runest == e_info[o_ptr->name2].runest) &&
+						(e_info[k].runesc < e_info[o_ptr->name2].runesc))
 				{
 					/* 'Basic' object */
 					text_out(format("You can apply %d %s rune%s to any ", 
 							e_info[o_ptr->name2].runesc - e_info[k].runesc,
 							y_name + y_info[e_info[o_ptr->name2].runest].name,
-							e_info[o_ptr->name2].runesc != 0 ? "s" : ""));
+							e_info[o_ptr->name2].runesc - e_info[k].runesc != 1 ? "s" : ""));
 
+					/* Need to do this trick again. */
+					output = FALSE;
+					
 					for (n = 3; n >= 0; n--)
 					{
+						if (!e_info[o_ptr->name2].tval[n]) continue;
+						
 						for (l = 0; l < 3; l++)
 						{
 							/* Must match tvals */
@@ -3949,12 +3981,43 @@ void list_object(const object_type *o_ptr, int mode)
 									
 									text_out(object_group_text[i]);
 									if (n > 1) text_out(", ");
-									else if (n == 1) text_out("or ");
+									else if (n == 1) text_out(" or ");
 								}
 							}
 						}
 					}
-				}	
+					
+					/* No match */
+					if (!output) text_out("ego item");
+					
+					text_out(format(" to make an ego item %s.  ", e_name + e_info[o_ptr->name2].name));
+				}				
+			}
+			
+			/* Check for upgrades */
+			for (k = 0; k < z_info->e_max; k++)
+			{
+				if (((spoil) || (e_info[k].aware & (AWARE_RUNES))) &&
+						(e_info[k].runest == e_info[o_ptr->name2].runest) &&
+						(e_info[k].runesc > e_info[o_ptr->name2].runesc))
+				{
+					for (l = 0; l < 3; l++)
+					{
+						/* Must match tvals */
+						if (e_info[k].tval[l] != o_ptr->tval) continue;
+						
+						/* Must match svals */
+						if (e_info[k].min_sval[l] > o_ptr->sval) continue;
+						if (e_info[k].max_sval[l] < o_ptr->sval) continue;
+
+						/* 'Basic' object */
+						text_out(format("You can apply %d %s rune%s to this to make it %s.  ", 
+								e_info[k].runesc - e_info[o_ptr->name2].runesc,
+								y_name + y_info[e_info[o_ptr->name2].runest].name,
+								e_info[k].runesc - e_info[o_ptr->name2].runesc != 1 ? "s" : "",
+								e_name + e_info[k].name));
+					}
+				}
 			}
 		}
 	}

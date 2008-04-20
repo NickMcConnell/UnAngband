@@ -756,6 +756,12 @@ void object_mental(object_type *o_ptr, bool floor)
 	/* Now we know about the item */
 	o_ptr->ident |= (IDENT_MENTAL);
 
+	/* And we learn the rune recipe if any */
+	k_info[o_ptr->k_idx].aware |= (AWARE_RUNEX);
+	
+	/* And we learn the ego rune recipe if any */
+	if (o_ptr->name2) e_info[o_ptr->name2].aware |= (AWARE_RUNES);
+	
 	/* Spoil the object */
 	object_flags(o_ptr,&f1,&f2,&f3,&f4);
 
