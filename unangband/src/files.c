@@ -3807,7 +3807,7 @@ errr file_character(cptr name, bool full)
 	}
 
 	/* Dump the inventory */
-	text_out("  [Character Inventory]\n\n");
+	text_out("  [Character inventory]\n\n");
 	for (i = 0; i < INVEN_PACK; i++)
 	{
 		if (!inventory[i].k_idx) break;
@@ -3825,7 +3825,7 @@ errr file_character(cptr name, bool full)
 	if (st_ptr->stock_num)
 	{
 		/* Header */
-		text_out("  [Home Inventory]\n\n");
+		text_out("  [Home inventory]\n\n");
 
 		/* Dump all available items */
 		for (i = 0; i < st_ptr->stock_num; i++)
@@ -3850,7 +3850,7 @@ errr file_character(cptr name, bool full)
 			continue;
 
 		/* Header */
-		text_out(format("  [%s Inventory]\n\n", u_name + st_ptr->name));
+		text_out(format("  [%s inventory]\n\n", u_name + st_ptr->name));
 
 		/* Dump all available items */
 		for (i = 0; i < st_ptr->stock_num; i++)
