@@ -645,10 +645,10 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	{
 		int i=0;
 
-		while ((object_group_tval[i]) && (object_group_tval[i] != s_ptr->param)) 
+		while ((object_group[i].tval) && (object_group[i].tval != s_ptr->param)) 
 			i++;
 
-		if (object_group_tval[i] == s_ptr->param) vp[vn++]=object_group_text[i];
+		if (object_group[i].tval == s_ptr->param) vp[vn++]=object_group[i].text;
 	}
 
 	if (s_ptr->type == SPELL_IDENT_NAME)
@@ -696,9 +696,9 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	{
 		int i=0;
 
-		while ((object_group_tval[i]) && (object_group_tval[i] != s_ptr->param)) i++;
+		while ((object_group[i].tval) && (object_group[i].tval != s_ptr->param)) i++;
 
-		if (object_group_tval[i] == s_ptr->param) vp[vn++]=object_group_text[i];
+		if (object_group[i].tval == s_ptr->param) vp[vn++]=object_group[i].text;
 			
 	}
 
@@ -3208,13 +3208,13 @@ void list_ego_item_runes(int ego, bool spoil)
 			text_out(o_name);
 		}
 		/* Hack -- matches 'any' tval */
-		else for (i = 0; object_group_tval[i]; i++)
+		else for (i = 0; object_group[i].tval; i++)
 		{
-			if (e_info[ego].tval[n] == object_group_tval[i])
+			if (e_info[ego].tval[n] == object_group[i].tval)
 			{
 				output = TRUE;
 				
-				text_out(object_group_text[i]);
+				text_out(object_group[i].text);
 			}
 		}
 		if (n > 1) text_out(", ");
@@ -3268,13 +3268,13 @@ void list_ego_item_runes(int ego, bool spoil)
 						output = TRUE;
 					}
 					/* Hack -- match 'any' tval */
-					else for (i = 0; object_group_tval[i]; i++)
+					else for (i = 0; object_group[i].tval; i++)
 					{
-						if (e_info[ego].tval[l] == object_group_tval[i])
+						if (e_info[ego].tval[l] == object_group[i].tval)
 						{
 							output = TRUE;
 							
-							text_out(object_group_text[i]);
+							text_out(object_group[i].text);
 						}
 					}
 					if (n > 1) text_out(", ");
@@ -3349,9 +3349,9 @@ void list_object(const object_type *o_ptr, int mode)
 	bool spoil = (mode == OBJECT_FLAGS_FULL) ? TRUE : FALSE;
 
 	/* Basic stats */
-	if ((!random) && (o_ptr->tval < TV_SERVICE)) for (i = 0; object_group_tval[i]; i++)
+	if ((!random) && (o_ptr->tval < TV_SERVICE)) for (i = 0; object_group[i].tval; i++)
 	{
-		if (o_ptr->tval == object_group_tval[i])
+		if (o_ptr->tval == object_group[i].tval)
 		{
 			anything = TRUE;
 
@@ -3360,28 +3360,28 @@ void list_object(const object_type *o_ptr, int mode)
 				text_out("This ");
 
 				/* Hack -- sets of plural items */
-				if (object_group_text[i][strlen(object_group_text[i])-1] == 's')
+				if (object_group[i].text[strlen(object_group[i].text)-1] == 's')
 					text_out("set of ");
 
 				/* 'Basic' object */
-				text_out(object_group_text[i]);
+				text_out(object_group[i].text);
 			}
 			else
 			{
 				text_out("These ");
 
 				/* Hack -- sets of plural items */
-				if (object_group_text[i][strlen(object_group_text[i])-1] == 's')
+				if (object_group[i].text[strlen(object_group[i].text)-1] == 's')
 				{
 					text_out("sets of ");
 
 					/* 'Basic' object */
-					text_out(object_group_text[i]);
+					text_out(object_group[i].text);
 				}
 				else
 				{
 					/* 'Basic' object */
-					text_out(object_group_text[i]);
+					text_out(object_group[i].text);
 
 					text_out("s");
 				}
@@ -3957,9 +3957,9 @@ void list_object(const object_type *o_ptr, int mode)
 		if (spoil || (object_aware_p(o_ptr) && (k_info[o_ptr->k_idx].aware & (AWARE_RUNEX))) ||
 				(k_info[o_ptr->k_idx].aware & (AWARE_RUNES)))
 		{
-			for (i = 0; object_group_tval[i]; i++)
+			for (i = 0; object_group[i].tval; i++)
 			{
-				if (o_ptr->tval == object_group_tval[i])
+				if (o_ptr->tval == object_group[i].tval)
 				{
 					anything = TRUE;
 
@@ -3968,7 +3968,7 @@ void list_object(const object_type *o_ptr, int mode)
 							k_info[o_ptr->k_idx].runesc,
 							y_name + y_info[k_info[o_ptr->k_idx].runest].name,
 							k_info[o_ptr->k_idx].runesc != 1 ? "s" : "",
-							object_group_text[i]));
+							object_group[i].text));
 				}
 			}
 			

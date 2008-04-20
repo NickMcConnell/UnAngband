@@ -311,12 +311,12 @@ static int wiz_create_itemtype(void)
 	Term_clear();
 
 	/* Print all tval's and their descriptions */
-        for (num = 0; (num < 78) && object_group_tval[num]; num++)
+        for (num = 0; (num < 78) && object_group[num].tval; num++)
 	{
 		row = 2 + (num % 26);
 		col = 30 * (num / 26);
 		ch  = choice_name[num];
-                prt(format("[%c] %s", ch, object_group_text[num]), row, col);
+                prt(format("[%c] %s", ch, object_group[num].text), row, col);
 	}
 
 	/* We need to know the maximal possible tval_index */
@@ -334,8 +334,8 @@ static int wiz_create_itemtype(void)
 	if ((num < 0) || (num >= max_num)) return (0);
 
 	/* Base object type chosen, fill in tval */
-        tval = object_group_tval[num];
-        tval_desc = object_group_text[num];
+        tval = object_group[num].tval;
+        tval_desc = object_group[num].text;
 
 
 	/*** And now we go for k_idx ***/

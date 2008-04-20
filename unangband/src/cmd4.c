@@ -1380,7 +1380,7 @@ static int a_cmp_tval(const void *a, const void *b)
 }
 
 static const char *kind_name(int gid)
-{ return object_group_text[obj_group_order[gid]]; }
+{ return object_group[obj_group_order[gid]].text; }
 static int art2tval(int oid) { return a_info[oid].tval; }
 
 /*
@@ -1493,7 +1493,7 @@ static int e_cmp_tval(const void *a, const void *b)
 	return strcmp(e_name + ea->name, e_name + eb->name);
 }
 static u16b *e_note(int oid) { return &e_info[default_join[oid].oid].note; }
-static const char *ego_grp_name(int gid) { return object_group_text[gid]; }
+static const char *ego_grp_name(int gid) { return object_group[gid].text; }
 
 /*
  * Display known ego_items
@@ -1702,7 +1702,7 @@ static void do_cmd_knowledge_objects(void)
 	for(i = 0; i < z_info->k_max; i++) {
 		if((k_info[i].aware & (AWARE_EXISTS)) || k_info[i].flavor || cheat_lore) {
 			int c = obj_group_order[k_info[i].tval];
-			if(c >= 0 && object_group_text[c]) {
+			if(c >= 0 && object_group[c].text) {
 				if ((k_info[i].aware & (AWARE_EXISTS)) || (cheat_lore))
 				{
 					objects[o_count++] = i;
@@ -6546,13 +6546,13 @@ void do_cmd_menu(int menuID, const char *title)
 	/* initialize static variables */
 	if(!obj_group_order) {
 		int i, n = 0;
-		for(n = 0; object_group_tval[n]; n++)
+		for(n = 0; object_group[n].tval; n++)
 		obj_group_order = C_ZNEW(TV_GEMS+1, int);
 		ang_atexit(cleanup_cmds);
 		for(i = 0; i <= TV_GEMS; i++) /* allow for missing values */
 			obj_group_order[i] = -1;
 		for(i = 0; i < n; i++) {
-			obj_group_order[object_group_tval[i]] = i;
+			obj_group_order[object_group[i].tval] = i;
 		}
 	}
 

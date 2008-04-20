@@ -104,6 +104,7 @@ typedef struct monster_blow monster_blow;
 typedef struct monster_race monster_race;
 typedef struct monster_lore monster_lore;
 typedef struct vault_type vault_type;
+typedef struct object_grouper object_grouper;
 typedef struct object_type object_type;
 typedef struct monster_type monster_type;
 typedef struct alloc_entry alloc_entry;
@@ -847,6 +848,20 @@ struct vault_type
 	byte wid;       /* Vault width */
 };
 
+
+
+/*
+ * Object information, for a generic object
+ * 
+ * These correspond to 'tvals' although the tval
+ * is indirect - it is held within the object group information.
+ * This allows a sparse tval array.
+ */
+struct object_grouper
+{
+	char *text;
+	int	tval;
+};
 
 
 /*
