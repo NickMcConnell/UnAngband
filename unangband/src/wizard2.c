@@ -284,33 +284,6 @@ static void wiz_display_item(const object_type *o_ptr)
 }
 
 
-
-/*
- * Strip an "object name" into a buffer
- */
-static void strip_name(char *buf, int k_idx)
-{
-	char *t;
-
-	object_kind *k_ptr = &k_info[k_idx];
-
-	cptr str = (k_name + k_ptr->name);
-
-
-	/* Skip past leading characters */
-	while ((*str == ' ') || (*str == '&')) str++;
-
-	/* Copy useful chars */
-	for (t = buf; *str; str++)
-	{
-		if (*str != '~') *t++ = *str;
-	}
-
-	/* Terminate the new name */
-	*t = '\0';
-}
-
-
 /*
  * Get an object kind for creation (or zero)
  *
@@ -387,7 +360,7 @@ static int wiz_create_itemtype(void)
 			ch  = choice_name[num];
 
 			/* Get the "name" of object "i" */
-			strip_name(buf, i);
+			strip_name(buf, sizeof(buf), i);
 
 			/* Print it */
 			prt(format("[%c] %s", ch, buf), row, col);

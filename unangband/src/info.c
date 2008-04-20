@@ -3173,6 +3173,123 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 
 }
 
+
+/*
+ * List the rune combinations an ego item type.
+ * 
+ * Note this is used in cmd4.c for 'generic' ego items. Note we don't show
+ * the upgrades here for several reasons - mostly to keep this simple.
+ */
+void list_ego_item_runes(int ego, bool spoil)
+{
+	bool output = TRUE;
+	
+	int i, k, l, n;
+
+	char o_name[80];
+	
+	/* 'Basic' object */
+	text_out(format("You can apply %d %s rune%s to any ", 
+			e_info[ego].runesc,
+			y_name + y_info[e_info[ego].runest].name,
+			e_info[ego].runesc != 0 ? "s" : ""));
+
+	/* Check ego item slots */
+	for (n = 3; n >= 0; n--)
+	{
+		/* Skip blank entries */
+		if (!e_info[ego].tval[n]) continue;
+		
+		/* Hack -- matches exact item */
+		if (e_info[ego].min_sval[n] == e_info[ego].max_sval[n])
+		{
+			strip_name(o_name, sizeof(o_name), lookup_kind(e_info[ego].tval[n], e_info[ego].min_sval[n]));
+			
+			text_out(o_name);
+		}
+		/* Hack -- matches 'any' tval */
+		else for (i = 0; object_group_tval[i]; i++)
+		{
+			if (e_info[ego].tval[n] == object_group_tval[i])
+			{
+				output = TRUE;
+				
+				text_out(object_group_text[i]);
+			}
+		}
+		if (n > 1) text_out(", ");
+		else if (n == 1) text_out(" or ");
+	}
+	
+	/* No match */
+	if (!output) text_out("ego item");
+	
+	text_out(format(" to make an ego item %s.  ", e_name + e_info[ego].name));
+	
+	/* Check for other recipes */
+	for (k = 0; k < z_info->e_max; k++)
+	{
+		if (((spoil) || (e_info[k].aware & (AWARE_RUNES))) &&
+				(e_info[k].runest == e_info[ego].runest) &&
+				(e_info[k].runesc < e_info[ego].runesc))
+		{
+			/* Need to do this trick again. */
+			output = FALSE;
+			
+			/* Check ego item slots */
+			for (n = 3; n >= 0; n--)
+			{
+				/* Skip blank entries */
+				if (!e_info[ego].tval[n]) continue;
+				
+				/* Check if slots match */
+				for (l = 0; l < 3; l++)
+				{
+					/* Must match tvals */
+					if (e_info[k].tval[l] != e_info[ego].tval[n]) continue;
+					
+					/* Must match svals */
+					if (e_info[k].min_sval[l] > e_info[ego].max_sval[n]) continue;
+					if (e_info[k].max_sval[l] < e_info[ego].min_sval[n]) continue;
+					
+					/* 'Basic' object */
+					if (!output) text_out(format("You can apply %d %s rune%s to any ", 
+							e_info[ego].runesc - e_info[k].runesc,
+							y_name + y_info[e_info[ego].runest].name,
+							e_info[ego].runesc - e_info[k].runesc != 1 ? "s" : ""));
+
+					/* Hack -- exact match */
+					if (e_info[ego].min_sval[n] == e_info[ego].max_sval[n])
+					{
+						strip_name(o_name, sizeof(o_name), lookup_kind(e_info[ego].tval[n], e_info[ego].min_sval[n]));
+						
+						text_out(o_name);
+						
+						output = TRUE;
+					}
+					/* Hack -- match 'any' tval */
+					else for (i = 0; object_group_tval[i]; i++)
+					{
+						if (e_info[ego].tval[l] == object_group_tval[i])
+						{
+							output = TRUE;
+							
+							text_out(object_group_text[i]);
+						}
+					}
+					if (n > 1) text_out(", ");
+					else if (n == 1) text_out(" or ");
+				}
+			}
+			
+			if (output) text_out(format(" %s to make an ego item %s.  ", e_name + e_info[k].name, e_name + e_info[ego].name));
+		}				
+	}
+}
+
+
+
+
 const cptr inscrip_info[] =
 {
 		NULL,
@@ -3911,88 +4028,12 @@ void list_object(const object_type *o_ptr, int mode)
 		/* Show runes */
 		if (spoil || (e_info[o_ptr->name2].aware & (AWARE_RUNES)))
 		{
-			bool output = FALSE;
 			int k, l;
 			
 			anything = TRUE;
 			
-			/* 'Basic' object */
-			text_out(format("You can apply %d %s rune%s to any ", 
-					e_info[o_ptr->name2].runesc,
-					y_name + y_info[e_info[o_ptr->name2].runest].name,
-					e_info[o_ptr->name2].runesc != 0 ? "s" : ""));
-
-			for (n = 3; n >= 0; n--)
-			{
-				if (!e_info[o_ptr->name2].tval[n]) continue;
-				
-				for (i = 0; object_group_tval[i]; i++)
-				{
-					if (e_info[o_ptr->name2].tval[n] == object_group_tval[i])
-					{
-						output = TRUE;
-						
-						text_out(object_group_text[i]);
-						if (n > 1) text_out(", ");
-						else if (n == 1) text_out(" or ");
-					}
-				}
-			}
-			
-			/* No match */
-			if (!output) text_out("ego item");
-			
-			text_out(format(" to make an ego item %s.  ", e_name + e_info[o_ptr->name2].name));
-			
-			/* Check for other recipes */
-			for (k = 0; k < z_info->e_max; k++)
-			{
-				if (((spoil) || (e_info[k].aware & (AWARE_RUNES))) &&
-						(e_info[k].runest == e_info[o_ptr->name2].runest) &&
-						(e_info[k].runesc < e_info[o_ptr->name2].runesc))
-				{
-					/* 'Basic' object */
-					text_out(format("You can apply %d %s rune%s to any ", 
-							e_info[o_ptr->name2].runesc - e_info[k].runesc,
-							y_name + y_info[e_info[o_ptr->name2].runest].name,
-							e_info[o_ptr->name2].runesc - e_info[k].runesc != 1 ? "s" : ""));
-
-					/* Need to do this trick again. */
-					output = FALSE;
-					
-					for (n = 3; n >= 0; n--)
-					{
-						if (!e_info[o_ptr->name2].tval[n]) continue;
-						
-						for (l = 0; l < 3; l++)
-						{
-							/* Must match tvals */
-							if ((e_info[k].tval[l]) && (e_info[k].tval[l] != e_info[o_ptr->name2].tval[n])) continue;
-							
-							/* Must match svals */
-							if (e_info[k].min_sval[l] > e_info[o_ptr->name2].max_sval[n]) continue;
-							if (e_info[k].max_sval[l] < e_info[o_ptr->name2].min_sval[n]) continue;
-							
-							for (i = 0; object_group_tval[i]; i++)
-							{
-								if (e_info[k].tval[n] == object_group_tval[i])
-								{
-									output = TRUE;
-									
-									text_out(object_group_text[i]);
-									if (n > 1) text_out(", ");
-									else if (n == 1) text_out(" or ");
-								}
-							}
-						}
-					}
-					
-					/* No match */
-					if (!output) text_out("ego item");
-					
-					text_out(format(" to make an ego item %s.  ", e_name + e_info[o_ptr->name2].name));
-				}				
-			}
+			/* Check for ego item runes */
+			list_ego_item_runes(o_ptr->name2, spoil);
 			
 			/* Check for upgrades */
 			for (k = 0; k < z_info->e_max; k++)

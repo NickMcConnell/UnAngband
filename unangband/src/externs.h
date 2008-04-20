@@ -525,6 +525,7 @@ extern void do_cmd_room_desc(void);
 extern void do_cmd_load_screen(void);
 extern void do_cmd_save_screen(void);
 extern void do_cmd_save_screen_html(void);
+extern void strip_name(char *buf, int buf_s, int oid);
 extern const cptr feature_group_text[];
 extern int feat_order(int feat);
 extern int count_routes(int from, int to);
@@ -613,6 +614,7 @@ extern void generate_cave(void);
 /* info.c */
 extern bool spell_desc(spell_type *s_ptr, const cptr intro, int level, bool detail, int target);
 extern void spell_info(char *p, int p_s, int spell, bool use_level);
+extern void list_ego_item_runes(int ego, bool spoil);
 extern bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode);
 extern void list_object(const object_type *o_ptr, int mode);
 extern void screen_object(object_type *o_ptr);

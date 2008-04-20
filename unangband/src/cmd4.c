@@ -1471,6 +1471,9 @@ static void desc_ego_fake(int oid)
 		}
 	}
 
+	/* List the runes required to make this item */
+	list_ego_item_runes(e_idx, cheat_lore);
+	
 	Term_flush();
 
 	anykey();
@@ -1535,7 +1538,7 @@ static void do_cmd_knowledge_ego_items(void)
 /*
  * Strip an "object kind name" into a buffer
  */
-static void strip_name(char *buf, int oid)
+void strip_name(char *buf, int buf_s, int oid)
 {
 	char *t;
 
@@ -1552,10 +1555,10 @@ static void strip_name(char *buf, int oid)
 	while ((*str == ' ') || (*str == '&') || (*str == '#')) str++;
 
 	/* Copy useful chars */
-	for (t = buf; *str; str++)
+	for (t = buf; *str && buf_s; str++)
 	{
 		if (prefix(str,"# ")) str++; /* Skip following space */
-		else if (*str != '~') *t++ = *str;
+		else if (*str != '~') { *t++ = *str; buf_s--; }
 	}
 
 	/* Terminate the new name */
@@ -1590,7 +1593,7 @@ static void display_object(int col, int row, bool cursor, int oid)
 	}
 
 	/* Tidy name */
-	strip_name(o_name,oid);
+	strip_name(o_name,sizeof(o_name),oid);
 
 	/* Display the name */
 	c_prt(attr, o_name, row, col);
