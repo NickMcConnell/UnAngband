@@ -1653,8 +1653,7 @@ static int o_cmp_tval(const void *a, const void *b)
 	int c = ta - tb;
 	if(c) return c;
 	/* order by */
-	c = (*(int*)a >= 0 ? 1 : 0) - (*(int*)b >= 0 ? 1 : 0)
-		+ ((k_a->aware & (AWARE_SEEN)) ? 2 : 0) - ((k_b->aware & (AWARE_SEEN)) ? 2 : 0);
+	c = (*(int*)a >= 0 ? 1 : 0) - (*(int*)b >= 0 ? 1 : 0);
 	if(c) return -c; /* aware has low sort weight */
 	if(*(int*)a < 0) {
 		return strcmp(x_text + x_info[k_a->flavor].text,
