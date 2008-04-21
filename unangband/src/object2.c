@@ -7138,6 +7138,7 @@ s16b get_feat_num(int level)
 	return (table[i].index);
 }
 
+
 /*
  * Helper function for "features"
  */

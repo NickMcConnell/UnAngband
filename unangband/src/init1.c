@@ -9056,6 +9056,46 @@ errr emit_v_info_index(FILE *fp, header *head, int i)
 					break;
 			}
 #endif
+
+#if 0
+			/* Translate Sangband monsters into Unangband encoding */
+			switch (v)
+			{
+				case '&':
+					v = 'U';
+					break;
+				case 'U':
+					v = 'k';
+					break;
+				case 'I':
+					v = 'u';
+					break;
+				case 'A':
+					v = 'M';
+					break;
+				case 'F':
+					v = 'I';
+					break;
+				case 'M':
+					v = 'I';
+					break;
+				case 'Q':
+					v = 'i';
+					break;
+				case 'l':
+					v = 'I';
+					break;
+				case 'q':
+					v = 'Q';
+					break;
+				case 'y':
+					v = 'k';
+					break;
+				case '~':
+					v = '&';
+					break;
+			}
+#endif
 			/* Extract encoded run */
 			for (c = 0; c < len; j++, c++)
 			{

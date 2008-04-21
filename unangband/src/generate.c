@@ -6017,6 +6017,10 @@ static bool build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data,
 	int c, len;
 	int temp;
 	
+	/* These features are placed in some vaults */
+	int deep_feat = 0;
+	int shallow_feat = 0;
+	
 	cptr t;
 	
 	/* Allow vertical and horizontal flipping */
@@ -6072,6 +6076,15 @@ static bool build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data,
 				{
 					continue;
 				}
+				
+				/* Hack -- skip "outside floors" on wild levels */
+				if (*t == '~')
+				{
+					if (level_flag & (LF1_WILD))
+						continue;
+					else if (dun->flood_feat)
+						room_info[room].flags |= (ROOM_FLOODED);
+				}
 
 				/* Allow vertical flips */
 				if (flip_vert) y = y2 - i;
@@ -6093,7 +6106,7 @@ static bool build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data,
 					/* Granite wall (outer) */
 					case '%':
 					{
-						if ((level_flag & (LF1_WILD)) == 0) cave_set_feat(y, x, FEAT_WALL_OUTER);
+						cave_set_feat(y, x, FEAT_WALL_OUTER);
 						break;
 					}
 					/* Granite wall (inner) */
@@ -6116,16 +6129,41 @@ static bool build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data,
 						else cave_set_feat(y, x, FEAT_QUARTZ_K);
 						break;
 					}
-					/* Lava. */
+					
+					/* Deep feature */
 					case '@':
 					{
-						cave_set_feat(y, x, FEAT_LAVA);
+						while (!deep_feat && (shallow_feat != deep_feat))
+						{
+							/* Hack player depth */
+							p_ptr->depth += 10;
+							
+							deep_feat = pick_proper_feature(cave_feat_pool);
+
+							/* Hack player depth */
+							p_ptr->depth -= 10;
+						}
+
+						cave_set_feat(y, x, deep_feat);						
 						break;
 					}
-					/* Water. */
+					/* Outside terrain */
+					case '~':
+					{
+						if (dun->flood_feat)
+						{
+							cave_set_feat(y, x, dun->flood_feat);							
+						}
+					}
+					/* Shallow feature */
 					case 'x':
 					{
-						cave_set_feat(y, x, FEAT_WATER);
+						while (!shallow_feat && (shallow_feat != deep_feat))
+						{
+							shallow_feat = pick_proper_feature(cave_feat_pool);
+						}
+						
+						cave_set_feat(y, x, shallow_feat);						
 						break;
 					}
 					/* Tree. */
@@ -6342,16 +6380,9 @@ static bool build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data,
 					}
 
 					/* A chest. */
-					case '~':
+					case '&':
 					{
-						tval_drop_idx = TV_CHEST;
-
-						object_level = p_ptr->depth + 5;
-						place_object(y, x, FALSE, FALSE);
-						object_level = p_ptr->depth;
-
-						tval_drop_idx = 0;
-
+						place_chest(y, x);
 						break;
 					}
 					/* Treasure. */
