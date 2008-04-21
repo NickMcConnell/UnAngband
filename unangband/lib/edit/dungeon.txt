@@ -172,7 +172,7 @@ Z:47:9
 L:26:435:56:154:0:0:the
 L:27:56:0:0:0:0:western passage into the
 L:28:56:0:0:0:0:the tunnels of
-L:42:56:0:0:475:0:the Bottommost Hall under
+L:36:56:0:0:475:0:the Bottommost Hall under
 D:There is a sudden flash of gold and flame in the
 D: air... Smaug has taken flight.  You desperately
 D: cower for cover on the open mountainside... he
@@ -244,7 +244,7 @@ W:449:48
 Y:449:48
 L:17:420:56:49:0:31:the hill of
 L:18:56:0:0:0:31:the tower of
-L:31:0:407:0:0:31:the crown of
+L:30:0:407:0:0:31:the crown of
 S:954:0:0:0:0:0:0:0
 
 N:13:Ford to Rivendell
@@ -292,9 +292,9 @@ D:The old dwarven doors to Moria are broken open and only foul air and darkness 
 N:16:west gates of Moria
 X:52:64:0:0
 W:52:42
-L:36:49:397:56:0:0:the
-L:37:56:393:0:0:0
-L:39:56:393:393:639:0
+L:33:49:397:56:0:0:the
+L:34:56:393:0:0:0
+L:36:56:393:393:639:0
 D:Balin has returned to Moria and sealed the ancient door so that
 D: it's impossible to find.  You'll need a map to guide you.
 D:  It's been long since you've last heard from Balin,
@@ -308,7 +308,7 @@ D: deadly stirs in the water outside.
 N:17:east gates of Moria
 X:63:0:0:0
 Z:61:61
-L:42:411:607:49:262:0:the
+L:36:411:607:49:262:0:the
 D:The door to Moria is closed from this direction, as Balin has
 D: returned to Moria to claim his bequest with dragon-gold.
 D:  Traces of orc camps on the shores of Kheled-Zaram
@@ -332,7 +332,7 @@ N:19:Parth Galen
 X:24:18:0:0
 L:20:420:155:56:0:0
 L:21:56:0:0:0:0
-L:50:56:0:0:0:0
+L:40:56:0:0:0:0
 D:The ruins of a more ancient race lie here: the glens and
 D: hillocks strewn with the toppled statues of kings and
 D: conquerors.
@@ -379,7 +379,7 @@ G:t
 R:ESCORT
 L:22:420:56:155:249:49:the Siege of
 L:23:420:56:155:249:49
-L:50:420:56:155:249:49
+L:40:420:56:155:249:49
 D:Saruman's orcs have laid siege to the fortress of Hornburg.  You stand with
 D: your allies to relieve the siege --- fight your way through the narrow ravine of Helm's Deep
 D: and scale the tower to confront the leader of the armies, or find him
@@ -395,7 +395,7 @@ Q:28:532
 Z:66:22
 L:21:420:141:141:514:31
 L:22:56:0:0:0:31
-L:50:56:0:0:532:31
+L:40:56:0:0:532:31
 D:You've discovered the true intents of Saruman
 D: and he no longer conceals his war preparations.
 D:  If you conquer Isengard,
@@ -407,7 +407,7 @@ D: you open the easier path to Minas Tirith.
 N:24:Dead Marshes
 X:19:25:0:0
 R:UNDEAD
-L:52:199:200:201:505:0
+L:41:199:200:201:505:0
 D:A dreadful place.  Nobody who crosses these marshes returns.
 
 N:25:Ithilien
@@ -423,9 +423,9 @@ S:512:520:521:522:0:0:0:0
 N:26:Minas Morgul
 X:25:0:0:0
 R:UNDEAD
-L:53:407:56:397:492:46
-L:54:56:0:397:0:46
-L:85:56:0:0:535:46
+L:42:407:56:397:492:46
+L:43:56:0:397:0:46
+L:57:56:0:0:535:46
 
 # Note that we need a map to travel from Minas Morgul to Cirith Ungol now.
 # Goes upwards
@@ -433,9 +433,9 @@ L:85:56:0:0:535:46
 N:27:Cirith Ungol
 X:26:0:0:0
 Q:33:530
-L:53:56:141:141:530:11
-L:54:56:1:0:0:11
-L:65:56:1:0:597:11
+L:42:56:141:141:530:11
+L:43:56:1:0:0:11
+L:48:56:1:0:597:11
 
 # Goes upwards
 
@@ -446,7 +446,7 @@ R:MAGE
 Q:31:1085
 L:0:0:410:56:0:46
 L:1:56:0:0:0:46
-L:55:56:0:0:1085:46
+L:48:56:0:0:1085:46
 S:505:516:517:503:519:518:509:508
 
 N:29:Paths of the Dead
@@ -454,9 +454,9 @@ X:0:0:0:0
 G:W
 R:UNDEAD
 Q:28:528
-L:66:0:420:0:528:0:the
-L:67:56:0:0:0:0:the
-L:75:56:0:0:522:0:the
+L:48:0:420:0:528:0:the
+L:49:56:0:0:0:0:the
+L:53:56:0:0:522:0:the
 S:806:0:0:0:0:0:0:0:the
 D:A single slab of grey stone covered with bones sits here, deep in the Dimholt woods.
 D:  Beyond, you can see the pale, flickering torches that light the Dark Door of the
@@ -467,7 +467,7 @@ N:30:Pelennor Fields
 X:28:0:0:0
 G:W
 R:ESCORT
-L:56:435:411:420:535:0:the Battle of
+L:43:435:411:420:535:0:the Battle of
 
 N:31:Mount Mindolluin
 X:28:0:0:0
@@ -479,16 +479,16 @@ D:A white tree has found root here, among snows of mountain Mindolluin above Min
 N:32:Plains of Gorgoroth
 X:51:33:0:0
 G:o
-L:65:441:201:431:0:0:the
-L:79:56:209:0:595:0:the
+L:48:441:201:431:0:0:the
+L:54:56:209:0:595:0:the
 
 N:33:Orodruin
 X:32:34:0:0
 Q:2:546
 R:BRTH_FIRE
-L:79:432:218:218:0:0
-L:80:56:218:218:0:0
-L:99:56:218:218:546:0
+L:54:432:218:218:0:0
+L:55:56:218:218:0:0
+L:59:56:218:218:546:0
 D:You can choose to confront Sauron here, deep in the blasted bowels of this mountain.
 
 # Goes upwards
@@ -498,9 +498,9 @@ X:33:0:0:0
 Q:2:546
 G:M
 R:EVIL
-L:65:409:218:216:541:20
-L:66:56:218:216:0:20
-L:99:56:218:216:546:20
+L:48:409:218:216:541:20
+L:49:56:218:216:0:20
+L:59:56:218:216:546:20
 D:You can choose to confront Sauron here, high in a tower lit by a flaming eye.
 
 N:35:Hobbiton, in ruins
@@ -508,7 +508,7 @@ X:11:53:0:0
 Q:36:532
 Z:36:36
 G:g
-L:99:0:407:159:532:0
+L:59:0:407:159:532:0
 S:516:517:14:266:509:0:0:0
 D:Someone with a silver-tongue and guile-full words has brought fair Hobbiton to
 D: its knees in a whir of devilish industry and foul pollution.
@@ -566,7 +566,7 @@ G:B
 Z:23:37
 L:3:420:141:141:0:31
 L:4:50:0:0:0:31
-L:35:56:0:0:1365:31
+L:33:56:0:0:1365:31
 D:The tower of Isengard is home to the wise councillor Saruman
 D: the White, head of the order of Istari.  However, you are not
 D: yet a member...
@@ -581,7 +581,7 @@ Q:18:1272
 L:20:451:56:148:140:0:the blizzard-covered
 L:21:56:144:145:473:0:a vanishing path below
 L:22:56:144:145:0:0:the snowy slopes of
-L:50:56:144:145:1272:0:the peak of
+L:40:56:144:145:1272:0:the peak of
 D:Legend has it that this mighty mountain is Morgoth's minion.
 D:  In good weather you'd laugh at the childish tales,
 D: confidently traversing the nearby pass.
@@ -609,10 +609,10 @@ D: rebuild their kingdom using the wealth, your share is here for taking.
 N:43:ruins of Angmar
 X:2:69:0:0
 R:UNDEAD
-L:31:425:141:141:0:0:the
-L:32:56:141:0:0:0:the
-L:72:56:0:0:535:0:the
-L:73:56:0:0:0:0:the
+L:30:425:141:141:0:0:the
+L:31:56:141:0:0:0:the
+L:50:56:0:0:535:0:the
+L:51:56:0:0:0:0:the
 
 # Sunken/outer plane dungeons
 # TODO: add guardian or remove
@@ -621,9 +621,9 @@ N:44:Numenor
 X:2:0:0:0
 G:G
 R:CAN_SWIM
-L:41:403:400:49:0:0:the sunken city of
-L:42:399:56:0:0:0
-L:65:399:56:0:0:0
+L:35:403:400:49:0:0:the sunken city of
+L:36:399:56:0:0:0
+L:48:399:56:0:0:0
 
 # TODO: add guardian or remove
 
@@ -633,7 +633,7 @@ G:E
 R:PRIEST
 L:21:425:141:141:0:0:the Temple of
 L:22:56:0:0:0:0:depths of the Temple of
-L:50:56:0:0:0:0:bottom of the Temple of
+L:40:56:0:0:0:0:bottom of the Temple of
 
 # TODO: add guardian or remove
 
@@ -641,9 +641,9 @@ N:46:Crystal Castle
 X:2:0:0:0
 G:g
 R:MAGE
-L:31:56:144:145:0:0:the
-L:32:148:145:0:0:0:the
-L:60:148:145:0:0:0:the
+L:30:56:144:145:0:0:the
+L:31:148:145:0:0:0:the
+L:45:148:145:0:0:0:the
 
 # TODO: make Bolg more powerful, I guess, he's fought after Smaug
 
@@ -663,9 +663,9 @@ N:48:Dol Guldur
 X:20:37:6:0
 G:q
 R:EVIL
-L:42:420:56:420:474:44
-L:43:56:0:0:0:44
-L:65:56:0:0:645:44
+L:36:420:56:420:474:44
+L:37:56:0:0:0:44
+L:48:56:0:0:645:44
 D:You have disturbed a terrible evil here... much has gone wrong with the land
 D: since its waking.
 
@@ -675,21 +675,21 @@ N:49:Morannon
 X:25:50:0:0
 G:q
 R:EVIL
-L:50:407:56:397:538:43
-L:51:56:0:397:0:43
-L:75:56:0:0:538:43
+L:40:407:56:397:538:43
+L:41:56:0:397:0:43
+L:53:56:0:0:538:43
 
 N:50:Udun
 X:49:51:0:0
 R:DEMON
-L:79:407:218:218:0:0
-L:80:56:218:218:0:0
-L:98:56:218:218:545:0
+L:54:407:218:218:0:0
+L:55:56:218:218:0:0
+L:58:56:218:218:545:0
 
 N:51:Isenmouthe
 X:32:50:0:0
 R:EVIL
-L:80:407:218:208:511:0
+L:55:407:218:208:511:0
 
 # Redhorn is actually another name for Caradhras;
 # 'Redhorn pass' is the pass nearby
@@ -704,7 +704,7 @@ Z:41:9
 Q:63:140
 L:7:544:56:148:140:0:the
 L:8:56:145:0:0:0:Orc Camp across
-L:37:56:145:0:297:0:Ogre Camp beneath
+L:33:56:145:0:297:0:Ogre Camp beneath
 D:Legend has it that Mount Redhorn,
 D: called also Caradhras, is Morgoth's minion.
 D:  If so, it appears asleep at the moment:
@@ -797,10 +797,10 @@ D:  Your only choice is to press onwards.  And downwards...
 N:61:Khazad-Dum
 X:60:0:0:0
 Q:18:483
-L:31:1:141:0:483:0
-L:32:56:141:0:0:0
-L:49:56:141:0:0:0
-L:50:56:393:393:483:0
+L:30:1:141:0:483:0
+L:31:56:141:0:0:0
+L:39:56:141:0:0:0
+L:40:56:393:393:483:0
 D:Drums. Drums. Drums in the deep.
 
 N:62:the Ent Moot
@@ -844,7 +844,7 @@ X:2:14:0:0
 G:t
 Q:40:407
 L:22:419:149:422:0:0
-L:45:414:141:140:407:0
+L:37:414:141:140:407:0
 D:Dunland is brewing for war, rallied by dark emissaries, who so far laboured in secret.
 D:  Whence they came?  It does not matter to the men of Dunland, long years waiting for a chance at revenge.
 
@@ -855,8 +855,8 @@ D:  Whence they came?  It does not matter to the men of Dunland, long years wait
 N:66:emptied Isengard
 X:37:64:0:0
 Q:28:532
-L:31:420:397:141:514:31
-L:32:56:0:0:0:31
+L:30:420:397:141:514:31
+L:31:56:0:0:0:31
 L:45:56:0:0:532:31
 D:Almost all of the Saruman's army went for Hornburg.  What are the tidings?
 
@@ -872,7 +872,7 @@ X:43:0:0:0
 Q:70:547
 L:0:0:407:0:0:0:the Siege Camp around
 L:1:56:0:0:0:0:the Dungeon of
-L:100:56:0:0:547:0:the Seat of Morgoth in
+L:60:56:0:0:547:0:the Seat of Morgoth in
 S:8:9:10:11:12:13:14:15
 D:It feels like home...
 
