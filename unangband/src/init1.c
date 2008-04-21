@@ -9017,7 +9017,7 @@ errr emit_v_info_index(FILE *fp, header *head, int i)
 	/* Output vault data */
 	for (t = head->text_ptr + v_ptr->text, n = 0; n < v_ptr->hgt; n++)
 	{
-		fprintf(fp, "V:");
+		fprintf(fp, "D:");
 		
 		for (j = 0; j < v_ptr->wid; t++)
 		{
