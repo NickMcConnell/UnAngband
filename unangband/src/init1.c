@@ -8263,10 +8263,11 @@ errr eval_r_power(header *head)
 					for (j = 1; (mexp > j + 4) || (threat > j + 5); mexp -= j * j, threat -= (j + 4), j++);
 	
 					/* Set level */
-					lvl = MIN(( j > 250 ? 90 + (j - 250) / 20 : 	/* Level 90 and above */
-							(j > 130 ? 70 + (j - 130) / 6 :	/* Level 70 and above */
-							(j > 40 ? 40 + (j - 40) / 3 :	/* Level 40 and above */
-							j))), 99);
+					lvl = MIN(( j > 160 ? 50 + (j - 160) / 20 : 	/* Level 50 and above */
+							(j > 100 ? 45 + (j - 100) / 12 :	/* Level 45 and above */
+							(j > 40 ? 35 + (j - 40) / 6 :	/* Level 35 and above */
+							(j > 30 ? 30 + (j - 30) / 2 :	/* Level 30 and above */
+							j)))), 59);
 	
 					/* Set level */
 					r_ptr->level = lvl;
@@ -8293,12 +8294,12 @@ errr eval_r_power(header *head)
 			/*
 			 * Hack - We have to use an adjustment factor to prevent overflow.
 			 */
-			if (lvl >= 90)
+			if (lvl >= 55)
 			{
 				hp /= 1000;
 				dam /= 1000;
 			}
-			else if (lvl >= 65)
+			else if (lvl >= 50)
 			{
 				hp /= 100;
 				dam /= 100;
