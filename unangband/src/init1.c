@@ -9178,13 +9178,14 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	/* Output 'T' for "Trap" (one line only) */
 	if (f_ptr->blow.method)
 	{
+#if 0
 		/* Output blow method */		
 		fprintf(fp, "T:%s", r_info_blow_method[f_ptr->blow.method]);
-		
+#endif		
 		/* Output blow effect */
 		if (f_ptr->blow.effect)
 		{
-			fprintf(fp, ":%s", r_info_blow_effect[f_ptr->blow.effect]);
+			fprintf(fp, /*":%s"*/ "T:%s", r_info_blow_effect[f_ptr->blow.effect]);
 			
 			/* Output blow damage if required */
 			if ((f_ptr->blow.d_dice) && (f_ptr->blow.d_side))
@@ -9200,10 +9201,10 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	/* Output 'S' for "Spell" (one line only) */
 	if (f_ptr->spell)
 	{
-		fprintf(fp,"S:%s\n", f_ptr->spell < 33 ? r_info_flags4[f_ptr->spell - 1] :
-							 (f_ptr->spell < 65 ? r_info_flags5[f_ptr->spell - 33] :
-							 (f_ptr->spell < 129 ? r_info_flags6[f_ptr->spell - 65] :
-							 (f_ptr->spell < 161 ? r_info_flags7[f_ptr->spell - 129] : "Error"))));		
+		fprintf(fp,"S:%s\n", f_ptr->spell < 129 ? r_info_flags4[f_ptr->spell - 96] :
+							 (f_ptr->spell < 161 ? r_info_flags5[f_ptr->spell - 128] :
+							 (f_ptr->spell < 193 ? r_info_flags6[f_ptr->spell - 160] :
+							 (f_ptr->spell < 225 ? r_info_flags7[f_ptr->spell - 192] : "Error"))));
 	}
 
 	/* Output 'K' for "Transitions" (up to 8 lines, plus default) */
