@@ -1173,7 +1173,7 @@ static void store_create(int store_index)
 			/* Get local object */
 			i_ptr = &object_type_body;
 
-			if (!make_object(i_ptr, TRUE, TRUE)) continue;
+			if (!make_object(i_ptr, TRUE, FALSE)) continue;
 
 			/* Reset depth */
 			p_ptr->depth = depth;
