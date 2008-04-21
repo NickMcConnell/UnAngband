@@ -4899,6 +4899,68 @@ static bool kind_is_shroom(int k_idx)
 
 }
 
+
+/*
+ * Hack -- determine if a template is "great"
+ * 
+ * Similar to kind is good, but doesn't include disposables / books / activatables.
+ */
+static bool kind_is_great(int k_idx)
+{
+	object_kind *k_ptr = &k_info[k_idx];
+
+	/* Analyze the item type */
+	switch (k_ptr->tval)
+	{
+		/* Armor -- Good unless damaged */
+		case TV_HARD_ARMOR:
+		case TV_SOFT_ARMOR:
+		case TV_DRAG_ARMOR:
+		case TV_SHIELD:
+		case TV_CLOAK:
+		case TV_BOOTS:
+		case TV_GLOVES:
+		case TV_HELM:
+		case TV_CROWN:
+		{
+			if (k_ptr->to_a < 0) return (FALSE);
+			return (TRUE);
+		}
+
+		/* Weapons -- Good unless damaged */
+		case TV_BOW:
+		case TV_SWORD:
+		case TV_HAFTED:
+		case TV_POLEARM:
+		case TV_DIGGING:
+		{
+			if (k_ptr->to_h < 0) return (FALSE);
+			if (k_ptr->to_d < 0) return (FALSE);
+			return (TRUE);
+		}
+
+		/* Rune stones and magical bags are good if not seen previously */
+		case TV_BAG:
+		{
+			if (!(k_ptr->aware & (AWARE_SEEN))) return (TRUE);
+			return (FALSE);
+		}
+
+		/* Rods/Scrolls/Potions/Amulets/Wands/Rings -- Deep is good */
+		case TV_RING:
+		case TV_AMULET:
+		{
+			if ((k_ptr->level >= 35) && (k_ptr->level > object_level + 9) && !(k_ptr->flags3 & (TR3_LIGHT_CURSE))) return (TRUE);
+			return (FALSE);
+		}
+	}
+
+	/* Assume not good */
+	return (FALSE);
+	
+}
+
+
 /*
  * Hack -- determine if a template is "good".
  *
@@ -4981,7 +5043,7 @@ static bool kind_is_good(int k_idx)
 		case TV_WAND:
 		case TV_FLASK:
 		{
-			if ((k_ptr->level >= 40) && (k_ptr->level > object_level + 9) && !(k_ptr->flags3 & (TR3_LIGHT_CURSE))) return (TRUE);
+			if ((k_ptr->level >= 35) && (k_ptr->level > object_level + 9) && !(k_ptr->flags3 & (TR3_LIGHT_CURSE))) return (TRUE);
 			return (FALSE);
 		}
 
@@ -5018,6 +5080,9 @@ static bool kind_is_race(int k_idx)
 	monster_race *r_ptr = &r_info[race_drop_idx];
 	object_kind *k_ptr = &k_info[k_idx];
 
+	/* Handle good items */
+	if ((r_ptr->flags1 & (RF1_DROP_GREAT)) && (!kind_is_great(k_idx))) return (FALSE);	
+	
 	/* Handle good items */
 	if ((r_ptr->flags1 & (RF1_DROP_GOOD)) && (!kind_is_good(k_idx))) return (FALSE);
 
@@ -5392,6 +5457,9 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 
 			/* Activate racial restriction */
 			else if (race_drop_idx) get_obj_num_hook = kind_is_race;
+
+			/* Activate 'great' restriction */
+			else if (great) get_obj_num_hook = kind_is_great;
 
 			/* Activate 'good' restriction */
 			else get_obj_num_hook = kind_is_good;
