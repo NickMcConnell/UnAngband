@@ -38,7 +38,7 @@ M:X:620
 M:R:1368
 
 # Maximum number of vaults
-M:V:51
+M:V:278
 
 # Maximum number of towns/dungeons
 M:T:71

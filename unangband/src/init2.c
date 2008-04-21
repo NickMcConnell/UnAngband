@@ -1102,6 +1102,12 @@ static errr init_v_info(void)
 	/* Save a pointer to the parsing function */
 	v_head.parse_info_txt = parse_v_info;
 
+#ifdef ALLOW_TEMPLATES_OUTPUT
+
+	/* Save a pointer to the evaluate power function*/
+	v_head.emit_info_txt_index = emit_v_info_index;
+#endif /* ALLOW_TEMPLATES_OUTPUT */
+	
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("vault", &v_head);

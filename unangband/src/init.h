@@ -142,6 +142,7 @@ extern errr eval_e_power(header *head);
 extern errr emit_d_info_always(FILE *fp, header *head);
 
 extern errr emit_blow_info_index(FILE *fp, header *head, int i);
+extern errr emit_v_info_index(FILE *fp, header *head, int i);
 extern errr emit_r_info_index(FILE *fp, header *head, int i);
 extern errr emit_f_info_index(FILE *fp, header *head, int i);
 extern errr emit_k_info_index(FILE *fp, header *head, int i);

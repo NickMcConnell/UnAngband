@@ -846,6 +846,9 @@ struct vault_type
 
 	byte hgt;       /* Vault height */
 	byte wid;       /* Vault width */
+	
+	byte min_lev;	/* Minimum level */
+	byte max_lev;	/* Maximum level */
 };
 
 

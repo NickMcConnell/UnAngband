@@ -1963,27 +1963,22 @@ errr parse_v_info(char *buf, header *head)
 	/* Process 'X' for "Extra info" (one line only) */
 	else if (buf[0] == 'X')
 	{
-		int typ, rat, hgt, wid;
+		int typ, rat, hgt, wid, min_lev, max_lev;
 
 		/* There better be a current v_ptr */
 		if (!v_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
-			    &typ, &rat, &hgt, &wid)) return (PARSE_ERROR_GENERIC);
+		if (6 != sscanf(buf+2, "%d:%d:%d:%d:%d:%d",
+				&typ, &rat, &hgt, &wid, &min_lev, &max_lev)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		v_ptr->typ = typ;
 		v_ptr->rat = rat;
 		v_ptr->hgt = hgt;
 		v_ptr->wid = wid;
-
-		/* Check for maximum vault sizes */
-		if ((v_ptr->typ == 7) && ((v_ptr->wid > 33) || (v_ptr->hgt > 22)))
-			return (PARSE_ERROR_VAULT_TOO_BIG);
-
-		if ((v_ptr->typ == 8) && ((v_ptr->wid > 66) || (v_ptr->hgt > 44)))
-			return (PARSE_ERROR_VAULT_TOO_BIG);
+		v_ptr->min_lev = min_lev;
+		v_ptr->max_lev = max_lev;
 	}
 	else
 	{
@@ -8895,6 +8890,8 @@ errr emit_blow_info_index(FILE *fp, header *head, int i)
 
 
 
+
+
 /*
  * Emit the "d_info" array into an ascii "template" file
  */
@@ -8990,6 +8987,91 @@ errr emit_d_info_always(FILE *fp, header *head)
 	return (0);	
 }
 
+
+/*
+ * Emit the "v_info" array into an ascii "template" file
+ */
+errr emit_v_info_index(FILE *fp, header *head, int i)
+{
+	int n, j, c;
+	byte v;
+	int len;
+	cptr t;
+
+	int lev;
+	
+	/* Current entry */
+	vault_type *v_ptr = (vault_type*)head->info_ptr + i;
+	
+	/* Output 'N' for "New/Number/Name" */
+	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + v_ptr->name);
+
+	lev = v_ptr->max_lev;
+	if (lev > 80) lev = 55 + (lev - 80) / 4;
+	else if (lev > 30) lev = 30 +  (lev - 30) / 2;
+	
+	/* Output 'X' for "Extra Info" */
+	fprintf(fp, "X:%d:%d:%d:%d:%d:%d\n", v_ptr->typ, v_ptr->rat, v_ptr->hgt, v_ptr->wid,
+				v_ptr->min_lev, v_ptr->max_lev ? v_ptr->max_lev : 60);
+	
+	/* Output vault data */
+	for (t = head->text_ptr + v_ptr->text, n = 0; n < v_ptr->hgt; n++)
+	{
+		fprintf(fp, "V:");
+		
+		for (j = 0; j < v_ptr->wid; t++)
+		{
+			len = (byte)*t;
+
+			/* Hack -- high bit indicates a run */
+			if (len & 0x80)
+			{
+				len ^= 0x80;
+				t++;
+			}
+			else
+			{
+				len = 1;
+			}
+
+			v = (byte)*t;
+#if 0
+			/* Translate vanilla vaults into Sangband encoding */
+			switch (v)
+			{
+				case '*':
+					v = '/';
+					break;
+				case '&':
+					v = '2';
+					break;
+				case '@':
+					v = '6';
+					break;
+				case ',':
+					v = '4';
+					break;
+				case '8':
+					v = '0';
+					break;
+			}
+#endif
+			/* Extract encoded run */
+			for (c = 0; c < len; j++, c++)
+			{
+				/* Output vault text */
+				fprintf(fp, "%c", v);
+			}
+		}
+		
+		fprintf(fp, "\n");
+	}
+	
+	fprintf(fp, "\n");
+
+	/* Success */
+	return (0);	
+}
 
 
 /*
