@@ -5924,7 +5924,7 @@ s32b slay_power(u32b s_index)
 				mult = 3;
 		if ( !(r_ptr->flags3 & RF3_IM_FIRE)
 			&& (s_index & 0x00004000L) )
-				mult = 4;
+				mult = 3;
 		if ( !(r_ptr->flags3 & RF3_IM_COLD)
 			&& (s_index & 0x00008000L) )
 				mult = 3;
