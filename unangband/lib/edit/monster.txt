@@ -3433,7 +3433,7 @@ N:185:Flesh golem
 G:g:R
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:110:12d8:12:30:10
 W:9:2:20:18
 M:0:0:0:0
@@ -3793,7 +3793,7 @@ N:204:Clay golem
 G:g:U
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:100:14d8:12:30:10
 W:15:2:20:56
 M:0:14:0:20
@@ -4360,7 +4360,7 @@ N:232:Stone golem
 G:g:W
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:100:28d8:12:75:10
 W:30:3:20:290
 M:0:14:0:20
@@ -4870,7 +4870,7 @@ N:258:Iron golem
 G:g:s
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:105:80d12:12:80:10
 W:33:3:20:420
 M:15:15:8:50
@@ -5248,7 +5248,7 @@ N:276:Pukelman
 G:g:D
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:110:80d12:12:80:10
 W:36:3:0:920
 M:0:25:12:56
@@ -5751,7 +5751,7 @@ N:300:Colbran
 G:g:y
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:120:80d12:12:80:10
 W:36:3:0:920
 M:0:33:16:56
@@ -6155,7 +6155,7 @@ N:318:Mithril golem
 G:g:B
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:110:80d60:12:100:10
 W:48:5:20:20000
 M:30:0:0:0
@@ -7070,7 +7070,7 @@ N:362:Eog golem
 G:g:u
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:105:100d20:12:125:10
 W:44:4:20:6400
 M:0:25:10:20
@@ -7474,7 +7474,7 @@ N:381:Colossus
 G:g:G
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:100:30d100:12:150:10
 W:45:4:0:9200
 M:0:0:0:0
@@ -9514,7 +9514,7 @@ N:472:Drolem
 G:g:g
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:120:25d100:25:130:30
 W:48:5:0:20000
 M:20:20:105:56
@@ -9919,7 +9919,7 @@ N:488:Lead golem
 G:g:z
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:105:80d10:12:80:10
 W:44:4:20:6000
 M:0:0:0:0
@@ -12414,7 +12414,7 @@ N:597:Silent watcher
 G:g:r
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:110:80d25:42:80:10
 W:26:3:0:200
 M:18:18:20:91
@@ -12562,7 +12562,29 @@ D:A vast, bloated arachnid, master of its brood: among the more terrible
 D: of Ungoliant's descendants, this is a monster such as those who haunted
 D: the dread valley of Nan Dungortheb long ago.
 
-#$# 604 - Unused ###
+N:604:the Silent Watcher of Cirith Ungol
+G:g:m
+#$ Multihued available
+#$ Metallics available:drgbuPRGpvtmYiTVIMZ
+#$ Colors available:dwbPpvtTVIMzZ
+I:110:80d25:42:80:10
+W:26:0:0:200
+M:18:18:20:91
+B:GAZE:PETRIFY
+B:GAZE:TERRIFY
+B:GAZE:HALLU
+B:SHRIEK:LOSE_STR
+F:UNIQUE | FORCE_MAXHP | NEVER_MOVE |
+F:COLD_BLOOD | EMPTY_MIND |
+F:EVIL | NONLIVING | HURT_ROCK | IM_ELEC | IM_FIRE | IM_COLD | IM_POIS |
+F:NO_FEAR | NO_CONF | NO_SLEEP |
+F:HAS_CORPSE | HAS_HEAD | HAS_HAND | HAS_ARM | HAS_LEG |
+F:LEVEL_POWER |
+S:BLOW_1 | BLOW_2 | BLOW_3 | BLOW_4 |
+S:DRAIN_MANA | MIND_BLAST | PROBE | CONF | HOLD |
+S:S_MONSTER |
+D:A figure carved from stone, with three vulture faces whose eyes glow
+D: with a malevolent light.
 
 N:605:Bat of Gorgoroth
 G:b:G
@@ -12629,7 +12651,7 @@ N:608:Bone golem
 G:g:Y
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:120:35d100:20:170:50
 W:51:1:20:49000
 M:0:15:55:78
@@ -12653,7 +12675,7 @@ N:609:Bronze golem
 G:g:o
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:120:40d100:20:170:50
 W:58:1:20:190000
 M:15:15:90:78
@@ -13454,7 +13476,7 @@ N:641:the Watcher of Cirith Ungol
 G:g:i
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:120:60d200:42:40:10
 W:36:6:0:14000
 M:18:18:60:120
@@ -16880,7 +16902,7 @@ N:827:Steel golem
 G:g:w
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:105:80d14:12:130:10
 W:38:4:20:2100
 M:10:0:0:0
@@ -16903,7 +16925,7 @@ N:828:Copper golem
 G:g:U
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:105:80d8:12:100:10
 W:39:4:20:2700
 M:0:14:23:60
@@ -16927,7 +16949,7 @@ N:829:Brass golem
 G:g:o
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:105:80d11:12:100:10
 W:43:4:20:5100
 M:0:14:27:80
@@ -16950,7 +16972,7 @@ N:830:Silver golem
 G:g:W
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:110:80d19:12:100:10
 W:44:4:20:6900
 M:14:14:24:80
@@ -16974,7 +16996,7 @@ N:831:Gold golem
 G:g:y
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:110:100d30:12:100:10
 W:45:4:20:7300
 M:0:25:25:40
@@ -16997,7 +17019,7 @@ N:832:Coal golem
 G:g:D
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:105:80d12:12:80:10
 W:44:4:20:6900
 M:0:14:26:75
@@ -17041,7 +17063,7 @@ N:834:Ice golem
 G:g:B
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:120:70d8:10:60:10
 W:39:4:18:2400
 M:0:11:33:90
@@ -23695,7 +23717,7 @@ N:1164:Diamond golem
 G:g:w
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:125:41d100:20:275:50
 W:59:1:95:240000
 M:20:20:100:95
@@ -23743,7 +23765,7 @@ S:BOLT_ACID | BOLT_ELEC | BOLT_FIRE | BOLT_COLD | BOLT_POIS | BOLT_PLAS |
 S:BOLT_ICE | BEAM_ELEC |
 S:SCARE |
 S:S_KIN |
-D:A strange reptilian hybrid with four heads.
+D:A strange reptilian hybrid with fifteen heads.
 
 N:1166:Great Power Serpent
 G:J:v
@@ -27707,7 +27729,7 @@ N:1364:Auto-roller
 G:g:s
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtmTVIMzZ
+#$ Colors available:dwbPpvtTVIMzZ
 I:110:70d12:10:80:12
 W:37:4:0:1400
 M:0:0:0:0
