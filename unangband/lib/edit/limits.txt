@@ -56,7 +56,7 @@ M:G:26
 M:H:350
 
 # Maximum number of player classes
-M:C:12
+M:C:13
 
 # Maximum number of weapon style lines
 M:W:164

@@ -3660,17 +3660,38 @@ F:IGNORE_ACID |
 ##### Items 445 to 479 reserved (old "terrain" objects) #####
 
 
+### The Rogue Returns ###
+
+N:440:of Tricks
+G:?:R
+I:90:60:0
+W:5:0:30:25
+A:5/4
+P:0:1d1:0:0:0
+
+N:441:of Misdirection
+G:?:R
+I:90:61:0
+W:10:0:30:100
+A:10/7
+P:0:1d1:0:0:0
+
+N:442:of Confabulation
+G:?:R
+I:90:62:0
+W:20:0:30:400
+A:20/7
+P:0:1d1:0:0:0
+
+N:443:of Spellstealing
+G:?:R
+I:90:63:0
+W:30:0:30:800
+A:30/7
+P:0:1d1:0:0:0
+
 ##### And here starts the gold/gems #####
 
-### 440 - Unused ###
-
-### 441 - Unused ###
-
-### 442 - Unused ###
-
-### 443 - Unused ###
-
-### 444 - Unused ###
 
 ### 445 - Unused ###
 
@@ -7195,7 +7216,7 @@ F:STEALTH |
 
 # Each 'school' acts as a stand alone set of balanced
 # spellbooks. Note the wizard school corresponds to the basic
-# spellbooks and there are separate 'ranger' and 'rogue' schools.
+# spellbooks and there are separate 'ranger' and 'artisan' schools.
 
 # The high level spellbooks, not being stocked in shops, are just
 # reflective of the pre-requisites and 'ongoing trend' of the spells
@@ -7419,9 +7440,9 @@ A:31/1
 P:0:1d1:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER |
 
-#### The Artisan School -- consists of the rogue books defined previously, plus this book.
+#### The Artisan School -- consists of the artisan books defined previously, plus this book.
 
-N:943:of Tricks
+N:943:of Trades
 G:?:R
 I:90:52:0
 W:5:0:30:25
@@ -7852,4 +7873,5 @@ I:24:12:0
 W:10:0:5:70
 A:10/2
 P:0:1d1:0:0:0
+
 
