@@ -991,6 +991,13 @@ void display_monlist(void)
 
 	u16b *race_counts;
 
+	/* If hallucinating, we can't see any monsters */
+	if (p_ptr->image)
+	{
+		Term_clear();
+		return;
+	}
+	
 	/* Allocate the array */
 	race_counts = C_ZNEW(z_info->r_max, u16b);
 

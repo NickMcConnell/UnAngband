@@ -332,10 +332,10 @@ bool set_image(int v)
 	if (disturb_state) disturb(0, 0);
 
 	/* Redraw map */
-	p_ptr->redraw |= (PR_MAP);
+	p_ptr->redraw |= (PR_MAP | PR_HEALTH);
 
 	/* Window stuff */
-	p_ptr->window |= (PW_OVERHEAD);
+	p_ptr->window |= (PW_OVERHEAD | PW_MONLIST);
 
 	/* Handle stuff */
 	handle_stuff();
