@@ -8356,13 +8356,13 @@ errr eval_r_power(header *head)
 				/*
 				 * Hack -- provide adjustment factor to prevent overflow
 				 */
-				if ((j == 90) && (r_ptr->level < 90))
+				if ((j == 55) && (r_ptr->level < 55))
 				{
 					hp /= 10;
 					dam /= 10;
 				}
 	
-				if ((j == 65) && (r_ptr->level < 65))
+				if ((j == 50) && (r_ptr->level < 50))
 				{
 					hp /= 10;
 					dam /= 10;
