@@ -734,8 +734,10 @@ struct monster_race
 	u32b name;      /* Name (offset) */
 	u32b text;      /* Text (offset) */
 
-	byte hdice;     /* Creatures hit dice count */
-	byte hside;     /* Creatures hit dice sides */
+	s16b hp;     /* Creatures average hit points */
+	
+	byte hdice;
+	byte hside;
 
 	s16b ac;	/* Armour Class */
 

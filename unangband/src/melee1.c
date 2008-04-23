@@ -518,7 +518,7 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 			if (scale > 100)
 			{
 				/* Boost hit points -- unlimited */
-				n_ptr->hside = n_ptr->hside * scale / 100;
+				n_ptr->hp = n_ptr->hp * scale / 100;
 			}
 		}
 	}

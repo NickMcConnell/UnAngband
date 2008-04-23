@@ -979,15 +979,7 @@ static void spoil_mon_desc(cptr fname)
 		sprintf(ac, "%d", r_ptr->ac);
 
 		/* Hitpoints */
-		if ((r_ptr->flags1 & (RF1_FORCE_MAXHP)) || (r_ptr->hside == 1))
-		{
-			sprintf(hp, "%d", r_ptr->hdice * r_ptr->hside);
-		}
-		else
-		{
-			sprintf(hp, "%dd%d", r_ptr->hdice, r_ptr->hside);
-		}
-
+		sprintf(hp, "%d", r_ptr->hp);
 
 		/* Hack -- use visual instead */
 		sprintf(vis, "%s '%c'", attr_to_text(r_ptr->d_attr), r_ptr->d_char);
@@ -1141,14 +1133,8 @@ static void spoil_mon_info(cptr fname)
 		text_out(buf);
 
 		/* Hitpoints */
-		if ((r_ptr->flags1 & RF1_FORCE_MAXHP) || (r_ptr->hside == 1))
-		{
-			sprintf(buf, "Hp:%d  ", r_ptr->hdice * r_ptr->hside);
-		}
-		else
-		{
-			sprintf(buf, "Hp:%dd%d  ", r_ptr->hdice, r_ptr->hside);
-		}
+		sprintf(buf, "Hp:%d  ", r_ptr->hp);
+
 		text_out(buf);
 
 		/* Armor Class */

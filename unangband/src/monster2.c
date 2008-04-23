@@ -3090,18 +3090,8 @@ int calc_monster_hp(int m_idx)
 		r_ptr = &monster_race_scaled;
 	}
 
-	/* Assign maximal hitpoints */
-	if (r_ptr->flags1 & (RF1_FORCE_MAXHP))
-	{
-		hp = maxroll(r_ptr->hdice, r_ptr->hside);
-	}
-	else
-	{
-		hp = damroll(r_ptr->hdice, r_ptr->hside);
-	}
-
-	/* Hack -- Scale down hit points by monster armour */
-	hp -= (hp * ((r_ptr->ac < 150) ? r_ptr->ac : 150) / 250);
+	/* Hit points */
+	hp = r_ptr->hp;
 
 	/* Adjust for monster constitution stat */
 	if (m_ptr->mflag & (MFLAG_SICK)) hp = hp * 9 / 10;

@@ -1467,14 +1467,14 @@ static void describe_monster_toughness(const monster_race *r_ptr, const monster_
 		if (l_ptr->flags1 & RF1_FORCE_MAXHP)
 		{
 			text_out(format(" and a life rating of %d.  ",
-			    r_ptr->hdice * r_ptr->hside));
+			    r_ptr->hp));
 		}
 
 		/* Variable hitpoints */
 		else
 		{
-			text_out(format(" and a life rating of %dd%d.  ",
-			    r_ptr->hdice, r_ptr->hside));
+			text_out(format(" and an average life rating of %d.  ",
+			    r_ptr->hp));
 		}
 	}
 }

@@ -4234,19 +4234,18 @@ errr parse_r_info(char *buf, header *head)
 	/* Process 'I' for "Info" (one line only) */
 	else if (buf[0] == 'I')
 	{
-		int spd, hp1, hp2, aaf, ac, slp;
+		int spd, hp, aaf, ac, slp;
 
 		/* There better be a current r_ptr */
 		if (!r_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the other values */
-		if (6 != sscanf(buf+2, "%d:%dd%d:%d:%d:%d",
-			    &spd, &hp1, &hp2, &aaf, &ac, &slp)) return (PARSE_ERROR_GENERIC);
+		if (5 != sscanf(buf+2, "%d:%d:%d:%d:%d",
+			    &spd, &hp, &aaf, &ac, &slp)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		r_ptr->speed = spd;
-		r_ptr->hdice = hp1;
-		r_ptr->hside = hp2;
+		r_ptr->hp = hp;
 		r_ptr->aaf = aaf;
 		r_ptr->ac = ac;
 		r_ptr->sleep = slp;
@@ -7142,11 +7141,10 @@ static long eval_max_dam(monster_race *r_ptr)
 
 	/*clear the counters*/
 	melee_dam = atk_dam = spell_dam = spell_dam_real = 0;
-
-	/* Evaluate average HP for this monster */
-	if (r_ptr->flags1 & (RF1_FORCE_MAXHP)) hp = r_ptr->hdice * r_ptr->hside;
-	else hp = r_ptr->hdice * (r_ptr->hside + 1) / 2;
-
+	
+	/* Get hitpoints for later modification */
+	hp = r_ptr->hp;
+	
 	/* Extract the monster level, force 1 for town monsters */
 	rlev = ((r_ptr->level >= 1) ? r_ptr->level : 1);
 
@@ -7932,11 +7930,10 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	int resists = 1;
 	int ac = 0;
 	int hide_bonus = 0;
-
-	/* Get the monster base hitpoints */
-	if (r_ptr->flags1 & (RF1_FORCE_MAXHP)) raw_hp = r_ptr->hdice * r_ptr->hside;
-	else raw_hp = r_ptr->hdice * (r_ptr->hside + 1) / 2;
-
+	
+	/* Get hit points for later modification */
+	raw_hp = r_ptr->hp;
+	
 	hp = raw_hp;
 
 	/* Never moves with no ranged attacks - high hit points count for less */
@@ -9198,9 +9195,9 @@ errr emit_r_info_index(FILE *fp, header *head, int i)
 		if ((chromatics & (1 << i)) == 0) fprintf(fp, "%c",color_table[i].index_char);
 	}
 	fprintf(fp, "\n");
-	
+
 	/* Output 'I' for "Info" (one line only) */
-	fprintf(fp, "I:%d:%dd%d:%d:%d:%d\n",r_ptr->speed,r_ptr->hdice,r_ptr->hside,r_ptr->aaf,r_ptr->ac,r_ptr->sleep);
+	fprintf(fp, "I:%d:%d:%d:%d:%d\n",r_ptr->speed,r_ptr->hp,r_ptr->aaf,r_ptr->ac,r_ptr->sleep);
 
 	/* Output 'W' for "More Info" (one line only) */
 	fprintf(fp,"W:%d:%d:%d:%ld\n",r_ptr->level, r_ptr->rarity, r_ptr->grp_idx, r_ptr->mexp);
