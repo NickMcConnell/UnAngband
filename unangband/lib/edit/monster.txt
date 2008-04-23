@@ -9419,7 +9419,7 @@ G:E:G
 #$ Metallics available:dwsDWPiTVIMzZ
 #$ Colors available:dDPBUpVIMz
 I:130:2430:12:50:50
-W:49:13:11:480000
+W:52:13:11:480000
 M:20:20:60:84
 B:HIT:BATTER:4d6
 B:HIT:BATTER:4d6

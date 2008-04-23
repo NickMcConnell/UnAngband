@@ -7031,6 +7031,9 @@ static long eval_blow_effect(int effect, int atk_dam, int rlev)
 		case GF_UN_BONUS:
 		case GF_UN_POWER:
 		case GF_LOSE_CON:
+		case GF_ANIM_DEAD:
+		case GF_ANIM_ELEMENT:
+		case GF_ANIM_OBJECT:
 		{
 			atk_dam += 30;
 			break;
@@ -7745,7 +7748,7 @@ static long eval_max_dam(monster_race *r_ptr)
 				if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL)) atk_dam *= 10;
 				else if (range >= 7) atk_dam *= 10;
 				else
-					atk_dam = atk_dam * (3 + range) + atk_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / (7 - range);
+					atk_dam = atk_dam * (3 + range) + atk_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / (13 - range);
 
 				/* Get frequency */
 				freq = r_ptr->freq_innate;
@@ -7783,7 +7786,10 @@ static long eval_max_dam(monster_race *r_ptr)
 				if (freq < 10) freq = 10;
 
 				/* Hack -- aura frequency */
-				if (method == RBM_AURA) freq += 100;
+				if (method == RBM_AURA)
+				{
+					freq += 100;
+				}
 
 				/* Adjust for frequency */
 				atk_dam = atk_dam * freq / 100;
@@ -7800,7 +7806,7 @@ static long eval_max_dam(monster_race *r_ptr)
 			if (method == RBM_AURA) 
 			{
 				/* Keep a running total */
-				melee_dam += 3 * atk_dam;
+				melee_dam += 2 * atk_dam;
 			}
 		}
 
@@ -7822,11 +7828,11 @@ static long eval_max_dam(monster_race *r_ptr)
 		else if ((r_ptr->flags3 & (RF3_HUGE)) ||
 			(((r_ptr->flags2 & (RF2_INVISIBLE)) || (r_ptr->flags6 & (RF6_INVIS))) && (r_ptr->flags2 & (RF2_COLD_BLOOD))))
 		{
-			melee_dam = melee_dam * 4 + melee_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 6;
+			melee_dam = melee_dam * 3 + melee_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 11;
 		}
 		else
 		{
-			melee_dam = melee_dam * 3 + melee_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 7;
+			melee_dam = melee_dam * 3 + melee_dam * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 12;
 		}
 
 		/*
@@ -7868,7 +7874,7 @@ static long eval_max_dam(monster_race *r_ptr)
 					/* Incorporate spell failure chance */
 					if (!(r_ptr->flags2 & RF2_STUPID)) melee_dam = melee_dam / 5 + 4 * melee_dam * MIN(75 + (rlev + 3) / 4, 100) / 500;
 				}
-				else if (r_ptr->flags2 & (RF2_HAS_AURA)) melee_dam /= 2;
+				else if (r_ptr->flags2 & (RF2_HAS_AURA)) melee_dam /= 3;
 				else if ((r_ptr->flags2 & (RF2_INVISIBLE)) && (r_ptr->flags2 & (RF2_COLD_BLOOD))) melee_dam /= 3;
 				else melee_dam /= 5;
 			}
@@ -8252,7 +8258,7 @@ errr eval_r_power(header *head)
 					long threat = r_ptr->highest_threat;
 	
 					/* Compute level algorithmically */
-					for (j = 1; (mexp > j + 4) || (threat > j + 5); mexp -= j * j, threat -= (j + 4), j++);
+					for (j = 1; (mexp > j + 5) || (threat > j + 3); mexp -= j * j, threat -= (j + 4), j++);
 	
 					/* Set level */
 					lvl = MIN(( j > 160 ? 50 + (j - 160) / 20 : 	/* Level 50 and above */
