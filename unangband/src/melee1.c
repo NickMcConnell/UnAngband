@@ -2290,6 +2290,8 @@ int sauron_shape(int old_form)
 		/* Pick the shape */
 		if (one_in_(++k)) r_idx = i;
 	}
+	
+	return (r_idx);
 }
 
 
