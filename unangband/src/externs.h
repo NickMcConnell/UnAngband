@@ -803,6 +803,7 @@ extern void drop_near(object_type *j_ptr, int chance, int y, int x);
 extern void feat_near(int feat, int y, int x);
 extern void acquirement(int y1, int x1, int num, bool great);
 extern void place_object(int y, int x, bool good, bool great);
+extern void place_chest(int y, int x);
 extern void place_gold(int y, int x);
 extern errr get_feat_num_prep(void);
 extern s16b get_feat_num(int level);
