@@ -2263,6 +2263,34 @@ static int mon_concentrate_power(int y, int x, int spower, bool use_los, bool de
 }
 
 
+/*
+ * Get Sauron's new shape.
+ */
+int sauron_shape(int old_form)
+{
+	int i, k = 0;
+	
+	int r_idx = SAURON_TRUE;
+	
+	for (i = SAURON_FORM; i < SAURON_FORM + MAX_SAURON_FORMS; i++)
+	{
+		/* Never pick old shape */
+		if (i == old_form) continue;
+		
+		/* Previously killed this shape on this level allows the 'true' form to be fought. */
+		if ((p_ptr->sauron_forms & (1 << (i - SAURON_FORM))) && one_in_(++k))
+		{
+			r_idx = SAURON_TRUE;
+			continue;
+		}
+
+		/* Player has killed this shape */
+		if (r_info[i].cur_num >= r_info[i].max_num) continue;
+
+		/* Pick the shape */
+		if (one_in_(++k)) r_idx = i;
+	}
+}
 
 
 /*
@@ -4088,6 +4116,18 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (target == 0) break;
 
+			/* Sauron changes shape */
+			if ((target > 0) && ((m_ptr->r_idx == SAURON_TRUE) ||
+				((m_ptr->r_idx >= SAURON_FORM) && (m_ptr->r_idx < SAURON_FORM + MAX_SAURON_FORMS))))
+			{
+				disturb(1,0);
+
+				if (blind) msg_format("%^s mumbles.", m_name);
+				else msg_format("%^s shits %s shape.", m_name, t_poss);
+				
+				/* Get the new Sauron Shape */
+				m_ptr->r_idx = sauron_shape(m_ptr->r_idx);
+			}
 			/* Druids/shamans sometimes add health from trees/plants */
 			if ((who > 0) && (target == who) && ((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_PRIEST)) != 0) && (rand_int(100) < 50))
 			{

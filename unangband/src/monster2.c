@@ -770,7 +770,7 @@ s16b get_mon_num(int level)
 			}			
 
 			/* Can choose this monster? */
-			if ((cave_ecology.get_mon[i] != 0) && !(rand_int(++j))) choice = i;
+			if ((cave_ecology.get_mon[i] != 0) && (one_in_(++j))) choice = i;
 		}
 
 		/* Made a choice */
@@ -857,7 +857,7 @@ s16b get_mon_num(int level)
 			
 			/* Allow a best effort choice in the event we can't find anything */
 			/* Hack -- have a soft boundary, so we don't always get the same monster very deep */
-			if ((closest_miss_level + 5 < miss_level) || ((closest_miss_level <= miss_level) && (!rand_int(++count)) ))
+			if ((closest_miss_level + 5 < miss_level) || ((closest_miss_level <= miss_level) && (one_in_(++count)) ))
 			{
 				closest_miss_r_idx = table[i].index;
 				if (closest_miss_level < miss_level) closest_miss_level = miss_level;
@@ -4537,6 +4537,12 @@ bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp, u32b flg)
 {
 	monster_race *r_ptr = &r_info[r_idx];
 
+	/* MegaHack: Handle forms of Sauron */
+	if (r_idx == SAURON_TRUE)
+	{
+		r_idx = sauron_shape(0);
+	}
+	
 	/* Place one monster, or fail */
 	if (!place_monster_one(y, x, r_idx, slp, r_ptr->flags1 & (RF1_FRIENDS) ? flg | MFLAG_LEADER : flg)) return (FALSE);
 
@@ -4893,7 +4899,7 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 							(my_stricmp(s,"Great ")))
 					{
 						/* Maybe get this word */
-						if (!rand_int(++k)) u = t;
+						if (one_in_(++k)) u = t;
 					}
 					
 					s += n + 1;

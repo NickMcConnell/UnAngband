@@ -1230,6 +1230,12 @@ static errr rd_extra(void)
 	/* XXX Hack -- should have saved this before */
 	if (p_ptr->pschool < SV_BOOK_MAX_GOOD) p_ptr->pschool = SV_BOOK_MAX_GOOD;
 
+	if (!older_than(0, 6, 2, 9))
+	{
+		/* Player school */
+		rd_byte(&p_ptr->sauron_forms);
+	}
+	
 	/* Special Race/Class info */
 	rd_byte(&p_ptr->expfact);
 

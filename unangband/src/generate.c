@@ -12085,6 +12085,9 @@ void generate_cave(void)
 	/* Generating */
 	if (cheat_room) msg_format("Generating new level (level %d in %s)", p_ptr->depth, t_name + t_info[p_ptr->dungeon].name);
 
+	/* MegaHack - Reset forms of Sauron */
+	p_ptr->sauron_forms = 0;
+	
 	/* Generate */
 	for (num = 0; TRUE; num++)
 	{

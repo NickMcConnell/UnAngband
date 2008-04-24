@@ -67,7 +67,7 @@
 #define VERSION_MAJOR	0
 #define VERSION_MINOR	6
 #define VERSION_PATCH	2
-#define VERSION_EXTRA	8
+#define VERSION_EXTRA	9
 
 
 /*
@@ -3645,6 +3645,18 @@
 
 
 /*** Monster flags ***/
+
+
+
+/*
+ * Hard coding for Sauron hack. Indexes into monster.txt
+ * 
+ * Should really replace this with shapeshifting based on group or similar.
+ */
+#define SAURON_TRUE		546
+#define SAURON_FORM		1367
+#define MAX_SAURON_FORMS	5
+
 
 
 /*

@@ -588,6 +588,8 @@ static void wr_extra(void)
 	/* School */
 	wr_byte(p_ptr->pschool);
 	
+	/* Forms of Sauron killed on current level */
+	wr_byte(p_ptr->sauron_forms);
 
 	wr_byte(p_ptr->expfact);
 

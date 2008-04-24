@@ -662,6 +662,7 @@ extern bool mon_check_hit(int m_idx, int power, int level, int who, bool ranged)
 extern void attack_desc(int who, int what, int target, int method, int damage, bool *do_cut, bool *do_stun);
 extern bool make_attack_normal(int m_idx);
 extern void mon_blow_ranged(int who, int what, int x, int y, int method, int range, int flg, cptr result);
+extern int sauron_shape(int old_form);
 extern bool make_attack_ranged(int who, int attack, int py, int px);
 extern bool mon_evade(int m_idx, int chance, int out_of, cptr r);
 extern bool mon_resist_object(int m_idx, const object_type *o_ptr);
@@ -1104,7 +1105,7 @@ extern int get_coin_type(const monster_race *r_ptr);
 extern void quest_assign(int q_idx);
 extern void quest_reward(int q_idx);
 extern void quest_penalty(int q_idx);
-extern void monster_death(int m_idx);
+extern bool monster_death(int m_idx);
 extern bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note);
 extern bool modify_panel(int wy, int wx);
 extern bool adjust_panel(int y, int x);

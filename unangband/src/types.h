@@ -1480,7 +1480,7 @@ struct player_type
 	byte psval;	/* Style sub-specialization*/
 	byte pshape;	/* Current shape */
 	byte pschool;	/* Current magic 'school' */
-	byte unused;	/* Current shape */
+	byte sauron_forms;	/* Forms of sauron that player has killed on this level */
 
 	u16b dungeon;		/* Current dungeon number */
 	u16b town;      /* Current town number */
@@ -1702,7 +1702,7 @@ struct player_type
 	byte blocking;   	/* Currently blocking */
 
 	byte branded_blows;	/* Current blow is branded with */
-	byte unused2;
+	byte unused;	/* Forms of Sauron that player has killed on this level already. */
 	
 	/*** Extracted fields ***/
 

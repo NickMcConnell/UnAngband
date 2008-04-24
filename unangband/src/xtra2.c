@@ -3021,7 +3021,7 @@ void scatter_objects_under_feat(int y, int x)
  * Note that monsters can now carry objects, and when a monster dies,
  * it drops all of its objects, which may disappear in crowded rooms.
  */
-void monster_death(int m_idx)
+bool monster_death(int m_idx)
 {
 	int i, j, y, x, ny, nx;
 
@@ -3083,7 +3083,7 @@ void monster_death(int m_idx)
 		p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1 | PW_PLAYER_2 | PW_PLAYER_3);
 
 		/* Player death */
-		if (p_ptr->is_dead) return;
+		if (p_ptr->is_dead) return (TRUE);
 	}
 
 	
@@ -3155,7 +3155,7 @@ void monster_death(int m_idx)
 	if (r_ptr->flags8 & (RF8_HAS_SLIME)) feat_near(FEAT_FLOOR_SLIME_T,m_ptr->fy,m_ptr->fx);
 
 	/* Do we drop more treasure? */
-	if (m_ptr->mflag & (MFLAG_MADE)) return;
+	if (m_ptr->mflag & (MFLAG_MADE)) return (TRUE);
 
 	/* Mega-Hack -- drop "winner" treasures */
 	if (r_ptr->flags1 & (RF1_DROP_CHOSEN))
@@ -3490,7 +3490,7 @@ void monster_death(int m_idx)
 
 	/* Only process "Quest Monsters" */
 	if (!(r_ptr->flags1 & (RF1_QUESTOR | RF1_GUARDIAN)))
-		return;
+		return (TRUE);
 
 	/* Check quests for completion */
 	for (i = 0; i < MAX_Q_IDX; i++)
@@ -3617,6 +3617,34 @@ void monster_death(int m_idx)
 			}
 		}
 	}
+	
+	/* Sauron forms */
+	if ((m_ptr->r_idx >= SAURON_FORM) && (m_ptr->r_idx < SAURON_FORM + MAX_SAURON_FORMS))
+	{
+		/* Killing this form means there is a chance of the true form being revealed */
+		p_ptr->sauron_forms |= (1 << (m_ptr->r_idx - SAURON_FORM));
+		
+		/* Sauron changes form */
+		m_ptr->r_idx = sauron_shape(m_ptr->r_idx);
+		
+		/* And gets back his hitpoints / mana */
+		m_ptr->hp = m_ptr->maxhp;
+		m_ptr->mana = r_ptr->mana;
+		
+		/* Message for the player */
+		if (m_ptr->r_idx == SAURON_TRUE)
+		{
+			msg_print("Sauron's form shifts, revealing his true shape.");
+			msg_print("He is vulnerable and can be killed permanently while in this form.");
+		}
+		else
+		{
+			msg_print("Sauron's form shifts fluidly.");
+			msg_print("You have destroyed this shape, but must continue the fight!");
+		}
+		
+		return (FALSE);
+	}
 
 	/* Dungeon guardian defeated - need some stairs except on surface */
 	if (r_ptr->flags1 & (RF1_GUARDIAN))
@@ -3667,6 +3695,8 @@ void monster_death(int m_idx)
 		msg_print("You have won the game!");
 		msg_print("You may retire (commit suicide) when you are ready.");
 	}
+	
+	return (TRUE);
 }
 
 
@@ -3844,7 +3874,7 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 		}
 
 		/* Generate treasure */
-		monster_death(m_idx);
+		if (!monster_death(m_idx)) return (FALSE);
 
 		/* When the player kills a Unique, it stays dead */
 		if (r_ptr->flags1 & (RF1_UNIQUE)) r_ptr->max_num = 0;
