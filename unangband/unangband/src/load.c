@@ -800,10 +800,13 @@ static errr rd_store(int n)
 
 	st_ptr->owner = own;
 	
-	/* Activate the owner */
-	ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max) 
-						  + st_ptr->owner];
-	ot_ptr->busy = TRUE;
+	/* Activate the owner, if any */
+	if (st_ptr->base >= STORE_MIN_BUY_SELL) 
+	{
+		ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max) 
+							  + st_ptr->owner];
+		ot_ptr->busy = TRUE;
+	}
 
 	/* Read the items */
 	for (j = 0; j < num; j++)
