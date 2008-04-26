@@ -436,8 +436,11 @@ static void player_wipe(void)
 		/* Reset "guess" */
 		k_ptr->guess = 0;
 
-		/* Reset "tried" and "flavor" */
-		k_ptr->aware &= ~(AWARE_TRIED | AWARE_FLAVOR | AWARE_RUNES);
+		/* Reset "tried" and "runes learnt on unaware objects" */
+		k_ptr->aware &= ~(AWARE_TRIED | AWARE_RUNES);
+		
+		/* Reset "flavor" if flavor not fixed */
+		if ((k_ptr->flavor) && !(x_info[k_ptr->flavor].sval)) k_ptr->aware &= ~(AWARE_FLAVOR);
 	}
 
 
