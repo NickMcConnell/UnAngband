@@ -1205,7 +1205,7 @@ struct player_race
 	u32b flags3;    /* Racial Flags, set 3 */
 	u32b flags4;    /* Racial Flags, set 4 */
 
-	s16b slots[END_EQUIPMENT - INVEN_WIELD];	/* Slot occupied by a shape 'object' */
+	s16b slots[END_EQUIPMENT - INVEN_WIELD + 1];	/* Slot occupied by a shape 'object' */
 };
 
 

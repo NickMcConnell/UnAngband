@@ -1848,7 +1848,7 @@ key_event inkey_ex(void)
  */
 key_event anykey(void)
 {
-	key_event ke;
+	key_event ke = {0, 0, 0, 0};
 
 	/* Only accept a keypress or mouse click*/
 	do
@@ -3806,7 +3806,7 @@ void request_command(bool shopping)
 {
 	int i;
 
-	key_event ke;
+	key_event ke = {0, 0, 0, 0};
 
 	int mode;
 
@@ -4077,9 +4077,8 @@ void request_command(bool shopping)
 		}
 	}
 
-
 	/* Hack -- erase the message line. */
-	if ((ke.key != '\xff') || (ke.mousebutton)) prt("", 0, 0);
+	if (ke.key && (ke.key != '\xff' || ke.mousebutton)) prt("", 0, 0);
 
 	/* Hack again -- apply the modified key command */
 	p_ptr->command_cmd_ex.key = p_ptr->command_cmd;
