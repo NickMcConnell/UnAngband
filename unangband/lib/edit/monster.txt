@@ -984,7 +984,7 @@ G:G:W
 #$ Metallics available:dY
 #$ Colors available:d
 I:130:6:8:15:10
-W:10:2:0:23
+W:10:2:21:23
 M:0:6:0:23
 B:TOUCH:TERRIFY
 F:RAND_25 | RAND_50 | DROP_60 | DROP_90 |
@@ -1437,7 +1437,7 @@ G:G:g
 #$ Metallics available:dY
 #$ Colors available:d
 I:130:7:10:20:10
-W:7:2:0:11
+W:7:2:21:11
 M:0:0:0:0
 B:TOUCH:EAT_FOOD:1d1
 B:SLIME
@@ -1915,7 +1915,7 @@ G:G:B
 #$ Metallics available:dY
 #$ Colors available:d
 I:110:9:12:10:10
-W:16:2:0:68
+W:16:2:23:68
 M:0:6:0:26
 B:HIT:HURT:2d9
 B:TOUCH:LOSE_WIS
@@ -5230,7 +5230,7 @@ G:G:b
 #$ Metallics available:dY
 #$ Colors available:d
 I:120:26:20:24:10
-W:31:3:0:310
+W:31:3:21:310
 M:6:6:8:60
 B:WAIL:TERRIFY
 B:TOUCH:EXP_20
@@ -6180,7 +6180,7 @@ G:D:z
 #$ Metallics available:dsDPGpiTMzZ
 #$ Colors available:d
 I:110:258:20:70:70
-W:34:3:0:540
+W:34:3:27:540
 M:18:18:5:70
 B:CLAW:HURT:2d4
 B:CLAW:HURT:2d4
@@ -6734,7 +6734,7 @@ G:G:Z
 #$ Metallics available:dY
 #$ Colors available:d
 I:120:139:20:30:10
-W:41:4:21:3900
+W:41:4:27:3900
 M:6:6:22:71
 B:WAIL:TERRIFY
 B:TOUCH:EXP_40
@@ -7216,7 +7216,7 @@ G:G:V
 #$ Metallics available:dY
 #$ Colors available:d
 I:120:247:20:30:10
-W:44:4:0:6700
+W:44:4:21:6700
 M:0:6:44:50
 B:HIT:HURT:6d6
 B:HIT:HURT:6d6
@@ -7382,7 +7382,7 @@ G:G:z
 #$ Metallics available:dY
 #$ Colors available:d
 I:120:99:30:30:20
-W:44:4:21:6200
+W:44:4:27:6200
 M:0:15:35:45
 B:TOUCH:EXP_80
 B:TOUCH:EXP_40
@@ -8788,7 +8788,7 @@ G:A:z
 #$ Metallics available:d
 #$ Colors available:dW
 I:120:1680:25:100:80
-W:50:1:0:29000
+W:50:1:27:29000
 M:25:25:26:95
 B:CLAW:WOUND:2d14
 B:CLAW:TERRIFY:2d14
@@ -9216,7 +9216,7 @@ G:G:o
 #$ Metallics available:dY
 #$ Colors available:d
 I:120:247:20:30:10
-W:44:7:0:6500
+W:44:7:21:6500
 M:6:6:44:50
 B:HIT:HURT:6d6
 B:HIT:HURT:6d6
@@ -9492,7 +9492,7 @@ G:G:y
 #$ Metallics available:dY
 #$ Colors available:d
 I:120:960:20:100:10
-W:48:5:0:18000
+W:48:5:21:18000
 M:0:12:65:91
 B:HIT:HURT:6d6
 B:HIT:HURT:6d6
@@ -10498,7 +10498,7 @@ G:G:r
 #$ Metallics available:dY
 #$ Colors available:d
 I:120:2100:20:150:10
-W:54:1:0:96000
+W:54:1:21:96000
 M:0:25:75:91
 B:HIT:EXP_40:6d6
 B:HIT:EXP_40:6d6
@@ -10679,7 +10679,7 @@ G:G:P
 #$ Metallics available:dY
 #$ Colors available:d
 I:130:4550:20:150:10
-W:58:1:0:280000
+W:58:1:21:280000
 M:40:40:100:162
 B:HIT:HURT:10d10
 B:HIT:HURT:10d10
@@ -13401,7 +13401,7 @@ G:G:V
 #$ Metallics available:dY
 #$ Colors available:d
 I:120:828:10:40:1
-W:38:6:0:8400
+W:38:6:22:8400
 M:0:50:50:100
 B:HIT:HURT:3d5
 B:HIT:HURT:3d5
@@ -17044,7 +17044,7 @@ G:Y:o
 #$ Metallics available:dwsrgbuDWPyRGBUpvtmYiTVIMzZ
 #$ Colors available:drbuDWyGBUpvtYTVIzZ
 I:110:60:12:30:10
-W:31:4:0:110
+W:31:4:20:110
 M:14:0:0:0
 B:HIT:HURT:1d8
 B:HIT:ACID:2d4
@@ -17329,7 +17329,7 @@ G:G:m
 #$ Metallics available:dY
 #$ Colors available:d
 I:110:10:12:10:12
-W:14:3:0:57
+W:14:3:23:57
 M:0:6:0:30
 B:HIT:HURT:2d3
 B:TOUCH:LOSE_INT
@@ -17346,7 +17346,7 @@ G:G:R
 #$ Metallics available:dY
 #$ Colors available:d
 I:110:16:12:10:12
-W:15:2:0:62
+W:15:2:23:62
 M:0:8:0:34
 B:HIT:HUNGER:2d2
 B:TOUCH:EAT_FOOD
@@ -17363,7 +17363,7 @@ G:G:b
 #$ Metallics available:dY
 #$ Colors available:d
 I:110:33:12:10:12
-W:21:3:0:120
+W:21:3:23:120
 M:0:10:0:38
 B:HIT:HURT:2d4
 B:TOUCH:COLD:2d4
@@ -17380,7 +17380,7 @@ G:G:r
 #$ Metallics available:dY
 #$ Colors available:d
 I:110:44:12:10:12
-W:29:3:0:250
+W:29:3:23:250
 M:0:12:0:42
 B:BITE:WOUND:5d2
 B:BITE:EXP_10
@@ -17397,7 +17397,7 @@ G:G:g
 #$ Metallics available:dY
 #$ Colors available:d
 I:115:49:12:10:11
-W:20:3:0:120
+W:20:3:23:120
 M:0:14:0:48
 B:HIT:HURT:2d3
 B:TOUCH:DISEASE
@@ -17414,7 +17414,7 @@ G:G:i
 #$ Metallics available:dY
 #$ Colors available:d
 I:110:54:12:10:11
-W:31:3:0:350
+W:31:3:23:350
 M:0:16:0:52
 B:HIT:HURT:2d3
 B:TOUCH:TIME:2d4
@@ -17431,7 +17431,7 @@ G:G:G
 #$ Metallics available:dY
 #$ Colors available:d
 I:115:49:12:10:11
-W:28:3:0:240
+W:28:3:23:240
 M:0:18:0:56
 B:HIT:HURT:2d4
 B:HIT:HURT:2d4
@@ -17450,7 +17450,7 @@ G:G:y
 #$ Metallics available:dY
 #$ Colors available:d
 I:115:58:16:20:11
-W:36:3:0:1000
+W:36:3:23:1000
 M:0:20:0:60
 B:BITE:HUNGER:2d4
 B:BITE:HUNGER:2d4
@@ -17469,7 +17469,7 @@ G:G:D
 #$ Metallics available:dY
 #$ Colors available:d
 I:120:81:16:20:11
-W:37:4:0:1400
+W:37:4:23:1400
 M:0:22:0:64
 B:HIT:HURT:3d4
 B:HIT:HURT:3d4
@@ -17488,7 +17488,7 @@ G:G:o
 #$ Metallics available:dY
 #$ Colors available:d
 I:120:108:16:20:11
-W:38:4:0:2000
+W:38:4:23:2000
 M:0:24:0:68
 B:HIT:HURT:3d5
 B:HIT:HURT:3d5
@@ -19353,7 +19353,7 @@ G:G:t
 #$ Metallics available:dY
 #$ Colors available:d
 I:130:548:20:25:10
-W:44:5:0:7200
+W:44:5:27:7200
 M:25:50:68:150
 B:TOUCH:EXP_80:1d16
 B:TOUCH:UN_POWER
@@ -23719,7 +23719,7 @@ G:g:w
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
 #$ Colors available:dwbPpvtTVIMzZ
 I:125:2870:20:275:50
-W:59:1:95:240000
+W:59:1:20:240000
 M:20:20:100:95
 B:HIT:HURT:10d10
 B:HIT:HURT:10d10
@@ -24873,7 +24873,7 @@ G:S:z
 #$ Metallics available:dwsorgbuWPyRGBUvtmYiVIMzZ
 #$ Colors available:dgWtVMZ
 I:120:686:25:15:5
-W:54:7:40:97000
+W:54:7:27:97000
 M:25:25:20:25
 B:CRAWL:EAT_LITE:5d1
 B:STING:BLIND:2d9
@@ -25873,7 +25873,7 @@ G:P:z
 #$ Metallics available:dwsorgbDWyRGBUptmYiTVMZ
 #$ Colors available:doDPpM
 I:115:2280:30:120:15
-W:48:8:0:90000
+W:48:8:27:90000
 M:20:20:65:57
 B:HIT:SHATTER:13d7
 B:HIT:CONFUSE:13d7
@@ -26634,7 +26634,7 @@ G:H:z
 #$ Metallics available:dwsorbuDWRGpvtmYiTVIMZ
 #$ Colors available:dgbBvVZ
 I:115:20:18:12:10
-W:7:2:24:9
+W:7:2:27:9
 M:0:25:5:20
 F:NEVER_BLOW | DROP_60 |
 F:HAS_LITE | CAN_FLY | MUST_FLY | OPEN_DOOR |
