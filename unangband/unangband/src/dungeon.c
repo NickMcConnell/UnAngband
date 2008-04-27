@@ -1808,7 +1808,8 @@ static void process_world(void)
 			/* Determine the level */
 			if (p_ptr->depth > min_depth(p_ptr->dungeon))
 			{
-				msg_print("You feel yourself yanked upwards!");
+				msg_format("You feel yourself yanked %swards!", 
+					((level_flag & (LF1_TOWER)) ? "down" : "up"));
 
 				/* New depth */
 				p_ptr->depth = min_depth(p_ptr->dungeon);
@@ -1821,7 +1822,8 @@ static void process_world(void)
 			}
 			else
 			{
-				msg_print("You feel yourself yanked downwards!");
+				msg_format("You feel yourself yanked %swards!", 
+					((level_flag & (LF1_TOWER)) ? "up" : "down"));
 
 				/* New depth */
 				p_ptr->depth = t_info[p_ptr->dungeon].attained_depth;
