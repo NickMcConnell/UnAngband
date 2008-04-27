@@ -4971,12 +4971,13 @@ extern int PlayerUID;
 #define ATTR_DARK		5	/* "Dark" color translation */
 #define ATTR_HIGH		6	/* "Highlight" color translation */
 #define ATTR_METAL		7	/* "Metallic" color translation */
+#define ATTR_MISC		8	/* "Miscellaneous" color translation - see misc_to_attr */
 
 /* Strongly consider the following for accessibility reasons */
-#define ATTR_COLOR_RG	8	/* Red/green colorblind users */
-#define ATTR_CONTRAST	9	/* High contrast colors */
+#define ATTR_COLOR_RG	9	/* Red/green colorblind users */
+#define ATTR_CONTRAST	10	/* High contrast colors */
 
-#define MAX_ATTR		8
+#define MAX_ATTR		9
 
 /*** Message constants ***/
 

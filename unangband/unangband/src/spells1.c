@@ -1183,26 +1183,29 @@ static u16b bolt_pict(int y, int x, int ny, int nx, int typ)
 	char c;
 
 	/* No motion (*) */
-	if ((ny == y) && (nx == x)) base = 0x30;
+	if ((ny == y) && (nx == x)) base = 0x00;
 
 	/* Vertical (|) */
-	else if (nx == x) base = 0x40;
+	else if (nx == x) base = 0x20;
 
 	/* Horizontal (-) */
-	else if (ny == y) base = 0x50;
+	else if (ny == y) base = 0x40;
 
 	/* Diagonal (/) */
 	else if ((ny-y) == (x-nx)) base = 0x60;
 
 	/* Diagonal (\) */
-	else if ((ny-y) == (nx-x)) base = 0x70;
+	else if ((ny-y) == (nx-x)) base = 0x80;
 
 	/* Weird (*) */
-	else base = 0x30;
+	else base = 0x00;
 
 	/* Basic spell color */
 	k = spell_color(typ);
 
+	/* Reduce to allowed colour range for spell bolts/balls - see e.g. font-xxx.prf */
+	k = get_color(k, ATTR_MISC, 1);
+	
 	/* Obtain attr/char */
 	a = misc_to_attr[base+k];
 	c = misc_to_char[base+k];
