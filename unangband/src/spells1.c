@@ -9569,6 +9569,13 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+		case GF_CONF_WEAK:
+		{
+			dam = 0;
+
+			/* Fall through */
+		}
+
 		/* Pure confusion */
 		case GF_CONFUSION:
 		{
