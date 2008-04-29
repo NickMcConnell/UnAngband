@@ -145,9 +145,7 @@ L:14:56:0:0:0:0:Elvenking's halls in
 L:25:0:1:155:0:0:the Storage Cellars under
 L:26:56:155:0:1082:0:the Great Hall under
 S:270:271:503:11:12:504:505:0
-D:Dark shapes scuttle in the shadows on the right side of the road through
-D: Mirkwood the Great.  Among odours of decay you sometimes imagine catching a sweet scent
-D: and among echoes of clicking and hissing you can sometimes faintly hear something like a captivating music.
+D: Dark shapes scuttle in the shadows, once on the right, once on the left side of the road through Mirkwood the Great.  Odours of decay assail your nostrils and you hear something clicking or hissing every now and then.  Occasionally, an errant breeze stirs the heavy air and then you imagine catching a subtle, sweet scent or a faint, captivating melody.
 
 N:6:Lake-town
 X:5:7:48:0
