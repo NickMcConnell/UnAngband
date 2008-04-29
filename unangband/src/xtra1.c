@@ -763,9 +763,10 @@ static void init_level_name(void)
     current_long_level_name(level_name_str);
  
     if (p_ptr->depth > 0)
-      sprintf(level_depth_str, " %2d", p_ptr->depth);
+		if (depth_in_feet) sprintf(level_depth_str, " %4d'", 50 * p_ptr->depth);
+		else sprintf(level_depth_str, " %2d", p_ptr->depth);
     else
-      level_depth_str[0] = 0;
+		level_depth_str[0] = 0;
 
     /* Obtain the size */
     (void)Term_get_size(&wid, &h);

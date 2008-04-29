@@ -1982,16 +1982,27 @@ static void dungeon_lore(int oid) {
 	screen_save();
 
 	if (zone == MAX_DUNGEON_ZONES - 1
-	    || t_info[dun].zone[zone+1].level == 0
-	    || t_info[dun].zone[zone+1].level - 1 == t_info[dun].zone[zone].level) {
-	  /* one-level zone */ 
-	  c_prt(TERM_L_BLUE, format("Level %d of %s", t_info[dun].zone[zone].level, str), 0, 0);
+			|| t_info[dun].zone[zone+1].level == 0
+			|| t_info[dun].zone[zone+1].level - 1 == t_info[dun].zone[zone].level) {
+		/* one-level zone */ 
+		if (t_info[dun].zone[zone].level == 0)
+			c_prt(TERM_L_BLUE, str, 0, 0);
+		else if (depth_in_feet)
+			c_prt(TERM_L_BLUE, format("%d feet at %s", 50 * t_info[dun].zone[zone].level, str), 0, 0);
+		else
+			c_prt(TERM_L_BLUE, format("Level %d of %s", t_info[dun].zone[zone].level, str), 0, 0);
 	}
 	else {
-	  c_prt(TERM_L_BLUE, format("Levels %d-%d of %s", 
-				    t_info[dun].zone[zone].level,
-				    t_info[dun].zone[zone+1].level - 1, 
-				    str), 0, 0);
+		if (depth_in_feet)
+			c_prt(TERM_L_BLUE, format("%d-%d feet at %s", 
+					t_info[dun].zone[zone].level * 50,
+					(t_info[dun].zone[zone+1].level - 1) * 50, 
+					str), 0, 0);
+		else
+			c_prt(TERM_L_BLUE, format("Levels %d-%d of %s", 
+					t_info[dun].zone[zone].level,
+					t_info[dun].zone[zone+1].level - 1, 
+					str), 0, 0);
 	}
 
 	Term_gotoxy(0, 1);
@@ -2031,7 +2042,11 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 			c_prt(attr, t_info[dun].name + t_name, row, col);
 		}
 		else {
-			c_prt(attr, format("Level %d of %s", t_info[dun].zone[zone].level,
+			if (depth_in_feet)
+				c_prt(attr, format("%d' in %s", t_info[dun].zone[zone].level * 50,
+									 t_info[dun].name + t_name),  row, col);
+			else
+				c_prt(attr, format("Level %d of %s", t_info[dun].zone[zone].level,
 									 t_info[dun].name + t_name),  row, col);
 		}
 	}
@@ -2048,8 +2063,12 @@ static void display_dungeon_zone(int col, int row, bool cursor, int oid)
 			|| (t_info[dun].attained_depth < t_info[dun].zone[zone+1].level)) 
 		{
 			if (t_info[dun].attained_depth)
-				c_prt(attr, format(" Lev %3d", t_info[dun].attained_depth), 
-						row, 67);
+				if (depth_in_feet)
+					c_prt(attr, format(" %4d'", 50 * t_info[dun].attained_depth), 
+							row, 67);
+				else
+					c_prt(attr, format(" Lev %3d", t_info[dun].attained_depth), 
+							row, 67);
 			else if (zone == 1 
 						|| t_info[dun].zone[zone+1].level == 0)
 				; /* no dungeon nor tower --- no babbling */

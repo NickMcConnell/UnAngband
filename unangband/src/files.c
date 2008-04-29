@@ -1562,7 +1562,7 @@ static void display_player_xtra_info(void)
 		if (p_ptr->depth < 100)
 		{
 			/* express in feet or level */ 	 
-			if (depth_in_feet) strnfmt(buf, sizeof(buf), "%4d ft", p_ptr->depth * 50);
+			if (depth_in_feet) strnfmt(buf, sizeof(buf), "  %4d'", p_ptr->depth * 50);
 			else strnfmt(buf, sizeof(buf), " Lev%3d", p_ptr->depth); 	 
 		}
 		else strnfmt(buf, sizeof(buf), " Absurd");
@@ -1579,7 +1579,7 @@ static void display_player_xtra_info(void)
 		if (p_ptr->max_depth < 100)
 		{
 			/* express in feet or level */ 	 
-			if (depth_in_feet) strnfmt(buf, sizeof(buf), "%4d ft", p_ptr->max_depth * 50); 	 
+			if (depth_in_feet) strnfmt(buf, sizeof(buf), "  %4d'", p_ptr->max_depth * 50); 	 
 			else strnfmt(buf, sizeof(buf), " Lev%3d", p_ptr->max_depth); 	 
 		}
 		else strnfmt(buf, sizeof(buf), " Bottom");
@@ -3945,7 +3945,7 @@ errr file_character(cptr name, bool full)
 							text_out("You reached");
 		
 						/* Express in feet or level*/
-						if (depth_in_feet) text_out(format(" %d foot depth in", t_info[i].attained_depth));
+						if (depth_in_feet) text_out(format(" %d foot depth in", 50 * t_info[i].attained_depth));
 						else text_out(format(" level %d in", t_info[i].attained_depth));
 					}
 				}
@@ -3994,9 +3994,11 @@ errr file_character(cptr name, bool full)
 			if (please_print_depths || min_depth(i) != max_depth(i)) 
 			{
 				if (min_depth(i) == max_depth(i))
-					text_out(format(" (%d).\n",  min_depth(i)));
+					if (depth_in_feet) text_out(format(" (%d').\n", 50 * min_depth(i)));
+					else text_out(format(" (%d).\n",  min_depth(i)));
 				else
-					text_out(format(" (%d-%d).\n",  min_depth(i), max_depth(i)));
+					if (depth_in_feet) text_out(format(" (%d-%d').\n", 50 * min_depth(i), 50 *max_depth(i)));
+					else text_out(format(" (%d-%d).\n",  min_depth(i), max_depth(i)));
 			}
 			else
 				text_out(".\n");
