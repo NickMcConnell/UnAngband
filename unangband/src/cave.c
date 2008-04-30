@@ -5758,6 +5758,10 @@ void cave_set_feat(int y, int x, int feat)
 			/* No longer opening a chest */
 			opening_chest = FALSE;
 
+			/* Mark the origin */
+			i_ptr->origin = ORIGIN_FEAT;
+			i_ptr->origin_depth = p_ptr->depth;
+
 			/* Drop it in the dungeon */
 			drop_near(i_ptr, -1, y, x);
 		}

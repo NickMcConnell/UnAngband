@@ -702,6 +702,7 @@ static void player_outfit(void)
 			/* Prepare the item */
 			object_prep(i_ptr, k_idx);
 			i_ptr->number = (byte)rand_range(e_ptr->number_min, e_ptr->number_max);
+			i_ptr->origin = ORIGIN_BIRTH; 
 
 			/* Modify the charges */
 			if ((e_ptr->charge_min) && (e_ptr->charge_max)) i_ptr->charges = rand_range(e_ptr->charge_min, e_ptr->charge_max);

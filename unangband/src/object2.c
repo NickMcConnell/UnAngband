@@ -2035,6 +2035,43 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr, bool floor)
 	/* Mega Hack -- Blend "usages" */
 	if (o_ptr->usage < j_ptr->usage) o_ptr->usage = j_ptr->usage;
 
+	/* Blend origins */
+	if ((o_ptr->origin != j_ptr->origin) ||
+		(o_ptr->origin_depth != j_ptr->origin_depth) ||
+		(o_ptr->origin_xtra != j_ptr->origin_xtra))
+	{
+		int act = 2;
+
+		if ((o_ptr->origin == ORIGIN_DROP) && (o_ptr->origin == j_ptr->origin))
+		{
+			monster_race *r_ptr = &r_info[o_ptr->origin_xtra];
+			monster_race *s_ptr = &r_info[j_ptr->origin_xtra];
+
+			bool r_uniq = (r_ptr->flags1 & RF1_UNIQUE) ? TRUE : FALSE;
+			bool s_uniq = (s_ptr->flags1 & RF1_UNIQUE) ? TRUE : FALSE;
+
+			if (r_uniq && !s_uniq) act = 0;
+			else if (s_uniq && !r_uniq) act = 1;
+			else act = 2;
+		}
+
+		switch (act)
+		{
+			/* Overwrite with j_ptr */
+			case 1:
+			{
+				o_ptr->origin = j_ptr->origin;
+				o_ptr->origin_depth = j_ptr->origin_depth;
+				o_ptr->origin_xtra = j_ptr->origin_xtra;
+			}
+
+			/* Set as "mixed" */
+			case 2:
+			{
+				o_ptr->origin = ORIGIN_MIXED;
+			}
+		}
+	}
 }
 
 
@@ -5954,6 +5991,10 @@ bool make_feat(object_type *j_ptr, int y, int x)
 	/* This is a 'store' item */
 	j_ptr->ident |= (IDENT_STORE);
 
+	/* Mark the origin */
+	j_ptr->origin = ORIGIN_FEAT;
+	j_ptr->origin_depth = p_ptr->depth;
+	
 	/* Hack -- only apply magic to boring objects */
 	a_m_aux_4(j_ptr, object_level, 0);
 
@@ -6888,6 +6929,9 @@ void acquirement(int y1, int x1, int num, bool great)
 
 		/* Make a good (or great) object (if possible) */
 		if (!make_object(i_ptr, TRUE, great)) continue;
+		
+		i_ptr->origin = ORIGIN_ACQUIRE; 
+		i_ptr->origin_depth = p_ptr->depth; 
 
 		/* Drop the object */
 		drop_near(i_ptr, -1, y1, x1);
@@ -6918,6 +6962,9 @@ void place_object(int y, int x, bool good, bool great)
 	/* Make an object (if possible) */
 	if (make_object(i_ptr, good, great))
 	{
+		i_ptr->origin = ORIGIN_FLOOR; 
+		i_ptr->origin_depth = p_ptr->depth; 
+
 		/* Give it to the floor */
 		if (!floor_carry(y, x, i_ptr))
 		{

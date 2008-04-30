@@ -945,6 +945,10 @@ struct object_type
 
 	s16b name3;   /* Race that dropped this item */
 
+	byte origin;        /* How this item was found */ 
+	byte origin_depth;  /* What depth the item was found at */ 
+	u16b origin_xtra;   /* Extra information about origin */ 
+
 	u32b can_flags1;
 	u32b can_flags2;
 	u32b can_flags3;

@@ -3172,6 +3172,11 @@ bool monster_death(int m_idx)
 		/* Mega-Hack -- Actually create "Grond" */
 		apply_magic(i_ptr, -1, TRUE, TRUE, TRUE);
 
+		/* Mark origin */
+		i_ptr->origin = ORIGIN_DROP; 
+		i_ptr->origin_depth = p_ptr->depth; 
+		i_ptr->origin_xtra = m_ptr->r_idx; 
+
 		/* Drop it in the dungeon */
 		drop_near(i_ptr, -1, y, x);
 
@@ -3187,6 +3192,11 @@ bool monster_death(int m_idx)
 
 		/* Mega-Hack -- Actually create "Morgoth" */
 		apply_magic(i_ptr, -1, TRUE, TRUE, TRUE);
+
+		/* Mark origin */
+		i_ptr->origin = ORIGIN_DROP; 
+		i_ptr->origin_depth = p_ptr->depth; 
+		i_ptr->origin_xtra = m_ptr->r_idx; 
 
 		/* Drop it in the dungeon */
 		drop_near(i_ptr, -1, y, x);
@@ -3458,6 +3468,11 @@ bool monster_death(int m_idx)
 			/* Assume seen XXX XXX XXX */
 			dump_item++;
 		}
+
+		/* Set origin */ 
+		i_ptr->origin = visible ? ORIGIN_DROP : ORIGIN_DROP_UNKNOWN; 
+		i_ptr->origin_depth = p_ptr->depth; 
+		i_ptr->origin_xtra = m_ptr->r_idx; 
 
 		/* Drop it in the dungeon */
 		drop_near(i_ptr, -1, y, x);
