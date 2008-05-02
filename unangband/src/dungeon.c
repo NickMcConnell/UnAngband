@@ -2427,6 +2427,13 @@ static void process_command(void)
 			break;
 		}
 
+		/* Show visible monster list */
+		case '[':
+		{
+			do_cmd_monlist();
+			break;
+		}
+
 
 
 		/*** Help and Such ***/

@@ -503,6 +503,7 @@ extern void do_cmd_locate(void);
 extern void do_cmd_query_symbol(void);
 extern bool ang_sort_comp_hook(vptr u, vptr v, int a, int b);
 extern void ang_sort_swap_hook(vptr u, vptr v, int a, int b);
+extern void do_cmd_monlist(void);
 
 /* cmd4.c */
 extern void do_cmd_redraw(void);

@@ -2384,3 +2384,21 @@ void do_cmd_query_symbol(void)
 	/* Free the "who" array */
 	FREE(who);
 }
+
+
+/*
+ * Display the main-screen monster list.
+ */
+void do_cmd_monlist(void)
+{
+	/* Save the screen and display the list */
+	screen_save();
+	display_monlist();
+
+	/* Wait */
+	anykey();
+
+	/* Return */
+	screen_load();
+}
+

@@ -980,8 +980,9 @@ s16b get_mon_num(int level)
  */
 void display_monlist(void)
 {
-	int idx, n;
-	int line = 0;
+	int idx, n, max;
+	int line = 1;
+	int total_count = 0, disp_count = 0;
 
 	char *m_name;
 	char buf[80];
@@ -991,10 +992,21 @@ void display_monlist(void)
 
 	u16b *race_counts;
 
+	/* Clear the term if in a subwindow, set x otherwise */
+	if (Term != angband_term[0])
+	{
+		clear_from(0);
+		max = Term->hgt - 1;
+	}
+	else
+	{
+		max = Term->hgt - 2;
+	}
+	
 	/* If hallucinating, we can't see any monsters */
 	if (p_ptr->image)
 	{
-		Term_clear();
+		c_prt(TERM_SLATE, "You're too confused to see straight!", 0, 0);
 		return;
 	}
 	
@@ -1011,11 +1023,24 @@ void display_monlist(void)
 
 		/* Bump the count for this race */
 		race_counts[m_ptr->r_idx]++;
+		total_count++;
 	}
 
+	/* Note no visible monsters */
+	if (!total_count)
+	{
+		/* Clear display and print note */
+		c_prt(TERM_SLATE, "You see no monsters.", 0, 0);
+
+		/* Free up memory */
+		FREE(race_counts);
+
+		/* Done */
+		return;
+	}
 
 	/* Iterate over mon_list ( again :-/ ) */
-	for (idx = 1; idx < z_info->m_max; idx++)
+	for (idx = 1; idx < z_info->m_max && (line < max); idx++)
 	{
 		m_ptr = &m_list[idx];
 
@@ -1057,6 +1082,7 @@ void display_monlist(void)
 			Term_putstr(0, line, n, TERM_WHITE, m_name);
 		}
 
+
 		/* Append the "standard" attr/char info */
 		Term_addstr(-1, TERM_WHITE, " ('");
 		Term_addch(r_ptr->d_attr, r_ptr->d_char);
@@ -1088,6 +1114,9 @@ void display_monlist(void)
 		/* Erase the rest of the line */
 		Term_erase(n, line, 255);
 
+		/* Add to monster counter */
+		disp_count += race_counts[m_ptr->r_idx];
+
 		/* Don't display again */
 		race_counts[m_ptr->r_idx] = 0;
 
@@ -1095,15 +1124,20 @@ void display_monlist(void)
 		line++;
 	}
 
+	/* Print "and others" message if we're out of space */
+	if (disp_count != total_count)
+		prt(format("  ...and %d others.", total_count - disp_count), line, 0);
+
+	/* Put a shadow */
+	else
+		prt("", line, 0);
+
+	/* Message */
+	prt(format("You can see %d monster%s:",
+	           total_count, (total_count > 1 ? "s" : "")), 0, 0);
+
 	/* Free the race counters */
 	FREE(race_counts);
-
-	/* Erase the rest of the window */
-	for (idx = line; idx < Term->hgt; idx++)
-	{
-		/* Erase the line */
-		Term_erase(0, idx, 255);
-	}
 }
 
 
