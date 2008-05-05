@@ -4483,27 +4483,26 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			else o_ptr->ident |= (IDENT_BROKEN);
 		}
 
-		/* Hack --- too shallow SPEED item */
-		if (e_ptr->flags1 & (TR1_SPEED)
-			&& p_ptr->depth < 35 + rand_int (20))
-		  { 
-			o_ptr->ident |= (IDENT_BROKEN);
-			o_ptr->ident |= (IDENT_CURSED);
-		  }
-
 		/* Apply bonuses or penalties */
-		if (e_ptr->max_to_h > 0) o_ptr->to_h = randint(e_ptr->max_to_h);
+		if (e_ptr->max_to_h > 0) 
+			o_ptr->to_h = MAX(o_ptr->to_h, randint(e_ptr->max_to_h));
 		else if (e_ptr->max_to_h < 0) o_ptr->to_h -= randint(-e_ptr->max_to_h);
 		
-		if (e_ptr->max_to_d > 0) o_ptr->to_d = randint(e_ptr->max_to_d);
+		if (e_ptr->max_to_d > 0) 
+			o_ptr->to_d = MIN(MAX(o_ptr->to_d, randint(e_ptr->max_to_d)), 
+									(o_ptr->tval == TV_BOW 
+									 ? 15 : o_ptr->dd * o_ptr->ds + 5));
 		else if (e_ptr->max_to_d < 0) o_ptr->to_d -= randint(-e_ptr->max_to_d);
 
-		if (e_ptr->max_to_a > 0) o_ptr->to_a = randint(e_ptr->max_to_a);
+		if (e_ptr->max_to_a > 0) 
+			o_ptr->to_a = MIN(MAX(o_ptr->to_a, randint(e_ptr->max_to_a)),
+									o_ptr->ac + 5);
 		else if (e_ptr->max_to_a < 0) o_ptr->to_a -= randint(-e_ptr->max_to_a);
 
-		if (e_ptr->max_pval > 0) o_ptr->pval = randint(e_ptr->max_pval);
+		if (e_ptr->max_pval > 0) 
+			o_ptr->pval = MAX(1, MIN(o_ptr->pval, randint(e_ptr->max_pval)));
 		else if (e_ptr->max_pval < 0) o_ptr->pval -= randint(-e_ptr->max_pval);
-		
+
 		/* Hack -- ensure negatives for broken or cursed items */
 		if (cursed_p(o_ptr) || broken_p(o_ptr))
 		{
