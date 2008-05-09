@@ -7195,35 +7195,6 @@ void mon_hit_trap(int m_idx, int y, int x)
 				break;
 			}
 
-			case TV_RUNESTONE:
-			{
-				u32b runes = p_ptr->cur_runes;
-
-				int num = 0;
-				s16b book[26];
-
-				/* Hack -- use current rune */
-				p_ptr->cur_runes = (2 << (o_ptr->sval-1));
-
-				/* Fill the book with spells */
-				fill_book(o_ptr,book,&num);
-
-				/* Unhack */
-				p_ptr->cur_runes = runes;
-
-				/* Get a power */
-				power = book[rand_int(num)];
-
-				/* Decrease the item */
-				floor_item_increase(cave_o_idx[y][x], -1);
-				floor_item_optimize(cave_o_idx[y][x]);
-
-				/* Disarm if runs out */
-				if (!cave_o_idx[y][x]) cave_alter_feat(y,x,FS_DISARM);
-
-				break;
-			}
-
 			case TV_SWORD:
 			case TV_POLEARM:
 			case TV_HAFTED:

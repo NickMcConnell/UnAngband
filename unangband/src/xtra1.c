@@ -2277,10 +2277,6 @@ void calc_spells(void)
 			p = "song";
 		break;
 
-		case TV_RUNESTONE:
-			p = "ritual";
-		break;
-
 		default:
 			p="spell";
 		break;
@@ -2825,69 +2821,6 @@ static void calc_mana(void)
 		/* Save it */
 		p_ptr->old_cumber_armor = p_ptr->cumber_armor;
 	}
-}
-
-/*
- * Calculate the players available runes
- *
- * Uses carried runes, runes on ground and seasonal information.
- *
- */
-static void calc_runes(void)
-{
-        int i, ii;
-        int this_o_idx,next_o_idx;
-
-	/* Clear runes */
-	p_ptr->cur_runes = 0;
-
-	/* Check inventory */
-	for (i = 0;i<INVEN_WIELD;i++)
-	{
-		/* Skip empty slots */
-		if (!inventory[i].k_idx) continue;
-
-		/* Check for runes */
-		if (inventory[i].tval == TV_RUNESTONE)
-		{
-			/* Add to available runes */
-			p_ptr->cur_runes |= (2 << (inventory[i].sval-1));
-		}
-
-		/* Check for bags for runes */
-		else if (inventory[i].tval == TV_BAG)
-		{
-			/* Scan the bag */
-			for (ii = 0; ii < INVEN_BAG_TOTAL; ii++)
-			{
-				/* Slot holds a map */
-				if ((bag_holds[inventory[i].sval][ii][0] == TV_RUNESTONE) && (bag_contents[inventory[i].sval][ii]))
-				{
-					int sval = bag_holds[inventory[i].sval][ii][1];
-
-					p_ptr->cur_runes |= (2 << (sval - 1));
-				}
-			}
-		}
-	}
-
-	/* Scan all objects in the grid */
-	for (this_o_idx = cave_o_idx[p_ptr->py][p_ptr->px]; this_o_idx; this_o_idx = next_o_idx)
-	{
-		object_type *o_ptr;
-
-		/* Get the object */
-		o_ptr = &o_list[this_o_idx];
-
-		/* Get the next object */
-		next_o_idx = o_ptr->next_o_idx;
-
-                if (o_ptr->tval == TV_RUNESTONE) p_ptr->cur_runes |= (2 << inventory[i].sval);
-	}
-
-	/* Fun hack -- each rune has 1 day in lunar cycle */
-	p_ptr->cur_runes |= 2 << ((turn / (10L * TOWN_DAWN)) % z_info->y_max);
-
 }
 
 /*
@@ -4392,12 +4325,6 @@ void update_stuff(void)
 	{
 		p_ptr->update &= ~(PU_SPELLS);
 		calc_spells();
-	}
-
-	if (p_ptr->update & (PU_RUNES))
-	{
-		p_ptr->update &= ~(PU_RUNES);
-		calc_runes();
 	}
 
 	/* Character is not ready yet, no screen updates */

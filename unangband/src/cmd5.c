@@ -26,7 +26,7 @@
  *
  * The "prompt" should be "cast", "recite", or "study"
  * The "known" should be TRUE for cast/pray/sing, FALSE for study if
- * a book (eg magic book, prayer book, song book, runestone).
+ * a book (eg magic book, prayer book, song book).
  * For all others, "known" should be TRUE if the player is to be
  * prompted to select an object power, or FALSE if a random power is
  * to be chosen.
@@ -85,11 +85,6 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 			cast = TRUE;
 			break;
 
-		case TV_RUNESTONE:
-			p="pattern";
-			cast = TRUE;
-			break;
-
 		default:
 			p="power";
 			break;
@@ -99,7 +94,7 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 	if ((cast) &&(c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
 		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
 	{
-		msg_print("You cannot read books or runestones.");
+		msg_print("You cannot read books.");
 
 		return(-2);
 
@@ -339,7 +334,6 @@ bool inven_book_okay(const object_type *o_ptr)
 {
 	if ((o_ptr->tval != TV_MAGIC_BOOK) &&
   	  (o_ptr->tval != TV_PRAYER_BOOK) &&
-  	  (o_ptr->tval != TV_RUNESTONE) &&
   	  (o_ptr->tval != TV_SONG_BOOK) &&
 	  (o_ptr->tval != TV_STUDY)) return (0);
 
@@ -349,7 +343,7 @@ bool inven_book_okay(const object_type *o_ptr)
 		return (spell_legible(o_ptr->pval));
 	}
 
-	/* Book / runestone */
+	/* Book */
 	else
 	{
 		s16b book[26];
@@ -385,7 +379,7 @@ void print_fields(const s16b *sn, int num, int y, int x)
 	{
 		/* Dump the spell -- skip 'of ' if required */
 		sprintf(out_val, "  %c) %-75s ",
-			I2A(i), k_name + k_info[sn[i]].name + (k_info[sn[i]].tval == TV_RUNESTONE ? 0 : 3));
+			I2A(i), k_name + k_info[sn[i]].name);
 		c_prt(TERM_WHITE, out_val, y + i, x);
 	}
 
@@ -489,19 +483,14 @@ bool do_cmd_browse_object(object_type *o_ptr)
 			r="Research which field";
 			break;
 
-		case TV_RUNESTONE:
-			p="pattern";
-			r="Engrave which pattern";
-			break;
-
 		default:
 			p="power";
 			r = "";
 			break;
 	}
 
-	/* Study materials -- Browse spells in a book related to the current spell for magic books and runestones only */
-	if ((o_ptr->tval == TV_STUDY) && ((o_ptr->sval == TV_MAGIC_BOOK) || (o_ptr->sval == TV_RUNESTONE)))
+	/* Study materials -- Browse spells in a book related to the current spell for magic books only */
+	if ((o_ptr->tval == TV_STUDY) && ((o_ptr->sval == TV_MAGIC_BOOK)))
 	{
 		s16b field[MAX_SPELL_APPEARS];
 
@@ -702,7 +691,7 @@ void do_cmd_browse(void)
 	if ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
 		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
 	{
-		msg_print("You cannot read books or runestones.");
+		msg_print("You cannot read books.");
 
 		return;
 	}
@@ -734,8 +723,8 @@ void do_cmd_browse(void)
 	item_tester_hook = inven_book_okay;
 
 	/* Get an item */
-	q = "Browse which book or runestone? ";
-	s = "You have no books or runestones that you can read.";
+	q = "Browse which book? ";
+	s = "You have no books that you can read.";
 	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 
 	/* Get the item (in the pack) */
@@ -832,7 +821,7 @@ void do_cmd_study(void)
 	if ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
 		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
 	{
-		msg_print("You cannot read books or runestones.");
+		msg_print("You cannot read books.");
 
 		return;
 	}
@@ -877,8 +866,8 @@ void do_cmd_study(void)
 	item_tester_hook = inven_book_okay;
 
 	/* Get an item */
-	q = "Study which book or runestone? ";
-	s = "You have no books or runestones that you can read.";
+	q = "Study which book? ";
+	s = "You have no books that you can read.";
 	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 
 	/* Get the item (in the pack) */
@@ -936,12 +925,6 @@ void do_cmd_study(void)
 		case TV_MAGIC_BOOK:
 			p="spell";
 			r="Research which field";
-			break;
-
-		case TV_RUNESTONE:
-			p="pattern";
-			r="Engrave which pattern";
-			u=" combination of runes";
 			break;
 
 		default:
@@ -1077,8 +1060,8 @@ void do_cmd_study(void)
 		spell = graft;
 	}
 
-	/* Magic book / runestone -- Learn a selected spell */
-	else if ((o_ptr->tval == TV_MAGIC_BOOK) || (o_ptr->tval == TV_RUNESTONE))
+	/* Magic book -- Learn a selected spell */
+	else if (o_ptr->tval == TV_MAGIC_BOOK)
 	{
 		/* Ask for a spell, allow cancel */
 		if (!get_spell(&spell, "study", o_ptr, FALSE) && (spell == -1)) return;
@@ -1183,9 +1166,9 @@ bool inven_cast_okay(const object_type *o_ptr)
 
 	if ((o_ptr->tval != TV_MAGIC_BOOK) &&
 	    (o_ptr->tval != TV_PRAYER_BOOK) &&
-	    (o_ptr->tval != TV_RUNESTONE) &&
-  	  (o_ptr->tval != TV_SONG_BOOK) &&
-	  (o_ptr->tval != TV_STUDY)) return (0);
+		 (o_ptr->tval != TV_SONG_BOOK) &&
+		 (o_ptr->tval != TV_STUDY)) 
+		return (0);
 
 	/* Research materials */
 	if (o_ptr->tval == TV_STUDY)
@@ -1196,14 +1179,14 @@ bool inven_cast_okay(const object_type *o_ptr)
 		}
 	}
 
-	/* Book / runestone */
+	/* Book */
 	else for (i=0;i<PY_MAX_SPELLS;i++)
 	{
 		if (p_ptr->spell_order[i] == 0) continue;
 
 		s_ptr=&s_info[p_ptr->spell_order[i]];
 
-		/* Book / runestone */
+		/* Book */
 		for (ii=0;ii<MAX_SPELL_APPEARS;ii++)
 		{
 			if ((s_ptr->appears[ii].tval == o_ptr->tval) &&
@@ -1497,7 +1480,7 @@ void do_cmd_cast(void)
 	if ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL)
 		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
 	{
-		msg_print("You cannot read books or runestones.");
+		msg_print("You cannot read books.");
 		return;
 	}
 
@@ -1527,7 +1510,7 @@ void do_cmd_cast(void)
 	item_tester_hook = inven_cast_okay;
 
 	/* Get an item */
-	q = "Use which book or runestone? ";
+	q = "Use which book? ";
 	s = "You have nothing you have studied!";
 	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR | USE_FEATU))) return;
 
@@ -1576,17 +1559,9 @@ void do_cmd_cast(void)
 			
 			break;
 		}
-		case TV_RUNESTONE:
-		{
-			p="draw";
-			t="pattern";
-			u=" combination of runes";
-			
-			break;
-		}
 		case TV_PRAYER_BOOK:
 		{
-       			p="recite";
+			p="recite";
 			t="prayer";
 			
 			break;

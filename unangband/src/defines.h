@@ -2903,7 +2903,6 @@
 #define PU_HP			0x00000010L	/* Calculate chp and mhp */
 #define PU_MANA			0x00000020L	/* Calculate csp and msp */
 #define PU_SPELLS		0x00000040L	/* Calculate spells */
-#define PU_RUNES		0x00000080L 	/* Calculate runes */
 /* xxx (many) */
 #define PU_FORGET_VIEW	0x00010000L	/* Forget field of view */
 #define PU_UPDATE_VIEW	0x00020000L	/* Update field of view */

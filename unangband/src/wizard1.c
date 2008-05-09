@@ -256,7 +256,7 @@ static void kind_info(char *buf, int buf_s, char *dam, int dam_s, char *wgt, int
 		}
 
 		if ((count) && ((i_ptr->tval == TV_MAGIC_BOOK) || (i_ptr->tval == TV_PRAYER_BOOK) 
-			|| (i_ptr->tval == TV_SONG_BOOK) || (i_ptr->tval == TV_RUNESTONE)))
+			|| (i_ptr->tval == TV_SONG_BOOK)))
 		{
                         sprintf(pow," %d spells",count);
 		}
@@ -1662,7 +1662,6 @@ static void spoil_magic_info(cptr fname)
 	int old_pstyle = p_ptr->pstyle;
 	int old_psval = p_ptr->psval;
 	const player_class *old_cp_ptr = cp_ptr;
-	int old_cur_runes = p_ptr->cur_runes;
 	
 	int t, s, i, j, k, l;
 
@@ -1699,18 +1698,14 @@ static void spoil_magic_info(cptr fname)
 	/* Header */
 	fprintf(fff, "Spoiler File -- Spell Casting (%s)\n\n\n", VERSION_STRING);
 
-	/* Hack -- mess with runestones */
-	p_ptr->cur_runes = 0;
-	
 	/* Check relevent tvals */
-	for (t = TV_MAGIC_BOOK; t < TV_RUNESTONE; t++)
+	for (t = TV_MAGIC_BOOK; t <= TV_SONG_BOOK; t++)
 	{
 		switch (t)
 		{
 			case TV_MAGIC_BOOK:	spoiler_underline("Magic Books", '='); break;
 			case TV_PRAYER_BOOK:	spoiler_underline("Prayer Books", '='); break;
 			case TV_SONG_BOOK:	spoiler_underline("Song Books", '='); break;
-			case TV_RUNESTONE:	spoiler_underline("Runestones", '='); break;		
 		}
 		
 		fprintf(fff, "\n");
@@ -1740,13 +1735,6 @@ static void spoil_magic_info(cptr fname)
 			
 			/* Nothing found */
 			if (!k_idx) continue;
-			
-			/* Hack -- mess with runes, to allow all spells to be displayed */
-			if (t == TV_RUNESTONE)
-			{
-				if (p_ptr->cur_runes == (0x0000FFFFL)) p_ptr->cur_runes = (0xFFFF0000L);
-				else p_ptr->cur_runes = (0x0000FFFFL);
-			}
 
 			/* Prepare the book */
 			object_prep(o_ptr, k_idx);
@@ -1761,7 +1749,7 @@ static void spoil_magic_info(cptr fname)
 			fill_book(o_ptr,book,&num);
 			
 			/* No casters cast from this yet -- except specialist */
-			casters_n = (t == TV_RUNESTONE ? 0 : 1);
+			casters_n = 1;
 			
 			/* Hack -- null caster for specialist */
 			if (casters_n) casters[0] = 0;
@@ -1785,7 +1773,7 @@ static void spoil_magic_info(cptr fname)
 					/* Not cast by anyone */
 					if (!s_ptr->cast[j].class) continue;
 					
-					for (k = (TV_RUNESTONE ? 0 : 1); k < casters_n; k++)
+					for (k = 1; k < casters_n; k++)
 					{
 						/* Already have it */
 						if (casters[k] == s_ptr->cast[j].class) done = TRUE;
@@ -1953,13 +1941,6 @@ static void spoil_magic_info(cptr fname)
 				
 				fprintf(fff, "\n\n");				
 			}
-			
-
-			/* Hack -- mess with runes, to allow all spells to be displayed */
-			if (t == TV_RUNESTONE)
-			{
-				if (p_ptr->cur_runes == (0x0000FFFFL)) s--;
-			}
 		}
 
 		fprintf(fff, "\n\n");
@@ -1970,7 +1951,6 @@ static void spoil_magic_info(cptr fname)
 	p_ptr->pstyle = old_pstyle;
 	p_ptr->psval = old_psval;
 	cp_ptr = old_cp_ptr;
-	p_ptr->cur_runes = old_cur_runes;
 
 	/* Check for errors */
 	if (ferror(fff) || my_fclose(fff))

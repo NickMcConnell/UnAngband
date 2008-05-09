@@ -5364,7 +5364,7 @@ errr parse_s_info(char *buf, header *head)
 	else if (buf[0] == 'A')
 	{
 		int tval,sval,slot;
-		
+
 		bool collision = FALSE;
 		bool last_slot = 0;
 		int j, k;
@@ -5381,6 +5381,10 @@ errr parse_s_info(char *buf, header *head)
 		/* Scan for the values */
 		if (3 != sscanf(buf+2, "%d:%d:%d",&tval,&sval,&slot)) return (PARSE_ERROR_GENERIC);		
 
+		/* Hack to remove in the future: ignore runestones from older versions */
+		if (tval == TV_RUNESTONE)
+			return 0;
+
 #ifdef ALLOW_TEMPLATES_OUTPUT
 		/* Debug: check if objects tval, sval exist, 
 			except shapechanges and WIP books;
@@ -5390,7 +5394,7 @@ errr parse_s_info(char *buf, header *head)
 #endif /* ALLOW_TEMPLATES_OUTPUT */
 
 		/* Hack -- check for next free slot in book */
-		if (tval != TV_RUNESTONE) for (j = 0; j < error_idx; j++)
+		for (j = 0; j < error_idx; j++)
 		{
 			/* Point at the "info" */
 			spell_type *s2_ptr = (spell_type*)head->info_ptr + j;
@@ -5412,12 +5416,8 @@ errr parse_s_info(char *buf, header *head)
 		}
 		
 		/* If collision, get the next slot */
-		if /*(collision) */ (tval != TV_RUNESTONE)
-		{
-			/*return (PARSE_ERROR_GENERIC);*/
-
-			slot = last_slot + 1;
-		}
+		/* return (PARSE_ERROR_GENERIC); */
+		slot = last_slot + 1;
 
 		/* Extract the info */
 		s_ptr->appears[i].tval = tval;
@@ -5811,79 +5811,6 @@ errr parse_y_info(char *buf, header *head)
 
 		/* Parse this entry */
 		if (0 != grab_one_rune_flag(y_ptr, t, i)) return (PARSE_ERROR_INVALID_FLAG);
-	}
-
-
-	/* Process 'B' for "Blows" (up to four lines) */
-	else if (buf[0] == 'B')
-	{
-		int n1, n2;
-
-		/* There better be a current y_ptr */
-		if (!y_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* Find the next empty blow slot (if any) */
-		for (i = 0; i < 4; i++) if (!y_ptr->blow[i].method) break;
-
-		/* Oops, no more slots */
-		if (i == 4) return (PARSE_ERROR_GENERIC);
-
-		/* Analyze the first field */
-		for (s = t = buf+2; *t && (*t != ':'); t++) /* loop */;
-
-		/* Terminate the field (if necessary) */
-		if (*t == ':') *t++ = '\0';
-
-		/* Analyze the method */
-		for (n1 = 0; r_info_blow_method[n1]; n1++)
-		{
-			if (streq(s, r_info_blow_method[n1])) break;
-		}
-
-		/* Invalid method */
-		if (!r_info_blow_method[n1]) return (PARSE_ERROR_GENERIC);
-
-
-		/* Analyze the second field */
-		for (s = t; *t && (*t != ':'); t++) /* loop */;
-
-		/* Terminate the field (if necessary) */
-		if (*t == ':') *t++ = '\0';
-
-		/* Analyze effect */
-		for (n2 = 0; r_info_blow_effect[n2]; n2++)
-		{
-			if (streq(s, r_info_blow_effect[n2])) break;
-		}
-
-		/* Invalid effect */
-		if (!r_info_blow_effect[n2]) return (PARSE_ERROR_GENERIC);
-
-		/* Analyze the third field */
-		for (s = t; *t && (*t != 'd'); t++) /* loop */;
-
-		/* Terminate the field (if necessary) */
-		if (*t == 'd') *t++ = '\0';
-
-		/* Save the method */
-		y_ptr->blow[i].method = n1;
-
-		/* Save the effect */
-		y_ptr->blow[i].effect = n2;
-
-		/* Extract the damage dice */
-		y_ptr->blow[i].d_dice = atoi(s);
-
-		/* Analyze the fourth field */
-		for (s = t; *t && (*t != '+'); t++) /* loop */;
-
-		/* Terminate the field (if necessary) */
-		if (*t == 'd') *t++ = '\0';
-
-		/* Extract the damage sides and plus */
-		y_ptr->blow[i].d_side = atoi(s);
-		y_ptr->blow[i].d_plus = atoi(t);
-
 	}
 	/* Process 'D' for "Description" */
 	else if (buf[0] == 'D')

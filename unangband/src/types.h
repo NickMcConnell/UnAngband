@@ -1397,8 +1397,6 @@ struct rune_type
 
 	byte count[MAX_RUNE_FLAGS];
 	byte flag[MAX_RUNE_FLAGS];
-
-	spell_blow blow[4];
 };
 
 
@@ -1765,7 +1763,6 @@ struct player_type
 	s16b tiring;    /* Current rate of tiring */
 
 	u32b cur_style; /* Current weapon style(s)*/
-	u32b cur_runes; /* Current runes */
 
 	s32b last_disturb;	/* Last time disturbed */
 

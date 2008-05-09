@@ -812,9 +812,6 @@ static void process_world(void)
 
 			/* Illuminate */
 			town_illuminate(dawn);
-
-			/* Update runes */
-			p_ptr->update |= (PU_RUNES);
 		}
 	}
 
@@ -3263,7 +3260,7 @@ static void dungeon(void)
 	Term_clear();
 
 	/* Update stuff */
-	p_ptr->update |= (PU_BONUS | PU_HP | PU_MANA | PU_SPELLS | PU_RUNES);
+	p_ptr->update |= (PU_BONUS | PU_HP | PU_MANA | PU_SPELLS);
 
 	/* Calculate torch radius */
 	p_ptr->update |= (PU_TORCH);

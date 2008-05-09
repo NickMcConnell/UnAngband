@@ -2309,7 +2309,7 @@ static void player_swap(const int y1, const int x1, const int y2, const int x2)
 	p_ptr->update |= (PU_UPDATE_VIEW | PU_DISTANCE);
 
 	/* Update the bonuses -- due to mud etc */
-	p_ptr->update |= (PU_BONUS | PU_RUNES); 
+	p_ptr->update |= (PU_BONUS); 
 
 	/* Window stuff */
 	p_ptr->window |= (PW_OVERHEAD);

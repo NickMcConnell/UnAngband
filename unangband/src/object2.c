@@ -6816,9 +6816,6 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 		{
 			msg_print("You feel something roll beneath your feet.");
 		}
-
-		/* Recalculate runes */
-		p_ptr->update |= (PU_RUNES);
 	}
 }
 
@@ -7993,9 +7990,6 @@ void inven_item_optimize(int item)
 		/* Hack -- wipe hole */
 		(void)WIPE(&inventory[i], object_type);
 
-		/* Recalculate runes */
-		p_ptr->update |= (PU_RUNES);
-
 		/* Redraw stuff */
 		p_ptr->redraw |= (PR_ITEM_LIST);
 
@@ -8023,7 +8017,7 @@ void inven_item_optimize(int item)
 		p_ptr->update |= (PU_TORCH);
 
 		/* Recalculate mana XXX */
-		p_ptr->update |= (PU_MANA | PU_RUNES);
+		p_ptr->update |= (PU_MANA);
 
 		/* Window stuff */
 		p_ptr->window |= (PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
@@ -8392,7 +8386,7 @@ s16b inven_carry(object_type *o_ptr)
 	p_ptr->inven_cnt++;
 
 	/* Recalculate bonuses */
-	p_ptr->update |= (PU_BONUS | PU_RUNES);
+	p_ptr->update |= (PU_BONUS);
 
 	/* Combine and Reorder pack */
 	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -9027,8 +9021,7 @@ bool spell_match_style(int spell)
 
 
 /*
- * Fills a book with spells (in order). Note hack for runestones
- * in order to fit them all in is to use book as a hashtable.
+ * Fills a book with spells (in order).
  */
 void fill_book(const object_type *o_ptr, s16b *book, int *num)
 {
@@ -9061,40 +9054,12 @@ void fill_book(const object_type *o_ptr, s16b *book, int *num)
 		{
 			int tval = s_ptr->appears[ii].tval;
 			int sval = s_ptr->appears[ii].sval;
-			int slot = s_ptr->appears[ii].slot;
 
 			if ((tval == o_ptr->tval) &&
 				(sval == o_ptr->sval))
 			{
-				if (o_ptr->tval == TV_RUNESTONE)
-				{
-					if (p_ptr->cur_runes & (2 << (slot-1)))
-					{
-						/* Use book as hash table */
-						slot = (slot - 1) % (INVEN_PACK - 1);
-
-						/* Free entry in book */
-						if (book[slot] == 0)
-						{
-							book[slot] = i;
-						}
-
-						/* Collision -- minimise impact by going from end of table */
-						else
-						{
-							for (slot = INVEN_PACK - 2; (slot >=0) && book[slot]; slot--) ;
-
-							if ((slot >= 0) && (!book[slot])) book[slot] = i;
-						}
-
-						if ((*num) < slot + 1) (*num) = slot + 1;
-					}
-				}
-				else
-				{
-					book[s_ptr->appears[ii].slot-1] = i;
-					(*num)++;
-				}
+				book[s_ptr->appears[ii].slot-1] = i;
+				(*num)++;
 			}
 		}
 	}

@@ -2774,30 +2774,24 @@ static void display_player_misc_info(void)
 	{
 		int t, u;
 
-	        switch (p_ptr->pstyle)
+		switch (p_ptr->pstyle)
 		{
-			case WS_MAGIC_BOOK:
-                        	t = TV_MAGIC_BOOK;
-                        	break;
+		case WS_MAGIC_BOOK:
+			t = TV_MAGIC_BOOK;
+			break;
 
-                	case WS_PRAYER_BOOK:
-                        	t = TV_PRAYER_BOOK;
-                        	break;
+		case WS_PRAYER_BOOK:
+			t = TV_PRAYER_BOOK;
+			break;
 
-                	case WS_SONG_BOOK:
-                        	t = TV_SONG_BOOK;
-                        	break;
-
-			default:
-				t = TV_RUNESTONE;
-				break;
+		case WS_SONG_BOOK:
+			t = TV_SONG_BOOK;
+			break;
 		}
 
 		u = lookup_kind(t, p_ptr->psval);
-
 		p = k_name + k_info[u].name + 3;
-
-        }
+	}
 	else
 		p = w_name_style[p_ptr->pstyle];
 

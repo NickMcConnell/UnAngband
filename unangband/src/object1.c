@@ -4746,7 +4746,7 @@ bool get_item_from_bag(int *cp, cptr pmt, cptr str, object_type *o_ptr)
 	*cp = i;
 
 	/* Recalculate bonuses */
-	p_ptr->update |= (PU_BONUS | PU_RUNES);
+	p_ptr->update |= (PU_BONUS);
 
 	/* Combine and Reorder pack */
 	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
