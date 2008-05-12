@@ -188,7 +188,7 @@ D:  Please report the bug and collect your reward from the abandoned store.
 # Campaign starting dungeon.
 
 N:1:Hobbiton
-X:5:4:0:0
+X:4:5:0:0
 Z:2:2
 G:h
 L:0:0:411:155:0:0:the town of
@@ -199,7 +199,7 @@ D: then to Bree.  Press < to travel from any town, or when near the edge of
 D: the larger wilderness locations.
 
 N:2:Hobbiton, in ruins
-X:12:7:0:0
+X:7:12:0:0
 Q:3:532
 Z:3:3
 G:g
@@ -266,7 +266,7 @@ L:0:0:420:408:0:0:Bucklebury town in
 S:8:9:10:11:12:13:268:778
 
 N:8:Old Forest
-X:10:7:0:0
+X:7:10:0:0
 R:PLANT
 Q:9:622
 L:6:0:420:153:622:0:a clearing in the
@@ -331,7 +331,7 @@ L:17:56:0:153:215:0:the
 # No guardian at the top, but worth exploring due to treasure at the top
 
 N:15:Weathertop
-X:16:10:14:0
+X:10:14:16:0
 W:449:28
 Y:449:28
 L:17:420:56:49:0:31:the hill of
@@ -340,7 +340,7 @@ L:30:0:407:0:0:31:the crown of
 S:954:0:0:0:0:0:0:0
 
 N:16:Ford to Rivendell
-X:17:15:13:0
+X:13:15:17:0
 W:453:28
 L:8:420:154:126:0:0:the
 D:River Bruinen runs here swiftly over its rocky bed.
@@ -349,7 +349,7 @@ D: the river is under the rule of the Lord of Rivendell.
 D:  The hidden valley of Rivendell is not yet visible from here.
 
 N:17:Rivendell
-X:18:16:46:29
+X:16:18:29:46
 L:0:0:420:155:0:0:the stronghold of
 S:267:9:10:11:519:13:268:513
 D:This is the Last Homely House on the Edge of the Wild,
@@ -398,7 +398,7 @@ S:503:12:515:956:512:0:0:0
 D:Wolves are howling around.  Woodmen keep hidden inside their fenced village on the western edge of Mirkwood.
 
 N:21:Mirkwood the Great
-X:19:22:20:0
+X:19:20:22:0
 G:l
 R:CAN_CLIMB
 L:13:420:56:153:637:0:a road through
@@ -488,7 +488,7 @@ D: rebuild their kingdom using the wealth, your share is here for taking.
 # Goes upwards
 
 N:28:Dol Guldur
-X:34:35:22:0
+X:22:34:35:0
 G:q
 R:EVIL
 L:36:420:56:420:474:44
@@ -506,7 +506,7 @@ D: since its waking.
 # No dungeon, part of the one-time free pass east around Misty Mountains.
 
 N:29:Dunland
-X:17:39:31:0
+X:17:31:39:0
 Z:30:28
 G:t
 L:9:419:149:422:0:0
@@ -531,7 +531,7 @@ D:  Whence they came?  It does not matter to the men of Dunland, long years wait
 # not recycling 1365, because he drops nothing and summons
 
 N:31:Isengard
-X:34:37:29:0
+X:29:34:37:0
 R:MAGE
 G:B
 Z:32:35
@@ -545,7 +545,7 @@ D: yet a member...
 # Goes upwards
 
 N:32:Isengard, war-ready
-X:35:37:38:29
+X:29:35:37:38
 Q:51:532
 Z:33:38
 L:21:420:141:141:514:31
@@ -562,7 +562,7 @@ D: you open the easier path to Minas Tirith.
 # Goes upwards
 
 N:33:emptied Isengard
-X:35:29:0:0
+X:29:35:0:0
 Q:51:532
 L:30:420:397:141:514:31
 L:31:56:0:0:0:31
@@ -572,7 +572,7 @@ D:Almost all of the Saruman's army went for Hornburg.  What are the tidings?
 # We warn about crossing to Dol Guldur
 
 N:34:Fangorn Forest
-X:31:28:0:0
+X:28:31:0:0
 Q:35:1313
 Z:35:35
 G::
@@ -585,7 +585,7 @@ D: but in Dol Guldur, wise people say, Death itself has made home
 D: among the twisted trees...
 
 N:35:Fangorn, aflame
-X:32:28:0:0
+X:28:32:0:0
 Q:36:249
 Z:36:36
 G:o
@@ -598,7 +598,7 @@ D: and, to the east, the even darker shape amongst the darkness: Dol Guldur.
 D:  Now it is clear that the lust for power corrupted Saruman beyond help.
 
 N:36:the Ent Moot
-X:33:28:0:0
+X:28:33:0:0
 Q:48:483
 L:21:0:420:153:1313:0
 R:PLANT
@@ -644,7 +644,7 @@ D: do not flee into the mountains!  They are haunted and even
 D: maps will not let you find your way back.
 
 N:39:west Moria entrance
-X:46:29:0:0
+X:29:46:0:0
 Z:40:27
 Q:43:262
 L:6:49:397:56:0:0
@@ -658,7 +658,7 @@ D: elves.  The ancient doors now stand ajar, but the mines behind them are home 
 # Smeagol recycled from Misty Mountains
 
 N:40:west gates of Moria
-X:46:29:0:0
+X:29:46:0:0
 W:52:27
 L:33:49:397:56:0:0:the
 L:34:56:393:0:0:0
@@ -736,7 +736,7 @@ D:Drums. Drums. Drums in the deep.
 # TODO: recycle 297
 
 N:46:Redhorn pass
-X:39:17:0:0
+X:17:39:0:0
 R:GIANT
 G:o
 Z:47:24
@@ -755,7 +755,7 @@ D: and they won't let you pass while their leader stands.
 # Guardian purposefully more powerful than 50 (verify!)
 
 N:47:Caradhras
-X:39:17:0:0
+X:17:39:0:0
 R:GIANT
 G:C
 Q:48:1272
@@ -773,7 +773,7 @@ D: nobody knows where you'll end.
 D:  Turn back, while you can!
 
 N:48:Lothlorien
-X:49:34:43:0
+X:34:43:49:0
 G:l
 L:0:0:420:420:0:0
 S:270:503:11:12:13:504:510:0
@@ -783,7 +783,7 @@ D:  Galadriel awaits you with gifts at her mirror.
 # No guardian at the bottom, TODO: find an exciting reason to explore
 
 N:49:Parth Galen
-X:57:48:0:0
+X:48:57:0:0
 L:20:420:155:56:0:0
 L:21:56:0:0:0:0
 L:40:56:0:0:0:0
@@ -808,7 +808,7 @@ D: stone while you search this lifeless place.
 # Goes upwards
 
 N:51:Minas Tirith
-X:31:54:52:0
+X:31:52:54:0
 G:t
 R:MAGE
 Q:53:1085
@@ -883,7 +883,7 @@ L:55:56:218:218:0:0
 L:58:56:218:218:545:0
 
 N:60:Isenmouthe
-X:61:59:0:0
+X:59:61:0:0
 R:EVIL
 L:55:407:218:208:511:0
 

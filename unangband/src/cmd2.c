@@ -493,7 +493,7 @@ int set_routes(s16b *routes, int max_num, int from)
 	dungeon_zone *zone1 = &t_ptr->zone[0];
 	dungeon_zone *zone2 = &t_ptr->zone[0];
 
-	int i, ii, num = 0;
+	int i, ii, max, num = 0;
 
 	/* Get the top of the dungeon */
 	get_zone(&zone1,from,min_depth(from));
@@ -603,7 +603,7 @@ int set_routes(s16b *routes, int max_num, int from)
 	}
 #endif
 
-	/* One final scan and remove duplicate routes and routes looping back to start */
+	/* Scan and remove duplicate routes and routes looping back to start */
 	for (i = 0; i < num; i++)
 	{
 		if (routes[i] == from) routes[i] = routes[--num];
@@ -615,6 +615,23 @@ int set_routes(s16b *routes, int max_num, int from)
 				routes[ii] = routes[--num];
 			}
 		}
+	}
+
+	/* Sort the routes in order */
+	for(i = 0; i < num; i++)
+	{
+		max = i;
+		for(int ii = i; ii < num; ii++)
+		{
+			if(routes[max] > routes[ii])
+			{
+				max = ii;
+			}
+		}
+		
+		s16b temp = routes[max];
+		routes[max] = routes[i];
+		routes[i] = temp;
 	}
 
 	/* Return number of routes */
