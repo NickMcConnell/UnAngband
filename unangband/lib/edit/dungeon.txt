@@ -472,7 +472,7 @@ L:30:414:56:153:235:0:the Battle of
 D:Five great armies have gathered at the promise of Smaug's riches hidden
 D: in the Lonely Mountain.
 
-# This is evidently the dwarven version of the story. ;)
+# The one below is evidently the dwarven version of the story. ;)
 
 N:27:vaults of Erebor
 X:24:0:0:0
@@ -486,6 +486,8 @@ D:  Treasures spill from the vaults long hidden inside.  While the dwarves
 D: rebuild their kingdom using the wealth, your share is here for taking.
 
 # Goes upwards
+# The only (one-time) free pass to the other side of the Misty Mountains,
+# but to avoid visiting dungeons you have to stir evil at Dol Guldur
 
 N:28:Dol Guldur
 X:22:34:35:0
@@ -496,12 +498,6 @@ L:37:56:0:0:0:44
 L:48:56:0:0:645:44
 D:You have disturbed a terrible evil here... much has gone wrong with the land
 D: since its waking.
-
-# The door to Moria can only by found with a map. 
-# This is the western door, actually; not that it matters. 
-# If we find the map before the west gate is closed, we assume the map actually helps in getting to N:60, as opposed to the normal N:14 dungeon one gets without the map. So, avoid mention of the door cracking open in the description below...
-# TODO: make the features a little more interesting: the 1:56 do not seem
-# to do anything, just flat empty space
 
 # No dungeon, part of the one-time free pass east around Misty Mountains.
 
@@ -523,12 +519,10 @@ L:37:414:141:140:407:0
 D:Dunland is brewing for war, rallied by dark emissaries, who so far laboured in secret.
 D:  Whence they came?  It does not matter to the men of Dunland, long years waiting for a chance at revenge.
 
-# The only (one-time) free pass to the other side of the Misty Mountains,
-# but to avoid visiting dungeons you have to stir evil at Dol Guldur
 # Goes upwards
-# shallow (but very high) tower to enable revenge to players
-# nearly killed and chased off embarrassingly at Weathertop
-# not recycling 1365, because he drops nothing and summons
+# A shallow (but very high) tower to enable players to avenge their shame,
+# when they were nearly killed and chased off embarrassingly at Weathertop.
+# Not recycling 1365, because he drops nothing and he summons.
 
 N:31:Isengard
 X:29:34:37:0
@@ -557,9 +551,9 @@ D:  If you conquer Isengard,
 D: darkened by the clouds of Saruman's machinations,
 D: you open the easier path to Minas Tirith.
 
+# Goes upwards
 # the emptiness is represented by the dungeon being shallower and by some water
 # This description is good that short, isn't it?
-# Goes upwards
 
 N:33:emptied Isengard
 X:29:35:0:0
@@ -670,6 +664,12 @@ D: old friend from the Battle of Five Armies, and you begin to worry.
 D:  While you search in vain for an entrance, something
 D: deadly stirs in the water outside.
 
+# The door to Moria can only by found with a map. 
+# This is the western door, actually; not that it matters. 
+# If we find the map before the west gate is closed, we assume the map actually helps in getting to N:60, as opposed to the normal N:14 dungeon one gets without the map. So, avoid mention of the door cracking open in the description below...
+# TODO: make the features a little more interesting: the 1:56 do not seem
+# to do anything, just flat empty space
+
 N:41:the door to Moria
 X:39:42:0:0
 G:E
@@ -704,7 +704,6 @@ L:24:56:0:0:262:0
 D:The old dwarven doors to Moria are broken open and only foul air and darkness welcome those who come inside.  Broken stairs and archways make the way difficult but, coming into Moria from east, from the Wild, you expect deadlier perils soon.
 
 # The gates of Moria after they are closed by Balin
-
 # No dungeon here, nor passage west
 # 262 recycled from east Moria entrance, but only till Khazad-Dum entered
 
@@ -847,8 +846,8 @@ L:42:407:56:397:492:46
 L:43:56:0:397:0:46
 L:57:56:0:0:535:46
 
-# Note that we need a map to travel from Minas Morgul to Cirith Ungol now.
 # Goes upwards
+# Note that we need a map to travel from Minas Morgul to Cirith Ungol now.
 
 N:56:Cirith Ungol
 X:55:0:0:0
