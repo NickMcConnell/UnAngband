@@ -3988,10 +3988,7 @@ static bool summon_specific_okay(int r_idx)
 
 	bool okay = FALSE;
 
-	/* Hack -- no specific type specified */
-	if (!summon_specific_type) return (TRUE);
-	
-	/* Hack -- try to minimise chain summoning */
+	/* Hack -- try to minimise chain summoning if monsters summon monsters */
 	if (summoner)
 	{
 		/* Hack -- never summon itself */
@@ -4003,11 +4000,16 @@ static bool summon_specific_okay(int r_idx)
 		 * 
 		 * Note that we relax this if the monster is capable of getting larger/more powerful etc.
 		 */	
-		if ((summon_strict) && (r_info[summoner].level <= r_info[r_idx].level)
-				&& (((r_info[summoner].flags9 & (RF9_LEVEL_MASK)) == 0) ||
-				(r_info[summoner].level + 15 <= r_info[r_idx].level))) return (FALSE);
+		if ((summon_strict) 
+			 && (r_info[summoner].level <= r_info[r_idx].level)
+			 && (((r_info[summoner].flags9 & (RF9_LEVEL_MASK)) == 0) ||
+				  (r_info[summoner].level + 15 <= r_info[r_idx].level))) 
+			return (FALSE);
 	}
 
+	/* Hack -- no specific type specified */
+	if (!summon_specific_type) return (TRUE);
+	
 	/* Check our requirements */
 	switch (summon_specific_type)
 	{
@@ -5098,7 +5100,8 @@ bool summon_specific(int y1, int x1, int restrict_race, int lev, int type, bool 
 		/* XXX Needed to allow the following test to be true */
 		summoner = 0;
 		
-		if (summon_specific_okay(restrict_race)) summon_strict = TRUE;
+		if (summon_specific_okay(restrict_race)) 
+			summon_strict = TRUE;
 	}
 
 	/* Restrict race as appropriate */
