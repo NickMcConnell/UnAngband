@@ -10554,7 +10554,28 @@ D:A vast, bloated arachnid, master of its brood: among the more terrible
 D: of Ungoliant's descendants, this is a monster such as those who haunted
 D: the dread valley of Nan Dungortheb long ago.
 
-#$# 604 - Unused ###
+#For Dunland in war rage --- modify
+N:604:the Death knight from the Mountains
+G:t:D
+I:120:60d10:20:100:10
+W:46:4:0:1400
+M:0:20:30:63
+B:HIT:WOUND:6d6
+B:HIT:WOUND:5d5
+B:HIT:WOUND:5d5
+F:UNIQUE | FORCE_MAXHP | FORCE_SLEEP | ONLY_ITEM | DROP_1D2 | DROP_1D3 |
+F:SMART | COLD_BLOOD | OPEN_DOOR | BASH_DOOR | WARRIOR | PRIEST |
+F:UNDEAD | EVIL | NONLIVING | IM_FIRE | RES_NETHR |
+F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_HAND |
+F:HAS_ARM | HAS_LEG | HAS_BLOOD | DROP_TOOL | DROP_WEAPON | DROP_MUSIC |
+F:DROP_CLOTHES | DROP_LITE | DROP_JEWELRY | DROP_POTION | DROP_FOOD |
+F:RES_DARK | NEUTRAL | MAN | LEVEL_POWER |
+S:BOLT_NETHR |
+S:TELE_SELF_TO | WOUND | BLESS | SCARE | BLIND |
+S:S_MONSTERS |
+D:It is a humanoid figure dressed in armour of an ancient form.  From
+D: beneath its helmet, eyes glow a baleful red and seem to pierce you like
+D: lances of fire.
 
 N:605:Bat of Gorgoroth
 G:b:G
@@ -23217,4 +23238,3 @@ D:Among all the wolves you have fought so far, this one stands head and
 D: shoulders above its kin.  Its fetid breath cloys the air, choking you
 D: in terror, and your spells seem to slide off its coat as if it was
 D: somehow magically protected.
-

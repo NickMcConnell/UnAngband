@@ -513,9 +513,9 @@ L:9:419:149:422:0:0
 N:30:Dunland in war rage
 X:17:39:0:0
 G:t
-Q:31:407
+Q:31:604
 L:22:419:149:422:0:0
-L:37:414:141:140:407:0
+L:37:414:141:140:604:0
 D:Dunland is brewing for war, rallied by dark emissaries, who so far laboured in secret.
 D:  Whence they came?  It does not matter to the men of Dunland, long years waiting for a chance at revenge.
 
@@ -854,7 +854,7 @@ X:55:0:0:0
 Q:62:530
 L:42:56:141:141:530:11
 L:43:56:1:0:0:11
-L:48:56:1:0:604:11
+L:48:56:1:0:641:11
 
 # TODO: find anything to do here, e.g. guardian that opens the way forth
 

@@ -12562,29 +12562,32 @@ D:A vast, bloated arachnid, master of its brood: among the more terrible
 D: of Ungoliant's descendants, this is a monster such as those who haunted
 D: the dread valley of Nan Dungortheb long ago.
 
-N:604:the Silent Watcher of Cirith Ungol
-G:g:m
+#For Dunland in war rage --- modify
+N:604:the Death knight from the Mountains
+G:t:D
+#$ Clear available
 #$ Multihued available
-#$ Metallics available:drgbuPRGpvtmYiTVIMZ
-#$ Colors available:dwbPpvtTVIMzZ
-I:110:1680:42:80:10
-W:26:4:0:390
-M:18:18:20:91
-B:GAZE:PETRIFY
-B:GAZE:TERRIFY
-B:GAZE:HALLU
-B:SHRIEK:LOSE_STR
-F:UNIQUE | FORCE_MAXHP | NEVER_MOVE |
-F:COLD_BLOOD | EMPTY_MIND |
-F:EVIL | NONLIVING | HURT_ROCK | IM_ELEC | IM_FIRE | IM_COLD | IM_POIS |
-F:NO_FEAR | NO_CONF | NO_SLEEP |
-F:HAS_CORPSE | HAS_HEAD | HAS_HAND | HAS_ARM | HAS_LEG |
-F:LEVEL_POWER |
-S:BLOW_1 | BLOW_2 | BLOW_3 | BLOW_4 |
-S:DRAIN_MANA | MIND_BLAST | PROBE | CONF | HOLD |
-S:S_MONSTER |
-D:A figure carved from stone, with three vulture faces whose eyes glow
-D: with a malevolent light.
+#$ Metallics available:dwsrguWPRGBUtmMZ
+#$ Colors available:d
+I:120:480:20:100:10
+W:38:4:0:1700
+M:0:20:30:63
+B:HIT:WOUND:6d6
+B:HIT:WOUND:5d5
+B:HIT:WOUND:5d5
+F:UNIQUE | FORCE_MAXHP | FORCE_SLEEP | ONLY_ITEM | DROP_1D2 | DROP_1D3 |
+F:SMART | COLD_BLOOD | OPEN_DOOR | BASH_DOOR | WARRIOR | PRIEST |
+F:UNDEAD | EVIL | NONLIVING | IM_FIRE | RES_NETHR |
+F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_HAND |
+F:HAS_ARM | HAS_LEG | HAS_BLOOD | DROP_TOOL | DROP_WEAPON | DROP_MUSIC |
+F:DROP_CLOTHES | DROP_LITE | DROP_JEWELRY | DROP_POTION | DROP_FOOD |
+F:RES_DARK | NEUTRAL | MAN | LEVEL_POWER |
+S:BOLT_NETHR |
+S:TELE_SELF_TO | WOUND | BLESS | SCARE | BLIND |
+S:S_MONSTERS |
+D:It is a humanoid figure dressed in armour of an ancient form.  From
+D: beneath its helmet, eyes glow a baleful red and seem to pierce you like
+D: lances of fire.
 
 N:605:Bat of Gorgoroth
 G:b:G
@@ -13478,7 +13481,7 @@ G:g:i
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
 #$ Colors available:dwbPpvtTVIMzZ
 I:120:5548:42:40:10
-W:36:10:0:32000
+W:46:10:0:32000
 M:18:18:60:120
 B:GAZE:TERRIFY:5d8
 B:GAZE:PARALYZE:5d8
@@ -27910,4 +27913,3 @@ S:BLIND |
 S:S_HI_DEMON |
 D:Sauron's form as a giant lidless flaming eye, surrounded by lightning,
 D: endless searching for you.
-

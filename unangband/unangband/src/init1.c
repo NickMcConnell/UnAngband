@@ -5940,6 +5940,11 @@ static errr grab_one_town_race_flag(town_type *t_ptr, cptr what)
 	return (PARSE_ERROR_GENERIC);
 }
 
+static bool monster_not_unique(int monster_id)
+{
+	return monster_id && !(r_info[monster_id].name 
+								  && r_info[monster_id].flags1 & RF1_UNIQUE);
+}
 
 /*
  * Initialize the "t_info" array, by parsing an ascii "template" file
@@ -6053,7 +6058,11 @@ errr parse_t_info(char *buf, header *head)
 		if (!t_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (2 != sscanf(buf+2, "%d:%d", &quest_opens, &quest_monster)) return (PARSE_ERROR_GENERIC);
+		if (2 != sscanf(buf+2, "%d:%d", &quest_opens, &quest_monster)) 
+			return (PARSE_ERROR_GENERIC);
+
+		if (monster_not_unique(quest_monster))
+			return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		t_ptr->quest_opens = quest_opens;
@@ -6071,6 +6080,9 @@ errr parse_t_info(char *buf, header *head)
 		/* Scan for the values */
 		if (2 != sscanf(buf+2, "%d:%d", &town_lockup_monster, &town_lockup_ifvisited)) return (PARSE_ERROR_GENERIC);
 
+		if (monster_not_unique(town_lockup_monster))
+			return (PARSE_ERROR_GENERIC);
+
 		/* Save the values */
 		t_ptr->town_lockup_monster = town_lockup_monster;
 		t_ptr->town_lockup_ifvisited = town_lockup_ifvisited;
@@ -6086,6 +6098,9 @@ errr parse_t_info(char *buf, header *head)
 
 		/* Scan for the values */
 		if (2 != sscanf(buf+2, "%d:%d", &replace_guardian, &guardian_ifvisited)) return (PARSE_ERROR_GENERIC);
+
+		if (monster_not_unique(replace_guardian))
+			return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		t_ptr->replace_guardian = replace_guardian;
@@ -6144,7 +6159,10 @@ errr parse_t_info(char *buf, header *head)
 		  if (!(name = add_name(head, s+1)))
 		    return (PARSE_ERROR_OUT_OF_MEMORY);
 		}
-		
+
+		if (monster_not_unique(guard))
+			return (PARSE_ERROR_GENERIC);
+
 		/* Save the values */
 		t_ptr->zone[zone].name = name;
 		t_ptr->zone[zone].level = level;
@@ -6204,8 +6222,6 @@ errr parse_t_info(char *buf, header *head)
 	/* Success */
 	return (0);
 }
-
-
 
 /*
  * Initialize the "u_info" array, by parsing an ascii "template" file
