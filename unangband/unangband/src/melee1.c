@@ -2733,6 +2733,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_XBOLT: mon_shot(who, what, y, x, effect, dam, hit, result); break;
 				case RBM_SPIKE: mon_shot(who, what, y, x, effect, dam, hit, result); break;
 				case RBM_DART: mon_shot(who, what, y, x, effect, dam, hit, result); break;
+				case RBM_DAGGER: mon_shot(who, what, y, x, effect, dam, hit, result); break;
 				case RBM_SHOT: mon_shot(who, what, y, x, effect, dam, hit, result); break;
 				case RBM_ARC_20: mon_arc(who, what, y, x, effect, dam, 0, (powerful ? 40 : 20), result); break;
 				case RBM_ARC_30: mon_arc(who, what, y, x, effect, dam, 0, (powerful ? 50 : 30), result); break;
@@ -2744,7 +2745,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_8WAY_II: mon_8way(who, what, y, x, effect, dam, 3, result); break;
 				case RBM_8WAY_III: mon_8way(who, what, y, x, effect, dam, 4, result); break;
 				case RBM_SWARM: for (k = 0; k < (rlev / 20) + 2; k++) mon_ball_minor(who, what, y, x, effect, dam, 2, TRUE, result); break;
-				case RBM_DAGGER: mon_shot(who, what, y, x, effect, dam, hit, result); break;
 				case RBM_SCATTER: for (k = 0; k < (rlev / 10) + 3; k++) { scatter(&y, &x, m_ptr->fy, m_ptr->fx, 5, 0); (void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0); } break;
 				default: mon_beam(who, what, y, x, effect, dam, 2, result); /* For all hurt huge attacks */
 			}
