@@ -620,8 +620,9 @@ int set_routes(s16b *routes, int max_num, int from)
 	/* Sort the routes in order */
 	for(i = 0; i < num; i++)
 	{
+		int ii;
 		max = i;
-		for(int ii = i; ii < num; ii++)
+		for(ii = i; ii < num; ii++)
 		{
 			if(routes[max] > routes[ii])
 			{
