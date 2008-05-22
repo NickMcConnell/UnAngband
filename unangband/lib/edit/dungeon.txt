@@ -306,12 +306,12 @@ L:4:56:0:0:620:0:the dump outside
 S:8:9:10:11:12:13:268:775
 D:Life goes as usual in Bree.  Men and hobbits trade peacefully together,
 D: despite the strange men recently coming from the south.
-D:  Regrettably, some hobbits can't help feeling not so absolutely safe
-D: in the lowest outskirts of the town,
-D: where the southerners tend to hang around the sewer exit and,
-D: as some boys claim, even disappear in the main sewer tunnel occasionally.
-D:  If you, per chance, would like to investigate the town sewers,
-D: press '>' when standing on the entrance '>'.
+D:  Regrettably, hobbits from the outskirts of the town
+D: can't help feeling unsafe since the southerners
+D: started gathering by the sewer exit at the edge of Chetwood Forest and,
+D: as some boys claim, even disappearing in the main sewer tunnel occasionally.
+D:  The well leading down to the town sewers is marked with '>'
+D: and can be descended by pressing '>' when standing over the grates.
 
 N:13:Trollshaws Forest
 X:12:16:0:0
