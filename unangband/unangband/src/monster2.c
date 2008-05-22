@@ -3988,22 +3988,16 @@ static bool summon_specific_okay(int r_idx)
 
 	bool okay = FALSE;
 
-	/* Hack -- try to minimise chain summoning if monsters summon monsters */
-	if (summoner)
+	/* Hack -- try to minimise annoyance if monsters summon monsters */
+	if (summoner && summon_strict)
 	{
-		/* Hack -- never summon itself */
-		if (summoner == r_idx) return (FALSE);
-
-		/* Hack -- do we strictly enforce lower level summons?
-		 * 
-		 * This prevents 'circular' chain summoning
-		 * 
-		 * Note that we relax this if the monster is capable of getting larger/more powerful etc.
+		/* This prevents 'circular' chain summoning
 		 */	
-		if ((summon_strict) 
-			 && (r_info[summoner].level <= r_info[r_idx].level)
-			 && (((r_info[summoner].flags9 & (RF9_LEVEL_MASK)) == 0) ||
-				  (r_info[summoner].level + 15 <= r_info[r_idx].level))) 
+		if (r_info[summoner].level <= r_info[r_idx].level)
+			return (FALSE);
+
+		/* Never summon breeders: they are out of control too quickly */
+		if (r_info[r_idx].flags2 & RF2_MULTIPLY)
 			return (FALSE);
 	}
 
