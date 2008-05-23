@@ -7630,9 +7630,10 @@ static long eval_max_dam(monster_race *r_ptr)
 				/* Some ranged blows can miss */
 				switch(method)
 				{
-					case RBM_SPIT:	mana = 0; must_hit = TRUE; break;
+					case RBM_SPIT:	mana = 0; range = 3; must_hit = TRUE; break;
 					case RBM_GAZE:	mana = 3; range = MIN(MAX_SIGHT, r_ptr->aaf);break;
 					case RBM_WAIL:  mana = 5; range = 4; break;
+				   case RBM_HOWL:  mana = 2; range = 2; break;
 					case RBM_SPORE:	mana = 0; range = 3; must_hit = TRUE; has_ammo = r_ptr->level; break;
 					case RBM_LASH:  mana = 0; range = 3; break;
 					case RBM_BEG:	mana = 0; range = 4; break;
@@ -7641,43 +7642,55 @@ static long eval_max_dam(monster_race *r_ptr)
 					case RBM_TRAP:  mana = 0; range = 1; break;
 					case RBM_BOULDER: mana = 0; range = 8; must_hit = TRUE; has_ammo = (r_ptr->level + 1) / 2; break;
 					case RBM_AURA:	mana = 4; range = 2; break;
+			      case RBM_AURA_MINOR:	mana = 3; range = 1; break;
 					case RBM_SELF:	mana = 3; range = 0; break;
 					case RBM_ADJACENT: mana = 3; range = 1; break;
-					case RBM_HANDS: mana = 4; range = 3; break;
-					case RBM_MISSILE: mana = 2; range = MAX_SIGHT; break;
-					case RBM_BOLT_10: mana = 5; range = MAX_SIGHT; break;
-					case RBM_BOLT: mana = 4; range = MAX_SIGHT; break;
+					case RBM_HANDS: mana = 2; range = 3; break;
+					case RBM_MISSILE: mana = 2; range = MAX_RANGE; break;
+				   case RBM_BOLT_MINOR: mana = 2; range = 4; break;
+					case RBM_BOLT_10: mana = 5; range = MAX_RANGE; break;
+					case RBM_BOLT: mana = 4; range = MAX_RANGE; break;
 					case RBM_BEAM: mana = 6; range = 10; break;
-					case RBM_BLAST: mana = 3; range = 5; break;
-					case RBM_WALL: mana = 6; range = MAX_SIGHT; break;
-					case RBM_BALL: mana = 4; range = MAX_SIGHT; break;
-					case RBM_BALL_II: mana = 5; range = MAX_SIGHT; break;
-					case RBM_BALL_III: mana = 6; range = MAX_SIGHT; break;
-					case RBM_CLOUD: mana = 5; range = MAX_SIGHT; break;
-					case RBM_STORM: mana = 6; range = MAX_SIGHT; break;
+					case RBM_BLAST: mana = 3; range = 1; break;
+					case RBM_WALL: mana = 6; range = MAX_RANGE; break;
+			      case RBM_BALL_MINOR: mana = 3; range = MAX_RANGE; break;
+					case RBM_BALL: mana = 4; range = MAX_RANGE; break;
+					case RBM_BALL_II: mana = 5; range = MAX_RANGE; break;
+					case RBM_BALL_III: mana = 6; range = MAX_RANGE; break;
+					case RBM_CLOUD: mana = 5; range = MAX_RANGE; break;
+					case RBM_STORM: mana = 6; range = MAX_RANGE; break;
 					case RBM_BREATH: mana = 0; range = 6; break;
 					case RBM_AREA: mana = 3; range = (r_ptr->level / 10) + 1; break;
 					case RBM_AIM_AREA: mana = 5; range = MAX_SIGHT; break;
 					case RBM_LOS: mana = 6; range = MAX_SIGHT; break;
-					case RBM_LINE: mana = 4; range = MAX_SIGHT; break;
+					case RBM_LINE: mana = 4; range = MAX_RANGE; break;
 					case RBM_AIM: mana = 4; range = MAX_SIGHT; break;
-					case RBM_ORB: mana = 5; range = MAX_SIGHT; break;
-					case RBM_STAR: mana = 5; range = MAX_SIGHT; break;
-					case RBM_SPHERE: mana = 6; range = MAX_SIGHT; break;
+					case RBM_ORB: mana = 5; range = MAX_RANGE; break;
+					case RBM_STAR: mana = 5; range = MAX_RANGE; break;
+					case RBM_SPHERE: mana = 6; range = MAX_RANGE; break;
 					case RBM_PANEL: mana = 6; range = MAX_SIGHT; break;
 					case RBM_LEVEL: mana = 8; range = 255; break;
-					case RBM_CROSS: mana = 4; range = MAX_SIGHT; break;
-					case RBM_STRIKE: mana = 5; range = MAX_SIGHT; break;
+					case RBM_CROSS: mana = 4; range = MAX_RANGE; break;
+					case RBM_STRIKE: mana = 5; range = MAX_RANGE; break;
 					case RBM_EXPLODE: mana = 0; range = 1; break;
 					case RBM_ARROW: mana = 0; range = 10; must_hit = TRUE; has_ammo = r_ptr->level; break;
 					case RBM_XBOLT: mana = 0; range = 12; must_hit = TRUE; has_ammo = r_ptr->level; break;
 					case RBM_SPIKE: mana = 0; range = 4; must_hit = TRUE; has_ammo = r_ptr->level; break;
-					case RBM_DART: mana = 0; range = 8; must_hit = TRUE; has_ammo = r_ptr->level; break;
+					case RBM_DART: mana = 0; range = 6; must_hit = TRUE; has_ammo = r_ptr->level; break;
 					case RBM_DAGGER: mana = 0; range = 6; must_hit = TRUE; has_ammo = r_ptr->level; break;
 					case RBM_SHOT: mana = 0; range = 8; must_hit = TRUE; break;
 					case RBM_ARC_20: mana = 6; range = 8; break;
 					case RBM_ARC_30: mana = 5; range = 6; break;
+				   case RBM_ARC_40: mana = 5; range = 6; break;
+				   case RBM_ARC_50: mana = 6; range = 6; break;
+				   case RBM_ARC_60: mana = 6; range = 6; break;
 					case RBM_FLASK:	mana = 0; range = 6; must_hit = TRUE; has_ammo = (r_ptr->level + 1) / 2; break;
+				   case RBM_8WAY: mana = 4; range = MAX_RANGE; break;
+				   case RBM_8WAY_II: mana = 5; range = MAX_RANGE; break;
+				   case RBM_8WAY_III: mana = 6; range = MAX_RANGE; break;
+				   case RBM_SWARM: mana = 6; range = MAX_RANGE; break;
+				   case RBM_SCATTER:  mana = 1; range = MAX_SIGHT; break; /* TODO: repair, no clue what to do here */
+				   default: mana = 0; range = 2; break; /* Everything we've forgotten */
 				}
 
 				/* Archers get more shots */

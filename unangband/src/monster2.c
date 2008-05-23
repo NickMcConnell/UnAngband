@@ -4019,26 +4019,25 @@ static bool summon_specific_okay(int r_idx)
 
 	bool okay = FALSE;
 
+	/* Hack -- try to minimise annoyance if monsters summon monsters */
+	if (summoner && summon_strict)
+	{
+		/* For flavour never summon itself, even if leveled */
+		if (summoner == r_idx) return (FALSE);
+
+		/* This prevents 'circular' chain summoning
+		 */	
+		if (r_info[summoner].level <= r_info[r_idx].level)
+			return (FALSE);
+
+		/* Never summon breeders: they are out of control too quickly */
+		if (r_info[r_idx].flags2 & RF2_MULTIPLY)
+			return (FALSE);
+	}
+
 	/* Hack -- no specific type specified */
 	if (!summon_specific_type) return (TRUE);
 	
-	/* Hack -- try to minimise chain summoning */
-	if (summoner)
-	{
-		/* Hack -- never summon itself */
-		if (summoner == r_idx) return (FALSE);
-
-		/* Hack -- do we strictly enforce lower level summons?
-		 * 
-		 * This prevents 'circular' chain summoning
-		 * 
-		 * Note that we relax this if the monster is capable of getting larger/more powerful etc.
-		 */	
-		if ((summon_strict) && (r_info[summoner].level <= r_info[r_idx].level)
-				&& (((r_info[summoner].flags9 & (RF9_LEVEL_MASK)) == 0) ||
-				(r_info[summoner].level + 15 <= r_info[r_idx].level))) return (FALSE);
-	}
-
 	/* Check our requirements */
 	switch (summon_specific_type)
 	{
@@ -5135,7 +5134,8 @@ bool summon_specific(int y1, int x1, int restrict_race, int lev, int type, bool 
 		/* XXX Needed to allow the following test to be true */
 		summoner = 0;
 		
-		if (summon_specific_okay(restrict_race)) summon_strict = TRUE;
+		if (summon_specific_okay(restrict_race)) 
+			summon_strict = TRUE;
 	}
 
 	/* Restrict race as appropriate */

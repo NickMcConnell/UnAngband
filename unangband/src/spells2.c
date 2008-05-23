@@ -4211,7 +4211,7 @@ bool mass_banishment(int who, int what, int y, int x)
 	/* Banishment affects player */
 	if (who > SOURCE_PLAYER_START)
 	{
-		if (distance(y, x, p_ptr->py, p_ptr->px) < MAX_SIGHT)
+		if (distance(y, x, p_ptr->py, p_ptr->px) <= MAX_SIGHT)
 		{
 			msg_print("You are banished.");
 			p_ptr->leaving = TRUE;
