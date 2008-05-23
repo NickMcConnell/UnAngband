@@ -3992,7 +3992,11 @@ static bool summon_specific_okay(int r_idx)
 	if (summoner && summon_strict)
 	{
 		/* This prevents 'circular' chain summoning */	
-		if (r_info[summoner].level <= r_info[r_idx].level)
+		if ((r_info[r_idx].flags4 & (RF4_SUMMON_MASK) ||
+			  r_info[r_idx].flags5 & (RF5_SUMMON_MASK) ||
+			  r_info[r_idx].flags6 & (RF6_SUMMON_MASK) ||
+			  r_info[r_idx].flags7 & (RF7_SUMMON_MASK))
+			 && r_info[summoner].level <= r_info[r_idx].level)
 			return (FALSE);
 	}
 

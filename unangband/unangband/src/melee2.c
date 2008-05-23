@@ -1573,10 +1573,10 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 					  (m_ptr->mflag & (MFLAG_AGGR) 
 						&& !(r_ptr->flags2 & (RF2_STUPID)))) 
 				 &&
-				 ((r_ptr->flags4 & (rf4_ball_mask | RF4_SUMMON_MASK)) ||
-				  (r_ptr->flags5 & (RF5_BALL_MASK | RF5_SUMMON_MASK)) ||
-				  (r_ptr->flags6 & (RF6_BALL_MASK | RF6_SUMMON_MASK)) ||
-				  (r_ptr->flags7 & (RF7_BALL_MASK | RF7_SUMMON_MASK))))
+				 (f4 & (rf4_ball_mask | RF4_SUMMON_MASK) ||
+				  f5 & (RF5_BALL_MASK | RF5_SUMMON_MASK) ||
+				  f6 & (RF6_BALL_MASK | RF6_SUMMON_MASK) ||
+				  f7 & (RF7_BALL_MASK | RF7_SUMMON_MASK)))
 			{
 				int alt_y, alt_x, alt_path, best_y, best_x, best_path;
 
@@ -1821,8 +1821,8 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	/* Check terrain for purposes of summoning spells */
 	spaces = summon_possible(m_ptr->fy, m_ptr->fx);
 
-	if (spaces > 10) want_summon=3;
-	else if (spaces > 3) want_summon=2;
+	if (spaces > 10) want_summon=5;
+	else if (spaces > 3) want_summon=3;
 	else if (spaces > 0) want_summon=1;
 	else /*no spaces to summon*/
 	{
