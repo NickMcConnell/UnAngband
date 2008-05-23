@@ -1249,6 +1249,8 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 
 	byte spell_range;
 
+	int dist;
+
 	bool do_random = FALSE;
 
 	bool require_los = TRUE;
@@ -1384,6 +1386,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	/*default: target the player*/
 	*tar_y = p_ptr->py;
 	*tar_x = p_ptr->px;
+	dist = distance(m_ptr->fy, m_ptr->fx, *tar_y, *tar_x);
 	
 	/*
 	 * Is monster an ally, or fighting an ally of the player?
@@ -1397,11 +1400,11 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		bool ally = ((m_ptr->mflag & (MFLAG_ALLY)) != 0);
 		bool aggressive = ((m_ptr->mflag & (MFLAG_AGGR)) != 0) ;
 		bool need_lite = ((r_ptr->flags2 & (RF2_NEED_LITE)) == 0);
-		bool sneaking = p_ptr->sneaking || m_ptr->cdis > MAX_SIGHT;
+		bool sneaking = p_ptr->sneaking || dist > MAX_SIGHT;
 
 		/* Note we scale this up, and use a pseudo-random hack to try to get multiple monsters
 		 * to favour different equi-distant enemies */
-		int k = (ally ? MAX_SIGHT : m_ptr->cdis) * 16 + 15;
+		int k = (ally ? MAX_SIGHT : dist) * 16 + 15;
 
 		/* Note the player can set target_near in the targetting routine to force allies to consider
 		 * targets closest to another monster or a point, as opposed to themselves. */
@@ -1532,6 +1535,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 				{
 					*tar_y = n_ptr->fy;
 					*tar_x = n_ptr->fx;
+					dist = distance(m_ptr->fy, m_ptr->fx, *tar_y, *tar_x);
 					
 					target_m_idx = i;
 					
@@ -1541,7 +1545,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		}
 	}
 
-	/* No valid target */
+	/* No valid target (only possible if an idle ally) */
 	if (!target_m_idx)
 	{		
 		f4 &= (rf4_no_player_mask | RF4_SUMMON_MASK);
@@ -1564,7 +1568,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 
 			/* Are we in range and additionally smart or annoyed but not stupid?
 				Have we got access to ball spells or summon spells? */
-			if ((m_ptr->cdis <= MAX_RANGE + 1) 
+			if (dist <= MAX_RANGE + 1
 				 && (r_ptr->flags2 & (RF2_SMART) ||
 					  (m_ptr->mflag & (MFLAG_AGGR) 
 						&& !(r_ptr->flags2 & (RF2_STUPID)))) 
@@ -1587,7 +1591,8 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 
 					alt_path = projectable(m_ptr->fy, m_ptr->fx, alt_y, alt_x, PROJECT_CHCK);
 
-					if (alt_path == PROJECT_NO) continue;
+					if (alt_path == PROJECT_NO) 
+						continue;
 
 					if (alt_path == PROJECT_NOT_CLEAR)
 					{
@@ -1599,6 +1604,10 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 							continue;
 					}
 
+					/* The spot close to the target is out of range */
+					if (distance(m_ptr->fy, m_ptr->fx, alt_y, alt_x) > MAX_RANGE)
+						continue;
+
 					/*
 				 	 * PROJECT_NOT_CLEAR, or the monster has an
 				 	 * empty square to lob a ball spell at target
@@ -1606,7 +1615,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 					best_y = alt_y;
 					best_x = alt_x;
 					best_path = alt_path;
-					/*we want to keep ball spells*/
+					/* we want to keep ball spells */
 					clear_ball_spell = FALSE;
 
 					if (best_path == PROJECT_CLEAR) break;
@@ -1617,36 +1626,35 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 					/* Set to best target */
 					*tar_y = best_y;
 					*tar_x = best_x;
-				}
-			
-				/* We don't have a reason to try a ball spell
-				   To make summoning less annoying we also assume
-					monster don't waste summons if player 
-					not even reachable by balls*/
-				if (clear_ball_spell)
-				{
-					f4 &= ~(rf4_ball_mask | RF4_SUMMON_MASK);
-					f5 &= ~(RF5_BALL_MASK | RF5_SUMMON_MASK);
-					f6 &= ~(RF6_BALL_MASK | RF6_SUMMON_MASK);
-					f7 &= ~(RF7_BALL_MASK | RF7_SUMMON_MASK);
+					dist = distance(m_ptr->fy, m_ptr->fx, *tar_y, *tar_x);
 				}
 			}
+			
+			if (clear_ball_spell)
+			{
+				/* Flat out 75% chance of not casting any spell at all 
+					if the player is unreachable. In addition, most spells 
+					don't work without a player around. */
+				if (rand_int(4)) return 0;
 
-			/* Flat out 50% chance of not casting if the player is not in sight */
-			/* In addition, most spells don't work without a player around */
-			if (rand_int(2)) return (0);
+				/* We don't have a reason to try a ball spell
+					To make summoning less annoying we also assume
+					monster don't waste summons if player 
+					not even reachable by balls */
+				f4 &= ~(rf4_ball_mask | RF4_SUMMON_MASK);
+				f5 &= ~(RF5_BALL_MASK | RF5_SUMMON_MASK);
+				f6 &= ~(RF6_BALL_MASK | RF6_SUMMON_MASK);
+				f7 &= ~(RF7_BALL_MASK | RF7_SUMMON_MASK);
+			}
 		
 			require_los = FALSE;
 		}
 
-		/* Melee attacks and some others have a hard maximum range */
+		/* We assume all innate attacks have a hard maximum range */
 		for (i = 0; i < 8; i++)
 		{
 			/* Out of range - eliminate spell */
-			if ((target_m_idx > 0 
-				  ? distance(m_ptr->fy, m_ptr->fx, *tar_y, *tar_x)
-				  : m_ptr->cdis) 
-				 > spell_info_RF4[i][COL_SPELL_BEST_RANGE]) 
+			if (dist > spell_info_RF4[i][COL_SPELL_BEST_RANGE]) 
 				f4 &= ~(RF4_BLOW_1 << i);
 		}
 	
@@ -1655,8 +1663,9 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 
 		/* Remove spells the 'no-brainers'*/
 
-		/* Remove all spells that require LOS */
-		if ((!require_los) || (m_ptr->cdis > MAX_RANGE + 1))
+		/* Remove all spells that require LOS
+			Not MAX_RANGE + 1, because we filter out non-ball spells here */
+		if (path == PROJECT_NO || dist > MAX_RANGE)
 		{
 			/* Ball spells and summon spells would have been 
 				filtered out above if not usable */
@@ -1666,7 +1675,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 			f7 &= (RF7_NO_PLAYER_MASK | RF7_BALL_MASK | RF7_SUMMON_MASK);
 		}
 
-		/* Rremove only bolts and archery shots */
+		/* Remove only bolts and archery shots */
 		else if (path == PROJECT_NOT_CLEAR)
 		{
 			f4 &= ~(rf4_bolt_mask);
@@ -1691,17 +1700,16 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 					 ((f7 & (RF7_BALL_MASK)) != 0)))
 			{
 				int rad = (r_ptr->spell_power < 10 ? 2 : (r_ptr->spell_power < 40 ? 3 : (r_ptr->spell_power < 80 ? 4 : 5)));
-				int d = distance(p_ptr->py, p_ptr->py, *tar_y, *tar_x);
 
 				/* Hack -- melee attacks */
-				if (d < 2)
+				if (dist < 2)
 				{
 					f4 &= ~(rf4_ball_mask);
 				}
 				
 				/* Check for spell range */
 				/* TODO: Why not rf4_ball_mask here? Explain. */
-				if (d < rad)
+				if (dist < rad)
 				{
 					f4 &= ~(RF4_BALL_MASK);
 					f5 &= ~(RF5_BALL_MASK);
@@ -1710,7 +1718,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 				}
 
 				/* Hack -- some balls are bigger */
-				else if (d == rad)
+				else if (dist == rad)
 				{
 					f5 &= ~(RF5_BALL_POIS | RF5_BALL_WIND | RF5_BALL_WATER);
 				}
@@ -1808,8 +1816,8 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	if (m_ptr->min_range == FLEE_RANGE) want_escape++;
 
 	/* Desire to keep minimum distance */
-	if (m_ptr->cdis < m_ptr->min_range)
-		want_tactic += (m_ptr->min_range - m_ptr->cdis + 1) / 2;
+	if (dist < m_ptr->min_range)
+		want_tactic += (m_ptr->min_range - dist + 1) / 2;
 	if (want_tactic > 3) want_tactic=3;
 
 	/* Check terrain for purposes of summoning spells */
@@ -1916,7 +1924,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		/* Penalty for range if attack drops off in power */
 		if (spell_range)
 		{
-			cur_range = m_ptr->cdis;
+			cur_range = dist;
 			while (cur_range-- > spell_range)
 				cur_spell_rating = (cur_spell_rating * spell_desire[D_RANGE])/100;
 		}

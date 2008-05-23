@@ -7764,6 +7764,7 @@ static long eval_max_dam(monster_race *r_ptr)
 				   case RBM_8WAY_II: mana = 5; range = MAX_RANGE; break;
 				   case RBM_8WAY_III: mana = 6; range = MAX_RANGE; break;
 				   case RBM_SWARM: mana = 6; range = MAX_RANGE; break;
+				   case RBM_SCATTER:  mana = 1; range = MAX_SIGHT; break; /* TODO: repair, no clue what to do here */
 				   default: mana = 0; range = 2; break; /* Everything we've forgotten */
 				}
 

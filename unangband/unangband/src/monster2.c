@@ -3991,6 +3991,9 @@ static bool summon_specific_okay(int r_idx)
 	/* Hack -- try to minimise annoyance if monsters summon monsters */
 	if (summoner && summon_strict)
 	{
+		/* For flavour never summon itself, even if leveled */
+		if (summoner == r_idx) return (FALSE);
+
 		/* This prevents 'circular' chain summoning
 		 */	
 		if (r_info[summoner].level <= r_info[r_idx].level)
