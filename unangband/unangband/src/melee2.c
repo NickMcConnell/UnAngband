@@ -1692,9 +1692,8 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		if ((m_ptr->mflag & (MFLAG_ALLY)) && (!(r_ptr->flags2 & (RF2_STUPID))))
 		{
 			/* Prevent ball spells if they could hit player */
-			/* TODO: Why not rf4_ball_mask here? Explain. */
 			if ((player_can_fire_bold(*tar_y, *tar_x)) &&
-					(((f4 & (RF4_BALL_MASK)) != 0) ||
+					(((f4 & (rf4_ball_mask)) != 0) ||
 					 ((f5 & (RF5_BALL_MASK)) != 0) ||
 					 ((f6 & (RF6_BALL_MASK)) != 0) ||
 					 ((f7 & (RF7_BALL_MASK)) != 0)))
@@ -1708,10 +1707,9 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 				}
 				
 				/* Check for spell range */
-				/* TODO: Why not rf4_ball_mask here? Explain. */
 				if (dist < rad)
 				{
-					f4 &= ~(RF4_BALL_MASK);
+					f4 &= ~(rf4_ball_mask);
 					f5 &= ~(RF5_BALL_MASK);
 					f6 &= ~(RF6_BALL_MASK);
 					f7 &= ~(RF7_BALL_MASK);

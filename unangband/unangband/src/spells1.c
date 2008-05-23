@@ -1248,6 +1248,7 @@ void take_hit(int who, int what, int dam)
 	if (p_ptr->chp >= p_ptr->mhp / 2
 		 && dam >= p_ptr->chp
 	    && (who == SOURCE_FEATURE
+			  || who == SOURCE_ENTOMB
 			  || who == SOURCE_PLAYER_COATING
 			  || who == SOURCE_PLAYER_EAT_MONSTER
 			  || who == SOURCE_PLAYER_VAMP_DRAIN
