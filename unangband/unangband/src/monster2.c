@@ -3991,16 +3991,8 @@ static bool summon_specific_okay(int r_idx)
 	/* Hack -- try to minimise annoyance if monsters summon monsters */
 	if (summoner && summon_strict)
 	{
-		/* For flavour never summon itself, even if leveled */
-		if (summoner == r_idx) return (FALSE);
-
-		/* This prevents 'circular' chain summoning
-		 */	
+		/* This prevents 'circular' chain summoning */	
 		if (r_info[summoner].level <= r_info[r_idx].level)
-			return (FALSE);
-
-		/* Never summon breeders: they are out of control too quickly */
-		if (r_info[r_idx].flags2 & RF2_MULTIPLY)
 			return (FALSE);
 	}
 
@@ -5088,18 +5080,9 @@ bool summon_specific(int y1, int x1, int restrict_race, int lev, int type, bool 
 	/* Save the "summon" type */
 	summon_specific_type = type;
 
-	/* Don't summon strictly yet */
-	summon_strict = FALSE;
-
-	/* Hack -- prevent 'chain summoning' */
+	/* Prevent 'chain summoning' if the summoner is a monster */
 	if (restrict_race)
-	{
-		/* XXX Needed to allow the following test to be true */
-		summoner = 0;
-		
-		if (summon_specific_okay(restrict_race)) 
-			summon_strict = TRUE;
-	}
+		summon_strict = TRUE;
 
 	/* Restrict race as appropriate */
 	summoner = restrict_race;
