@@ -1403,11 +1403,9 @@ static errr rd_extra(void)
 	/* Skip the flags */
 	strip_bytes(12);
 
-
 	/* Hack -- the two "special seeds" */
 	rd_u32b(&seed_flavor);
 	rd_u32b(&seed_town);
-
 
 	/* Special stuff */
 	rd_u16b(&p_ptr->panic_save);
@@ -2354,7 +2352,7 @@ static errr rd_savefile_new_aux(void)
 
 	if (arg_fiddle) note("Loaded Quests");
 
-	/* Hack -- do the random artifacts now. These will be over-written
+	/* TODO: Hack -- do the random artifacts now. These will be over-written
 	   by the save file data. */
 	do_randart(0x10000000, TRUE);
 
@@ -2484,6 +2482,10 @@ static errr rd_savefile_new_aux(void)
 	{
 		if (rd_randarts()) return (-1);
 		if (arg_fiddle) note("Loaded Random Artifacts");
+
+		/* TODO: Very Ugly Hack -- do the random artifacts again, 
+		   with proper seed, because we do not save name nor power */
+		do_randart(seed_randart, TRUE);
 	}
 
 	/* Important -- Initialize the sex */
