@@ -4919,7 +4919,6 @@ errr do_randart(u32b randart_seed, bool full)
 			if (i == ART_MORGOTH) continue;
 			
 			COPY(a2_ptr,a_ptr,artifact_type);
-			art_high_slot--;
 			if (--art_high_slot < z_info->a_max_standard)
 				break;
 		}
